@@ -119,9 +119,9 @@ do {static struct sigaction action; \
 
 #undef HAVE_XDR
 
-#ifdef IN_UNIXSAVE
-#include <linux/user.h> 
-#endif
+/*  #ifdef IN_UNIXSAVE */
+/*  #include <linux/user.h>  */
+/*  #endif */
 
 #define USE_ULONG_
 
@@ -149,7 +149,7 @@ do { int c = 0; \
 */
 
 
-#define BIG_ENDIAN
+/*  #define BIG_ENDIAN */
 
 #define	PAGSIZ		(NBPG)
 #define	SEGSIZ		(NBPG * CLSIZE)

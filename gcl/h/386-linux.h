@@ -150,9 +150,9 @@ do {static struct sigaction action; \
 
 #undef HAVE_XDR
 
-#ifdef IN_UNIXSAVE
-#include <linux/user.h> 
-#endif
+/*  #ifdef IN_UNIXSAVE */
+/*  #include <linux/user.h>  */
+/*  #endif */
 
 #define USE_ULONG_
 
