@@ -174,4 +174,4 @@ hpbsd-crt0-mod.o:
 
 GCL:=gcl
 clean:
-	rm -f saved_$(SYSTEM)$(EXE) raw_$(SYSTEM)$(EXE) saved_$(GCL)$(EXE) saved_ansi_$(GCL)$(EXE) raw_$(GCL)$(EXE) *.o core a.out $(RSYM) $(LSPDIR)/auto_new.lsp foo *maxima* init_gcl.lsp
+	rm -f saved_$(SYSTEM)$(EXE) raw_$(SYSTEM)$(EXE) saved_$(GCL)$(EXE) saved_ansi_$(GCL)$(EXE) raw_$(GCL)$(EXE) *.o core a.out $(RSYM) $(LSPDIR)/auto_new.lsp foo *maxima* init_gcl.lsp libgcl.a
