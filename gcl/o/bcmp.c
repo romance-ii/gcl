@@ -1,7 +1,7 @@
 #include <stdlib.h>
-int bcmp(const char *s1, const char *s2, size_t n)
+int bcmp(const void *s1, const void *s2, size_t n)
 {     while (n-- > 0)
-	{if (*s1++ != *s2++)
+	{if (*((char *)s1)++ != *((char *)s2)++)
 	 return 1;}
       return 0;
     }
