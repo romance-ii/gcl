@@ -43,7 +43,7 @@ Lvalues_list(void)
 	check_arg(1);
 	list = vs_base[0];
 	vs_top = vs_base;
-	while (!endp(list)) {	
+	while (!endp_prop(list)) {	
 		vs_push(MMcar(list));
 		list = MMcdr(list);
 	}

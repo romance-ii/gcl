@@ -999,7 +999,7 @@ Lreconc() {
 
 	check_arg(2);
 	y = vs_pop;
-	for (x = vs_base[0];  !endp(x);) {
+	for (x = vs_base[0];  !endp_prop(x);) {
 		z = x;
 		x = x->c.c_cdr;
 		z->c.c_cdr = y;
