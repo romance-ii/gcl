@@ -184,7 +184,7 @@ object x;
 int depth;
 {
 
-	return make_fixnum(ihash_equal(x,length));
+	return make_fixnum(ihash_equal(x,depth));
 
 }
 

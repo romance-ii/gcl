@@ -311,8 +311,8 @@ va_dcl
        tail=tail->c.c_cdr;
        i++;}
    END_INTER: END_NO_INTERRUPT;
-  return lis;}}	
   va_end(ap);
+  return lis;}}	
 
 }
 
