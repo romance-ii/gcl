@@ -64,6 +64,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define CHAR_SIZE        8     /* number of bits in a char */
 #endif
 
+#undef bool
 typedef int bool;
 typedef long fixnum;
 typedef float shortfloat;

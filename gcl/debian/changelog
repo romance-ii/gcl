@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-31) unstable; urgency=high
+
+  * #undef bool in object.h for some gcc-3.1 installations
+
+ -- Camm Maguire <camm@enhanced.com>  Tue,  6 Aug 2002 11:02:19 -0400
+
 gcl (2.5.0.cvs20020625-30) unstable; urgency=high
 
   * fix bug in cmpif.lsp and recompile compiler
