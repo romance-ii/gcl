@@ -122,6 +122,8 @@
 #include <math.h>
 #endif
 
+#undef LITTLE_END
+
 /* Define if you have the getcwd function.  */
 #undef HAVE_GETCWD
 
@@ -133,6 +135,9 @@
 
 /* Define if you have the <asm/signal.h> header file.  */
 #undef HAVE_ASM_SIGNAL_H
+
+/* Define if you have the <endian.h> header file.  */
+#undef HAVE_ENDIAN_H
 
 /* Define if you have the <math.h> header file.  */
 #undef HAVE_MATH_H

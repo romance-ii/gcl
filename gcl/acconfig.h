@@ -170,3 +170,4 @@ SGC is enabled.  */
 #include <math.h>
 #endif
 
+#undef LITTLE_END

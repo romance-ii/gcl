@@ -184,7 +184,7 @@ do { int c = 0; \
 */
 
 
-#define LITTLE_END
+/*  #define LITTLE_END */
 
 #define	PAGSIZ		(NBPG)
 #define	SEGSIZ		(NBPG * CLSIZE)
