@@ -844,14 +844,20 @@ char *tmp_alloc;
   (ALLOC_ALIGNED(f,(n)*sizeof(type),sizeof(type)))
 
 
+/* FIXME  Make all other page constants scale similarly by default. */
 #ifndef HOLEPAGE
-#define	HOLEPAGE	128
+/* #define	HOLEPAGE	128 */
+#define	HOLEPAGE	(4*(MAXPAGE/1024))
 #endif
 
 
-#define	INIT_HOLEPAGE	150
-#define	INIT_NRBPAGE	50
-#define	RB_GETA		512
+/* #define	INIT_HOLEPAGE	150 */
+/* #define	INIT_NRBPAGE	50 */
+/* #define	RB_GETA		512 */
+
+#define	INIT_HOLEPAGE	(6*HOLEPAGE/5)
+#define	INIT_NRBPAGE	(INIT_HOLEPAGE/3)
+#define	RB_GETA		(10*INIT_NRBPAGE)
 
 
 #ifdef AV

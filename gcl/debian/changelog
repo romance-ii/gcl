@@ -8,8 +8,13 @@ gclcvs (2.7.0-18) unstable; urgency=low
   * Support user deined predicates at an elementary level in the form
     '(satisfies foop) in gcl_predlib.lsp
   * Install binary gcd algorithm for ~10% performance increase
+  * Rescale some default allocation parameters -- bignum allocation by
+    relblocks by default, default growth parameters are 1 (min),
+    0.1*MAXPAGE (max), 0.5 (increase), 0.3 (percent free), holepage is
+    4*MAXPAGE/1024, INIT_HOLEPAGE, INIT_NRBPAGE and RB_GETA scale
+    accordingly
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 12 Jan 2004 13:46:32 -0500
+ -- Camm Maguire <camm@enhanced.com>  Mon, 12 Jan 2004 15:15:09 -0500
 
 gclcvs (2.7.0-17) unstable; urgency=low
 

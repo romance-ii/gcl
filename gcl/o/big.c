@@ -48,7 +48,7 @@ read.d: normalize_big_to_object
 #include <string.h>
 #include "include.h"
 
-static void* (*gcl_gmp_allocfun)(size_t) = alloc_contblock;
+static void* (*gcl_gmp_allocfun)(size_t) = alloc_relblock;
 
 DEFUN_NEW("SET-GMP-ALLOCATE-RELOCATABLE",object,fSset_gmp_allocate_relocatable,SI,1,1,NONE,OO,OO,OO,OO,
       (object flag),"Set the allocation to be relocatble ")

@@ -216,7 +216,8 @@ call_after_gbc_hook(t)
     }
 }
 
-#define PERCENT_FREE(tm)  ((tm->tm_percent_free ? tm->tm_percent_free : 10)/100.0)
+/* #define PERCENT_FREE(tm)  ((tm->tm_percent_free ? tm->tm_percent_free : 10)/100.0) */
+#define PERCENT_FREE(tm)  ((tm->tm_percent_free ? tm->tm_percent_free : 30)/100.0)
 
 static int
 grow_linear(int old, int fract, int grow_min, int grow_max) {
@@ -227,7 +228,8 @@ grow_linear(int old, int fract, int grow_min, int grow_max) {
   if (grow_min==0) 
     grow_min=1;
   if (grow_max==0) 
-    grow_max=1000;
+/*     grow_max=1000; */
+    grow_max=0.1*MAXPAGE;
 
   delt=(old*fract)/100;
   delt= (delt < grow_min ? grow_min:
