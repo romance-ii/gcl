@@ -9250,8 +9250,12 @@ EOF
 
 echo "$as_me:$LINENO: checking emacs info/dir" >&5
 echo $ECHO_N "checking emacs info/dir... $ECHO_C" >&6
-if [ "$EMACS" != "" ] && [ "$INFO_DIR" = "unknown" ] ; then
+if test "$use" = "mingw" ; then
+    INFO_DIR=\$\(prefix\)/lib/gcl-$VERSION/info/
+else
+    if [ "$EMACS" != "" ] && [ "$INFO_DIR" = "unknown" ] ; then
 	INFO_DIR=`$EMACS -q -batch --no-site-file -l conftest.el 2>&1 | sed -e /Loading/d | sed -e /load/d `
+    fi
 fi
 if  test -f "${INFO_DIR}dir"  ; then true;else
 if test -f /usr/info/dir ; then
