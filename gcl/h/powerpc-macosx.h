@@ -143,3 +143,11 @@ do {\
 #undef calloc
 #define calloc my_calloc
 
+#define GET_FULL_PATH_SELF (a_) \
+do { \
+extern char **NXArgv; \
+static char q [PATH_MAX]; \
+if (!realpath (q,NXArgv[0])) \
+    error ("realpath error"); \
+(a_) = q; \
+} while (0)

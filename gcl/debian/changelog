@@ -1,3 +1,9 @@
+gclcvs (2.7.0-4) unstable; urgency=low
+
+  * Mac OSX GET_FULL_PATH_SELF
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 19 Sep 2003 16:39:26 +0000
+
 gclcvs (2.7.0-3) unstable; urgency=low
 
   * Close streams in fasldlsym.c
