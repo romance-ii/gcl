@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-75) unstable; urgency=low
+
+  * Export truename for dlopen systems
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 14 Feb 2003 23:31:15 -0500
+
 gcl (2.5.0.cvs20020625-74) unstable; urgency=low
 
   * Remove duplicates in apropos a la clisp

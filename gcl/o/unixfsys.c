@@ -250,7 +250,7 @@ coerce_to_filename(object pathname, char *p)
 
 
 
-static object
+object
 truename(object pathname)
 {
 	register char *p, *q;
