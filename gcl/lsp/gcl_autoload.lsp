@@ -132,9 +132,42 @@
       (get-decoded-time)
     (encode-universal-time sec min h d m y tz)))
 
+; System dependent Temporary directory.
+(defun temp-dir ()
+  "A system dependent path to a temporary storage directory as a string." 
+  #+winnt (si::getenv "TEMP") #-winnt "/usr/tmp")
 
-(defun ed (&optional filename)
-  (system (format nil "vi ~A" filename)))
+;  Set the default system editor to a fairly certain bet.
+#-winnt(defvar *gcl-editor* "vi")
+#+winnt(defvar *gcl-editor* "notepad")
+
+(defun new-ed (editor-name)
+  "Change the editor called by (ed) held in *gcl-editor*."
+  (setf *gcl-editor* editor-name))
+
+(defun ed (&optional name)
+  "Edit a file using the editor named in *gcl-editor*; customise with new-ed()."
+  (if (null name)
+      (system *gcl-editor*)
+    (cond ((stringp name) 
+	   (system (format nil "~A ~A" *gcl-editor* name))) ; If string, assume file name.
+	  ((pathnamep name)
+	   (system (format nil "~A ~A" *gcl-editor* (namestring name)))) ; If pathname.
+	  (t 
+	   (let ((body (symbol-function name)))
+	     (cond ((compiled-function-p body) (error "You can't edit compiled functions."))
+		   ((and body
+			 (consp body)
+			 (eq (car body) 'lambda-block)) ; If lambda block, save file and edit.
+		    (let ((ed-file (concatenate 'string
+						(temp-dir)
+						(format nil "~A" (cadr body))
+						".lisp")))
+		      (with-open-file
+		       (st ed-file :direction :output)
+		       (print `(defun ,name ,@ (cddr body)) st))
+		      (system (format nil "~A ~A" *gcl-editor* ed-file))))
+		   (t (system (format nil "~A ~A" *gcl-editor* name))))))))) ; Use symbol as filename
 
 ;;; Allocator.
 
