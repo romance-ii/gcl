@@ -83,8 +83,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
     compiler::link
   * fix small bug when info is passed bad second argument
   * Don't try to open map file if doesn't stat (macosx)
+  * Add earlier forgotten branch patch to sfaslbfd.c for macosx
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 01:36:56 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 01:40:43 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

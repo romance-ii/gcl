@@ -317,6 +317,11 @@ fasload(object faslfile) {
 
   }
 
+#if defined(DARWIN)
+  if (!bfd_mach_o_inject_fp_branch_islands (b, bi, q))
+    FEerror ("Could not inject fp register preservation stubs",0);
+#endif
+
 #ifndef HAVE_ALLOCA
 #error Cannot use bfd relocations without alloca at present
 #endif
