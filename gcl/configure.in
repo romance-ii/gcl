@@ -720,6 +720,23 @@ fi
 
 AC_CHECK_SIZEOF(long,0)
 AC_MSG_CHECKING(sizeof struct contblock)
+
+# work around MSYS pwd result incompatibility
+if test "$use" = "mingw" ; then
+AC_TRY_RUN([#include <stdio.h>
+	#define EXTER
+	#include "$MP_INCLUDE"
+	#include "h/enum.h"
+	#include "h/object.h"
+	int main(int argc,char **argv,char **envp) {
+	FILE *f=fopen("conftest1","w");
+	fprintf(f,"%u",sizeof(struct contblock));
+	fclose(f);
+	return 0;
+	}],sizeof_contblock=`cat conftest1`,
+	   echo Cannot find sizeof struct contblock;exit 1,
+	   echo Cannot find sizeof struct contblock;exit 1)
+else
 AC_TRY_RUN([#include <stdio.h>
 	#define EXTER
 	#include "$MP_INCLUDE"
@@ -733,8 +750,10 @@ AC_TRY_RUN([#include <stdio.h>
 	}],sizeof_contblock=`cat conftest1`,
 	   echo Cannot find sizeof struct contblock;exit 1,
 	   echo Cannot find sizeof struct contblock;exit 1)
+fi
 AC_MSG_RESULT($sizeof_contblock)
 AC_DEFINE_UNQUOTED(SIZEOF_CONTBLOCK,$sizeof_contblock)
+
 
 
 AC_CHECK_HEADERS(endian.h,
