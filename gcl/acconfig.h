@@ -137,6 +137,11 @@ SGC is enabled.  */
 
 /* bfd support */
 #undef HAVE_LIBBFD
+#ifdef HAVE_LIBBFD
+#define IN_GCC
+#include <bfd.h>
+#include <bfdlink.h>
+#endif
 
 /* isnormal check */
 #undef HAVE_ISNORMAL

@@ -43,7 +43,15 @@ struct  string_address_table
   unsigned int alloc_length;
 };
 
+#if !defined(HAVE_LIBBFD) && !defined(SPECIAL_RSYM)
+#error Need either BFD or SPECIAL_RSYM
+#endif
+
+#ifdef SPECIAL_RSYM
 struct string_address_table c_table;
+#else
+static struct bfd_link_info link_info;
+#endif
 struct string_address_table combined_table;
 
 #define PTABLE_EXTRA 20

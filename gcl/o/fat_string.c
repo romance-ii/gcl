@@ -2,7 +2,6 @@
 (c) Copyright W. Schelter 1988, All rights reserved.
 */
 
-
 #include "include.h"
 #include "page.h"
 #define FAT_STRING
@@ -64,6 +63,9 @@ object funobj;
 #include <sys/ldr.h>
 char *data_load_addr =0;
 #endif
+
+
+#ifdef SPECIAL_RSYM
 
 read_special_symbols(symfile)
 char *symfile;
@@ -132,10 +134,12 @@ object x0;
  (void) strncpy(str,x->st.st_self,n);
  read_special_symbols(str);
   /* we sort them since these are used by the sfasl loader too */
-qsort((char*)(c_table.ptable),(int)(c_table.length),sizeof(struct node),node_compare);
+ qsort((char*)(c_table.ptable),(int)(c_table.length),sizeof(struct node),node_compare);
   free(str);}
  RETURN1(x0);
 }
+
+#endif /* special_rsym */
 
 #define CFUN_LIM 10000
 
@@ -204,37 +208,101 @@ char *node1, *node2;
 }
  
 
+#if defined(HAVE_LIBBFD) && ! defined(SPECIAL_RSYM)
+
+boolean
+bfd_combined_table_update(struct bfd_link_hash_entry *h,PTR ct) {
+
+  if (ct!=&combined_table)
+    return false;
+
+  if (h->type!=bfd_link_hash_defined)
+    return true;
+
+  if (!h->u.def.section) {
+    FEerror("Symbol without section");
+    return false;
+  }
+
+  SYM_ADDRESS(combined_table,combined_table.length)=h->u.def.value+h->u.def.section->vma;
+  SYM_STRING(combined_table,combined_table.length)=(char *)h->root.string;
+  
+  combined_table.length++;
+
+  return true;
+
+}
+#endif
+
 
 DEFUNO("SET-UP-COMBINED",object,fSset_up_combined,SI
    ,0,1,NONE,OO,OO,OO,OO,siLset_up_combined,"")(va_alist)
 va_dcl
-{	int nargs=VFUN_NARGS;
-	unsigned int n;
-	object siz;
-	va_list ap;
-	{ va_start(ap);
-	  if (nargs>=1) siz=va_arg(ap,object);
-	  else goto LDEFAULT1;
-	  goto LEND_VARARG;
-	LDEFAULT1: siz = small_fixnum(0);
-	LEND_VARARG: va_end(ap);}
-	CHECK_ARG_RANGE(0,1);
-	n = (unsigned int) fix(siz);
- cfuns_to_combined_table(n);
- if (c_table.ptable)
-   {int j,k;
+{
+  int nargs=VFUN_NARGS;
+  unsigned int n;
+  object siz;
+  va_list ap;
+
+  { 
+    va_start(ap);
+    if (nargs>=1) 
+      siz=va_arg(ap,object);
+    else 
+      goto LDEFAULT1;
+    
+    goto LEND_VARARG;
+	
+  LDEFAULT1: 
+    siz = small_fixnum(0);
+  LEND_VARARG: 
+    va_end(ap);
+  }
+
+  CHECK_ARG_RANGE(0,1);
+  n = (unsigned int) fix(siz);
+  cfuns_to_combined_table(n);
+
+#if !defined(HAVE_LIBBFD) && !defined(SPECIAL_RSYM)
+#error Need either BFD or SPECIAL_RSYM
+#endif
+
+#if defined(SPECIAL_RSYM)
+  if (c_table.ptable) {
+
+    int j,k;
+
     if((k=combined_table.length)+c_table.length >=
        combined_table.alloc_length)
       cfuns_to_combined_table(combined_table.length+c_table.length +20);
-    for(j = 0; j < c_table.length;)
-    { SYM_ADDRESS(combined_table,k) =SYM_ADDRESS(c_table,j);
+
+    for(j = 0; j < c_table.length;) { 
+      SYM_ADDRESS(combined_table,k) =SYM_ADDRESS(c_table,j);
       SYM_STRING(combined_table,k) =SYM_STRING(c_table,j);
-      k++;j++;
-    };
+      k++;
+      j++;
+    }
     combined_table.length += c_table.length ;}
- qsort((char*)combined_table.ptable,(int)combined_table.length,
-       sizeof(struct node),address_node_compare);
-	RETURN1(siz);
+
+#else
+#if defined(HAVE_LIBBFD)
+  if (link_info.hash) {
+
+    if (combined_table.length+link_info.hash->table.size >=
+	combined_table.alloc_length)
+      cfuns_to_combined_table(combined_table.length+link_info.hash->table.size+20);
+
+    bfd_link_hash_traverse(link_info.hash,
+				 bfd_combined_table_update,&combined_table);
+
+  }
+#endif
+#endif
+
+  qsort((char*)combined_table.ptable,(int)combined_table.length,
+	sizeof(struct node),address_node_compare);
+  RETURN1(siz);
+
 }
 
 static int  prof_start;

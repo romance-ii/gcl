@@ -1057,32 +1057,32 @@ static char *baby_malloc(n)
 }
 #endif
 
-#ifdef HAVE_LIBBFD
+/*  #ifdef HAVE_LIBBFD */
 
-int in_bfd_init=0;
+/*  int in_bfd_init=0; */
 
 /* configure size, static init ? */
-static char bfd_buf[/*  4392 */32768];
-static char *bfd_buf_p=bfd_buf;
+/*  static char bfd_buf[32768]; */
+/*  static char *bfd_buf_p=bfd_buf; */
 
-static void *
-bfd_malloc(int n) {
+/*  static void * */
+/*  bfd_malloc(int n) { */
 
-  char *c;
+/*    char *c; */
 
-  c=bfd_buf_p;
-  n+=7;
-  n>>=3;
-  n<<=3;
-  if (c+n>bfd_buf+sizeof(bfd_buf)) {
-    fprintf(stderr,"Not enough space in bfd_buf %d %d\n",n,sizeof(bfd_buf)-(bfd_buf_p-bfd_buf));
-    exit(1);
-  }
-  bfd_buf_p+=n;
-  return (void *)c;
+/*    c=bfd_buf_p; */
+/*    n+=7; */
+/*    n>>=3; */
+/*    n<<=3; */
+/*    if (c+n>bfd_buf+sizeof(bfd_buf)) { */
+/*      fprintf(stderr,"Not enough space in bfd_buf %d %d\n",n,sizeof(bfd_buf)-(bfd_buf_p-bfd_buf)); */
+/*      exit(1); */
+/*    } */
+/*    bfd_buf_p+=n; */
+/*    return (void *)c; */
 
-}
-#endif
+/*  } */
+/*  #endif */
 
 char *
 malloc(size)
@@ -1090,10 +1090,10 @@ int size;
 {
         object x;
 	
-#ifdef HAVE_LIBBFD
-	if (in_bfd_init)
-	  return bfd_malloc(size);
-#endif
+/*  #ifdef HAVE_LIBBFD */
+/*  	if (in_bfd_init) */
+/*  	  return bfd_malloc(size); */
+/*  #endif */
 
 #ifdef BABY_MALLOC_SIZE
 	if (GBC_enable == 0) return baby_malloc(size);

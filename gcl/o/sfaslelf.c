@@ -38,9 +38,9 @@ License for more details.
 #include <elf.h>
 
 #include "gclincl.h"
-#ifdef HAVE_LIBBFD
-#include <bfd.h>
-#endif
+/*  #ifdef HAVE_LIBBFD */
+/*  #include <bfd.h> */
+/*  #endif */
 
 #ifdef STAND
 #include "include.h"
@@ -446,122 +446,118 @@ relocate_symbols(sym,nsyms,nscns,init_address_ptr)
 }
 
 
-#ifdef HAVE_LIBBFD
+/*  #ifdef HAVE_LIBBFD */
 
-typedef struct {
-  unsigned int type;
-  reloc_howto_type *h;
-} mtbl;
+/*  typedef struct { */
+/*    unsigned int type; */
+/*    reloc_howto_type *h; */
+/*  } mtbl; */
 
-static void
-do_bfd_reloc(unsigned int oc,unsigned int val,
-	     unsigned int *where) {
+/*  static void */
+/*  do_bfd_reloc(unsigned int oc,unsigned int val, */
+/*  	     unsigned int *where) { */
 
-  static bfd *dum;
-  static reloc_howto_type * m[BFD_RELOC_UNUSED];
-  reloc_howto_type *h;
+/*    static bfd *dum; */
+/*    static reloc_howto_type * m[BFD_RELOC_UNUSED]; */
+/*    reloc_howto_type *h; */
 
-  if (!m[0]) {
+/*    if (!m[0]) { */
 
-    extern int in_bfd_init;
+/*      extern int in_bfd_init; */
 
-    bfd_reloc_code_real_type t;
+/*      bfd_reloc_code_real_type t; */
 
-    in_bfd_init=1;
+/*      in_bfd_init=1; */
 
-    bfd_init();
+/*      bfd_init(); */
 
-    if (!(dum=bfd_openr("/dev/null",NULL)))
-      FEerror("Cannot open dummy bfd\n");
+/*      if (!(dum=bfd_openr("/dev/null",NULL))) */
+/*        FEerror("Cannot open dummy bfd\n"); */
 
-    for (t=BFD_RELOC_UNUSED;t>_dummy_first_bfd_reloc_code_real;t--) 
-      if ((h=bfd_reloc_type_lookup(dum,t)))
-	m[h->type]=h;
+/*      for (t=BFD_RELOC_UNUSED;t>_dummy_first_bfd_reloc_code_real;t--)  */
+/*        if ((h=bfd_reloc_type_lookup(dum,t))) */
+/*  	m[h->type]=h; */
       
-    in_bfd_init=0;
+/*      in_bfd_init=0; */
 
-  }
+/*    } */
 
-  if (oc>=BFD_RELOC_UNUSED || !m[oc])
-    FEerror("Cannot lookup type %u\n",oc);
-  h=m[oc];
+/*    if (oc>=BFD_RELOC_UNUSED || !m[oc]) */
+/*      FEerror("Cannot lookup type %u\n",oc); */
+/*    h=m[oc]; */
 
-  if (h->pc_relative)
-    val-=(unsigned int)where;
+/*    if (h->pc_relative) */
+/*      val-=(unsigned int)where; */
 
-  val>>=h->rightshift;
-  val<<=h->bitpos;
-/*    *where = ( (*where & ~h->dst_mask) |  */
-/*  	     (((*where & h->src_mask) +  val) & h->dst_mask)); */
+/*    val>>=h->rightshift; */
+/*    val<<=h->bitpos; */
 
-#define DOIT(x) \
-  x = ( (x & ~h->dst_mask) | (((x & h->src_mask) +  val) & h->dst_mask))
+/*  #define DOIT(x) \ */
+/*    x = ( (x & ~h->dst_mask) | (((x & h->src_mask) +  val) & h->dst_mask)) */
 
-  switch (h->size) {
-  case 0:
-    {
-      char x = bfd_get_8 (dum, (char *) where);
-      DOIT (x);
-      bfd_put_8 (dum, x, (unsigned char *) where);
-    }
-    break;
+/*    switch (h->size) { */
+/*    case 0: */
+/*      { */
+/*        char x = bfd_get_8 (dum, (char *) where); */
+/*        DOIT (x); */
+/*        bfd_put_8 (dum, x, (unsigned char *) where); */
+/*      } */
+/*      break; */
 
-  case 1:
-    {
-      short x = bfd_get_16 (dum, (bfd_byte *) where);
-      DOIT (x);
-      bfd_put_16 (dum, (bfd_vma) x, (unsigned char *) where);
-    }
-    break;
-  case 2:
-    {
-      long x = bfd_get_32 (dum, (bfd_byte *) where);
-      DOIT (x);
-      bfd_put_32 (dum, (bfd_vma) x, (bfd_byte *) where);
-    }
-    break;
-  case -2:
-    {
-      long x = bfd_get_32 (dum, (bfd_byte *) where);
-      val = -val;
-      DOIT (x);
-      bfd_put_32 (dum, (bfd_vma) x, (bfd_byte *) where);
-    }
-    break;
+/*    case 1: */
+/*      { */
+/*        short x = bfd_get_16 (dum, (bfd_byte *) where); */
+/*        DOIT (x); */
+/*        bfd_put_16 (dum, (bfd_vma) x, (unsigned char *) where); */
+/*      } */
+/*      break; */
+/*    case 2: */
+/*      { */
+/*        long x = bfd_get_32 (dum, (bfd_byte *) where); */
+/*        DOIT (x); */
+/*        bfd_put_32 (dum, (bfd_vma) x, (bfd_byte *) where); */
+/*      } */
+/*      break; */
+/*    case -2: */
+/*      { */
+/*        long x = bfd_get_32 (dum, (bfd_byte *) where); */
+/*        val = -val; */
+/*        DOIT (x); */
+/*        bfd_put_32 (dum, (bfd_vma) x, (bfd_byte *) where); */
+/*      } */
+/*      break; */
     
-  case -1:
-    {
-      long x = bfd_get_16 (dum, (bfd_byte *) where);
-      val = -val;
-      DOIT (x);
-      bfd_put_16 (dum, (bfd_vma) x, (bfd_byte *) where);
-    }
-    break;
+/*    case -1: */
+/*      { */
+/*        long x = bfd_get_16 (dum, (bfd_byte *) where); */
+/*        val = -val; */
+/*        DOIT (x); */
+/*        bfd_put_16 (dum, (bfd_vma) x, (bfd_byte *) where); */
+/*      } */
+/*      break; */
     
-  case 3:
-    /* Do nothing */
-    break;
+/*    case 3: */
+/*      break; */
     
-  case 4:
-#ifdef BFD64
-    {
-      bfd_vma x = bfd_get_64 (dum, (bfd_byte *) where);
-      DOIT (x);
-      bfd_put_64 (dum, x, (bfd_byte *) where);
-    }
-#else
-    FEerror("Bad howto size %u\n",h->size);
-    /*        abort (); */
-#endif
-    break;
-  default:
-    FEerror("Bad howto size %u\n",h->size);
-    break;
-  }
+/*    case 4: */
+/*  #ifdef BFD64 */
+/*      { */
+/*        bfd_vma x = bfd_get_64 (dum, (bfd_byte *) where); */
+/*        DOIT (x); */
+/*        bfd_put_64 (dum, x, (bfd_byte *) where); */
+/*      } */
+/*  #else */
+/*      FEerror("Bad howto size %u\n",h->size); */
+/*  #endif */
+/*      break; */
+/*    default: */
+/*      FEerror("Bad howto size %u\n",h->size); */
+/*      break; */
+/*    } */
   
-}
+/*  } */
 
-#endif /* HAVE_LIBBFD */
+/*  #endif HAVE_LIBBFD */ 
 
 static void
 relocate(symbol_table,reloc_info,sh_type)
@@ -593,9 +589,9 @@ Elf32_Word sh_type;
 #define ADD_VAL(where, mask, val) \
     *(unsigned int *)where += ((val & mask) | ((*(unsigned int *)where) & ~mask))
 
-#ifdef HAVE_LIBBFD
-    do_bfd_reloc(ELF32_R_TYPE(reloc_info->r_info),s+a,(unsigned int *)where);
-#else
+/*  #ifdef HAVE_LIBBFD */
+/*      do_bfd_reloc(ELF32_R_TYPE(reloc_info->r_info),s+a,(unsigned int *)where); */
+/*  #else */
     switch(ELF32_R_TYPE(reloc_info->r_info)){
 #if (defined(__svr4__) || defined(__linux__)) && defined(__i386__)
     case     R_386_NONE:
@@ -685,7 +681,7 @@ Elf32_Word sh_type;
       printf("(non supported relocation type %d)\n",
 	     ELF32_R_TYPE(reloc_info->r_info));
     }
-#endif /* HAVE_LIBBFD */
+/*  #endif HAVE_LIBBFD */
   }
 }
 

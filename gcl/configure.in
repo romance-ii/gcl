@@ -237,9 +237,6 @@ AC_CHECK_LIB(readline,main,
 	RL_OBJS=readline.o
 	RL_LIB=lsp/readline.o,,-lncurses)
 
-#LO="-Wl,-static"
-#LIBS="$LIBS  $LO -lbfd -liberty"
-
 AC_CHECK_HEADER(bfd.h,
 	AC_CHECK_LIB(bfd,bfd_init,
 		AC_DEFINE(HAVE_LIBBFD)
