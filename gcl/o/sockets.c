@@ -19,7 +19,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-
 #define IN_SOCKETS
 
 #include "include.h"
@@ -29,15 +28,22 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "sheader.h"
 
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#ifndef __MINGW32__
+#  include <sys/socket.h>
+#  include <netinet/in.h>
+#  include <arpa/inet.h>
+#else
+#  include <windows.h>
+#  include <winsock2.h>
+#endif
 
 #ifdef __STDC__
 #include <string.h> 
 #endif
 
+#ifndef __MINGW32__
 # include <netdb.h> 
+#endif
 
 #include <sys/time.h>
 #ifndef NO_UNISTD_H
@@ -51,6 +57,43 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 void write_timeout_error();
 void connection_failure();
 
+#ifdef __MINGW32__
+/* Keep track of socket initialisations */
+int w32_socket_initialisations = 0;
+WSADATA WSAData;
+
+int w32_socket_init(void)
+{
+    int rv = 0;
+    if (w32_socket_initialisations++) {
+	rv = 0;
+    } else {
+        if (WSAStartup(0x0101, &WSAData)) {
+            w32_socket_initialisations = 0;
+            fprintf ( stderr, "WSAStartup failed\n" );
+            WSACleanup();
+            rv = -1;
+        }
+    }
+
+    return rv;
+}
+
+int w32_socket_exit(void)
+{
+    int rv = 0;
+
+    if ( w32_socket_initialisations == 0 ||
+         --w32_socket_initialisations > 0 ) {
+	rv = 0;
+    } else {
+        rv = WSACleanup();
+    }
+    
+    return rv;
+}
+
+#endif
 
 #define BIND_MAX_RETRY		128
 #define BIND_ADDRESS_INCREMENT	16
@@ -67,6 +110,13 @@ int port;
 { int s, n, rc; struct
 sockaddr_in addr;
 
+#ifdef __MINGW32__  
+  if ( w32_socket_init() < 0 ) {
+      perror("ERROR !!! Windows socket DLL initialisation failed in sock_connect_to_name\n");
+      return Cnil;
+  }
+#endif
+  
   /* Using TCP layer */
   s = socket(PF_INET, SOCK_STREAM, 0);
   if (s < 0)
@@ -92,7 +142,13 @@ sockaddr_in addr;
 	iLastAddressUsed += BIND_ADDRESS_INCREMENT;
 	if (iLastAddressUsed > BIND_LAST_ADDRESS)
 	  iLastAddressUsed = BIND_INITIAL_ADDRESS;
-      } while ((rc < 0) && (errno == EADDRINUSE) && (cRetry < BIND_MAX_RETRY));
+      } while ((rc < 0) &&
+#ifdef __MINGW32__                
+                (errno == WSAEADDRINUSE) &&
+#else                
+                (errno == EADDRINUSE) &&
+#endif                
+                (cRetry < BIND_MAX_RETRY));
       if (0)
 	{
 	  fprintf(stderr,
@@ -136,6 +192,9 @@ DEFUN("CLOSE-SD",object,fSclose_sfd,SI,1,1,NONE,OO,OO,OO,OO,
   free(OBJ_TO_CONNECTION_STATE(sfd)->read_buffer);
   res = close(OBJ_TO_CONNECTION_STATE(sfd)->fd);
   free (OBJ_TO_CONNECTION_STATE(sfd));
+#ifdef __MINGW32__  
+  w32_socket_exit();
+#endif  
   RETURN1(res ? Ct : Cnil);
 }
 
