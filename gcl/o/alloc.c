@@ -93,10 +93,10 @@ int reserve_pages_for_signal_handler =30;
    reserve_pages_for_signal_handler pages on hand in the hole
  */
 char *
-alloc_page(int n)
+alloc_page(long n)
 {
 	char *e;
-	int m;
+	long m;
 	e = heap_end;
 	if (n >= 0) {
 		if (n >=
@@ -159,12 +159,12 @@ eg to add 20 more do (si::set-hole-size %ld %d)\n...start over ", new_holepage, 
 void
 add_page_to_freelist(char *p, struct typemanager *tm)
 {short t,size;
- int i=tm->tm_nppage,fw;
+ long i=tm->tm_nppage,fw;
  object x,f;
  t=tm->tm_type;
 #ifdef SGC
  {
-   int nn=page(p);
+   long nn=page(p);
    if (sgc_enabled) {
      if (!WRITABLE_PAGE_P(nn)) 
        make_writable(nn,nn+1);
@@ -277,13 +277,13 @@ DEFVAR("*OPTIMIZE-MAXIMUM-PAGES*",sSAoptimize_maximum_pagesA,SI,sLt,"");
 #define OPTIMIZE_MAX_PAGES (sSAoptimize_maximum_pagesA ==0 || sSAoptimize_maximum_pagesA->s.s_dbind !=sLnil) 
 DEFVAR("*NOTIFY-OPTIMIZE-MAXIMUM-PAGES*",sSAnotify_optimize_maximum_pagesA,SI,sLnil,"");
 #define MMAX_PG(a_) ((a_)->tm_type == t_relocatable ? (a_)->tm_npage : (a_)->tm_maxpage)
-static int
+static long
 opt_maxpage(struct typemanager *my_tm) {
 
   double x=0.0,y=0.0,z,r;
-  int mmax_page;
+  long mmax_page;
   struct typemanager *tm,*tme;
-  int mro=0,tro=0;
+  long mro=0,tro=0;
 
   for (tm=tm_table,tme=tm+sizeof(tm_table)/sizeof(*tm_table);tm<tme;tm++) {
     x+=tm->tm_adjgbccnt;
@@ -516,8 +516,8 @@ void *
 alloc_contblock(size_t n) {
 	 char *p;
 	 struct contblock **cbpp;
-	 int i;
-	 int m;
+	 long i;
+	 long m;
 	 bool g;
 
 
@@ -552,7 +552,7 @@ ONCE_MORE:
 	m = (n + PAGESIZE - 1)/PAGESIZE;
        if(sSAignore_maximum_pagesA) {
 	if (ncbpage + m > maxcbpage || available_pages < m) {
- 	        int j=maxcbpage;
+ 	        long j=maxcbpage;
 		if (available_pages < m)
 		  sSAignore_maximum_pagesA->s.s_dbind = Cnil;
 		if (!g) 
@@ -676,7 +676,8 @@ alloc_relblock(size_t n) {
 
 	 char *p;
 	 bool g;
-	 int i,must_have_more_pages;
+	 long i;
+	 int must_have_more_pages;
 
 /*
 	printf("allocating %d-byte relocatable block...\n", n);
@@ -817,7 +818,7 @@ set_maxpage(void) {
 void
 gcl_init_alloc(void) {
 
-  int i;
+  long i;
   static int initialized;
 #ifdef GCL_GPROF
    extern void *_start;
@@ -1035,7 +1036,8 @@ DEFUN_NEW("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
        ,1,2,NONE,OI,OO,OO,OO,(fixnum npages,...),"")
 {
 
-  int nargs=VFUN_NARGS,i,m;
+  int nargs=VFUN_NARGS;
+  long i,m;
   object really_do;
   va_list ap;
   char *p=NULL;

@@ -11,7 +11,7 @@ static void
 sgc_mark_object1(object);
 
 static void
-sgc_mprotect(int, int, int);
+sgc_mprotect(long, long, int);
 
 
 #ifdef BSD
@@ -599,7 +599,7 @@ sgc_mark_object1(object x) {
 static void
 sgc_mark_stack_carefully(void *topv, void *bottomv, int offset) {
   
-  int p,m,pageoffset;
+  long p,m,pageoffset;
   object x;
   struct typemanager *tm;
   register long *j;
@@ -644,7 +644,7 @@ sgc_mark_stack_carefully(void *topv, void *bottomv, int offset) {
 static void
 sgc_mark_phase(void) {
 
-  STATIC int i, j;
+  STATIC long i, j;
   STATIC struct package *pp;
   STATIC bds_ptr bdp;
   STATIC frame_ptr frp;
@@ -655,7 +655,7 @@ sgc_mark_phase(void) {
   
   /* mark all non recent data on writable pages */
   {
-    int t,i=page(heap_end);
+    long t,i=page(heap_end);
     struct typemanager *tm;
     char *p;
     
@@ -756,7 +756,7 @@ sgc_mark_phase(void) {
 
 static void
 sgc_sweep_phase(void) {
-  STATIC int i, j, k;
+  STATIC long i, j, k;
   STATIC object x;
   STATIC char *p;
   STATIC struct typemanager *tm;
@@ -872,7 +872,7 @@ sgc_sweep_phase(void) {
 static void
 sgc_contblock_sweep_phase(void) {
 
-  STATIC int i, j;
+  STATIC long i, j;
   STATIC char *s, *e, *p, *q;
   STATIC struct contblock *cbp;
   
@@ -947,9 +947,9 @@ sgc_count(object yy) {
 static int
 sgc_count_writable(int end) { 
 
-  int j = first_protectable_page -1;
-  int count = 0;
-  int hp_end= page(heap_end);
+  long j = first_protectable_page -1;
+  long count = 0;
+  long hp_end= page(heap_end);
   while(j++ < hp_end)
     if (WRITABLE_PAGE_P(j)) count++;
   j= page(rb_start);
@@ -962,9 +962,9 @@ sgc_count_writable(int end) {
 int
 sgc_count_type(int t) {
 
-  int j = first_protectable_page -1;
-  int end = page(core_end);
-  int count=0;
+  long j = first_protectable_page -1;
+  long end = page(core_end);
+  long count=0;
   while(j++ < end)
     if (type_map[j]==t && SGC_PAGE_P(j))
       count++;
@@ -974,10 +974,10 @@ sgc_count_type(int t) {
 int
 sgc_count_read_only_type(int t) {
 
-  int j = first_protectable_page -1;
-  int hp_end = page(heap_end);
-  int end = page(rb_limit);
-  int count=0;
+  long j = first_protectable_page -1;
+  long hp_end = page(heap_end);
+  long end = page(rb_limit);
+  long count=0;
   while(j++ < hp_end)
     if ((type_map[j]==t || (t<0 && type_map[j]!=t_other)) && !WRITABLE_PAGE_P(j))
       count++;
@@ -1193,12 +1193,12 @@ memprotect_test_reset(void) {
 int
 sgc_start(void) {
 
-  int i;
-  int np;
-  short free_map[MAXPAGE];
+  long i;
+  long np;
+  unsigned short free_map[MAXPAGE];
   object f;
   struct typemanager *tm;
-  int npages;
+  long npages;
 
   if (memprotect_result!=memprotect_success && do_memprotect_test())
     return 0;
@@ -1216,19 +1216,21 @@ sgc_start(void) {
     if (TM_BASE_TYPE_P(i) && (np=(tm=tm_of(i))->tm_sgc)) 
       FIND_FREE_PAGES:
     {
-      int maxp=0;
-      int j;
+      long maxp=0;
+      long j;
       /* SGC cont pages: This used to be simply set to tm_sgc_minfree,
 	 which is a definite bug, as minfree could then be zero,
 	 leading this type to claim SGC pages not of its type as
 	 specified in type_map.  CM 20030827*/
-      int minfree = tm->tm_sgc_minfree > 0 ? tm->tm_sgc_minfree : 1 ;
+      unsigned short minfree = tm->tm_sgc_minfree > 0 ? tm->tm_sgc_minfree : 1 ;
       int count;
       bzero(free_map,npages*sizeof(short));
       f = tm->tm_free;
       count=0;
       while (f!=0) {
-	free_map[j=page(f)]++;
+	j=page(f);
+	/* protect against overflow */
+	free_map[j]=free_map[j]<minfree ? free_map[j]+1 : free_map[j];
 	if (j>=maxp) maxp=j;
 #ifdef DEBUG
 	count++;
@@ -1256,8 +1258,8 @@ sgc_start(void) {
       
       if (count < tm->tm_sgc) {
 	/* try to get some more free pages of type i */
-	int n = tm->tm_sgc - count;
-	int again=0,nfree = tm->tm_nfree;
+	long n = tm->tm_sgc - count;
+	long again=0,nfree = tm->tm_nfree;
 	char *p=alloc_page(n);
 	if (tm->tm_nfree > nfree) again=1;  /* gc freed some objects */
 	while (n-- > 0) {
@@ -1292,7 +1294,7 @@ sgc_start(void) {
   {
 
     void *p=NULL;
-    unsigned i,j,k,count;
+    unsigned long i,j,k,count;
     struct contblock *new_cb_pointer=NULL,*tmp_cb_pointer=NULL,**cbpp;
     
     tm=tm_of(t_contiguous);
@@ -1311,7 +1313,7 @@ sgc_start(void) {
     if (count>0) {
       /* SGC cont pages: allocate more if necessary, dumping possible
 	 GBC freed pages onto the old contblock list.  CM 20030827*/
-      int z=count+1;
+      long z=count+1;
       void *p1=alloc_contblock(z*PAGESIZE);
       p=PAGE_ROUND_UP(p1);
       if (p>p1) {
@@ -1384,7 +1386,7 @@ sgc_start(void) {
     {
       old_rb_start=rb_start;
       if(!saving_system) {
-	new=alloc_relblock(tm->tm_sgc*PAGESIZE);
+	new=alloc_relblock(((unsigned long)tm->tm_sgc)*PAGESIZE);
 	/* the above may cause a gc, shifting the relblock */
 	old_rb_start=rb_start;
 	new= PAGE_ROUND_UP(new);
@@ -1516,8 +1518,8 @@ sgc_quit(void) {
 	
 	/* remove the recent flag from any objects on sgc pages */
 	{
-	  int hp=page(heap_end);
-	  int i,j;
+	  long hp=page(heap_end);
+	  long i,j;
 	  char t = (char) tm->tm_type;
 	  char *p;
 	  for (i=0 ; i < hp; i++)
@@ -1534,7 +1536,7 @@ sgc_quit(void) {
 }
 
 void
-make_writable(int beg, int i) {
+make_writable(long beg, long i) {
 
   if (i > beg) {
     beg=ROUND_DOWN_PAGE_NO(beg);
@@ -1554,7 +1556,7 @@ extern char etext;
 static void
 memprotect_handler(int sig, long code, void *scp, char *addr) {
   
-  int p;
+  long p;
   int j=page_multiple;
   char *faddr;  /* Needed because we must not modify signal handler
 		   arguments on the stack! */
@@ -1604,7 +1606,7 @@ memprotect_handler(int sig, long code, void *scp, char *addr) {
 }
 
 static void
-sgc_mprotect(int pbeg, int n, int writable) {
+sgc_mprotect(long pbeg, long n, int writable) {
   /* CHECK_RANGE(pbeg,n);  */
 #ifdef DEBUG_MPROTECT
   printf("prot[%d,%d,(%d),%s]\n",pbeg,pbeg+n,writable & SGC_WRITABLE,
@@ -1624,9 +1626,9 @@ sgc_mprotect(int pbeg, int n, int writable) {
    rest must be */
 
 static void
-fix_for_page_multiple(int beg, int end) {
+fix_for_page_multiple(long beg, long end) {
 
-  int i,j;
+  long i,j;
   char *p;
   int writable;
 
@@ -1657,7 +1659,7 @@ fix_for_page_multiple(int beg, int end) {
 void
 memory_protect(int on) {
 
-  int i,beg,end= page(core_end);
+  long i,beg,end= page(core_end);
   int writable=1;
   extern void   install_segmentation_catcher(void);
 
@@ -1721,11 +1723,11 @@ FFN(siLsgc_on)(void) {
 /* make permanently writable pages containing pointers p thru p+n-1 */
 
 void
-perm_writable(char *p, int n) {
+perm_writable(char *p, long n) {
 
-  int beg=page(p);
-  int end=page(PAGE_ROUND_UP(p+n));
-  int i,must_protect=0;
+  long beg=page(p);
+  long end=page(PAGE_ROUND_UP(p+n));
+  long i,must_protect=0;
 
   beg = ROUND_DOWN_PAGE_NO(beg);
   end = ROUND_UP_PAGE_NO(end);
@@ -1742,93 +1744,3 @@ void
 system_error(void) {
   FEerror("System error",0);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -742,14 +742,14 @@ struct typemanager {
 	short   tm_nppage;	/*  number per page  */
 	object	tm_free;	/*  free list  */
 				/*  Note that it is of type object.  */
-	int	tm_nfree;	/*  number of free elements  */
-	int	tm_nused;	/*  number of elements used  */
-	int	tm_npage;	/*  number of pages  */
-	int	tm_maxpage;	/*  maximum number of pages  */
+	long	tm_nfree;	/*  number of free elements  */
+	long	tm_nused;	/*  number of elements used  */
+	long	tm_npage;	/*  number of pages  */
+	long	tm_maxpage;	/*  maximum number of pages  */
 	char	*tm_name;	/*  type name  */
 	int	tm_gbccount;	/*  GBC count  */
 	object  tm_alt_free;    /*  Alternate free list (swap with tm_free) */
-	int     tm_alt_nfree;   /*  Alternate nfree (length of nfree) */
+	long     tm_alt_nfree;   /*  Alternate nfree (length of nfree) */
 	short   tm_sgc;         /*  this type has at least this many
 				    sgc pages */
 	short   tm_sgc_minfree;   /* number free on a page to qualify for
@@ -802,7 +802,7 @@ EXTER struct contblock *old_cb_pointer;	/*  old contblock pointer when in SGC  *
 /*
 	Variables for memory management.
 */
-EXTER int ncb;			/*  number of contblocks  */
+EXTER long ncb;			/*  number of contblocks  */
 /* int ncbpage;			  number of contblock pages  */
 #define ncbpage tm_table[t_contiguous].tm_npage
 #define maxcbpage tm_table[t_contiguous].tm_maxpage
@@ -811,7 +811,7 @@ EXTER int ncb;			/*  number of contblocks  */
 
 /* int maxcbpage; maximum number of contblock pages  */
 EXTER 
-int holepage;			/*  hole pages  */
+long holepage;			/*  hole pages  */
 #define nrbpage tm_table[t_relocatable].tm_npage
 #define rbgbccount tm_table[t_relocatable].tm_gbccount
 /* int nrbpage;			  number of relblock pages  */

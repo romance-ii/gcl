@@ -10,7 +10,7 @@
   (MAYBE_DATA_P(pp) &&  ((char *)(pp) < heap_end))
 
 #ifndef page
-#define page(p)	((unsigned int)(((unsigned long)(((char *)(p))-DBEGIN)>>PAGEWIDTH)))
+#define page(p)	((unsigned long)(((unsigned long)(((char *)(p))-DBEGIN)>>PAGEWIDTH)))
 #define	pagetochar(x)	((char *)((((unsigned long)x) << PAGEWIDTH) + DBEGIN))
 #endif
   
@@ -64,7 +64,7 @@ char sgc_type_map[MAXPAGE];
 #define ON_WRITABLE_PAGE(x) (sgc_type_map[page(x)] & SGC_WRITABLE)
 
 
-#define  IF_WRITABLE(x,if_code) do {int xSG= page(x); \
+#define  IF_WRITABLE(x,if_code) do {long xSG= page(x); \
 			    if(((xSG & (-MAXPAGE)) ==0) && \
 			       (sgc_type_map[xSG] & SGC_WRITABLE)) \
 				 {if_code;}} while(0)
@@ -88,8 +88,8 @@ enum sgc_type { SGC_NORMAL,   /* not allocated since the last sgc */
 
 #define TM_BASE_TYPE_P(i) (((int) (tm_table[i].tm_type)) == i)
 
-void perm_writable() ;
-void make_writable();
+/* void perm_writable(char *,long) ; */
+/* void make_writable(long,long); */
 
 
 #define ROUND_DOWN_PAGE_NO(x) ((x) - (x % page_multiple))
@@ -139,7 +139,4 @@ extern int page_multiple;
 	enum type type_map[MAXPAGE];
 */
 char type_map[MAXPAGE];
-
-
-
 

@@ -108,7 +108,7 @@ static int gc_recursive    = 0;
 #ifdef SGC
 int sgc_enabled=0;
 #endif
-int first_protectable_page = 0;
+long first_protectable_page = 0;
 
 int runtime(void);
 
@@ -119,7 +119,7 @@ extern long real_maxpage;
 extern long new_holepage;
 
 #define	available_pages	\
-	(real_maxpage-page(heap_end)-new_holepage-2*nrbpage-real_maxpage/32)
+	(real_maxpage-page(heap_end)-(new_holepage>=holepage ? new_holepage : holepage)-2*nrbpage-real_maxpage/32)
 
 struct apage {
   char apage_self[PAGESIZE];
@@ -665,7 +665,7 @@ static long *c_stack_where;
 static void
 mark_stack_carefully(void *topv, void *bottomv, int offset) {
 
-  int p,m,pageoffset;
+  long p,m,pageoffset;
   object x;
   struct typemanager *tm;
   register long *j;
@@ -905,7 +905,7 @@ mark_c_stack(jmp_buf env1, int n, void (*fn)(void *,void *,int)) {
 static void
 sweep_phase(void) {
 
-  STATIC int i, j, k;
+  STATIC long i, j, k;
   STATIC object x;
   STATIC char *p;
   STATIC struct typemanager *tm;
@@ -995,7 +995,7 @@ sweep_phase(void) {
 static void
 contblock_sweep_phase(void) {
 
-  STATIC int i, j;
+  STATIC long i, j;
   STATIC char *s, *e, *p, *q;
   STATIC struct contblock *cbp;
   
@@ -1052,7 +1052,7 @@ char *old_rb_start;
 void
 GBC(enum type t) {
 
-  int i, j;
+  long i, j;
   struct apage *pp, *qq;
 #ifdef SGC
   int in_sgc = sgc_enabled;
@@ -1507,7 +1507,7 @@ gcl_init_GBC(void) {
   /* we use that maxpage is a power of 2 in this
      case, to quickly be able to look in our table */ 
   { 
-    int i,j;
+    long i,j;
   
     for(i=j=1 ; i< 32 ; i++) 
       if (MAXPAGE == (1 <<i))

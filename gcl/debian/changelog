@@ -7,8 +7,14 @@ gclcvs (2.7.0-23) unstable; urgency=low
     directory lists
   * Minor pathname and *features* fixes
   * Fix recently introduced configure.in syntax bug
+  * Minor patches to support big gcl images -- all page integers must be
+    long ints, need stack space limits that scale with MAXPAGES at least
+    to allow free_map stack array in sgc_start.  FIXME -- right now can
+    handle situations where page numbers are ints, but npage*PAGESIZE is
+    a long, need to handle npage >MAX_INT later.  This is to support the
+    'billion cons element acl2 image' requested by a gcl user
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 23 Apr 2004 20:21:32 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  3 May 2004 16:58:31 +0000
 
 gclcvs (2.7.0-22) unstable; urgency=low
 

@@ -751,7 +751,7 @@ Iarray_element_type(object x)
 /* add diff to body of x and arrays diisplaced to it */
 
 void
-adjust_displaced(object x, int diff)
+adjust_displaced(object x, long diff)
 {
 	if (x->ust.ust_self != NULL)
 		x->ust.ust_self = (char *)((long)(x->a.a_self) + diff);

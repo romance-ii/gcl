@@ -1,4 +1,4 @@
-/* alloc.c:89:OF */ extern char *alloc_page (int n); /* (n) int n; */
+/* alloc.c:89:OF */ extern char *alloc_page (long n); /* (n) int n; */
 /* alloc.c:149:OF */ extern void add_page_to_freelist (char *p, struct typemanager *tm); /* (p, tm) char *p; struct typemanager *tm; */
 /* alloc.c:196:OF */ extern object type_name (int t); /* (t) int t; */
 /* alloc.c:213:OF */ extern object alloc_object (enum type t); /* (t) enum type t; */
@@ -30,7 +30,7 @@
 /* array.c:480:OF */ extern void siLmake_vector (void); /* () */
 /* array.c:519:OF */ extern object fSmake_array1 (fixnum elt_type, object staticp, object initial_element, object displaced_to,fixnum displaced_index_offset, object dimensions); /* (elt_type, staticp, initial_element, displaced_to, displaced_index_offset, dimensions) int elt_type; object staticp; object initial_element; object displaced_to; int displaced_index_offset; object dimensions; */
 /* array.c::OF */ extern object fSmake_vector1_1 (fixnum n,fixnum elt_type,object staticp); 
-/* array.c:738:OF */ extern void adjust_displaced (object x, int diff); /* (x, diff) object x; int diff; */
+/* array.c:738:OF */ extern void adjust_displaced (object x, long diff); /* (x, diff) object x; int diff; */
 /* array.c:790:OF */ extern void gset (void *p1, void *val, int n, int typ); /* (p1, val, n, typ) char *p1; char *val; int n; int typ; */
 /* array.c:831:OF */ extern object fScopy_array_portion (object x, object y,fixnum i1,fixnum i2, object n1); /* (x, y, i1, i2, n1) object x; object y; int i1; int i2; int n1; */
 /* array.c:879:OF */ extern void array_allocself (object x, int staticp, object dflt); /* (x, staticp, dflt) object x; int staticp; object dflt; */
@@ -240,12 +240,12 @@ typedef void (*funcvoid)(void);
 /* sgbc.c:924:OF */ extern int sgc_count_type (int t); /* (t) int t; */
 /* sgbc.c:938:OF */ extern int sgc_start (void); /* () */
 /* sgbc.c:1068:OF */ extern int sgc_quit (void); /* () */
-/* sgbc.c:1131:OF */ extern void make_writable (int beg, int i); /* (beg, i) int beg; int i; */
+/* sgbc.c:1131:OF */ extern void make_writable (long beg, long i); /* (beg, i) int beg; int i; */
 #ifndef __MINGW32__
 /* #include <signal.h> */
 #endif
 /* sgbc.c:1246:OF */ extern void memory_protect (int on); /* (on) int on; */
-/* sgbc.c:1306:OF */ extern void perm_writable (char *p, int n); /* (p, n) char *p; int n; */
+/* sgbc.c:1306:OF */ extern void perm_writable (char *p, long n); /* (p, n) char *p; int n; */
 /* sgbc.c:1321:OF */ extern void system_error (void); /* () */
 /* gbc.c:1357:OF */ extern void gcl_init_GBC (void); /* () */
 /* gnumalloc.c:286:OF */ extern void malloc_init (char *start, void (*warnfun) (/* ??? */)); /* (start, warnfun) char *start; void (*warnfun)(); */

@@ -230,15 +230,22 @@ main(int argc, char **argv, char **envp) {
     install_segmentation_catcher();
 
 #ifdef BSD
-#  ifndef MAX_STACK_SIZE
-#    define MAX_STACK_SIZE (1<<23) /* 8Mb */
-#  endif
 #  ifdef RLIMIT_STACK
-    getrlimit(RLIMIT_STACK, &rl);
-    if (rl.rlim_cur == RLIM_INFINITY || 
-         rl.rlim_cur > MAX_STACK_SIZE)
-        rl.rlim_cur=MAX_STACK_SIZE;
-    cssize = rl.rlim_cur/4 - 4*CSGETA;
+    {
+      unsigned long mss;
+      mss=16*sizeof(short)*MAXPAGE; /* i.e. short foo[MAXPAGE] on stack in sgc_start */
+      if (getrlimit(RLIMIT_STACK, &rl))
+	error("Cannot get stack rlimit\n");
+      if (rl.rlim_max != RLIM_INFINITY && rl.rlim_max < mss)
+	mss=rl.rlim_max;
+      if (rl.rlim_cur == RLIM_INFINITY || 
+	  rl.rlim_cur != mss) {
+	rl.rlim_cur=mss;
+	if (setrlimit(RLIMIT_STACK,&rl))
+	  error("Cannot set stack rlimit\n");
+      }
+      cssize = rl.rlim_cur/sizeof(*cs_org) - sizeof(*cs_org)*CSGETA;
+    }
 #endif	
 #endif /* BSD */
 
