@@ -1,5 +1,9 @@
 AC_INIT()
 AC_CONFIG_HEADER(h/gclincl.h)
+
+VERSION=5.9.0
+AC_SUBST(VERSION)
+
 # some parts of this configure script are taken from the tcl configure.in
 
 #
@@ -1392,7 +1396,7 @@ AC_SUBST(O2FLAGS)
 if test -f h/$use.defs  ; then
 
   AC_SUBST(use)
-  AC_OUTPUT(makedefc)
+  AC_OUTPUT(makedefc windows/gcl.iss)
   echo makedefc
   cat makedefc
 
