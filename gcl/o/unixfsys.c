@@ -296,7 +296,7 @@ truename(object pathname)
 		q = filename;
 		p = current_directory;
 	} else
-#if 0
+#ifdef __MINGW32__
 	  if ( ( q > filename ) && ( q[-1] == ':' ) ) {
 	    int current = (q++, q[0]);
 	    q[0]=0;
