@@ -580,13 +580,15 @@ error:
  *----------------------------------------------------------------------
  */
 
- int
-TcpOutputProc(fd, buf, toWrite, errorCodePtr,block )
+int
+TcpOutputProc ( int fd, char *buf, int toWrite, int *errorCodePtr, int block )
+#if 0    
      int fd;       /* socket */
     char *buf;				/* Where to get data. */
     int toWrite;			/* Maximum number of bytes to write. */
     int *errorCodePtr;			/* Where to store error codes. */
      int block;
+#endif    
 {
     int bytesWritten;
     int error;
@@ -731,16 +733,14 @@ getCharGclSocket(strm,block)
   }
 }
 
-tcpCloseSocket(SOCKET fd)
+void tcpCloseSocket(SOCKET fd)
 {
 
  (*winSock.closesocket)(fd);
  
 }
 
-ungetCharGclSocket(c,strm)
-     int c;       /* the character to unget */
-     object strm; /* stream */
+void ungetCharGclSocket ( int c, object strm)
 {  object bufp = SOCKET_STREAM_BUFFER(strm);
   if (c == EOF) return;
   dprintf("pushing back %c\n",c);
@@ -751,16 +751,16 @@ ungetCharGclSocket(c,strm)
   }
 }
 
-doReverse(s,n)
-     char *s;
-{ char *p=&s[n-1];
-  int m = n/2;
-  while (--m>=0) {
-    int tem = *s;
-    *s = *p;
-    *p = tem;
-    s++; p--;
-  }
+void doReverse ( char *s, int n )
+{
+    char *p=&s[n-1];
+    int m = n/2;
+    while (--m>=0) {
+        int tem = *s;
+        *s = *p;
+        *p = tem;
+        s++; p--;
+    }
 }
 
 

@@ -4,7 +4,7 @@
 
 extern object truename(object);
 extern object make_pathname();
-Ldirectory()
+void Ldirectory ( void )
 {
 	char filename[MAXPATHLEN];
 	object *top=vs_top;
