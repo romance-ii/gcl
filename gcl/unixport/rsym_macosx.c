@@ -7,9 +7,9 @@
     in a simple format. This information will be used for relocation.
     
     To compile in standalone mode:
-        gcc -DDEBUG -DSTANDALONE -I../h -o rsym_macosx rsym_macosx.c
+        gcc -DDEBUG -I../h -o rsym_macosx rsym_macosx.c
     
-    Aurelien Chanudet (aurelienDOTchanudetATm4xDOTorg)
+    Aurelien Chanudet <aurelien.chanudet(at)m4x.org>
 */
 
 #include <mach-o/loader.h>
@@ -17,12 +17,12 @@
 
 #include <mach/mach.h>
 
-#ifdef STANDALONE
-#include <stdio.h>
+#ifndef SPECIAL_RSYM
 #define SPECIAL_RSYM
 #endif
 
 #include <fcntl.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -114,7 +114,7 @@ void rsym_doit1 (char *infile, char *outfile)
     struct stat stat_buf;
     struct mach_header *mh;
     struct load_command *lc;
-    struct symtab_command *st;
+    struct symtab_command *st = NULL;
     struct dysymtab_command *dyst;
     unsigned long nsyms, i, size;
     unsigned long strsize;
@@ -160,7 +160,8 @@ void rsym_doit1 (char *infile, char *outfile)
     symtab = (struct nlist *) ((char *) addr + st->symoff);
     
     s = sizeof(struct nlist) * st->nsyms;
-    if (vm_allocate (mach_task_self (), (vm_address_t *) &selected_symbols, s, 1) != KERN_SUCCESS) {
+    if (vm_allocate (mach_task_self (),
+		     (vm_address_t *) &selected_symbols, s, 1) != KERN_SUCCESS) {
         rsym_error ("could not vm_allocate");
     }
     
@@ -181,21 +182,25 @@ void rsym_doit1 (char *infile, char *outfile)
                 selected_symbols[i].n_un.n_strx > strsize)
             selected_symbols[i].n_un.n_name = "bad string index";
         else
-            selected_symbols[i].n_un.n_name = selected_symbols[i].n_un.n_strx + strtab;
+            selected_symbols[i].n_un.n_name =
+	      selected_symbols[i].n_un.n_strx + strtab;
         
       	if (verbose) {
-            fprintf (stdout, "%8x %s\n", (unsigned int) selected_symbols[i].n_value,
-                selected_symbols[i].n_un.n_name);
-   	}
+            fprintf (stdout, "%8x %s\n",
+		   (unsigned int) selected_symbols[i].n_value,
+		   selected_symbols[i].n_un.n_name);
+        }
     }
     
     rsym_doit2 (selected_symbols, nsyms, outfile);
     
-    if (vm_deallocate (mach_task_self (), (vm_address_t) selected_symbols, s) != KERN_SUCCESS) {
+    if (vm_deallocate (mach_task_self (),
+		       (vm_address_t) selected_symbols, s) != KERN_SUCCESS) {
         fprintf (stderr, "warning: failed to free memory\n");
     }
     
-    if (vm_deallocate (mach_task_self (), (vm_address_t) addr, (vm_size_t) size) != KERN_SUCCESS) {
+    if (vm_deallocate (mach_task_self (),
+		       (vm_address_t) addr, (vm_size_t) size) != KERN_SUCCESS) {
         fprintf (stderr, "warning: failed to deallocate mapped file\n");
     }
         
