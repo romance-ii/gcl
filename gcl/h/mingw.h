@@ -17,7 +17,7 @@
 #define GCL
 
 /* #define filehdr _IMAGE_FILE_HEADER */
-/*#define RUN_PROCESS*/
+#define RUN_PROCESS
 
 #define f_symptr PointerToSymbolTable
 #define f_nsyms NumberOfSymbols

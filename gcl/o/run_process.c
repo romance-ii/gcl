@@ -22,6 +22,260 @@ License for more details.
 #include "include.h"
 #ifdef RUN_PROCESS
 
+#ifdef __MINGW32__
+
+#include<windows.h>
+#include <fcntl.h>
+
+void DisplayError ( char *pszAPI );
+void PrepAndLaunchRedirectedChild ( HANDLE hChildStdOut,
+    HANDLE hChildStdIn,
+    HANDLE hChildStdErr,
+    PROCESS_INFORMATION *process_info,
+    char *name );
+void setup_stream_buffer ( object x );
+
+/* Run a process, with name holding the process name and arguments */
+void run_process ( char *name )
+{
+    object stream_in, stream_out, stream;
+    HANDLE hChildStdoutReadTmp,hChildStdoutRead,hChildStdoutWrite;
+    HANDLE hChildStdinWriteTmp,hChildStdinRead,hChildStdinWrite;
+    HANDLE hChildStderrWrite;
+    SECURITY_ATTRIBUTES sec_att;
+    PROCESS_INFORMATION process_info;
+    int ofd, ifd;
+    FILE *ofp, *ifp;
+#if 0
+    DWORD dwRead, dwWritten;
+    /*CHAR chBuf[1024] = "puts $env(PATH)\n\0";*/
+    CHAR chBuf[60] = "button .hello\npack .hello\n\0";
+     /*CHAR chBuf[60] = "button .hello\n\0"; */
+#endif
+    
+    /* Set up the security attributes struct. */
+    sec_att.nLength= sizeof(SECURITY_ATTRIBUTES);
+    sec_att.lpSecurityDescriptor = NULL;
+    sec_att.bInheritHandle = TRUE;
+
+    /* Create the child output r/w pipes. The read pipe is temporary. */
+    if ( ! CreatePipe ( &hChildStdoutReadTmp,
+                        &hChildStdoutWrite,
+                        &sec_att,
+                        0 ) ) {
+        DisplayError ( "CreatePipe stdout" );
+    }
+    
+    /* Duplicate the output write handle to be used as std error
+     * avoiding problems when the spawned process closes a
+     * stdout handle. */
+    if ( ! DuplicateHandle ( GetCurrentProcess (),
+                             hChildStdoutWrite,
+                             GetCurrentProcess (),
+                             &hChildStderrWrite,
+                             0,
+                             TRUE, /* Inheritable */
+                             DUPLICATE_SAME_ACCESS ) ) {
+        DisplayError ( "DuplicateHandle stdout/stderr" );
+    }
+    
+    /* Likewise, the child input pipes. */
+    if ( ! CreatePipe ( &hChildStdinRead,
+                        &hChildStdinWriteTmp,
+                        &sec_att,
+                        0 ) ) {
+        DisplayError ( "CreatePipe stdin" );
+    }
+
+    /* Make uninheritable copies of the output read handle and the
+     * input write handles. Stops the spawned process from
+     * inheriting non-closeable pipe handles. */
+    if ( ! DuplicateHandle ( GetCurrentProcess(),
+                             hChildStdoutReadTmp,
+                             GetCurrentProcess(),
+                             &hChildStdoutRead, /* The new handle. */
+                             0,
+                             FALSE, /* uninheritable. */
+                             DUPLICATE_SAME_ACCESS ) ) {
+        DisplayError ( "DuplicateHandle hChildStdoutRead" );
+    }
+
+    if ( ! DuplicateHandle ( GetCurrentProcess (),
+                             hChildStdinWriteTmp,
+                             GetCurrentProcess(),
+                             &hChildStdinWrite, /* New handle. */
+                             0,
+                             FALSE, /* uninheritable. */
+                             DUPLICATE_SAME_ACCESS ) ) {
+        DisplayError ( "DuplicateHandle hChildStdinWrite" );
+    }
+
+    /* Kill the inheritable temporary handles. */
+    if ( ! CloseHandle(hChildStdoutReadTmp ) ) DisplayError ( "CloseHandle: Temporary output read" );
+    if ( ! CloseHandle(hChildStdinWriteTmp ) ) DisplayError ( "CloseHandle: Temporary input write" );
+
+    PrepAndLaunchRedirectedChild ( hChildStdoutWrite,
+				   hChildStdinRead,
+				   hChildStderrWrite,
+				   &process_info,
+				   name );
+
+    /* Close pipe handles to ensure that no inappropriately accessible pipe handles
+     * remain in this process. */
+    if ( ! CloseHandle ( hChildStdoutWrite ) ) DisplayError ( "CloseHandle: Output write" );
+    if ( ! CloseHandle ( hChildStdinRead   ) ) DisplayError ( "CloseHandle: Input read" );
+    if ( ! CloseHandle ( hChildStderrWrite ) ) DisplayError ( "CloseHandle: Error write" );
+
+#if 0
+    fprintf ( stderr, "Before write\n" );
+    WriteFile( hChildStdinWrite, chBuf, strlen ( chBuf ), 
+               &dwWritten, NULL);
+    fprintf ( stderr, "Before read\n" );
+    if ( ! ReadFile( hChildStdoutRead, chBuf, 2, &dwRead, NULL ) || 
+         dwRead == 0 ) {
+        DisplayError ( "Nothing read\n" );
+    } else {
+        fprintf ( stderr, "Got Back: %s\n", chBuf );
+    }
+    fprintf ( stderr, "After read\n" );
+#endif
+
+    
+    /* Connect up the Lisp objects with the pipes. */
+    ofd = _open_osfhandle ( hChildStdoutRead, _O_RDONLY | _O_TEXT );
+    ofp = _fdopen ( ofd, "r" );
+    ifd = _open_osfhandle ( hChildStdinWrite, _O_WRONLY | _O_TEXT );
+    ifp = _fdopen ( ifd, "w" );
+
+#if 0
+    {
+        char buf[1024];
+        fprintf ( ifp, "button .wibble\n" );
+        fflush (ifp);
+        fgets ( buf, 2, ofp );
+        fprintf ( stderr, 
+                  "run_process: ofd = %x, ofp = %x, ifd = %x, ifp = %x, buf[0] = %x, buf[1] = %x, buf = %s\n",
+                  ofd, ofp, ifd, ifp, buf[0], buf[1], buf );
+    }
+#endif
+
+    stream_in = (object) alloc_object(t_stream);
+    stream_in->sm.sm_mode = smm_input;
+    stream_in->sm.sm_fp = ofp;
+    stream_out = (object) alloc_object(t_stream);
+    stream_out->sm.sm_mode = smm_output;
+    stream_out->sm.sm_fp = ifp;
+    setup_stream_buffer ( stream_in );
+    setup_stream_buffer ( stream_out );
+    stream = make_two_way_stream ( stream_in, stream_out );
+    vs_base[0] = stream;
+    vs_base[1] = Cnil;
+    vs_top = vs_base + 1;
+}
+
+/* Set up STARTUPINFO structure and launch redirected child. */
+void PrepAndLaunchRedirectedChild (
+    HANDLE hChildStdOut,
+    HANDLE hChildStdIn,
+    HANDLE hChildStdErr,
+    PROCESS_INFORMATION *process_info,
+    char * name )
+{
+    STARTUPINFO startup_info;
+
+    /* Set up the start up info struct. */
+    ZeroMemory ( &startup_info, sizeof ( STARTUPINFO ) );
+    startup_info.cb         = sizeof ( STARTUPINFO );
+    startup_info.dwFlags    = STARTF_USESTDHANDLES;
+    startup_info.hStdOutput = hChildStdOut;
+    startup_info.hStdInput  = hChildStdIn;
+    startup_info.hStdError  = hChildStdErr;
+    
+    /* Launch the redirected process. */
+    if ( ! CreateProcess ( NULL,
+                           name,
+                           NULL,
+                           NULL,
+                           TRUE,
+                           CREATE_NEW_CONSOLE,
+                           NULL,
+                           NULL,
+                           &startup_info,
+                           process_info ) ) {
+        DisplayError("CreateProcess");
+    }
+    
+}
+
+/* Display the error number and the corresponding Windows message. */
+void DisplayError(char *pszAPI)
+{
+    LPVOID lpvMessageBuffer;
+    CHAR szPrintBuffer[512];
+    DWORD nCharsWritten;
+
+    FormatMessage ( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+                    NULL,
+                    GetLastError (),
+                    MAKELANGID ( LANG_NEUTRAL, SUBLANG_DEFAULT ),
+                   (LPTSTR) &lpvMessageBuffer,
+                    0,
+                    NULL );
+
+    wsprintf ( szPrintBuffer,
+               "%s:\n   error code = %d.\n   message    = %s.\n",
+               pszAPI,
+               GetLastError(),
+               (char *)lpvMessageBuffer );
+
+    WriteConsole ( GetStdHandle(STD_OUTPUT_HANDLE),
+                   szPrintBuffer,
+                   lstrlen ( szPrintBuffer ),
+                   &nCharsWritten,
+                   NULL );
+
+    LocalFree ( lpvMessageBuffer );
+    FEerror ( "RUN-PROCESS encountered problems.", 0 );
+}
+
+void siLrun_process()
+{
+    char cmdline[20480];
+    int i, nargs;
+    int old = signals_allowed;
+    int argc = 0;
+
+    nargs = vs_top - vs_base;
+    for ( i = 0; i < nargs; i++ ) {
+      check_type_string ( &vs_base[i] );
+    }
+
+    cmdline[0]='\0';
+    for ( i = 0; i < nargs; i++ ) {
+      if ( strlen ( cmdline ) + vs_base[i]->st.st_fillp + 2 > 20480 ) {
+	FEerror ( "RUN-PROCESS command more than 20480 characters long.", 0 );
+      }
+      if ( i != 0 ) {
+        strcat ( cmdline, " ");
+      }
+      strcat ( cmdline,  vs_base[i]->st.st_self );
+      fprintf ( stderr, "siLrun_process: cmdline=%s\n", cmdline );
+      argc++;
+    }
+    signals_allowed = sig_at_read;
+    run_process ( cmdline );
+    signals_allowed = old;
+}
+
+void
+init_socket_function()
+{
+  make_si_function("RUN-PROCESS", siLrun_process);
+}
+
+
+#else /* __MINGW32__ */
+
 /*
  * System Include Files
  *
@@ -339,7 +593,9 @@ dlsym()
 
 
 #endif
-#endif
+#endif /* MUST_USE_STATIC_LINK */
+
+#endif /* __MINGW32__ */
 
 #else /* no RUN_PROCESS */
 void
