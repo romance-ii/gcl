@@ -871,10 +871,10 @@ Boston, MA 02111-1307, USA.
 /*
 
 */
-/* #include "lisp.h" */  /* for VALMASK */
-#define VALMASK -1
+
 /* try for 500 MB of address space */
-#define VALBITS 29
+#define VALBITS 31
+#define VALMASK ((((unsigned int) 1) << VALBITS) - 1)
 
 /* This gives us the page size and the size of the allocation unit on NT.  */
 SYSTEM_INFO sysinfo_cache;
