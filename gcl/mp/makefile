@@ -13,7 +13,7 @@ MPFILES= $(MPDIR)/mpi.o $(MPDIR)/mp2.o  $(MPDIR)/libmport.a
 OBJS= mp_divul3.o  mp_bfffo.o mp_mulul3.o mp2.o mp_dblrsl3.o mp_dblrul3.o ${GNULIB1}
 
 all:
-	make all1 "MPFILES=$(MPFILES)"
+	$(MAKE) all1 "MPFILES=$(MPFILES)"
 
 all1: ${MPFILES}
 

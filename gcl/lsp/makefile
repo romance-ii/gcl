@@ -49,7 +49,7 @@ all:	$(OBJS)
 fns1:	$(FNS)
 
 fns:	../cmpnew/collectfn.o
-	make fns1 -e "FNS=`echo ${OBJS} | sed -e 's:\.o:\.fn:g'`"
+	$(MAKE) fns1 -e "FNS=`echo ${OBJS} | sed -e 's:\.o:\.fn:g'`"
 
 ../cmpnew/collectfn.o: ../cmpnew/collectfn.lsp
 	(cd ../cmpnew ; $(PORTDIR)/saved_gcl $(PORTDIR)/ collectfn.lisp collectfn S1000)
@@ -69,6 +69,6 @@ sys-proclaim.lisp:
 
 
 newc:	
-	make $(OBJS) -e "NEWCFILES=`echo $(OBJS) | sed -e 's:\.o:.c:g'`"
+	$(MAKE) $(OBJS) -e "NEWCFILES=`echo $(OBJS) | sed -e 's:\.o:.c:g'`"
 
 

@@ -23,15 +23,15 @@ tar:
 	(cd .. ; tar cvf - ${TFILES} src/sobjs src/*.c src/*.el newh/*.el src/makefile comp/*.lsp comp/*.doc newh/*.h newh/makefile  | gzip -c > ${HOME}/`date '+acl-%y%m%d'`.tar.z)
 
 all-tests:
-	make
-	- make tests test1
-	- (cd /u11/wfs/nqthm1 ; rm *.o ; make "LISP=nacl")
-	- (cd /u11/wfs/gabriel ; make "LISP=nacl")
+	$(MAKE)
+	- $(MAKE) tests test1
+	- (cd /u11/wfs/nqthm1 ; rm *.o ; $(MAKE) "LISP=nacl")
+	- (cd /u11/wfs/gabriel ; $(MAKE) "LISP=nacl")
 
 tests2:
-	make
-	- make tests test1
-	- (cd /u11/wfs/nqthm1 ; rm *.o ; make "LISP=nacl")
+	$(MAKE)
+	- $(MAKE) tests test1
+	- (cd /u11/wfs/nqthm1 ; rm *.o ; $(MAKE) "LISP=nacl")
 
 
 -include ../makedefs

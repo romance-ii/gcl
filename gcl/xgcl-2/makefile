@@ -38,7 +38,7 @@ maxobjs: $(shell echo *.lsp) $(PORTDIR)/saved_gcl
 	'(xlib::compile-xgcl)' | $(LISP)
 
 $(PORTDIR)/saved_$(SYSTEM): $(C_OBJS) maxobjs
-	(cd $(PORTDIR) ; make saved_xgcl "INIT_SYSTEM_LSP=init_gcl.lsp" "SYSTEM=$(SYSTEM)" "SYSTEM_OBJS=`cat $(SYSDIR)/maxobjs` $(C_OBJS) " "LIBSYSTEM= $(X_LIBS) " "PORTDIR=$(PORTDIR)")
+	(cd $(PORTDIR) ; $(MAKE) saved_xgcl "INIT_SYSTEM_LSP=init_gcl.lsp" "SYSTEM=$(SYSTEM)" "SYSTEM_OBJS=`cat $(SYSDIR)/maxobjs` $(C_OBJS) " "LIBSYSTEM= $(X_LIBS) " "PORTDIR=$(PORTDIR)")
 	rm -f $(PORTDIR)/raw_$(SYSTEM)
 
 Xgcl:
@@ -63,7 +63,7 @@ general-c.o: general-c.c
 	$(CC) -c general-c.c  $(CFLAGS)
 
 tar:
-	make tar1 TARD=xgcl-`cat version`
+	$(MAKE) tar1 TARD=xgcl-`cat version`
 
 tar1:
 	(cd .. ; tar cvf - $(TARD)/*.lsp $(TARD)/*.lisp $(TARD)/*.c $(TARD)/*.paper $(TARD)/README $(TARD)/makefile $(TARD)/version | gzip -c > $(TARD).tgz)

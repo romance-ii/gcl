@@ -83,14 +83,14 @@ OBJS	= $(OD)main.o $(OD)alloc.o $(OD)gbc.o \
 all:  ../bin/dpp${EXE} $(OBJS) new-init $(LIBFILES) new_init.o  $(GCLIB) $(LAST_FILE)  $(FIRST_FILE) 
 
 go:
-	make "CFLAGS=${CFLAGS} -pg"
+	$(MAKE) "CFLAGS=${CFLAGS} -pg"
 
 ../bin/dpp${EXE}:	../bin/dpp.c
 	${CC} ${DEFS} -DUNIX -o ../bin/dpp${EXE} ../bin/dpp.c
 
 
 new-init: grab_defs
-	make new_init.c	decls1 "INI_FILES=`echo ${OBJS} | sed -e 's:\.o:.ini:g'  -e 's:new_init.o::g' `"
+	$(MAKE) new_init.c decls1 "INI_FILES=`echo ${OBJS} | sed -e 's:\.o:.ini:g'  -e 's:new_init.o::g' `"
 
 new_init.c: ${INI_FILES}
 	echo '#include "make-init.h"' > new_init.c

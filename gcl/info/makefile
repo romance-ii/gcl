@@ -75,7 +75,8 @@ tex:
 	TEXINPUTS=.:$$TEXINPUTS tex gcl-si.texi
 	TEXINPUTS=.:$$TEXINPUTS tex gcl-tk.texi
 	@echo must do twice to get indices correct...
-	@echo so do 'make tex' again
+	@echo so do '$(MAKE) tex' again
 
 clean:
 	rm -f *.info* *.html *.dvi *.cp *.ky *.vr *.tp *.pg *.toc *.aux *.log *.fn
+	rm -rf gcl.IC gcl.IE gcl.IG gcl.IP gcl.IR gcl.IT gcl.fu 

@@ -34,7 +34,7 @@ remake-sys-files:
 
 
 tar:
-	make -f makefile.gcl  tar1 DIR=`pwd`
+	$(MAKE) -f makefile.gcl  tar1 DIR=`pwd`
 
 tar1:
 	(cd .. ; tar cvf - `basename ${DIR}` | gzip -c > `basename ${DIR}`.tgz) 

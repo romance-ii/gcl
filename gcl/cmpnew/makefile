@@ -52,7 +52,7 @@ sys-proclaim.lisp:
 
 
 newfn:	
-	make `echo $(OBJS) | sed -e 's:\.o:.fn:g'`
+	$(MAKE) `echo $(OBJS) | sed -e 's:\.o:.fn:g'`
 
 
 
@@ -63,9 +63,9 @@ remake:
 	ln -s $(MAINDIR)/cmpnew/$$v.data . ; \
 	done
 	rm -f ../unixport/$(FLISP) 
-	(cd .. ; make sources)
-	(cd .. ; make)
-	(cd .. ; make)
+	(cd .. ; $(MAKE) sources)
+	(cd .. ; $(MAKE))
+	(cd .. ; $(MAKE))
 
 clean:
 	rm -f *.o core a.out *.fn

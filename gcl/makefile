@@ -34,10 +34,10 @@ all: $(BUILD_BFD) $(PORTDIR)/$(FLISP) command cmpnew/collectfn.o lsp/info.o do-g
 xgcl: $(PORTDIR)/saved_xgcl
 
 $(PORTDIR)/saved_xgcl: $(PORTDIR)/saved_gcl
-	cd xgcl-2 && make
+	cd xgcl-2 && $(MAKE)
 
 binutils/bfd/libbfd.a binutils/libiberty/libiberty.a:
-	cd $(@D) && make
+	cd $(@D) && $(MAKE)
 
 h/bfd.h: binutils/bfd/libbfd.a binutils/libiberty/libiberty.a
 	cp $(<D)/$(@F) $@
@@ -49,13 +49,13 @@ h/bfdlink.h h/ansidecl.h h/symcat.h: binutils/bfd/libbfd.a binutils/libiberty/li
 #	cp $< $@
 
 $(PORTDIR)/saved_gcl: $(HDIR)cmpinclude.h
-	(cd $(BINDIR); make all)
-	make mpfiles
+	(cd $(BINDIR); $(MAKE) all)
+	$(MAKE) mpfiles
 	rm -f o/cmpinclude.h ; cp h/cmpinclude.h o
-	(cd $(ODIR); make all)
-	(cd $(LSPDIR); make all)
-	(cd $(CMPDIR); make all)
-	cd $(@D) && make $(@F)
+	(cd $(ODIR); $(MAKE) all)
+	(cd $(LSPDIR); $(MAKE) all)
+	(cd $(CMPDIR); $(MAKE) all)
+	cd $(@D) && $(MAKE) $(@F)
 #	(cd $(PORTDIR); make saved_gcl)
 #	(cd $(PCLDIR); make compile; make saved_gcl_pcl)
 #	(cd $(CLCSDIR); make compile; make saved_full_gcl)
@@ -79,47 +79,47 @@ $(PORTDIR)/saved_gcl: $(HDIR)cmpinclude.h
 #	(cd info ; make)
 
 $(PCLDIR)/saved_gcl_pcl: $(PORTDIR)/saved_gcl
-	cd $(@D) &&  make compile LISP="../$<" &&  make $(@F) LISP="../$<"
+	cd $(@D) &&  $(MAKE) compile LISP="../$<" &&  $(MAKE) $(@F) LISP="../$<"
 
 $(CLCSDIR)/saved_full_gcl: $(PCLDIR)/saved_gcl_pcl
-	cd $(@D) &&  make compile LISP="../$<" &&  make $(@F) LISP="../$<"
+	cd $(@D) &&  $(MAKE) compile LISP="../$<" &&  $(MAKE) $(@F) LISP="../$<"
 
 $(PORTDIR)/saved_ansi_gcl: $(CLCSDIR)/saved_full_gcl
-	cd $(@D) &&  make $(@F)
+	cd $(@D) &&  $(MAKE) $(@F)
 
 cmpnew/collectfn.o lsp/info.o:
-	cd $(@D) && make $(@F)
+	cd $(@D) && $(MAKE) $(@F)
 
 do-gcl-tk:
 	if [ -d "$(TK_CONFIG_PREFIX)" ] ; then \
-		cd gcl-tk && make ; \
+		cd gcl-tk && $(MAKE) ; \
 	else \
 		echo "gcl-tk not made..missing include or lib" ; \
 	fi 
 
 do-info:
-	cd info && make
+	cd info && $(MAKE)
 
 mpfiles: $(MPFILES)
 
 $(MPDIR)/libmport.a:
-	(cd mp ; make all)
+	(cd mp ; $(MAKE) all)
 
 $(GMPDIR)/libgmp.a: $(GMPDIR)/Makefile
-	cd $(GMPDIR) && make && rm -f libgmp.a &&  ar qc libgmp.a *.o */*.o
+	cd $(GMPDIR) && $(MAKE) && rm -f libgmp.a &&  ar qc libgmp.a *.o */*.o
 
 gmp_all: $(GMPDIR)/Makefile
-	cd $(GMPDIR) && make 
+	cd $(GMPDIR) && $(MAKE) 
 	touch $@
 
 $(GMPDIR)/mpn/mul_n.o $(GMPDIR)/mpn/lshift.o $(GMPDIR)/mpn/rshift.o: $(GMPDIR)/Makefile
-	cd $(@D) && make $(@F)
+	cd $(@D) && $(MAKE) $(@F)
 
 command:
 	rm -f bin/gcl xbin/gcl
 	MGCLDIR=`echo $(GCLDIR) | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
 	GCLDIR=`echo $(GCLDIR)` ; \
-	make install-command "INSTALL_LIB_DIR=$$GCLDIR" "prefix=$$GCLDIR" "BINDIR=$$MGCLDIR/$(PORTDIR)"
+	$(MAKE) install-command "INSTALL_LIB_DIR=$$GCLDIR" "prefix=$$GCLDIR" "BINDIR=$$MGCLDIR/$(PORTDIR)"
 	(cd xbin ; cp ../bin/gcl .)
 
 #	GCLDIR=`echo $(GCLDIR) | sed -e 'sX^/cygdrive/\([a-z]\)X\1!Xg' -e 'sX^//\([a-z]\)X\1!Xg'` ; \
@@ -157,14 +157,14 @@ install-command:
 	 echo "start %cd%\..\lib\gcl-2.5.0\unixport\saved_gcl.exe -dir %cd%/../lib/gcl-2.5.0/unixport/ -libdir  %cd%/lib/gcl-2.5.0/ -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9" ) > $(DESTDIR)$(prefix)/bin/gclm.bat
 
 install: 
-	make install1 "INSTALL_LIB_DIR=$(prefix)/lib/gcl-`cat majvers`.`cat minvers`" "prefix=$(prefix)" "DESTDIR=$(DESTDIR)"
+	$(MAKE) install1 "INSTALL_LIB_DIR=$(prefix)/lib/gcl-`cat majvers`.`cat minvers`" "prefix=$(prefix)" "DESTDIR=$(DESTDIR)"
 INSTALL_LIB_DIR=
 install1:
 	mkdir -p $(DESTDIR)$(prefix)/lib 
 	mkdir -p $(DESTDIR)$(prefix)/bin
 	mkdir -p $(DESTDIR)$(INSTALL_LIB_DIR)
 	MINSTALL_LIB_DIR=`echo $(INSTALL_LIB_DIR) | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
-	make install-command "INSTALL_LIB_DIR=$(INSTALL_LIB_DIR)" "prefix=$(prefix)" "DESTDIR=$(DESTDIR)" "BINDIR=$$MINSTALL_LIB_DIR/unixport"
+	$(MAKE) install-command "INSTALL_LIB_DIR=$(INSTALL_LIB_DIR)" "prefix=$(prefix)" "DESTDIR=$(DESTDIR)" "BINDIR=$$MINSTALL_LIB_DIR/unixport"
 	rm -f $(DESTDIR)$(prefix)/bin/gcl.exe
 	tar cf - $(PORTDIR)/$(FLISP)$(EXE) info/*.info* $(LISP_LIB) \
 	$(TCL_EXES)  |  (cd $(DESTDIR)$(INSTALL_LIB_DIR) ;tar xf -)
@@ -180,30 +180,30 @@ install1:
 #	if [ -d "$(TK_CONFIG_PREFIX)" ] ; then  \
 #	(cd $(DESTDIR)$(INSTALL_LIB_DIR)/gcl-tk/demos ; \
 #	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../$(PORTDIR)/$(FLISP)$(EXE)) ; fi
-	if test "$(EMACS_SITE_LISP)" != "" ; then (cd elisp ; make install DESTDIR=$(DESTDIR)) ; fi
-	if test "$(INFO_DIR)" != "unknown"; then (cd info ; make ; make install DESTDIR=$(DESTDIR)) ; fi
+	if test "$(EMACS_SITE_LISP)" != "" ; then (cd elisp ; $(MAKE) install DESTDIR=$(DESTDIR)) ; fi
+	if test "$(INFO_DIR)" != "unknown"; then (cd info ; $(MAKE) ; $(MAKE) install DESTDIR=$(DESTDIR)) ; fi
 
 clean:
-	(cd $(BINDIR); make clean)
-	(cd mp ; make clean)
-	(cd $(ODIR); make clean)
-	(cd $(LSPDIR); make clean)
-	(cd $(CMPDIR); make clean)
-	(cd $(PORTDIR); make clean)
-	(cd gcl-tk ; make clean)
-	-(cd $(GMPDIR) ; make distclean)
-	cd $(CLCSDIR) && make clean
-	cd $(PCLDIR) && make clean
-	cd xgcl-2 && make clean
-	(cd $(TESTDIR); make clean)
-	(cd info ; make clean)
+	(cd $(BINDIR); $(MAKE) clean)
+	(cd mp ; $(MAKE) clean)
+	(cd $(ODIR); $(MAKE) clean)
+	(cd $(LSPDIR); $(MAKE) clean)
+	(cd $(CMPDIR); $(MAKE) clean)
+	(cd $(PORTDIR); $(MAKE) clean)
+	(cd gcl-tk ; $(MAKE) clean)
+	-(cd $(GMPDIR) ; $(MAKE) distclean)
+	cd $(CLCSDIR) && $(MAKE) clean
+	cd $(PCLDIR) && $(MAKE) clean
+	cd xgcl-2 && $(MAKE) clean
+	(cd $(TESTDIR); $(MAKE) clean)
+	(cd info ; $(MAKE) clean)
 	rm -f foo.tcl config.log makedefs makedefsafter config.cache config.status makedefc
 	rm -f h/config.h h/gclincl.h h/cmpinclude.h h/gmp.h
 	rm -rf $(GMPDIR)/.deps $(GMPDIR)/libgmp.a
 	rm -f xbin/gcl foo foo.c bin/gclm.bat gmp_all
 	rm -f h/*-linux.defs h/bfd.h h/bfdlink.h h/ansidecl.h h/symcat.h
-	-cd binutils/bfd && make distclean
-	-cd binutils/libiberty && make distclean
+	-cd binutils/bfd && $(MAKE) distclean
+	-cd binutils/libiberty && $(MAKE) distclean
 
 CMPINCLUDE_FILES=$(HDIR)cmpincl1.h $(HDIR)gclincl.h $(HDIR)compbas.h $(HDIR)enum.h $(HDIR)mgmp.h $(HDIR)object.h $(HDIR)vs.h \
 	$(HDIR)bds.h $(HDIR)frame.h \
@@ -223,7 +223,7 @@ $(HDIR)cmpinclude.h: $(CMPINCLUDE_FILES) $(HDIR)config.h
 go:
 	mkdir go
 	(cd go ; cp -s ../o/makefile ../o/*.o ../o/*.c ../o/*.d ../o/*.ini  .)
-	(cd go ; make  go)
+	(cd go ; $(MAKE)  go)
 
 tar:
 	rm -f gcl-`cat majvers`.`cat minvers`
@@ -234,5 +234,5 @@ configure: configure.in
 	chmod a+rx configure
 
 kcp:
-	(cd go ; make  "CFLAGS = -I../h -pg  -c -g ")
-	(cd unixport ; make gcp)
+	(cd go ; $(MAKE)  "CFLAGS = -I../h -pg  -c -g ")
+	(cd unixport ; $(MAKE) gcp)
