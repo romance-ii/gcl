@@ -819,7 +819,6 @@ integer_divide1(object x, object y)
 object
 get_gcd(object x, object y)
 {
-	int	i, j, k;
 	object	q, r;
 
 	if (number_minusp(x))
@@ -829,21 +828,38 @@ get_gcd(object x, object y)
 
 L:
 	if (type_of(x) == t_fixnum && type_of(y) == t_fixnum) {
-		i = fix(x);
-		j = fix(y);
-LL:
-		if (i < j) {
-			k = i;
-			i = j;
-			j = k;
-		}
-		if (j == 0) {
-			return(make_fixnum(i));
-		}
-		k = i % j;
-		i = j;
-		j = k;
-		goto LL;
+	  /* LL: */
+	  /* 		if (i < j) { */
+	  /* 			k = i; */
+	  /* 			i = j; */
+	  /* 			j = k; */
+	  /* 		} */
+	  /* 		if (j == 0) { */
+	  /* 			return(make_fixnum(i)); */
+	  /* 		} */
+	  /* 		k = i % j; */
+	  /* 		i = j; */
+	  /* 		j = k; */
+	  /* 		goto LL; */
+	  
+	  register fixnum i, j, k, t;
+
+	  i = fix(x);
+	  j = fix(y);
+	  k=0;
+	  while(!(i&0x1) && !(j&0x1)) {
+	      k++;
+	      i>>=1;
+	      j>>=1;
+	  }
+	  t= i&0x1 ? -j : i>>1; 
+	  do {
+	    while(!(t&0x1)) t>>=1;
+	    if(t>0) i=t; else j=-t;
+	    t=i-j;
+	  } while (t);
+	  return make_fixnum(i<<k);
+
 	}
 
 	if (number_compare(x, y) < 0) {
