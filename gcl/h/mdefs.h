@@ -48,7 +48,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define EXTER extern 
 #endif
 
-#ifdef NEED_MP_H
+#if defined(GMP) || defined(NEED_MP_H)
 #endif
+
 
 

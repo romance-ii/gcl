@@ -172,6 +172,7 @@ EXTER object  sKinternal ;
 EXTER object  sKnicknames ; 
 EXTER object  sKuse ; 
 EXTER object  sLApackageA ; 
+EXTER  object   fSset_gmp_allocate_relocatable (); 
 EXTER  object   fSallocate_bigger_fixnum_range (); 
 EXTER  object   fScmod  (); 
 EXTER  object   fScplus  (); 

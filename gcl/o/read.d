@@ -22,7 +22,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	read.d
 */
 
-#define NEED_MP_H
+
 #include "include.h"
 
 
@@ -674,7 +674,7 @@ BEGIN:
 		i++;
 	}
 	integer_part = (object)  big_register_0;
-	ZERO_BIG(big_register_0);
+	zero_big(big_register_0);
 	vs_push((object)integer_part);
 	if (i >= end)
 		goto NO_NUMBER;
@@ -758,7 +758,7 @@ MAKE_INTEGER:
 /**/
 	if (x == big_register_0)
 		big_register_0 = alloc_object(t_bignum);
-	ZERO_BIG(big_register_0);
+	zero_big(big_register_0);
 
 /**/
 	goto END;
@@ -858,7 +858,7 @@ MAKE_FLOAT:
 		goto NO_NUMBER;
 	}
 /**/
-	ZERO_BIG(big_register_0);
+	zero_big(big_register_0);
 
 
 /**/
@@ -870,14 +870,14 @@ DENOMINATOR:
 	vs_push(normalize_big_to_object(integer_part));
 /**/
 	if (vs_head == big_register_0)
-		big_register_0 = alloc_object(t_bignum);
-	ZERO_BIG(big_register_0);
+		big_register_0 = new_bignum();
+	zero_big(big_register_0);
 
 /**/
 	if ((d = digitp(s[i], radix)) < 0)
 		goto NO_NUMBER;
-	integer_part = alloc_object(t_bignum);
-	ZERO_BIG(integer_part);
+	integer_part = big_register_0;
+	/*	zero_big(integer_part); */
 	do {
 		mul_int_big(radix, integer_part);
 		add_int_big(d, integer_part);
@@ -896,7 +896,7 @@ NO_NUMBER:
 	*ep = i;
 	vs_reset;
 /**/
-	ZERO_BIG(big_register_0);
+	zero_big(big_register_0);
 
 
  /**/
@@ -942,7 +942,7 @@ int end, *ep, radix;
 /**/
 	if (x == big_register_0)
 		big_register_0 = alloc_object(t_bignum);
-	ZERO_BIG(big_register_0);
+	zero_big(big_register_0);
 	
 /**/
 	*ep = i;
@@ -953,7 +953,7 @@ NO_NUMBER:
 	*ep = i;
 	vs_reset;
 /**/
-	ZERO_BIG(big_register_0);
+	zero_big(big_register_0);
 /**/
 	return(OBJNULL);
 }
@@ -2623,8 +2623,8 @@ init_read()
 	in_list_flag = FALSE;
 	dot_flag = FALSE;
 
-	big_register_0 = alloc_object(t_bignum);
-	ZERO_BIG(big_register_0);
+	big_register_0 = new_bignum();
+	zero_big(big_register_0);
  
 	enter_mark_origin(&big_register_0);
 /*

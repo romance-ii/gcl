@@ -68,7 +68,7 @@ SGC is enabled.  */
 
 
 /* define if the profil system call is not defined in libc */
-#define NO_PROFILE 1 
+/* #undef NO_PROFILE */ 
 
 
 /* define if the _cleanup() function exists and should be called
@@ -101,4 +101,18 @@ SGC is enabled.  */
 
 /* #undef HAVE_SIGEMT */
 
+
+/* define if setenv  is define */
+#define HAVE_SETENV 1
+
+/* define if putenv  is define */
+/* #undef HAVE_PUTENV */
+
+
+/* define if long long int works to multiply to ints, */
+
+#define HAVE_LONG_LONG 1
+
+/* define if want to use GMP */
+#define GMP 1
 

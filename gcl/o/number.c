@@ -273,6 +273,7 @@ init_number()
 	make_constant("MOST-NEGATIVE-FIXNUM",
 		      make_fixnum(MOST_NEGATIVE_FIX));
 
+	init_big();
 	init_num_pred();
 	init_num_comp();
 	init_num_arith();

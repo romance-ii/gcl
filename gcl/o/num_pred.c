@@ -238,10 +238,11 @@ lf_eqlp(p,q)
 
 init_num_pred()
 {
-       	big_register_1 = alloc_object(t_bignum);
+#ifndef GMP
+        big_register_1 = new_bignum();
 	ZERO_BIG(big_register_1);
- 
-	enter_mark_origin(&big_register_1);
+ 	enter_mark_origin(&big_register_1);
+#endif
 	make_function("ZEROP", Lzerop);
 	make_function("PLUSP", Lplusp);
 	make_function("MINUSP", Lminusp);

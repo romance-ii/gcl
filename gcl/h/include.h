@@ -53,6 +53,10 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define EXTER extern 
 #endif
 
+#if defined(GMP) || defined(NEED_MP_H)
+#include "../h/mp.h"
+#endif
+
 #include "../h/compbas.h"
 #include "../h/enum.h"
 #include "../h/object.h"
@@ -62,9 +66,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "../h/stacks.h"
 #include "../h/lex.h"
 #include "../h/eval.h"
-#ifdef NEED_MP_H
-#include "../h/mp.h"
-#endif
 
 #include "../h/notcomp.h"
 #include "../h/funlink.h"

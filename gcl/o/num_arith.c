@@ -27,25 +27,46 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "num_include.h"
 
-object
-bignum2(most, least)
-int most, least;
-{ static  plong u [4] 
-   = {0x01010004 ,0x01010004, 0,0};
-  GEN w;
-  int l;
-  if(most) {setlgef(u,4),l=4;}
-    else {l=3; setlgef(u,3);}
-  MP_START_LOW(w,u,l);
-  MP_NEXT_UP(w) = least;
-  if (most) MP_NEXT_UP(w) = most;
- return  make_integer(u);
+object fixnum_add(i,j)
+     int i,j;
+{
+
+  if (i>=0)
+   { if (j<= (MOST_POSITIVE_FIX-i))
+      { MYmake_fixnum(return,i+j);
+      }
+   MPOP(return,addss,i,j);
+   } else { /* i < 0 */
+     if ((MOST_NEG_FIXNUM -i) <= j) {
+       MYmake_fixnum(return,i+j);
+     }
+   MPOP(return,addss,i,j);
+   }
+}
+/* return i - j */
+object fixnum_sub(i,j)
+     int i,j;
+{  
+
+  if (i>=0)
+   { if (j >= (i - MOST_POSITIVE_FIX))
+      { MYmake_fixnum(return,i-j);
+      }
+   MPOP(return,subss,i,j);
+   } else { /* i < 0 */
+     if ((MOST_NEG_FIXNUM -i) <= -j) {
+       MYmake_fixnum(return,i-j);
+     }
+   MPOP(return,subss,i,j);
+   }
 }
 
 object
 fixnum_times(i, j)
 int i, j;
-{ MPOP(return,mulss,i,j);
+{
+
+  MPOP(return,mulss,i,j);
 }
 
 object
@@ -81,23 +102,17 @@ object x, y;
 	int i, j, k;
 	double dx, dy;
 	object z, z1;
-	vs_mark;
-	
 	switch (type_of(x)) {
-
 	case t_fixnum:
 		switch(type_of(y)) {
 		case t_fixnum:
-		  MPOP(return, addss,fix(x),fix(y));
+		  return fixnum_add(fix(x),fix(y));
 		case t_bignum:
 		  MPOP(return, addsi,fix(x),MP(y));
 		case t_ratio:
-			vs_push(number_times(x, y->rat.rat_den));
-			z = number_plus(vs_top[-1], y->rat.rat_num);
-			vs_push(z);
-			z = make_ratio(z, y->rat.rat_den);
-			vs_reset;
-			return(z);
+			z = number_plus(number_times(x, y->rat.rat_den),
+					y->rat.rat_num);
+			return make_ratio(z, y->rat.rat_den);
 		case t_shortfloat:
 			dx = (double)(fix(x));
 			dy = (double)(sf(y));
@@ -119,12 +134,8 @@ object x, y;
 		case t_bignum:
 		  MPOP(return,addii,MP(y),MP(x)); 
 		case t_ratio:
-			vs_push(number_times(x, y->rat.rat_den));
-			z = number_plus(vs_top[-1], y->rat.rat_num);
-			vs_push(z);
-			z = make_ratio(z, y->rat.rat_den);
-			vs_reset;
-			return(z);
+			z = number_plus(number_times(x, y->rat.rat_den), y->rat.rat_num);
+			return make_ratio(z, y->rat.rat_den);
 		case t_shortfloat:
 			dx = number_to_double(x);
 			dy = (double)(sf(y));
@@ -143,20 +154,16 @@ object x, y;
 		switch (type_of(y)) {
 		case t_fixnum:
 		case t_bignum:
-			vs_push(number_times(x->rat.rat_den, y));
-			z = number_plus(x->rat.rat_num, vs_top[-1]);
-			vs_push(z);
+			
+			z = number_plus(x->rat.rat_num,
+					number_times(x->rat.rat_den, y));
 			z = make_ratio(z, x->rat.rat_den);
-			vs_reset;
 			return(z);
 		case t_ratio:
-			vs_push(number_times(x->rat.rat_num,y->rat.rat_den));
-			vs_push(number_times(x->rat.rat_den,y->rat.rat_num));
-			z = number_plus(vs_top[-2], vs_top[-1]);
-			vs_push(z);
-			vs_push(number_times(x->rat.rat_den,y->rat.rat_den));
-			z = make_ratio(z, vs_top[-1]);
-			vs_reset;
+
+			z = number_plus(number_times(x->rat.rat_num,y->rat.rat_den),
+					number_times(x->rat.rat_den,y->rat.rat_num));
+			z = make_ratio(z,number_times(x->rat.rat_den,y->rat.rat_den));
 			return(z);
 		case t_shortfloat:
 			dx = number_to_double(x);
@@ -224,13 +231,9 @@ object x, y;
 	case t_complex:
 	COMPLEX:
 		x = number_to_complex(x);
-		vs_push(x);
 		y = number_to_complex(y);
-		vs_push(y);
-		vs_push(number_plus(x->cmp.cmp_real, y->cmp.cmp_real));
-		vs_push(number_plus(x->cmp.cmp_imag, y->cmp.cmp_imag));
-		z = make_complex(vs_top[-2], vs_top[-1]);
-		vs_reset;
+		z = make_complex(number_plus(x->cmp.cmp_real, y->cmp.cmp_real),
+				 number_plus(x->cmp.cmp_imag, y->cmp.cmp_imag));
 		return(z);
 
 	default:
@@ -245,19 +248,21 @@ object x;
 	int i;
 	double dx;
 	object z, z1;
-	vs_mark;
+
 	
 	switch (type_of(x)) {
 
 	case t_fixnum:
-	  MPOP(return, addss,1,fix(x));
+	  
+	  if (fix(x)< MOST_POSITIVE_FIX-1) {
+	    MYmake_fixnum(return,fix(x)+1);
+	  }
+	  MPOP(return,addss,1,fix(x));
 	case t_bignum:
-	  MPOP(return, addsi,1,MP(x));
+	  MPOP(return,addsi,1,MP(x));
 	case t_ratio:
 		z = number_plus(x->rat.rat_num, x->rat.rat_den);
-		vs_push(z);
 		z = make_ratio(z, x->rat.rat_den);
-		vs_reset;
 		return(z);
 
 	case t_shortfloat:
@@ -274,9 +279,7 @@ object x;
 
 	case t_complex:
 	COMPLEX:
-		vs_push(one_plus(x->cmp.cmp_real));
-		z = make_complex(vs_top[-1], x->cmp.cmp_imag);
-		vs_reset;
+		z = make_complex(one_plus(x->cmp.cmp_real), x->cmp.cmp_imag);
 		return(z);
 
 	default:
@@ -291,23 +294,19 @@ object x, y;
 	int i, j, k;
 	double dx, dy;
 	object z, z1;
-	vs_mark;
+
 	
 	switch (type_of(x)) {
 
 	case t_fixnum:
 		switch(type_of(y)) {
-#define MOST_NEG_FIXNUM (1 << 31)		  
 		case t_fixnum:
 		  MPOP(return,subss,fix(x),fix(y));
 		case t_bignum:
 		  MPOP(return, subsi,fix(x),MP(y));
 		case t_ratio:
-			vs_push(number_times(x, y->rat.rat_den));
-			z = number_minus(vs_top[-1], y->rat.rat_num);
-			vs_push(z);
+			z = number_minus(number_times(x, y->rat.rat_den), y->rat.rat_num);
 			z = make_ratio(z, y->rat.rat_den);
-			vs_reset;
 			return(z);
 		case t_shortfloat:
 			dx = (double)(fix(x));
@@ -330,11 +329,8 @@ object x, y;
 		case t_bignum:
 		  MPOP(return,subii,MP(x),MP(y));
 		case t_ratio:
-			vs_push(number_times(x, y->rat.rat_den));
-			z = number_minus(vs_top[-1], y->rat.rat_num);
-			vs_push(z);
+			z = number_minus(number_times(x, y->rat.rat_den), y->rat.rat_num);
 			z = make_ratio(z, y->rat.rat_den);
-			vs_reset;
 			return(z);
 		case t_shortfloat:
 			dx = number_to_double(x);
@@ -354,20 +350,13 @@ object x, y;
 		switch (type_of(y)) {
 		case t_fixnum:
 		case t_bignum:
-			vs_push(number_times(x->rat.rat_den, y));
-			z = number_minus(x->rat.rat_num, vs_top[-1]);
-			vs_push(z);
+			z = number_minus(x->rat.rat_num, number_times(x->rat.rat_den, y));
 			z = make_ratio(z, x->rat.rat_den);
-			vs_reset;
 			return(z);
 		case t_ratio:
-			vs_push(number_times(x->rat.rat_num,y->rat.rat_den));
-			vs_push(number_times(x->rat.rat_den,y->rat.rat_num));
-			z = number_minus(vs_top[-2], vs_top[-1]);
-			vs_push(z);
-			vs_push(number_times(x->rat.rat_den,y->rat.rat_den));
-			z = make_ratio(z, vs_top[-1]);
-			vs_reset;
+			z = number_minus(number_times(x->rat.rat_num,y->rat.rat_den),
+					 (number_times(x->rat.rat_den,y->rat.rat_num)));
+			z = make_ratio(z,number_times(x->rat.rat_den,y->rat.rat_den));
 			return(z);
 		case t_shortfloat:
 			dx = number_to_double(x);
@@ -434,13 +423,9 @@ object x, y;
 	case t_complex:
 	COMPLEX:
 		x = number_to_complex(x);
-		vs_push(x);
 		y = number_to_complex(y);
-		vs_push(y);
-		vs_push(number_minus(x->cmp.cmp_real, y->cmp.cmp_real));
-		vs_push(number_minus(x->cmp.cmp_imag, y->cmp.cmp_imag));
-		z = make_complex(vs_top[-2], vs_top[-1]);
-		vs_reset;
+		z = make_complex(number_minus(x->cmp.cmp_real, y->cmp.cmp_real),
+				 number_minus(x->cmp.cmp_imag, y->cmp.cmp_imag));
 		return(z);
 
 	default:
@@ -455,8 +440,6 @@ object x;
 	int i;
 	double dx;
 	object z, z1;
-	vs_mark;
-	
 	switch (type_of(x)) {
 
 	case t_fixnum:
@@ -465,9 +448,7 @@ object x;
 	  MPOP(return,addsi,-1,MP(x));
 	case t_ratio:
 		z = number_minus(x->rat.rat_num, x->rat.rat_den);
-		vs_push(z);
 		z = make_ratio(z, x->rat.rat_den);
-		vs_reset;
 		return(z);
 
 	case t_shortfloat:
@@ -484,9 +465,7 @@ object x;
 
 	case t_complex:
 	COMPLEX:
-		vs_push(one_minus(x->cmp.cmp_real));
-		z = make_complex(vs_top[-1], x->cmp.cmp_imag);
-		vs_reset;
+		z = make_complex(one_minus(x->cmp.cmp_real), x->cmp.cmp_imag);
 		return(z);
 
 	default:
@@ -499,24 +478,21 @@ number_negate(x)
 object x;
 {
 	object	z, z1;
-	vs_mark;
 
 	switch (type_of(x)) {
 
 	case t_fixnum:
 		if(fix(x) == MOST_NEGATIVE_FIX)
-		  return make_bignum(ABS_MOST_NEGS);
+		  return fixnum_add(1,MOST_POSITIVE_FIX);
 		else
 		  return(make_fixnum(-fix(x)));
 	case t_bignum:
 		return big_minus(x);
 	case t_ratio:
 		z1 = number_negate(x->rat.rat_num);
-		vs_push(z1);
 		z = alloc_object(t_ratio);
 		z->rat.rat_num = z1;
 		z->rat.rat_den = x->rat.rat_den;
-		vs_reset;
 		return(z);
 
 	case t_shortfloat:
@@ -530,10 +506,8 @@ object x;
 		return(z);
 
 	case t_complex:
-		vs_push(number_negate(x->cmp.cmp_real));
-		vs_push(number_negate(x->cmp.cmp_imag));
-		z = make_complex(vs_top[-2], vs_top[-1]);
-		vs_reset;
+		z = make_complex(number_negate(x->cmp.cmp_real),
+				 number_negate(x->cmp.cmp_imag));
 		return(z);
 
 	default:
@@ -544,10 +518,9 @@ object x;
 object
 number_times(x, y)
 object x, y;
-{
+{  
 	object z;
 	double dx, dy;
-	vs_mark;
 
 	switch (type_of(x)) {
 
@@ -558,9 +531,7 @@ object x, y;
 		case t_bignum:
 		  MPOP(return,mulsi,fix(x),MP(y));
 		case t_ratio:
-			vs_push(number_times(x, y->rat.rat_num));
-			z = make_ratio(vs_top[-1], y->rat.rat_den);
-			vs_reset;
+			z = make_ratio(number_times(x, y->rat.rat_num), y->rat.rat_den);
 			return(z);
 		case t_shortfloat:
 			dx = (double)(fix(x));
@@ -584,9 +555,7 @@ object x, y;
 		case t_bignum:
 		  MPOP(return,mulii,MP(y),MP(x));
 		case t_ratio:
-			vs_push(number_times(x, y->rat.rat_num));
-			z = make_ratio(vs_top[-1], y->rat.rat_den);
-			vs_reset;
+			z = make_ratio(number_times(x, y->rat.rat_num), y->rat.rat_den);
 			return(z);
 		case t_shortfloat:
 			dx = number_to_double(x);
@@ -606,15 +575,11 @@ object x, y;
 		switch (type_of(y)) {
 		case t_fixnum:
 		case t_bignum:
-			vs_push(number_times(x->rat.rat_num, y));
-			z = make_ratio(vs_top[-1], x->rat.rat_den);
-			vs_reset;
+			z = make_ratio(number_times(x->rat.rat_num, y), x->rat.rat_den);
 			return(z);
 		case t_ratio:
-			vs_push(number_times(x->rat.rat_num,y->rat.rat_num));
-			vs_push(number_times(x->rat.rat_den,y->rat.rat_den));
-			z = make_ratio(vs_top[-2], vs_top[-1]);
-			vs_reset;
+			z = make_ratio(number_times(x->rat.rat_num,y->rat.rat_num),
+				       number_times(x->rat.rat_den,y->rat.rat_den));
 			return(z);
 		case t_shortfloat:
 			dx = number_to_double(x);
@@ -684,23 +649,14 @@ object x, y;
 		object z1, z2, z11, z12, z21, z22;
 
 		x = number_to_complex(x);
-		vs_push(x);
 		y = number_to_complex(y);
-		vs_push(y);
 		z11 = number_times(x->cmp.cmp_real, y->cmp.cmp_real);
-		vs_push(z11);
 		z12 = number_times(x->cmp.cmp_imag, y->cmp.cmp_imag);
-		vs_push(z12);
 		z21 = number_times(x->cmp.cmp_imag, y->cmp.cmp_real);
-		vs_push(z21);
 		z22 = number_times(x->cmp.cmp_real, y->cmp.cmp_imag);
-		vs_push(z22);
 		z1 =  number_minus(z11, z12);
-		vs_push(z1);
 		z2 =  number_plus(z21, z22);
-		vs_push(z2);
 		z = make_complex(z1, z2);
-		vs_reset;
 		return(z);
 	}
 
@@ -715,7 +671,6 @@ object x, y;
 {
 	object z;
 	double dx, dy;
-	vs_mark;
 
 	switch (type_of(x)) {
 
@@ -728,19 +683,14 @@ object x, y;
 				zero_divisor();
 			if (number_minusp(y) == TRUE) {
 				x = number_negate(x);
-				vs_push(x);
 				y = number_negate(y);
-				vs_push(y);
 			}
 			z = make_ratio(x, y);
-			vs_reset;
 			return(z);
 		case t_ratio:
 			if(number_zerop(y->rat.rat_num))
 				zero_divisor();
-			vs_push(number_times(x, y->rat.rat_den));
-			z = make_ratio(vs_top[-1], y->rat.rat_num);
-			vs_reset;
+			z = make_ratio(number_times(x, y->rat.rat_den), y->rat.rat_num);
 			return(z);
 		case t_shortfloat:
 			dx = number_to_double(x);
@@ -762,15 +712,11 @@ object x, y;
 		case t_bignum:
 			if (number_zerop(y))
 				zero_divisor();
-			vs_push(number_times(x->rat.rat_den, y));
-			z = make_ratio(x->rat.rat_num, vs_top[-1]);
-			vs_reset;
+			z = make_ratio(x->rat.rat_num, number_times(x->rat.rat_den, y));
 			return(z);
 		case t_ratio:
-			vs_push(number_times(x->rat.rat_num,y->rat.rat_den));
-			vs_push(number_times(x->rat.rat_den,y->rat.rat_num));
-			z = make_ratio(vs_top[-2], vs_top[-1]);
-			vs_reset;
+			z = make_ratio(number_times(x->rat.rat_num,y->rat.rat_den),
+				       number_times(x->rat.rat_den,y->rat.rat_num));
 			return(z);
 		case t_shortfloat:
 			dx = number_to_double(x);
@@ -845,34 +791,20 @@ object x, y;
 		object z1, z2, z3;
 
 		x = number_to_complex(x);
-		vs_push(x);
 		y = number_to_complex(y);
-		vs_push(y);
 		z1 = number_times(y->cmp.cmp_real, y->cmp.cmp_real);
-		vs_push(z1);
 		z2 = number_times(y->cmp.cmp_imag, y->cmp.cmp_imag);
-		vs_push(z2);
 		if (number_zerop(z3 = number_plus(z1, z2)))
 			zero_divisor();
-		vs_push(z3);
 		z1 = number_times(x->cmp.cmp_real, y->cmp.cmp_real);
-		vs_push(z1);
 		z2 = number_times(x->cmp.cmp_imag, y->cmp.cmp_imag);
-		vs_push(z2);
 		z1 = number_plus(z1, z2);
-		vs_push(z1);
 		z = number_times(x->cmp.cmp_imag, y->cmp.cmp_real);
-		vs_push(z);
 		z2 = number_times(x->cmp.cmp_real, y->cmp.cmp_imag);
-		vs_push(z2);
 		z2 = number_minus(z, z2);
-		vs_push(z2);
 		z1 = number_divide(z1, z3);
-		vs_push(z1);
 		z2 = number_divide(z2, z3);
-		vs_push(z2);
 		z = make_complex(z1, z2);
-		vs_reset;
 		return(z);
 	}
 
@@ -880,120 +812,6 @@ object x, y;
 		FEwrong_type_argument(sLnumber, x);
 	}
 }
-
-integer_quotient_remainder_1(x, y, qp, rp)
-object x, y;
-object *qp, *rp;
-{  GEN res,quot,x0,y0;
-  save_avma;
-  if (type_of(x)==t_fixnum) x0 = stoi(fix(x));
-   else x0=MP(x); 
-  if (type_of(y)==t_fixnum) y0 = stoi(fix(y));
-   else y0=MP(y);
-  res = dvmdii(x0,y0,&quot);
-  restore_avma;
-  *qp = make_integer(res);
-  *rp = make_integer(quot);
-  return;
- }
-      
-
-/* old
-integer_quotient_remainder_1(x, y, qp, rp)
-object x, y;
-object *qp, *rp;
-{
-	enum type tx, ty;
-	int i, j, q, r;
-	vs_mark;
-		
-	tx = type_of(x);
-	ty = type_of(y);
-	if (tx == t_fixnum) {
- 		if (ty == t_fixnum) {
-			if (fix(y) == 0)
-				zero_divisor();
-			if (fix(y) == MOST_NEGATIVE_FIX)
-				if (fix(x) == MOST_NEGATIVE_FIX) {
-					*qp = small_fixnum(1);
-					*rp = small_fixnum(0);
-					return;
-				} else {
-					*qp = small_fixnum(0);
-					*rp = x;
-					return;
-				}
-			if (fix(x) == MOST_NEGATIVE_FIX) {
-				if (fix(y) == 1) {
-					*qp = x;
-					*rp = small_fixnum(0);
-					return;
-				}
-				if (fix(y) == -1) {
-					*qp = bignum2(1, 0);
-					*rp = small_fixnum(0);
-					return;
-				}
-				if (fix(y) > 0) {
-					extended_div(fix(y), 1, 0,
-						     &q, &r);
-					*qp = make_fixnum(-q);
-					vs_push(*qp);
-					*rp = make_fixnum(-r);
-					vs_reset;
-					return;
-				} else {
-					extended_div(-fix(y), 1, 0,
-						     &q, &r);
-					*qp = make_fixnum(q);
-					vs_push(*qp);
-					*rp = make_fixnum(-r);
-					vs_reset;
-					return;
-				}
-			}
-			*qp = make_fixnum(fix(x) / fix(y));
-			vs_push(*qp);
-			*rp = make_fixnum(fix(x) % fix(y));
-			vs_reset;
-			return;
-		}
-		if (ty == t_bignum) {
-			if (fix(x) == MOST_NEGATIVE_FIX &&
-			    MP(y)[2] == MOST_NEGATIVE_FIX &&
-			    lgef(MP(y)) == 1 &&
-			    signe(MP(y)) < 0)
-			  {
-				*qp = small_fixnum(-1);
-				*rp = small_fixnum(0);
-				return;
-			      }
-			*qp = small_fixnum(0);
-			*rp = x;
-			return;
-		} else
-			FEwrong_type_argument(sLinteger, y);
-	}
-	if (tx == t_bignum) {
-		if (ty == t_fixnum)
-		  { 
-		     MPOP(*qp = ,divis,MP(x),fix(y));
-		     *rp = make_fixnum(hiremainder);
-		     return;
-		   }
-		else
-		  if (ty == t_bignum)
-#define Dvmdii(a,b) dvmdii(a,b,&p1)
-		    {GEN p1;
-		     MPOP(*qp = ,dvmdii,MP(x),MP(y));
-		     *rp = make_integer(p1);
-		     return;}
-		else
-			FEwrong_type_argument(sLinteger, y);
-	}
-	FEwrong_type_argument(sLinteger, x);
-}
-*/
 
 object
 integer_divide1(x, y)
@@ -1011,14 +829,11 @@ object	x, y;
 {
 	int	i, j, k;
 	object	q, r;
-	vs_mark;
 
 	if (number_minusp(x))
 		x = number_negate(x);
-	vs_push(x);
 	if (number_minusp(y))
 		y = number_negate(y);
-	vs_push(y);
 
 L:
 	if (type_of(x) == t_fixnum && type_of(y) == t_fixnum) {
@@ -1031,7 +846,6 @@ LL:
 			j = k;
 		}
 		if (j == 0) {
-			vs_reset;
 			return(make_fixnum(i));
 		}
 		k = i % j;
@@ -1046,12 +860,11 @@ LL:
 		y = r;
 	}
 	if (type_of(y) == t_fixnum && fix(y) == 0) {
-		vs_reset;
 		return(x);
 	}
 	integer_quotient_remainder_1(x, y, &q, &r);
-	vs_top[-2] = x = y;
-	vs_top[-1] = y = r;
+	 x = y;
+	 y = r;
 	goto L;
 }
 

@@ -42,430 +42,116 @@ read.d: normalize_big_to_object
 
  */
 
-
-
 #define remainder gclremainder
 #define NEED_MP_H
 #include "include.h"
 
+static char* (*gcl_gmp_allocfun)() = alloc_contblock;
+
+DEFUN("SET-GMP-ALLOCATE-RELOCATABLE",object,fSset_gmp_allocate_relocatable,SI,1,1,NONE,OO,OO,OO,OO,
+      "Set the allocation to be relocatble ")(flag)
+     object flag;
+{
+  if (flag == Ct) {
+    gcl_gmp_allocfun = alloc_relblock;
+  } else {
+    gcl_gmp_allocfun = alloc_contblock;
+  }
+  RETURN1(flag);
+}
+
+#ifdef GMP
+#include "gmp_big.c"
+#else
+#include "pari_big.c"
+#endif
 
 
 
+int big_sign(x)
+     object x;
+{
+  return BIG_SIGN(x);
+}
 
-#define BCOPY_BODY(x,y) \
-do { int *ucop = (int *)(x); \
-    int *vcop = (int *) (y); \
-  {int j = lgef(ucop); \
-    while(--j >= 0) \
-      { *vcop++ = *ucop++;}}}while (0)
+void set_big_sign(x,sign)
+     object x;
+     int sign;
+{
+  SET_BIG_SIGN(x,sign);
+}
 
-bcopy_body(x,y)
-    GEN x,y;
-{BCOPY_BODY(x,y);}
+void zero_big(x)
+     object x;
+{
+  ZERO_BIG(x);
+}
 
 
+#ifndef HAVE_MP_COERCE_TO_STRING
 
-
-/* coerce a pari GEN to a bignum or fixnum */
+double digitsPerBit[37]={ 0,0,
+1.0, /* 2 */
+0.6309297535714574, /* 3 */
+0.5, /* 4 */
+0.4306765580733931, /* 5 */
+0.3868528072345416, /* 6 */
+0.3562071871080222, /* 7 */
+0.3333333333333334, /* 8 */
+0.3154648767857287, /* 9 */
+0.3010299956639811, /* 10 */
+0.2890648263178878, /* 11 */
+0.2789429456511298, /* 12 */
+0.2702381544273197, /* 13 */
+0.2626495350371936, /* 14 */
+0.2559580248098155, /* 15 */
+0.25, /* 16 */
+0.244650542118226, /* 17 */
+0.2398124665681315, /* 18 */
+0.2354089133666382, /* 19 */
+0.2313782131597592, /* 20 */
+0.227670248696953, /* 21 */
+0.2242438242175754, /* 22 */
+0.2210647294575037, /* 23 */
+0.2181042919855316, /* 24 */
+0.2153382790366965, /* 25 */
+0.2127460535533632, /* 26 */
+0.2103099178571525, /* 27 */
+0.2080145976765095, /* 28 */
+0.2058468324604345, /* 29 */
+0.2037950470905062, /* 30 */
+0.2018490865820999, /* 31 */
+0.2, /* 32 */
+0.1982398631705605, /* 33 */
+0.1965616322328226, /* 34 */
+0.1949590218937863, /* 35 */
+0.1934264036172708, /* 36 */
+};
 
 object
-make_integer(u)
-GEN u;
-{ int l = lgef(u);
-  if (l > (MP_CODE_WORDS+1) ||
-      ( l == (MP_CODE_WORDS+1)  &&
-       (MP_ONLY_WORD(u) & (1<<31)) != 0
-       && (MP_ONLY_WORD(u) == ( 1<<31) ? signe(u) > 0 : 1)))
-    { object ans ;
-      GEN w;
-
-      { BEGIN_NO_INTERRUPT;
-      big_register_1->big.big_length = lg(u);
-      big_register_1->big.big_self =  u;
-      ans = alloc_object(t_bignum);
-      ans->big.big_self = 0;
-      w = (plong *)alloc_relblock(lg(u)*sizeof(plong));
-      /* may have been relocated */
-      u = (GEN)   big_register_1->big.big_self ;
-      ans->big.big_self = w;
-      ans->big.big_length = l;
-      BCOPY_BODY(u , w);
-      setlg(w,l);
-      END_NO_INTERRUPT;}	
-      return ans;
-    }
-  else
-    if (signe(u) > 0) return make_fixnum(MP_ONLY_WORD(u));
-  else
-    if (signe(u) < 0) return make_fixnum(-MP_ONLY_WORD(u));
-  else
-    return(small_fixnum(0));
+coerce_big_to_string(x,printbase)
+     int printbase;
+     object x;
+{ int i;
+ int sign=big_sign(x);
+ object b;
+ int size = (int)((ceil(MP_SIZE_IN_BASE2(MP(x))* digitsPerBit[printbase]))+.01);
+ char *q,*p = alloca(size+5);
+ q=p;
+ if(sign<=0) {
+   *q++ = '-';
+   b=big_minus(x);
+ } else {
+   b=copy_big(x);
  }
-
-
-object
-make_bignum(u)
-GEN u;
-{  BEGIN_NO_INTERRUPT;
-    { object ans = alloc_object(t_bignum);
-      GEN w;
-      ans->big.big_length = lg(u);
-      /* save u */
-      ans->big.big_self = u;
-      w = (plong *)alloc_relblock(lg(u)*sizeof(plong));
-      /* restore  u */
-      u = ans->big.big_self ;
-      ans->big.big_self = w;
-      BCOPY_BODY(u ,  ans->big.big_self);
-      END_NO_INTERRUPT;
-      return ans;
-     }}
-
-big_zerop(x)
- object x;
-{ return (signe(MP(x))== 0);}
-
-big_compare(x, y)
-     object x,y;
-{return cmpii(MP(x),MP(y));}
-
-object
-big_minus(x)
-     object x;
-{ object y; 
-  setsigne(MP(x),-(signe(MP(x))));
-  y = make_integer(MP(x));
-  setsigne(MP(x),-(signe(MP(x))));
-  return  y;
+ while (!big_zerop(b))
+   *q++=digit_weight(div_int_big(printbase, b),printbase);
+ *q++=0;
+  object ans = alloc_simple_string(q-p);
+  ans->ust.ust_self=alloc_relblock(ans->ust.ust_dim);
+  bcopy(ans->ust.ust_self,p,ans->ust.ust_dim);
+  ans->ust.ust_fillp=ans->ust.ust_dim-1;
+  return ans;
 }
 
-gcopy_to_big(res,x)
-     GEN res;
-     object x;
-{int l = (x)->big.big_length;
- int lgres = lg(res);
- if (l< lgres)
-    { BEGIN_NO_INTERRUPT;
-      big_register_1->big.big_length = lgres;
-      big_register_1->big.big_self = res;
-      (x)->big.big_self = (GEN) alloc_relblock(lgres*sizeof(int));
-      (x)->big.big_length = lgres; 
-      res =    big_register_1->big.big_self ;
-      END_NO_INTERRUPT;
-    }
- BCOPY_BODY(res,(x)->big.big_self);
-  if (l>lgres)
-    { setlg((x)->big.big_self, l);}
-} 
-	    
-
-add_int_big(i, x)
-int i;
-object x;
-{
-       MPOP_DEST(x,addsi,i,MP(x));
-}
-
-
-sub_int_big(i, x)
-int i;
-object x;
-{ MPOP_DEST(x,subsi,i,MP(x));
-}
-
-mul_int_big(i, x)
-int i;
-object x;
-{ MPOP_DEST(x,mulsi,i,MP(x));
-}    
-
-/*
-	Div_int_big(i, x) destructively divides non-negative bignum x
-	by positive int i.
-	X will hold the quotient from  the division.
-	Div_int_big(i, x) returns the remainder of the division.
-	I should be positive.
-	X should be non-negative.
-*/
-
-div_int_big(i, x)
-int i;
-object x;
-{ save_avma;
-  GEN res = divis(MP(x),i);
-  gcopy_to_big(res,x);
-  restore_avma;
-  return hiremainder;
-}
-
-
-object
-big_plus(x, y)
-object x,y;
-{ MPOP(return,addii,MP(x),MP(y));
-}
-
-object
-big_times(x, y)
-object x,y;
-{ MPOP(return,mulii,MP(x),MP(y));
-}
-
-
-
-big_quotient_remainder(x0, y0, qp, rp)
-     object x0,y0,*qp,*rp;
-{
-  GEN res,quot;
-  save_avma;
-  res = dvmdii(MP(x0),MP(y0),&quot);
-  *qp = make_integer(res);
-  *rp = make_integer(quot);
-  restore_avma;
-  return;
-
-}
-
-	
-double
-big_to_double(x)
-     object x;
-{
-	double d, e;
-	GEN u = MP(x);
-	unsigned int *w;
-	int l;
-	e =  4.294967296e9;
-
-	l = lgef(u);
-	MP_START_HIGH(w,(unsigned int *) u,l);
-	l = l - MP_CODE_WORDS;
-
-	if (l == 0) return 0.0;
-
-	d = (double) MP_NEXT_DOWN(w);
-	while (--l > 0)
-	  {d = e*d + (double)(MP_NEXT_DOWN(w));}
-	if (signe(u)>0) return d;
-	  else return -d;
-      }
-	
-
-object
-normalize_big_to_object(x)
- object x;
-{ return make_integer(MP(x));}
-  
-
-object copy_big(x)
-     object x;
-{
-  if (type_of(x)==t_bignum)
-    return make_bignum(MP(x));
-  else FEerror("bignum expected",0);
-
-}
-
-
-object
-copy_to_big(x)
-     object x;
-{object y;
-
-	if (type_of(x) == t_fixnum) {
-	  save_avma;
-	  y = make_bignum(stoi(fix(x)));
-	  restore_avma;
-	} else if (type_of(x) == t_bignum)
-		y = copy_big(x);
-	else
-		FEerror("integer expected",0);
-	return(y);
-      }
-  
-
-/* return the power of x */
-GEN
-powerii(x,y)
-     GEN x, y;
-{  GEN ans = gun;
-   if (signe(y) < 0) FEerror("bad",0);
-   while (lgef(y) > 2){
-     if (MP_LOW(y,lgef(y)) & 1)
-       { ans = mulii(ans,x);}
-     x = mulii(x,x);
-     y = shifti(y,-1);}
-   return ans;
- }
-
-
-
-replace_copy1(x,y)
-     GEN y,x;
-{ int j = lgef(x);
- if (y && j <= lg(y))
-    { x++; y++;
-      while (--j >0)
-      {*y++ = *x++;}
-     return 0;}
- END:
- return j*2*sizeof(GEN);
-}
-
-/* doubles the length ! */
-GEN
-replace_copy2(x,y)
-     GEN y,x;
-{GEN yp = y;  
- int k,j = lgef(x);
- k = j;
- while (--j >=0)
-   {*yp++ = *x++;}
- y[0] = INT_FLAG + k*2;
- return y;}
-
-#define STOI(x,y) do{ \
-  if (x ==0) { y[1]=2;} \
-  else if((x)>0) {y[1]=0x1000003;y[2]=x;} \
-                  else{y[1]=0xff000003;y[2]= -x;}}while (0)
-
-/* actually y == 0 is not supposed to happen !*/
-		    
-obj_replace_copy1(x,y)
-     object x;
-     GEN y;
-{ int j ;
-  GEN xp;
-  { if (type_of(x) == t_bignum)
-      {   j = lgef(MP(x));
-	  if (y && j <= lg(y))
-	    { xp=MP(x);
-	      xp++; y++;
-	      while (--j >0)
-		{*y++ = *xp++;}
-	      return 0;}}
-  else
-    { if (y==0) return 3*2*sizeof(GEN) ;
-      STOI(fix(x),y); return 0;}}
- END:
- return j*2*sizeof(GEN);
-}
-
-/* doubles the length ! */
-GEN
-obj_replace_copy2(x,y)
-     object x;
-     GEN y;
-{GEN yp = y;
- GEN xp;
- int k,j;
- if (type_of(x) == t_bignum)
-   { j = lgef(MP(x));
-     k = j;
-     xp = MP(x);
-     while (--j >=0)
-       {*yp++ = *xp++;}
-     y[0] = INT_FLAG + k*2;}
- else  {STOI(fix(x),yp); y[0] = INT_FLAG+3*2;}
- return y;}
-
-
-GEN
-otoi(x)
-     object x;
-{if (type_of(x)==t_fixnum) return stoi(fix(x));
- if (type_of(x)==t_bignum)
-   return (MP(x));
- FEwrong_type_argument(sLinteger,x);
- return 0;
-}
-
-object
-alloc_bignum_static(len)
-int len;
-    { object ans = alloc_object(t_bignum);
-      GEN w;
-      ans->big.big_length = len;
-      ans->big.big_self = 0;
-      w = (GEN)AR_ALLOC(alloc_contblock,len,unsigned plong);
-      ans->big.big_self = w;
-      w[0] = INT_FLAG + len;
-      return ans;
-     }
-
-
-GEN
-setq_io(x,all,val)
-     GEN x;
-     object val;
-     object *all;
-{int n= obj_replace_copy1(val,x);
- if (n)
-   { *all = alloc_bignum_static(n/sizeof(int));
-     return obj_replace_copy2(val,MP(*all));
-   }
- else return x;}
-
-
-GEN
-setq_ii(x,all,val)
-     GEN x;
-     GEN val;
-     object *all;
-{int n= replace_copy1(val,x);
- if (n)
-   { *all = alloc_bignum_static(n/sizeof(int));
-     return replace_copy2(val,MP(*all));
-   }
- else return x;}
-
-
- 
-
-void
-isetq_fix(var,s)
-     GEN var;
-     int s;
-{/* if (var==0) FEerror("unitialized integer var",0); */
- STOI(s,var);
-}
-
-GEN
-icopy_bignum(a,y)
-     object a;
-     GEN y;
-{ int *ucop = (int *)MP(a); 
-  int *vcop = (int *) (y);
-  int j = lgef(ucop);
-  {while(--j >= 0) 
-     { *vcop++ = *ucop++;}
-   setlg(y,a->big.big_length);
-   return y;}}
-     
-
-GEN
-icopy_fixnum(a,y)
-     object a;
-     GEN y;
-       
-{ int x= fix(a);
-  if(!x) return gzero;
-  y[0]=INT_FLAG+3;
-  if(x>0) {y[1]=0x1000003;y[2]=x;}
-  else{y[1]=0xff000003;y[2]= -x;}
-  return y;
-}
-     
-
-
-     
-
-
-  
-
-
-
-
-
-
-
+#endif

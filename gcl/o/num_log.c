@@ -26,155 +26,13 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "include.h"
 #include "num_include.h"
 
-/*
-	x : fixnum or bignum (may be not normalized)
-	y : integer
-   returns
-	fixnum or bignum ( not normalized )
-*/
-
-object big_log_op();
-
-object
-log_op(op)
-int (*op)();
-{
-	object x;
-	int	narg, i, j;
-	
-
-	narg = vs_top - vs_base;
-	if (narg < 2) too_few_arguments();
-	i = narg;
-	while(--i >= 0)
-		if (type_of(vs_base[i]) == t_bignum) goto BIG_OP;
-	j = fix(vs_base[0]);
-	i = 1;
-	while (i < narg) {
-		j = (*op)(j, fix(vs_base[i]));
-		i++;
-	}
-	return(make_fixnum(j));
-
-BIG_OP:
-	x = (object)copy_to_big(vs_base[0]);
-	vs_push(x);
-	i = 1;
-	{save_avma;
-	while (i < narg) {
-		x = (object)big_log_op(x, vs_base[i], op);
-		i++;
-	}
-	 restore_avma;}
-	x = normalize_big_to_object(x);
-	vs_pop;
-	return(x);
-}
-/*
-	big_log_op(x, y, op) performs the logical operation op onto
-	x and y, and return the result in x destructively.
-
-	
-*/
-
-void minimize_lg(x)
-GEN x;
-{int j,i,lgx = lgef(x);
- GEN u = x+2;
- i = lgx;
- i -= 2;
- while (-- i >= 0)
-   { if (*u++) break;
-   }
- j = lgx -i -3;
- if (j)
-   { GEN v = x+2;
-     GEN w = v + j;
-     GEN lim = x+lgx;
-     while (w<lim)
-       {*v++ = *w++;}
-     setlgef(x,(i+3));}
- if (i==-1) setsigne(x,0);
-}
-
-
-/* Fix this.   Should be destructive into x0.
-   It is for the benefit of log_op;
-   Maybe write an mp version, and then do it.
-*/   
-
-GEN
-complementi(x)
-     GEN x;
-{int l = lgef(x);
- GEN u = cgeti(l);
- unsigned plong * v ;
- unsigned plong *w ;
-
- MP_START_LOW(w,(unsigned plong *)x,l);
- MP_START_LOW(v,(unsigned plong *)u,l);
- setlgef(u,l);
- setsigne(u,1);
- l -= MP_CODE_WORDS;
- {unsigned int next=0;
-  while (--l >=0)
-    { unsigned int last = MP_NEXT_UP(w);
-      MP_NEXT_UP(v) = next - last ;
-       if (last > next)
-	 { next -= 1 ;}}
-  return u;}}
- 
-object big_log_op(x0,y0,op)
-object x0,y0;
- plong (*op)();     
-{ int leadx,leady;
-  int result_length;
-  int lgx,lgy;
-  GEN x,y,u,up,result;
-  save_avma;
-  x = MP(x0);
-  y = (type_of(y0)==t_bignum ? MP(y0) : stoi(fix(y0)));
-  leadx = signe(x);
-  lgx=lgef(x);
-  if (leadx < 0)
-    x = complementi(x);
-  else leadx = 0;
-
-  lgy = lgef(y);
-  leady = signe(y);
-  if (leady < 0)
-    y=complementi(y);
-  else leady = 0;
-  result_length = (lgx > lgy ? lgx : lgy);
-  u = result = cgeti(result_length);
-  setlgef(result,result_length);
-  MP_START_LOW(u,u,result_length);
-  result_length -= MP_CODE_WORDS;
-
-  x += lgx;
-  y += lgy;
-  lgx -= MP_CODE_WORDS;
-  lgy -= MP_CODE_WORDS;
-
-  while (--lgx >= 0)
-    { if (--lgy >= 0)
-	{ MP_NEXT_UP(u) = (*op)(MP_NEXT_UP(x),MP_NEXT_UP(y));}
-    else MP_NEXT_UP(u) = (*op)(MP_NEXT_UP(x),leady);
-      }
-  /*  lgx is now 0 */
-  while (--lgy >= 0)
-    {  MP_NEXT_UP(u) = (*op)(leadx,MP_NEXT_UP(y));}
-  {int leadresult = (*op)(leadx,leady);
-   if (leadresult < 0)
-     { result = complementi(result);
-       setsigne(result,-1);}
-   else setsigne(result,1);}
-  minimize_lg(result);
-  restore_avma;
-  gcopy_to_big(result,x0);
-  return x0;
-}
    
+#ifdef GMP
+#include "gmp_num_log.c"
+#else
+#include "pari_num_log.c"
+#endif
+
 
 int
 ior_op(i, j)
@@ -246,60 +104,69 @@ int	i, j;
 	return(i | (~j));
 }
 
+int
 b_clr_op(i, j)
 int	i, j;
 {
 	return(0);
 }
 
+int
 b_set_op(i, j)
 int	i, j;
 {
 	return(-1);
 }
 
+int
 b_1_op(i, j)
 int	i, j;
 {
 	return(i);
 }
 
+int
 b_2_op(i, j)
 int	i, j;
 {
 	return(j);
 }
 
+int
 b_c1_op(i, j)
 int	i, j;
 {
 	return(~i);
 }
 
+int
 b_c2_op(i, j)
 int	i, j;
 {
 	return(~j);
 }
 
-int
-big_bitp(x, p)
-object	x;
-int	p;
-{ GEN u = MP(x);
-  int ans ;
-  int i = p /32;
-  if (signe(u) < 0)
-    {  save_avma;
-       u = complementi(u);
-       restore_avma;
-   }
-  if (i < lgef(u) -MP_CODE_WORDS)
-    { ans = ((MP_ITH_WORD(u,i,lgef(u))) & (1 << p%32));}
-  else if (big_sign(x) < 0) ans = 1;
-  else ans = 0;
-  return ans;
+#ifdef NEVER
+int (*intLogOps)()[16]= {
+  b_clr_op,  /* 0 */
+  b_and_op,  /* 01 */
+  b_andc2_op,  /* 02 */
+  b_1_op,  /* 03 */
+  b_andc1_op,  /* 04 */
+  b_2_op,  /* 05 */
+  b_xor_op,  /* 06 */
+  b_ior_op,  /* 07 */
+  b_nor_op,  /* 010 */
+  b_eqv_op,  /* 011 */
+  b_c2_op,  /* 012 */
+  b_orc2_op,  /* 013 */
+  b_c1_op,  /* 014 */
+  b_orc1_op,  /* 015 */
+  b_nand_op,  /* 016 */
+  b_set_op,  /* 017 */
 }
+#endif
+
 
 int
 fix_bitp(x, p)
@@ -336,19 +203,10 @@ object	x;
 		if (i < 0) i = ~i;
 		count = count_int_bits(i);
 	} else if (type_of(x) == t_bignum)
-	  { save_avma;
-	    GEN u = MP(x);
-	    if (signe(u) < 0)
-	      { u = subsi(-1,u);}
-	    count = 0;
-	    {int leng = lgef(u);
-	     MP_START_LOW(u,u,leng);
-	     leng -= MP_CODE_WORDS;
-	     while (--leng >= 0)
-	       { count += count_int_bits(MP_NEXT_UP(u));}}
-	    restore_avma;
+	  {
+	    count= MP_BITCOUNT(MP(x));
 	  }
-	  else
+	else 
 		FEwrong_type_argument(sLinteger, x);
 	return(count);
 }
@@ -359,28 +217,29 @@ object	x;
 	result is returned in *hp and *lp.
 */
 
+
+
 object
 shift_integer(x, w)
 object	x;
 int	w;
-{ GEN u ;
-  
+{ 
   if (type_of(x) == t_fixnum)
     { if (w <= 0)
 	{ w = -w;
 	  if (w >= WSIZ) return small_fixnum(0);
 	  else
 	return make_fixnum (fix(x) >> (w));}
-      MPOP(return, shifti,stoi(fix(x)),w);
+    MPOP(return, shifti,SI_TO_MP(fix(x),big_fixnum1),w);
     }
   else
-    if (type_of(x) == t_bignum)
-      MPOP(return, shifti,MP(x),w);
-  else
-    	FEwrong_type_argument(sLinteger, x);
-    
+    if (type_of(x) == t_bignum) {
+      MPOP(return,shifti,MP(x),w);
+    }
+  FEwrong_type_argument(sLinteger, x);
 }
-  
+	
+
 int
 int_bit_length(i)
 int	i;
@@ -411,7 +270,7 @@ Llogior()
 	}
 	if (narg == 1)
 		return;
-	x = log_op(ior_op);
+	x = log_op(ior_op,mp_ior_op);
 	vs_top = vs_base;
 	vs_push(x);
 }
@@ -431,7 +290,7 @@ Llogxor()
 		return;
 	}
 	if (narg == 1) return;
-	x = log_op(xor_op);
+	x = log_op(xor_op,mp_xor_op);
 	vs_top = vs_base;
 	vs_push(x);
 }
@@ -451,7 +310,7 @@ Llogand()
 		return;
 	}
 	if (narg == 1) return;
-	x = log_op(and_op);
+	x = log_op(and_op,mp_and_op);
 	vs_top = vs_base;
 	vs_push(x);
 }
@@ -471,7 +330,7 @@ Llogeqv()
 		return;
 	}
 	if (narg == 1) return;
-	x = log_op(eqv_op);
+	x = log_op(eqv_op,mp_eqv_op);
 	vs_top = vs_base;
 	vs_push(x);
 }
@@ -481,35 +340,37 @@ Lboole()
 	object  x;
 	object	o, r;
 	int	(*op)();
+	void	(*mp_op)() = (void *) 0;
 
 	check_arg(3);
 	check_type_integer(&vs_base[0]);
 	check_type_integer(&vs_base[1]);
 	check_type_integer(&vs_base[2]);
 	o = vs_base[0];
+
 	switch(fixint(o)) {
-		case BOOLCLR:	op = b_clr_op;	break;
-		case BOOLSET:	op = b_set_op;	break;
-		case BOOL1:	op = b_1_op;	break;
-		case BOOL2:	op = b_2_op;	break;
-		case BOOLC1:	op = b_c1_op;	break;
-		case BOOLC2:	op = b_c2_op;	break;
-		case BOOLAND:	op = and_op;	break;
-		case BOOLIOR:	op = ior_op;	break;
-		case BOOLXOR:	op = xor_op;	break;
-		case BOOLEQV:	op = eqv_op;	break;
-		case BOOLNAND:	op = nand_op;	break;
-		case BOOLNOR:	op = nor_op;	break;
-		case BOOLANDC1:	op = andc1_op;	break;
-		case BOOLANDC2:	op = andc2_op;	break;
-		case BOOLORC1:	op = orc1_op;	break;
-		case BOOLORC2:	op = orc2_op;	break;
+		case BOOLCLR:	op = b_clr_op; mp_op = mp_b_clr_op;	break;
+		case BOOLSET:	op = b_set_op; mp_op = mp_b_set_op;	break;
+		case BOOL1:	op = b_1_op; mp_op = mp_b_1_op;	break;
+		case BOOL2:	op = b_2_op; mp_op = mp_b_2_op;	break;
+		case BOOLC1:	op = b_c1_op; mp_op =mp_b_c1_op;	break;
+		case BOOLC2:	op = b_c2_op; mp_op =mp_b_c2_op;	break;
+		case BOOLAND:	op = and_op; mp_op = mp_and_op;	break;
+		case BOOLIOR:	op = ior_op; mp_op = mp_ior_op;	break;
+		case BOOLXOR:	op = xor_op; mp_op = mp_xor_op;	break;
+		case BOOLEQV:	op = eqv_op; mp_op = mp_eqv_op;	break;
+		case BOOLNAND:	op = nand_op; mp_op =mp_nand_op;	break;
+		case BOOLNOR:	op = nor_op; mp_op = mp_nor_op;	break;
+		case BOOLANDC1:	op = andc1_op; mp_op = mp_andc1_op;	break;
+		case BOOLANDC2:	op = andc2_op; mp_op = mp_andc2_op;	break;
+		case BOOLORC1:	op = orc1_op; mp_op =mp_orc1_op;	break;
+		case BOOLORC2:	op = orc2_op; mp_op =mp_orc2_op;	break;
 		default:
 			FEerror("~S is an invalid logical operator.",
 				1, o);
 	}
 	vs_base++;
-	x = log_op(op);
+	x = log_op(op,mp_op);
 	vs_base--;
 	vs_top = vs_base;
 	vs_push(x);
@@ -629,29 +490,7 @@ Linteger_length()
 		if (i < 0) i = ~i;
 		count = int_bit_length(i);
 	} else if (type_of(x) == t_bignum) 
-	  { GEN w,u = MP(x);
-	    int l = lg(u);
-	    our_ulong high;
-	    w = u;
-	    MP_START_HIGH(u,u,l);
-	    high = MP_NEXT_DOWN(u);
-	    count = int_bit_length(high) ;
-	    
-	    l -= MP_CODE_WORDS;
-	    
-	    if (signe(w) < 0 &&
-		high == (1 << (count -1)))
-	      /* in the case of -(1<< n)
-		 it is one less */
-	      { int ll = l;
-		int nzero = 0;
-		while (--ll > 0)
-		  { if (MP_NEXT_DOWN(u))
-		      {nzero= 1; break;}}
-		if (nzero == 0) --count ;}
-		
-	    count +=               32* (l - 1);
-	  }
+	  count = MP_SIZE_IN_BASE2(MP(x));
 	else
 	      	FEwrong_type_argument(sLinteger, x);
 	vs_top = vs_base;

@@ -417,8 +417,21 @@ DEFUN("SETENV",object,fSsetenv,SI,2,2,NONE,OO,OO,OO,OO,"Set environment VARIABLE
      object value;
 {
 
-  int res;
+  int res = -1;
+#ifdef HAVE_SETENV 
   res = setenv(object_to_string(variable),object_to_string(value),1);
+#else
+#ifdef HAVE_PUTENV
+  {char *buf;
+  char *sym=object_to_string(variable);
+  char *val=object_to_string(value);
+  buf = malloc(strlen(sym)+strlen(value)+5);
+  sprintf(buf,"%s=%s",sym,val);
+  res=putenv(buf);
+  free(buf);
+  }
+#endif
+#endif  
   RETURN1((res == 0 ? Ct : Cnil ));
 }
 

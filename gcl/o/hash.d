@@ -42,7 +42,18 @@ object x;
 		return(fix(x));
 
 	case t_bignum:
-		{ GEN u = MP(x);
+#ifdef GMP
+	  { MP_INT *mp = MP(x);
+	  int l = mpz_size (mp);
+	  mp_limb_t *u = mp->_mp_d;
+	  if (l > 5) l = 5;
+	  while (-- l >= 0)
+	    { h += *u++;}
+	  return(h);
+	  }
+		
+#else
+	     { GEN u = MP(x);
 		  int l = lg(u) - 2;
 		  u += 2;
 		  h += l;
@@ -51,6 +62,7 @@ object x;
 		    { h += *u++;}
 		  return(h);
 		}
+#endif
 
 	case t_ratio:
    		return(hash_eql(x->rat.rat_num) + hash_eql(x->rat.rat_den));

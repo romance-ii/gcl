@@ -45,31 +45,31 @@ XS(tf);
 XS(left_trim);
 XS(right_trim);
 XS(lex_env);
-XS(in_saved_avma);
 XS(key_function);
 XS(test_function);
 XS(item_compared);
 XS(intern_flag);
 XS(printStructBufp);
 XS(sfaslp);
-XS(overflow);
 XS(preserving_whitespace_flag);
 XS(sharing_table);
 XS(string_sign);
 XS(string_boundary);
 XS(car_or_cdr);
 XS(casefun);
-XS(small_neg_int[2]);
+XS(tmp_alloc);
+#ifndef GMP 
 #ifdef CMAC
 XS(s4_neg_int[3]);
 XS(small_neg_int[2]);
 XS(small_pos_int[2]);
 #endif
-XS(tmp_alloc);
+XS(overflow);
 XS(top);
 XS(hiremainder);
+XS(in_saved_avma);
 XS(avma	);
-
+#endif
 
 /*  put in NO_INTERRUPT
 YS(fmt_base);

@@ -101,3 +101,17 @@ SGC is enabled.  */
 #undef HAVE_SIGEMT
 
 
+/* define if setenv  is define */
+#undef HAVE_SETENV
+
+/* define if putenv  is define */
+#undef HAVE_PUTENV
+
+
+/* define if long long int works to multiply to ints, */
+
+#undef HAVE_LONG_LONG
+
+/* define if want to use GMP */
+#undef GMP
+

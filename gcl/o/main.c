@@ -245,6 +245,7 @@ char **argv, **envp;
 			saving_system = FALSE;
 			terminal_io->sm.sm_object0->sm.sm_fp = stdin;
 			terminal_io->sm.sm_object1->sm.sm_fp = stdout;
+			init_big1();
 #ifdef INIT_CORE_END
 			INIT_CORE_END
 #endif			  
@@ -401,7 +402,6 @@ initlisp()
 	
 	NewInit();
 	init_typespec();
-	init_pari();
 	init_number();
 	init_character();
 
@@ -849,7 +849,10 @@ init_main()
 	   features=    make_cons(make_ordinary("COMMON"),
 		     make_cons(make_ordinary("KCL"), Cnil));
 	 ADD_FEATURE("AKCL");
-	 ADD_FEATURE("GCL");	 
+	 ADD_FEATURE("GCL");
+#ifdef GMP
+	 ADD_FEATURE("GMP");
+#endif	 
 
 #ifdef UNIX
 #ifndef WINDOWSNT	 

@@ -242,12 +242,8 @@
    (get '* 'inline-always))
 (push '((short-float short-float) short-float #.(flags rfa)"(#0)*(#1)")
    (get '* 'inline-always))
-(push '((integer integer) integer #.(flags rfa is)"mulii(#0,#1)")
-   (get '* 'inline-always))
-(push '((integer integer integer) integer #.(flags rfa is)"mulii(#0,mulii(#1,#2))")
-   (get '* 'inline-always))
-(push '((fixnum integer) integer #.(flags rfa is)"mulsi(#0,#1)")
-   (get '* 'inline-always))
+
+
 (push '((fixnum fixnum) fixnum #.(flags)"(#0)*(#1)")
    (get '* 'inline-always))
 
@@ -263,10 +259,8 @@
    (get '+ 'inline-always))
 (push '((short-float short-float) short-float #.(flags rfa)"(#0)+(#1)")
    (get '+ 'inline-always))
-(push '((integer integer) integer #.(flags rfa is)"addii(#0,#1)")
-   (get '+ 'inline-always))
-(push '((integer integer integer) integer #.(flags rfa is)"addii(#0,addii(#1,#2))")
-   (get '+ 'inline-always))
+
+
 (push '((fixnum fixnum) fixnum #.(flags)"(#0)+(#1)")
    (get '+ 'inline-always))
 
@@ -288,10 +282,8 @@
    (get '- 'inline-always))
 (push '((short-float short-float) short-float #.(flags rfa)"(#0)-(#1)")
    (get '- 'inline-always))
-(push '((integer integer) integer #.(flags rfa is)"subii(#0,#1)")
-   (get '- 'inline-always))
-(push '((integer) integer #.(flags rfa is)"subii(gzero,#0)")
-   (get '- 'inline-always))
+
+
 (push '((fixnum fixnum) fixnum #.(flags)"(#0)-(#1)")
    (get '- 'inline-always))
 (push '((fixnum) fixnum #.(flags)"-(#0)")
@@ -340,8 +332,7 @@
 ;;<
  (push '((t t) boolean #.(flags)"number_compare(#0,#1)<0")
    (get '< 'inline-always))
-(push '((integer integer) boolean #.(flags)"cmpii(#0,#1)<0")
-   (get '< 'inline-always))
+
 (push '((fixnum-float fixnum-float) boolean #.(flags)"(#0)<(#1)")
    (get '< 'inline-always))
 
@@ -349,32 +340,28 @@
 ;;<=
  (push '((t t) boolean #.(flags)"number_compare(#0,#1)<=0")
    (get '<= 'inline-always))
-(push '((integer integer) boolean #.(flags)"cmpii(#0,#1)<=0")
-   (get '<= 'inline-always))
+
 (push '((fixnum-float fixnum-float) boolean #.(flags)"(#0)<=(#1)")
    (get '<= 'inline-always))
 
 ;;=
  (push '((t t) boolean #.(flags)"number_compare(#0,#1)==0")
    (get '= 'inline-always))
-(push '((integer integer) boolean #.(flags)"cmpii(#0,#1)==0")
-   (get '= 'inline-always))
+
 (push '((fixnum-float fixnum-float) boolean #.(flags)"(#0)==(#1)")
    (get '= 'inline-always))
 
 ;;>
  (push '((t t) boolean #.(flags)"number_compare(#0,#1)>0")
    (get '> 'inline-always))
-(push '((integer integer) boolean #.(flags)"cmpii(#0,#1)>0")
-   (get '> 'inline-always))
+
 (push '((fixnum-float fixnum-float) boolean #.(flags)"(#0)>(#1)")
    (get '> 'inline-always))
 
 ;;>=
  (push '((t t) boolean #.(flags)"number_compare(#0,#1)>=0")
    (get '>= 'inline-always))
-(push '((integer integer) boolean #.(flags)"cmpii(#0,#1)>=0")
-   (get '>= 'inline-always))
+
 (push '((fixnum-float fixnum-float) boolean #.(flags)"(#0)>=(#1)")
    (get '>= 'inline-always))
 
@@ -747,8 +734,7 @@ type_of(#0)==t_bitvector")
 ;;EXPT
  (push '((t t) t #.(flags ans)"number_expt(#0,#1)")
    (get 'expt 'inline-always))
-(push '((integer integer) integer #.(flags is)"powerii(#0,#1)")
-   (get 'expt 'inline-always))
+
 (push '((fixnum fixnum) fixnum #.(flags)(LAMBDA (LOC1 LOC2)
                                           (IF
                                            (AND (CONSP LOC1)
@@ -988,12 +974,8 @@ type_of(#0)==t_complex")
       (get 'ratiop 'inline-always))
 
 ;;REM
-(push '((integer integer) integer #.(flags rfa is)"dvmdii(#0,#1,-1)")
-  (get 'rem 'inline-always))
-(push '((integer fixnum) fixnum #.(flags rfa is)
-    "(FIXtemp=(int)dvmdii(#0,stoi(#1),-1), (signe(FIXtemp)> 0 ? (int)
-   ((GEN)FIXtemp)[2] : (signe(FIXtemp)< 0 ? -(int)((GEN)FIXtemp)[2] : 0)))")
-  (get 'rem 'inline-always))
+
+
 #+
 TRUNCATE_USE_C
 (push '((fixnum fixnum) fixnum #.(flags rfa)"(#0)%(#1)")
@@ -1087,8 +1069,7 @@ TRUNCATE_USE_C
    (get 'third 'inline-unsafe))
 
 ;;TRUNCATE
-(push '((integer integer) integer #.(flags rfa is)"dvmdii(#0,#1,0)")
-   (get 'truncate 'inline-always))
+
 #+
 TRUNCATE_USE_C
 (push '((fixnum fixnum) fixnum #.(flags rfa)"(#0)/(#1)")
@@ -1113,8 +1094,7 @@ type_of(#0)==t_bitvector")
 ;;ZEROP
  (push '((t) boolean #.(flags)"number_compare(small_fixnum(0),#0)==0")
    (get 'zerop 'inline-always))
-(push '((integer) boolean #.(flags rfa)"lgef(#0)==2")
-   (get 'zerop 'inline-always))
+
 (push '((fixnum-float) boolean #.(flags)"(#0)==0")
    (get 'zerop 'inline-always))
 

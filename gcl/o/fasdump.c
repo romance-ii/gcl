@@ -776,12 +776,24 @@ write_fasd(obj)
        break;
      case DP(t_bignum:)
        PUT_OP(d_bignum);
+#ifdef GMP
+     {int l = MP(obj)->_mp_size;
+     int m = (l >= 0 ? l : -l);
+      
+     plong *u = (plong *) MP(obj)->_mp_d;
+     if (sizeof(mp_limb_t) != 4) { FEerror(0,"fix for gmp");}
+     PUT4(l);
+     while (-- m >=0)
+       {PUT4(*u) ; u++;}
+     break;}
+#else     
        {int l = obj->big.big_length;
 	plong *u = obj->big.big_self;
 	PUT4(l);
 	while (-- l >=0)
 	  {PUT4(*u) ; u++;}
        break;}
+#endif       
      case DP(t_package:)
        TRY_HASH;
        PUT_OP(d_package);
@@ -1239,17 +1251,27 @@ read_fasd1(i,loc)
 	 *loc=make_fixnum(j);       
 	 return;}
       case DP( d_bignum:)
-	{int j;
+	{int j,m;
 	 object tem;
 	 plong *u;
 	 GET4(j);
-	 { BEGIN_NO_INTERRUPT;
+#ifdef GMP
+	 tem = new_bignum();
+	 m = (j >= 0 ? j : -j);
+	 _mpz_realloc(MP(tem),m);
+	 MP(tem)->_mp_size = j;
+	 j = m;
+	 u = (plong *) MP(tem)->_mp_d;
+#else	 
+        { BEGIN_NO_INTERRUPT;
 	 tem = alloc_object(t_bignum);
 	 tem->big.big_length = j;
 	 tem-> big.big_self = 0;
 	 u = tem-> big.big_self = (plong *) alloc_relblock(j*sizeof(plong));
 	   END_NO_INTERRUPT;
 	 }
+	
+#endif	 
 	 while ( --j >=0)
 	   { GET4(*u);
 	     u++;}

@@ -114,6 +114,9 @@ LIBFILES=bsearch.o
 # the  make to use for saved_kcp the profiler.
 KCP=kcp-bsd
 
+MPFILES=${GMP_DIR}libgmp.a
+
+
 # end makedefs
 
 BINDIR	= bin
@@ -123,10 +126,12 @@ ODIR	= o
 LSPDIR	= lsp
 CMPDIR	= cmpnew
 PORTDIR	= unixport
+MPDIR	= mp
+GMP_DIR = gmp/
 
 all:   ${HDIR}cmpinclude.h
 	(cd $(BINDIR); make all)
-	(cd mp ; make all)
+	make mpfiles
 	rm -f o/cmpinclude.h ; ln h/cmpinclude.h o
 	(cd $(ODIR); make all)
 	(cd $(LSPDIR); make all)
@@ -149,6 +154,19 @@ all:   ${HDIR}cmpinclude.h
 	then (cd gcl-tk ; make) ; \
 	else echo "gcl-tk not made..missing include or lib" ; fi 
 	(cd info ; make)
+
+mpfiles: ${MPFILES}
+
+$(MPDIR)/libmport.a:
+	(cd mp ; make all)
+
+gmp/libgmp.a: gmp/Makefile
+	(cd gmp/mpn ; make)
+	(cd gmp/mpz ; make)
+	(cd gmp ; make `echo *.c | sed -e "s:\.c:.o :g"` )
+	(cd gmp ; rm -f libgmp.a ;  ar qc libgmp.a *.o */*.o)
+
+
 
 command:
 	rm -f bin/gcl xbin/gcl

@@ -395,11 +395,13 @@ BEGIN:
 		    
 		  }
 #endif 		
+#ifndef GMP_USE_MALLOC
 		if ((int)what_to_collect >= (int)t_contiguous) {
-		  j = x->big.big_length;
-		  cp = (char *)(x->big.big_self);
+		  j = MP_ALLOCATED(x);
+		  cp = (char *)MP_SELF(x);
 		  if (cp == 0)
 		    break;
+#ifdef PARI
 		  if (j != lg(MP(x))  &&
 		      /* we don't bother to zero this register,
 			 and its contents may get over written */
@@ -407,13 +409,14 @@ BEGIN:
 			 (int)(cp) <= top &&
 			 (int) cp >= bot))
 		    printf("bad length 0x%x ",x);
-		  j = j * sizeof(int);
-		
+#endif
+		  j = j * MP_LIMB_SIZE;
 		  if (inheap(cp)) {
 		    if (what_to_collect == t_contiguous)
 		      mark_contblock(cp, j);
 		  } else{
-		       x->big.big_self = (plong *) copy_relblock(cp, j);}}
+		      MP_SELF(x) = (void *) copy_relblock(cp, j);}}
+#endif /* not GMP_USE_MALLOC */
 		break;
 
 	CASE_STRING:
@@ -839,6 +842,12 @@ sweep_phase()
 			}
 			*/
 /*			((struct freelist *)x)->f_link = f; */
+
+#ifdef GMP_USE_MALLOC
+			if (x->d.t == t_bignum) {
+			  mpz_clear(MP(x));
+			}
+#endif
 			SET_LINK(x,f);
 			x->d.m = FREE;
 			f = x;

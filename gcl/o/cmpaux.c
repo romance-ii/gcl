@@ -160,7 +160,15 @@ object x;
 	case t_fixnum:
 		c = fix(x);  break;
 	case t_bignum:
-		c = (char)MP_LOW(MP(x),lgef(MP(x)));  break;
+	  {object *to = vs_top;
+	  vs_push(x);
+	  vs_push(small_fixnum(0xff));
+	  Llogand();
+	  x = vs_base[0];
+	  vs_top = to;
+	  c = (char) fix(x);
+	  break;
+	  }
 	case t_character:
 		c = char_code(x);  break;
 	default:
@@ -181,7 +189,8 @@ object x;
 	case t_fixnum:
 		i = fix(x);  break;
 	case t_bignum:
-		i = MP_LOW(MP(x),lgef(MP(x))) * big_sign(x);  break;
+	  i = number_to_double(x);
+	  break;
 	case t_ratio:
 		i = number_to_double(x);  break;
 	case t_shortfloat:

@@ -72,6 +72,19 @@ AC_DEFINE_UNQUOTED(CSTACK_ADDRESS,$cstack_address \
 AC_MSG_RESULT(got $cstack_address)
 
 
+
+AC_MSG_CHECKING("sizeof long long int")
+AC_TRY_RUN([#include <stdio.h>
+main()
+{
+  if (sizeof(long long int) == 2*sizeof(long)) return 0;
+  return 1;
+}
+],AC_DEFINE(HAVE_LONG_LONG),,)
+AC_SUBST(HAVE_LONG_LONG)
+
+
+
 # Maximum number of pages
 
 help="--enable-maxpage=XXXX will compile in a page table of size XXX (default ${default_maxpage})"
@@ -81,6 +94,9 @@ AC_ARG_ENABLE(maxpage,[ --enable-maxpage=XXXX will compile in a page table of si
 
 AC_ARG_ENABLE(machine,[ --enable-machine=XXXX will force the use of one of the definitions in h/XXXX.defs] ,
 [enable_machine=$enableval],[enable_machine=""])
+
+AC_ARG_ENABLE(use_gmp,[ --enable-gmp=no will disable use of GMP gnu multiprecision arithmetic, (default is =yes)] ,
+[use_gmp=$enable_eval],[use_gmp="yes"])
 
 AC_ARG_ENABLE(notify,[ --enable-notify=no will disable the automatic notification of gcl maintainers of successful builds/problems] ,
 [enable_notify=$enableval],[enable_notify="yes"])
@@ -211,6 +227,13 @@ AC_MSG_RESULT(no))
 
 AC_CHECK_FUNC(profil, ,[AC_DEFINE(NO_PROFILE)])
 AC_SUBST(NO_PROFILE)
+AC_CHECK_FUNC(setenv,[AC_DEFINE(HAVE_SETENV)],no_setenv=1 )
+AC_SUBST(HAVE_SETENV)
+if test "$no_setenv" = "1" ; then
+AC_CHECK_FUNC(putenv,[AC_DEFINE(HAVE_PUTENV)],)
+AC_SUBST(HAVE_PUTENV)
+fi
+
 AC_CHECK_FUNC(_cleanup, [AC_DEFINE(USE_CLEANUP)],)
 AC_SUBST(USE_CLEANUP)
 gcl_ok=no
@@ -705,6 +728,24 @@ if test $gcl_ok = no ; then     AC_MSG_RESULT(no) ; fi
 # getrlimit
 
 # fionread or block
+
+rm -f makedefsafter
+if test $use_gmp = yes ; then
+ AC_MSG_CHECKING("use_gmp=yes, doing configure in gmp directory")
+ case "${canonical}" in
+   i[5-9]86* | pentium* | k6* | athlon*)
+      (cd gmp ; ./configure --target=pentium) ;;
+   *)
+      (cd gmp ; ./configure) ;;
+ esac
+ GMP=1
+ AC_DEFINE(GMP)
+ AC_SUBST(GMP)
+ echo > makedefsafter
+ echo 'MPFILES=${GMP_DIR}libgmp.a' >> makedefsafter
+ echo >> makedefsafter
+fi
+ 
 
 if test -f h/$use.defs  ; then
 

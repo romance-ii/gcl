@@ -22,7 +22,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	print.d
 */
 
-#define NEED_MP_H
+
 #include "include.h"
 
 #define LINE_LENGTH line_length
@@ -600,8 +600,8 @@ int level;
 		}
 		if (i < 0) {
 			write_ch('-');
-			if (i == 0x80000000) {
-				x = make_bignum(ABS_MOST_NEGS);
+			if (i == MOST_NEG_FIXNUM) {
+				x = fixnum_add(1,(MOST_POSITIVE_FIXNUM));
 				vs_push(x);
 				i = PRINTradix;
 				PRINTradix = FALSE;
@@ -627,9 +627,6 @@ int level;
 
 	case t_bignum:
 	{
-		object b;
-		object *vsp;
-
 		if (PRINTradix && PRINTbase != 10)
 			write_base();
 		i = big_sign(x);
@@ -639,18 +636,10 @@ int level;
 				write_ch('.');
 			break;
 		}
-		if (i < 0) {
-			write_ch('-');
-			b = big_minus(x);
-		} else
-			b = copy_big(x);
-		vsp = vs_top;
-		while (!big_zerop(b))
-			vs_check_push(code_char(
-				digit_weight(div_int_big(PRINTbase, b),
-					PRINTbase)));
-		while (vs_top > vsp)
-			write_ch(char_code((vs_pop)));
+		{ object s = coerce_big_to_string(x,PRINTbase);
+                  int i=0;
+                  while (i<s->ust.ust_fillp) { write_ch(s->ust.ust_self[i++]); }
+                 } 
 		if (PRINTradix && PRINTbase == 10)
 			write_ch('.');
 		break;

@@ -54,6 +54,7 @@ EXTER object sLnconc;
 /*  bds.c  */
 
 /*  big.c  */
+object make_integer_clear();
 object stretch_big();
 object copy_big();
 object copy_to_big();
@@ -62,6 +63,12 @@ object big_plus();
 object big_times();
 object normalize_big_to_object();
 double big_to_double();
+EXTER  struct bignum big_fixnum1_body,big_fixnum2_body;
+EXTER object big_fixnum1,big_fixnum2;
+object maybe_replace_big();
+
+
+
 
 /* bind.c */
 EXTER object ANDoptional;
@@ -101,6 +108,7 @@ object coerce_to_character();
 
 /*  cmpaux.c  */
 char object_to_char();
+char *object_to_string();
 float object_to_float();
 double object_to_double();
 
@@ -326,6 +334,9 @@ object get_gcd();
 object get_lcm();
 object one_plus();
 object one_minus();
+object fixnum_add();
+object fixnum_sub();
+object new_bignum();
 
 /*  num_co.c  */
 object double_to_integer();

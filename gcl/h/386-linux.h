@@ -1,3 +1,4 @@
+/* #define GMP */
 #define BSD386
 #include "bsd.h"
 

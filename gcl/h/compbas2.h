@@ -1,4 +1,9 @@
 /* if already mp.h has been included skip */
+#ifdef _MP_H
+#ifdef GMP
+
+#else /* no gmp */
+
 typedef  plong *GEN1;
 /* if genpari.h not loaded */
 #ifndef MAXBLOC
@@ -30,6 +35,8 @@ EXTER GEN1 icopy_x;
 #define restore_avma avma = lvma
 #endif
 
+#endif /* NO GMP */
+#endif _MP_H
 
   /* copy x to y, increasing space by factor of 2  */
 object make_integer();

@@ -83,7 +83,7 @@ SGC is enabled.  */
 
 
 /* define if the profil system call is not defined in libc */
-#define NO_PROFILE 1 
+/* #undef NO_PROFILE */ 
 
 
 /* define if the _cleanup() function exists and should be called
@@ -106,7 +106,7 @@ SGC is enabled.  */
 
 */
 
-#define CSTACK_ADDRESS -1073743836 
+#define CSTACK_ADDRESS -1073742540 
 
 /* define if SIGSYS is defined in signal.h */
 
@@ -116,6 +116,12 @@ SGC is enabled.  */
 
 /* #undef HAVE_SIGEMT */
 
+/* define if long long int works to multiply to ints, */
+
+#define HAVE_LONG_LONG 1
+
+/* define if want to use GMP */
+#define GMP 1
 
 
 #include <varargs.h>
@@ -308,10 +314,30 @@ struct longfloat_struct {
 #define	Mlf(obje)	(obje)->LF.LFVAL
 #define lf(x) Mlf(x)
 
+
+
+#ifdef _MP_H
+
+#else
+typedef struct
+{
+  int _mp_alloc;		/* Number of *limbs* allocated and pointed
+				   to by the _mp_d field.  */
+  int _mp_size;			/* abs(_mp_size) is the number of limbs the
+				   last field points to.  If _mp_size is
+				   negative this is a negative number.  */
+  void *_mp_d;		/* Pointer to the limbs.  */
+} __mpz_struct;
+#endif
+
 struct bignum {
 			FIRSTWORD;
-	plong             *big_self;	/*  bignum body  */
-	int		big_length;	/*  bignum length  */
+#ifdef GMP
+  __mpz_struct big_mpz_t;
+#else
+  plong             *big_self;	/*  bignum body  */
+  int		big_length;	/*  bignum length  */
+#endif  
 };
 
 struct ratio {
@@ -1744,6 +1770,7 @@ EXTER object sLnconc;
 /*  bds.c  */
 
 /*  big.c  */
+object make_integer_clear();
 object stretch_big();
 object copy_big();
 object copy_to_big();
@@ -1752,6 +1779,12 @@ object big_plus();
 object big_times();
 object normalize_big_to_object();
 double big_to_double();
+EXTER  struct bignum big_fixnum1_body,big_fixnum2_body;
+EXTER object big_fixnum1,big_fixnum2;
+object maybe_replace_big();
+
+
+
 
 /* bind.c */
 EXTER object ANDoptional;
@@ -1791,6 +1824,7 @@ object coerce_to_character();
 
 /*  cmpaux.c  */
 char object_to_char();
+char *object_to_string();
 float object_to_float();
 double object_to_double();
 
@@ -2016,6 +2050,9 @@ object get_gcd();
 object get_lcm();
 object one_plus();
 object one_minus();
+object fixnum_add();
+object fixnum_sub();
+object new_bignum();
 
 /*  num_co.c  */
 object double_to_integer();
@@ -2481,6 +2518,7 @@ EXTER object  sKinternal ;
 EXTER object  sKnicknames ; 
 EXTER object  sKuse ; 
 EXTER object  sLApackageA ; 
+EXTER  object   fSset_gmp_allocate_relocatable (); 
 EXTER  object   fSallocate_bigger_fixnum_range (); 
 EXTER  object   fScmod  (); 
 EXTER  object   fScplus  (); 
@@ -2701,6 +2739,11 @@ EXTER  object   fSgetpeername ();
 EXTER  object   fSgetsockname (); 
 EXTER  int   fSset_blocking (); 
 /* if already mp.h has been included skip */
+#ifdef _MP_H
+#ifdef GMP
+
+#else /* no gmp */
+
 typedef  plong *GEN1;
 /* if genpari.h not loaded */
 #ifndef MAXBLOC
@@ -2732,6 +2775,8 @@ EXTER GEN1 icopy_x;
 #define restore_avma avma = lvma
 #endif
 
+#endif /* NO GMP */
+#endif _MP_H
 
   /* copy x to y, increasing space by factor of 2  */
 object make_integer();
@@ -2902,7 +2947,7 @@ object on_stack_make_list();
 object make_integer();
   /* copy x to y, increasing space by factor of 2  */
 
-
+#ifndef GMP
 GEN otoi();
 /*
 object integ_temp;
@@ -2927,6 +2972,8 @@ GEN setq_io(),setq_ii();
 #define SETQ_II(x,alloc,val)   (x)=setq_ii(x,&alloc,val)
 #define IDECL(a,b,c) our_ulong b[4];a =(b[0]=0x1010000 +4,b);object c
 #endif
+
+#endif /* end no GMP */
 
 #define	cclosure_call	funcall
 

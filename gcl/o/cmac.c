@@ -34,154 +34,23 @@ object *gclModulus;
 
 
 object ctimes(),cplus(),cdifference(),cmod();
-
-
-
-/* if hi < 0 this is taken to be the two's complement expression of
-   a bignum  */
-object
-signed_bignum2(hi,lo)
-     int hi,lo;
-{ 
-  GEN w;
-  object result;
-  plong u[4];
-  u[0] = 0x01010004;
-  u[1] = 0x01010004;
-  u[2] = 0;
-  u[3] = 0;
-  
-  if (hi < 0)
-      { setsigne(u,-1);
-	if (lo > 0) /* no borrow */
-	 { lo = -lo;
-	   hi = -hi;}
-       else {hi -= 1;
-	     hi = -hi;}
-     }
-  else
-    if (hi > 0)
-      {setsigne(u,1);
-     }
-  else /*hi==0 */
-    { setsigne(u,1);
-      setlgef(u,3);
-      MP_LOW(u,3) = lo;
-      result = make_integer(u);
-      setlgef(u,4);
-      return result;}
-  /* its length 4 */
-  MP_START_LOW(w,u,4);
-  MP_NEXT_UP(w) = lo;
-  MP_NEXT_UP(w) = hi;
-  return(make_integer(u));
-}
-  
-  
-  
-  	 
 	  
-
-#ifdef MC68020
-/*    
-int
-dblrem(m,n,mod)
-int m,n,mod;
-{ asm("movl a6@(8),d1");
-  asm("mulsl a6@(12),d0:d1");
-  asm("divsl a6@(16),d0:d1");
-}
-*/
-#endif
-
 object make_integer();  
-
-unsigned plong small_pos_int[3]={0x1000003,0x01000003,0};
-unsigned plong small_neg_int[3]={0x1000003,0xff000003,0};
-unsigned plong s4_neg_int[4]={0x1000004,0xff000004,1,0};
-
-
-
-object
-fplus(a,b)
-     int a,b;
-{ int z ;
-  int x;
-  if (a >= 0)
-   { if (b >= 0)
-       { x = a + b;
-	 if (x == 0) return small_fixnum(0);
-	 small_pos_int[2]=x;
-	 return make_integer(small_pos_int);
-       }
-     else
-       { /* b neg */
-	 x = a + b;
-	 MYmake_fixnum(return,x);
-       }}
-  else
-    { /* a neg */
-      if (b >= 0)
-	{ x = a + b;
-	  MYmake_fixnum(return,x);
-	}
-      else
-	{ /* both neg */
-	    { unsigned plong Xtx,Xty,overflow,Xtres;
-	      Xtres = addll(-a,-b);
-	      if (overflow)
-		{ 
-		  s4_neg_int[3]=Xtres;
-		  return make_integer(s4_neg_int);}
-	      else
-		{ small_neg_int[2]=Xtres;
-		  return make_integer(small_neg_int);}
-	    }}}
-}
-
-
-object
-fminus(a,b)
-     int a,b;
-{ int z ;
-  int x;
-  if (a >= 0)
-   { if (b >= 0)
-       { x = a - b;
-	 MYmake_fixnum(return,x);
-     }
-     else
-       { /* b neg */
-	 x = a - b;
-	 if (x==0) return small_fixnum(0);
-	 small_pos_int[2]=x;
-	 return make_integer(small_pos_int);
-       }}
-  else
-    { /* a neg */
-      if (b <= 0)
-	{ x = a - b;
-	  MYmake_fixnum(return,x);
-	}
-      else
-	{  /* b positive */
-	    { unsigned plong Xtx,Xty,overflow,Xtres;
-	      unsigned plong t[4];
-	      Xtres = addll(-a,b);
-	      if (overflow)
-		{ s4_neg_int[3]=Xtres;
-		  return make_integer(s4_neg_int);}
-	      else
-		{ small_neg_int[2]=Xtres;
-		  return make_integer(small_neg_int);}
-	    }}}
-}
  	  
-#define our_minus(a,b) ((FIXNUMP(a)&&FIXNUMP(b))?fminus(fix(a),fix(b)): \
+#define our_minus(a,b) ((FIXNUMP(a)&&FIXNUMP(b))?fixnum_sub(fix(a),fix(b)): \
 			number_minus(a,b))
-#define our_plus(a,b) ((FIXNUMP(a)&&FIXNUMP(b))?fplus(fix(a),fix(b)): \
+#define our_plus(a,b) ((FIXNUMP(a)&&FIXNUMP(b))?fixnum_add(fix(a),fix(b)): \
 			number_plus(a,b))
 #define our_times(a,b) number_times(a,b)
+
+
+#ifdef HAVE_LONG_LONG
+dblrem(a,b,mod)
+int a,b,mod;
+{
+  return  (((long long int)a*(long long int)b)%(long long int) mod);
+}
+#else
 
 int
 dblrem(a,b,mod)
@@ -190,11 +59,14 @@ int a,b,mod;
  if (a<0) 
    {a= -a; sign= (b<0)? (b= -b,1) :-1;}
  else { sign= (b<0) ? (b= -b,-1) : 1;}
-
- l = mulul(a,b,h);
- b = divul(l,mod,h);
- return ((sign<0) ? -h :h);}
-
+ { mp_limb_t ar[2],q[2],aa;
+ aa = a;
+  ar[1]=mpn_mul_1(ar,&aa,1,b);
+  h = mpn_divrem_1(&q,0,ar,2,mod);
+ return ((sign<0) ? -h :h);
+ }
+}
+#endif
 
 object	  
 cmod(x)

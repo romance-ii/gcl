@@ -44,9 +44,11 @@ echo $1 > machine
 
 ####### insert the h/machine.defs file ############
   cat h/$1.defs >> makedefs
+  if [ -f makedefsafter ] ; then cat makedefsafter >> makedefs ; fi
   if [ -f ${HOME}/local_gcl.defs ] ; then
     cat ${HOME}/local_gcl.defs >> makedefs
   fi
+
   echo "" >> makedefs
   echo "# end makedefs" >> makedefs
    

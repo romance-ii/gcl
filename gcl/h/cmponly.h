@@ -7,7 +7,7 @@
 object make_integer();
   /* copy x to y, increasing space by factor of 2  */
 
-
+#ifndef GMP
 GEN otoi();
 /*
 object integ_temp;
@@ -32,6 +32,8 @@ GEN setq_io(),setq_ii();
 #define SETQ_II(x,alloc,val)   (x)=setq_ii(x,&alloc,val)
 #define IDECL(a,b,c) our_ulong b[4];a =(b[0]=0x1010000 +4,b);object c
 #endif
+
+#endif /* end no GMP */
 
 #define	cclosure_call	funcall
 

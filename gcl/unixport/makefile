@@ -5,6 +5,7 @@ LSPDIR	= ../lsp
 CMPDIR	= ../cmpnew
 PORTDIR	= ../unixport
 MPDIR	= ../mp
+GMP_DIR	= ../gmp/
 
 CFLAGS	= -c $(DEFS) -I$(HDIR)
 LDCC    = $(CC) -g
@@ -12,6 +13,7 @@ LIBC	= -lc
 LIBS	= -lm # -lpixrect -lc
 OLDDATE = "DATE"
 GCLIB	= $(ODIR)/gcllib.a
+MPFILES= $(MPDIR)/mpi.o $(MPDIR)/mp2.o  $(MPDIR)/libmport.a
 MPFILES= $(MPDIR)/mpi.o $(MPDIR)/mp2.o  $(MPDIR)/libmport.a
 INIT_SYSTEM_LSP=init_$(SYSTEM).lsp
 SPECIAL_RSYM = rsym.c
@@ -118,6 +120,9 @@ LIBFILES=bsearch.o
 
 # the  make to use for saved_kcp the profiler.
 KCP=kcp-bsd
+
+MPFILES=${GMP_DIR}libgmp.a
+
 
 # end makedefs
 

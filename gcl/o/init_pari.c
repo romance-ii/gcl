@@ -1,3 +1,5 @@
+
+
 #define IN_INIT_PARI
 
 #define NEED_MP_H
@@ -5,8 +7,12 @@
 #include "include.h"
 #endif
 
-
-
+#ifdef GMP
+init_pari()
+{
+  ;
+}
+#else
 GEN     gnil,gzero,gun,gdeux,ghalf,gi;
 plong    lontyp[30]={0,0x10000,0x10000,1,1,1,1,2,1,0,2,2,1,1,1,0,1,1,1,1};
 unsigned plong hiremainder,overflow;
@@ -88,3 +94,4 @@ init_pari()
 
 
 
+#endif

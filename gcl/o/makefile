@@ -102,7 +102,7 @@ LBINDIR=/usr/local/bin
 OFLAG	=  -O 
 LIBS	= -lm 
 
-ODIR_DEBUG= -O4 -g 
+ODIR_DEBUG= -O4 
 
 # This CC string will be used for compilation of the system,
 # and also in the compiler::*cc* variable for later compilation of
@@ -139,6 +139,9 @@ LIBFILES=bsearch.o
 # the  make to use for saved_kcp the profiler.
 KCP=kcp-bsd
 
+MPFILES=${GMP_DIR}libgmp.a
+
+
 # end makedefs
 X11_INCLUDE=${TK_XINCLUDES} ${HAVE_X11}
 CFLAGS	=  -I../gcl-tk -I$(HDIR) $(ODIR_DEBUG) 
@@ -156,7 +159,7 @@ OTHERS=${HDIR}notcomp.h ${HDIR}rgbc.h ${HDIR}stacks.h
 HFILES	= $(HDIR)include.h $(CMPINCLUDE_FILES) $(OTHERS) 
 
 # these are made elsewhere...
-MPFILES=
+MPFILES= 
 
 OBJS	= $(OD)main.o $(OD)alloc.o $(OD)gbc.o \
 	$(OD)bitop.o $(OD)typespec.o $(OD)eval.o \
@@ -248,7 +251,7 @@ array.o: $(HFILES)
 assignment.o: $(HFILES)
 backq.o: $(HFILES)
 bds.o: $(HFILES)
-big.o: $(HFILES) ${MP}
+big.o: $(HFILES) ${MP} gmp_big.c pari_big.c
 bind.o: $(HFILES) 
 bitop.o: $(HFILES)
 block.o: $(HFILES)
