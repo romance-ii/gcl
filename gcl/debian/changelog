@@ -34,8 +34,9 @@ gcl (2.5.4-1) unstable; urgency=low
   * Fix gbc time calculation in case of recursive gbc calls
   * Run patch_sharp in LSharp_exclamation_reader to handle new case of
     defpackage ops at head of fasl vector, required for maxima build
+  * Special symbol Dotnil has ordinary list Cnil for plist and hpack
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 30 Jul 2003 20:21:52 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 31 Jul 2003 15:54:38 +0000
 
 gcl (2.5.3-2) unstable; urgency=low
 

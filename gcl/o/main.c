@@ -372,8 +372,8 @@ initlisp(void) {
 	Dotnil_body.s_fillp = 6;
 	Dotnil_body.s_self = "DOTNIL";
 	Dotnil_body.s_gfdef = OBJNULL;
-	Dotnil_body.s_plist = Dotnil;
-	Dotnil_body.s_hpack = Dotnil;
+	Dotnil_body.s_plist = Cnil;
+	Dotnil_body.s_hpack = Cnil;
 	Dotnil_body.s_stype = (short)stp_constant;
 	Dotnil_body.s_mflag = FALSE;
 	
