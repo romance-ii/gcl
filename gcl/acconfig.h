@@ -138,9 +138,30 @@ SGC is enabled.  */
 /* bfd support */
 #undef HAVE_LIBBFD
 
+/* isnormal check */
+#undef HAVE_ISNORMAL
+
+#undef HAVE_IEEEFP
+
+#ifdef IN_NUM_CO
+#ifdef HAVE_ISNORMAL
+#define _GNU_SOURCE
+#include <math.h>
+#define ISNORMAL(a) isnormal(a)
+#else
+#ifdef HAVE_IEEEFP
+#include <ieeefp.h>
+#define ISNORMAL(a) (fpclass(a)>=FP_NZERO)
+#else
+#error "No isnormal found"
+#endif
+#endif
+#endif
+
 /* math.h for definitions in generated C code */
 #undef NEED_MATH_H
 
 #ifdef NEED_MATH_H
 #include <math.h>
 #endif
+

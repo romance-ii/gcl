@@ -10,7 +10,7 @@ AC_CONFIG_HEADER(h/gclincl.h)
 AC_MSG_CHECKING([system version (for dynamic loading)])
 if machine=`uname -m` ; then true; else machine=unknown ; fi
 
-AC_CHECK_PROGS(AWK,awk nawk,"")
+AC_CHECK_PROGS(AWK,gawk nawk awk,"")
 
 if test -f /usr/lib/NextStep/software_version; then
     system=NEXTSTEP-`${AWK} '/3/,/3/' /usr/lib/NextStep/software_version`
@@ -169,6 +169,31 @@ AC_CHECK_LIB(m,sin,LIBS="${LIBS} -lm",true)
 # basically works for now.  CM
 #
 AC_CHECK_HEADERS(math.h,AC_DEFINE(NEED_MATH_H))
+
+#
+# The second alternative is for solaris.  This needs to be
+# a more comprehensive later, i.e. checking that the fpclass
+# test makes sense.  CM
+#
+AC_MSG_CHECKING([for isnormal])
+AC_TRY_RUN([#define _GNU_SOURCE
+	    #include <math.h>
+	    int main() {
+		float f;
+		return isnormal(f) || !isnormal(f) ? 0 : 1;
+		}],
+		AC_DEFINE(HAVE_ISNORMAL) AC_MSG_RESULT(yes),
+		AC_MSG_CHECKING([for fpclass in ieeefp.h])
+		AC_TRY_RUN([#include <ieeefp.h>
+			    int main() {
+				float f;
+				return fpclass(f)>=FP_NZERO || fpclass<FP_NZERO ? 0 : 1;
+				}],
+		AC_DEFINE(HAVE_IEEEFP) AC_MSG_RESULT(yes),
+		HAVE_IEEEFP=0 AC_MSG_RESULT(no),HAVE_IEEEFP=0 AC_MSG_RESULT(no))
+	,HAVE_ISNORMAL=0 AC_MSG_RESULT(no),HAVE_ISNORMAL=0 AC_MSG_RESULT(no))
+
+
 
 #--------------------------------------------------------------------
 #	Check for the existence of the -lsocket and -lnsl libraries.

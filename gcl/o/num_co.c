@@ -29,7 +29,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define IN_NUM_CO
 
 #define NEED_MP_H
-#define _GNU_SOURCE
+
 #include "include.h"
 #include "num_include.h"
 
@@ -121,7 +121,7 @@ int *hp, *lp, *ep, *sp;
 	h = h >> 1;
 #endif
 #ifdef IEEEFLOAT
-	if (isnormal(d)) {
+	if (ISNORMAL(d)) {
 	  *ep = ((h & 0x7ff00000) >> 20) - 1022 - 53;
 	  h = (h & 0x000fffff | 0x00100000);
 	} else {
@@ -207,7 +207,7 @@ int *mp, *ep, *sp;
 
 #endif
 #ifdef IEEEFLOAT
-	if (isnormal(f)) {
+	if (ISNORMAL(f)) {
 	  *ep = ((m & 0x7f800000) >> 23) - 126 - 24;
 	  *mp = m & 0x007fffff | 0x00800000;
 	} else {
