@@ -178,6 +178,11 @@ install-stamp: build-stamp debian/control $(INS)
 		for i in debian/tmp/usr/share/info/*.info*; do \
 			mv $$i $$(echo $$i | sed "s,gcl,gcl$(EXT),g"); done
 
+	mv debian/tmp/usr/share/doc debian/tmp/usr/share/foo
+	mkdir -p debian/tmp/usr/share/doc/gcl-doc
+	mv debian/tmp/usr/share/foo/* debian/tmp/usr/share/doc/gcl-doc
+	rmdir debian/tmp/usr/share/foo
+
 	[ "$(EXT)" = "" ] || \
 		mv debian/tmp/usr/share/doc/gcl-doc debian/tmp/usr/share/doc/gcl$(EXT)-doc 
 
