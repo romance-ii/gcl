@@ -5,8 +5,9 @@ gcl (2.5.0.cvs20020625-73) unstable; urgency=low
     179807
   * gcc-3.2 warning cleanups
   * bfd_boolean syntax support for newer binutils
+  * gcc-3.2 on powerpc can't yet handle -O2 and higher
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 10 Feb 2003 12:47:50 -0500
+ -- Camm Maguire <camm@enhanced.com>  Mon, 10 Feb 2003 13:38:20 -0500
 
 gcl (2.5.0.cvs20020625-72) unstable; urgency=high
 
