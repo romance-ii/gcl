@@ -126,8 +126,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Fix sigcontext autodetection on sparc
   * Improve optimize-maximum-pages algorithm
   * mprotect pages PROT_EXEC as CLEAR_CACHE step on amd64-linux
+  * Prevent recursive malloc calls for OpenBSD error reporting
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 13 Apr 2004 02:43:20 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 13 Apr 2004 02:57:21 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

@@ -1381,7 +1381,12 @@ static char *baby_malloc(n)
 void *
 malloc(size_t size) {
         object x;
-	
+	static int in_malloc;
+
+	if (in_malloc)
+	  return NULL;
+	in_malloc=1;
+
 /*  #ifdef HAVE_LIBBFD */
 /*  	if (in_bfd_init) */
 /*  	  return bfd_malloc(size); */
@@ -1403,7 +1408,6 @@ malloc(size_t size) {
 
 #endif	
       
-
 	x = alloc_simple_string(size);
 
 	x->st.st_self = alloc_contblock(size);
@@ -1412,6 +1416,7 @@ malloc(size_t size) {
 #endif
 	malloc_list = make_cons(x, malloc_list);
 
+	in_malloc=0;
 	return(x->st.st_self);
 }
 
