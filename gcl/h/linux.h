@@ -45,29 +45,6 @@ do {static struct sigaction action; \
       sigaction(SIGSEGV,&action,0); \
       sigaction(SIGBUS,&action,0);} while (0)
 
-/* the following two files have changed back
-   and forth in recent versions of linux...
-   Include both if they both exist, otherwise
-   include whatever one exists...
-   basically one wants the
-   struct sigcontext_struct { ... } ;
-   so as to get the fault address.
-   */
-
-#ifdef   SIGNAL_H_HAS_SIGCONTEXT
-#include <signal.h>
-#else     
-#ifdef HAVE_ASM_SIGCONTEXT_H     
-#include <asm/sigcontext.h>
-#endif
-#ifdef HAVE_ASM_SIGNAL_H          
-#include <asm/signal.h>
-#endif
-#ifdef HAVE_SIGCONTEXT
-#define sigcontext_struct sigcontext
-#endif
-#endif     
-
 #endif
 
 #define ELF_TEXT_BASE  DBEGIN

@@ -123,8 +123,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Improved dotimes macro which avoids unnecessary fixnum garbage
     generation
   * si::*OPTIMIZE-MAXIMUM-PAGES* support
+  * Fix sigcontext autodetection on sparc
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  3 Apr 2004 19:22:37 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun,  4 Apr 2004 19:29:16 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

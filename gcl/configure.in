@@ -1372,22 +1372,22 @@ AC_MSG_RESULT(no))
 #if test $use = "386-linux" ; then
 	AC_CHECK_HEADERS(asm/sigcontext.h)
 	AC_CHECK_HEADERS(asm/signal.h)
-	AC_MSG_CHECKING([for sigcontext_struct...])
+	AC_MSG_CHECKING([for sigcontext...])
         AC_TRY_COMPILE([#include <signal.h>
        ],
        [
-        struct sigcontext_struct foo;
+        struct sigcontext foo;
        ],
        [
-        sigcontext_struct_works=1;
+        sigcontext_works=1;
         AC_DEFINE(SIGNAL_H_HAS_SIGCONTEXT)
-	AC_MSG_RESULT(sigcontext_struct in signal.h)
+	AC_MSG_RESULT(sigcontext in signal.h)
        ],
         
-	[sigcontext_struct_works=0;
-         AC_MSG_RESULT(sigcontext_struct NOT in signal.h)]
+	[sigcontext_works=0;
+         AC_MSG_RESULT(sigcontext NOT in signal.h)]
        )
-       if test "$sigcontext_struct_works" = 0 ; then
+       if test "$sigcontext_works" = 0 ; then
        AC_MSG_CHECKING([for sigcontext...])
        AC_TRY_COMPILE([#include <signal.h>
              #ifdef HAVE_ASM_SIGCONTEXT_H     
@@ -1401,13 +1401,11 @@ AC_MSG_RESULT(no))
         struct sigcontext foo;
         ],
         [
-        sigcontext_works=1 ;
         AC_DEFINE(HAVE_SIGCONTEXT)
-	AC_MSG_RESULT(use struct sigcontext)
+	AC_MSG_RESULT(sigcontext in asm files)
         ],
         [
-        AC_MSG_RESULT(use struct sigcontext_struct)
-        sigcontext_works=0 ; 
+        AC_MSG_RESULT(no sigcontext found)
      ])
 
 

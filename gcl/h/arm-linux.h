@@ -1,21 +1,5 @@
 #include "linux.h"
 
-/*  #ifdef IN_GBC */
-/*  #define GET_FAULT_ADDR(sig,code,sv,a) \ */
-/*      ((void *)(((struct sigcontext_struct *)(&code))->cr2))      */
-/*  #endif */
-
-/*#define NULL_OR_ON_C_STACK(x) ((x)==0 || ((unsigned int)x) > (unsigned int)(pagetochar(MAXPAGE+1)))*/
-
-/*  #define ADDITIONAL_FEATURES \ */
-/*  		     ADD_FEATURE("BSD386"); \ */
-/*        	             ADD_FEATURE("MC68020") */
-
-
-/*  #define	I386 */
-/*  #define SGC */
-
-
 /*  #define CLEAR_CACHE do {\ */
 /*    void *v=memory->cfd.cfd_start,*ve=v+memory->cfd.cfd_size; \ */
 /*    register unsigned long _beg __asm ("a1") = (unsigned long)(v);	\ */

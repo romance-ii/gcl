@@ -5,6 +5,29 @@
    address can't be found directly in the sigcontext. One has to look at the
    CPU frame, and that one is different for each CPU.
    */
+/* the following two files have changed back
+   and forth in recent versions of linux...
+   Include both if they both exist, otherwise
+   include whatever one exists...
+   basically one wants the
+   struct sigcontext_struct { ... } ;
+   so as to get the fault address.
+   */
+
+#if !defined(SIGNAL_H_HAS_SIGCONTEXT) && !defined(HAVE_SIGCONTEXT)
+#error Need sigcontext on linux, at least in some architectures
+#else
+#include <signal.h>
+#ifndef SIGNAL_H_HAS_SIGCONTEXT
+#ifdef  HAVE_ASM_SIGCONTEXT_H     
+#include <asm/sigcontext.h>
+#endif
+#ifdef  HAVE_ASM_SIGNAL_H          
+#include <asm/signal.h>
+#endif
+#endif     
+#endif
+
 #define GET_FAULT_ADDR(sig,code,sv,a) \
     ({\
 	struct sigcontext *scp1 = (struct sigcontext *)(sv); \
