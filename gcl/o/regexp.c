@@ -230,7 +230,7 @@ int case_fold_search = 0;
  * of the structure of the compiled regexp.
  */
 static regexp *
-regcomp(char *exp)
+regcomp(char *exp,int *sz)
 {
 	register regexp *r;
 	register char *scan;
@@ -255,7 +255,8 @@ regcomp(char *exp)
 		FAIL("regexp too big");
 
 	/* Allocate space. */
-	r = (regexp *)malloc(sizeof(regexp) + (unsigned)regsize);
+	*sz=sizeof(regexp) + (unsigned)regsize;
+	r = (regexp *)alloc_relblock(*sz);
 	if (r == NULL)
 		FAIL("out of space");
 

@@ -61,6 +61,35 @@ DEFUN_NEW("MATCH-END",object,fSmatch_end,SI,1,1,NONE,OI,OO,OO,OO,(fixnum i),
   RETURN1(make_fixnum(-1));
 }
 
+DEFUN_NEW("COMPILE-REGEXP",object,fScompile_regexp,SI,1,1,NONE,OO,OO,OO,OO,(object p),
+	  "Provide handle to export pre-compiled regexp's to string-match") {
+
+  char *tmp;
+  object res;
+
+  if (type_of(p)!= t_string && type_of(p)!=t_symbol)
+    not_a_string_or_symbol(p);
+  
+  if (!(tmp=alloca(p->st.st_fillp+1)))
+    FEerror("out of C stack",0);
+  memcpy(tmp,p->st.st_self,p->st.st_fillp);
+  tmp[p->st.st_fillp]=0;
+
+  res=alloc_object(t_vector);
+  res->v.v_displaced=Cnil;
+  res->v.v_hasfillp=1;
+  res->v.v_elttype=aet_uchar;
+  res->v.v_adjustable=0;
+  res->v.v_offset=0;
+  if (!(res->v.v_self=(void *)regcomp(tmp,&res->v.v_dim)))
+    FEerror("regcomp failure",0);
+  res->v.v_fillp=res->v.v_dim;
+
+  RETURN1(res);
+
+}
+
+
 DEFUN_NEW("STRING-MATCH",object,fSstring_match,SI,2,4,NONE,OO,OI,IO,OO,(object pattern,object string,...),
       "Match regexp PATTERN in STRING starting in string starting at START \
 and ending at END.  Return -1 if match not found, otherwise \
@@ -73,14 +102,15 @@ be over written.   \
 
   int i,ans,nargs=VFUN_NARGS,len,start,end;
   static char buf[400],case_fold;
-  static regexp *compiled_regexp;
+  static regexp *saved_compiled_regexp;
   va_list ap;
   object v = sSAmatch_dataA->s.s_dbind;
   char **pp,*str,save_c=0;
   unsigned np;
 
-  if (type_of(pattern)!= t_string && type_of(pattern)!=t_symbol)
-    not_a_string_or_symbol(string);
+  if (type_of(pattern)!= t_string && type_of(pattern)!=t_symbol &&
+      (type_of(pattern)!=t_vector || pattern->v.v_elttype!=aet_uchar))
+    FEerror("~S is not a regexp pattern", 1 , pattern);
   if (type_of(string)!= t_string && type_of(string)!=t_symbol)
     not_a_string_or_symbol(string);
   
@@ -109,30 +139,21 @@ be over written.   \
    }
 
    {
+
+     regexp *compiled_regexp=saved_compiled_regexp;
+
      BEGIN_NO_INTERRUPT;
 
      case_fold_search = sSAcase_fold_searchA->s.s_dbind != sLnil ? 1 : 0;
-     if (case_fold != case_fold_search || len != strlen(buf) ||	 memcmp(pattern->ust.ust_self,buf,len)) {
-
-       char *tmp=len+1<sizeof(buf) ? buf : (char *) alloca(len+1);
-       if (!tmp)
-	 FEerror("Cannot allocate memory on C stack",0);
-
-       case_fold = case_fold_search;
-       memcpy(tmp,pattern->st.st_self,len);
-       tmp[len]=0;
-
-       if (compiled_regexp) {
-	 free((void *)compiled_regexp);
-	 compiled_regexp = 0;
-       }
+     
+     if (type_of(pattern)==t_vector)
        
-       if (!(compiled_regexp=regcomp(tmp))) {
-	 END_NO_INTERRUPT;
-	 RETURN1(make_fixnum(-1));
-       }
+       compiled_regexp=(void *)pattern->ust.ust_self;
 
-     }
+     else if (case_fold != case_fold_search || len != strlen(buf) || memcmp(pattern->ust.ust_self,buf,len)) 
+
+       compiled_regexp=saved_compiled_regexp=(regexp *)fScompile_regexp(pattern)->v.v_self;
+
 
      str=string->st.st_self;
      np=page(str);

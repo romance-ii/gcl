@@ -11,7 +11,8 @@
   `(slooP::sloop while ,test do ,@ body))
  (defmacro f (op x y)
    `(the ,(if  (get op 'compiler::predicate)  't 'fixnum)
-	 (,op (the fixnum ,x) (the fixnum ,y)))))
+	 (,op (the fixnum ,x) (the fixnum ,y))))
+(defmacro fcr (x) `(load-time-value (compile-regexp ,x))))
 
 (eval-when (compile eval load)
 (defun sharp-u-reader (stream subchar arg)
@@ -31,9 +32,12 @@
        (vector-push-extend ch tem)))
     tem))
 
-
 (set-dispatch-macro-character #\# #\u 'sharp-u-reader)
+
 )
+
+(defconstant +crlu+ (compile-regexp #u""))
+(defconstant +crnp+ (compile-regexp #u"[]"))
 
 (defvar *info-data* nil)
 (defvar *current-info-data* nil)
@@ -67,11 +71,11 @@
   (declare (fixnum lim))
   (let ((s (file-to-string file)) (i 0))
     (declare (fixnum i) (string s))
-    (cond ((f >= (string-match #u"[\n]+Indirect:" s 0) 0)
+    (cond ((f >= (string-match (fcr #u"[\n]+Indirect:") s 0) 0)
 	   (setq i (match-end 0))
-	   (setq lim (string-match #u"" s i))
+	   (setq lim (string-match +crlu+ s i))
 	   (while
-	       (f >= (string-match #u"\n([^\n]+): ([0-9]+)" s i lim) 0)
+	       (f >= (string-match (fcr #u"\n([^\n]+): ([0-9]+)") s i lim) 0)
 	     (setq i (match-end 0))
 	     (setq files
 		   (cons(cons
@@ -79,9 +83,9 @@
 			 (get-match s 1)
 			 )
 			files)))))
-    (cond ((f >=  (si::string-match #u"[\n]+Tag Table:" s i) 0)
+    (cond ((f >=  (si::string-match (fcr #u"[\n]+Tag Table:") s i) 0)
 	   (setq i (si::match-end 0))
-	   (cond ((f >= (si::string-match "" s i) 0)
+	   (cond ((f >= (si::string-match +crlu+ s i) 0)
 		  (setq tags (subseq s i (si::match-end 0)))))))
     (if files (or tags (info-error "Need tags if have multiple files")))
     (list* tags (nreverse files))))
@@ -89,29 +93,30 @@
 (defun re-quote-string (x &aux (i 0) (len (length x)) ch
 			   (extra 0)  )
   (declare (fixnum i len extra))
-  (declare (string x))
-  (let (tem)
-    (tagbody
-     AGAIN
-     (while (< i len)
-       (setq ch (aref x i))
-       (cond ((position ch "\\()[]+.*|^$?")
-	      (cond (tem 
-		     (vector-push-extend #\\ tem))
-		    (t (incf extra)))))
-       (if tem
-	   (vector-push-extend ch tem))
-       (setq i (+ i 1)))
-     (cond (tem )
-	   ((> extra 0)
-	    (setq tem 
-		  (make-array (f + (length x) extra)
-			      :element-type 'string-char :fill-pointer 0))
-	    (setq i 0)
-	    (go AGAIN))
-	   (t (setq tem x)))
-     )
-    tem))
+  (let ((x (if (stringp x) x (string x))))
+    (declare (string x))
+    (let (tem)
+      (tagbody
+       AGAIN
+       (while (< i len)
+	 (setq ch (aref x i))
+	 (cond ((position ch "\\()[]+.*|^$?")
+		(cond (tem 
+		       (vector-push-extend #\\ tem))
+		      (t (incf extra)))))
+	 (if tem
+	     (vector-push-extend ch tem))
+	 (setq i (+ i 1)))
+       (cond (tem )
+	     ((> extra 0)
+	      (setq tem 
+		    (make-array (f + (length x) extra)
+				:element-type 'string-char :fill-pointer 0))
+	      (setq i 0)
+	      (go AGAIN))
+	     (t (setq tem x)))
+       )
+      tem)))
 
 (defun get-match (string i)
   (subseq string (match-beginning i) (match-end i)))
@@ -289,15 +294,15 @@
   (let* ((info-subfile (info-subfile n))
 	 (s (info-get-file (cdr info-subfile)))
 	 (end (- n (car info-subfile))))
-    (while (f >=  (string-match #u"" s i end) 0)
+    (while (f >=  (string-match +crlu+ s i end) 0)
       (setq i (match-end 0)))
     (setq i (- i 1))
     (if (f >= (string-match
-	       #u"[\n][^\n]*Node:[ \t]+([^\n\t,]+)[\n\t,][^\n]*\n"  s i) 0)
+	       (fcr #u"[\n][^\n]*Node:[ \t]+([^\n\t,]+)[\n\t,][^\n]*\n")  s i) 0)
 	(let* ((i (match-beginning 0))
 	       (beg (match-end 0))
 	       (name (get-match s 1))
-	       (end(if (f >= (string-match "[]" s beg) 0)
+	       (end(if (f >= (string-match +crnp+ s beg) 0)
 		       (match-beginning 0)
 		     (length s)))
 	       (node (list* s beg end i name info-subfile
@@ -323,7 +328,7 @@
 	   (setq position-pattern (car name) name (cdr name)))))
   (or (stringp name) (info-error "bad arg"))
   (waiting *info-window*)  
-  (cond ((f >= (string-match "^\\(([^(]+)\\)([^)]*)" name) 0)
+  (cond ((f >= (string-match (fcr "^\\(([^(]+)\\)([^)]*)") name) 0)
 	 ;; (file)node
 	 (setq file (get-match name 1))
 	 (setq name (get-match name 2))
@@ -348,7 +353,7 @@
 		    s start) 0)
 	     (let* ((i (match-beginning 0))
 		    (beg (match-end 0))
-		    (end(if (f >= (string-match "[]" s beg) 0)
+		    (end(if (f >= (string-match +crnp+ s beg) 0)
 			    (match-beginning 0)
 			  (length s)))
 		    (node (list* s beg end i name info-subfile
@@ -363,7 +368,7 @@
 			(f >= (setq subnode
 				    (string-match
 				     (si::string-concatenate
-				      #u"\n - [A-Za-z ]+: "
+				      #u"\n -+ [A-Za-z ]+: "
 				      position-pattern #u"[ \n]")
 				     s beg end)) 0)
 			(f >= (string-match position-pattern s beg end) 0))
@@ -378,9 +383,13 @@
 		      (let ((e
 			     (if (and (>= subnode 0)
 				      (f >=
-					 (string-match #u"\n\n - [A-Z]"
-						       s (+ beg 1
-							    initial-offset)
+					 (string-match 
+					  (fcr #u"\n -+ [a-zA-Z]")
+					  s 
+					  (let* ((bg (+ beg 1 initial-offset))
+						 (sd (string-match (fcr #u"\n   ") s bg end))
+						 (nb (if (minusp sd) bg sd)))
+					    nb) 
 						       end)
 					 0))
 				 (match-beginning 0)
