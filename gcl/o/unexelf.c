@@ -1153,7 +1153,7 @@ unexec (new_name, old_name, data_start, bss_start, entry_address)
 	   be no harm in that provided that r_offset is always the first
 	   member.  */
 	nn = section.sh_info;
-	if (!strcmp (old_section_names + NEW_SECTION_H (nn).sh_name, ".data")
+	if (nn && !strcmp (old_section_names + NEW_SECTION_H (nn).sh_name, ".data")
 	    || !strcmp ((old_section_names + NEW_SECTION_H (nn).sh_name),
 			".sdata")
 	    || !strcmp ((old_section_names + NEW_SECTION_H (nn).sh_name),
