@@ -2,7 +2,27 @@
 @node System Definitions, Debugging, C Interface, Top
 @chapter System Definitions
 
+@defun SOCKET (port :host host)
+Package:SI
 
+GCL specific: Open a socket connection to HOST at PORT.
+
+@end defun
+@defun OPEN-NAMED-SOCKET (port)
+Package:SI
+
+GCL specific: Open a socket on PORT, returning (cons fd portname) where fd
+is a small fixnum which is the write file descriptor for
+the socket.  If PORT is zero do automatic allocation of port.
+
+@end defun
+@defun ACCEPT-SOCKET-CONNECTION (NAMED_SOCKET)
+Package:SI
+
+GCL specific: Wait for a connection on NAMED_SOCKET 
+and return (list* named_socket fd name1) when one is established.
+
+@end defun
 @defun ALLOCATE-CONTIGUOUS-PAGES (number &optional (really-allocate nil))
 Package:SI
 
