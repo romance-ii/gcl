@@ -64,7 +64,13 @@ install:
 	! grep -q gcl.info $(DESTDIR)${INFO_DIR}dir || \
 	echo "* GCL Ansi Doc: (gcl.info).  Ansi Common Lisp Specification." >> $(DESTDIR)${INFO_DIR}dir
 	cp *.info* $(DESTDIR)${INFO_DIR}
-
+	mkdir -p $(DESTDIR)$(INFO_DIR)../share/doc/gcl-doc/gcl.html
+	mkdir -p $(DESTDIR)$(INFO_DIR)../share/doc/gcl-doc/gcl-si.html
+	mkdir -p $(DESTDIR)$(INFO_DIR)../share/doc/gcl-doc/gcl-tk.html
+	cp gcl_*html $(DESTDIR)$(INFO_DIR)../share/doc/gcl-doc/gcl.html
+	cp gcl-si_*html $(DESTDIR)$(INFO_DIR)../share/doc/gcl-doc/gcl-si.html
+	cp gcl-tk_*html $(DESTDIR)$(INFO_DIR)../share/doc/gcl-doc/gcl-tk.html
+	cp *dvi $(DESTDIR)$(INFO_DIR)../share/doc/gcl-doc
 
 FILE=gcl-si.texi
 srcs:
@@ -74,6 +80,7 @@ srcs:
 tex:
 	TEXINPUTS=.:$$TEXINPUTS tex gcl-si.texi
 	TEXINPUTS=.:$$TEXINPUTS tex gcl-tk.texi
+	TEXINPUTS=.:$$TEXINPUTS tex gcl.texi
 	@echo must do twice to get indices correct...
 	@echo so do '$(MAKE) tex' again
 

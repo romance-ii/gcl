@@ -13,8 +13,9 @@ gcl (2.5.0.cvs20020625-61) unstable; urgency=low
   * prototype for system_time_zone_helper
   * Initial changes for solaris support
   * make -> $(MAKE) in makefiles
+  * Incorporated main GCL (ANSI) Lisp Documentation in distribution
 
- -- Camm Maguire <camm@m.enhanced.com>  Mon, 28 Oct 2002 03:01:01 -0500
+ -- Camm Maguire <camm@m.enhanced.com>  Mon, 28 Oct 2002 04:31:33 -0500
 
 gcl (2.5.0.cvs20020625-60) unstable; urgency=low
 

@@ -1,7 +1,7 @@
-Document: gcl-doc
-Title: GNU Common Lisp Documentation
+Document: gcl-si-doc
+Title: GNU Common Lisp Documentation -- System Internals 
 Author: W. Schelter
-Abstract: A Common Lisp compiler and interpreter based on C
+Abstract: Documentation on GCL-specific Lisp system functions
 Section: Apps/Programming
 
 Format: DVI

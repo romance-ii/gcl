@@ -106,7 +106,7 @@ install: build
 
 	$(MAKE) install DESTDIR=$$(pwd)/debian/tmp
 
-	rm -rf debian/tmp/usr/share
+#	rm -rf debian/tmp/usr/share
 	mkdir -p debian/tmp/usr/share/emacs/site-lisp
 	cp -a $$(find debian/tmp/usr/local -name site-lisp -type d) debian/tmp/usr/share/emacs/site-lisp/gcl
 	rm -rf debian/tmp/usr/local
@@ -115,10 +115,10 @@ install: build
 		sed "s,$$(pwd)/debian/tmp,,1" >debian/foo
 	mv debian/foo debian/tmp/usr/lib/gcl-2.5.0/gcl-tk/demos/index.lsp
 
-	mkdir -p debian/tmp/usr/share/doc/gcl-doc/gcl-si.html
-	cp info/gcl-si*html debian/tmp/usr/share/doc/gcl-doc/gcl-si.html/
-	mkdir -p debian/tmp/usr/share/doc/gcl-doc/gcl-tk.html
-	cp info/gcl-tk*html debian/tmp/usr/share/doc/gcl-doc/gcl-tk.html/
+#	mkdir -p debian/tmp/usr/share/doc/gcl-doc/gcl-si.html
+#	cp info/gcl-si*html debian/tmp/usr/share/doc/gcl-doc/gcl-si.html/
+#	mkdir -p debian/tmp/usr/share/doc/gcl-doc/gcl-tk.html
+#	cp info/gcl-tk*html debian/tmp/usr/share/doc/gcl-doc/gcl-tk.html/
 
 	rm -f debian/tmp/usr/bin/gcl.exe debian/tmp/usr/bin/gclm.bat
 
