@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-70) unstable; urgency=high
+
+  * loop fixes
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 26 Nov 2002 23:08:15 -0500
+
 gcl (2.5.0.cvs20020625-69) unstable; urgency=high
 
   * eval fix

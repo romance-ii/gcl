@@ -729,6 +729,12 @@ a LET-like macro, and a SETQ-like macro, which perform LOOP-style destructuring.
 ;;;List of all the value-accumulation descriptor structures in the loop.
 ;;; See loop-get-collection-info.
 (defvar *loop-collection-cruft*)		; for multiple COLLECTs (etc)
+
+;;;Flag indicating value accumulation without into
+(defvar *loop-collection-no-into*)
+
+
+
 
 
 ;;;; Code Analysis Stuff
@@ -1017,6 +1023,7 @@ collected result will be returned as the value of the LOOP."
 	(*loop-when-it-variable* nil)
 	(*loop-never-stepped-variable* nil)
 	(*loop-names* nil)
+	(*loop-collection-no-into* nil)
 	(*loop-collection-cruft* nil))
     (loop-iteration-driver)
     (loop-bind-block)
@@ -1026,9 +1033,10 @@ collected result will be returned as the value of the LOOP."
 		     ,(nreverse *loop-body*)
 		     ,(nreverse *loop-after-body*)
 		     ,(nreconc *loop-epilogue* (nreverse *loop-after-epilogue*)))))
-      (do () (nil)
-	(setq answer `(block ,(pop *loop-names*) ,answer))
-	(unless *loop-names* (return nil)))
+;      (do () (nil)
+;	(setq answer `(block ,(pop *loop-names*) ,answer))
+;	(unless *loop-names* (return nil)))
+;      (setq answer `(block ,(car *loop-names*) ,answer))
       (dolist (entry *loop-bind-stack*)
 	(let ((vars (first entry))
 	      (dcls (second entry))
@@ -1048,6 +1056,7 @@ collected result will be returned as the value of the LOOP."
 				   `((destructuring-bind ,@crocks
 					 ,@forms))
 				 forms)))))))
+      (setq answer `(block ,(car *loop-names*) ,answer))
       answer)))
 
 
@@ -1105,9 +1114,13 @@ collected result will be returned as the value of the LOOP."
 (defun loop-emit-final-value (form)
   (push (loop-construct-return form) *loop-after-epilogue*)
   (when *loop-final-value-culprit*
-    (loop-warn "LOOP clause is providing a value for the iteration,~@
+    (if *loop-collection-no-into*
+	(specific-error :invalid-form "LOOP clause is providing a value for the iteration,~@
 	        however one was already established by a ~S clause."
-	       *loop-final-value-culprit*))
+			*loop-final-value-culprit*)
+      (loop-warn "LOOP clause is providing a value for the iteration,~@
+	        however one was already established by a ~S clause."
+		 *loop-final-value-culprit*)))
   (setq *loop-final-value-culprit* (car *loop-source-context*)))
 
 
@@ -1345,6 +1358,8 @@ collected result will be returned as the value of the LOOP."
 
 
 (defun loop-get-collection-info (collector class default-type)
+  (unless (loop-tequal (car *loop-source-code*)'into)
+    (setq *loop-collection-no-into* t))
   (let ((form (loop-get-form))
 	(dtype (and (not (loop-universe-ansi *loop-universe*)) (loop-optional-type)))
 	(name (when (loop-tequal (car *loop-source-code*) 'into)
@@ -1461,7 +1476,8 @@ collected result will be returned as the value of the LOOP."
 (defun loop-do-thereis (restrictive)
   (when restrictive (loop-disallow-conditional))
   (loop-emit-body `(when (setq ,(loop-when-it-variable) ,(loop-get-form))
-		     ,(loop-construct-return *loop-when-it-variable*))))
+		     ,(loop-construct-return *loop-when-it-variable*)))
+  (loop-emit-final-value nil))
 
 
 (defun loop-do-while (negate kwd &aux (form (loop-get-form)))
