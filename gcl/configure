@@ -1819,7 +1819,7 @@ cat > conftest.$ac_ext <<EOF
 #include <fcntl.h>
 
 int main() {
-FILE *fp=fopen("jim","r");
+FILE *fp=fopen("configure.in","r");
   int orig;
   orig = fcntl(fileno(fp), F_GETFL);
   if (! (orig & O_NONBLOCK )) return 0;

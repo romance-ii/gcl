@@ -223,7 +223,7 @@ AC_MSG_CHECKING(check for listen using fcntl)
 AC_TRY_COMPILE([#include <stdio.h>
 #include <fcntl.h>
 ],
-[FILE *fp=fopen("jim","r");
+[FILE *fp=fopen("configure.in","r");
   int orig;
   orig = fcntl(fileno(fp), F_GETFL);
   if (! (orig & O_NONBLOCK )) return 0;
