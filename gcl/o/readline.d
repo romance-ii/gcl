@@ -208,7 +208,13 @@ static siLreadline_init() {
 	object con, word;
 	char **charp;
 	int words, i, j;
-	char c;
+	char c,*cp;
+
+	if (!isatty(0))
+	   return;
+
+	if ((cp=getenv("TERM")) && !strcmp(cp,"dumb"))
+	   return;
 
 	check_arg(4);
 
