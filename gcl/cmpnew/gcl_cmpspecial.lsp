@@ -128,11 +128,11 @@
                     *local-funs*)
               (push fun *closures*)
 	      (cond (*clink*
-		     (unwind-exit (list 'make-cclosure (fun-cfun fun) *clink*)))
+		     (unwind-exit (list 'make-cclosure (fun-cfun fun) *clink* (fun-name fun))))
 		    (t (push-data-incf nil)
 		       (add-init `(si::setvv ,*next-vv*
-					     (si::mc nil ,(add-address  "&LC"
-									(fun-cfun fun))))
+					     (si::mc nil ,(add-address
+							   (c-function-name "&LC" (fun-cfun fun) (fun-name fun)))))
 				 t) 
 		       (unwind-exit (list 'vv *next-vv*)))))
              ))
@@ -146,8 +146,8 @@
            (wt "symbol_function(VV[" vv "])")
            (wt "(VV[" vv "]->s.s_gfdef)")))
 
-(defun wt-make-cclosure (cfun clink)
-       (wt-nl "make_cclosure_new(LC" cfun ",Cnil,")
+(defun wt-make-cclosure (cfun clink fname)
+       (wt-nl "make_cclosure_new(" (c-function-name "LC" cfun fname) ",Cnil,")
        (wt-clink clink)
        (wt ",Cdata)"))
 

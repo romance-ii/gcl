@@ -163,7 +163,7 @@
          (setf (fun-ref fun) (vs-push))
          (wt-nl)
          (wt-vs (fun-ref fun))
-         (wt "=make_cclosure_new(LC" (fun-cfun fun) ",Cnil,") (wt-clink)
+         (wt "=make_cclosure_new(" (c-function-name "LC" (fun-cfun fun) (fun-name fun)) ",Cnil,") (wt-clink)
          (wt ",Cdata);")
          (wt-nl)
          (wt-vs (fun-ref fun))
@@ -297,7 +297,7 @@
     (push (car def) *closures*)
     (wt-nl)
     (wt-vs* (fun-ref (car def)))
-    (wt "=make_cclosure_new(LC" (fun-cfun (car def)) ",Cnil,") (wt-clink)
+    (wt "=make_cclosure_new(" (c-function-name "LC" (fun-cfun (car def)) (fun-name (car def))) ",Cnil,") (wt-clink)
     (wt ",Cdata);")
     )
 
@@ -393,7 +393,7 @@
     (cmpnote "Tail-recursive call of ~s was replaced by iteration."
              (fun-name (car fd))))
    (t (push-args args)
-      (wt-nl "L" (fun-cfun (car fd)) "(")
+      (wt-nl (c-function-name "L" (fun-cfun (car fd)) (fun-name (car fd))) "(")
       (dotimes** (n (fun-level (car fd))) (wt "base" n ","))
       (wt "base")
       (unless (= (fun-level (car fd)) *level*) (wt (fun-level (car fd))))

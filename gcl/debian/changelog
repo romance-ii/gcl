@@ -4,8 +4,10 @@ gclcvs (2.7.0-30) unstable; urgency=low
     (gcl_cmptop.lsp)
   * Make disassemble work when original system directory is gone
   * New debian/support files for debconf image default selection support
+  * More descriptive compiled C function names for use in gprof when
+    profiling is compiled in
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  5 Aug 2004 22:02:15 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  5 Aug 2004 22:17:00 +0000
 
 gclcvs (2.7.0-29) unstable; urgency=low
 

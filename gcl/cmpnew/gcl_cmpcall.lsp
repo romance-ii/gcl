@@ -323,7 +323,7 @@
      ;;; Call to a function defined in the same file.
      ((setq fd (assoc fname *global-funs*))
       (push-args args)
-      (wt-nl "L" (cdr fd) "();")
+      (wt-nl (c-function-name "L" (cdr fd) fname) "();")
       (unwind-exit 'fun-val nil fname)
       )
      ((eql fname 'funcall-c)

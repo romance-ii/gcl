@@ -187,6 +187,42 @@
 )
 
 
+;; FIXME case does not optimize as well
+(defun dash-to-underscore-int (str beg end)
+  (declare (string str) (fixnum beg end))
+  (unless (< beg end)
+    (return-from dash-to-underscore-int str))
+  (let ((ch (aref str beg)))
+    (declare (character ch))
+    (setf (aref str beg)
+	  (cond 
+	    ((eql ch #\-) #\_)
+	    ((eql ch #\/) #\_)
+	    ((eql ch #\.) #\_)
+	    ((eql ch #\_) #\_)
+	    ((eql ch #\!) #\E)
+	    ((eql ch #\*) #\A)
+	    (t (if (alphanumericp ch) ch #\$)))))
+  (dash-to-underscore-int str (1+ beg) end))
+
+(defun dash-to-underscore (str)
+  (declare (string str))
+  (let ((new (copy-seq str)))
+    (dash-to-underscore-int new 0 (length new))))
+
+;; FIXME consider making this a macro
+(defun c-function-name (prefix num fname)
+  (let ((fname (string fname)))
+    (si::string-concatenate
+     (string prefix)
+     (write-to-string num)
+     #+gprof(si::string-concatenate
+	     "__"
+	     (dash-to-underscore fname)
+	     "__"
+	     (if *compiler-input*
+		 (dash-to-underscore (namestring *compiler-input*))
+	       "")))))
 
 (defun t1expr (form &aux (*current-form* form) (*first-error* t))
   (catch *cmperr-tag*
@@ -293,7 +329,7 @@
     (wt-nl1 "}"))
 
   ;;; Declarations in h-file.
-  (dolist* (fun *closures*) (wt-h "static void LC" (fun-cfun fun) "();"))
+  (dolist* (fun *closures*) (wt-h "static void " (c-function-name "LC" (fun-cfun fun) (fun-name fun)) "();"))
   (dolist* (x *reservations*)
            (wt-h "#define VM" (car x) " " (cdr x)))
 
@@ -318,7 +354,7 @@
   (or *vaddress-list* (wt-h 0))
    (do ((v (nreverse *Vaddress-List*) (cdr v)))
        ((null v)   (wt-h "};"))
-       (wt-h "(char *)(" (caar v) (cadar v)  (if (cdr v) ")," ")")))
+       (wt-h "(char *)(" (caar v) (if (cdr v) ")," ")")))
 
    (wt-h "#define VV ((object *)VVi)")
 
@@ -531,7 +567,7 @@
                     (get fname 'proclaimed-return-type)
 		    (flags set ans)
                     (make-inline-string
-                     cfun (get fname 'proclaimed-arg-types)))
+                     cfun (get fname 'proclaimed-arg-types) fname))
               *inline-functions*))
    ((and ;(get fname 'proclaimed-function)
      (eq (get fname 'proclaimed-return-type) t))
@@ -554,12 +590,12 @@
        
        )))
 
-(defun make-inline-string (cfun args)
+(defun make-inline-string (cfun args fname)
   (if (null args)
-      (format nil "LI~d()" cfun)
+      (format nil "~d()" (c-function-name "LI" cfun fname))
       (let ((o (make-array 100 :element-type 'string-char :fill-pointer 0
 			   :adjustable t )))
-           (format o "LI~d(" cfun)
+           (format o "~d(" (c-function-name "LI" cfun fname))
            (do ((l args (cdr l))
                 (n 0 (1+ n)))
                ((endp (cdr l))
@@ -600,10 +636,10 @@
      (setq type (f-type (pop args))))))
     
 
-(defun wt-if-proclaimed (fname cfun  lambda-expr)
+(defun wt-if-proclaimed (fname cfun lambda-expr)
   (cond ((fast-link-proclaimed-type-p fname)
 	 (cond ((assoc fname *inline-functions*)
-		(add-init `(si::mfsfun ',fname ,(add-address "LI" cfun)
+		(add-init `(si::mfsfun ',fname ,(add-address (c-function-name "LI" cfun fname))
 				   ,(proclaimed-argd (get fname 'proclaimed-arg-types)
 						     (get fname 'proclaimed-return-type)
 					)		   )
@@ -667,10 +703,10 @@
 
 
   
-(defun add-address (a b)
+(defun add-address (a)
   ;; if need ampersand before function for address
   ;; (setq a (string-concatenate "&" a))
-  (push (list a b) *vaddress-list*)
+  (push (list a) *vaddress-list*)
   (prog1 *vind* (incf *vind*)))
 
 (defun t2defun (fname cfun lambda-expr doc sp)
@@ -685,20 +721,20 @@
 ;	   (wt-h "static object LI" cfun "();")
 	   (if keyp
 	       (add-init `(si::mfvfun-key
-			   ',fname ,(add-address "LI" cfun)
+			   ',fname ,(add-address (c-function-name "LI" cfun fname))
 			   ,(vargd (length (car (lambda-list lambda-expr)))
 				   (maxargs (lambda-list lambda-expr)))
-			   ,(add-address (format nil "&LI~akey" cfun) ""))
+			   ,(add-address (format nil "&LI~akey" cfun)))
 			 )
-	     (add-init `(si::mfvfun ',fname ,(add-address "LI" cfun)
+	     (add-init `(si::mfvfun ',fname ,(add-address (c-function-name "LI" cfun fname))
 				    ,(vargd (length (car (lambda-list lambda-expr)))
 					    (maxargs (lambda-list lambda-expr))))
 		       ))))
 	((numberp cfun)
-         (wt-h "static void L" cfun "();")
-	 (add-init `(si::mf ',fname ,(add-address "L" cfun)) ))
+         (wt-h "static void " (c-function-name "L" cfun fname) "();")
+	 (add-init `(si::mf ',fname ,(add-address (c-function-name "L" cfun fname))) ))
         (t (wt-h cfun "();")
-	   (add-init `(si::mf ',fname ,(add-address "" cfun )) )))
+	   (add-init `(si::mf ',fname ,(add-address (c-function-name "" cfun fname) )) )))
            
   (let ((base-name (setf-function-base-symbol fname)))
     (when base-name
@@ -774,8 +810,8 @@
                    )
              (setf (var-loc (car vl)) (next-cvar)))
          (wt-comment "local entry for function " (function-string fname))
-         (wt-h "static " (declaration-type (rep-type (caddr inline-info))) "LI" cfun "();")
-         (wt-nl1 "static " (declaration-type (rep-type (caddr inline-info))) "LI" cfun "(")
+         (wt-h "static " (declaration-type (rep-type (caddr inline-info))) (c-function-name "LI" cfun fname) "();")
+         (wt-nl1 "static " (declaration-type (rep-type (caddr inline-info))) (c-function-name "LI" cfun fname) "(")
          (wt-requireds  requireds
 		       (cadr inline-info))
          ;;; Now the body.
@@ -833,7 +869,7 @@
   (wt-comment "local entry for function " (function-string fname))
 
   (let ((tmp ""))
-    (wt-nl1 "static object LI" cfun "(")
+    (wt-nl1 "static object " (c-function-name "LI" cfun fname) "(")
     (when reqs 
       (do ((v reqs (cdr v)))
 	  ((null v))
@@ -848,7 +884,7 @@
       (wt "object first,...")
       (setq tmp (concatenate 'string tmp "object,...")))
     (wt ")")
-    (wt-h "static object LI" cfun "(" tmp ");"))
+    (wt-h "static object " (c-function-name "LI" cfun fname) "(" tmp ");"))
 
 
 ;  (when reqs (wt-nl "object ")
@@ -1050,7 +1086,7 @@
 	  (wt "static struct { short n,allow_other_keys;"
 	      "object *defaults;")
 	  (wt-nl " KEYTYPE keys[" (max n 1) "];")
-	  (wt "} LI"cfun "key=")
+	  (wt "} " "LI" cfun "key=")
 	  
 	  (wt "{" (length (ll-keywords ll)) ","
 	      (if (ll-allow-other-keys ll) 1 0)
@@ -1129,7 +1165,7 @@
 (defun t3defun-normal (fname cfun lambda-expr sp)
          (wt-comment "function definition for " (function-string fname))
          (if (numberp cfun)
-             (wt-nl1 "static void L" cfun "()")
+             (wt-nl1 "static void " (c-function-name "L" cfun fname) "()")
              (wt-nl1 cfun "()"))
          (wt-nl1 "{" "register object *"  *volatile*"base=vs_base;")
 	 (assign-down-vars (cadr lambda-expr) cfun
@@ -1284,7 +1320,7 @@
 (defun wt-global-entry (fname cfun arg-types return-type)
     (cond ((get fname 'no-global-entry)(return-from wt-global-entry nil)))
     (wt-comment "global entry for the function " (function-string fname))
-    (wt-nl1 "static void L" cfun "()")
+    (wt-nl1 "static void " (c-function-name "L" cfun fname) "()")
     (wt-nl1 "{	register object *base=vs_base;")
     (when (or *safe-compile* *compiler-check-args*)
           (wt-nl "check_arg(" (length arg-types) ");"))
@@ -1296,7 +1332,7 @@
                             (long-float "make_longfloat")
                             (short-float "make_shortfloat")
                             (otherwise ""))
-           "(LI" cfun "(")
+           "(" (c-function-name "LI" cfun fname) "(")
     (do ((types arg-types (cdr types))
          (n 0 (1+ n)))
         ((endp types))
@@ -1350,8 +1386,8 @@
   (when doc (add-init `(si::putprop ',fname ,doc 'si::function-documentation) ))
   (when ppn
 	(add-init `(si::putprop ',fname ',ppn 'si::pretty-print-format) ))
-  (wt-h "static void L" cfun "();")
-  (add-init `(si::MM ',fname ,(add-address "L" cfun)) )
+  (wt-h "static void " (c-function-name "L" cfun fname) "();")
+  (add-init `(si::MM ',fname ,(add-address (c-function-name "L" cfun fname))) )
   )
 
 (defun t3defmacro (fname cfun macro-lambda doc ppn sp
@@ -1361,7 +1397,7 @@
   (let-pass3
    ((*exit* 'return))
    (wt-comment "macro definition for " fname)
-   (wt-nl1 "static void L" cfun "()")
+   (wt-nl1 "static void " (c-function-name "L" cfun fname) "()")
    (wt-nl1 "{register object *" *volatile* "base=vs_base;")
    (assign-down-vars (nth 4 macro-lambda) cfun ;*dm-info*
 		     't3defun)
@@ -1531,9 +1567,9 @@
              (cond ((setq fd (assoc (caar s) *global-funs*))
                     (cond (*compiler-push-events*
                            (wt-nl1 "ihs_push(VV[" (add-symbol (caar s)) "]);")
-                           (wt-nl1 "L" (cdr fd) "();")
+                           (wt-nl1 (c-function-name "L" (cdr fd) (caar s)) "();")
                            (wt-nl1 "ihs_pop();"))
-                          (t (wt-nl1 "L" (cdr fd) "();"))))
+                          (t (wt-nl1 (c-function-name "L" (cdr fd) (caar s)) "();"))))
                    (*compiler-push-events*
                     (wt-nl1 "super_funcall(VV[" (add-symbol (caar s)) "]);"))
                    (*safe-compile*
@@ -1600,13 +1636,13 @@
 
 (defun t2defentry (fname cfun arg-types type cname)
   (declare (ignore arg-types type cname))
-  (wt-h "static void L" cfun "();")
-  (add-init `(si::mf ',fname ,(add-address "L" cfun)) )
+  (wt-h "static void " (c-function-name "L" cfun fname) "();")
+  (add-init `(si::mf ',fname ,(add-address (c-function-name "L" cfun fname))) )
   )
 
 (defun t3defentry (fname cfun arg-types type cname)
   (wt-comment "function definition for " fname)
-  (wt-nl1 "static void L" cfun "()")
+  (wt-nl1 "static void " (c-function-name "L" cfun fname) "()")
   (wt-nl1 "{	object *old_base=vs_base;")
   (case type
     (void)
@@ -1681,7 +1717,7 @@
 	     *downward-closures*
 	     (requireds (caaddr lambda-expr)))
   (wt-comment "local dc function " (if (fun-name fun) (fun-name fun) nil))
-  (wt-nl1 "static void " (if closure-p "LC" "L") (fun-cfun fun) "(")
+  (wt-nl1 "static void " (c-function-name (if closure-p "LC" "L") (fun-cfun fun) (fun-name fun)) "(")
   (wt "base0" (if requireds "," ""))
   (analyze-regs (cadr lambda-expr) 2)
   (wt-requireds (caaddr lambda-expr) nil) ;;nil = arg types all t
@@ -1724,8 +1760,8 @@
       (return-from t3local-fun
 		   (t3local-dcfun closure-p clink ccb-vs fun lambda-expr initial-ccb-vs)))
   (wt-comment "local function " (if (fun-name fun) (fun-name fun) nil))
-  (wt-h   "static void " (if closure-p "LC" "L") (fun-cfun fun) "();")
-  (wt-nl1 "static void " (if closure-p "LC" "L") (fun-cfun fun) "(")
+  (wt-h   "static void " (c-function-name (if closure-p "LC" "L") (fun-cfun fun) (fun-name fun)) "();")
+  (wt-nl1 "static void " (c-function-name (if closure-p "LC" "L") (fun-cfun fun) (fun-name fun)) "(")
   (dotimes* (n level (wt "base" n ")")) (wt "base" n ","))
   (wt-nl1  "register object ")
   (dotimes* (n level (wt "*"*volatile*"base" n ";"))
