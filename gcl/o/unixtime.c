@@ -131,7 +131,7 @@ Lget_internal_run_time(void)
 {
 
 #ifdef USE_INTERNAL_REAL_TIME_FOR_RUNTIME
-        vs_push(make_fixnum(fLget_internal_real_time()));
+        vs_push(fLget_internal_real_time());
 	return;
 #else
 	struct tms buf;
