@@ -147,7 +147,8 @@ clean: debian/control
 	for i in $(CFGS) ; do ! [ -e $$i ] || mv $$i $${i%.ori} ; done
 
 
-BVER:=$(shell dpkg -s binutils |grep ^Version: | cut -f2 -d\  | cut -f1 -d\-)
+BVER:=$(shell dpkg -s binutils |grep ^Version: | cut -f2 -d\  )
+BVERB:=$(shell echo $(BVER) | cut -f1 -d-)
 debian/substvars:
 	grep -q ^binutils: $@ 2>/dev/null || echo "binutils:Version=$(BVER)" >> $@
 
@@ -270,7 +271,7 @@ binary-arch: build install #debian/substvars
 	dh_fixperms -a
 	dh_installdeb -a
 	dh_shlibdeps -a
-	dh_gencontrol -a -u"-Vgcc=$(MCC) -Vbinutils=binutils-dev(=$(BVER))"
+	dh_gencontrol -a -u"-Vgcc=$(MCC) -Vbinutils=binutils-dev(>=$(BVER)),binutils-dev(<=$(BVERB)-999)"
 	dh_md5sums -a
 	dh_builddeb -a
 
