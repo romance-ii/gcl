@@ -1,10 +1,5 @@
-
-
-# Machine dependent makefile definitions for intel 386,486 running MSWINDOWS,
-# and compilation using mingw compiler and includes.
-
-# note using /bin/sh (ie a copy of ash.exe) will fail if a very LONG command
-# line is given, eg when linking maxima.  bash has more stack.
+# Machine dependent makefile definitions for Intel X86 under Microsoft Windows,
+# using Mingw32 compiler tools.
 
 SHELL        = bash
 
@@ -38,7 +33,7 @@ LAST_FILE    = $(ODIR)/lastfile.o
 INITFORM     = (si::build-symbol-table)
 
 # Use symbolic links
-SYMB         = -s
+SYMB         = -s -f
 APPEND       = ../bin/append
 
 # suffix for executables
