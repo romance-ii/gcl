@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "include.h"
-
 /*  We try here to compile in function addresses to which it is known
     that the compiler will make *direct* reference.  20040308 CM */
 
