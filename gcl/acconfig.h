@@ -16,6 +16,7 @@ SGC is enabled.  */
 #define IHSSIZE 4*1024
 #define FRSSIZE 4*1024
 
+#define HOLEPAGE (MAXPAGE/10)
 
 /* check to see if getcwd exists
 */

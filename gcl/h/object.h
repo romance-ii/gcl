@@ -846,8 +846,7 @@ char *tmp_alloc;
 
 /* FIXME  Make all other page constants scale similarly by default. */
 #ifndef HOLEPAGE
-/* #define	HOLEPAGE	128 */
-#define	HOLEPAGE	(4*(MAXPAGE/1024))
+#define	HOLEPAGE	(MAXPAGE/10)
 #endif
 
 

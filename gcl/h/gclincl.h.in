@@ -17,6 +17,8 @@
 #define IHSSIZE 4*1024
 #define FRSSIZE 4*1024
 
+#define HOLEPAGE (MAXPAGE/10)
+
 #undef NO_GETTOD
 
 /* define if have struct sigcontext in one of above */

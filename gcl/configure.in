@@ -14,6 +14,9 @@ help="--enable-maxpage=XXXX will compile in a page table of size XXX (default ${
 AC_ARG_ENABLE(maxpage,[ --enable-maxpage=XXXX will compile in a page table of size XXX (eg '--enable-maxpage=64*1024' would give 64K pages allowing 256 MB if pages are 4K each)] ,
 [AC_DEFINE_UNQUOTED(MAXPAGE,$enable_maxpage)])
 
+AC_ARG_ENABLE(holepage,[ --enable-holepage=XXXX will compile in a XXX-sized hole between the heap and relocatable memory area (eg '--enable-holepage=64*1024' would give 64K pages allowing 256 MB if pages are 4K each)] ,
+[AC_DEFINE_UNQUOTED(HOLEPAGE,$enable_holepage)])
+
 AC_ARG_ENABLE(vssize,[ --enable-vssize=XXXX will compile in a value stack of size XXX] ,
 [AC_DEFINE_UNQUOTED(VSSIZE,$enable_vssize)])
 
