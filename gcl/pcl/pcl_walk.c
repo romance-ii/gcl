@@ -42,14 +42,14 @@ static void L2()
 	V5=V5->c.c_cdr;
 	{object V6=getf(V5,VV[18],OBJNULL);
 	if(V6==OBJNULL){
-	base[4]= Cnil;
-	} else {
-	base[4]= V6;}}
+	base[4]= Cnil;} else {
+	base[4]= V6;
+	}}
 	{object V7=getf(V5,VV[19],OBJNULL);
 	if(V7==OBJNULL){
-	base[5]= Cnil;
-	} else {
-	base[5]= V7;}}
+	base[5]= Cnil;} else {
+	base[5]= V7;
+	}}
 	check_other_key(V5,2,VV[18],VV[19]);}
 	V4=V4->c.c_cdr;
 	base[6]= V4;}

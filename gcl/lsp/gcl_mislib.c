@@ -457,95 +457,96 @@ static void L6()
 	vs_top=(vs_base=base+4)+1;
 	return;
 }
-/*	function definition for COMPILE-FILE-PATHNAME	*/
+/*	local entry for function COMPILE-FILE-PATHNAME	*/
 
-static void L7()
-{register object *base=vs_base;
-	register object *sup=base+VM7; VC7
-	vs_reserve(VM7);
-	{object V62;
-	check_arg(1);
-	V62=(base[0]);
-	vs_top=sup;
+static object LI7(V63)
+
+object V63;
+{	 VMB7 VMS7 VMV7
 	goto TTL;
 TTL:;
-	base[1]= VV[14];
-	base[2]= (V62);
-	base[3]= VV[15];
-	base[4]= VV[16];
-	vs_top=(vs_base=base+1)+4;
+	base[0]= VV[14];
+	base[1]= (V63);
+	base[2]= VV[15];
+	base[3]= VV[16];
+	vs_top=(vs_base=base+0)+4;
 	Lmake_pathname();
-	return;
-	}
-}
-/*	function definition for CONSTANTLY	*/
-
-static void L8()
-{register object *base=vs_base;
-	register object *sup=base+VM8; VC8
-	vs_reserve(VM8);
-	check_arg(1);
-	base[0]=MMcons(base[0],Cnil);
 	vs_top=sup;
-	base[1]= 
-	make_cclosure_new(LC10,Cnil,base[0],Cdata);
-	vs_top=(vs_base=base+1)+1;
-	return;
+	{object V64 = vs_base[0];
+	VMR7(V64)}
+	base[0]=base[0];
+	return Cnil;
 }
-/*	function definition for COMPLEMENT	*/
+/*	local entry for function CONSTANTLY	*/
 
-static void L9()
-{register object *base=vs_base;
-	register object *sup=base+VM9; VC9
-	vs_reserve(VM9);
-	check_arg(1);
-	base[0]=MMcons(base[0],Cnil);
-	vs_top=sup;
-	base[1]= 
-	make_cclosure_new(LC11,Cnil,base[0],Cdata);
-	vs_top=(vs_base=base+1)+1;
-	return;
+static object LI9(V66)
+
+object V66;
+{	 VMB8 VMS8 VMV8
+	goto TTL;
+TTL:;
+	base[0]=MMcons((V66),Cnil);
+	{object V67 = 
+	make_cclosure_new(LC12,Cnil,base[0],Cdata);
+	VMR8(V67)}
+	base[0]=base[0];
+	return Cnil;
+}
+/*	local entry for function COMPLEMENT	*/
+
+static object LI11(V69)
+
+object V69;
+{	 VMB9 VMS9 VMV9
+	goto TTL;
+TTL:;
+	base[0]=MMcons((V69),Cnil);
+	{object V70 = 
+	make_cclosure_new(LC13,Cnil,base[0],Cdata);
+	VMR9(V70)}
+	base[0]=base[0];
+	return Cnil;
 }
 /*	local function CLOSURE	*/
 
-static void LC11(base0)
+static void LC13(base0)
 register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM10; VC10
 	vs_reserve(VM10);
-	{object V63;
+	{object V71;
 	vs_top[0]=Cnil;
 	{object *p=vs_top;
 	 for(;p>vs_base;p--)p[-1]=MMcons(p[-1],p[0]);}
-	V63=(base[0]);
+	V71=(base[0]);
 	vs_top=sup;
 	base[1]= (base0[0]->c.c_car);
-	{object V65;
-	V65= (V63);
+	{object V73;
+	V73= (V71);
 	 vs_top=base+2;
-	 while(!endp(V65))
-	 {vs_push(car(V65));V65=cdr(V65);}
+	 while(!endp(V73))
+	 {vs_push(car(V73));V73=cdr(V73);}
 	vs_base=base+2;}
 	super_funcall_no_event(base[1]);
 	vs_top=sup;
-	V64= vs_base[0];
-	base[1]= ((V64)==Cnil?Ct:Cnil);
+	V72= vs_base[0];
+	base[1]= ((V72)==Cnil?Ct:Cnil);
 	vs_top=(vs_base=base+1)+1;
 	return;
 	}
 }
 /*	local function CLOSURE	*/
 
-static void LC10(base0)
+static void LC12(base0)
 register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM11; VC11
 	vs_reserve(VM11);
-	{object V66;
+	{object V74;
 	vs_top[0]=Cnil;
 	{object *p=vs_top;
 	 for(;p>vs_base;p--)p[-1]=MMcons(p[-1],p[0]);}
-	V66=(base[0]);
+	V74=(base[0]);
 	vs_top=sup;
 	base[1]= (base0[0]->c.c_car);
 	vs_top=(vs_base=base+1)+1;

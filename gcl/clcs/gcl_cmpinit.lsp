@@ -1,4 +1,4 @@
-(proclaim '(optimize (safety 2) (space 3)))
+;(proclaim '(optimize (safety 2) (space 3)))
 
 (setq compiler::*eval-when-defaults* '(compile eval load))
 (setq compiler::*compile-ordinaries* t)

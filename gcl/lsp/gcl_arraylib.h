@@ -1,21 +1,24 @@
 
-static void L2();
 static object LI1();
 #define VMB1 register object *base=vs_top;
 #define VMS1  register object *sup=vs_top+3;vs_top=sup;
 #define VMV1 vs_reserve(3);
 #define VMR1(VMT1) vs_top=base ; return(VMT1);
-#define VC2
+static object LI2(object,object,...);
+#define VMB2
+#define VMS2
+#define VMV2
+#define VMR2(VMT2) return(VMT2);
 static object LI3(object,object,...);
 static object VK3defaults[8]={(void *)-1,(void *)-2,(void *)-1,(void *)-2,(void *)-2,(void *)-2,(void *)20,(void *)-2};
 static struct { short n,allow_other_keys;object *defaults;
 	 KEYTYPE keys[8];} LI3key={8,0,VK3defaults,{(void *)14,(void *)21,(void *)22,(void *)11,(void *)15,(void *)9,(void *)7,(void *)8}};
-#define VMB3 register object *base=vs_top; object  V32; object Vcs[17];
+#define VMB3 register object *base=vs_top; object  V34; object Vcs[17];
 #define VMS3  register object *sup=vs_top+8;vs_top=sup;
 #define VMV3 vs_reserve(8);
 #define VMR3(VMT3) vs_top=base ; return(VMT3);
 static object LI4();
-#define VMB4 object  V45;
+#define VMB4 object  V47;
 #define VMS4
 #define VMV4
 #define VMR4(VMT4) return(VMT4);
@@ -25,32 +28,32 @@ static object LI5();
 #define VMV5
 #define VMR5(VMT5) return(VMT5);
 static object LI6(object,...);
-#define VMB6 register object *base=vs_top; object  V56 ,V54;
+#define VMB6 register object *base=vs_top; object  V58 ,V56;
 #define VMS6 vs_top += 1;
 #define VMV6 vs_reserve(1);
 #define VMR6(VMT6) vs_top=base ; return(VMT6);
 static object LI7();
-#define VMB7 register object *base=vs_top; object  V63;
+#define VMB7 register object *base=vs_top; object  V65;
 #define VMS7  register object *sup=vs_top+2;vs_top=sup;
 #define VMV7 vs_reserve(2);
 #define VMR7(VMT7) vs_top=base ; return(VMT7);
 static object LI8(object,object,...);
-#define VMB8 register object *base=vs_top; object  V74 ,V73 ,V69 ,V67;
+#define VMB8 register object *base=vs_top; object  V76 ,V75 ,V71 ,V69;
 #define VMS8  register object *sup=vs_top+4;vs_top=sup;
 #define VMV8 vs_reserve(4);
 #define VMR8(VMT8) vs_top=base ; return(VMT8);
 static object LI9(object,object,...);
-#define VMB9 register object *base=vs_top; object  V86 ,V85 ,V79;
+#define VMB9 register object *base=vs_top; object  V88 ,V87 ,V81;
 #define VMS9  register object *sup=vs_top+2;vs_top=sup;
 #define VMV9 vs_reserve(2);
 #define VMR9(VMT9) vs_top=base ; return(VMT9);
 static object LI10(object,object,...);
-#define VMB10 register object *base=vs_top; object  V90;
+#define VMB10 register object *base=vs_top; object  V92;
 #define VMS10  register object *sup=vs_top+1;vs_top=sup;
 #define VMV10 vs_reserve(1);
 #define VMR10(VMT10) vs_top=base ; return(VMT10);
 static object LI11(object,object,...);
-#define VMB11 register object *base=vs_top; object  V96;
+#define VMB11 register object *base=vs_top; object  V98;
 #define VMS11  register object *sup=vs_top+1;vs_top=sup;
 #define VMV11 vs_reserve(1);
 #define VMR11(VMT11) vs_top=base ; return(VMT11);
@@ -110,12 +113,12 @@ static object LI22(object,object,...);
 #define VMV22 vs_reserve(4);
 #define VMR22(VMT22) vs_top=base ; return(VMT22);
 static object LI23();
-#define VMB23 register object *base=vs_top; object  V168;
+#define VMB23 register object *base=vs_top; object  V170;
 #define VMS23  register object *sup=vs_top+2;vs_top=sup;
 #define VMV23 vs_reserve(2);
 #define VMR23(VMT23) vs_top=base ; return(VMT23);
 static object LI24(object,object,object,...);
-#define VMB24 register object *base=vs_top; object  V185 ,V184 ,V183 ,V182 ,V181 ,V180 ,V179 ,V177;
+#define VMB24 register object *base=vs_top; object  V187 ,V186 ,V185 ,V184 ,V183 ,V182 ,V181 ,V179;
 #define VMS24  register object *sup=vs_top+2;vs_top=sup;
 #define VMV24 vs_reserve(2);
 #define VMR24(VMT24) vs_top=base ; return(VMT24);
@@ -127,7 +130,7 @@ static object LI25();
 static object LI26(object,object,object,...);
 static struct { short n,allow_other_keys;object *defaults;
 	 KEYTYPE keys[7];} LI26key={7,0,Cstd_key_defaults,{(void *)14,(void *)21,(void *)22,(void *)11,(void *)9,(void *)7,(void *)8}};
-#define VMB26 register object *base=vs_top; object  V220 ,V219 ,V217 ,V216 ,V215 ,V203; object Vcs[17];
+#define VMB26 register object *base=vs_top; object  V222 ,V221 ,V219 ,V218 ,V217 ,V205; object Vcs[17];
 #define VMS26  register object *sup=vs_top+6;vs_top=sup;
 #define VMV26 vs_reserve(6);
 #define VMR26(VMT26) vs_top=base ; return(VMT26);
@@ -155,12 +158,12 @@ static struct { short n,allow_other_keys;object *defaults;
 #define VM5 0
 #define VM4 0
 #define VM3 8
-#define VM2 3
+#define VM2 0
 #define VM1 3
 static char * VVi[37]={
 #define Cdata VV[36]
 (char *)(LI1),
-(char *)(L2),
+(char *)(LI2),
 (char *)(LI3),
 (char *)(&LI3key),
 (char *)(LI4),

@@ -13,6 +13,8 @@ OBJS	= gcl_cmpbind.o gcl_cmpblock.o gcl_cmpcall.o gcl_cmpcatch.o gcl_cmpenv.o gc
 	gcl_cmploc.o gcl_cmpmap.o gcl_cmpmulti.o gcl_cmpspecial.o gcl_cmptag.o gcl_cmptop.o \
 	gcl_cmptype.o gcl_cmputil.o gcl_cmpvar.o gcl_cmpvs.o gcl_cmpwt.o # gcl_cmpmain.o gcl_cmpopt.o gcl_lfun_list.o
 
+FNS:= $(OBJS:.o=.fn)
+
 COMPILE_FILE=$(PORTDIR)/saved_gcl $(PORTDIR) -system-p -c-file -data-file \
 	-o-file nil -h-file -compile
 #CFLAGS	= -c -O -I../h 
@@ -31,7 +33,7 @@ COMPILE_FILE=$(PORTDIR)/saved_gcl $(PORTDIR) -system-p -c-file -data-file \
 
 all:	$(OBJS)
 
-.lsp.fn: ../cmpnew/collectfn.o
+.lsp.fn: ../cmpnew/gcl_collectfn.o
 	../xbin/make-fn $*.lsp
 
 
@@ -39,16 +41,16 @@ all:	$(OBJS)
 	$(CC) $(OFLAG) $(CFLAGS) -c $*.c
 	${APPEND} ${NULLFILE} $*.data  $*.o
 
-collectfn.o:
+gcl_collectfn.o:
 	$(PORTDIR)/saved_gcl $(PORTDIR)/ -compile $*.lsp
 
 .lisp.o:
 	@ ../xbin/if-exists $(PORTDIR)/saved_gcl \
 	"$(PORTDIR)/saved_gcl $(PORTDIR)/ -compile $*.lisp " 
-sys-proclaim.lisp:
+sys-proclaim.lisp: $(FNS)
 	echo '(in-package "COMPILER")' \
-	'(load "../cmpnew/collectfn")(load "../lsp/sys-proclaim.lisp")'\
-	'(compiler::make-all-proclaims "*.fn")' | ../xbin/gcl
+	'(load "../cmpnew/gcl_collectfn")(load "../lsp/sys-proclaim.lisp")'\
+	'(compiler::make-all-proclaims "*.fn")' | ../unixport/saved_gcl
 
 
 newfn:	

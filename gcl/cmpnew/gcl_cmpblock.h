@@ -8,41 +8,41 @@ static struct { short n,allow_other_keys;object *defaults;
 	 KEYTYPE keys[7];} LI1key={7,0,Cstd_key_defaults,{(void *)23,(void *)24,(void *)25,(void *)5,(void *)6,(void *)4,(void *)3}};
 #define VMB1 register object *base=vs_top; object Vcs[14];
 #define VMS1  register object *sup=vs_top+8;vs_top=sup;
-#define VMV1 vs_reserve(8);
+#define VMV1 vs_check;
 #define VMR1(VMT1) vs_top=base ; return(VMT1);
 static object LI2();
 #define VMB2 register object *base=vs_top; object  V13;
 #define VMS2 vs_top += 3;
-#define VMV2 vs_reserve(3);
+#define VMV2 vs_check;
 #define VMR2(VMT2) vs_top=base ; return(VMT2);
 #define VC3
-#define VC4
+#define VC4 object  V21 ,V20;
 static object LI5();
-#define VMB5 register object *base=vs_top; object  V26 ,V25 ,V24;
+#define VMB5 register object *base=vs_top; object  V29 ,V28 ,V27 ,V26;
 #define VMS5  register object *sup=vs_top+3;vs_top=sup;
-#define VMV5 vs_reserve(3);
+#define VMV5 vs_check;
 #define VMR5(VMT5) vs_top=base ; return(VMT5);
 static object LI6();
-#define VMB6 register object *base=vs_top; object  V40 ,V39 ,V38 ,V37 ,V36 ,V35 ,V34 ,V33 ,V32;
+#define VMB6 register object *base=vs_top; object  V42 ,V41 ,V40 ,V39 ,V38 ,V37 ,V36 ,V35;
 #define VMS6  register object *sup=vs_top+5;vs_top=sup;
-#define VMV6 vs_reserve(5);
+#define VMV6 vs_check;
 #define VMR6(VMT6) vs_top=base ; return(VMT6);
 static object LI7();
-#define VMB7 object  V54 ,V51 ,V44;
+#define VMB7 object  V58 ,V57 ,V56 ,V55 ,V46;
 #define VMS7
 #define VMV7
 #define VMR7(VMT7) return(VMT7);
 #define VC8
 #define VC9
 static object LI10();
-#define VMB10 register object *base=vs_top; object  V68 ,V67 ,V66;
+#define VMB10 register object *base=vs_top; object  V70;
 #define VMS10 vs_top += 1;
-#define VMV10 vs_reserve(1);
+#define VMV10 vs_check;
 #define VMR10(VMT10) vs_top=base ; return(VMT10);
 static object LI11();
-#define VMB11 register object *base=vs_top; object  V76 ,V75 ,V74;
+#define VMB11 register object *base=vs_top; object  V76;
 #define VMS11 vs_top += 1;
-#define VMV11 vs_reserve(1);
+#define VMV11 vs_check;
 #define VMR11(VMT11) vs_top=base ; return(VMT11);
 #define VM11 1
 #define VM10 1

@@ -47,7 +47,7 @@ T10:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	function definition for Defclass SHORT-METHOD-COMBINATION8891	*/
+/*	function definition for Defclass SHORT-METHOD-COMBINATION8895	*/
 
 static void L3()
 {register object *base=vs_base;
@@ -377,7 +377,7 @@ T149:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	function definition for Defclass LONG-METHOD-COMBINATION8914	*/
+/*	function definition for Defclass LONG-METHOD-COMBINATION8918	*/
 
 static void L9()
 {register object *base=vs_base;

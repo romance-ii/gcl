@@ -6,8 +6,11 @@ gclcvs (2.7.0-5) unstable; urgency=low
     code we might use from cmucl, compiles structure references which
     are machine word size dependent, and will break on 64bit machines
     for example if compiled only from C with 32bit C sources.
+  * Merge in unused variable, cmpinit changes and optimizations,
+    fasdmacros name changes, collectfn name changes, and sys-proclaim
+    updates and rebuilds from 2.6.1
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 23 Sep 2003 15:04:58 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 23 Sep 2003 21:49:24 +0000
 
 gclcvs (2.7.0-4) unstable; urgency=low
 

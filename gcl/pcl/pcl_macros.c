@@ -655,14 +655,14 @@ static void L21()
 	V100=V100->c.c_cdr;
 	{object V101=getf(V100,VV[39],OBJNULL);
 	if(V101==OBJNULL){
-	base[4]= (VV[134]->s.s_gfdef);
-	} else {
-	base[4]= V101;}}
+	base[4]= (VV[134]->s.s_gfdef);} else {
+	base[4]= V101;
+	}}
 	{object V102=getf(V100,VV[135],OBJNULL);
 	if(V102==OBJNULL){
-	base[5]= base[2];
-	} else {
-	base[5]= V102;}}
+	base[5]= base[2];} else {
+	base[5]= V102;
+	}}
 	check_other_key(V100,2,VV[39],VV[135]);}
 	{register object V103;
 	register object V104;
@@ -1171,9 +1171,9 @@ static void L27()
 	{object V183=base[0]->c.c_cdr;
 	{object V184=getf(V183,VV[139],OBJNULL);
 	if(V184==OBJNULL){
-	base[2]= Cnil;
-	} else {
-	base[2]= V184;}}
+	base[2]= Cnil;} else {
+	base[2]= V184;
+	}}
 	check_other_key(V183,1,VV[139]);}
 	V185= list(2,VV[57],base[2]);
 	if(base[2]==Cnil){
@@ -2084,9 +2084,9 @@ static void L53()
 	{object V331=base[0]->c.c_cdr;
 	{object V332=getf(V331,VV[153],OBJNULL);
 	if(V332==OBJNULL){
-	base[2]= small_fixnum(0);
-	} else {
-	base[2]= V332;}}
+	base[2]= small_fixnum(0);} else {
+	base[2]= V332;
+	}}
 	check_other_key(V331,1,VV[153]);}
 	V333= list(2,VV[97],base[2]);
 	base[3]= list(3,VV[27],make_cons(/* INLINE-ARGS */V333,VV[98]),VV[99]);
@@ -2107,9 +2107,9 @@ static void L54()
 	V334=V334->c.c_cdr;
 	{object V335=getf(V334,VV[154],OBJNULL);
 	if(V335==OBJNULL){
-	base[3]= (VV[55]->s.s_gfdef);
-	} else {
-	base[3]= V335;}}
+	base[3]= (VV[55]->s.s_gfdef);} else {
+	base[3]= V335;
+	}}
 	check_other_key(V334,1,VV[154]);}
 	V336= list(2,VV[58],base[2]);
 	V337= make_cons(/* INLINE-ARGS */V336,Cnil);
@@ -2131,9 +2131,9 @@ static void L55()
 	V338=V338->c.c_cdr;
 	{object V339=getf(V338,VV[154],OBJNULL);
 	if(V339==OBJNULL){
-	base[3]= (VV[55]->s.s_gfdef);
-	} else {
-	base[3]= V339;}}
+	base[3]= (VV[55]->s.s_gfdef);} else {
+	base[3]= V339;
+	}}
 	check_other_key(V338,1,VV[154]);}
 	V340= list(2,VV[58],base[2]);
 	V341= make_cons(/* INLINE-ARGS */V340,Cnil);

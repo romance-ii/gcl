@@ -2,7 +2,7 @@
 #include "cmpinclude.h"
 #include "pcl_precom2.h"
 void init_pcl_precom2(){do_init(VV);}
-/*	function definition for (PRECOMPILE-FUNCTION-GENERATORS PCL 0)9381	*/
+/*	function definition for (PRECOMPILE-FUNCTION-GENERATORS PCL 0)9397	*/
 
 static void L1()
 {register object *base=vs_base;
@@ -17,7 +17,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-FUNCTION-GENERATORS PCL 1)9381	*/
+/*	function definition for (PRECOMPILE-FUNCTION-GENERATORS PCL 1)9397	*/
 
 static void L2()
 {register object *base=vs_base;
@@ -32,7 +32,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-FUNCTION-GENERATORS PCL 2)9381	*/
+/*	function definition for (PRECOMPILE-FUNCTION-GENERATORS PCL 2)9397	*/
 
 static void L3()
 {register object *base=vs_base;
@@ -47,7 +47,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-FUNCTION-GENERATORS PCL 3)9381	*/
+/*	function definition for (PRECOMPILE-FUNCTION-GENERATORS PCL 3)9397	*/
 
 static void L4()
 {register object *base=vs_base;
@@ -62,7 +62,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-FUNCTION-GENERATORS PCL 4)9381	*/
+/*	function definition for (PRECOMPILE-FUNCTION-GENERATORS PCL 4)9397	*/
 
 static void L5()
 {register object *base=vs_base;
@@ -77,7 +77,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-FUNCTION-GENERATORS PCL 5)9381	*/
+/*	function definition for (PRECOMPILE-FUNCTION-GENERATORS PCL 5)9397	*/
 
 static void L6()
 {register object *base=vs_base;
@@ -92,7 +92,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-FUNCTION-GENERATORS PCL 6)9381	*/
+/*	function definition for (PRECOMPILE-FUNCTION-GENERATORS PCL 6)9397	*/
 
 static void L7()
 {register object *base=vs_base;
@@ -107,7 +107,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-FUNCTION-GENERATORS PCL 7)9381	*/
+/*	function definition for (PRECOMPILE-FUNCTION-GENERATORS PCL 7)9397	*/
 
 static void L8()
 {register object *base=vs_base;
@@ -122,7 +122,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9422	*/
 
 static void L9()
 {register object *base=vs_base;
@@ -137,7 +137,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9422	*/
 
 static void L10()
 {register object *base=vs_base;
@@ -152,7 +152,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9422	*/
 
 static void L11()
 {register object *base=vs_base;
@@ -167,7 +167,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9422	*/
 
 static void L12()
 {register object *base=vs_base;
@@ -182,7 +182,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9422	*/
 
 static void L13()
 {register object *base=vs_base;
@@ -197,7 +197,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9422	*/
 
 static void L14()
 {register object *base=vs_base;
@@ -212,7 +212,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9422	*/
 
 static void L15()
 {register object *base=vs_base;
@@ -227,7 +227,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9422	*/
 
 static void L16()
 {register object *base=vs_base;
@@ -242,7 +242,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9422	*/
 
 static void L17()
 {register object *base=vs_base;
@@ -257,7 +257,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9422	*/
 
 static void L18()
 {register object *base=vs_base;
@@ -272,7 +272,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9422	*/
 
 static void L19()
 {register object *base=vs_base;
@@ -287,7 +287,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9422	*/
 
 static void L20()
 {register object *base=vs_base;
@@ -302,7 +302,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9422	*/
 
 static void L21()
 {register object *base=vs_base;
@@ -317,7 +317,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9422	*/
 
 static void L22()
 {register object *base=vs_base;
@@ -332,7 +332,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9422	*/
 
 static void L23()
 {register object *base=vs_base;
@@ -347,7 +347,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CACHING)9422	*/
 
 static void L24()
 {register object *base=vs_base;
@@ -362,7 +362,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CONSTANT-VALUE)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CONSTANT-VALUE)9422	*/
 
 static void L25()
 {register object *base=vs_base;
@@ -377,7 +377,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CONSTANT-VALUE)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CONSTANT-VALUE)9422	*/
 
 static void L26()
 {register object *base=vs_base;
@@ -392,7 +392,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CHECKING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CHECKING)9422	*/
 
 static void L27()
 {register object *base=vs_base;
@@ -407,7 +407,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CHECKING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CHECKING)9422	*/
 
 static void L28()
 {register object *base=vs_base;
@@ -422,7 +422,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CHECKING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CHECKING)9422	*/
 
 static void L29()
 {register object *base=vs_base;
@@ -437,7 +437,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CHECKING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CHECKING)9422	*/
 
 static void L30()
 {register object *base=vs_base;
@@ -452,7 +452,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CHECKING)9406	*/
+/*	function definition for (PRECOMPILE-DFUN-CONSTRUCTOR EMIT-CHECKING)9422	*/
 
 static void L31()
 {register object *base=vs_base;
@@ -467,7 +467,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 0)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 0)9565	*/
 
 static void L32()
 {register object *base=vs_base;
@@ -482,7 +482,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 1)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 1)9565	*/
 
 static void L33()
 {register object *base=vs_base;
@@ -497,7 +497,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 2)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 2)9565	*/
 
 static void L34()
 {register object *base=vs_base;
@@ -512,7 +512,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 3)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 3)9565	*/
 
 static void L35()
 {register object *base=vs_base;
@@ -527,7 +527,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 4)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 4)9565	*/
 
 static void L36()
 {register object *base=vs_base;
@@ -542,7 +542,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 5)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 5)9565	*/
 
 static void L37()
 {register object *base=vs_base;
@@ -557,7 +557,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 6)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 6)9565	*/
 
 static void L38()
 {register object *base=vs_base;
@@ -572,7 +572,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 7)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 7)9565	*/
 
 static void L39()
 {register object *base=vs_base;
@@ -587,7 +587,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 8)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 8)9565	*/
 
 static void L40()
 {register object *base=vs_base;
@@ -602,7 +602,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 9)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 9)9565	*/
 
 static void L41()
 {register object *base=vs_base;
@@ -617,7 +617,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 10)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 10)9565	*/
 
 static void L42()
 {register object *base=vs_base;
@@ -632,7 +632,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 11)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 11)9565	*/
 
 static void L43()
 {register object *base=vs_base;
@@ -647,7 +647,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 12)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 12)9565	*/
 
 static void L44()
 {register object *base=vs_base;
@@ -662,7 +662,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 13)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 13)9565	*/
 
 static void L45()
 {register object *base=vs_base;
@@ -677,7 +677,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 14)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 14)9565	*/
 
 static void L46()
 {register object *base=vs_base;
@@ -692,7 +692,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 15)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 15)9565	*/
 
 static void L47()
 {register object *base=vs_base;
@@ -707,7 +707,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 16)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 16)9565	*/
 
 static void L48()
 {register object *base=vs_base;
@@ -722,7 +722,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 17)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 17)9565	*/
 
 static void L49()
 {register object *base=vs_base;
@@ -737,7 +737,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 18)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 18)9565	*/
 
 static void L50()
 {register object *base=vs_base;
@@ -752,7 +752,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 19)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 19)9565	*/
 
 static void L51()
 {register object *base=vs_base;
@@ -767,7 +767,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 20)9549	*/
+/*	function definition for (PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE PCL 20)9565	*/
 
 static void L52()
 {register object *base=vs_base;

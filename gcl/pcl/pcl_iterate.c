@@ -1423,44 +1423,44 @@ static void L16()
 	{object V225=base[0]->c.c_cdr;
 	{object V226=getf(V225,VV[149],OBJNULL);
 	if(V226==OBJNULL){
-	base[2]= Cnil;
-	} else {
-	base[2]= V226;}}
+	base[2]= Cnil;} else {
+	base[2]= V226;
+	}}
 	{object V227=getf(V225,VV[150],OBJNULL);
 	if(V227==OBJNULL){
-	base[3]= Cnil;
-	} else {
-	base[3]= V227;}}
+	base[3]= Cnil;} else {
+	base[3]= V227;
+	}}
 	{object V228=getf(V225,VV[151],OBJNULL);
 	if(V228==OBJNULL){
-	base[4]= Cnil;
-	} else {
-	base[4]= V228;}}
+	base[4]= Cnil;} else {
+	base[4]= V228;
+	}}
 	{object V229=getf(V225,VV[152],OBJNULL);
 	if(V229==OBJNULL){
-	base[5]= Cnil;
-	} else {
-	base[5]= V229;}}
+	base[5]= Cnil;} else {
+	base[5]= V229;
+	}}
 	{object V230=getf(V225,VV[153],OBJNULL);
 	if(V230==OBJNULL){
-	base[6]= Cnil;
-	} else {
-	base[6]= V230;}}
+	base[6]= Cnil;} else {
+	base[6]= V230;
+	}}
 	{object V231=getf(V225,VV[154],OBJNULL);
 	if(V231==OBJNULL){
-	base[7]= Cnil;
-	} else {
-	base[7]= V231;}}
+	base[7]= Cnil;} else {
+	base[7]= V231;
+	}}
 	{object V232=getf(V225,VV[155],OBJNULL);
 	if(V232==OBJNULL){
-	base[8]= Cnil;
-	} else {
-	base[8]= V232;}}
+	base[8]= Cnil;} else {
+	base[8]= V232;
+	}}
 	{object V233=getf(V225,VV[156],OBJNULL);
 	if(V233==OBJNULL){
-	base[9]= Cnil;
-	} else {
-	base[9]= V233;}}
+	base[9]= Cnil;} else {
+	base[9]= V233;
+	}}
 	check_other_key(V225,8,VV[149],VV[150],VV[151],VV[152],VV[153],VV[154],VV[155],VV[156]);}
 	if((base[2])==Cnil){
 	goto T523;}
@@ -1658,9 +1658,9 @@ static void L17()
 	V259=V259->c.c_cdr;
 	{object V260=getf(V259,VV[155],OBJNULL);
 	if(V260==OBJNULL){
-	base[3]= VV[53];
-	} else {
-	base[3]= V260;}}
+	base[3]= VV[53];} else {
+	base[3]= V260;
+	}}
 	check_other_key(V259,1,VV[155]);}
 	V261= list(2,VV[54],base[2]);
 	V262= make_cons(/* INLINE-ARGS */V261,Cnil);
@@ -1682,9 +1682,9 @@ static void L18()
 	V263=V263->c.c_cdr;
 	{object V264=getf(V263,VV[155],OBJNULL);
 	if(V264==OBJNULL){
-	base[3]= VV[57];
-	} else {
-	base[3]= V264;}}
+	base[3]= VV[57];} else {
+	base[3]= V264;
+	}}
 	check_other_key(V263,1,VV[155]);}
 	V265= list(2,VV[54],base[2]);
 	V266= make_cons(/* INLINE-ARGS */V265,Cnil);
@@ -2400,9 +2400,9 @@ static void L32()
 	{object V388=base[0]->c.c_cdr;
 	{object V389=getf(V388,VV[172],OBJNULL);
 	if(V389==OBJNULL){
-	base[2]= Cnil;
-	} else {
-	base[2]= V389;}}
+	base[2]= Cnil;} else {
+	base[2]= V389;
+	}}
 	check_other_key(V388,1,VV[172]);}
 	V390= list(2,VV[108],base[2]);
 	if(base[2]==Cnil){
@@ -2426,9 +2426,9 @@ static void L33()
 	{object V392=base[0]->c.c_cdr;
 	{object V393=getf(V392,VV[172],OBJNULL);
 	if(V393==OBJNULL){
-	base[2]= Cnil;
-	} else {
-	base[2]= V393;}}
+	base[2]= Cnil;} else {
+	base[2]= V393;
+	}}
 	check_other_key(V392,1,VV[172]);}
 	V394= list(2,VV[111],base[2]);
 	base[3]= list(3,VV[18],make_cons(/* INLINE-ARGS */V394,Cnil),VV[112]);
@@ -2446,9 +2446,9 @@ static void L34()
 	{object V395=base[0]->c.c_cdr;
 	{object V396=getf(V395,VV[172],OBJNULL);
 	if(V396==OBJNULL){
-	base[2]= Cnil;
-	} else {
-	base[2]= V396;}}
+	base[2]= Cnil;} else {
+	base[2]= V396;
+	}}
 	check_other_key(V395,1,VV[172]);}
 	V397= list(2,VV[111],base[2]);
 	V398= make_cons(/* INLINE-ARGS */V397,Cnil);
@@ -2486,9 +2486,9 @@ static void L35()
 	{object V400=base[0]->c.c_cdr;
 	{object V401=getf(V400,VV[172],OBJNULL);
 	if(V401==OBJNULL){
-	base[2]= Cnil;
-	} else {
-	base[2]= V401;}}
+	base[2]= Cnil;} else {
+	base[2]= V401;
+	}}
 	check_other_key(V400,1,VV[172]);}
 	V402= list(2,VV[111],base[2]);
 	V403= make_cons(/* INLINE-ARGS */V402,Cnil);
@@ -2526,9 +2526,9 @@ static void L36()
 	{object V405=base[0]->c.c_cdr;
 	{object V406=getf(V405,VV[172],OBJNULL);
 	if(V406==OBJNULL){
-	base[2]= small_fixnum(0);
-	} else {
-	base[2]= V406;}}
+	base[2]= small_fixnum(0);} else {
+	base[2]= V406;
+	}}
 	check_other_key(V405,1,VV[172]);}
 	V407= list(2,VV[123],base[2]);
 	base[3]= list(3,VV[18],make_cons(/* INLINE-ARGS */V407,Cnil),VV[124]);

@@ -1,13 +1,15 @@
 
-static void L1();
 static void L3();
 static void L4();
 static void L13();
-static void L14();
 static void L17();
 static void L20();
 static void L23();
-#define VC1
+static object LI1();
+#define VMB1
+#define VMS1
+#define VMV1
+#define VMR1(VMT1) return(VMT1);
 static object LI2();
 #define VMB2
 #define VMS2
@@ -16,14 +18,14 @@ static object LI2();
 #define VC3
 #define VC4
 static object LI5();
-#define VMB5 object  V17 ,V16 ,V15;
+#define VMB5
 #define VMS5
 #define VMV5
 #define VMR5(VMT5) return(VMT5);
 static object LI6();
-#define VMB6 register object *base=vs_top; object  V23 ,V22;
+#define VMB6 register object *base=vs_top; object  V24 ,V23;
 #define VMS6 vs_top += 1;
-#define VMV6 vs_reserve(1);
+#define VMV6 vs_check;
 #define VMR6(VMT6) vs_top=base ; return(VMT6);
 static object LI7();
 #define VMB7
@@ -46,7 +48,7 @@ static object LI10();
 #define VMV10
 #define VMR10(VMT10) return(VMT10);
 static object LI11(object,object,...);
-#define VMB11 object  V40;
+#define VMB11 object  V41;
 #define VMS11
 #define VMV11
 #define VMR11(VMT11) return(VMT11);
@@ -55,10 +57,14 @@ static object LI12();
 #define VMS12
 #define VMV12
 #define VMR12(VMT12) return(VMT12);
-#define VC13 object  V47 ,V46;
-#define VC14 object  V57 ,V56 ,V55;
+#define VC13
+static object LI14(object,object,...);
+#define VMB14 register object *base=vs_top;
+#define VMS14  register object *sup=vs_top+3;vs_top=sup;
+#define VMV14 vs_check;
+#define VMR14(VMT14) vs_top=base ; return(VMT14);
 static object LI15();
-#define VMB15 object  V62;
+#define VMB15
 #define VMS15
 #define VMV15
 #define VMR15(VMT15) return(VMT15);
@@ -67,9 +73,9 @@ static object LI16();
 #define VMS16
 #define VMV16
 #define VMR16(VMT16) return(VMT16);
-#define VC17 object  V74 ,V73;
+#define VC17
 static object LI18();
-#define VMB18 object  V79;
+#define VMB18
 #define VMS18
 #define VMV18
 #define VMR18(VMT18) return(VMT18);
@@ -78,9 +84,9 @@ static object LI19();
 #define VMS19
 #define VMV19
 #define VMR19(VMT19) return(VMT19);
-#define VC20 object  V90 ,V89;
+#define VC20
 static object LI21();
-#define VMB21 object  V95;
+#define VMB21
 #define VMS21
 #define VMV21
 #define VMR21(VMT21) return(VMT21);
@@ -89,9 +95,9 @@ static object LI22();
 #define VMS22
 #define VMV22
 #define VMR22(VMT22) return(VMT22);
-#define VC23 object  V106 ,V105;
+#define VC23
 static object LI24();
-#define VMB24 object  V111;
+#define VMB24
 #define VMS24
 #define VMV24
 #define VMR24(VMT24) return(VMT24);
@@ -111,7 +117,7 @@ static object LI25();
 #define VM17 3
 #define VM16 0
 #define VM15 0
-#define VM14 5
+#define VM14 3
 #define VM13 3
 #define VM12 0
 #define VM11 0
@@ -124,10 +130,10 @@ static object LI25();
 #define VM4 2
 #define VM3 4
 #define VM2 0
-#define VM1 1
+#define VM1 0
 static char * VVi[50]={
 #define Cdata VV[49]
-(char *)(L1),
+(char *)(LI1),
 (char *)(LI2),
 (char *)(L3),
 (char *)(L4),
@@ -140,7 +146,7 @@ static char * VVi[50]={
 (char *)(LI11),
 (char *)(LI12),
 (char *)(L13),
-(char *)(L14),
+(char *)(LI14),
 (char *)(LI15),
 (char *)(LI16),
 (char *)(L17),

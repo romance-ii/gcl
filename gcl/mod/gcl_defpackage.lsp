@@ -71,6 +71,8 @@
 (export '(defpackage))
 ;(provide :defpackage)
 
+(si:putprop 'defpackage:defpackage t 'compiler::package-operation)
+
 (use-package :SLOOP)
 ;(use-package :DEFPACKAGE)
 

@@ -3,7 +3,6 @@ static void L8();
 static void L39();
 static void L40();
 static void L43();
-static void L45();
 static void L46();
 static object LI1();
 #define VMB1 register object *base=vs_top; object  V6;
@@ -295,13 +294,17 @@ static struct { short n,allow_other_keys;object *defaults;
 #define VMS43  register object *sup=vs_top+3;vs_top=sup;
 #define VMV43 vs_reserve(3);
 #define VMR43(VMT43) vs_top=base ; return(VMT43);
-#define VC44 object  V733;
-#define VC45 object  V746 ,V745 ,V744 ,V743 ,V742;
+static object LI45(object,object,object,...);
+#define VMB44 register object *base=vs_top; object  V737 ,V729;
+#define VMS44  register object *sup=vs_top+3;vs_top=sup;
+#define VMV44 vs_reserve(3);
+#define VMR44(VMT44) vs_top=base ; return(VMT44);
+#define VC45 object  V750 ,V749 ,V748 ,V747 ,V746;
 static void L41();
 #define VC46
 #define VM46 3
 #define VM45 6
-#define VM44 6
+#define VM44 3
 #define VM43 3
 #define VM42 8
 #define VM41 4
@@ -421,7 +424,7 @@ static char * VVi[76]={
 (char *)(L43),
 (char *)(LI44),
 (char *)(&LI44key),
-(char *)(L45),
+(char *)(LI45),
 (char *)(L46)
 };
 #define VV ((object *)VVi)

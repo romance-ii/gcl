@@ -1,5 +1,5 @@
-(proclaim '(optimize (safety 0) (space 3)))
-(proclaim '(optimize (safety 2) (space 3)))
+;(proclaim '(optimize (safety 0) (space 3)))
+;(proclaim '(optimize (safety 2) (space 3)))
 (load "../lsp/sys-proclaim.lisp")
 (load "sys-proclaim.lisp")
 (setq compiler::*eval-when-defaults* '(compile eval load))

@@ -10,7 +10,7 @@ static void L13();
 static object LI1();
 #define VMB1 register object *base=vs_top;
 #define VMS1  register object *sup=vs_top+2;vs_top=sup;
-#define VMV1 vs_reserve(2);
+#define VMV1 vs_check;
 #define VMR1(VMT1) vs_top=base ; return(VMT1);
 static object LI2();
 #define VMB2 object  V27 ,V26;
@@ -24,7 +24,7 @@ static object LI2();
 static object LI7();
 #define VMB7 register object *base=vs_top;
 #define VMS7  register object *sup=vs_top+4;vs_top=sup;
-#define VMV7 vs_reserve(4);
+#define VMV7 vs_check;
 #define VMR7(VMT7) vs_top=base ; return(VMT7);
 #define VC8
 #define VC9
@@ -32,7 +32,7 @@ static object LI7();
 static object LI12();
 #define VMB11 register object *base=vs_top; object  V86;
 #define VMS11  register object *sup=vs_top+2;vs_top=sup;
-#define VMV11 vs_reserve(2);
+#define VMV11 vs_check;
 #define VMR11(VMT11) vs_top=base ; return(VMT11);
 #define VC12 object  V96 ,V95 ,V94 ,V93 ,V92 ,V91;
 static void L9();

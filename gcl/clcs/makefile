@@ -18,10 +18,13 @@ saved_clcs_gcl: ../unixport/saved_pcl_gcl
 	$(CC) $(CFLAGS) -c $< -o $@
 	../xbin/append $*.data $@
 
-sys-proclaim.lisp:
+%.fn: ../cmpnew/gcl_collectfn.o %.lisp ./saved_clcs_gcl
+	echo '(load "$<")(compiler::emit-fn t)(compile-file "$*.lisp")' |./saved_clcs_gcl
+
+sys-proclaim.lisp: $(addsuffix .fn,$(FILES)) saved_clcs_gcl
 	echo '(in-package "CONDITIONS")' \
-	'(load "../cmpnew/collectfn")'\
-	'(compiler::make-all-proclaims "*.fn")' | ../xbin/gcl
+	'(load "../cmpnew/gcl_collectfn")'\
+	'(compiler::make-all-proclaims "*.fn")' | ./saved_clcs_gcl
 
 compile: ${LISP}
 	echo '(load "package.lisp")(load "loading.lisp")(jamie-load-clcs :compile)' | ${LISP}

@@ -10,23 +10,23 @@ static object LI1();
 static object LI2();
 #define VMB2 register object *base=vs_top; object  V31;
 #define VMS2  register object *sup=vs_top+1;vs_top=sup;
-#define VMV2 vs_reserve(1);
+#define VMV2 vs_check;
 #define VMR2(VMT2) vs_top=base ; return(VMT2);
 static object LI3();
 #define VMB3 register object *base=vs_top; object  V64 ,V62 ,V55 ,V47;
 #define VMS3 vs_top += 1;
-#define VMV3 vs_reserve(1);
+#define VMV3 vs_check;
 #define VMR3(VMT3) vs_top=base ; return(VMT3);
 #define VC4 object  V74 ,V73;
 static object LI5();
 #define VMB5 register object *base=vs_top;
 #define VMS5 vs_top += 2;
-#define VMV5 vs_reserve(2);
+#define VMV5 vs_check;
 #define VMR5(VMT5) vs_top=base ; return(VMT5);
 static object LI6();
 #define VMB6 register object *base=vs_top;
 #define VMS6 vs_top += 2;
-#define VMV6 vs_reserve(2);
+#define VMV6 vs_check;
 #define VMR6(VMT6) vs_top=base ; return(VMT6);
 static object LI7();
 #define VMB7
@@ -39,16 +39,16 @@ static object LI9();
 #define VMS9
 #define VMV9
 #define VMR9(VMT9) return(VMT9);
-#define VC10 object  V135 ,V134 ,V132 ,V130;
+#define VC10 object  V136 ,V135 ,V133 ,V130;
 static object LI11();
 #define VMB11 register object *base=vs_top;
 #define VMS11  register object *sup=vs_top+2;vs_top=sup;
-#define VMV11 vs_reserve(2);
+#define VMV11 vs_check;
 #define VMR11(VMT11) vs_top=base ; return(VMT11);
 static object LI12();
 #define VMB12 register object *base=vs_top;
 #define VMS12  register object *sup=vs_top+2;vs_top=sup;
-#define VMV12 vs_reserve(2);
+#define VMV12 vs_check;
 #define VMR12(VMT12) vs_top=base ; return(VMT12);
 static object LI13();
 #define VMB13
@@ -56,19 +56,19 @@ static object LI13();
 #define VMV13
 #define VMR13(VMT13) return(VMT13);
 static object LI14();
-#define VMB14 register object *base=vs_top; object  V177 ,V176;
+#define VMB14 register object *base=vs_top; object  V178 ,V177;
 #define VMS14  register object *sup=vs_top+4;vs_top=sup;
-#define VMV14 vs_reserve(4);
+#define VMV14 vs_check;
 #define VMR14(VMT14) vs_top=base ; return(VMT14);
 static object LI15(object,object,...);
-#define VMB15 register object *base=vs_top; object  V199 ,V198 ,V196 ,V190 ,V185;
+#define VMB15 register object *base=vs_top; object  V200 ,V199 ,V197 ,V191 ,V186;
 #define VMS15  register object *sup=vs_top+7;vs_top=sup;
-#define VMV15 vs_reserve(7);
+#define VMV15 vs_check;
 #define VMR15(VMT15) vs_top=base ; return(VMT15);
 static object LI16();
-#define VMB16 register object *base=vs_top; object  V221 ,V218 ,V209 ,V208;
+#define VMB16 register object *base=vs_top; object  V222 ,V219 ,V210 ,V209;
 #define VMS16  register object *sup=vs_top+8;vs_top=sup;
-#define VMV16 vs_reserve(8);
+#define VMV16 vs_check;
 #define VMR16(VMT16) vs_top=base ; return(VMT16);
 #define VM16 8
 #define VM15 7

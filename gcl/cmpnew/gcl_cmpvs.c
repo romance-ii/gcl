@@ -10,9 +10,9 @@ static object LI1()
 	goto TTL;
 TTL:;
 	{object V1;
-	V1= make_cons(symbol_value(VV[0]),symbol_value(VV[1]));
-	setq(VV[1],number_plus(symbol_value(VV[1]),small_fixnum(1)));
-	setq(VV[2],(number_compare(symbol_value(VV[1]),symbol_value(VV[2]))>=0?(symbol_value(VV[1])):symbol_value(VV[2])));
+	V1= make_cons((VV[0]->s.s_dbind),(VV[1]->s.s_dbind));
+	(VV[1]->s.s_dbind)= number_plus((VV[1]->s.s_dbind),small_fixnum(1));
+	(VV[2]->s.s_dbind)= (number_compare((VV[1]->s.s_dbind),(VV[2]->s.s_dbind))>=0?((VV[1]->s.s_dbind)):(VV[2]->s.s_dbind));
 	{object V2 = (V1);
 	VMR1(V2)}}
 	return Cnil;
@@ -27,9 +27,9 @@ register object V5;object V6;
 TTL:;
 	if(!(type_of((V5))==t_cons)){
 	goto T6;}
-	if(!((car((V5)))==(VV[3]))){
+	if(!((CMPcar((V5)))==(VV[3]))){
 	goto T6;}
-	if(equal(cadr((V5)),(V6))){
+	if(equal(CMPcadr((V5)),(V6))){
 	goto T7;}
 	goto T6;
 T6:;
@@ -54,37 +54,37 @@ register object V10;
 {	 VMB3 VMS3 VMV3
 	goto TTL;
 TTL:;
-	if(!((car((V10)))==(VV[5]))){
+	if(!((CMPcar((V10)))==(VV[5]))){
 	goto T19;}
 	princ_char(86,VV[4]);
-	(void)((*(LnkLI13))(cadr((V10))));
+	(void)((*(LnkLI13))(CMPcadr((V10))));
 	{object V11 = Cnil;
 	VMR3(V11)}
 	goto T19;
 T19:;
-	if(!((car((V10)))==(VV[6]))){
+	if(!((CMPcar((V10)))==(VV[6]))){
 	goto T24;}
-	setq(VV[7],Ct);
+	(VV[7]->s.s_dbind)= Ct;
 	princ_str("Vcs[",VV[4]);
-	(void)((*(LnkLI13))(cdr((V10))));
+	(void)((*(LnkLI13))(CMPcdr((V10))));
 	princ_char(93,VV[4]);
 	{object V12 = Cnil;
 	VMR3(V12)}
 	goto T24;
 T24:;
-	if(!(number_compare(car((V10)),symbol_value(VV[0]))==0)){
+	if(!(number_compare(CMPcar((V10)),(VV[0]->s.s_dbind))==0)){
 	goto T32;}
 	princ_str("base[",VV[4]);
-	(void)((*(LnkLI13))(cdr((V10))));
+	(void)((*(LnkLI13))(CMPcdr((V10))));
 	princ_char(93,VV[4]);
 	{object V13 = Cnil;
 	VMR3(V13)}
 	goto T32;
 T32:;
 	princ_str("base",VV[4]);
-	(void)((*(LnkLI13))(car((V10))));
+	(void)((*(LnkLI13))(CMPcar((V10))));
 	princ_char(91,VV[4]);
-	(void)((*(LnkLI13))(cdr((V10))));
+	(void)((*(LnkLI13))(CMPcdr((V10))));
 	princ_char(93,VV[4]);
 	{object V14 = Cnil;
 	VMR3(V14)}
@@ -114,7 +114,7 @@ object V19;
 	goto TTL;
 TTL:;
 	princ_str("(base0[",VV[4]);
-	V20= number_minus(symbol_value(VV[8]),(V19));
+	V20= number_minus((VV[8]->s.s_dbind),(V19));
 	(void)((*(LnkLI13))(/* INLINE-ARGS */V20));
 	princ_str("]->c.c_car)",VV[4]);
 	{object V21 = Cnil;
@@ -129,8 +129,8 @@ object V23;
 {	 VMB6 VMS6 VMV6
 	goto TTL;
 TTL:;
-	setq(VV[9],(V23));
-	{object V24 = symbol_value(VV[9]);
+	(VV[9]->s.s_dbind)= (V23);
+	{object V24 = (VV[9]->s.s_dbind);
 	VMR6(V24)}
 	return Cnil;
 }
@@ -149,7 +149,7 @@ static object LI7(object first,...)
 	--narg; goto T51;
 	goto T50;
 T50:;
-	V25= symbol_value(VV[9]);
+	V25= (VV[9]->s.s_dbind);
 	goto T51;
 T51:;
 	if(((V25))!=Cnil){
@@ -171,8 +171,8 @@ static object LI8()
 {	 VMB8 VMS8 VMV8
 	goto TTL;
 TTL:;
-	setq(VV[10],number_plus(symbol_value(VV[10]),small_fixnum(1)));
-	{object V28 = symbol_value(VV[10]);
+	(VV[10]->s.s_dbind)= number_plus((VV[10]->s.s_dbind),small_fixnum(1));
+	{object V28 = (VV[10]->s.s_dbind);
 	VMR8(V28)}
 	return Cnil;
 }
@@ -184,8 +184,8 @@ static object LI9()
 	goto TTL;
 TTL:;
 	{object V29;
-	V29= make_cons(VV[6],symbol_value(VV[11]));
-	setq(VV[11],number_plus(symbol_value(VV[11]),small_fixnum(1)));
+	V29= make_cons(VV[6],(VV[11]->s.s_dbind));
+	(VV[11]->s.s_dbind)= number_plus((VV[11]->s.s_dbind),small_fixnum(1));
 	{object V30 = (V29);
 	VMR9(V30)}}
 	return Cnil;
@@ -208,8 +208,8 @@ T62:;
 	VMR10(V34)}
 	goto T63;
 T63:;
-	(void)((*(LnkLI13))(car((V33))));
-	if(!((cdr((V33)))==Cnil)){
+	(void)((*(LnkLI13))(CMPcar((V33))));
+	if(!((CMPcdr((V33)))==Cnil)){
 	goto T70;}
 	goto T69;
 	goto T70;
@@ -217,7 +217,7 @@ T70:;
 	princ_char(44,VV[4]);
 	goto T69;
 T69:;
-	V33= cdr((V33));
+	V33= CMPcdr((V33));
 	goto T62;}
 	return Cnil;
 }

@@ -53,9 +53,9 @@ clean:
 remake-sys-files:
 	rm -f *.o *gazonk*
 	cp ../h/cmpinclude.h .
-	echo ${SETUP} '(load "../cmpnew/collectfn.lsp")(compiler::emit-fn t)' \
+	echo ${SETUP} '(load "../cmpnew/gcl_collectfn.lsp")(compiler::emit-fn t)' \
 		'(pcl::compile-pcl)' | ../unixport/saved_mod_gcl ../unixport/
-	echo ${SETUP} '(load "../cmpnew/collectfn.lsp") '\
+	echo ${SETUP} '(load "../cmpnew/gcl_collectfn.lsp") '\
 		'(pcl::load-pcl)(in-package "PCL")(renew-sys-files)' | \
 		../unixport/saved_mod_gcl ../unixport/
 	cp sys-proclaim.lisp xxx

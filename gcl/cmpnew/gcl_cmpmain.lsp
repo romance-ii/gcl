@@ -257,8 +257,8 @@ Cannot compile ~a.~%"
 	 (not system-p)
 	 (add-init `(si::warn-version ,si::*gcl-version* ,si::*gcl-major-version*)))
 
-    (when (probe-file "./cmpinit.lsp")
-      (load  "./cmpinit.lsp"
+    (when (probe-file "./gcl_cmpinit.lsp")
+      (load  "./gcl_cmpinit.lsp"
             :verbose *compile-verbose*))
 
     (with-open-file (*compiler-output-data*

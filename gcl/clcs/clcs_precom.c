@@ -2,13 +2,12 @@
 #include "cmpinclude.h"
 #include "clcs_precom.h"
 void init_clcs_precom(){do_init(VV);}
-/*	function definition for (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 0)2196	*/
+/*	function definition for (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 0)2198	*/
 
 static void L1()
 {register object *base=vs_base;
 	register object *sup=base+VM1; VC1
-	vs_reserve(VM1);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -20,7 +19,7 @@ TTL:;
 	(void) (*Lnk18)();
 	return;
 }
-/*	local entry for function progn 'compile2303	*/
+/*	local entry for function progn 'compile2305	*/
 
 static object LI2()
 
@@ -35,13 +34,12 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	function definition for (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 1)2196	*/
+/*	function definition for (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 1)2198	*/
 
 static void L3()
 {register object *base=vs_base;
 	register object *sup=base+VM3; VC3
-	vs_reserve(VM3);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -53,7 +51,7 @@ TTL:;
 	(void) (*Lnk18)();
 	return;
 }
-/*	local entry for function progn 'compile2414	*/
+/*	local entry for function progn 'compile2416	*/
 
 static object LI4()
 
@@ -68,13 +66,12 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	function definition for (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 2)2196	*/
+/*	function definition for (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 2)2198	*/
 
 static void L5()
 {register object *base=vs_base;
 	register object *sup=base+VM5; VC5
-	vs_reserve(VM5);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -86,7 +83,7 @@ TTL:;
 	(void) (*Lnk18)();
 	return;
 }
-/*	local entry for function progn 'compile2577	*/
+/*	local entry for function progn 'compile2579	*/
 
 static object LI6()
 
@@ -101,13 +98,12 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	function definition for (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 3)2196	*/
+/*	function definition for (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 3)2198	*/
 
 static void L7()
 {register object *base=vs_base;
 	register object *sup=base+VM7; VC7
-	vs_reserve(VM7);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -119,7 +115,7 @@ TTL:;
 	(void) (*Lnk18)();
 	return;
 }
-/*	local entry for function progn 'compile2804	*/
+/*	local entry for function progn 'compile2806	*/
 
 static object LI8()
 
@@ -134,7 +130,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2808	*/
+/*	local entry for function progn 'compile2810	*/
 
 static object LI9()
 
@@ -156,8 +152,7 @@ static void LC13(base0)
 register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM10; VC10
-	vs_reserve(VM10);
-	check_arg(2);
+	vs_check;
 	base[0]=MMcons(base[0],Cnil);
 	base[1]=MMcons(base[1],base[0]);
 	vs_top=sup;
@@ -172,10 +167,9 @@ static void LC14(base0)
 register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM11; VC11
-	vs_reserve(VM11);
+	vs_check;
 	{register object V6;
 	object V7;
-	check_arg(2);
 	V6=(base[0]);
 	V7=(base[1]);
 	vs_top=sup;
@@ -296,9 +290,8 @@ static void LC12(base0)
 register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM12; VC12
-	vs_reserve(VM12);
+	vs_check;
 	{object V23;
-	check_arg(2);
 	base[0]=MMcons(base[0],Cnil);
 	V23=(base[1]);
 	vs_top=sup;
@@ -314,10 +307,9 @@ static void LC15(base0)
 register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM13; VC13
-	vs_reserve(VM13);
+	vs_check;
 	{register object V24;
 	object V25;
-	check_arg(2);
 	V24=(base[0]);
 	V25=(base[1]);
 	vs_top=sup;
@@ -415,9 +407,8 @@ static void LC11(base0)
 register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM14; VC14
-	vs_reserve(VM14);
+	vs_check;
 	{object V41;
-	check_arg(2);
 	base[0]=MMcons(base[0],Cnil);
 	V41=(base[1]);
 	vs_top=sup;
@@ -433,10 +424,9 @@ static void LC16(base0)
 register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM15; VC15
-	vs_reserve(VM15);
+	vs_check;
 	{register object V42;
 	object V43;
-	check_arg(2);
 	V42=(base[0]);
 	V43=(base[1]);
 	vs_top=sup;
@@ -509,9 +499,8 @@ static void LC10(base0)
 register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM16; VC16
-	vs_reserve(VM16);
+	vs_check;
 	{object V55;
-	check_arg(2);
 	base[0]=MMcons(base[0],Cnil);
 	V55=(base[1]);
 	vs_top=sup;
@@ -527,10 +516,9 @@ static void LC17(base0)
 register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM17; VC17
-	vs_reserve(VM17);
+	vs_check;
 	{register object V56;
 	object V57;
-	check_arg(2);
 	V56=(base[0]);
 	V57=(base[1]);
 	vs_top=sup;
@@ -601,10 +589,10 @@ T252:;
 static void LnkT28(){ call_or_link(VV[28],(void **)(void *)&Lnk28);} /* WRAPPER-OF */
 static void LnkT27(){ call_or_link(VV[27],(void **)(void *)&Lnk27);} /* CCLOSURE-ENV-NTHCDR */
 static void LnkT26(){ call_or_link(VV[26],(void **)(void *)&Lnk26);} /* COMPILE-IIS-FUNCTIONS */
-static void LnkT25(){ call_or_link(VV[25],(void **)(void *)&Lnk25);} /* (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 3)2196 */
-static void LnkT23(){ call_or_link(VV[23],(void **)(void *)&Lnk23);} /* (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 2)2196 */
-static void LnkT21(){ call_or_link(VV[21],(void **)(void *)&Lnk21);} /* (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 1)2196 */
-static void LnkT19(){ call_or_link(VV[19],(void **)(void *)&Lnk19);} /* (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 0)2196 */
+static void LnkT25(){ call_or_link(VV[25],(void **)(void *)&Lnk25);} /* (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 3)2198 */
+static void LnkT23(){ call_or_link(VV[23],(void **)(void *)&Lnk23);} /* (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 2)2198 */
+static void LnkT21(){ call_or_link(VV[21],(void **)(void *)&Lnk21);} /* (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 1)2198 */
+static void LnkT19(){ call_or_link(VV[19],(void **)(void *)&Lnk19);} /* (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 0)2198 */
 static void LnkT18(){ call_or_link(VV[18],(void **)(void *)&Lnk18);} /* LOAD-PRECOMPILED-IIS-ENTRY */
 
 #ifdef SYSTEM_SPECIAL_INIT

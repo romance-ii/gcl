@@ -8,7 +8,7 @@ cp $@ ${TMP}
 
 for v in $@ ; 
 do
-echo '(load (format nil "~a~a" si::*system-directory* "../cmpnew/collectfn"))' \
+echo '(load (format nil "~a~a" si::*system-directory* "../cmpnew/gcl_collectfn"))' \
    '(compiler::emit-fn t)'\
    "(compile-file \"${TMP}/$v\" :o-file nil)" | ${LISP}
 done

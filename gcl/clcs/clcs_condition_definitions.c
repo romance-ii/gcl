@@ -2,7 +2,7 @@
 #include "cmpinclude.h"
 #include "clcs_condition_definitions.h"
 void init_clcs_condition_definitions(){do_init(VV);}
-/*	local entry for function progn 'compile2185	*/
+/*	local entry for function progn 'compile2187	*/
 
 static object LI1()
 
@@ -10,33 +10,33 @@ static object LI1()
 	goto TTL;
 TTL:;
 	base[0]= VV[0];
-	base[1]= symbol_value(VV[1]);
+	base[1]= (VV[1]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[1],vs_base[0]);
+	(VV[1]->s.s_dbind)= vs_base[0];
 	{object V2 = Cnil;
 	VMR1(V2)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2205	*/
+/*	local entry for function progn 'compile2207	*/
 
 static object LI2()
 
 {	 VMB2 VMS2 VMV2
 	goto TTL;
 TTL:;
-	{register object x= VV[0],V3= symbol_value(VV[1]);
-	while(!endp(V3))
+	{register object x= VV[0],V3= (VV[1]->s.s_dbind);
+	while(V3!=Cnil)
 	if(eql(x,V3->c.c_car)){
 	goto T8;
 	}else V3=V3->c.c_cdr;
 	goto T5;}
 	goto T8;
 T8:;
-	{register object x= VV[2],V4= symbol_value(VV[1]);
-	while(!endp(V4))
+	{register object x= VV[2],V4= (VV[1]->s.s_dbind);
+	while(V4!=Cnil)
 	if(eql(x,V4->c.c_car)){
 	goto T9;
 	}else V4=V4->c.c_cdr;
@@ -46,10 +46,10 @@ T9:;
 	{register object V5;
 	register object V6;
 	V5= VV[3];
-	V6= car((V5));
+	V6= CMPcar((V5));
 	goto T14;
 T14:;
-	if(!(endp_prop((V5)))){
+	if(!(((V5))==Cnil)){
 	goto T15;}
 	goto T10;
 	goto T15;
@@ -66,17 +66,17 @@ T15:;
 	vs_top=sup;
 	goto T19;
 T19:;
-	V5= cdr((V5));
-	V6= car((V5));
+	V5= CMPcdr((V5));
+	V6= CMPcar((V5));
 	goto T14;}
 	goto T10;
 T10:;
 	base[0]= VV[2];
-	base[1]= symbol_value(VV[1]);
+	base[1]= (VV[1]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	(void) (*Lnk260)();
 	vs_top=sup;
-	setq(VV[1],vs_base[0]);
+	(VV[1]->s.s_dbind)= vs_base[0];
 	goto T5;
 T5:;
 	{object V7 = Cnil;
@@ -84,13 +84,12 @@ T5:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	function definition for Defclass WARNING2251	*/
+/*	function definition for Defclass WARNING2253	*/
 
 static void L3()
 {register object *base=vs_base;
 	register object *sup=base+VM3; VC3
-	vs_reserve(VM3);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -103,7 +102,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile2267	*/
+/*	local entry for function progn 'compile2269	*/
 
 static object LI4()
 
@@ -118,7 +117,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2284	*/
+/*	local entry for function progn 'compile2286	*/
 
 static object LI5()
 
@@ -126,17 +125,17 @@ static object LI5()
 	goto TTL;
 TTL:;
 	base[0]= VV[7];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
+	(VV[8]->s.s_dbind)= vs_base[0];
 	{object V10 = Cnil;
 	VMR5(V10)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2308	*/
+/*	local entry for function progn 'compile2310	*/
 
 static object LI6()
 
@@ -148,7 +147,7 @@ TTL:;
 	VMR6(V11)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2320	*/
+/*	local entry for function progn 'compile2322	*/
 
 static object LI7()
 
@@ -159,13 +158,12 @@ TTL:;
 	VMR7(V12)}
 	return Cnil;
 }
-/*	function definition for Defclass SERIOUS-CONDITION2340	*/
+/*	function definition for Defclass SERIOUS-CONDITION2342	*/
 
 static void L8()
 {register object *base=vs_base;
 	register object *sup=base+VM8; VC8
-	vs_reserve(VM8);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -178,7 +176,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile2356	*/
+/*	local entry for function progn 'compile2358	*/
 
 static object LI9()
 
@@ -193,7 +191,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2373	*/
+/*	local entry for function progn 'compile2375	*/
 
 static object LI10()
 
@@ -201,17 +199,17 @@ static object LI10()
 	goto TTL;
 TTL:;
 	base[0]= VV[12];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
+	(VV[8]->s.s_dbind)= vs_base[0];
 	{object V15 = Cnil;
 	VMR10(V15)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2397	*/
+/*	local entry for function progn 'compile2399	*/
 
 static object LI11()
 
@@ -223,7 +221,7 @@ TTL:;
 	VMR11(V16)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2409	*/
+/*	local entry for function progn 'compile2411	*/
 
 static object LI12()
 
@@ -234,13 +232,12 @@ TTL:;
 	VMR12(V17)}
 	return Cnil;
 }
-/*	function definition for Defclass ERROR2429	*/
+/*	function definition for Defclass ERROR2431	*/
 
 static void L13()
 {register object *base=vs_base;
 	register object *sup=base+VM13; VC13
-	vs_reserve(VM13);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -253,7 +250,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile2445	*/
+/*	local entry for function progn 'compile2447	*/
 
 static object LI14()
 
@@ -268,7 +265,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2462	*/
+/*	local entry for function progn 'compile2464	*/
 
 static object LI15()
 
@@ -276,17 +273,17 @@ static object LI15()
 	goto TTL;
 TTL:;
 	base[0]= VV[15];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
+	(VV[8]->s.s_dbind)= vs_base[0];
 	{object V20 = Cnil;
 	VMR15(V20)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2486	*/
+/*	local entry for function progn 'compile2488	*/
 
 static object LI16()
 
@@ -298,7 +295,7 @@ TTL:;
 	VMR16(V21)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2498	*/
+/*	local entry for function progn 'compile2500	*/
 
 static object LI17()
 
@@ -330,8 +327,8 @@ TTL:;
 	vs_top=sup;
 	V27= vs_base[0];
 	 vs_top=base+2;
-	 while(!endp(V27))
-	 {vs_push(car(V27));V27=cdr(V27);}
+	 while(V27!=Cnil)
+	 {vs_push((V27)->c.c_car);V27=(V27)->c.c_cdr;}
 	vs_base=base+0;}
 	Lformat();
 	vs_top=sup;
@@ -340,13 +337,12 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	function definition for Defclass SIMPLE-CONDITION2526	*/
+/*	function definition for Defclass SIMPLE-CONDITION2528	*/
 
 static void L19()
 {register object *base=vs_base;
 	register object *sup=base+VM19; VC19
-	vs_reserve(VM19);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -355,7 +351,7 @@ TTL:;
 	base[2]= VV[17];
 	V29= listA(9,VV[18],VV[19],VV[20],VV[21],VV[22],Cnil,VV[23],VV[24],VV[25]);
 	base[4]= VV[26];
-	base[5]= symbol_function(VV[267]);
+	base[5]= (VV[267]->s.s_gfdef);
 	base[6]= VV[18];
 	base[7]= VV[27];
 	base[8]= VV[20];
@@ -375,7 +371,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile2544	*/
+/*	local entry for function progn 'compile2546	*/
 
 static object LI20()
 
@@ -390,7 +386,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2561	*/
+/*	local entry for function progn 'compile2563	*/
 
 static object LI21()
 
@@ -398,17 +394,17 @@ static object LI21()
 	goto TTL;
 TTL:;
 	base[0]= VV[31];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
+	(VV[8]->s.s_dbind)= vs_base[0];
 	{object V33 = Cnil;
 	VMR21(V33)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2585	*/
+/*	local entry for function progn 'compile2587	*/
 
 static object LI22()
 
@@ -420,7 +416,7 @@ TTL:;
 	VMR22(V34)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2601	*/
+/*	local entry for function progn 'compile2603	*/
 
 static object LI23()
 
@@ -442,12 +438,11 @@ TTL:;
 static void L24()
 {register object *base=vs_base;
 	register object *sup=base+VM24; VC24
-	vs_reserve(VM24);
+	vs_check;
 	{object V36;
 	register object V37;
 	register object V38;
 	register object V39;
-	check_arg(4);
 	V36=(base[0]);
 	V37=(base[1]);
 	V38=(base[2]);
@@ -455,7 +450,7 @@ static void L24()
 	vs_top=sup;
 	goto TTL;
 TTL:;
-	if((symbol_value(VV[34]))==Cnil){
+	if(((VV[34]->s.s_dbind))==Cnil){
 	goto T107;}
 	if(((V37))==Cnil){
 	goto T110;}
@@ -466,9 +461,9 @@ TTL:;
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
 	goto T114;}
-	base[4]= structure_ref((V37),VV[35],0);
-	base[5]= structure_ref((V37),VV[35],1);
-	base[6]= structure_ref((V37),VV[35],2);
+	base[4]= STREF(object,(V37),0);
+	base[5]= STREF(object,(V37),4);
+	base[6]= STREF(object,(V37),8);
 	base[7]= (V38);
 	base[8]= (V39);
 	vs_top=(vs_base=base+5)+4;
@@ -487,95 +482,90 @@ T114:;
 	goto T128;
 	goto T130;
 T130:;
-	base[4]= V38;
-	vs_top=(vs_base=base+4)+1;
-	(void) (*Lnk271)();
-	vs_top=sup;
-	V44= vs_base[0];
-	if(!((V44)==(VV[36]))){
+	if(!(((V38)->str.str_def)==(VV[36]))){
 	goto T128;}
-	V42= structure_ref((V38),VV[37],1);
+	V42= STREF(object,(V38),4);
 	goto T126;
 	goto T128;
-T128:;{object V45;
-	V45= symbol_value(VV[38]);
+T128:;{object V44;
+	V44= (VV[38]->s.s_dbind);
 	base[4]= small_fixnum(14);
 	base[5]= (V38);
 	vs_top=(vs_base=base+4)+2;
-	(void) (*Lnk272)();
+	(void) (*Lnk271)();
 	vs_top=sup;
-	V46= vs_base[0];
-	if(!((V45)==(car(V46)))){
-	goto T135;}}
-	V42= car(((V38))->cc.cc_turbo[12]);
+	V45= vs_base[0];
+	if(!((V44)==(CMPcar(V45)))){
+	goto T133;}}
+	V42= CMPcar(((V38))->cc.cc_turbo[12]);
 	goto T126;
-	goto T135;
-T135:;
+	goto T133;
+T133:;
 	V42= Cnil;
 	goto T126;
 T126:;
 	if(((V42))==Cnil){
-	goto T141;}
-	base[4]= aset1((V42),fix((V37)),V38);
+	goto T139;}
+	base[4]= ((V42))->v.v_self[fix((V37))]= (V38);
 	vs_top=(vs_base=base+4)+1;
 	return;
-	goto T141;
-T141:;
+	goto T139;
+T139:;
 	base[4]= Cnil;
 	vs_top=(vs_base=base+4)+1;
 	return;}
 	goto T124;
 T124:;
-	{register object V48;
-	V48= V37;
-	base[4]= (V48);
+	{register object V47;
+	V47= V37;
+	base[4]= (V47);
 	base[5]= VV[39];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T144;}
-	{object V49;
-	object V50;
-	register object V51;
-	V49= structure_ref((V37),VV[39],0);
-	V50= list(2,(V38),(V39));
-	V51= structure_ref((V37),VV[39],1);
-	if(((V51))==Cnil){
-	goto T152;}
-	if((cdr((V51)))!=Cnil){
-	goto T152;}
-	base[4]= (V50);
-	base[5]= car((V51));
+	goto T142;}
+	{object V48;
+	object V49;
+	register object V50;
+	V48= STREF(object,(V37),0);
+	V49= list(2,(V38),(V39));
+	V50= STREF(object,(V37),4);
+	if(((V50))==Cnil){
+	goto T150;}
+	if((CMPcdr((V50)))!=Cnil){
+	goto T150;}
+	base[4]= (V49);
+	base[5]= CMPcar((V50));
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V49);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V48);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T152;
-T152:;
-	base[4]= (V49);
-	base[5]= (V50);
-	{object V52;
-	V52= (V51);
+	goto T150;
+T150:;
+	base[4]= (V48);
+	base[5]= (V49);
+	{object V51;
+	V51= (V50);
 	 vs_top=base+6;
-	 while(!endp(V52))
-	 {vs_push(car(V52));V52=cdr(V52);}
+	 while(V51!=Cnil)
+	 {vs_push((V51)->c.c_car);V51=(V51)->c.c_cdr;}
 	vs_base=base+5;}
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;}
-	goto T144;
-T144:;
-	base[4]= (V48);
+	goto T142;
+T142:;
+	base[4]= (V47);
 	vs_top=(vs_base=base+4)+1;
 	Lfunctionp();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T162;}
+	goto T160;}
 	base[4]= (V38);
 	base[5]= (V39);
 	vs_top=(vs_base=base+4)+2;
@@ -584,8 +574,8 @@ T144:;
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T162;
-T162:;
+	goto T160;
+T160:;
 	base[4]= VV[40];
 	base[5]= VV[18];
 	base[6]= VV[41];
@@ -602,16 +592,16 @@ T162:;
 T110:;
 	base[4]= VV[47];
 	vs_top=(vs_base=base+4)+1;
-	(void) (*Lnk273)();
+	(void) (*Lnk272)();
 	return;
 	goto T107;
 T107:;
-	base[4]= (*(LnkLI274))((V38),(V39));
+	base[4]= (*(LnkLI273))((V38),(V39));
 	vs_top=(vs_base=base+4)+1;
 	return;
 	}
 }
-/*	local entry for function progn 'compile2794	*/
+/*	local entry for function progn 'compile2796	*/
 
 static object LI25()
 
@@ -623,35 +613,34 @@ TTL:;
 	base[2]= Cnil;
 	base[3]= VV[49];
 	base[4]= VV[50];
-	V53= symbol_function(VV[275]);
-	base[5]= listA(3,VV[51],V53,VV[52]);
+	V52= (VV[274]->s.s_gfdef);
+	base[5]= listA(3,VV[51],V52,VV[52]);
 	base[6]= Cnil;
 	vs_top=(vs_base=base+0)+7;
-	(void) (*Lnk276)();
+	(void) (*Lnk275)();
 	vs_top=sup;
-	{object V54 = Cnil;
-	VMR25(V54)}
+	{object V53 = Cnil;
+	VMR25(V53)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2802	*/
+/*	local entry for function progn 'compile2804	*/
 
 static object LI26()
 
 {	 VMB26 VMS26 VMV26
 	goto TTL;
 TTL:;
-	{object V55 = Cnil;
-	VMR26(V55)}
+	{object V54 = Cnil;
+	VMR26(V54)}
 	return Cnil;
 }
-/*	function definition for Defclass SIMPLE-WARNING2822	*/
+/*	function definition for Defclass SIMPLE-WARNING2824	*/
 
 static void L27()
 {register object *base=vs_base;
 	register object *sup=base+VM27; VC27
-	vs_reserve(VM27);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -664,7 +653,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile2838	*/
+/*	local entry for function progn 'compile2840	*/
 
 static object LI28()
 
@@ -672,14 +661,14 @@ static object LI28()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk277)();
+	(void) (*Lnk276)();
 	vs_top=sup;
-	{object V56 = Cnil;
-	VMR28(V56)}
+	{object V55 = Cnil;
+	VMR28(V55)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2855	*/
+/*	local entry for function progn 'compile2857	*/
 
 static object LI29()
 
@@ -687,17 +676,17 @@ static object LI29()
 	goto TTL;
 TTL:;
 	base[0]= VV[55];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V58 = Cnil;
-	VMR29(V58)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V57 = Cnil;
+	VMR29(V57)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2879	*/
+/*	local entry for function progn 'compile2881	*/
 
 static object LI30()
 
@@ -705,28 +694,27 @@ static object LI30()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[53],VV[9],Cnil));
-	{object V59 = Cnil;
-	VMR30(V59)}
+	{object V58 = Cnil;
+	VMR30(V58)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2891	*/
+/*	local entry for function progn 'compile2893	*/
 
 static object LI31()
 
 {	 VMB31 VMS31 VMV31
 	goto TTL;
 TTL:;
-	{object V60 = Cnil;
-	VMR31(V60)}
+	{object V59 = Cnil;
+	VMR31(V59)}
 	return Cnil;
 }
-/*	function definition for Defclass SIMPLE-ERROR2911	*/
+/*	function definition for Defclass SIMPLE-ERROR2913	*/
 
 static void L32()
 {register object *base=vs_base;
 	register object *sup=base+VM32; VC32
-	vs_reserve(VM32);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -739,7 +727,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile2927	*/
+/*	local entry for function progn 'compile2929	*/
 
 static object LI33()
 
@@ -747,14 +735,14 @@ static object LI33()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk278)();
+	(void) (*Lnk277)();
 	vs_top=sup;
-	{object V61 = Cnil;
-	VMR33(V61)}
+	{object V60 = Cnil;
+	VMR33(V60)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2944	*/
+/*	local entry for function progn 'compile2946	*/
 
 static object LI34()
 
@@ -762,17 +750,17 @@ static object LI34()
 	goto TTL;
 TTL:;
 	base[0]= VV[58];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V63 = Cnil;
-	VMR34(V63)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V62 = Cnil;
+	VMR34(V62)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2968	*/
+/*	local entry for function progn 'compile2970	*/
 
 static object LI35()
 
@@ -780,28 +768,27 @@ static object LI35()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[56],VV[9],Cnil));
-	{object V64 = Cnil;
-	VMR35(V64)}
+	{object V63 = Cnil;
+	VMR35(V63)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2980	*/
+/*	local entry for function progn 'compile2982	*/
 
 static object LI36()
 
 {	 VMB36 VMS36 VMV36
 	goto TTL;
 TTL:;
-	{object V65 = Cnil;
-	VMR36(V65)}
+	{object V64 = Cnil;
+	VMR36(V64)}
 	return Cnil;
 }
-/*	function definition for Defclass STORAGE-CONDITION3000	*/
+/*	function definition for Defclass STORAGE-CONDITION3002	*/
 
 static void L37()
 {register object *base=vs_base;
 	register object *sup=base+VM37; VC37
-	vs_reserve(VM37);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -814,7 +801,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile3016	*/
+/*	local entry for function progn 'compile3018	*/
 
 static object LI38()
 
@@ -822,14 +809,14 @@ static object LI38()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk279)();
+	(void) (*Lnk278)();
 	vs_top=sup;
-	{object V66 = Cnil;
-	VMR38(V66)}
+	{object V65 = Cnil;
+	VMR38(V65)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile3033	*/
+/*	local entry for function progn 'compile3035	*/
 
 static object LI39()
 
@@ -837,17 +824,17 @@ static object LI39()
 	goto TTL;
 TTL:;
 	base[0]= VV[61];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V68 = Cnil;
-	VMR39(V68)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V67 = Cnil;
+	VMR39(V67)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile3057	*/
+/*	local entry for function progn 'compile3059	*/
 
 static object LI40()
 
@@ -855,28 +842,27 @@ static object LI40()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[59],VV[9],Cnil));
-	{object V69 = Cnil;
-	VMR40(V69)}
+	{object V68 = Cnil;
+	VMR40(V68)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile3069	*/
+/*	local entry for function progn 'compile3071	*/
 
 static object LI41()
 
 {	 VMB41 VMS41 VMV41
 	goto TTL;
 TTL:;
-	{object V70 = Cnil;
-	VMR41(V70)}
+	{object V69 = Cnil;
+	VMR41(V69)}
 	return Cnil;
 }
-/*	function definition for Defclass STACK-OVERFLOW3089	*/
+/*	function definition for Defclass STACK-OVERFLOW3091	*/
 
 static void L42()
 {register object *base=vs_base;
 	register object *sup=base+VM42; VC42
-	vs_reserve(VM42);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -889,7 +875,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile3105	*/
+/*	local entry for function progn 'compile3107	*/
 
 static object LI43()
 
@@ -897,14 +883,14 @@ static object LI43()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk280)();
+	(void) (*Lnk279)();
 	vs_top=sup;
-	{object V71 = Cnil;
-	VMR43(V71)}
+	{object V70 = Cnil;
+	VMR43(V70)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile3122	*/
+/*	local entry for function progn 'compile3124	*/
 
 static object LI44()
 
@@ -912,17 +898,17 @@ static object LI44()
 	goto TTL;
 TTL:;
 	base[0]= VV[64];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V73 = Cnil;
-	VMR44(V73)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V72 = Cnil;
+	VMR44(V72)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile3146	*/
+/*	local entry for function progn 'compile3148	*/
 
 static object LI45()
 
@@ -930,28 +916,27 @@ static object LI45()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[62],VV[9],Cnil));
-	{object V74 = Cnil;
-	VMR45(V74)}
+	{object V73 = Cnil;
+	VMR45(V73)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile3158	*/
+/*	local entry for function progn 'compile3160	*/
 
 static object LI46()
 
 {	 VMB46 VMS46 VMV46
 	goto TTL;
 TTL:;
-	{object V75 = Cnil;
-	VMR46(V75)}
+	{object V74 = Cnil;
+	VMR46(V74)}
 	return Cnil;
 }
-/*	function definition for Defclass STORAGE-EXHAUSTED3178	*/
+/*	function definition for Defclass STORAGE-EXHAUSTED3180	*/
 
 static void L47()
 {register object *base=vs_base;
 	register object *sup=base+VM47; VC47
-	vs_reserve(VM47);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -964,7 +949,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile3194	*/
+/*	local entry for function progn 'compile3196	*/
 
 static object LI48()
 
@@ -972,14 +957,14 @@ static object LI48()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk281)();
+	(void) (*Lnk280)();
 	vs_top=sup;
-	{object V76 = Cnil;
-	VMR48(V76)}
+	{object V75 = Cnil;
+	VMR48(V75)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile3211	*/
+/*	local entry for function progn 'compile3213	*/
 
 static object LI49()
 
@@ -987,17 +972,17 @@ static object LI49()
 	goto TTL;
 TTL:;
 	base[0]= VV[67];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V78 = Cnil;
-	VMR49(V78)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V77 = Cnil;
+	VMR49(V77)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile3235	*/
+/*	local entry for function progn 'compile3237	*/
 
 static object LI50()
 
@@ -1005,42 +990,41 @@ static object LI50()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[65],VV[9],Cnil));
-	{object V79 = Cnil;
-	VMR50(V79)}
+	{object V78 = Cnil;
+	VMR50(V78)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile3247	*/
+/*	local entry for function progn 'compile3249	*/
 
 static object LI51()
 
 {	 VMB51 VMS51 VMV51
 	goto TTL;
 TTL:;
-	{object V80 = Cnil;
-	VMR51(V80)}
+	{object V79 = Cnil;
+	VMR51(V79)}
 	return Cnil;
 }
-/*	function definition for Defclass TYPE-ERROR3267	*/
+/*	function definition for Defclass TYPE-ERROR3269	*/
 
 static void L52()
 {register object *base=vs_base;
 	register object *sup=base+VM52; VC52
-	vs_reserve(VM52);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
 	base[0]= VV[68];
 	base[1]= VV[5];
 	base[2]= VV[69];
-	V81= listA(9,VV[18],VV[70],VV[20],VV[71],VV[22],Cnil,VV[23],VV[72],Cnil);
-	base[3]= list(2,/* INLINE-ARGS */V81,listA(9,VV[18],VV[73],VV[20],VV[74],VV[22],Cnil,VV[23],VV[75],Cnil));
+	V80= listA(9,VV[18],VV[70],VV[20],VV[71],VV[22],Cnil,VV[23],VV[72],Cnil);
+	base[3]= list(2,/* INLINE-ARGS */V80,listA(9,VV[18],VV[73],VV[20],VV[74],VV[22],Cnil,VV[23],VV[75],Cnil));
 	base[4]= Cnil;
 	base[5]= Cnil;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile3285	*/
+/*	local entry for function progn 'compile3287	*/
 
 static object LI53()
 
@@ -1048,14 +1032,14 @@ static object LI53()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk282)();
+	(void) (*Lnk281)();
 	vs_top=sup;
-	{object V82 = Cnil;
-	VMR53(V82)}
+	{object V81 = Cnil;
+	VMR53(V81)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile3302	*/
+/*	local entry for function progn 'compile3304	*/
 
 static object LI54()
 
@@ -1063,17 +1047,17 @@ static object LI54()
 	goto TTL;
 TTL:;
 	base[0]= VV[76];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V84 = Cnil;
-	VMR54(V84)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V83 = Cnil;
+	VMR54(V83)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile3326	*/
+/*	local entry for function progn 'compile3328	*/
 
 static object LI55()
 
@@ -1081,11 +1065,11 @@ static object LI55()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[68],VV[9],Cnil));
-	{object V85 = Cnil;
-	VMR55(V85)}
+	{object V84 = Cnil;
+	VMR55(V84)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile3342	*/
+/*	local entry for function progn 'compile3344	*/
 
 static object LI56()
 
@@ -1097,8 +1081,8 @@ TTL:;
 	vs_top=(vs_base=base+0)+2;
 	(void) (*Lnk269)();
 	vs_top=sup;
-	{object V86 = Cnil;
-	VMR56(V86)}
+	{object V85 = Cnil;
+	VMR56(V85)}
 	base[0]=base[0];
 	return Cnil;
 }
@@ -1107,155 +1091,149 @@ TTL:;
 static void L57()
 {register object *base=vs_base;
 	register object *sup=base+VM57; VC57
-	vs_reserve(VM57);
-	{object V87;
+	vs_check;
+	{object V86;
+	register object V87;
 	register object V88;
 	register object V89;
-	register object V90;
-	check_arg(4);
-	V87=(base[0]);
-	V88=(base[1]);
-	V89=(base[2]);
-	V90=(base[3]);
+	V86=(base[0]);
+	V87=(base[1]);
+	V88=(base[2]);
+	V89=(base[3]);
 	vs_top=sup;
 	goto TTL;
 TTL:;
-	if((symbol_value(VV[34]))==Cnil){
-	goto T271;}
-	if(((V88))==Cnil){
-	goto T274;}
-	base[4]= (V88);
+	if(((VV[34]->s.s_dbind))==Cnil){
+	goto T269;}
+	if(((V87))==Cnil){
+	goto T272;}
+	base[4]= (V87);
 	base[5]= VV[35];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T278;}
-	base[4]= structure_ref((V88),VV[35],0);
-	base[5]= structure_ref((V88),VV[35],1);
-	base[6]= structure_ref((V88),VV[35],2);
-	base[7]= (V89);
-	base[8]= (V90);
+	goto T276;}
+	base[4]= STREF(object,(V87),0);
+	base[5]= STREF(object,(V87),4);
+	base[6]= STREF(object,(V87),8);
+	base[7]= (V88);
+	base[8]= (V89);
 	vs_top=(vs_base=base+5)+4;
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T278;
-T278:;
-	if(!(type_of((V88))==t_fixnum)){
-	goto T288;}
-	{object V93;
-	if(type_of(V89)==t_structure){
-	goto T294;}
+	goto T276;
+T276:;
+	if(!(type_of((V87))==t_fixnum)){
+	goto T286;}
+	{object V92;
+	if(type_of(V88)==t_structure){
+	goto T292;}
+	goto T290;
 	goto T292;
-	goto T294;
-T294:;
-	base[4]= V89;
-	vs_top=(vs_base=base+4)+1;
+T292:;
+	if(!(((V88)->str.str_def)==(VV[78]))){
+	goto T290;}
+	V92= STREF(object,(V88),4);
+	goto T288;
+	goto T290;
+T290:;{object V94;
+	V94= (VV[38]->s.s_dbind);
+	base[4]= small_fixnum(14);
+	base[5]= (V88);
+	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk271)();
 	vs_top=sup;
 	V95= vs_base[0];
-	if(!((V95)==(VV[78]))){
-	goto T292;}
-	V93= structure_ref((V89),VV[37],1);
-	goto T290;
-	goto T292;
-T292:;{object V96;
-	V96= symbol_value(VV[38]);
-	base[4]= small_fixnum(14);
-	base[5]= (V89);
-	vs_top=(vs_base=base+4)+2;
-	(void) (*Lnk272)();
-	vs_top=sup;
-	V97= vs_base[0];
-	if(!((V96)==(car(V97)))){
-	goto T299;}}
-	V93= car(((V89))->cc.cc_turbo[12]);
-	goto T290;
-	goto T299;
-T299:;
-	V93= Cnil;
-	goto T290;
-T290:;
-	if(((V93))==Cnil){
-	goto T305;}
-	base[4]= aset1((V93),fix((V88)),V89);
+	if(!((V94)==(CMPcar(V95)))){
+	goto T295;}}
+	V92= CMPcar(((V88))->cc.cc_turbo[12]);
+	goto T288;
+	goto T295;
+T295:;
+	V92= Cnil;
+	goto T288;
+T288:;
+	if(((V92))==Cnil){
+	goto T301;}
+	base[4]= ((V92))->v.v_self[fix((V87))]= (V88);
 	vs_top=(vs_base=base+4)+1;
 	return;
-	goto T305;
-T305:;
+	goto T301;
+T301:;
 	base[4]= Cnil;
 	vs_top=(vs_base=base+4)+1;
 	return;}
-	goto T288;
-T288:;
-	{register object V99;
-	V99= V88;
-	base[4]= (V99);
+	goto T286;
+T286:;
+	{register object V97;
+	V97= V87;
+	base[4]= (V97);
 	base[5]= VV[39];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T308;}
-	{object V100;
-	object V101;
-	register object V102;
-	V100= structure_ref((V88),VV[39],0);
-	V101= list(2,(V89),(V90));
-	V102= structure_ref((V88),VV[39],1);
-	if(((V102))==Cnil){
-	goto T316;}
-	if((cdr((V102)))!=Cnil){
-	goto T316;}
-	base[4]= (V101);
-	base[5]= car((V102));
+	goto T304;}
+	{object V98;
+	object V99;
+	register object V100;
+	V98= STREF(object,(V87),0);
+	V99= list(2,(V88),(V89));
+	V100= STREF(object,(V87),4);
+	if(((V100))==Cnil){
+	goto T312;}
+	if((CMPcdr((V100)))!=Cnil){
+	goto T312;}
+	base[4]= (V99);
+	base[5]= CMPcar((V100));
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V100);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V98);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T316;
-T316:;
-	base[4]= (V100);
-	base[5]= (V101);
-	{object V103;
-	V103= (V102);
+	goto T312;
+T312:;
+	base[4]= (V98);
+	base[5]= (V99);
+	{object V101;
+	V101= (V100);
 	 vs_top=base+6;
-	 while(!endp(V103))
-	 {vs_push(car(V103));V103=cdr(V103);}
+	 while(V101!=Cnil)
+	 {vs_push((V101)->c.c_car);V101=(V101)->c.c_cdr;}
 	vs_base=base+5;}
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;}
-	goto T308;
-T308:;
-	base[4]= (V99);
+	goto T304;
+T304:;
+	base[4]= (V97);
 	vs_top=(vs_base=base+4)+1;
 	Lfunctionp();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T326;}
-	base[4]= (V89);
-	base[5]= (V90);
+	goto T322;}
+	base[4]= (V88);
+	base[5]= (V89);
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V88);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V87);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T326;
-T326:;
+	goto T322;
+T322:;
 	base[4]= VV[40];
 	base[5]= VV[18];
 	base[6]= VV[41];
 	base[7]= VV[42];
-	base[8]= V88;
+	base[8]= V87;
 	base[9]= VV[43];
 	base[10]= VV[79];
 	base[11]= VV[45];
@@ -1263,24 +1241,24 @@ T326:;
 	vs_top=(vs_base=base+4)+9;
 	(void) (*Lnk13)();
 	return;}
-	goto T274;
-T274:;
+	goto T272;
+T272:;
 	base[4]= VV[47];
 	vs_top=(vs_base=base+4)+1;
-	(void) (*Lnk273)();
+	(void) (*Lnk272)();
 	return;
-	goto T271;
-T271:;
-	base[4]= V90;
+	goto T269;
+T269:;
+	base[4]= V89;
 	base[5]= VV[81];
-	base[7]= V89;
+	base[7]= V88;
 	vs_top=(vs_base=base+7)+1;
-	(void) (*Lnk283)(Lclptr283);
+	(void) (*Lnk282)(Lclptr282);
 	vs_top=sup;
 	base[6]= vs_base[0];
-	base[8]= V89;
+	base[8]= V88;
 	vs_top=(vs_base=base+8)+1;
-	(void) (*Lnk284)(Lclptr284);
+	(void) (*Lnk283)(Lclptr283);
 	vs_top=sup;
 	base[7]= vs_base[0];
 	vs_top=(vs_base=base+4)+4;
@@ -1288,7 +1266,7 @@ T271:;
 	return;
 	}
 }
-/*	local entry for function progn 'compile3539	*/
+/*	local entry for function progn 'compile3541	*/
 
 static object LI58()
 
@@ -1300,35 +1278,34 @@ TTL:;
 	base[2]= Cnil;
 	base[3]= VV[82];
 	base[4]= VV[83];
-	V106= symbol_function(VV[285]);
-	base[5]= listA(3,VV[51],V106,VV[84]);
+	V104= (VV[284]->s.s_gfdef);
+	base[5]= listA(3,VV[51],V104,VV[84]);
 	base[6]= Cnil;
 	vs_top=(vs_base=base+0)+7;
-	(void) (*Lnk276)();
+	(void) (*Lnk275)();
 	vs_top=sup;
-	{object V107 = Cnil;
-	VMR58(V107)}
+	{object V105 = Cnil;
+	VMR58(V105)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile3547	*/
+/*	local entry for function progn 'compile3549	*/
 
 static object LI59()
 
 {	 VMB59 VMS59 VMV59
 	goto TTL;
 TTL:;
-	{object V108 = Cnil;
-	VMR59(V108)}
+	{object V106 = Cnil;
+	VMR59(V106)}
 	return Cnil;
 }
-/*	function definition for Defclass SIMPLE-TYPE-ERROR3567	*/
+/*	function definition for Defclass SIMPLE-TYPE-ERROR3569	*/
 
 static void L60()
 {register object *base=vs_base;
 	register object *sup=base+VM60; VC60
-	vs_reserve(VM60);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -1341,7 +1318,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile3583	*/
+/*	local entry for function progn 'compile3585	*/
 
 static object LI61()
 
@@ -1349,14 +1326,14 @@ static object LI61()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk286)();
+	(void) (*Lnk285)();
 	vs_top=sup;
-	{object V109 = Cnil;
-	VMR61(V109)}
+	{object V107 = Cnil;
+	VMR61(V107)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile3600	*/
+/*	local entry for function progn 'compile3602	*/
 
 static object LI62()
 
@@ -1364,17 +1341,17 @@ static object LI62()
 	goto TTL;
 TTL:;
 	base[0]= VV[87];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V111 = Cnil;
-	VMR62(V111)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V109 = Cnil;
+	VMR62(V109)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile3624	*/
+/*	local entry for function progn 'compile3626	*/
 
 static object LI63()
 
@@ -1382,42 +1359,41 @@ static object LI63()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[85],VV[9],Cnil));
-	{object V112 = Cnil;
-	VMR63(V112)}
+	{object V110 = Cnil;
+	VMR63(V110)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile3636	*/
+/*	local entry for function progn 'compile3638	*/
 
 static object LI64()
 
 {	 VMB64 VMS64 VMV64
 	goto TTL;
 TTL:;
-	{object V113 = Cnil;
-	VMR64(V113)}
+	{object V111 = Cnil;
+	VMR64(V111)}
 	return Cnil;
 }
-/*	function definition for Defclass CASE-FAILURE3656	*/
+/*	function definition for Defclass CASE-FAILURE3658	*/
 
 static void L65()
 {register object *base=vs_base;
 	register object *sup=base+VM65; VC65
-	vs_reserve(VM65);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
 	base[0]= VV[40];
 	base[1]= VV[5];
 	base[2]= VV[88];
-	V114= listA(9,VV[18],VV[89],VV[20],VV[90],VV[22],Cnil,VV[23],VV[91],Cnil);
-	base[3]= list(2,/* INLINE-ARGS */V114,listA(9,VV[18],VV[92],VV[20],VV[93],VV[22],Cnil,VV[23],VV[94],Cnil));
+	V112= listA(9,VV[18],VV[89],VV[20],VV[90],VV[22],Cnil,VV[23],VV[91],Cnil);
+	base[3]= list(2,/* INLINE-ARGS */V112,listA(9,VV[18],VV[92],VV[20],VV[93],VV[22],Cnil,VV[23],VV[94],Cnil));
 	base[4]= Cnil;
 	base[5]= Cnil;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile3674	*/
+/*	local entry for function progn 'compile3676	*/
 
 static object LI66()
 
@@ -1425,14 +1401,14 @@ static object LI66()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk287)();
+	(void) (*Lnk286)();
 	vs_top=sup;
-	{object V115 = Cnil;
-	VMR66(V115)}
+	{object V113 = Cnil;
+	VMR66(V113)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile3691	*/
+/*	local entry for function progn 'compile3693	*/
 
 static object LI67()
 
@@ -1440,17 +1416,17 @@ static object LI67()
 	goto TTL;
 TTL:;
 	base[0]= VV[95];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V117 = Cnil;
-	VMR67(V117)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V115 = Cnil;
+	VMR67(V115)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile3715	*/
+/*	local entry for function progn 'compile3717	*/
 
 static object LI68()
 
@@ -1458,11 +1434,11 @@ static object LI68()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[40],VV[9],Cnil));
-	{object V118 = Cnil;
-	VMR68(V118)}
+	{object V116 = Cnil;
+	VMR68(V116)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile3731	*/
+/*	local entry for function progn 'compile3733	*/
 
 static object LI69()
 
@@ -1474,8 +1450,8 @@ TTL:;
 	vs_top=(vs_base=base+0)+2;
 	(void) (*Lnk269)();
 	vs_top=sup;
-	{object V119 = Cnil;
-	VMR69(V119)}
+	{object V117 = Cnil;
+	VMR69(V117)}
 	base[0]=base[0];
 	return Cnil;
 }
@@ -1484,155 +1460,149 @@ TTL:;
 static void L70()
 {register object *base=vs_base;
 	register object *sup=base+VM70; VC70
-	vs_reserve(VM70);
-	{object V120;
+	vs_check;
+	{object V118;
+	register object V119;
+	register object V120;
 	register object V121;
-	register object V122;
-	register object V123;
-	check_arg(4);
-	V120=(base[0]);
-	V121=(base[1]);
-	V122=(base[2]);
-	V123=(base[3]);
+	V118=(base[0]);
+	V119=(base[1]);
+	V120=(base[2]);
+	V121=(base[3]);
 	vs_top=sup;
 	goto TTL;
 TTL:;
-	if((symbol_value(VV[34]))==Cnil){
-	goto T389;}
-	if(((V121))==Cnil){
-	goto T392;}
-	base[4]= (V121);
+	if(((VV[34]->s.s_dbind))==Cnil){
+	goto T385;}
+	if(((V119))==Cnil){
+	goto T388;}
+	base[4]= (V119);
 	base[5]= VV[35];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T396;}
-	base[4]= structure_ref((V121),VV[35],0);
-	base[5]= structure_ref((V121),VV[35],1);
-	base[6]= structure_ref((V121),VV[35],2);
-	base[7]= (V122);
-	base[8]= (V123);
+	goto T392;}
+	base[4]= STREF(object,(V119),0);
+	base[5]= STREF(object,(V119),4);
+	base[6]= STREF(object,(V119),8);
+	base[7]= (V120);
+	base[8]= (V121);
 	vs_top=(vs_base=base+5)+4;
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T396;
-T396:;
-	if(!(type_of((V121))==t_fixnum)){
-	goto T406;}
-	{object V126;
-	if(type_of(V122)==t_structure){
-	goto T412;}
-	goto T410;
-	goto T412;
-T412:;
-	base[4]= V122;
-	vs_top=(vs_base=base+4)+1;
-	(void) (*Lnk271)();
-	vs_top=sup;
-	V128= vs_base[0];
-	if(!((V128)==(VV[97]))){
-	goto T410;}
-	V126= structure_ref((V122),VV[37],1);
-	goto T408;
-	goto T410;
-T410:;{object V129;
-	V129= symbol_value(VV[38]);
-	base[4]= small_fixnum(14);
-	base[5]= (V122);
-	vs_top=(vs_base=base+4)+2;
-	(void) (*Lnk272)();
-	vs_top=sup;
-	V130= vs_base[0];
-	if(!((V129)==(car(V130)))){
-	goto T417;}}
-	V126= car(((V122))->cc.cc_turbo[12]);
-	goto T408;
-	goto T417;
-T417:;
-	V126= Cnil;
+	goto T392;
+T392:;
+	if(!(type_of((V119))==t_fixnum)){
+	goto T402;}
+	{object V124;
+	if(type_of(V120)==t_structure){
+	goto T408;}
+	goto T406;
 	goto T408;
 T408:;
-	if(((V126))==Cnil){
-	goto T423;}
-	base[4]= aset1((V126),fix((V121)),V122);
+	if(!(((V120)->str.str_def)==(VV[97]))){
+	goto T406;}
+	V124= STREF(object,(V120),4);
+	goto T404;
+	goto T406;
+T406:;{object V126;
+	V126= (VV[38]->s.s_dbind);
+	base[4]= small_fixnum(14);
+	base[5]= (V120);
+	vs_top=(vs_base=base+4)+2;
+	(void) (*Lnk271)();
+	vs_top=sup;
+	V127= vs_base[0];
+	if(!((V126)==(CMPcar(V127)))){
+	goto T411;}}
+	V124= CMPcar(((V120))->cc.cc_turbo[12]);
+	goto T404;
+	goto T411;
+T411:;
+	V124= Cnil;
+	goto T404;
+T404:;
+	if(((V124))==Cnil){
+	goto T417;}
+	base[4]= ((V124))->v.v_self[fix((V119))]= (V120);
 	vs_top=(vs_base=base+4)+1;
 	return;
-	goto T423;
-T423:;
+	goto T417;
+T417:;
 	base[4]= Cnil;
 	vs_top=(vs_base=base+4)+1;
 	return;}
-	goto T406;
-T406:;
-	{register object V132;
-	V132= V121;
-	base[4]= (V132);
+	goto T402;
+T402:;
+	{register object V129;
+	V129= V119;
+	base[4]= (V129);
 	base[5]= VV[39];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T426;}
-	{object V133;
-	object V134;
-	register object V135;
-	V133= structure_ref((V121),VV[39],0);
-	V134= list(2,(V122),(V123));
-	V135= structure_ref((V121),VV[39],1);
-	if(((V135))==Cnil){
-	goto T434;}
-	if((cdr((V135)))!=Cnil){
-	goto T434;}
-	base[4]= (V134);
-	base[5]= car((V135));
+	goto T420;}
+	{object V130;
+	object V131;
+	register object V132;
+	V130= STREF(object,(V119),0);
+	V131= list(2,(V120),(V121));
+	V132= STREF(object,(V119),4);
+	if(((V132))==Cnil){
+	goto T428;}
+	if((CMPcdr((V132)))!=Cnil){
+	goto T428;}
+	base[4]= (V131);
+	base[5]= CMPcar((V132));
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V133);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V130);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T434;
-T434:;
-	base[4]= (V133);
-	base[5]= (V134);
-	{object V136;
-	V136= (V135);
+	goto T428;
+T428:;
+	base[4]= (V130);
+	base[5]= (V131);
+	{object V133;
+	V133= (V132);
 	 vs_top=base+6;
-	 while(!endp(V136))
-	 {vs_push(car(V136));V136=cdr(V136);}
+	 while(V133!=Cnil)
+	 {vs_push((V133)->c.c_car);V133=(V133)->c.c_cdr;}
 	vs_base=base+5;}
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;}
-	goto T426;
-T426:;
-	base[4]= (V132);
+	goto T420;
+T420:;
+	base[4]= (V129);
 	vs_top=(vs_base=base+4)+1;
 	Lfunctionp();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T444;}
-	base[4]= (V122);
-	base[5]= (V123);
+	goto T438;}
+	base[4]= (V120);
+	base[5]= (V121);
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V121);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V119);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T444;
-T444:;
+	goto T438;
+T438:;
 	base[4]= VV[40];
 	base[5]= VV[18];
 	base[6]= VV[41];
 	base[7]= VV[42];
-	base[8]= V121;
+	base[8]= V119;
 	base[9]= VV[43];
 	base[10]= VV[98];
 	base[11]= VV[45];
@@ -1640,29 +1610,29 @@ T444:;
 	vs_top=(vs_base=base+4)+9;
 	(void) (*Lnk13)();
 	return;}
-	goto T392;
-T392:;
+	goto T388;
+T388:;
 	base[4]= VV[47];
 	vs_top=(vs_base=base+4)+1;
-	(void) (*Lnk273)();
+	(void) (*Lnk272)();
 	return;
-	goto T389;
-T389:;
-	base[4]= V123;
+	goto T385;
+T385:;
+	base[4]= V121;
 	base[5]= VV[100];
-	base[7]= V122;
+	base[7]= V120;
 	vs_top=(vs_base=base+7)+1;
-	(void) (*Lnk283)(Lclptr283);
+	(void) (*Lnk282)(Lclptr282);
 	vs_top=sup;
 	base[6]= vs_base[0];
-	base[8]= V122;
+	base[8]= V120;
 	vs_top=(vs_base=base+8)+1;
-	(void) (*Lnk288)(Lclptr288);
+	(void) (*Lnk287)(Lclptr287);
 	vs_top=sup;
 	base[7]= vs_base[0];
-	base[9]= V122;
+	base[9]= V120;
 	vs_top=(vs_base=base+9)+1;
-	(void) (*Lnk289)(Lclptr289);
+	(void) (*Lnk288)(Lclptr288);
 	vs_top=sup;
 	base[8]= vs_base[0];
 	vs_top=(vs_base=base+4)+5;
@@ -1670,7 +1640,7 @@ T389:;
 	return;
 	}
 }
-/*	local entry for function progn 'compile3928	*/
+/*	local entry for function progn 'compile3930	*/
 
 static object LI71()
 
@@ -1682,35 +1652,34 @@ TTL:;
 	base[2]= Cnil;
 	base[3]= VV[101];
 	base[4]= VV[102];
-	V139= symbol_function(VV[290]);
-	base[5]= listA(3,VV[51],V139,VV[103]);
+	V136= (VV[289]->s.s_gfdef);
+	base[5]= listA(3,VV[51],V136,VV[103]);
 	base[6]= Cnil;
 	vs_top=(vs_base=base+0)+7;
-	(void) (*Lnk276)();
+	(void) (*Lnk275)();
 	vs_top=sup;
-	{object V140 = Cnil;
-	VMR71(V140)}
+	{object V137 = Cnil;
+	VMR71(V137)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile3936	*/
+/*	local entry for function progn 'compile3938	*/
 
 static object LI72()
 
 {	 VMB72 VMS72 VMV72
 	goto TTL;
 TTL:;
-	{object V141 = Cnil;
-	VMR72(V141)}
+	{object V138 = Cnil;
+	VMR72(V138)}
 	return Cnil;
 }
-/*	function definition for Defclass PROGRAM-ERROR3956	*/
+/*	function definition for Defclass PROGRAM-ERROR3958	*/
 
 static void L73()
 {register object *base=vs_base;
 	register object *sup=base+VM73; VC73
-	vs_reserve(VM73);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -1723,7 +1692,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile3972	*/
+/*	local entry for function progn 'compile3974	*/
 
 static object LI74()
 
@@ -1731,14 +1700,14 @@ static object LI74()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk291)();
+	(void) (*Lnk290)();
 	vs_top=sup;
-	{object V142 = Cnil;
-	VMR74(V142)}
+	{object V139 = Cnil;
+	VMR74(V139)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile3989	*/
+/*	local entry for function progn 'compile3991	*/
 
 static object LI75()
 
@@ -1746,17 +1715,17 @@ static object LI75()
 	goto TTL;
 TTL:;
 	base[0]= VV[106];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V144 = Cnil;
-	VMR75(V144)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V141 = Cnil;
+	VMR75(V141)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile4013	*/
+/*	local entry for function progn 'compile4015	*/
 
 static object LI76()
 
@@ -1764,28 +1733,27 @@ static object LI76()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[104],VV[9],Cnil));
-	{object V145 = Cnil;
-	VMR76(V145)}
+	{object V142 = Cnil;
+	VMR76(V142)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile4025	*/
+/*	local entry for function progn 'compile4027	*/
 
 static object LI77()
 
 {	 VMB77 VMS77 VMV77
 	goto TTL;
 TTL:;
-	{object V146 = Cnil;
-	VMR77(V146)}
+	{object V143 = Cnil;
+	VMR77(V143)}
 	return Cnil;
 }
-/*	function definition for Defclass CONTROL-ERROR4045	*/
+/*	function definition for Defclass CONTROL-ERROR4047	*/
 
 static void L78()
 {register object *base=vs_base;
 	register object *sup=base+VM78; VC78
-	vs_reserve(VM78);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -1798,7 +1766,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile4061	*/
+/*	local entry for function progn 'compile4063	*/
 
 static object LI79()
 
@@ -1806,14 +1774,14 @@ static object LI79()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk292)();
+	(void) (*Lnk291)();
 	vs_top=sup;
-	{object V147 = Cnil;
-	VMR79(V147)}
+	{object V144 = Cnil;
+	VMR79(V144)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile4078	*/
+/*	local entry for function progn 'compile4080	*/
 
 static object LI80()
 
@@ -1821,17 +1789,17 @@ static object LI80()
 	goto TTL;
 TTL:;
 	base[0]= VV[109];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V149 = Cnil;
-	VMR80(V149)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V146 = Cnil;
+	VMR80(V146)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile4102	*/
+/*	local entry for function progn 'compile4104	*/
 
 static object LI81()
 
@@ -1839,42 +1807,41 @@ static object LI81()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[107],VV[9],Cnil));
-	{object V150 = Cnil;
-	VMR81(V150)}
+	{object V147 = Cnil;
+	VMR81(V147)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile4114	*/
+/*	local entry for function progn 'compile4116	*/
 
 static object LI82()
 
 {	 VMB82 VMS82 VMV82
 	goto TTL;
 TTL:;
-	{object V151 = Cnil;
-	VMR82(V151)}
+	{object V148 = Cnil;
+	VMR82(V148)}
 	return Cnil;
 }
-/*	function definition for Defclass STREAM-ERROR4134	*/
+/*	function definition for Defclass STREAM-ERROR4136	*/
 
 static void L83()
 {register object *base=vs_base;
 	register object *sup=base+VM83; VC83
-	vs_reserve(VM83);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
 	base[0]= VV[110];
 	base[1]= VV[5];
 	base[2]= VV[111];
-	V152= listA(9,VV[18],VV[112],VV[20],VV[113],VV[22],Cnil,VV[23],VV[114],Cnil);
-	base[3]= make_cons(/* INLINE-ARGS */V152,Cnil);
+	V149= listA(9,VV[18],VV[112],VV[20],VV[113],VV[22],Cnil,VV[23],VV[114],Cnil);
+	base[3]= make_cons(/* INLINE-ARGS */V149,Cnil);
 	base[4]= Cnil;
 	base[5]= Cnil;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile4151	*/
+/*	local entry for function progn 'compile4153	*/
 
 static object LI84()
 
@@ -1882,14 +1849,14 @@ static object LI84()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk293)();
+	(void) (*Lnk292)();
 	vs_top=sup;
-	{object V153 = Cnil;
-	VMR84(V153)}
+	{object V150 = Cnil;
+	VMR84(V150)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile4168	*/
+/*	local entry for function progn 'compile4170	*/
 
 static object LI85()
 
@@ -1897,17 +1864,17 @@ static object LI85()
 	goto TTL;
 TTL:;
 	base[0]= VV[115];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V155 = Cnil;
-	VMR85(V155)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V152 = Cnil;
+	VMR85(V152)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile4192	*/
+/*	local entry for function progn 'compile4194	*/
 
 static object LI86()
 
@@ -1915,28 +1882,27 @@ static object LI86()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[110],VV[9],Cnil));
-	{object V156 = Cnil;
-	VMR86(V156)}
+	{object V153 = Cnil;
+	VMR86(V153)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile4204	*/
+/*	local entry for function progn 'compile4206	*/
 
 static object LI87()
 
 {	 VMB87 VMS87 VMV87
 	goto TTL;
 TTL:;
-	{object V157 = Cnil;
-	VMR87(V157)}
+	{object V154 = Cnil;
+	VMR87(V154)}
 	return Cnil;
 }
-/*	function definition for Defclass END-OF-FILE4224	*/
+/*	function definition for Defclass END-OF-FILE4226	*/
 
 static void L88()
 {register object *base=vs_base;
 	register object *sup=base+VM88; VC88
-	vs_reserve(VM88);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -1949,7 +1915,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile4240	*/
+/*	local entry for function progn 'compile4242	*/
 
 static object LI89()
 
@@ -1957,14 +1923,14 @@ static object LI89()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk294)();
+	(void) (*Lnk293)();
 	vs_top=sup;
-	{object V158 = Cnil;
-	VMR89(V158)}
+	{object V155 = Cnil;
+	VMR89(V155)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile4257	*/
+/*	local entry for function progn 'compile4259	*/
 
 static object LI90()
 
@@ -1972,17 +1938,17 @@ static object LI90()
 	goto TTL;
 TTL:;
 	base[0]= VV[118];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V160 = Cnil;
-	VMR90(V160)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V157 = Cnil;
+	VMR90(V157)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile4281	*/
+/*	local entry for function progn 'compile4283	*/
 
 static object LI91()
 
@@ -1990,11 +1956,11 @@ static object LI91()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[116],VV[9],Cnil));
-	{object V161 = Cnil;
-	VMR91(V161)}
+	{object V158 = Cnil;
+	VMR91(V158)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile4297	*/
+/*	local entry for function progn 'compile4299	*/
 
 static object LI92()
 
@@ -2006,8 +1972,8 @@ TTL:;
 	vs_top=(vs_base=base+0)+2;
 	(void) (*Lnk269)();
 	vs_top=sup;
-	{object V162 = Cnil;
-	VMR92(V162)}
+	{object V159 = Cnil;
+	VMR92(V159)}
 	base[0]=base[0];
 	return Cnil;
 }
@@ -2016,155 +1982,149 @@ TTL:;
 static void L93()
 {register object *base=vs_base;
 	register object *sup=base+VM93; VC93
-	vs_reserve(VM93);
-	{object V163;
-	register object V164;
-	register object V165;
-	register object V166;
-	check_arg(4);
-	V163=(base[0]);
-	V164=(base[1]);
-	V165=(base[2]);
-	V166=(base[3]);
+	vs_check;
+	{object V160;
+	register object V161;
+	register object V162;
+	register object V163;
+	V160=(base[0]);
+	V161=(base[1]);
+	V162=(base[2]);
+	V163=(base[3]);
 	vs_top=sup;
 	goto TTL;
 TTL:;
-	if((symbol_value(VV[34]))==Cnil){
-	goto T535;}
-	if(((V164))==Cnil){
-	goto T538;}
-	base[4]= (V164);
+	if(((VV[34]->s.s_dbind))==Cnil){
+	goto T529;}
+	if(((V161))==Cnil){
+	goto T532;}
+	base[4]= (V161);
 	base[5]= VV[35];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T542;}
-	base[4]= structure_ref((V164),VV[35],0);
-	base[5]= structure_ref((V164),VV[35],1);
-	base[6]= structure_ref((V164),VV[35],2);
-	base[7]= (V165);
-	base[8]= (V166);
+	goto T536;}
+	base[4]= STREF(object,(V161),0);
+	base[5]= STREF(object,(V161),4);
+	base[6]= STREF(object,(V161),8);
+	base[7]= (V162);
+	base[8]= (V163);
 	vs_top=(vs_base=base+5)+4;
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T542;
-T542:;
-	if(!(type_of((V164))==t_fixnum)){
+	goto T536;
+T536:;
+	if(!(type_of((V161))==t_fixnum)){
+	goto T546;}
+	{object V166;
+	if(type_of(V162)==t_structure){
 	goto T552;}
-	{object V169;
-	if(type_of(V165)==t_structure){
-	goto T558;}
-	goto T556;
-	goto T558;
-T558:;
-	base[4]= V165;
-	vs_top=(vs_base=base+4)+1;
+	goto T550;
+	goto T552;
+T552:;
+	if(!(((V162)->str.str_def)==(VV[120]))){
+	goto T550;}
+	V166= STREF(object,(V162),4);
+	goto T548;
+	goto T550;
+T550:;{object V168;
+	V168= (VV[38]->s.s_dbind);
+	base[4]= small_fixnum(14);
+	base[5]= (V162);
+	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk271)();
 	vs_top=sup;
-	V171= vs_base[0];
-	if(!((V171)==(VV[120]))){
-	goto T556;}
-	V169= structure_ref((V165),VV[37],1);
-	goto T554;
-	goto T556;
-T556:;{object V172;
-	V172= symbol_value(VV[38]);
-	base[4]= small_fixnum(14);
-	base[5]= (V165);
-	vs_top=(vs_base=base+4)+2;
-	(void) (*Lnk272)();
-	vs_top=sup;
-	V173= vs_base[0];
-	if(!((V172)==(car(V173)))){
-	goto T563;}}
-	V169= car(((V165))->cc.cc_turbo[12]);
-	goto T554;
-	goto T563;
-T563:;
-	V169= Cnil;
-	goto T554;
-T554:;
-	if(((V169))==Cnil){
-	goto T569;}
-	base[4]= aset1((V169),fix((V164)),V165);
+	V169= vs_base[0];
+	if(!((V168)==(CMPcar(V169)))){
+	goto T555;}}
+	V166= CMPcar(((V162))->cc.cc_turbo[12]);
+	goto T548;
+	goto T555;
+T555:;
+	V166= Cnil;
+	goto T548;
+T548:;
+	if(((V166))==Cnil){
+	goto T561;}
+	base[4]= ((V166))->v.v_self[fix((V161))]= (V162);
 	vs_top=(vs_base=base+4)+1;
 	return;
-	goto T569;
-T569:;
+	goto T561;
+T561:;
 	base[4]= Cnil;
 	vs_top=(vs_base=base+4)+1;
 	return;}
-	goto T552;
-T552:;
-	{register object V175;
-	V175= V164;
-	base[4]= (V175);
+	goto T546;
+T546:;
+	{register object V171;
+	V171= V161;
+	base[4]= (V171);
 	base[5]= VV[39];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
+	goto T564;}
+	{object V172;
+	object V173;
+	register object V174;
+	V172= STREF(object,(V161),0);
+	V173= list(2,(V162),(V163));
+	V174= STREF(object,(V161),4);
+	if(((V174))==Cnil){
 	goto T572;}
-	{object V176;
-	object V177;
-	register object V178;
-	V176= structure_ref((V164),VV[39],0);
-	V177= list(2,(V165),(V166));
-	V178= structure_ref((V164),VV[39],1);
-	if(((V178))==Cnil){
-	goto T580;}
-	if((cdr((V178)))!=Cnil){
-	goto T580;}
-	base[4]= (V177);
-	base[5]= car((V178));
+	if((CMPcdr((V174)))!=Cnil){
+	goto T572;}
+	base[4]= (V173);
+	base[5]= CMPcar((V174));
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V176);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V172);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T580;
-T580:;
-	base[4]= (V176);
-	base[5]= (V177);
-	{object V179;
-	V179= (V178);
+	goto T572;
+T572:;
+	base[4]= (V172);
+	base[5]= (V173);
+	{object V175;
+	V175= (V174);
 	 vs_top=base+6;
-	 while(!endp(V179))
-	 {vs_push(car(V179));V179=cdr(V179);}
+	 while(V175!=Cnil)
+	 {vs_push((V175)->c.c_car);V175=(V175)->c.c_cdr;}
 	vs_base=base+5;}
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;}
-	goto T572;
-T572:;
-	base[4]= (V175);
+	goto T564;
+T564:;
+	base[4]= (V171);
 	vs_top=(vs_base=base+4)+1;
 	Lfunctionp();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T590;}
-	base[4]= (V165);
-	base[5]= (V166);
+	goto T582;}
+	base[4]= (V162);
+	base[5]= (V163);
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V164);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V161);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T590;
-T590:;
+	goto T582;
+T582:;
 	base[4]= VV[40];
 	base[5]= VV[18];
 	base[6]= VV[41];
 	base[7]= VV[42];
-	base[8]= V164;
+	base[8]= V161;
 	base[9]= VV[43];
 	base[10]= VV[121];
 	base[11]= VV[45];
@@ -2172,19 +2132,19 @@ T590:;
 	vs_top=(vs_base=base+4)+9;
 	(void) (*Lnk13)();
 	return;}
-	goto T538;
-T538:;
+	goto T532;
+T532:;
 	base[4]= VV[47];
 	vs_top=(vs_base=base+4)+1;
-	(void) (*Lnk273)();
+	(void) (*Lnk272)();
 	return;
-	goto T535;
-T535:;
-	base[4]= V166;
+	goto T529;
+T529:;
+	base[4]= V163;
 	base[5]= VV[123];
-	base[7]= V165;
+	base[7]= V162;
 	vs_top=(vs_base=base+7)+1;
-	(void) (*Lnk295)(Lclptr295);
+	(void) (*Lnk294)(Lclptr294);
 	vs_top=sup;
 	base[6]= vs_base[0];
 	vs_top=(vs_base=base+4)+3;
@@ -2192,7 +2152,7 @@ T535:;
 	return;
 	}
 }
-/*	local entry for function progn 'compile4494	*/
+/*	local entry for function progn 'compile4496	*/
 
 static object LI94()
 
@@ -2204,49 +2164,48 @@ TTL:;
 	base[2]= Cnil;
 	base[3]= VV[124];
 	base[4]= VV[125];
-	V182= symbol_function(VV[296]);
-	base[5]= listA(3,VV[51],V182,VV[126]);
+	V178= (VV[295]->s.s_gfdef);
+	base[5]= listA(3,VV[51],V178,VV[126]);
 	base[6]= Cnil;
 	vs_top=(vs_base=base+0)+7;
-	(void) (*Lnk276)();
+	(void) (*Lnk275)();
 	vs_top=sup;
-	{object V183 = Cnil;
-	VMR94(V183)}
+	{object V179 = Cnil;
+	VMR94(V179)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile4502	*/
+/*	local entry for function progn 'compile4504	*/
 
 static object LI95()
 
 {	 VMB95 VMS95 VMV95
 	goto TTL;
 TTL:;
-	{object V184 = Cnil;
-	VMR95(V184)}
+	{object V180 = Cnil;
+	VMR95(V180)}
 	return Cnil;
 }
-/*	function definition for Defclass FILE-ERROR4522	*/
+/*	function definition for Defclass FILE-ERROR4524	*/
 
 static void L96()
 {register object *base=vs_base;
 	register object *sup=base+VM96; VC96
-	vs_reserve(VM96);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
 	base[0]= VV[127];
 	base[1]= VV[5];
 	base[2]= VV[128];
-	V185= listA(9,VV[18],VV[129],VV[20],VV[130],VV[22],Cnil,VV[23],VV[131],Cnil);
-	base[3]= make_cons(/* INLINE-ARGS */V185,Cnil);
+	V181= listA(9,VV[18],VV[129],VV[20],VV[130],VV[22],Cnil,VV[23],VV[131],Cnil);
+	base[3]= make_cons(/* INLINE-ARGS */V181,Cnil);
 	base[4]= Cnil;
 	base[5]= Cnil;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile4539	*/
+/*	local entry for function progn 'compile4541	*/
 
 static object LI97()
 
@@ -2254,14 +2213,14 @@ static object LI97()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk297)();
+	(void) (*Lnk296)();
 	vs_top=sup;
-	{object V186 = Cnil;
-	VMR97(V186)}
+	{object V182 = Cnil;
+	VMR97(V182)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile4556	*/
+/*	local entry for function progn 'compile4558	*/
 
 static object LI98()
 
@@ -2269,17 +2228,17 @@ static object LI98()
 	goto TTL;
 TTL:;
 	base[0]= VV[132];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V188 = Cnil;
-	VMR98(V188)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V184 = Cnil;
+	VMR98(V184)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile4580	*/
+/*	local entry for function progn 'compile4582	*/
 
 static object LI99()
 
@@ -2287,42 +2246,41 @@ static object LI99()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[127],VV[9],Cnil));
-	{object V189 = Cnil;
-	VMR99(V189)}
+	{object V185 = Cnil;
+	VMR99(V185)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile4592	*/
+/*	local entry for function progn 'compile4594	*/
 
 static object LI100()
 
 {	 VMB100 VMS100 VMV100
 	goto TTL;
 TTL:;
-	{object V190 = Cnil;
-	VMR100(V190)}
+	{object V186 = Cnil;
+	VMR100(V186)}
 	return Cnil;
 }
-/*	function definition for Defclass PACKAGE-ERROR4612	*/
+/*	function definition for Defclass PACKAGE-ERROR4614	*/
 
 static void L101()
 {register object *base=vs_base;
 	register object *sup=base+VM101; VC101
-	vs_reserve(VM101);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
 	base[0]= VV[133];
 	base[1]= VV[5];
 	base[2]= VV[134];
-	V191= listA(9,VV[18],VV[135],VV[20],VV[136],VV[22],Cnil,VV[23],VV[137],Cnil);
-	base[3]= list(2,/* INLINE-ARGS */V191,listA(9,VV[18],VV[138],VV[20],VV[139],VV[22],Cnil,VV[23],VV[140],Cnil));
+	V187= listA(9,VV[18],VV[135],VV[20],VV[136],VV[22],Cnil,VV[23],VV[137],Cnil);
+	base[3]= list(2,/* INLINE-ARGS */V187,listA(9,VV[18],VV[138],VV[20],VV[139],VV[22],Cnil,VV[23],VV[140],Cnil));
 	base[4]= Cnil;
 	base[5]= Cnil;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile4630	*/
+/*	local entry for function progn 'compile4632	*/
 
 static object LI102()
 
@@ -2330,14 +2288,14 @@ static object LI102()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk298)();
+	(void) (*Lnk297)();
 	vs_top=sup;
-	{object V192 = Cnil;
-	VMR102(V192)}
+	{object V188 = Cnil;
+	VMR102(V188)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile4647	*/
+/*	local entry for function progn 'compile4649	*/
 
 static object LI103()
 
@@ -2345,17 +2303,17 @@ static object LI103()
 	goto TTL;
 TTL:;
 	base[0]= VV[141];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V194 = Cnil;
-	VMR103(V194)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V190 = Cnil;
+	VMR103(V190)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile4671	*/
+/*	local entry for function progn 'compile4673	*/
 
 static object LI104()
 
@@ -2363,11 +2321,11 @@ static object LI104()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[133],VV[9],Cnil));
-	{object V195 = Cnil;
-	VMR104(V195)}
+	{object V191 = Cnil;
+	VMR104(V191)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile4687	*/
+/*	local entry for function progn 'compile4689	*/
 
 static object LI105()
 
@@ -2379,8 +2337,8 @@ TTL:;
 	vs_top=(vs_base=base+0)+2;
 	(void) (*Lnk269)();
 	vs_top=sup;
-	{object V196 = Cnil;
-	VMR105(V196)}
+	{object V192 = Cnil;
+	VMR105(V192)}
 	base[0]=base[0];
 	return Cnil;
 }
@@ -2389,155 +2347,149 @@ TTL:;
 static void L106()
 {register object *base=vs_base;
 	register object *sup=base+VM106; VC106
-	vs_reserve(VM106);
-	{object V197;
-	register object V198;
-	register object V199;
-	register object V200;
-	check_arg(4);
-	V197=(base[0]);
-	V198=(base[1]);
-	V199=(base[2]);
-	V200=(base[3]);
+	vs_check;
+	{object V193;
+	register object V194;
+	register object V195;
+	register object V196;
+	V193=(base[0]);
+	V194=(base[1]);
+	V195=(base[2]);
+	V196=(base[3]);
 	vs_top=sup;
 	goto TTL;
 TTL:;
-	if((symbol_value(VV[34]))==Cnil){
-	goto T651;}
-	if(((V198))==Cnil){
-	goto T654;}
-	base[4]= (V198);
+	if(((VV[34]->s.s_dbind))==Cnil){
+	goto T643;}
+	if(((V194))==Cnil){
+	goto T646;}
+	base[4]= (V194);
 	base[5]= VV[35];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T658;}
-	base[4]= structure_ref((V198),VV[35],0);
-	base[5]= structure_ref((V198),VV[35],1);
-	base[6]= structure_ref((V198),VV[35],2);
-	base[7]= (V199);
-	base[8]= (V200);
+	goto T650;}
+	base[4]= STREF(object,(V194),0);
+	base[5]= STREF(object,(V194),4);
+	base[6]= STREF(object,(V194),8);
+	base[7]= (V195);
+	base[8]= (V196);
 	vs_top=(vs_base=base+5)+4;
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T658;
-T658:;
-	if(!(type_of((V198))==t_fixnum)){
-	goto T668;}
-	{object V203;
-	if(type_of(V199)==t_structure){
-	goto T674;}
-	goto T672;
-	goto T674;
-T674:;
-	base[4]= V199;
-	vs_top=(vs_base=base+4)+1;
+	goto T650;
+T650:;
+	if(!(type_of((V194))==t_fixnum)){
+	goto T660;}
+	{object V199;
+	if(type_of(V195)==t_structure){
+	goto T666;}
+	goto T664;
+	goto T666;
+T666:;
+	if(!(((V195)->str.str_def)==(VV[143]))){
+	goto T664;}
+	V199= STREF(object,(V195),4);
+	goto T662;
+	goto T664;
+T664:;{object V201;
+	V201= (VV[38]->s.s_dbind);
+	base[4]= small_fixnum(14);
+	base[5]= (V195);
+	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk271)();
 	vs_top=sup;
-	V205= vs_base[0];
-	if(!((V205)==(VV[143]))){
-	goto T672;}
-	V203= structure_ref((V199),VV[37],1);
-	goto T670;
-	goto T672;
-T672:;{object V206;
-	V206= symbol_value(VV[38]);
-	base[4]= small_fixnum(14);
-	base[5]= (V199);
-	vs_top=(vs_base=base+4)+2;
-	(void) (*Lnk272)();
-	vs_top=sup;
-	V207= vs_base[0];
-	if(!((V206)==(car(V207)))){
-	goto T679;}}
-	V203= car(((V199))->cc.cc_turbo[12]);
-	goto T670;
-	goto T679;
-T679:;
-	V203= Cnil;
-	goto T670;
-T670:;
-	if(((V203))==Cnil){
-	goto T685;}
-	base[4]= aset1((V203),fix((V198)),V199);
+	V202= vs_base[0];
+	if(!((V201)==(CMPcar(V202)))){
+	goto T669;}}
+	V199= CMPcar(((V195))->cc.cc_turbo[12]);
+	goto T662;
+	goto T669;
+T669:;
+	V199= Cnil;
+	goto T662;
+T662:;
+	if(((V199))==Cnil){
+	goto T675;}
+	base[4]= ((V199))->v.v_self[fix((V194))]= (V195);
 	vs_top=(vs_base=base+4)+1;
 	return;
-	goto T685;
-T685:;
+	goto T675;
+T675:;
 	base[4]= Cnil;
 	vs_top=(vs_base=base+4)+1;
 	return;}
-	goto T668;
-T668:;
-	{register object V209;
-	V209= V198;
-	base[4]= (V209);
+	goto T660;
+T660:;
+	{register object V204;
+	V204= V194;
+	base[4]= (V204);
 	base[5]= VV[39];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T688;}
-	{object V210;
-	object V211;
-	register object V212;
-	V210= structure_ref((V198),VV[39],0);
-	V211= list(2,(V199),(V200));
-	V212= structure_ref((V198),VV[39],1);
-	if(((V212))==Cnil){
-	goto T696;}
-	if((cdr((V212)))!=Cnil){
-	goto T696;}
-	base[4]= (V211);
-	base[5]= car((V212));
+	goto T678;}
+	{object V205;
+	object V206;
+	register object V207;
+	V205= STREF(object,(V194),0);
+	V206= list(2,(V195),(V196));
+	V207= STREF(object,(V194),4);
+	if(((V207))==Cnil){
+	goto T686;}
+	if((CMPcdr((V207)))!=Cnil){
+	goto T686;}
+	base[4]= (V206);
+	base[5]= CMPcar((V207));
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V210);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V205);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T696;
-T696:;
-	base[4]= (V210);
-	base[5]= (V211);
-	{object V213;
-	V213= (V212);
+	goto T686;
+T686:;
+	base[4]= (V205);
+	base[5]= (V206);
+	{object V208;
+	V208= (V207);
 	 vs_top=base+6;
-	 while(!endp(V213))
-	 {vs_push(car(V213));V213=cdr(V213);}
+	 while(V208!=Cnil)
+	 {vs_push((V208)->c.c_car);V208=(V208)->c.c_cdr;}
 	vs_base=base+5;}
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;}
-	goto T688;
-T688:;
-	base[4]= (V209);
+	goto T678;
+T678:;
+	base[4]= (V204);
 	vs_top=(vs_base=base+4)+1;
 	Lfunctionp();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T706;}
-	base[4]= (V199);
-	base[5]= (V200);
+	goto T696;}
+	base[4]= (V195);
+	base[5]= (V196);
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V198);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V194);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T706;
-T706:;
+	goto T696;
+T696:;
 	base[4]= VV[40];
 	base[5]= VV[18];
 	base[6]= VV[41];
 	base[7]= VV[42];
-	base[8]= V198;
+	base[8]= V194;
 	base[9]= VV[43];
 	base[10]= VV[144];
 	base[11]= VV[45];
@@ -2545,24 +2497,24 @@ T706:;
 	vs_top=(vs_base=base+4)+9;
 	(void) (*Lnk13)();
 	return;}
-	goto T654;
-T654:;
+	goto T646;
+T646:;
 	base[4]= VV[47];
 	vs_top=(vs_base=base+4)+1;
-	(void) (*Lnk273)();
+	(void) (*Lnk272)();
 	return;
-	goto T651;
-T651:;
-	base[4]= V200;
+	goto T643;
+T643:;
+	base[4]= V196;
 	base[5]= VV[146];
-	base[7]= V199;
+	base[7]= V195;
 	vs_top=(vs_base=base+7)+1;
-	(void) (*Lnk299)(Lclptr299);
+	(void) (*Lnk298)(Lclptr298);
 	vs_top=sup;
 	base[6]= vs_base[0];
-	base[8]= V199;
+	base[8]= V195;
 	vs_top=(vs_base=base+8)+1;
-	(void) (*Lnk300)(Lclptr300);
+	(void) (*Lnk299)(Lclptr299);
 	vs_top=sup;
 	base[7]= vs_base[0];
 	vs_top=(vs_base=base+4)+4;
@@ -2570,7 +2522,7 @@ T651:;
 	return;
 	}
 }
-/*	local entry for function progn 'compile4884	*/
+/*	local entry for function progn 'compile4886	*/
 
 static object LI107()
 
@@ -2582,49 +2534,48 @@ TTL:;
 	base[2]= Cnil;
 	base[3]= VV[147];
 	base[4]= VV[148];
-	V216= symbol_function(VV[301]);
-	base[5]= listA(3,VV[51],V216,VV[149]);
+	V211= (VV[300]->s.s_gfdef);
+	base[5]= listA(3,VV[51],V211,VV[149]);
 	base[6]= Cnil;
 	vs_top=(vs_base=base+0)+7;
-	(void) (*Lnk276)();
+	(void) (*Lnk275)();
 	vs_top=sup;
-	{object V217 = Cnil;
-	VMR107(V217)}
+	{object V212 = Cnil;
+	VMR107(V212)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile4892	*/
+/*	local entry for function progn 'compile4894	*/
 
 static object LI108()
 
 {	 VMB108 VMS108 VMV108
 	goto TTL;
 TTL:;
-	{object V218 = Cnil;
-	VMR108(V218)}
+	{object V213 = Cnil;
+	VMR108(V213)}
 	return Cnil;
 }
-/*	function definition for Defclass CELL-ERROR4912	*/
+/*	function definition for Defclass CELL-ERROR4914	*/
 
 static void L109()
 {register object *base=vs_base;
 	register object *sup=base+VM109; VC109
-	vs_reserve(VM109);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
 	base[0]= VV[150];
 	base[1]= VV[5];
 	base[2]= VV[151];
-	V219= listA(9,VV[18],VV[89],VV[20],VV[152],VV[22],Cnil,VV[23],VV[153],Cnil);
-	base[3]= make_cons(/* INLINE-ARGS */V219,Cnil);
+	V214= listA(9,VV[18],VV[89],VV[20],VV[152],VV[22],Cnil,VV[23],VV[153],Cnil);
+	base[3]= make_cons(/* INLINE-ARGS */V214,Cnil);
 	base[4]= Cnil;
 	base[5]= Cnil;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile4929	*/
+/*	local entry for function progn 'compile4931	*/
 
 static object LI110()
 
@@ -2632,14 +2583,14 @@ static object LI110()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk302)();
+	(void) (*Lnk301)();
 	vs_top=sup;
-	{object V220 = Cnil;
-	VMR110(V220)}
+	{object V215 = Cnil;
+	VMR110(V215)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile4946	*/
+/*	local entry for function progn 'compile4948	*/
 
 static object LI111()
 
@@ -2647,17 +2598,17 @@ static object LI111()
 	goto TTL;
 TTL:;
 	base[0]= VV[154];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V222 = Cnil;
-	VMR111(V222)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V217 = Cnil;
+	VMR111(V217)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile4970	*/
+/*	local entry for function progn 'compile4972	*/
 
 static object LI112()
 
@@ -2665,28 +2616,27 @@ static object LI112()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[150],VV[9],Cnil));
-	{object V223 = Cnil;
-	VMR112(V223)}
+	{object V218 = Cnil;
+	VMR112(V218)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile4982	*/
+/*	local entry for function progn 'compile4984	*/
 
 static object LI113()
 
 {	 VMB113 VMS113 VMV113
 	goto TTL;
 TTL:;
-	{object V224 = Cnil;
-	VMR113(V224)}
+	{object V219 = Cnil;
+	VMR113(V219)}
 	return Cnil;
 }
-/*	function definition for Defclass UNBOUND-VARIABLE5002	*/
+/*	function definition for Defclass UNBOUND-VARIABLE5004	*/
 
 static void L114()
 {register object *base=vs_base;
 	register object *sup=base+VM114; VC114
-	vs_reserve(VM114);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -2699,7 +2649,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile5018	*/
+/*	local entry for function progn 'compile5020	*/
 
 static object LI115()
 
@@ -2707,14 +2657,14 @@ static object LI115()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk303)();
+	(void) (*Lnk302)();
 	vs_top=sup;
-	{object V225 = Cnil;
-	VMR115(V225)}
+	{object V220 = Cnil;
+	VMR115(V220)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile5035	*/
+/*	local entry for function progn 'compile5037	*/
 
 static object LI116()
 
@@ -2722,17 +2672,17 @@ static object LI116()
 	goto TTL;
 TTL:;
 	base[0]= VV[157];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V227 = Cnil;
-	VMR116(V227)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V222 = Cnil;
+	VMR116(V222)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile5059	*/
+/*	local entry for function progn 'compile5061	*/
 
 static object LI117()
 
@@ -2740,11 +2690,11 @@ static object LI117()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[155],VV[9],Cnil));
-	{object V228 = Cnil;
-	VMR117(V228)}
+	{object V223 = Cnil;
+	VMR117(V223)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile5075	*/
+/*	local entry for function progn 'compile5077	*/
 
 static object LI118()
 
@@ -2756,8 +2706,8 @@ TTL:;
 	vs_top=(vs_base=base+0)+2;
 	(void) (*Lnk269)();
 	vs_top=sup;
-	{object V229 = Cnil;
-	VMR118(V229)}
+	{object V224 = Cnil;
+	VMR118(V224)}
 	base[0]=base[0];
 	return Cnil;
 }
@@ -2766,155 +2716,149 @@ TTL:;
 static void L119()
 {register object *base=vs_base;
 	register object *sup=base+VM119; VC119
-	vs_reserve(VM119);
-	{object V230;
-	register object V231;
-	register object V232;
-	register object V233;
-	check_arg(4);
-	V230=(base[0]);
-	V231=(base[1]);
-	V232=(base[2]);
-	V233=(base[3]);
+	vs_check;
+	{object V225;
+	register object V226;
+	register object V227;
+	register object V228;
+	V225=(base[0]);
+	V226=(base[1]);
+	V227=(base[2]);
+	V228=(base[3]);
 	vs_top=sup;
 	goto TTL;
 TTL:;
-	if((symbol_value(VV[34]))==Cnil){
-	goto T769;}
-	if(((V231))==Cnil){
-	goto T772;}
-	base[4]= (V231);
+	if(((VV[34]->s.s_dbind))==Cnil){
+	goto T759;}
+	if(((V226))==Cnil){
+	goto T762;}
+	base[4]= (V226);
 	base[5]= VV[35];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T776;}
-	base[4]= structure_ref((V231),VV[35],0);
-	base[5]= structure_ref((V231),VV[35],1);
-	base[6]= structure_ref((V231),VV[35],2);
-	base[7]= (V232);
-	base[8]= (V233);
+	goto T766;}
+	base[4]= STREF(object,(V226),0);
+	base[5]= STREF(object,(V226),4);
+	base[6]= STREF(object,(V226),8);
+	base[7]= (V227);
+	base[8]= (V228);
 	vs_top=(vs_base=base+5)+4;
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T776;
-T776:;
-	if(!(type_of((V231))==t_fixnum)){
-	goto T786;}
-	{object V236;
-	if(type_of(V232)==t_structure){
-	goto T792;}
-	goto T790;
-	goto T792;
-T792:;
-	base[4]= V232;
-	vs_top=(vs_base=base+4)+1;
+	goto T766;
+T766:;
+	if(!(type_of((V226))==t_fixnum)){
+	goto T776;}
+	{object V231;
+	if(type_of(V227)==t_structure){
+	goto T782;}
+	goto T780;
+	goto T782;
+T782:;
+	if(!(((V227)->str.str_def)==(VV[159]))){
+	goto T780;}
+	V231= STREF(object,(V227),4);
+	goto T778;
+	goto T780;
+T780:;{object V233;
+	V233= (VV[38]->s.s_dbind);
+	base[4]= small_fixnum(14);
+	base[5]= (V227);
+	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk271)();
 	vs_top=sup;
-	V238= vs_base[0];
-	if(!((V238)==(VV[159]))){
-	goto T790;}
-	V236= structure_ref((V232),VV[37],1);
-	goto T788;
-	goto T790;
-T790:;{object V239;
-	V239= symbol_value(VV[38]);
-	base[4]= small_fixnum(14);
-	base[5]= (V232);
-	vs_top=(vs_base=base+4)+2;
-	(void) (*Lnk272)();
-	vs_top=sup;
-	V240= vs_base[0];
-	if(!((V239)==(car(V240)))){
-	goto T797;}}
-	V236= car(((V232))->cc.cc_turbo[12]);
-	goto T788;
-	goto T797;
-T797:;
-	V236= Cnil;
-	goto T788;
-T788:;
-	if(((V236))==Cnil){
-	goto T803;}
-	base[4]= aset1((V236),fix((V231)),V232);
+	V234= vs_base[0];
+	if(!((V233)==(CMPcar(V234)))){
+	goto T785;}}
+	V231= CMPcar(((V227))->cc.cc_turbo[12]);
+	goto T778;
+	goto T785;
+T785:;
+	V231= Cnil;
+	goto T778;
+T778:;
+	if(((V231))==Cnil){
+	goto T791;}
+	base[4]= ((V231))->v.v_self[fix((V226))]= (V227);
 	vs_top=(vs_base=base+4)+1;
 	return;
-	goto T803;
-T803:;
+	goto T791;
+T791:;
 	base[4]= Cnil;
 	vs_top=(vs_base=base+4)+1;
 	return;}
-	goto T786;
-T786:;
-	{register object V242;
-	V242= V231;
-	base[4]= (V242);
+	goto T776;
+T776:;
+	{register object V236;
+	V236= V226;
+	base[4]= (V236);
 	base[5]= VV[39];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T806;}
-	{object V243;
-	object V244;
-	register object V245;
-	V243= structure_ref((V231),VV[39],0);
-	V244= list(2,(V232),(V233));
-	V245= structure_ref((V231),VV[39],1);
-	if(((V245))==Cnil){
-	goto T814;}
-	if((cdr((V245)))!=Cnil){
-	goto T814;}
-	base[4]= (V244);
-	base[5]= car((V245));
+	goto T794;}
+	{object V237;
+	object V238;
+	register object V239;
+	V237= STREF(object,(V226),0);
+	V238= list(2,(V227),(V228));
+	V239= STREF(object,(V226),4);
+	if(((V239))==Cnil){
+	goto T802;}
+	if((CMPcdr((V239)))!=Cnil){
+	goto T802;}
+	base[4]= (V238);
+	base[5]= CMPcar((V239));
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V243);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V237);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T814;
-T814:;
-	base[4]= (V243);
-	base[5]= (V244);
-	{object V246;
-	V246= (V245);
+	goto T802;
+T802:;
+	base[4]= (V237);
+	base[5]= (V238);
+	{object V240;
+	V240= (V239);
 	 vs_top=base+6;
-	 while(!endp(V246))
-	 {vs_push(car(V246));V246=cdr(V246);}
+	 while(V240!=Cnil)
+	 {vs_push((V240)->c.c_car);V240=(V240)->c.c_cdr;}
 	vs_base=base+5;}
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;}
-	goto T806;
-T806:;
-	base[4]= (V242);
+	goto T794;
+T794:;
+	base[4]= (V236);
 	vs_top=(vs_base=base+4)+1;
 	Lfunctionp();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T824;}
-	base[4]= (V232);
-	base[5]= (V233);
+	goto T812;}
+	base[4]= (V227);
+	base[5]= (V228);
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V231);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V226);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T824;
-T824:;
+	goto T812;
+T812:;
 	base[4]= VV[40];
 	base[5]= VV[18];
 	base[6]= VV[41];
 	base[7]= VV[42];
-	base[8]= V231;
+	base[8]= V226;
 	base[9]= VV[43];
 	base[10]= VV[160];
 	base[11]= VV[45];
@@ -2922,19 +2866,19 @@ T824:;
 	vs_top=(vs_base=base+4)+9;
 	(void) (*Lnk13)();
 	return;}
-	goto T772;
-T772:;
+	goto T762;
+T762:;
 	base[4]= VV[47];
 	vs_top=(vs_base=base+4)+1;
-	(void) (*Lnk273)();
+	(void) (*Lnk272)();
 	return;
-	goto T769;
-T769:;
-	base[4]= V233;
+	goto T759;
+T759:;
+	base[4]= V228;
 	base[5]= VV[162];
-	base[7]= V232;
+	base[7]= V227;
 	vs_top=(vs_base=base+7)+1;
-	(void) (*Lnk304)(Lclptr304);
+	(void) (*Lnk303)(Lclptr303);
 	vs_top=sup;
 	base[6]= vs_base[0];
 	vs_top=(vs_base=base+4)+3;
@@ -2942,7 +2886,7 @@ T769:;
 	return;
 	}
 }
-/*	local entry for function progn 'compile5272	*/
+/*	local entry for function progn 'compile5274	*/
 
 static object LI120()
 
@@ -2954,35 +2898,34 @@ TTL:;
 	base[2]= Cnil;
 	base[3]= VV[163];
 	base[4]= VV[164];
-	V249= symbol_function(VV[305]);
-	base[5]= listA(3,VV[51],V249,VV[165]);
+	V243= (VV[304]->s.s_gfdef);
+	base[5]= listA(3,VV[51],V243,VV[165]);
 	base[6]= Cnil;
 	vs_top=(vs_base=base+0)+7;
-	(void) (*Lnk276)();
+	(void) (*Lnk275)();
 	vs_top=sup;
-	{object V250 = Cnil;
-	VMR120(V250)}
+	{object V244 = Cnil;
+	VMR120(V244)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile5280	*/
+/*	local entry for function progn 'compile5282	*/
 
 static object LI121()
 
 {	 VMB121 VMS121 VMV121
 	goto TTL;
 TTL:;
-	{object V251 = Cnil;
-	VMR121(V251)}
+	{object V245 = Cnil;
+	VMR121(V245)}
 	return Cnil;
 }
-/*	function definition for Defclass UNDEFINED-FUNCTION5300	*/
+/*	function definition for Defclass UNDEFINED-FUNCTION5302	*/
 
 static void L122()
 {register object *base=vs_base;
 	register object *sup=base+VM122; VC122
-	vs_reserve(VM122);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -2995,7 +2938,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile5316	*/
+/*	local entry for function progn 'compile5318	*/
 
 static object LI123()
 
@@ -3003,14 +2946,14 @@ static object LI123()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk306)();
+	(void) (*Lnk305)();
 	vs_top=sup;
-	{object V252 = Cnil;
-	VMR123(V252)}
+	{object V246 = Cnil;
+	VMR123(V246)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile5333	*/
+/*	local entry for function progn 'compile5335	*/
 
 static object LI124()
 
@@ -3018,17 +2961,17 @@ static object LI124()
 	goto TTL;
 TTL:;
 	base[0]= VV[168];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V254 = Cnil;
-	VMR124(V254)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V248 = Cnil;
+	VMR124(V248)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile5357	*/
+/*	local entry for function progn 'compile5359	*/
 
 static object LI125()
 
@@ -3036,11 +2979,11 @@ static object LI125()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[166],VV[9],Cnil));
-	{object V255 = Cnil;
-	VMR125(V255)}
+	{object V249 = Cnil;
+	VMR125(V249)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile5373	*/
+/*	local entry for function progn 'compile5375	*/
 
 static object LI126()
 
@@ -3052,8 +2995,8 @@ TTL:;
 	vs_top=(vs_base=base+0)+2;
 	(void) (*Lnk269)();
 	vs_top=sup;
-	{object V256 = Cnil;
-	VMR126(V256)}
+	{object V250 = Cnil;
+	VMR126(V250)}
 	base[0]=base[0];
 	return Cnil;
 }
@@ -3062,155 +3005,149 @@ TTL:;
 static void L127()
 {register object *base=vs_base;
 	register object *sup=base+VM127; VC127
-	vs_reserve(VM127);
-	{object V257;
-	register object V258;
-	register object V259;
-	register object V260;
-	check_arg(4);
-	V257=(base[0]);
-	V258=(base[1]);
-	V259=(base[2]);
-	V260=(base[3]);
+	vs_check;
+	{object V251;
+	register object V252;
+	register object V253;
+	register object V254;
+	V251=(base[0]);
+	V252=(base[1]);
+	V253=(base[2]);
+	V254=(base[3]);
 	vs_top=sup;
 	goto TTL;
 TTL:;
-	if((symbol_value(VV[34]))==Cnil){
-	goto T872;}
-	if(((V258))==Cnil){
-	goto T875;}
-	base[4]= (V258);
+	if(((VV[34]->s.s_dbind))==Cnil){
+	goto T860;}
+	if(((V252))==Cnil){
+	goto T863;}
+	base[4]= (V252);
 	base[5]= VV[35];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T879;}
-	base[4]= structure_ref((V258),VV[35],0);
-	base[5]= structure_ref((V258),VV[35],1);
-	base[6]= structure_ref((V258),VV[35],2);
-	base[7]= (V259);
-	base[8]= (V260);
+	goto T867;}
+	base[4]= STREF(object,(V252),0);
+	base[5]= STREF(object,(V252),4);
+	base[6]= STREF(object,(V252),8);
+	base[7]= (V253);
+	base[8]= (V254);
 	vs_top=(vs_base=base+5)+4;
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
+	goto T867;
+T867:;
+	if(!(type_of((V252))==t_fixnum)){
+	goto T877;}
+	{object V257;
+	if(type_of(V253)==t_structure){
+	goto T883;}
+	goto T881;
+	goto T883;
+T883:;
+	if(!(((V253)->str.str_def)==(VV[170]))){
+	goto T881;}
+	V257= STREF(object,(V253),4);
 	goto T879;
-T879:;
-	if(!(type_of((V258))==t_fixnum)){
-	goto T889;}
-	{object V263;
-	if(type_of(V259)==t_structure){
-	goto T895;}
-	goto T893;
-	goto T895;
-T895:;
-	base[4]= V259;
-	vs_top=(vs_base=base+4)+1;
+	goto T881;
+T881:;{object V259;
+	V259= (VV[38]->s.s_dbind);
+	base[4]= small_fixnum(14);
+	base[5]= (V253);
+	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk271)();
 	vs_top=sup;
-	V265= vs_base[0];
-	if(!((V265)==(VV[170]))){
-	goto T893;}
-	V263= structure_ref((V259),VV[37],1);
-	goto T891;
-	goto T893;
-T893:;{object V266;
-	V266= symbol_value(VV[38]);
-	base[4]= small_fixnum(14);
-	base[5]= (V259);
-	vs_top=(vs_base=base+4)+2;
-	(void) (*Lnk272)();
-	vs_top=sup;
-	V267= vs_base[0];
-	if(!((V266)==(car(V267)))){
-	goto T900;}}
-	V263= car(((V259))->cc.cc_turbo[12]);
-	goto T891;
-	goto T900;
-T900:;
-	V263= Cnil;
-	goto T891;
-T891:;
-	if(((V263))==Cnil){
-	goto T906;}
-	base[4]= aset1((V263),fix((V258)),V259);
+	V260= vs_base[0];
+	if(!((V259)==(CMPcar(V260)))){
+	goto T886;}}
+	V257= CMPcar(((V253))->cc.cc_turbo[12]);
+	goto T879;
+	goto T886;
+T886:;
+	V257= Cnil;
+	goto T879;
+T879:;
+	if(((V257))==Cnil){
+	goto T892;}
+	base[4]= ((V257))->v.v_self[fix((V252))]= (V253);
 	vs_top=(vs_base=base+4)+1;
 	return;
-	goto T906;
-T906:;
+	goto T892;
+T892:;
 	base[4]= Cnil;
 	vs_top=(vs_base=base+4)+1;
 	return;}
-	goto T889;
-T889:;
-	{register object V269;
-	V269= V258;
-	base[4]= (V269);
+	goto T877;
+T877:;
+	{register object V262;
+	V262= V252;
+	base[4]= (V262);
 	base[5]= VV[39];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T909;}
-	{object V270;
-	object V271;
-	register object V272;
-	V270= structure_ref((V258),VV[39],0);
-	V271= list(2,(V259),(V260));
-	V272= structure_ref((V258),VV[39],1);
-	if(((V272))==Cnil){
-	goto T917;}
-	if((cdr((V272)))!=Cnil){
-	goto T917;}
-	base[4]= (V271);
-	base[5]= car((V272));
+	goto T895;}
+	{object V263;
+	object V264;
+	register object V265;
+	V263= STREF(object,(V252),0);
+	V264= list(2,(V253),(V254));
+	V265= STREF(object,(V252),4);
+	if(((V265))==Cnil){
+	goto T903;}
+	if((CMPcdr((V265)))!=Cnil){
+	goto T903;}
+	base[4]= (V264);
+	base[5]= CMPcar((V265));
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V270);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V263);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T917;
-T917:;
-	base[4]= (V270);
-	base[5]= (V271);
-	{object V273;
-	V273= (V272);
+	goto T903;
+T903:;
+	base[4]= (V263);
+	base[5]= (V264);
+	{object V266;
+	V266= (V265);
 	 vs_top=base+6;
-	 while(!endp(V273))
-	 {vs_push(car(V273));V273=cdr(V273);}
+	 while(V266!=Cnil)
+	 {vs_push((V266)->c.c_car);V266=(V266)->c.c_cdr;}
 	vs_base=base+5;}
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;}
-	goto T909;
-T909:;
-	base[4]= (V269);
+	goto T895;
+T895:;
+	base[4]= (V262);
 	vs_top=(vs_base=base+4)+1;
 	Lfunctionp();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T927;}
-	base[4]= (V259);
-	base[5]= (V260);
+	goto T913;}
+	base[4]= (V253);
+	base[5]= (V254);
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V258);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V252);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T927;
-T927:;
+	goto T913;
+T913:;
 	base[4]= VV[40];
 	base[5]= VV[18];
 	base[6]= VV[41];
 	base[7]= VV[42];
-	base[8]= V258;
+	base[8]= V252;
 	base[9]= VV[43];
 	base[10]= VV[171];
 	base[11]= VV[45];
@@ -3218,19 +3155,19 @@ T927:;
 	vs_top=(vs_base=base+4)+9;
 	(void) (*Lnk13)();
 	return;}
-	goto T875;
-T875:;
+	goto T863;
+T863:;
 	base[4]= VV[47];
 	vs_top=(vs_base=base+4)+1;
-	(void) (*Lnk273)();
+	(void) (*Lnk272)();
 	return;
-	goto T872;
-T872:;
-	base[4]= V260;
+	goto T860;
+T860:;
+	base[4]= V254;
 	base[5]= VV[173];
-	base[7]= V259;
+	base[7]= V253;
 	vs_top=(vs_base=base+7)+1;
-	(void) (*Lnk304)(Lclptr304);
+	(void) (*Lnk303)(Lclptr303);
 	vs_top=sup;
 	base[6]= vs_base[0];
 	vs_top=(vs_base=base+4)+3;
@@ -3238,7 +3175,7 @@ T872:;
 	return;
 	}
 }
-/*	local entry for function progn 'compile5570	*/
+/*	local entry for function progn 'compile5572	*/
 
 static object LI128()
 
@@ -3250,49 +3187,48 @@ TTL:;
 	base[2]= Cnil;
 	base[3]= VV[174];
 	base[4]= VV[175];
-	V276= symbol_function(VV[307]);
-	base[5]= listA(3,VV[51],V276,VV[176]);
+	V269= (VV[306]->s.s_gfdef);
+	base[5]= listA(3,VV[51],V269,VV[176]);
 	base[6]= Cnil;
 	vs_top=(vs_base=base+0)+7;
-	(void) (*Lnk276)();
+	(void) (*Lnk275)();
 	vs_top=sup;
-	{object V277 = Cnil;
-	VMR128(V277)}
+	{object V270 = Cnil;
+	VMR128(V270)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile5578	*/
+/*	local entry for function progn 'compile5580	*/
 
 static object LI129()
 
 {	 VMB129 VMS129 VMV129
 	goto TTL;
 TTL:;
-	{object V278 = Cnil;
-	VMR129(V278)}
+	{object V271 = Cnil;
+	VMR129(V271)}
 	return Cnil;
 }
-/*	function definition for Defclass ARITHMETIC-ERROR5598	*/
+/*	function definition for Defclass ARITHMETIC-ERROR5600	*/
 
 static void L130()
 {register object *base=vs_base;
 	register object *sup=base+VM130; VC130
-	vs_reserve(VM130);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
 	base[0]= VV[177];
 	base[1]= VV[5];
 	base[2]= VV[178];
-	V279= listA(9,VV[18],VV[179],VV[20],VV[180],VV[22],Cnil,VV[23],VV[181],Cnil);
-	base[3]= make_cons(/* INLINE-ARGS */V279,Cnil);
+	V272= listA(9,VV[18],VV[179],VV[20],VV[180],VV[22],Cnil,VV[23],VV[181],Cnil);
+	base[3]= make_cons(/* INLINE-ARGS */V272,Cnil);
 	base[4]= Cnil;
 	base[5]= Cnil;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile5615	*/
+/*	local entry for function progn 'compile5617	*/
 
 static object LI131()
 
@@ -3300,14 +3236,14 @@ static object LI131()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk308)();
+	(void) (*Lnk307)();
 	vs_top=sup;
-	{object V280 = Cnil;
-	VMR131(V280)}
+	{object V273 = Cnil;
+	VMR131(V273)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile5632	*/
+/*	local entry for function progn 'compile5634	*/
 
 static object LI132()
 
@@ -3315,17 +3251,17 @@ static object LI132()
 	goto TTL;
 TTL:;
 	base[0]= VV[182];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V282 = Cnil;
-	VMR132(V282)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V275 = Cnil;
+	VMR132(V275)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile5656	*/
+/*	local entry for function progn 'compile5658	*/
 
 static object LI133()
 
@@ -3333,28 +3269,27 @@ static object LI133()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[177],VV[9],Cnil));
-	{object V283 = Cnil;
-	VMR133(V283)}
+	{object V276 = Cnil;
+	VMR133(V276)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile5668	*/
+/*	local entry for function progn 'compile5670	*/
 
 static object LI134()
 
 {	 VMB134 VMS134 VMV134
 	goto TTL;
 TTL:;
-	{object V284 = Cnil;
-	VMR134(V284)}
+	{object V277 = Cnil;
+	VMR134(V277)}
 	return Cnil;
 }
-/*	function definition for Defclass DIVISION-BY-ZERO5688	*/
+/*	function definition for Defclass DIVISION-BY-ZERO5690	*/
 
 static void L135()
 {register object *base=vs_base;
 	register object *sup=base+VM135; VC135
-	vs_reserve(VM135);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -3367,7 +3302,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile5704	*/
+/*	local entry for function progn 'compile5706	*/
 
 static object LI136()
 
@@ -3375,14 +3310,14 @@ static object LI136()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk309)();
+	(void) (*Lnk308)();
 	vs_top=sup;
-	{object V285 = Cnil;
-	VMR136(V285)}
+	{object V278 = Cnil;
+	VMR136(V278)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile5721	*/
+/*	local entry for function progn 'compile5723	*/
 
 static object LI137()
 
@@ -3390,17 +3325,17 @@ static object LI137()
 	goto TTL;
 TTL:;
 	base[0]= VV[185];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V287 = Cnil;
-	VMR137(V287)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V280 = Cnil;
+	VMR137(V280)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile5745	*/
+/*	local entry for function progn 'compile5747	*/
 
 static object LI138()
 
@@ -3408,28 +3343,27 @@ static object LI138()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[183],VV[9],Cnil));
-	{object V288 = Cnil;
-	VMR138(V288)}
+	{object V281 = Cnil;
+	VMR138(V281)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile5757	*/
+/*	local entry for function progn 'compile5759	*/
 
 static object LI139()
 
 {	 VMB139 VMS139 VMV139
 	goto TTL;
 TTL:;
-	{object V289 = Cnil;
-	VMR139(V289)}
+	{object V282 = Cnil;
+	VMR139(V282)}
 	return Cnil;
 }
-/*	function definition for Defclass FLOATING-POINT-OVERFLOW5777	*/
+/*	function definition for Defclass FLOATING-POINT-OVERFLOW5779	*/
 
 static void L140()
 {register object *base=vs_base;
 	register object *sup=base+VM140; VC140
-	vs_reserve(VM140);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -3442,7 +3376,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile5793	*/
+/*	local entry for function progn 'compile5795	*/
 
 static object LI141()
 
@@ -3450,14 +3384,14 @@ static object LI141()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk310)();
+	(void) (*Lnk309)();
 	vs_top=sup;
-	{object V290 = Cnil;
-	VMR141(V290)}
+	{object V283 = Cnil;
+	VMR141(V283)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile5810	*/
+/*	local entry for function progn 'compile5812	*/
 
 static object LI142()
 
@@ -3465,17 +3399,17 @@ static object LI142()
 	goto TTL;
 TTL:;
 	base[0]= VV[188];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V292 = Cnil;
-	VMR142(V292)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V285 = Cnil;
+	VMR142(V285)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile5834	*/
+/*	local entry for function progn 'compile5836	*/
 
 static object LI143()
 
@@ -3483,28 +3417,27 @@ static object LI143()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[186],VV[9],Cnil));
-	{object V293 = Cnil;
-	VMR143(V293)}
+	{object V286 = Cnil;
+	VMR143(V286)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile5846	*/
+/*	local entry for function progn 'compile5848	*/
 
 static object LI144()
 
 {	 VMB144 VMS144 VMV144
 	goto TTL;
 TTL:;
-	{object V294 = Cnil;
-	VMR144(V294)}
+	{object V287 = Cnil;
+	VMR144(V287)}
 	return Cnil;
 }
-/*	function definition for Defclass FLOATING-POINT-UNDERFLOW5866	*/
+/*	function definition for Defclass FLOATING-POINT-UNDERFLOW5868	*/
 
 static void L145()
 {register object *base=vs_base;
 	register object *sup=base+VM145; VC145
-	vs_reserve(VM145);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -3517,7 +3450,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile5882	*/
+/*	local entry for function progn 'compile5884	*/
 
 static object LI146()
 
@@ -3525,14 +3458,14 @@ static object LI146()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk311)();
+	(void) (*Lnk310)();
 	vs_top=sup;
-	{object V295 = Cnil;
-	VMR146(V295)}
+	{object V288 = Cnil;
+	VMR146(V288)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile5899	*/
+/*	local entry for function progn 'compile5901	*/
 
 static object LI147()
 
@@ -3540,17 +3473,17 @@ static object LI147()
 	goto TTL;
 TTL:;
 	base[0]= VV[191];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V297 = Cnil;
-	VMR147(V297)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V290 = Cnil;
+	VMR147(V290)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile5923	*/
+/*	local entry for function progn 'compile5925	*/
 
 static object LI148()
 
@@ -3558,28 +3491,27 @@ static object LI148()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[189],VV[9],Cnil));
-	{object V298 = Cnil;
-	VMR148(V298)}
+	{object V291 = Cnil;
+	VMR148(V291)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile5935	*/
+/*	local entry for function progn 'compile5937	*/
 
 static object LI149()
 
 {	 VMB149 VMS149 VMV149
 	goto TTL;
 TTL:;
-	{object V299 = Cnil;
-	VMR149(V299)}
+	{object V292 = Cnil;
+	VMR149(V292)}
 	return Cnil;
 }
-/*	function definition for Defclass ABORT-FAILURE5955	*/
+/*	function definition for Defclass ABORT-FAILURE5957	*/
 
 static void L150()
 {register object *base=vs_base;
 	register object *sup=base+VM150; VC150
-	vs_reserve(VM150);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -3592,7 +3524,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile5971	*/
+/*	local entry for function progn 'compile5973	*/
 
 static object LI151()
 
@@ -3600,14 +3532,14 @@ static object LI151()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk312)();
+	(void) (*Lnk311)();
 	vs_top=sup;
-	{object V300 = Cnil;
-	VMR151(V300)}
+	{object V293 = Cnil;
+	VMR151(V293)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile5988	*/
+/*	local entry for function progn 'compile5990	*/
 
 static object LI152()
 
@@ -3615,17 +3547,17 @@ static object LI152()
 	goto TTL;
 TTL:;
 	base[0]= VV[194];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V302 = Cnil;
-	VMR152(V302)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V295 = Cnil;
+	VMR152(V295)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile6012	*/
+/*	local entry for function progn 'compile6014	*/
 
 static object LI153()
 
@@ -3633,11 +3565,11 @@ static object LI153()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[192],VV[9],Cnil));
-	{object V303 = Cnil;
-	VMR153(V303)}
+	{object V296 = Cnil;
+	VMR153(V296)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile6028	*/
+/*	local entry for function progn 'compile6030	*/
 
 static object LI154()
 
@@ -3649,8 +3581,8 @@ TTL:;
 	vs_top=(vs_base=base+0)+2;
 	(void) (*Lnk269)();
 	vs_top=sup;
-	{object V304 = Cnil;
-	VMR154(V304)}
+	{object V297 = Cnil;
+	VMR154(V297)}
 	base[0]=base[0];
 	return Cnil;
 }
@@ -3659,155 +3591,149 @@ TTL:;
 static void L155()
 {register object *base=vs_base;
 	register object *sup=base+VM155; VC155
-	vs_reserve(VM155);
-	{object V305;
-	register object V306;
-	register object V307;
-	register object V308;
-	check_arg(4);
-	V305=(base[0]);
-	V306=(base[1]);
-	V307=(base[2]);
-	V308=(base[3]);
+	vs_check;
+	{object V298;
+	register object V299;
+	register object V300;
+	register object V301;
+	V298=(base[0]);
+	V299=(base[1]);
+	V300=(base[2]);
+	V301=(base[3]);
 	vs_top=sup;
 	goto TTL;
 TTL:;
-	if((symbol_value(VV[34]))==Cnil){
-	goto T1027;}
-	if(((V306))==Cnil){
-	goto T1030;}
-	base[4]= (V306);
+	if(((VV[34]->s.s_dbind))==Cnil){
+	goto T1013;}
+	if(((V299))==Cnil){
+	goto T1016;}
+	base[4]= (V299);
 	base[5]= VV[35];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T1034;}
-	base[4]= structure_ref((V306),VV[35],0);
-	base[5]= structure_ref((V306),VV[35],1);
-	base[6]= structure_ref((V306),VV[35],2);
-	base[7]= (V307);
-	base[8]= (V308);
+	goto T1020;}
+	base[4]= STREF(object,(V299),0);
+	base[5]= STREF(object,(V299),4);
+	base[6]= STREF(object,(V299),8);
+	base[7]= (V300);
+	base[8]= (V301);
 	vs_top=(vs_base=base+5)+4;
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
+	goto T1020;
+T1020:;
+	if(!(type_of((V299))==t_fixnum)){
+	goto T1030;}
+	{object V304;
+	if(type_of(V300)==t_structure){
+	goto T1036;}
 	goto T1034;
-T1034:;
-	if(!(type_of((V306))==t_fixnum)){
-	goto T1044;}
-	{object V311;
-	if(type_of(V307)==t_structure){
-	goto T1050;}
-	goto T1048;
-	goto T1050;
-T1050:;
-	base[4]= V307;
-	vs_top=(vs_base=base+4)+1;
+	goto T1036;
+T1036:;
+	if(!(((V300)->str.str_def)==(VV[196]))){
+	goto T1034;}
+	V304= STREF(object,(V300),4);
+	goto T1032;
+	goto T1034;
+T1034:;{object V306;
+	V306= (VV[38]->s.s_dbind);
+	base[4]= small_fixnum(14);
+	base[5]= (V300);
+	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk271)();
 	vs_top=sup;
-	V313= vs_base[0];
-	if(!((V313)==(VV[196]))){
-	goto T1048;}
-	V311= structure_ref((V307),VV[37],1);
-	goto T1046;
-	goto T1048;
-T1048:;{object V314;
-	V314= symbol_value(VV[38]);
-	base[4]= small_fixnum(14);
-	base[5]= (V307);
-	vs_top=(vs_base=base+4)+2;
-	(void) (*Lnk272)();
-	vs_top=sup;
-	V315= vs_base[0];
-	if(!((V314)==(car(V315)))){
-	goto T1055;}}
-	V311= car(((V307))->cc.cc_turbo[12]);
-	goto T1046;
-	goto T1055;
-T1055:;
-	V311= Cnil;
-	goto T1046;
-T1046:;
-	if(((V311))==Cnil){
-	goto T1061;}
-	base[4]= aset1((V311),fix((V306)),V307);
+	V307= vs_base[0];
+	if(!((V306)==(CMPcar(V307)))){
+	goto T1039;}}
+	V304= CMPcar(((V300))->cc.cc_turbo[12]);
+	goto T1032;
+	goto T1039;
+T1039:;
+	V304= Cnil;
+	goto T1032;
+T1032:;
+	if(((V304))==Cnil){
+	goto T1045;}
+	base[4]= ((V304))->v.v_self[fix((V299))]= (V300);
 	vs_top=(vs_base=base+4)+1;
 	return;
-	goto T1061;
-T1061:;
+	goto T1045;
+T1045:;
 	base[4]= Cnil;
 	vs_top=(vs_base=base+4)+1;
 	return;}
-	goto T1044;
-T1044:;
-	{register object V317;
-	V317= V306;
-	base[4]= (V317);
+	goto T1030;
+T1030:;
+	{register object V309;
+	V309= V299;
+	base[4]= (V309);
 	base[5]= VV[39];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T1064;}
-	{object V318;
-	object V319;
-	register object V320;
-	V318= structure_ref((V306),VV[39],0);
-	V319= list(2,(V307),(V308));
-	V320= structure_ref((V306),VV[39],1);
-	if(((V320))==Cnil){
-	goto T1072;}
-	if((cdr((V320)))!=Cnil){
-	goto T1072;}
-	base[4]= (V319);
-	base[5]= car((V320));
+	goto T1048;}
+	{object V310;
+	object V311;
+	register object V312;
+	V310= STREF(object,(V299),0);
+	V311= list(2,(V300),(V301));
+	V312= STREF(object,(V299),4);
+	if(((V312))==Cnil){
+	goto T1056;}
+	if((CMPcdr((V312)))!=Cnil){
+	goto T1056;}
+	base[4]= (V311);
+	base[5]= CMPcar((V312));
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V318);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V310);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T1072;
-T1072:;
-	base[4]= (V318);
-	base[5]= (V319);
-	{object V321;
-	V321= (V320);
+	goto T1056;
+T1056:;
+	base[4]= (V310);
+	base[5]= (V311);
+	{object V313;
+	V313= (V312);
 	 vs_top=base+6;
-	 while(!endp(V321))
-	 {vs_push(car(V321));V321=cdr(V321);}
+	 while(V313!=Cnil)
+	 {vs_push((V313)->c.c_car);V313=(V313)->c.c_cdr;}
 	vs_base=base+5;}
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;}
-	goto T1064;
-T1064:;
-	base[4]= (V317);
+	goto T1048;
+T1048:;
+	base[4]= (V309);
 	vs_top=(vs_base=base+4)+1;
 	Lfunctionp();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T1082;}
-	base[4]= (V307);
-	base[5]= (V308);
+	goto T1066;}
+	base[4]= (V300);
+	base[5]= (V301);
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V306);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V299);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T1082;
-T1082:;
+	goto T1066;
+T1066:;
 	base[4]= VV[40];
 	base[5]= VV[18];
 	base[6]= VV[41];
 	base[7]= VV[42];
-	base[8]= V306;
+	base[8]= V299;
 	base[9]= VV[43];
 	base[10]= VV[197];
 	base[11]= VV[45];
@@ -3815,22 +3741,22 @@ T1082:;
 	vs_top=(vs_base=base+4)+9;
 	(void) (*Lnk13)();
 	return;}
-	goto T1030;
-T1030:;
+	goto T1016;
+T1016:;
 	base[4]= VV[47];
 	vs_top=(vs_base=base+4)+1;
-	(void) (*Lnk273)();
+	(void) (*Lnk272)();
 	return;
-	goto T1027;
-T1027:;
+	goto T1013;
+T1013:;
 	base[4]= VV[199];
-	base[5]= V308;
+	base[5]= V301;
 	vs_top=(vs_base=base+4)+2;
 	Lwrite_string();
 	return;
 	}
 }
-/*	local entry for function progn 'compile6229	*/
+/*	local entry for function progn 'compile6231	*/
 
 static object LI156()
 
@@ -3842,35 +3768,34 @@ TTL:;
 	base[2]= Cnil;
 	base[3]= VV[200];
 	base[4]= VV[201];
-	V324= symbol_function(VV[313]);
-	base[5]= listA(3,VV[51],V324,VV[202]);
+	V316= (VV[312]->s.s_gfdef);
+	base[5]= listA(3,VV[51],V316,VV[202]);
 	base[6]= Cnil;
 	vs_top=(vs_base=base+0)+7;
-	(void) (*Lnk276)();
+	(void) (*Lnk275)();
 	vs_top=sup;
-	{object V325 = Cnil;
-	VMR156(V325)}
+	{object V317 = Cnil;
+	VMR156(V317)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile6237	*/
+/*	local entry for function progn 'compile6239	*/
 
 static object LI157()
 
 {	 VMB157 VMS157 VMV157
 	goto TTL;
 TTL:;
-	{object V326 = Cnil;
-	VMR157(V326)}
+	{object V318 = Cnil;
+	VMR157(V318)}
 	return Cnil;
 }
-/*	function definition for Defclass INTERNAL-ERROR6257	*/
+/*	function definition for Defclass INTERNAL-ERROR6259	*/
 
 static void L158()
 {register object *base=vs_base;
 	register object *sup=base+VM158; VC158
-	vs_reserve(VM158);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -3878,7 +3803,7 @@ TTL:;
 	base[1]= VV[5];
 	base[2]= VV[204];
 	base[4]= VV[26];
-	base[5]= symbol_function(VV[267]);
+	base[5]= (VV[267]->s.s_gfdef);
 	base[6]= VV[18];
 	base[7]= VV[205];
 	base[8]= VV[20];
@@ -3891,14 +3816,14 @@ TTL:;
 	vs_top=(vs_base=base+4)+11;
 	LlistA();
 	vs_top=sup;
-	V327= vs_base[0];
-	base[3]= make_cons(V327,Cnil);
+	V319= vs_base[0];
+	base[3]= make_cons(V319,Cnil);
 	base[4]= Cnil;
 	base[5]= Cnil;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile6274	*/
+/*	local entry for function progn 'compile6276	*/
 
 static object LI159()
 
@@ -3906,14 +3831,14 @@ static object LI159()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk314)();
+	(void) (*Lnk313)();
 	vs_top=sup;
-	{object V328 = Cnil;
-	VMR159(V328)}
+	{object V320 = Cnil;
+	VMR159(V320)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile6291	*/
+/*	local entry for function progn 'compile6293	*/
 
 static object LI160()
 
@@ -3921,17 +3846,17 @@ static object LI160()
 	goto TTL;
 TTL:;
 	base[0]= VV[209];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V330 = Cnil;
-	VMR160(V330)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V322 = Cnil;
+	VMR160(V322)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile6315	*/
+/*	local entry for function progn 'compile6317	*/
 
 static object LI161()
 
@@ -3939,11 +3864,11 @@ static object LI161()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[203],VV[9],Cnil));
-	{object V331 = Cnil;
-	VMR161(V331)}
+	{object V323 = Cnil;
+	VMR161(V323)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile6331	*/
+/*	local entry for function progn 'compile6333	*/
 
 static object LI162()
 
@@ -3955,8 +3880,8 @@ TTL:;
 	vs_top=(vs_base=base+0)+2;
 	(void) (*Lnk269)();
 	vs_top=sup;
-	{object V332 = Cnil;
-	VMR162(V332)}
+	{object V324 = Cnil;
+	VMR162(V324)}
 	base[0]=base[0];
 	return Cnil;
 }
@@ -3965,155 +3890,149 @@ TTL:;
 static void L163()
 {register object *base=vs_base;
 	register object *sup=base+VM163; VC163
-	vs_reserve(VM163);
-	{object V333;
-	register object V334;
-	register object V335;
-	register object V336;
-	check_arg(4);
-	V333=(base[0]);
-	V334=(base[1]);
-	V335=(base[2]);
-	V336=(base[3]);
+	vs_check;
+	{object V325;
+	register object V326;
+	register object V327;
+	register object V328;
+	V325=(base[0]);
+	V326=(base[1]);
+	V327=(base[2]);
+	V328=(base[3]);
 	vs_top=sup;
 	goto TTL;
 TTL:;
-	if((symbol_value(VV[34]))==Cnil){
-	goto T1140;}
-	if(((V334))==Cnil){
-	goto T1143;}
-	base[4]= (V334);
+	if(((VV[34]->s.s_dbind))==Cnil){
+	goto T1124;}
+	if(((V326))==Cnil){
+	goto T1127;}
+	base[4]= (V326);
 	base[5]= VV[35];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T1147;}
-	base[4]= structure_ref((V334),VV[35],0);
-	base[5]= structure_ref((V334),VV[35],1);
-	base[6]= structure_ref((V334),VV[35],2);
-	base[7]= (V335);
-	base[8]= (V336);
+	goto T1131;}
+	base[4]= STREF(object,(V326),0);
+	base[5]= STREF(object,(V326),4);
+	base[6]= STREF(object,(V326),8);
+	base[7]= (V327);
+	base[8]= (V328);
 	vs_top=(vs_base=base+5)+4;
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
+	goto T1131;
+T1131:;
+	if(!(type_of((V326))==t_fixnum)){
+	goto T1141;}
+	{object V331;
+	if(type_of(V327)==t_structure){
+	goto T1147;}
+	goto T1145;
 	goto T1147;
 T1147:;
-	if(!(type_of((V334))==t_fixnum)){
-	goto T1157;}
-	{object V339;
-	if(type_of(V335)==t_structure){
-	goto T1163;}
-	goto T1161;
-	goto T1163;
-T1163:;
-	base[4]= V335;
-	vs_top=(vs_base=base+4)+1;
+	if(!(((V327)->str.str_def)==(VV[211]))){
+	goto T1145;}
+	V331= STREF(object,(V327),4);
+	goto T1143;
+	goto T1145;
+T1145:;{object V333;
+	V333= (VV[38]->s.s_dbind);
+	base[4]= small_fixnum(14);
+	base[5]= (V327);
+	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk271)();
 	vs_top=sup;
-	V341= vs_base[0];
-	if(!((V341)==(VV[211]))){
-	goto T1161;}
-	V339= structure_ref((V335),VV[37],1);
-	goto T1159;
-	goto T1161;
-T1161:;{object V342;
-	V342= symbol_value(VV[38]);
-	base[4]= small_fixnum(14);
-	base[5]= (V335);
-	vs_top=(vs_base=base+4)+2;
-	(void) (*Lnk272)();
-	vs_top=sup;
-	V343= vs_base[0];
-	if(!((V342)==(car(V343)))){
-	goto T1168;}}
-	V339= car(((V335))->cc.cc_turbo[12]);
-	goto T1159;
-	goto T1168;
-T1168:;
-	V339= Cnil;
-	goto T1159;
-T1159:;
-	if(((V339))==Cnil){
-	goto T1174;}
-	base[4]= aset1((V339),fix((V334)),V335);
+	V334= vs_base[0];
+	if(!((V333)==(CMPcar(V334)))){
+	goto T1150;}}
+	V331= CMPcar(((V327))->cc.cc_turbo[12]);
+	goto T1143;
+	goto T1150;
+T1150:;
+	V331= Cnil;
+	goto T1143;
+T1143:;
+	if(((V331))==Cnil){
+	goto T1156;}
+	base[4]= ((V331))->v.v_self[fix((V326))]= (V327);
 	vs_top=(vs_base=base+4)+1;
 	return;
-	goto T1174;
-T1174:;
+	goto T1156;
+T1156:;
 	base[4]= Cnil;
 	vs_top=(vs_base=base+4)+1;
 	return;}
-	goto T1157;
-T1157:;
-	{register object V345;
-	V345= V334;
-	base[4]= (V345);
+	goto T1141;
+T1141:;
+	{register object V336;
+	V336= V326;
+	base[4]= (V336);
 	base[5]= VV[39];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T1177;}
-	{object V346;
-	object V347;
-	register object V348;
-	V346= structure_ref((V334),VV[39],0);
-	V347= list(2,(V335),(V336));
-	V348= structure_ref((V334),VV[39],1);
-	if(((V348))==Cnil){
-	goto T1185;}
-	if((cdr((V348)))!=Cnil){
-	goto T1185;}
-	base[4]= (V347);
-	base[5]= car((V348));
+	goto T1159;}
+	{object V337;
+	object V338;
+	register object V339;
+	V337= STREF(object,(V326),0);
+	V338= list(2,(V327),(V328));
+	V339= STREF(object,(V326),4);
+	if(((V339))==Cnil){
+	goto T1167;}
+	if((CMPcdr((V339)))!=Cnil){
+	goto T1167;}
+	base[4]= (V338);
+	base[5]= CMPcar((V339));
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V346);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V337);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T1185;
-T1185:;
-	base[4]= (V346);
-	base[5]= (V347);
-	{object V349;
-	V349= (V348);
+	goto T1167;
+T1167:;
+	base[4]= (V337);
+	base[5]= (V338);
+	{object V340;
+	V340= (V339);
 	 vs_top=base+6;
-	 while(!endp(V349))
-	 {vs_push(car(V349));V349=cdr(V349);}
+	 while(V340!=Cnil)
+	 {vs_push((V340)->c.c_car);V340=(V340)->c.c_cdr;}
 	vs_base=base+5;}
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;}
-	goto T1177;
-T1177:;
-	base[4]= (V345);
+	goto T1159;
+T1159:;
+	base[4]= (V336);
 	vs_top=(vs_base=base+4)+1;
 	Lfunctionp();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T1195;}
-	base[4]= (V335);
-	base[5]= (V336);
+	goto T1177;}
+	base[4]= (V327);
+	base[5]= (V328);
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V334);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V326);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T1195;
-T1195:;
+	goto T1177;
+T1177:;
 	base[4]= VV[40];
 	base[5]= VV[18];
 	base[6]= VV[41];
 	base[7]= VV[42];
-	base[8]= V334;
+	base[8]= V326;
 	base[9]= VV[43];
 	base[10]= VV[212];
 	base[11]= VV[45];
@@ -4121,168 +4040,163 @@ T1195:;
 	vs_top=(vs_base=base+4)+9;
 	(void) (*Lnk13)();
 	return;}
-	goto T1143;
-T1143:;
+	goto T1127;
+T1127:;
 	base[4]= VV[47];
 	vs_top=(vs_base=base+4)+1;
-	(void) (*Lnk273)();
+	(void) (*Lnk272)();
 	return;
-	goto T1140;
-T1140:;
-	{register object V351;
-	V351= (V336);
-	base[4]= V335;
+	goto T1124;
+T1124:;
+	{register object V342;
+	V342= (V328);
+	base[4]= V327;
 	vs_top=(vs_base=base+4)+1;
-	(void) (*Lnk315)(Lclptr315);
+	(void) (*Lnk314)(Lclptr314);
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T1210;}
-	base[4]= (V351);
+	goto T1192;}
+	base[4]= (V342);
 	base[5]= VV[214];
-	base[7]= V335;
+	base[7]= V327;
 	vs_top=(vs_base=base+7)+1;
-	(void) (*Lnk315)(Lclptr315);
+	(void) (*Lnk314)(Lclptr314);
 	vs_top=sup;
 	base[6]= vs_base[0];
 	vs_top=(vs_base=base+4)+3;
 	Lformat();
 	vs_top=sup;
-	goto T1210;
-T1210:;
-	if(((V334))==Cnil){
-	goto T1219;}
-	base[4]= (V334);
+	goto T1192;
+T1192:;
+	if(((V326))==Cnil){
+	goto T1201;}
+	base[4]= (V326);
 	base[5]= VV[35];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T1223;}
-	base[4]= structure_ref((V334),VV[35],0);
-	base[5]= structure_ref((V334),VV[35],1);
-	base[6]= structure_ref((V334),VV[35],2);
-	base[7]= (V335);
-	base[8]= (V351);
+	goto T1205;}
+	base[4]= STREF(object,(V326),0);
+	base[5]= STREF(object,(V326),4);
+	base[6]= STREF(object,(V326),8);
+	base[7]= (V327);
+	base[8]= (V342);
 	vs_top=(vs_base=base+5)+4;
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T1223;
-T1223:;
-	if(!(type_of((V334))==t_fixnum)){
-	goto T1233;}
-	{object V353;
-	if(type_of(V335)==t_structure){
-	goto T1239;}
-	goto T1237;
-	goto T1239;
-T1239:;
-	base[4]= V335;
-	vs_top=(vs_base=base+4)+1;
+	goto T1205;
+T1205:;
+	if(!(type_of((V326))==t_fixnum)){
+	goto T1215;}
+	{object V344;
+	if(type_of(V327)==t_structure){
+	goto T1221;}
+	goto T1219;
+	goto T1221;
+T1221:;
+	if(!(((V327)->str.str_def)==(VV[215]))){
+	goto T1219;}
+	V344= STREF(object,(V327),4);
+	goto T1217;
+	goto T1219;
+T1219:;{object V346;
+	V346= (VV[38]->s.s_dbind);
+	base[4]= small_fixnum(14);
+	base[5]= (V327);
+	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk271)();
 	vs_top=sup;
-	V355= vs_base[0];
-	if(!((V355)==(VV[215]))){
-	goto T1237;}
-	V353= structure_ref((V335),VV[37],1);
-	goto T1235;
-	goto T1237;
-T1237:;{object V356;
-	V356= symbol_value(VV[38]);
-	base[4]= small_fixnum(14);
-	base[5]= (V335);
-	vs_top=(vs_base=base+4)+2;
-	(void) (*Lnk272)();
-	vs_top=sup;
-	V357= vs_base[0];
-	if(!((V356)==(car(V357)))){
-	goto T1244;}}
-	V353= car(((V335))->cc.cc_turbo[12]);
-	goto T1235;
-	goto T1244;
-T1244:;
-	V353= Cnil;
-	goto T1235;
-T1235:;
-	if(((V353))==Cnil){
-	goto T1250;}
-	base[4]= aset1((V353),fix((V334)),V335);
+	V347= vs_base[0];
+	if(!((V346)==(CMPcar(V347)))){
+	goto T1224;}}
+	V344= CMPcar(((V327))->cc.cc_turbo[12]);
+	goto T1217;
+	goto T1224;
+T1224:;
+	V344= Cnil;
+	goto T1217;
+T1217:;
+	if(((V344))==Cnil){
+	goto T1230;}
+	base[4]= ((V344))->v.v_self[fix((V326))]= (V327);
 	vs_top=(vs_base=base+4)+1;
 	return;
-	goto T1250;
-T1250:;
+	goto T1230;
+T1230:;
 	base[4]= Cnil;
 	vs_top=(vs_base=base+4)+1;
 	return;}
-	goto T1233;
-T1233:;
-	{register object V359;
-	V359= V334;
-	base[4]= (V359);
+	goto T1215;
+T1215:;
+	{register object V349;
+	V349= V326;
+	base[4]= (V349);
 	base[5]= VV[39];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T1253;}
-	{object V360;
-	object V361;
-	register object V362;
-	V360= structure_ref((V334),VV[39],0);
-	V361= list(2,(V335),(V351));
-	V362= structure_ref((V334),VV[39],1);
-	if(((V362))==Cnil){
-	goto T1261;}
-	if((cdr((V362)))!=Cnil){
-	goto T1261;}
-	base[4]= (V361);
-	base[5]= car((V362));
+	goto T1233;}
+	{object V350;
+	object V351;
+	register object V352;
+	V350= STREF(object,(V326),0);
+	V351= list(2,(V327),(V342));
+	V352= STREF(object,(V326),4);
+	if(((V352))==Cnil){
+	goto T1241;}
+	if((CMPcdr((V352)))!=Cnil){
+	goto T1241;}
+	base[4]= (V351);
+	base[5]= CMPcar((V352));
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V360);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V350);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T1261;
-T1261:;
-	base[4]= (V360);
-	base[5]= (V361);
-	{object V363;
-	V363= (V362);
+	goto T1241;
+T1241:;
+	base[4]= (V350);
+	base[5]= (V351);
+	{object V353;
+	V353= (V352);
 	 vs_top=base+6;
-	 while(!endp(V363))
-	 {vs_push(car(V363));V363=cdr(V363);}
+	 while(V353!=Cnil)
+	 {vs_push((V353)->c.c_car);V353=(V353)->c.c_cdr;}
 	vs_base=base+5;}
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;}
-	goto T1253;
-T1253:;
-	base[4]= (V359);
+	goto T1233;
+T1233:;
+	base[4]= (V349);
 	vs_top=(vs_base=base+4)+1;
 	Lfunctionp();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T1271;}
-	base[4]= (V335);
-	base[5]= (V351);
+	goto T1251;}
+	base[4]= (V327);
+	base[5]= (V342);
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V334);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V326);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T1271;
-T1271:;
+	goto T1251;
+T1251:;
 	base[4]= VV[40];
 	base[5]= VV[18];
 	base[6]= VV[41];
 	base[7]= VV[42];
-	base[8]= V334;
+	base[8]= V326;
 	base[9]= VV[43];
 	base[10]= VV[216];
 	base[11]= VV[45];
@@ -4290,15 +4204,15 @@ T1271:;
 	vs_top=(vs_base=base+4)+9;
 	(void) (*Lnk13)();
 	return;}
-	goto T1219;
-T1219:;
+	goto T1201;
+T1201:;
 	base[4]= VV[47];
 	vs_top=(vs_base=base+4)+1;
-	(void) (*Lnk273)();
+	(void) (*Lnk272)();
 	return;}
 	}
 }
-/*	local entry for function progn 'compile6644	*/
+/*	local entry for function progn 'compile6646	*/
 
 static object LI164()
 
@@ -4310,84 +4224,83 @@ TTL:;
 	base[2]= Cnil;
 	base[3]= VV[218];
 	base[4]= VV[219];
-	V364= symbol_function(VV[316]);
-	base[5]= listA(3,VV[51],V364,VV[220]);
+	V354= (VV[315]->s.s_gfdef);
+	base[5]= listA(3,VV[51],V354,VV[220]);
 	base[6]= Cnil;
 	vs_top=(vs_base=base+0)+7;
-	(void) (*Lnk276)();
+	(void) (*Lnk275)();
 	vs_top=sup;
-	{object V365 = Cnil;
-	VMR164(V365)}
+	{object V355 = Cnil;
+	VMR164(V355)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile6652	*/
+/*	local entry for function progn 'compile6654	*/
 
 static object LI165()
 
 {	 VMB165 VMS165 VMV165
 	goto TTL;
 TTL:;
-	{object V366 = Cnil;
-	VMR165(V366)}
+	{object V356 = Cnil;
+	VMR165(V356)}
 	return Cnil;
 }
 /*	local entry for function INTERNAL-SIMPLE-ERROR-PRINTER	*/
 
-static object LI166(V369,V370)
+static object LI166(V359,V360)
 
-register object V369;object V370;
+register object V359;object V360;
 {	 VMB166 VMS166 VMV166
 	goto TTL;
 TTL:;
-	base[0]= (V369);
+	base[0]= (V359);
 	vs_top=(vs_base=base+0)+1;
-	(void) (*Lnk315)(Lclptr315);
+	(void) (*Lnk314)(Lclptr314);
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T1296;}
-	base[0]= (V370);
+	goto T1276;}
+	base[0]= (V360);
 	base[1]= VV[221];
-	base[3]= (V369);
+	base[3]= (V359);
 	vs_top=(vs_base=base+3)+1;
-	(void) (*Lnk315)(Lclptr315);
+	(void) (*Lnk314)(Lclptr314);
 	vs_top=sup;
 	base[2]= vs_base[0];
 	vs_top=(vs_base=base+0)+3;
 	Lformat();
 	vs_top=sup;
-	goto T1296;
-T1296:;
-	base[0]= (V370);
-	base[2]= (V369);
+	goto T1276;
+T1276:;
+	base[0]= (V360);
+	base[2]= (V359);
 	vs_top=(vs_base=base+2)+1;
 	(void) (*Lnk265)(Lclptr265);
 	vs_top=sup;
 	base[1]= vs_base[0];
-	{object V371;
-	base[2]= (V369);
+	{object V361;
+	base[2]= (V359);
 	vs_top=(vs_base=base+2)+1;
 	(void) (*Lnk266)(Lclptr266);
 	vs_top=sup;
-	V371= vs_base[0];
+	V361= vs_base[0];
 	 vs_top=base+2;
-	 while(!endp(V371))
-	 {vs_push(car(V371));V371=cdr(V371);}
+	 while(V361!=Cnil)
+	 {vs_push((V361)->c.c_car);V361=(V361)->c.c_cdr;}
 	vs_base=base+0;}
 	Lformat();
 	vs_top=sup;
-	{object V372 = vs_base[0];
-	VMR166(V372)}
+	{object V362 = vs_base[0];
+	VMR166(V362)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	function definition for Defclass INTERNAL-SIMPLE-ERROR6684	*/
+/*	function definition for Defclass INTERNAL-SIMPLE-ERROR6686	*/
 
 static void L167()
 {register object *base=vs_base;
 	register object *sup=base+VM167; VC167
-	vs_reserve(VM167);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -4400,7 +4313,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile6700	*/
+/*	local entry for function progn 'compile6702	*/
 
 static object LI168()
 
@@ -4408,14 +4321,14 @@ static object LI168()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk317)();
+	(void) (*Lnk316)();
 	vs_top=sup;
-	{object V373 = Cnil;
-	VMR168(V373)}
+	{object V363 = Cnil;
+	VMR168(V363)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile6717	*/
+/*	local entry for function progn 'compile6719	*/
 
 static object LI169()
 
@@ -4423,17 +4336,17 @@ static object LI169()
 	goto TTL;
 TTL:;
 	base[0]= VV[224];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V375 = Cnil;
-	VMR169(V375)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V365 = Cnil;
+	VMR169(V365)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile6741	*/
+/*	local entry for function progn 'compile6743	*/
 
 static object LI170()
 
@@ -4441,11 +4354,11 @@ static object LI170()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[222],VV[9],Cnil));
-	{object V376 = Cnil;
-	VMR170(V376)}
+	{object V366 = Cnil;
+	VMR170(V366)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile6757	*/
+/*	local entry for function progn 'compile6759	*/
 
 static object LI171()
 
@@ -4457,8 +4370,8 @@ TTL:;
 	vs_top=(vs_base=base+0)+2;
 	(void) (*Lnk269)();
 	vs_top=sup;
-	{object V377 = Cnil;
-	VMR171(V377)}
+	{object V367 = Cnil;
+	VMR171(V367)}
 	base[0]=base[0];
 	return Cnil;
 }
@@ -4467,155 +4380,149 @@ TTL:;
 static void L172()
 {register object *base=vs_base;
 	register object *sup=base+VM172; VC172
-	vs_reserve(VM172);
-	{object V378;
-	register object V379;
-	register object V380;
-	register object V381;
-	check_arg(4);
-	V378=(base[0]);
-	V379=(base[1]);
-	V380=(base[2]);
-	V381=(base[3]);
+	vs_check;
+	{object V368;
+	register object V369;
+	register object V370;
+	register object V371;
+	V368=(base[0]);
+	V369=(base[1]);
+	V370=(base[2]);
+	V371=(base[3]);
 	vs_top=sup;
 	goto TTL;
 TTL:;
-	if((symbol_value(VV[34]))==Cnil){
-	goto T1328;}
-	if(((V379))==Cnil){
-	goto T1331;}
-	base[4]= (V379);
+	if(((VV[34]->s.s_dbind))==Cnil){
+	goto T1308;}
+	if(((V369))==Cnil){
+	goto T1311;}
+	base[4]= (V369);
 	base[5]= VV[35];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T1335;}
-	base[4]= structure_ref((V379),VV[35],0);
-	base[5]= structure_ref((V379),VV[35],1);
-	base[6]= structure_ref((V379),VV[35],2);
-	base[7]= (V380);
-	base[8]= (V381);
+	goto T1315;}
+	base[4]= STREF(object,(V369),0);
+	base[5]= STREF(object,(V369),4);
+	base[6]= STREF(object,(V369),8);
+	base[7]= (V370);
+	base[8]= (V371);
 	vs_top=(vs_base=base+5)+4;
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T1335;
-T1335:;
-	if(!(type_of((V379))==t_fixnum)){
-	goto T1345;}
-	{object V384;
-	if(type_of(V380)==t_structure){
-	goto T1351;}
-	goto T1349;
-	goto T1351;
-T1351:;
-	base[4]= V380;
-	vs_top=(vs_base=base+4)+1;
+	goto T1315;
+T1315:;
+	if(!(type_of((V369))==t_fixnum)){
+	goto T1325;}
+	{object V374;
+	if(type_of(V370)==t_structure){
+	goto T1331;}
+	goto T1329;
+	goto T1331;
+T1331:;
+	if(!(((V370)->str.str_def)==(VV[226]))){
+	goto T1329;}
+	V374= STREF(object,(V370),4);
+	goto T1327;
+	goto T1329;
+T1329:;{object V376;
+	V376= (VV[38]->s.s_dbind);
+	base[4]= small_fixnum(14);
+	base[5]= (V370);
+	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk271)();
 	vs_top=sup;
-	V386= vs_base[0];
-	if(!((V386)==(VV[226]))){
-	goto T1349;}
-	V384= structure_ref((V380),VV[37],1);
-	goto T1347;
-	goto T1349;
-T1349:;{object V387;
-	V387= symbol_value(VV[38]);
-	base[4]= small_fixnum(14);
-	base[5]= (V380);
-	vs_top=(vs_base=base+4)+2;
-	(void) (*Lnk272)();
-	vs_top=sup;
-	V388= vs_base[0];
-	if(!((V387)==(car(V388)))){
-	goto T1356;}}
-	V384= car(((V380))->cc.cc_turbo[12]);
-	goto T1347;
-	goto T1356;
-T1356:;
-	V384= Cnil;
-	goto T1347;
-T1347:;
-	if(((V384))==Cnil){
-	goto T1362;}
-	base[4]= aset1((V384),fix((V379)),V380);
+	V377= vs_base[0];
+	if(!((V376)==(CMPcar(V377)))){
+	goto T1334;}}
+	V374= CMPcar(((V370))->cc.cc_turbo[12]);
+	goto T1327;
+	goto T1334;
+T1334:;
+	V374= Cnil;
+	goto T1327;
+T1327:;
+	if(((V374))==Cnil){
+	goto T1340;}
+	base[4]= ((V374))->v.v_self[fix((V369))]= (V370);
 	vs_top=(vs_base=base+4)+1;
 	return;
-	goto T1362;
-T1362:;
+	goto T1340;
+T1340:;
 	base[4]= Cnil;
 	vs_top=(vs_base=base+4)+1;
 	return;}
-	goto T1345;
-T1345:;
-	{register object V390;
-	V390= V379;
-	base[4]= (V390);
+	goto T1325;
+T1325:;
+	{register object V379;
+	V379= V369;
+	base[4]= (V379);
 	base[5]= VV[39];
 	vs_top=(vs_base=base+4)+2;
 	(void) (*Lnk270)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T1365;}
-	{object V391;
-	object V392;
-	register object V393;
-	V391= structure_ref((V379),VV[39],0);
-	V392= list(2,(V380),(V381));
-	V393= structure_ref((V379),VV[39],1);
-	if(((V393))==Cnil){
-	goto T1373;}
-	if((cdr((V393)))!=Cnil){
-	goto T1373;}
-	base[4]= (V392);
-	base[5]= car((V393));
+	goto T1343;}
+	{object V380;
+	object V381;
+	register object V382;
+	V380= STREF(object,(V369),0);
+	V381= list(2,(V370),(V371));
+	V382= STREF(object,(V369),4);
+	if(((V382))==Cnil){
+	goto T1351;}
+	if((CMPcdr((V382)))!=Cnil){
+	goto T1351;}
+	base[4]= (V381);
+	base[5]= CMPcar((V382));
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V391);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V380);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T1373;
-T1373:;
-	base[4]= (V391);
-	base[5]= (V392);
-	{object V394;
-	V394= (V393);
+	goto T1351;
+T1351:;
+	base[4]= (V380);
+	base[5]= (V381);
+	{object V383;
+	V383= (V382);
 	 vs_top=base+6;
-	 while(!endp(V394))
-	 {vs_push(car(V394));V394=cdr(V394);}
+	 while(V383!=Cnil)
+	 {vs_push((V383)->c.c_car);V383=(V383)->c.c_cdr;}
 	vs_base=base+5;}
 	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;}
-	goto T1365;
-T1365:;
-	base[4]= (V390);
+	goto T1343;
+T1343:;
+	base[4]= (V379);
 	vs_top=(vs_base=base+4)+1;
 	Lfunctionp();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T1383;}
-	base[4]= (V380);
-	base[5]= (V381);
+	goto T1361;}
+	base[4]= (V370);
+	base[5]= (V371);
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V379);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V369);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	return;
-	goto T1383;
-T1383:;
+	goto T1361;
+T1361:;
 	base[4]= VV[40];
 	base[5]= VV[18];
 	base[6]= VV[41];
 	base[7]= VV[42];
-	base[8]= V379;
+	base[8]= V369;
 	base[9]= VV[43];
 	base[10]= VV[227];
 	base[11]= VV[45];
@@ -4623,20 +4530,20 @@ T1383:;
 	vs_top=(vs_base=base+4)+9;
 	(void) (*Lnk13)();
 	return;}
-	goto T1331;
-T1331:;
+	goto T1311;
+T1311:;
 	base[4]= VV[47];
 	vs_top=(vs_base=base+4)+1;
-	(void) (*Lnk273)();
+	(void) (*Lnk272)();
 	return;
-	goto T1328;
-T1328:;
-	base[4]= (*(LnkLI318))((V380),(V381));
+	goto T1308;
+T1308:;
+	base[4]= (*(LnkLI317))((V370),(V371));
 	vs_top=(vs_base=base+4)+1;
 	return;
 	}
 }
-/*	local entry for function progn 'compile6950	*/
+/*	local entry for function progn 'compile6952	*/
 
 static object LI173()
 
@@ -4648,35 +4555,34 @@ TTL:;
 	base[2]= Cnil;
 	base[3]= VV[229];
 	base[4]= VV[230];
-	V395= symbol_function(VV[319]);
-	base[5]= listA(3,VV[51],V395,VV[231]);
+	V384= (VV[318]->s.s_gfdef);
+	base[5]= listA(3,VV[51],V384,VV[231]);
 	base[6]= Cnil;
 	vs_top=(vs_base=base+0)+7;
-	(void) (*Lnk276)();
+	(void) (*Lnk275)();
 	vs_top=sup;
-	{object V396 = Cnil;
-	VMR173(V396)}
+	{object V385 = Cnil;
+	VMR173(V385)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile6958	*/
+/*	local entry for function progn 'compile6960	*/
 
 static object LI174()
 
 {	 VMB174 VMS174 VMV174
 	goto TTL;
 TTL:;
-	{object V397 = Cnil;
-	VMR174(V397)}
+	{object V386 = Cnil;
+	VMR174(V386)}
 	return Cnil;
 }
-/*	function definition for Defclass INTERNAL-TYPE-ERROR6978	*/
+/*	function definition for Defclass INTERNAL-TYPE-ERROR6980	*/
 
 static void L175()
 {register object *base=vs_base;
 	register object *sup=base+VM175; VC175
-	vs_reserve(VM175);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -4689,7 +4595,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile6994	*/
+/*	local entry for function progn 'compile6996	*/
 
 static object LI176()
 
@@ -4697,14 +4603,14 @@ static object LI176()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk320)();
+	(void) (*Lnk319)();
 	vs_top=sup;
-	{object V398 = Cnil;
-	VMR176(V398)}
+	{object V387 = Cnil;
+	VMR176(V387)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7011	*/
+/*	local entry for function progn 'compile7013	*/
 
 static object LI177()
 
@@ -4712,17 +4618,17 @@ static object LI177()
 	goto TTL;
 TTL:;
 	base[0]= VV[234];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V400 = Cnil;
-	VMR177(V400)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V389 = Cnil;
+	VMR177(V389)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7035	*/
+/*	local entry for function progn 'compile7037	*/
 
 static object LI178()
 
@@ -4730,28 +4636,27 @@ static object LI178()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[232],VV[9],Cnil));
-	{object V401 = Cnil;
-	VMR178(V401)}
+	{object V390 = Cnil;
+	VMR178(V390)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile7047	*/
+/*	local entry for function progn 'compile7049	*/
 
 static object LI179()
 
 {	 VMB179 VMS179 VMV179
 	goto TTL;
 TTL:;
-	{object V402 = Cnil;
-	VMR179(V402)}
+	{object V391 = Cnil;
+	VMR179(V391)}
 	return Cnil;
 }
-/*	function definition for Defclass INTERNAL-PACKAGE-ERROR7067	*/
+/*	function definition for Defclass INTERNAL-PACKAGE-ERROR7069	*/
 
 static void L180()
 {register object *base=vs_base;
 	register object *sup=base+VM180; VC180
-	vs_reserve(VM180);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -4764,7 +4669,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile7083	*/
+/*	local entry for function progn 'compile7085	*/
 
 static object LI181()
 
@@ -4772,14 +4677,14 @@ static object LI181()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk321)();
+	(void) (*Lnk320)();
 	vs_top=sup;
-	{object V403 = Cnil;
-	VMR181(V403)}
+	{object V392 = Cnil;
+	VMR181(V392)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7100	*/
+/*	local entry for function progn 'compile7102	*/
 
 static object LI182()
 
@@ -4787,17 +4692,17 @@ static object LI182()
 	goto TTL;
 TTL:;
 	base[0]= VV[237];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V405 = Cnil;
-	VMR182(V405)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V394 = Cnil;
+	VMR182(V394)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7124	*/
+/*	local entry for function progn 'compile7126	*/
 
 static object LI183()
 
@@ -4805,28 +4710,27 @@ static object LI183()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[235],VV[9],Cnil));
-	{object V406 = Cnil;
-	VMR183(V406)}
+	{object V395 = Cnil;
+	VMR183(V395)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile7136	*/
+/*	local entry for function progn 'compile7138	*/
 
 static object LI184()
 
 {	 VMB184 VMS184 VMV184
 	goto TTL;
 TTL:;
-	{object V407 = Cnil;
-	VMR184(V407)}
+	{object V396 = Cnil;
+	VMR184(V396)}
 	return Cnil;
 }
-/*	function definition for Defclass INTERNAL-SIMPLE-PROGRAM-ERROR7156	*/
+/*	function definition for Defclass INTERNAL-SIMPLE-PROGRAM-ERROR7158	*/
 
 static void L185()
 {register object *base=vs_base;
 	register object *sup=base+VM185; VC185
-	vs_reserve(VM185);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -4839,7 +4743,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile7172	*/
+/*	local entry for function progn 'compile7174	*/
 
 static object LI186()
 
@@ -4847,14 +4751,14 @@ static object LI186()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk322)();
+	(void) (*Lnk321)();
 	vs_top=sup;
-	{object V408 = Cnil;
-	VMR186(V408)}
+	{object V397 = Cnil;
+	VMR186(V397)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7189	*/
+/*	local entry for function progn 'compile7191	*/
 
 static object LI187()
 
@@ -4862,17 +4766,17 @@ static object LI187()
 	goto TTL;
 TTL:;
 	base[0]= VV[240];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V410 = Cnil;
-	VMR187(V410)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V399 = Cnil;
+	VMR187(V399)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7213	*/
+/*	local entry for function progn 'compile7215	*/
 
 static object LI188()
 
@@ -4880,28 +4784,27 @@ static object LI188()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[238],VV[9],Cnil));
-	{object V411 = Cnil;
-	VMR188(V411)}
+	{object V400 = Cnil;
+	VMR188(V400)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile7225	*/
+/*	local entry for function progn 'compile7227	*/
 
 static object LI189()
 
 {	 VMB189 VMS189 VMV189
 	goto TTL;
 TTL:;
-	{object V412 = Cnil;
-	VMR189(V412)}
+	{object V401 = Cnil;
+	VMR189(V401)}
 	return Cnil;
 }
-/*	function definition for Defclass INTERNAL-SIMPLE-CONTROL-ERROR7245	*/
+/*	function definition for Defclass INTERNAL-SIMPLE-CONTROL-ERROR7247	*/
 
 static void L190()
 {register object *base=vs_base;
 	register object *sup=base+VM190; VC190
-	vs_reserve(VM190);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -4914,7 +4817,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile7261	*/
+/*	local entry for function progn 'compile7263	*/
 
 static object LI191()
 
@@ -4922,14 +4825,14 @@ static object LI191()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk323)();
+	(void) (*Lnk322)();
 	vs_top=sup;
-	{object V413 = Cnil;
-	VMR191(V413)}
+	{object V402 = Cnil;
+	VMR191(V402)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7278	*/
+/*	local entry for function progn 'compile7280	*/
 
 static object LI192()
 
@@ -4937,17 +4840,17 @@ static object LI192()
 	goto TTL;
 TTL:;
 	base[0]= VV[243];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V415 = Cnil;
-	VMR192(V415)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V404 = Cnil;
+	VMR192(V404)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7302	*/
+/*	local entry for function progn 'compile7304	*/
 
 static object LI193()
 
@@ -4955,28 +4858,27 @@ static object LI193()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[241],VV[9],Cnil));
-	{object V416 = Cnil;
-	VMR193(V416)}
+	{object V405 = Cnil;
+	VMR193(V405)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile7314	*/
+/*	local entry for function progn 'compile7316	*/
 
 static object LI194()
 
 {	 VMB194 VMS194 VMV194
 	goto TTL;
 TTL:;
-	{object V417 = Cnil;
-	VMR194(V417)}
+	{object V406 = Cnil;
+	VMR194(V406)}
 	return Cnil;
 }
-/*	function definition for Defclass INTERNAL-UNBOUND-VARIABLE7334	*/
+/*	function definition for Defclass INTERNAL-UNBOUND-VARIABLE7336	*/
 
 static void L195()
 {register object *base=vs_base;
 	register object *sup=base+VM195; VC195
-	vs_reserve(VM195);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -4989,7 +4891,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile7350	*/
+/*	local entry for function progn 'compile7352	*/
 
 static object LI196()
 
@@ -4997,14 +4899,14 @@ static object LI196()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk324)();
+	(void) (*Lnk323)();
 	vs_top=sup;
-	{object V418 = Cnil;
-	VMR196(V418)}
+	{object V407 = Cnil;
+	VMR196(V407)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7367	*/
+/*	local entry for function progn 'compile7369	*/
 
 static object LI197()
 
@@ -5012,17 +4914,17 @@ static object LI197()
 	goto TTL;
 TTL:;
 	base[0]= VV[246];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V420 = Cnil;
-	VMR197(V420)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V409 = Cnil;
+	VMR197(V409)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7391	*/
+/*	local entry for function progn 'compile7393	*/
 
 static object LI198()
 
@@ -5030,28 +4932,27 @@ static object LI198()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[244],VV[9],Cnil));
-	{object V421 = Cnil;
-	VMR198(V421)}
+	{object V410 = Cnil;
+	VMR198(V410)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile7403	*/
+/*	local entry for function progn 'compile7405	*/
 
 static object LI199()
 
 {	 VMB199 VMS199 VMV199
 	goto TTL;
 TTL:;
-	{object V422 = Cnil;
-	VMR199(V422)}
+	{object V411 = Cnil;
+	VMR199(V411)}
 	return Cnil;
 }
-/*	function definition for Defclass INTERNAL-UNDEFINED-FUNCTION7423	*/
+/*	function definition for Defclass INTERNAL-UNDEFINED-FUNCTION7425	*/
 
 static void L200()
 {register object *base=vs_base;
 	register object *sup=base+VM200; VC200
-	vs_reserve(VM200);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -5064,7 +4965,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile7439	*/
+/*	local entry for function progn 'compile7441	*/
 
 static object LI201()
 
@@ -5072,14 +4973,14 @@ static object LI201()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk325)();
+	(void) (*Lnk324)();
 	vs_top=sup;
-	{object V423 = Cnil;
-	VMR201(V423)}
+	{object V412 = Cnil;
+	VMR201(V412)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7456	*/
+/*	local entry for function progn 'compile7458	*/
 
 static object LI202()
 
@@ -5087,17 +4988,17 @@ static object LI202()
 	goto TTL;
 TTL:;
 	base[0]= VV[249];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V425 = Cnil;
-	VMR202(V425)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V414 = Cnil;
+	VMR202(V414)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7480	*/
+/*	local entry for function progn 'compile7482	*/
 
 static object LI203()
 
@@ -5105,28 +5006,27 @@ static object LI203()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[247],VV[9],Cnil));
-	{object V426 = Cnil;
-	VMR203(V426)}
+	{object V415 = Cnil;
+	VMR203(V415)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile7492	*/
+/*	local entry for function progn 'compile7494	*/
 
 static object LI204()
 
 {	 VMB204 VMS204 VMV204
 	goto TTL;
 TTL:;
-	{object V427 = Cnil;
-	VMR204(V427)}
+	{object V416 = Cnil;
+	VMR204(V416)}
 	return Cnil;
 }
-/*	function definition for Defclass INTERNAL-END-OF-FILE7512	*/
+/*	function definition for Defclass INTERNAL-END-OF-FILE7514	*/
 
 static void L205()
 {register object *base=vs_base;
 	register object *sup=base+VM205; VC205
-	vs_reserve(VM205);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -5139,7 +5039,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile7528	*/
+/*	local entry for function progn 'compile7530	*/
 
 static object LI206()
 
@@ -5147,14 +5047,14 @@ static object LI206()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk326)();
+	(void) (*Lnk325)();
 	vs_top=sup;
-	{object V428 = Cnil;
-	VMR206(V428)}
+	{object V417 = Cnil;
+	VMR206(V417)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7545	*/
+/*	local entry for function progn 'compile7547	*/
 
 static object LI207()
 
@@ -5162,17 +5062,17 @@ static object LI207()
 	goto TTL;
 TTL:;
 	base[0]= VV[252];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V430 = Cnil;
-	VMR207(V430)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V419 = Cnil;
+	VMR207(V419)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7569	*/
+/*	local entry for function progn 'compile7571	*/
 
 static object LI208()
 
@@ -5180,28 +5080,27 @@ static object LI208()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[250],VV[9],Cnil));
-	{object V431 = Cnil;
-	VMR208(V431)}
+	{object V420 = Cnil;
+	VMR208(V420)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile7581	*/
+/*	local entry for function progn 'compile7583	*/
 
 static object LI209()
 
 {	 VMB209 VMS209 VMV209
 	goto TTL;
 TTL:;
-	{object V432 = Cnil;
-	VMR209(V432)}
+	{object V421 = Cnil;
+	VMR209(V421)}
 	return Cnil;
 }
-/*	function definition for Defclass INTERNAL-SIMPLE-FILE-ERROR7601	*/
+/*	function definition for Defclass INTERNAL-SIMPLE-FILE-ERROR7603	*/
 
 static void L210()
 {register object *base=vs_base;
 	register object *sup=base+VM210; VC210
-	vs_reserve(VM210);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -5214,7 +5113,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile7617	*/
+/*	local entry for function progn 'compile7619	*/
 
 static object LI211()
 
@@ -5222,14 +5121,14 @@ static object LI211()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk327)();
+	(void) (*Lnk326)();
 	vs_top=sup;
-	{object V433 = Cnil;
-	VMR211(V433)}
+	{object V422 = Cnil;
+	VMR211(V422)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7634	*/
+/*	local entry for function progn 'compile7636	*/
 
 static object LI212()
 
@@ -5237,17 +5136,17 @@ static object LI212()
 	goto TTL;
 TTL:;
 	base[0]= VV[255];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V435 = Cnil;
-	VMR212(V435)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V424 = Cnil;
+	VMR212(V424)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7658	*/
+/*	local entry for function progn 'compile7660	*/
 
 static object LI213()
 
@@ -5255,28 +5154,27 @@ static object LI213()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[253],VV[9],Cnil));
-	{object V436 = Cnil;
-	VMR213(V436)}
+	{object V425 = Cnil;
+	VMR213(V425)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile7670	*/
+/*	local entry for function progn 'compile7672	*/
 
 static object LI214()
 
 {	 VMB214 VMS214 VMV214
 	goto TTL;
 TTL:;
-	{object V437 = Cnil;
-	VMR214(V437)}
+	{object V426 = Cnil;
+	VMR214(V426)}
 	return Cnil;
 }
-/*	function definition for Defclass INTERNAL-SIMPLE-STREAM-ERROR7690	*/
+/*	function definition for Defclass INTERNAL-SIMPLE-STREAM-ERROR7692	*/
 
 static void L215()
 {register object *base=vs_base;
 	register object *sup=base+VM215; VC215
-	vs_reserve(VM215);
-	check_arg(0);
+	vs_check;
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -5289,7 +5187,7 @@ TTL:;
 	symlispcall(VV[261],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile7706	*/
+/*	local entry for function progn 'compile7708	*/
 
 static object LI216()
 
@@ -5297,14 +5195,14 @@ static object LI216()
 	goto TTL;
 TTL:;
 	vs_base=vs_top;
-	(void) (*Lnk328)();
+	(void) (*Lnk327)();
 	vs_top=sup;
-	{object V438 = Cnil;
-	VMR216(V438)}
+	{object V427 = Cnil;
+	VMR216(V427)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7723	*/
+/*	local entry for function progn 'compile7725	*/
 
 static object LI217()
 
@@ -5312,17 +5210,17 @@ static object LI217()
 	goto TTL;
 TTL:;
 	base[0]= VV[258];
-	base[1]= symbol_value(VV[8]);
+	base[1]= (VV[8]->s.s_dbind);
 	vs_top=(vs_base=base+0)+2;
 	Ladjoin();
 	vs_top=sup;
-	setq(VV[8],vs_base[0]);
-	{object V440 = Cnil;
-	VMR217(V440)}
+	(VV[8]->s.s_dbind)= vs_base[0];
+	{object V429 = Cnil;
+	VMR217(V429)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7747	*/
+/*	local entry for function progn 'compile7749	*/
 
 static object LI218()
 
@@ -5330,22 +5228,22 @@ static object LI218()
 	goto TTL;
 TTL:;
 	(void)(sputprop(VV[256],VV[9],Cnil));
-	{object V441 = Cnil;
-	VMR218(V441)}
+	{object V430 = Cnil;
+	VMR218(V430)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile7759	*/
+/*	local entry for function progn 'compile7761	*/
 
 static object LI219()
 
 {	 VMB219 VMS219 VMV219
 	goto TTL;
 TTL:;
-	{object V442 = Cnil;
-	VMR219(V442)}
+	{object V431 = Cnil;
+	VMR219(V431)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile7775	*/
+/*	local entry for function progn 'compile7777	*/
 
 static object LI220()
 
@@ -5354,158 +5252,153 @@ static object LI220()
 TTL:;
 	base[0]= VV[259];
 	vs_top=(vs_base=base+0)+1;
-	(void) (*Lnk329)();
+	(void) (*Lnk328)();
 	vs_top=sup;
-	{object V443 = Cnil;
-	VMR220(V443)}
+	{object V432 = Cnil;
+	VMR220(V432)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7787	*/
+/*	local entry for function progn 'compile7789	*/
 
 static object LI221()
 
 {	 VMB221 VMS221 VMV221
 	goto TTL;
 TTL:;
-	base[0]= VV[259];
-	vs_top=(vs_base=base+0)+1;
-	Lboundp();
-	vs_top=sup;
-	if((vs_base[0])==Cnil){
-	goto T1528;}
-	goto T1527;
-	goto T1528;
-T1528:;
+	if(!((VV[259])->s.s_dbind!=OBJNULL)){
+	goto T1506;}
+	goto T1505;
+	goto T1506;
+T1506:;
 	base[0]= VV[16];
 	vs_top=(vs_base=base+0)+1;
-	(void) (*Lnk330)();
+	(void) (*Lnk329)();
 	vs_top=sup;
-	setq(VV[259],vs_base[0]);
-	goto T1527;
-T1527:;
-	{object V444 = Cnil;
-	VMR221(V444)}
+	(VV[259]->s.s_dbind)= vs_base[0];
+	goto T1505;
+T1505:;
+	{object V433 = Cnil;
+	VMR221(V433)}
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile7800	*/
+/*	local entry for function progn 'compile7802	*/
 
 static object LI222()
 
 {	 VMB222 VMS222 VMV222
 	goto TTL;
 TTL:;
-	{object V445 = Cnil;
-	VMR222(V445)}
+	{object V434 = Cnil;
+	VMR222(V434)}
 	return Cnil;
 }
 /*	local entry for function SIMPLE-CONDITION-CLASS-P	*/
 
-static object LI223(V447)
+static object LI223(V436)
 
-register object V447;
+register object V436;
 {	 VMB223 VMS223 VMV223
 	goto TTL;
 TTL:;
-	if(!(type_of((V447))==t_symbol)){
-	goto T1534;}
-	base[0]= (V447);
+	if(!(type_of((V436))==t_symbol)){
+	goto T1511;}
+	base[0]= (V436);
 	vs_top=(vs_base=base+0)+1;
-	(void) (*Lnk330)();
+	(void) (*Lnk329)();
 	vs_top=sup;
-	V447= vs_base[0];
-	goto T1534;
-T1534:;
-	base[0]= (V447);
+	V436= vs_base[0];
+	goto T1511;
+T1511:;
+	base[0]= (V436);
 	base[1]= VV[5];
 	vs_top=(vs_base=base+0)+2;
-	(void) (*Lnk331)();
+	(void) (*Lnk330)();
 	vs_top=sup;
 	if((vs_base[0])!=Cnil){
-	goto T1539;}
-	{object V448 = Cnil;
-	VMR223(V448)}
-	goto T1539;
-T1539:;{object V450;
-	V450= symbol_value(VV[259]);
-	base[0]= (V447);
+	goto T1516;}
+	{object V437 = Cnil;
+	VMR223(V437)}
+	goto T1516;
+T1516:;{object V439;
+	V439= (VV[259]->s.s_dbind);
+	base[0]= (V436);
 	vs_top=(vs_base=base+0)+1;
-	(void) (*Lnk332)(Lclptr332);
+	(void) (*Lnk331)(Lclptr331);
 	vs_top=sup;
-	V451= vs_base[0];
-	{register object x= V450,V449= V451;
-	while(!endp(V449))
-	if(eql(x,V449->c.c_car)){
-	{object V452 = V449;
-	VMR223(V452)}
-	}else V449=V449->c.c_cdr;
-	{object V453 = Cnil;
-	VMR223(V453)}}}
+	V440= vs_base[0];
+	{register object x= V439,V438= V440;
+	while(V438!=Cnil)
+	if(eql(x,V438->c.c_car)){
+	{object V441 = V438;
+	VMR223(V441)}
+	}else V438=V438->c.c_cdr;
+	{object V442 = Cnil;
+	VMR223(V442)}}}
 	base[0]=base[0];
 	return Cnil;
 }
-static void LnkT332(ptr) object *ptr;{ call_or_link_closure(VV[332],(void **)(void *)&Lnk332,(void **)(void *)&Lclptr332);} /* CLASS-PRECEDENCE-LIST */
-static void LnkT331(){ call_or_link(VV[331],(void **)(void *)&Lnk331);} /* TYPEP */
-static void LnkT330(){ call_or_link(VV[330],(void **)(void *)&Lnk330);} /* FIND-CLASS */
-static void LnkT329(){ call_or_link(VV[329],(void **)(void *)&Lnk329);} /* *MAKE-SPECIAL */
-static void LnkT328(){ call_or_link(VV[328],(void **)(void *)&Lnk328);} /* Defclass INTERNAL-SIMPLE-STREAM-ERROR7690 */
-static void LnkT327(){ call_or_link(VV[327],(void **)(void *)&Lnk327);} /* Defclass INTERNAL-SIMPLE-FILE-ERROR7601 */
-static void LnkT326(){ call_or_link(VV[326],(void **)(void *)&Lnk326);} /* Defclass INTERNAL-END-OF-FILE7512 */
-static void LnkT325(){ call_or_link(VV[325],(void **)(void *)&Lnk325);} /* Defclass INTERNAL-UNDEFINED-FUNCTION7423 */
-static void LnkT324(){ call_or_link(VV[324],(void **)(void *)&Lnk324);} /* Defclass INTERNAL-UNBOUND-VARIABLE7334 */
-static void LnkT323(){ call_or_link(VV[323],(void **)(void *)&Lnk323);} /* Defclass INTERNAL-SIMPLE-CONTROL-ERROR7245 */
-static void LnkT322(){ call_or_link(VV[322],(void **)(void *)&Lnk322);} /* Defclass INTERNAL-SIMPLE-PROGRAM-ERROR7156 */
-static void LnkT321(){ call_or_link(VV[321],(void **)(void *)&Lnk321);} /* Defclass INTERNAL-PACKAGE-ERROR7067 */
-static void LnkT320(){ call_or_link(VV[320],(void **)(void *)&Lnk320);} /* Defclass INTERNAL-TYPE-ERROR6978 */
-static object  LnkTLI318(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[318],(void **)(void *)&LnkLI318,2,first,ap);va_end(ap);return V1;} /* INTERNAL-SIMPLE-ERROR-PRINTER */
-static void LnkT317(){ call_or_link(VV[317],(void **)(void *)&Lnk317);} /* Defclass INTERNAL-SIMPLE-ERROR6684 */
-static void LnkT315(ptr) object *ptr;{ call_or_link_closure(VV[315],(void **)(void *)&Lnk315,(void **)(void *)&Lclptr315);} /* INTERNAL-ERROR-FUNCTION-NAME */
-static void LnkT314(){ call_or_link(VV[314],(void **)(void *)&Lnk314);} /* Defclass INTERNAL-ERROR6257 */
-static void LnkT312(){ call_or_link(VV[312],(void **)(void *)&Lnk312);} /* Defclass ABORT-FAILURE5955 */
-static void LnkT311(){ call_or_link(VV[311],(void **)(void *)&Lnk311);} /* Defclass FLOATING-POINT-UNDERFLOW5866 */
-static void LnkT310(){ call_or_link(VV[310],(void **)(void *)&Lnk310);} /* Defclass FLOATING-POINT-OVERFLOW5777 */
-static void LnkT309(){ call_or_link(VV[309],(void **)(void *)&Lnk309);} /* Defclass DIVISION-BY-ZERO5688 */
-static void LnkT308(){ call_or_link(VV[308],(void **)(void *)&Lnk308);} /* Defclass ARITHMETIC-ERROR5598 */
-static void LnkT306(){ call_or_link(VV[306],(void **)(void *)&Lnk306);} /* Defclass UNDEFINED-FUNCTION5300 */
-static void LnkT304(ptr) object *ptr;{ call_or_link_closure(VV[304],(void **)(void *)&Lnk304,(void **)(void *)&Lclptr304);} /* CELL-ERROR-NAME */
-static void LnkT303(){ call_or_link(VV[303],(void **)(void *)&Lnk303);} /* Defclass UNBOUND-VARIABLE5002 */
-static void LnkT302(){ call_or_link(VV[302],(void **)(void *)&Lnk302);} /* Defclass CELL-ERROR4912 */
-static void LnkT300(ptr) object *ptr;{ call_or_link_closure(VV[300],(void **)(void *)&Lnk300,(void **)(void *)&Lclptr300);} /* PACKAGE-ERROR-MESSAGE */
-static void LnkT299(ptr) object *ptr;{ call_or_link_closure(VV[299],(void **)(void *)&Lnk299,(void **)(void *)&Lclptr299);} /* PACKAGE-ERROR-PACKAGE */
-static void LnkT298(){ call_or_link(VV[298],(void **)(void *)&Lnk298);} /* Defclass PACKAGE-ERROR4612 */
-static void LnkT297(){ call_or_link(VV[297],(void **)(void *)&Lnk297);} /* Defclass FILE-ERROR4522 */
-static void LnkT295(ptr) object *ptr;{ call_or_link_closure(VV[295],(void **)(void *)&Lnk295,(void **)(void *)&Lclptr295);} /* STREAM-ERROR-STREAM */
-static void LnkT294(){ call_or_link(VV[294],(void **)(void *)&Lnk294);} /* Defclass END-OF-FILE4224 */
-static void LnkT293(){ call_or_link(VV[293],(void **)(void *)&Lnk293);} /* Defclass STREAM-ERROR4134 */
-static void LnkT292(){ call_or_link(VV[292],(void **)(void *)&Lnk292);} /* Defclass CONTROL-ERROR4045 */
-static void LnkT291(){ call_or_link(VV[291],(void **)(void *)&Lnk291);} /* Defclass PROGRAM-ERROR3956 */
-static void LnkT289(ptr) object *ptr;{ call_or_link_closure(VV[289],(void **)(void *)&Lnk289,(void **)(void *)&Lclptr289);} /* CASE-FAILURE-POSSIBILITIES */
-static void LnkT288(ptr) object *ptr;{ call_or_link_closure(VV[288],(void **)(void *)&Lnk288,(void **)(void *)&Lclptr288);} /* CASE-FAILURE-NAME */
-static void LnkT287(){ call_or_link(VV[287],(void **)(void *)&Lnk287);} /* Defclass CASE-FAILURE3656 */
-static void LnkT286(){ call_or_link(VV[286],(void **)(void *)&Lnk286);} /* Defclass SIMPLE-TYPE-ERROR3567 */
-static void LnkT284(ptr) object *ptr;{ call_or_link_closure(VV[284],(void **)(void *)&Lnk284,(void **)(void *)&Lclptr284);} /* TYPE-ERROR-EXPECTED-TYPE */
-static void LnkT283(ptr) object *ptr;{ call_or_link_closure(VV[283],(void **)(void *)&Lnk283,(void **)(void *)&Lclptr283);} /* TYPE-ERROR-DATUM */
-static void LnkT282(){ call_or_link(VV[282],(void **)(void *)&Lnk282);} /* Defclass TYPE-ERROR3267 */
-static void LnkT281(){ call_or_link(VV[281],(void **)(void *)&Lnk281);} /* Defclass STORAGE-EXHAUSTED3178 */
-static void LnkT280(){ call_or_link(VV[280],(void **)(void *)&Lnk280);} /* Defclass STACK-OVERFLOW3089 */
-static void LnkT279(){ call_or_link(VV[279],(void **)(void *)&Lnk279);} /* Defclass STORAGE-CONDITION3000 */
-static void LnkT278(){ call_or_link(VV[278],(void **)(void *)&Lnk278);} /* Defclass SIMPLE-ERROR2911 */
-static void LnkT277(){ call_or_link(VV[277],(void **)(void *)&Lnk277);} /* Defclass SIMPLE-WARNING2822 */
-static void LnkT276(){ call_or_link(VV[276],(void **)(void *)&Lnk276);} /* LOAD-DEFMETHOD */
-static object  LnkTLI274(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[274],(void **)(void *)&LnkLI274,2,first,ap);va_end(ap);return V1;} /* SIMPLE-CONDITION-PRINTER */
-static void LnkT273(){ call_or_link(VV[273],(void **)(void *)&Lnk273);} /* ERROR */
+static void LnkT331(ptr) object *ptr;{ call_or_link_closure(VV[331],(void **)(void *)&Lnk331,(void **)(void *)&Lclptr331);} /* CLASS-PRECEDENCE-LIST */
+static void LnkT330(){ call_or_link(VV[330],(void **)(void *)&Lnk330);} /* TYPEP */
+static void LnkT329(){ call_or_link(VV[329],(void **)(void *)&Lnk329);} /* FIND-CLASS */
+static void LnkT328(){ call_or_link(VV[328],(void **)(void *)&Lnk328);} /* *MAKE-SPECIAL */
+static void LnkT327(){ call_or_link(VV[327],(void **)(void *)&Lnk327);} /* Defclass INTERNAL-SIMPLE-STREAM-ERROR7692 */
+static void LnkT326(){ call_or_link(VV[326],(void **)(void *)&Lnk326);} /* Defclass INTERNAL-SIMPLE-FILE-ERROR7603 */
+static void LnkT325(){ call_or_link(VV[325],(void **)(void *)&Lnk325);} /* Defclass INTERNAL-END-OF-FILE7514 */
+static void LnkT324(){ call_or_link(VV[324],(void **)(void *)&Lnk324);} /* Defclass INTERNAL-UNDEFINED-FUNCTION7425 */
+static void LnkT323(){ call_or_link(VV[323],(void **)(void *)&Lnk323);} /* Defclass INTERNAL-UNBOUND-VARIABLE7336 */
+static void LnkT322(){ call_or_link(VV[322],(void **)(void *)&Lnk322);} /* Defclass INTERNAL-SIMPLE-CONTROL-ERROR7247 */
+static void LnkT321(){ call_or_link(VV[321],(void **)(void *)&Lnk321);} /* Defclass INTERNAL-SIMPLE-PROGRAM-ERROR7158 */
+static void LnkT320(){ call_or_link(VV[320],(void **)(void *)&Lnk320);} /* Defclass INTERNAL-PACKAGE-ERROR7069 */
+static void LnkT319(){ call_or_link(VV[319],(void **)(void *)&Lnk319);} /* Defclass INTERNAL-TYPE-ERROR6980 */
+static object  LnkTLI317(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[317],(void **)(void *)&LnkLI317,2,first,ap);va_end(ap);return V1;} /* INTERNAL-SIMPLE-ERROR-PRINTER */
+static void LnkT316(){ call_or_link(VV[316],(void **)(void *)&Lnk316);} /* Defclass INTERNAL-SIMPLE-ERROR6686 */
+static void LnkT314(ptr) object *ptr;{ call_or_link_closure(VV[314],(void **)(void *)&Lnk314,(void **)(void *)&Lclptr314);} /* INTERNAL-ERROR-FUNCTION-NAME */
+static void LnkT313(){ call_or_link(VV[313],(void **)(void *)&Lnk313);} /* Defclass INTERNAL-ERROR6259 */
+static void LnkT311(){ call_or_link(VV[311],(void **)(void *)&Lnk311);} /* Defclass ABORT-FAILURE5957 */
+static void LnkT310(){ call_or_link(VV[310],(void **)(void *)&Lnk310);} /* Defclass FLOATING-POINT-UNDERFLOW5868 */
+static void LnkT309(){ call_or_link(VV[309],(void **)(void *)&Lnk309);} /* Defclass FLOATING-POINT-OVERFLOW5779 */
+static void LnkT308(){ call_or_link(VV[308],(void **)(void *)&Lnk308);} /* Defclass DIVISION-BY-ZERO5690 */
+static void LnkT307(){ call_or_link(VV[307],(void **)(void *)&Lnk307);} /* Defclass ARITHMETIC-ERROR5600 */
+static void LnkT305(){ call_or_link(VV[305],(void **)(void *)&Lnk305);} /* Defclass UNDEFINED-FUNCTION5302 */
+static void LnkT303(ptr) object *ptr;{ call_or_link_closure(VV[303],(void **)(void *)&Lnk303,(void **)(void *)&Lclptr303);} /* CELL-ERROR-NAME */
+static void LnkT302(){ call_or_link(VV[302],(void **)(void *)&Lnk302);} /* Defclass UNBOUND-VARIABLE5004 */
+static void LnkT301(){ call_or_link(VV[301],(void **)(void *)&Lnk301);} /* Defclass CELL-ERROR4914 */
+static void LnkT299(ptr) object *ptr;{ call_or_link_closure(VV[299],(void **)(void *)&Lnk299,(void **)(void *)&Lclptr299);} /* PACKAGE-ERROR-MESSAGE */
+static void LnkT298(ptr) object *ptr;{ call_or_link_closure(VV[298],(void **)(void *)&Lnk298,(void **)(void *)&Lclptr298);} /* PACKAGE-ERROR-PACKAGE */
+static void LnkT297(){ call_or_link(VV[297],(void **)(void *)&Lnk297);} /* Defclass PACKAGE-ERROR4614 */
+static void LnkT296(){ call_or_link(VV[296],(void **)(void *)&Lnk296);} /* Defclass FILE-ERROR4524 */
+static void LnkT294(ptr) object *ptr;{ call_or_link_closure(VV[294],(void **)(void *)&Lnk294,(void **)(void *)&Lclptr294);} /* STREAM-ERROR-STREAM */
+static void LnkT293(){ call_or_link(VV[293],(void **)(void *)&Lnk293);} /* Defclass END-OF-FILE4226 */
+static void LnkT292(){ call_or_link(VV[292],(void **)(void *)&Lnk292);} /* Defclass STREAM-ERROR4136 */
+static void LnkT291(){ call_or_link(VV[291],(void **)(void *)&Lnk291);} /* Defclass CONTROL-ERROR4047 */
+static void LnkT290(){ call_or_link(VV[290],(void **)(void *)&Lnk290);} /* Defclass PROGRAM-ERROR3958 */
+static void LnkT288(ptr) object *ptr;{ call_or_link_closure(VV[288],(void **)(void *)&Lnk288,(void **)(void *)&Lclptr288);} /* CASE-FAILURE-POSSIBILITIES */
+static void LnkT287(ptr) object *ptr;{ call_or_link_closure(VV[287],(void **)(void *)&Lnk287,(void **)(void *)&Lclptr287);} /* CASE-FAILURE-NAME */
+static void LnkT286(){ call_or_link(VV[286],(void **)(void *)&Lnk286);} /* Defclass CASE-FAILURE3658 */
+static void LnkT285(){ call_or_link(VV[285],(void **)(void *)&Lnk285);} /* Defclass SIMPLE-TYPE-ERROR3569 */
+static void LnkT283(ptr) object *ptr;{ call_or_link_closure(VV[283],(void **)(void *)&Lnk283,(void **)(void *)&Lclptr283);} /* TYPE-ERROR-EXPECTED-TYPE */
+static void LnkT282(ptr) object *ptr;{ call_or_link_closure(VV[282],(void **)(void *)&Lnk282,(void **)(void *)&Lclptr282);} /* TYPE-ERROR-DATUM */
+static void LnkT281(){ call_or_link(VV[281],(void **)(void *)&Lnk281);} /* Defclass TYPE-ERROR3269 */
+static void LnkT280(){ call_or_link(VV[280],(void **)(void *)&Lnk280);} /* Defclass STORAGE-EXHAUSTED3180 */
+static void LnkT279(){ call_or_link(VV[279],(void **)(void *)&Lnk279);} /* Defclass STACK-OVERFLOW3091 */
+static void LnkT278(){ call_or_link(VV[278],(void **)(void *)&Lnk278);} /* Defclass STORAGE-CONDITION3002 */
+static void LnkT277(){ call_or_link(VV[277],(void **)(void *)&Lnk277);} /* Defclass SIMPLE-ERROR2913 */
+static void LnkT276(){ call_or_link(VV[276],(void **)(void *)&Lnk276);} /* Defclass SIMPLE-WARNING2824 */
+static void LnkT275(){ call_or_link(VV[275],(void **)(void *)&Lnk275);} /* LOAD-DEFMETHOD */
+static object  LnkTLI273(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[273],(void **)(void *)&LnkLI273,2,first,ap);va_end(ap);return V1;} /* SIMPLE-CONDITION-PRINTER */
+static void LnkT272(){ call_or_link(VV[272],(void **)(void *)&Lnk272);} /* ERROR */
 static void LnkT13(){ call_or_link(VV[13],(void **)(void *)&Lnk13);} /* ERROR */
-static void LnkT272(){ call_or_link(VV[272],(void **)(void *)&Lnk272);} /* CCLOSURE-ENV-NTHCDR */
-static void LnkT271(){ call_or_link(VV[271],(void **)(void *)&Lnk271);} /* STRUCTURE-DEF */
+static void LnkT271(){ call_or_link(VV[271],(void **)(void *)&Lnk271);} /* CCLOSURE-ENV-NTHCDR */
 static void LnkT270(){ call_or_link(VV[270],(void **)(void *)&Lnk270);} /* STRUCTURE-SUBTYPE-P */
 static void LnkT269(){ call_or_link(VV[269],(void **)(void *)&Lnk269);} /* PROCLAIM-DEFGENERIC */
-static void LnkT268(){ call_or_link(VV[268],(void **)(void *)&Lnk268);} /* Defclass SIMPLE-CONDITION2526 */
+static void LnkT268(){ call_or_link(VV[268],(void **)(void *)&Lnk268);} /* Defclass SIMPLE-CONDITION2528 */
 static void LnkT266(ptr) object *ptr;{ call_or_link_closure(VV[266],(void **)(void *)&Lnk266,(void **)(void *)&Lclptr266);} /* SIMPLE-CONDITION-FORMAT-ARGUMENTS */
 static void LnkT265(ptr) object *ptr;{ call_or_link_closure(VV[265],(void **)(void *)&Lnk265,(void **)(void *)&Lclptr265);} /* SIMPLE-CONDITION-FORMAT-STRING */
-static void LnkT264(){ call_or_link(VV[264],(void **)(void *)&Lnk264);} /* Defclass ERROR2429 */
-static void LnkT263(){ call_or_link(VV[263],(void **)(void *)&Lnk263);} /* Defclass SERIOUS-CONDITION2340 */
-static void LnkT262(){ call_or_link(VV[262],(void **)(void *)&Lnk262);} /* Defclass WARNING2251 */
+static void LnkT264(){ call_or_link(VV[264],(void **)(void *)&Lnk264);} /* Defclass ERROR2431 */
+static void LnkT263(){ call_or_link(VV[263],(void **)(void *)&Lnk263);} /* Defclass SERIOUS-CONDITION2342 */
+static void LnkT262(){ call_or_link(VV[262],(void **)(void *)&Lnk262);} /* Defclass WARNING2253 */
 static void LnkT260(){ call_or_link(VV[260],(void **)(void *)&Lnk260);} /* REMOVE */
 
 #ifdef SYSTEM_SPECIAL_INIT

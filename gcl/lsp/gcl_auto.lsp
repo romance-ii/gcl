@@ -185,8 +185,8 @@
 )   ;;end autoloads of normally loaded files.j
 (if (find-package "COMPILER") (push :compiler *features*))
 #+compiler
-(autoload 'compiler::emit-fn '|../cmpnew/collectfn|)
-(autoload 'compiler::init-fn '|../cmpnew/collectfn|)
+(autoload 'compiler::emit-fn '|../cmpnew/gcl_collectfn|)
+(autoload 'compiler::init-fn '|../cmpnew/gcl_collectfn|)
 (autoload 'si::monstartup '"gprof")
 (autoload  'si::set-up-profile '"profile")
 

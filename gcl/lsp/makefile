@@ -43,31 +43,31 @@ all:	$(OBJS)
 	$(CC) $(OFLAG) $(CFLAGS) -c $*.c
 	${APPEND} ${NULLFILE} $*.data  $*.o
 
-.lsp.fn: ../cmpnew/collectfn.o
+.lsp.fn: ../cmpnew/gcl_collectfn.o
 	../xbin/make-fn $*.lsp
 
 all:	$(OBJS)
 
 fns1:	$(FNS)
 
-fns:	../cmpnew/collectfn.o
+fns:	../cmpnew/gcl_collectfn.o
 	$(MAKE) fns1 -e "FNS=`echo ${OBJS} | sed -e 's:\.o:\.fn:g'`"
 
-../cmpnew/collectfn.o: ../cmpnew/collectfn.lsp
-	(cd ../cmpnew ; $(PORTDIR)/saved_gcl $(PORTDIR)/ collectfn.lisp collectfn S1000)
+#../cmpnew/collectfn.o: ../cmpnew/collectfn.lsp
+#	(cd ../cmpnew ; $(PORTDIR)/saved_gcl $(PORTDIR)/ collectfn.lisp collectfn S1000)
 
 
 clean:
-	rm -f *.o core a.out
+	rm -f *.o core a.out *.fn
 allclean:
 	rm -f *.h *.data *.c
 
 dummy3 $(NEWCFILES): sys-proclaim.lisp
 
-sys-proclaim.lisp:
+sys-proclaim.lisp: fns
 	echo '(in-package "SYSTEM")' \
-	'(load "../cmpnew/collectfn")'\
-	'(compiler::make-all-proclaims "*.fn")' | ../xbin/gcl
+	'(load "../cmpnew/gcl_collectfn")'\
+	'(compiler::make-all-proclaims "*.fn")' | ../unixport/saved_gcl
 
 
 newc:	

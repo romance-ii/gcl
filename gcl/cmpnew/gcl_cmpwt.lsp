@@ -22,7 +22,7 @@
 (in-package 'compiler)
 
 (eval-when (compile eval)
-  (require 'FASDMACROS "../cmpnew/fasdmacros.lsp")
+  (require 'FASDMACROS "../cmpnew/gcl_fasdmacros.lsp")
 
 
 (defmacro data-vector () `(car *data*))

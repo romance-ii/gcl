@@ -30,7 +30,7 @@ static object LI8();
 static object LI9();
 #define VMB9 register object *base=vs_top;
 #define VMS9  register object *sup=vs_top+1;vs_top=sup;
-#define VMV9 vs_reserve(1);
+#define VMV9 vs_check;
 #define VMR9(VMT9) vs_top=base ; return(VMT9);
 static void LC13();
 #define VC10

@@ -109,7 +109,7 @@
 (si:putprop 'import t 'package-operation)
 (si:putprop 'provide t 'package-operation)
 (si:putprop 'require t 'package-operation)
-(si:putprop 'defpackage:defpackage t 'package-operation)
+;(si:putprop 'defpackage:defpackage t 'package-operation)
 
 ;;; Pass 1 top-levels.
 

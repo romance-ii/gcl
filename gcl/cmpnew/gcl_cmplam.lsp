@@ -843,6 +843,15 @@
 (defun c1dm-bad-key (key)
        (cmperr "Defmacro-lambda-list contains illegal use of ~s." key))
 
+(defmacro maybe-wt-c2dm-bind-vl (vl cvar form end-form)
+  `(let ((ipos (file-position *compiler-output1*)))
+    ,form
+    (let ((npos (file-position *compiler-output1*)))
+     (c2dm-bind-vl ,vl ,cvar)
+     (if (eql npos (file-position *compiler-output1*))
+         (file-position *compiler-output1* ipos)
+      ,end-form))))
+
 (defun c2dm (whole env vl body
                    &aux (cvar (next-cvar)))
   (when (or *safe-compile* *compiler-check-args*)
@@ -855,9 +864,7 @@
   (wt-nl "vs_top=sup;")
   (when whole (c2bind whole))
   (when env (c2bind env))
-  (wt-nl "{object V" cvar "=base[0]->c.c_cdr;")
-  (c2dm-bind-vl vl cvar)
-  (wt "}")
+  (maybe-wt-c2dm-bind-vl vl cvar (wt-nl "{object V" cvar "=base[0]->c.c_cdr;") (wt "}"))
   (c2expr body)
   )
 
@@ -879,7 +886,7 @@
       (c2dm-reserve-vl v)
       (setf (var-ref v) (vs-push))))
 
-(defun c2dm-bind-vl (vl cvar
+(defun c2dm-bind-vl (vl cvar 
                         &aux
                         (requireds (car vl)) (optionals (cadr vl))
                         (rest (caddr vl)) (key-flag (cadddr vl))
@@ -929,10 +936,10 @@
                (*ccb-vs* *ccb-vs*))
               (c2dm-bind-init (cadr kwd) (caddr kwd))
               (when (cadddr kwd) (c2dm-bind-loc (cadddr kwd) nil))
-              (wt-nl "} else {"))
+              (wt "} else {"))
          (c2dm-bind-loc (cadr kwd) `(cvar ,cvar1))
          (when (cadddr kwd) (c2dm-bind-loc (cadddr kwd) t))
-         (wt "}}")))
+         (wt-nl "}}")))
   (when (and (or *safe-compile* *compiler-check-args*)
              (null rest)
              (null key-flag))
@@ -951,9 +958,7 @@
 (defun c2dm-bind-loc (v loc)
   (if (consp v)
       (let ((cvar (next-cvar)))
-           (wt-nl "{object V" cvar "= " loc ";")
-           (c2dm-bind-vl v cvar)
-           (wt "}"))
+           (maybe-wt-c2dm-bind-vl v cvar (wt-nl "{object V" cvar "= " loc ";") (wt "}")))
       (c2bind-loc v loc)))
 
 (defun c2dm-bind-init (v init)
@@ -961,10 +966,8 @@
       (let* ((*vs* *vs*) (*inline-blocks* 0)
              (cvar (next-cvar))
              (loc (car (inline-args (list init) '(t)))))
-            (wt-nl "{object V" cvar "= " loc ";")
-            (c2dm-bind-vl v cvar)
-            (wt "}")
-            (close-inline-blocks))
+       (maybe-wt-c2dm-bind-vl v cvar (wt-nl "{object V" cvar "= " loc ";") (wt "}"))
+       (close-inline-blocks))
       (c2bind-init v init)))
 
 
