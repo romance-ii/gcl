@@ -45,9 +45,9 @@ endif
 GMP=--enable-dynsysgmp
 
 DEBUG=
-ifeq ($(ARCHT),hppa)
-DEBUG=--enable-debug
-endif
+#ifeq ($(ARCHT),hppa)
+#DEBUG=--enable-debug
+#endif
 
 VERS=$(shell echo $$(cat majvers).$$(cat minvers))
 EXT:=cvs
