@@ -1,6 +1,0 @@
-@ECHO off
-set cwd=@prefix@
-set libdir=@prefix@\..\lib\gcl-2.5.0
-set unixportdir=@prefix@\unixport
-path @prefix@\..\mingw\bin;%PATH%
-start %unixportdir%\saved_gcl.exe -dir %unixportdir% -libdir %libdir% -eval "(setq si::*allow-gzipped-file* t)" %1 %2 %3 %4 %5 %6 %7 %8 %9
