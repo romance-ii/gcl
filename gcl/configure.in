@@ -34,6 +34,9 @@ AC_ARG_ENABLE(tclconfig,[ --enable-tclconfig=XXXX will force the use of a TCL_CO
 AC_ARG_ENABLE(infodir,[ --enable-infodir=XXXX will force the use of a INFO_DIR=XXXXX as place to look for info ] ,
 [INFO_DIR=$enableval],[INFO_DIR="unknown"])
 
+AC_ARG_ENABLE(emacsdir,[ --enable-emacsdir=XXXX will manually specify the location for elisp files ] ,
+[EMACS_SITE_LISP=$enableval],[EMACS_SITE_LISP="unknown"])
+
 #
 # Host information 
 #
@@ -514,10 +517,10 @@ echo $X_EXTRA_LIBS
 echo $X_PRE_LIBS
 
 miss=0
-AC_CHECK_LIB(Xaw,main,X_LIBS="$X_LIBS -lXaw",miss=1,$X_LIBS)
 AC_CHECK_LIB(Xmu,main,X_LIBS="$X_LIBS -lXmu",miss=1,$X_LIBS)
 AC_CHECK_LIB(Xt,main,X_LIBS="$X_LIBS -lXt",miss=1,$X_LIBS)
 AC_CHECK_LIB(Xext,main,X_LIBS="$X_LIBS -lXext",miss=1,$X_LIBS)
+AC_CHECK_LIB(Xaw,main,X_LIBS="$X_LIBS -lXaw",miss=1,$X_LIBS)
 AC_CHECK_LIB(X11,main,X_LIBS="$X_LIBS -lX11",miss=1,$X_LIBS)
  
 if test "$miss" = "1" ; then
@@ -1058,8 +1061,7 @@ cat >> conftest.el <<EOF
 EOF
 
 AC_MSG_CHECKING([emacs site lisp directory])
-#EMACS_SITE_LISP=unknown
-if [[ "$EMACS" != "" ]] ; then
+if [[ "$EMACS" != "" ]]  && [[ "$EMACS_SITE_LISP" = "unknown" ]] ; then
 	EMACS_SITE_LISP=`$EMACS -q -batch --no-site-file -l conftest.el 2>&1 | sed -e /Loading/d | sed -e /load/d `
 else
 	EMACS_SITE_LISP=""

@@ -1,3 +1,10 @@
+gcl (2.5.0.cvs20020625-68) unstable; urgency=high
+
+  * enable emacsdir configure option
+  * reordered configure X lib detection for solaris
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 13 Nov 2002 14:41:35 -0500
+
 gcl (2.5.0.cvs20020625-67) unstable; urgency=high
 
   * Align cache flushes for powerpc and m68k on 32 byte boundaries,
