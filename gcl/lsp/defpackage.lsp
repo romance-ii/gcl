@@ -69,6 +69,7 @@
 
 (export '(defpackage))
 
+(use-package :SLOOP)
 
 (proclaim '(declaration values arglist))
 
@@ -128,19 +129,19 @@
 
 	 :SIZE is used only in Genera and Allegro.]"
 
-  (loop for (option) in options
+  (sloop for option in options
 	unless (member option '(:documentation :size :nicknames :shadow :shadowing-import-from :use :import-from :intern :export :export-from))
 	  do (cerror "Proceed, ignoring this option." "~s is not a valid DEFPACKAGE option." option))
   (labels ((option-test (arg1 arg2) (when (consp arg2) (equal (car arg2) arg1)))
 	   (option-values-list (option options)
-	     (loop for result = (member option options ':test #'option-test)
+	     (sloop for result = (member option options ':test #'option-test)
 			      then (member option (rest result) ':test #'option-test)
 		   until (null result) when result collect (rest (first result))))
 	   (option-values (option options)
-	     (loop for result  = (member option options ':test #'option-test)
+	     (sloop for result  = (member option options ':test #'option-test)
 			      then (member option (rest result) ':test #'option-test)
 		   until (null result) when result append (rest (first result)))))
-    (loop for option in '(:size :documentation)
+    (sloop for option in '(:size :documentation)
 	  when (<= 2 (count option options ':key #'car))
 	    do (warn "DEFPACKAGE option ~s specified more than once.  The first value \"~a\" will be used." option (first (option-values option options))))
     (setq name (string name))
@@ -150,22 +151,22 @@
 	  (shadowed-symbol-names (mapcar #'string (option-values ':shadow options)))
 	  (interned-symbol-names (mapcar #'string (option-values ':intern options)))
 	  (exported-symbol-names (mapcar #'string (option-values ':export options)))
-	  (shadowing-imported-from-symbol-names-list (loop for list in (option-values-list ':shadowing-import-from options)
+	  (shadowing-imported-from-symbol-names-list (sloop for list in (option-values-list ':shadowing-import-from options)
 							   collect (cons (string (first list)) (mapcar #'string (rest list)))))
-	  (imported-from-symbol-names-list (loop for list in (option-values-list ':import-from options)
+	  (imported-from-symbol-names-list (sloop for list in (option-values-list ':import-from options)
 						 collect (cons (string (first list)) (mapcar #'string (rest list)))))
 	  (exported-from-package-names (mapcar #'string (option-values ':export-from options))))
         (flet ((find-duplicates (&rest lists)
 		 (let (results)
-		   (loop for list in lists
+		   (sloop for list in lists
 			 for more on (cdr lists)
 			 for i from 1
 			 do
-		     (loop for elt in list
+		     (sloop for elt in list
 			   as entry = (find elt results :key #'car :test #'string=)
 			   unless (member i entry)
 			     do
-			       (loop for l2 in more
+			       (sloop for l2 in more
 				     for j from (1+ i)
 				     do
 				 (if (member elt l2 :test #'string=)
@@ -173,17 +174,17 @@
 					 (nconc entry (list j))
 					 (setq entry (car (push (list elt i j) results))))))))
 		   results)))
-	  (loop for duplicate in (find-duplicates shadowed-symbol-names interned-symbol-names
-						  (loop for list in shadowing-imported-from-symbol-names-list append (rest list))
-						  (loop for list in imported-from-symbol-names-list append (rest list)))
+	  (sloop for duplicate in (find-duplicates shadowed-symbol-names interned-symbol-names
+						  (sloop for list in shadowing-imported-from-symbol-names-list append (rest list))
+						  (sloop for list in imported-from-symbol-names-list append (rest list)))
 		do
 	    (error "The symbol ~s cannot coexist in these lists:~{ ~s~}" (first duplicate)
-		   (loop for num in (rest duplicate)
+		   (sloop for num in (rest duplicate)
 			 collect (case num (1 ':SHADOW)(2 ':INTERN)(3 ':SHADOWING-IMPORT-FROM)(4 ':IMPORT-FROM)))))
-	  (loop for duplicate in (find-duplicates exported-symbol-names interned-symbol-names)
+	  (sloop for duplicate in (find-duplicates exported-symbol-names interned-symbol-names)
 		do
 	    (error "The symbol ~s cannot coexist in these lists:~{ ~s~}" (first duplicate)
-		   (loop for num in (rest duplicate) collect (case num (1 ':EXPORT)(2 ':INTERN))))))
+		   (sloop for num in (rest duplicate) collect (case num (1 ':EXPORT)(2 ':INTERN))))))
       `(eval-when (load eval compile)
 	 (if (find-package ,name)
 	     (progn (rename-package ,name ,name)
@@ -205,7 +206,7 @@
 	       (mapcar #'(lambda (list)
 			   `(SHADOWING-IMPORT (mapcar #'(lambda (symbol) (intern symbol ,(first list))) ',(rest list))))
 		       SHADOWING-IMPORTed-from-symbol-names-list))
-	   (USE-PACKAGE ',(or (mapcar #'string (option-values ':USE options)) "CL"))
+	   (USE-PACKAGE ',(or (mapcar #'string (option-values ':USE options)) "LISP"))
 	   ,@(when IMPORTed-from-symbol-names-list
 	       (mapcar #'(lambda (list) `(IMPORT (mapcar #'(lambda (symbol) (intern symbol ,(first list))) ',(rest list))))
 		       IMPORTed-from-symbol-names-list))
