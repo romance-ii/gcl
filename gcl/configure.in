@@ -37,8 +37,8 @@ AC_ARG_ENABLE(infodir,[ --enable-infodir=XXXX will force the use of a INFO_DIR=X
 AC_ARG_ENABLE(emacsdir,[ --enable-emacsdir=XXXX will manually specify the location for elisp files ] ,
 [EMACS_SITE_LISP=$enableval],[EMACS_SITE_LISP="unknown"])
 
-AC_ARG_ENABLE(just486,[ --enable-just486=yes forces use of i486 compatible instructions only, (default is =yes)] ,
-[use_just486=$enableval],[use_just486="yes"])
+AC_ARG_ENABLE(common-binary,[ --enable-common-binary=yes forces use of lowest common denominator instruction sets, (default is =yes)] ,
+[use_common_binary=$enableval],[use_common_binary="yes"])
 
 #
 # Host information 
@@ -189,10 +189,10 @@ case $canonical in
      use=vax;;
 
      i*mingw*)
-       if test "$use_just486" = "yes"; then
-         host=i486-pc-mingw32
-	 PROCESSOR_FLAGS="-mcpu=i486 -march=i486"
-         echo "Host is being canonicalised to $host"
+       if test "$use_common_binary" = "yes"; then
+         host=i386-pc-mingw32
+	 PROCESSOR_FLAGS="-march=i386 "
+         echo "The host is canonicalised to $host"
        fi
      use=mingw;;
 
@@ -438,7 +438,7 @@ if test $use_gmp = yes ; then
 	GMPDIR=gmp3
  fi
 
- if test "$use_just486" = "yes"; then
+ if test "$use_common_binary" = "yes"; then
    cd $GMPDIR && ./configure --build=$host && cd ..
  else
    cd $GMPDIR && ./configure && cd ..
