@@ -156,33 +156,6 @@
 	      (setf y (+ y (j_getfontheight drawable)))
 	      (j_drawstring drawable x y teststr))))))
 
-(defun mandel (drawable)
-    (loop for y from -1 to 1.1 by 0.01 do
-      (loop for x from -2 to 1 by 0.004 do
-        (let* ((c 255)
-               (z (complex x y))
-               (a z))
-          (loop while (and (< (abs
-                               (setq z (+ (* z z) a)))
-                              2)
-                           (>= (decf c) 0)))
-	  (j_setcolor drawable c c c)
-          (j_drawpixel drawable (* 100 (+ 2 x)) (* 100 (+ 1 y)) )))))
-
-; Monochrome Mandelbrot
-(with-server
- ("GCL Japi library test GUI 4" 0)
- (with-frame
-  (frame "Mandelbrot")
-  (j_setsize frame 500 500)
-  (j_setnamedcolorbg frame J_BLACK)
-  (j_pack frame)
-  (j_show frame)
-  (with-canvas
-   (canvas1 frame 500 500)
-   (j_show canvas1)
-   (mandel canvas1))))
-
 
      
 ;; Run a five second frame in a Japi server
@@ -240,6 +213,7 @@
 		(drawgraphics image 0 0 600 800)
 		(when (= 0 (j_saveimage image "test.bmp" J_BMP))
 		  (j_alertbox frame "Problems" "Can't save the image" "OK")))))))))))))
+
 ;; Try some mouse handling
 (with-server
  ("GCL Japi library test GUI 3" 0)
@@ -326,70 +300,121 @@
        (with-menu-item
 	(quit-mi file-mi "Quit")
 
-    (with-menu
-     (edit-mi menubar "Edit")
-     (with-menu-item
-      (select-all-mi edit-mi "Select All")
-      (j_seperator edit-mi)
-      (with-menu-item
-       (cut-mi edit-mi "Cut")
-       (with-menu-item
-	(copy-mi edit-mi "Copy")
-	(with-menu-item
-	 (paste-mi edit-mi "Paste")
+	(with-menu
+	 (edit-mi menubar "Edit")
+	 (with-menu-item
+	  (select-all-mi edit-mi "Select All")
+	  (j_seperator edit-mi)
+	  (with-menu-item
+	   (cut-mi edit-mi "Cut")
+	   (with-menu-item
+	    (copy-mi edit-mi "Copy")
+	    (with-menu-item
+	     (paste-mi edit-mi "Paste")
        
-    (with-text-area
-     (text panel 15 4)
-     (j_setfont text J_DIALOGIN J_BOLD 18)
-     (let ((new-text (format nil "JAPI (Java Application~%Programming Interface)~%a platform and language~%independent API")))
-       (j_settext text new-text)
-       (j_show frame)
-       (j_pack frame)
-       (j_setrows text 4)
-       (j_setcolumns text 15)
-       (j_pack frame)
-       ;; Allocate immovable storage for passing data back from C land.
-       ;; Uses the GCL only make-array keyword :static
-       (let* ((xa (make-array 1 :initial-element 0 :element-type 'fixnum :static t))
-	      (ya (make-array 1 :initial-element 0 :element-type 'fixnum :static t))
-	      (pxa (inta-ptr xa))
-	      (pya (inta-ptr ya))
-	      (x 0)
-	      (y 0)
-	      (get-mouse-xy (lambda (obj)
-			      (progn (j_getmousepos obj pxa pya)
-				     (setf x (aref xa 0))
-				     (setf y (aref ya 0)))))
-	      (startx 0)
-	      (starty 0)
-	      (selstart 0)
-	      (selend 0)
-	      (text-buffer (make-array 64000 :initial-element 0 :element-type 'character :static t))
-;	      (text-buffer (make-string 64000 :initial-element #\0))
-	      (p-text-buffer (inta-ptr text-buffer)))
-	 (do ((obj (j_nextaction) (j_nextaction)))
-	     ((or (= obj frame) (= obj quit-mi))t)
-	     (when (= obj panel)
-	       (format t "Size changed to ~D rows ~D columns~%" (j_getrows text) (j_getcolumns text))
-	       (format t "Size changed to ~D x ~D pixels~%" (j_getwidth text) (j_getheight text)))
-	     (when (= obj text) (format t "Text changed (len=~D)~%" (j_getlength text) ))
-	     (when (= obj new-mi) (j_settext new-text))
-	     (when (= obj save-mi) (j_gettext text text-buffer))
-	     (when (= obj select-all-mi) (j_selectall text))
-	     (when (or (= obj cut-mi)
-		       (= obj copy-mi)
-		       (= obj paste-mi))
-	       (setf selstart (1- (j_getselstart text)))
-	       (setf selend (1- (j_getselend text))))
-	     (when (= obj cut-mi)
-	       (j_getseltext text p-text-buffer)
-	       (j_delete text (1- (j_getselstart text)) (1- (j_getselend text)))
-	       (setf selend selstart))
-	     (when (= obj copy-mi)
-	       (j_getseltext text p-text-buffer))
-	     (when (= obj paste-mi)
-	       (if (= selstart selend)
-		   (j_inserttext text p-text-buffer (1- (j_getcurpos text)))
-		 (j_replacetext text p-text-buffer (1- (j_getselstart text)) (1- (j_getselend text))))
-	       ))))))))))))))))))
+	     (with-text-area
+	      (text panel 15 4)
+	      (j_setfont text J_DIALOGIN J_BOLD 18)
+	      (let ((new-text (format nil "JAPI (Java Application~%Programming Interface)~%a platform and language~%independent API")))
+		(j_settext text new-text)
+		(j_show frame)
+		(j_pack frame)
+		(j_setrows text 4)
+		(j_setcolumns text 15)
+		(j_pack frame)
+		;; Allocate immovable storage for passing data back from C land.
+		;; Uses the GCL only make-array keyword :static
+		(let* ((xa (make-array 1 :initial-element 0 :element-type 'fixnum :static t))
+		       (ya (make-array 1 :initial-element 0 :element-type 'fixnum :static t))
+		       (pxa (inta-ptr xa))
+		       (pya (inta-ptr ya))
+		       (x 0)
+		       (y 0)
+		       (get-mouse-xy (lambda (obj)
+				       (progn (j_getmousepos obj pxa pya)
+					      (setf x (aref xa 0))
+					      (setf y (aref ya 0)))))
+		       (startx 0)
+		       (starty 0)
+		       (selstart 0)
+		       (selend 0)
+		       (text-buffer (make-array 64000 :initial-element 0 :element-type 'character :static t))
+					;	      (text-buffer (make-string 64000 :initial-element #\0))
+		       (p-text-buffer (inta-ptr text-buffer)))
+		  (do ((obj (j_nextaction) (j_nextaction)))
+		      ((or (= obj frame) (= obj quit-mi))t)
+		      (when (= obj panel)
+			(format t "Size changed to ~D rows ~D columns~%" (j_getrows text) (j_getcolumns text))
+			(format t "Size changed to ~D x ~D pixels~%" (j_getwidth text) (j_getheight text)))
+		      (when (= obj text) (format t "Text changed (len=~D)~%" (j_getlength text) ))
+		      (when (= obj new-mi) (j_settext new-text))
+		      (when (= obj save-mi) (j_gettext text text-buffer))
+		      (when (= obj select-all-mi) (j_selectall text))
+		      (when (or (= obj cut-mi)
+				(= obj copy-mi)
+				(= obj paste-mi))
+			(setf selstart (1- (j_getselstart text)))
+			(setf selend (1- (j_getselend text))))
+		      (when (= obj cut-mi)
+			(j_getseltext text p-text-buffer)
+			(j_delete text (1- (j_getselstart text)) (1- (j_getselend text)))
+			(setf selend selstart))
+		      (when (= obj copy-mi)
+			(j_getseltext text p-text-buffer))
+		      (when (= obj paste-mi)
+			(if (= selstart selend)
+			    (j_inserttext text p-text-buffer (1- (j_getcurpos text)))
+			  (j_replacetext text p-text-buffer (1- (j_getselstart text)) (1- (j_getselend text))))
+			))))))))))))))))))
 
+(defun mandel (drawable min_x max_x min_y max_y step_x step_y)
+  (let* ((scale_x (/ 1 step_x))
+	 (scale_y (/ 1 step_y)))
+    (loop for y from min_y to max_y by step_y do
+	  (loop for x from min_x to max_x by step_x do
+		(let* ((c 255)
+		       (z (complex x y))
+		       (a z))
+		  (loop while (and (< (abs
+				       (setq z (+ (* z z) a)))
+				      2)
+				   (>= (decf c) 0)))
+		  (j_setcolor drawable c c c)
+		  (j_drawpixel drawable (* scale_x (+ (abs min_x) x)) (* scale_y (+ (abs min_y) y)) ))))))
+
+;;; Monochrome Mandelbrot
+(with-server
+ ("GCL Japi library test GUI 4" 0)
+ (let* ((min_x -2)
+	(max_x  1)
+	(min_y -1)
+	(max_y  1.1)
+	(step_x 0.01)
+	(step_y 0.01)
+	(size_x (+ 1 (/ (- max_x min_x) step_x)))
+	(size_y (+ 1 (/ (- max_y min_y) step_y))))
+   (with-frame
+    (frame "Mandelbrot")
+    (j_setsize frame size_x size_y)
+    (j_setborderlayout frame)
+    (with-menu-bar
+     (menubar frame)
+     (with-menu
+      (file menubar "File")
+      (with-menu-item
+       (save file "Save BMP")
+       (with-menu-item
+	(quit file "Quit")
+	(with-canvas
+	 (canvas1 frame size_x size_y)
+	 (j_pack frame)
+	 (j_show frame)
+	 (j_show canvas1)
+	 (mandel canvas1  min_x max_x min_y max_y step_x step_y)
+	 (do ((obj (j_nextaction) (j_nextaction)))
+	     ((or (= obj frame) (= obj quit)) t)
+	     (when (= obj save)
+	       (let ((image (j_getimage canvas1)))
+		 (when (= 0 (j_saveimage image "mandel.bmp" J_BMP))
+		   (j_alertbox frame "Problems" "Can't save the image" "OK"))
+		 (j_dispose image) )))))))))))
