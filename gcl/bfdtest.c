@@ -17,8 +17,9 @@ int build_symbol_table_bfd ( char *oname ) {
     int u,v;
     asymbol **q;
 
+    bfd_init();
     if ( ! ( exe_bfd = bfd_openr ( oname, 0 ) ) ) {
-        fprintf ( stderr, "Cannot open self.\n" );
+        fprintf ( stderr, "Cannot open %s.\n", oname );
         exit ( 0 );
     }
     
@@ -27,17 +28,17 @@ int build_symbol_table_bfd ( char *oname ) {
         exit ( 0 );
     }
     
-    if (!(link_info.hash = bfd_link_hash_table_create (exe_bfd))) {
+    if ( !(link_info.hash = bfd_link_hash_table_create ( exe_bfd ) ) ) {
         fprintf ( stderr, "Cannot make hash table.\n" );
         exit ( 0 );
     }
     
-    if (!bfd_link_add_symbols(exe_bfd,&link_info)) {
+    if ( !bfd_link_add_symbols ( exe_bfd, &link_info ) ) {
         fprintf ( stderr, "Cannot add self symbols\n.\n" );
         exit ( 0 );
     }
     
-    if ((u=bfd_get_symtab_upper_bound(exe_bfd))<0) {
+    if ( ( u = bfd_get_symtab_upper_bound ( exe_bfd ) ) < 0 ) {
         fprintf ( stderr, "Cannot get self's symtab upper bound.\n" );
         exit ( 0 );
     }
@@ -255,7 +256,7 @@ int main ( int argc, char ** argv )
               sizeof ( rhtt ) );
     
     if ( argc < 3 ) {
-        fprintf ( stderr, "Need an executable and an object file as arguments.\n" );
+        fprintf ( stderr, "Need an executable (eg raw_gcl.exe) and an object file as arguments.\n" );
     } else {
 
         memset ( &link_info, 0, sizeof (link_info) );
@@ -263,9 +264,7 @@ int main ( int argc, char ** argv )
         memset ( &link_callbacks, 0, sizeof (link_callbacks) );
         
 
-        bfd_init();
-
-        fprintf ( stderr, "BUILDING EXECUTABLE SYMBOL TABLE (ARGV[1]) \n\n" );
+        fprintf ( stderr, "BUILDING EXECUTABLE SYMBOL TABLE FOR %s \n", argv[1] );
         build_symbol_table_bfd ( argv[1] );        
 
         link_callbacks.add_archive_element=madd_archive_element;
@@ -282,6 +281,7 @@ int main ( int argc, char ** argv )
         link_info.callbacks = &link_callbacks;
         link_order.type = bfd_indirect_link_order;
 
+        fprintf ( stderr, "OPENING OBJECT FILE %s\n", argv[2] );
         if ( ! ( obj_bfd = bfd_openr ( argv[2], 0 ) ) ) {
             fprintf ( stderr, "Cannot open bfd.\n" );
         }
