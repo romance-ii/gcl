@@ -189,6 +189,8 @@ source path for joe and compile him into the object path for :uinfor"
 	   
 #+kcl
 (setq si::*default-time-zone* 6)
+#+winnt
+(setq SYSTEM:*DEFAULT-TIME-ZONE*  (GET-SYSTEM-TIME-ZONE))
 
 (defun print-date (&optional(stream *standard-output*)
 			    (time (get-universal-time)))
