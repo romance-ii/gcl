@@ -185,7 +185,7 @@ the socket.  If PORT is zero do automatic allocation of port")
       return Cnil;
     }
 
-  return make_cons(make_fixnum(s), small_fixnum(ntohs(addr.sin_port)));
+  return make_cons(make_fixnum(s), make_fixnum(ntohs(addr.sin_port)));
 }
 
 DEFUN_NEW("CLOSE-FD",object,fSclose_fd,SI,1,1,NONE,OI,OO,OO,OO,(fixnum fd),

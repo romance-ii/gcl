@@ -3756,60 +3756,60 @@ T1454:;
 	goto T1449;}}
 	}
 }
-static void LnkT169(){ call_or_link(VV[169],(void **)&Lnk169);} /* SAFE-EVAL */
-static void LnkT168(){ call_or_link(VV[168],(void **)&Lnk168);} /* ERROR-SET */
-static void LnkT167(){ call_or_link(VV[167],(void **)&Lnk167);} /* APPLY-DISPLAY-FUN */
-static void LnkT166(){ call_or_link(VV[166],(void **)&Lnk166);} /* COMPUTING-ARGS-P */
-static void LnkT165(){ call_or_link(VV[165],(void **)&Lnk165);} /* VS-TOP */
-static void LnkT164(){ call_or_link(VV[164],(void **)&Lnk164);} /* NEXT-STACK-FRAME */
-static void LnkT163(){ call_or_link(VV[163],(void **)&Lnk163);} /* IHS-NOT-INTERPRETED-ENV */
-static void LnkT162(){ call_or_link(VV[162],(void **)&Lnk162);} /* GET-LINE-OF-FORM */
-static void LnkT161(){ call_or_link(VV[161],(void **)&Lnk161);} /* PRINT-STACK-FRAME */
-static object  LnkTLI160(){return call_proc0(VV[160],(void **)&LnkLI160);} /* SET-ENV */
-static void LnkT159(){ call_or_link(VV[159],(void **)&Lnk159);} /* NTH-STACK-FRAME */
-static void LnkT158(){ call_or_link(VV[158],(void **)&Lnk158);} /* DBL-WHAT-FRAME */
-static void LnkT157(){ call_or_link(VV[157],(void **)&Lnk157);} /* GET-NEXT-VISIBLE-FUN */
-static void LnkT156(){ call_or_link(VV[156],(void **)&Lnk156);} /* STRING-MATCH */
-static void LnkT155(){ call_or_link(VV[155],(void **)&Lnk155);} /* PACKAGE-SIZE */
-static void LnkT151(){ call_or_link(VV[151],(void **)&Lnk151);} /* RELATIVE-LINE */
-static void LnkT150(){ call_or_link(VV[150],(void **)&Lnk150);} /* SHORT-NAME */
-static void LnkT149(){ call_or_link(VV[149],(void **)&Lnk149);} /* SHOW-BREAK-POINT */
-static void LnkT148(){ call_or_link(VV[148],(void **)&Lnk148);} /* INSERT-BREAK-POINT */
-static void LnkT147(){ call_or_link(VV[147],(void **)&Lnk147);} /* BREAK-FUNCTION */
-static void LnkT146(){ call_or_link(VV[146],(void **)&Lnk146);} /* DWIM */
-static void LnkT145(){ call_or_link(VV[145],(void **)&Lnk145);} /* MAYBE-BREAK */
-static object  LnkTLI144(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[144],(void **)&LnkLI144,first,ap);va_end(ap);return V1;} /* POSITION */
-static void LnkT143(){ call_or_link(VV[143],(void **)&Lnk143);} /* CURRENT-STEP-FUN */
-static void LnkT142(){ call_or_link(VV[142],(void **)&Lnk142);} /* INIT-BREAK-POINTS */
-static void LnkT141(){ call_or_link(VV[141],(void **)&Lnk141);} /* IHS-FNAME */
-static void LnkT140(){ call_or_link(VV[140],(void **)&Lnk140);} /* ITERATE-OVER-BKPTS */
-static void LnkT139(){ call_or_link(VV[139],(void **)&Lnk139);} /* MAKE-BREAK-POINT */
-static object  LnkTLI138(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[138],(void **)&LnkLI138,first,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
-static void LnkT137(){ call_or_link(VV[137],(void **)&Lnk137);} /* WALK-THROUGH */
-static object  LnkTLI136(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[136],(void **)&LnkLI136,first,ap);va_end(ap);return V1;} /* VECTOR-PUSH-EXTEND */
-static void LnkT135(){ call_or_link(VV[135],(void **)&Lnk135);} /* INSTREAM-NAME */
-static void LnkT134(){ call_or_link(VV[134],(void **)&Lnk134);} /* LOAD */
-static void LnkT133(){ call_or_link(VV[133],(void **)&Lnk133);} /* SETUP-LINEINFO */
-static void LnkT132(){ call_or_link(VV[132],(void **)&Lnk132);} /* CLEANUP */
-static void LnkT129(){ call_or_link(VV[129],(void **)&Lnk129);} /* READ-FROM-STRING */
-static object  LnkTLI128(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[128],(void **)&LnkLI128,first,ap);va_end(ap);return V1;} /* COUNT */
-static void LnkT127(){ call_or_link(VV[127],(void **)&Lnk127);} /* GET-INSTREAM */
-static void LnkT126(){ call_or_link(VV[126],(void **)&Lnk126);} /* MAKE-INSTREAM */
-static void LnkT125(){ call_or_link(VV[125],(void **)&Lnk125);} /* STREAM-NAME */
-static object  LnkTLI124(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[124],(void **)&LnkLI124,first,ap);va_end(ap);return V1;} /* DELETE */
-static void LnkT123(){ call_or_link(VV[123],(void **)&Lnk123);} /* CLOSEDP */
-static void LnkT122(){ call_or_link(VV[122],(void **)&Lnk122);} /* BREAK-LEVEL */
-static object  LnkTLI121(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[121],(void **)&LnkLI121,1,first,ap);va_end(ap);return V1;} /* SHOW-ENVIRONMENT */
-static void LnkT120(){ call_or_link(VV[120],(void **)&Lnk120);} /* BREAK-LOCALS */
-static void LnkT119(){ call_or_link(VV[119],(void **)&Lnk119);} /* BREAK-GO */
-static object  LnkTLI118(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[118],(void **)&LnkLI118,first,ap);va_end(ap);return V1;} /* SEARCH */
-static void LnkT117(){ call_or_link(VV[117],(void **)&Lnk117);} /* COMPILED-FUNCTION-NAME */
-static void LnkT116(){ call_or_link(VV[116],(void **)&Lnk116);} /* IHS-FUN */
-static object  LnkTLI115(){return call_proc0(VV[115],(void **)&LnkLI115);} /* TYPE-ERROR */
-static void LnkT114(){ call_or_link(VV[114],(void **)&Lnk114);} /* IHS-TOP */
-static void LnkT113(){ call_or_link(VV[113],(void **)&Lnk113);} /* VS */
-static void LnkT112(){ call_or_link(VV[112],(void **)&Lnk112);} /* IHS-VS */
-static void LnkT111(){ call_or_link(VV[111],(void **)&Lnk111);} /* BREAK-PREVIOUS */
+static void LnkT169(){ call_or_link(VV[169],(void **)(void *)&Lnk169);} /* SAFE-EVAL */
+static void LnkT168(){ call_or_link(VV[168],(void **)(void *)&Lnk168);} /* ERROR-SET */
+static void LnkT167(){ call_or_link(VV[167],(void **)(void *)&Lnk167);} /* APPLY-DISPLAY-FUN */
+static void LnkT166(){ call_or_link(VV[166],(void **)(void *)&Lnk166);} /* COMPUTING-ARGS-P */
+static void LnkT165(){ call_or_link(VV[165],(void **)(void *)&Lnk165);} /* VS-TOP */
+static void LnkT164(){ call_or_link(VV[164],(void **)(void *)&Lnk164);} /* NEXT-STACK-FRAME */
+static void LnkT163(){ call_or_link(VV[163],(void **)(void *)&Lnk163);} /* IHS-NOT-INTERPRETED-ENV */
+static void LnkT162(){ call_or_link(VV[162],(void **)(void *)&Lnk162);} /* GET-LINE-OF-FORM */
+static void LnkT161(){ call_or_link(VV[161],(void **)(void *)&Lnk161);} /* PRINT-STACK-FRAME */
+static object  LnkTLI160(){return call_proc0(VV[160],(void **)(void *)&LnkLI160);} /* SET-ENV */
+static void LnkT159(){ call_or_link(VV[159],(void **)(void *)&Lnk159);} /* NTH-STACK-FRAME */
+static void LnkT158(){ call_or_link(VV[158],(void **)(void *)&Lnk158);} /* DBL-WHAT-FRAME */
+static void LnkT157(){ call_or_link(VV[157],(void **)(void *)&Lnk157);} /* GET-NEXT-VISIBLE-FUN */
+static void LnkT156(){ call_or_link(VV[156],(void **)(void *)&Lnk156);} /* STRING-MATCH */
+static void LnkT155(){ call_or_link(VV[155],(void **)(void *)&Lnk155);} /* PACKAGE-SIZE */
+static void LnkT151(){ call_or_link(VV[151],(void **)(void *)&Lnk151);} /* RELATIVE-LINE */
+static void LnkT150(){ call_or_link(VV[150],(void **)(void *)&Lnk150);} /* SHORT-NAME */
+static void LnkT149(){ call_or_link(VV[149],(void **)(void *)&Lnk149);} /* SHOW-BREAK-POINT */
+static void LnkT148(){ call_or_link(VV[148],(void **)(void *)&Lnk148);} /* INSERT-BREAK-POINT */
+static void LnkT147(){ call_or_link(VV[147],(void **)(void *)&Lnk147);} /* BREAK-FUNCTION */
+static void LnkT146(){ call_or_link(VV[146],(void **)(void *)&Lnk146);} /* DWIM */
+static void LnkT145(){ call_or_link(VV[145],(void **)(void *)&Lnk145);} /* MAYBE-BREAK */
+static object  LnkTLI144(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[144],(void **)(void *)&LnkLI144,first,ap);va_end(ap);return V1;} /* POSITION */
+static void LnkT143(){ call_or_link(VV[143],(void **)(void *)&Lnk143);} /* CURRENT-STEP-FUN */
+static void LnkT142(){ call_or_link(VV[142],(void **)(void *)&Lnk142);} /* INIT-BREAK-POINTS */
+static void LnkT141(){ call_or_link(VV[141],(void **)(void *)&Lnk141);} /* IHS-FNAME */
+static void LnkT140(){ call_or_link(VV[140],(void **)(void *)&Lnk140);} /* ITERATE-OVER-BKPTS */
+static void LnkT139(){ call_or_link(VV[139],(void **)(void *)&Lnk139);} /* MAKE-BREAK-POINT */
+static object  LnkTLI138(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[138],(void **)(void *)&LnkLI138,first,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
+static void LnkT137(){ call_or_link(VV[137],(void **)(void *)&Lnk137);} /* WALK-THROUGH */
+static object  LnkTLI136(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[136],(void **)(void *)&LnkLI136,first,ap);va_end(ap);return V1;} /* VECTOR-PUSH-EXTEND */
+static void LnkT135(){ call_or_link(VV[135],(void **)(void *)&Lnk135);} /* INSTREAM-NAME */
+static void LnkT134(){ call_or_link(VV[134],(void **)(void *)&Lnk134);} /* LOAD */
+static void LnkT133(){ call_or_link(VV[133],(void **)(void *)&Lnk133);} /* SETUP-LINEINFO */
+static void LnkT132(){ call_or_link(VV[132],(void **)(void *)&Lnk132);} /* CLEANUP */
+static void LnkT129(){ call_or_link(VV[129],(void **)(void *)&Lnk129);} /* READ-FROM-STRING */
+static object  LnkTLI128(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[128],(void **)(void *)&LnkLI128,first,ap);va_end(ap);return V1;} /* COUNT */
+static void LnkT127(){ call_or_link(VV[127],(void **)(void *)&Lnk127);} /* GET-INSTREAM */
+static void LnkT126(){ call_or_link(VV[126],(void **)(void *)&Lnk126);} /* MAKE-INSTREAM */
+static void LnkT125(){ call_or_link(VV[125],(void **)(void *)&Lnk125);} /* STREAM-NAME */
+static object  LnkTLI124(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[124],(void **)(void *)&LnkLI124,first,ap);va_end(ap);return V1;} /* DELETE */
+static void LnkT123(){ call_or_link(VV[123],(void **)(void *)&Lnk123);} /* CLOSEDP */
+static void LnkT122(){ call_or_link(VV[122],(void **)(void *)&Lnk122);} /* BREAK-LEVEL */
+static object  LnkTLI121(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[121],(void **)(void *)&LnkLI121,1,first,ap);va_end(ap);return V1;} /* SHOW-ENVIRONMENT */
+static void LnkT120(){ call_or_link(VV[120],(void **)(void *)&Lnk120);} /* BREAK-LOCALS */
+static void LnkT119(){ call_or_link(VV[119],(void **)(void *)&Lnk119);} /* BREAK-GO */
+static object  LnkTLI118(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[118],(void **)(void *)&LnkLI118,first,ap);va_end(ap);return V1;} /* SEARCH */
+static void LnkT117(){ call_or_link(VV[117],(void **)(void *)&Lnk117);} /* COMPILED-FUNCTION-NAME */
+static void LnkT116(){ call_or_link(VV[116],(void **)(void *)&Lnk116);} /* IHS-FUN */
+static object  LnkTLI115(){return call_proc0(VV[115],(void **)(void *)&LnkLI115);} /* TYPE-ERROR */
+static void LnkT114(){ call_or_link(VV[114],(void **)(void *)&Lnk114);} /* IHS-TOP */
+static void LnkT113(){ call_or_link(VV[113],(void **)(void *)&Lnk113);} /* VS */
+static void LnkT112(){ call_or_link(VV[112],(void **)(void *)&Lnk112);} /* IHS-VS */
+static void LnkT111(){ call_or_link(VV[111],(void **)(void *)&Lnk111);} /* BREAK-PREVIOUS */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

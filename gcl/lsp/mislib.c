@@ -553,9 +553,9 @@ register object *base0;
 	return;
 	}
 }
-static void LnkT19(){ call_or_link(VV[19],(void **)&Lnk19);} /* GET-DECODED-TIME */
-static object  LnkTLI18(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[18],(void **)&LnkLI18,1,first,ap);va_end(ap);return V1;} /* LEAP-YEAR-P */
-static object  LnkTLI17(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[17],(void **)&LnkLI17,1,first,ap);va_end(ap);return V1;} /* NUMBER-OF-DAYS-FROM-1900 */
+static void LnkT19(){ call_or_link(VV[19],(void **)(void *)&Lnk19);} /* GET-DECODED-TIME */
+static object  LnkTLI18(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[18],(void **)(void *)&LnkLI18,1,first,ap);va_end(ap);return V1;} /* LEAP-YEAR-P */
+static object  LnkTLI17(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[17],(void **)(void *)&LnkLI17,1,first,ap);va_end(ap);return V1;} /* NUMBER-OF-DAYS-FROM-1900 */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -1484,7 +1484,7 @@ static object LI37(object first,...)
 	va_start(ap,first);
 	narg= narg - 0;
 	{
-	parse_key_new_new(narg,Vcs +0,(struct key *)&LI37key,first,ap);
+	parse_key_new_new(narg,Vcs +0,(struct key *)(void *)&LI37key,first,ap);
 	goto TTL;
 TTL:;
 	base[0]= VV[51];
@@ -3185,35 +3185,35 @@ register object *base0;
 	return;
 	}
 }
-static void LnkT109(ptr) object *ptr;{ call_or_link_closure(VV[109],(void **)&Lnk109,(void **)&Lclptr109);} /* CLASS-PRECEDENCE-LIST */
-static void LnkT403(){ call_or_link(VV[403],(void **)&Lnk403);} /* LOAD-TRUENAME */
-static object  LnkTLI402(){return call_proc0(VV[402],(void **)&LnkLI402);} /* MAKE-ARG-INFO */
-static void LnkT390(ptr) object *ptr;{ call_or_link_closure(VV[390],(void **)&Lnk390,(void **)&Lclptr390);} /* SETF PCL OBJECT-PLIST */
-static void LnkT389(ptr) object *ptr;{ call_or_link_closure(VV[389],(void **)&Lnk389,(void **)&Lclptr389);} /* OBJECT-PLIST */
-static object  LnkTLI388(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[388],(void **)&LnkLI388,3,first,ap);va_end(ap);return V1;} /* VARIABLE-DECLARATION */
-static void LnkT387(){ call_or_link(VV[387],(void **)&Lnk387);} /* SUBTYPEP */
-static void LnkT386(){ call_or_link(VV[386],(void **)&Lnk386);} /* SPECIALIZER-APPLICABLE-USING-TYPE-P */
-static void LnkT384(ptr) object *ptr;{ call_or_link_closure(VV[384],(void **)&Lnk384,(void **)&Lclptr384);} /* CLASS-NAME */
-static void LnkT383(){ call_or_link(VV[383],(void **)&Lnk383);} /* CONVERT-TO-SYSTEM-TYPE */
-static void LnkT380(){ call_or_link(VV[380],(void **)&Lnk380);} /* *NORMALIZE-TYPE */
-static object  LnkTLI379(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[379],(void **)&LnkLI379,first,ap);va_end(ap);return V1;} /* FIND-CLASS-CELL */
-static object  LnkTLI378(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[378],(void **)&LnkLI378,2,first,ap);va_end(ap);return V1;} /* DO-SATISFIES-DEFTYPE */
-static object  LnkTLI377(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[377],(void **)&LnkLI377,1,first,ap);va_end(ap);return V1;} /* MAKE-TYPE-PREDICATE */
-static object  LnkTLI376(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[376],(void **)&LnkLI376,2,first,ap);va_end(ap);return V1;} /* SETF PCL GDEFINITION */
-static object  LnkTLI375(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[375],(void **)&LnkLI375,first,ap);va_end(ap);return V1;} /* MAKE-TYPE-PREDICATE-NAME */
-static object  LnkTLI374(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[374],(void **)&LnkLI374,1,first,ap);va_end(ap);return V1;} /* CLASS-OF */
-static void LnkT373(){ call_or_link(VV[373],(void **)&Lnk373);} /* TYPE-FROM-SPECIALIZER */
-static void LnkT372(ptr) object *ptr;{ call_or_link_closure(VV[372],(void **)&Lnk372,(void **)&Lclptr372);} /* SPECIALIZER-TYPE */
-static void LnkT371(ptr) object *ptr;{ call_or_link_closure(VV[371],(void **)&Lnk371,(void **)&Lclptr371);} /* SPECIALIZERP */
-static object  LnkTLI370(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[370],(void **)&LnkLI370,1,first,ap);va_end(ap);return V1;} /* INTERN-EQL-SPECIALIZER */
-static void LnkT92(ptr) object *ptr;{ call_or_link_closure(VV[92],(void **)&Lnk92,(void **)&Lclptr92);} /* CLASS-EQ-SPECIALIZER */
-static void LnkT367(ptr) object *ptr;{ call_or_link_closure(VV[367],(void **)&Lnk367,(void **)&Lclptr367);} /* MAKE-INSTANCE */
-static void LnkT366(){ call_or_link(VV[366],(void **)&Lnk366);} /* COERCE-TO-CLASS */
-static void LnkT365(){ call_or_link(VV[365],(void **)&Lnk365);} /* ENSURE-CLASS */
-static object  LnkTLI364(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[364],(void **)&LnkLI364,first,ap);va_end(ap);return V1;} /* FIND-CLASS */
-static object  LnkTLI363(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[363],(void **)&LnkLI363,2,first,ap);va_end(ap);return V1;} /* FDEFINE-CAREFULLY */
-static object  LnkTLI362(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[362],(void **)&LnkLI362,1,first,ap);va_end(ap);return V1;} /* UNENCAPSULATED-FDEFINITION */
-static object  LnkTLI361(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[361],(void **)&LnkLI361,1,first,ap);va_end(ap);return V1;} /* GET-SETF-FUNCTION-NAME */
+static void LnkT109(ptr) object *ptr;{ call_or_link_closure(VV[109],(void **)(void *)&Lnk109,(void **)(void *)&Lclptr109);} /* CLASS-PRECEDENCE-LIST */
+static void LnkT403(){ call_or_link(VV[403],(void **)(void *)&Lnk403);} /* LOAD-TRUENAME */
+static object  LnkTLI402(){return call_proc0(VV[402],(void **)(void *)&LnkLI402);} /* MAKE-ARG-INFO */
+static void LnkT390(ptr) object *ptr;{ call_or_link_closure(VV[390],(void **)(void *)&Lnk390,(void **)(void *)&Lclptr390);} /* SETF PCL OBJECT-PLIST */
+static void LnkT389(ptr) object *ptr;{ call_or_link_closure(VV[389],(void **)(void *)&Lnk389,(void **)(void *)&Lclptr389);} /* OBJECT-PLIST */
+static object  LnkTLI388(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[388],(void **)(void *)&LnkLI388,3,first,ap);va_end(ap);return V1;} /* VARIABLE-DECLARATION */
+static void LnkT387(){ call_or_link(VV[387],(void **)(void *)&Lnk387);} /* SUBTYPEP */
+static void LnkT386(){ call_or_link(VV[386],(void **)(void *)&Lnk386);} /* SPECIALIZER-APPLICABLE-USING-TYPE-P */
+static void LnkT384(ptr) object *ptr;{ call_or_link_closure(VV[384],(void **)(void *)&Lnk384,(void **)(void *)&Lclptr384);} /* CLASS-NAME */
+static void LnkT383(){ call_or_link(VV[383],(void **)(void *)&Lnk383);} /* CONVERT-TO-SYSTEM-TYPE */
+static void LnkT380(){ call_or_link(VV[380],(void **)(void *)&Lnk380);} /* *NORMALIZE-TYPE */
+static object  LnkTLI379(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[379],(void **)(void *)&LnkLI379,first,ap);va_end(ap);return V1;} /* FIND-CLASS-CELL */
+static object  LnkTLI378(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[378],(void **)(void *)&LnkLI378,2,first,ap);va_end(ap);return V1;} /* DO-SATISFIES-DEFTYPE */
+static object  LnkTLI377(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[377],(void **)(void *)&LnkLI377,1,first,ap);va_end(ap);return V1;} /* MAKE-TYPE-PREDICATE */
+static object  LnkTLI376(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[376],(void **)(void *)&LnkLI376,2,first,ap);va_end(ap);return V1;} /* SETF PCL GDEFINITION */
+static object  LnkTLI375(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[375],(void **)(void *)&LnkLI375,first,ap);va_end(ap);return V1;} /* MAKE-TYPE-PREDICATE-NAME */
+static object  LnkTLI374(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[374],(void **)(void *)&LnkLI374,1,first,ap);va_end(ap);return V1;} /* CLASS-OF */
+static void LnkT373(){ call_or_link(VV[373],(void **)(void *)&Lnk373);} /* TYPE-FROM-SPECIALIZER */
+static void LnkT372(ptr) object *ptr;{ call_or_link_closure(VV[372],(void **)(void *)&Lnk372,(void **)(void *)&Lclptr372);} /* SPECIALIZER-TYPE */
+static void LnkT371(ptr) object *ptr;{ call_or_link_closure(VV[371],(void **)(void *)&Lnk371,(void **)(void *)&Lclptr371);} /* SPECIALIZERP */
+static object  LnkTLI370(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[370],(void **)(void *)&LnkLI370,1,first,ap);va_end(ap);return V1;} /* INTERN-EQL-SPECIALIZER */
+static void LnkT92(ptr) object *ptr;{ call_or_link_closure(VV[92],(void **)(void *)&Lnk92,(void **)(void *)&Lclptr92);} /* CLASS-EQ-SPECIALIZER */
+static void LnkT367(ptr) object *ptr;{ call_or_link_closure(VV[367],(void **)(void *)&Lnk367,(void **)(void *)&Lclptr367);} /* MAKE-INSTANCE */
+static void LnkT366(){ call_or_link(VV[366],(void **)(void *)&Lnk366);} /* COERCE-TO-CLASS */
+static void LnkT365(){ call_or_link(VV[365],(void **)(void *)&Lnk365);} /* ENSURE-CLASS */
+static object  LnkTLI364(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[364],(void **)(void *)&LnkLI364,first,ap);va_end(ap);return V1;} /* FIND-CLASS */
+static object  LnkTLI363(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[363],(void **)(void *)&LnkLI363,2,first,ap);va_end(ap);return V1;} /* FDEFINE-CAREFULLY */
+static object  LnkTLI362(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[362],(void **)(void *)&LnkLI362,1,first,ap);va_end(ap);return V1;} /* UNENCAPSULATED-FDEFINITION */
+static object  LnkTLI361(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[361],(void **)(void *)&LnkLI361,1,first,ap);va_end(ap);return V1;} /* GET-SETF-FUNCTION-NAME */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -433,11 +433,11 @@ T175:;
 	return;}}
 	}
 }
-static object  LnkTLI12(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[12],(void **)&LnkLI12,first,ap);va_end(ap);return V1;} /* SET-DIFFERENCE */
-static object  LnkTLI11(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[11],(void **)&LnkLI11,first,ap);va_end(ap);return V1;} /* INTERSECTION */
-static object  LnkTLI10(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[10],(void **)&LnkLI10,first,ap);va_end(ap);return V1;} /* FIND */
-static void LnkT9(){ call_or_link(VV[9],(void **)&Lnk9);} /* PACKAGE-SIZE */
-static void LnkT8(){ call_or_link(VV[8],(void **)&Lnk8);} /* PACKAGE-SHADOWING-SYMBOLS */
+static object  LnkTLI12(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[12],(void **)(void *)&LnkLI12,first,ap);va_end(ap);return V1;} /* SET-DIFFERENCE */
+static object  LnkTLI11(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[11],(void **)(void *)&LnkLI11,first,ap);va_end(ap);return V1;} /* INTERSECTION */
+static object  LnkTLI10(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[10],(void **)(void *)&LnkLI10,first,ap);va_end(ap);return V1;} /* FIND */
+static void LnkT9(){ call_or_link(VV[9],(void **)(void *)&Lnk9);} /* PACKAGE-SIZE */
+static void LnkT8(){ call_or_link(VV[8],(void **)(void *)&Lnk8);} /* PACKAGE-SHADOWING-SYMBOLS */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -391,7 +391,7 @@ static object LI9(object V64,object V63,object first,...)
 	V66= V63;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI9key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI9key,first,ap);
 	V67=(Vcs[2]);
 	V68=(Vcs[3]);
 	{long V69;
@@ -451,7 +451,7 @@ static object LI10(object V76,object V75,object first,...)
 	V78= V75;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI10key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI10key,first,ap);
 	V79=(Vcs[2]);
 	V80=(Vcs[3]);
 	V81=(Vcs[4]);
@@ -591,7 +591,7 @@ static object LI11(object V104,object V103,object first,...)
 	V106= V103;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI11key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI11key,first,ap);
 	V107=(Vcs[2]);
 	V108=(Vcs[3]);
 	V109=(Vcs[4]);
@@ -759,7 +759,7 @@ static object LI12(object V142,object V141,object first,...)
 	V144= V141;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI12key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI12key,first,ap);
 	V145=(Vcs[2]);
 	V146=(Vcs[3]);
 	V147=(Vcs[4]);
@@ -799,7 +799,7 @@ static object LI13(object V153,object V152,object first,...)
 	V155= V152;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI13key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI13key,first,ap);
 	V156=(Vcs[2]);
 	V157=(Vcs[3]);
 	V158=(Vcs[4]);
@@ -841,7 +841,7 @@ static object LI14(object V164,object V163,object first,...)
 	V166= V163;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI14key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI14key,first,ap);
 	V167=(Vcs[2]);
 	V168=(Vcs[3]);
 	V169=(Vcs[4]);
@@ -1112,7 +1112,7 @@ static object LI15(object V230,object V229,object first,...)
 	V232= V229;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI15key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI15key,first,ap);
 	V233=(Vcs[2]);
 	V234=(Vcs[3]);
 	V235=(Vcs[4]);
@@ -1152,7 +1152,7 @@ static object LI16(object V241,object V240,object first,...)
 	V243= V240;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI16key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI16key,first,ap);
 	V244=(Vcs[2]);
 	V245=(Vcs[3]);
 	V246=(Vcs[4]);
@@ -1193,7 +1193,7 @@ static object LI17(object V252,object V251,object first,...)
 	V254= V251;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI17key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI17key,first,ap);
 	V255=(Vcs[2]);
 	V256=(Vcs[3]);
 	V257=(Vcs[4]);
@@ -1312,7 +1312,7 @@ static object LI18(object V274,object V273,object first,...)
 	V276= V273;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI18key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI18key,first,ap);
 	V277=(Vcs[2]);
 	V278=(Vcs[3]);
 	V279=(Vcs[4]);
@@ -1350,7 +1350,7 @@ static object LI19(object V284,object V283,object first,...)
 	V286= V283;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI19key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI19key,first,ap);
 	V287=(Vcs[2]);
 	V288=(Vcs[3]);
 	V289=(Vcs[4]);
@@ -1391,7 +1391,7 @@ static object LI20(object V294,object V293,object first,...)
 	V296= V293;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI20key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI20key,first,ap);
 	V297=(Vcs[2]);
 	V298=(Vcs[3]);
 	V299=(Vcs[4]);
@@ -1529,7 +1529,7 @@ static object LI21(object V322,object V321,object first,...)
 	V324= V321;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI21key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI21key,first,ap);
 	V325=(Vcs[2]);
 	V326=(Vcs[3]);
 	V327=(Vcs[4]);
@@ -1569,7 +1569,7 @@ static object LI22(object V333,object V332,object first,...)
 	V335= V332;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI22key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI22key,first,ap);
 	V336=(Vcs[2]);
 	V337=(Vcs[3]);
 	V338=(Vcs[4]);
@@ -1613,7 +1613,7 @@ static object LI23(object V345,object V344,object V343,object first,...)
 	V348= V343;
 	narg= narg - 3;
 	{
-	parse_key_new_new(narg,Vcs +3,(struct key *)&LI23key,first,ap);
+	parse_key_new_new(narg,Vcs +3,(struct key *)(void *)&LI23key,first,ap);
 	V349=(Vcs[3]);
 	V350=(Vcs[4]);
 	V351=(Vcs[5]);
@@ -1783,7 +1783,7 @@ static object LI24(object V384,object V383,object V382,object first,...)
 	V387= V382;
 	narg= narg - 3;
 	{
-	parse_key_new_new(narg,Vcs +3,(struct key *)&LI24key,first,ap);
+	parse_key_new_new(narg,Vcs +3,(struct key *)(void *)&LI24key,first,ap);
 	V388=(Vcs[3]);
 	V389=(Vcs[4]);
 	V390=(Vcs[5]);
@@ -1825,7 +1825,7 @@ static object LI25(object V397,object V396,object V395,object first,...)
 	V400= V395;
 	narg= narg - 3;
 	{
-	parse_key_new_new(narg,Vcs +3,(struct key *)&LI25key,first,ap);
+	parse_key_new_new(narg,Vcs +3,(struct key *)(void *)&LI25key,first,ap);
 	V401=(Vcs[3]);
 	V402=(Vcs[4]);
 	V403=(Vcs[5]);
@@ -1869,7 +1869,7 @@ static object LI26(object V410,object V409,object V408,object first,...)
 	V413= V408;
 	narg= narg - 3;
 	{
-	parse_key_new_new(narg,Vcs +3,(struct key *)&LI26key,first,ap);
+	parse_key_new_new(narg,Vcs +3,(struct key *)(void *)&LI26key,first,ap);
 	V414=(Vcs[3]);
 	V415=(Vcs[4]);
 	V416=(Vcs[5]);
@@ -2011,7 +2011,7 @@ static object LI27(object V440,object V439,object V438,object first,...)
 	V443= V438;
 	narg= narg - 3;
 	{
-	parse_key_new_new(narg,Vcs +3,(struct key *)&LI27key,first,ap);
+	parse_key_new_new(narg,Vcs +3,(struct key *)(void *)&LI27key,first,ap);
 	V444=(Vcs[3]);
 	V445=(Vcs[4]);
 	V446=(Vcs[5]);
@@ -2053,7 +2053,7 @@ static object LI28(object V453,object V452,object V451,object first,...)
 	V456= V451;
 	narg= narg - 3;
 	{
-	parse_key_new_new(narg,Vcs +3,(struct key *)&LI28key,first,ap);
+	parse_key_new_new(narg,Vcs +3,(struct key *)(void *)&LI28key,first,ap);
 	V457=(Vcs[3]);
 	V458=(Vcs[4]);
 	V459=(Vcs[5]);
@@ -2094,7 +2094,7 @@ static object LI29(object V465,object V464,object first,...)
 	V467= V464;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI29key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI29key,first,ap);
 	V468=(Vcs[2]);
 	V469=(Vcs[3]);
 	V470=(Vcs[4]);
@@ -2211,7 +2211,7 @@ static object LI30(object V487,object V486,object first,...)
 	V489= V486;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI30key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI30key,first,ap);
 	V490=(Vcs[2]);
 	V491=(Vcs[3]);
 	V492=(Vcs[4]);
@@ -2249,7 +2249,7 @@ static object LI31(object V497,object V496,object first,...)
 	V499= V496;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI31key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI31key,first,ap);
 	V500=(Vcs[2]);
 	V501=(Vcs[3]);
 	V502=(Vcs[4]);
@@ -2289,7 +2289,7 @@ static object LI32(object V507,object V506,object first,...)
 	V509= V506;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI32key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI32key,first,ap);
 	V510=(Vcs[2]);
 	V511=(Vcs[3]);
 	V512=(Vcs[4]);
@@ -2406,7 +2406,7 @@ static object LI33(object V529,object V528,object first,...)
 	V531= V528;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI33key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI33key,first,ap);
 	V532=(Vcs[2]);
 	V533=(Vcs[3]);
 	V534=(Vcs[4]);
@@ -2444,7 +2444,7 @@ static object LI34(object V539,object V538,object first,...)
 	V541= V538;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI34key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI34key,first,ap);
 	V542=(Vcs[2]);
 	V543=(Vcs[3]);
 	V544=(Vcs[4]);
@@ -2482,7 +2482,7 @@ static object LI35(object V548,object first,...)
 	V549= V548;
 	narg= narg - 1;
 	{
-	parse_key_new_new(narg,Vcs +1,(struct key *)&LI35key,first,ap);
+	parse_key_new_new(narg,Vcs +1,(struct key *)(void *)&LI35key,first,ap);
 	V550=(Vcs[1]);
 	V551=(Vcs[2]);
 	V552=(Vcs[3]);
@@ -2575,7 +2575,7 @@ static object LI36(object V561,object first,...)
 	V562= V561;
 	narg= narg - 1;
 	{
-	parse_key_new_new(narg,Vcs +1,(struct key *)&LI36key,first,ap);
+	parse_key_new_new(narg,Vcs +1,(struct key *)(void *)&LI36key,first,ap);
 	V563=(Vcs[1]);
 	V564=(Vcs[2]);
 	V565=(Vcs[3]);
@@ -2847,7 +2847,7 @@ static object LI37(object V610,object V609,object first,...)
 	V612= V609;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI37key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI37key,first,ap);
 	V613=(Vcs[2]);
 	V614=(Vcs[3]);
 	V615=(Vcs[4]);
@@ -3027,7 +3027,7 @@ static object LI38(object V644,object V643,object first,...)
 	V646= V643;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI38key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI38key,first,ap);
 	V647=(Vcs[2]);
 	V648=(Vcs[3]);
 	V649=(Vcs[4]);
@@ -3402,7 +3402,7 @@ static object LI44(object V705,object V704,object V703,object V702,object first,
 	V709= V702;
 	narg= narg - 4;
 	{
-	parse_key_new_new(narg,Vcs +4,(struct key *)&LI44key,first,ap);
+	parse_key_new_new(narg,Vcs +4,(struct key *)(void *)&LI44key,first,ap);
 	if(Vcs[4]==0){
 	V710= symbol_function(VV[35]);
 	}else{
@@ -3875,30 +3875,30 @@ T1449:;
 	goto T1361;}
 	}
 }
-static void LnkT62(){ call_or_link(VV[62],(void **)&Lnk62);} /* ARRAY-HAS-FILL-POINTER-P */
-static void LnkT61(){ call_or_link(VV[61],(void **)&Lnk61);} /* SUBTYPEP */
-static object  LnkTLI60(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[60],(void **)&LnkLI60,2,first,ap);va_end(ap);return V1;} /* COERCE */
-static void LnkT59(){ call_or_link(VV[59],(void **)&Lnk59);} /* SORT */
-static object  LnkTLI58(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[58],(void **)&LnkLI58,81925,first,ap);va_end(ap);return V1;} /* QUICK-SORT */
-static void LnkT57(){ call_or_link(VV[57],(void **)&Lnk57);} /* LIST-MERGE-SORT */
-static object  LnkTLI56(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[56],(void **)&LnkLI56,first,ap);va_end(ap);return V1;} /* DELETE-DUPLICATES */
-static void LnkT55(){ call_or_link(VV[55],(void **)&Lnk55);} /* MEMBER1 */
-static object  LnkTLI54(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[54],(void **)&LnkLI54,first,ap);va_end(ap);return V1;} /* POSITION */
-static object  LnkTLI53(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[53],(void **)&LnkLI53,first,ap);va_end(ap);return V1;} /* FIND */
-static object  LnkTLI52(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[52],(void **)&LnkLI52,first,ap);va_end(ap);return V1;} /* NSUBSTITUTE */
-static object  LnkTLI51(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[51],(void **)&LnkLI51,first,ap);va_end(ap);return V1;} /* SUBSTITUTE */
-static object  LnkTLI50(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[50],(void **)&LnkLI50,first,ap);va_end(ap);return V1;} /* COUNT */
-static object  LnkTLI49(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[49],(void **)&LnkLI49,1,first,ap);va_end(ap);return V1;} /* SEQTYPE */
-static object  LnkTLI48(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[48],(void **)&LnkLI48,first,ap);va_end(ap);return V1;} /* MAKE-SEQUENCE */
-static object  LnkTLI47(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[47],(void **)&LnkLI47,first,ap);va_end(ap);return V1;} /* INTERNAL-COUNT */
-static object  LnkTLI45(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[45],(void **)&LnkLI45,first,ap);va_end(ap);return V1;} /* REMOVE */
-static object  LnkTLI44(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[44],(void **)&LnkLI44,first,ap);va_end(ap);return V1;} /* DELETE */
-static object  LnkTLI43(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[43],(void **)&LnkLI43,4,first,ap);va_end(ap);return V1;} /* CALL-TEST */
-static object  LnkTLI42(){return call_proc0(VV[42],(void **)&LnkLI42);} /* TEST-ERROR */
-static object  LnkTLI37(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[37],(void **)&LnkLI37,258,first,ap);va_end(ap);return V1;} /* THE-END */
-static object  LnkTLI36(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[36],(void **)&LnkLI36,257,first,ap);va_end(ap);return V1;} /* THE-START */
-static object  LnkTLI33(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[33],(void **)&LnkLI33,first,ap);va_end(ap);return V1;} /* BAD-SEQ-LIMIT */
-static void LnkT32(){ call_or_link(VV[32],(void **)&Lnk32);} /* SPECIFIC-ERROR */
+static void LnkT62(){ call_or_link(VV[62],(void **)(void *)&Lnk62);} /* ARRAY-HAS-FILL-POINTER-P */
+static void LnkT61(){ call_or_link(VV[61],(void **)(void *)&Lnk61);} /* SUBTYPEP */
+static object  LnkTLI60(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[60],(void **)(void *)&LnkLI60,2,first,ap);va_end(ap);return V1;} /* COERCE */
+static void LnkT59(){ call_or_link(VV[59],(void **)(void *)&Lnk59);} /* SORT */
+static object  LnkTLI58(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[58],(void **)(void *)&LnkLI58,81925,first,ap);va_end(ap);return V1;} /* QUICK-SORT */
+static void LnkT57(){ call_or_link(VV[57],(void **)(void *)&Lnk57);} /* LIST-MERGE-SORT */
+static object  LnkTLI56(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[56],(void **)(void *)&LnkLI56,first,ap);va_end(ap);return V1;} /* DELETE-DUPLICATES */
+static void LnkT55(){ call_or_link(VV[55],(void **)(void *)&Lnk55);} /* MEMBER1 */
+static object  LnkTLI54(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[54],(void **)(void *)&LnkLI54,first,ap);va_end(ap);return V1;} /* POSITION */
+static object  LnkTLI53(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[53],(void **)(void *)&LnkLI53,first,ap);va_end(ap);return V1;} /* FIND */
+static object  LnkTLI52(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[52],(void **)(void *)&LnkLI52,first,ap);va_end(ap);return V1;} /* NSUBSTITUTE */
+static object  LnkTLI51(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[51],(void **)(void *)&LnkLI51,first,ap);va_end(ap);return V1;} /* SUBSTITUTE */
+static object  LnkTLI50(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[50],(void **)(void *)&LnkLI50,first,ap);va_end(ap);return V1;} /* COUNT */
+static object  LnkTLI49(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[49],(void **)(void *)&LnkLI49,1,first,ap);va_end(ap);return V1;} /* SEQTYPE */
+static object  LnkTLI48(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[48],(void **)(void *)&LnkLI48,first,ap);va_end(ap);return V1;} /* MAKE-SEQUENCE */
+static object  LnkTLI47(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[47],(void **)(void *)&LnkLI47,first,ap);va_end(ap);return V1;} /* INTERNAL-COUNT */
+static object  LnkTLI45(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[45],(void **)(void *)&LnkLI45,first,ap);va_end(ap);return V1;} /* REMOVE */
+static object  LnkTLI44(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[44],(void **)(void *)&LnkLI44,first,ap);va_end(ap);return V1;} /* DELETE */
+static object  LnkTLI43(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[43],(void **)(void *)&LnkLI43,4,first,ap);va_end(ap);return V1;} /* CALL-TEST */
+static object  LnkTLI42(){return call_proc0(VV[42],(void **)(void *)&LnkLI42);} /* TEST-ERROR */
+static object  LnkTLI37(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[37],(void **)(void *)&LnkLI37,258,first,ap);va_end(ap);return V1;} /* THE-END */
+static object  LnkTLI36(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[36],(void **)(void *)&LnkLI36,257,first,ap);va_end(ap);return V1;} /* THE-START */
+static object  LnkTLI33(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[33],(void **)(void *)&LnkLI33,first,ap);va_end(ap);return V1;} /* BAD-SEQ-LIMIT */
+static void LnkT32(){ call_or_link(VV[32],(void **)(void *)&Lnk32);} /* SPECIFIC-ERROR */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

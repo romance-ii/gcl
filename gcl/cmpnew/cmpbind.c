@@ -360,22 +360,22 @@ TTL:;
 	VMR4(V74)}
 	return Cnil;
 }
-static object  LnkTLI34(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[34],(void **)&LnkLI34,1,first,ap);va_end(ap);return V1;} /* C2EXPR* */
-static void LnkT33(){ call_or_link(VV[33],(void **)&Lnk33);} /* WT-SHORT-FLOAT-LOC */
-static void LnkT32(){ call_or_link(VV[32],(void **)&Lnk32);} /* WT-LONG-FLOAT-LOC */
-static void LnkT31(){ call_or_link(VV[31],(void **)&Lnk31);} /* WT-CHARACTER-LOC */
-static void LnkT30(){ call_or_link(VV[30],(void **)&Lnk30);} /* WT-FIXNUM-LOC */
-static void LnkT29(){ call_or_link(VV[29],(void **)&Lnk29);} /* WT-LOC */
-static object  LnkTLI28(){return call_proc0(VV[28],(void **)&LnkLI28);} /* CLOSE-INLINE-BLOCKS */
-static void LnkT27(){ call_or_link(VV[27],(void **)&Lnk27);} /* WT-INTEGER-LOC */
-static void LnkT26(){ call_or_link(VV[26],(void **)&Lnk26);} /* SAVE-AVMA */
-static object  LnkTLI25(){return call_proc0(VV[25],(void **)&LnkLI25);} /* BABOON */
-static object  LnkTLI18(){return call_proc0(VV[18],(void **)&LnkLI18);} /* WFS-ERROR */
-static object  LnkTLI17(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[17],(void **)&LnkLI17,1,first,ap);va_end(ap);return V1;} /* WT1 */
-static object  LnkTLI15(){return call_proc0(VV[15],(void **)&LnkLI15);} /* CCB-VS-PUSH */
-static object  LnkTLI14(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[14],(void **)&LnkLI14,1,first,ap);va_end(ap);return V1;} /* CLINK */
-static object  LnkTLI13(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[13],(void **)&LnkLI13,first,ap);va_end(ap);return V1;} /* WT-CLINK */
-static object  LnkTLI12(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[12],(void **)&LnkLI12,1,first,ap);va_end(ap);return V1;} /* WT-VS */
+static object  LnkTLI34(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[34],(void **)(void *)&LnkLI34,1,first,ap);va_end(ap);return V1;} /* C2EXPR* */
+static void LnkT33(){ call_or_link(VV[33],(void **)(void *)&Lnk33);} /* WT-SHORT-FLOAT-LOC */
+static void LnkT32(){ call_or_link(VV[32],(void **)(void *)&Lnk32);} /* WT-LONG-FLOAT-LOC */
+static void LnkT31(){ call_or_link(VV[31],(void **)(void *)&Lnk31);} /* WT-CHARACTER-LOC */
+static void LnkT30(){ call_or_link(VV[30],(void **)(void *)&Lnk30);} /* WT-FIXNUM-LOC */
+static void LnkT29(){ call_or_link(VV[29],(void **)(void *)&Lnk29);} /* WT-LOC */
+static object  LnkTLI28(){return call_proc0(VV[28],(void **)(void *)&LnkLI28);} /* CLOSE-INLINE-BLOCKS */
+static void LnkT27(){ call_or_link(VV[27],(void **)(void *)&Lnk27);} /* WT-INTEGER-LOC */
+static void LnkT26(){ call_or_link(VV[26],(void **)(void *)&Lnk26);} /* SAVE-AVMA */
+static object  LnkTLI25(){return call_proc0(VV[25],(void **)(void *)&LnkLI25);} /* BABOON */
+static object  LnkTLI18(){return call_proc0(VV[18],(void **)(void *)&LnkLI18);} /* WFS-ERROR */
+static object  LnkTLI17(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[17],(void **)(void *)&LnkLI17,1,first,ap);va_end(ap);return V1;} /* WT1 */
+static object  LnkTLI15(){return call_proc0(VV[15],(void **)(void *)&LnkLI15);} /* CCB-VS-PUSH */
+static object  LnkTLI14(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[14],(void **)(void *)&LnkLI14,1,first,ap);va_end(ap);return V1;} /* CLINK */
+static object  LnkTLI13(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[13],(void **)(void *)&LnkLI13,first,ap);va_end(ap);return V1;} /* WT-CLINK */
+static object  LnkTLI12(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[12],(void **)(void *)&LnkLI12,1,first,ap);va_end(ap);return V1;} /* WT-VS */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

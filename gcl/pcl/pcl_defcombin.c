@@ -47,7 +47,7 @@ T10:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	function definition for Defclass SHORT-METHOD-COMBINATION8890	*/
+/*	function definition for Defclass SHORT-METHOD-COMBINATION8891	*/
 
 static void L3()
 {register object *base=vs_base;
@@ -377,7 +377,7 @@ T149:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	function definition for Defclass LONG-METHOD-COMBINATION8913	*/
+/*	function definition for Defclass LONG-METHOD-COMBINATION8914	*/
 
 static void L9()
 {register object *base=vs_base;
@@ -1422,28 +1422,28 @@ register object *base0;
 	return;
 	}
 }
-static void LnkT141(){ call_or_link(VV[141],(void **)&Lnk141);} /* DO-SHORT-METHOD-COMBINATION */
-static void LnkT140(){ call_or_link(VV[140],(void **)&Lnk140);} /* INVALID-METHOD-ERROR */
-static object  LnkTLI139(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[139],(void **)&LnkLI139,1,first,ap);va_end(ap);return V1;} /* MAKE-DEFAULT-METHOD-GROUP-DESCRIPTION */
-static object  LnkTLI138(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[138],(void **)&LnkLI138,2,first,ap);va_end(ap);return V1;} /* PARSE-QUALIFIER-PATTERN */
-static void LnkT137(){ call_or_link(VV[137],(void **)&Lnk137);} /* PARSE-METHOD-GROUP-SPECIFIER */
-static object  LnkTLI136(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[136],(void **)&LnkLI136,2,first,ap);va_end(ap);return V1;} /* DEAL-WITH-ARGUMENTS-OPTION */
-static object  LnkTLI135(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[135],(void **)&LnkLI135,3,first,ap);va_end(ap);return V1;} /* WRAP-METHOD-GROUP-SPECIFIER-BINDINGS */
-static void LnkT134(){ call_or_link(VV[134],(void **)&Lnk134);} /* EXTRACT-DECLARATIONS */
-static void LnkT133(){ call_or_link(VV[133],(void **)&Lnk133);} /* MAKE-LONG-METHOD-COMBINATION-FUNCTION */
-static void LnkT132(ptr) object *ptr;{ call_or_link_closure(VV[132],(void **)&Lnk132,(void **)&Lclptr132);} /* METHOD-QUALIFIERS */
-static void LnkT131(ptr) object *ptr;{ call_or_link_closure(VV[131],(void **)&Lnk131,(void **)&Lclptr131);} /* SHORT-COMBINATION-IDENTITY-WITH-ONE-ARGUMENT */
-static void LnkT130(ptr) object *ptr;{ call_or_link_closure(VV[130],(void **)&Lnk130,(void **)&Lclptr130);} /* SHORT-COMBINATION-OPERATOR */
-static void LnkT129(ptr) object *ptr;{ call_or_link_closure(VV[129],(void **)&Lnk129,(void **)&Lclptr129);} /* METHOD-COMBINATION-TYPE */
-static void LnkT126(ptr) object *ptr;{ call_or_link_closure(VV[126],(void **)&Lnk126,(void **)&Lclptr126);} /* MAKE-INSTANCE */
-static object  LnkTLI124(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[124],(void **)&LnkLI124,first,ap);va_end(ap);return V1;} /* GET-METHOD */
-static object  LnkTLI123(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[123],(void **)&LnkLI123,1,first,ap);va_end(ap);return V1;} /* INTERN-EQL-SPECIALIZER */
-static object  LnkTLI122(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[122],(void **)&LnkLI122,first,ap);va_end(ap);return V1;} /* FIND-CLASS */
-static void LnkT121(){ call_or_link(VV[121],(void **)&Lnk121);} /* LOAD-TRUENAME */
-static object  LnkTLI120(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[120],(void **)&LnkLI120,3,first,ap);va_end(ap);return V1;} /* MAKE-TOP-LEVEL-FORM */
-static void LnkT118(){ call_or_link(VV[118],(void **)&Lnk118);} /* METHOD-COMBINATION-ERROR */
-static object  LnkTLI117(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[117],(void **)&LnkLI117,1,first,ap);va_end(ap);return V1;} /* EXPAND-SHORT-DEFCOMBIN */
-static object  LnkTLI116(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[116],(void **)&LnkLI116,1,first,ap);va_end(ap);return V1;} /* EXPAND-LONG-DEFCOMBIN */
+static void LnkT141(){ call_or_link(VV[141],(void **)(void *)&Lnk141);} /* DO-SHORT-METHOD-COMBINATION */
+static void LnkT140(){ call_or_link(VV[140],(void **)(void *)&Lnk140);} /* INVALID-METHOD-ERROR */
+static object  LnkTLI139(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[139],(void **)(void *)&LnkLI139,1,first,ap);va_end(ap);return V1;} /* MAKE-DEFAULT-METHOD-GROUP-DESCRIPTION */
+static object  LnkTLI138(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[138],(void **)(void *)&LnkLI138,2,first,ap);va_end(ap);return V1;} /* PARSE-QUALIFIER-PATTERN */
+static void LnkT137(){ call_or_link(VV[137],(void **)(void *)&Lnk137);} /* PARSE-METHOD-GROUP-SPECIFIER */
+static object  LnkTLI136(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[136],(void **)(void *)&LnkLI136,2,first,ap);va_end(ap);return V1;} /* DEAL-WITH-ARGUMENTS-OPTION */
+static object  LnkTLI135(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[135],(void **)(void *)&LnkLI135,3,first,ap);va_end(ap);return V1;} /* WRAP-METHOD-GROUP-SPECIFIER-BINDINGS */
+static void LnkT134(){ call_or_link(VV[134],(void **)(void *)&Lnk134);} /* EXTRACT-DECLARATIONS */
+static void LnkT133(){ call_or_link(VV[133],(void **)(void *)&Lnk133);} /* MAKE-LONG-METHOD-COMBINATION-FUNCTION */
+static void LnkT132(ptr) object *ptr;{ call_or_link_closure(VV[132],(void **)(void *)&Lnk132,(void **)(void *)&Lclptr132);} /* METHOD-QUALIFIERS */
+static void LnkT131(ptr) object *ptr;{ call_or_link_closure(VV[131],(void **)(void *)&Lnk131,(void **)(void *)&Lclptr131);} /* SHORT-COMBINATION-IDENTITY-WITH-ONE-ARGUMENT */
+static void LnkT130(ptr) object *ptr;{ call_or_link_closure(VV[130],(void **)(void *)&Lnk130,(void **)(void *)&Lclptr130);} /* SHORT-COMBINATION-OPERATOR */
+static void LnkT129(ptr) object *ptr;{ call_or_link_closure(VV[129],(void **)(void *)&Lnk129,(void **)(void *)&Lclptr129);} /* METHOD-COMBINATION-TYPE */
+static void LnkT126(ptr) object *ptr;{ call_or_link_closure(VV[126],(void **)(void *)&Lnk126,(void **)(void *)&Lclptr126);} /* MAKE-INSTANCE */
+static object  LnkTLI124(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[124],(void **)(void *)&LnkLI124,first,ap);va_end(ap);return V1;} /* GET-METHOD */
+static object  LnkTLI123(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[123],(void **)(void *)&LnkLI123,1,first,ap);va_end(ap);return V1;} /* INTERN-EQL-SPECIALIZER */
+static object  LnkTLI122(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[122],(void **)(void *)&LnkLI122,first,ap);va_end(ap);return V1;} /* FIND-CLASS */
+static void LnkT121(){ call_or_link(VV[121],(void **)(void *)&Lnk121);} /* LOAD-TRUENAME */
+static object  LnkTLI120(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[120],(void **)(void *)&LnkLI120,3,first,ap);va_end(ap);return V1;} /* MAKE-TOP-LEVEL-FORM */
+static void LnkT118(){ call_or_link(VV[118],(void **)(void *)&Lnk118);} /* METHOD-COMBINATION-ERROR */
+static object  LnkTLI117(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[117],(void **)(void *)&LnkLI117,1,first,ap);va_end(ap);return V1;} /* EXPAND-SHORT-DEFCOMBIN */
+static object  LnkTLI116(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[116],(void **)(void *)&LnkLI116,1,first,ap);va_end(ap);return V1;} /* EXPAND-LONG-DEFCOMBIN */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -19,7 +19,7 @@ static object LI1(object V2,object V1,object first,...)
 	V4= V1;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI1key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI1key,first,ap);
 	if(Vcs[2]==0){
 	V5= Cnil;
 	V6= Cnil;
@@ -715,13 +715,13 @@ static object LI7(object V106,object V105,object first,...)
 	base[0]=base[0];
 	return Cnil;}
 	}
-static void LnkT27(){ call_or_link(VV[27],(void **)&Lnk27);} /* EVERY */
-static void LnkT26(){ call_or_link(VV[26],(void **)&Lnk26);} /* SOME */
-static object  LnkTLI25(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[25],(void **)&LnkLI25,first,ap);va_end(ap);return V1;} /* MAKE-SEQUENCE */
-static object  LnkTLI24(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[24],(void **)&LnkLI24,1,first,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
-static void LnkT23(){ call_or_link(VV[23],(void **)&Lnk23);} /* SPECIFIC-ERROR */
-static void LnkT22(){ call_or_link(VV[22],(void **)&Lnk22);} /* SUBTYPEP */
-static object  LnkTLI21(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[21],(void **)&LnkLI21,1,first,ap);va_end(ap);return V1;} /* NORMALIZE-TYPE */
+static void LnkT27(){ call_or_link(VV[27],(void **)(void *)&Lnk27);} /* EVERY */
+static void LnkT26(){ call_or_link(VV[26],(void **)(void *)&Lnk26);} /* SOME */
+static object  LnkTLI25(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[25],(void **)(void *)&LnkLI25,first,ap);va_end(ap);return V1;} /* MAKE-SEQUENCE */
+static object  LnkTLI24(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[24],(void **)(void *)&LnkLI24,1,first,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
+static void LnkT23(){ call_or_link(VV[23],(void **)(void *)&Lnk23);} /* SPECIFIC-ERROR */
+static void LnkT22(){ call_or_link(VV[22],(void **)(void *)&Lnk22);} /* SUBTYPEP */
+static object  LnkTLI21(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[21],(void **)(void *)&LnkLI21,1,first,ap);va_end(ap);return V1;} /* NORMALIZE-TYPE */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

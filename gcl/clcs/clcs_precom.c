@@ -598,14 +598,14 @@ T252:;
 	return;
 	}
 }
-static void LnkT28(){ call_or_link(VV[28],(void **)&Lnk28);} /* WRAPPER-OF */
-static void LnkT27(){ call_or_link(VV[27],(void **)&Lnk27);} /* CCLOSURE-ENV-NTHCDR */
-static void LnkT26(){ call_or_link(VV[26],(void **)&Lnk26);} /* COMPILE-IIS-FUNCTIONS */
-static void LnkT25(){ call_or_link(VV[25],(void **)&Lnk25);} /* (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 3)2193 */
-static void LnkT23(){ call_or_link(VV[23],(void **)&Lnk23);} /* (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 2)2193 */
-static void LnkT21(){ call_or_link(VV[21],(void **)&Lnk21);} /* (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 1)2193 */
-static void LnkT19(){ call_or_link(VV[19],(void **)&Lnk19);} /* (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 0)2193 */
-static void LnkT18(){ call_or_link(VV[18],(void **)&Lnk18);} /* LOAD-PRECOMPILED-IIS-ENTRY */
+static void LnkT28(){ call_or_link(VV[28],(void **)(void *)&Lnk28);} /* WRAPPER-OF */
+static void LnkT27(){ call_or_link(VV[27],(void **)(void *)&Lnk27);} /* CCLOSURE-ENV-NTHCDR */
+static void LnkT26(){ call_or_link(VV[26],(void **)(void *)&Lnk26);} /* COMPILE-IIS-FUNCTIONS */
+static void LnkT25(){ call_or_link(VV[25],(void **)(void *)&Lnk25);} /* (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 3)2193 */
+static void LnkT23(){ call_or_link(VV[23],(void **)(void *)&Lnk23);} /* (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 2)2193 */
+static void LnkT21(){ call_or_link(VV[21],(void **)(void *)&Lnk21);} /* (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 1)2193 */
+static void LnkT19(){ call_or_link(VV[19],(void **)(void *)&Lnk19);} /* (PCL::PRECOMPILE-INITIALIZE-INSTANCE-SIMPLE CLCS 0)2193 */
+static void LnkT18(){ call_or_link(VV[18],(void **)(void *)&Lnk18);} /* LOAD-PRECOMPILED-IIS-ENTRY */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -759,16 +759,16 @@ T207:;
 	base[0]=base[0];
 	return Cnil;}
 	}
-static void LnkT58(){ call_or_link(VV[58],(void **)&Lnk58);} /* GET-DECODED-TIME */
-static void LnkT11(){ call_or_link(VV[11],(void **)&Lnk11);} /* OPEN */
-static object  LnkTLI57(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[57],(void **)&LnkLI57,first,ap);va_end(ap);return V1;} /* WARN */
-static object  LnkTLI56(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[56],(void **)&LnkLI56,first,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
-static void LnkT9(){ call_or_link(VV[9],(void **)&Lnk9);} /* GET-OUTPUT-STREAM-STRING */
-static void LnkT55(){ call_or_link(VV[55],(void **)&Lnk55);} /* MAKE-STRING-OUTPUT-STREAM */
-static void LnkT6(){ call_or_link(VV[6],(void **)&Lnk6);} /* GET-STRING-INPUT-STREAM-INDEX */
-static void LnkT44(){ call_or_link(VV[44],(void **)&Lnk44);} /* READ-PRESERVING-WHITESPACE */
-static void LnkT4(){ call_or_link(VV[4],(void **)&Lnk4);} /* MAKE-STRING-INPUT-STREAM */
-static void LnkT39(){ call_or_link(VV[39],(void **)&Lnk39);} /* FIND-DECLARATIONS */
+static void LnkT58(){ call_or_link(VV[58],(void **)(void *)&Lnk58);} /* GET-DECODED-TIME */
+static void LnkT11(){ call_or_link(VV[11],(void **)(void *)&Lnk11);} /* OPEN */
+static object  LnkTLI57(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[57],(void **)(void *)&LnkLI57,first,ap);va_end(ap);return V1;} /* WARN */
+static object  LnkTLI56(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[56],(void **)(void *)&LnkLI56,first,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
+static void LnkT9(){ call_or_link(VV[9],(void **)(void *)&Lnk9);} /* GET-OUTPUT-STREAM-STRING */
+static void LnkT55(){ call_or_link(VV[55],(void **)(void *)&Lnk55);} /* MAKE-STRING-OUTPUT-STREAM */
+static void LnkT6(){ call_or_link(VV[6],(void **)(void *)&Lnk6);} /* GET-STRING-INPUT-STREAM-INDEX */
+static void LnkT44(){ call_or_link(VV[44],(void **)(void *)&Lnk44);} /* READ-PRESERVING-WHITESPACE */
+static void LnkT4(){ call_or_link(VV[4],(void **)(void *)&Lnk4);} /* MAKE-STRING-INPUT-STREAM */
+static void LnkT39(){ call_or_link(VV[39],(void **)(void *)&Lnk39);} /* FIND-DECLARATIONS */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

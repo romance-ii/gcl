@@ -168,9 +168,9 @@ T55:;
 	return;}}
 	}
 }
-static void LnkT6(){ call_or_link(VV[6],(void **)&Lnk6);} /* TYPECASE-ERROR-STRING */
-static void LnkT5(){ call_or_link(VV[5],(void **)&Lnk5);} /* STRUCTURE-SUBTYPE-P */
-static void LnkT4(){ call_or_link(VV[4],(void **)&Lnk4);} /* TYPEP */
+static void LnkT6(){ call_or_link(VV[6],(void **)(void *)&Lnk6);} /* TYPECASE-ERROR-STRING */
+static void LnkT5(){ call_or_link(VV[5],(void **)(void *)&Lnk5);} /* STRUCTURE-SUBTYPE-P */
+static void LnkT4(){ call_or_link(VV[4],(void **)(void *)&Lnk4);} /* TYPEP */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -854,15 +854,15 @@ T283:;
 	VMR8(V147)}
 	return Cnil;
 }
-static object  LnkTLI70(){return call_proc0(VV[70],(void **)&LnkLI70);} /* C1NIL */
-static object  LnkTLI69(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[69],(void **)&LnkLI69,first,ap);va_end(ap);return V1;} /* CMPWARN */
-static void LnkT68(){ call_or_link(VV[68],(void **)&Lnk68);} /* COPY-INFO */
-static object  LnkTLI67(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[67],(void **)&LnkLI67,2,first,ap);va_end(ap);return V1;} /* TYPE-AND */
-static object  LnkTLI36(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[36],(void **)&LnkLI36,1,first,ap);va_end(ap);return V1;} /* TYPE-FILTER */
-static void LnkT60(){ call_or_link(VV[60],(void **)&Lnk60);} /* SUBTYPEP */
-static object  LnkTLI59(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[59],(void **)&LnkLI59,2,first,ap);va_end(ap);return V1;} /* SUB-INTERVAL-P */
-static object  LnkTLI58(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[58],(void **)&LnkLI58,1,first,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
-static object  LnkTLI56(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[56],(void **)&LnkLI56,1,first,ap);va_end(ap);return V1;} /* NORMALIZE-TYPE */
+static object  LnkTLI70(){return call_proc0(VV[70],(void **)(void *)&LnkLI70);} /* C1NIL */
+static object  LnkTLI69(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[69],(void **)(void *)&LnkLI69,first,ap);va_end(ap);return V1;} /* CMPWARN */
+static void LnkT68(){ call_or_link(VV[68],(void **)(void *)&Lnk68);} /* COPY-INFO */
+static object  LnkTLI67(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[67],(void **)(void *)&LnkLI67,2,first,ap);va_end(ap);return V1;} /* TYPE-AND */
+static object  LnkTLI36(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[36],(void **)(void *)&LnkLI36,1,first,ap);va_end(ap);return V1;} /* TYPE-FILTER */
+static void LnkT60(){ call_or_link(VV[60],(void **)(void *)&Lnk60);} /* SUBTYPEP */
+static object  LnkTLI59(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[59],(void **)(void *)&LnkLI59,2,first,ap);va_end(ap);return V1;} /* SUB-INTERVAL-P */
+static object  LnkTLI58(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[58],(void **)(void *)&LnkLI58,1,first,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
+static object  LnkTLI56(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[56],(void **)(void *)&LnkLI56,1,first,ap);va_end(ap);return V1;} /* NORMALIZE-TYPE */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

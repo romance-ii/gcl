@@ -355,7 +355,7 @@ BEGIN:
 @(defun char_code (c)
 @
 	check_type_character(&c);
-	@(return `small_fixnum(char_code(c))`)
+	@(return `make_fixnum(char_code(c))`)
 @)
 
 @(defun char_bits (c)

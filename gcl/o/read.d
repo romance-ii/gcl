@@ -392,6 +392,11 @@ too_long_token(void);
 	Read_object(in) reads an object from stream in.
 	This routine corresponds to COMMON Lisp function READ.
 */
+
+/* FIXME What should this be? Apparently no reliable way to use value stack */ 
+#define MAX_PACKAGE_STACK 1024
+static object P0[MAX_PACKAGE_STACK],*PP0=P0,LP;
+
 object
 read_object(in)
 object in;
@@ -428,6 +433,19 @@ BEGIN:
 	});
 		a = cat(c);
 	} while (a == cat_whitespace);
+	if (c->ch.ch_code == '(') { /* Loose package extension */
+	  LP=LP || PP0==P0 ? LP : PP0[-1]; /* push loose packages into nested lists */
+	  if (LP) {
+	    if (PP0-P0>=MAX_PACKAGE_STACK)
+	      FEerror("Too many nested package specifiers",0);
+	    *PP0++=LP;
+	    LP=NULL;
+	  }
+	} else if (LP)
+	    FEerror("Loose package prefix must be followed by a list",0);
+	if (c->ch.ch_code==')' && PP0>P0) PP0--; /* regardless of error behavior, 
+						    will pop stack to beginning as parens
+						    must match before the reader starts */
 	delimiting_char = vs_head;
 	if (delimiting_char != OBJNULL && c == delimiting_char) {
 		delimiting_char = OBJNULL;
@@ -499,8 +517,15 @@ BEGIN:
 				token_buffer[(tok_leng++,length++)] = char_code(c);
 			}
 			goto K;
-		} else if (a == cat_whitespace || a == cat_terminating)
+		} else if (a == cat_terminating) {
 			break;
+        	} else if (a == cat_whitespace) {
+		  /* skip all whitespace after trailing colon if no escape seen */
+		  if (colon+colon_type==length && !escape_flag)
+		    goto K;
+		  else
+		    break;
+		}
 		else if ('a' <= char_code(c) && char_code(c) <= 'z')
 			c = code_char(char_code(c) - ('a' - 'A'));
 		else if (char_code(c) == ':') {
@@ -587,6 +612,15 @@ SYMBOL:
 		token->st.st_fillp = length - (colon + 2);
 	} else
 		p = current_package();
+	/* loose package is an empty token following a non-beginning 
+	   colon with no escape, to allow for ||*/
+	if (!token->st.st_fillp && colon && !escape_flag) {
+	  LP=p;
+	  goto BEGIN;
+	}
+	/* unless package specified for this symbol, use loose package if present */
+	if (PP0>P0 && !colon_type)
+	  p=PP0[-1];
 	vs_push(p);
 	x = intern(token, p);
 	vs_push(x);
@@ -2742,7 +2776,7 @@ read_fasl_vector1(in)
 object in;
 {
 	int dimcount, dim;
-	object *vsp;		
+	object *vsp,vspo;
 	VOL object x;
 	int i;
 	bool e;
@@ -2755,7 +2789,7 @@ object in;
 		old_sharp_eq_context[SHARP_EQ_CONTEXT_SIZE];
 	int old_backq_level;
 
-	vsp=(object *)&vsp;
+	vsp=&vspo;
 	old_READtable = READtable;
 	old_READdefault_float_format = READdefault_float_format;
 	old_READbase = READbase;

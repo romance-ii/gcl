@@ -253,8 +253,10 @@ before_interrupt(struct save_for_interrupt *p, int allowed)
  SS1(p->ihs_topVAL,*ihs_top);
  { void **pp = p->save_objects;
 #undef XS
- /* #define XS(a) *pp++ = (void *) (a); */
-#define XS(a) *pp++ =  * (void **) (&a); 
+#undef XSI
+#define XS(a) *pp++ = (void *) (a);
+#define XSI(a) XS(a)
+/* #define XS(a) *pp++ =  * (void **) (&a);  */
 #include "usig2_aux.c"
    if ((pp - (&(p->save_objects)[0])) >= (sizeof(p->save_objects)/sizeof(void *)))
      abort();
@@ -309,12 +311,15 @@ after_interrupt(struct save_for_interrupt *p, int allowed)
   RS1(p->ihs_topVAL,*ihs_top);
  { void **pp = p->save_objects;
 #undef XS
+#undef XSI
 
  /*  #define XS(a) a = (void *)(*pp++)
      We store back in the location 'a' the value we have saved. 
   */
  
-#define XS(a) do { void **_p = (void **)(&a); *_p = (void *)(*pp++);}while(0)
+/* #define XS(a) do { void **_p = (void **)(&a); *_p = (void *)(*pp++);}while(0) */
+#define XS(a) a = (void *)(*pp++)
+#define XSI(a) {union {void *v;long l;}u; u.v=*pp++; a = u.l;}
 #include "usig2_aux.c"
  }
 

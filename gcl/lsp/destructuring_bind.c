@@ -1365,16 +1365,16 @@ T576:;
 	vs_top=(vs_base=base+6)+1;
 	return;}}
 }
-static void LnkT95(){ call_or_link(VV[95],(void **)&Lnk95);} /* PARSE-DEFMACRO */
-static void LnkT94(){ call_or_link(VV[94],(void **)&Lnk94);} /* MAKE-KEYWORD */
-static void LnkT93(){ call_or_link(VV[93],(void **)&Lnk93);} /* PUSH-OPTIONAL-BINDING */
-static void LnkT92(){ call_or_link(VV[92],(void **)&Lnk92);} /* PUSH-SUB-LIST-BINDING */
-static void LnkT91(){ call_or_link(VV[91],(void **)&Lnk91);} /* DEFMACRO-ERROR */
-static void LnkT90(){ call_or_link(VV[90],(void **)&Lnk90);} /* PUSH-LET-BINDING */
-static void LnkT49(){ call_or_link(VV[49],(void **)&Lnk49);} /* LOOKUP-KEYWORD */
-static void LnkT89(){ call_or_link(VV[89],(void **)&Lnk89);} /* SPECIFIC-ERROR */
-static void LnkT88(){ call_or_link(VV[88],(void **)&Lnk88);} /* PARSE-DEFMACRO-LAMBDA-LIST */
-static void LnkT30(){ call_or_link(VV[30],(void **)&Lnk30);} /* PARSE-BODY */
+static void LnkT95(){ call_or_link(VV[95],(void **)(void *)&Lnk95);} /* PARSE-DEFMACRO */
+static void LnkT94(){ call_or_link(VV[94],(void **)(void *)&Lnk94);} /* MAKE-KEYWORD */
+static void LnkT93(){ call_or_link(VV[93],(void **)(void *)&Lnk93);} /* PUSH-OPTIONAL-BINDING */
+static void LnkT92(){ call_or_link(VV[92],(void **)(void *)&Lnk92);} /* PUSH-SUB-LIST-BINDING */
+static void LnkT91(){ call_or_link(VV[91],(void **)(void *)&Lnk91);} /* DEFMACRO-ERROR */
+static void LnkT90(){ call_or_link(VV[90],(void **)(void *)&Lnk90);} /* PUSH-LET-BINDING */
+static void LnkT49(){ call_or_link(VV[49],(void **)(void *)&Lnk49);} /* LOOKUP-KEYWORD */
+static void LnkT89(){ call_or_link(VV[89],(void **)(void *)&Lnk89);} /* SPECIFIC-ERROR */
+static void LnkT88(){ call_or_link(VV[88],(void **)(void *)&Lnk88);} /* PARSE-DEFMACRO-LAMBDA-LIST */
+static void LnkT30(){ call_or_link(VV[30],(void **)(void *)&Lnk30);} /* PARSE-BODY */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -172,10 +172,10 @@ T50:;
 	return;}}
 	}
 }
-static void LnkT9(){ call_or_link(VV[9],(void **)&Lnk9);} /* TYPECASE-ERROR-STRING */
-static object  LnkTLI8(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[8],(void **)&LnkLI8,4098,first,ap);va_end(ap);return V1;} /* %CCLOSURE-ENV-NTHCDR */
-static void LnkT7(){ call_or_link(VV[7],(void **)&Lnk7);} /* CCLOSURE-ENV-NTHCDR */
-static void LnkT6(){ call_or_link(VV[6],(void **)&Lnk6);} /* STRUCTURE-SUBTYPE-P */
+static void LnkT9(){ call_or_link(VV[9],(void **)(void *)&Lnk9);} /* TYPECASE-ERROR-STRING */
+static object  LnkTLI8(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[8],(void **)(void *)&LnkLI8,4098,first,ap);va_end(ap);return V1;} /* %CCLOSURE-ENV-NTHCDR */
+static void LnkT7(){ call_or_link(VV[7],(void **)(void *)&Lnk7);} /* CCLOSURE-ENV-NTHCDR */
+static void LnkT6(){ call_or_link(VV[6],(void **)(void *)&Lnk6);} /* STRUCTURE-SUBTYPE-P */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

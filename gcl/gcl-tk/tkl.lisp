@@ -1411,12 +1411,12 @@
 	       ((probe-file (tk-conc si::*lib-directory* "gcl-tk/gcltksrv")))
 	       (t (error "Must setenv GCL_TK_SERVER ")))))
   (let ((pid (if host  -1 (si::getpid)))
-	(tk-socket  (si::open-named-socket 0 nil))
+	(tk-socket  (si::open-named-socket 0))
 	)
     (cond ((not host) (setq hostid loopback))
 	  (host (setq hostid (si::hostname-to-hostid (si::gethostname)))))
     (or hostid (error "Can't find my address"))
-    (setq tk-socket (si::open-named-socket 0 nil))
+    (setq tk-socket (si::open-named-socket 0))
     (if (pathnamep gcltksrv) (setq gcltksrv (namestring gcltksrv)))
     (let ((command 
 	   (tk-conc   gcltksrv " " hostid " "

@@ -782,12 +782,12 @@ register object *base0;
 	unwind(fr,VV[15]);}
 	}
 }
-static object  LnkTLI31(){return call_proc0(VV[31],(void **)&LnkLI31);} /* INSTALL-CLCS-SYMBOLS */
-static void LnkT30(){ call_or_link(VV[30],(void **)&Lnk30);} /* ERROR */
-static object  LnkTLI29(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[29],(void **)&LnkLI29,first,ap);va_end(ap);return V1;} /* MAKE-RESTART */
-static object  LnkTLI28(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[28],(void **)&LnkLI28,1,first,ap);va_end(ap);return V1;} /* REVERT-SYMBOL */
-static object  LnkTLI27(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[27],(void **)&LnkLI27,2,first,ap);va_end(ap);return V1;} /* INSTALL-SYMBOL */
-static void LnkT26(){ call_or_link(VV[26],(void **)&Lnk26);} /* *MAKE-SPECIAL */
+static object  LnkTLI31(){return call_proc0(VV[31],(void **)(void *)&LnkLI31);} /* INSTALL-CLCS-SYMBOLS */
+static void LnkT30(){ call_or_link(VV[30],(void **)(void *)&Lnk30);} /* ERROR */
+static object  LnkTLI29(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[29],(void **)(void *)&LnkLI29,first,ap);va_end(ap);return V1;} /* MAKE-RESTART */
+static object  LnkTLI28(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[28],(void **)(void *)&LnkLI28,1,first,ap);va_end(ap);return V1;} /* REVERT-SYMBOL */
+static object  LnkTLI27(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[27],(void **)(void *)&LnkLI27,2,first,ap);va_end(ap);return V1;} /* INSTALL-SYMBOL */
+static void LnkT26(){ call_or_link(VV[26],(void **)(void *)&Lnk26);} /* *MAKE-SPECIAL */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

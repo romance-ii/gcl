@@ -408,11 +408,11 @@
     (cond
       ((null type)
        (wt-nl1 "static void LnkT"
-	       num "(){ call_or_link(VV[" num "],(void **)&Lnk" num");}"
+	       num "(){ call_or_link(VV[" num "],(void **)(void *)&Lnk" num");}"
 	       ))
       ((eql type 'proclaimed-closure)
        (wt-nl1 "static void LnkT" num
-	       "(ptr) object *ptr;{ call_or_link_closure(VV[" num "],(void **)&Lnk" num",(void **)&Lclptr" num");}"))
+	       "(ptr) object *ptr;{ call_or_link_closure(VV[" num "],(void **)(void *)&Lnk" num",(void **)(void *)&Lclptr" num");}"))
       (t
        ;;change later to include above.
        ;;(setq type (cdr (assoc type '((t . "object")(:btpr . "bptr")))))
@@ -423,11 +423,11 @@
 		    (declaration-type (rep-type type)) "V1;"
 		    "va_list ap;va_start(ap,first);V1=call_"
 		    (if vararg "v" "") "proc_new(VV["
-		    (add-object name)"],(void **)&Lnk" num )
+		    (add-object name)"],(void **)(void *)&Lnk" num )
 		(or vararg (wt "," (proclaimed-argd args type)))
 		(wt   ",first,ap);va_end(ap);return V1;}" )))
 	     (t (wt "(){return call_proc0(VV[" (add-object name)
-		    "],(void **)&Lnk" num ");}" ))))
+		    "],(void **)(void *)&Lnk" num ");}" ))))
       (t (error "unknown link type ~a" type)))
     (setq name (symbol-name name))
     (if (find #\/ name) (setq name (remove #\/ name)))

@@ -116,13 +116,13 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-static object  LnkTLI8(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[8],(void **)&LnkLI8,2,first,ap);va_end(ap);return V1;} /* MAKE-STD-WRITER-METHOD-FUNCTION */
-static void LnkT7(ptr) object *ptr;{ call_or_link_closure(VV[7],(void **)&Lnk7,(void **)&Lclptr7);} /* CLASS-NAME */
-static object  LnkTLI6(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[6],(void **)&LnkLI6,2,first,ap);va_end(ap);return V1;} /* MAKE-STD-READER-METHOD-FUNCTION */
-static void LnkT5(ptr) object *ptr;{ call_or_link_closure(VV[5],(void **)&Lnk5,(void **)&Lclptr5);} /* CLASS-WRAPPER */
-static object  LnkTLI2(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[2],(void **)&LnkLI2,first,ap);va_end(ap);return V1;} /* ALLOCATE-FUNCALLABLE-INSTANCE */
-static void LnkT4(ptr) object *ptr;{ call_or_link_closure(VV[4],(void **)&Lnk4,(void **)&Lclptr4);} /* FINALIZE-INHERITANCE */
-static void LnkT3(ptr) object *ptr;{ call_or_link_closure(VV[3],(void **)&Lnk3,(void **)&Lclptr3);} /* CLASS-FINALIZED-P */
+static object  LnkTLI8(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[8],(void **)(void *)&LnkLI8,2,first,ap);va_end(ap);return V1;} /* MAKE-STD-WRITER-METHOD-FUNCTION */
+static void LnkT7(ptr) object *ptr;{ call_or_link_closure(VV[7],(void **)(void *)&Lnk7,(void **)(void *)&Lclptr7);} /* CLASS-NAME */
+static object  LnkTLI6(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[6],(void **)(void *)&LnkLI6,2,first,ap);va_end(ap);return V1;} /* MAKE-STD-READER-METHOD-FUNCTION */
+static void LnkT5(ptr) object *ptr;{ call_or_link_closure(VV[5],(void **)(void *)&Lnk5,(void **)(void *)&Lclptr5);} /* CLASS-WRAPPER */
+static object  LnkTLI2(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[2],(void **)(void *)&LnkLI2,first,ap);va_end(ap);return V1;} /* ALLOCATE-FUNCALLABLE-INSTANCE */
+static void LnkT4(ptr) object *ptr;{ call_or_link_closure(VV[4],(void **)(void *)&Lnk4,(void **)(void *)&Lclptr4);} /* FINALIZE-INHERITANCE */
+static void LnkT3(ptr) object *ptr;{ call_or_link_closure(VV[3],(void **)(void *)&Lnk3,(void **)(void *)&Lclptr3);} /* CLASS-FINALIZED-P */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

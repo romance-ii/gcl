@@ -7579,66 +7579,66 @@ T2749:;
 	goto T2748;
 	}
 }
-static void LnkT400(){ call_or_link(VV[400],(void **)&Lnk400);} /* LOOP-STANDARD-EXPANSION */
-static void LnkT399(){ call_or_link(VV[399],(void **)&Lnk399);} /* LOOP-TRANSLATE */
-static void LnkT398(){ call_or_link(VV[398],(void **)&Lnk398);} /* ADD-LOOP-PATH */
-static void LnkT397(){ call_or_link(VV[397],(void **)&Lnk397);} /* MAKE-STANDARD-LOOP-UNIVERSE */
-static void LnkT394(){ call_or_link(VV[394],(void **)&Lnk394);} /* NAMED-VARIABLE */
-static void LnkT389(){ call_or_link(VV[389],(void **)&Lnk389);} /* LOOP-SEQUENCER */
-static object  LnkTLI386(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[386],(void **)&LnkLI386,first,ap);va_end(ap);return V1;} /* DELETE */
-static void LnkT385(){ call_or_link(VV[385],(void **)&Lnk385);} /* LOOP-TASSOC */
-static void LnkT384(){ call_or_link(VV[384],(void **)&Lnk384);} /* LOOP-COLLECT-PREPOSITIONAL-PHRASES */
-static void LnkT383(){ call_or_link(VV[383],(void **)&Lnk383);} /* MAKE-LOOP-PATH */
-static void LnkT382(){ call_or_link(VV[382],(void **)&Lnk382);} /* STRUCTURE-SUBTYPE-P */
-static void LnkT381(){ call_or_link(VV[381],(void **)&Lnk381);} /* LOOP-LIST-STEP */
-static void LnkT380(){ call_or_link(VV[380],(void **)&Lnk380);} /* LOOP-MAKE-ITERATION-VARIABLE */
-static void LnkT379(){ call_or_link(VV[379],(void **)&Lnk379);} /* LOOP-CONSTANT-FOLD-IF-POSSIBLE */
-static void LnkT378(){ call_or_link(VV[378],(void **)&Lnk378);} /* LOOP-WHEN-IT-VARIABLE */
-static void LnkT377(){ call_or_link(VV[377],(void **)&Lnk377);} /* LOOP-NOTE-MINIMAX-OPERATION */
-static void LnkT376(){ call_or_link(VV[376],(void **)&Lnk376);} /* MAKE-LOOP-MINIMAX */
-static void LnkT375(){ call_or_link(VV[375],(void **)&Lnk375);} /* LOOP-CHECK-DATA-TYPE */
-static void LnkT372(){ call_or_link(VV[372],(void **)&Lnk372);} /* LOOP-EMIT-FINAL-VALUE */
-static void LnkT371(){ call_or_link(VV[371],(void **)&Lnk371);} /* LOOP-GET-COLLECTION-INFO */
-static void LnkT370(){ call_or_link(VV[370],(void **)&Lnk370);} /* MAKE-LOOP-COLLECTOR */
-static object  LnkTLI368(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[368],(void **)&LnkLI368,first,ap);va_end(ap);return V1;} /* FIND */
-static void LnkT367(){ call_or_link(VV[367],(void **)&Lnk367);} /* LOOP-OPTIONAL-TYPE */
-static void LnkT364(){ call_or_link(VV[364],(void **)&Lnk364);} /* LOOP-EMIT-BODY */
-static void LnkT363(){ call_or_link(VV[363],(void **)&Lnk363);} /* LOOP-GET-PROGN */
-static void LnkT362(){ call_or_link(VV[362],(void **)&Lnk362);} /* LOOP-DISALLOW-CONDITIONAL */
-static void LnkT361(){ call_or_link(VV[361],(void **)&Lnk361);} /* LOOP-GET-FORM */
-static void LnkT360(){ call_or_link(VV[360],(void **)&Lnk360);} /* LOOP-CONSTANTP */
-static void LnkT359(){ call_or_link(VV[359],(void **)&Lnk359);} /* LOOP-MAKE-VARIABLE */
-static void LnkT358(){ call_or_link(VV[358],(void **)&Lnk358);} /* LOOP-DECLARE-VARIABLE */
-static void LnkT357(){ call_or_link(VV[357],(void **)&Lnk357);} /* LOOP-TEQUAL */
-static object  LnkTLI356(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[356],(void **)&LnkLI356,2,first,ap);va_end(ap);return V1;} /* COERCE */
-static void LnkT355(){ call_or_link(VV[355],(void **)&Lnk355);} /* LOOP-CONSTRUCT-RETURN */
-static void LnkT354(){ call_or_link(VV[354],(void **)&Lnk354);} /* LOOP-PSEUDO-BODY */
-static void LnkT353(){ call_or_link(VV[353],(void **)&Lnk353);} /* LOOP-TMEMBER */
-static void LnkT352(){ call_or_link(VV[352],(void **)&Lnk352);} /* LOOP-HACK-ITERATION */
-static void LnkT351(){ call_or_link(VV[351],(void **)&Lnk351);} /* LOOP-LOOKUP-KEYWORD */
-static void LnkT350(){ call_or_link(VV[350],(void **)&Lnk350);} /* LOOP-POP-SOURCE */
-static void LnkT349(){ call_or_link(VV[349],(void **)&Lnk349);} /* LOOP-BIND-BLOCK */
-static void LnkT348(){ call_or_link(VV[348],(void **)&Lnk348);} /* LOOP-ITERATION-DRIVER */
-static void LnkT347(){ call_or_link(VV[347],(void **)&Lnk347);} /* LOOP-ERROR */
-static void LnkT326(){ call_or_link(VV[326],(void **)&Lnk326);} /* SUBTYPEP */
-static object  LnkTLI346(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[346],(void **)&LnkLI346,first,ap);va_end(ap);return V1;} /* WARN */
-static void LnkT345(){ call_or_link(VV[345],(void **)&Lnk345);} /* SPECIFIC-ERROR */
-static void LnkT344(){ call_or_link(VV[344],(void **)&Lnk344);} /* LOOP-CONTEXT */
-static void LnkT343(){ call_or_link(VV[343],(void **)&Lnk343);} /* SPECIAL-OPERATOR-P */
-static void LnkT342(){ call_or_link(VV[342],(void **)&Lnk342);} /* ESTIMATE-CODE-SIZE-1 */
-static void LnkT341(){ call_or_link(VV[341],(void **)&Lnk341);} /* DESTRUCTURING-SIZE */
-static void LnkT77(){ call_or_link(VV[77],(void **)&Lnk77);} /* ESTIMATE-CODE-SIZE */
-static void LnkT340(){ call_or_link(VV[340],(void **)&Lnk340);} /* LOOP-CODE-DUPLICATION-THRESHOLD */
-static void LnkT339(){ call_or_link(VV[339],(void **)&Lnk339);} /* LOOP-OPTIMIZATION-QUANTITIES */
-static void LnkT338(){ call_or_link(VV[338],(void **)&Lnk338);} /* LOOP-WARN */
-static void LnkT337(){ call_or_link(VV[337],(void **)&Lnk337);} /* LOOP-MAKE-DESETQ */
-static void LnkT336(){ call_or_link(VV[336],(void **)&Lnk336);} /* LOOP-MAKE-PSETQ */
-static void LnkT335(){ call_or_link(VV[335],(void **)&Lnk335);} /* MAKE-LOOP-UNIVERSE */
-static void LnkT333(){ call_or_link(VV[333],(void **)&Lnk333);} /* TYPEP */
-static void LnkT331(){ call_or_link(VV[331],(void **)&Lnk331);} /* HIDE-VARIABLE-REFERENCE */
-static void LnkT329(){ call_or_link(VV[329],(void **)&Lnk329);} /* LOOP-TYPED-INIT */
-static void LnkT328(){ call_or_link(VV[328],(void **)&Lnk328);} /* MAKE-LOOP-MINIMAX-INTERNAL */
-static void LnkT327(){ call_or_link(VV[327],(void **)&Lnk327);} /* LOOP-GENTEMP */
+static void LnkT400(){ call_or_link(VV[400],(void **)(void *)&Lnk400);} /* LOOP-STANDARD-EXPANSION */
+static void LnkT399(){ call_or_link(VV[399],(void **)(void *)&Lnk399);} /* LOOP-TRANSLATE */
+static void LnkT398(){ call_or_link(VV[398],(void **)(void *)&Lnk398);} /* ADD-LOOP-PATH */
+static void LnkT397(){ call_or_link(VV[397],(void **)(void *)&Lnk397);} /* MAKE-STANDARD-LOOP-UNIVERSE */
+static void LnkT394(){ call_or_link(VV[394],(void **)(void *)&Lnk394);} /* NAMED-VARIABLE */
+static void LnkT389(){ call_or_link(VV[389],(void **)(void *)&Lnk389);} /* LOOP-SEQUENCER */
+static object  LnkTLI386(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[386],(void **)(void *)&LnkLI386,first,ap);va_end(ap);return V1;} /* DELETE */
+static void LnkT385(){ call_or_link(VV[385],(void **)(void *)&Lnk385);} /* LOOP-TASSOC */
+static void LnkT384(){ call_or_link(VV[384],(void **)(void *)&Lnk384);} /* LOOP-COLLECT-PREPOSITIONAL-PHRASES */
+static void LnkT383(){ call_or_link(VV[383],(void **)(void *)&Lnk383);} /* MAKE-LOOP-PATH */
+static void LnkT382(){ call_or_link(VV[382],(void **)(void *)&Lnk382);} /* STRUCTURE-SUBTYPE-P */
+static void LnkT381(){ call_or_link(VV[381],(void **)(void *)&Lnk381);} /* LOOP-LIST-STEP */
+static void LnkT380(){ call_or_link(VV[380],(void **)(void *)&Lnk380);} /* LOOP-MAKE-ITERATION-VARIABLE */
+static void LnkT379(){ call_or_link(VV[379],(void **)(void *)&Lnk379);} /* LOOP-CONSTANT-FOLD-IF-POSSIBLE */
+static void LnkT378(){ call_or_link(VV[378],(void **)(void *)&Lnk378);} /* LOOP-WHEN-IT-VARIABLE */
+static void LnkT377(){ call_or_link(VV[377],(void **)(void *)&Lnk377);} /* LOOP-NOTE-MINIMAX-OPERATION */
+static void LnkT376(){ call_or_link(VV[376],(void **)(void *)&Lnk376);} /* MAKE-LOOP-MINIMAX */
+static void LnkT375(){ call_or_link(VV[375],(void **)(void *)&Lnk375);} /* LOOP-CHECK-DATA-TYPE */
+static void LnkT372(){ call_or_link(VV[372],(void **)(void *)&Lnk372);} /* LOOP-EMIT-FINAL-VALUE */
+static void LnkT371(){ call_or_link(VV[371],(void **)(void *)&Lnk371);} /* LOOP-GET-COLLECTION-INFO */
+static void LnkT370(){ call_or_link(VV[370],(void **)(void *)&Lnk370);} /* MAKE-LOOP-COLLECTOR */
+static object  LnkTLI368(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[368],(void **)(void *)&LnkLI368,first,ap);va_end(ap);return V1;} /* FIND */
+static void LnkT367(){ call_or_link(VV[367],(void **)(void *)&Lnk367);} /* LOOP-OPTIONAL-TYPE */
+static void LnkT364(){ call_or_link(VV[364],(void **)(void *)&Lnk364);} /* LOOP-EMIT-BODY */
+static void LnkT363(){ call_or_link(VV[363],(void **)(void *)&Lnk363);} /* LOOP-GET-PROGN */
+static void LnkT362(){ call_or_link(VV[362],(void **)(void *)&Lnk362);} /* LOOP-DISALLOW-CONDITIONAL */
+static void LnkT361(){ call_or_link(VV[361],(void **)(void *)&Lnk361);} /* LOOP-GET-FORM */
+static void LnkT360(){ call_or_link(VV[360],(void **)(void *)&Lnk360);} /* LOOP-CONSTANTP */
+static void LnkT359(){ call_or_link(VV[359],(void **)(void *)&Lnk359);} /* LOOP-MAKE-VARIABLE */
+static void LnkT358(){ call_or_link(VV[358],(void **)(void *)&Lnk358);} /* LOOP-DECLARE-VARIABLE */
+static void LnkT357(){ call_or_link(VV[357],(void **)(void *)&Lnk357);} /* LOOP-TEQUAL */
+static object  LnkTLI356(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[356],(void **)(void *)&LnkLI356,2,first,ap);va_end(ap);return V1;} /* COERCE */
+static void LnkT355(){ call_or_link(VV[355],(void **)(void *)&Lnk355);} /* LOOP-CONSTRUCT-RETURN */
+static void LnkT354(){ call_or_link(VV[354],(void **)(void *)&Lnk354);} /* LOOP-PSEUDO-BODY */
+static void LnkT353(){ call_or_link(VV[353],(void **)(void *)&Lnk353);} /* LOOP-TMEMBER */
+static void LnkT352(){ call_or_link(VV[352],(void **)(void *)&Lnk352);} /* LOOP-HACK-ITERATION */
+static void LnkT351(){ call_or_link(VV[351],(void **)(void *)&Lnk351);} /* LOOP-LOOKUP-KEYWORD */
+static void LnkT350(){ call_or_link(VV[350],(void **)(void *)&Lnk350);} /* LOOP-POP-SOURCE */
+static void LnkT349(){ call_or_link(VV[349],(void **)(void *)&Lnk349);} /* LOOP-BIND-BLOCK */
+static void LnkT348(){ call_or_link(VV[348],(void **)(void *)&Lnk348);} /* LOOP-ITERATION-DRIVER */
+static void LnkT347(){ call_or_link(VV[347],(void **)(void *)&Lnk347);} /* LOOP-ERROR */
+static void LnkT326(){ call_or_link(VV[326],(void **)(void *)&Lnk326);} /* SUBTYPEP */
+static object  LnkTLI346(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[346],(void **)(void *)&LnkLI346,first,ap);va_end(ap);return V1;} /* WARN */
+static void LnkT345(){ call_or_link(VV[345],(void **)(void *)&Lnk345);} /* SPECIFIC-ERROR */
+static void LnkT344(){ call_or_link(VV[344],(void **)(void *)&Lnk344);} /* LOOP-CONTEXT */
+static void LnkT343(){ call_or_link(VV[343],(void **)(void *)&Lnk343);} /* SPECIAL-OPERATOR-P */
+static void LnkT342(){ call_or_link(VV[342],(void **)(void *)&Lnk342);} /* ESTIMATE-CODE-SIZE-1 */
+static void LnkT341(){ call_or_link(VV[341],(void **)(void *)&Lnk341);} /* DESTRUCTURING-SIZE */
+static void LnkT77(){ call_or_link(VV[77],(void **)(void *)&Lnk77);} /* ESTIMATE-CODE-SIZE */
+static void LnkT340(){ call_or_link(VV[340],(void **)(void *)&Lnk340);} /* LOOP-CODE-DUPLICATION-THRESHOLD */
+static void LnkT339(){ call_or_link(VV[339],(void **)(void *)&Lnk339);} /* LOOP-OPTIMIZATION-QUANTITIES */
+static void LnkT338(){ call_or_link(VV[338],(void **)(void *)&Lnk338);} /* LOOP-WARN */
+static void LnkT337(){ call_or_link(VV[337],(void **)(void *)&Lnk337);} /* LOOP-MAKE-DESETQ */
+static void LnkT336(){ call_or_link(VV[336],(void **)(void *)&Lnk336);} /* LOOP-MAKE-PSETQ */
+static void LnkT335(){ call_or_link(VV[335],(void **)(void *)&Lnk335);} /* MAKE-LOOP-UNIVERSE */
+static void LnkT333(){ call_or_link(VV[333],(void **)(void *)&Lnk333);} /* TYPEP */
+static void LnkT331(){ call_or_link(VV[331],(void **)(void *)&Lnk331);} /* HIDE-VARIABLE-REFERENCE */
+static void LnkT329(){ call_or_link(VV[329],(void **)(void *)&Lnk329);} /* LOOP-TYPED-INIT */
+static void LnkT328(){ call_or_link(VV[328],(void **)(void *)&Lnk328);} /* MAKE-LOOP-MINIMAX-INTERNAL */
+static void LnkT327(){ call_or_link(VV[327],(void **)(void *)&Lnk327);} /* LOOP-GENTEMP */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -984,20 +984,20 @@ T231:;
 	return;
 	}
 }
-static void LnkT79(){ call_or_link(VV[79],(void **)&Lnk79);} /* REMOVE */
-static object  LnkTLI77(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[77],(void **)&LnkLI77,first,ap);va_end(ap);return V1;} /* MAKE-RESTART */
-static void LnkT76(){ call_or_link(VV[76],(void **)&Lnk76);} /* INVOKE-DEBUGGER */
-static object  LnkTLI8(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[8],(void **)&LnkLI8,first,ap);va_end(ap);return V1;} /* SIGNAL */
-static void LnkT75(){ call_or_link(VV[75],(void **)&Lnk75);} /* MAKE-CONDITION */
-static object  LnkTLI74(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[74],(void **)&LnkLI74,1,first,ap);va_end(ap);return V1;} /* CONDITION-CLASS-P */
-static object  LnkTLI73(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[73],(void **)&LnkLI73,first,ap);va_end(ap);return V1;} /* CERROR */
-static object  LnkTLI72(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[72],(void **)&LnkLI72,1,first,ap);va_end(ap);return V1;} /* CONDITIONP */
-static object  LnkTLI71(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[71],(void **)&LnkLI71,first,ap);va_end(ap);return V1;} /* BREAK */
-static void LnkT70(){ call_or_link(VV[70],(void **)&Lnk70);} /* TYPEP */
-static void LnkT69(){ call_or_link(VV[69],(void **)&Lnk69);} /* COERCE-TO-CONDITION */
-static void LnkT21(){ call_or_link(VV[21],(void **)&Lnk21);} /* ERROR */
-static void LnkT68(){ call_or_link(VV[68],(void **)&Lnk68);} /* EVERY */
-static void LnkT66(){ call_or_link(VV[66],(void **)&Lnk66);} /* *MAKE-SPECIAL */
+static void LnkT79(){ call_or_link(VV[79],(void **)(void *)&Lnk79);} /* REMOVE */
+static object  LnkTLI77(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[77],(void **)(void *)&LnkLI77,first,ap);va_end(ap);return V1;} /* MAKE-RESTART */
+static void LnkT76(){ call_or_link(VV[76],(void **)(void *)&Lnk76);} /* INVOKE-DEBUGGER */
+static object  LnkTLI8(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[8],(void **)(void *)&LnkLI8,first,ap);va_end(ap);return V1;} /* SIGNAL */
+static void LnkT75(){ call_or_link(VV[75],(void **)(void *)&Lnk75);} /* MAKE-CONDITION */
+static object  LnkTLI74(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[74],(void **)(void *)&LnkLI74,1,first,ap);va_end(ap);return V1;} /* CONDITION-CLASS-P */
+static object  LnkTLI73(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[73],(void **)(void *)&LnkLI73,first,ap);va_end(ap);return V1;} /* CERROR */
+static object  LnkTLI72(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[72],(void **)(void *)&LnkLI72,1,first,ap);va_end(ap);return V1;} /* CONDITIONP */
+static object  LnkTLI71(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[71],(void **)(void *)&LnkLI71,first,ap);va_end(ap);return V1;} /* BREAK */
+static void LnkT70(){ call_or_link(VV[70],(void **)(void *)&Lnk70);} /* TYPEP */
+static void LnkT69(){ call_or_link(VV[69],(void **)(void *)&Lnk69);} /* COERCE-TO-CONDITION */
+static void LnkT21(){ call_or_link(VV[21],(void **)(void *)&Lnk21);} /* ERROR */
+static void LnkT68(){ call_or_link(VV[68],(void **)(void *)&Lnk68);} /* EVERY */
+static void LnkT66(){ call_or_link(VV[66],(void **)(void *)&Lnk66);} /* *MAKE-SPECIAL */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

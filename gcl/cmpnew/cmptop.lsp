@@ -109,6 +109,7 @@
 (si:putprop 'import t 'package-operation)
 (si:putprop 'provide t 'package-operation)
 (si:putprop 'require t 'package-operation)
+(si:putprop 'defpackage:defpackage t 'package-operation)
 
 ;;; Pass 1 top-levels.
 
@@ -193,8 +194,11 @@
                     (when *non-package-operation*
                       (cmpwarn "The package operation ~s was in a bad place."
                                form))
-		    (maybe-eval t form)
-                    (wt-data-package-operation form))
+		    (let ((res (if (setq fd (macro-function fun))
+				   (cmp-expand-macro fd fun (copy-list (cdr form)))
+				 form)))
+		      (maybe-eval t res)
+		      (wt-data-package-operation res)))
                    ((setq fd (get fun 't1))
                     (when *compile-print* (print-current-form))
                     (funcall fd args))
@@ -1015,7 +1019,7 @@
 	      (t (wt-nl "parse_key_new_new(")))
 	(if (eql 0 *cs*)(setq *cs* 1))
 	(wt "narg," (if *vararg-use-vs* "base " "Vcs ")
-	    "+" key-offset",(struct key *)&LI" cfun "key,first,ap);")
+	    "+" key-offset",(struct key *)(void *)&LI" cfun "key,first,ap);")
 	
 	))
     

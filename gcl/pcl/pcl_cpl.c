@@ -34,7 +34,7 @@ static object LI2(object first,...)
 	va_start(ap,first);
 	narg= narg - 0;
 	{
-	parse_key_new_new(narg,Vcs +0,(struct key *)&LI2key,first,ap);
+	parse_key_new_new(narg,Vcs +0,(struct key *)(void *)&LI2key,first,ap);
 	V10=(Vcs[0]);
 	V11=(Vcs[1]);
 	V12=(Vcs[2]);
@@ -1156,20 +1156,20 @@ T395:;
 	return;}
 	}
 }
-static object  LnkTLI40(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[40],(void **)&LnkLI40,2,first,ap);va_end(ap);return V1;} /* CPL-FORWARD-REFERENCED-CLASS-ERROR */
-static void LnkT39(ptr) object *ptr;{ call_or_link_closure(VV[39],(void **)&Lnk39,(void **)&Lclptr39);} /* FORWARD-REFERENCED-CLASS-P */
-static object  LnkTLI38(){return call_proc0(VV[38],(void **)&LnkLI38);} /* MAKE-CPD */
-static object  LnkTLI37(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[37],(void **)&LnkLI37,1,first,ap);va_end(ap);return V1;} /* FORMAT-CYCLE-REASONS */
-static object  LnkTLI36(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[36],(void **)&LnkLI36,1,first,ap);va_end(ap);return V1;} /* FIND-CYCLE-REASONS */
-static object  LnkTLI35(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[35],(void **)&LnkLI35,first,ap);va_end(ap);return V1;} /* CPL-ERROR */
-static void LnkT34(){ call_or_link(VV[34],(void **)&Lnk34);} /* FIND-SUPERCLASS-CHAIN */
-static void LnkT33(ptr) object *ptr;{ call_or_link_closure(VV[33],(void **)&Lnk33,(void **)&Lclptr33);} /* CLASS-NAME */
-static object  LnkTLI32(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[32],(void **)&LnkLI32,2,first,ap);va_end(ap);return V1;} /* CPL-INCONSISTENT-ERROR */
-static object  LnkTLI30(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[30],(void **)&LnkLI30,65539,first,ap);va_end(ap);return V1;} /* COMPUTE-STD-CPL-PHASE-3 */
-static object  LnkTLI29(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[29],(void **)&LnkLI29,1,first,ap);va_end(ap);return V1;} /* COMPUTE-STD-CPL-PHASE-2 */
-static void LnkT28(){ call_or_link(VV[28],(void **)&Lnk28);} /* COMPUTE-STD-CPL-PHASE-1 */
-static void LnkT22(ptr) object *ptr;{ call_or_link_closure(VV[22],(void **)&Lnk22,(void **)&Lclptr22);} /* CLASS-DIRECT-SUPERCLASSES */
-static object  LnkTLI21(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[21],(void **)&LnkLI21,2,first,ap);va_end(ap);return V1;} /* COMPUTE-STD-CPL */
+static object  LnkTLI40(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[40],(void **)(void *)&LnkLI40,2,first,ap);va_end(ap);return V1;} /* CPL-FORWARD-REFERENCED-CLASS-ERROR */
+static void LnkT39(ptr) object *ptr;{ call_or_link_closure(VV[39],(void **)(void *)&Lnk39,(void **)(void *)&Lclptr39);} /* FORWARD-REFERENCED-CLASS-P */
+static object  LnkTLI38(){return call_proc0(VV[38],(void **)(void *)&LnkLI38);} /* MAKE-CPD */
+static object  LnkTLI37(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[37],(void **)(void *)&LnkLI37,1,first,ap);va_end(ap);return V1;} /* FORMAT-CYCLE-REASONS */
+static object  LnkTLI36(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[36],(void **)(void *)&LnkLI36,1,first,ap);va_end(ap);return V1;} /* FIND-CYCLE-REASONS */
+static object  LnkTLI35(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[35],(void **)(void *)&LnkLI35,first,ap);va_end(ap);return V1;} /* CPL-ERROR */
+static void LnkT34(){ call_or_link(VV[34],(void **)(void *)&Lnk34);} /* FIND-SUPERCLASS-CHAIN */
+static void LnkT33(ptr) object *ptr;{ call_or_link_closure(VV[33],(void **)(void *)&Lnk33,(void **)(void *)&Lclptr33);} /* CLASS-NAME */
+static object  LnkTLI32(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[32],(void **)(void *)&LnkLI32,2,first,ap);va_end(ap);return V1;} /* CPL-INCONSISTENT-ERROR */
+static object  LnkTLI30(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[30],(void **)(void *)&LnkLI30,65539,first,ap);va_end(ap);return V1;} /* COMPUTE-STD-CPL-PHASE-3 */
+static object  LnkTLI29(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[29],(void **)(void *)&LnkLI29,1,first,ap);va_end(ap);return V1;} /* COMPUTE-STD-CPL-PHASE-2 */
+static void LnkT28(){ call_or_link(VV[28],(void **)(void *)&Lnk28);} /* COMPUTE-STD-CPL-PHASE-1 */
+static void LnkT22(ptr) object *ptr;{ call_or_link_closure(VV[22],(void **)(void *)&Lnk22,(void **)(void *)&Lclptr22);} /* CLASS-DIRECT-SUPERCLASSES */
+static object  LnkTLI21(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[21],(void **)(void *)&LnkLI21,2,first,ap);va_end(ap);return V1;} /* COMPUTE-STD-CPL */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

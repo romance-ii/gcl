@@ -20,7 +20,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-static void LnkT0(ptr) object *ptr;{ call_or_link_closure(VV[0],(void **)&Lnk0,(void **)&Lclptr0);} /* PRINT-OBJECT */
+static void LnkT0(ptr) object *ptr;{ call_or_link_closure(VV[0],(void **)(void *)&Lnk0,(void **)(void *)&Lclptr0);} /* PRINT-OBJECT */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -180,11 +180,11 @@ T55:;
 	return;}}
 	}
 }
-static void LnkT11(){ call_or_link(VV[11],(void **)&Lnk11);} /* TYPECASE-ERROR-STRING */
-static void LnkT10(){ call_or_link(VV[10],(void **)&Lnk10);} /* SLOT-UNBOUND-INTERNAL */
-static object  LnkTLI9(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[9],(void **)&LnkLI9,4098,first,ap);va_end(ap);return V1;} /* %CCLOSURE-ENV-NTHCDR */
-static void LnkT8(){ call_or_link(VV[8],(void **)&Lnk8);} /* CCLOSURE-ENV-NTHCDR */
-static void LnkT7(){ call_or_link(VV[7],(void **)&Lnk7);} /* STRUCTURE-SUBTYPE-P */
+static void LnkT11(){ call_or_link(VV[11],(void **)(void *)&Lnk11);} /* TYPECASE-ERROR-STRING */
+static void LnkT10(){ call_or_link(VV[10],(void **)(void *)&Lnk10);} /* SLOT-UNBOUND-INTERNAL */
+static object  LnkTLI9(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[9],(void **)(void *)&LnkLI9,4098,first,ap);va_end(ap);return V1;} /* %CCLOSURE-ENV-NTHCDR */
+static void LnkT8(){ call_or_link(VV[8],(void **)(void *)&Lnk8);} /* CCLOSURE-ENV-NTHCDR */
+static void LnkT7(){ call_or_link(VV[7],(void **)(void *)&Lnk7);} /* STRUCTURE-SUBTYPE-P */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

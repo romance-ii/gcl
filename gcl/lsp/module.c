@@ -204,7 +204,7 @@ T58:;
 	base[0]=base[0];
 	return Cnil;
 }
-static void LnkT14(){ call_or_link(VV[14],(void **)&Lnk14);} /* LOAD */
+static void LnkT14(){ call_or_link(VV[14],(void **)(void *)&Lnk14);} /* LOAD */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

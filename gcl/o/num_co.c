@@ -98,6 +98,7 @@ static void
 integer_decode_double(double d, int *hp, int *lp, int *ep, int *sp)
 {
 	int h, l;
+	union {double d;int i[2];} u;
 
 	if (d == 0.0) {
 		*hp = *lp = 0;
@@ -109,8 +110,11 @@ integer_decode_double(double d, int *hp, int *lp, int *ep, int *sp)
 
 
 #else
-	h = *((int *)(&d) + HIND);
-	l = *((int *)(&d) + LIND);
+	u.d=d;
+	h=u.i[HIND];
+	l=u.i[LIND];
+/* 	h = *((int *)(&d) + HIND); */
+/* 	l = *((int *)(&d) + LIND); */
 #endif
 #ifdef VAX
 	*ep = ((h >> 7) & 0xff) - 128 - 56;
@@ -187,6 +191,7 @@ integer_decode_float(double d, int *mp, int *ep, int *sp)
 {
 	float f;
 	int m;
+	union {float f;int i;} u;
 
 	f = d;
 	if (f == 0.0) {
@@ -195,7 +200,9 @@ integer_decode_float(double d, int *mp, int *ep, int *sp)
 		*sp = 1;
 		return;
 	}
-	m = *(int *)(&f);
+	u.f=f;
+	m=u.i;
+/* 	m = *(int *)(&f); */
 #ifdef VAX
 	*ep = ((m >> 7) & 0xff) - 128 - 24;
 	*mp = ((m >> 16) & 0xffff) | (((m & 0x7f) | 0x80) << 16);
@@ -227,6 +234,8 @@ integer_decode_float(double d, int *mp, int *ep, int *sp)
 static int
 double_exponent(double d)
 {
+	union {double d;int i[2];} u;
+
 	if (d == 0.0)
 		return(0);
 #ifdef VAX
@@ -239,7 +248,8 @@ double_exponent(double d)
 #ifdef NS32K
 
 #else
-	return ((((*((int *)(&d) + HIND)) & 0x7ff00000) >> 20) - 1022);
+	u.d=d;
+	return (((u.i[HIND] & 0x7ff00000) >> 20) - 1022);
 #endif
 #endif
 #ifdef MV
@@ -254,11 +264,13 @@ static double
 set_exponent(double d, int e)
 {
 	double dummy;
+	union {double d;int i[2];} u;
 
 	if (d == 0.0)
 		return(0.0);
 	  
-	*((int *)(&d) + HIND)
+	u.d=d;
+	u.i[HIND]
 #ifdef VAX
 	= *(int *)(&d) & 0xffff807f | ((e + 128) << 7) & 0x7f80;
 #endif
@@ -269,7 +281,7 @@ set_exponent(double d, int e)
 #ifdef NS32K
 
 #else
-	= (*((int *)(&d) + HIND) & 0x800fffff) | (((e + 1022) << 20) & 0x7ff00000);
+	= (u.i[HIND] & 0x800fffff) | (((e + 1022) << 20) & 0x7ff00000);
 #endif
 #endif
 #ifdef MV
@@ -1215,6 +1227,8 @@ init_num_co(void)
 	double smallest_double, smallest_norm_double, biggest_double;
 	float float_epsilon, float_negative_epsilon;
 	double double_epsilon, double_negative_epsilon;
+	union {double d;int i[2];} u;
+	union {float f;int i;} uf;
 
 
 #ifdef VAX
@@ -1232,10 +1246,15 @@ init_num_co(void)
 
 
 #else
+	uf.i=1;
+	u.i[HIND]=0;
+	u.i[LIND]=1;
+	smallest_float=uf.f;
+	smallest_double=u.d;
 
-	((int *) &smallest_float)[0]= 1;
-	((int *) &smallest_double)[HIND] = 0;
-	((int *) &smallest_double)[LIND] = 1;
+/* 	((int *) &smallest_float)[0]= 1; */
+/* 	((int *) &smallest_double)[HIND] = 0; */
+/* 	((int *) &smallest_double)[LIND] = 1; */
 
 #endif
 #endif
@@ -1277,9 +1296,16 @@ init_num_co(void)
 
 #else
 
-	((int *) &biggest_float)[0]= 0x7f7fffff;
-	((int *) &biggest_double)[HIND] = 0x7fefffff;
-	((int *) &biggest_double)[LIND] = 0xffffffff;
+	uf.i=0x7f7fffff;
+	u.i[HIND]=0x7fefffff;
+	u.i[LIND]=0xffffffff;
+	
+	biggest_float=uf.f;
+	biggest_double=u.d;
+
+/* 	((int *) &biggest_float)[0]= 0x7f7fffff; */
+/* 	((int *) &biggest_double)[HIND] = 0x7fefffff; */
+/* 	((int *) &biggest_double)[LIND] = 0xffffffff; */
 
 #ifdef BAD_FPCHIP
  /* &&&& I am adding junk values to get past debugging */

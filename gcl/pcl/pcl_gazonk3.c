@@ -275,8 +275,8 @@ T58:;
 	return;
 	}
 }
-static void LnkT7(){ call_or_link(VV[7],(void **)&Lnk7);} /* TYPECASE-ERROR-STRING */
-static void LnkT6(){ call_or_link(VV[6],(void **)&Lnk6);} /* STRUCTURE-SUBTYPE-P */
+static void LnkT7(){ call_or_link(VV[7],(void **)(void *)&Lnk7);} /* TYPECASE-ERROR-STRING */
+static void LnkT6(){ call_or_link(VV[6],(void **)(void *)&Lnk6);} /* STRUCTURE-SUBTYPE-P */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

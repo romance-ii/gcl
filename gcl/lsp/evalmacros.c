@@ -1095,7 +1095,7 @@ static void L28()
 	vs_top=(vs_base=base+3)+1;
 	return;
 }
-static void LnkT46(){ call_or_link(VV[46],(void **)&Lnk46);} /* FIND-DOC */
+static void LnkT46(){ call_or_link(VV[46],(void **)(void *)&Lnk46);} /* FIND-DOC */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -73,7 +73,7 @@ static object LI4(object first,...)
 	va_start(ap,first);
 	narg= narg - 0;
 	{
-	parse_key_new_new(narg,Vcs +0,(struct key *)&LI4key,first,ap);
+	parse_key_new_new(narg,Vcs +0,(struct key *)(void *)&LI4key,first,ap);
 	V6=(Vcs[0]);
 	V7=(Vcs[1]);
 	base[0]= VV[11];
@@ -1052,19 +1052,19 @@ register object *base0;
 	return;
 	}
 }
-static void LnkT87(){ call_or_link(VV[87],(void **)&Lnk87);} /* FIFTH */
-static object  LnkTLI86(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[86],(void **)&LnkLI86,1,first,ap);va_end(ap);return V1;} /* STRUCTURE-TYPE-P */
-static object  LnkTLI85(){return call_proc0(VV[85],(void **)&LnkLI85);} /* STRUCTURE-FUNCTIONS-EXIST-P */
-static void LnkT84(){ call_or_link(VV[84],(void **)&Lnk84);} /* COERCE */
-static void LnkT83(){ call_or_link(VV[83],(void **)&Lnk83);} /* COMPILE */
-static object  LnkTLI82(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[82],(void **)&LnkLI82,1,first,ap);va_end(ap);return V1;} /* COMPILE-LAMBDA-DEFERRED */
-static object  LnkTLI81(){return call_proc0(VV[81],(void **)&LnkLI81);} /* IN-THE-COMPILER-P */
-static object  LnkTLI80(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[80],(void **)&LnkLI80,1,first,ap);va_end(ap);return V1;} /* COMPILE-LAMBDA-UNCOMPILED */
-static void LnkT79(){ call_or_link(VV[79],(void **)&Lnk79);} /* BREAK */
-static object  LnkTLI76(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[76],(void **)&LnkLI76,2,first,ap);va_end(ap);return V1;} /* PRINTING-RANDOM-THING-INTERNAL */
-static object  LnkTLI75(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[75],(void **)&LnkLI75,1,first,ap);va_end(ap);return V1;} /* EARLY-CLASS-NAME */
-static object  LnkTLI74(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[74],(void **)&LnkLI74,first,ap);va_end(ap);return V1;} /* FIND-CLASS */
-static object  LnkTLI73(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[73],(void **)&LnkLI73,1,first,ap);va_end(ap);return V1;} /* CLASS-OF */
+static void LnkT87(){ call_or_link(VV[87],(void **)(void *)&Lnk87);} /* FIFTH */
+static object  LnkTLI86(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[86],(void **)(void *)&LnkLI86,1,first,ap);va_end(ap);return V1;} /* STRUCTURE-TYPE-P */
+static object  LnkTLI85(){return call_proc0(VV[85],(void **)(void *)&LnkLI85);} /* STRUCTURE-FUNCTIONS-EXIST-P */
+static void LnkT84(){ call_or_link(VV[84],(void **)(void *)&Lnk84);} /* COERCE */
+static void LnkT83(){ call_or_link(VV[83],(void **)(void *)&Lnk83);} /* COMPILE */
+static object  LnkTLI82(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[82],(void **)(void *)&LnkLI82,1,first,ap);va_end(ap);return V1;} /* COMPILE-LAMBDA-DEFERRED */
+static object  LnkTLI81(){return call_proc0(VV[81],(void **)(void *)&LnkLI81);} /* IN-THE-COMPILER-P */
+static object  LnkTLI80(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[80],(void **)(void *)&LnkLI80,1,first,ap);va_end(ap);return V1;} /* COMPILE-LAMBDA-UNCOMPILED */
+static void LnkT79(){ call_or_link(VV[79],(void **)(void *)&Lnk79);} /* BREAK */
+static object  LnkTLI76(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[76],(void **)(void *)&LnkLI76,2,first,ap);va_end(ap);return V1;} /* PRINTING-RANDOM-THING-INTERNAL */
+static object  LnkTLI75(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[75],(void **)(void *)&LnkLI75,1,first,ap);va_end(ap);return V1;} /* EARLY-CLASS-NAME */
+static object  LnkTLI74(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[74],(void **)(void *)&LnkLI74,first,ap);va_end(ap);return V1;} /* FIND-CLASS */
+static object  LnkTLI73(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[73],(void **)(void *)&LnkLI73,1,first,ap);va_end(ap);return V1;} /* CLASS-OF */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

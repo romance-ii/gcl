@@ -402,19 +402,19 @@ register object *base0;
 	return;
 	}
 }
-static void LnkT37(){ call_or_link(VV[37],(void **)&Lnk37);} /* DUMMY-FUNCTION */
-static void LnkT35(){ call_or_link(VV[35],(void **)&Lnk35);} /* MAKE-TRAMPOLINE */
-static object  LnkTLI34(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[34],(void **)&LnkLI34,2,first,ap);va_end(ap);return V1;} /* SET-FUNCALLABLE-INSTANCE-FUNCTION */
-static void LnkT33(){ call_or_link(VV[33],(void **)&Lnk33);} /* %SET-CCLOSURE */
-static object  LnkTLI32(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[32],(void **)&LnkLI32,1,first,ap);va_end(ap);return V1;} /* %CCLOSURE-ENV */
-static object  LnkTLI31(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[31],(void **)&LnkLI31,1,first,ap);va_end(ap);return V1;} /* CCLOSUREP */
-static object  LnkTLI20(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[20],(void **)&LnkLI20,1,first,ap);va_end(ap);return V1;} /* FUNCALLABLE-INSTANCE-P */
-static void LnkT10(){ call_or_link(VV[10],(void **)&Lnk10);} /* CCLOSURE-ENV-NTHCDR */
-static void LnkT30(){ call_or_link(VV[30],(void **)&Lnk30);} /* TURBO-CLOSURE */
-static object  LnkTLI29(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[29],(void **)&LnkLI29,2,first,ap);va_end(ap);return V1;} /* %SET-CCLOSURE-ENV */
-static object  LnkTLI28(){return call_proc0(VV[28],(void **)&LnkLI28);} /* ALLOCATE-FUNCALLABLE-INSTANCE-2 */
-static void LnkT27(){ call_or_link(VV[27],(void **)&Lnk27);} /* WARN */
-static void LnkT6(){ call_or_link(VV[6],(void **)&Lnk6);} /* POSITION */
+static void LnkT37(){ call_or_link(VV[37],(void **)(void *)&Lnk37);} /* DUMMY-FUNCTION */
+static void LnkT35(){ call_or_link(VV[35],(void **)(void *)&Lnk35);} /* MAKE-TRAMPOLINE */
+static object  LnkTLI34(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[34],(void **)(void *)&LnkLI34,2,first,ap);va_end(ap);return V1;} /* SET-FUNCALLABLE-INSTANCE-FUNCTION */
+static void LnkT33(){ call_or_link(VV[33],(void **)(void *)&Lnk33);} /* %SET-CCLOSURE */
+static object  LnkTLI32(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[32],(void **)(void *)&LnkLI32,1,first,ap);va_end(ap);return V1;} /* %CCLOSURE-ENV */
+static object  LnkTLI31(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[31],(void **)(void *)&LnkLI31,1,first,ap);va_end(ap);return V1;} /* CCLOSUREP */
+static object  LnkTLI20(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[20],(void **)(void *)&LnkLI20,1,first,ap);va_end(ap);return V1;} /* FUNCALLABLE-INSTANCE-P */
+static void LnkT10(){ call_or_link(VV[10],(void **)(void *)&Lnk10);} /* CCLOSURE-ENV-NTHCDR */
+static void LnkT30(){ call_or_link(VV[30],(void **)(void *)&Lnk30);} /* TURBO-CLOSURE */
+static object  LnkTLI29(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[29],(void **)(void *)&LnkLI29,2,first,ap);va_end(ap);return V1;} /* %SET-CCLOSURE-ENV */
+static object  LnkTLI28(){return call_proc0(VV[28],(void **)(void *)&LnkLI28);} /* ALLOCATE-FUNCALLABLE-INSTANCE-2 */
+static void LnkT27(){ call_or_link(VV[27],(void **)(void *)&Lnk27);} /* WARN */
+static void LnkT6(){ call_or_link(VV[6],(void **)(void *)&Lnk6);} /* POSITION */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

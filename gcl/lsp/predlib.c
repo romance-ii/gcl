@@ -102,7 +102,7 @@ T1:;
 	vs_top=(vs_base=base+5)+1;
 	return;
 }
-/*	function definition for G1794	*/
+/*	function definition for G1380	*/
 
 static void L2()
 {register object *base=vs_base;
@@ -116,7 +116,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1795	*/
+/*	function definition for G1381	*/
 
 static void L3()
 {register object *base=vs_base;
@@ -130,7 +130,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1796	*/
+/*	function definition for G1382	*/
 
 static void L4()
 {register object *base=vs_base;
@@ -147,7 +147,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1797	*/
+/*	function definition for G1383	*/
 
 static void L5()
 {register object *base=vs_base;
@@ -181,7 +181,7 @@ T49:;
 	return;
 	}
 }
-/*	function definition for G1798	*/
+/*	function definition for G1384	*/
 
 static void L6()
 {register object *base=vs_base;
@@ -211,7 +211,7 @@ T55:;
 	return;
 	}
 }
-/*	function definition for G1799	*/
+/*	function definition for G1385	*/
 
 static void L7()
 {register object *base=vs_base;
@@ -225,7 +225,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1800	*/
+/*	function definition for G1386	*/
 
 static void L8()
 {register object *base=vs_base;
@@ -239,7 +239,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1801	*/
+/*	function definition for G1387	*/
 
 static void L9()
 {register object *base=vs_base;
@@ -253,7 +253,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1802	*/
+/*	function definition for G1388	*/
 
 static void L10()
 {register object *base=vs_base;
@@ -267,7 +267,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1803	*/
+/*	function definition for G1389	*/
 
 static void L11()
 {register object *base=vs_base;
@@ -296,7 +296,7 @@ T59:;
 	return;
 	}
 }
-/*	function definition for G1804	*/
+/*	function definition for G1390	*/
 
 static void L12()
 {register object *base=vs_base;
@@ -318,7 +318,7 @@ T63:;
 	return;
 	}
 }
-/*	function definition for G1805	*/
+/*	function definition for G1391	*/
 
 static void L13()
 {register object *base=vs_base;
@@ -340,7 +340,7 @@ T66:;
 	return;
 	}
 }
-/*	function definition for G1806	*/
+/*	function definition for G1392	*/
 
 static void L14()
 {register object *base=vs_base;
@@ -362,7 +362,7 @@ T69:;
 	return;
 	}
 }
-/*	function definition for G1807	*/
+/*	function definition for G1393	*/
 
 static void L15()
 {register object *base=vs_base;
@@ -384,7 +384,7 @@ T72:;
 	return;
 	}
 }
-/*	function definition for G1808	*/
+/*	function definition for G1394	*/
 
 static void L16()
 {register object *base=vs_base;
@@ -406,7 +406,7 @@ T75:;
 	return;
 	}
 }
-/*	function definition for G1809	*/
+/*	function definition for G1395	*/
 
 static void L17()
 {register object *base=vs_base;
@@ -428,7 +428,7 @@ T78:;
 	return;
 	}
 }
-/*	function definition for G1810	*/
+/*	function definition for G1396	*/
 
 static void L18()
 {register object *base=vs_base;
@@ -640,10 +640,7 @@ T117:;
 	goto T121;}
 	base[3]= (V44);
 	vs_top=(vs_base=base+3)+1;
-	{object _funobj = (V52);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
-                   (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
-               else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
-               else super_funcall_no_event(_funobj);}
+	super_funcall_no_event((V52));
 	return;}
 	goto T121;
 T121:;
@@ -733,10 +730,7 @@ T146:;
 	base[3]= car((V48));
 	base[4]= (V44);
 	vs_top=(vs_base=base+4)+1;
-	{object _funobj = base[3];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
-                   (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
-               else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
-               else super_funcall_no_event(_funobj);}
+	super_funcall_no_event(base[3]);
 	return;
 	goto T161;
 T161:;
@@ -1372,10 +1366,7 @@ T329:;
 	 while(!endp(V85))
 	 {vs_push(car(V85));V85=cdr(V85);}
 	vs_base=base+6;}
-	{object _funobj = base[5];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
-                   (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
-               else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
-               else super_funcall_no_event(_funobj);}
+	super_funcall_no_event(base[5]);
 	vs_top=sup;
 	base[4]= vs_base[0];
 	vs_top=(vs_base=base+3)+2;
@@ -1422,10 +1413,7 @@ T347:;
 	 while(!endp(V90))
 	 {vs_push(car(V90));V90=cdr(V90);}
 	vs_base=base+1;}
-	{object _funobj = base[0];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
-                   (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
-               else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
-               else super_funcall_no_event(_funobj);}
+	super_funcall_no_event(base[0]);
 	vs_top=sup;
 	V87= vs_base[0];
 	goto T346;
@@ -3628,28 +3616,28 @@ T1485:;
 	return;
 	}
 }
-static object  LnkTLI152(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[152],(void **)&LnkLI152,2,first,ap);va_end(ap);return V1;} /* COERCE */
-static object  LnkTLI151(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[151],(void **)&LnkLI151,first,ap);va_end(ap);return V1;} /* MAKE-SEQUENCE */
-static void LnkT150(){ call_or_link(VV[150],(void **)&Lnk150);} /* SPECIFIC-ERROR */
-static object  LnkTLI148(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[148],(void **)&LnkLI148,2,first,ap);va_end(ap);return V1;} /* SUB-INTERVAL-P */
-static object  LnkTLI147(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[147],(void **)&LnkLI147,1,first,ap);va_end(ap);return V1;} /* KNOWN-TYPE-P */
-static void LnkT146(){ call_or_link(VV[146],(void **)&Lnk146);} /* SUBTYPEP */
-static object  LnkTLI145(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[145],(void **)&LnkLI145,1,first,ap);va_end(ap);return V1;} /* NORMALIZE-TYPE */
-static void LnkT144(){ call_or_link(VV[144],(void **)&Lnk144);} /* FIND-CLASS */
-static void LnkT143(){ call_or_link(VV[143],(void **)&Lnk143);} /* STRUCTURE-SUBTYPE-P */
-static object  LnkTLI142(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[142],(void **)&LnkLI142,1,first,ap);va_end(ap);return V1;} /* SIMPLE-ARRAY-P */
-static object  LnkTLI141(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[141],(void **)&LnkLI141,1,first,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
-static object  LnkTLI135(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[135],(void **)&LnkLI135,1,first,ap);va_end(ap);return V1;} /* ARRAY-DIMENSIONS */
-static object  LnkTLI134(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[134],(void **)&LnkLI134,2,first,ap);va_end(ap);return V1;} /* MATCH-DIMENSIONS */
-static void LnkT129(){ call_or_link(VV[129],(void **)&Lnk129);} /* REALP */
-static void LnkT128(){ call_or_link(VV[128],(void **)&Lnk128);} /* RATIONALP */
-static object  LnkTLI127(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[127],(void **)&LnkLI127,2,first,ap);va_end(ap);return V1;} /* IN-INTERVAL-P */
-static void LnkT125(){ call_or_link(VV[125],(void **)&Lnk125);} /* TYPEP */
-static void LnkT124(){ call_or_link(VV[124],(void **)&Lnk124);} /* CLASS-PRECEDENCE-LIST */
-static void LnkT123(){ call_or_link(VV[123],(void **)&Lnk123);} /* CLASS-OF */
-static void LnkT122(){ call_or_link(VV[122],(void **)&Lnk122);} /* CLASSP */
-static void LnkT121(){ call_or_link(VV[121],(void **)&Lnk121);} /* ARRAY-HAS-FILL-POINTER-P */
-static object  LnkTLI120(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[120],(void **)&LnkLI120,1,first,ap);va_end(ap);return V1;} /* FIND-DOCUMENTATION */
+static object  LnkTLI152(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[152],(void **)(void *)&LnkLI152,2,first,ap);va_end(ap);return V1;} /* COERCE */
+static object  LnkTLI151(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[151],(void **)(void *)&LnkLI151,first,ap);va_end(ap);return V1;} /* MAKE-SEQUENCE */
+static void LnkT150(){ call_or_link(VV[150],(void **)(void *)&Lnk150);} /* SPECIFIC-ERROR */
+static object  LnkTLI148(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[148],(void **)(void *)&LnkLI148,2,first,ap);va_end(ap);return V1;} /* SUB-INTERVAL-P */
+static object  LnkTLI147(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[147],(void **)(void *)&LnkLI147,1,first,ap);va_end(ap);return V1;} /* KNOWN-TYPE-P */
+static void LnkT146(){ call_or_link(VV[146],(void **)(void *)&Lnk146);} /* SUBTYPEP */
+static object  LnkTLI145(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[145],(void **)(void *)&LnkLI145,1,first,ap);va_end(ap);return V1;} /* NORMALIZE-TYPE */
+static void LnkT144(){ call_or_link(VV[144],(void **)(void *)&Lnk144);} /* FIND-CLASS */
+static void LnkT143(){ call_or_link(VV[143],(void **)(void *)&Lnk143);} /* STRUCTURE-SUBTYPE-P */
+static object  LnkTLI142(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[142],(void **)(void *)&LnkLI142,1,first,ap);va_end(ap);return V1;} /* SIMPLE-ARRAY-P */
+static object  LnkTLI141(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[141],(void **)(void *)&LnkLI141,1,first,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
+static object  LnkTLI135(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[135],(void **)(void *)&LnkLI135,1,first,ap);va_end(ap);return V1;} /* ARRAY-DIMENSIONS */
+static object  LnkTLI134(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[134],(void **)(void *)&LnkLI134,2,first,ap);va_end(ap);return V1;} /* MATCH-DIMENSIONS */
+static void LnkT129(){ call_or_link(VV[129],(void **)(void *)&Lnk129);} /* REALP */
+static void LnkT128(){ call_or_link(VV[128],(void **)(void *)&Lnk128);} /* RATIONALP */
+static object  LnkTLI127(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[127],(void **)(void *)&LnkLI127,2,first,ap);va_end(ap);return V1;} /* IN-INTERVAL-P */
+static void LnkT125(){ call_or_link(VV[125],(void **)(void *)&Lnk125);} /* TYPEP */
+static void LnkT124(){ call_or_link(VV[124],(void **)(void *)&Lnk124);} /* CLASS-PRECEDENCE-LIST */
+static void LnkT123(){ call_or_link(VV[123],(void **)(void *)&Lnk123);} /* CLASS-OF */
+static void LnkT122(){ call_or_link(VV[122],(void **)(void *)&Lnk122);} /* CLASSP */
+static void LnkT121(){ call_or_link(VV[121],(void **)(void *)&Lnk121);} /* ARRAY-HAS-FILL-POINTER-P */
+static object  LnkTLI120(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[120],(void **)(void *)&LnkLI120,1,first,ap);va_end(ap);return V1;} /* FIND-DOCUMENTATION */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

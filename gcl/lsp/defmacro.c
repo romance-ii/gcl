@@ -1030,14 +1030,14 @@ T465:;
 	return;}
 	}
 }
-static void LnkT60(){ call_or_link(VV[60],(void **)&Lnk60);} /* FIND-DECLARATIONS */
-static object  LnkTLI59(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[59],(void **)&LnkLI59,2,first,ap);va_end(ap);return V1;} /* DM-NTH */
-static object  LnkTLI58(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[58],(void **)&LnkLI58,2,first,ap);va_end(ap);return V1;} /* DM-V */
-static object  LnkTLI57(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[57],(void **)&LnkLI57,1,first,ap);va_end(ap);return V1;} /* DM-BAD-KEY */
-static object  LnkTLI56(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[56],(void **)&LnkLI56,2,first,ap);va_end(ap);return V1;} /* DM-NTH-CDR */
-static object  LnkTLI55(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[55],(void **)&LnkLI55,3,first,ap);va_end(ap);return V1;} /* DM-VL */
-static void LnkT54(){ call_or_link(VV[54],(void **)&Lnk54);} /* GET-&ENVIRONMENT */
-static void LnkT53(){ call_or_link(VV[53],(void **)&Lnk53);} /* FIND-DOC */
+static void LnkT60(){ call_or_link(VV[60],(void **)(void *)&Lnk60);} /* FIND-DECLARATIONS */
+static object  LnkTLI59(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[59],(void **)(void *)&LnkLI59,2,first,ap);va_end(ap);return V1;} /* DM-NTH */
+static object  LnkTLI58(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[58],(void **)(void *)&LnkLI58,2,first,ap);va_end(ap);return V1;} /* DM-V */
+static object  LnkTLI57(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[57],(void **)(void *)&LnkLI57,1,first,ap);va_end(ap);return V1;} /* DM-BAD-KEY */
+static object  LnkTLI56(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[56],(void **)(void *)&LnkLI56,2,first,ap);va_end(ap);return V1;} /* DM-NTH-CDR */
+static object  LnkTLI55(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[55],(void **)(void *)&LnkLI55,3,first,ap);va_end(ap);return V1;} /* DM-VL */
+static void LnkT54(){ call_or_link(VV[54],(void **)(void *)&Lnk54);} /* GET-&ENVIRONMENT */
+static void LnkT53(){ call_or_link(VV[53],(void **)(void *)&Lnk53);} /* FIND-DOC */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

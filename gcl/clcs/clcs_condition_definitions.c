@@ -5445,68 +5445,68 @@ T1539:;{object V450;
 	base[0]=base[0];
 	return Cnil;
 }
-static void LnkT332(ptr) object *ptr;{ call_or_link_closure(VV[332],(void **)&Lnk332,(void **)&Lclptr332);} /* CLASS-PRECEDENCE-LIST */
-static void LnkT331(){ call_or_link(VV[331],(void **)&Lnk331);} /* TYPEP */
-static void LnkT330(){ call_or_link(VV[330],(void **)&Lnk330);} /* FIND-CLASS */
-static void LnkT329(){ call_or_link(VV[329],(void **)&Lnk329);} /* *MAKE-SPECIAL */
-static void LnkT328(){ call_or_link(VV[328],(void **)&Lnk328);} /* Defclass INTERNAL-SIMPLE-STREAM-ERROR7687 */
-static void LnkT327(){ call_or_link(VV[327],(void **)&Lnk327);} /* Defclass INTERNAL-SIMPLE-FILE-ERROR7598 */
-static void LnkT326(){ call_or_link(VV[326],(void **)&Lnk326);} /* Defclass INTERNAL-END-OF-FILE7509 */
-static void LnkT325(){ call_or_link(VV[325],(void **)&Lnk325);} /* Defclass INTERNAL-UNDEFINED-FUNCTION7420 */
-static void LnkT324(){ call_or_link(VV[324],(void **)&Lnk324);} /* Defclass INTERNAL-UNBOUND-VARIABLE7331 */
-static void LnkT323(){ call_or_link(VV[323],(void **)&Lnk323);} /* Defclass INTERNAL-SIMPLE-CONTROL-ERROR7242 */
-static void LnkT322(){ call_or_link(VV[322],(void **)&Lnk322);} /* Defclass INTERNAL-SIMPLE-PROGRAM-ERROR7153 */
-static void LnkT321(){ call_or_link(VV[321],(void **)&Lnk321);} /* Defclass INTERNAL-PACKAGE-ERROR7064 */
-static void LnkT320(){ call_or_link(VV[320],(void **)&Lnk320);} /* Defclass INTERNAL-TYPE-ERROR6975 */
-static object  LnkTLI318(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[318],(void **)&LnkLI318,2,first,ap);va_end(ap);return V1;} /* INTERNAL-SIMPLE-ERROR-PRINTER */
-static void LnkT317(){ call_or_link(VV[317],(void **)&Lnk317);} /* Defclass INTERNAL-SIMPLE-ERROR6681 */
-static void LnkT315(ptr) object *ptr;{ call_or_link_closure(VV[315],(void **)&Lnk315,(void **)&Lclptr315);} /* INTERNAL-ERROR-FUNCTION-NAME */
-static void LnkT314(){ call_or_link(VV[314],(void **)&Lnk314);} /* Defclass INTERNAL-ERROR6254 */
-static void LnkT312(){ call_or_link(VV[312],(void **)&Lnk312);} /* Defclass ABORT-FAILURE5952 */
-static void LnkT311(){ call_or_link(VV[311],(void **)&Lnk311);} /* Defclass FLOATING-POINT-UNDERFLOW5863 */
-static void LnkT310(){ call_or_link(VV[310],(void **)&Lnk310);} /* Defclass FLOATING-POINT-OVERFLOW5774 */
-static void LnkT309(){ call_or_link(VV[309],(void **)&Lnk309);} /* Defclass DIVISION-BY-ZERO5685 */
-static void LnkT308(){ call_or_link(VV[308],(void **)&Lnk308);} /* Defclass ARITHMETIC-ERROR5595 */
-static void LnkT306(){ call_or_link(VV[306],(void **)&Lnk306);} /* Defclass UNDEFINED-FUNCTION5297 */
-static void LnkT304(ptr) object *ptr;{ call_or_link_closure(VV[304],(void **)&Lnk304,(void **)&Lclptr304);} /* CELL-ERROR-NAME */
-static void LnkT303(){ call_or_link(VV[303],(void **)&Lnk303);} /* Defclass UNBOUND-VARIABLE4999 */
-static void LnkT302(){ call_or_link(VV[302],(void **)&Lnk302);} /* Defclass CELL-ERROR4909 */
-static void LnkT300(ptr) object *ptr;{ call_or_link_closure(VV[300],(void **)&Lnk300,(void **)&Lclptr300);} /* PACKAGE-ERROR-MESSAGE */
-static void LnkT299(ptr) object *ptr;{ call_or_link_closure(VV[299],(void **)&Lnk299,(void **)&Lclptr299);} /* PACKAGE-ERROR-PACKAGE */
-static void LnkT298(){ call_or_link(VV[298],(void **)&Lnk298);} /* Defclass PACKAGE-ERROR4609 */
-static void LnkT297(){ call_or_link(VV[297],(void **)&Lnk297);} /* Defclass FILE-ERROR4519 */
-static void LnkT295(ptr) object *ptr;{ call_or_link_closure(VV[295],(void **)&Lnk295,(void **)&Lclptr295);} /* STREAM-ERROR-STREAM */
-static void LnkT294(){ call_or_link(VV[294],(void **)&Lnk294);} /* Defclass END-OF-FILE4221 */
-static void LnkT293(){ call_or_link(VV[293],(void **)&Lnk293);} /* Defclass STREAM-ERROR4131 */
-static void LnkT292(){ call_or_link(VV[292],(void **)&Lnk292);} /* Defclass CONTROL-ERROR4042 */
-static void LnkT291(){ call_or_link(VV[291],(void **)&Lnk291);} /* Defclass PROGRAM-ERROR3953 */
-static void LnkT289(ptr) object *ptr;{ call_or_link_closure(VV[289],(void **)&Lnk289,(void **)&Lclptr289);} /* CASE-FAILURE-POSSIBILITIES */
-static void LnkT288(ptr) object *ptr;{ call_or_link_closure(VV[288],(void **)&Lnk288,(void **)&Lclptr288);} /* CASE-FAILURE-NAME */
-static void LnkT287(){ call_or_link(VV[287],(void **)&Lnk287);} /* Defclass CASE-FAILURE3653 */
-static void LnkT286(){ call_or_link(VV[286],(void **)&Lnk286);} /* Defclass SIMPLE-TYPE-ERROR3564 */
-static void LnkT284(ptr) object *ptr;{ call_or_link_closure(VV[284],(void **)&Lnk284,(void **)&Lclptr284);} /* TYPE-ERROR-EXPECTED-TYPE */
-static void LnkT283(ptr) object *ptr;{ call_or_link_closure(VV[283],(void **)&Lnk283,(void **)&Lclptr283);} /* TYPE-ERROR-DATUM */
-static void LnkT282(){ call_or_link(VV[282],(void **)&Lnk282);} /* Defclass TYPE-ERROR3264 */
-static void LnkT281(){ call_or_link(VV[281],(void **)&Lnk281);} /* Defclass STORAGE-EXHAUSTED3175 */
-static void LnkT280(){ call_or_link(VV[280],(void **)&Lnk280);} /* Defclass STACK-OVERFLOW3086 */
-static void LnkT279(){ call_or_link(VV[279],(void **)&Lnk279);} /* Defclass STORAGE-CONDITION2997 */
-static void LnkT278(){ call_or_link(VV[278],(void **)&Lnk278);} /* Defclass SIMPLE-ERROR2908 */
-static void LnkT277(){ call_or_link(VV[277],(void **)&Lnk277);} /* Defclass SIMPLE-WARNING2819 */
-static void LnkT276(){ call_or_link(VV[276],(void **)&Lnk276);} /* LOAD-DEFMETHOD */
-static object  LnkTLI274(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[274],(void **)&LnkLI274,2,first,ap);va_end(ap);return V1;} /* SIMPLE-CONDITION-PRINTER */
-static void LnkT273(){ call_or_link(VV[273],(void **)&Lnk273);} /* ERROR */
-static void LnkT13(){ call_or_link(VV[13],(void **)&Lnk13);} /* ERROR */
-static void LnkT272(){ call_or_link(VV[272],(void **)&Lnk272);} /* CCLOSURE-ENV-NTHCDR */
-static void LnkT271(){ call_or_link(VV[271],(void **)&Lnk271);} /* STRUCTURE-DEF */
-static void LnkT270(){ call_or_link(VV[270],(void **)&Lnk270);} /* STRUCTURE-SUBTYPE-P */
-static void LnkT269(){ call_or_link(VV[269],(void **)&Lnk269);} /* PROCLAIM-DEFGENERIC */
-static void LnkT268(){ call_or_link(VV[268],(void **)&Lnk268);} /* Defclass SIMPLE-CONDITION2523 */
-static void LnkT266(ptr) object *ptr;{ call_or_link_closure(VV[266],(void **)&Lnk266,(void **)&Lclptr266);} /* SIMPLE-CONDITION-FORMAT-ARGUMENTS */
-static void LnkT265(ptr) object *ptr;{ call_or_link_closure(VV[265],(void **)&Lnk265,(void **)&Lclptr265);} /* SIMPLE-CONDITION-FORMAT-STRING */
-static void LnkT264(){ call_or_link(VV[264],(void **)&Lnk264);} /* Defclass ERROR2426 */
-static void LnkT263(){ call_or_link(VV[263],(void **)&Lnk263);} /* Defclass SERIOUS-CONDITION2337 */
-static void LnkT262(){ call_or_link(VV[262],(void **)&Lnk262);} /* Defclass WARNING2248 */
-static void LnkT260(){ call_or_link(VV[260],(void **)&Lnk260);} /* REMOVE */
+static void LnkT332(ptr) object *ptr;{ call_or_link_closure(VV[332],(void **)(void *)&Lnk332,(void **)(void *)&Lclptr332);} /* CLASS-PRECEDENCE-LIST */
+static void LnkT331(){ call_or_link(VV[331],(void **)(void *)&Lnk331);} /* TYPEP */
+static void LnkT330(){ call_or_link(VV[330],(void **)(void *)&Lnk330);} /* FIND-CLASS */
+static void LnkT329(){ call_or_link(VV[329],(void **)(void *)&Lnk329);} /* *MAKE-SPECIAL */
+static void LnkT328(){ call_or_link(VV[328],(void **)(void *)&Lnk328);} /* Defclass INTERNAL-SIMPLE-STREAM-ERROR7687 */
+static void LnkT327(){ call_or_link(VV[327],(void **)(void *)&Lnk327);} /* Defclass INTERNAL-SIMPLE-FILE-ERROR7598 */
+static void LnkT326(){ call_or_link(VV[326],(void **)(void *)&Lnk326);} /* Defclass INTERNAL-END-OF-FILE7509 */
+static void LnkT325(){ call_or_link(VV[325],(void **)(void *)&Lnk325);} /* Defclass INTERNAL-UNDEFINED-FUNCTION7420 */
+static void LnkT324(){ call_or_link(VV[324],(void **)(void *)&Lnk324);} /* Defclass INTERNAL-UNBOUND-VARIABLE7331 */
+static void LnkT323(){ call_or_link(VV[323],(void **)(void *)&Lnk323);} /* Defclass INTERNAL-SIMPLE-CONTROL-ERROR7242 */
+static void LnkT322(){ call_or_link(VV[322],(void **)(void *)&Lnk322);} /* Defclass INTERNAL-SIMPLE-PROGRAM-ERROR7153 */
+static void LnkT321(){ call_or_link(VV[321],(void **)(void *)&Lnk321);} /* Defclass INTERNAL-PACKAGE-ERROR7064 */
+static void LnkT320(){ call_or_link(VV[320],(void **)(void *)&Lnk320);} /* Defclass INTERNAL-TYPE-ERROR6975 */
+static object  LnkTLI318(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[318],(void **)(void *)&LnkLI318,2,first,ap);va_end(ap);return V1;} /* INTERNAL-SIMPLE-ERROR-PRINTER */
+static void LnkT317(){ call_or_link(VV[317],(void **)(void *)&Lnk317);} /* Defclass INTERNAL-SIMPLE-ERROR6681 */
+static void LnkT315(ptr) object *ptr;{ call_or_link_closure(VV[315],(void **)(void *)&Lnk315,(void **)(void *)&Lclptr315);} /* INTERNAL-ERROR-FUNCTION-NAME */
+static void LnkT314(){ call_or_link(VV[314],(void **)(void *)&Lnk314);} /* Defclass INTERNAL-ERROR6254 */
+static void LnkT312(){ call_or_link(VV[312],(void **)(void *)&Lnk312);} /* Defclass ABORT-FAILURE5952 */
+static void LnkT311(){ call_or_link(VV[311],(void **)(void *)&Lnk311);} /* Defclass FLOATING-POINT-UNDERFLOW5863 */
+static void LnkT310(){ call_or_link(VV[310],(void **)(void *)&Lnk310);} /* Defclass FLOATING-POINT-OVERFLOW5774 */
+static void LnkT309(){ call_or_link(VV[309],(void **)(void *)&Lnk309);} /* Defclass DIVISION-BY-ZERO5685 */
+static void LnkT308(){ call_or_link(VV[308],(void **)(void *)&Lnk308);} /* Defclass ARITHMETIC-ERROR5595 */
+static void LnkT306(){ call_or_link(VV[306],(void **)(void *)&Lnk306);} /* Defclass UNDEFINED-FUNCTION5297 */
+static void LnkT304(ptr) object *ptr;{ call_or_link_closure(VV[304],(void **)(void *)&Lnk304,(void **)(void *)&Lclptr304);} /* CELL-ERROR-NAME */
+static void LnkT303(){ call_or_link(VV[303],(void **)(void *)&Lnk303);} /* Defclass UNBOUND-VARIABLE4999 */
+static void LnkT302(){ call_or_link(VV[302],(void **)(void *)&Lnk302);} /* Defclass CELL-ERROR4909 */
+static void LnkT300(ptr) object *ptr;{ call_or_link_closure(VV[300],(void **)(void *)&Lnk300,(void **)(void *)&Lclptr300);} /* PACKAGE-ERROR-MESSAGE */
+static void LnkT299(ptr) object *ptr;{ call_or_link_closure(VV[299],(void **)(void *)&Lnk299,(void **)(void *)&Lclptr299);} /* PACKAGE-ERROR-PACKAGE */
+static void LnkT298(){ call_or_link(VV[298],(void **)(void *)&Lnk298);} /* Defclass PACKAGE-ERROR4609 */
+static void LnkT297(){ call_or_link(VV[297],(void **)(void *)&Lnk297);} /* Defclass FILE-ERROR4519 */
+static void LnkT295(ptr) object *ptr;{ call_or_link_closure(VV[295],(void **)(void *)&Lnk295,(void **)(void *)&Lclptr295);} /* STREAM-ERROR-STREAM */
+static void LnkT294(){ call_or_link(VV[294],(void **)(void *)&Lnk294);} /* Defclass END-OF-FILE4221 */
+static void LnkT293(){ call_or_link(VV[293],(void **)(void *)&Lnk293);} /* Defclass STREAM-ERROR4131 */
+static void LnkT292(){ call_or_link(VV[292],(void **)(void *)&Lnk292);} /* Defclass CONTROL-ERROR4042 */
+static void LnkT291(){ call_or_link(VV[291],(void **)(void *)&Lnk291);} /* Defclass PROGRAM-ERROR3953 */
+static void LnkT289(ptr) object *ptr;{ call_or_link_closure(VV[289],(void **)(void *)&Lnk289,(void **)(void *)&Lclptr289);} /* CASE-FAILURE-POSSIBILITIES */
+static void LnkT288(ptr) object *ptr;{ call_or_link_closure(VV[288],(void **)(void *)&Lnk288,(void **)(void *)&Lclptr288);} /* CASE-FAILURE-NAME */
+static void LnkT287(){ call_or_link(VV[287],(void **)(void *)&Lnk287);} /* Defclass CASE-FAILURE3653 */
+static void LnkT286(){ call_or_link(VV[286],(void **)(void *)&Lnk286);} /* Defclass SIMPLE-TYPE-ERROR3564 */
+static void LnkT284(ptr) object *ptr;{ call_or_link_closure(VV[284],(void **)(void *)&Lnk284,(void **)(void *)&Lclptr284);} /* TYPE-ERROR-EXPECTED-TYPE */
+static void LnkT283(ptr) object *ptr;{ call_or_link_closure(VV[283],(void **)(void *)&Lnk283,(void **)(void *)&Lclptr283);} /* TYPE-ERROR-DATUM */
+static void LnkT282(){ call_or_link(VV[282],(void **)(void *)&Lnk282);} /* Defclass TYPE-ERROR3264 */
+static void LnkT281(){ call_or_link(VV[281],(void **)(void *)&Lnk281);} /* Defclass STORAGE-EXHAUSTED3175 */
+static void LnkT280(){ call_or_link(VV[280],(void **)(void *)&Lnk280);} /* Defclass STACK-OVERFLOW3086 */
+static void LnkT279(){ call_or_link(VV[279],(void **)(void *)&Lnk279);} /* Defclass STORAGE-CONDITION2997 */
+static void LnkT278(){ call_or_link(VV[278],(void **)(void *)&Lnk278);} /* Defclass SIMPLE-ERROR2908 */
+static void LnkT277(){ call_or_link(VV[277],(void **)(void *)&Lnk277);} /* Defclass SIMPLE-WARNING2819 */
+static void LnkT276(){ call_or_link(VV[276],(void **)(void *)&Lnk276);} /* LOAD-DEFMETHOD */
+static object  LnkTLI274(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[274],(void **)(void *)&LnkLI274,2,first,ap);va_end(ap);return V1;} /* SIMPLE-CONDITION-PRINTER */
+static void LnkT273(){ call_or_link(VV[273],(void **)(void *)&Lnk273);} /* ERROR */
+static void LnkT13(){ call_or_link(VV[13],(void **)(void *)&Lnk13);} /* ERROR */
+static void LnkT272(){ call_or_link(VV[272],(void **)(void *)&Lnk272);} /* CCLOSURE-ENV-NTHCDR */
+static void LnkT271(){ call_or_link(VV[271],(void **)(void *)&Lnk271);} /* STRUCTURE-DEF */
+static void LnkT270(){ call_or_link(VV[270],(void **)(void *)&Lnk270);} /* STRUCTURE-SUBTYPE-P */
+static void LnkT269(){ call_or_link(VV[269],(void **)(void *)&Lnk269);} /* PROCLAIM-DEFGENERIC */
+static void LnkT268(){ call_or_link(VV[268],(void **)(void *)&Lnk268);} /* Defclass SIMPLE-CONDITION2523 */
+static void LnkT266(ptr) object *ptr;{ call_or_link_closure(VV[266],(void **)(void *)&Lnk266,(void **)(void *)&Lclptr266);} /* SIMPLE-CONDITION-FORMAT-ARGUMENTS */
+static void LnkT265(ptr) object *ptr;{ call_or_link_closure(VV[265],(void **)(void *)&Lnk265,(void **)(void *)&Lclptr265);} /* SIMPLE-CONDITION-FORMAT-STRING */
+static void LnkT264(){ call_or_link(VV[264],(void **)(void *)&Lnk264);} /* Defclass ERROR2426 */
+static void LnkT263(){ call_or_link(VV[263],(void **)(void *)&Lnk263);} /* Defclass SERIOUS-CONDITION2337 */
+static void LnkT262(){ call_or_link(VV[262],(void **)(void *)&Lnk262);} /* Defclass WARNING2248 */
+static void LnkT260(){ call_or_link(VV[260],(void **)(void *)&Lnk260);} /* REMOVE */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

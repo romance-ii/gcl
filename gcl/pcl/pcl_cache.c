@@ -174,7 +174,7 @@ static object LI9(object first,...)
 	va_start(ap,first);
 	narg= narg - 0;
 	{
-	parse_key_new_new(narg,Vcs +0,(struct key *)&LI9key,first,ap);
+	parse_key_new_new(narg,Vcs +0,(struct key *)(void *)&LI9key,first,ap);
 	V19=(Vcs[0]);
 	V20=(Vcs[1]);
 	V21=(Vcs[2]);
@@ -5877,43 +5877,43 @@ register object *base0;
 	return;}
 	}
 }
-static void LnkT220(){ call_or_link(VV[220],(void **)&Lnk220);} /* *SUBTYPEP */
-static void LnkT219(ptr) object *ptr;{ call_or_link_closure(VV[219],(void **)&Lnk219,(void **)&Lclptr219);} /* SPECIALIZER-CLASS */
-static object  LnkTLI218(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[218],(void **)&LnkLI218,1,first,ap);va_end(ap);return V1;} /* CLASS-OF */
-static object  LnkTLI217(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[217],(void **)&LnkLI217,262148,first,ap);va_end(ap);return V1;} /* FILL-CACHE-FROM-CACHE-P */
-static object  LnkTLI36(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[36],(void **)&LnkLI36,1,first,ap);va_end(ap);return V1;} /* NEXT-WRAPPER-FIELD */
-static object  LnkTLI214(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[214],(void **)&LnkLI214,1,first,ap);va_end(ap);return V1;} /* FREE-CACHE */
-static object  LnkTLI213(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[213],(void **)&LnkLI213,first,ap);va_end(ap);return V1;} /* GET-CACHE-FROM-CACHE */
-static object  LnkTLI154(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[154],(void **)&LnkLI154,1,first,ap);va_end(ap);return V1;} /* CHECK-CACHE */
-static void LnkT212(){ call_or_link(VV[212],(void **)&Lnk212);} /* FIND-FREE-CACHE-LINE */
-static object  LnkTLI211(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[211],(void **)&LnkLI211,20739,first,ap);va_end(ap);return V1;} /* COMPUTE-PRIMARY-CACHE-LOCATION */
-static object  LnkTLI210(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[210],(void **)&LnkLI210,first,ap);va_end(ap);return V1;} /* COMPUTE-PRIMARY-CACHE-LOCATION-FROM-LOCATION */
-static object  LnkTLI209(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[209],(void **)&LnkLI209,4,first,ap);va_end(ap);return V1;} /* EXPAND-CACHE */
-static object  LnkTLI208(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[208],(void **)&LnkLI208,4,first,ap);va_end(ap);return V1;} /* ADJUST-CACHE */
-static object  LnkTLI207(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[207],(void **)&LnkLI207,257,first,ap);va_end(ap);return V1;} /* CACHE-COUNT */
-static object  LnkTLI206(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[206],(void **)&LnkLI206,4,first,ap);va_end(ap);return V1;} /* FILL-CACHE-P */
-static object  LnkTLI205(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[205],(void **)&LnkLI205,2,first,ap);va_end(ap);return V1;} /* MAKE-FAST-METHOD-CALL-LAMBDA-LIST */
-static object  LnkTLI204(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[204],(void **)&LnkLI204,2,first,ap);va_end(ap);return V1;} /* MAKE-DFUN-LAMBDA-LIST */
-static object  LnkTLI203(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[203],(void **)&LnkLI203,1,first,ap);va_end(ap);return V1;} /* DFUN-ARG-SYMBOL */
-static object  LnkTLI202(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[202],(void **)&LnkLI202,first,ap);va_end(ap);return V1;} /* FIND-CLASS */
-static object  LnkTLI201(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[201],(void **)&LnkLI201,4097,first,ap);va_end(ap);return V1;} /* POWER-OF-TWO-CEILING */
-static object  LnkTLI200(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[200],(void **)&LnkLI200,1,first,ap);va_end(ap);return V1;} /* FREE-CACHE-VECTOR */
-static void LnkT199(){ call_or_link(VV[199],(void **)&Lnk199);} /* COPY-CACHE-INTERNAL */
-static object  LnkTLI198(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[198],(void **)&LnkLI198,1,first,ap);va_end(ap);return V1;} /* GET-CACHE-VECTOR */
-static void LnkT197(){ call_or_link(VV[197],(void **)&Lnk197);} /* COMPUTE-CACHE-PARAMETERS */
-static object  LnkTLI196(){return call_proc0(VV[196],(void **)&LnkLI196);} /* MAKE-CACHE */
-static object  LnkTLI195(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[195],(void **)&LnkLI195,3,first,ap);va_end(ap);return V1;} /* OBSOLETE-INSTANCE-TRAP */
-static object  LnkTLI194(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[194],(void **)&LnkLI194,3,first,ap);va_end(ap);return V1;} /* FLUSH-CACHE-TRAP */
-static object  LnkTLI71(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[71],(void **)&LnkLI71,1,first,ap);va_end(ap);return V1;} /* WRAPPER-OF */
-static object  LnkTLI192(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[192],(void **)&LnkLI192,256,first,ap);va_end(ap);return V1;} /* GET-WRAPPER-CACHE-NUMBER */
-static object  LnkTLI191(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[191],(void **)&LnkLI191,1,first,ap);va_end(ap);return V1;} /* WRAPPER-FIELD */
-static void LnkT190(){ call_or_link(VV[190],(void **)&Lnk190);} /* POSITION */
-static void LnkT189(){ call_or_link(VV[189],(void **)&Lnk189);} /* SORT */
-static object  LnkTLI186(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[186],(void **)&LnkLI186,1,first,ap);va_end(ap);return V1;} /* ALLOCATE-CACHE-VECTOR */
-static object  LnkTLI185(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[185],(void **)&LnkLI185,1,first,ap);va_end(ap);return V1;} /* FLUSH-CACHE-VECTOR-INTERNAL */
-static object  LnkTLI184(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[184],(void **)&LnkLI184,2,first,ap);va_end(ap);return V1;} /* PRINTING-RANDOM-THING-INTERNAL */
-static void LnkT169(){ call_or_link(VV[169],(void **)&Lnk169);} /* FILL */
-static void LnkT44(){ call_or_link(VV[44],(void **)&Lnk44);} /* MAKE-ARRAY */
+static void LnkT220(){ call_or_link(VV[220],(void **)(void *)&Lnk220);} /* *SUBTYPEP */
+static void LnkT219(ptr) object *ptr;{ call_or_link_closure(VV[219],(void **)(void *)&Lnk219,(void **)(void *)&Lclptr219);} /* SPECIALIZER-CLASS */
+static object  LnkTLI218(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[218],(void **)(void *)&LnkLI218,1,first,ap);va_end(ap);return V1;} /* CLASS-OF */
+static object  LnkTLI217(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[217],(void **)(void *)&LnkLI217,262148,first,ap);va_end(ap);return V1;} /* FILL-CACHE-FROM-CACHE-P */
+static object  LnkTLI36(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[36],(void **)(void *)&LnkLI36,1,first,ap);va_end(ap);return V1;} /* NEXT-WRAPPER-FIELD */
+static object  LnkTLI214(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[214],(void **)(void *)&LnkLI214,1,first,ap);va_end(ap);return V1;} /* FREE-CACHE */
+static object  LnkTLI213(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[213],(void **)(void *)&LnkLI213,first,ap);va_end(ap);return V1;} /* GET-CACHE-FROM-CACHE */
+static object  LnkTLI154(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[154],(void **)(void *)&LnkLI154,1,first,ap);va_end(ap);return V1;} /* CHECK-CACHE */
+static void LnkT212(){ call_or_link(VV[212],(void **)(void *)&Lnk212);} /* FIND-FREE-CACHE-LINE */
+static object  LnkTLI211(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[211],(void **)(void *)&LnkLI211,20739,first,ap);va_end(ap);return V1;} /* COMPUTE-PRIMARY-CACHE-LOCATION */
+static object  LnkTLI210(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[210],(void **)(void *)&LnkLI210,first,ap);va_end(ap);return V1;} /* COMPUTE-PRIMARY-CACHE-LOCATION-FROM-LOCATION */
+static object  LnkTLI209(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[209],(void **)(void *)&LnkLI209,4,first,ap);va_end(ap);return V1;} /* EXPAND-CACHE */
+static object  LnkTLI208(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[208],(void **)(void *)&LnkLI208,4,first,ap);va_end(ap);return V1;} /* ADJUST-CACHE */
+static object  LnkTLI207(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[207],(void **)(void *)&LnkLI207,257,first,ap);va_end(ap);return V1;} /* CACHE-COUNT */
+static object  LnkTLI206(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[206],(void **)(void *)&LnkLI206,4,first,ap);va_end(ap);return V1;} /* FILL-CACHE-P */
+static object  LnkTLI205(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[205],(void **)(void *)&LnkLI205,2,first,ap);va_end(ap);return V1;} /* MAKE-FAST-METHOD-CALL-LAMBDA-LIST */
+static object  LnkTLI204(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[204],(void **)(void *)&LnkLI204,2,first,ap);va_end(ap);return V1;} /* MAKE-DFUN-LAMBDA-LIST */
+static object  LnkTLI203(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[203],(void **)(void *)&LnkLI203,1,first,ap);va_end(ap);return V1;} /* DFUN-ARG-SYMBOL */
+static object  LnkTLI202(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[202],(void **)(void *)&LnkLI202,first,ap);va_end(ap);return V1;} /* FIND-CLASS */
+static object  LnkTLI201(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[201],(void **)(void *)&LnkLI201,4097,first,ap);va_end(ap);return V1;} /* POWER-OF-TWO-CEILING */
+static object  LnkTLI200(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[200],(void **)(void *)&LnkLI200,1,first,ap);va_end(ap);return V1;} /* FREE-CACHE-VECTOR */
+static void LnkT199(){ call_or_link(VV[199],(void **)(void *)&Lnk199);} /* COPY-CACHE-INTERNAL */
+static object  LnkTLI198(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[198],(void **)(void *)&LnkLI198,1,first,ap);va_end(ap);return V1;} /* GET-CACHE-VECTOR */
+static void LnkT197(){ call_or_link(VV[197],(void **)(void *)&Lnk197);} /* COMPUTE-CACHE-PARAMETERS */
+static object  LnkTLI196(){return call_proc0(VV[196],(void **)(void *)&LnkLI196);} /* MAKE-CACHE */
+static object  LnkTLI195(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[195],(void **)(void *)&LnkLI195,3,first,ap);va_end(ap);return V1;} /* OBSOLETE-INSTANCE-TRAP */
+static object  LnkTLI194(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[194],(void **)(void *)&LnkLI194,3,first,ap);va_end(ap);return V1;} /* FLUSH-CACHE-TRAP */
+static object  LnkTLI71(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[71],(void **)(void *)&LnkLI71,1,first,ap);va_end(ap);return V1;} /* WRAPPER-OF */
+static object  LnkTLI192(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[192],(void **)(void *)&LnkLI192,256,first,ap);va_end(ap);return V1;} /* GET-WRAPPER-CACHE-NUMBER */
+static object  LnkTLI191(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[191],(void **)(void *)&LnkLI191,1,first,ap);va_end(ap);return V1;} /* WRAPPER-FIELD */
+static void LnkT190(){ call_or_link(VV[190],(void **)(void *)&Lnk190);} /* POSITION */
+static void LnkT189(){ call_or_link(VV[189],(void **)(void *)&Lnk189);} /* SORT */
+static object  LnkTLI186(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[186],(void **)(void *)&LnkLI186,1,first,ap);va_end(ap);return V1;} /* ALLOCATE-CACHE-VECTOR */
+static object  LnkTLI185(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[185],(void **)(void *)&LnkLI185,1,first,ap);va_end(ap);return V1;} /* FLUSH-CACHE-VECTOR-INTERNAL */
+static object  LnkTLI184(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[184],(void **)(void *)&LnkLI184,2,first,ap);va_end(ap);return V1;} /* PRINTING-RANDOM-THING-INTERNAL */
+static void LnkT169(){ call_or_link(VV[169],(void **)(void *)&Lnk169);} /* FILL */
+static void LnkT44(){ call_or_link(VV[44],(void **)(void *)&Lnk44);} /* MAKE-ARRAY */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

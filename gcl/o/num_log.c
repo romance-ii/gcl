@@ -685,8 +685,9 @@ siLbit_array_op(void)
 		    for (b1=b,i=0;i<x->a.a_rank;i++,b1=b1->c.c_cdr) {
 		      b1->d.t=(int)t_cons;
 		      b1->d.m=FALSE;
-		      b1->c.c_car=x->a.a_dims[i]<SMALL_FIXNUM_LIMIT ? 
-			small_fixnum(x->a.a_dims[i]) : 
+		      b1->c.c_car=/* x->a.a_dims[i]<SMALL_FIXNUM_LIMIT ?  */
+			/* small_fixnum(x->a.a_dims[i]) :  */ 
+			/* now done in a macro */
 			make_fixnum(x->a.a_dims[i]);
 		      b1->c.c_cdr=i<x->a.a_rank-1 ? (object)++p : Cnil;
 		    }

@@ -480,7 +480,7 @@ static object LI16(object first,...)
 	va_start(ap,first);
 	narg= narg - 0;
 	{
-	parse_key_new_new(narg,Vcs +0,(struct key *)&LI16key,first,ap);
+	parse_key_new_new(narg,Vcs +0,(struct key *)(void *)&LI16key,first,ap);
 	V53=(Vcs[0]);
 	V54=(Vcs[1]);
 	V55=(Vcs[2]);
@@ -1374,19 +1374,19 @@ register object *base0;
 	vs_top=(vs_base=base+1)+1;
 	unwind(fr,base[0]);}
 }
-static void LnkT80(){ call_or_link(VV[80],(void **)&Lnk80);} /* FIND */
-static void LnkT78(){ call_or_link(VV[78],(void **)&Lnk78);} /* INVOKE-RESTART */
-static void LnkT6(){ call_or_link(VV[6],(void **)&Lnk6);} /* PARSE-KEYWORD-PAIRS */
-static object  LnkTLI77(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[77],(void **)&LnkLI77,first,ap);va_end(ap);return V1;} /* FIND-RESTART */
-static object  LnkTLI76(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[76],(void **)&LnkLI76,1,first,ap);va_end(ap);return V1;} /* FIND-KCL-TOP-RESTART */
-static object  LnkTLI75(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[75],(void **)&LnkLI75,1,first,ap);va_end(ap);return V1;} /* MAKE-KCL-TOP-RESTART */
-static object  LnkTLI39(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[39],(void **)&LnkLI39,first,ap);va_end(ap);return V1;} /* MAKE-RESTART */
-static void LnkT74(){ call_or_link(VV[74],(void **)&Lnk74);} /* DEFINE-STRUCTURE */
-static void LnkT73(){ call_or_link(VV[73],(void **)&Lnk73);} /* RESTART-REPORT */
-static object  LnkTLI72(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[72],(void **)&LnkLI72,1,first,ap);va_end(ap);return V1;} /* UNIQUE-ID */
-static object  LnkTLI71(){return call_proc0(VV[71],(void **)&LnkLI71);} /* KCL-TOP-RESTARTS */
-static void LnkT70(){ call_or_link(VV[70],(void **)&Lnk70);} /* ERROR */
-static void LnkT69(){ call_or_link(VV[69],(void **)&Lnk69);} /* *MAKE-SPECIAL */
+static void LnkT80(){ call_or_link(VV[80],(void **)(void *)&Lnk80);} /* FIND */
+static void LnkT78(){ call_or_link(VV[78],(void **)(void *)&Lnk78);} /* INVOKE-RESTART */
+static void LnkT6(){ call_or_link(VV[6],(void **)(void *)&Lnk6);} /* PARSE-KEYWORD-PAIRS */
+static object  LnkTLI77(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[77],(void **)(void *)&LnkLI77,first,ap);va_end(ap);return V1;} /* FIND-RESTART */
+static object  LnkTLI76(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[76],(void **)(void *)&LnkLI76,1,first,ap);va_end(ap);return V1;} /* FIND-KCL-TOP-RESTART */
+static object  LnkTLI75(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[75],(void **)(void *)&LnkLI75,1,first,ap);va_end(ap);return V1;} /* MAKE-KCL-TOP-RESTART */
+static object  LnkTLI39(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[39],(void **)(void *)&LnkLI39,first,ap);va_end(ap);return V1;} /* MAKE-RESTART */
+static void LnkT74(){ call_or_link(VV[74],(void **)(void *)&Lnk74);} /* DEFINE-STRUCTURE */
+static void LnkT73(){ call_or_link(VV[73],(void **)(void *)&Lnk73);} /* RESTART-REPORT */
+static object  LnkTLI72(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[72],(void **)(void *)&LnkLI72,1,first,ap);va_end(ap);return V1;} /* UNIQUE-ID */
+static object  LnkTLI71(){return call_proc0(VV[71],(void **)(void *)&LnkLI71);} /* KCL-TOP-RESTARTS */
+static void LnkT70(){ call_or_link(VV[70],(void **)(void *)&Lnk70);} /* ERROR */
+static void LnkT69(){ call_or_link(VV[69],(void **)(void *)&Lnk69);} /* *MAKE-SPECIAL */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -2657,13 +2657,13 @@ T1014:;
 	return;}
 	}
 }
-static object  LnkTLI56(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[56],(void **)&LnkLI56,4098,first,ap);va_end(ap);return V1;} /* %CCLOSURE-ENV-NTHCDR */
-static void LnkT55(){ call_or_link(VV[55],(void **)&Lnk55);} /* CCLOSURE-ENV-NTHCDR */
-static object  LnkTLI54(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[54],(void **)&LnkLI54,first,ap);va_end(ap);return V1;} /* PROBE-CACHE */
-static object  LnkTLI53(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[53],(void **)&LnkLI53,1,first,ap);va_end(ap);return V1;} /* CHECK-WRAPPER-VALIDITY */
-static object  LnkTLI52(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[52],(void **)&LnkLI52,1,first,ap);va_end(ap);return V1;} /* WRAPPER-OF */
-static void LnkT51(){ call_or_link(VV[51],(void **)&Lnk51);} /* INVOKE-EMF */
-static object  LnkTLI49(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[49],(void **)&LnkLI49,4,first,ap);va_end(ap);return V1;} /* EMIT-CHECKING-OR-CACHING-FUNCTION-PRELIMINARY */
+static object  LnkTLI56(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[56],(void **)(void *)&LnkLI56,4098,first,ap);va_end(ap);return V1;} /* %CCLOSURE-ENV-NTHCDR */
+static void LnkT55(){ call_or_link(VV[55],(void **)(void *)&Lnk55);} /* CCLOSURE-ENV-NTHCDR */
+static object  LnkTLI54(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[54],(void **)(void *)&LnkLI54,first,ap);va_end(ap);return V1;} /* PROBE-CACHE */
+static object  LnkTLI53(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[53],(void **)(void *)&LnkLI53,1,first,ap);va_end(ap);return V1;} /* CHECK-WRAPPER-VALIDITY */
+static object  LnkTLI52(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[52],(void **)(void *)&LnkLI52,1,first,ap);va_end(ap);return V1;} /* WRAPPER-OF */
+static void LnkT51(){ call_or_link(VV[51],(void **)(void *)&Lnk51);} /* INVOKE-EMF */
+static object  LnkTLI49(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[49],(void **)(void *)&LnkLI49,4,first,ap);va_end(ap);return V1;} /* EMIT-CHECKING-OR-CACHING-FUNCTION-PRELIMINARY */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

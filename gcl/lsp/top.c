@@ -3567,62 +3567,62 @@ register object *base0;
 	return;
 	}
 }
-static void LnkT217(){ call_or_link(VV[217],(void **)&Lnk217);} /* ALOAD */
-static void LnkT216(){ call_or_link(VV[216],(void **)&Lnk216);} /* OPEN */
-static void LnkT215(){ call_or_link(VV[215],(void **)&Lnk215);} /* DO-F */
-static void LnkT214(){ call_or_link(VV[214],(void **)&Lnk214);} /* SET-DIR */
-static void LnkT213(){ call_or_link(VV[213],(void **)&Lnk213);} /* GETENV */
-static void LnkT212(){ call_or_link(VV[212],(void **)&Lnk212);} /* ARGV */
-static void LnkT211(){ call_or_link(VV[211],(void **)&Lnk211);} /* ARGC */
-static void LnkT210(){ call_or_link(VV[210],(void **)&Lnk210);} /* GET-COMMAND-ARG */
-static void LnkT209(){ call_or_link(VV[209],(void **)&Lnk209);} /* FILE-SEARCH */
-static void LnkT208(){ call_or_link(VV[208],(void **)&Lnk208);} /* FIX-LOAD-PATH */
-static void LnkT207(){ call_or_link(VV[207],(void **)&Lnk207);} /* COERCE-SLASH-TERMINATED */
-static void LnkT206(){ call_or_link(VV[206],(void **)&Lnk206);} /* PACKAGE-SIZE */
-static void LnkT205(){ call_or_link(VV[205],(void **)&Lnk205);} /* BREAK-GO */
-static object  LnkTLI203(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[203],(void **)&LnkLI203,first,ap);va_end(ap);return V1;} /* SEARCH */
-static void LnkT202(){ call_or_link(VV[202],(void **)&Lnk202);} /* INTERNAL-SUPER-GO */
-static object  LnkTLI201(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[201],(void **)&LnkLI201,2,first,ap);va_end(ap);return V1;} /* LIST-DELQ */
-static void LnkT200(){ call_or_link(VV[200],(void **)&Lnk200);} /* IHS-NOT-INTERPRETED-ENV */
-static void LnkT199(){ call_or_link(VV[199],(void **)&Lnk199);} /* COMPILED-FUNCTION-NAME */
-static object  LnkTLI197(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[197],(void **)&LnkLI197,first,ap);va_end(ap);return V1;} /* REMOVE */
-static void LnkT194(){ call_or_link(VV[194],(void **)&Lnk194);} /* SPICEP */
-static void LnkT193(){ call_or_link(VV[193],(void **)&Lnk193);} /* FRS-TAG */
-static void LnkT191(){ call_or_link(VV[191],(void **)&Lnk191);} /* FRS-CLASS */
-static void LnkT190(){ call_or_link(VV[190],(void **)&Lnk190);} /* FRS-VS */
-static object  LnkTLI189(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[189],(void **)&LnkLI189,1,first,ap);va_end(ap);return V1;} /* FRS-KIND */
-static void LnkT185(){ call_or_link(VV[185],(void **)&Lnk185);} /* IHS-FUN */
-static void LnkT184(){ call_or_link(VV[184],(void **)&Lnk184);} /* FRS-IHS */
-static void LnkT183(){ call_or_link(VV[183],(void **)&Lnk183);} /* BDS-VAL */
-static object  LnkTLI182(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[182],(void **)&LnkLI182,1,first,ap);va_end(ap);return V1;} /* PRINT-FRS */
-static void LnkT181(){ call_or_link(VV[181],(void **)&Lnk181);} /* BDS-VAR */
-static void LnkT180(){ call_or_link(VV[180],(void **)&Lnk180);} /* FRS-BDS */
-static void LnkT179(){ call_or_link(VV[179],(void **)&Lnk179);} /* BREAK-VS */
-static void LnkT178(){ call_or_link(VV[178],(void **)&Lnk178);} /* VS */
-static object  LnkTLI177(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[177],(void **)&LnkLI177,1,first,ap);va_end(ap);return V1;} /* PRINT-IHS */
-static void LnkT176(){ call_or_link(VV[176],(void **)&Lnk176);} /* IHS-VS */
-static void LnkT175(){ call_or_link(VV[175],(void **)&Lnk175);} /* BREAK-PREVIOUS */
-static void LnkT174(){ call_or_link(VV[174],(void **)&Lnk174);} /* IHS-FNAME */
-static object  LnkTLI173(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[173],(void **)&LnkLI173,1,first,ap);va_end(ap);return V1;} /* IHS-VISIBLE */
-static object  LnkTLI172(){return call_proc0(VV[172],(void **)&LnkLI172);} /* SET-ENV */
-static void LnkT171(){ call_or_link(VV[171],(void **)&Lnk171);} /* COMPLETE-PROP */
-static void LnkT170(){ call_or_link(VV[170],(void **)&Lnk170);} /* BREAK-LEVEL */
-static void LnkT169(){ call_or_link(VV[169],(void **)&Lnk169);} /* BREAK */
-static void LnkT166(){ call_or_link(VV[166],(void **)&Lnk166);} /* DBL-READ */
-static void LnkT165(){ call_or_link(VV[165],(void **)&Lnk165);} /* SET-BACK */
-static object  LnkTLI164(){return call_proc0(VV[164],(void **)&LnkLI164);} /* SET-CURRENT */
-static void LnkT163(){ call_or_link(VV[163],(void **)&Lnk163);} /* CATCH-FATAL */
-static void LnkT162(){ call_or_link(VV[162],(void **)&Lnk162);} /* BREAK-QUIT */
-static void LnkT161(){ call_or_link(VV[161],(void **)&Lnk161);} /* SIMPLE-BACKTRACE */
-static void LnkT160(){ call_or_link(VV[160],(void **)&Lnk160);} /* FRS-TOP */
-static void LnkT159(){ call_or_link(VV[159],(void **)&Lnk159);} /* SCH-FRS-BASE */
-static void LnkT158(){ call_or_link(VV[158],(void **)&Lnk158);} /* IHS-TOP */
-static void LnkT157(){ call_or_link(VV[157],(void **)&Lnk157);} /* MAKE-STRING-INPUT-STREAM */
-static void LnkT156(){ call_or_link(VV[156],(void **)&Lnk156);} /* STRING-CONCATENATE */
-static void LnkT155(){ call_or_link(VV[155],(void **)&Lnk155);} /* READ-FROM-STRING */
-static void LnkT154(){ call_or_link(VV[154],(void **)&Lnk154);} /* BREAK-CURRENT */
-static void LnkT150(){ call_or_link(VV[150],(void **)&Lnk150);} /* PROCESS-SOME-ARGS */
-static void LnkT149(){ call_or_link(VV[149],(void **)&Lnk149);} /* LOAD */
+static void LnkT217(){ call_or_link(VV[217],(void **)(void *)&Lnk217);} /* ALOAD */
+static void LnkT216(){ call_or_link(VV[216],(void **)(void *)&Lnk216);} /* OPEN */
+static void LnkT215(){ call_or_link(VV[215],(void **)(void *)&Lnk215);} /* DO-F */
+static void LnkT214(){ call_or_link(VV[214],(void **)(void *)&Lnk214);} /* SET-DIR */
+static void LnkT213(){ call_or_link(VV[213],(void **)(void *)&Lnk213);} /* GETENV */
+static void LnkT212(){ call_or_link(VV[212],(void **)(void *)&Lnk212);} /* ARGV */
+static void LnkT211(){ call_or_link(VV[211],(void **)(void *)&Lnk211);} /* ARGC */
+static void LnkT210(){ call_or_link(VV[210],(void **)(void *)&Lnk210);} /* GET-COMMAND-ARG */
+static void LnkT209(){ call_or_link(VV[209],(void **)(void *)&Lnk209);} /* FILE-SEARCH */
+static void LnkT208(){ call_or_link(VV[208],(void **)(void *)&Lnk208);} /* FIX-LOAD-PATH */
+static void LnkT207(){ call_or_link(VV[207],(void **)(void *)&Lnk207);} /* COERCE-SLASH-TERMINATED */
+static void LnkT206(){ call_or_link(VV[206],(void **)(void *)&Lnk206);} /* PACKAGE-SIZE */
+static void LnkT205(){ call_or_link(VV[205],(void **)(void *)&Lnk205);} /* BREAK-GO */
+static object  LnkTLI203(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[203],(void **)(void *)&LnkLI203,first,ap);va_end(ap);return V1;} /* SEARCH */
+static void LnkT202(){ call_or_link(VV[202],(void **)(void *)&Lnk202);} /* INTERNAL-SUPER-GO */
+static object  LnkTLI201(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[201],(void **)(void *)&LnkLI201,2,first,ap);va_end(ap);return V1;} /* LIST-DELQ */
+static void LnkT200(){ call_or_link(VV[200],(void **)(void *)&Lnk200);} /* IHS-NOT-INTERPRETED-ENV */
+static void LnkT199(){ call_or_link(VV[199],(void **)(void *)&Lnk199);} /* COMPILED-FUNCTION-NAME */
+static object  LnkTLI197(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[197],(void **)(void *)&LnkLI197,first,ap);va_end(ap);return V1;} /* REMOVE */
+static void LnkT194(){ call_or_link(VV[194],(void **)(void *)&Lnk194);} /* SPICEP */
+static void LnkT193(){ call_or_link(VV[193],(void **)(void *)&Lnk193);} /* FRS-TAG */
+static void LnkT191(){ call_or_link(VV[191],(void **)(void *)&Lnk191);} /* FRS-CLASS */
+static void LnkT190(){ call_or_link(VV[190],(void **)(void *)&Lnk190);} /* FRS-VS */
+static object  LnkTLI189(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[189],(void **)(void *)&LnkLI189,1,first,ap);va_end(ap);return V1;} /* FRS-KIND */
+static void LnkT185(){ call_or_link(VV[185],(void **)(void *)&Lnk185);} /* IHS-FUN */
+static void LnkT184(){ call_or_link(VV[184],(void **)(void *)&Lnk184);} /* FRS-IHS */
+static void LnkT183(){ call_or_link(VV[183],(void **)(void *)&Lnk183);} /* BDS-VAL */
+static object  LnkTLI182(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[182],(void **)(void *)&LnkLI182,1,first,ap);va_end(ap);return V1;} /* PRINT-FRS */
+static void LnkT181(){ call_or_link(VV[181],(void **)(void *)&Lnk181);} /* BDS-VAR */
+static void LnkT180(){ call_or_link(VV[180],(void **)(void *)&Lnk180);} /* FRS-BDS */
+static void LnkT179(){ call_or_link(VV[179],(void **)(void *)&Lnk179);} /* BREAK-VS */
+static void LnkT178(){ call_or_link(VV[178],(void **)(void *)&Lnk178);} /* VS */
+static object  LnkTLI177(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[177],(void **)(void *)&LnkLI177,1,first,ap);va_end(ap);return V1;} /* PRINT-IHS */
+static void LnkT176(){ call_or_link(VV[176],(void **)(void *)&Lnk176);} /* IHS-VS */
+static void LnkT175(){ call_or_link(VV[175],(void **)(void *)&Lnk175);} /* BREAK-PREVIOUS */
+static void LnkT174(){ call_or_link(VV[174],(void **)(void *)&Lnk174);} /* IHS-FNAME */
+static object  LnkTLI173(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[173],(void **)(void *)&LnkLI173,1,first,ap);va_end(ap);return V1;} /* IHS-VISIBLE */
+static object  LnkTLI172(){return call_proc0(VV[172],(void **)(void *)&LnkLI172);} /* SET-ENV */
+static void LnkT171(){ call_or_link(VV[171],(void **)(void *)&Lnk171);} /* COMPLETE-PROP */
+static void LnkT170(){ call_or_link(VV[170],(void **)(void *)&Lnk170);} /* BREAK-LEVEL */
+static void LnkT169(){ call_or_link(VV[169],(void **)(void *)&Lnk169);} /* BREAK */
+static void LnkT166(){ call_or_link(VV[166],(void **)(void *)&Lnk166);} /* DBL-READ */
+static void LnkT165(){ call_or_link(VV[165],(void **)(void *)&Lnk165);} /* SET-BACK */
+static object  LnkTLI164(){return call_proc0(VV[164],(void **)(void *)&LnkLI164);} /* SET-CURRENT */
+static void LnkT163(){ call_or_link(VV[163],(void **)(void *)&Lnk163);} /* CATCH-FATAL */
+static void LnkT162(){ call_or_link(VV[162],(void **)(void *)&Lnk162);} /* BREAK-QUIT */
+static void LnkT161(){ call_or_link(VV[161],(void **)(void *)&Lnk161);} /* SIMPLE-BACKTRACE */
+static void LnkT160(){ call_or_link(VV[160],(void **)(void *)&Lnk160);} /* FRS-TOP */
+static void LnkT159(){ call_or_link(VV[159],(void **)(void *)&Lnk159);} /* SCH-FRS-BASE */
+static void LnkT158(){ call_or_link(VV[158],(void **)(void *)&Lnk158);} /* IHS-TOP */
+static void LnkT157(){ call_or_link(VV[157],(void **)(void *)&Lnk157);} /* MAKE-STRING-INPUT-STREAM */
+static void LnkT156(){ call_or_link(VV[156],(void **)(void *)&Lnk156);} /* STRING-CONCATENATE */
+static void LnkT155(){ call_or_link(VV[155],(void **)(void *)&Lnk155);} /* READ-FROM-STRING */
+static void LnkT154(){ call_or_link(VV[154],(void **)(void *)&Lnk154);} /* BREAK-CURRENT */
+static void LnkT150(){ call_or_link(VV[150],(void **)(void *)&Lnk150);} /* PROCESS-SOME-ARGS */
+static void LnkT149(){ call_or_link(VV[149],(void **)(void *)&Lnk149);} /* LOAD */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -159,7 +159,7 @@ static object LI3(object V18,object first,...)
 	V19= V18;
 	narg= narg - 1;
 	{
-	parse_key_new_new(narg,Vcs +1,(struct key *)&LI3key,first,ap);
+	parse_key_new_new(narg,Vcs +1,(struct key *)(void *)&LI3key,first,ap);
 	if(Vcs[1]==0){
 	V20= Ct;
 	}else{
@@ -1165,7 +1165,7 @@ static object LI26(object V192,object V191,object first,...)
 	V203 = (ALLOCA_CONS(narg),ON_STACK_MAKE_LIST(narg));
 	V195= V203;
 	{
-	parse_key_rest_new(V203,narg,Vcs +3,(struct key *)&LI26key,first,ap);
+	parse_key_rest_new(V203,narg,Vcs +3,(struct key *)(void *)&LI26key,first,ap);
 	V196=(Vcs[3]);
 	V197=(Vcs[4]);
 	V198=(Vcs[5]);
@@ -1389,22 +1389,22 @@ T433:;
 	base[0]=base[0];
 	return Cnil;}
 	}}
-static void LnkT35(){ call_or_link(VV[35],(void **)&Lnk35);} /* ARRAY-IN-BOUNDS-P */
-static void LnkT34(){ call_or_link(VV[34],(void **)&Lnk34);} /* COPY-ARRAY-PORTION */
-static void LnkT33(){ call_or_link(VV[33],(void **)&Lnk33);} /* ARRAY-TOTAL-SIZE */
-static object  LnkTLI32(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[32],(void **)&LnkLI32,1,first,ap);va_end(ap);return V1;} /* ARRAY-DIMENSIONS */
-static void LnkT28(){ call_or_link(VV[28],(void **)&Lnk28);} /* MAKE-ARRAY */
-static void LnkT31(){ call_or_link(VV[31],(void **)&Lnk31);} /* STATICP */
-static void LnkT30(){ call_or_link(VV[30],(void **)&Lnk30);} /* ARRAY-HAS-FILL-POINTER-P */
-static object  LnkTLI29(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[29],(void **)&LnkLI29,first,ap);va_end(ap);return V1;} /* ADJUST-ARRAY */
-static object  LnkTLI28(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[28],(void **)&LnkLI28,first,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
-static object  LnkTLI27(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[27],(void **)&LnkLI27,2,first,ap);va_end(ap);return V1;} /* INCREMENT-CURSOR */
-static void LnkT26(){ call_or_link(VV[26],(void **)&Lnk26);} /* ASET-BY-CURSOR */
-static object  LnkTLI25(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[25],(void **)&LnkLI25,2,first,ap);va_end(ap);return V1;} /* SEQUENCE-CURSOR */
-static void LnkT24(){ call_or_link(VV[24],(void **)&Lnk24);} /* MAKE-ARRAY1 */
-static void LnkT23(){ call_or_link(VV[23],(void **)&Lnk23);} /* GET-AELTTYPE */
-static object  LnkTLI19(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[19],(void **)&LnkLI19,1,first,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
-static void LnkT18(){ call_or_link(VV[18],(void **)&Lnk18);} /* SUBTYPEP */
+static void LnkT35(){ call_or_link(VV[35],(void **)(void *)&Lnk35);} /* ARRAY-IN-BOUNDS-P */
+static void LnkT34(){ call_or_link(VV[34],(void **)(void *)&Lnk34);} /* COPY-ARRAY-PORTION */
+static void LnkT33(){ call_or_link(VV[33],(void **)(void *)&Lnk33);} /* ARRAY-TOTAL-SIZE */
+static object  LnkTLI32(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[32],(void **)(void *)&LnkLI32,1,first,ap);va_end(ap);return V1;} /* ARRAY-DIMENSIONS */
+static void LnkT28(){ call_or_link(VV[28],(void **)(void *)&Lnk28);} /* MAKE-ARRAY */
+static void LnkT31(){ call_or_link(VV[31],(void **)(void *)&Lnk31);} /* STATICP */
+static void LnkT30(){ call_or_link(VV[30],(void **)(void *)&Lnk30);} /* ARRAY-HAS-FILL-POINTER-P */
+static object  LnkTLI29(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[29],(void **)(void *)&LnkLI29,first,ap);va_end(ap);return V1;} /* ADJUST-ARRAY */
+static object  LnkTLI28(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[28],(void **)(void *)&LnkLI28,first,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
+static object  LnkTLI27(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[27],(void **)(void *)&LnkLI27,2,first,ap);va_end(ap);return V1;} /* INCREMENT-CURSOR */
+static void LnkT26(){ call_or_link(VV[26],(void **)(void *)&Lnk26);} /* ASET-BY-CURSOR */
+static object  LnkTLI25(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[25],(void **)(void *)&LnkLI25,2,first,ap);va_end(ap);return V1;} /* SEQUENCE-CURSOR */
+static void LnkT24(){ call_or_link(VV[24],(void **)(void *)&Lnk24);} /* MAKE-ARRAY1 */
+static void LnkT23(){ call_or_link(VV[23],(void **)(void *)&Lnk23);} /* GET-AELTTYPE */
+static object  LnkTLI19(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[19],(void **)(void *)&LnkLI19,1,first,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
+static void LnkT18(){ call_or_link(VV[18],(void **)(void *)&Lnk18);} /* SUBTYPEP */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

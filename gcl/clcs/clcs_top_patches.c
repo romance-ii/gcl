@@ -780,25 +780,25 @@ register object *base0;
 	unwind(fr,VV[46]);}
 	}
 }
-static void LnkT91(){ call_or_link(VV[91],(void **)&Lnk91);} /* INVOKE-RESTART */
-static void LnkT90(){ call_or_link(VV[90],(void **)&Lnk90);} /* ERROR */
-static void LnkT89(){ call_or_link(VV[89],(void **)&Lnk89);} /* CERROR */
-static void LnkT88(){ call_or_link(VV[88],(void **)&Lnk88);} /* BREAK-CURRENT */
-static void LnkT85(){ call_or_link(VV[85],(void **)&Lnk85);} /* CLCS-BREAK-LEVEL-INVOKE-RESTART */
-static void LnkT83(){ call_or_link(VV[83],(void **)&Lnk83);} /* DBL-READ */
-static void LnkT82(){ call_or_link(VV[82],(void **)&Lnk82);} /* CATCH-FATAL */
-static object  LnkTLI69(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[69],(void **)&LnkLI69,first,ap);va_end(ap);return V1;} /* SHOW-RESTARTS */
-static void LnkT81(){ call_or_link(VV[81],(void **)&Lnk81);} /* SET-CURRENT */
-static object  LnkTLI80(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[80],(void **)&LnkLI80,first,ap);va_end(ap);return V1;} /* MAKE-RESTART */
-static void LnkT79(){ call_or_link(VV[79],(void **)&Lnk79);} /* SET-BACK */
-static object  LnkTLI78(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[78],(void **)&LnkLI78,first,ap);va_end(ap);return V1;} /* FIND-RESTART */
-static object  LnkTLI77(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[77],(void **)&LnkLI77,first,ap);va_end(ap);return V1;} /* COMPUTE-RESTARTS */
-static void LnkT76(){ call_or_link(VV[76],(void **)&Lnk76);} /* FRS-TOP */
-static void LnkT75(){ call_or_link(VV[75],(void **)&Lnk75);} /* SCH-FRS-BASE */
-static void LnkT74(){ call_or_link(VV[74],(void **)&Lnk74);} /* IHS-TOP */
-static object  LnkTLI73(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[73],(void **)&LnkLI73,1,first,ap);va_end(ap);return V1;} /* CONDITIONP */
-static void LnkT72(){ call_or_link(VV[72],(void **)&Lnk72);} /* INVOKE-RESTART-INTERACTIVELY */
-static void LnkT71(){ call_or_link(VV[71],(void **)&Lnk71);} /* *MAKE-SPECIAL */
+static void LnkT91(){ call_or_link(VV[91],(void **)(void *)&Lnk91);} /* INVOKE-RESTART */
+static void LnkT90(){ call_or_link(VV[90],(void **)(void *)&Lnk90);} /* ERROR */
+static void LnkT89(){ call_or_link(VV[89],(void **)(void *)&Lnk89);} /* CERROR */
+static void LnkT88(){ call_or_link(VV[88],(void **)(void *)&Lnk88);} /* BREAK-CURRENT */
+static void LnkT85(){ call_or_link(VV[85],(void **)(void *)&Lnk85);} /* CLCS-BREAK-LEVEL-INVOKE-RESTART */
+static void LnkT83(){ call_or_link(VV[83],(void **)(void *)&Lnk83);} /* DBL-READ */
+static void LnkT82(){ call_or_link(VV[82],(void **)(void *)&Lnk82);} /* CATCH-FATAL */
+static object  LnkTLI69(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[69],(void **)(void *)&LnkLI69,first,ap);va_end(ap);return V1;} /* SHOW-RESTARTS */
+static void LnkT81(){ call_or_link(VV[81],(void **)(void *)&Lnk81);} /* SET-CURRENT */
+static object  LnkTLI80(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[80],(void **)(void *)&LnkLI80,first,ap);va_end(ap);return V1;} /* MAKE-RESTART */
+static void LnkT79(){ call_or_link(VV[79],(void **)(void *)&Lnk79);} /* SET-BACK */
+static object  LnkTLI78(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[78],(void **)(void *)&LnkLI78,first,ap);va_end(ap);return V1;} /* FIND-RESTART */
+static object  LnkTLI77(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[77],(void **)(void *)&LnkLI77,first,ap);va_end(ap);return V1;} /* COMPUTE-RESTARTS */
+static void LnkT76(){ call_or_link(VV[76],(void **)(void *)&Lnk76);} /* FRS-TOP */
+static void LnkT75(){ call_or_link(VV[75],(void **)(void *)&Lnk75);} /* SCH-FRS-BASE */
+static void LnkT74(){ call_or_link(VV[74],(void **)(void *)&Lnk74);} /* IHS-TOP */
+static object  LnkTLI73(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[73],(void **)(void *)&LnkLI73,1,first,ap);va_end(ap);return V1;} /* CONDITIONP */
+static void LnkT72(){ call_or_link(VV[72],(void **)(void *)&Lnk72);} /* INVOKE-RESTART-INTERACTIVELY */
+static void LnkT71(){ call_or_link(VV[71],(void **)(void *)&Lnk71);} /* *MAKE-SPECIAL */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

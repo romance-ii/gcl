@@ -776,19 +776,19 @@ T325:;
 	V106= car((V105));
 	goto T320;}
 }
-static object  LnkTLI55(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[55],(void **)&LnkLI55,first,ap);va_end(ap);return V1;} /* CONCATENATE */
-static void LnkT54(){ call_or_link(VV[54],(void **)&Lnk54);} /* CLOSE-FASD */
-static void LnkT53(){ call_or_link(VV[53],(void **)&Lnk53);} /* WRITE-FASD-TOP */
-static void LnkT52(){ call_or_link(VV[52],(void **)&Lnk52);} /* FIND-SHARING-TOP */
-static object  LnkTLI51(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[51],(void **)&LnkLI51,1,first,ap);va_end(ap);return V1;} /* WT-DATA1 */
-static void LnkT50(){ call_or_link(VV[50],(void **)&Lnk50);} /* WT-FASD-DATA-FILE */
-static object  LnkTLI49(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[49],(void **)&LnkLI49,2,first,ap);va_end(ap);return V1;} /* COERCE */
-static object  LnkTLI48(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[48],(void **)&LnkLI48,1,first,ap);va_end(ap);return V1;} /* VERIFY-DATA-VECTOR */
-static object  LnkTLI47(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[47],(void **)&LnkLI47,first,ap);va_end(ap);return V1;} /* CMPWARN */
-static void LnkT46(){ call_or_link(VV[46],(void **)&Lnk46);} /* HASH-EQUAL */
-static object  LnkTLI45(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[45],(void **)&LnkLI45,first,ap);va_end(ap);return V1;} /* VECTOR-PUSH-EXTEND */
-static void LnkT44(){ call_or_link(VV[44],(void **)&Lnk44);} /* CMPILER-ERROR */
-static void LnkT43(){ call_or_link(VV[43],(void **)&Lnk43);} /* WT-LOC */
+static object  LnkTLI55(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[55],(void **)(void *)&LnkLI55,first,ap);va_end(ap);return V1;} /* CONCATENATE */
+static void LnkT54(){ call_or_link(VV[54],(void **)(void *)&Lnk54);} /* CLOSE-FASD */
+static void LnkT53(){ call_or_link(VV[53],(void **)(void *)&Lnk53);} /* WRITE-FASD-TOP */
+static void LnkT52(){ call_or_link(VV[52],(void **)(void *)&Lnk52);} /* FIND-SHARING-TOP */
+static object  LnkTLI51(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[51],(void **)(void *)&LnkLI51,1,first,ap);va_end(ap);return V1;} /* WT-DATA1 */
+static void LnkT50(){ call_or_link(VV[50],(void **)(void *)&Lnk50);} /* WT-FASD-DATA-FILE */
+static object  LnkTLI49(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[49],(void **)(void *)&LnkLI49,2,first,ap);va_end(ap);return V1;} /* COERCE */
+static object  LnkTLI48(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[48],(void **)(void *)&LnkLI48,1,first,ap);va_end(ap);return V1;} /* VERIFY-DATA-VECTOR */
+static object  LnkTLI47(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[47],(void **)(void *)&LnkLI47,first,ap);va_end(ap);return V1;} /* CMPWARN */
+static void LnkT46(){ call_or_link(VV[46],(void **)(void *)&Lnk46);} /* HASH-EQUAL */
+static object  LnkTLI45(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[45],(void **)(void *)&LnkLI45,first,ap);va_end(ap);return V1;} /* VECTOR-PUSH-EXTEND */
+static void LnkT44(){ call_or_link(VV[44],(void **)(void *)&Lnk44);} /* CMPILER-ERROR */
+static void LnkT43(){ call_or_link(VV[43],(void **)(void *)&Lnk43);} /* WT-LOC */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

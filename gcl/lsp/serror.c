@@ -802,11 +802,11 @@ T85:;
 	vs_top=(vs_base=base+5)+1;
 	return;}
 }
-static void LnkT76(){ call_or_link(VV[76],(void **)&Lnk76);} /* MAKE-ERROR-CONDITION */
-static void LnkT75(){ call_or_link(VV[75],(void **)&Lnk75);} /* FIFTH */
-static void LnkT74(){ call_or_link(VV[74],(void **)&Lnk74);} /* BREAK-VS */
-static void LnkT73(){ call_or_link(VV[73],(void **)&Lnk73);} /* BACKTRACE */
-static void LnkT72(){ call_or_link(VV[72],(void **)&Lnk72);} /* SIMPLE-BACKTRACE */
+static void LnkT76(){ call_or_link(VV[76],(void **)(void *)&Lnk76);} /* MAKE-ERROR-CONDITION */
+static void LnkT75(){ call_or_link(VV[75],(void **)(void *)&Lnk75);} /* FIFTH */
+static void LnkT74(){ call_or_link(VV[74],(void **)(void *)&Lnk74);} /* BREAK-VS */
+static void LnkT73(){ call_or_link(VV[73],(void **)(void *)&Lnk73);} /* BACKTRACE */
+static void LnkT72(){ call_or_link(VV[72],(void **)(void *)&Lnk72);} /* SIMPLE-BACKTRACE */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

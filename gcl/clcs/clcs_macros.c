@@ -539,10 +539,10 @@ TTL:;
 	Leval();
 	return;
 }
-static void LnkT74(){ call_or_link(VV[74],(void **)&Lnk74);} /* Y-OR-N-P */
-static object  LnkTLI73(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[73],(void **)&LnkLI73,1,first,ap);va_end(ap);return V1;} /* ESCAPE-SPECIAL-CASES-REPLACE */
-static object  LnkTLI72(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[72],(void **)&LnkLI72,3,first,ap);va_end(ap);return V1;} /* ACCUMULATE-CASES */
-static void LnkT8(){ call_or_link(VV[8],(void **)&Lnk8);} /* ERROR */
+static void LnkT74(){ call_or_link(VV[74],(void **)(void *)&Lnk74);} /* Y-OR-N-P */
+static object  LnkTLI73(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[73],(void **)(void *)&LnkLI73,1,first,ap);va_end(ap);return V1;} /* ESCAPE-SPECIAL-CASES-REPLACE */
+static object  LnkTLI72(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[72],(void **)(void *)&LnkLI72,3,first,ap);va_end(ap);return V1;} /* ACCUMULATE-CASES */
+static void LnkT8(){ call_or_link(VV[8],(void **)(void *)&Lnk8);} /* ERROR */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -59,7 +59,7 @@ static object LI2(object V12,object V11,object first,...)
 	V14= V11;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI2key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI2key,first,ap);
 	V15=(Vcs[2]);
 	V16=(Vcs[3]);
 	V17=(Vcs[4]);
@@ -150,7 +150,7 @@ static object LI3(object V26,object V25,object first,...)
 	V28= V25;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI3key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI3key,first,ap);
 	V29=(Vcs[2]);
 	V30=(Vcs[3]);
 	V31=(Vcs[4]);
@@ -241,7 +241,7 @@ static object LI4(object V39,object V38,object first,...)
 	V41= V38;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI4key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI4key,first,ap);
 	V42=(Vcs[2]);
 	V43=(Vcs[3]);
 	V44=(Vcs[4]);
@@ -313,7 +313,7 @@ static object LI5(object V50,object V49,object first,...)
 	V52= V49;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI5key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI5key,first,ap);
 	V53=(Vcs[2]);
 	V54=(Vcs[3]);
 	V55=(Vcs[4]);
@@ -401,7 +401,7 @@ static object LI6(object V62,object V61,object first,...)
 	V64= V61;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI6key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI6key,first,ap);
 	V65=(Vcs[2]);
 	V66=(Vcs[3]);
 	V67=(Vcs[4]);
@@ -543,7 +543,7 @@ static object LI8(object V81,object V80,object first,...)
 	V83= V80;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI8key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI8key,first,ap);
 	V84=(Vcs[2]);
 	V85=(Vcs[3]);
 	V86=(Vcs[4]);
@@ -717,7 +717,7 @@ static object LI10(object V102,object V101,object first,...)
 	V104= V101;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI10key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI10key,first,ap);
 	V105=(Vcs[2]);
 	V106=(Vcs[3]);
 	V107=(Vcs[4]);
@@ -778,7 +778,7 @@ static object LI11(object V114,object V113,object first,...)
 	V116= V113;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI11key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI11key,first,ap);
 	V117=(Vcs[2]);
 	V118=(Vcs[3]);
 	V119=(Vcs[4]);
@@ -923,7 +923,7 @@ static object LI12(object V132,object V131,object first,...)
 	V134= V131;
 	narg= narg - 2;
 	{
-	parse_key_new_new(narg,Vcs +2,(struct key *)&LI12key,first,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)(void *)&LI12key,first,ap);
 	V135=(Vcs[2]);
 	V136=(Vcs[3]);
 	V137=(Vcs[4]);
@@ -977,11 +977,11 @@ T346:;
 	base[0]=base[0];
 	return Cnil;}
 	}}
-static void LnkT18(){ call_or_link(VV[18],(void **)&Lnk18);} /* NSET-DIFFERENCE-REV */
-static void LnkT17(){ call_or_link(VV[17],(void **)&Lnk17);} /* SET-DIFFERENCE-REV */
-static void LnkT16(){ call_or_link(VV[16],(void **)&Lnk16);} /* SET-DIFFERENCE */
-static void LnkT14(){ call_or_link(VV[14],(void **)&Lnk14);} /* MEMBER1 */
-static void LnkT15(){ call_or_link(VV[15],(void **)&Lnk15);} /* KEY-LIST */
+static void LnkT18(){ call_or_link(VV[18],(void **)(void *)&Lnk18);} /* NSET-DIFFERENCE-REV */
+static void LnkT17(){ call_or_link(VV[17],(void **)(void *)&Lnk17);} /* SET-DIFFERENCE-REV */
+static void LnkT16(){ call_or_link(VV[16],(void **)(void *)&Lnk16);} /* SET-DIFFERENCE */
+static void LnkT14(){ call_or_link(VV[14],(void **)(void *)&Lnk14);} /* MEMBER1 */
+static void LnkT15(){ call_or_link(VV[15],(void **)(void *)&Lnk15);} /* KEY-LIST */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -775,19 +775,19 @@ register object *base0;
 	unwind(fr,VV[14]);}
 	}
 }
-static object  LnkTLI51(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[51],(void **)&LnkLI51,1,first,ap);va_end(ap);return V1;} /* CONDITION-BACKTRACE */
-static void LnkT28(){ call_or_link(VV[28],(void **)&Lnk28);} /* ERROR-SET */
-static object  LnkTLI50(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[50],(void **)&LnkLI50,1,first,ap);va_end(ap);return V1;} /* RESET-FUNCTION */
-static void LnkT48(){ call_or_link(VV[48],(void **)&Lnk48);} /* SIMPLE-BACKTRACE */
-static void LnkT47(){ call_or_link(VV[47],(void **)&Lnk47);} /* FRS-TOP */
-static void LnkT46(){ call_or_link(VV[46],(void **)&Lnk46);} /* SCH-FRS-BASE */
-static void LnkT45(){ call_or_link(VV[45],(void **)&Lnk45);} /* IHS-TOP */
-static object  LnkTLI44(){return call_proc0(VV[44],(void **)&LnkLI44);} /* INITIALIZE-INTERNAL-ERROR-TABLE */
-static void LnkT43(){ call_or_link(VV[43],(void **)&Lnk43);} /* SET-INTERNAL-ERROR */
-static void LnkT32(){ call_or_link(VV[32],(void **)&Lnk32);} /* ERROR */
-static object  LnkTLI42(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[42],(void **)&LnkLI42,1,first,ap);va_end(ap);return V1;} /* SIMPLE-CONDITION-CLASS-P */
-static object  LnkTLI41(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[41],(void **)&LnkLI41,first,ap);va_end(ap);return V1;} /* MAKE-RESTART */
-static void LnkT40(){ call_or_link(VV[40],(void **)&Lnk40);} /* *MAKE-SPECIAL */
+static object  LnkTLI51(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[51],(void **)(void *)&LnkLI51,1,first,ap);va_end(ap);return V1;} /* CONDITION-BACKTRACE */
+static void LnkT28(){ call_or_link(VV[28],(void **)(void *)&Lnk28);} /* ERROR-SET */
+static object  LnkTLI50(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[50],(void **)(void *)&LnkLI50,1,first,ap);va_end(ap);return V1;} /* RESET-FUNCTION */
+static void LnkT48(){ call_or_link(VV[48],(void **)(void *)&Lnk48);} /* SIMPLE-BACKTRACE */
+static void LnkT47(){ call_or_link(VV[47],(void **)(void *)&Lnk47);} /* FRS-TOP */
+static void LnkT46(){ call_or_link(VV[46],(void **)(void *)&Lnk46);} /* SCH-FRS-BASE */
+static void LnkT45(){ call_or_link(VV[45],(void **)(void *)&Lnk45);} /* IHS-TOP */
+static object  LnkTLI44(){return call_proc0(VV[44],(void **)(void *)&LnkLI44);} /* INITIALIZE-INTERNAL-ERROR-TABLE */
+static void LnkT43(){ call_or_link(VV[43],(void **)(void *)&Lnk43);} /* SET-INTERNAL-ERROR */
+static void LnkT32(){ call_or_link(VV[32],(void **)(void *)&Lnk32);} /* ERROR */
+static object  LnkTLI42(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[42],(void **)(void *)&LnkLI42,1,first,ap);va_end(ap);return V1;} /* SIMPLE-CONDITION-CLASS-P */
+static object  LnkTLI41(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[41],(void **)(void *)&LnkLI41,first,ap);va_end(ap);return V1;} /* MAKE-RESTART */
+static void LnkT40(){ call_or_link(VV[40],(void **)(void *)&Lnk40);} /* *MAKE-SPECIAL */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

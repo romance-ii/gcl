@@ -1,3 +1,17 @@
+gcl (2.6.0cvs-1) exerimental; urgency=low
+
+  * Experimental Debian distribution for CVS snapshots
+  * Type-punning warning fixes
+  * small_fixnum overflow fixes
+  * off by one fix in cerror
+  * reader enhancement to handle foo:(a b c)
+  * preliminary defgeneric method support
+  * Fix compiler error which had not recognized defpackage as a package
+    operation
+  * Fix tkl.lisp call to open-named-socket
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 15 Jul 2003 13:41:33 -0400
+
 gcl (2.5.3-1) unstable; urgency=low
 
   * New upstream release
@@ -6,7 +20,7 @@ gcl (2.5.3-1) unstable; urgency=low
     si-defs.texi
   * Unstatic object_to_float, object_to_double
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  2 Jun 2003 12:38:03 -0400
+ -- Camm Maguire <camm@enhanced.com>  Tue, 15 Jul 2003 13:37:08 -0400
 
 gcl (2.5.2-1) unstable; urgency=low
 

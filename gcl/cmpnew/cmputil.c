@@ -811,13 +811,13 @@ T222:;
 	base[0]=base[0];
 	return Cnil;
 }
-static object  LnkTLI64(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[64],(void **)&LnkLI64,2,first,ap);va_end(ap);return V1;} /* COMPILER-DEF-HOOK */
-static void LnkT63(){ call_or_link(VV[63],(void **)&Lnk63);} /* ERROR-SET */
-static void LnkT62(){ call_or_link(VV[62],(void **)&Lnk62);} /* IHS-TOP */
-static object  LnkTLI61(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[61],(void **)&LnkLI61,1,first,ap);va_end(ap);return V1;} /* ADD-MACRO-CALLEE */
-static void LnkT60(){ call_or_link(VV[60],(void **)&Lnk60);} /* CMP-TOPLEVEL-EVAL */
-static object  LnkTLI59(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[59],(void **)&LnkLI59,first,ap);va_end(ap);return V1;} /* BREAK */
-static object  LnkTLI58(){return call_proc0(VV[58],(void **)&LnkLI58);} /* PRINT-CURRENT-FORM */
+static object  LnkTLI64(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[64],(void **)(void *)&LnkLI64,2,first,ap);va_end(ap);return V1;} /* COMPILER-DEF-HOOK */
+static void LnkT63(){ call_or_link(VV[63],(void **)(void *)&Lnk63);} /* ERROR-SET */
+static void LnkT62(){ call_or_link(VV[62],(void **)(void *)&Lnk62);} /* IHS-TOP */
+static object  LnkTLI61(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[61],(void **)(void *)&LnkLI61,1,first,ap);va_end(ap);return V1;} /* ADD-MACRO-CALLEE */
+static void LnkT60(){ call_or_link(VV[60],(void **)(void *)&Lnk60);} /* CMP-TOPLEVEL-EVAL */
+static object  LnkTLI59(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[59],(void **)(void *)&LnkLI59,first,ap);va_end(ap);return V1;} /* BREAK */
+static object  LnkTLI58(){return call_proc0(VV[58],(void **)(void *)&LnkLI58);} /* PRINT-CURRENT-FORM */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -1283,35 +1283,35 @@ T421:;
 	return;}
 	}
 }
-static void LnkT63(ptr) object *ptr;{ call_or_link_closure(VV[63],(void **)&Lnk63,(void **)&Lclptr63);} /* CLASS-NAME */
-static void LnkT62(ptr) object *ptr;{ call_or_link_closure(VV[62],(void **)&Lnk62,(void **)&Lclptr62);} /* CLASS-DEFSTRUCT-CONSTRUCTOR */
-static object  LnkTLI2(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[2],(void **)&LnkLI2,first,ap);va_end(ap);return V1;} /* ALLOCATE-STANDARD-INSTANCE */
-static void LnkT61(ptr) object *ptr;{ call_or_link_closure(VV[61],(void **)&Lnk61,(void **)&Lclptr61);} /* FINALIZE-INHERITANCE */
-static void LnkT60(ptr) object *ptr;{ call_or_link_closure(VV[60],(void **)&Lnk60,(void **)&Lclptr60);} /* CLASS-FINALIZED-P */
-static void LnkT59(){ call_or_link(VV[59],(void **)&Lnk59);} /* TYPECASE-ERROR-STRING */
-static object  LnkTLI58(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[58],(void **)&LnkLI58,1,first,ap);va_end(ap);return V1;} /* WRAPPER-OF */
-static void LnkT57(ptr) object *ptr;{ call_or_link_closure(VV[57],(void **)&Lnk57,(void **)&Lclptr57);} /* SLOT-DEFINITION-INTERNAL-WRITER-FUNCTION */
-static void LnkT56(ptr) object *ptr;{ call_or_link_closure(VV[56],(void **)&Lnk56,(void **)&Lclptr56);} /* SLOT-DEFINITION-INTERNAL-READER-FUNCTION */
-static object  LnkTLI55(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[55],(void **)&LnkLI55,1,first,ap);va_end(ap);return V1;} /* CHECK-WRAPPER-VALIDITY */
-static void LnkT54(ptr) object *ptr;{ call_or_link_closure(VV[54],(void **)&Lnk54,(void **)&Lclptr54);} /* SLOT-DEFINITION-LOCATION */
-static void LnkT9(){ call_or_link(VV[9],(void **)&Lnk9);} /* SLOT-VALUE */
-static void LnkT12(){ call_or_link(VV[12],(void **)&Lnk12);} /* SLOT-BOUNDP */
-static void LnkT30(ptr) object *ptr;{ call_or_link_closure(VV[30],(void **)&Lnk30,(void **)&Lclptr30);} /* SLOT-MAKUNBOUND-USING-CLASS */
-static void LnkT26(ptr) object *ptr;{ call_or_link_closure(VV[26],(void **)&Lnk26,(void **)&Lclptr26);} /* SLOT-BOUNDP-USING-CLASS */
-static void LnkT53(ptr) object *ptr;{ call_or_link_closure(VV[53],(void **)&Lnk53,(void **)&Lclptr53);} /* SETF PCL SLOT-VALUE-USING-CLASS */
-static void LnkT18(ptr) object *ptr;{ call_or_link_closure(VV[18],(void **)&Lnk18,(void **)&Lclptr18);} /* SLOT-VALUE-USING-CLASS */
-static object  LnkTLI52(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[52],(void **)&LnkLI52,2,first,ap);va_end(ap);return V1;} /* FIND-SLOT-DEFINITION */
-static object  LnkTLI51(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[51],(void **)&LnkLI51,1,first,ap);va_end(ap);return V1;} /* CLASS-OF */
-static void LnkT50(ptr) object *ptr;{ call_or_link_closure(VV[50],(void **)&Lnk50,(void **)&Lclptr50);} /* SLOT-DEFINITION-NAME */
-static void LnkT49(ptr) object *ptr;{ call_or_link_closure(VV[49],(void **)&Lnk49,(void **)&Lclptr49);} /* CLASS-SLOTS */
-static void LnkT48(){ call_or_link(VV[48],(void **)&Lnk48);} /* SET-CLASS-SLOT-VALUE-1 */
-static void LnkT47(){ call_or_link(VV[47],(void **)&Lnk47);} /* GET-CLASS-SLOT-VALUE-1 */
-static void LnkT46(ptr) object *ptr;{ call_or_link_closure(VV[46],(void **)&Lnk46,(void **)&Lclptr46);} /* CLASS-PROTOTYPE */
-static void LnkT45(ptr) object *ptr;{ call_or_link_closure(VV[45],(void **)&Lnk45,(void **)&Lclptr45);} /* CLASS-WRAPPER */
-static void LnkT44(ptr) object *ptr;{ call_or_link_closure(VV[44],(void **)&Lnk44,(void **)&Lclptr44);} /* SLOT-UNBOUND */
-static void LnkT43(ptr) object *ptr;{ call_or_link_closure(VV[43],(void **)&Lnk43,(void **)&Lclptr43);} /* SLOT-MISSING */
-static object  LnkTLI42(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[42],(void **)&LnkLI42,4098,first,ap);va_end(ap);return V1;} /* %CCLOSURE-ENV-NTHCDR */
-static void LnkT41(){ call_or_link(VV[41],(void **)&Lnk41);} /* CCLOSURE-ENV-NTHCDR */
+static void LnkT63(ptr) object *ptr;{ call_or_link_closure(VV[63],(void **)(void *)&Lnk63,(void **)(void *)&Lclptr63);} /* CLASS-NAME */
+static void LnkT62(ptr) object *ptr;{ call_or_link_closure(VV[62],(void **)(void *)&Lnk62,(void **)(void *)&Lclptr62);} /* CLASS-DEFSTRUCT-CONSTRUCTOR */
+static object  LnkTLI2(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[2],(void **)(void *)&LnkLI2,first,ap);va_end(ap);return V1;} /* ALLOCATE-STANDARD-INSTANCE */
+static void LnkT61(ptr) object *ptr;{ call_or_link_closure(VV[61],(void **)(void *)&Lnk61,(void **)(void *)&Lclptr61);} /* FINALIZE-INHERITANCE */
+static void LnkT60(ptr) object *ptr;{ call_or_link_closure(VV[60],(void **)(void *)&Lnk60,(void **)(void *)&Lclptr60);} /* CLASS-FINALIZED-P */
+static void LnkT59(){ call_or_link(VV[59],(void **)(void *)&Lnk59);} /* TYPECASE-ERROR-STRING */
+static object  LnkTLI58(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[58],(void **)(void *)&LnkLI58,1,first,ap);va_end(ap);return V1;} /* WRAPPER-OF */
+static void LnkT57(ptr) object *ptr;{ call_or_link_closure(VV[57],(void **)(void *)&Lnk57,(void **)(void *)&Lclptr57);} /* SLOT-DEFINITION-INTERNAL-WRITER-FUNCTION */
+static void LnkT56(ptr) object *ptr;{ call_or_link_closure(VV[56],(void **)(void *)&Lnk56,(void **)(void *)&Lclptr56);} /* SLOT-DEFINITION-INTERNAL-READER-FUNCTION */
+static object  LnkTLI55(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[55],(void **)(void *)&LnkLI55,1,first,ap);va_end(ap);return V1;} /* CHECK-WRAPPER-VALIDITY */
+static void LnkT54(ptr) object *ptr;{ call_or_link_closure(VV[54],(void **)(void *)&Lnk54,(void **)(void *)&Lclptr54);} /* SLOT-DEFINITION-LOCATION */
+static void LnkT9(){ call_or_link(VV[9],(void **)(void *)&Lnk9);} /* SLOT-VALUE */
+static void LnkT12(){ call_or_link(VV[12],(void **)(void *)&Lnk12);} /* SLOT-BOUNDP */
+static void LnkT30(ptr) object *ptr;{ call_or_link_closure(VV[30],(void **)(void *)&Lnk30,(void **)(void *)&Lclptr30);} /* SLOT-MAKUNBOUND-USING-CLASS */
+static void LnkT26(ptr) object *ptr;{ call_or_link_closure(VV[26],(void **)(void *)&Lnk26,(void **)(void *)&Lclptr26);} /* SLOT-BOUNDP-USING-CLASS */
+static void LnkT53(ptr) object *ptr;{ call_or_link_closure(VV[53],(void **)(void *)&Lnk53,(void **)(void *)&Lclptr53);} /* SETF PCL SLOT-VALUE-USING-CLASS */
+static void LnkT18(ptr) object *ptr;{ call_or_link_closure(VV[18],(void **)(void *)&Lnk18,(void **)(void *)&Lclptr18);} /* SLOT-VALUE-USING-CLASS */
+static object  LnkTLI52(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[52],(void **)(void *)&LnkLI52,2,first,ap);va_end(ap);return V1;} /* FIND-SLOT-DEFINITION */
+static object  LnkTLI51(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[51],(void **)(void *)&LnkLI51,1,first,ap);va_end(ap);return V1;} /* CLASS-OF */
+static void LnkT50(ptr) object *ptr;{ call_or_link_closure(VV[50],(void **)(void *)&Lnk50,(void **)(void *)&Lclptr50);} /* SLOT-DEFINITION-NAME */
+static void LnkT49(ptr) object *ptr;{ call_or_link_closure(VV[49],(void **)(void *)&Lnk49,(void **)(void *)&Lclptr49);} /* CLASS-SLOTS */
+static void LnkT48(){ call_or_link(VV[48],(void **)(void *)&Lnk48);} /* SET-CLASS-SLOT-VALUE-1 */
+static void LnkT47(){ call_or_link(VV[47],(void **)(void *)&Lnk47);} /* GET-CLASS-SLOT-VALUE-1 */
+static void LnkT46(ptr) object *ptr;{ call_or_link_closure(VV[46],(void **)(void *)&Lnk46,(void **)(void *)&Lclptr46);} /* CLASS-PROTOTYPE */
+static void LnkT45(ptr) object *ptr;{ call_or_link_closure(VV[45],(void **)(void *)&Lnk45,(void **)(void *)&Lclptr45);} /* CLASS-WRAPPER */
+static void LnkT44(ptr) object *ptr;{ call_or_link_closure(VV[44],(void **)(void *)&Lnk44,(void **)(void *)&Lclptr44);} /* SLOT-UNBOUND */
+static void LnkT43(ptr) object *ptr;{ call_or_link_closure(VV[43],(void **)(void *)&Lnk43,(void **)(void *)&Lclptr43);} /* SLOT-MISSING */
+static object  LnkTLI42(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[42],(void **)(void *)&LnkLI42,4098,first,ap);va_end(ap);return V1;} /* %CCLOSURE-ENV-NTHCDR */
+static void LnkT41(){ call_or_link(VV[41],(void **)(void *)&Lnk41);} /* CCLOSURE-ENV-NTHCDR */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

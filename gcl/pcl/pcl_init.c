@@ -1106,36 +1106,36 @@ T365:;
 	base[0]=base[0];
 	return Cnil;}
 	}
-static void LnkT48(){ call_or_link(VV[48],(void **)&Lnk48);} /* ANALYZE-LAMBDA-LIST */
-static void LnkT47(ptr) object *ptr;{ call_or_link_closure(VV[47],(void **)&Lnk47,(void **)&Lclptr47);} /* METHOD-LAMBDA-LIST */
-static object  LnkTLI46(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[46],(void **)&LnkLI46,1,first,ap);va_end(ap);return V1;} /* EARLY-METHOD-LAMBDA-LIST */
-static void LnkT45(ptr) object *ptr;{ call_or_link_closure(VV[45],(void **)&Lnk45,(void **)&Lclptr45);} /* COMPUTE-APPLICABLE-METHODS */
-static object  LnkTLI44(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[44],(void **)&LnkLI44,1,first,ap);va_end(ap);return V1;} /* GDEFINITION */
-static object  LnkTLI43(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[43],(void **)&LnkLI43,first,ap);va_end(ap);return V1;} /* CHECK-INITARGS-2-LIST */
-static object  LnkTLI42(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[42],(void **)&LnkLI42,first,ap);va_end(ap);return V1;} /* CHECK-INITARGS-2-PLIST */
-static void LnkT41(){ call_or_link(VV[41],(void **)&Lnk41);} /* CHECK-INITARGS-VALUES */
-static void LnkT40(ptr) object *ptr;{ call_or_link_closure(VV[40],(void **)&Lnk40,(void **)&Lclptr40);} /* SLOT-DEFINITION-INITFUNCTION */
-static void LnkT39(ptr) object *ptr;{ call_or_link_closure(VV[39],(void **)&Lnk39,(void **)&Lclptr39);} /* SLOT-BOUNDP-USING-CLASS */
-static void LnkT38(ptr) object *ptr;{ call_or_link_closure(VV[38],(void **)&Lnk38,(void **)&Lclptr38);} /* SETF PCL SLOT-VALUE-USING-CLASS */
-static void LnkT37(ptr) object *ptr;{ call_or_link_closure(VV[37],(void **)&Lnk37,(void **)&Lclptr37);} /* SLOT-DEFINITION-INITARGS */
-static void LnkT36(){ call_or_link(VV[36],(void **)&Lnk36);} /* CCLOSURE-ENV-NTHCDR */
-static object  LnkTLI35(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[35],(void **)&LnkLI35,first,ap);va_end(ap);return V1;} /* CHECK-INITARGS-1 */
-static void LnkT34(ptr) object *ptr;{ call_or_link_closure(VV[34],(void **)&Lnk34,(void **)&Lclptr34);} /* SLOT-DEFINITION-ALLOCATION */
-static void LnkT33(ptr) object *ptr;{ call_or_link_closure(VV[33],(void **)&Lnk33,(void **)&Lclptr33);} /* SLOT-DEFINITION-NAME */
-static void LnkT32(ptr) object *ptr;{ call_or_link_closure(VV[32],(void **)&Lnk32,(void **)&Lclptr32);} /* CLASS-SLOTS */
-static object  LnkTLI31(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[31],(void **)&LnkLI31,1,first,ap);va_end(ap);return V1;} /* CLASS-OF */
-static void LnkT11(ptr) object *ptr;{ call_or_link_closure(VV[11],(void **)&Lnk11,(void **)&Lclptr11);} /* SHARED-INITIALIZE */
-static object  LnkTLI30(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[30],(void **)&LnkLI30,4,first,ap);va_end(ap);return V1;} /* INITIALIZE-INSTANCE-SIMPLE */
-static void LnkT29(ptr) object *ptr;{ call_or_link_closure(VV[29],(void **)&Lnk29,(void **)&Lclptr29);} /* INITIALIZE-INSTANCE */
-static void LnkT28(ptr) object *ptr;{ call_or_link_closure(VV[28],(void **)&Lnk28,(void **)&Lclptr28);} /* ALLOCATE-INSTANCE */
-static void LnkT27(ptr) object *ptr;{ call_or_link_closure(VV[27],(void **)&Lnk27,(void **)&Lclptr27);} /* CLASS-NAME */
-static object  LnkTLI26(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[26],(void **)&LnkLI26,2,first,ap);va_end(ap);return V1;} /* UPDATE-INITIALIZE-INFO-INTERNAL */
-static object  LnkTLI0(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[0],(void **)&LnkLI0,first,ap);va_end(ap);return V1;} /* INITIALIZE-INFO */
-static void LnkT25(ptr) object *ptr;{ call_or_link_closure(VV[25],(void **)&Lnk25,(void **)&Lclptr25);} /* DEFAULT-INITARGS */
-static void LnkT24(ptr) object *ptr;{ call_or_link_closure(VV[24],(void **)&Lnk24,(void **)&Lclptr24);} /* FINALIZE-INHERITANCE */
-static void LnkT23(ptr) object *ptr;{ call_or_link_closure(VV[23],(void **)&Lnk23,(void **)&Lclptr23);} /* CLASS-FINALIZED-P */
-static void LnkT21(ptr) object *ptr;{ call_or_link_closure(VV[21],(void **)&Lnk21,(void **)&Lclptr21);} /* MAKE-INSTANCE */
-static object  LnkTLI22(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[22],(void **)&LnkLI22,first,ap);va_end(ap);return V1;} /* FIND-CLASS */
+static void LnkT48(){ call_or_link(VV[48],(void **)(void *)&Lnk48);} /* ANALYZE-LAMBDA-LIST */
+static void LnkT47(ptr) object *ptr;{ call_or_link_closure(VV[47],(void **)(void *)&Lnk47,(void **)(void *)&Lclptr47);} /* METHOD-LAMBDA-LIST */
+static object  LnkTLI46(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[46],(void **)(void *)&LnkLI46,1,first,ap);va_end(ap);return V1;} /* EARLY-METHOD-LAMBDA-LIST */
+static void LnkT45(ptr) object *ptr;{ call_or_link_closure(VV[45],(void **)(void *)&Lnk45,(void **)(void *)&Lclptr45);} /* COMPUTE-APPLICABLE-METHODS */
+static object  LnkTLI44(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[44],(void **)(void *)&LnkLI44,1,first,ap);va_end(ap);return V1;} /* GDEFINITION */
+static object  LnkTLI43(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[43],(void **)(void *)&LnkLI43,first,ap);va_end(ap);return V1;} /* CHECK-INITARGS-2-LIST */
+static object  LnkTLI42(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[42],(void **)(void *)&LnkLI42,first,ap);va_end(ap);return V1;} /* CHECK-INITARGS-2-PLIST */
+static void LnkT41(){ call_or_link(VV[41],(void **)(void *)&Lnk41);} /* CHECK-INITARGS-VALUES */
+static void LnkT40(ptr) object *ptr;{ call_or_link_closure(VV[40],(void **)(void *)&Lnk40,(void **)(void *)&Lclptr40);} /* SLOT-DEFINITION-INITFUNCTION */
+static void LnkT39(ptr) object *ptr;{ call_or_link_closure(VV[39],(void **)(void *)&Lnk39,(void **)(void *)&Lclptr39);} /* SLOT-BOUNDP-USING-CLASS */
+static void LnkT38(ptr) object *ptr;{ call_or_link_closure(VV[38],(void **)(void *)&Lnk38,(void **)(void *)&Lclptr38);} /* SETF PCL SLOT-VALUE-USING-CLASS */
+static void LnkT37(ptr) object *ptr;{ call_or_link_closure(VV[37],(void **)(void *)&Lnk37,(void **)(void *)&Lclptr37);} /* SLOT-DEFINITION-INITARGS */
+static void LnkT36(){ call_or_link(VV[36],(void **)(void *)&Lnk36);} /* CCLOSURE-ENV-NTHCDR */
+static object  LnkTLI35(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[35],(void **)(void *)&LnkLI35,first,ap);va_end(ap);return V1;} /* CHECK-INITARGS-1 */
+static void LnkT34(ptr) object *ptr;{ call_or_link_closure(VV[34],(void **)(void *)&Lnk34,(void **)(void *)&Lclptr34);} /* SLOT-DEFINITION-ALLOCATION */
+static void LnkT33(ptr) object *ptr;{ call_or_link_closure(VV[33],(void **)(void *)&Lnk33,(void **)(void *)&Lclptr33);} /* SLOT-DEFINITION-NAME */
+static void LnkT32(ptr) object *ptr;{ call_or_link_closure(VV[32],(void **)(void *)&Lnk32,(void **)(void *)&Lclptr32);} /* CLASS-SLOTS */
+static object  LnkTLI31(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[31],(void **)(void *)&LnkLI31,1,first,ap);va_end(ap);return V1;} /* CLASS-OF */
+static void LnkT11(ptr) object *ptr;{ call_or_link_closure(VV[11],(void **)(void *)&Lnk11,(void **)(void *)&Lclptr11);} /* SHARED-INITIALIZE */
+static object  LnkTLI30(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[30],(void **)(void *)&LnkLI30,4,first,ap);va_end(ap);return V1;} /* INITIALIZE-INSTANCE-SIMPLE */
+static void LnkT29(ptr) object *ptr;{ call_or_link_closure(VV[29],(void **)(void *)&Lnk29,(void **)(void *)&Lclptr29);} /* INITIALIZE-INSTANCE */
+static void LnkT28(ptr) object *ptr;{ call_or_link_closure(VV[28],(void **)(void *)&Lnk28,(void **)(void *)&Lclptr28);} /* ALLOCATE-INSTANCE */
+static void LnkT27(ptr) object *ptr;{ call_or_link_closure(VV[27],(void **)(void *)&Lnk27,(void **)(void *)&Lclptr27);} /* CLASS-NAME */
+static object  LnkTLI26(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[26],(void **)(void *)&LnkLI26,2,first,ap);va_end(ap);return V1;} /* UPDATE-INITIALIZE-INFO-INTERNAL */
+static object  LnkTLI0(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[0],(void **)(void *)&LnkLI0,first,ap);va_end(ap);return V1;} /* INITIALIZE-INFO */
+static void LnkT25(ptr) object *ptr;{ call_or_link_closure(VV[25],(void **)(void *)&Lnk25,(void **)(void *)&Lclptr25);} /* DEFAULT-INITARGS */
+static void LnkT24(ptr) object *ptr;{ call_or_link_closure(VV[24],(void **)(void *)&Lnk24,(void **)(void *)&Lclptr24);} /* FINALIZE-INHERITANCE */
+static void LnkT23(ptr) object *ptr;{ call_or_link_closure(VV[23],(void **)(void *)&Lnk23,(void **)(void *)&Lclptr23);} /* CLASS-FINALIZED-P */
+static void LnkT21(ptr) object *ptr;{ call_or_link_closure(VV[21],(void **)(void *)&Lnk21,(void **)(void *)&Lclptr21);} /* MAKE-INSTANCE */
+static object  LnkTLI22(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[22],(void **)(void *)&LnkLI22,first,ap);va_end(ap);return V1;} /* FIND-CLASS */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -75,7 +75,7 @@ structure_ref(object x, object name, int i)
    case aet_sf: return(make_shortfloat(STREF(shortfloat,x,s_pos[i])));
    case aet_lf: return(make_longfloat(STREF(longfloat,x,s_pos[i])));
    case aet_uchar: return(small_fixnum(STREF(unsigned char,x,s_pos[i])));
-   case aet_ushort: return(small_fixnum(STREF(unsigned short,x,s_pos[i])));
+   case aet_ushort: return(make_fixnum(STREF(unsigned short,x,s_pos[i])));
    case aet_short: return(make_fixnum(STREF(short,x,s_pos[i])));
    default:
      bad_raw_type();

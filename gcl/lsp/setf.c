@@ -2395,13 +2395,13 @@ T662:;
 	vs_top=(vs_base=base+3)+1;
 	return;}
 }
-static object  LnkTLI104(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[104],(void **)&LnkLI104,2,first,ap);va_end(ap);return V1;} /* SETF-EXPAND */
-static object  LnkTLI103(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[103],(void **)&LnkLI103,3,first,ap);va_end(ap);return V1;} /* SETF-EXPAND-1 */
-static void LnkT101(){ call_or_link(VV[101],(void **)&Lnk101);} /* GET-SETF-METHOD */
-static object  LnkTLI100(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[100],(void **)&LnkLI100,4,first,ap);va_end(ap);return V1;} /* SETF-STRUCTURE-ACCESS */
-static void LnkT99(){ call_or_link(VV[99],(void **)&Lnk99);} /* GET-SETF-METHOD-MULTIPLE-VALUE */
-static void LnkT98(){ call_or_link(VV[98],(void **)&Lnk98);} /* GET-&ENVIRONMENT */
-static object  LnkTLI97(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[97],(void **)&LnkLI97,1,first,ap);va_end(ap);return V1;} /* FIND-DOCUMENTATION */
+static object  LnkTLI104(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[104],(void **)(void *)&LnkLI104,2,first,ap);va_end(ap);return V1;} /* SETF-EXPAND */
+static object  LnkTLI103(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[103],(void **)(void *)&LnkLI103,3,first,ap);va_end(ap);return V1;} /* SETF-EXPAND-1 */
+static void LnkT101(){ call_or_link(VV[101],(void **)(void *)&Lnk101);} /* GET-SETF-METHOD */
+static object  LnkTLI100(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[100],(void **)(void *)&LnkLI100,4,first,ap);va_end(ap);return V1;} /* SETF-STRUCTURE-ACCESS */
+static void LnkT99(){ call_or_link(VV[99],(void **)(void *)&Lnk99);} /* GET-SETF-METHOD-MULTIPLE-VALUE */
+static void LnkT98(){ call_or_link(VV[98],(void **)(void *)&Lnk98);} /* GET-&ENVIRONMENT */
+static object  LnkTLI97(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[97],(void **)(void *)&LnkLI97,1,first,ap);va_end(ap);return V1;} /* FIND-DOCUMENTATION */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

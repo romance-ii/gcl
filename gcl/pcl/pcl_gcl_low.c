@@ -1326,23 +1326,23 @@ register object *base0;
 	return;
 	}
 }
-static void LnkT76(){ call_or_link(VV[76],(void **)&Lnk76);} /* STRUCTURE-REF1 */
-static void LnkT75(){ call_or_link(VV[75],(void **)&Lnk75);} /* PACKAGE-SIZE */
-static void LnkT74(){ call_or_link(VV[74],(void **)&Lnk74);} /* MAKE-ALL-PROCLAIMS */
-static void LnkT73(){ call_or_link(VV[73],(void **)&Lnk73);} /* OPEN */
-static void LnkT72(){ call_or_link(VV[72],(void **)&Lnk72);} /* GET-PACKAGES */
-static object  LnkTLI71(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[71],(void **)&LnkLI71,1,first,ap);va_end(ap);return V1;} /* DO-STANDARD-DEFSETF-1 */
-static object  LnkTLI70(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[70],(void **)&LnkLI70,1,first,ap);va_end(ap);return V1;} /* GET-SETF-FUNCTION-NAME */
-static object  LnkTLI69(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[69],(void **)&LnkLI69,1,first,ap);va_end(ap);return V1;} /* STRUCTURE-TYPE-INCLUDED-TYPE-NAME */
-static object  LnkTLI68(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[68],(void **)&LnkLI68,1,first,ap);va_end(ap);return V1;} /* STRUCTURE-TYPE-INTERNAL-SLOTDS */
-static object  LnkTLI67(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[67],(void **)&LnkLI67,1,first,ap);va_end(ap);return V1;} /* %STRUCTURE-NAME */
-static object  LnkTLI66(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[66],(void **)&LnkLI66,2,first,ap);va_end(ap);return V1;} /* %SET-COMPILED-FUNCTION-NAME */
-static object  LnkTLI65(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[65],(void **)&LnkLI65,2,first,ap);va_end(ap);return V1;} /* PROCLAIM-DEFMETHOD */
-static void LnkT64(){ call_or_link(VV[64],(void **)&Lnk64);} /* TURBO-CLOSURE */
-static void LnkT63(){ call_or_link(VV[63],(void **)&Lnk63);} /* EVERY */
-static void LnkT61(){ call_or_link(VV[61],(void **)&Lnk61);} /* FIFTH */
-static void LnkT60(){ call_or_link(VV[60],(void **)&Lnk60);} /* ADDRESS */
-static void LnkT59(){ call_or_link(VV[59],(void **)&Lnk59);} /* EXTRACT-DECLARATIONS */
+static void LnkT76(){ call_or_link(VV[76],(void **)(void *)&Lnk76);} /* STRUCTURE-REF1 */
+static void LnkT75(){ call_or_link(VV[75],(void **)(void *)&Lnk75);} /* PACKAGE-SIZE */
+static void LnkT74(){ call_or_link(VV[74],(void **)(void *)&Lnk74);} /* MAKE-ALL-PROCLAIMS */
+static void LnkT73(){ call_or_link(VV[73],(void **)(void *)&Lnk73);} /* OPEN */
+static void LnkT72(){ call_or_link(VV[72],(void **)(void *)&Lnk72);} /* GET-PACKAGES */
+static object  LnkTLI71(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[71],(void **)(void *)&LnkLI71,1,first,ap);va_end(ap);return V1;} /* DO-STANDARD-DEFSETF-1 */
+static object  LnkTLI70(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[70],(void **)(void *)&LnkLI70,1,first,ap);va_end(ap);return V1;} /* GET-SETF-FUNCTION-NAME */
+static object  LnkTLI69(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[69],(void **)(void *)&LnkLI69,1,first,ap);va_end(ap);return V1;} /* STRUCTURE-TYPE-INCLUDED-TYPE-NAME */
+static object  LnkTLI68(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[68],(void **)(void *)&LnkLI68,1,first,ap);va_end(ap);return V1;} /* STRUCTURE-TYPE-INTERNAL-SLOTDS */
+static object  LnkTLI67(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[67],(void **)(void *)&LnkLI67,1,first,ap);va_end(ap);return V1;} /* %STRUCTURE-NAME */
+static object  LnkTLI66(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[66],(void **)(void *)&LnkLI66,2,first,ap);va_end(ap);return V1;} /* %SET-COMPILED-FUNCTION-NAME */
+static object  LnkTLI65(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[65],(void **)(void *)&LnkLI65,2,first,ap);va_end(ap);return V1;} /* PROCLAIM-DEFMETHOD */
+static void LnkT64(){ call_or_link(VV[64],(void **)(void *)&Lnk64);} /* TURBO-CLOSURE */
+static void LnkT63(){ call_or_link(VV[63],(void **)(void *)&Lnk63);} /* EVERY */
+static void LnkT61(){ call_or_link(VV[61],(void **)(void *)&Lnk61);} /* FIFTH */
+static void LnkT60(){ call_or_link(VV[60],(void **)(void *)&Lnk60);} /* ADDRESS */
+static void LnkT59(){ call_or_link(VV[59],(void **)(void *)&Lnk59);} /* EXTRACT-DECLARATIONS */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -2993,34 +2993,34 @@ T937:;}
 	Lgensym();
 	return;
 }
-static object  LnkTLI174(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[174],(void **)&LnkLI174,2,first,ap);va_end(ap);return V1;} /* VARIABLE-SPECIAL-P */
-static object  LnkTLI173(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[173],(void **)&LnkLI173,3,first,ap);va_end(ap);return V1;} /* VARIABLE-SAME-P */
-static void LnkT171(){ call_or_link(VV[171],(void **)&Lnk171);} /* WALK-GATHERING-BODY */
-static object  LnkTLI170(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[170],(void **)&LnkLI170,3,first,ap);va_end(ap);return V1;} /* RENAME-AND-CAPTURE-VARIABLES */
-static void LnkT169(){ call_or_link(VV[169],(void **)&Lnk169);} /* SECOND */
-static object  LnkTLI168(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[168],(void **)&LnkLI168,3,first,ap);va_end(ap);return V1;} /* SIMPLE-EXPAND-GATHERING-FORM */
-static object  LnkTLI167(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[167],(void **)&LnkLI167,3,first,ap);va_end(ap);return V1;} /* OPTIMIZE-GATHERING-FORM */
-static object  LnkTLI158(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[158],(void **)&LnkLI158,1,first,ap);va_end(ap);return V1;} /* SEQUENCE-ACCESSOR */
-static void LnkT157(){ call_or_link(VV[157],(void **)&Lnk157);} /* REMOVE */
-static object  LnkTLI148(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[148],(void **)&LnkLI148,2,first,ap);va_end(ap);return V1;} /* VARIABLE-LEXICAL-P */
-static void LnkT147(){ call_or_link(VV[147],(void **)&Lnk147);} /* RENAME-VARIABLES */
-static void LnkT146(){ call_or_link(VV[146],(void **)&Lnk146);} /* UNION */
-static void LnkT145(){ call_or_link(VV[145],(void **)&Lnk145);} /* REMOVE-IF-NOT */
-static void LnkT144(){ call_or_link(VV[144],(void **)&Lnk144);} /* SET-DIFFERENCE */
-static void LnkT143(){ call_or_link(VV[143],(void **)&Lnk143);} /* INTERSECTION */
-static void LnkT139(){ call_or_link(VV[139],(void **)&Lnk139);} /* WALK-FORM */
-static object  LnkTLI137(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[137],(void **)&LnkLI137,2,first,ap);va_end(ap);return V1;} /* EXTRACT-SPECIAL-BINDINGS */
-static object  LnkTLI136(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[136],(void **)&LnkLI136,1,first,ap);va_end(ap);return V1;} /* VARIABLES-FROM-LET */
-static void LnkT135(){ call_or_link(VV[135],(void **)&Lnk135);} /* FIND-IF */
-static object  LnkTLI133(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[133],(void **)&LnkLI133,2,first,ap);va_end(ap);return V1;} /* MV-SETQ */
-static void LnkT132(){ call_or_link(VV[132],(void **)&Lnk132);} /* ITERATE-TRANSFORM-BODY */
-static void LnkT131(){ call_or_link(VV[131],(void **)&Lnk131);} /* PARSE-DECLARATIONS */
-static void LnkT130(){ call_or_link(VV[130],(void **)&Lnk130);} /* RENAME-LET-BINDINGS */
-static object  LnkTLI129(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[129],(void **)&LnkLI129,first,ap);va_end(ap);return V1;} /* MAYBE-WARN */
-static object  LnkTLI128(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[128],(void **)&LnkLI128,first,ap);va_end(ap);return V1;} /* FUNCTION-LAMBDA-P */
-static void LnkT127(){ call_or_link(VV[127],(void **)&Lnk127);} /* EXPAND-INTO-LET */
-static void LnkT126(){ call_or_link(VV[126],(void **)&Lnk126);} /* WARN */
-static object  LnkTLI125(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[125],(void **)&LnkLI125,3,first,ap);va_end(ap);return V1;} /* OPTIMIZE-ITERATE-FORM */
+static object  LnkTLI174(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[174],(void **)(void *)&LnkLI174,2,first,ap);va_end(ap);return V1;} /* VARIABLE-SPECIAL-P */
+static object  LnkTLI173(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[173],(void **)(void *)&LnkLI173,3,first,ap);va_end(ap);return V1;} /* VARIABLE-SAME-P */
+static void LnkT171(){ call_or_link(VV[171],(void **)(void *)&Lnk171);} /* WALK-GATHERING-BODY */
+static object  LnkTLI170(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[170],(void **)(void *)&LnkLI170,3,first,ap);va_end(ap);return V1;} /* RENAME-AND-CAPTURE-VARIABLES */
+static void LnkT169(){ call_or_link(VV[169],(void **)(void *)&Lnk169);} /* SECOND */
+static object  LnkTLI168(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[168],(void **)(void *)&LnkLI168,3,first,ap);va_end(ap);return V1;} /* SIMPLE-EXPAND-GATHERING-FORM */
+static object  LnkTLI167(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[167],(void **)(void *)&LnkLI167,3,first,ap);va_end(ap);return V1;} /* OPTIMIZE-GATHERING-FORM */
+static object  LnkTLI158(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[158],(void **)(void *)&LnkLI158,1,first,ap);va_end(ap);return V1;} /* SEQUENCE-ACCESSOR */
+static void LnkT157(){ call_or_link(VV[157],(void **)(void *)&Lnk157);} /* REMOVE */
+static object  LnkTLI148(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[148],(void **)(void *)&LnkLI148,2,first,ap);va_end(ap);return V1;} /* VARIABLE-LEXICAL-P */
+static void LnkT147(){ call_or_link(VV[147],(void **)(void *)&Lnk147);} /* RENAME-VARIABLES */
+static void LnkT146(){ call_or_link(VV[146],(void **)(void *)&Lnk146);} /* UNION */
+static void LnkT145(){ call_or_link(VV[145],(void **)(void *)&Lnk145);} /* REMOVE-IF-NOT */
+static void LnkT144(){ call_or_link(VV[144],(void **)(void *)&Lnk144);} /* SET-DIFFERENCE */
+static void LnkT143(){ call_or_link(VV[143],(void **)(void *)&Lnk143);} /* INTERSECTION */
+static void LnkT139(){ call_or_link(VV[139],(void **)(void *)&Lnk139);} /* WALK-FORM */
+static object  LnkTLI137(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[137],(void **)(void *)&LnkLI137,2,first,ap);va_end(ap);return V1;} /* EXTRACT-SPECIAL-BINDINGS */
+static object  LnkTLI136(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[136],(void **)(void *)&LnkLI136,1,first,ap);va_end(ap);return V1;} /* VARIABLES-FROM-LET */
+static void LnkT135(){ call_or_link(VV[135],(void **)(void *)&Lnk135);} /* FIND-IF */
+static object  LnkTLI133(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[133],(void **)(void *)&LnkLI133,2,first,ap);va_end(ap);return V1;} /* MV-SETQ */
+static void LnkT132(){ call_or_link(VV[132],(void **)(void *)&Lnk132);} /* ITERATE-TRANSFORM-BODY */
+static void LnkT131(){ call_or_link(VV[131],(void **)(void *)&Lnk131);} /* PARSE-DECLARATIONS */
+static void LnkT130(){ call_or_link(VV[130],(void **)(void *)&Lnk130);} /* RENAME-LET-BINDINGS */
+static object  LnkTLI129(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[129],(void **)(void *)&LnkLI129,first,ap);va_end(ap);return V1;} /* MAYBE-WARN */
+static object  LnkTLI128(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[128],(void **)(void *)&LnkLI128,first,ap);va_end(ap);return V1;} /* FUNCTION-LAMBDA-P */
+static void LnkT127(){ call_or_link(VV[127],(void **)(void *)&Lnk127);} /* EXPAND-INTO-LET */
+static void LnkT126(){ call_or_link(VV[126],(void **)(void *)&Lnk126);} /* WARN */
+static object  LnkTLI125(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[125],(void **)(void *)&LnkLI125,3,first,ap);va_end(ap);return V1;} /* OPTIMIZE-ITERATE-FORM */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

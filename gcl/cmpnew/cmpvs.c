@@ -221,8 +221,8 @@ T67:;
 	goto T60;}
 	return Cnil;
 }
-static object  LnkTLI12(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[12],(void **)&LnkLI12,1,first,ap);va_end(ap);return V1;} /* WT1 */
-static object  LnkTLI11(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[11],(void **)&LnkLI11,1,first,ap);va_end(ap);return V1;} /* WT-VS */
+static object  LnkTLI12(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[12],(void **)(void *)&LnkLI12,1,first,ap);va_end(ap);return V1;} /* WT1 */
+static object  LnkTLI11(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[11],(void **)(void *)&LnkLI11,1,first,ap);va_end(ap);return V1;} /* WT-VS */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -747,27 +747,27 @@ T160:;
 	return;}
 	}
 }
-static object  LnkTLI38(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[38],(void **)&LnkLI38,1,first,ap);va_end(ap);return V1;} /* FGEN-GENERATOR-LAMBDA */
-static object  LnkTLI37(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[37],(void **)&LnkLI37,1,first,ap);va_end(ap);return V1;} /* FGEN-GENSYMS */
-static object  LnkTLI36(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[36],(void **)&LnkLI36,3,first,ap);va_end(ap);return V1;} /* MAKE-TOP-LEVEL-FORM */
-static void LnkT35(){ call_or_link(VV[35],(void **)&Lnk35);} /* WALK-FORM */
-static void LnkT34(){ call_or_link(VV[34],(void **)&Lnk34);} /* COMPUTE-CODE */
-static object  LnkTLI33(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[33],(void **)&LnkLI33,1,first,ap);va_end(ap);return V1;} /* STORE-FGEN */
-static object  LnkTLI32(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[32],(void **)&LnkLI32,5,first,ap);va_end(ap);return V1;} /* MAKE-FGEN */
-static void LnkT31(){ call_or_link(VV[31],(void **)&Lnk31);} /* COMPILE-LAMBDA */
-static void LnkT30(){ call_or_link(VV[30],(void **)&Lnk30);} /* GET-NEW-FUNCTION-GENERATOR-INTERNAL */
-static object  LnkTLI29(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[29],(void **)&LnkLI29,3,first,ap);va_end(ap);return V1;} /* GET-NEW-FUNCTION-GENERATOR */
-static void LnkT28(){ call_or_link(VV[28],(void **)&Lnk28);} /* COMPUTE-TEST */
-static void LnkT27(){ call_or_link(VV[27],(void **)&Lnk27);} /* MAKE-ARRAY */
-static void LnkT26(){ call_or_link(VV[26],(void **)&Lnk26);} /* FIND */
-static object  LnkTLI24(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[24],(void **)&LnkLI24,1,first,ap);va_end(ap);return V1;} /* FGEN-SYSTEM */
-static object  LnkTLI23(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[23],(void **)&LnkLI23,1,first,ap);va_end(ap);return V1;} /* FGEN-GENERATOR */
-static object  LnkTLI22(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[22],(void **)&LnkLI22,1,first,ap);va_end(ap);return V1;} /* FGEN-TEST */
-static object  LnkTLI21(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[21],(void **)&LnkLI21,1,first,ap);va_end(ap);return V1;} /* LOOKUP-FGEN */
-static object  LnkTLI20(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[20],(void **)&LnkLI20,1,first,ap);va_end(ap);return V1;} /* DEFAULT-CONSTANTP */
-static void LnkT19(){ call_or_link(VV[19],(void **)&Lnk19);} /* TYPEP */
-static object  LnkTLI18(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[18],(void **)&LnkLI18,2,first,ap);va_end(ap);return V1;} /* COMPUTE-CONSTANTS */
-static object  LnkTLI17(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[17],(void **)&LnkLI17,3,first,ap);va_end(ap);return V1;} /* GET-FUNCTION-GENERATOR */
+static object  LnkTLI38(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[38],(void **)(void *)&LnkLI38,1,first,ap);va_end(ap);return V1;} /* FGEN-GENERATOR-LAMBDA */
+static object  LnkTLI37(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[37],(void **)(void *)&LnkLI37,1,first,ap);va_end(ap);return V1;} /* FGEN-GENSYMS */
+static object  LnkTLI36(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[36],(void **)(void *)&LnkLI36,3,first,ap);va_end(ap);return V1;} /* MAKE-TOP-LEVEL-FORM */
+static void LnkT35(){ call_or_link(VV[35],(void **)(void *)&Lnk35);} /* WALK-FORM */
+static void LnkT34(){ call_or_link(VV[34],(void **)(void *)&Lnk34);} /* COMPUTE-CODE */
+static object  LnkTLI33(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[33],(void **)(void *)&LnkLI33,1,first,ap);va_end(ap);return V1;} /* STORE-FGEN */
+static object  LnkTLI32(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[32],(void **)(void *)&LnkLI32,5,first,ap);va_end(ap);return V1;} /* MAKE-FGEN */
+static void LnkT31(){ call_or_link(VV[31],(void **)(void *)&Lnk31);} /* COMPILE-LAMBDA */
+static void LnkT30(){ call_or_link(VV[30],(void **)(void *)&Lnk30);} /* GET-NEW-FUNCTION-GENERATOR-INTERNAL */
+static object  LnkTLI29(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[29],(void **)(void *)&LnkLI29,3,first,ap);va_end(ap);return V1;} /* GET-NEW-FUNCTION-GENERATOR */
+static void LnkT28(){ call_or_link(VV[28],(void **)(void *)&Lnk28);} /* COMPUTE-TEST */
+static void LnkT27(){ call_or_link(VV[27],(void **)(void *)&Lnk27);} /* MAKE-ARRAY */
+static void LnkT26(){ call_or_link(VV[26],(void **)(void *)&Lnk26);} /* FIND */
+static object  LnkTLI24(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[24],(void **)(void *)&LnkLI24,1,first,ap);va_end(ap);return V1;} /* FGEN-SYSTEM */
+static object  LnkTLI23(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[23],(void **)(void *)&LnkLI23,1,first,ap);va_end(ap);return V1;} /* FGEN-GENERATOR */
+static object  LnkTLI22(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[22],(void **)(void *)&LnkLI22,1,first,ap);va_end(ap);return V1;} /* FGEN-TEST */
+static object  LnkTLI21(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[21],(void **)(void *)&LnkLI21,1,first,ap);va_end(ap);return V1;} /* LOOKUP-FGEN */
+static object  LnkTLI20(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[20],(void **)(void *)&LnkLI20,1,first,ap);va_end(ap);return V1;} /* DEFAULT-CONSTANTP */
+static void LnkT19(){ call_or_link(VV[19],(void **)(void *)&Lnk19);} /* TYPEP */
+static object  LnkTLI18(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[18],(void **)(void *)&LnkLI18,2,first,ap);va_end(ap);return V1;} /* COMPUTE-CONSTANTS */
+static object  LnkTLI17(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[17],(void **)(void *)&LnkLI17,3,first,ap);va_end(ap);return V1;} /* GET-FUNCTION-GENERATOR */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

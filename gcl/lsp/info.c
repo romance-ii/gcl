@@ -2484,45 +2484,45 @@ T935:;
 	return;
 	}
 }
-static void LnkT126(){ call_or_link(VV[126],(void **)&Lnk126);} /* DEFAULT-INFO-HOTLIST */
-static void LnkT125(){ call_or_link(VV[125],(void **)&Lnk125);} /* USER-HOMEDIR-PATHNAME */
-static object  LnkTLI124(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[124],(void **)&LnkLI124,first,ap);va_end(ap);return V1;} /* REMOVE-IF */
-static void LnkT123(){ call_or_link(VV[123],(void **)&Lnk123);} /* READ-FROM-STRING */
-static object  LnkTLI122(){return call_proc0(VV[122],(void **)&LnkLI122);} /* TYPE-ERROR */
-static void LnkT121(){ call_or_link(VV[121],(void **)&Lnk121);} /* OFFER-CHOICES */
-static void LnkT120(){ call_or_link(VV[120],(void **)&Lnk120);} /* INFO-AUX */
-static void LnkT119(){ call_or_link(VV[119],(void **)&Lnk119);} /* ADD-FILE */
-static void LnkT118(){ call_or_link(VV[118],(void **)&Lnk118);} /* GET-INFO-CHOICES */
-static void LnkT117(){ call_or_link(VV[117],(void **)&Lnk117);} /* END-WAITING */
-static void LnkT116(){ call_or_link(VV[116],(void **)&Lnk116);} /* PRINT-NODE */
-static void LnkT115(){ call_or_link(VV[115],(void **)&Lnk115);} /* GET-NODE-INDEX */
-static void LnkT114(){ call_or_link(VV[114],(void **)&Lnk114);} /* SETUP-INFO */
-static void LnkT113(){ call_or_link(VV[113],(void **)&Lnk113);} /* WAITING */
-static void LnkT112(){ call_or_link(VV[112],(void **)&Lnk112);} /* INFO-GET-FILE */
-static void LnkT111(){ call_or_link(VV[111],(void **)&Lnk111);} /* INFO-SUBFILE */
-static void LnkT110(){ call_or_link(VV[110],(void **)&Lnk110);} /* WINFO */
-static void LnkT109(){ call_or_link(VV[109],(void **)&Lnk109);} /* TKERROR */
-static void LnkT108(){ call_or_link(VV[108],(void **)&Lnk108);} /* NODES-FROM-INDEX */
-static void LnkT107(){ call_or_link(VV[107],(void **)&Lnk107);} /* INFO-GET-TAGS */
-static void LnkT106(){ call_or_link(VV[106],(void **)&Lnk106);} /* FILE-SEARCH */
-static void LnkT105(){ call_or_link(VV[105],(void **)&Lnk105);} /* FIX-LOAD-PATH */
-static void LnkT104(){ call_or_link(VV[104],(void **)&Lnk104);} /* GET-INDEX-NODE */
-static void LnkT103(){ call_or_link(VV[103],(void **)&Lnk103);} /* SHOW-INFO */
-static void LnkT102(){ call_or_link(VV[102],(void **)&Lnk102);} /* GET-NODES */
-static void LnkT101(){ call_or_link(VV[101],(void **)&Lnk101);} /* STRING-CONCATENATE */
-static void LnkT100(){ call_or_link(VV[100],(void **)&Lnk100);} /* RE-QUOTE-STRING */
-static object  LnkTLI99(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[99],(void **)&LnkLI99,first,ap);va_end(ap);return V1;} /* POSITION */
-static void LnkT98(){ call_or_link(VV[98],(void **)&Lnk98);} /* INFO-ERROR */
-static void LnkT97(){ call_or_link(VV[97],(void **)&Lnk97);} /* GET-MATCH */
-static void LnkT96(){ call_or_link(VV[96],(void **)&Lnk96);} /* ATOI */
-static object  LnkTLI95(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[95],(void **)&LnkLI95,4353,first,ap);va_end(ap);return V1;} /* MATCH-BEGINNING */
-static object  LnkTLI94(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[94],(void **)&LnkLI94,4353,first,ap);va_end(ap);return V1;} /* MATCH-END */
-static object  LnkTLI93(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[93],(void **)&LnkLI93,first,ap);va_end(ap);return V1;} /* STRING-MATCH */
-static void LnkT92(){ call_or_link(VV[92],(void **)&Lnk92);} /* FILE-TO-STRING */
-static void LnkT91(){ call_or_link(VV[91],(void **)&Lnk91);} /* FREAD */
-static void LnkT90(){ call_or_link(VV[90],(void **)&Lnk90);} /* OPEN */
-static object  LnkTLI89(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[89],(void **)&LnkLI89,first,ap);va_end(ap);return V1;} /* VECTOR-PUSH-EXTEND */
-static object  LnkTLI88(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[88],(void **)&LnkLI88,first,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
+static void LnkT126(){ call_or_link(VV[126],(void **)(void *)&Lnk126);} /* DEFAULT-INFO-HOTLIST */
+static void LnkT125(){ call_or_link(VV[125],(void **)(void *)&Lnk125);} /* USER-HOMEDIR-PATHNAME */
+static object  LnkTLI124(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[124],(void **)(void *)&LnkLI124,first,ap);va_end(ap);return V1;} /* REMOVE-IF */
+static void LnkT123(){ call_or_link(VV[123],(void **)(void *)&Lnk123);} /* READ-FROM-STRING */
+static object  LnkTLI122(){return call_proc0(VV[122],(void **)(void *)&LnkLI122);} /* TYPE-ERROR */
+static void LnkT121(){ call_or_link(VV[121],(void **)(void *)&Lnk121);} /* OFFER-CHOICES */
+static void LnkT120(){ call_or_link(VV[120],(void **)(void *)&Lnk120);} /* INFO-AUX */
+static void LnkT119(){ call_or_link(VV[119],(void **)(void *)&Lnk119);} /* ADD-FILE */
+static void LnkT118(){ call_or_link(VV[118],(void **)(void *)&Lnk118);} /* GET-INFO-CHOICES */
+static void LnkT117(){ call_or_link(VV[117],(void **)(void *)&Lnk117);} /* END-WAITING */
+static void LnkT116(){ call_or_link(VV[116],(void **)(void *)&Lnk116);} /* PRINT-NODE */
+static void LnkT115(){ call_or_link(VV[115],(void **)(void *)&Lnk115);} /* GET-NODE-INDEX */
+static void LnkT114(){ call_or_link(VV[114],(void **)(void *)&Lnk114);} /* SETUP-INFO */
+static void LnkT113(){ call_or_link(VV[113],(void **)(void *)&Lnk113);} /* WAITING */
+static void LnkT112(){ call_or_link(VV[112],(void **)(void *)&Lnk112);} /* INFO-GET-FILE */
+static void LnkT111(){ call_or_link(VV[111],(void **)(void *)&Lnk111);} /* INFO-SUBFILE */
+static void LnkT110(){ call_or_link(VV[110],(void **)(void *)&Lnk110);} /* WINFO */
+static void LnkT109(){ call_or_link(VV[109],(void **)(void *)&Lnk109);} /* TKERROR */
+static void LnkT108(){ call_or_link(VV[108],(void **)(void *)&Lnk108);} /* NODES-FROM-INDEX */
+static void LnkT107(){ call_or_link(VV[107],(void **)(void *)&Lnk107);} /* INFO-GET-TAGS */
+static void LnkT106(){ call_or_link(VV[106],(void **)(void *)&Lnk106);} /* FILE-SEARCH */
+static void LnkT105(){ call_or_link(VV[105],(void **)(void *)&Lnk105);} /* FIX-LOAD-PATH */
+static void LnkT104(){ call_or_link(VV[104],(void **)(void *)&Lnk104);} /* GET-INDEX-NODE */
+static void LnkT103(){ call_or_link(VV[103],(void **)(void *)&Lnk103);} /* SHOW-INFO */
+static void LnkT102(){ call_or_link(VV[102],(void **)(void *)&Lnk102);} /* GET-NODES */
+static void LnkT101(){ call_or_link(VV[101],(void **)(void *)&Lnk101);} /* STRING-CONCATENATE */
+static void LnkT100(){ call_or_link(VV[100],(void **)(void *)&Lnk100);} /* RE-QUOTE-STRING */
+static object  LnkTLI99(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[99],(void **)(void *)&LnkLI99,first,ap);va_end(ap);return V1;} /* POSITION */
+static void LnkT98(){ call_or_link(VV[98],(void **)(void *)&Lnk98);} /* INFO-ERROR */
+static void LnkT97(){ call_or_link(VV[97],(void **)(void *)&Lnk97);} /* GET-MATCH */
+static void LnkT96(){ call_or_link(VV[96],(void **)(void *)&Lnk96);} /* ATOI */
+static object  LnkTLI95(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[95],(void **)(void *)&LnkLI95,4353,first,ap);va_end(ap);return V1;} /* MATCH-BEGINNING */
+static object  LnkTLI94(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[94],(void **)(void *)&LnkLI94,4353,first,ap);va_end(ap);return V1;} /* MATCH-END */
+static object  LnkTLI93(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[93],(void **)(void *)&LnkLI93,first,ap);va_end(ap);return V1;} /* STRING-MATCH */
+static void LnkT92(){ call_or_link(VV[92],(void **)(void *)&Lnk92);} /* FILE-TO-STRING */
+static void LnkT91(){ call_or_link(VV[91],(void **)(void *)&Lnk91);} /* FREAD */
+static void LnkT90(){ call_or_link(VV[90],(void **)(void *)&Lnk90);} /* OPEN */
+static object  LnkTLI89(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[89],(void **)(void *)&LnkLI89,first,ap);va_end(ap);return V1;} /* VECTOR-PUSH-EXTEND */
+static object  LnkTLI88(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[88],(void **)(void *)&LnkLI88,first,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -1057,14 +1057,14 @@ T355:;
 	vs_top=(vs_base=base+6)+1;
 	return;}
 }
-static void LnkT68(){ call_or_link(VV[68],(void **)&Lnk68);} /* SPECIFIC-ERROR */
-static object  LnkTLI67(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[67],(void **)&LnkLI67,1,first,ap);va_end(ap);return V1;} /* PRINT-SYMBOL-APROPOS */
-static object  LnkTLI66(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[66],(void **)&LnkLI66,first,ap);va_end(ap);return V1;} /* APROPOS-LIST */
-static void LnkT65(){ call_or_link(VV[65],(void **)&Lnk65);} /* STABLE-SORT */
-static object  LnkTLI63(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[63],(void **)&LnkLI63,first,ap);va_end(ap);return V1;} /* DELETE-DUPLICATES */
-static object  LnkTLI62(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[62],(void **)&LnkLI62,2,first,ap);va_end(ap);return V1;} /* SUBSTRINGP */
-static void LnkT15(){ call_or_link(VV[15],(void **)&Lnk15);} /* PACKAGE-SIZE */
-static void LnkT61(){ call_or_link(VV[61],(void **)&Lnk61);} /* FIND-DECLARATIONS */
+static void LnkT68(){ call_or_link(VV[68],(void **)(void *)&Lnk68);} /* SPECIFIC-ERROR */
+static object  LnkTLI67(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[67],(void **)(void *)&LnkLI67,1,first,ap);va_end(ap);return V1;} /* PRINT-SYMBOL-APROPOS */
+static object  LnkTLI66(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[66],(void **)(void *)&LnkLI66,first,ap);va_end(ap);return V1;} /* APROPOS-LIST */
+static void LnkT65(){ call_or_link(VV[65],(void **)(void *)&Lnk65);} /* STABLE-SORT */
+static object  LnkTLI63(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[63],(void **)(void *)&LnkLI63,first,ap);va_end(ap);return V1;} /* DELETE-DUPLICATES */
+static object  LnkTLI62(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[62],(void **)(void *)&LnkLI62,2,first,ap);va_end(ap);return V1;} /* SUBSTRINGP */
+static void LnkT15(){ call_or_link(VV[15],(void **)(void *)&Lnk15);} /* PACKAGE-SIZE */
+static void LnkT61(){ call_or_link(VV[61],(void **)(void *)&Lnk61);} /* FIND-DECLARATIONS */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -203,9 +203,13 @@ work during bootstrapping.
 		  (duplicate-option :method-class)
 		  (initarg :method-class `',(cadr option))))
 	    (:method
-	      (error
-		"DEFGENERIC doesn't support the :METHOD option yet."))))
-
+;	      (error
+;		"DEFGENERIC doesn't support the :METHOD option yet."))))
+	     (push `(defmethod ,function-specifier ,@(cdr option))
+		   methods))))
+;	    (t ;unsuported things must get a 'program-error
+;	     (simple-program-error "Unsupported option ~S." option))))
+	
 	(let ((declarations (initarg :declarations)))
 	  (when declarations (initarg :declarations `',declarations)))))
     `(progn

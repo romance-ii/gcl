@@ -341,7 +341,7 @@ DEFUN_NEW("GETPEERNAME",object,fSgetpeername,SI,1,1,NONE,OO,OO,OO,OO,(object soc
             if (hostEntPtr != (struct hostent *) NULL) 
                host = make_simple_string(hostEntPtr->h_name);
             else host = address;
-	    return list(3,address,host,small_fixnum(ntohs(peername.sin_port)));
+	    return list(3,address,host,make_fixnum(ntohs(peername.sin_port)));
  } else {
    return Cnil;
  }
@@ -364,7 +364,7 @@ DEFUN_NEW("GETSOCKNAME",object,fSgetsockname,SI,1,1,NONE,OO,OO,OO,OO,(object soc
   if (hostEntPtr != (struct hostent *) NULL)
    host = make_simple_string(hostEntPtr->h_name);
   else host=address;
-  return list(3,address,host,small_fixnum(ntohs(sockname.sin_port)));
+  return list(3,address,host,make_fixnum(ntohs(sockname.sin_port)));
  } else {
    return Cnil;
  }

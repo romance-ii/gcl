@@ -1547,19 +1547,19 @@ register object *base0;
 	return;
 	}
 }
-static void LnkT83(){ call_or_link(VV[83],(void **)&Lnk83);} /* INVOKE-RESTART-INTERACTIVELY */
-static void LnkT82(){ call_or_link(VV[82],(void **)&Lnk82);} /* INVOKE-RESTART */
-static object  LnkTLI81(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[81],(void **)&LnkLI81,first,ap);va_end(ap);return V1;} /* MAKE-RESTART */
-static void LnkT80(){ call_or_link(VV[80],(void **)&Lnk80);} /* EXECUTE-DEBUGGER-COMMAND */
-static object  LnkTLI79(){return call_proc0(VV[79],(void **)&LnkLI79);} /* READ-DEBUG-COMMAND */
-static object  LnkTLI78(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[78],(void **)&LnkLI78,first,ap);va_end(ap);return V1;} /* SHOW-RESTARTS */
-static object  LnkTLI77(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[77],(void **)&LnkLI77,first,ap);va_end(ap);return V1;} /* FIND-RESTART */
-static object  LnkTLI76(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[76],(void **)&LnkLI76,first,ap);va_end(ap);return V1;} /* COMPUTE-RESTARTS */
-static void LnkT75(){ call_or_link(VV[75],(void **)&Lnk75);} /* COERCE-TO-CONDITION */
-static void LnkT74(){ call_or_link(VV[74],(void **)&Lnk74);} /* GET-OUTPUT-STREAM-STRING */
-static void LnkT73(){ call_or_link(VV[73],(void **)&Lnk73);} /* MAKE-STRING-OUTPUT-STREAM */
-static void LnkT67(){ call_or_link(VV[67],(void **)&Lnk67);} /* MAKE-STRING-INPUT-STREAM */
-static void LnkT65(){ call_or_link(VV[65],(void **)&Lnk65);} /* *MAKE-SPECIAL */
+static void LnkT83(){ call_or_link(VV[83],(void **)(void *)&Lnk83);} /* INVOKE-RESTART-INTERACTIVELY */
+static void LnkT82(){ call_or_link(VV[82],(void **)(void *)&Lnk82);} /* INVOKE-RESTART */
+static object  LnkTLI81(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[81],(void **)(void *)&LnkLI81,first,ap);va_end(ap);return V1;} /* MAKE-RESTART */
+static void LnkT80(){ call_or_link(VV[80],(void **)(void *)&Lnk80);} /* EXECUTE-DEBUGGER-COMMAND */
+static object  LnkTLI79(){return call_proc0(VV[79],(void **)(void *)&LnkLI79);} /* READ-DEBUG-COMMAND */
+static object  LnkTLI78(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[78],(void **)(void *)&LnkLI78,first,ap);va_end(ap);return V1;} /* SHOW-RESTARTS */
+static object  LnkTLI77(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[77],(void **)(void *)&LnkLI77,first,ap);va_end(ap);return V1;} /* FIND-RESTART */
+static object  LnkTLI76(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[76],(void **)(void *)&LnkLI76,first,ap);va_end(ap);return V1;} /* COMPUTE-RESTARTS */
+static void LnkT75(){ call_or_link(VV[75],(void **)(void *)&Lnk75);} /* COERCE-TO-CONDITION */
+static void LnkT74(){ call_or_link(VV[74],(void **)(void *)&Lnk74);} /* GET-OUTPUT-STREAM-STRING */
+static void LnkT73(){ call_or_link(VV[73],(void **)(void *)&Lnk73);} /* MAKE-STRING-OUTPUT-STREAM */
+static void LnkT67(){ call_or_link(VV[67],(void **)(void *)&Lnk67);} /* MAKE-STRING-INPUT-STREAM */
+static void LnkT65(){ call_or_link(VV[65],(void **)(void *)&Lnk65);} /* *MAKE-SPECIAL */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

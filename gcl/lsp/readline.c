@@ -375,8 +375,8 @@ T2:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-static void LnkT0(){ call_or_link(VV[0],(void **)&Lnk0);} /* READLINE-INIT */
-static void LnkT6(){ call_or_link(VV[6],(void **)&Lnk6);} /* PACKAGE-SIZE */
+static void LnkT0(){ call_or_link(VV[0],(void **)(void *)&Lnk0);} /* READLINE-INIT */
+static void LnkT6(){ call_or_link(VV[6],(void **)(void *)&Lnk6);} /* PACKAGE-SIZE */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -1223,17 +1223,17 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-static object  LnkTLI23(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[23],(void **)&LnkLI23,3,first,ap);va_end(ap);return V1;} /* DPB */
-static object  LnkTLI22(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[22],(void **)&LnkLI22,2,first,ap);va_end(ap);return V1;} /* MASK-FIELD */
-static object  LnkTLI21(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[21],(void **)&LnkLI21,2,first,ap);va_end(ap);return V1;} /* LDB */
-static object  LnkTLI20(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[20],(void **)&LnkLI20,1,first,ap);va_end(ap);return V1;} /* BYTE-SIZE */
-static object  LnkTLI19(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[19],(void **)&LnkLI19,1,first,ap);va_end(ap);return V1;} /* BYTE-POSITION */
-static object  LnkTLI18(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[18],(void **)&LnkLI18,2,first,ap);va_end(ap);return V1;} /* LOGANDC2 */
-static object  LnkTLI17(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[17],(void **)&LnkLI17,3,first,ap);va_end(ap);return V1;} /* TYPECASE-ERROR-STRING */
-static void LnkT16(){ call_or_link(VV[16],(void **)&Lnk16);} /* RATIONALP */
-static object  LnkTLI15(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[15],(void **)&LnkLI15,1,first,ap);va_end(ap);return V1;} /* COSH */
-static object  LnkTLI14(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[14],(void **)&LnkLI14,1,first,ap);va_end(ap);return V1;} /* SINH */
-static object  LnkTLI13(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[13],(void **)&LnkLI13,1,first,ap);va_end(ap);return V1;} /* ABS */
+static object  LnkTLI23(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[23],(void **)(void *)&LnkLI23,3,first,ap);va_end(ap);return V1;} /* DPB */
+static object  LnkTLI22(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[22],(void **)(void *)&LnkLI22,2,first,ap);va_end(ap);return V1;} /* MASK-FIELD */
+static object  LnkTLI21(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[21],(void **)(void *)&LnkLI21,2,first,ap);va_end(ap);return V1;} /* LDB */
+static object  LnkTLI20(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[20],(void **)(void *)&LnkLI20,1,first,ap);va_end(ap);return V1;} /* BYTE-SIZE */
+static object  LnkTLI19(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[19],(void **)(void *)&LnkLI19,1,first,ap);va_end(ap);return V1;} /* BYTE-POSITION */
+static object  LnkTLI18(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[18],(void **)(void *)&LnkLI18,2,first,ap);va_end(ap);return V1;} /* LOGANDC2 */
+static object  LnkTLI17(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[17],(void **)(void *)&LnkLI17,3,first,ap);va_end(ap);return V1;} /* TYPECASE-ERROR-STRING */
+static void LnkT16(){ call_or_link(VV[16],(void **)(void *)&Lnk16);} /* RATIONALP */
+static object  LnkTLI15(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[15],(void **)(void *)&LnkLI15,1,first,ap);va_end(ap);return V1;} /* COSH */
+static object  LnkTLI14(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[14],(void **)(void *)&LnkLI14,1,first,ap);va_end(ap);return V1;} /* SINH */
+static object  LnkTLI13(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[13],(void **)(void *)&LnkLI13,1,first,ap);va_end(ap);return V1;} /* ABS */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT
