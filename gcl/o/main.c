@@ -133,6 +133,9 @@ main(int argc, char **argv, char **envp) {
     setbuf(stdout, stdout_buf);
 #ifdef _WIN32
     _fmode = _O_BINARY;
+    _setmode( _fileno( stdin ), _O_BINARY );
+    _setmode( _fileno( stdout ), _O_BINARY );
+    _setmode( _fileno( stderr ), _O_BINARY );
 #endif
     ARGC = argc;
     ARGV = argv;
