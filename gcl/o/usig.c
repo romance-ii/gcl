@@ -41,8 +41,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "usig.h"
 
-EXTER
-char signals_handled[32];
+extern char signals_handled[];
 
 void
 gcl_signal(int signo, handler_function_type handler)

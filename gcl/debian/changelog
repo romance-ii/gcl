@@ -1,3 +1,10 @@
+gclcvs (2.7.0-27) unstable; urgency=low
+
+  * Fixup bad extern declaration of signals_handled in usig.c
+  * Minor extern declaration fixup for signals_handled in usig.c
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 25 Jun 2004 23:07:23 +0000
+
 gclcvs (2.7.0-26) unstable; urgency=low
 
   * C_GC_OFFSET is 2 on m68k-linux
