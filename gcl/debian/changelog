@@ -1,3 +1,9 @@
+gclcvs (2.7.0-17) unstable; urgency=low
+
+  * Fix gcl-doc doc-base files
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 30 Dec 2003 22:35:58 +0000
+
 gclcvs (2.7.0-16) unstable; urgency=low
 
   * Fix bug in compiler::c2labels in which *ccb-vs* was missing a ocal

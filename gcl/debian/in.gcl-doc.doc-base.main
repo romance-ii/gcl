@@ -8,5 +8,5 @@ Format: DVI
 Files: /usr/share/doc/gcl@EXT@-doc/gcl.dvi.gz /usr/share/doc/gcl@EXT@-doc/gcl.dvi
 
 Format: HTML
-Index: /usr/share/doc/gcl@EXT@-doc/gcl.html/gcl_toc.html
-Files: /usr/share/doc/gcl@EXT@-doc/gcl.html/gcl*.html
+Index: /usr/share/doc/gcl@EXT@-doc/gcl.html/index.html
+Files: /usr/share/doc/gcl@EXT@-doc/gcl.html/*.html
