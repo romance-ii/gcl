@@ -160,6 +160,7 @@ clean:
 	rm -f h/config.h h/gclincl.h h/cmpinclude.h
 	rm -rf gmp/.deps gmp/libgmp.a
 	rm -f xbin/gcl foo foo.c
+	rm -f h/*-linux.defs
 
 CMPINCLUDE_FILES=${HDIR}cmpincl1.h ${HDIR}gclincl.h ${HDIR}compbas.h ${HDIR}enum.h $(MP_INCLUDE) ${HDIR}object.h ${HDIR}vs.h \
 	${HDIR}bds.h ${HDIR}frame.h \

@@ -194,3 +194,10 @@ SGC is enabled.  */
 #endif
 
 #undef LITTLE_END
+
+#undef PAGEWIDTH
+
+/*  #ifdef PAGEWIDTH */
+/*  #undef PAGESIZE */
+/*  #define PAGESIZE (1<<PAGEWIDTH) */
+/*  #endif */

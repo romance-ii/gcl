@@ -2,7 +2,7 @@
 
 /*  #ifdef IN_GBC */
 /*  #define GET_FAULT_ADDR(sig,code,sv,a) \ */
-/*      ((void *)(*((char ***)(&code)))[17]) */
+/*      ((void *)(((struct sigcontext_struct *)(&code))->cr2))      */
 /*  #endif */
 
 /*#define NULL_OR_ON_C_STACK(x) ((x)==0 || ((unsigned int)x) > (unsigned int)(pagetochar(MAXPAGE+1)))*/

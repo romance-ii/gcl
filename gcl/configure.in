@@ -66,7 +66,7 @@ main()
 {
   char *b = (void *) malloc(1000);
   FILE *fp = fopen("conftest1","w");
-  fprintf(fp,"0x%x",((unsigned int) b) & ~0xffffff);
+  fprintf(fp,"0x%lx",((unsigned long) b) & ~(unsigned long)0xffffff);
   fclose(fp);
   return 0;
 }],dbegin=`cat conftest1`,dbegin=0,dbegin=0)
@@ -124,6 +124,18 @@ fi
 
 AC_SUBST(FLISP)
 
+# pagewidth
+AC_MSG_CHECKING(for pagewidth)
+AC_TRY_RUN([#include <stdio.h>
+            #include <unistd.h>
+int main() {size_t i=getpagesize(),j; 
+	    FILE *fp=fopen("conftest1","w");
+	    for (j=0;i>>=1;j++);
+	    fprintf(fp,"%u",j);
+	    return 0;}],PAGEWIDTH=`cat conftest1`,PAGEWIDTH=0,PAGEWIDTH=0)
+AC_MSG_RESULT($PAGEWIDTH)
+AC_DEFINE_UNQUOTED(PAGEWIDTH,$PAGEWIDTH)
+AC_SUBST(PAGEWIDTH)
 
 # bfd probe
 
@@ -422,37 +434,37 @@ case $canonical in
      use=386-bsd;;
 
      *86-*-linux*)
-     use=386-linux;;
+     use=386-linux; ln -snf linux.defs h/$use.defs;;
 
      m68k-*-linux*)
-     use=m68k-linux;;
+     use=m68k-linux; ln -snf linux.defs h/$use.defs;;
 
-     alpha-*-linux*)
-     use=alpha-linux;;
+     alpha*-*-linux*)
+     use=alpha-linux; ln -snf linux.defs h/$use.defs;;
 
      mips-*-linux*)
-     use=mips-linux;;
+     use=mips-linux; ln -snf linux.defs h/$use.defs;;
 
      mipsel-*-linux*)
-     use=mipsel-linux;;
+     use=mipsel-linux; ln -snf linux.defs h/$use.defs;;
 
-     sparc-*-linux*)
-     use=sparc-linux;;
+     sparc*-*-linux*)
+     use=sparc-linux; ln -snf linux.defs h/$use.defs;;
 
      arm*-*-linux*)
-     use=arm-linux;;
+     use=arm-linux; ln -snf linux.defs h/$use.defs;;
 
      s390-*-linux*)
-     use=s390-linux;;
+     use=s390-linux; ln -snf linux.defs h/$use.defs;;
 
      ia64-*-linux*)
-     use=ia64-linux;;
+     use=ia64-linux; ln -snf linux.defs h/$use.defs;;
 
      hppa-*-linux*)
-     use=hppa-linux;;
+     use=hppa-linux; ln -snf linux.defs h/$use.defs;;
 
      powerpc-*-linux*)
-     use=powerpc-linux;;
+     use=powerpc-linux; ln -snf linux.defs h/$use.defs;;
 
      alpha-dec-osf)
      use=alpha-osf1;;

@@ -147,6 +147,13 @@
 
 #undef LITTLE_END
 
+#undef PAGEWIDTH
+
+/*  #ifdef PAGEWIDTH */
+/*  #undef PAGESIZE */
+/*  #define PAGESIZE (1<<PAGEWIDTH) */
+/*  #endif */
+
 /* Define if you have the getcwd function.  */
 #undef HAVE_GETCWD
 
