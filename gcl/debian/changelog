@@ -4,8 +4,9 @@ gclcvs (2.7.0-36) unstable; urgency=low
     correctly choose which arguments need pre-evaluation in binary op
     compiler-macros
   * fix fix_bitp reference to 30 instead of LOG_WORD_SIZE-2
+  * int ->fixnum in list.d
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 28 Nov 2004 04:06:18 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 28 Nov 2004 04:26:56 +0000
 
 gclcvs (2.7.0-35) unstable; urgency=high
 

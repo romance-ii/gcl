@@ -243,7 +243,7 @@ stack_cons(void)
  goto TOP;
 }*/
 
-object on_stack_list_vector_new(int n,object first,va_list ap)
+object on_stack_list_vector_new(fixnum n,object first,va_list ap)
 {object res=(object) alloca_val;
  struct cons *p;
  object x;
@@ -279,7 +279,7 @@ object on_stack_list_vector_new(int n,object first,va_list ap)
  return ans;
 }*/
 
-object list_vector_new(int n,object first,va_list ap)
+object list_vector_new(fixnum n,object first,va_list ap)
 {object ans,*p;
  
  if (n == 0) return Cnil;
@@ -304,7 +304,7 @@ object list_vector_new(int n,object first,va_list ap)
 
    
 
-object list(int n,...)
+object list(fixnum n,...)
 { va_list ap;
   struct typemanager *tm=(&tm_table[(int)t_cons]);
   va_start(ap,n);
@@ -322,7 +322,7 @@ object list(int n,...)
      }
   else
     {BEGIN_NO_INTERRUPT;
-    {int i=0;
+    {fixnum i=0;
     object tail=tm->tm_free;
     object lis;
     tm->tm_nfree -= n;
@@ -351,7 +351,7 @@ object list(int n,...)
 
 }
 
-object listA(int n, ...)
+object listA(fixnum n, ...)
 {       va_list ap;
 	object *p = vs_top;
 	va_start(ap,n);
@@ -730,7 +730,7 @@ LFD(Lendp)()
 
 LFD(Llist_length)()
 {
-	int n;
+	fixnum n;
 	object fast, slow;
 	check_arg(1);
 	n = 0;
@@ -756,7 +756,7 @@ LFD(Llist_length)()
 
 
 object
-nth(int n, object x) {
+nth(fixnum n, object x) {
 
 	if (n < 0) {
 		vs_push(make_fixnum(n));
@@ -781,7 +781,7 @@ LFD(Lnthcdr)()
 }
 
 object
-nthcdr(int n, object x) {
+nthcdr(fixnum n, object x) {
 
 	if (n < 0) {
 		vs_push(make_fixnum(n));
@@ -797,7 +797,7 @@ nthcdr(int n, object x) {
 
 LFD(Llast)() {
 	object t;
-	int n;
+	fixnum n;
 
 	n=vs_top-vs_base;
 	if (n<1)
@@ -860,7 +860,7 @@ object x;
         
  
 object on_stack_make_list(n)
-int n;
+fixnum n;
 { object res=(object) alloca_val;
  struct cons *p = (struct cons *)res;
  if (n<=0) return Cnil;
@@ -878,14 +878,14 @@ int n;
 }
 
 object make_list(n)
-int n;
+fixnum n;
 {object x =Cnil ;
   while (n-- > 0)
     x = make_cons(Cnil, x);
  return x;}
 
 @(defun make_list (size &key initial_element &aux x)
-	int i;
+	fixnum i;
 @
 	check_type_non_negative_integer(&size);
 	if (type_of(size) != t_fixnum)
@@ -960,7 +960,7 @@ nconc(object x, object y) {
 
 LFD(Lnconc)() {
 	object x, l, m=Cnil;
-        int i, narg;
+        fixnum i, narg;
 	
 	narg = vs_top - vs_base - 1;
 	if (narg < 0) { vs_push(Cnil); return; }
@@ -1000,7 +1000,7 @@ LFD(Lreconc)() {
 }
 
 @(defun butlast (lis &optional (nn `make_fixnum(1)`))
-	int i;
+	fixnum i;
 @
 	check_type_non_negative_integer(&nn);
 	if (type_of(nn) != t_fixnum)
@@ -1021,7 +1021,7 @@ LFD(Lreconc)() {
 @)
 
 @(defun nbutlast (lis &optional (nn `make_fixnum(1)`))
-	int i;
+	fixnum i;
 	object x;
 @
 	check_type_non_negative_integer(&nn);
@@ -1038,7 +1038,7 @@ LFD(Lreconc)() {
 @)
 
 LFD(Lldiff)() {
-	int i;
+	fixnum i;
 	object x;
 
 	check_arg(2);
