@@ -27,7 +27,7 @@ Package:SI
 GCL specific: Tells the GCL memory manager whether to attempt to
 adjust the maximum allowable pages for each type to approximately
 optimize the garbage collection load in the current process.  Defaults
-to T.  Set to NIL if you cat more about memory usage than runtime.
+to T.  Set to NIL if you care more about memory usage than runtime.
 
 
 @end defvar
