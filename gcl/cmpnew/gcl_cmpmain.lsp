@@ -537,12 +537,11 @@ SYSTEM_SPECIAL_INIT
   (declare (special *c-debug*))
   (let ((dirlist (pathname-directory (first args)))
 	(name (pathname-name (first args)))
-	dir
-	)
+	dir)
     (cond (dirlist (setq dir (namestring (make-pathname :directory dirlist))))
 	  (t (setq dir ".")))
-     (setq na  (namestring
-		(make-pathname :name name :type (pathname-type(first args)))))
+    (setq na  (namestring
+	       (make-pathname :name name :type (pathname-type(first args)))))
    #+(or dos winnt)
       (format nil "~a -I~a ~a ~a -c -w ~a -o ~a"
 	      *cc*
@@ -552,26 +551,21 @@ SYSTEM_SPECIAL_INIT
 		    (3 *opt-three* )
 		    (2 *opt-two*) 
 		    (t ""))	
-;              (case *speed* 
-;		    (3 #+broken_o4_opt "-O2" #-broken_o4_opt"-O4")
-;		    (2 "-O") (t ""))
 	      (namestring (make-pathname  :type "c" :defaults (first args)))
 	      (namestring (make-pathname  :type "o" :defaults (first args)))
 	      )
 
    #-(or dos winnt)
-   (format nil  "(cd ~a ;~a -I~a ~a ~a -c ~a ~a)"
-	   dir *cc*
+   (format nil  "~a -I~a ~a ~a -c '~a' -o '~a' ~a"
+	   *cc*
 	   (concatenate 'string si::*system-directory* "../h")
 	   (if (and (boundp '*c-debug*) *c-debug*) " -g " "")
-;           (case *speed*
-;		 (3 #+broken_o4_opt "-O" #-broken_o4_opt"-O4")
-;	         (2 "-O") (t ""))	
            (case *speed*
 		 (3 *opt-three* )
 		 (2 *opt-two*) 
 		 (t ""))	
-	   na
+	   (namestring (first args))
+	   (namestring (second args))
 	   (prog1
 	       #+aix3
 	     (format nil " -w ;ar x /lib/libc.a fsavres.o  ; ar qc XXXfsave fsavres.o ; echo init_~a > XXexp ; mv  ~a  XXX~a ; ld -r -D-1 -bexport:XXexp -bgc XXX~a -o ~a XXXfsave ; rm -f XXX~a XXexp XXXfsave fsavres.o"
@@ -801,18 +795,6 @@ SYSTEM_SPECIAL_INIT
 		   (subseq str 0 x)
 		   new
 		   (mysub (subseq str y) it new)))))
-
-(defun mysub (str it new)
-  (let ((x (search it str)))
-    (if x
-	(concatenate 'string
-		     (subseq str 0 x)
-		     new
-		     (mysub
-		      (subseq str (+ (length it) x) (length str))
-		      it
-		      new))
-      str)))
 
 (defun link (files image &optional post extra-libs (run-user-init t) &aux raw init) 
 
