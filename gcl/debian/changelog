@@ -1,8 +1,9 @@
 gclcvs (2.7.0-7) unstable; urgency=low
 
   * ANSI :default-initarg fixes to define-condition
+  * Restore mpz_to_mpz{1} in gmp_big.c, can be written by compiler
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 25 Sep 2003 16:12:41 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 26 Sep 2003 13:44:56 +0000
 
 gclcvs (2.7.0-6) unstable; urgency=low
 

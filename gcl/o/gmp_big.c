@@ -380,27 +380,27 @@ obj_to_mpz1(object x,MP_INT * y,void *v) {
 
 }
 
-/* static int */
-/* mpz_to_mpz(MP_INT * x,MP_INT * y) { */
+int
+mpz_to_mpz(MP_INT * x,MP_INT * y) {
 
-/*   if (abs(x->_mp_size)<=y->_mp_alloc) */
-/*     mpz_set(y,x); */
-/*   else */
-/*     return abs(x->_mp_size)*sizeof(*y->_mp_d); */
+  if (abs(x->_mp_size)<=y->_mp_alloc)
+    mpz_set(y,x);
+  else
+    return abs(x->_mp_size)*sizeof(*y->_mp_d);
 
-/*   return 0; */
+  return 0;
 
-/* } */
+}
 
-/* static int */
-/* mpz_to_mpz1(MP_INT * x,MP_INT * y,void *v) { */
+int
+mpz_to_mpz1(MP_INT * x,MP_INT * y,void *v) {
 
-/*   y->_mp_alloc=abs(x->_mp_size); */
-/*   y->_mp_d=v; */
-/*   mpz_set(y,x); */
-/*   return 0; */
+  y->_mp_alloc=abs(x->_mp_size);
+  y->_mp_d=v;
+  mpz_set(y,x);
+  return 0;
 
-/* } */
+}
 
 void
 isetq_fix(MP_INT * var,int s)
