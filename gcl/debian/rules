@@ -153,13 +153,14 @@ install-stamp: build-stamp
 	dh_clean -k
 	dh_installdirs
 
+	mkdir -p debian/tmp
 	cp -a debian/trad/* debian/tmp/
 	cp -a debian/ansi/* debian/tmp/
 
-	cat debian/gcl.sh | sed "s,gcl/,/usr/lib/gcl-$(VERS)/,g" >debian/gcl/usr/bin/gcl
-	chmod 0755 debian/gcl/usr/bin/gcl
+	cat debian/gcl.sh | sed "s,gcl/,/usr/lib/gcl-$(VERS)/,g" >debian/tmp/usr/bin/gcl
+	chmod 0755 debian/tmp/usr/bin/gcl
 
-	dh_movefiles
+	dh_install
 
 	touch $@
 

@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-79) unstable; urgency=low
+
+  * Fix Debian package install bug
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 27 Feb 2003 23:17:55 -0500
+
 gcl (2.5.0.cvs20020625-78) unstable; urgency=low
 
   * Add config.log config.status and config.cache to clean target
