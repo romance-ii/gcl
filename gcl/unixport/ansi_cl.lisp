@@ -143,9 +143,10 @@ write-sequence ))
 (unintern 'int)
 (unintern 'shadow-system)
 
-(push ':ansi-cl *features*)
+(push :common-lisp *features*)
+(push :ansi-cl *features*)
 
-(rename-package 'common-lisp 'common-lisp '(cl))
+(rename-package 'common-lisp 'common-lisp '(cl))
 (rename-package 'user 'common-lisp-user '(cl-user user))
 
 (si::save-system "saved_ansi_gcl")
