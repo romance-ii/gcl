@@ -1,0 +1,16 @@
+
+=====Compile the system=========
+
+(si::chdir "clcs")
+(load "loading.lisp")
+(jamie-load-clcs :compile)
+
+
+======== load the system ========
+
+(si::chdir "clcs")
+(load "package.lisp")
+(load "loading.lisp")
+(jamie-load-clcs :compiled)
+
+

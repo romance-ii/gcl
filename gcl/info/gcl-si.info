@@ -1,0 +1,52 @@
+This is Info file gcl-si.info, produced by Makeinfo version 1.67 from
+the input file gcl-si.texi.
+
+   This is a Texinfo GCL SYSTEM INTERNALS Manual
+
+   Copyright 1994 William F. Schelter
+
+
+Indirect:
+gcl-si.info-1: 188
+gcl-si.info-2: 48967
+gcl-si.info-3: 93280
+gcl-si.info-4: 141301
+gcl-si.info-5: 178869
+gcl-si.info-6: 226517
+
+Tag Table:
+(Indirect)
+Node: Top188
+Node: Numbers1046
+Node: Sequences and Arrays and Hash Tables23336
+Node: Characters48967
+Node: Lists56361
+Node: Streams and Reading70139
+Node: Special Forms and Functions93280
+Node: Compilation119070
+Node: Symbols127296
+Node: Operating System137092
+Node: Command Line137278
+Node: Operating System Definitions141301
+Node: Structures147674
+Node: Iteration and Tests149220
+Node: User Interface152668
+Node: Doc161748
+Node: Type165015
+Node: GCL Specific167669
+Node: Bignums175547
+Node: C Interface178241
+Node: Available Symbols178397
+Node: System Definitions178869
+Node: Regular Expressions207603
+Node: Debugging213723
+Node: Source Level Debugging in Emacs213918
+Node: Low Level Debug Functions218281
+Node: Miscellaneous219279
+Node: Environment219481
+Node: Inititialization220095
+Node: Low Level X Interface220632
+Node: Compiler Definitions221223
+Node: Function and Variable Index226517
+
+End Tag Table

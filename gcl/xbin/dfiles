@@ -1,0 +1,2 @@
+#!/bin/sh
+for v in c/*.d ;do echo  "ln $v `echo $v | sed -e s:\\\.d:\\\.c:g`" | sh ;done

@@ -1,0 +1,5 @@
+#!/bin/sh
+if [ "$#" = "3" ] ;then
+cat $1 $2 >> $3 ;
+else cat $1 >> $2 ;
+fi

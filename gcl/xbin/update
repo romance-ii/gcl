@@ -1,0 +1,4 @@
+#!/bin/sh
+lis=$*
+echo make -f Smakefile $lis "CHANGED=${lis}"
+make -f Smakefile ${lis} "CHANGED=${lis}"
