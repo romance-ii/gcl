@@ -24,6 +24,7 @@ CROSS_PREFIX =
 # It is needed for the Unexec stuff to work with 3.3.1 at least
 CFLAGS       = -fno-zero-initialized-in-bss -mms-bitfields -Wall -fwritable-strings -DVOL=volatile -fsigned-char $(PROCESSOR_FLAGS) $(ODIR_DEBUG) -I$(GCLDIR)/o 
 FINAL_CFLAGS = -fno-zero-initialized-in-bss -mms-bitfields -Wall -fwritable-strings -DVOL=volatile -fsigned-char $(PROCESSOR_FLAGS) $(ODIR_DEBUG)
+NIFLAGS      = -fno-zero-initialized-in-bss -mms-bitfields -Wall -fwritable-strings -DVOL=volatile -fsigned-char $(PROCESSOR_FLAGS) $(ODIR_DEBUG) -I$(GCLDIR)/o
 O3FLAGS      = -O2 -fomit-frame-pointer
 O2FLAGS      = -O
 
@@ -83,7 +84,6 @@ TCL_EXES=
 
 # Don't do dvi on Windows, just HTML
 GCL_DVI=
-GCL_HTML=gcl-si_toc.html gcl-tk_toc.html gcl_toc.html
 
 # Use MSYS makeinfo
 HTML_CMD=makeinfo --html --no-split
