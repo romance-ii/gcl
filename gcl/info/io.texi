@@ -955,3 +955,54 @@ representation is CHAR.  Returns a list of the objects read.
 
 
 @end defun
+
+@defun READLINE-ON ()
+Package:SI
+
+Begins readline command editing mode when possible.  In addition to
+the basic readline editing features, command word completion is
+implemented according to the following scheme:
+
+[[pkg]:[:]]txt
+
+pkg -- an optional package specifier.  Defaults to the current
+package.  The symbols in this package and those in the packages in
+this package's use list will be searched.
+
+:[:] -- an optional internal/external specifier.  Defaults to
+external.  The keyword package is denoted by a single colon at the
+beginning of the token.  Only symbols of this type will be searched
+for completion.
+
+txt -- a string.  Symbol names beginning with this string are
+completed.  The comparison is case insensitive.
+
+
+@end defun 
+
+@defun READLINE-OFF ()
+Package:SI
+
+Disables readline command editing mode.
+
+@end defun 
+
+@defvar *READLINE-PREFIX* 
+Package:SI
+
+A string implicitly prepended to input text for use in readline
+command completion.  If this string contains one or more colons, it is
+used to specify the default package and internal/external setting for
+searched symbols in the case that the supplied text itself contains no
+explicit package specification.  If this string contains characters
+after the colon(s), or contains no colons at all, it is treated as a
+symbol name prefix.  In this case, the prefix is matched first, then
+the supplied text, and the completion returned is relative to the
+supplied text itself, i.e. contains no prefix.  For example, the
+setting ``maxima::$'' will complete input text ``int'' according to
+the internal symbols in the maxima package of the form
+``maxima::$int...'', and return suggestions to the user of the form
+``int...''.
+
+@end defvar
+

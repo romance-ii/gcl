@@ -1029,13 +1029,18 @@ if test "$tcl_checkBoth" = 1; then
 fi
 AC_CHECK_FUNC(gethostbyname, , AC_CHECK_LIB(nsl, main, [TLIBS="$TLIBS -lnsl"]))
 
+RL_OJBS=""
+RL_LIB=""
 if test "$enable_readline" = "yes" ; then
 	AC_CHECK_HEADERS(readline/readline.h,
 		AC_CHECK_LIB(readline,main,
 			AC_DEFINE(HAVE_READLINE) 
 			TLIBS="$TLIBS -lreadline -lncurses"
 			RL_OBJS=gcl_readline.o
-			RL_LIB=mod/gcl_readline.o,,-lncurses))
+# Readline support now initialized automatically when compiled in, this lisp
+# object no longer needed, 20040102 CM
+#			RL_LIB=mod/gcl_readline.o
+			,,-lncurses))
 fi
 
 AC_SUBST(RL_OBJS)

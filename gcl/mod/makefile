@@ -30,7 +30,7 @@ COMPILE_FILE=$(PORTDIR)/saved_gcl $(PORTDIR) -system-p -c-file -data-file \
 	"${APPEND} ${NULLFILE} $*.data $*.o "
 
 
-all:	$(OBJS) $(RL_OBJS)
+all:	$(OBJS) #$(RL_OBJS)
 
 
 

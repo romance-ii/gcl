@@ -57,6 +57,11 @@ static unsigned char *rl_putc_em_line = NULL;
 
 #ifdef RL_COMPLETION
 
+
+/* New completion generator avoids malloc excet where required, and
+   dynamically searches current package lists -- 20040102 CM */
+#if 0
+
 static char **completion_list = NULL;
 static int case_sensitivity = 0;	/* 0 = case sensitive */
 					/* 1 = complete to lower case */
@@ -89,6 +94,113 @@ static char *rl_completion_words(char *text, int state) {
 	return NULL;
 }
 
+#endif
+
+/* New completion generator avoids malloc excet where required, and
+   dynamically searches current package lists -- 20040102 CM */
+
+/* FIXME -- consider mapping malloc to alloca for this function only */
+
+DEFVAR("*READLINE-PREFIX*",sSAreadline_prefixA,SI,Cnil,"");
+
+static char *rl_completion_words_new(char *text, int state) {
+  static int i,len,internal,size,prefl;
+  static object package,use,tp,*base,l;
+  static const char *ftext,*wtext,*pref;
+  
+  if (state==0) {
+    const char *mch,*fmch,*temp,*temp1,*fpref;
+    int fprefl;
+
+    fpref=pref=fmch=NULL;
+    fprefl=prefl=0;
+    if (type_of(sSAreadline_prefixA->s.s_dbind)==t_string) {
+      pref=fpref=sSAreadline_prefixA->s.s_dbind->st.st_self;
+      prefl=fprefl=sSAreadline_prefixA->s.s_dbind->st.st_fillp;
+      if ((fmch=memchr(fpref,':',fprefl))) {
+	pref=fmch[1]==':' ? fmch+2 : fmch+1;
+	prefl-=pref-fpref;
+      } 
+    }
+
+    mch=strchr(text,':');
+    if (!mch) {
+      temp=fmch;
+      temp1=fpref;
+    } else  {
+      temp=mch;
+      temp1=text;
+      pref=NULL;
+      prefl=0;
+    }
+
+    if (!temp) 
+      package=sLApackageA->s.s_dbind;
+    else {
+      if (temp==temp1) 
+	package=(temp[1]==':') ? sLApackageA->s.s_dbind : keyword_package;
+      else {
+	struct string s={t_string,0,0,0,OBJNULL,1,0,(char *)temp1,temp-temp1};
+	package=find_package((object)&s);
+      }
+    }
+    
+    package=package ? package : user_package;
+    use=package->p.p_uselist;
+    internal=temp && temp[1]==':' ? 1 : 0;
+    ftext=text;
+    wtext=mch ? mch+1 : ftext;
+    wtext=*wtext==':' ? wtext+1 : wtext;
+    len=strlen(wtext);
+    tp=package;
+    i=0;
+    base=internal ? tp->p.p_internal : tp->p.p_external;
+    size=internal ? tp->p.p_internal_size : tp->p.p_external_size;
+    l=base[i];
+
+  }
+
+  while (tp && tp != Cnil) {
+
+    while (1) {
+      while (type_of(l)==t_cons) {
+	struct symbol sym=l->c.c_car->s;
+	l=l->c.c_cdr;
+	if (pref) {
+	  if (sym.s_fillp<prefl ||
+	      strncasecmp(pref,sym.s_self,prefl))
+	    continue;
+	  sym.s_self+=prefl;
+	  sym.s_fillp-=prefl;
+	}
+	if (sym.s_fillp>=len && 
+	    !strncasecmp(wtext,sym.s_self,len)) {
+	  static char *c;
+	  c=malloc((wtext-ftext)+sym.s_fillp+1);
+	  memcpy(c,ftext,wtext-ftext);
+	  memcpy(c+(wtext-ftext),sym.s_self,sym.s_fillp);
+	  c[(wtext-ftext)+sym.s_fillp]=0;
+	  return c;
+	}
+      }
+      if (++i==size)
+	break;
+      l=base[i];
+    }      
+
+    tp=use->c.c_car;
+    use=use->c.c_cdr;
+    base=internal ? tp->p.p_internal : tp->p.p_external;
+    size=internal ? tp->p.p_internal_size : tp->p.p_external_size;
+    i=0;
+    l=base[i];
+
+  }
+
+  return NULL;
+  
+}
+
 /* Attempt to complete on the contents of TEXT.  START and END bound the
    region of rl_line_buffer that contains the word to complete.  TEXT is
    the word to complete.  We can use the entire contents of rl_line_buffer
@@ -96,7 +208,7 @@ static char *rl_completion_words(char *text, int state) {
    or NULL if there aren't any. */
 extern char **completion_matches(char *,char *(*)(char *,int));
 static char **rl_completion(char *text, int start, int end) {
-	return completion_matches(text, rl_completion_words);
+	return completion_matches(text, rl_completion_words_new);
 }
 #endif
 
@@ -171,6 +283,9 @@ int rl_putc_em(int c, FILE *f) {
 	tail:
 	return putc(c, f);
 }
+
+/* readline support now initialized automatically -- 20040102 CM */
+#if 0
 
 static int qsort_compare(const void *a, const void *b) {
 	const char *ac = *((const char **)a);
@@ -300,14 +415,52 @@ FFN(siLreadline_init)() {
 		}
 	}
 }
+#endif
+
+
+static void
+FFN(siLreadline_on)() {
+
+  const char *cp;
+
+  if (!isatty(0)) {
+    FEerror("GCL is not being run from a terminal", 0);
+    return;
+  }
+  
+  if ((cp=getenv("TERM")) && !strcmp(cp,"dumb")) {
+    FEerror("Controlling terminal is not readline capable", 0);
+    return;
+  }
+
+  readline_on=1;
+  return;
+
+}
+
+static void
+FFN(siLreadline_off)() {
+
+  readline_on=0;
+  return;
+
+}
 
 void
 gcl_init_readline_function(void) {
-	rl_readline_name = NULL;
+  static int n;
+  char *pn="GCL",*cp=getenv("TERM");
+  rl_readline_name=pn;
 #ifdef RL_COMPLETION
 	rl_attempted_completion_function = (CPPFunction *)rl_completion;
 #endif			
-	make_si_function("READLINE-INIT", siLreadline_init); 
+  if (isatty(0) && (!cp || strcmp(cp,"dumb")))
+    readline_on=1;
+  if (!n) {
+    make_si_function("READLINE-ON", siLreadline_on);
+    make_si_function("READLINE-OFF", siLreadline_off);
+    n=1;
+  }
 }
 
 #endif /* HAVE_READLINE */
