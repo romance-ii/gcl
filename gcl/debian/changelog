@@ -14,8 +14,9 @@ gclcvs (2.6.0-2) unstable; urgency=low
   * Rework debian package structure to handle stable and cvs packages
     simultaneously
   * fixup config.guess,sub rules in debian/rules
+  * remove  windows/install.ansi.lsp (build generated file) from CVS
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 22 Aug 2003 17:07:31 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 22 Aug 2003 17:18:30 +0000
 
 gcl (2.6.0cvs-1) experimental; urgency=low
 
