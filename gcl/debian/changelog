@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020610-3) unstable; urgency=high
+
+  * CVS updates, new s390 arch
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 25 Jun 2002 19:26:36 -0400
+
 gcl (2.5.0.cvs20020610-2) unstable; urgency=high
 
   * cvs updates
