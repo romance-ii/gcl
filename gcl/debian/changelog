@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-14) unstable; urgency=high
+
+  * include stdarg.h when defining _GNU_SOURCE
+
+ -- Camm Maguire <camm@enhanced.com>  Sat, 20 Jul 2002 18:47:43 -0400
+
 gcl (2.5.0.cvs20020625-13) unstable; urgency=high
 
   * Proper va_dcl declarations
