@@ -1524,8 +1524,10 @@ BEGIN:
 	case smm_input:
 	case smm_io:
 
+#ifdef HAVE_READLINE
 	  if (readline_on && strm->sm.sm_fp==rl_instream)
 	    return *rl_line_buffer ? TRUE : FALSE;
+#endif
 
 		if (strm->sm.sm_fp == NULL)
 			closed_stream(strm);
