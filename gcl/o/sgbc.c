@@ -1094,7 +1094,7 @@ static int
 memprotect_test(void) {
 
   char b1[2*PAGESIZE],b2[PAGESIZE];
-  struct sigaction sa,sao;
+  struct sigaction sa,sao,saob;
 
   if (memprotect_result!=memprotect_none)
     return memprotect_result!=memprotect_success;
@@ -1116,21 +1116,29 @@ memprotect_test(void) {
     memprotect_result=memprotect_sigaction;
     return -1;
   }
+  if (sigaction(SIGBUS,&sa,&saob)) {
+    sigaction(SIGSEGV,&sao,NULL);
+    memprotect_result=memprotect_sigaction;
+    return -1;
+  }
   memprotect_result=memprotect_bad_return;
   memset(memprotect_test_address,0,PAGESIZE);
   if (memprotect_result==memprotect_bad_return)
     memprotect_result=memprotect_no_signal;
   if (memprotect_result!=memprotect_none) {
     sigaction(SIGSEGV,&sao,NULL);
+    sigaction(SIGBUS,&saob,NULL);
     return -1;
   }
   if (memcmp(memprotect_test_address,b2,PAGESIZE)) {
     memprotect_result=memprotect_no_restart;
     sigaction(SIGSEGV,&sao,NULL);
+    sigaction(SIGBUS,&saob,NULL);
     return -1;
   }
   memprotect_result=memprotect_success;
   sigaction(SIGSEGV,&sao,NULL);
+    sigaction(SIGBUS,&saob,NULL);
   return 0;
 
 }
@@ -1578,14 +1586,8 @@ memprotect_handler(int sig, long code, void *scp, char *addr) {
   INSTALL_MPROTECT_HANDLER;
 #endif
 
-#if !defined(DARWIN)
-  /* if (SIGSEGV == SIGPROTV) */
-  segmentation_catcher(SIGSEGV);
-#else
-  /* segmentation_catcher(SIGBUS,code,scp); */
-  /* for the sake of exactness */
-  segmentation_catcher(SIGBUS);
-#endif
+  segmentation_catcher(0);
+
 }
 
 static void
