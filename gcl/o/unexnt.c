@@ -36,6 +36,14 @@ Boston, MA 02111-1307, USA.
 #include "cyglacks.h"
 #endif
 
+#if 0
+#ifdef __MINGW32__
+#  define SEPARATE_BSS_SECTION
+#endif
+#endif
+
+extern sigint();
+
 /* Include relevant definitions from IMAGEHLP.H, which can be found
    in \\win32sdk\mstools\samples\image\include\imagehlp.h. */
 
@@ -132,7 +140,7 @@ _start (void)
 {
   extern void mainCRTStartup (void);
 
-#if 0
+#if 1
   /* Give us a way to debug problems with crashes on startup when
      running under the MSVC profiler. */
   if (GetEnvironmentVariable ("EMACS_DEBUG", NULL, 0) > 0)
@@ -701,6 +709,8 @@ dump_bss_and_heap (file_data *p_infile, file_data *p_outfile)
     printf ("\t0x%p BSS start in process.\n", bss_data);
     printf ("\t0x%08lx BSS offset in executable.\n", index);
     printf ("\t0x%08lx BSS size in bytes.\n", size);
+    printf ("\t0x%08lx file base.\n", p_outfile->file_base );
+    printf ("\t0x%08lx file base + index.\n", p_outfile->file_base + index );
     memcpy ((char *) p_outfile->file_base + index, bss_data, size);
 }
 
@@ -740,6 +750,10 @@ read_in_bss (char *filename)
       i = GetLastError ();
       exit (1);
     }
+    printf ("\t0x%p BSS start in memory.\n", bss_start);
+    printf ("\t0x%08lx BSS offset in saved executable.\n", index);
+    printf ("\t0x%08lx BSS size in bytes.\n", bss_size);
+    printf ("\t0x%08lx bytes read.\n", n_read);
 
   CloseHandle (file);
 }
@@ -775,6 +789,11 @@ map_in_heap (char *filename)
   file_base = MapViewOfFileEx (file_mapping, FILE_MAP_COPY, 0, 
 			       heap_index_in_executable, size,
 			       get_heap_start ());
+    printf ("\t0x%p Heap start in memory.\n", get_heap_start() );
+    printf ("\t0x%08lx Heap offset in executable.\n", heap_index_in_executable);
+    printf ("\t0x%08lx Heap size in bytes.\n", size);
+    printf ("\t0x%08lx file base.\n", file_base);
+
   if (file_base != 0) 
     {
       return;
@@ -953,8 +972,11 @@ allocate_heap (void)
      the region below the 256MB line for our malloc arena - 229MB is
      still a pretty decent arena to play in!  */
 
+#if 0
   unsigned long base = DBEGIN;   /*  27MB */
-  /*   unsigned long base = 0x01B00000; */  /*  27MB */
+#else  
+  unsigned long base = 0x10100000 /*0x01B00000*/;  /*  27MB */
+#endif  
   unsigned long end  = 1 << VALBITS; /* 256MB */
   void *ptr = NULL;
 
@@ -979,6 +1001,7 @@ allocate_heap (void)
 		      MEM_RESERVE,
 		      PAGE_NOACCESS);
   DBEGIN = (DBEGIN_TY) ptr;
+  base = DBEGIN;
 #endif
 
   return ptr;
