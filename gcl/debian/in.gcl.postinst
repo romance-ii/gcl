@@ -47,6 +47,8 @@ sed -e "s/^ *DEFAULT_GCL_ANSI=.*/DEFAULT_GCL_ANSI=\"$DEFAULT_GCL_ANSI\"/" \
     < $CONFIGFILE > $CONFIGFILE.tmp
 mv -f $CONFIGFILE.tmp $CONFIGFILE
 
+! [ -e /usr/lib/common-lisp/bin/gcl@EXT@.sh ] || register-common-lisp-implementation gcl@EXT@
+
 fi
 
 #DEBHELPER#

@@ -1,4 +1,4 @@
-gclcvs (2.7.0-30) unstable; urgency=low
+gclcvs (2.7.0-30) unstable; urgency=high
 
   * Slightly modify proclaimed vararg function handling fix
     (gcl_cmptop.lsp)
@@ -17,8 +17,9 @@ gclcvs (2.7.0-30) unstable; urgency=low
     directories, show profiling support in banner if present
   * reset sys paths on installation
   * Fix typo in sys docs
+  * Better common-lisp-controller support
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  5 Aug 2004 22:51:53 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri,  6 Aug 2004 18:21:08 +0000
 
 gclcvs (2.7.0-29) unstable; urgency=low
 

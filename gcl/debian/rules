@@ -231,8 +231,8 @@ install-stamp: build-stamp debian/control $(INS)
 	echo DEFAULT_GCL_PROF= >>debian/tmp/etc/default/gcl$(EXT)
 
 	mkdir -p debian/tmp/usr/lib/common-lisp/bin
-	chmod +x debian/gclcvs.sh
-	cp debian/gclcvs.sh debian/tmp/usr/lib/common-lisp/bin
+	chmod +x debian/gcl$(EXT)-clc.sh
+	cp debian/gcl$(EXT)-clc.sh debian/tmp/usr/lib/common-lisp/bin/gcl$(EXT).sh
 
 	dh_install
 
