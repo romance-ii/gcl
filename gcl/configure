@@ -1406,6 +1406,8 @@ canonical=$host
 echo "$as_me:$LINENO: result: host=$host" >&5
 echo "${ECHO_T}host=$host" >&6
 
+PROCESSOR_FLAGS=""
+
 use=unknown
 case $canonical in
      older)
@@ -1545,6 +1547,7 @@ case $canonical in
      i*mingw*)
        if test "$use_just486" = "yes"; then
          host=i486-pc-mingw32
+	 PROCESSOR_FLAGS="-mcpu=i486 -march=i486"
          echo "Host is being canonicalised to $host"
        fi
      use=mingw;;
@@ -1556,6 +1559,8 @@ case $canonical in
         fi;;
 
 esac
+
+
 
 echo enable_machine=$enable_machine
 if test "x$enable_machine" != "x" ; then
@@ -9737,6 +9742,7 @@ s,@host@,$host,;t t
 s,@host_cpu@,$host_cpu,;t t
 s,@host_vendor@,$host_vendor,;t t
 s,@host_os@,$host_os,;t t
+s,@PROCESSOR_FLAGS@,$PROCESSOR_FLAGS,;t t
 s,@CC@,$CC,;t t
 s,@CFLAGS@,$CFLAGS,;t t
 s,@LDFLAGS@,$LDFLAGS,;t t

@@ -50,6 +50,8 @@ canonical=$host
 ## host=CPU-COMPANY-SYSTEM
 AC_MSG_RESULT(host=$host)
 
+PROCESSOR_FLAGS=""
+
 use=unknown
 case $canonical in
      older)
@@ -189,6 +191,7 @@ case $canonical in
      i*mingw*)
        if test "$use_just486" = "yes"; then
          host=i486-pc-mingw32
+	 PROCESSOR_FLAGS="-mcpu=i486 -march=i486"
          echo "Host is being canonicalised to $host"
        fi
      use=mingw;;
@@ -200,6 +203,8 @@ case $canonical in
         fi;;
   
 esac
+
+AC_SUBST(PROCESSOR_FLAGS)
 
 echo enable_machine=$enable_machine
 if test "x$enable_machine" != "x" ; then
