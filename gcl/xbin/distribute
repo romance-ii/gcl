@@ -28,11 +28,17 @@ if [ "${DNAME}" != "${nameNow}" ] ;
   echo mv -f ${GCL} ${DNAME}
   mv -f ${GCL} ${DNAME}
 fi
-tar cvf - `${GCL}/xbin/new-files ${DNAME} ${DNAME}` | (cd ${DNAME} ; gzip -c ${OPT} > ${FILE} )
+tar cvf - `${DNAME}/xbin/new-files ${DNAME} ${DNAME}` | (cd ${DNAME} ; gzip -c ${OPT} > ${FILE} )
+
+if [ "${DNAME}" != "${nameNow}" ] ; then
 if [ "${moved}" = "1" ]  ; then
   echo   mv ${DNAME} ${GCL}
-  mv -f prev-${DNAME}  ${DNAME} 
-fi  
+  mv -f prev-${DNAME}  ${DNAME}
+fi
+mv -f ${DNAME} ${GCL}
+fi
+
+
 if  [ $# -eq 0 ] ; then
 rcp ${FILE} ${FTPDIR}/${NAME}
 fi
