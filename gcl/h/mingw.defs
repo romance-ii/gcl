@@ -47,9 +47,6 @@ BAT          = .bat
 LIBFILES     = bcmp.o bzero.o bcopy.o
 EXTRAS       = ${OD}mingwin.o ${OD}mingfile.o
 
-# the  make to use for saved_kcp the profiler.
-KCP          = kcp-bsd
-
 # Work around install problem caused by non-support of GCL TK
 # on Windows platforms.
 TK_LISP_LIB  =
