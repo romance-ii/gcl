@@ -1062,7 +1062,7 @@ static char *baby_malloc(n)
 int in_bfd_init=0;
 
 /* configure size, static init ? */
-static char bfd_buf[/*  4392 */5000];
+static char bfd_buf[/*  4392 */32768];
 static char *bfd_buf_p=bfd_buf;
 
 static void *
