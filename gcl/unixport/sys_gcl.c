@@ -1,7 +1,4 @@
-#ifdef __MINGW32__
-#  include <string.h>
-#endif
-
+#include <string.h>
 #include <stdlib.h>
 #include "../h/include.h"
 
