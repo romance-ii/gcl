@@ -128,6 +128,7 @@ LISP_LIB=cmpnew/collectfn.o lsp/gprof.lsp lsp/info.o lsp/profile.lsp lsp/export.
 install-command:
 	rm -f $(DESTDIR)${prefix}/bin/gcl
 	(echo '#!/bin/sh' ; \
+	echo export C_INCLUDE_PATH=${INSTALL_LIB_DIR}/h:\$$C_INCLUDE_PATH;\
 	echo exec ${INSTALL_LIB_DIR}/$(PORTDIR)/$(FLISP)$(EXE) \\ ; \
 	echo '   -dir' ${INSTALL_LIB_DIR}/unixport/ \\ ; \
 	echo '   -libdir' ${INSTALL_LIB_DIR}/ \\ ; \

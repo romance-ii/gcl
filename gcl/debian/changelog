@@ -6,8 +6,9 @@ gcl (2.5.0.cvs20020625-55) unstable; urgency=high
   * Dotted-list support in member
   * Reworked dotnil definitions and support macros
   * add compile-file-pathname
+  * setup C_INCLUDE_PATH env variable in gcl shell wrapper
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 28 Sep 2002 09:42:06 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sun, 29 Sep 2002 23:36:55 -0400
 
 gcl (2.5.0.cvs20020625-54) unstable; urgency=high
 
