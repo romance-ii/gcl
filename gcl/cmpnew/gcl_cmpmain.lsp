@@ -27,7 +27,7 @@
 (in-package 'compiler)
 
 
-(export '(*compile-print* *compile-verbose*))
+(export '(*compile-print* *compile-verbose* *compile-file-truename* *compile-file-pathname*))
 
 ;;; This had been true with Linux 1.2.13 a.out or even older
 ;;; #+linux   (push :ld-not-accept-data  *features*)
@@ -52,6 +52,8 @@
 (defvar *cmpinclude-string* t)
 (defvar *compiler-default-type* #p".lsp")
 (defvar *compiler-normal-type* #p".lsp")
+(defvar *compile-file-truename* nil)
+(defvar *compile-file-pathname* nil)
 
 (defun compiler-default-type (pname) 
   "Set the default file extension (type) for compilable file names."
@@ -148,6 +150,8 @@
 	  (let ((gaz (let ((*DEFAULT-PATHNAME-DEFAULTS* (car args)))
 			    			    (gazonk-name)))
 		(*readtable* (si::standard-readtable)))
+	    (setf *compile-file-pathname* (pathname (merge-pathnames gaz)))
+	    (setf *compile-file-truename* (truename *compile-file-pathname*))
 	    (setq gaz (get-output-pathname gaz "lsp" (car args)))
 	    (with-open-file (st gaz :direction :output)
 	      (print
@@ -163,6 +167,8 @@
 	       (unless *keep-gaz* (delete-file gaz))))
 	    ))
 	 (t nil))
+   (setf *compile-file-pathname* nil)
+   (setf *compile-file-truename* nil)
    (if (consp *split-files*)
        (setf (car *split-files*) (+ (third *split-files*) section-length)))
    ))
