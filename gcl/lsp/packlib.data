@@ -1,8 +1,0 @@
-       
-#(#! 
-(lisp::in-package (lisp::quote user::lisp))#! 
-(lisp::export (lisp::quote (lisp::find-all-symbols lisp::do-symbols lisp::do-external-symbols lisp::do-all-symbols)))#! 
-(lisp::export (lisp::quote (lisp::apropos lisp::apropos-list)))#! 
-(lisp::in-package (lisp::quote lisp::system))
-#(lisp::*package* lisp::let lisp::if lisp::packagep lisp::find-package lisp::string :internal :external system::coerce-to-package lisp::multiple-value-bind system::package-size lisp::declare lisp::fixnum lisp::dotimes lisp::+ lisp::progn lisp::setq lisp::< system::package-internal system::package-external lisp::- lisp::when lisp::null lisp::go lisp::car lisp::cdr lisp::dolist system::.v (lisp::list-all-packages) lisp::do-symbols :start2 :end2 system::find-declarations system::substringp system::print-symbol-apropos (system::%init . #((lisp::proclaim (lisp::quote (lisp::optimize (lisp::safety 2) (lisp::space 3)))) (system::mm (lisp::quote system::coerce-to-package) 0) (system::mfsfun (lisp::quote lisp::find-all-symbols) 1 1) (system::mm (lisp::quote lisp::do-symbols) 2) (system::mm (lisp::quote lisp::do-external-symbols) 3) (system::mm (lisp::quote lisp::do-all-symbols) 4) (system::mfsfun (lisp::quote system::substringp) 5 2) (system::mfsfun (lisp::quote system::print-symbol-apropos) 6 1) (system::mf (lisp::quote lisp::apropos) 7) (system::mfvfun (lisp::quote lisp::apropos-list) 8 513))))
-)

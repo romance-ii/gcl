@@ -1,1 +1,0 @@
-@setfilename foo.info

@@ -1,1 +1,0 @@
-(load "tk-package.lsp")

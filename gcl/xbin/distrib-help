@@ -1,9 +1,0 @@
-#!/bin/sh
-for v in $@ ; do
-for w in c h lsp data ;
-do 
-if [ -f $v.$w- ] ; then
- mv $v.$w-  $v.$w ;
-fi
-done
-done

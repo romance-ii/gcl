@@ -1,7 +1,0 @@
-       
-#(#! 
-(lisp::in-package (lisp::quote user::lisp))#! 
-(lisp::export (lisp::quote (lisp::union lisp::nunion lisp::intersection lisp::nintersection lisp::set-difference lisp::nset-difference lisp::set-exclusive-or lisp::nset-exclusive-or lisp::subsetp)))#! 
-(lisp::in-package (lisp::quote lisp::system))
-#("UNION not passed a list" "NUNION not passed a list" "INTERSECTION not passed a list" "NINTERSECTION not passed a list" "SET-DIFFERENCE not passed a list" "NSET-DIFFERENCE not passed a list" "NSET-EXCLUSIVE-OR not passed a list" "SUBSETP not passed a list" system::member1 :key :test-not :test lisp::set-difference lisp::nset-difference (system::%init . #((system::mfvfun (lisp::quote lisp::union) 0 16386) (system::mfvfun (lisp::quote lisp::nunion) 1 16386) (system::mfvfun (lisp::quote lisp::intersection) 2 16386) (system::mfvfun (lisp::quote lisp::nintersection) 3 16386) (system::mfvfun (lisp::quote lisp::set-difference) 4 16386) (system::mfvfun (lisp::quote lisp::nset-difference) 5 16386) (system::mfvfun-key (lisp::quote lisp::set-exclusive-or) 6 16386 7) (system::mfvfun (lisp::quote lisp::nset-exclusive-or) 8 16386) (system::mfvfun-key (lisp::quote lisp::subsetp) 9 16386 10))))
-)

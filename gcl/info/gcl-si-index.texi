@@ -1,5 +1,0 @@
-@node Function and Variable Index, , Compiler Definitions, Top
-@appendix Function and Variable Index
-@printindex vr
-
-

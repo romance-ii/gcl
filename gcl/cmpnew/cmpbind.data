@@ -1,5 +1,0 @@
-       
-#(#! 
-(lisp::in-package (lisp::quote user::compiler))
-#(compiler::var compiler::*compiler-output1* compiler::*unwind-exit* compiler::bds-bind compiler::*inline-blocks* compiler::*restore-avma* (lisp::nil lisp::integer) compiler::vs compiler::*value-to-go* compiler::*clink* compiler::down compiler::lexical compiler::wt-vs compiler::wt-clink compiler::clink compiler::ccb-vs-push lisp::special compiler::wt1 compiler::wfs-error lisp::integer lisp::object lisp::fixnum lisp::character lisp::long-float lisp::short-float compiler::baboon compiler::save-avma compiler::wt-integer-loc compiler::close-inline-blocks compiler::wt-loc compiler::wt-fixnum-loc compiler::wt-character-loc compiler::wt-long-float-loc compiler::wt-short-float-loc compiler::c2expr* (system::%init . #((system::putprop (lisp::quote compiler::bds-bind) (lisp::quote compiler::set-bds-bind) (lisp::quote compiler::set-loc)) (system::mfsfun (lisp::quote compiler::c2bind) 0 1) (system::mfsfun (lisp::quote compiler::c2bind-loc) 1 2) (system::mfsfun (lisp::quote compiler::c2bind-init) 2 2) (system::mfsfun (lisp::quote compiler::set-bds-bind) 3 2))))
-)

@@ -1,7 +1,0 @@
-
-This is the remnants of the port of akcl to dos under djgpp (version 1.06)
-Unfortunately djgpp has changed and so it is not so straightforward to
-make gcl work .. I would be happy if someone else does it!
-
-Bill Schelter
-

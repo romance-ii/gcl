@@ -1,5 +1,0 @@
-#!/bin/sh
-egrep '^(DEFUN\()|^(DEFUNO\()|^(DEFCOMP\()|^(DEFVAR\()|^(DO_INIT\()|^(DEF_ORDINARY\()' $1
-exit 0
-
-

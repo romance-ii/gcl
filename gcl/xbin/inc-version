@@ -1,6 +1,0 @@
-#!/bin/sh
-echo '(@ VER = `cat ../minvers` + 1 ; echo  ${VER} > ../minvers)' | /bin/csh ;
-
-exit 0
-
-

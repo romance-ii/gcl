@@ -1,4 +1,0 @@
-#!/bin/sh
-cat $1 | sed -f ../utils/revstruct.sed |  sed -f ../utils/repls3.sed | sed -f ../utils/repls2.sed | sed -f ../utils/repls1.sed  | sed  -f ../utils/repls4.sed 
-
-

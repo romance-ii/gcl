@@ -1,9 +1,0 @@
-       
-#(#! 
-(lisp::in-package (lisp::quote user::lisp))#! 
-(lisp::export (lisp::quote (lisp::*modules* lisp::provide lisp::require)))#! 
-(lisp::export (lisp::quote lisp::documentation))#! 
-(lisp::export (lisp::quote (lisp::variable lisp::function lisp::structure lisp::type lisp::setf)))#! 
-(lisp::in-package (lisp::quote lisp::system))
-#(lisp::*modules* :test lisp::*default-pathname-defaults* #"" system::variable-documentation system::function-documentation system::structure-documentation system::type-documentation system::setf-documentation "~S is an illegal documentation type." lisp::declare lisp::string= lisp::load lisp::variable lisp::function lisp::structure lisp::type lisp::setf (system::%init . #((system::*make-special (lisp::quote lisp::*modules*)) (lisp::or (lisp::boundp (lisp::quote lisp::*modules*)) (lisp::setq lisp::*modules* lisp::nil)) (system::mfsfun (lisp::quote lisp::provide) 0 1) (system::mfvfun (lisp::quote lisp::require) 1 513) (system::mfsfun (lisp::quote lisp::documentation) 2 2) (system::mfsfun (lisp::quote system::find-documentation) 3 1))))
-)

@@ -1,3 +1,0 @@
-#!/bin/sh
-gcl  -batch -eval '(si::error-set (quote (progn (tk::tkconnect :args "-geometry 20x20-2+2")(tk::wm :iconify ".")(si::info '\"$1\"')(tk::bind (quote .info) "<Destroy>" (quote (bye)))(read))))'
-

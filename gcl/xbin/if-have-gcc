@@ -1,3 +1,0 @@
-#!/bin/sh
-if which gcc > /dev/null ; then echo $1 ; else echo $2 ; fi
-exit 0

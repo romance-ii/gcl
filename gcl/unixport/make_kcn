@@ -1,5 +1,0 @@
-PORTDIR	= ../unixport
-
-LDCC = ${CC}
-
--include ../makedefs

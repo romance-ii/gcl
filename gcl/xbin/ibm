@@ -1,7 +1,0 @@
-#!/bin/sh
-FILE=${HOME}/ibm/ibm-`cat majvers`-`cat minvers`.tar.Z
-echo creating file ${FILE}
-tar cvf - `"ls"  */rt* */ps2_*  */*aos* | sed -e "/~/d"` |  compress -c > ${FILE}
-
-
-
