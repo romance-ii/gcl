@@ -119,9 +119,24 @@ GCL_SI= number.texi sequence.texi character.texi list.texi io.texi \
 	gcl-si-index.texi
 GCL_TK= general.texi widgets.texi control.texi
 
-gcl-si.dvi gcl-si.info: ${GCL_SI} gcl-si.texi
-gcl-tk.dvi gcl-tk.info: ${GCL_TK} gcl-tk.texi
+gcl-si.dvi: ${GCL_SI} gcl-si.texi
+	tex gcl-si.texi
 
+gcl-si.info:
+	makeinfo gcl-si.texi	
+
+gcl-tk.dvi gcl-tk.info: ${GCL_TK} gcl-tk.texi
+	tex gcl-tk.texi
+	makeinfo gcl-tk.texi
+
+gcl-si_toc.html:
+	texi2html -split_chapter gcl-si.texi
+
+gcl-tk_toc.html:
+	texi2html -split_chapter gcl-tk.texi
+
+install-html: gcl-tk_toc.html gcl-si_toc.html
+	cp *.html /d/www/gcl
 
 install:
 	if [  -d "${INFO_DIR}" ] ; then true ; else exit 0; fi
