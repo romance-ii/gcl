@@ -72,7 +72,7 @@
    (get 'shift<< 'inline-always))
 
 ;;SHIFT>>
- (push '((fixnum fixnum) fixnum #.(flags)"((#0) >> (- (#1)))")
+ (push '((fixnum fixnum) fixnum #.(flags set rfa)"((#0) >> (- (#1)))")
    (get 'shift>> 'inline-always))
 
 ;;SHORT-FLOAT-P

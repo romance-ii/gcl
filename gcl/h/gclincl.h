@@ -91,7 +91,7 @@ SGC is enabled.  */
 
 */
 
-#define CSTACK_ADDRESS -1073743836 
+#define CSTACK_ADDRESS -1073743868 
 
 /* define if SIGSYS is defined in signal.h */
 
@@ -116,3 +116,5 @@ SGC is enabled.  */
 /* define if want to use GMP */
 #define GMP 1
 
+/* have a broken version of C compiler which makes bad code for -O4 */
+/* #undef BROKEN_O4_OPT */ 

@@ -226,8 +226,8 @@ int	w;
 { 
   if (type_of(x) == t_fixnum)
     { if (w <= 0)
-	{ w = -w;
-	  if (w >= WSIZ) return small_fixnum(0);
+      {   w = -w;
+	  if (w >= WSIZ) return small_fixnum(fix(x) < 0 ? -1 :0);
 	  else
 	return make_fixnum (fix(x) >> (w));}
     MPOP(return, shifti,SI_TO_MP(fix(x),big_fixnum1),w);

@@ -106,7 +106,7 @@ SGC is enabled.  */
 
 */
 
-#define CSTACK_ADDRESS -1073742540 
+#define CSTACK_ADDRESS -1073743868 
 
 /* define if SIGSYS is defined in signal.h */
 
@@ -116,6 +116,14 @@ SGC is enabled.  */
 
 /* #undef HAVE_SIGEMT */
 
+
+/* define if setenv  is define */
+#define HAVE_SETENV 1
+
+/* define if putenv  is define */
+/* #undef HAVE_PUTENV */
+
+
 /* define if long long int works to multiply to ints, */
 
 #define HAVE_LONG_LONG 1
@@ -123,6 +131,8 @@ SGC is enabled.  */
 /* define if want to use GMP */
 #define GMP 1
 
+/* have a broken version of C compiler which makes bad code for -O4 */
+/* #undef BROKEN_O4_OPT */ 
 
 #include <varargs.h>
 #include <setjmp.h>

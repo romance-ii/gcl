@@ -936,7 +936,7 @@ fi
 # Check whether --enable-use_gmp or --disable-use_gmp was given.
 if test "${enable_use_gmp+set}" = set; then
   enableval="$enable_use_gmp"
-  use_gmp=$enable_eval
+  use_gmp=$enableval
 else
   use_gmp="yes"
 fi
@@ -3018,11 +3018,12 @@ if test $gcl_ok = no ; then     echo "$ac_t""no" 1>&6 ; fi
 # fionread or block
 
 rm -f makedefsafter
+
 if test $use_gmp = yes ; then
- echo $ac_n "checking "use_gmp=yes""... $ac_c" 1>&6
-echo "configure:3024: checking "use_gmp=yes" >&5
+ echo $ac_n "checking use_gmp=yes, doing configure in gmp directory""... $ac_c" 1>&6
+echo "configure:3025: checking use_gmp=yes, doing configure in gmp directory" >&5
  case "${canonical}" in
-   i5-986* | pentium* | k6* | athlon*)
+   i[5-9]86* | pentium* | k6* | athlon*)
       (cd gmp ; ./configure --target=pentium) ;;
    *)
       (cd gmp ; ./configure) ;;
@@ -3038,6 +3039,25 @@ EOF
  echo >> makedefsafter
 fi
  
+# redhat/cygnus released for some reason a buggy version of gcc,
+# which no one else released.   Catch that here.
+echo $ac_n "checking Checking for buggy gcc version from redhat""... $ac_c" 1>&6
+echo "configure:3046: checking Checking for buggy gcc version from redhat" >&5
+if  2>&1 gcc -v | fgrep 2.96 > /dev/null 
+   then 
+        BROKEN_O4_OPT=1
+        cat >> confdefs.h <<\EOF
+#define BROKEN_O4_OPT 1
+EOF
+
+        
+        echo ODIR_DEBUG=-O >> makedefsafter
+	echo >> makedefsafter
+	echo "$ac_t""yes .. turning off -O4" 1>&6
+   else
+	echo "$ac_t""no" 1>&6
+fi 
+
 
 if test -f h/$use.defs  ; then
 
@@ -3211,6 +3231,7 @@ s%@TCL_DL_LIBS@%$TCL_DL_LIBS%g
 s%@TCL_LIBS@%$TCL_LIBS%g
 s%@NOTIFY@%$NOTIFY%g
 s%@GMP@%$GMP%g
+s%@BROKEN_O4_OPT@%$BROKEN_O4_OPT%g
 s%@use@%$use%g
 
 CEOF

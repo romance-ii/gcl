@@ -507,7 +507,9 @@ SYSTEM_SPECIAL_INIT
       (format nil "~a ~a ~a -c -I~a -w ~a -o ~a"
 	      *cc*
 	      (if (and (boundp '*c-debug*) *c-debug*) " -g " "")
-              (case *speed* (3 "-O4") (2 "-O") (t ""))
+              (case *speed* 
+		    (3 #+broken_o4_opt "-O" #-broken_o4_opt"-O4")
+		    (2 "-O") (t ""))
 	      dir
 	      (namestring (make-pathname  :type "c" :defaults (first args)))
 	      (namestring (make-pathname  :type "o" :defaults (first args)))
@@ -519,7 +521,9 @@ SYSTEM_SPECIAL_INIT
    (format nil  "(cd ~a ;~a ~a ~a -c -I. ~a ~a)"
 	   dir *cc*
 	   (if (and (boundp '*c-debug*) *c-debug*) " -g " "")
-           (case *speed* (3 "-O4") (2 "-O") (t ""))	
+           (case *speed*
+		 (3 #+broken_o4_opt "-O" #-broken_o4_opt"-O4")
+		 (2 "-O") (t ""))	
 	   na
 	   (prog1
 	       #+aix3

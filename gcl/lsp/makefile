@@ -47,7 +47,7 @@ MPFILES=$(MPDIR)/mpi-386_no_under.o $(MPDIR)/libmport.a
 prefix=/usr/local
 
 # where to place the info files
-INFO_DIR=/usr/local/info/
+INFO_DIR=
 
 # where to put emacs lisp files.
 EMACS_SITE_LISP=/usr/share/emacs/20.7/site-lisp
@@ -57,19 +57,19 @@ EMACS_DEFAULT_EL=/usr/share/emacs/20.7/site-lisp/default.el
 
 # numerous TCL/TK variables culled from the tkConfig.sh and tclConfig.sh
 # if these are found.
-TK_CONFIG_PREFIX=/usr/local/lib
-TK_LIBRARY=/usr/local/lib/tk8.3
-TCL_LIBRARY=/usr/local/lib/tcl8.3
+TK_CONFIG_PREFIX=/usr/lib
+TK_LIBRARY=/usr/lib/tk8.3
+TCL_LIBRARY=/usr/lib/tcl8.3
 TK_XINCLUDES=-I/usr/X11R6/include
-TK_INCLUDE=-I/usr/local/lib/../include
-TCL_INCLUDE=-I/usr/local/lib/../include
-TK_LIB_SPEC=-L/usr/local/lib -ltk8.3
-TK_BUILD_LIB_SPEC=-L/home/wfs/src/tk8.3.2/unix -ltk8.3
+TK_INCLUDE=-I/usr/lib/../include
+TCL_INCLUDE=-I/usr/lib/../include
+TK_LIB_SPEC=-L/usr/lib -ltk8.3
+TK_BUILD_LIB_SPEC=-L/tmp/tk8.3.2/unix -ltk8.3
 TK_XLIBSW=-L/usr/X11R6/lib -lX11
 TK_XINCLUDES=-I/usr/X11R6/include
-TCL_LIB_SPEC=-L/usr/local/lib -ltcl8.3${TCL_DBGX}
+TCL_LIB_SPEC=-L/usr/lib -ltcl8.3
 TCL_DL_LIBS=-ldl
-TCL_LIBS=-ldl -lm
+TCL_LIBS=-ldl  -lm
 
 NOTIFY=yes
 GCC=gcc

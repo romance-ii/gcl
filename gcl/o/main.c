@@ -850,6 +850,9 @@ init_main()
 		     make_cons(make_ordinary("KCL"), Cnil));
 	 ADD_FEATURE("AKCL");
 	 ADD_FEATURE("GCL");
+#ifdef BROKEN_O4_OPT
+	 ADD_FEATURE("BROKEN_O4_OPT");
+#endif
 #ifdef GMP
 	 ADD_FEATURE("GMP");
 #endif	 

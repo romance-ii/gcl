@@ -11,13 +11,13 @@ fi
 #check to see if TK_LIBRARY set in users environment ok..
 if [ -f ${TK_LIBRARY}/tk.tcl ] ;then true;
 else 
-TK_LIBRARY=/usr/local/lib/tk8.3
+TK_LIBRARY=/usr/lib/tk8.3
   if [ -f ${TK_LIBRARY}/tk.tcl ] ;then export TK_LIBRARY ; fi
 export TK_LIBRARY
 fi
 if [ -f ${TCL_LIBRARY}/init.tcl ] ;then true;
 else 
-TCL_LIBRARY=/usr/local/lib/tcl8.3
+TCL_LIBRARY=/usr/lib/tcl8.3
  if [ -f ${TCL_LIBRARY}/init.tcl ] ; then export TCL_LIBRARY ; fi
 fi
 if [ $# -ge 4 ] ;then

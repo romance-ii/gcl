@@ -115,3 +115,5 @@ SGC is enabled.  */
 /* define if want to use GMP */
 #undef GMP
 
+/* have a broken version of C compiler which makes bad code for -O4 */
+#undef BROKEN_O4_OPT 
