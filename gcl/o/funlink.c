@@ -43,63 +43,63 @@ vpush_extend(void *,object);
 object sLAlink_arrayA;
 int Rset = 0;
 
-/* cleanup link */
 void
-call_or_link(object sym, void **link )
-{
-    object fun;
-    fun = sym->s.s_gfdef;
+call_or_link(object sym,int setf,void **link) {
+
+  object fun = setf ? get(sym,sSsetf_function,OBJNULL) : sym->s.s_gfdef;
 #ifdef DO_FUNLINK_DEBUG
-    fprintf ( stderr, "call_or_link: fun %x START for function ", fun );
-    print_lisp_string ( "name: ", fun->cf.cf_name );
+  fprintf ( stderr, "call_or_link: fun %x START for function ", fun );
+  print_lisp_string ( "name: ", fun->cf.cf_name );
 #endif 
-    if (fun == OBJNULL || sym->s.s_sfdef != NOT_SPECIAL || sym->s.s_mflag) {
-        FEinvalid_function(sym);
+  if (fun == OBJNULL || sym->s.s_sfdef != NOT_SPECIAL || sym->s.s_mflag) {
+    FEinvalid_function(sym);
 #ifdef DO_FUNLINK_DEBUG
-        fprintf ( stderr, "call_or_link: fun %x Invalid function EXIT\n", fun );
-#endif 
-        return;
-    }
-    if ( type_of ( fun ) == t_cclosure && (fun->cc.cc_turbo) ) {
-        if ( Rset ==0 ) {
-            MMccall ( fun, fun->cc.cc_turbo );
-        } else {
-            (*(fun)->cf.cf_self)(fun->cc.cc_turbo);
-        }
-#ifdef DO_FUNLINK_DEBUG
-        fprintf ( stderr, "call_or_link: fun %x EXIT POINT 1 closure and turbo branch\n", fun );
+    fprintf ( stderr, "call_or_link: fun %x Invalid function EXIT\n", fun );
 #endif 
     return;
-    }
-    if ( Rset == 0 ) {
-        funcall(fun);
+  }
+
+  if ( type_of ( fun ) == t_cclosure && (fun->cc.cc_turbo) ) {
+    if ( Rset ==0 ) {
+      MMccall ( fun, fun->cc.cc_turbo );
     } else {
-        if ( type_of(fun) == t_cfun ) {
-            (void) vpush_extend ( link,sLAlink_arrayA->s.s_dbind );
-            (void) vpush_extend ( *link,sLAlink_arrayA->s.s_dbind );	 
-            *link = (void *) (fun->cf.cf_self);
-#ifdef DO_FUNLINK_DEBUG
-            fprintf ( stderr, "call_or_link: fun %x, fun->cf %x (cf_name %x, cf_data %x, cf_self %x), ",
-                      fun, fun->cf, fun->cf.cf_name, fun->cf.cf_data, fun->cf.cf_self );
-            fflush ( stderr );
-            print_lisp_string ( "name: ", fun->cf.cf_name );
-            fflush ( stderr );
-#endif         
-            ( *(void (*)()) (fun->cf.cf_self)) ();
-        } else {
-            funcall(fun);
-        }
+      (*(fun)->cf.cf_self)(fun->cc.cc_turbo);
     }
 #ifdef DO_FUNLINK_DEBUG
-    fprintf ( stderr, "call_or_link: fun %x EXIT POINT 2\n", fun );
+    fprintf ( stderr, "call_or_link: fun %x EXIT POINT 1 closure and turbo branch\n", fun );
 #endif 
+    return;
+  }
+  if ( Rset == 0 ) {
+    funcall(fun);
+  } else {
+    if ( type_of(fun) == t_cfun ) {
+      (void) vpush_extend ( link,sLAlink_arrayA->s.s_dbind );
+      (void) vpush_extend ( *link,sLAlink_arrayA->s.s_dbind );	 
+      *link = (void *) (fun->cf.cf_self);
+#ifdef DO_FUNLINK_DEBUG
+      fprintf ( stderr, "call_or_link: fun %x, fun->cf %x (cf_name %x, cf_data %x, cf_self %x), ",
+		fun, fun->cf, fun->cf.cf_name, fun->cf.cf_data, fun->cf.cf_self );
+      fflush ( stderr );
+      print_lisp_string ( "name: ", fun->cf.cf_name );
+      fflush ( stderr );
+#endif         
+      ( *(void (*)()) (fun->cf.cf_self)) ();
+    } else {
+      funcall(fun);
+    }
+  }
+#ifdef DO_FUNLINK_DEBUG
+  fprintf ( stderr, "call_or_link: fun %x EXIT POINT 2\n", fun );
+#endif 
+  
 }
 
+
 void
-call_or_link_closure ( object sym, void **link, void **ptr )
+call_or_link_closure ( object sym, int setf, void **link, void **ptr )
 {
-    object fun;
-    fun = sym->s.s_gfdef;
+    object fun = setf ? get(sym,sSsetf_function,OBJNULL) : sym->s.s_gfdef;
 #ifdef DO_FUNLINK_DEBUG
     fprintf ( stderr, "call_or_link_closure: START sym %x, link %x, *link %x, ptr %x, *ptr %x, sym->s.s_gfdef (fun) %x ",
               sym, link, *link, ptr, *ptr, fun );
@@ -690,14 +690,14 @@ value.  This function is called by the static lnk function in the reference
 file */
 
 static object
-call_proc(object sym, void **link, int argd, va_list ll)
+call_proc(object sym, int setf, void **link, int argd, va_list ll)
 {object fun;
  int nargs;
 #ifdef DO_FUNLINK_DEBUG_1
     fprintf ( stderr, "call_proc: sym %x START\n", sym );
 #endif 
  check_type_symbol(&sym);
- fun=sym->s.s_gfdef;
+ fun = setf ? get(sym,sSsetf_function,OBJNULL) : sym->s.s_gfdef;
  if (fun && (type_of(fun)==t_sfun
 	     || type_of(fun)==t_gfun
 	     || type_of(fun)== t_vfun)
@@ -781,7 +781,7 @@ call_proc(object sym, void **link, int argd, va_list ll)
      register object *base;
      enum ftype result_type;
      /* we check they are valid functions before calling this */
-     if(type_of(sym)==t_symbol) fun = symbol_function(sym);
+     if(type_of(sym)==t_symbol) fun =  setf ? get(sym,sSsetf_function,OBJNULL) : symbol_function(sym);
      else fun = sym;
      vs_base= (base =   vs_top);
      if (fun == OBJNULL || sym->s.s_sfdef != NOT_SPECIAL || sym->s.s_mflag) FEinvalid_function(sym);
@@ -820,14 +820,14 @@ call_proc(object sym, void **link, int argd, va_list ll)
 /* For ANSI C stdarg */
 
 object
-call_proc_new(object sym, void **link, int argd, object first, va_list ll)
+call_proc_new(object sym, int setf,void **link, int argd, object first, va_list ll)
 {object fun;
  int nargs;
 #ifdef DO_FUNLINK_DEBUG_1
     fprintf ( stderr, "call_proc_new: sym %x START\n", sym );
 #endif 
  check_type_symbol(&sym);
- fun=sym->s.s_gfdef;
+ fun = setf ? get(sym,sSsetf_function,OBJNULL) : sym->s.s_gfdef;
  if (fun && (type_of(fun)==t_sfun
 	     || type_of(fun)==t_gfun
 	     || type_of(fun)== t_vfun)
@@ -913,7 +913,7 @@ call_proc_new(object sym, void **link, int argd, object first, va_list ll)
      register object *base;
      enum ftype result_type;
      /* we check they are valid functions before calling this */
-     if(type_of(sym)==t_symbol) fun = symbol_function(sym);
+     if(type_of(sym)==t_symbol)  fun = setf ? get(sym,sSsetf_function,OBJNULL) : symbol_function(sym);
      else fun = sym;
      vs_base= (base =   vs_top);
      if (fun == OBJNULL || sym->s.s_sfdef != NOT_SPECIAL || sym->s.s_mflag) FEinvalid_function(sym);
@@ -956,17 +956,17 @@ call_proc_new(object sym, void **link, int argd, object first, va_list ll)
 }
 
 
-object call_vproc_new(object sym, void *link, object first,va_list ll)
-{return call_proc_new(sym,link,VFUN_NARGS | VFUN_NARG_BIT,first,ll);}
+object call_vproc_new(object sym, int setf,void *link, object first,va_list ll)
+{return call_proc_new(sym,setf,link,VFUN_NARGS | VFUN_NARG_BIT,first,ll);}
 
 static object
-mcall_proc0(object sym,void *link,int argd,...) 
+mcall_proc0(object sym,int setf,void *link,int argd,...) 
 {
   object res;
   va_list ap;
 
   va_start(ap,argd);
-  res=call_proc(sym,link,argd,ap);
+  res=call_proc(sym,setf,link,argd,ap);
   va_end(ap);
 
   return res;
@@ -974,8 +974,8 @@ mcall_proc0(object sym,void *link,int argd,...)
 }
 
 object
-call_proc0(object sym, void *link)
-{return mcall_proc0(sym,link,0);}
+call_proc0(object sym, int setf,void *link)
+{return mcall_proc0(sym,setf,link,0);}
 
 #if 0
 object
