@@ -93,6 +93,7 @@
 /* bfd support */
 #undef HAVE_LIBBFD
 #undef NEED_CONST
+#define NEED_COUNT 1
 
 /* isnormal check */
 #undef HAVE_ISNORMAL

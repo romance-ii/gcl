@@ -26,6 +26,7 @@ PORTDIR	= unixport
 CLCSDIR = clcs
 PCLDIR = pcl
 MPDIR	= mp
+TESTDIR = ansi-tests
 #GMP_DIR = gmp3/
 
 all: $(BUILD_BFD) $(PORTDIR)/$(FLISP) command cmpnew/collectfn.o lsp/info.o do-gcl-tk do-info
@@ -194,6 +195,7 @@ clean:
 	cd $(CLCSDIR) && make clean
 	cd $(PCLDIR) && make clean
 	cd xgcl-2 && make clean
+	(cd $(TESTDIR); make clean)
 	(cd info ; make clean)
 	rm -f foo.tcl config.log makedefs makedefsafter config.cache config.status makedefc
 	rm -f h/config.h h/gclincl.h h/cmpinclude.h h/gmp.h
