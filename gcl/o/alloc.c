@@ -559,8 +559,18 @@ ONCE_MORE:
  	        long j=maxcbpage;
 		if (available_pages < m)
 		  sSAignore_maximum_pagesA->s.s_dbind = Cnil;
-		if (!g) 
-		  GBC(t_contiguous);
+		if (!g) {
+		  switch (jmp_gmp) {
+		  case 0:
+		    GBC(t_contiguous);
+		    break;
+		  case 1:
+		    longjmp(gmp_jmp,t_contiguous);
+		    break;
+		  default:
+		    break;
+		  }
+		}
 		if (g && !IGNORE_MAX_PAGES)
 		  goto EXHAUSTED;
 		if (IGNORE_MAX_PAGES) {
@@ -695,8 +705,18 @@ ONCE_MORE:
         CHECK_INTERRUPT;
 
 	if (rb_limit - rb_pointer < n) {
-	  if (!g && in_signal_handler == 0) 
-	    GBC(t_relocatable);
+	  if (!g && in_signal_handler == 0) {
+	    switch (jmp_gmp) {
+	    case 0:
+	      GBC(t_relocatable);
+	      break;
+	    case 1:
+	      longjmp(gmp_jmp,t_relocatable);
+	      break;
+	    default:
+	      break;
+	    }
+	  }
 	  must_have_more_pages=((float)(rb_limit - rb_pointer) < 
 				PERCENT_FREE(tm_of(t_relocatable)) * (float)(rb_limit - rb_start)) ? 1 : 0;
 	  if ((must_have_more_pages || g) && !IGNORE_MAX_PAGES)
@@ -828,8 +848,8 @@ gcl_init_alloc(void) {
   long i;
   static int initialized;
 #ifdef GCL_GPROF
-   extern void *_start;
-   unsigned textpage=2*((void *)&etext-(void *)&_start)/PAGESIZE;
+   extern void *GCL_GPROF_START;
+   unsigned textpage=2*((void *)&etext-(void *)&GCL_GPROF_START)/PAGESIZE;
 #endif
   
   if (initialized) return;
@@ -1248,11 +1268,11 @@ DEFUN_NEW("GPROF-START",object,fSgprof_start,SI
        ,0,0,NONE,OO,OO,OO,OO,(void),"")
 {
   extern void monstartup(unsigned long,unsigned long);
-  extern void *_start;
+  extern void *GCL_GPROF_START;
   static int n;
 
   if (!gprof_on) {
-    start=start ? start : (unsigned long)&_start;
+    start=start ? start : (unsigned long)&GCL_GPROF_START;
     end=end ? end : (unsigned long)core_end;
     monstartup(start,end);
     gprof_on=1;
@@ -1487,9 +1507,9 @@ malloc(size_t size) {
 	   allocated with gprof-start. 20040804 CM*/
 #ifdef GCL_GPROF
 	{
-	  extern void *_start;
+	  extern void *GCL_GPROF_START;
 
-	  if (!initflag && size > ((void *)&etext-(void *)&_start)
+	  if (!initflag && size > ((void *)&etext-(void *)&GCL_GPROF_START)
 	      && !initial_monstartup_pointer) 
 	    initial_monstartup_pointer=malloc_list->c.c_car->st.st_self;
 

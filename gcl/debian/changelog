@@ -6,8 +6,10 @@ gclcvs (2.7.0-31) unstable; urgency=low
     information for future use in the compiler, making sure that plt.c
     carries the needed gmp symbols at this point
   * Build support for gmp_wrappers
+  * Support for gmp_wrappers in alloc_relblock/alloc_contblock;Support
+    for GCL_GPROF_START define in gprof functions
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 12 Aug 2004 16:27:41 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 12 Aug 2004 16:34:47 +0000
 
 gclcvs (2.7.0-30) unstable; urgency=high
 
