@@ -282,7 +282,7 @@ DEFUNO("ASET", object, fSaset, SI, 1, ARG_LIMIT, NONE, OO,
      int rank = n - 2; 
      if (x->a.a_rank != rank)
        FEerror(" ~a has wrong rank",1,x);
-     if (rank == 0) return fSaset1(x,0,ii);
+     if (rank == 0) return fSaset1(x,make_fixnum(0),ii);
      ASSURE_TYPE(ii,t_fixnum);
      i = fix(ii);
      if (rank == 1)
@@ -1142,7 +1142,7 @@ object array,val,cursor;
 	object ind[ARRAY_RANK_LIMIT];
 	/* 3 args */
 	ind[0]=array;
-	if (cursor==sLnil) {fSaset1(array,0,val); RETURN1(array);}
+	if (cursor==sLnil) {fSaset1(array,make_fixnum(0),val); RETURN1(array);}
 	ind[1]=MMcar(cursor);
 	i = 2;
 	for (x = MMcdr(cursor);  !endp(x);  x = MMcdr(x))

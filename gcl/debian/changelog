@@ -1,3 +1,10 @@
+gcl (2.5.0.cvs20020625-34) unstable; urgency=high
+
+  * fix zero length array support
+  * reverse configure order for bfd and libiberty
+
+ -- Camm Maguire <camm@enhanced.com>  Fri,  9 Aug 2002 11:52:38 -0400
+
 gcl (2.5.0.cvs20020625-33) unstable; urgency=high
 
   * chmod +x for subconfigures
