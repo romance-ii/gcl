@@ -22,32 +22,35 @@
 
 #include "windows.h"
 #include "ptable.h"
-struct node * find_sym();
-int node_compare();
+
+struct node *find_sym ( PIMAGE_SYMBOL sym, char *name );
+int          get_extra_bss ( PIMAGE_SYMBOL sym_table, int length, int start, int *ptr, int bsssize);
+void         relocate_symbols ( unsigned int length );
+void         set_symbol_address ( PIMAGE_SYMBOL sym, char *string );
+
 
 IMAGE_RELOCATION relocation_info;
-/* next 5 static after debug */
-
-int debug;
 
 #ifndef MAXPATHLEN
-#define MAXPATHLEN 256
+#  define MAXPATHLEN 256
 #endif
+
 #define PTABLE_EXTRA 20
 
 #define COFF_SECTIONS 10 /* Numbner of section headers in section header buffer */
 
 #define INVALID_NSCN 64000 /* A number greater than the number of sections ever likely to be read in. */
 
+/* This macro depends on tem being in scope and set up to be SYMNMLEN + 1 characters long. */
 #define SYMNMLEN 8
 #define SYM_NAME(p) \
-    (((p)->N.Name.Short == 0) ? \
+    (tem[SYMNMLEN]=0, ((p)->N.Name.Short == 0) ? \
       &my_string_table[(p)->N.Name.Long] : \
-      ((p)->N.ShortName[7] ? \
-        ( strncpy ( tem, (p)->N.ShortName,  \
-                    8 ), \
-          (char *) tem) : \
-        (p)->N.ShortName ))
+      ((p)->N.ShortName[SYMNMLEN-1] ? \
+        ( strncpy ( tem, (char *) (p)->N.ShortName,  \
+                    SYMNMLEN ), \
+          (char *) tem ) : \
+        (char *) (p)->N.ShortName ))
 
 /*
  * names of "special" sections
@@ -91,24 +94,24 @@ void describe_sym1 ( int n, int aux_to_go )
 {
     char *str;
     char tem[9];
-    struct syment sym;
+    PIMAGE_SYMBOL sym;
     sym = &symbol_table[n];
-    if ( sym->n_zeroes == 0 ) {
-        str = &my_string_table[sym->n_offset];
+    if ( sym->N.Name.Short == 0 ) {
+        str = &my_string_table[sym->N.Name.Long];
     } else {
-        if ( sym->n_name[SYMNMLEN -1] != 0 ) {
+        if ( sym->N.ShortName[SYMNMLEN-1] != 0 ) {
             /* MAKE IT NULL TERMINATED */
-            strncpy ( tem, sym->n_name, SYMNMLEN );
+            strncpy ( tem, sym->N.ShortName, SYMNMLEN );
             tem[SYMNMLEN] = '\0';
             str = &tem[0];
         } else {
-            str = sym->n_name;
+            str = sym->N.ShortName;
         }
     }
     if ( aux_to_go > 0 ) {
         fprintf ( stderr," symbol_table[%3d] (%8x): auxiliary entry (%d to go)\n", n, &symbol_table[n], aux_to_go - 1 ); 
     } else {
-        if ( sym->n_zeroes == 0 ) {
+        if ( sym->N.Name.Short == 0 ) {
             fprintf ( stderr,
                       "symbol_table[%3d] (%8x) (%22s): "
                       "n_offset %x, n_value %x, n_scnum %d, n_type %d, "
@@ -116,12 +119,12 @@ void describe_sym1 ( int n, int aux_to_go )
                       n,
                       &symbol_table[n],
                       str,
-                      symbol_table[n].n_offset,
-                      symbol_table[n].n_value,
-                      symbol_table[n].n_scnum,
-                      symbol_table[n].n_type,
-                      symbol_table[n].n_sclass,
-                      symbol_table[n].n_numaux );
+                      symbol_table[n].N.Name.Long,
+                      symbol_table[n].Value,
+                      symbol_table[n].SectionNumber,
+                      symbol_table[n].Type,
+                      symbol_table[n].StorageClass,
+                      symbol_table[n].NumberOfAuxSymbols );
         } else {
             fprintf ( stderr,
                       "symbol_table[%3d] (%8x) (%22s): "
@@ -130,33 +133,31 @@ void describe_sym1 ( int n, int aux_to_go )
                       n,
                       &symbol_table[n],
                       str,
-                      symbol_table[n].n_value ,
-                      symbol_table[n].n_scnum ,
-                      symbol_table[n].n_type ,
-                      symbol_table[n].n_sclass ,
-                      symbol_table[n].n_numaux );
+                      symbol_table[n].Value,
+                      symbol_table[n].SectionNumber,
+                      symbol_table[n].Type,
+                      symbol_table[n].StorageClass,
+                      symbol_table[n].NumberOfAuxSymbols );
         }
     }
 }
 #endif
 
 /* This function does the low level relocation. */
-void
-    relocate()
+void relocate()
 {
     char *where;
-    /* describe_sym ( relocation_info.r_symndx, 0 ); */
     where = the_start + relocation_info.VirtualAddress;
     if ( relocation_info.Type == IMAGE_REL_I386_ABSOLUTE ) {
         return;
     }
     
-    switch(relocation_info.Type)
+    switch ( relocation_info.Type )
         {
 
         case IMAGE_REL_I386_DIR32:
-            *(int *)where = *((int *)where) + 
-                symbol_table[relocation_info.SymbolTableIndex].Value;
+            *(int *) where = *( (int *) where ) + 
+                symbol_table [ relocation_info.SymbolTableIndex ].Value;
             break;
             
         case IMAGE_REL_I386_REL32:
@@ -164,22 +165,16 @@ void
                not where the 'where' is but where the 'call' is just
                AFTER the 'where'.
                */
-            *(int *)where = symbol_table[relocation_info.SymbolTableIndex].Value
-                - (int) where - sizeof(int *);
-
+            *(int *) where = symbol_table [relocation_info.SymbolTableIndex ].Value
+                - (int) where - sizeof ( int * );
             break;
 
         default:
             fprintf ( stderr, "%d: unsupported relocation type.\n",
-                      relocation_info.Type);
-            FEerror("The relocation type was unknown\n",0,0);
+                      relocation_info.Type );
+            FEerror ( "The relocation type was unknown\n", 0 );
         }
-
 }
-
-int get_extra_bss ( PIMAGE_SYMBOL sym_table, int length, int start, int *ptr, int bsssize);
-void relocate_symbols ( unsigned int length );
-void set_symbol_address ( PIMAGE_SYMBOL sym, char *string );
 
 /* Loop through the section headers to determine the index fo each section header
  * This is needed because depending on the compiler flags, different sections
@@ -188,7 +183,7 @@ void set_symbol_address ( PIMAGE_SYMBOL sym, char *string );
  * This will make it easier to handle object files from other compilers than
  * our old friend gcc too, for example Visual C++.
  */
-static void work_out_section_indices ( IMAGE_SECTION_HEADER *section )
+static void work_out_section_indices ( PIMAGE_SECTION_HEADER section )
 {
     unsigned int i;
 
@@ -247,10 +242,10 @@ int fasload ( object faslfile )
 
     sfaslp = &sfasl_info_buf;
 
-    extra_bss=0;
-    coerce_to_filename(faslfile, filename);
-    faslfile = open_stream(faslfile, smm_input, Cnil, sKerror);
-    vs_push(faslfile);
+    extra_bss = 0;
+    coerce_to_filename ( faslfile, filename );
+    faslfile = open_stream (faslfile, smm_input, Cnil, sKerror );
+    vs_push ( faslfile );
     fp = faslfile->sm.sm_fp;
 
     /* Read the object file header */
@@ -382,7 +377,7 @@ int fasload ( object faslfile )
             memory->cfd.cfd_size =
                 datasize + textsize + bsssize +
                     stabsize + stabstrsize + rdatasize + extra_bss;
-            vs_push(memory);
+            vs_push ( memory );
             the_start = start_address =        
                 memory->cfd.cfd_start =	
                     alloc_contblock ( memory->cfd.cfd_size );
@@ -395,7 +390,7 @@ int fasload ( object faslfile )
 	
 	/* This currently goes to section 1's raw data so should be fixed. */
 	if ( fseek ( fp, section[1].PointerToRawData, 0) < 0 ) {
-            FEerror("file seek error",0);
+            FEerror ( "file seek error", 0 );
         }
 	SAFE_FREAD ( the_start,
 		     textsize + datasize + stabsize + stabstrsize + rdatasize,
@@ -434,49 +429,46 @@ int fasload ( object faslfile )
         }
 
         /* Finished relocation, read in the fasl vector. */
-	fseek(fp,fasl_vector_start,0);
+	fseek ( fp, fasl_vector_start, 0 );
         if ( feof ( fp ) ) {
             data=0;
         } else {
-            data = read_fasl_vector(faslfile);
-            vs_push(data);
+            data = read_fasl_vector ( faslfile );
+            vs_push ( data );
 	}
-	close_stream(faslfile);
+	close_stream ( faslfile );
 
-	ALLOCA_FREE(my_string_table);
-	ALLOCA_FREE(symbol_table);
+	ALLOCA_FREE ( my_string_table );
+	ALLOCA_FREE ( symbol_table );
 	call_init ( init_address, memory, data, 0);
         vs_base = old_vs_base;
-	vs_top = old_vs_top;
-        if ( symbol_value(sLAload_verboseA) != Cnil ) {
+	vs_top  = old_vs_top;
+        if ( symbol_value ( sLAload_verboseA ) != Cnil ) {
             printf("start address -T %x ", memory->cfd.cfd_start);
         }
 	return ( memory->cfd.cfd_size );
     }
 }
 
-int get_extra_bss(sym_table,length,start,ptr,bsssize)
-    int length,bsssize;
-    PIMAGE_SYMBOL sym_table;
-    int *ptr;                   /* store init address offset here */
+int get_extra_bss ( PIMAGE_SYMBOL sym_table, int length, int start, int *ptr, int bsssize )
 {
     int result = start;
-    IMAGE_SYMBOL *end, *sym;
+    PIMAGE_SYMBOL end, sym;
 
-    end =sym_table + length;
+    end = sym_table + length;
 
     for ( sym = sym_table; sym < end; sym++ ) {
         /* The C compiler optimiser sometimes moves object initialisation
            code around. */
         if ( ( *ptr == 0 ) && ( sym->SectionNumber == TEXT_NSCN ) && sym->Value ) {
-            char tem [9];
+            char tem [SYMNMLEN+1];
             char *str = SYM_NAME ( sym );
             if ( str[1] == 'i' && str[2] == 'n' && str[3] == 'i' &&
                  str[4] == 't' && str[5] == '_' && str[0] == '_' ) {
                 *ptr=  sym->Value ;
             }
         }
-        if(0)
+        if ( 0 ) {
             /* what we really want is
                if (sym->n_scnum==0 && sym->n_sclass == C_EXT
                && !(bsearch(..in ptable for this symbol)))
@@ -492,52 +484,57 @@ int get_extra_bss(sym_table,length,start,ptr,bsssize)
                for the ones you flagged last time.
                */
             /* external bss so not included in size of bss for file */
-            {int val=sym->Value;
-             if (val && c_table.ptable
-                  && (0== find_sym(sym,0)))
-                 { sym->Value=result;
-                   result += val;}}
+            int val = sym->Value;
+            if ( val && c_table.ptable && ( 0 == find_sym ( sym, 0 ) ) ) {
+                sym->Value=result;
+                result += val;
+            }
+        }
         
         sym += sym->NumberOfAuxSymbols; 
 
     }
-    return (result-start);
+    return ( result-start );
 }
 
 
 
-/* go through the symbol table changing the addresses of the symbols
+/* Go through the symbol table changing the addresses of the symbols
    to reflect the current cfd_start */
 void relocate_symbols ( unsigned int length )
 {
-    IMAGE_SYMBOL *end,*sym;
+    PIMAGE_SYMBOL end, sym;
     unsigned int typ;
     char *str;
-    char tem[SYMNMLEN +1];
-    int Value=(int)start_address;
-    tem[SYMNMLEN]=0;
-
+    char tem[SYMNMLEN+1];
+    int Value     = (int) start_address;
+    
     end = symbol_table + length;
     for ( sym = symbol_table; sym < end; sym++ ) {
         typ = sym->SectionNumber;
 
 	if ( typ == TEXT_NSCN || typ == DATA_NSCN ||
 	     typ == RDATA_NSCN || typ == BSS_NSCN ) {
-            if ( typ == TEXT_NSCN )  Value = (int)start_address;
-            if ( typ == DATA_NSCN )  Value = (int)sfaslp->s_start_data;
-            if ( typ == RDATA_NSCN ) Value = (int)sfaslp->s_start_rdata;
-            if ( typ == BSS_NSCN )   Value = (int)sfaslp->s_start_bss;
-            str=SYM_NAME(sym);
+
+            if ( typ == TEXT_NSCN )  Value = (int) start_address;
+            if ( typ == DATA_NSCN )  Value = (int) sfaslp->s_start_data;
+            if ( typ == RDATA_NSCN ) Value = (int) sfaslp->s_start_rdata;
+            if ( typ == BSS_NSCN )   Value = (int) sfaslp->s_start_bss;
+
+            str = SYM_NAME ( sym );
             sym->Value = Value;
+            
         } else {
             if ( typ == 0 ) {
-                str=SYM_NAME(sym);
-                /* describe_sym ( sym-symbol_table, 0 );*/
-                set_symbol_address(sym,str);
-                /* describe_sym ( sym-symbol_table, 0 ); */
+                str = SYM_NAME ( sym );
+                set_symbol_address ( sym, str );
             } else {
-                printf ("relocate_symbols: am ignoring section number %d\n",
-                         (sym->SectionNumber) );	  }
+                fprintf ( stderr,
+                          "relocate_symbols: am ignoring section number %d (%s)\n",
+                          sym->SectionNumber,
+                          SYM_NAME ( sym ) );
+                fflush ( stderr );
+            }
         }
         sym += sym->NumberOfAuxSymbols;
     }
@@ -554,27 +551,28 @@ void relocate_symbols ( unsigned int length )
 
 struct node *find_sym ( PIMAGE_SYMBOL sym, char *name )
 {
-    char tem[SYMNMLEN + 1];
-    tem [SYMNMLEN] = 0;
-    if ( name == NULL ) name = SYM_NAME(sym);
-    return find_sym_ptable(name);
+    char tem[SYMNMLEN+1];
+    if ( name == NULL ) {
+        name = SYM_NAME ( sym );
+    }
+    return ( find_sym_ptable ( name ) );
 }
 
 void set_symbol_address ( PIMAGE_SYMBOL sym, char *string )
 {
     struct node *answ;
     if ( c_table.ptable ) {
-        answ = find_sym(sym,string);
+        answ = find_sym ( sym, string );
         if ( answ ) {
             sym->Value = answ->address - sym->Value;
             /* for symbols in the local  data,text and bss this gets added
                on when we add the current value */
         } else {
             fprintf ( stdout,"undefined %s symbol", string );
-            fflush(stdout);
+            fflush ( stdout );
         }
     } else {
-        FEerror("symbol table not loaded",0);
+        FEerror ( "symbol table not loaded", 0 );
     }
 }
 
