@@ -1,3 +1,24 @@
+2001-12-29  Camm Maguire <camm@enhanced.com>
+
+        * gmp/configure.in update for darwin
+        * #ifdef'ed R_386_NUM in sfaslelf.c for old libc
+	* changes to configure.in and elisp/makefile to handle emacs not
+	being present
+	* fix to gmp/ltconfig to avoid exec'ing '""'
+	* Added DESTDIR to makefiles to support installing under arbitrary
+	subdir
+	* good 'clean' targets
+	* correct building in absense of tcl/tk
+
+
+2001-12-18  David Billinghurst <David.Billinghurst@riotinto.com>
+
+        * h/gnuwin95.h:  Cruft removal and update
+	(SA_RESTART): Surround by #if 0/#endif 
+	(fopen_binary): Remove
+	(fopen): Remove redefinition to fopen_binary
+
+
 2001-04-15  Bill Schelter  <wfs@linux163.ma.utexas.edu>
 
 	*  Added changes to allow the loading .o files compiled
