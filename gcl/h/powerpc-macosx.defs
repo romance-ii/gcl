@@ -6,13 +6,16 @@ CC = gcc $(CPPFLAGS)
 
 # Set this to avoid warnings when linking against libncurses.
 # This is due to the requirements of the two level namespace.
-LIBS := `echo $(LIBS) | sed -e 's/-lncurses/ /'`
+LIBS := `echo $(LIBS) | sed -e 's/-lncurses/ /'` /sw/lib/libintl.dylib
 
 # Set this for the linker to operate correctly.
 MACOSX_DEPLOYMENT_TARGET = 10.2
 
 # Define this to build an executable rsym.
 RSYM = rsym
+ifneq ($(findstring bfd,$(LIBS)),) 
+RSYM = 
+endif
 
 # Define this in order to compile sfasl.c.
 SFASL = $(ODIR)/sfasl.o
@@ -23,4 +26,5 @@ INITFORM = (si::build-symbol-table)
 
 # This is Apple's libtool, completely unrelated to GNU libtool.
 # Other plateforms define this to be `ar rs`.
+# This appears to be no longer necessary on Panther.
 ARRS = libtool -static -o
