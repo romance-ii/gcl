@@ -3,8 +3,10 @@ gclcvs (2.7.0-7) unstable; urgency=low
   * ANSI :default-initarg fixes to define-condition
   * Restore mpz_to_mpz{1} in gmp_big.c, can be written by compiler
   * tk8.4 patches
+  * Prevent destructive modification of bignum arguments in log_op/mp_op
+    in gmp_big.c
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 26 Sep 2003 13:51:17 +0000
+ -- Camm Maguire <camm@intech.m.enhanced.com>  Sat, 27 Sep 2003 16:13:17 +0000
 
 gclcvs (2.7.0-6) unstable; urgency=low
 

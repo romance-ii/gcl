@@ -39,6 +39,9 @@ typedef struct
 #define INTEGER_TO_MP(x, temp ) \
   (type_of(x) == t_bignum ? MP(x) : SI_TO_MP(fix(x), temp))
 
+#define INTEGER_TO_TEMP_MP(x, temp ) \
+  (type_of(x) == t_bignum ? (MP_ASSIGN_OBJECT(MP(temp),x),MP(temp)) : SI_TO_MP(fix(x), temp))
+
 #define MPOP(action,function,x1,x2) \
   do {  \
    function(MP(big_fixnum2) ,x1,x2); \

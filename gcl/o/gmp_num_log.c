@@ -36,7 +36,7 @@ BIG_OP:
 	i = 1;
 	while (i < narg) {
 	  object y = vs_base[i];
-	  (*mp_op) (MP(u),MP(u), INTEGER_TO_MP(y,big_fixnum1));
+	  (*mp_op) (MP(u),MP(u), INTEGER_TO_TEMP_MP(y,big_fixnum1));
 	  i++;
 	}
 	x = normalize_big(u);
