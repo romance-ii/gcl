@@ -367,6 +367,11 @@ case $use in
 			;;
 		arm*)
 			TCFLAGS="$TCFLAGS -mlong-calls";;	
+		powerpc*) 
+			if $(CC) -v 2>&1 | grep -q "gcc version 3.2" ; then
+			   echo Reducing optimization for buggy gcc-3.2
+			   TO3FLAGS="-O -fomit-frame-pointer"
+			fi;;
 	esac;;
 esac
 if test "$enable_pic" = "yes" ; then
