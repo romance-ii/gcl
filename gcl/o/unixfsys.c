@@ -31,6 +31,10 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <pwd.h>
 #endif
 
+#ifdef __MINGW32__
+#  include <windows.h>        
+#endif
+
 #ifdef BSD
 #define HAVE_RENAME
 #endif
@@ -210,6 +214,10 @@ void
 coerce_to_filename(object pathname, char *p)
 {
   object namestring;
+  if ( pathname == Cnil ) {
+      FEerror ( "NIL argument.", 1, pathname );
+  }
+        
   namestring = coerce_to_namestring(pathname);
 #ifndef NO_PWD_H  
   if(namestring->st.st_self[0]=='~')
@@ -259,41 +267,71 @@ truename(object pathname)
 	char current_directory[MAXPATHLEN];
 	char directory[MAXPATHLEN];
 	static char *getwd(char *buffer);
-	coerce_to_filename(pathname, filename);
 
-
+#ifdef __MINGW32__
+        DWORD current_directory_length = GetCurrentDirectory ( MAXPATHLEN, current_directory );
+        if ( MAXPATHLEN < current_directory_length ) {
+            FEerror ( "truename got a current directory name larger than MAXPATHLEN", 1, "" );
+        }
+        if ( 0 == current_directory_length ) {
+            FEerror ( "truename could not determine the current directory.", 1, "" );
+        }
+#else
+        getwd(current_directory);
+#endif        
 	
+        if ( pathname == Cnil ) {
+            FEerror("Cannot get the truename of NIL.", 1, pathname );
+        }
+        
+        coerce_to_filename(pathname, filename);
+
 	for (p = filename, q = 0;  *p != '\0';  p++)
 		if (*p == '/')
 			q = p;
 	if (q == filename) {
 		q++;
-		getwd(current_directory);
 		p = "/";
 	} else if (q == 0) {
 		q = filename;
-		p = getwd(current_directory);
+		p = current_directory;
 	} else
-#ifdef __MINGW32__
-	  if (q[-1]==':') {
+#if 0
+	  if ( ( q > filename ) && ( q[-1] == ':' ) ) {
 	    int current = (q++, q[0]);
 	    q[0]=0;
-	    getwd(current_directory);
 	    if (chdir(filename) < 0)
 	      FEerror("Cannot get the truename of ~S.", 1, pathname);
-	    p = getwd(directory);
-	    if (p[1]==':' && p[2]=='\\' && p[3]==0) p[2]=0;
+            current_directory_length = GetCurrentDirectory ( MAXPATHLEN, directory );
+            if ( MAXPATHLEN < current_directory_length ) {
+                FEerror ( "truename got a current directory name larger than MAXPATHLEN", 1, "" );
+            }
+            if ( 0 == current_directory_length ) {
+                FEerror ( "truename could not determine the current directory.", 1, "" );
+            }
+	    p = directory;
+	    if ( p[1]==':' && ( p[2]=='\\' || p[2]=='/' ) && p[3]==0 ) p[2]=0;
 	    q[0]=current;
           }
 	  else
 #endif	
 	  {
 		*q++ = '\0';
-		getwd(current_directory);
 		if (chdir(filename) < 0)
 		    FEerror("Cannot get the truename of ~S.", 1, pathname);
+#ifdef __MINGW32__
+                current_directory_length = GetCurrentDirectory ( MAXPATHLEN, directory );
+                if ( MAXPATHLEN < current_directory_length ) {
+                    FEerror ( "truename got a current directory name larger than MAXPATHLEN", 1, "" );
+                }
+                if ( 0 == current_directory_length ) {
+                    FEerror ( "truename could not determine the current directory.", 1, "" );
+                }
+                p = directory;
+#else
 		p = getwd(directory);
-	}
+#endif                
+          }
 	if (p[0] == '/' && p[1] == '\0') {
 		if (strcmp(q, "..") == 0)
 			strcpy(truefilename, "/.");
@@ -327,6 +365,18 @@ file_exists(object file)
 	struct stat filestatus;
 
 	coerce_to_filename(file, filename);
+
+#ifdef __MINGW32__
+        {
+            char *p;
+            for (p = filename;  *p != '\0';  p++);
+            if ( (p > filename) &&
+                 ( ( *(p-1) == '/' ) || ( *(p-1) == '\\' ) ) ) {
+               *(p-1) = '\0'; 
+            }
+        }
+#endif        
+
 	if (stat(filename, &filestatus) >= 0)
 	  {
 #ifdef AIX

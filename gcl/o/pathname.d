@@ -84,6 +84,9 @@ int start, end, *ep;
 #define IS_DIR_SEPARATOR(x) (x == '/')
 #endif
 
+	if ( s == Cnil ) {
+      	    FEerror ( "NIL argument in parse_namestring.", 1, x );
+  	}	
 	*ep=oldend;
 	vsp = vs_top + 1;
 	for (;--end >= start && isspace((int)s->st.st_self[end]););
@@ -202,6 +205,9 @@ object x;
 	object y;
 	int e;
 
+        if ( x == Cnil ) {
+            FEerror ( "NIL argument in coerce_to_pathname.", 1, x );
+        }
 L:
 	switch (type_of(x)) {
 	case t_symbol:
@@ -306,6 +312,9 @@ object x;
 	int i, j;
 	object l, y;
 
+	if ( x == Cnil ) {
+      	    FEerror ( "NIL argument in namestring.", 1, x );
+  	}	
 	i = 0;
 
 	l = x->pn.pn_device;
@@ -408,6 +417,9 @@ coerce_to_namestring(x)
 object x;
 {
 
+	if ( x == Cnil ) {
+      	    FEerror ( "NIL argument in coerce_to_namestring.", 1, x );
+  	}	
 L:
 	switch (type_of(x)) {
 	case t_symbol:
