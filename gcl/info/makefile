@@ -47,12 +47,15 @@ gcl.info: ${GCL_MAN} gcl.texi
 
 gcl-si_toc.html:
 	texi2html -split_chapter gcl-si.texi
+#	makeinfo --html gcl-si.texi
 
 gcl-tk_toc.html:
 	texi2html -split_chapter gcl-tk.texi
+#	makeinfo --html gcl-tk.texi
 
 gcl_toc.html:
 	texi2html -split_chapter gcl.texi
+#	makeinfo --html gcl.texi
 
 install-html: gcl-tk_toc.html gcl-si_toc.html gcl_toc.html
 	cp *.html /d/www/gcl
