@@ -241,7 +241,7 @@ struct key {short n,allow_other_keys;
 typedef int (*FUNC)();
 /* cmpaux.c:294:OF */ extern void call_init (int init_address, object memory, object fasl_vec, FUNC fptr); /* (init_address, memory, fasl_vec, fptr) int init_address; object memory; object fasl_vec; FUNC fptr; */
 /* cmpaux.c:339:OF */ extern void do_init (object *statVV); /* (statVV) object *statVV; */
-/* cmpaux.c:416:OF */ extern void init_or_load1 (int (*fn) (/* ??? */), char *file); /* (fn, file) int (*fn)(); char *file; */
+/* cmpaux.c:416:OF */ extern void init_or_load1 (void (*fn) (void), char *file); /* (fn, file) int (*fn)(); char *file; */
 /* conditional.c:34:OF */ extern void Fif (object form); /* (form) object form; */
 /* conditional.c:60:OF */ extern void Fcond (object args); /* (args) object args; */
 /* conditional.c:94:OF */ extern void Fcase (object arg); /* (arg) object arg; */
@@ -487,7 +487,7 @@ typedef void (*funcvoid)(void);
 /* sgbc.c:1068:OF */ extern int sgc_quit (void); /* () */
 /* sgbc.c:1131:OF */ extern void make_writable (int beg, int i); /* (beg, i) int beg; int i; */
 #include <signal.h>
-/* sgbc.c:1149:OF */ extern void memprotect_handler (int sig, int code, struct sigcontext *scp, char *addr); /* (sig, code, scp, addr) int sig; int code; struct sigcontext *scp; char *addr; */
+/* sgbc.c:1149:OF */ extern void memprotect_handler (int sig, long code, struct sigcontext *scp, char *addr); /* (sig, code, scp, addr) int sig; int code; struct sigcontext *scp; char *addr; */
 /* sgbc.c:1202:OF */ extern void sgc_mprotect (int pbeg, int n, int writable); /* (pbeg, n, writable) int pbeg; int n; int writable; */
 /* sgbc.c:1220:OF */ extern void fix_for_page_multiple (int beg, int end); /* (beg, end) int beg; int end; */
 /* sgbc.c:1246:OF */ extern void memory_protect (int on); /* (on) int on; */

@@ -868,6 +868,10 @@ type_of(#0)==t_bitvector")
  (push '((fixnum fixnum) fixnum #.(flags rfa)"((#0) | (#1))")
    (get 'logior 'inline-always))
 
+;;LOGXOR
+ (push '((fixnum fixnum) fixnum #.(flags rfa)"((#0) ^ (#1))")
+   (get 'logxor 'inline-always))
+
 ;;LOGNOT
  (push '((fixnum) fixnum #.(flags rfa)"(~(#0))")
    (get 'lognot 'inline-always))

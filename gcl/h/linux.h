@@ -38,7 +38,7 @@
 do {static struct sigaction action; \
       action.sa_handler = (void *)memprotect_handler; \
       action.sa_flags = MPROTECT_ACTION_FLAGS; \
-      action.sa_restorer = 0; \
+      /*action.sa_restorer = 0;*/ \
       sigemptyset(&action.sa_mask); \
       sigaddset(&action.sa_mask,SIGINT); \
       sigaddset(&action.sa_mask,SIGALRM); \

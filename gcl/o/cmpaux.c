@@ -399,7 +399,7 @@ char *s;
 #endif
 
 void
-init_or_load1(int (*fn) (/* ??? */), char *file)
+init_or_load1(void (*fn)(void),char *file)
 {int n=strlen(file);
  if (file[n-1]=='o')
    { object memory;

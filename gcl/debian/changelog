@@ -1,3 +1,11 @@
+gcl (2.5.0.cvs20020625-23) unstable; urgency=high
+
+  * 64bit SGC support
+  * SGC on by default for sparc-linux and mips(el)-linux
+  * Optimized logxor funtion
+
+ -- Camm Maguire <camm@enhanced.com>  Mon, 29 Jul 2002 18:47:20 -0400
+
 gcl (2.5.0.cvs20020625-22) unstable; urgency=high
 
   * ElfW macros in rsym*.c for 64bit

@@ -93,7 +93,8 @@ sgc_mark_cons(object x) {
 void
 sgc_mark_object1(object x) {
 
-  int i, j;
+  long i;
+  int j;
   object *p;
   char *cp;
   
@@ -285,8 +286,8 @@ sgc_mark_object1(object x) {
 	  x->a.a_self = (object *)copy_relblock(cp, j);
       }
       else if (x->a.a_displaced->c.c_car == Cnil) {
-	i = (int)(object *)copy_relblock(cp, j)
-	  - (int)(x->a.a_self);
+	i = (long)(object *)copy_relblock(cp, j)
+	  - (long)(x->a.a_self);
 	adjust_displaced(x, i);
       }
     }
@@ -635,7 +636,7 @@ sgc_mark_phase(void) {
       tm=tm_of(t);
       p=pagetochar(i);
       if ( t == t_cons) 
-	for (j = tm->tm_nppage; --j >= 0; p += sizeof(struct cons)) {
+	for (j = tm->tm_nppage; --j >= 0; p += tm_table[t_cons].tm_size/*  sizeof(struct cons) */) {
 	  object x = (object) p; 
 	  if (SGC_OR_M(x)) 
 	    continue;
@@ -887,7 +888,7 @@ sgc_contblock_sweep_phase(void) {
 
 
 #define PAGE_ROUND_UP(adr) \
-    ((char *)(PAGESIZE*(((int)(adr)+PAGESIZE -1) >> PAGEWIDTH)))
+    ((char *)(PAGESIZE*(((long)(adr)+PAGESIZE -1) >> PAGEWIDTH)))
 
 char *old_rb_start;
 
@@ -1161,12 +1162,12 @@ make_writable(int beg, int i) {
   }
 }
 
-int debug_fault =0;
+long debug_fault =0;
 int fault_count =0;
 extern char etext;
 /*  void memprotect_handler(int sig, int code, struct sigcontext *scp, char *addr); */
 void
-memprotect_handler(int sig, int code, struct sigcontext *scp, char *addr) {
+memprotect_handler(int sig, long code, struct sigcontext *scp, char *addr) {
   
   int p;
   int j=page_multiple;
@@ -1174,11 +1175,11 @@ memprotect_handler(int sig, int code, struct sigcontext *scp, char *addr) {
 		   arguments on the stack! */
 #ifdef GET_FAULT_ADDR
   faddr=GET_FAULT_ADDR(sig,code,scp,addr); 
-  debug_fault = (int) faddr;
+  debug_fault = (long) faddr;
 #ifdef DEBUG_MPROTECT
   printf("fault:0x%x [%d] (%d)  ",faddr,page(faddr),faddr >= core_end);
 #endif 
-  if (faddr >= core_end || (unsigned int)faddr < DBEGIN) {
+  if (faddr >= core_end || (unsigned long)faddr < DBEGIN) {
     if (fault_count > 300) error("fault count too high");
     fault_count ++;
     INSTALL_MPROTECT_HANDLER;

@@ -2,8 +2,8 @@
 
 extern object user_init();
 
-void init_or_load1 ();
-#define init_or_load(fn,file) do {extern int fn(); init_or_load1(fn,file);} \
+void init_or_load1 (void (*)(void),char *);
+#define init_or_load(fn,file) do {extern void fn(void); init_or_load1(fn,file);} \
   while(0)
 
 static void

@@ -16,6 +16,7 @@
 
 
 #define	SPARC
-/*  #define SGC */
+#define SGC
 
 #define PTR_ALIGN 8
+
