@@ -28,8 +28,9 @@ gclcvs (2.7.0-1) unstable; urgency=low
     Debian autoconf's dependency bug on emacsen-common
   * Fix permissions bug in temporary gzipped file handling
   * Propagate control changes correctly with package extension
+  * Newer standards
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  9 Sep 2003 16:59:47 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue,  9 Sep 2003 17:08:10 +0000
 
 gcl (2.6.1-1) unstable; urgency=low
 
