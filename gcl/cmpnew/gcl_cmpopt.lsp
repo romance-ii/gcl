@@ -634,11 +634,11 @@ type_of(#0)==t_bitvector")
    (get 'char-code 'inline-always))
 
 ;;CHAR/=
- (push '((character character) boolean #.(flags)"(#0)!=(#1)")
-   (get 'char/= 'inline-always))
 (push '((t t) boolean #.(flags)"!eql(#0,#1)")
    (get 'char/= 'inline-unsafe))
 (push '((t t) boolean #.(flags)"char_code(#0)!=char_code(#1)")
+   (get 'char/= 'inline-unsafe))
+(push '((character character) boolean #.(flags)"(#0)!=(#1)")
    (get 'char/= 'inline-unsafe))
 
 ;;CHAR<
@@ -1138,3 +1138,20 @@ type_of(#0)==t_bitvector")
  (push '((t t) t #.(flags) "cdifference(#0,#1)")
    (get 'system:cdifference 'inline-always))
 
+;;GETHASH
+(push '((t t *) (values t t) #.(flags)(lambda (key hash &optional default)
+				(let ((*value-to-go* (or
+						      (pop *values-to-go*)
+						      (and (member *value-to-go* '(top return) :test (function eq))
+							   (list 'vs (vs-push)))
+						      'trash)))
+				    (wt "({struct htent *_t=gethash(" key "," hash "); _t->hte_key==OBJNULL ? ({")
+				    (set-loc nil)
+				    (wt default ";}) : ({")
+				    (set-loc t)
+				    (wt "_t->hte_value;});})"))))
+      (get 'gethash 'inline-unsafe))
+
+
+;;si::HASH-SET
+(push '((t t t) t #.(flags set) "(sethash(#0,#1,#2),#2)") (get 'si::hash-set 'inline-unsafe))

@@ -266,7 +266,7 @@
   (cond ((and fname (symbolp fname))
 	 (add-callee fname)))
   (cond ((eq loc 'record-call-info) (return-from record-call-info nil)))
-  (case *value-to-go*
+  (case (if (multiple-values-p) 'top *value-to-go*)
     (return
       (if (eq loc 'fun-val)
 	  (add-value-type nil (or fname  'unknown-values))
@@ -275,10 +275,7 @@
       (add-value-type 'fixnum nil))
     (return-object
       (add-value-type t nil))
-    
-    (top  (setq *top-data* (cons fname nil))
-	 ))
-     )
+    (top (setq *top-data* (cons fname nil)))))
 
 (defun list-undefined-functions (&aux undefs)
   (sloop::sloop for (name fn) in-table *call-table*

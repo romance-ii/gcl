@@ -27,8 +27,10 @@ gclcvs (2.7.0-32) unstable; urgency=low
   * fix wrongprototype for Llast
   * compiler macros to rewrite certain multi argument functions as
     nested calls with two arguments, to enable inlining
+  * Support for inlining functions returning multiple values, with
+    gethash as the first example
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 16 Sep 2004 20:59:06 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 16 Sep 2004 21:04:24 +0000
 
 gclcvs (2.7.0-31) unstable; urgency=high
 

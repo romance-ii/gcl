@@ -1103,6 +1103,9 @@ siLhash_set(void);
 void
 Lgethash(void);
 
+struct htent *
+gethash(object,object);
+
 void
 Lremhash(void);
 

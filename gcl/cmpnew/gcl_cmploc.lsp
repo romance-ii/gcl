@@ -22,6 +22,8 @@
 (in-package 'compiler)
 
 (defvar *value-to-go*)
+(defvar *values-to-go* nil)
+(defvar *multiple-value-exit-label* nil)
 
 ;;; Valid locations are:
 ;;;	NIL
@@ -104,6 +106,9 @@
 (defun wt-next-var-arg ()
   (wt "va_arg(ap,object)"))
 
+(defun multiple-values-p ()
+  (and (consp *value-to-go*) (consp (car *value-to-go*))))
+
 (defun set-loc (loc &aux fd)
   (cond ((eq *value-to-go* 'return) (set-return loc))
         ((eq *value-to-go* 'trash)
@@ -119,6 +124,13 @@
                 (wt-nl "(void)" loc ";"))))
         ((eq *value-to-go* 'top)
          (unless (eq loc 'fun-val) (set-top loc)))
+	((multiple-values-p)
+	 (unless (eq loc 'fun-val)
+	   (let ((*values-to-go* *value-to-go*))
+	     (do ((loc loc nil)) ((null *values-to-go*))
+	       (let ((*value-to-go* (pop *values-to-go*)))
+		 (set-loc loc)))
+	     (wt-nl)(reset-top)(wt-go *multiple-value-exit-label*))))
         ((eq *value-to-go* 'return-fixnum) (set-return-fixnum loc))
         ((eq *value-to-go* 'return-character) (set-return-character loc))
         ((eq *value-to-go* 'return-long-float) (set-return-long-float loc))
@@ -161,10 +173,10 @@
   )
 
 (defun set-top (loc)
- (let ((*vs* *vs*))
-      (wt-nl) (wt-vs (vs-push)) (wt "= " loc ";")
-      (wt-nl "vs_top=(vs_base=base+" (1- *vs*) ")+1;")
-      (base-used)))
+  (let ((vs-mark *vs*) (*vs* *vs*))
+    (wt-nl) (wt-vs (vs-push)) (wt "= " loc ";")
+    (wt-nl "vs_top=(vs_base=base+" vs-mark ")+" (- *vs* vs-mark) ";")
+    (base-used)))))
 
 (defun wt-vs-base (offset) (wt "vs_base[" offset "]"))
 

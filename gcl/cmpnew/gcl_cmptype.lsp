@@ -132,14 +132,22 @@
 (defun type-and (type1 type2)
   
   (cond ((equal type1 type2) type1)
+	((and (consp type2) (eq (car type2) 'values))
+	 (if (and (consp type1) (eq (car type1) 'values))
+	     (let ((r (list 'values)))
+	       (do ((t1 (cdr type1) (cdr t1))
+		    (t2 (cdr type2) (cdr t2)))
+		   ((not (and (consp t1) (consp t2))) (nreverse r))
+		 (push (type-and (car t1) (car t2)) r)))
+	   (type-and type1 (second type2))))
+	((and (consp type1) (eq (car type1) 'values))
+	   (type-and (second type1) type2))
         ((eq type1 t) type2)
 	((eq type1 '*) type2)
 	((eq type1 'object) type2)
 	((eq type2 'object) type1)
         ((eq type2 t) type1)
 	((eq type2 '*) type1)
-	((and (consp type2) (eq (car type2) 'values))
-	 (type-and type1 (second type2)))
         ((consp type1)
          (case (car type1)
                (array
@@ -154,7 +162,6 @@
                 (if (and (consp type2) (eq (car type2) 'array)
                          (eq (cadr type1) (cadr type2)))
                     type1 nil))
-	       (values (type-and (second type1) type2))
                (t nil)))
         (t (case type1
                  (string
