@@ -1,7 +1,7 @@
 AC_INIT()
 AC_CONFIG_HEADER(h/gclincl.h)
 
-VERSION=2.5.4
+VERSION=`cat majvers`.`cat minvers`
 AC_SUBST(VERSION)
 
 # some parts of this configure script are taken from the tcl configure.in
