@@ -6,7 +6,7 @@ Build-Depends: debhelper, emacsen, libreadline4-dev, m4, tk8.2-dev, tetex-bin, t
 Standards-Version: 3.5.2
 
 Package: gcl
-Architecture: i386 m68k arm
+Architecture: i386 m68k arm sparc
 Depends: ${shlibs:Depends}
 Suggests: gcl-doc
 Description: GNU Common Lisp compiler.

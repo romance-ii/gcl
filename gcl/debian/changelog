@@ -1,9 +1,10 @@
-gcl (2.5.0.cvs20020429-1) unstable; urgency=medium
+gcl (2.5.0.cvs20020429-1) unstable; urgency=high
 
   * Build-Depend on tk8.2-dev, Closes: #144330
   * New cvs updates
+  * Added sparc to arch list, Closes: #143465
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 29 Apr 2002 21:48:57 -0400
+ -- Camm Maguire <camm@enhanced.com>  Mon, 29 Apr 2002 23:07:36 -0400
 
 gcl (2.5.0.cvs20020219-2) unstable; urgency=medium
 
