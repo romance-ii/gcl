@@ -192,7 +192,7 @@ do { int c = 0; \
 
 
 /* try out the gnu malloc */
-/* #define GNU_MALLOC */
+/*  #define GNU_MALLOC */
 
 #define INSTALL_SEGMENTATION_CATCHER \
   	 (void) signal(SIGSEGV,segmentation_catcher)

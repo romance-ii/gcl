@@ -1,5 +1,4 @@
-This is Info file gcl-si.info, produced by Makeinfo version 1.67 from
-the input file gcl-si.texi.
+This is gcl-si.info, produced by makeinfo version 4.0 from gcl-si.texi.
 
    This is a Texinfo GCL SYSTEM INTERNALS Manual
 
@@ -7,46 +6,45 @@ the input file gcl-si.texi.
 
 
 Indirect:
-gcl-si.info-1: 188
-gcl-si.info-2: 48967
-gcl-si.info-3: 93280
-gcl-si.info-4: 141301
-gcl-si.info-5: 178869
-gcl-si.info-6: 226517
+gcl-si.info-1: 162
+gcl-si.info-2: 48943
+gcl-si.info-3: 93711
+gcl-si.info-4: 141734
+gcl-si.info-5: 179304
 
 Tag Table:
 (Indirect)
-Node: Top188
-Node: Numbers1046
-Node: Sequences and Arrays and Hash Tables23336
-Node: Characters48967
-Node: Lists56361
-Node: Streams and Reading70139
-Node: Special Forms and Functions93280
-Node: Compilation119070
-Node: Symbols127296
-Node: Operating System137092
-Node: Command Line137278
-Node: Operating System Definitions141301
-Node: Structures147674
-Node: Iteration and Tests149220
-Node: User Interface152668
-Node: Doc161748
-Node: Type165015
-Node: GCL Specific167669
-Node: Bignums175547
-Node: C Interface178241
-Node: Available Symbols178397
-Node: System Definitions178869
-Node: Regular Expressions207603
-Node: Debugging213723
-Node: Source Level Debugging in Emacs213918
-Node: Low Level Debug Functions218281
-Node: Miscellaneous219279
-Node: Environment219481
-Node: Inititialization220095
-Node: Low Level X Interface220632
-Node: Compiler Definitions221223
-Node: Function and Variable Index226517
+Node: Top162
+Node: Numbers1022
+Node: Sequences and Arrays and Hash Tables23312
+Node: Characters48943
+Node: Lists56337
+Node: Streams and Reading70115
+Node: Special Forms and Functions93711
+Node: Compilation119501
+Node: Symbols127728
+Node: Operating System137524
+Node: Command Line137710
+Node: Operating System Definitions141734
+Node: Structures148107
+Node: Iteration and Tests149653
+Node: User Interface153101
+Node: Doc162181
+Node: Type165448
+Node: GCL Specific168104
+Node: Bignums175982
+Node: C Interface178676
+Node: Available Symbols178832
+Node: System Definitions179304
+Node: Regular Expressions208038
+Node: Debugging214158
+Node: Source Level Debugging in Emacs214353
+Node: Low Level Debug Functions218716
+Node: Miscellaneous219714
+Node: Environment219916
+Node: Inititialization220532
+Node: Low Level X Interface221069
+Node: Compiler Definitions221660
+Node: Function and Variable Index226954
 
 End Tag Table

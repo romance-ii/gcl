@@ -1199,7 +1199,7 @@ char *ptr;
 #endif
 
 
-#ifndef GNUMALLOC
+#ifndef GNU_MALLOC
 char *
 memalign(align,size)
      int align,size;

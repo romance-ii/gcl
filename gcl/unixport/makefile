@@ -81,10 +81,12 @@ MACHINE=386-linux
 
 LBINDIR=/usr/local/bin
 
-OFLAG	=  -O 
+#OFLAG	=  -O 
+OFLAG	=  -g
 LIBS	= -lm 
 
-ODIR_DEBUG= -O4 
+#ODIR_DEBUG= -O4 
+ODIR_DEBUG= -g
 
 # This CC string will be used for compilation of the system,
 # and also in the compiler::*cc* variable for later compilation of
