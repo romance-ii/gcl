@@ -164,9 +164,9 @@ DEFUN_NEW("ROW-MAJOR-AREF", object, fLrow_major_aref, LISP, 2, 2,
     case aet_uchar:
       return small_fixnum(x->ust.ust_self[i]);
     case aet_short:
-      return make_fixnum(SHORT(x, i));
+      return make_fixnum(SHORT_GCL(x, i));
     case aet_ushort:
-      return small_fixnum(USHORT(x, i));
+      return small_fixnum(USHORT_GCL(x, i));
 
     default:
       FEerror("unknown array type",0);
@@ -234,11 +234,11 @@ DEFUN_NEW("ASET1", object, fSaset1, SI, 3, 3, NONE, OO, IO, OO,OO,(object x, fix
       break;
     case aet_short:
       ASSURE_TYPE(val,t_fixnum);
-      SHORT(x, i) = Mfix(val);
+      SHORT_GCL(x, i) = Mfix(val);
       break;
     case aet_ushort:
       ASSURE_TYPE(val,t_fixnum);
-      USHORT(x, i) = Mfix(val);
+      USHORT_GCL(x, i) = Mfix(val);
       break;
     default:
       FEerror("unknown array type",0);

@@ -360,8 +360,8 @@ struct ustring {
 
 };
 
-#define USHORT(x,i) (((unsigned short *)(x)->ust.ust_self)[i])
-#define SHORT(x,i) ((( short *)(x)->ust.ust_self)[i])
+#define USHORT_GCL(x,i) (((unsigned short *)(x)->ust.ust_self)[i])
+#define SHORT_GCL(x,i) ((( short *)(x)->ust.ust_self)[i])
 
 #define BV_OFFSET(x) ((type_of(x)==t_bitvector ? x->bv.bv_offset : \
 		       type_of(x)== t_array ? x->a.a_offset : (abort(),0)))
@@ -455,7 +455,7 @@ struct s_data {object name;
 
 #define S_DATA(x) ((struct s_data *)((x)->str.str_self))
 #define SLOT_TYPE(def,i) (((S_DATA(def))->raw->ust.ust_self[i]))
-#define SLOT_POS(def,i) USHORT(S_DATA(def)->slot_position,i)
+#define SLOT_POS(def,i) USHORT_GCL(S_DATA(def)->slot_position,i)
 #define STREF(type,x,i) (*((type *)(((char *)((x)->str.str_self))+(i))))
 
 
