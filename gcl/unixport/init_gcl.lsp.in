@@ -9,7 +9,6 @@
 ;;Appropriate for Austin
 (setq SYSTEM:*DEFAULT-TIME-ZONE*  6)
 (in-package "USER")
-(load (concatenate si::*system-directory* "../gcl-tk/tk-package.lsp"))
 (progn 
 ;(allocate 'cons 100) (allocate 'string 40)
  (system:init-system) (gbc t)
