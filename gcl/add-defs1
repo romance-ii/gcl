@@ -1,8 +1,8 @@
 #!/bin/sh
 
-CC=cc
+#CC=cc
 if test "$1" = "mingw" -o  "$1" = "gnuwin95"  ; then
-   EXE=.exe ; CC=gcc
+   EXE=.exe ; # CC=gcc
    rm -f o/*.ini
 fi
  
