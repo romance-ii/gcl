@@ -830,8 +830,7 @@ SYSTEM_SPECIAL_INIT
 	 #+winnt (raw (merge-pathnames (make-pathname :type "exe") raw))
 	 )
 
-
-    (system (format nil "touch ~a" (namestring map)))
+    (with-open-file (st (namestring map) :direction :output))
     (system 
      (format nil "~a ~a ~a ~a -L~a ~a ~a ~a"
 	     *ld* 

@@ -79,8 +79,10 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Autodetect GNU ld and add -Wl,-Map only when appropriate
   * Fix GNU_LD autodetection in configure.in
   * Eliminate C_INCLUDE_PATH from shell script wrapper
+  * Use lisp rather than 'system touch' to make empty map file in
+    compiler::link
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 01:31:19 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 01:33:54 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
