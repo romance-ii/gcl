@@ -498,6 +498,9 @@ if test $use = "386-linux" ; then
 
 fi
 
+AC_PATH_PROG(EMACS,emacs)
+
+
 # check for where the emacs site lisp directory is.
 rm -f conftest.el
 cat >> conftest.el <<EOF
@@ -512,8 +515,12 @@ cat >> conftest.el <<EOF
 EOF
 
 AC_MSG_CHECKING([emacs site lisp directory])
-EMACS_SITE_LISP=unknown
-EMACS_SITE_LISP=`emacs -q -batch --no-site-file -l conftest.el 2>&1 | sed -e /Loading/d `
+#EMACS_SITE_LISP=unknown
+if [[ "$EMACS" != "" ]] ; then
+	EMACS_SITE_LISP=`$EMACS -q -batch --no-site-file -l conftest.el 2>&1 | sed -e /Loading/d `
+else
+	EMACS_SITE_LISP=""
+fi
 AC_MSG_RESULT($EMACS_SITE_LISP)
 AC_SUBST(EMACS_SITE_LISP)
 
@@ -530,9 +537,15 @@ cat >> conftest.el <<EOF
 EOF
 
 AC_MSG_CHECKING([emacs default.el])
-EMACS_DEFAULT_EL=`emacs -q -batch --no-site-file -l conftest.el 2>&1 | sed -e /Loading/d | sed -e /load/d `
+if [[ "$EMACS" != "" ]] ; then
+	EMACS_DEFAULT_EL=`$EMACS -q -batch --no-site-file -l conftest.el 2>&1 | sed -e /Loading/d | sed -e /load/d `
+else
+	EMACS_DEFAULT_EL=""
+fi
 if  test -f "${EMACS_DEFAULT_EL}"  ; then true;else
-  EMACS_DEFAULT_EL=${EMACS_SITE_LISP}/default.el
+  if test -d "$EMACS_SITE_LISP" ; then
+     EMACS_DEFAULT_EL=${EMACS_SITE_LISP}/default.el
+  fi
 fi
 AC_MSG_RESULT($EMACS_DEFAULT_EL)
 AC_SUBST(EMACS_DEFAULT_EL)
@@ -552,7 +565,9 @@ cat >> conftest.el <<EOF
 EOF
 
 AC_MSG_CHECKING([emacs info/dir])
-INFO_DIR=`emacs -q -batch --no-site-file -l conftest.el 2>&1 | sed -e /Loading/d | sed -e /load/d `
+if [[ "$EMACS" != "" ]] ; then
+	INFO_DIR=`$EMACS -q -batch --no-site-file -l conftest.el 2>&1 | sed -e /Loading/d | sed -e /load/d `
+fi
 if  test -f "${INFO_DIR}dir"  ; then true;else
 if test -f /usr/info/dir ; then
   INFO_DIR=/usr/info/
