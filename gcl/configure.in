@@ -665,37 +665,42 @@ if test "${TCLSH}" = "" ; then true ; else
 TCL_CONFIG_PREFIX=`${TCLSH} < conftest.tcl`
 fi
 fi
+if test -f ${TCL_CONFIG_PREFIX}/tclConfig.sh  ; then . ${TCL_CONFIG_PREFIX}/tclConfig.sh ; fi
 
 
 if test -d "${TK_CONFIG_PREFIX}"  ; then true ; else
 if test -f ${TCL_CONFIG_PREFIX}/tkConfig.sh ; then
 TK_CONFIG_PREFIX=${TCL_CONFIG_PREFIX}
 else
-rm -f conftest.tcl
-cat >> conftest.tcl <<EOF
-[
-set dir [set tk_library]
-if { [file exists [file join [set dir] tkConfig.sh]] } {
-      puts  [set dir]
-      exit
-  }
-set dir [file dirname [set tk_library]]
-if { [file exists [file join [set dir] tkConfig.sh]] } {
-      puts  [set dir]
-  }
-exit 0
-]
-EOF
-cp conftest.tcl foo.tcl
-AC_CHECK_PROG(TKSH,wish,wish,${TKSH})
-#AC_CHECK_PROG(TKSH,wish8.0,wish8.0,${TKSH})
-if test "${TKSH}" = "" ; then true ; else
-TK_CONFIG_PREFIX=`${TKSH} < conftest.tcl`
+#rm -f conftest.tcl
+#cat >> conftest.tcl <<EOF
+#[
+#set dir [set tk_library]
+#if { [file exists [file join [set dir] tkConfig.sh]] } {
+#      puts  [set dir]
+#      exit
+#  }
+#set dir [file dirname [set tk_library]]
+#if { [file exists [file join [set dir] tkConfig.sh]] } {
+#      puts  [set dir]
+#  }
+#exit 0
+#]
+#EOF
+#cp conftest.tcl foo.tcl
+#AC_CHECK_PROG(TKSH,wish,wish,${TKSH})
+##AC_CHECK_PROG(TKSH,wish8.0,wish8.0,${TKSH})
+#if test "${TKSH}" = "" ; then true ; else
+#TK_CONFIG_PREFIX=`${TKSH} < conftest.tcl`
+#fi
+
+if test "${TCLSH}" = "" ; then true ; else
+	TK_CONFIG_PREFIX=`echo tcl_findLibrary \"tk\" \"${TCL_VERSION}\" \"\" \"tkConfig.sh\" \"TK_LIBRARY\" tk_library | ${TCLSH} 2>&1 | awk '/"source / {if (i++) next;sub("/[[^/]]*$","",$2);print $2}'`
 fi
+
 fi
 fi
 #AC_MSG_CHECKING(TK_CONFIG_PREFIX=${TK_CONFIG_PREFIX})
-if test -f ${TCL_CONFIG_PREFIX}/tclConfig.sh  ; then . ${TCL_CONFIG_PREFIX}/tclConfig.sh ; fi
 if test -f ${TK_CONFIG_PREFIX}/tkConfig.sh  ; then . ${TK_CONFIG_PREFIX}/tkConfig.sh ; fi
 
 if test -d ${TK_CONFIG_PREFIX}/tk${TK_VERSION} ; then
