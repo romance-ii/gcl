@@ -8,8 +8,10 @@ gclcvs (2.7.0-20) unstable; urgency=low
     size across the board, install same for use with compiler::link
   * Use pathnames instead of strings in compiler::link, also in image
     init files, for Windows
+  * small mod to unixport/makefile re filtering of firstfile and
+    lastfile
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 20 Feb 2004 04:01:14 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 20 Feb 2004 04:04:34 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
