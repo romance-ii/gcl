@@ -1,4 +1,9 @@
 /* if already mp.h has been included skip */
+#ifdef GMP
+#define save_avma 
+#define restore_avma 
+#endif
+
 #ifdef _MP_H
 #ifdef GMP
 

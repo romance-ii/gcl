@@ -361,32 +361,65 @@ copy_to_big(x)
 int
 obj_to_mpz(object x,MP_INT * y) {
 
-  int ret=0;
+  switch(type_of(x)) {
+  case t_fixnum:
+    mpz_set_si(y,fix(x));
+    break;
+  case t_bignum:
+    if (abs(MP(x)->_mp_size)<=y->_mp_alloc)
+      mpz_set(y,MP(x));
+    else
+      return abs(MP(x)->_mp_size)*sizeof(*y->_mp_d);
+    break;
+  default:
+    FEerror("fixnum or bignum expected",0);
+    break;
+  }
+
+  return 0;
+
+}
+
+int
+obj_to_mpz1(object x,MP_INT * y,void *v) {
 
   switch(type_of(x)) {
   case t_fixnum:
     mpz_set_si(y,fix(x));
     break;
   case t_bignum:
+    y->_mp_alloc=abs(MP(x)->_mp_size);
+    y->_mp_d=v;
     mpz_set(y,MP(x));
     break;
   default:
     FEerror("fixnum or bignum expected",0);
-    ret=1;
     break;
   }
 
-  return ret;
+  return 0;
 
 }
 
 int
 mpz_to_mpz(MP_INT * x,MP_INT * y) {
 
-  int ret=0;
+  if (abs(x->_mp_size)<=y->_mp_alloc)
+    mpz_set(y,x);
+  else
+    return abs(x->_mp_size)*sizeof(*y->_mp_d);
 
+  return 0;
+
+}
+
+int
+mpz_to_mpz1(MP_INT * x,MP_INT * y,void *v) {
+
+  y->_mp_alloc=abs(x->_mp_size);
+  y->_mp_d=v;
   mpz_set(y,x);
-  return ret;
+  return 0;
 
 }
 

@@ -38,16 +38,34 @@ GEN setq_io(),setq_ii();
 typedef MP_INT * GEN;
 
 int obj_to_mpz(object,MP_INT *);
+int obj_to_mpz1(object,MP_INT *,void *);
 int mpz_to_mpz(MP_INT *,MP_INT *);
+int mpz_to_mpz1(MP_INT *,MP_INT *,void *);
 void isetq_fix(MP_INT *,int);
 MP_INT * otoi(object x);
 
-#define IDECL(a,b,c) MP_INT b; a = (mpz_init(&b),&b) ; object c
+#ifndef HAVE_ALLOCA
+#error Need alloca for GMP
+#endif
+
+#define IDECL(a,b,c) MP_INT b={1,1,alloca(1*sizeof(mp_limb_t))}; a = &b ; object c
 #define SETQ_IO(var,alloc,val) { object _xx = (val); \
-                                 obj_to_mpz(_xx,(var));}
+                                 int _n; \
+                                 if ((_n=obj_to_mpz(_xx,(var)))) {\
+                                   obj_to_mpz1(_xx,(var),alloca(_n));}}
 #define SETQ_II(var,alloc,val) { MP_INT * _xx = (val); \
-                                 mpz_to_mpz(_xx,(var));}
+                                 int _n; \
+                                 if ((_n=mpz_to_mpz(_xx,(var)))) {\
+                                   mpz_to_mpz1(_xx,(var),alloca(_n));}}
 #define ISETQ_FIX(a,b,c) isetq_fix(a,c)
+
+
+/*  #define IDECL(a,b,c) MP_INT b; a = (mpz_init(&b),&b) ; object c */
+/*  #define SETQ_IO(var,alloc,val) { object _xx = (val); \ */
+/*                                   obj_to_mpz(_xx,(var));} */
+/*  #define SETQ_II(var,alloc,val) { MP_INT * _xx = (val); \ */
+/*                                   mpz_to_mpz(_xx,(var));} */
+/*  #define ISETQ_FIX(a,b,c) isetq_fix(a,c) */
 
 
 #endif /* end no GMP */
