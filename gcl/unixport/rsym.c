@@ -12,8 +12,7 @@ to compile use cc rsym.c -o rsym  -I../h
 
 #define IN_RSYM 1
 #include <stdio.h>
-#include "config.h"
-#include "gclincl.h"
+#include "include.h"
 
 #ifdef SPECIAL_RSYM
 #include SPECIAL_RSYM

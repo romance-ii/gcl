@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-22) unstable; urgency=high
+
+  * ElfW macros in rsym*.c for 64bit
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 25 Jul 2002 17:49:32 -0400
+
 gcl (2.5.0.cvs20020625-21) unstable; urgency=high
 
   * Support for dlopen object loading where bfd is not yet working --

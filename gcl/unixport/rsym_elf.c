@@ -28,13 +28,15 @@ to compile use cc rsym.c -o rsym  -I../h
 
 
 #include <elf.h>
-Elf32_Phdr pheader;
-Elf32_Ehdr eheader;
-Elf32_Sym *symbol_table;
+ElfW(Phdr) pheader;
+ElfW(Ehdr) eheader;
+ElfW(Sym) *symbol_table;
 int text_index,data_index,bss_index,sbss_index;
 #undef SYM_NAME
 #undef EXT_and_TEXT_BSS_DAT
-
+#define mjoin(a,b) a ## b
+#define Mjoin(a,b) mjoin(a,b)
+#define ELFW(a) Mjoin(ELF,Mjoin(__ELF_NATIVE_CLASS,Mjoin(_,a)))
 
 int nsyms;
 char *my_string_table;
@@ -71,9 +73,9 @@ int
 output_externals(char *);
 
 int
-main(argc,argv)
+main(argc,argv,envp)
 int argc ;
-char *argv[];
+char *argv[],*envp[];
 {
   if (argc!=3) {perror("bad arg count");
 		fflush(stdout);
@@ -87,7 +89,7 @@ char *argv[];
 }
 #define SECTION_H(k) section_headers[k]
 char *section_names;
-Elf32_Shdr *section_headers;
+ElfW(Shdr) *section_headers;
 
 int
 get_section_number(name)
@@ -152,7 +154,7 @@ char *filename;
 	  fprintf(stderr,"Bad magic %s",filename);
 	  exit(1);};
 
-	section_headers = (void *)malloc(sizeof(Elf32_Shdr)*
+	section_headers = (void *)malloc(sizeof(ElfW(Shdr))*
 				 (1+ eheader.e_shnum));
 	fseek(fp,eheader.e_shoff,0);
 	for (i=0 ; i< eheader.e_shnum ; i++)
@@ -163,7 +165,7 @@ char *filename;
 	symsize = SECTION_H(symbol_index).sh_entsize;
 	nsyms= SECTION_H(symbol_index).sh_size/symsize;
 	symbol_table
-	= (void *) malloc(sizeof(Elf32_Sym) * nsyms);
+	= (void *) malloc(sizeof(ElfW(Sym)) * nsyms);
 	/*
 	sizeof(struct syment) and SYMESZ are not always the same.
 	*/
@@ -186,8 +188,8 @@ char *filename;
 
 struct lsymbol_table tab;
 
-#define EXT_and_TEXT_BSS_DAT(p) (((ELF32_ST_BIND(p->st_info) == STB_GLOBAL) \
-				  || (ELF32_ST_BIND(p->st_info) == STB_WEAK) \
+#define EXT_and_TEXT_BSS_DAT(p) (((ELFW(ST_BIND)(p->st_info) == STB_GLOBAL) \
+				  || (ELFW(ST_BIND)(p->st_info) == STB_WEAK) \
 				  ) \
 				 && \
 				 (p->st_shndx == text_index \
@@ -197,7 +199,7 @@ struct lsymbol_table tab;
 				  || p->st_shndx == SHN_UNDEF \
 				  ))
 #define SYM_NAME(p) my_string_table+(p->st_name)
-#define STRUCT_SYMENT Elf32_Sym
+#define STRUCT_SYMENT ElfW(Sym)
 #define n_value st_value  
 				 
 				 
@@ -281,6 +283,3 @@ char *out;
 
  return 0;
 }
-
-
-
