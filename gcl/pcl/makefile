@@ -10,8 +10,8 @@ GFILES:=$(addprefix pcl_gazonk,$(GFILES1))
 AFILES:=$(FILES) $(GFILES)
 
 SETUP='(load "../clcs/package.lisp")(load "../clcs/myload1.lisp")(load "sys-package.lisp")' \
-	'(setq *features* (delete (quote kcl) *features*))'\
-	'(load "defsys.lisp")(push (quote kcl) *features*)' \
+	'(setq *features* (delete (quote :kcl) *features*))'\
+	'(load "defsys.lisp")(push (quote :kcl) *features*)' \
 	'(setq pcl::*default-pathname-extensions* (cons "lisp" "o"))' \
 	'(setq pcl::*pathname-extensions* (cons "lisp" "o"))' \
 	'(load "sys-proclaim.lisp")' \

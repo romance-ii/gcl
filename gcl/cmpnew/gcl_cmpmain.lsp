@@ -29,7 +29,11 @@
 
 (export '(*compile-print* *compile-verbose*))
 
-#+linux   (push :ld-not-accept-data  *features*)
+;;; This had been true with Linux 1.2.13 a.out or even older
+;;; #+linux   (push :ld-not-accept-data  *features*)
+;;; its now a bug preventing the :linux feature.
+
+
 (defvar *compiler-in-use* nil)
 (defvar *compiler-input*)
 (defvar *compiler-output1*)

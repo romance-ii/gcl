@@ -243,3 +243,5 @@ SGC is enabled.  */
 #undef HAVE_RL_COMPENTRY_FUNC_T
 #undef HAVE_GNU_LD
 #undef NEED_NONRANDOM_SBRK
+#undef HOST_CPU
+#undef HOST_OS

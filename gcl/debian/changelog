@@ -1,3 +1,17 @@
+gclcvs (2.7.0-23) unstable; urgency=low
+
+  * Make *features* entries keywords -- add canonical host cpu and
+    kernel-system to *features*, disable h files specific
+    ADDITIONAL_FEATURES macro in main.c
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 22 Apr 2004 16:40:23 +0000
+
+gclcvs (2.7.0-22) unstable; urgency=low
+
+  * New snapshot for Debian package
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 20 Apr 2004 12:05:26 -0400
+
 gclcvs (2.7.0-21) unstable; urgency=low
 
   * Remove junk files from source, which blocked build on ia64

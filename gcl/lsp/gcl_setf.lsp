@@ -100,7 +100,7 @@
 ;;;; GET-SETF-METHOD-MULTIPLE-VALUE.
 
 ;; FIXME  when all is well, remove this and the setf tests in the pcl directory
-(push 'setf *features*)
+(push :setf *features*)
 
 (defun get-setf-method-multiple-value (form &optional env &aux tem)
   (cond ((symbolp form)
