@@ -353,6 +353,8 @@ case $use in
 			TO3FLAGS=""
 			TO2FLAGS=""
 			;;
+		arm*)
+			TCFLAGS="$TCFLAGS -mlong-calls";;	
 	esac;;
 esac
 if test "$enable_pic" = "yes" ; then
@@ -393,6 +395,7 @@ else
     fi
 fi
 
+MY_SUBDIRS=
 
 #
 # GMP
@@ -404,13 +407,13 @@ MP_INLCUDE=""
 if test $use_gmp = yes ; then
 
  AC_MSG_CHECKING([use_gmp=yes, doing configure in gmp directory])
- echo
- echo "#"
- echo "#"
- echo "# -------------------"
- echo "# Subconfigure of GMP"
- echo "#"
- echo "#"
+# echo
+# echo "#"
+# echo "#"
+# echo "# -------------------"
+# echo "# Subconfigure of GMP"
+# echo "#"
+# echo "#"
 
  if test "$enable_oldgmp" = "yes" ; then
 	GMPDIR=gmp
@@ -423,14 +426,15 @@ if test $use_gmp = yes ; then
 #   m68k-linux)
 #      (cd gmp3 && ./configure --build=none-unknown-linux-gnu) ;;
    *)
-      (cd $GMPDIR && ./configure) ;;
+#      (cd $GMPDIR && ./configure) ;;
+       MY_SUBDIRS="$MY_SUBDIRS $GMPDIR" ;;
  esac
- echo "#"
- echo "#"
- echo "#"
- echo "# Subconfigure of GMP done"
- echo "# ------------------------"
- echo "#"
+# echo "#"
+# echo "#"
+# echo "#"
+# echo "# Subconfigure of GMP done"
+# echo "# ------------------------"
+# echo "#"
 
  PATCHED_SYMBOLS=""
  if test "$enable_dynsysgmp" = "yes" ; then
@@ -588,37 +592,41 @@ if test "$enable_statsysbfd" = "yes" || test "$enable_dynsysbfd" = "yes" ; then
 fi
 
 if test "$enable_locbfd" = "yes" ; then
-	echo "#"
-	echo "#"
-	echo "# -------------------------"
-	echo "# Subconfigure of LIBIBERTY"
-	echo "#"
-	echo "#"
-	cd binutils/libiberty && chmod +x configure && ./configure && cd ../..
-	echo "#"
-	echo "#"
-	echo "#"
-	echo "# Subconfigure of LIBIBERTY done"
-	echo "# ------------------------------"
-	echo "#"
-	echo "#"
-	echo "#"
-	echo "# -------------------"
-	echo "# Subconfigure of BFD"
-	echo "#"
-	echo "#"
-	cd binutils/bfd && chmod +x configure && ./configure && cd ../..
-	echo "#"
-	echo "#"
-	echo "#"
-	echo "# Subconfigure of BFD done"
-	echo "# ------------------------"
-	echo "#"
+#	echo "#"
+#	echo "#"
+#	echo "# -------------------------"
+#	echo "# Subconfigure of LIBIBERTY"
+#	echo "#"
+#	echo "#"
+#	cd binutils/libiberty && chmod +x configure && ./configure && cd ../..
+        MY_SUBDIRS="$MY_SUBDIRS binutils/libiberty " 
+#	echo "#"
+#	echo "#"
+#	echo "#"
+#	echo "# Subconfigure of LIBIBERTY done"
+#	echo "# ------------------------------"
+#	echo "#"
+#	echo "#"
+#	echo "#"
+#	echo "# -------------------"
+#	echo "# Subconfigure of BFD"
+#	echo "#"
+#	echo "#"
+#	cd binutils/bfd && chmod +x configure && ./configure && cd ../..
+        MY_SUBDIRS="$MY_SUBDIRS binutils/bfd " 
+#	echo "#"
+#	echo "#"
+#	echo "#"
+#	echo "# Subconfigure of BFD done"
+#	echo "# ------------------------"
+#	echo "#"
 	TLIBS="$TLIBS `pwd`/binutils/bfd/libbfd.a `pwd`/binutils/libiberty/libiberty.a"
 	AC_DEFINE(HAVE_LIBBFD)
 	BUILD_BFD="h/bfd.h h/bfdlink.h h/ansidecl.h h/symcat.h"
 	AC_SUBST(BUILD_BFD)
 fi
+
+AC_CONFIG_SUBDIRS($MY_SUBDIRS)
 
 # Find where Data begins.  This is used by the storage allocation
 # mechanism, in the PAGE macro.  This offset is subtracted from
