@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include "att.h"
 
-FILE *fopen_binary(char *name,char *mode);
-
 /* bfd support */
 #ifdef HAVE_LIBBFD
 #  undef SPECIAL_RSYM
@@ -15,6 +13,7 @@ FILE *fopen_binary(char *name,char *mode);
       sprintf(command,"rsym %s %s",kcl_self,tmpfile1);
 #endif
 
+#define SIZEOF_LONG_P 4
 
 #define MP386
 #define WINDOWSNT
@@ -49,8 +48,10 @@ FILE *fopen_binary(char *name,char *mode);
 #define signals_pending *signalsPendingPtr
 
 #undef DBEGIN
+#undef DBEGIN_TY
 #define DBEGIN _dbegin
-extern unsigned int _stacktop, _stackbottom, _dbegin;
+#define DBEGIN_TY unsigned int
+extern DBEGIN_TY _stacktop, _stackbottom, _dbegin;
 
 /* define if there is no _cleanup,   do here what needs
    to be done before calling unexec
@@ -100,15 +101,7 @@ extern unsigned int _stacktop, _stackbottom, _dbegin;
 #define SIG_SETMASK        2	/* for setting the signal mask */
 
 #define HAVE_SIGPROCMASK
-
-#if 0
-#ifdef __MSVCRT__
-typedef int sigset_t ;
-#endif
-#endif
-
 #define NEED_TO_REINSTALL_SIGNALS 
-
 #ifndef SIGIO
 #  define SIGIO 23
 #endif
@@ -131,40 +124,16 @@ typedef int sigset_t ;
 #define SV_ONSTACK 0
 #define SA_RESTART 0
 
-#define brk(x) printf("not doing break\n");
+#define brk(x) fprintf( stderr, "not doing brk(%d)\n", x);
 
-#define USE_NT_UNEXEC
-
-#ifdef USE_NT_UNEXEC
-   /* use the slightly older unexec */
-#  define UNIXSAVE "unexnt.c" 
-#  define RECREATE_HEAP if (initflag) { recreate_heap1(); \
+/* use the slightly older unexec */
+#define UNIXSAVE "unexnt.c" 
+#define RECREATE_HEAP if (initflag) { recreate_heap1(); \
      terminal_io->sm.sm_object1->sm.sm_fp=stdout; \
      terminal_io->sm.sm_object0->sm.sm_fp=stdin; }
-#else
-#  define UNIXSAVE "unexw32.c"
-#  define RECREATE_HEAP  init_heap();
-#endif
-
-#if defined(IN_SFASL) || defined(IN_RSYM)
-#  undef fopen
-FILE *fopen_binary(char *name,char *mode)
-{
-  char buf[10];
-  char *p=buf;
-  while (*mode)
-    *p++=*mode++;
-  *p++='b';
-  *p++=0;
-  return fopen(name,buf);
-}
-#endif
-  
-#define fopen fopen_binary
 
 #define HAVE_AOUT "wincoff.h"
 /* we dont need to worry about zeroing fp->_base , to prevent  */
-
  /* must use seek to go to beginning of string table */
 /* #define MUST_SEEK_TO_STROFF */
 /* #define N_STROFF(hdr)   ((&hdr)->f_symptr+((&hdr)->f_nsyms)*SYMESZ) */
@@ -173,13 +142,13 @@ FILE *fopen_binary(char *name,char *mode)
 
 #define SEEK_TO_END_OFILE(fp) do { struct filehdr fileheader; int i; \
         fseek(fp,0,0) ; \
-	fread(&fileheader, sizeof(fileheader), 1, fp); \
+        fread(&fileheader, sizeof(fileheader), 1, fp); \
 	fseek(fp,    fileheader.f_symptr+fileheader.f_nsyms*SYMESZ, 0); \
 	fread(&i, sizeof(i), 1, fp); \
 	fseek(fp, i - sizeof(i), 1); \
 	while ((i = getc(fp)) == 0) \
 		; \
-	ungetc(i, fp); \
+        ungetc(i, fp); \
     } while (0)
 		
 #define FCLOSE_SETBUF_OK 
@@ -222,7 +191,7 @@ FILE *fopen_binary(char *name,char *mode)
         error("Someone allocated my memory!");} \
 	if (core_end != (sbrk(PAGESIZE*(n - m))))
 
-#define USE_INTERNAL_REAL_TIME_FOR_RUNTIME     
+#define USE_INTERNAL_REAL_TIME_FOR_RUNTIME
 #define SHARP_EQ_CONTEXT_SIZE 1024
 
 /* Begin for cmpinclude */
