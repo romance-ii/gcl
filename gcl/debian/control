@@ -7,7 +7,7 @@ Standards-Version: 3.5.2
 
 Package: gcl
 Architecture: i386 m68k arm
-Depends: ${shlibs:Depends}, binutils
+Depends: ${shlibs:Depends}, binutils (>=${binutils:Version}-1), binutils (<=${binutils:Version}-99)
 Description: GNU Common Lisp compiler.
  The GNU Common Lisp compiler, based on Kyoto Common Lisp.
 

@@ -1,3 +1,10 @@
+gcl (2.5.0.cvs-2) unstable; urgency=medium
+
+  * Put in versioned dependency on binutils for libbfd support, rebuilt
+    with latest binutils, Closes: #133004
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 12 Feb 2002 13:19:12 -0500
+
 gcl (2.5.0.cvs-1) unstable; urgency=medium
 
   * Latest patches from CVS, enabling libbfd relocations, among other
