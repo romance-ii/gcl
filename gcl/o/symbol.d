@@ -426,7 +426,7 @@ symbol_name(x)
 object x;
 {
 object y;
- if (type_of(x)!=t_symbol) FEerror("Takes a symbol ~a",1,x);
+ if (type_of(x)!=t_symbol) FEwrong_type_argument(sLsymbol,x);
   for (y=x->s.s_plist; type_of(y)==t_cons ; y=y->c.c_cdr->c.c_cdr)
    {if(y->c.c_car==siSpname) return(y->c.c_cdr->c.c_car);}
    {BEGIN_NO_INTERRUPT;		
