@@ -126,7 +126,7 @@ typedef struct _TAS {
 
 #define SET_SESSION_ID() 0
 
-UINT WINAPI tf ( void *tain )
+UINT WINAPI tf1 ( void *tain )
 {
     TAS *ta = (TAS *) tain;
     UINT rv = 0;
@@ -136,15 +136,8 @@ UINT WINAPI tf ( void *tain )
     if ( w32_socket_init() >= 0 ) {
         dsfd = sock_connect_to_name ( ta->argv[1], atoi ( ta->argv[2] ), 0);
         if ( dsfd ) {
-            fprintf ( stderr, "connected to %s %s", ta->argv[1], ta->argv[2] );
-            /* give chance for someone to attach with gdb and
-               to set waiting to 0 */
-            while ( -- ta->delay >= 0 ) sleep(1);
-            {
-		char *buf = "\0\0";
-		TkX_Wish ( ta->argc, ta->argv );
-            }
-
+            fprintf ( stderr, "connected to %s %s\n", ta->argv[1], ta->argv[2] );
+            TkX_Wish ( ta->argc, ta->argv );
             fprintf ( stderr, "Wish shell done\n" );
             sock_close_connection ( dsfd );
             ta->rv = 0;
@@ -239,7 +232,7 @@ char *envp[];
         hThread = (HANDLE) _beginthreadex (
                                             NULL,
                                             0,
-                                            tf,
+                                            tf1,
                                             pTA,
                                             0,
                                             &dwThreadID
