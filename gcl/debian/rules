@@ -165,12 +165,20 @@ install-stamp: build-stamp debian/control $(INS)
 #	rm -rf debian/tmp/usr/local
 
 	cat debian/tmp/usr/share/emacs/site-lisp/gcl$(EXT)/gcl.el |\
-		sed "s,(provide 'gcl),(provide 'gcl$(EXT)),1" >tmp &&\
+		sed \
+			-e "s,(provide  *'gcl),(provide 'gcl$(EXT)),g" \
+			-e "s,(require  *'gcl),(require 'gcl$(EXT)),g" \
+			-e "s,gcl-mode,gcl$(EXT)-mode,1" \
+		>tmp &&\
 		mv tmp debian/tmp/usr/share/emacs/site-lisp/gcl$(EXT)/gcl$(EXT).el
 	[ "$(EXT)" = "" ] || rm debian/tmp/usr/share/emacs/site-lisp/gcl$(EXT)/gcl.el
 
 	cat debian/tmp/usr/share/emacs/site-lisp/gcl$(EXT)/dbl.el |\
-		sed "s,(provide 'dbl),(provide 'dbl$(EXT)),1" >tmp &&\
+		sed \
+			-e "s,(provide  *'gcl),(provide 'gcl$(EXT)),g" \
+			-e "s,(require  *'gcl),(require 'gcl$(EXT)),g" \
+			-e "s,gcl-mode,gcl$(EXT)-mode,1" \
+		>tmp &&\
 		mv tmp debian/tmp/usr/share/emacs/site-lisp/gcl$(EXT)/dbl$(EXT).el
 	[ "$(EXT)" = "" ] || rm debian/tmp/usr/share/emacs/site-lisp/gcl$(EXT)/dbl.el
 

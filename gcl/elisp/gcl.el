@@ -167,7 +167,7 @@ by get-buffer-package.
     (and time-to-throw-away
 	 (string-match "telnet"(buffer-name (process-buffer proc)))
 	 (dump-output proc time-to-throw-away))
-    (cond (nil  (get-buffer-window lisp-buffer)
+    (cond (nil  ;(get-buffer-window lisp-buffer)
 		  (select-window (get-buffer-window lisp-buffer))
 		  (goto-char (point-max)))
 	  (t nil))))
