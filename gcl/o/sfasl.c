@@ -321,9 +321,14 @@ int fasload ( object faslfile )
         }
 #else
         /* What does this mean? */
+#  ifdef SILLY        
 	the_start = start_address
             = malloc ( datasize + textsize + bsssize + extra_bss + 0x80000 );
 	the_start = start_address = (char *) ( 0x1000 * ( ( ( (int) the_start + 0x70000) + 0x1000) / 0x1000 ) );
+#  else  /* SILLY */
+        the_start = start_address
+            = malloc ( datasize + textsize + bsssize + extra_bss );
+#  endif /* SILLY */       
 	sfaslp->s_start_data = start_address + textsize;
 	sfaslp->s_start_bss = start_address + textsize + datasize;
 #endif
@@ -602,9 +607,7 @@ void relocate_symbols ( unsigned int length )
     char *str;
     char tem[SYMNMLEN +1];
     int n_value=(int)start_address;
-
     tem[SYMNMLEN]=0;
-    int n_value=(int)start_address;
 
     end =symbol_table + length;
     for(sym=symbol_table; sym < end; sym++) {

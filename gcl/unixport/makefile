@@ -42,7 +42,7 @@ bfdfiles: $(shell find ../binutils -name "*.o")
 	done 
 	touch $@
 
-OOBJS:=$(shell j=$$(ar t $(ODIR)/gcllib.a) ; for i in $$(ls -1 $(ODIR)/*.o) ; do if ! echo $$j |grep $$(basename $$i) >/dev/null 2>&1 ; then echo $$i ; fi ; done)
+OOBJS:=$(filter-out ../o/firstfile.o ../o/lastfile.o, $(shell j=$$(ar t $(ODIR)/gcllib.a) ; for i in $$(ls -1 $(ODIR)/*.o) ; do if ! echo $$j |grep $$(basename $$i) >/dev/null 2>&1 ; then echo $$i ; fi ; done))
 OBJS:=$(OOBJS) $(shell ls -1 $(LSPDIR)/*.o)
 OBJS:=$(OBJS) $(shell ls -1 $(CMPDIR)/*.o | grep -v collectfn.o)
 
