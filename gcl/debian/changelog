@@ -3,8 +3,9 @@ gclcvs (2.7.0-16) unstable; urgency=low
   * Fix bug in compiler::c2labels in which *ccb-vs* was missing a ocal
     rebind
   * Remove duplicate tags from compiled C switch statements
+  * Minor merges for DARWIN support
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 12 Nov 2003 15:23:19 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 12 Nov 2003 15:47:00 +0000
 
 gclcvs (2.7.0-15) unstable; urgency=low
 

@@ -111,6 +111,11 @@ main(int argc, char **argv, char **envp) {
     struct rlimit rl;
 #endif
 
+#if defined(DARWIN)
+    extern void init_darwin_zone_compat ();
+    init_darwin_zone_compat ();
+#endif
+
 #ifdef RECREATE_HEAP
     RECREATE_HEAP
 #endif

@@ -16,8 +16,13 @@ PORTDIR = $(shell pwd)
 LD_LIBS_PRE=$(addprefix -u ,$(PATCHED_SYMBOLS))
 LD_LIBS_POST=$(LIBS) $(LIBC) -lgclp
 
+ifeq ($(ARRS),)
+ARRS:=ar rs
+endif
+
 libgclp.a: $(ODIR)/gcllib.a
 	cp $< $@
+	ranlib $@
 
 gmpfiles: $(shell find ../$(GMPDIR) -name "*.o" |grep -v '\.lib')
 	rm -rf gmp
@@ -116,26 +121,26 @@ $(HDIR)/mdefs.h: $(HDIR)/include.h
 
 libgcl.a: $(FIRST_FILE) $(OBJS) sys_gcl.o $(LAST_FILE) gmpfiles bfdfiles
 	rm -rf $@
-	ar rs $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
+	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
 libpre_gcl.a: $(FIRST_FILE) $(OOBJS) sys_pre_gcl.o $(LAST_FILE) gmpfiles bfdfiles
 	rm -rf $@
-	ar rs $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
+	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
 libmod_gcl.a: $(FIRST_FILE) $(OBJS) $(MODOBJS) sys_mod_gcl.o $(LAST_FILE) gmpfiles bfdfiles
 	rm -rf $@
-	ar rs $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
+	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
 libxgcl.a: libgcl.a
 	ln -snf $< $@
 
 libansi_gcl.a: $(FIRST_FILE) $(OBJS) $(ANSIOBJS) sys_ansi_gcl.o $(LAST_FILE) gmpfiles bfdfiles
 	rm -rf $@
-	ar rs $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
+	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
 libpcl_gcl.a: $(FIRST_FILE) $(OBJS) $(PCLOBJS) sys_pcl_gcl.o $(LAST_FILE) gmpfiles bfdfiles
 	rm -rf $@
-	ar rs $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
+	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
 raw_%: lib%.a libgclp.a $(SYSTEM_OBJS) $(EXTRAS)
 	$(CC) -o raw_$*$(EXE) $(filter %.o,$^) \

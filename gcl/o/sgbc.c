@@ -48,6 +48,10 @@ int gclmprotect ( void *addr, size_t len, int prot ) {
 
 #endif
 
+#if defined(DARWIN)
+#include <sys/ucontext.h>
+#endif
+
 #include <signal.h>
 
 /*  void segmentation_catcher(void); */
@@ -1440,9 +1444,15 @@ memprotect_handler(int sig, long code, void *scp, char *addr) {
 #ifndef  BSD
   INSTALL_MPROTECT_HANDLER;
 #endif
+
+#if !defined(DARWIN)
   /* if (SIGSEGV == SIGPROTV) */
   segmentation_catcher(SIGSEGV);
-
+#else
+  /* segmentation_catcher(SIGBUS,code,scp); */
+  /* for the sake of exactness */
+  segmentation_catcher(SIGBUS);
+#endif
 }
 
 static void
