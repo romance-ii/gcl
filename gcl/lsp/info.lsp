@@ -191,7 +191,7 @@
 
 (defvar *info-paths*
   '("" "/usr/info/" "/usr/local/lib/info/" "/usr/local/info/"
-    "/usr/local/gnu/info/" ))
+    "/usr/local/gnu/info/" "/usr/share/info/"))
 
 (defvar *old-lib-directory* nil)
 (defun setup-info (name &aux tem file)
@@ -453,6 +453,7 @@
      (t
 
     (when tem
+      (let ((nitems (length tem)))
 	  (sloop for i from 0 for name in tem with prev
 		 do (setq file nil position-pattern nil)
 		 (progn ;decode name
@@ -464,8 +465,12 @@
 		 (format t "~% ~d: ~@[~a :~]~@[(~a)~]~a." i
 			 position-pattern
 			 (if (eq file prev) nil (setq prev file)) name))
-	  (format t "~%Enter n, all, none, or multiple choices eg 1 3 : ")
-	  (let ((line (read-line)) (start 0) val)
+  	  (if (> (length tem) 1)
+	    (format t "~%Enter n, all, none, or multiple choices eg 1 3 : ")
+	    (terpri))
+	  (let ((line (if (> (length tem) 1) (read-line) "0"))
+	        (start 0)
+	        val)
 	    (while (equal line "") (setq line (read-line)))
 	    (while (multiple-value-setq
 		    (val start)
@@ -478,10 +483,14 @@
 		   (setq wanted (and
 				 (equal (symbol-name wanted) "ALL")
 				 (sloop for i below (length tem) collect i)))))
-	    (if wanted
-		(format t "~%Info from file ~a:" (car *current-info-data*)))
+	    (when wanted
+ 	      ;; Remove invalid (numerical) answers
+	      (setf wanted (remove-if #'(lambda (x)
+					  (and (integerp x) (>= x nitems)))
+				      wanted))
+	      (format t "~%Info from file ~a:" (car *current-info-data*)))
 	    (sloop for i in wanted
-		   do (princ(show-info (nth i tem))))))))))
+		   do (princ(show-info (nth i tem)))))))))))
 
 	     
 ;; idea make info_text window have previous,next,up bindings on keys
