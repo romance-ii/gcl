@@ -45,7 +45,15 @@
 
 #undef DBEGIN_TY
 #define DBEGIN_TY unsigned int
-extern DBEGIN_TY _stacktop, _stackbottom, _dbegin;
+extern DBEGIN_TY _dbegin;
+
+#define AV
+#ifdef AV
+#  define _stacktop cs_limit
+#  define _stackbottom cs_org
+#else
+extern DBEGIN_TY _stacktop, _stackbottom;
+#endif
 
 /* define if there is no _cleanup,   do here what needs
    to be done before calling unexec
@@ -103,10 +111,16 @@ extern DBEGIN_TY _stacktop, _stackbottom, _dbegin;
    if the pointe/r is on the C stack or the 0 pointer
    in winnt our heap starts at DBEGIN
    */
+#ifdef AV
+#define NULL_OR_ON_C_STACK(y) \
+    ((y) == 0 || \
+    ((y) > _stacktop && (y) < _stackbottom))     
+#else
 #define NULL_OR_ON_C_STACK(y) \
     (((unsigned int)(y)) == 0 || \
     (((unsigned int)(y)) > _stacktop && ((unsigned int)(y)) < _stackbottom))     
-      
+#endif
+
 #if defined ( IN_FILE ) || defined ( IN_SOCKETS )
 #  define HAVE_NSOCKET
 #endif
