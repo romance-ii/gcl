@@ -6,8 +6,10 @@ gclcvs (2.7.0-4) unstable; urgency=low
     classes
   * Newest loop macro from cmucl with a few edits
   * Raise a package error in si::coerce-to-package on failure
+  * Better class handling in subtypep and support for 'satisfies in
+    normalize-type, some more predicate type pairs added
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 22 Sep 2003 21:59:51 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 22 Sep 2003 22:01:10 +0000
 
 gclcvs (2.7.0-3) unstable; urgency=low
 

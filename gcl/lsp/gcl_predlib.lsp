@@ -117,6 +117,9 @@
           (atom . atom)
           (cons . consp)
           (list . listp)
+          (fixnum . fixnump)
+          (integer . integerp)
+          (rational . rationalp)
           (number . numberp)
           (character . characterp)
           (package . packagep)
@@ -132,7 +135,9 @@
           )
         (cdr l)))
     ((endp l))
-  (si:putprop (caar l) (cdar l) 'type-predicate))
+  (si:putprop (caar l) (cdar l) 'type-predicate)
+  (si:putprop (cdar l) (caar l) 'predicate-type))
+
 
 (defun class-of (object)
   (declare (ignore object))
@@ -144,6 +149,9 @@
   (declare (ignore object))
   nil)
 (defun find-class (object)
+  (declare (ignore object))
+  nil)
+(defun find-class-no-error (object)
   (declare (ignore object))
   nil)
 
@@ -256,6 +264,10 @@
 ;;; The result is always a list.
 (defun normalize-type (type &aux tp i )
   ;; Loops until the car of type has no DEFTYPE definition.
+  (when (and (consp type) (eq (car type) 'satisfies))
+    (unless (setq tp (get (cadr type) 'predicate-type))
+      (error "Cannot process type ~S~%" type))
+    (setq type tp))
   (loop
     (if (atom type)
         (setq tp type i nil)
@@ -300,14 +312,12 @@
 ;;; SUBTYPEP predicate.
 (defun subtypep (type1 type2 &optional env &aux t1 t2 i1 i2 ntp1 ntp2 tem)
   (declare (ignore env))
-  (let ((c1 (classp type1)) (c2 (classp type2)))
-    (when (and c1 c2)
+  (let* ((c1 (classp type1)) (c2 (classp type2)) 
+	(t1 (if c1 type1 (find-class-no-error type1))) 
+	(t2 (if c2 type2 (find-class-no-error type2))))
+    (when (and t1 t2)
       (return-from subtypep 
-		   (if (member type2 (class-precedence-list type1))
-		       (values t t) (values nil t))))
-    (when (and c1 (or (eq type2 'structure-object) (eq type2 'standard-object)))
-      (return-from subtypep 
-		   (if (member (find-class type2) (class-precedence-list type1))
+		   (if (member t2 (class-precedence-list t1))
 		       (values t t) (values nil t))))
     (when (or c1 c2)
       (return-from subtypep (values nil t))))
