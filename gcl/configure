@@ -2783,18 +2783,34 @@ if test -f ${TK_CONFIG_PREFIX}/tkConfig.sh  ; then . ${TK_CONFIG_PREFIX}/tkConfi
 
 if test -d ${TK_CONFIG_PREFIX}/tk${TK_VERSION} ; then
   TK_LIBRARY=${TK_CONFIG_PREFIX}/tk${TK_VERSION}
+  else
+  if test -d ${TK_CONFIG_PREFIX}/../tk${TK_VERSION} ; then
+    TK_LIBRARY=${TK_CONFIG_PREFIX}/../tk${TK_VERSION}
+  fi
 fi
 if test -d ${TK_CONFIG_PREFIX}/tcl${TCL_VERSION} ; then
   TCL_LIBRARY=${TK_CONFIG_PREFIX}/tcl${TCL_VERSION}
+  else
+  if test -d ${TK_CONFIG_PREFIX}/../tcl${TCL_VERSION} ; then
+    TCL_LIBRARY=${TK_CONFIG_PREFIX}/../tcl${TCL_VERSION}
+  fi
 fi
 if test -f ${TK_CONFIG_PREFIX}/../include/tk.h ; then
   TK_INCLUDE=-I${TK_CONFIG_PREFIX}/../include
+  else
+  if test -f /usr/include/tcl${TCL_VERSION}/tk.h ; then
+    TK_INCLUDE=-I/usr/include/tcl${TCL_VERSION}
+  fi	
 fi
 if test -f ${TCL_CONFIG_PREFIX}/../include/tcl.h ; then
   TCL_INCLUDE=-I${TCL_CONFIG_PREFIX}/../include
+  else
+  if test -f /usr/include/tcl${TCL_VERSION}/tcl.h ; then
+    TCL_INCLUDE=-I/usr/include/tcl${TCL_VERSION}
+  fi
 fi
 echo $ac_n "checking for main in -llieee""... $ac_c" 1>&6
-echo "configure:2798: checking for main in -llieee" >&5
+echo "configure:2814: checking for main in -llieee" >&5
 ac_lib_var=`echo lieee'_'main | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -2802,14 +2818,14 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-llieee  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 2806 "configure"
+#line 2822 "configure"
 #include "confdefs.h"
 
 int main() {
 main()
 ; return 0; }
 EOF
-if { (eval echo configure:2813: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:2829: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -2834,7 +2850,7 @@ if test "$have_ieee" = "0" ; then
  TCL_LIBS=`echo ${TCL_LIBS} | sed -e "s:-lieee::g" `
 fi
 echo $ac_n "checking for dlopen in -ldl""... $ac_c" 1>&6
-echo "configure:2838: checking for dlopen in -ldl" >&5
+echo "configure:2854: checking for dlopen in -ldl" >&5
 ac_lib_var=`echo dl'_'dlopen | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -2842,7 +2858,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-ldl  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 2846 "configure"
+#line 2862 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -2853,7 +2869,7 @@ int main() {
 dlopen()
 ; return 0; }
 EOF
-if { (eval echo configure:2857: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:2873: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -2935,16 +2951,16 @@ echo "$ac_t""use=$use" 1>&6
 # the time handling for unixtime, add timezone
 
 echo $ac_n "checking alloca""... $ac_c" 1>&6
-echo "configure:2939: checking alloca" >&5
+echo "configure:2955: checking alloca" >&5
 if test "$cross_compiling" = yes; then
   gcl_ok=no
 else
   cat > conftest.$ac_ext <<EOF
-#line 2944 "configure"
+#line 2960 "configure"
 #include "confdefs.h"
 int main() { exit(alloca(500) != NULL ? 0 : 1);}
 EOF
-if { (eval echo configure:2948: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:2964: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   :
 else
@@ -2967,12 +2983,12 @@ else
   gcl_ok=no
 else
   cat > conftest.$ac_ext <<EOF
-#line 2971 "configure"
+#line 2987 "configure"
 #include "confdefs.h"
 #include <alloca.h>
   int main() { exit(alloca(500) != NULL ? 0 : 1)}
 EOF
-if { (eval echo configure:2976: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:2992: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   :
 else
@@ -3034,7 +3050,7 @@ rm -f makedefsafter
 
 if test $use_gmp = yes ; then
  echo $ac_n "checking use_gmp=yes, doing configure in gmp directory""... $ac_c" 1>&6
-echo "configure:3038: checking use_gmp=yes, doing configure in gmp directory" >&5
+echo "configure:3054: checking use_gmp=yes, doing configure in gmp directory" >&5
  case "${canonical}" in
    i[5-9]86* | pentium* | k6* | athlon*)
       (cd gmp ; ./configure --target=i486) ;;
@@ -3055,7 +3071,7 @@ fi
 # redhat/cygnus released for some reason a buggy version of gcc,
 # which no one else released.   Catch that here.
 echo $ac_n "checking Checking for buggy gcc version from redhat""... $ac_c" 1>&6
-echo "configure:3059: checking Checking for buggy gcc version from redhat" >&5
+echo "configure:3075: checking Checking for buggy gcc version from redhat" >&5
 if  2>&1 $CC -v | fgrep "gcc version 2.96" > /dev/null 
    then 
         BROKEN_O4_OPT=1
