@@ -957,7 +957,3 @@ char *GCLExeName ( void )
     return ( (char *) rv );
 }
 
-void WindowsHandlers ( void )
-{
-    /* SetConsoleCtrlHandler ( (PHANDLER_ROUTINE) sigint, TRUE ); */
-}
