@@ -721,6 +721,13 @@ if test "$enable_statsysbfd" = "yes" || test "$enable_dynsysbfd" = "yes" ; then
 fi
 
 if test "$enable_locbfd" = "yes" ; then
+
+	# check for gettext.  It is part of glibc, but others
+	# need GNU gettext separately.
+	AC_CHECK_HEADER(libintl.h, true,
+			   AC_MSG_ERROR(libintl.h (gettext) not found))
+	AC_SEARCH_LIBS(dgettext, intl, true, AC_MSG_ERROR(gettext library not found))
+ 
 	echo "#"
 	echo "#"
 	echo "# -------------------------"
