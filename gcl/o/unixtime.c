@@ -158,6 +158,7 @@ LFD(Lget_internal_run_time)(void)
 
 #ifdef USE_INTERNAL_REAL_TIME_FOR_RUNTIME
         vs_push(fLget_internal_real_time());
+	vs_push(small_fixnum(0));
 	return;
 #else
 	struct tms buf;

@@ -127,8 +127,10 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Improve optimize-maximum-pages algorithm
   * mprotect pages PROT_EXEC as CLEAR_CACHE step on amd64-linux
   * Prevent recursive malloc calls for OpenBSD error reporting
+  * Push dummy 0 time for child runtime on windows to be compatible with
+    other platforms for now
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 13 Apr 2004 02:57:21 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 13 Apr 2004 02:57:41 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
