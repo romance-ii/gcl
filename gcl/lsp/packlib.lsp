@@ -134,22 +134,22 @@
   (terpri))
 
 
-(defun apropos (string &optional package)
-  (setq string (string string))
-  (cond (package
-         (do-symbols (symbol package)
-           (when (substringp string (string symbol))
-                 (print-symbol-apropos symbol)))
-         (do ((p (package-use-list package) (cdr p)))
-             ((null p))
-           (do-external-symbols (symbol (car p))
-             (when (substringp string (string symbol))
-                   (print-symbol-apropos symbol)))))
-        (t
-         (do-all-symbols (symbol)
-           (when (substringp string (string symbol))
-                 (print-symbol-apropos symbol)))))
-  (values))
+;(defun apropos (string &optional package)
+;  (setq string (string string))
+;  (cond (package
+;         (do-symbols (symbol package)
+;           (when (substringp string (string symbol))
+;                 (print-symbol-apropos symbol)))
+;         (do ((p (package-use-list package) (cdr p)))
+;             ((null p))
+;           (do-external-symbols (symbol (car p))
+;             (when (substringp string (string symbol))
+;                   (print-symbol-apropos symbol)))))
+;        (t
+;         (do-all-symbols (symbol)
+;           (when (substringp string (string symbol))
+;                 (print-symbol-apropos symbol)))))
+;  (values))
 
 
 (defun apropos-list (string &optional package &aux list)
@@ -157,18 +157,24 @@
   (setq string (string string))
   (cond (package
          (do-symbols (symbol package)
-           (when (substringp string (string symbol))
-                 (setq list (cons symbol list))))
+		     (when (substringp string (string symbol))
+		       (setq list (cons symbol list))))
          (do ((p (package-use-list package) (cdr p)))
              ((null p))
-           (do-symbols (symbol (car p))
-             (when (substringp string (string symbol))
-                   (setq list (cons symbol list))))))
+	     (do-external-symbols (symbol (car p))
+				  (when (substringp string (string symbol))
+				    (setq list (cons symbol list))))))
         (t
          (do-all-symbols (symbol)
-           (when (substringp string (string symbol))
-                 (setq list (cons symbol list))))))
-  list)
+			 (when (substringp string (string symbol))
+			   (setq list (cons symbol list))))))
+  (stable-sort (delete-duplicates list :test #'eq)
+	       #'string< :key #'symbol-name))
+
+(defun apropos (string &optional package)
+  (dolist (symbol (apropos-list string package))
+    (print-symbol-apropos symbol))
+  (values))
 
 (defmacro with-package-iterator ((name plist &rest symbol-types) . body)
   (let ((p (gensym)) (i (gensym)) (l (gensym)) (q (gensym)) (dum (gensym))
