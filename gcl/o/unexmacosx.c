@@ -562,10 +562,10 @@ read_load_commands ()
 	}
     }
 
-  printf ("Highest address of load commands in input file: %#8x\n",
+  printf ("Highest address of load commands in input file: %#10x\n",
 	  infile_lc_highest_addr);
 
-  printf ("Lowest offset of all sections in __TEXT segment: %#8lx\n",
+  printf ("Lowest offset of all sections in __TEXT segment: %#10lx\n",
 	  text_seg_lowest_offset);
 
   printf ("--- List of Load Commands in Input File ---\n");
@@ -573,7 +573,7 @@ read_load_commands ()
 
   for (i = 0; i < nlc; i++)
     {
-      printf ("%#2d ", i);
+      printf ("%2d ", i);
       print_load_command (lca[i]);
     }
 }
@@ -598,7 +598,7 @@ copy_segment (struct load_command *lc)
       sectp++;
     }
 
-  printf ("Writing segment %-16.16s at %#8lx - %#8lx (sz: %#8lx)\n",
+  printf ("Writing segment %-16.16s at %#10lx - %#10lx (sz: %#10lx)\n",
 	  scp->segname, scp->fileoff, scp->fileoff + scp->filesize,
 	  scp->filesize);
 
@@ -636,7 +636,7 @@ copy_data_segment (struct load_command *lc)
     return;
   }
 
-  printf ("Writing segment %-16.16s at %#8lx - %#8lx (sz: %#8lx)\n",
+  printf ("Writing segment %-16.16s at %#10lx - %#10lx (sz: %#10lx)\n",
 	  scp->segname, scp->fileoff, scp->fileoff + scp->filesize,
 	  scp->filesize);
   
@@ -684,7 +684,7 @@ copy_data_segment (struct load_command *lc)
       else
 	unexec_error ("unrecognized section name in __DATA segment");
 
-      printf ("        section %-16.16s at %#8lx - %#8lx (sz: %#8lx)\n",
+      printf ("        section %-16.16s at %#10lx - %#10lx (sz: %#10lx)\n",
 	      sectp->sectname, sectp->offset, sectp->offset + sectp->size,
 	      sectp->size);
 
@@ -751,7 +751,7 @@ copy_data_segment (struct load_command *lc)
       section.reserved1 = 0;
       section.reserved2 = 0;
       
-      printf ("Writing segment %-16.16s at %#8lx - %#8lx (sz: %#8lx)\n",
+      printf ("Writing segment %-16.16s at %#10lx - %#10lx (sz: %#10lx)\n",
 	      sc.segname, sc.fileoff, sc.fileoff + sc.filesize, sc.filesize);
 
       if (!unexec_write (sc.fileoff, (void *) sc.vmaddr, sc.filesize))
@@ -1072,6 +1072,41 @@ void term_darwin_zone_compat ()
 
 }
 
+static void dump_regionXXX (vm_address_t start, vm_size_t size)
+{
+    task_t target_task = mach_task_self ();
+    kern_return_t rtn;
+    struct vm_region_basic_info info;
+    mach_msg_type_number_t info_count = VM_REGION_BASIC_INFO_COUNT;
+    mach_port_t object_name;
+    vm_prot_t prot, maxprot;
+    
+    fprintf (stderr, "introspecting between %x and %x\n", start, start+size);
+    
+    fflush (stderr);
+    
+    rtn = vm_region (target_task, &start, &size, VM_REGION_BASIC_INFO,
+        (vm_region_info_t) &info, &info_count, &object_name);
+    
+    if (rtn != KERN_SUCCESS || info_count != VM_REGION_BASIC_INFO_COUNT) {
+        mach_error ("[dump_regionXXX] vm_region() failed: ", rtn);
+        return;
+    }
+
+    if (object_name != MACH_PORT_NULL)
+        mach_port_deallocate (target_task, object_name);    
+    
+    prot = info.protection;
+    maxprot = info.max_protection;
+    
+    fprintf (stderr, "region_start=%x region_size=%x region_end=%x prot=%c%c%c maxprot=%c%c%c\n",
+        start, size, start+size, prot & VM_PROT_READ ? 'r' : '-', prot & VM_PROT_WRITE ? 'w' : '-',
+        prot & VM_PROT_EXECUTE ? 'x' : '-', maxprot & VM_PROT_READ ? 'r' : '-',
+        maxprot & VM_PROT_WRITE ? 'w' : '-', maxprot & VM_PROT_EXECUTE ? 'x' : '-');
+    
+    fflush (stderr);
+}
+
 char *my_sbrk (int incr)
 {
     char               *temp, *ptr;
@@ -1105,6 +1140,15 @@ char *my_sbrk (int incr)
 	    fflush (stderr);
 	    return ((char *)-1);
 	}
+    }
+}
+
+void prot_debug () {
+    if (mach_brkpt >= mach_mapstart+0x2000) {
+        dump_regionXXX ((vm_address_t) (mach_mapstart+0x1000),(vm_size_t) 0x1000);
+    }
+    else {
+        printf ("mach_brkpt < mach_mapstart+0x2000\n"); fflush (stdout);
     }
 }
 
