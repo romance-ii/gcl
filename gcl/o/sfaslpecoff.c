@@ -13,35 +13,15 @@
    via #include "../c/sfasl.c\n" 
    */
 
-
-/* for testing in standalone manner define STAND
-   You may then compile this file cc -g -DSTAND -DDEBUG -I../hn
-   a.out /tmp/foo.o /public/gcl/unixport/saved_kcl /public/gcl/unixport/
-   will write a /tmp/sfasltest file
-   which you can use comp to compare with one produced by ld.
-   */
 #if 0
 #define DEBUG
 #endif
 
 #define IN_SFASL
 
-/*  #ifdef STAND */
-/*  #include "config.h" */
-/*  #include "gclincl.h" */
-/*  #define OUR_ALLOCA alloca */
-/*  #include <stdio.h> */
-/*  #include "mdefs.h" */
-
-/*  #else */
 #include "gclincl.h"
 #include "include.h"
 #undef S_DATA
-/*  #endif */
-
-#ifdef SEPARATE_SFASL_FILE
-#include SEPARATE_SFASL_FILE
-#else
 
 #include "ext_sym.h"
 struct node * find_sym();
@@ -153,11 +133,6 @@ void describe_sym1 ( int n, int aux_to_go )
 #  define describe_sym(a,b)
 #endif /* DEBUG */
 
-
-#ifdef STAND
-#include "rel_stand.c"
-#endif
-
 /* begin reloc_file */
 #include RELOC_FILE
 
@@ -224,11 +199,8 @@ int fasload ( object faslfile )
     int init_address=0;
     int aux_to_go = 0;
     size_t sections_read = 0;
-    
-#ifndef STAND	
     object *old_vs_base = vs_base;
     object *old_vs_top = vs_top;
-#endif
 
     /* Zero out the COFF section header storage space */    
     memset ( section, 0, COFF_SECTIONS * sizeof ( struct scnhdr ) );
@@ -236,15 +208,10 @@ int fasload ( object faslfile )
     sfaslp = &sfasl_info_buf;
 
     extra_bss=0;
-#ifdef STAND
-    strcpy(filename,faslfile);
-    fp=fopen(filename,"r");
-#else
     coerce_to_filename(faslfile, filename);
     faslfile = open_stream(faslfile, smm_input, Cnil, sKerror);
     vs_push(faslfile);
     fp = faslfile->sm.sm_fp;
-#endif	
 
     /* Read the object file header */
     HEADER_SEEK(fp);
@@ -363,7 +330,6 @@ int fasload ( object faslfile )
                                     bsssize );
 	
         /* allocate some memory */
-#ifndef STAND  
 	{
             BEGIN_NO_INTERRUPT;
             memory = alloc_object ( t_cfdata );
@@ -379,20 +345,6 @@ int fasload ( object faslfile )
             sfaslp->s_start_bss   = sfaslp->s_start_rdata + rdatasize;
             END_NO_INTERRUPT;
         }
-#else
-        /* What does this mean? */
-#  ifdef SILLY        
-	the_start = start_address
-            = malloc ( datasize + textsize + bsssize + stabsize + stabstrsize + rdatasize + extra_bss + 0x80000 );
-	the_start = start_address = (char *) ( 0x1000 * ( ( ( (int) the_start + 0x70000) + 0x1000) / 0x1000 ) );
-#  else  /* SILLY */
-        the_start = start_address
-            = malloc ( datasize + textsize + bsssize + stabsize + stabstrsize + rdatasize + extra_bss );
-#  endif /* SILLY */       
-	sfaslp->s_start_data  = start_address + textsize;
-        sfaslp->s_start_rdata = sfaslp->s_start_data + datasize + stabsize + stabstrsize;
-	sfaslp->s_start_bss   = sfaslp->s_start_rdata + rdatasize;
-#endif
 	dprintf(" Code size %d, ", datasize+rdatasize+textsize+bsssize + extra_bss);
 	if ( fseek ( fp, N_TXTOFF(fileheader), 0) < 0 ) {
             FEerror("file seek error",0);
@@ -409,25 +361,6 @@ int fasload ( object faslfile )
                   memory->cfd.cfd_start,
                   memory->cfd.cfd_start +  memory->cfd.cfd_size );
 #endif        
-	/* record which symbols are used */
-        
-#ifdef SYM_USED
-        {
-            int j=0;
-            for(j=1; j< BSS_NSCN ; j++) {
-                dprintf(" relocating section %d \n",j);
-                if (section[j].s_nreloc) fseek(fp,section[j].s_relptr,0);
-                for(i=0; i < section[j].s_nreloc; i++) {
-                    struct syment *sym;
-                    fread(&relocation_info, RELSZ, 1, fp);
-                    sym = & symbol_table[relocation_info.r_symndx];
-                    if (TC_SYMBOL_P(sym)) {
-                        SYM_USED(sym) = 1;
-                    }
-                }
-            }
-        }
-#endif
 	/* this looks up symbols in c.ptable and also adds new externals to
 	   that c.table */
 	relocate_symbols(NSYMS(fileheader));  
@@ -504,7 +437,6 @@ int fasload ( object faslfile )
 	}
 	close_stream(faslfile);
 
-#ifndef STAND
 	ALLOCA_FREE(my_string_table);
 	ALLOCA_FREE(symbol_table);
         dprintf ( "About to call_init %x \n", init_address );
@@ -519,8 +451,6 @@ int fasload ( object faslfile )
             printf("start address -T %x ", memory->cfd.cfd_start);
         }
 	return ( memory->cfd.cfd_size );
-#endif
-        printf("\n(start %x)\n",start_address);
     }
 }
 
@@ -676,4 +606,3 @@ void print_name ( struct syment *p )
 }
 #endif
 
-#endif /* SEPARATE_SFASL_FILE */
