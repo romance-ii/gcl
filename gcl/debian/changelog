@@ -5,8 +5,11 @@ gclcvs (2.7.0-7) unstable; urgency=low
   * tk8.4 patches
   * Prevent destructive modification of bignum arguments in log_op/mp_op
     in gmp_big.c
+  * Make sure to push stack variables onto newly allocated C variable
+    when inlining args and args cause side effects, in inline-args,
+    gcl_cmpinline.lsp
 
- -- Camm Maguire <camm@intech.m.enhanced.com>  Sat, 27 Sep 2003 16:13:17 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 29 Sep 2003 15:25:30 +0000
 
 gclcvs (2.7.0-6) unstable; urgency=low
 

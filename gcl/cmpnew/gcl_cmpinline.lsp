@@ -107,6 +107,7 @@
 	(t (incf *inline-blocks*))))
 
 (defun inline-args (forms types &optional fun &aux (locs nil) ii)
+  (let ((arg-side-effects (args-cause-side-effect forms)))
   (do ((forms forms (cdr forms))
        (types types (cdr types)))
       ((endp forms) (reverse locs))
@@ -132,9 +133,10 @@
                                (wt-var (caaddr form) (cadr (caddr form)))
                                (wt ";")
                                (push (coerce-loc temp type) locs)))))
-                     ((and (member (var-kind (caaddr form))
-                                   '(FIXNUM LONG-FLOAT SHORT-FLOAT INTEGER))
-                           (not (eq type (var-kind (caaddr form)))))
+                     ((or arg-side-effects
+			  (and (member (var-kind (caaddr form))
+				       '(FIXNUM LONG-FLOAT SHORT-FLOAT INTEGER))
+			       (not (eq type (var-kind (caaddr form))))))
 		      (let ((temp (cs-push type)))
 			(wt-nl "V" temp " = "
 			       (coerce-loc (cons 'var (caddr form)) type) ";")
@@ -233,7 +235,7 @@
 			     (t  (list 'vs (vs-push))))))
 		   (let ((*value-to-go* temp))
 		     (c2expr* form)
-		     (push (coerce-loc temp type) locs)))))))
+		     (push (coerce-loc temp type) locs))))))))
   )
 
 (defun coerce-loc (loc type)
