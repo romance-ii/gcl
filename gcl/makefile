@@ -162,7 +162,7 @@ install1:
 	rm -f $(DESTDIR)${prefix}/bin/gcl.exe
 	tar cf - $(PORTDIR)/$(FLISP)$(EXE) info/*.info* ${LISP_LIB} \
 	$(TCL_EXES)  |  (cd $(DESTDIR)${INSTALL_LIB_DIR} ;tar xf -)
-	if [ -e "unixport/rsym" ] ; then cp unixport/rsym $(DESTDIR)$(INSTALL_LIB_DIR)/unixport/ ; fi
+	if [ -e "unixport/rsym$(EXE)" ] ; then cp unixport/rsym$(EXE) $(DESTDIR)$(INSTALL_LIB_DIR)/unixport/ ; fi
 #	ln ${SYMB} ${INSTALL_LIB_DIR}/$(PORTDIR)/$(FLISP)$(EXE) \
 #	 $(DESTDIR)${prefix}/bin/gcl.exe
 	if [ -d "${TK_CONFIG_PREFIX}" ] ; then  \
