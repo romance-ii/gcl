@@ -95,21 +95,20 @@ do {                                                                            
 /* Mac OS X has sigaction (this is needed in o/usig.c)  */
 #define HAVE_SIGACTION
 
-/* make this a noop */
-/* #define SETUP_SIG_STACK */
-
 /* Copied from {Net,Free,Open}BSD.h  */
+/* Modified according to Camm's instructions on April 15, 2004.  */
 #define HAVE_SIGPROCMASK
-#define SIG_STACK_SIZE (SIGSTKSZ/sizeof(double))
-#define SETUP_SIG_STACK                             \
-{                                                   \
-static struct sigaltstack estack;                   \
-if ((estack.ss_sp = malloc(SIGSTKSZ)) == NULL)      \
-    perror("malloc");                               \
-estack.ss_size = SIGSTKSZ;                          \
-estack.ss_flags = 0;                                \
-if (sigaltstack(&estack, 0) < 0)                    \
-    perror("sigaltstack");                          \
+/* #define SIG_STACK_SIZE (SIGSTKSZ/sizeof(double)) */
+#define SETUP_SIG_STACK                                \
+{                                                      \
+static struct sigaltstack estack;                      \
+static double estack_buf [SIG_STACK_SIZE];             \
+bzero(estack_buf, sizeof(estack_buf));                 \
+estack.ss_sp = (char *) &estack_buf[SIG_STACK_SIZE-1]; \
+estack.ss_flags = 0;                                   \
+estack.ss_size = SIGSTKSZ;                             \
+if (sigaltstack(&estack, 0) < 0)                       \
+    perror("sigaltstack");                             \
 }
 
 #define SGC
