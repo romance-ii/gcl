@@ -17,8 +17,9 @@ gclcvs (2.7.0-12) unstable; urgency=low
   * Many restart test fixes, with guidance from cmucl, TODO rationalize
     the integration with traditional image catch/throw of quit-tags
   * relativize pathnames in clcs/myload.lisp
+  * Add with-condition-restarts to clcs exports
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 23 Oct 2003 15:14:33 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 23 Oct 2003 15:15:03 +0000
 
 gclcvs (2.7.0-11) unstable; urgency=low
 
