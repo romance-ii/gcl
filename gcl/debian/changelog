@@ -1,3 +1,21 @@
+gcl (2.5.0.cvs20020625-76) unstable; urgency=low
+
+  * Debian Priority is optional
+  * Configure lowest common denominator on m68k to m68020 -- gcc-3.2
+    can't handle m68000 -- no __mulsi3
+  * Fix bit array bug
+  * Add upgraded-array-element-type
+  * Misc typep and subtypep fixes
+  * Proper error handling in certain array.c functions
+  * First needs exactly one arg
+  * Proper error handlin in LAST
+  * bit array allocation fixes in num_log.c
+  * eliminate Iapply_fun_n1
+  * Dummy system find-class in traditional image, overwritten by pcl
+    version in ANSI
+
+ -- Camm Maguire <camm@enhanced.com>  Mon, 17 Feb 2003 11:47:03 -0500
+
 gcl (2.5.0.cvs20020625-75) unstable; urgency=low
 
   * Export truename for dlopen systems

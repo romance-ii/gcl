@@ -1,3 +1,4 @@
+
 /*
  Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
 
@@ -675,17 +676,37 @@ siLbit_array_op(void)
 		}
 	L2:
 		if (r == Cnil) {
-		  object b[F_ARG_LIMIT];
-		  b[0]=Cnil;
-		  for (i = 0;  i < x->a.a_rank;  i++)
-		    b[i] = (make_fixnum(x->a.a_dims[i]));
-		  r=Iapply_fun_n1(fSmake_array1,5,x->a.a_rank ? x->a.a_rank : 1,
-			       aet_bit,
-			       Cnil,
-			       small_fixnum(0),
-			       Cnil,
-			       Cnil,
-				 b);
+		  object b;
+		  struct cons *p=alloca(x->a.a_rank*sizeof(struct cons));
+		  if (x->a.a_rank) {
+		    object b1;
+
+		    b=(object)p;
+		    for (b1=b,i=0;i<x->a.a_rank;i++,b1=b1->c.c_cdr) {
+		      b1->d.t=(int)t_cons;
+		      b1->d.m=FALSE;
+		      b1->c.c_car=x->a.a_dims[i]<SMALL_FIXNUM_LIMIT ? 
+			small_fixnum(x->a.a_dims[i]) : 
+			make_fixnum(x->a.a_dims[i]);
+		      b1->c.c_cdr=i<x->a.a_rank-1 ? (object)++p : Cnil;
+		    }
+		  } else
+		    b=Cnil;
+
+		  r = fSmake_array1(aet_bit,Cnil,small_fixnum(0),Cnil,0,b);
+
+		  /* 		  object b[F_ARG_LIMIT]; */
+		  /* 		  b[0]=Cnil; */
+		  /* 		  for (i = 0;  i < x->a.a_rank;  i++) */
+		  /* 		    b[i] = (make_fixnum(x->a.a_dims[i])); */
+		  /* 		  r=Iapply_fun_n1(fSmake_array1,5,x->a.a_rank ? x->a.a_rank : 1, */
+		  /* 			       aet_bit, */
+		  /* 			       Cnil, */
+		  /* 			       small_fixnum(0), */
+		  /* 			       Cnil, */
+		  /* 			       Cnil, */
+		  /*				 b); */
+
 		}
 	}
 	rp = r->bv.bv_self;

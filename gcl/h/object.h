@@ -363,10 +363,10 @@ struct ustring {
 #define SHORT(x,i) ((( short *)(x)->ust.ust_self)[i])
 
 #define BV_OFFSET(x) ((type_of(x)==t_bitvector ? x->bv.bv_offset : \
-		       type_of(x)== t_array ? x->a.a_offset : abort(),0))
+		       type_of(x)== t_array ? x->a.a_offset : (abort(),0)))
 
 #define SET_BV_OFFSET(x,val) ((type_of(x)==t_bitvector ? x->bv.bv_offset = val : \
-		       type_of(x)== t_array ? x->a.a_offset=val : abort(),0))
+		       type_of(x)== t_array ? x->a.a_offset=val : (abort(),0)))
 
 
 		       

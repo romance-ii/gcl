@@ -143,6 +143,9 @@
 (defun class-precedence-list (object)
   (declare (ignore object))
   nil)
+(defun find-class (object)
+  (declare (ignore object))
+  nil)
 
 ;;; TYPEP predicate.
 ;;; FIXME --optimize with most likely cases first
@@ -200,25 +203,36 @@
     (sequence (or (listp object) (vectorp object)))
     ((base-string string) ;FIXME
      (and (stringp object)
-          (or (null i) (match-dimensions (array-dimensions object) i))))
+          (or (endp i) (match-dimensions (array-dimensions object) i))))
     (bit-vector
      (and (bit-vector-p object)
-          (or (null i) (match-dimensions (array-dimensions object) i))))
+          (or (endp i) (match-dimensions (array-dimensions object) i))))
     ((simple-base-string simple-string) ;FIXME
      (and (simple-string-p object)
-          (or (null i) (match-dimensions (array-dimensions object) i))))
+          (or (endp i) (match-dimensions (array-dimensions object) i))))
     (simple-bit-vector
      (and (simple-bit-vector-p object)
-          (or (null i) (match-dimensions (array-dimensions object) i))))
+          (or (endp i) (match-dimensions (array-dimensions object) i))))
     (simple-vector
      (and (simple-vector-p object)
-          (or (null i) (match-dimensions (array-dimensions object) i))))
+	  (or (endp i) (eq (car i) '*) 
+	      (and (eq (car i) t) (not (stringp object)) (not (bit-vector-p object)))
+	      (equal (array-element-type object) (best-array-element-type (car i))))
+          (or (endp (cdr i)) (match-dimensions (array-dimensions object) (cdr i)))))
+    (vector
+     (and (vectorp object)
+	  (or (endp i) (eq (car i) '*) 
+	      (and (eq (car i) t) (not (stringp object)) (not (bit-vector-p object)))
+	      (equal (array-element-type object) (best-array-element-type (car i))))
+          (or (endp (cdr i)) (match-dimensions (array-dimensions object) (cdr i)))))
     (simple-array
      (and (simple-array-p object)
           (or (endp i) (eq (car i) '*)
               (equal (array-element-type object)(best-array-element-type (car i))))
           (or (endp (cdr i)) (eq (cadr i) '*)
-              (match-dimensions (array-dimensions object) (cadr i)))))
+	      (if (listp (cadr i))
+		  (match-dimensions (array-dimensions object) (cadr i))
+		(eql (array-rank object) (cadr i))))))
     (array
      (and (arrayp object)
           (or (endp i) (eq (car i) '*)
@@ -226,7 +240,9 @@
               ;; Is this too strict?
               (equal (array-element-type object) (best-array-element-type (car i))))
           (or (endp (cdr i)) (eq (cadr i) '*)
-              (match-dimensions (array-dimensions object) (cadr i)))))
+	      (if (listp (cadr i))
+		  (match-dimensions (array-dimensions object) (cadr i))
+		(eql (array-rank object) (cadr i))))))
     (t 
      (cond ((setq tem (get tp 'si::s-data))
 	    (structure-subtype-p object tem))
@@ -286,6 +302,10 @@
     (when (and c1 c2)
       (return-from subtypep 
 		   (if (member type2 (class-precedence-list type1))
+		       (values t t) (values nil t))))
+    (when (and c1 (or (eq type2 'structure-object) (eq type2 'standard-object)))
+      (return-from subtypep 
+		   (if (member (find-class type2) (class-precedence-list type1))
 		       (values t t) (values nil t))))
     (when (or c1 c2)
       (return-from subtypep (values nil t))))

@@ -60,7 +60,12 @@ case $canonical in
      *86*linux*)
 	use=386-linux;;
 
+# m6800 not working with gcc-3.2
      m68k*linux*)
+       if test "$use_common_binary" = "yes"; then
+         host=m68020-unknown-linux-gnu
+         echo "The host is canonicalised to $host"
+       fi
      	use=m68k-linux;;
 
      alpha*linux*)
@@ -439,7 +444,7 @@ if test $use_gmp = yes ; then
  fi
 
  if test "$use_common_binary" = "yes"; then
-   cd $GMPDIR && ./configure --build=$host && cd ..
+   cd $GMPDIR && ./configure --host=$host && cd ..
  else
    cd $GMPDIR && ./configure && cd ..
  fi

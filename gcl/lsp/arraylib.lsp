@@ -30,13 +30,12 @@
           array-dimensions
           array-in-bounds-p array-row-major-index
           adjustable-array-p
-          bit sbit
+          bit sbit 
           bit-and bit-ior bit-xor bit-eqv bit-nand bit-nor
           bit-andc1 bit-andc2 bit-orc1 bit-orc2 bit-not
           array-has-fill-pointer-p fill-pointer
           vector-push vector-push-extend vector-pop
-          adjust-array))
-
+          adjust-array upgraded-array-element-type))
 
 (in-package 'system)
 
@@ -64,6 +63,10 @@
 			  (return v))))
 	       t))))
 	 
+(defun upgraded-array-element-type (type &optional environment)
+  (declare (ignore environment))
+  (best-array-element-type type))
+
 ;(defun array-displacement (array)
 ;  (let ((x (si:array-displacement1 array)))
 ;  (values (car x) (cdr x)))

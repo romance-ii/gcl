@@ -571,13 +571,17 @@ Larray_displacement(void) {
   BEGIN_NO_INTERRUPT;
 
   n = vs_top - vs_base;
-  if (n != 1)
-    FEerror("Wrong number of arguments",0);
+  if (n < 1)
+    FEtoo_few_arguments(vs_base,vs_top);
+  if (n > 1)
+    FEtoo_many_arguments(vs_base,vs_top);
   array = vs_base[0];
   vs_base=vs_top;
 
-  if (type_of(array)!=t_array && type_of(array)!=t_vector)
-    FEerror("Argument is not an array",0);
+/*   if (type_of(array)!=t_array && type_of(array)!=t_vector && */
+/*       type_of(array)!=t_bitvector && type_of(array)!=t_string) */
+/*     FEwrong_type_argument(sLarray,array); */
+  IisArray(array);
   a=array->a.a_displaced->c.c_car;
 
   if (a==Cnil) {
@@ -923,7 +927,7 @@ DEFUNO_NEW("FILL-POINTER",object,fLfill_pointer,LISP,1,1,NONE,OO,
   return make_fixnum(x->v.v_fillp) ;
 
  no_fillp:
-  FEerror("~a does not have a fill pointer",1,x);
+  FEwrong_type_argument(sLvector,x);
   return make_fixnum(0);
 } 
 
@@ -958,7 +962,9 @@ DEFUNO_NEW("ARRAY-ELEMENT-TYPE",object,fLarray_element_type,
 
 DEFUNO_NEW("ADJUSTABLE-ARRAY-P",object,fLadjustable_array_p,
        LISP,1,1,NONE,OO,OO,OO,OO,void,Ladjustable_array_p,(object x),"")
-{ return sLt;
+{ 
+  IisArray(x);
+  return sLt;
 }
 
 DEFUNO_NEW("DISPLACED-ARRAY-P",object,fSdisplaced_array_p,SI,1,

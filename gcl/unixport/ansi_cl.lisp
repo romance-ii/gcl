@@ -94,6 +94,8 @@
 (setf (symbol-function 'si::class-of) (symbol-function 'pcl::class-of))
 (setf (symbol-function 'si::class-precedence-list) 
 	(symbol-function 'pcl::class-precedence-list))
+(setf (symbol-function 'si::find-class) 
+	(symbol-function 'pcl::find-class))
 
 (do-external-symbols (s "CONDITIONS")
   (if (member s clcs_shadow)
@@ -129,7 +131,7 @@ set-pprint-dispatch simple-condition-format-control
 stream-external-format synonym-stream-symbol
 translate-logical-pathname translate-pathname
 two-way-stream-input-stream two-way-stream-output-stream
-unbound-slot-instance upgraded-array-element-type
+unbound-slot-instance 
 upgraded-complex-part-type wild-pathname-p with-compilation-unit
 with-condition-restarts with-package-iterator with-standard-io-syntax
 write-sequence ))

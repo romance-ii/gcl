@@ -33,7 +33,7 @@ IisArray(object f)
 		|TS(t_string)))
     return f;
   else
-   { FEerror("Not an array ~s",1,f); return f;
+   { FEwrong_type_argument(sLarray,f); return f;
 	}	
 }
 
@@ -120,27 +120,27 @@ Ifuncall_n(object fun,int n,...) {
 
 /* For applying FUN to args in VA_LIST, where n are supplied directly
    and the last one is itself a va_list */
-object
-Iapply_fun_n1(object (*fun)(),int n,int m,...) {
+/* object */
+/* Iapply_fun_n1(object (*fun)(),int n,int m,...) { */
 
-  va_list ap;
-  object b[F_ARG_LIMIT],*bb;
-  int i = 0;
+/*   va_list ap; */
+/*   object b[F_ARG_LIMIT],*bb; */
+/*   int i = 0; */
 
-  va_start(ap,m);
+/*   va_start(ap,m); */
 
-  while (--n >= 0) { 
-    b[i++] = va_arg(ap,object);}
-  if (m > 0) {
-    bb = va_arg(ap,object *);
-    while (--m >= 0)
-      b[i++] = *bb++;
-  }
+/*   while (--n >= 0) {  */
+/*     b[i++] = va_arg(ap,object);} */
+/*   if (m > 0) { */
+/*     bb = va_arg(ap,object *); */
+/*     while (--m >= 0) */
+/*       b[i++] = *bb++; */
+/*   } */
 
-  va_end(ap);
+/*   va_end(ap); */
 
- return IapplyVector(make_sfun(Cnil,fun,i,Cnil),i,b);
-}
+/*  return IapplyVector(make_sfun(Cnil,fun,i,Cnil),i,b); */
+/* } */
  
 /* For applying FUN to args in VA_LIST, where n are supplied directly
    and the last one is itself a va_list */

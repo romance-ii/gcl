@@ -665,7 +665,7 @@ DEFUNO_NEW("NTH",object,fLnth,LISP,2,2,NONE,OI,OO,OO,OO,void,Lnth,(int index,obj
 }   
 
 
-DEFUN_NEW("FIRST",object,fLfirst,LISP,0,0,NONE,OO,OO,OO,OO,(object x),"") 
+DEFUN_NEW("FIRST",object,fLfirst,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") 
 { RETURN1(car(x)) ;}
 
 DEFUN_NEW("SECOND",object,fLsecond,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
@@ -802,8 +802,10 @@ Llast() {
 	int n;
 
 	n=vs_top-vs_base;
-	if (n!=1 && n!=2)
-		FEerror("Expected one or two arguments, received ~D.",1,make_fixnum(n));
+	if (n<1)
+		FEtoo_few_arguments(vs_base,vs_top);
+	if (n>2)
+		FEtoo_many_arguments(vs_base,vs_top);
 	if (endp(vs_base[0]))
 		return;
 	if (n==2) {

@@ -111,1225 +111,1251 @@ T35:;}
 	base[0]=base[0];
 	return Cnil;
 }
+/*	function definition for UPGRADED-ARRAY-ELEMENT-TYPE	*/
+
+static void L2()
+{register object *base=vs_base;
+	register object *sup=base+VM2; VC2
+	vs_reserve(VM2);
+	{object V16;
+	object V17;
+	if(vs_top-vs_base<1) too_few_arguments();
+	if(vs_top-vs_base>2) too_many_arguments();
+	V16=(base[0]);
+	vs_base=vs_base+1;
+	if(vs_base>=vs_top){vs_top=sup;goto T55;}
+	V17=(base[1]);
+	vs_top=sup;
+	goto T56;
+goto T55;
+T55:;
+	V17= Cnil;
+goto T56;
+T56:;
+	base[2]= (*(LnkLI19))((V16));
+	vs_top=(vs_base=base+2)+1;
+	return;
+	}
+}
 /*	local entry for function MAKE-ARRAY	*/
 
-static object LI2(object V16,object first,...)
+static object LI3(object V18,object first,...)
 {	
 	va_list ap;
-	int narg = VFUN_NARGS; VMB2 VMS2 VMV2
-	{register object V17;
-	object V18;
-	object V19;
-	register object V20;
+	int narg = VFUN_NARGS; VMB3 VMS3 VMV3
+	{register object V19;
+	object V20;
 	object V21;
-	object V22;
+	register object V22;
 	object V23;
 	object V24;
 	object V25;
 	object V26;
+	object V27;
+	object V28;
 	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
-	V17= V16;
+	V19= V18;
 	narg= narg - 1;
 	{
-	parse_key_new_new(narg,Vcs +1,(struct key *)&LI2key,first,ap);
+	parse_key_new_new(narg,Vcs +1,(struct key *)&LI3key,first,ap);
 	if(Vcs[1]==0){
-	V18= Ct;
+	V20= Ct;
 	}else{
-	V18=(Vcs[1]);}
-	V19=(Vcs[2]);
+	V20=(Vcs[1]);}
+	V21=(Vcs[2]);
 	if(Vcs[3]==0){
-	V20= Cnil;
-	V21= Cnil;
+	V22= Cnil;
+	V23= Cnil;
 	}else{
-	V20=(Vcs[3]);
-	V21= Ct;}
-	V22=(Vcs[4]);
-	V23=(Vcs[5]);
-	V24=(Vcs[6]);
-	V25=(Vcs[7]);
-	V26=(Vcs[8]);
-	if(!(type_of((V17))==t_fixnum||type_of((V17))==t_bignum)){
-	goto T57;}
-	V17= make_cons((V17),Cnil);
-goto T57;
-T57:;
-	V18= (*(LnkLI22))((V18));
-	if(!(((long)length((V17)))==(1))){
-	goto T64;}
-	{register object V27;
-	base[0]= (V18);
-	base[1]= car((V17));
-	base[2]= (V22);
-	base[3]= (V23);
-	base[4]= (V24);
-	base[5]= (V25);
-	base[6]= (V26);
-	base[7]= (V19);
+	V22=(Vcs[3]);
+	V23= Ct;}
+	V24=(Vcs[4]);
+	V25=(Vcs[5]);
+	V26=(Vcs[6]);
+	V27=(Vcs[7]);
+	V28=(Vcs[8]);
+	if(!(type_of((V19))==t_fixnum||type_of((V19))==t_bignum)){
+	goto T60;}
+	V19= make_cons((V19),Cnil);
+goto T60;
+T60:;
+	V20= (*(LnkLI19))((V20));
+	if(!(((long)length((V19)))==(1))){
+	goto T67;}
+	{register object V29;
+	base[0]= (V20);
+	base[1]= car((V19));
+	base[2]= (V24);
+	base[3]= (V25);
+	base[4]= (V26);
+	base[5]= (V27);
+	base[6]= (V28);
+	base[7]= (V21);
 	vs_top=(vs_base=base+0)+8;
 	siLmake_vector();
 	vs_top=sup;
-	V27= vs_base[0];
-	if(((V21))==Cnil){
-	goto T75;}
-	{long V28;
-	register long V29;
-	V28= fix(car((V17)));
-	V29= 0;
-goto T81;
-T81:;
-	if(!((V29)>=(V28))){
-	goto T82;}
-	goto T75;
-goto T82;
-T82:;
-	V30= elt((V20),V29);
-	(void)(aset1((V27),V29,/* INLINE-ARGS */V30));
-	V29= (long)(V29)+1;
-	goto T81;}
-goto T75;
-T75:;
-	{object V31 = (V27);
-	VMR2(V31)}}
-goto T64;
-T64:;
-	{register object V32;
-	base[1]= (V18);
+	V29= vs_base[0];
+	if(((V23))==Cnil){
+	goto T78;}
+	{long V30;
+	register long V31;
+	V30= fix(car((V19)));
+	V31= 0;
+goto T84;
+T84:;
+	if(!((V31)>=(V30))){
+	goto T85;}
+	goto T78;
+goto T85;
+T85:;
+	V32= elt((V22),V31);
+	(void)(aset1((V29),V31,/* INLINE-ARGS */V32));
+	V31= (long)(V31)+1;
+	goto T84;}
+goto T78;
+T78:;
+	{object V33 = (V29);
+	VMR3(V33)}}
+goto T67;
+T67:;
+	{register object V34;
+	base[1]= (V20);
 	vs_top=(vs_base=base+1)+1;
 	(void) (*Lnk23)();
 	vs_top=sup;
 	base[0]= vs_base[0];
-	base[1]= (V26);
-	base[2]= (V19);
-	base[3]= (V24);
-	base[4]= (V25);
-	base[5]= (V17);
+	base[1]= (V28);
+	base[2]= (V21);
+	base[3]= (V26);
+	base[4]= (V27);
+	base[5]= (V19);
 	vs_top=(vs_base=base+0)+6;
 	(void) (*Lnk24)();
 	vs_top=sup;
-	V32= vs_base[0];
-	if(((V23))==Cnil){
-	goto T98;}
+	V34= vs_base[0];
+	if(((V25))==Cnil){
+	goto T101;}
 	base[0]= VV[6];
 	vs_top=(vs_base=base+0)+1;
 	Lerror();
 	vs_top=sup;
-goto T98;
-T98:;
-	{register object x= small_fixnum(0),V33= (V17);
-	while(!endp(V33))
-	if(eql(x,V33->c.c_car)){
-	goto T102;
-	}else V33=V33->c.c_cdr;}
-	if(((V21))==Cnil){
-	goto T102;}
-	{register object V34;
-	base[0]= make_fixnum((long)length((V17)));
+goto T101;
+T101:;
+	{register object x= small_fixnum(0),V35= (V19);
+	while(!endp(V35))
+	if(eql(x,V35->c.c_car)){
+	goto T105;
+	}else V35=V35->c.c_cdr;}
+	if(((V23))==Cnil){
+	goto T105;}
+	{register object V36;
+	base[0]= make_fixnum((long)length((V19)));
 	base[1]= VV[7];
 	base[2]= small_fixnum(0);
 	vs_top=(vs_base=base+0)+3;
 	Lmake_list();
 	vs_top=sup;
-	V34= vs_base[0];
-goto T112;
-T112:;
-	base[0]= (V32);
-	base[1]= (*(LnkLI25))((V20),(V34));
-	base[2]= (V34);
+	V36= vs_base[0];
+goto T115;
+T115:;
+	base[0]= (V34);
+	base[1]= (*(LnkLI25))((V22),(V36));
+	base[2]= (V36);
 	vs_top=(vs_base=base+0)+3;
 	(void) (*Lnk26)();
 	vs_top=sup;
-	if(((*(LnkLI27))((V34),(V17)))==Cnil){
-	goto T119;}
-	goto T102;
-goto T119;
-T119:;
-	goto T112;}
-goto T102;
-T102:;
-	{object V35 = (V32);
-	VMR2(V35)}}
+	if(((*(LnkLI27))((V36),(V19)))==Cnil){
+	goto T122;}
+	goto T105;
+goto T122;
+T122:;
+	goto T115;}
+goto T105;
+T105:;
+	{object V37 = (V34);
+	VMR3(V37)}}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}}
 /*	local entry for function INCREMENT-CURSOR	*/
 
-static object LI3(V38,V39)
+static object LI4(V40,V41)
 
-register object V38;object V39;
-{	 VMB3 VMS3 VMV3
+register object V40;object V41;
+{	 VMB4 VMS4 VMV4
 goto TTL;
 TTL:;
-	if(((V38))!=Cnil){
-	goto T125;}
-	{object V40 = Ct;
-	VMR3(V40)}
-goto T125;
-T125:;
-	{object V41;
-	V41= (*(LnkLI27))(cdr((V38)),cdr((V39)));
-	if(((V41))==Cnil){
-	goto T129;}
-	if(!(((long)(fix(car((V38))))+1)>=(fix(car((V39)))))){
-	goto T132;}
-	if(type_of((V38))!=t_cons)FEwrong_type_argument(Scons,(V38));
-	((V38))->c.c_car = small_fixnum(0);
+	if(((V40))!=Cnil){
+	goto T128;}
 	{object V42 = Ct;
-	VMR3(V42)}
+	VMR4(V42)}
+goto T128;
+T128:;
+	{object V43;
+	V43= (*(LnkLI27))(cdr((V40)),cdr((V41)));
+	if(((V43))==Cnil){
+	goto T132;}
+	if(!(((long)(fix(car((V40))))+1)>=(fix(car((V41)))))){
+	goto T135;}
+	if(type_of((V40))!=t_cons)FEwrong_type_argument(Scons,(V40));
+	((V40))->c.c_car = small_fixnum(0);
+	{object V44 = Ct;
+	VMR4(V44)}
+goto T135;
+T135:;
+	V45 = make_fixnum((long)(fix(car((V40))))+1);
+	if(type_of((V40))!=t_cons)FEwrong_type_argument(Scons,(V40));
+	((V40))->c.c_car = V45;
+	{object V46 = Cnil;
+	VMR4(V46)}
 goto T132;
 T132:;
-	V43 = make_fixnum((long)(fix(car((V38))))+1);
-	if(type_of((V38))!=t_cons)FEwrong_type_argument(Scons,(V38));
-	((V38))->c.c_car = V43;
-	{object V44 = Cnil;
-	VMR3(V44)}
-goto T129;
-T129:;
-	{object V45 = Cnil;
-	VMR3(V45)}}
+	{object V47 = Cnil;
+	VMR4(V47)}}
 	return Cnil;
 }
 /*	local entry for function SEQUENCE-CURSOR	*/
 
-static object LI4(V48,V49)
+static object LI5(V50,V51)
 
-object V48;object V49;
-{	 VMB4 VMS4 VMV4
+object V50;object V51;
+{	 VMB5 VMS5 VMV5
 goto TTL;
 TTL:;
-	if(((V49))!=Cnil){
-	goto T137;}
-	{object V50 = (V48);
-	VMR4(V50)}
-goto T137;
-T137:;
-	V48= elt((V48),fix(car((V49))));
-	V49= cdr((V49));
+	if(((V51))!=Cnil){
+	goto T140;}
+	{object V52 = (V50);
+	VMR5(V52)}
+goto T140;
+T140:;
+	V50= elt((V50),fix(car((V51))));
+	V51= cdr((V51));
 	goto TTL;
 	return Cnil;
 }
 /*	local entry for function VECTOR	*/
 
-static object LI5(object first,...)
+static object LI6(object first,...)
 {	
 	va_list ap;
-	int narg = VFUN_NARGS; VMB5 VMS5 VMV5
-	{object V51;
+	int narg = VFUN_NARGS; VMB6 VMS6 VMV6
+	{object V53;
 	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
-	V52 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));
-	V51= V52;
-	{object V53;
-	V54 = make_fixnum((long)length((V51)));
-	V53= make_cons(V54,Cnil);
-	{object V55 = (VFUN_NARGS=5,(*(LnkLI28))((V53),VV[8],Ct,VV[9],(V51)));
-	VMR5(V55)}}
+	V54 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));
+	V53= V54;
+	{object V55;
+	V56 = make_fixnum((long)length((V53)));
+	V55= make_cons(V56,Cnil);
+	{object V57 = (VFUN_NARGS=5,(*(LnkLI28))((V55),VV[8],Ct,VV[9],(V53)));
+	VMR6(V57)}}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function ARRAY-DIMENSIONS	*/
 
-static object LI6(V57)
+static object LI7(V59)
 
-register object V57;
-{	 VMB6 VMS6 VMV6
+register object V59;
+{	 VMB7 VMS7 VMV7
 goto TTL;
 TTL:;
-	{register object V58;
-	register object V59;
-	base[0]= (V57);
+	{register object V60;
+	register object V61;
+	base[0]= (V59);
 	vs_top=(vs_base=base+0)+1;
 	Larray_rank();
 	vs_top=sup;
-	V58= vs_base[0];
-	V59= Cnil;
-goto T146;
-T146:;
-	if(!(number_compare((V58),small_fixnum(0))==0)){
-	goto T147;}
-	{object V60 = (V59);
-	VMR6(V60)}
-goto T147;
-T147:;
-	V58= one_minus((V58));
-	base[0]= (V57);
-	base[1]= (V58);
+	V60= vs_base[0];
+	V61= Cnil;
+goto T149;
+T149:;
+	if(!(number_compare((V60),small_fixnum(0))==0)){
+	goto T150;}
+	{object V62 = (V61);
+	VMR7(V62)}
+goto T150;
+T150:;
+	V60= one_minus((V60));
+	base[0]= (V59);
+	base[1]= (V60);
 	vs_top=(vs_base=base+0)+2;
 	Larray_dimension();
 	vs_top=sup;
-	V61= vs_base[0];
-	V59= make_cons(V61,(V59));
-	goto T146;}
+	V63= vs_base[0];
+	V61= make_cons(V63,(V61));
+	goto T149;}
 	base[0]=base[0];
 	return Cnil;
 }
 /*	local entry for function ARRAY-IN-BOUNDS-P	*/
 
-static object LI7(object V62,object first,...)
+static object LI8(object V64,object first,...)
 {	
 	va_list ap;
-	int narg = VFUN_NARGS; VMB7 VMS7 VMV7
-	{register object V63;
-	object V64;
+	int narg = VFUN_NARGS; VMB8 VMS8 VMV8
+	{register object V65;
+	object V66;
 	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
-	V63= V62;
+	V65= V64;
 	narg= narg - 1;
-	V65 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));
-	V64= V65;
-	{register object V66;
-	base[1]= (V63);
+	V67 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));
+	V66= V67;
+	{register object V68;
+	base[1]= (V65);
 	vs_top=(vs_base=base+1)+1;
 	Larray_rank();
 	vs_top=sup;
-	V66= vs_base[0];
-	V67 = make_fixnum((long)length((V64)));
-	if(!(number_compare((V66),V67)!=0)){
-	goto T162;}
+	V68= vs_base[0];
+	V69 = make_fixnum((long)length((V66)));
+	if(!(number_compare((V68),V69)!=0)){
+	goto T165;}
 	base[1]= VV[10];
-	base[2]= (V66);
-	base[3]= make_fixnum((long)length((V64)));
+	base[2]= (V68);
+	base[3]= make_fixnum((long)length((V66)));
 	vs_top=(vs_base=base+1)+3;
 	Lerror();
 	vs_top=sup;
-goto T162;
-T162:;
-	{register object V68;
-	register object V69;
-	V68= small_fixnum(0);
-	V69= (V64);
-goto T169;
-T169:;
-	if(!(number_compare((V68),(V66))>=0)){
-	goto T170;}
-	{object V70 = Ct;
-	VMR7(V70)}
-goto T170;
-T170:;
-	if(number_compare(car((V69)),small_fixnum(0))<0){
-	goto T175;}
-	V71= car((V69));
-	base[1]= (V63);
-	base[2]= (V68);
+goto T165;
+T165:;
+	{register object V70;
+	register object V71;
+	V70= small_fixnum(0);
+	V71= (V66);
+goto T172;
+T172:;
+	if(!(number_compare((V70),(V68))>=0)){
+	goto T173;}
+	{object V72 = Ct;
+	VMR8(V72)}
+goto T173;
+T173:;
+	if(number_compare(car((V71)),small_fixnum(0))<0){
+	goto T178;}
+	V73= car((V71));
+	base[1]= (V65);
+	base[2]= (V70);
 	vs_top=(vs_base=base+1)+2;
 	Larray_dimension();
 	vs_top=sup;
-	V72= vs_base[0];
-	if(!(number_compare(/* INLINE-ARGS */V71,V72)>=0)){
-	goto T174;}
-goto T175;
-T175:;
-	{object V73 = Cnil;
-	VMR7(V73)}
-goto T174;
-T174:;
-	V68= one_plus((V68));
-	V69= cdr((V69));
-	goto T169;}}
+	V74= vs_base[0];
+	if(!(number_compare(/* INLINE-ARGS */V73,V74)>=0)){
+	goto T177;}
+goto T178;
+T178:;
+	{object V75 = Cnil;
+	VMR8(V75)}
+goto T177;
+T177:;
+	V70= one_plus((V70));
+	V71= cdr((V71));
+	goto T172;}}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function ARRAY-ROW-MAJOR-INDEX	*/
 
-static object LI8(object V74,object first,...)
+static object LI9(object V76,object first,...)
 {	
 	va_list ap;
-	int narg = VFUN_NARGS; VMB8 VMS8 VMV8
-	{register object V75;
-	object V76;
+	int narg = VFUN_NARGS; VMB9 VMS9 VMV9
+	{register object V77;
+	object V78;
 	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
-	V75= V74;
+	V77= V76;
 	narg= narg - 1;
-	V77 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));
-	V76= V77;
-	{register object V78;
-	register object V79;
-	register object V80;
-	V78= small_fixnum(0);
-	V79= small_fixnum(0);
-	V80= (V76);
-goto T187;
-T187:;
-	if(((V80))!=Cnil){
-	goto T188;}
-	{object V81 = (V79);
-	VMR8(V81)}
-goto T188;
-T188:;
-	{object V82;
-	V82= one_plus((V78));
-	base[0]= (V75);
-	base[1]= (V78);
+	V79 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));
+	V78= V79;
+	{register object V80;
+	register object V81;
+	register object V82;
+	V80= small_fixnum(0);
+	V81= small_fixnum(0);
+	V82= (V78);
+goto T190;
+T190:;
+	if(((V82))!=Cnil){
+	goto T191;}
+	{object V83 = (V81);
+	VMR9(V83)}
+goto T191;
+T191:;
+	{object V84;
+	V84= one_plus((V80));
+	base[0]= (V77);
+	base[1]= (V80);
 	vs_top=(vs_base=base+0)+2;
 	Larray_dimension();
 	vs_top=sup;
-	V83= vs_base[0];
-	V84= number_times((V79),V83);
-	V79= number_plus(/* INLINE-ARGS */V84,car((V80)));
-	V80= cdr((V80));
-	V78= (V82);}
-	goto T187;}
+	V85= vs_base[0];
+	V86= number_times((V81),V85);
+	V81= number_plus(/* INLINE-ARGS */V86,car((V82)));
+	V82= cdr((V82));
+	V80= (V84);}
+	goto T190;}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function BIT	*/
 
-static object LI9(object V85,object first,...)
+static object LI10(object V87,object first,...)
 {	
 	va_list ap;
-	int narg = VFUN_NARGS; VMB9 VMS9 VMV9
-	{object V86;
-	object V87;
+	int narg = VFUN_NARGS; VMB10 VMS10 VMV10
+	{object V88;
+	object V89;
 	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
-	V86= V85;
+	V88= V87;
 	narg= narg - 1;
-	V88 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));
-	V87= V88;
-	base[0]= (V86);
-	{object V89;
-	V89= (V87);
+	V90 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));
+	V89= V90;
+	base[0]= (V88);
+	{object V91;
+	V91= (V89);
 	 vs_top=base+1;
-	 while(!endp(V89))
-	 {vs_push(car(V89));V89=cdr(V89);}
+	 while(!endp(V91))
+	 {vs_push(car(V91));V91=cdr(V91);}
 	vs_base=base+0;}
 	Laref();
 	vs_top=sup;
-	{object V90 = vs_base[0];
-	VMR9(V90)}
+	{object V92 = vs_base[0];
+	VMR10(V92)}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function SBIT	*/
 
-static object LI10(object V91,object first,...)
+static object LI11(object V93,object first,...)
 {	
 	va_list ap;
-	int narg = VFUN_NARGS; VMB10 VMS10 VMV10
-	{object V92;
-	object V93;
+	int narg = VFUN_NARGS; VMB11 VMS11 VMV11
+	{object V94;
+	object V95;
 	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
-	V92= V91;
+	V94= V93;
 	narg= narg - 1;
-	V94 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));
-	V93= V94;
-	base[0]= (V92);
-	{object V95;
-	V95= (V93);
+	V96 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));
+	V95= V96;
+	base[0]= (V94);
+	{object V97;
+	V97= (V95);
 	 vs_top=base+1;
-	 while(!endp(V95))
-	 {vs_push(car(V95));V95=cdr(V95);}
+	 while(!endp(V97))
+	 {vs_push(car(V97));V97=cdr(V97);}
 	vs_base=base+0;}
 	Laref();
 	vs_top=sup;
-	{object V96 = vs_base[0];
-	VMR10(V96)}
+	{object V98 = vs_base[0];
+	VMR11(V98)}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function BIT-AND	*/
 
-static object LI11(object V98,object V97,object first,...)
+static object LI12(object V100,object V99,object first,...)
 {	
 	va_list ap;
-	int narg = VFUN_NARGS; VMB11 VMS11 VMV11
-	{object V99;
-	object V100;
-	object V101;
+	int narg = VFUN_NARGS; VMB12 VMS12 VMV12
+	{object V101;
+	object V102;
+	object V103;
 	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
-	V99= V98;
-	V100= V97;
+	V101= V100;
+	V102= V99;
 	narg = narg - 2;
-	if (narg <= 0) goto T204;
+	if (narg <= 0) goto T207;
 	else {
-	V101= first;}
-	--narg; goto T205;
-goto T204;
-T204:;
-	V101= Cnil;
-goto T205;
-T205:;
+	V103= first;}
+	--narg; goto T208;
+goto T207;
+T207:;
+	V103= Cnil;
+goto T208;
+T208:;
 	base[0]= small_fixnum(1);
-	base[1]= (V99);
-	base[2]= (V100);
-	base[3]= (V101);
+	base[1]= (V101);
+	base[2]= (V102);
+	base[3]= (V103);
 	vs_top=(vs_base=base+0)+4;
 	siLbit_array_op();
 	vs_top=sup;
-	{object V102 = vs_base[0];
-	VMR11(V102)}
+	{object V104 = vs_base[0];
+	VMR12(V104)}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function BIT-IOR	*/
 
-static object LI12(object V104,object V103,object first,...)
+static object LI13(object V106,object V105,object first,...)
 {	
 	va_list ap;
-	int narg = VFUN_NARGS; VMB12 VMS12 VMV12
-	{object V105;
-	object V106;
-	object V107;
+	int narg = VFUN_NARGS; VMB13 VMS13 VMV13
+	{object V107;
+	object V108;
+	object V109;
 	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
-	V105= V104;
-	V106= V103;
+	V107= V106;
+	V108= V105;
 	narg = narg - 2;
-	if (narg <= 0) goto T211;
+	if (narg <= 0) goto T214;
 	else {
-	V107= first;}
-	--narg; goto T212;
-goto T211;
-T211:;
-	V107= Cnil;
-goto T212;
-T212:;
+	V109= first;}
+	--narg; goto T215;
+goto T214;
+T214:;
+	V109= Cnil;
+goto T215;
+T215:;
 	base[0]= small_fixnum(7);
-	base[1]= (V105);
-	base[2]= (V106);
-	base[3]= (V107);
+	base[1]= (V107);
+	base[2]= (V108);
+	base[3]= (V109);
 	vs_top=(vs_base=base+0)+4;
 	siLbit_array_op();
 	vs_top=sup;
-	{object V108 = vs_base[0];
-	VMR12(V108)}
+	{object V110 = vs_base[0];
+	VMR13(V110)}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function BIT-XOR	*/
 
-static object LI13(object V110,object V109,object first,...)
+static object LI14(object V112,object V111,object first,...)
 {	
 	va_list ap;
-	int narg = VFUN_NARGS; VMB13 VMS13 VMV13
-	{object V111;
-	object V112;
-	object V113;
+	int narg = VFUN_NARGS; VMB14 VMS14 VMV14
+	{object V113;
+	object V114;
+	object V115;
 	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
-	V111= V110;
-	V112= V109;
+	V113= V112;
+	V114= V111;
 	narg = narg - 2;
-	if (narg <= 0) goto T218;
+	if (narg <= 0) goto T221;
 	else {
-	V113= first;}
-	--narg; goto T219;
-goto T218;
-T218:;
-	V113= Cnil;
-goto T219;
-T219:;
+	V115= first;}
+	--narg; goto T222;
+goto T221;
+T221:;
+	V115= Cnil;
+goto T222;
+T222:;
 	base[0]= small_fixnum(6);
-	base[1]= (V111);
-	base[2]= (V112);
-	base[3]= (V113);
+	base[1]= (V113);
+	base[2]= (V114);
+	base[3]= (V115);
 	vs_top=(vs_base=base+0)+4;
 	siLbit_array_op();
 	vs_top=sup;
-	{object V114 = vs_base[0];
-	VMR13(V114)}
+	{object V116 = vs_base[0];
+	VMR14(V116)}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function BIT-EQV	*/
 
-static object LI14(object V116,object V115,object first,...)
+static object LI15(object V118,object V117,object first,...)
 {	
 	va_list ap;
-	int narg = VFUN_NARGS; VMB14 VMS14 VMV14
-	{object V117;
-	object V118;
-	object V119;
+	int narg = VFUN_NARGS; VMB15 VMS15 VMV15
+	{object V119;
+	object V120;
+	object V121;
 	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
-	V117= V116;
-	V118= V115;
+	V119= V118;
+	V120= V117;
 	narg = narg - 2;
-	if (narg <= 0) goto T225;
+	if (narg <= 0) goto T228;
 	else {
-	V119= first;}
-	--narg; goto T226;
-goto T225;
-T225:;
-	V119= Cnil;
-goto T226;
-T226:;
+	V121= first;}
+	--narg; goto T229;
+goto T228;
+T228:;
+	V121= Cnil;
+goto T229;
+T229:;
 	base[0]= small_fixnum(9);
-	base[1]= (V117);
-	base[2]= (V118);
-	base[3]= (V119);
+	base[1]= (V119);
+	base[2]= (V120);
+	base[3]= (V121);
 	vs_top=(vs_base=base+0)+4;
 	siLbit_array_op();
 	vs_top=sup;
-	{object V120 = vs_base[0];
-	VMR14(V120)}
+	{object V122 = vs_base[0];
+	VMR15(V122)}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function BIT-NAND	*/
 
-static object LI15(object V122,object V121,object first,...)
+static object LI16(object V124,object V123,object first,...)
 {	
 	va_list ap;
-	int narg = VFUN_NARGS; VMB15 VMS15 VMV15
-	{object V123;
-	object V124;
-	object V125;
+	int narg = VFUN_NARGS; VMB16 VMS16 VMV16
+	{object V125;
+	object V126;
+	object V127;
 	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
-	V123= V122;
-	V124= V121;
+	V125= V124;
+	V126= V123;
 	narg = narg - 2;
-	if (narg <= 0) goto T232;
+	if (narg <= 0) goto T235;
 	else {
-	V125= first;}
-	--narg; goto T233;
-goto T232;
-T232:;
-	V125= Cnil;
-goto T233;
-T233:;
+	V127= first;}
+	--narg; goto T236;
+goto T235;
+T235:;
+	V127= Cnil;
+goto T236;
+T236:;
 	base[0]= small_fixnum(14);
-	base[1]= (V123);
-	base[2]= (V124);
-	base[3]= (V125);
+	base[1]= (V125);
+	base[2]= (V126);
+	base[3]= (V127);
 	vs_top=(vs_base=base+0)+4;
 	siLbit_array_op();
 	vs_top=sup;
-	{object V126 = vs_base[0];
-	VMR15(V126)}
+	{object V128 = vs_base[0];
+	VMR16(V128)}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function BIT-NOR	*/
 
-static object LI16(object V128,object V127,object first,...)
+static object LI17(object V130,object V129,object first,...)
 {	
 	va_list ap;
-	int narg = VFUN_NARGS; VMB16 VMS16 VMV16
-	{object V129;
-	object V130;
-	object V131;
+	int narg = VFUN_NARGS; VMB17 VMS17 VMV17
+	{object V131;
+	object V132;
+	object V133;
 	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
-	V129= V128;
-	V130= V127;
+	V131= V130;
+	V132= V129;
 	narg = narg - 2;
-	if (narg <= 0) goto T239;
+	if (narg <= 0) goto T242;
 	else {
-	V131= first;}
-	--narg; goto T240;
-goto T239;
-T239:;
-	V131= Cnil;
-goto T240;
-T240:;
+	V133= first;}
+	--narg; goto T243;
+goto T242;
+T242:;
+	V133= Cnil;
+goto T243;
+T243:;
 	base[0]= small_fixnum(8);
-	base[1]= (V129);
-	base[2]= (V130);
-	base[3]= (V131);
+	base[1]= (V131);
+	base[2]= (V132);
+	base[3]= (V133);
 	vs_top=(vs_base=base+0)+4;
 	siLbit_array_op();
 	vs_top=sup;
-	{object V132 = vs_base[0];
-	VMR16(V132)}
+	{object V134 = vs_base[0];
+	VMR17(V134)}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function BIT-ANDC1	*/
 
-static object LI17(object V134,object V133,object first,...)
+static object LI18(object V136,object V135,object first,...)
 {	
 	va_list ap;
-	int narg = VFUN_NARGS; VMB17 VMS17 VMV17
-	{object V135;
-	object V136;
-	object V137;
+	int narg = VFUN_NARGS; VMB18 VMS18 VMV18
+	{object V137;
+	object V138;
+	object V139;
 	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
-	V135= V134;
-	V136= V133;
+	V137= V136;
+	V138= V135;
 	narg = narg - 2;
-	if (narg <= 0) goto T246;
+	if (narg <= 0) goto T249;
 	else {
-	V137= first;}
-	--narg; goto T247;
-goto T246;
-T246:;
-	V137= Cnil;
-goto T247;
-T247:;
+	V139= first;}
+	--narg; goto T250;
+goto T249;
+T249:;
+	V139= Cnil;
+goto T250;
+T250:;
 	base[0]= small_fixnum(4);
-	base[1]= (V135);
-	base[2]= (V136);
-	base[3]= (V137);
+	base[1]= (V137);
+	base[2]= (V138);
+	base[3]= (V139);
 	vs_top=(vs_base=base+0)+4;
 	siLbit_array_op();
 	vs_top=sup;
-	{object V138 = vs_base[0];
-	VMR17(V138)}
+	{object V140 = vs_base[0];
+	VMR18(V140)}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function BIT-ANDC2	*/
 
-static object LI18(object V140,object V139,object first,...)
+static object LI19(object V142,object V141,object first,...)
 {	
 	va_list ap;
-	int narg = VFUN_NARGS; VMB18 VMS18 VMV18
-	{object V141;
-	object V142;
-	object V143;
+	int narg = VFUN_NARGS; VMB19 VMS19 VMV19
+	{object V143;
+	object V144;
+	object V145;
 	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
-	V141= V140;
-	V142= V139;
+	V143= V142;
+	V144= V141;
 	narg = narg - 2;
-	if (narg <= 0) goto T253;
+	if (narg <= 0) goto T256;
 	else {
-	V143= first;}
-	--narg; goto T254;
-goto T253;
-T253:;
-	V143= Cnil;
-goto T254;
-T254:;
+	V145= first;}
+	--narg; goto T257;
+goto T256;
+T256:;
+	V145= Cnil;
+goto T257;
+T257:;
 	base[0]= small_fixnum(2);
-	base[1]= (V141);
-	base[2]= (V142);
-	base[3]= (V143);
+	base[1]= (V143);
+	base[2]= (V144);
+	base[3]= (V145);
 	vs_top=(vs_base=base+0)+4;
 	siLbit_array_op();
 	vs_top=sup;
-	{object V144 = vs_base[0];
-	VMR18(V144)}
+	{object V146 = vs_base[0];
+	VMR19(V146)}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function BIT-ORC1	*/
 
-static object LI19(object V146,object V145,object first,...)
+static object LI20(object V148,object V147,object first,...)
 {	
 	va_list ap;
-	int narg = VFUN_NARGS; VMB19 VMS19 VMV19
-	{object V147;
-	object V148;
-	object V149;
+	int narg = VFUN_NARGS; VMB20 VMS20 VMV20
+	{object V149;
+	object V150;
+	object V151;
 	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
-	V147= V146;
-	V148= V145;
+	V149= V148;
+	V150= V147;
 	narg = narg - 2;
-	if (narg <= 0) goto T260;
+	if (narg <= 0) goto T263;
 	else {
-	V149= first;}
-	--narg; goto T261;
-goto T260;
-T260:;
-	V149= Cnil;
-goto T261;
-T261:;
+	V151= first;}
+	--narg; goto T264;
+goto T263;
+T263:;
+	V151= Cnil;
+goto T264;
+T264:;
 	base[0]= small_fixnum(13);
-	base[1]= (V147);
-	base[2]= (V148);
-	base[3]= (V149);
+	base[1]= (V149);
+	base[2]= (V150);
+	base[3]= (V151);
 	vs_top=(vs_base=base+0)+4;
 	siLbit_array_op();
 	vs_top=sup;
-	{object V150 = vs_base[0];
-	VMR19(V150)}
+	{object V152 = vs_base[0];
+	VMR20(V152)}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function BIT-ORC2	*/
 
-static object LI20(object V152,object V151,object first,...)
+static object LI21(object V154,object V153,object first,...)
 {	
 	va_list ap;
-	int narg = VFUN_NARGS; VMB20 VMS20 VMV20
-	{object V153;
-	object V154;
-	object V155;
+	int narg = VFUN_NARGS; VMB21 VMS21 VMV21
+	{object V155;
+	object V156;
+	object V157;
 	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
-	V153= V152;
-	V154= V151;
+	V155= V154;
+	V156= V153;
 	narg = narg - 2;
-	if (narg <= 0) goto T267;
+	if (narg <= 0) goto T270;
 	else {
-	V155= first;}
-	--narg; goto T268;
-goto T267;
-T267:;
-	V155= Cnil;
-goto T268;
-T268:;
+	V157= first;}
+	--narg; goto T271;
+goto T270;
+T270:;
+	V157= Cnil;
+goto T271;
+T271:;
 	base[0]= small_fixnum(11);
-	base[1]= (V153);
-	base[2]= (V154);
-	base[3]= (V155);
+	base[1]= (V155);
+	base[2]= (V156);
+	base[3]= (V157);
 	vs_top=(vs_base=base+0)+4;
 	siLbit_array_op();
 	vs_top=sup;
-	{object V156 = vs_base[0];
-	VMR20(V156)}
+	{object V158 = vs_base[0];
+	VMR21(V158)}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function BIT-NOT	*/
 
-static object LI21(object V157,object first,...)
+static object LI22(object V159,object first,...)
 {	
 	va_list ap;
-	int narg = VFUN_NARGS; VMB21 VMS21 VMV21
-	{object V158;
-	object V159;
+	int narg = VFUN_NARGS; VMB22 VMS22 VMV22
+	{object V160;
+	object V161;
 	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
-	V158= V157;
+	V160= V159;
 	narg = narg - 1;
-	if (narg <= 0) goto T274;
+	if (narg <= 0) goto T277;
 	else {
-	V159= first;}
-	--narg; goto T275;
-goto T274;
-T274:;
-	V159= Cnil;
-goto T275;
-T275:;
+	V161= first;}
+	--narg; goto T278;
+goto T277;
+T277:;
+	V161= Cnil;
+goto T278;
+T278:;
 	base[0]= small_fixnum(12);
-	base[1]= (V158);
-	base[2]= (V158);
-	base[3]= (V159);
+	base[1]= (V160);
+	base[2]= (V160);
+	base[3]= (V161);
 	vs_top=(vs_base=base+0)+4;
 	siLbit_array_op();
 	vs_top=sup;
-	{object V160 = vs_base[0];
-	VMR21(V160)}
+	{object V162 = vs_base[0];
+	VMR22(V162)}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function VECTOR-PUSH	*/
 
-static object LI22(V163,V164)
+static object LI23(V165,V166)
 
-object V163;register object V164;
-{	 VMB22 VMS22 VMV22
+object V165;register object V166;
+{	 VMB23 VMS23 VMV23
 goto TTL;
 TTL:;
-	{register long V165;
-	base[0]= (V164);
+	{register long V167;
+	base[0]= (V166);
 	vs_top=(vs_base=base+0)+1;
 	Lfill_pointer();
 	vs_top=sup;
-	V165= fix(vs_base[0]);
-	base[0]= (V164);
+	V167= fix(vs_base[0]);
+	base[0]= (V166);
 	base[1]= small_fixnum(0);
 	vs_top=(vs_base=base+0)+2;
 	Larray_dimension();
 	vs_top=sup;
-	V166= vs_base[0];
-	if(!((V165)<(fix(V166)))){
-	goto T284;}
-	(void)(aset1((V164),V165,(V163)));
-	base[0]= (V164);
-	base[1]= make_fixnum((long)(V165)+1);
+	V168= vs_base[0];
+	if(!((V167)<(fix(V168)))){
+	goto T287;}
+	(void)(aset1((V166),V167,(V165)));
+	base[0]= (V166);
+	base[1]= make_fixnum((long)(V167)+1);
 	vs_top=(vs_base=base+0)+2;
 	siLfill_pointer_set();
 	vs_top=sup;
-	{object V167 = make_fixnum(V165);
-	VMR22(V167)}
-goto T284;
-T284:;
-	{object V168 = Cnil;
-	VMR22(V168)}}
+	{object V169 = make_fixnum(V167);
+	VMR23(V169)}
+goto T287;
+T287:;
+	{object V170 = Cnil;
+	VMR23(V170)}}
 	base[0]=base[0];
 	return Cnil;
 }
 /*	local entry for function VECTOR-PUSH-EXTEND	*/
 
-static object LI23(object V170,object V169,object first,...)
+static object LI24(object V172,object V171,object first,...)
 {	
 	va_list ap;
-	int narg = VFUN_NARGS; VMB23 VMS23 VMV23
-	{object V171;
-	register object V172;
-	object V173;
+	int narg = VFUN_NARGS; VMB24 VMS24 VMV24
+	{object V173;
+	register object V174;
+	object V175;
 	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
-	V171= V170;
-	V172= V169;
+	V173= V172;
+	V174= V171;
 	narg = narg - 2;
-	if (narg <= 0) goto T293;
+	if (narg <= 0) goto T296;
 	else {
-	V173= first;}
-	--narg; goto T294;
-goto T293;
-T293:;
-	V173= Cnil;
-goto T294;
-T294:;
-	{register long V174;
-	base[0]= (V172);
+	V175= first;}
+	--narg; goto T297;
+goto T296;
+T296:;
+	V175= Cnil;
+goto T297;
+T297:;
+	{register long V176;
+	base[0]= (V174);
 	vs_top=(vs_base=base+0)+1;
 	Lfill_pointer();
 	vs_top=sup;
-	V174= fix(vs_base[0]);
-	base[0]= (V172);
-	base[1]= small_fixnum(0);
-	vs_top=(vs_base=base+0)+2;
-	Larray_dimension();
-	vs_top=sup;
-	V175= vs_base[0];
-	if(!((V174)<(fix(V175)))){
-	goto T299;}
-	(void)(aset1((V172),V174,(V171)));
-	base[0]= (V172);
-	base[1]= make_fixnum((long)(V174)+1);
-	vs_top=(vs_base=base+0)+2;
-	siLfill_pointer_set();
-	vs_top=sup;
-	{object V176 = make_fixnum(V174);
-	VMR23(V176)}
-goto T299;
-T299:;
-	base[0]= (V172);
+	V176= fix(vs_base[0]);
+	base[0]= (V174);
 	base[1]= small_fixnum(0);
 	vs_top=(vs_base=base+0)+2;
 	Larray_dimension();
 	vs_top=sup;
 	V177= vs_base[0];
-	if((V173)!=Cnil){
-	V178= (V173);
-	goto T312;}
-	base[0]= (V172);
+	if(!((V176)<(fix(V177)))){
+	goto T302;}
+	(void)(aset1((V174),V176,(V173)));
+	base[0]= (V174);
+	base[1]= make_fixnum((long)(V176)+1);
+	vs_top=(vs_base=base+0)+2;
+	siLfill_pointer_set();
+	vs_top=sup;
+	{object V178 = make_fixnum(V176);
+	VMR24(V178)}
+goto T302;
+T302:;
+	base[0]= (V174);
 	base[1]= small_fixnum(0);
 	vs_top=(vs_base=base+0)+2;
 	Larray_dimension();
 	vs_top=sup;
 	V179= vs_base[0];
-	if(!((fix(V179))>(0))){
-	goto T314;}
-	base[0]= (V172);
+	if((V175)!=Cnil){
+	V180= (V175);
+	goto T315;}
+	base[0]= (V174);
 	base[1]= small_fixnum(0);
 	vs_top=(vs_base=base+0)+2;
 	Larray_dimension();
 	vs_top=sup;
-	V178= vs_base[0];
-	goto T312;
-goto T314;
-T314:;
-	V178= small_fixnum(5);
-goto T312;
-T312:;
-	V180= number_plus(V177,V178);
-	V181= make_cons(/* INLINE-ARGS */V180,Cnil);
-	base[0]= (V172);
+	V181= vs_base[0];
+	if(!((fix(V181))>(0))){
+	goto T317;}
+	base[0]= (V174);
+	base[1]= small_fixnum(0);
+	vs_top=(vs_base=base+0)+2;
+	Larray_dimension();
+	vs_top=sup;
+	V180= vs_base[0];
+	goto T315;
+goto T317;
+T317:;
+	V180= small_fixnum(5);
+goto T315;
+T315:;
+	V182= number_plus(V179,V180);
+	V183= make_cons(/* INLINE-ARGS */V182,Cnil);
+	base[0]= (V174);
 	vs_top=(vs_base=base+0)+1;
 	Larray_element_type();
 	vs_top=sup;
-	V182= vs_base[0];
-	V183 = make_fixnum(V174);
-	(void)((VFUN_NARGS=6,(*(LnkLI29))((V172),/* INLINE-ARGS */V181,VV[8],V182,VV[11],V183)));
-	(void)(aset1((V172),V174,(V171)));
-	base[0]= (V172);
-	base[1]= make_fixnum((long)(V174)+1);
+	V184= vs_base[0];
+	V185 = make_fixnum(V176);
+	(void)((VFUN_NARGS=6,(*(LnkLI29))((V174),/* INLINE-ARGS */V183,VV[8],V184,VV[11],V185)));
+	(void)(aset1((V174),V176,(V173)));
+	base[0]= (V174);
+	base[1]= make_fixnum((long)(V176)+1);
 	vs_top=(vs_base=base+0)+2;
 	siLfill_pointer_set();
 	vs_top=sup;
-	{object V184 = make_fixnum(V174);
-	VMR23(V184)}}
+	{object V186 = make_fixnum(V176);
+	VMR24(V186)}}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function VECTOR-POP	*/
 
-static object LI24(V186)
+static object LI25(V188)
 
-register object V186;
-{	 VMB24 VMS24 VMV24
+register object V188;
+{	 VMB25 VMS25 VMV25
 goto TTL;
 TTL:;
-	{long V187;
-	base[0]= (V186);
+	{long V189;
+	base[0]= (V188);
 	vs_top=(vs_base=base+0)+1;
 	Lfill_pointer();
 	vs_top=sup;
-	V187= fix(vs_base[0]);
-	if(!((V187)==(0))){
-	goto T329;}
+	V189= fix(vs_base[0]);
+	if(!((V189)==(0))){
+	goto T332;}
 	base[0]= VV[12];
-	base[1]= (V186);
+	base[1]= (V188);
 	vs_top=(vs_base=base+0)+2;
 	Lerror();
 	vs_top=sup;
-goto T329;
-T329:;
-	base[0]= (V186);
-	base[1]= make_fixnum((long)(V187)-1);
+goto T332;
+T332:;
+	base[0]= (V188);
+	base[1]= make_fixnum((long)(V189)-1);
 	vs_top=(vs_base=base+0)+2;
 	siLfill_pointer_set();
 	vs_top=sup;
-	{object V188 = aref1((V186),(long)(V187)-1);
-	VMR24(V188)}}
+	{object V190 = aref1((V188),(long)(V189)-1);
+	VMR25(V190)}}
 	base[0]=base[0];
 	return Cnil;
 }
 /*	local entry for function ADJUST-ARRAY	*/
 
-static object LI25(object V190,object V189,object first,...)
+static object LI26(object V192,object V191,object first,...)
 {	
 	va_list ap;
-	int narg = VFUN_NARGS; VMB25 VMS25 VMV25
-	{register object V191;
-	register object V192;
-	register object V193;
-	object V194;
-	object V195;
+	int narg = VFUN_NARGS; VMB26 VMS26 VMV26
+	{register object V193;
+	register object V194;
+	register object V195;
 	object V196;
 	object V197;
 	object V198;
 	object V199;
 	object V200;
+	object V201;
+	object V202;
 	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
-	V191= V190;
-	V192= V189;
+	V193= V192;
+	V194= V191;
 	narg= narg - 2;
-	V201 = (ALLOCA_CONS(narg),ON_STACK_MAKE_LIST(narg));
-	V193= V201;
+	V203 = (ALLOCA_CONS(narg),ON_STACK_MAKE_LIST(narg));
+	V195= V203;
 	{
-	parse_key_rest_new(V201,narg,Vcs +3,(struct key *)&LI25key,first,ap);
-	V194=(Vcs[3]);
-	V195=(Vcs[4]);
-	V196=(Vcs[5]);
-	V197=(Vcs[6]);
-	V198=(Vcs[7]);
-	V199=(Vcs[8]);
-	V200=(Vcs[9]);
-	{register object V202;
-	V202= Cnil;
-	if(!(type_of((V192))==t_fixnum||type_of((V192))==t_bignum)){
-	goto T338;}
-	V192= make_cons((V192),Cnil);
-goto T338;
-T338:;
-	{register object x= VV[11],V203= (V193);
-	while(!endp(V203))
-	if(eql(x,V203->c.c_car)){
-	V202= V203;
-	goto T346;
-	}else V203=V203->c.c_cdr;
-	V202= Cnil;}
-goto T346;
-T346:;
-	if(((V202))==Cnil){
-	goto T344;}
-	base[0]= (V191);
+	parse_key_rest_new(V203,narg,Vcs +3,(struct key *)&LI26key,first,ap);
+	V196=(Vcs[3]);
+	V197=(Vcs[4]);
+	V198=(Vcs[5]);
+	V199=(Vcs[6]);
+	V200=(Vcs[7]);
+	V201=(Vcs[8]);
+	V202=(Vcs[9]);
+	{register object V204;
+	V204= Cnil;
+	if(!(type_of((V194))==t_fixnum||type_of((V194))==t_bignum)){
+	goto T341;}
+	V194= make_cons((V194),Cnil);
+goto T341;
+T341:;
+	{register object x= VV[11],V205= (V195);
+	while(!endp(V205))
+	if(eql(x,V205->c.c_car)){
+	V204= V205;
+	goto T349;
+	}else V205=V205->c.c_cdr;
+	V204= Cnil;}
+goto T349;
+T349:;
+	if(((V204))==Cnil){
+	goto T347;}
+	base[0]= (V193);
 	vs_top=(vs_base=base+0)+1;
 	(void) (*Lnk30)();
 	vs_top=sup;
 	if((vs_base[0])!=Cnil){
-	goto T342;}
+	goto T345;}
 	base[0]= VV[13];
 	vs_top=(vs_base=base+0)+1;
 	Lerror();
 	vs_top=sup;
-	goto T342;
-goto T344;
-T344:;
-	base[0]= (V191);
+	goto T345;
+goto T347;
+T347:;
+	base[0]= (V193);
 	vs_top=(vs_base=base+0)+1;
 	(void) (*Lnk30)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T342;}
-	{object V204;
-	base[1]= (V191);
+	goto T345;}
+	{object V206;
+	base[1]= (V193);
 	vs_top=(vs_base=base+1)+1;
 	Lfill_pointer();
 	vs_top=sup;
-	V204= vs_base[0];
-	V193= ON_STACK_CONS((V204),(V193));}
-	V193= ON_STACK_CONS(VV[11],(V193));
-goto T342;
-T342:;
-	base[0]= (V191);
+	V206= vs_base[0];
+	V195= ON_STACK_CONS((V206),(V195));}
+	V195= ON_STACK_CONS(VV[11],(V195));
+goto T345;
+T345:;
+	base[0]= (V193);
 	vs_top=(vs_base=base+0)+1;
 	Larray_element_type();
 	vs_top=sup;
-	V194= vs_base[0];
-	if(((V194))==(Ct)){
-	goto T362;}
-	V193= ON_STACK_CONS(V194,(V193));
-	V193= ON_STACK_CONS(VV[8],(V193));
-goto T362;
-T362:;
-	{register object x= VV[14],V208= (V193);
-	while(!endp(V208))
-	if(eql(x,V208->c.c_car)){
-	goto T368;
-	}else V208=V208->c.c_cdr;}
-	{object V209;
-	base[1]= (V191);
+	V196= vs_base[0];
+	if(((V196))==(Ct)){
+	goto T365;}
+	V195= ON_STACK_CONS(V196,(V195));
+	V195= ON_STACK_CONS(VV[8],(V195));
+goto T365;
+T365:;
+	{register object x= VV[14],V210= (V195);
+	while(!endp(V210))
+	if(eql(x,V210->c.c_car)){
+	goto T371;
+	}else V210=V210->c.c_cdr;}
+	{object V211;
+	base[1]= (V193);
 	vs_top=(vs_base=base+1)+1;
 	(void) (*Lnk31)();
 	vs_top=sup;
-	V209= vs_base[0];
-	V193= ON_STACK_CONS((V209),(V193));}
-	V193= ON_STACK_CONS(VV[14],(V193));
-goto T368;
-T368:;
-	{register object V211;
-	base[0]= (V192);
+	V211= vs_base[0];
+	V195= ON_STACK_CONS((V211),(V195));}
+	V195= ON_STACK_CONS(VV[14],(V195));
+goto T371;
+T371:;
+	{register object V213;
+	base[0]= (V194);
 	base[1]= VV[15];
 	base[2]= Ct;
-	{object V212;
-	V212= (V193);
+	{object V214;
+	V214= (V195);
 	 vs_top=base+3;
-	 while(!endp(V212))
-	 {vs_push(car(V212));V212=cdr(V212);}
+	 while(!endp(V214))
+	 {vs_push(car(V214));V214=cdr(V214);}
 	vs_base=base+0;}
 	(void) (*Lnk28)();
 	vs_top=sup;
-	V211= vs_base[0];
-	if((cdr((V192)))==Cnil){
-	goto T382;}
-	V213= cdr((V192));
-	V214= (*(LnkLI32))((V191));
-	if(!(equal(/* INLINE-ARGS */V213,cdr(/* INLINE-ARGS */V214)))){
-	goto T383;}
-	if(!(((V194))==(VV[16]))){
-	goto T382;}
-	base[0]= (V192);
+	V213= vs_base[0];
+	if((cdr((V194)))==Cnil){
+	goto T385;}
+	V215= cdr((V194));
+	V216= (*(LnkLI32))((V193));
+	if(!(equal(/* INLINE-ARGS */V215,cdr(/* INLINE-ARGS */V216)))){
+	goto T386;}
+	if(!(((V196))==(VV[16]))){
+	goto T385;}
+	base[0]= (V194);
 	vs_top=(vs_base=base+0)+1;
 	Llast();
 	vs_top=sup;
-	V215= vs_base[0];
-	{int V216= fix(car(V215));
-	if(!((0)==((long)(V216>=0&&(8)>0?(V216)%(8):imod(V216,8))))){
-	goto T383;}}
-goto T382;
-T382:;
-	base[0]= (V191);
-	base[1]= (V211);
+	V217= vs_base[0];
+	{int V218= fix(car(V217));
+	if(!((0)==((long)(V218>=0&&(8)>0?(V218)%(8):imod(V218,8))))){
+	goto T386;}}
+goto T385;
+T385:;
+	base[0]= (V193);
+	base[1]= (V213);
 	base[2]= small_fixnum(0);
 	base[3]= small_fixnum(0);
-	base[5]= (V211);
+	base[5]= (V213);
 	vs_top=(vs_base=base+5)+1;
 	(void) (*Lnk33)();
 	vs_top=sup;
-	V217= vs_base[0];
-	base[5]= (V191);
+	V219= vs_base[0];
+	base[5]= (V193);
 	vs_top=(vs_base=base+5)+1;
 	(void) (*Lnk33)();
 	vs_top=sup;
-	V218= vs_base[0];
-	base[4]= (number_compare(V217,V218)<=0?(V217):V218);
+	V220= vs_base[0];
+	base[4]= (number_compare(V219,V220)<=0?(V219):V220);
 	vs_top=(vs_base=base+0)+5;
 	(void) (*Lnk34)();
 	vs_top=sup;
-	goto T381;
-goto T383;
-T383:;
-	{register object V219;
-	base[0]= make_fixnum((long)length((V192)));
+	goto T384;
+goto T386;
+T386:;
+	{register object V221;
+	base[0]= make_fixnum((long)length((V194)));
 	base[1]= VV[7];
 	base[2]= small_fixnum(0);
 	vs_top=(vs_base=base+0)+3;
 	Lmake_list();
 	vs_top=sup;
-	V219= vs_base[0];
-goto T407;
-T407:;
-	base[0]= (V191);
-	{object V220;
-	V220= (V219);
+	V221= vs_base[0];
+goto T410;
+T410:;
+	base[0]= (V193);
+	{object V222;
+	V222= (V221);
 	 vs_top=base+1;
-	 while(!endp(V220))
-	 {vs_push(car(V220));V220=cdr(V220);}
+	 while(!endp(V222))
+	 {vs_push(car(V222));V222=cdr(V222);}
 	vs_base=base+0;}
 	(void) (*Lnk35)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T410;}
-	base[0]= (V211);
-	base[2]= (V191);
-	{object V221;
-	V221= (V219);
+	goto T413;}
+	base[0]= (V213);
+	base[2]= (V193);
+	{object V223;
+	V223= (V221);
 	 vs_top=base+3;
-	 while(!endp(V221))
-	 {vs_push(car(V221));V221=cdr(V221);}
+	 while(!endp(V223))
+	 {vs_push(car(V223));V223=cdr(V223);}
 	vs_base=base+2;}
 	Laref();
 	vs_top=sup;
 	base[1]= vs_base[0];
-	base[2]= (V219);
+	base[2]= (V221);
 	vs_top=(vs_base=base+0)+3;
 	(void) (*Lnk26)();
 	vs_top=sup;
-goto T410;
-T410:;
-	if(((*(LnkLI27))((V219),(V192)))==Cnil){
-	goto T420;}
-	goto T381;
-goto T420;
-T420:;
-	goto T407;}
-goto T381;
-T381:;
-	base[0]= (V191);
-	base[1]= (V211);
+goto T413;
+T413:;
+	if(((*(LnkLI27))((V221),(V194)))==Cnil){
+	goto T423;}
+	goto T384;
+goto T423;
+T423:;
+	goto T410;}
+goto T384;
+T384:;
+	base[0]= (V193);
+	base[1]= (V213);
 	vs_top=(vs_base=base+0)+2;
 	siLreplace_array();
 	vs_top=sup;
-	V202= cadr((V202));
-	if(((V202))==Cnil){
-	goto T430;}
-	if(!(eql(Ct,(V202)))){
-	goto T434;}
-	base[0]= (V191);
-	base[2]= (V191);
+	V204= cadr((V204));
+	if(((V204))==Cnil){
+	goto T433;}
+	if(!(eql(Ct,(V204)))){
+	goto T437;}
+	base[0]= (V193);
+	base[2]= (V193);
 	vs_top=(vs_base=base+2)+1;
 	(void) (*Lnk33)();
 	vs_top=sup;
@@ -1337,28 +1363,28 @@ T381:;
 	vs_top=(vs_base=base+0)+2;
 	siLfill_pointer_set();
 	vs_top=sup;
-	goto T430;
-goto T434;
-T434:;
-	if(!(type_of((V202))==t_fixnum)){
-	goto T440;}
-	base[0]= (V191);
-	base[1]= (V202);
+	goto T433;
+goto T437;
+T437:;
+	if(!(type_of((V204))==t_fixnum)){
+	goto T443;}
+	base[0]= (V193);
+	base[1]= (V204);
 	vs_top=(vs_base=base+0)+2;
 	siLfill_pointer_set();
 	vs_top=sup;
-	goto T430;
-goto T440;
-T440:;
+	goto T433;
+goto T443;
+T443:;
 	base[0]= VV[17];
-	base[1]= (V202);
+	base[1]= (V204);
 	vs_top=(vs_base=base+0)+2;
 	Lerror();
 	vs_top=sup;
-goto T430;
-T430:;
-	{object V222 = (V191);
-	VMR25(V222)}}}
+goto T433;
+T433:;
+	{object V224 = (V193);
+	VMR26(V224)}}}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
@@ -1377,7 +1403,7 @@ static void LnkT26(){ call_or_link(VV[26],(void **)&Lnk26);} /* ASET-BY-CURSOR *
 static object  LnkTLI25(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[25],(void **)&LnkLI25,2,first,ap);va_end(ap);return V1;} /* SEQUENCE-CURSOR */
 static void LnkT24(){ call_or_link(VV[24],(void **)&Lnk24);} /* MAKE-ARRAY1 */
 static void LnkT23(){ call_or_link(VV[23],(void **)&Lnk23);} /* GET-AELTTYPE */
-static object  LnkTLI22(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[22],(void **)&LnkLI22,1,first,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
+static object  LnkTLI19(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[19],(void **)&LnkLI19,1,first,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
 static void LnkT18(){ call_or_link(VV[18],(void **)&Lnk18);} /* SUBTYPEP */
 
 #ifdef SYSTEM_SPECIAL_INIT
