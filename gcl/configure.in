@@ -206,11 +206,12 @@ AC_CHECK_LIB(readline,main,
 	RL_OBJS=readline.o
 	RL_LIB=lsp/readline.o,,-lncurses)
 
+LO="-Wl,-static"
 AC_CHECK_HEADER(bfd.h,
 	AC_CHECK_LIB(bfd,bfd_init,
 		AC_DEFINE(HAVE_LIBBFD)
-		LIBS="$LIBS libbfd.a libiberty.a"
-		,,libiberty.a))
+		LIBS="$LIBS  $LO -lbfd -liberty"
+		,,-liberty))
 
 AC_SUBST(LIBS)
 AC_SUBST(RL_OBJS)
