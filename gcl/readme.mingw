@@ -1,12 +1,111 @@
+====================================================
 BUILDING A NATIVE WIN32 GNU COMMON LISP (DRAFT ONLY)
+====================================================
 
-Note:  The process outlined below uses Cygwin Posix tools to host
-a native Win32 build using the standalone Mingw32 tools.  
+I have recently changed the preferred build host system
+for the Mingw32 compiler to MSYS, rather than Cygwin.
 
-I am currently (31 July 2002) trying the MSYS Mingw build system 
-as the preferred way to configure and build native Win32 GCL.  My 
-preliminary test buildt a "traditional mode" GCL which built CVS 
-Maxima after one or two tweaks to circumvent path problems.
+The older Cygwin hosted method is set out further into this file
+below the MSYS method described here.
+
+
+===============================================
+BUILDING GCL USING MSYS AS THE HOST
+===============================================
+
+BUILD TOOLS
+
+- Mingw32 1.1 Windows native gcc from Source Forge:
+    http://sourceforge.net/projects/mingw/
+
+- MSYS Mingw build environment, including the MSYS DTK
+    http://sourceforge.net/projects/mingw/
+
+- tcl/tk 8.3 from the http (ftp seems to be broken) links at:
+    http://members1.chello.nl/~j.nijtmans/mingw.html
+
+- Source code for GCL.
+    http://savannah.gnu.org/projects/gcl/
+
+It is a good idea to keep up to date with Mingw32 and MSYS, especially 
+the latest Mingw32 runtime (30 April 2002).
+
+Having said that, I have not yet tried the recently released versions 3.1 
+and 3.2 of Mingw32 gcc as they are still experimental.  
+
+Only gcc 2.95 is known to work (The newer may well work, they just hasn't
+been tried yet).
+
+
+SETUP
+
+- Install Mingw32 and MSYS using the instructions at those sites. 
+
+- Install the Tcl/Tk packages directly into your Mingw32 directory. You don't
+  need these packages if you don't want to build "tclwinkill.dll", "winkill.exe"  or (perhaps one day) gcl-tk.  
+
+- Note that "tclwinkill.dll" and "winkill.exe" are both needed by XMaxima.
+
+
+BUILDING
+
+- Change to your GCL source directory eg:
+
+	cd /c/cvs/gcl
+
+- We are now ready to configure:
+
+        ./configure --enable-custreloc --prefix="c:/gcl" >& con.log
+
+  Change the prefix directory as required for your final installation path.  
+  Note that it is helpful to redirect output from configure and make into log
+  files for future debugging and checking.
+
+- Check the log.  If all is well, check the value of GCLDIR in "makedefs".
+
+  If it is in the "/c/" form, change to the colon form "c:/" (eg "/c/cvs/gcl").
+  This will ensure that the compiler can find headers, and driver scripts
+  are correct (forward slashes are OK however).
+
+- Type:
+
+  	make >& make.log 
+
+- The "saved_gcl.exe" should turn up eventually in the unixport directory.  You
+  can try it out directly by typing:
+
+	./unixport/saved_gcl.exe
+
+  at the command prompt.
+
+- To install:
+
+	make install >& install.log
+
+  You may need to fiddle with the install target a little as it is not very
+  Windows friendly at the moment.
+
+  You may also need to edit the gcl and gcl.bat scripts to ensure the path 
+  uses colon format.  The batch file can be used to make a Windows desktop 
+  shortcut.
+
+- BFD fasloading and Stratified Garbage Collection (SGC) do not work.   The
+  configuration options above provide a "traditional" gcl executable which
+  will build the current CVS version of Maxima.  
+
+- A PCL/ANSI build ("configure --enable-ansi --enable-custreloc") can be 
+  obtained by adding "(si::use-fast-links nil)" to the end of the list of
+  commands in the SETUP makefile macro in "pcl/makefile".  I don't know 
+  why this is necessary on Windows.
+
+
+Mike Thomas, 30 August 2002
+
+
+
+===============================================
+BUILDING GCL USING CYGWIN AS THE HOST
+===============================================
 
 BUILD TOOLS
 
@@ -67,7 +166,7 @@ BUILDING
 
 - We are now ready to configure:
 
-        ./configure --disable-bfd --enable-machine=mingw --prefix="c:/gcl" >& con.log
+   ./configure --enable-custreloc --enable-machine=mingw --prefix="c:/gcl" >& con.log
 
   Change the prefix directory as required for your final installation path.  
   Note that it is helpful to redirect output from configure and make into log
@@ -75,18 +174,18 @@ BUILDING
 
 - Check the log.  If all is well, type:
 
-  	make >& make.log 
+    make >& make.log 
 
 - The "saved_gcl.exe" should turn up eventually in the unixport directory.  You
   can try it out directly by typing:
 
-	./unixport/saved_gcl.exe
+    ./unixport/saved_gcl.exe
 
   at the command prompt.
 
 - To install:
 
-	make install >& install.log
+    make install >& install.log
 
   You may need to fiddle with the install target a little as it is not very
   Windows friendly at the moment.
