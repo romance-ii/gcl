@@ -1,13 +1,39 @@
 #define MP386
 #define WINDOWSNT
+#define MINGW
+/* #define filehdr _IMAGE_FILE_HEADER */
+#define f_symptr PointerToSymbolTable
+#define f_nsyms NumberOfSymbols
+#define NO_PWD_H
+
+#define MAXPATHLEN 512
+
+/* alter pathToAlter to fit in with the Clibrary of the system.
+   and report error using name 'x' if you cant do it.
+   The result in pathToAlter should be less
+*/   
+#define FIX_FILENAME(x,pathToAlter) fix_filename(x,pathToAlter)
+
+#define MEMORY_SAVE(self,filename) \
+  do { char buf[MAXPATHLEN]; \
+       strcpy(buf,self); \
+       fix_filename(Cnil,buf); \
+       memory_save(buf,filename); \
+       } while (0)
+
+
+
 #include "att.h"
 /* #include "386.h" */
 /* #include "fcntl.h" */
 
-#undef DBEGIN
-/* we want finer than config.h */
-#define DBEGIN 0x10100000
 
+
+#define signals_pending *signalsPendingPtr
+
+
+#undef DBEGIN
+#define DBEGIN 0x10000000
 
 
 /* define if there is no _cleanup,   do here what needs
@@ -23,18 +49,49 @@
 /* #define RECREATE_HEAP if (initflag) recreate_heap(argv[0]); */
 #define RECREATE_HEAP if (initflag) recreate_heap1();
 
+#define NO_SYS_PARAM_H
+#define NO_SYS_TIMES_H
+
 #ifdef IN_UNIXTIME
 #undef ATT
-#define BSD
+#undef BSD
+
 #endif
+
+#undef NEED_GETWD 
+#define GETCWD
 
 #define IS_DIR_SEPARATOR(x) ((x=='/')||(x=='\\'))
 
-#undef NEED_GETWD
 #ifdef IN_UNIXFSYS
 #undef ATT
 #define BSD
 #endif
+
+#define OUR_NSOCKET "winnsocket.c"
+
+#define SIGBUS		 7
+#ifndef SIGKILL
+#define SIGKILL          9
+#endif
+#define SIGUSR1		10
+#define SIGUSR2		12
+#define SIGPIPE		13
+#define SIGALRM		14
+#define SIGIO		29
+
+#define OTHER_SIGNALS_HANDLED SIGTERM,SIGKILL,SIGABRT,
+
+#define SIG_BLOCK          0	/* for blocking signals */
+#define SIG_UNBLOCK        1	/* for unblocking signals */
+#define SIG_SETMASK        2	/* for setting the signal mask */
+
+#define HAVE_SIGPROCMASK
+
+#ifdef __MSVCRT__
+typedef int sigset_t ;
+#endif
+
 
 #define NEED_TO_REINSTALL_SIGNALS 
 
@@ -51,11 +108,13 @@
      (((unsigned int)(y)) < DBEGIN && ((unsigned int)(y)) &0xf000000))
      
       
-
+#ifdef IN_FILE
+#define HAVE_NSOCKET
+#endif
 
      
 
-#define HAVE_SIGACTION
+/* #define HAVE_SIGACTION */
 /* a noop */
 #define SETUP_SIG_STACK
 #define SV_ONSTACK 0
@@ -71,8 +130,12 @@ FILE *fopen_binary(char *name,char *mode);
 #define UNIXSAVE "unexnt.c"
 
 #define SPECIAL_RSYM "rsym_nt.c"
+
+#define  RSYM_COMMAND(command,system_directory,kcl_self,tmpfile1) \
+    sprintf(command,"rsym %s %s",kcl_self,tmpfile1);
+
      
-#ifdef IN_SFASL
+#if defined(IN_SFASL) || defined(IN_RSYM)
 #undef fopen
 FILE *fopen_binary(char *name,char *mode)
 {
@@ -120,7 +183,9 @@ FILE *fopen_binary(char *name,char *mode)
   
 #undef SET_REAL_MAXPAGE  
 #define SET_REAL_MAXPAGE \
-	real_maxpage=MAXPAGE;
+	 init_shared_memory(); real_maxpage=MAXPAGE;
+
+
 
 
 /* include some low level routines for maxima */

@@ -39,6 +39,8 @@ PUBLIC=/public
 fi
 export PUBLIC
 
+
+
 TK_XINCLUDES=-Iunknown
 # `add-dir'  searches for ITEM in LIST-OF-DIRECTORIES and then sets the
 # directory in VARIABLE-SETTING-TEMPLATE
@@ -102,7 +104,7 @@ fi
   for v in makefile unixport/make_kcn */makefile ; 
   do
   echo " $v,"
-  ./xbin/file-sub makedefs $v "# begin makedefs" "# end makedefs"
+  ./bin/file-sub makedefs $v "# begin makedefs" "# end makedefs" tmpx
   mv tmpx $v
   done
 

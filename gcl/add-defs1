@@ -1,5 +1,7 @@
 #!/bin/sh
 
+(cd bin ; make file-sub)
+
 if [ $# -le 0 ]  ; then
   echo usage: ./add-defs machine-type;
   echo  or '  ' ./add-defs machine-type directory
@@ -21,6 +23,8 @@ echo $1 > machine
 #  echo "# begin makedefs" >> makedefs
 #  echo "# constructed by ${USER} using: $0 $1 $2 $3 $4 $5" >> makdefs
 
+  rm -f makedefs
+  cp makedefc makedefs
   if [ -d ${PWD}/unixport ] ; 
    then  echo "GCLDIR=${PWD}" >> makedefs ;
    else echo "GCLDIR=`pwd`" >> makedefs ;
@@ -37,6 +41,7 @@ echo $1 > machine
   if [ -f ${HOME}/local_gcl.defs ] ; then
     cat ${HOME}/local_gcl.defs >> makedefs
   fi
+  echo "" >> makedefs
   echo "# end makedefs" >> makedefs
    
 
@@ -44,7 +49,7 @@ echo $1 > machine
   for v in makefile unixport/make_kcn */makefile ; 
   do
   echo " $v,"
-  ./xbin/file-sub makedefs $v "# begin makedefs" "# end makedefs"
+  ./bin/file-sub makedefs $v "# begin makedefs" "# end makedefs" tmpx
   mv tmpx $v
   done
 

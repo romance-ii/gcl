@@ -1,3 +1,10 @@
+2000-10-27  Bill Schelter  <wfs@sonia.ma.utexas.edu>
+
+	*  o/file.d bug in close_stream
+	*  add xbin/386-linux-fix to knock the -O4 flag off of gcc if
+	it is version 2.96 because of a C compiler bug
+	*  fixes to configure.in to better find the tcl tk stuff.
+
 2000-06-01  Bill Schelter  <wfs@sonia.ma.utexas.edu>
 
 	* o/print.d: change printing of pathnames to use the more

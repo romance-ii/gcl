@@ -16,7 +16,7 @@ memory_save(original_file,save_file)
 Lsave()
 {
 	char filename[256];
-
+        extern char *kcl_self ;
 	check_arg(1);
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 	coerce_to_filename(vs_base[0], filename);
@@ -27,7 +27,12 @@ Lsave()
 	_cleanup();
 #endif	
 #endif
+
+#ifdef MEMORY_SAVE
+	MEMORY_SAVE(kcl_self,filename);
+#else	  
 	memory_save(kcl_self, filename);
+#endif	
 
 	exit(0);
 	/*  no return  */

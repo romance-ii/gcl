@@ -217,9 +217,13 @@ unexec (char *new_name, char *old_name, void *start_data, void *start_bss,
   char *ptr;
 
   fflush (stdin);
-  /* copy_stdin = *stdin;
-    setvbuf(stdin,0,_IONBF,0); */
-  stdin->_data->__sdidinit = 0;
+  /* copy_stdin = *stdin; */
+    setvbuf(stdin,0,_IONBF,0);
+    setvbuf(stdout,0,_IONBF,0);
+    
+  /* stdin->_data->__sdidinit = 0;
+   */
+  
 
   if (!get_allocation_unit())
     cache_system_info ();

@@ -23,9 +23,15 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "include.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifndef NO_PWD_H
 #include <pwd.h>
+#endif
 
+#ifdef BSD
+#define HAVE_RENAME
+#endif
 
+void Ldirectory();
 
 
 
@@ -204,6 +210,7 @@ char *p;
   int n;
   object namestring;
   namestring = coerce_to_namestring(pathname);
+#ifndef NO_PWD_H  
   if(namestring->st.st_self[0]=='~')
     {char name[20];
      int j;
@@ -230,12 +237,19 @@ char *p;
      bcopy(namestring->st.st_self+n,p+m,namestring->st.st_fillp-n);
      p[m+namestring->st.st_fillp-n]=0;}
   else
+#endif
     {if (namestring->st.st_fillp >= MAXPATHLEN - 16) {
       vs_push(namestring);
       FEerror("Too long filename: ~S.", 1, namestring);}
      bcopy(namestring->st.st_self,p,namestring->st.st_fillp);
      p[namestring->st.st_fillp]=0;}
+#ifdef FIX_FILENAME
+    FIX_FILENAME(pathname,p);
+#endif
+    
 }
+
+
 
 object
 truename(pathname)
@@ -247,8 +261,10 @@ object pathname;
 	char current_directory[MAXPATHLEN];
 	char directory[MAXPATHLEN];
 	char *getwd();
-
 	coerce_to_filename(pathname, filename);
+
+
+	
 	for (p = filename, q = 0;  *p != '\0';  p++)
 		if (*p == '/')
 			q = p;
@@ -259,7 +275,21 @@ object pathname;
 	} else if (q == 0) {
 		q = filename;
 		p = getwd(current_directory);
-	} else {
+	} else
+#ifdef MINGW
+	  if (q[-1]==':') {
+	    int current = (q++, q[0]);
+	    q[0]=0;
+	    getwd(current_directory);
+	    if (chdir(filename) < 0)
+	      FEerror("Cannot get the truename of ~S.", 1, pathname);
+	    p = getwd(directory);
+	    if (p[1]==':' && p[2]=='\\' && p[3]==0) p[2]=0;
+	    q[0]=current;
+          }
+	  else
+#endif	
+	  {
 		*q++ = '\0';
 		getwd(current_directory);
 		if (chdir(filename) < 0)
@@ -341,8 +371,9 @@ FILE *fp;
 {
 	struct stat filestatus;
 
-	fstat(fileno(fp), &filestatus);
+	if (fstat(fileno(fp), &filestatus)==0) 
 	return(filestatus.st_size);
+	else return 0;
 }
 
 Ltruename()
@@ -366,7 +397,7 @@ Lrename_file()
 	vs_base[1] = coerce_to_pathname(vs_base[1]);
 	vs_base[1] = merge_pathnames(vs_base[1], vs_base[0], Cnil);
 	coerce_to_filename(vs_base[1], newfilename);
-#ifdef BSD
+#ifdef HAVE_RENAME
 	if (rename(filename, newfilename) < 0)
 		FEerror("Cannot rename the file ~S to ~S.",
 			2, vs_base[0], vs_base[1]);
@@ -378,6 +409,17 @@ Lrename_file()
 	vs_push(truename(vs_base[0]));
 	vs_push(truename(vs_base[1]));
 	vs_base += 2;
+}
+
+
+DEFUN("SETENV",object,fSsetenv,SI,2,2,NONE,OO,OO,OO,OO,"Set environment VARIABLE to VALUE")(variable,value)
+     object variable;
+     object value;
+{
+
+  int res;
+  res = setenv(object_to_string(variable),object_to_string(value),1);
+  RETURN1((res == 0 ? Ct : Cnil ));
 }
 
 DEFUNO("DELETE-FILE",object,fLdelete_file,LISP
@@ -421,6 +463,7 @@ Lfile_write_date()
 Lfile_author()
 {
 	char filename[MAXPATHLEN];
+#ifndef NO_PWD_H
 	struct stat filestatus;
 	struct passwd *pwent;
 #ifndef __STDC__
@@ -433,10 +476,16 @@ Lfile_author()
 	if (stat(filename, &filestatus) < 0) { vs_base[0] = Cnil; return;}
 	pwent = getpwuid(filestatus.st_uid);
 	vs_base[0] = make_simple_string(pwent->pw_name);
+#else
+	vs_base[0] = Cnil; return;
+#endif	
+	
 }
 
 Luser_homedir_pathname()
+
 {
+#ifndef NO_PWD_H  
 	struct passwd *pwent;
 	char filename[MAXPATHLEN];
 	register int i;
@@ -453,13 +502,18 @@ Luser_homedir_pathname()
 		filename[i++] = '/';
 		filename[i] = '\0';
 	}
+#else
+	 char *filename= "~/" ;
+#endif	
 	vs_base[0] = make_simple_string(filename);
 	vs_top = vs_base+1;
 	vs_base[0] = coerce_to_pathname(vs_base[0]);
+	
 }
 
 
 #ifdef BSD
+void
 Ldirectory()
 {
 	char filename[MAXPATHLEN];
@@ -512,6 +566,7 @@ L:
 
 
 #ifdef ATT
+void
 Ldirectory()
 {
 	object name, type;
@@ -576,6 +631,7 @@ Ldirectory()
 
 #ifdef E15
 #include <sys/dir.h>
+void
 Ldirectory()
 {
 	object name, type;
@@ -696,6 +752,7 @@ siLchdir()
 	check_arg(1);
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 	coerce_to_filename(vs_base[0], filename);
+
 	if (chdir(filename) < 0)
 		FEerror("Can't change the current directory to ~S.",
 			1, vs_base[0]);

@@ -37,7 +37,7 @@ SGC is enabled.  */
 #define HAVE_ASM_SIGCONTEXT_H 1
 
 /* define if have struct sigcontext in one of above */
-#define HAVE_SIGCONTEXT 1
+/* #undef HAVE_SIGCONTEXT */
 
 
 /* define if have <sys/ioctl.h> */
@@ -64,7 +64,7 @@ SGC is enabled.  */
 #define LISTEN_USE_FCNTL 1
 
 /* if signal.h alone contains the stuff necessary for sgc */
-/* #undef SIGNAL_H_HAS_SIGCONTEXT */
+#define SIGNAL_H_HAS_SIGCONTEXT 1
 
 
 /* define if the profil system call is not defined in libc */
@@ -81,4 +81,4 @@ SGC is enabled.  */
 /* #define ENDIAN_ALREADY_DEFINED */
 
 /* define if SV_ONSTACK is defined in signal.h */
-/* #undef HAVE_SV_ONSTACK */ 
+#define HAVE_SV_ONSTACK 1 

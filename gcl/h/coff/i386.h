@@ -150,11 +150,15 @@ struct external_syment
   char e_numaux[1];
 };
 
+#ifndef MINGW
+
 #define N_BTMASK	(0xf)
 #define N_TMASK		(0x30)
 #define N_BTSHFT	(4)
 #define N_TSHIFT	(2)
-  
+
+#endif
+
 union external_auxent {
 	struct {
 		char x_tagndx[4];	/* str, un, or enum tag indx */
@@ -209,7 +213,7 @@ union external_auxent {
 #define	AUXESZ	18
 
 
-#	define _ETEXT	"etext"
+#define _ETEXT	"etext"
 
 
 /********************** RELOCATION DIRECTIVES **********************/

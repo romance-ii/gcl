@@ -21,26 +21,26 @@ prefix=/usr/local
 INFO_DIR=/usr/local/info/
 
 # where to put emacs lisp files.
-EMACS_SITE_LISP=/usr/share/emacs/20.3/site-lisp
+EMACS_SITE_LISP=/usr/share/emacs/20.7/site-lisp
 
 # the default.el file
-EMACS_DEFAULT_EL=/usr/share/emacs/20.3/site-lisp/default.el
+EMACS_DEFAULT_EL=/usr/share/emacs/20.7/site-lisp/default.el
 
 # numerous TCL/TK variables culled from the tkConfig.sh and tclConfig.sh
 # if these are found.
-TK_CONFIG_PREFIX=/usr/lib
-TK_LIBRARY=/usr/lib/tk8.0
-TCL_LIBRARY=/usr/lib/tcl8.0
+TK_CONFIG_PREFIX=/usr/local/lib
+TK_LIBRARY=/usr/local/lib/tk8.3
+TCL_LIBRARY=/usr/local/lib/tcl8.3
 TK_XINCLUDES=-I/usr/X11R6/include
-TK_INCLUDE=-I/usr/lib/../include
-TCL_INCLUDE=-I/usr/lib/../include
-TK_LIB_SPEC=-L/usr/lib -ltk8.0
-TK_BUILD_LIB_SPEC=-L/work-in-progress/tk8.0/unix -ltk8.0
+TK_INCLUDE=-I/usr/local/lib/../include
+TCL_INCLUDE=-I/usr/local/lib/../include
+TK_LIB_SPEC=-L/usr/local/lib -ltk8.3
+TK_BUILD_LIB_SPEC=-L/home/wfs/src/tk8.3.2/unix -ltk8.3
 TK_XLIBSW=-L/usr/X11R6/lib -lX11
 TK_XINCLUDES=-I/usr/X11R6/include
-TCL_LIB_SPEC=-L/usr/lib -ltcl8.0
+TCL_LIB_SPEC=-L/usr/local/lib -ltcl8.3${TCL_DBGX}
 TCL_DL_LIBS=-ldl
-TCL_LIBS=-ldl  -lieee -lm
+TCL_LIBS=-ldl -lm
 
 NOTIFY=yes
 GCC=gcc
@@ -103,27 +103,5 @@ LIBFILES=bsearch.o
 
 # the  make to use for saved_kcp the profiler.
 KCP=kcp-bsd
+
 # end makedefs
-
-OBJS =	../o/main.o ../o/alloc.o ../o/gbc.o  ../o/typespec.o ../o/eval.o ../o/macros.o ../o/lex.o ../o/bds.o ../o/frame.o ../o/predicate.o ../o/reference.o ../o/assignment.o ../o/bind.o ../o/let.o ../o/conditional.o ../o/block.o ../o/iteration.o ../o/mapfun.o ../o/prog.o ../o/multival.o ../o/catch.o ../o/symbol.o ../o/cfun.o ../o/cmpaux.o ../o/package.o ../o/big.o ../o/number.o ../o/num_pred.o ../o/num_comp.o ../o/num_arith.o ../o/num_sfun.o ../o/num_co.o ../o/num_log.o ../o/num_rand.o ../o/earith.o ../o/character.o ../o/sequence.o ../o/list.o ../o/hash.o ../o/array.o ../o/string.o ../o/structure.o ../o/toplevel.o ../o/file.o ../o/read.o ../o/backq.o ../o/print.o ../o/format.o ../o/pathname.o ../o/unixfsys.o ../o/unixfasl.o ../o/error.o ../o/unixtime.o ../o/unixsys.o ../o/unixsave.o ../o/unixint.o $(SFASL) ../o/funlink.o ../o/fat_string.o \
-	sys_kcn.o ../lsp/defmacro.o ../lsp/evalmacros.o ../lsp/top.o ../lsp/module.o ../o/run_process.o ../o/init_pari.o  $(MPFILES)
-
-OPTIONAL  =	../lsp/predlib.o ../lsp/setf.o ../lsp/arraylib.o ../lsp/assert.o ../lsp/defstruct.o ../lsp/describe.o ../lsp/iolib.o ../lsp/listlib.o ../lsp/mislib.o ../lsp/numlib.o ../lsp/packlib.o ../lsp/seq.o ../lsp/seqlib.o ../lsp/trace.o 
-
-ODIR=../o
-
-saved_kcn: raw_kcn init_kcn.lsp ../lsp/autoload.lsp ../lsp/auto.lsp
-	cat init_kcn.lsp | sed -e "sDATE`date`g" \
-	-e 'slinks t)links t)(setq compiler::*cc* "$(CC)")$(INITFORM)g' \
-	| raw_kcn $(PORTDIR)/
-
-raw_kcn: $(OBJS) $(OPTIONAL) 
-	$(LDCC)  -o raw_kcn $(OBJS) $(LIBS) ../o/akcllib.a
-
-KCND = .
-
-sys_kcn.o: $(KCND)/sys_kcn.c
-	$(CC) $(OFLAGS) $(DEFS) -c $(KCND)/sys_kcn.c
-
-
-

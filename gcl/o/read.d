@@ -357,13 +357,20 @@ L:
 	 { eof_code;} \
        else res=code_char(ch);} \
       else \
-	{ if (stream_at_end(in)) \
-	    {eof_code;} \
-	else res=read_char(in);}} while(0)
+	{int ch ; \
+	if(stream_at_end(in)) {eof_code ;} \
+	ch = readc_stream(in); \
+         if (ch == EOF) { eof_code;} \
+         res = code_char(ch); \
+          }} while(0)
 #else
 #define read_char_to(res,in,eof_code) \
-  if(stream_at_end(in)) {eof_code ;} \
-  else res=read_char(in)
+ do {if(stream_at_end(in)) {eof_code ;} \
+  else { int ch = readc_stream(in); \
+         if (ch == EOF) { eof_code;} \
+         res = code_char(ch); \
+          } \
+   } while(0)
 #endif
 
 /*
@@ -2057,13 +2064,15 @@ READ:
 	else if (strm == Ct)
 		strm = symbol_value(sLAterminal_ioA);
 	check_type_stream(&strm);
-	if (stream_at_end(strm)) {
-		if (eof_errorp == Cnil && recursivep == Cnil)
-			@(return eof_value)
-		else
-			end_of_stream(strm);
-	}
-	@(return `read_char(strm)`)
+        {object x ;
+        read_char_to(x,strm,goto AT_EOF);
+        @(return `x`)
+          AT_EOF:
+	 if (eof_errorp == Cnil && recursivep == Cnil)
+		@(return eof_value)
+	 else
+		end_of_stream(strm);
+       }
 @)
 
 @(defun unread_char (c &optional (strm `symbol_value(sLAstandard_inputA)`))

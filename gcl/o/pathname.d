@@ -429,6 +429,15 @@ M:
 		token->st.st_self[i++] = y->st.st_self[j];
 N:
 	token->st.st_fillp = i;
+#ifdef FIX_FILENAME
+        {char buf[MAXPATHLEN];
+         if (i > MAXPATHLEN-1) i =MAXPATHLEN-1;
+         bcopy(token->st.st_self,buf,i);
+         buf[i]=0;
+         FIX_FILENAME(x,buf);
+         return (make_simple_string(buf));
+         }
+#endif        
 	return(copy_simple_string(token));
 }
 

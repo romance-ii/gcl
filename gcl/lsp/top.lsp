@@ -718,7 +718,7 @@ First directory is checked for first name and all extensions etc."
 ;    (if tem (or  val-if-there (cadr tem) t))))
 
 (defun set-dir (sym flag)
-   (let ((tem (or (si::get-command-arg flag) (symbol-value sym))))
+   (let ((tem (or (si::get-command-arg flag) (and (boundp sym) (symbol-value sym)))))
       (if tem (set sym (si::coerce-slash-terminated tem)))))
 
 (defun set-up-top-level ( &aux (i (si::argc)) tem)
@@ -737,7 +737,9 @@ First directory is checked for first name and all extensions etc."
 						     "lsp/") *load-path*))
      (setq *load-path* (cons (si::string-concatenate *lib-directory*
 						     "gcl-tk/") *load-path*))
-	    )      
+	    )
+    (setq si::*system-directory* (namestring
+        (truename (make-pathname :name nil :defaults (si::argv 0)))))
     (set-dir  'si::*system-directory* "-dir")
     (if (multiple-value-setq (tem tem) (get-command-arg "-f"))
 	(let (*load-verbose*)

@@ -484,8 +484,12 @@ BEGIN:
 	    fprintf(stderr,"tried Clsing %d ! as scoket \n",SOCKET_STREAM_FD(strm));
 	    fflush(stderr);
 	  }
-	  else {   
-	  close(SOCKET_STREAM_FD(strm));
+	  else {
+          if (GET_STREAM_FLAG(strm,gcl_sm_output))
+              {	 gclFlushSocket(strm);
+                 /* there are two for one fd so close only one */
+            	  tcpCloseSocket(SOCKET_STREAM_FD(strm));
+               } 
 	  SOCKET_STREAM_FD(strm)=-1;
 	  }
 
@@ -840,8 +844,17 @@ BEGIN:
 		else
 			STREAM_FILE_COLUMN(strm)++;
 		if (strm->sm.sm_fp == NULL)
+		  {
+		    if (strm->sm.sm_mode == smm_socket && strm->sm.sm_fd>=0)
+		      putCharGclSocket(strm,c);
+		    else
+		      if (!GET_STREAM_FLAG(strm,gcl_sm_had_error))
 			closed_stream(strm);
-		kclputc(c, strm->sm.sm_fp);
+		  } else {
+			
+		    kclputc(c, strm->sm.sm_fp);
+		  }
+
 		break;
 
 	case smm_synonym:
@@ -942,12 +955,16 @@ BEGIN:
 	switch (strm->sm.sm_mode) {
 	case smm_output:
 	case smm_io:
-	case smm_socket:  
-		if (strm->sm.sm_fp == NULL)
-			closed_stream(strm);
-		fflush(strm->sm.sm_fp);
+	  if (strm->sm.sm_fp == NULL)
+	    closed_stream(strm);
+	  fflush(strm->sm.sm_fp);
+	  break;
+	case smm_socket:
+		if (SOCKET_STREAM_FD(strm) >0)
+		  gclFlushSocket(strm);
+		else
+		  closed_stream(strm);
 		break;
-
 	case smm_synonym:
 		strm = symbol_value(strm->sm.sm_object0);
 		if (type_of(strm) != t_stream)
@@ -1026,7 +1043,7 @@ BEGIN:
 		if (xkclfeof(c,strm->sm.sm_fp))
 			return(TRUE);
 		else {
-			kclungetc(c, strm->sm.sm_fp);
+			if (c>=0) kclungetc(c, strm->sm.sm_fp);
 			return(FALSE);
 		}
 
@@ -1229,12 +1246,12 @@ int disp;
 {
 BEGIN:
 	switch (strm->sm.sm_mode) {
+	case smm_socket:
+	  return -1;
 	case smm_input:
 	case smm_output:
 	case smm_io:
-	case smm_socket:  
-		if (strm->sm.sm_fp == NULL)
-			closed_stream(strm);
+
 		if (fseek(strm->sm.sm_fp, disp, 0) < 0)
 			return(-1);
 		/* strm->sm.sm_int0 = disp; */
@@ -1913,7 +1930,12 @@ siLuser_stream_state()
 closed_stream(strm)
 object strm;
 {
+  if (!GET_STREAM_FLAG(strm,gcl_sm_had_error))
+    {
+        SET_STREAM_FLAG(strm,gcl_sm_had_error,1);
 	FEerror("The stream ~S is already closed.", 1, strm);
+    }
+
 }
 
 
@@ -1954,7 +1976,7 @@ int out;
     if (out) cannot_write(strm);
   break;
  case smm_io:
- case smm_socket:
+   /* case smm_socket: */
  break;
  
  default:
@@ -2006,6 +2028,71 @@ siLfp_input_stream()
 
 #ifdef HAVE_NSOCKET
 
+#ifdef DODEBUG
+#define dprintf(s,arg) \
+  do {fprintf(stderr,s,arg); \
+    fflush(stderr); }\
+    while(0)
+#else 
+#define dprintf(s,arg)
+#endif     
+
+
+
+/*
+  putCharGclSocket(strm,ch) -- put one character to a socket
+  stream.
+  Results:
+  Side Effects:  The buffer may be filled, and the fill pointer
+  of the buffer may be changed.
+ */
+putCharGclSocket(strm,ch)
+  object strm;
+  int ch;
+{
+  object bufp = SOCKET_STREAM_BUFFER(strm);
+
+ AGAIN:
+  if (bufp->ust.ust_fillp < bufp->ust.ust_dim) {
+    dprintf("getchar returns (%c)\n",bufp->ust.ust_self[-1+(bufp->ust.ust_fillp)]);
+    bufp->ust.ust_self[(bufp->ust.ust_fillp)++]=ch;
+    return ch;
+  }
+  else {
+    gclFlushSocket(strm,Ct);
+    goto AGAIN;
+  }
+}
+
+
+gclFlushSocket(strm)
+     object strm;
+
+{
+    int fd = SOCKET_STREAM_FD(strm);
+    object bufp = SOCKET_STREAM_BUFFER(strm);
+    int i=0;
+    int err;
+    int wrote;
+    if (!GET_STREAM_FLAG(strm,gcl_sm_output)
+	||   GET_STREAM_FLAG(strm,gcl_sm_had_error))
+	 return;
+#define AMT_TO_WRITE 500
+    while(i< bufp->ust.ust_fillp) {
+      wrote =TcpOutputProc(fd,&(bufp->ust.ust_self[i]),
+		  bufp->ust.ust_fillp-i > AMT_TO_WRITE ? AMT_TO_WRITE :
+		  bufp->ust.ust_fillp-i,&err,
+			 AMT_TO_WRITE);
+      if (wrote < 0) {
+	SET_STREAM_FLAG(strm,gcl_sm_had_error,1);
+	close_stream(strm);
+	FEerror("error writing to socket: errno= ~a",1,make_fixnum(err));
+	
+      }
+      i+= wrote;
+    }
+    bufp->ust.ust_fillp=0;
+}
 
 static
 object
@@ -2033,12 +2120,15 @@ object async;
   SOCKET_STREAM_FD(x)= fd;
   SET_STREAM_FLAG(x,mode,1);
   SET_STREAM_FLAG(x,gcl_sm_tcp_async,(async!=Cnil));
+  /*
   if (mode == gcl_sm_output)
      { fp=fdopen(fd,(mode==gcl_sm_input ? "r" : "w"));
        if (fp==NULL)      FEerror("Could not connect",0);
        x->sm.sm_fp = fp;
        setup_stream_buffer(x);
-     } else {
+     } else
+   */
+     {
          object buffer;
          x->sm.sm_fp = NULL;
 	  buffer=alloc_simple_string((BUFSIZ < 4096 ? 4096 : BUFSIZ));

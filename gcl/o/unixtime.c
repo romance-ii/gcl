@@ -31,7 +31,9 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 /* all we want from this is HZ the number of clock ticks per second
 which is usually 60 maybe 100 or something else. */
 #undef PAGESIZE
+#ifndef NO_SYS_PARAM_H
 #include <sys/param.h>
+#endif
 #endif
 #ifndef HZ
 #define HZ 60
@@ -43,10 +45,15 @@ which is usually 60 maybe 100 or something else. */
 #undef BSD
 #define ATT
 #endif
+#ifdef MINGW
+#include <sys/timeb.h>
+#endif
 
 #ifdef BSD
 #include <sys/timeb.h>
+#ifndef NO_SYS_TIMES_H
 #include <sys/times.h>
+#endif
 #include <sys/time.h>
 static struct timeb beginning;
 #endif
@@ -135,6 +142,14 @@ Lget_internal_run_time()
 DEFUN("GET-INTERNAL-REAL-TIME",int,fLget_internal_real_time,LISP,0,0,NONE,IO,OO,OO,OO,"Run time relative to beginning")
      ()
 {
+#ifdef MINGW
+  static struct timeb t0;
+  struct timeb t;
+    if (t0.time == 0) ftime(&t0);
+    ftime(&t);
+    return (t.time - t0.time)*HZ1 + ((t.millitm)*HZ1)/1000;
+
+#endif  
 #ifdef BSD
 	static struct timeval begin_tzp;
 	struct timeval tzp;
@@ -157,6 +172,9 @@ DEFVAR("*DEFAULT-TIME-ZONE*",sSAdefault_time_zoneA,SI,make_fixnum(TIME_ZONE),"")
 
 init_unixtime()
 {
+#ifdef MINGW
+
+#endif  
 #ifdef BSD
 	ftime(&beginning);
 #endif

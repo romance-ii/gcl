@@ -134,6 +134,12 @@ char **argv, **envp;
 		error("can't get the program name");
 */
 	kcl_self = argv[0];
+#ifdef FIX_FILENAME
+	{ int n = strlen(kcl_self);
+	 FIX_FILENAME(Cnil,kcl_self);
+	 if (strlen(kcl_self)> n) error("name grew");
+	}
+#endif	
 	if (!initflag) {
 
 		system_directory= (char *) malloc(strlen(argv[0])+3);
@@ -600,7 +606,12 @@ siLgetenv()
 		name[i] = vs_base[0]->st.st_self[i];
 	name[i] = '\0';
 	if ((value = getenv(name)) != NULL)
-		vs_base[0] = make_simple_string(value);
+		{vs_base[0] = make_simple_string(value);
+#ifdef FREE_GETENV_RESULT
+		free(value);
+		
+#endif		
+		}
 	else
 		vs_base[0] = Cnil;
 }

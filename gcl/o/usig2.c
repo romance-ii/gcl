@@ -19,14 +19,23 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+
 #ifndef IN_UNIXINT
 #define NEED_MP_H
 #include "include.h"
 
+#ifndef USIG2
 #include <signal.h>
 #include "usig.h"
 #include "arith.h"
 #endif
+#endif
+
+#ifdef USIG2
+#include USIG2
+#else
+
+
 
 /* these sstructure pointers would need their structures provided...
    so we just call them void */
@@ -79,7 +88,11 @@ struct save_for_interrupt{
 
 
  
-char signals_handled [] = {SIGINT,SIGUSR2,SIGUSR1,SIGIO,SIGALRM,0};
+char signals_handled [] = {SIGINT,SIGUSR2,SIGUSR1,SIGIO,SIGALRM,
+#ifdef OTHER_SIGNALS_HANDLED			   
+			   OTHER_SIGNALS_HANDLED
+#endif			   
+			   0};
 
 /* * in_signal_handler:   if not zero indicates we are running inside a signal
      handler, which may have been invoked at a random intruction, and so
@@ -407,3 +420,4 @@ DEFUN("ALLOW-SIGNAL",int,fSallow_signal,SI,1,1,NONE,II,OO,OO,OO,
 
 
 
+#endif

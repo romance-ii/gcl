@@ -19,9 +19,12 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+
 #define IN_SOCKETS
 
 #include "include.h"
+
+#ifdef HAVE_NSOCKET
 
 #include "sheader.h"
 
@@ -489,6 +492,8 @@ DEFUN("CLEAR-CONNECTION-STATE",int,fSclear_connection_state,
  return n;
 }
 
+#endif
+
 void
 write_timeout_error(s)
      char *s;
@@ -500,4 +505,5 @@ connection_failure(s)
      char *s;
 {FEerror("Connect failure: ~s",1,make_simple_string(s));
 }
+
 

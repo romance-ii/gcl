@@ -314,6 +314,7 @@ EXTER object  sSpretty_print_format ;
 EXTER object  sSAprint_nansA ; 
 EXTER  object   fLformat  (); 
 EXTER object  sSAindent_formatted_outputA ; 
+EXTER  object   fSsetenv (); 
 EXTER  object   fLdelete_file  (); 
 EXTER  object   fLerror  (); 
 EXTER  object   fLcerror  (); 

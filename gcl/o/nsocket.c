@@ -1,6 +1,19 @@
 /* the following file compiles under win95 using cygwinb19 */ 
 #include "include.h"
+
+
+#ifdef DODEBUG
+#define dprintf(s,arg) \
+  do {fprintf(stderr,s,arg); \
+    fflush(stderr); }\
+    while(0)
+#else 
+#define dprintf(s,arg)
+#endif     
+
 #ifdef HAVE_NSOCKET
+
+
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -168,6 +181,7 @@ CreateSocketAddress(sockaddrPtr, host, port)
     sockaddrPtr->sin_addr.s_addr = addr.s_addr;
     return 1;	/* Success. */
 }
+
 
 
 /* return -1 on failure, or else an fd */
@@ -534,6 +548,52 @@ ungetCharGclSocket(c,strm)
   }
 }
 
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TcpOutputProc --
+ *
+ *	This procedure is invoked by the generic IO level to write output
+ *	to a TCP socket based channel.
+ *
+ *	NOTE: We cannot share code with FilePipeOutputProc because here
+ *	we must use send, not write, to get reliable error reporting.
+ *
+ * Results:
+ *	The number of bytes written is returned. An output argument is
+ *	set to a POSIX error code if an error occurred, or zero.
+ *
+ * Side effects:
+ *	Writes output on the output device of the channel.
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+TcpOutputProc(fd, buf, toWrite, errorCodePtr)
+     int fd;		/* Socket state. */
+    char *buf;				/* The data buffer. */
+    int toWrite;			/* How many bytes to write? */
+    int *errorCodePtr;			/* Where to store error code. */
+{
+    int written;
+
+    *errorCodePtr = 0;
+    written = send(fd, buf, (size_t) toWrite, 0);
+    if (written > -1) {
+        return written;
+    }
+    *errorCodePtr = errno;
+    return -1;
+}
+
+tcpCloseSocket(fd)
+{
+  close(fd);
+
+}
+
 doReverse(s,n)
      char *s;
 { char *p=&s[n-1];
@@ -572,8 +632,8 @@ getCharGclSocket(strm,block)
       { int high;
       AGAIN:      
       /* under cygwin a too large timout like (1<<30) does not work */
-      timeout.tv_sec = (block != Ct ?  0 : 939524096);
-      timeout.tv_usec = 0;
+      timeout.tv_sec = (block != Ct ?  0 : 0);
+      timeout.tv_usec = 10000;
       FD_ZERO(&readfds);
       FD_SET(fd,&readfds);
       high = select(fd+1,&readfds,NULL,NULL,&timeout);
@@ -589,7 +649,10 @@ getCharGclSocket(strm,block)
 	    return bufp->ust.ust_self[--(bufp->ust.ust_fillp)];
 	  }
 	else
+	  {
+	   return EOF;
 	  FEerror("select said there was stuff there but there was not",0);
+	  }
 	}
       /* probably a signal interrupted us.. */
       if (block == Ct)
@@ -598,10 +661,6 @@ getCharGclSocket(strm,block)
       }
   }
 }
-
-
-
-
 
 #else
 int
@@ -612,5 +671,6 @@ getOneChar(fp)
 }
 
 #endif
+
 
 

@@ -14,6 +14,7 @@ OLDDATE = "DATE"
 GCLIB	= $(ODIR)/gcllib.a
 MPFILES= $(MPDIR)/mpi.o $(MPDIR)/mp2.o  $(MPDIR)/libmport.a
 INIT_SYSTEM_LSP=init_$(SYSTEM).lsp
+SPECIAL_RSYM = rsym.c
 
 # begin makedefs
 
@@ -35,26 +36,26 @@ prefix=/usr/local
 INFO_DIR=/usr/local/info/
 
 # where to put emacs lisp files.
-EMACS_SITE_LISP=/usr/share/emacs/20.3/site-lisp
+EMACS_SITE_LISP=/usr/share/emacs/20.7/site-lisp
 
 # the default.el file
-EMACS_DEFAULT_EL=/usr/share/emacs/20.3/site-lisp/default.el
+EMACS_DEFAULT_EL=/usr/share/emacs/20.7/site-lisp/default.el
 
 # numerous TCL/TK variables culled from the tkConfig.sh and tclConfig.sh
 # if these are found.
-TK_CONFIG_PREFIX=/usr/lib
-TK_LIBRARY=/usr/lib/tk8.0
-TCL_LIBRARY=/usr/lib/tcl8.0
+TK_CONFIG_PREFIX=/usr/local/lib
+TK_LIBRARY=/usr/local/lib/tk8.3
+TCL_LIBRARY=/usr/local/lib/tcl8.3
 TK_XINCLUDES=-I/usr/X11R6/include
-TK_INCLUDE=-I/usr/lib/../include
-TCL_INCLUDE=-I/usr/lib/../include
-TK_LIB_SPEC=-L/usr/lib -ltk8.0
-TK_BUILD_LIB_SPEC=-L/work-in-progress/tk8.0/unix -ltk8.0
+TK_INCLUDE=-I/usr/local/lib/../include
+TCL_INCLUDE=-I/usr/local/lib/../include
+TK_LIB_SPEC=-L/usr/local/lib -ltk8.3
+TK_BUILD_LIB_SPEC=-L/home/wfs/src/tk8.3.2/unix -ltk8.3
 TK_XLIBSW=-L/usr/X11R6/lib -lX11
 TK_XINCLUDES=-I/usr/X11R6/include
-TCL_LIB_SPEC=-L/usr/lib -ltcl8.0
+TCL_LIB_SPEC=-L/usr/local/lib -ltcl8.3${TCL_DBGX}
 TCL_DL_LIBS=-ldl
-TCL_LIBS=-ldl  -lieee -lm
+TCL_LIBS=-ldl -lm
 
 NOTIFY=yes
 GCC=gcc
@@ -117,6 +118,7 @@ LIBFILES=bsearch.o
 
 # the  make to use for saved_kcp the profiler.
 KCP=kcp-bsd
+
 # end makedefs
 
 LIBS1= $(LIBS) $(LIBSYSTEM) $(GCLIB)
@@ -186,8 +188,8 @@ saved_$(SYSTEM):raw_$(SYSTEM) $(RSYM) $(INIT_SYSTEM_LSP) \
 	-e "s:GCL-1:GCL-"`cat ../majvers`":g" 	> foo 
 	$(PORTDIR)/raw_$(SYSTEM)$(EXE) $(PORTDIR)/ -libdir ${GCLDIR}/ < foo
 
-${RSYM}:	rsym.c $(HDIR)/mdefs.h
-	$(LDCC) $(DEFS) -g -I../h -o ${RSYM} rsym.c 
+${RSYM}:	${SPECIAL_RSYM} $(HDIR)/mdefs.h
+	$(LDCC) $(DEFS) -g -I../h -o ${RSYM} ${SPECIAL_RSYM}
 
 $(HDIR)/mdefs.h: $(HDIR)/include.h
 	cat $(HDIR)/include.h | sed -e "/include/d" > $(HDIR)/mdefs.h
@@ -198,7 +200,7 @@ saved_kcn:
 FOR_RAW= $(FIRST_FILE) $(OBJS) $(LSPOBJS) $(CMPOBJS) $(SYSTEM_OBJS) sys_gcl.o $(LAST_FILE)
 
 raw_$(SYSTEM):  $(FOR_RAW)
-	$(LDCC)  -o raw_$(SYSTEM) $(FOR_RAW) ${LIBC} $(LIBS1)
+	$(LDCC)  -o raw_$(SYSTEM)$(EXE) $(FOR_RAW) ${LIBC} $(LIBS1)
 
 sys_gcl.o:	sys_gcl.c ${HDIR}/object.h ${HDIR}/config.h
 	$(CC) $(CFLAGS) sys_gcl.c

@@ -19,11 +19,23 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+
+
 #ifndef IN_UNIXINT
 #include "include.h"
 
+
 #include <signal.h>
 #endif
+
+#ifdef USIG
+#include USIG
+#else
+
+#ifdef HAVE_SIGACTION
+#define HAVE_SIGPROCMASK
+#endif
+
 
 #include "usig.h"
 
@@ -80,7 +92,7 @@ unblock_signals(n,m)
 #ifdef  SIG_UNBLOCK_SIGNALS
   SIG_UNBLOCK_SIGNALS(result,n,n);
 #else  
-#ifdef HAVE_SIGACTION
+#ifdef HAVE_SIGPROCMASK
   /* posix */
   { sigset_t set,oset;
     sigemptyset(&set);
@@ -91,6 +103,7 @@ unblock_signals(n,m)
               |(sigismember(&oset,m) ? signal_mask(m) : 0));
   }
 #else
+
   current_mask = sigblock(0);
   sigsetmask(~(sigmask(m)) & ~(sigmask(n)) & current_mask);
   result = (current_mask & sigmask(m) ? signal_mask(m) : 0)
@@ -102,7 +115,7 @@ unblock_signals(n,m)
 
 unblock_sigusr_sigio()
 { int current_mask;
-#ifdef HAVE_SIGACTION
+#ifdef HAVE_SIGPROCMASK
   /* posix */
   { sigset_t set;
     sigemptyset(&set);
@@ -178,3 +191,4 @@ install_default_signals()
 
 	
 
+#endif

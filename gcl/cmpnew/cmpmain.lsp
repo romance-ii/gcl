@@ -509,10 +509,10 @@ SYSTEM_SPECIAL_INIT
 	      (make-pathname :name
 			     (pathname-name (first args))
 			     :type (pathname-type(first args)))))
-  (format nil #-dos "(cd ~a ;~a ~a ~@[~*-O ~]-c -I. ~a ~a)"
-		 #+dos "~a ~a ~@[~*-O ~]-c -I. ~a ~a"
+  (format nil #-(or dos winnt) "(cd ~a ;~a ~a ~@[~*-O ~]-c -I. ~a ~a)"
+		 #+(or dos winnt)  "~a ~a ~@[~*-O ~]-c -I. ~a ~a"
 	          
-		#-dos (let ((dir 	 (pathname-directory (first args))))
+		#-(or dos winnt) (let ((dir 	 (pathname-directory (first args))))
 		   (cond (dir (namestring (make-pathname :directory dir)))
 			 (t ".")))
 		*cc*

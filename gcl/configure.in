@@ -343,7 +343,11 @@ case $canonical in
      use=vax;;
 
      i*cygwin32)
-     use=gnuwin95;;
+	if gcc -v 2>&1 | fgrep ming > /dev/null ;
+            then use=mingw
+          else  use=gnuwin95
+        fi;;
+  
 
 esac
 AC_MSG_CHECKING(check for SV_ONSTACK)
@@ -506,6 +510,9 @@ fi
 
 
 if test -d "${TK_CONFIG_PREFIX}"  ; then true ; else
+if test -f ${TCL_CONFIG_PREFIX}/tkConfig.sh ; then
+TK_CONFIG_PREFIX=${TCL_CONFIG_PREFIX}
+else
 rm -f conftest.tcl
 cat >> conftest.tcl <<EOF
 [
@@ -522,12 +529,12 @@ AC_CHECK_PROG(TKSH,wish8.0,wish8.0,${TKSH})
 if test "${TKSH}" = "" ; then true ; else
 TK_CONFIG_PREFIX=`${TKSH} < conftest.tcl`
 fi
-
 fi
-
+fi
 #AC_MSG_CHECKING(TK_CONFIG_PREFIX=${TK_CONFIG_PREFIX})
 if test -f ${TCL_CONFIG_PREFIX}/tclConfig.sh  ; then . ${TCL_CONFIG_PREFIX}/tclConfig.sh ; fi
 if test -f ${TK_CONFIG_PREFIX}/tkConfig.sh  ; then . ${TK_CONFIG_PREFIX}/tkConfig.sh ; fi
+
 if test -d ${TK_CONFIG_PREFIX}/tk${TK_VERSION} ; then
   TK_LIBRARY=${TK_CONFIG_PREFIX}/tk${TK_VERSION}
 fi
@@ -646,6 +653,9 @@ if test $gcl_ok = no ; then     AC_MSG_RESULT(no) ; fi
 
 # check getcwd, getwd etc..
 
+
+
+
 # check socket stuff..
 
 # getrlimit
@@ -655,9 +665,9 @@ if test $gcl_ok = no ; then     AC_MSG_RESULT(no) ; fi
 if test -f h/$use.defs  ; then
 
   AC_SUBST(use)
-  AC_OUTPUT(makedefs)
-  echo makedefs
-  cat makedefs
+  AC_OUTPUT(makedefc)
+  echo makedefc
+  cat makedefc
 
   echo    add-defs1 $use
   sh add-defs1 $use

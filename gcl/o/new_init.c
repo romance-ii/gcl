@@ -430,6 +430,7 @@ DEFVAR("*PRINT-NANS*",sSAprint_nansA,SI,Cnil,"")
 DEFUNO("FORMAT",object,fLformat,LISP
    ,2,((1<< 6 ) -1) ,0 ,OO,OO,OO,OO,Lformat,"")
 DEFVAR("*INDENT-FORMATTED-OUTPUT*",sSAindent_formatted_outputA,SI,((object)&Cnil_body) ,"")
+DEFUN("SETENV",object,fSsetenv,SI,2,2,0 ,OO,OO,OO,OO,"Set environment VARIABLE to VALUE")
 DEFUNO("DELETE-FILE",object,fLdelete_file,LISP
    ,1,1,0 ,OO,OO,OO,OO,Ldelete_file,"")
 DEFUNO("ERROR",object,fLerror,LISP

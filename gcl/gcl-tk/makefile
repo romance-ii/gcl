@@ -14,64 +14,6 @@ ODIR	= ../o
 GCLIB  = ../o/gcllib.a
 
 
-CFLAGS1=$(CFLAGS) -I../o -I../h ${TK_INCLUDE} ${TCL_INCLUDE} ${TK_XINCLUDES} 
-
-all: gcltksrv   tkl.o tinfo.o  demos/gc-monitor.o gcltkaux
-	(cd demos ; \
-	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../unixport/saved_gcl) 
-	
-
-.lisp.o:
-	echo "(compile-file \"$*.lisp\" :c-file nil :c-debug nil)" | ../unixport/saved_gcl
-
-.lsp.o:
-	echo "(compile-file \"$*.lsp\" :c-file t :c-debug t)" | ../unixport/saved_gcl
-
-
-
-GUIOS = guis.o tkAppInit.o tkMain.o
-
-clean::
-	rm -f ${GUIOS} $(OFILES) gcltkaux gcltksrv *.o */*.o
-
-.c.o:
-	$(GCLTKCC) -c $(CFLAGS1) ${ODIR_DEBUG}  $*.c
-
-
-# for some reason -lieee is on various linux systems in the list of requireds..
-
-gcltkaux:  $(GUIOS)
-	$(LD_ORDINARY_CC) $(GUIOS) -o gcltkaux  ${TK_LIB_SPEC} ${TK_BUILD_LIB_SPEC} ${TK_XLIBSW} ${TK_XINCLUDES} ${TCL_LIB_SPEC}  `echo ${TCL_LIBS} | sed -e s:-lieee::g`  ${LIBS} ${GCLIB}
-
-gcltksrv: makefile
-	cat gcltksrv.in | sed -e "s:TK_LIBRARY=.*:TK_LIBRARY=${TK_LIBRARY}:g" \
-	-e "s:TCL_LIBRARY=.*:TCL_LIBRARY=${TCL_LIBRARY}:g" \
-	-e "s:TK_XLIB_DIR=.*:TK_XLIB_DIR=${TK_XLIB_DIR}:g" \
-	-e "s:GCL_TK_DIR=.*:GCL_TK_DIR=${GCLDIR}/gcl-tk:g" > gcltksrv
-	chmod a+x gcltksrv
-
-gcltksrv.interp: makefile
-	cat gcltksrv.in.interp | sed -e "s:TK_LIBRARY=.*:TK_LIBRARY=${TK_LIBRARY}:g" \
-	-e "s:TK_XLIB_DIR=.*:TK_XLIB_DIR=${TK_XLIB_DIR}:g" \
-	-e "s:TCL_LIBRARY=.*:TCL_LIBRARY=${TCL_LIBRARY}:g" \
-	-e "s:GCL_TK_DIR=.*:GCL_TK_DIR=${GCLDIR}/gcl-tk:g" > gcltksrv.interp
-	chmod a+x gcltksrv.interp
-
-INTERESTING=*.lsp *.lisp tk*.c guis.c sockets.c  comm.c Makefile  demos/*.lisp  *.h
-
-tar:
-	tar cvf - ${INTERESTING} | gzip -c > /u/wfs/sock-`date +%y%m%d`.tgz
-tags:
-	etags *.lsp *.lisp tk*.c guis.c sockets.c   guis.h our_io.c
-
-tkAppInit.o : tkAppInit.c
-tkMain.o : tkMain.c
-tkXAppInit.o : tkXAppInit.c
-tkXshell.o : tkXshell.c
-guis.o : guis.c guis.h comm.c sheader.h
-sockets.c: our_io.c sheader.h
-socketsl.o: socketsl.lisp sockets.c
-
 # begin makedefs
 
 # use=386-linux
@@ -92,26 +34,26 @@ prefix=/usr/local
 INFO_DIR=/usr/local/info/
 
 # where to put emacs lisp files.
-EMACS_SITE_LISP=/usr/share/emacs/20.3/site-lisp
+EMACS_SITE_LISP=/usr/share/emacs/20.7/site-lisp
 
 # the default.el file
-EMACS_DEFAULT_EL=/usr/share/emacs/20.3/site-lisp/default.el
+EMACS_DEFAULT_EL=/usr/share/emacs/20.7/site-lisp/default.el
 
 # numerous TCL/TK variables culled from the tkConfig.sh and tclConfig.sh
 # if these are found.
-TK_CONFIG_PREFIX=/usr/lib
-TK_LIBRARY=/usr/lib/tk8.0
-TCL_LIBRARY=/usr/lib/tcl8.0
+TK_CONFIG_PREFIX=/usr/local/lib
+TK_LIBRARY=/usr/local/lib/tk8.3
+TCL_LIBRARY=/usr/local/lib/tcl8.3
 TK_XINCLUDES=-I/usr/X11R6/include
-TK_INCLUDE=-I/usr/lib/../include
-TCL_INCLUDE=-I/usr/lib/../include
-TK_LIB_SPEC=-L/usr/lib -ltk8.0
-TK_BUILD_LIB_SPEC=-L/work-in-progress/tk8.0/unix -ltk8.0
+TK_INCLUDE=-I/usr/local/lib/../include
+TCL_INCLUDE=-I/usr/local/lib/../include
+TK_LIB_SPEC=-L/usr/local/lib -ltk8.3
+TK_BUILD_LIB_SPEC=-L/home/wfs/src/tk8.3.2/unix -ltk8.3
 TK_XLIBSW=-L/usr/X11R6/lib -lX11
 TK_XINCLUDES=-I/usr/X11R6/include
-TCL_LIB_SPEC=-L/usr/lib -ltcl8.0
+TCL_LIB_SPEC=-L/usr/local/lib -ltcl8.3${TCL_DBGX}
 TCL_DL_LIBS=-ldl
-TCL_LIBS=-ldl  -lieee -lm
+TCL_LIBS=-ldl -lm
 
 NOTIFY=yes
 GCC=gcc
@@ -174,4 +116,65 @@ LIBFILES=bsearch.o
 
 # the  make to use for saved_kcp the profiler.
 KCP=kcp-bsd
+
 # end makedefs
+
+
+CFLAGS1=$(CFLAGS) -I../o -I../h ${TK_INCLUDE} ${TCL_INCLUDE} ${TK_XINCLUDES}
+
+
+all: gcltksrv   tkl.o tinfo.o  demos/gc-monitor.o gcltkaux
+	(cd demos ; \
+	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../unixport/saved_gcl) 
+	
+
+.lisp.o:
+	echo "(compile-file \"$*.lisp\" :c-file nil :c-debug nil)" | ../unixport/saved_gcl
+
+.lsp.o:
+	echo "(compile-file \"$*.lsp\" :c-file t :c-debug t)" | ../unixport/saved_gcl
+
+
+
+GUIOS = guis.o tkAppInit.o tkMain.o
+
+clean::
+	rm -f ${GUIOS} $(OFILES) gcltkaux gcltksrv *.o */*.o
+
+.c.o:
+	$(GCLTKCC) -c $(CFLAGS1) ${ODIR_DEBUG}  $*.c
+
+
+# for some reason -lieee is on various linux systems in the list of requireds..
+
+gcltkaux:  $(GUIOS)
+	$(LD_ORDINARY_CC) $(GUIOS) -o gcltkaux  ${TK_LIB_SPEC} ${TK_BUILD_LIB_SPEC} ${TK_XLIBSW} ${TK_XINCLUDES} ${TCL_LIB_SPEC}  `echo ${TCL_LIBS} | sed -e s:-lieee::g`  ${LIBS} ${GCLIB}
+
+gcltksrv: makefile
+	cat gcltksrv.in | sed -e "s:TK_LIBRARY=.*:TK_LIBRARY=${TK_LIBRARY}:g" \
+	-e "s:TCL_LIBRARY=.*:TCL_LIBRARY=${TCL_LIBRARY}:g" \
+	-e "s:TK_XLIB_DIR=.*:TK_XLIB_DIR=${TK_XLIB_DIR}:g" \
+	-e "s:GCL_TK_DIR=.*:GCL_TK_DIR=${GCLDIR}/gcl-tk:g" > gcltksrv
+	chmod a+x gcltksrv
+
+gcltksrv.interp: makefile
+	cat gcltksrv.in.interp | sed -e "s:TK_LIBRARY=.*:TK_LIBRARY=${TK_LIBRARY}:g" \
+	-e "s:TK_XLIB_DIR=.*:TK_XLIB_DIR=${TK_XLIB_DIR}:g" \
+	-e "s:TCL_LIBRARY=.*:TCL_LIBRARY=${TCL_LIBRARY}:g" \
+	-e "s:GCL_TK_DIR=.*:GCL_TK_DIR=${GCLDIR}/gcl-tk:g" > gcltksrv.interp
+	chmod a+x gcltksrv.interp
+
+INTERESTING=*.lsp *.lisp tk*.c guis.c sockets.c  comm.c Makefile  demos/*.lisp  *.h
+
+tar:
+	tar cvf - ${INTERESTING} | gzip -c > /u/wfs/sock-`date +%y%m%d`.tgz
+tags:
+	etags *.lsp *.lisp tk*.c guis.c sockets.c   guis.h our_io.c
+
+tkAppInit.o : tkAppInit.c
+tkMain.o : tkMain.c
+tkXAppInit.o : tkXAppInit.c
+tkXshell.o : tkXshell.c
+guis.o : guis.c guis.h comm.c sheader.h
+sockets.c: our_io.c sheader.h
+socketsl.o: socketsl.lisp sockets.c

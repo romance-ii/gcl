@@ -52,7 +52,7 @@ SGC is enabled.  */
 #define HAVE_ASM_SIGCONTEXT_H 1
 
 /* define if have struct sigcontext in one of above */
-#define HAVE_SIGCONTEXT 1
+/* #undef HAVE_SIGCONTEXT */
 
 
 /* define if have <sys/ioctl.h> */
@@ -79,7 +79,7 @@ SGC is enabled.  */
 #define LISTEN_USE_FCNTL 1
 
 /* if signal.h alone contains the stuff necessary for sgc */
-/* #undef SIGNAL_H_HAS_SIGCONTEXT */
+#define SIGNAL_H_HAS_SIGCONTEXT 1
 
 
 /* define if the profil system call is not defined in libc */
@@ -96,7 +96,7 @@ SGC is enabled.  */
 /* #define ENDIAN_ALREADY_DEFINED */
 
 /* define if SV_ONSTACK is defined in signal.h */
-/* #undef HAVE_SV_ONSTACK */ 
+#define HAVE_SV_ONSTACK 1 
 
 #include <varargs.h>
 #include <setjmp.h>
@@ -502,10 +502,10 @@ struct ustring {
 #define SHORT(x,i) ((( short *)(x)->ust.ust_self)[i])
 
 #define BV_OFFSET(x) ((type_of(x)==t_bitvector ? x->bv.bv_offset : \
-		       type_of(x)== t_array ? x->a.a_offset : abort()))
+		       type_of(x)== t_array ? x->a.a_offset : abort(),0))
 
 #define SET_BV_OFFSET(x,val) ((type_of(x)==t_bitvector ? x->bv.bv_offset = val : \
-		       type_of(x)== t_array ? x->a.a_offset=val : abort()))
+		       type_of(x)== t_array ? x->a.a_offset=val : abort(),0))
 
 
 		       
@@ -664,7 +664,9 @@ enum gcl_sm_flags {
   gcl_sm_blocking=1,
   gcl_sm_tcp_async,
   gcl_sm_input,
-  gcl_sm_output
+  gcl_sm_output,
+  gcl_sm_had_error
+  
   
 };
   
@@ -2601,6 +2603,7 @@ EXTER object  sSpretty_print_format ;
 EXTER object  sSAprint_nansA ; 
 EXTER  object   fLformat  (); 
 EXTER object  sSAindent_formatted_outputA ; 
+EXTER  object   fSsetenv (); 
 EXTER  object   fLdelete_file  (); 
 EXTER  object   fLerror  (); 
 EXTER  object   fLcerror  (); 
