@@ -107,10 +107,5 @@ BUILDING
   PE-COFF linking fixing some problems with the BFD library - I am slowly
   absorbing the info needed, but we really need input from an expert.
 
-- A PCL/ANSI build ("configure --enable-ansi") can be obtained by adding 
-  "(si::use-fast-links nil)" to the end of the list of commands in the SETUP 
-  makefile macro in "pcl/makefile".  I don't know why this is necessary on 
-  Windows.  The PCL/ANSI version of GCL is still experimental.
 
-
-Mike Thomas, 13 January 2004
+Mike Thomas, 19 February 2004
