@@ -994,6 +994,8 @@ if test "$HAVE_SBRK" = "1" ; then
 fi
 
 
+old_LDFLAGS="$LDFLAGS"
+LDFLAGS="$TLDFLAGS"
 AC_MSG_CHECKING("finding DBEGIN")
 AC_TRY_RUN([#include <stdio.h>
             #include <stdlib.h>
@@ -1035,6 +1037,7 @@ AC_DEFINE_UNQUOTED(DBEGIN,$dbegin \
 /* where data begins */
 )
 AC_MSG_RESULT(got $dbegin)
+LDFLAGS="$old_LDFLAGS"
 
 
 AC_MSG_CHECKING("finding CSTACK_ADDRESS")
