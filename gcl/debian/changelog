@@ -40,8 +40,9 @@ gcl (2.5.4-1) unstable; urgency=low
   * Restore pp() function for debugging; print out undefined symbol
     names
   * Small patch for fix xgcl demo (thanks  Michael Koehne)
+  * Better bfd symbol table strategy
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  8 Aug 2003 13:42:40 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri,  8 Aug 2003 20:02:54 +0000
 
 gcl (2.5.3-2) unstable; urgency=low
 
