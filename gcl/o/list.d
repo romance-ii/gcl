@@ -786,20 +786,25 @@ Llast() {
 	if (endp(vs_base[0]))
 		return;
 	if (n==2) {
-		if (type_of(vs_base[1])!=t_fixnum || (n=fix(vs_base[1]))<1)
-			FEerror("Expected fixed integer type greater than or equal to one in second argument: ~S",
+		if (type_of(vs_base[1])!=t_fixnum || (n=fix(vs_base[1]))<0)
+			FEerror("Expected non-negative fixed integer in second argument: ~S",
 				1,vs_base[1]);
 		vs_popp;
 	}	
-	
-	t=vs_base[0];
-        while (type_of(vs_base[0]->c.c_cdr) == t_cons && --n)
-		vs_base[0] = vs_base[0]->c.c_cdr;
-        while (type_of(vs_base[0]->c.c_cdr) == t_cons) {
-		t=t->c.c_cdr;
-		vs_base[0] = vs_base[0]->c.c_cdr;
+
+	if (!n)
+		while (type_of(vs_base[0]) == t_cons)
+			vs_base[0]=vs_base[0]->c.c_cdr;
+	else {
+		t=vs_base[0];
+		while (type_of(vs_base[0]->c.c_cdr) == t_cons && --n)
+			vs_base[0] = vs_base[0]->c.c_cdr;
+		while (type_of(vs_base[0]->c.c_cdr) == t_cons) {
+			t=t->c.c_cdr;
+			vs_base[0] = vs_base[0]->c.c_cdr;
+		}
+		vs_base[0]=t;
 	}
-	vs_base[0]=t;
 
 }
 
