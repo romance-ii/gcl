@@ -739,6 +739,8 @@ First directory is checked for first name and all extensions etc."
      (setq *load-path* (cons (si::string-concatenate *lib-directory*
 						     "lsp/") *load-path*))
      (setq *load-path* (cons (si::string-concatenate *lib-directory*
+						     "mod/") *load-path*))
+     (setq *load-path* (cons (si::string-concatenate *lib-directory*
 						     "gcl-tk/") *load-path*))
 	    )
     (when (not (boundp 'si::*system-directory*)) 
