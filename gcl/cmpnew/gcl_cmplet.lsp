@@ -106,7 +106,7 @@
 	((integerp form) (list 'integer form form))
 	((atom form) (type-of form))
 	((eq (car form) 'quote) (type-of (cadr form)))
-	((atom (cdr form)) (error "Dotted list in fun-ret-type~"))
+	((and (cdr form) (atom (cdr form))) (error "Dotted list in fun-ret-type~"))
 	((symbolp (car form))
 	 (nil-to-t (or (result-type-from-args (car form) (mapcar #'fun-ret-type (cdr form)))
 		       (let ((proc (get (car form) 'proclaimed-return-type)))

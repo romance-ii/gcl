@@ -3,8 +3,10 @@ gclcvs (2.7.0-37) unstable; urgency=low
   * Preliminary support for integer range type propagation and
     optimization -- better function return type deductions using result-
     from-args info
+  * Macroexpand let bindings as well as let* for use in function return
+    type deduction, error in latter when dotted list is encountered
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 14 Dec 2004 03:18:37 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 14 Dec 2004 12:21:54 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 
