@@ -402,7 +402,7 @@ if test $use_gmp = yes ; then
 		AC_CHECK_LIB(gmp,__gmpz_init,
 			MPFILES=$GMPDIR/mpn/mul_n.o
 			if test "$use" = "m68k-linux" ; then
-				MPFILES="$MPFILES $GMPDIR/mpn/lshift.o $GOMEDIR/mpn/rshift.o"
+				MPFILES="$MPFILES $GMPDIR/mpn/lshift.o $GMPDIR/mpn/rshift.o"
 			fi
 			TLIBS="$TLIBS -lgmp"
 			echo "#include \"gmp.h\"" >foo.c

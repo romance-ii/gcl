@@ -1537,7 +1537,7 @@ if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   MPFILES=$GMPDIR/mpn/mul_n.o
 			if test "$use" = "m68k-linux" ; then
-				MPFILES="$MPFILES $GMPDIR/mpn/lshift.o $GOMEDIR/mpn/rshift.o"
+				MPFILES="$MPFILES $GMPDIR/mpn/lshift.o $GMPDIR/mpn/rshift.o"
 			fi
 			TLIBS="$TLIBS -lgmp"
 			echo "#include \"gmp.h\"" >foo.c
