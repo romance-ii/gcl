@@ -1,0 +1,11 @@
+To install PCL at your site, follow the instructions in the defsys.lisp file.
+
+
+If you use gcl (GNU Common Lisp), follow the instructions in impl/gcl/README.
+
+If you use cmucl17f, follow the instructions in impl/cmu/README,
+then recompile PCL and rebuild the world.
+
+If you use lucid, just compile and load defsys, 
+then type (pcl::compile-pcl), or (pcl::load-pcl).
+
