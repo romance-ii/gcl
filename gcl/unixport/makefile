@@ -54,7 +54,7 @@ LLSPOBJS=defmacro.o evalmacros.o top.o module.o predlib.o setf.o \
 	 arraylib.o assert.o defstruct.o describe.o iolib.o listlib.o \
 	 mislib.o numlib.o packlib.o seq.o seqlib.o trace.o sloop.o  debug.o \
 	 serror.o info.o destructuring_bind.o defpackage.o make_defpackage.o \
-	 loop.o $(RL_OBJS)
+	 loop.o $(EXTRA_LOBJS) $(RL_OBJS)
 
 LSPOBJS	= $(addprefix $(LSPDIR)/,$(LLSPOBJS))
 
@@ -119,7 +119,7 @@ libgcl.a: $(FIRST_FILE) $(OBJS) $(LSPOBJS) $(CMPOBJS) sys_gcl.o $(LAST_FILE) gmp
 	ar rs $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
 raw_$(SYSTEM): libgcl.a libgclp.a $(SYSTEM_OBJS) $(EXTRAS)
-	$(CC) -o raw_$(SYSTEM)$(EXE) $(filter %.o,$^) -L. $(EXTRA_LD_LIBS) $(LD_LIBS)
+	$(CC) -Wl,--allow-multiple-definition  -Wl,-Map=map.txt -o raw_$(SYSTEM)$(EXE) $(filter %.o,$^) -L. $(EXTRA_LD_LIBS) $(LD_LIBS)
 
 sys_gcl.o: sys_gcl.c $(HDIR)/object.h $(HDIR)/config.h
 	$(CC) $(CFLAGS) -c -I$(HDIR) sys_gcl.c

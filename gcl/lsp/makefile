@@ -12,7 +12,7 @@ APPEND=../xbin/append
 OBJS	= arraylib.o assert.o defmacro.o defstruct.o describe.o evalmacros.o \
 	iolib.o listlib.o mislib.o module.o numlib.o packlib.o predlib.o \
 	seq.o seqlib.o setf.o top.o trace.o sloop.o debug.o info.o serror.o \
-	destructuring_bind.o defpackage.o make_defpackage.o loop.o 
+	destructuring_bind.o defpackage.o make_defpackage.o loop.o $(EXTRA_LOBJS)
 	# export.o autoload.o auto_new.o
 
 
