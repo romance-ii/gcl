@@ -844,8 +844,10 @@ L:
 	  
 	  register fixnum i, j, k, t;
 
-	  i = fix(x);
-	  j = fix(y);
+	  if (!(i = fix(x)))
+	    return y;
+	  if (!(j = fix(y)))
+	    return x;
 	  k=0;
 	  while(!(i&0x1) && !(j&0x1)) {
 	      k++;
