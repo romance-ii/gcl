@@ -36,11 +36,16 @@ fi
 # addresses, in calculating a page for an address in the heap.
 
 AC_PROG_CC
-if test "${GCC}" -eq "yes" ; then
-GCC=gcc
+# can only test for numbers -- CM
+# if test "${GCC}" -eq "yes" ; then
+if [[ "${GCC}" = "yes" ]] ; then
+# Allog for environment variable overrides on compiler selection -- CM
+GCC=$CC
 else
 GCC=""
 fi
+# subst GCC not only under 386-linux, but where available -- CM
+AC_SUBST(GCC)
 
 
 AC_MSG_CHECKING("finding DBEGIN")
@@ -391,7 +396,7 @@ case $canonical in
      use=vax;;
 
      i*cygwin32)
-	if gcc -v 2>&1 | fgrep ming > /dev/null ;
+	if $CC -v 2>&1 | fgrep ming > /dev/null ;
             then use=mingw
           else  use=gnuwin95
         fi;;
@@ -476,7 +481,7 @@ if test $use = "386-linux" ; then
 
        fi
 	echo 'foo() {}' > conftest1.c
-	gcc -S conftest1.c
+	$CC -S conftest1.c
 	use_underscore=0	
 	if fgrep _foo conftest1.s ; then use_underscore=1 ; fi
 	if test $use_underscore = 0 ; then
@@ -485,11 +490,11 @@ if test $use = "386-linux" ; then
 	     MPI_FILE=mpi-386d.o
         fi
 	AC_SUBST(MPI_FILE)
-        GCC=gcc
+#       GCC=$CC
 #        if test -x  /usr/bin/i386-glibc20-linux-gcc ; then
 #          GCC=/usr/bin/i386-glibc20-linux-gcc
 #       fi
-	AC_SUBST(GCC)
+#	AC_SUBST(GCC)
 
 fi
 
@@ -755,7 +760,7 @@ fi
 # redhat/cygnus released for some reason a buggy version of gcc,
 # which no one else released.   Catch that here.
 AC_MSG_CHECKING([Checking for buggy gcc version from redhat])
-if  2>&1 gcc -v | fgrep 2.96 > /dev/null 
+if  2>&1 $CC -v | fgrep "gcc version 2.96" > /dev/null 
    then 
         BROKEN_O4_OPT=1
         AC_DEFINE(BROKEN_O4_OPT)
