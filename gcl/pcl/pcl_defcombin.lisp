@@ -168,10 +168,11 @@
 	(ioa (short-combination-identity-with-one-argument combin))
 	(order (car (method-combination-options combin)))
 	(around ())
-	(primary ()))
+	(primary ())
+	(invalid ()))
     (dolist (m applicable-methods)
       (let ((qualifiers (method-qualifiers m)))
-	(flet ((lose (method why)
+	(labels ((lose (method why)
 		 (invalid-method-error
 		   method
 		   "The method ~S ~A.~%~
@@ -179,17 +180,21 @@
                     short form of DEFINE-METHOD-COMBINATION and so requires~%~
                     all methods have either the single qualifier ~S or the~%~
                     single qualifier :AROUND."
-		   method why type type)))
+		   method why type type))
+		 (invalid-method (method why)
+		   (if *in-precompute-effective-methods-p*
+		       (push method invalid)
+		       (lose method why))))
 	  (cond ((null qualifiers)
-		 (lose m "has no qualifiers"))
+		 (invalid-method m "has no qualifiers"))
 		((cdr qualifiers)
-		 (lose m "has more than one qualifier"))
+		 (invalid-method m "has more than one qualifier"))
 		((eq (car qualifiers) :around)
 		 (push m around))
 		((eq (car qualifiers) type)
 		 (push m primary))
 		(t
-		 (lose m "has an illegal qualifier"))))))
+		 (invalid-method m "has an illegal qualifier"))))))
     (setq around (nreverse around))
     (unless (eq order :most-specific-last)
       (setq primary (nreverse primary)))
@@ -199,10 +204,12 @@
 		`(call-method ,(car primary) ())
 		`(,operator ,@(mapcar (lambda (m) `(call-method ,m ()))
 				      primary)))))
-      (cond ((null primary)
-	     `(error "No ~S methods for the generic function ~S."
-		     ',type ',generic-function))
-	    ((null around) main-method)
+      (cond (invalid
+	     `(%invalid-qualifiers ',generic-function ',combin .args. ',invalid))
+	    ((null primary)
+	     `(%no-primary-method ',generic-function .args.))
+	    ((null around)
+	     main-method)
 	    (t
 	     `(call-method ,(car around)
 			   (,@(cdr around) (make-method ,main-method))))))))

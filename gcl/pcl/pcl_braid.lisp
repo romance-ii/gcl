@@ -758,3 +758,36 @@
           when called with arguments ~S."
 	  generic-function args)
   (apply generic-function args))
+
+(defmethod no-next-method ((generic-function standard-generic-function)
+			   (method standard-method)
+			   &rest args)
+  (cerror "Try again."
+	  "No next method to ~S when calling generic function ~S with arguments ~S~%"
+	  method generic-function args)
+  (apply generic-function args))
+
+(defmethod no-primary-method ((generic-function standard-generic-function)
+			      &rest args)
+  (cerror "Try again."
+	  "No primary method when calling generic function ~S with arguments ~S~%"
+	  generic-function args)
+  (apply generic-function args))
+
+(defmethod invalid-qualifiers ((gf generic-function) combin args methods)
+  (if (null (cdr methods))
+      (error "~@<In a call to ~s with arguments ~:s: ~
+              The method ~s has invalid qualifiers for method ~
+              combination ~s.~@:>"
+	 gf args (car methods) combin)
+      (error "~@<In a call to ~s with arguments ~:s: ~
+              The methods ~{~s~^, ~} have invalid qualifiers for ~
+              method combination ~s.~@:>"
+	 gf args methods combin)))
+
+(defun %no-primary-method (gf args)
+  (apply #'no-primary-method gf args))
+
+(defun %invalid-qualifiers (gf combin args methods)
+  (invalid-qualifiers gf combin args methods))
+
