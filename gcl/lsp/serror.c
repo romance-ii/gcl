@@ -140,7 +140,6 @@ static object LI4(object first,...)
 	va_list ap;
 	int narg = VFUN_NARGS; VMB4 VMS4 VMV4
 	{register object V24;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	V25 = list_vector_new(narg,first,ap);

@@ -10,7 +10,6 @@ static object LI1(object V1,object first,...)
 	int narg = VFUN_NARGS; VMB1 VMS1 VMV1
 	{object V2;
 	object V3;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V2= V1;
@@ -265,7 +264,6 @@ static object LI7(object V32,object first,...)
 	int narg = VFUN_NARGS; VMB7 VMS7 VMV7
 	{object V33;
 	object V34;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V33= V32;

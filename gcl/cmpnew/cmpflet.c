@@ -13,7 +13,6 @@ static object LI1(object first,...)
 	object V3;
 	object V4;
 	object V5;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{

@@ -18,7 +18,7 @@ static object LI3();
 #define VMR3(VMT3) vs_top=base ; return(VMT3);
 #define VC4 object  V31 ,V29 ,V28 ,V26 ,V25;
 static object LI5(object,object,object,object,object,object,object,...);
-#define VMB5 register object *base=vs_top; object  V58 ,V57 ,V56 ,V55 ,V54; object Vcs[7];
+#define VMB5 register object *base=vs_top; object  V58 ,V57 ,V56 ,V55 ,V54;
 #define VMS5  register object *sup=vs_top+5;vs_top=sup;
 #define VMV5 vs_reserve(5);
 #define VMR5(VMT5) vs_top=base ; return(VMT5);

@@ -797,7 +797,6 @@ static object LI47(object first,...)
 	{object V64;
 	object V65;
 	object V66;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg = narg - 0;
 	if (narg <= 0) goto T129;

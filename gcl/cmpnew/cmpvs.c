@@ -34,9 +34,9 @@ TTL:;
 	goto T6;
 T6:;
 	princ_str("\n	",VV[4]);
-	(void)((*(LnkLI11))((V6)));
+	(void)((*(LnkLI12))((V6)));
 	princ_str("= ",VV[4]);
-	(void)((*(LnkLI12))((V5)));
+	(void)((*(LnkLI13))((V5)));
 	princ_char(59,VV[4]);
 	{object V7 = Cnil;
 	VMR2(V7)}
@@ -57,33 +57,34 @@ TTL:;
 	if(!((car((V10)))==(VV[5]))){
 	goto T19;}
 	princ_char(86,VV[4]);
-	(void)((*(LnkLI12))(cadr((V10))));
+	(void)((*(LnkLI13))(cadr((V10))));
 	{object V11 = Cnil;
 	VMR3(V11)}
 	goto T19;
 T19:;
 	if(!((car((V10)))==(VV[6]))){
 	goto T24;}
+	setq(VV[7],Ct);
 	princ_str("Vcs[",VV[4]);
-	(void)((*(LnkLI12))(cdr((V10))));
+	(void)((*(LnkLI13))(cdr((V10))));
 	princ_char(93,VV[4]);
 	{object V12 = Cnil;
 	VMR3(V12)}
 	goto T24;
 T24:;
 	if(!(number_compare(car((V10)),symbol_value(VV[0]))==0)){
-	goto T30;}
+	goto T32;}
 	princ_str("base[",VV[4]);
-	(void)((*(LnkLI12))(cdr((V10))));
+	(void)((*(LnkLI13))(cdr((V10))));
 	princ_char(93,VV[4]);
 	{object V13 = Cnil;
 	VMR3(V13)}
-	goto T30;
-T30:;
+	goto T32;
+T32:;
 	princ_str("base",VV[4]);
-	(void)((*(LnkLI12))(car((V10))));
+	(void)((*(LnkLI13))(car((V10))));
 	princ_char(91,VV[4]);
-	(void)((*(LnkLI12))(cdr((V10))));
+	(void)((*(LnkLI13))(cdr((V10))));
 	princ_char(93,VV[4]);
 	{object V14 = Cnil;
 	VMR3(V14)}
@@ -98,7 +99,7 @@ object V16;
 	goto TTL;
 TTL:;
 	princ_char(40,VV[4]);
-	(void)((*(LnkLI11))((V16)));
+	(void)((*(LnkLI12))((V16)));
 	princ_str("->c.c_car)",VV[4]);
 	{object V17 = Cnil;
 	VMR4(V17)}
@@ -113,8 +114,8 @@ object V19;
 	goto TTL;
 TTL:;
 	princ_str("(base0[",VV[4]);
-	V20= number_minus(symbol_value(VV[7]),(V19));
-	(void)((*(LnkLI12))(/* INLINE-ARGS */V20));
+	V20= number_minus(symbol_value(VV[8]),(V19));
+	(void)((*(LnkLI13))(/* INLINE-ARGS */V20));
 	princ_str("]->c.c_car)",VV[4]);
 	{object V21 = Cnil;
 	VMR5(V21)}
@@ -128,8 +129,8 @@ object V23;
 {	 VMB6 VMS6 VMV6
 	goto TTL;
 TTL:;
-	setq(VV[8],(V23));
-	{object V24 = symbol_value(VV[8]);
+	setq(VV[9],(V23));
+	{object V24 = symbol_value(VV[9]);
 	VMR6(V24)}
 	return Cnil;
 }
@@ -140,26 +141,25 @@ static object LI7(object first,...)
 	va_list ap;
 	int narg = VFUN_NARGS; VMB7 VMS7 VMV7
 	{object V25;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg = narg - 0;
-	if (narg <= 0) goto T48;
+	if (narg <= 0) goto T50;
 	else {
 	V25= first;}
-	--narg; goto T49;
-	goto T48;
-T48:;
-	V25= symbol_value(VV[8]);
-	goto T49;
-T49:;
+	--narg; goto T51;
+	goto T50;
+T50:;
+	V25= symbol_value(VV[9]);
+	goto T51;
+T51:;
 	if(((V25))!=Cnil){
-	goto T52;}
+	goto T54;}
 	princ_str("Cnil",VV[4]);
 	{object V26 = Cnil;
 	VMR7(V26)}
-	goto T52;
-T52:;
-	{object V27 = (*(LnkLI11))((V25));
+	goto T54;
+T54:;
+	{object V27 = (*(LnkLI12))((V25));
 	VMR7(V27)}
 	va_end(ap);
 	return Cnil;}
@@ -171,8 +171,8 @@ static object LI8()
 {	 VMB8 VMS8 VMV8
 	goto TTL;
 TTL:;
-	setq(VV[9],number_plus(symbol_value(VV[9]),small_fixnum(1)));
-	{object V28 = symbol_value(VV[9]);
+	setq(VV[10],number_plus(symbol_value(VV[10]),small_fixnum(1)));
+	{object V28 = symbol_value(VV[10]);
 	VMR8(V28)}
 	return Cnil;
 }
@@ -184,8 +184,8 @@ static object LI9()
 	goto TTL;
 TTL:;
 	{object V29;
-	V29= make_cons(VV[6],symbol_value(VV[10]));
-	setq(VV[10],number_plus(symbol_value(VV[10]),small_fixnum(1)));
+	V29= make_cons(VV[6],symbol_value(VV[11]));
+	setq(VV[11],number_plus(symbol_value(VV[11]),small_fixnum(1)));
 	{object V30 = (V29);
 	VMR9(V30)}}
 	return Cnil;
@@ -200,29 +200,29 @@ object V32;
 TTL:;
 	{register object V33;
 	V33= (V32);
-	goto T60;
-T60:;
+	goto T62;
+T62:;
 	if(((V33))!=Cnil){
-	goto T61;}
+	goto T63;}
 	{object V34 = Cnil;
 	VMR10(V34)}
-	goto T61;
-T61:;
-	(void)((*(LnkLI12))(car((V33))));
+	goto T63;
+T63:;
+	(void)((*(LnkLI13))(car((V33))));
 	if(!((cdr((V33)))==Cnil)){
-	goto T68;}
-	goto T67;
-	goto T68;
-T68:;
+	goto T70;}
+	goto T69;
+	goto T70;
+T70:;
 	princ_char(44,VV[4]);
-	goto T67;
-T67:;
+	goto T69;
+T69:;
 	V33= cdr((V33));
-	goto T60;}
+	goto T62;}
 	return Cnil;
 }
-static object  LnkTLI12(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[12],(void **)(void *)&LnkLI12,1,first,ap);va_end(ap);return V1;} /* WT1 */
-static object  LnkTLI11(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[11],(void **)(void *)&LnkLI11,1,first,ap);va_end(ap);return V1;} /* WT-VS */
+static object  LnkTLI13(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[13],(void **)(void *)&LnkLI13,1,first,ap);va_end(ap);return V1;} /* WT1 */
+static object  LnkTLI12(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[12],(void **)(void *)&LnkLI12,1,first,ap);va_end(ap);return V1;} /* WT-VS */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -69,7 +69,6 @@ static object LI4(object first,...)
 	int narg = VFUN_NARGS; VMB4 VMS4 VMV4
 	{object V6;
 	object V7;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{
@@ -623,7 +622,6 @@ static object LI29(object V81,object V80,object first,...)
 	{object V82;
 	object V83;
 	object V84;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V82= V81;

@@ -30,7 +30,7 @@ static object LI6();
 #define VMV6
 #define VMR6(VMT6) return(VMT6);
 static object LI7(object,...);
-#define VMB7 object Vcs[1];
+#define VMB7
 #define VMS7
 #define VMV7
 #define VMR7(VMT7) return(VMT7);
@@ -59,8 +59,8 @@ static object LI10();
 #define VM3 0
 #define VM2 0
 #define VM1 0
-static char * VVi[14]={
-#define Cdata VV[13]
+static char * VVi[15]={
+#define Cdata VV[14]
 (char *)(LI1),
 (char *)(LI2),
 (char *)(LI3),
@@ -73,7 +73,7 @@ static char * VVi[14]={
 (char *)(LI10)
 };
 #define VV ((object *)VVi)
+static object  LnkTLI13(object,...);
+static object  (*LnkLI13)() = (object (*)()) LnkTLI13;
 static object  LnkTLI12(object,...);
 static object  (*LnkLI12)() = (object (*)()) LnkTLI12;
-static object  LnkTLI11(object,...);
-static object  (*LnkLI11)() = (object (*)()) LnkTLI11;

@@ -399,7 +399,6 @@ static object LI9(object first,...)
 	int narg = VFUN_NARGS; VMB9 VMS9 VMV9
 	{register object V64;
 	register object V65;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg = narg - 0;
 	if (narg <= 0) goto T65;
@@ -468,7 +467,6 @@ static object LI10(object first,...)
 	int narg = VFUN_NARGS; VMB10 VMS10 VMV10
 	{register object V70;
 	register object V71;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg = narg - 0;
 	if (narg <= 0) goto T94;
@@ -591,7 +589,6 @@ static object LI12(object first,...)
 	{object V90;
 	object V91;
 	object V92;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg = narg - 0;
 	if (narg <= 0) goto T145;

@@ -25,7 +25,6 @@ static object LI2(object V2,object first,...)
 	bds_check;
 	{object V3;
 	object V4;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V3= V2;
@@ -147,7 +146,6 @@ static object LI6(object V20,object first,...)
 	bds_check;
 	{object V21;
 	object V22;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V21= V20;
@@ -192,7 +190,6 @@ static object LI7(object V26,object first,...)
 	bds_check;
 	{object V27;
 	object V28;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V27= V26;

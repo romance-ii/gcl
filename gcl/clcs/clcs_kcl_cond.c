@@ -252,7 +252,6 @@ static object LI6(object V28,object V27,object V26,object first,...)
 	object V30;
 	object V31;
 	object V32;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <3) too_few_arguments();
 	V29= V28;

@@ -61,7 +61,7 @@ static object LI14();
 #define VMV14 vs_reserve(4);
 #define VMR14(VMT14) vs_top=base ; return(VMT14);
 static object LI15(object,object,...);
-#define VMB15 register object *base=vs_top; object  V199 ,V198 ,V196 ,V190 ,V185; object Vcs[2];
+#define VMB15 register object *base=vs_top; object  V199 ,V198 ,V196 ,V190 ,V185;
 #define VMS15  register object *sup=vs_top+7;vs_top=sup;
 #define VMV15 vs_reserve(7);
 #define VMR15(VMT15) vs_top=base ; return(VMT15);

@@ -441,7 +441,6 @@ static object LI8(object V86,object first,...)
 	int narg = VFUN_NARGS; VMB8 VMS8 VMV8
 	{object V87;
 	object V88;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V87= V86;

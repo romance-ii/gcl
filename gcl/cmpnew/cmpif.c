@@ -1183,7 +1183,6 @@ static object LI15(object V179,object first,...)
 	int narg = VFUN_NARGS; VMB15 VMS15 VMV15
 	{object V180;
 	register object V181;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V180= V179;

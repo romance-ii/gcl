@@ -1575,7 +1575,6 @@ static object LI17(object V174,object first,...)
 	int narg = VFUN_NARGS; VMB14 VMS14 VMV14
 	{object V175;
 	object V176;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V175= V174;

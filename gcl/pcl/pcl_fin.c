@@ -54,7 +54,6 @@ static object LI2(object first,...)
 	va_list ap;
 	int narg = VFUN_NARGS; VMB2 VMS2 VMV2
 	{object V3;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	V4 = list_vector_new(narg,first,ap);

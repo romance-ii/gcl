@@ -834,7 +834,6 @@ static object LI23(object V123,object V122,object first,...)
 	{object V124;
 	object V125;
 	object V126;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V124= V123;
@@ -1022,7 +1021,6 @@ static object LI26(object V148,object V147,object V146,object V145,object V144,o
 	object V152;
 	object V153;
 	object V154;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <5) too_few_arguments();
 	V149= V148;
@@ -1348,7 +1346,6 @@ static object LI33(object V255,object V254,object V253,object first,...)
 	register object V257;
 	object V258;
 	register object V259;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <3) too_few_arguments();
 	V256= V255;

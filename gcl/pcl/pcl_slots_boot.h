@@ -102,7 +102,7 @@ static object LI37();
 #define VMV27 vs_check;
 #define VMR27(VMT27) vs_top=base ; return(VMT27);
 static object LI38(object,object,...);
-#define VMB28 register object *base=vs_top; object Vcs[2];
+#define VMB28 register object *base=vs_top;
 #define VMS28  register object *sup=vs_top+5;vs_top=sup;
 #define VMV28 vs_check;
 #define VMR28(VMT28) vs_top=base ; return(VMT28);

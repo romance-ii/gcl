@@ -128,7 +128,7 @@ static object LI25();
 #define VMV22 vs_check;
 #define VMR22(VMT22) vs_top=base ; return(VMT22);
 static object LI26(object,object,...);
-#define VMB23 register object *base=vs_top; object Vcs[2];
+#define VMB23 register object *base=vs_top;
 #define VMS23  register object *sup=vs_top+7;vs_top=sup;
 #define VMV23 vs_check;
 #define VMR23(VMT23) vs_top=base ; return(VMT23);

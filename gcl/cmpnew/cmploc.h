@@ -46,7 +46,7 @@ static object LI10();
 #define VMV10
 #define VMR10(VMT10) return(VMT10);
 static object LI11(object,object,...);
-#define VMB11 object  V40; object Vcs[2];
+#define VMB11 object  V40;
 #define VMS11
 #define VMV11
 #define VMR11(VMT11) return(VMT11);

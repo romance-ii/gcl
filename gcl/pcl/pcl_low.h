@@ -87,7 +87,7 @@ static object LI27();
 #define VMR25(VMT25) vs_top=base ; return(VMT25);
 #define VC26 object  V79 ,V78;
 static object LI29(object,object,object,...);
-#define VMB27 object  V85; object Vcs[3];
+#define VMB27 object  V85;
 #define VMS27
 #define VMV27
 #define VMR27(VMT27) return(VMT27);

@@ -25,7 +25,7 @@ static object LI7();
 #define VMV7 vs_reserve(1);
 #define VMR7(VMT7) vs_top=base ; return(VMT7);
 static object LI8(object,object,...);
-#define VMB8 register object *base=vs_top; object  V134 ,V133 ,V132 ,V131 ,V130 ,V129 ,V128 ,V123 ,V114 ,V106 ,V105 ,V104 ,V103 ,V102 ,V101 ,V96; object Vcs[2];
+#define VMB8 register object *base=vs_top; object  V134 ,V133 ,V132 ,V131 ,V130 ,V129 ,V128 ,V123 ,V114 ,V106 ,V105 ,V104 ,V103 ,V102 ,V101 ,V96;
 #define VMS8  register object *sup=vs_top+8;vs_top=sup;
 #define VMV8 vs_reserve(8);
 #define VMR8(VMT8) vs_top=base ; return(VMT8);

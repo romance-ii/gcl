@@ -1434,7 +1434,6 @@ static object LI38(object V199,object first,...)
 	int narg = VFUN_NARGS; VMB28 VMS28 VMV28
 	{register object V200;
 	register object V201;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V200= V199;

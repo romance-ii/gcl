@@ -13,7 +13,7 @@ static object LI5();
 #define VMV5
 #define VMR5(VMT5) return(VMT5);
 static object LI6(object,object,...);
-#define VMB6 register object *base=vs_top; object  V48 ,V47 ,V46 ,V45 ,V44 ,V37 ,V35 ,V34 ,V32 ,V30 ,V28; object Vcs[3];
+#define VMB6 register object *base=vs_top; object  V48 ,V47 ,V46 ,V45 ,V44 ,V37 ,V35 ,V34 ,V32 ,V30 ,V28;
 #define VMS6  register object *sup=vs_top+4;vs_top=sup;
 #define VMV6 vs_reserve(4);
 #define VMR6(VMT6) vs_top=base ; return(VMT6);

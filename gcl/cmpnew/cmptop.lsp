@@ -230,8 +230,8 @@
 			def
 		(*function-links* nil) *c-vars* (*volatile* " VOL ")
 		*vaddress-list* (*vind* 0)  *inits*
-		*current-form*)
-  (declare (special *current-form*))
+		*current-form* *vcs-used*)
+  (declare (special *current-form* *vcs-used*))
 
   (setq *top-level-forms* (reverse *top-level-forms*))
 
@@ -245,6 +245,7 @@
   ;; write all the inits.
   (dolist* (*current-form* *top-level-forms*)
 	   (setq *first-error* t)	   
+	   (setq *vcs-used* nil)
            (when (setq def (get (car *current-form*) 't2))
                  (apply def (cdr *current-form*))))
 
@@ -252,6 +253,7 @@
   ;;; C function definitions.
   (dolist* (*current-form* *top-level-forms*)
 	   (setq *first-error* t)	   
+	   (setq *vcs-used* nil)
            (when (setq def (get (car *current-form*) 't3))
                  (apply def (cdr *current-form*))))
 
@@ -262,17 +264,19 @@
           (when (endp *local-funs*) (return-from local-fun-process))
           (setq lf (car *local-funs*))
           (pop *local-funs*)
+	  (setq *vcs-used* nil)
           (apply 't3local-fun lf))))
 
   ;;; Global entries for directly called functions.
 
   (dolist* (x *global-entries*)
+	   (setq *vcs-used* nil)
            (apply 'wt-global-entry x))
   
   ;;; Fastlinks
   (dolist* (x *function-links*)
-	   (wt-function-link x)
-	   )
+	   (setq *vcs-used* nil)
+	   (wt-function-link x))
   #+sgi3d
   (progn
     (wt-nl1 "" "static void Init_Links () {")
@@ -857,7 +861,7 @@
 	  )
 
   ;;; Use Vcs for lint
-    (if *vararg-use-vs* t (progn (wt-nl "Vcs[0]=Vcs[0];")))
+  ;  (if *vararg-use-vs* t (progn (wt-nl "Vcs[0]=Vcs[0];")))
 
   ;;; start va_list at beginning
     (if (or (ll-optionals ll) (ll-rest ll) (ll-keywords-p ll))
@@ -1018,7 +1022,7 @@
 	       (wt-nl "parse_key_rest_new(" (list 'cvar rest-var) ","))
 	      (t (wt-nl "parse_key_new_new(")))
 	(if (eql 0 *cs*)(setq *cs* 1))
-	(wt "narg," (if *vararg-use-vs* "base " "Vcs ")
+	(wt "narg," (if *vararg-use-vs* "base " (progn (setq *vcs-used* t) "Vcs "))
 	    "+" key-offset",(struct key *)(void *)&LI" cfun "key,first,ap);")
 	
 	))
@@ -1100,6 +1104,7 @@
 ;;Macros for conditionally writing vs_base ..preamble, and for setting
 ;;up the return.
 (defun wt-V*-macros (cm return-type)
+  (declare (ignore return-type))
   (push (cons cm *max-vs*) *reservations*)
   (if (and (zerop *max-vs*) (not *sup-used*) (not *base-used*))
       ;;note if (proclaim '(function foo () t))
@@ -1700,7 +1705,7 @@
 	      ))
        ))
  (and *c-vars* (format *compiler-output2* ";"))
- (unless (eql *cs* 0)
+ (unless (or (not *vcs-used*) (eql *cs* 0))
 ;	 (format *compiler-output2* " object Vcs[~a]={Cnil" *cs*)
 ;	 (dotimes (temp (- *cs* 1) t) (format *compiler-output2* ",Cnil"))
 ;	 (format *compiler-output2* "};"))

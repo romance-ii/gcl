@@ -283,7 +283,6 @@ static object LI5(object V37,object V36,object V35,object V34,object V33,object 
 	object V42;
 	register object V43;
 	object V44;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <6) too_few_arguments();
 	V38= V37;

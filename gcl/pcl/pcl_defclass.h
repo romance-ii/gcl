@@ -8,7 +8,7 @@ static object LI3();
 #define VMV1 vs_check;
 #define VMR1(VMT1) vs_top=base ; return(VMT1);
 static object LI5(object,...);
-#define VMB2 register object *base=vs_top; object  V11; object Vcs[1];
+#define VMB2 register object *base=vs_top; object  V11;
 #define VMS2  register object *sup=vs_top+2;vs_top=sup;
 #define VMV2 vs_check;
 #define VMR2(VMT2) vs_top=base ; return(VMT2);

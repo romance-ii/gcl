@@ -407,7 +407,6 @@ static object LI11(object V37,object first,...)
 	int narg = VFUN_NARGS; VMB11 VMS11 VMV11
 	{object V38;
 	object V39;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V38= V37;

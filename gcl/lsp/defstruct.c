@@ -20,7 +20,6 @@ static object LI1(object V12,object V11,object V10,object V9,object V8,object V7
 	object V22;
 	object V23;
 	object V24;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <12) too_few_arguments();
 	V13= V12;
@@ -1349,7 +1348,6 @@ static object LI10(object V232,object V231,object V230,object V229,object V228,o
 	object V244;
 	object V245;
 	register object V246;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <13) too_few_arguments();
 	Vcs[0]=MMcons(V232,Cnil);
@@ -2182,7 +2180,6 @@ static object LI12(object first,...)
 	object V339;
 	object V340;
 	object V341;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{

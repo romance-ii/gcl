@@ -2,7 +2,7 @@
 static void L9();
 static void L12();
 static object LI1(object,object,...);
-#define VMB1 register object *base=vs_top; object  V18 ,V10; object Vcs[2];
+#define VMB1 register object *base=vs_top; object  V18 ,V10;
 #define VMS1 vs_top += 2;
 #define VMV1 vs_reserve(2);
 #define VMR1(VMT1) vs_top=base ; return(VMT1);
@@ -22,12 +22,12 @@ static object LI4();
 #define VMV4 vs_reserve(4);
 #define VMR4(VMT4) vs_top=base ; return(VMT4);
 static object LI5(object,object,object,...);
-#define VMB5 register object *base=vs_top; object  V67 ,V65; object Vcs[4];
+#define VMB5 register object *base=vs_top; object  V67 ,V65;
 #define VMS5 vs_top += 2;
 #define VMV5 vs_reserve(2);
 #define VMR5(VMT5) vs_top=base ; return(VMT5);
 static object LI6(object,...);
-#define VMB6 register object *base=vs_top; object  V75 ,V74 ,V71; object Vcs[1];
+#define VMB6 register object *base=vs_top; object  V75 ,V74 ,V71;
 #define VMS6 vs_top += 3;
 #define VMV6 vs_reserve(3);
 #define VMR6(VMT6) vs_top=base ; return(VMT6);
@@ -69,7 +69,7 @@ static object LI15();
 #define VMV15 vs_reserve(7);
 #define VMR15(VMT15) vs_top=base ; return(VMT15);
 static object LI16(object,object,object,object,...);
-#define VMB16 object Vcs[4];
+#define VMB16
 #define VMS16
 #define VMV16
 #define VMR16(VMT16) return(VMT16);

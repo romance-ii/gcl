@@ -11,8 +11,9 @@ gclcvs (2.7.0-1) unstable; urgency=low
     .1
   * fixup config.guess,sub rules in debian/rules
   * remove  windows/install.ansi.lsp (build generated file) from CVS
+  * Remove unused definitions of Vcs
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 22 Aug 2003 17:18:30 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue,  2 Sep 2003 20:33:23 +0000
 
 gcl (2.6.1-1) unstable; urgency=low
 

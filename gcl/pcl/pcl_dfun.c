@@ -505,7 +505,6 @@ static object LI5(object first,...)
 	va_list ap;
 	int narg = VFUN_NARGS; VMB5 VMS5 VMV5
 	{object V84;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{
@@ -568,7 +567,6 @@ static object LI7(object first,...)
 	va_list ap;
 	int narg = VFUN_NARGS; VMB7 VMS7 VMV7
 	{object V93;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{
@@ -609,7 +607,6 @@ static object LI9(object first,...)
 	va_list ap;
 	int narg = VFUN_NARGS; VMB9 VMS9 VMV9
 	{object V97;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{
@@ -650,7 +647,6 @@ static object LI11(object first,...)
 	va_list ap;
 	int narg = VFUN_NARGS; VMB11 VMS11 VMV11
 	{object V101;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{
@@ -691,7 +687,6 @@ static object LI13(object first,...)
 	va_list ap;
 	int narg = VFUN_NARGS; VMB13 VMS13 VMV13
 	{object V105;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{
@@ -732,7 +727,6 @@ static object LI15(object first,...)
 	va_list ap;
 	int narg = VFUN_NARGS; VMB15 VMS15 VMV15
 	{object V109;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{
@@ -774,7 +768,6 @@ static object LI17(object first,...)
 	int narg = VFUN_NARGS; VMB17 VMS17 VMV17
 	{object V113;
 	object V114;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{
@@ -819,7 +812,6 @@ static object LI19(object first,...)
 	{object V117;
 	object V118;
 	object V119;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{
@@ -865,7 +857,6 @@ static object LI21(object first,...)
 	int narg = VFUN_NARGS; VMB21 VMS21 VMV21
 	{object V122;
 	object V123;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{
@@ -913,7 +904,6 @@ static object LI23(object first,...)
 	object V131;
 	object V132;
 	object V133;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{
@@ -985,7 +975,6 @@ static object LI26(object first,...)
 	object V146;
 	object V147;
 	object V148;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{
@@ -1058,7 +1047,6 @@ static object LI29(object first,...)
 	{object V161;
 	object V162;
 	object V163;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{
@@ -1107,7 +1095,6 @@ static object LI31(object first,...)
 	int narg = VFUN_NARGS; VMB31 VMS31 VMV31
 	{object V172;
 	object V173;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{
@@ -1169,7 +1156,6 @@ static object LI34(object first,...)
 	va_list ap;
 	int narg = VFUN_NARGS; VMB34 VMS34 VMV34
 	{object V181;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{
@@ -1211,7 +1197,6 @@ static object LI36(object first,...)
 	va_list ap;
 	int narg = VFUN_NARGS; VMB36 VMS36 VMV36
 	{object V186;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{
@@ -2188,7 +2173,6 @@ static object LI58(object V302,object first,...)
 	va_list ap;
 	int narg = VFUN_NARGS; VMB57 VMS57 VMV57
 	{register object V303;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V303= V302;
@@ -2434,7 +2418,6 @@ static object LI61(object V328,object first,...)
 	int narg = VFUN_NARGS; VMB60 VMS60 VMV60
 	{object V329;
 	object V330;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V329= V328;
@@ -2733,7 +2716,6 @@ static object LI69(object V359,object V358,object V357,object V356,object first,
 	object V362;
 	object V363;
 	object V364;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <4) too_few_arguments();
 	V360= V359;
@@ -3363,7 +3345,6 @@ static object LI76(object V445,object first,...)
 	int narg = VFUN_NARGS; VMB74 VMS74 VMV74
 	{object V446;
 	object V447;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V446= V445;
@@ -6931,7 +6912,6 @@ static object LI125(object V889,object V888,object V887,object V886,object V885,
 	register object V894;
 	object V895;
 	register object V896;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <5) too_few_arguments();
 	Vcs[0]=MMcons(V889,Cnil);
@@ -7162,7 +7142,6 @@ static object LI128(object V949,object V948,object first,...)
 	{object V950;
 	object V951;
 	object V952;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V950= V949;
@@ -7257,7 +7236,6 @@ static object LI130(object V963,object first,...)
 	object V965;
 	object V966;
 	object V967;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V964= V963;

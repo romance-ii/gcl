@@ -9,7 +9,6 @@ static object LI1(object first,...)
 	va_list ap;
 	int narg = VFUN_NARGS; VMB1 VMS1 VMV1
 	bds_check;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg = narg - 0;
 	if (narg <= 0) goto T1;

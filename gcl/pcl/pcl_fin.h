@@ -9,7 +9,7 @@ static void L12();
 static void L13();
 #define VC1
 static object LI2(object,...);
-#define VMB2 register object *base=vs_top; object  V4; object Vcs[1];
+#define VMB2 register object *base=vs_top; object  V4;
 #define VMS2  register object *sup=vs_top+1;vs_top=sup;
 #define VMV2 vs_check;
 #define VMR2(VMT2) vs_top=base ; return(VMT2);

@@ -32,7 +32,6 @@ static object LI2(object V4,object first,...)
 	bds_check;
 	{object V5;
 	object V6;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V5= V4;

@@ -153,7 +153,6 @@ static object LI3(object V18,object first,...)
 	object V26;
 	object V27;
 	object V28;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V19= V18;
@@ -343,7 +342,6 @@ static object LI6(object first,...)
 	va_list ap;
 	int narg = VFUN_NARGS; VMB6 VMS6 VMV6
 	{object V53;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	V54 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));
@@ -401,7 +399,6 @@ static object LI8(object V64,object first,...)
 	int narg = VFUN_NARGS; VMB8 VMS8 VMV8
 	{register object V65;
 	object V66;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V65= V64;
@@ -469,7 +466,6 @@ static object LI9(object V76,object first,...)
 	int narg = VFUN_NARGS; VMB9 VMS9 VMV9
 	{register object V77;
 	object V78;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V77= V76;
@@ -515,7 +511,6 @@ static object LI10(object V87,object first,...)
 	int narg = VFUN_NARGS; VMB10 VMS10 VMV10
 	{object V88;
 	object V89;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V88= V87;
@@ -545,7 +540,6 @@ static object LI11(object V93,object first,...)
 	int narg = VFUN_NARGS; VMB11 VMS11 VMV11
 	{object V94;
 	object V95;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V94= V93;
@@ -576,7 +570,6 @@ static object LI12(object V100,object V99,object first,...)
 	{object V101;
 	object V102;
 	object V103;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V101= V100;
@@ -613,7 +606,6 @@ static object LI13(object V106,object V105,object first,...)
 	{object V107;
 	object V108;
 	object V109;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V107= V106;
@@ -650,7 +642,6 @@ static object LI14(object V112,object V111,object first,...)
 	{object V113;
 	object V114;
 	object V115;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V113= V112;
@@ -687,7 +678,6 @@ static object LI15(object V118,object V117,object first,...)
 	{object V119;
 	object V120;
 	object V121;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V119= V118;
@@ -724,7 +714,6 @@ static object LI16(object V124,object V123,object first,...)
 	{object V125;
 	object V126;
 	object V127;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V125= V124;
@@ -761,7 +750,6 @@ static object LI17(object V130,object V129,object first,...)
 	{object V131;
 	object V132;
 	object V133;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V131= V130;
@@ -798,7 +786,6 @@ static object LI18(object V136,object V135,object first,...)
 	{object V137;
 	object V138;
 	object V139;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V137= V136;
@@ -835,7 +822,6 @@ static object LI19(object V142,object V141,object first,...)
 	{object V143;
 	object V144;
 	object V145;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V143= V142;
@@ -872,7 +858,6 @@ static object LI20(object V148,object V147,object first,...)
 	{object V149;
 	object V150;
 	object V151;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V149= V148;
@@ -909,7 +894,6 @@ static object LI21(object V154,object V153,object first,...)
 	{object V155;
 	object V156;
 	object V157;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V155= V154;
@@ -945,7 +929,6 @@ static object LI22(object V159,object first,...)
 	int narg = VFUN_NARGS; VMB22 VMS22 VMV22
 	{object V160;
 	object V161;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V160= V159;
@@ -1018,7 +1001,6 @@ static object LI24(object V172,object V171,object first,...)
 	{object V173;
 	register object V174;
 	object V175;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V173= V172;
@@ -1156,7 +1138,6 @@ static object LI26(object V192,object V191,object first,...)
 	object V200;
 	object V201;
 	object V202;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V193= V192;

@@ -53,7 +53,6 @@ static object LI2(object V12,object V11,object first,...)
 	register object V15;
 	register object V16;
 	register object V17;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	V13= V12;
 	V14= V11;
@@ -144,7 +143,6 @@ static object LI3(object V26,object V25,object first,...)
 	register object V29;
 	register object V30;
 	register object V31;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	V27= V26;
 	V28= V25;
@@ -235,7 +233,6 @@ static object LI4(object V39,object V38,object first,...)
 	register object V42;
 	register object V43;
 	register object V44;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	V40= V39;
 	V41= V38;
@@ -307,7 +304,6 @@ static object LI5(object V50,object V49,object first,...)
 	register object V53;
 	register object V54;
 	register object V55;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	V51= V50;
 	V52= V49;
@@ -395,7 +391,6 @@ static object LI6(object V62,object V61,object first,...)
 	register object V65;
 	register object V66;
 	register object V67;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	V63= V62;
 	V64= V61;
@@ -537,7 +532,6 @@ static object LI8(object V81,object V80,object first,...)
 	register object V84;
 	register object V85;
 	register object V86;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	V82= V81;
 	V83= V80;
@@ -711,7 +705,6 @@ static object LI10(object V102,object V101,object first,...)
 	object V105;
 	object V106;
 	object V107;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	V103= V102;
 	V104= V101;
@@ -772,7 +765,6 @@ static object LI11(object V114,object V113,object first,...)
 	register object V117;
 	register object V118;
 	register object V119;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	V115= V114;
 	V116= V113;
@@ -917,7 +909,6 @@ static object LI12(object V132,object V131,object first,...)
 	register object V135;
 	register object V136;
 	register object V137;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	V133= V132;
 	V134= V131;

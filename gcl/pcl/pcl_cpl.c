@@ -30,7 +30,6 @@ static object LI2(object first,...)
 	object V11;
 	object V12;
 	object V13;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{
@@ -401,7 +400,6 @@ static object LI10(object V86,object V85,object first,...)
 	{object V87;
 	object V88;
 	object V89;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V87= V86;

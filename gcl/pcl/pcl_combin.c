@@ -347,7 +347,6 @@ static object LI5(object V48,object V47,object first,...)
 	int narg = VFUN_NARGS; VMB5 VMS5 VMV5
 	{object V49;
 	object V50;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	Vcs[0]=MMcons(V48,Cnil);
@@ -412,7 +411,6 @@ static object LI6(object V54,object V53,object first,...)
 	object V58;
 	object V59;
 	object V60;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V55= V54;
@@ -639,7 +637,6 @@ static object LI9(object V85,object V84,object first,...)
 	{object V86;
 	object V87;
 	object V88;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V86= V85;

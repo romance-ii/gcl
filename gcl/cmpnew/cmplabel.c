@@ -115,7 +115,6 @@ static object LI6(object V16,object first,...)
 	{register object V17;
 	object V18;
 	object V19;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V17= V16;

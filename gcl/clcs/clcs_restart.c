@@ -357,7 +357,6 @@ static object LI13(object first,...)
 	va_list ap;
 	int narg = VFUN_NARGS; VMB13 VMS13 VMV13
 	{object V43;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg = narg - 0;
 	if (narg <= 0) goto T70;
@@ -476,7 +475,6 @@ static object LI16(object first,...)
 	object V54;
 	object V55;
 	object V56;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{
@@ -778,7 +776,6 @@ static object LI27(object V96,object first,...)
 	int narg = VFUN_NARGS; VMB26 VMS26 VMV26
 	{register object V97;
 	object V98;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V97= V96;

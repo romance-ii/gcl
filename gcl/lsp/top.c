@@ -680,7 +680,6 @@ static object LI5(object V30,object first,...)
 	bds_check;
 	{object V31;
 	object V32;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	V31= V30;
 	narg= narg - 1;
@@ -746,7 +745,6 @@ static object LI6(object V42,object V41,object V40,object V39,object V38,object 
 	object V46;
 	register object V47;
 	register object V48;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	V43= V42;
 	V44= V41;
@@ -932,7 +930,6 @@ static object LI7(object first,...)
 	bds_check;
 	{object V56;
 	object V57;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg = narg - 0;
 	if (narg <= 0) goto T391;

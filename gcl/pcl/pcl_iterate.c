@@ -1054,7 +1054,6 @@ static object LI10(object V159,object first,...)
 	int narg = VFUN_NARGS; VMB9 VMS9 VMV9
 	{register object V160;
 	object V161;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V160= V159;
@@ -1375,7 +1374,6 @@ static object LI15(object V217,object first,...)
 	int narg = VFUN_NARGS; VMB14 VMS14 VMV14
 	{object V218;
 	object V219;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V218= V217;

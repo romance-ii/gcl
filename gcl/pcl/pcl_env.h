@@ -31,7 +31,7 @@ static object LI11();
 #define VC12 object  V157;
 #define VC13 object  V170;
 static object LI17(object,object,...);
-#define VMB14 register object *base=vs_top; object  V183 ,V177; object Vcs[2];
+#define VMB14 register object *base=vs_top; object  V183 ,V177;
 #define VMS14  register object *sup=vs_top+7;vs_top=sup;
 #define VMV14 vs_check;
 #define VMR14(VMT14) vs_top=base ; return(VMT14);

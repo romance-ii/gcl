@@ -59,6 +59,7 @@
   (cond ((eq (car vs) 'cvar)
 	 (wt "V" (second vs)))
 	((eq (car vs) 'cs)
+	 (setq *vcs-used* t)
 	 (wt "Vcs[" (cdr vs) "]"))
 	(t
 	 (if (= (car vs) *level*)

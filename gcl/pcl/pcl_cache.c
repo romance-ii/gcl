@@ -170,7 +170,6 @@ static object LI9(object first,...)
 	object V28;
 	object V29;
 	object V30;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	{
@@ -839,7 +838,6 @@ static object LI30(object V120,object first,...)
 	int narg = VFUN_NARGS; VMB30 VMS30 VMV30
 	{object V121;
 	object V122;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V121= V120;
@@ -1271,7 +1269,6 @@ static object LI39(object V221,object V220,object first,...)
 	{register object V222;
 	long V223;
 	object V224;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V222= V221;
@@ -1635,7 +1632,6 @@ static object LI45(object V297,object V296,object first,...)
 	{object V298;
 	register long V299;
 	object V300;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V298= V297;
@@ -2081,7 +2077,6 @@ static object LI55(object V397,object V396,object V395,object first,...)
 	object V399;
 	object V400;
 	object V401;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <3) too_few_arguments();
 	V398= V397;
@@ -2513,7 +2508,6 @@ static object LI62(object V510,object V509,object V508,object first,...)
 	register object V512;
 	object V513;
 	object V514;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <3) too_few_arguments();
 	V511= V510;
@@ -2840,7 +2834,6 @@ static object LI65(object V571,object V570,object first,...)
 	object V573;
 	object V574;
 	object V575;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V572= V571;
@@ -3062,7 +3055,6 @@ static object LI66(object V619,object V618,object first,...)
 	{object V620;
 	object V621;
 	object V622;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V620= V619;

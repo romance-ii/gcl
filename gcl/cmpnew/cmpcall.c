@@ -10,7 +10,6 @@ static object LI1(object V1,object first,...)
 	int narg = VFUN_NARGS; VMB1 VMS1 VMV1
 	{register object V2;
 	object V3;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V2= V1;
@@ -392,7 +391,6 @@ static object LI5(object V55,object V54,object first,...)
 	register object V57;
 	register object V58;
 	object V59;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V56= V55;
@@ -526,7 +524,6 @@ static object LI6(object first,...)
 	va_list ap;
 	int narg = VFUN_NARGS; VMB6 VMS6 VMV6
 	{register object V70;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg= narg - 0;
 	V71 = list_vector_new(narg,first,ap);
@@ -1523,7 +1520,6 @@ static object LI16(object V204,object V203,object V202,object first,...)
 	object V206;
 	object V207;
 	object V208;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <3) too_few_arguments();
 	V205= V204;

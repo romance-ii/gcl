@@ -223,7 +223,7 @@ static object LI46();
 #define VMV46
 #define VMR46(VMT46) return(VMT46);
 static object LI47(object,...);
-#define VMB47 register object *base=vs_top; object  V75; object Vcs[3];
+#define VMB47 register object *base=vs_top; object  V75;
 #define VMS47  register object *sup=vs_top+7;vs_top=sup;
 #define VMV47 vs_reserve(7);
 #define VMR47(VMT47) vs_top=base ; return(VMT47);

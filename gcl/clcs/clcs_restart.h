@@ -66,7 +66,7 @@ static object LI12();
 #define VMV12
 #define VMR12(VMT12) return(VMT12);
 static object LI13(object,...);
-#define VMB13 register object *base=vs_top; object  V47 ,V44; object Vcs[1];
+#define VMB13 register object *base=vs_top; object  V47 ,V44;
 #define VMS13  register object *sup=vs_top+3;vs_top=sup;
 #define VMV13 vs_reserve(3);
 #define VMR13(VMT13) vs_top=base ; return(VMT13);
@@ -121,7 +121,7 @@ static object LI24();
 #define VC24
 #define VC25 object  V95 ,V91;
 static object LI27(object,object,...);
-#define VMB26 register object *base=vs_top; object  V109 ,V103; object Vcs[2];
+#define VMB26 register object *base=vs_top; object  V109 ,V103;
 #define VMS26 vs_top += 2;
 #define VMV26 vs_reserve(2);
 #define VMR26(VMT26) vs_top=base ; return(VMT26);

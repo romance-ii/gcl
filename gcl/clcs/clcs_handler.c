@@ -161,7 +161,6 @@ static object LI8(object V13,object first,...)
 	bds_check;
 	{object V14;
 	object V15;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V14= V13;
@@ -355,7 +354,6 @@ static object LI11(object V34,object V33,object first,...)
 	int narg = VFUN_NARGS; VMB11 VMS11 VMV11
 	bds_check;
 	{VOL object V35;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	Vcs[0]=MMcons(V34,Cnil);
@@ -422,7 +420,6 @@ static object LI12(object first,...)
 	bds_check;
 	{VOL object V44;
 	VOL object V45;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg = narg - 0;
 	if (narg <= 0) goto T115;
@@ -498,7 +495,6 @@ static object LI13(object V53,object first,...)
 	bds_check;
 	{VOL object V54;
 	VOL object V55;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V54= V53;

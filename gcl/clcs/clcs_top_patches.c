@@ -111,7 +111,6 @@ static object LI6(object V9,object first,...)
 	bds_check;
 	{VOL object V10;
 	VOL object V11;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V10= V9;
@@ -582,7 +581,6 @@ static object LI8(object first,...)
 	va_list ap;
 	int narg = VFUN_NARGS; VMB8 VMS8 VMV8
 	{object V49;
-	Vcs[0]=Vcs[0];
 	va_start(ap,first);
 	narg = narg - 0;
 	if (narg <= 0) goto T234;

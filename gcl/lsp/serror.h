@@ -33,7 +33,7 @@ static void L31();
 #define VC2 object  V17 ,V16 ,V15 ,V12 ,V11 ,V10;
 #define VC3 object  V23 ,V22 ,V21 ,V20;
 static object LI4(object,...);
-#define VMB4 register object *base=vs_top; object  V32 ,V31 ,V25; object Vcs[1];
+#define VMB4 register object *base=vs_top; object  V32 ,V31 ,V25;
 #define VMS4  register object *sup=vs_top+13;vs_top=sup;
 #define VMV4 vs_reserve(13);
 #define VMR4(VMT4) vs_top=base ; return(VMT4);
