@@ -49,6 +49,7 @@ which is usually 60 maybe 100 or something else. */
 #endif
 #ifdef __MINGW32__
 #include <sys/timeb.h>
+int usleep ( unsigned int microseconds );
 #endif
 
 #ifdef BSD
@@ -190,3 +191,12 @@ init_unixtime(void)
 	make_function("SLEEP", Lsleep);
 	make_function("GET-INTERNAL-RUN-TIME", Lget_internal_run_time);
 }
+
+#ifdef __MINGW32__
+#include <windows.h>
+int usleep ( unsigned int microseconds )
+{
+    unsigned int milliseconds = microseconds / 1000;
+    return ( SleepEx ( milliseconds, TRUE ) );
+}
+#endif
