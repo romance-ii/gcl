@@ -1,6 +1,7 @@
 SPECIAL_RSYM = rsym.c
 
 LIBC	= -lc
+LIBGCLP = libgclp.a
 -include ../makedefs
 
 HDIR	= ../h
@@ -101,12 +102,12 @@ $(RSYM): $(SPECIAL_RSYM) $(HDIR)/mdefs.h
 $(HDIR)/mdefs.h: $(HDIR)/include.h
 	cat $(HDIR)/include.h | sed -e "/include/d" > $(HDIR)/mdefs.h
 
-libgcl.a: $(OBJS) $(LSPOBJS) $(CMPOBJS) sys_gcl.o gmpfiles bfdfiles
+libgcl.a: $(FIRST_FILE) $(OBJS) $(LSPOBJS) $(CMPOBJS) sys_gcl.o $(LAST_FILE) gmpfiles bfdfiles
 	rm -rf $@
 	ar rs $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
-raw_$(SYSTEM): libgcl.a libgclp.a $(SYSTEM_OBJS)
-	$(CC) -o raw_$(SYSTEM)$(EXE) $(FIRST_FILE) $(filter %.o,$^) $(LAST_FILE) -L. $(LD_LIBS)
+raw_$(SYSTEM): libgcl.a $(LIBGCLP) $(SYSTEM_OBJS)
+	$(CC) -o raw_$(SYSTEM)$(EXE) $(filter %.o,$^) -L. $(LD_LIBS)
 
 sys_gcl.o: sys_gcl.c $(HDIR)/object.h $(HDIR)/config.h
 	$(CC) $(CFLAGS) -c -I$(HDIR) sys_gcl.c
