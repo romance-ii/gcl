@@ -614,7 +614,7 @@ EXTER object sLsimple_base_string,sLsimple_condition,sLsimple_type_error,sLsimpl
 EXTER object sLstandard_generic_function,sLstandard_method,sLstandard_object,sLstorage_condition;
 EXTER object sLstream_error,sLstring_stream,sLstructure_class,sLstyle_warning,sLsynonym_stream;
 EXTER object sLtwo_way_stream,sLtype_error,sLunbound_slot,sLunbound_variable,sLundefined_function,sLwarning;
-EXTER object sLmethod_combination,sLstructure_object;
+EXTER object sLmethod_combination,sLstructure_object,sLdynamic_extent;
 #endif
 
 EXTER object sLsatisfies;

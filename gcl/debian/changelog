@@ -15,8 +15,9 @@ gclcvs (2.7.0-37) unstable; urgency=low
   * Fix incf/decf bug
   * enhanced support for multiple value inlining
   * Better packlib number bounds
+  * boolean and dynamic-extent declaration type support
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 21 Dec 2004 04:51:00 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 27 Dec 2004 22:06:49 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 

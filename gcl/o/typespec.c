@@ -571,6 +571,7 @@ DEF_ORDINARY("UNBOUND-SLOT",sLunbound_slot,LISP,"");
 DEF_ORDINARY("UNBOUND-VARIABLE",sLunbound_variable,LISP,"");
 DEF_ORDINARY("UNDEFINED-FUNCTION",sLundefined_function,LISP,"");
 DEF_ORDINARY("WARNING",sLwarning,LISP,"");
+DEF_ORDINARY("DYNAMIC-EXTENT",sLdynamic_extent,LISP,"");
 #endif
 
 DEFCONST("CHAR-SIZE",sSchar_size,SI,small_fixnum(CHAR_SIZE),"Size in bits of a character");

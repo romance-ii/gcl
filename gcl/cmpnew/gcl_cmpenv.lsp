@@ -473,15 +473,20 @@
 					  decl var)
 				   (push (cons var  'register) ts)
 				   ))
+			((:dynamic-extent dynamic-extent)
+			 (dolist** (var (cdr decl))
+				   (cmpck (not (symbolp var))
+					  "The type declaration ~s contains a non-symbol ~s."
+					  decl var)
+				   (push (cons var :dynamic-extent) ts)))
 			((fixnum character double-float short-float array atom bignum bit
 				 bit-vector common compiled-function complex cons float hash-table
 				 integer keyword list long-float nil null number package pathname
 				 random-state ratio rational readtable sequence simple-array
 				 simple-bit-vector simple-string simple-vector single-float
-				 standard-char stream string string-char symbol t vector
-				 signed-byte unsigned-byte :dynamic-extent)
-			 (let ((type (if (eq stype ':dynamic-extent) stype
-				       (type-filter stype))))
+				 standard-char stream string string-char symbol t vector boolean
+				 signed-byte unsigned-byte)
+			 (let ((type (type-filter stype)))
 			   (when type
 			     (dolist** (var (cdr decl))
 				       (cmpck (not (symbolp var))
