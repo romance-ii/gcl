@@ -175,6 +175,7 @@ install1:
 	rm -f $(DESTDIR)$(prefix)/bin/gcl.exe
 	tar cf - $(PORTDIR)/$(FLISP)$(EXE) info/*.info* $(LISP_LIB) \
 	$(TCL_EXES)  |  (cd $(DESTDIR)$(INSTALL_LIB_DIR) ;tar xf -)
+	if gcc --version | grep -q -i mingw ; then if grep -q -i oncrpc makedefs ; then cp /mingw/bin/oncrpc.dll $(DESTDIR)$(INSTALL_LIB_DIR)/$(PORTDIR); fi ; fi
 	cd $(DESTDIR)$(INSTALL_LIB_DIR)/$(PORTDIR) && \
 		mv $(FLISP)$(EXE) temp$(EXE) && \
 		echo "(setq si::*system-directory* \"$(INSTALL_LIB_DIR)/$(PORTDIR)\")(si::save-system \"$(FLISP)$(EXE)\")" | ./temp$(EXE) && \
@@ -195,7 +196,7 @@ install1:
 	if test "$(INFO_DIR)" != "unknown"; then (cd info ; $(MAKE) ; $(MAKE) install DESTDIR=$(DESTDIR)) ; fi
 	if gcc --version | grep -q -i mingw ; then cp COPYING.LIB-2.0 readme-bin.mingw $(prefix) ; fi
 	if gcc --version | grep -q -i mingw ; then cp gcl.ico $(prefix)/bin ; fi
-	if gcc --version | grep -q -i mingw ; then rm -rf $(prefix)/install; mkdir $(prefix)/install ; cp windows/install.lsp $(prefix)/install ;fi
+	if gcc --version | grep -q -i mingw ; then rm -rf $(prefix)/install; mkdir $(prefix)/install ; cp windows/install.lsp $(prefix)/install ; cp windows/sysdir.bat $(prefix)/bin ; fi
 	if gcc --version | grep -q -i mingw ; then rm -rf $(prefix)/doc; mkdir $(prefix)/doc; cp info/*.html $(prefix)/doc ; fi
 
 clean:
@@ -220,6 +221,7 @@ clean:
 	rm -f h/*-linux.defs h/bfd.h h/bfdlink.h h/ansidecl.h h/symcat.h
 	rm -f windows/gcl.iss bin/gcl.bat windows/gcl.ansi.iss windows/install.ansi.lsp \
 		windows/install.lsp
+	rm -rf windows/Output
 	rm -f ansi-tests/test_results ansi-tests/gazonk* \
 		ansi-tests/generated-eval-when-test-file.lisp
 	rm -f config.log config.cache config.status
