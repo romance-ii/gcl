@@ -120,9 +120,10 @@ integer_exact_quotient(object x,object y,int in_place) {
 static object
 ratio_op_with_cancellation(object a,object b,object c,object d,object (*op)(object,object)) {
 
-  object bo,g,t,g1,r;
+  object b0,d0g,t,g1,r;
   
-  bo=b;
+  b0=b;
+  d0=d;
 
   g=get_gcd(b,d);
   
@@ -133,8 +134,8 @@ ratio_op_with_cancellation(object a,object b,object c,object d,object (*op)(obje
   
   g1=get_gcd(t,g);
     
-  t=integer_exact_quotient(t,g1,1);
-  b=integer_exact_quotient(bo,g1,0);
+  t=integer_exact_quotient(t,g1,t!=a&&t!=b0&&t!=c&&t!=d0);
+  b=integer_exact_quotient(b0,g1,0);
 
   b=number_times(b,d);
   
@@ -891,7 +892,7 @@ get_gcd(object x, object y)
 {
 	object	r;
 
-	if (x==small_fixnum(1) || x==small_fixnum(1))
+	if (x==small_fixnum(1) || y==small_fixnum(1))
 	  return small_fixnum(1);
 
 	if (number_minusp(x))

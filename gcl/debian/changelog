@@ -5,8 +5,10 @@ gclcvs (2.7.0-32) unstable; urgency=low
   * Optimize some ratio calculations by advance call of get_gcd, also
     bring forward gmp functions mpz_divexact and mpz_divexact_ui
   * lisp-implementation-version reports GCL instead of Kyoto Common Lisp
+  * Fix typo in get_gcd in num_arith.c; safer in_place checking in
+    ratio_op_with_cancellation
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 20 Aug 2004 22:02:48 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 23 Aug 2004 16:16:12 +0000
 
 gclcvs (2.7.0-31) unstable; urgency=high
 
