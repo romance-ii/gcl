@@ -209,7 +209,8 @@ clean:
 	rm -rf $(GMPDIR)/.deps $(GMPDIR)/libgmp.a
 	rm -f xbin/gcl foo foo.c bin/gclm.bat gmp_all
 	rm -f h/*-linux.defs h/bfd.h h/bfdlink.h h/ansidecl.h h/symcat.h
-	rm -f windows/gcl.iss bin/gcl.bat windows/gcl.ansi.iss windows/install.ansi.lsp
+	rm -f windows/gcl.iss bin/gcl.bat windows/gcl.ansi.iss windows/install.ansi.lsp \
+		windows/install.lsp
 	rm -f ansi-tests/test_results ansi-tests/gazonk*lsp
 	rm -f config.log config.cache config.status
 	-cd binutils/bfd && $(MAKE) distclean
