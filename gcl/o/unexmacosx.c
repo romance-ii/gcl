@@ -421,7 +421,7 @@ build_region_list ()
 }
 
 
-#define MAX_UNEXEC_REGIONS 30
+#define MAX_UNEXEC_REGIONS 256
 
 int num_unexec_regions;
 vm_range_t unexec_regions[MAX_UNEXEC_REGIONS];
@@ -756,11 +756,11 @@ copy_data_segment (struct load_command *lc)
       
       if (sc.vmaddr == (unsigned long) mach_mapstart && sc.vmsize == (mach_maplimit - mach_mapstart)) {
       #ifdef VERBOSE
-        printf ("old sc.filesize = %lx (heap size)\n",sc.filesize);
+	/* printf ("old sc.filesize = %lx (heap size)\n",sc.filesize); */
       #endif
         sc.filesize -= (mach_maplimit - mach_brkpt);
       #ifdef VERBOSE
-        printf ("new sc.filesize = %lx (actual heap size)\n",sc.filesize);
+        /* printf ("new sc.filesize = %lx (actual heap size)\n",sc.filesize); */
       #endif
       }
       
@@ -958,8 +958,13 @@ add_marked_regions ()
     num_unexec_regions = 0;
     
     for (n=0 ; n < num_marked_regions ; n++) {
-        printf ("marked regions %#8x (sz: %#8x)\n", marked_regions[n].address, marked_regions[n].size);
+      if (num_marked_regions < MAX_UNEXEC_REGIONS) {
+     /* printf ("marked regions %#8x (sz: %#8x)\n", marked_regions[n].address, marked_regions[n].size); */
         unexec_regions[num_unexec_regions++] = marked_regions[n];
+      } else {
+	fprintf (stderr, "warning: too many unexec regions\n");
+	fflush (stderr);
+      }
     }
 }
 
@@ -1012,8 +1017,10 @@ static size_t stub_size (malloc_zone_t *zone, const void *ptr)
     object *p;
     
     for (p = &malloc_list ; *p && !endp(*p) ; p = &((*p)->c.c_cdr)) {
-        if ((*p)->c.c_car->st.st_self == ptr) {
-            return ((*p)->c.c_car->st.st_dim);
+        size_t size = (*p)->c.c_car->st.st_dim;
+        void *base = (*p)->c.c_car->st.st_self;  
+        if (ptr >= base && ptr < base + size) {
+            return (size);
         }
     }
     return (0);
