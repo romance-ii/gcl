@@ -72,40 +72,42 @@ mp_nand_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 void
 mp_nor_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
-     mpz_ior(u,u,j);
-     mpz_com(u,i);
+/*      mpz_ior(u,u,j); */
+/*      mpz_com(u,i); */
+     mpz_ior(u,i,j);
+     mpz_com(u,u);
      /* (~(i | j)); */
 }
 
 void
 mp_andc1_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
-     mpz_com(u,i);
-     mpz_and(u,u,j);
+     mpz_com(i,i);
+     mpz_and(u,i,j);
 	/* ((~i) & j); */
 }
 
 void
 mp_andc2_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
-      mpz_com(u,j);
-      mpz_and(u,u,i);
+      mpz_com(j,j);
+      mpz_and(u,i,j);
 	/* (i & (~j));*/
 }
 
 void
 mp_orc1_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
-   mpz_com(u,i);
-   mpz_ior(u,u,j);
+   mpz_com(i,i);
+   mpz_ior(u,i,j);
 /*	((~i) | j); */
 }
 
 void
 mp_orc2_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
-    mpz_com(u,j);
-    mpz_ior(u,u,i);
+    mpz_com(j,j);
+    mpz_ior(u,i,j);
 	/* (i | (~j)); */
 }
 

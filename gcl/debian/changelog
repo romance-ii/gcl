@@ -3,8 +3,9 @@ gcl (2.5.0.cvs20020625-71) unstable; urgency=high
   * ansi changes to sloop.lsp and conditions.lisp to fix symbol tests
   * :definition-before-pcl -> definition-before-pcl
   * Allow spaces in pathnames
+  * Significant fixes to gmp_num_log.c affecting bitwise ops on bignums
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 18 Dec 2002 21:04:30 -0500
+ -- Camm Maguire <camm@enhanced.com>  Wed, 18 Dec 2002 23:12:12 -0500
 
 gcl (2.5.0.cvs20020625-70) unstable; urgency=high
 
