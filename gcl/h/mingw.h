@@ -201,6 +201,8 @@ extern DBEGIN_TY _stacktop, _stackbottom;
 /* #define WRITEC_NEWLINE(strm) (writec_stream('\r',strm),\ */
 /*                          writec_stream('\n', strm)) */
 
+#define DOES_CRLF
+
 extern char *GCLExeName ( void );
 #define GET_FULL_PATH_SELF(a_) do {\
    (a_)=GCLExeName();\
