@@ -334,6 +334,9 @@ case $canonical in
      mips-*-linux*)
      use=mips-linux;;
 
+     mipsel-*-linux*)
+     use=mipsel-linux;;
+
      sparc-*-linux*)
      use=sparc-linux;;
 
@@ -843,8 +846,8 @@ rm -f makedefsafter
 if test $use_gmp = yes ; then
  AC_MSG_CHECKING([use_gmp=yes, doing configure in gmp directory])
  case "${canonical}" in
-   i[[5-9]]86* | pentium* | k6* | athlon*)
-      (cd gmp ; ./configure --target=i486) ;;
+#   i[[5-9]]86* | pentium* | k6* | athlon*)
+#      (cd gmp ; ./configure --target=i486) ;;
    *)
       (cd gmp ; ./configure) ;;
  esac
