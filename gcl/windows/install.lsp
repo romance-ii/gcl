@@ -60,10 +60,10 @@
       (kill-double-forwards (kill-backs (subseq *system-directory* 0 (- (length *msys-system-directory*) 23)))))
 
 (setq *lib-directory* 
-      (format nil "~a~a" *root-directory* "lib/gcl-2.5.2/"))
+      (format nil "~a~a" *root-directory* "lib/gcl-2.5.4/"))
 
 (setq *h-directory* 
-      (format nil "~a~a" *msys-root-directory* "/lib/gcl-2.5.2/h"))
+      (format nil "~a~a" *msys-root-directory* "/lib/gcl-2.5.4/h"))
 
 (setq *bin-directory* 
       (format nil "~a~a" *root-directory* "bin/"))
@@ -85,7 +85,7 @@
       (subseq *dos-system-directory* 0 (- (length *dos-system-directory*) 23)))
 
 (setq *dos-h-directory* 
-      (format nil "~a~a" *dos-root-directory* "lib\\gcl-2.5.2\\h"))
+      (format nil "~a~a" *dos-root-directory* "lib\\gcl-2.5.4\\h"))
 
 (setq *dos-bin-directory* 
       (format nil "~a~a" *dos-root-directory* "bin\\"))

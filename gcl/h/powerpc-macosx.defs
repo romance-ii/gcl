@@ -1,0 +1,15 @@
+#
+# For MacOS X
+#
+
+# Disable Apple's custom C preprocessor which gets confused when
+# preprocessing some of the *.d files in the o/ subdirectory.
+CC = gcc -no-cpp-precomp
+
+# Set this to avoid warnings when linking against libncurses.
+LIBS = -lSystem -lreadline -ldl
+
+# Set this for the linker to operate correctly.
+MACOSX_DEPLOYMENT_TARGET = 10.2
+
+LDCC = ld -X -seglinkedit -segprot __TEXT rwx rwx /lib/crt0.o 
