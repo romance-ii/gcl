@@ -28,7 +28,7 @@ is usually 4K or 8K bytes.  From 1 to 3 bytes per page are
 preallocated in a table at compile time.  this must be a power of 2 if
 SGC is enabled.  */
 
-#define MAXPAGE 32*1024
+#define MAXPAGE 128*1024
 
 
 /* check to see if getcwd exists
@@ -96,7 +96,7 @@ SGC is enabled.  */
 /* #define ENDIAN_ALREADY_DEFINED */
 
 /* define if SV_ONSTACK is defined in signal.h */
-/* #define HAVE_SV_ONSTACK */
+/* #undef HAVE_SV_ONSTACK */ 
 
 #include <varargs.h>
 #include <setjmp.h>

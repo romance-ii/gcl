@@ -29,6 +29,10 @@ License for more details.
 
 #include <elf.h>
 
+static void relocate_symbols(Elf32_Sym *sym,int nsyms,int nscns);
+static void relocate(Elf32_Sym *symbol_table,Elf32_Rela
+*reloc_info,Elf32_Word sh_type);
+
 
 #ifdef STAND
 char *kcl_self;

@@ -224,6 +224,9 @@ else
 	{rp = number_plus(rp,mod);}
     return rp;}}
 
+
+#define MOST_POSITIVE_FIX (((unsigned int) (~0) ) /2)
+#define SMALL_MODULUS_P(mod) (FIXNUMP(mod) && (fix(mod) < (MOST_POSITIVE_FIX)/2))
 object
 ctimes(a,b)
 object a,b;
@@ -242,7 +245,7 @@ object
 cdifference(a,b)
 object a,b;
 {object mod = *gclModulus;
- if (FIXNUMP(mod))
+ if (SMALL_MODULUS_P(mod))
    {register int res,m;
     res=((fix(a)-fix(b))%(m=fix(mod)));
     FIX_MOD(res,m);
@@ -255,7 +258,7 @@ object
 cplus(a,b)
 object a,b;
 {object mod = *gclModulus;
- if (FIXNUMP(mod))
+ if (SMALL_MODULUS_P(mod))
    {register int res,m;
     res=((fix(a)+fix(b))%(m=fix(mod)));
     FIX_MOD(res,m);

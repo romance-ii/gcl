@@ -10,7 +10,7 @@ This information will be used for relocation.
 to compile use cc rsym.c -o rsym  -I../h
 */
 
-
+#include "string.h"
 #ifdef __linux__
 /* Needed these to get it working with Linux.  Bill Metzenthen 23 May 95 */
 #define IN_RSYM 1
@@ -67,7 +67,7 @@ int debug =0;
 them out to a file together with their addresses */
 static char *outfile;
 
-void
+int
 main(argc,argv)
 int argc ;
 char *argv[];
@@ -80,7 +80,7 @@ char *argv[];
 #endif    
   get_myself(argv[1]);
   output_externals(outfile=argv[2]);
-  exit(0);
+  return 0;
 }
 #define SECTION_H(k) section_headers[k]
 char *section_names;
@@ -217,6 +217,24 @@ char *out;
      */
    if (EXT_and_TEXT_BSS_DAT(p))
      { name= SYM_NAME(p);
+    
+            /* turn __setjmp@@GLIB* to __setjmp
+	       since GLIB2.0 likes to tack on the @@GLIB to
+	       certain symbols .. but the names in the .o
+	       files to be loaded do NOT have this tacked on.
+	     */
+     if (name ) {
+        char *tmp;
+       tmp=index(name,'@') ;
+       if (name 
+	   && tmp
+	   && tmp[1]=='@'
+	   && tmp[2]=='G'
+	   && tmp[3]=='L'
+	   && tmp[4]=='I')
+	 { *tmp=0; }
+     }
+
        { dprintf(tab.n_symbols %d , tab.n_symbols);
 	 tab.n_symbols++;
 	 {int i = (p->n_value);

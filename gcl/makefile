@@ -1,13 +1,15 @@
-# Compiling gcl:
-#   ./configure
-#   make
-# For more details see the file readme
+#  Compiling gcl
+# select a machine-type from ./MACHINES
+
+# ./add-defs machine-type
+# make
+
+# For more details see README
 
 prefix=/usr/local
 # This would cause make install to create /usr/local/bin/gcl and
-# /usr/local/lib/gcl-x.yy/* with some basic files.
-# This prefix may be overridden e.g. with
-# ./configure --prefix=/usr/share
+# /usr/local/lib/gcl-1-??/* with some basic files.
+# this may be overridden in the makedefs
 
 ##########################
 
@@ -28,28 +30,28 @@ MPFILES=$(MPDIR)/mpi-386_no_under.o $(MPDIR)/libmport.a
 prefix=/usr/local
 
 # where to place the info files
-INFO_DIR=/usr/local/info/
+INFO_DIR=/usr/info/
 
 # where to put emacs lisp files.
-EMACS_SITE_LISP=/usr/share/emacs/20.3/site-lisp
+EMACS_SITE_LISP=
 
 # the default.el file
-EMACS_DEFAULT_EL=/usr/share/emacs/20.3/site-lisp/default.el
+EMACS_DEFAULT_EL=/default.el
 
 # numerous TCL/TK variables culled from the tkConfig.sh and tclConfig.sh
 # if these are found.
-TK_CONFIG_PREFIX=/usr/lib
-TK_LIBRARY=/usr/lib/tk8.0
-TCL_LIBRARY=/usr/lib/tcl8.0
+TK_CONFIG_PREFIX=/usr/local/lib
+TK_LIBRARY=/usr/local/lib/tk8.2
+TCL_LIBRARY=/usr/local/lib/tcl8.2
 TK_XINCLUDES=-I/usr/X11R6/include
-TK_INCLUDE=-I/usr/lib/../include
-TK_LIB_SPEC=-L/usr/lib -ltk8.0
-TK_BUILD_LIB_SPEC=-L/work-in-progress/tk8.0/unix -ltk8.0
+TK_INCLUDE=-I/usr/local/lib/../include
+TK_LIB_SPEC=-L/usr/local/lib -ltk8.2
+TK_BUILD_LIB_SPEC=-L/home/wfs/src/tk8.2.1/unix -ltk8.2
 TK_XLIBSW=-L/usr/X11R6/lib -lX11
 TK_XINCLUDES=-I/usr/X11R6/include
-TCL_LIB_SPEC=-L/usr/lib -ltcl8.0
+TCL_LIB_SPEC=-L/usr/local/lib -ltcl8.2${TCL_DBGX}
 TCL_DL_LIBS=-ldl
-TCL_LIBS=-ldl  -lieee -lm
+TCL_LIBS=-ldl  -lm
 
 NOTIFY=yes
 GCC=gcc

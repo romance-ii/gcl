@@ -1,6 +1,19 @@
-1999-12-06  Bill Schelter  <wfs@linux115.ma.utexas.edu>
+2000-05-13  Bill Schelter  <wfs@sonia.ma.utexas.edu>
 
-	* start using CVS
+	* fix readme file
+	* update gcl-2.3/mp/mpi-sol-sparc.s for the 'sparc' version.
+	* number of changes to 'configure.in' to handle finding
+	paths correctly. 
+
+2000-05-02  Bill Schelter  <wfs@linux119.ma.utexas.edu>
+
+	* rsym_elf.c (out;): strip off the @@GLIB* from symbols,
+	in the base image, since this is not added to .o files
+	With advent of GLIB2.0 this addition to the symbol was made.
+	This will allow dynamic linking of the raw_gcl with the C library.
+	* remove the -static default from the 386-linux.defs file,
+	so that links will by default be dynamic for libc ..
+	
 
 Fri Mar 28 16:23:18 1997  Bill Schelter  <wfs@marie.ma.utexas.edu>
 
