@@ -23,37 +23,41 @@
 
  (in-package "USER")
 
- (load (concatenate 'string si::*system-directory* "../gcl-tk/tk-package.lsp"))
-
  (or lisp::*link-array*
      (setq lisp::*link-array*
 	   (make-array (ash 1 11)  :element-type 'string-char :fill-pointer 0)))
  (si::use-fast-links t)
+
+ (let* ((x (append (pathname-directory si::*system-directory*) (list :parent)))
+	(lsp (append x (list "lsp")))
+	(cmpnew (append x (list "cmpnew")))
+	(h (append x (list "h")))
+	(gtk (append x (list "gcl-tk"))))
+   (dolist (d (list lsp cmpnew))
+       (load (make-pathname :name "sys-proclaim" :type "lisp" :directory d)))
+   (load (make-pathname :name "tk-package" :type "lsp" :directory gtk))
+   (load (make-pathname :name "gcl_cmpmain" :type "lsp" :directory cmpnew))
+   (load (make-pathname :name "gcl_lfun_list" :type "lsp" :directory cmpnew))
+   (load (make-pathname :name "gcl_cmpopt" :type "lsp" :directory cmpnew))
+   (load (make-pathname :name "gcl_auto_new" :type "lsp" :directory lsp))
+
+   (gbc t)
+
+   (setq compiler::*cmpinclude* "\"cmpinclude.h\"") 
  
- (setq compiler::*cmpinclude* "\"cmpinclude.h\"") 
- 
- (load (concatenate 'string si::*system-directory* "../cmpnew/gcl_cmpmain.lsp")) 
- (gbc t)
- (load (concatenate 'string si::*system-directory* "../cmpnew/gcl_lfun_list.lsp"))
- (gbc t) 
- (load (concatenate 'string si::*system-directory* "../cmpnew/gcl_cmpopt.lsp"))
- (gbc t)
- (load (concatenate 'string si::*system-directory* "../lsp/gcl_auto_new.lsp")) 
- (gbc t)
- 
- (when compiler::*cmpinclude-string*
-   (with-open-file (st (concatenate 'string si::*system-directory* "../h/cmpinclude.h"))
-		   (let
-		       ((tem (make-array (file-length st) :element-type 'standard-char
-					 :static t)))
-		     (if (si::fread tem 0 (length tem) st)
-			 (setq compiler::*cmpinclude-string* tem)))))
+   (when compiler::*cmpinclude-string*
+     (with-open-file (st (make-pathname :directory h :name "cmpinclude" :type "h"))
+		     (let
+			 ((tem (make-array (file-length st) :element-type 'standard-char
+					   :static t)))
+		       (if (si::fread tem 0 (length tem) st)
+			   (setq compiler::*cmpinclude-string* tem))))))
  
  (setf (symbol-function 'si:clear-compiler-properties)
        (symbol-function 'compiler::compiler-clear-compiler-properties))
  (setq system::*old-top-level* (symbol-function 'system:top-level))
  
- (defvar si::*lib-directory* (namestring "../"))
+ (defvar si::*lib-directory* (namestring (make-pathname :directory (list :parent))))
  
  (defun system::gcl-top-level (&aux tem)
    (si::set-up-top-level)
