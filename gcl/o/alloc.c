@@ -147,7 +147,7 @@ eg to add 20 more do (si::set-hole-size %ld %d)\n...start over ", new_holepage, 
 		return(e);
 
 
-	IF_ALLOCATE_ERR fputs("Can't allocate.  Good-bye!",stderr);
+	IF_ALLOCATE_ERR error("Can't allocate.  Good-bye!");
 #ifdef SGC
 	if (sgc_enabled)
 	  make_writable(page(core_end),page(core_end)+n-m);
@@ -308,7 +308,7 @@ opt_maxpage(struct typemanager *my_tm) {
   r=((x-my_tm->tm_adjgbccnt)+ my_tm->tm_adjgbccnt*mmax_page/z)*(y-mmax_page+z);
   r/=x*y;
   if (sSAnotify_optimize_maximum_pagesA->s.s_dbind!=sLnil)
-    printf("[type %u max %u(%u) opt %u   y %u(%u) gbcrat %f sav %f]\n",
+    printf("[type %u max %lu(%lu) opt %u   y %u(%lu) gbcrat %f sav %f]\n",
 	   my_tm->tm_type,mmax_page,mro,(int)z,(int)y,tro,(my_tm->tm_adjgbccnt-1)/(1+x-0.9*my_tm->tm_adjgbccnt),r);
   if (r<=0.95) {
     my_tm->tm_adjgbccnt*=mmax_page/z;
@@ -1398,7 +1398,10 @@ malloc(size_t size) {
 /*  #endif */
 
 #ifdef BABY_MALLOC_SIZE
-	if (GBC_enable == 0) return baby_malloc(size);
+	if (GBC_enable == 0) {
+	  in_malloc = 0;
+	  return baby_malloc(size);
+	}
 #else	
 	if (GBC_enable==0) {
 	   if ( initflag ==0)
@@ -1471,7 +1474,7 @@ realloc(void *ptr, size_t size) {
   int i, j;
   /* was allocated by baby_malloc */
 #ifdef BABY_MALLOC_SIZE	
-  if (ptr >= baby_malloc_data && ptr -baby_malloc_data <BABY_MALLOC_SIZE)
+  if (ptr >= (void*)baby_malloc_data && ptr - (void*)baby_malloc_data <BABY_MALLOC_SIZE)
     {
       int dim = ((int *)ptr)[-1];
       if (dim > size)

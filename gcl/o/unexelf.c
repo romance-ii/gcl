@@ -397,6 +397,9 @@ Filesz      Memsz       Flags       Align
 
  */
 
+/* We do not use mmap because that fails with NFS.
+   Instead we read the whole file, modify it, and write it out.  */
+
 #ifndef emacs
 #define fatal(a, b...) fprintf (stderr, a, ##b), exit (1)
 #else
@@ -424,6 +427,18 @@ extern void fatal (char *, ...);
 #if __sgi
 #include <syms.h> /* for HDRR declaration */
 #endif /* __sgi */
+
+#ifndef MAP_ANON
+#ifdef MAP_ANONYMOUS
+#define MAP_ANON MAP_ANONYMOUS
+#else
+#define MAP_ANON 0
+#endif
+#endif
+
+#ifndef MAP_FAILED
+#define MAP_FAILED ((void *) -1)
+#endif
 
 #if defined (__alpha__) && !defined (__NetBSD__) && !defined (__OpenBSD__)
 /* Declare COFF debugging symbol table.  This used to be in
@@ -624,9 +639,14 @@ unexec (char *new_name, char *old_name, unsigned int data_start, unsigned int bs
   /* Pointers to the base of the image of the two files. */
   caddr_t old_base, new_base;
 
-  /* Pointers to the file, program and section headers for the old and new
-   * files.
-   */
+#if MAP_ANON == 0
+  int mmap_fd;
+#else
+# define mmap_fd -1
+#endif
+
+  /* Pointers to the file, program and section headers for the old and
+     new files.  */
   ElfW(Ehdr) *old_file_h, *new_file_h;
   ElfW(Phdr) *old_program_h, *new_program_h;
   ElfW(Shdr) *old_section_h, *new_section_h;
@@ -644,8 +664,10 @@ unexec (char *new_name, char *old_name, unsigned int data_start, unsigned int bs
   int old_data_index, new_data2_index;
   int old_mdebug_index;
   struct stat stat_buf;
+  int old_file_size;
 
-  /* Open the old file & map it into the address space. */
+  /* Open the old file, allocate a buffer of the right size, and read
+     in the file contents.  */
 
   old_file = open (old_name, O_RDONLY);
 
@@ -655,16 +677,24 @@ unexec (char *new_name, char *old_name, unsigned int data_start, unsigned int bs
   if (fstat (old_file, &stat_buf) == -1)
     fatal ("Can't fstat (%s): errno %d\n", old_name, errno);
 
-  old_base = mmap ((caddr_t) 0, stat_buf.st_size, PROT_READ, MAP_SHARED,
-		   old_file, 0);
-
-  if (old_base == (caddr_t) -1)
-    fatal ("Can't mmap (%s): errno %d\n", old_name, errno);
-
-#ifdef DEBUG
-  fprintf (stderr, "mmap (%s, %x) -> %x\n", old_name, stat_buf.st_size,
-	   old_base);
+#if MAP_ANON == 0
+  mmap_fd = open ("/dev/zero", O_RDONLY);
+  if (mmap_fd < 0)
+    fatal ("Can't open /dev/zero for reading: errno %d\n", errno);
 #endif
+
+  /* We cannot use malloc here because that may use sbrk.  If it does,
+     we'd dump our temporary buffers with Emacs, and we'd have to be
+     extra careful to use the correct value of sbrk(0) after
+     allocating all buffers in the code below, which we aren't.  */
+  old_file_size = stat_buf.st_size;
+  old_base = mmap (NULL, old_file_size, PROT_READ | PROT_WRITE,
+		   MAP_ANON | MAP_PRIVATE, mmap_fd, 0);
+  if (old_base == MAP_FAILED)
+    fatal ("Can't allocate buffer for %s\n", old_name);
+
+  if (read (old_file, old_base, stat_buf.st_size) != stat_buf.st_size)
+    fatal ("Didn't read all of %s: errno %d\n", old_name, errno);
 
   /* Get pointers to headers & section names */
 
@@ -735,10 +765,9 @@ unexec (char *new_name, char *old_name, unsigned int data_start, unsigned int bs
   if ((unsigned) new_bss_addr < (unsigned) old_bss_addr + old_bss_size)
     fatal (".bss shrank when undumping???\n");
 
-  /* Set the output file to the right size and mmap it.  Set
-   * pointers to various interesting objects.  stat_buf still has
-   * old_file data.
-   */
+  /* Set the output file to the right size.  Allocate a buffer to hold
+     the image of the new file.  Set pointers to various interesting
+     objects.  stat_buf still has old_file data.  */
 
   new_file = open (new_name, O_RDWR | O_CREAT, 0666);
   if (new_file < 0)
@@ -749,16 +778,10 @@ unexec (char *new_name, char *old_name, unsigned int data_start, unsigned int bs
   if (ftruncate (new_file, new_file_size))
     fatal ("Can't ftruncate (%s): errno %d\n", new_name, errno);
 
-#ifdef UNEXEC_USE_MAP_PRIVATE
-  new_base = mmap ((caddr_t) 0, new_file_size, PROT_READ | PROT_WRITE,
-		   MAP_PRIVATE, new_file, 0);
-#else
-  new_base = mmap ((caddr_t) 0, new_file_size, PROT_READ | PROT_WRITE,
-		   MAP_SHARED, new_file, 0);
-#endif
-
-  if (new_base == (caddr_t) -1)
-    fatal ("Can't mmap (%s): errno %d\n", new_name, errno);
+  new_base = mmap (NULL, new_file_size, PROT_READ | PROT_WRITE,
+		   MAP_ANON | MAP_PRIVATE, mmap_fd, 0);
+  if (new_base == MAP_FAILED)
+    fatal ("Can't allocate buffer for %s\n", old_name);
 
   new_file_h = (ElfW(Ehdr) *) new_base;
   new_program_h = (ElfW(Phdr) *) ((byte *) new_base + old_file_h->e_phoff);
@@ -913,8 +936,13 @@ unexec (char *new_name, char *old_name, unsigned int data_start, unsigned int bs
 	}
       else
 	{
-	  /* Any section that was original placed AFTER the bss
-	     section should now be off by NEW_DATA2_SIZE. */
+	  /* Any section that was originally placed after the .bss
+	     section should now be off by NEW_DATA2_SIZE.  If a
+	     section overlaps the .bss section, consider it to be
+	     placed after the .bss section.  Overlap can occur if the
+	     section just before .bss has less-strict alignment; this
+	     was observed between .symtab and .bss on Solaris 2.5.1
+	     (sparc) with GCC snapshot 960602.  */
 #ifdef SOLARIS_POWERPC
 	  /* On PPC Reference Platform running Solaris 2.5.1
 	     the plt section is also of type NOBI like the bss section.
@@ -928,9 +956,8 @@ unexec (char *new_name, char *old_name, unsigned int data_start, unsigned int bs
 	      >= OLD_SECTION_H (old_bss_index-1).sh_offset)
 	    NEW_SECTION_H (nn).sh_offset += new_data2_size;
 #else
-	  if (round_up (NEW_SECTION_H (nn).sh_offset,
-			OLD_SECTION_H (old_bss_index).sh_addralign)
-	      >= new_data2_offset)
+	  if (NEW_SECTION_H (nn).sh_offset + NEW_SECTION_H (nn).sh_size
+	      > new_data2_offset)
 	    NEW_SECTION_H (nn).sh_offset += new_data2_size;
 #endif
 	  /* Any section that was originally placed after the section
@@ -1179,15 +1206,20 @@ unexec (char *new_name, char *old_name, unsigned int data_start, unsigned int bs
       }
     }
 
-#ifdef UNEXEC_USE_MAP_PRIVATE
-  if (lseek (new_file, 0, SEEK_SET) == -1)
-    fatal ("Can't rewind (%s): errno %d\n", new_name, errno);
+  /* Write out new_file, and free the buffers.  */
 
   if (write (new_file, new_base, new_file_size) != new_file_size)
-    fatal ("Can't write (%s): errno %d\n", new_name, errno);
-#endif
+    fatal ("Didn't write %d bytes to %s: errno %d\n",
+	   new_file_size, new_base, errno);
+
+  munmap (old_base, old_file_size);
+  munmap (new_base, new_file_size);
 
   /* Close the files and make the new file executable.  */
+
+#if MAP_ANON == 0
+  close (mmap_fd);
+#endif
 
   if (close (old_file))
     fatal ("Can't close (%s): errno %d\n", old_name, errno);
@@ -1209,6 +1241,9 @@ unexec (char *new_name, char *old_name, unsigned int data_start, unsigned int bs
    gcl") we make the NEW_SECTION_H executable since it will have code
    in it.  NEW_SECTION_H (nn).sh_flags |= SHF_EXECINSTR;
    
+   Partly synchronized with Emacs HEAD of 2004-04-12 by Magnus Henoch.
+   The files themselves are no longer mmap'ed, but memory is allocated
+   with mmap, and everything is written to the new file at the end.
 */
 #ifdef UNIXSAVE
 #include "save.c"

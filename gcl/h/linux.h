@@ -5,7 +5,7 @@
 #endif
 
 #undef HAVE_AOUT
-#define HAVE_AOUT <elf.h>
+/* #define HAVE_AOUT <elf.h> */
 #define HAVE_ELF
 
 /* Seeking to the end of ELF data is a little messy... */

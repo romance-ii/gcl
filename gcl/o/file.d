@@ -78,8 +78,10 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define a_drsize	rdsize
 #endif
 
-#ifdef HAVE_ELF
+#if defined(HAVE_ELF_H)
 #include <elf.h>
+#elif defined(HAVE_ELF_ABI_H)
+#include <elf_abi.h>
 #endif
 
 extern void tcpCloseSocket (int fd);

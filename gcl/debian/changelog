@@ -15,8 +15,9 @@ gclcvs (2.7.0-23) unstable; urgency=low
     'billion cons element acl2 image' requested by a gcl user
   * Revert winnt features and debugging aids in configure.in
   * Revert debugging forms in o/prog.c
+  * OpenBSD support, gcc warning cleanups for long page integers
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  3 May 2004 17:11:58 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  3 May 2004 21:36:09 +0000
 
 gclcvs (2.7.0-22) unstable; urgency=low
 

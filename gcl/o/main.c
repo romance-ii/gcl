@@ -246,6 +246,20 @@ main(int argc, char **argv, char **envp) {
       }
       cssize = rl.rlim_cur/sizeof(*cs_org) - sizeof(*cs_org)*CSGETA;
     }
+
+    /* Maybe the soft limit for data segment size is lower than the
+     * hard limit.  In that case, we want as much as possible.
+     */
+    if (getrlimit(RLIMIT_DATA, &rl))
+      error("Cannot get data rlimit\n");
+    if (rl.rlim_cur != RLIM_INFINITY &&
+	(rl.rlim_max == RLIM_INFINITY ||
+	 rl.rlim_max > rl.rlim_cur)) {
+      rl.rlim_cur = rl.rlim_max;
+      if (setrlimit(RLIMIT_DATA, &rl))
+	error("Cannot set data rlimit\n");
+    }
+
 #endif	
 #endif /* BSD */
 

@@ -27,7 +27,28 @@ to compile use cc rsym.c -o rsym  -I../h
 #include "ext_sym.h"
 
 
+#if defined(HAVE_ELF_H)
 #include <elf.h>
+#elif defined(HAVE_ELF_ABI_H)
+#include <elf_abi.h>
+#else
+#error Neither elf.h nor elf_abi.h found
+#endif
+
+/* For OpenBSD */
+#ifndef ElfW
+/* ElfW(type) becomes Elf32_type or Elf64_type, respectively.
+ * Defined in link.h on Linux.  OpenBSD does this in another way:
+ * by defining Elf_Ehdr etc to the correct type in exec_elf.h.
+ */
+#ifdef Elf_Ehdr
+#define ElfW(type) Elf_##type
+#else
+#error Neither ElfW nor Elf_Ehdr defined
+#endif
+
+#endif
+
 ElfW(Phdr) pheader;
 ElfW(Ehdr) eheader;
 ElfW(Sym) *symbol_table;
@@ -36,7 +57,13 @@ int text_index,data_index,bss_index,sbss_index;
 #undef EXT_and_TEXT_BSS_DAT
 /* #define mjoin(a,b) a ## b */
 /* #define Mjoin(a,b) mjoin(a,b) */
+#if defined(__ELF_NATIVE_CLASS)
 #define ELFW(a) Mjoin(ELF,Mjoin(__ELF_NATIVE_CLASS,Mjoin(_,a)))
+#elif defined(ELFSIZE)
+#define ELFW(a) Mjoin(ELF,Mjoin(ELFSIZE,Mjoin(_,a)))
+#else
+#error Neither __ELF_NATIVE_CLASS nor ELFSIZE defined
+#endif
 
 int nsyms;
 char *my_string_table;

@@ -28,8 +28,10 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifdef HAVE_AOUT
 #include HAVE_AOUT
 #endif
-#ifdef HAVE_ELF
+#if defined(HAVE_ELF_H)
 #include <elf.h>
+#elif defined(HAVE_ELF_ABI_H)
+#include <elf_abi.h>
 #endif
 
 #include "ptable.h"

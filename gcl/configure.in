@@ -83,6 +83,7 @@ AC_MSG_RESULT(host=$host)
 PROCESSOR_FLAGS=${PROCESSOR_FLAGS:-""}
 
 use=unknown
+TLDFLAGS=""
 case $canonical in
      older)
      use=386-bsd;;
@@ -243,6 +244,11 @@ case $canonical in
             then use=mingw
           else  use=gnuwin95
         fi;;
+
+     *openbsd*)
+	# 'ld -Z' means disable W^X
+	TLDFLAGS="$TLDFLAGS -Z"
+	use=FreeBSD;;
   
 esac
 
@@ -377,6 +383,9 @@ AC_MSG_RESULT(use=$use)
 # CM 20040106
 if test "$CFLAGS" = "" ; then
 	CFLAGS=" "
+fi
+if test "$LDFLAGS" = "" ; then
+	LDFLAGS=" "
 fi
 
 AC_PROG_CC
@@ -702,13 +711,16 @@ AC_SUBST(X_CFLAGS)
 
 if test "$enable_dlopen" = "yes" ; then
 
-	AC_CHECK_LIB(dl,dlopen,have_dl=1,have_dl=0)
-	if test "$have_dl" = "0" ; then
-		echo "Cannot find dlopen in -dl"
-		exit 1
-	fi
+ 	AC_CHECK_LIB(dl,dlopen,have_dl=1,have_dl=0)
+ 	if test "$have_dl" = "0" ; then
+ 		echo "Cannot find dlopen in -dl"
+ 		exit 1
+ 	fi
+dnl	AC_SEARCH_LIBS(dlopen, dl, have_dl=1, AC_ERROR(dlopen not found))
+dnl LIBS and TLIBS - why not merged from the beginning?
 
 	TLIBS="$TLIBS -ldl -rdynamic"
+dnl	TLIBS="$TLIBS -rdynamic"
 	AC_DEFINE(USE_DLOPEN)
 fi
 
@@ -1104,6 +1116,9 @@ AC_CHECK_FUNC(gettimeofday, , AC_DEFINE(NO_GETTOD))
 
 
 AC_CHECK_HEADERS(sys/ioctl.h)
+
+# OpenBSD has elf_abi.h instead of elf.h
+AC_CHECK_HEADERS(elf.h elf_abi.h)
 
 
 #--------------------------------------------------------------------
@@ -1732,7 +1747,7 @@ if  2>&1 $CC -v | fgrep "gcc version 2.96" > /dev/null
 	AC_MSG_RESULT([no])
 fi 
 
-LIBS="$LIBS $TLIBS"
+LIBS="$LDFLAGS $TLDFLAGS $LIBS $TLIBS"
 AC_SUBST(LIBS)
 FINAL_CFLAGS="$CFLAGS $TCFLAGS $PROCESSOR_FLAGS"
 AC_SUBST(FINAL_CFLAGS)

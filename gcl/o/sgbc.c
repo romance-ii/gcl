@@ -631,7 +631,7 @@ sgc_mark_stack_carefully(void *topv, void *bottomv, int offset) {
 	if (m==TRUE) continue;
 	if (m!=0) {
 	  fprintf(stdout,
-		  "**bad value %d of d.m in gbc page %d skipping mark**"
+		  "**bad value %ld of d.m in gbc page %ld skipping mark**"
 		  ,m,p);fflush(stdout);
 	  continue;
 	}
@@ -1223,7 +1223,7 @@ sgc_start(void) {
 	 leading this type to claim SGC pages not of its type as
 	 specified in type_map.  CM 20030827*/
       unsigned short minfree = tm->tm_sgc_minfree > 0 ? tm->tm_sgc_minfree : 1 ;
-      int count;
+      long count;
       bzero(free_map,npages*sizeof(short));
       f = tm->tm_free;
       count=0;
@@ -1239,7 +1239,7 @@ sgc_start(void) {
       }
 #ifdef DEBUG       
       if (count!=tm->tm_nfree) 
-	printf("[Count differed type(%d)nfree= %d in freelist %d]\n"
+	printf("[Count differed type(%d)nfree= %ld in freelist %ld]\n"
 	       ,tm->tm_type,tm->tm_nfree,
 	       count);fflush(stdout);
 #endif       

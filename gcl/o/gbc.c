@@ -698,7 +698,7 @@ mark_stack_carefully(void *topv, void *bottomv, int offset) {
 	if (m==TRUE) continue;
 	if (m!=0) {
 	  fprintf(stdout,
-		  "**bad value %d of d.m in gbc page %d skipping mark**"
+		  "**bad value %ld of d.m in gbc page %ld skipping mark**"
 		  ,m,p);fflush(stdout);
 	  continue;
 	}
@@ -1093,7 +1093,7 @@ GBC(enum type t) {
     
     if (gc_time < 0) gc_time=0;
 #ifdef SGC
-    printf("[%s for %d %s pages..",
+    printf("[%s for %ld %s pages..",
 	   (sgc_enabled ? "SGC" : "GC"),
 	   (sgc_enabled ? sgc_count_type(t) : tm_of(t)->tm_npage),
 	   (tm_table[(int)t].tm_name)+1);
@@ -1282,7 +1282,7 @@ GBC(enum type t) {
   if (debug) {
     for (i = 0, j = 0;  i < (int)t_end;  i++) {
       if (tm_table[i].tm_type == (enum type)i) {
-	printf("%13s: %8d used %8d free %4d/%d pages\n",
+	printf("%13s: %8ld used %8ld free %4ld/%ld pages\n",
 	       tm_table[i].tm_name,
 	       TM_NUSED(tm_table[i]),
 	       tm_table[i].tm_nfree,
@@ -1294,10 +1294,10 @@ GBC(enum type t) {
 	       tm_table[i].tm_name,
 	       tm_table[(int)tm_table[i].tm_type].tm_name);
     }
-    printf("contblock: %d blocks %d pages\n", ncb, ncbpage);
-    printf("hole: %d pages\n", holepage);
-    printf("relblock: %d bytes used %d bytes free %d pages\n",
-	   (int)(rb_pointer - rb_start), (int)(rb_end - rb_pointer), nrbpage);
+    printf("contblock: %ld blocks %ld pages\n", ncb, ncbpage);
+    printf("hole: %ld pages\n", holepage);
+    printf("relblock: %ld bytes used %ld bytes free %ld pages\n",
+	   (long)(rb_pointer - rb_start), (long)(rb_end - rb_pointer), nrbpage);
     printf("GBC ended\n");
     fflush(stdout);
   }

@@ -166,7 +166,8 @@ SGC is enabled.  */
 #include <ieeefp.h>
 #define ISNORMAL(a) (fpclass(a)>=FP_NZERO)
 #else
-#error "No isnormal found"
+#include <math.h>
+#define ISNORMAL(a) (finite(a) && (a) != 0.0)
 #endif
 #endif
 #endif

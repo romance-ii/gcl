@@ -22,6 +22,9 @@
 #endif
 #define ELFW(a) Mjoin(ELF,Mjoin(__ELF_NATIVE_CLASS,Mjoin(_,a)))
  
+/* OpenBSD needs sys/types.h included before link.h, which is included
+   in linux.h */
+#include <sys/types.h>
 #include "linux.h"
 
 #if defined(__i386__)

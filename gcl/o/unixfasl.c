@@ -282,8 +282,8 @@ AGAIN:
 static int
 faslink(object faslfile, object ldargstring)
 {
-#if ((defined(__linux__) || defined(__FreeBSD__)) && defined(__ELF__)) || defined(DARWIN)
-  FEerror("faslink() not supported for ELF yet",0);
+#if defined(__ELF__) || defined(DARWIN)
+  FEerror("faslink() not supported for ELF or DARWIN yet",0);
   return 0;
 #else
 	struct exec header, faslheader;
