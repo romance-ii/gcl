@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020523-1) unstable; urgency=high
+
+  * New upstream release
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 23 May 2002 01:39:46 -0400
+
 gcl (2.5.0.cvs20020429-1) unstable; urgency=high
 
   * Build-Depend on tk8.2-dev, Closes: #144330
