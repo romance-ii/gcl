@@ -25,6 +25,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	predicates
 */
 
+#include <stdlib.h>
 #include "include.h"
 
 DEFUN("NULL",object,fLnot,LISP

@@ -23,6 +23,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	Logical operations on number
 */
 #define NEED_MP_H
+#include <stdlib.h>
 #include "include.h"
 #include "num_include.h"
 

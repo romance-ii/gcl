@@ -206,7 +206,7 @@ struct key {short n,allow_other_keys;
 /* cfun.c:390:OF */ extern void siLturbo_closure (void); /* () */
 /* cfun.c:392:OF */ extern object fSturbo_closure (object funobj); /* (funobj) object funobj; */
 /* cfun.c:403:OF */ extern void init_cfun (void); /* () */
-/* cmac.c:49:OF */ extern long long int dblrem (int a, int b, int mod); /* (a, b, mod) int a; int b; int mod; */
+/* cmac.c:49:OF */ extern int dblrem (int a, int b, int mod); /* (a, b, mod) int a; int b; int mod; */
 /* cmac.c:73:OF */ extern object cmod (object x); /* (x) object x; */
 /* cmac.c:104:OF */ extern object ctimes (object a, object b); /* (a, b) object a; object b; */
 /* cmac.c:118:OF */ extern object cdifference (object a, object b); /* (a, b) object a; object b; */

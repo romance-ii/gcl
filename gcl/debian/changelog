@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-18) unstable; urgency=high
+
+  * misc. lintian cleanups, mostly for 64 bit
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 23 Jul 2002 23:35:03 -0400
+
 gcl (2.5.0.cvs20020625-17) unstable; urgency=high
 
   * Fixed typeo in error.c preventing arm compilation

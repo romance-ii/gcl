@@ -44,6 +44,7 @@ read.d: normalize_big_to_object
 
 #define remainder gclremainder
 #define NEED_MP_H
+#include <stdlib.h>
 #include "include.h"
 
 static void* (*gcl_gmp_allocfun)(size_t) = alloc_contblock;

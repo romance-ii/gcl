@@ -4,6 +4,7 @@ Fast linking method for kcl by W. Schelter University of Texas
  cmpcall.lsp and cmptop.lsp */
 
 
+#include <stdlib.h>
 #include "include.h"
 #include "sfun_argd.h"
 #include "page.h"

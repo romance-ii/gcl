@@ -43,12 +43,12 @@ object make_integer(__mpz_struct *u);
 			number_plus(a,b))
 #define our_times(a,b) number_times(a,b)
 
-
+/* fix (and check) this on 64 bit machines, where long is the long long */
 #ifdef HAVE_LONG_LONG
-long long int
+int
 dblrem(int a, int b, int mod)
 {
-  return  (((long long int)a*(long long int)b)%(long long int) mod);
+  return  (int)(((long long int)a*(long long int)b)%(long long int) mod);
 }
 #else
 

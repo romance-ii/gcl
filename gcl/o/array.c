@@ -19,6 +19,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+#include <stdlib.h>
 #include "include.h"
 
 
@@ -188,7 +189,7 @@ aset1(object x,int i,object val) {
   return fSaset1(x,make_fixnum(i),val);
 }
 
-DEFUN("ASET1", object, fSaset1, SI, 3, 3, NONE, OO, IO, OO,OO,"")
+DEFUN("ASET1", object, fSaset1, SI, 3, 3, NONE, OO, OO, OO,OO,"")
 (x, ii,val)
   object x;
   object ii;

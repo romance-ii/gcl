@@ -253,16 +253,16 @@ object list_vector(n,ap)
  return ans;}
 
    
-
+/* clean this up */
 object on_stack_list(n, va_alist)
 int n;
 va_dcl
 {va_list ap;
- object *new;
+ object res;
  va_start(ap);
- {COERCE_VA_LIST(new,ap,n);
- return on_stack_list_vector(n,new);}
+ res=on_stack_list_vector(n,ap);
  va_end(ap);
+ return res;
 }
 
    

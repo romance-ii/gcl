@@ -406,6 +406,7 @@ extern void fatal (char *, ...);
 
 #include <sys/types.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include <memory.h>
 #include <string.h>

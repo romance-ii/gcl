@@ -27,6 +27,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 /*  #define _GNU_SOURCE */
+#include <stdlib.h>
 #include "include.h"
 #include <varargs.h>
 object siSuniversal_error_handler;

@@ -16,6 +16,7 @@ License for more details.
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 /* recognize \nDEF ......... ") and output it to stdout
    [ie '")' is a two character sequence which ends the def

@@ -28,6 +28,7 @@
 
 #define IN_GBC
 #define NEED_MP_H
+#include <stdlib.h>
 #include "include.h"
 
 /* the following in line definitions seem to be twice as fast (at
@@ -1158,7 +1159,7 @@ GBC(enum type t) {
     }
     printf("contblock: %d blocks %d pages\n", ncb, ncbpage);
     printf("hole: %d pages\n", holepage);
-    printf("relblock: %d bytes used %d bytes free %d pages\n",
+    printf("relblock: %ld bytes used %ld bytes free %d pages\n",
 	   rb_pointer - rb_start, rb_end - rb_pointer, nrbpage);
     printf("GBC ended\n");
     fflush(stdout);
