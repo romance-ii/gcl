@@ -119,8 +119,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Rename loop-finish -> sloop-finish in sloop package so that sloop
     and ansi loop can be used simultaneously
   * Handle arguments which are zero in LCM
+  * Fix typo in configure.in
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 30 Mar 2004 21:49:15 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri,  2 Apr 2004 17:35:57 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

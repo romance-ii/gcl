@@ -858,8 +858,8 @@ AC_TRY_RUN([#include <unistd.h>
 		}],
 		HAVE_SBRK=1
 		AC_MSG_RESULT(yes),
-		AC_MSG_RESULT([no: WARNING you must beable to emulate sbrk: as on mingw or macosx]),
-		AC_MSG_RESULT([no: WARNING you must beable to emulate sbrk: as on mingw or macosx]))
+		AC_MSG_RESULT([no: WARNING you must be able to emulate sbrk: as on mingw or macosx]),
+		AC_MSG_RESULT([no: WARNING you must be able to emulate sbrk: as on mingw or macosx]))
 
 if test "$HAVE_SBRK" = "1" ; then
 	AC_MSG_CHECKING([for randomized sbrk])
