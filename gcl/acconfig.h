@@ -186,10 +186,20 @@ SGC is enabled.  */
 #endif
 #endif
 
-/* math.h for definitions in generated C code */
-#undef NEED_MATH_H
+#undef HAVE_VALUES_H
 
-#ifdef NEED_MATH_H
+#ifdef IN_NUM_CO
+#ifdef HAVE_VALUES_H
+#include <values.h>
+#endif
+#endif
+
+
+
+/* math.h for definitions in generated C code */
+#undef HAVE_MATH_H
+
+#ifdef HAVE_MATH_H
 #include <math.h>
 #endif
 

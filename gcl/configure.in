@@ -215,7 +215,12 @@ AC_CHECK_LIB(mingwex,main,LIBS="${LIBS} -lmingwex",true)
 # Should really find a way to check for prototypes, but this 
 # basically works for now.  CM
 #
-AC_CHECK_HEADERS(math.h,AC_DEFINE(NEED_MATH_H))
+AC_CHECK_HEADERS(math.h,AC_DEFINE(HAVE_MATH_H))
+
+#
+# For DBL_MAX et. al. on (only) certain Linux arches, apparently CM
+#
+AC_CHECK_HEADERS(values.h,AC_DEFINE(HAVE_VALUES_H))
 
 #
 # The second alternative is for solaris.  This needs to be
