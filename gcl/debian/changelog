@@ -8,8 +8,10 @@ gclcvs (2.6.0-2) unstable; urgency=low
     source package name instead of version, enable concurrent stable and
     cvs snapshot installation
   * add gazonk*.lsp to clean targets
+  * 6.0 minor version for CVS snapshots, stable releases will start at
+    .1
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 22 Aug 2003 15:27:38 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 22 Aug 2003 15:29:20 +0000
 
 gcl (2.6.0cvs-1) experimental; urgency=low
 
