@@ -148,12 +148,12 @@
 (defun class-precedence-list (object)
   (declare (ignore object))
   nil)
-(defun find-class (object)
-  (declare (ignore object))
+(defun find-class (object &optional errorp environment)
+  (declare (ignore object errorp environment))
   nil)
-(defun find-class-no-error (object)
-  (declare (ignore object))
-  nil)
+;(defun find-class-no-error (object)
+;  (declare (ignore object))
+;  nil)
 
 ;;; TYPEP predicate.
 ;;; FIXME --optimize with most likely cases first
@@ -313,8 +313,8 @@
 (defun subtypep (type1 type2 &optional env &aux t1 t2 i1 i2 ntp1 ntp2 tem)
   (declare (ignore env))
   (let* ((c1 (classp type1)) (c2 (classp type2)) 
-	(t1 (if c1 type1 (find-class-no-error type1))) 
-	(t2 (if c2 type2 (find-class-no-error type2))))
+	(t1 (if c1 type1 (find-class type1 nil))) 
+	(t2 (if c2 type2 (find-class type2 nil))))
     (when (and t1 t2)
       (return-from subtypep 
 		   (if (member t2 (class-precedence-list t1))
