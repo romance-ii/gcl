@@ -18,6 +18,16 @@
 
 (in-package :japi-primitives)
 
+;;;----------------------------------------------------------------------
+;;; General routines.
+(defCfun "static void* int_ptr(object s)" 0 
+" return(&fix(s));")
+(defentry int-ptr (object) (int "int_ptr"))
+(defCfun "static void* inta_ptr(object s)" 0 
+" return(s->fixa.fixa_self);")
+(defentry inta-ptr (object) (int "inta_ptr"))
+
+
 ;; Turn Japi system debug tracing on
 ;(j_setdebug 2)
 
@@ -38,14 +48,13 @@
 (setf alert (j_choicebox2 frame "label1" "label2" "Yes" "No"))
 (setf alert (j_choicebox3 frame "label1" "label2" "Yes" "No" "Cancel"))
 
+
 (defun drawgraphics (drawable xmin ymin xmax ymax)
   (let* ((fntsize 10)
 	 (tmpstrx (format nil "XMax = ~D" xmax))
 	 (tmpstry (format nil "YMax = ~D" ymax))
 	 (tmpstrwidx (j_getstringwidth drawable tmpstrx))
 	 (tmpstrwidy (j_getstringwidth drawable tmpstry)))
-    (format t "In drawgraphics: drawable is ~D, xmin ~D, ymin ~D, xmax ~D, ymax ~D"
-	    drawable xmin ymin xmax ymax)
     (j_setfontsize drawable fntsize)
     (j_setnamedcolor drawable J_RED)
 
@@ -107,6 +116,82 @@
 	  (drawgraphics image 0 0 600 800)
 	  (when (= 0 (j_saveimage image "test.bmp" J_BMP))
 	    (j_alertbox frame "Problems" "Can't save the image" "OK")))))
+
+(j_dispose canvas)
+(j_dispose menubar)
+(j_dispose file)
+(j_dispose print)
+(j_dispose save)
+(j_dispose quit)
+(j_dispose frame)
+
+;; Try some mouse handling
+(setf frame (j_frame "Move and drag the mouse"))
+(j_setsize frame 430 240)
+(j_setnamedcolorbg frame J_LIGHT_GRAY)
+
+(setf canvas1 (j_canvas frame 200 200))
+(setf canvas2 (j_canvas frame 200 200))
+
+(j_setpos canvas1 10 30)
+(j_setpos canvas2 220 30)
+
+(setf pressed (j_mouselistener canvas1 J_PRESSED))
+(setf dragged (j_mouselistener canvas1 J_DRAGGED))
+(setf released (j_mouselistener canvas1 J_RELEASED))
+(setf entered (j_mouselistener canvas2 J_ENTERERD))
+(setf moved (j_mouselistener canvas2 J_MOVED))
+(setf exited (j_mouselistener canvas2 J_EXITED))
+
+(j_show frame)
+
+; (defentry j_getmousepos1 ( int string string ) ( void "j_getmousepos" ))
+
+(let ((xa (make-array 1 :initial-element 0 :element-type 'fixnum))
+      (ya (make-array 1 :initial-element 0 :element-type 'fixnum))
+      (x 0)
+      (y 0)
+      (startx 0)
+      (starty 0))
+
+  (loop as obj = (j_nextaction)
+	while (and (not (= obj frame)) (not (= obj quit)))
+	do 
+	(when (= obj pressed)
+	  (j_getmousepos pressed (inta-ptr xa) (inta-ptr ya))
+	  (setf x (aref xa 0))
+	  (setf y (aref ya 0))
+	  (setf startx x)
+	  (setf starty y))
+	(when (= obj dragged)
+	  (j_getmousepos dragged (inta-ptr xa) (inta-ptr ya))
+	  (setf x (aref xa 0))
+	  (setf y (aref ya 0))
+	  (j_drawrect canvas1 startx starty (- x startx) (- y starty)))
+	(when (= obj released)
+	  (j_getmousepos released (inta-ptr xa) (inta-ptr ya))
+	  (setf x (aref xa 0))
+	  (setf y (aref ya 0))
+	  (j_drawrect canvas1 startx starty (- x startx) (- y starty)))
+	(when (= obj entered)
+	  (j_getmousepos entered (inta-ptr xa) (inta-ptr ya))
+	  (setf x (aref xa 0))
+	  (setf y (aref ya 0))
+	  (setf startx x)
+	  (setf starty y))
+	(when (= obj moved)
+	  (j_getmousepos moved (inta-ptr xa) (inta-ptr ya))
+	  (setf x (aref xa 0))
+	  (setf y (aref ya 0))
+	  (setf startx x)
+	  (setf starty y)
+	  (j_drawline canvas2 startx starty x y))
+	(when (= obj exited)
+	  (j_getmousepos exited (inta-ptr xa) (inta-ptr ya))
+	  (setf x (aref xa 0))
+	  (setf y (aref ya 0))
+	  (j_drawline canvas2 startx starty x y))))
+
 
 ;; Kill the Japi GUI server
 (j_quit)
