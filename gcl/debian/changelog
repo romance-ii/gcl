@@ -31,8 +31,9 @@ gcl (2.5.4-1) unstable; urgency=low
   * fix potential longjmp clobber in read.d;add some windows files to
     main makefile clean target;
   * Darwin revealed fixes to usig.c and unixtime.c
+  * Fix gbc time calculation in case of recursive gbc calls
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 20 Jul 2003 14:00:38 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed, 30 Jul 2003 15:11:22 +0000
 
 gcl (2.5.3-2) unstable; urgency=low
 

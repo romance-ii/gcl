@@ -95,6 +95,7 @@ bool ovm_process_created;
 
 static int gc_time         = -1;
 static int gc_start        = 0;
+static int gc_recursive    = 0;
 int sgc_enabled            = 0;
 int first_protectable_page = 0;
 
@@ -1084,7 +1085,7 @@ GBC(enum type t) {
     fflush(stdout);
   }
 #endif
-  if (gc_time >=0) {gc_start=runtime();}
+  if (gc_time >=0 && !gc_recursive++) {gc_start=runtime();}
   
   maxpage = page(heap_end);
   
@@ -1319,14 +1320,16 @@ GBC(enum type t) {
   if (in_sgc && sgc_enabled==0)
     sgc_start();
   
-  if(gc_time>=0) {gc_time=gc_time+(gc_start=(runtime()-gc_start));}
+  if(gc_time>=0 && !--gc_recursive) {gc_time=gc_time+(gc_start=(runtime()-gc_start));}
   
   if (sSAnotify_gbcA->s.s_dbind != Cnil) {
     
-    fprintf(stdout, "(T=%d).GC finished]\n",
-	    gc_start
-	    );
+    if (gc_recursive)
+      fprintf(stdout, "(T=...).GC finished]\n");
+    else
+      fprintf(stdout, "(T=%d).GC finished]\n",gc_start);
     fflush(stdout);
+
   }
   
   
