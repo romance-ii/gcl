@@ -107,8 +107,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * allow universe file to be loaded by 2.6.1
   * rebuild pcl_gaz* files
   * cleanup room report and give more space to modern large heaps
+  * room report formatting
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 18:07:21 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 21 Mar 2004 16:06:43 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

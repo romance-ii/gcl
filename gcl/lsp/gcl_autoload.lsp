@@ -284,7 +284,7 @@
                            link-alist))))))
     (terpri)
     (dolist (info (reverse info-list))
-      (apply #'format t "~6D/~D~12T~6,1F%~@[~6D~]~28T~{~A~^ ~}"
+      (apply #'format t "~6D/~D~12T~6,1F%~@[~8D~]~28T~{~A~^ ~}"
              (append (cdr info)
                      (if  (assoc (car info) link-alist)
                           (list (assoc (car info) link-alist))
@@ -292,10 +292,10 @@
       (terpri)
       )
     (terpri)
-    (format t "~6D/~D~18T~@[~6D~]~28Tcontiguous (~D blocks)~%"
+    (format t "~6D/~D~19T~@[~8D~]~28Tcontiguous (~D blocks)~%"
             ncbpage maxcbpage (if (zerop cbgbccount) nil cbgbccount) ncb)
     (format t "~7T~D~28Thole~%" holepage)
-    (format t "~7T~D~12T~6,1F%~@[~6D~]~28Trelocatable~%~%"
+    (format t "~7T~D~12T~6,1F%~@[~8D~]~28Trelocatable~%~%"
             nrbpage (/ rbused 0.01 (+ rbused rbfree))
             (if (zerop rbgbccount) nil rbgbccount))
     (format t "~10D pages for cells~%" npage)
