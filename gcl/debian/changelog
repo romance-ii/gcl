@@ -3,8 +3,10 @@ gclcvs (2.7.0-18) unstable; urgency=low
   * Automatic readline initialization
   * Add watch file
   * Prevent circular error loops
+  * Prevent automatic optimization added to CFLAGS by autoconf
+  * Rework documentation installation in and outside of Debian
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  8 Jan 2004 23:27:53 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  8 Jan 2004 23:30:22 +0000
 
 gclcvs (2.7.0-17) unstable; urgency=low
 
