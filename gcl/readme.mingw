@@ -9,6 +9,9 @@ The older Cygwin hosted method is set out further into this file
 below the MSYS method described here.  It is not recommended, not
 supported and the instructions are not up to date.
 
+I have also built a debug GCL with the new Mingw 2 executable install 
+package (uses GCC 3.2).  This does not work with the default 
+optimisation settings however - more work needed.
 
 ===============================================
 BUILDING GCL USING MSYS AS THE HOST

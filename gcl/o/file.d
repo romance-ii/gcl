@@ -2166,9 +2166,14 @@ gclFlushSocket(strm)
 	 return;
 #define AMT_TO_WRITE 500
     while(i< bufp->ust.ust_fillp) {
-      wrote =TcpOutputProc(fd,&(bufp->ust.ust_self[i]),
-		  bufp->ust.ust_fillp-i > AMT_TO_WRITE ? AMT_TO_WRITE :
-		  bufp->ust.ust_fillp-i,&err);
+      wrote =TcpOutputProc ( fd, 
+	                     &(bufp->ust.ust_self[i]),
+		             bufp->ust.ust_fillp-i > AMT_TO_WRITE ? AMT_TO_WRITE : bufp->ust.ust_fillp-i,
+			     &err
+#ifdef __MINGW32__
+				, TRUE /* Wild guess as to whether it should block or not */
+#endif
+);
       if (wrote < 0) {
 	SET_STREAM_FLAG(strm,gcl_sm_had_error,1);
 	close_stream(strm);

@@ -776,7 +776,7 @@ BOOL WINAPI inthandler(DWORD i)
 
 
 
-
+void
 alarm(int n) {
   /* printf("dummy alarm"); */
   return;
@@ -854,7 +854,7 @@ void close_shared_memory()
   init_signals_pendingPtr();
 }
 
-void init_shared_memory ()
+void init_shared_memory (void)
 { 
   sprintf(sharedMemory.name,"gcl-%d",getpid());
   sharedMemory.handle =
@@ -880,18 +880,18 @@ void init_shared_memory ()
 */
 
 static _current_set=0;
-int
+void
 sigemptyset( sigset_t *set)
 {
   *set = 0;
 }
-
+void
 sigaddset( sigset_t *set, int n)
 {
   *set |= (1 << n);
 }
 
-
+int
 sigismember ( sigset_t *set, int n)
 {
   return ((*set & (1 << n)) != 0);
@@ -921,7 +921,7 @@ sigprocmask (int how , const sigset_t *set,sigset_t *oldset)
   return 0;
 }
   
-
+void
 fix_filename(object pathname, char *filename1)
 {
     char current_directory[MAXPATHLEN];

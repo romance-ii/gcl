@@ -108,8 +108,6 @@
 /* backq.c:326:OF */ extern object fLcomma_reader (object x0, object x1); /* (x0, x1) object x0; object x1; */
 /* backq.c:351:OF */ extern object fLbackquote_reader (object x0, object x1); /* (x0, x1) object x0; object x1; */
 /* backq.c:381:OF */ extern void init_backq (void); /* () */
-/* bcmp.c:2:OF */ /*  extern int bcmp (const char *s1, const char *s2, size_t n); */ /* (s1, s2, n) char *s1; char *s2; int n; */
-/* bcopy.c:3:OF */ /*  extern void bcopy (const char *s1, char *s2, size_t n); */ /* (s1, s2, n) char *s1; char *s2; int n; */
 /* bds.c:31:OF */ extern void bds_unwind (bds_ptr new_bds_top); /* (new_bds_top) bds_ptr new_bds_top; */
 /* big.c:53:OF */ extern object fSset_gmp_allocate_relocatable (object flag); /* (flag) object flag; */
 /* gmp_big.c:96:OF */ extern void init_big1 (void); /* () */
@@ -165,7 +163,9 @@ struct key {short n,allow_other_keys;
 /* block.c:97:OF */ extern void Freturn (object args); /* (args) object args; */
 /* block.c:121:OF */ extern void init_block (void); /* () */
 /* bsearch.c:5:OF */ extern void *bsearch (const void *key, const void *base, size_t nel, size_t keysize, int (*compar) (const void *,const void *)); /* (key, base, nel, keysize, compar) char *key; char *base; unsigned int nel; unsigned int keysize; int (*compar)(); */
+#if defined (__MINGW32__)
 /* bzero.c:3:OF */ /*  extern void bzero (char *b, size_t length); */ /* (b, length) char *b; int length; */
+#endif
 /* catch.c:32:OF */ extern void Fcatch (object args); /* (args) object args; */
 /* catch.c:52:OF */ extern void siLerror_set (void); /* () */
 /* catch.c:61:OF */ extern object fSerror_set (object x0); /* (x0) object x0; */
@@ -621,8 +621,8 @@ typedef void (*funcvoid)(void);
 /* nsocket.c:484:OF */ extern int getOneChar (FILE *fp); /* (fp) FILE *fp; */
 /* nsocket.c:539:OF */ extern void ungetCharGclSocket (int c, object strm); /* (c, strm) int c; object strm; */
 #ifndef __MINGW32__
-/* nsocket.c:575:OF */ extern int TcpOutputProc (int fd, char *buf, int toWrite, int *errorCodePtr); /* (fd, buf, toWrite, errorCodePtr) int fd; char *buf; int toWrite; int *errorCodePtr; */
 /* nsocket.c:592:OF */ extern void tcpCloseSocket (int fd); /* (fd) int fd; */
+/* nsocket.c:575:OF */ extern int TcpOutputProc (int fd, char *buf, int toWrite, int *errorCodePtr); /* (fd, buf, toWrite, errorCodePtr) int fd; char *buf; int toWrite; int *errorCodePtr; */
 #endif
 /* nsocket.c:598:OF */ extern void doReverse (char *s, int n); /* (s, n) char *s; int n; */
 /* nsocket.c:619:OF */ extern int getCharGclSocket (object strm, object block); /* (strm, block) object strm; object block; */
@@ -1780,3 +1780,18 @@ node_compare(const void *,const void *);
 
 void
 unlink_loaded_files(void);
+
+#if defined (__MINGW32__)
+int bcmp ( const void *s1, const void *s2, size_t n );
+void bcopy ( const void *s1, void *s2, size_t n );
+int TcpOutputProc ( int fd, char *buf, int toWrite, int *errorCodePtr, int block );
+void recreate_heap1 ( void );
+void init_shared_memory ( void );
+void fix_filename ( object pathname, char *filename1 );
+void alarm ( int n );
+void *sbrk ( unsigned long increment );
+void sigemptyset( sigset_t *set);
+void sigaddset ( sigset_t *set, int n);
+int sigismember ( sigset_t *set, int n );
+int sigprocmask ( int how, const sigset_t *set, sigset_t *oldset );
+#endif

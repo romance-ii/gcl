@@ -569,6 +569,7 @@ find_sym(sym,name)
   if (name==0) name = SYM_NAME(sym);
   return find_sym_ptable(name);}
 
+void
 set_symbol_address(sym,string)
 struct syment *sym;
 char *string;

@@ -73,7 +73,9 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define HEADER_SEEK
 #endif
 
-#define	MAXPATHLEN	1024
+#ifndef MAXPATHLEN
+#  define	MAXPATHLEN	1024
+#endif
 
 #ifndef SFASL
 int

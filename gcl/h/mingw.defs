@@ -11,10 +11,10 @@ ODIR_DEBUG   = -g
 
 CROSS_PREFIX =
 
-CFLAGS       = -Wall -fwritable-strings -DVOL=volatile -O2 -fomit-frame-pointer -fsigned-char -I$(GCLDIR)/o 
-FINAL_CFLAGS = -Wall -fwritable-strings -DVOL=volatile -O2 -fomit-frame-pointer -fsigned-char
+#CFLAGS       = -Wall -fwritable-strings -DVOL=volatile -O2 -fomit-frame-pointer -fsigned-char -I$(GCLDIR)/o 
+#FINAL_CFLAGS = -Wall -fwritable-strings -DVOL=volatile -O2 -fomit-frame-pointer -fsigned-char
 
-CC           = ${CROSS_PREFIX}gcc -Wall -fwritable-strings -DVOL=volatile -O2 -fomit-frame-pointer -fsigned-char -I$(GCLDIR)/o 
+#CC           = ${CROSS_PREFIX}gcc -Wall -fwritable-strings -DVOL=volatile -O2 -fomit-frame-pointer -fsigned-char -I$(GCLDIR)/o 
 
 AS           = ${CROSS_PREFIX}as
 AR           = ${CROSS_PREFIX}ar q

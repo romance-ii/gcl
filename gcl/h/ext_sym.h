@@ -55,7 +55,6 @@
 
 
 
-#define MAXPATHLENGTH 200
 #define RDONLY "r"
  
 #ifdef BSD
