@@ -9,8 +9,10 @@ gclcvs (2.7.0-30) unstable; urgency=low
   * Allow sharp numbers to be bignums
   * lintian fix in string-match
   * Improve gprof support
+  * Improve sgc page allocation which optimize-maximum-pages is in
+    effect and the hole is overrun
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  5 Aug 2004 22:28:56 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  5 Aug 2004 22:31:53 +0000
 
 gclcvs (2.7.0-29) unstable; urgency=low
 

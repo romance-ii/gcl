@@ -761,6 +761,7 @@ struct typemanager {
 	short   tm_percent_free;  /* percent which must be free after a gc for this type */
         short   tm_distinct;       /* pages of this type are distinct */
         float   tm_adjgbccnt;
+        long    tm_opt_maxpage;
 };
 
 

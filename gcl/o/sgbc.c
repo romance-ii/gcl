@@ -1192,6 +1192,17 @@ memprotect_test_reset(void) {
 
 }
 
+#define MMIN(a,b) ({long _a=a,_b=b;_a<_b ? _a : _b;})
+#define MMAX(a,b) ({long _a=a,_b=b;_a>_b ? _a : _b;})
+/* If opt_maxpage is set, don't lose balancing information gained thus
+   far if we are triggered 'artificially' via a hole overrun. FIXME --
+   try to allocate a small working set with the right proportions
+   later on. 20040804 CM*/
+#define WSGC(tm) ({long _t=MMAX(MMIN(tm->tm_opt_maxpage,tm->tm_npage),tm->tm_sgc);_t;})
+/* If opt_maxpage is set, add full pages to the sgc set if needed
+   too. 20040804 CM*/
+#define FSGC(tm) (tm->tm_opt_maxpage ? 0 : tm->tm_sgc_minfree)
+
 int
 sgc_start(void) {
 
@@ -1201,16 +1212,30 @@ sgc_start(void) {
   object f;
   struct typemanager *tm;
   long npages;
-  unsigned long npp;
+  static int n;
+  extern int hole_overrun;
 
   if (memprotect_result!=memprotect_success && do_memprotect_test())
     return 0;
 
-  npp=page((&sgc_type_map[0]));
-  if (npp<MAXPAGE && sgc_type_map[npp] != SGC_PERM_WRITABLE)
+  if (!n) {
     perm_writable(&sgc_type_map[0],sizeof(sgc_type_map));
+    n=1;
+  }
   if (sgc_enabled)
     return 1;
+
+  /* Reset maxpage statistics if not invoked automatically on a hole
+     overrun. 20040804 CM*/
+  if (!hole_overrun) {
+    vs_mark;
+    object *old_vs_base=vs_base;
+    vs_base=vs_top;
+    FFN(siLreset_gbc_count)();
+    vs_base=old_vs_base;
+    vs_reset;
+  }
+
   sgc_type_map[0]=0;
   /* FIXME ensure core_end in range for type_map reference below.  CM*/
   i=npages=page(core_end);
@@ -1227,7 +1252,7 @@ sgc_start(void) {
 	 which is a definite bug, as minfree could then be zero,
 	 leading this type to claim SGC pages not of its type as
 	 specified in type_map.  CM 20030827*/
-      unsigned short minfree = tm->tm_sgc_minfree > 0 ? tm->tm_sgc_minfree : 1 ;
+      unsigned short minfree = FSGC(tm) > 0 ? FSGC(tm) : 1 ;
       unsigned long count;
       bzero(free_map,npages*sizeof(short));
       f = tm->tm_free;
@@ -1237,7 +1262,7 @@ sgc_start(void) {
 	if (j>=MAXPAGE)
 	  error("Address in tm freelist out of range");
 	/* protect against overflow */
-	free_map[j]=free_map[j]<minfree ? free_map[j]+1 : free_map[j];
+	free_map[j]=free_map[j]<(unsigned short)-1 ? free_map[j]+1 : free_map[j];
 	if (j>=maxp) maxp=j;
 #ifdef DEBUG
 	count++;
@@ -1250,22 +1275,34 @@ sgc_start(void) {
 	       ,tm->tm_type,tm->tm_nfree,
 	       count);fflush(stdout);
 #endif       
+      /*FIXME -- sort free_map here, and alloca it to heap end only above */
       for(j=0,count=0; j <= maxp ;j++) {
 	if (free_map[j] >= minfree) {
 	  sgc_type_map[j] |= (SGC_PAGE_FLAG | SGC_TEMP_WRITABLE);
 	  ++count;
-	  if (count >= tm->tm_sgc_max)
+	  if (count >= MMAX(tm->tm_sgc_max,WSGC(tm)))
 	    break; 
 	  }
       }
+      /* If opt_maxpage is set, add full pages to the sgc set if needed
+	 too. 20040804 CM*/
+      if (count<WSGC(tm) && !FSGC(tm)) 
+	for (j=0;j<=MAXPAGE;j++) 
+	  if (type_map[j]==i && free_map[j]==0) {
+	    sgc_type_map[j] |= (SGC_PAGE_FLAG | SGC_TEMP_WRITABLE);
+	    ++count;
+	    if (count >= MMAX(tm->tm_sgc_max,WSGC(tm)))
+	      break; 
+	  }
+	
       
       /* don't do any more allocations  for this type if saving system */
       if (saving_system) 
 	continue;
       
-      if (count < tm->tm_sgc) {
+      if (count < WSGC(tm)) {
 	/* try to get some more free pages of type i */
-	long n = tm->tm_sgc - count;
+	long n = WSGC(tm) - count;
 	long again=0,nfree = tm->tm_nfree;
 	char *p=alloc_page(n);
 	if (tm->tm_nfree > nfree) again=1;  /* gc freed some objects */
@@ -1315,7 +1352,8 @@ sgc_start(void) {
       i=((*cbpp)->cb_size-k)/PAGESIZE;
       count+=i;
     }
-    count=tm->tm_sgc>count ? tm->tm_sgc - count : 0;
+    i=WSGC(tm);
+    count=i>count ? i - count : 0;
     
     if (count>0) {
       /* SGC cont pages: allocate more if necessary, dumping possible
@@ -1402,7 +1440,7 @@ sgc_start(void) {
     {
       old_rb_start=rb_start;
       if(!saving_system) {
-	new=alloc_relblock(((unsigned long)tm->tm_sgc)*PAGESIZE);
+	new=alloc_relblock(((unsigned long)WSGC(tm))*PAGESIZE);
 	/* the above may cause a gc, shifting the relblock */
 	old_rb_start=rb_start;
 	new= PAGE_ROUND_UP(new);
