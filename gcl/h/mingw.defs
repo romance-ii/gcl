@@ -40,7 +40,7 @@ APPEND       = ../bin/append
 EXE          = .exe
 BAT          = .bat
 
-LIBFILES     = bsearch.o bcmp.o bzero.o bcopy.o
+LIBFILES     = bcmp.o bzero.o bcopy.o
 EXTRAS       = ${OD}mingwin.o ${OD}mingfile.o
 
 # the  make to use for saved_kcp the profiler.
