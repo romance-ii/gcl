@@ -1,0 +1,40 @@
+Building and using GCL 2.6.2 on OpenBSD
+
+PLATFORMS
+---------
+GCL has only been tested on OpenBSD/i386 3.4.  Newer versions should
+work as well.  Other hardware platforms are unchartered land.
+
+TOOLS
+-----
+You need GNU make to compile GCL.  If you have installed the ports
+tree, you can get it by running the following as root:
+
+cd /usr/ports/devel/gmake
+make install
+
+It is then installed as `gmake'.
+
+The sed that ships with OpenBSD 3.4 has a bug (PR 3677) which is
+triggered by the GCL makefiles.  You can use either the sed of 3.5 or
+GNU sed.  Make sure the correct sed comes first in your PATH.
+
+BUILDING
+--------
+There's nothing special to do for OpenBSD; GCL should build out of
+the box.  The OpenBSD version shares makefiles with FreeBSD, so don't
+be surprised when you see "FreeBSD" in the output.
+
+NOTES
+-----
+The default limits on data segment size are 64MB (soft) and 256MB
+(hard).  GCL will automatically raise the soft limit to the hard
+limit, but you may find that it runs out of memory anyway.  If so,
+you can change the limits in /etc/login.conf.
+
+For the record, the W^X feature of OpenBSD is disabled, since it
+interfers with the way GCL dumps its executable.
+
+
+Magnus Henoch, 12 June 2004
+

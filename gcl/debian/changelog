@@ -29,8 +29,9 @@ gclcvs (2.7.0-25) unstable; urgency=low
   * Include elf.h in FreeBSD.h
   * Allow for elf_abi.h in FreeBSD.h
   * Add envp arg to main in rsym_nt.c
+  * Add README.openbsd file
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 12 Jun 2004 16:31:32 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 13 Jun 2004 04:02:51 +0000
 
 gclcvs (2.7.0-24) unstable; urgency=low
 
