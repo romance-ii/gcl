@@ -224,15 +224,24 @@ char *out;
 	       files to be loaded do NOT have this tacked on.
 	     */
      if (name ) {
-        char *tmp;
+       char *tmp;
        tmp=index(name,'@') ;
        if (name 
 	   && tmp
 	   && tmp[1]=='@'
 	   && tmp[2]=='G'
 	   && tmp[3]=='L'
-	   && tmp[4]=='I')
-	 { *tmp=0; }
+	   && tmp[4]=='I') { 
+	 *tmp=0;      
+
+	 /* Some glibc have _setjmp as a strong symbol.  We will need
+            __sigsetjmp, to which _setjmp apparently points, to run
+            properly */
+
+	 if (!(strcmp(name,"_setjmp")))
+	   name="__sigsetjmp";
+
+       }
      }
 
        { dprintf(tab.n_symbols %d , tab.n_symbols);
