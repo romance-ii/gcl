@@ -1,3 +1,9 @@
+gclcvs (2.7.0-13) unstable; urgency=low
+
+  * Repair weak symbol addition to the bfd symbol table in sfasli.c
+
+ -- Camm Maguire <camm@intech.m.enhanced.com>  Thu, 30 Oct 2003 20:10:31 -0500
+
 gclcvs (2.7.0-12) unstable; urgency=low
 
   * Fix sh syntax in debian/gcl.sh

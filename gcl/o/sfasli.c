@@ -59,7 +59,7 @@ build_symbol_table_bfd(void) {
     if (!*q[u]->name)
       continue;
 
-    if (strncmp(q[u]->section->name,"*UND*",5) && ! q[u]->flags & BSF_WEAK)
+    if (strncmp(q[u]->section->name,"*UND*",5) && !(q[u]->flags & BSF_WEAK))
       continue;
 
     if ((c=(char *)strstr(q[u]->name,"@@"))) {
