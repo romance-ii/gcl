@@ -131,9 +131,9 @@ unblock_sigusr_sigio()
 
 
 void
-sigfpe()
+sigfpe1()
 {
-	gcl_signal(SIGFPE, sigfpe);
+	gcl_signal(SIGFPE, sigfpe1);
 	FEerror("Floating-point exception.", 0);
 }
 sigpipe()
@@ -177,7 +177,7 @@ sigio()
 
 void
 install_default_signals()
-{	gcl_signal(SIGFPE, sigfpe);
+{	gcl_signal(SIGFPE, sigfpe1);
 	gcl_signal(SIGPIPE, sigpipe);
 	gcl_signal(SIGINT, sigint);
 	gcl_signal(SIGUSR1, sigusr1);
