@@ -63,13 +63,13 @@ TTL:;
 	(void) (*Lnk3)(Lclptr3);
 	vs_top=sup;
 	if((vs_base[0])!=Cnil){
-	goto T17;}
+	goto T11;}
 	base[0]= (V41);
 	vs_top=(vs_base=base+0)+1;
 	(void) (*Lnk4)(Lclptr4);
 	vs_top=sup;
-	goto T17;
-T17:;
+	goto T11;
+T11:;
 	base[0]= (V41);
 	vs_top=(vs_base=base+0)+1;
 	(void) (*Lnk5)(Lclptr5);
@@ -93,28 +93,26 @@ TTL:;
 	(void) (*Lnk7)(Lclptr7);
 	vs_top=sup;
 	V56= vs_base[0];
-	V57 = (V54);
-	{object V58 = (*(LnkLI6))(V56,V57);
-	VMR6(V58)}
+	{object V57 = (*(LnkLI6))(V56,(V54));
+	VMR6(V57)}
 	base[0]=base[0];
 	return Cnil;
 }
 /*	local entry for function (FAST-METHOD MAKE-WRITER-METHOD-FUNCTION (FUNCALLABLE-STANDARD-CLASS T))	*/
 
-static object LI7(V63,V64,V65,V66)
+static object LI7(V62,V63,V64,V65)
 
-object V63;object V64;object V65;object V66;
+object V62;object V63;object V64;object V65;
 {	 VMB7 VMS7 VMV7
 	goto TTL;
 TTL:;
-	base[0]= (V65);
+	base[0]= (V64);
 	vs_top=(vs_base=base+0)+1;
 	(void) (*Lnk7)(Lclptr7);
 	vs_top=sup;
-	V68= vs_base[0];
-	V69 = (V66);
-	{object V70 = (*(LnkLI8))(V68,V69);
-	VMR7(V70)}
+	V67= vs_base[0];
+	{object V68 = (*(LnkLI8))(V67,(V65));
+	VMR7(V68)}
 	base[0]=base[0];
 	return Cnil;
 }

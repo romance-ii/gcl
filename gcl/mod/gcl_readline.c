@@ -58,13 +58,12 @@ T10:;
 	V4= Cnil;
 	{object V6;
 	object V7;
-	V8 = (V2);
 	base[2]= (V2);
 	vs_top=(vs_base=base+2)+1;
 	Lpackage_use_list();
 	vs_top=sup;
-	V9= vs_base[0];
-	V6= make_cons(V8,V9);
+	V8= vs_base[0];
+	V6= make_cons((V2),V8);
 	V7= CMPcar((V6));
 	goto T27;
 T27:;
@@ -74,49 +73,49 @@ T27:;
 	goto T6;
 	goto T28;
 T28:;
-	{long V10;
-	long V11;
+	{long V9;
+	long V10;
 	base[2]= (V7);
 	vs_top=(vs_base=base+2)+1;
 	(void) (*Lnk9)();
 	if(vs_base>=vs_top){vs_top=sup;goto T37;}
-	V10= fix(vs_base[0]);
+	V9= fix(vs_base[0]);
 	vs_base++;
 	if(vs_base>=vs_top){vs_top=sup;goto T38;}
-	V11= fix(vs_base[0]);
+	V10= fix(vs_base[0]);
 	vs_top=sup;
 	goto T39;
 	goto T37;
 T37:;
-	V10= fix(Cnil);
+	V9= fix(Cnil);
 	goto T38;
 T38:;
-	V11= fix(Cnil);
+	V10= fix(Cnil);
 	goto T39;
 T39:;
 	if(((V2))==((V7))){
 	goto T40;}
-	V11= 0;
+	V10= 0;
 	goto T40;
 T40:;
-	{object V12;
-	register object V13;
-	V14 = CMPmake_fixnum(V11);
-	V15 = CMPmake_fixnum(V10);
-	V12= number_plus(V14,V15);
-	V13= small_fixnum(0);
+	{object V11;
+	register object V12;
+	V13 = CMPmake_fixnum(V10);
+	V14 = CMPmake_fixnum(V9);
+	V11= number_plus(V13,V14);
+	V12= small_fixnum(0);
 	goto T47;
 T47:;
-	if(!(number_compare((V13),(V12))>=0)){
+	if(!(number_compare((V12),(V11))>=0)){
 	goto T48;}
 	goto T34;
 	goto T48;
 T48:;
-	V16 = CMPmake_fixnum(V11);
-	if(!(number_compare((V13),V16)<0)){
+	V15 = CMPmake_fixnum(V10);
+	if(!(number_compare((V12),V15)<0)){
 	goto T57;}
 	base[3]= (V7);
-	base[4]= (V13);
+	base[4]= (V12);
 	vs_top=(vs_base=base+3)+2;
 	siLpackage_internal();
 	vs_top=sup;
@@ -125,8 +124,8 @@ T48:;
 	goto T57;
 T57:;
 	base[3]= (V7);
-	V17 = CMPmake_fixnum(V11);
-	base[4]= number_minus((V13),V17);
+	V16 = CMPmake_fixnum(V10);
+	base[4]= number_minus((V12),V16);
 	vs_top=(vs_base=base+3)+2;
 	siLpackage_external();
 	vs_top=sup;
@@ -153,8 +152,8 @@ T63:;
 	vs_top=(vs_base=base+3)+1;
 	Llast();
 	vs_top=sup;
-	V18= vs_base[0];
-	if(!((VV[4])==(CMPcar(V18)))){
+	V17= vs_base[0];
+	if(!((VV[4])==(CMPcar(V17)))){
 	goto T68;}
 	goto T69;
 T69:;
@@ -168,8 +167,8 @@ T69:;
 	goto T78;}
 	goto T79;
 T79:;
-	V19= symbol_name((V3));
-	V1= make_cons(/* INLINE-ARGS */V19,(V1));
+	V18= symbol_name((V3));
+	V1= make_cons(/* INLINE-ARGS */V18,(V1));
 	goto T78;
 T78:;
 	goto T68;
@@ -181,7 +180,7 @@ T54:;
 	goto T51;
 	goto T51;
 T51:;
-	V13= one_plus((V13));
+	V12= one_plus((V12));
 	goto T47;}}
 	goto T34;
 T34:;
@@ -193,27 +192,27 @@ T6:;
 	goto T5;
 	goto T5;
 T5:;
-	{object V20;
+	{object V19;
+	register object V20;
 	register object V21;
-	register object V22;
-	{object V23;
+	{object V22;
 	base[0]= VV[5];
 	vs_top=(vs_base=base+0)+1;
 	Lfind_package();
 	vs_top=sup;
-	V23= vs_base[0];
-	base[0]= (V23);
+	V22= vs_base[0];
+	base[0]= (V22);
 	vs_top=(vs_base=base+0)+1;
 	Lpackagep();
 	vs_top=sup;
 	if((vs_base[0])!=Cnil){
 	goto T101;}
-	base[0]= coerce_to_string((V23));
+	base[0]= coerce_to_string((V22));
 	vs_top=(vs_base=base+0)+1;
 	Lfind_package();
 	vs_top=sup;
-	V23= vs_base[0];
-	if(((V23))!=Cnil){
+	V22= vs_base[0];
+	if(((V22))!=Cnil){
 	goto T101;}
 	base[0]= VV[2];
 	base[1]= VV[3];
@@ -227,98 +226,97 @@ T5:;
 	vs_top=sup;
 	goto T101;
 T101:;
-	V20= (V23);}
+	V19= (V22);}
+	V20= Cnil;
 	V21= Cnil;
-	V22= Cnil;
-	{object V24;
-	object V25;
-	V26 = (V20);
-	base[2]= (V20);
+	{object V23;
+	object V24;
+	base[2]= (V19);
 	vs_top=(vs_base=base+2)+1;
 	Lpackage_use_list();
 	vs_top=sup;
-	V27= vs_base[0];
-	V24= make_cons(V26,V27);
-	V25= CMPcar((V24));
+	V25= vs_base[0];
+	V23= make_cons((V19),V25);
+	V24= CMPcar((V23));
 	goto T118;
 T118:;
-	if(!(((V24))==Cnil)){
+	if(!(((V23))==Cnil)){
 	goto T119;}
-	V21= Cnil;
+	V20= Cnil;
 	goto T97;
 	goto T119;
 T119:;
-	{long V28;
-	long V29;
-	base[2]= (V25);
+	{long V26;
+	long V27;
+	base[2]= (V24);
 	vs_top=(vs_base=base+2)+1;
 	(void) (*Lnk9)();
 	if(vs_base>=vs_top){vs_top=sup;goto T128;}
-	V28= fix(vs_base[0]);
+	V26= fix(vs_base[0]);
 	vs_base++;
 	if(vs_base>=vs_top){vs_top=sup;goto T129;}
-	V29= fix(vs_base[0]);
+	V27= fix(vs_base[0]);
 	vs_top=sup;
 	goto T130;
 	goto T128;
 T128:;
-	V28= fix(Cnil);
+	V26= fix(Cnil);
 	goto T129;
 T129:;
-	V29= fix(Cnil);
+	V27= fix(Cnil);
 	goto T130;
 T130:;
-	if(((V20))==((V25))){
+	if(((V19))==((V24))){
 	goto T131;}
-	V29= 0;
+	V27= 0;
 	goto T131;
 T131:;
-	{object V30;
-	register object V31;
-	V32 = CMPmake_fixnum(V29);
-	V33 = CMPmake_fixnum(V28);
-	V30= number_plus(V32,V33);
-	V31= small_fixnum(0);
+	{object V28;
+	register object V29;
+	V30 = CMPmake_fixnum(V27);
+	V31 = CMPmake_fixnum(V26);
+	V28= number_plus(V30,V31);
+	V29= small_fixnum(0);
 	goto T138;
 T138:;
-	if(!(number_compare((V31),(V30))>=0)){
+	if(!(number_compare((V29),(V28))>=0)){
 	goto T139;}
 	goto T125;
 	goto T139;
 T139:;
-	V34 = CMPmake_fixnum(V29);
-	if(!(number_compare((V31),V34)<0)){
+	V32 = CMPmake_fixnum(V27);
+	if(!(number_compare((V29),V32)<0)){
 	goto T148;}
-	base[3]= (V25);
-	base[4]= (V31);
+	base[3]= (V24);
+	base[4]= (V29);
 	vs_top=(vs_base=base+3)+2;
 	siLpackage_internal();
 	vs_top=sup;
-	V22= vs_base[0];
+	V21= vs_base[0];
 	goto T146;
 	goto T148;
 T148:;
-	base[3]= (V25);
-	V35 = CMPmake_fixnum(V29);
-	base[4]= number_minus((V31),V35);
+	base[3]= (V24);
+	V33 = CMPmake_fixnum(V27);
+	base[4]= number_minus((V29),V33);
 	vs_top=(vs_base=base+3)+2;
 	siLpackage_external();
 	vs_top=sup;
-	V22= vs_base[0];
+	V21= vs_base[0];
 	goto T146;
 T146:;
 	goto T144;
 T144:;
-	if(((V22))!=Cnil){
+	if(((V21))!=Cnil){
 	goto T154;}
 	goto T145;
 	goto T154;
 T154:;
-	V21= CMPcar((V22));
-	if(((V25))==((V20))){
+	V20= CMPcar((V21));
+	if(((V24))==((V19))){
 	goto T160;}
-	base[4]= symbol_name((V21));
-	base[5]= (V20);
+	base[4]= symbol_name((V20));
+	base[5]= (V19);
 	vs_top=(vs_base=base+4)+2;
 	Lfind_symbol();
 	Llist();
@@ -327,14 +325,14 @@ T154:;
 	vs_top=(vs_base=base+3)+1;
 	Llast();
 	vs_top=sup;
-	V36= vs_base[0];
-	if(!((VV[4])==(CMPcar(V36)))){
+	V34= vs_base[0];
+	if(!((VV[4])==(CMPcar(V34)))){
 	goto T159;}
 	goto T160;
 T160:;
-	if(((V21))->s.s_dbind!=OBJNULL){
+	if(((V20))->s.s_dbind!=OBJNULL){
 	goto T170;}
-	base[3]= (V21);
+	base[3]= (V20);
 	vs_top=(vs_base=base+3)+1;
 	Lfboundp();
 	vs_top=sup;
@@ -344,30 +342,29 @@ T160:;
 T170:;
 	base[3]= Cnil;
 	base[4]= VV[6];
-	base[5]= (V21);
+	base[5]= (V20);
 	vs_top=(vs_base=base+3)+3;
 	Lformat();
 	vs_top=sup;
-	V37= vs_base[0];
-	V38 = (V1);
-	V1= make_cons(V37,V38);
+	V35= vs_base[0];
+	V1= make_cons(V35,(V1));
 	goto T169;
 T169:;
 	goto T159;
 T159:;
-	V22= CMPcdr((V22));
+	V21= CMPcdr((V21));
 	goto T144;
 	goto T145;
 T145:;
 	goto T142;
 	goto T142;
 T142:;
-	V31= one_plus((V31));
+	V29= one_plus((V29));
 	goto T138;}}
 	goto T125;
 T125:;
-	V24= CMPcdr((V24));
-	V25= CMPcar((V24));
+	V23= CMPcdr((V23));
+	V24= CMPcar((V23));
 	goto T118;}}
 	goto T97;
 T97:;

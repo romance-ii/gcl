@@ -30,7 +30,7 @@ static object LI6();
 #define VMV6 vs_check;
 #define VMR6(VMT6) vs_top=base ; return(VMT6);
 static object LI7();
-#define VMB7 register object *base=vs_top; object  V23 ,V22;
+#define VMB7 register object *base=vs_top; object  V22;
 #define VMS7  register object *sup=vs_top+3;vs_top=sup;
 #define VMV7 vs_check;
 #define VMR7(VMT7) vs_top=base ; return(VMT7);

@@ -4,16 +4,16 @@ static void L1();
 static void LC2();
 #define VC2
 static void LC2();
-#define VM2 9
-#define VM1 5
-static char * VVi[8]={
-#define Cdata VV[7]
+#define VM2 12
+#define VM1 6
+static char * VVi[13]={
+#define Cdata VV[12]
 (char *)(L1)
 };
 #define VV ((object *)VVi)
-static void LnkT6();
-static void (*Lnk6)() = LnkT6;
-static void LnkT5();
-static void (*Lnk5)() = LnkT5;
-static void LnkT4();
-static void (*Lnk4)() = LnkT4;
+static void LnkT11();
+static void (*Lnk11)() = LnkT11;
+static void LnkT10();
+static void (*Lnk10)() = LnkT10;
+static void LnkT9();
+static void (*Lnk9)() = LnkT9;

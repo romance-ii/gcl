@@ -51,7 +51,7 @@ T7:;
 	base[6]= (V9);
 	base[7]= VV[0];
 	vs_top=(vs_base=base+6)+2;
-	(void) (*Lnk7)();
+	(void) (*Lnk14)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
 	goto T14;}
@@ -67,35 +67,35 @@ T14:;
 	base[6]= V9;
 	base[7]= VV[1];
 	vs_top=(vs_base=base+6)+2;
-	(void) (*Lnk7)();
+	(void) (*Lnk14)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
 	goto T19;}
-	{object V12;
-	object V13;
-	register object V14;
-	V12= STREF(object,(V9),0);
-	V13= listA(3,(V3),(V4),(V5));
-	V14= STREF(object,(V9),4);
-	if(((V14))==Cnil){
+	{object V13;
+	object V14;
+	register object V15;
+	V13= STREF(object,(V9),0);
+	V14= listA(3,(V3),(V4),(V5));
+	V15= STREF(object,(V9),4);
+	if(((V15))==Cnil){
 	goto T27;}
-	if((CMPcdr((V14)))!=Cnil){
+	if((CMPcdr((V15)))!=Cnil){
 	goto T27;}
 	(void)((
-	(type_of((V12)) == t_sfun ?(*(((V12))->sfn.sfn_self)):
-	(fcall.argd=2,type_of((V12))==t_vfun) ?
-	(*(((V12))->sfn.sfn_self)):
-	(fcall.fun=((V12)),fcalln))((V13),CMPcar((V14)))));
+	(type_of((V13)) == t_sfun ?(*(((V13))->sfn.sfn_self)):
+	(fcall.argd=2,type_of((V13))==t_vfun) ?
+	(*(((V13))->sfn.sfn_self)):
+	(fcall.fun=((V13)),fcalln))((V14),CMPcar((V15)))));
 	goto T11;
 	goto T27;
 T27:;
-	base[6]= (V12);
-	base[7]= (V13);
-	{object V15;
-	V15= (V14);
+	base[6]= (V13);
+	base[7]= (V14);
+	{object V16;
+	V16= (V15);
 	 vs_top=base+8;
-	 while(V15!=Cnil)
-	 {vs_push((V15)->c.c_car);V15=(V15)->c.c_cdr;}
+	 while(V16!=Cnil)
+	 {vs_push((V16)->c.c_car);V16=(V16)->c.c_cdr;}
 	vs_base=base+7;}
 	{object _funobj = base[6];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
@@ -114,11 +114,11 @@ T19:;
 	base[6]= (V9);
 	base[7]= (V3);
 	base[8]= (V4);
-	{object V16;
-	V16= (V5);
+	{object V17;
+	V17= (V5);
 	 vs_top=base+9;
-	 while(V16!=Cnil)
-	 {vs_push((V16)->c.c_car);V16=(V16)->c.c_cdr;}
+	 while(V17!=Cnil)
+	 {vs_push((V17)->c.c_car);V17=(V17)->c.c_cdr;}
 	vs_base=base+7;}
 	{object _funobj = base[6];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
@@ -128,15 +128,17 @@ T19:;
 	goto T11;
 	goto T35;
 T35:;
-	base[7]= VV[2];
-	base[8]= V9;
-	base[9]= VV[3];
-	vs_top=(vs_base=base+7)+3;
-	(void) (*Lnk8)();
-	vs_top=sup;
-	base[6]= vs_base[0];
-	vs_top=(vs_base=base+6)+1;
-	Lerror();
+	base[6]= VV[2];
+	base[7]= VV[3];
+	base[8]= VV[4];
+	base[9]= VV[5];
+	base[10]= V9;
+	base[11]= VV[6];
+	base[12]= VV[7];
+	base[13]= VV[8];
+	base[14]= VV[9];
+	vs_top=(vs_base=base+6)+9;
+	(void) (*Lnk15)();
 	vs_top=sup;
 	goto T11;
 T11:;
@@ -148,10 +150,10 @@ T2:;
 	base[5]= (base0[1]->c.c_car);
 	base[6]= VV[0];
 	vs_top=(vs_base=base+5)+2;
-	(void) (*Lnk7)();
+	(void) (*Lnk14)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T53;}
+	goto T58;}
 	base[5]= STREF(object,(base0[1]->c.c_car),0);
 	base[6]= STREF(object,(base0[1]->c.c_car),4);
 	base[7]= STREF(object,(base0[1]->c.c_car),8);
@@ -164,83 +166,85 @@ T2:;
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	goto T1;
-	goto T53;
-T53:;
-	{object V17;
-	V17= (base0[1]->c.c_car);
-	base[5]= (V17);
+	goto T58;
+T58:;
+	{object V18;
+	V18= (base0[1]->c.c_car);
+	base[5]= V18;
 	base[6]= VV[1];
 	vs_top=(vs_base=base+5)+2;
-	(void) (*Lnk7)();
+	(void) (*Lnk14)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T64;}
-	{object V18;
-	object V19;
-	object V20;
-	V18= STREF(object,(base0[1]->c.c_car),0);
-	V19= listA(3,(V3),(V4),(V5));
-	V20= STREF(object,(base0[1]->c.c_car),4);
-	if(((V20))==Cnil){
-	goto T72;}
-	if((CMPcdr((V20)))!=Cnil){
-	goto T72;}
-	base[5]= (V19);
-	base[6]= CMPcar((V20));
+	goto T69;}
+	{object V20;
+	object V21;
+	object V22;
+	V20= STREF(object,(base0[1]->c.c_car),0);
+	V21= listA(3,(V3),(V4),(V5));
+	V22= STREF(object,(base0[1]->c.c_car),4);
+	if(((V22))==Cnil){
+	goto T77;}
+	if((CMPcdr((V22)))!=Cnil){
+	goto T77;}
+	base[5]= (V21);
+	base[6]= CMPcar((V22));
 	vs_top=(vs_base=base+5)+2;
-	{object _funobj = (V18);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V20);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	goto T1;
-	goto T72;
-T72:;
-	base[5]= (V18);
-	base[6]= (V19);
-	{object V21;
-	V21= (V20);
+	goto T77;
+T77:;
+	base[5]= (V20);
+	base[6]= (V21);
+	{object V23;
+	V23= (V22);
 	 vs_top=base+7;
-	 while(V21!=Cnil)
-	 {vs_push((V21)->c.c_car);V21=(V21)->c.c_cdr;}
+	 while(V23!=Cnil)
+	 {vs_push((V23)->c.c_car);V23=(V23)->c.c_cdr;}
 	vs_base=base+6;}
 	{object _funobj = base[5];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	goto T1;}
-	goto T64;
-T64:;
-	base[5]= (V17);
+	goto T69;
+T69:;
+	base[5]= V18;
 	vs_top=(vs_base=base+5)+1;
 	Lfunctionp();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T82;}
+	goto T87;}
 	base[5]= (base0[1]->c.c_car);
 	base[6]= (V3);
 	base[7]= (V4);
-	{object V22;
-	V22= (V5);
+	{object V24;
+	V24= (V5);
 	 vs_top=base+8;
-	 while(V22!=Cnil)
-	 {vs_push((V22)->c.c_car);V22=(V22)->c.c_cdr;}
+	 while(V24!=Cnil)
+	 {vs_push((V24)->c.c_car);V24=(V24)->c.c_cdr;}
 	vs_base=base+6;}
 	{object _funobj = base[5];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	goto T1;
-	goto T82;
-T82:;
-	base[6]= VV[4];
-	base[7]= (V17);
+	goto T87;
+T87:;
+	base[5]= VV[2];
+	base[6]= VV[3];
+	base[7]= VV[4];
 	base[8]= VV[5];
-	vs_top=(vs_base=base+6)+3;
-	(void) (*Lnk8)();
-	vs_top=sup;
-	base[5]= vs_base[0];
-	vs_top=(vs_base=base+5)+1;
-	Lerror();}
+	base[9]= (V18);
+	base[10]= VV[6];
+	base[11]= VV[10];
+	base[12]= VV[8];
+	base[13]= VV[11];
+	vs_top=(vs_base=base+5)+9;
+	(void) (*Lnk15)();}
 	goto T1;
 T1:;
 	{object *V7=vs_top;object *V6=vs_base; vs_base=V7;
@@ -251,121 +255,123 @@ T1:;
 	base[0]=base[0];
 	vs_check;
 	vs_top=sup;
-	{object V23;
-	register object V24;
-	V23= (base0[0]->c.c_car);
-	V24= CMPcar((V23));
-	goto T97;
-T97:;
-	if(!(((V23))==Cnil)){
-	goto T98;}
-	goto T93;
-	goto T98;
-T98:;
-	base[1]= (V24);
+	{object V25;
+	register object V26;
+	V25= (base0[0]->c.c_car);
+	V26= CMPcar((V25));
+	goto T107;
+T107:;
+	if(!(((V25))==Cnil)){
+	goto T108;}
+	goto T103;
+	goto T108;
+T108:;
+	base[1]= (V26);
 	base[2]= VV[0];
 	vs_top=(vs_base=base+1)+2;
-	(void) (*Lnk7)();
+	(void) (*Lnk14)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T105;}
+	goto T115;}
 	(void)((
-	V25 = STREF(object,(V24),0),
-	(type_of(V25) == t_sfun ?(*((V25)->sfn.sfn_self)):
-	(fcall.argd=5,type_of(V25)==t_vfun) ?
-	(*((V25)->sfn.sfn_self)):
-	(fcall.fun=(V25),fcalln))(STREF(object,(V24),4),STREF(object,(V24),8),(V3),(V4),(V5))));
-	goto T102;
-	goto T105;
-T105:;
-	base[1]= V24;
+	V27 = STREF(object,(V26),0),
+	(type_of(V27) == t_sfun ?(*((V27)->sfn.sfn_self)):
+	(fcall.argd=5,type_of(V27)==t_vfun) ?
+	(*((V27)->sfn.sfn_self)):
+	(fcall.fun=(V27),fcalln))(STREF(object,(V26),4),STREF(object,(V26),8),(V3),(V4),(V5))));
+	goto T112;
+	goto T115;
+T115:;
+	base[1]= V26;
 	base[2]= VV[1];
 	vs_top=(vs_base=base+1)+2;
-	(void) (*Lnk7)();
+	(void) (*Lnk14)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T110;}
-	{object V27;
-	object V28;
-	register object V29;
-	V27= STREF(object,(V24),0);
-	V28= listA(3,(V3),(V4),(V5));
-	V29= STREF(object,(V24),4);
-	if(((V29))==Cnil){
-	goto T118;}
-	if((CMPcdr((V29)))!=Cnil){
-	goto T118;}
-	(void)((
-	(type_of((V27)) == t_sfun ?(*(((V27))->sfn.sfn_self)):
-	(fcall.argd=2,type_of((V27))==t_vfun) ?
-	(*(((V27))->sfn.sfn_self)):
-	(fcall.fun=((V27)),fcalln))((V28),CMPcar((V29)))));
-	goto T102;
-	goto T118;
-T118:;
-	base[1]= (V27);
-	base[2]= (V28);
+	goto T120;}
 	{object V30;
-	V30= (V29);
+	object V31;
+	register object V32;
+	V30= STREF(object,(V26),0);
+	V31= listA(3,(V3),(V4),(V5));
+	V32= STREF(object,(V26),4);
+	if(((V32))==Cnil){
+	goto T128;}
+	if((CMPcdr((V32)))!=Cnil){
+	goto T128;}
+	(void)((
+	(type_of((V30)) == t_sfun ?(*(((V30))->sfn.sfn_self)):
+	(fcall.argd=2,type_of((V30))==t_vfun) ?
+	(*(((V30))->sfn.sfn_self)):
+	(fcall.fun=((V30)),fcalln))((V31),CMPcar((V32)))));
+	goto T112;
+	goto T128;
+T128:;
+	base[1]= (V30);
+	base[2]= (V31);
+	{object V33;
+	V33= (V32);
 	 vs_top=base+3;
-	 while(V30!=Cnil)
-	 {vs_push((V30)->c.c_car);V30=(V30)->c.c_cdr;}
+	 while(V33!=Cnil)
+	 {vs_push((V33)->c.c_car);V33=(V33)->c.c_cdr;}
 	vs_base=base+2;}
 	{object _funobj = base[1];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	vs_top=sup;
-	goto T102;}
-	goto T110;
-T110:;
-	base[1]= V24;
+	goto T112;}
+	goto T120;
+T120:;
+	base[1]= V26;
 	vs_top=(vs_base=base+1)+1;
 	Lfunctionp();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T126;}
-	base[1]= (V24);
+	goto T136;}
+	base[1]= (V26);
 	base[2]= (V3);
 	base[3]= (V4);
-	{object V31;
-	V31= (V5);
+	{object V34;
+	V34= (V5);
 	 vs_top=base+4;
-	 while(V31!=Cnil)
-	 {vs_push((V31)->c.c_car);V31=(V31)->c.c_cdr;}
+	 while(V34!=Cnil)
+	 {vs_push((V34)->c.c_car);V34=(V34)->c.c_cdr;}
 	vs_base=base+2;}
 	{object _funobj = base[1];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	vs_top=sup;
-	goto T102;
-	goto T126;
-T126:;
-	base[2]= VV[2];
-	base[3]= V24;
-	base[4]= VV[6];
-	vs_top=(vs_base=base+2)+3;
-	(void) (*Lnk8)();
+	goto T112;
+	goto T136;
+T136:;
+	base[1]= VV[2];
+	base[2]= VV[3];
+	base[3]= VV[4];
+	base[4]= VV[5];
+	base[5]= V26;
+	base[6]= VV[6];
+	base[7]= VV[12];
+	base[8]= VV[8];
+	base[9]= VV[13];
+	vs_top=(vs_base=base+1)+9;
+	(void) (*Lnk15)();
 	vs_top=sup;
-	base[1]= vs_base[0];
-	vs_top=(vs_base=base+1)+1;
-	Lerror();
-	vs_top=sup;
-	goto T102;
-T102:;
-	V23= CMPcdr((V23));
-	V24= CMPcar((V23));
-	goto T97;}
+	goto T112;
+T112:;
+	V25= CMPcdr((V25));
+	V26= CMPcar((V25));
+	goto T107;}
 	}}
-	goto T93;
-T93:;
+	goto T103;
+T103:;
 	vs_base=V6;vs_top=V7;}
 	return;
 	}
 }
-static void LnkT8(){ call_or_link(VV[8],(void **)(void *)&Lnk8);} /* TYPECASE-ERROR-STRING */
-static void LnkT7(){ call_or_link(VV[7],(void **)(void *)&Lnk7);} /* STRUCTURE-SUBTYPE-P */
+static void LnkT15(){ call_or_link(VV[15],(void **)(void *)&Lnk15);} /* ERROR */
+static void LnkT14(){ call_or_link(VV[14],(void **)(void *)&Lnk14);} /* STRUCTURE-SUBTYPE-P */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

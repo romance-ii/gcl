@@ -210,6 +210,13 @@ static void L208();
 static void L209();
 static void L210();
 static void L211();
+static void L212();
+static void L213();
+static void L214();
+static void L215();
+static void L216();
+static void L217();
+static void L218();
 #define VC1
 #define VC2
 #define VC3
@@ -421,6 +428,20 @@ static void L211();
 #define VC209
 #define VC210
 #define VC211
+#define VC212
+#define VC213
+#define VC214
+#define VC215
+#define VC216
+#define VC217
+#define VC218
+#define VM218 2
+#define VM217 2
+#define VM216 2
+#define VM215 2
+#define VM214 2
+#define VM213 2
+#define VM212 2
 #define VM211 2
 #define VM210 2
 #define VM209 2
@@ -632,8 +653,8 @@ static void L211();
 #define VM3 2
 #define VM2 2
 #define VM1 2
-static char * VVi[424]={
-#define Cdata VV[423]
+static char * VVi[438]={
+#define Cdata VV[437]
 (char *)(L1),
 (char *)(L2),
 (char *)(L3),
@@ -844,8 +865,15 @@ static char * VVi[424]={
 (char *)(L208),
 (char *)(L209),
 (char *)(L210),
-(char *)(L211)
+(char *)(L211),
+(char *)(L212),
+(char *)(L213),
+(char *)(L214),
+(char *)(L215),
+(char *)(L216),
+(char *)(L217),
+(char *)(L218)
 };
 #define VV ((object *)VVi)
-static void LnkT422();
-static void (*Lnk422)() = LnkT422;
+static void LnkT436();
+static void (*Lnk436)() = LnkT436;

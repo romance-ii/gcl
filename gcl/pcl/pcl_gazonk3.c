@@ -60,7 +60,7 @@ T2:;
 	base[4]= (base0[1]->c.c_car);
 	base[5]= VV[0];
 	vs_top=(vs_base=base+4)+2;
-	(void) (*Lnk6)();
+	(void) (*Lnk12)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
 	goto T20;}
@@ -79,58 +79,37 @@ T2:;
 T20:;
 	{object V10;
 	V10= (base0[1]->c.c_car);
-	base[4]= (V10);
+	base[4]= V10;
 	base[5]= VV[1];
 	vs_top=(vs_base=base+4)+2;
-	(void) (*Lnk6)();
+	(void) (*Lnk12)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
 	goto T30;}
-	{object V11;
-	object V12;
+	{object V12;
 	object V13;
-	V11= STREF(object,(base0[1]->c.c_car),0);
-	V12= make_cons((V3),(V4));
-	V13= STREF(object,(base0[1]->c.c_car),4);
-	if(((V13))==Cnil){
+	object V14;
+	V12= STREF(object,(base0[1]->c.c_car),0);
+	V13= make_cons((V3),(V4));
+	V14= STREF(object,(base0[1]->c.c_car),4);
+	if(((V14))==Cnil){
 	goto T38;}
-	if((CMPcdr((V13)))!=Cnil){
+	if((CMPcdr((V14)))!=Cnil){
 	goto T38;}
-	base[4]= (V12);
-	base[5]= CMPcar((V13));
+	base[4]= (V13);
+	base[5]= CMPcar((V14));
 	vs_top=(vs_base=base+4)+2;
-	{object _funobj = (V11);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+	{object _funobj = (V12);if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	goto T1;
 	goto T38;
 T38:;
-	base[4]= (V11);
-	base[5]= (V12);
-	{object V14;
-	V14= (V13);
-	 vs_top=base+6;
-	 while(V14!=Cnil)
-	 {vs_push((V14)->c.c_car);V14=(V14)->c.c_cdr;}
-	vs_base=base+5;}
-	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
-                   (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
-               else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
-               else super_funcall_no_event(_funobj);}
-	goto T1;}
-	goto T30;
-T30:;
-	base[4]= (V10);
-	vs_top=(vs_base=base+4)+1;
-	Lfunctionp();
-	vs_top=sup;
-	if((vs_base[0])==Cnil){
-	goto T48;}
-	base[4]= (base0[1]->c.c_car);
-	base[5]= (V3);
+	base[4]= (V12);
+	base[5]= (V13);
 	{object V15;
-	V15= (V4);
+	V15= (V14);
 	 vs_top=base+6;
 	 while(V15!=Cnil)
 	 {vs_push((V15)->c.c_car);V15=(V15)->c.c_cdr;}
@@ -139,18 +118,41 @@ T30:;
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
+	goto T1;}
+	goto T30;
+T30:;
+	base[4]= V10;
+	vs_top=(vs_base=base+4)+1;
+	Lfunctionp();
+	vs_top=sup;
+	if((vs_base[0])==Cnil){
+	goto T48;}
+	base[4]= (base0[1]->c.c_car);
+	base[5]= (V3);
+	{object V16;
+	V16= (V4);
+	 vs_top=base+6;
+	 while(V16!=Cnil)
+	 {vs_push((V16)->c.c_car);V16=(V16)->c.c_cdr;}
+	vs_base=base+5;}
+	{object _funobj = base[4];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
+                   (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
+               else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
+               else super_funcall_no_event(_funobj);}
 	goto T1;
 	goto T48;
 T48:;
-	base[5]= VV[2];
-	base[6]= (V10);
-	base[7]= VV[3];
-	vs_top=(vs_base=base+5)+3;
-	(void) (*Lnk7)();
-	vs_top=sup;
-	base[4]= vs_base[0];
-	vs_top=(vs_base=base+4)+1;
-	Lerror();}
+	base[4]= VV[2];
+	base[5]= VV[3];
+	base[6]= VV[4];
+	base[7]= VV[5];
+	base[8]= (V10);
+	base[9]= VV[6];
+	base[10]= VV[7];
+	base[11]= VV[8];
+	base[12]= VV[9];
+	vs_top=(vs_base=base+4)+9;
+	(void) (*Lnk13)();}
 	goto T1;
 T1:;
 	{object *V6=vs_top;object *V5=vs_base; vs_base=V6;
@@ -161,122 +163,122 @@ T1:;
 	base[0]=base[0];
 	vs_check;
 	vs_top=sup;
-	{register object V16;
-	register object V17;
-	V16= (base0[0]->c.c_car);
-	V17= CMPcar((V16));
-	goto T62;
-T62:;
-	if(!(((V16))==Cnil)){
-	goto T63;}
-	goto T58;
+	{register object V17;
+	register object V18;
+	V17= (base0[0]->c.c_car);
+	V18= CMPcar((V17));
+	goto T67;
+T67:;
+	if(!(((V17))==Cnil)){
+	goto T68;}
 	goto T63;
-T63:;
-	base[1]= (V17);
+	goto T68;
+T68:;
+	base[1]= (V18);
 	base[2]= VV[0];
 	vs_top=(vs_base=base+1)+2;
-	(void) (*Lnk6)();
-	vs_top=sup;
-	if((vs_base[0])==Cnil){
-	goto T70;}
-	(void)((
-	V18 = STREF(object,(V17),0),
-	(type_of(V18) == t_sfun ?(*((V18)->sfn.sfn_self)):
-	(fcall.argd=4,type_of(V18)==t_vfun) ?
-	(*((V18)->sfn.sfn_self)):
-	(fcall.fun=(V18),fcalln))(STREF(object,(V17),4),STREF(object,(V17),8),(V3),(V4))));
-	goto T67;
-	goto T70;
-T70:;
-	{register object V19;
-	V19= (V17);
-	base[1]= (V19);
-	base[2]= VV[1];
-	vs_top=(vs_base=base+1)+2;
-	(void) (*Lnk6)();
+	(void) (*Lnk12)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
 	goto T75;}
-	{object V20;
-	object V21;
-	register object V22;
-	V20= STREF(object,(V17),0);
-	V21= make_cons((V3),(V4));
-	V22= STREF(object,(V17),4);
-	if(((V22))==Cnil){
-	goto T83;}
-	if((CMPcdr((V22)))!=Cnil){
-	goto T83;}
 	(void)((
-	(type_of((V20)) == t_sfun ?(*(((V20))->sfn.sfn_self)):
-	(fcall.argd=2,type_of((V20))==t_vfun) ?
-	(*(((V20))->sfn.sfn_self)):
-	(fcall.fun=((V20)),fcalln))((V21),CMPcar((V22)))));
-	goto T67;
-	goto T83;
-T83:;
-	base[1]= (V20);
-	base[2]= (V21);
-	{object V23;
-	V23= (V22);
+	V19 = STREF(object,(V18),0),
+	(type_of(V19) == t_sfun ?(*((V19)->sfn.sfn_self)):
+	(fcall.argd=4,type_of(V19)==t_vfun) ?
+	(*((V19)->sfn.sfn_self)):
+	(fcall.fun=(V19),fcalln))(STREF(object,(V18),4),STREF(object,(V18),8),(V3),(V4))));
+	goto T72;
+	goto T75;
+T75:;
+	base[1]= V18;
+	base[2]= VV[1];
+	vs_top=(vs_base=base+1)+2;
+	(void) (*Lnk12)();
+	vs_top=sup;
+	if((vs_base[0])==Cnil){
+	goto T80;}
+	{object V22;
+	object V23;
+	register object V24;
+	V22= STREF(object,(V18),0);
+	V23= make_cons((V3),(V4));
+	V24= STREF(object,(V18),4);
+	if(((V24))==Cnil){
+	goto T88;}
+	if((CMPcdr((V24)))!=Cnil){
+	goto T88;}
+	(void)((
+	(type_of((V22)) == t_sfun ?(*(((V22))->sfn.sfn_self)):
+	(fcall.argd=2,type_of((V22))==t_vfun) ?
+	(*(((V22))->sfn.sfn_self)):
+	(fcall.fun=((V22)),fcalln))((V23),CMPcar((V24)))));
+	goto T72;
+	goto T88;
+T88:;
+	base[1]= (V22);
+	base[2]= (V23);
+	{object V25;
+	V25= (V24);
 	 vs_top=base+3;
-	 while(V23!=Cnil)
-	 {vs_push((V23)->c.c_car);V23=(V23)->c.c_cdr;}
+	 while(V25!=Cnil)
+	 {vs_push((V25)->c.c_car);V25=(V25)->c.c_cdr;}
 	vs_base=base+2;}
 	{object _funobj = base[1];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	vs_top=sup;
-	goto T67;}
-	goto T75;
-T75:;
-	base[1]= (V19);
+	goto T72;}
+	goto T80;
+T80:;
+	base[1]= V18;
 	vs_top=(vs_base=base+1)+1;
 	Lfunctionp();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T91;}
-	base[1]= (V17);
+	goto T96;}
+	base[1]= (V18);
 	base[2]= (V3);
-	{object V24;
-	V24= (V4);
+	{object V26;
+	V26= (V4);
 	 vs_top=base+3;
-	 while(V24!=Cnil)
-	 {vs_push((V24)->c.c_car);V24=(V24)->c.c_cdr;}
+	 while(V26!=Cnil)
+	 {vs_push((V26)->c.c_car);V26=(V26)->c.c_cdr;}
 	vs_base=base+2;}
 	{object _funobj = base[1];if(type_of(_funobj)==t_cclosure && (_funobj->cc.cc_turbo))
                    (*(_funobj->cc.cc_self))(_funobj->cc.cc_turbo);
                else if (type_of(_funobj)==t_cfun) (*(_funobj->cc.cc_self))();
                else super_funcall_no_event(_funobj);}
 	vs_top=sup;
-	goto T67;
-	goto T91;
-T91:;
-	base[2]= VV[4];
-	base[3]= (V19);
+	goto T72;
+	goto T96;
+T96:;
+	base[1]= VV[2];
+	base[2]= VV[3];
+	base[3]= VV[4];
 	base[4]= VV[5];
-	vs_top=(vs_base=base+2)+3;
-	(void) (*Lnk7)();
+	base[5]= V18;
+	base[6]= VV[6];
+	base[7]= VV[10];
+	base[8]= VV[8];
+	base[9]= VV[11];
+	vs_top=(vs_base=base+1)+9;
+	(void) (*Lnk13)();
 	vs_top=sup;
-	base[1]= vs_base[0];
-	vs_top=(vs_base=base+1)+1;
-	Lerror();
-	vs_top=sup;}
-	goto T67;
-T67:;
-	V16= CMPcdr((V16));
-	V17= CMPcar((V16));
-	goto T62;}
+	goto T72;
+T72:;
+	V17= CMPcdr((V17));
+	V18= CMPcar((V17));
+	goto T67;}
 	}}
-	goto T58;
-T58:;
+	goto T63;
+T63:;
 	vs_base=V5;vs_top=V6;}
 	return;
 	}
 }
-static void LnkT7(){ call_or_link(VV[7],(void **)(void *)&Lnk7);} /* TYPECASE-ERROR-STRING */
-static void LnkT6(){ call_or_link(VV[6],(void **)(void *)&Lnk6);} /* STRUCTURE-SUBTYPE-P */
+static void LnkT13(){ call_or_link(VV[13],(void **)(void *)&Lnk13);} /* ERROR */
+static void LnkT12(){ call_or_link(VV[12],(void **)(void *)&Lnk12);} /* STRUCTURE-SUBTYPE-P */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

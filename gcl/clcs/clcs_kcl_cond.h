@@ -96,7 +96,7 @@ static object LI21();
 #define VMS21
 #define VMV21
 #define VMR21(VMT21) return(VMT21);
-#define VC22 object  V74 ,V73 ,V72;
+#define VC22 object  V73 ,V72;
 static void LC27();
 #define VC23
 static void LC26();

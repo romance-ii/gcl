@@ -296,8 +296,8 @@ static void L8()
 {register object *base=vs_base;
 	register object *sup=base+VM8; VC8
 	vs_check;
-	{object V72;
-	object V73;
+	{register object V72;
+	register object V73;
 	V72=(base[0]);
 	V73=(base[1]);
 	vs_top=sup;

@@ -1,4 +1,4 @@
        
 #(
-#(lisp::generic-function pcl::fast-method-call pcl::method-call pcl::emf lisp::typep system::structure-subtype-p system::typecase-error-string (system::%init . #((system::mf (lisp::quote compiler::cmp-anon) 0) (system::debug (lisp::quote compiler::cmp-anon) (lisp::quote (#:g9137 #:g9138 #:g9139 #:g9141))))))
+#(lisp::generic-function pcl::fast-method-call pcl::method-call conditions::case-failure :name conditions::etypecase :datum :expected-type :possibilities lisp::typep system::structure-subtype-p conditions::error (system::%init . #((system::mf (lisp::quote compiler::cmp-anon) 0) (system::debug (lisp::quote compiler::cmp-anon) (lisp::quote (#:g10218 #:g10219 #:g10220 #:g10224 #:g10225))))))
 )
