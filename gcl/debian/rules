@@ -126,7 +126,8 @@ install: build
 	rm -f debian/tmp/usr/bin/gcl.exe debian/tmp/usr/bin/gclm.bat
 
 	mkdir -p debian/tmp/usr/include && \
-		ln -snf $$(find debian/tmp -name "cmpinclude.h" |sed 's,debian/tmp,,1') debian/tmp/usr/include/
+		cd debian/tmp/usr/include && \
+		ln -snf $$(find ../lib -name "cmpinclude.h" ) .
 
 	find debian/tmp -type f -name "*.lsp" -exec chmod -x {} \;
 	find debian/tmp -type f -name "*.lisp" -exec chmod -x {} \;
