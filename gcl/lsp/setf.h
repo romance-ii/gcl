@@ -58,12 +58,12 @@ static object LI15();
 #define VC20 object  V286 ,V282;
 #define VC21 object  V301 ,V300 ,V299 ,V298 ,V294;
 #define VC22 object  V316 ,V315 ,V314 ,V313 ,V309;
-#define VC23 object  V330 ,V329 ,V328 ,V327 ,V323;
-#define VC24 object  V344 ,V343 ,V342 ,V341 ,V337;
-#define VC25 object  V361 ,V360 ,V359 ,V358 ,V354 ,V348 ,V347;
+#define VC23 object  V332 ,V331 ,V330 ,V326 ,V320 ,V319;
+#define VC24 object  V348 ,V347 ,V346 ,V342 ,V336 ,V335;
+#define VC25 object  V365 ,V364 ,V363 ,V362 ,V358 ,V352 ,V351;
 #define VM25 5
-#define VM24 7
-#define VM23 6
+#define VM24 9
+#define VM23 8
 #define VM22 6
 #define VM21 6
 #define VM20 6

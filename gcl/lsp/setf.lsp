@@ -491,25 +491,29 @@
 (define-modify-macro decf (&optional (delta 1)) -)
 
 (defmacro push (&environment env item place)
-  (when (symbolp place)
-        (return-from push `(setq ,place (cons ,item ,place))))
-  (multiple-value-bind (vars vals stores store-form access-form)
-      (get-setf-method place env)
-    `(let* ,(mapcar #'list
-		    (append vars stores)
-		    (append vals (list (list 'cons item access-form))))
-       ,store-form)))
+  (let ((myitem (gensym)))
+    (when (symbolp place)
+      (return-from push `(let* ((,myitem ,item))
+			   (setq ,place (cons ,myitem ,place)))))
+    (multiple-value-bind (vars vals stores store-form access-form)
+			 (get-setf-method place env)
+			 `(let* ,(mapcar #'list
+					 (append (list myitem) vars stores)
+					 (append (list   item) vals (list (list 'cons myitem access-form))))
+			    ,store-form))))
 
 (defmacro pushnew (&environment env item place &rest rest)
-  (cond ((symbolp place)
-	 (return-from pushnew `(setq ,place (adjoin ,item ,place ,@rest)))))
-  (multiple-value-bind (vars vals stores store-form access-form)
-      (get-setf-method place env)
-    `(let* ,(mapcar #'list
-		    (append vars stores)
-		    (append vals
-			    (list (list* 'adjoin item access-form rest))))
-       ,store-form)))
+  (let ((myitem (gensym)))
+    (cond ((symbolp place)
+	   (return-from pushnew `(let* ((,myitem ,item))
+				   (setq ,place (adjoin ,myitem ,place ,@rest))))))
+    (multiple-value-bind (vars vals stores store-form access-form)
+			 (get-setf-method place env)
+			 `(let* ,(mapcar #'list
+					 (append (list myitem) vars stores)
+					 (append (list   item) vals
+						 (list (list* 'adjoin myitem access-form rest))))
+			    ,store-form))))
 
 (defmacro pop (&environment env place)
   (when (symbolp place)
