@@ -50,6 +50,7 @@ which is usually 60 maybe 100 or something else. */
 #ifdef __MINGW32__
 #include <sys/timeb.h>
 int usleep ( unsigned int microseconds );
+void Lget_system_time_zone(void);
 #endif
 
 #ifdef BSD
@@ -150,8 +151,8 @@ DEFUN("GET-INTERNAL-REAL-TIME",object,fLget_internal_real_time,LISP,0,0,NONE,OO,
      ()
 {
 #ifdef __MINGW32__
-  static struct timeb t0;
-  struct timeb t;
+    static struct timeb t0;
+    struct timeb t;
     if (t0.time == 0) ftime(&t0);
     ftime(&t);
     return make_fixnum((t.time - t0.time)*HZ1 + ((t.millitm)*HZ1)/1000);
@@ -174,7 +175,11 @@ DEFUN("GET-INTERNAL-REAL-TIME",object,fLget_internal_real_time,LISP,0,0,NONE,OO,
 #endif
 }
 
+#ifdef __MINGW32__
+DEFVAR("*DEFAULT-TIME-ZONE*",sSAdefault_time_zoneA,SI,make_fixnum ( system_time_zone_helper() ),"");
+#else
 DEFVAR("*DEFAULT-TIME-ZONE*",sSAdefault_time_zoneA,SI,make_fixnum(TIME_ZONE),"");
+#endif
 
 void
 init_unixtime(void)
@@ -190,6 +195,9 @@ init_unixtime(void)
 
 	make_function("SLEEP", Lsleep);
 	make_function("GET-INTERNAL-RUN-TIME", Lget_internal_run_time);
+#ifdef __MINGW32__        
+	make_function("GET-SYSTEM-TIME-ZONE", Lget_system_time_zone);
+#endif        
 }
 
 #ifdef __MINGW32__
@@ -199,4 +207,25 @@ int usleep ( unsigned int microseconds )
     unsigned int milliseconds = microseconds / 1000;
     return ( SleepEx ( milliseconds, TRUE ) );
 }
+
+int system_time_zone_helper(void)
+{
+    TIME_ZONE_INFORMATION tzi;
+    DWORD TZResult;
+    int tz=0;
+    check_arg(0);
+    TZResult = GetTimeZoneInformation ( &tzi );
+
+    /* Now UTC = (local time + bias), in units of minutes, so */
+    /*fprintf ( stderr, "Bias = %ld\n", tzi.Bias );*/
+    tz = (int) (tzi.Bias / 60);
+    return ( tz );                                    
+}
+
+void
+Lget_system_time_zone(void)
+{
+    vs_push ( make_fixnum ( system_time_zone_helper() ) );
+}
+
 #endif

@@ -6,7 +6,11 @@
 
 (lisp::in-package "SLOOP")
 ;;Appropriate for Austin
+#-winnt
 (setq SYSTEM:*DEFAULT-TIME-ZONE*  6)
+#+winnt
+(setq SYSTEM:*DEFAULT-TIME-ZONE*  (GET-SYSTEM-TIME-ZONE))
+
 (in-package "USER")
 (progn (allocate 'cons 100) (allocate 'string 40)
  (system:init-system) (gbc t)

@@ -19,6 +19,7 @@ main(int argc,char *argv[])
   fflush(stdout);
   exit(1);}
 
+  fprintf ( stderr, "rsym_nt: %s %s\n", in, out );
   sprintf(buf,"nm -g %s > _rsym1",argv[1]);
   if (system(buf))
     {
