@@ -1002,11 +1002,12 @@ fi
 AC_CHECK_FUNC(gethostbyname, , AC_CHECK_LIB(nsl, main, [TLIBS="$TLIBS -lnsl"]))
 
 if test "$enable_readline" = "yes" ; then
-	AC_CHECK_LIB(readline,main,
-		AC_DEFINE(HAVE_READLINE) 
-		TLIBS="$TLIBS -lreadline -lncurses"
-		RL_OBJS=gcl_readline.o
-		RL_LIB=mod/gcl_readline.o,,-lncurses)
+	AC_CHECK_HEADERS(readline/readline.h,
+		AC_CHECK_LIB(readline,main,
+			AC_DEFINE(HAVE_READLINE) 
+			TLIBS="$TLIBS -lreadline -lncurses"
+			RL_OBJS=gcl_readline.o
+			RL_LIB=mod/gcl_readline.o,,-lncurses))
 fi
 
 AC_SUBST(RL_OBJS)

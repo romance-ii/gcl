@@ -5,8 +5,9 @@ gclcvs (2.7.0-16) unstable; urgency=low
   * Remove duplicate tags from compiled C switch statements
   * Minor merges for DARWIN support
   * Path to configure to make --enable-emacsdir work
+  * Check for readline/readline.h header before configuring for readline
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 15 Nov 2003 17:18:53 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 16 Nov 2003 18:39:55 +0000
 
 gclcvs (2.7.0-15) unstable; urgency=low
 
