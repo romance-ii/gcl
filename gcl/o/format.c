@@ -956,9 +956,11 @@ fmt_fix_float(bool colon, bool atsign)
 		return;
 	}
 	if (type_of(x) == t_longfloat)
-		n = 16;
+/* 		n = 16; */
+		n = 17;
 	else
-		n = 7;
+/* 		n = 7; */
+		n = 8;
 	f = number_to_double(x);
 	edit_double(n, f, &sign, buff, &exp);
 	if (exp + k > 100 || exp + k < -100 || d > 100) {
@@ -1152,9 +1154,11 @@ fmt_exponential_float(bool colon, bool atsign)
 		return;
 	}
 	if (type_of(x) == t_longfloat)
-		n = 16;
+/* 		n = 16; */
+		n = 17;
 	else
-		n = 7;
+/* 		n = 7; */
+		n = 8;
 	f = number_to_double(x);
 	edit_double(n, f, &sign, buff, &exp);
 	if (d >= 0) {
@@ -1342,9 +1346,11 @@ fmt_general_float(bool colon, bool atsign)
 		return;
 	}
 	if (type_of(x) == t_longfloat)
-		q = 16;
+/* 		q = 16; */
+		q = 17;
 	else
-		q = 7;
+/* 		q = 7; */
+		q = 8;
 	edit_double(q, number_to_double(x), &sign, buff, &exp);
 	n = exp + 1;
 	while (q >= 0)
@@ -1426,9 +1432,11 @@ fmt_dollars_float(bool colon, bool atsign)
 		vs_reset;
 		return;
 	}
-	q = 7;
+/* 	q = 7; */
+	q = 8;
 	if (type_of(x) == t_longfloat)
-		q = 16;
+/* 		q = 16; */
+		q = 17;
 	f = number_to_double(x);
 	edit_double(q, f, &sign, buff, &exp);
 	if ((q = exp + d + 1) > 0)
