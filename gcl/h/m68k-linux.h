@@ -72,3 +72,5 @@ int cacheflush(void *,int,int,int);
                         v=(void *)((unsigned long)v & ~(CLEAR_CACHE_LINE_SIZE - 1));\
                         cacheflush(v,FLUSH_SCOPE_PAGE,FLUSH_CACHE_BOTH,ve-v);\
                     } while(0)
+
+#define C_GC_OFFSET 2

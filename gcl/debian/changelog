@@ -1,3 +1,9 @@
+gclcvs (2.7.0-26) unstable; urgency=low
+
+  * C_GC_OFFSET is 2 on m68k-linux
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 24 Jun 2004 15:13:46 +0000
+
 gclcvs (2.7.0-25) unstable; urgency=low
 
   * gcc-3.4 support
