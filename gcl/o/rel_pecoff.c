@@ -31,17 +31,18 @@ relocate()
         break;
       
     case R_PCRLONG:
-#ifdef _WIN32
         /* the following is logical, except the address offset is
            not where the 'where' is but where the 'call' is just
            AFTER the 'where'.
            */
         *(int *)where = symbol_table[relocation_info.r_symndx].n_value
             - (int) where - sizeof(int *);
-#else      
-        *(int *)where = *((int *)where)  - (int)start_address
-            + symbol_table[relocation_info.r_symndx].n_value;
-#endif	
+
+	/*
+          *(int *)where = *((int *)where)  - (int)start_address
+	             + symbol_table[relocation_info.r_symndx].n_value;
+	*/
+
 #ifdef DEBUG        
         fprintf ( stderr, "new val R_PCRLONG %9x\n", *(int *)where );
 #endif      

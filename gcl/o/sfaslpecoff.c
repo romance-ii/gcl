@@ -46,10 +46,6 @@
 #include "ext_sym.h"
 struct node * find_sym();
 int node_compare();
-#ifndef _WIN32
-void *malloc();
-void *bsearch();
-#endif
 
 struct reloc relocation_info;
 /* next 5 static after debug */
@@ -71,19 +67,14 @@ int sfasldebug=1;
 #endif
 #define PTABLE_EXTRA 20
 
-#ifdef COFF
-#  define COFF_SECTIONS 10   /* Numbner of section headers in section header buffer */
-#endif
+#define COFF_SECTIONS 10   /* Numbner of section headers in section header buffer */
 
 #define INVALID_NSCN 64000   /* A number greater than the number of sections ever likely to be read in. */
 
-#ifdef _WIN32
 unsigned int TEXT_NSCN = INVALID_NSCN, DATA_NSCN = INVALID_NSCN,
   BSS_NSCN = INVALID_NSCN, STAB_NSCN = INVALID_NSCN,
   STABSTR_NSCN = INVALID_NSCN, RDATA_NSCN = INVALID_NSCN,
   BIGGEST_NSCN_FOUND = 0;
-#endif
-
 
 struct sfasl_info {
     struct syment *s_symbol_table;
@@ -184,7 +175,6 @@ void set_symbol_address ( struct syment *sym, char *string );
  */
 static void work_out_section_indices ( struct scnhdr *section )
 {
-#ifdef _WIN32
   unsigned int i;
 
   /* Initialise the global *_NSCN variables to INVALID_NSCN */
@@ -216,7 +206,6 @@ static void work_out_section_indices ( struct scnhdr *section )
       if ( i > BIGGEST_NSCN_FOUND ) BIGGEST_NSCN_FOUND = i;
     }
   }
-#endif
 }
 
 int fasload ( object faslfile )
@@ -224,16 +213,10 @@ int fasload ( object faslfile )
     long fasl_vector_start;
     struct filehdr fileheader;
     struct sfasl_info sfasl_info_buf;
-#ifdef COFF
     struct scnhdr section[COFF_SECTIONS];
     struct aouthdr header;
-#endif
     int textsize = 0, datasize = 0, bsssize = 0, stabsize = 0,
       stabstrsize = 0, rdatasize = 0, nsyms = 0;
-#if defined ( READ_IN_STRING_TABLE ) || defined ( HPUX )
-    int string_size=0;
-#endif        
-
     object memory, data;
     FILE *fp;
     char filename[MAXPATHLEN];
@@ -269,11 +252,6 @@ int fasload ( object faslfile )
         FEerror("Could not get the header",0);
     }
     nsyms = NSYMS(fileheader);
-
-#ifdef COFF
-#  ifdef AIX3
-    setup_for_aix_load();
-#  endif	
 
     /* Read the optional object file header */
     fread ( &header, 1, fileheader.f_opthdr, fp );
@@ -324,13 +302,6 @@ int fasload ( object faslfile )
       rdatasize = section[RDATA_NSCN].s_size;
     }
 
-#endif
-
-#ifdef BSD
-    textsize=fileheader.a_text;
-    datasize=fileheader.a_data;
-    bsssize=fileheader.a_bss;
-#endif
     dprintf ( "fasload: %s, ", filename );
     dprintf ( "number of symbols: %d\n", nsyms );
 
@@ -345,12 +316,6 @@ int fasload ( object faslfile )
     /* Read the symbol table */
     for (i = 0;  i < nsyms;  i++) {
         fread((char *)&symbol_table[i], SYMESZ, 1, fp);
-#ifdef HPUX
-        symbol_table[i].n_un.n_strx = string_size;
-        dprintf("string_size %d\n", string_size);
-        string_size += symbol_table[i].n_length + 1;
-        fseek(fp,(int)symbol_table[i].n_length,1);
-#endif
     }
     /*	
        on MP386
@@ -359,12 +324,6 @@ int fasload ( object faslfile )
        fread((char *)symbol_table, SYMESZ*fileheader.f_nsyms,1,fp);
        */
 
-#ifdef READ_IN_STRING_TABLE
-    my_string_table=READ_IN_STRING_TABLE(fp,string_size);
-#else 
-#  ifdef MUST_SEEK_TO_STROFF
-    fseek(fp,N_STROFF(fileheader),0);
-#  endif	
     {
         int ii=0;
 	if ( !fread ( (char *) &ii, sizeof(int), 1, fp ) ) {
@@ -379,8 +338,6 @@ int fasload ( object faslfile )
         if ( ii != fread ( my_string_table, 1, ii, fp ) ) {
             FEerror ( "Could not read whole string table", 0 );
 	}
-#endif
-        
 #ifdef SEEK_TO_END_OFILE
         SEEK_TO_END_OFILE(fp);	
 #else
@@ -475,7 +432,6 @@ int fasload ( object faslfile )
 	   that c.table */
 	relocate_symbols(NSYMS(fileheader));  
 	
-#ifdef COFF
         {
             int j = 0;
 
@@ -507,33 +463,6 @@ int fasload ( object faslfile )
                 }
             }
         }
-#endif
-        
-#ifdef BSD
-        fseek(fp,N_RELOFF(fileheader),0);
-	{
-            int nrel = fileheader.a_trsize/sizeof(struct reloc);
-            for ( i=0; i < nrel; i++ ) {
-                fread ( (char *)&relocation_info, sizeof(struct reloc),
-			1, fp);
-                dprintf("relocating %d\n",i);
-                relocate();
-            }
-	}
-#  ifdef N_DRELOFF
-        fseek (fp, N_DRELOFF(fileheader), 0);
-#  endif
-        {
-            int nrel = fileheader.a_drsize/sizeof(struct reloc);
-            the_start += fileheader.a_text;
-            for (i=0; i < nrel; i++) {
-                fread ( (char *) &relocation_info, sizeof(struct reloc),
-                        1, fp);
-                dprintf("relocating %d\n",i);
-                relocate();
-            }
-        }
-#endif
 
         /* end of relocation */
         dprintf(" END OF RELOCATION \n",0);
@@ -571,18 +500,13 @@ int fasload ( object faslfile )
         } else {
             data = read_fasl_vector(faslfile);
             vs_push(data);
-#ifdef COFF
             dprintf(" read fasl now symbols %d \n", fileheader.f_nsyms);
-#endif
 	}
 	close_stream(faslfile);
 
 #ifndef STAND
 	ALLOCA_FREE(my_string_table);
 	ALLOCA_FREE(symbol_table);
-#  ifdef CLEAR_CACHE
-	CLEAR_CACHE;
-#  endif
         dprintf ( "About to call_init %x \n", init_address );
 	call_init ( init_address, memory, data, 0);
         dprintf ( "Finished call_init %x \n", memory );
@@ -596,15 +520,6 @@ int fasload ( object faslfile )
         }
 	return ( memory->cfd.cfd_size );
 #endif
-#if 0        
-	{
-            FILE *out;
-            out=fopen("/tmp/sfasltest","w");
-            fwrite((char *)&fileheader, sizeof(struct filehdr), 1, out);
-            fwrite(start_address,sizeof(char),datasize+textsize+stabsize+stabstrsize+rdatasize,out);
-            fclose(out);
-        }
-#endif        
         printf("\n(start %x)\n",start_address);
     }
 }
@@ -615,80 +530,17 @@ int get_extra_bss(sym_table,length,start,ptr,bsssize)
     int *ptr;                   /* store init address offset here */
 {
     int result = start;
-
-#ifdef AIX3
-    int next_bss =  start - bsssize;
-#endif
-
     struct syment *end,*sym;
 
-#ifdef BSD
-    char tem[SYMNMLEN +1];
-#endif
-
     end =sym_table + length;
+
     for(sym=sym_table; sym < end; sym++)
         {
             
 #ifdef FIND_INIT
             FIND_INIT
 #endif
-
-#ifdef AIX3
-                /* we later go through the relocation entries making this 1
-                   for symbols used */
-#ifdef SYM_USED 
-                if(TC_SYMBOL_P(sym))
-                    {SYM_USED(sym) = 0;}
-#endif
             
-            /* fix up the external refer to _ptrgl to be local ref */
-            if (sym->n_scnum == 0 &&
-                 strcmp(sym->n_name,"_ptrgl")==0)
-                {struct syment* s =
-                     get_symbol("._ptrgl",TEXT_NSCN,sym_table,length);
-                 if (s ==0) FEerror("bad glue",0);
-                 sym->n_value = next_bss ;
-                 ptrgl_offset = next_bss;
-                 ptrgl_text = s->n_value;
-                 next_bss += 0xc;
-                 sym->n_scnum = DATA_NSCN;
-                 ((union auxent *)(sym+1))->x_csect.x_scnlen = 0xc;
-
-             }
-
-            if(sym->n_scnum != BSS_NSCN) goto NEXT;
-            if(SYM_EXTERNAL_P(sym))
-                {int val=sym->n_value;
-                 struct node joe;
-                 if (val && c_table.ptable)
-                     {struct node *answ;
-                      answ= find_sym(sym,0);
-                      if(answ)
-                          {sym->n_value = answ->address ;
-                           sym->n_scnum = N_UNDEF;
-                           val= ((union auxent *)(sym+1))->x_csect.x_scnlen;
-                           result -= val;
-                           goto NEXT;
-                       }}
-             }
-            /* reallocate the bss space */
-            if (sym->n_value == 0)
-                {result += ((union auxent *)(sym+1))->x_csect.x_scnlen;}
-            sym->n_value = next_bss;
-            next_bss += ((union auxent *)(sym+1))->x_csect.x_scnlen;
-        NEXT:
-            ;
-            /* end aix3 */
-#endif
-            
-
-            
-#ifdef BSD
-            tem;                /* ignored */
-            if(SYM_EXTERNAL_P(sym) && SYM_UNDEF_P(sym))
-#endif
-#ifdef COFF
                 if(0)
                     /* what we really want is
                        if (sym->n_scnum==0 && sym->n_sclass == C_EXT
@@ -704,7 +556,6 @@ int get_extra_bss(sym_table,length,start,ptr,bsssize)
                        you could make the pass setting the relative addresses.
                        for the ones you flagged last time.
                        */
-#endif
                     /* external bss so not included in size of bss for file */
                     {int val=sym->n_value;
                      if (val && c_table.ptable
@@ -737,32 +588,12 @@ void relocate_symbols ( unsigned int length )
     for ( sym = symbol_table; sym < end; sym++ ) {
       typ = NTYPE ( sym );
 
-#ifdef BSD
-#  ifdef N_STAB    
-        if (N_STAB & sym->n_type) continue; /* skip: It  is for dbx only */
-#  endif    
-        typ=N_SECTION(sym);
-        /* if(sym->n_type  &  N_EXT) should add the symbol name,
-           so it would be accessible by future loads  */
-        if ( typ == N_ABS || typ == N_TEXT || typ == N_DATA || typ == N_BSS ) {
-#endif
-
-#ifdef COFF
 	if ( typ == TEXT_NSCN || typ == DATA_NSCN || typ == RDATA_NSCN || typ == BSS_NSCN ) {
-#ifdef  _WIN32
 	  if ( typ == TEXT_NSCN )  n_value = (int)start_address;
 	  if ( typ == DATA_NSCN )  n_value = (int)sfaslp->s_start_data;
 	  if ( typ == RDATA_NSCN ) n_value = (int)sfaslp->s_start_rdata;
 	  if ( typ == BSS_NSCN )   n_value = (int)sfaslp->s_start_bss;
-#endif /* _WIN32 */
-#endif /* COFF */
 	  str=SYM_NAME(sym);
-#ifdef AIX3 
-	  if ( N_SECTION(sym) == DATA_NSCN
-	       && NUM_AUX(sym) 
-	       && allocate_toc(sym) )
-	    break;
-#endif     
 	  sym->n_value = n_value;
         } else {
           if ( typ == N_UNDEF ) {
@@ -773,9 +604,7 @@ void relocate_symbols ( unsigned int length )
             set_symbol_address(sym,str);
             describe_sym ( sym-symbol_table, 0 );
           } else {
-#ifdef COFF
             dprintf("relocate_symbols: am ignoring a scnum %d\n",(sym->n_scnum));
-#endif
 	  }
         }
         sym += NUM_AUX(sym);
@@ -807,25 +636,9 @@ void set_symbol_address ( struct syment *sym, char *string )
         answ = find_sym(sym,string);
         dprintf("answ %d \n", (answ ? answ->address : -1) );
         if ( answ ) {
-#ifdef COFF
-#ifdef _AIX370
-            if ( NTYPE(sym) == N_UNDEF )   
-                sym->n_value = answ->address;
-            else 
-#endif 
                 sym->n_value = answ->address -sym->n_value;
             /* for symbols in the local  data,text and bss this gets added
                on when we add the current value */
-#endif
-#ifdef BSD
-            /* the old value of sym->n_value is the length of the common area
-               starting at this address */
-            sym->n_value = answ->address;
-#endif
-#ifdef AIX3
-            fix_undef_toc_address(answ,sym,string);
-#endif
-      
         } else {
             fprintf ( stdout,"undefined %s symbol", string );
             fflush(stdout);
