@@ -23,8 +23,9 @@ gclcvs (2.7.0-32) unstable; urgency=low
   * subtypep, upgraded array-element-type and ash ansi fixes
   * Build with local bfd in libgcl to ease migration into testing, as
     current binutils is long-term buggy
+  * gmp_wrapper variable declaration order change for older gcc
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  3 Sep 2004 17:46:56 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 16 Sep 2004 20:55:25 +0000
 
 gclcvs (2.7.0-31) unstable; urgency=high
 

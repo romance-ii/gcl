@@ -96,8 +96,8 @@ GMP_EXTERN int jmp_gmp;
 
 #define MEM_GMP_CALL(n_,rt_,a_,s_,b_...) \
    GMP_EXTERN_INLINE Join(RF_,rt_) Join(m,a_)(Join(P,n_)(b_)) { \
-           Join(RD_,rt_);\
            int j;\
+           Join(RD_,rt_);\
 	   jmp_gmp=0;\
            if ((j=setjmp(gmp_jmp)))\
               GBC(j);\
