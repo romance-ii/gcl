@@ -7,12 +7,8 @@ gclcvs (2.6.0-2) unstable; urgency=low
   * Back to unstable distribution for cvs snapshots, reflect snapshot in
     source package name instead of version, enable concurrent stable and
     cvs snapshot installation
-  * add gazonk*.lsp to clean targets
   * 6.0 minor version for CVS snapshots, stable releases will start at
     .1
-  * syntax fix to lsp/gprof.hc
-  * Rework debian package structure to handle stable and cvs packages
-    simultaneously
   * fixup config.guess,sub rules in debian/rules
   * remove  windows/install.ansi.lsp (build generated file) from CVS
 
@@ -61,8 +57,12 @@ gcl (2.5.4-1) unstable; urgency=low
   * Fix debian/gcl-doc.docs for latest texinfo file splitting policy,
     Closes: #206017
   * Fix typo in o/sfasli.c
+  * Rework debian package structure to handle stable and cvs packages
+    simultaneously
+  * Add gazonk*.lsp to clean target
+  * syntax fix to lsp/gprof.hc
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 21 Aug 2003 18:44:27 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 22 Aug 2003 17:11:19 +0000
 
 gcl (2.5.3-2) unstable; urgency=low
 
