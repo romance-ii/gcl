@@ -3,8 +3,10 @@ gclcvs (2.7.0-23) unstable; urgency=low
   * Make *features* entries keywords -- add canonical host cpu and
     kernel-system to *features*, disable h files specific
     ADDITIONAL_FEATURES macro in main.c
+  * Fix merge-pathanames bug in concatenating default and supplied
+    directory lists
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 22 Apr 2004 16:40:23 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 22 Apr 2004 18:23:56 +0000
 
 gclcvs (2.7.0-22) unstable; urgency=low
 
