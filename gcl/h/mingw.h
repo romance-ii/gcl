@@ -180,7 +180,6 @@ extern DBEGIN_TY _stacktop, _stackbottom, _dbegin;
 	if (core_end != (sbrk(PAGESIZE*(n - m))))
 
 #define USE_INTERNAL_REAL_TIME_FOR_RUNTIME
-#define SHARP_EQ_CONTEXT_SIZE 1024
 
 /* Use this pending test in configure */
 #define NO_MKSTEMP
