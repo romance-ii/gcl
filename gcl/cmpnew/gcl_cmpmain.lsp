@@ -833,7 +833,7 @@ SYSTEM_SPECIAL_INIT
 
     (system (format nil "touch ~a" (namestring map)))
     (system 
-     (format nil "~a ~a ~a ~a -L~a -Wl,-Map ~a ~a ~a"
+     (format nil "~a ~a ~a ~a -L~a ~a ~a ~a"
 	     *ld* 
 	     (namestring raw)
 	     (namestring ui)
@@ -843,7 +843,7 @@ SYSTEM_SPECIAL_INIT
 		     (setq sfiles (concatenate 'string sfiles " " (namestring tem)))))
 	       sfiles) 
 	     si::*system-directory*
-	     (namestring map)
+	     #+gnu-ld (format nil "-Wl,-Map ~a" (namestring map))
 	     (let* ((par (namestring (make-pathname :directory '(:parent))))
 		    (i (concatenate 'string " " par))
 		    (j (concatenate 'string " " si::*system-directory* par)))

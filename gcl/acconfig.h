@@ -241,3 +241,4 @@ SGC is enabled.  */
 #undef GCL_GPROF
 #undef HAVE_DECL_RL_COMPLETION_MATCHES
 #undef HAVE_RL_COMPENTRY_FUNC_T
+#undef HAVE_GNU_LD

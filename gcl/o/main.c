@@ -949,6 +949,10 @@ init_main(void) {
   ADD_FEATURE("BFD");
 #endif
   ADD_FEATURE("UNEXEC");
+
+#ifdef HAVE_GNU_LD
+  ADD_FEATURE("GNU-LD");
+#endif
   
   make_special("*FEATURES*",features);}
   

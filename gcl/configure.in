@@ -579,7 +579,19 @@ else
 	LEADING_UNDERSCORE=""
 	AC_MSG_RESULT("no")
 fi
-rm -f foo.c foo.o
+AC_MSG_CHECKING("for GNU ld option -Map")
+touch map
+$CC -o foo [ -Wl,-Map ] map foo.o >/dev/null 2>&1
+MAP_SIZE=`cat map | wc -l`
+if test "$MAP_SIZE" != "0" ; then
+	AC_MSG_RESULT("yes")
+	AC_DEFINE(HAVE_GNU_LD)
+	GNU_LD=1
+else
+	AC_MSG_RESULT("no")
+	GNU_LD=
+fi
+rm -f foo.c foo.o foo map
 
  AC_MSG_CHECKING("for size of gmp limbs")
  AC_TRY_RUN([#include <stdio.h>
@@ -1579,6 +1591,7 @@ AC_SUBST(O2FLAGS)
 
 AC_SUBST(EXTRA_LOBJS)
 AC_SUBST(LEADING_UNDERSCORE)
+AC_SUBST(GNU_LD)
 if test -f h/$use.defs  ; then
 
   AC_SUBST(use)

@@ -148,8 +148,13 @@ libpcl_gcl.a: $(OBJS) $(PCLOBJS) sys_pcl_gcl.o gmpfiles bfdfiles # plt_pcl_gcl.o
 
 raw_%_map raw_%: lib%.a libgclp.a $(SYSTEM_OBJS) $(EXTRAS)
 	touch raw_$*_map
+ifeq ($(GNU_LD),1)
 	$(CC) -o raw_$*$(EXE) $(filter %.o,$^) \
 		-L. $(EXTRA_LD_LIBS) -Wl,-Map raw_$*_map $(LD_LIBS_PRE) -l$* $(LD_LIBS_POST)
+else
+	$(CC) -o raw_$*$(EXE) $(filter %.o,$^) \
+		-L. $(EXTRA_LD_LIBS) $(LD_LIBS_PRE) -l$* $(LD_LIBS_POST)
+endif
 #	diff map_$* map_$*.old >/dev/null || (cp map_$* map_$*.old && rm -f $@ && $(MAKE) $@)
 #	cp map_$*.old map_$*
 
