@@ -24,7 +24,7 @@ you may try using bash.exe instead.
 and have installed the mingw compilers and includes under
 g:/progs/mingw-msvrt/bin
 then in bash add
-bash$ export PATH=//g/progs/mingw-msvrt/bin:$PATHxcs
+bash$ export PATH=//g/progs/mingw-msvrt/bin:$PATHxcs
 
 There is a bug in winsock2.h in the mingw distribution at line 46,
 the 'ifdef' should have '#' in front of it.   You will see this when 
