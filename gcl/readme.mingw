@@ -5,7 +5,7 @@ BUILD TOOLS
 - Mingw32 1.1 Windows native gcc from Source Forge:
     http://sourceforge.net/projects/mingw/
 
-- Cygwin Unix emulation tools, which supply the configuration and build environment:
+- Cygwin Unix emulation tools - the configuration and build environment:
     http://sources.redhat.com/cygwin/
 
 - tcl/tk 8.3 from the http (ftp seems to be broken) links at:
@@ -14,21 +14,21 @@ BUILD TOOLS
 - Source code for GCL.
     http://savannah.gnu.org/projects/gcl/
 
-As a general rule it is a good idea to keep up to date with Mingw32 and Cygwin.  
-Most importantly, get the latest runtime (30 April 2002).  Having said that, 
+It is a good idea to keep up to date with Mingw32 and Cygwin, especially 
+the latest Mingw32 runtime (30 April 2002).  Having said that, 
 I have not yet tried the recently released version 3.1 of Mingw32 gcc.
 
-Only version 2.95 is known to work (3.1 may well work, it just hasn't been tried yet).
+Only gcc 2.95 is known to work (3.1 may well work, it just hasn't been tried yet).
 
 
 
 SETUP
 
-- Install Cygwin and Mingw32 per the instructions at those sites. 
+- Install Cygwin and Mingw32 using the instructions at those sites. 
 
 - Install the Tcl/Tk packages directly into your Mingw32 directory. You don't
   need these packages if you don't want to build "tclwinkill.dll" or
-  (perhaps one day, gcl-tk).
+  (perhaps one day) gcl-tk.
 
 - After installing Cygwin, set your Bash path so that Mingw32 is first eg:
   
@@ -59,7 +59,7 @@ BUILDING
 
 - We are now ready to configure:
 
-        ./configure --enable-machine=mingw --prefix="f:/lang/gclcvs" >& con.log
+        ./configure --disable-bfd --enable-machine=mingw --prefix="c:/gcl" >& con.log
 
   Change the prefix directory as required for your final installation path.  
   Note that it is helpful to redirect output from configure and make into log
@@ -83,8 +83,12 @@ BUILDING
   You may need to fiddle with the install target a little as it is not very
   Windows friendly at the moment.
 
+- At this point, BFD fasloading and PCL/ANSI do not work, but the configuration
+  options above are sufficient to get a "traditional" gcl executable which
+  will build the current CVS version of Maxima.
 
-Mike Thomas, 4 April 2002
+
+Mike Thomas, 10 July 2002
 
 
 
