@@ -450,6 +450,8 @@
   
 (defun info (x &optional (dirs *default-info-files*)  &aux wanted
 	       *current-info-data* file position-pattern)
+  (unless (consp dirs)
+    (setq dirs *default-info-files*))
   (let ((tem (info-aux x dirs)))
     (cond
      (*tk-connection*
