@@ -451,13 +451,18 @@ AC_CHECK_HEADERS(sys/ioctl.h)
 #	   declare it.
 #--------------------------------------------------------------------
 
-AC_CHECK_FUNC(BSDgettimeofday, AC_DEFINE(HAVE_BSDGETTIMEOFDAY),
-	AC_CHECK_FUNC(gettimeofday, , AC_DEFINE(NO_GETTOD)))
+AC_CHECK_FUNC([BSDgettimeofday],
+              [AC_DEFINE(HAVE_BSDGETTIMEOFDAY)],
+	      [AC_CHECK_FUNC([gettimeofday], ,
+	                     [AC_DEFINE([NO_GETTOD])])])
+
 AC_MSG_CHECKING([for gettimeofday declaration])
-AC_EGREP_HEADER(gettimeofday, sys/time.h, AC_MSG_RESULT(present), [
-    AC_MSG_RESULT(missing)
-    AC_DEFINE(GETTOD_NOT_DECLARED)
-])
+
+AC_EGREP_HEADER([gettimeofday],
+                [sys/time.h],
+		[AC_MSG_RESULT([present])],
+		[AC_MSG_RESULT([missing])
+    		 AC_DEFINE(GETTOD_NOT_DECLARED)])
 
 
 AC_CHECK_LIB(m,sin,LIBS="${LIBS} -lm",true)
