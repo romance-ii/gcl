@@ -31,6 +31,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 object sLsetf;
 
 object sLget;
+object sLgetf;
 object sLaref;
 object sLsvref;
 object sLelt;
@@ -312,6 +313,8 @@ setf(object place, object form)
 	  val = Ieval(form);
 	  return (putprop(sym,val,Ieval(car(Mcdr(args))))); 
 	}
+	if (fun == sLgetf) 
+	  Ieval(Mcaddr(args));
 	if (fun == sLaref) { f = siLaset; goto EVAL; }
 	if (fun == sLsvref) { f = siLsvset; goto EVAL; }
 	if (fun == sLelt) { f = siLelt_set; goto EVAL; }
@@ -569,6 +572,7 @@ DEF_ORDINARY("DECF",sLdecf,LISP,"");
 DEF_ORDINARY("ELT",sLelt,LISP,"");
 DEF_ORDINARY("FILL-POINTER",sLfill_pointer,LISP,"");
 DEF_ORDINARY("GET",sLget,LISP,"");
+DEF_ORDINARY("GETF",sLgetf,LISP,"");
 DEF_ORDINARY("GETHASH",sLgethash,LISP,"");
 DEF_ORDINARY("INCF",sLincf,LISP,"");
 DEF_ORDINARY("POP",sLpop,LISP,"");

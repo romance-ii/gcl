@@ -1283,15 +1283,18 @@ void Lrassoc() { car_or_cdr = cdr; Lassoc_or_rassoc(); }
 
 static bool true_or_false;
 
-@(defun assoc_or_rassoc_predicate (predicate a_list)
+@(defun assoc_or_rassoc_predicate (predicate a_list &key key)
  	object endp_temp;
+	object x;
 @
 	while (!endp(a_list)) {
-		if ((ifuncall1(predicate,
-			       (*car_or_cdr)(a_list->c.c_car)) != Cnil)
-		    == true_or_false) {
+		if (a_list->c.c_car==Cnil)
+			continue;
+		x=(*car_or_cdr)(a_list->c.c_car);
+		if (key!=Cnil)
+			x=ifuncall1(key,x);
+		if ((ifuncall1(predicate,x) != Cnil) == true_or_false) 
 			@(return `a_list->c.c_car`)
-		}
 		a_list = a_list->c.c_cdr;
 	}
 	@(return a_list)

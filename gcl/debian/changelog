@@ -2,8 +2,9 @@ gcl (2.5.0.cvs20020625-44) unstable; urgency=high
 
   * Handle second argument to last; treat dotted lists correctly in
     ldiff et. al., tailp fix
+  * optional key argument for assoc-if et.al.;eval getf deflt if in setf
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 20 Aug 2002 01:42:27 -0400
+ -- Camm Maguire <camm@enhanced.com>  Tue, 20 Aug 2002 19:23:40 -0400
 
 gcl (2.5.0.cvs20020625-43) unstable; urgency=high
 

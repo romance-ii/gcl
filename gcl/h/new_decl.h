@@ -140,6 +140,7 @@ EXTER object  sLdecf ;
 EXTER object  sLelt ; 
 EXTER object  sLfill_pointer ; 
 EXTER object  sLget ; 
+EXTER object  sLgetf ; 
 EXTER object  sLgethash ; 
 EXTER object  sLincf ; 
 EXTER object  sLpop ; 
