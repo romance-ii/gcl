@@ -243,8 +243,8 @@ AC_CHECK_LIB(readline,main,
 AC_CHECK_HEADER(bfd.h,
 	AC_CHECK_LIB(bfd,bfd_init,
 		AC_DEFINE(HAVE_LIBBFD)
-		echo "int main() {bfd_init();bfd_perror();return 0;}" >foo.c
-		MP=`$GCC -t -o foo foo.c -lbfd -liberty 2>&1 |tr '()' '  ' | ${AWK} '/\/libbfd/ || /\/libiberty/ {for (j=1;j<=NF;j++) {sub("\.so$",".a",$j); if ($j ~ "/libbfd") a=$j; if ($j ~ "/libiberty") b=$j;}} END {print a " " b}'`
+		echo "int main() {bfd_init();xmalloc(1);return 0;}" >foo.c
+		MP=`$GCC -t -static -o foo foo.c -lbfd -liberty 2>&1 |tr '()' '  ' | ${AWK} '/\/libbfd/ || /\/libiberty/ {for (j=1;j<=NF;j++) {sub("\.so$",".a",$j); if ($j ~ "/libbfd") a=$j; if ($j ~ "/libiberty") b=$j;}} END {print a " " b}'`
 		LIBS="$LIBS  $MP"
 		,,-liberty))
 
