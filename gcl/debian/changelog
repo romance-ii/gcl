@@ -47,8 +47,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
     than already allocated
   * Rework internal plt symbol address capture
   * Cleanup sfaslelf compiler warning
+  * Remove implicit dependency on gawk, optimize plt.c a little
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  3 Mar 2004 00:26:11 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  3 Mar 2004 15:38:02 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

@@ -157,9 +157,10 @@ map_%:
 
 plt_%.h: map_%
 	cat $< | awk '/^ .plt/ {if (NF==4) i=1;next;} \
-		{if (!NF) i=0; if (!i) next; }\
-		{b=$$2; sub("@.*$$","",b);A[++k]="{\"" b "\"," $$1 "}"} \
-		END {l=asort(A);for (i=1;i<=l;i++) printf("%s%s\n",A[i],i==l ? "" : ",")}' >$@
+		{if (!NF) i=0; if (!i) next; } \
+		{b=$$2; sub("@.*$$","",b);print "{\"" b "\"," $$1 "}"}' | \
+		sort | awk '{A[++k]=$$0} END {for (i=1;i<=k;i++) \
+			printf("%s%s\n",A[i],i==k ? "" : ",")}' >$@
 
 plt_%.o: plt_%.h plt.c
 	ln -snf $< plt.h
