@@ -218,6 +218,26 @@ call_after_gbc_hook(t)
 
 #define PERCENT_FREE(tm)  ((tm->tm_percent_free ? tm->tm_percent_free : 10)/100.0)
 
+static int
+grow_linear(int old, int fract, int grow_min, int grow_max) {
+  
+  int delt;
+  if (fract==0) 
+    fract=50;
+  if (grow_min==0) 
+    grow_min=1;
+  if (grow_max==0) 
+    grow_max=1000;
+
+  delt=(old*fract)/100;
+  delt= (delt < grow_min ? grow_min:
+	 delt > grow_max ? grow_max:
+	 delt);
+
+  return old + delt;
+
+}
+
 
 object
 alloc_object(enum type t)
@@ -289,26 +309,6 @@ Use ALLOCATE to expand the space.",
 	vs_popp;
 	call_after_gbc_hook(t);
 	goto ONCE_MORE;
-}
-
-static int
-grow_linear(int old, int fract, int grow_min, int grow_max) {
-  
-  int delt;
-  if (fract==0) 
-    fract=50;
-  if (grow_min==0) 
-    grow_min=1;
-  if (grow_max==0) 
-    grow_max=1000;
-
-  delt=(old*fract)/100;
-  delt= (delt < grow_min ? grow_min:
-	 delt > grow_max ? grow_max:
-	 delt);
-
-  return old + delt;
-
 }
 
 object
