@@ -296,6 +296,17 @@
 	   ;;decl, not just the coerced one.  This needs another slot in
 	   ;;info.
 	   (or (member t body) (setq body (append body (list t))))
+	   ;; Remove duplicate tags in C switch statement -- CM 20031112
+	   (setq body
+		 (let (tags new-body)
+		   (dolist (b body)
+		     (cond ((or (symbolp b) (integerp b))
+			    (unless (member b tags)
+			      (push b tags)
+			      (push b new-body)))
+			   (t
+			    (push b new-body))))
+		   (nreverse new-body)))
 	   (setq body
 		 (mapcar
 		  #'(lambda (x)
