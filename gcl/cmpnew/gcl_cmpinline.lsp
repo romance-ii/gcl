@@ -53,25 +53,51 @@
 
 (defun args-info-changed-vars (var forms)
   (case (var-kind var)
-        ((LEXICAL FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT OBJECT)
-         (dolist** (form forms)
-           (when (member var (info-changed-vars (cadr form)))
+    ((LEXICAL FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT OBJECT)
+     (dolist** (form forms)
+	       (when (member var (info-changed-vars (cadr form)))
                  (return-from args-info-changed-vars t))))
-        (REPLACED nil)
-        (t (dolist** (form forms nil)
-             (when (or (member var (info-changed-vars (cadr form)))
-                       (info-sp-change (cadr form)))
+    (REPLACED nil)
+    (t (dolist** (form forms nil)
+		 (when (or (member var (info-changed-vars (cadr form)))
+			   (info-sp-change (cadr form)))
                    (return-from args-info-changed-vars t)))))
   )
+
+;; Variable references in arguments can also be via replaced variables
+;; (see gcl_cmplet.lsp) It appears that this is not necessary when
+;; checking for changed variables, as matches would appear to require
+;; that the variable not be replaced.  It might be better to provide a
+;; new slot in the var structure to point to the variable by which one
+;; is replaced -- one would need to consider chains in such a case.
+;; Here we match on the C variable reference, which should be complete.
+;; 20040306 CM
+
+(defun var-rep-loc (x)
+  (and
+   (eq (var-kind x) 'replaced)
+   (consp (var-loc x)) ;; may not be necessary, but vars can also be replaced to 'locations
+                       ;; see gcl_cmplet.lsp
+   (cadr (var-loc x))))
+
+(defmacro eql-not-nil (x y) `(and ,x (eql ,x ,y)))
+
+(defun var-rep-eq (x y)
+  (or
+   (eq x y)
+   (let ((rx (var-rep-loc x)) (ry (var-rep-loc y)))
+     (or (eql-not-nil (var-loc x) ry)
+	 (eql-not-nil (var-loc y) rx)
+	 (eql-not-nil rx ry)))))
 
 (defun args-info-referred-vars (var forms)
   (case (var-kind var)
         ((LEXICAL REPLACED FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT OBJECT)
          (dolist** (form forms nil)
-           (when (member var (info-referred-vars (cadr form)))
+           (when (member var (info-referred-vars (cadr form)) :test #'var-rep-eq)
                  (return-from args-info-referred-vars t))))
         (t (dolist** (form forms nil)
-             (when (or (member var (info-referred-vars (cadr form)))
+             (when (or (member var (info-referred-vars (cadr form)) :test #'var-rep-eq)
                        (info-sp-change (cadr form)))
                    (return-from args-info-referred-vars t))))
         ))

@@ -59,8 +59,10 @@ gclcvs (2.7.0-20) unstable; urgency=low
     te local supremum
   * Adjustments to vs_top reset logic to clear (hopefully last)
     remaining bug found by the random-tester
+  * Allow args-info-referred-vars to match replaced vars, clearing bug
+    report submitted by Matt Kauffman
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  6 Mar 2004 14:42:54 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat,  6 Mar 2004 14:44:37 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
