@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020219-2) unstable; urgency=medium
+
+  * flavor ->debian-emacs-flavor in emacsen-startup
+
+ -- Camm Maguire <camm@enhanced.com>  Mon,  4 Mar 2002 14:29:59 -0500
+
 gcl (2.5.0.cvs20020219-1) unstable; urgency=medium
 
   * Updated package descriptions, Closes: #134402
