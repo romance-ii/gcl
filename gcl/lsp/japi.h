@@ -181,8 +181,15 @@ static void L179();
 static void L180();
 static void L181();
 static void L182();
-static char * VVi[182]={
-#define Cdata VV[181]
+static void L183();
+static void L184();
+static void L185();
+static void L186();
+static void L187();
+static void L188();
+static void L189();
+static char * VVi[189]={
+#define Cdata VV[188]
 (char *)(L1),
 (char *)(L2),
 (char *)(L3),
@@ -364,6 +371,13 @@ static char * VVi[182]={
 (char *)(L179),
 (char *)(L180),
 (char *)(L181),
-(char *)(L182)
+(char *)(L182),
+(char *)(L183),
+(char *)(L184),
+(char *)(L185),
+(char *)(L186),
+(char *)(L187),
+(char *)(L188),
+(char *)(L189)
 };
 #define VV ((object *)VVi)

@@ -1484,9 +1484,21 @@ static void L125()
 	vs_top=(vs_base=old_base)+1;
 	vs_base[0]=make_fixnum(x);
 }
-/*	function definition for J_GETPARENTID	*/
+/*	function definition for J_GETPOS	*/
 
 static void L126()
+{	object *old_base=vs_base;
+	check_arg(3);
+	j_getpos(
+	object_to_int(vs_base[0]),
+	object_to_int(vs_base[1]),
+	object_to_int(vs_base[2]));
+	vs_top=(vs_base=old_base)+1;
+	vs_base[0]=Cnil;
+}
+/*	function definition for J_GETPARENTID	*/
+
+static void L127()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(1);
@@ -1498,7 +1510,7 @@ static void L126()
 }
 /*	function definition for J_SETFOCUS	*/
 
-static void L127()
+static void L128()
 {	object *old_base=vs_base;
 	check_arg(1);
 	j_setfocus(
@@ -1508,7 +1520,7 @@ static void L127()
 }
 /*	function definition for J_HASFOCUS	*/
 
-static void L128()
+static void L129()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(1);
@@ -1520,7 +1532,7 @@ static void L128()
 }
 /*	function definition for J_GETSTRINGWIDTH	*/
 
-static void L129()
+static void L130()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(2);
@@ -1533,7 +1545,7 @@ static void L129()
 }
 /*	function definition for J_GETFONTHEIGHT	*/
 
-static void L130()
+static void L131()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(1);
@@ -1545,7 +1557,7 @@ static void L130()
 }
 /*	function definition for J_GETFONTASCENT	*/
 
-static void L131()
+static void L132()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(1);
@@ -1557,7 +1569,7 @@ static void L131()
 }
 /*	function definition for J_KEYLISTENER	*/
 
-static void L132()
+static void L133()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(1);
@@ -1569,7 +1581,7 @@ static void L132()
 }
 /*	function definition for J_GETKEYCODE	*/
 
-static void L133()
+static void L134()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(1);
@@ -1581,7 +1593,7 @@ static void L133()
 }
 /*	function definition for J_GETKEYCHAR	*/
 
-static void L134()
+static void L135()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(1);
@@ -1593,7 +1605,7 @@ static void L134()
 }
 /*	function definition for J_MOUSELISTENER	*/
 
-static void L135()
+static void L136()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(2);
@@ -1606,7 +1618,7 @@ static void L135()
 }
 /*	function definition for J_GETMOUSEX	*/
 
-static void L136()
+static void L137()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(1);
@@ -1618,7 +1630,7 @@ static void L136()
 }
 /*	function definition for J_GETMOUSEY	*/
 
-static void L137()
+static void L138()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(1);
@@ -1628,9 +1640,21 @@ static void L137()
 	vs_top=(vs_base=old_base)+1;
 	vs_base[0]=make_fixnum(x);
 }
+/*	function definition for J_GETMOUSEPOS	*/
+
+static void L139()
+{	object *old_base=vs_base;
+	check_arg(3);
+	j_getmousepos(
+	object_to_int(vs_base[0]),
+	object_to_int(vs_base[1]),
+	object_to_int(vs_base[2]));
+	vs_top=(vs_base=old_base)+1;
+	vs_base[0]=Cnil;
+}
 /*	function definition for J_GETMOUSEBUTTON	*/
 
-static void L138()
+static void L140()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(1);
@@ -1642,7 +1666,7 @@ static void L138()
 }
 /*	function definition for J_FOCUSLISTENER	*/
 
-static void L139()
+static void L141()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(1);
@@ -1654,7 +1678,7 @@ static void L139()
 }
 /*	function definition for J_COMPONENTLISTENER	*/
 
-static void L140()
+static void L142()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(2);
@@ -1667,7 +1691,7 @@ static void L140()
 }
 /*	function definition for J_WINDOWLISTENER	*/
 
-static void L141()
+static void L143()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(2);
@@ -1680,7 +1704,7 @@ static void L141()
 }
 /*	function definition for J_SETFLOWLAYOUT	*/
 
-static void L142()
+static void L144()
 {	object *old_base=vs_base;
 	check_arg(2);
 	j_setflowlayout(
@@ -1691,7 +1715,7 @@ static void L142()
 }
 /*	function definition for J_SETBORDERLAYOUT	*/
 
-static void L143()
+static void L145()
 {	object *old_base=vs_base;
 	check_arg(1);
 	j_setborderlayout(
@@ -1701,7 +1725,7 @@ static void L143()
 }
 /*	function definition for J_SETGRIDLAYOUT	*/
 
-static void L144()
+static void L146()
 {	object *old_base=vs_base;
 	check_arg(3);
 	j_setgridlayout(
@@ -1713,7 +1737,7 @@ static void L144()
 }
 /*	function definition for J_SETFIXLAYOUT	*/
 
-static void L145()
+static void L147()
 {	object *old_base=vs_base;
 	check_arg(1);
 	j_setfixlayout(
@@ -1723,7 +1747,7 @@ static void L145()
 }
 /*	function definition for J_SETNOLAYOUT	*/
 
-static void L146()
+static void L148()
 {	object *old_base=vs_base;
 	check_arg(1);
 	j_setnolayout(
@@ -1733,7 +1757,7 @@ static void L146()
 }
 /*	function definition for J_SETBORDERPOS	*/
 
-static void L147()
+static void L149()
 {	object *old_base=vs_base;
 	check_arg(2);
 	j_setborderpos(
@@ -1744,7 +1768,7 @@ static void L147()
 }
 /*	function definition for J_SETHGAP	*/
 
-static void L148()
+static void L150()
 {	object *old_base=vs_base;
 	check_arg(2);
 	j_sethgap(
@@ -1755,7 +1779,7 @@ static void L148()
 }
 /*	function definition for J_SETVGAP	*/
 
-static void L149()
+static void L151()
 {	object *old_base=vs_base;
 	check_arg(2);
 	j_setvgap(
@@ -1766,7 +1790,7 @@ static void L149()
 }
 /*	function definition for J_SETINSETS	*/
 
-static void L150()
+static void L152()
 {	object *old_base=vs_base;
 	check_arg(5);
 	j_setinsets(
@@ -1780,7 +1804,7 @@ static void L150()
 }
 /*	function definition for J_SETALIGN	*/
 
-static void L151()
+static void L153()
 {	object *old_base=vs_base;
 	check_arg(2);
 	j_setalign(
@@ -1791,7 +1815,7 @@ static void L151()
 }
 /*	function definition for J_SETFLOWFILL	*/
 
-static void L152()
+static void L154()
 {	object *old_base=vs_base;
 	check_arg(2);
 	j_setflowfill(
@@ -1802,7 +1826,7 @@ static void L152()
 }
 /*	function definition for J_TRANSLATE	*/
 
-static void L153()
+static void L155()
 {	object *old_base=vs_base;
 	check_arg(3);
 	j_translate(
@@ -1814,7 +1838,7 @@ static void L153()
 }
 /*	function definition for J_CLIPRECT	*/
 
-static void L154()
+static void L156()
 {	object *old_base=vs_base;
 	check_arg(5);
 	j_cliprect(
@@ -1828,7 +1852,7 @@ static void L154()
 }
 /*	function definition for J_DRAWRECT	*/
 
-static void L155()
+static void L157()
 {	object *old_base=vs_base;
 	check_arg(5);
 	j_drawrect(
@@ -1842,7 +1866,7 @@ static void L155()
 }
 /*	function definition for J_FILLRECT	*/
 
-static void L156()
+static void L158()
 {	object *old_base=vs_base;
 	check_arg(5);
 	j_fillrect(
@@ -1856,7 +1880,7 @@ static void L156()
 }
 /*	function definition for J_DRAWROUNDRECT	*/
 
-static void L157()
+static void L159()
 {	object *old_base=vs_base;
 	check_arg(7);
 	j_drawroundrect(
@@ -1872,7 +1896,7 @@ static void L157()
 }
 /*	function definition for J_FILLROUNDRECT	*/
 
-static void L158()
+static void L160()
 {	object *old_base=vs_base;
 	check_arg(7);
 	j_fillroundrect(
@@ -1888,7 +1912,7 @@ static void L158()
 }
 /*	function definition for J_DRAWOVAL	*/
 
-static void L159()
+static void L161()
 {	object *old_base=vs_base;
 	check_arg(5);
 	j_drawoval(
@@ -1902,7 +1926,7 @@ static void L159()
 }
 /*	function definition for J_FILLOVAL	*/
 
-static void L160()
+static void L162()
 {	object *old_base=vs_base;
 	check_arg(5);
 	j_filloval(
@@ -1916,7 +1940,7 @@ static void L160()
 }
 /*	function definition for J_DRAWCIRCLE	*/
 
-static void L161()
+static void L163()
 {	object *old_base=vs_base;
 	check_arg(4);
 	j_drawcircle(
@@ -1929,7 +1953,7 @@ static void L161()
 }
 /*	function definition for J_FILLCIRCLE	*/
 
-static void L162()
+static void L164()
 {	object *old_base=vs_base;
 	check_arg(4);
 	j_fillcircle(
@@ -1942,7 +1966,7 @@ static void L162()
 }
 /*	function definition for J_DRAWARC	*/
 
-static void L163()
+static void L165()
 {	object *old_base=vs_base;
 	check_arg(7);
 	j_drawarc(
@@ -1958,7 +1982,7 @@ static void L163()
 }
 /*	function definition for J_FILLARC	*/
 
-static void L164()
+static void L166()
 {	object *old_base=vs_base;
 	check_arg(7);
 	j_fillarc(
@@ -1974,7 +1998,7 @@ static void L164()
 }
 /*	function definition for J_DRAWLINE	*/
 
-static void L165()
+static void L167()
 {	object *old_base=vs_base;
 	check_arg(5);
 	j_drawline(
@@ -1986,9 +2010,48 @@ static void L165()
 	vs_top=(vs_base=old_base)+1;
 	vs_base[0]=Cnil;
 }
+/*	function definition for J_DRAWPOLYLINE	*/
+
+static void L168()
+{	object *old_base=vs_base;
+	check_arg(4);
+	j_drawpolyline(
+	object_to_int(vs_base[0]),
+	object_to_int(vs_base[1]),
+	object_to_int(vs_base[2]),
+	object_to_int(vs_base[3]));
+	vs_top=(vs_base=old_base)+1;
+	vs_base[0]=Cnil;
+}
+/*	function definition for J_DRAWPOLYGON	*/
+
+static void L169()
+{	object *old_base=vs_base;
+	check_arg(4);
+	j_drawpolygon(
+	object_to_int(vs_base[0]),
+	object_to_int(vs_base[1]),
+	object_to_int(vs_base[2]),
+	object_to_int(vs_base[3]));
+	vs_top=(vs_base=old_base)+1;
+	vs_base[0]=Cnil;
+}
+/*	function definition for J_FILLPOLYGON	*/
+
+static void L170()
+{	object *old_base=vs_base;
+	check_arg(4);
+	j_fillpolygon(
+	object_to_int(vs_base[0]),
+	object_to_int(vs_base[1]),
+	object_to_int(vs_base[2]),
+	object_to_int(vs_base[3]));
+	vs_top=(vs_base=old_base)+1;
+	vs_base[0]=Cnil;
+}
 /*	function definition for J_DRAWPIXEL	*/
 
-static void L166()
+static void L171()
 {	object *old_base=vs_base;
 	check_arg(3);
 	j_drawpixel(
@@ -2000,7 +2063,7 @@ static void L166()
 }
 /*	function definition for J_DRAWSTRING	*/
 
-static void L167()
+static void L172()
 {	object *old_base=vs_base;
 	check_arg(4);
 	j_drawstring(
@@ -2013,7 +2076,7 @@ static void L167()
 }
 /*	function definition for J_SETXOR	*/
 
-static void L168()
+static void L173()
 {	object *old_base=vs_base;
 	check_arg(2);
 	j_setxor(
@@ -2024,7 +2087,7 @@ static void L168()
 }
 /*	function definition for J_GETIMAGE	*/
 
-static void L169()
+static void L174()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(1);
@@ -2034,9 +2097,43 @@ static void L169()
 	vs_top=(vs_base=old_base)+1;
 	vs_base[0]=make_fixnum(x);
 }
+/*	function definition for J_GETIMAGESOURCE	*/
+
+static void L175()
+{	object *old_base=vs_base;
+	check_arg(8);
+	j_getimagesource(
+	object_to_int(vs_base[0]),
+	object_to_int(vs_base[1]),
+	object_to_int(vs_base[2]),
+	object_to_int(vs_base[3]),
+	object_to_int(vs_base[4]),
+	object_to_int(vs_base[5]),
+	object_to_int(vs_base[6]),
+	object_to_int(vs_base[7]));
+	vs_top=(vs_base=old_base)+1;
+	vs_base[0]=Cnil;
+}
+/*	function definition for J_DRAWIMAGESOURCE	*/
+
+static void L176()
+{	object *old_base=vs_base;
+	check_arg(8);
+	j_drawimagesource(
+	object_to_int(vs_base[0]),
+	object_to_int(vs_base[1]),
+	object_to_int(vs_base[2]),
+	object_to_int(vs_base[3]),
+	object_to_int(vs_base[4]),
+	object_to_int(vs_base[5]),
+	object_to_int(vs_base[6]),
+	object_to_int(vs_base[7]));
+	vs_top=(vs_base=old_base)+1;
+	vs_base[0]=Cnil;
+}
 /*	function definition for J_GETSCALEDIMAGE	*/
 
-static void L170()
+static void L177()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(7);
@@ -2054,7 +2151,7 @@ static void L170()
 }
 /*	function definition for J_DRAWIMAGE	*/
 
-static void L171()
+static void L178()
 {	object *old_base=vs_base;
 	check_arg(4);
 	j_drawimage(
@@ -2067,7 +2164,7 @@ static void L171()
 }
 /*	function definition for J_DRAWSCALEDIMAGE	*/
 
-static void L172()
+static void L179()
 {	object *old_base=vs_base;
 	check_arg(10);
 	j_drawscaledimage(
@@ -2086,7 +2183,7 @@ static void L172()
 }
 /*	function definition for J_SETCOLOR	*/
 
-static void L173()
+static void L180()
 {	object *old_base=vs_base;
 	check_arg(4);
 	j_setcolor(
@@ -2099,7 +2196,7 @@ static void L173()
 }
 /*	function definition for J_SETCOLORBG	*/
 
-static void L174()
+static void L181()
 {	object *old_base=vs_base;
 	check_arg(4);
 	j_setcolorbg(
@@ -2112,7 +2209,7 @@ static void L174()
 }
 /*	function definition for J_SETNAMEDCOLOR	*/
 
-static void L175()
+static void L182()
 {	object *old_base=vs_base;
 	check_arg(2);
 	j_setnamedcolor(
@@ -2123,7 +2220,7 @@ static void L175()
 }
 /*	function definition for J_SETNAMEDCOLORBG	*/
 
-static void L176()
+static void L183()
 {	object *old_base=vs_base;
 	check_arg(2);
 	j_setnamedcolorbg(
@@ -2134,7 +2231,7 @@ static void L176()
 }
 /*	function definition for J_LOADIMAGE	*/
 
-static void L177()
+static void L184()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(1);
@@ -2146,7 +2243,7 @@ static void L177()
 }
 /*	function definition for J_SAVEIMAGE	*/
 
-static void L178()
+static void L185()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(3);
@@ -2160,7 +2257,7 @@ static void L178()
 }
 /*	function definition for J_SYNC	*/
 
-static void L179()
+static void L186()
 {	object *old_base=vs_base;
 	check_arg(0);
 	j_sync();
@@ -2169,7 +2266,7 @@ static void L179()
 }
 /*	function definition for J_BEEP	*/
 
-static void L180()
+static void L187()
 {	object *old_base=vs_base;
 	check_arg(0);
 	j_beep();
@@ -2178,7 +2275,7 @@ static void L180()
 }
 /*	function definition for J_RANDOM	*/
 
-static void L181()
+static void L188()
 {	object *old_base=vs_base;
 	int x;
 	check_arg(0);
@@ -2189,7 +2286,7 @@ static void L181()
 }
 /*	function definition for J_SLEEP	*/
 
-static void L182()
+static void L189()
 {	object *old_base=vs_base;
 	check_arg(1);
 	j_sleep(
