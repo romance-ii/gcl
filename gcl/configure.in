@@ -209,8 +209,8 @@ AC_CHECK_LIB(readline,main,
 AC_CHECK_HEADER(bfd.h,
 	AC_CHECK_LIB(bfd,bfd_init,
 		AC_DEFINE(HAVE_LIBBFD)
-		LIBS="$LIBS -lbfd -liberty"
-		,,-liberty))
+		LIBS="$LIBS libbfd.a libiberty.a"
+		,,libiberty.a))
 
 AC_SUBST(LIBS)
 AC_SUBST(RL_OBJS)
