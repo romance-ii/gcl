@@ -86,7 +86,7 @@ TCL_EXES=
 GCL_DVI=
 
 # Use MSYS makeinfo
-HTML_CMD=makeinfo --html --no-split
+HTML_CMD=makeinfo --html
 
 #
 # End h/mingw.defs
