@@ -349,10 +349,7 @@
 ;; as I can make it.   Valid values of *eval-when-defaults* are
 ;; a sublist of '(compile eval load)
 
-;; FIXME -- when it is determined that this is globally correct,
-;; remove :defaults check throughout compiler code.  20040706 CM
-;(defvar *eval-when-defaults* :defaults)
-(defvar *eval-when-defaults* '(:compile-toplevel :load-toplevel :execute))
+(defvar *eval-when-defaults* :defaults)
 
 (defun maybe-eval (default-action form)
   (or default-action (and (symbolp (car form))
