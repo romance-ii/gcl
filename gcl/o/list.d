@@ -785,7 +785,7 @@ nthcdr(fixnum n, object x) {
 
 	if (n < 0) {
 		vs_push(make_fixnum(n));
-		FEwrong_type_argument(sLpositive_fixnum, vs_head);
+		FEwrong_type_argument(sLnon_negative_fixnum, vs_head);
 	}
 	while (n-- > 0)
 		if (endp_prop(x)) {
@@ -808,7 +808,7 @@ LFD(Llast)() {
 		return;
 	if (n==2) {
 		if (type_of(vs_base[1])!=t_fixnum || (n=fix(vs_base[1]))<0)
-			FEwrong_type_argument(sLpositive_fixnum,vs_base[1]);
+			FEwrong_type_argument(sLnon_negative_fixnum,vs_base[1]);
 		vs_popp;
 	}	
 

@@ -337,7 +337,7 @@
 
 
 (defun add-fast-link (fname type args)
-  (let (link link-info (n (add-symbol fname)) vararg)
+  (let (link-info (n (add-symbol fname)) vararg)
     (cond (type  
 	   ;;should do some args checking in that case too.
 	   (let* (link-string tem argtypes
@@ -377,22 +377,19 @@
 		    (princ ")" st)
 		    )
 		    )
-;	      (print (list 'link-string link-string))
-;   (format t "~{~a~#[~:;,~]~}" '(1 2 3 4))
-; 1,2,3,4
 
-	      (if vararg (setq link
-					#'(lambda ( &rest l)
+	      ;; If link is bound above, closure is unprintable as is in its own environment
+	      ;; enables tracing of inline-type-matches.  CM 20050106
+	      (let ((link (when vararg (lambda ( &rest l)
 					    (wt "(VFUN_NARGS="(length l) ",")
 					    (wt-inline-loc link-string l)
-					    (wt ")"))))
-							   
-	      (push (list fname argtypes
-			  (or (get fname 'proclaimed-return-type)
-			      t)
-			  (flags side-effect-p allocates-new-storage)
-			  (or link link-string) 'link-call)
-		    *inline-functions*)
+					    (wt ")")))))
+		(push (list fname argtypes
+			    (or (get fname 'proclaimed-return-type)
+				t)
+			    (flags side-effect-p allocates-new-storage)
+			    (or link link-string) 'link-call)
+		      *inline-functions*))
 	      (setq link-info (list fname (format nil "LI~d" n)
 				    (or (get fname 'proclaimed-return-type)
 					t)

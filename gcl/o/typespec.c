@@ -481,10 +481,34 @@ DEF_ORDINARY("RATIO",sLratio,LISP,"");
 DEF_ORDINARY("SHORT-FLOAT",sLshort_float,LISP,"");
 DEF_ORDINARY("STANDARD-CHAR",sLstandard_char,LISP,"");
 DEF_ORDINARY("BOOLEAN",sLboolean,LISP,"");
+
+DEF_ORDINARY("SEQIND",sLseqind,LISP,"");
+DEF_ORDINARY("RNKIND",sLrnkind,LISP,"");
+
+DEF_ORDINARY("CHAR",sLchar,LISP,"");
+DEF_ORDINARY("NON-NEGATIVE-CHAR",sLnon_negative_char,LISP,"");
+DEF_ORDINARY("NEGATIVE-CHAR",sLnegative_char,LISP,"");
+DEF_ORDINARY("SIGNED-CHAR",sLsigned_char,LISP,"");
+DEF_ORDINARY("UNSIGNED-CHAR",sLunsigned_char,LISP,"");
+
+DEF_ORDINARY("SHORT",sLshort,LISP,"");
+DEF_ORDINARY("NON-NEGATIVE-SHORT",sLnon_negative_short,LISP,"");
+DEF_ORDINARY("NEGATIVE-SHORT",sLnegative_short,LISP,"");
+DEF_ORDINARY("SIGNED-SHORT",sLsigned_short,LISP,"");
+DEF_ORDINARY("UNSIGNED-SHORT",sLunsigned_short,LISP,"");
+
 DEF_ORDINARY("FIXNUM",sLfixnum,LISP,"");
-DEF_ORDINARY("POSITIVE-FIXNUM",sLpositive_fixnum,LISP,"");
-DEF_ORDINARY("POSITIVE-SHORT",sLpositive_short,LISP,"");
-DEF_ORDINARY("POSITIVE-CHAR",sLpositive_char,LISP,"");
+DEF_ORDINARY("NON-NEGATIVE-FIXNUM",sLnon_negative_fixnum,LISP,"");
+DEF_ORDINARY("NEGATIVE-FIXNUM",sLnegative_fixnum,LISP,"");
+DEF_ORDINARY("SIGNED-FIXNUM",sLsigned_fixnum,LISP,"");
+DEF_ORDINARY("UNSIGNED-FIXNUM",sLunsigned_fixnum,LISP,"");
+
+DEF_ORDINARY("LFIXNUM",sLlfixnum,LISP,"");
+DEF_ORDINARY("NON-NEGATIVE-LFIXNUM",sLnon_negative_lfixnum,LISP,"");
+DEF_ORDINARY("NEGATIVE-LFIXNUM",sLnegative_lfixnum,LISP,"");
+DEF_ORDINARY("SIGNED-LFIXNUM",sLsigned_lfixnum,LISP,"");
+DEF_ORDINARY("UNSIGNED-LFIXNUM",sLunsigned_lfixnum,LISP,"");
+
 DEF_ORDINARY("COMPLEX",sLcomplex,LISP,"");
 DEF_ORDINARY("SINGLE-FLOAT",sLsingle_float,LISP,"");
 DEF_ORDINARY("PACKAGE",sLpackage,LISP,"");
@@ -507,8 +531,6 @@ DEF_ORDINARY("VALUES",sLvalues,LISP,"");
 DEF_ORDINARY("MOD",sLmod,LISP,"");
 DEF_ORDINARY("SIGNED-BYTE",sLsigned_byte,LISP,"");
 DEF_ORDINARY("UNSIGNED-BYTE",sLunsigned_byte,LISP,"");
-DEF_ORDINARY("SIGNED-CHAR",sLsigned_char,LISP,"");
-DEF_ORDINARY("UNSIGNED-CHAR",sLunsigned_char,LISP,"");
 DEF_ORDINARY("SIGNED-SHORT",sLsigned_short,LISP,"");
 DEF_ORDINARY("UNSIGNED-SHORT",sLunsigned_short,LISP,"");
 DEF_ORDINARY("*",sLA,LISP,"");
@@ -574,8 +596,10 @@ DEF_ORDINARY("WARNING",sLwarning,LISP,"");
 DEF_ORDINARY("DYNAMIC-EXTENT",sLdynamic_extent,LISP,"");
 #endif
 
-DEFCONST("CHAR-SIZE",sSchar_size,SI,small_fixnum(CHAR_SIZE),"Size in bits of a character");
-DEFCONST("SHORT-SIZE",sSshort_size,SI,small_fixnum(CHAR_SIZE*sizeof(short)),"Size in bits of a short integer");
+DEFCONST("CHAR-LENGTH",sSchar_length,SI,small_fixnum(CHAR_SIZE),"Size in bits of a character");
+DEFCONST("SHORT-LENGTH",sSshort_length,SI,small_fixnum(CHAR_SIZE*sizeof(short)),"Size in bits of a short integer");
+DEFCONST("FIXNUM-LENGTH",sSfixnum_length,SI,small_fixnum(CHAR_SIZE*sizeof(fixnum)),"Size in bits of a short integer");
+DEFCONST("LFIXNUM-LENGTH",sSlfixnum_length,SI,small_fixnum(CHAR_SIZE*sizeof(lfixnum)),"Size in bits of a short integer");
 
 void     
 gcl_init_typespec(void)

@@ -36,7 +36,7 @@ DEFCONST("ARRAY-RANK-LIMIT", sLarray_rank_limit, LISP,
 	 make_fixnum(ARRAY_RANK_LIMIT),"");
 
 DEFCONST("ARRAY-DIMENSION-LIMIT", sLarray_dimension_limit,
-	 LISP, make_fixnum(MOST_POSITIVE_FIX),"");
+	 LISP, make_fixnum(MOST_POSITIVE_FIX>>3),"");
 DEFCONST("ARRAY-TOTAL-SIZE-LIMIT", sLarray_total_size_limit,
 	 LISP, make_fixnum(MOST_POSITIVE_FIX),"");
 
@@ -115,7 +115,7 @@ fScheck_bounds_bounds(object x, int i)
 }
 
 DEFUNO_NEW("SVREF", object, fLsvref, LISP, 2, 2,
-      ONE_VAL, OO, IO, OO,OO,void,Lsvref,(object x,ufixnum i),
+      ONE_VAL, OO, IO, OO,OO,void,Lsvref,(object x,fixnum i),
       "For array X and index I it returns (aref x i) ")
 {
  if (type_of(x)==t_vector
@@ -127,8 +127,8 @@ DEFUNO_NEW("SVREF", object, fLsvref, LISP, 2, 2,
  return(Cnil);
 }
     
-DEFUN_NEW("ROW-MAJOR-AREF", object, fLrow_major_aref, LISP, 2, 2,
-       NONE, OO, IO, OO,OO,(object x,fixnum i),
+DEFUNO_NEW("ROW-MAJOR-AREF", object, fLrow_major_aref, LISP, 2, 2,
+       NONE, OO, IO, OO,OO,void,Lrow_major_aref,(object x,fixnum i),
       "For array X and index I it returns (aref x i) as if x were \
 1 dimensional, even though its rank may be bigger than 1")
 {
@@ -462,11 +462,11 @@ DEFUN_NEW("GET-AELTTYPE",object,fSget_aelttype,SI,1,1,NONE,OO,OO,OO,OO,(object x
       return make_fixnum((enum aelttype) i);
   if (x == sLlong_float || x == sLsingle_float || x == sLdouble_float)
     return make_fixnum(aet_lf);
-  if (x==sLpositive_char)
+  if (x==sLnon_negative_char)
     return make_fixnum(aet_char);
-  if (x==sLpositive_short)
+  if (x==sLnon_negative_short)
     return make_fixnum(aet_short);
-  if (x==sLpositive_fixnum)
+  if (x==sLnon_negative_fixnum)
     return make_fixnum(aet_fix);
   return make_fixnum(aet_object);
 }

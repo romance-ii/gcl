@@ -1209,7 +1209,7 @@ int start,end;
 	    else
 		    istart = FIX_CHECK(start);
 	    if (istart < 0)
-		    FEwrong_type_argument(sLpositive_fixnum,start);
+		    FEwrong_type_argument(sLnon_negative_fixnum,start);
 	
 	    if ((end == Cnil) &&
 	        (type_of(arr) == t_cons))
@@ -1225,7 +1225,7 @@ int start,end;
 	    else
 		    iend = FIX_CHECK(end);
 	    if (iend < 0)
-		    FEwrong_type_argument(sLpositive_fixnum,end);
+		    FEwrong_type_argument(sLnon_negative_fixnum,end);
 
 	    ipos=read_sequence_stream(arr,str,istart,iend);
 	    start = make_fixnum(ipos);
@@ -1312,7 +1312,7 @@ int start,end;
 	    else
 		    istart = FIX_CHECK(start);
 	    if (istart < 0)
-		    FEwrong_type_argument(sLpositive_fixnum,start);
+		    FEwrong_type_argument(sLnon_negative_fixnum,start);
 	
 	    if ((end == Cnil) &&
 	        (type_of(arr) == t_cons))
@@ -1328,7 +1328,7 @@ int start,end;
 	    else
 		    iend = FIX_CHECK(end);
 	    if (iend < 0)
-		    FEwrong_type_argument(sLpositive_fixnum,end);
+		    FEwrong_type_argument(sLnon_negative_fixnum,end);
 
 	    ipos=write_sequence_stream(arr,str,istart,iend);
 	    if (ipos == iend)

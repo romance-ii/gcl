@@ -130,7 +130,7 @@
 (defun decls-from-procls (ll procls body)
   (cond ((or (null procls) (eq (car procls) '*)
 	     (null ll) (member (car ll) '(&whole &optional &rest &key &environment) :test #'eq)) nil)
-	((or (var-is-declared (car ll) body) (eq (car procls) t))
+	((eq (car procls) t)
 	 (decls-from-procls (cdr ll) (cdr procls) body))
 	(t
 	 (cons (list (car procls) (or (if (atom (car ll)) (car ll) (caar ll))))
@@ -145,7 +145,6 @@
                            (aux-inits nil) doc vl spec body ss is ts
                            other-decls vnames
                            (*vars* *vars*)
-			   (*decls* *decls*)
                            (info (make-info))
                            (aux-info nil)
 			   (setjmps *setjmps*)
@@ -154,6 +153,10 @@
   (cmpck (endp lambda-expr)
          "The lambda expression ~s is illegal." (cons 'lambda lambda-expr))
 
+
+  ;;FIXME -- this is backwards, as the proclamations should be
+  ;;generated from the declarations.  What we need here and in the let
+  ;;code is reverse type propagation.  CM 20050106
   (let ((decls (decls-from-procls
 		(car lambda-expr)
 		(and block-it (get block-name 'compiler::proclaimed-arg-types))
@@ -354,7 +357,11 @@
         (add-info aux-info (cadr body))
         (setq body (list 'let* aux-info aux-vars aux-inits body))
 	(or (eql setjmps *setjmps*) (setf (info-volatile aux-info) t)))
-  
+
+  ;;FIXME -- is above for aux needed too?
+  (when (or optionals keywords)
+    (or (eql setjmps *setjmps*) (setf (info-volatile info) t)))
+
   (setq body (fix-down-args requireds body block-name))
   (setq lambda-list
 	(list requireds optionals rest key-flag keywords allow-other-keys))
@@ -722,8 +729,8 @@
 
 
 (defun c1dm (macro-name vl body
-                        &aux (*vs* *vs*) (whole nil) (env nil)  (*decls* *decls*)
-	(setjmps *setjmps*)
+                        &aux (*vs* *vs*) (whole nil) (env nil)
+			(setjmps *setjmps*)
                         (*vnames* nil) (*dm-info* (make-info)) (*dm-vars* nil)
                         doc ss is ts other-decls ppn)
 

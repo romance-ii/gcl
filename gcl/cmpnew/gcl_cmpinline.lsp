@@ -479,15 +479,15 @@
             (setq x (get fname 'inline-safe))
             (setq x (get fname 'inline-unsafe)))
         (dolist** (y x nil)
-          (when (setq ii (inline-type-matches y args return-type))
+          (when (setq ii (inline-type-matches fname y args return-type))
                 (return-from get-inline-info ii))))
   (when (setq x (get fname 'inline-always))
         (dolist** (y x)
-          (when (setq ii (inline-type-matches y args return-type))
+          (when (setq ii (inline-type-matches fname y args return-type))
                 (return-from get-inline-info ii))))
   (dolist* (x *inline-functions*)
 	(when (and (eq (car x) fname)
-		   (setq ii (inline-type-matches (cdr x) args return-type)))
+		   (setq ii (inline-type-matches fname (cdr x) args return-type)))
 	              (return-from get-inline-info ii)))
   ;; ( n . string , function ) or string , function
   
@@ -505,19 +505,28 @@
   nil
   )
 
-(defun inline-type-matches (inline-info arg-types return-type
+(defun inline-type-matches (fname inline-info arg-types return-type
                                         &aux (rts nil))
+  (declare (ignore fname))
   (if (not (typep (third inline-info) 'fixnum))
       (fix-opt inline-info))
+  ;;         FIXME -- the idea here is that an inline might want to
+  ;;         force the coersion of certain arguments, notably fixnums,
+  ;;         in certain circumstances.  Thisd is already done
+  ;;         elsewhere when the function is actually called, i.e. not
+  ;;         inlined, and this logic should be centralized there.  CM 20050106
+  (when (flag-p (third inline-info) itf)
+    (let ((restp (apply (car inline-info) arg-types)))
+      (return-from inline-type-matches (when restp `(,(car restp) ,(cadr restp) ,@(cddr inline-info))))))
   (if (member 'integer (car inline-info))
       (return-from inline-type-matches nil))
-  (if (and (let ((types (car inline-info)))
+  (if (and (let ((types (car inline-info))(last t))
                 (declare (object types))
                 (dolist** (arg-type arg-types (or (equal types '(*))
 						  (endp types)))
 	                (when (endp types) (return nil))
 		  (cond ((equal types '(*))
-			 (setq types '(t *))))
+			 (setq types `(,last *))))
 		  (let ((arg-type (coerce-to-one-value arg-type)))
 		    (cond ((eq (car types) 'fixnum-float)
 			   (cond ((type>= 'fixnum arg-type)
@@ -530,11 +539,9 @@
 			  ((type>= (car types) arg-type)
 			   (push (car types) rts))
 			  (t (return nil))))
-                  (pop types)))
+                  (setq last (pop types))))
 	   (type>= (cadr inline-info) return-type))
-       (cons (reverse rts) (cdr inline-info))
-      nil)
-  )
+      (cons (nreverse rts) (cdr inline-info))))
 
 (defun need-to-protect (forms types &aux ii)
   (do ((forms forms (cdr forms))
@@ -708,7 +715,7 @@
 	(eq (car *value-to-go*) 'var)
 	(/= (var-dynamic (second *value-to-go*)) 0)))
 
-(defun list-inline (&rest x &aux tem (n (length x)))
+(defun list-inline (&rest x &aux (n (length x)))
   (let ((tem (can-allocate-on-stack)))
     (if tem
 	(wt "(ALLOCA_CONS(" n "),ON_STACK_LIST(" n)
@@ -730,7 +737,107 @@
 	(wt "ON_STACK_CONS(" x "," y ")")
       (wt "make_cons(" x "," y ")"))))
 
+;;FIXME -- All the var and C type code, e.g. var-type and var-kind, needs much centralization.
+;;         20050106 CM.
+(defun c-cast (aet)
+  (case aet
+    ((string-char unsigned-char non-negative-char) "unsigned char")
+    (signed-char "char")
+    (signed-short "short")
+    ((non-negative-short unsigned-short) "unsigned short")
+    (fixnum "fixnum")
+    (short-float "float")
+    (long-float "double")
+    ((t object) "object")
+    (otherwise (baboon))))
 
+
+;;FIXME -- This set of inlining/type-propagation work makes use of
+;;three types of functions per compiled function -- an expander as a
+;;compiler-macro, a type propagator, and an (optional) inliner.
+;;Traditionally, these tasks were divided among the c1 and c2
+;;functions.  The compiler-macros effectively run at a pre-pass1
+;;level, enabling simplifications which allow auto-declaration of
+;;constant bindings at the lisp level.  This seems logically distinct
+;;from the role of the c1 functions, which is promaliry to produce the
+;;call tree forms, and so should probably stay.  The type propagator
+;;functions are partially redundant with the rfa inliner types,
+;;arg-types/return-types in the plist, and
+;;proclaimed-arg-types/proclaimed-return-types in the plist.  One
+;;cannot, however, enumerate all the bounded integer range propagation
+;;information in the older type facilities.  Unlike the latter,
+;;however, it appears difficult to automate the generation of such
+;;propagator functions from the function definitions themselves,
+;;making the overhead of this facility quite large.  The existing
+;;inliner records have two difficulties vis a vis inliner functions --
+;;1) their functionality is overloaded, producing (lisp) variable type
+;;information in result-type-from-args and C type (e.g. var-kind)
+;;coersion information in inline-type-matches, and 2) enumerating all
+;;the possibilites at a minimum does not scale well, e.g. with the
+;;array types.  Still, to go forward efficiently, we are in need of a
+;;centralized means of producing the expander, propagator, and inliner
+;;from the function definitions themselves.  CM 20050106.
+(defun aref-propagator (fn x &rest inds)
+  (declare (ignore fn inds))
+  (and (consp x) (member (car x) '(array vector string) :test #'eq)
+       (let ((uaet (upgraded-array-element-type (nil-to-t (cadr x)))))
+	 ;; FIXME -- inline bit-vectors too.
+	 (unless (eq uaet 'bit)
+	   uaet))))
+
+(setf (symbol-function 'cmp-aref) (symbol-function 'row-major-aref))
+
+(defun cmp-aref-inline-types (&rest r)
+  (let ((art (car r)))
+    (let ((aet (aref-propagator 'cmp-aref art)))
+      (if aet
+	  `((,art seqind) ,aet)
+	`((t seqind) t)))))
+
+(defun cmp-aref-inline (a i)
+  (let ((at (nil-to-t (and (consp a) (eq (car a) 'var) (var-type (cadr a))))))
+    (let ((aet (aref-propagator 'cmp-aref at)))
+      (if aet
+	  (wt  "((" (c-cast aet) " *)(" a ")->v.v_self)[" i "]")
+	(wt "fLrow_major_aref(" a "," i ")")))))
+  
+  
+(setf (symbol-function 'cmp-aset) (symbol-function 'si::aset1))
+
+(defun cmp-aset-inline-types (&rest r)
+  (let ((art (car r)))
+    (let ((aet (aref-propagator 'cmp-asef art)))
+      (if aet
+	  `((,art seqind ,aet) ,aet)
+	`((t seqind t) t)))))
+
+(defun cmp-aset-inline (a i j)
+  (let ((at (nil-to-t (and (consp a) (eq (car a) 'var)(var-type (cadr a))))))
+    (let ((aet (aref-propagator 'cmp-aset at)))
+      (if aet
+	  (wt  "((" (c-cast aet) " *)(" a ")->v.v_self)[" i "]=" j)
+	(wt "fSaset1(" a "," i "," j ")")))))
+  
+  
+(setf (symbol-function 'cmp-array-dimension) (symbol-function 'array-dimension))
+(proclaim '(ftype (function (t rnkind) seqind) cmp-array-dimension))
+(defun cmp-array-dimension-inline-types (&rest r)
+  (if (aref-propagator 'cmp-array-dimension (car r))
+      `((,(car r) rnkind) seqind)
+    `((t rnkind) seqind)))
+
+(defun cmp-array-dimension-inline (a i)
+  (let ((at (si::normalize-type (and (consp a) (eq (car a) 'var) (var-type (cadr a))))))
+    (let ((aet (aref-propagator 'cmp-aset at)))
+      (if aet
+	  (if (and (consp (third at)) (= (length (third at)) 1))
+	      (wt "(" a ")->v.v_dim")
+	    (wt "(" a ")->a.a_dims[(" i ")]"))
+	(if *safe-compile*
+	    ;;FIXME -- alter C definition to remove the fixint here.
+	    (wt "fixint(fLarray_dimension(" a "," i "))")
+	  (wt "(type_of(" a ")==t_array ? (" a ")->a.a_dims[(" i ")] : (" a ")->v.v_dim)"))))))
+  
 (defun list*-inline (&rest x)
   (case (length x)
         (1 (wt (car x)))

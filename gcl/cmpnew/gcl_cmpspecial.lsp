@@ -59,7 +59,7 @@
   (setq info (copy-info (cadr form)))
   (setq type (type-and (type-filter (car args)) (info-type info)))
   (when (null type)
-        (cmpwarn "Type mismatch was found in ~s." (cons 'the args)))
+    (cmpwarn "Type mismatch was found in ~s." (cons 'the args)))
   (setf (info-type info) type)
   (list* (car form) info (cddr form))
   )
@@ -109,7 +109,7 @@
                     (*tags* (cons 'cb *tags*)))
                    (setq fun (c1lambda-expr (cdr fun)))
                    (list 'function (cadr fun) fun)))
-             (t (cmperr "The function ~s is illegal." fun))))
+             (t (break "bar")(cmperr "The function ~s is illegal." fun))))
   )
 
 (defun c2function (funob)

@@ -61,7 +61,7 @@
 ;(DEFSYSFUN 'USER-HOMEDIR-PATHNAME "Luser_homedir_pathname" '(*) 'T NIL
 ;    NIL) 
 (DEFSYSFUN 'NBUTLAST "Lnbutlast" '(T *) 'T NIL NIL) 
-(DEFSYSFUN 'ARRAY-DIMENSION "Larray_dimension" '(T T) 'FIXNUM NIL NIL) 
+(DEFSYSFUN 'ARRAY-DIMENSION "Larray_dimension" '(T RNKIND) 'SEQIND NIL NIL) 
 (DEFSYSFUN 'CDR "Lcdr" '(T) 'T NIL NIL) 
 (DEFSYSFUN 'EQL "Leql" '(T T) 'T NIL T) 
 (DEFSYSFUN 'LOG "Llog" '(T *) 'T NIL NIL) 
@@ -329,6 +329,8 @@
 (DEFSYSFUN 'STRING-NOT-LESSP "Lstring_not_lessp" '(T T *) 'T NIL T) 
 (DEFSYSFUN 'CHAR "Lchar" '(T T) 'CHARACTER NIL NIL) 
 (DEFSYSFUN 'AREF "Laref" '(T *) 'T NIL NIL) 
+;;FIXME -- autogenerate this whole file from C definitions.  CM 20050106
+(DEFSYSFUN 'ROW-MAJOR-AREF "Lrow_major_aref" '(T SEQIND) T NIL NIL) 
 (DEFSYSFUN 'PACKAGE-NICKNAMES "Lpackage_nicknames" '(T) 'T NIL NIL) 
 (DEFSYSFUN 'ENDP "Lendp" '(T) 'T NIL T) 
 (DEFSYSFUN 'ODDP "Loddp" '(T) 'T NIL T) 

@@ -80,8 +80,8 @@
 	(t (make-cdxr (- n 4) `(cddddr ,form)))))
 )
 
-(deftype non-negative-fixnum ()
-  '(and fixnum (integer 0 *)))
+;(deftype non-negative-fixnum ()
+;  '(and fixnum (integer 0 *)))
 
 (defun true (&rest ignore) (declare (ignore ignore)) t)
 (defun false (&rest ignore) (declare (ignore ignore)) nil)

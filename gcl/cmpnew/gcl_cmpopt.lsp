@@ -13,6 +13,7 @@
 ;;	 (result-type-from-args rfa)            ;; if passed args of matching
 ;;					        ;; type result is of result type
 ;;       (is)                                   ;; extends the `integer stack'.
+;;	 (inline-types-function itf)))          ;; car of ii is a function returning match info
 ;    (cond ((member flag v :test 'eq)
 ;
 ;;;   valid properties are 'inline-always 'inline-safe 'inline-unsafe
@@ -237,7 +238,7 @@
    (get 'system:svset 'inline-unsafe))
 
 ;;*
-(si::putprop '* 'super-range 'result-type-from-bounded-args)
+(si::putprop '* 'super-range 'type-propagator)
 (push '((t t) t #.(flags ans)"number_times(#0,#1)")
    (get '* 'inline-always))
 (push '((fixnum-float fixnum-float) short-float #.(flags)"(double)(#0)*(double)(#1)")
@@ -253,7 +254,7 @@
    (get '* 'inline-always))
 
 ;;ASH
-(si::putprop 'ash 'ash-propagator 'result-type-from-bounded-args)
+(si::putprop 'ash 'ash-propagator 'type-propagator)
 (push '(((integer 0 0) t) fixnum #.(flags rfa)"0")
    (get 'ash 'inline-always))
 (push '((fixnum (integer 0 #.(integer-length most-positive-fixnum))) fixnum #.(flags)"((#0)<<(#1))")
@@ -266,7 +267,7 @@
 
 
 ;;+
-(si::putprop '+ 'super-range 'result-type-from-bounded-args)
+(si::putprop '+ 'super-range 'type-propagator)
 (push '((t t) t #.(flags ans)"number_plus(#0,#1)")
    (get '+ 'inline-always))
 (push '((fixnum-float fixnum-float) short-float #.(flags)"(double)(#0)+(double)(#1)")
@@ -282,7 +283,7 @@
    (get '+ 'inline-always))
 
 ;;-
-(si::putprop '- 'super-range 'result-type-from-bounded-args)
+(si::putprop '- 'super-range 'type-propagator)
 (push '((t) t #.(flags ans)"number_negate(#0)")
    (get '- 'inline-always))
 (push '(((integer #.(1+ most-negative-fixnum) #.most-positive-fixnum)) fixnum #.(flags)"-(#0)")
@@ -390,49 +391,80 @@
    (get 'append 'inline-always))
 
 ;;AREF
- (push '((t t) t #.(flags ans)"aref1(#0,fixint(#1))")
-   (get 'aref 'inline-always))
-(push '((t fixnum) t #.(flags ans)"aref1(#0,#1)")
-   (get 'aref 'inline-always))
-(push '((t t) t #.(flags ans)"aref1(#0,fix(#1))")
-   (get 'aref 'inline-unsafe))
-(push '(((array t) fixnum) t #.(flags)"(#0)->v.v_self[#1]")
-   (get 'aref 'inline-unsafe))
-(push '(((array string-char) fixnum) character #.(flags rfa)"(#0)->ust.ust_self[#1]")
-   (get 'aref 'inline-unsafe))
-(push '(((array fixnum) fixnum) fixnum #.(flags rfa)"(#0)->fixa.fixa_self[#1]")
-   (get 'aref 'inline-unsafe))
-(push '(((array unsigned-char) fixnum) fixnum #.(flags rfa)"(#0)->ust.ust_self[#1]")
-   (get 'aref 'inline-unsafe))
-(push '(((array signed-char) fixnum) fixnum #.(flags rfa)"SIGNED_CHAR((#0)->ust.ust_self[#1])")
-   (get 'aref 'inline-unsafe))
-(push '(((array unsigned-short) fixnum) fixnum #.(flags rfa)
-  "((unsigned short *)(#0)->ust.ust_self)[#1]")
-   (get 'aref 'inline-unsafe))
-(push '(((array signed-short) fixnum) fixnum #.(flags rfa)"((short *)(#0)->ust.ust_self)[#1]")
-   (get 'aref 'inline-unsafe))
-(push '(((array short-float) fixnum) short-float #.(flags rfa)"(#0)->sfa.sfa_self[#1]")
-   (get 'aref 'inline-unsafe))
-(push '(((array long-float) fixnum) long-float #.(flags rfa)"(#0)->lfa.lfa_self[#1]")
-   (get 'aref 'inline-unsafe))
-(push '((t t t) t #.(flags ans)
-  "@0;aref(#0,fix(#1)*(#0)->a.a_dims[1]+fix(#2))")
-   (get 'aref 'inline-unsafe))
-(push '(((array t) fixnum fixnum) t #.(flags )
-  "@0;(#0)->a.a_self[(#1)*(#0)->a.a_dims[1]+#2]")
-   (get 'aref 'inline-unsafe))
-(push '(((array string-char) fixnum fixnum) character #.(flags rfa)
-  "@0;(#0)->ust.ust_self[(#1)*(#0)->a.a_dims[1]+#2]")
-   (get 'aref 'inline-unsafe))
-(push '(((array fixnum) fixnum fixnum) fixnum #.(flags rfa)
-  "@0;(#0)->fixa.fixa_self[(#1)*(#0)->a.a_dims[1]+#2]")
-   (get 'aref 'inline-unsafe))
-(push '(((array short-float) fixnum fixnum) short-float #.(flags rfa)
-  "@0;(#0)->sfa.sfa_self[(#1)*(#0)->a.a_dims[1]+#2]")
-   (get 'aref 'inline-unsafe))
-(push '(((array long-float) fixnum fixnum) long-float #.(flags rfa)
-  "@0;(#0)->lfa.lfa_self[(#1)*(#0)->a.a_dims[1]+#2]")
-   (get 'aref 'inline-unsafe))
+;(push '((t t) t #.(flags ans)"aref1(#0,fixint(#1))")
+;   (get 'aref 'inline-always))
+;(push '((t fixnum) t #.(flags ans)"aref1(#0,#1)")
+;   (get 'aref 'inline-always))
+;(push '((t t) t #.(flags ans)"aref1(#0,fix(#1))")
+;   (get 'aref 'inline-unsafe))
+;(push '(((array t) fixnum) t #.(flags)"(#0)->v.v_self[#1]")
+;   (get 'aref 'inline-unsafe))
+;(push '(((array string-char) fixnum) character #.(flags rfa)"(#0)->ust.ust_self[#1]")
+;   (get 'aref 'inline-unsafe))
+;(push '(((array fixnum) fixnum) fixnum #.(flags rfa)"(#0)->fixa.fixa_self[#1]")
+;   (get 'aref 'inline-unsafe))
+;(push '(((array unsigned-char) fixnum) fixnum #.(flags rfa)"(#0)->ust.ust_self[#1]")
+;   (get 'aref 'inline-unsafe))
+;(push '(((array signed-char) fixnum) fixnum #.(flags rfa)"SIGNED_CHAR((#0)->ust.ust_self[#1])")
+;   (get 'aref 'inline-unsafe))
+;(push '(((array unsigned-short) fixnum) fixnum #.(flags rfa)
+;  "((unsigned short *)(#0)->ust.ust_self)[#1]")
+;   (get 'aref 'inline-unsafe))
+;(push '(((array signed-short) fixnum) fixnum #.(flags rfa)"((short *)(#0)->ust.ust_self)[#1]")
+;   (get 'aref 'inline-unsafe))
+;(push '(((array short-float) fixnum) short-float #.(flags rfa)"(#0)->sfa.sfa_self[#1]")
+;   (get 'aref 'inline-unsafe))
+;(push '(((array long-float) fixnum) long-float #.(flags rfa)"(#0)->lfa.lfa_self[#1]")
+;   (get 'aref 'inline-unsafe))
+;(push '((t t t) t #.(flags ans)
+;  "@0;aref(#0,fix(#1)*(#0)->a.a_dims[1]+fix(#2))")
+;   (get 'aref 'inline-unsafe))
+;(push '(((array t) fixnum fixnum) t #.(flags )
+;  "@0;(#0)->a.a_self[(#1)*(#0)->a.a_dims[1]+#2]")
+;   (get 'aref 'inline-unsafe))
+;(push '(((array string-char) fixnum fixnum) character #.(flags rfa)
+;  "@0;(#0)->ust.ust_self[(#1)*(#0)->a.a_dims[1]+#2]")
+;   (get 'aref 'inline-unsafe))
+;(push '(((array fixnum) fixnum fixnum) fixnum #.(flags rfa)
+;  "@0;(#0)->fixa.fixa_self[(#1)*(#0)->a.a_dims[1]+#2]")
+;   (get 'aref 'inline-unsafe))
+;(push '(((array short-float) fixnum fixnum) short-float #.(flags rfa)
+;  "@0;(#0)->sfa.sfa_self[(#1)*(#0)->a.a_dims[1]+#2]")
+;   (get 'aref 'inline-unsafe))
+;(push '(((array long-float) fixnum fixnum) long-float #.(flags rfa)
+;  "@0;(#0)->lfa.lfa_self[(#1)*(#0)->a.a_dims[1]+#2]")
+;   (get 'aref 'inline-unsafe))
+
+
+;(si::putprop 'aref 'aref-propagator 'type-propagator)
+;(push '((t *) t #.(flags rfba)aref-inline)
+;   (get 'aref 'inline-unsafe))
+;(push '(((array) *) t #.(flags rfba)aref-inline)
+;   (get 'aref 'inline-always))
+
+;;ROW-MAJOR-AREF
+;(si::putprop 'row-major-aref 'aref-propagator 'type-propagator)
+;(push '(nil nil #.(flags rfba)row-major-aref-inline)
+;   (get 'row-major-aref 'inline-unsafe))
+
+;;CMP-AREF
+(si::putprop 'cmp-aref 'aref-propagator 'type-propagator)
+(push '(cmp-aref-inline-types nil #.(flags itf) cmp-aref-inline)
+   (get 'cmp-aref 'inline-always))
+
+;;CMP-ASET
+(si::putprop 'cmp-aset 'aref-propagator 'type-propagator)
+(push '(cmp-aset-inline-types nil #.(flags itf) cmp-aset-inline)
+   (get 'cmp-aset 'inline-always))
+
+
+;;ARRAY-DIMENSION
+;(push '((t fixnum) fixnum #.(flags rfa)"@01;(type_of(#0)==t_array ? (#0)->a.a_dims[(#1)] : (#0)->v.v_dim)")
+;   (get 'array-dimension 'inline-unsafe))
+
+;;CMP-ARRAY-DIMENSION
+(push '(cmp-array-dimension-inline-types nil #.(flags itf) cmp-array-dimension-inline)
+   (get 'cmp-array-dimension 'inline-always))
 
 ;;ARRAY-TOTAL-SIZE
  (push '((t) fixnum #.(flags rfa)"((#0)->st.st_dim)")
@@ -798,13 +830,13 @@ type_of(#0)==t_bitvector")
 ; (push '((fixnum fixnum) fixnum #.(flags rfa)
 ;  "@01;(#0>=0&&(#1)>0?(#0)/(#1):ifloor(#0,#1))")
 ;   (get 'floor 'inline-always))
-(si::putprop 'floor 'floor-propagator 'result-type-from-bounded-args)
+(si::putprop 'floor 'floor-propagator 'type-propagator)
 (push '((fixnum fixnum) (values fixnum fixnum) #.(flags rfa set)
 	 "@01;({fixnum _t=(#0)/(#1);_t=((#0)<=0 && (#1)<=0) || ((#0)>=0 && (#1)>=0) || ((#1)*_t==(#0)) ? _t : _t-1;$1((#0)-_t*(#1))$ _t;})")
    (get 'floor 'inline-always))
 
 ;;CEILING
-(si::putprop 'ceiling 'floor-propagator 'result-type-from-bounded-args)
+(si::putprop 'ceiling 'floor-propagator 'type-propagator)
 (push '((fixnum fixnum) (values fixnum fixnum) #.(flags rfa set)
 	 "@01;({fixnum _t=(#0)/(#1);_t=((#0)<=0 && (#1)>=0) || ((#0)>=0 && (#1)<=0) || ((#1)*_t==(#0)) ? _t : _t+1;$1((#0)-_t*(#1))$ _t;})")
    (get 'ceiling 'inline-always))
@@ -846,13 +878,13 @@ type_of(#0)==t_bitvector")
 
 
 ;;LENGTH
- (push '((t) (integer 0 #.(ash most-positive-fixnum -2)) #.(flags rfa)"length(#0)")
+ (push '((t) seqind #.(flags rfa set)"length(#0)")
    (get 'length 'inline-always))
-(push '(((array t)) (integer 0 #.(ash most-positive-fixnum -2)) #.(flags rfa)"(#0)->v.v_fillp")
+(push '(((array t)) seqind #.(flags rfa)"(#0)->v.v_fillp")
    (get 'length 'inline-unsafe))
-(push '(((array fixnum)) (integer 0 #.(ash most-positive-fixnum -2)) #.(flags rfa)"(#0)->v.v_fillp")
+(push '(((array fixnum)) seqind #.(flags rfa)"(#0)->v.v_fillp")
    (get 'length 'inline-unsafe))
-(push '((string) (integer 0 #.(ash most-positive-fixnum -2)) #.(flags rfa)"(#0)->v.v_fillp")
+(push '((string) seqind #.(flags rfa)"(#0)->v.v_fillp")
    (get 'length 'inline-unsafe))
 
 ;;LIST
@@ -926,14 +958,14 @@ type_of(#0)==t_bitvector")
    (get 'make-list 'inline-always))
 
 ;;MAX
-(si::putprop 'max 'super-range 'result-type-from-bounded-args)
+(si::putprop 'max 'super-range 'type-propagator)
 (push '((t t) t #.(flags set)"@01;(number_compare(#0,#1)>=0?(#0):#1)")
    (get 'max 'inline-always))
  (push '((fixnum fixnum) fixnum #.(flags rfa set)"@01;((#0)>=(#1)?(#0):#1)")
    (get 'max 'inline-always))
 
 ;;MIN
-(si::putprop 'min 'super-range 'result-type-from-bounded-args)
+(si::putprop 'min 'super-range 'type-propagator)
 (push '((t t) t #.(flags set)"@01;(number_compare(#0,#1)<=0?(#0):#1)")
    (get 'min 'inline-always))
 (push '((fixnum fixnum) fixnum #.(flags rfa set)"@01;((#0)<=(#1)?(#0):#1)")
@@ -1124,7 +1156,7 @@ TRUNCATE_USE_C
 
 #+
 TRUNCATE_USE_C
-(si::putprop 'truncate 'floor-propagator 'result-type-from-bounded-args)
+(si::putprop 'truncate 'floor-propagator 'type-propagator)
 (push '((fixnum fixnum) (values fixnum fixnum) #.(flags rfa)"({fixnum _t=(#0)/(#1);$1(#0)-_t*(#1)$ _t;})")
    (get 'truncate 'inline-always))
 (push '((fixnum-float) fixnum #.(flags)"(fixnum)(#0)")

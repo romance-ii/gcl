@@ -479,26 +479,18 @@
 					  "The type declaration ~s contains a non-symbol ~s."
 					  decl var)
 				   (push (cons var 'dynamic-extent) ts)))
-			((fixnum character double-float short-float array atom bignum bit
-				 bit-vector common compiled-function complex cons float hash-table
-				 integer keyword list long-float nil null number package pathname
-				 random-state ratio rational readtable sequence simple-array
-				 simple-bit-vector simple-string simple-vector single-float
-				 standard-char stream string string-char symbol t vector boolean
-				 signed-byte unsigned-byte)
-			 (let ((type (type-filter stype)))
-			   (when type
-			     (dolist** (var (cdr decl))
-				       (cmpck (not (symbolp var))
-					      "The type declaration ~s contains a non-symbol ~s."
-					      decl var)
-				       (push (cons var type) ts)))))
 			(otherwise
-			 (push decl others))))))))
+			 (let ((type (t-to-nil (type-filter stype))))
+			   (if type
+			       (dolist** (var (cdr decl))
+					 (cmpck (not (symbolp var))
+						"The type declaration ~s contains a non-symbol ~s."
+						decl var)
+					 (push (cons var type) ts))
+			     (push decl others))))))))))
      (t (return)))
     (pop body)
     )
-  (dolist (l ts) (push l *decls*))
   (values body ss ts is others doc)
   )
 

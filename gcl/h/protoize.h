@@ -20,7 +20,7 @@
 /* alloc.c:1000:OF */ extern void gcl_init_alloc_function (void); /* () */
 /* alloc.c:1126:OF */ extern void free (void *ptr); /* (ptr) void *ptr; */
 /* array.c:57:OF */ extern void Laref (void); /* () */
-/* array.c:126:OF */ extern object fLsvref (object x, ufixnum i); /* (x, i) object x; unsigned int i; */
+/* array.c:126:OF */ extern object fLsvref (object x, fixnum i); /* (x, i) object x; unsigned int i; */
 /* array.c:142:OF */ extern object fLrow_major_aref (object x,fixnum i); /* (x, i) object x; int i; */
 /* array.c:190:OF */ extern object fSaset1 (object x,fixnum i, object val); /* (x, i, val) object x; int i; object val; */
 /* array.c:262:OF */ extern void siLaset (void); /* () */

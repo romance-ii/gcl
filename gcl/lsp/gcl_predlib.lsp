@@ -24,7 +24,7 @@
 
 (in-package 'system)
 
-(export '(lisp::deftype lisp::typep lisp::subtypep lisp::coerce) 'lisp)
+(export '(lisp::deftype lisp::typep lisp::subtypep lisp::coerce lisp::upgraded-array-element-type) 'lisp)
 
 (eval-when (compile)
 (proclaim '(optimize (safety 2) (space 3)))
@@ -53,7 +53,10 @@
 			  '(deftype ,name ,lambda-list ,@body)
 			  'deftype-form)
 	      (si:putprop ',name
-			  #'(lambda ,lambda-list ,@body)
+			  (if (null ',lambda-list)
+			      (let ((tem (progn ,@body)))
+				(lambda ,lambda-list tem))
+			    (lambda ,lambda-list ,@body))
 			  'deftype-definition)
 	      (si:putprop ',name
 			  ,(find-documentation body)
@@ -62,19 +65,29 @@
 
 
 ;;; Some DEFTYPE definitions.
-(deftype fixnum ()
-  `(integer ,most-negative-fixnum ,most-positive-fixnum))
-(deftype positive-fixnum ()
-  `(integer 0 ,most-positive-fixnum))
-(deftype fixnum ()
-  `(integer ,most-negative-fixnum ,most-positive-fixnum))
+;(deftype fixnum ()
+;  `(integer ,most-negative-fixnum ,most-positive-fixnum))
+(deftype seqind ()
+  `(integer 0 ,array-dimension-limit))
+(deftype rnkind ()
+  `(integer 0 ,array-rank-limit))
+;(deftype non-negative-fixnum ()
+;  `(integer 0 ,most-positive-fixnum))
+;(deftype negative-fixnum ()
+;  `(integer ,most-negative-fixnum -1))
+;(deftype fixnum ()
+;  `(integer ,most-negative-fixnum ,most-positive-fixnum))
 (deftype bit () '(integer 0 1))
 (deftype mod (n)
   `(integer 0 ,(1- n)))
-(deftype positive-byte (&optional s)
+(deftype non-negative-byte (&optional s)
   (if (eq s '*)
       `(integer * *)
       `(integer 0 ,(1- (expt 2 (1- s))))))
+(deftype negative-byte (&optional s)
+  (if (eq s '*)
+      `(integer * *)
+      `(integer ,(- (expt 2 (1- s))) -1)))
 (deftype signed-byte (&optional s)
   (if (eq s '*)
       `(integer * *)
@@ -83,13 +96,30 @@
   (if (eq s '*)
       `(integer 0 *)
       `(integer 0 ,(1- (expt 2 s)))))
-(deftype positive-char () `(positive-byte ,char-size))
-(deftype signed-char ()`(signed-byte ,char-size))
-(deftype unsigned-char ()`(unsigned-byte ,char-size))
-(deftype positive-short () `(positive-byte ,short-size))
-(deftype signed-short ()`(signed-byte ,short-size))
-(deftype unsigned-short ()`(unsigned-byte ,short-size))
 
+(deftype non-negative-char () `(non-negative-byte ,char-length))
+(deftype negative-char () `(negative-byte ,char-length))
+(deftype signed-char ()`(signed-byte ,char-length))
+(deftype unsigned-char ()`(unsigned-byte ,char-length))
+(deftype char ()`(signed-char))
+
+(deftype non-negative-short () `(non-negative-byte ,short-length))
+(deftype negative-short () `(negative-byte ,short-length))
+(deftype signed-short ()`(signed-byte ,short-length))
+(deftype unsigned-short ()`(unsigned-byte ,short-length))
+(deftype short ()`(signed-short))
+
+(deftype non-negative-fixnum () `(non-negative-byte ,fixnum-length))
+(deftype negative-fixnum () `(negative-byte ,fixnum-length))
+(deftype signed-fixnum ()`(signed-byte ,fixnum-length))
+(deftype unsigned-fixnum ()`(unsigned-byte ,fixnum-length))
+(deftype fixnum ()`(signed-fixnum))
+
+(deftype non-negative-lfixnum () `(non-negative-byte ,lfixnum-length))
+(deftype negative-lfixnum () `(negative-byte ,lfixnum-length))
+(deftype signed-lfixnum ()`(signed-byte ,lfixnum-length))
+(deftype unsigned-lfixnum ()`(unsigned-byte ,lfixnum-length))
+(deftype lfixnum ()`(signed-lfixnum))
 
 
 (deftype vector (&optional element-type size)
@@ -298,14 +328,16 @@
 
 ;;; KNOWN-TYPE-P answers if the given type is a known base type.
 ;;; The type may not be normalized.
+
+;;FIXME -- get rid of this list.  And those in subtypep.  CM 20050106
 (defun known-type-p (type)
   (when (consp type) (setq type (car type)))
   (if (or (equal (string type) "ERROR")
 	  (member type
                   '(t nil boolean null symbol keyword atom cons list sequence
-		      positive-char negative-char signed-char unsigned-char
-		      positive-short negative-short signed-short unsigned-short
-		      positive-fixnum negative-fixnum
+		      non-negative-char negative-char signed-char unsigned-char
+		      non-negative-short negative-short signed-short unsigned-short
+		      non-negative-fixnum negative-fixnum
 		      number integer bignum rational ratio float method-combination
 		      short-float single-float double-float long-float complex
 		      character standard-char string-char real 
@@ -337,6 +369,10 @@
 	   (and (symbolp b) (implicit-symbol (cdr a) b))))
 	((let ((a (car a))) (or (eq a '*) (eq a t)))
 	 (implicit-symbol (cdr a) b))))
+
+(defun upgraded-array-element-type (type &optional environment)
+  (declare (ignore environment))
+  (best-array-element-type type))
 
 ;;; SUBTYPEP predicate.
 (defun subtypep (type1 type2 &optional env &aux t1 t2 i1 i2 ntp1 ntp2 tem)
@@ -668,7 +704,7 @@
 		       (let* ((at1 (ty i1))
 			      (at2 (ty i2))
 			      (at2 (or (and (eq at2 'string-char) 'character) at2)))
-			 (unless (equal at1 at2)
+			 (unless (eq (upgraded-array-element-type at1) (upgraded-array-element-type at2))
 			   (return-from subtypep (values nil t))))
 		       (let ((ad1 (di i1))
 			     (ad2 (di i2)))

@@ -207,7 +207,8 @@ IapplyVector(object fun, int nargs, object *base)
       FEtoo_many_arguments(base,vs_top);
     atypes = F_TYPES(fun->sfn.sfn_argd) >> F_TYPE_WIDTH;
     if (atypes==0) {abase = base;}
-    else { abase = vs_top;
+    else { abase = alloca(nargs*sizeof(object));
+           assert(abase);
 	   for (i=0; i < nargs ; i++, atypes >>= F_TYPE_WIDTH)
 	     { object next = base[i];
 	       int atyp = atypes & MASK_RANGE(0,F_TYPE_WIDTH);
@@ -223,7 +224,8 @@ IapplyVector(object fun, int nargs, object *base)
 		 { ASSURE_TYPE(next,t_longfloat);
 		   next = COERCE_F_TYPE(next,F_object,F_double_ptr);}
 	       else {FEerror("cant get here!",0);}
-	       vs_push(next);}
+	       vs_push(base[i]);
+               abase[i]=next;}
 
 	 }
     res = c_apply_n(fun->sfn.sfn_self,nargs,abase);

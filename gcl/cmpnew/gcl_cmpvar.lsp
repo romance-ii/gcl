@@ -357,7 +357,7 @@
   (add-info info (cadr form1))
   (setq type (type-and (var-type (car name1)) (info-type (cadr form1))))
   (when (null type)
-        (cmpwarn "Type mismatches between ~s and ~s." name form))
+    (cmpwarn "Type mismatches between ~s and ~s." name form))
   (unless (eq type (info-type (cadr form1)))
     (let ((info1 (copy-info (cadr form1))))
          (setf (info-type info1) type)

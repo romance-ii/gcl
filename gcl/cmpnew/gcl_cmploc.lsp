@@ -203,7 +203,7 @@
          (wt "(fixnum)")(wt-inline-loc (caddr loc) (cadddr loc)))
         ((and (consp loc) (eq (car loc) 'fixnum-value))
          (wt "(fixnum)")(wt (caddr loc)))
-        (t (wt "fix(" loc ")"))))
+        (t (wt (if *safe-compile* "fixint(" "fix(") loc ")"))))
 
 (defun wt-integer-loc (loc &optional type
 			   &aux (avma t)(first (and (consp loc) (car loc))))

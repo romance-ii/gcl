@@ -90,7 +90,7 @@ int index;
 
 	if (index < 0) {
 		vs_push(make_fixnum(index));
-		FEwrong_type_argument(sLpositive_fixnum, vs_head);
+		FEwrong_type_argument(sLnon_negative_fixnum, vs_head);
 	}
 	switch (type_of(seq)) {
 	case t_cons:
@@ -162,7 +162,7 @@ object val;
 
 	if (index < 0) {
 		vs_push(make_fixnum(index));
-		FEwrong_type_argument(sLpositive_fixnum, vs_head);
+		FEwrong_type_argument(sLnon_negative_fixnum, vs_head);
 	}
 	switch (type_of(seq)) {
 	case t_cons:

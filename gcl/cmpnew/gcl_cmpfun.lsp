@@ -441,7 +441,7 @@
 (si:putprop 'length 'c1length 'c1)
 
 (defun c1length (args &aux (info (make-info)))
-  (setf (info-type info) '(integer 0 #.(ash most-positive-fixnum -2)))
+  (setf (info-type info) 'seqind)
   (cond ((and (consp (car args))
 	      (eq (caar args) 'symbol-name)
 	      (let ((args1 (cdr (car args))))

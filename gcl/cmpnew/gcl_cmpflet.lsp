@@ -63,7 +63,7 @@
 ;;; when the compiler begins to process a closure.  A local macro definition
 ;;; is a list ( macro-name expansion-function).
 
-(defun c1flet (args &aux body ss ts is other-decl info  (*decls* *decls*)
+(defun c1flet (args &aux body ss ts is other-decl info
                          (defs1 nil) (local-funs nil) (closures nil) (*info* (copy-info *info*)))
   (when (endp args) (too-few-args 'flet 1 0))
 
@@ -175,7 +175,7 @@
   (c2expr body)
   )
 
-(defun c1labels (args &aux body ss ts is other-decl info  (*decls* *decls*)
+(defun c1labels (args &aux body ss ts is other-decl info
                       (defs1 nil) (local-funs nil) (closures nil)
                       (fnames nil) (processed-flag nil) (*funs* *funs*) (*info* (copy-info *info*)))
   (when (endp args) (too-few-args 'labels 1 0))
@@ -307,7 +307,7 @@
   )
 
 (defun c1macrolet (args &aux body ss ts is other-decl
-                        (*funs* *funs*) (*vars* *vars*) (*decls* *decls*))
+                        (*funs* *funs*) (*vars* *vars*))
   (when (endp args) (too-few-args 'macrolet 1 0))
   (dolist** (def (car args))
     (cmpck (or (endp def) (not (symbolp (car def))) (endp (cdr def)))

@@ -75,7 +75,7 @@
     (terpri))
   nil)
 
-(defvar *suppress-compiler-notes* nil)
+(defvar *suppress-compiler-notes* t)
 
 (defun cmpnote (string &rest args &aux (*print-case* :upcase))
   (unless *suppress-compiler-notes* 

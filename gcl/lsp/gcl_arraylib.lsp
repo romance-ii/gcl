@@ -35,13 +35,14 @@
           bit-andc1 bit-andc2 bit-orc1 bit-orc2 bit-not
           array-has-fill-pointer-p fill-pointer
           vector-push vector-push-extend vector-pop
-          adjust-array upgraded-array-element-type))
+          adjust-array))
 
 (in-package 'system)
 
 
 (proclaim '(optimize (safety 2) (space 3)))
 
+;;FIXME -- this needs integration with other type functions.  CM 20050106
 (defun best-array-element-type (type)
   (cond ((null type) nil)
 	((eql t type) t)
@@ -50,7 +51,7 @@
 				    signed-short fixnum))
 	       type)
 	((subtypep type 'fixnum)
-	 (dolist (v '(bit positive-char signed-char unsigned-char positive-short signed-short unsigned-short)
+	 (dolist (v '(bit non-negative-char signed-char unsigned-char non-negative-short signed-short unsigned-short)
 		    'fixnum)
 		 (cond ((subtypep type v)
 			(return v)))))
@@ -313,7 +314,7 @@
 		 (and (equal (cdr new-dimensions)
 			     (cdr (array-dimensions array)))
 		      (or (not (eq element-type 'bit))
-			  (eql 0 (the fixnum (mod (the fixnum (car (last new-dimensions))) char-size))))))
+			  (eql 0 (the fixnum (mod (the fixnum (car (last new-dimensions))) char-length))))))
 	     (copy-array-portion
 	      array x 0 0 (min (array-total-size x)
 			       (array-total-size array))))

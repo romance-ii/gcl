@@ -63,16 +63,17 @@
 
 (defun emit-fn (flag) (setq *record-call-info* flag))
 
-(defun type-or (a b)
-  (if (eq b '*) '*
-    (case a
-      ((nil) b)
-      ((t inline) t)
-      ((fixnum inline-fixnum fixnum-value) (if (eq b 'fixnum) 'fixnum
-					     (type-or t b)))
-      (otherwise '*)
-      )))
+(defun promote-inlines (x)
+  (if (eq x 'inline) t
+    (if (si::memq x '(inline-fixnum fixnum-value)) 'fixnum
+      x)))
 
+(defun type-or (a b)
+  (let ((a (promote-inlines a)))
+    (if (type>= b a) b
+      (if (type>= a b) a
+	'*))))
+      
 (defun current-fn ()
   (cond ((and (consp *current-form*)
 	      (member (car *current-form*) '(defun defmacro))

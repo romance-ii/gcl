@@ -119,7 +119,8 @@
 	                                        ;; double eval ok.
 	 (result-type-from-args rfa)            ;; if passed args of matching
 					        ;; type result is of result type
-         (is)))                                 ;; extends the `integer stack'.
+         (is)                                   ;; extends the `integer stack'.
+	 (inline-types-function itf)))          ;; car of ii is a function returning match info
     (cond ((member flag v :test 'eq)
 	   (return-from flags-pos i)))
     (setq i (+ i 1)))
@@ -193,7 +194,7 @@
   (when (and (setq tem (get f 'return-type))
              (not (eq tem '*)))
 ;	     (not (consp tem))) ;; propagate multiple-value types, CM 20041221
-    (let* ((be (and (not (cddr args)) (get f 'result-type-from-bounded-args)))
+    (let* ((be (get f 'type-propagator))
 	   (ba (and be (apply be f (mapcar #'coerce-to-one-value args)))))
       (when ba
 	(return-from result-type-from-args ba)))
@@ -267,30 +268,6 @@
 		   (cdddr form)))
        (1- len))
     form))
-
-;(defun find-var (var decls)
-;  (if decls
-;      (or (and (eq (caar decls) var) (car decls))
-;	  (find-var var (cdr decls)))
-;    nil))
-
-;(defun decls-from-lets (lets decls)
-;  (if lets
-;      (let ((decl (find-var (cadar lets) *decls*)))
-;	(when decl
-;	  (push (list (cdr decl) (caar lets)) decls))
-;	(decls-from-lets (cdr lets) decls))
-;    (and decls (cons 'declare (nreverse decls)))))
-	  
-
-;(defmacro let-wrap (lets form)
-;  (let ((decls (gensym)))
-;    `(if lets
-;	 (let ((,decls (decls-from-lets ,lets nil)))
-;	   (if ,decls
-;	       (list 'let* ,lets ,decls ,form)
-;	     (list 'let* ,lets ,form)))
-;     ,form)))
 
 (defmacro let-wrap (lets form)
   `(if lets
@@ -379,6 +356,69 @@
 
 (si::putprop '1+ (function incr-to-plus) 'compiler-macro)
 (si::putprop '1- (function decr-to-minus) 'compiler-macro)
+
+(defun seqind-wrap (form)
+  (if *safe-compile*
+      form
+    `(the seqind ,form)))
+
+(defun array-row-major-index-expander (form env &optional (it 0))
+  (declare (ignore env) (fixnum it))
+  (let ((l (length form)))
+    (cond ((= l 2) 0)
+	  ((= l 3) (seqind-wrap (caddr form)))
+	  (t (let ((it (1+ it))
+		   (fn (car form))
+		   (ar (cadr form))
+		   (first (seqind-wrap (caddr form)))
+		   (second (seqind-wrap (cadddr form)))
+		   (rest (cddddr form)))
+	       (array-row-major-index-expander
+		`(,fn ,ar ,(seqind-wrap
+			    `(+
+			      ,(seqind-wrap
+				`(* ,first (array-dimension ,ar ,it))) ,second)) ,@rest)
+		nil it))))))
+
+(si::putprop 'array-row-major-index (function array-row-major-index-expander) 'compiler-macro)
+
+(defmacro with-pulled-array (bindings form &body body)
+  `(let ((,(car bindings) (cadr ,form)))
+     (let ((,(cadr bindings) (and (consp ,(car bindings)) `((,(gensym) ,,(car bindings))))))
+       (let ((,(caddr bindings) (or (caar ,(cadr bindings)) ,(car bindings))))
+	 ,@body))))
+	
+
+(defun aref-expander (form env)
+  (declare (ignore env))
+  (with-pulled-array
+   (ar lets sym) form
+   (let ((isym (gensym)))
+     (let ((lets (append lets `((,isym (array-row-major-index ,sym ,@(cddr form)))))))
+       (let-wrap lets `(compiler::cmp-aref ,sym ,isym))))))
+
+(si::putprop 'aref (function aref-expander) 'compiler-macro)
+(si::putprop 'row-major-aref (function aref-expander) 'compiler-macro)
+
+(defun aset-expander (form env)
+  (declare (ignore env))
+  (with-pulled-array
+   (ar lets sym) form
+   (let ((isym (gensym)))
+     (let ((lets (append lets `((,isym (array-row-major-index ,sym ,@(butlast (cddr form))))))))
+       (let-wrap lets `(compiler::cmp-aset ,sym ,isym ,(car (last form))))))))
+
+(si::putprop 'si::aset (function aset-expander) 'compiler-macro)
+;FIXME -- test and install this and svref, CM 20050106
+;(si::putprop 'svset (function aset-expander) 'compiler-macro)
+
+(defun array-dimension-expander (form env)
+  (declare (ignore env))
+  (with-pulled-array
+   (ar lets sym) form
+   (let-wrap lets `(compiler::cmp-array-dimension ,sym ,(caddr form)))))
+
+(si::putprop 'array-dimension (function array-dimension-expander) 'compiler-macro)
 
 (defun bind-all-vars-int (form nf bindings)
   (cond ((null form)
@@ -694,7 +734,10 @@
   (let* ((sd (get name 'si::s-data))
 	 (aet-type (aref (si::s-data-raw sd) index))
 	 )
-    (setf (info-type info) (type-filter (aref *aet-types* aet-type)))
+    (setf (info-type info) (if (and (eq name 'si::s-data) (= index 2))
+			       ;;FIXME -- this belongs somewhere else.  CM 20050106
+			       '(vector unsigned-char)
+			     (type-filter (aref *aet-types* aet-type))))
     (list 'structure-ref info
 	  (c1expr* form info)
 	  (add-symbol name)

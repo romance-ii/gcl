@@ -30,8 +30,9 @@ gclcvs (2.7.0-37) unstable; urgency=low
     one_val flag
   * Fix dynamic extent declarations, ammend existing declarations with
     auto-determined ones where possible
+  * Compiler type propagation enhancements
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 28 Dec 2004 22:22:39 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri,  7 Jan 2005 17:58:11 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 
