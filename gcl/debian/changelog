@@ -11,8 +11,10 @@ gclcvs (2.7.0-25) unstable; urgency=low
   * installed tcl/tk patch for mingw
   * Fix banner license detection code in lsp/gcl_mislib.lsp as
     8features* entries are now keywords
+  * o/makefile changes to work around trailing slash -I arguments gcc
+    bug on mingw
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  5 Jun 2004 18:21:19 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat,  5 Jun 2004 18:21:40 +0000
 
 gclcvs (2.7.0-24) unstable; urgency=low
 

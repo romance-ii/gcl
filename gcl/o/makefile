@@ -4,7 +4,7 @@
 
 -include ../makedefs
 
-HDIR	= ../h/
+HDIR	= ../h
 CDIR	= ./
 MPDIR	= ../mp
 
@@ -19,7 +19,7 @@ LIBFILES= bcmp.o bcopy.o bzero.o user_init.o user_match.o
 MAIN_DEBUG=
 DPP	= ../bin/dpp$(EXE)
 
-DECL := $(HDIR)new_decl.h
+DECL := $(HDIR)/new_decl.h
 
 # AUX_INFO=-aux-info $*.X
 %.o: %.c $(DECL)
@@ -44,16 +44,16 @@ X11_INCLUDE=${TK_XINCLUDES} ${HAVE_X11}
 #CFLAGS	=  -I../gcl-tk -I$(HDIR) $(ODIR_DEBUG) 
 
 
-MP 	= $(HDIR)mp.h
+MP 	= $(HDIR)/mp.h
 
-CMPINCLUDE_FILES=${HDIR}compbas.h ${HDIR}enum.h ${HDIR}object.h ${HDIR}vs.h \
-	${HDIR}bds.h ${HDIR}frame.h \
-	${HDIR}lex.h ${HDIR}eval.h    ${HDIR}funlink.h \
-	${HDIR}att_ext.h ${HDIR}compbas2.h ${HDIR}/compat.h ${HDIR}/cmponly.h
+CMPINCLUDE_FILES=${HDIR}/compbas.h ${HDIR}/enum.h ${HDIR}/object.h ${HDIR}/vs.h \
+	${HDIR}/bds.h ${HDIR}/frame.h \
+	${HDIR}/lex.h ${HDIR}/eval.h    ${HDIR}/funlink.h \
+	${HDIR}/att_ext.h ${HDIR}/compbas2.h ${HDIR}/compat.h ${HDIR}/cmponly.h
 
-OTHERS=${HDIR}notcomp.h ${HDIR}rgbc.h ${HDIR}stacks.h 
+OTHERS=${HDIR}/notcomp.h ${HDIR}/rgbc.h ${HDIR}/stacks.h 
 
-HFILES	= $(HDIR)include.h $(CMPINCLUDE_FILES) $(OTHERS) 
+HFILES	= $(HDIR)/include.h $(CMPINCLUDE_FILES) $(OTHERS) 
 
 # these are made elsewhere...
 MPFILES= 
@@ -115,7 +115,7 @@ decls1: $(INI_FILES)
 	echo '#include "make-decl.h"' > foo.c
 	cat ${INI_FILES} >> foo.c
 	${CC} -E -I${HDIR} foo.c | sed -n -e '/#/d' -e '/DO_/d' -e '/[a-zA-Z;]/p' > tmpx
-	../xbin/move-if-changed mv tmpx ${HDIR}new_decl.h
+	../xbin/move-if-changed mv tmpx ${HDIR}/new_decl.h
 
 $(DECL): $(HDIR)/make-decl.h $(INI_FILES)
 	echo '#include "make-decl.h"' > foo.c
