@@ -14,8 +14,9 @@ gclcvs (2.7.0-36) unstable; urgency=low
     expressions on nesting certain optimized forms
   * Old pathname-name case behavior in CLtL1
   * Preliminary type inferencing
+  * reduce print.cons.random.2 iterations for slow autobuilders
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 11 Dec 2004 00:33:56 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 11 Dec 2004 01:22:13 +0000
 
 gclcvs (2.7.0-35) unstable; urgency=high
 
