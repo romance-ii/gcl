@@ -120,10 +120,17 @@
 	   ;; evaluations.  We unwind this stack supremum variable change here
 	   ;; when necessary.  CM 20040301
 	   ((eq (car ue) 'sup)
-	    (wt-nl "sup=V" (cdr ue) ";")
-	    (when (and (eq loc 'fun-val)
+	    (when (and ;; If we've pushed the sup, we've always reset vs_top, as we're
+		       ;; using c2expr-top{*}.  Regardless then of whether we are
+		       ;; explicitly unwinding a fun-val, we must reset the top, unless
+		       ;; unless returning, when we rely on the returning code to leave
+		       ;; the stack in the correct state, regardless of loc being a fun-val
+		       ;; or otherwise.  We might need to reset when returning and loc is not
+		       ;; fun-val, but this appears doubtful.  20040306 CM
+		       ;; (eq loc 'fun-val)
 		       (not (eq *value-to-go* 'return))
 		       (not (eq *value-to-go* 'top)))
+	      (wt-nl "sup=V" (cdr ue) ";")
 	      (wt-nl)
 	      (reset-top)))
 	   (t (setq jump-p t))))

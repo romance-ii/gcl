@@ -57,8 +57,10 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * fix some more compiler errors found by the random tester -- all
     related to proper unwinding of temporary reductions of vs_top from
     te local supremum
+  * Adjustments to vs_top reset logic to clear (hopefully last)
+    remaining bug found by the random-tester
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  6 Mar 2004 02:05:11 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat,  6 Mar 2004 14:42:54 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
