@@ -555,27 +555,68 @@ DEFUN("MAKE-ARRAY1",object,fSmake_array1,SI,6,6,
 (defun array-displacement1 ( array )
 */
 
-DEFUNO("ARRAY-DISPLACEMENT1",object,fSarray_displacement,SI,1,1,
-      NONE,OO,OO,OO,OO,siLarray_displacement,"")
-     (object array) {
+/*  DEFUNO("ARRAY-DISPLACEMENT1",object,fSarray_displacement,SI,1,1, */
+/*        NONE,OO,OO,OO,OO,siLarray_displacement,"") */
+/*       (object array) { */
 
-  object a;
+/*    object a; */
+/*    int s,n; */
+
+/*    BEGIN_NO_INTERRUPT; */
+/*    if (type_of(array)!=t_array && type_of(array)!=t_vector) */
+/*      FEerror("Argument is not an array",0); */
+/*    a=array->a.a_displaced->c.c_car; */
+/*    if (a==Cnil) { */
+/*      END_NO_INTERRUPT; */
+/*      return make_cons(Cnil,make_fixnum(0)); */
+/*    } */
+/*    s=aet_sizes[Iarray_element_type(a)]; */
+/*    n=(void *)array->a.a_self-(void *)a->a.a_self; */
+/*    if (n%s) */
+/*      FEerror("Array is displaced by fractional elements",0); */
+/*    END_NO_INTERRUPT; */
+/*    return make_cons(a,make_fixnum(n/s)); */
+
+/*  } */
+
+void
+Larray_displacement(void) {
+
+  object array,a;
   int s,n;
 
   BEGIN_NO_INTERRUPT;
+
+  n = vs_top - vs_base;
+  if (n != 1)
+    FEerror("Wrong number of arguments",0);
+  array = vs_base[0];
+  vs_base=vs_top;
+
   if (type_of(array)!=t_array && type_of(array)!=t_vector)
     FEerror("Argument is not an array",0);
   a=array->a.a_displaced->c.c_car;
+
   if (a==Cnil) {
+
+    vs_push(Cnil);
+    vs_push(make_fixnum(0));
     END_NO_INTERRUPT;
-    return make_cons(Cnil,make_fixnum(0));
+
+    return;
+
   }
+
   s=aet_sizes[Iarray_element_type(a)];
   n=(void *)array->a.a_self-(void *)a->a.a_self;
   if (n%s)
     FEerror("Array is displaced by fractional elements",0);
+
+  vs_push(a);
+  vs_push(make_fixnum(n/s));
   END_NO_INTERRUPT;
-  return make_cons(a,make_fixnum(n/s));
+
+  return;
 
 }
 
@@ -1115,7 +1156,10 @@ object array,val,cursor;
 	RETURN1(array);
 }
 
-init_array_function(){;}
+void
+init_array_function(void) {
+  make_function("ARRAY-DISPLACEMENT", Larray_displacement);
+}
      
 
 

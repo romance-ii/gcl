@@ -64,10 +64,10 @@
 			  (return v))))
 	       t))))
 	 
-(defun array-displacement (array)
-  (let ((x (si:array-displacement1 array)))
-  (values (car x) (cdr x)))
-  )
+;(defun array-displacement (array)
+;  (let ((x (si:array-displacement1 array)))
+;  (values (car x) (cdr x)))
+;  )
 
 (defun make-array (dimensions
 		   &key (element-type t)
