@@ -313,7 +313,7 @@ sgc_mark_object1(object x) {
 	;
       else if (x->a.a_displaced == Cnil) {
 #ifdef HAVE_ALLOCA
-	if (cp <= core_end)  /* only if body of array not on C stack */
+	if (!NULL_OR_ON_C_STACK(cp))  /* only if body of array not on C stack */
 #endif			  
 	  x->a.a_self = (object *)copy_relblock(cp, j);
       }

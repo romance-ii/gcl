@@ -181,12 +181,13 @@ void
 enter_mark_origin(object *p)
 {
   unsigned long np=page(p);
-  if (np>=MAXPAGE)
-    error("Address supplied to enter_mar_origin out of range");
+/*   if (np>=MAXPAGE) */
+/*     error("Address supplied to enter_mar_origin out of range"); */
   if (mark_origin_max >= MARK_ORIGIN_MAX)
     error("too many mark origins");
 #ifdef SGC
-  sgc_type_map[np] |= SGC_PERM_WRITABLE ;
+  if (np<MAXPAGE)
+    sgc_type_map[np] |= SGC_PERM_WRITABLE ;
 #endif	
   mark_origin[mark_origin_max++] = p;
 }
@@ -416,7 +417,7 @@ mark_object(object x) {
 	  mark_contblock(cp, j);
       } else if (x->a.a_displaced == Cnil) {
 #ifdef HAVE_ALLOCA
-	if (cp <= core_end)  /* only if body of array not on C stack */
+	if (!NULL_OR_ON_C_STACK(cp))  /* only if body of array not on C stack */
 #endif			  
 	  x->a.a_self = (object *)copy_relblock(cp, j);}
       else if (x->a.a_displaced->c.c_car == Cnil) {
