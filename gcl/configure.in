@@ -12,6 +12,9 @@ if machine=`uname -m` ; then true; else machine=unknown ; fi
 
 AC_CHECK_PROGS(AWK,gawk nawk awk,"")
 
+AC_CHECK_PROGS(MAKEINFO,makeinfo,"false")
+AC_SUBST(MAKEINFO)
+
 if test -f /usr/lib/NextStep/software_version; then
     system=NEXTSTEP-`${AWK} '/3/,/3/' /usr/lib/NextStep/software_version`
 else

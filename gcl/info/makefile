@@ -9,7 +9,7 @@ all: gcl-tk.info gcl-si.info gcl-tk.dvi gcl-si.dvi gcl-si_toc.html gcl-tk_toc.ht
 
 .texi.info:
 	rm -f $*.*gz
-	makeinfo $*.texi
+	-$(MAKEINFO) $*.texi
 	- gzip $*.info-*
 
 GCL_SI= number.texi sequence.texi character.texi list.texi io.texi \
@@ -23,13 +23,13 @@ gcl-si.dvi: ${GCL_SI} gcl-si.texi
 	TEXINPUTS=.:$$TEXINPUTS tex --interaction nonstopmode gcl-si.texi || true
 
 gcl-si.info:
-	makeinfo gcl-si.texi	
+	-$(MAKEINFO) gcl-si.texi	
 
 gcl-tk.dvi: ${GCL_TK} gcl-tk.texi
 	TEXINPUTS=.:$$TEXINPUTS tex --interaction nonstopmode gcl-tk.texi || true
 
 gcl-tk.info: ${GCL_TK} gcl-tk.texi
-	makeinfo gcl-tk.texi
+	-$(MAKEINFO) gcl-tk.texi
 
 gcl-si_toc.html:
 	texi2html -split_chapter gcl-si.texi
