@@ -120,7 +120,7 @@ ihs_top_function_name(ihs_ptr h)
 
 
 
-static object
+object
 Icall_error_handler(object error_name,object error_format_string,int nfmt_args,...)
 { object b[20];
   b[0]= error_name;

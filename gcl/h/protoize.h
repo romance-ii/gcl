@@ -1737,6 +1737,9 @@ cdifference(object,object);
 object
 cplus(object,object);
 
+object
+Icall_error_handler(object,object,int,...);
+
 #if defined (__MINGW32__)
 int bcmp ( const void *s1, const void *s2, size_t n );
 void bcopy ( const void *s1, void *s2, size_t n );
