@@ -39,6 +39,21 @@ GCL_DVI=
 # Use MSYS makeinfo
 HTML_CMD=makeinfo --html
 
+# Avoid interference from incompatible tcl-tk configuration.
+TK_CONFIG_PREFIX=
+TK_LIBRARY=
+TCL_LIBRARY=
+TK_XINCLUDES=
+TK_INCLUDE=
+TCL_INCLUDE=
+TK_LIB_SPEC=
+TK_BUILD_LIB_SPEC=
+TK_XLIBSW=
+TK_XINCLUDES=
+TCL_LIB_SPEC=
+TCL_DL_LIBS=
+TCL_LIBS=
+
 #
 # End h/mingw.defs
 #
