@@ -933,7 +933,7 @@ and load your system with:
 		    (set var value)))
 	      names values))      
     (dolist (sym *redefined-functions*)
-      (setf (symbol-function sym) (get sym ':definition-before-pcl)))
+      (setf (symbol-function sym) (get sym 'definition-before-pcl)))
     nil))
 
 (defun reset-package (&optional (package-name "PCL"))

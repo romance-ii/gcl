@@ -1,3 +1,10 @@
+gcl (2.5.0.cvs20020625-71) unstable; urgency=high
+
+  * ansi changes to sloop.lsp and conditions.lisp to fix symbol tests
+  * :definition-before-pcl -> definition-before-pcl
+
+ -- Camm Maguire <camm@enhanced.com>  Sat,  7 Dec 2002 22:39:06 -0500
+
 gcl (2.5.0.cvs20020625-70) unstable; urgency=high
 
   * loop fixes

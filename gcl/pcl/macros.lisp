@@ -777,7 +777,7 @@
 (defvar *redefined-functions* nil)
 
 (defmacro original-definition (name)
-  `(get ,name ':definition-before-pcl))
+  `(get ,name 'definition-before-pcl))
 
 (defun redefine-function (name new)
   (pushnew name *redefined-functions*)
