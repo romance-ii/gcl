@@ -1641,7 +1641,13 @@
 
 
 
-(defun t3local-dcfun (closure-p clink ccb-vs fun lambda-expr
+;; Add optional argument initial-ccb-vs here defaulting to ccb-vs.
+;; Local functions will set this to the value of *initial-ccb-vs*
+;; prevalent at the time of the local function creation.  Closures
+;; will let it default to ccb-vs, which will be the value of *ccb-vs*
+;; prevalent at the time the environment stack was pushed and the
+;; closure was created.  CM 20031130
+(defun t3local-dcfun (closure-p clink ccb-vs fun lambda-expr &optional (initial-ccb-vs ccb-vs)
                               &aux (level (if closure-p 0 (fun-level fun)))
 			      cm
              (*volatile* (volatile (cadr lambda-expr)))
@@ -1656,7 +1662,10 @@
   (let-pass3
    ((*exit* 'return-object)
     (*clink* clink)(*ccb-vs* ccb-vs)
-    (*level* (1+ level))(*initial-ccb-vs* ccb-vs))
+                         ;; Use new optional parameter to initialize
+                         ;; *initial-ccb-vs* for correct use in
+                         ;; wt-ccb-vs. CM 20031130
+    (*level* (1+ level))(*initial-ccb-vs* initial-ccb-vs))
    (setq cm *reservation-cmacro*)
        (wt-nl1 "{")
        (assign-down-vars
@@ -1673,14 +1682,20 @@
   ))
 
 
-(defun t3local-fun (closure-p clink ccb-vs fun lambda-expr
+;; Add optional argument initial-ccb-vs here defaulting to ccb-vs.
+;; Local functions will set this to the value of *initial-ccb-vs*
+;; prevalent at the time of the local function creation.  Closures
+;; will let it default to ccb-vs, which will be the value of *ccb-vs*
+;; prevalent at the time the environment stack was pushed and the
+;; closure was created.  CM 20031130
+(defun t3local-fun (closure-p clink ccb-vs fun lambda-expr &optional (initial-ccb-vs ccb-vs)
                               &aux (level (if closure-p 0 (fun-level fun)))
 			      (*volatile* (volatile (cadr lambda-expr)))
 			      *downward-closures*)
   (declare (fixnum level))
   (if (eq closure-p 'dclosure)
       (return-from t3local-fun
-		   (t3local-dcfun closure-p clink ccb-vs fun lambda-expr)))
+		   (t3local-dcfun closure-p clink ccb-vs fun lambda-expr initial-ccb-vs)))
   (wt-comment "local function " (if (fun-name fun) (fun-name fun) nil))
   (wt-h   "static void " (if closure-p "LC" "L") (fun-cfun fun) "();")
   (wt-nl1 "static void " (if closure-p "LC" "L") (fun-cfun fun) "(")
@@ -1691,7 +1706,10 @@
   (analyze-regs (info-referred-vars (cadr lambda-expr)) 2)
   (let-pass3
    ((*clink* clink) (*ccb-vs* ccb-vs)
-    (*level* (1+ level)) (*initial-ccb-vs* ccb-vs)
+                         ;; Use new optional parameter to initialize
+                         ;; *initial-ccb-vs* for correct use in
+                         ;; wt-ccb-vs. CM 20031130
+    (*level* (1+ level)) (*initial-ccb-vs* initial-ccb-vs)
     (*exit* 'return))
    (wt-nl1 "{	register object *"*volatile*"base=vs_base;")
    (wt-nl  "register object *" *volatile* "sup=base+VM" *reservation-cmacro* ";")

@@ -22,8 +22,36 @@ gclcvs (2.7.0-16) unstable; urgency=low
     handle header dependencies more robustly.  Thanks to Robert Boyer
     for the report
   * Improve SGC define extraction for cmpinclude.h
+  * Fix variable reference errors which were occurring for compiled
+    local functions defined within closure-generating or other
+    environment stack pushing functions when safety is set to 3 (thanks
+    Paul Dietz for the report.).  When constructing local functions and
+    closures within a 'mother' function, *ccb-vs* will hold the number
+    of closure environments stacked at the point of each closure
+    creation or call to a local function.  This value is stored as the
+    cadr of a list pushed onto *local-funs*, and is read when writing
+    out the C code for the local function or closure, where it is used
+    to initialize *ccb-vs* and *initial-ccb-vs* for subsequent
+    processing.  The latter is used as the reference point when
+    addressing variables in wt-ccb-vs, as the former could be still
+    further incremented within the closure or local function itself.
+    Local functions as opposed to closures do not increment *ccb-vs* and
+    do not push the environment.  When a local function is defined
+    within a closure-generating flet/labels, or a tagbody or block which
+    pushes the environment, the value of *ccb-vs* written to the list
+    corresponding to the local function can be erroneously incremented
+    beyond the *initial-ccb-vs* value established before any environment
+    pushing operations were processed.  It is this latter value which is
+    appropriate for use in wt-ccb-vs, as the local functions, unlike the
+    closures, receive an environment level with the mother generating
+    function.  We therefore push *initial-ccb-vs* onto the end the list
+    pushed onto *local-funs* only when defining a local function, and
+    use it to initialize an added optional variable initialize-ccb-vs in
+    t3local-fun and t3local-dcfun, which default to the original ccb-vs.
+    We then bind *initial-ccb-vs* to this new optional parameter instead
+    of the former *ccb-vs, which was only appropriate for closures.
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 26 Nov 2003 15:28:15 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  1 Dec 2003 01:50:26 +0000
 
 gclcvs (2.7.0-15) unstable; urgency=low
 

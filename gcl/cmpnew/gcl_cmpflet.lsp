@@ -145,7 +145,11 @@
 
   (dolist** (def local-funs)
     (setf (fun-level (car def)) *level*)
-    (push (list nil *clink* *ccb-vs* (car def) (cadr def)) *local-funs*))
+    ;; Append *initial-ccb-vs* here and use it to initialize *initial-ccb-vs* when writing
+    ;; the code for this function.  Local functions, unlike closures, get an envinment
+    ;; level with the *initial-ccb-vs* at this point, and *ccb-vs* can be further incremented
+    ;; here, in c2tagbody-ccb, and in c2block-ccb.  CM 20031130
+    (push (list nil *clink* *ccb-vs* (car def) (cadr def) *initial-ccb-vs*) *local-funs*))
 
   ;;; Setup closures.
   (dolist** (def closures)
@@ -279,7 +283,11 @@
 
   (dolist** (def local-funs)
     (setf (fun-level (car def)) *level*)
-    (push (list nil *clink* *ccb-vs* (car def) (cadr def)) *local-funs*))
+    ;; Append *initial-ccb-vs* here and use it to initialize *initial-ccb-vs* when writing
+    ;; the code for this function.  Local functions, unlike closures, get an envinment
+    ;; level with the *initial-ccb-vs* at this point, and *ccb-vs* can be further incremented
+    ;; here, in c2tagbody-ccb, and in c2block-ccb.  CM 20031130
+    (push (list nil *clink* *ccb-vs* (car def) (cadr def) *initial-ccb-vs*) *local-funs*))
 
   ;;; Then make closures.
   (dolist** (def closures)

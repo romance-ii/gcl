@@ -30,7 +30,10 @@
 (defvar *max-vs* 0)
 (defvar *clink* nil)
 (defvar *ccb-vs* 0)
-(defvar *initial-ccb-vs*)
+;; We need an initial binding for *initial-ccb-vs* for use in defining
+;; local functions at the toplevel in c2flet and c2labels.  CM
+;; 20031130.
+(defvar *initial-ccb-vs* 0)
 (defvar *level* 0)
 
 ;;; *vs* holds the offset of the current vs-top.
