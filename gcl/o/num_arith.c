@@ -100,7 +100,7 @@ integer_exact_quotient(object x,object y,int in_place) {
 
   object r;
 
-  if (y==small_fixnum(1))
+  if (y==small_fixnum(1) || x==small_fixnum(0))
     return x;
 
   if (type_of(y)==t_fixnum && type_of(x)==t_fixnum) 
@@ -120,7 +120,7 @@ integer_exact_quotient(object x,object y,int in_place) {
 static object
 ratio_op_with_cancellation(object a,object b,object c,object d,object (*op)(object,object)) {
 
-  object b0,d0,g,t,g1,r;
+  object b0,d0,g,t,g1;
   
   b0=b;
   d0=d;
@@ -139,11 +139,7 @@ ratio_op_with_cancellation(object a,object b,object c,object d,object (*op)(obje
 
   b=number_times(b,d);
   
-  r=alloc_object(t_ratio);
-  r->rat.rat_num=t;
-  r->rat.rat_den=b;
-
-  return r;
+  return make_ratio(t,b,1);
   
 }
 
@@ -151,7 +147,7 @@ ratio_op_with_cancellation(object a,object b,object c,object d,object (*op)(obje
 static object
 ratio_mult_with_cancellation(object a,object b,object c,object d) {
 
-  object g,r;
+  object g;
   
   g=get_gcd(a,d);
   
@@ -163,11 +159,10 @@ ratio_mult_with_cancellation(object a,object b,object c,object d) {
   b=integer_exact_quotient(b,g,0);
   c=integer_exact_quotient(c,g,0);
 
-  r=alloc_object(t_ratio);
-  r->rat.rat_num=number_times(a,c);
-  r->rat.rat_den=number_times(b,d);
+  a=number_times(a,c);
+  b=number_times(b,d);
 
-  return r;
+  return make_ratio(a,b,1);
   
 }
 
@@ -744,14 +739,14 @@ number_divide(object x, object y)
 		switch (type_of(y)) {
 		case t_fixnum:
 		case t_bignum:
-			if(number_zerop(y) == TRUE)
-				zero_divisor();
-			if (number_minusp(y) == TRUE) {
-				x = number_negate(x);
-				y = number_negate(y);
-			}
-			z = make_ratio(x, y);
-			return(z);
+/* 			if(number_zerop(y) == TRUE) */
+/* 				zero_divisor(); */
+/* 			if (number_minusp(y) == TRUE) { */
+/* 				x = number_negate(x); */
+/* 				y = number_negate(y); */
+/* 			} */
+/* 			z = make_ratio(x, y, 0); */
+			return(make_ratio(x, y, 0));
 		case t_ratio:
 			if(number_zerop(y->rat.rat_num))
 				zero_divisor();

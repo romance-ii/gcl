@@ -12,8 +12,16 @@ gclcvs (2.7.0-32) unstable; urgency=low
     too), remove assertion of non-alloc rel/rela section names
   * Solaris Lint fix to sfasli.c
   * Fix compiler::link when gnu-ld is absent
+  * Fix case of exact division of 0 by a greater gcd value in
+    integer_exact_quotient; trim make_ratio and reinstate as a ratio
+    regularization routine in all instances,add pre_cancle flag to
+    make_ratio, proper precision for some internal constants to
+    correctly propagate precision of results, rework sqrt to give sane
+    results for negative reals and to preserve precision, precision
+    corrections in number_atan2, fix inverse trig, sqrt, and all floor
+    related ansi tests
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 23 Aug 2004 23:30:31 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 25 Aug 2004 03:09:25 +0000
 
 gclcvs (2.7.0-31) unstable; urgency=high
 

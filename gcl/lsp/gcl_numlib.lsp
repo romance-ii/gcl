@@ -41,7 +41,7 @@
 (proclaim '(optimize (safety 2) (space 3)))
 
 
-(defconstant imag-one #C(0.0d0 1.0d0))
+(defconstant imag-one #C(0 1))
 
 
 (defun isqrt (i)
@@ -85,30 +85,24 @@
 
 (defun cis (x) (exp (* imag-one x)))
 
+(defmacro asincos (x f)
+  (let* ((rad (list 'sqrt (list '- 1d0 (list '* x x))))
+	 (ff (if f (list '* imag-one x) x))
+	 (ss (if f rad (list '* imag-one rad))))
+    `(let* ((sf (or (typep ,x 'short-float) (typep ,x '(complex short-float))))
+	    (c (- (* imag-one
+		     (log (+ ,ff ,ss)))))
+	    (c (if (or (and (not (complexp ,x)) (<= ,x 1) (>= ,x -1))
+		       (zerop (imagpart c)))
+		   (realpart c)
+		 c)))
+       (if sf (coerce c (if (complexp c) '(complex short-float) 'short-float)) c))))
+
 (defun asin (x)
-       (let ((c (- (* imag-one
-                      (log (+ (* imag-one x)
-                              (sqrt (- 1.0d0 (* x x)))))))))
-            (if (or (and (not (complexp x))
-			  (<= x 1.0d0)
-			   (>= x -1.0d0)
-			    )
-		        (zerop (imagpart c)))
-                (realpart c)
-                c)))
+  (asincos x t))
 
 (defun acos (x)
-       (let ((c (- (* imag-one
-                      (log (+ x (* imag-one
-                                   (sqrt (- 1.0d0 (* x x))))))))))
-            (if (or (and (not (complexp x))
-			  (<= x 1.0d0)
-			   (>= x -1.0d0)
-			    )
-		        (zerop (imagpart c)))
-                (realpart c)
-                c)))
-
+  (asincos x nil))
 
 (defun sinh (z)
   (cond ((complexp z)
@@ -154,7 +148,7 @@
 ;(defun cosh (x) (/ (+ (exp x) (exp (- x))) 2.0d0))
 (defun tanh (x) (/ (sinh x) (cosh x)))
 
-(defun asinh (x) (log (+ x (sqrt (+ 1.0d0 (* x x))))))
+(defun asinh (x) (log (+ x (sqrt (+ 1 (* x x))))))
 ;(defun acosh (x)
 ;  (log (+ x
 ;	  (* (1+ x)
@@ -165,10 +159,10 @@
 (defun acosh (x)
   (* 2 (log (+ (sqrt (/ (1+ x) 2)) (sqrt (/ (1- x) 2))))))
 (defun atanh (x)
-       (when (or (= x 1.0d0) (= x -1.0d0))
+       (when (or (= x 1) (= x -1))
              (error "The argument ~S for ~S, is a logarithmic singularity."
                     x 'atan))
-       (log (/ (1+ x) (sqrt (- 1.0d0 (* x x))))))
+       (log (/ (1+ x) (sqrt (- 1 (* x x))))))
 
 
 (defun rational (x)
@@ -217,20 +211,20 @@
 
 
 (defun ffloor (x &optional (y 1.0s0))
-       (multiple-value-bind (i r) (floor (float x) (float y))
-        (values (float i r) r)))
+  (multiple-value-bind (i r) (floor x y)
+    (values (float i (if (floatp x) x 1.0)) r)))
 
 (defun fceiling (x &optional (y 1.0s0))
-       (multiple-value-bind (i r) (ceiling (float x) (float y))
-        (values (float i r) r)))
+  (multiple-value-bind (i r) (ceiling x y)
+    (values (float i (if (floatp x) x 1.0)) r)))
 
 (defun ftruncate (x &optional (y 1.0s0))
-       (multiple-value-bind (i r) (truncate (float x) (float y))
-        (values (float i r) r)))
+  (multiple-value-bind (i r) (truncate x y)
+    (values (float i (if (floatp x) x 1.0)) r)))
 
 (defun fround (x &optional (y 1.0s0))
-       (multiple-value-bind (i r) (round (float x) (float y))
-        (values (float i r) r)))
+  (multiple-value-bind (i r) (round x y)
+    (values (float i (if (floatp x) x 1.0)) r)))
 
 
 (defun lognand (x y) (boole boole-nand x y))

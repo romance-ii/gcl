@@ -1490,10 +1490,10 @@ gcl_init_num_co(void)
 	make_constant("LEAST-NEGATIVE-NORMALIZED-LONG-FLOAT",
 		      make_longfloat(-smallest_norm_double));
 
-	plus_half = make_ratio(small_fixnum(1), small_fixnum(2));
+	plus_half = make_ratio(small_fixnum(1), small_fixnum(2),1);
 	enter_mark_origin(&plus_half);
 
-	minus_half = make_ratio(small_fixnum(-1), small_fixnum(2));
+	minus_half = make_ratio(small_fixnum(-1), small_fixnum(2),1);
 	enter_mark_origin(&minus_half);
 
 	make_function("FLOAT", Lfloat);

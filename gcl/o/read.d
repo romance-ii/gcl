@@ -922,7 +922,7 @@ parse_number(char *s, int end, int *ep, int radix) {
     i++;
   } while (i < end && (d = digitp(s[i], radix)) >= 0);
   vs_push(normalize_big_to_object(integer_part));
-  x = make_ratio(vs_top[-2], vs_top[-1]);
+  x = make_ratio(vs_top[-2], vs_top[-1],0);
   goto END;
   
  END:

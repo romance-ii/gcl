@@ -104,16 +104,14 @@ make_fixnum1(long i)
 }
 
 object
-make_ratio(object num, object den)
+make_ratio(object num, object den,int pre_cancelled)
 {
 	object g, r, integer_divide1(object x, object y), get_gcd(object x, object y);
 	vs_mark;
 
-	if (number_zerop(den))
+	if (den==small_fixnum(0) /* number_zerop(den) */)
 		FEerror("Zero denominator.", 0);
-	if (number_zerop(num))
-		return(small_fixnum(0));
-	if (type_of(den) == t_fixnum && fix(den) == 1)
+	if (num==small_fixnum(0)/* number_zerop(num) */)
 		return(num);
 	if (number_minusp(den)) {
 		num = number_negate(num);
@@ -121,20 +119,25 @@ make_ratio(object num, object den)
 		den = number_negate(den);
 		vs_push(den);
 	}
-	g = get_gcd(num, den);
-	vs_push(g);
-	num = integer_divide1(num, g);
-	vs_push(num);
-	den = integer_divide1(den, g);
-	vs_push(den);
-	if(type_of(den) == t_fixnum && fix(den) == 1) {
-		vs_reset;
+	if (den==small_fixnum(1)/* type_of(den) == t_fixnum && fix(den) == 1 */)
 		return(num);
-	}
-	if(type_of(den) == t_fixnum && fix(den) == -1) {
-		num = number_negate(num);
-		vs_reset;
-		return(num);
+	if (!pre_cancelled) {
+	  g = get_gcd(num, den);
+	  vs_push(g);
+	  num = integer_divide1(num, g); /*FIXME exact division here*/
+	  vs_push(num);
+	  den = integer_divide1(den, g);
+	  vs_push(den);
+	  if(den==small_fixnum(1)/* type_of(den) == t_fixnum && fix(den) == 1 */) {
+	    vs_reset;
+	    return(num);
+	  }
+	  /* Impossible, as gcd is positive, and den is made positive above. */
+/* 	  if(type_of(den) == t_fixnum && fix(den) == -1) { */
+/* 	    num = number_negate(num); */
+/* 	    vs_reset; */
+/* 	    return(num); */
+/* 	  } */
 	}
 	r = alloc_object(t_ratio);
 	r->rat.rat_num = num;
