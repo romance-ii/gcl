@@ -281,7 +281,7 @@ static void LC96();
 #define VM37 3
 #define VM36 6
 #define VM35 3
-#define VM34 6
+#define VM34 7
 #define VM33 1
 #define VM32 7
 #define VM31 4
@@ -315,8 +315,8 @@ static void LC96();
 #define VM3 6
 #define VM2 2
 #define VM1 4
-static char * VVi[399]={
-#define Cdata VV[398]
+static char * VVi[401]={
+#define Cdata VV[400]
 (char *)(L1),
 (char *)(L2),
 (char *)(L3),
@@ -410,20 +410,24 @@ static char * VVi[399]={
 (char *)(L104)
 };
 #define VV ((object *)VVi)
+static void LnkT398() ;
+static void (*Lnk398)() = LnkT398;
+static void LnkT397() ;
+static void (*Lnk397)() = LnkT397;
 static void LnkT396() ;
 static void (*Lnk396)() = LnkT396;
 static void LnkT395() ;
 static void (*Lnk395)() = LnkT395;
-static void LnkT394() ;
-static void (*Lnk394)() = LnkT394;
-static void LnkT393() ;
-static void (*Lnk393)() = LnkT393;
-static void LnkT390() ;
-static void (*Lnk390)() = LnkT390;
-static void LnkT385() ;
-static void (*Lnk385)() = LnkT385;
-static object  LnkTLI382() ;
-static object  (*LnkLI382)() = LnkTLI382;
+static void LnkT392() ;
+static void (*Lnk392)() = LnkT392;
+static void LnkT387() ;
+static void (*Lnk387)() = LnkT387;
+static object  LnkTLI384() ;
+static object  (*LnkLI384)() = LnkTLI384;
+static void LnkT383() ;
+static void (*Lnk383)() = LnkT383;
+static void LnkT382() ;
+static void (*Lnk382)() = LnkT382;
 static void LnkT381() ;
 static void (*Lnk381)() = LnkT381;
 static void LnkT380() ;
@@ -442,20 +446,20 @@ static void LnkT374() ;
 static void (*Lnk374)() = LnkT374;
 static void LnkT373() ;
 static void (*Lnk373)() = LnkT373;
-static void LnkT372() ;
-static void (*Lnk372)() = LnkT372;
-static void LnkT371() ;
-static void (*Lnk371)() = LnkT371;
+static void LnkT370() ;
+static void (*Lnk370)() = LnkT370;
+static void LnkT369() ;
+static void (*Lnk369)() = LnkT369;
 static void LnkT368() ;
 static void (*Lnk368)() = LnkT368;
-static void LnkT367() ;
-static void (*Lnk367)() = LnkT367;
-static void LnkT366() ;
-static void (*Lnk366)() = LnkT366;
-static object  LnkTLI364() ;
-static object  (*LnkLI364)() = LnkTLI364;
-static void LnkT363() ;
-static void (*Lnk363)() = LnkT363;
+static object  LnkTLI366() ;
+static object  (*LnkLI366)() = LnkTLI366;
+static void LnkT365() ;
+static void (*Lnk365)() = LnkT365;
+static void LnkT362() ;
+static void (*Lnk362)() = LnkT362;
+static void LnkT361() ;
+static void (*Lnk361)() = LnkT361;
 static void LnkT360() ;
 static void (*Lnk360)() = LnkT360;
 static void LnkT359() ;
@@ -468,12 +472,12 @@ static void LnkT356() ;
 static void (*Lnk356)() = LnkT356;
 static void LnkT355() ;
 static void (*Lnk355)() = LnkT355;
-static void LnkT354() ;
-static void (*Lnk354)() = LnkT354;
+static object  LnkTLI354() ;
+static object  (*LnkLI354)() = LnkTLI354;
 static void LnkT353() ;
 static void (*Lnk353)() = LnkT353;
-static object  LnkTLI352() ;
-static object  (*LnkLI352)() = LnkTLI352;
+static void LnkT352() ;
+static void (*Lnk352)() = LnkT352;
 static void LnkT351() ;
 static void (*Lnk351)() = LnkT351;
 static void LnkT350() ;
@@ -488,24 +492,24 @@ static void LnkT346() ;
 static void (*Lnk346)() = LnkT346;
 static void LnkT345() ;
 static void (*Lnk345)() = LnkT345;
-static void LnkT344() ;
-static void (*Lnk344)() = LnkT344;
+static void LnkT324() ;
+static void (*Lnk324)() = LnkT324;
+static object  LnkTLI344() ;
+static object  (*LnkLI344)() = LnkTLI344;
 static void LnkT343() ;
 static void (*Lnk343)() = LnkT343;
-static void LnkT323() ;
-static void (*Lnk323)() = LnkT323;
-static object  LnkTLI342() ;
-static object  (*LnkLI342)() = LnkTLI342;
+static void LnkT342() ;
+static void (*Lnk342)() = LnkT342;
 static void LnkT341() ;
 static void (*Lnk341)() = LnkT341;
 static void LnkT340() ;
 static void (*Lnk340)() = LnkT340;
 static void LnkT339() ;
 static void (*Lnk339)() = LnkT339;
-static void LnkT338() ;
-static void (*Lnk338)() = LnkT338;
 static void LnkT77() ;
 static void (*Lnk77)() = LnkT77;
+static void LnkT338() ;
+static void (*Lnk338)() = LnkT338;
 static void LnkT337() ;
 static void (*Lnk337)() = LnkT337;
 static void LnkT336() ;
@@ -516,15 +520,13 @@ static void LnkT334() ;
 static void (*Lnk334)() = LnkT334;
 static void LnkT333() ;
 static void (*Lnk333)() = LnkT333;
-static void LnkT332() ;
-static void (*Lnk332)() = LnkT332;
-static void LnkT330() ;
-static void (*Lnk330)() = LnkT330;
-static void LnkT328() ;
-static void (*Lnk328)() = LnkT328;
+static void LnkT331() ;
+static void (*Lnk331)() = LnkT331;
+static void LnkT329() ;
+static void (*Lnk329)() = LnkT329;
+static void LnkT327() ;
+static void (*Lnk327)() = LnkT327;
 static void LnkT326() ;
 static void (*Lnk326)() = LnkT326;
 static void LnkT325() ;
 static void (*Lnk325)() = LnkT325;
-static void LnkT324() ;
-static void (*Lnk324)() = LnkT324;

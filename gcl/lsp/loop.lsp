@@ -962,7 +962,7 @@ a LET-like macro, and a SETQ-like macro, which perform LOOP-style destructuring.
 (defun loop-error (format-string &rest format-args)
   #+(or Genera CLOE) (declare (dbg:error-reporter))
   #+Genera (setq format-args (copy-list format-args))	;Don't ask.
-  (error "~?~%Current LOOP context:~{ ~S~}." format-string format-args (loop-context)))
+  (specific-error :invalid-form "~?~%Current LOOP context:~{ ~S~}." format-string format-args (loop-context)))
 
 
 (defun loop-warn (format-string &rest format-args)
@@ -2101,6 +2101,8 @@ collected result will be returned as the value of the LOOP."
 			     (downfrom (loop-for-arithmetic :downfrom))
 			     (upfrom (loop-for-arithmetic :upfrom))
 			     (below (loop-for-arithmetic :below))
+			     (above (loop-for-arithmetic :above))
+			     (by (loop-for-arithmetic :by))
 			     (to (loop-for-arithmetic :to))
 			     (upto (loop-for-arithmetic :upto))
 			     (being (loop-for-being)))
