@@ -993,7 +993,7 @@ Lreconc() {
 	check_type_non_negative_integer(&nn);
 	if (type_of(nn) != t_fixnum)
 		@(return Cnil)
-	for (i = 0;  !endp(lis) && proper_cons(lis);  i++, lis = lis->c.c_cdr)
+	for (i = 0;  !endp(lis) && fix_dot(lis)==lis;  i++, lis = lis->c.c_cdr)
 		vs_check_push(lis->c.c_car);
 	if (i <= fix((nn))) {
 		vs_top -= i;
@@ -1015,7 +1015,7 @@ Lreconc() {
 	check_type_non_negative_integer(&nn);
 	if (type_of(nn) != t_fixnum)
 		@(return Cnil)
-	for (i = 0, x = lis;  !endp(x) && proper_cons(x);  i++, x = x->c.c_cdr)
+	for (i = 0, x = lis;  !endp(x) && fix_dot(x)==x;  i++, x = x->c.c_cdr)
 		;
 	if (i <= fix((nn)))
 		@(return Cnil)
@@ -1032,7 +1032,8 @@ Lldiff() {
 
 	check_arg(2);
 	for (i = 0, x = vs_base[0];  !endp(x);  i++, x = x->c.c_cdr)
-		if (dot_list_eq(x,vs_base[1]))
+/*		if (dot_list_eq(x,vs_base[1]))*/
+		if (fix_dot(x)==vs_base[1])
 			break;
 		else
 			vs_check_push(x->c.c_car);
@@ -1159,6 +1160,7 @@ check_alist(alist)
 		list = list->c.c_cdr;
 	}
 	restoreTEST;
+	list=fix_dot(list);
 	@(return list)
 @)
 
@@ -1186,7 +1188,8 @@ Ltailp() {
 
 	check_arg(2);
 	for (x = vs_base[1];  !endp(x);  x = x->c.c_cdr)
-		if (dot_list_eq(x,vs_base[0])) {
+/*		if (dot_list_eq(x,vs_base[0])) {*/
+		if (fix_dot(x)==vs_base[0]) {
 			vs_base[0] = Ct;
 			vs_popp;
 			return;
@@ -1341,14 +1344,6 @@ init_list_function()
 	sKkey = make_keyword("KEY");
 
 	sKinitial_element = make_keyword("INITIAL-ELEMENT");
-
-	memset(&my_dot_pit,0,sizeof(my_dot_pit));
-	my_dot_pit.t=t_symbol;
-	my_dot_pit.c_car=my_dot_pit.c_cdr=(object)&my_dot_pit;
-
-	memset(&my_dot,0,sizeof(my_dot));
-	my_dot.t=t_cons;
-	my_dot.c_car=my_dot.c_cdr=(object)&my_dot_pit;
 
 	make_function("CAR", Lcar);
 	make_function("CDR", Lcdr);

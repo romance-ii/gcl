@@ -388,6 +388,17 @@ initlisp(void) {
 	  }
 	init_alloc();
 
+	Dotnil_body.t = (short)t_symbol;
+	Dotnil_body.s_dbind = Dotnil;
+	Dotnil_body.s_sfdef = NOT_SPECIAL;
+	Dotnil_body.s_fillp = 6;
+	Dotnil_body.s_self = "DOTNIL";
+	Dotnil_body.s_gfdef = OBJNULL;
+	Dotnil_body.s_plist = Dotnil;
+	Dotnil_body.s_hpack = Dotnil;
+	Dotnil_body.s_stype = (short)stp_constant;
+	Dotnil_body.s_mflag = FALSE;
+	
 	Cnil_body.t = (short)t_symbol;
 	Cnil_body.s_dbind = Cnil;
 	Cnil_body.s_sfdef = NOT_SPECIAL;
