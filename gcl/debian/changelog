@@ -19,8 +19,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Regenerate generated autotools files in binutils/bfd subdir
   * *gcl-version* -> *gcl-minor-version*,*gcl-extra-version*
   * powerpc-macosx h and defs files from cvs head
+  * Support for more informative banner reading features list
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 25 Feb 2004 22:55:02 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 25 Feb 2004 22:56:04 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
