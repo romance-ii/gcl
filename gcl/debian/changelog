@@ -12,8 +12,9 @@ gclcvs (2.7.0-27) unstable; urgency=low
   * Protect against compiling references to macro functions; set sane
     *eval-when-defaults* to '(:compile-toplevel :load-toplevel :execute)
   * revert erroneously changed eval-when-defaults
+  * Fix value stack leak in rare compiled call sequence
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  8 Jul 2004 03:30:33 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 13 Jul 2004 10:13:31 -0400
 
 gclcvs (2.7.0-26) unstable; urgency=low
 

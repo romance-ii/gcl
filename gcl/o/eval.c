@@ -1356,7 +1356,7 @@ static object
 fcalln_cclosure(object first,va_list ap)
 {
 int i=fcall.argd;
- {object *base=vs_top;
+ {object *base=vs_top,*old_base=base;
   DEBUG_AVMA
     vs_base=base;
   if (i) {
@@ -1378,7 +1378,7 @@ int i=fcall.argd;
     default:
       FEerror("bad args",0);
     } vs_top=base;
-      base=base -i;
+      base=old_base;
   	do{object fun=fcall.fun;
 		object *top, *base, l;
 
@@ -1459,7 +1459,7 @@ fcalln1(object first,...)
    DEBUG_AVMA
    va_start(ap,first);
    if(type_of(fun)==t_cfun)
-     {object *base=vs_top;
+     {object *base=vs_top,*old_base=base;
       int i=fcall.argd;
       vs_base=base;
       if (i) {
@@ -1481,7 +1481,7 @@ fcalln1(object first,...)
       default:
 	FEerror("bad args",0);
       }  vs_top=base;
-      base=base -i;
+      base=old_base;
       (*fcall.fun->cf.cf_self)();
       vs_top=base;
       CHECK_AVMA;
