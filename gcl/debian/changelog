@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-64) unstable; urgency=low
+
+  * Fix epsilon calculations again to reenable arm build
+
+ -- Camm Maguire <camm@enhanced.com>  Fri,  1 Nov 2002 05:30:04 -0500
+
 gcl (2.5.0.cvs20020625-63) unstable; urgency=low
 
   * Add versioned dependency on the gcc used to build gcl

@@ -1190,76 +1190,6 @@ Limagpart(void)
 	}
 }
 
-static float sf1,sf2;
-static int sf_eql(void)
-{return(sf1==sf2);}
-
-
-
-int lf_eqlp(double *p, double *q);
-#define LF_EQL(a,b) (lf1=a,lf2=b,lf_eqlp(&lf1,&lf2))
-#define SF_EQL(a,b) (sf1=a,sf2=b,sf_eql())
-
-void  _assure_in_memory (void *p);
-
-#define FMEM(f) _assure_in_memory(&f)
-
-#ifdef IEEEFLOAT
-/* from ieee754.h */
-
-typedef union {
-  float f;
-  
-  /* This is the IEEE 754 single-precision format.  */
-  struct float_bits
-  {
-#ifndef LITTLE_END
-    unsigned int negative:1;
-    unsigned int exponent:8;
-    unsigned int mantissa:23;
-#else				/* Big endian.  */
-    unsigned int mantissa:23;
-    unsigned int exponent:8;
-    unsigned int negative:1;
-#endif				/* Little endian.  */
-  } ieee;
-} IEEE_float;
-  
-typedef union  {
-
-  double d;
-  
-  /* This is the IEEE 754 double-precision format.  */
-  struct double_bits
-  {
-#ifndef LITTLE_END
-    unsigned int negative:1;
-    unsigned int exponent:11;
-    /* Together these comprise the mantissa.  */
-    unsigned int mantissa0:20;
-    unsigned int mantissa1:32;
-#else				/* Big endian.  */
-    /* # if	__FLOAT_WORD_ORDER == BIG_ENDIAN */
-    /*     unsigned int mantissa0:20; */
-    /*     unsigned int exponent:11; */
-    /*     unsigned int negative:1; */
-    /*     unsigned int mantissa1:32; */
-    /* # else */
-    /* Together these comprise the mantissa.  */
-    unsigned int mantissa1:32;
-    unsigned int mantissa0:20;
-    unsigned int exponent:11;
-    unsigned int negative:1;
-    /* # endif */
-#endif				/* Little endian.  */
-  } ieee;
-} IEEE_double;
-  
-
-#endif
-
-
-
 void
 init_num_co(void)
 {
@@ -1267,8 +1197,6 @@ init_num_co(void)
 	double smallest_double, smallest_norm_double, biggest_double;
 	float float_epsilon, float_negative_epsilon;
 	double double_epsilon, double_negative_epsilon;
-	double lf1,lf2;
-
 
 
 #ifdef VAX
@@ -1381,78 +1309,42 @@ init_num_co(void)
 	biggest_float = FLT_MAX;
 #endif
 	
+	{
+	  
+	  volatile double rd,dd,td,td1;
+	  volatile float  rf,df,tf,tf1;
+	  int i,j;
+#define MAX 500
+	  
+	  for (rf=1.0f,df=0.5f,i=j=0;i<MAX && j<MAX && df!=1.0f;i++,df=1.0f-(0.5f*(1.0f-df)))
+	    for (tf=rf,tf1=tf+1.0f,j=0;j<MAX && tf1!=1.0f;j++,rf=tf,tf*=df,tf1=tf+1.0f);
+	  if (i==MAX||j==MAX)
+	    printf("WARNING, cannot calculate float_epsilon: %d %d %f   %f %f %f\n",i,j,rf,df,tf,tf1);
+	  float_epsilon=rf;
+
+	  for (rf=1.0f,df=0.5f,i=j=0;i<MAX && j<MAX && df!=1.0f;i++,df=1.0f-(0.5f*(1.0f-df)))
+	    for (tf=rf,tf1=1.0f-tf,j=0;j<MAX && tf1!=1.0f;j++,rf=tf,tf*=df,tf1=1.0f-tf);
+	  if (i==MAX||j==MAX)
+	    printf("WARNING, cannot calculate float_negative_epsilon: %d %d %f   %f %f %f\n",i,j,rf,df,tf,tf1);
+	  float_negative_epsilon=rf;
+	  
+	  for (rd=1.0,dd=0.5,i=j=0;i<MAX && j<MAX && dd!=1.0;i++,dd=1.0-(0.5*(1.0-dd)))
+	    for (td=rd,td1=td+1.0,j=0;j<MAX && td1!=1.0;j++,rd=td,td*=dd,td1=td+1.0);
+	  if (i==MAX||j==MAX)
+	    printf("WARNING, cannot calculate double_epsilon: %d %d %f   %f %f %f\n",i,j,rd,dd,td,td1);
+	  double_epsilon=rd;
+
+	  for (rd=1.0,dd=0.5,i=j=0;i<MAX && j<MAX && dd!=1.0;i++,dd=1.0-(0.5*(1.0-dd)))
+	    for (td=rd,td1=1.0-td,j=0;j<MAX && td1!=1.0;j++,rd=td,td*=dd,td1=1.0-td);
+	  if (i==MAX||j==MAX)
+	    printf("WARNING, cannot calculate double_negative_epsilon: %d %d %f   %f %f %f\n",i,j,rd,dd,td,td1);
+	  double_negative_epsilon=rd;
+	  
+	}
+
 	
 #ifdef IEEEFLOAT
- { 
-   IEEE_float ief;
-   IEEE_double ied;
-
-   if (sizeof(ief)!=sizeof(ief.f))
-     FEerror("Bad ieee float definition\n");
-   if (sizeof(ied)!=sizeof(ied.d))
-     FEerror("Bad ieee float definition\n");
-
-   for (float_epsilon=ief.f=1.0,ief.ieee.mantissa=1;
-	FMEM(ief.f),!SF_EQL((float)(1.0+ief.f),(float)1.0);
-	float_epsilon=ief.f,ief.ieee.exponent--);
-
-   for (float_negative_epsilon=ief.f=1.0,ief.ieee.mantissa=1;
-	FMEM(ief.f),!SF_EQL((float)(1.0-ief.f),(float)1.0);
-	float_negative_epsilon=ief.f,ief.ieee.exponent--);
-
-   for (double_epsilon=ied.d=1.0,ied.ieee.mantissa1=1;
-	FMEM(ied.d),!LF_EQL((1.0+ied.d),1.0);
-	double_epsilon=ied.d,ied.ieee.exponent--);
-   /* FIXME double calculations end one iteration too early */
-   double_epsilon=ied.d;
-
-   for (double_negative_epsilon=ied.d=1.0,ied.ieee.mantissa1=1;
-	FMEM(ied.d),!LF_EQL((1.0-ied.d),1.0);
-	double_negative_epsilon=ied.d,ied.ieee.exponent--);
-   double_negative_epsilon=ied.d;
-
- }
-#else
-
- /* We want the smallest number not satisfying something,
-    and so we go quickly down, and then back up.  We have
-    to use a function call for test, since in line code may keep
-    too much precision, while the usual lisp eql,is not
-    in line.
-    We use SMALL as a multiple to come back up by.
-    We use FMEM(double_negative_epsilon)
-    to force the quantity into memory by taking its address
-    and then passing it to a function.
- */
- 
-#define SMALL 1.05	
-	for (float_epsilon = 1.0;
-	     FMEM(float_epsilon),!SF_EQL((float)(1.0 + float_epsilon),(float)1.0);
-	     float_epsilon /= 2.0)
-		;
-	while(SF_EQL((float)(1.0 + float_epsilon),(float)1.0))
-	  { FMEM(float_epsilon); float_epsilon=float_epsilon*SMALL;}
-	for (float_negative_epsilon = 1.0;
-	    FMEM(float_negative_epsilon), !SF_EQL((float)(1.0 - float_negative_epsilon) ,(float)1.0);
-	     float_negative_epsilon /= 2.0)
-		;
-	while(SF_EQL((float)(1.0 - float_negative_epsilon) ,(float)1.0))
-	  float_negative_epsilon=float_negative_epsilon*SMALL;
-	for (double_epsilon = 1.0;
-	     FMEM(double_epsilon), !(LF_EQL(1.0 + double_epsilon, 1.0));
-	     double_epsilon /= 2.0)
-		;
-	while((LF_EQL(1.0 + double_epsilon, 1.0)))
-	  double_epsilon=double_epsilon*SMALL;
-	  ;
-	for (double_negative_epsilon = 1.0;
-	   FMEM(double_negative_epsilon),
-	       !LF_EQL(1.0 - double_negative_epsilon , 1.0);
-	     double_negative_epsilon /= 2.0)
-		;
-	while(LF_EQL(1.0 - double_negative_epsilon , 1.0))
-	  double_negative_epsilon=double_negative_epsilon*SMALL;
-	  ;
+	/* Maybe check for "right" answer here */
 #endif
 
 	make_constant("MOST-POSITIVE-SHORT-FLOAT",
