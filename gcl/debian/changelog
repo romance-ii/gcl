@@ -1,3 +1,9 @@
+gclcvs (2.7.0-3) unstable; urgency=low
+
+  * Close streams in fasldlsym.c
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 16 Sep 2003 15:04:45 +0000
+
 gclcvs (2.7.0-2) unstable; urgency=low
 
   * Add processor flag variable to flags in configure.in

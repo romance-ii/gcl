@@ -129,6 +129,7 @@ fasload(faslfile)
     printf(" start address (dynamic) %p ",fptr);
   call_init(0,memory,data,fptr);
   unlink(buf);
+  close(stream(faslstream);
   did_a_dynamic_load = 1;
   return memory->cfd.cfd_size;
 }
