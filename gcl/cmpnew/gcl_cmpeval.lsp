@@ -219,14 +219,28 @@
 ; (push '((integer integer) integer #.(flags const raf) "addii(#0,#1)")
 ;         (get '+ 'inline-always))
 
+(defun arg-appears (x y dep)
+  (cond ((null y) nil)
+	((atom y) nil)
+	((consp (car y))
+	 (or (arg-appears x (cdar y) t) (arg-appears x (cdr y) dep)))
+	(t
+	 (or (and (eq x (car y)) dep)
+	     (arg-appears x (cdr y) dep)))))
+
 (defun pull-evals (x &optional form lets)
   (if (consp x)
-      (if (and (consp (car x)) (not (eq (caar x) 'quote)))
-	  (let ((s (gensym)))
-	    (pull-evals (cdr x) (cons s form) (cons (list s (car x)) lets)))
+      (if (or (and (consp (car x)) (not (eq (caar x) 'quote)))
+	      (and (atom (car x))
+		   (not (constantp (car x)))
+		   (arg-appears (car x) (cdr x) nil)))
+	  (let ((s (caar (member (car x) lets :test (lambda (x y) (eq x (cadr y)))))))
+	    (if s
+		(pull-evals (cdr x) (cons s form) lets)
+	      (let ((s (gensym)))
+		(pull-evals (cdr x) (cons s form) (cons (list s (car x)) lets)))))
 	(pull-evals (cdr x) (cons (car x) form) lets))
     (values (nreverse form) (nreverse lets))))
-	    
 
 (defun binary-nest-int (form len)
   (declare (fixnum len) (list form))
