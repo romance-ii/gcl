@@ -211,6 +211,7 @@ void
 unexec (char *new_name, char *old_name, void *start_data, void *start_bss,
 	void *entry_address)
 {
+#ifdef __CYGWIN32__
   file_data in_file, out_file;
   char out_filename[MAX_PATH], in_filename[MAX_PATH];
   char filename[MAX_PATH];
@@ -235,12 +236,40 @@ unexec (char *new_name, char *old_name, void *start_data, void *start_bss,
   strcpy(filename, old_name);
   strcat(filename, (strcmp (ptr, ".exe") && strcmp (ptr, ".EXE"))?".exe":"");
   cygwin_conv_to_full_win32_path(filename,in_filename);
-
   ptr = new_name + strlen (new_name) - 4;
   strcpy(filename, new_name);
   strcat(filename, (strcmp (ptr, ".exe") && strcmp (ptr, ".EXE"))?".exe":"");
   cygwin_conv_to_full_win32_path(filename,out_filename);
+#else 
+  file_data in_file, out_file;
+  char out_filename[MAX_PATH], in_filename[MAX_PATH];
+  unsigned long size;
+  char *ptr;
 
+  fflush (stdin);
+  /* copy_stdin = *stdin; */
+    setvbuf(stdin,0,_IONBF,0);
+    setvbuf(stdout,0,_IONBF,0);
+    
+  /* stdin->_data->__sdidinit = 0;
+   */
+  
+
+  if (!get_allocation_unit())
+    cache_system_info ();
+  
+  /* Make sure that the input and output filenames have the
+     ".exe" extension...patch them up if they don't.  */
+  strcpy (in_filename, old_name);
+  ptr = in_filename + strlen (in_filename) - 4;
+  if  (strcmp (ptr, ".exe") && strcmp (ptr, ".EXE")  )
+    strcat (in_filename, ".exe");
+
+  strcpy (out_filename, new_name);
+  ptr = out_filename + strlen (out_filename) - 4;
+  if (strcmp (ptr, ".exe") && strcmp (ptr, ".EXE")  )
+    strcat (out_filename, ".exe");
+#endif
   printf ("Dumping from %s\n", in_filename);
   printf ("          to %s\n", out_filename);
 
