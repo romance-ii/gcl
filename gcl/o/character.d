@@ -45,7 +45,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	if (char_font(c) != 0 || char_bits(c) != 0)
 		@(return Cnil)
 	i = char_code(c);
-	if (' ' <= i && ' ' < '\177')
+	if (' ' <= i && i < '\177')
 		@(return Ct)
 	@(return Cnil)
 @)
@@ -599,22 +599,22 @@ init_character()
  	make_constant("CHAR-FONT-LIMIT", make_fixnum(CHFONTLIM));
  	make_constant("CHAR-BITS-LIMIT", make_fixnum(CHBITSLIM));
 
-	STreturn = make_simple_string("RETURN");
+	STreturn = make_simple_string("Return");
 	enter_mark_origin(&STreturn);
-	STspace = make_simple_string("SPACE");
+	STspace = make_simple_string("Space");
 	enter_mark_origin(&STspace);
-	STrubout = make_simple_string("RUBOUT");
+	STrubout = make_simple_string("Rubout");
 	enter_mark_origin(&STrubout);
-	STpage = make_simple_string("PAGE");
+	STpage = make_simple_string("Page");
 	enter_mark_origin(&STpage);
-	STtab = make_simple_string("TAB");
+	STtab = make_simple_string("Tab");
 	enter_mark_origin(&STtab);
-	STbackspace = make_simple_string("BACKSPACE");
+	STbackspace = make_simple_string("Backspace");
 	enter_mark_origin(&STbackspace);
-	STlinefeed = make_simple_string("LINEFEED");
+	STlinefeed = make_simple_string("Linefeed");
 	enter_mark_origin(&STlinefeed);
 
-	STnewline = make_simple_string("NEWLINE");
+	STnewline = make_simple_string("Newline");
 	enter_mark_origin(&STnewline);
 
 	make_constant("CHAR-CONTROL-BIT", make_fixnum(0));
