@@ -55,7 +55,7 @@ main(int argc,char *argv[])
 void
 scanCopyToLine(FILE *fp, char *line,FILE *outstream)
 {    
-  int length ;
+  int length=0;
   int finish=0;
   char buf[5000];
   if (line) length = strlen(line);
