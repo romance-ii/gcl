@@ -116,9 +116,11 @@ $(GMPDIR)/mpn/mul_n.o $(GMPDIR)/mpn/lshift.o $(GMPDIR)/mpn/rshift.o: $(GMPDIR)/M
 
 command:
 	rm -f bin/gcl xbin/gcl
-	GCLDIR=`echo ${GCLDIR} | sed -e 'sX^/cygdrive/\([a-z]\)X\1!Xg' -e 'sX^//\([a-z]\)X\1!Xg'` ; \
+	GCLDIR=`echo ${GCLDIR} | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
 	make install-command "INSTALL_LIB_DIR=$${GCLDIR}" "prefix=$${GCLDIR}" 
 	(cd xbin ; cp ../bin/gcl .)
+
+#	GCLDIR=`echo ${GCLDIR} | sed -e 'sX^/cygdrive/\([a-z]\)X\1!Xg' -e 'sX^//\([a-z]\)X\1!Xg'` ; \
 
 merge:
 	${CC} -o merge merge.c
