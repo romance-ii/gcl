@@ -838,7 +838,7 @@ EXPONENT:
 MAKE_FLOAT:
 #ifdef IEEEFLOAT
 /*	if ((*((int *)&fraction +HIND) & 0x7ff00000) == 0x7ff00000)*/
-	if (!isfinite(fraction))
+	if (!ISFINITE(fraction))
 		FEerror("Floating-point overflow.", 0);
 #endif
 	switch (exponent_marker) {

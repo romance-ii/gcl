@@ -298,7 +298,7 @@ int *ep;
 
 #ifdef IEEEFLOAT
 /*	if ((*((int *)&d +HIND) & 0x7ff00000) == 0x7ff00000)*/
-	if (!isfinite(d))
+	if (!ISFINITE(d))
            {if (sSAprint_nansA->s.s_dbind !=Cnil)
 	      {sprintf(s, "%e",d);
 	       *sp = 2;
