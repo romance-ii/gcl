@@ -497,9 +497,9 @@ BEGIN:
 	case smm_probe:
 		if (strm->sm.sm_fp == NULL) break;
 		deallocate_stream_buffer(strm);
-		if (x->sm.sm_object1 &&
-		    type_of(x->sm.sm_object1)==t_string &&
-		    x->sm.sm_object1->st.st_self[0] =='|')
+		if (strm->sm.sm_object1 &&
+		    type_of(strm->sm.sm_object1)==t_string &&
+		    strm->sm.sm_object1->st.st_self[0] =='|')
 		  pclose(strm->sm.sm_fp);
 		else 
 		  fclose(strm->sm.sm_fp);

@@ -495,7 +495,13 @@ if { [file exists [file join [set dir] tclConfig.sh]] } {
 ]
 EOF
 cp conftest.tcl foo.tcl
-TCL_CONFIG_PREFIX=`tclsh8.0 conftest.tcl`
+
+AC_CHECK_PROG(TCLSH,tclsh,tclsh)
+AC_CHECK_PROG(TCLSH,tclsh8.0,tclsh8.0,${TCLSH})
+
+if test "${TCLSH}" = "" ; then true ; else
+TCL_CONFIG_PREFIX=`${TCLSH} < conftest.tcl`
+fi
 fi
 
 
@@ -511,7 +517,12 @@ exit 0
 ]
 EOF
 cp conftest.tcl foo.tcl
-TK_CONFIG_PREFIX=`wish8.0 -f conftest.tcl`
+AC_CHECK_PROG(TKSH,wish,wish)
+AC_CHECK_PROG(TKSH,wish8.0,wish8.0,${TKSH})
+if test "${TKSH}" = "" ; then true ; else
+TK_CONFIG_PREFIX=`${TKSH} < conftest.tcl`
+fi
+
 fi
 
 #AC_MSG_CHECKING(TK_CONFIG_PREFIX=${TK_CONFIG_PREFIX})
