@@ -19,6 +19,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+#define IN_NUM_CO
+
 #include "include.h"
 #include "num_include.h"
 
@@ -127,6 +129,16 @@ number_expt(object x, object y)
 			vs_push(z);
 			z = number_expt(x, z);
 			vs_push(z);
+			if ((type_of(z)==t_shortfloat && !ISNORMAL(z->SF.SFVAL)) ||
+			    (type_of(z)==t_longfloat && !ISNORMAL(z->LF.LFVAL))) {
+			  z = number_nlog(x);
+			  vs_push(z);
+			  z = number_times(z, y);
+			  vs_push(z);
+			  z = number_exp(z);
+			  vs_reset;
+			  return(z);
+			}
 			z = number_divide(small_fixnum(1), z);
 			vs_reset;
 			return(z);

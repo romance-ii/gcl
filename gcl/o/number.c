@@ -26,6 +26,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	This file creates some implementation dependent constants.
 */
 
+#define IN_NUM_CO
+
 #include "include.h"
 #include "num_include.h"
 
@@ -235,8 +237,32 @@ number_to_double(object x)
 		return(big_to_double(/*  (struct bignum *) */x));
 
 	case t_ratio:
-		return(number_to_double(x->rat.rat_num) /
-		       number_to_double(x->rat.rat_den));
+	  
+	  {
+	    double dx,dy;
+	    object xx,yy;
+	    
+	    for (xx=x->rat.rat_num,yy=x->rat.rat_den,dx=number_to_double(xx),dy=number_to_double(yy);
+		 dx && dy && (!ISNORMAL(dx) || !ISNORMAL(dy));) {
+
+	      if (ISNORMAL(dx))
+		dx*=0.5;
+	      else {
+		xx=integer_divide1(xx,small_fixnum(2));
+		dx=number_to_double(xx);
+	      }
+
+	      if (ISNORMAL(dy))
+		dy*=0.5;
+	      else {
+		yy=integer_divide1(yy,small_fixnum(2));
+		dy=number_to_double(yy);
+	      }
+
+	    }
+
+	    return dx/dy;
+	  }
 
 	case t_shortfloat:
 		return((double)(sf(x)));

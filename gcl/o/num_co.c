@@ -239,7 +239,7 @@ double_exponent(double d)
 #ifdef NS32K
 
 #else
-	return((((*((int *)(&d) + HIND)) & 0x7ff00000) >> 20) - 1022);
+	return ((((*((int *)(&d) + HIND)) & 0x7ff00000) >> 20) - 1022);
 #endif
 #endif
 #ifdef MV
@@ -257,6 +257,7 @@ set_exponent(double d, int e)
 
 	if (d == 0.0)
 		return(0.0);
+	  
 	*((int *)(&d) + HIND)
 #ifdef VAX
 	= *(int *)(&d) & 0xffff807f | ((e + 128) << 7) & 0x7f80;
@@ -318,7 +319,7 @@ double_to_integer(double d)
 #endif
 		return(make_fixnum(s*h));
 	}
-	if (h != 0)
+	if (h != 0 || l<0)
 		x = bignum2(h, l);
 	else
 		x = make_fixnum(l);
@@ -937,7 +938,17 @@ Ldecode_float(void)
 		d = -d;
 		s = -1;
 	}
-	e = double_exponent(d);
+	e=0;
+	if (!ISNORMAL(d)) {
+	  unsigned hp,lp,sp;
+
+	  integer_decode_double(d,&hp,&lp,&e,&sp);
+	  if (hp!=0 || lp<0)
+	    d=number_to_double(bignum2(hp, lp));
+	  else
+	    d=lp;
+	}
+	e += double_exponent(d);
 	d = set_exponent(d, 0);
 	vs_top = vs_base;
 	if (type_of(x) == t_shortfloat) {
@@ -977,8 +988,10 @@ Lscale_float(void)
 
 #endif
 #ifdef IEEEFLOAT
-	if ((type_of(x) == t_shortfloat && (e <= -126 || e >= 130)) ||
-	    (type_of(x) == t_longfloat && (e <= -1022 || e >= 1026)))
+	  /* Upper bound not needed, handled by floating point overflow */
+	  /* this checks if we're in the denormalized range */
+	if (!ISNORMAL(d) || (type_of(x) == t_shortfloat && e <= -126/*  || e >= 130 */) ||
+	    (type_of(x) == t_longfloat && (e <= -1022 /* || e >= 1026 */)))
 #endif
 #ifdef MV
 
@@ -986,8 +999,13 @@ Lscale_float(void)
 #ifdef S3000
 	if (e < -64 || e >= 64)
 #endif
-		FEerror("~S is an illegal exponent.", 1, vs_base[1]);
-	d = set_exponent(d, e);
+/* 		FEerror("~S is an illegal exponent.", 1, vs_base[1]); */
+	  {
+	    for (;k>0;d*=2.0,k--);
+	    for (;k<0;d*=0.5,k++);
+	  }
+	else
+	  d = set_exponent(d, e);
 	vs_popp;
 	if (type_of(x) == t_shortfloat)
 		vs_base[0] = make_shortfloat((shortfloat)d);
@@ -1113,7 +1131,7 @@ Linteger_decode_float(void)
 	vs_base = vs_top;
 	if (type_of(x) == t_longfloat) {
 		integer_decode_double(lf(x), &h, &l, &e, &s);
-		if (h != 0)
+		if (h != 0 || l<0)
 			vs_push(bignum2(h, l));
 		else
 			vs_push(make_fixnum(l));
