@@ -6,8 +6,9 @@ gclcvs (2.7.0-36) unstable; urgency=low
   * fix fix_bitp reference to 30 instead of LOG_WORD_SIZE-2
   * int ->fixnum in list.d
   * Don't pull-eval function slot of binary-op forms
+  * Yet more conservative binary-op compiler-macro strategy
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 28 Nov 2004 15:56:51 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 29 Nov 2004 01:29:09 +0000
 
 gclcvs (2.7.0-35) unstable; urgency=high
 

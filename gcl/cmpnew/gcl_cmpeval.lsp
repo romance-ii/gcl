@@ -219,19 +219,23 @@
 ; (push '((integer integer) integer #.(flags const raf) "addii(#0,#1)")
 ;         (get '+ 'inline-always))
 
-(defun arg-appears (x y dep)
-  (cond ((atom y) nil)
-	((consp (car y))
-	 (or (arg-appears x (cdar y) t) (arg-appears x (cdr y) dep)))
-	(t
-	 (or (and (eq x (car y)) dep)
-	     (arg-appears x (cdr y) dep)))))
+;(defun arg-appears (x y dep)
+;  (cond ((atom y) nil)
+;	((consp (car y))
+;	 (or (arg-appears x (cdar y) t) (arg-appears x (cdr y) dep)))
+;	(t
+;	 (or (and (eq x (car y)) dep)
+;	     (arg-appears x (cdr y) dep)))))
+
+(defun cons-to-right (x)
+  (and x (or (consp (car x)) (cons-to-right (cdr x)))))
 
 (defun needs-pre-eval (x)
   (or (and (consp (car x)) (not (eq (caar x) 'quote)))
       (and (atom (car x))
 	   (not (constantp (car x)))
-	   (arg-appears (car x) (cdr x) nil))))
+	   (cons-to-right (cdr x)))))
+;	   (arg-appears (car x) (cdr x) nil))))
 
 (defun pull-evals-int (x form lets)
   (if (atom x)
