@@ -102,7 +102,7 @@ LBINDIR=/usr/local/bin
 OFLAG	=  -O 
 LIBS	= -lm 
 
-ODIR_DEBUG= -O  -g
+ODIR_DEBUG= -O4 
 
 # This CC string will be used for compilation of the system,
 # and also in the compiler::*cc* variable for later compilation of

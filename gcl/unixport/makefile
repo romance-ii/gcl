@@ -95,7 +95,7 @@ CC = ${GCC} -pipe -fwritable-strings  -DVOL=volatile -I$(GCLDIR)/o -fsigned-char
 # under redhat 6.1 and slackware 7.0 we needed to have this
 # link be static, but should be ok with the fix to unixport/rsym_elf.c
 LDCC=${CC} -static
-LDCC=${CC} 
+LDCC=${CC}
 
 # note for linuxaout on an elf machine add -b i486-linuxaout 
 # CC = gcc -pipe -fwritable-strings  -DVOL=volatile -I$(GCLDIR)/o -fsigned-char -b i486-linuxaout 
