@@ -25,19 +25,23 @@ CROSS_PREFIX =
 # O3FLAGS      = -O2 -fomit-frame-pointer
 # O2FLAGS      = -O
 
-CFLAGS       = -Wall -DVOL=volatile -fsigned-char -fwritable-strings -I$(GCLDIR)/o 
-FINAL_CFLAGS = -Wall -DVOL=volatile -fsigned-char -fwritable-strings
-O3FLAGS      = -O2 -fomit-frame-pointer
-O2FLAGS      = -O
+# Unexec dependency
 
-#CC           = ${CROSS_PREFIX}gcc
+UNIX_SAVE_DEP  = unexnt.c
 
-AS           = ${CROSS_PREFIX}as
-AR           = ${CROSS_PREFIX}ar q
-RANLIB       = ${CROSS_PREFIX}ranlib
+CFLAGS         = -Wall -DVOL=volatile -fsigned-char -fwritable-strings -I$(GCLDIR)/o 
+FINAL_CFLAGS   = -Wall -DVOL=volatile -fsigned-char -fwritable-strings
+O3FLAGS        = -O2 -fomit-frame-pointer
+O2FLAGS        = -O
+
+#CC             = ${CROSS_PREFIX}gcc
+
+AS             = ${CROSS_PREFIX}as
+AR             = ${CROSS_PREFIX}ar q
+RANLIB         = ${CROSS_PREFIX}ranlib
 
 
-LDCC         = ${CC}
+LDCC           = ${CC}
 
 # Enable the fastloading mechanism which does not use ld -A
 # requires c/rel_.. machine dependent code.

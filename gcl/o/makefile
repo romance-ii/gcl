@@ -187,7 +187,7 @@ typespec.o: $(HFILES) ${MP}
 unixfasl.o: $(HFILES)
 unixfsys.o: $(HFILES)
 unixint.o: $(HFILES)
-unixsave.o: $(HFILES)
+unixsave.o: $(HFILES) $(UNIX_SAVE_DEP)
 unixsys.o: $(HFILES)
 unixtime.o: $(HFILES)
 funlink.o: $(HFILES)

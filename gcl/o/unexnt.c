@@ -279,7 +279,7 @@ unexec (char *new_name, char *old_name, void *start_data, void *start_bss,
   /* Open the undumped executable file.  */
   if (!open_input_file (&in_file, in_filename))
     {
-      printf ("Failed to open %s (%d)...bailing.\n", 
+      printf ("Failed to open %s (%ld)...bailing.\n", 
 	      in_filename, GetLastError ());
       exit (1);
     }
@@ -299,7 +299,7 @@ unexec (char *new_name, char *old_name, void *start_data, void *start_bss,
   size = heap_index_in_executable + get_committed_heap_size () + bss_size;
   if (!open_output_file (&out_file, out_filename, size))
     {
-      printf ("Failed to open %s (%d)...bailing.\n", 
+      printf ("Failed to open %s (%ld)...bailing.\n", 
 	      out_filename, GetLastError ());
       exit (1);
     }
@@ -540,7 +540,7 @@ get_section_info (file_data *p_infile)
   /* Check the NT header signature ...  */
   if (nt_header->Signature != IMAGE_NT_SIGNATURE) 
     {
-      printf ("Invalid IMAGE_NT_SIGNATURE 0x%x in %s...bailing.\n",
+      printf ("Invalid IMAGE_NT_SIGNATURE 0x%lx in %s...bailing.\n",
 	      nt_header->Signature, p_infile->name);
     }
 
@@ -653,23 +653,23 @@ copy_executable_and_dump_data_section (file_data *p_infile,
   printf ("Copying executable up to data section...\n");
   printf ("\t0x%08x Offset in input file.\n", 0);
   printf ("\t0x%08x Offset in output file.\n", 0);
-  printf ("\t0x%08x Size in bytes.\n", size);
+  printf ("\t0x%08lx Size in bytes.\n", size);
   memcpy (p_outfile->file_base, p_infile->file_base, size);
   
   size = data_size;
   printf ("Dumping .data section...\n");
-  printf ("\t0x%08x Address in process.\n", data_va);
+  printf ("\t0x%p Address in process.\n", data_va);
   printf ("\t0x%08x Offset in output file.\n", 
 	  data_file - p_outfile->file_base);
-  printf ("\t0x%08x Size in bytes.\n", size);
+  printf ("\t0x%08lx Size in bytes.\n", size);
   memcpy (data_file, data_va, size);
   
   index = (DWORD) data_file + size - (DWORD) p_outfile->file_base;
   size = p_infile->size - index;
   printf ("Copying rest of executable...\n");
-  printf ("\t0x%08x Offset in input file.\n", index);
-  printf ("\t0x%08x Offset in output file.\n", index);
-  printf ("\t0x%08x Size in bytes.\n", size);
+  printf ("\t0x%08lx Offset in input file.\n", index);
+  printf ("\t0x%08lx Offset in output file.\n", index);
+  printf ("\t0x%08lx Size in bytes.\n", size);
   memcpy ((char *) p_outfile->file_base + index, 
 	  (char *) p_infile->file_base + index, size);
 }
@@ -686,9 +686,9 @@ dump_bss_and_heap (file_data *p_infile, file_data *p_outfile)
     size = get_committed_heap_size ();
     heap_data = get_heap_start ();
 
-    printf ("\t0x%08x Heap start in process.\n", heap_data);
-    printf ("\t0x%08x Heap offset in executable.\n", index);
-    printf ("\t0x%08x Heap size in bytes.\n", size);
+    printf ("\t0x%p Heap start in process.\n", heap_data);
+    printf ("\t0x%08lx Heap offset in executable.\n", index);
+    printf ("\t0x%08lx Heap size in bytes.\n", size);
 
     memcpy ((PUCHAR) p_outfile->file_base + index, heap_data, size);
 
@@ -698,9 +698,9 @@ dump_bss_and_heap (file_data *p_infile, file_data *p_outfile)
     size = bss_size;
     bss_data = bss_start;
     
-    printf ("\t0x%08x BSS start in process.\n", bss_data);
-    printf ("\t0x%08x BSS offset in executable.\n", index);
-    printf ("\t0x%08x BSS size in bytes.\n", size);
+    printf ("\t0x%p BSS start in process.\n", bss_data);
+    printf ("\t0x%08lx BSS offset in executable.\n", index);
+    printf ("\t0x%08lx BSS size in bytes.\n", size);
     memcpy ((char *) p_outfile->file_base + index, bss_data, size);
 }
 
