@@ -18,19 +18,20 @@ sgc_mprotect(int, int, int);
 /* ulong may have been defined in mp.h but the define is no longer needed */
 #undef ulong
 #include <sys/mman.h>
-#define PROT_READ_WRITE (PROT_READ | PROT_WRITE |PROT_EXEC)
+#define PROT_READ_WRITE_EXEC (PROT_READ | PROT_WRITE |PROT_EXEC)
+#define PROT_READ_EXEC (PROT_READ|PROT_EXEC)
 #endif
 #ifdef AIX3
 #include <sys/vmuser.h>
-#define PROT_READ RDONLY
-#define  PROT_READ_WRITE UDATAKEY
+#define PROT_READ_EXEC RDONLY /*FIXME*/
+#define  PROT_READ_WRITE_EXEC UDATAKEY
 int mprotect();
 #endif
 
 #ifdef __MINGW32__
 #include <windows.h>
-#define PROT_READ_WRITE PAGE_EXECUTE_READWRITE
-#define PROT_READ PAGE_READONLY
+#define PROT_READ_WRITE_EXEC PAGE_EXECUTE_READWRITE
+#define PROT_READ_EXEC PAGE_READONLY /*FIXME*/
 
 int gclmprotect ( void *addr, size_t len, int prot ) {
     int old, rv;
@@ -1103,7 +1104,7 @@ memprotect_handler_test(int sig, long code, void *scp, char *addr) {
     memprotect_result=memprotect_bad_fault_address;
   else
     memprotect_result=memprotect_none;
-  mprotect(memprotect_test_address,PAGESIZE,PROT_READ|PROT_WRITE);
+  mprotect(memprotect_test_address,PAGESIZE,PROT_READ_WRITE_EXEC);
 
 }
 
@@ -1123,7 +1124,7 @@ memprotect_test(void) {
   memset(b1,32,sizeof(b1));
   memset(b2,0,sizeof(b2));
   memprotect_test_address=(void *)(((unsigned long)b1+PAGESIZE-1) & ~(PAGESIZE-1));
-  if (mprotect(memprotect_test_address,PAGESIZE,PROT_READ)) {
+  if (mprotect(memprotect_test_address,PAGESIZE,PROT_READ_EXEC)) {
     memprotect_result=memprotect_cannot_protect;
     return -1;
   }
@@ -1583,7 +1584,7 @@ memprotect_handler(int sig, long code, void *scp, char *addr) {
 	   pagetochar(p),page_multiple * PAGESIZE, sbrk(0));
     fflush(stdout);
 #endif     
-    mprotect(pagetochar(p),page_multiple * PAGESIZE, PROT_READ_WRITE);
+    mprotect(pagetochar(p),page_multiple * PAGESIZE, PROT_READ_WRITE_EXEC);
     while (--j >= 0)
       sgc_type_map[p+j] = sgc_type_map[p+j] | SGC_TEMP_WRITABLE;
     
@@ -1613,7 +1614,7 @@ sgc_mprotect(int pbeg, int n, int writable) {
   fflush(stdout);
 #endif  
   if(mprotect(pagetochar(pbeg),n*PAGESIZE,
-	      (writable & SGC_WRITABLE ? PROT_READ_WRITE : PROT_READ)))
+	      (writable & SGC_WRITABLE ? PROT_READ_WRITE_EXEC : PROT_READ_EXEC)))
     FEerror("Couldn't protect",0);
 }
 

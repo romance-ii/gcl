@@ -797,8 +797,11 @@ set_maxpage(void) {
 #ifdef SGC
   page_multiple=getpagesize()/PAGESIZE;
   if (page_multiple==0) error("PAGESIZE must be factor of getpagesize()");
-  if (sgc_enabled)
-    {memory_protect(1);}
+  if (heap_end) {
+    extern long maxpage;
+    maxpage=page(heap_end);
+    memory_protect(sgc_enabled ? 1 : 0);
+  }
   if (~(-MAXPAGE) != MAXPAGE-1) error("MAXPAGE must be power of 2");
   if (core_end)
     bzero(&sgc_type_map[ page(core_end)],MAXPAGE- page(core_end));

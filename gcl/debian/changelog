@@ -129,8 +129,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Prevent recursive malloc calls for OpenBSD error reporting
   * Push dummy 0 time for child runtime on windows to be compatible with
     other platforms for now
+  * Make sure pages are mprotected PROT_EXEC for amd64 support
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 13 Apr 2004 02:57:41 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 13 Apr 2004 21:02:02 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
