@@ -86,10 +86,9 @@ TCL_LIBS=
 TK_LISP_LIB=
 TCL_EXES=
 
-# Don't do dvi and html
+# Don't do dvi on Windows
 
 GCL_DVI=
-GCL_HTML=
 
 #
 # End h/mingw.defs
