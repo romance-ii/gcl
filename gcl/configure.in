@@ -199,6 +199,7 @@ fi
 def_dlopen="no"
 def_statsysbfd="yes"
 def_custreloc="no"
+def_oldgmp="no"
 case $use in 
      *linux)
 	ln -snf linux.defs h/$use.defs;
@@ -211,6 +212,8 @@ case $use in
 			def_dlopen="yes" ; def_statsysbfd="no" ;;
 		hppa*)
 			def_dlopen="yes" ; def_statsysbfd="no" ;;
+		m68k*)
+			def_oldgmp="yes" ;;
 	esac;;
     *mingw*)
 	def_statsysbfd="no" ; def_custreloc="yes" ;;
@@ -234,6 +237,10 @@ AC_ARG_ENABLE(custreloc,
 AC_ARG_ENABLE(debug,
 	[ --enable-debug builds gcl with -g in CFLAGS to enable running under gdb ]
 	,,enable_debug="no")
+
+AC_ARG_ENABLE(oldgmp,
+	[ --enable-oldgmp will link agains gmp2 instead of gmp3 ]
+	,,enable_oldgmp="$def_oldgmp")
 
 load_opt="0"
 if test "$enable_dlopen" = "yes" ; then
@@ -364,12 +371,19 @@ if test $use_gmp = yes ; then
  echo "# Subconfigure of GMP"
  echo "#"
  echo "#"
+
+ if test "$enable_oldgmp" = "yes" ; then
+	GMPDIR=gmp
+ else
+	GMPDIR=gmp3
+ fi
+
  case "$use" in
 #  Seem to be some problems with gmp3 on 68060 machines.  CM
 #   m68k-linux)
 #      (cd gmp3 && ./configure --build=none-unknown-linux-gnu) ;;
    *)
-      (cd gmp3 && ./configure) ;;
+      (cd $GMPDIR && ./configure) ;;
  esac
  echo "#"
  echo "#"
@@ -377,7 +391,7 @@ if test $use_gmp = yes ; then
  echo "# Subconfigure of GMP done"
  echo "# ------------------------"
  echo "#"
- cp gmp3/gmp.h h/gmp.h
+ cp $GMPDIR/gmp.h h/gmp.h
  AC_MSG_CHECKING("for size of gmp limbs")
  AC_TRY_RUN([#include <stdio.h>
 	#include "h/gmp.h"
@@ -396,9 +410,10 @@ if test $use_gmp = yes ; then
  GMP=1
  AC_DEFINE(GMP)
  AC_SUBST(GMP)
+ AC_SUBST(GMPDIR)
  MP_INCLUDE=h/gmp.h
  echo > makedefsafter
- echo 'MPFILES=${GMP_DIR}libgmp.a' >> makedefsafter
+ echo 'MPFILES=${GMPDIR}/libgmp.a' >> makedefsafter
  echo >> makedefsafter
 fi
 AC_SUBST(MP_INCLUDE)
@@ -488,7 +503,7 @@ if test "$enable_locbfd" = "yes" ; then
 	echo "#"
 	TLIBS="$TLIBS `pwd`/binutils/bfd/libbfd.a `pwd`/binutils/libiberty/libiberty.a"
 	AC_DEFINE(HAVE_LIBBFD)
-	BUILD_BFD="h/bfd.h h/bfdlink.h"
+	BUILD_BFD="h/bfd.h h/bfdlink.h h/ansidecl.h h/symcat.h"
 	AC_SUBST(BUILD_BFD)
 fi
 

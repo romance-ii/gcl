@@ -26,6 +26,15 @@ License for more details.
 #error Cannot use bfd fasloading with SPECIAL_RSYM/without HAVE_LIBBFD  defined
 #endif
 
+#ifdef HAVE_LIBBFD
+#ifdef NEED_CONST
+#define CONST const
+#endif
+#define IN_GCC
+#include <bfd.h>
+#include <bfdlink.h>
+#endif
+
 
 #include "ext_sym.h"
 #include "gclincl.h"

@@ -1,3 +1,14 @@
+gcl (2.5.0.cvs20020625-42) unstable; urgency=high
+
+  * copy ansidecl.h and symcat.h in h/ for local bfd builds
+  * localize bfd.h includes to sfaslbfd.c
+  * take bfd/po out of the build loop
+  * import xgcl-2, but don't build by default
+  * oldgmp configure option, and made default for m68k as temporary
+    workaround
+
+ -- Camm Maguire <camm@enhanced.com>  Mon, 12 Aug 2002 23:49:09 -0400
+
 gcl (2.5.0.cvs20020625-41) unstable; urgency=high
 
   * Minor rules revision for i164

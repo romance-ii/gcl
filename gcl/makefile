@@ -23,9 +23,14 @@ PORTDIR	= unixport
 CLCSDIR = clcs
 PCLDIR = pcl
 MPDIR	= mp
-GMP_DIR = gmp3/
+#GMP_DIR = gmp3/
 
 all: $(BUILD_BFD) $(PORTDIR)/$(FLISP) command cmpnew/collectfn.o lsp/info.o do-gcl-tk do-info
+
+xgcl: $(PORTDIR)/saved_xgcl
+
+$(PORTDIR)/saved_xgcl: $(PORTDIR)/saved_gcl
+	cd xgcl-2 && make
 
 binutils/bfd/libbfd.a binutils/libiberty/libiberty.a:
 	cd $(@D) && make
@@ -33,7 +38,7 @@ binutils/bfd/libbfd.a binutils/libiberty/libiberty.a:
 h/bfd.h: binutils/bfd/libbfd.a binutils/libiberty/libiberty.a
 	cp $(<D)/$(@F) $@
 
-h/bfdlink.h: binutils/bfd/libbfd.a binutils/libiberty/libiberty.a
+h/bfdlink.h h/ansidecl.h h/symcat.h: binutils/bfd/libbfd.a binutils/libiberty/libiberty.a
 	cp $(<D)/../include/$(@F) $@
 
 #$(PORTDIR)/saved_gcl: $(PORTDIR)/$(FLISP)
@@ -96,11 +101,8 @@ mpfiles: ${MPFILES}
 $(MPDIR)/libmport.a:
 	(cd mp ; make all)
 
-gmp3/libgmp.a: gmp3/Makefile
-#	(cd gmp/mpn ; make)
-#	(cd gmp/mpz ; make)
-#	(cd gmp ; make `echo *.c | sed -e "s!\.c!.o !g"` )
-	(cd gmp3 && make && rm -f libgmp.a &&  ar qc libgmp.a *.o */*.o)
+$(GMPDIR)/libgmp.a: $(GMPDIR)/Makefile
+	cd $(GMPDIR) && make && rm -f libgmp.a &&  ar qc libgmp.a *.o */*.o
 
 
 
@@ -166,15 +168,16 @@ clean:
 	(cd $(CMPDIR); make clean)
 	(cd $(PORTDIR); make clean)
 	(cd gcl-tk ; make clean)
-	-(cd gmp3 ; make distclean)
+	-(cd $(GMPDIR) ; make distclean)
 	cd $(CLCSDIR) && make clean
 	cd $(PCLDIR) && make clean
+	cd xgcl-2 && make clean
 	(cd info ; make clean)
 	rm -f foo.tcl config.log makedefs makedefsafter config.cache config.status makedefc
-	rm -f h/config.h h/gclincl.h h/cmpinclude.h
-	rm -rf gmp3/.deps gmp3/libgmp.a
+	rm -f h/config.h h/gclincl.h h/cmpinclude.h h/gmp.h
+	rm -rf $(GMPDIR)/.deps $(GMPDIR)/libgmp.a
 	rm -f xbin/gcl foo foo.c bin/gclm.bat
-	rm -f h/*-linux.defs h/bfd.h h/bfdlink.h
+	rm -f h/*-linux.defs h/bfd.h h/bfdlink.h h/ansidecl.h h/symcat.h
 	-cd binutils/bfd && make distclean
 	-cd binutils/libiberty && make distclean
 

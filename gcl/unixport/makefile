@@ -10,7 +10,7 @@ PORTDIR	= ../unixport
 CLCSDIR = ../clcs
 PCLDIR = ../pcl
 #MPDIR	= ../mp
-GMP_DIR	= ../gmp3/
+#GMP_DIR= ../gmp3/
 
 #CFLAGS	= -c $(DEFS) -I$(HDIR)
 #LDCC    = $(CC) -g
@@ -51,7 +51,7 @@ OBJS	=  $(OD)main.o $(OD)alloc.o $(OD)gbc.o \
 	$(OD)fat_string.o ${ODIR}/run_process.o \
 	$(OD)nfunlink.o $(OD)usig.o $(OD)usig2.o $(OD)utils.o \
 	$(OD)makefun.o $(OD)sockets.o  $(OD)clxsocket.o  \
-	$(OD)init_pari.o $(OD)nsocket.o $(NEW_INIT) $(MPFILES) $(SFASL) $(EXTRAS) \
+	$(OD)init_pari.o $(OD)nsocket.o $(NEW_INIT) ../$(MPFILES) $(SFASL) $(EXTRAS) \
 	$(addprefix $(OD),$(RL_OBJS))
 
 LSPOBJS	= $(LSPDIR)/defmacro.o $(LSPDIR)/evalmacros.o $(LSPDIR)/top.o \

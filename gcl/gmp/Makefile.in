@@ -335,7 +335,12 @@ depcomp =
 SOURCES = $(libgmp_la_SOURCES) $(libmp_la_SOURCES)
 OBJECTS = $(am_libgmp_la_OBJECTS) $(am_libmp_la_OBJECTS)
 
-all: all-redirect
+all:
+	cd mpn && make
+	cd mpz && make
+	make $$(ls -1 *.c | sed 's,\.c,.o,1')
+
+all1: all-redirect
 .SUFFIXES:
 .SUFFIXES: .c .dvi .info .lo .o .obj .ps .texi .texinfo .txi
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 

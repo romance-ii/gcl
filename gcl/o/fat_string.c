@@ -8,6 +8,16 @@
 
 #include "include.h"
 #include "page.h"
+
+#ifdef HAVE_LIBBFD
+#ifdef NEED_CONST
+#define CONST const
+#endif
+#define IN_GCC
+#include <bfd.h>
+#include <bfdlink.h>
+#endif
+
 #define FAT_STRING
 
 
