@@ -351,7 +351,7 @@ DEFUN("MAKE-VECTOR1",object,fSmake_vector1,SI,3,8,NONE,OI,
   (n,elt_type,staticp,va_alist)
 int n;int elt_type;object staticp;va_dcl 
 { 
-    int  displaced_index_offset;
+    int displaced_index_offset=0;
     int Inargs = VFUN_NARGS - 3;
     va_list Iap;object fillp;object initial_element;object displaced_to;object V9;
     Inargs = VFUN_NARGS - 3 ;

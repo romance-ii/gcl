@@ -59,7 +59,7 @@ Iapply_ap(object (*f) (/* ??? */), va_list ap)
 { int n = VFUN_NARGS;
   object *new;
   COERCE_VA_LIST(new,ap,n);
-  return c_apply_n(f,n,ap);
+  return c_apply_n(f,n,new);
 }
 
 object

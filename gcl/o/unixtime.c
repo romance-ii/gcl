@@ -52,6 +52,7 @@ which is usually 60 maybe 100 or something else. */
 #endif
 
 #ifdef BSD
+#include <time.h>
 #include <sys/timeb.h>
 #ifndef NO_SYS_TIMES_H
 #include <sys/times.h>

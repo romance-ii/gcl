@@ -24,6 +24,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	IMPLEMENTATION-DEPENDENT
 */
 
+#include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 

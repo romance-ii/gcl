@@ -1,3 +1,10 @@
+gcl (2.5.0.cvs20020625-15) unstable; urgency=high
+
+  * More lint changes for sundry arches
+  * Fixed bug in Iapply_ap
+
+ -- Camm Maguire <camm@enhanced.com>  Sat, 20 Jul 2002 23:40:33 -0400
+
 gcl (2.5.0.cvs20020625-14) unstable; urgency=high
 
   * include stdarg.h when defining _GNU_SOURCE

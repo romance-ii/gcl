@@ -151,13 +151,16 @@ void
 add_page_to_freelist(char *p, struct typemanager *tm)
 {short t,size;
  int i=tm->tm_nppage,fw;
- int nn;
  object x,f;
  t=tm->tm_type;
 #ifdef SGC
- nn=page(p);
- if (sgc_enabled)
-   { if (!WRITABLE_PAGE_P(nn)) make_writable(nn,nn+1);}
+ {
+   int nn=page(p);
+   if (sgc_enabled) {
+     if (!WRITABLE_PAGE_P(nn)) 
+       make_writable(nn,nn+1);
+   }
+ }
 #endif
  type_map[page(p)]= t;
  size=tm->tm_size;
