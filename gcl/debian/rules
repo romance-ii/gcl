@@ -58,9 +58,15 @@ configure-stamp:
 
 	if [ /usr/share/misc/config.guess -nt config.guess ] ; then \
 		cp /usr/share/misc/config.guess .;\
+		cp /usr/share/misc/config.guess binutils;\
+		cp /usr/share/misc/config.guess gmp;\
+		cp /usr/share/misc/config.guess gmp3/configfsf.guess;\
 	fi
 	if [ /usr/share/misc/config.sub -nt config.sub ] ; then \
 		cp /usr/share/misc/config.sub .;\
+		cp /usr/share/misc/config.sub binutils;\
+		cp /usr/share/misc/config.sub gmp;\
+		cp /usr/share/misc/config.sub gmp3/configfsf.sub;\
 	fi
 	if [ configure.in -nt configure ]; then autoconf; fi
 	chmod -R +x gmp3/*

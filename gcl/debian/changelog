@@ -3,8 +3,10 @@ gcl (2.5.0.cvs20020625-59) unstable; urgency=low
   * wrong number of arguments, keyword errors in lambda list bindings,
     are program errors
   * acosh fix at -1.0
+  * New config.sub and config.guess files and automatic updates in
+    binutils, gmp, and gmp3 subdirs
 
- -- Camm Maguire <camm@m.enhanced.com>  Wed, 16 Oct 2002 07:45:53 -0400
+ -- Camm Maguire <camm@m.enhanced.com>  Wed, 16 Oct 2002 11:38:56 -0400
 
 gcl (2.5.0.cvs20020625-58) unstable; urgency=low
 
