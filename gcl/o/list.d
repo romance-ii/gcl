@@ -219,7 +219,7 @@ stack_cons(void)
 
 object on_stack_list_vector(n,ap)
      int n;
-     object *ap;
+     va_list ap;
 {object res=(object) alloca_val;
  struct cons *p;
  object x;
@@ -228,7 +228,7 @@ object on_stack_list_vector(n,ap)
  TOP:
  p->t = (int)t_cons;
  p->m=FALSE;
- p->c_car= *(ap++);
+ p->c_car= va_arg(ap,object);
  if (--n == 0)
    {p->c_cdr = Cnil;
     return res;}
