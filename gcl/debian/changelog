@@ -50,8 +50,11 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Remove implicit dependency on gawk, optimize plt.c a little
   * Fix rsym generated symbol tables for 64 bit platforms
   * Make sure 'unwind' in frame.c does nt go below frs_org
+  * Do not define symbols with no value, either in bfd/rsym, or in
+    plt.c.  Generates a clear and explicit error of an undefined symbol
+    when we've missed an address
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  6 Mar 2004 02:00:07 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat,  6 Mar 2004 02:00:29 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

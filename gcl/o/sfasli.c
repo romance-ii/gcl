@@ -76,7 +76,6 @@ build_symbol_table_bfd(void) {
 	FEerror("Cannot make new hash entry",0);
 
     if (h->type!=bfd_link_hash_defined) {
-      h->type=bfd_link_hash_defined;
       if (!q[u]->section)
 	FEerror("Symbol ~S is missing section",1,make_simple_string(q[u]->name));
       if (!my_plt(q[u]->name,&pa)) {
@@ -86,8 +85,11 @@ build_symbol_table_bfd(void) {
 	else
 	  q[u]->value=pa;
       }
-      h->u.def.value=q[u]->value+q[u]->section->vma;
-      h->u.def.section=q[u]->section;
+      if (q[u]->value) {
+	h->type=bfd_link_hash_defined;
+	h->u.def.value=q[u]->value+q[u]->section->vma;
+	h->u.def.section=q[u]->section;
+      }
     }
 
     if (c) {
