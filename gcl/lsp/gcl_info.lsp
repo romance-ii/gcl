@@ -211,24 +211,21 @@
       (setq file (subseq file 0 ext))))
   (cond ((and (null file)
 	      (not (equal name "dir")))
-	 (let* (
-		(tem (show-info "(dir)Top" nil nil))
-	       *case-fold-search*)
+	 (let* ((tem (show-info "(dir)Top" nil nil))
+		*case-fold-search*)
 	   (cond ((f >= (string-match
-	    (si::string-concatenate
-	    "\\(([^(]*"
-	     (re-quote-string name)
-	     "(.info)?)\\)")
-	    tem ) 0)
-		 (setq file  (get-match tem 1)))))))
+			 (si::string-concatenate "\\(([^(]*" (re-quote-string name) "(.info)?)\\)")
+			 tem)
+		     0)
+		  (setq file (get-match tem 1)))))))
   (cond (file
-	 (let* ((na (namestring (truename file))))
+;	 (let* ((na (namestring (truename file))))
+	 (let* ((na (namestring file)))
 	   (cond ((setq tem (assoc na *info-data* :test 'equal))
 		  (setq *current-info-data* tem))
-		 (t   (setq *current-info-data*
-			    (list na (info-get-tags na) nil))
-		      (setq *info-data* (cons *current-info-data* *info-data*)
-			    )))))
+		 (t (setq *current-info-data*
+			  (list na (info-get-tags na) nil))
+		    (setq *info-data* (cons *current-info-data* *info-data*))))))
 	(t (format t "(not found ~s)" name)))
   nil)
 			  

@@ -369,20 +369,27 @@ object if_exists, if_does_not_exist;
 		
 		if ((fp == NULL) &&
 		    (sSAallow_gzipped_fileA->s.s_dbind != sLnil)) { 
-			snprintf(token->st.st_self,token->st.st_dim,
-			    "%s.gz", fname);
-			fp = fopen(token->st.st_self,"r");
-
-			if ((fp != NULL) && (smm == smm_input)) {
-			    fclose(fp);
-			    snprintf(token->st.st_self,token->st.st_dim,
-			    	"|zcat < %s.gz", fname);
-			    fp = popen(token->st.st_self+1,"r");
-			}
-			if (fp != NULL) {
-			    strncpy(fname,token->st.st_self,BUFSIZ-1);
-			    fname[BUFSIZ-1]=0;
-			}
+		  struct stat ss;
+		  char buf[256];
+		  if (snprintf(buf,sizeof(buf),"%s.gz",fname)<=0)
+		    FEerror("Cannot write .gz filename",0);
+		  if (!stat(buf,&ss)) {
+		    FILE *pp;
+		    int n;
+		    if (!(fp=tmpfile()))
+		      FEerror("Cannot create temporary file",0);
+		    if (snprintf(buf,sizeof(buf),"zcat %s.gz",fname)<=0)
+		      FEerror("Cannot write zcat pipe name",0);
+		    if (!(pp=popen(buf,"r")))
+		      FEerror("Cannot open zcat pipe",0);
+		    while((n=fread(buf,1,sizeof(buf),pp)))
+		      if (!fwrite(buf,1,n,fp))
+			FEerror("Cannot write pipe output to temporary file",0);
+		    if (pclose(pp)<0)
+		      FEerror("Cannot close zcat pipe",0);
+		    if (fseek(fp,0,SEEK_SET))
+		      FEerror("Cannot rewind temporary file\n",0); 
+		  }
 		}
 		if (fp == NULL) {
 		    if (if_does_not_exist == sKerror)

@@ -21,8 +21,10 @@ gclcvs (2.7.0-31) unstable; urgency=low
     cases where slot-specs are symbols rather than lists -- allows ansi
     tests to run
   * Large pretty print queue size for ansi tests
+  * Reenable compressed info lookup -- allow-gzipped files must be
+    seekable, not pipes
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 12 Aug 2004 21:01:02 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 13 Aug 2004 15:29:25 +0000
 
 gclcvs (2.7.0-30) unstable; urgency=high
 
