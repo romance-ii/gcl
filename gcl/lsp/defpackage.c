@@ -1,5 +1,6 @@
 
-#include <cmpinclude.h>
+
+#include "cmpinclude.h"
 #include "defpackage.h"
 init_defpackage(){do_init(VV);}
 /*	macro definition for DEFPACKAGE	*/
@@ -1151,8 +1152,3 @@ static object  LnkTLI67(){return call_proc0(VV[67],&LnkLI67);} /* TYPE-ERROR */
 static object  LnkTLI65(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[65],&LnkLI65,ap);} /* FIND */
 static object  LnkTLI64(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[64],&LnkLI64,ap);} /* WARN */
 static object  LnkTLI62(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[62],&LnkLI62,ap);} /* COUNT */
-
-#ifdef SYSTEM_SPECIAL_INIT
-SYSTEM_SPECIAL_INIT
-#endif
-
