@@ -10,8 +10,9 @@ gclcvs (2.7.0-32) unstable; urgency=low
   * Lint fixes to sfaslelf.c, correctly set init_address when .text is
     not first (Solaris ld) (heads up, Mike, you might need to check this
     too), remove assertion of non-alloc rel/rela section names
+  * Solaris Lint fix to sfasli.c
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 23 Aug 2004 23:08:19 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 23 Aug 2004 23:09:32 +0000
 
 gclcvs (2.7.0-31) unstable; urgency=high
 

@@ -118,7 +118,7 @@ LFD(build_symbol_table)(void) {
 
     char tmpfile1[80],command[300];
 
-    snprintf(tmpfile1,sizeof(tmpfile1),"rsym%d",getpid());
+    snprintf(tmpfile1,sizeof(tmpfile1),"rsym%d",(int)getpid());
 #ifndef STAND
     coerce_to_filename(symbol_value(sSAsystem_directoryA),
 		       system_directory);
