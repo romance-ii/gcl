@@ -7,6 +7,9 @@
 ;;; Variables for amassing the results of parsing a defmacro.  Declarations
 ;;; in DEFMACRO are the reason this isn't as easy as it sounds.
 ;;;
+
+(in-package 'lisp)
+
 (defvar *arg-tests* ()
   "A list of tests that do argument counting at expansion time.")
 
