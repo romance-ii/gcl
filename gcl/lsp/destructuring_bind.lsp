@@ -20,6 +20,9 @@
 (defvar *default-default* nil
   "Unsupplied optional and keyword arguments get this value defaultly.")
 
+;; Temps that we introduce and might not reference.
+(defvar *ignorable-vars*)
+
 ;;;; Stuff to parse DEFMACRO, MACROLET, DEFINE-SETF-METHOD, and DEFTYPE.
 
 ;;; PARSE-DEFMACRO returns, as multiple-values, a body, possibly a declare
