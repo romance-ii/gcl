@@ -10,8 +10,8 @@
   (MAYBE_DATA_P(pp) &&  ((char *)(pp) < heap_end))
 
 #ifndef page
-#define page(p)	(((long)(((char *)(p))-DBEGIN)>>PAGEWIDTH))
-#define	pagetochar(x)	((char *)(((x) << PAGEWIDTH) + DBEGIN))
+#define page(p)	((unsigned int)(((unsigned long)(((char *)(p))-DBEGIN)>>PAGEWIDTH)))
+#define	pagetochar(x)	((char *)((((unsigned long)x) << PAGEWIDTH) + DBEGIN))
 #endif
   
 #ifdef UNIX
