@@ -527,7 +527,7 @@ SYSTEM_SPECIAL_INIT
 
 	       
    #-(or dos winnt)
-   (format nil  "(cd ~a ;~a ~a ~a -c -I. ~a ~a)"
+   (format nil  "(cd ~a ;~a ~a ~a -c ~a ~a)"
 	   dir *cc*
 	   (if (and (boundp '*c-debug*) *c-debug*) " -g " "")
            (case *speed*
