@@ -8,8 +8,9 @@ gclcvs (2.7.0-19) unstable; urgency=low
   * SGC on for arm and hppa
   * use standard sgc fault recovery element for hppa as recommended by
     hppa kernel experts
+  * Document system return codes
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 14 Feb 2004 17:36:38 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 14 Feb 2004 17:38:00 +0000
 
 gclcvs (2.7.0-18) unstable; urgency=low
 

@@ -4,8 +4,10 @@
 @defun SYSTEM (string)
 Package:LISP
 
-GCL specific: Executes a Shell command as if STRING is an input to the Shell.
-Not all versions of GCL support this function.
+GCL specific: Executes a Shell command as if STRING is an input to the
+Shell.  Not all versions of GCL support this function.  At least on
+POSIX systems, this call should return two integers represeting the
+exit status and any possible terminating signal respectively.
 
 
 @end defun
