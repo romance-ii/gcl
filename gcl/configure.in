@@ -658,7 +658,7 @@ if test "$enable_statsysbfd" = "yes" || test "$enable_dynsysbfd" = "yes" ; then
 #
 	if test "$enable_statsysbfd" = "yes" && ! $CC -v 2>&1 | fgrep ming > /dev/null ; then
 		echo 'int main() {bfd_init();bfd_openr("/dev/null",0);return 0;}' >foo.c
-		MP=`$CC [ -Wl,-M ] -static -o foo foo.c -lbfd -liberty 2>&1 | tr '()' '\012\012' | $AWK '{print $NF}' | sort | uniq`
+		MP=`$CC [ -Wl,-M ] -static -o foo foo.c -lbfd -liberty 2>&1 | grep -v : | tr '()' '\012\012' | $AWK '{print $NF}' | sort | uniq`
 		rm -f foo.c foo
 		if echo $MP | tr ' ' '\012' | grep -q libbfd.a ; then
 		   TLIBS="$TLIBS `echo $MP | tr ' ' '\012' | grep libbfd.a`"
