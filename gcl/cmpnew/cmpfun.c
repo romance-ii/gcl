@@ -2910,7 +2910,7 @@ T1141:;
 goto T1142;
 T1142:;
 	FEerror("The ECASE key value ~s is illegal.",1,V485);
-	{object V495 = VV[177];
+	{object V495 = Cnil;
 	VMR50(V495)}}
 	return Cnil;
 }

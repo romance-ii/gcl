@@ -21,7 +21,7 @@ saved_gcl_pcl:
 	echo ${SETUP} '(pcl::load-pcl)(si::save-system "saved_gcl_pcl")' | $(LISP)
 
 clean:
-	rm -f *.o *.fn *.exe *.dll
+	rm -f *.o *.fn *.exe *.dll saved_gcl_pcl
 
 
 # remake the sys-package.lisp and sys-proclaim.lisp files

@@ -1,3 +1,11 @@
+gcl (2.5.0.cvs20020625-30) unstable; urgency=high
+
+  * fix bug in cmpif.lsp and recompile compiler
+  * \-O6 \-fomit\-frame\-pointer for Linux, speed gain of ~ 10%
+  * clean saved_gcl_pcl
+
+ -- Camm Maguire <camm@enhanced.com>  Mon,  5 Aug 2002 16:34:33 -0400
+
 gcl (2.5.0.cvs20020625-29) unstable; urgency=high
 
   * Back out of hppa assembler register flush for hppa, apparently issue
