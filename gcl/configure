@@ -4028,7 +4028,7 @@ else
 #line 4029 "configure"
 #include "confdefs.h"
 #include <math.h>
-	                    #include <ieeefp.h>xs
+	                    #include <ieeefp.h>
 			    int main() {
 				float f;
 				return finite(f) || !finite(f) ? 0 : 1;

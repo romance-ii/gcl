@@ -2436,6 +2436,8 @@ char *str;
 	object faslfile, data;
 #ifdef UNIX
 #ifdef BSD
+	FILE *fp;
+	int i;
 #ifdef HAVE_AOUT
  	struct exec header;
 #endif

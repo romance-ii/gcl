@@ -366,6 +366,7 @@ static void mark_x (char *name);
  *
  * driving logic.
  */
+void
 unexec (char *new_name, char *a_name, unsigned int data_start, unsigned int bss_start, unsigned int entry_address)
 {
   int new, a_out = -1;

@@ -4,8 +4,9 @@
 
 LBINDIR=/usr/local/bin
 
-OFLAG	= -O2 -pipe
-LIBS    = -lm
+OFLAG	= -pipe -O2 
+CFLAGS	= -fwritable-strings -fomit-frame-pointer -DVOL=volatile -I$(GCLDIR)/o -I/usr/local/lib/gcl-2.0/h -fsigned-char -I/usr/local/lib
+LIBS    = -lm -L/usr/local/lib
 ODIR_DEBUG=
 NULLFILE=../h/twelve_null
 
@@ -13,7 +14,7 @@ NULLFILE=../h/twelve_null
 # and also in the compiler::*cc* variable for later compilation of
 # lisp files.
 
-CC = gcc -pipe -O -fwritable-strings -fomit-frame-pointer -DVOL=volatile -I$(GCLDIR)/o -I/usr/local/lib/gcl-2.0/h -fsigned-char
+CC = gcc
 
 LDCC = $(CC) -static
 
@@ -24,6 +25,9 @@ GNULIB1=/usr/lib/libgcc.a
 # Enable the fastloading mechanism which does not use ld -A
 # requires c/rel_.. machine dependent code.
 RSYM	= rsym
+ifneq ($(findstring bfd,$(LIBS)),) 
+RSYM    = 
+endif
 SFASL	= $(ODIR)/sfasl.o
 
 # When using SFASL it is good to have (si::build-symbol-table)

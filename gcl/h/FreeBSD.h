@@ -30,8 +30,9 @@
 
 #undef LISTEN_FOR_INPUT
 #define LISTEN_FOR_INPUT(fp) \
+do {int c=0;\
   if ((fp)->_r <=0 && (c=0, ioctl((fp)->_file, FIONREAD, &c), c<=0)) \
-	return(FALSE)
+	return(FALSE);} while(0)
 
 #ifdef IN_GBC
 #include <sys/types.h>
@@ -61,11 +62,13 @@
 #define PAGEWIDTH 12		/* i386 sees 4096 byte pages */
 /* end for GC */
 
+#define HAVE_SIGPROCMASK
 #define SIG_STACK_SIZE (SIGSTKSZ/sizeof(double))
 #define SETUP_SIG_STACK \
 { \
 	static struct sigaltstack estack; \
-	estack.ss_sp = estack_buf; \
+	if ((estack.ss_sp = malloc(SIGSTKSZ)) == NULL) \
+	  perror("malloc"); \
 	estack.ss_size = SIGSTKSZ; \
 	estack.ss_flags = 0; \
 	if (sigaltstack(&estack, 0) < 0) \
@@ -75,6 +78,21 @@
 #define INSTALL_SEGMENTATION_CATCHER \
   	 (void) gcl_signal(SIGSEGV, segmentation_catcher); \
   	 (void) gcl_signal(SIGBUS, segmentation_catcher)
+
+#ifdef USE_DLOPEN
+#define SPECIAL_RSYM "rsym_elf.c"
+#define SEPARATE_SFASL_FILE "fasldlsym.c"
+#else
+#ifdef HAVE_LIBBFD
+#define SEPARATE_SFASL_FILE "sfaslbfd.c"
+#else
+#if !defined(__i386__) && !defined(__sparc__)
+#error Can only do non-bfd relocs for i386 and sparc
+#endif
+#define SPECIAL_RSYM "rsym_elf.c"
+#define SEPARATE_SFASL_FILE "sfaslelf.c"
+#endif
+#endif
 
 /*
  * The next two defines are for SGC,

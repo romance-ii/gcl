@@ -46,7 +46,7 @@ via #include "../c/sfasl.c"
 struct node * find_sym();
 int node_compare();
 #ifndef _WIN32
-char *malloc();
+void *malloc();
 char *bsearch();
 #endif
 

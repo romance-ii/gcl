@@ -304,11 +304,13 @@ siLrun_process()
   run_process(object_to_string(vs_base[0]), argv);
 }
 
+void
 siLmake_socket_pair()
 {
   make_socket_pair();
 }
 
+void
 init_socket_function()
 {
   make_si_function("MAKE-SOCKET-STREAM", siLmake_socket_stream); 
