@@ -1,0 +1,974 @@
+gcl (2.5.0.cvs20020625-78) unstable; urgency=low
+
+  * Add config.log config.status and config.cache to clean target
+  * Remove xgcl-2/debian directory
+  * Update clcs/sys-proclaim.lisp
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 27 Feb 2003 18:48:38 -0500
+
+gcl (2.5.0.cvs20020625-77) unstable; urgency=low
+
+  * Lintian cleanups
+  * Don't strip libansi_gcl.a, need .data at end of .o, as with libgcl.a
+  * Take newlines out of doc string for init-cmp-anon
+  * Cleanup gcc-3.2 compiler warning
+  * 64 bit STREF fixes
+  * pcl and clcs need to have C rebuilt afresh, as 64 bit machines write
+    different STREF offsets into the C files
+  * Rework Debian package build a bit
+  * README.Debian explaining the toggling of the ANSI image
+  * Typo in debian/rules
+  * Remove debian/gcl.conffiles
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 27 Feb 2003 15:56:11 -0500
+
+gcl (2.5.0.cvs20020625-76) unstable; urgency=low
+
+  * Debian Priority is optional
+  * Configure lowest common denominator on m68k to m68020 -- gcc-3.2
+    can't handle m68000 -- no __mulsi3
+  * Fix bit array bug
+  * Add upgraded-array-element-type
+  * Misc typep and subtypep fixes
+  * Proper error handling in certain array.c functions
+  * First needs exactly one arg
+  * Proper error handlin in LAST
+  * bit array allocation fixes in num_log.c
+  * eliminate Iapply_fun_n1
+  * Dummy system find-class in traditional image, overwritten by pcl
+    version in ANSI
+  * Invalid variable is a program error, not a symbol is a type error
+  * Attempt at uninterned symbol support as slot names
+  * defstruct changes for ANSI conc-name handling
+  * Rework ansi build to follow existing pattern for traditional image,
+    enabling preliminary ansi support on dlopen systems
+  * Fix broken mingw probe in main makefile
+  * Rename pcl and clcs files to avoid init name conflict on dlopen
+    systems
+  * sys-proclaim for clcs
+  * Compiler goto indentation
+  * Compiler pointer cast in call_or_link_closure
+  * *keep-gaz* compiler variable to save anonymously generated lisp
+  * si::init-cmp-anon function to initialize anonymously generated and
+    compiled lisp from .text section of running executable
+  * Debian/rules builds and ships both images
+  * Check for small fixnum in make_fixnum macro
+  * Pass real integers to array functions to minimize fixnum garbage
+  * Larger SHARP_EQ_CONTEXT_SIZE in read.d
+  * Shadowing-import instead of import dummy symbols into common-lisp in
+    ansi_cl.lisp
+  * Rework object definition in makefiles
+  * Remove old gmp directory
+  * Remove old tests directory
+  * Reinsert JAPI configuration
+  * Spruce up clean target
+  * Use saved_gcl to recompile cmpnew files
+  * Toggle ansi image with GCL_ANSI environment variable
+  * Version 2.5.1
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 26 Feb 2003 21:31:04 -0500
+
+gcl (2.5.0.cvs20020625-75) unstable; urgency=low
+
+  * Export truename for dlopen systems
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 14 Feb 2003 23:31:15 -0500
+
+gcl (2.5.0.cvs20020625-74) unstable; urgency=low
+
+  * Remove duplicates in apropos a la clisp
+  * Use static where possible, remove unused functions, decrease global
+    symbol count by about 1/3 (~ 600 global functions)
+  * Inline optimize cmod,cplus,ctimes and cdifference like maxima
+  * eliminate make-pure-array from lfun_list.lsp, not defined
+  * Prototypes for all possible compiler generated function calls
+  * relative symlink for cmpinclude.h in Debian package
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 14 Feb 2003 20:17:31 -0500
+
+gcl (2.5.0.cvs20020625-73) unstable; urgency=low
+
+  * typep fixes for class types
+  * m68k Build-depend on gcc-2.95 as a temporary work around to bug
+    179807
+  * gcc-3.2 warning cleanups
+  * bfd_boolean syntax support for newer binutils
+  * gcc-3.2 on powerpc can't yet handle -O2 and higher
+  * Reenable gcc-3.2 for m68k and do some guesswork in configure
+
+ -- Camm Maguire <camm@enhanced.com>  Mon, 10 Feb 2003 13:47:00 -0500
+
+gcl (2.5.0.cvs20020625-72) unstable; urgency=high
+
+  * Fix to siLbit_array_op for 0 dimension arrays
+  * Fixed aref of short-float vector
+  * nconc can take dotted lists
+  * tailp returns t if first arg is nil
+  * Repair nconc and tailp fixes
+  * varargs->stdarg for gcc 3.3 and higher
+
+ -- Camm Maguire <camm@enhanced.com>  Sun,  9 Feb 2003 16:57:33 -0500
+
+gcl (2.5.0.cvs20020625-71) unstable; urgency=high
+
+  * ansi changes to sloop.lsp and conditions.lisp to fix symbol tests
+  * :definition-before-pcl -> definition-before-pcl
+  * Allow spaces in pathnames
+  * Significant fixes to gmp_num_log.c affecting bitwise ops on bignums
+  * Fix test segfault arising from faulty structure-type-included-type-
+    name in gcl-low.lisp ; Thanks Peter
+  * aref1 -> row-major-aref
+  * Fixes to certain numerical functions to handle denormalized floating
+    point numbers
+  * Number of argument check in IapplyVector
+  * Print offset bit vectors correctly
+  * Correct precision for formatting short and long doubles
+  * Added si::modf
+  * Do not trigger error in IapplyVector if max args is zero
+  * Fixes to with-package-iterator to cleanup compiler warnings
+  * :invalid-variable is a type error
+  * No max arg checking if &key or &rest present
+  * proper defun declarations in listlib.lsp
+  * class specifiers in typep, subtypep and coerce
+  * Corrections to allow-other-key processing in bind.c
+  * eval sfuns with argument error checking (in one place)
+  * copy-structure takes only one arg
+  * si::classp, si::class-of, and si::class-precedence-list overwritten
+    by pcl analogs when compiling ansi
+  * recompiled core lsp and compiler files
+  * restore dvi and html doc build for non-mingw
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 24 Jan 2003 13:55:11 -0500
+
+gcl (2.5.0.cvs20020625-70) unstable; urgency=high
+
+  * loop fixes
+  * configure fixes
+  * :common-lisp in *features*
+  * :definition-before-clcs -> definition-before-clcs
+  * protect against sgc segfault within fread in fasdump.c -- fixes m68k
+    acl2 build
+  * SGC for s390
+
+ -- Camm Maguire <camm@enhanced.com>  Thu,  5 Dec 2002 08:02:17 -0500
+
+gcl (2.5.0.cvs20020625-69) unstable; urgency=high
+
+  * eval fix
+  * \-mlong-calls for arm
+
+ -- Camm Maguire <camm@enhanced.com>  Mon, 25 Nov 2002 08:35:27 -0500
+
+gcl (2.5.0.cvs20020625-68) unstable; urgency=high
+
+  * enable emacsdir configure option
+  * reordered configure X lib detection for solaris
+  * redo integer declarations for gmp bignums to avoid compiler warnings
+  * Clear large and negative count errors for remove/delete
+  * Loop error fixes
+  * cache flush with page granularity on m68k
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 21 Nov 2002 17:44:30 -0500
+
+gcl (2.5.0.cvs20020625-67) unstable; urgency=high
+
+  * Align cache flushes for powerpc and m68k on 32 byte boundaries,
+    should fix acl2 build
+  * Removed diagnostic SIGILL trapping in cmpaux.c
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 12 Nov 2002 23:25:49 -0500
+
+gcl (2.5.0.cvs20020625-66) unstable; urgency=high
+
+  * Fix SIGILL trap in cmpaux.c
+
+ -- Camm Maguire <camm@enhanced.com>  Mon, 11 Nov 2002 11:14:07 -0500
+
+gcl (2.5.0.cvs20020625-65) unstable; urgency=high
+
+  * Miscellaneous Freebsd patches
+  * non-recursive with-package-iterator
+  * map-into fill-pointer fixes
+  * changes to the user-init mechanism for portable acl2 build
+
+ -- Camm Maguire <camm@enhanced.com>  Sun, 10 Nov 2002 12:33:59 -0500
+
+gcl (2.5.0.cvs20020625-64) unstable; urgency=low
+
+  * Fix epsilon calculations again to reenable arm build
+
+ -- Camm Maguire <camm@enhanced.com>  Fri,  1 Nov 2002 07:08:33 -0500
+
+gcl (2.5.0.cvs20020625-63) unstable; urgency=low
+
+  * Add versioned dependency on the gcc used to build gcl
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 29 Oct 2002 16:20:22 -0500
+
+gcl (2.5.0.cvs20020625-62) unstable; urgency=low
+
+  * with-package-iterator modifications
+  * with-package-iterator uses labels to correctly provide for recursion
+  * Fix doc directory problem with install target in info/makefile
+  * Fix info dir setting in configure
+  * Priority extra
+
+ -- Camm Maguire <camm@enhanced.com>  Mon, 28 Oct 2002 23:45:07 -0500
+
+gcl (2.5.0.cvs20020625-61) unstable; urgency=low
+
+  * Placeholder support for optional condition in find-restart
+  * defpackage error on importing non-existent symbols
+  * working with-package-iterator macro
+  * various package errors reported as :package-error
+  * Destructuring-bind fixes
+  * delete-package error fix
+  * pcl functions use pcl-destructuring-bind for now -- fix later
+  * Trigger error if function calls use too many 'values'
+  * Maximum values increased to 50
+  * Enable previously failing tests in multiple-value-{setq,prog1}.lsp
+  * prototype for system_time_zone_helper
+  * Initial changes for solaris support
+  * make -> $(MAKE) in makefiles
+  * Incorporated main GCL (ANSI) Lisp Documentation in distribution
+
+ -- Camm Maguire <camm@m.enhanced.com>  Mon, 28 Oct 2002 04:31:33 -0500
+
+gcl (2.5.0.cvs20020625-60) unstable; urgency=low
+
+  * Still better acosh, courtesy of Barton Willis
+  * Better epsilon contant determination in ieee case
+  * Implicit tagbody in do-symbols and do-all-symbols
+  * Better epsilon handling in ieee case
+  * Add setf (values ... support
+  * invalid-function errors are type errors
+  * ecase and ccase take t and otherwise clauses
+  * ECASE/CCASE test fixes
+  * setf values fixes to use setf instead of setq when target value is
+    not a symbol
+  * ETYPECASE/CTYPECASE can take t and otherwise
+  * Backout of restart-clusters export
+  * fix handler.lisp
+  * Fix to bfd/GBC interaction
+
+ -- Camm Maguire <camm@m.enhanced.com>  Wed, 23 Oct 2002 08:38:08 -0400
+
+gcl (2.5.0.cvs20020625-59) unstable; urgency=low
+
+  * wrong number of arguments, keyword errors in lambda list bindings,
+    are program errors
+  * acosh fix at -1.0
+  * New config.sub and config.guess files and automatic updates in
+    binutils, gmp, and gmp3 subdirs
+
+ -- Camm Maguire <camm@m.enhanced.com>  Wed, 16 Oct 2002 11:38:56 -0400
+
+gcl (2.5.0.cvs20020625-58) unstable; urgency=low
+
+  * GENSYM fixes
+  * add complement and constantly
+  * import certain symbols into common-lisp package
+  * Fix makefile bug in install target
+  * Prepend instead of overwrite C_INCLUDE_PATH in shell wrapper
+  * More shell variable fixes in main makefile
+  * Corrected order of push and pushnew
+  * Set bfd_error appropriately
+  * Report function for package-error in condition-definitions.lisp;fix
+    internal-package-error deinition and handling;export *restart-
+    clusters* to user error code specified in handler-case;package-error
+    error formatting changes;dummy optional argument added to compute-
+    restarts (for now);Paul Dietz patch to defpackage.lsp fixing several
+    tests (thanks);export/unexport error handling fixes
+  * Recompile c,h and data files
+  * Fix number of argument errors in debug.lsp;documentation support for
+    packages in defpackage.lsp and module.lsp;do-symbols loops over
+    inherited symbols too in packlib.lsp
+  * Reworked EXTRAS variable handling in unixport/makefile
+  * Build-depend on autotools-dev and automatic update of config.sub and
+    config.guess;newer config.sub and config.guess in cvs tree; Closes:
+    #164526
+  * Remove stray comments in package.d
+  * elt errors of type type error
+  * bad-sequence limit returns type error
+
+ -- Camm Maguire <camm@m.enhanced.com>  Tue, 15 Oct 2002 15:39:19 -0400
+
+gcl (2.5.0.cvs20020625-57) unstable; urgency=low
+
+  * Capitalization changes to names of special characters;graphic-char-p
+    fix
+  * fix shadowing of existing symbols in package.d
+  * (simple-)base-string not a subtype of (simple-)vector
+  * add package-error condition(preliminary);hash conditions only by the
+    error name, not the format string;pass error types for both
+    correctable and non-correctable situations;eliminate duplicate
+    loading of clcs/package.lisp;Allow t doc-types in documentation
+    (returning nil) for now;fix final type errors in predlib.lsp
+    (regarding base-string);other error functions to pass continuable
+    errors (needs cleaning up);package designators can be
+    characters;delete-package added;make-package doesn't :use lisp by
+    default;in-package returns error if package does not exist instead
+    of making the package(relatively big change -- need to address
+    instances of in-package in .lsp code);call make-package on relevant
+    packages in init_gcl.lsp.in and pcl/sys-package.lisp;
+  * \-ffunction-sections for hppa with no-optimization -- enables first
+    maxima build here
+  * separate lisp variables to specify optimization flags for level 2
+    and 3
+  * symbol-name throws a type error on bad input
+  * tk8.2 -> tk8.3
+  * Fix bug in main makefile
+  * Newlines at end of test files
+
+ -- Camm Maguire <camm@m.enhanced.com>  Wed,  9 Oct 2002 15:04:41 -0400
+
+gcl (2.5.0.cvs20020625-56) unstable; urgency=high
+
+  * ansi-test corrections; extra-libs option to LINK function; LINK doc
+    change; subtypep and string changes to pass more tests
+  * Add method-combination and structure-object symbols for ansi;remove
+    unused variables in debug.lsp;remove in-package system from
+    defstruct.lsp;make-keyword and defmacro temporary function
+    placeholders in destructuring_bind.lsp;predlib changes to fix ansi-
+    test type errors;break-call takes 2 args (sys-proclaim.lisp);char
+    and char-set protected by string dimension not fillpointer in
+    string.d;fix bug in string.d:member_char for vector types;redefine
+    slot reader and writer functions in pcl/impl/gcl/gcl-low.lisp
+
+ -- Camm Maguire <camm@enhanced.com>  Sat,  5 Oct 2002 14:33:46 -0400
+
+gcl (2.5.0.cvs20020625-55) unstable; urgency=high
+
+  * Add LINK documentation to info pages
+  * 0 length last support
+  * make-sequence error check for 'null type and non-zero size
+  * Dotted-list support in member
+  * Reworked dotnil definitions and support macros
+  * add compile-file-pathname
+  * setup C_INCLUDE_PATH env variable in gcl shell wrapper
+  * POSITIVE-FIXNUM variable type,simple-error->type error where
+    indicated by various ansi tests, eq->eql in ldiff and tailp;proper
+    lists only in member et. al.
+  * rev keyword for member1 to reverse test arguments
+  * specific-error function to pass a given type of error from lisp
+  * set-exclusive-or preserves order of test arguments
+  * type-errors where appropriate in make-sequence
+  * nil keys accepted in remove/delete et.al.
+  * Reworked linking command line to ensure that certain symbols are
+    resolved in libgcl.a as opposed to certain system libraries, e.g.
+    gmp
+  * new gmp for m68k;no -ffloat-store for m68k a requested by user due
+    to performance impact (will alter test results in maxima
+    accordingly)
+  * libgclp.a for objects to be overriden by the C library if necessary
+  * readably support
+  * boolean type
+  * Missing ansi type support
+  * subtype code for boolean
+  * add missing ansi types as known types
+  * other preliminary subtype code for missing ansi types
+  * rework result-type check in make-sequence
+  * :element-type support in make-string (preliminary)
+  * (char ignores fill-pointer
+  * remove -O4 from debian/rules
+
+ -- Camm Maguire <camm@enhanced.com>  Thu,  3 Oct 2002 01:52:45 -0400
+
+gcl (2.5.0.cvs20020625-54) unstable; urgency=high
+
+  * Fix delete et. al. :from-end error; typo in gbc.c
+  * character and string-char equal in type hierarchy
+  * concatenate/make-sequence fixes
+  * merge takes nil key argument
+  * make-sequence checks size against result type
+  * install endp macro for dotted list support
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 24 Sep 2002 14:57:44 -0400
+
+gcl (2.5.0.cvs20020625-53) unstable; urgency=high
+
+  * Sleep with (in principle) microsecond precision
+  * nth-value macro added
+  * \-ffloat\-store and warning cleanups for m68k
+  * Compile hppa with debugging, will get a build but a broken one, ok
+    for now, Closes: #159591
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 20 Sep 2002 09:48:35 -0400
+
+gcl (2.5.0.cvs20020625-52) unstable; urgency=high
+
+  * Fixed gcc version bug in debian/rules
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 12 Sep 2002 18:00:50 -0400
+
+gcl (2.5.0.cvs20020625-51) unstable; urgency=high
+
+  * static gmp for m68k
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 12 Sep 2002 09:33:03 -0400
+
+gcl (2.5.0.cvs20020625-50) unstable; urgency=high
+
+  * Reworked static gmp target for new libgcl.a;gcc-3.2 for
+    hppa,ia64,and arm;libgmp2-dev for m68k;no rsym with
+    dynsysbfd;build_symbol_table earlier to shrink table size;
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 12 Sep 2002 00:39:17 -0400
+
+gcl (2.5.0.cvs20020625-49) unstable; urgency=high
+
+  * Use old gmp for m68k until can pin down test failure with gmp3
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 10 Sep 2002 00:36:10 -0400
+
+gcl (2.5.0.cvs20020625-48) unstable; urgency=high
+
+  * Rework build and install so that custom images can be made without
+    the source tree, even when using dlopen
+
+ -- Camm Maguire <camm@enhanced.com>  Mon,  9 Sep 2002 23:26:47 -0400
+
+gcl (2.5.0.cvs20020625-47) unstable; urgency=high
+
+  * Install cmpinclude.h in system include directory
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 29 Aug 2002 23:31:55 -0400
+
+gcl (2.5.0.cvs20020625-46) unstable; urgency=high
+
+  * Keep a *much* smaller piece of gmp.h in cmpinclude.h, reducing image
+    size by almost 100k
+  * Check for _SHORT_LIMB and _LONG_LONG_LIMB in configure
+  * Remove build specific include directories from compile command in
+    final executable
+  * Include local regexp.h explicitly in cmpinclude.h, to eliminate
+    intereference with system regexp.h, and to fix bug in which gcl
+    compilation depended on existing build directories
+  * Correctly add directory paths to extra gmp file targets in
+    unixport/makefile for m68k
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 29 Aug 2002 21:56:28 -0400
+
+gcl (2.5.0.cvs20020625-45) unstable; urgency=high
+
+  * Fix typo in rshift target for m68k
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 28 Aug 2002 18:02:00 -0400
+
+gcl (2.5.0.cvs20020625-44) unstable; urgency=high
+
+  * Handle second argument to last; treat dotted lists correctly in
+    ldiff et. al., tailp fix
+  * optional key argument for assoc-if et.al.;eval getf deflt if in setf
+  * Fix infinite loop in assoc-if et.al.
+  * X_LIBS and X_CFLAGS determination in configure script
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 21 Aug 2002 18:22:37 -0400
+
+gcl (2.5.0.cvs20020625-43) unstable; urgency=high
+
+  * Larger ihs stack;fix array-total-size-limit;check negative
+    fillp;allow #P
+  * don't make common_lisp package when not configuring with --enable-
+    ansi
+  * Patch gmp3/mpn/m68k/{l,r}shift.asm, restore gmp3 to m68k build
+  * Dynamic libgmp support, overriding with patched functions from local
+    source where necessary
+
+ -- Camm Maguire <camm@enhanced.com>  Sun, 18 Aug 2002 12:10:55 -0400
+
+gcl (2.5.0.cvs20020625-42) unstable; urgency=high
+
+  * copy ansidecl.h and symcat.h in h/ for local bfd builds
+  * localize bfd.h includes to sfaslbfd.c
+  * take bfd/po out of the build loop
+  * import xgcl-2, but don't build by default
+  * oldgmp configure option, and made default for m68k as temporary
+    workaround
+
+ -- Camm Maguire <camm@enhanced.com>  Mon, 12 Aug 2002 23:49:09 -0400
+
+gcl (2.5.0.cvs20020625-41) unstable; urgency=high
+
+  * Minor rules revision for i164
+
+ -- Camm Maguire <camm@enhanced.com>  Sun, 11 Aug 2002 13:49:03 -0400
+
+gcl (2.5.0.cvs20020625-40) unstable; urgency=high
+
+  * revamp CONST configure test for certain bfd versions
+
+ -- Camm Maguire <camm@enhanced.com>  Sun, 11 Aug 2002 12:31:35 -0400
+
+gcl (2.5.0.cvs20020625-39) unstable; urgency=high
+
+  * gcc-3.1 for ia64 fixes a compilation bug in num_co.c for -O3 and
+    higher -- code takes address of a variable kept in a register
+  * compile num_log.c with -O only on ia64 to work around compiler bug
+
+ -- Camm Maguire <camm@enhanced.com>  Sun, 11 Aug 2002 08:53:03 -0400
+
+gcl (2.5.0.cvs20020625-38) unstable; urgency=high
+
+  * check for long c statck addresses, fixing NULL_OR_ON_C_STACK macro
+    for ia64
+  * Remove error in clean target
+
+ -- Camm Maguire <camm@enhanced.com>  Sat, 10 Aug 2002 13:20:08 -0400
+
+gcl (2.5.0.cvs20020625-37) unstable; urgency=high
+
+  * Replace tmpnam and mktemp with less dangerous mkstemp
+
+ -- Camm Maguire <camm@enhanced.com>  Fri,  9 Aug 2002 19:45:52 -0400
+
+gcl (2.5.0.cvs20020625-36) unstable; urgency=high
+
+  * Fix rsym compilation when not using bfd
+
+ -- Camm Maguire <camm@enhanced.com>  Fri,  9 Aug 2002 19:10:16 -0400
+
+gcl (2.5.0.cvs20020625-35) unstable; urgency=high
+
+  * Don't build bfd/po subdir
+  * Build-depend on automake and gettext
+
+ -- Camm Maguire <camm@enhanced.com>  Fri,  9 Aug 2002 14:36:58 -0400
+
+gcl (2.5.0.cvs20020625-34) unstable; urgency=high
+
+  * fix zero length array support
+  * reverse configure order for bfd and libiberty
+
+ -- Camm Maguire <camm@enhanced.com>  Fri,  9 Aug 2002 11:52:38 -0400
+
+gcl (2.5.0.cvs20020625-33) unstable; urgency=high
+
+  * chmod +x for subconfigures
+  * dlopen for appropriate arches in debian/rules
+  * add custreloc configure option
+
+ -- Camm Maguire <camm@enhanced.com>  Fri,  9 Aug 2002 10:16:55 -0400
+
+gcl (2.5.0.cvs20020625-32) unstable; urgency=high
+
+  * Local bfd build option to prepare for arch-specific patches
+  * Try default gmp3 build on m68k
+  * Fix merge-pathnames
+
+ -- Camm Maguire <camm@enhanced.com>  Fri,  9 Aug 2002 00:13:16 -0400
+
+gcl (2.5.0.cvs20020625-31) unstable; urgency=high
+
+  * #undef bool in object.h for some gcc-3.1 installations
+  * New number_tan implementation using real tan, so optimized compiled
+    code will find symbol in -lm
+
+ -- Camm Maguire <camm@enhanced.com>  Tue,  6 Aug 2002 18:37:52 -0400
+
+gcl (2.5.0.cvs20020625-30) unstable; urgency=high
+
+  * fix bug in cmpif.lsp and recompile compiler
+  * \-O6 \-fomit\-frame\-pointer for Linux, speed gain of ~ 10%
+  * clean saved_gcl_pcl
+
+ -- Camm Maguire <camm@enhanced.com>  Mon,  5 Aug 2002 16:34:33 -0400
+
+gcl (2.5.0.cvs20020625-29) unstable; urgency=high
+
+  * Back out of hppa assembler register flush for hppa, apparently issue
+    is cleared by long/object function declaration fix
+  * Remove ansi2knr.1 man page, Closes: #155067
+  * hppa still has gc leak, possibly due to faulty setjmp.  Try Lamont
+    Jones' latest assembler to flush regs
+
+ -- Camm Maguire <camm@enhanced.com>  Fri,  2 Aug 2002 20:50:21 -0400
+
+gcl (2.5.0.cvs20020625-28) unstable; urgency=high
+
+  * SGC support for alpha
+  * generic gmp3 build for m68k
+  * compiler changes to declare all functions as returning object, with
+    functions that actually return long being cast appropriately
+  * back out of m68k hack in eval.c and funlink.c
+
+ -- Camm Maguire <camm@enhanced.com>  Fri,  2 Aug 2002 18:22:04 -0400
+
+gcl (2.5.0.cvs20020625-27) unstable; urgency=high
+
+  * Use generic lshift.c in gmp3 for m68k
+  * use SGC for ia64
+  * m68k workaround, cast (object(*)()) to (long(*)()) in funlink.c and
+    eval.c
+  * GBC register spiil asm for hppa
+  * fix hash_equal declaration error in hash.d
+
+ -- Camm Maguire <camm@enhanced.com>  Thu,  1 Aug 2002 18:12:49 -0400
+
+gcl (2.5.0.cvs20020625-26) unstable; urgency=high
+
+  * Remove extra load of tkl.o in install target of main makefile
+  * gcc-3.1 for hppa
+  * Remove gcc version spec for m68k
+  * \-fPIC for hppa, needed for dlopen
+  * cleanup gcc 3.1 warning in funlink.c
+  * cc instead of ld for -shared linking in fasldlsym.c (needed for
+    hppa)
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 31 Jul 2002 18:46:54 -0400
+
+gcl (2.5.0.cvs20020625-25) unstable; urgency=high
+
+  * Move chmod +x gmp3/* into debian/rules
+  * Remove gclm.bat from Debian package
+  * Build-Depend on autoconf, Closes: #154909
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 31 Jul 2002 09:44:20 -0400
+
+gcl (2.5.0.cvs20020625-24) unstable; urgency=high
+
+  * chmod +x gmp3/configure
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 31 Jul 2002 07:55:17 -0400
+
+gcl (2.5.0.cvs20020625-23) unstable; urgency=high
+
+  * 64bit SGC support
+  * SGC on by default for sparc-linux and mips(el)-linux
+  * Optimized logxor funtion
+  * Check for MP_LIMB_SIZE in fasdump.c, for 64bit support
+  * gbc fix for ia64
+  * gmp3 import for ia64
+  * system bzero, bcmp, and bcopy function prototypes
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 30 Jul 2002 23:11:58 -0400
+
+gcl (2.5.0.cvs20020625-22) unstable; urgency=high
+
+  * ElfW macros in rsym*.c for 64bit
+  * Allow for 8 byte gmp mp_limbs
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 25 Jul 2002 18:52:37 -0400
+
+gcl (2.5.0.cvs20020625-21) unstable; urgency=high
+
+  * Support for dlopen object loading where bfd is not yet working --
+    ./configure --enable-dlopen
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 25 Jul 2002 15:08:05 -0400
+
+gcl (2.5.0.cvs20020625-20) unstable; urgency=high
+
+  * Cleanups for --disable-bfd option
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 24 Jul 2002 15:05:28 -0400
+
+gcl (2.5.0.cvs20020625-19) unstable; urgency=high
+
+  * 64bit fixes
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 24 Jul 2002 12:16:42 -0400
+
+gcl (2.5.0.cvs20020625-18) unstable; urgency=high
+
+  * misc. lintian cleanups, mostly for 64 bit
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 23 Jul 2002 23:35:03 -0400
+
+gcl (2.5.0.cvs20020625-17) unstable; urgency=high
+
+  * Fixed typeo in error.c preventing arm compilation
+
+ -- Camm Maguire <camm@enhanced.com>  Mon, 22 Jul 2002 17:18:18 -0400
+
+gcl (2.5.0.cvs20020625-16) unstable; urgency=high
+
+  * Fix bad on_stack_list_vector args
+
+ -- Camm Maguire <camm@enhanced.com>  Mon, 22 Jul 2002 16:10:16 -0400
+
+gcl (2.5.0.cvs20020625-15) unstable; urgency=high
+
+  * More lint changes for sundry arches
+  * Fixed bug in Iapply_ap
+
+ -- Camm Maguire <camm@enhanced.com>  Sat, 20 Jul 2002 23:40:33 -0400
+
+gcl (2.5.0.cvs20020625-14) unstable; urgency=high
+
+  * include stdarg.h when defining _GNU_SOURCE
+
+ -- Camm Maguire <camm@enhanced.com>  Sat, 20 Jul 2002 18:47:43 -0400
+
+gcl (2.5.0.cvs20020625-13) unstable; urgency=high
+
+  * Proper va_dcl declarations
+
+ -- Camm Maguire <camm@enhanced.com>  Sat, 20 Jul 2002 10:40:02 -0400
+
+gcl (2.5.0.cvs20020625-12) unstable; urgency=high
+
+  * cvs updates for missing ptrdiff_t
+
+ -- Camm Maguire <camm@enhanced.com>  Sat, 20 Jul 2002 08:41:37 -0400
+
+gcl (2.5.0.cvs20020625-11) unstable; urgency=high
+
+  * cvs changes to compile cleanly with -Wall
+
+ -- Camm Maguire <camm@enhanced.com>  Sat, 20 Jul 2002 02:59:33 -0400
+
+gcl (2.5.0.cvs20020625-10) unstable; urgency=high
+
+  * Architecture any, though still have some issues
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 12 Jul 2002 19:02:09 -0400
+
+gcl (2.5.0.cvs20020625-9) unstable; urgency=high
+
+  * cvs commits for 64bit support
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 12 Jul 2002 18:01:21 -0400
+
+gcl (2.5.0.cvs20020625-8) unstable; urgency=high
+
+  * NULL_OR_ON_C_STACK macro correction for m68k
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 12 Jul 2002 14:37:48 -0400
+
+gcl (2.5.0.cvs20020625-7) unstable; urgency=high
+
+  * arm is bigendian
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 10 Jul 2002 18:04:22 -0400
+
+gcl (2.5.0.cvs20020625-6) unstable; urgency=high
+
+  * cvs updates for arm build
+
+ -- Camm Maguire <camm@enhanced.com>  Tue,  9 Jul 2002 16:09:26 -0400
+
+gcl (2.5.0.cvs20020625-5) unstable; urgency=high
+
+  * CC environment variable setting in debian/rules to aid in porting
+  * gcc 2.95 for m68k
+
+ -- Camm Maguire <camm@enhanced.com>  Sat,  6 Jul 2002 23:00:23 -0400
+
+gcl (2.5.0.cvs20020625-4) unstable; urgency=high
+
+  * gcc 3.0 for arm
+  * cachectl header for m68k
+
+ -- Camm Maguire <camm@enhanced.com>  Mon,  1 Jul 2002 15:47:53 -0400
+
+gcl (2.5.0.cvs20020625-3) unstable; urgency=high
+
+  * Better libbfd detection for arm/alpha
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 26 Jun 2002 17:27:21 -0400
+
+gcl (2.5.0.cvs20020625-2) unstable; urgency=high
+
+  * s390 support
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 25 Jun 2002 21:25:35 -0400
+
+gcl (2.5.0.cvs20020625-1) unstable; urgency=high
+
+  * CVS updates, new s390 arch
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 25 Jun 2002 19:26:36 -0400
+
+gcl (2.5.0.cvs20020610-2) unstable; urgency=high
+
+  * cvs updates
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 13 Jun 2002 08:42:32 -0400
+
+gcl (2.5.0.cvs20020610-1) unstable; urgency=high
+
+  * cvs updates
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 12 Jun 2002 23:04:57 -0400
+
+gcl (2.5.0.cvs20020523-2) unstable; urgency=high
+
+  * configure updates for better tk detection
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 24 May 2002 18:50:22 -0400
+
+gcl (2.5.0.cvs20020523-1) unstable; urgency=high
+
+  * New upstream release
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 24 May 2002 18:50:22 -0400
+
+gcl (2.5.0.cvs20020429-1) unstable; urgency=high
+
+  * Build-Depend on tk8.2-dev, Closes: #144330
+  * New cvs updates
+  * Added sparc to arch list, Closes: #143465
+
+ -- Camm Maguire <camm@enhanced.com>  Mon, 29 Apr 2002 23:07:36 -0400
+
+gcl (2.5.0.cvs20020219-2) unstable; urgency=medium
+
+  * flavor ->debian-emacs-flavor in emacsen-startup
+
+ -- Camm Maguire <camm@enhanced.com>  Mon,  4 Mar 2002 14:29:59 -0500
+
+gcl (2.5.0.cvs20020219-1) unstable; urgency=medium
+
+  * Updated package descriptions, Closes: #134402
+  * Static linking of libbfd, Closes: #134647
+  * Gcl currently only available on i386, arm and m68k as specified in
+    the Architecture control field, Closes: #133912
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 19 Feb 2002 12:04:29 -0500
+
+gcl (2.5.0.cvs-3) unstable; urgency=medium
+
+  * Build-depend on texi2html, Closes: #133699
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 13 Feb 2002 16:22:35 -0500
+
+gcl (2.5.0.cvs-2) unstable; urgency=medium
+
+  * Put in versioned dependency on binutils for libbfd support, rebuilt
+    with latest binutils, Closes: #133004
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 12 Feb 2002 13:19:12 -0500
+
+gcl (2.5.0.cvs-1) unstable; urgency=medium
+
+  * Latest patches from CVS, enabling libbfd relocations, among other
+    things
+  * /etc/emacs/site-start.d/50gcl.el as conffile, Closes: #132137
+  * limited arm and m68k support
+
+ -- Camm Maguire <camm@enhanced.com>  Mon,  4 Feb 2002 09:32:29 -0500
+
+gcl (2.5.0-1) unstable; urgency=medium
+
+  * New maintainer
+  * New upstream release
+  * New release so far builds only on i386, Closes: #116070, Closes:
+    #123371
+  * New release so far builds only on i386, Closes: #115041
+  * Gcl must currently use its own copy of gmp, as the upstream version
+    of gmp uses malloc, which interferes with gcl's garbage collection
+    and relocation scheme.  The change from malloc to alloca has been
+    suggested to upstream gmp developers. Closes: #108910
+  * Tcl/Tk support now in. Closes: #113197
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 21 Dec 2001 00:03:43 -0500
+
+gcl (2.4.0-3) unstable; urgency=medium
+
+  * Make gcl use libgmp3 package. (closes: #108910)
+  * Remove tk support. (closes: #108909)
+  * Fix stupid missing dependency line. (closes: #108907, #108908)
+  * Removed readme.mingw from the debian package, this package is not compiled under
+    mingw (windows gcc port).
+  * Close ITA bug. (closes: #112312)
+
+ -- Baruch Even <baruch@debian.org>  Sat, 22 Sep 2001 00:27:14 +0300
+
+gcl (2.4.0-2) unstable; urgency=low
+
+  * Change tclsh Build-Depends to tcl8.0 because apt is broken. (closes: #99261)
+
+ -- JP Sugarbroad <taral@taral.net>  Wed, 30 May 2001 14:34:53 -0500
+
+gcl (2.4.0-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- JP Sugarbroad <taral@taral.net>  Sun, 13 May 2001 20:31:01 -0500
+
+gcl (2.3.7+beta3-3) unstable; urgency=low
+
+  * Move gcl-doc to section doc (closes: #78666)
+
+ -- JP Sugarbroad <taral@taral.net>  Sun, 13 May 2001 20:26:28 -0500
+
+gcl (2.3.7+beta3-2) unstable; urgency=low
+
+  * Remove alpha from arch list
+  * Move tcl/tk from Depends to Suggests
+
+ -- JP Sugarbroad <taral@taral.net>  Fri,  4 May 2001 16:24:11 -0500
+
+gcl (2.3.7+beta3-1) unstable; urgency=low
+
+  * New maintainer
+  * Repackaged with debhelper (closes: #42045, #86097, #91475, #91478)
+  * New upstream release (closes: #59577, #71096)
+  * Added sparc+alpha, removed m68k (closes: #87407)
+
+ -- JP Sugarbroad <taral@taral.net>  Mon, 30 Apr 2001 19:07:49 -0500
+
+gcl (2.2.1-6) unstable; urgency=low
+
+  * Disable stripping of "saved_gcl" binary. (#45778)
+
+ -- Steve Dunham <dunham@debian.org>  Fri, 24 Sep 1999 14:39:15 -0400
+
+gcl (2.2.1-5) unstable; urgency=low
+
+  * Fix m68k build
+
+ -- Steve Dunham <dunham@debian.org>  Tue,  6 Jul 1999 09:45:09 -0400
+
+gcl (2.2.1-4) unstable; urgency=low
+
+  * Fix bug #31718
+
+ -- Steve Dunham <dunham@debian.org>  Fri,  2 Jul 1999 11:11:12 -0400
+
+gcl (2.2.1-3) unstable; urgency=low
+
+  * Add m68k patches
+
+ -- Steve Dunham <dunham@debian.org>  Wed, 16 Dec 1998 14:25:46 -0500
+
+gcl (2.2.1-2) unstable; urgency=low
+
+  * Compile against libc6.  New maintainer.
+
+ -- Steve Dunham <dunham@cps.msu.edu>  Wed,  5 Nov 1997 10:09:12 -0500
+
+gcl (2.2.1-1) unstable; urgency=low
+
+  * New upstream release; suggests tcl76, tk42.
+  * gcl-doc contains gcl-si and gcl-tk info pages.
+  * debian/rules: clean target removes temporary files from h and o
+    subdirectories (bug #5984).
+
+ -- Karl Sackett <krs@debian.org>  Fri, 3 Jan 1997 10:16:40 -0600
+
+gcl (2.2-5) unstable; urgency=low
+
+  * Converted package to 2.1.1.0 standard.
+  * Stripped gcltkaux (bug #5074).
+  * gcl-si and gcl-tk info pages converted to HTML.
+
+ -- Karl Sackett <krs@debian.org>  Tue, 5 Nov 1996 13:30:30 -0600
+
+2.2-4
+        * add-defs: patched locates for tk.tcl, init.tcl 
+        * gcl-tk/tkAppInit.c: patched for tk4.1 support
+        * gcl-tk/tkMain.c: patched for tk4.1 support
+2.2-3
+        * Debian support files now partily architecture independent.
+          There are, however, no add-defs files except for 386-linux.
+        * Rebuilt package to correct corrupted upload problem.
+2.2-2
+        * Removed tk support from distribution.  This was written to
+          use tk-3.6 and doesn't support tk-4.0 or tk-4.1.  I am not aware
+          of any plans to upgrade the code. (Closes bug #2865)
+2.2-1
+        * Added Debian support files
+        * h/386-linux.defs: set OFLAG = -O2
+        * h/386-linux.h: undid patch that swaped signal.h for sigcontext.h
