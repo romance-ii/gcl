@@ -3,8 +3,9 @@ gcl (2.5.0.cvs20020625-70) unstable; urgency=high
   * loop fixes
   * configure fixes
   * :common-lisp in *features*
+  * :definition-before-clcs -> definition-before-clcs
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  2 Dec 2002 16:10:54 -0500
+ -- Camm Maguire <camm@enhanced.com>  Mon,  2 Dec 2002 22:30:13 -0500
 
 gcl (2.5.0.cvs20020625-69) unstable; urgency=high
 

@@ -6,8 +6,8 @@
   '(BREAK ERROR CERROR WARN CHECK-TYPE ASSERT ETYPECASE CTYPECASE ECASE CCASE))
 
 (defun install-symbol (real clcs)
-  (unless (get real ':definition-before-clcs)
-    (setf (get real ':definition-before-clcs)
+  (unless (get real 'definition-before-clcs)
+    (setf (get real 'definition-before-clcs)
 	  (symbol-function real)))
   (unless (eq (symbol-function real)
 	      (symbol-function clcs))	       
@@ -15,11 +15,11 @@
 	  (symbol-function clcs))))
 
 (defun revert-symbol (real)
-  (when (and (get real ':definition-before-clcs)
+  (when (and (get real 'definition-before-clcs)
 	     (not (eq (symbol-function real)
-		      (get real ':definition-before-clcs))))
+		      (get real 'definition-before-clcs))))
     (setf (symbol-function real)
-	  (get real ':definition-before-clcs))))
+	  (get real 'definition-before-clcs))))
 
 (defvar *clcs-redefinitions*
   (nconc (mapcar #'(lambda (symbol)
@@ -48,7 +48,7 @@
 (defun clcs-compile-file (file &rest args)
   (loop (with-simple-restart (retry "Retry compiling file ~S." file)
 	  (let ((values (multiple-value-list 
-			    (apply (or (get 'compile-file ':definition-before-clcs)
+			    (apply (or (get 'compile-file 'definition-before-clcs)
 				       #'compile-file)
 				   file args))))
 	    (unless #+kcl compiler::*error-p* #-kcl nil
@@ -59,7 +59,7 @@
 (defun clcs-compile (&rest args)
   (loop (with-simple-restart (retry "Retry compiling ~S." (car args))
 	  (let ((values (multiple-value-list 
-			    (apply (or (get 'compile ':definition-before-clcs)
+			    (apply (or (get 'compile 'definition-before-clcs)
 				       #'compile-file)
 				   args))))
 	    (unless #+kcl compiler::*error-p* #-kcl nil
@@ -70,13 +70,13 @@
 (defun clcs-load (file &rest args)
   (loop (with-simple-restart (retry "Retry loading file ~S." file)
           (return-from clcs-load 
-                       (apply (or (get 'load ':definition-before-clcs) #'load)
+                       (apply (or (get 'load 'definition-before-clcs) #'load)
                               file args)))))
 
 (defun clcs-open (file &rest args)
   (loop (with-simple-restart (retry "Retry opening file ~S." file)
           (return-from clcs-open
-                       (apply (or (get 'open ':definition-before-clcs) #'open)
+                       (apply (or (get 'open 'definition-before-clcs) #'open)
                               file args)))))
 
 #+(or kcl lucid cmu)
