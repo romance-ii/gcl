@@ -17,8 +17,9 @@ gclcvs (2.7.0-1) unstable; urgency=low
   * Add in macosx files to stable and cvs head
   * Fix bad debelper postinst, Closes: #208765
   * Fix static detection fr ia64; contblock size detection on arm
+  * Fix gcc verion checking in gmp3 subconfigure, esp. for arm
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  5 Sep 2003 21:37:10 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri,  5 Sep 2003 21:38:12 +0000
 
 gcl (2.6.1-1) unstable; urgency=low
 

@@ -491,15 +491,15 @@ AC_DEFUN(GMP_GCC_VERSION_GE,
 [tmp_version=`($1 --version) 2>&AC_FD_CC`
 echo "$1 --version '$tmp_version'" >&AC_FD_CC
 
-major=`(echo "$tmp_version" | sed -n ['s/^[a-z-]*\([0-9][0-9]*\).*/\1/p']) 2>&AC_FD_CC`
+major=`(echo "$tmp_version" | sed -n ['s/^[a-zA-Z- ()]*\([0-9][0-9]*\).*/\1/p']|head -1l) 2>&AC_FD_CC`
 echo "    major '$major'" >&AC_FD_CC
 
 ifelse([$3],,,
-[minor=`(echo "$tmp_version" | sed -n ['s/^[a-z-]*[0-9][0-9]*\.\([0-9][0-9]*\).*/\1/p']) 2>&AC_FD_CC`
+[minor=`(echo "$tmp_version" | sed -n ['s/^[a-zA-Z- ()]*[0-9][0-9]*\.\([0-9][0-9]*\).*/\1/p']|head -1l) 2>&AC_FD_CC`
 echo "    minor '$minor'" >&AC_FD_CC])
 
 ifelse([$4],,,
-[subminor=`(echo "$tmp_version" | sed -n ['s/^[a-z-]*[0-9][0-9]*\.[0-9][0-9]*\.\([0-9][0-9]*\).*/\1/p']) 2>&AC_FD_CC`
+[subminor=`(echo "$tmp_version" | sed -n ['s/^[a-zA-Z- ()]*[0-9][0-9]*\.[0-9][0-9]*\.\([0-9][0-9]*\).*/\1/p']|head -1l) 2>&AC_FD_CC`
 echo "    subminor '$subminor'" >&AC_FD_CC])
 
 if test -z "$major"; then
