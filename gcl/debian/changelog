@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-63) unstable; urgency=low
+
+  * Add versioned dependency on the gcc used to build gcl
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 29 Oct 2002 16:20:22 -0500
+
 gcl (2.5.0.cvs20020625-62) unstable; urgency=low
 
   * with-package-iterator modifications
