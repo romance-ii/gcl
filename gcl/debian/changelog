@@ -1,4 +1,4 @@
-gcl (2.6.0cvs-1) exerimental; urgency=low
+gcl (2.6.0cvs-1) experimental; urgency=low
 
   * Experimental Debian distribution for CVS snapshots
   * Type-punning warning fixes
