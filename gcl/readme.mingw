@@ -1,12 +1,13 @@
-====================================================
-BUILDING A NATIVE WIN32 GNU COMMON LISP (DRAFT ONLY)
-====================================================
+=============================================================
+BUILDING A NATIVE WIN32 GNU COMMON LISP FROM CVS (DRAFT ONLY)
+=============================================================
 
 I have recently changed the preferred build host system
 for the Mingw32 compiler to MSYS, rather than Cygwin.
 
 The older Cygwin hosted method is set out further into this file
-below the MSYS method described here.
+below the MSYS method described here.  It is not recommended, not
+supported and the instructions are not up to date.
 
 
 ===============================================
@@ -31,35 +32,64 @@ It is a good idea to keep up to date with Mingw32 and MSYS, especially
 the latest Mingw32 runtime (30 April 2002).
 
 Having said that, I have not yet tried the recently released versions 3.1 
-and 3.2 of Mingw32 gcc as they are still experimental.  
+and 3.2 of Mingw32 gcc as they are still experimental.  Furthermore, do not
+install Mingw 2 as that contains gcc 3.2.
 
-Only gcc 2.95 is known to work (The newer may well work, they just hasn't
-been tried yet).
+Only gcc 2.95 is known to work (The newer versions may well work, they just 
+haven't been tried yet).
 
 
-SETUP
+SHORT SETUP NOTES
 
 - Install Mingw32 and MSYS using the instructions at those sites. 
 
-- Install the Tcl/Tk packages directly into your Mingw32 directory. You don't
-  need these packages if you don't want to build "tclwinkill.dll", "winkill.exe"  or (perhaps one day) gcl-tk.  
 
-- Note that "tclwinkill.dll" and "winkill.exe" are both needed by XMaxima.
+DETAILED SETUP NOTES
+
+- Start with MinGW-1.1.tar.gz.  DO NOT USE THE NEW MINGW 2 PACKAGE.
+
+- By looking at the dates and version numbers appended to the other
+  packages on the download page, get the latest versions of gcc, binutils,
+  mingw-runtime, and w32api.   (Stick with gcc 2.95 rather than gcc 3.1/3.2).
+  I have the following packages:
+
+  gcc-2.95.3-20011106.tar.gz
+  binutils-2.13-20020808-1.tar.gz
+  mingwDTK-1.0.0-alpha-1.tar.gz
+  mingw-runtime-2.1.tar.gz
+  w32api-1.5.tar.gz
+
+- Go to the top level Mingw32 installation directory - the one in which you
+  can see "bin", "lib" etc
+
+- Extract those other packages in that directory eg:
+
+  tar xzf rumpty-dumpty.tar.gz
+
+- Remove the Mingw version of "make" from the bin directory - it has serious
+  bugs and will not work properly for most tasks including building GCL and Maxima.
+
+- Get MSYS and install it - follow the instructions - subscribe to the
+  mailing list and read the archives.
+
+- In the MSYS directory install the "msysDTK-1.0.0-alpha-1.tar.gz" package
+  which gives you cvs, ssh, rlogin, etc.
+
 
 
 BUILDING
 
 - Change to your GCL source directory eg:
 
-	cd /c/cvs/gcl
+  cd /c/cvs/gcl
 
-- We are now ready to configure:
+- You are now ready to configure GCL:
 
-        ./configure --enable-custreloc --prefix="c:/gcl" >& con.log
+  ./configure --prefix="c:/gcl" > configure.log 2>&1
 
   Change the prefix directory as required for your final installation path.  
   Note that it is helpful to redirect output from configure and make into log
-  files for future debugging and checking.
+  files for debugging and checking.
 
 - Check the log.  If all is well, check the value of GCLDIR in "makedefs".
 
@@ -82,24 +112,28 @@ BUILDING
 
 	make install >& install.log
 
-  You may need to fiddle with the install target a little as it is not very
-  Windows friendly at the moment.
+  It is necessary to install GCL before building Maxima.
 
-  You may also need to edit the gcl and gcl.bat scripts to ensure the path 
-  uses colon format.  The batch file can be used to make a Windows desktop 
-  shortcut.
+- You may also need to edit the gcl script to ensure the path 
+  uses colon format.  
 
-- BFD fasloading and Stratified Garbage Collection (SGC) do not work.   The
-  configuration options above provide a "traditional" gcl executable which
-  will build the current CVS version of Maxima.  
+- The batch file "gclm.bat" can be used to make a Windows desktop 
+  shortcut.  You will need to alter the path command in that batch file
+  so that your Mingw32 bin directory is visible.  This will enable you
+  to compile lisp code.
+
+- BFD fasloading and Stratified Garbage Collection (SGC) do not work under
+  Windows.  The configuration options above provide a "traditional" GCL 
+  executable which will build the current CVS version of Maxima.  
 
 - A PCL/ANSI build ("configure --enable-ansi --enable-custreloc") can be 
   obtained by adding "(si::use-fast-links nil)" to the end of the list of
   commands in the SETUP makefile macro in "pcl/makefile".  I don't know 
-  why this is necessary on Windows.
+  why this is necessary on Windows.  The PCL/ANSI version of GCL is still
+  experimental and will not compile Maxima at present.
 
 
-Mike Thomas, 30 August 2002
+Mike Thomas, 23 September 2002
 
 
 
