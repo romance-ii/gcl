@@ -35,8 +35,9 @@ $(addsuffix .c,$(AFILES)) $(addsuffix .data,$(AFILES))\
 	cp ../h/cmpinclude.h .
 	echo ${SETUP} '(pcl::compile-pcl)' | ../unixport/saved_mod_gcl ../unixport/
 # FIXME -- small compiler setjmp/volatile detection bug -- CM
-	patch -p0 <pcl_methods.patch
-	rm -f pcl_methods.o
+# doesn't seem to be needed now, but investigate more later
+#	patch -p0 <pcl_methods.patch
+#	rm -f pcl_methods.o
 	for i in gazonk* ; do j=$$(echo $$i | sed 's,\..*$$,,1');\
 		cat $$i | sed "s,$$j,pcl_$$j,g" >pcl_$$i && rm $$i; done
 
