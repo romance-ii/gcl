@@ -1203,6 +1203,63 @@ int lf_eqlp(double *p, double *q);
 void  _assure_in_memory (void *p);
 
 #define FMEM(f) _assure_in_memory(&f)
+
+#ifdef IEEEFLOAT
+/* from ieee754.h */
+
+typedef union {
+  float f;
+  
+  /* This is the IEEE 754 single-precision format.  */
+  struct float_bits
+  {
+#ifndef LITTLE_END
+    unsigned int negative:1;
+    unsigned int exponent:8;
+    unsigned int mantissa:23;
+#else				/* Big endian.  */
+    unsigned int mantissa:23;
+    unsigned int exponent:8;
+    unsigned int negative:1;
+#endif				/* Little endian.  */
+  } ieee;
+} IEEE_float;
+  
+typedef union  {
+
+  double d;
+  
+  /* This is the IEEE 754 double-precision format.  */
+  struct double_bits
+  {
+#ifndef LITTLE_END
+    unsigned int negative:1;
+    unsigned int exponent:11;
+    /* Together these comprise the mantissa.  */
+    unsigned int mantissa0:20;
+    unsigned int mantissa1:32;
+#else				/* Big endian.  */
+    /* # if	__FLOAT_WORD_ORDER == BIG_ENDIAN */
+    /*     unsigned int mantissa0:20; */
+    /*     unsigned int exponent:11; */
+    /*     unsigned int negative:1; */
+    /*     unsigned int mantissa1:32; */
+    /* # else */
+    /* Together these comprise the mantissa.  */
+    unsigned int mantissa1:32;
+    unsigned int mantissa0:20;
+    unsigned int exponent:11;
+    unsigned int negative:1;
+    /* # endif */
+#endif				/* Little endian.  */
+  } ieee;
+} IEEE_double;
+  
+
+#endif
+
+
+
 void
 init_num_co(void)
 {
@@ -1289,33 +1346,6 @@ init_num_co(void)
 #endif
 #endif
 
-#ifdef MV
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#endif
-
 #if defined(S3000) && ~defined(DBL_MAX_10_EXP)
 	l[0] = 0x7fffffff;
 	l[1] = 0xffffffff;
@@ -1351,37 +1381,50 @@ init_num_co(void)
 	biggest_float = FLT_MAX;
 #endif
 	
-
-/* We want the smallest number not satisfying something,
-   and so we go quickly down, and then back up.  We have
-   to use a function call for test, since in line code may keep
-   too much precision, while the usual lisp eql,is not
-   in line.
-   We use SMALL as a multiple to come back up by.
-   We use FMEM(double_negative_epsilon)
-   to force the quantity into memory by taking its address
-   and then passing it to a function.
-*/
-
+	
 #ifdef IEEEFLOAT
  { 
-   double div,td;
-   float ts;
-   for (float_epsilon=1.0,div=0.5;(float)div!=1.0;div=1.0-(0.5*(1.0-div)))
-     for (ts=float_epsilon;FMEM(ts),!SF_EQL((float)(1.0+ts),(float)1.0);float_epsilon=ts,ts*=div);
+   IEEE_float ief;
+   IEEE_double ied;
 
-   for (float_negative_epsilon=1.0,div=0.5;(float)div!=1.0;div=1.0-(0.5*(1.0-div)))
-     for (ts=float_negative_epsilon;FMEM(ts),!SF_EQL((float)(1.0-ts),(float)1.0);float_negative_epsilon=ts,ts*=div);
+   if (sizeof(ief)!=sizeof(ief.f))
+     FEerror("Bad ieee float definition\n");
+   if (sizeof(ied)!=sizeof(ied.d))
+     FEerror("Bad ieee float definition\n");
 
-   for (double_epsilon=1.0,div=0.5;(double)div!=1.0;div=1.0-(0.5*(1.0-div)))
-     for (td=double_epsilon;FMEM(td),!LF_EQL((double)(1.0+td),(double)1.0);double_epsilon=td,td*=div);
+   for (float_epsilon=ief.f=1.0,ief.ieee.mantissa=1;
+	FMEM(ief.f),!SF_EQL((float)(1.0+ief.f),(float)1.0);
+	float_epsilon=ief.f,ief.ieee.exponent--);
 
-   for (double_negative_epsilon=1.0,div=0.5;(double)div!=1.0;div=1.0-(0.5*(1.0-div)))
-     for (td=double_negative_epsilon;FMEM(td),!LF_EQL((double)(1.0-td),(double)1.0);double_negative_epsilon=td,td*=div);
+   for (float_negative_epsilon=ief.f=1.0,ief.ieee.mantissa=1;
+	FMEM(ief.f),!SF_EQL((float)(1.0-ief.f),(float)1.0);
+	float_negative_epsilon=ief.f,ief.ieee.exponent--);
+
+   for (double_epsilon=ied.d=1.0,ied.ieee.mantissa1=1;
+	FMEM(ied.d),!LF_EQL((1.0+ied.d),1.0);
+	double_epsilon=ied.d,ied.ieee.exponent--);
+   /* FIXME double calculations end one iteration too early */
+   double_epsilon=ied.d;
+
+   for (double_negative_epsilon=ied.d=1.0,ied.ieee.mantissa1=1;
+	FMEM(ied.d),!LF_EQL((1.0-ied.d),1.0);
+	double_negative_epsilon=ied.d,ied.ieee.exponent--);
+   double_negative_epsilon=ied.d;
 
  }
 #else
 
+ /* We want the smallest number not satisfying something,
+    and so we go quickly down, and then back up.  We have
+    to use a function call for test, since in line code may keep
+    too much precision, while the usual lisp eql,is not
+    in line.
+    We use SMALL as a multiple to come back up by.
+    We use FMEM(double_negative_epsilon)
+    to force the quantity into memory by taking its address
+    and then passing it to a function.
+ */
+ 
 #define SMALL 1.05	
 	for (float_epsilon = 1.0;
 	     FMEM(float_epsilon),!SF_EQL((float)(1.0 + float_epsilon),(float)1.0);
