@@ -45,7 +45,7 @@ which is usually 60 maybe 100 or something else. */
 #undef BSD
 #define ATT
 #endif
-#ifdef MINGW
+#ifdef __MINGW32__
 #include <sys/timeb.h>
 #endif
 
@@ -142,13 +142,12 @@ Lget_internal_run_time()
 DEFUN("GET-INTERNAL-REAL-TIME",int,fLget_internal_real_time,LISP,0,0,NONE,IO,OO,OO,OO,"Run time relative to beginning")
      ()
 {
-#ifdef MINGW
+#ifdef __MINGW32__
   static struct timeb t0;
   struct timeb t;
     if (t0.time == 0) ftime(&t0);
     ftime(&t);
     return (t.time - t0.time)*HZ1 + ((t.millitm)*HZ1)/1000;
-
 #endif  
 #ifdef BSD
 	static struct timeval begin_tzp;
@@ -172,9 +171,6 @@ DEFVAR("*DEFAULT-TIME-ZONE*",sSAdefault_time_zoneA,SI,make_fixnum(TIME_ZONE),"")
 
 init_unixtime()
 {
-#ifdef MINGW
-
-#endif  
 #ifdef BSD
 	ftime(&beginning);
 #endif
