@@ -24,8 +24,10 @@ gclcvs (2.7.0-31) unstable; urgency=low
   * Reenable compressed info lookup -- allow-gzipped files must be
     seekable, not pipes
   * head -1l -> head -n 1 for freebsd
+  * Cleanup gmp_wrapper code, check for in-place calls as write in one
+    step is not guaranteed in gmp according to its developers
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 13 Aug 2004 16:15:34 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 16 Aug 2004 17:28:30 +0000
 
 gclcvs (2.7.0-30) unstable; urgency=high
 

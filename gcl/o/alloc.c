@@ -560,12 +560,16 @@ ONCE_MORE:
 		if (available_pages < m)
 		  sSAignore_maximum_pagesA->s.s_dbind = Cnil;
 		if (!g) {
+		  /*GMP_WRAPPERS:  Please see comments in gmp_wrappers.h 20040815 CM*/
 		  switch (jmp_gmp) {
-		  case 0:
+		  case 0: /* not in gmp call*/
 		    GBC(t_contiguous);
 		    break;
-		  case 1:
+		  case 1: /* non-in-place gmp call*/
 		    longjmp(gmp_jmp,t_contiguous);
+		    break;
+		  case -1: /* in-place gmp call */
+		    jmp_gmp=-t_contiguous;
 		    break;
 		  default:
 		    break;
@@ -706,12 +710,16 @@ ONCE_MORE:
 
 	if (rb_limit - rb_pointer < n) {
 	  if (!g && in_signal_handler == 0) {
+	    /*GMP_WRAPPERS:  Please see comments in gmp_wrappers.h 20040815 CM*/
 	    switch (jmp_gmp) {
-	    case 0:
+	    case 0: /* not in gmp call*/
 	      GBC(t_relocatable);
 	      break;
-	    case 1:
+	    case 1: /* non-in-place gmp call*/
 	      longjmp(gmp_jmp,t_relocatable);
+	      break;
+	    case -1: /* in-place gmp call */
+	      jmp_gmp=-t_relocatable;
 	      break;
 	    default:
 	      break;
