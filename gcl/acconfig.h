@@ -136,7 +136,17 @@ SGC is enabled.  */
 /* bfd support */
 #undef HAVE_LIBBFD
 #undef NEED_CONST
+#undef HAVE_BFD_BOOLEAN
 
+#ifdef HAVE_BFD_BOOLEAN
+#define MY_BFD_BOOLEAN bfd_boolean
+#define MY_BFD_FALSE FALSE
+#define MY_BFD_TRUE TRUE
+#else
+#define MY_BFD_BOOLEAN boolean
+#define MY_BFD_FALSE false
+#define MY_BFD_TRUE true
+#endif
 /* isnormal check */
 #undef HAVE_ISNORMAL
 

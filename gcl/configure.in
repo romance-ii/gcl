@@ -589,6 +589,21 @@ if test "$enable_statsysbfd" = "yes" || test "$enable_dynsysbfd" = "yes" ; then
 	AC_DEFINE(HAVE_LIBBFD)
 
 #
+# BFD boolean syntax
+#
+
+	AC_MSG_CHECKING(for useable bfd_boolean)
+	AC_TRY_RUN([#define IN_GCC
+		    #include <bfd.h>
+		    bfd_boolean foo() {return FALSE}
+		    int main() {return 0;}],
+		AC_MSG_RESULT(yes) 
+		AC_DEFINE(HAVE_BFD_BOOLEAN),
+		AC_MSG_RESULT(no),
+		AC_MSG_RESULT(no))
+
+
+#
 # FIXME: Need to workaround mingw before this point -- CM
 #
 	if test "$enable_statsysbfd" = "yes" && ! $CC -v 2>&1 | fgrep ming > /dev/null ; then
