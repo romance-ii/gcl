@@ -1,3 +1,9 @@
+gclcvs (2.7.0-2) unstable; urgency=low
+
+  * Add processor flag variable to flags in configure.in
+
+ -- Camm Maguire <camm@enhanced.com>  Tue,  9 Sep 2003 19:04:46 +0000
+
 gclcvs (2.7.0-1) unstable; urgency=low
 
   * New files for macosx

@@ -1540,7 +1540,7 @@ canonical=$host
 echo "$as_me:$LINENO: result: host=$host" >&5
 echo "${ECHO_T}host=$host" >&6
 
-PROCESSOR_FLAGS=""
+PROCESSOR_FLAGS=${PROCESSOR_FLAGS:-""}
 
 use=unknown
 case $canonical in
@@ -10546,9 +10546,9 @@ fi
 
 LIBS="$LIBS $TLIBS"
 
-FINAL_CFLAGS="$TCFLAGS"
+FINAL_CFLAGS="$TCFLAGS $PROCESSOR_FLAGS"
 
-CFLAGS="$TCFLAGS $TO3FLAGS -I\$(GCLDIR)/o"
+CFLAGS="$TCFLAGS $TO3FLAGS $PROCESSOR_FLAGS -I\$(GCLDIR)/o"
 
 O3FLAGS=$TO3FLAGS
 
