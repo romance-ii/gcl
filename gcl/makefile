@@ -23,7 +23,7 @@ PORTDIR	= unixport
 CLCSDIR = clcs
 PCLDIR = pcl
 MPDIR	= mp
-GMP_DIR = gmp/
+GMP_DIR = gmp3/
 
 all: $(PORTDIR)/$(FLISP) command cmpnew/collectfn.o lsp/info.o do-gcl-tk do-info
 
@@ -87,11 +87,11 @@ mpfiles: ${MPFILES}
 $(MPDIR)/libmport.a:
 	(cd mp ; make all)
 
-gmp/libgmp.a: gmp/Makefile
-	(cd gmp/mpn ; make)
-	(cd gmp/mpz ; make)
-	(cd gmp ; make `echo *.c | sed -e "s!\.c!.o !g"` )
-	(cd gmp ; rm -f libgmp.a ;  ar qc libgmp.a *.o */*.o)
+gmp3/libgmp.a: gmp3/Makefile
+#	(cd gmp/mpn ; make)
+#	(cd gmp/mpz ; make)
+#	(cd gmp ; make `echo *.c | sed -e "s!\.c!.o !g"` )
+	(cd gmp3 && make && rm -f libgmp.a &&  ar qc libgmp.a *.o */*.o)
 
 
 
@@ -152,13 +152,13 @@ clean:
 	(cd $(CMPDIR); make clean)
 	(cd $(PORTDIR); make clean)
 	(cd gcl-tk ; make clean)
-	-(cd gmp ; make distclean)
+	-(cd gmp3 ; make distclean)
 	cd $(CLCSDIR) && make clean
 	cd $(PCLDIR) && make clean
 	(cd info ; make clean)
 	rm -f foo.tcl config.log makedefs makedefsafter config.cache config.status makedefc
 	rm -f h/config.h h/gclincl.h h/cmpinclude.h
-	rm -rf gmp/.deps gmp/libgmp.a
+	rm -rf gmp3/.deps gmp3/libgmp.a
 	rm -f xbin/gcl foo foo.c
 	rm -f h/*-linux.defs
 

@@ -24,6 +24,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #define NEED_ISFINITE
 #include "include.h"
+#include <string.h>
 
 
 #define	token_buffer	token->st.st_self

@@ -5,6 +5,7 @@ Fast linking method for kcl by W. Schelter University of Texas
 
 
 #include <stdlib.h>
+#include <string.h>
 #include "include.h"
 #include "sfun_argd.h"
 #include "page.h"

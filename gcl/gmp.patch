@@ -1,0 +1,19 @@
+diff -ruN ../libgmp3-4.0.1/mpn/generic/mul_n.c gmp/mpn/generic/mul_n.c
+--- ../libgmp3-4.0.1/mpn/generic/mul_n.c	Thu Jun 28 19:04:08 2001
++++ gmp/mpn/generic/mul_n.c	Sun Jul 28 14:01:36 2002
+@@ -1144,9 +1144,15 @@
+        * multiplication will take much longer than malloc()/free().  */
+       mp_limb_t wsLen, *ws;
+       wsLen = MPN_TOOM3_MUL_N_TSIZE (n);
++#ifdef BAD_ALLOCA
+       ws = __GMP_ALLOCATE_FUNC_LIMBS ((size_t) wsLen);
++#else
++      ws = TMP_ALLOC ((size_t) wsLen * sizeof(mp_limb_t));
++#endif
+       mpn_toom3_mul_n (p, a, b, n, ws);
++#ifdef BAD_ALLOCA
+       __GMP_FREE_FUNC_LIMBS (ws, (size_t) wsLen);
++#endif
+     }
+ #if WANT_FFT || TUNE_PROGRAM_BUILD
+   else

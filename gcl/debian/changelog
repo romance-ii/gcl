@@ -4,8 +4,11 @@ gcl (2.5.0.cvs20020625-23) unstable; urgency=high
   * SGC on by default for sparc-linux and mips(el)-linux
   * Optimized logxor funtion
   * Check for MP_LIMB_SIZE in fasdump.c, for 64bit support
+  * gbc fix for ia64
+  * gmp3 import for ia64
+  * system bzero, bcmp, and bcopy function prototypes
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 29 Jul 2002 19:32:43 -0400
+ -- Camm Maguire <camm@enhanced.com>  Tue, 30 Jul 2002 23:11:58 -0400
 
 gcl (2.5.0.cvs20020625-22) unstable; urgency=high
 

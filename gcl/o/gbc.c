@@ -28,6 +28,7 @@
 
 #define IN_GBC
 #define NEED_MP_H
+#include <string.h>
 #include <stdlib.h>
 #include "include.h"
 
@@ -764,6 +765,28 @@ mark_phase(void) {
   
 }
 
+#if defined(__ia64__)
+	asm("        .text");
+	asm("        .psr abi64");
+	asm("        .psr lsb");
+	asm("        .lsb");
+	asm("");
+	asm("        .text");
+	asm("        .align 16");
+	asm("        .global GC_save_regs_in_stack");
+	asm("        .proc GC_save_regs_in_stack");
+	asm("GC_save_regs_in_stack:");
+	asm("        .body");
+	asm("        flushrs");
+	asm("        ;;");
+	asm("        mov r8=ar.bsp");
+	asm("        br.ret.sptk.few rp");
+	asm("        .endp GC_save_regs_in_stack");
+
+void * GC_save_regs_in_stack();
+#endif
+
+
 void
 mark_c_stack(jmp_buf env1, int n, void (*fn)(void *,void *,int)) {
 
@@ -789,6 +812,20 @@ mark_c_stack(jmp_buf env1, int n, void (*fn)(void *,void *,int)) {
     else
       (*fn)(cs_org,0,C_GC_OFFSET);}
   
+#if defined(__ia64__)
+    {
+       extern void * __libc_ia64_register_backing_store_base;
+       void * bst=GC_save_regs_in_stack();
+       void * bsb=__libc_ia64_register_backing_store_base;
+
+       if (bsb>bst)
+          (*fn)(bsb,bst,C_GC_OFFSET);
+       else
+          (*fn)(bst,bsb,C_GC_OFFSET);
+       
+    }
+#endif
+
 }
 
 void

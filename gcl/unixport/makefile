@@ -7,7 +7,7 @@ PORTDIR	= ../unixport
 CLCSDIR = ../clcs
 PCLDIR = ../pcl
 MPDIR	= ../mp
-GMP_DIR	= ../gmp/
+GMP_DIR	= ../gmp3/
 
 CFLAGS	= -c $(DEFS) -I$(HDIR)
 LDCC    = $(CC) -g

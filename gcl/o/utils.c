@@ -1,4 +1,5 @@
 #define _GNU_SOURCE
+#include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include "include.h"

@@ -25,6 +25,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #define _GNU_SOURCE
 #include "include.h"
+#include <string.h>
 /*  #include "varargs.h" */
 
 struct nil3 { object nil3_self[3]; } three_nils;

@@ -3838,12 +3838,12 @@ if test $use_gmp = yes ; then
 echo "configure:3839: checking use_gmp=yes, doing configure in gmp directory" >&5
  case "${canonical}" in
 #   i[[5-9]]86* | pentium* | k6* | athlon*)
-#      (cd gmp ; ./configure --target=i486) ;;
+#      (cd gmp3 ; ./configure --target=i486) ;;
    *)
-      (cd gmp ; ./configure) ;;
+      (cd gmp3 ; ./configure) ;;
  esac
- [ "`ls -1 gmp/mpn/add_n.* 2>/dev/null`" != "" ] || cp gmp/mpn/generic/*.c gmp/mpn/
- cp gmp/gmp.h h/gmp.h
+ [ "`ls -1 gmp3/mpn/add_n.* 2>/dev/null`" != "" ] || cp gmp3/mpn/generic/*.c gmp/mpn/
+ cp gmp3/gmp.h h/gmp.h
  echo $ac_n "checking "for size of gmp limbs"""... $ac_c" 1>&6
 echo "configure:3849: checking "for size of gmp limbs"" >&5
  if test "$cross_compiling" = yes; then
