@@ -22,8 +22,10 @@ gcl (2.5.0.cvs20020625-57) unstable; urgency=low
     and 3
   * symbol-name throws a type error on bad input
   * tk8.2 -> tk8.3
+  * Fix bug in main makefile
+  * Newlines at end of test files
 
- -- Camm Maguire <camm@m.enhanced.com>  Wed,  9 Oct 2002 11:42:36 -0400
+ -- Camm Maguire <camm@m.enhanced.com>  Wed,  9 Oct 2002 15:04:41 -0400
 
 gcl (2.5.0.cvs20020625-56) unstable; urgency=high
 
