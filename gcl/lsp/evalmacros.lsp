@@ -286,3 +286,5 @@
 (defmacro declaim (&rest l)
  `(eval-when (compile eval load)
 	     ,@(mapcar #'(lambda (x) `(proclaim ',x)) l)))
+
+(defmacro lambda ( &rest l) `(function (lambda ,@l)))

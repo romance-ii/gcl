@@ -26,6 +26,7 @@ static L24();
 static L25();
 static L26();
 static L27();
+static L28();
 #define VC1 object  V5 ,V4 ,V3 ,V2;
 #define VC2 object  V11 ,V10 ,V9 ,V8 ,V7;
 #define VC3 object  V15 ,V14 ,V13;
@@ -53,6 +54,8 @@ static L27();
 #define VC25 object  V141 ,V140 ,V139;
 #define VC26 object  V145 ,V144;
 #define VC27 object  V147;
+#define VC28
+#define VM28 4
 #define VM27 4
 #define VM26 8
 #define VM25 8
@@ -108,7 +111,8 @@ static char * VVi[48]={
 (char *)(L24),
 (char *)(L25),
 (char *)(L26),
-(char *)(L27)
+(char *)(L27),
+(char *)(L28)
 };
 #define VV ((object *)VVi)
 static  LnkT46() ;

@@ -993,4 +993,23 @@ T312:;
 	vs_top=(vs_base=base+3)+1;
 	return;
 }
+/*	macro definition for LAMBDA	*/
+
+static L28()
+{register object *base=vs_base;
+	register object *sup=base+VM28; VC28
+	vs_reserve(VM28);
+	check_arg(2);
+	vs_top=sup;
+	{object V151=base[0]->c.c_cdr;
+	base[2]= V151;}
+	base[3]= list(2,VV[22],make_cons(VV[23],base[2]));
+	vs_top=(vs_base=base+3)+1;
+	return;
+}
 static LnkT46(){ call_or_link(VV[46],&Lnk46);} /* FIND-DOC */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+
