@@ -188,7 +188,7 @@
         ((and (consp loc) (eq (car loc) 'INLINE-FIXNUM))
          (wt "(long)")(wt-inline-loc (caddr loc) (cadddr loc)))
         ((and (consp loc) (eq (car loc) 'fixnum-value))
-         (wt (caddr loc)))
+         (wt "(long)")(wt (caddr loc)))
         ((and (consp loc) (member (car loc) '(INLINE-SHORT-FLOAT
 					      INLINE-LONG-FLOAT)))
 	 (wt "((long)(")
@@ -293,4 +293,3 @@
 (defun wt-short-float-value (vv short-float-value)
        (declare (ignore short-float-value))
        (wt "VV[" vv "]"))
-

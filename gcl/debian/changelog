@@ -20,8 +20,13 @@ gclcvs (2.7.0-25) unstable; urgency=low
   * Fix potential stack overwrite bug in quick_call_sfun/eval.c
   * Add -mprferred-stack-boundary=8 on amd64, as constant integers used
     in a call must be retrievable with va_arg(,fixnum)
+  * Revert preferred-stack-boundary option on amd64 as it does not play
+    well with external libraries, also eliminate -m64 to allow for user
+    settings.  Cast fixnum constant C arguments in gcl_cmploc.lsp
+    explicitly to (long) to ensure they can be extracted via
+    va_arg(,fixnum)
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 10 Jun 2004 21:14:52 -0400
+ -- Camm Maguire <camm@enhanced.com>  Fri, 11 Jun 2004 03:07:57 +0000
 
 gclcvs (2.7.0-24) unstable; urgency=low
 

@@ -464,8 +464,8 @@ TONIFLAGS=""
 case $use in 
      *linux)
 	case $use in
-		amd64*)
-			TCFLAGS="$TCFLAGS -m64 -mpreferred-stack-boundary=8";;  
+#		amd64*) # stack-boundary option does not work
+#			TCFLAGS="$TCFLAGS -m64 -mpreferred-stack-boundary=8";;  
 		alpha*)
 			TCFLAGS="$TCFLAGS -mieee";;
 #		m68k*)
@@ -1781,4 +1781,3 @@ else
   echo "Unable to guess machine type"
   echo use configure --enable-machine=XXX,  for XXX such that h/XXX.defs exists, ie in h/*.defs
 fi
-
