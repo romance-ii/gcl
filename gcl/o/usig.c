@@ -127,7 +127,7 @@ unblock_sigusr_sigio(void)
     sigprocmask( SIG_UNBLOCK,&set,0);
   }
 #else
-  current_mask = sigblock(0);
+  int current_mask = sigblock(0);
   return sigsetmask(~(sigmask(SIGIO))&~(sigmask(SIGUSR1)) & current_mask);
 #endif
 }

@@ -71,12 +71,12 @@ static void siLget_system_time_zone(void);
 #include <sys/times.h>
 #endif
 #include <sys/time.h>
-static struct timeb beginning;
+/* static struct timeb beginning; */
 #endif
 
 #ifdef ATT
 #include <sys/times.h>
-long beginning;
+static long beginning;
 #endif
 
 int
@@ -212,9 +212,9 @@ DEFVAR("*DEFAULT-TIME-ZONE*",sSAdefault_time_zoneA,SI,make_fixnum(TIME_ZONE),"")
 void
 init_unixtime(void)
 {
-#ifdef BSD
-	ftime(&beginning);
-#endif
+/* #ifdef BSD */
+/* 	ftime(&beginning); */
+/* #endif */
 #ifdef ATT
 	beginning = time(0);
 #endif
