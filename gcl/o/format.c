@@ -1544,7 +1544,7 @@ fmt_newline(bool colon, bool atsign)
 	fmt_not_colon_atsign(colon, atsign);
 	if (atsign)
 	  WRITEC_NEWLINE(fmt_stream);
-	while (ctl_index < ctl_end && isspace(ctl_string[ctl_index])) {
+	while (ctl_index < ctl_end && isspace((int)ctl_string[ctl_index])) {
 		if (colon)
 			writec_stream(ctl_string[ctl_index], fmt_stream);
 		ctl_index++;

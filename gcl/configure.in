@@ -805,6 +805,7 @@ AC_TRY_RUN([#define _GNU_SOURCE
 		AC_DEFINE(HAVE_ISFINITE) AC_MSG_RESULT(yes),
 		AC_MSG_CHECKING([for finite()])
 		AC_TRY_RUN([#include <math.h>
+	                    #include <ieeefp.h>xs
 			    int main() {
 				float f;
 				return finite(f) || !finite(f) ? 0 : 1;

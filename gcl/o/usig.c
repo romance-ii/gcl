@@ -100,8 +100,9 @@ unblock_signals(int n, int m)
     sigaddset(&set,n);
     sigaddset(&set,m);
     sigprocmask(SIG_UNBLOCK,&set,&oset);
-    result =((sigismember(&oset,n) ? signal_mask(n) : 0)
-              |(sigismember(&oset,m) ? signal_mask(m) : 0));
+    current_mask=0;
+    result =((sigismember(&oset,n) ? signal_mask(n) : current_mask)
+              |(sigismember(&oset,m) ? signal_mask(m) : current_mask));
   }
 #else
 

@@ -78,7 +78,7 @@ int start, end, *ep;
 
 	vsp = vs_top + 1;
 	for (i = j = start;  i < end;  ) {
-		if (isspace(s->st.st_self[i]))
+		if (isspace((int)s->st.st_self[i]))
 			break;
 #ifndef IS_DIR_SEPARATOR
 #define IS_DIR_SEPARATOR(x) (x == '/')
@@ -534,7 +534,7 @@ L:
 	case t_symbol:
 	case t_string:
 		get_string_start_end(x, start, end, &s, &e);
-		for (;  s < e && isspace(x->st.st_self[s]);  s++)
+		for (;  s < e && isspace((int)x->st.st_self[s]);  s++)
 			;
 		y
                   /* !!!!! Bug Fix. NLG */
@@ -544,7 +544,7 @@ L:
 				   &ee);
 		if (junk_allowed == Cnil) {
 			for (;  ee < e - s;  ee++)
-				if (!isspace(x->st.st_self[s + ee]))
+				if (!isspace((int)x->st.st_self[s + ee]))
 					break;
 			if (y == OBJNULL || ee != e - s)
 				FEerror("Cannot parse the namestring ~S~%\

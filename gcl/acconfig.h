@@ -170,6 +170,7 @@ SGC is enabled.  */
 #else
 #ifdef HAVE_FINITE
 #include <math.h>
+#include <ieeefp.h>
 #define ISFINITE(a) finite(a)
 #else
 #error "No isfinite found"
