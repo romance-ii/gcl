@@ -1,8 +1,9 @@
 gcl (2.5.0.cvs20020625-62) unstable; urgency=low
 
   * with-package-iterator modifications
+  * with-package-iterator uses labels to correctly provide for recursion
 
- -- Camm Maguire <camm@m.enhanced.com>  Mon, 28 Oct 2002 11:53:53 -0500
+ -- Camm Maguire <camm@m.enhanced.com>  Tue, 29 Oct 2002 04:33:08 -0500
 
 gcl (2.5.0.cvs20020625-61) unstable; urgency=low
 

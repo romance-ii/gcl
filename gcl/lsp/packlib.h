@@ -42,8 +42,8 @@ static object LI9();
 #define VM3 7
 #define VM2 3
 #define VM1 4
-static char * VVi[66]={
-#define Cdata VV[65]
+static char * VVi[64]={
+#define Cdata VV[63]
 (char *)(L1),
 (char *)(LI2),
 (char *)(L3),
@@ -56,13 +56,13 @@ static char * VVi[66]={
 (char *)(L10)
 };
 #define VV ((object *)VVi)
-static void LnkT64() ;
-static void (*Lnk64)() = LnkT64;
-static object  LnkTLI63() ;
-static object  (*LnkLI63)() = LnkTLI63;
-static object  LnkTLI62() ;
-static object  (*LnkLI62)() = LnkTLI62;
+static void LnkT62() ;
+static void (*Lnk62)() = LnkT62;
+static object  LnkTLI61() ;
+static object  (*LnkLI61)() = LnkTLI61;
+static object  LnkTLI60() ;
+static object  (*LnkLI60)() = LnkTLI60;
 static void LnkT15() ;
 static void (*Lnk15)() = LnkT15;
-static void LnkT61() ;
-static void (*Lnk61)() = LnkT61;
+static void LnkT59() ;
+static void (*Lnk59)() = LnkT59;
