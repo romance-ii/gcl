@@ -354,6 +354,63 @@ copy_to_big(x)
 }
 
 
+/* put in to get (declare integer working with existing setup.
+   should be optimized at some point, as we're just converting 
+   and reconverting integer data, it appears -- CM */
+
+int
+obj_to_mpz(object x,MP_INT * y) {
+
+  int ret=0;
+
+  switch(type_of(x)) {
+  case t_fixnum:
+    mpz_set_si(y,fix(x));
+    break;
+  case t_bignum:
+    mpz_set(y,MP(x));
+    break;
+  default:
+    FEerror("fixnum or bignum expected",0);
+    ret=1;
+    break;
+  }
+
+  return ret;
+
+}
+
+int
+mpz_to_mpz(MP_INT * x,MP_INT * y) {
+
+  int ret=0;
+
+  mpz_set(y,x);
+  return ret;
+
+}
+
+void
+isetq_fix(MP_INT * var,int s)
+{
+  mpz_set_si(var,s);
+}
+
+MP_INT *
+otoi(object x) {
+  if (type_of(x)==t_fixnum) {
+    object y = new_bignum();
+    mpz_set_si(MP(y),fix(x));
+    return MP(y);
+  }
+  if (type_of(x)==t_bignum)
+    return (MP(x));
+  FEwrong_type_argument(sLinteger,x);
+  return NULL;
+}
+/* end added section for declare integer -- CM */
+
+
 
 
 /* return object like *xpt coercing to a fixnum if necessary,

@@ -33,6 +33,23 @@ GEN setq_io(),setq_ii();
 #define IDECL(a,b,c) our_ulong b[4];a =(b[0]=0x1010000 +4,b);object c
 #endif
 
+#else
+
+typedef MP_INT * GEN;
+
+int obj_to_mpz(object,MP_INT *);
+int mpz_to_mpz(MP_INT *,MP_INT *);
+void isetq_fix(MP_INT *,int);
+MP_INT * otoi(object x);
+
+#define IDECL(a,b,c) MP_INT b; a = (mpz_init(&b),&b) ; object c
+#define SETQ_IO(var,alloc,val) { object _xx = (val); \
+                                 obj_to_mpz(_xx,(var));}
+#define SETQ_II(var,alloc,val) { MP_INT * _xx = (val); \
+                                 mpz_to_mpz(_xx,(var));}
+#define ISETQ_FIX(a,b,c) isetq_fix(a,c)
+
+
 #endif /* end no GMP */
 
 #define	cclosure_call	funcall

@@ -877,6 +877,7 @@ if test $gcl_ok = no ; then     AC_MSG_RESULT(no) ; fi
 
 rm -f makedefsafter
 
+MP_INLCUDE=""
 if test $use_gmp = yes ; then
  AC_MSG_CHECKING([use_gmp=yes, doing configure in gmp directory])
  case "${canonical}" in
@@ -889,10 +890,12 @@ if test $use_gmp = yes ; then
  GMP=1
  AC_DEFINE(GMP)
  AC_SUBST(GMP)
+ MP_INCLUDE=h/gmp.h
  echo > makedefsafter
  echo 'MPFILES=${GMP_DIR}libgmp.a' >> makedefsafter
  echo >> makedefsafter
 fi
+AC_SUBST(MP_INCLUDE)
  
 # redhat/cygnus released for some reason a buggy version of gcc,
 # which no one else released.   Catch that here.

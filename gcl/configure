@@ -3420,9 +3420,10 @@ if test $gcl_ok = no ; then     echo "$ac_t""no" 1>&6 ; fi
 
 rm -f makedefsafter
 
+MP_INLCUDE=""
 if test $use_gmp = yes ; then
  echo $ac_n "checking use_gmp=yes, doing configure in gmp directory""... $ac_c" 1>&6
-echo "configure:3426: checking use_gmp=yes, doing configure in gmp directory" >&5
+echo "configure:3427: checking use_gmp=yes, doing configure in gmp directory" >&5
  case "${canonical}" in
 #   i[[5-9]]86* | pentium* | k6* | athlon*)
 #      (cd gmp ; ./configure --target=i486) ;;
@@ -3436,15 +3437,17 @@ echo "configure:3426: checking use_gmp=yes, doing configure in gmp directory" >&
 EOF
 
  
+ MP_INCLUDE=h/gmp.h
  echo > makedefsafter
  echo 'MPFILES=${GMP_DIR}libgmp.a' >> makedefsafter
  echo >> makedefsafter
 fi
+
  
 # redhat/cygnus released for some reason a buggy version of gcc,
 # which no one else released.   Catch that here.
 echo $ac_n "checking Checking for buggy gcc version from redhat""... $ac_c" 1>&6
-echo "configure:3448: checking Checking for buggy gcc version from redhat" >&5
+echo "configure:3451: checking Checking for buggy gcc version from redhat" >&5
 if  2>&1 $CC -v | fgrep "gcc version 2.96" > /dev/null 
    then 
         BROKEN_O4_OPT=1
@@ -3636,6 +3639,7 @@ s%@TCL_DL_LIBS@%$TCL_DL_LIBS%g
 s%@TCL_LIBS@%$TCL_LIBS%g
 s%@NOTIFY@%$NOTIFY%g
 s%@GMP@%$GMP%g
+s%@MP_INCLUDE@%$MP_INCLUDE%g
 s%@BROKEN_O4_OPT@%$BROKEN_O4_OPT%g
 s%@use@%$use%g
 
