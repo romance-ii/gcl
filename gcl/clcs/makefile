@@ -8,7 +8,7 @@ FILES:=$(shell ls -1 clcs_*.lisp | sed 's,\.lisp,,1')
 all: $(addsuffix .c,$(FILES)) $(addsuffix .o,$(FILES))
 
 saved_clcs_gcl: ../unixport/saved_pcl_gcl
-	echo '(load "package.lisp")(load "myload.lisp")(si::save-system "$@")' | $< $(<D)/
+	echo '(load "myload.lisp")(si::save-system "$@")' | $< $(<D)/
 
 %.h %.data %.c : %.lisp saved_clcs_gcl
 	cp ../h/cmpinclude.h .

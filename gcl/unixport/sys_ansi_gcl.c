@@ -129,6 +129,8 @@ gcl_init_system(object no_init)
   ar_check_init(gcl_cmpvs,no_init);
   ar_check_init(gcl_cmpwt,no_init);
 
+  lsp_init("../clcs/myload1.lisp");
+
   ar_check_init(pcl_pkg,no_init);
   ar_check_init(pcl_walk,no_init);
   ar_check_init(pcl_iterate,no_init);

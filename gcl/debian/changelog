@@ -4,8 +4,15 @@ gclcvs (2.7.0-12) unstable; urgency=low
   * init_or_load1 -> gcl_init_or_load1 in xgcl-2/sysinit.lsp
   * Add generated pcl_gazonk8 files to archive, as Windows still can't
     build pcl from lisp source
+  * Add clcs_macros and clcs package info to image before pcl build, as
+    walker needs final forms of certain macros/fuctions to generate
+    correct generic function calls, and clcs replaces/shadows some semi-
+    equivalent macros/functions in the traditional image, e.g.
+    etypecase, etc.
+  * TODO, rationalize this circular dependency between clcs and pcl for
+    the other shadowed functions (not in clcs_macros) as well
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 23 Oct 2003 15:02:45 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 23 Oct 2003 15:06:30 +0000
 
 gclcvs (2.7.0-11) unstable; urgency=low
 
