@@ -76,6 +76,7 @@ struct sfasl_info {
     struct syment *s_symbol_table;
     char *s_start_address;
     char *s_start_data;
+    char *s_start_bss;
     char *s_my_string_table;
     int s_extra_bss;
     char *s_the_start;
@@ -315,6 +316,7 @@ int fasload ( object faslfile )
                 memory->cfd.cfd_start =	
                     alloc_contblock ( memory->cfd.cfd_size );
             sfaslp->s_start_data = start_address + textsize;
+            sfaslp->s_start_bss = start_address + textsize + datasize;
             END_NO_INTERRUPT;
         }
 #else
@@ -323,6 +325,7 @@ int fasload ( object faslfile )
             = malloc ( datasize + textsize + bsssize + extra_bss + 0x80000 );
 	the_start = start_address = (char *) ( 0x1000 * ( ( ( (int) the_start + 0x70000) + 0x1000) / 0x1000 ) );
 	sfaslp->s_start_data = start_address + textsize;
+	sfaslp->s_start_bss = start_address + textsize + datasize;
 #endif
 	dprintf(" Code size %d, ", datasize+textsize+bsssize + extra_bss);
 	if ( fseek ( fp, N_TXTOFF(fileheader), 0) < 0 ) {
@@ -599,6 +602,8 @@ void relocate_symbols ( unsigned int length )
     char *str;
     char tem[SYMNMLEN +1];
     tem[SYMNMLEN]=0;
+    int n_value=(int)start_address;
+
     end =symbol_table + length;
     for(sym=symbol_table; sym < end; sym++) {
         typ=NTYPE(sym);
@@ -615,16 +620,14 @@ void relocate_symbols ( unsigned int length )
         case N_ABS : case N_TEXT: case N_DATA: case N_BSS:
 #endif
 #ifdef COFF
-#  ifdef  _WIN32
-        case TEXT_NSCN:
-            sym->n_value = (int)start_address;
-            break;
-        case DATA_NSCN:
-            sym->n_value = (int)sfaslp->s_start_data;
-            break;
-        case BSS_NSCN:
-#  else  /* _WIN32 */
         case TEXT_NSCN : case DATA_NSCN: case BSS_NSCN :
+#ifdef  _WIN32
+	  if (typ==DATA_NSCN)
+	    n_value = (int)sfaslp->s_start_data;
+	  if (typ==BSS_NSCN)
+	    n_value = (int)sfaslp->s_start_bss;
+	  if (typ==TEXT_NSCN)
+            n_value = (int)start_address;
 #endif /* _WIN32 */
 #endif /* COFF */
             str=SYM_NAME(sym);
@@ -641,7 +644,7 @@ void relocate_symbols ( unsigned int length )
                 fprintf ( stderr, "(BSS_NSCN)");
                 break;
             }
-            fprintf ( stderr, " new value will be start %x for sym %s,  \n", start_address, str );
+            fprintf ( stderr, " new value will be start %x for sym %s,  \n", n_value, str );
 #endif            
 #ifdef AIX3 
             if ( N_SECTION(sym) == DATA_NSCN
@@ -649,7 +652,7 @@ void relocate_symbols ( unsigned int length )
                  && allocate_toc(sym) )
                 break;
 #endif     
-            sym->n_value = (int)start_address;
+            sym->n_value = n_value;
             break;
         case  N_UNDEF:
             str=SYM_NAME(sym);
