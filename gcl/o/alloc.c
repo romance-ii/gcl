@@ -62,7 +62,7 @@ sbrk1(n)
 #endif /* DEBUG_SBRK */
 
 long real_maxpage = MAXPAGE;
-long new_holepage = 0;
+long new_holepage;
 
 #define	available_pages	\
 	(real_maxpage-page(heap_end)-new_holepage-2*nrbpage-real_maxpage/32)
@@ -270,10 +270,9 @@ CALL_GBC:
 
 EXHAUSTED:
 	if (IGNORE_MAX_PAGES) {
-		if (tm->tm_maxpage/2 <= 0)
-			tm->tm_maxpage += 1;
-		else
-			tm->tm_maxpage += tm->tm_maxpage/2;
+		tm->tm_maxpage =
+		    grow_linear(tm->tm_maxpage,tm->tm_growth_percent,
+				tm->tm_min_grow,tm->tm_max_grow);
 		call_after_gbc_hook(t);
 		goto ONCE_MORE;
 	}
