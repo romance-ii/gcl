@@ -23,6 +23,9 @@ endif
 ifeq ($(ARCHT),ia64)
 MCC:=gcc-3.2
 endif
+ifeq ($(ARCHT),m68k)
+MCC:=gcc-2.95
+endif
 
 #RELOC=locbfd
 RELOC=statsysbfd

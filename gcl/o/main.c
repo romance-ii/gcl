@@ -603,11 +603,7 @@ DEFUNO_NEW("BYE",object,fLbye,LISP
        ,0,1,NONE,OI,OO,OO,OO,Lby,(int exitc),"")
 {	int n=VFUN_NARGS;
 	int exit_code;
-	{ 
-	  if (n>=1) exit_code=exitc;else goto LDEFAULT1;
-	  goto LEND_VARARG;
-	LDEFAULT1: exit_code = 0;
-	LEND_VARARG: }
+	if (n>=1) exit_code=exitc;else exit_code=0;
 
 #ifdef UNIX
 /*	printf("Bye.\n"); */

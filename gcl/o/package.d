@@ -718,12 +718,12 @@ delete_package(object n) {
  	
 	FEpackage_error((object)p,"Package used by other packages.");
 	for (t=p->p_usedbylist;!endp(t);t=t->c.c_cdr)
-	  unuse_package(p,t->c.c_car);
+	  unuse_package((object)p,t->c.c_car);
       }
 
       if (p->p_uselist!=Cnil) {
 	for (t=p->p_uselist;!endp(t);t=t->c.c_cdr)
-	  unuse_package(t->c.c_car,p);
+	  unuse_package(t->c.c_car,(object)p);
       }
 
       p->p_name=Cnil;

@@ -328,7 +328,7 @@ fasload(object faslfile) {
 					     v,0,q)) 
        FEerror("Cannot get relocated section contents\n",0);
 
-     memcpy((void *)s->output_section->vma,v,s->_raw_size);
+     memcpy((void *)(unsigned long)s->output_section->vma,v,s->_raw_size);
      
    }
  }

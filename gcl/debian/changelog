@@ -1,8 +1,11 @@
 gcl (2.5.0.cvs20020625-73) unstable; urgency=low
 
   * typep fixes for class types
+  * m68k Build-depend on gcc-2.95 as a temporary work around to bug
+    179807
+  * gcc-3.2 warning cleanups
 
- -- Camm Maguire <camm@enhanced.com>  Sun,  9 Feb 2003 18:28:49 -0500
+ -- Camm Maguire <camm@enhanced.com>  Mon, 10 Feb 2003 12:20:53 -0500
 
 gcl (2.5.0.cvs20020625-72) unstable; urgency=high
 

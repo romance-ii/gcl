@@ -253,22 +253,11 @@ DEFUNO_NEW("SET-UP-COMBINED",object,fSset_up_combined,SI
   int nargs=VFUN_NARGS;
   unsigned int n;
   object siz;
-/*   va_list ap; */
 
-  { 
-/*     va_start(ap,first); */
-    if (nargs>=1) 
-      siz=first;
-    else 
-      goto LDEFAULT1;
-    
-    goto LEND_VARARG;
-	
-  LDEFAULT1: 
+  if (nargs>=1) 
+    siz=first;
+  else 
     siz = small_fixnum(0);
-  LEND_VARARG: 
-/*     va_end(ap); */
-  }
 
   CHECK_ARG_RANGE(0,1);
   n = (unsigned int) fix(siz);
