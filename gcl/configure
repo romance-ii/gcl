@@ -9645,7 +9645,7 @@ O2FLAGS=$TO2FLAGS
 if test -f h/$use.defs  ; then
 
 
-  ac_config_files="$ac_config_files makedefc windows/gcl.iss windows/gcl.ansi.iss"
+  ac_config_files="$ac_config_files makedefc windows/gcl.iss windows/gcl.ansi.iss windows/install.ansi.lsp windows/install.lsp"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -10119,6 +10119,8 @@ do
   "makedefc" ) CONFIG_FILES="$CONFIG_FILES makedefc" ;;
   "windows/gcl.iss" ) CONFIG_FILES="$CONFIG_FILES windows/gcl.iss" ;;
   "windows/gcl.ansi.iss" ) CONFIG_FILES="$CONFIG_FILES windows/gcl.ansi.iss" ;;
+  "windows/install.ansi.lsp" ) CONFIG_FILES="$CONFIG_FILES windows/install.ansi.lsp" ;;
+  "windows/install.lsp" ) CONFIG_FILES="$CONFIG_FILES windows/install.lsp" ;;
   "h/gclincl.h" ) CONFIG_HEADERS="$CONFIG_HEADERS h/gclincl.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}

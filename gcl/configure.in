@@ -1430,7 +1430,7 @@ AC_SUBST(EXTRA_LOBJS)
 if test -f h/$use.defs  ; then
 
   AC_SUBST(use)
-  AC_OUTPUT(makedefc windows/gcl.iss windows/gcl.ansi.iss)
+  AC_OUTPUT(makedefc windows/gcl.iss windows/gcl.ansi.iss windows/install.ansi.lsp windows/install.lsp )
   echo makedefc
   cat makedefc
 
