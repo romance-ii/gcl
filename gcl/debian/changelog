@@ -32,8 +32,10 @@ gclcvs (2.7.0-20) unstable; urgency=low
     can be resonled when optimization is turned off
   * completion_matches ->  rl_completion_matches in gcl_readline.d,
     which is what is exported in the headers
+  * make suure bfd fasload initializes dum.sm.sm_object1 for
+    read_fasl_vector
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 27 Feb 2004 23:51:34 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 28 Feb 2004 16:58:54 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

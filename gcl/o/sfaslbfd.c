@@ -205,7 +205,7 @@ fasload(object faslfile) {
 
     dum.sm.t=t_stream;
     dum.sm.sm_mode=smm_input;
-    dum.sm.sm_object0=dum.sm.sm_object1=OBJNULL;
+    dum.sm.sm_object0=sLsting_char;
 
     link_callbacks.add_archive_element=madd_archive_element;
     link_callbacks.multiple_definition=mmultiple_definition;
@@ -346,6 +346,7 @@ fasload(object faslfile) {
    }
  }
    
+  dum.sm.sm_object1=faslfile;
   dum.sm.sm_fp=b->iostream;
 
   /* Find a way of doing this in bfd -- use this for now.  Unfortunately, 
