@@ -1,5 +1,13 @@
 BUILDING A NATIVE WIN32 GNU COMMON LISP (DRAFT ONLY)
 
+Note:  The process outlined below uses Cygwin Posix tools to host
+a native Win32 build using the standalone Mingw32 tools.  
+
+I am currently (31 July 2002) trying the MSYS Mingw build system 
+as the preferred way to configure and build native Win32 GCL.  My 
+preliminary test buildt a "traditional mode" GCL which built CVS 
+Maxima after one or two tweaks to circumvent path problems.
+
 BUILD TOOLS
 
 - Mingw32 1.1 Windows native gcc from Source Forge:
