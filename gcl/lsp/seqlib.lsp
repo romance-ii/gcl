@@ -728,12 +728,12 @@
 
 (defun map-into (result-sequence function &rest sequences)
 ;  "map-into:  (result-sequence function &rest sequences)"
-  (let ((nel (apply #'min (if (eq 'vector (type-of result-sequence))
+  (let ((nel (apply #'min (if (subtypep (type-of result-sequence) 'vector)
 			      (array-dimension result-sequence 0)
 			    (length result-sequence))
 		    (mapcar #'length sequences))))
     ;; Set the fill pointer to the number of iterations
-    (when (and (eq 'vector (type-of result-sequence))
+    (when (and (subtypep  (type-of result-sequence) 'vector)
 		(array-has-fill-pointer-p result-sequence))
       (setf (fill-pointer result-sequence) nel))
     ;; Perform mapping

@@ -1,7 +1,14 @@
+gcl (2.5.0.cvs20020625-65) unstable; urgency=low
+
+  * Miscellaneous Freebsd patches
+  * non-recursive with-package-iterator
+  * map-into fill-pointer fixes
+
+ -- Camm Maguire <camm@enhanced.com>  Sun,  3 Nov 2002 20:43:59 -0500
+
 gcl (2.5.0.cvs20020625-64) unstable; urgency=low
 
   * Fix epsilon calculations again to reenable arm build
-  * Miscellaneous Freebsd patches
 
  -- Camm Maguire <camm@enhanced.com>  Fri,  1 Nov 2002 07:08:33 -0500
 

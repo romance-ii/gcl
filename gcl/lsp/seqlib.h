@@ -327,8 +327,8 @@ static struct { short n,allow_other_keys;object *defaults;
 #define VMS43  register object *sup=vs_top+3;vs_top=sup;
 #define VMV43 vs_reserve(3);
 #define VMR43(VMT43) vs_top=base ; return(VMT43);
-#define VC44 object  V706 ,V703 ,V700;
-#define VC45 object  V719 ,V718 ,V717 ,V716 ,V715;
+#define VC44 object  V704;
+#define VC45 object  V717 ,V716 ,V715 ,V714 ,V713;
 static void L41();
 #define VC46
 #define VM46 3
@@ -457,6 +457,8 @@ static char * VVi[76]={
 (char *)(L46)
 };
 #define VV ((object *)VVi)
+static void LnkT62() ;
+static void (*Lnk62)() = LnkT62;
 static void LnkT61() ;
 static void (*Lnk61)() = LnkT61;
 static object  LnkTLI60() ;
