@@ -113,9 +113,10 @@ typedef int sigset_t ;
    if the pointe/r is on the C stack or the 0 pointer
    in winnt our heap starts at DBEGIN
    */
-#define NULL_OR_ON_C_STACK(y)\
-    (((unsigned int)(y)) == 0 ||  \
-     (((unsigned int)(y)) < DBEGIN && ((unsigned int)(y)) &0xf000000))
+/*  #define NULL_OR_ON_C_STACK(y)\ */
+/*      (((unsigned int)(y)) == 0 ||  \ */
+/*       (((unsigned int)(y)) < DBEGIN && ((unsigned int)(y)) &0xf000000)) */
+#define NULL_OR_ON_C_STACK(y) (((void *)(y)) < ((void *)0x400000))
      
       
 #ifdef IN_FILE

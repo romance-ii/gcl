@@ -790,6 +790,7 @@ if test $use_gmp = yes ; then
    *)
       (cd gmp ; ./configure) ;;
  esac
+ test -e gmp/mpn/add_n.* || cp gmp/mpn/generic/*.c gmp/mpn/
  GMP=1
  AC_DEFINE(GMP)
  AC_SUBST(GMP)

@@ -3057,6 +3057,7 @@ echo "configure:3054: checking use_gmp=yes, doing configure in gmp directory" >&
    *)
       (cd gmp ; ./configure) ;;
  esac
+ test -e gmp/mpn/add_n.* || cp gmp/mpn/generic/*.c gmp/mpn/
  GMP=1
  cat >> confdefs.h <<\EOF
 #define GMP 1
@@ -3071,7 +3072,7 @@ fi
 # redhat/cygnus released for some reason a buggy version of gcc,
 # which no one else released.   Catch that here.
 echo $ac_n "checking Checking for buggy gcc version from redhat""... $ac_c" 1>&6
-echo "configure:3075: checking Checking for buggy gcc version from redhat" >&5
+echo "configure:3076: checking Checking for buggy gcc version from redhat" >&5
 if  2>&1 $CC -v | fgrep "gcc version 2.96" > /dev/null 
    then 
         BROKEN_O4_OPT=1
