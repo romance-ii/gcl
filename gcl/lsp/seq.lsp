@@ -45,13 +45,15 @@
               ((or (eq type 'simple-vector) (eq type 'vector)) t)
               (t
                (setq type (normalize-type type))
-               (when (eq (car type) 'list)
+               (when (subtypep (car type) 'list)
                      (return-from make-sequence
                       (if iesp
                           (make-list size :initial-element initial-element)
                           (make-list size))))
-               (unless (or (eq (car type) 'array)
-                           (eq (car type) 'simple-array))
+	       (format nil "~A" (caddr type))
+               (unless (and (or (eq (car type) 'array)
+				(eq (car type) 'simple-array))
+			    (not (si::fixnump (car (caddr type)))))
                        (error "~S is not a sequence type." type))
                (or (cadr type) t))))
   (setq element-type (si::best-array-element-type element-type))

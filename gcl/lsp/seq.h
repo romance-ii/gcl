@@ -51,8 +51,8 @@ static object LI7();
 #define VM3 2
 #define VM2 2
 #define VM1 7
-static char * VVi[19]={
-#define Cdata VV[18]
+static char * VVi[21]={
+#define Cdata VV[20]
 (char *)(LI1),
 (char *)(&LI1key),
 (char *)(LI2),
@@ -63,13 +63,15 @@ static char * VVi[19]={
 (char *)(LI7)
 };
 #define VV ((object *)VVi)
-static void LnkT17() ;
-static void (*Lnk17)() = LnkT17;
-static void LnkT16() ;
-static void (*Lnk16)() = LnkT16;
-static object  LnkTLI15() ;
-static object  (*LnkLI15)() = LnkTLI15;
+static void LnkT19() ;
+static void (*Lnk19)() = LnkT19;
+static void LnkT18() ;
+static void (*Lnk18)() = LnkT18;
+static object  LnkTLI17() ;
+static object  (*LnkLI17)() = LnkTLI17;
+static object  LnkTLI16() ;
+static object  (*LnkLI16)() = LnkTLI16;
+static void LnkT15() ;
+static void (*Lnk15)() = LnkT15;
 static object  LnkTLI14() ;
 static object  (*LnkLI14)() = LnkTLI14;
-static object  LnkTLI13() ;
-static object  (*LnkLI13)() = LnkTLI13;
