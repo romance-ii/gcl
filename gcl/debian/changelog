@@ -87,8 +87,10 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * minor variable name change
   * Perhormance improvement to gcl_seqlib.lsp -- no inner loop over
     bignums
+  * Proper contblock/relblock determination when expanding string
+    streams
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 01:58:50 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 02:01:23 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

@@ -976,7 +976,7 @@ BEGIN:
 			if (!x->st.st_adjustable)
 				FEerror("The string ~S is not adjustable.",
 					1, x);
-                        p = (inheap((long)x->st.st_dim) ? alloc_contblock : alloc_relblock)
+                        p = (inheap((long)x->st.st_self) ? alloc_contblock : alloc_relblock)
                              (x->st.st_dim * 2 + 16); 
 			for (i = 0;  i < x->st.st_dim;  i++)
 				p[i] = x->st.st_self[i];
