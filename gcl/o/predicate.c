@@ -491,8 +491,15 @@ equal(register object x, register object y)
 register enum type t;
 
 	cs_check(y);
+	cs_check(x);
 
 BEGIN:
+        if ( NULL == x ) {
+            FEerror ( "equal: x is a NULL pointer", 0 );
+        }
+        if ( NULL == y ) {
+            FEerror ( "equal: y is a NULL pointer", 0 );
+        }
 	if ((t = type_of(x)) != type_of(y))
 		return(FALSE);
 	if (x==y)
