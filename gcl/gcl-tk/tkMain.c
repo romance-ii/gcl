@@ -236,9 +236,11 @@ TkX_Wish (argc, argv)
 	fprintf(stderr, "%s\n", interp->result);
 	exit(1);
     }
+#ifndef __MINGW32__    
     if (synchronize) {
 	XSynchronize(Tk_Display(mainWindow), True);
     }
+#endif    
     Tk_GeometryRequest(mainWindow, 200, 200);
     Tk_UnmapWindow(mainWindow);
 
@@ -337,8 +339,9 @@ TkX_Wish (argc, argv)
 	}
 
 	dfprintf(stderr, "guis : Creating file handler for %d\n", dsfd->fd);
-	
+#ifndef __MINGW32__	
 	Tk_CreateFileHandler(dsfd->fd, TK_READABLE, StdinProc, (ClientData) 0);
+#endif        
     }
     fflush(stdout);
     Tcl_DStringInit(&command);
@@ -395,8 +398,9 @@ tell_lisp_var_changed(
 				 val, strlen(val))
 		 < 0)
 		{		/* what do we want to do if the write failed */}
-	      
+#ifndef __MINGW32__	      
     if (parent > 0)  kill(parent, SIGUSR1);
+#endif      
     }
   else
   /* avoid going back to lisp if it is lisp that is doing the setting! */
@@ -461,7 +465,9 @@ StdinProc(clientData, mask)
 	{
 	  /*dfprintf(stderr, "Yoo !!! Empty command\n"); */
 	  if (debug)perror("zero message");
+#ifndef __MINGW32__          
 	  Tk_CreateFileHandler(dsfd->fd, TK_READABLE, StdinProc, (ClientData) 0);
+#endif          
 	  return;
 	}
 
@@ -501,8 +507,10 @@ StdinProc(clientData, mask)
 	      
 	      if (msg->type == m_tcl_command_wait_response)
 		{ /* parent is waiting so dong signal */ ;}
+#ifndef __MINGW32__              
 	      else
 		if (parent> 0)kill(parent, SIGUSR1);
+#endif              
 	    }
 
 	  Tcl_DStringFree(&command);
@@ -628,7 +636,9 @@ TclGenericCommandProcedure( clientData,
 	      , szCmd, dsfd->fd, errno, cb);
 
     }
+#ifndef __MINGW32__  
   if (parent > 0)kill(parent, SIGUSR1);
+#endif  
   return TCL_OK;
 }
 

@@ -29,21 +29,28 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifdef __cplusplus
 extern "C" {
 #endif
+    
 #include <sys/types.h>
-#include <netinet/in.h>
 
-  
-#ifdef PLATFORM_NEXT
-# include <bsd/netdb.h>
-# include <libc.h>
-#else
-# include <netdb.h>
-# include <arpa/inet.h>
+#ifndef _WIN32
+#  include <netinet/in.h>
+#  ifdef PLATFORM_NEXT
+#     include <bsd/netdb.h>
+#     include <libc.h>
+#  else
+#     include <netdb.h>
+#     include <arpa/inet.h>
+#  endif
 #endif
+    
 /* #include <sys/types.h> */
 
 #include <sys/time.h>
+
+#ifndef _WIN32  
 #include <sys/socket.h>
+#endif    
+
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -76,10 +83,8 @@ extern char *inet_ntoa ( struct in_addr in );
 
 #include "guis.h"
 
-
 FILE *pstreamDebug;
 int fDebugSockets;
-
 
 #ifdef PLATFORM_SUNOS
 static void notice_input( );
@@ -95,7 +100,103 @@ pid_t parent;
  
 int debug;
 
+#ifdef _WIN32
+
+#include <windows.h>
+#include <winsock2.h>
+
+/* Keep track of socket initialisations */
+int w32_socket_initialisations = 0;
+
+WSADATA WSAData;
+
+
+/* Use threads instead of fork() */
+/* Struct to hold args for thread. */
+typedef struct _TAS {
+    char **argv;
+    int    argc;
+    int    rv;
+    int    delay;
+} TAS;
+
+#endif
+
 #include "comm.c"
+
+#ifdef _WIN32
+
+#define SET_SESSION_ID() 0
+
+UINT WINAPI tf ( void *tain )
+{
+    TAS *ta = (TAS *) tain;
+    UINT rv = 0;
+    if (SET_SESSION_ID() == -1) {
+        fprintf ( stderr, "tf: Error - set session id failed : %d\n", errno );
+    }
+    if ( w32_socket_init() >= 0 ) {
+        dsfd = sock_connect_to_name ( ta->argv[1], atoi ( ta->argv[2] ), 0);
+        if ( dsfd ) {
+            fprintf ( stderr, "connected to %s %s", ta->argv[1], ta->argv[2] );
+            /* give chance for someone to attach with gdb and
+               to set waiting to 0 */
+            while ( -- ta->delay >= 0 ) sleep(1);
+            {
+		char *buf = "\0\0";
+		TkX_Wish ( ta->argc, ta->argv );
+            }
+
+            fprintf ( stderr, "Wish shell done\n" );
+            sock_close_connection ( dsfd );
+            ta->rv = 0;
+        } else {
+            fprintf ( stderr,
+                       "Error: Can't connect to socket host=%s, port=%s, errno=%d\n",
+                       ta->argv[1], ta->argv[2], errno );
+            fflush ( stderr );
+            ta->rv = -1;
+        }
+        w32_socket_exit();
+    } else {
+        fprintf ( stderr, "tf: Can't initialise sockets - w32_socket_init failed.\n" );
+    }
+    _endthreadex ( 0 );
+    return ( 0 );
+}
+
+int w32_socket_init(void)
+{
+    int rv = 0;
+    if (w32_socket_initialisations++) {
+	rv = 0;
+    } else {
+        if (WSAStartup(0x0101, &WSAData)) {
+            w32_socket_initialisations = 0;
+            fprintf ( stderr, "WSAStartup failed\n" );
+            WSACleanup();
+            rv = -1;
+        }
+    }
+
+    return rv;
+}
+
+int w32_socket_exit(void)
+{
+    int rv = 0;
+
+    if ( w32_socket_initialisations == 0 ||
+         --w32_socket_initialisations > 0 ) {
+	rv = 0;
+    } else {
+        rv = WSACleanup();
+    }
+    
+    return rv;
+}
+
+#endif    
 
 
 /* Start up our Graphical User Interface connecting to 
@@ -108,54 +209,82 @@ int debug;
 
 
 int delay;
-int
-main(argc, argv)
-     int argc;
-     char *argv[];
+int main(argc, argv)
+int argc;
+char *argv[];
 {
-  {int i = argc;
-  pstreamDebug  = stderr; 
-   while (--i > 3)
-     { if (strcmp(argv[i],"-delay")==0)
-	 { delay = atoi(argv[i+1]);}
-       if (strcmp(argv[i],"-debug")==0)
-	   {debug = 1; fDebugSockets = -1;}
-       }
- }
-  
-  
-
-  if (argc >= 4)
+    int rv = 0; 
     {
-      pid_t p;
+        int i = argc;
+        pstreamDebug  = stderr; 
+        while (--i > 3) {
+            if (strcmp(argv[i],"-delay")==0)
+                { delay = atoi(argv[i+1]);}
+            if (strcmp(argv[i],"-debug")==0)
+                {debug = 1; fDebugSockets = -1;}
+        }
+    }
 
-      parent = atoi(argv[3]);
-      dfprintf(stderr,"guis, parent is : %d\n", parent);
+    if (argc >= 4) {
+
+#ifdef _WIN32
+        UINT dwThreadID;
+        HANDLE hThread;
+        TAS targs;
+        void *pTA   = (void *) &targs;
+        targs.argv  = argv;
+        targs.argc  = argc;
+        targs.rv    = 0;
+        targs.delay = delay;
+
+        hThread = (HANDLE) _beginthreadex (
+                                            NULL,
+                                            0,
+                                            tf,
+                                            pTA,
+                                            0,
+                                            &dwThreadID
+                                            );
+        if ( 0 == hThread ) {
+            dfprintf ( stderr, "Error: Couldn't create thread.\n" );
+            rv = -1;
+        }
+        if ( WAIT_OBJECT_0 != WaitForSingleObject ( hThread, INFINITE ) ) {
+            dfprintf ( stderr, "Error: Couldn't wait for thread to exit.\n" );
+            rv = -1;
+        }
+        CloseHandle ( hThread );
+        
+#else  /* _WIN32 */
+        pid_t p;
+
+        parent = atoi(argv[3]);
+        dfprintf(stderr,"guis, parent is : %d\n", parent);
 
 #ifdef MUST_USE_VFORK
-      p = vfork();
+        p = vfork();
 #else
-      p = fork();
+        p = fork();
 #endif
-      dfprintf(stderr, "guis, vfork returned : %d\n", p);
+        dfprintf(stderr, "guis, vfork returned : %d\n", p);
 
-      if (p == -1)
-	{
-	  dfprintf(stderr, "Error !!! vfork failed %d\n", errno);
+        if (p == -1)
+            {
+                dfprintf(stderr, "Error !!! vfork failed %d\n", errno);
 
-	  return -1;
-	}
-      else if (p)
-	{
-	  dfprintf(stderr, "guis,vforked child : %d\n", p);
+                return -1;
+            }
+        else if (p)
+            {
+                dfprintf(stderr, "guis,vforked child : %d\n", p);
 
-	  _exit(p);
-/*
-	  return p;
-*/
-	}
-      else
-	{
+                _exit(p);
+                /*
+                   return p;
+                   */
+            }
+        else
+            {
 
 #ifndef SET_SESSION_ID	  
 #if defined(__svr4__) || defined(ATT) 
@@ -166,49 +295,49 @@ main(argc, argv)
 #endif
 #endif	  
 #endif
-	  
-	  if (SET_SESSION_ID() == -1)
-	    {   dfprintf(stderr, "Error !!! setsid failed : %d\n", errno);
-	      }
+                
+                if (SET_SESSION_ID() == -1)
+                    {   dfprintf(stderr, "Error !!! setsid failed : %d\n", errno);
+                    }
 
 
-	    
-	  dsfd = sock_connect_to_name(argv[1], atoi(argv[2]), 0);
-	  if (dsfd)
-	    {
-	      dfprintf(stderr, "connected to %s %s"
-		      , argv[1], argv[2]);
-	      /* give chance for someone to attach with gdb and
-		 to set waiting to 0 */
-	      while (-- delay >=0) sleep(1);
-		
-	      
-	      {
-		char *buf = "\0\0";
-		TkX_Wish(argc, argv);
-	      }
-
-	      dfprintf(stderr, "Wish shell done\n");
-
-	      sock_close_connection(dsfd);
-	      return 0;
-	    }
-	  else
-	    {
-	      dfprintf(stderr,
-      "Error !!! Can't connect to socket host=%s, port=%s, errno=%d\n"
-		      , argv[1], argv[2], errno);
-	      fflush(stderr);
-	      return -1;
-	    }
-	}
+                dsfd = sock_connect_to_name(argv[1], atoi(argv[2]), 0);
+                if (dsfd) {
+                    dfprintf(stderr, "connected to %s %s"
+                              , argv[1], argv[2]);
+                    /* give chance for someone to attach with gdb and
+                       to set waiting to 0 */
+                    while (-- delay >=0) sleep(1);
+                    {
+                        char *buf = "\0\0";
+                        TkX_Wish(argc, argv);
+                    }
+                    
+                    dfprintf(stderr, "Wish shell done\n");
+                    
+                    sock_close_connection(dsfd);
+                    return 0;
+                } else {
+                    dfprintf(stderr,
+                              "Error !!! Can't connect to socket host=%s, port=%s, errno=%d\n"
+                              , argv[1], argv[2], errno);
+                    fflush(stderr);
+                    return -1;
+                }
+            }
+#endif  /* _WIN32 */
+    } else {
+        int i;
+        fprintf ( stderr, "gcltkaux: Error - expecting more arguments, but found:\n" );
+        fflush(stderr);
+        for ( i = 0; i<argc; i++ ) {
+            fprintf ( stderr, "    argv[%d] = %s\n", i, argv[i] );
+            fflush(stderr);
+        }
+        fflush(stderr);
+        return -1;
     }
-  else
-    {
-      dfprintf(stderr, "Error !!! Not enough arguments\n");
-      fflush(stderr);
-      return -1;
-    }
+    return ( rv );
 }
 
 struct connection_state *

@@ -47,17 +47,17 @@ gcltkaux:  $(GUIOS)
 	$(LD_ORDINARY_CC) $(GUIOS) -o gcltkaux  ${TK_LIB_SPEC} ${TK_BUILD_LIB_SPEC} ${TK_XLIBSW} ${TK_XINCLUDES} ${TCL_LIB_SPEC}  `echo ${TCL_LIBS} | sed -e s:-lieee::g`  ${LIBS} ${GCLIB}
 
 gcltksrv: makefile
-	cat gcltksrv.in | sed -e "s:TK_LIBRARY=.*:TK_LIBRARY=${TK_LIBRARY}:g" \
-	-e "s:TCL_LIBRARY=.*:TCL_LIBRARY=${TCL_LIBRARY}:g" \
-	-e "s:TK_XLIB_DIR=.*:TK_XLIB_DIR=${TK_XLIB_DIR}:g" \
-	-e "s:GCL_TK_DIR=.*:GCL_TK_DIR=${GCLDIR}/gcl-tk:g" > gcltksrv
+	cat gcltksrv.in | sed -e "s!TK_LIBRARY=.*!TK_LIBRARY=${TK_LIBRARY}!g" \
+	-e "s!TCL_LIBRARY=.*!TCL_LIBRARY=${TCL_LIBRARY}!g" \
+	-e "s!TK_XLIB_DIR=.*!TK_XLIB_DIR=${TK_XLIB_DIR}!g" \
+	-e "s!GCL_TK_DIR=.*!GCL_TK_DIR=${GCLDIR}/gcl-tk!g" > gcltksrv
 	chmod a+x gcltksrv
 
 gcltksrv.interp: makefile
-	cat gcltksrv.in.interp | sed -e "s:TK_LIBRARY=.*:TK_LIBRARY=${TK_LIBRARY}:g" \
-	-e "s:TK_XLIB_DIR=.*:TK_XLIB_DIR=${TK_XLIB_DIR}:g" \
-	-e "s:TCL_LIBRARY=.*:TCL_LIBRARY=${TCL_LIBRARY}:g" \
-	-e "s:GCL_TK_DIR=.*:GCL_TK_DIR=${GCLDIR}/gcl-tk:g" > gcltksrv.interp
+	cat gcltksrv.in.interp | sed -e "s!TK_LIBRARY=.*!TK_LIBRARY=${TK_LIBRARY}!g" \
+	-e "s!TK_XLIB_DIR=.*!TK_XLIB_DIR=${TK_XLIB_DIR}!g" \
+	-e "s!TCL_LIBRARY=.*!TCL_LIBRARY=${TCL_LIBRARY}!g" \
+	-e "s!GCL_TK_DIR=.*!GCL_TK_DIR=${GCLDIR}/gcl-tk!g" > gcltksrv.interp
 	chmod a+x gcltksrv.interp
 
 INTERESTING=*.lsp *.lisp tk*.c guis.c sockets.c  comm.c Makefile  demos/*.lisp  *.h
