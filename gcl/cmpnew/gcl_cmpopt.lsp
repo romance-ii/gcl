@@ -332,10 +332,12 @@
 ;;<
  (push '((t t) boolean #.(flags)"number_compare(#0,#1)<0")
    (get '< 'inline-always))
-
 (push '((fixnum-float fixnum-float) boolean #.(flags)"(#0)<(#1)")
    (get '< 'inline-always))
 
+;;compiler::objlt
+ (push '((t t) boolean #.(flags)"((object)(#0))<((object)(#1))")
+   (get 'si::objlt 'inline-always))
 
 ;;<=
  (push '((t t) boolean #.(flags)"number_compare(#0,#1)<=0")
@@ -361,7 +363,6 @@
 ;;>=
  (push '((t t) boolean #.(flags)"number_compare(#0,#1)>=0")
    (get '>= 'inline-always))
-
 (push '((fixnum-float fixnum-float) boolean #.(flags)"(#0)>=(#1)")
    (get '>= 'inline-always))
 
@@ -808,10 +809,21 @@ type_of(#0)==t_bitvector")
   "@0;(type_of(#0)==t_symbol&&(#0)->s.s_hpack==keyword_package)")
    (get 'keywordp 'inline-always))
 
+;;ADDRESS
+ (push '((t) fixnum #.(flags rfa)"((fixnum)(#0))")
+   (get 'si::address 'inline-always))
+
+;;NANI
+ (push '((fixnum) t #.(flags rfa)"((object)(#0))")
+   (get 'si::nani 'inline-always))
+
+
 ;;LENGTH
  (push '((t) fixnum #.(flags rfa)"length(#0)")
    (get 'length 'inline-always))
 (push '(((array t)) fixnum #.(flags rfa)"(#0)->v.v_fillp")
+   (get 'length 'inline-unsafe))
+(push '(((array fixnum)) fixnum #.(flags rfa)"(#0)->v.v_fillp")
    (get 'length 'inline-unsafe))
 (push '((string) fixnum #.(flags rfa)"(#0)->v.v_fillp")
    (get 'length 'inline-unsafe))

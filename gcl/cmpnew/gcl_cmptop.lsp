@@ -434,7 +434,7 @@
        (declare (object fname))
        (setq lambda-expr (c1lambda-expr (cdr args) fname))
   (or (eql setjmps *setjmps*) (setf (info-volatile (cadr lambda-expr)) t))
-  (check-downward (info-referred-vars (cadr lambda-expr)))
+  (check-downward (cadr lambda-expr))
 
 ;;provide a simple way for the user to declare functions to
 ;;have fixed args without having to count them, and make mistakes.
@@ -487,10 +487,7 @@
 						long-float short-float))
 			       (eq (var-loc var) 'object)
 			       *c-gc* 
-				    (not (member var
-						      (info-changed-vars
-							(cadr lambda-expr))))))
-                                    
+			       (not (is-changed var (cadr lambda-expr)))))
 			 (unless bind
 				 (cmpwarn "Calls to ~a will be VERY SLOW. Recommend not to proclaim.  ~%;;The arg caused the problem. ~a"
 					  fname  (var-name var)))
@@ -701,7 +698,7 @@
 		*global-entries*))
 
     ;;; Local entry
-    (analyze-regs (info-referred-vars (cadr lambda-expr)) 0)
+    (analyze-regs (cadr lambda-expr) 0)
     (t3defun-aux 't3defun-local-entry
 		 (case (caddr inline-info)
 		   (fixnum 'return-fixnum)
@@ -712,11 +709,11 @@
 		 fname cfun lambda-expr sp inline-info
     ))
    ((vararg-p fname)
-    (analyze-regs (info-referred-vars (cadr lambda-expr)) 0)
+    (analyze-regs (cadr lambda-expr) 0)
     (t3defun-aux 't3defun-vararg 'return-object
 		 fname cfun lambda-expr sp))
    (t
-    (analyze-regs (info-referred-vars (cadr lambda-expr)) 2)
+    (analyze-regs (cadr lambda-expr) 2)
     (t3defun-aux 't3defun-normal 'return fname cfun lambda-expr sp)))
   
   (wt-downward-closure-macro cfun)
@@ -755,7 +752,7 @@
 	        (if *do-tail-recursion* (cons fname requireds) nil))
 	       (*unwind-exit* *unwind-exit*))
               (wt-nl1 "{	")
-               (assign-down-vars (info-referred-vars (cadr lambda-expr)) cfun
+               (assign-down-vars (cadr lambda-expr) cfun
 		  't3defun)
                 (wt " VMB" cm " VMS" cm " VMV" cm)
 
@@ -846,7 +843,7 @@
     (when is-var-arg	  (wt-nl "va_list ap;"))
     (wt-nl "int narg = VFUN_NARGS;")
 
-    (assign-down-vars (info-referred-vars (cadr lambda-expr)) cfun
+    (assign-down-vars (cadr lambda-expr) cfun
 		      't3defun)
     (wt " VMB" cm " VMS" cm " VMV" cm)
 
@@ -1101,7 +1098,7 @@
              (wt-nl1 "static void L" cfun "()")
              (wt-nl1 cfun "()"))
          (wt-nl1 "{" "register object *"  *volatile*"base=vs_base;")
-	 (assign-down-vars (info-referred-vars (cadr lambda-expr)) cfun
+	 (assign-down-vars (cadr lambda-expr) cfun
 			   't3defun)
          (wt-nl 
 		"register object *" *volatile*"sup=base+VM" *reservation-cmacro* ";")
@@ -1186,12 +1183,12 @@
    (t
     (remprop fname 'debug-prop)
     (let ((leng 0))
-      (dolist (va (info-referred-vars (second lambda-expr)))
+      (do-referred (va (second lambda-expr))
 	      (when (and (consp (var-ref va))
 			 (si::fixnump (cdr (var-ref va))))
 	    (setq leng (max leng (cdr (var-ref va))))))
       (setq locals (make-list (1+ leng)))
-      (dolist (va (info-referred-vars (second lambda-expr)))
+      (do-referred (va (second lambda-expr))
 	      (when (and (consp (var-ref va))  ;always fixnum ?
 			 (si::fixnump (cdr (var-ref va))))
 		    (setf (nth (cdr (var-ref va)) locals)
@@ -1207,28 +1204,27 @@
 ;;Checks the register slots of variables, and finds which
 ;;variables should be in registers, zero'ing the register slot
 ;;in the remaining.  Data and address variables are done separately.
-(defun analyze-regs (vars for-sup-base)
+(defun analyze-regs (info for-sup-base)
   (let ((addr-regs (- *free-address-registers* for-sup-base)))
   (cond ((zerop *free-data-registers*)
-	 (analyze-regs1 (remove-duplicates vars) addr-regs))
+	 (analyze-regs1 info addr-regs))
 	(t
-	 (let (addr data)
-	   (dolist (v vars)
-	     (cond ((member
-		     (var-type v)'(FIXNUM CHARACTER SHORT-FLOAT LONG-FLOAT)
-		     :test 'eq)
-		    (or (member v data) (push v data)))
-		   (t (or (member v addr :test 'eq) (push v data)))))
+	 (let ((addr (make-info))
+	       (data (make-info)))
+	   (do-referred (v info)
+	     (cond ((member (var-type v) '(FIXNUM CHARACTER SHORT-FLOAT LONG-FLOAT) :test #'eq)
+		    (push-referred v data))
+		   (t
+		    (push-referred v addr))))
 	   (analyze-regs1 addr addr-regs)
 	   (analyze-regs1 data *free-data-registers*))))))
 
-(defun analyze-regs1 (vars want )
+(defun analyze-regs1 (info want )
   (let ((tem 0)(real-min 3)(this-min 100000)(want want)(have 0))
     (declare (fixnum tem real-min this-min  want have))
-    (setq vars (remove-duplicates vars))
   (tagbody
    START
-   (dolist (v vars)
+   (do-referred (v info)
 	   (setq tem (var-register v))
 	   (cond ((>= tem real-min)
 		  (setq have (the fixnum (+ have 1)))
@@ -1237,7 +1233,7 @@
 		  (cond ((> have want) (go NEXT)))
 		  )))
     (cond ((< have want) (setq real-min (- real-min 1))))
-    (dolist (v vars)
+    (do-referred (v info)
 	    (cond ((< (the fixnum (var-register v))
 		      real-min)
 		   (setf (var-register v) 0))))
@@ -1333,7 +1329,7 @@
    (wt-comment "macro definition for " fname)
    (wt-nl1 "static void L" cfun "()")
    (wt-nl1 "{register object *" *volatile* "base=vs_base;")
-   (assign-down-vars (info-referred-vars (nth 4 macro-lambda)) cfun ;*dm-info*
+   (assign-down-vars (nth 4 macro-lambda) cfun ;*dm-info*
 		     't3defun)
    (wt-nl "register object *"*volatile* "sup=base+VM" *reservation-cmacro* ";")
    (wt " VC" *reservation-cmacro*)
@@ -1653,7 +1649,7 @@
   (wt-comment "local dc function " (if (fun-name fun) (fun-name fun) nil))
   (wt-nl1 "static void " (if closure-p "LC" "L") (fun-cfun fun) "(")
   (wt "base0" (if requireds "," ""))
-  (analyze-regs (info-referred-vars (cadr lambda-expr)) 2)
+  (analyze-regs (cadr lambda-expr) 2)
   (wt-requireds (caaddr lambda-expr) nil) ;;nil = arg types all t
   (wt "register object *" *volatile* "base0;")
   (let-pass3
@@ -1666,7 +1662,7 @@
    (setq cm *reservation-cmacro*)
        (wt-nl1 "{")
        (assign-down-vars
-	(info-referred-vars (cadr lambda-expr)) (fun-cfun fun) 't3local-dcfun)
+	(cadr lambda-expr) (fun-cfun fun) 't3local-dcfun)
         (wt-nl  "VMB" cm " VMS" cm " VMV" cm )
 	(when *compiler-push-events* (wt-nl "ihs_check;"))
 	(c2expr (caddr (cddr lambda-expr)))
@@ -1700,7 +1696,7 @@
   (wt-nl1  "register object ")
   (dotimes* (n level (wt "*"*volatile*"base" n ";"))
 	    (wt "*"*volatile*"base" n ","))
-  (analyze-regs (info-referred-vars (cadr lambda-expr)) 2)
+  (analyze-regs (cadr lambda-expr) 2)
   (let-pass3
    ((*clink* clink) (*ccb-vs* ccb-vs)
                          ;; Use new optional parameter to initialize
@@ -1710,7 +1706,7 @@
     (*exit* 'return))
    (wt-nl1 "{	register object *"*volatile*"base=vs_base;")
    (wt-nl  "register object *" *volatile* "sup=base+VM" *reservation-cmacro* ";")
-   (assign-down-vars (info-referred-vars (cadr lambda-expr)) (fun-cfun fun)
+   (assign-down-vars (cadr lambda-expr) (fun-cfun fun)
 		     't3local-fun)
    (wt " VC" *reservation-cmacro*)
    (if *safe-compile*

@@ -35,19 +35,27 @@
 
 
 (defmacro time (form)
-  `(let (real-start real-end run-start run-end x)
+  `(let (real-start real-end run-start run-end child-run-start child-run-end
+		    (gbc-time-start (si::gbc-time)) gbc-time x)
      (setq real-start (get-internal-real-time))
-     (setq run-start (get-internal-run-time))
-     (setq x (multiple-value-list ,form))
-     (setq run-end (get-internal-run-time))
-     (setq real-end (get-internal-real-time))
-     (fresh-line *trace-output*)
-     (format *trace-output*
-             "real time : ~,3F secs~%~
-              run time  : ~,3F secs~%"
-             (/ (- real-end real-start) internal-time-units-per-second)
-             (/ (- run-end run-start) internal-time-units-per-second))
-     (values-list x)))
+     (multiple-value-bind (run-start child-run-start) (get-internal-run-time)
+       (si::gbc-time 0)
+       (setq x (multiple-value-list ,form))
+       (setq gbc-time (si::gbc-time))
+       (si::gbc-time (+ gbc-time-start gbc-time))
+       (multiple-value-bind (run-end child-run-end) (get-internal-run-time)
+	 (setq real-end (get-internal-real-time))
+	 (fresh-line *trace-output*)
+	 (format *trace-output*
+		 "real time       : ~10,3F secs~%~
+                  run-gbc time    : ~10,3F secs~%~
+                  child run time  : ~10,3F secs~%~
+                  gbc time        : ~10,3F secs~%"
+		 (/ (- real-end real-start) internal-time-units-per-second)
+		 (/ (- (- run-end run-start) gbc-time) internal-time-units-per-second)
+		 (/ (- child-run-end child-run-start) internal-time-units-per-second)
+		 (/ gbc-time internal-time-units-per-second))))
+       (values-list x)))
 
 
 (defconstant month-days-list '(31 28 31 30 31 30 31 31 30 31 30 31))
@@ -137,3 +145,10 @@ x))
 	   si::*gcl-minor-version*
 	   si::*gcl-extra-version*))
 
+(defun objlt (x y)
+  (declare (object x y))
+  (let ((x (si::address x)) (y (si::address y)))
+    (declare (fixnum x y))
+    (if (< y 0)
+	(if (< x 0) (< x y) t)
+      (if (< x 0) nil (< x y)))))

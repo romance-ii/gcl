@@ -25,29 +25,144 @@
 ;;;	( id  info-object . rest )
 ;;; for each form encountered.
 
- (defstruct info
-  (changed-vars nil)	;;; List of var-objects changed by the form.
-  (referred-vars nil)	;;; List of var-objects referred in the form.
+;;;  Change changed-vars and referrred-vars slots in info structure to arrays
+;;;  for dramatic compilation speed improvements when the number of variables
+;;;  are large, as occurs at present in running the random-int-form tester.
+;;;  20040320 CM
+
+
+(defmacro mia (x y) `(make-array ,x :adjustable t :fill-pointer ,y))
+(defmacro eql-not-nil (x y) `(and ,x (eql ,x ,y)))
+
+(defstruct (info (:copier old-copy-info))
   (type t)		;;; Type of the form.
   (sp-change nil)	;;; Whether execution of the form may change
 			;;; the value of a special variable *VS*.
   (volatile nil)	;;; whether there is a possible setjmp
-  )
+  (changed-array (mia 10 0))     ;;; List of var-objects changed by the form. 
+  (referred-array (mia 10 0)))	 ;;; List of var-objects referred in the form.
+
+(defun copy-array (array)
+  (declare ((vector t) array))
+  (let ((new-array (mia (the fixnum (array-total-size array)) (length array))))
+    (declare ((vector t) new-array))
+    (do ((i 0 (1+ i))) ((>= i (length array)) new-array)
+      (declare (fixnum i))
+      (setf (aref new-array i) (aref array i)))))
+
+(defun copy-info (info)
+  (let ((new-info (old-copy-info info)))
+    (setf (info-referred-array new-info)
+	  (copy-array (info-referred-array info)))
+    (setf (info-changed-array new-info)
+	  (copy-array (info-changed-array info)))    
+    new-info))
+
+(defun bsearchleq (x a i j le)
+  (declare (object x le) ((vector t) a) (fixnum i j))
+  (when (eql i j)
+    (return-from bsearchleq (if (or le (and (< i (length a)) (eq x (aref a i)))) i (length a))))
+  (let* ((k (the fixnum (+ i (the fixnum (ash (the fixnum (- j i) ) -1)))))
+	 (y (aref a k)))
+    (declare (fixnum k) (object y))
+    (cond ((si::objlt x y)
+	   (bsearchleq x a i k le))
+	  ((eq x y) k)
+	  (t (bsearchleq x a (1+ k) j le)))))
+
+(defun push-array (x ar s lin)
+  (declare  (object x lin) ((vector t) ar) (fixnum s) (ignore lin))
+;	 (j (if lin
+;		 (do ((k s (1+ k))) ((or (eql k (length ar)) (si::objlt x (aref ar k)) (eq x (aref ar k))) k)
+;		   (declare (fixnum k)))
+;		 (bsearchleq x ar s (length ar)))))
+  (let ((j (bsearchleq x ar s (length ar) t)))
+    (declare (fixnum j))
+    (when (and (< j (length ar)) (eq (aref ar j) x))
+	(return-from push-array -1))
+    (let ((ar (if (eql (length ar) (the fixnum (array-total-size ar)))
+		  (adjust-array ar (the fixnum (* 2 (length ar))))
+		ar)))
+      (declare ((vector t) ar))
+      (do ((i (length ar) (1- i))) ((<= i j))
+	(declare (fixnum i))
+	(setf (aref ar i) (aref ar (the fixnum (1- i)))))
+      (setf (aref ar j) x)
+      (setf (fill-pointer ar) (the fixnum (1+ (length ar))))
+      j)))
+
+
+(defmacro do-array ((v oar) &rest body)
+  (let ((count (gensym)) (ar (gensym)))
+    `(let* ((,ar ,oar))
+       (declare ((vector t) ,ar))
+       (do ((,count 0 (1+ ,count))) ((eql ,count (length ,ar)))
+	 (declare (fixnum ,count))
+	 (let ((,v (aref ,ar ,count)))
+	   ,@body)))))
+
+(defmacro in-array (v ar)
+  `(< (bsearchleq ,v ,ar 0 (length ,ar) nil) (length ,ar)))
+
+
+(defmacro do-referred ((v info) &rest body)
+  `(do-array (,v (info-referred-array ,info)) ,@body))
+(defmacro do-changed ((v info) &rest body)
+  `(do-array (,v (info-changed-array ,info)) ,@body))
+(defmacro is-referred (var info)
+  `(in-array ,var (info-referred-array ,info)))
+(defmacro is-changed (var info)
+  `(in-array ,var (info-changed-array ,info)))
+(defmacro push-referred (var info)
+  `(push-array ,var (info-referred-array ,info) 0 nil))
+(defmacro push-changed (var info)
+  `(push-array ,var (info-changed-array ,info) 0 nil))
+(defmacro push-referred-with-start (var info s lin)
+  `(push-array ,var (info-referred-array ,info) ,s ,lin))
+(defmacro push-changed-with-start (var info s lin)
+  `(push-array ,var (info-changed-array ,info) ,s ,lin))
+(defmacro changed-length (info)
+  `(length (info-changed-array ,info)))
+(defmacro referred-length (info)
+  `(length (info-referred-array ,info)))
+
 
 (defvar *info* (make-info))
+
+(defun mlin (x y)
+  (declare (fixnum x y))
+  (when (<= y 3)
+    (return-from mlin nil))
+  (let ((ly
+	 (do ((tl y (ash tl -1)) (k -1 (1+ k))) ((eql tl 0) k)
+	   (declare (fixnum k tl)))))
+    (declare (fixnum ly))
+    (let ((lyr (the fixnum (truncate y (the fixnum (1- ly))))))
+      (declare (fixnum lyr))
+      (> x (the fixnum (1+ lyr))))))
 
 (defun add-info (to-info from-info)
   ;; Allow nil from-info without error CM 20031030
   (unless from-info
     (return-from add-info to-info))
- (dolist (v (info-changed-vars from-info))
-   (unless (member v (info-changed-vars to-info))
-     (push v (info-changed-vars to-info))))
- (dolist (v (info-referred-vars from-info))
-   (unless (member v (info-referred-vars to-info))
-     (push v (info-referred-vars to-info))))
+  (let* ((s 0)
+	 (lin)); (mlin (changed-length from-info) (changed-length to-info))))
+    (declare (fixnum s) (object lin))
+    (do-changed (v from-info)
+		(let ((res (push-changed-with-start v to-info s lin)))
+		  (declare (fixnum res))
+		  (when (>= res 0)
+		    (setq s (the fixnum (1+ res)))))))
+  (let* ((s 0)
+	 (lin)); (mlin (referred-length from-info) (referred-length to-info))))
+    (declare (fixnum s) (object lin))
+    (do-referred (v from-info)
+		 (let ((res (push-referred-with-start v to-info s lin)))
+		   (declare (fixnum res))
+		   (when (>= res 0)
+		     (setq s (the fixnum (1+ res)))))))
   (when (info-sp-change from-info)
-        (setf (info-sp-change to-info) t))
+    (setf (info-sp-change to-info) t))
   ;; Return to-info, CM 20031030
   to-info)
 
@@ -55,11 +170,11 @@
   (case (var-kind var)
     ((LEXICAL FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT OBJECT)
      (dolist** (form forms)
-	       (when (member var (info-changed-vars (cadr form)))
+	       (when (is-changed var (cadr form))
                  (return-from args-info-changed-vars t))))
     (REPLACED nil)
     (t (dolist** (form forms nil)
-		 (when (or (member var (info-changed-vars (cadr form)))
+		 (when (or (is-changed var (cadr form))
 			   (info-sp-change (cadr form)))
                    (return-from args-info-changed-vars t)))))
   )
@@ -80,26 +195,27 @@
                        ;; see gcl_cmplet.lsp
    (cadr (var-loc x))))
 
-(defmacro eql-not-nil (x y) `(and ,x (eql ,x ,y)))
-
-(defun var-rep-eq (x y)
-  (or
-   (eq x y)
-   (let ((rx (var-rep-loc x)) (ry (var-rep-loc y)))
-     (or (eql-not-nil (var-loc x) ry)
-	 (eql-not-nil (var-loc y) rx)
-	 (eql-not-nil rx ry)))))
+(defun is-rep-referred (var info)
+  (let ((rx (var-rep-loc var)))
+    (do-referred (v info)
+     (let ((ry (var-rep-loc v)))
+       (when (or (eql-not-nil (var-loc var) ry)
+		 (eql-not-nil (var-loc v) rx)
+		 (eql-not-nil rx ry))
+	 (return-from is-rep-referred t))))))
 
 (defun args-info-referred-vars (var forms)
   (case (var-kind var)
         ((LEXICAL REPLACED FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT OBJECT)
          (dolist** (form forms nil)
-           (when (member var (info-referred-vars (cadr form)) :test #'var-rep-eq)
+           (when (or (is-referred var (cadr form))
+		     (is-rep-referred var (cadr form)))
                  (return-from args-info-referred-vars t))))
         (t (dolist** (form forms nil)
-             (when (or (member var (info-referred-vars (cadr form)) :test #'var-rep-eq)
-                       (info-sp-change (cadr form)))
-                   (return-from args-info-referred-vars t))))
+		     (when (or (is-referred var (cadr form))
+			       (is-rep-referred var (cadr form))
+			       (info-sp-change (cadr form)))
+		       (return-from args-info-referred-vars t))))
         ))
 
 ;;; Valid property names for open coded functions are:

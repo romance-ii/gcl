@@ -395,63 +395,83 @@
       (setq doc form))
      ((and (consp form) (eq (car form) 'declare))
       (dolist** (decl (cdr form))
-        (cmpck (or (not (consp decl)) (not (symbolp (car decl))))
-               "The declaration ~s is illegal." decl)
-        (case (car decl)
-          (special
-           (dolist** (var (cdr decl))
-             (cmpck (not (symbolp var))
-                    "The special declaration ~s contains a non-symbol ~s."
-                    decl var)
-             (push var ss)))
-          ((ignore ignorable)
-           (dolist** (var (cdr decl))
-             (cmpck (not (symbolp var))
-                    "The ignore declaration ~s contains a non-symbol ~s."
-                    decl var)
-             (when (eq (car decl) 'ignorable)
-               (push 'ignorable is))
-             (push var is)))
-          (type
-           (cmpck (endp (cdr decl))
-                  "The type declaration ~s is illegal." decl)
-           (let ((type (type-filter (cadr decl))))
-                (when type
-                      (dolist** (var (cddr decl))
-                        (cmpck (not (symbolp var))
-                          "The type declaration ~s contains a non-symbol ~s."
-                          decl var)
-                        (push (cons var type) ts)))))
-          (object
-           (dolist** (var (cdr decl))
-             (cmpck (not (symbolp var))
-                    "The object declaration ~s contains a non-symbol ~s."
-                    decl var)
-             (push (cons var 'object) ts)))
-	  (:register
-           (dolist** (var (cdr decl))
-             (cmpck (not (symbolp var))
-                    "The register declaration ~s contains a non-symbol ~s."
-                    decl var)
-	     (push (cons var  'register) ts)
-	     ))
-          ((fixnum character double-float short-float array atom bignum bit
-            bit-vector common compiled-function complex cons float hash-table
-            integer keyword list long-float nil null number package pathname
-            random-state ratio rational readtable sequence simple-array
-            simple-bit-vector simple-string simple-vector single-float
-            standard-char stream string string-char symbol t vector
-            signed-byte unsigned-byte :dynamic-extent)
-           (let ((type (if (eq (car decl) ':dynamic-extent) (car decl)
-			 (type-filter (car decl)))))
-                (when type
-                      (dolist** (var (cdr decl))
-                        (cmpck (not (symbolp var))
-                          "The type declaration ~s contains a non-symbol ~s."
-                          decl var)
-                        (push (cons var type) ts)))))
-          (otherwise (push decl others))
-          )))
+;;; Add support for 'cons' declarations, such as (declare ((vector t) foo))
+;;; 20040320 CM		
+		(cmpck (not (consp decl))
+		       "The declaration ~s is illegal." decl)
+		(let* ((dtype (car decl)))
+;; Can process user deftypes here in the future -- 20040318 CM
+;;		       (dft (and (symbolp dtype) (get dtype 'si::deftype-definition)))
+;;		       (dtype (or (and dft (funcall dft)) dtype)))
+		  (if (consp dtype)
+		    (let ((stype (car dtype)))
+		      (cmpck (or (not (symbolp stype)) (cdddr dtype)) "The declaration ~s is illegal." decl)
+		      (case stype
+			(satisfies
+			 (push decl others))
+			(otherwise
+			 (dolist** (var (cdr decl))
+				   (cmpck (not (symbolp var))
+					  "The type declaration ~s contains a non-symbol ~s."
+					  decl var)
+				   (push (cons var dtype) ts)))))
+		    (let ((stype dtype))
+		      (cmpck (not (symbolp stype)) "The declaration ~s is illegal." decl)
+		      (case stype
+			(special
+			 (dolist** (var (cdr decl))
+				   (cmpck (not (symbolp var))
+					  "The special declaration ~s contains a non-symbol ~s."
+					  decl var)
+				   (push var ss)))
+			((ignore ignorable)
+			 (dolist** (var (cdr decl))
+				   (cmpck (not (symbolp var))
+					  "The ignore declaration ~s contains a non-symbol ~s."
+					  decl var)
+				   (when (eq stype 'ignorable)
+				     (push 'ignorable is))
+				   (push var is)))
+			(type
+			 (cmpck (endp (cdr decl))
+				"The type declaration ~s is illegal." decl)
+			 (let ((type (type-filter (cadr decl))))
+			   (when type
+			     (dolist** (var (cddr decl))
+				       (cmpck (not (symbolp var))
+					      "The type declaration ~s contains a non-symbol ~s."
+					      decl var)
+				       (push (cons var type) ts)))))
+			(object
+			 (dolist** (var (cdr decl))
+				   (cmpck (not (symbolp var))
+					  "The object declaration ~s contains a non-symbol ~s."
+					  decl var)
+				   (push (cons var 'object) ts)))
+			(:register
+			 (dolist** (var (cdr decl))
+				   (cmpck (not (symbolp var))
+					  "The register declaration ~s contains a non-symbol ~s."
+					  decl var)
+				   (push (cons var  'register) ts)
+				   ))
+			((fixnum character double-float short-float array atom bignum bit
+				 bit-vector common compiled-function complex cons float hash-table
+				 integer keyword list long-float nil null number package pathname
+				 random-state ratio rational readtable sequence simple-array
+				 simple-bit-vector simple-string simple-vector single-float
+				 standard-char stream string string-char symbol t vector
+				 signed-byte unsigned-byte :dynamic-extent)
+			 (let ((type (if (eq stype ':dynamic-extent) stype
+				       (type-filter stype))))
+			   (when type
+			     (dolist** (var (cdr decl))
+				       (cmpck (not (symbolp var))
+					      "The type declaration ~s contains a non-symbol ~s."
+					      decl var)
+				       (push (cons var type) ts)))))
+			(otherwise
+			 (push decl others))))))))
      (t (return)))
     (pop body)
     )

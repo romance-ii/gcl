@@ -155,7 +155,7 @@
                  "The constant ~s is being assigned a value." var)
           (setq var (c1vref var))
           (push var vrefs)
-          (push (car var) (info-changed-vars info))
+          (push-changed (car var) info)
           )
   (list 'multiple-value-setq info (reverse vrefs) (c1expr* (cadr args) info))
   )

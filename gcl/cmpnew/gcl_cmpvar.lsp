@@ -120,7 +120,7 @@
 (defun c1var (name)
   (let ((info (make-info))
         (vref (c1vref name)))
-       (push (car vref) (info-referred-vars info))
+       (push-referred (car vref) info)
        (setf (info-type info) (var-type (car vref)))
        (list 'var info vref))
   )
@@ -181,7 +181,7 @@
 (defun c2location (loc) (unwind-exit loc nil 'single-value))
 
 
-(defun check-downward (vars &aux no-down )
+(defun check-downward (info &aux no-down )
   (dolist (v *local-functions*)
 	  (cond ((eq (car v) 'function)
 		 (setq no-down t)
@@ -191,13 +191,13 @@
 		 (return nil))))
   (setq *local-functions* nil)
   (cond (no-down
-	(dolist (var vars)
+	(do-referred (var info)
 		(if (eq (var-kind var) 'down)
 		    (setf (var-kind var) 'lexical))))))
 
 
-(defun assign-down-vars(vars cfun inside &aux (ind 0) )
-  (dolist (var vars)
+(defun assign-down-vars (info cfun inside &aux (ind 0) )
+  (do-referred (var info)
 	  (cond ((eq (var-kind var) 'down)
 		 ;;don't do twice since this list may have duplicates.
 		 (cond ((integerp (var-loc var) )
@@ -353,7 +353,7 @@
   (cmpck (not (symbolp name)) "The variable ~s is not a symbol." name)
   (cmpck (constantp name) "The constant ~s is being assigned a value." name)
   (setq name1 (c1vref name))
-  (push (car name1) (info-changed-vars info))
+  (push-changed (car name1) info)
   (setq form1 (c1expr form))
   (add-info info (cadr form1))
   (setq type (type-and (var-type (car name1)) (info-type (cadr form1))))
@@ -434,7 +434,7 @@
                    (setq form (list* (car form) info1 (cddr form)))))
             (push vref vrefs)
             (push form forms)
-            (push (car vref) (info-changed-vars info))
+            (push-changed (car vref) info)
             (add-info info (cadar forms)))
       )
   (list 'psetq info (reverse vrefs) (reverse forms))

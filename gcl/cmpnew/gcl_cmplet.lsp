@@ -119,8 +119,7 @@
                                 (member (var-kind var1)
                                         '(LEXICAL REPLACED OBJECT))
                                 (null (var-ref-ccb var1))
-                                (not (member var1 (info-changed-vars
-                                                   (cadr body)))))
+                                (not (is-changed  var1 (cadr body))))
                            (setf (var-kind var) 'REPLACED)
                            (setf (var-loc var)
                                  (case (var-kind var1)
@@ -233,8 +232,7 @@
                                         '(LEXICAL REPLACED OBJECT))
                                 (null (var-ref-ccb var1))
                                 (not (args-info-changed-vars var1 (cdr fl)))
-                                (not (member var1 (info-changed-vars
-                                                   (cadr body)))))
+                                (not (is-changed var1 (cadr body))))
                            (setf (var-kind var) 'REPLACED)
                            (setf (var-loc var)
                                  (case (var-kind var1)
@@ -284,12 +282,12 @@
 		   (the fixnum *register-min*))))
        (null (var-ref-ccb var))
        (not (eq (var-loc var) 'clb))
-       (not (member var (info-changed-vars (cadr body))))))
+       (not (is-changed var (cadr body)))))
 
 (defun can-be-replaced* (var body forms)
   (and (can-be-replaced var body)
        (dolist** (form forms t)
-         (when (member var (info-changed-vars (cadr form)))
+         (when (is-changed var (cadr form))
                (return nil)))
        ))
 

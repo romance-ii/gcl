@@ -99,8 +99,13 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * , -> # as sed separator
   * Fix find-class proclamation
   * Minor warning removals and fixups
+  * Binary searches through ordered arrays of referred and changed
+    variables for dramatic compiler performance improvement in the large
+    case -- support declarations and thereby optimizations of the form
+    (declare ((vector t) foo)), etc.
+  * Better 'time macro
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 02:48:31 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 17:41:19 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
