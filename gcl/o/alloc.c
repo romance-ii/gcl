@@ -939,7 +939,7 @@ DEFUN_NEW("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
   if  (npages  < 0)
     FEerror("Allocate requires positive argument.", 0);
   if (ncbpage > npages) { 
-    printf("Allocate contiguous %ld: %d already there pages",npages,ncbpage);
+/*     printf("Allocate contiguous %ld: %d already there pages",npages,ncbpage); */
     npages=ncbpage;
   }
   maxcbpage = npages;
