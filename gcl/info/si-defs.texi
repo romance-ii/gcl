@@ -902,18 +902,6 @@ for starting up an alternate top level loop.
 
 
 @end defvar
-@defun MULTIPLY-BIGNUM-STACK (n)
-Package:SI
-
-Increase the internal bignum stack by a factor of N.  Normally space on this
-stack is recovered after each complete lisp expression is evaluated.  However
-if you are dealing with large integers, you may need to use this function 
-to increase the stack.
-
-
-
-@end defun
-
 @defun RUN-PROCESS (string arglist)
 Package:SI
 

@@ -199,51 +199,51 @@ object_to_int(object x)
 	return(i);
 }
 
-/* static float */
-/* object_to_float(object x) */
-/* { */
-/* 	float f=0.0; */
+float 
+object_to_float(object x) 
+{ 
+	float f=0.0; 
 
-/* 	switch (type_of(x)) { */
-/* 	case t_character: */
-/* 		f = char_code(x);  break; */
-/* 	case t_fixnum: */
-/* 		f = fix(x);  break; */
-/* 	case t_bignum: */
-/* 	case t_ratio: */
-/* 		f = number_to_double(x);  break; */
-/* 	case t_shortfloat: */
-/* 		f = sf(x);  break; */
-/* 	case t_longfloat: */
-/* 		f = lf(x);  break; */
-/* 	default: */
-/* 		FEerror("~S cannot be coerce to a C float.", 1, x); */
-/* 	} */
-/* 	return(f); */
-/* } */
+	switch (type_of(x)) { 
+	case t_character: 
+		f = char_code(x);  break; 
+	case t_fixnum: 
+		f = fix(x);  break; 
+	case t_bignum: 
+	case t_ratio: 
+		f = number_to_double(x);  break; 
+	case t_shortfloat: 
+		f = sf(x);  break; 
+	case t_longfloat: 
+		f = lf(x);  break; 
+	default: 
+		FEerror("~S cannot be coerce to a C float.", 1, x); 
+	} 
+	return(f); 
+} 
 
-/* static double */
-/* object_to_double(object x) */
-/* { */
-/* 	double d=0.0; */
+double 
+object_to_double(object x) 
+{ 
+	double d=0.0; 
 
-/* 	switch (type_of(x)) { */
-/* 	case t_character: */
-/* 		d = char_code(x);  break; */
-/* 	case t_fixnum: */
-/* 		d = fix(x);  break; */
-/* 	case t_bignum: */
-/* 	case t_ratio: */
-/* 		d = number_to_double(x);  break; */
-/* 	case t_shortfloat: */
-/* 		d = sf(x);  break; */
-/* 	case t_longfloat: */
-/* 		d = lf(x);  break; */
-/* 	default: */
-/* 		FEerror("~S cannot be coerce to a C double.", 1, x); */
-/* 	} */
-/* 	return(d); */
-/* } */
+	switch (type_of(x)) { 
+	case t_character: 
+		d = char_code(x);  break; 
+	case t_fixnum: 
+		d = fix(x);  break; 
+	case t_bignum: 
+	case t_ratio: 
+		d = number_to_double(x);  break; 
+	case t_shortfloat: 
+		d = sf(x);  break; 
+	case t_longfloat: 
+		d = lf(x);  break; 
+	default: 
+		FEerror("~S cannot be coerce to a C double.", 1, x); 
+	} 
+	return(d); 
+} 
 
 /* this may allocate storage.  The user can prevent this
    by providing a string will fillpointer < length and
