@@ -2,8 +2,9 @@ gcl (2.6.0cvs-2) experimental; urgency=low
 
   * New files for macosx
   * rpm spec file added
+  * Merge changes from 2.5.4
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 18 Jul 2003 19:22:39 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 19 Jul 2003 19:38:44 -0400
 
 gcl (2.6.0cvs-1) experimental; urgency=low
 
@@ -27,6 +28,8 @@ gcl (2.5.4-1) unstable; urgency=low
   * Avoid use of windows.h types as macros.
   * New config.{sub,guess}
   * Windows installer updates from CVS HEAD
+  * fix potential longjmp clobber in read.d;add some windows files to
+    main makefile clean target;
 
  -- Camm Maguire <camm@enhanced.com>  Thu, 17 Jul 2003 17:49:35 +0000
 
