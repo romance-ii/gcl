@@ -31,8 +31,8 @@ static object LI9();
 #define VMS9  register object *sup=vs_top+8;vs_top=sup;
 #define VMV9 vs_reserve(8);
 #define VMR9(VMT9) vs_top=base ; return(VMT9);
-#define VC10 object  V208 ,V207 ,V206 ,V205 ,V204 ,V203 ,V202 ,V201 ,V200;
-#define VM10 7
+#define VC10 object  V253 ,V252 ,V251 ,V250 ,V249 ,V248 ,V247 ,V246 ,V245 ,V244 ,V243 ,V242 ,V241 ,V240 ,V239 ,V238 ,V237 ,V236 ,V235 ,V234 ,V233 ,V232 ,V231 ,V230 ,V229 ,V228 ,V227 ,V226 ,V225 ,V224 ,V223 ,V222 ,V221 ,V220 ,V219 ,V218 ,V217 ,V216 ,V215 ,V214 ,V213 ,V212 ,V211 ,V210 ,V209 ,V208 ,V207 ,V206 ,V205 ,V204 ,V203 ,V202 ,V201;
+#define VM10 8
 #define VM9 8
 #define VM8 10
 #define VM7 1
@@ -42,8 +42,8 @@ static object LI9();
 #define VM3 7
 #define VM2 3
 #define VM1 4
-static char * VVi[50]={
-#define Cdata VV[49]
+static char * VVi[67]={
+#define Cdata VV[66]
 (char *)(L1),
 (char *)(LI2),
 (char *)(L3),
@@ -56,11 +56,13 @@ static char * VVi[50]={
 (char *)(L10)
 };
 #define VV ((object *)VVi)
-static object  LnkTLI48() ;
-static object  (*LnkLI48)() = LnkTLI48;
-static object  LnkTLI47() ;
-static object  (*LnkLI47)() = LnkTLI47;
+static void LnkT65() ;
+static void (*Lnk65)() = LnkT65;
+static object  LnkTLI64() ;
+static object  (*LnkLI64)() = LnkTLI64;
+static object  LnkTLI63() ;
+static object  (*LnkLI63)() = LnkTLI63;
 static void LnkT15() ;
 static void (*Lnk15)() = LnkT15;
-static void LnkT46() ;
-static void (*Lnk46)() = LnkT46;
+static void LnkT62() ;
+static void (*Lnk62)() = LnkT62;

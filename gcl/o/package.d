@@ -500,10 +500,8 @@ L:
 			if (x == OBJNULL)
 				x = y;
 			else if (x != y)
-FEerror("Cannot unintern the shadowing symbol ~S~%\
-from ~S,~%\
-because ~S and ~S will cause~%\
-a name conflict.", 4, s, p, x, y);
+			  FEpackage_error(p,"Cannot unintern the shadowing symbol"\
+					  "as it will produce a name conflict");
 		}
 	}
 	delete_eq(s, &p->p.p_shadowings);
@@ -546,10 +544,7 @@ BEGIN:
 		x = find_symbol(s, l->c.c_car);
 		if (intern_flag && s != x &&
 		    !member_eq(x, l->c.c_car->p.p_shadowings))
-FEerror("Cannot export the symbol ~S~%\
-from ~S,~%\
-because it will cause a name conflict~%\
-in ~S.", 3, s, p, l->c.c_car);
+		  FEpackage_error(p,"Cannot export symbol as it will produce a name conflict.");
 	}
 	if (ip != NULL)
 		{delete_eq(s, ip);
@@ -567,7 +562,7 @@ object s, p;
 	int j;
 
 	if (p == keyword_package)
-		FEerror("Cannot unexport a symbol from the keyword.", 0);
+		FEpackage_error(p,"Cannot unexport a symbol from the keyword.");
 	x = find_symbol(s, p);
 	if (/* intern_flag != EXTERNAL || */ x != s)
 	  FEpackage_error(p,"Symbol not in package.");
@@ -594,10 +589,7 @@ object s, p;
 	x = find_symbol(s, p);
 	if (intern_flag) {
 		if (x != s)
-FEerror("Cannot import the symbol ~S~%\
-from ~S,~%\
-because there is already a symbol with the same name~%\
-in the package.", 2, s, p);
+		  FEpackage_error(p,"Cannot import symbol as it will produce a name conflict");
 		if (intern_flag == INTERNAL || intern_flag == EXTERNAL)
 			return;
 	}
@@ -675,7 +667,7 @@ object x0, p;
 			no_package(x0);
 	}
 	if (x == keyword_package)
-		FEerror("Cannot use keyword package.", 0);
+		FEpackage_error(x,"Cannot use keyword package.");
 	if (p == x)
 		return;
 	if (member_eq(x, p->p.p_uselist))
@@ -688,10 +680,8 @@ object x0, p;
 			if (intern_flag && l->c.c_car != y
 			    && ! member_eq(y,p->p.p_shadowings)
 			    )
-FEerror("Cannot use ~S~%\
-from ~S,~%\
-because ~S and ~S will cause~%\
-a name conflict.", 4, x, p, l->c.c_car, y);
+			  FEpackage_error(p,"Cannot use package as it will produce"
+					  " a name conflict");
 		}
 	p->p.p_uselist = make_cons(x, p->p.p_uselist);
 	x->p.p_usedbylist = make_cons(p, x->p.p_usedbylist);
@@ -726,7 +716,7 @@ delete_package(object n) {
       
       if (p->p_usedbylist!=Cnil) {
  	
-	/* 	FEpackage_error((object)p,"Package used by other packages."); */
+	FEpackage_error((object)p,"Package used by other packages.");
 	for (t=p->p_usedbylist;!endp(t);t=t->c.c_cdr)
 	  unuse_package(p,t->c.c_car);
       }
@@ -747,7 +737,7 @@ delete_package(object n) {
       
     }
   
-    /*   FEpackage_error(n,"No such pachage."); */
+    FEpackage_error(n,"No such pachage.");
 
   return(Cnil);
   

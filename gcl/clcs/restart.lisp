@@ -114,7 +114,9 @@
 				   *RESTART-CLUSTERS*)))
      ,@FORMS))
 
-(DEFUN FIND-RESTART (NAME)
+(DEFUN FIND-RESTART (NAME &optional condition)
+;FIXME add condition support
+  (declare (ignore condition))
   (DOLIST (RESTART-CLUSTER *RESTART-CLUSTERS*)
     (DOLIST (RESTART RESTART-CLUSTER)
       (WHEN (OR (EQ RESTART NAME) (EQ (RESTART-NAME RESTART) NAME))
