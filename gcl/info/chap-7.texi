@@ -1938,7 +1938,7 @@ The inheritance of methods is described in detail in
 * add-method::			
 * initialize-instance::		
 * class-name::			
-* (setf class-name)::		
+* setf class-name::		
 * class-of::			
 * unbound-slot::		
 * unbound-slot-instance::	
@@ -5836,7 +5836,7 @@ not interfere with the default behavior of @b{initialize-instance}.
 @ref{Rules for Initialization Arguments},
 @ref{Declaring the Validity of Initialization Arguments}
 
-@node class-name, (setf class-name), initialize-instance, Objects Dictionary
+@node class-name, setf class-name, initialize-instance, Objects Dictionary
 @subsection class-name                                      [Standard Generic Function]
 
 @subsubheading  Syntax::
@@ -5871,16 +5871,16 @@ For further discussion, see @ref{Classes}.
 
 The name of an anonymous @i{class} is @b{nil}.
 
-@node (setf class-name), class-of, class-name, Objects Dictionary
-@subsection (setf class-name)                               [Standard Generic Function]
+@node setf class-name, class-of, class-name, Objects Dictionary
+@subsection setf class-name                               [Standard Generic Function]
 
 @subsubheading  Syntax::
 
-@code{(setf class-name)}  @i{new-value class} @result{}  @i{new-value}
+@code{setf class-name}  @i{new-value class} @result{}  @i{new-value}
 
 @subsubheading  Method Signatures::
 
-@code{(setf class-name)}  @i{new-value @r{(}@i{class} @b{class}@r{)}}
+@code{setf class-name}  @i{new-value @r{(}@i{class} @b{class}@r{)}}
 
 @subsubheading  Arguments and Values::
 
@@ -5890,7 +5890,7 @@ The name of an anonymous @i{class} is @b{nil}.
 
 @subsubheading  Description::
 
-The generic function @t{(setf class-name)} sets the name of 
+The generic function @t{setf class-name} sets the name of 
 a @i{class} object.
 
 @subsubheading  See Also::
@@ -5900,7 +5900,7 @@ a @i{class} object.
 @i{proper name},
 @ref{Classes}
 
-@node class-of, unbound-slot, (setf class-name), Objects Dictionary
+@node class-of, unbound-slot, setf class-name, Objects Dictionary
 @subsection class-of                                                         [Function]
 
 @code{class-of}  @i{object} @result{}  @i{class}

@@ -74,8 +74,9 @@ gclcvs (2.7.0-16) unstable; urgency=low
   * Some FreeBSD cleanups
   * Preliminary gprof profiling support
   * Rework html documentation generation and installation
+  * Remove parentheses from setf class-name info node in chap-7.texi
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 30 Dec 2003 16:48:56 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 30 Dec 2003 16:50:01 +0000
 
 gclcvs (2.7.0-15) unstable; urgency=low
 
