@@ -584,6 +584,11 @@ if test -d "${TCL_CONFIG_PREFIX}"  ; then true ; else
 rm -f conftest.tcl
 cat >> conftest.tcl <<EOF
 [
+set dir [set tcl_library]
+if { [file exists [file join [set dir] tclConfig.sh]] } {
+      puts  [set dir]
+      exit	
+  }
 set dir [file dirname [set tcl_library]]
 if { [file exists [file join [set dir] tclConfig.sh]] } {
       puts  [set dir]
@@ -592,8 +597,8 @@ if { [file exists [file join [set dir] tclConfig.sh]] } {
 EOF
 cp conftest.tcl foo.tcl
 
-AC_CHECK_PROG(TCLSH,tclsh,tclsh)
-AC_CHECK_PROG(TCLSH,tclsh8.0,tclsh8.0,${TCLSH})
+AC_CHECK_PROG(TCLSH,tclsh,tclsh,${TCLSH})
+#AC_CHECK_PROG(TCLSH,tclsh8.0,tclsh8.0,${TCLSH})
 
 if test "${TCLSH}" = "" ; then true ; else
 TCL_CONFIG_PREFIX=`${TCLSH} < conftest.tcl`
@@ -608,6 +613,11 @@ else
 rm -f conftest.tcl
 cat >> conftest.tcl <<EOF
 [
+set dir [set tk_library]
+if { [file exists [file join [set dir] tkConfig.sh]] } {
+      puts  [set dir]
+      exit
+  }
 set dir [file dirname [set tk_library]]
 if { [file exists [file join [set dir] tkConfig.sh]] } {
       puts  [set dir]
@@ -616,8 +626,8 @@ exit 0
 ]
 EOF
 cp conftest.tcl foo.tcl
-AC_CHECK_PROG(TKSH,wish,wish)
-AC_CHECK_PROG(TKSH,wish8.0,wish8.0,${TKSH})
+AC_CHECK_PROG(TKSH,wish,wish,${TKSH})
+#AC_CHECK_PROG(TKSH,wish8.0,wish8.0,${TKSH})
 if test "${TKSH}" = "" ; then true ; else
 TK_CONFIG_PREFIX=`${TKSH} < conftest.tcl`
 fi
