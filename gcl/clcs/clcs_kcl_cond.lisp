@@ -100,7 +100,7 @@
     ("FEinvalid_function" :invalid-function "~S is invalid as a function."
      internal-type-error :datum :expected-type) ; |obj|
     ("FEinvalid_variable" :invalid-variable "~S is an invalid variable."
-     internal-program-error) ; |obj|
+     internal-simple-program-error ) ; |obj|
     ("check_arg_failed" :too-few-arguments "~S [or a callee] requires ~R argument~:p,~%\
 but only ~R ~:*~[were~;was~:;were~] supplied."
      internal-simple-program-error) ; |<function>| |n| |top - base|
@@ -134,6 +134,8 @@ but only ~R ~:*~[were~;was~:;were~] supplied."
     ("open_stream" :error "Cannot append to the file ~A."
      internal-simple-file-error :pathname)
     ("open_stream" :error "~S is an illegal IF-EXISTS option."
+     internal-simple-control-error)
+    ("control error" :control-error "control error"
      internal-simple-control-error)
     ("close_stream" :error "Cannot close the standard output."
      internal-simple-stream-error) ; no stream here!!
