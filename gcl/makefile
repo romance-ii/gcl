@@ -120,7 +120,7 @@ LISP_LIB=cmpnew/collectfn.o lsp/gprof.lsp lsp/info.o lsp/profile.lsp lsp/export.
 install-command:
 	rm -f $(DESTDIR)$(prefix)/bin/gcl
 	(echo '#!/bin/sh' ; \
-	if gcc --version | grep -q mingw ; then echo "export C_INCLUDE_PATH=`echo $$INSTALL_LIB_DIR`/h"; else echo "export C_INCLUDE_PATH=$(INSTALL_LIB_DIR)/h:\$$C_INCLUDE_PATH"; fi ;\
+	if gcc --version | grep -q -i mingw ; then echo "export C_INCLUDE_PATH=`echo $$INSTALL_LIB_DIR`/h"; else echo "export C_INCLUDE_PATH=$(INSTALL_LIB_DIR)/h:\$$C_INCLUDE_PATH"; fi ;\
 	echo exec $(BINDIR)/$(FLISP)$(EXE) \\ ; \
 	echo '   -dir' $(INSTALL_LIB_DIR)/unixport/ \\ ; \
 	echo '   -libdir' $(INSTALL_LIB_DIR)/ \\ ; \
@@ -146,7 +146,7 @@ install-command:
 	 echo 'path %cd%\..\mingw\bin;%PATH%'; \
 	 echo "start %unixportdir%\saved_gcl.exe -dir %unixportdir% -libdir %libdir% -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9" ) > $(DESTDIR)$(prefix)/bin/gclm.bat ; fi
 	rm -f $(DESTDIR)$(prefix)/bin/gclfinal.bat
-	if gcc --version | grep -q mingw ; then (echo 'ECHO path %1\mingw\bin;%PATH% > gcli.bat'; \
+	if gcc --version | grep -q -i mingw ; then (echo 'ECHO path %1\mingw\bin;%PATH% > gcli.bat'; \
 	 echo "ECHO start %1\lib\gcl-2.5.0\unixport\saved_gcl.exe -dir %1\lib\gcl-2.5.0\unixport -libdir %1\lib\gcl-2.5.0 -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9 >> gcli.bat" ) > $(DESTDIR)$(prefix)/bin/gclfinal.bat ; fi
 
 install: 
@@ -175,10 +175,10 @@ install1:
 #	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../$(PORTDIR)/$(FLISP)$(EXE)) ; fi
 	if test "$(EMACS_SITE_LISP)" != "" ; then (cd elisp ; $(MAKE) install DESTDIR=$(DESTDIR)) ; fi
 	if test "$(INFO_DIR)" != "unknown"; then (cd info ; $(MAKE) ; $(MAKE) install DESTDIR=$(DESTDIR)) ; fi
-	if gcc --version | grep mingw ; then cp COPYING.LIB-2.0 readme-bin.mingw $(prefix) ; fi
-	if gcc --version | grep mingw ; then cp gcl.ico $(prefix)/bin ; fi
-	if gcc --version | grep mingw ; then rm -rf $(prefix)/install; mkdir $(prefix)/install ; cp windows/install.lsp $(prefix)/install ;fi
-	if gcc --version | grep mingw ; then mkdir $(prefix)/doc; cp info/*.html $(prefix)/doc ; fi
+	if gcc --version | grep -q -i mingw ; then cp COPYING.LIB-2.0 readme-bin.mingw $(prefix) ; fi
+	if gcc --version | grep -q -i mingw ; then cp gcl.ico $(prefix)/bin ; fi
+	if gcc --version | grep -q -i mingw ; then rm -rf $(prefix)/install; mkdir $(prefix)/install ; cp windows/install.lsp $(prefix)/install ;fi
+	if gcc --version | grep -q -i mingw ; then rm -rf $(prefix)/doc; mkdir $(prefix)/doc; cp info/*.html $(prefix)/doc ; fi
 
 clean:
 	(cd $(BINDIR); $(MAKE) clean)
