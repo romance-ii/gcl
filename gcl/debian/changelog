@@ -8,8 +8,9 @@ gclcvs (2.7.0-30) unstable; urgency=low
     profiling is compiled in
   * Allow sharp numbers to be bignums
   * lintian fix in string-match
+  * Improve gprof support
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  5 Aug 2004 22:21:50 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  5 Aug 2004 22:28:56 +0000
 
 gclcvs (2.7.0-29) unstable; urgency=low
 

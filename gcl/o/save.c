@@ -27,12 +27,23 @@ LFD(Lsave)(void)
 #endif	
 #endif
 
-#ifdef MEMORY_SAVE
-	MEMORY_SAVE(kcl_self,filename);
-#else	  
-	memory_save(kcl_self, filename);
-#endif	
+	if (raw_image) {
 
+	  raw_image=FALSE;
+#ifdef MEMORY_SAVE
+	  MEMORY_SAVE(kcl_self,filename);
+#else	  
+	  memory_save(kcl_self, filename);
+#endif	
+	  raw_image=TRUE;
+
+	} else {
+#ifdef MEMORY_SAVE
+	  MEMORY_SAVE(kcl_self,filename);
+#else	  
+	  memory_save(kcl_self, filename);
+#endif	
+	}
 	exit(0);
 	/*  no return  */
 }

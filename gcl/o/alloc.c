@@ -82,6 +82,7 @@ struct rlimit data_rlimit;
 #endif
 
 int reserve_pages_for_signal_handler =30;
+int hole_overrun=0;
 
 /* If  (n >= 0 ) return pointer to n pages starting at heap end,
    These must come from the hole, so if that is exhausted you have
@@ -120,7 +121,7 @@ eg to add 20 more do (si::set-hole-size %ld %d)\n...start over ", new_holepage, 
 			GBC(t_relocatable);
 #ifdef SGC
 			if (in_sgc)
-			  {sgc_start();
+			  {hole_overrun=1;sgc_start();hole_overrun=0;
 			   /* starting sgc can use up some pages
 			      and may move heap end, so start over
 			    */
@@ -304,6 +305,7 @@ opt_maxpage(struct typemanager *my_tm) {
   z/=(1+x-0.9*my_tm->tm_adjgbccnt);
   z*=(y-mmax_page)*mmax_page;
   z=sqrt(z);
+  my_tm->tm_opt_maxpage=(long)z>my_tm->tm_opt_maxpage ? (long)z : my_tm->tm_opt_maxpage;
 
   if (z<=mmax_page)
     return 0;
@@ -311,8 +313,8 @@ opt_maxpage(struct typemanager *my_tm) {
   r=((x-my_tm->tm_adjgbccnt)+ my_tm->tm_adjgbccnt*mmax_page/z)*(y-mmax_page+z);
   r/=x*y;
   if (sSAnotify_optimize_maximum_pagesA->s.s_dbind!=sLnil)
-    printf("[type %u max %lu(%lu) opt %u   y %u(%lu) gbcrat %f sav %f]\n",
-	   my_tm->tm_type,mmax_page,mro,(int)z,(int)y,tro,(my_tm->tm_adjgbccnt-1)/(1+x-0.9*my_tm->tm_adjgbccnt),r);
+    printf("[type %u max %lu(%lu) opt %lu   y %lu(%lu) gbcrat %f sav %f]\n",
+	   my_tm->tm_type,mmax_page,mro,(long)z,(long)y,tro,(my_tm->tm_adjgbccnt-1)/(1+x-0.9*my_tm->tm_adjgbccnt),r);
   if (r<=0.95) {
     my_tm->tm_adjgbccnt*=mmax_page/z;
     if (my_tm->tm_type==t_relocatable)
@@ -783,6 +785,7 @@ init_tm(enum type t, char *name, int elsize, int nelts, int sgc,int distinct) {
   tm_table[(int)t].tm_maxpage = maxpage;
   tm_table[(int)t].tm_gbccount = 0;
   tm_table[(int)t].tm_adjgbccnt = 0;
+  tm_table[(int)t].tm_opt_maxpage = 0;
   tm_table[(int)t].tm_distinct=distinct;
 #ifdef SGC	
   tm_table[(int)t].tm_sgc = sgc;
@@ -1206,18 +1209,57 @@ DEFUN_NEW("GET-HOLE-SIZE",object,fSget_hole_size,SI
 #ifdef GCL_GPROF
 
 static unsigned long start,end,gprof_on;
+static void *initial_monstartup_pointer;
+
+void
+gprof_cleanup(void) {
+
+  extern void _mcleanup(void);
+
+  if (initial_monstartup_pointer) {
+    _mcleanup();
+    gprof_on=0;
+  }
+
+  if (gprof_on) {
+
+    char b[PATH_MAX],b1[PATH_MAX];
+
+    if (!getwd(b))
+      FEerror("Cannot get working directory", 0);
+    if (chdir(P_tmpdir))
+      FEerror("Cannot change directory to tmpdir", 0);
+    _mcleanup();
+    if (snprintf(b1,sizeof(b1),"gmon.out.%u",getpid())<=0)
+      FEerror("Cannot write temporary gmon filename", 0);
+    if (rename("gmon.out",b1))
+      FEerror("Cannot rename gmon.out",0);
+    if (chdir(b))
+      FEerror("Cannot restore working directory", 0);
+    gprof_on=0;
+
+  }
+
+}
+    
+ 
 
 DEFUN_NEW("GPROF-START",object,fSgprof_start,SI
        ,0,0,NONE,OO,OO,OO,OO,(void),"")
 {
   extern void monstartup(unsigned long,unsigned long);
   extern void *_start;
+  static int n;
 
   if (!gprof_on) {
     start=start ? start : (unsigned long)&_start;
     end=end ? end : (unsigned long)core_end;
     monstartup(start,end);
     gprof_on=1;
+    if (!n && atexit(gprof_cleanup)) {
+      FEerror("Cannot setup gprof_cleanup on exit", 0);
+      n=1;
+    }
   }
 
   return Cnil;
@@ -1438,6 +1480,22 @@ malloc(size_t size) {
 	malloc_list->c.c_car = alloc_simple_string(size);
 
 	malloc_list->c.c_car->st.st_self = alloc_contblock(size);
+
+	/* FIXME: this is just to handle clean freeing of the
+	   monstartup memory allocated automatically on raw image
+	   startup.  In saved images, monstartup memory is only
+	   allocated with gprof-start. 20040804 CM*/
+#ifdef GCL_GPROF
+	{
+	  extern void *_start;
+
+	  if (!initflag && size > ((void *)&etext-(void *)&_start)
+	      && !initial_monstartup_pointer) 
+	    initial_monstartup_pointer=malloc_list->c.c_car->st.st_self;
+
+	}
+#endif
+	
 #ifdef SGC
 	perm_writable(malloc_list->c.c_car->st.st_self,size);
 #endif
@@ -1475,12 +1533,20 @@ free(void *ptr)
 #endif
 			(*p)->c.c_car->st.st_self = NULL;
 			*p = (*p)->c.c_cdr;
+#ifdef GCL_GPROF
+			if (initial_monstartup_pointer==ptr) {
+			  initial_monstartup_pointer=NULL;
+			  if (core_end-heap_end>=sizeof(ptr))
+			    *(void **)heap_end=ptr;
+			}
+#endif
 			return ;
 		}
 #ifdef NOFREE_ERR
 	return ;
 #else	
-	FEerror("free(3) error.",0);
+	if (raw_image==FALSE || core_end-heap_end<sizeof(ptr) || ptr!=*(void **)heap_end)
+	  FEerror("free(3) error.",0);
 	return;
 #endif	
 }

@@ -1782,3 +1782,8 @@ void sigaddset ( sigset_t *set, int n);
 int sigismember ( sigset_t *set, int n );
 int sigprocmask ( int how, const sigset_t *set, sigset_t *oldset );
 #endif
+
+#ifdef GCL_GPROF
+void
+gprof_cleanup(void);
+#endif

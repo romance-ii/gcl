@@ -72,6 +72,7 @@ int page_multiple        = 1;
 
 int    debug             = FALSE;		/* debug switch */
 int    initflag          = FALSE;		/* initialized flag */
+int    raw_image         = FALSE;		/* raw or saved image */
 
 int    stack_multiple    = 1;
 int    cssize            = 0;
@@ -286,6 +287,10 @@ main(int argc, char **argv, char **envp) {
 #ifdef SGC
     memprotect_test_reset();
 #endif
+#ifdef GCL_GPROF
+	if (atexit(gprof_cleanup))
+	  error("Cannot setup gprof_cleanup on exit");
+#endif
 
     if (initflag) {
         if (saving_system) {
@@ -361,6 +366,8 @@ main(int argc, char **argv, char **envp) {
 
     interrupt_enable = TRUE;
 
+    raw_image=TRUE;
+ 
     super_funcall(sStop_level);
 
     return 0;
@@ -856,8 +863,10 @@ FFN(siLsave_system)(void) {
     saving_system = TRUE;
   GBC(t_contiguous);
   
-  
-  
+#ifdef GCL_GPROF
+  gprof_cleanup();
+#endif
+    
 #if defined(BSD) || defined(ATT)  
   brk(core_end);
   /* printf( "(breaking at core_end = %x in main ,)",core_end); */
@@ -870,10 +879,10 @@ FFN(siLsave_system)(void) {
 /*  #ifdef AOSVS */
   
 /*  #endif */
-  cbgbccount = tm_table[t_contiguous].tm_adjgbccnt = 0;
-  rbgbccount = tm_table[t_relocatable].tm_adjgbccnt = 0;
+  cbgbccount = tm_table[t_contiguous].tm_adjgbccnt = tm_table[t_contiguous].tm_opt_maxpage = 0;
+  rbgbccount = tm_table[t_relocatable].tm_adjgbccnt = tm_table[t_relocatable].tm_opt_maxpage = 0;
   for (i = 0;  i < (int)t_end;  i++)
-    tm_table[i].tm_gbccount = tm_table[i].tm_adjgbccnt = 0;
+    tm_table[i].tm_gbccount = tm_table[i].tm_adjgbccnt = tm_table[i].tm_opt_maxpage = 0;
   Lsave();
   saving_system = FALSE;
   alloc_page(-(holepage+nrbpage));
@@ -927,6 +936,9 @@ init_main(void) {
 
 #ifdef GMP
   ADD_FEATURE("GMP");
+#endif	 
+#ifdef GCL_GPROF
+  ADD_FEATURE("GPROF");
 #endif	 
   
 #if defined ( UNIX ) && !defined ( _WIN32 )
