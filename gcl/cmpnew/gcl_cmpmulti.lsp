@@ -41,22 +41,33 @@
            (list 'multiple-value-call info funob args)))
   )
 
-(defun c2multiple-value-call (funob forms &aux (*vs* *vs*) loc top)
+(defun c2multiple-value-call (funob forms &aux (*vs* *vs*) loc top sup)
   (cond ((endp (cdr forms))
          (setq loc (save-funob funob))
          (let ((*value-to-go* 'top)) (c2expr* (car forms)))
          (c2funcall funob 'args-pushed loc))
         (t
          (setq top (next-cvar))
+         (setq sup (next-cvar))
          (setq loc (save-funob funob))
-         (wt-nl "{object *V" top "=base+" *vs* ";")
          (base-used)
-         (dolist** (form forms)
-           (let ((*value-to-go* 'top)) (c2expr-top* form top))
-           (wt-nl "while(vs_base<vs_top)")
-           (wt-nl "{V" top "[0]=vs_base[0];V" top "++;vs_base++;}"))
+	 ;; Add (sup .var) handling in unwind-exit -- in
+	 ;; c2multiple-value-prog1 and c2-multiple-value-call, apparently
+	 ;; alone, c2expr-top is used to evaluate arguments, presumably to
+	 ;; preserve certain states of the value stack for the purposes of
+	 ;; retrieving the final results.  c2exprt-top rebinds sup, and
+	 ;; vs_top in turn to the new sup, causing non-local exits to lose
+	 ;; the true top of the stack vital for subsequent function
+	 ;; evaluations.  We unwind this stack supremum variable change here
+	 ;; when necessary.  CM 20040301
+         (wt-nl "{object *V" top "=base+" *vs* ",*V" sup "=sup;")
+	 (dolist** (form forms)
+		   (let ((*value-to-go* 'top)
+			 (*unwind-exit* (cons (cons 'sup sup) *unwind-exit*)))
+		     (c2expr-top* form top))
+		   (wt-nl "while(vs_base<vs_top)")
+		   (wt-nl "{V" top "[0]=vs_base[0];V" top "++;vs_base++;}"))
          (wt-nl "vs_base=base+" *vs* ";vs_top=V" top ";")
-         (base-used)
          (c2funcall funob 'args-pushed loc)
          (wt "}")))
   )
@@ -71,17 +82,28 @@
 (defvar *top-data* nil)
 
 (defun c2multiple-value-prog1 (form forms &aux (base (next-cvar))
-                                               (top (next-cvar))
+				               (top (next-cvar))
+					       (sup (next-cvar))
 					       top-data)
   (let ((*value-to-go* 'top)
 	*top-data* )
     (c2expr* form)
-    (setq top-data *top-data*)
-    )
-  (wt-nl "{object *V" top "=vs_top;object *V" base "=vs_base; vs_base=V" top ";")
-  
+    (setq top-data *top-data*))
+  ;; Add (sup .var) handling in unwind-exit -- in
+  ;; c2multiple-value-prog1 and c2-multiple-value-call, apparently
+  ;; alone, c2expr-top is used to evaluate arguments, presumably to
+  ;; preserve certain states of the value stack for the purposes of
+  ;; retrieving the final results.  c2exprt-top rebinds sup, and
+  ;; vs_top in turn to the new sup, causing non-local exits to lose
+  ;; the true top of the stack vital for subsequent function
+  ;; evaluations.  We unwind this stack supremum variable change here
+  ;; when necessary.  CM 20040301
+  (wt-nl "{object *V" top "=vs_top,*V" base "=vs_base,*V" sup "=sup;")
+  (wt-nl "vs_base=V" top ";")
   (dolist** (form forms)
-    (let ((*value-to-go* 'trash)) (c2expr-top* form top)))
+	    (let ((*value-to-go* 'trash)
+		  (*unwind-exit* (cons (cons 'sup sup) *unwind-exit*)))
+	      (c2expr-top* form top)))
   (wt-nl "vs_base=V" base ";vs_top=V" top ";}")
   (unwind-exit 'fun-val nil (if top-data (car top-data)))
   )

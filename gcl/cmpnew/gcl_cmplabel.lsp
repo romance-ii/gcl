@@ -110,6 +110,19 @@
 	      (when (consp *inline-blocks*) (wt-nl "restore_avma; "))
 	      (wt-nl) (wt-go *exit*))
 	    (return))
+	   ;; Add (sup .var) handling in unwind-exit -- in
+	   ;; c2multiple-value-prog1 and c2-multiple-value-call, apparently
+	   ;; alone, c2expr-top is used to evaluate arguments, presumably to
+	   ;; preserve certain states of the value stack for the purposes of
+	   ;; retrieving the final results.  c2exprt-top rebinds sup, and
+	   ;; vs_top in turn to the new sup, causing non-local exits to lose
+	   ;; the true top of the stack vital for subsequent function
+	   ;; evaluations.  We unwind this stack supremum variable change here
+	   ;; when necessary.  CM 20040301
+	   ((eq (car ue) 'sup)
+	    (wt-nl "sup=V" (cdr ue) ";")
+	    (wt-nl)
+	    (reset-top))
 	   (t (setq jump-p t))))
     ((numberp ue) (setq bds-cvar ue bds-bind 0))
     ((eq ue 'bds-bind) (incf bds-bind))
@@ -156,7 +169,6 @@
 	      (if (equal (rep-type (car type.wt)) "long ") "(object)" "") 
 	      "V" cvar")}")
        (return)))
-		
     (t (baboon))
        ;;; Never reached
     ))
@@ -169,7 +181,20 @@
        ((consp ue)
         (when (eq ue exit)
               (unwind-bds bds-cvar bds-bind)
-              (return)))
+              (return))
+	;; Add (sup .var) handling in unwind-exit -- in
+	;; c2multiple-value-prog1 and c2-multiple-value-call, apparently
+	;; alone, c2expr-top is used to evaluate arguments, presumably to
+	;; preserve certain states of the value stack for the purposes of
+	;; retrieving the final results.  c2exprt-top rebinds sup, and
+	;; vs_top in turn to the new sup, causing non-local exits to lose
+	;; the true top of the stack vital for subsequent function
+	;; evaluations.  We unwind this stack supremum variable change here
+	;; when necessary.  CM 20040301
+	(when (eq (car ue) 'sup)
+	  (wt-nl "sup=V" (cdr ue) ";")
+	  (wt-nl)
+	  (reset-top)))
        ((numberp ue) (setq bds-cvar ue bds-bind 0))
        ((eq ue 'bds-bind) (incf bds-bind))
        ((member ue '(return return-object return-fixnum return-character
