@@ -430,9 +430,11 @@ Elf32_Word sh_type;
       FEerror("Unsupported ELF type R_386_GOTPC");
       break;
 
+#ifdef R_386_NUM
     case     R_386_NUM:
       FEerror("Unsupported ELF type R_386_NUM");
       break;
+#endif
 
 #else
     case     R_SPARC_WDISP30:
