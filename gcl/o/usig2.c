@@ -255,7 +255,7 @@ before_interrupt(struct save_for_interrupt *p, int allowed)
 #undef XS
 #undef XSI
 #define XS(a) *pp++ = (void *) (a);
-#define XSI(a) XS(a)
+#define XSI(a) *pp++ = (void *)(long)(a);
 /* #define XS(a) *pp++ =  * (void **) (&a);  */
 #include "usig2_aux.c"
    if ((pp - (&(p->save_objects)[0])) >= (sizeof(p->save_objects)/sizeof(void *)))

@@ -1728,7 +1728,7 @@ case $use in
 # def_static -- Function descriptors are currently realized at runtime in a non-reproducible fashion
 # on these architectures -- CM
 		ia64*)
-			def_dlopen="yes" ; def_statsysbfd="no" ; def_static="yes" ;;
+			def_dlopen="yes" ; def_statsysbfd="no" ; def_static="no" ;;
 		hppa*)
 			def_dlopen="yes" ; def_statsysbfd="no" def_pic="yes" ;;
 #		m68k*)

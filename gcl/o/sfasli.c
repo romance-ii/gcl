@@ -59,6 +59,9 @@ build_symbol_table_bfd(void) {
     if (!*q[u]->name)
       continue;
 
+    if (strncmp(q[u]->section->name,"*UND*",5))
+      continue;
+
     if ((c=(char *)strstr(q[u]->name,"@@"))) {
       *c=0;
       if (!(h=bfd_link_hash_lookup(link_info.hash,q[u]->name,MY_BFD_TRUE,MY_BFD_TRUE,MY_BFD_TRUE)))

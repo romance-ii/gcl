@@ -19,8 +19,12 @@ gclcvs (2.7.0-1) unstable; urgency=low
   * Fix static detection fr ia64; contblock size detection on arm
   * Fix gcc verion checking in gmp3 subconfigure, esp. for arm
   * Escape all sgc code with #ifdef SGC
+  * Fix to sfasli.c to avoid defining symbols in other than *UND*
+    sections
+  * Remove some 64 bit warnings
+  * Turn off def_static on ia64 for now -- its broken
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  5 Sep 2003 21:49:49 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat,  6 Sep 2003 17:31:52 +0000
 
 gcl (2.6.1-1) unstable; urgency=low
 
