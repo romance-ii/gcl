@@ -111,7 +111,8 @@ if (sigaltstack(&estack, 0) < 0)                       \
     perror("sigaltstack");                             \
 }
 
-#define SGC
+/* until the sgc/save problem can be fixed.  20050114 CM*/
+/* #define SGC */
 
 #define MPROTECT_ACTION_FLAGS (SA_SIGINFO | SA_RESTART)
 
