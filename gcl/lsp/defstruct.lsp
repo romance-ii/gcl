@@ -33,7 +33,7 @@
 
 
 
-(in-package 'system)
+;(in-package 'system)
 
 
 
@@ -300,10 +300,10 @@
                           (eq (car x) ',name)))
              `(defun ,predicate (x)
                      (do ((i ,name-offset (1- i))
-                          (y x (cdr y)))
-                         ((= i 0) (and (consp y) (eq (car y) ',name)))
+                          (z x (cdr z)))
+                         ((= i 0) (and (consp z) (eq (car z) ',name)))
 			 (declare (fixnum i))
-                       (unless (consp y) (return nil))))))
+                       (unless (consp z) (return nil))))))
         ((error "~S is an illegal structure type."))))
 
 

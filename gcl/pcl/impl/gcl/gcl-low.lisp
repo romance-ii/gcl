@@ -272,8 +272,14 @@ object set_cclosure (result_cc,value_cc,available_size)
 (defun structure-slotd-accessor-symbol (slotd)
   (second slotd))
 
-(defun structure-slotd-writer-function (slotd)
+;(defun structure-slotd-writer-function (slotd)
+;  (third slotd))
+
+(defun structure-slotd-reader-function (slotd)
   (third slotd))
+
+(defun structure-slotd-writer-function (slotd)
+  (fourth slotd))
 
 (defun renew-sys-files()
   ;; packages:

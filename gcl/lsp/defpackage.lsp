@@ -65,13 +65,17 @@
 ;;;
 ;;; -----------------------------------------------------------------
 
+
 (lisp:in-package :DEFPACKAGE)
 
 (export '(defpackage))
+;(provide :defpackage)
 
 (use-package :SLOOP)
+;(use-package :DEFPACKAGE)
 
 (proclaim '(declaration values arglist))
+
 
 ;#-gcl
 ;(eval-when (compile load eval)
@@ -241,6 +245,9 @@
 ;	 (or (get symbol ':package-documentation)
 ;	     (get (intern (string symbol) :keyword) ':package-documentation))
 ;       (values :do-it))))
+
+;(pushnew :defpackage *features*)
+;(unintern 'defpackage 'user)
 
 (provide :defpackage)
 (pushnew :defpackage *features*)

@@ -2,8 +2,16 @@ gcl (2.5.0.cvs20020625-56) unstable; urgency=high
 
   * ansi-test corrections; extra-libs option to LINK function; LINK doc
     change; subtypep and string changes to pass more tests
+  * Add method-combination and structure-object symbols for ansi;remove
+    unused variables in debug.lsp;remove in-package system from
+    defstruct.lsp;make-keyword and defmacro temporary function
+    placeholders in destructuring_bind.lsp;predlib changes to fix ansi-
+    test type errors;break-call takes 2 args (sys-proclaim.lisp);char
+    and char-set protected by string dimension not fillpointer in
+    string.d;fix bug in string.d:member_char for vector types;redefine
+    slot reader and writer functions in pcl/impl/gcl/gcl-low.lisp
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  3 Oct 2002 23:28:46 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sat,  5 Oct 2002 14:33:46 -0400
 
 gcl (2.5.0.cvs20020625-55) unstable; urgency=high
 

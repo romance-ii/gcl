@@ -387,7 +387,8 @@
   (setf (fill-pointer *break-point-vector*) 0)
   (setf *break-points* *break-point-vector*))
 
-(defun step-into (&optional (n 1))
+;(defun step-into (&optional (n 1))
+(defun step-into ()
   ;;FORM is the next form about to be evaluated.
   (or *break-points* (init-break-points))
   (setq *break-step* 'break-step-into)
@@ -737,7 +738,7 @@
   )
 
 
-(defun print-stack-frame (i auto-display ihs fun &optional line file env)
+(defun print-stack-frame (i auto-display ihs fun &optional line file)
   (when (and auto-display line)
     (format *debug-io* "~a:~a:0:beg~%" file line))
   (let  ((computing-args (computing-args-p ihs)))

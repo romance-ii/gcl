@@ -136,6 +136,7 @@
   (if (atom type)
       (setq tp type i nil)
       (setq tp (car type) i (cdr type)))
+  (if (eq tp 'structure-object) (setq tp 'structure))
   (let ((f (get tp 'type-predicate)))
     (when f (return-from typep (funcall f object))))
   (case tp
@@ -158,7 +159,7 @@
     (ratio (eq (type-of object) 'ratio))
     (standard-char
      (and (characterp object) (standard-char-p object)))
-    (string-char
+    ((base-char string-char)
      (and (characterp object) (string-char-p object)))
     (integer
      (and (integerp object) (in-interval-p object i)))
@@ -210,12 +211,12 @@
               (equal (array-element-type object) (best-array-element-type (car i))))
           (or (endp (cdr i)) (eq (cadr i) '*)
               (match-dimensions (array-dimensions object) (cadr i)))))
-    (t
+    (t 
      (cond ((setq tem (get tp 'si::s-data))
 	    (structure-subtype-p object tem))
-           ((get tp 'deftype-definition)
-            (typep object
-                   (apply (get tp 'deftype-definition) i)))))))
+           ((setq tem (get tp 'deftype-definition))
+	      (typep object
+		     (apply tem nil)))))))
 
 
 ;;; NORMALIZE-TYPE normalizes the type using the DEFTYPE definitions.
@@ -235,27 +236,29 @@
 ;;; The type may not be normalized.
 (defun known-type-p (type)
   (when (consp type) (setq type (car type)))
-  (if (or (member type
+  (if (or (equal (string type) "ERROR")
+	  (member type
                   '(t nil boolean null symbol keyword atom cons list sequence
 		      signed-char unsigned-char signed-short unsigned-short
-                    number integer bignum rational ratio float
-                    short-float single-float double-float long-float complex
-                    character standard-char string-char
-		    real 
-                    package stream pathname readtable hash-table random-state
-                    structure array simple-array function compiled-function
-		    arithmetic-error base-char base-string broadcast-stream 
-		    built-in-class cell-error class concatenated-stream condition 
-		    control-error division-by-zero echo-stream end-of-file error 
-		    extended-char file-error file-stream floating-point-inexact 
-		    floating-point-invalid-operation floating-point-overflow 
-		    floating-point-underflow generic-function logical-pathname method 
-		    package-error parse-error print-not-readable program-error 
-		    reader-error serious-condition simple-base-string simple-condition 
-		    simple-type-error simple-warning standard-class standard-generic-function 
-		    standard-method standard-object storage-condition stream-error 
-		    string-stream structure-class style-warning synonym-stream two-way-stream 
-		    type-error unbound-slot unbound-variable undefined-function warning ))
+		      number integer bignum rational ratio float method-combination
+		      short-float single-float double-float long-float complex
+		      character standard-char string-char real 
+		      package stream pathname readtable hash-table random-state
+		      structure array simple-array function compiled-function
+		      arithmetic-error base-char base-string broadcast-stream 
+		      built-in-class cell-error class concatenated-stream condition 
+		      control-error division-by-zero echo-stream end-of-file error 
+		      extended-char file-error file-stream floating-point-inexact 
+		      floating-point-invalid-operation floating-point-overflow 
+		      floating-point-underflow generic-function logical-pathname method 
+		      package-error parse-error print-not-readable program-error 
+		      reader-error serious-condition simple-base-string simple-condition 
+		      simple-type-error simple-warning standard-class 
+		      standard-generic-function standard-method standard-object
+		      storage-condition stream-error string-stream structure-class
+		      style-warning synonym-stream two-way-stream structure-object
+		      type-error unbound-slot unbound-variable undefined-function
+		      warning ))
           (get type 's-data))
       t
       nil))
@@ -263,8 +266,12 @@
 
 ;;; SUBTYPEP predicate.
 (defun subtypep (type1 type2 &aux t1 t2 i1 i2 ntp1 ntp2 tem)
-  (setq type1 (normalize-type type1))
-  (setq type2 (normalize-type type2))  
+  (setq t1 (normalize-type type1))
+  (setq type1 (if (eq (car t1) 'satisfies) (list type1) t1))
+  (setq t2 (normalize-type type2))
+  (setq type2 (if (eq (car t2) 'satisfies) (list type2) t2))
+;  (setq type1 (normalize-type type1))
+;  (setq type2 (normalize-type type2))  
   (when (equal type1 type2)
     (return-from subtypep (values t t)))
   (setq t1 (car type1) t2 (car type2))
@@ -310,10 +317,11 @@
        	((eq t1 't) (values nil ntp2))
        	((eq t1 'common) (values nil ntp2))
        	((eq t2 'list)
-       	 (cond ((member t1 '(null cons list)) (values t t))
+       	 (cond ((member t1 '(null cons)) (values t t))
        	       (t (values nil ntp1))))
        	((eq t2 'sequence)
-       	 (cond ((member t1 '(null cons list sequence base-string simple-base-string)) (values t t))
+       	 (cond ((member t1 '(null cons list base-string simple-base-string)) 
+		(values t t))
        	       ((or (eq t1 'simple-array) (eq t1 'array))
        	        (if (and (cdr i1) (consp (cadr i1)) (null (cdadr i1)))
        	            (values t t)
@@ -327,7 +335,7 @@
        	       (t (values nil nil))))
        	((eq t1 'atom) (values nil ntp2))
        	((eq t2 'symbol)
-       	 (if (member t1 '(symbol keyword boolean null))
+       	 (if (member t1 '(keyword boolean null))
        	     (values t t)
        	     (values nil ntp1)))
        	((eq t2 'function)
@@ -336,6 +344,119 @@
        	     (values nil ntp1)))
        	((eq t2 'generic-function)
        	 (if (eq t1 'standard-generic-function)
+       	     (values t t)
+       	     (values nil ntp1)))
+       	((eq t2 'boolean)
+       	 (if (eq t1 'null)
+       	     (values t t)
+       	     (values nil ntp1)))
+       	((eq t2 'standard-object)
+       	 (if (member t1 '(class built-in-class structure-class standard-class 
+				method standard-method))
+       	     (values t t)
+       	     (values nil ntp1)))
+       	((eq t2 'class)
+       	 (if (member t1 '(built-in-class structure-class standard-class ))
+       	     (values t t)
+       	     (values nil ntp1)))
+       	((eq t2 'condition)
+       	 (if (or (equal (string t1) "ERROR")
+		 (member t1 '(serious-condition error type-error simple-type-error
+					    parse-error cell-error unbound-slot
+					    warning style-warning storage-condition
+					    simple-warning unbound-variable control-error
+					    program-error undefined-function
+					    package-error arithmetic-error 
+					    division-by-zero simple-condition
+					    floating-point-invalid-operation
+					    floating-point-inexact 
+					    floating-point-overflow
+					    floating-point-underflow 
+					    file-error stream-error end-of-file
+					    print-not-readable
+					    reader-error)))
+       	     (values t t)
+       	     (values nil ntp1)))
+       	((eq t2 'serious-condition)
+       	 (if (or (equal (string t1) "ERROR")
+		 (member t1 '( error type-error simple-type-error
+				     parse-error cell-error unbound-slot
+				     storage-condition
+				     unbound-variable control-error
+				     program-error undefined-function
+				     package-error arithmetic-error 
+				     division-by-zero simple-type-error
+				     floating-point-invalid-operation
+				     floating-point-inexact
+				     floating-point-overflow
+				     floating-point-underflow 
+				     file-error stream-error end-of-file 
+				     print-not-readable
+				     reader-error)))
+       	     (values t t)
+       	     (values nil ntp1)))
+       	((eq t2 'type-error)
+       	 (if (eq t1 'simple-type-error)
+       	     (values t t)
+       	     (values nil ntp1)))
+       	((eq t2 'parse-error)
+       	 (if (eq t1 'reader-error)
+       	     (values t t)
+       	     (values nil ntp1)))
+       	((eq t2 'stream-error)
+       	 (if (member t1 '(reader-error end-of-file))
+       	     (values t t)
+       	     (values nil ntp1)))
+       	((or (equal (string t2) "ERROR") (eq t2 'error))
+       	 (if (member t1 '(simple-type-error type-error
+			  parse-error cell-error unbound-slot
+			  unbound-variable control-error
+			  program-error undefined-function
+			  package-error arithmetic-error 
+			  division-by-zero simple-type-error
+			  floating-point-invalid-operation
+			  floating-point-inexact
+			  floating-point-overflow
+			  floating-point-underflow 
+			  file-error stream-error end-of-file print-not-readable
+			  reader-error ))
+       	     (values t t)
+       	     (values nil ntp1)))
+       	((eq t2 'stream)
+       	 (if (member t1 '(broadcast-stream concatenated-stream echo-stream file-stream
+					   string-stream synonym-stream two-way-stream))
+       	     (values t t)
+       	     (values nil ntp1)))
+       	((eq t2 'pathname)
+       	 (if (eq t1 'logical-pathname)
+       	     (values t t)
+       	     (values nil ntp1)))
+       	((eq t2 'method)
+       	 (if (eq t1 'standard-method)
+       	     (values t t)
+       	     (values nil ntp1)))
+       	((eq t2 'simple-condition)
+       	 (if (member t1 '(simple-type-error simple-warning))
+       	     (values t t)
+       	     (values nil ntp1)))
+       	((eq t2 'simple-condition)
+       	 (if (member t1 '(simple-type-error simple-warning))
+       	     (values t t)
+       	     (values nil ntp1)))
+       	((eq t2 'cell-error)
+       	 (if (member t1 '(unbound-slot unbound-variable undefined-function))
+       	     (values t t)
+       	     (values nil ntp1)))
+       	((eq t2 'warning)
+       	 (if (member t1 '(style-warning simple-warning))
+       	     (values t t)
+       	     (values nil ntp1)))
+       	((eq t2 'arithmetic-error)
+       	 (if (member t1 '(division-by-zero
+			  floating-point-invalid-operation
+			  floating-point-inexact
+			  floating-point-overflow
+			  floating-point-underflow ))
        	     (values t t)
        	     (values nil ntp1)))
        	((eq t2 'keyword)
@@ -349,7 +470,7 @@
 	        (values t t))
 	       (t (values nil ntp1))))
        	((eq t1 'number) (values nil ntp2))
-       	((eq t2 'structure)
+       	((or (eq t2 'structure) (eq t2 'structure-object))
        	 (if (or (eq t1 'structure) (get t1 'si::s-data))
        	     (values t t)
        	     (values nil ntp1)))
@@ -363,9 +484,9 @@
 		 (t (values nil ntp2)))))
         ((eq t2 'real)
          (cond ((and
-		 (member t1 '(fixnum integer bignum float
+		 (member t1 '(fixnum integer bignum float short-float
 				     single-float double-float long-float
-				     real
+				     real ratio
 				     rational))
 		 (sub-interval-p i1 i2))
 		(values t t))
@@ -383,12 +504,11 @@
        	      (t (values nil ntp2))))
        	   (ratio
        	    (case t2
-       	      (ratio (values t t))
        	      (rational
        	       (if (sub-interval-p '(* *) i2) (values t t) (values nil t)))
        	      (t (values nil ntp2))))
        	   (standard-char
-	    (if (member t2 '(standard-char string-char character))
+	    (if (member t2 '(base-char string-char character))
 	        (values t t)
 	        (values nil ntp2)))
        	   (base-string
@@ -399,17 +519,21 @@
 	    (if (member t2 '(character string-char))
 	        (values t t)
 	        (values nil ntp2)))
+       	   (extended-char
+	    (if (member t2 '(character string-char))
+	        (values t t)
+	        (values nil ntp2)))
        	   (simple-base-string
 	    (if (member t2 '(string simple-string base-string vector
 				    simple-vector simple-array array sequence))
 	        (values t t)
 	        (values nil ntp2)))
 	   (string-char
-	    (if (member t2 '(string-char character))
+	    (if (eq t2 'character)
 	        (values t t)
 	        (values nil ntp2)))
 	   (character
-	    (if (member t2 '(string-char character))
+	    (if (eq t2 'string-char)
 	        (values t t)
 	        (values nil ntp2)))
 	   (integer

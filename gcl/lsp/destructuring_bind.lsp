@@ -68,6 +68,11 @@
 	 minimum
 	 maximum)))))
 
+(defun make-keyword (a) 
+	(error "Need to write make-keyword ~S" a))
+
+(defun defmacro-error (a b c) 
+	(error "Need to write defmacro-error ~S ~S ~S" a b c))
 
 (defun parse-defmacro-lambda-list
        (lambda-list arg-list-name name error-kind error-fun

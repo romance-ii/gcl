@@ -211,7 +211,7 @@ object x;
 	check_type_string(&s);
 	if (type_of(i) != t_fixnum)
 		illegal_index(s, i);
-	if ((j = fix(i)) < 0 /*|| j >= s->st.st_fillp*/)
+	if ((j = fix(i)) < 0 || j >= s->st.st_dim)
 		illegal_index(s, i);
 	@(return `code_char(s->ust.ust_self[j])`)
 @)
@@ -225,7 +225,7 @@ siLchar_set()
 	check_type_string(&vs_base[0]);
 	if (type_of(vs_base[1]) != t_fixnum)
 		illegal_index(vs_base[0], vs_base[1]);
-	if ((j = fix(vs_base[1])) < 0 /* || j >= vs_base[0]->st.st_fillp */)
+	if ((j = fix(vs_base[1])) < 0 || j >= vs_base[0]->st.st_dim)
 		illegal_index(vs_base[0], vs_base[1]);
 	check_type_character(&vs_base[2]);
 	vs_base[0]->st.st_self[j] = char_code(vs_base[2]);
@@ -435,7 +435,7 @@ object char_bag;
 
 	case t_vector:
 		for (i = 0, f = char_bag->v.v_fillp;  i < f;  i++) {
-			if (type_of(char_bag->v.v_self[i]) != t_character
+			if (type_of(char_bag->v.v_self[i]) == t_character
 			  && c == char_code(char_bag->v.v_self[i]))
 				return(TRUE);
 		}

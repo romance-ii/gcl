@@ -488,6 +488,7 @@ DEF_ORDINARY("PLUSP",sLplusp,LISP,"");
 
 #ifdef ANSI_COMMON_LISP
 /* New ansi types */
+DEF_ORDINARY("METHOD-COMBINATION",sLmethod_combination,LISP,"");
 DEF_ORDINARY("ARITHMETIC-ERROR",sLarithmetic_error,LISP,"");
 DEF_ORDINARY("BASE-CHAR",sLbase_char,LISP,"");
 DEF_ORDINARY("BASE-STRING",sLbase_string,LISP,"");
@@ -530,6 +531,7 @@ DEF_ORDINARY("STORAGE-CONDITION",sLstorage_condition,LISP,"");
 DEF_ORDINARY("STREAM-ERROR",sLstream_error,LISP,"");
 DEF_ORDINARY("STRING-STREAM",sLstring_stream,LISP,"");
 DEF_ORDINARY("STRUCTURE-CLASS",sLstructure_class,LISP,"");
+DEF_ORDINARY("STRUCTURE-OBJECT",sLstructure_object,LISP,"");
 DEF_ORDINARY("STYLE-WARNING",sLstyle_warning,LISP,"");
 DEF_ORDINARY("SYNONYM-STREAM",sLsynonym_stream,LISP,"");
 DEF_ORDINARY("TWO-WAY-STREAM",sLtwo_way_stream,LISP,"");
