@@ -1015,13 +1015,18 @@ LFD(Llcm)(void)
 		return;
 	}
 	for (i = 1;  i < narg;  i++) {
-		t = number_times(vs_base[0], vs_base[i]);
-		vs_push(t);
-		g = get_gcd(vs_base[0], vs_base[i]);
-		vs_push(g);
-		vs_base[0] = number_divide(t, g);
-		vs_popp;
-		vs_popp;
+	  if (number_zerop(vs_base[0]) ||
+	      number_zerop(vs_base[i]))
+	    vs_base[0]=small_fixnum(0);
+	  else {
+	    t = number_times(vs_base[0], vs_base[i]);
+	    vs_push(t);
+	    g = get_gcd(vs_base[0], vs_base[i]);
+	    vs_push(g);
+	    vs_base[0] = number_divide(t, g);
+	    vs_popp;
+	    vs_popp;
+	  }
 	}
 	if (number_minusp(vs_base[0]))
 		vs_base[0] = number_negate(vs_base[0]);
