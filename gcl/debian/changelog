@@ -13,8 +13,9 @@ gclcvs (2.7.0-37) unstable; urgency=low
   * expand type propation facility
   * Fix bug in fixnum_add on most-negative-fixnum arg
   * Fix incf/decf bug
+  * enhanced support for multiple value inlining
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 17 Dec 2004 21:31:34 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 21 Dec 2004 04:48:26 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 

@@ -237,7 +237,7 @@
    (get 'system:svset 'inline-unsafe))
 
 ;;*
-(si::putprop '* t 'result-type-from-bounded-args)
+(si::putprop '* 'super-range 'result-type-from-bounded-args)
 (push '((t t) t #.(flags ans)"number_times(#0,#1)")
    (get '* 'inline-always))
 (push '((fixnum-float fixnum-float) short-float #.(flags)"(double)(#0)*(double)(#1)")
@@ -253,7 +253,7 @@
    (get '* 'inline-always))
 
 ;;ASH
-(si::putprop 'ash '(fixnum (integer #.most-negative-fixnum #.(integer-length most-positive-fixnum))) 'result-type-from-bounded-args)
+(si::putprop 'ash 'ash-propagator 'result-type-from-bounded-args)
 (push '(((integer 0 0) t) fixnum #.(flags rfa)"0")
    (get 'ash 'inline-always))
 (push '((fixnum (integer 0 #.(integer-length most-positive-fixnum))) fixnum #.(flags)"((#0)<<(#1))")
@@ -266,7 +266,7 @@
 
 
 ;;+
-(si::putprop '+ t 'result-type-from-bounded-args)
+(si::putprop '+ 'super-range 'result-type-from-bounded-args)
 (push '((t t) t #.(flags ans)"number_plus(#0,#1)")
    (get '+ 'inline-always))
 (push '((fixnum-float fixnum-float) short-float #.(flags)"(double)(#0)+(double)(#1)")
@@ -282,7 +282,7 @@
    (get '+ 'inline-always))
 
 ;;-
-(si::putprop '- t 'result-type-from-bounded-args)
+(si::putprop '- 'super-range 'result-type-from-bounded-args)
 (push '((t) t #.(flags ans)"number_negate(#0)")
    (get '- 'inline-always))
 (push '(((integer #.(1+ most-negative-fixnum) #.most-positive-fixnum)) fixnum #.(flags)"-(#0)")
@@ -798,9 +798,17 @@ type_of(#0)==t_bitvector")
 ; (push '((fixnum fixnum) fixnum #.(flags rfa)
 ;  "@01;(#0>=0&&(#1)>0?(#0)/(#1):ifloor(#0,#1))")
 ;   (get 'floor 'inline-always))
- (push '((fixnum fixnum) fixnum #.(flags rfa set)
-  "@01;({fixnum _t=(#0)/(#1);((#1)<0  && (#0)<=0) || ((#1)>0 && (#0)>=0) || ((#1)*_t == (#0)) ? _t : _t - 1;})")
+(si::putprop 'floor 'floor-propagator 'result-type-from-bounded-args)
+(push '((fixnum fixnum) (values fixnum fixnum) #.(flags rfa set)
+	 "@01;({fixnum _t=(#0)/(#1);_t=((#0)<=0 && (#1)<=0) || ((#0)>=0 && (#1)>=0) || ((#1)*_t==(#0)) ? _t : _t-1;$1((#0)-_t*(#1))$ _t;})")
    (get 'floor 'inline-always))
+
+;;CEILING
+(si::putprop 'ceiling 'floor-propagator 'result-type-from-bounded-args)
+(push '((fixnum fixnum) (values fixnum fixnum) #.(flags rfa set)
+	 "@01;({fixnum _t=(#0)/(#1);_t=((#0)<=0 && (#1)>=0) || ((#0)>=0 && (#1)<=0) || ((#1)*_t==(#0)) ? _t : _t+1;$1((#0)-_t*(#1))$ _t;})")
+   (get 'ceiling 'inline-always))
+
 
 ;;FOURTH
  (push '((t) t #.(flags)"cadddr(#0)")
@@ -838,13 +846,13 @@ type_of(#0)==t_bitvector")
 
 
 ;;LENGTH
- (push '((t) fixnum #.(flags rfa)"length(#0)")
+ (push '((t) (integer 0 #.(ash most-positive-fixnum -2)) #.(flags rfa)"length(#0)")
    (get 'length 'inline-always))
-(push '(((array t)) fixnum #.(flags rfa)"(#0)->v.v_fillp")
+(push '(((array t)) (integer 0 #.(ash most-positive-fixnum -2)) #.(flags rfa)"(#0)->v.v_fillp")
    (get 'length 'inline-unsafe))
-(push '(((array fixnum)) fixnum #.(flags rfa)"(#0)->v.v_fillp")
+(push '(((array fixnum)) (integer 0 #.(ash most-positive-fixnum -2)) #.(flags rfa)"(#0)->v.v_fillp")
    (get 'length 'inline-unsafe))
-(push '((string) fixnum #.(flags rfa)"(#0)->v.v_fillp")
+(push '((string) (integer 0 #.(ash most-positive-fixnum -2)) #.(flags rfa)"(#0)->v.v_fillp")
    (get 'length 'inline-unsafe))
 
 ;;LIST
@@ -919,14 +927,14 @@ type_of(#0)==t_bitvector")
    (get 'make-list 'inline-always))
 
 ;;MAX
-(si::putprop 'max t 'result-type-from-bounded-args)
+(si::putprop 'max 'super-range 'result-type-from-bounded-args)
 (push '((t t) t #.(flags set)"@01;(number_compare(#0,#1)>=0?(#0):#1)")
    (get 'max 'inline-always))
  (push '((fixnum fixnum) fixnum #.(flags rfa set)"@01;((#0)>=(#1)?(#0):#1)")
    (get 'max 'inline-always))
 
 ;;MIN
-(si::putprop 'min t 'result-type-from-bounded-args)
+(si::putprop 'min 'super-range 'result-type-from-bounded-args)
 (push '((t t) t #.(flags set)"@01;(number_compare(#0,#1)<=0?(#0):#1)")
    (get 'min 'inline-always))
 (push '((fixnum fixnum) fixnum #.(flags rfa set)"@01;((#0)<=(#1)?(#0):#1)")
@@ -1117,7 +1125,8 @@ TRUNCATE_USE_C
 
 #+
 TRUNCATE_USE_C
-(push '((fixnum fixnum) fixnum #.(flags rfa)"(#0)/(#1)")
+(si::putprop 'truncate 'floor-propagator 'result-type-from-bounded-args)
+(push '((fixnum fixnum) (values fixnum fixnum) #.(flags rfa)"({fixnum _t=(#0)/(#1);$1(#0)-_t*(#1)$ _t;})")
    (get 'truncate 'inline-always))
 (push '((fixnum-float) fixnum #.(flags)"(fixnum)(#0)")
    (get 'truncate 'inline-always))

@@ -113,6 +113,11 @@
 			 (and (symbolp proc) proc)))))
 	(t t)))
 
+(defun coerce-to-one-value (type)
+  (if (and (consp type) (eq (car type) 'values))
+      (cadr type)
+    type))
+
 (defun binding-decls (bindings body star)
   (cond ((atom bindings) nil)
 	((atom (car bindings)) (binding-decls (cdr bindings) body star))
@@ -124,7 +129,7 @@
 		 (exp (and (consp (cadr bf)) (eq (caadr bf) 'the) (cadadr bf)))
 		 (frt (and (consp (cadr bf))
 			   (symbolp (caadr bf))
-			   (t-to-nil (fun-ret-type (cadr bf)))))
+			   (t-to-nil (coerce-to-one-value (fun-ret-type (cadr bf))))))
 		 (dec (var-is-declared var body))
 		 (chb (var-is-changed var body))
 		 (chc (and star (var-is-changed var (cdr bindings)))))

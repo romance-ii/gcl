@@ -157,6 +157,8 @@
           (push var vrefs)
           (push-changed (car var) info)
           )
+  (setf (info-type info) (type-and (info-type (cadar (c1args (car args) info)))
+				   (info-type (cadar (c1args (cdr args) info)))))
   (list 'multiple-value-setq info (reverse vrefs) (c1expr* (cadr args) info))
   )
 
@@ -203,12 +205,71 @@
 	(t (unless (eq *exit* 'return) (wt-nl) (reset-top))
 	   (unwind-exit (cons 'var (car vrefs))))))
 
+(defun form-to-values-type (form)
+  (if (and (consp form) (eq (car form) 'values)) form
+    (let ((frt (fun-ret-type form)))
+      (if (and (consp frt) (eq (car frt) 'values)) frt
+	(list 'values frt)))))
+
+(defun multiple-binding-decls (vars mv-form body &optional expn vls)
+  (cond ((and (not expn) (not vls) (not (eq (car mv-form) 'values)) (symbolp (car mv-form)))
+	 (let ((mv-form (form-to-values-type mv-form)))
+	   (multiple-binding-decls vars mv-form body t vls)))
+	((eq (car mv-form) 'values)
+	 (multiple-binding-decls vars (cdr mv-form) body expn t))
+	((or (null vars) (null mv-form)) nil)
+	(t
+	 (let ((var (car vars)))
+	   (let ((outer (and (symbolp (car mv-form)) (cdr (assoc (car mv-form) *decls*))))
+		 (inf (t-to-nil (var-is-inferred var body)))
+		 (exp (and (consp (car mv-form)) (eq (caar mv-form) 'the) (cadar mv-form)))
+		 (typ (and expn (t-to-nil (car mv-form))))
+		 (frt (and (consp (car mv-form))
+			   (symbolp (caar mv-form))
+			   (t-to-nil (coerce-to-one-value (fun-ret-type (car mv-form))))))
+		 (dec (var-is-declared var body))
+		 (chb (var-is-changed var body)))
+	     (let ((type (or exp typ frt inf outer))
+		   (ublk (not (or dec chb))))
+	       (if type
+		   (progn
+		     (cmpnote "var ~S is type ~S from ~a, ~a~%"
+			      var type (cond (exp "explicit declaration")
+					     (typ "deduced multiple-value function return type")
+					     (frt "deduced function return type")
+					     (inf "argument inference")
+					     (outer "outer scope"))
+			      (cond (dec "but is already declared")
+				    (chb "but is changed in body")
+				    (t "declaring")))
+		     (if ublk
+			 (cons (list type var)
+			       (multiple-binding-decls (cdr vars) (cdr mv-form) body expn vls))
+		       (multiple-binding-decls (cdr vars) (cdr mv-form) body expn vls)))
+		 (multiple-binding-decls (cdr vars) (cdr mv-form) body expn vls))))))))
+
+  
+
+
+(defun declare-multiple-value-bindings (args)
+  (let ((decls (multiple-binding-decls
+		(car args)
+		(recursively-cmp-macroexpand (cadr args))
+		(recursively-cmp-macroexpand (cddr args)))))
+    (if decls
+	(progn (cmpnote "multiple-value bindings ~S ~S declared ~S~%" (car args) (cadr args) decls)
+	       (cons (car args) (cons (cadr args) (cons (cons 'declare decls) (cddr args)))))
+      args)))
+
+
 (defun c1multiple-value-bind (args &aux (info (make-info))
                                    (vars nil) (vnames nil) init-form
                                    ss is ts body other-decls
                                    (*vars* *vars*) (*decls* *decls*))
   (when (or (endp args) (endp (cdr args)))
     (too-few-args 'multiple-value-bind 2 (length args)))
+
+  (setq args (declare-multiple-value-bindings args))
 
   (multiple-value-setq (body ss ts is other-decls) (c1body (cddr args) nil))
 

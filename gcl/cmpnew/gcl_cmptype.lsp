@@ -50,7 +50,8 @@
 (defun object-type (thing)
   (let ((type (type-of thing)))
     (case type
-      ((fixnum short-float long-float) type)
+      ((fixnum bignum) `(integer ,thing ,thing))
+      ((short-float long-float) type)
       ((string-char standard-char character) 'character)
       ((string bit-vector) type)
       (vector (list 'vector (array-element-type thing)))
@@ -123,17 +124,47 @@
                )))))
 
 (defun promoted-c-type (type)
-  (if (bounded-type type)
-      (cond ;((subtypep type 'signed-char) 'signed-char)
-	    ((subtypep type 'fixnum) 'fixnum)
-	    ((subtypep type 'integer) 'integer)
-	    (t  (error "Cannot promote type ~S to C type~%" type)))
-    type)))
+  (let ((type (coerce-to-one-value type)))
+    (if (bounded-type type)
+	(cond ;((subtypep type 'signed-char) 'signed-char)
+	 ((subtypep type 'fixnum) 'fixnum)
+	 ((subtypep type 'integer) 'integer)
+	 (t  (error "Cannot promote type ~S to C type~%" type)))
+      type)))
 
 (defun coerce-to-bounded-type (t1)
   (if (bounded-type t1) t1
     (let ((t1 (si::normalize-type t1)))
       (if (bounded-type t1) t1))))
+
+(defun ash-propagator (f t1 t2)
+  (and
+   (type>= 'fixnum t1)
+   (type>= '(integer #.most-negative-fixnum #.(integer-length most-positive-fixnum)) t2)
+   (super-range f t1 t2)))
+
+(defun floor-propagator (f t1 t2)
+  (let ((t1 (coerce-to-bounded-type t1))
+	(t2 (coerce-to-bounded-type t2)))
+    (and t2 (> (* (cadr t2) (caddr t2)) 0)
+	 (let ((sr (super-range f t1 t2)))
+	   (and sr
+		(list 'values sr
+		      (let ((outer (if (< (cadr t2) 0) (cadr t2) (caddr t2))))
+			(let ((a (cadr (multiple-value-list
+					(funcall (symbol-function f) 1 outer))))
+			      (b (cadr (multiple-value-list
+					(funcall (symbol-function f) -1 outer))))
+			      (c (cadr (multiple-value-list
+					(funcall (symbol-function f) (1+ outer) outer))))
+			      (d (cadr (multiple-value-list
+					(funcall (symbol-function f) (1- outer) outer)))))
+			  (let ((p (min a b c d)))
+			    (if (< p 0)
+				(list (car t2) p 0)
+			      (list (car t2) 0 (max a b c d))))))))))))
+
+
 
 (defun super-range (f ot1 ot2)
   (let ((t1 (coerce-to-bounded-type ot1))

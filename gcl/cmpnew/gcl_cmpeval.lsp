@@ -191,14 +191,10 @@
 
 (defun result-type-from-args (f args &aux tem)
   (when (and (setq tem (get f 'return-type))
-             (not (eq tem '*))
-	     (not (consp tem)))
+             (not (eq tem '*)))
+;	     (not (consp tem))) ;; propagate multiple-value types, CM 20041221
     (let* ((be (and (not (cddr args)) (get f 'result-type-from-bounded-args)))
-	   (ba (and be
-		    (or (atom be)
-			(and (type>= (nil-to-t (car be)) (car args))
-			     (type>= (nil-to-t (cadr be)) (cadr args))))
-		    (super-range f (car args) (cadr args)))))
+	   (ba (and be (funcall be f (car args) (cadr args)))))
       (when ba
 	(return-from result-type-from-args ba)))
     (dolist (v '(inline-always inline-unsafe))
@@ -482,83 +478,83 @@
         ((eq fname 'si:|#,|)
          (cmperr "Sharp-comma-macro was found in a bad place."))
         (t (let* ((info (make-info
-                        :sp-change (null (get fname 'no-sp-change))))
+			 :sp-change (null (get fname 'no-sp-change))))
                   (forms (c1args args info))) ;; info updated by args here
 	     (let ((return-type (get-return-type fname)))
-		  (when return-type
-			(if (equal return-type '(*))
-			    (setf return-type nil)
-			(setf (info-type info) return-type))))
-                (let ((arg-types (get-arg-types fname)))
+	       (when return-type
+		 (if (equal return-type '(*))
+		     (setf return-type nil)
+		   (setf (info-type info) return-type))))
+	     (let ((arg-types (get-arg-types fname)))
                      ;;; Add type information to the arguments.
-                     (when arg-types
-                       (do ((fl forms (cdr fl))
-                            (fl1 nil)
-                            (al args (cdr al)))
-                           ((endp fl)
-                            (setq forms (reverse fl1)))
-                           (cond ((endp arg-types) (push (car fl) fl1))
-                                 (t (push (and-form-type (car arg-types)
-                                                         (car fl)
-                                                         (car al))
-                                          fl1)
-                                    (pop arg-types))))))
-                (let ((arg-types (get fname 'arg-types)))
+	       (when arg-types
+		 (do ((fl forms (cdr fl))
+		      (fl1 nil)
+		      (al args (cdr al)))
+		     ((endp fl)
+		      (setq forms (reverse fl1)))
+		   (cond ((endp arg-types) (push (car fl) fl1))
+			 (t (push (and-form-type (car arg-types)
+						 (car fl)
+						 (car al))
+				  fl1)
+			    (pop arg-types))))))
+	     (let ((arg-types (get fname 'arg-types)))
                      ;;; Check argument types.
-                     (when arg-types
-                           (do ((fl forms (cdr fl))
-                                (al args (cdr al)))
-                               ((or (endp arg-types) (endp fl)))
-                               (check-form-type (car arg-types)
-                                                (car fl) (car al))
-                               (pop arg-types))))
-                (case fname
-                      (aref
-                       (let ((etype (info-type (cadar forms))))
-                            (when (or (and (eq etype 'string)
-                                           (setq etype 'character))
-                                      (and (consp etype)
-                                           (or (eq (car etype) 'array)
-                                               (eq (car etype) 'vector))
-                                           (setq etype (cadr etype))))
-                                  (setq etype
-                                        (type-and (info-type info) etype))
-                                  (when (null etype)
-				    (cmpwarn
-                                         "Type mismatch was found in ~s."
-                                         (cons fname args)))
-                                  (setf (info-type info) etype))))
-                      (si:aset
-                       (let ((etype (info-type (cadar forms))))
-                            (when (or (and (eq etype 'string)
-                                           (setq etype 'character))
-                                      (and (consp etype)
-                                           (or (eq (car etype) 'array)
-                                               (eq (car etype) 'vector))
-                                           (setq etype (cadr etype))))
-                                  (setq etype
-                                        (type-and (info-type info)
-                                          (type-and (info-type
-                                                     (cadar (last forms)))
-                                                    etype)))
-                                  (when (null etype)
-                                        (cmpwarn
-                                         "Type mismatch was found in ~s."
-                                         (cons fname args)))
-                                  (setf (info-type info) etype)
-                                  (setf (info-type (cadar (last forms)))
-                                        etype)
-                                  ))))
-		;; some functions can have result type deduced from
-		;; arg types.
-
-		(let ((tem (result-type-from-args fname
-						  (mapcar #'(lambda (x) (info-type (cadr x)))
-							  forms))))
-			  (when tem
-			    (setq tem (type-and tem (info-type info)))
-			    (setf (info-type info) tem)))
-		(list 'call-global info fname forms)))
+	       (when arg-types
+		 (do ((fl forms (cdr fl))
+		      (al args (cdr al)))
+		     ((or (endp arg-types) (endp fl)))
+		   (check-form-type (car arg-types)
+				    (car fl) (car al))
+		   (pop arg-types))))
+	     (case fname
+	       (aref
+		(let ((etype (info-type (cadar forms))))
+		  (when (or (and (eq etype 'string)
+				 (setq etype 'character))
+			    (and (consp etype)
+				 (or (eq (car etype) 'array)
+				     (eq (car etype) 'vector))
+				 (setq etype (cadr etype))))
+		    (setq etype
+			  (type-and (info-type info) etype))
+		    (when (null etype)
+		      (cmpwarn
+		       "Type mismatch was found in ~s."
+		       (cons fname args)))
+		    (setf (info-type info) etype))))
+	       (si:aset
+		(let ((etype (info-type (cadar forms))))
+		  (when (or (and (eq etype 'string)
+				 (setq etype 'character))
+			    (and (consp etype)
+				 (or (eq (car etype) 'array)
+				     (eq (car etype) 'vector))
+				 (setq etype (cadr etype))))
+		    (setq etype
+			  (type-and (info-type info)
+				    (type-and (info-type
+					       (cadar (last forms)))
+					      etype)))
+		    (when (null etype)
+		      (cmpwarn
+		       "Type mismatch was found in ~s."
+		       (cons fname args)))
+		    (setf (info-type info) etype)
+		    (setf (info-type (cadar (last forms)))
+			  etype)
+		    ))))
+	     ;; some functions can have result type deduced from
+	     ;; arg types.
+	     
+	     (let ((tem (result-type-from-args fname
+					       (mapcar #'(lambda (x) (info-type (cadr x)))
+						       forms))))
+	       (when tem
+		 (setq tem (type-and tem (info-type info)))
+		 (setf (info-type info) tem)))
+	     (list 'call-global info fname forms)))
         )
   )
 

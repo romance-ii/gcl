@@ -369,10 +369,11 @@
 					     (make-var
 					      :type type
 					      :kind
-					      (if (member type
-							  *special-types*)
-						  type 'object)
-						       :loc (cdar *c-vars*))
+					      (let ((type (promoted-c-type type)))
+						(if (member type
+							    *special-types*)
+						    type 'object))
+					      :loc (cdar *c-vars*))
 					     nil
 					     ))))
 			     (t  (list 'vs (vs-push))))))
@@ -449,10 +450,14 @@
                   )
                  (t (push loc1 locs1))))
               (push (car l) locs1)))))
-  (list (inline-type (cadr ii))
-        (caddr ii)
-        fun
-        locs)
+
+  (let ((others (and (stringp fun) (consp (cadr ii)) (eq 'values (caadr ii))
+		     (mapcar #'inline-type (cddadr ii)))))
+    (list (inline-type (cadr ii))
+	  (caddr ii)
+	  (if others (cons fun others) fun)
+	  locs
+	  ))
   )
 (defvar *inline-types*
   '((boolean . INLINE-COND)
@@ -589,9 +594,11 @@
 (si:putprop 'inline-long-float 'wt-inline-long-float 'wt-loc)
 (si:putprop 'inline-short-float 'wt-inline-short-float 'wt-loc)
 
-(defun wt-inline-loc (fun locs &aux (i 0) (max -1))
-       (declare (fixnum i max))
-  (cond ((stringp fun)
+(defun wt-inline-loc (fun locs &aux (i 0) (max -1) (maxv 0))
+  (declare (fixnum i max maxv))
+  (let* ((others (and (consp fun) (stringp (car fun)) (cdr fun)))
+	 (fun (if (and (consp fun) (stringp (car fun))) (car fun) fun)))
+       (cond ((stringp fun)
          (when (char= (char (the string fun) 0) #\@)
            (setq i 1)
            (do ()
@@ -629,11 +636,23 @@
 				  (cond ((>= n max) (setq  max n)))
 				  (wt-loc (nth n locs)))))
                          (incf i 2))
+			((char= char #\$)
+			 (let* ((n (- (char-code (char fun (1+ i))) #.(char-code #\1)))
+				(pos (position #\$ fun :start (+ i 2)))
+				(new-fun (subseq fun (+ i 2) pos))
+				(*value-to-go* (or (nth n *values-to-go*)
+						   (and (member *value-to-go* '(top return) :test #'eq)
+						       (list 'vs (vs-push)))
+						   'trash)))
+			   (set-loc (list (nth n others) (flags) new-fun locs))
+			   (setf maxv (max maxv (1+ n)))
+			   (setf i (1+ pos))))
                         (t
                          (princ char *compiler-output1*)
                          (incf i)))))
+	 (setq *values-to-go* (nthcdr maxv *values-to-go*))
          )
-        (t (apply fun locs))))
+        (t (apply fun locs)))))
 
 (defun wt-inline (side-effectp fun locs)
   (declare (ignore side-effectp))
