@@ -612,7 +612,7 @@ struct cclosure {		/*  compiled closure header  */
 struct closure {
 	FIRSTWORD; 
 	object	cl_name;       /* name */
-	object	(*cl_self)();  /* C start address of code */
+	int	(*cl_self)();  /* C start address of code */
 	object	cl_data;       /* To object holding VV vector */
 	int cl_argd;           /* description of args + number */
 	int cl_envdim;         /* length of the environment vector */
@@ -622,7 +622,7 @@ struct closure {
 struct sfun {
 		FIRSTWORD; 
 	object	sfn_name;       /* name */
-	object	(*sfn_self)();  /* C start address of code */
+	int	(*sfn_self)();  /* C start address of code */
 	object	sfn_data;       /* To object holding VV vector */
 	int sfn_argd;           /* description of args + number */
 

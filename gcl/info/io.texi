@@ -18,8 +18,7 @@ The current readtable.
 
 @end defvar
 
-@defun LOAD (filename
-       &key (verbose *load-verbose*) (print nil) (if-does-not-exist :error))
+@defun LOAD (filename &key (verbose *load-verbose*) (print nil) (if-does-not-exist :error))
 Package:LISP
 
 Loads the file named by FILENAME into GCL.
@@ -27,8 +26,7 @@ Loads the file named by FILENAME into GCL.
 
 @end defun
 
-@defun OPEN (filename &key (direction :input) (element-type 'string-char)
-                     (if-exists :error) (if-does-not-exist :error))
+@defun OPEN (filename &key (direction :input) (element-type 'string-char) (if-exists :error) (if-does-not-exist :error))
 Package:LISP
 
 Opens the file specified by FILENAME, which may be a string, a pathname,
@@ -95,8 +93,7 @@ Must be one of SHORT-FLOAT, SINGLE-FLOAT, DOUBLE-FLOAT, and LONG-FLOAT.
 
 @end defvar
 
-@defun READ-PRESERVING-WHITESPACE (&optional (stream *standard-input*) (eof-error-p t) (eof-value nil)
-                 (recursive-p nil))
+@defun READ-PRESERVING-WHITESPACE (&optional (stream *standard-input*) (eof-error-p t) (eof-value nil) (recursive-p nil))
 Package:LISP
 
 Reads an object from STREAM, preserving the whitespace that followed the
@@ -164,8 +161,7 @@ representation.  Returns OBJECT.  Equivalent to
 
 @end defun
 
-@defun SET-MACRO-CHARACTER (char function
-       &optional (non-terminating-p nil) (readtable *readtable*))
+@defun SET-MACRO-CHARACTER (char function &optional (non-terminating-p nil) (readtable *readtable*))
 Package:LISP
 
 Causes CHAR to be a macro character that, when seen by READ, causes FUNCTION
@@ -291,8 +287,7 @@ bindings and assignments all at once, just like LET and PSETQ do.
 
 @end deffn
 
-@defun READ-FROM-STRING (string &optional (eof-error-p t) (eof-value nil)
-              &key (start 0) (end (length string)) (preserve-whitespace nil))
+@defun READ-FROM-STRING (string &optional (eof-error-p t) (eof-value nil) &key (start 0) (end (length string)) (preserve-whitespace nil))
 Package:LISP
 
 Reads an object from STRING.
@@ -300,8 +295,7 @@ Reads an object from STRING.
 
 @end defun
 
-@defun WRITE-STRING (string &optional (stream *standard-output*)
-              &key (start 0) (end (length string)))
+@defun WRITE-STRING (string &optional (stream *standard-output*) &key (start 0) (end (length string)))
 Package:LISP
 
 Outputs STRING and returns it.
@@ -343,8 +337,7 @@ Returns an output stream which sends its output to all of the given streams.
 
 @end defun
 
-@defun READ-CHAR (&optional (stream *standard-input*) (eof-error-p t)
-                 (eof-value nil) (recursive-p nil))
+@defun READ-CHAR (&optional (stream *standard-input*) (eof-error-p t) (eof-value nil) (recursive-p nil))
 Package:LISP
 
 Reads a character from STREAM.
@@ -352,8 +345,7 @@ Reads a character from STREAM.
 
 @end defun
 
-@defun PEEK-CHAR (&optional (peek-type nil) (stream *standard-input*) (eof-error-p t)
-                 (eof-value nil) (recursive-p nil))
+@defun PEEK-CHAR (&optional (peek-type nil) (stream *standard-input*) (eof-error-p t) (eof-value nil) (recursive-p nil))
 Package:LISP
 
 Peeks at the next character in the input stream STREAM.
@@ -438,14 +430,7 @@ mechanism in the underlying operating system.
 
 @end defun
 
-@defun MAKE-PATHNAME (&key (defaults (parse-namestring ""
-                        (pathname-host *default-pathname-defaults*)))
-            (host (pathname-host defaults))
-            (device (pathname-device defaults))
-            (directory (pathname-directory defaults))
-            (name (pathname-name defaults))
-            (type (pathname-type defaults))
-            (version (pathname-version defaults)))
+@defun MAKE-PATHNAME (&key (defaults (parse-namestring "" (pathname-host *default-pathname-defaults*))) (host (pathname-host defaults)) (device (pathname-device defaults)) (directory (pathname-directory defaults)) (name (pathname-name defaults)) (type (pathname-type defaults)) (version (pathname-version defaults)))
 Package:LISP
 
 Create a pathname from HOST, DEVICE, DIRECTORY, NAME, TYPE and VERSION.
@@ -469,8 +454,7 @@ with "#:".
 
 @end defvar
 
-@defun READ-LINE (&optional (stream *standard-input*) (eof-error-p t)
-                 (eof-value nil) (recursive-p nil))
+@defun READ-LINE (&optional (stream *standard-input*) (eof-error-p t) (eof-value nil) (recursive-p nil))
 Package:LISP
 
 Returns a line of text read from STREAM as a string, discarding the newline
@@ -521,11 +505,7 @@ Input file name: /tmp/myfile
 
 @end defun
 
-@defun WRITE-TO-STRING (object &key (escape *print-escape*) (radix *print-radix*)
-                   (base *print-base*) (circle *print-circle*)
-                   (pretty *print-pretty*) (level *print-level*)
-                   (length *print-length*) (case *print-case*)
-                   (array *print-array*) (gensym *print-gensym*))
+@defun WRITE-TO-STRING (object &key (escape *print-escape*) (radix *print-radix*) (base *print-base*) (circle *print-circle*) (pretty *print-pretty*) (level *print-level*) (length *print-length*) (case *print-case*) (array *print-array*) (gensym *print-gensym*))
 Package:LISP
 
 Returns as a string the printed representation of OBJECT in the specified
@@ -550,8 +530,7 @@ Returns T if X is a readtable object; NIL otherwise.
 
 @end defun
 
-@defun READ (&optional (stream *standard-input*) (eof-error-p t) (eof-value nil)
-                 (recursivep nil))
+@defun READ (&optional (stream *standard-input*) (eof-error-p t) (eof-value nil) (recursivep nil))
 Package:LISP
 
 Reads in the next object from STREAM.
@@ -591,8 +570,7 @@ object.  Unlimited if NIL.
 
 @end defvar
 
-@defun SET-SYNTAX-FROM-CHAR (to-char from-char
-       &optional (to-readtable *readtable*) (from-readtable nil))
+@defun SET-SYNTAX-FROM-CHAR (to-char from-char &optional (to-readtable *readtable*) (from-readtable nil))
 Package:LISP
 
 Makes the syntax of TO-CHAR in TO-READTABLE be the same as the syntax of
@@ -706,8 +684,7 @@ Returns the device slot of PATHNAME.
 
 @end defun
 
-@defun READ-CHAR-NO-HANG (&optional (stream *standard-input*) (eof-error-p t)
-                 (eof-value nil) (recursive-p nil))
+@defun READ-CHAR-NO-HANG (&optional (stream *standard-input*) (eof-error-p t) (eof-value nil) (recursive-p nil))
 Package:LISP
 
 Returns the next character from STREAM if one is available; NIL otherwise.
@@ -732,8 +709,7 @@ Outputs CHAR and returns it.
 
 @end defun
 
-@defun PARSE-NAMESTRING (thing &optional host (defaults *default-pathname-defaults*)
-             &key (start 0) (end (length thing)) (junk-allowed nil))
+@defun PARSE-NAMESTRING (thing &optional host (defaults *default-pathname-defaults*) &key (start 0) (end (length thing)) (junk-allowed nil))
 Package:LISP
 
 Parses a string representation of a pathname into a pathname.  HOST
@@ -894,8 +870,7 @@ Equivalent to (WRITE-TO-STRING OBJECT :ESCAPE T).
 
 @end defun
 
-@defun MERGE-PATHNAMES (pathname
-       &optional (defaults *default-pathname-defaults*) default-version)
+@defun MERGE-PATHNAMES (pathname &optional (defaults *default-pathname-defaults*) default-version)
 Package:LISP
 
 Fills in unspecified slots of PATHNAME from DEFAULTS.  DEFAULT-VERSION
@@ -946,8 +921,7 @@ Returns the version slot of PATHNAME.
 
 @end defun
 
-@defun WRITE-LINE (string &optional (stream *standard-output*)
-              &key (start 0) (end (length string)))
+@defun WRITE-LINE (string &optional (stream *standard-output*) &key (start 0) (end (length string)))
 Package:LISP
 
 Outputs STRING and then outputs a newline character.  Returns STRING.
@@ -955,12 +929,7 @@ Outputs STRING and then outputs a newline character.  Returns STRING.
 
 @end defun
 
-@defun WRITE (object &key (stream *standard-output*) (escape *print-escape*)
-                   (radix *print-radix*) (base *print-base*)
-                   (circle *print-circle*) (pretty *print-pretty*)
-                   (level *print-level*) (length *print-length*)
-                   (case *print-case*) (array *print-array*)
-                   (gensym *print-gensym*))
+@defun WRITE (object &key (stream *standard-output*) (escape *print-escape*) (radix *print-radix*) (base *print-base*) (circle *print-circle*) (pretty *print-pretty*) (level *print-level*) (length *print-length*) (case *print-case*) (array *print-array*) (gensym *print-gensym*))
 Package:LISP
 
 Prints OBJECT in the specified mode.  See the variable docs of *PRINT-...*

@@ -1,0 +1,14 @@
+Document: gcl-tk-doc
+Title: GNU Common Lisp Tk Interface Documentation
+Author: W. Schelter
+Abstract: Documentation for Graphical Interface to GCL using TCL/Tk
+Section: Apps/Programming
+
+Format: DVI
+Files: /usr/share/doc/gcl-doc/gcl-tk*.dvi.gz /usr/share/doc/gcl-doc/gcl-tk*.dvi
+
+Format: HTML
+Index: /usr/share/doc/gcl-doc/gcl-tk.html/gcl-tk_toc.html
+Files: /usr/share/doc/gcl-doc/gcl-tk.html/gcl-tk*.html
+
+  

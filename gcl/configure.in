@@ -56,6 +56,7 @@ main()
   FILE *fp = fopen("conftest1","w");
   fprintf(fp,"0x%x",((unsigned int) b) & ~0xffffff);
   fclose(fp);
+  return 0;
 }],dbegin=`cat conftest1`,dbegin=0,dbegin=0)
 AC_DEFINE_UNQUOTED(DBEGIN,$dbegin \
 /* where data begins */
@@ -71,6 +72,7 @@ main()
   FILE *fp = fopen("conftest1","w");
   fprintf(fp,"%d",((int) &b));
   fclose(fp);
+  return 0;
 }],cstack_address=`cat conftest1`,cstack_address=0,cstack_address=0)
 AC_DEFINE_UNQUOTED(CSTACK_ADDRESS,$cstack_address \
 )
@@ -190,7 +192,22 @@ if test "$tcl_checkBoth" = 1; then
 fi
 AC_CHECK_FUNC(gethostbyname, , AC_CHECK_LIB(nsl, main, [LIBS="$LIBS -lnsl"]))
 
+AC_CHECK_LIB(readline,main,
+	AC_CHECK_LIB(ncurses,main,
+		AC_DEFINE(HAVE_READLINE) 
+		LIBS="$LIBS -lreadline -lncurses"
+		RL_OBJS=readline.o
+		RL_LIB=lsp/readline.o))
+
+AC_CHECK_HEADER(bfd.h,
+	AC_CHECK_LIB(bfd,bfd_init,
+		AC_DEFINE(HAVE_LIBBFD)
+		LIBS="$LIBS -lbfd -liberty"
+		,,-liberty))
+
 AC_SUBST(LIBS)
+AC_SUBST(RL_OBJS)
+AC_SUBST(RL_LIB)
 
 AC_MSG_CHECKING(For network code for nsocket.c)
 AC_TRY_LINK([
@@ -293,6 +310,33 @@ case $canonical in
 
      *86-*-linux*)
      use=386-linux;;
+
+     m68k-*-linux*)
+     use=m68k-linux;;
+
+     alpha-*-linux*)
+     use=alpha-linux;;
+
+     mips-*-linux*)
+     use=mips-linux;;
+
+     sparc-*-linux*)
+     use=sparc-linux;;
+
+     arm*-*-linux*)
+     use=arm-linux;;
+
+     s390-*-linux*)
+     use=s390-linux;;
+
+     ia64-*-linux*)
+     use=ia64-linux;;
+
+     hppa-*-linux*)
+     use=hppa-linux;;
+
+     powerpc-*-linux*)
+     use=powerpc-linux;;
 
      alpha-dec-osf)
      use=alpha-osf1;;
@@ -438,14 +482,14 @@ AC_MSG_RESULT(no))
 
 
 
-if test $use = "386-linux" ; then
+#if test $use = "386-linux" ; then
 	AC_CHECK_HEADERS(asm/sigcontext.h)
 	AC_CHECK_HEADERS(asm/signal.h)
         AC_TRY_COMPILE([#include <signal.h>
                         long code;  
        ],
        [
-        void *p = ((void *)(((struct sigcontext_struct *)(&code))->cr2));
+        void *p = ((void *)(((struct sigcontext_struct *)(&code))));
        ],
        [
         sigcontext_struct_works=1;
@@ -467,7 +511,7 @@ if test $use = "386-linux" ; then
              long code;
           ],
         [ 
-        void *p = ((void *)(((struct sigcontext *)(&code))->cr2));
+        void *p = ((void *)(((struct sigcontext *)(&code))));
         ],
         [
         sigcontext_works=1 ;
@@ -480,23 +524,23 @@ if test $use = "386-linux" ; then
 
 
        fi
-	echo 'foo() {}' > conftest1.c
-	$CC -S conftest1.c
-	use_underscore=0	
-	if fgrep _foo conftest1.s ; then use_underscore=1 ; fi
-	if test $use_underscore = 0 ; then
-            MPI_FILE=mpi-386_no_under.o
-          else
-	     MPI_FILE=mpi-386d.o
-        fi
-	AC_SUBST(MPI_FILE)
+#	echo 'foo() {}' > conftest1.c
+#	$CC -S conftest1.c
+#	use_underscore=0	
+#	if fgrep _foo conftest1.s ; then use_underscore=1 ; fi
+#	if test $use_underscore = 0 ; then
+#            MPI_FILE=mpi-386_no_under.o
+#          else
+#	     MPI_FILE=mpi-386d.o
+#        fi
+#	AC_SUBST(MPI_FILE)
 #       GCC=$CC
 #        if test -x  /usr/bin/i386-glibc20-linux-gcc ; then
 #          GCC=/usr/bin/i386-glibc20-linux-gcc
 #       fi
 #	AC_SUBST(GCC)
 
-fi
+#fi
 
 AC_PATH_PROG(EMACS,emacs)
 

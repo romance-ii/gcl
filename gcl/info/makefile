@@ -7,10 +7,10 @@ INFO_DIR=/usr/local/lib/info
 # use=386-linux
 
 # for main link of raw_gcl
-LIBS= -lm
+LIBS= -lm -lreadline -lncurses -lbfd -liberty
 
 #The multi precision library stuff
-MPFILES=$(MPDIR)/mpi-386_no_under.o $(MPDIR)/libmport.a
+MPFILES=$(MPDIR)/@MPI_FILE@ $(MPDIR)/libmport.a
 
 
 # root for the installation, eg /usr/local
@@ -29,12 +29,12 @@ EMACS_DEFAULT_EL=/usr/local/share/emacs/20.7/site-lisp/default.el
 
 # numerous TCL/TK variables culled from the tkConfig.sh and tclConfig.sh
 # if these are found.
-TK_CONFIG_PREFIX=/usr/lib/tk8.2
-TK_LIBRARY=/usr/lib/tk8.2/../tk8.2
-TCL_LIBRARY=/usr/lib/tk8.2/../tcl8.2
+TK_CONFIG_PREFIX=/usr/lib
+TK_LIBRARY=/usr/lib/tk8.2
+TCL_LIBRARY=/usr/lib/tcl8.2
 TK_XINCLUDES=-I/usr/X11R6/include
-TK_INCLUDE=-I/usr/include/tcl8.2
-TCL_INCLUDE=-I/usr/include/tcl8.2
+TK_INCLUDE=-I/usr/lib/../include
+TCL_INCLUDE=-I/usr/lib/../include
 TK_LIB_SPEC=-L/usr/lib -ltk8.2
 TK_BUILD_LIB_SPEC=-L/usr/lib -ltk8.2
 TK_XLIBSW=-L/usr/X11R6/lib -lX11
@@ -46,11 +46,11 @@ TCL_LIBS=-ldl  -lm
 NOTIFY=yes
 GCC=gcc
 
+RL_OBJS=readline.o
 
+RL_LIB=lsp/readline.o
 
-
-
-GCLDIR=/mnt/i19/f/debian/mm/gcl/gcl
+GCLDIR=/fix/f/debian/mm/gcl/gcl-2.5.0
 SHELL=/bin/sh
 MACHINE=386-linux
 
@@ -65,12 +65,12 @@ MACHINE=386-linux
 
 LBINDIR=/usr/local/bin
 
-#OFLAG	=  -O 
-OFLAG	=  -g
-LIBS	= -lm 
+#OFLAG	=  -g 
+OFLAG	=  -O 
+#LIBS	= -lm 
 
-#ODIR_DEBUG= -O4 
-ODIR_DEBUG= -g
+ODIR_DEBUG= -O4 
+#ODIR_DEBUG= -g
 
 # This CC string will be used for compilation of the system,
 # and also in the compiler::*cc* variable for later compilation of
@@ -113,7 +113,7 @@ MPFILES=${GMP_DIR}libgmp.a
 # end makedefs
 
 
-all: gcl-tk.info gcl-si.info # gcl-tk.dvi gcl-si.dvi gcl-si_toc.html gcl-tk_toc.html
+all: gcl-tk.info gcl-si.info gcl-tk.dvi gcl-si.dvi gcl-si_toc.html gcl-tk_toc.html
 
 .texi.info:
 	rm -f $*.*gz

@@ -1074,8 +1074,7 @@ Returns the complement of the logical OR of INTEGER1 and INTEGER2.
 
 @end defun
 
-@defun PARSE-INTEGER (string
-       &key (start 0) (end (length string)) (radix 10) (junk-allowed nil))
+@defun PARSE-INTEGER (string &key (start 0) (end (length string)) (radix 10) (junk-allowed nil))
 Package:LISP
 
 Parses STRING for an integer and returns it.

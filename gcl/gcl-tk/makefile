@@ -19,10 +19,10 @@ GCLIB  = ../o/gcllib.a
 # use=386-linux
 
 # for main link of raw_gcl
-LIBS= -lm
+LIBS= -lm -lreadline -lncurses -lbfd -liberty
 
 #The multi precision library stuff
-MPFILES=$(MPDIR)/mpi-386_no_under.o $(MPDIR)/libmport.a
+MPFILES=$(MPDIR)/@MPI_FILE@ $(MPDIR)/libmport.a
 
 
 # root for the installation, eg /usr/local
@@ -58,11 +58,11 @@ TCL_LIBS=-ldl  -lm
 NOTIFY=yes
 GCC=gcc
 
+RL_OBJS=readline.o
 
+RL_LIB=lsp/readline.o
 
-
-
-GCLDIR=/fix/f/debian/mm/gcl/gcl
+GCLDIR=/fix/f/debian/mm/gcl/gcl-2.5.0
 SHELL=/bin/sh
 MACHINE=386-linux
 
@@ -77,12 +77,12 @@ MACHINE=386-linux
 
 LBINDIR=/usr/local/bin
 
-#OFLAG	=  -O 
-OFLAG	=  -g
-LIBS	= -lm 
+#OFLAG	=  -g 
+OFLAG	=  -O 
+#LIBS	= -lm 
 
-#ODIR_DEBUG= -O4 
-ODIR_DEBUG= -g
+ODIR_DEBUG= -O4 
+#ODIR_DEBUG= -g
 
 # This CC string will be used for compilation of the system,
 # and also in the compiler::*cc* variable for later compilation of

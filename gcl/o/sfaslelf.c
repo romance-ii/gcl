@@ -15,6 +15,14 @@ License for more details.
 
 */
 
+/* for testing in standalone manner define STAND
+ You may then compile this file cc -g -DSTAND -DDEBUG -I../hn
+ a.out /tmp/foo.o /public/gcl/unixport/saved_kcl /public/gcl/unixport/
+ will write a /tmp/sfasltest file
+ which you can use comp to compare with one produced by ld.
+ */
+
+
 #ifndef __linux__
 #define ELF_TARGET_SPARC 1
 #endif
@@ -29,20 +37,77 @@ License for more details.
 
 #include <elf.h>
 
+#include "gclincl.h"
+#ifdef HAVE_LIBBFD
+#include <bfd.h>
+#endif
+
+#ifdef STAND
+#include "include.h"
+
+#define FEerror(a...) do {fprintf(stderr,##a);exit(1);} while (0)
+#endif
+
 static void relocate_symbols(Elf32_Sym *sym,int nsyms,int nscns, int *init_address_ptr);
 static void relocate(Elf32_Sym *symbol_table,Elf32_Rela
 *reloc_info,Elf32_Word sh_type);
 
 
 #ifdef STAND
-char *kcl_self;
+char *kcl_self,*system_directory;
 main(argc,argv)
      char *argv[];
 {char *file ;
  file = argv[1];
  kcl_self = argv[2];
+ system_directory = argv[3];
+/*   _fmode = O_BINARY; */
  fasload(file);
+ return 0;
 }
+
+node_compare(node1,node2)
+char *node1, *node2;
+{ return(strcmp( ((struct node *)node1)->string,
+	         ((struct node *)node2)->string));}
+
+
+
+read_special_symbols(symfile)
+char *symfile;
+{FILE *symin;
+ char *symbols;
+ int i,jj;
+ struct lsymbol_table tab;
+ if (!(symin=fopen(symfile,"r")))
+   {perror(symfile);exit(1);};
+ if(!fread((char *)&tab,sizeof(tab),1,symin))
+   FEerror("No header",0,0);
+ symbols=malloc(tab.tot_leng);
+ c_table.alloc_length=( (PTABLE_EXTRA+ tab.n_symbols));
+ (c_table.ptable) = (TABL *) malloc(sizeof(struct node) * c_table.alloc_length);
+ if (!(c_table.ptable)) {perror("could not allocate"); exit(1);};
+ i=0; c_table.length=tab.n_symbols;
+ while(i < tab.n_symbols)
+   { fread((char *)&jj,sizeof(int),1,symin);
+     (SYM_ADDRESS(c_table,i))=jj;
+     SYM_STRING(c_table,i)=symbols;
+ 
+     while( *(symbols++) =   getc(symin)) 
+       {;}
+/*     dprintf( name %s ,  SYM_STRING(c_table,i));
+     dprintf( addr %d , jj);
+*/
+     i++;
+   }
+
+ /*
+   for(i=0;i< 5;i++)
+   {printf("Symbol: %d %s %d \n",i,SYM_STRINGN(c_table,i),
+   SYM_ADDRESS(*ptable,i));}
+   */
+}
+
 #endif
 
 static Elf32_Ehdr *file_h;
@@ -84,8 +149,10 @@ fasload(faslfile)
    Elf32_Shdr *shp;
    int file;
    struct stat stat_buf;
+#ifndef STAND
    object     * old_vs_base =   vs_base ;
    object     * old_vs_top =   vs_top ;
+#endif
    int symtab_index,j;
    int nsyms;
    int init_address=-1;
@@ -100,7 +167,7 @@ fasload(faslfile)
    section = section_org;
 
 #ifdef STAND
-   strcpy(filename,faslfile);
+   strcpy(filename,(char *)faslfile);
    fp=fopen(filename,RDONLY);
 #else
    coerce_to_filename(faslfile, filename);
@@ -180,16 +247,27 @@ fasload(faslfile)
    extra_bss = 0;
 
 
+#ifndef STAND
    memory = alloc_object(t_cfdata);
    memory->cfd.cfd_self = 0;
    memory->cfd.cfd_start = 0;
    memory->cfd.cfd_size = current + (max_align > sizeof(char *) ?
 				     max_align :0);
    
-
    the_start=start_address=        
      memory->cfd.cfd_start =	
        alloc_contblock(memory->cfd.cfd_size);
+#else
+   memory=(object)malloc(sizeof(*memory));
+   memory->cfd.cfd_self = 0;
+   memory->cfd.cfd_start = 0;
+   memory->cfd.cfd_size = current + (max_align > sizeof(char *) ?
+				     max_align :0);
+   the_start=start_address=memory->cfd.cfd_start=
+     malloc(memory->cfd.cfd_size + 0x80000);
+   the_start=start_address= (char *)(0x1000 * 
+				     ((((int)the_start + 0x70000) + 0x1000)/0x1000));
+#endif
 
     /* make sure the memory is aligned */
    start_address = ROUND_UP(start_address,max_align);
@@ -216,22 +294,23 @@ fasload(faslfile)
      for (j=1 ; j <  file_h->e_shnum ; j++)
        {
 	 shp = &SECTION_H(j); 
-	 if (shp->sh_type == SHT_RELA
-	     && (SECTION_H(shp->sh_info).sh_flags & SHF_ALLOC))
+	 if ((shp->sh_type == SHT_RELA || shp->sh_type == SHT_REL) &&
+	     shp->sh_info<file_h->e_shnum &&
+	     (SECTION_H(shp->sh_info).sh_flags & SHF_ALLOC))
 	   {
 	     int index_to_relocate = shp->sh_info;
 	     if (symtab_index != shp->sh_link)
 	       FEerror("unexpected symbol table used");
 	     the_start = start_address + section[index_to_relocate].start;
 	   }
-	 else if (shp->sh_type == SHT_REL
-	     && (SECTION_H(shp->sh_info).sh_flags & SHF_ALLOC))
-	   {
-	     int index_to_relocate = shp->sh_info;
-	     if (symtab_index != shp->sh_link)
-	       FEerror("unexpected symbol table used");
-	     the_start = start_address + section[index_to_relocate].start;
-	   }
+/*  	 else if (shp->sh_type == SHT_REL */
+/*  	     && (SECTION_H(shp->sh_info).sh_flags & SHF_ALLOC)) */
+/*  	   { */
+/*  	     int index_to_relocate = shp->sh_info; */
+/*  	     if (symtab_index != shp->sh_link) */
+/*  	       FEerror("unexpected symbol table used"); */
+/*  	     the_start = start_address + section[index_to_relocate].start; */
+/*  	   } */
 	 
 	 else if ( (shp->sh_type == SHT_REL) || (shp->sh_type == SHT_RELA) )
 	   {  if (get_section_number(".rel.stab") == j)
@@ -243,11 +322,22 @@ fasload(faslfile)
 	 {
 	   int k=0;
 	   char *rel = (char *) base +   shp->sh_offset;
-	   for (k= 0; k< shp->sh_size ; k+= shp->sh_entsize)
+	   for (k= 0; k< shp->sh_size ; k+= shp->sh_entsize) 
 	     relocate(symbol_table,(Elf32_Rela *)(rel + k),shp->sh_type);
 	 }
        }
    }
+
+#ifdef STAND
+   {FILE *out;char pad=0;
+   out=fopen("/tmp/sfasltest","wb");
+   for (j=1 ; j <  file_h->e_shnum ; j++)
+     if ((SECTION_H(j).sh_flags & SHF_ALLOC) && (SECTION_H(j).sh_type == SHT_PROGBITS))
+       memcpy(base+SECTION_H(j).sh_offset,start_address+section[j].start,SECTION_H(j).sh_size);
+   fwrite((char *)base, stat_buf.st_size, 1, out);
+   fclose(out);}
+   printf("\n(start %x)\n",start_address);
+#else   
 
    SEEK_TO_END_OFILE(fp);
 
@@ -265,8 +355,7 @@ fasload(faslfile)
    else
    free(base);
   
-
-   close_stream(faslfile);
+  close_stream(faslfile);
 
 #ifdef CLEAR_CACHE
    CLEAR_CACHE;
@@ -276,9 +365,12 @@ fasload(faslfile)
 	
    vs_base = old_vs_base;
    vs_top = old_vs_top;
+
    if(symbol_value(sLAload_verboseA)!=Cnil)
      printf("start address -T %x ",memory->cfd.cfd_start);
    return(memory->cfd.cfd_size);
+
+#endif /* STAND */
 
  }
 
@@ -353,6 +445,124 @@ relocate_symbols(sym,nsyms,nscns,init_address_ptr)
     }
 }
 
+
+#ifdef HAVE_LIBBFD
+
+typedef struct {
+  unsigned int type;
+  reloc_howto_type *h;
+} mtbl;
+
+int in_bfd_init=0;
+
+static void
+do_bfd_reloc(unsigned int oc,unsigned int val,
+	     unsigned int *where) {
+
+  static bfd *dum;
+  static reloc_howto_type * m[BFD_RELOC_UNUSED];
+  reloc_howto_type *h;
+
+  if (!m[0]) {
+
+    bfd_reloc_code_real_type t;
+
+    in_bfd_init=1;
+
+    bfd_init();
+
+    if (!(dum=bfd_openr("/dev/null",NULL)))
+      FEerror("Cannot open dummy bfd\n");
+
+    for (t=BFD_RELOC_UNUSED;t>_dummy_first_bfd_reloc_code_real;t--) 
+      if ((h=bfd_reloc_type_lookup(dum,t)))
+	m[h->type]=h;
+      
+    in_bfd_init=0;
+
+  }
+
+  if (oc>=BFD_RELOC_UNUSED || !m[oc])
+    FEerror("Cannot lookup type %u\n",oc);
+  h=m[oc];
+
+  if (h->pc_relative)
+    val-=(unsigned int)where;
+
+  val>>=h->rightshift;
+  val<<=h->bitpos;
+/*    *where = ( (*where & ~h->dst_mask) |  */
+/*  	     (((*where & h->src_mask) +  val) & h->dst_mask)); */
+
+#define DOIT(x) \
+  x = ( (x & ~h->dst_mask) | (((x & h->src_mask) +  val) & h->dst_mask))
+
+  switch (h->size) {
+  case 0:
+    {
+      char x = bfd_get_8 (dum, (char *) where);
+      DOIT (x);
+      bfd_put_8 (dum, x, (unsigned char *) where);
+    }
+    break;
+
+  case 1:
+    {
+      short x = bfd_get_16 (dum, (bfd_byte *) where);
+      DOIT (x);
+      bfd_put_16 (dum, (bfd_vma) x, (unsigned char *) where);
+    }
+    break;
+  case 2:
+    {
+      long x = bfd_get_32 (dum, (bfd_byte *) where);
+      DOIT (x);
+      bfd_put_32 (dum, (bfd_vma) x, (bfd_byte *) where);
+    }
+    break;
+  case -2:
+    {
+      long x = bfd_get_32 (dum, (bfd_byte *) where);
+      val = -val;
+      DOIT (x);
+      bfd_put_32 (dum, (bfd_vma) x, (bfd_byte *) where);
+    }
+    break;
+    
+  case -1:
+    {
+      long x = bfd_get_16 (dum, (bfd_byte *) where);
+      val = -val;
+      DOIT (x);
+      bfd_put_16 (dum, (bfd_vma) x, (bfd_byte *) where);
+    }
+    break;
+    
+  case 3:
+    /* Do nothing */
+    break;
+    
+  case 4:
+#ifdef BFD64
+    {
+      bfd_vma x = bfd_get_64 (dum, (bfd_byte *) where);
+      DOIT (x);
+      bfd_put_64 (dum, x, (bfd_byte *) where);
+    }
+#else
+    FEerror("Bad howto size %u\n",h->size);
+    /*        abort (); */
+#endif
+    break;
+  default:
+    FEerror("Bad howto size %u\n",h->size);
+    break;
+  }
+  
+}
+
+#endif /* HAVE_LIBBFD */
+
 static void
 relocate(symbol_table,reloc_info,sh_type)
 Elf32_Rela *reloc_info;
@@ -372,6 +582,7 @@ Elf32_Word sh_type;
       FEerror("relocate() error: unknown sh_type in ELF object");
     b = (unsigned int) the_start;
     s = symbol_table[ELF32_R_SYM(reloc_info->r_info)].st_value;
+/*      printf("Doing %s\n",string_table + symbol_table[ELF32_R_SYM(reloc_info->r_info)].st_name); */
     where = the_start + reloc_info->r_offset;
     p = (unsigned int) where;
 
@@ -381,7 +592,10 @@ Elf32_Word sh_type;
     *(unsigned int *)where = ((val & mask) | ((*(unsigned int *)where) & ~mask))
 #define ADD_VAL(where, mask, val) \
     *(unsigned int *)where += ((val & mask) | ((*(unsigned int *)where) & ~mask))
-    
+
+#ifdef HAVE_LIBBFD
+    do_bfd_reloc(ELF32_R_TYPE(reloc_info->r_info),s+a,(unsigned int *)where);
+#else
     switch(ELF32_R_TYPE(reloc_info->r_info)){
 #if (defined(__svr4__) || defined(__linux__)) && defined(__i386__)
     case     R_386_NONE:
@@ -436,7 +650,7 @@ Elf32_Word sh_type;
       break;
 #endif
 
-#else
+#else /*  (defined(__svr4__) || defined(__linux__)) && defined(__i386__) */
     case     R_SPARC_WDISP30:
       /* v-disp30*/
       val=(s+a-p) >> 2;
@@ -466,11 +680,12 @@ Elf32_Word sh_type;
       val = (s+a) & MASK(10);
       *(short *)(where +2) |= val;
       break;
-#endif
+#endif /*  (defined(__svr4__) || defined(__linux__)) && defined(__i386__) */
     default:
       printf("(non supported relocation type %d)\n",
 	     ELF32_R_TYPE(reloc_info->r_info));
     }
+#endif /* HAVE_LIBBFD */
   }
 }
 

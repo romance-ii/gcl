@@ -1,0 +1,12 @@
+Document: gcl-doc
+Title: GNU Common Lisp Documentation
+Author: W. Schelter
+Abstract: A Common Lisp compiler and interpreter based on C
+Section: Apps/Programming
+
+Format: DVI
+Files: /usr/share/doc/gcl-doc/gcl-si*.dvi.gz /usr/share/doc/gcl-doc/gcl-si*.dvi
+
+Format: HTML
+Index: /usr/share/doc/gcl-doc/gcl-si.html/gcl-si_toc.html
+Files: /usr/share/doc/gcl-doc/gcl-si.html/gcl-si*.html

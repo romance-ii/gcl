@@ -153,9 +153,7 @@ invocation history stack.
 
 
 @end defun
-@defun UNIVERSAL-ERROR-HANDLER (error-name correctable function-name
-       continue-format-string error-format-string
-       &rest args)
+@defun UNIVERSAL-ERROR-HANDLER (error-name correctable function-name continue-format-string error-format-string &rest args)
 Package:SI
 
 GCL specific: Starts the error handler of GCL.  When an error is detected,
@@ -525,9 +523,7 @@ stack.
 
 
 @end defun
-@defun WRITE-DEBUG-SYMBOLS (start file
-  &key (main-file "/usr/local/schelter/xgcl/unixport/raw_gcl")
-  (output-file "debug-symbols.o" ))
+@defun WRITE-DEBUG-SYMBOLS (start file &key (main-file "/usr/local/schelter/xgcl/unixport/raw_gcl") (output-file "debug-symbols.o" ))
 Package:SI
 
 Write out a file of debug-symbols using address START as the place

@@ -26,9 +26,7 @@ Returns a copy of SEQUENCE.
 
 @end defun
 
-@defun POSITION (item sequence
-       &key (from-end nil) (test #'eql) test-not (start 0)
-            (end (length sequence)) (key #'identity))
+@defun POSITION (item sequence &key (from-end nil) (test #'eql) test-not (start 0) (end (length sequence)) (key #'identity))
 Package:LISP
 
 Returns the index of the first element in SEQUENCE that satisfies TEST with
@@ -62,9 +60,7 @@ upper-case, and remaining characters in the word converted to lower case.
 
 @end defun
 
-@defun NSUBSTITUTE-IF-NOT (new test sequence
-       &key (from-end nil) (start 0) (end (length sequence))
-            (count most-positive-fixnum) (key #'identity))
+@defun NSUBSTITUTE-IF-NOT (new test sequence &key (from-end nil) (start 0) (end (length sequence)) (count most-positive-fixnum) (key #'identity))
 Package:LISP
 
 Returns a sequence of the same kind as SEQUENCE with the same elements
@@ -75,8 +71,7 @@ SEQUENCE may be destroyed.
 
 @end defun
 
-@defun FIND-IF (test sequence
-       &key (from-end nil) (start 0) (end (length sequence)) (key #'identity))
+@defun FIND-IF (test sequence &key (from-end nil) (start 0) (end (length sequence)) (key #'identity))
 Package:LISP
 
 Returns the index of the first element in SEQUENCE that satisfies TEST; NIL if
@@ -95,9 +90,7 @@ BIT-ARRAY1 if RESULT-BIT-ARRAY is T, or into RESULT-BIT-ARRAY otherwise.
 
 @end defun
 
-@defun STRING< (string1 string2
-       &key (start1 0) (end1 (length string1))
-            (start2 0) (end2 (length string2)))
+@defun STRING< (string1 string2 &key (start1 0) (end1 (length string1)) (start2 0) (end2 (length string2)))
 Package:LISP
 
 If STRING1 is lexicographically less than STRING2, then returns the longest
@@ -123,9 +116,7 @@ Returns STRING with all lower case characters converted to uppercase.
 
 @end defun
 
-@defun STRING>= (string1 string2
-       &key (start1 0) (end1 (length string1))
-            (start2 0) (end2 (length string2)))
+@defun STRING>= (string1 string2 &key (start1 0) (end1 (length string1)) (start2 0) (end2 (length string2)))
 Package:LISP
 
 If STRING1 is lexicographically greater than or equal to STRING2, then returns
@@ -152,9 +143,7 @@ Returns the length of AXIS-NUMBER of ARRAY.
 
 @end defun
 
-@defun FIND (item sequence
-       &key (from-end nil) (test #'eql) test-not (start 0)
-            (end (length sequence)) (key #'identity))
+@defun FIND (item sequence &key (from-end nil) (test #'eql) test-not (start 0) (end (length sequence)) (key #'identity))
 Package:LISP
 
 Returns the first element in SEQUENCE satisfying TEST with ITEM; NIL if no
@@ -163,9 +152,7 @@ such element exists.
 
 @end defun
 
-@defun STRING-NOT-EQUAL (string1 string2
-       &key (start1 0) (end1 (length string1))
-            (start2 0) (end2 (length string2)))
+@defun STRING-NOT-EQUAL (string1 string2 &key (start1 0) (end1 (length string1)) (start2 0) (end2 (length string2)))
 Package:LISP
 
 Similar to STRING=, but ignores cases.
@@ -182,9 +169,7 @@ right end.
 
 @end defun
 
-@defun DELETE-IF-NOT (test sequence
-       &key (from-end nil) (start 0) (end (length sequence))
-            (count most-positive-fixnum) (key #'identity))
+@defun DELETE-IF-NOT (test sequence &key (from-end nil) (start 0) (end (length sequence)) (count most-positive-fixnum) (key #'identity))
 Package:LISP
 
 Returns a sequence formed by destructively removing the elements not
@@ -193,9 +178,7 @@ satisfying TEST from SEQUENCE.
 
 @end defun
 
-@defun REMOVE-IF-NOT (test sequence
-       &key (from-end nil) (start 0) (end (length sequence))
-            (count most-positive-fixnum) (key #'identity))
+@defun REMOVE-IF-NOT (test sequence &key (from-end nil) (start 0) (end (length sequence)) (count most-positive-fixnum) (key #'identity))
 Package:LISP
 
 Returns a copy of SEQUENCE with elements not satisfying TEST removed.
@@ -203,9 +186,7 @@ Returns a copy of SEQUENCE with elements not satisfying TEST removed.
 
 @end defun
 
-@defun STRING= (string1 string2
-       &key (start1 0) (end1 (length string1))
-            (start2 0) (end2 (length string2)))
+@defun STRING= (string1 string2 &key (start1 0) (end1 (length string1)) (start2 0) (end2 (length string2)))
 Package:LISP
 
 Returns T if the two strings are character-wise CHAR=; NIL otherwise.
@@ -213,9 +194,7 @@ Returns T if the two strings are character-wise CHAR=; NIL otherwise.
 
 @end defun
 
-@defun NSUBSTITUTE-IF (new test sequence
-       &key (from-end nil) (start 0) (end (length sequence))
-            (count most-positive-fixnum) (key #'identity))
+@defun NSUBSTITUTE-IF (new test sequence &key (from-end nil) (start 0) (end (length sequence)) (count most-positive-fixnum) (key #'identity))
 Package:LISP
 
 Returns a sequence of the same kind as SEQUENCE with the same elements
@@ -243,10 +222,7 @@ INITIAL-ELEMENT.
 
 @end defun
 
-@defun NSUBSTITUTE (newitem olditem sequence
-       &key (from-end nil) (test #'eql) test-not (start 0)
-            (end (length sequence)) (count most-positive-fixnum)
-            (key #'identity))
+@defun NSUBSTITUTE (newitem olditem sequence &key (from-end nil) (test #'eql) test-not (start 0) (end (length sequence)) (count most-positive-fixnum) (key #'identity))
 Package:LISP
 
 Returns a sequence of the same kind as SEQUENCE with the same elements
@@ -255,9 +231,7 @@ except that OLDITEMs are replaced with NEWITEM.  SEQUENCE may be destroyed.
 
 @end defun
 
-@defun STRING-EQUAL (string1 string2
-       &key (start1 0) (end1 (length string1))
-            (start2 0) (end2 (length string2)))
+@defun STRING-EQUAL (string1 string2 &key (start1 0) (end1 (length string1)) (start2 0) (end2 (length string2)))
 Package:LISP
 
 Given two strings (string1 and string2), and optional integers start1,
@@ -267,9 +241,7 @@ string2 (using char-equal).
 
 @end defun
 
-@defun STRING-NOT-GREATERP (string1 string2
-       &key (start1 0) (end1 (length string1))
-            (start2 0) (end2 (length string2)))
+@defun STRING-NOT-GREATERP (string1 string2 &key (start1 0) (end1 (length string1)) (start2 0) (end2 (length string2)))
 Package:LISP
 
 Similar to STRING<=, but ignores cases.
@@ -277,9 +249,7 @@ Similar to STRING<=, but ignores cases.
 
 @end defun
 
-@defun STRING> (string1 string2
-       &key (start1 0) (end1 (length string1))
-            (start2 0) (end2 (length string2)))
+@defun STRING> (string1 string2 &key (start1 0) (end1 (length string1)) (start2 0) (end2 (length string2)))
 Package:LISP
 
 If STRING1 is lexicographically greater than STRING2, then returns the
@@ -296,9 +266,7 @@ Returns T if X is a string; NIL otherwise.
 
 @end defun
 
-@defun DELETE-IF (test sequence
-       &key (from-end nil) (start 0) (end (length sequence))
-            (count most-positive-fixnum) (key #'identity))
+@defun DELETE-IF (test sequence &key (from-end nil) (start 0) (end (length sequence)) (count most-positive-fixnum) (key #'identity))
 Package:LISP
 
 Returns a sequence formed by removing the elements satisfying TEST
@@ -315,9 +283,7 @@ Returns T if X is a simple string; NIL otherwise.
 
 @end defun
 
-@defun REMOVE-IF (test sequence
-       &key (from-end nil) (start 0) (end (length sequence))
-            (count most-positive-fixnum) (key #'identity))
+@defun REMOVE-IF (test sequence &key (from-end nil) (start 0) (end (length sequence)) (count most-positive-fixnum) (key #'identity))
 Package:LISP
 
 Returns a copy of SEQUENCE with elements satisfying TEST removed.
@@ -341,9 +307,7 @@ Returns a list whose elements are the dimensions of ARRAY
 
 @end defun
 
-@defun SUBSTITUTE-IF-NOT (new test sequence
-       &key (from-end nil) (start 0) (end (length sequence))
-            (count most-positive-fixnum) (key #'identity))
+@defun SUBSTITUTE-IF-NOT (new test sequence &key (from-end nil) (start 0) (end (length sequence)) (count most-positive-fixnum) (key #'identity))
 Package:LISP
 
 Returns a sequence of the same kind as SEQUENCE with the same elements
@@ -377,10 +341,7 @@ extends VECTOR rather then simply returns NIL.
 
 @end defun
 
-@defun DELETE (item sequence
-       &key (from-end nil) (test #'eql) test-not (start 0)
-            (end (length sequence)) (count most-positive-fixnum)
-            (key #'identity))
+@defun DELETE (item sequence &key (from-end nil) (test #'eql) test-not (start 0) (end (length sequence)) (count most-positive-fixnum) (key #'identity))
 Package:LISP
 
 Returns a sequence formed by removing the specified ITEM destructively from
@@ -389,10 +350,7 @@ SEQUENCE.
 
 @end defun
 
-@defun REMOVE (item sequence
-       &key (from-end nil) (test #'eql) test-not (start 0)
-            (end (length sequence)) (count most-positive-fixnum)
-            (key #'identity))
+@defun REMOVE (item sequence &key (from-end nil) (test #'eql) test-not (start 0) (end (length sequence)) (count most-positive-fixnum) (key #'identity))
 Package:LISP
 
 Returns a copy of SEQUENCE with ITEM removed.
@@ -438,9 +396,7 @@ Creates and returns a hash table.
 
 @end defun
 
-@defun STRING/= (string1 string2
-       &key (start1 0) (end1 (length string1))
-            (start2 0) (end2 (length string2)))
+@defun STRING/= (string1 string2 &key (start1 0) (end1 (length string1)) (start2 0) (end2 (length string2)))
 Package:LISP
 
 Returns NIL if STRING1 and STRING2 are character-wise CHAR=.  Otherwise,
@@ -449,9 +405,7 @@ returns the index to the longest common prefix of the strings.
 
 @end defun
 
-@defun STRING-GREATERP (string1 string2
-       &key (start1 0) (end1 (length string1))
-            (start2 0) (end2 (length string2)))
+@defun STRING-GREATERP (string1 string2 &key (start1 0) (end1 (length string1)) (start2 0) (end2 (length string2)))
 Package:LISP
 
 Similar to STRING>, but ignores cases.
@@ -467,10 +421,7 @@ Returns the INDEX-th element of SEQUENCE.
 
 @end defun
 
-@defun MAKE-ARRAY (dimensions
-       &key (element-type t) initial-element (initial-contents nil)
-            (adjustable nil) (fill-pointer nil) (displaced-to nil)
-            (displaced-index-offset 0) static)
+@defun MAKE-ARRAY (dimensions &key (element-type t) initial-element (initial-contents nil) (adjustable nil) (fill-pointer nil) (displaced-to nil) (displaced-index-offset 0) static)
 Package:LISP
 
 Creates an array of the specified DIMENSIONS.  The default for INITIAL-
@@ -506,8 +457,7 @@ nil, will cause the array body to be non relocatable.
 
 @end defun
 
-@defun NSTRING-DOWNCASE (string &key
-(start 0) (end (length string)))
+@defun NSTRING-DOWNCASE (string &key (start 0) (end (length string)))
 Package:LISP
  Returns STRING with all upper case
 characters converted to lowercase.
@@ -515,8 +465,7 @@ characters converted to lowercase.
 
 @end defun
 
-@defun ARRAY-IN-BOUNDS-P (array
-&rest subscripts)
+@defun ARRAY-IN-BOUNDS-P (array &rest subscripts)
 Package:LISP
  Returns T if SUBSCRIPTS are valid subscripts for
 ARRAY; NIL otherwise.
@@ -542,9 +491,7 @@ otherwise.
 
 @end defun
 
-@defun COUNT-IF-NOT  (test
-sequence
-       &key (from-end nil) (start 0) (end (length sequence)) (key #'identity))
+@defun COUNT-IF-NOT  (test sequence &key (from-end nil) (start 0) (end (length sequence)) (key #'identity))
 Package:LISP
 
 Returns the number of elements in SEQUENCE not satisfying TEST.
@@ -569,9 +516,7 @@ Returns T if X is an array; NIL otherwise.
 
 @end defun
 
-@defun REPLACE (sequence1 sequence2
-       &key (start1 0) (end1 (length sequence1))
-            (start2 0) (end2 (length sequence2)))
+@defun REPLACE (sequence1 sequence2 &key (start1 0) (end1 (length sequence1)) (start2 0) (end2 (length sequence2)))
 Package:LISP
 
 Destructively modifies SEQUENCE1 by copying successive elements into it from
@@ -598,9 +543,7 @@ Removes all entries of HASH-TABLE and returns the hash table itself.
 
 @end defun
 
-@defun SUBSTITUTE-IF (newitem test sequence
-       &key (from-end nil) (start 0) (end (length sequence))
-            (count most-positive-fixnum) (key #'identity))
+@defun SUBSTITUTE-IF (newitem test sequence &key (from-end nil) (start 0) (end (length sequence)) (count most-positive-fixnum) (key #'identity))
 Package:LISP
 
 Returns a sequence of the same kind as SEQUENCE with the same elements
@@ -609,10 +552,7 @@ except that all elements satisfying TEST are replaced with NEWITEM.
 
 @end defun
 
-@defun MISMATCH (sequence1 sequence2
-       &key (from-end nil) (test #'eql) test-not (start1 0) (start2 0)
-            (end1 (length sequence1)) (end2 (length sequence2))
-            (key #'identity))
+@defun MISMATCH (sequence1 sequence2 &key (from-end nil) (test #'eql) test-not (start1 0) (start2 0) (end1 (length sequence1)) (end2 (length sequence2)) (key #'identity))
 Package:LISP
 
 The specified subsequences of SEQUENCE1 and SEQUENCE2 are compared
@@ -642,10 +582,7 @@ the fill pointer is 0.
 
 @end defun
 
-@defun SUBSTITUTE (newitem olditem sequence
-       &key (from-end nil) (test #'eql) test-not (start 0)
-            (end (length sequence)) (count most-positive-fixnum)
-            (key #'identity))
+@defun SUBSTITUTE (newitem olditem sequence &key (from-end nil) (test #'eql) test-not (start 0) (end (length sequence)) (count most-positive-fixnum) (key #'identity))
 Package:LISP
 
 Returns a sequence of the same kind as SEQUENCE with the same elements
@@ -727,8 +664,7 @@ BIT-ARRAY1 if RESULT-BIT-ARRAY is T, or into RESULT-BIT-ARRAY otherwise.
 
 @end defun
 
-@defun COUNT-IF (test sequence
-       &key (from-end nil) (start 0) (end (length sequence)) (key #'identity))
+@defun COUNT-IF (test sequence &key (from-end nil) (start 0) (end (length sequence)) (key #'identity))
 Package:LISP
 
 Returns the number of elements in SEQUENCE satisfying TEST.
@@ -753,9 +689,7 @@ The exclusive upper bound on the rank of an array.
 
 @end defvr
 
-@defun COUNT (item sequence
-       &key (from-end nil) (test #'eql) test-not (start 0)
-            (end (length sequence)) (key #'identity))
+@defun COUNT (item sequence &key (from-end nil) (test #'eql) test-not (start 0) (end (length sequence)) (key #'identity))
 Package:LISP
 
 Returns the number of elements in SEQUENCE satisfying TEST with ITEM.
@@ -780,10 +714,7 @@ and remaining characters in the word converted to lower case.
 
 @end defun
 
-@defun ADJUST-ARRAY (array dimensions
-       &key (element-type (array-element-type array))
-            initial-element (initial-contents nil) (fill-pointer nil)
-            (displaced-to nil) (displaced-index-offset 0))
+@defun ADJUST-ARRAY (array dimensions &key (element-type (array-element-type array)) initial-element (initial-contents nil) (fill-pointer nil) (displaced-to nil) (displaced-index-offset 0))
 Package:LISP
 
 Adjusts the dimensions of ARRAY to the given DIMENSIONS.  The default value
@@ -792,10 +723,7 @@ of INITIAL-ELEMENT depends on ELEMENT-TYPE.
 
 @end defun
 
-@defun SEARCH (sequence1 sequence2
-       &key (from-end nil) (test #'eql) test-not (start1 0) (start2 0)
-            (end1 (length sequence1)) (end2 (length sequence2))
-            (key #'identity))
+@defun SEARCH (sequence1 sequence2 &key (from-end nil) (test #'eql) test-not (start1 0) (start2 0) (end1 (length sequence1)) (end2 (length sequence2)) (key #'identity))
 Package:LISP
 
 A search is conducted for the first subsequence of SEQUENCE2 which
@@ -858,8 +786,7 @@ PREDICATE; NIL otherwise.
 
 @end defun
 
-@defun POSITION-IF-NOT (test sequence
-       &key (from-end nil) (start 0) (end (length sequence)) (key #'identity))
+@defun POSITION-IF-NOT (test sequence &key (from-end nil) (start 0) (end (length sequence)) (key #'identity))
 Package:LISP
 
 Returns the index of the first element in SEQUENCE that does not satisfy TEST;
@@ -885,9 +812,7 @@ Returns the bit from BIT-ARRAY at SUBSCRIPTS.
 
 @end defun
 
-@defun STRING-NOT-LESSP (string1 string2
-       &key (start1 0) (end1 (length string1))
-            (start2 0) (end2 (length string2)))
+@defun STRING-NOT-LESSP (string1 string2 &key (start1 0) (end1 (length string1)) (start2 0) (end2 (length string2)))
 Package:LISP
 
 Similar to STRING>=, but ignores cases.
@@ -955,9 +880,7 @@ Returns T if X is a vector; NIL otherwise.
 
 @end defun
 
-@defun STRING<= (string1 string2
-       &key (start1 0) (end1 (length string1))
-            (start2 0) (end2 (length string2)))
+@defun STRING<= (string1 string2 &key (start1 0) (end1 (length string1)) (start2 0) (end2 (length string2)))
 Package:LISP
 
 If STRING1 is lexicographically less than or equal to STRING2, then returns
@@ -991,8 +914,7 @@ Returns the total number of elements of ARRAY.
 
 @end defun
 
-@defun FIND-IF-NOT (test sequence
-       &key (from-end nil) (start 0) (end (length sequence)) (key #'identity))
+@defun FIND-IF-NOT (test sequence &key (from-end nil) (start 0) (end (length sequence)) (key #'identity))
 Package:LISP
 
 Returns the index of the first element in SEQUENCE that does not satisfy
@@ -1001,8 +923,7 @@ TEST; NIL if no such element exists.
 
 @end defun
 
-@defun DELETE-DUPLICATES (sequence &key (from-end nil) (test #'eql) test-not (start 0)
-                     (end (length sequence)) (key #'identity))
+@defun DELETE-DUPLICATES (sequence &key (from-end nil) (test #'eql) test-not (start 0) (end (length sequence)) (key #'identity))
 Package:LISP
 
 Returns a sequence formed by removing duplicated elements destructively from
@@ -1011,9 +932,7 @@ SEQUENCE.
 
 @end defun
 
-@defun REMOVE-DUPLICATES (sequence
-       &key (from-end nil) (test #'eql) test-not (start 0)
-            (end (length sequence)) (key #'identity))
+@defun REMOVE-DUPLICATES (sequence &key (from-end nil) (test #'eql) test-not (start 0) (end (length sequence)) (key #'identity))
 Package:LISP
 
 The elements of SEQUENCE are examined, and if any two match, one is discarded.
@@ -1022,8 +941,7 @@ Returns the resulting sequence.
 
 @end defun
 
-@defun POSITION-IF (test sequence
-       &key (from-end nil) (start 0) (end (length sequence)) (key #'identity))
+@defun POSITION-IF (test sequence &key (from-end nil) (start 0) (end (length sequence)) (key #'identity))
 Package:LISP
 
 Returns the index of the first element in SEQUENCE that satisfies TEST; NIL
@@ -1049,8 +967,7 @@ Returns T if every elements of SEQUENCEs satisfy PREDICATE; NIL otherwise.
 
 @end defun
 
-@defun REDUCE (function sequence
-       &key (from-end nil) (start 0) (end (length sequence)) initial-value)
+@defun REDUCE (function sequence &key (from-end nil) (start 0) (end (length sequence)) initial-value)
 Package:LISP
 
 Combines all the elements of SEQUENCE using a binary operation FUNCTION.
@@ -1059,9 +976,7 @@ If INITIAL-VALUE is supplied, it is logically placed before the SEQUENCE.
 
 @end defun
 
-@defun STRING-LESSP (string1 string2
-       &key (start1 0) (end1 (length string1))
-            (start2 0) (end2 (length string2)))
+@defun STRING-LESSP (string1 string2 &key (start1 0) (end1 (length string1)) (start2 0) (end2 (length string2)))
 Package:LISP
 
 Similar to STRING<, but ignores cases.

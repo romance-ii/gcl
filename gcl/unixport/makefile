@@ -9,7 +9,7 @@ GMP_DIR	= ../gmp/
 
 CFLAGS	= -c $(DEFS) -I$(HDIR)
 LDCC    = $(CC) -g
-LIBC	= -lc	
+LIBC	= -lc
 LIBS	= -lm # -lpixrect -lc
 OLDDATE = "DATE"
 GCLIB	= $(ODIR)/gcllib.a
@@ -23,10 +23,10 @@ SPECIAL_RSYM = rsym.c
 # use=386-linux
 
 # for main link of raw_gcl
-LIBS= -lm
+LIBS= -lm -lreadline -lncurses -lbfd -liberty
 
 #The multi precision library stuff
-MPFILES=$(MPDIR)/mpi-386_no_under.o $(MPDIR)/libmport.a
+MPFILES=$(MPDIR)/@MPI_FILE@ $(MPDIR)/libmport.a
 
 
 # root for the installation, eg /usr/local
@@ -62,11 +62,11 @@ TCL_LIBS=-ldl  -lm
 NOTIFY=yes
 GCC=gcc
 
+RL_OBJS=readline.o
 
+RL_LIB=lsp/readline.o
 
-
-
-GCLDIR=/fix/f/debian/mm/gcl/gcl
+GCLDIR=/fix/f/debian/mm/gcl/gcl-2.5.0
 SHELL=/bin/sh
 MACHINE=386-linux
 
@@ -81,12 +81,12 @@ MACHINE=386-linux
 
 LBINDIR=/usr/local/bin
 
-#OFLAG	=  -O 
-OFLAG	=  -g
-LIBS	= -lm 
+#OFLAG	=  -g 
+OFLAG	=  -O 
+#LIBS	= -lm 
 
-#ODIR_DEBUG= -O4 
-ODIR_DEBUG= -g
+ODIR_DEBUG= -O4 
+#ODIR_DEBUG= -g
 
 # This CC string will be used for compilation of the system,
 # and also in the compiler::*cc* variable for later compilation of
@@ -157,7 +157,8 @@ OBJS	=  $(OD)main.o $(OD)alloc.o $(OD)gbc.o \
 	$(OD)fat_string.o ${ODIR}/run_process.o \
 	$(OD)nfunlink.o $(OD)usig.o $(OD)usig2.o $(OD)utils.o \
 	$(OD)makefun.o $(OD)sockets.o  $(OD)clxsocket.o  \
-	$(OD)init_pari.o $(OD)nsocket.o $(NEW_INIT) $(MPFILES) $(SFASL) $(EXTRAS) 
+	$(OD)init_pari.o $(OD)nsocket.o $(NEW_INIT) $(MPFILES) $(SFASL) $(EXTRAS) \
+	$(addprefix $(OD),$(RL_OBJS))
 
 LSPOBJS	= $(LSPDIR)/defmacro.o $(LSPDIR)/evalmacros.o $(LSPDIR)/top.o \
 	$(LSPDIR)/module.o $(LSPDIR)/predlib.o $(LSPDIR)/setf.o \
@@ -165,8 +166,10 @@ LSPOBJS	= $(LSPDIR)/defmacro.o $(LSPDIR)/evalmacros.o $(LSPDIR)/top.o \
 	$(LSPDIR)/describe.o $(LSPDIR)/iolib.o $(LSPDIR)/listlib.o \
 	$(LSPDIR)/mislib.o $(LSPDIR)/numlib.o $(LSPDIR)/packlib.o \
 	$(LSPDIR)/seq.o $(LSPDIR)/seqlib.o $(LSPDIR)/trace.o \
-	$(LSPDIR)/sloop.o  $(LSPDIR)/debug.o $(LSPDIR)/info.o \
-	$(LSPDIR)/serror.o
+	$(LSPDIR)/sloop.o  $(LSPDIR)/debug.o \
+	$(LSPDIR)/serror.o $(LSPDIR)/info.o $(LSPDIR)/destructuring_bind.o \
+        $(LSPDIR)/defpackage.o $(LSPDIR)/make_defpackage.o \
+	$(addprefix $(LSPDIR)/,$(RL_OBJS))
 
 CMPOBJS	= $(CMPDIR)/cmpinline.o $(CMPDIR)/cmputil.o $(CMPDIR)/cmptype.o \
 	$(CMPDIR)/cmpbind.o $(CMPDIR)/cmpblock.o $(CMPDIR)/cmpcall.o \
@@ -179,10 +182,16 @@ CMPOBJS	= $(CMPDIR)/cmpinline.o $(CMPDIR)/cmputil.o $(CMPDIR)/cmptype.o \
 
 SYSTEM=gcl
 
+$(LSPDIR)/auto_new.lsp: $(LSPDIR)/auto.lsp
+	cp $< $@
+	[ "$(RL_OBJS)" = "" ] || \
+		echo "(AUTOLOAD 'init-readline '|readline|)" >>$@
+
 saved_$(SYSTEM):raw_$(SYSTEM) $(RSYM) $(INIT_SYSTEM_LSP) \
 		$(CMPDIR)/cmpmain.lsp \
 		$(CMPDIR)/lfun_list.lsp \
-		$(CMPDIR)/cmpopt.lsp ${HDIR}/cmpinclude.h
+		$(CMPDIR)/cmpopt.lsp ${HDIR}/cmpinclude.h \
+		$(LSPDIR)/auto_new.lsp
 # if you are wfs on rascal increment the minor version number.
 	../xbin/if-exists /usr/u9/wfs/schelter "../xbin/inc-version"
 	../xbin/if-exists saved_$(SYSTEM) "rm -f saved_$(SYSTEM)"
@@ -247,7 +256,6 @@ hpbsd-crt0-mod.o:
 	cp /lib/crt0.o .
 	emacs -batch -l hpbsd-crt0.el
 
-
-GCL=gcl
+GCL:=gcl
 clean:
-	rm -f saved_$(GCL) raw_$(GCL) *.o core a.out rsym foo *maxima*
+	rm -f saved_$(GCL) raw_$(GCL) *.o core a.out rsym $(LSPDIR)/auto_new.lsp foo *maxima*

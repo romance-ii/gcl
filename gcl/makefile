@@ -16,10 +16,10 @@ prefix=/usr/local
 # use=386-linux
 
 # for main link of raw_gcl
-LIBS= -lm
+LIBS= -lm -lreadline -lncurses -lbfd -liberty
 
 #The multi precision library stuff
-MPFILES=$(MPDIR)/mpi-386_no_under.o $(MPDIR)/libmport.a
+MPFILES=$(MPDIR)/@MPI_FILE@ $(MPDIR)/libmport.a
 
 
 # root for the installation, eg /usr/local
@@ -55,11 +55,11 @@ TCL_LIBS=-ldl  -lm
 NOTIFY=yes
 GCC=gcc
 
+RL_OBJS=readline.o
 
+RL_LIB=lsp/readline.o
 
-
-
-GCLDIR=/fix/f/debian/mm/gcl/gcl
+GCLDIR=/fix/f/debian/mm/gcl/gcl-2.5.0
 SHELL=/bin/sh
 MACHINE=386-linux
 
@@ -74,12 +74,12 @@ MACHINE=386-linux
 
 LBINDIR=/usr/local/bin
 
-#OFLAG	=  -O 
-OFLAG	=  -g
-LIBS	= -lm 
+#OFLAG	=  -g 
+OFLAG	=  -O 
+#LIBS	= -lm 
 
-#ODIR_DEBUG= -O4 
-ODIR_DEBUG= -g
+ODIR_DEBUG= -O4 
+#ODIR_DEBUG= -g
 
 # This CC string will be used for compilation of the system,
 # and also in the compiler::*cc* variable for later compilation of
@@ -179,7 +179,7 @@ command:
 merge:
 	${CC} -o merge merge.c
 
-LISP_LIB=cmpnew/collectfn.o lsp/gprof.lsp lsp/info.o lsp/profile.lsp gcl-tk/tkl.o  gcl-tk/tinfo.o gcl-tk/decode.tcl gcl-tk/demos/*.lsp gcl-tk/demos/*.lisp gcl-tk/demos/*.o
+LISP_LIB=cmpnew/collectfn.o lsp/gprof.lsp lsp/info.o lsp/profile.lsp gcl-tk/tkl.o  gcl-tk/tinfo.o gcl-tk/decode.tcl gcl-tk/demos/*.lsp gcl-tk/demos/*.lisp gcl-tk/demos/*.o $(RL_LIB)
 
 install-command:
 	rm -f $(DESTDIR)${prefix}/bin/gcl
@@ -189,6 +189,7 @@ install-command:
 	echo '   -libdir' ${INSTALL_LIB_DIR}/ \\ ; \
 	echo '   -eval '\''(setq si::*allow-gzipped-file* t)'\' \\ ;\
 	! [ -d "${TK_CONFIG_PREFIX}" ] || echo '   -eval '\''(setq si::*tk-library* '\"${TK_LIBRARY}\"')'\' \\;\
+	[ "$(RL_OBJS)" = "" ] || echo '   -eval '\''(si::init-readline)'\' \\;\
 	echo '     '\"\$$@\" ) > $(DESTDIR)${prefix}/bin/gcl;
 	echo '#' other options: -load "/tmp/foo.o" -load "jo.lsp" -eval '"(joe 3)"' >> $(DESTDIR)${prefix}/bin/gcl
 	chmod a+x $(DESTDIR)${prefix}/bin/gcl

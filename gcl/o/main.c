@@ -221,7 +221,7 @@ char **argv, **envp;
 #endif
 #ifdef RLIMIT_STACK
 	getrlimit(RLIMIT_STACK, &rl);
-        if (rl.rlim_cur == RLIM_INFINITY ||
+        if (rl.rlim_cur == RLIM_INFINITY || 
 	    rl.rlim_cur > MAX_STACK_SIZE)
 	  rl.rlim_cur=MAX_STACK_SIZE;
 	cssize = rl.rlim_cur/4 - 4*CSGETA;
@@ -278,6 +278,9 @@ char **argv, **envp;
 
 		v_init_processes();
 		ovm_process_created = 1;
+#endif
+#ifdef HAVE_READLINE
+		init_readline_function();
 #endif
 	      again:
 		super_funcall(sStop_level);
@@ -574,6 +577,17 @@ va_dcl
 
 	RETURN(1,int,exit_code, 0); 
 }
+
+DEFUNO("QUIT",int,fLquit,LISP
+   ,0,1,NONE,II,OO,OO,OO,Lquit,"")(va_alist)
+va_dcl
+{	return fLbye(va_alist); }
+ 
+DEFUNO("EXIT",int,fLexit,LISP
+   ,0,1,NONE,II,OO,OO,OO,Lexit,"")(va_alist)
+va_dcl
+{	return fLbye(va_alist); }
+ 
 
 c_trace()
 {

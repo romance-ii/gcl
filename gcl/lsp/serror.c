@@ -317,7 +317,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1080	*/
+/*	function definition for FINISH1061	*/
 
 static L8()
 {register object *base=vs_base;
@@ -347,7 +347,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1081	*/
+/*	function definition for FINISH1062	*/
 
 static L10()
 {register object *base=vs_base;
@@ -377,7 +377,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1082	*/
+/*	function definition for FINISH1063	*/
 
 static L12()
 {register object *base=vs_base;
@@ -407,7 +407,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1083	*/
+/*	function definition for FINISH1064	*/
 
 static L14()
 {register object *base=vs_base;
@@ -437,7 +437,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1084	*/
+/*	function definition for FINISH1065	*/
 
 static L16()
 {register object *base=vs_base;
@@ -467,7 +467,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1085	*/
+/*	function definition for FINISH1066	*/
 
 static L18()
 {register object *base=vs_base;
@@ -497,7 +497,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1086	*/
+/*	function definition for FINISH1067	*/
 
 static L20()
 {register object *base=vs_base;
@@ -527,7 +527,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1087	*/
+/*	function definition for FINISH1068	*/
 
 static L22()
 {register object *base=vs_base;
@@ -557,7 +557,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1088	*/
+/*	function definition for FINISH1069	*/
 
 static L24()
 {register object *base=vs_base;
@@ -587,7 +587,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1089	*/
+/*	function definition for FINISH1070	*/
 
 static L26()
 {register object *base=vs_base;
@@ -617,7 +617,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1090	*/
+/*	function definition for FINISH1071	*/
 
 static L28()
 {register object *base=vs_base;
@@ -647,7 +647,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1091	*/
+/*	function definition for FINISH1072	*/
 
 static L30()
 {register object *base=vs_base;

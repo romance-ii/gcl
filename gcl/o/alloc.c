@@ -1057,13 +1057,37 @@ static char *baby_malloc(n)
 }
 #endif
 
+/* configure size, static init ? */
+static char bfd_buf[/*  4392 */5000];
+static char *bfd_buf_p=bfd_buf;
 
+static void *
+bfd_malloc(int n) {
+
+  char *c;
+
+  c=bfd_buf_p;
+  n+=7;
+  n>>=3;
+  n<<=3;
+  if (c+n>bfd_buf+sizeof(bfd_buf)) {
+    fprintf(stderr,"Not enough space in bfd_buf %d %d\n",n,sizeof(bfd_buf)-(bfd_buf_p-bfd_buf));
+    exit(1);
+  }
+  bfd_buf_p+=n;
+  return (void *)c;
+
+}
 
 char *
 malloc(size)
 int size;
 {
-	object x;
+        extern int in_bfd_init;
+        object x;
+	
+	if (in_bfd_init)
+	  return bfd_malloc(size);
 
 #ifdef BABY_MALLOC_SIZE
 	if (GBC_enable == 0) return baby_malloc(size);
@@ -1199,7 +1223,7 @@ char *ptr;
 #endif
 
 
-#ifndef GNU_MALLOC
+#ifndef GNUMALLOC
 char *
 memalign(align,size)
      int align,size;

@@ -21,7 +21,7 @@
 (setq compiler::*cmpinclude* "<cmpinclude.h>") (load #"../cmpnew/cmpmain.lsp") (gbc t)
  (load #"../cmpnew/lfun_list.lsp")
  (gbc t) (load #"../cmpnew/cmpopt.lsp") (gbc t)
-(load #"../lsp/auto.lsp") (gbc t)
+(load #"../lsp/auto_new.lsp") (gbc t)
 
  (when compiler::*cmpinclude-string*
   (with-open-file (st "../h/cmpinclude.h")
@@ -94,10 +94,10 @@
  (unintern 'compiler)
  (unintern 'user)
  ;system-init
+
  (if (fboundp 'user-init) (user-init))
  (si::set-up-top-level)
  (in-package "USER")
  (system:save-system "saved_gcl") (bye)
  (defun system:top-level nil (system::gcl-top-level))
  (save "saved_gcl") (bye))
-

@@ -54,17 +54,17 @@ object sSAbreak_stepA;
 
 #define SET_TO_APPLY(res,f,n,x) \
  switch(n) {\
- case 0:   res=((f))(); break;\
-  case 1:  res=((f))(x[0]); break; \
-  case 2:  res=((f))(x[0],x[1]);break; \
-  case 3:  res=((f))(x[0],x[1],x[2]);break; \
-  case 4:  res=((f))(x[0],x[1],x[2],x[3]);break; \
-  case 5:  res=((f))(x[0],x[1],x[2],x[3],x[4]);break; \
-  case 6:  res=((f))(x[0],x[1],x[2],x[3],x[4],x[5]);  break;\
-  case 7:  res=((f))(x[0],x[1],x[2],x[3],x[4],x[5], x[6]); break;\
-  case 8:  res=((f))(x[0],x[1],x[2],x[3],x[4],x[5], x[6],x[7]); break;\
-  case 9:  res=((f))(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8]);break;\
-  case 10: res=((f))(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8],x[9]);break;\
+ case 0:   res=(object)((int (*)())(f))(); break;\
+  case 1:  res=(object)((int (*)())(f))(x[0]); break; \
+  case 2:  res=(object)((int (*)())(f))(x[0],x[1]);break; \
+  case 3:  res=(object)((int (*)())(f))(x[0],x[1],x[2]);break; \
+  case 4:  res=(object)((int (*)())(f))(x[0],x[1],x[2],x[3]);break; \
+  case 5:  res=(object)((int (*)())(f))(x[0],x[1],x[2],x[3],x[4]);break; \
+  case 6:  res=(object)((int (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5]);  break;\
+  case 7:  res=(object)((int (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5], x[6]); break;\
+  case 8:  res=(object)((int (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5], x[6],x[7]); break;\
+  case 9:  res=(object)((int (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8]);break;\
+  case 10: res=(object)((int (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8],x[9]);break;\
    default: res=c_apply_n(f,n,x); break;}
 
 /*

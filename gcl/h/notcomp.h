@@ -56,6 +56,7 @@ EXTER object user_package;
 			 endp1(endp_temp))
 
 #ifndef NO_DEFUN
+#undef DEFUN
 #define DEFUN(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,doc) ret fname
 /* eg.
    A function taking from 2 to 8 args

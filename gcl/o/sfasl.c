@@ -24,17 +24,17 @@ via #include "../c/sfasl.c"
 
 #define IN_SFASL
 
-#ifdef STAND
-#include "config.h"
-#include "gclincl.h"
-#define OUR_ALLOCA alloca
-#include <stdio.h>
-#include "mdefs.h"
+/*  #ifdef STAND */
+/*  #include "config.h" */
+/*  #include "gclincl.h" */
+/*  #define OUR_ALLOCA alloca */
+/*  #include <stdio.h> */
+/*  #include "mdefs.h" */
 
-#else
+/*  #else */
 #include "include.h"
 #undef S_DATA
-#endif
+/*  #endif */
 
 #ifdef SEPARATE_SFASL_FILE
 #include SEPARATE_SFASL_FILE

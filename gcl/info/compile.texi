@@ -35,10 +35,7 @@ be evaluated when the compiled code is loaded.
 
 @end deffn
 
-@defun COMPILE-FILE (input-pathname
-       &key output-file (load nil) (message-file nil) 
-       ;GCL specific keywords:
-       system-p c-debug c-file h-file data-file)
+@defun COMPILE-FILE (input-pathname &key output-file (load nil) (message-file nil)  ;GCL specific keywords: system-p c-debug c-file h-file data-file)
 Package:LISP
 
 

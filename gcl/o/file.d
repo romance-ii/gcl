@@ -32,14 +32,17 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define IN_FILE
 #include "include.h"
 
+#ifdef HAVE_READLINE
+#define kclgetc(FP)		rl_getc_em(FP)
+#define kclungetc(C, FP)	rl_ungetc_em(C, FP)
+#define kclputc(C, FP)		rl_putc_em(C, FP)
+#else
 #define	kclgetc(FP)		getc(FP)
 #define	kclungetc(C, FP)	ungetc(C, FP)
-#ifdef __STDC__
-#define	xkclfeof(c,FP)		feof(FP)
-#else
-#define	xkclfeof(c,FP)		feof(FP)
-#endif
 #define	kclputc(C, FP)		putc(C, FP)
+#endif /* HAVE_READLINE */
+
+#define	xkclfeof(c,FP)		feof(FP)
 
 #ifdef HAVE_AOUT
 #undef ATT
@@ -2349,7 +2352,9 @@ init_file_function()
 	make_si_function("USER-STREAM-STATE", siLuser_stream_state);
 #endif
 
-
+#ifdef HAVE_READLINE
+	init_readline_function();
+#endif
 }
 
 
