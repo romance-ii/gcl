@@ -93,28 +93,21 @@ bool ovm_process_created;
 #endif
 
 
-bool saving_system;
-static int gc_time = -1;
-static int gc_start = 0;
-int runtime(void);
-int sgc_enabled=0;
-int  first_protectable_page =0;
+static int gc_time         = -1;
+static int gc_start        = 0;
+int sgc_enabled            = 0;
+int first_protectable_page = 0;
 
+int runtime(void);
 
 
 static char *copy_relblock(char *p, int s);
 
 #include "page.h"
 
-
-#ifdef MV
-
-
-#endif
-
-
-long real_maxpage;
-long new_holepage;
+extern bool saving_system;
+extern long real_maxpage;
+extern long new_holepage;
 
 #define	available_pages	\
 	(real_maxpage-page(heap_end)-new_holepage-2*nrbpage-real_maxpage/32)
@@ -666,7 +659,7 @@ mark_stack_carefully(void *topv, void *bottomv, int offset) {
   object x;
   struct typemanager *tm;
   register long *j;
-  long *top=topv,*bottom=bottomv;
+  long *top = (long *) topv, *bottom = (long *) bottomv;
   
   /* if either of these happens we are marking the C stack
      and need to use a local */
@@ -679,7 +672,7 @@ mark_stack_carefully(void *topv, void *bottomv, int offset) {
   */
   
   if (offset) 
-    mark_stack_carefully((((char *) top) +offset),bottom,0);
+    mark_stack_carefully ( (((char *) top) +offset), bottom, 0 );
 
   for (j=top ; j >= bottom ; j--) {
     if (VALID_DATA_ADDRESS_P(*j)

@@ -62,7 +62,7 @@ sbrk1(n)
 #endif /* DEBUG_SBRK */
 
 long real_maxpage = MAXPAGE;
-long new_holepage;
+long new_holepage = 0;
 
 #define	available_pages	\
 	(real_maxpage-page(heap_end)-new_holepage-2*nrbpage-real_maxpage/32)
