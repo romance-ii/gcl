@@ -148,7 +148,7 @@ imod(int x, int y)
 	Conversions to C
 */
 
-static char
+char
 object_to_char(object x)
 {
 	int c=0;
