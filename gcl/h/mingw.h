@@ -148,7 +148,7 @@ extern DBEGIN_TY _stacktop, _stackbottom;
 	fseek(fp,    fileheader.f_symptr+fileheader.f_nsyms*SYMESZ, 0); \
 	fread(&i, sizeof(i), 1, fp); \
 	fseek(fp, i - sizeof(i), 1); \
-	while ((i = getc(fp)) == 0) \
+	while ((i = fgetc(fp)) == 0) \
 		; \
         ungetc(i, fp); \
     } while (0)
@@ -221,6 +221,11 @@ extern char *GCLExeName ( void );
 	*ptr=  sym->n_value ; \
    else {/* printf("The first data symbol was not the init");*/}  \
  }}
+
+#ifdef getc
+  #undef getc
+#endif
+#define getc fgetc
 
 /* Begin for cmpinclude */
 
