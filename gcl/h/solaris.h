@@ -1,10 +1,11 @@
-#define SPARC_ELF
+#define __ELF__
+
+#include "linux.h"
+
 struct sigcontext {
   unsigned u;
 }
 #define ElfW(a) Elf32_ ## a
-
-#include "linux.h"
 
 #ifdef IN_GBC
 #undef MPROTECT_ACTION_FLAGS
