@@ -17,8 +17,9 @@ gclcvs (2.7.0-18) unstable; urgency=low
   * Check for zero args in new gcd code
   * Default hole is maxpages/10, holesize configure option added
   * Build depend on emacs21 | emacsen
+  * Remove calls to init-readline with new automatic readline setup
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 23 Jan 2004 22:03:31 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 28 Jan 2004 16:41:11 +0000
 
 gclcvs (2.7.0-17) unstable; urgency=low
 

@@ -7,7 +7,6 @@ exec gcl/unixport/saved_ansi_gcl \
    -libdir gcl/ \
    -eval '(setq si::*allow-gzipped-file* t)' \
    -eval '(setq si::*tk-library* "/usr/lib/tk8.3/../tk8.3")' \
-   -eval '(si::init-readline)' \
      "$@"
 else
 exec gcl/unixport/saved_gcl \
@@ -15,7 +14,6 @@ exec gcl/unixport/saved_gcl \
    -libdir gcl/ \
    -eval '(setq si::*allow-gzipped-file* t)' \
    -eval '(setq si::*tk-library* "/usr/lib/tk8.3/../tk8.3")' \
-   -eval '(si::init-readline)' \
      "$@"
 fi
 # other options: -load /tmp/foo.o -load jo.lsp -eval "(joe 3)"

@@ -143,7 +143,6 @@ install-command:
 	echo '   -libdir' $(INSTALL_LIB_DIR)/ \\ ; \
 	echo '   -eval '\''(setq si::*allow-gzipped-file* t)'\' \\ ;\
 	! [ -d "$(TK_CONFIG_PREFIX)" ] || echo '   -eval '\''(setq si::*tk-library* '\"$(TK_LIBRARY)\"')'\' \\;\
-	[ "$(RL_OBJS)" = "" ] || echo '   -eval '\''(si::init-readline)'\' \\;\
 	echo '     '\"\$$@\" ) > $(DESTDIR)$(prefix)/bin/gcl;
 	echo '#' other options: -load "/tmp/foo.o" -load "jo.lsp" -eval '"(joe 3)"' >> $(DESTDIR)$(prefix)/bin/gcl
 	chmod a+x $(DESTDIR)$(prefix)/bin/gcl
