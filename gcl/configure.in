@@ -29,8 +29,10 @@ AC_ARG_ENABLE(frssize,[ --enable-frssize=XXXX will compile in a frame stack of s
 AC_ARG_ENABLE(machine,[ --enable-machine=XXXX will force the use of one of the definitions in h/XXXX.defs] ,
 [enable_machine=$enableval],[enable_machine=""])
 
-AC_ARG_ENABLE(gmp,[ --enable-gmp=no will disable use of GMP gnu multiprecision arithmetic, (default is =yes)] ,
-[use_gmp=$enableval],[use_gmp="yes"])
+#AC_ARG_ENABLE(gmp,[ --enable-gmp=no will disable use of GMP gnu multiprecision arithmetic, (default is =yes)] ,
+#[use_gmp=$enableval],[use_gmp="yes"])
+
+use_gmp="yes"
 
 AC_ARG_ENABLE(notify,[ --enable-notify=no will disable the automatic notification of gcl maintainers of successful builds/problems] ,
 [enable_notify=$enableval],[enable_notify="yes"])
