@@ -248,6 +248,7 @@ def_statsysbfd="yes"
 def_custreloc="no"
 def_pic="no";
 def_static="no";
+def_static="debug";
 case $use in 
      *linux)
 	ln -snf linux.defs h/$use.defs;
@@ -261,7 +262,7 @@ case $use in
 		ia64*)
 			def_dlopen="yes" ; def_statsysbfd="no" ; def_static="no" ;;
 		hppa*)
-			def_dlopen="yes" ; def_statsysbfd="no" def_pic="yes" ;;
+			def_dlopen="yes" ; def_statsysbfd="no" ; def_pic="yes" ; def_debug="yes" ;;
 	esac;;
     *mingw*)
 	def_statsysbfd="no" ; def_custreloc="yes" ;;
@@ -284,7 +285,7 @@ AC_ARG_ENABLE(custreloc,
 	,,enable_custreloc="$def_custreloc")
 AC_ARG_ENABLE(debug,
 	[ --enable-debug builds gcl with -g in CFLAGS to enable running under gdb ]
-	,,enable_debug="no")
+	,,enable_debug="$def_debug")
 AC_ARG_ENABLE(gprof,
 	[ --enable-gprof builds gcl with -pg in CFLAGS to enable profiling with gprof ]
 	,,enable_gprof="no")
