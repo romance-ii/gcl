@@ -13,8 +13,6 @@
 		     ADD_FEATURE("SUN"); \
       	             ADD_FEATURE("SPARC")
 
-
-
 #define	SPARC
 #define SGC
 
