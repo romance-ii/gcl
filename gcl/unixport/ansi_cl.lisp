@@ -124,7 +124,7 @@ echo-stream-input-stream echo-stream-output-stream
 ensure-directories-exist fdefinition file-string-length formatter
 function-lambda-expression get-setf-expansion hash-table-rehash-size
 hash-table-rehash-threshold ignorable interactive-stream-p
-load-logical-pathname-translations load-time-value
+load-logical-pathname-translations
 logical-pathname-translations make-load-form
 make-load-form-saving-slots make-method open-stream-p pathname-match-p
 pprint-dispatch pprint-exit-if-list-exhausted pprint-fill

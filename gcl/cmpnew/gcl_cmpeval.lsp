@@ -68,9 +68,30 @@
   (if (eq form '*cmperr-tag*) (c1nil) form))
 
 (si::putprop 'si:|#,| 'c1sharp-comma 'c1special)
+(si::putprop 'load-time-value 'c1load-time-value 'c1special)
 
 (defun c1sharp-comma (arg)
   (c1constant-value (cons 'si:|#,| arg) t))
+
+(defun wrap-literals (form)
+  (cond ((consp form)
+	 (if (eq (car form) 'quote )
+	     `(load-time-value (si::nani ,(si::address (cadr form))))
+	   (cons (wrap-literals (car form)) (wrap-literals (cdr form)))))
+	((stringp form)
+	 `(load-time-value (si::nani ,(si::address form))))
+	(t form)))
+
+(defun c1load-time-value (arg)
+  (c1constant-value
+   (cons 'si:|#,|
+	 (if *compiler-compile*
+	     (let ((x (cmp-eval (car arg))))
+	       (if (and (cdr arg) (cadr arg))
+		   x
+		 `(si::nani ,(si::address x))))
+	   (car arg)))
+   t))
 
 (si::putprop 'si::define-structure 'c1define-structure 't1)
 

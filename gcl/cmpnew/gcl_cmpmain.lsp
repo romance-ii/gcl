@@ -35,6 +35,7 @@
 
 
 (defvar *compiler-in-use* nil)
+(defvar *compiler-compile* nil)
 (defvar *compiler-input*)
 (defvar *compiler-output1*)
 (defvar *compiler-output2*)
@@ -426,7 +427,6 @@ Cannot compile ~a.~%"
     (wt-data1 form)  ;; this binds all the print stuff
     ))
 
-
 (defun compile (name &optional def &aux tem gaz (*default-pathname-defaults* #"."))
 
   (cond ((not(symbolp name)) (error "Must be a name"))
@@ -441,10 +441,12 @@ Cannot compile ~a.~%"
 	 (setf (symbol-function 'cmp-anon) tem)
 	 (compile 'cmp-anon)
 	 (setf (macro-function name) (macro-function name))
-	 name)
+	 ;; FIXME -- support warnings-p and failures-p.  CM 20041119
+	 (values name nil nil))
 	((and (setq tem (symbol-function name))
 	      (consp tem))
-	 (let ((na (if (symbol-package name) name 'cmp-anon)))
+	 (let ((na (if (symbol-package name) name 'cmp-anon))
+	       (tem (wrap-literals tem)))
 	   (unless (and (fboundp 'si::init-cmp-anon) (or (si::init-cmp-anon) (fmakunbound 'si::init-cmp-anon)))
 	     (with-open-file
 	      (st (setq gaz (gazonk-name)) :direction :output)
@@ -452,12 +454,14 @@ Cannot compile ~a.~%"
 					       (lambda (cdr tem))
 					       (lambda-block (cddr tem))
 					       ))       st))
-	     (let ((fi (compile-file gaz)))
+	     (let ((fi (let ((*compiler-compile* t))
+			 (compile-file gaz))))
 	       (load fi)
 	       (delete-file fi))
 	     (unless *keep-gaz* (delete-file gaz)))
 	   (or (eq na name) (setf (symbol-function name) (symbol-function na)))
-	   (symbol-function name)
+	 ;; FIXME -- support warnings-p and failures-p.  CM 20041119
+	   (values (symbol-function name) nil nil)
 	   ))
 	(t (error "can't compile ~a" name))))
 

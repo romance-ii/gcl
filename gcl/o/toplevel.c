@@ -157,6 +157,19 @@ FFN(Feval_when)(object arg)
 }
 
 static void
+FFN(Fload_time_value)(object arg)
+{
+
+	if(endp(arg))
+		FEtoo_few_argumentsF(arg);
+	if(!endp(MMcdr(arg)) && !endp(MMcddr(arg)))
+		FEtoo_many_argumentsF(arg);
+	vs_push(MMcar(arg));
+	eval(vs_head);
+
+}
+
+static void
 FFN(Fdeclare)(object arg)
 {
 	FEerror("DECLARE appeared in an invalid position.", 0);
@@ -228,6 +241,7 @@ gcl_init_toplevel(void)
 	make_si_function("*MAKE-SPECIAL", siLAmake_special);
 	make_si_function("*MAKE-CONSTANT", siLAmake_constant);
 	make_special_form("EVAL-WHEN", Feval_when);
+	make_special_form("LOAD-TIME-VALUE", Fload_time_value);
 	make_special_form("THE", Fthe);
 	sLdeclare=make_special_form("DECLARE",Fdeclare);
 	make_special_form("LOCALLY",Flocally);
