@@ -137,17 +137,6 @@ extern DBEGIN_TY _dbegin;
 
 #define TO_NUMBER(ptr,type) (*((type *)(void *)(ptr)))
 
-#define SEEK_TO_END_OFILE(fp) do { struct filehdr fileheader; int i; \
-        fseek(fp,0,0) ; \
-        fread(&fileheader, sizeof(fileheader), 1, fp); \
-	fseek(fp,    fileheader.f_symptr+fileheader.f_nsyms*SYMESZ, 0); \
-	fread(&i, sizeof(i), 1, fp); \
-	fseek(fp, i - sizeof(i), 1); \
-	while ((i = fgetc(fp)) == 0) \
-		; \
-        ungetc(i, fp); \
-    } while (0)
-		
 #define FCLOSE_SETBUF_OK 
 #define	IEEEFLOAT
 #define I386
@@ -163,8 +152,6 @@ extern DBEGIN_TY _dbegin;
 /* include some low level routines for maxima */
 #define CMAC
 
-#define RELOC_FILE "rel_pecoff.c"
-
 /*  FIONREAD not supported */
 #undef  LISTEN_FOR_INPUT
 
@@ -172,6 +159,17 @@ extern DBEGIN_TY _dbegin;
 #define ADJUST_RELOC_START(j) \
 	the_start = memory->cfd.cfd_start + \
 	  (j == DATA_NSCN ? textsize : 0);
+
+#define SEEK_TO_END_OFILE(fp) do {  IMAGE_FILE_HEADER fileheader; int i; \
+        fseek ( fp, 0, 0 ) ; \
+        fread ( &fileheader, sizeof ( IMAGE_FILE_HEADER ), 1, fp ); \
+	fseek ( fp, fileheader.PointerToSymbolTable + fileheader.NumberOfSymbols * sizeof ( IMAGE_SYMBOL ) , 0); \
+	fread ( &i, sizeof ( i ), 1, fp ); \
+	fseek ( fp, i - sizeof ( i ), 1 ); \
+	while ( ( i = fgetc(fp) ) == 0 ) \
+		; \
+        ungetc ( i, fp ); \
+    } while (0)
 	
 #define IF_ALLOCATE_ERR \
 	if (core_end != sbrk(0))\
@@ -201,17 +199,6 @@ extern char *GCLExeName ( void );
 #define GET_FULL_PATH_SELF(a_) do {\
    (a_)=GCLExeName();\
 } while(0)
-
-/* Needed if optimiser moves object initialisation code around. */
-#define FIND_INIT \
-{ if (*ptr==0 && (NTYPE(sym) == TEXT_NSCN) && sym->n_value ) \
-  { char tem [9]; \
-    char *str=SYM_NAME(sym); \
-  if (str[1]=='i'    && str[2]=='n'  && str[3]=='i' && str[4]== 't' \
-      && str[5]=='_' && str[0]== '_' )  \
-	*ptr=  sym->n_value ; \
-   else {/* printf("The first data symbol was not the init");*/}  \
- }}
 
 #define INSTALL_SEGMENTATION_CATCHER \
   	 (void) signal(SIGSEGV,segmentation_catcher)

@@ -9,13 +9,7 @@ relocate()
   char *where;
   describe_sym ( relocation_info.r_symndx, 0 );
   where = the_start + relocation_info.r_vaddr;
-#ifdef DEBUG  
-  fprintf ( stderr, "relocate: where: %9x at %9x -> " , *where, (unsigned int) where );
-#endif
   if ( relocation_info.r_type == R_ABS ) {
-#ifdef DEBUG          
-      fprintf( stderr, "R_ABS return %9x\n", relocation_info.r_type );
-#endif          
       return;
   }
   
@@ -25,9 +19,6 @@ relocate()
     case R_DIR32:
         *(int *)where = *((int *)where) + 
             symbol_table[relocation_info.r_symndx].n_value;
-#ifdef DEBUG        
-        fprintf ( stderr, "new val R_DIR32   %9x\n", *(int *)where);
-#endif      
         break;
       
     case R_PCRLONG:
@@ -37,15 +28,6 @@ relocate()
            */
         *(int *)where = symbol_table[relocation_info.r_symndx].n_value
             - (int) where - sizeof(int *);
-
-	/*
-          *(int *)where = *((int *)where)  - (int)start_address
-	             + symbol_table[relocation_info.r_symndx].n_value;
-	*/
-
-#ifdef DEBUG        
-        fprintf ( stderr, "new val R_PCRLONG %9x\n", *(int *)where );
-#endif      
 
         break;
 
