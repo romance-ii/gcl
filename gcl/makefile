@@ -160,9 +160,6 @@ install-command:
 	 echo 'set unixportdir=%libdir%\unixport'; \
 	 echo 'path %cd%\..\mingw\bin;%PATH%'; \
 	 echo "start %unixportdir%\saved_gcl.exe -dir %unixportdir% -libdir %libdir% -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9" ) > $(DESTDIR)$(prefix)/bin/gclm.bat
-	rm -f $(DESTDIR)$(prefix)/bin/gclfinal.bat
-	(echo 'ECHO path %1\mingw\bin;%PATH% > gcl.bat'; \
-	 echo "ECHO start %1\lib\gcl-2.5.0\unixport\saved_gcl.exe -dir %1\lib\gcl-2.5.0\unixport -libdir %1\lib\gcl-2.5.0 -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9 >> gcl.bat" ) > $(DESTDIR)$(prefix)/bin/gclfinal.bat
 
 install: 
 	$(MAKE) install1 "INSTALL_LIB_DIR=$(prefix)/lib/gcl-`cat majvers`.`cat minvers`" "prefix=$(prefix)" "DESTDIR=$(DESTDIR)"
@@ -193,6 +190,7 @@ install1:
 	if [ "gcc --version | grep mingw" ] ; then cp COPYING.LIB-2.0 readme-bin.mingw $(prefix) ; fi
 	if [ "gcc --version | grep mingw" ] ; then cp gcl.ico $(prefix)/bin ; fi
 	if [ "gcc --version | grep mingw" ] ; then rm -rf $(prefix)/install; mkdir $(prefix)/install ; cp windows/install.lsp $(prefix)/install ;fi
+	if [ "gcc --version | grep mingw" ] ; then mkdir $(prefix)/doc; cp info/*.html $(prefix)/doc ; fi
 
 clean:
 	(cd $(BINDIR); $(MAKE) clean)
