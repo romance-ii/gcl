@@ -1,4 +1,10 @@
-gclcvs (2.7.0-32) unstable; urgency=low
+gclcvs (2.7.0-33) unstable; urgency=low
+
+  * Temporary workaround to restore xgcl
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 28 Sep 2004 16:27:16 +0000
+
+gclcvs (2.7.0-32) unstable; urgency=high
 
   * Use GMP gcd in bignum case, for performance improvement and better
     binary algorithm
