@@ -47,11 +47,13 @@ which is usually 60 maybe 100 or something else. */
 #undef BSD
 #define ATT
 #endif
+#if defined __MINGW32__ || defined __GNUC__
 #ifdef __MINGW32__
 #include <sys/timeb.h>
 int usleep ( unsigned int microseconds );
-void Lget_system_time_zone(void);
 #endif
+void Lget_system_time_zone(void);
+#endif /* __MINGW32__ and __GNUC__ */
 
 #ifdef BSD
 #include <time.h>
@@ -175,7 +177,7 @@ DEFUN("GET-INTERNAL-REAL-TIME",object,fLget_internal_real_time,LISP,0,0,NONE,OO,
 #endif
 }
 
-#ifdef __MINGW32__
+#if defined __MINGW32__ || defined __GNUC__
 DEFVAR("*DEFAULT-TIME-ZONE*",sSAdefault_time_zoneA,SI,make_fixnum ( system_time_zone_helper() ),"");
 #else
 DEFVAR("*DEFAULT-TIME-ZONE*",sSAdefault_time_zoneA,SI,make_fixnum(TIME_ZONE),"");
@@ -195,7 +197,7 @@ init_unixtime(void)
 
 	make_function("SLEEP", Lsleep);
 	make_function("GET-INTERNAL-RUN-TIME", Lget_internal_run_time);
-#ifdef __MINGW32__        
+#if defined __MINGW32__   || defined __GNUC__
 	make_function("GET-SYSTEM-TIME-ZONE", Lget_system_time_zone);
 #endif        
 }
@@ -213,7 +215,7 @@ int system_time_zone_helper(void)
     TIME_ZONE_INFORMATION tzi;
     DWORD TZResult;
     int tz=0;
-    check_arg(0);
+
     TZResult = GetTimeZoneInformation ( &tzi );
 
     /* Now UTC = (local time + bias), in units of minutes, so */
@@ -221,11 +223,31 @@ int system_time_zone_helper(void)
     tz = (int) (tzi.Bias / 60);
     return ( tz );                                    
 }
+#endif
 
+#ifdef __GNUC__
+int system_time_zone_helper(void){
+  
+  struct tm *local;
+  time_t TIME;
+  int nsecs;
+
+  TIME = time(0);
+  local = localtime(&TIME);
+  nsecs = local->tm_gmtoff;
+  if (nsecs == 0)
+    return (nsecs);
+  else
+    return(- (nsecs / 60 / 60));
+}
+#endif /*__GNUC__*/
+
+#if defined __MINGW32__ || defined __GNUC__
 void
 Lget_system_time_zone(void)
 {
-    vs_push ( make_fixnum ( system_time_zone_helper() ) );
+  check_arg(0);
+  vs_push ( make_fixnum ( system_time_zone_helper() ) );
 }
 
-#endif
+#endif /*__MINGW32__ and __GNUC__ */

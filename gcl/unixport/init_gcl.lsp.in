@@ -12,11 +12,10 @@
 (make-package "DEFPACKAGE" :use '("LISP"))
 (make-package "TK" :use '("LISP" "SLOOP"))
 
-;;Appropriate for Austin
-#-winnt
-(setq SYSTEM:*DEFAULT-TIME-ZONE*  6)
-#+winnt
-(setq SYSTEM:*DEFAULT-TIME-ZONE*  (GET-SYSTEM-TIME-ZONE))
+(eval-when (load)
+    (if (fboundp 'get-system-time-zone)
+	(setf system:*default-time-zone* (get-system-time-zone))
+       (setf system:*default-time-zone* 6)))
 
 (in-package "USER")
 (progn 
