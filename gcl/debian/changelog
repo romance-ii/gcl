@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-49) unstable; urgency=high
+
+  * Use old gmp for m68k until can pin down test failure with gmp3
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 10 Sep 2002 00:36:10 -0400
+
 gcl (2.5.0.cvs20020625-48) unstable; urgency=high
 
   * Rework build and install so that custom images can be made without

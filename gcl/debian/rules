@@ -42,6 +42,11 @@ ifeq ($(ARCHT),hppa)
 RELOC=dlopen
 endif
 
+GMP=--enable-dynsysgmp
+ifeq ($(ARCHT),m68k)
+GMP=
+endif
+
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
@@ -49,7 +54,7 @@ configure-stamp:
 	if [ configure.in -nt configure ]; then autoconf; fi
 	chmod -R +x gmp3/*
 	[ "$(ARCHT)" != "i386" ] || ( cd gmp3 && CC=$(MCC) ./configure --build=i486-unknown-linux-gnu )
-	CC=$(MCC) ./configure --disable-statsysbfd --enable-$(RELOC) --enable-dynsysgmp --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
+	CC=$(MCC) ./configure --disable-statsysbfd --enable-$(RELOC) $(GMP) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
 	[ "$(ARCHT)" != "ia64" ] || ( cd o && $(MCC) -c -Wall -DVOL=volatile -I. -fsigned-char -fwritable-strings -pipe -O -fomit-frame-pointer -I../h -I../gcl-tk num_log.c  )
 	touch configure-stamp
 

@@ -880,8 +880,8 @@ case $use in
 			def_dlopen="yes" ; def_statsysbfd="no" ;;
 		hppa*)
 			def_dlopen="yes" ; def_statsysbfd="no" def_pic="yes" ;;
-#		m68k*)
-#			def_oldgmp="yes" ;;
+		m68k*)
+			def_oldgmp="yes" ;;
 	esac;;
     *mingw*)
 	def_statsysbfd="no" ; def_custreloc="yes" ;;
