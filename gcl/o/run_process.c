@@ -26,16 +26,22 @@ License for more details.
 
 #include<windows.h>
 #include <fcntl.h>
+#define PIPE_BUFFER_SIZE 2048
 
 void DisplayError ( char *pszAPI );
+void setup_stream_buffer ( object x );
 void PrepAndLaunchRedirectedChild ( HANDLE hChildStdOut,
     HANDLE hChildStdIn,
     HANDLE hChildStdErr,
     PROCESS_INFORMATION *process_info,
     char *name );
-void setup_stream_buffer ( object x );
 
-/* Run a process, with name holding the process name and arguments */
+/* Run a process, with name holding the process name and arguments
+ * To test:
+ *
+ *    (setq fp (si::run-process "wish"))
+ * 
+ */
 void run_process ( char *name )
 {
     object stream_in, stream_out, stream;
@@ -62,7 +68,7 @@ void run_process ( char *name )
     if ( ! CreatePipe ( &hChildStdoutReadTmp,
                         &hChildStdoutWrite,
                         &sec_att,
-                        0 ) ) {
+                        PIPE_BUFFER_SIZE ) ) {
         DisplayError ( "CreatePipe stdout" );
     }
     
@@ -83,7 +89,7 @@ void run_process ( char *name )
     if ( ! CreatePipe ( &hChildStdinRead,
                         &hChildStdinWriteTmp,
                         &sec_att,
-                        0 ) ) {
+                        PIPE_BUFFER_SIZE ) ) {
         DisplayError ( "CreatePipe stdin" );
     }
 
@@ -128,8 +134,10 @@ void run_process ( char *name )
 
 #if 0
     fprintf ( stderr, "Before write\n" );
-    WriteFile( hChildStdinWrite, chBuf, strlen ( chBuf ), 
+    WriteFile ( hChildStdinWrite, chBuf, strlen ( chBuf ), 
                &dwWritten, NULL);
+    FlushFileBuffers ( hChildStdinWrite );
+    FlushFileBuffers ( hChildStdoutRead );
     fprintf ( stderr, "Before read\n" );
     if ( ! ReadFile( hChildStdoutRead, chBuf, 2, &dwRead, NULL ) || 
          dwRead == 0 ) {

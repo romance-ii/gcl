@@ -1,5 +1,8 @@
+
+#
 # Machine dependent makefile definitions for Intel X86 under Microsoft Windows,
-# using Mingw32 compiler tools.
+# using Mingw32 compiler tools. (h/mingw.defs)
+#
 
 SHELL        = sh
 
@@ -17,8 +20,13 @@ CROSS_PREFIX =
 # MPIOBJS      = $(MPIDIR)/mpi_glue.o
 # LIBS        += -L$(MPICHDIR)/lib -lmpich
 
-CFLAGS       = -Wall -fwritable-strings -DVOL=volatile -fsigned-char -I$(GCLDIR)/o 
-FINAL_CFLAGS = -Wall -fwritable-strings -DVOL=volatile -fsigned-char
+# CFLAGS       = -Wall -fwritable-strings -DVOL=volatile -fsigned-char -I$(GCLDIR)/o 
+# FINAL_CFLAGS = -Wall -fwritable-strings -DVOL=volatile -fsigned-char
+# O3FLAGS      = -O2 -fomit-frame-pointer
+# O2FLAGS      = -O
+
+CFLAGS       = -Wall -DVOL=volatile -fsigned-char -fwritable-strings -I$(GCLDIR)/o 
+FINAL_CFLAGS = -Wall -DVOL=volatile -fsigned-char -fwritable-strings
 O3FLAGS      = -O2 -fomit-frame-pointer
 O2FLAGS      = -O
 
@@ -78,3 +86,7 @@ TCL_EXES=
 
 GCL_DVI=
 GCL_HTML=
+
+#
+# End h/mingw.defs
+#

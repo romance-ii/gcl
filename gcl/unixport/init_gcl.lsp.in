@@ -84,9 +84,11 @@
         (t  ;; if ANY header or license information is printed by the
             ;; program, then the following License and Enhancement notice
             ;; must be printed (see License).
-	 (format t "GCL (GNU Common Lisp)  ~A~%~a~%~a~%" "DATE"
+	 (format t "GCL (GNU Common Lisp)  ~A~%~a~%~a~%~a~%~a~%" "DATE"
 		 "Licensed under GNU Library General Public License"
-		 "Contains Enhancements by W. Schelter")))
+		 "Contains Enhancements by W. Schelter."
+		 "The function (apropos <some string>) gives symbols containing that string."
+		 "These functions describe those symbols: (describe 'symbol), (help 'symbol).")))
      (setq si::*ihs-top* 1)
   (in-package 'system::user) (incf system::*ihs-top* 2)
   (funcall system::*old-top-level*))
