@@ -10,7 +10,8 @@
 
 static bfd *exe_bfd = NULL;
 struct bfd_link_info link_info;
-
+reloc_howto_type rhtt;
+    
 int build_symbol_table_bfd ( char *oname ) {
 
     int u,v;
@@ -250,7 +251,9 @@ int main ( int argc, char ** argv )
     void *start_address = NULL;
     void *m             = NULL;
     
-    fprintf ( stderr, "In BFD fast load test.\n" );
+    fprintf ( stderr, "In BFD fast load test. Reloc_howto_type size %d\n",
+              sizeof ( rhtt ) );
+    
     if ( argc < 3 ) {
         fprintf ( stderr, "Need an executable and an object file as arguments.\n" );
     } else {
