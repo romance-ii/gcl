@@ -2278,7 +2278,7 @@ case $canonical in
      old)
      use=vax;;
 
-     i*cygwin32)
+     i*cygwin*)
 	if $CC -v 2>&1 | fgrep ming > /dev/null ;
             then use=mingw
           else  use=gnuwin95
