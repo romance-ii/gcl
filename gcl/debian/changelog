@@ -11,8 +11,9 @@ gcl (2.5.0.cvs20020625-60) unstable; urgency=low
   * setf values fixes to use setf instead of setq when target value is
     not a symbol
   * ETYPECASE/CTYPECASE can take t and otherwise
+  * Backout of restart-clusters export
 
- -- Camm Maguire <camm@m.enhanced.com>  Tue, 22 Oct 2002 15:39:29 -0400
+ -- Camm Maguire <camm@m.enhanced.com>  Tue, 22 Oct 2002 17:44:50 -0400
 
 gcl (2.5.0.cvs20020625-59) unstable; urgency=low
 
