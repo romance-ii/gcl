@@ -77,9 +77,10 @@ int start, end, *ep;
 	vs_mark;
 
 	vsp = vs_top + 1;
-	for (i = j = start;  i < end;  ) {
-		if (isspace((int)s->st.st_self[i]))
-			break;
+	for (;--end >= start && isspace((int)s->st.st_self[end]););
+	for (i = j = start;  i <= end;  ) {
+/* 		if (isspace((int)s->st.st_self[i])) */
+/* 			break; */
 #ifndef IS_DIR_SEPARATOR
 #define IS_DIR_SEPARATOR(x) (x == '/')
 #endif
@@ -102,10 +103,6 @@ int start, end, *ep;
 			}
 			/* END OF BUG FIX */
 #endif
-#ifdef AOSVS
-
-
-#endif
 #ifdef UNIX
 			if (i-j == 1 && s->st.st_self[j] == '.') {
 				vs_push(sKcurrent);
@@ -114,39 +111,8 @@ int start, end, *ep;
 			} else
 				make_one(&s->st.st_self[j], i-j);
 #endif
-#ifdef AOSVS
-
-#endif
 			i++;
 			j = i;
-#ifdef AOSVS
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#endif
 		} else
 			i++;
 	}
@@ -179,9 +145,6 @@ int start, end, *ep;
 #ifdef UNIX
 		if (i-j == 1 && s->st.st_self[j] == '*')
 #endif
-#ifdef AOSVS
-
-#endif
 			vs_push(sKwild);
 		else
 			make_one(&s->st.st_self[j], i-j);
@@ -192,9 +155,6 @@ int start, end, *ep;
 #ifdef UNIX
 		if (i-d-1 == 1 && s->st.st_self[d+1] == '*')
 #endif
-#ifdef AOSVS
-
-#endif
 			vs_push(sKwild);
 		else
 			make_one(&s->st.st_self[d+1], i-d-1);
@@ -203,17 +163,11 @@ int start, end, *ep;
 #ifdef UNIX
 		if (d-j == 1 && s->st.st_self[j] == '*')
 #endif
-#ifdef AOSVS
-
-#endif
 			vs_push(sKwild);
 		else
 			make_one(&s->st.st_self[j], d-j);
 #ifdef UNIX
 		if (i-d-1 == 1 && s->st.st_self[d+1] == '*')
-#endif
-#ifdef AOSVS
-
 #endif
 			vs_push(sKwild);
 		else
