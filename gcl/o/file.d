@@ -304,7 +304,7 @@ object strm;
   if (strm->sm.sm_buffer)
     {insert_contblock(strm->sm.sm_buffer, BUFSIZ);
      strm->sm.sm_buffer = 0;}
-  else
+ else
     printf("no buffer? %p  \n",strm->sm.sm_fp);
 
 #ifndef FCLOSE_SETBUF_OK
@@ -363,12 +363,20 @@ object if_exists, if_does_not_exist;
 			    sprintf(buf,"%s.gz",fname);
 			    fp = fopen(buf,"r");
 			    if (fp)
-			      { char tmp[200];
+			      { 
+#ifdef NO_MKSTEMP
+	                        char *tmp;
+#else
+	                        char tmp[200];
+#endif
 				char command [500];
 				fclose(fp);
-				/*tmp = tmpnam(0);*/
+#ifdef NO_MKSTEMP
+				tmp = tmpnam(0);
+#else
 				snprintf(tmp,sizeof(tmp),"uzipXXXXXX");
 				mkstemp(tmp); /* fixme: catch errors */
+#endif
 				unzipped = make_simple_string(tmp);
 				sprintf(command,"gzip -dc %s > %s",buf,tmp);
 				fp = 0;
