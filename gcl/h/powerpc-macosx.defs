@@ -28,3 +28,5 @@ INITFORM = (si::build-symbol-table)
 # Other plateforms define this to be `ar rs`.
 # This appears to be no longer necessary on Panther.
 ARRS = libtool -static -o
+
+FINAL_CFLAGS := `echo $(FINAL_CFLAGS) | sed -e 's:-g::g'`
