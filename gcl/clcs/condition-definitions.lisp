@@ -26,7 +26,7 @@
 (DEFINE-CONDITION SERIOUS-CONDITION (CONDITION)
   ())
 
-(DEFINE-CONDITION lisp:ERROR (SERIOUS-CONDITION)
+(DEFINE-CONDITION ERROR (SERIOUS-CONDITION)
   ())
 
 (DEFUN SIMPLE-CONDITION-PRINTER (CONDITION STREAM)
@@ -54,7 +54,7 @@
   #-(or clos pcl)(:CONC-NAME %%SIMPLE-WARNING-)
   #-(or clos pcl)(:REPORT SIMPLE-CONDITION-PRINTER))
 
-(DEFINE-CONDITION SIMPLE-ERROR (#+(or clos pcl) SIMPLE-CONDITION lisp:ERROR)
+(DEFINE-CONDITION SIMPLE-ERROR (#+(or clos pcl) SIMPLE-CONDITION ERROR)
   #-(or clos pcl)
   (FORMAT-STRING (FORMAT-ARGUMENTS '()))
   #+(or clos pcl)
@@ -68,7 +68,7 @@
 
 (DEFINE-CONDITION STORAGE-EXHAUSTED (STORAGE-CONDITION) ())
 
-(DEFINE-CONDITION TYPE-ERROR (lisp:ERROR)
+(DEFINE-CONDITION TYPE-ERROR (ERROR)
   #-(or clos pcl)
   (DATUM EXPECTED-TYPE)
   #+(or clos pcl)
@@ -105,13 +105,13 @@
 	      (CASE-FAILURE-NAME CONDITION)
 	      (CASE-FAILURE-POSSIBILITIES CONDITION)))))
 
-(DEFINE-CONDITION PROGRAM-ERROR (lisp:ERROR)
+(DEFINE-CONDITION PROGRAM-ERROR (ERROR)
   ())
 
-(DEFINE-CONDITION CONTROL-ERROR (lisp:ERROR)
+(DEFINE-CONDITION CONTROL-ERROR (ERROR)
   ())
 
-(DEFINE-CONDITION STREAM-ERROR (lisp:ERROR)
+(DEFINE-CONDITION STREAM-ERROR (ERROR)
   #-(or clos pcl)
   (STREAM)
   #+(or clos pcl)
@@ -124,21 +124,21 @@
 	     (FORMAT STREAM "Unexpected end of file on ~S."
 		     (STREAM-ERROR-STREAM CONDITION)))))
 
-(DEFINE-CONDITION FILE-ERROR (lisp:ERROR)
+(DEFINE-CONDITION FILE-ERROR (ERROR)
   #-(or clos pcl)
   (PATHNAME)
   #+(or clos pcl)
   ((PATHNAME :initarg :PATHNAME
 	     :reader FILE-ERROR-PATHNAME)))
 
-(DEFINE-CONDITION PACKAGE-ERROR (lisp:ERROR)
+(DEFINE-CONDITION PACKAGE-ERROR (ERROR)
   #-(or clos pcl)
   (PACKAGE)
   #+(or clos pcl)
   ((PACKAGE :initarg :PACKAGE
 	    :reader PACKAGE-ERROR-PACKAGE)))
 
-(DEFINE-CONDITION CELL-ERROR (lisp:ERROR)
+(DEFINE-CONDITION CELL-ERROR (ERROR)
   #-(or clos pcl)
   (NAME)
   #+(or clos pcl)
@@ -157,7 +157,7 @@
 	     (FORMAT STREAM "The function ~S is undefined."
 		     (CELL-ERROR-NAME CONDITION)))))
 
-(DEFINE-CONDITION ARITHMETIC-ERROR (lisp:ERROR)
+(DEFINE-CONDITION ARITHMETIC-ERROR (ERROR)
   #-(or clos pcl)
   (OPERATION OPERANDS)
   #+(or clos pcl)
@@ -178,7 +178,7 @@
 
 #+kcl
 (progn
-(define-condition internal-error (lisp:error)
+(define-condition internal-error ( error)
   #-(or clos pcl)
   ((function-name nil))
   #+(or clos pcl)
