@@ -93,12 +93,12 @@ object sSAbreak_stepA;
 static void
 quick_call_sfun(object fun)
 { DEBUG_AVMA
-  int i,n;
+  int i=fun->sfn.sfn_argd,n=SFUN_NARGS(i);
   enum ftype restype;
   object *x,res,*base;
-  object temp_ar[10];
-  i=fun->sfn.sfn_argd;
-  n=SFUN_NARGS(i);
+  object *temp_ar=alloca(n*sizeof(object));
+/*   i=fun->sfn.sfn_argd; */
+/*   n=SFUN_NARGS(i); */
   base = vs_base;
   if (n != vs_top - base)
     {check_arg_failed(n);}
