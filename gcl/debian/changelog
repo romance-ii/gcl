@@ -29,8 +29,9 @@ gclcvs (2.7.0-31) unstable; urgency=low
   * Fix ansi bug in set-pprint-dispatch which prevented test completion
   * Properly detect floating point numbers and reset radix to 10 in
     parse_number
+  * Further fixes to parse_number
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 17 Aug 2004 16:26:06 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 17 Aug 2004 18:03:19 +0000
 
 gclcvs (2.7.0-30) unstable; urgency=high
 

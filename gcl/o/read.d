@@ -722,7 +722,9 @@ parse_number(char *s, int end, int *ep, int radix) {
   vs_push((object)integer_part);
   if (i >= end)
     goto NO_NUMBER;
-  
+
+  j=i;
+
 #define MOST_POSITIVE_FIX (((unsigned int) (~0) ) /2)
 #define TEN_EXPT_9 1000000000
   
@@ -765,7 +767,8 @@ parse_number(char *s, int end, int *ep, int radix) {
   if (i >= end)
     goto MAKE_INTEGER;
   if (s[i] == '/') {
-    i++;
+    if (i==j || ++i >= end || (d = digitp(s[i], radix)) < 0)
+      goto NO_NUMBER;
     goto DENOMINATOR;
   }
 
@@ -779,7 +782,7 @@ parse_number(char *s, int end, int *ep, int radix) {
   if (s[i] == '.') {
     if (++i >= end)
       goto MAKE_INTEGER;
-    else if (digitp(s[i], radix) >= 0)
+    else if ((d=digitp(s[i], radix)) >= 0)
       goto FRACTION;
     else if (is_exponent_marker(s[i])) {
       fraction
@@ -810,8 +813,8 @@ parse_number(char *s, int end, int *ep, int radix) {
  FRACTION:
   if (radix!=10)
     FEerror("Parse_number radix error", 0);
-  if ((d = digitp(s[i], radix)) < 0)
-    goto NO_NUMBER;
+/*   if ((d = digitp(s[i], radix)) < 0) */
+/*     goto NO_NUMBER; */
   fraction = 0.0;
   fraction_unit = 1000000000.0;
   for (;;) {
@@ -909,8 +912,8 @@ parse_number(char *s, int end, int *ep, int radix) {
     big_register_0 = new_bignum();
   zero_big(big_register_0);
   
-  if ((d = digitp(s[i], radix)) < 0)
-    goto NO_NUMBER;
+/*   if ((d = digitp(s[i], radix)) < 0) */
+/*     goto NO_NUMBER; */
   integer_part = big_register_0;
   /*	zero_big(integer_part); */
   do {
