@@ -290,20 +290,23 @@
 ;; of the other argument in the comparison, apparently to symmetrize
 ;; the long integer range.  20040403 CM.
 (defmacro dotimes ((var form &optional (val nil)) &rest body)
-  (cond ((symbolp form)
-	 `(cond ((< ,form 0)
-		 (let ((,var 0))
-		   (declare (fixnum ,var) (ignorable ,var))
-		   ,val))
-		((<= ,form most-positive-fixnum)
-		 (let ((,form ,form))
-		   (declare (fixnum ,form))
-		   (do* ((,var 0 (1+ ,var))) ((>= ,var ,form) ,val)
-		     (declare (fixnum ,var))
-		     ,@body)))
-		(t 
-		 (do* ((,var 0 (1+ ,var))) ((>= ,var ,form) ,val)
-		   ,@body))))
+  (cond
+   ((symbolp form)
+    (let ((temp (gensym)))
+      `(cond ((< ,form 0)
+	      (let ((,var 0))
+		(declare (fixnum ,var) (ignorable ,var))
+		,val))
+	     ((<= ,form most-positive-fixnum)
+                 (let ((,temp ,form))
+                   (declare (fixnum ,temp))
+                   (do* ((,var 0 (1+ ,var))) ((>= ,var ,temp) ,val)
+                     (declare (fixnum ,var))
+                     ,@body)))
+                (t 
+		 (let ((,temp ,form))
+		   (do* ((,var 0 (1+ ,var))) ((>= ,var ,temp) ,val)
+		     ,@body))))))
 	((constantp form)
 	 (cond ((< form 0)
 		`(let ((,var 0))
@@ -332,6 +335,7 @@
 		  (t 
 		   (do* ((,var 0 (1+ ,var))) ((>= ,var ,temp) ,val)
 		     ,@body))))))))
+
 
 (defmacro declaim (&rest l)
  `(eval-when (compile eval load)
