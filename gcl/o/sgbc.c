@@ -806,7 +806,7 @@ sgc_sweep_phase(void) {
 	    x->a.a_displaced->c.c_cdr = Cnil;
 	  }
 	}
-#endif OLD_DISPLACE
+#endif /* OLD_DISPLACE */
 #ifdef GMP_USE_MALLOC			
 	if (x->d.t == t_bignum) 
 	  mpz_clear(MP(x));

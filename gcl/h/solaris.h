@@ -24,3 +24,8 @@
 #undef LISTEN_FOR_INPUT
 #undef SIG_UNBLOCK_SIGNALS
 #define NO_SYSTEM_TIME_ZONE
+
+void bcopy (const void *,void *,size_t);
+void bzero(void *,size_t);
+int bcmp(const void *,const void *,size_t);
+

@@ -768,6 +768,11 @@ AC_CHECK_HEADERS(math.h,AC_DEFINE(HAVE_MATH_H))
 AC_CHECK_HEADERS(values.h,AC_DEFINE(HAVE_VALUES_H))
 
 #
+# Sparc solaris keeps this in float.h, rework either/or with values.h later
+#
+AC_CHECK_HEADERS(float.h,AC_DEFINE(HAVE_FLOAT_H))
+
+#
 # The second alternative is for solaris.  This needs to be
 # a more comprehensive later, i.e. checking that the fpclass
 # test makes sense.  CM

@@ -178,10 +178,14 @@ SGC is enabled.  */
 #endif
 
 #undef HAVE_VALUES_H
+#undef HAVE_FLOAT_H
 
 #ifdef IN_NUM_CO
 #ifdef HAVE_VALUES_H
 #include <values.h>
+#endif
+#ifdef HAVE_FLOAT_H
+#include <float.h>
 #endif
 #endif
 
