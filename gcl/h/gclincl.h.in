@@ -180,6 +180,8 @@
 #undef __SHORT_LIMB
 #undef __LONG_LONG_LIMB
 
+#undef HAVE_JAPI_H
+
 /* The number of bytes in a long *.  */
 #undef SIZEOF_LONG_P
 
@@ -201,6 +203,9 @@
 /* Define if you have the <float.h> header file.  */
 #undef HAVE_FLOAT_H
 
+/* Define if you have the <japi.h> header file.  */
+#undef HAVE_JAPI_H
+
 /* Define if you have the <math.h> header file.  */
 #undef HAVE_MATH_H
 
@@ -209,6 +214,3 @@
 
 /* Define if you have the <values.h> header file.  */
 #undef HAVE_VALUES_H
-
-/* Define if you have the <japi.h> header file. */
-#undef HAVE_JAPI_H

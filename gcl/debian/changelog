@@ -36,8 +36,9 @@ gcl (2.5.0.cvs20020625-76) unstable; urgency=low
   * Rework object definition in makefiles
   * Remove old gmp directory
   * Remove old tests directory
+  * Reinsert JAPI configuration
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 26 Feb 2003 18:10:54 -0500
+ -- Camm Maguire <camm@enhanced.com>  Wed, 26 Feb 2003 18:26:21 -0500
 
 gcl (2.5.0.cvs20020625-75) unstable; urgency=low
 

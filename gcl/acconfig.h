@@ -226,3 +226,5 @@ SGC is enabled.  */
 
 #undef __SHORT_LIMB
 #undef __LONG_LONG_LIMB
+
+#undef HAVE_JAPI_H

@@ -819,6 +819,11 @@ AC_EGREP_HEADER([gettimeofday],
 
 AC_CHECK_LIB(m,sin,LIBS="${LIBS} -lm",true)
 AC_CHECK_LIB(mingwex,main,LIBS="${LIBS} -lmingwex",true)
+# AC_CHECK_LIB(japi,j_start,LIBS="${LIBS} -ljapi -lwsock32",true)
+EXTRA_LOBJS=
+AC_CHECK_HEADERS(japi.h,[AC_DEFINE(HAVE_JAPI_H)
+			 EXTRA_LOBJS="${EXTRA_LOBJS} japi.o"
+			 LIBS="${LIBS} -ljapi -lwsock32"] )
 
 # Should really find a way to check for prototypes, but this 
 # basically works for now.  CM
@@ -1395,6 +1400,7 @@ AC_SUBST(O3FLAGS)
 O2FLAGS=$TO2FLAGS
 AC_SUBST(O2FLAGS)
 
+AC_SUBST(EXTRA_LOBJS)
 if test -f h/$use.defs  ; then
 
   AC_SUBST(use)
