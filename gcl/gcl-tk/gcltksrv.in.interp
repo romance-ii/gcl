@@ -3,7 +3,7 @@
 export GCL_TK_DIR ; \
 GCL_TK_DIR=/d2/wfs/gcl-2.3/gcl-tk
 #comment \
-export DISPLAY; DISPLAY=$4 ;   exec wish8.0 "$0" "$@" 
+export DISPLAY; DISPLAY=$4 ;   exec wish "$0" "$@" 
 set host [lindex $argv 0]
 set port [lindex $argv 1]
 set pid [lindex $argv 2]
