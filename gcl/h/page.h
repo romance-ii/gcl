@@ -58,14 +58,14 @@ char sgc_type_map[MAXPAGE];
 #define SGC_WRITABLE  (SGC_PERM_WRITABLE | SGC_TEMP_WRITABLE)
 #define SGC_PAGE (SGC_TEMP_WRITABLE | SGC_PAGE_FLAG)
 
-#define SGC_PAGE_P(p) (sgc_type_map[p] & SGC_PAGE_FLAG)
-#define WRITABLE_PAGE_P(p) (sgc_type_map[p] & SGC_WRITABLE)
-#define ON_SGC_PAGE(x) (sgc_type_map[page(x)] & SGC_PAGE_FLAG)
-#define ON_WRITABLE_PAGE(x) (sgc_type_map[page(x)] & SGC_WRITABLE)
+#define SGC_PAGE_P(p) ((unsigned long)p<MAXPAGE && (sgc_type_map[p] & SGC_PAGE_FLAG))
+#define WRITABLE_PAGE_P(p) ((unsigned long)p<MAXPAGE && (sgc_type_map[p] & SGC_WRITABLE))
+#define ON_SGC_PAGE(x) ((unsigned long)page(x)<MAXPAGE && (sgc_type_map[page(x)] & SGC_PAGE_FLAG))
+#define ON_WRITABLE_PAGE(x) ((unsigned long)page(x)<MAXPAGE && (sgc_type_map[page(x)] & SGC_WRITABLE))
 
 
-#define  IF_WRITABLE(x,if_code) do {long xSG= page(x); \
-			    if(((xSG & (-MAXPAGE)) ==0) && \
+#define  IF_WRITABLE(x,if_code) do {unsigned long xSG= page(x); \
+			    if(((xSG & (-MAXPAGE)) ==0) && xSG < MAXPAGE && \
 			       (sgc_type_map[xSG] & SGC_WRITABLE)) \
 				 {if_code;}} while(0)
 

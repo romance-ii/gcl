@@ -160,18 +160,21 @@ void
 add_page_to_freelist(char *p, struct typemanager *tm)
 {short t,size;
  long i=tm->tm_nppage,fw;
+ unsigned long np=page(p);
  object x,f;
+ if (np>=MAXPAGE)
+   error("Address passed to add_page_to_freelist beyone MAXPAGES\n");
  t=tm->tm_type;
 #ifdef SGC
  {
-   long nn=page(p);
+   long nn=np;
    if (sgc_enabled) {
      if (!WRITABLE_PAGE_P(nn)) 
        make_writable(nn,nn+1);
    }
  }
 #endif
- type_map[page(p)]= t;
+ type_map[np]= t;
  size=tm->tm_size;
  f=tm->tm_free;
  x= (object)p;
@@ -180,7 +183,7 @@ add_page_to_freelist(char *p, struct typemanager *tm)
 #ifdef SGC
  if (sgc_enabled && tm->tm_sgc)
    {x->d.s=SGC_RECENT;
-    sgc_type_map[page(x)] = (SGC_PAGE_FLAG | SGC_TEMP_WRITABLE);}
+    sgc_type_map[np] = (SGC_PAGE_FLAG | SGC_TEMP_WRITABLE);}
  else x->d.s = SGC_NORMAL;
  
  /* array headers must be always writable, since a write to the
@@ -189,7 +192,7 @@ add_page_to_freelist(char *p, struct typemanager *tm)
     but just SGC_TOUCH the header each time you write to it.   this
     is what is done with t_structure */
   if (t== (tm_of(t_array)->tm_type))
-   sgc_type_map[page(x)] |= SGC_PERM_WRITABLE;
+   sgc_type_map[np] |= SGC_PERM_WRITABLE;
    
 #endif 
  fw= *(int *)x;
@@ -520,7 +523,6 @@ alloc_contblock(size_t n) {
 	 long m;
 	 bool g;
 
-
 /*
 	printf("allocating %d-byte contiguous block...\n", n);
 */
@@ -582,8 +584,9 @@ Use ALLOCATE-CONTIGUOUS-PAGES to expand the space.",
 		goto ONCE_MORE;
 	}
       }
-	p = alloc_page(m);
 
+	p = alloc_page(m);
+	/* alloc_page guaranteed to return p in range for type_map references below. CM */
 	for (i = 0;  i < m;  i++) {
 		type_map[page(p) + i] = (char)t_contiguous;
 
@@ -804,6 +807,7 @@ set_maxpage(void) {
     memory_protect(sgc_enabled ? 1 : 0);
   }
   if (~(-MAXPAGE) != MAXPAGE-1) error("MAXPAGE must be power of 2");
+  /* FIXME ensure core_end in range for type_map reference below.  CM */
   if (core_end)
     bzero(&sgc_type_map[ page(core_end)],MAXPAGE- page(core_end));
 #else
@@ -1063,9 +1067,10 @@ DEFUN_NEW("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
   if (available_pages < m || (p = alloc_page(m)) == NULL)
     FEerror("Can't allocate ~D pages for contiguous blocks.",
 	    1, make_fixnum(npages));
-
+  
+  /* alloc_page call above guaranteed to return p in range for type_map reference below. CM */
   for (i = 0;  i < m;  i++) {
-    type_map[page(p + PAGESIZE*i)] = (char)t_contiguous;
+    type_map[page(p)+i] = (char)t_contiguous;
     /* SGC cont pages: Before this point, GCL never marked contiguous
        pages for SGC, causing no contiguous pages to be
        swept when SGC was on.  Here we follow the behavior

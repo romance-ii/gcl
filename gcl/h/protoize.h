@@ -240,7 +240,7 @@ typedef void (*funcvoid)(void);
 /* sgbc.c:924:OF */ extern int sgc_count_type (int t); /* (t) int t; */
 /* sgbc.c:938:OF */ extern int sgc_start (void); /* () */
 /* sgbc.c:1068:OF */ extern int sgc_quit (void); /* () */
-/* sgbc.c:1131:OF */ extern void make_writable (long beg, long i); /* (beg, i) int beg; int i; */
+/* sgbc.c:1131:OF */ extern void make_writable (unsigned long beg, unsigned long i); /* (beg, i) int beg; int i; */
 #ifndef __MINGW32__
 /* #include <signal.h> */
 #endif

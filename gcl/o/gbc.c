@@ -180,10 +180,13 @@ enum type what_to_collect;
 void
 enter_mark_origin(object *p)
 {
+  unsigned long np=page(p);
+  if (np>=MAXPAGE)
+    error("Address supplied to enter_mar_origin out of range");
   if (mark_origin_max >= MARK_ORIGIN_MAX)
     error("too many mark origins");
 #ifdef SGC
-  sgc_type_map[page(p)] |= SGC_PERM_WRITABLE ;
+  sgc_type_map[np] |= SGC_PERM_WRITABLE ;
 #endif	
   mark_origin[mark_origin_max++] = p;
 }
@@ -665,7 +668,8 @@ static long *c_stack_where;
 static void
 mark_stack_carefully(void *topv, void *bottomv, int offset) {
 
-  long p,m,pageoffset;
+  long m,pageoffset;
+  unsigned long p;
   object x;
   struct typemanager *tm;
   register long *j;
@@ -1450,8 +1454,9 @@ mark_contblock(void *p, int s) {
 
   STATIC char *q;
   STATIC char *x, *y;
+  long np=page(p);
   
-  if (!MAYBE_DATA_P(p) || (enum type)type_map[page(p)] != t_contiguous)
+  if (!MAYBE_DATA_P(p) || np >= MAXPAGE || (enum type)type_map[page(p)] != t_contiguous)
     return;
   q = p + s;
   /* SGC cont pages: contblock pages must be no smaller than

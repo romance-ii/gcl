@@ -599,7 +599,8 @@ sgc_mark_object1(object x) {
 static void
 sgc_mark_stack_carefully(void *topv, void *bottomv, int offset) {
   
-  long p,m,pageoffset;
+  long m,pageoffset;
+  unsigned long p;
   object x;
   struct typemanager *tm;
   register long *j;
@@ -947,9 +948,9 @@ sgc_count(object yy) {
 static int
 sgc_count_writable(int end) { 
 
-  long j = first_protectable_page -1;
-  long count = 0;
-  long hp_end= page(heap_end);
+  unsigned long j = first_protectable_page -1;
+  unsigned long count = 0;
+  unsigned long hp_end= page(heap_end)-1;
   while(j++ < hp_end)
     if (WRITABLE_PAGE_P(j)) count++;
   j= page(rb_start);
@@ -962,9 +963,10 @@ sgc_count_writable(int end) {
 int
 sgc_count_type(int t) {
 
-  long j = first_protectable_page -1;
-  long end = page(core_end);
-  long count=0;
+  unsigned long j = first_protectable_page -1;
+  unsigned long end = page(core_end)-1;
+  unsigned long count=0;
+  /* FIXME  ensure core_end in range for type_map reference below.  CM*/
   while(j++ < end)
     if (type_map[j]==t && SGC_PAGE_P(j))
       count++;
@@ -974,10 +976,10 @@ sgc_count_type(int t) {
 int
 sgc_count_read_only_type(int t) {
 
-  long j = first_protectable_page -1;
-  long hp_end = page(heap_end);
-  long end = page(rb_limit);
-  long count=0;
+  unsigned long j = first_protectable_page -1;
+  unsigned long hp_end = page(heap_end)-1;
+  unsigned long end = page(rb_limit)-1;
+  unsigned long count=0;
   while(j++ < hp_end)
     if ((type_map[j]==t || (t<0 && type_map[j]!=t_other)) && !WRITABLE_PAGE_P(j))
       count++;
@@ -1199,15 +1201,18 @@ sgc_start(void) {
   object f;
   struct typemanager *tm;
   long npages;
+  unsigned long npp;
 
   if (memprotect_result!=memprotect_success && do_memprotect_test())
     return 0;
 
-  if (sgc_type_map[page((&sgc_type_map[0]))] != SGC_PERM_WRITABLE)
+  npp=page((&sgc_type_map[0]));
+  if (npp<MAXPAGE && sgc_type_map[npp] != SGC_PERM_WRITABLE)
     perm_writable(&sgc_type_map[0],sizeof(sgc_type_map));
   if (sgc_enabled)
     return 1;
   sgc_type_map[0]=0;
+  /* FIXME ensure core_end in range for type_map reference below.  CM*/
   i=npages=page(core_end);
   while (i--> 0)
     sgc_type_map[i] = sgc_type_map[i]  & SGC_PERM_WRITABLE ;
@@ -1216,19 +1221,21 @@ sgc_start(void) {
     if (TM_BASE_TYPE_P(i) && (np=(tm=tm_of(i))->tm_sgc)) 
       FIND_FREE_PAGES:
     {
-      long maxp=0;
-      long j;
+      unsigned long maxp=0;
+      unsigned long j;
       /* SGC cont pages: This used to be simply set to tm_sgc_minfree,
 	 which is a definite bug, as minfree could then be zero,
 	 leading this type to claim SGC pages not of its type as
 	 specified in type_map.  CM 20030827*/
       unsigned short minfree = tm->tm_sgc_minfree > 0 ? tm->tm_sgc_minfree : 1 ;
-      long count;
+      unsigned long count;
       bzero(free_map,npages*sizeof(short));
       f = tm->tm_free;
       count=0;
       while (f!=0) {
 	j=page(f);
+	if (j>=MAXPAGE)
+	  error("Address in tm freelist out of range");
 	/* protect against overflow */
 	free_map[j]=free_map[j]<minfree ? free_map[j]+1 : free_map[j];
 	if (j>=maxp) maxp=j;
@@ -1313,7 +1320,7 @@ sgc_start(void) {
     if (count>0) {
       /* SGC cont pages: allocate more if necessary, dumping possible
 	 GBC freed pages onto the old contblock list.  CM 20030827*/
-      long z=count+1;
+      unsigned long z=count+1;
       void *p1=alloc_contblock(z*PAGESIZE);
       p=PAGE_ROUND_UP(p1);
       if (p>p1) {
@@ -1329,8 +1336,13 @@ sgc_start(void) {
       insert_contblock(p,PAGESIZE*z);
       new_cb_pointer=cb_pointer;
       cb_pointer=tmp_cb_pointer;
-      for (i=0;i<z;i++) 
-	sgc_type_map[page(p)+i]|= SGC_PAGE_FLAG;
+      
+      i=page(p);
+      k=i+z;
+      if (i>=MAXPAGE || k>MAXPAGE)
+	error("Pages out of range in sgc_start");
+      for (;i<k;i++) 
+	sgc_type_map[i]|= SGC_PAGE_FLAG;
     }
 
     for (cbpp=&cb_pointer;*cbpp;) {
@@ -1362,8 +1374,12 @@ sgc_start(void) {
       new_cb_pointer=cb_pointer;
       cb_pointer=tmp_cb_pointer;
       i/=PAGESIZE;
-      for (j=0;j<i;j++)
-	sgc_type_map[page(p)+j]|= SGC_PAGE_FLAG;
+      j=page(p);
+      i+=j;
+      if (j>=MAXPAGE || i>MAXPAGE)
+	error("Pages out of range in sgc_start");
+      for (;j<i;j++)
+	sgc_type_map[j]|= SGC_PAGE_FLAG;
     }
 
     /* SGC contblock pages: switch to new free SGC contblock list. CM
@@ -1518,8 +1534,8 @@ sgc_quit(void) {
 	
 	/* remove the recent flag from any objects on sgc pages */
 	{
-	  long hp=page(heap_end);
-	  long i,j;
+	  unsigned long hp=page(heap_end);
+	  unsigned long i,j;
 	  char t = (char) tm->tm_type;
 	  char *p;
 	  for (i=0 ; i < hp; i++)
@@ -1536,13 +1552,15 @@ sgc_quit(void) {
 }
 
 void
-make_writable(long beg, long i) {
+make_writable(unsigned long beg, unsigned long i) {
 
   if (i > beg) {
     beg=ROUND_DOWN_PAGE_NO(beg);
     i=ROUND_UP_PAGE_NO(i);
     {
-      int k=beg;
+      unsigned long k=beg;
+      if (k>=MAXPAGE || i>MAXPAGE)
+	error("Pages out of range in make_writable");
       while(k <i )
 	sgc_type_map[k++] |= SGC_TEMP_WRITABLE;
     }
@@ -1556,7 +1574,7 @@ extern char etext;
 static void
 memprotect_handler(int sig, long code, void *scp, char *addr) {
   
-  long p;
+  unsigned long p;
   int j=page_multiple;
   char *faddr;  /* Needed because we must not modify signal handler
 		   arguments on the stack! */
@@ -1587,6 +1605,8 @@ memprotect_handler(int sig, long code, void *scp, char *addr) {
     fflush(stdout);
 #endif     
     mprotect(pagetochar(p),page_multiple * PAGESIZE, PROT_READ_WRITE_EXEC);
+    if (p>=MAXPAGE || p+j>MAXPAGE)
+      error("Pages out of range in memprotect_handler");
     while (--j >= 0)
       sgc_type_map[p+j] = sgc_type_map[p+j] | SGC_TEMP_WRITABLE;
     
@@ -1626,9 +1646,9 @@ sgc_mprotect(long pbeg, long n, int writable) {
    rest must be */
 
 static void
-fix_for_page_multiple(long beg, long end) {
+fix_for_page_multiple(unsigned long beg, unsigned long end) {
 
-  long i,j;
+  unsigned long i,j;
   char *p;
   int writable;
 
@@ -1659,7 +1679,7 @@ fix_for_page_multiple(long beg, long end) {
 void
 memory_protect(int on) {
 
-  long i,beg,end= page(core_end);
+  unsigned long i,beg,end= page(core_end);
   int writable=1;
   extern void   install_segmentation_catcher(void);
 
@@ -1725,12 +1745,14 @@ FFN(siLsgc_on)(void) {
 void
 perm_writable(char *p, long n) {
 
-  long beg=page(p);
-  long end=page(PAGE_ROUND_UP(p+n));
-  long i,must_protect=0;
+  unsigned long beg=page(p);
+  unsigned long end=page(PAGE_ROUND_UP(p+n));
+  unsigned long i,must_protect=0;
 
   beg = ROUND_DOWN_PAGE_NO(beg);
   end = ROUND_UP_PAGE_NO(end);
+  if (beg >= MAXPAGE || end >MAXPAGE)
+    error("Address supplied to perm_writable out of range");
   for (i=beg ; i < end ; i++) {
     if (sgc_enabled & !(WRITABLE_PAGE_P(i))) 
       must_protect = 1;
