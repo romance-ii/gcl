@@ -6,8 +6,10 @@ gclcvs (2.7.0-20) unstable; urgency=low
     profiling
   * Load sys-proclaim.lisp files forimproved linking and smaller object
     size across the board, install same for use with compiler::link
+  * Use pathnames instead of strings in compiler::link, also in image
+    init files, for Windows
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 20 Feb 2004 03:58:52 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 20 Feb 2004 04:01:14 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
