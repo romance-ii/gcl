@@ -484,7 +484,7 @@ static void L5()
 	vs_top=(vs_base=base+5)+1;
 	return;
 }
-/*	function definition for G1027	*/
+/*	function definition for G1030	*/
 
 static void L6()
 {register object *base=vs_base;
@@ -574,7 +574,7 @@ T168:;
 	return;}}
 	}
 }
-/*	function definition for G1029	*/
+/*	function definition for G1032	*/
 
 static void L7()
 {register object *base=vs_base;
@@ -648,7 +648,7 @@ T184:;
 	return;}}
 	}
 }
-/*	function definition for G1031	*/
+/*	function definition for G1034	*/
 
 static void L8()
 {register object *base=vs_base;
@@ -809,7 +809,7 @@ T226:;
 	return;}
 	}
 }
-/*	function definition for G1032	*/
+/*	function definition for G1035	*/
 
 static void L9()
 {register object *base=vs_base;
@@ -889,7 +889,7 @@ T256:;
 	return;}}
 	}
 }
-/*	function definition for G1034	*/
+/*	function definition for G1037	*/
 
 static void L10()
 {register object *base=vs_base;
@@ -969,7 +969,7 @@ T273:;
 	return;}}
 	}
 }
-/*	function definition for G1036	*/
+/*	function definition for G1039	*/
 
 static void L11()
 {register object *base=vs_base;
@@ -2286,13 +2286,13 @@ T618:;
 	vs_top=(vs_base=base+3)+1;
 	return;}
 }
-static object  LnkTLI100(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[100],(void **)&LnkLI100,2,ap);} /* SETF-EXPAND */
-static object  LnkTLI99(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[99],(void **)&LnkLI99,3,ap);} /* SETF-EXPAND-1 */
+static object  LnkTLI100(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[100],(void **)&LnkLI100,2,ap);va_end(ap);return V1;} /* SETF-EXPAND */
+static object  LnkTLI99(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[99],(void **)&LnkLI99,3,ap);va_end(ap);return V1;} /* SETF-EXPAND-1 */
 static void LnkT97(){ call_or_link(VV[97],(void **)&Lnk97);} /* GET-SETF-METHOD */
-static object  LnkTLI96(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[96],(void **)&LnkLI96,4,ap);} /* SETF-STRUCTURE-ACCESS */
+static object  LnkTLI96(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[96],(void **)&LnkLI96,4,ap);va_end(ap);return V1;} /* SETF-STRUCTURE-ACCESS */
 static void LnkT95(){ call_or_link(VV[95],(void **)&Lnk95);} /* GET-SETF-METHOD-MULTIPLE-VALUE */
 static void LnkT94(){ call_or_link(VV[94],(void **)&Lnk94);} /* GET-&ENVIRONMENT */
-static object  LnkTLI93(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[93],(void **)&LnkLI93,1,ap);} /* FIND-DOCUMENTATION */
+static object  LnkTLI93(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[93],(void **)&LnkLI93,1,ap);va_end(ap);return V1;} /* FIND-DOCUMENTATION */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

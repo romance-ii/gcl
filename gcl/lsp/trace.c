@@ -1476,14 +1476,14 @@ static void LnkT113(){ call_or_link(VV[113],(void **)&Lnk113);} /* IHS-TOP */
 static void LnkT112(){ call_or_link(VV[112],(void **)&Lnk112);} /* READ-PRESERVING-WHITESPACE */
 static object  LnkTLI111(){return call_proc0(VV[111],(void **)&LnkLI111);} /* STEP-READ-LINE */
 static void LnkT60(){ call_or_link(VV[60],(void **)&Lnk60);} /* STEPPER */
-static object  LnkTLI110(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[110],(void **)&LnkLI110,ap);} /* DELETE-IF */
-static object  LnkTLI109(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[109],(void **)&LnkLI109,1,ap);} /* RESET-TRACE-DECLARATIONS */
-static object  LnkTLI108(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[108],(void **)&LnkLI108,1,ap);} /* TRACE-ONE-PREPROCESS */
-static object  LnkTLI107(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[107],(void **)&LnkLI107,1,ap);} /* CHECK-TRACE-SPEC */
-static object  LnkTLI106(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[106],(void **)&LnkLI106,1,ap);} /* UNTRACE-ONE */
-static object  LnkTLI105(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[105],(void **)&LnkLI105,1,ap);} /* CHECK-DECLARATIONS */
+static object  LnkTLI110(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[110],(void **)&LnkLI110,ap);va_end(ap);return V1;} /* DELETE-IF */
+static object  LnkTLI109(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[109],(void **)&LnkLI109,1,ap);va_end(ap);return V1;} /* RESET-TRACE-DECLARATIONS */
+static object  LnkTLI108(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[108],(void **)&LnkLI108,1,ap);va_end(ap);return V1;} /* TRACE-ONE-PREPROCESS */
+static object  LnkTLI107(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[107],(void **)&LnkLI107,1,ap);va_end(ap);return V1;} /* CHECK-TRACE-SPEC */
+static object  LnkTLI106(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[106],(void **)&LnkLI106,1,ap);va_end(ap);return V1;} /* UNTRACE-ONE */
+static object  LnkTLI105(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[105],(void **)&LnkLI105,1,ap);va_end(ap);return V1;} /* CHECK-DECLARATIONS */
 static object  LnkTLI104(){return call_proc0(VV[104],(void **)&LnkLI104);} /* ALL-TRACE-DECLARATIONS */
-static object  LnkTLI103(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[103],(void **)&LnkLI103,3,ap);} /* CHECK-TRACE-ARGS */
+static object  LnkTLI103(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[103],(void **)&LnkLI103,3,ap);va_end(ap);return V1;} /* CHECK-TRACE-ARGS */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -152,7 +152,9 @@
        (wt-nl "{" (rep-type (car type.wt)) "V" cvar " = ")
        (funcall (cdr type.wt) loc)  (wt ";")
        (unwind-bds bds-cvar bds-bind)
-       (wt-nl "VMR" *reservation-cmacro* "(V" cvar")}")
+       (wt-nl "VMR" *reservation-cmacro* "(" 
+	      (if (equal (rep-type (car type.wt)) "long ") "(object)" "") 
+	      "V" cvar")}")
        (return)))
 		
     (t (baboon))

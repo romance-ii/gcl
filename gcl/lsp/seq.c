@@ -153,7 +153,7 @@ T69:;
 goto T70;
 T70:;
 	(void)(elt_set((V8),V14,(V5)));
-	V14= (V14)+1;
+	V14= (long)(V14)+1;
 	goto T69;}
 goto T63;
 T63:;
@@ -225,7 +225,7 @@ T87:;
 	{register long V29;
 	register long V30;
 	V29= 0;
-	V30= length(car((V22)));
+	V30= (long)length(car((V22)));
 goto T95;
 T95:;
 	if(!((V29)>=(V30))){
@@ -235,8 +235,8 @@ goto T96;
 T96:;
 	V31= elt(car((V22)),V29);
 	(void)(elt_set((V21),V23,/* INLINE-ARGS */V31));
-	V23= (V23)+(1);
-	V29= (V29)+1;
+	V23= (long)(V23)+(1);
+	V29= (long)(V29)+1;
 	goto T95;}
 goto T91;
 T91:;
@@ -337,7 +337,7 @@ T129:;
 	vs_base=base+1;}
 	super_funcall_no_event(base[0]);
 	vs_top=sup;
-	V44= (V44)+1;
+	V44= (long)(V44)+1;
 	goto T122;}
 goto T117;
 T117:;
@@ -383,7 +383,7 @@ T147:;
 	vs_top=sup;
 	V55= vs_base[0];
 	(void)(elt_set((V51),V52,V55));
-	V52= (V52)+1;
+	V52= (long)(V52)+1;
 	goto T139;}}}
 	va_end(ap);
 	base[0]=base[0];
@@ -482,7 +482,7 @@ T170:;
 	VMR4(V77)}}
 goto T167;
 T167:;
-	V66= (V66)+1;
+	V66= (long)(V66)+1;
 	goto T162;}
 	va_end(ap);
 	base[0]=base[0];
@@ -579,7 +579,7 @@ T196:;
 	VMR5(V94)}
 goto T192;
 T192:;
-	V84= (V84)+1;
+	V84= (long)(V84)+1;
 	goto T187;}
 	va_end(ap);
 	base[0]=base[0];
@@ -659,9 +659,9 @@ static object LI7(V105,V104,va_alist)
 	}
 static void LnkT17(){ call_or_link(VV[17],(void **)&Lnk17);} /* EVERY */
 static void LnkT16(){ call_or_link(VV[16],(void **)&Lnk16);} /* SOME */
-static object  LnkTLI15(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[15],(void **)&LnkLI15,ap);} /* MAKE-SEQUENCE */
-static object  LnkTLI14(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[14],(void **)&LnkLI14,1,ap);} /* BEST-ARRAY-ELEMENT-TYPE */
-static object  LnkTLI13(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[13],(void **)&LnkLI13,1,ap);} /* NORMALIZE-TYPE */
+static object  LnkTLI15(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[15],(void **)&LnkLI15,ap);va_end(ap);return V1;} /* MAKE-SEQUENCE */
+static object  LnkTLI14(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[14],(void **)&LnkLI14,1,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
+static object  LnkTLI13(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[13],(void **)&LnkLI13,1,ap);va_end(ap);return V1;} /* NORMALIZE-TYPE */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

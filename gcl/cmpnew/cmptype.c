@@ -154,7 +154,7 @@ T22:;
 	goto T34;}
 	if(!(type_of(caddr((V23)))==t_cons)){
 	goto T35;}
-	if(!((length(caddr((V23))))==(1))){
+	if(!(((long)length(caddr((V23))))==(1))){
 	goto T35;}
 goto T34;
 T34:;
@@ -855,14 +855,14 @@ T283:;
 	return Cnil;
 }
 static object  LnkTLI70(){return call_proc0(VV[70],(void **)&LnkLI70);} /* C1NIL */
-static object  LnkTLI69(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[69],(void **)&LnkLI69,ap);} /* CMPWARN */
+static object  LnkTLI69(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[69],(void **)&LnkLI69,ap);va_end(ap);return V1;} /* CMPWARN */
 static void LnkT68(){ call_or_link(VV[68],(void **)&Lnk68);} /* COPY-INFO */
-static object  LnkTLI67(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[67],(void **)&LnkLI67,2,ap);} /* TYPE-AND */
-static object  LnkTLI36(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[36],(void **)&LnkLI36,1,ap);} /* TYPE-FILTER */
+static object  LnkTLI67(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[67],(void **)&LnkLI67,2,ap);va_end(ap);return V1;} /* TYPE-AND */
+static object  LnkTLI36(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[36],(void **)&LnkLI36,1,ap);va_end(ap);return V1;} /* TYPE-FILTER */
 static void LnkT60(){ call_or_link(VV[60],(void **)&Lnk60);} /* SUBTYPEP */
-static object  LnkTLI59(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[59],(void **)&LnkLI59,2,ap);} /* SUB-INTERVAL-P */
-static object  LnkTLI58(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[58],(void **)&LnkLI58,1,ap);} /* BEST-ARRAY-ELEMENT-TYPE */
-static object  LnkTLI56(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[56],(void **)&LnkLI56,1,ap);} /* NORMALIZE-TYPE */
+static object  LnkTLI59(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[59],(void **)&LnkLI59,2,ap);va_end(ap);return V1;} /* SUB-INTERVAL-P */
+static object  LnkTLI58(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[58],(void **)&LnkLI58,1,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
+static object  LnkTLI56(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[56],(void **)&LnkLI56,1,ap);va_end(ap);return V1;} /* NORMALIZE-TYPE */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

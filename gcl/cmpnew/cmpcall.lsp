@@ -170,11 +170,13 @@
 	  (setq f (list 'cvar (cs-push)))
 	  (wt-nl f " = " (car args) ","))
    (wt-nl "(type_of(" f ") == t_sfun ?"
-	  "(*(object (*)())((" f ")->sfn.sfn_self)):")
+;	  "(*(object (*)())((" f ")->sfn.sfn_self)):")
+	  "(*((" f ")->sfn.sfn_self)):")
    (when (< *space* 3)
 	 (setq length t)
 	 (wt-nl "(fcall.argd="  (length (cdr args)) ",type_of("f")==t_vfun) ?")
-	 (wt-nl  "(*(object (*)())((" f ")->sfn.sfn_self)):"))
+;	 (wt-nl  "(*(object (*)())((" f ")->sfn.sfn_self)):"))
+	 (wt-nl  "(*((" f ")->sfn.sfn_self)):"))
    (wt-nl  "(fcall.fun=(" f "),")
    (unless length
 	   (wt "fcall.argd="  (length (cdr args)) ","))
@@ -391,6 +393,11 @@
     (pushnew link-info    *function-links* :test 'equal)
     n))
 
+(defun declaration-type (type) 
+  (cond ((equal type "") "void")
+	((equal type "long ") "object ")
+	(t type)))
+
 ;;make a function which will be called hopefully only once,
 ;;and will establish the link.
 (defun wt-function-link (x)
@@ -409,14 +416,16 @@
       (t
        ;;change later to include above.
        ;;(setq type (cdr (assoc type '((t . "object")(:btpr . "bptr")))))
-       (wt-nl1 "static " (rep-type type) " LnkT" num )
+       (wt-nl1 "static " (declaration-type (rep-type type)) " LnkT" num )
        (cond ((or args (not (eq t type)))
 	      (let ((vararg (member '* args)))
-		(wt "(va_alist)va_dcl{va_list ap;va_start(ap);return("
-		    (rep-type type)")call_" (if vararg "v" "") "proc(VV["
+		(wt "(va_alist)va_dcl{"
+		    (declaration-type (rep-type type)) "V1;"
+		    "va_list ap;va_start(ap);V1=call_"
+		    (if vararg "v" "") "proc(VV["
 		    (add-object name)"],(void **)&Lnk" num )
 		(or vararg (wt "," (proclaimed-argd args type)))
-		(wt   ",ap);}" )))
+		(wt   ",ap);va_end(ap);return V1;}" )))
 	     (t (wt "(){return call_proc0(VV[" (add-object name)
 		    "],(void **)&Lnk" num ");}" ))))
       (t (error "unknown link type ~a" type)))

@@ -14,12 +14,12 @@ static object LI5();
 #define VMV5
 #define VMR5(VMT5) return(VMT5);
 static object LI6();
-#define VMB6 register object *base=vs_top; object  V46 ,V45 ,V44 ,V37 ,V35 ,V34 ,V32 ,V30 ,V28; object Vcs[3];
+#define VMB6 register object *base=vs_top; object  V48 ,V47 ,V46 ,V45 ,V44 ,V37 ,V35 ,V34 ,V32 ,V30 ,V28; object Vcs[3];
 #define VMS6  register object *sup=vs_top+4;vs_top=sup;
 #define VMV6 vs_reserve(4);
 #define VMR6(VMT6) vs_top=base ; return(VMT6);
 static object LI7();
-#define VMB7 register object *base=vs_top; object  V60 ,V58 ,V55;
+#define VMB7 register object *base=vs_top; object  V62 ,V60 ,V57;
 #define VMS7 vs_top += 1;
 #define VMV7 vs_reserve(1);
 #define VMR7(VMT7) vs_top=base ; return(VMT7);
@@ -36,8 +36,8 @@ static object LI8();
 #define VM3 4
 #define VM2 3
 #define VM1 3
-static char * VVi[55]={
-#define Cdata VV[54]
+static char * VVi[58]={
+#define Cdata VV[57]
 (char *)(L1),
 (char *)(L2),
 (char *)(L3),
@@ -48,16 +48,22 @@ static char * VVi[55]={
 (char *)(LI8)
 };
 #define VV ((object *)VVi)
+static object  LnkTLI56() ;
+static object  (*LnkLI56)() = LnkTLI56;
+static object  LnkTLI55() ;
+static object  (*LnkLI55)() = LnkTLI55;
+static object  LnkTLI54() ;
+static object  (*LnkLI54)() = LnkTLI54;
 static object  LnkTLI53() ;
 static object  (*LnkLI53)() = LnkTLI53;
-static object  LnkTLI52() ;
-static object  (*LnkLI52)() = LnkTLI52;
+static void LnkT52() ;
+static void (*Lnk52)() = LnkT52;
 static object  LnkTLI51() ;
 static object  (*LnkLI51)() = LnkTLI51;
 static object  LnkTLI50() ;
 static object  (*LnkLI50)() = LnkTLI50;
-static void LnkT49() ;
-static void (*Lnk49)() = LnkT49;
+static object  LnkTLI49() ;
+static object  (*LnkLI49)() = LnkTLI49;
 static object  LnkTLI48() ;
 static object  (*LnkLI48)() = LnkTLI48;
 static object  LnkTLI47() ;
@@ -66,9 +72,3 @@ static object  LnkTLI46() ;
 static object  (*LnkLI46)() = LnkTLI46;
 static object  LnkTLI45() ;
 static object  (*LnkLI45)() = LnkTLI45;
-static object  LnkTLI44() ;
-static object  (*LnkLI44)() = LnkTLI44;
-static object  LnkTLI43() ;
-static object  (*LnkLI43)() = LnkTLI43;
-static object  LnkTLI42() ;
-static object  (*LnkLI42)() = LnkTLI42;

@@ -656,7 +656,7 @@ T156:;
 	V93= list(3,VV[7],/* INLINE-ARGS */V91,list(3,VV[30],V92,(V87)));
 	V88= make_cons(/* INLINE-ARGS */V93,(V88));
 	V86= cdr((V86));
-	V89= (V89)+1;
+	V89= (long)(V89)+1;
 	goto T155;}
 }
 /*	macro definition for MULTIPLE-VALUE-BIND	*/
@@ -702,7 +702,7 @@ T170:;
 	V103= list(2,/* INLINE-ARGS */V101,list(3,VV[30],V102,(V96)));
 	V97= make_cons(/* INLINE-ARGS */V103,(V97));
 	V95= cdr((V95));
-	V98= (V98)+1;
+	V98= (long)(V98)+1;
 	goto T169;}
 }
 /*	macro definition for DO	*/

@@ -318,10 +318,10 @@ TTL:;
 	{register object V68;
 	register object V69;
 	register object V70;
-	V71 = make_fixnum(length((V67)));
-	V72 = make_fixnum(length((V66)));
+	V71 = make_fixnum((long)length((V67)));
+	V72 = make_fixnum((long)length((V66)));
 	V68= number_minus(V71,V72);
-	V69= make_fixnum(length((V66)));
+	V69= make_fixnum((long)length((V66)));
 	V70= small_fixnum(0);
 goto T49;
 T49:;
@@ -1141,8 +1141,8 @@ T261:;
 	base[0]=base[0];
 	return Cnil;}
 	}
-static object  LnkTLI34(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[34],(void **)&LnkLI34,1,ap);} /* PRINT-SYMBOL-APROPOS */
-static object  LnkTLI33(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[33],(void **)&LnkLI33,2,ap);} /* SUBSTRINGP */
+static object  LnkTLI34(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[34],(void **)&LnkLI34,1,ap);va_end(ap);return V1;} /* PRINT-SYMBOL-APROPOS */
+static object  LnkTLI33(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[33],(void **)&LnkLI33,2,ap);va_end(ap);return V1;} /* SUBSTRINGP */
 static void LnkT10(){ call_or_link(VV[10],(void **)&Lnk10);} /* PACKAGE-SIZE */
 static void LnkT32(){ call_or_link(VV[32],(void **)&Lnk32);} /* FIND-DECLARATIONS */
 

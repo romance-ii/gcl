@@ -214,6 +214,11 @@
            )))
   )
 
+(defun declaration-type (type) 
+  (cond ((equal type "") "void")
+	((equal type "long ") "object ")
+	(t type)))
+
 (defvar *vaddress-list*)   ;; hold addresses of C functions, and other data
 (defvar *vind*)            ;; index in the VV array where the address is.
 (defvar *Inits*)
@@ -315,9 +320,9 @@
 		  (t
 		   (setq type (if type (Rep-type type) ""))))
 
-	    (wt-h "static " (if (equal type "") "void" type) " LnkT" num "() ;") ;initial function.
-   #-sgi3d    (wt-h "static "  (if (equal type "") "void" type) " (*Lnk" num ")() = LnkT" num ";")
-   #+sgi3d    (wt-h "static "  (if (equal type "") "void" type) " (*Lnk" num ")();")))
+	    (wt-h "static " (declaration-type type) " LnkT" num "() ;") ;initial function.
+   #-sgi3d    (wt-h "static "  (declaration-type type) " (*Lnk" num ")() = LnkT" num ";")
+   #+sgi3d    (wt-h "static "  (declaration-type type) " (*Lnk" num ")();")))
   )
 
 
@@ -695,8 +700,8 @@
                    )
              (setf (var-loc (car vl)) (next-cvar)))
          (wt-comment "local entry for function " fname)
-         (wt-h "static " (rep-type (caddr inline-info)) "LI" cfun "();")
-         (wt-nl1 "static " (rep-type (caddr inline-info)) "LI" cfun "(")
+         (wt-h "static " (declaration-type (rep-type (caddr inline-info))) "LI" cfun "();")
+         (wt-nl1 "static " (declaration-type (rep-type (caddr inline-info))) "LI" cfun "(")
          (wt-requireds  requireds
 		       (cadr inline-info))
          ;;; Now the body.
@@ -1426,9 +1431,9 @@
                (wt-nl1 "vs_push(")
                (case (car arg)
                      (object (wt (cadr arg)))
-                     (char (wt "code_char((int)" (cadr arg) ")"))
+                     (char (wt "code_char((long)" (cadr arg) ")"))
                      (int (when (zerop *space*) (wt "CMP"))
-                          (wt "make_fixnum((int)" (cadr arg) ")"))
+                          (wt "make_fixnum((long)" (cadr arg) ")"))
                      (float (wt "make_shortfloat((double)" (cadr arg) ")"))
                      (double (wt "make_longfloat((double)" (cadr arg) ")")))
                (wt ");"))

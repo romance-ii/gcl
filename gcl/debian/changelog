@@ -1,3 +1,13 @@
+gcl (2.5.0.cvs20020625-28) unstable; urgency=high
+
+  * SGC support for alpha
+  * generic gmp3 build for m68k
+  * compiler changes to declare all functions as returning object, with
+    functions that actually return long being cast appropriately
+  * back out of m68k hack in eval.c and funlink.c
+
+ -- Camm Maguire <camm@enhanced.com>  Fri,  2 Aug 2002 18:22:04 -0400
+
 gcl (2.5.0.cvs20020625-27) unstable; urgency=high
 
   * Use generic lshift.c in gmp3 for m68k

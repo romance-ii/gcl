@@ -494,7 +494,7 @@ T213:;
 goto T219;
 T219:;
 	if((V46!= VV[27]))goto T240;
-	if(!((length((V41)))>(3))){
+	if(!(((long)length((V41)))>(3))){
 	goto T241;}
 	base[8]= VV[35];
 	base[9]= VV[36];

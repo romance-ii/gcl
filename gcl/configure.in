@@ -1022,18 +1022,17 @@ rm -f makedefsafter
 MP_INLCUDE=""
 if test $use_gmp = yes ; then
  AC_MSG_CHECKING([use_gmp=yes, doing configure in gmp directory])
- case "${canonical}" in
+ case "$use" in
 #   i[[5-9]]86* | pentium* | k6* | athlon*)
 #      (cd gmp3 ; ./configure --target=i486) ;;
+#  Seem to be some problems with gmp3 on 68060 machines.  CM
+   m68k-linux)
+      (cd gmp3 && ./configure --build=none-unknown-linux-gnu) ;;
    *)
       (cd gmp3 && ./configure) ;;
  esac
- [[ "`ls -1 gmp3/mpn/add_n.* 2>/dev/null`" != "" ]] || cp gmp3/mpn/generic/*.c gmp/mpn/
+# [[ "`ls -1 gmp3/mpn/add_n.* 2>/dev/null`" != "" ]] || cp gmp3/mpn/generic/*.c gmp3/mpn/
  cp gmp3/gmp.h h/gmp.h
- if test "$use" = "m68k-linux" ; then
-	ln -snf generic/lshift.c gmp3/mpn/
-	rm gmp3/mpn/lshift.asm
- fi
  AC_MSG_CHECKING("for size of gmp limbs")
  AC_TRY_RUN([#include <stdio.h>
 	#include "h/gmp.h"

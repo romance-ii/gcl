@@ -102,7 +102,7 @@ T1:;
 	vs_top=(vs_base=base+5)+1;
 	return;
 }
-/*	function definition for G1024	*/
+/*	function definition for G1027	*/
 
 static void L2()
 {register object *base=vs_base;
@@ -116,7 +116,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1025	*/
+/*	function definition for G1028	*/
 
 static void L3()
 {register object *base=vs_base;
@@ -130,7 +130,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1026	*/
+/*	function definition for G1029	*/
 
 static void L4()
 {register object *base=vs_base;
@@ -147,7 +147,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1027	*/
+/*	function definition for G1030	*/
 
 static void L5()
 {register object *base=vs_base;
@@ -181,7 +181,7 @@ T49:;
 	return;
 	}
 }
-/*	function definition for G1028	*/
+/*	function definition for G1031	*/
 
 static void L6()
 {register object *base=vs_base;
@@ -211,7 +211,7 @@ T55:;
 	return;
 	}
 }
-/*	function definition for G1029	*/
+/*	function definition for G1032	*/
 
 static void L7()
 {register object *base=vs_base;
@@ -225,7 +225,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1030	*/
+/*	function definition for G1033	*/
 
 static void L8()
 {register object *base=vs_base;
@@ -239,7 +239,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1031	*/
+/*	function definition for G1034	*/
 
 static void L9()
 {register object *base=vs_base;
@@ -253,7 +253,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1032	*/
+/*	function definition for G1035	*/
 
 static void L10()
 {register object *base=vs_base;
@@ -267,7 +267,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1033	*/
+/*	function definition for G1036	*/
 
 static void L11()
 {register object *base=vs_base;
@@ -296,7 +296,7 @@ T59:;
 	return;
 	}
 }
-/*	function definition for G1034	*/
+/*	function definition for G1037	*/
 
 static void L12()
 {register object *base=vs_base;
@@ -318,7 +318,7 @@ T63:;
 	return;
 	}
 }
-/*	function definition for G1035	*/
+/*	function definition for G1038	*/
 
 static void L13()
 {register object *base=vs_base;
@@ -340,7 +340,7 @@ T66:;
 	return;
 	}
 }
-/*	function definition for G1036	*/
+/*	function definition for G1039	*/
 
 static void L14()
 {register object *base=vs_base;
@@ -362,7 +362,7 @@ T69:;
 	return;
 	}
 }
-/*	function definition for G1037	*/
+/*	function definition for G1040	*/
 
 static void L15()
 {register object *base=vs_base;
@@ -384,7 +384,7 @@ T72:;
 	return;
 	}
 }
-/*	function definition for G1038	*/
+/*	function definition for G1041	*/
 
 static void L16()
 {register object *base=vs_base;
@@ -2489,7 +2489,7 @@ T1050:;
 	if((V171!= VV[41]))goto T1057;
 	{register object V172;
 	register object V173;
-	V174 = make_fixnum(length((V168)));
+	V174 = make_fixnum((long)length((V168)));
 	V173= one_minus(V174);
 	V172= Cnil;
 goto T1060;
@@ -2525,9 +2525,9 @@ T1070:;
 	{register object V177;
 	register object V178;
 	register object V179;
-	V180 = make_fixnum(length((V168)));
+	V180 = make_fixnum((long)length((V168)));
 	V177= (VFUN_NARGS=2,(*(LnkLI98))((V169),V180));
-	V179= make_fixnum(length((V168)));
+	V179= make_fixnum((long)length((V168)));
 	V178= small_fixnum(0);
 goto T1083;
 T1083:;
@@ -2689,23 +2689,23 @@ T1126:;
 	return;
 	}
 }
-static object  LnkTLI100(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[100],(void **)&LnkLI100,2,ap);} /* COERCE */
-static object  LnkTLI98(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[98],(void **)&LnkLI98,ap);} /* MAKE-SEQUENCE */
-static object  LnkTLI97(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[97],(void **)&LnkLI97,2,ap);} /* SUB-INTERVAL-P */
-static object  LnkTLI96(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[96],(void **)&LnkLI96,1,ap);} /* KNOWN-TYPE-P */
+static object  LnkTLI100(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[100],(void **)&LnkLI100,2,ap);va_end(ap);return V1;} /* COERCE */
+static object  LnkTLI98(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[98],(void **)&LnkLI98,ap);va_end(ap);return V1;} /* MAKE-SEQUENCE */
+static object  LnkTLI97(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[97],(void **)&LnkLI97,2,ap);va_end(ap);return V1;} /* SUB-INTERVAL-P */
+static object  LnkTLI96(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[96],(void **)&LnkLI96,1,ap);va_end(ap);return V1;} /* KNOWN-TYPE-P */
 static void LnkT95(){ call_or_link(VV[95],(void **)&Lnk95);} /* SUBTYPEP */
-static object  LnkTLI94(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[94],(void **)&LnkLI94,1,ap);} /* NORMALIZE-TYPE */
+static object  LnkTLI94(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[94],(void **)&LnkLI94,1,ap);va_end(ap);return V1;} /* NORMALIZE-TYPE */
 static void LnkT93(){ call_or_link(VV[93],(void **)&Lnk93);} /* STRUCTURE-SUBTYPE-P */
-static object  LnkTLI92(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[92],(void **)&LnkLI92,1,ap);} /* BEST-ARRAY-ELEMENT-TYPE */
-static object  LnkTLI91(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[91],(void **)&LnkLI91,1,ap);} /* SIMPLE-ARRAY-P */
-static object  LnkTLI86(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[86],(void **)&LnkLI86,1,ap);} /* ARRAY-DIMENSIONS */
-static object  LnkTLI85(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[85],(void **)&LnkLI85,2,ap);} /* MATCH-DIMENSIONS */
+static object  LnkTLI92(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[92],(void **)&LnkLI92,1,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
+static object  LnkTLI91(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[91],(void **)&LnkLI91,1,ap);va_end(ap);return V1;} /* SIMPLE-ARRAY-P */
+static object  LnkTLI86(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[86],(void **)&LnkLI86,1,ap);va_end(ap);return V1;} /* ARRAY-DIMENSIONS */
+static object  LnkTLI85(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[85],(void **)&LnkLI85,2,ap);va_end(ap);return V1;} /* MATCH-DIMENSIONS */
 static void LnkT81(){ call_or_link(VV[81],(void **)&Lnk81);} /* REALP */
 static void LnkT80(){ call_or_link(VV[80],(void **)&Lnk80);} /* RATIONALP */
-static object  LnkTLI79(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[79],(void **)&LnkLI79,2,ap);} /* IN-INTERVAL-P */
+static object  LnkTLI79(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[79],(void **)&LnkLI79,2,ap);va_end(ap);return V1;} /* IN-INTERVAL-P */
 static void LnkT76(){ call_or_link(VV[76],(void **)&Lnk76);} /* TYPEP */
 static void LnkT75(){ call_or_link(VV[75],(void **)&Lnk75);} /* ARRAY-HAS-FILL-POINTER-P */
-static object  LnkTLI74(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[74],(void **)&LnkLI74,1,ap);} /* FIND-DOCUMENTATION */
+static object  LnkTLI74(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[74],(void **)&LnkLI74,1,ap);va_end(ap);return V1;} /* FIND-DOCUMENTATION */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -3839,25 +3839,24 @@ MP_INLCUDE=""
 if test $use_gmp = yes ; then
  echo $ac_n "checking use_gmp=yes, doing configure in gmp directory""... $ac_c" 1>&6
 echo "configure:3842: checking use_gmp=yes, doing configure in gmp directory" >&5
- case "${canonical}" in
+ case "$use" in
 #   i[[5-9]]86* | pentium* | k6* | athlon*)
 #      (cd gmp3 ; ./configure --target=i486) ;;
+#  Seem to be some problems with gmp3 on 68060 machines.  CM
+   m68k-linux)
+      (cd gmp3 && ./configure --build=none-unknown-linux-gnu) ;;
    *)
       (cd gmp3 && ./configure) ;;
  esac
- [ "`ls -1 gmp3/mpn/add_n.* 2>/dev/null`" != "" ] || cp gmp3/mpn/generic/*.c gmp/mpn/
+# [[ "`ls -1 gmp3/mpn/add_n.* 2>/dev/null`" != "" ]] || cp gmp3/mpn/generic/*.c gmp3/mpn/
  cp gmp3/gmp.h h/gmp.h
- if test "$use" = "m68k-linux" ; then
-	ln -snf generic/lshift.c gmp3/mpn/
-	rm gmp3/mpn/lshift.asm
- fi
  echo $ac_n "checking "for size of gmp limbs"""... $ac_c" 1>&6
-echo "configure:3856: checking "for size of gmp limbs"" >&5
+echo "configure:3855: checking "for size of gmp limbs"" >&5
  if test "$cross_compiling" = yes; then
   mpsize=0
 else
   cat > conftest.$ac_ext <<EOF
-#line 3861 "configure"
+#line 3860 "configure"
 #include "confdefs.h"
 #include <stdio.h>
 	#include "h/gmp.h"
@@ -3869,7 +3868,7 @@ else
 	return 0;
 }
 EOF
-if { (eval echo configure:3873: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:3872: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   mpsize=`cat conftest1`
 else
@@ -3906,7 +3905,7 @@ fi
 # redhat/cygnus released for some reason a buggy version of gcc,
 # which no one else released.   Catch that here.
 echo $ac_n "checking Checking for buggy gcc version from redhat""... $ac_c" 1>&6
-echo "configure:3910: checking Checking for buggy gcc version from redhat" >&5
+echo "configure:3909: checking Checking for buggy gcc version from redhat" >&5
 if  2>&1 $CC -v | fgrep "gcc version 2.96" > /dev/null 
    then 
         BROKEN_O4_OPT=1

@@ -158,7 +158,7 @@ static object LI2(V16,va_alist)
 goto T57;
 T57:;
 	V18= (*(LnkLI22))((V18));
-	if(!((length((V17)))==(1))){
+	if(!(((long)length((V17)))==(1))){
 	goto T64;}
 	{register object V27;
 	base[0]= (V18);
@@ -188,7 +188,7 @@ goto T82;
 T82:;
 	V30= elt((V20),V29);
 	(void)(aset1((V27),V29,/* INLINE-ARGS */V30));
-	V29= (V29)+1;
+	V29= (long)(V29)+1;
 	goto T81;}
 goto T75;
 T75:;
@@ -227,7 +227,7 @@ T98:;
 	if(((V21))==Cnil){
 	goto T102;}
 	{register object V34;
-	base[0]= make_fixnum(length((V17)));
+	base[0]= make_fixnum((long)length((V17)));
 	base[1]= VV[7];
 	base[2]= small_fixnum(0);
 	vs_top=(vs_base=base+0)+3;
@@ -274,7 +274,7 @@ T125:;
 	V41= (*(LnkLI27))(cdr((V38)),cdr((V39)));
 	if(((V41))==Cnil){
 	goto T129;}
-	if(!(((fix(car((V38))))+1)>=(fix(car((V39)))))){
+	if(!(((long)(fix(car((V38))))+1)>=(fix(car((V39)))))){
 	goto T132;}
 	if(type_of((V38))!=t_cons)FEwrong_type_argument(Scons,(V38));
 	((V38))->c.c_car = small_fixnum(0);
@@ -282,7 +282,7 @@ T125:;
 	VMR3(V42)}
 goto T132;
 T132:;
-	V43 = make_fixnum((fix(car((V38))))+1);
+	V43 = make_fixnum((long)(fix(car((V38))))+1);
 	if(type_of((V38))!=t_cons)FEwrong_type_argument(Scons,(V38));
 	((V38))->c.c_car = V43;
 	{object V44 = Cnil;
@@ -326,7 +326,7 @@ static object LI5(va_alist)
 	V52 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR(narg,ap));
 	V51= V52;
 	{object V53;
-	V54 = make_fixnum(length((V51)));
+	V54 = make_fixnum((long)length((V51)));
 	V53= make_cons(V54,Cnil);
 	{object V55 = (VFUN_NARGS=5,(*(LnkLI28))((V53),VV[8],Ct,VV[9],(V51)));
 	VMR5(V55)}}
@@ -393,12 +393,12 @@ static object LI7(V62,va_alist)
 	Larray_rank();
 	vs_top=sup;
 	V66= vs_base[0];
-	V67 = make_fixnum(length((V64)));
+	V67 = make_fixnum((long)length((V64)));
 	if(!(number_compare((V66),V67)!=0)){
 	goto T162;}
 	base[1]= VV[10];
 	base[2]= (V66);
-	base[3]= make_fixnum(length((V64)));
+	base[3]= make_fixnum((long)length((V64)));
 	vs_top=(vs_base=base+1)+3;
 	Lerror();
 	vs_top=sup;
@@ -1003,7 +1003,7 @@ TTL:;
 	goto T284;}
 	(void)(aset1((V164),V165,(V163)));
 	base[0]= (V164);
-	base[1]= make_fixnum((V165)+1);
+	base[1]= make_fixnum((long)(V165)+1);
 	vs_top=(vs_base=base+0)+2;
 	siLfill_pointer_set();
 	vs_top=sup;
@@ -1058,7 +1058,7 @@ T294:;
 	goto T299;}
 	(void)(aset1((V172),V174,(V171)));
 	base[0]= (V172);
-	base[1]= make_fixnum((V174)+1);
+	base[1]= make_fixnum((long)(V174)+1);
 	vs_top=(vs_base=base+0)+2;
 	siLfill_pointer_set();
 	vs_top=sup;
@@ -1106,7 +1106,7 @@ T312:;
 	(void)((VFUN_NARGS=6,(*(LnkLI29))((V172),/* INLINE-ARGS */V181,VV[8],V182,VV[11],V183)));
 	(void)(aset1((V172),V174,(V171)));
 	base[0]= (V172);
-	base[1]= make_fixnum((V174)+1);
+	base[1]= make_fixnum((long)(V174)+1);
 	vs_top=(vs_base=base+0)+2;
 	siLfill_pointer_set();
 	vs_top=sup;
@@ -1140,11 +1140,11 @@ TTL:;
 goto T329;
 T329:;
 	base[0]= (V186);
-	base[1]= make_fixnum((V187)-1);
+	base[1]= make_fixnum((long)(V187)-1);
 	vs_top=(vs_base=base+0)+2;
 	siLfill_pointer_set();
 	vs_top=sup;
-	{object V188 = aref1((V186),(V187)-1);
+	{object V188 = aref1((V186),(long)(V187)-1);
 	VMR24(V188)}}
 	base[0]=base[0];
 	return Cnil;
@@ -1282,7 +1282,7 @@ T368:;
 	vs_top=sup;
 	V211= vs_base[0];
 	{int V212= fix(car(V211));
-	if(!((0)==((V212>=0&&(8)>0?(V212)%(8):imod(V212,8))))){
+	if(!((0)==((long)(V212>=0&&(8)>0?(V212)%(8):imod(V212,8))))){
 	goto T383;}}
 goto T382;
 T382:;
@@ -1308,7 +1308,7 @@ T382:;
 goto T383;
 T383:;
 	{register object V215;
-	base[0]= make_fixnum(length((V192)));
+	base[0]= make_fixnum((long)length((V192)));
 	base[1]= VV[7];
 	base[2]= small_fixnum(0);
 	vs_top=(vs_base=base+0)+3;
@@ -1401,18 +1401,18 @@ T430:;
 static void LnkT35(){ call_or_link(VV[35],(void **)&Lnk35);} /* ARRAY-IN-BOUNDS-P */
 static void LnkT34(){ call_or_link(VV[34],(void **)&Lnk34);} /* COPY-ARRAY-PORTION */
 static void LnkT33(){ call_or_link(VV[33],(void **)&Lnk33);} /* ARRAY-TOTAL-SIZE */
-static object  LnkTLI32(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[32],(void **)&LnkLI32,1,ap);} /* ARRAY-DIMENSIONS */
+static object  LnkTLI32(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[32],(void **)&LnkLI32,1,ap);va_end(ap);return V1;} /* ARRAY-DIMENSIONS */
 static void LnkT28(){ call_or_link(VV[28],(void **)&Lnk28);} /* MAKE-ARRAY */
 static void LnkT31(){ call_or_link(VV[31],(void **)&Lnk31);} /* STATICP */
 static void LnkT30(){ call_or_link(VV[30],(void **)&Lnk30);} /* ARRAY-HAS-FILL-POINTER-P */
-static object  LnkTLI29(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[29],(void **)&LnkLI29,ap);} /* ADJUST-ARRAY */
-static object  LnkTLI28(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[28],(void **)&LnkLI28,ap);} /* MAKE-ARRAY */
-static object  LnkTLI27(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[27],(void **)&LnkLI27,2,ap);} /* INCREMENT-CURSOR */
+static object  LnkTLI29(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[29],(void **)&LnkLI29,ap);va_end(ap);return V1;} /* ADJUST-ARRAY */
+static object  LnkTLI28(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[28],(void **)&LnkLI28,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
+static object  LnkTLI27(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[27],(void **)&LnkLI27,2,ap);va_end(ap);return V1;} /* INCREMENT-CURSOR */
 static void LnkT26(){ call_or_link(VV[26],(void **)&Lnk26);} /* ASET-BY-CURSOR */
-static object  LnkTLI25(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[25],(void **)&LnkLI25,2,ap);} /* SEQUENCE-CURSOR */
+static object  LnkTLI25(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[25],(void **)&LnkLI25,2,ap);va_end(ap);return V1;} /* SEQUENCE-CURSOR */
 static void LnkT24(){ call_or_link(VV[24],(void **)&Lnk24);} /* MAKE-ARRAY1 */
 static void LnkT23(){ call_or_link(VV[23],(void **)&Lnk23);} /* GET-AELTTYPE */
-static object  LnkTLI22(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[22],(void **)&LnkLI22,1,ap);} /* BEST-ARRAY-ELEMENT-TYPE */
+static object  LnkTLI22(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[22],(void **)&LnkLI22,1,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
 static void LnkT18(){ call_or_link(VV[18],(void **)&Lnk18);} /* SUBTYPEP */
 
 #ifdef SYSTEM_SPECIAL_INIT

@@ -230,7 +230,7 @@ T80:;
 	return;
 goto T98;
 T98:;
-	V14= (V14)-(1);
+	V14= (long)(V14)-(1);
 	goto T71;
 goto T72;
 T72:;
@@ -340,8 +340,8 @@ T141:;
 	princ_char(10,Cnil);
 	princ_char(10,Cnil);
 	bds_unwind1;
-	V30= (V30)+(1);
-	V33= (V33)-(1);
+	V30= (long)(V30)+(1);
+	V33= (long)(V33)-(1);
 	goto T136;
 goto T137;
 T137:;
@@ -382,7 +382,7 @@ T152:;
 goto T160;
 T160:;
 	{object V36;
-	base[6]= make_fixnum((1)+(fix(symbol_value(VV[9]))));
+	base[6]= make_fixnum((long)(1)+(fix(symbol_value(VV[9]))));
 	vs_top=(vs_base=base+6)+1;
 	(void) (*Lnk111)();
 	vs_top=sup;
@@ -482,7 +482,7 @@ T203:;
 	vs_top=sup;
 goto T201;
 T201:;
-	V37= (V37)+(1);
+	V37= (long)(V37)+(1);
 	if(!((V41)<(2147483646))){
 	goto T219;}
 	goto T218;
@@ -491,7 +491,7 @@ T219:;
 	(void)((*(LnkLI114))());
 goto T218;
 T218:;
-	V41= (V41)+(1);
+	V41= (long)(V41)+(1);
 	goto T186;
 goto T187;
 T187:;
@@ -566,13 +566,13 @@ T230:;
 	(void) (*Lnk113)();
 	vs_top=sup;
 	V47= vs_base[0];
-	V48 = make_fixnum((1)+(fix(symbol_value(VV[9]))));
+	V48 = make_fixnum((long)(1)+(fix(symbol_value(VV[9]))));
 	base[1]= (number_compare(V47,V48)<=0?(V47):V48);
 	vs_top=(vs_base=base+1)+1;
 	(void) (*Lnk111)();
 	vs_top=sup;
 	V46= vs_base[0];
-	if((fix((V44)))<((fix(V46))-(fix((V45))))){
+	if((fix((V44)))<((long)(fix(V46))-(fix((V45))))){
 	goto T234;}
 goto T235;
 T235:;
@@ -582,7 +582,7 @@ T235:;
 	vs_top=sup;
 goto T234;
 T234:;
-	base[1]= make_fixnum((fix((V44)))+(fix((V45))));
+	base[1]= make_fixnum((long)(fix((V44)))+(fix((V45))));
 	vs_top=(vs_base=base+1)+1;
 	(void) (*Lnk112)();
 	return;}
@@ -838,7 +838,7 @@ TTL:;
 	vs_top=sup;
 	V77= vs_base[0];
 	{long V78= fix(structure_ref((V77),VV[25],1));
-	V79 = make_fixnum((1)+(/* INLINE-ARGS */V78));
+	V79 = make_fixnum((long)(1)+(/* INLINE-ARGS */V78));
 	(void)(structure_set((V77),VV[25],1,V79));}}
 	base[2]= Cnil;
 	base[3]= (V75);
@@ -878,7 +878,7 @@ TTL:;
 	{object V83;
 	object V84;
 	V83= (
-	(type_of(symbol_value(VV[32])) == t_sfun ?(*(object (*)())((symbol_value(VV[32]))->sfn.sfn_self)):
+	(type_of(symbol_value(VV[32])) == t_sfun ?(*((symbol_value(VV[32]))->sfn.sfn_self)):
 	(fcall.fun=(symbol_value(VV[32])),fcall.argd=2,fcalln))((V81),(V82)));
 	base[2]= (V81);
 	vs_top=(vs_base=base+2)+1;
@@ -926,7 +926,7 @@ TTL:;
 	vs_top=sup;
 	V92= vs_base[0];
 	{long V93= fix(structure_ref((V91),VV[25],1));
-	V94 = make_fixnum((1)+(/* INLINE-ARGS */V93));
+	V94 = make_fixnum((long)(1)+(/* INLINE-ARGS */V93));
 	(void)(structure_set((V91),VV[25],1,V94));}
 	if(!(eql((V92),VV[34]))){
 	goto T354;}
@@ -966,7 +966,7 @@ TTL:;
 goto T354;
 T354:;
 	(void)((
-	(type_of(symbol_value(VV[38])) == t_sfun ?(*(object (*)())((symbol_value(VV[38]))->sfn.sfn_self)):
+	(type_of(symbol_value(VV[38])) == t_sfun ?(*((symbol_value(VV[38]))->sfn.sfn_self)):
 	(fcall.fun=(symbol_value(VV[38])),fcall.argd=2,fcalln))((V89),(V90))));
 goto T352;
 T352:;
@@ -1111,7 +1111,7 @@ goto T415;
 T415:;
 	{object V105;
 	V105= (
-	(type_of(symbol_value(VV[45])) == t_sfun ?(*(object (*)())((symbol_value(VV[45]))->sfn.sfn_self)):
+	(type_of(symbol_value(VV[45])) == t_sfun ?(*((symbol_value(VV[45]))->sfn.sfn_self)):
 	(fcall.fun=(symbol_value(VV[45])),fcall.argd=2,fcalln))((V101),(V102)));
 	if(((V104))==Cnil){
 	goto T423;}
@@ -1244,7 +1244,7 @@ T467:;
 	vs_top=sup;
 	{object V121;
 	register long V122;
-	V121= make_fixnum(length((V118)));
+	V121= make_fixnum((long)length((V118)));
 	V122= 0;
 goto T481;
 T481:;
@@ -1267,15 +1267,15 @@ T488:;
 	V119= V124;}
 goto T486;
 T486:;
-	V122= (V122)+1;
+	V122= (long)(V122)+1;
 	goto T481;}
 goto T477;
 T477:;
-	if(!((length(symbol_value(VV[47])))>(0))){
+	if(!(((long)length(symbol_value(VV[47])))>(0))){
 	goto T499;}
 	{object V126;
 	object V127;
-	V128 = make_fixnum(((V120)-(V119))+(2));
+	V128 = make_fixnum((long)((long)(V120)-(V119))+(2));
 	V126= (VFUN_NARGS=3,(*(LnkLI137))(V128,VV[50],VV[51]));
 	V127= get((V116),VV[49],Cnil);
 	V129= aref1((V118),0);
@@ -1283,10 +1283,10 @@ T477:;
 	V131 = make_fixnum(V119);
 	V132= make_cons(/* INLINE-ARGS */V130,V131);
 	(void)(aset1((V126),0,/* INLINE-ARGS */V132));
-	V119= (V119)-(1);
+	V119= (long)(V119)-(1);
 	{object V133;
 	register object V134;
-	V133= make_fixnum(length((V118)));
+	V133= make_fixnum((long)length((V118)));
 	V134= small_fixnum(0);
 goto T510;
 T510:;
@@ -1297,7 +1297,7 @@ goto T511;
 T511:;
 	{object V135;
 	V135= aref1((V118),fixint((V134)));
-	(void)(aset1((V126),(fix(cdar((V135))))-(V119),cdr((V135))));}
+	(void)(aset1((V126),(long)(fix(cdar((V135))))-(V119),cdr((V135))));}
 	V134= one_plus((V134));
 	goto T510;}
 goto T506;
@@ -1335,7 +1335,7 @@ T530:;
 	if((type_of(V146)!=t_cons) && ((V141)!= Cnil))
 	 FEwrong_type_argument(Scons,V146);
 	V145= fix((V146->c.c_car));}
-	V143= make_fixnum((V145)-(fix((V137))));{object V147;
+	V143= make_fixnum((long)(V145)-(fix((V137))));{object V147;
 	V147= symbol_value(VV[53]);
 	base[6]= (V142);
 	base[7]= (V126);
@@ -1451,7 +1451,7 @@ TTL:;
 	goto T561;}
 	{object V158;
 	register object V159;
-	V158= make_fixnum(length((V157)));
+	V158= make_fixnum((long)length((V157)));
 	V159= small_fixnum(0);
 goto T566;
 T566:;
@@ -1555,7 +1555,7 @@ T599:;
 	return;}
 goto T603;
 T603:;
-	V164= make_fixnum((fix((V164)))-(1));
+	V164= make_fixnum((long)(fix((V164)))-(1));
 	goto T598;}
 	}
 }
@@ -1669,7 +1669,7 @@ TTL:;
 	if(((V173))==Cnil){
 	goto T632;}
 	setq(VV[58],Cnil);
-	if(!((length(symbol_value(VV[53])))>(0))){
+	if(!(((long)length(symbol_value(VV[53])))>(0))){
 	goto T638;}
 	goto T637;
 goto T638;
@@ -1942,7 +1942,7 @@ T715:;
 	V195= cdr(/* INLINE-ARGS */V196);
 	if(((V192))==Cnil){
 	goto T723;}
-	V191= make_fixnum((fix((V191)))-(fix((V195))));
+	V191= make_fixnum((long)(fix((V191)))-(fix((V195))));
 goto T723;
 T723:;{object V197;
 	if((fix((V191)))>=(1)){
@@ -1951,7 +1951,7 @@ T723:;{object V197;
 	goto T729;
 goto T730;
 T730:;
-	V197= ((fix((V191)))<(length((V194)))?Ct:Cnil);
+	V197= ((fix((V191)))<((long)length((V194)))?Ct:Cnil);
 goto T729;
 T729:;
 	if(V197==Cnil)goto T728;
@@ -1993,7 +1993,7 @@ goto T737;
 T737:;
 	{register object V200;
 	register object V201;
-	V200= make_fixnum((length((V194)))-(fix((V191))));
+	V200= make_fixnum((long)((long)length((V194)))-(fix((V191))));
 	V201= small_fixnum(0);
 goto T753;
 T753:;
@@ -2007,7 +2007,7 @@ T754:;
 	goto T758;}
 	base[6]= (V190);
 	base[7]= (V194);
-	base[8]= make_fixnum((fix((V191)))+(fix((V201))));
+	base[8]= make_fixnum((long)(fix((V191)))+(fix((V201))));
 	vs_top=(vs_base=base+6)+3;
 	(void) (*Lnk138)();
 	vs_top=sup;
@@ -2063,7 +2063,7 @@ T773:;{object V205;
 goto T776;
 T776:;}
 	{object V206;
-	V206= make_fixnum(length(symbol_value(VV[53])));
+	V206= make_fixnum((long)length(symbol_value(VV[53])));
 	(void)((VFUN_NARGS=2,(*(LnkLI135))(Cnil,symbol_value(VV[53]))));
 	V204= (V206);}
 goto T775;
@@ -2100,7 +2100,7 @@ TTL:;
 	if(((V214))==Cnil){
 	goto T787;}
 	base[1]= (V213);
-	base[2]= make_fixnum((1)+(fix((V214))));
+	base[2]= make_fixnum((long)(1)+(fix((V214))));
 	vs_top=(vs_base=base+1)+2;
 	Lsubseq();
 	return;
@@ -2185,7 +2185,7 @@ goto TTL;
 TTL:;
 	{register object V221;
 	register object V222;
-	V221= make_fixnum(length(symbol_value(VV[53])));
+	V221= make_fixnum((long)length(symbol_value(VV[53])));
 	V222= small_fixnum(0);
 goto T820;
 T820:;
@@ -2462,7 +2462,7 @@ T872:;
 	return;
 goto T936;
 T936:;
-	if(!((length((V240)))>(1))){
+	if(!(((long)length((V240)))>(1))){
 	goto T939;}
 	base[4]= Ct;
 	base[5]= VV[75];
@@ -2596,7 +2596,7 @@ TTL:;
 	Lformat();
 	vs_top=sup;
 	(void)((
-	(type_of((V263)) == t_sfun ?(*(object (*)())(((V263))->sfn.sfn_self)):
+	(type_of((V263)) == t_sfun ?(*(((V263))->sfn.sfn_self)):
 	(fcall.fun=((V263)),fcall.argd=2,fcalln))((V264),(V265))));
 	base[8]= symbol_value(VV[77]);
 	vs_top=(vs_base=base+8)+1;
@@ -2651,7 +2651,7 @@ TTL:;
 	if(((V269))==Cnil){
 	goto T999;}
 	V270= aref1((V268),0);
-	base[2]= make_fixnum((fix((V269)))+(fix(cdr(/* INLINE-ARGS */V270))));
+	base[2]= make_fixnum((long)(fix((V269)))+(fix(cdr(/* INLINE-ARGS */V270))));
 	vs_top=(vs_base=base+2)+1;
 	return;
 goto T999;
@@ -2725,7 +2725,7 @@ T1018:;
 	return;}}}}
 goto T1008;
 T1008:;
-	V272= make_fixnum((fix((V272)))-(1));
+	V272= make_fixnum((long)(fix((V272)))-(1));
 	goto T1002;}
 	}
 }
@@ -2764,8 +2764,8 @@ T1031:;
 	return;
 goto T1039;
 T1039:;
-	V280= (V280)+(1);
-	V279= (V279)-(1);
+	V280= (long)(V280)+(1);
+	V279= (long)(V279)-(1);
 	goto T1031;}
 	}
 }
@@ -2814,7 +2814,7 @@ TTL:;
 	V288= (MVloc[(3)]);
 	V289= (MVloc[(4)]);}
 	(void)((*(LnkLI159))());
-	base[2]= make_fixnum((fix((V285)))+(fix((V283))));
+	base[2]= make_fixnum((long)(fix((V285)))+(fix((V283))));
 	base[3]= Ct;
 	base[4]= symbol_value(VV[9]);
 	base[5]= (V286);
@@ -2826,7 +2826,7 @@ TTL:;
 	return;
 goto T1055;
 T1055:;
-	V283= make_fixnum((fix((V285)))+(fix((V283))));
+	V283= make_fixnum((long)(fix((V285)))+(fix((V283))));
 	if(!((fix((V283)))>=(0))){
 	goto T1083;}
 	goto T1082;
@@ -2893,7 +2893,7 @@ goto T1110;
 T1110:;
 	{register object V301;
 	register object V302;
-	V301= make_fixnum((fix((V291)))+(1));
+	V301= make_fixnum((long)(fix((V291)))+(1));
 	V302= Cnil;
 goto T1115;
 T1115:;
@@ -2953,7 +2953,7 @@ T1116:;
 	return;}
 goto T1123;
 T1123:;
-	V301= make_fixnum((fix((V301)))-(1));
+	V301= make_fixnum((long)(fix((V301)))-(1));
 	goto T1115;}
 goto T1109;
 T1109:;
@@ -3019,7 +3019,7 @@ T1166:;
 	(void) (*Lnk112)();
 	vs_top=sup;
 	V314= vs_base[0];
-	base[1]= make_fixnum((fix((V312)))+(2));
+	base[1]= make_fixnum((long)(fix((V312)))+(2));
 	vs_top=(vs_base=base+1)+1;
 	(void) (*Lnk112)();
 	vs_top=sup;
@@ -3079,7 +3079,7 @@ goto T1185;
 T1185:;
 	{object V323;
 	register object V324;
-	V323= make_fixnum((fix((V316)))+(1));
+	V323= make_fixnum((long)(fix((V316)))+(1));
 	V324= small_fixnum(0);
 goto T1193;
 T1193:;
@@ -3102,11 +3102,11 @@ T1194:;
 	V319= (MVloc[(1)]);
 	V320= (MVloc[(2)]);
 	V321= (MVloc[(3)]);}
-	V317= make_fixnum((fix((V322)))-(1));
+	V317= make_fixnum((long)(fix((V322)))-(1));
 	goto T1201;
 goto T1203;
 T1203:;
-	V316= make_fixnum((fix((V324)))-(1));
+	V316= make_fixnum((long)(fix((V324)))-(1));
 	goto T1189;
 goto T1201;
 T1201:;
@@ -3114,7 +3114,7 @@ T1201:;
 	goto T1193;}
 goto T1189;
 T1189:;
-	V317= make_fixnum((fix((V317)))+(1));
+	V317= make_fixnum((long)(fix((V317)))+(1));
 	base[2]= (V317);
 	vs_top=(vs_base=base+2)+1;
 	(void) (*Lnk140)();
@@ -3201,7 +3201,7 @@ T1257:;
 	goto T1241;
 goto T1268;
 T1268:;
-	V328= make_fixnum((fix((V328)))-(1));
+	V328= make_fixnum((long)(fix((V328)))-(1));
 	goto T1243;
 goto T1241;
 T1241:;
@@ -3286,7 +3286,7 @@ goto T1298;
 T1298:;
 	if((car((V342)))!=Cnil){
 	goto T1303;}
-	base[7]= make_fixnum((fix((V341)))-(fix((V337))));
+	base[7]= make_fixnum((long)(fix((V341)))-(fix((V337))));
 	goto T1301;
 goto T1303;
 T1303:;
@@ -3298,7 +3298,7 @@ T1301:;
 	(void) (*Lnk112)();
 	vs_top=sup;
 	base[8]= vs_base[0];
-	V341= make_fixnum((fix((V341)))+(1));
+	V341= make_fixnum((long)(fix((V341)))+(1));
 	base[9]= ((fix((V341)))<(fix((V338)))?Ct:Cnil);
 	vs_top=(vs_base=base+4)+6;
 	Lformat();
@@ -3503,7 +3503,7 @@ TTL:;
 	V364= aref1((V361),0);
 	V365= car(/* INLINE-ARGS */V364);
 	V366= aref1((V361),0);
-	V367 = make_fixnum((fix(cdr(/* INLINE-ARGS */V366)))+(fix((V362))));
+	V367 = make_fixnum((long)(fix(cdr(/* INLINE-ARGS */V366)))+(fix((V362))));
 	base[3]= list(4,/* INLINE-ARGS */V363,/* INLINE-ARGS */V365,V367,(V360));
 	vs_top=(vs_base=base+3)+1;
 	return;
@@ -3528,7 +3528,7 @@ TTL:;
 	if(((V370))==Cnil){
 	goto T1371;}
 	V371= aref1((V370),0);
-	base[2]= make_fixnum((fix((V369)))-(fix(cdr(/* INLINE-ARGS */V371))));
+	base[2]= make_fixnum((long)(fix((V369)))-(fix(cdr(/* INLINE-ARGS */V371))));
 	vs_top=(vs_base=base+2)+1;
 	return;
 goto T1371;
@@ -3731,31 +3731,31 @@ static void LnkT147(){ call_or_link(VV[147],(void **)&Lnk147);} /* INSERT-BREAK-
 static void LnkT146(){ call_or_link(VV[146],(void **)&Lnk146);} /* BREAK-FUNCTION */
 static void LnkT145(){ call_or_link(VV[145],(void **)&Lnk145);} /* DWIM */
 static void LnkT144(){ call_or_link(VV[144],(void **)&Lnk144);} /* MAYBE-BREAK */
-static object  LnkTLI143(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[143],(void **)&LnkLI143,ap);} /* POSITION */
+static object  LnkTLI143(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[143],(void **)&LnkLI143,ap);va_end(ap);return V1;} /* POSITION */
 static void LnkT142(){ call_or_link(VV[142],(void **)&Lnk142);} /* CURRENT-STEP-FUN */
 static void LnkT141(){ call_or_link(VV[141],(void **)&Lnk141);} /* INIT-BREAK-POINTS */
 static void LnkT140(){ call_or_link(VV[140],(void **)&Lnk140);} /* IHS-FNAME */
 static void LnkT139(){ call_or_link(VV[139],(void **)&Lnk139);} /* ITERATE-OVER-BKPTS */
 static void LnkT138(){ call_or_link(VV[138],(void **)&Lnk138);} /* MAKE-BREAK-POINT */
-static object  LnkTLI137(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[137],(void **)&LnkLI137,ap);} /* MAKE-ARRAY */
+static object  LnkTLI137(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[137],(void **)&LnkLI137,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
 static void LnkT136(){ call_or_link(VV[136],(void **)&Lnk136);} /* WALK-THROUGH */
-static object  LnkTLI135(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[135],(void **)&LnkLI135,ap);} /* VECTOR-PUSH-EXTEND */
+static object  LnkTLI135(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[135],(void **)&LnkLI135,ap);va_end(ap);return V1;} /* VECTOR-PUSH-EXTEND */
 static void LnkT134(){ call_or_link(VV[134],(void **)&Lnk134);} /* INSTREAM-NAME */
 static void LnkT133(){ call_or_link(VV[133],(void **)&Lnk133);} /* LOAD */
 static void LnkT132(){ call_or_link(VV[132],(void **)&Lnk132);} /* SETUP-LINEINFO */
 static void LnkT131(){ call_or_link(VV[131],(void **)&Lnk131);} /* CLEANUP */
 static void LnkT128(){ call_or_link(VV[128],(void **)&Lnk128);} /* READ-FROM-STRING */
-static object  LnkTLI127(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[127],(void **)&LnkLI127,ap);} /* COUNT */
+static object  LnkTLI127(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[127],(void **)&LnkLI127,ap);va_end(ap);return V1;} /* COUNT */
 static void LnkT126(){ call_or_link(VV[126],(void **)&Lnk126);} /* GET-INSTREAM */
 static void LnkT125(){ call_or_link(VV[125],(void **)&Lnk125);} /* MAKE-INSTREAM */
 static void LnkT124(){ call_or_link(VV[124],(void **)&Lnk124);} /* STREAM-NAME */
-static object  LnkTLI123(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[123],(void **)&LnkLI123,ap);} /* DELETE */
+static object  LnkTLI123(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[123],(void **)&LnkLI123,ap);va_end(ap);return V1;} /* DELETE */
 static void LnkT122(){ call_or_link(VV[122],(void **)&Lnk122);} /* CLOSEDP */
 static void LnkT121(){ call_or_link(VV[121],(void **)&Lnk121);} /* BREAK-LEVEL */
-static object  LnkTLI120(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[120],(void **)&LnkLI120,1,ap);} /* SHOW-ENVIRONMENT */
+static object  LnkTLI120(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[120],(void **)&LnkLI120,1,ap);va_end(ap);return V1;} /* SHOW-ENVIRONMENT */
 static void LnkT119(){ call_or_link(VV[119],(void **)&Lnk119);} /* BREAK-LOCALS */
 static void LnkT118(){ call_or_link(VV[118],(void **)&Lnk118);} /* BREAK-GO */
-static object  LnkTLI117(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[117],(void **)&LnkLI117,ap);} /* SEARCH */
+static object  LnkTLI117(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[117],(void **)&LnkLI117,ap);va_end(ap);return V1;} /* SEARCH */
 static void LnkT116(){ call_or_link(VV[116],(void **)&Lnk116);} /* COMPILED-FUNCTION-NAME */
 static void LnkT115(){ call_or_link(VV[115],(void **)&Lnk115);} /* IHS-FUN */
 static object  LnkTLI114(){return call_proc0(VV[114],(void **)&LnkLI114);} /* TYPE-ERROR */

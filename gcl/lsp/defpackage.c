@@ -1049,7 +1049,7 @@ T428:;
 	(void)((*(LnkLI67))());
 goto T427;
 T427:;
-	V157= (V157)+(1);
+	V157= (long)(V157)+(1);
 	goto T405;
 goto T406;
 T406:;
@@ -1075,7 +1075,7 @@ T441:;
 	(void)((*(LnkLI67))());
 goto T440;
 T440:;
-	V144= (V144)+(1);
+	V144= (long)(V144)+(1);
 	goto T370;
 goto T371;
 T371:;
@@ -1303,9 +1303,9 @@ T491:;
 	}
 }
 static object  LnkTLI67(){return call_proc0(VV[67],(void **)&LnkLI67);} /* TYPE-ERROR */
-static object  LnkTLI65(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[65],(void **)&LnkLI65,ap);} /* FIND */
-static object  LnkTLI64(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[64],(void **)&LnkLI64,ap);} /* WARN */
-static object  LnkTLI62(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[62],(void **)&LnkLI62,ap);} /* COUNT */
+static object  LnkTLI65(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[65],(void **)&LnkLI65,ap);va_end(ap);return V1;} /* FIND */
+static object  LnkTLI64(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[64],(void **)&LnkLI64,ap);va_end(ap);return V1;} /* WARN */
+static object  LnkTLI62(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[62],(void **)&LnkLI62,ap);va_end(ap);return V1;} /* COUNT */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

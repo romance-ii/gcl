@@ -196,7 +196,7 @@ T23:;
 	}else{
 	V33=(base[3]);}
 	if(base[7]==Cnil){
-	V34= make_fixnum(length((V30)));
+	V34= make_fixnum((long)length((V30)));
 	}else{
 	V34=(base[4]);}
 	V35=(base[5]);
@@ -570,9 +570,9 @@ T132:;
 goto T133;
 T133:;
 	V84= one_plus((V84));
-	V89 = make_fixnum(length((V86)));
+	V89 = make_fixnum((long)length((V86)));
 	V85= make_cons(V89,(V85));
-	if(!((length((V86)))==0)){
+	if(!(((long)length((V86)))==0)){
 	goto T142;}
 	goto T140;
 goto T142;
@@ -764,8 +764,8 @@ T207:;
 	}
 static void LnkT58(){ call_or_link(VV[58],(void **)&Lnk58);} /* GET-DECODED-TIME */
 static void LnkT11(){ call_or_link(VV[11],(void **)&Lnk11);} /* OPEN */
-static object  LnkTLI57(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[57],(void **)&LnkLI57,ap);} /* WARN */
-static object  LnkTLI56(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[56],(void **)&LnkLI56,ap);} /* MAKE-ARRAY */
+static object  LnkTLI57(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[57],(void **)&LnkLI57,ap);va_end(ap);return V1;} /* WARN */
+static object  LnkTLI56(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[56],(void **)&LnkLI56,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
 static void LnkT9(){ call_or_link(VV[9],(void **)&Lnk9);} /* GET-OUTPUT-STREAM-STRING */
 static void LnkT55(){ call_or_link(VV[55],(void **)&Lnk55);} /* MAKE-STRING-OUTPUT-STREAM */
 static void LnkT6(){ call_or_link(VV[6],(void **)&Lnk6);} /* GET-STRING-INPUT-STREAM-INDEX */

@@ -219,9 +219,9 @@ T60:;
 	V31= aref1(symbol_value(VV[14]),V29);
 	V28= (
 	V32 = /* INLINE-ARGS */V31,
-	(type_of(V32) == t_sfun ?(*(object (*)())((V32)->sfn.sfn_self)):
+	(type_of(V32) == t_sfun ?(*((V32)->sfn.sfn_self)):
 	(fcall.argd=1,type_of(V32)==t_vfun) ?
-	(*(object (*)())((V32)->sfn.sfn_self)):
+	(*((V32)->sfn.sfn_self)):
 	(fcall.fun=(V32),fcalln))((V26)));
 	if(((V28))==Cnil){
 	goto T64;}
@@ -233,7 +233,7 @@ T60:;
 	unwind(fr,(V28));}
 goto T64;
 T64:;
-	V29= (V29)+1;
+	V29= (long)(V29)+1;
 	goto T59;}}
 goto T54;
 T54:;
@@ -336,7 +336,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1031	*/
+/*	function definition for G1034	*/
 
 static void L8()
 {register object *base=vs_base;
@@ -368,7 +368,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1032	*/
+/*	function definition for G1035	*/
 
 static void L10()
 {register object *base=vs_base;
@@ -400,7 +400,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1033	*/
+/*	function definition for G1036	*/
 
 static void L12()
 {register object *base=vs_base;
@@ -432,7 +432,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1034	*/
+/*	function definition for G1037	*/
 
 static void L14()
 {register object *base=vs_base;
@@ -464,7 +464,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1035	*/
+/*	function definition for G1038	*/
 
 static void L16()
 {register object *base=vs_base;
@@ -496,7 +496,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1036	*/
+/*	function definition for G1039	*/
 
 static void L18()
 {register object *base=vs_base;
@@ -528,7 +528,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1037	*/
+/*	function definition for G1040	*/
 
 static void L20()
 {register object *base=vs_base;
@@ -560,7 +560,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1038	*/
+/*	function definition for G1041	*/
 
 static void L22()
 {register object *base=vs_base;
@@ -592,7 +592,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1039	*/
+/*	function definition for G1042	*/
 
 static void L24()
 {register object *base=vs_base;
@@ -624,7 +624,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1040	*/
+/*	function definition for G1043	*/
 
 static void L26()
 {register object *base=vs_base;
@@ -656,7 +656,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1041	*/
+/*	function definition for G1044	*/
 
 static void L28()
 {register object *base=vs_base;
@@ -688,7 +688,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1042	*/
+/*	function definition for G1045	*/
 
 static void L30()
 {register object *base=vs_base;

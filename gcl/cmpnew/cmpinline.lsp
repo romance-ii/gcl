@@ -502,7 +502,7 @@
 (defun wt-inline-fixnum (side-effectp fun locs)
   (declare (ignore side-effectp))
   (when (zerop *space*) (wt "CMP"))
-  (wt "make_fixnum(") (wt-inline-loc fun locs) (wt ")"))
+  (wt "make_fixnum((long)") (wt-inline-loc fun locs) (wt ")"))
 
 (defun wt-inline-integer (side-effectp fun locs)
   (declare (ignore side-effectp))

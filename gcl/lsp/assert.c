@@ -587,7 +587,7 @@ T177:;
 goto T176;
 T176:;
 	base[6]= VV[41];
-	V112 = make_fixnum(length((V95)));
+	V112 = make_fixnum((long)length((V95)));
 	V116= reverse((V95));
 	{object V114;
 	object V115= /* INLINE-ARGS */V116;
@@ -624,7 +624,7 @@ register object V119;
 goto TTL;
 TTL:;
 	if(!((car((V119)))==(VV[25]))){
-	goto T185;}switch(length(cdr((V119)))){
+	goto T185;}switch((long)length(cdr((V119)))){
 	case 0:
 goto T188;
 T188:;
@@ -709,10 +709,10 @@ TTL:;
 	VMR11(V140)}}
 	return Cnil;
 }
-static object  LnkTLI58(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[58],(void **)&LnkLI58,1,ap);} /* BOIN-P */
-static object  LnkTLI57(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[57],(void **)&LnkLI57,ap);} /* REMOVE */
-static object  LnkTLI56(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[56],(void **)&LnkLI56,1,ap);} /* TYPECASE-ERROR-STRINGS */
-static object  LnkTLI53(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[53],(void **)&LnkLI53,1,ap);} /* ASK-FOR-FORM */
+static object  LnkTLI58(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[58],(void **)&LnkLI58,1,ap);va_end(ap);return V1;} /* BOIN-P */
+static object  LnkTLI57(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[57],(void **)&LnkLI57,ap);va_end(ap);return V1;} /* REMOVE */
+static object  LnkTLI56(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[56],(void **)&LnkLI56,1,ap);va_end(ap);return V1;} /* TYPECASE-ERROR-STRINGS */
+static object  LnkTLI53(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[53],(void **)&LnkLI53,1,ap);va_end(ap);return V1;} /* ASK-FOR-FORM */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

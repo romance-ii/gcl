@@ -188,7 +188,7 @@ static void L7()
 	goto T20;}
 	if(!((car(base[5]))==(VV[5]))){
 	goto T24;}
-	V18 = make_fixnum(length(cdr(base[5])));
+	V18 = make_fixnum((long)length(cdr(base[5])));
 	V17= one_minus(V18);
 	goto T20;
 goto T24;
@@ -216,7 +216,7 @@ T28:;
 	goto T20;}
 goto T32;
 T32:;
-	V22 = make_fixnum(length(cdr(base[5])));
+	V22 = make_fixnum((long)length(cdr(base[5])));
 	V17= number_minus(V22,small_fixnum(2));
 goto T20;
 T20:;
@@ -876,7 +876,7 @@ T163:;
 	base[28]= VV[60];
 	{object V100;
 	object V101;
-	V100= make_fixnum(length((V98)));
+	V100= make_fixnum((long)length((V98)));
 	base[32]= VV[61];
 	if(!(number_compare((V100),small_fixnum(10))<0)){
 	goto T217;}
@@ -1210,7 +1210,7 @@ static void L32()
 	base[7]= Cnil;
 	base[8]= Cnil;
 	base[9]= Cnil;}
-	if((length(base[3]))==(length(base[5]))){
+	if(((long)length(base[3]))==((long)length(base[5]))){
 	goto T323;}
 	base[10]= VV[68];
 	vs_top=(vs_base=base+10)+1;
@@ -1575,7 +1575,7 @@ T494:;
 	L40(base);
 	vs_top=sup;
 	V175= fix(vs_base[0]);
-	base[2]= make_fixnum((fix((V172)))+(V175));
+	base[2]= make_fixnum((long)(fix((V172)))+(V175));
 	vs_top=(vs_base=base+2)+1;
 	return;
 goto T506;
@@ -1604,7 +1604,7 @@ T515:;
 	L40(base);
 	vs_top=sup;
 	V178= fix(vs_base[0]);
-	base[2]= make_fixnum((/* INLINE-ARGS */V177)+(V178));
+	base[2]= make_fixnum((long)(/* INLINE-ARGS */V177)+(V178));
 	vs_top=(vs_base=base+2)+1;
 	return;}
 goto T513;
@@ -1631,7 +1631,7 @@ T525:;
 	vs_top=sup;
 	V182= vs_base[0];
 	V173= fix(number_plus(V181,V182));
-	V173= (V173)+(1);
+	V173= (long)(V173)+(1);
 	V179= cdr((V179));
 	V180= car((V179));
 	goto T524;}
@@ -1737,13 +1737,13 @@ goto T585;
 T585:;
 	if(!(((V171))==(VV[85]))){
 	goto T596;}
-	{long V186= length(cadr((V168)));
+	{long V186= (long)length(cadr((V168)));
 	base[2]= cddr((V168));
 	vs_top=(vs_base=base+2)+1;
 	L40(base);
 	vs_top=sup;
 	V187= fix(vs_base[0]);
-	base[2]= make_fixnum((/* INLINE-ARGS */V186)+(V187));
+	base[2]= make_fixnum((long)(/* INLINE-ARGS */V186)+(V187));
 	vs_top=(vs_base=base+2)+1;
 	return;}
 goto T596;
@@ -1817,7 +1817,7 @@ T620:;
 	L40(base);
 	vs_top=sup;
 	V192= fix(vs_base[0]);
-	base[2]= make_fixnum((3)+(V192));
+	base[2]= make_fixnum((long)(3)+(V192));
 	vs_top=(vs_base=base+2)+1;
 	return;}}
 goto T497;
@@ -4458,7 +4458,7 @@ T1520:;
 	goto T1531;}
 goto T1533;
 T1533:;
-	V406= length((V405));
+	V406= (long)length((V405));
 	V407= make_fixnum(V406);
 goto T1531;
 T1531:;
@@ -5192,7 +5192,7 @@ T1810:;}
 	vs_top=sup;
 goto T1826;
 T1826:;
-	V486 = make_fixnum(length((V476)));
+	V486 = make_fixnum((long)length((V476)));
 	{register object x= V486,V485= VV[238];
 	while(!endp(V485))
 	if(eql(x,V485->c.c_car)){
@@ -6042,7 +6042,7 @@ T2189:;
 	V556= vs_base[0];
 	V554= (
 	V557 = V556,
-	(type_of(V557) == t_sfun ?(*(object (*)())((V557)->sfn.sfn_self)):
+	(type_of(V557) == t_sfun ?(*((V557)->sfn.sfn_self)):
 	(fcall.fun=(V557),fcall.argd=2,fcalln))((V537),(V541)));
 	if(((V554))==Cnil){
 	goto T2197;}
@@ -7413,7 +7413,7 @@ goto TTL;
 TTL:;
 	{object V695;
 	object V696;
-	V695= make_fixnum(length((V694)));
+	V695= make_fixnum((long)length((V694)));
 	base[3]= VV[61];
 	if(!(number_compare((V695),small_fixnum(10))<0)){
 	goto T2696;}
@@ -7515,7 +7515,7 @@ T2726:;
 goto T2722;
 T2722:;
 	V702= list(2,VV[17],(V702));
-	V703= (V703)-(4);
+	V703= (long)(V703)-(4);
 	goto T2721;
 	}
 }
@@ -7525,7 +7525,7 @@ static void LnkT394(){ call_or_link(VV[394],(void **)&Lnk394);} /* ADD-LOOP-PATH
 static void LnkT393(){ call_or_link(VV[393],(void **)&Lnk393);} /* MAKE-STANDARD-LOOP-UNIVERSE */
 static void LnkT390(){ call_or_link(VV[390],(void **)&Lnk390);} /* NAMED-VARIABLE */
 static void LnkT385(){ call_or_link(VV[385],(void **)&Lnk385);} /* LOOP-SEQUENCER */
-static object  LnkTLI382(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[382],(void **)&LnkLI382,ap);} /* DELETE */
+static object  LnkTLI382(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[382],(void **)&LnkLI382,ap);va_end(ap);return V1;} /* DELETE */
 static void LnkT381(){ call_or_link(VV[381],(void **)&Lnk381);} /* LOOP-TASSOC */
 static void LnkT380(){ call_or_link(VV[380],(void **)&Lnk380);} /* LOOP-COLLECT-PREPOSITIONAL-PHRASES */
 static void LnkT379(){ call_or_link(VV[379],(void **)&Lnk379);} /* MAKE-LOOP-PATH */
@@ -7540,7 +7540,7 @@ static void LnkT371(){ call_or_link(VV[371],(void **)&Lnk371);} /* LOOP-CHECK-DA
 static void LnkT368(){ call_or_link(VV[368],(void **)&Lnk368);} /* LOOP-EMIT-FINAL-VALUE */
 static void LnkT367(){ call_or_link(VV[367],(void **)&Lnk367);} /* LOOP-GET-COLLECTION-INFO */
 static void LnkT366(){ call_or_link(VV[366],(void **)&Lnk366);} /* MAKE-LOOP-COLLECTOR */
-static object  LnkTLI364(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[364],(void **)&LnkLI364,ap);} /* FIND */
+static object  LnkTLI364(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[364],(void **)&LnkLI364,ap);va_end(ap);return V1;} /* FIND */
 static void LnkT363(){ call_or_link(VV[363],(void **)&Lnk363);} /* LOOP-OPTIONAL-TYPE */
 static void LnkT360(){ call_or_link(VV[360],(void **)&Lnk360);} /* LOOP-EMIT-BODY */
 static void LnkT359(){ call_or_link(VV[359],(void **)&Lnk359);} /* LOOP-GET-PROGN */
@@ -7550,7 +7550,7 @@ static void LnkT356(){ call_or_link(VV[356],(void **)&Lnk356);} /* LOOP-CONSTANT
 static void LnkT355(){ call_or_link(VV[355],(void **)&Lnk355);} /* LOOP-MAKE-VARIABLE */
 static void LnkT354(){ call_or_link(VV[354],(void **)&Lnk354);} /* LOOP-DECLARE-VARIABLE */
 static void LnkT353(){ call_or_link(VV[353],(void **)&Lnk353);} /* LOOP-TEQUAL */
-static object  LnkTLI352(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[352],(void **)&LnkLI352,2,ap);} /* COERCE */
+static object  LnkTLI352(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[352],(void **)&LnkLI352,2,ap);va_end(ap);return V1;} /* COERCE */
 static void LnkT351(){ call_or_link(VV[351],(void **)&Lnk351);} /* LOOP-CONSTRUCT-RETURN */
 static void LnkT350(){ call_or_link(VV[350],(void **)&Lnk350);} /* LOOP-PSEUDO-BODY */
 static void LnkT349(){ call_or_link(VV[349],(void **)&Lnk349);} /* LOOP-TMEMBER */
@@ -7561,7 +7561,7 @@ static void LnkT345(){ call_or_link(VV[345],(void **)&Lnk345);} /* LOOP-BIND-BLO
 static void LnkT344(){ call_or_link(VV[344],(void **)&Lnk344);} /* LOOP-ITERATION-DRIVER */
 static void LnkT343(){ call_or_link(VV[343],(void **)&Lnk343);} /* LOOP-ERROR */
 static void LnkT323(){ call_or_link(VV[323],(void **)&Lnk323);} /* SUBTYPEP */
-static object  LnkTLI342(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[342],(void **)&LnkLI342,ap);} /* WARN */
+static object  LnkTLI342(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[342],(void **)&LnkLI342,ap);va_end(ap);return V1;} /* WARN */
 static void LnkT341(){ call_or_link(VV[341],(void **)&Lnk341);} /* LOOP-CONTEXT */
 static void LnkT340(){ call_or_link(VV[340],(void **)&Lnk340);} /* SPECIAL-OPERATOR-P */
 static void LnkT339(){ call_or_link(VV[339],(void **)&Lnk339);} /* ESTIMATE-CODE-SIZE-1 */

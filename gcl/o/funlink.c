@@ -224,11 +224,11 @@ clean_link_array(object *ar, object *ar_end)
    object.  A proper fix will require rewriting sections of the lisp
    compiler to separate the calling procedures for functions returning
    an object from functions returning a long.  CM  20020801 */
-#if defined(__mc68020__)
-#define LCAST(a) (object)(*(long(*)())a)
-#else
+/*  #if defined(__mc68020__) */
+/*  #define LCAST(a) (object)(*(long(*)())a) */
+/*  #else */
 #define LCAST(a) (*a)
-#endif
+/*  #endif */
 
 object
 c_apply_n(object (*fn)(), int n, object *x)

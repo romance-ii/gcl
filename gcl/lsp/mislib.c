@@ -247,7 +247,7 @@ goto T90;
 T90:;
 	if(!(number_compare((V21),car((V30)))<=0)){
 	goto T91;}
-	V31 = make_fixnum(length((V30)));
+	V31 = make_fixnum((long)length((V30)));
 	V22= number_minus(small_fixnum(13),V31);
 	goto T88;
 goto T91;
@@ -441,8 +441,8 @@ T144:;
 	return Cnil;}
 	}
 static void LnkT15(){ call_or_link(VV[15],(void **)&Lnk15);} /* GET-DECODED-TIME */
-static object  LnkTLI14(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[14],(void **)&LnkLI14,1,ap);} /* LEAP-YEAR-P */
-static object  LnkTLI13(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[13],(void **)&LnkLI13,1,ap);} /* NUMBER-OF-DAYS-FROM-1900 */
+static object  LnkTLI14(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[14],(void **)&LnkLI14,1,ap);va_end(ap);return V1;} /* LEAP-YEAR-P */
+static object  LnkTLI13(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[13],(void **)&LnkLI13,1,ap);va_end(ap);return V1;} /* NUMBER-OF-DAYS-FROM-1900 */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

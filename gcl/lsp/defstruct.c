@@ -80,7 +80,7 @@ T13:;
 	V24= symbol_value(VV[0]);}
 goto T8;
 T8:;
-	V27 = make_fixnum(length((V24)));
+	V27 = make_fixnum((long)length((V24)));
 	if(!(number_compare(V27,(Vcs[10]->c.c_car))>0)){
 	goto T17;}
 	goto T16;
@@ -1030,7 +1030,7 @@ T426:;
 	V161= structure_ref((V160),VV[55],2);
 	{object V162;
 	register object V163;
-	V164 = make_fixnum(length((V161)));
+	V164 = make_fixnum((long)length((V161)));
 	V162= (number_compare((V155),V164)<=0?((V155)):V164);
 	V163= small_fixnum(0);
 goto T434;
@@ -1080,7 +1080,7 @@ T454:;
 	goto T447;}
 goto T443;
 T443:;
-	V171 = make_fixnum(length(symbol_value(VV[58])));
+	V171 = make_fixnum((long)length(symbol_value(VV[58])));
 	if(!(number_compare((V155),V171)<0)){
 	goto T468;}
 	{register object V173;
@@ -1114,7 +1114,7 @@ T468:;
 }
 /*	local entry for function ROUND-UP	*/
 
-static long LI8(V180,V181)
+static object LI8(V180,V181)
 
 long V180;long V181;
 {	 VMB8 VMS8 VMV8
@@ -1126,8 +1126,8 @@ TTL:;
 	Lceiling();
 	vs_top=sup;
 	V180= fix(vs_base[0]);
-	{long V182 = (V180)*(V181);
-	VMR8(V182)}
+	{long V182 = (long)(V180)*(V181);
+	VMR8((object)V182)}
 	base[0]=base[0];
 }
 /*	local entry for function GET-SLOT-POS	*/
@@ -1226,7 +1226,7 @@ T492:;
 	goto T537;
 goto T538;
 T538:;
-	V201 = make_fixnum(length(symbol_value(VV[59])));
+	V201 = make_fixnum((long)length(symbol_value(VV[59])));
 	if(number_compare((V186),V201)<0){
 	goto T540;}
 	V200= Cnil;
@@ -1288,7 +1288,7 @@ T557:;
 	V212= nconc((V212),VV[62]);
 goto T566;
 T566:;
-	V210= (*(LnkLI126))(V206,V208);
+	V210= (long)(*(LnkLI126))(V206,V208);
 	if(!((V206)==(V210))){
 	goto T579;}
 	goto T578;
@@ -1307,7 +1307,7 @@ T578:;
 	vs_top=sup;
 	V218= vs_base[0];
 	V206= fix(number_plus(V217,V218));
-	V207= (V207)+(1);
+	V207= (long)(V207)+(1);
 	V211= cdr((V211));
 	V212= car((V211));
 	goto T556;}
@@ -1318,7 +1318,7 @@ T552:;
 	(void) (*Lnk125)();
 	vs_top=sup;
 	V219= vs_base[0];
-	V220 = make_fixnum((*(LnkLI126))(V206,fix(V219)));
+	V220 = make_fixnum((long)(*(LnkLI126))(V206,fix(V219)));
 	{object V221 = list(3,(V205),V220,(V191));
 	VMR9(V221)}}}}
 	base[0]=base[0];
@@ -1393,7 +1393,7 @@ T608:;
 	V235= VV[19];
 goto T605;
 T605:;
-	V248= make_fixnum(length((V237)));
+	V248= make_fixnum((long)length((V237)));
 	{register object V249;
 	register object V250;
 	V249= (V237);
@@ -2484,31 +2484,31 @@ T1072:;
 }
 static void LnkT149(){ call_or_link(VV[149],(void **)&Lnk149);} /* STRUCTURE-REF1 */
 static void LnkT148(){ call_or_link(VV[148],(void **)&Lnk148);} /* STRUCTURE-SUBTYPE-P */
-static object  LnkTLI144(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[144],(void **)&LnkLI144,5,ap);} /* MAKE-PREDICATE */
-static object  LnkTLI143(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[143],(void **)&LnkLI143,5,ap);} /* MAKE-CONSTRUCTOR */
-static object  LnkTLI142(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[142],(void **)&LnkLI142,2,ap);} /* PARSE-SLOT-DESCRIPTION */
-static object  LnkTLI136(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[136],(void **)&LnkLI136,3,ap);} /* CHECK-S-DATA */
-static object  LnkTLI135(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[135],(void **)&LnkLI135,ap);} /* MAKE-S-DATA */
-static object  LnkTLI134(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[134],(void **)&LnkLI134,3,ap);} /* GET-SLOT-POS */
-static object  LnkTLI133(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[133],(void **)&LnkLI133,ap);} /* WARN */
+static object  LnkTLI144(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[144],(void **)&LnkLI144,5,ap);va_end(ap);return V1;} /* MAKE-PREDICATE */
+static object  LnkTLI143(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[143],(void **)&LnkLI143,5,ap);va_end(ap);return V1;} /* MAKE-CONSTRUCTOR */
+static object  LnkTLI142(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[142],(void **)&LnkLI142,2,ap);va_end(ap);return V1;} /* PARSE-SLOT-DESCRIPTION */
+static object  LnkTLI136(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[136],(void **)&LnkLI136,3,ap);va_end(ap);return V1;} /* CHECK-S-DATA */
+static object  LnkTLI135(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[135],(void **)&LnkLI135,ap);va_end(ap);return V1;} /* MAKE-S-DATA */
+static object  LnkTLI134(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[134],(void **)&LnkLI134,3,ap);va_end(ap);return V1;} /* GET-SLOT-POS */
+static object  LnkTLI133(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[133],(void **)&LnkLI133,ap);va_end(ap);return V1;} /* WARN */
 static void LnkT132(){ call_or_link(VV[132],(void **)&Lnk132);} /* MAKE-S-DATA-STRUCTURE */
-static object  LnkTLI131(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[131],(void **)&LnkLI131,3,ap);} /* MAKE-T-TYPE */
+static object  LnkTLI131(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[131],(void **)&LnkLI131,3,ap);va_end(ap);return V1;} /* MAKE-T-TYPE */
 static void LnkT127(){ call_or_link(VV[127],(void **)&Lnk127);} /* MAKE-ACCESS-FUNCTION */
-static long  LnkTLI126(va_alist)va_dcl{va_list ap;va_start(ap);return(long )call_proc(VV[126],(void **)&LnkLI126,20738,ap);} /* ROUND-UP */
+static object  LnkTLI126(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[126],(void **)&LnkLI126,20738,ap);va_end(ap);return V1;} /* ROUND-UP */
 static void LnkT125(){ call_or_link(VV[125],(void **)&Lnk125);} /* SIZE-OF */
-static object  LnkTLI124(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[124],(void **)&LnkLI124,2,ap);} /* COERCE */
+static object  LnkTLI124(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[124],(void **)&LnkLI124,2,ap);va_end(ap);return V1;} /* COERCE */
 static void LnkT123(){ call_or_link(VV[123],(void **)&Lnk123);} /* TYPEP */
 static void LnkT122(){ call_or_link(VV[122],(void **)&Lnk122);} /* AET-TYPE */
 static void LnkT121(){ call_or_link(VV[121],(void **)&Lnk121);} /* ALIGNMENT */
-static object  LnkTLI120(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[120],(void **)&LnkLI120,ap);} /* MAKE-ARRAY */
-static object  LnkTLI119(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[119],(void **)&LnkLI119,2,ap);} /* OVERWRITE-SLOT-DESCRIPTIONS */
-static object  LnkTLI118(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[118],(void **)&LnkLI118,1,ap);} /* NORMALIZE-TYPE */
-static object  LnkTLI117(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[117],(void **)&LnkLI117,1,ap);} /* BEST-ARRAY-ELEMENT-TYPE */
+static object  LnkTLI120(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[120],(void **)&LnkLI120,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
+static object  LnkTLI119(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[119],(void **)&LnkLI119,2,ap);va_end(ap);return V1;} /* OVERWRITE-SLOT-DESCRIPTIONS */
+static object  LnkTLI118(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[118],(void **)&LnkLI118,1,ap);va_end(ap);return V1;} /* NORMALIZE-TYPE */
+static object  LnkTLI117(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[117],(void **)&LnkLI117,1,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
 static void LnkT115(){ call_or_link(VV[115],(void **)&Lnk115);} /* X */
 static object  LnkTLI113(){return call_proc0(VV[113],(void **)&LnkLI113);} /* ILLEGAL-BOA */
 static void LnkT112(){ call_or_link(VV[112],(void **)&Lnk112);} /* SUBTYPEP */
 static void LnkT111(){ call_or_link(VV[111],(void **)&Lnk111);} /* RECORD-FN */
-static object  LnkTLI110(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[110],(void **)&LnkLI110,ap);} /* ADJUST-ARRAY */
+static object  LnkTLI110(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[110],(void **)&LnkLI110,ap);va_end(ap);return V1;} /* ADJUST-ARRAY */
 static void LnkT109(){ call_or_link(VV[109],(void **)&Lnk109);} /* STRING-CONCATENATE */
 
 #ifdef SYSTEM_SPECIAL_INIT
