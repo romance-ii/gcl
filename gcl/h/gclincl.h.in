@@ -182,6 +182,8 @@
 
 #undef HAVE_JAPI_H
 
+#undef HAVE_XDR
+
 /* The number of bytes in a long *.  */
 #undef SIZEOF_LONG_P
 

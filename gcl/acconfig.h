@@ -227,4 +227,8 @@ SGC is enabled.  */
 #undef __SHORT_LIMB
 #undef __LONG_LONG_LIMB
 
+/* Define if we have the JAPI library on board */
 #undef HAVE_JAPI_H
+
+/* Define if we have XDR functions on board */
+#undef HAVE_XDR
