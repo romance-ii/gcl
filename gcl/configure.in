@@ -845,7 +845,8 @@ AC_SUBST(LITTLE_END)
 # On systems with execshield, brk is randomized.  We need to catch
 # this and restore the traditional behavior here
 
-AC_MSG_CHECKING([for randomized brk])
+AC_MSG_CHECKING([for sbrk])
+HAVE_SBRK=""
 AC_TRY_RUN([#include <unistd.h>
 	    #include <stdio.h>
 	    int main() {
@@ -855,41 +856,17 @@ AC_TRY_RUN([#include <unistd.h>
 		fprintf(f,"%u",sbrk(0));
 		return 0;
 		}],
-		SBRK=`cat conftest1`,SBRK=0,SBRK=0)
-if test "$SBRK" = "0" ; then
-	AC_MSG_RESULT(cannot trap sbrk)
-	exit 1
-fi
-AC_TRY_RUN([#include <unistd.h>
-	    #include <stdio.h>
-	    int main() {
-		FILE *f;
-		if (!(f=fopen("conftest1","w")))
-			return -1;
-		fprintf(f,"%u",sbrk(0));
-		return 0;
-		}],
-		SBRK1=`cat conftest1`,SBRK1=0,SBRK1=0)
-if test "$SBRK1" = "0" ; then
-	AC_MSG_RESULT(cannot trap sbrk)
-	exit 1
-fi
+		HAVE_SBRK=1
+		AC_MSG_RESULT(yes),
+		AC_MSG_RESULT([no, WARNING you must beable to emulate sbrk, as on mingw or macosx]),
+		AC_MSG_RESULT([no, WARNING you must beable to emulate sbrk, as on mingw or macosx]))
 
-if test "$SBRK" != "$SBRK1" ; then
-	AC_MSG_RESULT(yes)
-	AC_MSG_CHECKING([for randomized brk remedy])
-	AC_TRY_RUN([#include <syscall.h>
-		    #include <linux/personality.h>
-         	    #include <stdio.h>
-		    #include <unistd.h>
-		    int main(int argc,char * argv[]) {
+if test "$HAVE_SBRK" = "1" ; then
+	AC_MSG_CHECKING([for randomized sbrk])
+	AC_TRY_RUN([#include <unistd.h>
+		    #include <stdio.h>
+		    int main() {
 			FILE *f;
-			#if SIZEOF_LONG == 4
-			if (!syscall(SYS_personality,PER_LINUX32))
-			#else
-			if (!syscall(SYS_personality,PER_LINUX))
-			#endif
-				execvp(argv[0],argv);
 			if (!(f=fopen("conftest1","w")))
 				return -1;
 			fprintf(f,"%u",sbrk(0));
@@ -900,18 +877,10 @@ if test "$SBRK" != "$SBRK1" ; then
 		AC_MSG_RESULT(cannot trap sbrk)
 		exit 1
 	fi
-	AC_TRY_RUN([#include <syscall.h>
-		    #include <linux/personality.h>
+	AC_TRY_RUN([#include <unistd.h>
 		    #include <stdio.h>
-		    #include <unistd.h>
-		    int main(int argc,char * argv[]) {
+		    int main() {
 			FILE *f;
-			#if SIZEOF_LONG == 4
-			if (!syscall(SYS_personality,PER_LINUX32))
-			#else
-			if (!syscall(SYS_personality,PER_LINUX))
-			#endif
-				execvp(argv[0],argv);
 			if (!(f=fopen("conftest1","w")))
 				return -1;
 			fprintf(f,"%u",sbrk(0));
@@ -922,18 +891,66 @@ if test "$SBRK" != "$SBRK1" ; then
 		AC_MSG_RESULT(cannot trap sbrk)
 		exit 1
 	fi
-	if test "$SBRK" = "$SBRK1" ; then
+	
+	if test "$SBRK" != "$SBRK1" ; then
 		AC_MSG_RESULT(yes)
-		AC_DEFINE(NEED_NONRANDOM_SBRK)
+		AC_MSG_CHECKING([for randomized brk remedy])
+		AC_TRY_RUN([#include <syscall.h>
+			    #include <linux/personality.h>
+	         	    #include <stdio.h>
+			    #include <unistd.h>
+			    int main(int argc,char * argv[]) {
+				FILE *f;
+				#if SIZEOF_LONG == 4
+				if (!syscall(SYS_personality,PER_LINUX32))
+				#else
+				if (!syscall(SYS_personality,PER_LINUX))
+				#endif
+					execvp(argv[0],argv);
+				if (!(f=fopen("conftest1","w")))
+					return -1;
+				fprintf(f,"%u",sbrk(0));
+				return 0;
+				}],
+				SBRK=`cat conftest1`,SBRK=0,SBRK=0)
+		if test "$SBRK" = "0" ; then
+			AC_MSG_RESULT(cannot trap sbrk)
+			exit 1
+		fi
+		AC_TRY_RUN([#include <syscall.h>
+			    #include <linux/personality.h>
+			    #include <stdio.h>
+			    #include <unistd.h>
+			    int main(int argc,char * argv[]) {
+				FILE *f;
+				#if SIZEOF_LONG == 4
+				if (!syscall(SYS_personality,PER_LINUX32))
+				#else
+				if (!syscall(SYS_personality,PER_LINUX))
+				#endif
+					execvp(argv[0],argv);
+				if (!(f=fopen("conftest1","w")))
+					return -1;
+				fprintf(f,"%u",sbrk(0));
+				return 0;
+				}],
+				SBRK1=`cat conftest1`,SBRK1=0,SBRK1=0)
+		if test "$SBRK1" = "0" ; then
+			AC_MSG_RESULT(cannot trap sbrk)
+			exit 1
+		fi
+		if test "$SBRK" = "$SBRK1" ; then
+			AC_MSG_RESULT(yes)
+			AC_DEFINE(NEED_NONRANDOM_SBRK)
+		else
+			AC_MSG_RESULT(no)
+			echo "Cannot build with randomized sbrk"
+			exit 1
+		fi 
 	else
 		AC_MSG_RESULT(no)
-		echo "Cannot build with randomized sbrk"
-		exit 1
-	fi 
-else
-	AC_MSG_RESULT(no)
+	fi
 fi
-
 
 
 AC_MSG_CHECKING("finding DBEGIN")
