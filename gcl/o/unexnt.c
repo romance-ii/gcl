@@ -970,6 +970,7 @@ allocate_heap (void)
 			  MEM_RESERVE,
 			  PAGE_NOACCESS);
       base += 0x00100000;  /* 1MB increment */
+      DBEGIN = ptr;
     }
 #else
   reserved_heap_size = end - base;
@@ -977,6 +978,7 @@ allocate_heap (void)
 		      get_reserved_heap_size (),
 		      MEM_RESERVE,
 		      PAGE_NOACCESS);
+  DBEGIN = ptr;
 #endif
 
   return ptr;

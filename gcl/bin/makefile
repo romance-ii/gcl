@@ -5,10 +5,10 @@ APPEND=../bin/append
 
 # begin makedefs
 
-# use=386-linux
+# use=mingw
 
 # for main link of raw_gcl
-LIBS= -lm -lreadline -lncurses -lbfd -liberty
+LIBS= -lm  /libbfd.a /libiberty.a
 
 #The multi precision library stuff
 MPFILES=$(MPDIR)/@MPI_FILE@ $(MPDIR)/libmport.a
@@ -17,96 +17,98 @@ MPFILES=$(MPDIR)/@MPI_FILE@ $(MPDIR)/libmport.a
 # root for the installation, eg /usr/local
 # This would cause make install to create /usr/local/bin/gcl and
 # /usr/local/lib/gcl-2-??/* with some basic files.
-prefix=/usr/local
+prefix=c:/lang/gclcvs
 
 # where to place the info files
 INFO_DIR=/usr/info/
 
 # where to put emacs lisp files.
-EMACS_SITE_LISP=/usr/local/share/emacs/20.7/site-lisp
+EMACS_SITE_LISP=
 
 # the default.el file
-EMACS_DEFAULT_EL=/usr/local/share/emacs/20.7/site-lisp/default.el
+EMACS_DEFAULT_EL=
 
 # numerous TCL/TK variables culled from the tkConfig.sh and tclConfig.sh
 # if these are found.
-TK_CONFIG_PREFIX=/usr/lib
-TK_LIBRARY=/usr/lib/tk8.2
-TCL_LIBRARY=/usr/lib/tcl8.2
-TK_XINCLUDES=-I/usr/X11R6/include
-TK_INCLUDE=-I/usr/lib/../include
-TCL_INCLUDE=-I/usr/lib/../include
-TK_LIB_SPEC=-L/usr/lib -ltk8.2
-TK_BUILD_LIB_SPEC=-L/usr/lib -ltk8.2
-TK_XLIBSW=-L/usr/X11R6/lib -lX11
-TK_XINCLUDES=-I/usr/X11R6/include
-TCL_LIB_SPEC=-L/usr/lib -ltcl8.2${TCL_DBGX}
-TCL_DL_LIBS=-ldl
-TCL_LIBS=-ldl  -lm
+TK_CONFIG_PREFIX=c:/lang/mingw32/lib
+TK_LIBRARY=c:/lang/mingw32/lib/tk8.3
+TCL_LIBRARY=
+TK_XINCLUDES=
+TK_INCLUDE=-Ic:/lang/mingw32/lib/../include
+TCL_INCLUDE=
+TK_LIB_SPEC=
+TK_BUILD_LIB_SPEC=
+TK_XLIBSW=
+TK_XINCLUDES=
+TCL_LIB_SPEC=
+TCL_DL_LIBS=
+TCL_LIBS=
 
 NOTIFY=yes
 GCC=gcc
 
-RL_OBJS=readline.o
+RL_OBJS=
 
-RL_LIB=lsp/readline.o
+RL_LIB=
 
-GCLDIR=/fix/f/debian/mm/gcl/gcl-2.5.0
+GCLDIR=c:/cvs/gcl
 SHELL=/bin/sh
-MACHINE=386-linux
-
-# notes for redhat 6.0
-#  the configure should select the compiler GCC=/usr/bin/i386-glibc20-linux-gcc
-#  However for the gcl-tk directory, you must use plain 'gcc' since
-#  that must link with the tcl tk libs which have been compiled with it.
-#  so after configure change to GCC=gcc in the gcl-tk/makefile
+MACHINE=mingw
 
 
-# Machine dependent makefile definitions for intel 386,486 running linux
+# Machine dependent makefile definitions for intel 386,486 running MSWINDOWS,
+# and compilation using mingw compiler and includes.
 
-LBINDIR=/usr/local/bin
+# note using /bin/sh (ie a copy of ash.exe) will fail if a very LONG command
+# line is given, eg when linking maxima.  bash has more stack.
 
-#OFLAG	=  -g 
-OFLAG	=  -O 
-#LIBS	= -lm 
+SHELL        = bash
 
-ODIR_DEBUG= -O4 
-#ODIR_DEBUG= -g
+OFLAG	     = -O 
+LIBS	     = -lm 
+LIBC 	     =
 
-# This CC string will be used for compilation of the system,
-# and also in the compiler::*cc* variable for later compilation of
-# lisp files.
-# (the -pipe is just since our file system is slow..)
-CC = ${GCC} -pipe -fwritable-strings  -DVOL=volatile -I$(GCLDIR)/o -fsigned-char
+ODIR_DEBUG   = -g
 
-# under redhat 6.1 and slackware 7.0 we needed to have this
-# link be static, but should be ok with the fix to unixport/rsym_elf.c
-LDCC=${CC} -static
-LDCC=${CC}
+CROSS_PREFIX =
 
-# note for linuxaout on an elf machine add -b i486-linuxaout 
-# CC = gcc -pipe -fwritable-strings  -DVOL=volatile -I$(GCLDIR)/o -fsigned-char -b i486-linuxaout 
+CC           = ${CROSS_PREFIX}gcc -fwritable-strings -DVOL=volatile -I$(GCLDIR)/o -fsigned-char
+AS           = ${CROSS_PREFIX}as
+AR           = ${CROSS_PREFIX}ar q
+RANLIB       = ${CROSS_PREFIX}ranlib
+
+
+LDCC         = ${CC}
 
 # Enable the fastloading mechanism which does not use ld -A
 # requires c/rel_.. machine dependent code.
 
-RSYM	= rsym
-SFASL	= $(ODIR)/sfasl.o
+RSYM	     = rsym.exe
+SPECIAL_RSYM = rsym_nt.c
+SFASL	     = $(ODIR)/sfasl.o
 
-
-#MPFILES= $(MPDIR)/mpi-386d.o   $(MPDIR)/libmport.a
-
+FIRST_FILE   = $(ODIR)/firstfile.o
+LAST_FILE    = $(ODIR)/lastfile.o
 
 # When using SFASL it is good to have (si::build-symbol-table)
-INITFORM=(si::build-symbol-table)
+INITFORM     = (si::build-symbol-table)
 
 # Use symbolic links
-SYMB=-s
+SYMB         = -s
+APPEND       = ../bin/append
 
-LIBFILES=bsearch.o
+# suffix for executables
+EXE          = .exe
+LIBFILES     = bsearch.o bcmp.o bzero.o bcopy.o
+EXTRAS       = ${OD}mingwin.o ${OD}mingfile.o
 
 # the  make to use for saved_kcp the profiler.
-KCP=kcp-bsd
+KCP          = kcp-bsd
+
+# using gcc so dont need
+GNULIB1      =
+
+WINKILL      = winkill.exe tclwinkill.dll
 
 MPFILES=${GMP_DIR}libgmp.a
 
@@ -127,6 +129,8 @@ ${APPEND}${EXE}: append.c
 winkill.exe: winkill.c
 	${CC} ${CFLAGS} winkill.c -o winkill.exe
 
+tclwinkill.dll: ../o/tclwinkill.c
+	-(cd ../o; $(CC) -I../h -shared tclwinkill.c -ltclstub83 -o ../bin/tclwinkill.dll)
 
 clean:
 	rm -f dpp dpp${EXE} append append${EXE} file-sub${EXE} core a.out *.o gcl

@@ -19,7 +19,9 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-
+#ifdef __MINGW32__
+#include <sys/types.h>          /* sigset_t */
+#endif
 
 #ifndef IN_UNIXINT
 #include "include.h"

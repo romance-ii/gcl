@@ -1,8 +1,17 @@
+#include <varargs.h>     
+#include <stdio.h>
+#include "att.h"
+
+FILE *fopen_binary(char *name,char *mode);
+
 #define MP386
 #define WINDOWSNT
 #define MINGW
 #define GCL
+
 /* #define filehdr _IMAGE_FILE_HEADER */
+/* #define RUN_PROCESS */
+
 #define f_symptr PointerToSymbolTable
 #define f_nsyms NumberOfSymbols
 #define NO_PWD_H
@@ -11,7 +20,6 @@
    the native system page width  */
 
 #define PAGEWIDTH 12 
-
 #define MAXPATHLEN 512
 
 /* alter pathToAlter to fit in with the Clibrary of the system.
@@ -27,41 +35,28 @@
        memory_save(buf,filename); \
        } while (0)
 
-
-
-#include "att.h"
-/* #include "386.h" */
-/* #include "fcntl.h" */
-
-
-
 #define signals_pending *signalsPendingPtr
 
-
 #undef DBEGIN
-#define DBEGIN 0x10000000
-
+#define DBEGIN _dbegin
+extern unsigned int _stacktop, _stackbottom, _dbegin;
 
 /* define if there is no _cleanup,   do here what needs
    to be done before calling unexec
    */   
 #define CLEANUP_CODE \
   setbuf(stdin,0); \
-   setbuf(stdout,0);
+  setbuf(stdout,0);
 
 /* size to use for mallocs done  */
 /* #define BABY_MALLOC_SIZE 0x5000 */
-
-
-
 
 #define NO_SYS_PARAM_H
 #define NO_SYS_TIMES_H
 
 #ifdef IN_UNIXTIME
-#undef ATT
-#undef BSD
-
+#  undef ATT
+#  undef BSD
 #endif
 
 #undef NEED_GETWD 
@@ -70,14 +65,12 @@
 #define IS_DIR_SEPARATOR(x) ((x=='/')||(x=='\\'))
 
 #ifdef IN_UNIXFSYS
-#undef ATT
-#define HAVE_RENAME
-
+#  undef ATT
+#  define HAVE_RENAME
 #endif
+
 /* the result of 'getenv' is malloc'd */
 #define FREE_GETENV_RESULT
-
-
 #define OUR_NSOCKET "winnsocket.c"
 
 #define SIGBUS		 7
@@ -98,32 +91,29 @@
 
 #define HAVE_SIGPROCMASK
 
+#if 0
 #ifdef __MSVCRT__
 typedef int sigset_t ;
 #endif
-
+#endif
 
 #define NEED_TO_REINSTALL_SIGNALS 
 
 #ifndef SIGIO
-#define SIGIO 23
+#  define SIGIO 23
 #endif
 
 /* on most machines this will test in one instruction
    if the pointe/r is on the C stack or the 0 pointer
    in winnt our heap starts at DBEGIN
    */
-/*  #define NULL_OR_ON_C_STACK(y)\ */
-/*      (((unsigned int)(y)) == 0 ||  \ */
-/*       (((unsigned int)(y)) < DBEGIN && ((unsigned int)(y)) &0xf000000)) */
-#define NULL_OR_ON_C_STACK(y) (((void *)(y)) < ((void *)0x400000))
-     
+#define NULL_OR_ON_C_STACK(y) \
+    (((unsigned int)(y)) == 0 || \
+    (((unsigned int)(y)) > _stacktop && ((unsigned int)(y)) < _stackbottom))     
       
 #ifdef IN_FILE
-#define HAVE_NSOCKET
+#  define HAVE_NSOCKET
 #endif
-
-     
 
 /* #define HAVE_SIGACTION */
 /* a noop */
@@ -131,39 +121,28 @@ typedef int sigset_t ;
 #define SV_ONSTACK 0
 #define SA_RESTART 0
 
-
-
-
 #define brk(x) printf("not doing break\n");
-#include <varargs.h>     
-#include <stdio.h>
-FILE *fopen_binary(char *name,char *mode);
-
 
 #define USE_NT_UNEXEC
+
 #ifdef USE_NT_UNEXEC
-/* use the slightly older unexec */
-#define UNIXSAVE "unexnt.c" 
-#define RECREATE_HEAP if (initflag) { recreate_heap1(); \
-   terminal_io->sm.sm_object1->sm.sm_fp=stdout; \
-   terminal_io->sm.sm_object0->sm.sm_fp=stdin; }
-
- 
-
+   /* use the slightly older unexec */
+#  define UNIXSAVE "unexnt.c" 
+#  define RECREATE_HEAP if (initflag) { recreate_heap1(); \
+     terminal_io->sm.sm_object1->sm.sm_fp=stdout; \
+     terminal_io->sm.sm_object0->sm.sm_fp=stdin; }
 #else
-#define UNIXSAVE "unexw32.c"
-#define RECREATE_HEAP  init_heap();
+#  define UNIXSAVE "unexw32.c"
+#  define RECREATE_HEAP  init_heap();
 #endif
 
-
 #define SPECIAL_RSYM "rsym_nt.c"
-
-#define  RSYM_COMMAND(command,system_directory,kcl_self,tmpfile1) \
+#define RSYM_COMMAND(command,system_directory,kcl_self,tmpfile1) \
     sprintf(command,"rsym %s %s",kcl_self,tmpfile1);
 
      
 #if defined(IN_SFASL) || defined(IN_RSYM)
-#undef fopen
+#  undef fopen
 FILE *fopen_binary(char *name,char *mode)
 {
   char buf[10];
@@ -175,7 +154,7 @@ FILE *fopen_binary(char *name,char *mode)
   return fopen(name,buf);
 }
 #endif
-     
+  
 #define fopen fopen_binary
 
 #define HAVE_AOUT "wincoff.h"
@@ -199,21 +178,17 @@ FILE *fopen_binary(char *name,char *mode)
     } while (0)
 		
 #define FCLOSE_SETBUF_OK 
-
-
 #define	IEEEFLOAT
-  
 #define I386
-
 #define ADDITIONAL_FEATURES \
-		     ADD_FEATURE("I386"); ADD_FEATURE("WINNT"); ADD_FEATURE("BROKEN_O4_OPT"); ADD_FEATURE("MINGW32");
+	 ADD_FEATURE("I386"); \
+         ADD_FEATURE("WINNT"); \
+         ADD_FEATURE("BROKEN_O4_OPT"); \
+         ADD_FEATURE("MINGW32");
   
 #undef SET_REAL_MAXPAGE  
 #define SET_REAL_MAXPAGE \
 	 init_shared_memory(); real_maxpage=MAXPAGE;
-
-
-
 
 /* include some low level routines for maxima */
 #define CMAC
@@ -223,14 +198,11 @@ FILE *fopen_binary(char *name,char *mode)
 /*  FIONREAD not supported */
 #undef  LISTEN_FOR_INPUT
 
-
-
 /* adjust the start to the offset */
 #define ADJUST_RELOC_START(j) \
 	the_start = memory->cfd.cfd_start + \
 	  (j == DATA_NSCN ? textsize : 0);
 	
-
 #define IF_ALLOCATE_ERR \
 	if (core_end != sbrk(0))\
          {char * e = sbrk(0); \
@@ -245,13 +217,8 @@ FILE *fopen_binary(char *name,char *mode)
         error("Someone allocated my memory!");} \
 	if (core_end != (sbrk(PAGESIZE*(n - m))))
 
-  /* allow things like //c at beginning of pathnames, and c:/ */
-#define ALLOW_DRIVE_PATH
-
-
 #define USE_INTERNAL_REAL_TIME_FOR_RUNTIME     
-
-#define  SHARP_EQ_CONTEXT_SIZE 1024
+#define SHARP_EQ_CONTEXT_SIZE 1024
 
 /* Begin for cmpinclude */
 

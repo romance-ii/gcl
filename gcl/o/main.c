@@ -56,6 +56,11 @@ bool saving_system ;
 
 #endif
 
+#if 0
+#ifdef _WIN32
+#include <fcntl.h>
+#endif
+#endif
 
 #define LISP_IMPLEMENTATION_VERSION "April 1994"
 
@@ -83,6 +88,10 @@ object sSAmultiply_stacksA;
 int stack_multiple=1;
 static object stack_space;
 
+#ifdef _WIN32
+unsigned int _dbegin = 0x10100000;
+unsigned int _stacktop, _stackbottom;
+#endif
 
 int cssize;
 
@@ -103,6 +112,7 @@ int argc;
 char **argv, **envp;
 {
 	FILE *i;
+        unsigned int dummy;
 #ifdef BSD
 #ifdef RLIMIT_STACK
 	struct rlimit rl;
@@ -121,9 +131,17 @@ char **argv, **envp;
 	RECREATE_HEAP
 #endif
 	
-	setbuf(stdin, stdin_buf); 
+#ifdef _WIN32
+        _stackbottom = (unsigned int ) &dummy;
+        _stacktop    = _stackbottom - 0x10000; // ???
+#endif
+        setbuf(stdin, stdin_buf); 
 	setbuf(stdout, stdout_buf);
-	
+#if 0        
+#ifdef _WIN32
+	_fmode = _O_BINARY;
+#endif
+#endif
 	ARGC = argc;
 	ARGV = argv;
 #ifdef UNIX
