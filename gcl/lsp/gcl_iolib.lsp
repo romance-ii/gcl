@@ -178,6 +178,8 @@
 (defun set-pprint-dispatch (type-spec function &optional
 			    (priority 0)
 			    (table *print-pprint-dispatch*))
+  (unless (typep priority 'real)
+    (specific-error :wrong-type-argument "~S is not of type ~S." priority 'real))
   (let ((a (assoc type-spec (cdr table) :test 'equal)))
     (if a (setf (cdr a) (list function priority))
 	(rplacd (last table) `((,type-spec ,function ,priority)))))

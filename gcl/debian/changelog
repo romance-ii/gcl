@@ -26,8 +26,9 @@ gclcvs (2.7.0-31) unstable; urgency=low
   * head -1l -> head -n 1 for freebsd
   * Cleanup gmp_wrapper code, check for in-place calls as write in one
     step is not guaranteed in gmp according to its developers
+  * Fix ansi bug in set-pprint-dispatch which prevented test completion
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 16 Aug 2004 17:28:30 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 16 Aug 2004 22:31:51 +0000
 
 gclcvs (2.7.0-30) unstable; urgency=high
 
