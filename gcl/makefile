@@ -199,6 +199,7 @@ clean:
 	rm -rf $(GMPDIR)/.deps $(GMPDIR)/libgmp.a
 	rm -f xbin/gcl foo foo.c bin/gclm.bat gmp_all
 	rm -f h/*-linux.defs h/bfd.h h/bfdlink.h h/ansidecl.h h/symcat.h
+	rm -f windows/gcl.iss bin/gcl.bat
 	-cd binutils/bfd && $(MAKE) distclean
 	-cd binutils/libiberty && $(MAKE) distclean
 
