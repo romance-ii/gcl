@@ -356,6 +356,12 @@ AC_MSG_RESULT(use=$use)
 # System programs
 #
 
+# We set the default CFLAGS below, and don't want the autoconf default
+# CM 20040106
+if test "$CFLAGS" = "" ; then
+	CFLAGS=" "
+fi
+
 AC_PROG_CC
 AC_PROG_CPP
 AC_SUBST(CC)
