@@ -47,6 +47,13 @@ fixnnint(object x)
 		FEerror("~S is not a non-negative fixnum.", 1, x);
 	return(fix(x));
 }
+#if 0
+object small_fixnum ( int i ) {
+#include <assert.h>    
+    assert ( ( -SMALL_FIXNUM_LIMIT <= i ) && ( i < SMALL_FIXNUM_LIMIT ) ); 
+    (object) small_fixnum_table + SMALL_FIXNUM_LIMIT + i;
+}
+#endif
 
 #define BIGGER_FIXNUM_RANGE
 

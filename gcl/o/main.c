@@ -369,17 +369,20 @@ int catch_fatal=1;
 void
 error(char *s)
 {
-        if (catch_fatal>0 && interrupt_enable )
-            {catch_fatal = -1;
-	   if (sgc_enabled)
-	     { sgc_quit();}
-	   if (sgc_enabled==0)
-	     { install_segmentation_catcher() ;}
-	   FEerror("Caught fatal error [memory may be damaged]",0); }
-	printf("\nUnrecoverable error: %s.\n", s);
-	fflush(stdout);
+    if ( catch_fatal > 0 && interrupt_enable ) {
+        catch_fatal = -1;
+        if ( sgc_enabled ) {
+            sgc_quit();
+        }
+        if ( sgc_enabled == 0 ) {
+	    install_segmentation_catcher();
+        }
+        FEerror("Caught fatal error [memory may be damaged]",0);
+    }
+    printf("\nUnrecoverable error: %s.\n", s);
+    fflush(stdout);
 #ifdef UNIX
-	abort();
+    abort();
 #endif
 }
 

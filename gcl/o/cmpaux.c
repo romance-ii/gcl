@@ -290,62 +290,38 @@ object_to_string(object x)
 /* #endif */
 
 void
-call_init(int init_address, object memory, object fasl_vec, FUNC fptr)
-{object form;
- FUNC at;
-/* #ifdef CLEAR_CACHE */
-/*  static int n; */
-/*  static sigset_t ss; */
+call_init ( int init_address, object memory, object fasl_vec, FUNC fptr )
+{
+    object form; 
+    FUNC at;
 
-/*  if (!n) { */
-/*      struct sigaction sa={{(void *)sigh},{{0}},SA_RESTART|SA_SIGINFO,NULL}; */
+    check_type ( fasl_vec, t_vector );
+    form = ( fasl_vec->v.v_self [ fasl_vec->v.v_fillp - 1 ] );
 
-/*      sigaction(SIGILL,&sa,NULL); */
-/*      sigemptyset(&ss); */
-/*      sigaddset(&ss,SIGILL); */
-/*      sigprocmask(SIG_BLOCK,&ss,NULL); */
-/*      n=1; */
-/*  } */
-/* #endif */
-
-
-  check_type(fasl_vec,t_vector);
-  form=(fasl_vec->v.v_self[fasl_vec->v.v_fillp -1]);
-
- if (fptr) at = fptr;
-  else 
- at=(FUNC)(memory->cfd.cfd_start+ init_address );
+    if (fptr) {
+        at = fptr;
+    } else { 
+        at = (FUNC) ( memory->cfd.cfd_start + init_address );
+    }
  
 #ifdef VERIFY_INIT
- VERIFY_INIT
+    VERIFY_INIT;
 #endif
    
- if (type_of(form)==t_cons &&
-     form->c.c_car == sSPinit)
-   {bds_bind(sSPinit,fasl_vec);
-    bds_bind(sSPmemory,memory);
-/* #ifdef CLEAR_CACHE */
-/*     sigprocmask(SIG_UNBLOCK,&ss,NULL); */
-/* #endif */
-    (*at)();
-/* #ifdef CLEAR_CACHE */
-/*     sigprocmask(SIG_BLOCK,&ss,NULL); */
-/* #endif */
-    bds_unwind1;
-    bds_unwind1;
-  }
- else
-   /* old style three arg init, with all init being done by C code. */
-   {memory->cfd.cfd_self = fasl_vec->v.v_self;
-    memory->cfd.cfd_fillp = fasl_vec->v.v_fillp;
-/* #ifdef CLEAR_CACHE */
-/*     sigprocmask(SIG_UNBLOCK,&ss,NULL); */
-/* #endif */
-    (*at)(memory->cfd.cfd_start, memory->cfd.cfd_size, memory);
-/* #ifdef CLEAR_CACHE */
-/*     sigprocmask(SIG_BLOCK,&ss,NULL); */
-/* #endif */
-}}
+    if ( type_of ( form ) == t_cons &&
+         form->c.c_car == sSPinit ) {
+        bds_bind(sSPinit,fasl_vec);
+        bds_bind(sSPmemory,memory);
+        (*at)();
+        bds_unwind1;
+        bds_unwind1;
+    } else {
+        /* old style three arg init, with all init being done by C code. */
+        memory->cfd.cfd_self = fasl_vec->v.v_self;
+        memory->cfd.cfd_fillp = fasl_vec->v.v_fillp;
+        (*at)(memory->cfd.cfd_start, memory->cfd.cfd_size, memory);
+    }
+}
 
 /* statVV is the address of some static storage, which is used by the
    cfunctions to refer to global variables,..
