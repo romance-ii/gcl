@@ -213,6 +213,7 @@ object hashtable;
 		i = hash_eql(key);
 	else if (htest == htt_equal)
 		i = ihash_equal(key,0);
+	/*FIXME 64*/
 	i &= 0x7fffffff;
 	for (i %= hsize, k = 0; k < hsize;  i = (i + 1) % hsize, k++) { /* k added by chou */
 		e = &hashtable->ht.ht_self[i];
@@ -462,6 +463,7 @@ LFD(Lsxhash)()
 {
 	check_arg(1);
 
+	/*FIXME 64*/
 	vs_base[0] = make_fixnum((ihash_equal(vs_base[0],0) & 0x7fffffff));
 }
 

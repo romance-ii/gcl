@@ -132,6 +132,7 @@ MEM_GMP_CALL(1,double,mpz_get_d,0,mpz_t)
 MEM_GMP_CALL(1,gmp_lint,mpz_get_si,0,mpz_t)
 MEM_GMP_CALL(3,gmp_char_star,mpz_get_str,0,char *,int,mpz_t)
 MEM_GMP_CALL(1,int,mpz_fits_sint_p,0,mpz_t)
+MEM_GMP_CALL(1,int,mpz_fits_slong_p,0,mpz_t)
 MEM_GMP_CALL(1,gmp_ulint,mpz_popcount,0,mpz_t)
 /*MEM_GMP_CALL(2,void *,mpz_realloc,mpz_t,mp_size_t)*/
 MEM_GMP_CALL(1,size_t,mpz_size,0,mpz_t)
@@ -167,6 +168,7 @@ MEM_GMP_CALL(3,void,mpz_divexact_ui,1,mpz_t,mpz_t,unsigned long int)
 #define __gmpz_get_si m__gmpz_get_si
 #define __gmpz_get_str m__gmpz_get_str
 #define __gmpz_fits_sint_p m__gmpz_fits_sint_p
+#define __gmpz_fits_slong_p m__gmpz_fits_slong_p
 #define __gmpz_popcount m__gmpz_popcount
 /*#define __gmpz_realloc m__gmpz_realloc*/
 #define __gmpz_size m__gmpz_size

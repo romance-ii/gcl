@@ -30,33 +30,33 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 void
 zero_divisor(void);
 
-object fixnum_add(int i, int j)
+object fixnum_add(fixnum i, fixnum j)
 {
 
   if (i>=0)
    { if (j<= (MOST_POSITIVE_FIX-i))
-      { MYmake_fixnum(return,i+j);
+      { return make_fixnum(i+j);
       }
    MPOP(return,addss,i,j);
    } else { /* i < 0 */
-     if ((MOST_NEG_FIXNUM -i) <= j) {
-       MYmake_fixnum(return,i+j);
+     if ((MOST_NEGATIVE_FIX -i) <= j) {
+       return make_fixnum(i+j);
      }
    MPOP(return,addss,i,j);
    }
 }
 /* return i - j */
-object fixnum_sub(int i, int j)
+object fixnum_sub(fixnum i, fixnum j)
 {  
 
   if (i>=0)
    { if (j >= (i - MOST_POSITIVE_FIX))
-      { MYmake_fixnum(return,i-j);
+      { return make_fixnum(i-j);
       }
    MPOP(return,subss,i,j);
    } else { /* i < 0 */
-     if ((MOST_NEG_FIXNUM -i) <= -j) {
-       MYmake_fixnum(return,i-j);
+     if ((MOST_NEGATIVE_FIX -i) <= -j) {
+       return make_fixnum(i-j);
      }
    MPOP(return,subss,i,j);
    }
@@ -320,7 +320,7 @@ one_plus(object x)
 	case t_fixnum:
 	  
 	  if (fix(x)< MOST_POSITIVE_FIX-1) {
-	    MYmake_fixnum(return,fix(x)+1);
+	    return make_fixnum(fix(x)+1);
 	  }
 	  MPOP(return,addss,1,fix(x));
 	case t_bignum:

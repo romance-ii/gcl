@@ -107,6 +107,9 @@
     (setf (cache-vector-lock-count cache-vector) 0))
   cache-vector)
 
+;; FIXME 64
+(defconstant rand-base (- (ash 1 31) 1))
+
 (defmacro modify-cache (cache-vector &body body)
   `(without-interrupts
      (multiple-value-prog1
@@ -114,7 +117,7 @@
        (let ((old-count (cache-vector-lock-count ,cache-vector)))
 	 (declare (type non-negative-fixnum old-count))
 	 (setf (cache-vector-lock-count ,cache-vector)
-	       (if (= old-count most-positive-fixnum)
+	       (if (= old-count rand-base)
 		   1 (the non-negative-fixnum (1+ old-count))))))))
 
 (deftype field-type ()
@@ -255,7 +258,7 @@
 ;;; most-positive-fixnum is all-ones.  -- Ram
 ;;;
 (defconstant wrapper-cache-number-length
-	     (- (integer-length most-positive-fixnum)
+	     (- (integer-length rand-base)
 		wrapper-cache-number-adds-ok))
 
 (defconstant wrapper-cache-number-mask
@@ -270,7 +273,7 @@
     (loop
       (setq n
 	    (logand wrapper-cache-number-mask
-		    (random most-positive-fixnum *get-wrapper-cache-number*)))
+		    (random rand-base *get-wrapper-cache-number*)))
       (unless (zerop n) (return n)))))
 
 

@@ -42,10 +42,11 @@ rando(object x, object rs)
 	tx = type_of(x);
 	if (number_compare(x, small_fixnum(0)) != 1)
 		FEwrong_type_argument(TSpositive_number, x);
+	/*FIXME 64*/
 	d = (double)(rs->rnd.rnd_value>>1) / (4294967296.0/2.0);
 	d = number_to_double(x) * d;
 	if (tx == t_fixnum) {
-		z = make_fixnum((int)d);
+		z = make_fixnum((fixnum)d);
 		return(z);
 	} else if (tx == t_bignum) {
 		z = double_to_integer(d);

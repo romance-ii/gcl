@@ -555,6 +555,7 @@ enum gcl_sm_flags {
 
 struct random {
 			FIRSTWORD;
+  /*FIXME 64*/
 	unsigned	rnd_value;	/*  random state value  */
 };
 

@@ -374,6 +374,7 @@ object x;
 		 }
   }
  END:
+	/*FIXME 64*/
   h &= 0x7fffffff; 
   return(h);
 }}

@@ -28,6 +28,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "include.h"
 #include "num_include.h"
 
+/*FIXME 64*/
+#define int fixnum
    
 #ifdef GMP
 #include "gmp_num_log.c"
@@ -172,7 +174,7 @@ count_int_bits(int x)
 	int	i, count;
 
 	count = 0;
-	for (i=0; i <= 31; i++) count += ((x >> i) & 1);
+	for (i=0; i <= (LOG_WORD_SIZE-1); i++) count += ((x >> i) & 1);
 	return(count);
 }
 
@@ -203,11 +205,11 @@ count_bits(object x)
 
 
 object
-shift_integer(object x, int w) { 
+shift_integer(object x, fixnum w) { 
   if (type_of(x) == t_fixnum) { 
     if (w <= 0){   
       w = -w;
-      if (w >= WSIZ || w<0 /*most-negative-fixnum*/) 
+      if (w >= LOG_WORD_SIZE || w<0 /*most-negative-fixnum*/) 
 	return small_fixnum(fix(x) < 0 ? -1 :0);
       else
 	return make_fixnum (fix(x) >> (w));
@@ -229,7 +231,7 @@ int_bit_length(int i)
 	int	count, j;
 
 	count = 0;
-	for (j = 0; j <= 31 ; j++)
+	for (j = 0; j <= (LOG_WORD_SIZE-1) ; j++)
 		if (((i >> j) & 1) == 1) count = j + 1;
 	return(count);
 }

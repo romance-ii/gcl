@@ -273,9 +273,11 @@ number_sqrt(object x)
 	  break;
 	case t_longfloat:
 	  d=sqrt(lf(x));
+	  q=Cnil;
 	  break;
 	default:
-		FEwrong_type_argument(sLnumber, x);
+	  FEwrong_type_argument(sLnumber, x);
+	  return Cnil;
 	}
 
 	q=t==t_longfloat ? make_longfloat(d) : q;

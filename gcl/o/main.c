@@ -802,7 +802,21 @@ FFN(siLaddress)(void) {
 static void
 FFN(siLnani)(void) {
   check_arg(1);
-  vs_base[0] = (object)fixint(vs_base[0]);
+  switch(type_of(vs_base[0])) {
+  case t_fixnum:
+    vs_base[0] = (object)fixint(vs_base[0]);
+    break;
+  case t_bignum:
+    if (vs_base[0]->big.big_mpz_t._mp_size!=1)
+      FEerror("Integer too big",0);
+    /*FIXME 64*/
+    fprintf(stderr,"Warning, bignum in nani\n");
+    vs_base[0]=(object)*vs_base[0]->big.big_mpz_t._mp_d;
+    break;
+  default:
+    FEerror("Not an integer",0);
+    break;
+  }    
 }
 
 static void

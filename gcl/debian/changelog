@@ -4,8 +4,10 @@ gclcvs (2.7.0-35) unstable; urgency=low
     via compiler macros, closing recent test failures misc.lsp
   * revert native-reloc exemption to wrap-literals -- is rather a 64bit
     issue
+  * Preliminary support for 64bit address/nani/load-time-value, and
+    64bit most-positive-fixnum
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 27 Nov 2004 15:37:07 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 27 Nov 2004 22:03:22 +0000
 
 gclcvs (2.7.0-34) unstable; urgency=low
 

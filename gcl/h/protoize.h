@@ -80,7 +80,7 @@
 /* gmp_big.c:302:OF */ extern object big_minus (object x); /* (x) object x; */
 /* gmp_big.c:324:OF */ extern double big_to_double (object x); /* (x) object x; */
 /* gmp_big.c:454:OF */ extern object maybe_replace_big (object x); /* (x) object x; */
-/* gmp_big.c:472:OF */ extern object bignum2 (unsigned int h, unsigned int l); /* (h, l) unsigned int h; unsigned int l; */
+/* gmp_big.c:472:OF */ extern object bignum2 ( int h,  int l); /* (h, l) unsigned int h; unsigned int l; */
 /* gmp_big.c:482:OF */ extern void integer_quotient_remainder_1 (object x, object y, object *qp, object *rp); /* (x, y, qp, rp) object x; object y; object *qp; object *rp; */
 /* gmp_big.c:502:OF */ extern object coerce_big_to_string (object x, int printbase); /* (x, printbase) object x; int printbase; */
 /* gmp_big.c:521:OF */ extern void gcl_init_big (void); /* () */
@@ -328,8 +328,8 @@ typedef void (*funcvoid)(void);
 /* nsocket.c:575:OF */ extern int TcpOutputProc (int fd, char *buf, int toWrite, int *errorCodePtr); /* (fd, buf, toWrite, errorCodePtr) int fd; char *buf; int toWrite; int *errorCodePtr; */
 #endif
 /* nsocket.c:619:OF */ extern int getCharGclSocket (object strm, object block); /* (strm, block) object strm; object block; */
-/* num_arith.c:31:OF */ extern object fixnum_add (int i, int j); /* (i, j) int i; int j; */
-/* num_arith.c:48:OF */ extern object fixnum_sub (int i, int j); /* (i, j) int i; int j; */
+/* num_arith.c:31:OF */ extern object fixnum_add (fixnum i, fixnum j); /* (i, j) int i; int j; */
+/* num_arith.c:48:OF */ extern object fixnum_sub (fixnum i, fixnum j); /* (i, j) int i; int j; */
 /* num_arith.c:100:OF */ extern object number_plus (object x, object y); /* (x, y) object x; object y; */
 /* num_arith.c:246:OF */ extern object one_plus (object x); /* (x) object x; */
 /* num_arith.c:292:OF */ extern object number_minus (object x, object y); /* (x, y) object x; object y; */
@@ -365,7 +365,7 @@ typedef void (*funcvoid)(void);
 /* num_comp.c:272:OF */ extern void Lmonotonically_nonincreasing (void); /* () */
 /* num_comp.c:292:OF */ extern void Lmin (void); /* () */
 /* num_comp.c:309:OF */ extern void gcl_init_num_comp (void); /* () */
-/* num_log.c:224:OF */ extern object shift_integer (object x, int w); /* (x, w) object x; int w; */
+/* num_log.c:224:OF */ extern object shift_integer (object x, fixnum w); /* (x, w) object x; int w; */
 /* num_log.c:258:OF */ extern void Llogior (void); /* () */
 /* num_log.c:279:OF */ extern void Llogxor (void); /* () */
 /* num_log.c:299:OF */ extern void Llogand (void); /* () */

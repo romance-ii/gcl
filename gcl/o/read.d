@@ -25,6 +25,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define NEED_ISFINITE
 #include "include.h"
 #include <string.h>
+#include "num_include.h"
 
 static object
 current_readtable(void);
@@ -725,7 +726,8 @@ parse_number(char *s, int end, int *ep, int radix) {
 
   j=i;
 
-#define MOST_POSITIVE_FIX (((unsigned int) (~0) ) /2)
+/* #define MOST_POSITIVE_FIX (((unsigned int) (~0) ) /2) */
+/*FIXME 64!!!*/
 #define TEN_EXPT_9 1000000000
   
   if (radix == 10 && TEN_EXPT_9 <MOST_POSITIVE_FIX ) {

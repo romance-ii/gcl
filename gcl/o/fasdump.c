@@ -382,6 +382,9 @@ getd(str)
 #define MASK ~(~0 << 8)
 #define WRITE_BYTEI(x,i)  putc((((x) >> (i*SIZE_BYTE)) & MASK),fas_stream)
 
+#define PUTFIX(v_) Join(PUT,SIZEOF_LONG)(v_)
+#define GETFIX(v_) Join(GET,SIZEOF_LONG)(v_)
+
 #define PUT8(varx ) \
  do{unsigned long var= varx ; \
      DPRINTF("{8byte:varx= %ld}", var); \
@@ -665,7 +668,7 @@ FFN(close_fasd)(object ar)
 
 static void
 write_fasd(object obj)
-{  int j,leng;
+{  fixnum j,leng;
 
    /* hook for writing other data in fasd file */
 
@@ -778,7 +781,7 @@ write_fasd(object obj)
        else
 	 {PUT_OP(d_fixnum);
 	  j=leng;
-	  PUT4(j);}
+	  PUTFIX(j);}
        break;
      case DP(t_character:)
        PUT_OP(d_standard_character);
@@ -1264,8 +1267,8 @@ read_fasd1(int i, object *loc)
 	 return;}
     
       case DP(d_fixnum:)
-	{int j;
-	 GET4(j);
+	{fixnum j;
+	 GETFIX(j);
 	 *loc=make_fixnum(j);       
 	 return;}
       case DP( d_bignum:)

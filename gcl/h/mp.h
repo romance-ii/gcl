@@ -6,8 +6,8 @@
 /* define to show we included mp.h */
 #define _MP_H  
 
-#define MOST_NEG_FIXNUM (-2147483647-1)
-#define MOST_POSITIVE_FIXNUM (2147483647)
+/* #define MOST_NEG_FIXNUM (-2147483647-1) */
+/* #define MOST_POSITIVE_FIXNUM (2147483647) */
 
 #define MP_ALLOCATED(x) MP(x)->_mp_alloc
 #define MP_SELF(x) MP(x)->_mp_d
@@ -56,10 +56,10 @@ typedef struct
       } while(0)
 
 
-#define MYmake_fixnum(action,x) \
-  do{register int CMPt1; \
-   action \
-   ((((CMPt1=(x))+1024)&-2048)==0?small_fixnum(CMPt1):make_fixnum1(CMPt1));}while(0)
+/* #define MYmake_fixnum(action,x) \ */
+/*   do{register int CMPt1; \ */
+/*    action \ */
+/*    ((((CMPt1=(x))+1024)&-2048)==0?small_fixnum(CMPt1):make_fixnum1(CMPt1));}while(0) */
      
 #define ineg(a_) (sizeof(a_)==sizeof(unsigned) ? (unsigned)-(a_) : (unsigned long)-(a_))
 

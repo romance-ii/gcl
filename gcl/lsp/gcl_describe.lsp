@@ -200,7 +200,7 @@
 
 (defun inspect-number (number)
   (case (type-of number)
-    (fixnum (format t "~S - fixnum (32 bits)" number))
+    (fixnum (format t "~S - fixnum" number))
     (bignum (format t "~S - bignum" number))
     (ratio
      (format t "~S - ratio" number)

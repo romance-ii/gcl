@@ -391,13 +391,16 @@
  
 (si:putprop 'ash '(c1ash-condition . c1ash) 'c1conditional)
 
+(defconstant itop (integer-length most-positive-fixnum))
+(defconstant ibot (- itop))
+
 (defun c1ash-condition (args)
   (let ((shamt (second args)))
-    (or (typep shamt '(integer -31 31))
+    (or (typep shamt `(integer ,ibot ,itop))
 	(and (consp shamt)
 	     (eq (car  shamt) 'the)
 	     (let ((type (cadr  shamt)))
-	        (subtypep type '(integer -31 31)))))))
+	        (subtypep type `(integer ,ibot ,itop)))))))
 
 (defun c1ash (args)
   (let  ((shamt (second args))fun)
@@ -407,9 +410,9 @@
 		 ((>= shamt 0) (setq fun 'shift<<))))
 	  (t (let ((type (second shamt)))
 	       ;;it had to be a (the type..)
-	       (cond ((subtypep type '(integer 0 31))
+	       (cond ((subtypep type `(integer 0 ,itop))
 		      (setq fun 'shift<< ))
-		     ((subtypep type '(integer -31 0))
+		     ((subtypep type `(integer ,ibot 0))
 		      (setq fun 'shift>> ))
 		     (t (error "should not get here")))
 	       )))

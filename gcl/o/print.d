@@ -37,6 +37,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 #include <unistd.h>
+#include "num_include.h"
 
 #define LINE_LENGTH get_line_length()
 #define MINIMUM_RIGHT_MARGIN 1
@@ -741,7 +742,8 @@ int level;
 	case t_fixnum:
 	{
 		object *vsp;
-
+		/*FIXME 64*/
+		fixnum i;
 		if (PRINTradix && PRINTbase != 10)
 			write_base();
 		i = fix(x);
@@ -753,8 +755,8 @@ int level;
 		}
 		if (i < 0) {
 			write_ch('-');
-			if (i == MOST_NEG_FIXNUM) {
-				x = fixnum_add(1,(MOST_POSITIVE_FIXNUM));
+			if (i == MOST_NEGATIVE_FIX) {
+				x = fixnum_add(1,(MOST_POSITIVE_FIX));
 				vs_push(x);
 				i = PRINTradix;
 				PRINTradix = FALSE;
