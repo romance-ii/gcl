@@ -134,17 +134,17 @@ merge:
 LISP_LIB=clcs/myload1.lisp clcs/clcs_macros.lisp cmpnew/gcl_collectfn.o cmpnew/gcl_collectfn.lsp lsp/gcl_gprof.lsp lsp/gcl_info.o lsp/gcl_profile.lsp lsp/gcl_export.lsp lsp/gcl_autoload.lsp cmpnew/gcl_cmpmain.lsp cmpnew/gcl_cmpopt.lsp cmpnew/gcl_lfun_list.lsp lsp/gcl_auto_new.lsp h/cmpinclude.h unixport/init_$(SYSTEM).lsp unixport/lib$(SYSTEM).a unixport/libgclp.a gcl-tk/tk-package.lsp $(TK_LISP_LIB) $(RL_LIB) $(FIRST_FILE) $(LAST_FILE) $(addsuffix /sys-proclaim.lisp,lsp cmpnew pcl clcs)
 
 install-command:
-	rm -f $(DESTDIR)$(prefix)/bin/gcl
+	rm -f bin/gcl
 	(echo '#!/bin/sh' ; \
 	echo exec $(BINDIR)/$(FLISP)$(EXE) \\ ; \
 	echo '   -dir' $(INSTALL_LIB_DIR)/unixport/ \\ ; \
 	echo '   -libdir' $(INSTALL_LIB_DIR)/ \\ ; \
 	echo '   -eval '\''(setq si::*allow-gzipped-file* t)'\' \\ ;\
 	! [ -d "$(TK_CONFIG_PREFIX)" ] || echo '   -eval '\''(setq si::*tk-library* '\"$(TK_LIBRARY)\"')'\' \\;\
-	echo '     '\"\$$@\" ) > $(DESTDIR)$(prefix)/bin/gcl;
-	echo '#' other options: -load "/tmp/foo.o" -load "jo.lsp" -eval '"(joe 3)"' >> $(DESTDIR)$(prefix)/bin/gcl
-	chmod a+x $(DESTDIR)$(prefix)/bin/gcl
-	rm -f $(DESTDIR)$(prefix)/bin/gclm.bat
+	echo '     '\"\$$@\" ) > bin/gcl;
+	echo '#' other options: -load "/tmp/foo.o" -load "jo.lsp" -eval '"(joe 3)"' >> bin/gcl
+	chmod a+x bin/gcl
+	rm -f bin/gclm.bat
 	if gcc --version | grep mingw >/dev/null 2>&1 ; then (echo '@SET cd='; \
 	 echo '@SET promp$=%prompt%'; \
 	 echo '@PROMPT SET cd$Q$P'; \
@@ -158,10 +158,10 @@ install-command:
 	 echo 'set libdir=%cd%\..\lib\gcl-'$(VERSION); \
 	 echo 'set unixportdir=%libdir%\unixport'; \
 	 echo 'path %cd%\..\mingw\bin;%PATH%'; \
-	 echo "start %unixportdir%\$(FLISP).exe -dir %unixportdir% -libdir %libdir% -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9" ) > $(DESTDIR)$(prefix)/bin/gclm.bat ; fi
-	rm -f $(DESTDIR)$(prefix)/bin/gclfinal.bat
+	 echo "start %unixportdir%\$(FLISP).exe -dir %unixportdir% -libdir %libdir% -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9" ) > bin/gclm.bat ; fi
+	rm -f bin/gclfinal.bat
 	if gcc --version | grep -i mingw >/dev/null 2>&1 ; then (echo 'ECHO path %1\mingw\bin;%PATH% > gcli.bat'; \
-	 echo "ECHO start %1\lib\gcl-$(VERSION)\unixport\$(FLISP).exe -dir %1\lib\gcl-$(VERSION)\unixport -libdir %1\lib\gcl-$(VERSION) -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9 >> gcli.bat" ) > $(DESTDIR)$(prefix)/bin/gclfinal.bat ; fi
+	 echo "ECHO start %1\lib\gcl-$(VERSION)\unixport\$(FLISP).exe -dir %1\lib\gcl-$(VERSION)\unixport -libdir %1\lib\gcl-$(VERSION) -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9 >> gcli.bat" ) > bin/gclfinal.bat ; fi
 
 install: all
 	$(MAKE) install1 "INSTALL_LIB_DIR=$(prefix)/lib/gcl-`cat majvers`.`cat minvers`" "prefix=$(prefix)" "DESTDIR=$(DESTDIR)"
