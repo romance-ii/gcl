@@ -27,6 +27,7 @@ MA 02111-1307, USA. */
    bits mpz_scan1 is counting, and at the same time call mpn directly.  */
 
 #include <stdio.h> /* for NULL */
+#include <stdlib.h>
 #include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"

@@ -20,10 +20,11 @@ MA 02111-1307, USA.
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "gmp.h"
 #include "gmp-impl.h"
 
-#if defined (USG) || defined (__SVR4) || defined (_UNICOS) || defined (__hpux)
+#if defined (USG) || defined (__SVR4) || defined (_UNICOS) || defined (__hpux) || (defined(__DECC) && defined(__VMS))
 #include <time.h>
 
 int
@@ -69,6 +70,8 @@ cputime ()
 #define CLOCK (50 M)
 #elif defined (__alpha)
 #define CLOCK (133 M)
+#elif defined (__vax)
+#define CLOCK (40 M)
 #else
 #error "Don't know CLOCK of your machine"
 #endif
@@ -97,6 +100,10 @@ main ()
   mp_size_t nsize, dsize, qsize, rsize, psize;
   int test;
   mp_limb_t qlimb;
+  int clock_mhz;
+
+  clock_mhz = CLOCK / 1000000;
+  printf("\r\nTest Times Are Based On A CPU Clock Speed Of %dMHz.\r\n\r\n",clock_mhz);
 
   for (test = 0; ; test++)
     {

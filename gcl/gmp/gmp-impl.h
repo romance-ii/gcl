@@ -43,14 +43,23 @@ MA 02111-1307, USA. */
  || defined (_MIPSEL) || defined (_MIPSEB) || defined (__sgi) \
  || defined (__alpha) || defined (__sparc) || defined (sparc) \
  || defined (__ksr__)
-#include <alloca.h>
-#define HAVE_ALLOCA
+
+/*
+ * Modification For OpenVMS By Robert Alan Byer <byer@mail.ourservers.net>
+ * OpenVMS DECC v6.0-001 dosen't have <alloca.h>.
+ */
+#if !defined(__DECC) && !defined(__VMS)
+#  include <alloca.h>
+#  define HAVE_ALLOCA
+#endif
+
 #endif
 #if defined (_IBMR2)
 #pragma alloca
 #define HAVE_ALLOCA
 #endif
-#if defined (__DECC)
+
+#if defined (__DECC) && !defined(__VMS)
 #define alloca(x) __ALLOCA(x)
 #define HAVE_ALLOCA
 #endif

@@ -21,9 +21,18 @@ the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
 MA 02111-1307, USA. */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "gmp.h"
 #include "gmp-impl.h"
 #include "urandom.h"
+
+size_t
+#if defined(__STDC__)
+  mpz_out_str (FILE *stream, int base, mpz_srcptr x);
+#else
+  mpz_out_str (stream, base, x);
+#endif
 
 void debug_mp ();
 

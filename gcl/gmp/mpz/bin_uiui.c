@@ -19,10 +19,10 @@ along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
 MA 02111-1307, USA. */
 
+#include <stdlib.h>
 #include "gmp.h"
 #include "gmp-impl.h"
 #include "longlong.h"
-
 
 /* Avoid reallocs by rounding up any new size */
 #define ROUNDUP_MASK  15

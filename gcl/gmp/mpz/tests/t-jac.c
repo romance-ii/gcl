@@ -38,9 +38,17 @@ MA 02111-1307, USA.
 
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "gmp.h"
 #include "gmp-impl.h"
 
+size_t
+#if defined(__STDC__)
+  mpz_out_str (FILE *stream, int base, mpz_srcptr x);
+#else
+  mpz_out_str (stream, base, x);
+#endif
 
 int option_pari = 0;
 
