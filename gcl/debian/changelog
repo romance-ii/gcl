@@ -46,8 +46,9 @@ gclcvs (2.7.0-37) unstable; urgency=low
   * Reenable run-process on Linux
   * Remove debugging break from gcl_cmpspecial.lsp
   * Fix control-d in readline
+  * libreadline5-dev in build-depends
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 31 Mar 2005 02:06:16 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 31 Mar 2005 02:16:28 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 
