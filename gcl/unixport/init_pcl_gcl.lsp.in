@@ -140,4 +140,7 @@
 
   (defvar si::*system-banner* (si::default-system-banner))
 
+  (in-package 'user)
+  (import 'si::info)
+
   t)

@@ -124,4 +124,7 @@
  (setq compiler::*opt-two* @LI-OPT-TWO@)
  (setq compiler::*init-lsp* @LI-INIT-LSP@)
  
+ (in-package 'user)
+ (import 'si::info)
+
  t)
