@@ -13,8 +13,9 @@ gclcvs (2.7.0-1) unstable; urgency=low
   * remove  windows/install.ansi.lsp (build generated file) from CVS
   * Remove unused definitions of Vcs
   * Merge changes from 2.6.1
+  * Add windows/install.lsp to clean target
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  4 Sep 2003 03:10:11 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  4 Sep 2003 15:00:56 +0000
 
 gcl (2.6.1-1) unstable; urgency=low
 
