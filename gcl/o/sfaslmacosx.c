@@ -215,9 +215,13 @@ int fasload (object faslfile)
     
     char cmd [256];
     
+    static int count = 0;
+    
+    if (count == 0) count = time (0);
+    
     coerce_to_filename (truename (faslfile), filename);
     
-    snprintf (tmpfile, sizeof(tmpfile), "/tmp/fasload%lx.so", time(0));
+    snprintf (tmpfile, sizeof(tmpfile), "/tmp/ufas%dx.so", count++);
 
     mkstemp (tmpfile);
     symlink (filename, tmpfile);
