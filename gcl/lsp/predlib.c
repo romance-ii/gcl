@@ -102,7 +102,7 @@ T1:;
 	vs_top=(vs_base=base+5)+1;
 	return;
 }
-/*	function definition for G1364	*/
+/*	function definition for G1380	*/
 
 static void L2()
 {register object *base=vs_base;
@@ -116,7 +116,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1365	*/
+/*	function definition for G1381	*/
 
 static void L3()
 {register object *base=vs_base;
@@ -130,7 +130,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1366	*/
+/*	function definition for G1382	*/
 
 static void L4()
 {register object *base=vs_base;
@@ -147,7 +147,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1367	*/
+/*	function definition for G1383	*/
 
 static void L5()
 {register object *base=vs_base;
@@ -181,7 +181,7 @@ T49:;
 	return;
 	}
 }
-/*	function definition for G1368	*/
+/*	function definition for G1384	*/
 
 static void L6()
 {register object *base=vs_base;
@@ -211,7 +211,7 @@ T55:;
 	return;
 	}
 }
-/*	function definition for G1369	*/
+/*	function definition for G1385	*/
 
 static void L7()
 {register object *base=vs_base;
@@ -225,7 +225,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1370	*/
+/*	function definition for G1386	*/
 
 static void L8()
 {register object *base=vs_base;
@@ -239,7 +239,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1371	*/
+/*	function definition for G1387	*/
 
 static void L9()
 {register object *base=vs_base;
@@ -253,7 +253,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1372	*/
+/*	function definition for G1388	*/
 
 static void L10()
 {register object *base=vs_base;
@@ -267,7 +267,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1373	*/
+/*	function definition for G1389	*/
 
 static void L11()
 {register object *base=vs_base;
@@ -296,7 +296,7 @@ T59:;
 	return;
 	}
 }
-/*	function definition for G1374	*/
+/*	function definition for G1390	*/
 
 static void L12()
 {register object *base=vs_base;
@@ -318,7 +318,7 @@ T63:;
 	return;
 	}
 }
-/*	function definition for G1375	*/
+/*	function definition for G1391	*/
 
 static void L13()
 {register object *base=vs_base;
@@ -340,7 +340,7 @@ T66:;
 	return;
 	}
 }
-/*	function definition for G1376	*/
+/*	function definition for G1392	*/
 
 static void L14()
 {register object *base=vs_base;
@@ -362,7 +362,7 @@ T69:;
 	return;
 	}
 }
-/*	function definition for G1377	*/
+/*	function definition for G1393	*/
 
 static void L15()
 {register object *base=vs_base;
@@ -384,7 +384,7 @@ T72:;
 	return;
 	}
 }
-/*	function definition for G1378	*/
+/*	function definition for G1394	*/
 
 static void L16()
 {register object *base=vs_base;
@@ -406,7 +406,7 @@ T75:;
 	return;
 	}
 }
-/*	function definition for G1379	*/
+/*	function definition for G1395	*/
 
 static void L17()
 {register object *base=vs_base;
@@ -428,7 +428,7 @@ T78:;
 	return;
 	}
 }
-/*	function definition for G1380	*/
+/*	function definition for G1396	*/
 
 static void L18()
 {register object *base=vs_base;

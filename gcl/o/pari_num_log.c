@@ -120,7 +120,7 @@ object big_log_op();
 */
 
 
-object
+static object
 log_op(op,ignore)
 int (*op)();
 void (*ignore)();
@@ -159,7 +159,7 @@ BIG_OP:
 
 
 
-int
+static int
 big_bitp(x, p)
 object	x;
 int	p;

@@ -63,7 +63,7 @@ L:  \
 		unwind(nlj_fr, nlj_tag);  \
 	}
 
-bool
+static bool
 test_compare(x)
 object x;
 {
@@ -77,7 +77,7 @@ object x;
 	return(b != Cnil);
 }
 
-bool
+static bool
 test_compare_not(x)
 object x;
 {
@@ -91,28 +91,28 @@ object x;
 	return(b == Cnil);
 }
 
-bool
+static bool
 test_eql(x)
 object x;
 {
 	return(eql(item_compared, (*kf)(x)));
 }
 
-object
+static object
 apply_key_function(x)
 object x;
 {
 	return(ifuncall1(key_function, x));
 }
 
-object
+static object
 identity(x)
 object x;
 {
 	return(x);
 }
 
-void
+static void
 setupTEST(item, test, test_not, key)
 object item, test, test_not, key;
 {
@@ -153,19 +153,19 @@ void f_if_not()  \
 	f();  \
 }
 
-bool
+/* static bool
 endp1(x)
 object x;
 {
 
 	if (type_of(x) == t_cons)
 		return(FALSE);
-	else/* if (x == Cnil)*/
+	else * if (x == Cnil) *
 		return(TRUE);
 	vs_push(x);
 	FEwrong_type_argument(sLlist, x);
 	return(FALSE);
-}
+}*/
 
 object
 car(x)
@@ -201,7 +201,7 @@ object x;
 	return(Cnil);
 }
 
-object
+/* static object
 kdr(x)
 object x;
 {
@@ -209,7 +209,7 @@ object x;
 		return(x->c.c_cdr);
 	FEwrong_type_argument(sLcons, x);
 	return(Cnil);
-}
+}*/
 
 void
 stack_cons(void)
@@ -222,7 +222,7 @@ stack_cons(void)
 	*vs_top++ = c;
 }
 
-object on_stack_list_vector(n,ap)
+/*static object on_stack_list_vector(n,ap)
      int n;
      va_list ap;
 {object res=(object) alloca_val;
@@ -241,7 +241,7 @@ object on_stack_list_vector(n,ap)
    { x= (object) p;
      x->c.c_cdr= (object) ( ++p);}
  goto TOP;
-}
+}*/
 
 object on_stack_list_vector_new(int n,object first,va_list ap)
 {object res=(object) alloca_val;
@@ -264,7 +264,7 @@ object on_stack_list_vector_new(int n,object first,va_list ap)
  goto TOP;
 }
 
-object list_vector(n,ap)
+/* static object list_vector(n,ap)
      int n;
      va_list ap;
 {object ans,*p;
@@ -276,7 +276,8 @@ object list_vector(n,ap)
    { *p = make_cons(va_arg(ap,object),Cnil);
      p = & ((*p)->c.c_cdr);
    }
- return ans;}
+ return ans;
+}*/
 
 object list_vector_new(int n,object first,va_list ap)
 {object ans,*p;
@@ -292,14 +293,14 @@ object list_vector_new(int n,object first,va_list ap)
 
    
 /* clean this up */
-object on_stack_list(int n, ...)
+/* static object on_stack_list(int n, ...)
 {va_list ap;
  object res;
  va_start(ap,n);
  res=on_stack_list_vector(n,ap);
  va_end(ap);
  return res;
-}
+}*/
 
    
 
@@ -364,7 +365,7 @@ object listA(int n, ...)
 	return(vs_pop);
 }
 
-bool
+static bool
 tree_equal(x, y)
 object x, y;
 {
@@ -436,7 +437,7 @@ object x;
 /*
 	Copy_alist(x) copies alist x.
 */
-object
+static object
 copy_alist(x)
 object x;
 {
@@ -461,7 +462,7 @@ object x;
 	Copy_tree(x) copies tree x
 	and pushes the result onto vs.
 */
-void
+static void
 copy_tree(x)
 object x;
 {
@@ -480,7 +481,7 @@ object x;
 	the result of substituting new in tree
 	onto vs.
 */
-void
+static void
 subst(new, tree)
 object new, tree;
 {
@@ -501,7 +502,7 @@ object new, tree;
 	the result of nsubstituting new in *treep
 	to *treep.
 */
-void
+static void
 nsubst(new, treep)
 object new, *treep;
 {
@@ -520,7 +521,7 @@ object new, *treep;
 	result of substituting tree by alist
 	onto vs.
 */
-void
+static void
 sublis(alist, tree)
 object alist, tree;
 {
@@ -548,7 +549,7 @@ object alist, tree;
 	the result of substiting *treep by alist
 	to *treep.
 */
-void
+static void
 nsublis(alist, treep)
 object alist, *treep;
 {
@@ -650,7 +651,7 @@ void Lcddadr(){check_arg(1); vs_base[0] = cdr(cdr(car(cdr(vs_base[0]))));}
 void Lcdddar(){check_arg(1); vs_base[0] = cdr(cdr(cdr(car(vs_base[0]))));}
 void Lcddddr(){check_arg(1); vs_base[0] = cdr(cdr(cdr(cdr(vs_base[0]))));}
 
-DEFUNO_NEW("NTH",object,fLnth,LISP,2,2,NONE,OI,OO,OO,OO,Lnth,(int index,object list),"")
+DEFUNO_NEW("NTH",object,fLnth,LISP,2,2,NONE,OI,OO,OO,OO,void,Lnth,(int index,object list),"")
 { object x = list;
   if (index < 0)
     FEerror("Negative index: ~D.", 1, make_fixnum(index));
@@ -667,23 +668,23 @@ DEFUNO_NEW("NTH",object,fLnth,LISP,2,2,NONE,OI,OO,OO,OO,Lnth,(int index,object l
 DEFUN_NEW("FIRST",object,fLfirst,LISP,0,0,NONE,OO,OO,OO,OO,(object x),"") 
 { RETURN1(car(x)) ;}
 
-DEFUNO_NEW("SECOND",object,fLsecond,LISP,1,1,NONE,OO,OO,OO,OO,Lsecond,(object x),"")
+DEFUN_NEW("SECOND",object,fLsecond,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { return fLnth(1,x);}
-DEFUNO_NEW("THIRD",object,fLthird,LISP,1,1,NONE,OO,OO,OO,OO,Lthird,(object x),"")
+DEFUN_NEW("THIRD",object,fLthird,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { return fLnth(2,x);}
-DEFUNO_NEW("FOURTH",object,fLfourth,LISP,1,1,NONE,OO,OO,OO,OO,Lfourth,(object x),"")
+DEFUN_NEW("FOURTH",object,fLfourth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { return fLnth(3,x);}
-DEFUNO_NEW("FIFTH",object,fLfifth,LISP,1,1,NONE,OO,OO,OO,OO,Lfifth,(object x),"")
+DEFUN_NEW("FIFTH",object,fLfifth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { return fLnth(4,x);}
-DEFUNO_NEW("SIXTH",object,fLsixth,LISP,1,1,NONE,OO,OO,OO,OO,Lsixth,(object x),"")
+DEFUN_NEW("SIXTH",object,fLsixth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { return fLnth(5,x);}
-DEFUNO_NEW("SEVENTH",object,fLseventh,LISP,1,1,NONE,OO,OO,OO,OO,Lseventh,(object x),"")
+DEFUN_NEW("SEVENTH",object,fLseventh,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { return fLnth(6,x);}
-DEFUNO_NEW("EIGHTH",object,fLeighth,LISP,1,1,NONE,OO,OO,OO,OO,Leighth,(object x),"")
+DEFUN_NEW("EIGHTH",object,fLeighth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { return fLnth(7,x);}
-DEFUNO_NEW("NINTH",object,fLninth,LISP,1,1,NONE,OO,OO,OO,OO,Lninth,(object x),"")
+DEFUN_NEW("NINTH",object,fLninth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { return fLnth(8,x);}
-DEFUNO_NEW("TENTH",object,fLtenth,LISP,1,1,NONE,OO,OO,OO,OO,Ltenth,(object x),"")
+DEFUN_NEW("TENTH",object,fLtenth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { return fLnth(9,x);}
 
 void
@@ -843,7 +844,7 @@ LlistA()
 	while (vs_top > vs_base + 1)
 		stack_cons();
 }
-object copy_off_stack_tree(x)
+static object copy_off_stack_tree(x)
 object x;
 {object *p;
  p = &x;
@@ -1095,7 +1096,7 @@ Lrplacd()
 	@(return tree)
 @)
 
-PREDICATE(Lsubst, Lsubst_if, Lsubst_if_not, 3)
+PREDICATE(Lsubst,Lsubst_if,Lsubst_if_not, 3)
 
 
 @(defun nsubst (new old tree &key test test_not key)
@@ -1108,7 +1109,7 @@ PREDICATE(Lsubst, Lsubst_if, Lsubst_if_not, 3)
 	@(return tree)
 @)
 
-PREDICATE(Lnsubst, Lnsubst_if, Lnsubst_if_not, 3)
+PREDICATE(Lnsubst,Lnsubst_if,Lnsubst_if_not, 3)
 
 object
 sublis1(alist,tree,tst)
@@ -1127,10 +1128,10 @@ sublis1(alist,tree,tst)
   return tree;
 }
 
-int
+/* static int
 eq(x,y)
 object x,y;
-{return (x==y);} 	 
+{return (x==y);}*/
 
 void
 check_alist(alist)
@@ -1181,9 +1182,9 @@ check_alist(alist)
 	@(return list)
 @)
 
-PREDICATE(Lmember, Lmember_if, Lmember_if_not, 2)
+PREDICATE(Lmember,Lmember_if,Lmember_if_not, 2)
 
-@(defun member1 (item list &key test test_not key rev)
+@(static defun member1 (item list &key test test_not key rev)
 	saveTEST;
 @
 	protectTEST;
@@ -1271,7 +1272,7 @@ Lacons()
 	@(return `vp[-1]`)
 @)
 
-@(defun assoc_or_rassoc (item a_list &key test test_not key)
+@(static defun assoc_or_rassoc (item a_list &key test test_not key)
 	saveTEST;
 @
 	protectTEST;
@@ -1293,7 +1294,7 @@ void Lrassoc() { car_or_cdr = cdr; Lassoc_or_rassoc(); }
 
 static bool true_or_false;
 
-@(defun assoc_or_rassoc_predicate (predicate a_list &key key)
+@(static defun assoc_or_rassoc_predicate (predicate a_list &key key)
 	object x;
 @
 	while (!endp(a_list)) {
@@ -1325,7 +1326,7 @@ object x, l;
 	return(FALSE);
 }
 
-void
+static void
 siLmemq()
 {
 	object x, l;

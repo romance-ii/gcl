@@ -57,7 +57,7 @@ char *command;
 }
 #endif
 
-void
+static void
 Lsystem(void)
 {
 	char command[32768];
@@ -81,8 +81,8 @@ Lsystem(void)
        }
 }
 
-DEFUN("GETPID",object,fSgetpid,SI,0,0,NONE,OO,OO,OO,OO,
-      "getpid  returns  the  process  ID  of the current process")()
+DEFUN_NEW("GETPID",object,fSgetpid,SI,0,0,NONE,OO,OO,OO,OO,(void),
+      "getpid  returns  the  process  ID  of the current process")
 { return make_fixnum(getpid());
 }
 

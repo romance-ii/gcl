@@ -30,7 +30,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 object sLotherwise;
 
-void
+static void
 Fif(object form)
 {
 
@@ -55,7 +55,7 @@ Fif(object form)
 	}
 }
 
-void
+static void
 Fcond(object args)
 {
 
@@ -88,7 +88,7 @@ Fcond(object args)
 	vs_push(Cnil);
 }
 
-void
+static void
 Fcase(object arg)
 {
 
@@ -138,7 +138,7 @@ FOUND:
 	return;
 }
 
-void
+static void
 Fwhen(object form)
 {
 
@@ -164,7 +164,7 @@ Fwhen(object form)
 	}
 }
 
-void
+static void
 Funless(object form)
 {
 

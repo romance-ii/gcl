@@ -616,7 +616,7 @@ find_section (char *name, char *section_names, char *file_name, ElfW(Ehdr) *old_
  * .data section, and inserting an empty .bss immediately afterwards.
  *
  */
-void
+static void
 unexec (char *new_name, char *old_name, unsigned int data_start, unsigned int bss_start, unsigned int entry_address)
 {
   int new_file, old_file, new_file_size;

@@ -20,7 +20,7 @@ object MakeAfun(object (*addr)(object,object), unsigned int argd, object data)
 }
  
 
-object
+static object
 fSmakefun(object sym, object (*addr) (/* ??? */), unsigned int argd)
 {object ans = MakeAfun(addr,argd,
 		      (sSPmemory && sSPmemory->s.s_dbind &&
@@ -30,17 +30,17 @@ fSmakefun(object sym, object (*addr) (/* ??? */), unsigned int argd)
  return ans;
 }
 
-object
-ImakeClosure(object (*addr)(),int argd,int n,...)
-{ object x = fSmakefun(Cnil,addr,argd);
-  va_list ap;
-  va_start(ap,n);
-  IsetClosure(x,n,ap);
-  va_end(ap);
-  return x;
-}
+/* static object */
+/* ImakeClosure(object (*addr)(),int argd,int n,...) */
+/* { object x = fSmakefun(Cnil,addr,argd); */
+/*   va_list ap; */
+/*   va_start(ap,n); */
+/*   IsetClosure(x,n,ap); */
+/*   va_end(ap); */
+/*   return x; */
+/* } */
 
-void     
+static void     
 IsetClosure(object x, int n, va_list ap)
 {  /* this will change so that we can allocate 'hunks' which will be little
    blocks the size of an array header say with only one header word.   This
@@ -115,26 +115,26 @@ LISP_makefun(char *strg, object (*fn) (/* ??? */), unsigned int argd)
 }
 
 
-object 
-MakeClosure(int n,int argd,object data,object (*fn)(),...)
-{ object x;
-  va_list ap;
-  x = alloc_object(t_closure);
-  x->cl.cl_name = Cnil;
-  x->cl.cl_self = fn;
-  x->cl.cl_data = data;
-  x->cl.cl_argd = argd;
-  x->cl.cl_env = 0;
-  x->cl.cl_env = (object *)alloc_contblock(n*sizeof(object));
-  x->cl.cl_envdim=n;
-  va_start(ap,fn);
-  { object *p = x->cl.cl_env;
-  while (--n>= 0)
-    { *p++ = va_arg(ap,object);}
-  va_end(ap);
-  }
-  return x;
-}
+/* static object  */
+/* MakeClosure(int n,int argd,object data,object (*fn)(),...) */
+/* { object x; */
+/*   va_list ap; */
+/*   x = alloc_object(t_closure); */
+/*   x->cl.cl_name = Cnil; */
+/*   x->cl.cl_self = fn; */
+/*   x->cl.cl_data = data; */
+/*   x->cl.cl_argd = argd; */
+/*   x->cl.cl_env = 0; */
+/*   x->cl.cl_env = (object *)alloc_contblock(n*sizeof(object)); */
+/*   x->cl.cl_envdim=n; */
+/*   va_start(ap,fn); */
+/*   { object *p = x->cl.cl_env; */
+/*   while (--n>= 0) */
+/*     { *p++ = va_arg(ap,object);} */
+/*   va_end(ap); */
+/*   } */
+/*   return x; */
+/* } */
       
 DEFUN_NEW("INVOKE",object,fSinvoke,SI,1,ARG_LIMIT,NONE,OO,OO,OO,OO,(object x),
       "Invoke a C function whose body is at INDEX in the VV array")

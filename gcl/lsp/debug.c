@@ -154,7 +154,9 @@ T60:;
 	goto T66;
 goto T67;
 T67:;}
-	(void)((*(LnkLI115))());
+	vs_base=vs_top;
+	(void) (*Lnk115)();
+	vs_top=sup;
 goto T66;
 T66:;
 	V14= fix((V16));}
@@ -299,7 +301,9 @@ T112:;
 	goto T127;
 goto T128;
 T128:;}
-	(void)((*(LnkLI115))());
+	vs_base=vs_top;
+	(void) (*Lnk115)();
+	vs_top=sup;
 goto T127;
 T127:;
 	V31= fix((V23));
@@ -310,7 +314,9 @@ T127:;
 	goto T131;
 goto T132;
 T132:;}
-	(void)((*(LnkLI115))());
+	vs_base=vs_top;
+	(void) (*Lnk115)();
+	vs_top=sup;
 goto T131;
 T131:;
 	V33= fix((V26));
@@ -404,7 +410,9 @@ T160:;
 	goto T177;
 goto T178;
 T178:;}
-	(void)((*(LnkLI115))());
+	vs_base=vs_top;
+	(void) (*Lnk115)();
+	vs_top=sup;
 goto T177;
 T177:;
 	V37= fix((V25));{object V40;
@@ -413,7 +421,9 @@ T177:;
 	goto T181;
 goto T182;
 T182:;}
-	(void)((*(LnkLI115))());
+	vs_base=vs_top;
+	(void) (*Lnk115)();
+	vs_top=sup;
 goto T181;
 T181:;
 	V38= fix((V36));
@@ -488,7 +498,9 @@ T201:;
 	goto T218;
 goto T219;
 T219:;
-	(void)((*(LnkLI115))());
+	vs_base=vs_top;
+	(void) (*Lnk115)();
+	vs_top=sup;
 goto T218;
 T218:;
 	V41= (long)(V41)+(1);
@@ -3805,7 +3817,7 @@ static void LnkT119(){ call_or_link(VV[119],(void **)&Lnk119);} /* BREAK-GO */
 static object  LnkTLI118(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[118],(void **)&LnkLI118,first,ap);va_end(ap);return V1;} /* SEARCH */
 static void LnkT117(){ call_or_link(VV[117],(void **)&Lnk117);} /* COMPILED-FUNCTION-NAME */
 static void LnkT116(){ call_or_link(VV[116],(void **)&Lnk116);} /* IHS-FUN */
-static object  LnkTLI115(){return call_proc0(VV[115],(void **)&LnkLI115);} /* TYPE-ERROR */
+static void LnkT115(){ call_or_link(VV[115],(void **)&Lnk115);} /* TYPE-ERROR */
 static void LnkT114(){ call_or_link(VV[114],(void **)&Lnk114);} /* IHS-TOP */
 static void LnkT113(){ call_or_link(VV[113],(void **)&Lnk113);} /* VS */
 static void LnkT112(){ call_or_link(VV[112],(void **)&Lnk112);} /* IHS-VS */

@@ -28,6 +28,15 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <unistd.h>
 #include <string.h>
 
+static void
+init_main(void);
+
+static void
+initlisp(void);
+
+static int
+multiply_stacks(int);
+
 #define IN_MAIN
 
 #ifdef KCLOVM
@@ -374,7 +383,7 @@ error(char *s)
 #endif
 }
 
-void
+static void
 initlisp(void) {
 
 	int j;
@@ -579,28 +588,28 @@ segmentation_catcher(int i) {
   error("Segmentation violation.");
 }
 
-void
-cs_overflow(void) {
-#ifdef AV
-	if (cs_limit < cs_org - cssize)
-		error("control stack overflow");
-	cs_limit -= CSGETA;
-#endif
-#ifdef MV
+/* static void */
+/* cs_overflow(void) { */
+/* #ifdef AV */
+/* 	if (cs_limit < cs_org - cssize) */
+/* 		error("control stack overflow"); */
+/* 	cs_limit -= CSGETA; */
+/* #endif */
+/* #ifdef MV */
 
 
 
-#endif
-	FEerror("Control stack overflow.", 0);
-}
+/* #endif */
+/* 	FEerror("Control stack overflow.", 0); */
+/* } */
 
-void
-end_of_file(void) {
-	error("end of file");
-}
+/* static void */
+/* end_of_file(void) { */
+/* 	error("end of file"); */
+/* } */
 
 DEFUNO_NEW("BYE",object,fLbye,LISP
-       ,0,1,NONE,OI,OO,OO,OO,Lby,(int exitc),"")
+       ,0,1,NONE,OI,OO,OO,OO,void,Lby,(int exitc),"")
 {	int n=VFUN_NARGS;
 	int exit_code;
 	if (n>=1) exit_code=exitc;else exit_code=0;
@@ -614,12 +623,12 @@ DEFUNO_NEW("BYE",object,fLbye,LISP
 
 }
 
-DEFUNO_NEW("QUIT",object,fLquit,LISP
-       ,0,1,NONE,OI,OO,OO,OO,Lquit,(int exitc),"")
+DEFUN_NEW("QUIT",object,fLquit,LISP
+       ,0,1,NONE,OI,OO,OO,OO,(int exitc),"")
 {	return fLbye(exitc); }
  
-DEFUNO_NEW("EXIT",object,fLexit,LISP
-       ,0,1,NONE,OI,OO,OO,OO,Lexit,(int exitc),"")
+DEFUN_NEW("EXIT",object,fLexit,LISP
+       ,0,1,NONE,OI,OO,OO,OO,(int exitc),"")
 {	return fLbye(exitc); }
  
 
@@ -630,13 +639,13 @@ DEFUNO_NEW("EXIT",object,fLexit,LISP
 /*  #endif */
 /*  } */
 
-void
+static void
 siLargc(void) {
   check_arg(0);
   vs_push(make_fixnum(ARGC));
 }
 
-void
+static void
 siLargv(void) {
   int i=0;
   
@@ -650,7 +659,7 @@ siLargv(void) {
 }
 
 #ifdef UNIX
-void
+static void
 siLgetenv(void) {
 
   char name[256];
@@ -680,14 +689,14 @@ siLgetenv(void) {
 
 object *vs_marker;
 
-void
+static void
 siLmark_vs(void) {
   check_arg(0);
   vs_marker = vs_base;
   vs_base[0] = Cnil;
 }
 
-void
+static void
 siLcheck_vs(void) {
   check_arg(0);
   if (vs_base != vs_marker)
@@ -695,7 +704,7 @@ siLcheck_vs(void) {
   vs_base[0] = Cnil;
 }
 
-object
+static object
 siLcatch_fatal(int i) {
   catch_fatal=i;
   return Cnil;
@@ -750,7 +759,7 @@ siLreset_stack_limits(void)
   lim = ((typ *)p) - (STACK_OVER+1)*geta;   \
   }while (0)
 
-int
+static int
 multiply_stacks(int m) {  
 /*    int n; */
 /*    object x; */
@@ -785,7 +794,7 @@ siLinit_system(void) {
   vs_base[0] = Cnil;
 }
 
-void
+static void
 siLuser_init(void) {
   check_arg(0);
   sLApackageA->s.s_dbind = user_package;
@@ -793,19 +802,19 @@ siLuser_init(void) {
   vs_base[0] = Cnil;
 }
 
-void
+static void
 siLaddress(void) {
   check_arg(1);
   vs_base[0] = make_fixnum((long)vs_base[0]);
 }
 
-void
+static void
 siLnani(void) {
   check_arg(1);
   vs_base[0] = (object)fixint(vs_base[0]);
 }
 
-void
+static void
 siLinitialization_failure(void) {
   check_arg(0);
   printf("lisp initialization failed\n");
@@ -813,21 +822,21 @@ siLinitialization_failure(void) {
 }
 
 DEFUNO_NEW("IDENTITY",object,fLidentity,LISP
-       ,1,1,NONE,OO,OO,OO,OO,Lidentity,(object x0),"")
+       ,1,1,NONE,OO,OO,OO,OO,void,Lidentity,(object x0),"")
 {
 	/* 1 args */
   RETURN1 (x0);
 }
 
-DEFUNO_NEW("LISP-IMPLEMENTATION-VERSION",object,fLlisp_implementation_version,LISP
-       ,0,0,NONE,OO,OO,OO,OO,Llisp_implementation_version,(void),"")
+DEFUN_NEW("LISP-IMPLEMENTATION-VERSION",object,fLlisp_implementation_version,LISP
+       ,0,0,NONE,OO,OO,OO,OO,(void),"")
 {
 	/* 0 args */
 	RETURN1((make_simple_string(LISP_IMPLEMENTATION_VERSION)));
 }
 
 
-void
+static void
 siLsave_system(void) {
   int i;
   
@@ -883,7 +892,7 @@ DEFVAR("*MULTIPLY-STACKS*",sSAmultiply_stacksA,SI,Cnil,"");
 DEF_ORDINARY("TOP-LEVEL",sStop_level,SI,"");
 DEFVAR("*COMMAND-ARGS*",sSAcommand_argsA,SI,sLnil,"");
 
-void
+static void
 init_main(void) {
 
   make_function("BY", Lby);

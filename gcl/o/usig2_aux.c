@@ -1,5 +1,3 @@
-
-
 XS(string_register->st.st_fillp);
 XS(string_register->st.st_fillp);
 XS(string_register->st.st_dim);

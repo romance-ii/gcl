@@ -230,16 +230,16 @@ Levenp(void)
 }
 
 /* this is just to force things into memory in num_co.c */
-void  _assure_in_memory (void *p)
-{
-;
-}
+/* static void  _assure_in_memory (void *p) */
+/* { */
+/* ; */
+/* } */
 
-int
-lf_eqlp(double *p, double *q)
-{
-  return *p == *q;
-}
+/* static int */
+/* lf_eqlp(double *p, double *q) */
+/* { */
+/*   return *p == *q; */
+/* } */
 
 
 void

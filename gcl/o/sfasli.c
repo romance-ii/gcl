@@ -1,4 +1,3 @@
-
 /* 
 Copyright William Schelter. All rights reserved. */
 
@@ -27,7 +26,7 @@ find_sym_ptable(name)
 #else
 
 /* Replace this with gcl's own hash structure at some point */
-int
+static int
 build_symbol_table_bfd(void) {
 
   int u,v;

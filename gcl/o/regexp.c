@@ -62,6 +62,10 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "string.h"
 #include "regexp.h"
 
+static int
+min_initial_branch_length(regexp *, unsigned char *, int);
+
+
 /*
  * The "internal use only" fields in regexp.h are present to pass info from
  * compile to execute that permits the execute phase to run lots faster on
@@ -225,7 +229,7 @@ int case_fold_search = 0;
  * Beware that the optimization-preparation code in here knows about some
  * of the structure of the compiled regexp.
  */
-regexp *
+static regexp *
 regcomp(char *exp)
 {
 	register regexp *r;
@@ -765,7 +769,7 @@ STATIC char *regprop();
  If it is not 0 and is large, then a fast checking will be enabled. 
 
  */
-int
+static int
 regexec(register regexp *prog, register char *string, char *start, int length)
 {
 	register char *s;
@@ -1466,7 +1470,7 @@ char *s2;
    */
 
 #define MINIMIZE(loc,val) if (val < loc) loc=val
-int
+static int
 min_initial_branch_length(regexp *x, unsigned char *buf, int advance)
 { char *s = x->program+1;
   int overall = 10000;

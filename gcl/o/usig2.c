@@ -27,6 +27,10 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdlib.h>
 #include "include.h"
 
+static void
+invoke_handler(int,int);
+
+
 #ifndef USIG2
 #include <signal.h>
 #include "usig.h"
@@ -147,17 +151,14 @@ init_safety(void)
 }
   
 DO_INIT(init_safety();)
-DEFUN("SIGNAL-SAFETY-REQUIRED",object,sSsignal_safety_required,SI,2,2,
-      NONE,OI,IO,OO,OO,
+DEFUN_NEW("SIGNAL-SAFETY-REQUIRED",object,sSsignal_safety_required,SI,2,2,
+	  NONE,OI,IO,OO,OO,(int signo,int safety),
       "Set the safety level required for handling SIGNO to SAFETY, or if \
 SAFETY is negative just return the current safety level for that \
 signal number.  Value of 1 means allow interrupt at any place not \
 specifically marked in the code as bad, and value of 2 means allow it \
 only in very SAFE places.")
 
-     
-     
-     (signo,safety)
 { if (signo > sizeof(safety_required))
     {FEerror("Illegal signo:~a.",1,make_fixnum(signo));}
   if (safety >=0) safety_required[signo] = safety;
@@ -196,7 +197,7 @@ static void before_interrupt(struct save_for_interrupt *p, int allowed);
 static void after_interrupt(struct save_for_interrupt *p, int allowed);
 
 /* caller saves and restores the global signals_allowed; */
-void
+static void
 invoke_handler(int signo, int allowed)
 {struct save_for_interrupt buf;
  before_interrupt(&buf,allowed);
@@ -325,27 +326,27 @@ after_interrupt(struct save_for_interrupt *p, int allowed)
    and is suitable for inlining.
 */
 
-object
-MakeCons(object a, object b)
-{ struct typemanager*ad = &tm_table[t_cons];
-  object new = (object) ad->tm_free;
-  if (new == 0)
-    { new = alloc_object(t_cons);
-      new->c.c_car = a;
-      goto END;
-    }
+/* static object */
+/* MakeCons(object a, object b) */
+/* { struct typemanager*ad = &tm_table[t_cons]; */
+/*   object new = (object) ad->tm_free; */
+/*   if (new == 0) */
+/*     { new = alloc_object(t_cons); */
+/*       new->c.c_car = a; */
+/*       goto END; */
+/*     } */
       
-  new->c.c_car=a;
+/*   new->c.c_car=a; */
   /* interrupt here and before_interrupt will copy new->c into the
      C stack, so that a will be protected */
-  new->c.t=t_cons;
-  new->c.m= 0;
+/*   new->c.t=t_cons; */
+/*   new->c.m= 0; */
   /*  Make interrupt copy new out to the stack and then zero new.
       That way new is certainly gc valid, and its contents are protected.
       So the above three operations can occur in any order.
       */
 
-  { object tem  = OBJ_LINK(new);
+/*   { object tem  = OBJ_LINK(new); */
     /*
       interrupt here and we see that before_interrupt must save the top of the
       free list AND the second thing on the Free list.  That way we will be ok
@@ -353,19 +354,19 @@ MakeCons(object a, object b)
       == 0, yet a gc happened in between.  An interrupt here when tem = 0 would
       mean the free list needs to be collected again by second gc.
       */
-    ad->tm_free = tem;
-  }
+/*     ad->tm_free = tem; */
+/*   } */
   /* Whew:  we got it safely off so interrupts can't hurt us now.  */
-  ad->tm_nfree --;
+/*   ad->tm_nfree --; */
   /* interrupt here and the cdr field will point to a f_link which is
      a 'free' and so gc valid.   b is still protected since
      it is in the stack or a regiseter, and a is protected since it is
      in new, and new is not free
      */
- END:
-  new->c.c_cdr=b;
-  return new;
-}
+/*  END: */
+/*   new->c.c_cdr=b; */
+/*   return new; */
+/* } */
 
 
 /* COND is the condition where this is raised.
@@ -400,10 +401,9 @@ raise_pending_signals(int cond)
  }}
 
 
-DEFUN("ALLOW-SIGNAL",object,fSallow_signal,SI,1,1,NONE,OI,OO,OO,OO,
+DEFUN_NEW("ALLOW-SIGNAL",object,fSallow_signal,SI,1,1,NONE,OI,OO,OO,OO,(int n),
       "Install the default signal handler on signal N")
-     (n)
-     int n;
+
 {
 
  signals_allowed |= signal_mask(n);

@@ -7,6 +7,12 @@
     
 */
 
+static void
+sgc_mark_object1(object);
+
+static void
+sgc_mprotect(int, int, int);
+
 
 #ifdef BSD
 /* ulong may have been defined in mp.h but the define is no longer needed */
@@ -61,7 +67,7 @@ joe1(){;}
 joe() {;}     
 #endif
 
-void
+static void
 sgc_mark_cons(object x) {
   
   cs_check(x);
@@ -111,7 +117,7 @@ sgc_mark_cons(object x) {
    header, that way we won't have to keep the headers in memory.
    This takes only 1.47 as opposed to 1.33 microseconds per set.
 */
-void
+static void
 sgc_mark_object1(object x) {
 
   long i;
@@ -585,7 +591,7 @@ sgc_mark_object1(object x) {
   
 }
 
-void
+static void
 sgc_mark_stack_carefully(void *topv, void *bottomv, int offset) {
   
   int p,m,pageoffset;
@@ -630,7 +636,7 @@ sgc_mark_stack_carefully(void *topv, void *bottomv, int offset) {
   }
 }
 
-void
+static void
 sgc_mark_phase(void) {
 
   STATIC int i, j;
@@ -743,7 +749,7 @@ sgc_mark_phase(void) {
   
 }
 
-void
+static void
 sgc_sweep_phase(void) {
   STATIC int i, j, k;
   STATIC object x;
@@ -858,7 +864,7 @@ sgc_sweep_phase(void) {
 }
 
 
-void
+static void
 sgc_contblock_sweep_phase(void) {
 
   STATIC int i, j;
@@ -928,7 +934,7 @@ sgc_count(object yy) {
 
 #endif
 /* count writable pages excluding the hole */
-int
+static int
 sgc_count_writable(int end) { 
 
   int j = first_protectable_page -1;
@@ -1186,7 +1192,7 @@ make_writable(int beg, int i) {
 long debug_fault =0;
 int fault_count =0;
 extern char etext;
-void
+static void
 memprotect_handler(int sig, long code, void *scp, char *addr) {
   
   int p;
@@ -1238,7 +1244,7 @@ memprotect_handler(int sig, long code, void *scp, char *addr) {
 
 }
 
-void
+static void
 sgc_mprotect(int pbeg, int n, int writable) {
   /* CHECK_RANGE(pbeg,n);  */
 #ifdef DEBUG_MPROTECT
@@ -1258,7 +1264,7 @@ sgc_mprotect(int pbeg, int n, int writable) {
    if one page in a a page_multiple grouping is writable,the
    rest must be */
 
-void
+static void
 fix_for_page_multiple(int beg, int end) {
 
   int i,j;
@@ -1339,7 +1345,7 @@ memory_protect(int on) {
   }
 }
 
-void
+static void
 siLsgc_on(void) {
 
   if (vs_base==vs_top) {

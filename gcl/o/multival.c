@@ -50,7 +50,7 @@ Lvalues_list(void)
 	if (vs_top == vs_base) vs_base[0] = Cnil;
 }
 
-void
+static void
 Fmultiple_value_list(object form)
 {
 
@@ -70,7 +70,7 @@ Fmultiple_value_list(object form)
 	vs_top = top+1;
 }
 
-void
+static void
 Fmultiple_value_call(object form)
 {
 
@@ -99,7 +99,7 @@ Fmultiple_value_call(object form)
 	super_funcall(top[0]);
 }
 
-void
+static void
 Fmultiple_value_prog1(object forms)
 {
 

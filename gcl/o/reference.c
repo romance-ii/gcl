@@ -91,7 +91,7 @@ Lsymbol_function(void)
 	vs_base[0] = sym->s.s_gfdef;
 }
 
-void
+static void
 Fquote(object form)
 {
 
@@ -103,7 +103,7 @@ Fquote(object form)
 	vs_push(MMcar(form));
 }
 
-void
+static void
 Ffunction(object form)
 {
 

@@ -92,6 +92,7 @@ char pool[POOLSIZE];
 char *poolp;
 
 char *function;
+int fstatic;
 
 char *required[MAXREQ];
 int nreq;
@@ -412,7 +413,7 @@ get_return()
 void
 put_fhead()
 {
-	fprintf(out, "void\nL%s()\n{", function);
+	fprintf(out, "%svoid\nL%s()\n{", fstatic ? "static " : "",function);
 }
 
 void
@@ -601,6 +602,11 @@ LOOP:
 	if (readc() != '(')
 		error("@( expected");
 	p = read_token();
+	fstatic=0;
+	if (strcmp(p, "static") == 0) {
+	  fstatic=1;
+	  p = read_token();
+	}
 	if (strcmp(p, "defun") == 0) {
 		get_function();
 		get_lambda_list();

@@ -1,4 +1,3 @@
-
 /* Copyright    Massachusetts Institute of Technology    1988	*/
 /*
  * THIS IS AN OS DEPENDENT FILE! It should work on 4.2BSD derived

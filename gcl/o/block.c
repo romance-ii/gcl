@@ -28,7 +28,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 
-void
+static void
 Fblock(VOL object args)
 {
 	object *oldlex = lex_env;
@@ -64,7 +64,7 @@ Fblock(VOL object args)
 	lex_env = oldlex;
 }
 
-void
+static void
 Freturn_from(object args)
 {
 	object lex_block;
@@ -90,7 +90,7 @@ Freturn_from(object args)
 	/*  never reached  */
 }
 
-void
+static void
 Freturn(object args)
 {
 	object lex_block;

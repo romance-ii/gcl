@@ -29,7 +29,7 @@ object sLwarn;
 
 object sSAinhibit_macro_specialA;
 
-void
+static void
 siLdefine_macro(void)
 {
 	check_arg(2);
@@ -68,7 +68,7 @@ siLdefine_macro(void)
 	vs_top = vs_base+1;
 }
 
-void
+static void
 Fdefmacro(object form)
 {
 
@@ -145,7 +145,7 @@ Imacro_expand1(object exp_fun, object form)
 	the expansion function if the form is a macro form.  Otherwise,
 	MACRO_DEF returns NIL.
 */
-object
+static object
 macro_def(object form)
 {
 	object head, fd;
@@ -168,7 +168,7 @@ macro_def(object form)
 }
 
 DEFUNO_NEW("MACROEXPAND",object,fLmacroexpand,LISP
-       ,1,2,NONE,OO,OO,OO,OO,Lmacroexpand,(object form,...),"")
+       ,1,2,NONE,OO,OO,OO,OO,void,Lmacroexpand,(object form,...),"")
 {	int n=VFUN_NARGS;
 	object envir;
 	object exp_fun;

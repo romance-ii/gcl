@@ -88,7 +88,7 @@ register int n;
 			break;
 }
 
-
+static void
 memory_save(original_file, save_file)
 char *original_file, *save_file;
 {	MEM_SAVE_LOCALS;

@@ -10,8 +10,14 @@ Fast linking method for kcl by W. Schelter University of Texas
 #include "sfun_argd.h"
 #include "page.h"
 
+static int
+clean_link_array(object *,object *);
+
 object sScdefn;
 typedef object (*object_func)();
+
+static int     
+vpush_extend(void *,object);
 
 object sLAlink_arrayA;
 int Rset = 0;
@@ -83,7 +89,7 @@ call_or_link_closure(object sym, void **link, object *ptr)
 or a fixnum if array-type = fixnum */
 
 #define SET_ITEM(ar,ind,val) (*((object *)(&((ar)->ust.ust_self[ind]))))= val
-int     
+static int     
 vpush_extend(void *item, object ar)
 { register int ind = ar->ust.ust_fillp;
  AGAIN:
@@ -108,7 +114,7 @@ vpush_extend(void *item, object ar)
    push them back  */
 static int number_unlinked=0;
 
-void
+static void
 delete_link(void *address, object link_ar)
 {object *ar,*ar_end,*p;
  p=0;
@@ -209,7 +215,7 @@ is supplied and FLAG is nil, then this function is deleted from the fast links")
   RETURN1(Cnil);
 }
 
-int
+static int
 clean_link_array(object *ar, object *ar_end)
 {int i=0;
  object *orig;
@@ -568,7 +574,7 @@ c_apply_n(object (*fn)(), int n, object *x)
 value.  This function is called by the static lnk function in the reference
 file */
 
-object
+static object
 call_proc(object sym, void **link, int argd, va_list ll)
 {object fun;
  int nargs;
@@ -690,8 +696,8 @@ call_proc(object sym, void **link, int argd, va_list ll)
 }
 
 
-object call_vproc(object sym, void *link, va_list ll)
-{return call_proc(sym,link,VFUN_NARGS | VFUN_NARG_BIT,ll);}
+/* static object call_vproc(object sym, void *link, va_list ll) */
+/* {return call_proc(sym,link,VFUN_NARGS | VFUN_NARG_BIT,ll);} */
 
 /* For ANSI C stdarg */
 
@@ -880,7 +886,6 @@ ifuncall(object sym,int n,...)
   if (type_of(sym->s.s_gfdef)==t_cfun)
     (*(sym->s.s_gfdef)->cf.cf_self)();
   else  super_funcall(sym);
-/*   funcall(sym->s.s_gfdef);*/
   x = vs_base[0];
   vs_top = old_vs_top;
   vs_base = old_vs_base;
@@ -888,25 +893,24 @@ ifuncall(object sym,int n,...)
 }
 
 
-object
-imfuncall(object sym,int n,...)
-{ va_list ap;
-  int i;
-  object *old_vs_top;
-  old_vs_top = vs_top;
-  vs_base = old_vs_top;
-  vs_top=old_vs_top+n;
-  vs_check;
-  va_start(ap,n);
-  for(i=0;i<n;i++)
-    old_vs_top[i]= va_arg(ap,object);
-  va_end(ap);
-  if (type_of(sym->s.s_gfdef)==t_cfun)
-    (*(sym->s.s_gfdef)->cf.cf_self)();
-  else  super_funcall(sym);
-/*   funcall(sym->s.s_gfdef);*/
-  return(vs_base[0]);
-}
+/* static object */
+/* imfuncall(object sym,int n,...) */
+/* { va_list ap; */
+/*   int i; */
+/*   object *old_vs_top; */
+/*   old_vs_top = vs_top; */
+/*   vs_base = old_vs_top; */
+/*   vs_top=old_vs_top+n; */
+/*   vs_check; */
+/*   va_start(ap,n); */
+/*   for(i=0;i<n;i++) */
+/*     old_vs_top[i]= va_arg(ap,object); */
+/*   va_end(ap); */
+/*   if (type_of(sym->s.s_gfdef)==t_cfun) */
+/*     (*(sym->s.s_gfdef)->cf.cf_self)(); */
+/*   else  super_funcall(sym); */
+/*   return(vs_base[0]); */
+/* } */
 
 /* go from beg+1 below limit setting entries equal to 0 until you
    come to FRESH 0's . */
@@ -921,7 +925,7 @@ clear_stack(object *beg, object *limit)
    if (i > FRESH) return 0;
    ;*beg=0;} return 0;}
 
-object
+static object
 set_mv(int i, object val)
 { if (i >= (sizeof(MVloc)/sizeof(object)))
      FEerror("Bad mv index",0);
@@ -929,7 +933,7 @@ set_mv(int i, object val)
 }
 
 
-object
+static object
 mv_ref(unsigned int i)
 { object x;
   if (i >= (sizeof(MVloc)/sizeof(object)))

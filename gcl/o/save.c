@@ -2,7 +2,7 @@
 #include "include.h"
 #endif
 
-void
+static void
 memory_save(char *original_file, char *save_file)
 {
 #ifdef DO_BEFORE_SAVE

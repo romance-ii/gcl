@@ -24,7 +24,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #undef STATIC
 #define regerror gcl_regerror
-void
+static void
 gcl_regerror(char *s)
 { 
   FEerror("Regexp Error: ~a",1,make_simple_string(s));

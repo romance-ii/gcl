@@ -35,97 +35,97 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 
-int
+static int
 ior_op(int i, int j)
 {
 	return(i | j);
 }
 
-int
+static int
 xor_op(int i, int j)
 {
 	return(i ^ j);
 }
 
-int
+static int
 and_op(int i, int j)
 {
 	return(i & j);
 }
 
-int
+static int
 eqv_op(int i, int j)
 {
 	return(~(i ^ j));
 }
 
-int
+static int
 nand_op(int i, int j)
 {
 	return(~(i & j));
 }
 
-int
+static int
 nor_op(int i, int j)
 {
 	return(~(i | j));
 }
 
-int
+static int
 andc1_op(int i, int j)
 {
 	return((~i) & j);
 }
 
-int
+static int
 andc2_op(int i, int j)
 {
 	return(i & (~j));
 }
 
-int
+static int
 orc1_op(int i, int j)
 {
 	return((~i) | j);
 }
 
-int
+static int
 orc2_op(int i, int j)
 {
 	return(i | (~j));
 }
 
-int
+static int
 b_clr_op(int i, int j)
 {
 	return(0);
 }
 
-int
+static int
 b_set_op(int i, int j)
 {
 	return(-1);
 }
 
-int
+static int
 b_1_op(int i, int j)
 {
 	return(i);
 }
 
-int
+static int
 b_2_op(int i, int j)
 {
 	return(j);
 }
 
-int
+static int
 b_c1_op(int i, int j)
 {
 	return(~i);
 }
 
-int
+static int
 b_c2_op(int i, int j)
 {
 	return(~j);
@@ -153,7 +153,7 @@ int (*intLogOps)()[16]= {
 #endif
 
 
-int
+static int
 fix_bitp(object x, int p)
 {
 	if (p > 30) {		/* fix = sign + bit0-30 */
@@ -165,7 +165,7 @@ fix_bitp(object x, int p)
 	return((fix(x) >> p) & 1);
 }	
 
-int
+static int
 count_int_bits(int x)
 {
 	int	i, count;
@@ -175,7 +175,7 @@ count_int_bits(int x)
 	return(count);
 }
 
-int
+static int
 count_bits(object x)
 {
 	int i, count=0;
@@ -221,7 +221,7 @@ shift_integer(object x, int w)
 }
 	
 
-int
+static int
 int_bit_length(int i)
 {
 	int	count, j;
@@ -487,47 +487,47 @@ Linteger_length(void)
 }
 
 #define W_SIZE (8*sizeof(int))
-object
-bitand(object a, object b, object c)
-{ int d= a->bv.bv_fillp;
-  int *ap,*bp,*cp;
-  d=(d+W_SIZE-1)/W_SIZE;
-  ap= (int *)(a->bv.bv_self);
-  bp= (int *)(b->bv.bv_self);
-  cp= (int *)(c->bv.bv_self);
-  while (--d >= 0)
-    { *cp++ = *bp++ & *ap++;
-    }
-  return c;
-}
+/* static object */
+/* bitand(object a, object b, object c) */
+/* { int d= a->bv.bv_fillp; */
+/*   int *ap,*bp,*cp; */
+/*   d=(d+W_SIZE-1)/W_SIZE; */
+/*   ap= (int *)(a->bv.bv_self); */
+/*   bp= (int *)(b->bv.bv_self); */
+/*   cp= (int *)(c->bv.bv_self); */
+/*   while (--d >= 0) */
+/*     { *cp++ = *bp++ & *ap++; */
+/*     } */
+/*   return c; */
+/* } */
 
-object
-bitior(object a, object b, object c)
-{ int *ap,*cp,*bp, d= a->bv.bv_fillp;
-  d=(d+W_SIZE-1)/W_SIZE;
-   ap= (int *)((a->bv.bv_self));
-   bp= (int *)(b->bv.bv_self);
-   cp= (int *)(c->bv.bv_self);
-  while (--d >= 0)
-    { *cp++ = *bp++ | *ap++;
-    }
-  return c;
-}
+/* static object */
+/* bitior(object a, object b, object c) */
+/* { int *ap,*cp,*bp, d= a->bv.bv_fillp; */
+/*   d=(d+W_SIZE-1)/W_SIZE; */
+/*    ap= (int *)((a->bv.bv_self)); */
+/*    bp= (int *)(b->bv.bv_self); */
+/*    cp= (int *)(c->bv.bv_self); */
+/*   while (--d >= 0) */
+/*     { *cp++ = *bp++ | *ap++; */
+/*     } */
+/*   return c; */
+/* } */
 
 /* Note in order to be equal we assume that the part above the
    fill pointer is 0 up to the next word */
 
-int
-bvequal(object a, object b)
-{ int *ap,*bp, d= a->bv.bv_fillp;
-  d=(d+W_SIZE-1)/W_SIZE;
- ap= (int *)(a->bv.bv_self);
- bp= (int *)(b->bv.bv_self);
-  while (--d >= 0)
-    { if (*ap++ != *bp++) return 1;
-    }
-  return 0;
-}
+/* static int */
+/* bvequal(object a, object b) */
+/* { int *ap,*bp, d= a->bv.bv_fillp; */
+/*   d=(d+W_SIZE-1)/W_SIZE; */
+/*  ap= (int *)(a->bv.bv_self); */
+/*  bp= (int *)(b->bv.bv_self); */
+/*   while (--d >= 0) */
+/*     { if (*ap++ != *bp++) return 1; */
+/*     } */
+/*   return 0; */
+/* } */
 
   
 

@@ -1,4 +1,3 @@
-
 /* for file nfunlink.X */
 
 extern object Icall_proc GPR((object fun_name, int link_desk, object (**link_loc) ( ), ...));;  

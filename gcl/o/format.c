@@ -24,6 +24,113 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "include.h"
+
+static int
+fmt_thousand(int,int,bool,bool,int);
+
+static void
+fmt_exponent1(int);
+
+static void
+fmt_write_numeral(int,int);
+
+static void
+fmt_write_ordinal(int,int);
+
+static int
+fmt_nonillion(int,int,bool,bool,int);
+
+static void
+fmt_roman(int,int,int,int,int);
+
+static void
+fmt_integer(object,bool,bool,int,int,int,int);
+
+static void
+fmt_semicolon(bool,bool);
+
+static void
+fmt_up_and_out(bool,bool);
+
+static void
+fmt_justification(volatile bool,bool);
+
+static void
+fmt_iteration(bool,bool);
+
+static void
+fmt_conditional(bool,bool);
+
+static void
+fmt_case(bool,bool);
+
+static void
+fmt_indirection(bool,bool);
+
+static void
+fmt_asterisk(bool,bool);
+
+static void
+fmt_tabulate(bool,bool);
+
+static void
+fmt_newline(bool,bool);
+
+static void
+fmt_tilde(bool,bool);
+
+static void
+fmt_bar(bool,bool);
+
+static void
+fmt_ampersand(bool,bool);
+
+static void
+fmt_percent(bool,bool);
+
+static void
+fmt_dollars_float(bool,bool);
+
+static void
+fmt_general_float(bool,bool);
+
+static void
+fmt_exponential_float(bool,bool);
+
+static void
+fmt_fix_float(bool,bool);
+
+static void
+fmt_character(bool,bool);
+
+static void
+fmt_plural(bool,bool);
+
+static void
+fmt_radix(bool,bool);
+
+static void
+fmt_hexadecimal(bool,bool);
+
+static void
+fmt_octal(bool,bool);
+
+static void
+fmt_binary(bool,bool);
+
+static void
+fmt_error(char *);
+
+static void
+fmt_ascii(bool, bool);
+
+static void
+fmt_S_expression(bool, bool);
+
+static void
+fmt_decimal(bool, bool);
+
+
 object sSAindent_formatted_outputA;
 
 
@@ -129,13 +236,13 @@ int fmt_spare_spaces;
 int fmt_line_length;
 
 
-int
+static int
 fmt_tempstr(int s)
 {
 	return(fmt_temporary_string->st.st_self[s]);
 }
 
-int
+static int
 ctl_advance(void)
 {
 	if (ctl_index >= ctl_end)
@@ -143,7 +250,7 @@ ctl_advance(void)
 	return(ctl_string[ctl_index++]);
 }
 
-object
+static object
 fmt_advance(void)
 {
 	if (fmt_index >= fmt_end)
@@ -152,7 +259,7 @@ fmt_advance(void)
 }
 
 
-void
+static void
 format(object fmt_stream0, int ctl_origin0, int ctl_end0)
 {
 	int c, i, n;
@@ -397,7 +504,7 @@ DIRECTIVE:
 
 
 
-int
+static int
 fmt_skip(void)
 {
 	int c, level = 0;
@@ -446,35 +553,35 @@ DIRECTIVE:
 }
 
 
-void
+static void
 fmt_max_param(int n)
 {
 	if (fmt_nparam > n)
 		fmt_error("too many parameters");
 }
 
-void
+static void
 fmt_not_colon(bool colon)
 {
 	if (colon)
 		fmt_error("illegal :");
 }
 
-void
+static void
 fmt_not_atsign(bool atsign)
 {
 	if (atsign)
 		fmt_error("illegal @");
 }
 
-void
+static void
 fmt_not_colon_atsign(bool colon, bool atsign)
 {
 	if (colon && atsign)
 		fmt_error("illegal :@");
 }
 
-void
+static void
 fmt_set_param(int i, int *p, int t, int v)
 {
 	if (i >= fmt_nparam || FMT_PARAM[i].fmt_param_type == fmt_null)
@@ -486,7 +593,7 @@ fmt_set_param(int i, int *p, int t, int v)
 }	
 
 
-void
+static void
 fmt_ascii(bool colon, bool atsign)
 {
 	int mincol, colinc, minpad, padchar;
@@ -524,7 +631,7 @@ fmt_ascii(bool colon, bool atsign)
 	}
 }
 
-void
+static void
 fmt_S_expression(bool colon, bool atsign)
 {
 	int mincol, colinc, minpad, padchar;
@@ -562,7 +669,7 @@ fmt_S_expression(bool colon, bool atsign)
 	}
 }
 
-void
+static void
 fmt_decimal(bool colon, bool atsign)
 {
 	int mincol, padchar, commachar;
@@ -575,7 +682,7 @@ fmt_decimal(bool colon, bool atsign)
 		    10, mincol, padchar, commachar);
 }
 
-void
+static void
 fmt_binary(bool colon, bool atsign)
 {
 	int mincol, padchar, commachar;
@@ -588,7 +695,7 @@ fmt_binary(bool colon, bool atsign)
 		    2, mincol, padchar, commachar);
 }
 
-void
+static void
 fmt_octal(bool colon, bool atsign)
 {
 	int mincol, padchar, commachar;
@@ -601,7 +708,7 @@ fmt_octal(bool colon, bool atsign)
 		    8, mincol, padchar, commachar);
 }
 
-void
+static void
 fmt_hexadecimal(bool colon, bool atsign)
 {
 	int mincol, padchar, commachar;
@@ -614,7 +721,7 @@ fmt_hexadecimal(bool colon, bool atsign)
 		    16, mincol, padchar, commachar);
 }
 
-void
+static void
 fmt_radix(bool colon, bool atsign)
 {
 	int radix, mincol, padchar, commachar;
@@ -695,7 +802,7 @@ fmt_radix(bool colon, bool atsign)
 	fmt_integer(x, colon, atsign, radix, mincol, padchar, commachar);
 }	
 
-void
+static void
 fmt_integer(object x, bool colon, bool atsign, int radix, int mincol, int padchar, int commachar)
 {
 	int l, l1;
@@ -752,7 +859,7 @@ fmt_integer(object x, bool colon, bool atsign, int radix, int mincol, int padcha
 	}
 }
 
-int
+static int
 fmt_nonillion(int s, int i, bool b, bool o, int t)
 {
 	int j;
@@ -773,7 +880,7 @@ fmt_nonillion(int s, int i, bool b, bool o, int t)
 	return(fmt_thousand(s, i, b, o, t));
 }		
 
-int
+static int
 fmt_thousand(int s, int i, bool b, bool o, int t)
 {
 	if (i == 3 && fmt_tempstr(s) > '0') {
@@ -830,19 +937,19 @@ fmt_thousand(int s, int i, bool b, bool o, int t)
 	return(b);
 }
 	
-void
+static void
 fmt_write_numeral(int s, int i)
 {
 	writestr_stream(fmt_numeral[fmt_tempstr(s) - '0' + i], fmt_stream);
 }
 
-void
+static void
 fmt_write_ordinal(int s, int i)
 {
 	writestr_stream(fmt_ordinal[fmt_tempstr(s) - '0' + i], fmt_stream);
 }
 
-void
+static void
 fmt_roman(int i, int one, int five, int ten, int colon)
 {
 	int j;
@@ -865,7 +972,7 @@ fmt_roman(int i, int one, int five, int ten, int colon)
 	}
 }
 
-void
+static void
 fmt_plural(bool colon, bool atsign)
 {
 	fmt_max_param(0);
@@ -886,7 +993,7 @@ fmt_plural(bool colon, bool atsign)
 			writec_stream('s', fmt_stream);
 }
 
-void
+static void
 fmt_character(bool colon, bool atsign)
 {
 	object x;
@@ -907,7 +1014,7 @@ fmt_character(bool colon, bool atsign)
 		writec_stream(fmt_tempstr(i), fmt_stream);
 }
 
-void
+static void
 fmt_fix_float(bool colon, bool atsign)
 {
 	int w, d, k, overflowchar, padchar;
@@ -1064,7 +1171,7 @@ OVER:
 	return;
 }
 
-int
+static int
 fmt_exponent_length(int e)
 {
 	int i;
@@ -1078,7 +1185,7 @@ fmt_exponent_length(int e)
 	return(i);
 }
 
-void
+static void
 fmt_exponent(int e)
 {
 	if (e == 0) {
@@ -1090,7 +1197,7 @@ fmt_exponent(int e)
 	fmt_exponent1(e);
 }
 	
-void
+static void
 fmt_exponent1(int e)
 {
 	if (e == 0)
@@ -1099,7 +1206,7 @@ fmt_exponent1(int e)
 	writec_stream('0' + e%10, fmt_stream);
 }
 
-void
+static void
 fmt_exponential_float(bool colon, bool atsign)
 {
 	int w, d, e, k, overflowchar, padchar, exponentchar;
@@ -1303,7 +1410,7 @@ OVER:
 	return;
 }
 
-void
+static void
 fmt_general_float(bool colon, bool atsign)
 {
 	int w, d, e, k, overflowchar, padchar, exponentchar;
@@ -1395,7 +1502,7 @@ fmt_general_float(bool colon, bool atsign)
 	vs_reset;
 }
 
-void
+static void
 fmt_dollars_float(bool colon, bool atsign)
 {
 	int d, n, w, padchar;
@@ -1482,7 +1589,7 @@ fmt_dollars_float(bool colon, bool atsign)
 	vs_reset;
 }
 
-void
+static void
 fmt_percent(bool colon, bool atsign)
 {
 	int n, i;
@@ -1499,7 +1606,7 @@ fmt_percent(bool colon, bool atsign)
 	}
 }
 
-void
+static void
 fmt_ampersand(bool colon, bool atsign)
 {
 	int n;
@@ -1517,7 +1624,7 @@ fmt_ampersand(bool colon, bool atsign)
 	fmt_indents = 0;
 }
 
-void
+static void
 fmt_bar(bool colon, bool atsign)
 {
 	int n;
@@ -1530,7 +1637,7 @@ fmt_bar(bool colon, bool atsign)
 		writec_stream('\f', fmt_stream);
 }
 
-void
+static void
 fmt_tilde(bool colon, bool atsign)
 {
 	int n;
@@ -1543,7 +1650,7 @@ fmt_tilde(bool colon, bool atsign)
 		writec_stream('~', fmt_stream);
 }
 
-void
+static void
 fmt_newline(bool colon, bool atsign)
 {
 
@@ -1558,7 +1665,7 @@ fmt_newline(bool colon, bool atsign)
 	}
 }
 
-void
+static void
 fmt_tabulate(bool colon, bool atsign)
 {
 	int colnum, colinc;
@@ -1594,7 +1701,7 @@ fmt_tabulate(bool colon, bool atsign)
 	}
 }
 
-void
+static void
 fmt_asterisk(bool colon, bool atsign)
 {
 	int n;
@@ -1618,7 +1725,7 @@ fmt_asterisk(bool colon, bool atsign)
 	}
 }	
 
-void
+static void
 fmt_indirection(bool colon, bool atsign) {
 	object s, l;
 	fmt_old;
@@ -1661,7 +1768,7 @@ fmt_indirection(bool colon, bool atsign) {
 	}
 }
 
-void
+static void
 fmt_case(bool colon, bool atsign)
 {
 	VOL object x;
@@ -1729,7 +1836,7 @@ fmt_case(bool colon, bool atsign)
 		longjmp(*fmt_jmp_bufp, up_colon);
 }
 
-void
+static void
 fmt_conditional(bool colon, bool atsign)
 {
 	int i, j, k;
@@ -1818,7 +1925,7 @@ fmt_conditional(bool colon, bool atsign)
 	}
 }	
 
-void
+static void
 fmt_iteration(bool colon, bool atsign) {
 	int i,n;
 	VOL int j;
@@ -1943,7 +2050,7 @@ fmt_iteration(bool colon, bool atsign) {
 
 #define FORMAT_DIRECTIVE_LIMIT 100
 
-void
+static void
 fmt_justification(volatile bool colon, bool atsign)
 {
 	int mincol, colinc, minpad, padchar;
@@ -2043,7 +2150,7 @@ fmt_justification(volatile bool colon, bool atsign)
 }
 
 
-void
+static void
 fmt_up_and_out(bool colon, bool atsign)
 {
 	int i, j, k;
@@ -2072,7 +2179,7 @@ fmt_up_and_out(bool colon, bool atsign)
 }
 
 
-void
+static void
 fmt_semicolon(bool colon, bool atsign)
 {
 	fmt_not_atsign(atsign);
@@ -2084,7 +2191,7 @@ fmt_semicolon(bool colon, bool atsign)
 }
 
 DEFUNO_NEW("FORMAT",object,fLformat,LISP
-       ,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,Lformat,(object strm, object control,...),"")
+       ,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,void,Lformat,(object strm, object control,...),"")
 {       va_list ap; 
         VOL int nargs= VFUN_NARGS;
 	VOL object x = OBJNULL;
@@ -2155,7 +2262,7 @@ L:
 
 /*  object c_apply_n(long int (*fn) (), int n, object *x); */
 
-void
+static void
 fmt_error(char *s)
 {
 	vs_push(make_simple_string(s));

@@ -1014,7 +1014,9 @@ T388:;
 	goto T404;
 goto T405;
 T405:;}
-	(void)((*(LnkLI75))());
+	vs_base=vs_top;
+	(void) (*Lnk75)();
+	vs_top=sup;
 goto T404;
 T404:;
 	V159= fix((V160));}
@@ -1063,7 +1065,9 @@ T416:;
 	goto T432;
 goto T433;
 T433:;
-	(void)((*(LnkLI75))());
+	vs_base=vs_top;
+	(void) (*Lnk75)();
+	vs_top=sup;
 goto T432;
 T432:;
 	V159= (long)(V159)+(1);
@@ -1089,7 +1093,9 @@ T384:;
 	goto T445;
 goto T446;
 T446:;
-	(void)((*(LnkLI75))());
+	vs_base=vs_top;
+	(void) (*Lnk75)();
+	vs_top=sup;
 goto T445;
 T445:;
 	V146= (long)(V146)+(1);
@@ -1319,7 +1325,7 @@ T496:;
 	return;}}
 	}
 }
-static object  LnkTLI75(){return call_proc0(VV[75],(void **)&LnkLI75);} /* TYPE-ERROR */
+static void LnkT75(){ call_or_link(VV[75],(void **)&Lnk75);} /* TYPE-ERROR */
 static object  LnkTLI73(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[73],(void **)&LnkLI73,first,ap);va_end(ap);return V1;} /* FIND */
 static void LnkT72(){ call_or_link(VV[72],(void **)&Lnk72);} /* SPECIFIC-ERROR */
 static object  LnkTLI70(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[70],(void **)&LnkLI70,first,ap);va_end(ap);return V1;} /* COUNT */

@@ -32,7 +32,7 @@ object sKrehash_size;
 object sKrehash_threshold;
 
 
-unsigned int
+static unsigned int
 hash_eql(x)
 object x;
 {
@@ -86,7 +86,7 @@ object x;
 	}
 }
 
-unsigned int
+static unsigned int
 ihash_equal(x,depth)
 object x;
 int depth;
@@ -179,7 +179,7 @@ BEGIN:
 	}
 }
 		
-object
+static object
 hash_equal(x,depth)
 object x;
 int depth;
@@ -241,7 +241,7 @@ object hashtable;
 	return(&hashtable->ht.ht_self[j]);	/* added by chou */
 }
 
-void
+static void
 extend_hashtable(object);
 
 void
@@ -270,7 +270,7 @@ object key, hashtable, value;
 	e->hte_value = value;
 }
 	
-void
+static void
 extend_hashtable(hashtable)
 object hashtable;
 {
@@ -373,7 +373,7 @@ object hashtable;
 @)
 
 void
-Lhash_table_p()
+Lhash_table_p(void)
 {
 	check_arg(1);
 
@@ -488,10 +488,7 @@ Lmaphash()
 	vs_popp;
 }
 
-DEFUN("NEXT-HASH-TABLE-ENTRY",object,fSnext_hash_table_entry,SI,2,2,NONE,OO,OO,OO,OO,"For HASH-TABLE and for index I return three values: NEXT-START, the next KEY and its  VALUE.   NEXT-START will be -1 if there are no more entries, otherwise it will be a value suitable for passing as an index")
-(table,ind)
-object table;
-object ind;
+DEFUN_NEW("NEXT-HASH-TABLE-ENTRY",object,fSnext_hash_table_entry,SI,2,2,NONE,OO,OO,OO,OO,(object table,object ind),"For HASH-TABLE and for index I return three values: NEXT-START, the next KEY and its  VALUE.   NEXT-START will be -1 if there are no more entries, otherwise it will be a value suitable for passing as an index")
 { int i = fix(ind);
   check_type_hash_table(&table);
   if ( i < 0) { FEerror("needs non negative index",0);}
@@ -504,9 +501,8 @@ object ind;
    RETURN(3,object,small_fixnum(-1),(RV(sLnil),RV(sLnil)));
 }
 
-DEFUN("HASH-TABLE-TEST",object,fLhash_table_test,LISP,1,1,NONE,OO,OO,OO,OO,
- "Given a HASH-TABLE return a symbol which specifies the function used in its test") (table)
-object table;
+DEFUN_NEW("HASH-TABLE-TEST",object,fLhash_table_test,LISP,1,1,NONE,OO,OO,OO,OO,(object table),
+ "Given a HASH-TABLE return a symbol which specifies the function used in its test") 
 { switch(table->ht.ht_test) {
      case htt_equal: RETURN1(sLequal);
      case htt_eq: RETURN1(sLeq);
@@ -516,9 +512,7 @@ object table;
   RETURN1(sLnil);
 }
 
-DEFUN("HASH-TABLE-SIZE",object,fLhash_table_size,LISP,1,1,NONE,OO,OO,OO,OO,"")
-(table)
-object table;
+DEFUN_NEW("HASH-TABLE-SIZE",object,fLhash_table_size,LISP,1,1,NONE,OO,OO,OO,OO,(object table),"")
 {
   RETURN1(make_fixnum(table->ht.ht_size));
 

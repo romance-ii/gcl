@@ -102,7 +102,7 @@ struct sgc_firstword {short t; short sm;};
 #ifndef INSTALL_MPROTECT_HANDLER
 #define INSTALL_MPROTECT_HANDLER gcl_signal(SIGPROTV, memprotect_handler)
 #endif
-extern void memprotect_handler ();
+/* extern void memprotect_handler (); */
 
         
 #else  /* END SGC */

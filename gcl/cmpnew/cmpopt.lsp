@@ -1105,3 +1105,19 @@ type_of(#0)==t_bitvector")
 (push '((fixnum-float) boolean #.(flags)"(#0)==0")
    (get 'zerop 'inline-always))
 
+;;CMOD
+ (push '((t) t #.(flags) "cmod(#0)")
+   (get 'system:cmod 'inline-always))
+
+;;CTIMES
+ (push '((t t) t #.(flags) "ctimes(#0,#1)")
+   (get 'system:ctimes 'inline-always))
+
+;;CPLUS
+ (push '((t t) t #.(flags) "cplus(#0,#1)")
+   (get 'system:cplus 'inline-always))
+
+;;CDIFFERENCE
+ (push '((t t) t #.(flags) "cdifference(#0,#1)")
+   (get 'system:cdifference 'inline-always))
+

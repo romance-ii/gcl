@@ -72,10 +72,10 @@ object sSAprint_structureA;
 
 extern object coerce_stream(object,int);
 
-void
+static void
 flush_queue(int);
 
-void
+static void
 writec_queue(c)
 int c;
 {
@@ -88,7 +88,7 @@ int c;
 	qc++;
 }
 
-void
+static void
 flush_queue(int force)
 {
 	int c, i, j, k, l, i0;
@@ -231,10 +231,10 @@ char *s;
 		write_ch(*s++);
 }
 
-void
+static void
 write_decimal1(int);
 
-void
+static void
 write_decimal(i)
 int i;
 {
@@ -245,7 +245,7 @@ int i;
 	write_decimal1(i);
 }
 
-void
+static void
 write_decimal1(i)
 int i;
 {
@@ -255,7 +255,7 @@ int i;
 	write_ch(i%10 + '0');
 }
 
-void
+static void
 write_addr(x)
 object x;
 {
@@ -272,7 +272,7 @@ object x;
 	}
 }
 
-void
+static void
 write_base(void)
 {
 	if (PRINTbase == 2)
@@ -375,7 +375,7 @@ int *ep;
 	s[n] = '\0';
 }
 
-void
+static void
 write_double(d, e, shortp)
 double d;
 int e;
@@ -453,7 +453,7 @@ bool shortp;
 	write_decimal(exp);
 }
 
-void
+static void
 call_structure_print_function(x, level)
 object x;
 int level;
@@ -587,7 +587,7 @@ L:
 object copy_big();
 object coerce_big_to_string(object,int);
 
-bool
+static bool
 potential_number_p(object,int);
 
 void
@@ -1395,7 +1395,7 @@ int level;
 
 char travel_push_type[32]; 
 
-void
+static void
 travel_push_object(x)
 object x;
 {
@@ -1435,7 +1435,7 @@ BEGIN:
 	}
 }
 
-void
+static void
 setupPRINTcircle(x,dogensyms)
      object x;
      int dogensyms;
@@ -1526,7 +1526,7 @@ cleanupPRINT(void)
 		flush_queue(TRUE);
 }
 
-void
+/*static void
 write_object_by_default(x)
 object x;
 {
@@ -1534,18 +1534,18 @@ object x;
 	write_object(x, 0);
 	flush_stream(PRINTstream);
 	CLEANUP_PRINT_DEFAULT;
-}
+}*/
 
-void
+/*static void
 terpri_by_default()
 {
 	PRINTstream = symbol_value(sLAstandard_outputA);
 	if (type_of(PRINTstream) != t_stream)
 		FEwrong_type_argument(sLstream, PRINTstream);
         WRITEC_NEWLINE(PRINTstream);
-}
+}*/
 
-bool
+static bool
 potential_number_p(strng, base)
 object strng;
 int base;
@@ -2017,16 +2017,16 @@ object sym;
 
 }
 
-
-void
+/*
+static void
 pp(x)
 object x;
 {
 princ(x,Cnil);
 flush_stream(symbol_value(sLAstandard_outputA));
-}
+}*/
 
-object
+static object
 set_line_length(n)
 int n;
 {

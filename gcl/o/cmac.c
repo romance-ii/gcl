@@ -45,14 +45,14 @@ object make_integer(__mpz_struct *u);
 
 /* fix (and check) this on 64 bit machines, where long is the long long */
 #ifdef HAVE_LONG_LONG
-int
+static int
 dblrem(int a, int b, int mod)
 {
   return  (int)(((long long int)a*(long long int)b)%(long long int) mod);
 }
 #else
 
-int
+static int
 dblrem(a,b,mod)
 int a,b,mod;
 {int h,sign;
@@ -108,7 +108,7 @@ ctimes(object a, object b)
       MYmake_fixnum(return,res);}
 else if (mod==Cnil)
   { return(our_times(a,b));}
-return cmod(number_times(a,b));}
+ return cmod(number_times(a,b));}
 
 
 object
@@ -138,27 +138,27 @@ cplus(object a, object b)
    return(cmod(number_plus(a,b)));}
 
 
-DEFUNO("CMOD",object,fScmod,SI
-   ,1,1,NONE,OO,OO,OO,OO,siLcmod,"")(num)
-object num;
+DEFUNO_NEW("CMOD",object,fScmod,SI
+   ,1,1,NONE,OO,OO,OO,OO,void,siLcmod,(object num),"")
+
 {/* 1 args */
  num=cmod(num);
  RETURN1(num);
 }
 
 
-DEFUNO("CPLUS",object,fScplus,SI
-   ,2,2,NONE,OO,OO,OO,OO,siLcplus,"")(x0,x1)
-object x0,x1;
+DEFUNO_NEW("CPLUS",object,fScplus,SI
+   ,2,2,NONE,OO,OO,OO,OO,void,siLcplus,(object x0,object x1),"")
+
 { /* 2 args */
  x0 = cplus(x0,x1);
  RETURN1( x0 );
 }
 
 
-DEFUNO("CTIMES",object,fSctimes,SI
-   ,2,2,NONE,OO,OO,OO,OO,siLctimes,"")(x0,x1)
-object x0,x1;
+DEFUNO_NEW("CTIMES",object,fSctimes,SI
+   ,2,2,NONE,OO,OO,OO,OO,void,siLctimes,(object x0,object x1),"")
+
 {
  /* 2 args */
  x0=ctimes(x0,x1);
@@ -166,19 +166,19 @@ object x0,x1;
 }
 
 
-DEFUNO("CDIFFERENCE",object,fScdifference,SI
-   ,2,2,NONE,OO,OO,OO,OO,siLcdifference,"")(x0,x1)
-object x0,x1;
+DEFUNO_NEW("CDIFFERENCE",object,fScdifference,SI
+   ,2,2,NONE,OO,OO,OO,OO,void,siLcdifference,(object x0,object x1),"")
+
 { /* 2 args */
  x0=cdifference(x0,x1);
  RETURN1(x0);
 }
 
-object 
-memq(register object a, register object b)
-{while (1)
-    {if ((a==b->c.c_car)||b==Cnil) return b;
-    b=b->c.c_cdr;}}
+/* static object  */
+/* memq(register object a, register object b) */
+/* {while (1) */
+/*     {if ((a==b->c.c_car)||b==Cnil) return b; */
+/*     b=b->c.c_cdr;}} */
 
 
 void     

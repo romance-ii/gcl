@@ -32,6 +32,32 @@
 #include <stdlib.h>
 #include "include.h"
 
+
+#ifdef SGC
+static void
+sgc_contblock_sweep_phase(void);
+
+static void
+sgc_sweep_phase(void);
+
+static void
+sgc_mark_phase(void);
+
+static int
+sgc_count_writable(int);
+
+#endif
+
+static void
+mark_c_stack(jmp_buf, int, void (*)(void *,void *,int));
+
+static void
+mark_contblock(void *, int);
+
+static void
+mark_object(object);
+
+
 /* the following in line definitions seem to be twice as fast (at
    least on mc68020) as going to the assembly function calls in bitop.c so
    since this is more portable and faster lets use them --W. Schelter
@@ -76,7 +102,7 @@ int  first_protectable_page =0;
 
 
 
-char *copy_relblock(char *p, int s);
+static char *copy_relblock(char *p, int s);
 
 #include "page.h"
 
@@ -159,15 +185,15 @@ enter_mark_origin(object *p)
   mark_origin[mark_origin_max++] = p;
 }
 
-void
-enter_mark_origin_block(object *p, int n) {
-  if (mark_origin_block_max >= MARK_ORIGIN_BLOCK_MAX)
-    error("too many mark origin blocks");
-  mark_origin_block[mark_origin_block_max].mob_addr = p;
-  mark_origin_block[mark_origin_block_max++].mob_size = n;
-}
+/* static void */
+/* enter_mark_origin_block(object *p, int n) { */
+/*   if (mark_origin_block_max >= MARK_ORIGIN_BLOCK_MAX) */
+/*     error("too many mark origin blocks"); */
+/*   mark_origin_block[mark_origin_block_max].mob_addr = p; */
+/*   mark_origin_block[mark_origin_block_max++].mob_size = n; */
+/* } */
 
-void
+static void
 mark_cons(object x) {
   
   cs_check(x);
@@ -204,7 +230,7 @@ mark_cons(object x) {
    if one is live, the other will be made live */
 #define mark_displaced_field(ar) mark_object(ar->a.a_displaced)
 
-void
+static void
 mark_object(object x) {
   
   long i;
@@ -633,7 +659,7 @@ mark_object(object x) {
 
 static long *c_stack_where;
 
-void
+static void
 mark_stack_carefully(void *topv, void *bottomv, int offset) {
 
   int p,m,pageoffset;
@@ -680,7 +706,7 @@ mark_stack_carefully(void *topv, void *bottomv, int offset) {
 }
 
 
-void
+static void
 mark_phase(void) {
 
   STATIC int i, j;
@@ -825,7 +851,7 @@ void hppa_save_regs(struct regs);
 	asm(".end");
 #endif
 
-void
+static void
 mark_c_stack(jmp_buf env1, int n, void (*fn)(void *,void *,int)) {
 
 #if defined(__hppa__)
@@ -873,7 +899,7 @@ mark_c_stack(jmp_buf env1, int n, void (*fn)(void *,void *,int)) {
 
 }
 
-void
+static void
 sweep_phase(void) {
 
   STATIC int i, j, k;
@@ -963,7 +989,7 @@ sweep_phase(void) {
 #endif
 }
 
-void
+static void
 contblock_sweep_phase(void) {
 
   STATIC int i, j;
@@ -1314,7 +1340,7 @@ GBC(enum type t) {
   CHECK_INTERRUPT;
 }
 
-void
+static void
 siLroom_report(void) {
 
   int i;
@@ -1353,7 +1379,7 @@ siLroom_report(void) {
   }
 }
 
-void
+static void
 siLreset_gbc_count(void) {
 
   int i;
@@ -1370,7 +1396,7 @@ siLreset_gbc_count(void) {
    of sizeof(char *);
 */
 
-char *
+static char *
 copy_relblock(char *p, int s)
 { char *res = rb_pointer;
  char *q = rb_pointer1;
@@ -1385,7 +1411,7 @@ copy_relblock(char *p, int s)
 }
 
 
-void
+static void
 mark_contblock(void *p, int s) {
 
   STATIC char *q;
@@ -1400,9 +1426,9 @@ mark_contblock(void *p, int s) {
     set_mark_bit(x);
 }
 
-DEFUNO("GBC",object,fLgbc,LISP
-       ,1,1,NONE,OO,OO,OO,OO,Lgbc,"")(x0)
-     object x0;
+DEFUN_NEW("GBC",object,fLgbc,LISP
+       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
+
 {
   /* 1 args */
   
@@ -1415,7 +1441,7 @@ DEFUNO("GBC",object,fLgbc,LISP
   RETURN1(x0);
 }
 
-void
+static void
 siLgbc_time(void) {
   if (vs_top>vs_base)
     gc_time=fix(vs_base[0]);

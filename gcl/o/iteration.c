@@ -27,7 +27,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 
-void
+static void
 Floop(object form)
 {
 
@@ -79,7 +79,7 @@ LOOP:
 					during the main loop.
 */
 
-void
+static void
 do_var_list(object var_list)
 {
 
@@ -120,7 +120,7 @@ do_var_list(object var_list)
 	}
 }
 
-void
+static void
 Fdo(VOL object arg)
 {
 
@@ -205,7 +205,7 @@ END:
 	lex_env = oldlex;
 }
 
-void
+static void
 FdoA(VOL object arg)
 {
 
@@ -283,7 +283,7 @@ END:
 	lex_env = oldlex;
 }
 
-void
+static void
 Fdolist(VOL object arg)
 {
 
@@ -364,7 +364,7 @@ END:
 	lex_env = oldlex;
 }
 
-void
+static void
 Fdotimes(VOL object arg)
 {
 

@@ -31,11 +31,15 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "include.h"
 #include "page.h"
 
+static int
+t_from_type(object);
+
+
 DEFVAR("*AFTER-GBC-HOOK*",sSAafter_gbc_hookA,SI,sLnil,"");
 DEFVAR("*IGNORE-MAXIMUM-PAGES*",sSAignore_maximum_pagesA,SI,sLt,"");
 #define IGNORE_MAX_PAGES (sSAignore_maximum_pagesA ==0 || sSAignore_maximum_pagesA->s.s_dbind !=sLnil) 
 
-void call_after_gbc_hook(int t);
+static void call_after_gbc_hook(int t);
 
 #ifdef DEBUG_SBRK
 int debug;
@@ -200,7 +204,7 @@ type_name(int t)
 { return make_simple_string(tm_table[(int)t].tm_name+1);}
 
 
-void
+static void
 call_after_gbc_hook(t)
 { if (sSAafter_gbc_hookA && sSAafter_gbc_hookA->s.s_dbind!= Cnil)
     { set_up_string_register(tm_table[(int)t].tm_name+1);
@@ -279,7 +283,7 @@ Use ALLOCATE to expand the space.",
 	goto ONCE_MORE;
 }
 
-int
+static int
 grow_linear(int old, int fract, int grow_min, int grow_max) {
   
   int delt;
@@ -374,7 +378,7 @@ object on_stack_cons(object x, object y)
 }
 
 
-DEFUN_NEW("ALLOCATED",object,fSallocated,SI,2,2,NONE,OO,OO,OO,OO,(object typ),"")
+DEFUN_NEW("ALLOCATED",object,fSallocated,SI,1,1,NONE,OO,OO,OO,OO,(object typ),"")
 { struct typemanager *tm=(&tm_table[t_from_type(typ)]);
   tm = & tm_table[tm->tm_type];
   if (tm->tm_type == t_relocatable)
@@ -564,7 +568,7 @@ Use ALLOCATE-RELOCATABLE-PAGES to expand the space.",
 	return(p);
 }
 
-void
+static void
 init_tm(enum type t, char *name, int elsize, int nelts, int sgc) {
 
   int i, j;
@@ -732,13 +736,13 @@ DEFUN_NEW("STATICP",object,fSstaticp,SI,1,1,NONE,OO,OO,OO,OO,(object x),"Tell if
 { RETURN1((inheap(x->ust.ust_self) ? sLt : sLnil));
 }
 
-void
-cant_get_a_type(void) {
-  FEerror("Can't get a type.", 0);
-}
+/* static void */
+/* cant_get_a_type(void) { */
+/*   FEerror("Can't get a type.", 0); */
+/* } */
 
-DEFUNO_NEW("ALLOCATE",object,fSallocate,SI
-       ,2,3,NONE,OO,IO,OO,OO,siLallocate,(object type,int npages,...),"")
+DEFUN_NEW("ALLOCATE",object,fSallocate,SI
+       ,2,3,NONE,OO,IO,OO,OO,(object type,int npages,...),"")
 {
 
   int nargs=VFUN_NARGS;
@@ -790,7 +794,7 @@ DEFUNO_NEW("ALLOCATE",object,fSallocate,SI
 
 }
 
-int
+static int
 t_from_type(object type) {
  
   int i;
@@ -858,8 +862,8 @@ DEFUN_NEW("ALLOCATE-GROWTH",object,fSallocate_growth,SI,5,5,NONE,OO,II,II,OO,
 
 
 
-DEFUNO_NEW("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
-       ,1,2,NONE,OI,OO,OO,OO,siLalloc_contpage,(int npages,...),"")
+DEFUN_NEW("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
+       ,1,2,NONE,OI,OO,OO,OO,(int npages,...),"")
 {
 
   int nargs=VFUN_NARGS,i,m;
@@ -899,23 +903,23 @@ DEFUNO_NEW("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
 }
 
 
-DEFUNO_NEW("ALLOCATED-CONTIGUOUS-PAGES",object,fSallocated_contiguous_pages,SI
-       ,0,0,NONE,OO,OO,OO,OO,siLncbpage,(void),"")
+DEFUN_NEW("ALLOCATED-CONTIGUOUS-PAGES",object,fSallocated_contiguous_pages,SI
+       ,0,0,NONE,OO,OO,OO,OO,(void),"")
 {
 	/* 0 args */
 	RETURN1((make_fixnum(ncbpage)));
 }
 
-DEFUNO_NEW("MAXIMUM-CONTIGUOUS-PAGES",object,fSmaximum_contiguous_pages,SI
-       ,0,0,NONE,OO,OO,OO,OO,siLmaxcbpage,(void),"")
+DEFUN_NEW("MAXIMUM-CONTIGUOUS-PAGES",object,fSmaximum_contiguous_pages,SI
+       ,0,0,NONE,OO,OO,OO,OO,(void),"")
 {
 	/* 0 args */
 	RETURN1((make_fixnum(maxcbpage)));
 }
 
 
-DEFUNO_NEW("ALLOCATE-RELOCATABLE-PAGES",object,fSallocate_relocatable_pages,SI
-       ,1,2,NONE,OI,OO,OO,OO,siLalloc_relpage,(int npages,...),"")
+DEFUN_NEW("ALLOCATE-RELOCATABLE-PAGES",object,fSallocate_relocatable_pages,SI
+       ,1,2,NONE,OI,OO,OO,OO,(int npages,...),"")
 {
 
   int nargs=VFUN_NARGS;
@@ -946,22 +950,22 @@ DEFUNO_NEW("ALLOCATE-RELOCATABLE-PAGES",object,fSallocate_relocatable_pages,SI
 
 }
 
-DEFUNO_NEW("ALLOCATED-RELOCATABLE-PAGES",object,fSallocated_relocatable_pages,SI
-       ,0,0,NONE,OO,OO,OO,OO,siLnrbpage,(void),"")
+DEFUN_NEW("ALLOCATED-RELOCATABLE-PAGES",object,fSallocated_relocatable_pages,SI
+       ,0,0,NONE,OO,OO,OO,OO,(void),"")
 {
 	/* 0 args */
 	RETURN1(make_fixnum(nrbpage));
 }
 
-DEFUNO_NEW("GET-HOLE-SIZE",object,fSget_hole_size,SI
-       ,0,0,NONE,OO,OO,OO,OO,siLget_hole_size,(void),"")
+DEFUN_NEW("GET-HOLE-SIZE",object,fSget_hole_size,SI
+       ,0,0,NONE,OO,OO,OO,OO,(void),"")
 {
 	/* 0 args */
 	RETURN1((make_fixnum(new_holepage)));
 }
 
-DEFUNO_NEW("SET-HOLE-SIZE",object,fSset_hole_size,SI
-       ,1,2,NONE,OI,IO,OO,OO,siLset_hole_size,(int npages,...),"")
+DEFUN_NEW("SET-HOLE-SIZE",object,fSset_hole_size,SI
+       ,1,2,NONE,OI,IO,OO,OO,(int npages,...),"")
 {
 
   int nargs=VFUN_NARGS;
@@ -1218,7 +1222,7 @@ cfree(void *ptr) {
 
 
 #ifndef GNUMALLOC
-void *
+static void *
 memalign(size_t align,size_t size) { 
   object x = alloc_simple_string(size);
   x->st.st_self = ALLOC_ALIGNED(alloc_contblock,size,align);

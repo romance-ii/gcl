@@ -90,7 +90,7 @@ object LSP_string;
 
 object sSAignore_eof_on_terminal_ioA;
 
-bool
+static bool
 feof1(fp)
 FILE *fp;
 {
@@ -129,7 +129,7 @@ object strm;
 	from the stream,
 	but only checks the mode of the stream (sm_mode).
 */
-bool
+static bool
 input_stream_p(strm)
 object strm;
 {
@@ -185,7 +185,7 @@ BEGIN:
 	to the stream,
 	but only checks the mode of the stream (sm_mode).
 */
-bool
+static bool
 output_stream_p(strm)
 object strm;
 {
@@ -234,7 +234,7 @@ BEGIN:
 	}
 }
 
-object
+static object
 stream_element_type(strm)
 object strm;
 {
@@ -288,7 +288,7 @@ BEGIN:
 }
 
 #ifndef NO_SETBUF
-void
+static void
 setup_stream_buffer(x)
      object x;
 {char *buf=alloc_contblock(BUFSIZ);
@@ -299,7 +299,7 @@ setup_stream_buffer(x)
 	setbuf(x->sm.sm_fp, buf);
 }	
 
-void
+static void
 deallocate_stream_buffer(strm)
 object strm;
 {
@@ -318,11 +318,11 @@ object strm;
 
 DEFVAR("*ALLOW-GZIPPED-FILE*",sSAallow_gzipped_fileA,SI,sLnil,"");
 
-void
+static void
 too_long_file_name(object);
-void
+static void
 cannot_open(object);
-void
+static void
 cannot_create(object);
 /*
 	Open_stream(fn, smm, if_exists, if_does_not_exist)
@@ -484,7 +484,7 @@ object if_exists, if_does_not_exist;
 	return(x);
 }
 
-void
+static void
 gclFlushSocket(object);
 /*
 	Close_stream(strm) closes stream strm.
@@ -580,7 +580,7 @@ BEGIN:
 	}
 }
 
-object
+static object
 make_two_way_stream(istrm, ostrm)
 object istrm, ostrm;
 {
@@ -595,7 +595,7 @@ object istrm, ostrm;
 	return(strm);
 }
 
-object
+static object
 make_echo_stream(istrm, ostrm)
 object istrm, ostrm;
 {
@@ -651,7 +651,7 @@ int line_length;
 	return(strm);
 }
 
-object
+static object
 get_output_stream_string(strm)
 object strm;
 {
@@ -662,10 +662,10 @@ object strm;
 	return(strng);
 }
 
-void
+static void
 cannot_read(object);
 
-void
+static void
 closed_stream(object);
 int
 readc_stream(strm)
@@ -862,11 +862,11 @@ UNREAD_ERROR:
 	FEerror("Cannot unread the stream ~S.", 1, strm);
 }
 
-void
+static void
 putCharGclSocket(object,int);
 int
 rl_putc_em(int, FILE *);
-void
+static void
 cannot_write(object);
 
 int
@@ -1333,7 +1333,7 @@ BEGIN:
 	}
 }
 
-int
+static int
 file_length(strm)
 object strm;
 {
@@ -1492,7 +1492,7 @@ Lmake_broadcast_stream()
 	vs_base[0] = x;
 }
 
-void
+static void
 Lmake_concatenated_stream()
 {
 	object x;
@@ -1545,7 +1545,7 @@ Lmake_echo_stream()
 	vs_popp;
 }
 
-@(defun make_string_input_stream (strng &o istart iend)
+@(static defun make_string_input_stream (strng &o istart iend)
 	int s, e;
 @
 	check_type_string(&strng);
@@ -1571,14 +1571,14 @@ for the string ~S.",
 		3, istart, iend, strng);
 @)
 
-void
+static void
 Lmake_string_output_stream()
 {
 	check_arg(0);
 	vs_push(make_string_output_stream(64));
 }
 
-void
+static void
 Lget_output_stream_string()
 {
 	check_arg(1);
@@ -1656,7 +1656,7 @@ Lstream_element_type()
 	@(return Ct)
 @)
 
-@(defun open (filename
+@(static defun open (filename
 	      &key (direction sKinput)
 		   (element_type sLstring_char)
 		   (if_exists Cnil iesp)
@@ -1744,7 +1744,7 @@ Lfile_length()
 
 object sSAload_pathnameA;
 
-@(defun load (pathname
+@(static defun load (pathname
 	      &key (verbose `symbol_value(sLAload_verboseA)`)
 		    print
 		    (if_does_not_exist sKerror)
@@ -1902,7 +1902,7 @@ object sSAload_pathnameA;
 	@(return Ct)
 @)
 
-void
+static void
 siLget_string_input_stream_index()
 {
 	check_arg(1);
@@ -1912,7 +1912,7 @@ siLget_string_input_stream_index()
 	vs_base[0] = make_fixnum(STRING_INPUT_STREAM_NEXT(vs_base[0]));
 }
 
-void
+static void
 siLmake_string_output_stream_from_string()
 {
 	object strng, strm;
@@ -1951,35 +1951,35 @@ siLcopy_stream()
 #endif
 }
 
-void
+static void
 too_long_file_name(fn)
 object fn;
 {
 	FEerror("~S is a too long file name.", 1, fn);
 }
 
-void
+static void
 cannot_open(fn)
 object fn;
 {
 	FEerror("Cannot open the file ~A.", 1, fn);
 }
 
-void
+static void
 cannot_create(fn)
 object fn;
 {
 	FEerror("Cannot create the file ~A.", 1, fn);
 }
 
-void
+static void
 cannot_read(strm)
 object strm;
 {
 	FEerror("Cannot read the stream ~S.", 1, strm);
 }
 
-void
+static void
 cannot_write(strm)
 object strm;
 {
@@ -1988,7 +1988,7 @@ object strm;
 
 #ifdef USER_DEFINED_STREAMS
 /* more support for user defined streams */
-void
+static void
 siLuser_stream_state()
 {     
   check_arg(1);
@@ -2000,7 +2000,7 @@ siLuser_stream_state()
 }
 #endif
 
-void
+static void
 closed_stream(strm)
 object strm;
 {
@@ -2062,20 +2062,20 @@ int out;
  return(strm);
 }
 
-void
+static void
 siLfp_output_stream()
 {check_arg(1);
  vs_base[0]=coerce_stream(vs_base[0],1);
 }
 
-void
+static void
 siLfp_input_stream()
 {check_arg(1);
  vs_base[0]=coerce_stream(vs_base[0],0);
 }
  
 
-@(defun fwrite (vector start count stream)
+@(static defun fwrite (vector start count stream)
   unsigned char *p;
   int n,beg;
 @  
@@ -2088,7 +2088,7 @@ siLfp_input_stream()
   @(return Cnil);
 @)
 
-@(defun fread (vector start count stream)
+@(static defun fread (vector start count stream)
   unsigned char *p;
   int n,beg;
 @  
@@ -2122,7 +2122,7 @@ siLfp_input_stream()
   Side Effects:  The buffer may be filled, and the fill pointer
   of the buffer may be changed.
  */
-void
+static void
 putCharGclSocket(strm,ch)
   object strm;
   int ch;
@@ -2141,7 +2141,7 @@ putCharGclSocket(strm,ch)
   }
 }
 
-void
+static void
 gclFlushSocket(strm)
      object strm;
 
@@ -2219,7 +2219,7 @@ object async;
   return x;
 }
      
-@(defun socket (port &key host server async myaddr myport)
+@(static defun socket (port &key host server async myaddr myport)
              /*
 	     HOST is a string then connection is made to that
                           ip or domain address.

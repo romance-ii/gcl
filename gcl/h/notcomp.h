@@ -14,7 +14,7 @@ EXTER object sSAnotify_gbcA;
 /* symbols which are not needed in compiled lisp code */
 EXTER int interrupt_flag,initflag,interrupt_enable;
 void install_default_signals();
-void sigint(),sigalrm();
+/* void sigint(),sigalrm(); */
 void segmentation_catcher();
 
 
@@ -85,10 +85,10 @@ void old(void) \
 */
 
 /* for defining old style */
-#define DEFUNO_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,old,args,doc) \
+#define DEFUNO_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,oldret,old,args,doc) \
   ret fname args; \
-void old(void) \
-{   Iinvoke_c_function_from_value_stack((ret (*)())fname,F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
+oldret old(void) \
+{   Iinvoke_c_function_from_value_stack((object (*)())fname,F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
     return;} \
   ret fname args
 

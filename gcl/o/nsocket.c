@@ -325,9 +325,8 @@ doConnect(host,port)
 
 #define SOCKET_FD(strm) ((strm)->sm.sm_fp ? fileno((strm)->sm.sm_fp) : -1)
 
-DEFUN("GETPEERNAME",object,fSgetpeername,SI,1,1,NONE,OO,OO,OO,OO,
- "Return a list of three elements: the address, the hostname and the port for the other end of the socket.  If hostname is not available it will be equal to the address.  Invalid on server sockets. Return NIL on failure.")(sock)
-object sock;
+DEFUN_NEW("GETPEERNAME",object,fSgetpeername,SI,1,1,NONE,OO,OO,OO,OO,(object sock),
+ "Return a list of three elements: the address, the hostname and the port for the other end of the socket.  If hostname is not available it will be equal to the address.  Invalid on server sockets. Return NIL on failure.")
 {
  struct sockaddr_in peername;
  int size = sizeof(struct sockaddr_in);
@@ -349,9 +348,8 @@ object sock;
 }
 	    
 
-DEFUN("GETSOCKNAME",object,fSgetsockname,SI,1,1,NONE,OO,OO,OO,OO,
- "Return a list of three elements: the address, the hostname and the port for the socket.  If hostname is not available it will be equal to the address. Return NIL on failure. ")(sock)
-object sock;
+DEFUN_NEW("GETSOCKNAME",object,fSgetsockname,SI,1,1,NONE,OO,OO,OO,OO,(object sock),
+ "Return a list of three elements: the address, the hostname and the port for the socket.  If hostname is not available it will be equal to the address. Return NIL on failure. ")
 { struct sockaddr_in sockname;
  int size = sizeof(struct sockaddr_in);
  struct hostent *hostEntPtr;
@@ -381,10 +379,8 @@ object sock;
      the channel is setto blocking or nonblocking mode. 
 */  
 
-DEFUN("SET-BLOCKING",object,fSset_blocking,SI,2,2,NONE,OO,OO,OO,OO,
-      "Set blocking on if MODE is T otherwise off.  Return 0 if succeeds. Otherwise the error number.")(sock,setBlocking)
-      object sock;
-      object setBlocking;
+DEFUN_NEW("SET-BLOCKING",object,fSset_blocking,SI,2,2,NONE,OO,OO,OO,OO,(object sock,object setBlocking),
+      "Set blocking on if MODE is T otherwise off.  Return 0 if succeeds. Otherwise the error number.")
 {
       int setting;
       int fd ;
@@ -473,7 +469,7 @@ update ()
 }
 */
 
-int
+static int
 joe(int x) { return x; }
 
 /*
@@ -594,7 +590,7 @@ tcpCloseSocket(int fd)
 
 }
 
-void
+static void
 doReverse(char *s, int n)
 { char *p=&s[n-1];
   int m = n/2;

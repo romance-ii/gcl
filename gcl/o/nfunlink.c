@@ -66,114 +66,114 @@ union {int i;
 
  
 
-object
-Icall_proc(object fun_name, int link_desk, object (**link_loc) (/* ??? */), va_list ap)
-{ object fun,res;
-  object (*fn)();
-  int nargs;
-  unsigned int fargd ;
+/* static object */
+/* Icall_proc(object fun_name, int link_desk, object (**link_loc) (/\* ??? *\/), va_list ap) */
+/* { object fun,res; */
+/*   object (*fn)(); */
+/*   int nargs; */
+/*   unsigned int fargd ; */
    /* used for laying out a call
       in the bad case.   This could be static, but it would
       need gcprotecting, and saving at interrupts.
     */
-  object vec [64];
-  if (type_of(fun_name)!=t_symbol || fun_name->s.s_gfdef ==0
-      )
-    fun_name = IisFboundp(fun_name);
-  if (fun_name->s.s_sfdef != NOT_SPECIAL || fun_name->s.s_mflag)
-    FEinvalid_function(fun_name);
-  fun = fun_name->s.s_gfdef;
-  if (Rset == 0 ||
-      !( type_of(fun)==t_afun || type_of(fun)==t_closure))
-    goto GENERAL;
-  fn = (void *)  fun->sfn.sfn_self;
-  fargd =  fun->sfn.sfn_argd;
-  if ( (F_ARG_FLAGS(fargd) & F_ARG_FLAGS(link_desk)) == F_ARG_FLAGS(fargd)
-      && F_MIN_ARGS(fargd) <= F_MIN_ARGS(link_desk)
-      && F_MAX_ARGS(fargd) >= F_MIN_ARGS(link_desk)
-      && F_TYPES(fargd) == F_TYPES(link_desk))
-    {				/* do the link */
-      (void) vpush_extend(link_loc,sLAlink_arrayA->s.s_dbind); 
-      (void) vpush_extend(*link_loc,sLAlink_arrayA->s.s_dbind);
-      *link_loc = fn;}
+/*   object vec [64]; */
+/*   if (type_of(fun_name)!=t_symbol || fun_name->s.s_gfdef ==0 */
+/*       ) */
+/*     fun_name = IisFboundp(fun_name); */
+/*   if (fun_name->s.s_sfdef != NOT_SPECIAL || fun_name->s.s_mflag) */
+/*     FEinvalid_function(fun_name); */
+/*   fun = fun_name->s.s_gfdef; */
+/*   if (Rset == 0 || */
+/*       !( type_of(fun)==t_afun || type_of(fun)==t_closure)) */
+/*     goto GENERAL; */
+/*   fn = (void *)  fun->sfn.sfn_self; */
+/*   fargd =  fun->sfn.sfn_argd; */
+/*   if ( (F_ARG_FLAGS(fargd) & F_ARG_FLAGS(link_desk)) == F_ARG_FLAGS(fargd) */
+/*       && F_MIN_ARGS(fargd) <= F_MIN_ARGS(link_desk) */
+/*       && F_MAX_ARGS(fargd) >= F_MIN_ARGS(link_desk) */
+/*       && F_TYPES(fargd) == F_TYPES(link_desk)) */
+/*     {				/\* do the link *\/ */
+/*       (void) vpush_extend(link_loc,sLAlink_arrayA->s.s_dbind);  */
+/*       (void) vpush_extend(*link_loc,sLAlink_arrayA->s.s_dbind); */
+/*       *link_loc = fn;} */
   /* make this call */
 
   /* figure out the true number of args passed */
-  nargs = (F_ARG_FLAGS_P(link_desk,F_requires_nargs) ?
-	   F_NARGS(VFUN_NARGS) : F_NARGS(link_desk));
-  {unsigned int  atypes = (F_TYPES(link_desk) >> F_TYPE_WIDTH);
-   unsigned int  ftypes = (F_TYPES(fargd) >> F_TYPE_WIDTH);
-   int i;
-   object *new ;
-   if (atypes==ftypes)
-     {
-#ifdef MUST_COPY_VA_LIST
-       new = vec;
-       for (i=0; i < nargs ; i++) new[i] = va_arg(ap,object);
-#else
-     new = (object *) ap;
-#endif       
-     }
-   else
-     { new = vec;
-       for (i = 0; i < nargs ; i++, atypes >>= F_TYPE_WIDTH,
-	    ftypes >>= F_TYPE_WIDTH)
-	 { int atyp = atypes & MASK_RANGE(0,F_TYPE_WIDTH);
-	   int ftyp = ftypes & MASK_RANGE(0,F_TYPE_WIDTH);
-	   object next = va_arg(ap,object);
-	   new [i] = COERCE_F_TYPE(next, atyp ,ftyp);
-	 }}
-   res = c_apply_n(fn,nargs,new);
-   { int lret_type = F_TYPES(link_desk) & MASK_RANGE(0,F_TYPE_WIDTH);
-     int fret_type = F_TYPES(fargd) & MASK_RANGE(0,F_TYPE_WIDTH);
-     return  COERCE_F_TYPE(res,fret_type,lret_type);
-   }}
+/*   nargs = (F_ARG_FLAGS_P(link_desk,F_requires_nargs) ? */
+/* 	   F_NARGS(VFUN_NARGS) : F_NARGS(link_desk)); */
+/*   {unsigned int  atypes = (F_TYPES(link_desk) >> F_TYPE_WIDTH); */
+/*    unsigned int  ftypes = (F_TYPES(fargd) >> F_TYPE_WIDTH); */
+/*    int i; */
+/*    object *new ; */
+/*    if (atypes==ftypes) */
+/*      { */
+/* #ifdef MUST_COPY_VA_LIST */
+/*        new = vec; */
+/*        for (i=0; i < nargs ; i++) new[i] = va_arg(ap,object); */
+/* #else */
+/*      new = (object *) ap; */
+/* #endif        */
+/*      } */
+/*    else */
+/*      { new = vec; */
+/*        for (i = 0; i < nargs ; i++, atypes >>= F_TYPE_WIDTH, */
+/* 	    ftypes >>= F_TYPE_WIDTH) */
+/* 	 { int atyp = atypes & MASK_RANGE(0,F_TYPE_WIDTH); */
+/* 	   int ftyp = ftypes & MASK_RANGE(0,F_TYPE_WIDTH); */
+/* 	   object next = va_arg(ap,object); */
+/* 	   new [i] = COERCE_F_TYPE(next, atyp ,ftyp); */
+/* 	 }} */
+/*    res = c_apply_n(fn,nargs,new); */
+/*    { int lret_type = F_TYPES(link_desk) & MASK_RANGE(0,F_TYPE_WIDTH); */
+/*      int fret_type = F_TYPES(fargd) & MASK_RANGE(0,F_TYPE_WIDTH); */
+/*      return  COERCE_F_TYPE(res,fret_type,lret_type); */
+/*    }} */
 
-   GENERAL:
+/*    GENERAL: */
   /* figure out the true number of args passed */
-  nargs = (F_ARG_FLAGS_P(link_desk,F_requires_nargs) ?
-	   F_NARGS(VFUN_NARGS) : F_NARGS(link_desk));
+/*   nargs = (F_ARG_FLAGS_P(link_desk,F_requires_nargs) ? */
+/* 	   F_NARGS(VFUN_NARGS) : F_NARGS(link_desk)); */
   
-  { int atypes,i,restype;
-    object res;
-    object *base = vs_top;
-#define DEBUG
-#ifdef DEBUG
-    bds_ptr oldbd = bds_top;
-    frame_ptr oldctl = frs_top;
-#endif    
+/*   { int atypes,i,restype; */
+/*     object res; */
+/*     object *base = vs_top; */
+/* #define DEBUG */
+/* #ifdef DEBUG */
+/*     bds_ptr oldbd = bds_top; */
+/*     frame_ptr oldctl = frs_top; */
+/* #endif     */
     
-    restype = F_RESULT_TYPE(link_desk);
-    atypes = F_TYPES(link_desk)>> F_TYPE_WIDTH;
+/*     restype = F_RESULT_TYPE(link_desk); */
+/*     atypes = F_TYPES(link_desk)>> F_TYPE_WIDTH; */
 
-    vs_top+= nargs;
-    for (i=0; i < nargs ; i++, atypes >>= F_TYPE_WIDTH)
-      { object next = va_arg(ap,object);
-	int atyp = atypes & MASK_RANGE(0,F_TYPE_WIDTH);
-	base[i] = COERCE_F_TYPE(next,atyp,F_object);}
-    res = IapplyVector(fun,nargs,base);
-    vs_top = base;
-    res = COERCE_F_TYPE(res,F_object,restype);
-#ifdef DEBUG
-    if (oldctl != frs_top || oldbd  != bds_top)
-      FEerror("compiler error ? ",0 );
-#endif      
-    return res;
-}}
+/*     vs_top+= nargs; */
+/*     for (i=0; i < nargs ; i++, atypes >>= F_TYPE_WIDTH) */
+/*       { object next = va_arg(ap,object); */
+/* 	int atyp = atypes & MASK_RANGE(0,F_TYPE_WIDTH); */
+/* 	base[i] = COERCE_F_TYPE(next,atyp,F_object);} */
+/*     res = IapplyVector(fun,nargs,base); */
+/*     vs_top = base; */
+/*     res = COERCE_F_TYPE(res,F_object,restype); */
+/* #ifdef DEBUG */
+/*     if (oldctl != frs_top || oldbd  != bds_top) */
+/*       FEerror("compiler error ? ",0 ); */
+/* #endif       */
+/*     return res; */
+/* }} */
 
 /* for making a link which calls a function returning a double
    
  */
 
-float
-Icall_proc_float(object fun_name, int link_desk, object (**link_loc) (/* ??? */), va_list ap)
-{ object val;
-  val = Icall_proc(fun_name,link_desk,link_loc,ap);
-  { union { void *p;
-	    float f;} bil;
-    bil.p = val;
-    return bil.f;}
-}
+/* static float */
+/* Icall_proc_float(object fun_name, int link_desk, object (**link_loc) (/\* ??? *\/), va_list ap) */
+/* { object val; */
+/*   val = Icall_proc(fun_name,link_desk,link_loc,ap); */
+/*   { union { void *p; */
+/* 	    float f;} bil; */
+/*     bil.p = val; */
+/*     return bil.f;} */
+/* } */
 
 object
 IapplyVector(object fun, int nargs, object *base)
@@ -310,23 +310,23 @@ Iinvoke_c_function_from_value_stack(object (*f)(), int fargd)
 
 #define TYPE_STRING(i) (i == F_object ? "object" : i == F_int ?  "int" : i == F_double_ptr ? "double ptr" : "unknown")
 
-int
-print_fargd(int fargd)
-{ int i;
-  int nargs = 7;
-  unsigned int  ftypes = (F_TYPES(fargd) >> F_TYPE_WIDTH);
+/* static int */
+/* print_fargd(int fargd) */
+/* { int i; */
+/*   int nargs = 7; */
+/*   unsigned int  ftypes = (F_TYPES(fargd) >> F_TYPE_WIDTH); */
 
-  printf("minargs=%d,maxargs=%d, arg_types=(",F_MIN_ARGS(fargd),
-	 F_MAX_ARGS(fargd));
-  for (i = 0; i < F_MAX_ARGS(fargd) ; i++, ftypes >>= F_TYPE_WIDTH)
-    {int ftyp = ftypes & MASK_RANGE(0,F_TYPE_WIDTH);
-     printf(" %s,",TYPE_STRING(ftyp));
-     if (i >= nargs) { printf("...object..");  break;}
-   }
-  printf(") result_type=%s\n",TYPE_STRING(F_RESULT_TYPE(fargd)));
-  fflush(stdout);
-  return 0;
-}
+/*   printf("minargs=%d,maxargs=%d, arg_types=(",F_MIN_ARGS(fargd), */
+/* 	 F_MAX_ARGS(fargd)); */
+/*   for (i = 0; i < F_MAX_ARGS(fargd) ; i++, ftypes >>= F_TYPE_WIDTH) */
+/*     {int ftyp = ftypes & MASK_RANGE(0,F_TYPE_WIDTH); */
+/*      printf(" %s,",TYPE_STRING(ftyp)); */
+/*      if (i >= nargs) { printf("...object..");  break;} */
+/*    } */
+/*   printf(") result_type=%s\n",TYPE_STRING(F_RESULT_TYPE(fargd))); */
+/*   fflush(stdout); */
+/*   return 0; */
+/* } */
      
   
   

@@ -28,12 +28,12 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdlib.h>
 #include "include.h"
 
-DEFUN("NULL",object,fLnot,LISP
-   ,1,1,NONE,OO,OO,OO,OO,"")();
+DEFUNO_NEW("NULL",object,fLnot,LISP
+	  ,1,1,NONE,OO,OO,OO,OO,void,Lnull,(object x0),"");
 
-DEFUNO("NOT",object,fLnot,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lnull,"")(x0)
-object x0;
+DEFUN_NEW("NOT",object,fLnot,LISP
+   ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
+
 {
     /* 1 args */
 
@@ -44,9 +44,9 @@ object x0;
 	RETURN1(x0);
 }
 
-DEFUNO("SYMBOLP",object,fLsymbolp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lsymbolp,"")(x0)
-object x0;
+DEFUNO_NEW("SYMBOLP",object,fLsymbolp,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Lsymbolp,(object x0),"")
+
 {
 	/* 1 args */
 
@@ -57,9 +57,9 @@ object x0;
 	RETURN1(x0);
 }
 
-DEFUNO("ATOM",object,fLatom  ,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Latom  ,"")(x0)
-object x0;
+DEFUNO_NEW("ATOM",object,fLatom  ,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Latom,(object x0),"")
+
 {
 	/* 1 args */
 
@@ -70,9 +70,9 @@ object x0;
 	RETURN1(x0);
 }
 
-DEFUNO("CONSP",object,fLconsp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lconsp,"")(x0)
-object x0;
+DEFUNO_NEW("CONSP",object,fLconsp,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Lconsp,(object x0),"")
+
 {
 	/* 1 args */
 
@@ -83,9 +83,9 @@ object x0;
 	RETURN1(x0);
 }
 
-DEFUNO("LISTP",object,fLlistp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Llistp,"")(x0)
-object x0;
+DEFUNO_NEW("LISTP",object,fLlistp,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Llistp,(object x0),"")
+
 {
 	/* 1 args */
 
@@ -96,9 +96,9 @@ object x0;
 	RETURN1(x0);
 }
 
-DEFUNO("NUMBERP",object,fLnumberp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lnumberp,"")(x0)
-object x0;
+DEFUNO_NEW("NUMBERP",object,fLnumberp,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Lnumberp,(object x0),"")
+
 {
 	enum type t;
 	/* 1 args */
@@ -113,9 +113,9 @@ object x0;
 	RETURN1(x0);
 }
 
-DEFUNO("INTEGERP",object,fLintegerp ,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lintegerp ,"")(x0)
-object x0;
+DEFUNO_NEW("INTEGERP",object,fLintegerp ,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Lintegerp,(object x0),"")
+
 {
 	enum type t;
 	/* 1 args */
@@ -128,9 +128,9 @@ object x0;
 	RETURN1(x0);
 }
 
-DEFUNO("RATIONALP",object,fLrationalp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lrationalp,"")(x0)
-object x0;
+DEFUN_NEW("RATIONALP",object,fLrationalp,LISP
+   ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
+
 {
 	enum type t;
 	/* 1 args */
@@ -144,9 +144,8 @@ object x0;
 }
 
 
-DEFUN("REALP",object,fLrealp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,"")(x0)
-object x0;
+DEFUN_NEW("REALP",object,fLrealp,LISP
+   ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
 {
 	enum type t;
 	t = type_of(x0);
@@ -160,9 +159,9 @@ object x0;
 
 
 
-DEFUNO("FLOATP",object,fLfloatp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lfloatp,"")(x0)
-object x0;
+DEFUNO_NEW("FLOATP",object,fLfloatp,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Lfloatp,(object x0),"")
+
 {
 	enum type t;
 	/* 1 args */
@@ -174,9 +173,9 @@ object x0;
 		x0 = Cnil;
 RETURN1(x0);}
 
-DEFUNO("COMPLEXP",object,fLcomplexp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lcomplexp,"")(x0)
-object x0;
+DEFUNO_NEW("COMPLEXP",object,fLcomplexp,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Lcomplexp,(object x0),"")
+
 {
 	/* 1 args */
 
@@ -186,9 +185,9 @@ object x0;
 		x0 = Cnil;
 RETURN1(x0);}
 
-DEFUNO("CHARACTERP",object,fLcharacterp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lcharacterp,"")(x0)
-object x0;
+DEFUNO_NEW("CHARACTERP",object,fLcharacterp,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Lcharacterp,(object x0),"")
+
 {
 	/* 1 args */
 
@@ -198,9 +197,9 @@ object x0;
 		x0 = Cnil;
 RETURN1(x0);}
 
-DEFUNO("STRINGP",object,fLstringp ,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lstringp ,"")(x0)
-object x0;
+DEFUNO_NEW("STRINGP",object,fLstringp ,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Lstringp,(object x0),"")
+
 {
 	/* 1 args */
 
@@ -210,9 +209,9 @@ object x0;
 		x0 = Cnil;
 RETURN1(x0);}
 
-DEFUNO("BIT-VECTOR-P",object,fLbit_vector_p,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lbit_vector_p,"")(x0)
-object x0;
+DEFUNO_NEW("BIT-VECTOR-P",object,fLbit_vector_p,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Lbit_vector_p,(object x0),"")
+
 {
 	/* 1 args */
 
@@ -222,9 +221,9 @@ object x0;
 		x0 = Cnil;
 RETURN1(x0);}
 
-DEFUNO("VECTORP",object,fLvectorp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lvectorp,"")(x0)
-object x0;
+DEFUNO_NEW("VECTORP",object,fLvectorp,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Lvectorp,(object x0),"")
+
 {
 	enum type t;
 	/* 1 args */
@@ -236,9 +235,9 @@ object x0;
 		x0 = Cnil;
 RETURN1(x0);}
 
-DEFUNO("SIMPLE-STRING-P",object,fLsimple_string_p,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lsimple_string_p,"")(x0)
-object x0;
+DEFUNO_NEW("SIMPLE-STRING-P",object,fLsimple_string_p,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Lsimple_string_p,(object x0),"")
+
 {
 	/* 1 args */
 
@@ -251,9 +250,9 @@ object x0;
 		x0 = Cnil;
 RETURN1(x0);}
 
-DEFUNO("SIMPLE-BIT-VECTOR-P",object,fLsimple_bit_vector_p ,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lsimple_bit_vector_p ,"")(x0)
-object x0;
+DEFUNO_NEW("SIMPLE-BIT-VECTOR-P",object,fLsimple_bit_vector_p ,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Lsimple_bit_vector_p ,(object x0),"")
+
 {
 	/* 1 args */
 
@@ -266,9 +265,9 @@ object x0;
 		x0 = Cnil;
 RETURN1(x0);}
 
-DEFUNO("SIMPLE-VECTOR-P",object,fLsimple_vector_p ,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lsimple_vector_p ,"")(x0)
-object x0;
+DEFUNO_NEW("SIMPLE-VECTOR-P",object,fLsimple_vector_p ,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Lsimple_vector_p ,(object x0),"")
+
 {
 	enum type t;
 	/* 1 args */
@@ -284,9 +283,9 @@ object x0;
 		x0 = Cnil;
 RETURN1(x0);}
 
-DEFUNO("ARRAYP",object,fLarrayp ,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Larrayp ,"")(x0)
-object x0;
+DEFUNO_NEW("ARRAYP",object,fLarrayp ,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Larrayp,(object x0),"")
+
 {
 	enum type t;
 	/* 1 args */
@@ -299,9 +298,9 @@ object x0;
 		x0 = Cnil;
 RETURN1(x0);}
 
-DEFUNO("PACKAGEP",object,fLpackagep ,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lpackagep ,"")(x0)
-object x0;
+DEFUNO_NEW("PACKAGEP",object,fLpackagep ,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Lpackagep ,(object x0),"")
+
 {
 	/* 1 args */
 
@@ -311,9 +310,9 @@ object x0;
 		x0 = Cnil;
 RETURN1(x0);}
 
-DEFUNO("FUNCTIONP",object,fLfunctionp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lfunctionp,"")(x0)
-object x0;
+DEFUNO_NEW("FUNCTIONP",object,fLfunctionp,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Lfunctionp,(object x0),"")
+
 {
 	enum type t;
 	object x;
@@ -342,9 +341,9 @@ object x0;
 		x0 = Cnil;
 RETURN1(x0);}
 
-DEFUNO("COMPILED-FUNCTION-P",object,fLcompiled_function_p,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lcompiled_function_p,"")(x0)
-object x0;
+DEFUNO_NEW("COMPILED-FUNCTION-P",object,fLcompiled_function_p,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Lcompiled_function_p,(object x0),"")
+
 {
 	/* 1 args */;
 
@@ -363,9 +362,9 @@ object x0;
 		x0 = Cnil;
 RETURN1(x0);}
 
-DEFUNO("COMMONP",object,fLcommonp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lcommonp,"")(x0)
-object x0;
+DEFUNO_NEW("COMMONP",object,fLcommonp,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Lcommonp,(object x0),"")
+
 {
 	/* 1 args */;
 
@@ -375,9 +374,9 @@ object x0;
 		x0 = Cnil;
 RETURN1(x0);}
 
-DEFUNO("EQ",object,fLeq,LISP
-   ,2,2,NONE,OO,OO,OO,OO,Leq,"")(x0,x1)
-object x0,x1;
+DEFUNO_NEW("EQ",object,fLeq,LISP
+   ,2,2,NONE,OO,OO,OO,OO,void,Leq,(object x0,object x1),"")
+
 {
   /* 2 args */
 
@@ -451,9 +450,9 @@ eql(object x, object y)
 	return(FALSE);
 }
 
-DEFUNO("EQL",object,fLeql,LISP
-   ,2,2,NONE,OO,OO,OO,OO,Leql,"")(x0,x1)
-object x0,x1;
+DEFUNO_NEW("EQL",object,fLeql,LISP
+   ,2,2,NONE,OO,OO,OO,OO,void,Leql,(object x0,object x1),"")
+
 {
 	/* 2 args */
 
@@ -541,9 +540,9 @@ BEGIN:
 	return(eql(x,y));
 }
 
-DEFUNO("EQUAL",object,fLequal,LISP
-   ,2,2,NONE,OO,OO,OO,OO,Lequal,"")(x0,x1)
-object x0,x1;
+DEFUNO_NEW("EQUAL",object,fLequal,LISP
+   ,2,2,NONE,OO,OO,OO,OO,void,Lequal,(object x0,object x1),"")
+
 {
 	/* 2 args */
 
@@ -682,9 +681,9 @@ ARRAY:
 	}
 }
 
-DEFUNO("EQUALP",object,fLequalp,LISP
-   ,2,2,NONE,OO,OO,OO,OO,Lequalp,"")(x0,x1)
-object x0,x1;
+DEFUNO_NEW("EQUALP",object,fLequalp,LISP
+   ,2,2,NONE,OO,OO,OO,OO,void,Lequalp,(object x0,object x1),"")
+
 {
 	/* 2 args */
 
@@ -695,7 +694,7 @@ object x0,x1;
 	RETURN1(x0);
 }
 
-void
+static void
 Fand(object args)
 {
 
@@ -719,7 +718,7 @@ Fand(object args)
 	eval(MMcar(args));
 }
 
-void
+static void
 For(object args)
 {
 
@@ -795,9 +794,9 @@ BEGIN:
 	return(FALSE);
 }
 
-DEFUNO("CONTAINS-SHARP-COMMA",object,fScontains_sharp_comma,SI
-   ,1,1,NONE,OO,OO,OO,OO,siLcontains_sharp_comma,"")(x0)
-object x0;
+DEFUN_NEW("CONTAINS-SHARP-COMMA",object,fScontains_sharp_comma,SI
+   ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
+
 {
 	/* 1 args */
 
@@ -808,9 +807,9 @@ object x0;
 	RETURN1(x0);
 }
 
-DEFUNO("SPICEP",object,fSspicep  ,SI
-   ,1,1,NONE,OO,OO,OO,OO,siLspicep  ,"")(x0)
-object x0;
+DEFUN_NEW("SPICEP",object,fSspicep  ,SI
+   ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
+
 {
 	/* 1 args */
 	if (type_of(x0) == t_spice)
@@ -820,9 +819,9 @@ object x0;
 	RETURN1(x0);
 }
 
-DEFUNO("FIXNUMP",object,fSfixnump,SI
-   ,1,1,NONE,OO,OO,OO,OO,siLfixnump,"")(x0)
-object x0;
+DEFUN_NEW("FIXNUMP",object,fSfixnump,SI
+   ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
+
 {
 	/* 1 args */
 	if (type_of(x0) == t_fixnum)

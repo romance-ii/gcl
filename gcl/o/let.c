@@ -57,7 +57,7 @@ let_var_list(object var_list)
 	}
 }
 
-void
+static void
 Flet(object form)
 {
 
@@ -85,7 +85,7 @@ Flet(object form)
 	bds_unwind(old_bds_top);
 }
 
-void
+static void
 FletA(object form)
 {
 
@@ -113,7 +113,7 @@ FletA(object form)
 	bds_unwind(old_bds_top);
 }
 
-void
+static void
 Fmultiple_value_bind(object form)
 {
 
@@ -167,7 +167,7 @@ Fmultiple_value_bind(object form)
 	bds_unwind(old_bds_top);
 }
 
-void
+static void
 Fcompiler_let(object form)
 {
 
@@ -202,7 +202,7 @@ Fcompiler_let(object form)
 	bds_unwind(old_bds_top);
 }
 
-void
+static void
 Fflet(object args)
 {
 
@@ -235,7 +235,7 @@ is an illegal function definition in FLET.",
 	lex_env = lex;
 }
 
-void
+static void
 Flabels(object args)
 {
 
@@ -276,7 +276,7 @@ is an illegal function definition in LABELS.",
 	lex_env = lex;
 }
 
-void
+static void
 Fmacrolet(object args)
 {
 

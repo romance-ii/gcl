@@ -32,7 +32,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #endif
 
-object
+static object
 rando(object x, object rs)
 {
 	enum type tx;
@@ -65,7 +65,7 @@ rando(object x, object rs)
 	}
 }
 
-object
+static object
 make_random_state(object rs)
 {
         object z;
@@ -99,7 +99,7 @@ make_random_state(object rs)
 	}
 }
 
-void
+static void
 advance_random_state(object rs)
 {
 	rs->rnd.rnd_value

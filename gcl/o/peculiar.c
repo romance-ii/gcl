@@ -1,5 +1,3 @@
-
-
 #ifndef PECULIAR_MACHINE
 
 #define BIGM    (int)((((unsigned int)(-1))/2))

@@ -26,6 +26,14 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "include.h"
 #include <string.h>
 
+static object
+current_readtable(void);
+
+static object
+patch_sharp(object);
+
+static object
+parse_number(char *,int,int *,int);
 
 #define	token_buffer	token->st.st_self
 /* the active length of the token */
@@ -43,7 +51,7 @@ object dispatch_reader;
 #define	SHARP_EQ_CONTEXT_SIZE	250
 #endif
 
-void
+static void
 setup_READtable()
 {
 	READtable = current_readtable();
@@ -63,7 +71,7 @@ struct sharp_eq_context_struct {
 */
 
 
-void
+static void
 setup_READ()
 {
 	object x;
@@ -93,7 +101,7 @@ setup_READ()
 	backq_level = 0;
 }
 
-void
+static void
 setup_standard_READ()
 {
 	READtable = standard_readtable;
@@ -113,7 +121,7 @@ object in;
 
 #define	read_char(in)	code_char(readc_stream(in))
 
-void
+static void
 unread_char(c, in)
 object c, in;
 {
@@ -147,7 +155,7 @@ object in;
 }
 		
 
-object
+static object
 read_object_recursive(in)
 object in;
 {
@@ -275,7 +283,7 @@ L:
 	return(x);
 }
 
-object
+/* static object
 standard_read_object_non_recursive(in)
 object in;
 {
@@ -296,7 +304,7 @@ object in;
 	old_READbase = READbase;
 	old_READsuppress = READsuppress;
 	old_sharp_eq_context_max = sharp_eq_context_max;
-	/* BUG FIX by Toshiba */
+	BUG FIX by Toshiba
 	vs_push(old_READtable);
 	for (i = 0;  i < sharp_eq_context_max;  i++)
 		old_sharp_eq_context[i] = sharp_eq_context[i];
@@ -334,10 +342,10 @@ L:
 		unwind(nlj_fr, nlj_tag);
 	}
 	vs_popp;
-	/* BUG FIX by Toshiba */
+	BUG FIX by Toshiba
 	vs_popp;
 	return(x);
-}
+}*/
 #ifdef UNIX  /* faster code for inner loop from file stream */
 #define xxxread_char_to(res,in,eof_code) \
   do{FILE *fp; \
@@ -378,7 +386,7 @@ L:
    } while(0)
 #endif
 
-void
+static void
 too_long_token(void);
 /*
 	Read_object(in) reads an object from stream in.
@@ -593,7 +601,7 @@ SYMBOL:
 	return(x);
 }
 
-void
+static void
 Lleft_parenthesis_reader()
 {
 	object in, c, x;
@@ -651,7 +659,7 @@ double pow();
 	and the number is returned as a lisp data object.
 	If not, OBJNULL is returned.
 */
-object
+static object
 parse_number(s, end, ep, radix)
 char *s;
 int end, *ep, radix;
@@ -912,7 +920,7 @@ NO_NUMBER:
 	return(OBJNULL);
 }
 
-object
+static object
 parse_integer(s, end, ep, radix)
 char *s;
 int end, *ep, radix;
@@ -968,7 +976,7 @@ NO_NUMBER:
 }
 
 
-void
+static void
 too_long_string(void);
 
 /*
@@ -977,7 +985,7 @@ too_long_string(void);
 	and places it in token.
 	Delim is not included in the string but discarded.
 */
-void
+static void
 read_string(delim, in)
 int delim;
 object in;
@@ -1004,7 +1012,7 @@ object in;
 	a sequence of constituent characters from stream in
 	and places it in token_buffer.
 */
-void
+static void
 read_constituent(in)
 object in;
 {
@@ -1026,7 +1034,7 @@ object in;
 	
 }
 
-void
+static void
 Ldouble_quote_reader()
 {
 	check_arg(2);
@@ -1035,7 +1043,7 @@ Ldouble_quote_reader()
 	vs_base[0] = copy_simple_string(token);
 }
 
-void
+static void
 Ldispatch_reader()
 {
 	object c, x;
@@ -1069,7 +1077,7 @@ Ldispatch_reader()
 	super_funcall(x);
 }
 
-void
+static void
 Lsingle_quote_reader()
 {
 	check_arg(2);
@@ -1082,7 +1090,7 @@ Lsingle_quote_reader()
 	vs_base[0] = vs_pop;
 }
 
-void
+static void
 Lright_parenthesis_reader()
 {
 	check_arg(2);
@@ -1095,7 +1103,7 @@ Lright_parenthesis_reader()
 Lcomma_reader(){}
 */
 
-void
+static void
 Lsemicolon_reader()
 {
 	object c;
@@ -1118,10 +1126,10 @@ Lbackquote_reader(){}
 /*
 	sharpmacro routines
 */
-void
+static void
 extra_argument(int);
 
-void
+static void
 Lsharp_C_reader()
 {
 	object x, c;
@@ -1163,7 +1171,7 @@ Lsharp_C_reader()
 	vs_top = vs_base + 1;
 }
 
-void
+static void
 Lsharp_backslash_reader()
 {
 	object c;
@@ -1218,7 +1226,7 @@ Lsharp_backslash_reader()
 		FEerror("~S is an illegal character name.", 1, c);
 }
 
-void
+static void
 Lsharp_single_quote_reader()
 {
 
@@ -1244,7 +1252,7 @@ Lsharp_single_quote_reader()
 
 object siScomma;
 
-void
+static void
 Lsharp_left_parenthesis_reader()
 {
 
@@ -1328,7 +1336,7 @@ L:
 	vs_push(x);
 }
 
-void
+static void
 Lsharp_asterisk_reader()
 {
 	int dim=0;
@@ -1390,7 +1398,7 @@ Lsharp_asterisk_reader()
 	vs_push(x);
 }
 
-void
+static void
 Lsharp_colon_reader()
 {
 	object in;
@@ -1457,7 +1465,7 @@ M:
 	vs_base[0] = make_symbol(vs_base[0]);
 }
 
-void
+static void
 Lsharp_dot_reader()
 {
 	check_arg(3);
@@ -1474,7 +1482,7 @@ Lsharp_dot_reader()
 	vs_base[0] = ieval(vs_base[0]);
 }
 
-void
+static void
 Lsharp_comma_reader()
 {
 	check_arg(3);
@@ -1491,7 +1499,7 @@ Lsharp_comma_reader()
 	vs_base[0] = ieval(vs_base[0]);
 }
 
-void
+static void
 siLsharp_comma_reader_for_compiler()
 {
 	check_arg(3);
@@ -1510,7 +1518,7 @@ siLsharp_comma_reader_for_compiler()
 /*
 	For fasload.
 */
-void
+static void
 Lsharp_exclamation_reader()
 {
 	check_arg(3);
@@ -1527,7 +1535,7 @@ Lsharp_exclamation_reader()
 	vs_popp;
 }
 
-void
+static void
 Lsharp_B_reader()
 {
 	int i;
@@ -1551,7 +1559,7 @@ Lsharp_B_reader()
 			1, vs_base[0]);
 }
 
-void
+static void
 Lsharp_O_reader()
 {
 	int i;
@@ -1575,7 +1583,7 @@ Lsharp_O_reader()
 			1, vs_base[0]);
 }
 
-void
+static void
 Lsharp_X_reader()
 {
 	int i;
@@ -1599,7 +1607,7 @@ Lsharp_X_reader()
 			1, vs_base[0]);
 }
 
-void
+static void
 Lsharp_R_reader()
 {
 	int radix=0, i;
@@ -1630,11 +1638,11 @@ Lsharp_R_reader()
 			1, vs_base[0]);
 }
 
-void Lsharp_A_reader(){}
+/*static void Lsharp_A_reader(){}*/
 
-void Lsharp_S_reader(){}
+/*static void Lsharp_S_reader(){}*/
 
-void
+static void
 Lsharp_eq_reader()
 {
 	int i;
@@ -1665,7 +1673,7 @@ Lsharp_eq_reader()
 	vs_top = vs_base+1;
 }
 
-void
+static void
 Lsharp_sharp_reader()
 {
 	int i;
@@ -1692,7 +1700,7 @@ Lsharp_sharp_reader()
 	vs_top = vs_base+1;
 }
 
-void
+static void
 patch_sharp_cons(x)
 object x;
 {
@@ -1707,7 +1715,7 @@ object x;
 	}
 }
 
-object
+static object
 patch_sharp(x)
 object x;
 {
@@ -1770,17 +1778,17 @@ object x;
 	return(x);
 }
 
-void Lsharp_plus_reader(){}
+static void Lsharp_plus_reader(){}
 
-void Lsharp_minus_reader(){}
+static void Lsharp_minus_reader(){}
 
-void Lsharp_less_than_reader(){}
+/*static void Lsharp_less_than_reader(){}*/
 
-void Lsharp_whitespace_reader(){}
+/*static void Lsharp_whitespace_reader(){}*/
 
-void Lsharp_right_parenthesis_reader(){}
+/*static void Lsharp_right_parenthesis_reader(){}*/
 
-void
+static void
 Lsharp_vertical_bar_reader()
 {
 	int c;
@@ -1814,7 +1822,7 @@ Lsharp_vertical_bar_reader()
 	/*  no result  */
 }
 
-void
+static void
 Ldefault_dispatch_macro()
 {
 	FEerror("The default dispatch macro signalled an error.", 0);
@@ -1838,7 +1846,7 @@ Lsharp_p_reader()
 /*
 	#" ... " returns the pathname with namestring ... .
 */
-void
+static void
 Lsharp_double_quote_reader()
 {
 	check_arg(3);
@@ -1856,7 +1864,7 @@ Lsharp_double_quote_reader()
 	#$ fixnum returns a random-state with the fixnum
 	as its content.
 */
-void
+static void
 Lsharp_dollar_reader()
 {
 	int i;
@@ -1879,7 +1887,7 @@ Lsharp_dollar_reader()
 	readtable routines
 */
 
-object
+static object
 copy_readtable(from, to)
 object from, to;
 {
@@ -1916,7 +1924,7 @@ object from, to;
 	return(to);
 }
 
-object
+static object
 current_readtable()
 {
 	object r;
@@ -1957,7 +1965,7 @@ current_readtable()
 	@(return x)
 @)
 
-@(defun read_preserving_whitespace
+@(static defun read_preserving_whitespace
 	(&optional (strm `symbol_value(sLAstandard_inputA)`)
 		   (eof_errorp Ct)
 		   eof_value
@@ -2397,7 +2405,7 @@ Lreadtablep()
 		@(return m Cnil)
 @)
 
-@(defun make_dispatch_macro_character (chr
+@(static defun make_dispatch_macro_character (chr
 	&optional ntp (rdtbl `current_readtable()`))
 	int i;
 @
@@ -2421,7 +2429,7 @@ Lreadtablep()
 	@(return Ct)
 @)
 
-@(defun set_dispatch_macro_character (dspchr subchr fnc
+@(static defun set_dispatch_macro_character (dspchr subchr fnc
 	&optional (rdtbl `current_readtable()`))
 @
 	check_type_character(&dspchr);
@@ -2439,7 +2447,7 @@ Lreadtablep()
 	@(return Ct)
 @)
 
-@(defun get_dispatch_macro_character (dspchr subchr
+@(static defun get_dispatch_macro_character (dspchr subchr
 	&optional (rdtbl `current_readtable()`))
 @
 	check_type_character(&dspchr);
@@ -2453,7 +2461,7 @@ Lreadtablep()
 		  .rte_dtab[char_code(subchr)]`)
 @)
 
-object
+static object
 string_to_object(x)
 object x;
 {
@@ -2479,7 +2487,7 @@ siLstring_to_object()
 }
 
 
-void
+static void
 siLstandard_readtable()
 {
 	check_arg(0);
@@ -2487,7 +2495,7 @@ siLstandard_readtable()
 	vs_push(standard_readtable);
 }
 
-void
+static void
 too_long_token(void)
 {
 	char *q;
@@ -2506,7 +2514,7 @@ too_long_token(void)
 */
 }
 
-void
+static void
 too_long_string(void)
 {
 	char *q;
@@ -2524,7 +2532,7 @@ too_long_string(void)
 */
 }
 
-void
+static void
 extra_argument(c)
 int c;
 {

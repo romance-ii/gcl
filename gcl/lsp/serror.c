@@ -336,7 +336,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1371	*/
+/*	function definition for G1387	*/
 
 static void L8()
 {register object *base=vs_base;
@@ -368,7 +368,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1372	*/
+/*	function definition for G1388	*/
 
 static void L10()
 {register object *base=vs_base;
@@ -400,7 +400,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1373	*/
+/*	function definition for G1389	*/
 
 static void L12()
 {register object *base=vs_base;
@@ -432,7 +432,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1374	*/
+/*	function definition for G1390	*/
 
 static void L14()
 {register object *base=vs_base;
@@ -464,7 +464,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1375	*/
+/*	function definition for G1391	*/
 
 static void L16()
 {register object *base=vs_base;
@@ -496,7 +496,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1376	*/
+/*	function definition for G1392	*/
 
 static void L18()
 {register object *base=vs_base;
@@ -528,7 +528,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1377	*/
+/*	function definition for G1393	*/
 
 static void L20()
 {register object *base=vs_base;
@@ -560,7 +560,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1378	*/
+/*	function definition for G1394	*/
 
 static void L22()
 {register object *base=vs_base;
@@ -592,7 +592,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1379	*/
+/*	function definition for G1395	*/
 
 static void L24()
 {register object *base=vs_base;
@@ -624,7 +624,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1380	*/
+/*	function definition for G1396	*/
 
 static void L26()
 {register object *base=vs_base;
@@ -656,7 +656,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1381	*/
+/*	function definition for G1397	*/
 
 static void L28()
 {register object *base=vs_base;
@@ -688,7 +688,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1382	*/
+/*	function definition for G1398	*/
 
 static void L30()
 {register object *base=vs_base;

@@ -37,7 +37,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 object sSYB;
 object sSYZ;
 
-void
+static void
 kwote_cdr(void)
 {
 	object x;
@@ -57,7 +57,7 @@ KWOTE:
 	vs_head = make_cons(sLquote, vs_head);
 }
 
-void
+static void
 kwote_car(void)
 {
 	object x;
@@ -87,7 +87,7 @@ KWOTE:
 		APPEND		the form should be applied to APPEND
 		NCONC		the form should be applied to NCONC
 */
-int
+static int
 backq_cdr(object x)
 {
 	int a, d;
@@ -301,7 +301,7 @@ backq_car(object x)
 	return(EVAL);
 }
 
-object
+static object
 backq(object x)
 {
 	int a;
@@ -314,7 +314,7 @@ backq(object x)
 	return(vs_pop);
 }
 
-object fLcomma_reader(object x0, object x1)
+static object fLcomma_reader(object x0, object x1)
 { object w;
 	object in, c;
 
@@ -338,7 +338,7 @@ object fLcomma_reader(object x0, object x1)
 	RETURN1(x0);
 }
 
-object fLbackquote_reader(object x0, object x1)
+static object fLbackquote_reader(object x0, object x1)
 {
 	object in;
 

@@ -19,17 +19,13 @@
 #endif
 
 
-DEFUN("CHECK-FD-FOR-INPUT",object,fScheck_fd_for_input,
-      SI,2,2,NONE,OI,IO,OO,OO,
+DEFUN_NEW("CHECK-FD-FOR-INPUT",object,fScheck_fd_for_input,
+      SI,2,2,NONE,OI,IO,OO,OO,(int fd,int timeout),
 
 "Check FD a file descriptor for data to read, waiting TIMEOUT clicks \
 for data to become available.  Here there are \
 INTERNAL-TIME-UNITS-PER-SECOND in one second.  Return is 1 if data \
 available on FD, 0 if timeout reached and -1 if failed.")
-
-     (fd,timeout)
-int fd;
-int timeout;
 {
   fd_set inp;
   int n;
@@ -79,7 +75,7 @@ setup_connection_state(fd)
 }
 
 /* P is supposed to start with a hdr  and run N bytes. */
-void
+static void
 scan_headers(sfd)
      struct connection_state *sfd;
 { struct our_header *hdr;
@@ -118,7 +114,7 @@ send_confirmation(struct connection_state *sfd)
 
 */   
 
-int
+static int
 read1(sfd,p,m,timeout)
 struct connection_state* sfd;     
 char *p;
@@ -208,6 +204,12 @@ int m;
 /* send BYTES chars from buffer P to CONNECTION.
    They are packaged up with a hdr */
 
+static void
+write_timeout_error(char *);
+
+static void
+connection_failure(char *);
+
 int
 write1(sfd,p,bytes)
      struct connection_state *sfd;
@@ -255,10 +257,8 @@ write1(sfd,p,bytes)
       
 }	  
 
-DEFUN("CLEAR-CONNECTION",object,fSclear_connection,SI,1,1,NONE,OI,OO,OO,OO,
+DEFUN_NEW("CLEAR-CONNECTION",object,fSclear_connection,SI,1,1,NONE,OI,OO,OO,OO,(int fd),
       "Read on FD until nothing left to read.  Return number of bytes read")
-     (fd)
-     int fd;
 {char buffer[0x1000];
  int n=0;
  while (fix(fScheck_fd_for_input(fd,0)))

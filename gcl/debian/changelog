@@ -1,8 +1,13 @@
 gcl (2.5.0.cvs20020625-74) unstable; urgency=low
 
   * Remove duplicates in apropos a la clisp
+  * Use static where possible, remove unused functions, decrease global
+    symbol count by about 1/3 (~ 600 global functions)
+  * Inline optimize cmod,cplus,ctimes and cdifference like maxima
+  * eliminate make-pure-array from lfun_list.lsp, not defined
+  * Prototypes for all possible compiler generated function calls
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 10 Feb 2003 14:35:42 -0500
+ -- Camm Maguire <camm@enhanced.com>  Fri, 14 Feb 2003 19:05:18 -0500
 
 gcl (2.5.0.cvs20020625-73) unstable; urgency=low
 

@@ -1,5 +1,3 @@
-
-
 #define IN_INIT_PARI
 
 #define NEED_MP_H
@@ -8,11 +6,11 @@
 #endif
 
 #ifdef GMP
-void
-init_pari(void)
-{
-  ;
-}
+/* static void */
+/* init_pari(void) */
+/* { */
+/*   ; */
+/* } */
 #else
 GEN     gnil,gzero,gun,gdeux,ghalf,gi;
 plong    lontyp[30]={0,0x10000,0x10000,1,1,1,1,2,1,0,2,2,1,1,1,0,1,1,1,1};
@@ -72,7 +70,7 @@ set_pari_stack(parisize)
   top = avma = bot + parisize;
 }
 
-
+static 
 init_pari()
 {
   if (avma==0)

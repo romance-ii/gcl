@@ -1,4 +1,3 @@
-
 #include "arith.h"
 
 extended_mul(a,b,c,h,l)

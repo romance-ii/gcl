@@ -251,7 +251,7 @@ Lall_different(void)
 	vs_base[0] = Ct;
 }
 
-void
+static void
 Lnumber_compare(int s, int t)
 {
 	int narg, i;

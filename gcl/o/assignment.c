@@ -28,6 +28,9 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 
+static object
+setf(object,object);
+
 object sLsetf;
 
 object sLget;
@@ -81,7 +84,7 @@ setq(object sym, object val)
 	}
 }
 
-void
+static void
 Fsetq(object form)
 {
 	object ans;
@@ -103,7 +106,7 @@ Fsetq(object form)
 	}
 }
 
-void
+static void
 Fpsetq(object arg)
 {
 	object *old_top = vs_top;
@@ -122,9 +125,9 @@ Fpsetq(object arg)
 	vs_push(Cnil);
 }
 
-DEFUNO("SET",object,fLset,LISP
-   ,2,2,NONE,OO,OO,OO,OO,Lset,"")(symbol,value)
-object symbol,value;
+DEFUNO_NEW("SET",object,fLset,LISP
+   ,2,2,NONE,OO,OO,OO,OO,void,Lset,(object symbol,object value),"")
+
 {
 	/* 2 args */
 	if (type_of(symbol) != t_symbol)
@@ -136,9 +139,9 @@ object symbol,value;
 	RETURN1(value);
 }
 
-DEFUNO("FSET",object,fSfset,SI
-   ,2,2,NONE,OO,OO,OO,OO,siLfset,"")(sym,function)
-object sym,function;
+DEFUNO_NEW("FSET",object,fSfset,SI
+   ,2,2,NONE,OO,OO,OO,OO,void,siLfset,(object sym,object function),"")
+
 {
 	/* 2 args */
 	if (type_of(sym) != t_symbol)
@@ -180,7 +183,7 @@ object sym,function;
 	RETURN1(function);
 }
 
-void
+static void
 Fmultiple_value_setq(object form)
 {
 	object vars;
@@ -204,9 +207,9 @@ Fmultiple_value_setq(object form)
 	vs_top = vs_base+1;
 }
 
-DEFUNO("MAKUNBOUND",object,fLmakunbound,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lmakunbound,"")(sym)
-object sym;
+DEFUNO_NEW("MAKUNBOUND",object,fLmakunbound,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Lmakunbound,(object sym),"")
+
 {
 	/* 1 args */
 	if (type_of(sym) != t_symbol)
@@ -220,9 +223,9 @@ object sym;
 
 object sStraced;
 
-DEFUNO("FMAKUNBOUND",object,fLfmakunbound,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lfmakunbound,"")(sym)
-object sym;
+DEFUNO_NEW("FMAKUNBOUND",object,fLfmakunbound,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Lfmakunbound,(object sym),"")
+
 {
 	/* 1 args */
 	if(type_of(sym) != t_symbol)
@@ -247,7 +250,7 @@ object sym;
 	RETURN1(sym);
 }
 
-void
+static void
 Fsetf(object form)
 {
 	object result,*t,*t1;
@@ -280,7 +283,7 @@ Fsetf(object form)
 	vs_top = old_top + 1;  \
 }
 
-object
+static object
 setf(object place, object form)
 {
 	object fun;
@@ -399,7 +402,7 @@ OTHERWISE:
 	return Ieval(vs_base[0]);
 }
 
-void
+static void
 Fpush(object form)
 {
 	object var;
@@ -430,7 +433,7 @@ Fpush(object form)
 	eval(vs_base[0]);
 }
 
-void
+static void
 Fpop(object form)
 {
 	object var;
@@ -459,7 +462,7 @@ Fpop(object form)
 	eval(vs_base[0]);
 }
 
-void
+static void
 Fincf(object form)
 {
 	object var;
@@ -497,7 +500,7 @@ Fincf(object form)
 	eval(vs_base[0]);
 }
 
-void
+static void
 Fdecf(object form)
 {
 	object var;
@@ -550,9 +553,9 @@ clear_compiler_properties(object sym, object code)
 
 DEF_ORDINARY("CLEAR-COMPILER-PROPERTIES",sSclear_compiler_properties,SI,"");
 
-DEFUNO("CLEAR-COMPILER-PROPERTIES",object,fSclear_compiler_properties,SI
-   ,2,2,NONE,OO,OO,OO,OO,siLclear_compiler_properties,"")(x0,x1)
-object x0,x1;
+DEFUN_NEW("CLEAR-COMPILER-PROPERTIES",object,fSclear_compiler_properties,SI
+   ,2,2,NONE,OO,OO,OO,OO,(object x0,object x1),"")
+
 {
 	/* 2 args */
   RETURN1(Cnil);

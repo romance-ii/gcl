@@ -41,7 +41,7 @@ terminal_interrupt(int correctable)
     ifuncall1(sSterminal_interrupt, correctable?Ct:Cnil);
 }
 
-object
+static object
 ihs_function_name(object x)
 {
 	object y;
@@ -97,7 +97,7 @@ ihs_function_name(object x)
 	}
 }
 
-object
+static object
 ihs_top_function_name(ihs_ptr h)
 {
 	object x;
@@ -112,15 +112,15 @@ ihs_top_function_name(ihs_ptr h)
 	return(Cnil);
 }
 
-void
-call_error_handler(void)
-{
-	super_funcall(siSuniversal_error_handler);
-}
+/* static void */
+/* call_error_handler(void) */
+/* { */
+/* 	super_funcall(siSuniversal_error_handler); */
+/* } */
 
 
 
-object
+static object
 Icall_error_handler(object error_name,object error_format_string,int nfmt_args,...)
 { object b[20];
   b[0]= error_name;
@@ -159,7 +159,7 @@ Icall_continue_error_handler(object error_name,object error_format_string,int nf
 }
 
 DEFUNO_NEW("ERROR",object,fLerror,LISP
-       ,1,F_ARG_LIMIT,NONE,OO,OO,OO,OO,Lerror,(object fmt_string,...),"")
+       ,1,F_ARG_LIMIT,NONE,OO,OO,OO,OO,void,Lerror,(object fmt_string,...),"")
 { int n = VFUN_NARGS,i=0;
   object b[F_ARG_LIMIT];
   va_list ap;
@@ -183,8 +183,8 @@ DEFUNO_NEW("ERROR",object,fLerror,LISP
 /*  		       &ap)); */
 }
 
-DEFUNO_NEW("SPECIFIC-ERROR",object,fLspecific_error,LISP
-       ,1,F_ARG_LIMIT,NONE,OO,OO,OO,OO,Lspecific_error,(object error_name,object fmt_string,...),"")
+DEFUN_NEW("SPECIFIC-ERROR",object,fLspecific_error,LISP
+       ,1,F_ARG_LIMIT,NONE,OO,OO,OO,OO,(object error_name,object fmt_string,...),"")
 { int n = VFUN_NARGS,i=0;
   object b[F_ARG_LIMIT];
   va_list ap;
@@ -204,8 +204,8 @@ DEFUNO_NEW("SPECIFIC-ERROR",object,fLspecific_error,LISP
 }
 
 
-DEFUNO_NEW("SPECIFIC-CORRECTABLE-ERROR",object,fLspecific_correctable_error,LISP
-       ,1,F_ARG_LIMIT,NONE,OO,OO,OO,OO,Lspecific_correctable_error,
+DEFUN_NEW("SPECIFIC-CORRECTABLE-ERROR",object,fLspecific_correctable_error,LISP
+       ,1,F_ARG_LIMIT,NONE,OO,OO,OO,OO,
        (object error_name,object fmt_string,...),"")
 { int n = VFUN_NARGS,i=0;
   object b[F_ARG_LIMIT];
@@ -227,7 +227,7 @@ DEFUNO_NEW("SPECIFIC-CORRECTABLE-ERROR",object,fLspecific_correctable_error,LISP
 
 
 DEFUNO_NEW("CERROR",object,fLcerror,LISP
-       ,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,Lcerror,(object continue_fmt_string,object fmt_string,...),"")
+       ,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,void,Lcerror,(object continue_fmt_string,object fmt_string,...),"")
 { int n = VFUN_NARGS,i=0;
   object b[F_ARG_LIMIT];
   va_list ap;
@@ -325,7 +325,7 @@ FEtoo_many_argumentsF(object args)
 		      make_simple_string("Too many arguments."),0);
 }
 
-void
+static void
 FEinvalid_macro_call(void)
 {Icall_error_handler(sKinvalid_form,
 		     (make_simple_string("Invalid macro call to ~S.")),
@@ -401,7 +401,7 @@ CEerror(char *error_str, char *cont_str, int num, object arg1, object arg2, obje
 	Lisp interface to IHS
 */
 
-ihs_ptr get_ihs_ptr(object x)
+static ihs_ptr get_ihs_ptr(object x)
 {
 	ihs_ptr p;
 
@@ -417,30 +417,30 @@ ILLEGAL:
 }
 
 DEFUNO_NEW("IHS-TOP",object,fSihs_top,SI
-       ,0,0,NONE,OO,OO,OO,OO,siLihs_top,(void),"")
+       ,0,0,NONE,OO,OO,OO,OO,static void,siLihs_top,(void),"")
 
 {
 	/* 0 args */
 RETURN1(make_fixnum(ihs_top - ihs_org));
 }
 
-DEFUNO_NEW("IHS-FUN",object,fSihs_fun,SI
-       ,1,1,NONE,OO,OO,OO,OO,siLihs_fun,(object x0),"")
+DEFUN_NEW("IHS-FUN",object,fSihs_fun,SI
+       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
 {
 	/* 1 args */
 	x0 = get_ihs_ptr(x0)->ihs_function;
 	RETURN1(x0);
 }
 
-DEFUNO_NEW("IHS-VS",object,fSihs_vs,SI
-       ,1,1,NONE,OO,OO,OO,OO,siLihs_vs,(object x0),"")
+DEFUN_NEW("IHS-VS",object,fSihs_vs,SI
+       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
 {
 	/* 1 args */
 	x0 = make_fixnum(get_ihs_ptr(x0)->ihs_base - vs_org);
 	RETURN1(x0);
 }
 
-frame_ptr get_frame_ptr(object x)
+static frame_ptr get_frame_ptr(object x)
 {
 	frame_ptr p;
 
@@ -455,24 +455,24 @@ ILLEGAL:
 	return NULL;
 }
 
-DEFUNO_NEW("FRS-TOP",object,fSfrs_top,SI
-       ,0,0,NONE,OO,OO,OO,OO,siLfrs_top,(void),"")
+DEFUN_NEW("FRS-TOP",object,fSfrs_top,SI
+       ,0,0,NONE,OO,OO,OO,OO,(void),"")
 
 {
 	/* 0 args */
 	RETURN1((make_fixnum(frs_top - frs_org)));
 }
 
-DEFUNO_NEW("FRS-VS",object,fSfrs_vs,SI
-       ,1,1,NONE,OO,OO,OO,OO,siLfrs_vs,(object x0),"")
+DEFUN_NEW("FRS-VS",object,fSfrs_vs,SI
+       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
 {
 	/* 1 args */
 	x0 = make_fixnum(get_frame_ptr(x0)->frs_lex - vs_org);
 	RETURN1(x0);
 }
 
-DEFUNO_NEW("FRS-BDS",object,fSfrs_bds,SI
-       ,1,1,NONE,OO,OO,OO,OO,siLfrs_bds,(object x0),"")
+DEFUN_NEW("FRS-BDS",object,fSfrs_bds,SI
+       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
 {
 	/* 1 args */
 	x0
@@ -480,8 +480,8 @@ DEFUNO_NEW("FRS-BDS",object,fSfrs_bds,SI
 	RETURN1(x0);
 }
 
-DEFUNO_NEW("FRS-CLASS",object,fSfrs_class,SI
-       ,1,1,NONE,OO,OO,OO,OO,siLfrs_class,(object x0),"")
+DEFUN_NEW("FRS-CLASS",object,fSfrs_class,SI
+       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
 {
 	enum fr_class c;
 
@@ -495,16 +495,16 @@ DEFUNO_NEW("FRS-CLASS",object,fSfrs_class,SI
 	RETURN1(x0);
 }
 
-DEFUNO_NEW("FRS-TAG",object,fSfrs_tag,SI
-       ,1,1,NONE,OO,OO,OO,OO,siLfrs_tag,(object x0),"")
+DEFUN_NEW("FRS-TAG",object,fSfrs_tag,SI
+       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
 {
 	/* 1 args */
 	x0 = get_frame_ptr(x0)->frs_val;
 	RETURN1(x0);
 }
 
-DEFUNO_NEW("FRS-IHS",object,fSfrs_ihs,SI
-       ,1,1,NONE,OO,OO,OO,OO,siLfrs_ihs,(object x0),"")
+DEFUN_NEW("FRS-IHS",object,fSfrs_ihs,SI
+       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
 {
 	/* 1 args */
 	x0
@@ -512,7 +512,7 @@ DEFUNO_NEW("FRS-IHS",object,fSfrs_ihs,SI
 	RETURN1(x0);
 }
 
-bds_ptr get_bds_ptr(object x)
+static bds_ptr get_bds_ptr(object x)
 {
 	bds_ptr p;
 
@@ -527,31 +527,31 @@ ILLEGAL:
 	return NULL;
 }
 
-DEFUNO_NEW("BDS-TOP",object,fSbds_top,SI
-       ,0,0,NONE,OO,OO,OO,OO,siLbds_top,(void),"")
+DEFUN_NEW("BDS-TOP",object,fSbds_top,SI
+       ,0,0,NONE,OO,OO,OO,OO,(void),"")
 
 {
 	/* 0 args */
 	RETURN1((make_fixnum(bds_top - bds_org)));
 }
 
-DEFUNO_NEW("BDS-VAR",object,fSbds_var,SI
-       ,1,1,NONE,OO,OO,OO,OO,siLbds_var,(object x0),"")
+DEFUN_NEW("BDS-VAR",object,fSbds_var,SI
+       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
 {
 	/* 1 args */
 	x0 = get_bds_ptr(x0)->bds_sym;
 	RETURN1(x0);
 }
 
-DEFUNO_NEW("BDS-VAL",object,fSbds_val,SI
-       ,1,1,NONE,OO,OO,OO,OO,siLbds_val,(object x0),"")
+DEFUN_NEW("BDS-VAL",object,fSbds_val,SI
+       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
 {
 	/* 1 args */
 	x0 = get_bds_ptr(x0)->bds_val;
 	RETURN1(x0);
 }
 
-object *get_vs_ptr(object x)
+static object *get_vs_ptr(object x)
 {
 	object *p;
 
@@ -565,8 +565,8 @@ ILLEGAL:
 	return NULL;
 }
 
-DEFUNO_NEW("VS-TOP",object,fSvs_top,SI
-       ,0,0,NONE,OO,OO,OO,OO,siLvs_top,(void),"")
+DEFUN_NEW("VS-TOP",object,fSvs_top,SI
+       ,0,0,NONE,OO,OO,OO,OO,(void),"")
 {
 	object x;
 	/* 0 args */
@@ -574,16 +574,16 @@ DEFUNO_NEW("VS-TOP",object,fSvs_top,SI
 	RETURN1(x);
 }
 
-DEFUNO_NEW("VS",object,fSvs,SI
-       ,1,1,NONE,OO,OO,OO,OO,siLvs,(object x0),"")
+DEFUN_NEW("VS",object,fSvs,SI
+       ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
 {
 	/* 1 args */
 	x0 = *get_vs_ptr(x0);
 	RETURN1(x0);
 }
 
-DEFUNO_NEW("SCH-FRS-BASE",object,fSsch_frs_base,SI
-       ,2,2,NONE,OO,OO,OO,OO,siLsch_frs_base,(object x0,object x1),"")
+DEFUN_NEW("SCH-FRS-BASE",object,fSsch_frs_base,SI
+       ,2,2,NONE,OO,OO,OO,OO,(object x0,object x1),"")
 {
 	frame_ptr x;
 	ihs_ptr y;
@@ -599,8 +599,8 @@ DEFUNO_NEW("SCH-FRS-BASE",object,fSsch_frs_base,SI
 	RETURN1(x0);
 }
 
-DEFUNO_NEW("INTERNAL-SUPER-GO",object,fSinternal_super_go,SI
-       ,3,3,NONE,OO,OO,OO,OO,siLinternal_super_go,(object tag,object x1,object x2),"")
+DEFUN_NEW("INTERNAL-SUPER-GO",object,fSinternal_super_go,SI
+       ,3,3,NONE,OO,OO,OO,OO,(object tag,object x1,object x2),"")
 {
 	frame_ptr fr;
 
@@ -623,9 +623,8 @@ internal error handling mechanism. \
  Args:  (error-name correctable function-name \
    continue-format-string error-format-string \
    &rest args)");
-DEFUNO_NEW("UNIVERSAL-ERROR-HANDLER",object,fSuniversal_error_handler,SI
-   ,5,F_ARG_LIMIT,NONE,OO,OO,OO,OO,
-       siLuniversal_error_handler,(object x0,object x1,object x2,object x3,object error_fmt_string),"")
+DEFUN_NEW("UNIVERSAL-ERROR-HANDLER",object,fSuniversal_error_handler,SI
+	   ,5,F_ARG_LIMIT,NONE,OO,OO,OO,OO,(object x0,object x1,object x2,object x3,object error_fmt_string),"")
 {
 	int i;
 	/* 5 args */
@@ -678,23 +677,23 @@ invalid_macro_call(void)
 	FEinvalid_macro_call();
 }
 
-void
-keyword_value_mismatch(void)
-{
-	FEerror("Keywords and values do not match.", 0);
-}
+/* static void */
+/* keyword_value_mismatch(void) */
+/* { */
+/* 	FEerror("Keywords and values do not match.", 0); */
+/* } */
 
-void
-not_a_keyword(object x)
-{
-	FEunexpected_keyword(x);
-}
+/* static void */
+/* not_a_keyword(object x) */
+/* { */
+/* 	FEunexpected_keyword(x); */
+/* } */
 
-void
-unexpected_keyword(object key)
-{
-	FEunexpected_keyword(key);
-}
+/* static void */
+/* unexpected_keyword(object key) */
+/* { */
+/* 	FEunexpected_keyword(key); */
+/* } */
 
 object
 wrong_type_argument(object typ, object obj)
@@ -710,10 +709,10 @@ illegal_declare(object form)
 	FEinvalid_form("~S is an illegal declaration form.", form);
 }
 
-void
-not_a_string(object obj)
-{ FEwrong_type_argument(sLstring,obj);
-}
+/* static void */
+/* not_a_string(object obj) */
+/* { FEwrong_type_argument(sLstring,obj); */
+/* } */
 
 void
 not_a_string_or_symbol(object x)
@@ -756,15 +755,15 @@ if (type_of(strm) != t_stream)
 			FEwrong_type_argument(sLstream, strm);
 }
 
-object
-LVerror(object first,...)
-{va_list ap;
- va_start(ap,first);
- fcall.fun= make_cfun(Lerror,Cnil,Cnil,0,0);
- fcalln_general(first,ap);
- va_end(ap);
- return Cnil;
-}
+/* static object */
+/* LVerror(object first,...) */
+/* {va_list ap; */
+/*  va_start(ap,first); */
+/*  fcall.fun= make_cfun(Lerror,Cnil,Cnil,0,0); */
+/*  fcalln_general(first,ap); */
+/*  va_end(ap); */
+/*  return Cnil; */
+/* } */
      
 void
 vfun_wrong_number_of_args(object x)

@@ -27,6 +27,9 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "num_include.h"
 
+static void
+zero_divisor(void);
+
 object fixnum_add(int i, int j)
 {
 
@@ -59,14 +62,14 @@ object fixnum_sub(int i, int j)
    }
 }
 
-object
-fixnum_times(int i, int j)
-{
+/* static object */
+/* fixnum_times(int i, int j) */
+/* { */
 
-  MPOP(return,mulss,i,j);
-}
+/*   MPOP(return,mulss,i,j); */
+/* } */
 
-object
+static object
 number_to_complex(object x)
 {
 	object z;
@@ -1016,7 +1019,7 @@ Llcm(void)
 	vs_top = vs_base+1;
 }
 
-void
+static void
 zero_divisor(void)
 {
 	FEerror("Zero divisor.", 0);

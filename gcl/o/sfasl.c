@@ -1,4 +1,3 @@
-
 /* 
 Copyright William Schelter. All rights reserved.
 There is a companion file rsym.c which is used to build

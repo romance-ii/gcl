@@ -50,9 +50,8 @@ read.d: normalize_big_to_object
 
 static void* (*gcl_gmp_allocfun)(size_t) = alloc_contblock;
 
-DEFUN("SET-GMP-ALLOCATE-RELOCATABLE",object,fSset_gmp_allocate_relocatable,SI,1,1,NONE,OO,OO,OO,OO,
-      "Set the allocation to be relocatble ")(flag)
-     object flag;
+DEFUN_NEW("SET-GMP-ALLOCATE-RELOCATABLE",object,fSset_gmp_allocate_relocatable,SI,1,1,NONE,OO,OO,OO,OO,
+      (object flag),"Set the allocation to be relocatble ")
 {
   if (flag == Ct) {
     gcl_gmp_allocfun = alloc_relblock;

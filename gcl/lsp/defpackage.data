@@ -39,5 +39,5 @@
 
 	 :DOCUMENTATION is an extension to DEFPACKAGE.
 
-	 :SIZE is used only in Genera and Allegro.]" (lisp::quote system::function-documentation)) (system::mm (lisp::quote defpackage::defpackage) 0) (lisp::let* ((#0=#:g1487 :defpackage)) (lisp::setq lisp::*features* (lisp::adjoin #0# lisp::*features*))) (lisp::unintern (lisp::quote defpackage::defpackage) (lisp::quote defpackage::user)))))
+	 :SIZE is used only in Genera and Allegro.]" (lisp::quote system::function-documentation)) (system::mm (lisp::quote defpackage::defpackage) 0) (lisp::let* ((#0=#:g1503 :defpackage)) (lisp::setq lisp::*features* (lisp::adjoin #0# lisp::*features*))) (lisp::unintern (lisp::quote defpackage::defpackage) (lisp::quote defpackage::user)))))
 )

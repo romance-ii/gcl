@@ -67,7 +67,7 @@ make_sfun(object name, object (*self)(), int argd, object data)
 #define VFUN_MIN_ARGS(argd) (argd & 0xff)
 #define VFUN_MAX_ARGS(argd) ((argd) >> 8)
 
-object
+static object
 make_vfun(object name, object (*self)(), int argd, object data)
 {object vfn;
        
@@ -107,9 +107,8 @@ make_cclosure(void (*self)(), object name, object env, object data, char *start,
 }
 
 
-DEFUNO("MC",object,fSmc,SI
-   ,2,2,NONE,OO,OO,OO,OO,siLmc,"")(name,address) 
-object name,address;
+DEFUN_NEW("MC",object,fSmc,SI
+   ,2,2,NONE,OO,OO,OO,OO,(object name,object address),"") 
 { /* 2 args */
   dcheck_type(name,t_symbol);
   dcheck_type(address,t_fixnum);
@@ -119,7 +118,7 @@ object name,address;
   RETURN1(name);
 }
 
-object
+static object
 MFsfun(object sym, object (*self)(), int argd, object data)
 {object sfn;
  if (type_of(sym)!=t_symbol) not_a_symbol(sym);
@@ -132,16 +131,15 @@ MFsfun(object sym, object (*self)(), int argd, object data)
  return sym;
 }
 
-DEFUNO("MFSFUN",object,fSmfsfun,SI
-   ,3,3,NONE,OO,OO,OO,OO,siLmfsfun,"")(name,address,argd) 
-object name,address,argd;
+DEFUN_NEW("MFSFUN",object,fSmfsfun,SI
+   ,3,3,NONE,OO,OO,OO,OO,(object name,object address,object argd),"") 
 { /* 3 args */
   dcheck_type(address,t_fixnum);
   return MFsfun(name,PADDR(address),fix(argd),sSPmemory->s.s_dbind);RETURN1(name);
 }
 
 
-object
+static object
 MFvfun(object sym, object (*self)(), int argd, object data)
 {object vfn;
  if (type_of(sym)!=t_symbol) not_a_symbol(sym);
@@ -155,9 +153,9 @@ MFvfun(object sym, object (*self)(), int argd, object data)
  return sym;
 }
 
-DEFUNO("MFVFUN",object,fSmfvfun,SI
-   ,3,3,NONE,OO,OO,OO,OO,siLmfvfun,"")(name,address,argd)
-object name,address,argd;
+DEFUN_NEW("MFVFUN",object,fSmfvfun,SI
+   ,3,3,NONE,OO,OO,OO,OO,(object name,object address,object argd),"")
+
 { /* 3 args */
   MFvfun(name,PADDR(address),fix(argd),sSPmemory->s.s_dbind);
   RETURN1(name);
@@ -165,22 +163,21 @@ object name,address,argd;
 
 
 
-object
+static object
 MFvfun_key(object sym, object (*self)(), int argd, object data, struct key *keys)
 {if (data) set_key_struct(keys,data);
  return MFvfun(sym,self,argd,data);
 }
 
-DEFUNO("MFVFUN-KEY",object,fSmfvfun_key,SI
-   ,4,4,NONE,OO,OO,OO,OO,siLmfvfun_key,"")(symbol,address,argd,keys) 
-object symbol,address,argd,keys;
+DEFUN_NEW("MFVFUN-KEY",object,fSmfvfun_key,SI
+   ,4,4,NONE,OO,OO,OO,OO,(object symbol,object address,object argd,object keys),"") 
 { /* 4 args */
  MFvfun_key(symbol,PADDR(address),fix(argd),sSPmemory->s.s_dbind,PADDR(keys));
  RETURN1(symbol);
 }
 
 
-object MFnew(object sym, void (*self)(), object data)
+static object MFnew(object sym, void (*self)(), object data)
 {
 	object cf;
 
@@ -198,25 +195,25 @@ object MFnew(object sym, void (*self)(), object data)
 	return sym;
 }
 
-DEFUNO("MF",object,fSmf,SI
-   ,2,2,NONE,OO,OO,OO,OO,siLmf,"")(name,addr)
-object name,addr;
+DEFUN_NEW("MF",object,fSmf,SI
+   ,2,2,NONE,OO,OO,OO,OO,(object name,object addr),"")
+
 { /* 2 args */
   MFnew(name,PADDR(addr),sSPmemory->s.s_dbind);
   RETURN1(name);
 }
 
 
-object
-MF(object sym, void (*self)(), char *start, int size, object data)
-{ if(data && type_of(data)==t_cfdata)
-	  { data->cfd.cfd_start=start; 
-	    data->cfd.cfd_size=size;}
-	  else if(size) FEerror("Bad call to make_cfun",0);
-  return(MFnew(sym,self,data));
-}
+/* static object */
+/* MF(object sym, void (*self)(), char *start, int size, object data) */
+/* { if(data && type_of(data)==t_cfdata) */
+/* 	  { data->cfd.cfd_start=start;  */
+/* 	    data->cfd.cfd_size=size;} */
+/* 	  else if(size) FEerror("Bad call to make_cfun",0); */
+/*   return(MFnew(sym,self,data)); */
+/* } */
 
-object
+static object
 MM(object sym, void (*self)(), char *start, int size, object data)
 {
 	object cf;
@@ -237,9 +234,9 @@ MM(object sym, void (*self)(), char *start, int size, object data)
 	return sym;
 }
 
-DEFUNO("MM",object,fSmm,SI
-   ,2,2,NONE,OO,OO,OO,OO,siLmm,"")(name,addr)
-object name,addr;
+DEFUN_NEW("MM",object,fSmm,SI
+   ,2,2,NONE,OO,OO,OO,OO,(object name,object addr),"")
+
 { /* 2 args */
   MM(name,PADDR(addr),
     /* bit wasteful to pass these in just to be reset to themselves..*/
@@ -273,13 +270,13 @@ make_si_sfun(char *s, object (*f) (), int argd) {
   return(x);
 }
 
-object
-make_si_vfun1(char *s, object (*f)(), int argd)
-{  object x= make_si_ordinary(s);
-   x->s.s_gfdef = make_vfun( x,f,argd, Cnil);
-   x->s.s_mflag = FALSE;
-   return(x);
-}
+/* static object */
+/* make_si_vfun1(char *s, object (*f)(), int argd) */
+/* {  object x= make_si_ordinary(s); */
+/*    x->s.s_gfdef = make_vfun( x,f,argd, Cnil); */
+/*    x->s.s_mflag = FALSE; */
+/*    return(x); */
+/* } */
 
 
 object
@@ -308,9 +305,9 @@ make_special_form(char *s, void (*f)())
 	return(x);
 }
 
-DEFUNO("COMPILED-FUNCTION-NAME",object,fScompiled_function_name,SI
-   ,1,1,NONE,OO,OO,OO,OO,siLcompiled_function_name,"")(fun)
-object fun;
+DEFUN_NEW("COMPILED-FUNCTION-NAME",object,fScompiled_function_name,SI
+   ,1,1,NONE,OO,OO,OO,OO,(object fun),"")
+
 {
 	/* 1 args */
 	switch(type_of(fun)) {
@@ -347,9 +344,9 @@ turbo_closure(object fun)
    }
 }
 
-DEFUNO("TURBO-CLOSURE",object,fSturbo_closure,SI
-   ,1,1,NONE,OO,OO,OO,OO,siLturbo_closure,"")(funobj)
-object funobj;
+DEFUN_NEW("TURBO-CLOSURE",object,fSturbo_closure,SI
+   ,1,1,NONE,OO,OO,OO,OO,(object funobj),"")
+
 {
 	/* 1 args */
 	if (type_of(funobj) == t_cclosure)

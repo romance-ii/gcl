@@ -80,15 +80,15 @@ check_type_float(object *p)
 		*p = wrong_type_argument(sLfloat, *p);
 }
 
-void
-check_type_or_integer_float(object *p)
-{
-	enum type t;
+/* static void */
+/* check_type_or_integer_float(object *p) */
+/* { */
+/* 	enum type t; */
 
-	while ((t = type_of(*p)) != t_fixnum && t != t_bignum &&
-	       t != t_shortfloat && t != t_longfloat)
-		*p = wrong_type_argument(TSor_integer_float, *p);
-}
+/* 	while ((t = type_of(*p)) != t_fixnum && t != t_bignum && */
+/* 	       t != t_shortfloat && t != t_longfloat) */
+/* 		*p = wrong_type_argument(TSor_integer_float, *p); */
+/* } */
 
 void
 check_type_or_rational_float(object *p)
@@ -111,13 +111,13 @@ check_type_number(object *p)
 		*p = wrong_type_argument(sLnumber, *p);
 }
 
-void
-check_type_bit(object *p)
-{
-	while (type_of(*p) != t_fixnum ||
-	       (fix((*p)) != 0 && fix((*p)) != 1))
-		*p = wrong_type_argument(sLbit, *p);
-}
+/* static void */
+/* check_type_bit(object *p) */
+/* { */
+/* 	while (type_of(*p) != t_fixnum || */
+/* 	       (fix((*p)) != 0 && fix((*p)) != 1)) */
+/* 		*p = wrong_type_argument(sLbit, *p); */
+/* } */
 
 void
 check_type_character(object *p)
@@ -126,14 +126,14 @@ check_type_character(object *p)
 		*p = wrong_type_argument(sLcharacter, *p);
 }
 
-void
-check_type_string_char(object *p)
-{
-	while (type_of(*p) != t_character ||
-	       char_font((*p)) != 0 ||
-	       char_bits((*p)) != 0)
-		*p = wrong_type_argument(sLcharacter, *p);
-}
+/* static void */
+/* check_type_string_char(object *p) */
+/* { */
+/* 	while (type_of(*p) != t_character || */
+/* 	       char_font((*p)) != 0 || */
+/* 	       char_bits((*p)) != 0) */
+/* 		*p = wrong_type_argument(sLcharacter, *p); */
+/* } */
 
 void
 check_type_symbol(object *p)
@@ -156,15 +156,15 @@ check_type_or_string_symbol(object *p)
 		*p = wrong_type_argument(TSor_string_symbol, *p);
 }
 
-void
-check_type_or_symbol_string_package(object *p)
-{
-	while (type_of(*p) != t_symbol &&
-	       type_of(*p) != t_string &&
-	       type_of(*p) != t_package)
-		*p = wrong_type_argument(TSor_symbol_string_package,
- 					   *p);
-}
+/* static void */
+/* check_type_or_symbol_string_package(object *p) */
+/* { */
+/* 	while (type_of(*p) != t_symbol && */
+/* 	       type_of(*p) != t_string && */
+/* 	       type_of(*p) != t_package) */
+/* 		*p = wrong_type_argument(TSor_symbol_string_package, */
+/*  					   *p); */
+/* } */
 
 void
 check_type_package(object *p)
@@ -180,12 +180,12 @@ check_type_string(object *p)
 		*p = wrong_type_argument(sLstring, *p);
 }
 
-void
-check_type_bit_vector(object *p)
-{
-	while (type_of(*p) != t_bitvector)
-		*p = wrong_type_argument(sLbit_vector, *p);
-}
+/* static void */
+/* check_type_bit_vector(object *p) */
+/* { */
+/* 	while (type_of(*p) != t_bitvector) */
+/* 		*p = wrong_type_argument(sLbit_vector, *p); */
+/* } */
 
 void
 check_type_cons(object *p)
@@ -263,21 +263,21 @@ BEGIN:
 	}
 }
 
-void
-check_type_vector(object *p)
-{
-BEGIN:
-	switch (type_of(*p)) {
-	case t_vector:
-	case t_string:
-	case t_bitvector:
-		return;
+/* static void */
+/* check_type_vector(object *p) */
+/* { */
+/* BEGIN: */
+/* 	switch (type_of(*p)) { */
+/* 	case t_vector: */
+/* 	case t_string: */
+/* 	case t_bitvector: */
+/* 		return; */
 
-	default:
-		*p = wrong_type_argument(sLvector, *p);
-		goto BEGIN;
-	}
-}
+/* 	default: */
+/* 		*p = wrong_type_argument(sLvector, *p); */
+/* 		goto BEGIN; */
+/* 	} */
+/* } */
 
 void
 check_type(object x, int t)

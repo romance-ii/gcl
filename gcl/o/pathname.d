@@ -65,7 +65,7 @@ int end;
 }
 
 /* !!!!! Bug Fix. NLG */
-object
+static object
 parse_namestring(s, start, end, ep)
 object s;
 int start, end, *ep;
@@ -233,7 +233,7 @@ L:
 	}
 }
 
-object
+static object
 default_device(host)
 object host;
 {

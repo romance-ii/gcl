@@ -31,7 +31,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define dcheck_type(a,b) check_type(a,b)
 
 DEFUNO_NEW("SPECIALP",object,fSspecialp,SI
-       ,1,1,NONE,OO,OO,OO,OO,siLspecialp,(object sym),"")
+       ,1,1,NONE,OO,OO,OO,OO,void,siLspecialp,(object sym),"")
 {
 	/* 1 args */
 	if (type_of(sym) == t_symbol &&
@@ -44,8 +44,8 @@ DEFUNO_NEW("SPECIALP",object,fSspecialp,SI
 
 DEF_ORDINARY("DEBUG",sSdebug,SI,"");
 
-DEFUNO_NEW("DEFVAR1",object,fSdefvar1,SI
-       ,2,3,NONE,OO,OO,OO,OO,siLdefvar1,(object sym,object val,...),"")
+DEFUN_NEW("DEFVAR1",object,fSdefvar1,SI
+       ,2,3,NONE,OO,OO,OO,OO,(object sym,object val,...),"")
 {	int n=VFUN_NARGS;
 	object doc;
 	va_list ap;
@@ -65,16 +65,16 @@ DEFUNO_NEW("DEFVAR1",object,fSdefvar1,SI
       }
 
 
-DEFUNO_NEW("DEBUG",object,fSdebug,SI
-       ,2,2,NONE,OO,OO,OO,OO,siLdebug,(object sym,object val),"")
+DEFUN_NEW("DEBUG",object,fSdebug,SI
+       ,2,2,NONE,OO,OO,OO,OO,(object sym,object val),"")
 { /* 2 args */
   putprop(sym,val,sSdebug);
   RETURN1(sym);
 }
 
 
-DEFUNO_NEW("SETVV",object,fSsetvv,SI
-       ,2,2,NONE,OO,OO,OO,OO,siLsetvv,(object index,object val),"")
+DEFUN_NEW("SETVV",object,fSsetvv,SI
+       ,2,2,NONE,OO,OO,OO,OO,(object index,object val),"")
 { /* 2 args */
   if(type_of(sSPmemory->s.s_dbind)==t_cfdata)
   sSPmemory->s.s_dbind->cfd.cfd_self[fix(index)]=val;
@@ -122,54 +122,57 @@ imod(int x, int y)
   return(x - ifloor(x, y)*y);
 }
 
-void
-set_VV_data(object *VV, int n, object data, char *start, int size)
-{set_VV(VV,n,data);
- data->cfd.cfd_start=start;
- data->cfd.cfd_size = size;
-}
+/* static void */
+/* set_VV(object *, int, object); */
 
-void
-set_VV(object *VV, int n, object data)
-{
-	object *p, *q;
+/* static void */
+/* set_VV_data(object *VV, int n, object data, char *start, int size) */
+/* {set_VV(VV,n,data); */
+/*  data->cfd.cfd_start=start; */
+/*  data->cfd.cfd_size = size; */
+/* } */
 
-	p = VV;
-	q = data->v.v_self;
-	while (n-- > 0)
-		*p++ = *q++;
-	data->cfd.cfd_self = VV;
-}
+/* static void */
+/* set_VV(object *VV, int n, object data) */
+/* { */
+/* 	object *p, *q; */
+
+/* 	p = VV; */
+/* 	q = data->v.v_self; */
+/* 	while (n-- > 0) */
+/* 		*p++ = *q++; */
+/* 	data->cfd.cfd_self = VV; */
+/* } */
 
 /*
 	Conversions to C
 */
 
-char
-object_to_char(object x)
-{
-	int c=0;
+/* static char */
+/* object_to_char(object x) */
+/* { */
+/* 	int c=0; */
 
-	switch (type_of(x)) {
-	case t_fixnum:
-		c = fix(x);  break;
-	case t_bignum:
-	  {object *to = vs_top;
-	  vs_push(x);
-	  vs_push(small_fixnum(0xff));
-	  Llogand();
-	  x = vs_base[0];
-	  vs_top = to;
-	  c = (char) fix(x);
-	  break;
-	  }
-	case t_character:
-		c = char_code(x);  break;
-	default:
-		FEerror("~S cannot be coerce to a C char.", 1, x);
-	}
-	return(c);
-}
+/* 	switch (type_of(x)) { */
+/* 	case t_fixnum: */
+/* 		c = fix(x);  break; */
+/* 	case t_bignum: */
+/* 	  {object *to = vs_top; */
+/* 	  vs_push(x); */
+/* 	  vs_push(small_fixnum(0xff)); */
+/* 	  Llogand(); */
+/* 	  x = vs_base[0]; */
+/* 	  vs_top = to; */
+/* 	  c = (char) fix(x); */
+/* 	  break; */
+/* 	  } */
+/* 	case t_character: */
+/* 		c = char_code(x);  break; */
+/* 	default: */
+/* 		FEerror("~S cannot be coerce to a C char.", 1, x); */
+/* 	} */
+/* 	return(c); */
+/* } */
 
 int
 object_to_int(object x)
@@ -196,51 +199,51 @@ object_to_int(object x)
 	return(i);
 }
 
-float
-object_to_float(object x)
-{
-	float f=0.0;
+/* static float */
+/* object_to_float(object x) */
+/* { */
+/* 	float f=0.0; */
 
-	switch (type_of(x)) {
-	case t_character:
-		f = char_code(x);  break;
-	case t_fixnum:
-		f = fix(x);  break;
-	case t_bignum:
-	case t_ratio:
-		f = number_to_double(x);  break;
-	case t_shortfloat:
-		f = sf(x);  break;
-	case t_longfloat:
-		f = lf(x);  break;
-	default:
-		FEerror("~S cannot be coerce to a C float.", 1, x);
-	}
-	return(f);
-}
+/* 	switch (type_of(x)) { */
+/* 	case t_character: */
+/* 		f = char_code(x);  break; */
+/* 	case t_fixnum: */
+/* 		f = fix(x);  break; */
+/* 	case t_bignum: */
+/* 	case t_ratio: */
+/* 		f = number_to_double(x);  break; */
+/* 	case t_shortfloat: */
+/* 		f = sf(x);  break; */
+/* 	case t_longfloat: */
+/* 		f = lf(x);  break; */
+/* 	default: */
+/* 		FEerror("~S cannot be coerce to a C float.", 1, x); */
+/* 	} */
+/* 	return(f); */
+/* } */
 
-double
-object_to_double(object x)
-{
-	double d=0.0;
+/* static double */
+/* object_to_double(object x) */
+/* { */
+/* 	double d=0.0; */
 
-	switch (type_of(x)) {
-	case t_character:
-		d = char_code(x);  break;
-	case t_fixnum:
-		d = fix(x);  break;
-	case t_bignum:
-	case t_ratio:
-		d = number_to_double(x);  break;
-	case t_shortfloat:
-		d = sf(x);  break;
-	case t_longfloat:
-		d = lf(x);  break;
-	default:
-		FEerror("~S cannot be coerce to a C double.", 1, x);
-	}
-	return(d);
-}
+/* 	switch (type_of(x)) { */
+/* 	case t_character: */
+/* 		d = char_code(x);  break; */
+/* 	case t_fixnum: */
+/* 		d = fix(x);  break; */
+/* 	case t_bignum: */
+/* 	case t_ratio: */
+/* 		d = number_to_double(x);  break; */
+/* 	case t_shortfloat: */
+/* 		d = sf(x);  break; */
+/* 	case t_longfloat: */
+/* 		d = lf(x);  break; */
+/* 	default: */
+/* 		FEerror("~S cannot be coerce to a C double.", 1, x); */
+/* 	} */
+/* 	return(d); */
+/* } */
 
 /* this may allocate storage.  The user can prevent this
    by providing a string will fillpointer < length and

@@ -279,7 +279,7 @@ AGAIN:
 #define FASLINK
 #ifndef PRIVATE_FASLINK
 
-int
+static int
 faslink(object faslfile, object ldargstring)
 {
 #if defined(__linux__) && defined(__ELF__)
@@ -381,7 +381,7 @@ SEEK_TO_END_OFILE(faslfile->sm.sm_fp);
 
 #endif
 
-void
+static void
 siLfaslink(void)
 {
 	bds_ptr old_bds_top;

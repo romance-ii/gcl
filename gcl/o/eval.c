@@ -26,6 +26,10 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "include.h"
 #include "sfun_argd.h"
 
+static void
+call_applyhook(object);
+
+
 struct nil3 { object nil3_self[3]; } three_nils;
 
 #ifdef DEBUG_AVMA
@@ -86,7 +90,7 @@ object sSAbreak_stepA;
 
 /* for t_sfun,t_gfun with args on vs stack */
 
-void
+static void
 quick_call_sfun(object fun)
 { DEBUG_AVMA
   int i,n;
@@ -121,7 +125,7 @@ quick_call_sfun(object fun)
   return;}
 
 /* only for sfun not gfun !!  Does not check number of args */
-void
+static void
 call_sfun_no_check(object fun)
 { DEBUG_AVMA
   int n;
@@ -132,7 +136,7 @@ call_sfun_no_check(object fun)
   CHECK_AVMA;
   return;
 }
-void
+static void
 call_vfun(object fun)
 { DEBUG_AVMA
   int n;
@@ -425,7 +429,7 @@ void
 lispcall_no_event(object *funp, int narg)
 {
         DEBUG_AVMA
-	object fun = *funp;
+        object fun = *funp;
 
 	vs_base = funp + 1;
 	vs_top = vs_base + narg;
@@ -592,50 +596,50 @@ simple_lispcall(object *funp, int narg)
 	
 }
 
-object
-simple_lispcall_no_event(object *funp, int narg)
-{
-        DEBUG_AVMA 
-	object fun = *funp;
-	object *sup = vs_top;
+/* static object */
+/* simple_lispcall_no_event(object *funp, int narg) */
+/* { */
+/*         DEBUG_AVMA  */
+/* 	object fun = *funp; */
+/* 	object *sup = vs_top; */
 
-	vs_base = funp + 1;
-	vs_top = vs_base + narg;
+/* 	vs_base = funp + 1; */
+/* 	vs_top = vs_base + narg; */
 
-	if (fun == OBJNULL)
-		FEerror("Undefined function.", 0);
-	switch (type_of(fun)) {
-	case t_cfun:
-		(*fun->cf.cf_self)();
-		break;
+/* 	if (fun == OBJNULL) */
+/* 		FEerror("Undefined function.", 0); */
+/* 	switch (type_of(fun)) { */
+/* 	case t_cfun: */
+/* 		(*fun->cf.cf_self)(); */
+/* 		break; */
 
-	case t_cclosure:
-	{
-		object *top, *base, l;
+/* 	case t_cclosure: */
+/* 	{ */
+/* 		object *top, *base, l; */
 
-		if (fun->cc.cc_turbo != NULL) {
-			(*fun->cc.cc_self)(fun->cc.cc_turbo);
-			break;
-		}
-		top = vs_top;
-		base = vs_base;
-		for (l = fun->cc.cc_env;  !endp(l);  l = l->c.c_cdr)
-			vs_push(l);
-		vs_base = vs_top;
-		while (base < top)
-			vs_push(*base++);
-		(*fun->cc.cc_self)(top);
-		break;
-	}
+/* 		if (fun->cc.cc_turbo != NULL) { */
+/* 			(*fun->cc.cc_self)(fun->cc.cc_turbo); */
+/* 			break; */
+/* 		} */
+/* 		top = vs_top; */
+/* 		base = vs_base; */
+/* 		for (l = fun->cc.cc_env;  !endp(l);  l = l->c.c_cdr) */
+/* 			vs_push(l); */
+/* 		vs_base = vs_top; */
+/* 		while (base < top) */
+/* 			vs_push(*base++); */
+/* 		(*fun->cc.cc_self)(top); */
+/* 		break; */
+/* 	} */
 
-	default:
-		funcall(fun);
+/* 	default: */
+/* 		funcall(fun); */
 
-	}
-	vs_top = sup;
-	CHECK_AVMA;
-	return(vs_base[0]);
-}
+/* 	} */
+/* 	vs_top = sup; */
+/* 	CHECK_AVMA; */
+/* 	return(vs_base[0]); */
+/* } */
 
 object
 simple_symlispcall(object sym, object *base, int narg)
@@ -682,49 +686,49 @@ simple_symlispcall(object sym, object *base, int narg)
 	return(vs_base[0]);
 }
 
-object
-simple_symlispcall_no_event(object sym, object *base, int narg)
-{
-        DEBUG_AVMA
-	object fun = symbol_function(sym);
-	object *sup = vs_top;
+/* static object */
+/* simple_symlispcall_no_event(object sym, object *base, int narg) */
+/* { */
+/*         DEBUG_AVMA */
+/* 	object fun = symbol_function(sym); */
+/* 	object *sup = vs_top; */
 
-	vs_base = base;
-	vs_top = vs_base + narg;
+/* 	vs_base = base; */
+/* 	vs_top = vs_base + narg; */
 
-	if (fun == OBJNULL)
-		FEerror("Undefined function.", 0);
-	switch (type_of(fun)) {
-	case t_cfun:
-		(*fun->cf.cf_self)();
-		break;
+/* 	if (fun == OBJNULL) */
+/* 		FEerror("Undefined function.", 0); */
+/* 	switch (type_of(fun)) { */
+/* 	case t_cfun: */
+/* 		(*fun->cf.cf_self)(); */
+/* 		break; */
 
-	case t_cclosure:
-	{
-		object *top, *base, l;
+/* 	case t_cclosure: */
+/* 	{ */
+/* 		object *top, *base, l; */
 
-		if (fun->cc.cc_turbo != NULL) {
-			(*fun->cc.cc_self)(fun->cc.cc_turbo);
-			break;
-		}
-		top = vs_top;
-		base = vs_base;
-		for (l = fun->cc.cc_env;  !endp(l);  l = l->c.c_cdr)
-			vs_push(l);
-		vs_base = vs_top;
-		while (base < top)
-			vs_push(*base++);
-		(*fun->cc.cc_self)(top);
-		break;
-	}
+/* 		if (fun->cc.cc_turbo != NULL) { */
+/* 			(*fun->cc.cc_self)(fun->cc.cc_turbo); */
+/* 			break; */
+/* 		} */
+/* 		top = vs_top; */
+/* 		base = vs_base; */
+/* 		for (l = fun->cc.cc_env;  !endp(l);  l = l->c.c_cdr) */
+/* 			vs_push(l); */
+/* 		vs_base = vs_top; */
+/* 		while (base < top) */
+/* 			vs_push(*base++); */
+/* 		(*fun->cc.cc_self)(top); */
+/* 		break; */
+/* 	} */
 
-	default:
-		funcall(fun);
-	}
-	vs_top = sup;
-	CHECK_AVMA;
-	return(vs_base[0]);
-}
+/* 	default: */
+/* 		funcall(fun); */
+/* 	} */
+/* 	vs_top = sup; */
+/* 	CHECK_AVMA; */
+/* 	return(vs_base[0]); */
+/* } */
 
 void
 super_funcall(object fun)
@@ -1102,7 +1106,7 @@ LAMBDA:
 	FEinvalid_function(fun);
 }	
 
-void
+static void
 call_applyhook(object fun)
 {
 	object ah;
@@ -1127,7 +1131,7 @@ call_applyhook(object fun)
 
 
 DEFUNO_NEW("FUNCALL",object,fLfuncall,LISP
-       ,1,MAX_ARGS,NONE,OO,OO,OO,OO,Lfuncall,(object fun,...),"")
+       ,1,MAX_ARGS,NONE,OO,OO,OO,OO,void,Lfuncall,(object fun,...),"")
 { va_list ap;
   object *new;
   int n = VFUN_NARGS;
@@ -1140,7 +1144,7 @@ DEFUNO_NEW("FUNCALL",object,fLfuncall,LISP
 
 
 DEFUNO_NEW("APPLY",object,fLapply,LISP
-       ,2,MAX_ARGS,NONE,OO,OO,OO,OO,Lapply,(object fun,...),"")
+       ,2,MAX_ARGS,NONE,OO,OO,OO,OO,void,Lapply,(object fun,...),"")
 {	int m,n=VFUN_NARGS;
 	object list;
 	object buf[MAX_ARGS];
@@ -1164,7 +1168,7 @@ DEFUNO_NEW("APPLY",object,fLapply,LISP
 	
 
 DEFUNO_NEW("EVAL",object,fLeval,LISP
-       ,1,1,NONE,OO,OO,OO,OO,Leval,(object x0),"")
+       ,1,1,NONE,OO,OO,OO,OO,void,Leval,(object x0),"")
 {
 	object *lex = lex_env;
 
@@ -1245,7 +1249,7 @@ Lapplyhook(void)
 }
 
 DEFUNO_NEW("CONSTANTP",object,fLconstantp,LISP
-       ,1,1,NONE,OO,OO,OO,OO,Lconstantp,(object x0),"")
+       ,1,1,NONE,OO,OO,OO,OO,void,Lconstantp,(object x0),"")
 {
 	enum type x;
 	/* 1 args */
@@ -1350,7 +1354,7 @@ funcall_with_catcher(object fname, object fun)
 	frs_pop();
 }
 
-object 
+static object 
 fcalln_cclosure(object first,va_list ap)
 {
 int i=fcall.argd;
@@ -1399,7 +1403,7 @@ int i=fcall.argd;
        return(vs_base[0]);
 }}
 
-object 
+static object 
 fcalln_general(object first,va_list ap) {
   int i=fcall.argd;
 
@@ -1440,7 +1444,7 @@ fcalln_general(object first,va_list ap) {
   }
 }
 
-object
+static object
 fcalln_vfun(object first,va_list vl)
 {object *new,res;
  DEBUG_AVMA

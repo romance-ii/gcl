@@ -308,7 +308,7 @@ for the string ~S.", 3, start, end, string);
 
 int string_sign, string_boundary;
 
-@(defun string_cmp (string1 string2
+@(static defun string_cmp (string1 string2
 		    &key start1 end1 start2 end2)
 	int s1, e1, s2, e2;
 	int i1, i2;
@@ -347,7 +347,7 @@ void Lstring_le() { string_sign =  1;  string_boundary = 0;  Lstring_cmp(); }
 void Lstring_ge() { string_sign = -1;  string_boundary = 0;  Lstring_cmp(); }
 void Lstring_neq() { string_sign = 0;  string_boundary = 1;  Lstring_cmp(); }
 
-@(defun string_compare (string1 string2
+@(static defun string_compare (string1 string2
 			&key start1 end1 start2 end2)
 	int s1, e1, s2, e2;
 	int i1, i2;
@@ -414,7 +414,7 @@ void Lstring_not_equal()   { string_sign =  0; string_boundary = 1;  Lstring_com
 	@(return x)
 @)
 
-bool
+static bool
 member_char(c, char_bag)
 int c;
 object char_bag;
@@ -457,12 +457,12 @@ object char_bag;
 	}
 }
 
-void Lstring_trim0();
+static void Lstring_trim0();
 void Lstring_trim() { left_trim = right_trim = TRUE; Lstring_trim0(); }
 void Lstring_left_trim() { left_trim = TRUE; right_trim = FALSE; Lstring_trim0(); }
 void Lstring_right_trim() { left_trim = FALSE; right_trim = TRUE; Lstring_trim0();}
 
-@(defun string_trim0 (char_bag strng &aux res)
+@(static defun string_trim0 (char_bag strng &aux res)
 	int i, j, k;
 @
 	strng = coerce_to_string(strng);
@@ -522,7 +522,7 @@ int c, *bp;
 	return(c);
 }
 
-@(defun string_case (strng &key start end &aux conv)
+@(static defun string_case (strng &key start end &aux conv)
 	int s, e, i;
 	bool b;
 @
@@ -541,7 +541,7 @@ void Lstring_downcase()   { casefun =   char_downcase;  Lstring_case(); }
 void Lstring_capitalize() { casefun = char_capitalize;  Lstring_case(); }
 
 
-@(defun nstring_case (strng &key start end)
+@(static defun nstring_case (strng &key start end)
 	int s, e, i;
 	bool b;
 @
@@ -564,7 +564,7 @@ void Lnstring_capitalize() { casefun = char_capitalize;  Lnstring_case(); }
 	@(return `coerce_to_string(x)`)
 @)
 
-void
+static void
 siLstring_concatenate()
 {
 	int narg, i, l, m;

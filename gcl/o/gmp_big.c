@@ -126,7 +126,7 @@ new_bignum(void)
  
 
 
-object
+static object
 make_bignum(__mpz_struct *u)
 { object ans ;
  int size;
@@ -193,9 +193,9 @@ mpz_t u;
 }
 #endif /* obsolete */
 
-int
-big_zerop(object x)
-{ return (mpz_sgn(MP(x))== 0);}
+/* static int */
+/* big_zerop(object x) */
+/* { return (mpz_sgn(MP(x))== 0);} */
 
 int
 big_compare(object x, object y)
@@ -210,11 +210,11 @@ normalize_big_to_object(object x)
 }
 
 
-void
-gcopy_to_big(__mpz_struct *res, object x)
-{
-  mpz_set(MP(x),res);
-}
+/* static void */
+/* gcopy_to_big(__mpz_struct *res, object x) */
+/* { */
+/*   mpz_set(MP(x),res); */
+/* } */
 
 /* destructively modifies x = i - x; */
 void
@@ -223,11 +223,11 @@ add_int_big(int i, object x)
        MPOP_DEST(x,addsi,i,MP(x));
 }
 
-void
-sub_int_big(int i, object x)
-{  /*  SI_TEMP_DECL(mpz_int_temp); */
-  MPOP_DEST(x,subsi,i,MP(x));
-}
+/* static void */
+/* sub_int_big(int i, object x) */
+/* { */  /*  SI_TEMP_DECL(mpz_int_temp); */
+/*   MPOP_DEST(x,subsi,i,MP(x)); */
+/* } */
 
 void
 mul_int_big(int i, object x)
@@ -245,25 +245,25 @@ mul_int_big(int i, object x)
 	X should be non-negative.
 */
 
-int
-div_int_big(int i, object x)
-{
-  return mpz_tdiv_q_ui(MP(x),MP(x),i);
-}
+/* static int */
+/* div_int_big(int i, object x) */
+/* { */
+/*   return mpz_tdiv_q_ui(MP(x),MP(x),i); */
+/* } */
 
 
-object
-big_plus(object x, object y)
-{
-  MPOP(return,addii,MP(x),MP(y));
-}
+/* static object */
+/* big_plus(object x, object y) */
+/* { */
+/*   MPOP(return,addii,MP(x),MP(y)); */
+/* } */
 
-object
-big_times(object x, object y)
-{
- MPOP(return,mulii,MP(x),MP(y));
+/* static object */
+/* big_times(object x, object y) */
+/* { */
+/*  MPOP(return,mulii,MP(x),MP(y)); */
 
-}
+/* } */
 
 /* x is a big, and it is coerced to a fixnum (and the big is cleared)
    or it is smashed
@@ -289,17 +289,17 @@ big_minus(object x)
 }
 
 
-void
-big_quotient_remainder(object x0, object y0, object *qp, object *rp)
-{
-  object res,quot;
-  res = new_bignum();
-  quot = new_bignum();
-  mpz_tdiv_qr(MP(quot),MP(res),MP(x0),MP(y0));
-  *qp = normalize_big(quot);
-  *rp = normalize_big(res);
-  return;
-}
+/* static void */
+/* big_quotient_remainder(object x0, object y0, object *qp, object *rp) */
+/* { */
+/*   object res,quot; */
+/*   res = new_bignum(); */
+/*   quot = new_bignum(); */
+/*   mpz_tdiv_qr(MP(quot),MP(res),MP(x0),MP(y0)); */
+/*   *qp = normalize_big(quot); */
+/*   *rp = normalize_big(res); */
+/*   return; */
+/* } */
 
 	
 double
@@ -309,28 +309,28 @@ big_to_double(object x)
 }
 
 
-object copy_big(object x)
-{
-  if (type_of(x)==t_bignum)
-    return make_bignum(MP(x));
-  else FEerror("bignum expected",0);
-  return Cnil;
+/* static object copy_big(object x) */
+/* { */
+/*   if (type_of(x)==t_bignum) */
+/*     return make_bignum(MP(x)); */
+/*   else FEerror("bignum expected",0); */
+/*   return Cnil; */
 
-}
+/* } */
 
 /* this differes from old copy_to_big in that it does not alter
    copy a bignum.
 */   
-object
-copy_to_big(object x) {
- if (type_of(x) == t_fixnum) {
-   object ans = new_bignum();
-   mpz_set_si(MP(ans),fix(x));
-   return ans;
- } else {
-   return x;
-}
-}
+/* static object */
+/* copy_to_big(object x) { */
+/*  if (type_of(x) == t_fixnum) { */
+/*    object ans = new_bignum(); */
+/*    mpz_set_si(MP(ans),fix(x)); */
+/*    return ans; */
+/*  } else { */
+/*    return x; */
+/* } */
+/* } */
 
 
 /* put in to get (declare integer working with existing setup.
@@ -380,27 +380,27 @@ obj_to_mpz1(object x,MP_INT * y,void *v) {
 
 }
 
-int
-mpz_to_mpz(MP_INT * x,MP_INT * y) {
+/* static int */
+/* mpz_to_mpz(MP_INT * x,MP_INT * y) { */
 
-  if (abs(x->_mp_size)<=y->_mp_alloc)
-    mpz_set(y,x);
-  else
-    return abs(x->_mp_size)*sizeof(*y->_mp_d);
+/*   if (abs(x->_mp_size)<=y->_mp_alloc) */
+/*     mpz_set(y,x); */
+/*   else */
+/*     return abs(x->_mp_size)*sizeof(*y->_mp_d); */
 
-  return 0;
+/*   return 0; */
 
-}
+/* } */
 
-int
-mpz_to_mpz1(MP_INT * x,MP_INT * y,void *v) {
+/* static int */
+/* mpz_to_mpz1(MP_INT * x,MP_INT * y,void *v) { */
 
-  y->_mp_alloc=abs(x->_mp_size);
-  y->_mp_d=v;
-  mpz_set(y,x);
-  return 0;
+/*   y->_mp_alloc=abs(x->_mp_size); */
+/*   y->_mp_d=v; */
+/*   mpz_set(y,x); */
+/*   return 0; */
 
-}
+/* } */
 
 void
 isetq_fix(MP_INT * var,int s)

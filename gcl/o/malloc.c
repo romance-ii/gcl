@@ -599,7 +599,7 @@ realloc (mem, n)
 
 #ifndef VMS
 
-char *
+static char *
 memalign (alignment, size)
      unsigned alignment, size;
 {
@@ -626,7 +626,7 @@ memalign (alignment, size)
 #ifndef HPUX
 /* This runs into trouble with getpagesize on HPUX.
    Patching out seems cleaner than the ugly fix needed.  */
-char *
+static char *
 valloc (size)
 {
   return memalign (getpagesize (), size);

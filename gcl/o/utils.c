@@ -15,14 +15,14 @@ IisSymbol(object f)
   return f;
 }
 
-object
-IisFboundp(object f)
-{ 
-  IisSymbol(f);
-  if (f->s.s_gfdef ==0)
-    { FEerror("Not a fboundp ~s",1,f);}
-  return f;
-}
+/* object */
+/* IisFboundp(object f) */
+/* {  */
+/*   IisSymbol(f); */
+/*   if (f->s.s_gfdef ==0) */
+/*     { FEerror("Not a fboundp ~s",1,f);} */
+/*   return f; */
+/* } */
 
 object
 IisArray(object f)
@@ -51,17 +51,17 @@ void Wrong_type_error(char *str,int n,...) {
   FEerror("Wrong type error",0);
 }
 
-object
-Iapply_ap(object (*f) (/* ??? */), va_list ap)
+/* static object */
+/* Iapply_ap(object (*f) (/\* ??? *\/), va_list ap) */
 /* Apply f to the va_list ap, with an implicit number of args
    passed in VFUN_NARGS */
            
               
-{ int n = VFUN_NARGS;
-  object *new;
-  COERCE_VA_LIST(new,ap,n);
-  return c_apply_n(f,n,new);
-}
+/* { int n = VFUN_NARGS; */
+/*   object *new; */
+/*   COERCE_VA_LIST(new,ap,n); */
+/*   return c_apply_n(f,n,new); */
+/* } */
 
 object
 Iapply_ap_new(object (*f) (/* ??? */), object first, va_list ap)
@@ -167,20 +167,20 @@ Iapply_fun_n1(object (*fun)(),int n,int m,...) {
 /*  } */
  
 
-object
-ImakeStructure(int n, object *p)
+/* static object */
+/* ImakeStructure(int n, object *p) */
 /* p[0]= structure name , p[1] = 1'st elt,.... p[n-1] = last elt. */ 
       
           
-{ object * r = vs_top;
-  object res;
-  if (p+n != r) { FEerror("bad make struct",0);}
-  vs_base= p;
-  siLmake_structure();
-  res = vs_base[0];
-  vs_top=p;
-  return res;
-}
+/* { object * r = vs_top; */
+/*   object res; */
+/*   if (p+n != r) { FEerror("bad make struct",0);} */
+/*   vs_base= p; */
+/*   siLmake_structure(); */
+/*   res = vs_base[0]; */
+/*   vs_top=p; */
+/*   return res; */
+/* } */
 
 object
 Icheck_one_type(object x, enum type t)
@@ -196,9 +196,9 @@ fSincorrect_type(object val, object type)
 { return CEerror("Got ~a,Expected a ~a","Supply a new one",1,val,type,Cnil,Cnil);
 }
 
-void
-Ineed_in_image(object (*foo) (/* ??? */))
-{;}
+/* static void */
+/* Ineed_in_image(object (*foo) (/\* ??? *\/)) */
+/* {;} */
 
 /* Convert a value stack type return to an fcall multiple vaule return
    and return the actual value (or nil if no values);  */
@@ -215,12 +215,12 @@ Ivs_values(void)
 }
   
 			
-void
-fatal(char *s, int i1, int i2)
-{
-  fprintf(stderr,s,i1,i2);
-  exit(1);
-}
+/* static void */
+/* fatal(char *s, int i1, int i2) */
+/* { */
+/*   fprintf(stderr,s,i1,i2); */
+/*   exit(1); */
+/* } */
   
   
   

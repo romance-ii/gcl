@@ -27,14 +27,14 @@ char *alloc_page();
 object alloc_object();
 void *malloc(size_t);
 void *realloc(void *,size_t);
-void * memalign(size_t,size_t);
+/* void * memalign(size_t,size_t); */
 void *alloc_contblock(size_t);
 void *alloc_relblock(size_t);
 /* object fSallocate_contiguous_pages(); */
 /* object fSallocate_relocatable_pages(); */
 
 /*  array.c  */
-enum aelttype Iarray_element_type();
+/* enum aelttype Iarray_element_type(); */
 object fLrow_major_aref();
 object fSaset1();
 EXTER object sLarray_dimension_limit;
@@ -43,7 +43,7 @@ object fSmake_array1();
 /* object fSmake_vector1(); */
 
 /*  assignment.c  */
-object setf();
+/* object setf(); */
 
 
 
@@ -89,7 +89,7 @@ object letA_bind();
 /*  cfun.c  */
 object make_cfun();
 object MF();
-object MM();
+/* object MM(); */
 object make_function();
 object make_si_function();
 object make_special_form();
@@ -188,13 +188,13 @@ EXTER object standard_io;
 
 EXTER object sLAload_verboseA;
 EXTER object FASL_string;
-object stream_element_type();
+/* object stream_element_type(); */
 object open_stream();
-object make_two_way_stream();
-object make_echo_stream();
+/* object make_two_way_stream(); */
+/* object make_echo_stream(); */
 object make_string_input_stream();
 object make_string_output_stream();
-object get_output_stream_string();
+/* object get_output_stream_string(); */
 object read_fasl_data();
 
 #ifdef UNIX
@@ -327,7 +327,7 @@ long fixint(object);
 /*  num_arith  */
 object bignum2();
 object bignum3();
-object number_to_complex();
+/* object number_to_complex(); */
 object complex_plus();
 object number_plus();
 object number_negate();
@@ -366,11 +366,11 @@ EXTER object sKnicknames;
 EXTER object sKuse;
 EXTER int intern_flag;
 EXTER object uninterned_list;
-object make_package();
-object in_package();
-object rename_package();
+/* object make_package(); */
+/* object in_package(); */
+/* object rename_package(); */
 object find_package();
-object coerce_to_package();
+/* object coerce_to_package(); */
 object current_package();
 object intern();
 object find_symbol();
@@ -393,9 +393,9 @@ EXTER object sKroot;
 EXTER object sKcurrent;
 EXTER object sKparent;
 EXTER object sKper;
-object parse_namestring();
+/* object parse_namestring(); */
 object coerce_to_pathname();
-object default_device();
+/* object default_device(); */
 object merge_pathnames();
 object namestring();
 object coerce_to_namestring();
@@ -460,7 +460,7 @@ EXTER object sLAread_default_float_formatA;
 EXTER object sLAread_baseA;
 EXTER object sLAread_suppressA;
 EXTER object READtable;
-EXTER object read_byte1(); 
+/* EXTER object read_byte1();  */
 EXTER int READdefault_float_format;
 EXTER int READbase;
 EXTER bool READsuppress;
@@ -477,15 +477,15 @@ EXTER int sharp_eq_context_max;
 object read_char();
 object read_char1(object,object);
 object peek_char();
-object read_object_recursive();
+/* object read_object_recursive(); */
 object read_object_non_recursive();
 object standard_read_object_non_recursive();
 object read_object();
-object parse_number();
-object parse_integer();
-object copy_readtable();
-object current_readtable();
-object patch_sharp();
+/* object parse_number(); */
+/* object parse_integer(); */
+/* object copy_readtable(); */
+/* object current_readtable(); */
+/* object patch_sharp(); */
 object read_fasl_vector();
 
 /* fasdump.c */
@@ -624,7 +624,7 @@ EXTER object sLAlink_arrayA;
 /* nfunlink.c */
 object Icall_proc();
 float Icall_proc_float();
-object Icall_proc();
+/* object Icall_proc(); */
 float Icall_proc_float();
 object ImakeStructure();
 object list_vector();
@@ -639,8 +639,8 @@ object sLfset();
 object MakeAfun();
 extern  object Cstd_key_defaults[];   
 extern object call_proc0();
-extern object call_proc();
-extern object call_vproc();
+/* extern object call_proc(); */
+/* extern object call_vproc(); */
 object fLrow_major_aref();
 object Icheck_one_type();
 

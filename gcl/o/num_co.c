@@ -94,7 +94,7 @@ object plus_half, minus_half;
 	LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
 */
 #endif
-void
+static void
 integer_decode_double(double d, int *hp, int *lp, int *ep, int *sp)
 {
 	int h, l;
@@ -182,7 +182,7 @@ integer_decode_double(double d, int *hp, int *lp, int *ep, int *sp)
 	SEEEEEEEMMMMMMMMMMMMMMMMMMMMMMMM
 */
 #endif
-void
+static void
 integer_decode_float(double d, int *mp, int *ep, int *sp)
 {
 	float f;
@@ -224,7 +224,7 @@ integer_decode_float(double d, int *mp, int *ep, int *sp)
 	*sp = (f > 0.0 ? 1 : -1);
 }
 
-int
+static int
 double_exponent(double d)
 {
 	if (d == 0.0)
@@ -250,7 +250,7 @@ double_exponent(double d)
 #endif
 }
 
-double
+static double
 set_exponent(double d, int e)
 {
 	double dummy;
@@ -347,7 +347,7 @@ double_to_integer(double d)
 	return(x);
 }
 
-object
+static object
 num_remainder(object x, object y, object q)
 {
 	object z;

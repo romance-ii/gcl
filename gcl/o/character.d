@@ -185,7 +185,7 @@ object x, y;
 @)
 
 
-int
+static int
 char_cmp(x, y)
 object x, y;
 {
@@ -204,7 +204,7 @@ object x, y;
 	return(0);
 }
 
-void
+static void
 Lchar_cmp(s, t)
 int s, t;
 {
@@ -272,7 +272,7 @@ object x, y;
 @)
 
 
-int
+static int
 char_compare(x, y)
 object x, y;
 {
@@ -292,7 +292,7 @@ object x, y;
 		return(1);
 }
 
-void
+static void
 Lchar_compare(s, t)
 int s, t;
 {

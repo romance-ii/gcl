@@ -49,7 +49,7 @@ char dotdot[3*16+2] = "../../../../../../../../../../../../../../../../.";
 static char *getwd_buf;
 static int getwd_bufp;
 
-char *
+static char *
 getwd(buffer)
 char *buffer;
 {
@@ -250,7 +250,7 @@ coerce_to_filename(object pathname, char *p)
 
 
 
-object
+static object
 truename(object pathname)
 {
 	register char *p, *q;
@@ -258,7 +258,7 @@ truename(object pathname)
 	char truefilename[MAXPATHLEN];
 	char current_directory[MAXPATHLEN];
 	char directory[MAXPATHLEN];
-	char *getwd(char *buffer);
+	static char *getwd(char *buffer);
 	coerce_to_filename(pathname, filename);
 
 
@@ -408,9 +408,8 @@ Lrename_file(void)
 }
 
 
-DEFUN("SETENV",object,fSsetenv,SI,2,2,NONE,OO,OO,OO,OO,"Set environment VARIABLE to VALUE")(variable,value)
-     object variable;
-     object value;
+DEFUN_NEW("SETENV",object,fSsetenv,SI,2,2,NONE,OO,OO,OO,OO,(object variable,object value),"Set environment VARIABLE to VALUE")
+
 {
 
   int res = -1;
@@ -431,9 +430,9 @@ DEFUN("SETENV",object,fSsetenv,SI,2,2,NONE,OO,OO,OO,OO,"Set environment VARIABLE
   RETURN1((res == 0 ? Ct : Cnil ));
 }
 
-DEFUNO("DELETE-FILE",object,fLdelete_file,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Ldelete_file,"")(path)
-object path;
+DEFUNO_NEW("DELETE-FILE",object,fLdelete_file,LISP
+   ,1,1,NONE,OO,OO,OO,OO,void,Ldelete_file,(object path),"")
+
 {
 	char filename[MAXPATHLEN];
 
@@ -494,7 +493,7 @@ Lfile_author(void)
 	
 }
 
-void
+static void
 Luser_homedir_pathname(void)
 {
 #ifndef NO_PWD_H  
@@ -757,7 +756,7 @@ Ldirectory()
 
 #endif
 
-void
+static void
 siLchdir(void)
 {
 	char filename[MAXPATHLEN];

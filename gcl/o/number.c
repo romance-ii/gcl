@@ -54,9 +54,8 @@ fixnnint(object x)
 struct {int min,max;} bigger_fixnums;
 
 struct fixnum_struct *bigger_fixnum_table;
-DEFUN("ALLOCATE-BIGGER-FIXNUM-RANGE",object,fSallocate_bigger_fixnum_range,
-      SI,2,2,NONE,OI,IO,OO,OO,"") (min,max)
-     int min,max;
+DEFUN_NEW("ALLOCATE-BIGGER-FIXNUM-RANGE",object,fSallocate_bigger_fixnum_range,
+      SI,2,2,NONE,OI,IO,OO,OO,(int min,int max),"") 
 { int j; 
   if (min <= max); else {FEerror("Need Min < Max",0);}
   bigger_fixnum_table= (void *) malloc(sizeof(struct fixnum_struct)*

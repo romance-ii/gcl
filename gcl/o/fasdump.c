@@ -24,9 +24,12 @@
 #include "include.h"
 #endif
 
+static void
+clrhash(object);
+
 
 object coerce_stream();
-object fasd_patch_sharp(object x, int depth);
+static object fasd_patch_sharp(object x, int depth);
 object make_pathname ();
 
 
@@ -153,7 +156,7 @@ enum dump_type {
 FILE *fas_stream;
 int dump_index;
 struct htent *gethash();
-void read_fasd1(int i, object *loc);
+static void read_fasd1(int i, object *loc);
 object extended_read();
 
 /* to enable debugging define the following,
@@ -456,7 +459,7 @@ getd(str)
 
 
 
-enum circ_ind
+static enum circ_ind
 do_hash(object obj, int dot)
 {    struct htent *e;
      int i;
@@ -504,8 +507,8 @@ do_hash(object obj, int dot)
      return LATER_INDEX;
    }
  
-void write_fasd(object obj);
-object
+static void write_fasd(object obj);
+static object
 write_fasd_top(object obj, object x)
 {struct fasd *fd = (struct fasd *) x->v.v_self;
   if (fd->direction == sKoutput)
@@ -527,7 +530,7 @@ write_fasd_top(object obj, object x)
 #define MAYBE_PATCH(result) \
   if (needs_patching)  result =fasd_patch_sharp(result,0)
 
-object
+static object
 read_fasd_top(object x)
 {  struct fasd *fd = (struct fasd *)  x->v.v_self;
    VOL int e=0;
@@ -573,7 +576,7 @@ object sLeq;
 object sSPinit;
 void Lmake_hash_table();
 
-object
+static object
 open_fasd(object stream, object direction, object eof, object tabl)
 {  object str=Cnil;
    object result;
@@ -624,7 +627,7 @@ open_fasd(object stream, object direction, object eof, object tabl)
     return result;
   }}
 
-object
+static object
 close_fasd(object ar)
 {  struct fasd *fd= (struct fasd *)(ar->v.v_self);
    check_type(ar,t_vector);
@@ -659,7 +662,7 @@ close_fasd(object ar)
 #define TRY_HASH \
   if(do_hash(obj,0)==LATER_INDEX) return;
 
-void
+static void
 write_fasd(object obj)
 {  int j,leng;
 
@@ -893,7 +896,7 @@ fasd_patch_sharp_cons(object x, int depth)
 	}
 }
 
-object
+static object
 fasd_patch_sharp(object x, int depth)
 {
 	cs_check(x);
@@ -965,7 +968,7 @@ fasd_patch_sharp(object x, int depth)
 }
 
 object sharing_table;
-enum circ_ind
+static enum circ_ind
 is_it_there(object x)
 { struct htent *e;
   object table=sharing_table;
@@ -1047,7 +1050,7 @@ find_sharing(object x)
 	return;
 }
 
-object
+static object
 find_sharing_top(object x, object table)
 {sharing_table=table;
  find_sharing(x);
@@ -1058,15 +1061,15 @@ find_sharing_top(object x, object table)
 
 
 
-object           
-read_fasd(int i)
-{object tem;
-   read_fasd1(i,&tem);
-   return tem;}
+/* static object            */
+/* read_fasd(int i) */
+/* {object tem; */
+/*    read_fasd1(i,&tem); */
+/*    return tem;} */
 
 
      /* I am not sure if saving vs_top,vs_base is necessary */
-object 
+static object 
 lisp_eval(object x)
 {  object *b,*t;
    SAVE_CURRENT_FASD;
@@ -1107,7 +1110,7 @@ bad_eof(void)
 
 
 /* read one starting with byte i into location loc */
-void
+static void
 read_fasd1(int i, object *loc)
 {  object tem;
    int leng;
@@ -1467,7 +1470,7 @@ read_fasd1(int i, object *loc)
 	
       }}
        
-void
+static void
 clrhash(object table)
 {int i;
    if (table->ht.ht_nent > 0 )
@@ -1539,39 +1542,39 @@ read_fasl_vector(object in)
 }}
 
 object IfaslInStream;
-void
-IreadFasdData(void)
+/* static void */
+/* IreadFasdData(void) */
 
    /* While  executing this the  siPMemory should be  bound to the cfdata
    and the sSPinit to a vector of addresses. */
-{object ar=open_fasd(IfaslInStream,sKinput,0,Cnil);
-  int n=fix(current_fasd.table_length);
-  object result;
- {BEGIN_NO_INTERRUPT;
-#ifdef HAVE_ALLOCA
-  current_fasd.table->v.v_self
-    = (object *)alloca(n*sizeof(object));
-#else
-  current_fasd.table->v.v_self
-    = (object *)alloc_relblock(n*sizeof(object));
-#endif
-  current_fasd.table->v.v_dim=n;
-  current_fasd.table->v.v_fillp=n;
-  gset( current_fasd.table->v.v_self,0,n,aet_object);
-  END_NO_INTERRUPT;
-}
-  result=read_fasd_top(ar);
+/* {object ar=open_fasd(IfaslInStream,sKinput,0,Cnil); */
+/*   int n=fix(current_fasd.table_length); */
+/*   object result; */
+/*  {BEGIN_NO_INTERRUPT; */
+/* #ifdef HAVE_ALLOCA */
+/*   current_fasd.table->v.v_self */
+/*     = (object *)alloca(n*sizeof(object)); */
+/* #else */
+/*   current_fasd.table->v.v_self */
+/*     = (object *)alloc_relblock(n*sizeof(object)); */
+/* #endif */
+/*   current_fasd.table->v.v_dim=n; */
+/*   current_fasd.table->v.v_fillp=n; */
+/*   gset( current_fasd.table->v.v_self,0,n,aet_object); */
+/*   END_NO_INTERRUPT; */
+/* } */
+/*   result=read_fasd_top(ar); */
  /* make sure there is nothing still pointing into the stack */
-  current_fasd.table->v.v_self = 0;
-   current_fasd.table->v.v_dim=0;
-  current_fasd.table->v.v_fillp=0;
+/*   current_fasd.table->v.v_self = 0; */
+/*    current_fasd.table->v.v_dim=0; */
+/*   current_fasd.table->v.v_fillp=0; */
 
-}
+/* } */
 
  
 
 
-void
+static void
 init_fasdump(void)
 {
   make_si_sfun("READ-FASD-TOP",read_fasd_top,1);

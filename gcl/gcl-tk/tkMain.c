@@ -98,7 +98,7 @@ static char *display = NULL;
 static char *geometry = NULL;
 int debug = 0;
 
-void guiCreateCommand _ANSI_ARGS_((int idLispObject, int iSlot , char *arglist));
+static void guiCreateCommand _ANSI_ARGS_((int idLispObject, int iSlot , char *arglist));
 
 void
 dfprintf(FILE *fp,char *s,...) {
@@ -117,7 +117,7 @@ dfprintf(FILE *fp,char *s,...) {
 #define CMD_SIZE 4000
 #define SIGNAL_ERROR TCL_signal_error
 
-void
+static void
 TCL_signal_error(x)
      char *x;
 {char buf[300] ;
@@ -379,7 +379,7 @@ error:
 
 static char *being_set_by_lisp;
 
-char *
+static char *
 tell_lisp_var_changed(
                 clientData,
                interp,
@@ -520,7 +520,7 @@ StdinProc(clientData, mask)
 	  {
 	    Tcl_DStringInit(&command);
 	    Tcl_DStringFree(&command);
-	    fSclear_connection(dsfd);
+	    fSclear_connection(dsfd->fd);
 	  }
 	  break;
 	case m_tcl_set_text_variable:
@@ -641,7 +641,7 @@ TclGenericCommandProcedure( clientData,
 
 
 
-void
+static void
 guiCreateCommand( idLispObject,  iSlot , arglist)
      int idLispObject; int iSlot ; char *arglist;
 {
@@ -691,14 +691,14 @@ guiBindCallback(char *szNameCmdProc, char *szTclObject, char *szModifier,char* a
   return code;
 }
 */
-void
-guiDeleteCallback(szCallback)
-     char *szCallback;
-{
-  dfprintf(stderr, "Tcl Deleting command : %s\n", szCallback);
+/* static void */
+/* guiDeleteCallback(szCallback) */
+/*      char *szCallback; */
+/* { */
+/*   dfprintf(stderr, "Tcl Deleting command : %s\n", szCallback); */
 
-  Tcl_DeleteCommand(interp, szCallback);
-}
+/*   Tcl_DeleteCommand(interp, szCallback); */
+/* } */
 
 /*  */
 

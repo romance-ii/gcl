@@ -31,7 +31,7 @@ fixnum_expt(int x, int y)
 {
 	int z;
 
-	z = 1;
+ 	z = 1;
 	while (y > 0)
 		if (y%2 == 0) {
 			x *= x;
@@ -43,7 +43,7 @@ fixnum_expt(int x, int y)
 	return(z);
 }
 
-object
+static object
 number_exp(object x)
 {
 	double exp(double);
@@ -64,7 +64,7 @@ number_exp(object x)
 	case t_complex:
 	{
 		object y, y1;
-		object number_sin(object x), number_cos(object x);
+		static object number_sin(object x), number_cos(object x);
 	        vs_mark;
 	
 		y = x->cmp.cmp_imag;
@@ -92,7 +92,8 @@ object
 number_expt(object x, object y)
 {
 	enum type tx, ty;
-	object z, number_nlog(object x);
+	object z;
+	static object number_nlog(object x);
 	vs_mark;
 
 	tx = type_of(x);
@@ -171,11 +172,12 @@ number_expt(object x, object y)
 	return(z);
 }
 
-object
+static object
 number_nlog(object x)
 {
 	double log(double);
-	object r=Cnil, i=Cnil, a, p, number_sqrt(object x), number_atan2(object y, object x);
+	object r=Cnil, i=Cnil, a, p;
+	static object number_sqrt(object x), number_atan2(object y, object x);
 	vs_mark;
 
 	if (type_of(x) == t_complex) {
@@ -224,7 +226,7 @@ COMPLEX:
 	return(x);
 }
 
-object
+static object
 number_log(object x, object y)
 {
 	object z;
@@ -243,7 +245,7 @@ number_log(object x, object y)
 	return(z);
 }
 
-object
+static object
 number_sqrt(object x)
 {
 	object z;
@@ -279,7 +281,7 @@ COMPLEX:
 	return(z);
 }
 
-object
+static object
 number_atan2(object y, object x)
 {
 	object z;
@@ -315,7 +317,7 @@ number_atan2(object y, object x)
 	return(z);
 }
 
-object
+static object
 number_atan(object y)
 {
 	object z, z1;
@@ -343,7 +345,7 @@ number_atan(object y)
 	return(number_atan2(y, small_fixnum(1)));
 }
 
-object
+static object
 number_sin(object x)
 {
 	double sin(double);
@@ -390,7 +392,7 @@ number_sin(object x)
 	}
 }
 
-object
+static object
 number_cos(object x)
 {
 	double cos(double);
@@ -484,7 +486,7 @@ number_tan1(object x)
 	}
 }
 
-object
+static object
 number_tan(object x)
 {
 	object r, c;
@@ -589,7 +591,7 @@ Latan(void)
 		too_many_arguments();
 }
 
-void
+static void
 siLmodf(void)
 {
   

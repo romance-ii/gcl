@@ -38,7 +38,7 @@ object sSAinhibit_macro_specialA;
 
 object sLtypep;
 
-void
+static void
 Fdefun(object args)
 {
 
@@ -97,7 +97,7 @@ Fdefun(object args)
 	}
 }
 	
-void
+static void
 siLAmake_special(void)
 {
 	check_arg(1);
@@ -107,7 +107,7 @@ siLAmake_special(void)
 	vs_base[0]->s.s_stype = (short)stp_special;
 }
 
-void
+static void
 siLAmake_constant(void)
 {
 	check_arg(2);
@@ -121,7 +121,7 @@ siLAmake_constant(void)
 	vs_popp;
 }
 
-void
+static void
 Feval_when(object arg)
 {
 
@@ -147,13 +147,13 @@ Feval_when(object arg)
 	}
 }
 
-void
+static void
 Fdeclare(object arg)
 {
 	FEerror("DECLARE appeared in an invalid position.", 0);
 }
 
-void
+static void
 Flocally(object body)
 {
 	object *oldlex = lex_env;
@@ -165,7 +165,7 @@ Flocally(object body)
 	lex_env = oldlex;
 }
 
-void
+static void
 Fthe(object args)
 {
 

@@ -25,6 +25,10 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <string.h>
 #include "include.h"
 
+static void
+odd_plist(object);
+
+
 object siSpname;
 
 void
@@ -604,7 +608,7 @@ siLrem_f()
 }
 
 void
-siLset_symbol_plist()
+siLset_symbol_plist(void)
 {
 	check_arg(2);
 
@@ -627,7 +631,7 @@ siLputprop()
 }
 
 
-void
+static void
 odd_plist(place)
 object place;
 {

@@ -1,5 +1,3 @@
-
-
 (defun fix-struct-ref ()
   (interactive)
   (while (re-search-forward "->\\([a-z]+\\)+[.]\\([A-Z][a-zA-Z]+\\)")

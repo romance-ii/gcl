@@ -110,7 +110,7 @@ GEN u;
  }
 
 
-object
+static object
 make_bignum(u)
 GEN u;
 {  BEGIN_NO_INTERRUPT;
@@ -127,7 +127,7 @@ GEN u;
       END_NO_INTERRUPT;
       return ans;
      }}
-
+static 
 big_zerop(x)
  object x;
 { return (signe(MP(x))== 0);}
@@ -145,7 +145,7 @@ big_minus(x)
   setsigne(MP(x),-(signe(MP(x))));
   return  y;
 }
-
+static 
 gcopy_to_big(res,x)
      GEN res;
      object x;
@@ -172,7 +172,7 @@ object x;
 {
        MPOP_DEST(x,addsi,i,MP(x));
 }
-
+static 
 sub_int_big(i, x)
 int i;
 object x;
@@ -193,7 +193,7 @@ object x;
 	I should be positive.
 	X should be non-negative.
 */
-
+static 
 div_int_big(i, x)
 int i;
 object x;
@@ -205,13 +205,13 @@ object x;
 }
 
 
-object
+static object
 big_plus(x, y)
 object x,y;
 { MPOP(return,addii,MP(x),MP(y));
 }
 
-object
+static object
 big_times(x, y)
 object x,y;
 {
@@ -219,7 +219,7 @@ object x,y;
 }
 
 
-
+static 
 big_quotient_remainder(x0, y0, qp, rp)
      object x0,y0,*qp,*rp;
 {
@@ -264,7 +264,7 @@ normalize_big_to_object(x)
 { return make_integer(MP(x));}
   
 
-object copy_big(x)
+static object copy_big(x)
      object x;
 {
   if (type_of(x)==t_bignum)
@@ -274,7 +274,7 @@ object copy_big(x)
 }
 
 
-object
+static object
 copy_to_big(x)
      object x;
 {object y;
@@ -377,7 +377,7 @@ obj_replace_copy2(x,y)
  return y;}
 
 
-GEN
+static GEN
 otoi(x)
      object x;
 {if (type_of(x)==t_fixnum) return stoi(fix(x));

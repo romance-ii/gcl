@@ -103,7 +103,7 @@ Ftagbody(object body)
 	vs_base[0] = Cnil;
 }
 
-void
+static void
 Fprog(VOL object arg)
 {
 
@@ -136,7 +136,7 @@ END:
 	lex_env = oldlex;
 }
 
-void
+static void
 FprogA(VOL object arg)
 {
 
@@ -169,7 +169,7 @@ END:
 	lex_env = oldlex;
 }
 
-void
+static void
 Fgo(object args)
 {
 
@@ -191,7 +191,7 @@ Fgo(object args)
 	/*  never reached  */
 }
 
-void
+static void
 Fprogv(object args)
 {
 
@@ -253,7 +253,7 @@ Fprogn(object body)
 	}
 }
 
-void
+static void
 Fprog1(object arg)
 {
 
@@ -270,7 +270,7 @@ Fprog1(object arg)
 	vs_top = top + 1;
 }
 
-void
+static void
 Fprog2(object arg)
 {
 

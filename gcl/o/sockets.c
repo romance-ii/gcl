@@ -54,8 +54,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <errno.h> 
 
-void write_timeout_error();
-void connection_failure();
+static void write_timeout_error();
+static void connection_failure();
 
 #ifdef __MINGW32__
 /* Keep track of socket initialisations */
@@ -101,12 +101,10 @@ int w32_socket_exit(void)
 #define BIND_LAST_ADDRESS	65534
 static unsigned int iLastAddressUsed = BIND_INITIAL_ADDRESS;
 
-DEFUN("OPEN-NAMED-SOCKET",object,fSopen_named_socket,SI,1,1,NONE,OI,OO,OO,OO,
+DEFUN_NEW("OPEN-NAMED-SOCKET",object,fSopen_named_socket,SI,1,1,NONE,OI,OO,OO,OO,(int port),
 "Open a socket on PORT and return (cons fd portname) where file \
 descriptor is a small fixnum which is the write file descriptor for \
 the socket.  If PORT is zero do automatic allocation of port") 
-     (port)
-int port;
 { int s, n, rc; struct
 sockaddr_in addr;
 
@@ -180,14 +178,14 @@ sockaddr_in addr;
   return make_cons(make_fixnum(s), make_fixnum(ntohs(addr.sin_port)));
 }
 
-DEFUN("CLOSE-FD",object,fSclose_fd,SI,1,1,NONE,OI,OO,OO,OO,
-      "Close the file descriptor FD")(fd)
-     int fd;
+DEFUN_NEW("CLOSE-FD",object,fSclose_fd,SI,1,1,NONE,OI,OO,OO,OO,(int fd),
+      "Close the file descriptor FD")
+
 {RETURN1(0==close(fd) ? Ct : Cnil);}
 
-DEFUN("CLOSE-SD",object,fSclose_sfd,SI,1,1,NONE,OO,OO,OO,OO,
-      "Close the socket connection sfd")(sfd)
-     object sfd;
+DEFUN_NEW("CLOSE-SD",object,fSclose_sfd,SI,1,1,NONE,OO,OO,OO,OO,(object sfd),
+      "Close the socket connection sfd")
+
 { int res;
   free(OBJ_TO_CONNECTION_STATE(sfd)->read_buffer);
   res = close(OBJ_TO_CONNECTION_STATE(sfd)->fd);
@@ -199,12 +197,11 @@ DEFUN("CLOSE-SD",object,fSclose_sfd,SI,1,1,NONE,OO,OO,OO,OO,
 }
 
 
-DEFUN("ACCEPT-SOCKET-CONNECTION",object,fSaccept_socket_connection,
-      SI,1,1,NONE,OO,OO,OO,OO,
+DEFUN_NEW("ACCEPT-SOCKET-CONNECTION",object,fSaccept_socket_connection,
+	  SI,1,1,NONE,OO,OO,OO,OO,(object named_socket),
       "Given a NAMED_SOCKET it waits for a connection on this \
 and returns (list* named_socket fd name1) when one is established")
-     (named_socket)
-     object named_socket;
+
 {
   int n, fd;
   struct sockaddr_in addr;
@@ -227,28 +224,28 @@ and returns (list* named_socket fd name1) when one is established")
 		   );
 }
 
-object
-sock_hostname_to_hostid_list(host_name)
-     char *host_name;
-{
-  struct hostent *h;
-  object addr_list = Cnil;
-  int i;
+/* static object */
+/* sock_hostname_to_hostid_list(host_name) */
+/*      char *host_name; */
+/* { */
+/*   struct hostent *h; */
+/*   object addr_list = Cnil; */
+/*   int i; */
 
-  h = gethostbyname(host_name);
+/*   h = gethostbyname(host_name); */
 
-  for (i = 0; h->h_addr_list[i] != 0; i++)
-    {
-      addr_list = make_cons(make_simple_string(inet_ntoa(*(struct in_addr *)h->h_addr_list[i])), addr_list);
-    }
-  return addr_list;
-}
+/*   for (i = 0; h->h_addr_list[i] != 0; i++) */
+/*     { */
+/*       addr_list = make_cons(make_simple_string(inet_ntoa(*(struct in_addr *)h->h_addr_list[i])), addr_list); */
+/*     } */
+/*   return addr_list; */
+/* } */
 
     
       
 
-DEFUN("HOSTNAME-TO-HOSTID",object,fShostname_to_hostid,SI,1,1,
-      NONE,OO,OO,OO,OO,"")(object host)
+DEFUN_NEW("HOSTNAME-TO-HOSTID",object,fShostname_to_hostid,SI,1,1,
+      NONE,OO,OO,OO,OO,(object host),"")
 {
   struct hostent *h;
   char buf[300];
@@ -262,19 +259,18 @@ DEFUN("HOSTNAME-TO-HOSTID",object,fShostname_to_hostid,SI,1,1,
   else return Cnil;
 }
 
-DEFUN("GETHOSTNAME",object,fSgethostname,SI,0,0,NONE,OO,OO,OO,OO,
+DEFUN_NEW("GETHOSTNAME",object,fSgethostname,SI,0,0,NONE,OO,OO,OO,OO,(void),
       "Returns HOSTNAME of the local host")
-     ()
+     
 {char buf[300];
  if (0 == gethostname(buf,sizeof(buf)))
    return make_simple_string(buf);
  else return Cnil;
 }
 
-DEFUN("HOSTID-TO-HOSTNAME",object,fShostid_to_hostname,SI,
-      1,10,NONE,OO,OO,OO,OO,"")
-     (host_id)
-     object host_id;
+DEFUN_NEW("HOSTID-TO-HOSTNAME",object,fShostid_to_hostname,SI,
+      1,10,NONE,OO,OO,OO,OO,(object host_id),"")
+
 {char *hostid;
   struct in_addr addr;
   struct hostent *h;
@@ -288,45 +284,39 @@ DEFUN("HOSTID-TO-HOSTNAME",object,fShostid_to_hostname,SI,
     return Cnil;
 }
 
-object
-sock_get_name(s)
-     int s;
-{
-  struct sockaddr_in addr;
-  int m = sizeof(addr);
-  getsockname(s, (struct sockaddr *)&addr, &m);
-  return make_cons(
-		   make_cons(
-			     make_fixnum(addr.sin_port)
-			     , make_simple_string(inet_ntoa(addr.sin_addr))
-			     )
-		   ,make_cons(make_fixnum(addr.sin_family)
-			      , make_fixnum(s))
-		   );
-}
+/* static object */
+/* sock_get_name(s) */
+/*      int s; */
+/* { */
+/*   struct sockaddr_in addr; */
+/*   int m = sizeof(addr); */
+/*   getsockname(s, (struct sockaddr *)&addr, &m); */
+/*   return make_cons( */
+/* 		   make_cons( */
+/* 			     make_fixnum(addr.sin_port) */
+/* 			     , make_simple_string(inet_ntoa(addr.sin_addr)) */
+/* 			     ) */
+/* 		   ,make_cons(make_fixnum(addr.sin_family) */
+/* 			      , make_fixnum(s)) */
+/* 		   ); */
+/* } */
 
 #include "comm.c"
 
 
-DEFUN("CONNECTION-STATE-FD",object,fSconnection_state_fd,SI,1,1,NONE,OO,OO,OO,OO,"") (sfd)
-     object sfd;
+DEFUN_NEW("CONNECTION-STATE-FD",object,fSconnection_state_fd,SI,1,1,NONE,OO,OO,OO,OO,(object sfd),"") 
 { return make_fixnum(OBJ_TO_CONNECTION_STATE(sfd)->fd);
 }
      
-DEFUN("OUR-WRITE",object,fSour_write,SI,3,3,NONE,OO,OI,OO,OO,"")
-     (sfd,buffer,nbytes)
-     object buffer;
-     object sfd;
-     int nbytes;
+DEFUN_NEW("OUR-WRITE",object,fSour_write,SI,3,3,NONE,OO,OI,OO,OO,(object sfd,object buffer,int nbytes),"")
+
 { return make_fixnum(write1(OBJ_TO_CONNECTION_STATE(sfd),buffer->ust.ust_self,nbytes));
 }
 
-DEFUN("OUR-READ-WITH-OFFSET",object,fSour_read_with_offset,SI,5,5,NONE,
-      OO,OI,II,OO,
+DEFUN_NEW("OUR-READ-WITH-OFFSET",object,fSour_read_with_offset,SI,5,5,NONE,
+	  OO,OI,II,OO,(object fd,object buffer,int offset,int nbytes,int timeout),
       "Read from STATE-FD into string BUFFER putting data at OFFSET and reading NBYTES, waiting for TIMEOUT before failing")
-     (fd,buffer,offset,nbytes,timeout)
-     int offset,nbytes,timeout;
-     object buffer,fd;
+
 { return make_fixnum(read1(OBJ_TO_CONNECTION_STATE(fd),&((buffer)->ust.ust_self[offset]),nbytes,timeout));
 }
 
@@ -357,12 +347,10 @@ enum print_arglist_codes {
 
 static int needs_quoting[256];
 
-DEFUN("PRINT-TO-STRING1",object,fSprint_to_string1,SI,3,3,NONE,OO,OO,OO,OO,
+DEFUN_NEW("PRINT-TO-STRING1",object,fSprint_to_string1,SI,3,3,NONE,OO,OO,OO,OO,(object str,object x,object the_code),
       "Print to STRING the object X according to CODE.   The string must have \
 fill pointer, and this will be advanced.")
-     (str,x,the_code)
-object str,x;
-object the_code;
+
 { enum type t = type_of(x);
   int fp = str->st.st_fillp;
   char *xx = &(str->st.st_self[fp]);
@@ -480,14 +468,13 @@ object the_code;
    }
 }
 
-void
+static void
 not_defined_for_os()
 { FEerror("Function not defined for this operating system",0);}
 
 
-DEFUN("SET-SIGIO-FOR-FD",object,fSset_sigio_for_fd,SI,1,1,NONE,OI,OO,OO,OO,"")
-     (fd)
-     int fd;
+DEFUN_NEW("SET-SIGIO-FOR-FD",object,fSset_sigio_for_fd,SI,1,1,NONE,OI,OO,OO,OO,(int fd),"")
+
 { 
   /* for the moment we will use SIGUSR1 to notify, instead of depending on SIGIO,
      since LINUX does not support the latter yet...
@@ -515,32 +502,27 @@ DEFUN("SET-SIGIO-FOR-FD",object,fSset_sigio_for_fd,SI,1,1,NONE,OI,OO,OO,OO,"")
 
 }
      
-DEFUN("RESET-STRING-INPUT-STREAM",object,fSreset_string_input_stream,SI,4,4,NONE,OO,OI,IO,OO,
+DEFUN_NEW("RESET-STRING-INPUT-STREAM",object,fSreset_string_input_stream,SI,4,4,NONE,OO,OI,IO,OO,(object strm,object string,int start,int end),
       "Reuse a string output STREAM by setting its output to STRING \
 and positioning the ouput/input to start at START and end at END")
-     (strm,string,start,end)
-     object strm,string;
-     int start,end;
+
 { strm->sm.sm_object0 = string;
   strm->sm.sm_int0 = start;
   strm->sm.sm_int1 = end;
   return strm;
 }
 
-DEFUN("CHECK-STATE-INPUT",object,fScheck_state_input,SI,2,2,NONE,OO,IO,OO,OO,
-      "") (osfd,timeout)
-     object osfd;
-     int timeout;
+DEFUN_NEW("CHECK-STATE-INPUT",object,fScheck_state_input,SI,2,2,NONE,OO,IO,OO,OO,(object osfd,int timeout),
+      "") 
 {
   return fScheck_dsfd_for_input(OBJ_TO_CONNECTION_STATE(osfd),timeout);
 
 }
 
-DEFUN("CLEAR-CONNECTION-STATE",object,fSclear_connection_state,
-      SI,1,1,NONE,OO,OO,OO,OO,
+DEFUN_NEW("CLEAR-CONNECTION-STATE",object,fSclear_connection_state,
+	  SI,1,1,NONE,OO,OO,OO,OO,(object osfd),
       "Read on FD until nothing left to read.  Return number of bytes read")
-     (osfd)
-     object osfd;
+
 { 
   struct connection_state *sfd = OBJ_TO_CONNECTION_STATE(osfd);
   int n=fix(fSclear_connection(sfd->fd));
@@ -553,13 +535,13 @@ DEFUN("CLEAR-CONNECTION-STATE",object,fSclear_connection_state,
 
 #endif
 
-void
+static void
 write_timeout_error(s)
      char *s;
 {FEerror("Write timeout: ~s",1,make_simple_string(s));
 }
 
-void
+static void
 connection_failure(s)
      char *s;
 {FEerror("Connect failure: ~s",1,make_simple_string(s));

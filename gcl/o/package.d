@@ -39,7 +39,7 @@ void check_type_or_symbol_string_package(object *);
 
 
 
-bool
+static bool
 member_string_equal(x, l)
 object x, l;
 {
@@ -81,7 +81,7 @@ designate_package(object x,struct package *p) {
 					   FEwrong_type_argument(TSor_symbol_string_package,(a))
 #define check_type_or_symbol_string_package(a) check_package_designator(*a)
 
-void
+static void
 rehash_pack(ptab,n,m)
      object **ptab;
      int *n,m;
@@ -113,7 +113,7 @@ static int package_sizes[]={
   97,251, 509, 1021, 2039, 4093, 8191, 16381,
   32749, 65521, 131071, 262139,   524287, 1048573};
 
-int
+static int
 suitable_package_size(n)
 {int *i=package_sizes;
  if (n>= 1000000) return 1048573;
@@ -127,12 +127,12 @@ suitable_package_size(n)
 	and uses packages in list ul, which must be a list of packages
 	or package names i.e. strings or symbols.
 */
-void
+static void
 package_already(object);
-void
+static void
 no_package(object);
 
-object
+static object
 make_package(n, ns, ul,isize,esize)
 object n, ns, ul;
 int isize,esize;
@@ -206,10 +206,10 @@ int isize,esize;
 	return(x);
 }
 
-void
+static void
 use_package(object,object);
 
-object
+static object
 in_package(n, ns, ul,isize,esize)
 object n, ns, ul;
 int isize,esize;
@@ -249,7 +249,7 @@ int isize,esize;
 	return(x);
 }
 
-object
+static object
 rename_package(x, n, ns)
 object x, n, ns;
 {
@@ -308,7 +308,7 @@ object n;
 	return(Cnil);
 }
 
-object
+static object
 coerce_to_package(p)
 object p;
 {
@@ -469,7 +469,7 @@ object st, p;
 	END_NO_INTERRUPT;return(Cnil);
 }}
 
-bool
+static bool
 unintern(s, p)
 object s, p;
 {
@@ -554,7 +554,7 @@ BEGIN:
 	*ep = make_cons(s, *ep);
 }
 
-void
+static void
 unexport(s, p)
 object s, p;
 {
@@ -599,7 +599,7 @@ object s, p;
 	*ip = make_cons(s, *ip);
 }
 
-void
+static void
 shadowing_import(s, p)
 object s, p;
 {
@@ -630,7 +630,7 @@ object s, p;
 	p->p.p_shadowings = make_cons(s, p->p.p_shadowings);
 }
 
-void
+static void
 shadow(s, p)
 object s, p;
 {
@@ -653,7 +653,7 @@ object s, p;
 	vs_popp;
 }
 
-void
+static void
 use_package(x0, p)
 object x0, p;
 {
@@ -687,7 +687,7 @@ object x0, p;
 	x->p.p_usedbylist = make_cons(p, x->p.p_usedbylist);
 }
 
-void
+static void
 unuse_package(x0, p)
 object x0, p;
 {
@@ -704,7 +704,7 @@ object x0, p;
 
 
 
-object
+static object
 delete_package(object n) {
 
   struct package *p,*pp;
@@ -780,7 +780,7 @@ Lfind_package()
 	vs_base[0] = find_package(vs_base[0]);
 }
 
-void
+static void
 Ldelete_package()
 {
 	check_arg(1);
@@ -840,7 +840,7 @@ Lpackage_used_by_list()
 	vs_base[0] = vs_base[0]->p.p_usedbylist;
 }
 
-void
+static void
 Lpackage_shadowing_symbols()
 {
 	check_arg(1);
@@ -1124,21 +1124,21 @@ siLpackage_external()
 	vs_popp;
 }
 
-void
+static void
 no_package(n)
 object n;
 {
 	FEwrong_type_argument(TSor_symbol_string_package,n);
 }
 
-void
+static void
 package_already(n)
 object n;
 {
   FEpackage_error(n,"A package with this name already exists.");
 }
 
-void
+static void
 siLpackage_size()
 {object p;
  p=vs_base[0];

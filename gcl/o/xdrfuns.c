@@ -113,7 +113,7 @@ siGxdr_read(str,elt)
   FEerror("bad xdr read",0);
   return elt;
 }
-
+static 
 init_xdrfuns()
 { make_si_sfun("XDR-WRITE",siGxdr_write,
 	       ARGTYPE2(f_object,f_object)|RESTYPE(f_object));
@@ -125,5 +125,5 @@ init_xdrfuns()
   
 }
 #else
-void init_xdrfuns(void) {;}
+static void init_xdrfuns(void) {;}
 #endif     

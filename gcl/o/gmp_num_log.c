@@ -8,7 +8,7 @@
 object big_log_op();
 object normalize_big(object);
 
-object
+static object
 log_op(int (*op) (/* ??? */), void (*mp_op) (/* ??? */))
 {
 	object x;
@@ -45,14 +45,14 @@ BIG_OP:
 }
 
 
-void
+static void
 mp_and_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
 	mpz_and(u,i,j);
          /* (i & j); */
 }
 
-void
+static void
 mp_eqv_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
 	mpz_xor(u,i,j);
@@ -61,7 +61,7 @@ mp_eqv_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 
 }
 
-void
+static void
 mp_nand_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
 	mpz_and(u,i,j);
@@ -69,7 +69,7 @@ mp_nand_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 	/* (~(i & j)); */
 }
 
-void
+static void
 mp_nor_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
 /*      mpz_ior(u,u,j); */
@@ -79,7 +79,7 @@ mp_nor_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
      /* (~(i | j)); */
 }
 
-void
+static void
 mp_andc1_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
      mpz_com(i,i);
@@ -87,7 +87,7 @@ mp_andc1_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 	/* ((~i) & j); */
 }
 
-void
+static void
 mp_andc2_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
       mpz_com(j,j);
@@ -95,7 +95,7 @@ mp_andc2_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 	/* (i & (~j));*/
 }
 
-void
+static void
 mp_orc1_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
    mpz_com(i,i);
@@ -103,7 +103,7 @@ mp_orc1_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 /*	((~i) | j); */
 }
 
-void
+static void
 mp_orc2_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
     mpz_com(j,j);
@@ -111,42 +111,42 @@ mp_orc2_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 	/* (i | (~j)); */
 }
 
-void
+static void
 mp_b_clr_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
     mpz_set_si(u,0);
 /* 	(0); */
 }
 
-void
+static void
 mp_b_set_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
    mpz_set_si(u,-1);
 	/* (-1); */
 }
 
-void
+static void
 mp_b_1_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
     mpz_set(u,i);
    /*	(i); */
 }
 
-void
+static void
 mp_b_2_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
    mpz_set(u,j);
 /* 	(j); */
 }
 
-void
+static void
 mp_b_c1_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
   mpz_com(u,i);
 	/* (~i); */
 }
 
-void
+static void
 mp_b_c2_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
    mpz_com(u,j);
@@ -156,7 +156,7 @@ mp_b_c2_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 
 
 
-int
+static int
 big_bitp(object x, int p)
 {
   return mpz_tstbit(MP(x),p);
@@ -166,21 +166,21 @@ big_bitp(object x, int p)
 
    
 
-void
+static void
 mp_ior_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
 	mpz_ior(u,i,j);
     /* (i | j); */
 }
 
-void
+static void
 mp_xor_op(__mpz_struct *u, __mpz_struct *i, __mpz_struct *j)
 {
 	mpz_xor(u,i,j);
   /* (i ^ j); */
 }
 
-int
+static int
 mpz_bitcount(__mpz_struct *x)
 {
   if (mpz_sgn(x) >= 0) {
@@ -193,7 +193,7 @@ mpz_bitcount(__mpz_struct *x)
 }
 
 
-int
+static int
 mpz_bitlength(__mpz_struct *x)
 {
   if (mpz_sgn(x) >= 0) {

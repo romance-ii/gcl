@@ -37,7 +37,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
     FEwrong_type_argument(sLstructure,(x)) 
 
 
-bool
+static bool
 structure_subtypep(object x, object y)
 { if (x==y) return 1;
   if (type_of(x)!= t_structure
@@ -83,7 +83,7 @@ structure_ref(object x, object name, int i)
    }}
 
 
-void
+static void
 siLstructure_ref1(void)
 {object x=vs_base[0];
  int n=fix(vs_base[1]);
@@ -137,7 +137,7 @@ structure_set(object x, object name, int i, object v)
  return(v);
 }
 
-void
+static void
 siLstructure_subtype_p(void)
 {object x,y;
  check_arg(2);
@@ -235,7 +235,7 @@ siLmake_structure(void)
  }
 }
 
-void
+static void
 siLcopy_structure(void)
 {
 	object x, y;
@@ -346,7 +346,7 @@ siLlist_nth(void)
 }
 
 
-void
+static void
 siLmake_s_data_structure(void)
 {object x,y,raw,*base;
  int i;
@@ -370,7 +370,7 @@ siLmake_s_data_structure(void)
  vs_top=vs_base+1;
 }
 
-void
+static void
 siLstructure_def(void)
 {check_arg(1);
  check_type_structure(vs_base[0]);
@@ -394,7 +394,7 @@ sizeof(short)  /* aet_ushort  unsigned short   */
 
 
 
-void
+static void
 siLsize_of(void)
 { object x= vs_base[0];
   int i;
@@ -402,7 +402,7 @@ siLsize_of(void)
   vs_base[0]=make_fixnum(i);
 }
   
-void
+static void
 siLaet_type(void)
 {vs_base[0]=fSget_aelttype(vs_base[0]);}
 
@@ -411,7 +411,7 @@ siLaet_type(void)
    an address which is a multiple of N */
 
 
-void
+static void
 siLalignment(void)
 {struct {double x; int y; double z;
 	 float x1; int y1; float z1;}

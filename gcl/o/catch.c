@@ -28,7 +28,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 
-void
+static void
 Fcatch(VOL object args)
 {
 
@@ -47,16 +47,15 @@ Fcatch(VOL object args)
 	frs_pop();
 }
 
-DEFUNO("ERROR-SET",object,fSerror_set,SI
-   ,1,1,NONE,OO,OO,OO,OO,siLerror_set,
+DEFUN_NEW("ERROR-SET",object,fSerror_set,SI
+	   ,1,1,NONE,OO,OO,OO,OO,(volatile object x0),
        "Evaluates the FORM in the null environment.  If the evaluation \
 of the FORM has successfully completed, SI:ERROR-SET returns NIL as the first \
 value and the result of the evaluation as the rest of the values.  If, in the \
 course of the evaluation, a non-local jump from the FORM is atempted, \
 SI:ERROR-SET traps the jump and returns the corresponding jump tag as its \
 value.")
-   (x0)
-volatile object x0;
+
 {
 	object *old_lex = lex_env;
 
@@ -89,7 +88,7 @@ volatile object x0;
 	return Cnil;
 }
 
-void
+static void
 Funwind_protect(VOL object args)
 {
 
@@ -134,7 +133,7 @@ Funwind_protect(VOL object args)
 	}
 }
 
-void
+static void
 Fthrow(object args)
 {
 

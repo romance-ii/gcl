@@ -133,13 +133,13 @@ unblock_sigusr_sigio(void)
 }
 
 
-void
+static void
 sigfpe1(void)
 {
 	gcl_signal(SIGFPE, sigfpe1);
 	FEerror("Floating-point exception.", 0);
 }
-void
+static void
 sigpipe(void)
 {
 	gcl_signal(SIGPIPE, sigpipe);
@@ -148,7 +148,7 @@ sigpipe(void)
 }
 
 
-void
+static void
 sigint(void)
 {
   unblock_signals(SIGINT,SIGINT);
@@ -157,7 +157,7 @@ sigint(void)
 
 
 
-void
+static void
 sigalrm(void)
 {
   unblock_signals(SIGALRM,SIGALRM);
@@ -169,11 +169,11 @@ DEFVAR("*INTERRUPT-ENABLE*",sSAinterrupt_enableA,SI,sLt,"");
 DEF_ORDINARY("SIGUSR1-INTERRUPT",sSsigusr1_interrupt,SI,"");
 DEF_ORDINARY("SIGIO-INTERRUPT",sSsigio_interrupt,SI,"");
 
-void
+static void
 sigusr1(void)
 {ifuncall1(sSsigusr1_interrupt,Cnil);}
 
-void
+static void
 sigio(void)
 {ifuncall1(sSsigio_interrupt,Cnil);}
 
