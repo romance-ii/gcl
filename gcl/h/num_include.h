@@ -56,4 +56,4 @@ object Vrandom_state;
 #endif
 
 #define MOST_POSITIVE_FIX	2147483647
-#define MOST_NEGATIVE_FIX	-2147483648
+#define MOST_NEGATIVE_FIX	( - MOST_POSITIVE_FIX - 1 )
