@@ -453,8 +453,6 @@ typedef struct {
   reloc_howto_type *h;
 } mtbl;
 
-int in_bfd_init=0;
-
 static void
 do_bfd_reloc(unsigned int oc,unsigned int val,
 	     unsigned int *where) {
@@ -464,6 +462,8 @@ do_bfd_reloc(unsigned int oc,unsigned int val,
   reloc_howto_type *h;
 
   if (!m[0]) {
+
+    extern int in_bfd_init;
 
     bfd_reloc_code_real_type t;
 

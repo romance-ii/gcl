@@ -1057,6 +1057,10 @@ static char *baby_malloc(n)
 }
 #endif
 
+#ifdef HAVE_LIBBFD
+
+int in_bfd_init=0;
+
 /* configure size, static init ? */
 static char bfd_buf[/*  4392 */5000];
 static char *bfd_buf_p=bfd_buf;
@@ -1078,16 +1082,18 @@ bfd_malloc(int n) {
   return (void *)c;
 
 }
+#endif
 
 char *
 malloc(size)
 int size;
 {
-        extern int in_bfd_init;
         object x;
 	
+#ifdef HAVE_LIBBFD
 	if (in_bfd_init)
 	  return bfd_malloc(size);
+#endif
 
 #ifdef BABY_MALLOC_SIZE
 	if (GBC_enable == 0) return baby_malloc(size);
