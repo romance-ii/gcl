@@ -65,8 +65,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
     axiom, and mingw32
   * Try to automatically determine the form used for the explicitly
     compiled in external function addresses in plt.c
+  * No need to explicitly write cr-lf on windows
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  8 Mar 2004 19:25:50 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  8 Mar 2004 19:35:38 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

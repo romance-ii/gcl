@@ -198,8 +198,8 @@ extern DBEGIN_TY _stacktop, _stackbottom;
 /* Use this pending test in configure */
 #define NO_MKSTEMP
 
-#define WRITEC_NEWLINE(strm) (writec_stream('\r',strm),\
-                         writec_stream('\n', strm))
+/* #define WRITEC_NEWLINE(strm) (writec_stream('\r',strm),\ */
+/*                          writec_stream('\n', strm)) */
 
 extern char *GCLExeName ( void );
 #define GET_FULL_PATH_SELF(a_) do {\
