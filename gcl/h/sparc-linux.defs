@@ -5,7 +5,7 @@ LBINDIR=/usr/local/bin
 
 OFLAG	=  -O
 #OFLAG	=  -g
-LIBS	= -lm 
+#LIBS	= -lm 
 
 ODIR_DEBUG= -O4 
 #ODIR_DEBUG= -g
@@ -16,6 +16,7 @@ ODIR_DEBUG= -O4
 # (the -pipe is just since our file system is slow..)
 CC = gcc -pipe -fwritable-strings  -DVOL=volatile -I$(GCLDIR)/o -fsigned-char
 LDCC=${CC} -static 
+LDCC=${CC}
 
 # Enable the fastloading mechanism which does not use ld -A
 # requires c/rel_.. machine dependent code.
