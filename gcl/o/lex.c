@@ -118,8 +118,8 @@ object lex_block_sch(object name)
 void
 gcl_init_lex(void)
 {
-	sLfunction = make_ordinary("FUNCTION");
-	enter_mark_origin(&sLfunction);
+/* 	sLfunction = make_ordinary("FUNCTION"); */
+/* 	enter_mark_origin(&sLfunction); */
 	sLmacro = make_ordinary("MACRO");
 	enter_mark_origin(&sLmacro);
 	sLtag = make_ordinary("TAG");

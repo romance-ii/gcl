@@ -34,8 +34,8 @@ ElfW(Sym) *symbol_table;
 int text_index,data_index,bss_index,sbss_index;
 #undef SYM_NAME
 #undef EXT_and_TEXT_BSS_DAT
-#define mjoin(a,b) a ## b
-#define Mjoin(a,b) mjoin(a,b)
+/* #define mjoin(a,b) a ## b */
+/* #define Mjoin(a,b) mjoin(a,b) */
 #define ELFW(a) Mjoin(ELF,Mjoin(__ELF_NATIVE_CLASS,Mjoin(_,a)))
 
 int nsyms;

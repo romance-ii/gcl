@@ -96,8 +96,7 @@ build_symbol_table_bfd(void) {
 
 #endif /* special_rsym */
 
-void
-build_symbol_table(void) { 
+LFD(build_symbol_table)(void) { 
 
 
   printf("Building symbol table for %s ..\n",kcl_self);fflush(stdout);
@@ -135,3 +134,11 @@ build_symbol_table(void) {
 
 }
 
+void
+gcl_init_sfasl() {
+
+#ifdef SFASL
+ make_si_function("BUILD-SYMBOL-TABLE",build_symbol_table);
+#endif
+
+}

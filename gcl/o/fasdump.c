@@ -509,7 +509,7 @@ do_hash(object obj, int dot)
  
 static void write_fasd(object obj);
 static object
-write_fasd_top(object obj, object x)
+FFN(write_fasd_top)(object obj, object x)
 {struct fasd *fd = (struct fasd *) x->v.v_self;
   if (fd->direction == sKoutput)
     SETUP_FASD_IN(fd);
@@ -531,7 +531,7 @@ write_fasd_top(object obj, object x)
   if (needs_patching)  result =fasd_patch_sharp(result,0)
 
 static object
-read_fasd_top(object x)
+FFN(read_fasd_top)(object x)
 {  struct fasd *fd = (struct fasd *)  x->v.v_self;
    VOL int e=0;
    object result;
@@ -577,7 +577,7 @@ object sSPinit;
 void Lmake_hash_table();
 
 static object
-open_fasd(object stream, object direction, object eof, object tabl)
+FFN(open_fasd)(object stream, object direction, object eof, object tabl)
 {  object str=Cnil;
    object result;
    if(direction==sKinput)
@@ -628,7 +628,7 @@ open_fasd(object stream, object direction, object eof, object tabl)
   }}
 
 static object
-close_fasd(object ar)
+FFN(close_fasd)(object ar)
 {  struct fasd *fd= (struct fasd *)(ar->v.v_self);
    check_type(ar,t_vector);
    if (type_of(fd->table)==t_vector)
@@ -1051,7 +1051,7 @@ find_sharing(object x)
 }
 
 static object
-find_sharing_top(object x, object table)
+FFN(find_sharing_top)(object x, object table)
 {sharing_table=table;
  find_sharing(x);
  return Ct;
@@ -1514,7 +1514,7 @@ read_fasl_vector(object in)
      if (ch== d_begin_dump){
        unreadc_stream(ch,in);
        break;}}
- {object ar=open_fasd(in,sKinput,0,Cnil);
+ {object ar=FFN(open_fasd)(in,sKinput,0,Cnil);
   int n=fix(current_fasd.table_length);
   object result,last;
   { BEGIN_NO_INTERRUPT;
@@ -1530,13 +1530,13 @@ read_fasl_vector(object in)
   gset( current_fasd.table->v.v_self,0,n,aet_object);
   END_NO_INTERRUPT;
   }  
-  result=read_fasd_top(ar);
+  result=FFN(read_fasd_top)(ar);
   if (type_of(result) !=t_vector) goto ERROR;
   last=result->v.v_self[result->v.v_fillp-1];
   if(type_of(last)!=t_cons || last->c.c_car !=sSPinit)
     goto ERROR;
   current_fasd.table->v.v_self = 0;
-  close_fasd(ar);
+  FFN(close_fasd)(ar);
   if (orig != in)
     close_stream(in);
   return result;

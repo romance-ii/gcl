@@ -1485,8 +1485,8 @@ char *s;
 }
 
 
-void
-Lmake_synonym_stream()
+
+LFD(Lmake_synonym_stream)()
 {
 	object x;
 
@@ -1501,8 +1501,7 @@ Lmake_synonym_stream()
 	vs_base[0] = x;
 }
 
-void
-Lmake_broadcast_stream()
+LFD(Lmake_broadcast_stream)()
 {
 	object x;
 	int narg, i;
@@ -1524,8 +1523,7 @@ Lmake_broadcast_stream()
 	vs_base[0] = x;
 }
 
-static void
-Lmake_concatenated_stream()
+LFD(Lmake_concatenated_stream)()
 {
 	object x;
 	int narg, i;
@@ -1547,8 +1545,7 @@ Lmake_concatenated_stream()
 	vs_base[0] = x;
 }
 
-void
-Lmake_two_way_stream()
+LFD(Lmake_two_way_stream)()
 {
 	check_arg(2);
 
@@ -1562,8 +1559,7 @@ Lmake_two_way_stream()
 	vs_popp;
 }
 
-void
-Lmake_echo_stream()
+LFD(Lmake_echo_stream)()
 {
 	check_arg(2);
 
@@ -1604,14 +1600,13 @@ for the string ~S.",
 @)
 
 static void
-Lmake_string_output_stream()
+FFN(Lmake_string_output_stream)()
 {
 	check_arg(0);
 	vs_push(make_string_output_stream(64));
 }
 
-static void
-Lget_output_stream_string()
+LFD(Lget_output_stream_string)()
 {
 	check_arg(1);
 
@@ -1627,8 +1622,7 @@ Lget_output_stream_string()
 		extracts the string associated with the given
 		string-output-stream.
 */
-void
-siLoutput_stream_string()
+LFD(siLoutput_stream_string)()
 {
 	check_arg(1);
 	if (type_of(vs_base[0]) != t_stream ||
@@ -1637,8 +1631,7 @@ siLoutput_stream_string()
 	vs_base[0] = vs_base[0]->sm.sm_object0;
 }
 
-void
-Lstreamp()
+LFD(Lstreamp)()
 {
 	check_arg(1);
 
@@ -1648,8 +1641,7 @@ Lstreamp()
 		vs_base[0] = Cnil;
 }
 
-void
-Linput_stream_p()
+LFD(Linput_stream_p)()
 {
 	check_arg(1);
 
@@ -1660,8 +1652,7 @@ Linput_stream_p()
 		vs_base[0] = Cnil;
 }
 
-void
-Loutput_stream_p()
+LFD(Loutput_stream_p)()
 {
 	check_arg(1);
 
@@ -1672,8 +1663,7 @@ Loutput_stream_p()
 		vs_base[0] = Cnil;
 }
 
-void
-Lstream_element_type()
+LFD(Lstream_element_type)()
 {
 	check_arg(1);
 
@@ -1760,8 +1750,7 @@ for the file-stream ~S.",
 	}	
 @)
 
-void
-Lfile_length()
+LFD(Lfile_length)()
 {
 	int i;
 
@@ -1949,7 +1938,7 @@ DEFVAR("*BINARY-MODULES*",sSAbinary_modulesA,SI,Cnil,"");
 @)
 
 static void
-siLget_string_input_stream_index()
+FFN(siLget_string_input_stream_index)()
 {
 	check_arg(1);
 	check_type_stream(&vs_base[0]);
@@ -1958,8 +1947,7 @@ siLget_string_input_stream_index()
 	vs_base[0] = make_fixnum(STRING_INPUT_STREAM_NEXT(vs_base[0]));
 }
 
-static void
-siLmake_string_output_stream_from_string()
+LFD(siLmake_string_output_stream_from_string)()
 {
 	object strng, strm;
 
@@ -1977,8 +1965,7 @@ siLmake_string_output_stream_from_string()
 	vs_base[0] = strm;
 }
 
-void
-siLcopy_stream()
+LFD(siLcopy_stream)()
 {
 	object in, out;
 
@@ -2035,7 +2022,7 @@ object strm;
 #ifdef USER_DEFINED_STREAMS
 /* more support for user defined streams */
 static void
-siLuser_stream_state()
+FFN(siLuser_stream_state)()
 {     
   check_arg(1);
 
@@ -2109,13 +2096,13 @@ int out;
 }
 
 static void
-siLfp_output_stream()
+FFN(siLfp_output_stream)()
 {check_arg(1);
  vs_base[0]=coerce_stream(vs_base[0],1);
 }
 
 static void
-siLfp_input_stream()
+FFN(siLfp_input_stream)()
 {check_arg(1);
  vs_base[0]=coerce_stream(vs_base[0],0);
 }

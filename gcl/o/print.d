@@ -2027,7 +2027,7 @@ flush_stream(symbol_value(sLAstandard_outputA));
 }
 
 static object
-set_line_length(n)
+FFN(set_line_length)(n)
 int n;
 {
   line_length=n;

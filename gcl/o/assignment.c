@@ -85,7 +85,7 @@ setq(object sym, object val)
 }
 
 static void
-Fsetq(object form)
+FFN(Fsetq)(object form)
 {
 	object ans;
 	if (endp(form)) {
@@ -107,7 +107,7 @@ Fsetq(object form)
 }
 
 static void
-Fpsetq(object arg)
+FFN(Fpsetq)(object arg)
 {
 	object *old_top = vs_top;
 	object *top;
@@ -187,9 +187,15 @@ DEFUNO_NEW("FSET",object,fSfset,SI
 
 	RETURN1(function);
 }
+#ifdef STATIC_FUNCTION_POINTERS
+object
+fSfset(object sym,object function) {
+  return FFN(fSfset)(sym,function);
+}
+#endif
 
 static void
-Fmultiple_value_setq(object form)
+FFN(Fmultiple_value_setq)(object form)
 {
 	object vars;
 	int n, i;
@@ -256,7 +262,7 @@ DEFUNO_NEW("FMAKUNBOUND",object,fLfmakunbound,LISP
 }
 
 static void
-Fsetf(object form)
+FFN(Fsetf)(object form)
 {
 	object result,*t,*t1;
 	if (endp(form)) {
@@ -419,7 +425,7 @@ OTHERWISE:
 }
 
 static void
-Fpush(object form)
+FFN(Fpush)(object form)
 {
 	object var;
 	
@@ -450,7 +456,7 @@ Fpush(object form)
 }
 
 static void
-Fpop(object form)
+FFN(Fpop)(object form)
 {
 	object var;
 
@@ -479,7 +485,7 @@ Fpop(object form)
 }
 
 static void
-Fincf(object form)
+FFN(Fincf)(object form)
 {
 	object var;
 	object one_plus(object x), number_plus(object x, object y);
@@ -517,7 +523,7 @@ Fincf(object form)
 }
 
 static void
-Fdecf(object form)
+FFN(Fdecf)(object form)
 {
 	object var;
 	object one_minus(object x), number_minus(object x, object y);
@@ -555,17 +561,17 @@ Fdecf(object form)
 }
 
 
-object
-clear_compiler_properties(object sym, object code)
-{ object tem;
-  VFUN_NARGS=2; fSuse_fast_links(Cnil,sym);
-  tem = getf(sym->s.s_plist,sStraced,Cnil);
-  if (sSAinhibit_macro_specialA && sSAinhibit_macro_specialA->s.s_dbind != Cnil)
-    (void)ifuncall2(sSclear_compiler_properties, sym,code);
-  if (tem != Cnil) return tem;
-  return sym;
+/* object */
+/* clear_compiler_properties(object sym, object code) */
+/* { object tem; */
+/*   VFUN_NARGS=2; fSuse_fast_links(Cnil,sym); */
+/*   tem = getf(sym->s.s_plist,sStraced,Cnil); */
+/*   if (sSAinhibit_macro_specialA && sSAinhibit_macro_specialA->s.s_dbind != Cnil) */
+/*     (void)ifuncall2(sSclear_compiler_properties, sym,code); */
+/*   if (tem != Cnil) return tem; */
+/*   return sym; */
   
-}
+/* } */
 
 DEF_ORDINARY("CLEAR-COMPILER-PROPERTIES",sSclear_compiler_properties,SI,"");
 
@@ -604,10 +610,10 @@ gcl_init_assignment(void)
 	make_special_form("SETQ", Fsetq);
 	make_special_form("PSETQ", Fpsetq);
 	make_special_form("MULTIPLE-VALUE-SETQ", Fmultiple_value_setq);
-	make_special_form("SETF", Fsetf);
-	make_special_form("PUSH", Fpush);
-	make_special_form("POP", Fpop);
-	make_special_form("INCF", Fincf);
-	make_special_form("DECF", Fdecf);
+	sLsetf=make_special_form("SETF", Fsetf);
+	sLpush=make_special_form("PUSH", Fpush);
+	sLpop=make_special_form("POP", Fpop);
+	sLincf=make_special_form("INCF", Fincf);
+	sLdecf=make_special_form("DECF", Fdecf);
 
 }

@@ -49,8 +49,7 @@ Use of VS in mapfunctions:
 		   VS
 */
 
-void
-Lmapcar(void)
+LFD(Lmapcar)(void)
 {
 
 	object *top = vs_top;
@@ -93,8 +92,7 @@ LOOP:
 	goto LOOP;
 }
 
-void
-Lmaplist(void)
+LFD(Lmaplist)(void)
 {
 
 	object *top = vs_top;
@@ -137,8 +135,7 @@ LOOP:
 	goto LOOP;
 }
 
-void
-Lmapc(void)
+LFD(Lmapc)(void)
 {
 
 	object *top = vs_top;
@@ -177,8 +174,7 @@ LOOP:
 	goto LOOP;
 }
 
-void
-Lmapl(void)
+LFD(Lmapl)(void)
 {
 
 	object *top = vs_top;
@@ -217,8 +213,7 @@ LOOP:
 	goto LOOP;
 }
 
-void
-Lmapcan(void)
+LFD(Lmapcan)(void)
 {
 
 	object *top = vs_top;
@@ -268,8 +263,7 @@ LOOP:
 	goto LOOP;
 }
 
-void
-Lmapcon(void)
+LFD(Lmapcon)(void)
 {
 
 	object *top = vs_top;

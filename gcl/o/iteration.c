@@ -28,7 +28,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "include.h"
 
 static void
-Floop(object form)
+FFN(Floop)(object form)
 {
 
 	object x;
@@ -121,7 +121,7 @@ do_var_list(object var_list)
 }
 
 static void
-Fdo(VOL object arg)
+FFN(Fdo)(VOL object arg)
 {
 
 	object *oldlex = lex_env;
@@ -206,7 +206,7 @@ END:
 }
 
 static void
-FdoA(VOL object arg)
+FFN(FdoA)(VOL object arg)
 {
 
 	object *oldlex = lex_env;
@@ -284,7 +284,7 @@ END:
 }
 
 static void
-Fdolist(VOL object arg)
+FFN(Fdolist)(VOL object arg)
 {
 
 	object *oldlex = lex_env;
@@ -365,7 +365,7 @@ END:
 }
 
 static void
-Fdotimes(VOL object arg)
+FFN(Fdotimes)(VOL object arg)
 {
 
 	object *oldlex = lex_env;

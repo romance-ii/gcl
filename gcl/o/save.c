@@ -12,8 +12,7 @@ memory_save(char *original_file, char *save_file)
   unexec(save_file,original_file,0,0,0);
 }
 
-void
-Lsave(void)
+LFD(Lsave)(void)
 {
 	char filename[256];
         extern char *kcl_self ;

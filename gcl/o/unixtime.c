@@ -60,7 +60,7 @@ int usleep ( unsigned int microseconds );
 
 #  endif
 
-static void siLget_system_time_zone(void);
+static void FFN(siLget_system_time_zone)(void);
 
 #endif /* __MINGW32__ or  !defined NO_SYSTEM_TIME_ZONE */
 
@@ -128,8 +128,7 @@ DEFUN_NEW("GET-UNIVERSAL-TIME",object,fLget_universal_time,LISP
 	RETURN1(unix_time_to_universal_time(time(0)));
 }
 
-void
-Lsleep(void)
+LFD(Lsleep)(void)
 {
 	object z;
 	
@@ -154,8 +153,7 @@ Lsleep(void)
 	vs_push(Cnil);
 }
 
-void
-Lget_internal_run_time(void)
+LFD(Lget_internal_run_time)(void)
 {
 
 #ifdef USE_INTERNAL_REAL_TIME_FOR_RUNTIME
@@ -274,7 +272,7 @@ int system_time_zone_helper(void){
 #if defined __MINGW32__ || !defined NO_SYSTEM_TIME_ZONE
 
 static void
-siLget_system_time_zone(void)
+FFN(siLget_system_time_zone)(void)
 {
   check_arg(0);
   vs_push ( make_fixnum ( system_time_zone_helper() ) );

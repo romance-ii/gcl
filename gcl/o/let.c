@@ -58,7 +58,7 @@ let_var_list(object var_list)
 }
 
 static void
-Flet(object form)
+FFN(Flet)(object form)
 {
 
 	object body;
@@ -86,7 +86,7 @@ Flet(object form)
 }
 
 static void
-FletA(object form)
+FFN(FletA)(object form)
 {
 
 	object body;
@@ -114,7 +114,7 @@ FletA(object form)
 }
 
 static void
-Fmultiple_value_bind(object form)
+FFN(Fmultiple_value_bind)(object form)
 {
 
 	object body, values_form, x, y;
@@ -168,7 +168,7 @@ Fmultiple_value_bind(object form)
 }
 
 static void
-Fcompiler_let(object form)
+FFN(Fcompiler_let)(object form)
 {
 
 	object body;
@@ -203,7 +203,7 @@ Fcompiler_let(object form)
 }
 
 static void
-Fflet(object args)
+FFN(Fflet)(object args)
 {
 
 	object def_list;
@@ -238,7 +238,7 @@ is an illegal function definition in FLET.",
 }
 
 static void
-Flabels(object args)
+FFN(Flabels)(object args)
 {
 
 	object def_list;
@@ -279,7 +279,7 @@ is an illegal function definition in LABELS.",
 }
 
 static void
-Fmacrolet(object args)
+FFN(Fmacrolet)(object args)
 {
 
 	object def_list;

@@ -206,8 +206,7 @@ number_compare(object x, object y)
 	}
 }
 
-void
-Lall_the_same(void)
+LFD(Lall_the_same)(void)
 {
 	int narg, i;
 
@@ -226,8 +225,7 @@ Lall_the_same(void)
 	vs_base[0] = Ct;
 }
 
-void
-Lall_different(void)
+LFD(Lall_different)(void)
 {
 	int narg, i, j;
 
@@ -271,13 +269,12 @@ Lnumber_compare(int s, int t)
 	vs_base[0] = Ct;
 }
 
-void Lmonotonically_increasing(void) { Lnumber_compare( 1, 1); }
-void Lmonotonically_decreasing(void) { Lnumber_compare(-1, 1); }
-void Lmonotonically_nondecreasing(void) { Lnumber_compare( 1, 0); }
-void Lmonotonically_nonincreasing(void) { Lnumber_compare(-1, 0); }
+LFD(Lmonotonically_increasing)(void) { Lnumber_compare( 1, 1); }
+LFD(Lmonotonically_decreasing)(void) { Lnumber_compare(-1, 1); }
+LFD(Lmonotonically_nondecreasing)(void) { Lnumber_compare( 1, 0); }
+LFD(Lmonotonically_nonincreasing)(void) { Lnumber_compare(-1, 0); }
 
-void
-Lmax(void)
+LFD(Lmax)(void)
 {
 	object max;
 	int narg, i;
@@ -294,8 +291,7 @@ Lmax(void)
 	vs_base[0] = max;
 }
 
-void
-Lmin(void)
+LFD(Lmin)(void)
 {
 	object min;
 	int narg, i;

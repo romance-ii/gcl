@@ -535,7 +535,7 @@ DEFUN_NEW("CLEAR-CONNECTION-STATE",object,fSclear_connection_state,
 
 { 
   struct connection_state *sfd = OBJ_TO_CONNECTION_STATE(osfd);
-  int n=fix(fSclear_connection(sfd->fd));
+  int n=fix(FFN(fSclear_connection)(sfd->fd));
   
   sfd->valid_data = sfd->read_buffer;
   sfd->valid_data_size = 0;

@@ -178,7 +178,7 @@ int m;
     { bcopy(sfd->valid_data,sfd->read_buffer,sfd->valid_data_size);
       sfd->valid_data=sfd->read_buffer;}
    /* there is at least a packet size of space available */   
-  if ((fix(fScheck_fd_for_input(sfd->fd,sfd->write_timeout))>0));
+  if ((fix(FFN(fScheck_fd_for_input)(sfd->fd,sfd->write_timeout))>0));
      again:
         {char *start = sfd->valid_data+sfd->valid_data_size;
         nread = read(sfd->fd,start,
@@ -261,7 +261,7 @@ DEFUN_NEW("CLEAR-CONNECTION",object,fSclear_connection,SI,1,1,NONE,OI,OO,OO,OO,(
       "Read on FD until nothing left to read.  Return number of bytes read")
 {char buffer[0x1000];
  int n=0;
- while (fix(fScheck_fd_for_input(fd,0)))
+ while (fix(FFN(fScheck_fd_for_input)(fd,0)))
    { n+=read(fd,buffer,sizeof(buffer));
    }
  

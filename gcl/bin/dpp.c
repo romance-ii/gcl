@@ -63,6 +63,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "gclincl.h"
+#include "config.h"
 
 #ifdef UNIX
 #include <ctype.h>
@@ -413,7 +415,14 @@ get_return()
 void
 put_fhead()
 {
+#ifdef STATIC_FUNCTION_POINTERS
+	fprintf(out, "static void L%s_static ();\n",function);
+	if (!fstatic)
+	  fprintf(out,"void\nL%s()\n{ L%s_static();}\n\n",function,function);
+	fprintf(out,"static void\nL%s_static()\n{",function);
+#else
 	fprintf(out, "%svoid\nL%s()\n{", fstatic ? "static " : "",function);
+#endif
 }
 
 void

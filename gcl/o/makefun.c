@@ -87,7 +87,7 @@ DEFUN_NEW("INITMACRO",object,fSinitmacro,SI,4,ARG_LIMIT,NONE,OO,OO,OO,OO,(object
 {va_list ap;
  object res;
  va_start(ap,first);
- res = Iapply_ap_new((object (*)())fSinitfun,first,ap);
+ res = Iapply_ap_new((object (*)())FFN(fSinitfun),first,ap);
  va_end(ap);
  res->s.s_mflag = 1;
  return res;

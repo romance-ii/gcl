@@ -2259,6 +2259,12 @@ L:
 	}
 	RETURN1 (x ==0 ? Cnil : x);  
 }
+object 
+fLformat_1(object strm, object control,object x) {
+  VFUN_NARGS=3;
+  return FFN(fLformat)(strm,control,x);
+
+}
 
 /*  object c_apply_n(long int (*fn) (), int n, object *x); */
 

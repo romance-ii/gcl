@@ -180,7 +180,7 @@ BEGIN:
 }
 		
 static object
-hash_equal(x,depth)
+FFN(hash_equal)(x,depth)
 object x;
 int depth;
 {
@@ -372,8 +372,7 @@ object hashtable;
 	@(return h)
 @)
 
-void
-Lhash_table_p(void)
+LFD(Lhash_table_p)(void)
 {
 	check_arg(1);
 
@@ -383,8 +382,7 @@ Lhash_table_p(void)
 		vs_base[0] = Cnil;
 }
 
-void
-Lgethash()
+LFD(Lgethash)()
 {
 	int narg;
 	struct htent *e;
@@ -408,8 +406,7 @@ Lgethash()
 	vs_popp;
 }
 
-void
-siLhash_set()
+LFD(siLhash_set)()
 {
 	check_arg(3);
 
@@ -417,9 +414,8 @@ siLhash_set()
 	sethash(vs_base[0], vs_base[1], vs_base[2]);
 	vs_base += 2;
 }
-	
-void
-Lremhash()
+ 	
+LFD(Lremhash)()
 {
 	struct htent *e;
 
@@ -436,8 +432,7 @@ Lremhash()
 	vs_top = vs_base + 1;
 }
 
-void
-Lclrhash()
+LFD(Lclrhash)()
 {
 	int i;
 
@@ -450,8 +445,7 @@ Lclrhash()
 	vs_base[0]->ht.ht_nent = 0;
 }
 
-void
-Lhash_table_count()
+LFD(Lhash_table_count)()
 {
 
 	check_arg(1);
@@ -460,16 +454,14 @@ Lhash_table_count()
 }
 
 
-void
-Lsxhash()
+LFD(Lsxhash)()
 {
 	check_arg(1);
 
 	vs_base[0] = make_fixnum((ihash_equal(vs_base[0],0) & 0x7fffffff));
 }
 
-void
-Lmaphash()
+LFD(Lmaphash)()
 {
 	object *base = vs_base;
         object hashtable;

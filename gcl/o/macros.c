@@ -30,7 +30,7 @@ object sLwarn;
 object sSAinhibit_macro_specialA;
 
 static void
-siLdefine_macro(void)
+FFN(siLdefine_macro)(void)
 {
 	check_arg(2);
 	if (type_of(vs_base[0]) != t_symbol)
@@ -69,7 +69,7 @@ siLdefine_macro(void)
 }
 
 static void
-Fdefmacro(object form)
+FFN(Fdefmacro)(object form)
 {
 
 	object *top = vs_top;
@@ -215,8 +215,7 @@ DEFUNO_NEW("MACROEXPAND",object,fLmacroexpand,LISP
 	  }
 }
 
-void
-Lmacroexpand_1(void)
+LFD(Lmacroexpand_1)(void)
 {
 	object exp_fun;
 	object *base=vs_base;

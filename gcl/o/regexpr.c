@@ -91,9 +91,7 @@ be over written.   \
        || v->v.v_elttype != aet_fix
        || v->v.v_dim < (NSUBEXP *2))
      v= sSAmatch_dataA->s.s_dbind =
-       (VFUN_NARGS=3, fSmake_vector1((NSUBEXP *2),
-				     aet_fix,
-				     sLnil));
+       fSmake_vector1_1((NSUBEXP *2),aet_fix,sLnil);
    if (type_of(string)!= t_string && type_of(string)!=t_symbol)
         not_a_string_or_symbol(string);
    if (type_of(pattern)!= t_string && type_of(pattern)!=t_symbol)

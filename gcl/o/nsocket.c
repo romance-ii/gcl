@@ -405,8 +405,8 @@ DEFUN_NEW("SET-BLOCKING",object,fSset_blocking,SI,2,2,NONE,OO,OO,OO,OO,(object s
 	  }
 	else
 	{
-	  int x1 = fix(fSset_blocking(STREAM_INPUT_STREAM(sock),setBlocking));
-	  int x2 = fix(fSset_blocking(STREAM_OUTPUT_STREAM(sock),setBlocking));
+	  int x1 = fix(FFN(fSset_blocking)(STREAM_INPUT_STREAM(sock),setBlocking));
+	  int x2 = fix(FFN(fSset_blocking)(STREAM_OUTPUT_STREAM(sock),setBlocking));
 	  /* if either is negative result return negative. (ie fail)
 	     If either is positive return positive (ie fail)
 	     Zero result means both ok.  (ie succeed)

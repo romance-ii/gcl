@@ -138,7 +138,7 @@ char *original_file, *save_file;
 	fclose(save);
 }
 
-Lsave()
+LFD(Lsave)()
 {
 	char filename[256];
 

@@ -86,7 +86,7 @@ go:
 	$(MAKE) "CFLAGS=${CFLAGS} -pg"
 
 ../bin/dpp${EXE}:	../bin/dpp.c
-	${CC} ${DEFS} -DUNIX -o ../bin/dpp${EXE} ../bin/dpp.c
+	${CC} ${DEFS} -o ../bin/dpp${EXE} ../bin/dpp.c
 
 
 new-init: grab_defs

@@ -23,8 +23,8 @@ License for more details.
 #include <rpc/rpc.h>
 
 extern short aet_sizes[];
-object
-siGxdr_open(f)
+static object
+FFN(siGxdr_open)(f)
      object f;
 { XDR *xdrs;
   object ar= alloc_simple_string(sizeof(XDR));
@@ -39,8 +39,8 @@ siGxdr_open(f)
   return ar;
 }
 
-object
-siGxdr_write(object str,object elt) {
+static object
+FFN(siGxdr_write)(object str,object elt) {
 
   XDR *xdrp= (XDR *) str->ust.ust_self;
   xdrproc_t e;
@@ -92,8 +92,8 @@ siGxdr_write(object str,object elt) {
   return elt;
 }
 
-object
-siGxdr_read(object str,object elt) {
+static object
+FFN(siGxdr_read)(object str,object elt) {
 
   XDR *xdrp= (XDR *) str->ust.ust_self;
   xdrproc_t e;

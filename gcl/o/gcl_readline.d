@@ -200,7 +200,7 @@ static int qsort_compare(const void *a, const void *b) {
 
 /* Should this return void or what? Should input args be void? */
 static void
-siLreadline_init() {
+FFN(siLreadline_init)() {
 	object on_or_off;
 	object program_name;
 	object case_type;

@@ -39,7 +39,7 @@ object sSAinhibit_macro_specialA;
 object sLtypep;
 
 static void
-Fdefun(object args)
+FFN(Fdefun)(object args)
 {
 
 	object name;
@@ -106,7 +106,7 @@ Fdefun(object args)
 }
 	
 static void
-siLAmake_special(void)
+FFN(siLAmake_special)(void)
 {
 	check_arg(1);
 	check_type_symbol(&vs_base[0]);
@@ -116,7 +116,7 @@ siLAmake_special(void)
 }
 
 static void
-siLAmake_constant(void)
+FFN(siLAmake_constant)(void)
 {
 	check_arg(2);
 	check_type_symbol(&vs_base[0]);
@@ -130,7 +130,7 @@ siLAmake_constant(void)
 }
 
 static void
-Feval_when(object arg)
+FFN(Feval_when)(object arg)
 {
 
 	object *base = vs_base;
@@ -157,13 +157,13 @@ Feval_when(object arg)
 }
 
 static void
-Fdeclare(object arg)
+FFN(Fdeclare)(object arg)
 {
 	FEerror("DECLARE appeared in an invalid position.", 0);
 }
 
 static void
-Flocally(object body)
+FFN(Flocally)(object body)
 {
 	object *oldlex = lex_env;
 
@@ -175,7 +175,7 @@ Flocally(object body)
 }
 
 static void
-Fthe(object args)
+FFN(Fthe)(object args)
 {
 
 	object *vs;
@@ -229,7 +229,7 @@ gcl_init_toplevel(void)
 	make_si_function("*MAKE-CONSTANT", siLAmake_constant);
 	make_special_form("EVAL-WHEN", Feval_when);
 	make_special_form("THE", Fthe);
-	make_special_form("DECLARE",Fdeclare);
+	sLdeclare=make_special_form("DECLARE",Fdeclare);
 	make_special_form("LOCALLY",Flocally);
 
 

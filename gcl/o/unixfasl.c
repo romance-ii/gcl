@@ -382,7 +382,7 @@ SEEK_TO_END_OFILE(faslfile->sm.sm_fp);
 #endif
 
 static void
-siLfaslink(void)
+FFN(siLfaslink)(void)
 {
 	bds_ptr old_bds_top;
 	int i;

@@ -28,8 +28,17 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdlib.h>
 #include "include.h"
 
-DEFUNO_NEW("NULL",object,fLnot,LISP
-	  ,1,1,NONE,OO,OO,OO,OO,void,Lnull,(object x0),"");
+DEFUNO_NEW("NULL",object,fLnull,LISP
+	  ,1,1,NONE,OO,OO,OO,OO,void,Lnull,(object x0),"")
+{
+    /* 1 args */
+
+	if (x0 == Cnil)
+		x0 = Ct;
+	else
+		x0 = Cnil;
+	RETURN1(x0);
+}
 
 DEFUN_NEW("NOT",object,fLnot,LISP
    ,1,1,NONE,OO,OO,OO,OO,(object x0),"")
@@ -340,6 +349,13 @@ DEFUNO_NEW("FUNCTIONP",object,fLfunctionp,LISP
 	} else
 		x0 = Cnil;
 RETURN1(x0);}
+#ifdef STATIC_FUNCTION_POINTERS
+object
+fLfunctionp(object x) {
+  return FFN(fLfunctionp)(x);
+}
+#endif
+
 
 DEFUNO_NEW("COMPILED-FUNCTION-P",object,fLcompiled_function_p,LISP
    ,1,1,NONE,OO,OO,OO,OO,void,Lcompiled_function_p,(object x0),"")
@@ -698,7 +714,7 @@ DEFUNO_NEW("EQUALP",object,fLequalp,LISP
 }
 
 static void
-Fand(object args)
+FFN(Fand)(object args)
 {
 
 	object *top = vs_top;
@@ -722,7 +738,7 @@ Fand(object args)
 }
 
 static void
-For(object args)
+FFN(For)(object args)
 {
 
 	object *top = vs_top;
@@ -838,8 +854,8 @@ void
 gcl_init_predicate_function(void)
 {
 
-	make_special_form("AND",Fand);
-	make_special_form("OR",For);
+	sLand=make_special_form("AND",Fand);
+	sLor=make_special_form("OR",For);
 
 
 

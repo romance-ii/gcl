@@ -283,7 +283,7 @@ FEerror(char *s,int num,...)
     arg4=va_arg(args,object);
   va_end(args);
 
-  fLerror(make_simple_string(s),arg1,arg2,arg3,arg4);
+  FFN(fLerror)(make_simple_string(s),arg1,arg2,arg3,arg4);
   
 }
 
@@ -392,7 +392,7 @@ object
 CEerror(char *error_str, char *cont_str, int num, object arg1, object arg2, object arg3, object arg4)
 {
         VFUN_NARGS=num+2; 
-        return fLcerror(make_simple_string(cont_str),
+        return FFN(fLcerror)(make_simple_string(cont_str),
 			make_simple_string(error_str),
 			arg1,arg2,arg3,arg4);
 }

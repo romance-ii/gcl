@@ -94,3 +94,5 @@ fSclear_connection(fixnum);
 
 object
 fScheck_fd_for_input(fixnum,fixnum);
+
+#define SI_makefun(a_,b_,c_)

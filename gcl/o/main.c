@@ -425,8 +425,8 @@ initlisp(void) {
 	export(Ct, common_lisp_package);
 #endif
 
-	sLquote = make_ordinary("QUOTE");
-	sLfunction = make_ordinary("FUNCTION");
+/* 	sLquote = make_ordinary("QUOTE"); */
+/* 	sLfunction = make_ordinary("FUNCTION"); */
 	sLlambda = make_ordinary("LAMBDA");
 	sLlambda_block = make_ordinary("LAMBDA-BLOCK");
 	sLlambda_closure = make_ordinary("LAMBDA-CLOSURE");
@@ -506,6 +506,7 @@ initlisp(void) {
 	gcl_init_links();
 
 	gcl_init_fat_string();
+	gcl_init_sfasl();
 #ifdef CMAC
 	gcl_init_cmac();
 #endif	
@@ -577,7 +578,7 @@ DEFUNO_NEW("BYE",object,fLbye,LISP
 
 DEFUN_NEW("QUIT",object,fLquit,LISP
        ,0,1,NONE,OI,OO,OO,OO,(fixnum exitc),"")
-{	return fLbye(exitc); }
+{	return FFN(fLbye)(exitc); }
  
 /* DEFUN_NEW("EXIT",object,fLexit,LISP */
 /*        ,0,1,NONE,OI,OO,OO,OO,(fixnum exitc),"") */
@@ -585,13 +586,13 @@ DEFUN_NEW("QUIT",object,fLquit,LISP
  
 
 static void
-siLargc(void) {
+FFN(siLargc)(void) {
   check_arg(0);
   vs_push(make_fixnum(ARGC));
 }
 
 static void
-siLargv(void) {
+FFN(siLargv)(void) {
   int i=0;
   
   check_arg(1);
@@ -605,7 +606,7 @@ siLargv(void) {
 
 #ifdef UNIX
 static void
-siLgetenv(void) {
+FFN(siLgetenv)(void) {
 
   char name[256];
   int i;
@@ -634,14 +635,14 @@ siLgetenv(void) {
 object *vs_marker;
 
 static void
-siLmark_vs(void) {
+FFN(siLmark_vs)(void) {
   check_arg(0);
   vs_marker = vs_base;
   vs_base[0] = Cnil;
 }
 
 static void
-siLcheck_vs(void) {
+FFN(siLcheck_vs)(void) {
   check_arg(0);
   if (vs_base != vs_marker)
     FEerror("Value stack is flawed.", 0);
@@ -649,7 +650,7 @@ siLcheck_vs(void) {
 }
 
 static object
-siLcatch_fatal(int i) {
+FFN(siLcatch_fatal)(int i) {
   catch_fatal=i;
   return Cnil;
 }
@@ -664,8 +665,7 @@ reset_cstack_limit(int arg) {
 #endif
 }
 
-void
-siLreset_stack_limits(void)
+LFD(siLreset_stack_limits)(void)
 {
   int i=0;
 
@@ -731,15 +731,14 @@ multiply_stacks(int m) {
 
 DEFVAR("*NO-INIT*",sSAno_initA,SI,Cnil,"");
 
-void
-siLinit_system(void) {
+LFD(siLinit_system)(void) {
   check_arg(0);
   gcl_init_system(sSAno_initA);
   vs_base[0] = Cnil;
 }
 
 static void
-siLuser_init(void) {
+FFN(siLuser_init)(void) {
   check_arg(0);
   sLApackageA->s.s_dbind = user_package;
   user_init();
@@ -747,19 +746,19 @@ siLuser_init(void) {
 }
 
 static void
-siLaddress(void) {
+FFN(siLaddress)(void) {
   check_arg(1);
   vs_base[0] = make_fixnum((long)vs_base[0]);
 }
 
 static void
-siLnani(void) {
+FFN(siLnani)(void) {
   check_arg(1);
   vs_base[0] = (object)fixint(vs_base[0]);
 }
 
 static void
-siLinitialization_failure(void) {
+FFN(siLinitialization_failure)(void) {
   check_arg(0);
   printf("lisp initialization failed\n");
   exit(0);
@@ -781,7 +780,7 @@ DEFUN_NEW("LISP-IMPLEMENTATION-VERSION",object,fLlisp_implementation_version,LIS
 
 
 static void
-siLsave_system(void) {
+FFN(siLsave_system)(void) {
   int i;
   
 #ifdef HAVE_YP_UNBIND
@@ -925,5 +924,6 @@ init_main(void) {
   
   make_si_function("SAVE-SYSTEM", siLsave_system);
   make_si_sfun("CATCH-FATAL",siLcatch_fatal,ARGTYPE1(f_fixnum));
+  make_si_function("WARN-VERSION",Lidentity);
   
 }

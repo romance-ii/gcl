@@ -309,8 +309,8 @@ object s, v, p;
 
 
 /* done in the right order for efficient setf.. */
-object
-sputprop(s, p, v)
+STATD object
+FFN(sputprop)(s, p, v)
 object s, v, p;
 {
 	if (type_of(s) != t_symbol)
@@ -318,7 +318,12 @@ object s, v, p;
 	s->s.s_plist = putf(s->s.s_plist, v, p);
 	return(v);
 }
-
+#ifdef STATIC_FUNCTION_POINTERS
+object
+sputprop(object s, object p, object v) {
+	return FFN(sputprop)(s,p,v);
+}
+#endif
 
 /*
 	Remf(p, i) removes property i
@@ -381,8 +386,7 @@ object s;
 	@(return `getf(sym->s.s_plist, indicator, deflt)`)
 @)
 
-void
-Lremprop()
+LFD(Lremprop)()
 {
 	check_arg(2);
 
@@ -394,8 +398,7 @@ Lremprop()
 	vs_popp;
 }
 
-void
-Lsymbol_plist()
+LFD(Lsymbol_plist)()
 {
 	check_arg(1);
 
@@ -449,15 +452,13 @@ object y;
     return(y);
 }
 
-void
-Lsymbol_name()
+LFD(Lsymbol_name)()
 {
 	check_arg(1);
         vs_base[0]=symbol_name(vs_base[0]);
 }
 
-void
-Lmake_symbol()
+LFD(Lmake_symbol)()
 {
 	check_arg(1);
 
@@ -498,8 +499,7 @@ DEFVAR("*GENSYM-COUNTER*",sLgensym_counter,LISP,make_fixnum(0),"");
         if (x==gensym_prefix) 
                 sLgensym_counter->s.s_dbind=number_plus(sLgensym_counter->s.s_dbind,small_fixnum(1));
 /*         FIXME: come up with a better call sequence */
-        VFUN_NARGS=3;
-        this_gensym_counter_string=fLformat(Cnil,make_simple_string("~S"),this_gensym_counter);
+        this_gensym_counter_string=fLformat_1(Cnil,make_simple_string("~S"),this_gensym_counter);
         i=this_gensym_counter_string->st.st_fillp;
 	i += this_gensym_prefix->st.st_fillp;
 	set_up_string_register("");
@@ -551,8 +551,7 @@ ONCE_MORE:
 	@(return smbl)
 @)
 
-void
-Lsymbol_package()
+LFD(Lsymbol_package)()
 {
 	check_arg(1);
 
@@ -560,8 +559,7 @@ Lsymbol_package()
 	vs_base[0] = vs_base[0]->s.s_hpack;
 }
 
-void
-Lkeywordp()
+LFD(Lkeywordp)()
 {
 	check_arg(1);
 
@@ -576,8 +574,7 @@ Lkeywordp()
 	returns the new property list with value for property indicator.
 	It will be used in SETF for GETF.
 */
-void
-siLput_f()
+LFD(siLput_f)()
 {
 	check_arg(3);
 
@@ -596,8 +593,7 @@ siLput_f()
 
 	It will be used for macro REMF.
 */
-void
-siLrem_f()
+LFD(siLrem_f)()
 {
 	check_arg(2);
 
@@ -607,8 +603,7 @@ siLrem_f()
 		vs_base[1] = Cnil;
 }
 
-void
-siLset_symbol_plist(void)
+LFD(siLset_symbol_plist)(void)
 {
 	check_arg(2);
 
@@ -618,8 +613,7 @@ siLset_symbol_plist(void)
 	vs_popp;
 }
 
-void
-siLputprop()
+LFD(siLputprop)()
 {
 	check_arg(3);
 

@@ -272,6 +272,25 @@ is supplied and FLAG is nil, then this function is deleted from the fast links")
 }
   RETURN1(Cnil);
 }
+object
+fSuse_fast_links_2(object flag,object res) {
+  VFUN_NARGS=2;
+  return FFN(fSuse_fast_links)(flag,res);
+}
+
+object
+clear_compiler_properties(object sym, object code)
+{ object tem;
+  extern object sSclear_compiler_properties;  
+  VFUN_NARGS=2; FFN(fSuse_fast_links)(Cnil,sym);
+  tem = getf(sym->s.s_plist,sStraced,Cnil);
+  if (sSAinhibit_macro_specialA && sSAinhibit_macro_specialA->s.s_dbind != Cnil)
+    (void)ifuncall2(sSclear_compiler_properties, sym,code);
+  if (tem != Cnil) return tem;
+  return sym;
+  
+}
+
 
 static int
 clean_link_array(object *ar, object *ar_end)
@@ -1012,7 +1031,7 @@ clear_stack(object *beg, object *limit)
    ;*beg=0;} return 0;}
 
 static object
-set_mv(int i, object val)
+FFN(set_mv)(int i, object val)
 { if (i >= (sizeof(MVloc)/sizeof(object)))
      FEerror("Bad mv index",0);
   return(MVloc[i]=val);
@@ -1020,7 +1039,7 @@ set_mv(int i, object val)
 
 
 static object
-mv_ref(unsigned int i)
+FFN(mv_ref)(unsigned int i)
 { object x;
   if (i >= (sizeof(MVloc)/sizeof(object)))
      FEerror("Bad mv index",0);

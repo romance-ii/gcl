@@ -467,8 +467,7 @@ L:
 	}
 }
 
-void
-Lpathname(void)
+LFD(Lpathname)(void)
 {
 	check_arg(1);
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
@@ -589,8 +588,7 @@ from ~S to ~S.",
 	@(return x)
 @)
 
-void
-Lpathnamep(void)
+LFD(Lpathnamep)(void)
 {
 	check_arg(1);
 
@@ -600,8 +598,7 @@ Lpathnamep(void)
 		vs_base[0] = Cnil;
 }
 
-void
-Lpathname_host(void)
+LFD(Lpathname_host)(void)
 {
 	check_arg(1);
 
@@ -610,8 +607,7 @@ Lpathname_host(void)
 	vs_base[0] = vs_base[0]->pn.pn_host;
 }
 
-void
-Lpathname_device(void)
+LFD(Lpathname_device)(void)
 {
 	check_arg(1);
 
@@ -620,8 +616,7 @@ Lpathname_device(void)
 	vs_base[0] = vs_base[0]->pn.pn_device;
 }
 
-void
-Lpathname_directory(void)
+LFD(Lpathname_directory)(void)
 {
 	check_arg(1);
 
@@ -630,8 +625,7 @@ Lpathname_directory(void)
 	vs_base[0] = vs_base[0]->pn.pn_directory;
 }
 
-void
-Lpathname_name(void)
+LFD(Lpathname_name)(void)
 {
 	check_arg(1);
 
@@ -640,8 +634,7 @@ Lpathname_name(void)
 	vs_base[0] = vs_base[0]->pn.pn_name;
 }
 
-void
-Lpathname_type(void)
+LFD(Lpathname_type)(void)
 {
 	check_arg(1);
 
@@ -650,8 +643,7 @@ Lpathname_type(void)
 	vs_base[0] = vs_base[0]->pn.pn_type;
 }
 
-void
-Lpathname_version(void)
+LFD(Lpathname_version)(void)
 {
 	check_arg(1);
 
@@ -660,8 +652,7 @@ Lpathname_version(void)
 	vs_base[0] = vs_base[0]->pn.pn_version;
 }
 
-void
-Lnamestring(void)
+LFD(Lnamestring)(void)
 {
 	check_arg(1);
 
@@ -669,8 +660,7 @@ Lnamestring(void)
 	vs_base[0] = coerce_to_namestring(vs_base[0]);
 }
 
-void
-Lfile_namestring(void)
+LFD(Lfile_namestring)(void)
 {
 	check_arg(1);
 
@@ -684,8 +674,7 @@ Lfile_namestring(void)
 	vs_base[0] = namestring(vs_base[0]);
 }
 
-void
-Ldirectory_namestring(void)
+LFD(Ldirectory_namestring)(void)
 {
 	check_arg(1);
 
@@ -698,8 +687,7 @@ Ldirectory_namestring(void)
 	vs_base[0] = namestring(vs_base[0]);
 }
 
-void
-Lhost_namestring(void)
+LFD(Lhost_namestring)(void)
 {
 	check_arg(1);
 

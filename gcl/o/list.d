@@ -135,7 +135,7 @@ object item, test, test_not, key;
 }
 
 #define	PREDICATE(f, f_if, f_if_not, n)  \
-void f_if()  \
+LFD(f_if)()  \
 {  \
 	if (vs_top - vs_base < n)  \
 		too_few_arguments();  \
@@ -144,7 +144,7 @@ void f_if()  \
 	f();  \
 }  \
 \
-void f_if_not()  \
+LFD(f_if_not)()  \
 {  \
 	if (vs_top - vs_base < n)  \
 		too_few_arguments();  \
@@ -571,8 +571,7 @@ object alist, *treep;
 	}
 }
 
-void
-Lcar()
+LFD(Lcar)()
 {
 	check_arg(1);
 
@@ -582,8 +581,7 @@ Lcar()
 		FEwrong_type_argument(sLlist, vs_base[0]);
 }
 
-void
-Lcdr()
+LFD(Lcdr)()
 {
 	check_arg(1);
 
@@ -622,34 +620,34 @@ object cddadr(x) object x;  {  return(cdr(cdr(car(cdr(x)))));  }
 object cdddar(x) object x;  {  return(cdr(cdr(cdr(car(x)))));  }
 object cddddr(x) object x;  {  return(cdr(cdr(cdr(cdr(x)))));  }
 
-void Lcaar(){  check_arg(1);  vs_base[0] = car(car(vs_base[0]));  }
-void Lcadr(){  check_arg(1);  vs_base[0] = car(cdr(vs_base[0]));  }
-void Lcdar(){  check_arg(1);  vs_base[0] = cdr(car(vs_base[0]));  }
-void Lcddr(){  check_arg(1);  vs_base[0] = cdr(cdr(vs_base[0]));  }
-void Lcaaar(){  check_arg(1);  vs_base[0] = car(car(car(vs_base[0])));  }
-void Lcaadr(){  check_arg(1);  vs_base[0] = car(car(cdr(vs_base[0])));  }
-void Lcadar(){  check_arg(1);  vs_base[0] = car(cdr(car(vs_base[0])));  }
-void Lcaddr(){  check_arg(1);  vs_base[0] = car(cdr(cdr(vs_base[0])));  }
-void Lcdaar(){  check_arg(1);  vs_base[0] = cdr(car(car(vs_base[0])));  }
-void Lcdadr(){  check_arg(1);  vs_base[0] = cdr(car(cdr(vs_base[0])));  }
-void Lcddar(){  check_arg(1);  vs_base[0] = cdr(cdr(car(vs_base[0])));  }
-void Lcdddr(){  check_arg(1);  vs_base[0] = cdr(cdr(cdr(vs_base[0])));  }
-void Lcaaaar(){check_arg(1); vs_base[0] = car(car(car(car(vs_base[0]))));}
-void Lcaaadr(){check_arg(1); vs_base[0] = car(car(car(cdr(vs_base[0]))));}
-void Lcaadar(){check_arg(1); vs_base[0] = car(car(cdr(car(vs_base[0]))));}
-void Lcaaddr(){check_arg(1); vs_base[0] = car(car(cdr(cdr(vs_base[0]))));}
-void Lcadaar(){check_arg(1); vs_base[0] = car(cdr(car(car(vs_base[0]))));}
-void Lcadadr(){check_arg(1); vs_base[0] = car(cdr(car(cdr(vs_base[0]))));}
-void Lcaddar(){check_arg(1); vs_base[0] = car(cdr(cdr(car(vs_base[0]))));}
-void Lcadddr(){check_arg(1); vs_base[0] = car(cdr(cdr(cdr(vs_base[0]))));}
-void Lcdaaar(){check_arg(1); vs_base[0] = cdr(car(car(car(vs_base[0]))));}
-void Lcdaadr(){check_arg(1); vs_base[0] = cdr(car(car(cdr(vs_base[0]))));}
-void Lcdadar(){check_arg(1); vs_base[0] = cdr(car(cdr(car(vs_base[0]))));}
-void Lcdaddr(){check_arg(1); vs_base[0] = cdr(car(cdr(cdr(vs_base[0]))));}
-void Lcddaar(){check_arg(1); vs_base[0] = cdr(cdr(car(car(vs_base[0]))));}
-void Lcddadr(){check_arg(1); vs_base[0] = cdr(cdr(car(cdr(vs_base[0]))));}
-void Lcdddar(){check_arg(1); vs_base[0] = cdr(cdr(cdr(car(vs_base[0]))));}
-void Lcddddr(){check_arg(1); vs_base[0] = cdr(cdr(cdr(cdr(vs_base[0]))));}
+LFD(Lcaar)(){  check_arg(1);  vs_base[0] = car(car(vs_base[0]));  }
+LFD(Lcadr)(){  check_arg(1);  vs_base[0] = car(cdr(vs_base[0]));  }
+LFD(Lcdar)(){  check_arg(1);  vs_base[0] = cdr(car(vs_base[0]));  }
+LFD(Lcddr)(){  check_arg(1);  vs_base[0] = cdr(cdr(vs_base[0]));  }
+LFD(Lcaaar)(){  check_arg(1);  vs_base[0] = car(car(car(vs_base[0])));  }
+LFD(Lcaadr)(){  check_arg(1);  vs_base[0] = car(car(cdr(vs_base[0])));  }
+LFD(Lcadar)(){  check_arg(1);  vs_base[0] = car(cdr(car(vs_base[0])));  }
+LFD(Lcaddr)(){  check_arg(1);  vs_base[0] = car(cdr(cdr(vs_base[0])));  }
+LFD(Lcdaar)(){  check_arg(1);  vs_base[0] = cdr(car(car(vs_base[0])));  }
+LFD(Lcdadr)(){  check_arg(1);  vs_base[0] = cdr(car(cdr(vs_base[0])));  }
+LFD(Lcddar)(){  check_arg(1);  vs_base[0] = cdr(cdr(car(vs_base[0])));  }
+LFD(Lcdddr)(){  check_arg(1);  vs_base[0] = cdr(cdr(cdr(vs_base[0])));  }
+LFD(Lcaaaar)(){check_arg(1); vs_base[0] = car(car(car(car(vs_base[0]))));}
+LFD(Lcaaadr)(){check_arg(1); vs_base[0] = car(car(car(cdr(vs_base[0]))));}
+LFD(Lcaadar)(){check_arg(1); vs_base[0] = car(car(cdr(car(vs_base[0]))));}
+LFD(Lcaaddr)(){check_arg(1); vs_base[0] = car(car(cdr(cdr(vs_base[0]))));}
+LFD(Lcadaar)(){check_arg(1); vs_base[0] = car(cdr(car(car(vs_base[0]))));}
+LFD(Lcadadr)(){check_arg(1); vs_base[0] = car(cdr(car(cdr(vs_base[0]))));}
+LFD(Lcaddar)(){check_arg(1); vs_base[0] = car(cdr(cdr(car(vs_base[0]))));}
+LFD(Lcadddr)(){check_arg(1); vs_base[0] = car(cdr(cdr(cdr(vs_base[0]))));}
+LFD(Lcdaaar)(){check_arg(1); vs_base[0] = cdr(car(car(car(vs_base[0]))));}
+LFD(Lcdaadr)(){check_arg(1); vs_base[0] = cdr(car(car(cdr(vs_base[0]))));}
+LFD(Lcdadar)(){check_arg(1); vs_base[0] = cdr(car(cdr(car(vs_base[0]))));}
+LFD(Lcdaddr)(){check_arg(1); vs_base[0] = cdr(car(cdr(cdr(vs_base[0]))));}
+LFD(Lcddaar)(){check_arg(1); vs_base[0] = cdr(cdr(car(car(vs_base[0]))));}
+LFD(Lcddadr)(){check_arg(1); vs_base[0] = cdr(cdr(car(cdr(vs_base[0]))));}
+LFD(Lcdddar)(){check_arg(1); vs_base[0] = cdr(cdr(cdr(car(vs_base[0]))));}
+LFD(Lcddddr)(){check_arg(1); vs_base[0] = cdr(cdr(cdr(cdr(vs_base[0]))));}
 
 DEFUNO_NEW("NTH",object,fLnth,LISP,2,2,NONE,OI,OO,OO,OO,void,Lnth,(fixnum index,object list),"")
 { object x = list;
@@ -663,7 +661,12 @@ DEFUNO_NEW("NTH",object,fLnth,LISP,2,2,NONE,OI,OO,OO,OO,void,Lnth,(fixnum index,
       else if (x == sLnil) RETURN1(sLnil);
       else FEwrong_type_argument(sLlist, list);}
 }   
-
+#ifdef STATIC_FUNCTION_POINTERS
+object
+fLnth(fixnum index,object list) {
+	return FFN(fLnth)(index,list);
+}
+#endif
 
 DEFUN_NEW("FIRST",object,fLfirst,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") 
 { RETURN1(car(x)) ;}
@@ -687,8 +690,7 @@ DEFUN_NEW("NINTH",object,fLninth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 DEFUN_NEW("TENTH",object,fLtenth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { return fLnth(9,x);}
 
-void
-Lcons()
+LFD(Lcons)()
 {
 	object x;
 
@@ -710,8 +712,7 @@ Lcons()
         @(return x) 
 @)
 
-void
-Lendp()
+LFD(Lendp)()
 {
 
 	check_arg(1);
@@ -727,8 +728,7 @@ Lendp()
 	FEwrong_type_argument(sLlist, vs_base[0]);
 }
 
-void
-Llist_length()
+LFD(Llist_length)()
 {
 	int n;
 	object fast, slow;
@@ -773,8 +773,7 @@ nth(int n, object x) {
 		return(x->c.c_car);
 }
 
-void
-Lnthcdr()
+LFD(Lnthcdr)()
 {
 	check_arg(2);
 	vs_base[0] = nthcdr(fixint(vs_base[0]), vs_base[1]);
@@ -796,8 +795,7 @@ nthcdr(int n, object x) {
 	return(x);
 }
 
-void
-Llast() {
+LFD(Llast)() {
 	object t;
 	int n;
 
@@ -830,16 +828,14 @@ Llast() {
 
 }
 
-void
-Llist()
+LFD(Llist)()
 {
 	vs_push(Cnil);
 	while (vs_top > vs_base + 1)
 		stack_cons();
 }
 
-void
-LlistA()
+LFD(LlistA)()
 {
 	if (vs_top == vs_base)
 		too_few_arguments();
@@ -900,8 +896,7 @@ int n;
 	@(return x)
 @)
 
-void
-Lappend()
+LFD(Lappend)()
 {
 	object x;
 
@@ -916,30 +911,26 @@ Lappend()
 	}
 }
 
-void
-Lcopy_list()
+LFD(Lcopy_list)()
 {
 	check_arg(1);
 	vs_base[0] = copy_list(vs_base[0]);
 }
 
-void
-Lcopy_alist()
+LFD(Lcopy_alist)()
 {
 	check_arg(1);
 	vs_base[0] = copy_alist(vs_base[0]);
 }
 
-void
-Lcopy_tree()
+LFD(Lcopy_tree)()
 {
 	check_arg(1);
 	copy_tree(vs_base[0]);
 	vs_base[0] = vs_pop;
 }
 
-void
-Lrevappend() {
+LFD(Lrevappend)() {
 	object x, y;
 
 	check_arg(2);
@@ -965,8 +956,7 @@ nconc(object x, object y) {
 	return(x);
 }
 
-void
-Lnconc() {
+LFD(Lnconc)() {
 	object x, l, m=Cnil;
         int i, narg;
 	
@@ -993,8 +983,7 @@ Lnconc() {
 	vs_top = vs_base+1;
 }
 
-void
-Lreconc() {
+LFD(Lreconc)() {
 	object x, y, z;
 
 	check_arg(2);
@@ -1046,8 +1035,7 @@ Lreconc() {
 	@(return lis)
 @)
 
-void
-Lldiff() {
+LFD(Lldiff)() {
 	int i;
 	object x;
 
@@ -1068,8 +1056,7 @@ Lldiff() {
 	vs_popp;
 }
 
-void
-Lrplaca()
+LFD(Lrplaca)()
 {
 	check_arg(2);
 	check_type_cons(&vs_base[0]);
@@ -1078,8 +1065,7 @@ Lrplaca()
 	vs_popp;
 }
 
-void
-Lrplacd()
+LFD(Lrplacd)()
 {
 	check_arg(2);
 	check_type_cons(&vs_base[0]);
@@ -1205,8 +1191,7 @@ PREDICATE(Lmember,Lmember_if,Lmember_if_not, 2)
 	@(return list)
 @)
 
-void
-Ltailp() {
+LFD(Ltailp)() {
 	object x;
 
 	check_arg(2);
@@ -1224,8 +1209,7 @@ Ltailp() {
 	return;
 }
 
-void
-Ladjoin()
+LFD(Ladjoin)()
 {
 	object *base = vs_base, *top = vs_top;
 
@@ -1233,15 +1217,14 @@ Ladjoin()
 		too_few_arguments();
 	while (vs_base < top)
 		vs_push(*vs_base++);
-	Lmember1();
+	FFN(Lmember1)();
 	if (vs_base[0] == Cnil)
 		base[1] = make_cons(base[0], base[1]);
 	vs_base = base+1;
 	vs_top = base+2;
 }
 
-void
-Lacons()
+LFD(Lacons)()
 {
 	check_arg(3);
 
@@ -1291,8 +1274,8 @@ Lacons()
 	@(return a_list)
 @)
 
-void Lassoc() { car_or_cdr = car; Lassoc_or_rassoc(); }
-void Lrassoc() { car_or_cdr = cdr; Lassoc_or_rassoc(); }
+LFD(Lassoc)() { car_or_cdr = car; FFN(Lassoc_or_rassoc)(); }
+LFD(Lrassoc)() { car_or_cdr = cdr; FFN(Lassoc_or_rassoc)(); }
 
 static bool true_or_false;
 
@@ -1312,10 +1295,10 @@ static bool true_or_false;
 	@(return a_list)
 @)
 
-void Lassoc_if() { car_or_cdr = car; true_or_false = TRUE; Lassoc_or_rassoc_predicate(); }
-void Lassoc_if_not() { car_or_cdr = car; true_or_false = FALSE; Lassoc_or_rassoc_predicate(); }
-void Lrassoc_if() { car_or_cdr = cdr; true_or_false = TRUE; Lassoc_or_rassoc_predicate(); }
-void Lrassoc_if_not() { car_or_cdr = cdr; true_or_false = FALSE; Lassoc_or_rassoc_predicate(); }
+LFD(Lassoc_if)() { car_or_cdr = car; true_or_false = TRUE; FFN(Lassoc_or_rassoc_predicate)(); }
+LFD(Lassoc_if_not)() { car_or_cdr = car; true_or_false = FALSE; FFN(Lassoc_or_rassoc_predicate)(); }
+LFD(Lrassoc_if)() { car_or_cdr = cdr; true_or_false = TRUE; FFN(Lassoc_or_rassoc_predicate)(); }
+LFD(Lrassoc_if_not)() { car_or_cdr = cdr; true_or_false = FALSE; FFN(Lassoc_or_rassoc_predicate)(); }
 
 bool
 member_eq(x, l)
@@ -1329,7 +1312,7 @@ object x, l;
 }
 
 static void
-siLmemq()
+FFN(siLmemq)()
 {
 	object x, l;
 

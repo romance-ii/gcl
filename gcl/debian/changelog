@@ -7,6 +7,10 @@ gclcvs (2.7.0-14) unstable; urgency=low
     copies required, and eventually replace this global parameter with
     local variables
   * Turn on some optimization on hppa, -O only
+  * Make all C defined functions installed into lisp static functions
+    to work around dynamic function descriptors on ia64, Closes:
+    #217484, Closes: #204789, (STATIC_FUNCTION_POINTERS define in
+    config.h)
 
  -- Camm Maguire <camm@enhanced.com>  Thu,  6 Nov 2003 15:43:07 +0000
 

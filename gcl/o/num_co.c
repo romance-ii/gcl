@@ -372,8 +372,7 @@ num_remainder(object x, object y, object q)
 /* Coerce X to single-float if one arg,
    otherwise coerce to same float type as second arg */
 
-void
-Lfloat(void)
+LFD(Lfloat)(void)
 {
 	double	d;
 	int narg;
@@ -425,8 +424,7 @@ Lfloat(void)
 	vs_push(x);
 }
 
-void
-Lnumerator(void)
+LFD(Lnumerator)(void)
 {
 	check_arg(1);
 	check_type_rational(&vs_base[0]);
@@ -434,8 +432,7 @@ Lnumerator(void)
 		vs_base[0] = vs_base[0]->rat.rat_num;
 }
 
-void
-Ldenominator(void)
+LFD(Ldenominator)(void)
 {
 	check_arg(1);
 	check_type_rational(&vs_base[0]);
@@ -445,8 +442,7 @@ Ldenominator(void)
 		vs_base[0] = small_fixnum(1);
 }
 
-void
-Lfloor(void)
+LFD(Lfloor)(void)
 {
 	object x, y, q, q1;
 	double d;
@@ -569,8 +565,7 @@ TWO_ARG:
 	}
 }
 
-void
-Lceiling(void)
+LFD(Lceiling)(void)
 {
 	object x, y, q, q1;
 	double d;
@@ -693,8 +688,7 @@ TWO_ARG:
 	}
 }
 
-void
-Ltruncate(void)
+LFD(Ltruncate)(void)
 {
 	object x, y, q, q1;
 	int n;
@@ -778,8 +772,7 @@ TWO_ARG:
 	}
 }
 
-void
-Lround(void)
+LFD(Lround)(void)
 {
 	object x, y, q, q1, r;
 	double d;
@@ -911,16 +904,14 @@ TWO_ARG:
 	}
 }
 
-void
-Lmod(void)
+LFD(Lmod)(void)
 {
 	check_arg(2);
 	Lfloor();
 	vs_base++;
 }
 
-void
-Lrem(void)
+LFD(Lrem)(void)
 {
 	check_arg(2);
 	Ltruncate();
@@ -928,8 +919,7 @@ Lrem(void)
 }
 
 
-void
-Ldecode_float(void)
+LFD(Ldecode_float)(void)
 {
 	object x;
 	double d;
@@ -972,8 +962,7 @@ Ldecode_float(void)
 	}
 }
 
-void
-Lscale_float(void)
+LFD(Lscale_float)(void)
 {
 	object x;
 	double d;
@@ -1023,8 +1012,7 @@ Lscale_float(void)
 		vs_base[0] = make_longfloat(d);
 }
 
-void
-Lfloat_radix(void)
+LFD(Lfloat_radix)(void)
 {
 	check_arg(1);
 	check_type_float(&vs_base[0]);
@@ -1045,8 +1033,7 @@ Lfloat_radix(void)
 #endif
 }
 
-void
-Lfloat_sign(void)
+LFD(Lfloat_sign)(void)
 {
 	object x;
 	int narg;
@@ -1084,8 +1071,7 @@ Lfloat_sign(void)
 		vs_push(make_longfloat(f));
 }
 
-void
-Lfloat_digits(void)
+LFD(Lfloat_digits)(void)
 {
 	check_arg(1);
 	check_type_float(&vs_base[0]);
@@ -1095,8 +1081,7 @@ Lfloat_digits(void)
 		vs_base[0] = small_fixnum(53);
 }
 
-void
-Lfloat_precision(void)
+LFD(Lfloat_precision)(void)
 {
 	object x;
 
@@ -1129,8 +1114,7 @@ Lfloat_precision(void)
 #endif
 }
 
-void
-Linteger_decode_float(void)
+LFD(Linteger_decode_float)(void)
 {
 	object x;
 	int h, l, e, s;
@@ -1155,8 +1139,7 @@ Linteger_decode_float(void)
 	}
 }
 
-void
-Lcomplex(void)
+LFD(Lcomplex)(void)
 {
 	object	r, i;
 	int narg;
@@ -1178,8 +1161,7 @@ Lcomplex(void)
 	vs_push(make_complex(r, i));
 }
 
-void
-Lrealpart(void)
+LFD(Lrealpart)(void)
 {
 	object	x;
 
@@ -1190,8 +1172,7 @@ Lrealpart(void)
 		vs_base[0] = x->cmp.cmp_real;
 }
 
-void
-Limagpart(void)
+LFD(Limagpart)(void)
 {
 	object x;
 

@@ -29,6 +29,7 @@
 /* array.c:461:OF */ extern object fSget_aelttype (object x); /* (x) object x; */
 /* array.c:480:OF */ extern void siLmake_vector (void); /* () */
 /* array.c:519:OF */ extern object fSmake_array1 (fixnum elt_type, object staticp, object initial_element, object displaced_to,fixnum displaced_index_offset, object dimensions); /* (elt_type, staticp, initial_element, displaced_to, displaced_index_offset, dimensions) int elt_type; object staticp; object initial_element; object displaced_to; int displaced_index_offset; object dimensions; */
+/* array.c::OF */ extern object fSmake_vector1_1 (fixnum n,fixnum elt_type,object staticp); 
 /* array.c:738:OF */ extern void adjust_displaced (object x, int diff); /* (x, diff) object x; int diff; */
 /* array.c:790:OF */ extern void gset (void *p1, void *val, int n, int typ); /* (p1, val, n, typ) char *p1; char *val; int n; int typ; */
 /* array.c:831:OF */ extern object fScopy_array_portion (object x, object y,fixnum i1,fixnum i2, object n1); /* (x, y, i1, i2, n1) object x; object y; int i1; int i2; int n1; */
@@ -119,10 +120,10 @@ struct key {short n,allow_other_keys;
 /* cfun.c:193:OF */ extern object fSmfvfun_key (object symbol, object address, object argd, object keys); /* (symbol, address, argd, keys) object symbol; object address; object argd; object keys; */
 /* cfun.c:221:OF */ extern object fSmf (object name, object addr); /* (name, addr) object name; object addr; */
 /* cfun.c:269:OF */ extern object fSmm (object name, object addr); /* (name, addr) object name; object addr; */
-/* cfun.c:283:OF */ extern object make_function (char *s, void(*f)()); /* (s, f) char *s; int (*f)(); */
-/* cfun.c:299:OF */ extern object make_si_sfun (char *s, object (*f)(), int argd); /* (s, f, argd) char *s; int (*f)(); int argd; */
-/* cfun.c:322:OF */ extern object make_si_function (char *s, void (*f) ()); /* (s, f) char *s; int (*f)(); */
-/* cfun.c:341:OF */ extern object make_special_form (char *s, void (*f)()); /* (s, f) char *s; int (*f)(); */
+/* cfun.c:283:OF */ extern object make_function_internal (char *s, void(*f)()); /* (s, f) char *s; int (*f)(); */
+/* cfun.c:299:OF */ extern object make_si_sfun_internal (char *s, object (*f)(), int argd); /* (s, f, argd) char *s; int (*f)(); int argd; */
+/* cfun.c:322:OF */ extern object make_si_function_internal (char *s, void (*f) ()); /* (s, f) char *s; int (*f)(); */
+/* cfun.c:341:OF */ extern object make_special_form_internal (char *s, void (*f)()); /* (s, f) char *s; int (*f)(); */
 /* cfun.c:352:OF */ extern object fScompiled_function_name (object fun); /* (fun) object fun; */
 /* cfun.c:371:OF */ extern void turbo_closure (object fun); /* (fun) object fun; */
 /* cfun.c:392:OF */ extern object fSturbo_closure (object funobj); /* (funobj) object funobj; */
@@ -220,6 +221,8 @@ typedef void (*funcvoid)(void);
 /* fat_string.c:331:OF */ extern object fSdisplay_profile (object start_addr, object scal); /* (start_addr, scal) object start_addr; object scal; */
 /* fat_string.c:394:OF */ extern object fSarray_adress (object array); /* (array) object array; */
 /* fat_string.c:435:OF */ extern void gcl_init_fat_string (void); /* () */
+/* sfasli.c::OF */ extern void gcl_init_sfasl (void); /* () */
+/* format.c::OF */ extern object fLformat_1(object strm, object control,object x);
 /* format.c:2084:OF */ extern void Lformat (void); /* () */
 /* format.c:2171:OF */ extern void gcl_init_format (void); /* () */
 /* frame.c:32:OF */ extern void unwind (frame_ptr fr, object tag); /* (fr, tag) frame_ptr fr; object tag; */

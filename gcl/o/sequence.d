@@ -71,8 +71,7 @@ int l;
 	return(x);
 }
 
-void
-Lelt()
+LFD(Lelt)()
 {
 	check_arg(2);
 	vs_base[0] = elt(vs_base[0], fixint(vs_base[1]));
@@ -129,8 +128,7 @@ E:
 	return(Cnil);
 }
 
-void
-siLelt_set()
+LFD(siLelt_set)()
 {
 	check_arg(3);
 	vs_base[0] = elt_set(vs_base[0], fixint(vs_base[1]), vs_base[2]);
@@ -317,8 +315,7 @@ ILLEGAL_START_END:
 for the sequence ~S.", 3, start, end, sequence);
 @)
 
-void
-Lcopy_seq()
+LFD(Lcopy_seq)()
 {
 	check_arg(1);
 	vs_push(small_fixnum(0));
@@ -358,15 +355,13 @@ object x;
 	}
 }
 
-void
-Llength()
+LFD(Llength)()
 {
 	check_arg(1);
 	vs_base[0] = make_fixnum(length(vs_base[0]));
 }
 
-void
-Lreverse()
+LFD(Lreverse)()
 {
 	check_arg(1);
 	vs_base[0] = reverse(vs_base[0]);
@@ -460,8 +455,7 @@ object seq;
 	}
 }
 
-void
-Lnreverse()
+LFD(Lnreverse)()
 {
 	check_arg(1);
 	vs_base[0] = nreverse(vs_base[0]);

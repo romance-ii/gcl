@@ -110,8 +110,7 @@ advance_random_state(object rs)
 }
 
 
-void
-Lrandom(void)
+LFD(Lrandom)(void)
 {
 	int j;
         object x;
@@ -127,8 +126,7 @@ Lrandom(void)
 	vs_push(x);
 }
 
-void
-Lmake_random_state(void)
+LFD(Lmake_random_state)(void)
 {
 	int j;
 	object x;
@@ -142,8 +140,7 @@ Lmake_random_state(void)
 	vs_push(x);
 }
 
-void
-Lrandom_state_p(void)
+LFD(Lrandom_state_p)(void)
 {
 	check_arg(1);
 	if (type_of(vs_pop) == t_random)

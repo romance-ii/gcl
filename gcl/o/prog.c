@@ -44,8 +44,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 			   VS			  |<-------- body1 -------->|
 */
 
-void
-Ftagbody(object body)
+FFD(Ftagbody)(object body)
 {
 
 	object *old_top = vs_top;
@@ -104,7 +103,7 @@ Ftagbody(object body)
 }
 
 static void
-Fprog(VOL object arg)
+FFN(Fprog)(VOL object arg)
 {
 
 	object *oldlex = lex_env;
@@ -137,7 +136,7 @@ END:
 }
 
 static void
-FprogA(VOL object arg)
+FFN(FprogA)(VOL object arg)
 {
 
 	object *oldlex = lex_env;
@@ -170,7 +169,7 @@ END:
 }
 
 static void
-Fgo(object args)
+FFN(Fgo)(object args)
 {
 
 	object lex_tag;
@@ -192,7 +191,7 @@ Fgo(object args)
 }
 
 static void
-Fprogv(object args)
+FFN(Fprogv)(object args)
 {
 
 	object *top;
@@ -236,8 +235,7 @@ Fprogv(object args)
 	bds_unwind(old_bds_top);
 }
 
-void
-Fprogn(object body)
+FFD(Fprogn)(object body)
 {
 
 	if(endp(body)) {
@@ -254,7 +252,7 @@ Fprogn(object body)
 }
 
 static void
-Fprog1(object arg)
+FFN(Fprog1)(object arg)
 {
 
 	object *top = vs_top;
@@ -271,7 +269,7 @@ Fprog1(object arg)
 }
 
 static void
-Fprog2(object arg)
+FFN(Fprog2)(object arg)
 {
 
 	object *top = vs_top;
@@ -300,7 +298,7 @@ gcl_init_prog(void)
 
 	make_special_form("PROGV", Fprogv);
 
-	make_special_form("PROGN",Fprogn);
+	sLprogn=make_special_form("PROGN",Fprogn);
 	make_special_form("PROG1",Fprog1);
 	make_special_form("PROG2",Fprog2);
 }

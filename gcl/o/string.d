@@ -216,8 +216,7 @@ object x;
 	@(return `code_char(s->ust.ust_self[j])`)
 @)
 
-void
-siLchar_set()
+LFD(siLchar_set)()
 {
 	int j;
 
@@ -341,11 +340,11 @@ int string_sign, string_boundary;
 	@(return `string_sign>=0 ? make_fixnum(s1) : Cnil`)
 @)
 
-void Lstring_l()  { string_sign =  1;  string_boundary = 1;  Lstring_cmp(); }
-void Lstring_g()  { string_sign = -1;  string_boundary = 1;  Lstring_cmp(); }
-void Lstring_le() { string_sign =  1;  string_boundary = 0;  Lstring_cmp(); }
-void Lstring_ge() { string_sign = -1;  string_boundary = 0;  Lstring_cmp(); }
-void Lstring_neq() { string_sign = 0;  string_boundary = 1;  Lstring_cmp(); }
+LFD(Lstring_l)()  { string_sign =  1;  string_boundary = 1;  FFN(Lstring_cmp)(); }
+LFD(Lstring_g)()  { string_sign = -1;  string_boundary = 1;  FFN(Lstring_cmp)(); }
+LFD(Lstring_le)() { string_sign =  1;  string_boundary = 0;  FFN(Lstring_cmp)(); }
+LFD(Lstring_ge)() { string_sign = -1;  string_boundary = 0;  FFN(Lstring_cmp)(); }
+LFD(Lstring_neq)() { string_sign = 0;  string_boundary = 1;  FFN(Lstring_cmp)(); }
 
 @(static defun string_compare (string1 string2
 			&key start1 end1 start2 end2)
@@ -384,11 +383,11 @@ void Lstring_neq() { string_sign = 0;  string_boundary = 1;  Lstring_cmp(); }
 	@(return `string_sign>=0 ? make_fixnum(s1) : Cnil`)
 @)
 
-void Lstring_lessp()      { string_sign =  1; string_boundary = 1;  Lstring_compare(); }
-void Lstring_greaterp()   { string_sign = -1; string_boundary = 1;  Lstring_compare(); }
-void Lstring_not_greaterp(){ string_sign =  1; string_boundary = 0;  Lstring_compare(); }
-void Lstring_not_lessp()   { string_sign = -1; string_boundary = 0;  Lstring_compare(); }
-void Lstring_not_equal()   { string_sign =  0; string_boundary = 1;  Lstring_compare(); }
+LFD(Lstring_lessp)()      { string_sign =  1; string_boundary = 1;  FFN(Lstring_compare)(); }
+LFD(Lstring_greaterp)()   { string_sign = -1; string_boundary = 1;  FFN(Lstring_compare)(); }
+LFD(Lstring_not_greaterp)(){ string_sign =  1; string_boundary = 0;  FFN(Lstring_compare)(); }
+LFD(Lstring_not_lessp)()   { string_sign = -1; string_boundary = 0;  FFN(Lstring_compare)(); }
+LFD(Lstring_not_equal)()   { string_sign =  0; string_boundary = 1;  FFN(Lstring_compare)(); }
 
 /* element_type is currently ignored -- character == base-char == standard-char */
 @(defun make_string (size
@@ -457,10 +456,7 @@ object char_bag;
 	}
 }
 
-static void Lstring_trim0();
-void Lstring_trim() { left_trim = right_trim = TRUE; Lstring_trim0(); }
-void Lstring_left_trim() { left_trim = TRUE; right_trim = FALSE; Lstring_trim0(); }
-void Lstring_right_trim() { left_trim = FALSE; right_trim = TRUE; Lstring_trim0();}
+/*static void Lstring_trim0();*/
 
 @(static defun string_trim0 (char_bag strng &aux res)
 	int i, j, k;
@@ -485,6 +481,10 @@ void Lstring_right_trim() { left_trim = FALSE; right_trim = TRUE; Lstring_trim0(
 	END_NO_INTERRUPT;	}
 	@(return res)
 @)
+
+LFD(Lstring_trim)() { left_trim = right_trim = TRUE; FFN(Lstring_trim0)(); }
+LFD(Lstring_left_trim)() { left_trim = TRUE; right_trim = FALSE; FFN(Lstring_trim0)(); }
+LFD(Lstring_right_trim)() { left_trim = FALSE; right_trim = TRUE; FFN(Lstring_trim0)();}
 
 static int char_upcase(c, bp)
 int c, *bp;
@@ -536,9 +536,9 @@ int c, *bp;
 	@(return conv)
 @)
 
-void Lstring_upcase()     { casefun =     char_upcase;  Lstring_case(); }
-void Lstring_downcase()   { casefun =   char_downcase;  Lstring_case(); }
-void Lstring_capitalize() { casefun = char_capitalize;  Lstring_case(); }
+LFD(Lstring_upcase)()     { casefun =     char_upcase;  FFN(Lstring_case)(); }
+LFD(Lstring_downcase)()   { casefun =   char_downcase;  FFN(Lstring_case)(); }
+LFD(Lstring_capitalize)() { casefun = char_capitalize;  FFN(Lstring_case)(); }
 
 
 @(static defun nstring_case (strng &key start end)
@@ -554,9 +554,9 @@ void Lstring_capitalize() { casefun = char_capitalize;  Lstring_case(); }
 	@(return strng)
 @)
 
-void Lnstring_upcase()     { casefun =     char_upcase;  Lnstring_case(); }
-void Lnstring_downcase()   { casefun =   char_downcase;  Lnstring_case(); }
-void Lnstring_capitalize() { casefun = char_capitalize;  Lnstring_case(); }
+LFD(Lnstring_upcase)()     { casefun =     char_upcase;  FFN(Lnstring_case)(); }
+LFD(Lnstring_downcase)()   { casefun =   char_downcase;  FFN(Lnstring_case)(); }
+LFD(Lnstring_capitalize)() { casefun = char_capitalize;  FFN(Lnstring_case)(); }
 
 
 @(defun string (x)
@@ -565,7 +565,7 @@ void Lnstring_capitalize() { casefun = char_capitalize;  Lnstring_case(); }
 @)
 
 static void
-siLstring_concatenate()
+FFN(siLstring_concatenate)()
 {
 	int narg, i, l, m;
 	object *v;

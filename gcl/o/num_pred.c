@@ -174,8 +174,7 @@ number_evenp(object x)
 	return(~i & 1);
 }
 
-void
-Lzerop(void)
+LFD(Lzerop)(void)
 {
 	check_arg(1);
 	check_type_number(&vs_base[0]);
@@ -185,8 +184,7 @@ Lzerop(void)
 		vs_base[0] = Cnil;
 }
 
-void
-Lplusp(void)
+LFD(Lplusp)(void)
 {
 	check_arg(1);
 	check_type_or_rational_float(&vs_base[0]);
@@ -196,8 +194,7 @@ Lplusp(void)
 		vs_base[0] = Cnil;
 }
 
-void
-Lminusp(void)
+LFD(Lminusp)(void)
 {
 	check_arg(1);
 	check_type_or_rational_float(&vs_base[0]);
@@ -207,8 +204,7 @@ Lminusp(void)
 		vs_base[0] = Cnil;
 }
 
-void
-Loddp(void)
+LFD(Loddp)(void)
 {
 	check_arg(1);
 	check_type_integer(&vs_base[0]);
@@ -218,8 +214,7 @@ Loddp(void)
 		vs_base[0] = Cnil;
 }
 
-void
-Levenp(void)
+LFD(Levenp)(void)
 {
 	check_arg(1);
 	check_type_integer(&vs_base[0]);

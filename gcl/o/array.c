@@ -180,6 +180,12 @@ DEFUN_NEW("ROW-MAJOR-AREF", object, fLrow_major_aref, LISP, 2, 2,
     return(Cnil);
   }
 }
+#ifdef STATIC_FUNCTION_POINTERS
+object
+fLrow_major_aref(object x,fixnum i) {
+  return FFN(fLrow_major_aref)(x,i);
+}
+#endif
 
 object
 aset1(object x,fixnum i,object val) {
@@ -255,6 +261,12 @@ DEFUN_NEW("ASET1", object, fSaset1, SI, 3, 3, NONE, OO, IO, OO,OO,(object x, fix
   }
   return val;
 }
+#ifdef STATIC_FUNCTION_POINTERS
+object
+fSaset1(object x, fixnum i,object val) {
+  return FFN(fSaset1)(x,i,val);
+}
+#endif
 
 DEFUNO_NEW("ASET", object, fSaset, SI, 1, ARG_LIMIT, NONE, OO,
        IO, OO, OO,void,siLaset,(object x,fixnum i,object y, ...),"")
@@ -314,6 +326,7 @@ DEFUNO_NEW("ASET", object, fSaset, SI, 1, ARG_LIMIT, NONE, OO,
     }
    
 }
+
 
 DEFUNO_NEW("SVSET", object, fSsvset, SI, 3, 3, NONE, OO, IO, OO,
        OO,void,siLsvset,(object x,fixnum i,object val),"")
@@ -424,7 +437,11 @@ DEFUN_NEW("MAKE-VECTOR1",object,fSmake_vector1,SI,3,8,NONE,OI,
       }
     }
   }
-
+object 
+fSmake_vector1_1(fixnum n,fixnum elt_type,object staticp) {
+  VFUN_NARGS=3;
+  return FFN(fSmake_vector1)(n,elt_type,staticp);
+}
 
 
 static object DFLT_aet_object = Cnil;	
@@ -457,6 +474,12 @@ DEFUN_NEW("GET-AELTTYPE",object,fSget_aelttype,SI,1,1,NONE,OO,OO,OO,OO,(object x
     return make_fixnum(aet_lf);
   return make_fixnum(aet_object);
 }
+#ifdef STATIC_FUNCTION_POINTERS
+object
+fSget_aelttype(object x) {
+  return FFN(fSget_aelttype)(x);
+}
+#endif
 
 /* backward compatibility only:
    	(si:make-vector element-type 0
@@ -482,7 +505,7 @@ DEFUNO_NEW("MAKE-VECTOR",object,fSmake_vector,SI,7,8,NONE,
   /* 8 args */
 
   VFUN_NARGS = 8;
-  x = fSmake_vector1(Mfix(x1),  /* n */
+  x = FFN(fSmake_vector1)(Mfix(x1),  /* n */
 		     fix(fSget_aelttype(x0)), /*aelt type */
 		     x6, /* staticp */
 		     x3, /* fillp */ 
@@ -533,6 +556,15 @@ DEFUN_NEW("MAKE-ARRAY1",object,fSmake_array1,SI,6,6,
 	return x;
       }
  }}
+#ifdef STATIC_FUNCTION_POINTERS
+object
+fSmake_array1(fixnum elt_type,object staticp,object initial_element,object displaced_to,
+	      fixnum displaced_index_offset,object dimensions) {
+  return FFN(fSmake_array1)(elt_type,staticp,initial_element,
+			    displaced_to,displaced_index_offset,dimensions);
+}
+#endif
+
 
 /*
 (proclaim '(ftype (function (object t  *)) array-displacement1))
@@ -564,7 +596,7 @@ DEFUN_NEW("MAKE-ARRAY1",object,fSmake_array1,SI,6,6,
 /*  } */
 
 static void
-Larray_displacement(void) {
+FFN(Larray_displacement)(void) {
 
   object array,a;
   int s,n;
@@ -1151,202 +1183,202 @@ DEFUN_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
 
 	/* FIXME do this with C macros */
 	switch(i+1){
-	case 3:  (*fSaset)(ind[0],fix(ind[1]),ind[2]);break;
-	case 4:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3]);break;
-	case 5:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4]);break;
-	case 6:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5]);break;
-	case 7:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6]);break;
-	case 8:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7]);break;
-	case 9:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 3:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2]);break;
+	case 4:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3]);break;
+	case 5:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4]);break;
+	case 6:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5]);break;
+	case 7:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6]);break;
+	case 8:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7]);break;
+	case 9:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 			       ind[8]);break;
-	case 10:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 10:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9]);break;
-	case 11:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 11:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10]);break;
-	case 12:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 12:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11]);break;
-	case 13:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 13:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12]);break;
-	case 14:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 14:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13]);break;
-	case 15:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 15:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14]);break;
-	case 16:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 16:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15]);break;
-	case 17:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 17:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16]);break;
-	case 18:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 18:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17]);break;
-	case 19:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 19:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18]);break;
-	case 20:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 20:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19]);break;
-	case 21:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 21:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20]);break;
-	case 22:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 22:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21]);break;
-	case 23:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 23:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22]);break;
-	case 24:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 24:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23]);break;
-	case 25:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 25:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24]);break;
-	case 26:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 26:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25]);break;
-	case 27:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 27:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26]);break;
-	case 28:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 28:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27]);break;
-	case 29:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 29:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28]);break;
-	case 30:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 30:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29]);break;
-	case 31:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 31:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30]);break;
-	case 32:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 32:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30],ind[31]);break;
-	case 33:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 33:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30],ind[31],ind[32]);break;
-	case 34:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 34:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30],ind[31],ind[32],ind[33]);break;
-	case 35:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 35:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30],ind[31],ind[32],ind[33],ind[34]);break;
-	case 36:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 36:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30],ind[31],ind[32],ind[33],ind[34],ind[35]);break;
-	case 37:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 37:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30],ind[31],ind[32],ind[33],ind[34],ind[35],
 				ind[36]);break;
-	case 38:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 38:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30],ind[31],ind[32],ind[33],ind[34],ind[35],
 				ind[36],ind[37]);break;
-	case 39:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 39:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30],ind[31],ind[32],ind[33],ind[34],ind[35],
 				ind[36],ind[37],ind[38]);break;
-	case 40:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 40:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30],ind[31],ind[32],ind[33],ind[34],ind[35],
 				ind[36],ind[37],ind[38],ind[39]);break;
-	case 41:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 41:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30],ind[31],ind[32],ind[33],ind[34],ind[35],
 				ind[36],ind[37],ind[38],ind[39],ind[40]);break;
-	case 42:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 42:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30],ind[31],ind[32],ind[33],ind[34],ind[35],
 				ind[36],ind[37],ind[38],ind[39],ind[40],ind[41]);break;
-	case 43:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 43:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30],ind[31],ind[32],ind[33],ind[34],ind[35],
 				ind[36],ind[37],ind[38],ind[39],ind[40],ind[41],ind[42]);break;
-	case 44:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 44:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30],ind[31],ind[32],ind[33],ind[34],ind[35],
 				ind[36],ind[37],ind[38],ind[39],ind[40],ind[41],ind[42],
 				ind[43]);break;
-	case 45:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 45:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30],ind[31],ind[32],ind[33],ind[34],ind[35],
 				ind[36],ind[37],ind[38],ind[39],ind[40],ind[41],ind[42],
 				ind[43],ind[44]);break;
-	case 46:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 46:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30],ind[31],ind[32],ind[33],ind[34],ind[35],
 				ind[36],ind[37],ind[38],ind[39],ind[40],ind[41],ind[42],
 				ind[43],ind[44],ind[45]);break;
-	case 47:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 47:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30],ind[31],ind[32],ind[33],ind[34],ind[35],
 				ind[36],ind[37],ind[38],ind[39],ind[40],ind[41],ind[42],
 				ind[43],ind[44],ind[45],ind[46]);break;
-	case 48:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 48:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30],ind[31],ind[32],ind[33],ind[34],ind[35],
 				ind[36],ind[37],ind[38],ind[39],ind[40],ind[41],ind[42],
 				ind[43],ind[44],ind[45],ind[46],ind[47]);break;
-	case 49:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 49:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30],ind[31],ind[32],ind[33],ind[34],ind[35],
 				ind[36],ind[37],ind[38],ind[39],ind[40],ind[41],ind[42],
 				ind[43],ind[44],ind[45],ind[46],ind[47],ind[48]);break;
-	case 50:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 50:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
 				ind[29],ind[30],ind[31],ind[32],ind[33],ind[34],ind[35],
 				ind[36],ind[37],ind[38],ind[39],ind[40],ind[41],ind[42],
 				ind[43],ind[44],ind[45],ind[46],ind[47],ind[48],ind[49]);break;
-	case 51:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 51:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
@@ -1354,7 +1386,7 @@ DEFUN_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
 				ind[36],ind[37],ind[38],ind[39],ind[40],ind[41],ind[42],
 				ind[43],ind[44],ind[45],ind[46],ind[47],ind[48],ind[49],
 				ind[50]);break;
-	case 52:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 52:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
@@ -1362,7 +1394,7 @@ DEFUN_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
 				ind[36],ind[37],ind[38],ind[39],ind[40],ind[41],ind[42],
 				ind[43],ind[44],ind[45],ind[46],ind[47],ind[48],ind[49],
 				ind[50],ind[51]);break;
-	case 53:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 53:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
@@ -1370,7 +1402,7 @@ DEFUN_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
 				ind[36],ind[37],ind[38],ind[39],ind[40],ind[41],ind[42],
 				ind[43],ind[44],ind[45],ind[46],ind[47],ind[48],ind[49],
 				ind[50],ind[51],ind[52]);break;
-	case 54:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 54:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
@@ -1378,7 +1410,7 @@ DEFUN_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
 				ind[36],ind[37],ind[38],ind[39],ind[40],ind[41],ind[42],
 				ind[43],ind[44],ind[45],ind[46],ind[47],ind[48],ind[49],
 				ind[50],ind[51],ind[52],ind[53]);break;
-	case 55:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 55:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
@@ -1386,7 +1418,7 @@ DEFUN_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
 				ind[36],ind[37],ind[38],ind[39],ind[40],ind[41],ind[42],
 				ind[43],ind[44],ind[45],ind[46],ind[47],ind[48],ind[49],
 				ind[50],ind[51],ind[52],ind[53],ind[54]);break;
-	case 56:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 56:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
@@ -1394,7 +1426,7 @@ DEFUN_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
 				ind[36],ind[37],ind[38],ind[39],ind[40],ind[41],ind[42],
 				ind[43],ind[44],ind[45],ind[46],ind[47],ind[48],ind[49],
 				ind[50],ind[51],ind[52],ind[53],ind[54],ind[55]);break;
-	case 57:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 57:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
@@ -1402,7 +1434,7 @@ DEFUN_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
 				ind[36],ind[37],ind[38],ind[39],ind[40],ind[41],ind[42],
 				ind[43],ind[44],ind[45],ind[46],ind[47],ind[48],ind[49],
 				ind[50],ind[51],ind[52],ind[53],ind[54],ind[55],ind[56]);break;
-	case 58:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 58:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
@@ -1411,7 +1443,7 @@ DEFUN_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
 				ind[43],ind[44],ind[45],ind[46],ind[47],ind[48],ind[49],
 				ind[50],ind[51],ind[52],ind[53],ind[54],ind[55],ind[56],
 				ind[57]);break;
-	case 59:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 59:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
@@ -1420,7 +1452,7 @@ DEFUN_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
 				ind[43],ind[44],ind[45],ind[46],ind[47],ind[48],ind[49],
 				ind[50],ind[51],ind[52],ind[53],ind[54],ind[55],ind[56],
 				ind[57],ind[58]);break;
-	case 60:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 60:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
@@ -1429,7 +1461,7 @@ DEFUN_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
 				ind[43],ind[44],ind[45],ind[46],ind[47],ind[48],ind[49],
 				ind[50],ind[51],ind[52],ind[53],ind[54],ind[55],ind[56],
 				ind[57],ind[58],ind[59]);break;
-	case 61:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 61:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
@@ -1438,7 +1470,7 @@ DEFUN_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
 				ind[43],ind[44],ind[45],ind[46],ind[47],ind[48],ind[49],
 				ind[50],ind[51],ind[52],ind[53],ind[54],ind[55],ind[56],
 				ind[57],ind[58],ind[59],ind[60]);break;
-	case 62:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 62:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
@@ -1447,7 +1479,7 @@ DEFUN_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
 				ind[43],ind[44],ind[45],ind[46],ind[47],ind[48],ind[49],
 				ind[50],ind[51],ind[52],ind[53],ind[54],ind[55],ind[56],
 				ind[57],ind[58],ind[59],ind[60],ind[61]);break;
-	case 63:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 63:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
@@ -1456,7 +1488,7 @@ DEFUN_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
 				ind[43],ind[44],ind[45],ind[46],ind[47],ind[48],ind[49],
 				ind[50],ind[51],ind[52],ind[53],ind[54],ind[55],ind[56],
 				ind[57],ind[58],ind[59],ind[60],ind[61],ind[62]);break;
-	case 64:  (*fSaset)(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
+	case 64:  (*FFN(fSaset))(ind[0],fix(ind[1]),ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],

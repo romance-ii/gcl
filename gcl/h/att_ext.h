@@ -90,9 +90,9 @@ object letA_bind();
 object make_cfun();
 object MF();
 /* object MM(); */
-object make_function();
-object make_si_function();
-object make_special_form();
+/* object make_function_internal(); */
+/* object make_si_function_internal(); */
+/* object make_special_form_internal(); */
 object make_macro();
 object make_cclosure_new();
 

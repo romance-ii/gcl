@@ -1374,7 +1374,7 @@ GBC(enum type t) {
 }
 
 static void
-siLroom_report(void) {
+FFN(siLroom_report)(void) {
 
   int i;
   
@@ -1413,7 +1413,7 @@ siLroom_report(void) {
 }
 
 static void
-siLreset_gbc_count(void) {
+FFN(siLreset_gbc_count)(void) {
 
   int i;
   
@@ -1477,7 +1477,7 @@ DEFUN_NEW("GBC",object,fLgbc,LISP
 }
 
 static void
-siLgbc_time(void) {
+FFN(siLgbc_time)(void) {
   if (vs_top>vs_base)
     gc_time=fix(vs_base[0]);
   else {

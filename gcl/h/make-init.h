@@ -15,6 +15,11 @@
    pack == LISP ? LISP_makefun(string,fname,argd) : \
    error("Bad pack variable in MAKEFUN\n"))
 
+#define MAKESYM(pack,string) \
+  (pack == SI ? make_si_ordinary(string) : \
+   pack == LISP ? make_ordinary(string) : \
+   (error("Bad pack variable in MAKESYM\n"),Cnil))
+
 #undef DEFUN
 #define DEFUN(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,doc) \
   {extern ret fname(); \
@@ -25,15 +30,15 @@
   {extern ret fname(); \
      MAKEFUN(pack,string,fname,F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));}
 
+/* FIXME, possibly restore old MAKEFUN in place (in NewInit) here 
+   when STATIC_FUNCTION_POINTERS not defined */
 #undef DEFUN_NEW
 #define DEFUN_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) \
-  {extern ret fname args; \
-     MAKEFUN(pack,string,(ret (*)())fname,F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));}
+  {extern void Mjoin(fname,_init)(); Mjoin(fname,_init)();}
 
 #undef DEFUNO_NEW
 #define DEFUNO_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,oldret,old,args,doc) \
-  {extern ret fname args; \
-     MAKEFUN(pack,string,(ret (*)())fname,F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));}
+  {extern void Mjoin(fname,_init)();Mjoin(fname,_init)();}
 
 #undef DEFCOMP
 #define DEFCOMP(type, fun,doc) Ineed_in_image(fun);

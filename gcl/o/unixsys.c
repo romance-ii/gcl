@@ -58,7 +58,7 @@ char *command;
 #endif
 
 static void
-Lsystem(void)
+FFN(Lsystem)(void)
 {
 	char command[32768];
 	int i;

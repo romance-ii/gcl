@@ -249,7 +249,7 @@ DEFUN_NEW("MM",object,fSmm,SI
   
 
 object
-make_function(char *s, void (*f)())
+make_function_internal(char *s, void (*f)())
 {
 	object x;
 	vs_mark;
@@ -263,7 +263,7 @@ make_function(char *s, void (*f)())
 }
 
 object
-make_si_sfun(char *s, object (*f) (), int argd) {  
+make_si_sfun_internal(char *s, object (*f) (), int argd) {  
   object x= make_si_ordinary(s);
   x->s.s_gfdef = make_sfun( x,f,argd, Cnil);
   x->s.s_mflag = FALSE;
@@ -280,7 +280,7 @@ make_si_sfun(char *s, object (*f) (), int argd) {
 
 
 object
-make_si_function(char *s, void (*f)())
+make_si_function_internal(char *s, void (*f)())
 {
 	object x;
 	vs_mark;
@@ -297,7 +297,7 @@ make_si_function(char *s, void (*f)())
 
 
 object
-make_special_form(char *s, void (*f)())
+make_special_form_internal(char *s, void (*f)())
 {
 	object x;
 	x = make_ordinary(s);

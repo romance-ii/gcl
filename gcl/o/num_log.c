@@ -235,8 +235,7 @@ int_bit_length(int i)
 
 
 
-void
-Llogior(void)
+LFD(Llogior)(void)
 {
 	object  x;
 	int	narg, i;
@@ -257,8 +256,7 @@ Llogior(void)
 	vs_push(x);
 }
 
-void
-Llogxor(void)
+LFD(Llogxor)(void)
 {
 	object  x;
 	int	narg, i;
@@ -278,8 +276,7 @@ Llogxor(void)
 	vs_push(x);
 }
 
-void
-Llogand(void)
+LFD(Llogand)(void)
 {
 	object  x;
 	int	narg, i;
@@ -299,8 +296,7 @@ Llogand(void)
 	vs_push(x);
 }
 
-void
-Llogeqv(void)
+LFD(Llogeqv)(void)
 {
 	object  x;
 	int	narg, i;
@@ -320,8 +316,7 @@ Llogeqv(void)
 	vs_push(x);
 }
 
-void
-Lboole(void)
+LFD(Lboole)(void)
 {
 	object  x;
 	object	o;
@@ -362,8 +357,7 @@ Lboole(void)
 	vs_push(x);
 }
 
-void
-Llogbitp(void)
+LFD(Llogbitp)(void)
 {
 	object	x, p;
 	int	i;
@@ -403,8 +397,7 @@ Llogbitp(void)
 		vs_push(Cnil);
 }
 
-void
-Lash(void)
+LFD(Lash)(void)
 {
 	object	r=Cnil, x, y;
 	int	w, sign_x;
@@ -453,8 +446,7 @@ BYE:
 	vs_push(r);
 }
 
-void
-Llogcount(void)
+LFD(Llogcount)(void)
 {
 	object	x;
 	int	i;
@@ -467,8 +459,7 @@ Llogcount(void)
 	vs_push(make_fixnum(i));
 }
 
-void
-Linteger_length(void)
+LFD(Linteger_length)(void)
 {
 	object	x;
 	int count=0, i;
@@ -532,44 +523,7 @@ Linteger_length(void)
 
   
 
-void
-gcl_init_num_log(void)
-{
-/*  	int siLbit_array_op(void); */
-
-	make_constant("BOOLE-CLR", make_fixnum(BOOLCLR));
-	make_constant("BOOLE-SET", make_fixnum(BOOLSET));
-	make_constant("BOOLE-1", make_fixnum(BOOL1));
-	make_constant("BOOLE-2", make_fixnum(BOOL2));
-	make_constant("BOOLE-C1", make_fixnum(BOOLC1));
-	make_constant("BOOLE-C2", make_fixnum(BOOLC2));
-	make_constant("BOOLE-AND", make_fixnum(BOOLAND));
-	make_constant("BOOLE-IOR", make_fixnum(BOOLIOR));
-	make_constant("BOOLE-XOR", make_fixnum(BOOLXOR));
-	make_constant("BOOLE-EQV", make_fixnum(BOOLEQV));
-	make_constant("BOOLE-NAND", make_fixnum(BOOLNAND));
-	make_constant("BOOLE-NOR", make_fixnum(BOOLNOR));
-	make_constant("BOOLE-ANDC1", make_fixnum(BOOLANDC1));
-	make_constant("BOOLE-ANDC2", make_fixnum(BOOLANDC2));
-	make_constant("BOOLE-ORC1", make_fixnum(BOOLORC1));
-	make_constant("BOOLE-ORC2", make_fixnum(BOOLORC2));
-
-	make_function("LOGIOR", Llogior);
-	make_function("LOGXOR", Llogxor);
-	make_function("LOGAND", Llogand);
-	make_function("LOGEQV", Llogeqv);
-	make_function("BOOLE", Lboole);
-	make_function("LOGBITP", Llogbitp);
-	make_function("ASH", Lash);
-	make_function("LOGCOUNT", Llogcount);
-	make_function("INTEGER-LENGTH", Linteger_length);
-
-	sLbit = make_ordinary("BIT");
-	make_si_function("BIT-ARRAY-OP", siLbit_array_op);
-}
-
-void
-siLbit_array_op(void)
+LFD(siLbit_array_op)(void)
 {
 	int i, j, n, d;
 	object  o, x, y, r, r0=Cnil;
@@ -795,3 +749,40 @@ siLbit_array_op(void)
 ERROR:
 	FEerror("Illegal arguments for bit-array operation.", 0);
 }
+
+void
+gcl_init_num_log(void)
+{
+/*  	int siLbit_array_op(void); */
+
+	make_constant("BOOLE-CLR", make_fixnum(BOOLCLR));
+	make_constant("BOOLE-SET", make_fixnum(BOOLSET));
+	make_constant("BOOLE-1", make_fixnum(BOOL1));
+	make_constant("BOOLE-2", make_fixnum(BOOL2));
+	make_constant("BOOLE-C1", make_fixnum(BOOLC1));
+	make_constant("BOOLE-C2", make_fixnum(BOOLC2));
+	make_constant("BOOLE-AND", make_fixnum(BOOLAND));
+	make_constant("BOOLE-IOR", make_fixnum(BOOLIOR));
+	make_constant("BOOLE-XOR", make_fixnum(BOOLXOR));
+	make_constant("BOOLE-EQV", make_fixnum(BOOLEQV));
+	make_constant("BOOLE-NAND", make_fixnum(BOOLNAND));
+	make_constant("BOOLE-NOR", make_fixnum(BOOLNOR));
+	make_constant("BOOLE-ANDC1", make_fixnum(BOOLANDC1));
+	make_constant("BOOLE-ANDC2", make_fixnum(BOOLANDC2));
+	make_constant("BOOLE-ORC1", make_fixnum(BOOLORC1));
+	make_constant("BOOLE-ORC2", make_fixnum(BOOLORC2));
+
+	make_function("LOGIOR", Llogior);
+	make_function("LOGXOR", Llogxor);
+	make_function("LOGAND", Llogand);
+	make_function("LOGEQV", Llogeqv);
+	make_function("BOOLE", Lboole);
+	make_function("LOGBITP", Llogbitp);
+	make_function("ASH", Lash);
+	make_function("LOGCOUNT", Llogcount);
+	make_function("INTEGER-LENGTH", Linteger_length);
+
+	sLbit = make_ordinary("BIT");
+	make_si_function("BIT-ARRAY-OP", siLbit_array_op);
+}
+

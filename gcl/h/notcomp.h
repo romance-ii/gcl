@@ -76,7 +76,51 @@ void old(void) \
     return;} \
   ret fname
 
-#define DEFUN_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) ret fname args
+#define MAKEFUN(pack,string,fname,argd) \
+  (pack == SI ? SI_makefun(string,fname,argd) : \
+   pack == LISP ? LISP_makefun(string,fname,argd) : \
+   error("Bad pack variable in MAKEFUN\n"))
+
+#define mjoin(a_,b_) a_ ## b_
+#define Mjoin(a_,b_) mjoin(a_,b_)
+
+#define SI 0
+#define LISP 1
+
+#undef FFN
+#undef LFD
+#undef FFD
+#undef STATD
+#undef make_function
+#undef make_si_function
+#undef make_si_sfun
+#undef make_special_form
+#ifdef STATIC_FUNCTION_POINTERS
+#define FFN(a_) Mjoin(a_,_static)
+#define LFD(a_) static void FFN(a_) (); void a_  () { FFN(a_)();} static void FFN(a_)
+#define FFD(a_) static void FFN(a_) (object); void a_  (object x) { FFN(a_)(x);} static void FFN(a_)
+#define make_function(a_,b_) make_function_internal(a_,FFN(b_))
+#define make_si_function(a_,b_) make_si_function_internal(a_,FFN(b_))
+#define make_special_form(a_,b_) make_special_form_internal(a_,FFN(b_))
+#define make_si_sfun(a_,b_,c_) make_si_sfun_internal(a_,FFN(b_),c_)
+#define STATD static
+#else
+#define FFN(a_) (a_)
+#define LFD(a_) void a_
+#define FFD(a_) void a_
+#define make_function(a_,b_) make_function_internal(a_,b_)
+#define make_si_function(a_,b_) make_si_function_internal(a_,b_)
+#define make_special_form(a_,b_) make_special_form_internal(a_,b_)
+#define make_si_sfun(a_,b_,c_) make_si_sfun_internal(a_,b_,c_)
+#define STATD
+#endif
+
+#define DEFUN_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) STATD ret FFN(fname) args;\
+void Mjoin(fname,_init) () {\
+   MAKEFUN(pack,string,(ret (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));\
+}\
+STATD ret FFN(fname) args
+
 /* eg.
    A function taking from 2 to 8 args
    returning object the first args is object, the next 6 int, and last defaults to object.
@@ -86,11 +130,14 @@ void old(void) \
 
 /* for defining old style */
 #define DEFUNO_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,oldret,old,args,doc) \
-  ret fname args; \
-oldret old(void) \
-{   Iinvoke_c_function_from_value_stack((object (*)())fname,F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
+STATD  ret FFN(fname) args; \
+void Mjoin(fname,_init) () {\
+   MAKEFUN(pack,string,(ret (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));\
+}\
+LFD(old)(void) \
+{   Iinvoke_c_function_from_value_stack((object (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
     return;} \
-  ret fname args
+STATD  ret FFN(fname) args
 
   /* these will come later */
 #define DEFUNL DEFUN

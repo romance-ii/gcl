@@ -7,7 +7,7 @@ APPEND  = ../bin/append
 all:	dpp${EXE} ${APPEND}${EXE} file-sub${EXE}
 
 dpp${EXE}:	dpp.c
-	${CC} ${DEFS}  -DUNIX -o dpp${EXE} dpp.c
+	${CC} ${DEFS}  -o dpp${EXE} dpp.c
 
 file-sub${EXE}:	file-sub.c
 	${CC} ${DEFS} -o file-sub${EXE} file-sub.c

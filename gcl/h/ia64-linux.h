@@ -24,3 +24,5 @@
   ((siginfo_t *)code )->si_addr
 #endif
 #define SGC
+
+#define STATIC_FUNCTION_POINTERS

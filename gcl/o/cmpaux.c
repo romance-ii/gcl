@@ -86,14 +86,14 @@ DEFUN_NEW("SETVV",object,fSsetvv,SI
 DEF_ORDINARY("%MEMORY",sSPmemory,SI,"");
 DEF_ORDINARY("%INIT",sSPinit,SI,"");
 
-void Lidentity(void);
+/* void Lidentity(void); */
 void
 gcl_init_cmpaux(void)
 {
 
 
 	/* real one defined in predlib.lsp, need this for bootstrap */
-	make_si_function("WARN-VERSION",Lidentity);
+/* 	make_si_function("WARN-VERSION",Lidentity); */
 	
 }
 

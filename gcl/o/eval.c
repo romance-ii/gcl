@@ -1180,8 +1180,7 @@ DEFUNO_NEW("EVAL",object,fLeval,LISP
 	return Ivs_values();
 }
 
-void
-Levalhook(void)
+LFD(Levalhook)(void)
 {
 	object env;
 	bds_ptr old_bds_top = bds_top;
@@ -1211,8 +1210,7 @@ Levalhook(void)
 	bds_unwind(old_bds_top);
 }
 
-void
-Lapplyhook(void)
+LFD(Lapplyhook)(void)
 {
 
 	object env;

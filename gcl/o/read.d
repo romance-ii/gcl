@@ -1537,7 +1537,7 @@ Lsharp_comma_reader()
 }
 
 static void
-siLsharp_comma_reader_for_compiler()
+FFN(siLsharp_comma_reader_for_compiler)()
 {
 	check_arg(3);
 	if(vs_base[2] != Cnil && !READsuppress)
@@ -2381,8 +2381,7 @@ object strm,eof;
 	@(return `copy_readtable(from, to)`)
 @)
 
-void
-Lreadtablep()
+LFD(Lreadtablep)()
 {
 	check_arg(1);
 
@@ -2530,8 +2529,7 @@ object x;
 	return(x);
 }
 	
-void
-siLstring_to_object()
+LFD(siLstring_to_object)()
 {
 	check_arg(1);
 
@@ -2541,7 +2539,7 @@ siLstring_to_object()
 
 
 static void
-siLstandard_readtable()
+FFN(siLstandard_readtable)()
 {
 	check_arg(0);
 

@@ -287,8 +287,7 @@ check_type(object x, int t)
 }
    
 
-void
-Ltype_of(void)
+LFD(Ltype_of)(void)
 {
 	int i;
 

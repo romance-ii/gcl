@@ -84,7 +84,7 @@ structure_ref(object x, object name, int i)
 
 
 static void
-siLstructure_ref1(void)
+FFN(siLstructure_ref1)(void)
 {object x=vs_base[0];
  int n=fix(vs_base[1]);
  object def;
@@ -138,7 +138,7 @@ structure_set(object x, object name, int i, object v)
 }
 
 static void
-siLstructure_subtype_p(void)
+FFN(siLstructure_subtype_p)(void)
 {object x,y;
  check_arg(2);
  x=vs_base[0];
@@ -177,8 +177,7 @@ structure_to_list(object x)
 	return(vs_pop);
 }
 
-void
-siLmake_structure(void)
+LFD(siLmake_structure)(void)
 {
   object x,name,*base;
   struct s_data *def=NULL;
@@ -236,7 +235,7 @@ siLmake_structure(void)
 }
 
 static void
-siLcopy_structure(void)
+FFN(siLcopy_structure)(void)
 {
 	object x, y;
 	struct s_data *def;
@@ -255,32 +254,28 @@ siLcopy_structure(void)
         END_NO_INTERRUPT;}
 }
 
-void
-siLstructure_name(void)
+LFD(siLstructure_name)(void)
 {
 	check_arg(1);
 	check_type_structure(vs_base[0]);
 	vs_base[0] = S_DATA(vs_base[0]->str.str_def)->name;
 }
 
-void
-siLstructure_ref(void)
+LFD(siLstructure_ref)(void)
 {
 	check_arg(3);
 	vs_base[0]=structure_ref(vs_base[0],vs_base[1],fix(vs_base[2]));
 	vs_top=vs_base+1;
 }
 
-void
-siLstructure_set(void)
+LFD(siLstructure_set)(void)
 {
 	check_arg(4);
 	structure_set(vs_base[0],vs_base[1],fix(vs_base[2]),vs_base[3]);
 	vs_base = vs_top-1;
 }
 
-void
-siLstructurep(void)
+LFD(siLstructurep)(void)
 {
 	check_arg(1);
 	if (type_of(vs_base[0]) == t_structure)
@@ -289,8 +284,7 @@ siLstructurep(void)
 		vs_base[0] = Cnil;
 }
 
-void
-siLrplaca_nthcdr(void)
+LFD(siLrplaca_nthcdr)(void)
 {
 
 /*
@@ -317,8 +311,7 @@ siLrplaca_nthcdr(void)
 	vs_base = vs_base + 2;
 }
 
-void
-siLlist_nth(void)
+LFD(siLlist_nth)(void)
 {
 
 /*
@@ -347,7 +340,7 @@ siLlist_nth(void)
 
 
 static void
-siLmake_s_data_structure(void)
+FFN(siLmake_s_data_structure)(void)
 {object x,y,raw,*base;
  int i;
  check_arg(5);
@@ -371,7 +364,7 @@ siLmake_s_data_structure(void)
 }
 
 static void
-siLstructure_def(void)
+FFN(siLstructure_def)(void)
 {check_arg(1);
  check_type_structure(vs_base[0]);
   vs_base[0]=vs_base[0]->str.str_def;
@@ -395,7 +388,7 @@ sizeof(short)  /* aet_ushort  unsigned short   */
 
 
 static void
-siLsize_of(void)
+FFN(siLsize_of)(void)
 { object x= vs_base[0];
   int i;
   i= aet_sizes[fix(fSget_aelttype(x))];
@@ -403,7 +396,7 @@ siLsize_of(void)
 }
   
 static void
-siLaet_type(void)
+FFN(siLaet_type)(void)
 {vs_base[0]=fSget_aelttype(vs_base[0]);}
 
 
@@ -412,7 +405,7 @@ siLaet_type(void)
 
 
 static void
-siLalignment(void)
+FFN(siLalignment)(void)
 {struct {double x; int y; double z;
 	 float x1; int y1; float z1;}
  joe;
@@ -424,7 +417,7 @@ siLalignment(void)
    if (vs_base[0]==sLshort_float)
      {vs_base[0]=make_fixnum((long)&(joe.z1)-(long)&(joe.y1)); return;}
    else
-     {siLsize_of();}
+     {FFN(siLsize_of)();}
 }
    
  

@@ -225,10 +225,10 @@ int s, t;
 	vs_base[0] = Ct;
 }
 
-void Lchar_l()  { Lchar_cmp( 1, 1); }
-void Lchar_g()  { Lchar_cmp(-1, 1); }
-void Lchar_le() { Lchar_cmp( 1, 0); }
-void Lchar_ge() { Lchar_cmp(-1, 0); }
+LFD(Lchar_l)()  { Lchar_cmp( 1, 1); }
+LFD(Lchar_g)()  { Lchar_cmp(-1, 1); }
+LFD(Lchar_le)() { Lchar_cmp( 1, 0); }
+LFD(Lchar_ge)() { Lchar_cmp(-1, 0); }
 
 
 bool
@@ -313,10 +313,10 @@ int s, t;
 	vs_base[0] = Ct;
 }
 
-void Lchar_lessp()        { Lchar_compare( 1, 1); }
-void Lchar_greaterp()     { Lchar_compare(-1, 1); }
-void Lchar_not_greaterp() { Lchar_compare( 1, 0); }
-void Lchar_not_lessp()    { Lchar_compare(-1, 0); }
+LFD(Lchar_lessp)()        { Lchar_compare( 1, 1); }
+LFD(Lchar_greaterp)()     { Lchar_compare(-1, 1); }
+LFD(Lchar_not_greaterp)() { Lchar_compare( 1, 0); }
+LFD(Lchar_not_lessp)()    { Lchar_compare(-1, 0); }
 
 
 object

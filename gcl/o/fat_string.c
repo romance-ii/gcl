@@ -442,9 +442,9 @@ gcl_init_fat_string(void)
 {
  
  make_si_constant("*ASH->>*",(-1==(((int)-1) >> 20))? Ct :Cnil);
-#ifdef SFASL
- make_si_function("BUILD-SYMBOL-TABLE",build_symbol_table);
-#endif
+/* #ifdef SFASL */
+/*  make_si_function("BUILD-SYMBOL-TABLE",build_symbol_table); */
+/* #endif */
 
 
  init_fasdump();

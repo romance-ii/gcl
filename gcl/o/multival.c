@@ -28,14 +28,12 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 
-void
-Lvalues(void)
+LFD(Lvalues)(void)
 {
 	if (vs_base == vs_top) vs_base[0] = Cnil;
 }
 
-void
-Lvalues_list(void)
+LFD(Lvalues_list)(void)
 {
 
 	object list;
@@ -51,7 +49,7 @@ Lvalues_list(void)
 }
 
 static void
-Fmultiple_value_list(object form)
+FFN(Fmultiple_value_list)(object form)
 {
 
 	object *top = vs_top;
@@ -71,7 +69,7 @@ Fmultiple_value_list(object form)
 }
 
 static void
-Fmultiple_value_call(object form)
+FFN(Fmultiple_value_call)(object form)
 {
 
 	object *top = vs_top;
@@ -100,7 +98,7 @@ Fmultiple_value_call(object form)
 }
 
 static void
-Fmultiple_value_prog1(object forms)
+FFN(Fmultiple_value_prog1)(object forms)
 {
 
 	object *top;

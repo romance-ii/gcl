@@ -861,8 +861,7 @@ LL:
 }
 
 /* (+          )   */
-void
-Lplus(void)
+LFD(Lplus)(void)
 {
         int i, j;
 	
@@ -878,8 +877,7 @@ Lplus(void)
 	vs_top = vs_base+1;
 }
 
-void
-Lminus(void)
+LFD(Lminus)(void)
 {
 	int i, j;
 
@@ -897,8 +895,7 @@ Lminus(void)
 	vs_top = vs_base+1;
 }
 
-void
-Ltimes(void)
+LFD(Ltimes)(void)
 {
 	int i, j;
 
@@ -914,8 +911,7 @@ Ltimes(void)
 	vs_top = vs_base+1;
 }
 
-void
-Ldivide(void)
+LFD(Ldivide)(void)
 {
 	int i, j;
 
@@ -933,8 +929,7 @@ Ldivide(void)
 	vs_top = vs_base+1;
 }
 
-void
-Lone_plus(void)
+LFD(Lone_plus)(void)
 {
 	
 	check_arg(1);
@@ -942,8 +937,7 @@ Lone_plus(void)
 	vs_base[0] = one_plus(vs_base[0]);
 }
 
-void
-Lone_minus(void)
+LFD(Lone_minus)(void)
 {
 	
 	check_arg(1);
@@ -951,8 +945,7 @@ Lone_minus(void)
 	vs_base[0] = one_minus(vs_base[0]);
 }
 
-void
-Lconjugate(void)
+LFD(Lconjugate)(void)
 {
 	object	c, i;
 
@@ -967,8 +960,7 @@ Lconjugate(void)
 	}
 }
 
-void
-Lgcd(void)
+LFD(Lgcd)(void)
 {
 	int i, narg;
 
@@ -989,8 +981,7 @@ Lgcd(void)
 	vs_top = vs_base+1;
 }
 
-void
-Llcm(void)
+LFD(Llcm)(void)
 {
 	object t, g;
 	int i, narg;

@@ -777,24 +777,21 @@ delete_package(object n) {
 	@(return `in_package(pack_name, nicknames, use,fix(internal),fix(external))`)
 @)
 
-void
-Lfind_package()
+LFD(Lfind_package)()
 {
 	check_arg(1);
 
 	vs_base[0] = find_package(vs_base[0]);
 }
 
-static void
-Ldelete_package()
+LFD(Ldelete_package)()
 {
 	check_arg(1);
 
 	vs_base[0] = delete_package(vs_base[0]);
 }
 
-void
-Lpackage_name()
+LFD(Lpackage_name)()
 {
   object t;
 
@@ -806,8 +803,7 @@ Lpackage_name()
 
 }
 
-void
-Lpackage_nicknames()
+LFD(Lpackage_nicknames)()
 {
 	check_arg(1);
 
@@ -825,8 +821,7 @@ Lpackage_nicknames()
 	@(return `rename_package(pack, new_name, new_nicknames)`)
 @)
 
-void
-Lpackage_use_list()
+LFD(Lpackage_use_list)()
 {
 	check_arg(1);
 
@@ -835,8 +830,7 @@ Lpackage_use_list()
 	vs_base[0] = vs_base[0]->p.p_uselist;
 }
 
-void
-Lpackage_used_by_list()
+LFD(Lpackage_used_by_list)()
 {
 	check_arg(1);
 
@@ -846,7 +840,7 @@ Lpackage_used_by_list()
 }
 
 static void
-Lpackage_shadowing_symbols()
+FFN(Lpackage_shadowing_symbols)()
 {
 	check_arg(1);
 
@@ -855,8 +849,7 @@ Lpackage_shadowing_symbols()
 	vs_base[0] = vs_base[0]->p.p_shadowings;
 }
 
-void
-Llist_all_packages()
+LFD(Llist_all_packages)()
 {
 	struct package *p;
 	int i;
@@ -1098,8 +1091,7 @@ BEGIN:
 	@(return Ct)
 @)
 
-void
-siLpackage_internal()
+LFD(siLpackage_internal)()
 {
 
 	int j=0;
@@ -1114,8 +1106,7 @@ siLpackage_internal()
 	vs_popp;
 }
 
-void
-siLpackage_external()
+LFD(siLpackage_external)()
 {
 	int j=0;
 
@@ -1144,7 +1135,7 @@ object n;
 }
 
 static void
-siLpackage_size()
+FFN(siLpackage_size)()
 {object p;
  p=vs_base[0];
  check_type_package(&p);
@@ -1207,8 +1198,7 @@ gcl_init_package_function()
 	make_function("RENAME-PACKAGE", Lrename_package);
 	make_function("PACKAGE-USE-LIST", Lpackage_use_list);
 	make_function("PACKAGE-USED-BY-LIST", Lpackage_used_by_list);
-	make_function("PACKAGE-SHADOWING-SYMBOLS",
-		      Lpackage_shadowing_symbols);
+	make_function("PACKAGE-SHADOWING-SYMBOLS",Lpackage_shadowing_symbols);
 	make_function("LIST-ALL-PACKAGES", Llist_all_packages);
 	make_function("INTERN", Lintern);
 	make_function("FIND-SYMBOL", Lfind_symbol);

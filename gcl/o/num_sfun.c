@@ -501,16 +501,14 @@ number_tan(object x)
 	return(r);
 }
 
-void
-Lexp(void)
+LFD(Lexp)(void)
 {
 	check_arg(1);
 	check_type_number(&vs_base[0]);
 	vs_base[0] = number_exp(vs_base[0]);
 }
 
-void
-Lexpt(void)
+LFD(Lexpt)(void)
 {
 	check_arg(2);
 	check_type_number(&vs_base[0]);
@@ -519,8 +517,7 @@ Lexpt(void)
 	vs_popp;
 }
 
-void
-Llog(void)
+LFD(Llog)(void)
 {
 	int narg;
 	
@@ -539,40 +536,35 @@ Llog(void)
 		too_many_arguments();
 }
 
-void
-Lsqrt(void)
+LFD(Lsqrt)(void)
 {
 	check_arg(1);
 	check_type_number(&vs_base[0]);
 	vs_base[0] = number_sqrt(vs_base[0]);
 }
 
-void
-Lsin(void)
+LFD(Lsin)(void)
 {
 	check_arg(1);
 	check_type_number(&vs_base[0]);
 	vs_base[0] = number_sin(vs_base[0]);
 }
 
-void
-Lcos(void)
+LFD(Lcos)(void)
 {
 	check_arg(1);
 	check_type_number(&vs_base[0]);
 	vs_base[0] = number_cos(vs_base[0]);
 }
 
-void
-Ltan(void)
+LFD(Ltan)(void)
 {
 	check_arg(1);
 	check_type_number(&vs_base[0]);
 	vs_base[0] = number_tan(vs_base[0]);
 }
 
-void
-Latan(void)
+LFD(Latan)(void)
 {
 	int narg;
 
@@ -592,7 +584,7 @@ Latan(void)
 }
 
 static void
-siLmodf(void)
+FFN(siLmodf)(void)
 {
   
   object x;

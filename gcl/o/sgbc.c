@@ -1547,7 +1547,7 @@ memory_protect(int on) {
 }
 
 static void
-siLsgc_on(void) {
+FFN(siLsgc_on)(void) {
 
   if (vs_base==vs_top) {
     vs_base[0]=(sgc_enabled ? Ct :Cnil);

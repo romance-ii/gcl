@@ -371,16 +371,14 @@ file_len(FILE *fp)
 	else return 0;
 }
 
-void
-Ltruename(void)
+LFD(Ltruename)(void)
 {
 	check_arg(1);
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 	vs_base[0] = truename(vs_base[0]);
 }
 
-void
-Lrename_file(void)
+LFD(Lrename_file)(void)
 {
 	char filename[MAXPATHLEN];
 	char newfilename[MAXPATHLEN];
@@ -444,9 +442,14 @@ DEFUNO_NEW("DELETE-FILE",object,fLdelete_file,LISP
 	path = Ct;
 	RETURN1(path);
 }
+#ifdef STATIC_FUNCTION_POINTERS
+object
+fLdelete_file(object path) {
+  return FFN(fLdelete_file)(path);
+}
+#endif
 
-void
-Lprobe_file(void)
+LFD(Lprobe_file)(void)
 {
 	check_arg(1);
 
@@ -457,8 +460,7 @@ Lprobe_file(void)
 		vs_base[0] = Cnil;
 }
 
-void
-Lfile_write_date(void)
+LFD(Lfile_write_date)(void)
 {
 	char filename[MAXPATHLEN];
 	struct stat filestatus;
@@ -470,8 +472,7 @@ Lfile_write_date(void)
 	vs_base[0] = unix_time_to_universal_time(filestatus.st_mtime);
 }
 
-void
-Lfile_author(void)
+LFD(Lfile_author)(void)
 {
 #ifndef NO_PWD_H
 	char filename[MAXPATHLEN];
@@ -494,7 +495,7 @@ Lfile_author(void)
 }
 
 static void
-Luser_homedir_pathname(void)
+FFN(Luser_homedir_pathname)(void)
 {
 #ifndef NO_PWD_H  
 	struct passwd *pwent;
@@ -524,8 +525,7 @@ Luser_homedir_pathname(void)
 
 
 #ifdef BSD
-void
-Ldirectory(void)
+LFD(Ldirectory)(void)
 {
 	char filename[MAXPATHLEN];
 	char command[MAXPATHLEN * 2];
@@ -577,8 +577,7 @@ L:
 
 
 #ifdef ATT
-void
-Ldirectory()
+LFD(Ldirectory)()
 {
 	object name, type;
 	char filename[MAXPATHLEN];
@@ -642,8 +641,8 @@ Ldirectory()
 
 #ifdef E15
 #include <sys/dir.h>
-void
-Ldirectory()
+
+LFD(Ldirectory)()
 {
 	object name, type;
 	char filename[MAXPATHLEN];
@@ -757,7 +756,7 @@ Ldirectory()
 #endif
 
 static void
-siLchdir(void)
+FFN(siLchdir)(void)
 {
 	char filename[MAXPATHLEN];
 

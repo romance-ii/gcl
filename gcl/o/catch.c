@@ -29,7 +29,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "include.h"
 
 static void
-Fcatch(VOL object args)
+FFN(Fcatch)(VOL object args)
 {
 
 	object *top = vs_top;
@@ -89,7 +89,7 @@ value.")
 }
 
 static void
-Funwind_protect(VOL object args)
+FFN(Funwind_protect)(VOL object args)
 {
 
 	object *top = vs_top;
@@ -134,7 +134,7 @@ Funwind_protect(VOL object args)
 }
 
 static void
-Fthrow(object args)
+FFN(Fthrow)(object args)
 {
 
 	object *top = vs_top;
