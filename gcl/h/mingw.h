@@ -160,9 +160,6 @@ extern DBEGIN_TY _dbegin;
          ADD_FEATURE("WINNT"); \
          ADD_FEATURE("MINGW32");
 
-/*         ADD_FEATURE("BROKEN_O4_OPT"); \ */
-
-  
 #undef SET_REAL_MAXPAGE  
 #define SET_REAL_MAXPAGE \
 	 init_shared_memory(); real_maxpage=MAXPAGE;

@@ -939,12 +939,18 @@ fix_filename(object pathname, char *filename1)
 
 char *GCLExeName ( void )
 {
-    static char module_name_buf[128];
+    static char module_name_buf[PATH_MAX];
     char *rv = NULL;
     module_name_buf[0] = 0;
-    DWORD result = GetModuleFileName ( (HMODULE) NULL, (LPTSTR) &module_name_buf, 128 );
-    if ( result != 0 ) {
-      rv = module_name_buf;
+    DWORD result = GetModuleFileName ( (HMODULE) NULL, (LPTSTR) &module_name_buf, PATH_MAX );
+    if ( result > PATH_MAX ) {
+      fprintf ( stderr,
+		"GCLExeName: ERROR: GetModuleFileName returned a path larger than %d characters.\n",
+		PATH_MAX );
+    } else {
+      if ( result != 0 ) {
+	rv = module_name_buf;
+      }
     }
     return ( (char *) rv );
 }
