@@ -14,8 +14,9 @@ gclcvs (2.7.0-33) unstable; urgency=low
     file.  Make wrapping algorithm a bit more thorough.
   * Fix method-combintion ANSI failures, from cmucl
   * compiler-macro and method-combination documentation types
+  * complete si::debug -> si::debugger name change
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 22 Nov 2004 21:59:02 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 23 Nov 2004 22:32:01 +0000
 
 gclcvs (2.7.0-32) unstable; urgency=high
 

@@ -135,7 +135,7 @@ struct key {short n,allow_other_keys;
 /* cmac.c:191:OF */ extern void gcl_init_cmac (void); /* () */
 /* cmpaux.c:33:OF */ extern void siLspecialp (void); /* () */
 /* cmpaux.c:35:OF */ extern object fSspecialp (object sym); /* (sym) object sym; */
-/* cmpaux.c:73:OF */ extern object fSdebug (object sym, object val); /* (sym, val) object sym; object val; */
+/* cmpaux.c:73:OF */ extern object fSdebugger (object sym, object val); /* (sym, val) object sym; object val; */
 /* cmpaux.c:82:OF */ extern object fSsetvv (object index, object val); /* (index, val) object index; object val; */
 /* cmpaux.c:95:OF */ extern void gcl_init_cmpaux (void); /* () */
 /* cmpaux.c:106:OF */ /* extern int ifloor (int x, int y); */ /* (x, y) int x; int y; */
