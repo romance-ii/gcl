@@ -114,7 +114,6 @@ main(int argc, char **argv, char **envp) {
 #if defined ( BSD ) && defined ( RLIMIT_STACK )
     struct rlimit rl;
 #endif
-    set_maxpage();
 
 #ifdef NEED_NONRANDOM_SBRK
 #if SIZEOF_LONG == 4
@@ -129,6 +128,9 @@ main(int argc, char **argv, char **envp) {
     extern void init_darwin_zone_compat ();
     init_darwin_zone_compat ();
 #endif
+
+    set_maxpage();
+
 #ifdef RECREATE_HEAP
     RECREATE_HEAP
 #endif

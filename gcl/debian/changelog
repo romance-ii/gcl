@@ -5,8 +5,9 @@ gclcvs (2.7.0-37) unstable; urgency=low
     from-args info
   * Macroexpand let bindings as well as let* for use in function return
     type deduction, error in latter when dotted list is encountered
+  * Move set_maxpage() past init_darwin_zone for mac
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 14 Dec 2004 12:21:54 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 14 Dec 2004 17:12:55 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 
