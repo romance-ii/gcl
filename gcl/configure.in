@@ -206,11 +206,17 @@ AC_CHECK_LIB(readline,main,
 	RL_OBJS=readline.o
 	RL_LIB=lsp/readline.o,,-lncurses)
 
-LO="-Wl,-static"
+#LO="-Wl,-static"
+#LIBS="$LIBS  $LO -lbfd -liberty"
+
 AC_CHECK_HEADER(bfd.h,
 	AC_CHECK_LIB(bfd,bfd_init,
 		AC_DEFINE(HAVE_LIBBFD)
-		LIBS="$LIBS  $LO -lbfd -liberty"
+		echo "int main() {return 0;}" >foo.c
+		$GCC -o foo foo.c -lbfd -liberty
+		MP=`ldd foo | grep bfd | awk '{print $3}'`
+		MPD=`dirname $MP` 
+		LIBS="$LIBS  $MPD/libbfd.a $MPD/libiberty.a"
 		,,-liberty))
 
 AC_SUBST(LIBS)
