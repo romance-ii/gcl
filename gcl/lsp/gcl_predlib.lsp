@@ -265,9 +265,8 @@
 (defun normalize-type (type &aux tp i )
   ;; Loops until the car of type has no DEFTYPE definition.
   (when (and (consp type) (eq (car type) 'satisfies))
-    (unless (setq tp (get (cadr type) 'predicate-type))
-      (error "Cannot process type ~S~%" type))
-    (setq type tp))
+    (when (setq tp (get (cadr type) 'predicate-type))
+      (setq type tp)))
   (loop
     (if (atom type)
         (setq tp type i nil)

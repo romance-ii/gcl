@@ -5,8 +5,10 @@ gclcvs (2.7.0-18) unstable; urgency=low
   * Prevent circular error loops
   * Prevent automatic optimization added to CFLAGS by autoconf
   * Rework documentation installation in and outside of Debian
+  * Support user deined predicates at an elementary level in the form
+    '(satisfies foop) in gcl_predlib.lsp
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  8 Jan 2004 23:30:22 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  8 Jan 2004 23:46:59 +0000
 
 gclcvs (2.7.0-17) unstable; urgency=low
 
