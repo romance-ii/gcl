@@ -6,7 +6,7 @@ mymonitor(low,high,x)
      int low,high;
      object x;
 { if (0 == x) {monitor(0); return 0;}
-  if (type_of(x)!=t_string) FEerror("expected string");
+  if (type_of(x)!=t_string) FEerror("expected string", 0);
   monitor(low,high,x->ust.ust_self,x->ust.ust_dim,1000);
 }
 */
@@ -77,9 +77,9 @@ write_outsyms()
  struct fileheader hdr;
  fdout= fopen("syms.out","w");
  fdin=fopen(kcl_self,"r");
- if (fdin == 0) FEerror("Can't find  akcl image");
+ if (fdin == 0) FEerror("Can't find  akcl image",0);
  fread(&hdr,sizeof(hdr),1,fdin);
-  if (fdout == 0) FEerror("Can't open syms.out");
+  if (fdout == 0) FEerror("Can't open syms.out",0);
  fclose(fdin);
  sym.n_type= (N_TEXT | N_EXT);
  hdr.a_text=sizeof(hdr);
