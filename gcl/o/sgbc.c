@@ -1287,7 +1287,7 @@ sgc_start(void) {
       /* If opt_maxpage is set, add full pages to the sgc set if needed
 	 too. 20040804 CM*/
       if (count<WSGC(tm) && !FSGC(tm)) 
-	for (j=0;j<=MAXPAGE;j++) 
+	for (j=0;j<MAXPAGE;j++) 
 	  if (type_map[j]==i && free_map[j]==0) {
 	    sgc_type_map[j] |= (SGC_PAGE_FLAG | SGC_TEMP_WRITABLE);
 	    ++count;

@@ -13,8 +13,9 @@ gclcvs (2.7.0-31) unstable; urgency=low
     patched symbols are needed; autodetect and set the _start symbol
     when using gprof
   * Fix (setf (get ...) ...) return bug when interpreted
+  * Fix overwrite end of sgc_type_map bug
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 12 Aug 2004 16:41:36 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 12 Aug 2004 16:42:53 +0000
 
 gclcvs (2.7.0-30) unstable; urgency=high
 
