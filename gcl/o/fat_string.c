@@ -30,7 +30,8 @@ enum type what_to_collect;
 
 object sSAprofile_arrayA;
 #ifdef NO_PROFILE
-profil()
+void
+profil(void)
 {;}
 #endif
 

@@ -21,6 +21,9 @@ void
 call_or_link(object sym, void **link )
 {object fun;
  fun = sym->s.s_gfdef;
+#if 0
+ fprintf ( stderr, "call_or_link: fun %x\n", fun );
+#endif 
  if (fun == OBJNULL) {FEinvalid_function(sym); return;}
  if (type_of(fun) == t_cclosure
      && (fun->cc.cc_turbo))
@@ -33,6 +36,16 @@ call_or_link(object sym, void **link )
        { (void) vpush_extend( link,sLAlink_arrayA->s.s_dbind);
 	  (void) vpush_extend( *link,sLAlink_arrayA->s.s_dbind);	 
          *link = (void *) (fun->cf.cf_self);
+#if 0
+         fprintf ( stderr, "call_or_link: cf %x\n", fun->cf );
+         fprintf ( stderr, "call_or_link: cf_name %x\n", fun->cf.cf_name );
+         fprintf ( stderr, "call_or_link: cf_data %x\n", fun->cf.cf_data );
+         fprintf ( stderr, "call_or_link: cf_self %x\n", fun->cf.cf_self );
+         fflush ( stderr );
+         fprintf ( stderr, "call_or_link: staddr %x\n", fun->cf.cf_name->st.st_self );
+         fprintf ( stderr, "call_or_link: ststring %s\n", fun->cf.cf_name->st.st_self );
+         fflush ( stderr );
+#endif         
 	 (*(void (*)())(fun->cf.cf_self))();
        }
    else funcall(fun);}

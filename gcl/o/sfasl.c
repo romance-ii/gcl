@@ -110,15 +110,15 @@ fasload(faslfile)
 object faslfile;
 {       long fasl_vector_start;
 	struct filehdr fileheader;
-	int init_done = 0;
 	struct sfasl_info sfasl_info_buf;
 #ifdef COFF
-	struct scnhdr sectionheader;
         struct scnhdr section[10];
 	struct aouthdr header;
 #endif
 	int textsize, datasize, bsssize,nsyms;
+#if defined ( READ_IN_STRING_TABLE ) || defined ( HPUX )
 	int string_size=0;
+#endif        
 
 	object memory, data;
 	FILE *fp;

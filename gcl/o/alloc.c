@@ -671,8 +671,10 @@ init_alloc(void) {
       fputs("WARNING: Non-fatal Linux sbrk() error\n", stderr);
     }
 #endif
-  
+
+#ifdef INIT_ALLOC  
   INIT_ALLOC;
+#endif  
   
   alloc_page(-(holepage + nrbpage));
   

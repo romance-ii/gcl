@@ -16,7 +16,7 @@ relocate()
   if (relocation_info.r_type == R_ABS)
     { dprintf( r_abs ,0)  return; }
   switch(relocation_info.r_type)
-    { int *q;
+    {
     case R_DIR32:
       dprintf(new val r_dir32 %x ,  *((int *)where) + 
 	      symbol_table[relocation_info.r_symndx].n_value);

@@ -5,6 +5,7 @@
 #include "windows.h"
 #include "errno.h"
 #include "signal.h"
+#include "stdlib.h"
 
 #ifdef DODEBUG
 #define dprintf(s,arg) \
@@ -111,7 +112,6 @@ static void close_winsock();
 static void
 InitSockets()
 {
-    DWORD id;
     WSADATA wsaData;
     static int initialized;
     if (! initialized) {
@@ -418,7 +418,7 @@ CreateSocket(port, host, server, myaddr, myport, async)
                                          * in progress. */
     struct sockaddr_in sockaddr;	/* Socket address */
     struct sockaddr_in mysockaddr;	/* Socket address for client */
-    SOCKET sock;
+    SOCKET sock = 0;
 
     /*
      * Check that WinSock is initialized; do not call it if not, to
@@ -612,7 +612,6 @@ TcpOutputProc ( int fd, char *buf, int toWrite, int *errorCodePtr, int block )
         {   fd_set writefds;
 	int res;
 	    struct timeval timeout;
-	    int err;
 	      FD_ZERO(&writefds);
 	      FD_SET(fd,&writefds);
 	      timeout.tv_sec = (block == 0 ?  0 : 60*60*24*30);
@@ -677,7 +676,7 @@ TcpOutputProc ( int fd, char *buf, int toWrite, int *errorCodePtr, int block )
   Side Effects:  The buffer may be filled, and the fill pointer
   of the buffer may be changed.
  */
-getCharGclSocket(strm,block)
+int getCharGclSocket(strm,block)
   object strm;
   object block;
 {
@@ -766,19 +765,19 @@ sigint()
 }
 */
 
-
+#if 0
 BOOL WINAPI inthandler(DWORD i)
 {
   fprintf(stderr,"in handler %d",i);
       fflush(stderr); 
   terminal_interrupt(1);
+  return TRUE;
 }
-
+#endif
 
 
 void
 alarm(int n) {
-  /* printf("dummy alarm"); */
   return;
 }
 
