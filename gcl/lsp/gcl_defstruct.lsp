@@ -49,7 +49,6 @@
 				  slot-name default-init slot-type read-only
 				  offset &optional predicate ) 
   (declare (ignore named default-init predicate ))
-  
   (let ((access-function
 	 (if no-conc
 	     slot-name
@@ -172,6 +171,16 @@
 	  (push keydef res))))
     (nreverse res)))
 
+(defun maybe-cons-keyname (x &optional y)
+  (unless (consp x)
+    (specific-error :invalid-form "x ~S is not a list~%" x))
+  (let ((sn (sixth x)))
+    (if sn
+	(if y
+	    (list (list (car x) sn) y)
+	  (list (list (car x) sn)))
+      (if y (list (car x) y) (car x)))))
+
 (defun make-constructor (name constructor type named
                          slot-descriptions)
   (declare (ignore named))
@@ -187,15 +196,15 @@
                             ;;  it is the structure name.
                             ;;  This is for typed structures with names.
                             (list 'quote (cadr x)))
-                           (t (car x))))
+                           (t (let ((sn (sixth x))) (if sn sn (car x))))))
                  slot-descriptions))
         (keys
          ;; Make the keyword parameters.
          (mapcan #'(lambda (x)
                      (cond ((null x) nil)
                            ((null (car x)) nil)
-                           ((null (cadr x)) (list (car x)))
-                           (t (list (list  (car x) (cadr x))))))
+                           ((null (cadr x)) (list (maybe-cons-keyname x)))
+                           (t (list (maybe-cons-keyname x (cadr x))))))
                  slot-descriptions)))
     (cond ((consp constructor)
 	   (setq keys (parse-boa-lambda-list (cadr constructor) keys))
@@ -203,18 +212,25 @@
           (t
            ;; If not a BOA constructor, just cons &KEY.
            (setq keys (cons '&key keys))))
-    (cond ((null type)
-           `(defun ,constructor ,keys
-              (si:make-structure ',name ,@slot-names)))
-          ((or (eq type 'vector)
-               (and (consp type) (eq (car type) 'vector)))
-           `(defun ,constructor ,keys
-              (vector ,@slot-names)))
-          ((eq type 'list)
-           `(defun ,constructor ,keys
-              (list ,@slot-names)))
-          ((error "~S is an illegal structure type" type)))))
-
+     (cond ((null type)
+	    `(defun ,constructor ,keys
+	       (si:make-structure ',name ,@slot-names)))
+	   ((eq type 'vector)
+	    `(defun ,constructor ,keys
+	       (vector ,@slot-names)))
+	   ((and (consp type) (eq (car type) 'vector))
+	    (if (endp (cdr type))
+		`(defun ,constructor ,keys
+		   (vector ,@slot-names)))
+	      `(defun ,constructor ,keys
+		 (make-array ,(length slot-names)
+			     :element-type ',(cadr type)
+			     :initial-contents (list ,@slot-names))))
+	   ((eq type 'list)
+	    `(defun ,constructor ,keys
+	       (list ,@slot-names)))
+	   ((error "~S is an illegal structure type" type)))))
+  
 (defun make-predicate (name predicate type named name-offset)
   (cond ((null type))
 	 ; done in define-structure
@@ -391,28 +407,6 @@
 	     (list ar (round-up pos (size-of t)) has-holes)
 	     ))))
 
-
-
-
-	       
-		       
-		       
-		       
-		       
-		       
-		       
-		     
-	     
-	 
-	 
-
-
-		      		      
-				
-			      
-	       
-	 
-
 (defun define-structure (name conc-name no-conc type named slot-descriptions copier
 			      static include print-function constructors
 			      offset predicate &optional documentation no-funs
@@ -420,10 +414,10 @@
   (and (consp type) (eq (car type) 'vector)(setq type 'vector))
   (setq leng(length slot-descriptions))
   (dolist (x slot-descriptions)
-	   (and x (car x)
-		(apply #'make-access-function
-                                     name conc-name no-conc type named include no-funs
-                                     x )))
+    (and x (car x)
+	 (apply #'make-access-function
+		name conc-name no-conc type named include no-funs
+		x )))
   (when (and copier (not no-funs))
 	(setf (symbol-function copier)
 	      (ecase type
@@ -492,7 +486,7 @@
 	   (or tem (setf (get name 's-data) def)))
 	  (tem 
 	   (check-s-data tem def name))
-	  (t  (setf (get name 's-data) def)))
+	  (t (setf (get name 's-data) def)))
     (when documentation
 	  (setf (get name 'structure-documentation)
 		documentation))
@@ -687,22 +681,36 @@
     ;; Check the print-function.
     (when (and print-function type)
           (error "A print function is supplied to a typed structure."))
-    
-    `(progn
-       (define-structure ',name  ',conc-name ',no-conc ',type
-	 ',named ',slot-descriptions ',copier ',static ',include ',print-function ',constructors 
-	 ',offset ',predicate ',documentation 
-	 )
 
-       ,@(mapcar #'(lambda (constructor)
-		     (make-constructor name constructor type named
-				       slot-descriptions))
-		 constructors)
-       ,@(if (and type predicate)
-	     (list (make-predicate name predicate type named
-				   name-offset)))
-       ',name
-       )))
+    (let* (new-slot-descriptions
+	   (new-slot-descriptions ;(copy-list slot-descriptions)))
+	    (dolist (sd slot-descriptions (nreverse new-slot-descriptions))
+	      (if (and (consp sd) (eql (length sd) 5))
+		(let* ((csd (car sd))
+		       (sym (when (or (constantp csd) (keywordp csd) (si::specialp csd)) 
+			      (make-symbol (symbol-name csd))))
+		       (nsd (if (or (constantp csd) (si::specialp csd))
+				(cons (intern (symbol-name csd) 'keyword) (cdr sd))
+			      sd)))
+		  (push (append nsd (list sym)) new-slot-descriptions)
+		  (when sym
+		    (setf (car sd) sym)))
+		(push sd new-slot-descriptions)))))
+      `(progn
+	 (define-structure ',name  ',conc-name ',no-conc ',type
+	   ',named ',slot-descriptions ',copier ',static ',include 
+	   ',print-function ',constructors 
+	   ',offset ',predicate ',documentation 
+	   )
+	 
+	 ,@(mapcar #'(lambda (constructor)
+		       (make-constructor name constructor type named new-slot-descriptions))
+		   constructors)
+	 ,@(if (and type predicate)
+	       (list (make-predicate name predicate type named
+				     name-offset)))
+	 ',name
+	 ))))
 
 ;; First several fields of this must coincide with the C structure
 ;; s_data (see object.h).
