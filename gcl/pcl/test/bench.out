@@ -1,0 +1,21 @@
+
+                                        cmucl17f    cmucl17g    lucid411g   lucid411c
+1 default method:                       1.810e+6    1.810e+6    1.250E+6    1.000E+7
+1 dispatch, 1 method:                   7.394e+5    1.173e+6    9.091E+5    1.429E+6
+1 dispatch, :around + primary:          5.398e+5    6.441e+5    2.174E+5    1.093E+5
+1 dispatch, 3 methods, instance:        7.394e+5    7.130e+5    9.091E+5    1.429E+6
+1 dispatch, 3 methods, noninstance:     6.768e+5    1.023e+6    3.509E+5    1.429E+6
+2 dispatch, 2 methods:                  5.890e+4    9.070e+5    4.255E+5    8.333E+5
+slot reader method:                     1.533e+6    1.476e+6    1.111E+6    1.429E+6
+with-slots (1 access):                  2.738e+5    4.994e+5    2.198E+5    6.452E+5
+with-slots (1 modify):                  4.872e+5    5.961e+5    4.082E+5    5.882E+5
+naked slot-value:                       1.215e+5    1.687e+5    6.061E+5    8.696E+5
+class-of instance:                      4.938e+6    4.938e+6    3.333E+6    1.000E+7
+class-of noninstance:                   1.896e+6    9.070e+5    7.407E+5    2.857E+6
+allocate-instance (2 slots):            8.867e+4    6.813e+4    2.475E+4    1.250E+5
+make-instance (2 slots) (opt):          5.798e+3    1.002e+5    2.174E+5    1.266E+5
+make-instance (2 initargs) (opt):       5.657e+3    7.206e+4    1.099E+5    1.613E+5
+make-instance (2 slots):                5.798e+3    1.002e+5    6.969E+3    1.266E+5
+make-instance (2 initargs):             5.657e+3    7.206e+4    5.249E+3    1.613E+5
+make-instance (2 variable initargs):                                        1.754E+5  
+
