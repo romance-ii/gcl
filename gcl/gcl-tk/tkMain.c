@@ -596,7 +596,7 @@ TclGenericCommandProcedure( clientData,
 {
   char szCmd[CMD_SIZE];
   ClientDataLispObject *pcdlo = (ClientDataLispObject *)clientData;
-  int cb;
+  int cb=0;
   char *q = szCmd;
   char *p = pcdlo->arglist;
 

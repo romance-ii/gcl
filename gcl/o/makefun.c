@@ -31,7 +31,11 @@ fSmakefun(object sym, object (*addr) (/* ??? */), unsigned int argd)
 }
 
 object
-ImakeClosure(object (*addr) (/* ??? */), int argd, int n, __builtin_va_alist_t __builtin_va_alist)
+ImakeClosure(addr,argd,n,va_alist)
+     object (*addr)();
+     int argd;
+     int n;
+     va_dcl
 { object x = fSmakefun(Cnil,addr,argd);
   va_list ap;
   va_start(ap);
@@ -122,7 +126,12 @@ LISP_makefun(char *strg, object (*fn) (/* ??? */), unsigned int argd)
 
 
 object 
-MakeClosure(int n, int argd, object data, object (*fn)(), __builtin_va_alist_t __builtin_va_alist)
+MakeClosure(n,argd,data,fn,va_alist)
+     int n;
+     int argd;
+     object data;
+     object (*fn)();
+     va_dcl
 { object x;
   va_list ap;
   x = alloc_object(t_closure);

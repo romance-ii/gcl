@@ -15,43 +15,35 @@
 /* alloc.c:737:OF */ extern object fSstaticp (object x); /* (x) object x; */
 /* alloc.c:742:OF */ extern void cant_get_a_type (void); /* () */
 /* alloc.c:746:OF */ extern void siLallocate (void); /* () */
-/* alloc.c:748:OF *//*   extern object fSallocate (object type, int npages, __builtin_va_alist_t __builtin_va_alist); */ /* (type, npages, __builtin_va_alist) object type; int npages; __builtin_va_alist_t __builtin_va_alist; */
 /* alloc.c:802:OF */ extern int t_from_type (object type); /* (type) object type; */
 /* alloc.c:822:OF */ extern object fSallocate_sgc (object type, int min, int max, int free_percent); /* (type, min, max, free_percent) object type; int min; int max; int free_percent; */
 /* alloc.c:846:OF */ extern object fSallocate_growth (object type, int min, int max, int percent, int percent_free); /* (type, min, max, percent, percent_free) object type; int min; int max; int percent; int percent_free; */
 /* alloc.c:870:OF */ extern void siLalloc_contpage (void); /* () */
-/* alloc.c:872:OF *//*   extern object fSallocate_contiguous_pages ( int npages, __builtin_va_alist_t __builtin_va_alist); */ /* (npages, __builtin_va_alist) int npages; __builtin_va_alist_t __builtin_va_alist; */
 /* alloc.c:909:OF */ extern void siLncbpage (void); /* () */
 /* alloc.c:911:OF */ extern object fSallocated_contiguous_pages (void); /* () */
 /* alloc.c:916:OF */ extern void siLmaxcbpage (void); /* () */
 /* alloc.c:918:OF */ extern object fSmaximum_contiguous_pages (void); /* () */
 /* alloc.c:924:OF */ extern void siLalloc_relpage (void); /* () */
-/* alloc.c:926:OF *//*   extern object fSallocate_relocatable_pages ( int npages, __builtin_va_alist_t __builtin_va_alist); */ /* (npages, __builtin_va_alist) int npages; __builtin_va_alist_t __builtin_va_alist; */
 /* alloc.c:956:OF */ extern void siLnrbpage (void); /* () */
 /* alloc.c:958:OF */ extern object fSallocated_relocatable_pages (void); /* () */
 /* alloc.c:963:OF */ extern void siLget_hole_size (void); /* () */
 /* alloc.c:965:OF */ extern object fSget_hole_size (void); /* () */
 /* alloc.c:970:OF */ extern void siLset_hole_size (void); /* () */
-/* alloc.c:972:OF *//*   extern object fSset_hole_size (int npages, __builtin_va_alist_t __builtin_va_alist); */ /* (npages, __builtin_va_alist) int npages; __builtin_va_alist_t __builtin_va_alist; */
 /* alloc.c:1000:OF */ extern void init_alloc_function (void); /* () */
 /* alloc.c:1126:OF */ extern void free (void *ptr); /* (ptr) void *ptr; */
 /* alloc.c:1203:OF */ extern void *calloc (size_t nelem, size_t elsize); /* (nelem, elsize) int nelem; int elsize; */
 /* alloc.c:1216:OF */ extern void cfree (void *ptr); /* (ptr) char *ptr; */
 /* alloc.c:1236:OF */ extern void *valloc (size_t size); /* (size) int size; */
 /* array.c:57:OF */ extern void Laref (void); /* () */
-/* array.c:60:OF *//*   extern object fLaref (object x, int i, __builtin_va_alist_t __builtin_va_alist); */ /* (x, i, __builtin_va_alist) object x; int i; __builtin_va_alist_t __builtin_va_alist; */
 /* array.c:107:OF */ extern void fScheck_bounds_bounds (object x, int i); /* (x, i) object x; int i; */
 /* array.c:126:OF */ extern object fLsvref (object x, unsigned int i); /* (x, i) object x; unsigned int i; */
 /* array.c:142:OF */ extern object fSaref1 (object x, int i); /* (x, i) object x; int i; */
 /* array.c:190:OF */ extern object fSaset1 (object x, object i, object val); /* (x, i, val) object x; int i; object val; */
 /* array.c:262:OF */ extern void siLaset (void); /* () */
-/* array.c:265:OF *//*   extern object fSaset (object x, object ii, object y, __builtin_va_alist_t __builtin_va_alist); */ /* (x, ii, y, __builtin_va_alist) object x; object ii; object y; __builtin_va_alist_t __builtin_va_alist; */
 /* array.c:321:OF */ extern void siLsvset (void); /* () */
 /* array.c:324:OF */ extern object fSsvset (object x, int i, object val); /* (x, i, val) object x; int i; object val; */
-/* array.c:346:OF *//*   extern object fSmake_vector1 (int n, int elt_type, object staticp, __builtin_va_alist_t __builtin_va_alist); */ /* (n, elt_type, staticp, __builtin_va_alist) int n; int elt_type; object staticp; __builtin_va_alist_t __builtin_va_alist; */
 /* array.c:461:OF */ extern object fSget_aelttype (object x); /* (x) object x; */
 /* array.c:480:OF */ extern void siLmake_vector (void); /* () */
-/* array.c:482:OF *//*   extern object fSmake_vector (object x0, object x1, object x2, object x3, object x4, object x5, object x6, __builtin_va_alist_t __builtin_va_alist); */ /* (x0, x1, x2, x3, x4, x5, x6, __builtin_va_alist) object x0; object x1; object x2; object x3; object x4; object x5; object x6; __builtin_va_alist_t __builtin_va_alist; */
 /* array.c:519:OF */ extern object fSmake_array1 (int elt_type, object staticp, object initial_element, object displaced_to, int displaced_index_offset, object dimensions); /* (elt_type, staticp, initial_element, displaced_to, displaced_index_offset, dimensions) int elt_type; object staticp; object initial_element; object displaced_to; int displaced_index_offset; object dimensions; */
 /* array.c:583:OF */ extern void Larray_displacement (void); /* () */
 /* array.c:638:OF */ extern void displace (object from_array, object dest_array, int offset); /* (from_array, dest_array, offset) object from_array; object dest_array; int offset; */
@@ -154,8 +146,8 @@
 /* bind.c:610:OF */ extern object find_special (object body, struct bind_temp *start, struct bind_temp *end); /* (body, start, end) object body; struct bind_temp *start; struct bind_temp *end; */
 /* bind.c:670:OF */ extern object let_bind (object body, struct bind_temp *start, struct bind_temp *end); /* (body, start, end) object body; struct bind_temp *start; struct bind_temp *end; */
 /* bind.c:688:OF */ extern object letA_bind (object body, struct bind_temp *start, struct bind_temp *end); /* (body, start, end) object body; struct bind_temp *start; struct bind_temp *end; */
-/* bind.c:712:OF */ extern void parse_key (object *base, bool rest, bool allow_other_keys, register int n, ... /*__builtin_va_alist_t __builtin_va_alist*/); /* (base, rest, allow_other_keys, n, __builtin_va_alist) object *base; bool rest; bool allow_other_keys; register int n; __builtin_va_alist_t __builtin_va_alist; */
-/* bind.c:820:OF */ extern void check_other_key (object l, int n, .../*  __builtin_va_alist_t __builtin_va_alist */); /* (l, n, __builtin_va_alist) object l; int n; __builtin_va_alist_t __builtin_va_alist; */
+/* bind.c:712:OF */ extern void parse_key (object *base, bool rest, bool allow_other_keys, register int n, ... ); 
+/* bind.c:820:OF */ extern void check_other_key (object l, int n, ...); 
 struct key {short n,allow_other_keys;
 	    iobject *defaults;
 	    iobject keys[1];
@@ -232,7 +224,6 @@ struct key {short n,allow_other_keys;
 /* cmpaux.c:33:OF */ extern void siLspecialp (void); /* () */
 /* cmpaux.c:35:OF */ extern object fSspecialp (object sym); /* (sym) object sym; */
 /* cmpaux.c:48:OF */ extern void siLdefvar1 (void); /* () */
-/* cmpaux.c:50:OF *//*   extern object fSdefvar1 (object sym, object val, __builtin_va_alist_t __builtin_va_alist); */ /* (sym, val, __builtin_va_alist) object sym; object val; __builtin_va_alist_t __builtin_va_alist; */
 /* cmpaux.c:71:OF */ extern void siLdebug (void); /* () */
 /* cmpaux.c:73:OF */ extern object fSdebug (object sym, object val); /* (sym, val) object sym; object val; */
 /* cmpaux.c:80:OF */ extern void siLsetvv (void); /* () */
@@ -261,11 +252,8 @@ typedef int (*FUNC)();
 /* error.c:45:OF */ extern object ihs_function_name (object x); /* (x) object x; */
 /* error.c:102:OF */ extern object ihs_top_function_name (ihs_ptr h); /* (h) ihs_ptr h; */
 /* error.c:118:OF */ extern void call_error_handler (void); /* () */
-/* error.c:126:OF *//*   extern object Icall_error_handler (object error_name, object error_format_string, int nfmt_args, __builtin_va_alist_t __builtin_va_alist); */ /* (error_name, error_format_string, nfmt_args, __builtin_va_alist) object error_name; object error_format_string; int nfmt_args; __builtin_va_alist_t __builtin_va_alist; */
 /* error.c:147:OF */ extern void Lerror (void); /* () */
-/* error.c:149:OF *//*   extern object fLerror (object fmt_string, __builtin_va_alist_t __builtin_va_alist); */ /* (fmt_string, __builtin_va_alist) object fmt_string; __builtin_va_alist_t __builtin_va_alist; */
 /* error.c:164:OF */ extern void Lcerror (void); /* () */
-/* error.c:167:OF *//*   extern object fLcerror (object continue_fmt_string, object fmt_string, __builtin_va_alist_t __builtin_va_alist); */ /* (continue_fmt_string, fmt_string, __builtin_va_alist) object continue_fmt_string; object fmt_string; __builtin_va_alist_t __builtin_va_alist; */
 /* error.c:184:OF */ extern void FEerror (/*  char *s, int num, ... */); /* (s, num, arg1, arg2, arg3, arg4) char *s; int num; object arg1; object arg2; object arg3; object arg4; */
 /* error.c:203:OF */ extern void FEwrong_type_argument (object type, object value); /* (type, value) object type; object value; */
 /* error.c:210:OF */ extern void FEtoo_few_arguments (object *base, object *top); /* (base, top) object *base; object *top; */
@@ -336,7 +324,6 @@ typedef int (*FUNC)();
 /* error.c:653:OF */ extern void illegal_index (object x, object i); /* (x, i) object x; object i; */
 /* error.c:660:OF */ extern void check_socket (object x); /* (x) object x; */
 /* error.c:670:OF */ extern void check_stream (object strm); /* (strm) object strm; */
-/* error.c:677:OF *//*   extern object LVerror (__builtin_va_alist_t __builtin_va_alist); */ /* (__builtin_va_alist) __builtin_va_alist_t __builtin_va_alist; */
 /* error.c:688:OF */ extern void vfun_wrong_number_of_args (object x); /* (x) object x; */
 /* error.c:697:OF */ extern void check_arg_range (int n, int m); /* (n, m) int n; int m; */
 /* error.c:727:OF */ extern void init_error (void); /* () */
@@ -359,9 +346,7 @@ typedef int (*FUNC)();
 /* eval.c:944:OF */ extern void eval (object form); /* (form) object form; */
 /* eval.c:1124:OF */ extern void call_applyhook (object fun); /* (fun) object fun; */
 /* eval.c:1147:OF */ extern void Lfuncall (void); /* () */
-/* eval.c:1149:OF *//*   extern object fLfuncall (object fun, __builtin_va_alist_t __builtin_va_alist); */ /* (fun, __builtin_va_alist) object fun; __builtin_va_alist_t __builtin_va_alist; */
 /* eval.c:1162:OF */ extern void Lapply (void); /* () */
-/* eval.c:1164:OF *//*   extern object fLapply (object fun, __builtin_va_alist_t __builtin_va_alist); */ /* (fun, __builtin_va_alist) object fun; __builtin_va_alist_t __builtin_va_alist; */
 /* eval.c:1189:OF */ extern void Leval (void); /* () */
 /* eval.c:1191:OF */ extern object fLeval (object x0); /* (x0) object x0; */
 /* eval.c:1203:OF */ extern void Levalhook (void); /* () */
@@ -376,9 +361,7 @@ typedef int (*FUNC)();
 /* eval.c:1384:OF */ extern object fcalln_cclosure (va_list ap); /* (ap) va_list ap; */
 /* eval.c:1431:OF */ extern object fcalln_general (va_list ap); /* (ap) va_list ap; */
 /* eval.c:1464:OF */ extern object fcalln_vfun (va_list vl); /* (vl) va_list vl; */
-/* eval.c:1476:OF *//*   extern object fcalln (__builtin_va_alist_t __builtin_va_alist); */ /* (__builtin_va_alist) __builtin_va_alist_t __builtin_va_alist; */
 typedef void (*funcvoid)(void);
-/* eval.c:1519:OF *//*   extern object funcall_cfun (funcvoid fn, int n, __builtin_va_alist_t __builtin_va_alist); */ /* (fn, n, __builtin_va_alist) funcvoid fn; int n; __builtin_va_alist_t __builtin_va_alist; */
 /* eval.c:1545:OF */ extern void init_eval (void); /* () */
 /* fasdump.c:436:OF */ extern enum circ_ind do_hash (object obj, int dot); /* (obj, dot) object obj; int dot; */
 /* fasdump.c:488:OF */ extern object write_fasd_top (object obj, object x); /* (obj, x) object obj; object x; */
@@ -403,7 +386,6 @@ typedef void (*funcvoid)(void);
 /* fat_string.c:153:OF */ extern void cfuns_to_combined_table (unsigned int n); /* (n) unsigned int n; */
 /* fat_string.c:201:OF */ extern int address_node_compare (const void *node1, const void *node2); /* (node1, node2) char *node1; char *node2; */
 /* fat_string.c:238:OF */ extern void siLset_up_combined (void); /* () */
-/* fat_string.c:240:OF *//*   extern object fSset_up_combined (__builtin_va_alist_t __builtin_va_alist); */ /* (__builtin_va_alist) __builtin_va_alist_t __builtin_va_alist; */
 /* fat_string.c:310:OF */ extern int prof_ind (unsigned int address, int scale); /* (address, scale) unsigned int address; int scale; */
 /* fat_string.c:318:OF */ extern int string_sum (register unsigned char *aar, unsigned int dim); /* (aar, dim) register unsigned char *aar; unsigned int dim; */
 /* fat_string.c:329:OF */ extern void siLdisplay_profile (void); /* () */
@@ -458,7 +440,6 @@ typedef void (*funcvoid)(void);
 /* format.c:2045:OF */ extern void fmt_up_and_out (bool colon, bool atsign); /* (colon, atsign) bool colon; bool atsign; */
 /* format.c:2074:OF */ extern void fmt_semicolon (bool colon, bool atsign); /* (colon, atsign) bool colon; bool atsign; */
 /* format.c:2084:OF */ extern void Lformat (void); /* () */
-/* format.c:2086:OF *//*   extern object fLformat (object strm, object control, __builtin_va_alist_t __builtin_va_alist); */ /* (strm, control, __builtin_va_alist) object strm; object control; __builtin_va_alist_t __builtin_va_alist; */
 /* format.c:2161:OF */ extern void fmt_error (char *s); /* (s) char *s; */
 /* format.c:2171:OF */ extern void init_format (void); /* () */
 /* frame.c:32:OF */ extern void unwind (frame_ptr fr, object tag); /* (fr, tag) frame_ptr fr; object tag; */
@@ -468,14 +449,11 @@ typedef void (*funcvoid)(void);
 /* funlink.c:41:OF */ extern void call_or_link_closure (object sym, void **link, object *ptr); /* (sym, link, ptr) object sym; void **link; object *ptr; */
 /* funlink.c:77:OF */ extern int vpush_extend (void *item, object ar); /* (item, ar) void *item; object ar; */
 /* funlink.c:103:OF */ extern void delete_link (void *address, object link_ar); /* (address, link_ar) void *address; object link_ar; */
-/* funlink.c:128:OF *//*   extern object fSuse_fast_links (object flag, __builtin_va_alist_t __builtin_va_alist); */ /* (flag, __builtin_va_alist) object flag; __builtin_va_alist_t __builtin_va_alist; */
 /* funlink.c:211:OF */ extern int clean_link_array (object *ar, object *ar_end); /* (ar, ar_end) object *ar; object *ar_end; */
 /* funlink.c:230:OF */ extern object c_apply_n (object (*fn)(), int n, object *x); /* (fn, n, x) long int (*fn)(); int n; object *x; */
 /* funlink.c:564:OF */ extern object call_proc (object sym, void **link, int argd, va_list ll); /* (sym, link, argd, ll) object sym; void **link; int argd; va_list ll; */
 /* funlink.c:689:OF */ extern object call_vproc (object sym, void *link, va_list ll); /* (sym, link, ll) object sym; void *link; va_list ll; */
 /* funlink.c:696:OF */ extern object call_proc0 (object sym, void *link); /* (sym, link) object sym; void *link; */
-/* funlink.c:728:OF *//*   extern object ifuncall (object sym, int n, __builtin_va_alist_t __builtin_va_alist); */ /* (sym, n, __builtin_va_alist) object sym; int n; __builtin_va_alist_t __builtin_va_alist; */
-/* funlink.c:757:OF *//*   extern object imfuncall (object sym, int n, __builtin_va_alist_t __builtin_va_alist); */ /* (sym, n, __builtin_va_alist) object sym; int n; __builtin_va_alist_t __builtin_va_alist; */
 /* funlink.c:784:OF */ extern int clear_stack (object *beg, object *limit); /* (beg, limit) object *beg; object *limit; */
 /* funlink.c:793:OF */ extern object set_mv (int i, object val); /* (i, val) int i; object val; */
 /* funlink.c:803:OF */ extern object mv_ref (unsigned int i); /* (i) unsigned int i; */
@@ -573,7 +551,6 @@ typedef void (*funcvoid)(void);
 /* macros.c:139:OF */ extern object Imacro_expand1 (object exp_fun, object form); /* (exp_fun, form) object exp_fun; object form; */
 /* macros.c:152:OF */ extern object macro_def (object form); /* (form) object form; */
 /* macros.c:173:OF */ extern void Lmacroexpand (void); /* () */
-/* macros.c:175:OF *//*   extern object fLmacroexpand (object form, __builtin_va_alist_t __builtin_va_alist); */ /* (form, __builtin_va_alist) object form; __builtin_va_alist_t __builtin_va_alist; */
 /* macros.c:224:OF */ extern void Lmacroexpand_1 (void); /* () */
 /* macros.c:265:OF */ extern object macro_expand (object form); /* (form) object form; */
 /* macros.c:344:OF */ extern void init_macros (void); /* () */
@@ -589,11 +566,8 @@ typedef void (*funcvoid)(void);
 /* main.c:568:OF */ extern void cs_overflow (void); /* () */
 /* main.c:583:OF */ extern void end_of_file (void); /* () */
 /* main.c:587:OF */ extern void Lby (void); /* () */
-/* main.c:589:OF *//*   extern object fLbye (__builtin_va_alist_t __builtin_va_alist); */ /* (__builtin_va_alist) __builtin_va_alist_t __builtin_va_alist; */
 /* main.c:607:OF */ extern void Lquit(void); /* () */
-/* main.c:609:OF *//*   extern object fLquit (__builtin_va_alist_t __builtin_va_alist); */ /* (__builtin_va_alist) __builtin_va_alist_t __builtin_va_alist; */
 /* main.c:612:OF */ extern void Lexit(void); /* () */
-/* main.c:614:OF *//*   extern object fLexit (__builtin_va_alist_t __builtin_va_alist); */ /* (__builtin_va_alist) __builtin_va_alist_t __builtin_va_alist; */
 /* main.c:619:OF */ extern int c_trace (void); /* () */
 /* main.c:626:OF */ extern void siLargc (void); /* () */
 /* main.c:632:OF */ extern void siLargv (void); /* () */
@@ -615,14 +589,10 @@ typedef void (*funcvoid)(void);
 /* main.c:870:OF */ extern void init_main (void); /* () */
 /* makefun.c:10:OF */ extern object MakeAfun (object (*addr)(object,object), unsigned int argd, object data); /* (addr, argd, data) int (*addr)(); unsigned int argd; object data; */
 /* makefun.c:28:OF */ extern object fSmakefun (object sym, object (*addr) (/* ??? */), unsigned int argd); /* (sym, addr, argd) object sym; object (*addr)(); unsigned int argd; */
-/* makefun.c:40:OF *//*   extern object ImakeClosure (object (*addr) (), int argd, int n, __builtin_va_alist_t __builtin_va_alist); */ /* (addr, argd, n, __builtin_va_alist) object (*addr)(); int argd; int n; __builtin_va_alist_t __builtin_va_alist; */
 /* makefun.c:52:OF */ extern void IsetClosure (object x, int n, va_list ap); /* (x, n, ap) object x; int n; va_list ap; */
-/* makefun.c:78:OF *//*   extern object fSinitfun (object sym, object addr_ind, object argd, __builtin_va_alist_t __builtin_va_alist); */ /* (sym, addr_ind, argd, __builtin_va_alist) object sym; object addr_ind; object argd; __builtin_va_alist_t __builtin_va_alist; */
-/* makefun.c:98:OF *//*   extern object fSinitmacro (__builtin_va_alist_t __builtin_va_alist); */ /* (__builtin_va_alist) __builtin_va_alist_t __builtin_va_alist; */
 /* makefun.c:113:OF */ extern object fSset_key_struct (object key_struct_ind); /* (key_struct_ind) object key_struct_ind; */
 /* makefun.c:122:OF */ extern void SI_makefun (char *strg, object (*fn) (/* ??? */), unsigned int argd); /* (strg, fn, argd) char *strg; object (*fn)(); unsigned int argd; */
 /* makefun.c:131:OF */ extern void LISP_makefun (char *strg, object (*fn) (/* ??? */), unsigned int argd); /* (strg, fn, argd) char *strg; object (*fn)(); unsigned int argd; */
-/* makefun.c:141:OF *//*   extern object MakeClosure (int n, int argd, object data, int (*fn) (), __builtin_va_alist_t __builtin_va_alist); */ /* (n, argd, data, fn, __builtin_va_alist) int n; int argd; object data; int (*fn)(); __builtin_va_alist_t __builtin_va_alist; */
 /* makefun.c:167:OF */ extern object fSinvoke (object x); /* (x) object x; */
 /* mapfun.c:53:OF */ extern void Lmapcar (void); /* () */
 /* mapfun.c:97:OF */ extern void Lmaplist (void); /* () */
@@ -912,7 +882,6 @@ typedef void (*funcvoid)(void);
 /* regexpr.c:29:OF */ extern void gcl_regerror (char *s); /* (s) char *s; */
 /* regexpr.c:48:OF */ extern object fSmatch_beginning (int i); /* (i) int i; */
 /* regexpr.c:57:OF */ extern object fSmatch_end (int i); /* (i) int i; */
-/* regexpr.c:75:OF *//*   extern int fSstring_match (object pattern, object string, __builtin_va_alist_t __builtin_va_alist); */ /* (pattern, string, __builtin_va_alist) object pattern; object string; __builtin_va_alist_t __builtin_va_alist; */
 /* run_process.c:344:OF */ extern void init_socket_function (void); /* () */
 /* save.c:6:OF */ extern void memory_save (char *original_file, char *save_file); /* (original_file, save_file) char *original_file; char *save_file; */
 /* save.c:17:OF */ extern void Lsave (void); /* () */

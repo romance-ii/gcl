@@ -92,3 +92,5 @@ object
 fSclear_connection();
 
 
+object
+fScheck_fd_for_input();

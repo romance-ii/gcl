@@ -1450,7 +1450,8 @@ fcalln_vfun(va_list vl)
 }
 
 object 
-fcalln(__builtin_va_alist_t __builtin_va_alist)
+fcalln(va_alist)
+va_dcl
 {  va_list ap;
    object fun=fcall.fun;
    DEBUG_AVMA
@@ -1492,7 +1493,10 @@ fcalln(__builtin_va_alist_t __builtin_va_alist)
 /*  typedef void (*funcvoid)(); */
 
 object
-funcall_cfun(funcvoid fn, int n, __builtin_va_alist_t __builtin_va_alist)
+funcall_cfun(fn,n,va_alist)
+     funcvoid fn;
+     int n;
+     va_dcl
 {object *old_top = vs_top;
  object *old_base= vs_base;
  object result;

@@ -705,7 +705,7 @@ letA_bind(object body, struct bind_temp *start, struct bind_temp *end)
 #define	NOT_KEYWORD	1
 
 void
-parse_key(object *base, bool rest, bool allow_other_keys, register int n, .../*  __builtin_va_alist_t __builtin_va_alist */)
+parse_key(object *base, bool rest, bool allow_other_keys, register int n, ...)
 { 
         object temporary;
 	va_list ap;
@@ -810,7 +810,7 @@ parse_key(object *base, bool rest, bool allow_other_keys, register int n, .../* 
 }
 
 void
-check_other_key(object l, int n, .../*  __builtin_va_alist_t __builtin_va_alist */)
+check_other_key(object l, int n, ...)
 {
  	object endp_temp;
 	va_list ap;

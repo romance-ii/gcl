@@ -716,7 +716,8 @@ if (type_of(strm) != t_stream)
 }
 
 object
-LVerror(__builtin_va_alist_t __builtin_va_alist)
+LVerror(va_alist)
+va_dcl
 {va_list ap;
  va_start(ap);
  fcall.fun= make_cfun(Lerror,Cnil,Cnil,0,0);

@@ -703,7 +703,10 @@ call_proc2(sym,link,va_alist)
    
 
 object
-ifuncall(object sym, int n, __builtin_va_alist_t __builtin_va_alist)
+ifuncall(sym,n,va_alist)
+     object sym;
+     int n;
+     va_dcl
 { va_list ap;
   int i;
   object *old_vs_base;
@@ -730,7 +733,10 @@ ifuncall(object sym, int n, __builtin_va_alist_t __builtin_va_alist)
 
 
 object
-imfuncall(object sym, int n, __builtin_va_alist_t __builtin_va_alist)
+imfuncall(sym,n,va_alist)
+     object sym;
+     int n;
+     va_dcl
 { va_list ap;
   int i;
   object *old_vs_top;
