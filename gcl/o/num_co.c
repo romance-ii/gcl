@@ -1363,6 +1363,25 @@ init_num_co(void)
    and then passing it to a function.
 */
 
+#ifdef IEEEFLOAT
+ { 
+   double div,td;
+   float ts;
+   for (float_epsilon=1.0,div=0.5;(float)div!=1.0;div=1.0-(0.5*(1.0-div)))
+     for (ts=float_epsilon;FMEM(ts),!SF_EQL((float)(1.0+ts),(float)1.0);float_epsilon=ts,ts*=div);
+
+   for (float_negative_epsilon=1.0,div=0.5;(float)div!=1.0;div=1.0-(0.5*(1.0-div)))
+     for (ts=float_negative_epsilon;FMEM(ts),!SF_EQL((float)(1.0-ts),(float)1.0);float_negative_epsilon=ts,ts*=div);
+
+   for (double_epsilon=1.0,div=0.5;(double)div!=1.0;div=1.0-(0.5*(1.0-div)))
+     for (td=double_epsilon;FMEM(td),!LF_EQL((double)(1.0+td),(double)1.0);double_epsilon=td,td*=div);
+
+   for (double_negative_epsilon=1.0,div=0.5;(double)div!=1.0;div=1.0-(0.5*(1.0-div)))
+     for (td=double_negative_epsilon;FMEM(td),!LF_EQL((double)(1.0-td),(double)1.0);double_negative_epsilon=td,td*=div);
+
+ }
+#else
+
 #define SMALL 1.05	
 	for (float_epsilon = 1.0;
 	     FMEM(float_epsilon),!SF_EQL((float)(1.0 + float_epsilon),(float)1.0);
@@ -1391,7 +1410,7 @@ init_num_co(void)
 	while(LF_EQL(1.0 - double_negative_epsilon , 1.0))
 	  double_negative_epsilon=double_negative_epsilon*SMALL;
 	  ;
-	
+#endif
 
 	make_constant("MOST-POSITIVE-SHORT-FLOAT",
 		      make_shortfloat(biggest_float));
