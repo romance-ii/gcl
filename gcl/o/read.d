@@ -2338,19 +2338,30 @@ CANNOT_PARSE:
 @)
 
 object
-read_byte1(str,eof)
-object str,eof;
-{if (stream_at_end(str))
-   return eof;
- return make_fixnum(readc_stream(str));}
+read_byte1(strm,eof)
+object strm,eof;
+{
+  if (strm == Cnil)
+    strm = symbol_value(sLAstandard_inputA);
+  else if (strm == Ct)
+    strm = symbol_value(sLAterminal_ioA);
+  if (stream_at_end(strm))
+    return eof;
+  return make_fixnum(readc_stream(strm));
+}
 
 object
-read_char1(str,eof)
-object str,eof;
-{if (stream_at_end(str))
-   return eof;
- return code_char(readc_stream(str));}
-
+read_char1(strm,eof)
+object strm,eof;
+{
+  if (strm == Cnil)
+    strm = symbol_value(sLAstandard_inputA);
+  else if (strm == Ct)
+    strm = symbol_value(sLAterminal_ioA);
+  if (stream_at_end(strm))
+    return eof;
+  return code_char(readc_stream(strm));
+}
 
 @(defun copy_readtable (&optional (from `current_readtable()`) to)
 @

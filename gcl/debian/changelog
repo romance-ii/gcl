@@ -30,8 +30,10 @@ gclcvs (2.7.0-12) unstable; urgency=low
   * Rebuild dependent files and install (for Windows), bringing ansi
     failures down to 508, or some 3.5%
   * Protect find-class with when symbolp in subtypep
+  * Map t and nil stream indicators properly in optimized compiled
+    references to read_char1 and read_byte1 (in read.d)
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 23 Oct 2003 16:05:10 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 23 Oct 2003 16:46:02 +0000
 
 gclcvs (2.7.0-11) unstable; urgency=low
 
