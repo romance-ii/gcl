@@ -31,8 +31,9 @@ gcl (2.5.0.cvs20020625-55) unstable; urgency=high
   * rework result-type check in make-sequence
   * :element-type support in make-string (preliminary)
   * (char ignores fill-pointer
+  * remove -O4 from debian/rules
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  3 Oct 2002 01:30:10 -0400
+ -- Camm Maguire <camm@enhanced.com>  Thu,  3 Oct 2002 01:52:45 -0400
 
 gcl (2.5.0.cvs20020625-54) unstable; urgency=high
 
