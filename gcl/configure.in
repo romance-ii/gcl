@@ -1396,7 +1396,7 @@ AC_SUBST(O2FLAGS)
 if test -f h/$use.defs  ; then
 
   AC_SUBST(use)
-  AC_OUTPUT(makedefc windows/gcl.iss bin/gcl.bat)
+  AC_OUTPUT(makedefc windows/gcl.iss)
   echo makedefc
   cat makedefc
 
