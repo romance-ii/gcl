@@ -209,10 +209,10 @@ getwd(char *buffer)
 void
 coerce_to_filename(object pathname, char *p)
 {
-  int n;
   object namestring;
   namestring = coerce_to_namestring(pathname);
 #ifndef NO_PWD_H  
+  int n;
   if(namestring->st.st_self[0]=='~')
     {char name[20];
      char *q = namestring->st.st_self;
@@ -421,7 +421,7 @@ DEFUN("SETENV",object,fSsetenv,SI,2,2,NONE,OO,OO,OO,OO,"Set environment VARIABLE
   {char *buf;
   char *sym=object_to_string(variable);
   char *val=object_to_string(value);
-  buf = malloc(strlen(sym)+strlen(value)+5);
+  buf = malloc(strlen(sym)+strlen(val)+5);
   sprintf(buf,"%s=%s",sym,val);
   res=putenv(buf);
   free(buf);
@@ -474,8 +474,8 @@ Lfile_write_date(void)
 void
 Lfile_author(void)
 {
-	char filename[MAXPATHLEN];
 #ifndef NO_PWD_H
+	char filename[MAXPATHLEN];
 	struct stat filestatus;
 	struct passwd *pwent;
 #ifndef __STDC__

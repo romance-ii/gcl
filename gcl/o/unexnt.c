@@ -713,8 +713,7 @@ void
 read_in_bss (char *filename)
 {
   HANDLE file;
-  DWORD size, index, n_read, total_read;
-  char   buffer[512], *bss;
+  DWORD index, n_read;
   int    i;
 
   file = CreateFile (filename, GENERIC_READ, FILE_SHARE_READ, NULL,

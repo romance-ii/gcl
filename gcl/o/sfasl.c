@@ -101,6 +101,9 @@ struct sfasl_info *sfaslp;
 #include RELOC_FILE
 
 /* end reloc_file */
+int get_extra_bss ( struct syment *sym_table, int length, int start, int *ptr, int bsssize);
+void relocate_symbols ( unsigned int length );
+void set_symbol_address ( struct syment *sym, char *string );
 
 int
 fasload(faslfile)
@@ -378,105 +381,113 @@ ADJUST_RELOC_START(j)
 
 }
 
-		   
-get_extra_bss(sym_table,length,start,ptr,bsssize)
-int length,bsssize;
-struct syment *sym_table;
-int *ptr;   /* store init address offset here */
-{int result = start;
- int next_bss =  start - bsssize;
- struct syment *end,*sym;
- char tem[SYMNMLEN +1];
- end =sym_table + length;
- for(sym=sym_table; sym < end; sym++)
-   {
+int get_extra_bss(sym_table,length,start,ptr,bsssize)
+     int length,bsssize;
+     struct syment *sym_table;
+     int *ptr;   /* store init address offset here */
+{
+  int result = start;
+
+#ifdef AIX3
+  int next_bss =  start - bsssize;
+#endif
+
+  struct syment *end,*sym;
+
+#ifdef BSD
+  char tem[SYMNMLEN +1];
+#endif
+
+  end =sym_table + length;
+  for(sym=sym_table; sym < end; sym++)
+    {
      
 #ifdef FIND_INIT
-FIND_INIT
+      FIND_INIT
 #endif
 
 #ifdef AIX3
- /* we later go through the relocation entries making this 1
-    for symbols used */
+	/* we later go through the relocation entries making this 1
+	   for symbols used */
 #ifdef SYM_USED 
- if(TC_SYMBOL_P(sym))
-   {SYM_USED(sym) = 0;}
+	if(TC_SYMBOL_P(sym))
+	  {SYM_USED(sym) = 0;}
 #endif
  
- /* fix up the external refer to _ptrgl to be local ref */
- if (sym->n_scnum == 0 &&
-     strcmp(sym->n_name,"_ptrgl")==0)
-   {struct syment* s =
-      get_symbol("._ptrgl",TEXT_NSCN,sym_table,length);
-    if (s ==0) FEerror("bad glue",0,0);
-    sym->n_value = next_bss ;
-    ptrgl_offset = next_bss;
-    ptrgl_text = s->n_value;
-    next_bss += 0xc;
-    sym->n_scnum = DATA_NSCN;
-    ((union auxent *)(sym+1))->x_csect.x_scnlen = 0xc;
+      /* fix up the external refer to _ptrgl to be local ref */
+      if (sym->n_scnum == 0 &&
+	  strcmp(sym->n_name,"_ptrgl")==0)
+	{struct syment* s =
+	   get_symbol("._ptrgl",TEXT_NSCN,sym_table,length);
+	if (s ==0) FEerror("bad glue",0,0);
+	sym->n_value = next_bss ;
+	ptrgl_offset = next_bss;
+	ptrgl_text = s->n_value;
+	next_bss += 0xc;
+	sym->n_scnum = DATA_NSCN;
+	((union auxent *)(sym+1))->x_csect.x_scnlen = 0xc;
 
-  }
+	}
 
-     if(sym->n_scnum != BSS_NSCN) goto NEXT;
-     if(SYM_EXTERNAL_P(sym))
-       {int val=sym->n_value;
+      if(sym->n_scnum != BSS_NSCN) goto NEXT;
+      if(SYM_EXTERNAL_P(sym))
+	{int val=sym->n_value;
 	struct node joe;
 	if (val && c_table.ptable)
 	  {struct node *answ;
-	   answ= find_sym(sym,0);
-           if(answ)
-	     {sym->n_value = answ->address ;
-	      sym->n_scnum = N_UNDEF;
-	      val= ((union auxent *)(sym+1))->x_csect.x_scnlen;
-	      result -= val;
-	      goto NEXT;
+	  answ= find_sym(sym,0);
+	  if(answ)
+	    {sym->n_value = answ->address ;
+	    sym->n_scnum = N_UNDEF;
+	    val= ((union auxent *)(sym+1))->x_csect.x_scnlen;
+	    result -= val;
+	    goto NEXT;
 	    }}
-      }
- /* reallocate the bss space */
- if (sym->n_value == 0)
-   {result += ((union auxent *)(sym+1))->x_csect.x_scnlen;}
- sym->n_value = next_bss;
- next_bss += ((union auxent *)(sym+1))->x_csect.x_scnlen;
- NEXT:
- ;
-     /* end aix3 */
+	}
+      /* reallocate the bss space */
+      if (sym->n_value == 0)
+	{result += ((union auxent *)(sym+1))->x_csect.x_scnlen;}
+      sym->n_value = next_bss;
+      next_bss += ((union auxent *)(sym+1))->x_csect.x_scnlen;
+    NEXT:
+      ;
+      /* end aix3 */
 #endif
 	  
 
   
 #ifdef BSD
-     tem; /* ignored */
-     if(SYM_EXTERNAL_P(sym) && SYM_UNDEF_P(sym))
+      tem; /* ignored */
+      if(SYM_EXTERNAL_P(sym) && SYM_UNDEF_P(sym))
 #endif
 #ifdef COFF
-     if(0)
-     /* what we really want is
-	if (sym->n_scnum==0 && sym->n_sclass == C_EXT
-	                    && !(bsearch(..in ptable for this symbol)))
-	Since this won't allow loading in of a new external array
-	char foo[10]  not ok
-	static foo[10] ok.
-	for the moment we give undefined symbol warning..
-	Should really go through the symbols, recording the external addr
-	for ones found in ptable, and for the ones not in ptable
-	set some flag, and add up the extra_bss required.  Then
-	when you have the new memory chunk in hand,
-	you could make the pass setting the relative addresses.
-	for the ones you flagged last time.
-    */
+	if(0)
+	  /* what we really want is
+	     if (sym->n_scnum==0 && sym->n_sclass == C_EXT
+	     && !(bsearch(..in ptable for this symbol)))
+	     Since this won't allow loading in of a new external array
+	     char foo[10]  not ok
+	     static foo[10] ok.
+	     for the moment we give undefined symbol warning..
+	     Should really go through the symbols, recording the external addr
+	     for ones found in ptable, and for the ones not in ptable
+	     set some flag, and add up the extra_bss required.  Then
+	     when you have the new memory chunk in hand,
+	     you could make the pass setting the relative addresses.
+	     for the ones you flagged last time.
+	  */
 #endif
-       /* external bss so not included in size of bss for file */
-       {int val=sym->n_value;
-	if (val && c_table.ptable
-	    && (0== find_sym(sym,0)))
-	   { sym->n_value=result;
-	     result += val;}}
+	  /* external bss so not included in size of bss for file */
+	  {int val=sym->n_value;
+	  if (val && c_table.ptable
+	      && (0== find_sym(sym,0)))
+	    { sym->n_value=result;
+	    result += val;}}
      
-     sym += NUM_AUX(sym); 
+      sym += NUM_AUX(sym); 
 
-   }
- return (result-start);
+    }
+  return (result-start);
 }
  
 
@@ -485,7 +496,7 @@ FIND_INIT
 to reflect the current cfd_start */
 
 
-
+void
 relocate_symbols(length)
 unsigned int length;
 {struct syment *end,*sym;

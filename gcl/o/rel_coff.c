@@ -4,7 +4,7 @@ the low level relocation which tends to be very system dependent.
 It is included by the file sfasl.c
 */
 
-
+void
 relocate()
 {
   char *where;
