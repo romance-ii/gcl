@@ -15,8 +15,9 @@ gclcvs (2.7.0-1) unstable; urgency=low
   * Merge changes from 2.6.1
   * Add windows/install.lsp to clean target
   * Add in macosx files to stable and cvs head
+  * Fix bad debelper postinst, Closes: #208765
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  4 Sep 2003 15:14:46 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri,  5 Sep 2003 13:19:40 +0000
 
 gcl (2.6.1-1) unstable; urgency=low
 

@@ -136,9 +136,9 @@ BVER:=$(shell dpkg -s binutils |grep ^Version: | cut -f2 -d\  | cut -f1 -d\-)
 debian/substvars:
 	grep -q ^binutils: $@ 2>/dev/null || echo "binutils:Version=$(BVER)" >> $@
 
-INS:=$(shell for i in debian/*.in ; do echo $${i%.in} ; done |sed "s,gcl,gcl$(EXT),g")
+INS:=$(shell for i in debian/in.* ; do echo $$i | sed 's,in.,,1' ; done |sed "s,gcl,gcl$(EXT),g")
 
-$(INS): debian/gcl$(EXT)% : debian/gcl%.in
+$(INS): debian/gcl$(EXT)% : debian/in.gcl%
 	cat $< | sed 's,@EXT@,$(EXT),g' >$@
 
 install: install-stamp
