@@ -4,11 +4,15 @@
 FILE *fopen_binary(char *name,char *mode);
 
 /* bfd support */
-#undef HAVE_LIBBFD
 #ifdef HAVE_LIBBFD
-#define IN_GCC
-#include <bfd.h>
-#include <bfdlink.h>
+#  undef SPECIAL_RSYM
+#  undef RSYM_COMMAND
+#  define SEPARATE_SFASL_FILE "sfaslbfd.c"
+#else
+#  undef SEPARATE_SFASL_FILE
+#  define SPECIAL_RSYM "rsym_nt.c"
+#  define RSYM_COMMAND(command,system_directory,kcl_self,tmpfile1) \
+      sprintf(command,"rsym %s %s",kcl_self,tmpfile1);
 #endif
 
 
@@ -142,11 +146,6 @@ typedef int sigset_t ;
 #  define RECREATE_HEAP  init_heap();
 #endif
 
-#define SPECIAL_RSYM "rsym_nt.c"
-#define RSYM_COMMAND(command,system_directory,kcl_self,tmpfile1) \
-    sprintf(command,"rsym %s %s",kcl_self,tmpfile1);
-
-     
 #if defined(IN_SFASL) || defined(IN_RSYM)
 #  undef fopen
 FILE *fopen_binary(char *name,char *mode)

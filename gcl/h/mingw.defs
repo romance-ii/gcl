@@ -4,7 +4,7 @@
 SHELL        = bash
 
 OFLAG	     = -O 
-LIBS	     = -lm -lmingwex -lwsock32
+LIBS	    += -lwsock32
 LIBC 	     =
 
 ODIR_DEBUG   = -g
