@@ -1,16 +1,16 @@
 
 static object LI1();
-#define VMB1 object  V26 ,V25 ,V23 ,V21 ,V20 ,V19 ,V16 ,V15 ,V14 ,V12 ,V11 ,V8 ,V7 ,V6 ,V5 ,V4;
+#define VMB1 object  V27 ,V26 ,V24 ,V22 ,V21 ,V20 ,V17 ,V16 ,V15 ,V12 ,V11 ,V8 ,V7 ,V6 ,V5 ,V4;
 #define VMS1
 #define VMV1
 #define VMR1(VMT1) return(VMT1);
 static object LI2();
-#define VMB2 register object *base=vs_top; object  V48 ,V46 ,V44 ,V42 ,V40 ,V38 ,V36 ,V35 ,V34 ,V33;
+#define VMB2 register object *base=vs_top; object  V50 ,V48 ,V46 ,V44 ,V41 ,V39 ,V37 ,V36 ,V35 ,V34;
 #define VMS2  register object *sup=vs_top+4;vs_top=sup;
 #define VMV2 vs_reserve(4);
 #define VMR2(VMT2) vs_top=base ; return(VMT2);
 static object LI3();
-#define VMB3 register object *base=vs_top; object  V62 ,V59 ,V58 ,V57 ,V55;
+#define VMB3 register object *base=vs_top; object  V64 ,V61 ,V60 ,V59 ,V57;
 #define VMS3 vs_top += 1;
 #define VMV3 vs_reserve(1);
 #define VMR3(VMT3) vs_top=base ; return(VMT3);

@@ -513,6 +513,7 @@ DEF_ORDINARY("FLOATING-POINT-UNDERFLOW",sLfloating_point_underflow,LISP,"");
 DEF_ORDINARY("GENERIC-FUNCTION",sLgeneric_function,LISP,"");
 DEF_ORDINARY("LOGICAL-PATHNAME",sLlogical_pathname,LISP,"");
 DEF_ORDINARY("METHOD",sLmethod,LISP,"");
+/* FIXME -- need this for types in predlib.lsp, why can't we use the keyword sKpackage_error ? */
 DEF_ORDINARY("PACKAGE-ERROR",sLpackage_error,LISP,"");
 DEF_ORDINARY("PARSE-ERROR",sLparse_error,LISP,"");
 DEF_ORDINARY("PRINT-NOT-READABLE",sLprint_not_readable,LISP,"");

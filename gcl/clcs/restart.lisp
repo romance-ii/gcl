@@ -42,7 +42,8 @@
 
 (DEFVAR *RESTART-CLUSTERS* '())
 
-(DEFUN COMPUTE-RESTARTS ()
+; FIXME add condition support
+(DEFUN COMPUTE-RESTARTS (&optional condition)
   #+kcl (nconc (mapcan #'copy-list *RESTART-CLUSTERS*) (kcl-top-restarts))
   #-kcl (mapcan #'copy-list *RESTART-CLUSTERS*))
 

@@ -9,7 +9,7 @@
 \\* ([^:
 ]*" "[^:
 ]*):[ 	]+([^	
-,.]+)" "Node: " "([0-9]+)" "cant find node ~s" lisp::nth (lisp::string system::begin system::end system::header system::name system::info-subfile system::file system::tags) system::*old-lib-directory* system::*lib-directory* system::*info-paths* "info/" "DIR" "dir" ("" ".info") "dir" "(dir)Top" "\\(([^(]*" "(.info)?)\\)" system::*info-data* "(not found ~s)" system::index system::*tk-connection* system::*last-info-file* :exists :return lisp::boolean :configure :cursor "watch" "" "" "[
+,.]+)" "Node: " "([0-9]+)" "cant find node ~s" lisp::nth (lisp::string system::begin system::end system::header system::name system::info-subfile system::file system::tags) system::*old-lib-directory* system::*lib-directory* "info/" system::*info-paths* "DIR" "dir" ("" ".info") "dir" "(dir)Top" "\\(([^(]*" "(.info)?)\\)" system::*info-data* "(not found ~s)" system::index system::*tk-connection* system::*last-info-file* :exists :return lisp::boolean :configure :cursor "watch" "" "" "[
 ][^
 ]*Node:[ 	]+([^
 	,]+)[

@@ -8,8 +8,15 @@ gcl (2.5.0.cvs20020625-58) unstable; urgency=low
   * More shell variable fixes in main makefile
   * Corrected order of push and pushnew
   * Set bfd_error appropriately
+  * Report function for package-error in condition-definitions.lisp;fix
+    internal-package-error deinition and handling;export *restart-
+    clusters* to user error code specified in handler-case;package-error
+    error formatting changes;dummy optional argument added to compute-
+    restarts (for now);Paul Dietz patch to defpackage.lsp fixing several
+    tests (thanks);export/unexport error handling fixes
+  * Recompile c,h and data files
 
- -- Camm Maguire <camm@m.enhanced.com>  Fri, 11 Oct 2002 15:47:13 -0400
+ -- Camm Maguire <camm@m.enhanced.com>  Mon, 14 Oct 2002 08:53:30 -0400
 
 gcl (2.5.0.cvs20020625-57) unstable; urgency=low
 

@@ -539,8 +539,7 @@ BEGIN:
 		else if (intern_flag == EXTERNAL)
 			return;
 	} else
-		FEerror("The symbol ~S is not accessible from ~S.", 2,
-			s, p);
+		FEpackage_error(p,"Symbol not accessible.");
 	for (l = p->p.p_usedbylist;
 	     type_of(l) == t_cons;
 	     l = l->c.c_cdr) {
@@ -570,11 +569,12 @@ object s, p;
 	if (p == keyword_package)
 		FEerror("Cannot unexport a symbol from the keyword.", 0);
 	x = find_symbol(s, p);
-	if (intern_flag != EXTERNAL || x != s)
-FEerror("Cannot unexport the symbol ~S~%\
-from ~S,~%\
-because the symbol is not an external symbol~%\
-of the package.", 2, s, p);
+	if (/* intern_flag != EXTERNAL || */ x != s)
+	  FEpackage_error(p,"Symbol not in package.");
+/* "Cannot unexport the symbol ~S~%\ */
+/* from ~S,~%\ */
+/* because the symbol is not an external symbol~%\ */
+/* of the package.", 2, s, p); */
 	j = pack_hash(s);
 	ep = &P_EXTERNAL(p,j);
 	delete_eq(s, ep);
@@ -1155,7 +1155,7 @@ void
 package_already(n)
 object n;
 {
-	FEerror("A package with the name ~A already exists.", 1, n);
+  FEpackage_error(n,"A package with this name already exists.");
 }
 
 void

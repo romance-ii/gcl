@@ -144,7 +144,7 @@ static object LI24();
 static object LI25();
 static struct { short n,allow_other_keys;object *defaults;
 	 KEYTYPE keys[7];} LI25key={7,0,Cstd_key_defaults,{(void *)14,(void *)20,(void *)21,(void *)11,(void *)9,(void *)7,(void *)8}};
-#define VMB25 register object *base=vs_top; object  V214 ,V213 ,V211 ,V210 ,V209 ,V206 ,V204 ,V201; object Vcs[17];
+#define VMB25 register object *base=vs_top; object  V218 ,V217 ,V215 ,V214 ,V213 ,V201; object Vcs[17];
 #define VMS25  register object *sup=vs_top+6;vs_top=sup;
 #define VMV25 vs_reserve(6);
 #define VMR25(VMT25) vs_top=base ; return(VMT25);

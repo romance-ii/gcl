@@ -21,7 +21,7 @@ static void L23();
 static void L24();
 static void L25();
 #define VC1 object  V16 ,V15 ,V14 ,V13 ,V12 ,V11 ,V10 ,V9 ,V8 ,V7 ,V6 ,V5 ,V4 ,V3 ,V2;
-#define VC2 object  V26 ,V25 ,V24 ,V23 ,V22 ,V21 ,V20 ,V19 ,V18;
+#define VC2 object  V26 ,V25 ,V24 ,V23 ,V22 ,V21 ,V20 ,V18;
 #define VC3 object  V34;
 #define VC4 object  V56 ,V48 ,V47 ,V46;
 #define VC5 object  V59;

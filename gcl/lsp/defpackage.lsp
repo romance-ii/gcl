@@ -212,7 +212,9 @@
 	       (mapcar #'(lambda (list)
 			   `(SHADOWING-IMPORT (mapcar #'(lambda (symbol) (intern symbol ,(first list))) ',(rest list))))
 		       SHADOWING-IMPORTed-from-symbol-names-list))
-	   (USE-PACKAGE ',(or (mapcar #'string (option-values ':USE options)) "LISP"))
+	   (USE-PACKAGE ',(if (member ':USE options ':test #'option-test)
+			      (mapcar #'string (option-values ':USE options))
+			    "LISP"))
 	   ,@(when IMPORTed-from-symbol-names-list
 	       (mapcar #'(lambda (list) `(IMPORT (mapcar #'(lambda (symbol) (intern symbol ,(first list))) ',(rest list))))
 		       IMPORTed-from-symbol-names-list))

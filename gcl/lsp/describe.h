@@ -70,13 +70,13 @@ static object LI15();
 #define VMS16  register object *sup=vs_top+12;vs_top=sup;
 #define VMV16 vs_reserve(12);
 #define VMR16(VMT16) vs_top=base ; return(VMT16);
-#define VC17 object  V135 ,V134 ,V133 ,V132 ,V131 ,V130 ,V129 ,V128 ,V127;
+#define VC17 object  V136 ,V135 ,V134 ,V133 ,V132 ,V131 ,V130 ,V129 ,V128;
 #define VC18
 #define VC19
-#define VC20 object  V149 ,V148 ,V145 ,V144;
-#define VC21 object  V182 ,V181 ,V180 ,V179 ,V178 ,V166 ,V165 ,V164 ,V163 ,V162;
+#define VC20 object  V150 ,V149 ,V146 ,V145;
+#define VC21 object  V183 ,V182 ,V181 ,V180 ,V179 ,V167 ,V166 ,V165 ,V164 ,V163;
 static void L21();
-#define VC22 object  V186 ,V185;
+#define VC22 object  V187 ,V186;
 static void L20();
 #define VC23
 #define VM23 7

@@ -59,10 +59,10 @@ static object LI12();
 #define VMS12 vs_top += 1;
 #define VMV12 vs_reserve(1);
 #define VMR12(VMT12) vs_top=base ; return(VMT12);
-#define VC13 object  V69 ,V68 ,V67 ,V66;
-#define VC14 object  V82 ,V81 ,V80 ,V77 ,V76 ,V75 ,V74 ,V73;
-#define VC15 object  V95 ,V94 ,V93 ,V90 ,V89 ,V88 ,V87 ,V86;
-#define VC16 object  V108 ,V107 ,V106 ,V103 ,V102 ,V101 ,V100 ,V99;
+#define VC13 object  V68 ,V67;
+#define VC14 object  V81 ,V76 ,V75 ,V74;
+#define VC15 object  V94 ,V89 ,V88 ,V87;
+#define VC16 object  V107 ,V102 ,V101 ,V100;
 #define VM16 7
 #define VM15 7
 #define VM14 7

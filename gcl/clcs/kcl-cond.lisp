@@ -43,7 +43,7 @@
 	      (with-simple-restart 
 	       (continue "~a" (apply #'format nil continue-format-string args))
 	       (apply #'error condition-name
-		      :function-name function-name
+		   :function-name function-name
 		      (let ((k-a (mapcan #'list (cdr e-d) args)))
 			(if (simple-condition-class-p condition-name)
 			    (list* :format-string error-format-string
@@ -76,8 +76,8 @@
 (defparameter *internal-error-list*
   '(("FEwrong_type_argument" :wrong-type-argument "~S is not of type ~S."
      internal-type-error :datum :expected-type)
-    ("FEpackage_error" :package-error "A package error occurred on ~S:~S."
-     internal-package-error) ; |<function>| |top - base|
+    ("FEpackage_error" :package-error "A package error occurred on ~S: ~S."
+     internal-package-error :package :message) ; |<function>| |top - base|
     ("FEtoo_few_arguments" :too-few-arguments "~S [or a callee] requires more than ~R argument~:p." 
      internal-simple-control-error) ; |<function>| |top - base|
     ("FEtoo_few_argumentsF" :too-few-arguments "Too few arguments."

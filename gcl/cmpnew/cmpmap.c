@@ -1051,7 +1051,7 @@ object V144;object V145;
 goto TTL;
 TTL:;
 	{register object V146;
-	register object V147;
+	object V147;
 	V146= Cnil;
 	V147= make_cons((V145),Cnil);
 	{register object V148;
@@ -1079,11 +1079,15 @@ T729:;
 	princ_str("= ",VV[11]);
 	(void)((*(LnkLI32))((V149)));
 	princ_char(59,VV[11]);
-	V146= make_cons((V151),(V146));
-	goto T733;}
+	{register object V152;
+	V152= (V151);
+	V146= make_cons((V152),(V146));
+	goto T733;}}
 goto T735;
 T735:;
-	V146= make_cons((V149),(V146));
+	{register object V153;
+	V153= (V149);
+	V146= make_cons((V153),(V146));}
 goto T733;
 T733:;
 	V148= cdr((V148));

@@ -11,17 +11,17 @@ static void L9();
 #define VC1 object  V21 ,V20 ,V19 ,V18 ,V17 ,V16;
 #define VC2
 #define VC3
-#define VC4 object  V82 ,V81 ,V80 ,V79 ,V78 ,V77 ,V76 ,V73 ,V72 ,V71 ,V70 ,V69 ,V68 ,V67 ,V66 ,V65 ,V64 ,V62 ,V61 ,V60 ,V59 ,V58;
-#define VC5 object  V96 ,V95 ,V94 ,V93 ,V92 ,V91 ,V90;
+#define VC4 object  V85 ,V84 ,V83 ,V82 ,V81 ,V80 ,V76 ,V75 ,V74 ,V73 ,V72 ,V71 ,V70 ,V69 ,V68 ,V66 ,V65 ,V64 ,V63 ,V62;
+#define VC5 object  V99 ,V98 ,V97 ,V96 ,V95 ,V94;
 #define VC6
 #define VC7
 #define VC8
-#define VC9 object  V125 ,V124 ,V123;
+#define VC9 object  V131 ,V130 ,V129;
 #define VM9 15
 #define VM8 6
 #define VM7 14
 #define VM6 6
-#define VM5 7
+#define VM5 8
 #define VM4 20
 #define VM3 7
 #define VM2 3

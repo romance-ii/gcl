@@ -401,10 +401,10 @@ FEinvalid_function(object obj)
 
 void
 FEpackage_error(object obj,const char *s)
-{Icall_continue_error_handler(sKpackage_error,
-		     make_simple_string("A package error occurred on ~S:~S."),
-		     2,(obj),make_simple_string(s));
-		     
+{
+  Icall_continue_error_handler(sKpackage_error,
+			       make_simple_string("A package error occurred on ~S: ~S."),
+			       2,(obj),make_simple_string(s));
 }
 
 

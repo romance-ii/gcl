@@ -1221,12 +1221,13 @@ T344:;
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
 	goto T342;}
-	base[0]= (V191);
-	vs_top=(vs_base=base+0)+1;
+	{object V204;
+	base[1]= (V191);
+	vs_top=(vs_base=base+1)+1;
 	Lfill_pointer();
 	vs_top=sup;
 	V204= vs_base[0];
-	V193= ON_STACK_CONS(V204,(V193));
+	V193= ON_STACK_CONS((V204),(V193));}
 	V193= ON_STACK_CONS(VV[11],(V193));
 goto T342;
 T342:;
@@ -1237,42 +1238,43 @@ T342:;
 	V194= vs_base[0];
 	if(((V194))==(Ct)){
 	goto T362;}
-	V193= ON_STACK_CONS((V194),(V193));
+	V193= ON_STACK_CONS(V194,(V193));
 	V193= ON_STACK_CONS(VV[8],(V193));
 goto T362;
 T362:;
-	{register object x= VV[14],V205= (V193);
-	while(!endp(V205))
-	if(eql(x,V205->c.c_car)){
+	{register object x= VV[14],V208= (V193);
+	while(!endp(V208))
+	if(eql(x,V208->c.c_car)){
 	goto T368;
-	}else V205=V205->c.c_cdr;}
-	base[0]= (V191);
-	vs_top=(vs_base=base+0)+1;
+	}else V208=V208->c.c_cdr;}
+	{object V209;
+	base[1]= (V191);
+	vs_top=(vs_base=base+1)+1;
 	(void) (*Lnk31)();
 	vs_top=sup;
-	V206= vs_base[0];
-	V193= ON_STACK_CONS(V206,(V193));
+	V209= vs_base[0];
+	V193= ON_STACK_CONS((V209),(V193));}
 	V193= ON_STACK_CONS(VV[14],(V193));
 goto T368;
 T368:;
-	{register object V207;
+	{register object V211;
 	base[0]= (V192);
 	base[1]= VV[15];
 	base[2]= Ct;
-	{object V208;
-	V208= (V193);
+	{object V212;
+	V212= (V193);
 	 vs_top=base+3;
-	 while(!endp(V208))
-	 {vs_push(car(V208));V208=cdr(V208);}
+	 while(!endp(V212))
+	 {vs_push(car(V212));V212=cdr(V212);}
 	vs_base=base+0;}
 	(void) (*Lnk28)();
 	vs_top=sup;
-	V207= vs_base[0];
+	V211= vs_base[0];
 	if((cdr((V192)))==Cnil){
 	goto T382;}
-	V209= cdr((V192));
-	V210= (*(LnkLI32))((V191));
-	if(!(equal(/* INLINE-ARGS */V209,cdr(/* INLINE-ARGS */V210)))){
+	V213= cdr((V192));
+	V214= (*(LnkLI32))((V191));
+	if(!(equal(/* INLINE-ARGS */V213,cdr(/* INLINE-ARGS */V214)))){
 	goto T383;}
 	if(!(((V194))==(VV[16]))){
 	goto T382;}
@@ -1280,72 +1282,72 @@ T368:;
 	vs_top=(vs_base=base+0)+1;
 	Llast();
 	vs_top=sup;
-	V211= vs_base[0];
-	{int V212= fix(car(V211));
-	if(!((0)==((long)(V212>=0&&(8)>0?(V212)%(8):imod(V212,8))))){
+	V215= vs_base[0];
+	{int V216= fix(car(V215));
+	if(!((0)==((long)(V216>=0&&(8)>0?(V216)%(8):imod(V216,8))))){
 	goto T383;}}
 goto T382;
 T382:;
 	base[0]= (V191);
-	base[1]= (V207);
+	base[1]= (V211);
 	base[2]= small_fixnum(0);
 	base[3]= small_fixnum(0);
-	base[5]= (V207);
+	base[5]= (V211);
 	vs_top=(vs_base=base+5)+1;
 	(void) (*Lnk33)();
 	vs_top=sup;
-	V213= vs_base[0];
+	V217= vs_base[0];
 	base[5]= (V191);
 	vs_top=(vs_base=base+5)+1;
 	(void) (*Lnk33)();
 	vs_top=sup;
-	V214= vs_base[0];
-	base[4]= (number_compare(V213,V214)<=0?(V213):V214);
+	V218= vs_base[0];
+	base[4]= (number_compare(V217,V218)<=0?(V217):V218);
 	vs_top=(vs_base=base+0)+5;
 	(void) (*Lnk34)();
 	vs_top=sup;
 	goto T381;
 goto T383;
 T383:;
-	{register object V215;
+	{register object V219;
 	base[0]= make_fixnum((long)length((V192)));
 	base[1]= VV[7];
 	base[2]= small_fixnum(0);
 	vs_top=(vs_base=base+0)+3;
 	Lmake_list();
 	vs_top=sup;
-	V215= vs_base[0];
+	V219= vs_base[0];
 goto T407;
 T407:;
 	base[0]= (V191);
-	{object V216;
-	V216= (V215);
+	{object V220;
+	V220= (V219);
 	 vs_top=base+1;
-	 while(!endp(V216))
-	 {vs_push(car(V216));V216=cdr(V216);}
+	 while(!endp(V220))
+	 {vs_push(car(V220));V220=cdr(V220);}
 	vs_base=base+0;}
 	(void) (*Lnk35)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
 	goto T410;}
-	base[0]= (V207);
+	base[0]= (V211);
 	base[2]= (V191);
-	{object V217;
-	V217= (V215);
+	{object V221;
+	V221= (V219);
 	 vs_top=base+3;
-	 while(!endp(V217))
-	 {vs_push(car(V217));V217=cdr(V217);}
+	 while(!endp(V221))
+	 {vs_push(car(V221));V221=cdr(V221);}
 	vs_base=base+2;}
 	Laref();
 	vs_top=sup;
 	base[1]= vs_base[0];
-	base[2]= (V215);
+	base[2]= (V219);
 	vs_top=(vs_base=base+0)+3;
 	(void) (*Lnk26)();
 	vs_top=sup;
 goto T410;
 T410:;
-	if(((*(LnkLI27))((V215),(V192)))==Cnil){
+	if(((*(LnkLI27))((V219),(V192)))==Cnil){
 	goto T420;}
 	goto T381;
 goto T420;
@@ -1354,7 +1356,7 @@ T420:;
 goto T381;
 T381:;
 	base[0]= (V191);
-	base[1]= (V207);
+	base[1]= (V211);
 	vs_top=(vs_base=base+0)+2;
 	siLreplace_array();
 	vs_top=sup;
@@ -1392,8 +1394,8 @@ T440:;
 	vs_top=sup;
 goto T430;
 T430:;
-	{object V218 = (V191);
-	VMR25(V218)}}}
+	{object V222 = (V191);
+	VMR25(V222)}}}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}

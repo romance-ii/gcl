@@ -19,17 +19,17 @@ static object LI3();
 #define VC7 object  V71 ,V70 ,V66 ,V65;
 #define VC8 object  V88 ,V87 ,V86 ,V85 ,V81 ,V80 ,V79 ,V75 ,V74 ,V73;
 static object LI9();
-#define VMB9 register object *base=vs_top; object  V116 ,V113 ,V112 ,V107 ,V103 ,V98;
+#define VMB9 register object *base=vs_top; object  V119 ,V116 ,V115;
 #define VMS9  register object *sup=vs_top+9;vs_top=sup;
 #define VMV9 vs_reserve(9);
 #define VMR9(VMT9) vs_top=base ; return(VMT9);
 static object LI10();
-#define VMB10 object  V132 ,V130;
+#define VMB10 object  V135 ,V133;
 #define VMS10
 #define VMV10
 #define VMR10(VMT10) return(VMT10);
 static object LI11();
-#define VMB11 object  V138 ,V137;
+#define VMB11 object  V141 ,V140;
 #define VMS11
 #define VMV11
 #define VMR11(VMT11) return(VMT11);

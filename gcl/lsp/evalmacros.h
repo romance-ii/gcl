@@ -36,24 +36,24 @@ static void L28();
 #define VC7 object  V31;
 #define VC8 object  V35 ,V34 ,V33;
 #define VC9 object  V48 ,V47 ,V46 ,V45 ,V44 ,V43 ,V42 ,V41 ,V40;
-#define VC10 object  V57 ,V56 ,V54 ,V53;
+#define VC10 object  V54 ,V53;
 #define VC11 object  V64 ,V63 ,V62;
 #define VC12
 #define VC13 object  V67;
 #define VC14 object  V70 ,V69;
-#define VC15 object  V74 ,V73;
-#define VC16 object  V79 ,V78 ,V77;
-#define VC17 object  V83 ,V82 ,V81;
+#define VC15 object  V75 ,V74;
+#define VC16 object  V81 ,V80 ,V79;
+#define VC17 object  V85 ,V84 ,V83;
 #define VC18
-#define VC19 object  V93 ,V92 ,V91 ,V90;
-#define VC20 object  V103 ,V102 ,V101 ,V100 ,V99;
-#define VC21 object  V116 ,V115 ,V114 ,V113 ,V112 ,V111 ,V110 ,V109;
-#define VC22 object  V129 ,V128 ,V127 ,V126 ,V125 ,V124 ,V123 ,V122;
-#define VC23 object  V135 ,V134 ,V133;
+#define VC19 object  V95 ,V94 ,V92;
+#define VC20 object  V105 ,V104 ,V102 ,V101;
+#define VC21 object  V121 ,V120 ,V119 ,V118 ,V117 ,V116 ,V115;
+#define VC22 object  V137 ,V136 ,V135 ,V134 ,V133 ,V132 ,V131;
+#define VC23 object  V143 ,V142 ,V141;
 #define VC24
-#define VC25 object  V141 ,V140 ,V139;
-#define VC26 object  V145 ,V144;
-#define VC27 object  V147;
+#define VC25 object  V149 ,V148 ,V147;
+#define VC26 object  V153 ,V152;
+#define VC27 object  V155;
 #define VC28
 #define VM28 4
 #define VM27 4
@@ -61,8 +61,8 @@ static void L28();
 #define VM25 8
 #define VM24 4
 #define VM23 9
-#define VM22 11
-#define VM21 11
+#define VM22 12
+#define VM21 12
 #define VM20 6
 #define VM19 5
 #define VM18 4

@@ -470,15 +470,15 @@ object V59;
 {	 VMB12 VMS12 VMV12
 goto TTL;
 TTL:;
-	{object V60;
-	object V61;
-	V60= symbol_value(VV[6]);
-	V61= make_cons((V59),caddr((V60)));
-	if(type_of(cddr((V60)))!=t_cons)FEwrong_type_argument(Scons,cddr((V60)));
-	(cddr((V60)))->c.c_car = (V61);
-	(void)(cddr((V60)));
-	{object V62 = (V61);
-	VMR12(V62)}}
+	{object V61;
+	object V62;
+	V61= symbol_value(VV[6]);
+	V62= make_cons(V59,caddr((V61)));
+	if(type_of(cddr((V61)))!=t_cons)FEwrong_type_argument(Scons,cddr((V61)));
+	(cddr((V61)))->c.c_car = (V62);
+	(void)(cddr((V61)));
+	{object V63 = (V62);
+	VMR12(V63)}}
 	base[0]=base[0];
 	return Cnil;
 }
@@ -490,37 +490,39 @@ static void L13()
 	vs_reserve(VM13);
 	check_arg(2);
 	vs_top=sup;
-	{object V63=base[0]->c.c_cdr;
-	base[2]= V63;
+	{object V64=base[0]->c.c_cdr;
+	base[2]= V64;
 	base[3]= Cnil;}
-	{register object V64;
-	register object V65;
-	V64= base[2];
-	V65= car((V64));
+	{register object V65;
+	register object V66;
+	V65= base[2];
+	V66= car((V65));
 goto T173;
 T173:;
-	if(!(endp_prop((V64)))){
+	if(!(endp_prop((V65)))){
 	goto T174;}
-	V66= make_cons(Cnil,base[3]);
-	V67= reverse(/* INLINE-ARGS */V66);
-	base[5]= make_cons(VV[29],/* INLINE-ARGS */V67);
+	V67= make_cons(Cnil,base[3]);
+	V68= reverse(/* INLINE-ARGS */V67);
+	base[5]= make_cons(VV[29],/* INLINE-ARGS */V68);
 	vs_top=(vs_base=base+5)+1;
 	return;
 goto T174;
 T174:;
-	if(!(type_of((V65))==t_string)){
+	if(!(type_of((V66))==t_string)){
 	goto T180;}
-	V68= list(3,VV[30],(V65),VV[0]);
-	base[3]= make_cons(/* INLINE-ARGS */V68,base[3]);
-	goto T178;
+	{register object V69;
+	V69= list(3,VV[30],(V66),VV[0]);
+	base[3]= make_cons((V69),base[3]);
+	goto T178;}
 goto T180;
 T180:;
-	V69= list(2,VV[31],(V65));
-	base[3]= make_cons(/* INLINE-ARGS */V69,base[3]);
+	{register object V70;
+	V70= list(2,VV[31],(V66));
+	base[3]= make_cons((V70),base[3]);}
 goto T178;
 T178:;
-	V64= cdr((V64));
-	V65= car((V64));
+	V65= cdr((V65));
+	V66= car((V65));
 	goto T173;}
 }
 /*	macro definition for WT-H	*/
@@ -531,78 +533,82 @@ static void L14()
 	vs_reserve(VM14);
 	check_arg(2);
 	vs_top=sup;
-	{object V70=base[0]->c.c_cdr;
-	base[2]= V70;
+	{object V71=base[0]->c.c_cdr;
+	base[2]= V71;
 	base[3]= Cnil;}
 	if(!(endp_prop(base[2]))){
-	goto T191;}
+	goto T193;}
 	base[4]= VV[32];
 	vs_top=(vs_base=base+4)+1;
 	return;
-goto T191;
-T191:;
+goto T193;
+T193:;
 	if(!(type_of(car(base[2]))==t_string)){
-	goto T194;}
-	{register object V71;
-	register object V72;
-	V71= cdr(base[2]);
-	V72= car((V71));
-goto T199;
-T199:;
-	if(!(endp_prop((V71)))){
-	goto T200;}
-	V73= (VFUN_NARGS=3,(*(LnkLI55))(VV[33],VV[34],car(base[2])));
-	V74= list(3,VV[30],/* INLINE-ARGS */V73,VV[5]);
-	V75= make_cons(Cnil,base[3]);
-	base[6]= listA(3,VV[29],/* INLINE-ARGS */V74,reverse(/* INLINE-ARGS */V75));
+	goto T196;}
+	{register object V72;
+	register object V73;
+	V72= cdr(base[2]);
+	V73= car((V72));
+goto T201;
+T201:;
+	if(!(endp_prop((V72)))){
+	goto T202;}
+	V74= (VFUN_NARGS=3,(*(LnkLI55))(VV[33],VV[34],car(base[2])));
+	V75= list(3,VV[30],/* INLINE-ARGS */V74,VV[5]);
+	V76= make_cons(Cnil,base[3]);
+	base[6]= listA(3,VV[29],/* INLINE-ARGS */V75,reverse(/* INLINE-ARGS */V76));
 	vs_top=(vs_base=base+6)+1;
 	return;
-goto T200;
-T200:;
-	if(!(type_of((V72))==t_string)){
+goto T202;
+T202:;
+	if(!(type_of((V73))==t_string)){
+	goto T208;}
+	{register object V77;
+	V77= list(3,VV[30],(V73),VV[5]);
+	base[3]= make_cons((V77),base[3]);
 	goto T206;}
-	V76= list(3,VV[30],(V72),VV[5]);
-	base[3]= make_cons(/* INLINE-ARGS */V76,base[3]);
-	goto T204;
+goto T208;
+T208:;
+	{register object V78;
+	V78= list(2,VV[35],(V73));
+	base[3]= make_cons((V78),base[3]);}
 goto T206;
 T206:;
-	V77= list(2,VV[35],(V72));
-	base[3]= make_cons(/* INLINE-ARGS */V77,base[3]);
-goto T204;
-T204:;
-	V71= cdr((V71));
-	V72= car((V71));
-	goto T199;}
-goto T194;
-T194:;
-	{register object V78;
-	register object V79;
-	V78= base[2];
-	V79= car((V78));
-goto T218;
-T218:;
-	if(!(endp_prop((V78)))){
-	goto T219;}
-	V80= make_cons(Cnil,base[3]);
-	base[5]= listA(3,VV[29],VV[36],reverse(/* INLINE-ARGS */V80));
+	V72= cdr((V72));
+	V73= car((V72));
+	goto T201;}
+goto T196;
+T196:;
+	{register object V79;
+	register object V80;
+	V79= base[2];
+	V80= car((V79));
+goto T222;
+T222:;
+	if(!(endp_prop((V79)))){
+	goto T223;}
+	V81= make_cons(Cnil,base[3]);
+	base[5]= listA(3,VV[29],VV[36],reverse(/* INLINE-ARGS */V81));
 	vs_top=(vs_base=base+5)+1;
 	return;
-goto T219;
-T219:;
-	if(!(type_of((V79))==t_string)){
-	goto T225;}
-	V81= list(3,VV[30],(V79),VV[5]);
-	base[3]= make_cons(/* INLINE-ARGS */V81,base[3]);
-	goto T223;
-goto T225;
-T225:;
-	V82= list(2,VV[35],(V79));
-	base[3]= make_cons(/* INLINE-ARGS */V82,base[3]);
 goto T223;
 T223:;
-	V78= cdr((V78));
-	V79= car((V78));
-	goto T218;}
+	if(!(type_of((V80))==t_string)){
+	goto T229;}
+	{register object V82;
+	V82= list(3,VV[30],(V80),VV[5]);
+	base[3]= make_cons((V82),base[3]);
+	goto T227;}
+goto T229;
+T229:;
+	{register object V83;
+	V83= list(2,VV[35],(V80));
+	base[3]= make_cons((V83),base[3]);}
+goto T227;
+T227:;
+	V79= cdr((V79));
+	V80= car((V79));
+	goto T222;}
 }
 /*	macro definition for WT-NL	*/
 
@@ -612,78 +618,82 @@ static void L15()
 	vs_reserve(VM15);
 	check_arg(2);
 	vs_top=sup;
-	{object V83=base[0]->c.c_cdr;
-	base[2]= V83;
+	{object V84=base[0]->c.c_cdr;
+	base[2]= V84;
 	base[3]= Cnil;}
 	if(!(endp_prop(base[2]))){
-	goto T236;}
+	goto T242;}
 	base[4]= VV[37];
 	vs_top=(vs_base=base+4)+1;
 	return;
-goto T236;
-T236:;
+goto T242;
+T242:;
 	if(!(type_of(car(base[2]))==t_string)){
-	goto T239;}
-	{register object V84;
-	register object V85;
-	V84= cdr(base[2]);
-	V85= car((V84));
-goto T244;
-T244:;
-	if(!(endp_prop((V84)))){
 	goto T245;}
-	V86= (VFUN_NARGS=3,(*(LnkLI55))(VV[33],VV[38],car(base[2])));
-	V87= list(3,VV[30],/* INLINE-ARGS */V86,VV[0]);
-	V88= make_cons(Cnil,base[3]);
-	base[6]= listA(3,VV[29],/* INLINE-ARGS */V87,reverse(/* INLINE-ARGS */V88));
+	{register object V85;
+	register object V86;
+	V85= cdr(base[2]);
+	V86= car((V85));
+goto T250;
+T250:;
+	if(!(endp_prop((V85)))){
+	goto T251;}
+	V87= (VFUN_NARGS=3,(*(LnkLI55))(VV[33],VV[38],car(base[2])));
+	V88= list(3,VV[30],/* INLINE-ARGS */V87,VV[0]);
+	V89= make_cons(Cnil,base[3]);
+	base[6]= listA(3,VV[29],/* INLINE-ARGS */V88,reverse(/* INLINE-ARGS */V89));
 	vs_top=(vs_base=base+6)+1;
 	return;
-goto T245;
-T245:;
-	if(!(type_of((V85))==t_string)){
-	goto T251;}
-	V89= list(3,VV[30],(V85),VV[0]);
-	base[3]= make_cons(/* INLINE-ARGS */V89,base[3]);
-	goto T249;
 goto T251;
 T251:;
-	V90= list(2,VV[31],(V85));
-	base[3]= make_cons(/* INLINE-ARGS */V90,base[3]);
-goto T249;
-T249:;
-	V84= cdr((V84));
-	V85= car((V84));
-	goto T244;}
-goto T239;
-T239:;
+	if(!(type_of((V86))==t_string)){
+	goto T257;}
+	{register object V90;
+	V90= list(3,VV[30],(V86),VV[0]);
+	base[3]= make_cons((V90),base[3]);
+	goto T255;}
+goto T257;
+T257:;
 	{register object V91;
-	register object V92;
-	V91= base[2];
-	V92= car((V91));
-goto T263;
-T263:;
-	if(!(endp_prop((V91)))){
-	goto T264;}
-	V93= make_cons(Cnil,base[3]);
-	base[5]= listA(3,VV[29],VV[39],reverse(/* INLINE-ARGS */V93));
+	V91= list(2,VV[31],(V86));
+	base[3]= make_cons((V91),base[3]);}
+goto T255;
+T255:;
+	V85= cdr((V85));
+	V86= car((V85));
+	goto T250;}
+goto T245;
+T245:;
+	{register object V92;
+	register object V93;
+	V92= base[2];
+	V93= car((V92));
+goto T271;
+T271:;
+	if(!(endp_prop((V92)))){
+	goto T272;}
+	V94= make_cons(Cnil,base[3]);
+	base[5]= listA(3,VV[29],VV[39],reverse(/* INLINE-ARGS */V94));
 	vs_top=(vs_base=base+5)+1;
 	return;
-goto T264;
-T264:;
-	if(!(type_of((V92))==t_string)){
-	goto T270;}
-	V94= list(3,VV[30],(V92),VV[0]);
-	base[3]= make_cons(/* INLINE-ARGS */V94,base[3]);
-	goto T268;
-goto T270;
-T270:;
-	V95= list(2,VV[31],(V92));
-	base[3]= make_cons(/* INLINE-ARGS */V95,base[3]);
-goto T268;
-T268:;
-	V91= cdr((V91));
-	V92= car((V91));
-	goto T263;}
+goto T272;
+T272:;
+	if(!(type_of((V93))==t_string)){
+	goto T278;}
+	{register object V95;
+	V95= list(3,VV[30],(V93),VV[0]);
+	base[3]= make_cons((V95),base[3]);
+	goto T276;}
+goto T278;
+T278:;
+	{register object V96;
+	V96= list(2,VV[31],(V93));
+	base[3]= make_cons((V96),base[3]);}
+goto T276;
+T276:;
+	V92= cdr((V92));
+	V93= car((V92));
+	goto T271;}
 }
 /*	macro definition for WT-NL1	*/
 
@@ -693,78 +703,82 @@ static void L16()
 	vs_reserve(VM16);
 	check_arg(2);
 	vs_top=sup;
-	{object V96=base[0]->c.c_cdr;
-	base[2]= V96;
+	{object V97=base[0]->c.c_cdr;
+	base[2]= V97;
 	base[3]= Cnil;}
 	if(!(endp_prop(base[2]))){
-	goto T281;}
+	goto T291;}
 	base[4]= VV[40];
 	vs_top=(vs_base=base+4)+1;
 	return;
-goto T281;
-T281:;
+goto T291;
+T291:;
 	if(!(type_of(car(base[2]))==t_string)){
-	goto T284;}
-	{register object V97;
-	register object V98;
-	V97= cdr(base[2]);
-	V98= car((V97));
-goto T289;
-T289:;
-	if(!(endp_prop((V97)))){
-	goto T290;}
-	V99= (VFUN_NARGS=3,(*(LnkLI55))(VV[33],VV[41],car(base[2])));
-	V100= list(3,VV[30],/* INLINE-ARGS */V99,VV[0]);
-	V101= make_cons(Cnil,base[3]);
-	base[6]= listA(3,VV[29],/* INLINE-ARGS */V100,reverse(/* INLINE-ARGS */V101));
+	goto T294;}
+	{register object V98;
+	register object V99;
+	V98= cdr(base[2]);
+	V99= car((V98));
+goto T299;
+T299:;
+	if(!(endp_prop((V98)))){
+	goto T300;}
+	V100= (VFUN_NARGS=3,(*(LnkLI55))(VV[33],VV[41],car(base[2])));
+	V101= list(3,VV[30],/* INLINE-ARGS */V100,VV[0]);
+	V102= make_cons(Cnil,base[3]);
+	base[6]= listA(3,VV[29],/* INLINE-ARGS */V101,reverse(/* INLINE-ARGS */V102));
 	vs_top=(vs_base=base+6)+1;
 	return;
-goto T290;
-T290:;
-	if(!(type_of((V98))==t_string)){
-	goto T296;}
-	V102= list(3,VV[30],(V98),VV[0]);
-	base[3]= make_cons(/* INLINE-ARGS */V102,base[3]);
-	goto T294;
-goto T296;
-T296:;
-	V103= list(2,VV[31],(V98));
-	base[3]= make_cons(/* INLINE-ARGS */V103,base[3]);
+goto T300;
+T300:;
+	if(!(type_of((V99))==t_string)){
+	goto T306;}
+	{register object V103;
+	V103= list(3,VV[30],(V99),VV[0]);
+	base[3]= make_cons((V103),base[3]);
+	goto T304;}
+goto T306;
+T306:;
+	{register object V104;
+	V104= list(2,VV[31],(V99));
+	base[3]= make_cons((V104),base[3]);}
+goto T304;
+T304:;
+	V98= cdr((V98));
+	V99= car((V98));
+	goto T299;}
 goto T294;
 T294:;
-	V97= cdr((V97));
-	V98= car((V97));
-	goto T289;}
-goto T284;
-T284:;
-	{register object V104;
-	register object V105;
-	V104= base[2];
-	V105= car((V104));
-goto T308;
-T308:;
-	if(!(endp_prop((V104)))){
-	goto T309;}
-	V106= make_cons(Cnil,base[3]);
-	base[5]= listA(3,VV[29],VV[42],reverse(/* INLINE-ARGS */V106));
+	{register object V105;
+	register object V106;
+	V105= base[2];
+	V106= car((V105));
+goto T320;
+T320:;
+	if(!(endp_prop((V105)))){
+	goto T321;}
+	V107= make_cons(Cnil,base[3]);
+	base[5]= listA(3,VV[29],VV[42],reverse(/* INLINE-ARGS */V107));
 	vs_top=(vs_base=base+5)+1;
 	return;
-goto T309;
-T309:;
-	if(!(type_of((V105))==t_string)){
-	goto T315;}
-	V107= list(3,VV[30],(V105),VV[0]);
-	base[3]= make_cons(/* INLINE-ARGS */V107,base[3]);
-	goto T313;
-goto T315;
-T315:;
-	V108= list(2,VV[31],(V105));
-	base[3]= make_cons(/* INLINE-ARGS */V108,base[3]);
-goto T313;
-T313:;
-	V104= cdr((V104));
-	V105= car((V104));
-	goto T308;}
+goto T321;
+T321:;
+	if(!(type_of((V106))==t_string)){
+	goto T327;}
+	{register object V108;
+	V108= list(3,VV[30],(V106),VV[0]);
+	base[3]= make_cons((V108),base[3]);
+	goto T325;}
+goto T327;
+T327:;
+	{register object V109;
+	V109= list(2,VV[31],(V106));
+	base[3]= make_cons((V109),base[3]);}
+goto T325;
+T325:;
+	V105= cdr((V105));
+	V106= car((V105));
+	goto T320;}
 }
 static object  LnkTLI55(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[55],(void **)&LnkLI55,ap);va_end(ap);return V1;} /* CONCATENATE */
 static void LnkT54(){ call_or_link(VV[54],(void **)&Lnk54);} /* CLOSE-FASD */

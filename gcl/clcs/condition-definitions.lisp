@@ -136,7 +136,15 @@
   (PACKAGE)
   #+(or clos pcl)
   ((PACKAGE :initarg :PACKAGE
-	    :reader PACKAGE-ERROR-PACKAGE)))
+	    :reader PACKAGE-ERROR-PACKAGE)
+   (MESSAGE :initarg :MESSAGE
+	    :reader PACKAGE-ERROR-MESSAGE))
+  (:report
+    (lambda (condition stream)
+      (format stream "A package error occurred on ~S: ~S."
+	      (PACKAGE-ERROR-PACKAGE CONDITION)
+	      (PACKAGE-ERROR-MESSAGE CONDITION)))))
+	      
 
 (DEFINE-CONDITION CELL-ERROR (ERROR)
   #-(or clos pcl)
@@ -223,18 +231,19 @@
 				    (type-error-expected-type condition)))))
 
 (define-condition internal-package-error 
-    (#+(or clos pcl) internal-error simple-condition)
-  #-(or clos pcl)
-  ((function-name nil))
-  #+(or clos pcl)
-  ()
-  #-(or clos pcl)(:conc-name %%internal-package-error-)
-  #-(or clos pcl)(:report (lambda (condition stream)
+   (#+(or clos pcl) internal-error package-error)
+ #-(or clos pcl)
+ ((function-name nil))
+ #+(or clos pcl)
+ ()
+ #-(or clos pcl)(:conc-name %%internal-package-error-)
+ #-(or clos pcl)(:report (lambda (condition stream)
 			    (when (internal-error-function-name condition)
 			      (format stream "Error in ~S [or a callee]: "
 				      (internal-error-function-name condition)))
-			    (format stream "A package error occurred on ~S."
-				    (type-error-datum condition)))))
+			    (format stream "A package error occurred on ~S: ~S."
+				    (package-error-package condition)
+				    (package-error-message condition)))))
 
 (define-condition internal-simple-program-error 
     (#+(or clos pcl) internal-simple-error program-error)

@@ -42,7 +42,7 @@ static void L30();
 #define VC11 object  V86 ,V84;
 #define VC12 object  V90;
 #define VC13
-#define VC14 object  V101 ,V97 ,V95;
+#define VC14 object  V101 ,V97;
 #define VC15
 #define VC16
 #define VC17
