@@ -122,37 +122,53 @@ $(RSYM): $(SPECIAL_RSYM) $(HDIR)/mdefs.h
 $(HDIR)/mdefs.h: $(HDIR)/include.h
 	cat $(HDIR)/include.h | sed -e "/include/d" > $(HDIR)/mdefs.h
 
-libgcl.a: $(OBJS) sys_gcl.o gmpfiles bfdfiles
+libgcl.a: $(OBJS) sys_gcl.o gmpfiles bfdfiles plt_gcl.o
 	rm -rf $@
 	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
-libpre_gcl.a: $(OOBJS) sys_pre_gcl.o gmpfiles bfdfiles
+libpre_gcl.a: $(OOBJS) sys_pre_gcl.o gmpfiles bfdfiles plt_pre_gcl.o
 	rm -rf $@
 	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
-libmod_gcl.a: $(OBJS) $(MODOBJS) sys_mod_gcl.o gmpfiles bfdfiles
+libmod_gcl.a: $(OBJS) $(MODOBJS) sys_mod_gcl.o gmpfiles bfdfiles plt_mod_gcl.o
 	rm -rf $@
 	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
 libxgcl.a: libgcl.a
 	ln -snf $< $@
 
-libansi_gcl.a: $(OBJS) $(ANSIOBJS) sys_ansi_gcl.o gmpfiles bfdfiles
+libansi_gcl.a: $(OBJS) $(ANSIOBJS) sys_ansi_gcl.o gmpfiles bfdfiles plt_ansi_gcl.o
 	rm -rf $@
 	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
-libpcl_gcl.a: $(OBJS) $(PCLOBJS) sys_pcl_gcl.o gmpfiles bfdfiles
+libpcl_gcl.a: $(OBJS) $(PCLOBJS) sys_pcl_gcl.o gmpfiles bfdfiles plt_pcl_gcl.o
 	rm -rf $@
 	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
 raw_%: lib%.a libgclp.a $(SYSTEM_OBJS) $(EXTRAS)
-	$(CC) -o raw_$*$(EXE) $(filter %.o,$^) \
+	touch map_$*
+	$(CC) -Wl,-Map map_$* -o raw_$*$(EXE) $(filter %.o,$^) \
 		-L. $(EXTRA_LD_LIBS) $(LD_LIBS_PRE) -l$* $(LD_LIBS_POST)
+	diff map_$* map_$*.old >/dev/null || (cp map_$* map_$*.old && rm -f $@ && $(MAKE) $@)
+	cp map_$*.old map_$*
+
+map_%:
+	touch $@
+
+plt_%.h: map_%
+	cat $< | awk '/^ .plt/ {if (NF==4) i=1;next;} \
+		{if (!NF) i=0; if (!i) next; }\
+		{b=$$2; sub("@.*$$","",b);A[++k]="{\"" b "\"," $$1 "}"} \
+		END {l=asort(A);for (i=1;i<=l;i++) printf("%s%s\n",A[i],i==l ? "" : ",")}' >$@
+
+plt_%.o: plt_%.h plt.c
+	ln -snf $< plt.h
+	$(CC) -c -o $@ plt.c $(CFLAGS) -I$(HDIR) -I$(ODIR)
 
 clean:
 	rm -rf  saved_*$(EXE) raw_*$(EXE) *.o core a.out $(RSYM) \
 		$(LSPDIR)/auto_new.lsp foo *maxima* init_*.lsp lib*.a gmp* bfd* *.lsp.tmp \
-		gazonk*.lsp
+		gazonk*.lsp plt*h map_*
 
 .INTERMEDIATE: init_ansi_gcl.lsp.tmp init_gcl.lsp.tmp raw_gcl raw_ansi_gcl
 .PRECIOUS: init_gcl.lsp init_ansi_gcl.lsp

@@ -1,9 +1,7 @@
 typedef struct {
   const char *n;
-  const void *f;
+  unsigned long ad;
 } Plt;
-
-#include "void.h"
 
 #define join(a_,b_) a_ ## b_
 #define Join(a_,b_) join(a_,b_)
@@ -12,19 +10,19 @@ typedef struct {
 int
 my_plt(const char *s,unsigned long *v) {
 
-  const char *c;
+  const char *c,*s1=s;
   Plt mplt[]={
-#include "undef.h"
+#include "plt.h"
   },*p=mplt,*pe=p+sizeof(mplt)/sizeof(*mplt);
 
   for (;p<pe;p++) {
-    for (c=p->n;*c && *s && *c==*s;c++,s++);
+    for (s=s1,c=p->n;*c && *s && *c==*s;c++,s++);
     if (!*c && !*s)
       break;
   }
   if (p==pe)
     return -1;
-  *v=(unsigned long)p->f;
+  *v=p->ad;
   return 0;
 
 }

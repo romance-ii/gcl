@@ -79,13 +79,14 @@ build_symbol_table_bfd(void) {
       h->type=bfd_link_hash_defined;
       if (!q[u]->section)
 	FEerror("Symbol ~S is missing section",1,make_simple_string(q[u]->name));
-      if (q[u]->value || q[u]->flags != BSF_FUNCTION)
-	h->u.def.value=q[u]->value+q[u]->section->vma;
-      else if (!my_plt(q[u]->name,&pa)) {
-	printf("my_plt %s %lu\n",q[u]->name,pa);
-	h->u.def.value=pa+q[u]->section->vma;
-      } /* else */
-/* 	printf("missing %s\n",q[u]->name); */
+      if (!my_plt(q[u]->name,&pa)) {
+/* 	printf("my_plt %s %p\n",q[u]->name,(void *)pa); */
+	if (q[u]->value && q[u]->value!=pa)
+	  FEerror("plt address mismatch", 0);
+	else
+	  q[u]->value=pa;
+      }
+      h->u.def.value=q[u]->value+q[u]->section->vma;
       h->u.def.section=q[u]->section;
     }
 
@@ -114,13 +115,6 @@ LFD(build_symbol_table)(void) {
   {
 
     char tmpfile1[80],command[300];
-    unsigned long v;
-
-    /* Link in my_plt for SPECIAL_RSYM case required for binutils >=2.14.90.0.8*/
-    /* FIXME use my_plt as in build_symbol_table_bfd here for safety */
-    /* 20040227 CM */
-    my_plt("",&v);
-
 
     snprintf(tmpfile1,sizeof(tmpfile1),"rsym%d",getpid());
 #ifndef STAND
@@ -142,6 +136,21 @@ LFD(build_symbol_table)(void) {
     read_special_symbols(tmpfile1);
     unlink(tmpfile1);
     qsort((char*)(c_table.ptable),(int)(c_table.length),sizeof(struct node),node_compare);
+
+    {
+      struct node *p,*pe;
+      for (p=*c_table.ptable,pe=p+c_table.length;p<pe;p++) {
+	unsigned long pa;
+	if (!my_plt(p->string,&pa)) {
+/* 	  printf("my_plt %s %p %p\n",p->string,(void *)pa,(void *)p->address); */
+	  if (p->address && p->address!=pa)
+	    FEerror("plt address mismatch",0);
+	  else
+	    p->address=pa;
+	}
+      }
+    }
+
   }
 #else /* special_rsym */
 
