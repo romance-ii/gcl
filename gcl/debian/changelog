@@ -6,8 +6,9 @@ gclcvs (2.7.0-11) unstable; urgency=low
     save natively relocated objects, Closes: #215501
   * Fix some allow-other-keys errors in pcl_fast_init.lisp:  TODO
     verify and test this
+  * Program error when bad place is passed to getf
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 13 Oct 2003 21:47:14 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 13 Oct 2003 21:50:55 +0000
 
 gclcvs (2.7.0-10) unstable; urgency=low
 

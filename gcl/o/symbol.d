@@ -257,7 +257,7 @@ object place, indicator, deflt;
 			return(l->c.c_cdr->c.c_car);
 	}
 	if(l==Cnil) return deflt;
-	FEerror("Bad plist ~a",1,place);	
+	FEinvalid_form("Bad plist ~a",place);	
 	return Cnil;
 }
 
