@@ -30,8 +30,10 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Make configure demand gettext when choosing --enable-locbfd
   * Make sure references to ldb1, a stub conventionally optimized away,
     can be resonled when optimization is turned off
+  * completion_matches ->  rl_completion_matches in gcl_readline.d,
+    which is what is exported in the headers
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 27 Feb 2004 23:49:11 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 27 Feb 2004 23:51:34 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

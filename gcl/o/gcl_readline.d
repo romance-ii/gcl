@@ -206,9 +206,9 @@ static char *rl_completion_words_new(char *text, int state) {
    the word to complete.  We can use the entire contents of rl_line_buffer
    in case we want to do some simple parsing.  Return the array of matches,
    or NULL if there aren't any. */
-extern char **completion_matches(char *,char *(*)(char *,int));
+/* extern char **rl_completion_matches(char *,char *(*)(char *,int)); */
 static char **rl_completion(char *text, int start, int end) {
-	return completion_matches(text, rl_completion_words_new);
+	return rl_completion_matches(text, (rl_compentry_func_t *)rl_completion_words_new);
 }
 #endif
 
