@@ -105,8 +105,14 @@ DEFUN_NEW("OPEN-NAMED-SOCKET",object,fSopen_named_socket,SI,1,1,NONE,OI,OO,OO,OO
 "Open a socket on PORT and return (cons fd portname) where file \
 descriptor is a small fixnum which is the write file descriptor for \
 the socket.  If PORT is zero do automatic allocation of port") 
-{ int s, n, rc; struct
-sockaddr_in addr;
+{
+#ifdef __MINGW32__
+    SOCKET s;
+#else    
+    int s;
+#endif    
+  int n, rc;
+  struct sockaddr_in addr;
 
 #ifdef __MINGW32__  
   if ( w32_socket_init() < 0 ) {
