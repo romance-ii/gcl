@@ -255,7 +255,9 @@ Cannot compile ~a.~%"
 
     (and (boundp 'si::*gcl-version*)
 	 (not system-p)
-	 (add-init `(si::warn-version ,si::*gcl-version* ,si::*gcl-major-version*)))
+	 (add-init `(si::warn-version ,si::*gcl-major-version*
+				      ,si::*gcl-minor-version*
+				      ,si::*gcl-extra-version*)))
 
     (when (probe-file "./gcl_cmpinit.lsp")
       (load  "./gcl_cmpinit.lsp"

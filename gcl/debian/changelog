@@ -17,8 +17,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Add bfd/po makefiles
   * Macosx defaults in configure.in
   * Regenerate generated autotools files in binutils/bfd subdir
+  * *gcl-version* -> *gcl-minor-version*,*gcl-extra-version*
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 25 Feb 2004 22:44:24 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 25 Feb 2004 22:53:17 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

@@ -113,3 +113,25 @@
 x))
 (defun complement (fn)
 #'(lambda (&rest args) (not (apply fn args))))
+
+(defun default-system-banner ()
+  (let (gpled-modules)
+    (dolist (l '(unexec bfd readline))
+      (when (member l *features*)
+	(push l gpled-modules)))
+    (format nil "GCL (GNU Common Lisp)  ~a.~a.~a ~a   ~a~%~a~%~a ~a~%~a~%~a~%~%~a~%" 
+	    *gcl-major-version* *gcl-minor-version* *gcl-extra-version*
+	    (if (member :ansi-cl *features*) "ANSI" "CLtL1")
+	    (si::gcl-compile-time)
+	    "Source License: LGPL(gcl,gmp), GPL(unexec,bfd)"
+	    "Binary License: GPL due to GPL'ed components:" gpled-modules
+	    "Modifications of this banner must retain notice of a compatible license"
+	    "Dedicated to the memory of W. Schelter"
+	    "Use (help) to get some basic information on how to use GCL.")))
+
+ (defun lisp-implementation-version nil
+   (format nil "GCL ~a.~a.~a"
+	   si::*gcl-major-version*
+	   si::*gcl-minor-version*
+	   si::*gcl-extra-version*))
+

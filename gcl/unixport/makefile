@@ -96,7 +96,8 @@ init_%.lsp: init_%.lsp.tmp
 
 	cat $< | sed \
 		-e "s,@LI-VERS@,(`cat ../majvers`.`cat ../minvers`) `date`,1" \
-		-e "s,@LI-MINVERS@,`cat ../minvers`,1" \
+		-e "s,@LI-EXTVERS@,`cat ../minvers | cut -f2 -d.`,1" \
+		-e "s,@LI-MINVERS@,`cat ../minvers | cut -f1 -d.`,1" \
 		-e "s,@LI-MAJVERS@,`cat ../majvers`,1" \
 		-e "s/@LI-CC@/\"$(CC) -c $(FINAL_CFLAGS)\"/1" \
 		-e "s,@LI-LD@,\"$(CC) -o \",1" \

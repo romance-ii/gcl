@@ -758,15 +758,17 @@
 
 ;; set by unixport/init_kcl.lsp
 ;; warn if a file was comopiled in another version
-(defvar *gcl-version* nil)
+(defvar *gcl-extra-version* nil)
+(defvar *gcl-minor-version* nil)
 (defvar *gcl-major-version* nil)
 
-(defun warn-version (x &optional majvers)
-  (and *gcl-version*
-       (or (not (eql x *gcl-version*))
+(defun warn-version (majvers minvers extvers)
+  (and *gcl-major-version* *gcl-minor-version* *gcl-extra-version*
+       (or (not (eql extvers *gcl-extra-version*))
+	   (not (eql minvers *gcl-minor-version*))
 	   (not (eql majvers *gcl-major-version*)))
        *load-verbose*
-       (format t "[compiled in GCL ~a-~a] " majvers x)))
+       (format t "[compiled in GCL ~a.~a.~a] " majvers minvers extvers)))
 
 
 
