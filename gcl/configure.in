@@ -465,7 +465,7 @@ case $use in
      *linux)
 	case $use in
 		amd64*)
-			TCFLAGS="$TCFLAGS -m64";;  
+			TCFLAGS="$TCFLAGS -m64 -mpreferred-stack-boundary=8";;  
 		alpha*)
 			TCFLAGS="$TCFLAGS -mieee";;
 #		m68k*)
