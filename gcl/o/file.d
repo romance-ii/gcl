@@ -334,7 +334,11 @@ object if_exists, if_does_not_exist;
 	
 	fname[i] = '\0';
 	if (smm == smm_input || smm == smm_probe) {
-		fp = fopen(fname, "r");
+                if(fname[0]=='|')
+		  fp = popen(fname+1,"r");
+		else 
+		  fp = fopen(fname, "r");
+		
 	      AGAIN:
 		if (fp == NULL) {
 		        if (sSAallow_gzipped_fileA->s.s_dbind != sLnil)
@@ -419,7 +423,12 @@ object if_exists, if_does_not_exist;
 			else if (if_does_not_exist == sKcreate) {
 			CREATE:
 				if (smm == smm_output)
-					fp = fopen(fname, "w");
+				  {
+				    if(fname[0]=='|')
+				      fp = popen(fname+1,"w");
+				    else 
+		                       fp = fopen(fname, "w");
+				  }
 				else
 					fp = fopen(fname, "w+");
 				if (fp == NULL)
@@ -488,7 +497,12 @@ BEGIN:
 	case smm_probe:
 		if (strm->sm.sm_fp == NULL) break;
 		deallocate_stream_buffer(strm);
-		fclose(strm->sm.sm_fp);
+		if (x->sm.sm_object1 &&
+		    type_of(x->sm.sm_object1)==t_string &&
+		    x->sm.sm_object1->st.st_self[0] =='|')
+		  pclose(strm->sm.sm_fp);
+		else 
+		  fclose(strm->sm.sm_fp);
 		strm->sm.sm_fp = NULL;
 		if (type_of(strm->sm.sm_object0 ) == t_cons &&
 		    Mcar(strm->sm.sm_object0 ) == sSAallow_gzipped_fileA)

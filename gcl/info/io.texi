@@ -41,6 +41,16 @@ IF-EXISTS is :ERROR, :NEW-VERSION, :RENAME,
 :RENAME-AND-DELETE, :OVERWRITE, :APPEND, :SUPERSEDE, or NIL.
 IF-DOES-NOT-EXIST is  :ERROR, :CREATE, or NIL.
 
+If FILENAME begins with a vertical pipe sign: '|'  then the resulting
+stream is actually a one way pipe.   It will be open for reading
+or writing depending on the direction given.   The rest
+of FILENAME in this case is passed to the /bin/sh command.   See
+the posix description of popen for more details.
+@example
+(setq pipe (open "| wc < /tmp/jim"))
+(format t "File has ~%d lines" (read pipe))
+(close pipe)
+@end example
 
 @end defun
 
