@@ -483,10 +483,11 @@ LFD(Lmake_symbol)()
 DEFVAR("*GENSYM-COUNTER*",sLgensym_counter,LISP,make_fixnum(0),"");
 
 @(defun gensym (&optional (x gensym_prefix) &aux sym)
-	int i, j;
-        object this_gensym_prefix;
+	int i, j, sign, size;
+        fixnum f;
+        char *q,*p;
+        object this_gensym_prefix,big;
         object this_gensym_counter;
-        object this_gensym_counter_string;
 @
         this_gensym_prefix=gensym_prefix;
 	this_gensym_counter=sLgensym_counter->s.s_dbind;
@@ -498,10 +499,37 @@ DEFVAR("*GENSYM-COUNTER*",sLgensym_counter,LISP,make_fixnum(0),"");
 	}
         if (x==gensym_prefix) 
                 sLgensym_counter->s.s_dbind=number_plus(sLgensym_counter->s.s_dbind,small_fixnum(1));
+
+        switch (type_of(this_gensym_counter)) {
+	case t_bignum:
+	  big=this_gensym_counter;
+	  sign=BIG_SIGN(big);
+	  size = mpz_sizeinbase(MP(big),10)+2+(sign<0? 1 : 0);
+	  if (!(p=alloca(size)))
+	    FEerror("Cannot alloca gensym name", 0);
+	  mpz_get_str(p,10,MP(big));
+	  j=size-5;
+	  j=j<0 ? 0 : j;
+	  while (p[j]) j++;
+	  q=p+j;
+	  break;
+	case t_fixnum:
+	  for (size=1,f=this_gensym_counter->FIX.FIXVAL;f;f/=10,size++);
+	  q=p=alloca(size+5);
+	  if ((j=snprintf(p,size+5,"%d",(int)this_gensym_counter->FIX.FIXVAL))<=0)
+	    FEerror("Cannot write gensym counter",0);
+	  q=p+j;
+	  break;
+	default:
+	  FEerror("Bad gensym counter type", 0);
+	  break;
+	}
+
 /*         FIXME: come up with a better call sequence */
-        this_gensym_counter_string=fLformat_1(Cnil,make_simple_string("~S"),this_gensym_counter);
-        i=this_gensym_counter_string->st.st_fillp;
-	i += this_gensym_prefix->st.st_fillp;
+/*         this_gensym_counter_string=fLformat_1(Cnil,make_simple_string("~S"),this_gensym_counter); */
+/*        i=this_gensym_counter_string->st.st_fillp; */
+
+	i = (q-p)+this_gensym_prefix->st.st_fillp;
 	set_up_string_register("");
 	sym = make_symbol(string_register);
 	{BEGIN_NO_INTERRUPT;	
@@ -511,7 +539,7 @@ DEFVAR("*GENSYM-COUNTER*",sLgensym_counter,LISP,make_fixnum(0),"");
 	for (j = 0;  j < i;  j++)
 		sym->s.s_self[j] = this_gensym_prefix->st.st_self[j];
 	for (;j<sym->s.s_fillp;j++)
-               sym->s.s_self[j] = this_gensym_counter_string->st.st_self[j-i];
+               sym->s.s_self[j] = p[j-i];
 	END_NO_INTERRUPT;}	
 	@(return sym)
 @)
