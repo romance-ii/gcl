@@ -126,7 +126,7 @@ x))
 
 (defun default-system-banner ()
   (let (gpled-modules)
-    (dolist (l '(unexec bfd readline))
+    (dolist (l '(:unexec :bfd :readline))
       (when (member l *features*)
 	(push l gpled-modules)))
     (format nil "GCL (GNU Common Lisp)  ~a.~a.~a ~a   ~a~%~a~%~a ~a~%~a~%~a~%~%~a~%" 

@@ -9,8 +9,10 @@ gclcvs (2.7.0-25) unstable; urgency=low
     the random tester
   * No -fomit-frame-pointer on mingw
   * installed tcl/tk patch for mingw
+  * Fix banner license detection code in lsp/gcl_mislib.lsp as
+    8features* entries are now keywords
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  5 Jun 2004 18:20:51 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat,  5 Jun 2004 18:21:19 +0000
 
 gclcvs (2.7.0-24) unstable; urgency=low
 
