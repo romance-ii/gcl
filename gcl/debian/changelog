@@ -1,3 +1,9 @@
+gclcvs (2.7.0-6) unstable; urgency=low
+
+  * Enable NIFLAGS variable to work around ppc compiler bug
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 24 Sep 2003 15:38:48 +0000
+
 gclcvs (2.7.0-5) unstable; urgency=low
 
   * Separate lsp modules not in wfs' original tree into mod directory,
