@@ -18,13 +18,7 @@ ODIR_DEBUG=
 # This CC string will be used for compilation of the system,
 # and also in the compiler::*cc* variable for later compilation of
 # lisp files.
-# (the -pipe is just since our file system is slow..)
-CC = gnuwin32gcc -pipe -fwritable-strings  -DVOL=volatile -I/usr/gnuwin32/i586-pc-cygwin32/include -I/usr/gnuwin32/include -I$(GCLDIR)/o -fsigned-char
-AS= gnuwin32as	
-AR= gnuwin32ar q
-RANLIB= gnuwin32ranlib
-
-CC = gcc  -fwritable-strings  -DVOL=volatile  -I$(GCLDIR)/o -I/Cygnus/src/include -fsigned-char
+CC = gcc  -fwritable-strings  -DVOL=volatile  -I$(GCLDIR)/o -fsigned-char
 AS= as	
 AR= ar q
 RANLIB= ranlib

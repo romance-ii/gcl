@@ -131,10 +131,6 @@ FILE *fopen_binary(char *name,char *mode)
 /*  FIONREAD not supported */
 #undef  LISTEN_FOR_INPUT
 
-
-/* dont have profil */
-#define NO_PROFILE
-
 /* adjust the start to the offset */
 #define ADJUST_RELOC_START(j) \
 	the_start = memory->cfd.cfd_start + \
