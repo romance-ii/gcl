@@ -18,6 +18,26 @@ along with GNU Emacs; see the file COPYING.  If not, write to
 the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.  */
 
+/*
+
+This file is part of GNU Common Lisp, herein referred to as GCL
+
+GCL is free software; you can redistribute it and/or modify it under
+the terms of the GNU LIBRARY GENERAL PUBLIC LICENSE as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+GCL is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public 
+License for more details.
+
+You should have received a copy of the GNU Library General Public License 
+along with GCL; see the file COPYING.  If not, write to the Free Software
+Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+
+*/
+
 /* Contributed by Andrew Choi (akochoi@mac.com).  */
 
 /* Documentation note.
@@ -95,7 +115,9 @@ Boston, MA 02111-1307, USA.  */
 #include <sys/types.h>
 #include <unistd.h>
 #include <mach/mach.h>
+#include <mach/mach_error.h>
 #include <mach-o/loader.h>
+#include <mach-o/nlist.h>
 #include <objc/malloc.h>
 
 #include <sys/mman.h>
@@ -111,7 +133,7 @@ Boston, MA 02111-1307, USA.  */
 #define VM_DATA_TOP (20 * 1024 * 1024)
 
 /* Used by malloc_freezedry and malloc_jumpstart.  */
-int malloc_cookie;
+extern int malloc_cookie;
 
 /* Type of an element on the list of regions to be dumped.  */
 struct region_t {
@@ -162,21 +184,23 @@ int in_dumped_exec = 0;
 
 malloc_zone_t *gcl_zone = 0L;
 
+#define MAX_MARKED_REGIONS 1024
+
+vm_range_t marked_regions [MAX_MARKED_REGIONS];
+
 unsigned num_marked_regions;
 
-#include <mach/mach_error.h>
-#include <mach-o/nlist.h>
+/* Size of the heap.  */
+int big_heap = BIG_HEAP_SIZE;
 
-#ifndef BIG_HEAP_SIZE
-#define BIG_HEAP_SIZE   0x50000000
-#endif
+/* Start of the heap.  */
+char *mach_mapstart = 0;
 
-int	big_heap = BIG_HEAP_SIZE;
+/* End of the heap.  */
+char *mach_maplimit = 0;
 
-char	*mach_maplimit = 0;
-char	*mach_brkpt = 0;
-char	*mach_mapstart = 0;
-
+/* Position ot the break within the heap.  */
+char *mach_brkpt = 0;
 
 /* Read n bytes from infd into memory starting at address dest.
    Return true if successful, false otherwise.  */
@@ -908,22 +932,21 @@ dump_it ()
     unexec_error ("cannot write final header contents");
 }
 
-#define MAX_MARKED_REGIONS 1024
-
-vm_range_t marked_regions[MAX_MARKED_REGIONS];
+/* Mark a range of virtual memory to be dumped upon unexec()'ing.  */
 
 void
 mark_region (unsigned long address, unsigned long size)
 {
     if (num_marked_regions < MAX_MARKED_REGIONS)
     {
-        marked_regions[num_marked_regions].address = address;
-        marked_regions[num_marked_regions].size = size;
+      marked_regions[num_marked_regions].address = address;
+      marked_regions[num_marked_regions].size = size;
     
-        num_marked_regions++;
+      num_marked_regions++;
     }
     else {
-        printf ("warning: too many marked regions\n");
+      fprintf (stderr, "warning: too many marked regions\n");
+      fflush (stderr);
     }
 }
 
@@ -948,8 +971,6 @@ void
 unexec (char *outfile, char *infile, void *start_data, void *start_bss,
         void *entry_address)
 { 
-/*extern malloc_zone_t *debug_zone __attribute__((weak_import));*/
-  
   infd = open (infile, O_RDONLY, 0);
   if (infd < 0)
     {
@@ -977,16 +998,6 @@ unexec (char *outfile, char *infile, void *start_data, void *start_bss,
   
 /*find_gcl_zone_regions ();*/
   add_marked_regions ();
-  
-  /*
-  if (debug_zone != NULL)
-  debug_zone->introspect->enumerator (mach_task_self(), 0,
-				      MALLOC_PTR_REGION_RANGE_TYPE
-				      | MALLOC_ADMIN_REGION_RANGE_TYPE,
-				      (vm_address_t) debug_zone,
-				      unexec_reader,
-				      unexec_regions_recorder);
-  */
   
   in_dumped_exec = 1;
 
@@ -1038,37 +1049,63 @@ static void stub_free (malloc_zone_t *zone, void *ptr)
     my_free (ptr);
 }
 
+/* Create a new zone to accommodate GCL's heap and make it the default zone.  */
+
 void init_darwin_zone_compat ()
 {
-    extern unsigned malloc_num_zones;
-    malloc_zone_t *default_zone;
-        
-    default_zone = malloc_default_zone ();
+  extern unsigned malloc_num_zones;
+  extern malloc_zone_t **malloc_zones;
+  unsigned malloc_num_zones_copy;
+  malloc_zone_t **malloc_zones_copy;
+  malloc_zone_t *default_zone;
+  kern_return_t rtn;
+  vm_size_t s;
+  unsigned i;
+
+  default_zone = malloc_default_zone ();
+  
+  if ((gcl_zone = malloc_create_zone (0,0)) == NULL) {
+    fprintf (stderr, "init_darwin_zone_compat(): malloc_create_zone() failed\n");
+    exit (1);
+  }
     
-    gcl_zone = malloc_create_zone (0,0);
+  gcl_zone->size       = (void *) stub_size;
+  gcl_zone->malloc     = (void *) stub_malloc;
+  gcl_zone->calloc     = (void *) stub_calloc;
+  gcl_zone->valloc     = (void *) stub_valloc;
+  gcl_zone->realloc    = (void *) stub_realloc;
+  gcl_zone->free       = (void *) stub_free;
+
+  /* Maybe we'll want to implement the zone introspector some day.  */
     
-    gcl_zone->size       = (void *) stub_size;
-    gcl_zone->malloc     = (void *) stub_malloc;
-    gcl_zone->calloc     = (void *) stub_calloc;
-    gcl_zone->valloc     = (void *) stub_valloc;
-    gcl_zone->realloc    = (void *) stub_realloc;
-    gcl_zone->free       = (void *) stub_free;
- /* if the zone introspector is ever called, the program will crash */
-    
- /* we could support any number of zones, but I'm being lazy */
-    assert (malloc_num_zones <= 2);
-    
-    if (default_zone)
-    {
-        malloc_zone_unregister (default_zone);
-        malloc_zone_unregister (gcl_zone);
-            
-        malloc_zone_register (gcl_zone);
-        malloc_zone_register (default_zone);
-    }
-    
-    malloc_set_zone_name (gcl_zone, "GNU Common Lisp");
+  malloc_num_zones_copy = malloc_num_zones;
+  s = malloc_num_zones * sizeof (malloc_zone_t *);
+  
+  if ((rtn = vm_allocate (mach_task_self (), (vm_address_t *) &malloc_zones_copy, s, 1)) != KERN_SUCCESS) {
+    mach_error ("init_darwin_zone_compat(): vm_allocate() failed", rtn);
+    exit (1);
+  }
+
+  memcpy (malloc_zones_copy, malloc_zones, s);
+
+  for (i=0 ; i < malloc_num_zones_copy ; i++) {
+    malloc_zone_unregister (malloc_zones_copy [i]);
+  }
+
+  /* Make our zone the default zone.  */
+  malloc_zone_register (gcl_zone);
+  
+  for (i=0 ; i < malloc_num_zones_copy ; i++) {
+    if (malloc_zones_copy [i] != gcl_zone)
+      malloc_zone_register (malloc_zones_copy [i]);
+  }
+
+  vm_deallocate (mach_task_self (), (vm_address_t) malloc_zones_copy, s);
+  
+  malloc_set_zone_name (gcl_zone, "GNU Common Lisp");
 }
+
+/* Replacement for broken sbrk(2).  */
 
 char *my_sbrk (int incr)
 {
@@ -1076,13 +1113,13 @@ char *my_sbrk (int incr)
     kern_return_t       rtn;
     
     if (mach_brkpt == 0) {
-       if ((rtn = vm_allocate(mach_task_self(), (vm_address_t *) &mach_brkpt, big_heap, 1)) != KERN_SUCCESS) {
+       if ((rtn = vm_allocate (mach_task_self (), (vm_address_t *) &mach_brkpt, big_heap, 1)) != KERN_SUCCESS) {
 	    mach_error ("my_sbrk(): vm_allocate() failed", rtn);
 	    return ((char *)-1);
 	}
         if (!mach_brkpt) {
-         /* FIX-ME: this fprintf call will most probably fail because memory isn't initialized */
-	    fprintf (stderr, "my_sbrk(): cannot allocate heap\n");
+	 /* Call this instead of fprintf() because no allocation is performed.  */
+ 	    malloc_printf ("my_sbrk(): cannot allocate heap\n");
 	    return ((char *)-1);        
         }
         mark_region ((unsigned long) mach_brkpt, (unsigned long) big_heap);
@@ -1099,11 +1136,73 @@ char *my_sbrk (int incr)
 	    mach_brkpt = ptr;
 	    return (temp);
 	} else {
-	    fprintf (stderr, "my_sbrk(): no more memory\n");
-	    fflush (stderr);
+	    malloc_printf ("my_sbrk(): no more memory\n");
 	    return ((char *)-1);
 	}
     }
+}
+
+/* The file has non Mach-O stuff appended.  We need to now where the Mach-O stuff ends.
+   Put this here, although it pertains to fasload()'ing, because we'll stop using sfaslmacosx.c.  */
+
+int seek_to_end_ofile (FILE *fp)
+{
+    struct mach_header mach_header;
+    char *hdrbuf;
+    struct load_command *load_command;
+    struct segment_command *segment_command;
+    struct section *section;
+    struct symtab_command *symtab_command;
+    struct symseg_command *symseg_command;
+    int len, cmd, seg;
+    int end_sec, end_ofile;
+    
+    end_ofile = 0;
+    fseek(fp, 0L, 0);
+    len = fread((char *)&mach_header, sizeof(struct mach_header), 1, fp);
+    if (len == 1 && mach_header.magic == MH_MAGIC) {
+        hdrbuf = (char *)malloc(mach_header.sizeofcmds);
+	len = fread(hdrbuf, mach_header.sizeofcmds, 1, fp);
+	if (len != 1) {
+	    fprintf(stderr, "seek_to_end_ofile(): failure reading Mach-O load commands\n");
+	    return 0;
+	}
+	load_command = (struct load_command *) hdrbuf;
+	for (cmd = 0; cmd < mach_header.ncmds; ++cmd) {
+	    switch (load_command->cmd) {
+	    case LC_SEGMENT:
+		segment_command = (struct segment_command *) load_command;
+		section = (struct section *) ((char *)(segment_command + 1));
+		for (seg = 0; seg < segment_command->nsects; ++seg, ++section) {
+		    end_sec = section->offset + section->size;
+		    if (end_sec > end_ofile)
+			end_ofile = end_sec;
+		}
+		break;
+	    case LC_SYMTAB:
+		symtab_command = (struct symtab_command *) load_command;
+		end_sec = symtab_command->symoff + symtab_command->nsyms * sizeof(struct nlist);
+		if (end_sec > end_ofile)
+		    end_ofile = end_sec;
+		end_sec = symtab_command->stroff + symtab_command->strsize;
+		if (end_sec > end_ofile)
+		    end_ofile = end_sec;
+		break;
+	    case LC_SYMSEG:
+		symseg_command = (struct symseg_command *) load_command;
+		end_sec = symseg_command->offset + symseg_command->size;
+		if (end_sec > end_ofile)
+		    end_ofile = end_sec;
+		break;
+	    }
+	    load_command = (struct load_command *)
+	      ((char *)load_command + load_command->cmdsize);
+	}
+	free(hdrbuf);
+	fseek(fp, end_ofile, 0);
+	return 1;
+    }
+    return 0;
 }
 
 #ifdef UNIXSAVE
