@@ -26,15 +26,14 @@ UninstallFilesDir={app}\uninst
 Name: "desktopicon"; Description: "Create a &desktop icon"; GroupDescription: "Additional icons:"; MinVersion: 4,4
 
 [Files]
-; Source: "@prefix@\bin\gclm.bat"; DestDir: "{app}\bin\"; CopyMode: alwaysoverwrite
 Source: "@prefix@\*.*"; DestDir: "{app}\";  Flags: recursesubdirs
+Source: "c:\lang\MinGW32-gcl\*.*"; DestDir: "{app}\mingw";  Flags: recursesubdirs
 
 [Icons]
-Name: "{group}\GNU Common Lisp @VERSION@"; Filename: "{app}\bin\gclm.bat"; IconFilename: "{app}\bin\gcl.ico"
-; Name: "{group}\Introduction"; Filename: "{app}\share\maxima\@VERSION@\doc\html\intromax.html"; WorkingDir: "{app}\share\maxima\@VERSION@"
-; Name: "{group}\Reference Manual"; Filename: "{app}\share\maxima\@VERSION@\doc\html\maxima_toc.html"; WorkingDir: "{app}\share\maxima\@VERSION@"
-Name: "{userdesktop}\GNU Common Lisp"; Filename: "{app}\bin\gclm.bat"; MinVersion: 4,4; Tasks: desktopicon; IconFilename: "{app}\bin\gcl.ico"
+Name: "{group}\GNU Common Lisp @VERSION@"; Filename: "{app}\bin\gcl.bat"; IconFilename: "{app}\bin\gcl.ico"
+Name: "{userdesktop}\GNU Common Lisp"; Filename: "{app}\bin\gcl.bat"; MinVersion: 4,4; Tasks: desktopicon; IconFilename: "{app}\bin\gcl.ico"
 
 [Run]
-Filename: "{app}\bin\gclm.bat"; Description: "Launch GNU Common Lisp"; Flags: postinstall skipifsilent
+Filename: "{app}\bin\gclfinal.bat"; Parameters: {app}
+Filename: "{app}\bin\gcl.bat"; Description: "Launch GNU Common Lisp"; Flags: postinstall skipifsilent
 
