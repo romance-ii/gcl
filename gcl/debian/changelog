@@ -30,8 +30,9 @@ gclcvs (2.7.0-32) unstable; urgency=low
   * Support for inlining functions returning multiple values, with
     gethash as the first example
   * Fix compiler warning in gcl_top.lsp
+  * Cleanup fixes to subtype tests of ansi test suite
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 16 Sep 2004 21:13:07 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 16 Sep 2004 21:15:35 +0000
 
 gclcvs (2.7.0-31) unstable; urgency=high
 

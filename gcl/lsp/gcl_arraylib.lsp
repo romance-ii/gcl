@@ -78,7 +78,7 @@
 			displaced-to (displaced-index-offset 0)
 			static)
   (when (integerp dimensions) (setq dimensions (list dimensions)))
-  (setq element-type (best-array-element-type element-type))
+  (setq element-type (or (best-array-element-type element-type) 'string-char))
   (cond ((= (length dimensions) 1)
 	 (let ((x (si:make-vector element-type (car dimensions)
 	                          adjustable fill-pointer
@@ -94,7 +94,7 @@
         (t
 	 (let ((x
 		(make-array1
-		       (the fixnum(get-aelttype element-type))
+		       (the fixnum (get-aelttype element-type))
 			static initial-element 
 		       displaced-to (the fixnum displaced-index-offset)
 		       dimensions)))
