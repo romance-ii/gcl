@@ -29,6 +29,10 @@
 #define SET_REAL_MAXPAGE \
   { extern int mach_maplimit; my_sbrk(0); real_maxpage = mach_maplimit/PAGESIZE; }
 
+extern char *mach_mapstart;
+extern char *mach_maplimit;
+extern char *mach_brkpt;
+
 #define sbrk my_sbrk
 extern char *my_sbrk(int incr);
 
@@ -145,9 +149,11 @@ do {\
 
 #define GET_FULL_PATH_SELF (a_) \
 do { \
-extern char **NXArgv; \
-static char q [PATH_MAX]; \
-if (!realpath (q,NXArgv[0])) \
-    error ("realpath error"); \
+extern int _NSGetExecutablePath (char *, unsigned long *); \
+unsigned long bufsize = PATH_MAX; \
+static char buf [PATH_MAX]; \
+if (_NSGetExecutablePath (buf, &bufsize) != 0) { \
+    error ("_NSGetExecutablePath failed"); \
+} \
 (a_) = q; \
-} while (0)
+} while (0);
