@@ -152,7 +152,7 @@ init_safety(void)
   
 DO_INIT(init_safety();)
 DEFUN_NEW("SIGNAL-SAFETY-REQUIRED",object,sSsignal_safety_required,SI,2,2,
-	  NONE,OI,IO,OO,OO,(int signo,int safety),
+	  NONE,OI,IO,OO,OO,(fixnum signo,fixnum safety),
       "Set the safety level required for handling SIGNO to SAFETY, or if \
 SAFETY is negative just return the current safety level for that \
 signal number.  Value of 1 means allow interrupt at any place not \
@@ -401,7 +401,7 @@ raise_pending_signals(int cond)
  }}
 
 
-DEFUN_NEW("ALLOW-SIGNAL",object,fSallow_signal,SI,1,1,NONE,OI,OO,OO,OO,(int n),
+DEFUN_NEW("ALLOW-SIGNAL",object,fSallow_signal,SI,1,1,NONE,OI,OO,OO,OO,(fixnum n),
       "Install the default signal handler on signal N")
 
 {

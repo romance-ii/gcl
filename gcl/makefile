@@ -53,6 +53,9 @@ $(PORTDIR)/saved_gcl: $(HDIR)cmpinclude.h
 	$(MAKE) mpfiles
 	rm -f o/cmpinclude.h ; cp h/cmpinclude.h o
 	(cd $(ODIR); $(MAKE) all)
+	$(MAKE) $<
+	rm -f o/cmpinclude.h ; cp h/cmpinclude.h o
+	(cd $(ODIR); $(MAKE) all)
 	(cd $(LSPDIR); $(MAKE) all)
 	(cd $(CMPDIR); $(MAKE) all)
 	cd $(@D) && $(MAKE) $(@F)

@@ -89,8 +89,8 @@ sock_write_str2(struct connection_state *,enum mtype, char *,
 
 
 object
-fSclear_connection();
+fSclear_connection(fixnum);
 
 
 object
-fScheck_fd_for_input();
+fScheck_fd_for_input(fixnum,fixnum);

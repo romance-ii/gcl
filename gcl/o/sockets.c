@@ -101,7 +101,7 @@ int w32_socket_exit(void)
 #define BIND_LAST_ADDRESS	65534
 static unsigned int iLastAddressUsed = BIND_INITIAL_ADDRESS;
 
-DEFUN_NEW("OPEN-NAMED-SOCKET",object,fSopen_named_socket,SI,1,1,NONE,OI,OO,OO,OO,(int port),
+DEFUN_NEW("OPEN-NAMED-SOCKET",object,fSopen_named_socket,SI,1,1,NONE,OI,OO,OO,OO,(fixnum port),
 "Open a socket on PORT and return (cons fd portname) where file \
 descriptor is a small fixnum which is the write file descriptor for \
 the socket.  If PORT is zero do automatic allocation of port") 
@@ -178,7 +178,7 @@ sockaddr_in addr;
   return make_cons(make_fixnum(s), small_fixnum(ntohs(addr.sin_port)));
 }
 
-DEFUN_NEW("CLOSE-FD",object,fSclose_fd,SI,1,1,NONE,OI,OO,OO,OO,(int fd),
+DEFUN_NEW("CLOSE-FD",object,fSclose_fd,SI,1,1,NONE,OI,OO,OO,OO,(fixnum fd),
       "Close the file descriptor FD")
 
 {RETURN1(0==close(fd) ? Ct : Cnil);}
@@ -308,13 +308,13 @@ DEFUN_NEW("CONNECTION-STATE-FD",object,fSconnection_state_fd,SI,1,1,NONE,OO,OO,O
 { return make_fixnum(OBJ_TO_CONNECTION_STATE(sfd)->fd);
 }
      
-DEFUN_NEW("OUR-WRITE",object,fSour_write,SI,3,3,NONE,OO,OI,OO,OO,(object sfd,object buffer,int nbytes),"")
+DEFUN_NEW("OUR-WRITE",object,fSour_write,SI,3,3,NONE,OO,OI,OO,OO,(object sfd,object buffer,fixnum nbytes),"")
 
 { return make_fixnum(write1(OBJ_TO_CONNECTION_STATE(sfd),buffer->ust.ust_self,nbytes));
 }
 
 DEFUN_NEW("OUR-READ-WITH-OFFSET",object,fSour_read_with_offset,SI,5,5,NONE,
-	  OO,OI,II,OO,(object fd,object buffer,int offset,int nbytes,int timeout),
+	  OO,OI,II,OO,(object fd,object buffer,fixnum offset,fixnum nbytes,fixnum timeout),
       "Read from STATE-FD into string BUFFER putting data at OFFSET and reading NBYTES, waiting for TIMEOUT before failing")
 
 { return make_fixnum(read1(OBJ_TO_CONNECTION_STATE(fd),&((buffer)->ust.ust_self[offset]),nbytes,timeout));
@@ -473,7 +473,7 @@ not_defined_for_os()
 { FEerror("Function not defined for this operating system",0);}
 
 
-DEFUN_NEW("SET-SIGIO-FOR-FD",object,fSset_sigio_for_fd,SI,1,1,NONE,OI,OO,OO,OO,(int fd),"")
+DEFUN_NEW("SET-SIGIO-FOR-FD",object,fSset_sigio_for_fd,SI,1,1,NONE,OI,OO,OO,OO,(fixnum fd),"")
 
 { 
   /* for the moment we will use SIGUSR1 to notify, instead of depending on SIGIO,
@@ -502,7 +502,7 @@ DEFUN_NEW("SET-SIGIO-FOR-FD",object,fSset_sigio_for_fd,SI,1,1,NONE,OI,OO,OO,OO,(
 
 }
      
-DEFUN_NEW("RESET-STRING-INPUT-STREAM",object,fSreset_string_input_stream,SI,4,4,NONE,OO,OI,IO,OO,(object strm,object string,int start,int end),
+DEFUN_NEW("RESET-STRING-INPUT-STREAM",object,fSreset_string_input_stream,SI,4,4,NONE,OO,OI,IO,OO,(object strm,object string,fixnum start,fixnum end),
       "Reuse a string output STREAM by setting its output to STRING \
 and positioning the ouput/input to start at START and end at END")
 
@@ -512,7 +512,7 @@ and positioning the ouput/input to start at START and end at END")
   return strm;
 }
 
-DEFUN_NEW("CHECK-STATE-INPUT",object,fScheck_state_input,SI,2,2,NONE,OO,IO,OO,OO,(object osfd,int timeout),
+DEFUN_NEW("CHECK-STATE-INPUT",object,fScheck_state_input,SI,2,2,NONE,OO,IO,OO,OO,(object osfd,fixnum timeout),
       "") 
 {
   return fScheck_dsfd_for_input(OBJ_TO_CONNECTION_STATE(osfd),timeout);

@@ -63,7 +63,7 @@ extern short aet_sizes[];
 #define N_FIXNUM_ARGS 6
 
 DEFUNO_NEW("AREF", object, fLaref, LISP, 1, ARRAY_RANK_LIMIT,
-       NONE, OO, II, II, II,void,Laref,(object x, int i, ...),"")
+       NONE, OO, II, II, II,void,Laref,(object x,fixnum i, ...),"")
 { int n = VFUN_NARGS;
   int i1;
   va_list ap;
@@ -90,7 +90,7 @@ DEFUNO_NEW("AREF", object, fLaref, LISP, 1, ARRAY_RANK_LIMIT,
 	 if (m <= rank)
 	   { i1 = i1 * x->a.a_dims[m];
 	     if (m < N_FIXNUM_ARGS)
-	       { k = va_arg(ap,int);}
+	       { k = va_arg(ap,fixnum);}
 	     else {object x = va_arg(ap,object);
 		   check_type(x,t_fixnum);
 		   k = Mfix(x);}
@@ -122,7 +122,7 @@ fScheck_bounds_bounds(object x, int i)
 }
 
 DEFUNO_NEW("SVREF", object, fLsvref, LISP, 2, 2,
-      ONE_VAL, OO, IO, OO,OO,void,Lsvref,(object x, unsigned int i),
+      ONE_VAL, OO, IO, OO,OO,void,Lsvref,(object x,ufixnum i),
       "For array X and index I it returns (aref x i) ")
 {
  if (type_of(x)==t_vector
@@ -135,7 +135,7 @@ DEFUNO_NEW("SVREF", object, fLsvref, LISP, 2, 2,
 }
     
 DEFUN_NEW("ROW-MAJOR-AREF", object, fLrow_major_aref, LISP, 2, 2,
-       NONE, OO, IO, OO,OO,(object x, int i),
+       NONE, OO, IO, OO,OO,(object x,fixnum i),
       "For array X and index I it returns (aref x i) as if x were \
 1 dimensional, even though its rank may be bigger than 1")
 {
@@ -182,11 +182,11 @@ DEFUN_NEW("ROW-MAJOR-AREF", object, fLrow_major_aref, LISP, 2, 2,
 }
 
 object
-aset1(object x,int i,object val) {
+aset1(object x,fixnum i,object val) {
   return fSaset1(x,i,val);
 }
 
-DEFUN_NEW("ASET1", object, fSaset1, SI, 3, 3, NONE, OO, IO, OO,OO,(object x, int i,object val),"")
+DEFUN_NEW("ASET1", object, fSaset1, SI, 3, 3, NONE, OO, IO, OO,OO,(object x, fixnum i,object val),"")
 {
   switch (type_of(x)) {
   case t_array:
@@ -257,7 +257,7 @@ DEFUN_NEW("ASET1", object, fSaset1, SI, 3, 3, NONE, OO, IO, OO,OO,(object x, int
 }
 
 DEFUNO_NEW("ASET", object, fSaset, SI, 1, ARG_LIMIT, NONE, OO,
-       IO, OO, OO,void,siLaset,(object x,int i,object y, ...),"")
+       IO, OO, OO,void,siLaset,(object x,fixnum i,object y, ...),"")
 { int i1;
   int n = VFUN_NARGS;
   va_list ap;
@@ -316,7 +316,7 @@ DEFUNO_NEW("ASET", object, fSaset, SI, 1, ARG_LIMIT, NONE, OO,
 }
 
 DEFUNO_NEW("SVSET", object, fSsvset, SI, 3, 3, NONE, OO, IO, OO,
-       OO,void,siLsvset,(object x,int i,object val),"")
+       OO,void,siLsvset,(object x,fixnum i,object val),"")
 { if (TYPE_OF(x) != t_vector
       || DISPLACED_TO(x) != Cnil)
     Wrong_type_error("simple array",0);
@@ -335,7 +335,7 @@ DEFUNO_NEW("SVSET", object, fSsvset, SI, 3, 3, NONE, OO, IO, OO,
 
 
 DEFUN_NEW("MAKE-VECTOR1",object,fSmake_vector1,SI,3,8,NONE,OI,
-      IO,OO,OO,(int n,int elt_type,object staticp,...),"")
+      IO,OO,OO,(fixnum n,fixnum elt_type,object staticp,...),"")
   
 { 
     int displaced_index_offset=0;
@@ -430,7 +430,7 @@ DEFUN_NEW("MAKE-VECTOR1",object,fSmake_vector1,SI,3,8,NONE,OI,
 static object DFLT_aet_object = Cnil;	
 static char DFLT_aet_ch = ' ';
 static char DFLT_aet_char = 0; 
-static int DFLT_aet_fix = 0  ;		
+static fixnum DFLT_aet_fix = 0  ;		
 static short DFLT_aet_short = 0;
 static shortfloat DFLT_aet_sf = 0.0;
 static longfloat DFLT_aet_lf = 0.0;	
@@ -502,7 +502,7 @@ DEFUNO_NEW("MAKE-VECTOR",object,fSmake_vector,SI,7,8,NONE,
 
 DEFUN_NEW("MAKE-ARRAY1",object,fSmake_array1,SI,6,6,
       NONE,OI,OO,OI,OO,
-      (int elt_type,object staticp,object initial_element,object displaced_to, int displaced_index_offset,
+      (fixnum elt_type,object staticp,object initial_element,object displaced_to,fixnum displaced_index_offset,
        object dimensions),"")
 {   
   int rank = length(dimensions);
@@ -801,7 +801,7 @@ gset(void *p1, void *val, int n, int typ)
    */
 
 DEFUN_NEW("COPY-ARRAY-PORTION",object,fScopy_array_portion,SI,4,
-      5,NONE,OO,OI,IO,OO,(object x,object y,int i1,int i2,object n1o),
+      5,NONE,OO,OI,IO,OO,(object x,object y,fixnum i1,fixnum i2,object n1o),
    "Copy elements from X to Y starting at x[i1] to x[i2] and doing N1 \
 elements if N1 is supplied otherwise, doing the length of X - I1 \
 elements.  If the types of the arrays are not the same, this has \
@@ -896,7 +896,7 @@ array_allocself(object x, int staticp, object dflt)
 }
 
 DEFUNO_NEW("FILL-POINTER-SET",object,fSfill_pointer_set,SI,2,2,
-       NONE,OO,IO,OO,OO,void,siLfill_pointer_set,(object x,int i),"")
+       NONE,OO,IO,OO,OO,void,siLfill_pointer_set,(object x,fixnum i),"")
 {
 
     if (!(TS_MEMBER(type_of(x),TS(t_vector)|
@@ -983,7 +983,7 @@ DEFUNO_NEW("ARRAY-RANK",object,fLarray_rank,LISP,1,1,NONE,OO,OO,OO,
 }
 
 DEFUNO_NEW("ARRAY-DIMENSION",object,fLarray_dimension,LISP,2,2,
-       NONE,OO,IO,OO,OO,void,Larray_dimension,(object x,int i),"")
+       NONE,OO,IO,OO,OO,void,Larray_dimension,(object x,fixnum i),"")
 { 
   if (type_of(x) == t_array)
    {  if ((unsigned int)i >= x->a.a_rank)

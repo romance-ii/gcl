@@ -651,7 +651,7 @@ void Lcddadr(){check_arg(1); vs_base[0] = cdr(cdr(car(cdr(vs_base[0]))));}
 void Lcdddar(){check_arg(1); vs_base[0] = cdr(cdr(cdr(car(vs_base[0]))));}
 void Lcddddr(){check_arg(1); vs_base[0] = cdr(cdr(cdr(cdr(vs_base[0]))));}
 
-DEFUNO_NEW("NTH",object,fLnth,LISP,2,2,NONE,OI,OO,OO,OO,void,Lnth,(int index,object list),"")
+DEFUNO_NEW("NTH",object,fLnth,LISP,2,2,NONE,OI,OO,OO,OO,void,Lnth,(fixnum index,object list),"")
 { object x = list;
   if (index < 0)
     FEerror("Negative index: ~D.", 1, make_fixnum(index));

@@ -56,7 +56,7 @@ typedef struct
 #define MYmake_fixnum(action,x) \
   do{register int CMPt1; \
    action \
-   ((((CMPt1=(x))+1024)&-2048)==0?small_fixnum(CMPt1):make_fixnum(CMPt1));}while(0)
+   ((((CMPt1=(x))+1024)&-2048)==0?small_fixnum(CMPt1):make_fixnum1(CMPt1));}while(0)
      
 #define addii mpz_add
 #define addsi(u,a,b) (a >= 0 ?  mpz_add_ui(u,b,a) : mpz_sub_ui(u,b,-a))

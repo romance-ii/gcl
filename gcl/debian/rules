@@ -84,7 +84,7 @@ configure-%-stamp:
 		--mandir=\$${prefix}/share/man \
 		--enable-infodir=\$${prefix}/share/info
 
-	[ "$(ARCHT)" != "ia64" ] || ( cd o && $(MCC) -c -Wall -DVOL=volatile -I. -fsigned-char -fwritable-strings -pipe -O -fomit-frame-pointer -I../h -I../gcl-tk num_log.c  )
+#	[ "$(ARCHT)" != "ia64" ] || ( cd o && $(MCC) -c -Wall -DVOL=volatile -I. -fsigned-char -fwritable-strings -pipe -O -fomit-frame-pointer -I../h -I../gcl-tk num_log.c  )
 
 	touch $@
 

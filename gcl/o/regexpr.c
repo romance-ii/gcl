@@ -40,7 +40,7 @@ DEFVAR("*MATCH-DATA*",sSAmatch_dataA,SI,sLnil,"");
 DEFVAR("*CASE-FOLD-SEARCH*",sSAcase_fold_searchA,SI,sLnil,
        "Non nil means that a string-match should ignore case");
 
-DEFUN_NEW("MATCH-BEGINNING",object,fSmatch_beginning,SI,1,1,NONE,OI,OO,OO,OO,(int i),
+DEFUN_NEW("MATCH-BEGINNING",object,fSmatch_beginning,SI,1,1,NONE,OI,OO,OO,OO,(fixnum i),
    "Returns the beginning of the I'th match from the previous STRING-MATCH, \
 where the 0th is for the whole regexp and the subsequent ones match parenthetical expressions.  -1 is returned if there is no match, or if the *match-data* \
 vector is not a fixnum array.")
@@ -51,7 +51,7 @@ vector is not a fixnum array.")
   RETURN1(make_fixnum(-1));
 }
 
-DEFUN_NEW("MATCH-END",object,fSmatch_end,SI,1,1,NONE,OI,OO,OO,OO,(int i),
+DEFUN_NEW("MATCH-END",object,fSmatch_end,SI,1,1,NONE,OI,OO,OO,OO,(fixnum i),
    "Returns the end of the I'th match from the previous STRING-MATCH")
 { object v = sSAmatch_dataA->s.s_dbind;
   if (type_of(v)==t_vector
@@ -81,8 +81,8 @@ be over written.   \
    object v = sSAmatch_dataA->s.s_dbind;
 
    { va_start(ap,string);
-     if (nargs>=3) start=va_arg(ap,int);else goto LDEFAULT3;
-     if (nargs>=4) end=va_arg(ap,int);else goto LDEFAULT4;
+     if (nargs>=3) start=va_arg(ap,fixnum);else goto LDEFAULT3;
+     if (nargs>=4) end=va_arg(ap,fixnum);else goto LDEFAULT4;
      goto LEND_VARARG;
    LDEFAULT3: start = 0;
    LDEFAULT4: end = string->st.st_fillp;

@@ -742,7 +742,7 @@ DEFUN_NEW("STATICP",object,fSstaticp,SI,1,1,NONE,OO,OO,OO,OO,(object x),"Tell if
 /* } */
 
 DEFUN_NEW("ALLOCATE",object,fSallocate,SI
-       ,2,3,NONE,OO,IO,OO,OO,(object type,int npages,...),"")
+       ,2,3,NONE,OO,IO,OO,OO,(object type,fixnum npages,...),"")
 {
 
   int nargs=VFUN_NARGS;
@@ -815,7 +815,7 @@ t_from_type(object type) {
    */
 
 DEFUN_NEW("ALLOCATE-SGC",object,fSallocate_sgc,SI
-      ,4,4,NONE,OO,II,II,OO,(object type,int min,int max,int free_percent),"") {
+      ,4,4,NONE,OO,II,II,OO,(object type,fixnum min,fixnum max,fixnum free_percent),"") {
 
   int t=t_from_type(type);
   struct typemanager *tm;
@@ -840,7 +840,7 @@ DEFUN_NEW("ALLOCATE-SGC",object,fSallocate_sgc,SI
    It will try to grow PERCENT of the current pages.
    */
 DEFUN_NEW("ALLOCATE-GROWTH",object,fSallocate_growth,SI,5,5,NONE,OO,II,II,OO,
-      (object type,int min,int max,int percent,int percent_free),"")
+      (object type,fixnum min,fixnum max,fixnum percent,fixnum percent_free),"")
 {int  t=t_from_type(type);
  struct typemanager *tm=tm_of(t);
  object res,x,x1,x2,x3;
@@ -865,7 +865,7 @@ DEFUN_NEW("ALLOCATE-GROWTH",object,fSallocate_growth,SI,5,5,NONE,OO,II,II,OO,
 
 
 DEFUN_NEW("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
-       ,1,2,NONE,OI,OO,OO,OO,(int npages,...),"")
+       ,1,2,NONE,OI,OO,OO,OO,(fixnum npages,...),"")
 {
 
   int nargs=VFUN_NARGS,i,m;
@@ -884,7 +884,7 @@ DEFUN_NEW("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
   if  (npages  < 0)
     FEerror("Allocate requires positive argument.", 0);
   if (ncbpage > npages) { 
-    printf("Allocate contiguous %d: %d already there pages",npages,ncbpage);
+    printf("Allocate contiguous %ld: %d already there pages",npages,ncbpage);
     npages=ncbpage;
   }
   maxcbpage = npages;
@@ -921,7 +921,7 @@ DEFUN_NEW("MAXIMUM-CONTIGUOUS-PAGES",object,fSmaximum_contiguous_pages,SI
 
 
 DEFUN_NEW("ALLOCATE-RELOCATABLE-PAGES",object,fSallocate_relocatable_pages,SI
-       ,1,2,NONE,OI,OO,OO,OO,(int npages,...),"")
+       ,1,2,NONE,OI,OO,OO,OO,(fixnum npages,...),"")
 {
 
   int nargs=VFUN_NARGS;
@@ -967,7 +967,7 @@ DEFUN_NEW("GET-HOLE-SIZE",object,fSget_hole_size,SI
 }
 
 DEFUN_NEW("SET-HOLE-SIZE",object,fSset_hole_size,SI
-       ,1,2,NONE,OI,IO,OO,OO,(int npages,...),"")
+       ,1,2,NONE,OI,IO,OO,OO,(fixnum npages,...),"")
 {
 
   int nargs=VFUN_NARGS;
@@ -977,7 +977,7 @@ DEFUN_NEW("SET-HOLE-SIZE",object,fSset_hole_size,SI
   reserve=30;
   if (nargs>=2) {
     va_start(ap,npages);
-    reserve=va_arg(ap,int);
+    reserve=va_arg(ap,fixnum);
     va_end(ap);
   }
   

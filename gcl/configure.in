@@ -44,6 +44,9 @@ AC_ARG_ENABLE(emacsdir,[ --enable-emacsdir=XXXX will manually specify the locati
 AC_ARG_ENABLE(common-binary,[ --enable-common-binary=yes forces use of lowest common denominator instruction sets, (default is =yes)] ,
 [use_common_binary=$enableval],[use_common_binary="yes"])
 
+AC_ARG_ENABLE(japi,[ --enable-japi=yes will compile in support for the JAPI graphical interface if present on your system],
+[try_japi=$enableval],[try_japi="no"])
+
 #
 # Host information 
 #
@@ -362,6 +365,8 @@ else
 	TO2FLAGS="-O"
 fi
 
+AC_CHECK_PROGS(AWK,gawk nawk awk,"")
+
 case $use in 
      *linux)
 	case $use in
@@ -380,6 +385,13 @@ case $use in
 			if $CC -v 2>&1 | grep -q "gcc version 3.2" ; then
 			   echo Reducing optimization for buggy gcc-3.2
 			   TO3FLAGS="-O -fomit-frame-pointer"
+			fi;
+			echo Probing for longcall
+			if ! $CC -v 2>&1 | $AWK '/^gcc version / {split($3,A,".");if (A[[1]]+0>=3 && A[[2]]+0>=3) exit 1;}'; then
+			   echo Enabling longcall on gcc 3.3 or later
+			   TCFLAGS="$TCFLAGS -mlongcall"
+			   echo Reducing optimization for buggy gcc 3.3 or later
+			   TO3FLAGS="-O -fomit-frame-pointer"
 			fi;;
 	esac;;
 esac
@@ -394,8 +406,6 @@ fi
 
 AC_MSG_CHECKING([system version (for dynamic loading)])
 if machine=`uname -m` ; then true; else machine=unknown ; fi
-
-AC_CHECK_PROGS(AWK,gawk nawk awk,"")
 
 AC_CHECK_PROGS(MAKEINFO,makeinfo,"false")
 AC_SUBST(MAKEINFO)
@@ -821,9 +831,11 @@ AC_CHECK_LIB(m,sin,LIBS="${LIBS} -lm",true)
 AC_CHECK_LIB(mingwex,main,LIBS="${LIBS} -lmingwex",true)
 # AC_CHECK_LIB(japi,j_start,LIBS="${LIBS} -ljapi -lwsock32",true)
 EXTRA_LOBJS=
-AC_CHECK_HEADERS(japi.h,[AC_DEFINE(HAVE_JAPI_H)
-			 EXTRA_LOBJS="${EXTRA_LOBJS} japi.o"
-			 LIBS="${LIBS} -ljapi -lwsock32"] )
+if test "$try_japi" = "yes" ; then
+   AC_CHECK_HEADERS(japi.h,[AC_DEFINE(HAVE_JAPI_H)
+				 EXTRA_LOBJS="${EXTRA_LOBJS} japi.o"
+			 	 LIBS="${LIBS} -ljapi -lwsock32"] )
+fi
 
 # Should really find a way to check for prototypes, but this 
 # basically works for now.  CM

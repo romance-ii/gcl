@@ -67,6 +67,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #undef bool
 typedef int bool;
 typedef long fixnum;
+typedef unsigned long ufixnum;
 typedef float shortfloat;
 typedef double longfloat;
 typedef unsigned short fatchar;

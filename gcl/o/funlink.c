@@ -681,7 +681,7 @@ call_proc(object sym, void **link, int argd, va_list ll)
 	{while(i < nargs)
 	    {enum ftype typ=SFUN_NEXT_TYPE(argd);
 	      vs_push((typ==f_object? va_arg(ll,object):
-		       make_fixnum(va_arg(ll,long))));
+		       make_fixnum(va_arg(ll,fixnum))));
 	     i++;}}
     }
 
@@ -815,7 +815,7 @@ call_proc_new(object sym, void **link, int argd, object first, va_list ll)
 	      _xx=i ? va_arg(ll,object) : first;
 	    else {
 	      long _yy;
-	      _yy=i ? va_arg(ll,long) : (long)first;
+	      _yy=i ? va_arg(ll,fixnum) : (fixnum)first;
 	      _xx=make_fixnum(_yy);
 	    }
 	    vs_push(_xx);

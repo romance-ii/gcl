@@ -66,6 +66,16 @@ build_symbol_table_bfd(void) {
       h->u.def.section=q[u]->section;
       *c='@';
     }
+    if (!strncmp(q[u]->name,"__",2) && !strcmp("i3",q[u]->name+strlen(q[u]->name)-2)) {
+      struct bfd_link_hash_entry *h;
+      if (!(h=bfd_link_hash_lookup(link_info.hash,q[u]->name,MY_BFD_TRUE,MY_BFD_TRUE,MY_BFD_TRUE)))
+	FEerror("Cannot make new hash entry",0);
+      h->type=bfd_link_hash_defined;
+      if (!q[u]->section)
+	FEerror("Symbol is missing section",0);
+      h->u.def.value=q[u]->value+q[u]->section->vma;
+      h->u.def.section=q[u]->section;
+    }
   }
 #ifndef HAVE_ALLOCA
   free(q);

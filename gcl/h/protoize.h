@@ -10,8 +10,8 @@
 /* alloc.c:611:OF */ extern void set_maxpage (void); /* () */
 /* alloc.c:635:OF */ extern void init_alloc (void); /* () */
 /* alloc.c:737:OF */ extern object fSstaticp (object x); /* (x) object x; */
-/* alloc.c:822:OF */ extern object fSallocate_sgc (object type, int min, int max, int free_percent); /* (type, min, max, free_percent) object type; int min; int max; int free_percent; */
-/* alloc.c:846:OF */ extern object fSallocate_growth (object type, int min, int max, int percent, int percent_free); /* (type, min, max, percent, percent_free) object type; int min; int max; int percent; int percent_free; */
+/* alloc.c:822:OF */ extern object fSallocate_sgc (object type,fixnum min,fixnum max,fixnum free_percent); /* (type, min, max, free_percent) object type; int min; int max; int free_percent; */
+/* alloc.c:846:OF */ extern object fSallocate_growth (object type,fixnum min,fixnum max,fixnum percent,fixnum percent_free); /* (type, min, max, percent, percent_free) object type; int min; int max; int percent; int percent_free; */
 /* alloc.c:911:OF */ extern object fSallocated_contiguous_pages (void); /* () */
 /* alloc.c:918:OF */ extern object fSmaximum_contiguous_pages (void); /* () */
 /* alloc.c:958:OF */ extern object fSallocated_relocatable_pages (void); /* () */
@@ -19,21 +19,21 @@
 /* alloc.c:1000:OF */ extern void init_alloc_function (void); /* () */
 /* alloc.c:1126:OF */ extern void free (void *ptr); /* (ptr) void *ptr; */
 /* array.c:57:OF */ extern void Laref (void); /* () */
-/* array.c:126:OF */ extern object fLsvref (object x, unsigned int i); /* (x, i) object x; unsigned int i; */
-/* array.c:142:OF */ extern object fLrow_major_aref (object x, int i); /* (x, i) object x; int i; */
-/* array.c:190:OF */ extern object fSaset1 (object x, int i, object val); /* (x, i, val) object x; int i; object val; */
+/* array.c:126:OF */ extern object fLsvref (object x, ufixnum i); /* (x, i) object x; unsigned int i; */
+/* array.c:142:OF */ extern object fLrow_major_aref (object x,fixnum i); /* (x, i) object x; int i; */
+/* array.c:190:OF */ extern object fSaset1 (object x,fixnum i, object val); /* (x, i, val) object x; int i; object val; */
 /* array.c:262:OF */ extern void siLaset (void); /* () */
 /* array.c:321:OF */ extern void siLsvset (void); /* () */
-/* array.c:324:OF */ extern object fSsvset (object x, int i, object val); /* (x, i, val) object x; int i; object val; */
+/* array.c:324:OF */ extern object fSsvset (object x,fixnum i, object val); /* (x, i, val) object x; int i; object val; */
 /* array.c:461:OF */ extern object fSget_aelttype (object x); /* (x) object x; */
 /* array.c:480:OF */ extern void siLmake_vector (void); /* () */
-/* array.c:519:OF */ extern object fSmake_array1 (int elt_type, object staticp, object initial_element, object displaced_to, int displaced_index_offset, object dimensions); /* (elt_type, staticp, initial_element, displaced_to, displaced_index_offset, dimensions) int elt_type; object staticp; object initial_element; object displaced_to; int displaced_index_offset; object dimensions; */
+/* array.c:519:OF */ extern object fSmake_array1 (fixnum elt_type, object staticp, object initial_element, object displaced_to,fixnum displaced_index_offset, object dimensions); /* (elt_type, staticp, initial_element, displaced_to, displaced_index_offset, dimensions) int elt_type; object staticp; object initial_element; object displaced_to; int displaced_index_offset; object dimensions; */
 /* array.c:738:OF */ extern void adjust_displaced (object x, int diff); /* (x, diff) object x; int diff; */
 /* array.c:790:OF */ extern void gset (void *p1, void *val, int n, int typ); /* (p1, val, n, typ) char *p1; char *val; int n; int typ; */
-/* array.c:831:OF */ extern object fScopy_array_portion (object x, object y, int i1, int i2, object n1); /* (x, y, i1, i2, n1) object x; object y; int i1; int i2; int n1; */
+/* array.c:831:OF */ extern object fScopy_array_portion (object x, object y,fixnum i1,fixnum i2, object n1); /* (x, y, i1, i2, n1) object x; object y; int i1; int i2; int n1; */
 /* array.c:879:OF */ extern void array_allocself (object x, int staticp, object dflt); /* (x, staticp, dflt) object x; int staticp; object dflt; */
 /* array.c:920:OF */ extern void siLfill_pointer_set (void); /* () */
-/* array.c:923:OF */ extern object fSfill_pointer_set (object x, int i); /* (x, i) object x; int i; */
+/* array.c:923:OF */ extern object fSfill_pointer_set (object x,fixnum i); /* (x, i) object x; int i; */
 /* array.c:944:OF */ extern void Lfill_pointer (void); /* () */
 /* array.c:947:OF */ extern object fLfill_pointer (object x); /* (x) object x; */
 /* array.c:965:OF */ extern object fLarray_has_fill_pointer_p (object x); /* (x) object x; */
@@ -46,7 +46,7 @@
 /* array.c:1010:OF */ extern void Larray_rank (void); /* () */
 /* array.c:1013:OF */ extern object fLarray_rank (object x); /* (x) object x; */
 /* array.c:1020:OF */ extern void Larray_dimension (void); /* () */
-/* array.c:1023:OF */ extern object fLarray_dimension (object x, int i); /* (x, i) object x; int i; */
+/* array.c:1023:OF */ extern object fLarray_dimension (object x,fixnum i); /* (x, i) object x; int i; */
 /* array.c:1090:OF */ extern void siLreplace_array (void); /* () */
 /* array.c:1093:OF */ extern object fSreplace_array (object old, object new); /* (old, new) object old; object new; */
 /* array.c:1132:OF */ extern object fLarray_total_size (object x); /* (x) object x; */
@@ -389,7 +389,7 @@ typedef void (*funcvoid)(void);
 /* num_sfun.c:535:OF */ extern void init_num_sfun (void); /* () */
 /* number.c:35:OF */ extern long int fixint (object x); /* (x) object x; */
 /* number.c:44:OF */ extern int fixnnint (object x); /* (x) object x; */
-/* number.c:59:OF */ extern object fSallocate_bigger_fixnum_range (int min, int max); /* (min, max) int min; int max; */
+/* number.c:59:OF */ extern object fSallocate_bigger_fixnum_range (fixnum min,fixnum max); /* (min, max) int min; int max; */
 /* number.c:81:OF */ extern object make_fixnum1 (long i); /* (i) int i; */
 /* number.c:102:OF */ extern object make_ratio (object num, object den); /* (num, den) object num; object den; */
 /* number.c:144:OF */ extern object make_shortfloat (double f); /* (f) double f; */
@@ -454,8 +454,8 @@ typedef void (*funcvoid)(void);
 /* reference.c:191:OF */ extern void init_reference (void); /* () */
 /*  #include "regexp.h" */
 /* regexp.c:1588:OF */ extern void regerror (char *s); /* (s) char *s; */
-/* regexpr.c:48:OF */ extern object fSmatch_beginning (int i); /* (i) int i; */
-/* regexpr.c:57:OF */ extern object fSmatch_end (int i); /* (i) int i; */
+/* regexpr.c:48:OF */ extern object fSmatch_beginning (fixnum i); /* (i) int i; */
+/* regexpr.c:57:OF */ extern object fSmatch_end (fixnum i); /* (i) int i; */
 /* save.c:17:OF */ extern void Lsave (void); /* () */
 #include <unistd.h>
 /* sbrk.c:9:OF */ /*  extern void * sbrk (int n); */ /* (n) int n; */
@@ -523,14 +523,14 @@ typedef void (*funcvoid)(void);
 /* usig.c:119:OF */ extern void unblock_sigusr_sigio (void); /* () */
 /* usig.c:182:OF */ extern void install_default_signals (void); /* () */
 /* usig2.c:142:OF */ extern void init_safety (void); /* () */
-/* usig2.c:158:OF */ extern object sSsignal_safety_required (int signo, int safety); /* (signo, safety) int signo; int safety; */
+/* usig2.c:158:OF */ extern object sSsignal_safety_required (fixnum signo,fixnum safety); /* (signo, safety) int signo; int safety; */
 #ifdef __MINGW32__
 /* usig2.c:167:OF */ extern void main_signal_handler (int signo); /* (signo) int signo */
 #else
 /* usig2.c:167:OF */ extern void main_signal_handler (int signo, int a, int b); /* (signo, a, b) int signo; int a; int b; */
 #endif
 /* usig2.c:375:OF */ extern void raise_pending_signals (int cond); /* (cond) int cond; */
-/* usig2.c:407:OF */ extern object fSallow_signal (int n); /* (n) int n; */
+/* usig2.c:407:OF */ extern object fSallow_signal (fixnum n); /* (n) int n; */
 /* utils.c:12:OF */ extern object IisSymbol (object f); /* (f) object f; */
 /* utils.c:20:OF */ extern object IisFboundp (object f); /* (f) object f; */
 /* utils.c:30:OF */ extern object IisArray (object f); /* (f) object f; */
@@ -738,7 +738,7 @@ void
 init_file(void);
 
 object
-aset1(object,int,object);
+aset1(object,fixnum,object);
 
 void
 dfprintf(FILE *,char *,...);
@@ -1728,7 +1728,14 @@ void siLrem_f(void);
 void siLset_symbol_plist(void);
 void siLbit_array_op(void);
 
-
+object
+cmod(object);
+object
+ctimes(object,object);
+object
+cdifference(object,object);
+object
+cplus(object,object);
 
 #if defined (__MINGW32__)
 int bcmp ( const void *s1, const void *s2, size_t n );
