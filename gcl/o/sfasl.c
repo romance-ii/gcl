@@ -55,7 +55,6 @@ struct reloc relocation_info;
 /* next 5 static after debug */
 
 int debug;
-
 #ifdef DEBUG
 #define debug sfasldebug
 int sfasldebug=1;
@@ -76,9 +75,10 @@ struct sfasl_info {
     struct syment *s_symbol_table;
     char *s_start_address;
     char *s_start_data;
+    char *s_start_rdata;
     char *s_start_bss;
     char *s_my_string_table;
-    int s_extra_bss;
+    int   s_extra_bss;
     char *s_the_start;
 };
 
@@ -170,7 +170,7 @@ int fasload ( object faslfile )
     struct scnhdr section[10];
     struct aouthdr header;
 #endif
-    int textsize, datasize, bsssize, nsyms;
+    int textsize, datasize, bsssize, stabsize, stabstrsize, rdatasize, nsyms;
 #if defined ( READ_IN_STRING_TABLE ) || defined ( HPUX )
     int string_size=0;
 #endif        
@@ -181,11 +181,15 @@ int fasload ( object faslfile )
     int i;
     int init_address=0;
     int aux_to_go = 0;
+    size_t sections_read = 0;
     
 #ifndef STAND	
     object *old_vs_base = vs_base;
     object *old_vs_top = vs_top;
 #endif
+    
+    memset ( section, 0, 10 * sizeof ( struct scnhdr ) );
+
     sfaslp = &sfasl_info_buf;
 
     extra_bss=0;
@@ -201,7 +205,7 @@ int fasload ( object faslfile )
 
     HEADER_SEEK(fp);
     if ( !fread ( (char *) &fileheader, sizeof(struct filehdr), 1, fp ) ) {
-        FEerror("Could not get the header",0,0);
+        FEerror("Could not get the header",0);
     }
     nsyms = NSYMS(fileheader);
 
@@ -211,17 +215,41 @@ int fasload ( object faslfile )
 #  endif	
 
     fread ( &header, 1, fileheader.f_opthdr, fp );
-    fread ( &section[1],
-            fileheader.f_nscns,
-            sizeof ( struct  scnhdr ),
-            fp );
+    sections_read = fread ( &section[1],
+                            sizeof ( struct  scnhdr ),
+                            fileheader.f_nscns,
+                            fp );
+    if ( sections_read != fileheader.f_nscns ) {
+        fprintf ( stderr, "Could not get the expected number of sections (%d), got %d\n",
+		  fileheader.f_nscns, sections_read );
+	fflush ( stderr );
+    }
+
     textsize = section[TEXT_NSCN].s_size;
     datasize = section[DATA_NSCN].s_size; 
-    if (strcmp(section[BSS_NSCN].s_name, ".bss") == 0) {
+    if (strcmp(section[BSS_NSCN].s_name, _BSS) == 0) {
         bsssize=section[BSS_NSCN].s_size;
     } else {
         bsssize=section[BSS_NSCN].s_size = 0;
     }
+
+    if (strcmp(section[STAB_NSCN].s_name, _STAB) == 0) {
+        stabsize=section[STAB_NSCN].s_size;
+    } else {
+        stabsize=section[STAB_NSCN].s_size = 0;
+    }
+
+    if (strcmp(section[STABSTR_NSCN].s_name, _STABSTR) == 0) {
+        stabstrsize=section[STABSTR_NSCN].s_size;
+    } else {
+        stabstrsize=section[STABSTR_NSCN].s_size = 0;
+    }
+
+    if ( strcmp ( section[RDATA_NSCN].s_name, _RDATA ) == 0 ) {
+        rdatasize = section[RDATA_NSCN].s_size;
+    } else {
+        rdatasize = section[RDATA_NSCN].s_size = 0;
+    }       
 #endif
 
 #ifdef BSD
@@ -299,7 +327,7 @@ int fasload ( object faslfile )
         /* figure out if there is more bss space needed */
 	extra_bss = get_extra_bss ( symbol_table,
                                     nsyms,
-                                    datasize+textsize+bsssize,
+                                    datasize+textsize+bsssize+stabsize+stabstrsize+rdatasize,
                                     &init_address,
                                     bsssize );
 	
@@ -310,34 +338,36 @@ int fasload ( object faslfile )
             memory = alloc_object ( t_cfdata );
             memory->cfd.cfd_self = 0;
             memory->cfd.cfd_start = 0;
-            memory->cfd.cfd_size = datasize + textsize + bsssize + extra_bss;
+            memory->cfd.cfd_size = datasize + textsize + bsssize + stabsize + stabstrsize + rdatasize + extra_bss;
             vs_push(memory);
             the_start = start_address =        
                 memory->cfd.cfd_start =	
                     alloc_contblock ( memory->cfd.cfd_size );
-            sfaslp->s_start_data = start_address + textsize;
-            sfaslp->s_start_bss = start_address + textsize + datasize;
+            sfaslp->s_start_data  = start_address + textsize;
+            sfaslp->s_start_rdata = sfaslp->s_start_data + datasize + stabsize + stabstrsize;
+            sfaslp->s_start_bss   = sfaslp->s_start_rdata + rdatasize;
             END_NO_INTERRUPT;
         }
 #else
         /* What does this mean? */
 #  ifdef SILLY        
 	the_start = start_address
-            = malloc ( datasize + textsize + bsssize + extra_bss + 0x80000 );
+            = malloc ( datasize + textsize + bsssize + stabsize + stabstrsize + rdatasize + extra_bss + 0x80000 );
 	the_start = start_address = (char *) ( 0x1000 * ( ( ( (int) the_start + 0x70000) + 0x1000) / 0x1000 ) );
 #  else  /* SILLY */
         the_start = start_address
-            = malloc ( datasize + textsize + bsssize + extra_bss );
+            = malloc ( datasize + textsize + bsssize + stabsize + stabstrsize + rdatasize + extra_bss );
 #  endif /* SILLY */       
-	sfaslp->s_start_data = start_address + textsize;
-	sfaslp->s_start_bss = start_address + textsize + datasize;
+	sfaslp->s_start_data  = start_address + textsize;
+        sfaslp->s_start_rdata = sfaslp->s_start_data + datasize + stabsize + stabstrsize;
+	sfaslp->s_start_bss   = sfaslp->s_start_rdata + rdatasize;
 #endif
-	dprintf(" Code size %d, ", datasize+textsize+bsssize + extra_bss);
+	dprintf(" Code size %d, ", datasize+rdatasize+textsize+bsssize + extra_bss);
 	if ( fseek ( fp, N_TXTOFF(fileheader), 0) < 0 ) {
             FEerror("file seek error",0,0);
         }
-	SAFE_FREAD ( the_start, textsize + datasize, 1, fp );
-	dprintf("read %d bytes of text + data into memory at ", textsize + datasize );
+	SAFE_FREAD ( the_start, textsize + datasize + stabsize + stabstrsize + rdatasize, 1, fp );
+	dprintf("read %d bytes of text + data into memory at ", textsize + datasize + stabsize + stabstrsize + rdatasize );
         /* relocate the actual loaded text  */
 
         dprintf(" the_start (%x)\n", the_start);
@@ -374,18 +404,26 @@ int fasload ( object faslfile )
 #ifdef COFF
         {
             int j = 0;
-            for ( j = 1; j < BSS_NSCN ; j++) {
-                dprintf("relocating section %d \n",j);
-                if (section[j].s_nreloc) fseek(fp,section[j].s_relptr,0);
-#  ifdef ADJUST_RELOC_START
-                ADJUST_RELOC_START(j);
-#  endif  
-                for ( i=0; i < section[j].s_nreloc; i++ ) {
-                    /* RELSZ = sizeof(relocation_info) */
-                    fread ( &relocation_info, RELSZ, 1, fp);
-                    dprintf ( "    item %3d: ", i );
-                    relocate() ;
-                } 
+            for ( j = 1; j <= RDATA_NSCN ; j++ ) {
+                if ( ( j != BSS_NSCN ) && ( j != STAB_NSCN ) &&
+                     ( j != STABSTR_NSCN ) && ( 0 != section[j].s_nreloc ) ) {
+                    dprintf ( "relocating section %d \n", j );
+                    fseek ( fp, section[j].s_relptr, 0 );
+                    switch ( j ) {
+                    case TEXT_NSCN:  the_start = memory->cfd.cfd_start; break;
+                    case DATA_NSCN:  the_start = sfaslp->s_start_data;  break;
+                    case RDATA_NSCN: the_start = sfaslp->s_start_rdata; break;
+                    default:
+                        the_start = memory->cfd.cfd_start;
+                    }
+                    for ( i=0; i < section[j].s_nreloc; i++ ) {
+                        fread ( &relocation_info, RELSZ, 1, fp );
+                        dprintf ( "    item %3d: ", i );
+			if ( j == RDATA_NSCN    ) {
+			}
+                        relocate() ;
+                    }
+                }
             }
         }
 #endif
@@ -421,6 +459,9 @@ int fasload ( object faslfile )
         dprintf(" invoking init function at %x", start_address);
         dprintf(" textsize is %x",textsize);
         dprintf(" datasize is %x\n",datasize);
+        dprintf(" stabsize is %x\n",stabsize);
+        dprintf(" stabstrsize is %x\n",stabstrsize);
+        dprintf(" rdatasize is %x\n",rdatasize);
 
 #ifdef DEBUG
         /* Output the symbol table for debugging.
@@ -474,13 +515,15 @@ int fasload ( object faslfile )
         }
 	return ( memory->cfd.cfd_size );
 #endif
+#if 0        
 	{
             FILE *out;
             out=fopen("/tmp/sfasltest","w");
             fwrite((char *)&fileheader, sizeof(struct filehdr), 1, out);
-            fwrite(start_address,sizeof(char),datasize+textsize,out);
+            fwrite(start_address,sizeof(char),datasize+textsize+stabsize+stabstrsize+rdatasize,out);
             fclose(out);
         }
+#endif        
         printf("\n(start %x)\n",start_address);
     }
 }
@@ -625,10 +668,13 @@ void relocate_symbols ( unsigned int length )
         case N_ABS : case N_TEXT: case N_DATA: case N_BSS:
 #endif
 #ifdef COFF
-        case TEXT_NSCN : case DATA_NSCN: case BSS_NSCN :
+        case TEXT_NSCN : case DATA_NSCN: case RDATA_NSCN: case BSS_NSCN :
 #ifdef  _WIN32
 	  if (typ==DATA_NSCN)
 	    n_value = (int)sfaslp->s_start_data;
+	  if (typ==RDATA_NSCN) {
+              n_value = (int)sfaslp->s_start_rdata;
+          }
 	  if (typ==BSS_NSCN)
 	    n_value = (int)sfaslp->s_start_bss;
 	  if (typ==TEXT_NSCN)
@@ -644,6 +690,9 @@ void relocate_symbols ( unsigned int length )
                 break;
             case DATA_NSCN:
                 fprintf ( stderr, "(DATA_NSCN)");
+                break;
+            case RDATA_NSCN:
+                fprintf ( stderr, "(RDATA_NSCN)");
                 break;
             case BSS_NSCN:
                 fprintf ( stderr, "(BSS_NSCN)");

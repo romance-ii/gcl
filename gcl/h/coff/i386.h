@@ -102,11 +102,14 @@ struct external_scnhdr {
 /*
  * names of "special" sections
  */
-#define _TEXT	".text"
-#define _DATA	".data"
-#define _BSS	".bss"
-#define _COMMENT ".comment"
-#define _LIB ".lib"
+#define _TEXT	    ".text"
+#define _DATA	    ".data"
+#define _BSS	    ".bss"
+#define _STAB	    ".stab"
+#define _STABSTR    ".stabstr"
+#define _RDATA	    ".rdata"
+#define _COMMENT    ".comment"
+#define _LIB        ".lib"
 
 /********************** LINE NUMBERS **********************/
 

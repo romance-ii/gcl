@@ -34,14 +34,14 @@
 #define f_nsyms NumberOfSymbols
 #define NO_PWD_H
 
+
 /* Maxima won't build if default used.
  * Temporary hack until better understanding of cause. */
 
 #ifdef MAXPATHLEN
 #  undef MAXPATHLEN
 #endif
-#define MAXPATHLEN 512
-
+#define MAXPATHLEN (PATH_MAX*2)
 
 /* alter pathToAlter to fit in with the Clibrary of the system.
    and report error using name 'x' if you cant do it.
