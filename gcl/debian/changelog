@@ -3,8 +3,9 @@ gclcvs (2.7.0-36) unstable; urgency=low
   * Modify pull-evals and add arg-appears in gcl_cmpeval.lsp to more
     correctly choose which arguments need pre-evaluation in binary op
     compiler-macros
+  * fix fix_bitp reference to 30 instead of LOG_WORD_SIZE-2
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 28 Nov 2004 03:23:17 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 28 Nov 2004 04:06:18 +0000
 
 gclcvs (2.7.0-35) unstable; urgency=high
 

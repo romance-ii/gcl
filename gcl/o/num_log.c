@@ -159,7 +159,7 @@ int (*intLogOps)()[16]= {
 static int
 fix_bitp(object x, int p)
 {
-	if (p > 30) {		/* fix = sign + bit0-30 */
+	if (p > LOG_WORD_SIZE-2) {		/* fix = sign + bit0-30 */
 		if (fix(x) < 0)
 			return(1);
 		else
