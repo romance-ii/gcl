@@ -4,8 +4,9 @@ gcl (2.5.0.cvs20020625-72) unstable; urgency=high
   * Fixed aref of short-float vector
   * nconc can take dotted lists
   * tailp returns t if first arg is nil
+  * Repair nconc and tailp fixes
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 27 Jan 2003 15:34:36 -0500
+ -- Camm Maguire <camm@enhanced.com>  Tue, 28 Jan 2003 10:42:39 -0500
 
 gcl (2.5.0.cvs20020625-71) unstable; urgency=high
 

@@ -968,11 +968,7 @@ Lnconc() {
 			m->c.c_cdr = l;
 			m = l;
 		}
-		for (;  m->c.c_cdr!=Cnil && type_of(m->c.c_cdr)==t_cons;  m = m->c.c_cdr);
-		if (m->c.c_cdr!=Cnil) {
-			m->c.c_cdr=make_cons(m->c.c_cdr,Cnil);
-			m = m->c.c_cdr;
-		}
+		for (;  type_of(m->c.c_cdr)==t_cons;  m = m->c.c_cdr);
 	}
 	if (x == Cnil) vs_base[0] = vs_top[-1];
 	else {
@@ -1200,13 +1196,15 @@ Ltailp() {
 
 	check_arg(2);
 	for (x = vs_base[1];  !endp(x);  x = x->c.c_cdr)
-/*		if (dot_list_eq(x,vs_base[0])) {*/
 		if (eql(fix_dot(x),vs_base[0])) {
 			vs_base[0] = Ct;
 			vs_popp;
 			return;
 		}
-	vs_base[0] = vs_base[0]==Cnil ? Ct : Cnil;
+	if (eql(x,vs_base[0])) 
+		vs_base[0] = Ct;
+	else
+		vs_base[0] = Cnil;
 	vs_popp;
 	return;
 }
