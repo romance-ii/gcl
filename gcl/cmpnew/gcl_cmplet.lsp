@@ -53,7 +53,7 @@
       (let ((new-cdr-bf (or (and (consp bf)
 				 (if (atom (car bf)) bf
 				   (and (member (caar bf) '(flet labels macrolet) :test #'eq) 'lambda)))
-			    (car (member cf '(let let* lambda flet labels macrolet quote)))))
+			    (car (member cf '(let let* lambda flet labels macrolet quote function)))))
 	    (new-car-bf (and (consp cf) bf (list bf)))
 	    (new-cf (if (or bf (atom cf) (eq (car cf) 'lambda))
 			cf (cmp-macroexp-with-compiler-macros cf))))
@@ -101,17 +101,17 @@
 (defun nil-to-t (x)
   (if x x t))
 
-(defun fun-ret-type (form)
-  (cond ((symbolp form) (nil-to-t (cdr (assoc form *decls*))))
-	((integerp form) (list 'integer form form))
-	((atom form) (type-of form))
-	((eq (car form) 'quote) (type-of (cadr form)))
-	((and (cdr form) (atom (cdr form))) (error "Dotted list in fun-ret-type~"))
-	((symbolp (car form))
-	 (nil-to-t (or (result-type-from-args (car form) (mapcar #'fun-ret-type (cdr form)))
-		       (let ((proc (get (car form) 'proclaimed-return-type)))
-			 (and (symbolp proc) proc)))))
-	(t t)))
+;(defun fun-ret-type (form)
+;  (cond ((symbolp form) (nil-to-t (cdr (assoc form *decls*))))
+;	((integerp form) (list 'integer form form))
+;	((atom form) (type-of form))
+;	((eq (car form) 'quote) (type-of (cadr form)))
+;	((and (cdr form) (atom (cdr form))) (error "Dotted list in fun-ret-type~"))
+;	((symbolp (car form))
+;	 (nil-to-t (or (result-type-from-args (car form) (mapcar #'fun-ret-type (cdr form)))
+;		       (let ((proc (get (car form) 'proclaimed-return-type)))
+;			 (and (symbolp proc) proc)))))
+;	(t t)))
 
 (defun coerce-to-one-value (type)
   (if (and (consp type) (eq (car type) 'values))
@@ -129,27 +129,33 @@
 		 (exp (and (consp (cadr bf)) (eq (caadr bf) 'the) (cadadr bf)))
 		 (frt (and (consp (cadr bf))
 			   (symbolp (caadr bf))
-			   (t-to-nil (coerce-to-one-value (fun-ret-type (cadr bf))))))
+			   (t-to-nil
+			    (coerce-to-one-value
+			     (info-type
+			      (cadr
+			       (c1symbol-fun (caadr bf) (cdadr bf))))))))
 		 (dec (var-is-declared var body))
 		 (chb (var-is-changed var body))
 		 (chc (and star (var-is-changed var (cdr bindings)))))
 	     (let ((type (or exp frt inf outer))
 		   (ublk (not (or dec chb chc))))
-	       (if type
-		   (progn
-		     (cmpnote "var ~S is type ~S from ~a, ~a~%"
-			      var type (cond (exp "explicit declaration")
-					     (frt "deduced function return type")
-					     (inf "argument inference")
-					     (outer "outer scope"))
-			      (cond (dec "but is already declared")
-				    (chb "but is changed in body")
-				    (chc "but is changed in other bindings")
-				    (t "declaring")))
-		     (if ublk
-			 (cons (list type var) (binding-decls (cdr bindings) body star))
-		       (binding-decls (cdr bindings) body star)))
-		 (binding-decls (cdr bindings) body star))))))))
+	       (let ((*vars* (if (not star) *vars*
+				 (cons (c1make-var var nil nil (list (cons var (nil-to-t type)))) *vars*))))
+		 (if type
+		     (progn
+		       (cmpnote "var ~S is type ~S from ~a, ~a~%"
+				var type (cond (exp "explicit declaration")
+					       (frt "deduced function return type")
+					       (inf "argument inference")
+					       (outer "outer scope"))
+				(cond (dec "but is already declared")
+				      (chb "but is changed in body")
+				      (chc "but is changed in other bindings")
+				      (t "declaring")))
+		       (if ublk
+			   (cons (list type var) (binding-decls (cdr bindings) body star))
+			 (binding-decls (cdr bindings) body star)))
+		   (binding-decls (cdr bindings) body star)))))))))
 
 ;(type (or (and (symbolp (cadr bf)) (cdr (assoc (cadr bf) *decls*)))
 ;			  (t-to-nil (var-is-inferred var body))

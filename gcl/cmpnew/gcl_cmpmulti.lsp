@@ -207,7 +207,7 @@
 
 (defun form-to-values-type (form)
   (if (and (consp form) (eq (car form) 'values)) form
-    (let ((frt (fun-ret-type form)))
+    (let ((frt (info-type (cadr (c1symbol-fun (car form) (cdr form))))))
       (if (and (consp frt) (eq (car frt) 'values)) frt
 	(list 'values frt)))))
 
@@ -220,13 +220,17 @@
 	((or (null vars) (null mv-form)) nil)
 	(t
 	 (let ((var (car vars)))
-	   (let ((outer (and (symbolp (car mv-form)) (cdr (assoc (car mv-form) *decls*))))
+	   (let ((outer (and (not expn) (symbolp (car mv-form)) (cdr (assoc (car mv-form) *decls*))))
 		 (inf (t-to-nil (var-is-inferred var body)))
-		 (exp (and (consp (car mv-form)) (eq (caar mv-form) 'the) (cadar mv-form)))
+		 (exp (and (not expn) (consp (car mv-form)) (eq (caar mv-form) 'the) (cadar mv-form)))
 		 (typ (and expn (t-to-nil (car mv-form))))
-		 (frt (and (consp (car mv-form))
+		 (frt (and (not expn) (consp (car mv-form))
 			   (symbolp (caar mv-form))
-			   (t-to-nil (coerce-to-one-value (fun-ret-type (car mv-form))))))
+			   (t-to-nil
+			    (coerce-to-one-value
+			     (info-type
+			      (cadr
+			       (c1symbol-fun (caar mv-form) (cdar mv-form))))))))
 		 (dec (var-is-declared var body))
 		 (chb (var-is-changed var body)))
 	     (let ((type (or exp typ frt inf outer))
