@@ -82,4 +82,4 @@
 (in-package "USER")
 
 (SETQ *LOAD-PATH*
-      (APPEND '("/home/wfs/gcl-2.3/gcl-tk/demos/") *LOAD-PATH*))
+      (APPEND '("/home/wfs/cvs/gcl/gcl-tk/demos/") *LOAD-PATH*))
