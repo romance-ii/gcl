@@ -93,8 +93,13 @@
  (push '((t t t) t #.(flags ans set)SUBLIS1-INLINE)
    (get 'sublis1 'inline-always))
 
+;;FIXME the MAX and MIN optimized  arg evaluations aren't logically related to side effects
+;;      but we need to save the intermediate results in any case to avoid exponential
+;;      growth in nested expressions.  set added to flags for now here and in analogous
+;;      constructs involving ?.  CM 20041129
+
 ;;SYMBOL-LENGTH
- (push '((t) fixnum #.(flags rfa)
+ (push '((t) fixnum #.(flags rfa set)
   "@0;(type_of(#0)==t_symbol ? (#0)->s.st_fillp :not_a_variable((#0)))")
    (get 'symbol-length 'inline-always))
 
@@ -779,7 +784,7 @@ type_of(#0)==t_bitvector")
 ; (push '((fixnum fixnum) fixnum #.(flags rfa)
 ;  "@01;(#0>=0&&(#1)>0?(#0)/(#1):ifloor(#0,#1))")
 ;   (get 'floor 'inline-always))
- (push '((fixnum fixnum) fixnum #.(flags rfa)
+ (push '((fixnum fixnum) fixnum #.(flags rfa set)
   "@01;({fixnum _t=(#0)/(#1);((#1)<0  && (#0)<=0) || ((#1)>0 && (#0)>=0) || ((#1)*_t == (#0)) ? _t : _t - 1;})")
    (get 'floor 'inline-always))
 
@@ -900,15 +905,15 @@ type_of(#0)==t_bitvector")
    (get 'make-list 'inline-always))
 
 ;;MAX
- (push '((t t) t #.(flags)"@01;(number_compare(#0,#1)>=0?(#0):#1)")
+ (push '((t t) t #.(flags set)"@01;(number_compare(#0,#1)>=0?(#0):#1)")
    (get 'max 'inline-always))
-(push '((fixnum fixnum) fixnum #.(flags rfa)"@01;((#0)>=(#1)?(#0):#1)")
+(push '((fixnum fixnum) fixnum #.(flags rfa set)"@01;((#0)>=(#1)?(#0):#1)")
    (get 'max 'inline-always))
 
 ;;MIN
- (push '((t t) t #.(flags)"@01;(number_compare(#0,#1)<=0?(#0):#1)")
+ (push '((t t) t #.(flags set)"@01;(number_compare(#0,#1)<=0?(#0):#1)")
    (get 'min 'inline-always))
-(push '((fixnum fixnum) fixnum #.(flags rfa)"@01;((#0)<=(#1)?(#0):#1)")
+(push '((fixnum fixnum) fixnum #.(flags rfa set)"@01;((#0)<=(#1)?(#0):#1)")
    (get 'min 'inline-always))
 
 ;;MINUSP
@@ -920,7 +925,7 @@ type_of(#0)==t_bitvector")
 ;;MOD
 ; (push '((fixnum fixnum) fixnum #.(flags rfa)"@01;(#0>=0&&(#1)>0?(#0)%(#1):imod(#0,#1))")
 ;   (get 'mod 'inline-always))
- (push '((fixnum fixnum) fixnum #.(flags rfa)"@01;({fixnum _t=(#0)%(#1);((#1)<0 && _t<=0) || ((#1)>0 && _t>=0) ? _t : _t + (#1);})")
+ (push '((fixnum fixnum) fixnum #.(flags rfa set)"@01;({fixnum _t=(#0)%(#1);((#1)<0 && _t<=0) || ((#1)>0 && _t>=0) ? _t : _t + (#1);})")
    (get 'mod 'inline-always))
 
 ;;NCONC

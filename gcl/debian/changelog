@@ -10,8 +10,10 @@ gclcvs (2.7.0-36) unstable; urgency=low
   * Choose right binding when pre-evaluating vars in binary-op compiler-
     macros, using cons args as divisors
   * Fix bignum2 function broken recently by accident
+  * Use side-effect flag in optimizer to prevent exponential growth in C
+    expressions on nesting certain optimized forms
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 30 Nov 2004 02:54:19 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 30 Nov 2004 03:50:31 +0000
 
 gclcvs (2.7.0-35) unstable; urgency=high
 
