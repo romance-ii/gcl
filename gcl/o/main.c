@@ -58,7 +58,11 @@ void initialize_process();
 #endif
 
 #ifdef _WIN32
+
+extern void init_shared_memory (void);
+
 #  include <fcntl.h>
+
 #endif
 
 #define LISP_IMPLEMENTATION_VERSION "April 1994"
@@ -75,7 +79,7 @@ int    initflag          = FALSE;		/* initialized flag */
 int    raw_image         = FALSE;		/* raw or saved image */
 
 int    stack_multiple    = 1;
-int    cssize            = 0;
+unsigned int cssize      = 0;
 
 extern bool saving_system;
 extern long real_maxpage;
@@ -110,6 +114,7 @@ main(int argc, char **argv, char **envp) {
 #if defined ( BSD ) && defined ( RLIMIT_STACK )
     struct rlimit rl;
 #endif
+    set_maxpage();
 
 #ifdef NEED_NONRANDOM_SBRK
 #if SIZEOF_LONG == 4
@@ -124,25 +129,18 @@ main(int argc, char **argv, char **envp) {
     extern void init_darwin_zone_compat ();
     init_darwin_zone_compat ();
 #endif
-
 #ifdef RECREATE_HEAP
     RECREATE_HEAP
 #endif
-	
 #if defined ( _WIN32 ) && !defined ( AV )
-    {
-        unsigned int dummy;
-	    
-        _stackbottom = (unsigned int ) &argc;
-        _stacktop    = _stackbottom - CSSIZE; // ???
-
-    }
-#endif
+#  error BLAH
+#endif        
+	
     setbuf(stdin, stdin_buf); 
     setbuf(stdout, stdout_buf);
 #ifdef _WIN32
     _fmode = _O_BINARY;
-    _setmode( _fileno( stdin ), _O_BINARY );
+    _setmode( _fileno( stdin ),  _O_BINARY );
     _setmode( _fileno( stdout ), _O_BINARY );
     _setmode( _fileno( stderr ), _O_BINARY );
 #endif
@@ -215,12 +213,13 @@ main(int argc, char **argv, char **envp) {
     }
 
     vs_top = vs_base = vs_org;
-    clear_stack ( vs_top, vs_top+200 );
+    clear_stack ( vs_top, vs_limit );
     ihs_top = ihs_org-1;
     bds_top = bds_org-1;
     frs_top = frs_org-1;
     cs_org = &argc;
-    cssize = CSSIZE;
+    /* CSSIZE in bytes, cssize for pointer arithmetic. */ 
+    cssize = CSSIZE / sizeof ( void * );
     install_segmentation_catcher();
 
 #ifdef BSD
@@ -258,10 +257,10 @@ main(int argc, char **argv, char **envp) {
 #endif /* BSD */
 
 #ifdef AV
+    
     cs_limit = cs_org - cssize;
 #endif
 
-    set_maxpage();
 
 #ifdef SETUP_SIG_STACK
     SETUP_SIG_STACK
@@ -707,10 +706,10 @@ FFN(siLcatch_fatal)(int i) {
 static void
 reset_cstack_limit(int arg) {
 #ifdef AV
-  if (&arg > cs_org - cssize + 16)
-    cs_limit = cs_org - cssize;
+  if ( &arg > cs_org - cssize + 16 )
+      cs_limit = cs_org - cssize;
   else
-    error("can't reset cs_limit");
+      error ( "can't reset cs_limit" );
 #endif
 }
 

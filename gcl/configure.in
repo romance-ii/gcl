@@ -29,6 +29,9 @@ AC_ARG_ENABLE(ihssize,[ --enable-ihssize=XXXX will compile in a invocation histo
 AC_ARG_ENABLE(frssize,[ --enable-frssize=XXXX will compile in a frame stack of size XXX] ,
 [AC_DEFINE_UNQUOTED(FRSSIZE,$enable_frssize)])
 
+AC_ARG_ENABLE(cssize,[ --enable-cssize=XXXX produces executables with a C stack of size XXX (Windows only)] ,
+[AC_DEFINE_UNQUOTED(CSSIZE,$enable_cssize)])
+
 AC_ARG_ENABLE(machine,[ --enable-machine=XXXX will force the use of one of the definitions in h/XXXX.defs] ,
 [enable_machine=$enableval],[enable_machine=""])
 
@@ -81,6 +84,7 @@ fi
 AC_MSG_RESULT(host=$host)
 
 PROCESSOR_FLAGS=${PROCESSOR_FLAGS:-""}
+LD_STACK_FLAGS=""
 
 use=unknown
 TLDFLAGS=""
@@ -233,10 +237,18 @@ case $canonical in
      i*mingw*)
        if test "$use_common_binary" = "yes"; then
          host=i386-pc-mingw32
-	 PROCESSOR_FLAGS="-mcpu=i386 -march=i386"
+         PROCESSOR_FLAGS="-march=i686 -mfpmath=387"
          echo "The host is canonicalised to $host"
        fi
-
+       # If we have set the C stack size on the command line then send them to
+       # the linker.  Set a default otherwise of 2 Mbytes (Windows default).
+       if test "$enable_cssize" == "" ; then
+         enable_cssize=1024*1024*2
+       else
+	 LD_STACK_FLAGS="-Wl,--stack=$CSSIZE"
+         echo "Linker stack size flags added: $LD_STACK_FLAGS"
+       fi
+       echo "Executable C stack size will be $CSSIZE"
        use=mingw;;
 
      i*cygwin*)
@@ -1074,7 +1086,7 @@ AC_DEFINE_UNQUOTED(CSTACK_ADDRESS,$cstack_address \
 )
 AC_MSG_RESULT(got $cstack_address)
 
-
+AC_DEFINE_UNQUOTED(CSSIZE,$enable_cssize)
 
 AC_MSG_CHECKING("sizeof long long int")
 AC_TRY_RUN([#include <stdio.h>
@@ -1787,10 +1799,13 @@ AC_SUBST(O2FLAGS)
 AC_SUBST(EXTRA_LOBJS)
 AC_SUBST(LEADING_UNDERSCORE)
 AC_SUBST(GNU_LD)
+
+AC_SUBST(LD_STACK_FLAGS)
+
 if test -f h/$use.defs  ; then
 
   AC_SUBST(use)
-  AC_OUTPUT(makedefc windows/gcl.iss windows/sysdir.bat windows/install.lsp )
+  AC_OUTPUT(makedefc windows/gcl.iss windows/sysdir.bat windows/install.lsp)
   echo makedefc
   cat makedefc
 

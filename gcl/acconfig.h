@@ -15,6 +15,7 @@ SGC is enabled.  */
 #define BDSSIZE 2*1024
 #define IHSSIZE 4*1024
 #define FRSSIZE 4*1024
+#define CSSIZE  2*1024*1024
 
 #define HOLEPAGE (MAXPAGE/10)
 
