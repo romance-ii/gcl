@@ -55,7 +55,7 @@ dblrem(int a, int b, int mod)
 int
 dblrem(a,b,mod)
 int a,b,mod;
-{int h,l,sign;
+{int h,sign;
  if (a<0) 
    {a= -a; sign= (b<0)? (b= -b,1) :-1;}
  else { sign= (b<0) ? (b= -b,-1) : 1;}

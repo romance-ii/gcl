@@ -1619,7 +1619,8 @@ fmt_indirection(bool colon, bool atsign)
 	jmp_buf fmt_jmp_buf0;
 	int up_colon;
 
-	up_colon=(int)&old_fmt_paramp;
+	/* to prevent longjmp clobber */
+	up_colon=(long)&old_fmt_paramp;
 	fmt_max_param(0);
 	fmt_not_colon(colon);
 	s = fmt_advance();
@@ -1824,7 +1825,8 @@ fmt_iteration(bool colon, bool atsign)
 	jmp_buf fmt_jmp_buf0;
 	int up_colon;
 
-	up_colon=(int)&old_fmt_paramp;
+	/* to prevent longjmp clobber */
+	up_colon=(long)&old_fmt_paramp;
 	fmt_max_param(1);
 	fmt_set_param(0, &n, fmt_int, 1000000);
 	i = ctl_index;
@@ -1950,7 +1952,8 @@ fmt_justification(volatile bool colon, bool atsign)
 	volatile int spare_spaces=0, line_length=0;
 	vs_mark;
 
-	up_colon=(int)&old_fmt_paramp;
+	/* to prevent longjmp clobber */
+	up_colon=(long)&old_fmt_paramp;
 	fmt_max_param(4);
 	fmt_set_param(0, &mincol, fmt_int, 0);
 	fmt_set_param(1, &colinc, fmt_int, 1);

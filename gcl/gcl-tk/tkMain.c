@@ -399,7 +399,7 @@ tell_lisp_var_changed(
   if (being_set_by_lisp == 0)
     { char *val = Tcl_GetVar2(interp,name1,name2, TCL_GLOBAL_ONLY);
       char buf[3];
-      STORE_3BYTES(buf,(int) clientData);
+      STORE_3BYTES(buf,(long) clientData);
       if(sock_write_str2(dsfd,   m_set_lisp_loc, buf, 3 ,
 				 val, strlen(val))
 		 < 0)
@@ -537,7 +537,7 @@ StdinProc(clientData, mask)
 	  break;
 
 	case m_tcl_link_text_variable:
-	  {int i;
+	  {long i;
 	   GET_3BYTES(msg->body,i);
 	   Tcl_TraceVar2(interp,msg->body+3 ,0,
 			   TCL_TRACE_WRITES
@@ -548,7 +548,7 @@ StdinProc(clientData, mask)
 	   break;
 
 	case m_tcl_unlink_text_variable:
-	  {int i;
+	  {long i;
 	   GET_3BYTES(msg->body,i);
 	   Tcl_UntraceVar2(interp,msg->body+3 ,0,
 			   TCL_TRACE_WRITES

@@ -1159,8 +1159,8 @@ GBC(enum type t) {
     }
     printf("contblock: %d blocks %d pages\n", ncb, ncbpage);
     printf("hole: %d pages\n", holepage);
-    printf("relblock: %ld bytes used %ld bytes free %d pages\n",
-	   rb_pointer - rb_start, rb_end - rb_pointer, nrbpage);
+    printf("relblock: %d bytes used %d bytes free %d pages\n",
+	   (int)(rb_pointer - rb_start), (int)(rb_end - rb_pointer), nrbpage);
     printf("GBC ended\n");
     fflush(stdout);
   }

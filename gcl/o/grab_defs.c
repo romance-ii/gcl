@@ -17,6 +17,7 @@ License for more details.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* recognize \nDEF ......... ") and output it to stdout
    [ie '")' is a two character sequence which ends the def
@@ -86,6 +87,7 @@ main(void)
 	ungetc('\n',stdin);
       }
    }
+  printf("\n");
   exit(0);
   
 }

@@ -673,9 +673,27 @@ call_proc(object sym, void **link, int argd, va_list ll)
 object call_vproc(object sym, void *link, va_list ll)
 {return call_proc(sym,link,VFUN_NARGS | VFUN_NARG_BIT,ll);}
 
+static object
+mcall_proc0(sym,link,argd,va_alist) 
+     object sym;
+     void *link;
+     int argd;
+     va_dcl
+{
+  object res;
+  va_list ap;
+
+  va_start(ap);
+  res=call_proc(sym,link,argd,ap);
+  va_end(ap);
+
+  return res;
+
+}
+
 object
 call_proc0(object sym, void *link)
-{return call_proc(sym,link,0,0);}
+{return mcall_proc0(sym,link,0);}
 
 #if 0
 object

@@ -582,7 +582,7 @@ round_up (x, y)
    if NOERROR is 0; we return -1 if NOERROR is nonzero.  */
 
 static int
-find_section (char *name, char *section_names, char *file_name, Elf32_Ehdr *old_file_h, Elf32_Shdr *old_section_h, int noerror)
+find_section (char *name, char *section_names, char *file_name, ElfW(Ehdr) *old_file_h, ElfW(Shdr) *old_section_h, int noerror)
 {
   int idx;
 
