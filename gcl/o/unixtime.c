@@ -52,7 +52,7 @@ which is usually 60 maybe 100 or something else. */
 #include <sys/timeb.h>
 int usleep ( unsigned int microseconds );
 #endif
-void Lget_system_time_zone(void);
+void siLget_system_time_zone(void);
 #endif /* __MINGW32__ and __GNUC__ */
 
 #ifdef BSD
@@ -198,7 +198,7 @@ init_unixtime(void)
 	make_function("SLEEP", Lsleep);
 	make_function("GET-INTERNAL-RUN-TIME", Lget_internal_run_time);
 #if defined __MINGW32__   || defined __GNUC__
-	make_function("GET-SYSTEM-TIME-ZONE", Lget_system_time_zone);
+	make_si_function("GET-SYSTEM-TIME-ZONE", siLget_system_time_zone);
 #endif        
 }
 
@@ -244,7 +244,7 @@ int system_time_zone_helper(void){
 
 #if defined __MINGW32__ || defined __GNUC__
 void
-Lget_system_time_zone(void)
+siLget_system_time_zone(void)
 {
   check_arg(0);
   vs_push ( make_fixnum ( system_time_zone_helper() ) );
