@@ -50,7 +50,7 @@ DEBUG=
 #endif
 
 VERS=$(shell echo $$(cat majvers).$$(cat minvers))
-#EXT:=cvs
+EXT:=cvs
 
 CFG:=$(addsuffix /config.,. binutils) gmp3/configfsf.
 # Bug in autocont dependency on emacsen-common workaround
