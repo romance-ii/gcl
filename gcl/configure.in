@@ -109,7 +109,7 @@ AC_SUBST(HAVE_LONG_LONG)
 
 # ansi lisp
 AC_ARG_ENABLE(ansi,[--enable-ansi builds a large gcl aiming for ansi compliance, 
-		    --disable-ansi builds the smaller traditional CLtL1 image],,enable_ansi="yes")
+		    --disable-ansi builds the smaller traditional CLtL1 image],,enable_ansi="no")
 
 if test "$enable_ansi" = "yes" ; then
 	FLISP=saved_ansi_gcl;

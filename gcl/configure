@@ -1152,7 +1152,7 @@ if test "${enable_ansi+set}" = set; then
   enableval="$enable_ansi"
   :
 else
-  enable_ansi="yes"
+  enable_ansi="no"
 fi
 
 
