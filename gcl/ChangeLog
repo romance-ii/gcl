@@ -1,3 +1,7 @@
+1999-12-06  Bill Schelter  <wfs@linux115.ma.utexas.edu>
+
+	* start using CVS
+
 Fri Mar 28 16:23:18 1997  Bill Schelter  <wfs@marie.ma.utexas.edu>
 
 	* fix o/unexelf.c for section following bss overlapping it.
