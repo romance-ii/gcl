@@ -783,6 +783,12 @@ DEFUNO_NEW("IDENTITY",object,fLidentity,LISP
   RETURN1 (x0);
 }
 
+DEFUNO_NEW("GCL-COMPILE-TIME",object,fSgcl_compile_time,SI
+       ,0,0,NONE,OO,OO,OO,OO,void,Lgcl_compile_time,(void),"")
+{
+  RETURN1 (make_simple_string(__DATE__ " " __TIME__));
+}
+
 DEFUN_NEW("LISP-IMPLEMENTATION-VERSION",object,fLlisp_implementation_version,LISP
        ,0,0,NONE,OO,OO,OO,OO,(void),"")
 {
@@ -828,7 +834,13 @@ FFN(siLsave_system)(void) {
 /*  #ifdef AOSVS */
   
   
-  
+#ifdef HAVE_READLINE
+  ADD_FEATURE("READLINE");
+#endif
+#if defined(HAVE_LIBBFD) && !defined(USE_DLOPEN)
+  ADD_FEATURE("BFD");
+#endif
+  ADD_FEATURE("UNEXEC");
   
 /*  #endif */
   cbgbccount = 0;

@@ -6,18 +6,13 @@
 (make-package "TK" :use '("LISP" "SLOOP"))
 
 (in-package "SYSTEM")
+
 (defvar *command-args* nil)
  ;; if ANY header or license information is printed by the
  ;; program, then the following License and Enhancement notice
  ;; must be printed (see License).
-(defvar *system-banner* (format nil "GCL (GNU Common Lisp)  ~A~%~a~%~a~%~a~%~%~a~%" 
-		    "@LI-VERS@"
-       		    "Licensed under GNU Library General Public License"
-		    "Modifications of this banner must retain notice of a compatible license"
-                    "Dedicated to the memory of W. Schelter"
-       		    "Use (help) to get some basic information on how to use GCL."))
-
 (progn 
+
  (system:init-system) 
  (gbc t)
 
@@ -95,8 +90,6 @@
    (in-package 'system::user) (incf system::*ihs-top* 2)
    (funcall system::*old-top-level*))
  
- (defun lisp-implementation-version nil (format nil "GCL-~a-~a" si::*gcl-major-version* si::*gcl-version*))
- 
  (terpri)
  (setq si:*inhibit-macro-special* t)
  (gbc t) (system:reset-gbc-count)
@@ -123,12 +116,16 @@
  (if (fboundp 'si::user-init) (si::user-init))
  (si::set-up-top-level)
  
- (setq si::*gcl-version* @LI-MINVERS@ si::*gcl-major-version* @LI-MAJVERS@)
+ (setq si::*gcl-extra-version* @LI-EXTVERS@
+       si::*gcl-minor-version* @LI-MINVERS@
+       si::*gcl-major-version* @LI-MAJVERS@)
  (setq compiler::*cc* @LI-CC@)
  (setq compiler::*ld* @LI-LD@)
  (setq compiler::*ld-libs* @LI-LD-LIBS@)
  (setq compiler::*opt-three* @LI-OPT-THREE@)
  (setq compiler::*opt-two* @LI-OPT-TWO@)
  (setq compiler::*init-lsp* @LI-INIT-LSP@)
+
+ (defvar si::*system-banner* (si::default-system-banner))
  
  t)
