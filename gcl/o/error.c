@@ -161,7 +161,7 @@ va_dcl
   va_start(ap);
   while (--n)
     b[++i]=va_arg(ap,object);
-  va_end(arg);
+  va_end(ap);
   RETURN1(IapplyVector(sSuniversal_error_handler,++i,b));
 /*    RETURN1(Iapply_fun_n2(sSuniversal_error_handler,5,n-1, */
 /*  			  sKerror, */
@@ -169,7 +169,6 @@ va_dcl
 /*  			  ihs_top_function_name(ihs_top-1), */
 /*  			  null_string,fmt_string, */
 /*  		       &ap)); */
-  va_end(ap);
 }
 
 
@@ -191,7 +190,7 @@ va_dcl
   va_start(ap);
   while (--n)
     b[++i]=va_arg(ap,object);
-  va_end(arg);
+  va_end(ap);
   RETURN1(IapplyVector(sSuniversal_error_handler,++i,b));
 /*    RETURN1(Iapply_fun_n2(sSuniversal_error_handler,5,n-2, */
 /*  			  sKerror, */
@@ -199,7 +198,6 @@ va_dcl
 /*  			  ihs_top_function_name(ihs_top-1), */
 /*  		       continue_fmt_string,fmt_string, */
 /*  		       &ap)); */
-  va_end(ap);
 }
 
 

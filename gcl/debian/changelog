@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-17) unstable; urgency=high
+
+  * Fixed typeo in error.c preventing arm compilation
+
+ -- Camm Maguire <camm@enhanced.com>  Mon, 22 Jul 2002 17:18:18 -0400
+
 gcl (2.5.0.cvs20020625-16) unstable; urgency=high
 
   * Fix bad on_stack_list_vector args
