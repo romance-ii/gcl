@@ -176,7 +176,7 @@
        (eval-when (compile load eval)
 	 (pushnew '(,name ,parent-list
 		    ,@(mapcan #'(lambda (slot-spec)
-				  (let* ((ia (getf (cdr slot-spec) ':initarg)))
+				  (let* ((ia (and (consp slot-spec) (getf (cdr slot-spec) ':initarg))))
 				    (when ia
 				      (list
 				       (cons ia
