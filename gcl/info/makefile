@@ -5,6 +5,7 @@ INFO_DIR=/usr/local/lib/info
 
 GCL_DVI=gcl-tk.dvi gcl-si.dvi gcl.dvi
 GCL_HTML=gcl-si_toc.html gcl-tk_toc.html gcl_toc.html
+HTML_CMD=texi2html -split_chapter
 
 -include ../makedefs
 
@@ -46,16 +47,13 @@ gcl.info: ${GCL_MAN} gcl.texi
 	-$(MAKEINFO) gcl.texi
 
 gcl-si_toc.html:
-	texi2html -split_chapter gcl-si.texi
-#	makeinfo --html gcl-si.texi
+	$(HTML_CMD) gcl-si.texi
 
 gcl-tk_toc.html:
-	texi2html -split_chapter gcl-tk.texi
-#	makeinfo --html gcl-tk.texi
+	$(HTML_CMD) gcl-tk.texi
 
 gcl_toc.html:
-	texi2html -split_chapter gcl.texi
-#	makeinfo --html gcl.texi
+	$(HTML_CMD) gcl.texi
 
 install-html: gcl-tk_toc.html gcl-si_toc.html gcl_toc.html
 	cp *.html /d/www/gcl

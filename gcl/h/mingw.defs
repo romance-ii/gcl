@@ -87,8 +87,10 @@ TK_LISP_LIB=
 TCL_EXES=
 
 # Don't do dvi on Windows
-
 GCL_DVI=
+
+# Use MSYS makeinfo
+HTML_CMD=makeinfo --html --no-split
 
 #
 # End h/mingw.defs
