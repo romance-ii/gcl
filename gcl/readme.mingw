@@ -1,0 +1,55 @@
+
+GCL 2.3.8 compiles for MS windows win32 under mingw. 
+The mingw version of GCC comes equipped with include files  
+which allow it to make a regular windows executable which links 
+with msvcrt.dll (or an older microsoft dll as well). 
+
+
+I have tested it using the msvcrt.dll support.
+
+I did the compiles on a system with cygwin support installed during
+the compile, although the resulting image does NOT use the cygwin
+libraries, but only the microsoft msvcrt.dll which should be on all
+systems.
+
+copy the sh.exe from the cygwin/bin directory to /bin, so that 
+configure and friends can find it.   
+Check it is not buggy:
+
+/bin/sh -c 'echo */makefile' 
+
+should give the actual list of makefiles in each subdirectory... if not
+you may try using bash.exe instead.
+
+and have installed the mingw compilers and includes under
+g:/progs/mingw-msvrt/bin
+then in bash add
+bash$ export PATH=//g/progs/mingw-msvrt/bin:$PATHxcs
+
+There is a bug in winsock2.h in the mingw distribution at line 46,
+the 'ifdef' should have '#' in front of it.   You will see this when 
+you compile mingwin.c, if yours is buggy, just correct it at that time.
+
+Also we will use the make.exe from the cygwin/bin, so move aside the 
+mingw one:  
+
+in g:/progs/mingw-msvrt/bin
+cd g:/progs/mingw-msvrt/bin
+mv make.exe make.exe-ming
+
+
+so now your path will fall through to the cygwin make, and the ming gcc.
+
+Now you are ready to go!!
+
+bash$ ./configure --enable-machine=mingw
+# edit the unixport/makefile so that GCLDIR does not have /cygdrive etc..
+# since otherwise gcc will have that in it.. 
+#GCLDIR=h:/wfs2/tmp/gcl-2.3.8
+bash$ mak
+
+
+ 
+ 
+
+
