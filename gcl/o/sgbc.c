@@ -975,7 +975,7 @@ sgc_count_read_only_type(int t) {
 
   int j = first_protectable_page -1;
   int hp_end = page(heap_end);
-  int end = page(core_end);
+  int end = page(rb_limit);
   int count=0;
   while(j++ < hp_end)
     if ((type_map[j]==t || (t<0 && type_map[j]!=t_other)) && !WRITABLE_PAGE_P(j))
@@ -1377,18 +1377,13 @@ sgc_start(void) {
   /* Now  allocate the sgc relblock.   We do this as the tail
      end of the ordinary rb.     */  
   {
-    int want;
     char *new;
     tm=tm_of(t_relocatable);
-    want =((int) (rb_end - rb_pointer) >> PAGEWIDTH);
-    if (want < tm->tm_sgc) want = tm->tm_sgc;
-    else 
-      want  = (want < 4 ? want : want -2);
     
     {
       old_rb_start=rb_start;
       if(!saving_system) {
-	new=alloc_relblock(want*PAGESIZE);
+	new=alloc_relblock(tm->tm_sgc*PAGESIZE);
 	/* the above may cause a gc, shifting the relblock */
 	old_rb_start=rb_start;
 	new= PAGE_ROUND_UP(new);

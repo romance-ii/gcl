@@ -124,8 +124,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
     generation
   * si::*OPTIMIZE-MAXIMUM-PAGES* support
   * Fix sigcontext autodetection on sparc
+  * Improve optimize-maximum-pages algorithm
 
- -- Camm Maguire <camm@enhanced.com>  Sun,  4 Apr 2004 19:29:16 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue,  6 Apr 2004 03:25:32 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

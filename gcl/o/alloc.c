@@ -275,6 +275,7 @@ grow_linear(int old, int fract, int grow_min, int grow_max) {
 
 DEFVAR("*OPTIMIZE-MAXIMUM-PAGES*",sSAoptimize_maximum_pagesA,SI,sLt,"");
 #define OPTIMIZE_MAX_PAGES (sSAoptimize_maximum_pagesA ==0 || sSAoptimize_maximum_pagesA->s.s_dbind !=sLnil) 
+DEFVAR("*NOTIFY-OPTIMIZE-MAXIMUM-PAGES*",sSAnotify_optimize_maximum_pagesA,SI,sLnil,"");
 #define MMAX_PG(a_) ((a_)->tm_type == t_relocatable ? (a_)->tm_npage : (a_)->tm_maxpage)
 static int
 opt_maxpage(struct typemanager *my_tm) {
@@ -282,16 +283,16 @@ opt_maxpage(struct typemanager *my_tm) {
   double x=0.0,y=0.0,z,r;
   int mmax_page;
   struct typemanager *tm,*tme;
-  int mro=0;
+  int mro=0,tro=0;
 
   for (tm=tm_table,tme=tm+sizeof(tm_table)/sizeof(*tm_table);tm<tme;tm++) {
     x+=tm->tm_adjgbccnt;
     y+=MMAX_PG(tm);
   }
   mmax_page=MMAX_PG(my_tm);
-#ifdef SGC
+#if 0
   if (sgc_enabled) {
-    y-=sgc_count_read_only_type(-1);
+    y-=(tro=sgc_count_read_only_type(-1));
     mmax_page-=(mro=sgc_count_read_only_type(my_tm->tm_type));
   }
 #endif
@@ -306,6 +307,9 @@ opt_maxpage(struct typemanager *my_tm) {
 
   r=((x-my_tm->tm_adjgbccnt)+ my_tm->tm_adjgbccnt*mmax_page/z)*(y-mmax_page+z);
   r/=x*y;
+  if (sSAnotify_optimize_maximum_pagesA->s.s_dbind!=sLnil)
+    printf("[type %u max %u(%u) opt %u   y %u(%u) gbcrat %f sav %f]\n",
+	   my_tm->tm_type,mmax_page,mro,(int)z,(int)y,tro,(my_tm->tm_adjgbccnt-1)/(1+x-0.9*my_tm->tm_adjgbccnt),r);
   if (r<=0.95) {
     my_tm->tm_adjgbccnt*=mmax_page/z;
     if (my_tm->tm_type==t_relocatable)
