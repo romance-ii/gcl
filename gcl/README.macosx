@@ -1,0 +1,121 @@
+
+Mac OS X implementation notes
+aurelien.chanudet <at> m4x.org
+July 18, 2004
+
+
+This file briefly discusses Mac OS X implementation notes.
+
+
+* Third party malloc(3) calls
+
+In GCL, for the sake of efficient memory management, there should be no calls to standard memory
+allocation routines such as malloc(3) or free(3). Instead, GCL's own memory allocation routines
+should be used. In particular, this means that third party calls to malloc(3) (remember that GCL
+uses, say, gmp which is likely to call malloc(3)) should be intercepted and re-routed to GCL's
+own functions. On Linux, this is done at build time, during the linking stage. This is possible
+because symbols in Linux live in a flat namespace. By contrast, symbols in Mac OS X live in a
+two-level namespace. This means that it is not possible, on Mac OS X, to override the default
+implementation of malloc(3) as provided by libc. The trick on Mac OS X is to use Darwin's zone
+mechanism. Darwin has a poorly documented API allowing advanced memory management (see
+<objc/malloc.h>). Most applications have only one zone, also called the default zone, which is
+automatically created the first time the program calls malloc(3). In GCL, an extra zone is
+created at initialization time and is then made to be the default zone.
+
+
+* Broken sbrk(2) replacement strategy
+
+sbrk(2) simply does not work on Mac OS X. Unfortunately, GCL heavily relies on it. Indeed,
+GCL has its own page level memory management scheme. Regular Mach-O applications have at least
+three segments : the text segment (__TEXT), the data segment (__DATA) and the link-edit segment
+(__LINKEDIT). The first two segments have equivalent ELF segments (the third segment contains
+link-edit information such as references to imported symbols). When the process is bootstrapped
+in memory by the dynamic loader, these segments are mapped in memory and any subsequent memory
+allocation takes place after the end of the link-edit segment. This layout turns out to be
+problematic because GCL assumes that memory allocation takes place immediately after the end of the
+data segment. That is, I suspect that, on Linux, calling sbrk(2) results in extending the size
+of this data segment ; however, on Mac OS X, the size of the data segment cannot vary at runtime.
+For this reason, an extra data segment is created at initialization time and is inserted between
+the first data segment and the link-edit segment resulting in the following memory layout :
+
++---------------------------------------------------------------------+
+| __TEXT segment as created by gcc                                    |
++---------------------------------------------------------------------+ <- DBEGIN
+| __DATA segment as created by gcc (size is fixed)                    |
++---------------------------------------------------------------------+ <- mach_mapstart
+|                                                                     | <- heap_end
+|                                                                     | <- core_end
+|                                                                     | <- mach_brkpt (= my_sbrk(0))
++---------------------------------------------------------------------+ <- mach_maplimit (= DBEGIN + MAXPAGE)
+| __LINKEDIT segment created by gcc but moved toward higher addresses |
++---------------------------------------------------------------------+
+
+The heap ranges from DBEGIN to DBEGIN+MAXPAGE. The area of memory between mach_mapstart
+and mach_maplimit is our extra data segment. To bridge the gap with our first section (third
+party malloc(3) calls), we can say that all memory allocation happens between mach_mapstart
+and mach_brkpt. In particular, this means that the area ranging from mach_brkpt to mach_maplimit
+is mere wiggle room (memory is set to zero). You might wonder how an extra data segment can
+be programmatically inserted once the process is mapped in memory : the trick is to write
+a modified executable file (containing sufficient information for the dynamic loader to know
+how to set up this memory layout) and then use execv(2).
+
+
+* Unexec()'ing 
+
+Unexec()'ing is the process of capturing the memory footprint of a running process and storing
+it to an executable file for later re-execution. Fortunately, not the whole address space
+has to be saved to disk. Indeed, because the virtual address space is sparse, only non zero
+ranges have to be saved. In particular, this means that the region ranging from mach_brkpt
+to mach_maplimit isn't saved to the file (thus resulting in a segment whose filesize is
+less than its virtual memory size, see Mach-O Runtime Architecture for details). The bulk of
+the work comes from Andrew Choi's work for Emacs.
+
+
+* BFD Mach-O port
+
+GCL has the ability to compile Lisp code to native object code, load the compiled code into the
+running image, link the code and execute it. Most of the time, this kind of functionality is
+achieved by compiling shared object libraries (.so files on Linux, .dylib files or .bundle files on
+Mac OS X) and then loading the shared object library using the dlopen(3) interface (note, however,
+that Mac OS X has its own replacement solution for dlopen(3), which is the dyld(3) interface, but
+the concept remains the same). Handy as the dlopen strategy is, it is a fairly time consuming one
+because the external linker has to be called in order to turn raw object files (.o) as output by
+the compiler into shared object files. To speed things up at the expense of more development, GCL
+implements its own toy linker on top of the BFD interface. BFD is the Binary File Descriptor library.
+The official BFD distribution supports ELF well, but does not really support Mach-O. For this reason,
+I had to extend the official Mach-O back-end in order to support linking (see files "mach-o.c" and
+"mach-o-reloc.c" in the local BFD tree). There's nothing special to say about this port, excepted
+that the job of adding relocation support was tough. To summarize at this stage, there are two
+dynamic loading mechanism available for Mac OS X. The old one, slow and no longer supported relies
+on the dyld(3). And the new one, built on top of my work to extend the Mach-O back-end. At this
+stage, there are no known bugs in the relocation code (that is, Maxima and ACL2 compiles fine),
+but there's a high probability that as yet hidden bugs remain.
+
+Perhaps the biggest disadvantage of dlopen wrt. bfd or custom relocation is the number of file
+descriptors consumed, which is severely limited in many environments.  This is a current problem for
+axiom, for example, where we do not yet have native relocation.  Likewise, say someone goes through
+a series of trial function files, compiling, loading, replacing, etc.  If the code is part of the
+heap, the natural gc process already written will clean up after the old loads.  With dlopen, one
+would need a complex additional layer trying to keep track of when pointers to the old load were
+still active, a layer which we do not yet have in place, and hopefully won't have to if we can extend
+our bfd and/or custom relocation work elsewhere.
+
+
+* Stratified Garbage Collection
+
+SGC is an optional performance feature that speeds up garbage collection. The idea is that some
+systems have large *static* data sets, and the system just wastes time passing these pages through GBC.
+So mark these pages read only, GBC a much smaller frequently changing set of pages, and when the odd
+write happens to the static page, mark it read-write and schedule it for GBC marking too. mprotect(3)
+is used to change page protections. A so-called stratified segfault occurs when attempting to write
+on a read-only page. Such segfaults are caught in a signal handler and are thereupon marked as
+read-write. For this to work, one needs to be able to retrieve the faulting address. By contrast
+with Linux, si_addr does not contain the faulting address in Darwin. This is a known bug and the
+work around is to look at the dar field of the exception state (see "powerpc-macosx.h"). Note that,
+in Darwin, memory segments have maximal protection and initial protection attributes (otool -lV).
+
+
+* Further references :
+
+- Mach-O Runtime Architecture
+- Linkers & Loaders by John R. Levine
