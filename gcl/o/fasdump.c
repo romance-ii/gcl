@@ -446,6 +446,7 @@ getd(str)
 #define  READ_STRING(leng,loc) do {BEGIN_NO_INTERRUPT;     \
      *loc = alloc_simple_string(leng); \
      (*loc)->st.st_self=alloc_relblock(leng); END_NO_INTERRUPT; \
+  memset((*loc)->st.st_self,0,leng); /* fread won't restart if it triggers an SGC segfault -- CM */ \
   D_FREAD((*loc)->st.st_self,1,leng,fas_stream);} while(0)
 
 /* if try_hash finds it we don't need to write the object

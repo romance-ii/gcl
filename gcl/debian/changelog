@@ -4,8 +4,10 @@ gcl (2.5.0.cvs20020625-70) unstable; urgency=high
   * configure fixes
   * :common-lisp in *features*
   * :definition-before-clcs -> definition-before-clcs
+  * protect against sgc segfault within fread in fasdump.c -- fixes m68k
+    acl2 build
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  2 Dec 2002 22:30:13 -0500
+ -- Camm Maguire <camm@enhanced.com>  Thu,  5 Dec 2002 07:57:37 -0500
 
 gcl (2.5.0.cvs20020625-69) unstable; urgency=high
 
