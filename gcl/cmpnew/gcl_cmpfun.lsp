@@ -432,7 +432,7 @@
 		(< (+ (car specs)(cdr specs))
 		   len)
 		(subtypep (result-type (second args)) 'fixnum))
-	   (c1expr `(the fixnum (ldb1 ,(car specs) ,(cdr specs) ,(second args))))))))
+	   (c1expr `(the fixnum (si::ldb1 ,(car specs) ,(cdr specs) ,(second args))))))))
 
 	  
 (si:putprop 'length 'c1length 'c1)

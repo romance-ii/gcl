@@ -38,7 +38,7 @@
 ;;LDB1
  (push '((fixnum fixnum fixnum) fixnum #.(flags)
   "((((~(-1 << (#0))) << (#1)) & (#2)) >> (#1))")
-   (get 'ldb1 'inline-always))
+   (get 'si::ldb1 'inline-always))
 
 ;;LONG-FLOAT-P
  (push '((t) boolean #.(flags)"type_of(#0)==t_longfloat")

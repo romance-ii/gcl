@@ -28,8 +28,10 @@ gclcvs (2.7.0-20) unstable; urgency=low
     addresses exist to which undefined symbols in compiled lisp objects
     referring to external shared libraries can be relocated
   * Make configure demand gettext when choosing --enable-locbfd
+  * Make sure references to ldb1, a stub conventionally optimized away,
+    can be resonled when optimization is turned off
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 27 Feb 2004 23:45:41 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 27 Feb 2004 23:49:11 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
