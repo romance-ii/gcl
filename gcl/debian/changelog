@@ -5,8 +5,9 @@ gclcvs (2.7.0-31) unstable; urgency=low
     -- extend to all gmp functions in a systematic way, and write header
     information for future use in the compiler, making sure that plt.c
     carries the needed gmp symbols at this point
+  * Build support for gmp_wrappers
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 12 Aug 2004 16:24:32 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 12 Aug 2004 16:27:41 +0000
 
 gclcvs (2.7.0-30) unstable; urgency=high
 

@@ -1,4 +1,5 @@
 
+
 #define	CHAR_CODE_LIMIT	256	
 #define	READ_TABLE_SIZE CHAR_CODE_LIMIT
 #define ARRAY_RANK_LIMIT 63
@@ -285,3 +286,4 @@ gcl_init_cmp_anon(void);
 #define SAFE_FREAD(a_,b_,c_,d_) fread((a_),(b_),(c_),(d_))
 #endif
 
+#include "gmp_wrappers.h"

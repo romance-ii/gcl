@@ -67,6 +67,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "../h/lex.h"
 #include "../h/eval.h"
 
+#include "../h/protoize.h"
 #include "../h/notcomp.h"
 #include "../h/funlink.h"
 #include "../h/att_ext.h"
@@ -76,4 +77,3 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "../h/rgbc.h"
 #include "../o/regexp.h"
-#include "../h/protoize.h"
