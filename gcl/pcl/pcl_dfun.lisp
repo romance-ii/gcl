@@ -101,17 +101,15 @@ And so, we are saved.
 	      "enabled" "disabled"))
   (dolist (generator-entry *dfun-constructors*)
     (dolist (args-entry (cdr generator-entry))
-      (format t "~&~S ~S ~A"
-	      (cons (car generator-entry) (car args-entry))
-	      (caddr args-entry)
-	      (if (cadddr args-entry) "(preliminary)" "")))))
+      (format t "~&~S ~S"
+	      (cons (car generator-entry) (caar args-entry))
+	      (caddr args-entry)))))
 
 (defvar *raise-metatypes-to-class-p* t)
 
 (defun get-dfun-constructor (generator &rest args)
   (when (and *raise-metatypes-to-class-p*
-	     (member generator 
-		     '(emit-checking emit-caching
+	     (member generator '(emit-checking emit-caching
 		       emit-in-checking-cache-p emit-constant-value)))
     (setq args (cons (mapcar #'(lambda (mt)
 				 (if (eq mt 't)
@@ -165,13 +163,15 @@ And so, we are saved.
 (defmacro precompile-dfun-constructors (&optional system)
   (let ((*precompiling-lap* t))
     `(progn
-       ,@(gathering1 (collecting)
-	   (dolist (generator-entry *dfun-constructors*)
+       ,@(let ((collected ()))
+	   (dolist (generator-entry *dfun-constructors*
+				    (nreverse collected))
 	     (dolist (args-entry (cdr generator-entry))
 	       (when (or (null (caddr args-entry))
 			 (eq (caddr args-entry) system))
-		 (when system (setf (caddr args-entry) system))
-		 (gather1
+		 (when system
+		   (setf (caddr args-entry) system))
+		 (push
 		   (make-top-level-form `(precompile-dfun-constructor 
 					  ,(car generator-entry))
 					'(load)
@@ -180,7 +180,8 @@ And so, we are saved.
 		       ',(car args-entry)
 		       ',system
 		       ,(apply (symbol-function (car generator-entry))
-			       (car args-entry))))))))))))
+			       (car args-entry))))
+		   collected))))))))
 
 
 ;;;
@@ -500,20 +501,15 @@ And so, we are saved.
 (defun caching-limit-fn (nlines)
   (default-limit-fn nlines))
 
-(defun insure-dfun (gf caching-p)
+(defun insure-caching-dfun (gf)
   (multiple-value-bind (nreq applyp metatypes nkeys)
       (get-generic-function-info gf)
     (declare (ignore nreq nkeys))
-    (when (or (null metatypes)
-	      (not (null (car metatypes))))
-      (cond ((use-constant-value-dfun-p gf)
-	     (get-dfun-constructor 'emit-constant-value metatypes))
-	    (caching-p
-	     (get-dfun-constructor 'emit-caching metatypes applyp))
-	    ((dolist (mt metatypes t) (unless (eq mt 't) (return nil)))
-	     (get-dfun-constructor 'emit-default-only metatypes applyp))
-	    (t
-	     (get-dfun-constructor 'emit-checking metatypes applyp))))))
+    (when (and metatypes
+	       (not (null (car metatypes)))
+	       (dolist (mt metatypes nil)
+		 (unless (eq mt t) (return t))))
+      (get-dfun-constructor 'emit-caching metatypes applyp))))
 
 (defun use-constant-value-dfun-p (gf &optional boolean-values-p)
   (multiple-value-bind (nreq applyp metatypes nkeys)
@@ -574,8 +570,8 @@ And so, we are saved.
       ;; one (non built-in) typep.
       ;; Otherwise, it is probably at least as fast to use
       ;; a caching dfun first, possibly followed by secondary dispatching.
-      (let ((caching-cost (caching-dfun-cost gf)))
-	(< (dispatch-dfun-cost gf caching-cost) caching-cost)))))
+      (let ((cdc (caching-dfun-cost gf)))
+	(> cdc (dispatch-dfun-cost gf cdc))))))
 
 ;; Try this on print-object, find-method-combination, and documentation.
 ;; Look at pcl/generic-functions.lisp for other potential test cases.
@@ -631,7 +627,7 @@ And so, we are saved.
 	   *secondary-dfun-call-cost*
 	   0))))
 
-#+cmu
+;#+cmu
 (progn
   (setq *non-built-in-typep-cost* 100)
   (setq *structure-typep-cost* 15)
@@ -731,7 +727,8 @@ And so, we are saved.
 		  (cond ((use-dispatch-dfun-p gf caching-p)
 			 (values initial-dfun nil (initial-dispatch-dfun-info)))
 			(t
-			 (insure-dfun gf caching-p)
+			 (when caching-p
+			   (insure-caching-dfun gf))
 			 (values initial-dfun nil (initial-dfun-info))))
 		  (make-final-dfun-internal gf classes-list)))
 	    (let ((arg-info (if (early-gf-p gf)
@@ -1006,23 +1003,19 @@ And so, we are saved.
 ;;;               in the object argument.
 ;;;
 (defun cache-miss-values (gf args state)
-  (if (null (if (early-gf-p gf)
-		(early-gf-methods gf)
-		(generic-function-methods gf)))
-      (apply #'no-applicable-method gf args)
-      (multiple-value-bind (nreq applyp metatypes nkeys arg-info)
-	  (get-generic-function-info gf)
-	(declare (ignore nreq applyp nkeys))
-	(with-dfun-wrappers (args metatypes)
-	  (dfun-wrappers invalid-wrapper-p wrappers classes types)
-	  (error "The function ~S requires at least ~D arguments"
-		 gf (length metatypes))
-	  (multiple-value-bind (emf methods accessor-type index)
-	      (cache-miss-values-internal gf arg-info wrappers classes types state)
-	    (values emf methods
-		    dfun-wrappers
-		    invalid-wrapper-p
-		    accessor-type index))))))
+  (multiple-value-bind (nreq applyp metatypes nkeys arg-info)
+      (get-generic-function-info gf)
+    (declare (ignore nreq applyp nkeys))
+    (with-dfun-wrappers (args metatypes)
+			(dfun-wrappers invalid-wrapper-p wrappers classes types)
+			(error "The function ~S requires at least ~D arguments"
+			       gf (length metatypes))
+			(multiple-value-bind (emf methods accessor-type index)
+			    (cache-miss-values-internal gf arg-info wrappers classes types state)
+			  (values emf methods
+				  dfun-wrappers
+				  invalid-wrapper-p
+				  accessor-type index)))))
 
 (defun cache-miss-values-internal (gf arg-info wrappers classes types state)
   (let* ((for-accessor-p (eq state 'accessor))
@@ -1296,8 +1289,12 @@ And so, we are saved.
 
 (defun compute-precedence (lambda-list nreq argument-precedence-order)
   (if (null argument-precedence-order)
-      (let ((list nil))(dotimes (i nreq list) (push (- (1- nreq) i) list)))
-      (mapcar #'(lambda (x) (position x lambda-list)) argument-precedence-order)))
+      (let ((list nil))
+	(dotimes (i nreq list) 
+	  (declare (fixnum i))
+	  (push (- (1- nreq) i) list)))
+    (mapcar #'(lambda (x) (position x lambda-list)) 
+	    argument-precedence-order)))
 
 (defun saut-and (specl type)
   (let ((applicable nil)
@@ -1526,14 +1523,9 @@ And so, we are saved.
 		      (generic-function-name generic-function)))
 	 (ocache (gf-dfun-cache generic-function)))
     (set-dfun generic-function dfun cache info)
-    (let* ((dfun (if early-p
-		     (or dfun (make-initial-dfun generic-function))
-		     (compute-discriminating-function generic-function)))
-	   (info (gf-dfun-info generic-function)))
-      (unless (eq 'default-method-only (type-of info))
-	(setq dfun (doctor-dfun-for-the-debugger 
-		    generic-function
-		    #+cmu dfun #-cmu (set-function-name dfun gf-name))))
+    (let ((dfun (if early-p
+		    (or dfun (make-initial-dfun generic-function))
+		  (compute-discriminating-function generic-function))))
       (set-funcallable-instance-function generic-function dfun)
       #+cmu (set-function-name generic-function gf-name)
       (when (and ocache (not (eq ocache cache))) (free-cache ocache))

@@ -1385,14 +1385,19 @@
 	   (arg-info (gf-arg-info generic-function))
 	   (metatypes (arg-info-metatypes arg-info))
 	   (applyp (arg-info-applyp arg-info))
-	   (fmc-arg-info (cons (length metatypes) applyp)))
+	   (fmc-arg-info (cons (length metatypes) applyp))
+	   (arglist (if function-p
+			(make-dfun-lambda-list metatypes applyp)
+			(make-fast-method-call-lambda-list metatypes applyp))))
       (multiple-value-bind
 	  (cfunction constants)
-	  (get-function1 (make-dispatch-lambda 
-			  function-p metatypes applyp
-			  `((locally (declare #.*optimize-speed*)
-			      (let ((emf ,net))
-				,(make-emf-call metatypes applyp 'emf)))))
+	  (get-function1 `(lambda
+			    ,arglist
+			    ,@(unless function-p
+				`((declare (ignore .pv-cell. .next-method-call.))))
+			    (locally (declare #.*optimize-speed*)
+				     (let ((emf ,net))
+				       ,(make-emf-call metatypes applyp 'emf))))
 			 #'net-test-converter
 			 #'net-code-converter
 			 #'(lambda (form)

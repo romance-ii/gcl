@@ -128,20 +128,21 @@
 	    :qualifiers ()
 	    :specializers specializers
 	    :lambda-list '(generic-function type options)
-	    :function #'(lambda (args nms &rest cm-args)
+	    :function (lambda (args nms &rest cm-args)
 			(declare (ignore nms cm-args))
 			(apply 
 			 (lambda (gf type options)
 			   (declare (ignore gf))
-			   (do-short-method-combination
+			   (make-short-method-combination
 			       type options operator ioa new-method doc))
 			 args))
 	    :definition-source `((define-method-combination ,type) ,truename)))
     (when old-method
       (remove-method #'find-method-combination old-method))
-    (add-method #'find-method-combination new-method)))
+    (add-method #'find-method-combination new-method)
+    type))
 
-(defun do-short-method-combination (type options operator ioa method doc)
+(defun make-short-method-combination (type options operator ioa method doc)
   (cond ((null options) (setq options '(:most-specific-first)))
 	((equal options '(:most-specific-first)))
 	((equal options '(:most-specific-last)))
@@ -196,7 +197,7 @@
 	    (if (and (null (cdr primary))
 		     (not (null ioa)))
 		`(call-method ,(car primary) ())
-		`(,operator ,@(mapcar #'(lambda (m) `(call-method ,m ()))
+		`(,operator ,@(mapcar (lambda (m) `(call-method ,m ()))
 				      primary)))))
       (cond ((null primary)
 	     `(error "No ~S methods for the generic function ~S."
@@ -212,9 +213,6 @@
 ;;;
 ;;;
 
-(defclass long-method-combination (standard-method-combination)
-     ((function :initarg :function
-		:reader long-method-combination-function)))
 
 (defun expand-long-defcombin (form)
   (let ((type (cadr form))
@@ -233,11 +231,11 @@
 	  body)
       (make-top-level-form `(define-method-combination ,type)
 			   '(load eval)
-	`(load-long-defcombin ',type ',documentation #',function)))))
+	`(load-long-defcombin ',type ',documentation #',function ',arguments-option)))))
 
 (defvar *long-method-combination-functions* (make-hash-table :test #'eq))
 
-(defun load-long-defcombin (type doc function)
+(defun load-long-defcombin (type doc function arguments-lambda-list)
   (let* ((specializers
 	   (list (find-class 'generic-function)
 		 (intern-eql-specializer type)
@@ -249,17 +247,25 @@
 	     :qualifiers ()
 	     :specializers specializers
 	     :lambda-list '(generic-function type options)
-	     :function #'(lambda (generic-function type options)
+	     :function (lambda (args nms &rest cm-args)
+			 (declare (ignore nms cm-args))
+			 (apply
+			  (lambda (generic-function type options)
 			   (declare (ignore generic-function))
 			   (make-instance 'long-method-combination
 			     :type type
-			     :documentation doc
-			     :options options))
+			     :options options
+			     :function function
+			     :arguments-lambda-list
+			     arguments-lambda-list
+			     :documentation doc))
+			  args))
 	     :definition-source `((define-method-combination ,type)
 				  ,(load-truename)))))
     (setf (gethash type *long-method-combination-functions*) function)
     (when old-method (remove-method #'find-method-combination old-method))
-    (add-method #'find-method-combination new-method)))
+    (add-method #'find-method-combination new-method)
+    type))
 
 (defmethod compute-effective-method ((generic-function generic-function)
 				     (combin long-method-combination)
@@ -275,7 +281,6 @@
 ;;;
 (defun make-long-method-combination-function
        (type ll method-group-specifiers arguments-option gf-var body)
-  ;;(declare (values documentation function))
   (declare (ignore type))
   (multiple-value-bind (documentation declarations real-body)
       (extract-declarations body)
@@ -288,18 +293,19 @@
 	(push `(,gf-var .generic-function.) (cadr wrapped-body)))
       
       (when arguments-option
-	(setq wrapped-body (deal-with-arguments-option wrapped-body
-						       arguments-option)))
+	(setq wrapped-body
+	      (deal-with-arguments-option wrapped-body arguments-option)))
 
       (when ll
 	(setq wrapped-body
-	      `(apply #'(lambda ,ll ,wrapped-body)
+	      `(apply (lambda ,ll ,wrapped-body)
 		      (method-combination-options .method-combination.))))
 
       (values
 	documentation
 	`(lambda (.generic-function. .method-combination. .applicable-methods.)
-	   (progn .generic-function. .method-combination. .applicable-methods.)
+	   (declare (ignorable .generic-function. .method-combination.
+		               .applicable-methods.))
 	   (block .long-method-combination-function. ,wrapped-body))))))
 ;;
 ;; parse-method-group-specifiers parse the method-group-specifiers
@@ -307,20 +313,21 @@
 
 (defun wrap-method-group-specifier-bindings
        (method-group-specifiers declarations real-body)
-  (with-gathering ((names (collecting))
-		   (specializer-caches (collecting))
-		   (cond-clauses (collecting))
-		   (required-checks (collecting))
-		   (order-cleanups (collecting)))
+  (let ((names ())
+	(specializer-caches ())
+	(cond-clauses ())
+	(required-checks ())
+	(order-cleanups ()))
       (dolist (method-group-specifier method-group-specifiers)
 	(multiple-value-bind (name tests description order required)
 	    (parse-method-group-specifier method-group-specifier)
 	  (declare (ignore description))
 	  (let ((specializer-cache (gensym)))
-	    (gather name names)
-	    (gather specializer-cache specializer-caches)
-	    (gather `((or ,@tests)
-		      (if  (equal ,specializer-cache .specializers.)
+	    (push name names)
+	    (push specializer-cache specializer-caches)
+	    (push `((or ,@tests)
+		      (if  (and (equal ,specializer-cache .specializers.)
+				(not (null .specializers.)))
 			   (return-from .long-method-combination-function.
 			     '(error "More than one method of type ~S ~
                                       with the same specializers."
@@ -329,14 +336,14 @@
 		      (push .method. ,name))
 		    cond-clauses)
 	    (when required
-	      (gather `(when (null ,name)
+	      (push `(when (null ,name)
 			 (return-from .long-method-combination-function.
 			   '(error "No ~S methods." ',name)))
 		      required-checks))
 	    (loop (unless (and (constantp order)
 			       (neq order (setq order (eval order))))
 		    (return t)))
-	    (gather (cond ((eq order :most-specific-first)
+	    (push (cond ((eq order :most-specific-first)
 			   `(setq ,name (nreverse ,name)))
 			  ((eq order :most-specific-last) ())
 			  (t
@@ -345,42 +352,37 @@
 				(setq ,name (nreverse ,name)))
 			      (:most-specific-last))))
 		    order-cleanups))))
-   `(let (,@names ,@specializer-caches)
+   `(let (,@(nreverse names) ,@(nreverse specializer-caches))
       ,@declarations
       (dolist (.method. .applicable-methods.)
 	(let ((.qualifiers. (method-qualifiers .method.))
 	      (.specializers. (method-specializers .method.)))
-	  (progn .qualifiers. .specializers.)
-	  (cond ,@cond-clauses)))
-      ,@required-checks
-      ,@order-cleanups
+	  (declare (ignorable .qualifiers. .specializers.))
+	  (cond ,@(nreverse cond-clauses))))
+      ,@(nreverse required-checks)
+      ,@(nreverse order-cleanups)
       ,@real-body)))
    
 (defun parse-method-group-specifier (method-group-specifier)
   ;;(declare (values name tests description order required))
-  (let* ((name (pop method-group-specifier))
-	 (patterns ())
-	 (tests 
-	   (gathering1 (collecting)
-	     (block collect-tests
-	       (loop
-		 (if (or (null method-group-specifier)
-			 (memq (car method-group-specifier)
-			       '(:description :order :required)))
-		     (return-from collect-tests t)
-		     (let ((pattern (pop method-group-specifier)))
-		       (push pattern patterns)
-		       (gather1 (parse-qualifier-pattern name pattern)))))))))
-    (values name
+  (loop with name = (pop method-group-specifier)
+	for rest on method-group-specifier
+	for pattern = (car rest)
+	until (memq pattern '(:description :order :required))
+	collect pattern into patterns
+	collect (parse-qualifier-pattern name pattern) into tests
+	finally
+	(return (values name
 	    tests
-	    (getf method-group-specifier :description
-		  (make-default-method-group-description patterns))
-	    (getf method-group-specifier :order :most-specific-first)
-	    (getf method-group-specifier :required nil))))
+	    (getf rest :description
+		  (make-default-method-group-description 
+		   (nreverse patterns)))
+	    (getf rest :order :most-specific-first)
+	    (getf rest :required nil)))))
 
 (defun parse-qualifier-pattern (name pattern)
   (cond ((eq pattern '()) `(null .qualifiers.))
-	((eq pattern '*) 't)
+	((eq pattern '*) t)
 	((symbolp pattern) `(,pattern .qualifiers.))
 	((listp pattern) `(qualifier-check-runtime ',pattern .qualifiers.))
 	(t (error "In the method group specifier ~S,~%~
@@ -391,7 +393,10 @@
   (loop (cond ((and (null pattern) (null qualifiers))
 	       (return t))
 	      ((eq pattern '*) (return t))
-	      ((and pattern qualifiers (eq (car pattern) (car qualifiers)))
+	      ((and pattern qualifiers 
+		    (let ((element (car pattern)))
+		      (or (eq element (car qualifiers))
+			  (eq element '*))))
 	       (pop pattern)
 	       (pop qualifiers))	      
 	      (t (return nil)))))

@@ -172,11 +172,37 @@
   (multiple-value-bind (nreq applyp metatypes nkeys arg-info)
       (get-generic-function-info gf)
     (declare (ignore nreq nkeys arg-info))
-    (let ((args (make-fast-method-call-lambda-list metatypes applyp)))
-      `(lambda ,args
-	 (declare (ignore .pv-cell. .next-method-call.))
-	 #+cmu (declare (ignorable ,@(cddr args)))
-	 ,effective-method))))
+    (let ((ll (make-fast-method-call-lambda-list metatypes applyp)))
+      (cond
+       ;; When there are no primary methods and a next-method call
+       ;; occurs effective-method is (%no-primary-method <gf>),
+       ;; which we define here to collect all gf arguments, to pass
+       ;; those together with the GF to no-primary-method:
+       ((eq (first effective-method) '%no-primary-method)
+	`(lambda (.pv-cell. .next-method-call. &rest .args.)
+	   (declare (ignore .pv-cell. .next-method-call.))
+	   (flet ((%no-primary-method (gf)
+				      (apply #'no-primary-method gf .args.)))
+	     ,effective-method)))
+       ;; When the method combination uses the :arguments option
+       ((and (eq *boot-state* 'complete)
+	     ;; Otherwise the METHOD-COMBINATION slot is not bound.
+	     (let ((combin (generic-function-method-combination gf)))
+	       (and (long-method-combination-p combin)
+		    (long-method-combination-arguments-lambda-list combin))))
+	(let* ((required (dfun-arg-symbol-list metatypes))
+	       (gf-args (if applyp
+			    `(list* ,@required .dfun-rest-arg.)
+			  `(list ,@required))))
+	  `(lambda ,ll
+	     (declare (ignore .pv-cell. .next-method-call.))
+	      (let ((.gf-args. ,gf-args))
+		(declare (ignorable .gf-args.))
+		,effective-method))))
+       (t
+	`(lambda ,ll
+	   (declare (ignore .pv-cell. .next-method-call.))
+	   ,effective-method))))))
 
 (defun expand-emf-call-method (gf form metatypes applyp env)
   (declare (ignore gf metatypes applyp env))

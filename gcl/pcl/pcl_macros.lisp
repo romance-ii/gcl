@@ -460,8 +460,9 @@
   (find-class-cell-predicate cell))
 
 (defun legal-class-name-p (x)
-  (and (symbolp x)
-       (not (keywordp x))))
+  (symbolp x))
+;  (and (symbolp x)
+;       (not (keywordp x))))
 
 (defun find-class (symbol &optional (errorp t) environment)
   (declare (ignore environment))
@@ -505,7 +506,7 @@
   (declare (ignore errorp environment))
   `(SETF\ PCL\ FIND-CLASS ,new-value ,symbol))
 
-(defun #-setf SETF\ PCL\ FIND-CLASS #+setf (setf find-class) (new-value symbol)
+(defun #-setf SETF\ PCL\ FIND-CLASS #+setf (setf find-class) (new-value symbol  &optional errorp environment)
   (if (legal-class-name-p symbol)
       (let ((cell (find-class-cell symbol)))
 	(setf (find-class-cell-class cell) new-value)
@@ -524,7 +525,8 @@
 	    (dolist (keys+aok (find-class-cell-make-instance-function-keys cell))
 	      (update-initialize-info-internal
 	       (initialize-info new-value (car keys+aok) nil (cdr keys+aok))
-	       'make-instance-function)))))
+	       'make-instance-function))))
+	new-value)
       (error "~S is not a legal class name." symbol)))
 
 #-setf
