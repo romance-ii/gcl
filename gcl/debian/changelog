@@ -3,8 +3,9 @@ gcl (2.6.0cvs-2) experimental; urgency=low
   * New files for macosx
   * rpm spec file added
   * Merge changes from 2.5.4
+  * Add additional pop to loose package stack in read.d for dotted pairs
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 19 Jul 2003 19:38:44 -0400
+ -- Camm Maguire <camm@enhanced.com>  Tue,  5 Aug 2003 20:20:36 +0000
 
 gcl (2.6.0cvs-1) experimental; urgency=low
 

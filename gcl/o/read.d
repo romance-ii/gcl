@@ -663,6 +663,9 @@ Lleft_parenthesis_reader()
 				c = read_char(in);
 			if (char_code(c) != ')')
 	FEerror("A dot appeared before a right parenthesis.", 0);
+			else if (PP0>P0) PP0--; /* should be the only other place
+ 						   outside of read_object where
+					           closing parens are read */
 			goto ENDUP;
 		}
 		vs_push(x);
