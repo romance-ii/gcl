@@ -4,7 +4,7 @@ APPEND  = ../bin/append
 
 -include ../makedefs
 
-all:	dpp${EXE} ${APPEND}${EXE} file-sub${EXE} ${WINKILL}
+all:	dpp${EXE} ${APPEND}${EXE} file-sub${EXE}
 
 dpp${EXE}:	dpp.c
 	${CC} ${DEFS}  -DUNIX -o dpp${EXE} dpp.c
@@ -15,12 +15,5 @@ file-sub${EXE}:	file-sub.c
 ${APPEND}${EXE}: append.c
 	${CC}  ${DEFS} -o append${EXE}  append.c
 
-$(WINKILL): winkill.c
-	echo $(CFLAGS)
-	${CC} $(DEFS) ${CFLAGS} winkill.c -o winkill.exe
-
-tclwinkill.dll: ../o/tclwinkill.c
-	-(cd ../o; $(CC) $(DEFS) -shared tclwinkill.c -ltclstub83 -o ../bin/tclwinkill.dll)
-
 clean:
-	rm -f dpp dpp${EXE} append append${EXE} file-sub${EXE} core a.out *.o gcl winkill.exe tclwinkill.dll
+	rm -f dpp${EXE} append${EXE} file-sub${EXE} core a.out *.o gcl gclm.bat
