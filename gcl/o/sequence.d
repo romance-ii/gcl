@@ -91,7 +91,7 @@ int index;
 
 	if (index < 0) {
 		vs_push(make_fixnum(index));
-		FEerror("Negative index: ~D.", 1, vs_head);
+		FEwrong_type_argument(sLpositive_fixnum, vs_head);
 	}
 	switch (type_of(seq)) {
 	case t_cons:
@@ -117,12 +117,13 @@ int index;
 
 	default:
 		if (seq == Cnil) goto E;
-		FEerror("~S is not a sequence.", 1, seq);
+		FEwrong_type_argument(sLsequence, seq);
 	}
 
 E:
 	vs_push(make_fixnum(index));
-	FEerror("The index, ~D, is too large", 1, vs_head);
+	/* FIXME message should indicate out of range */
+	FEwrong_type_argument(sLpositive_fixnum,vs_head);
 	return(Cnil);
 }
 
@@ -148,7 +149,7 @@ object val;
 
 	if (index < 0) {
 		vs_push(make_fixnum(index));
-		FEerror("Negative index: ~D.", 1, vs_head);
+		FEwrong_type_argument(sLpositive_fixnum, vs_head);
 	}
 	switch (type_of(seq)) {
 	case t_cons:
@@ -171,18 +172,19 @@ object val;
 		if (index >= seq->st.st_fillp)
 			goto E;
 		if (type_of(val) != t_character)
-			FEerror("~S is not a character.", 1, val);
+			FEwrong_type_argument(sLcharacter, val);
 		seq->st.st_self[index] = val->ch.ch_code;
 		return(val);
 
 	default:
 		if (seq == Cnil) goto E;
-		FEerror("~S is not a sequence.", 1, seq);
+		FEwrong_type_argument(sLsequence, seq);
 	}
 
 E:
 	vs_push(make_fixnum(index));
-	FEerror("The index, ~D, is too large", 1, vs_head);
+	/* FIXME error message should indicate value out of range */
+	FEwrong_type_argument(sLpositive_fixnum, vs_head);
 	return(Cnil);	
 }
 
