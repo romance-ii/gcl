@@ -67,7 +67,7 @@
 		     (c2expr-top* form top))
 		   (wt-nl "while(vs_base<vs_top)")
 		   (wt-nl "{V" top "[0]=vs_base[0];V" top "++;vs_base++;}"))
-         (wt-nl "vs_base=base+" *vs* ";vs_top=V" top ";")
+         (wt-nl "vs_base=base+" *vs* ";vs_top=V" top ";sup=V" sup ";")
          (c2funcall funob 'args-pushed loc)
          (wt "}")))
   )
@@ -104,7 +104,7 @@
 	    (let ((*value-to-go* 'trash)
 		  (*unwind-exit* (cons (cons 'sup sup) *unwind-exit*)))
 	      (c2expr-top* form top)))
-  (wt-nl "vs_base=V" base ";vs_top=V" top ";}")
+  (wt-nl "vs_base=V" base ";vs_top=V" top ";sup=V" sup ";}")
   (unwind-exit 'fun-val nil (if top-data (car top-data)))
   )
 

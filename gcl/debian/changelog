@@ -42,8 +42,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Add code to unwind redefinitions of the stack supremum in c2expr-top
     (used in c2multiple-value-prog1 and c2multiple-value-call in
     evaluating arguments) on non-local exit
+  * Use new temporarry variables holding lisp stack  supremum for lint
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  2 Mar 2004 03:04:17 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  3 Mar 2004 00:13:14 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
