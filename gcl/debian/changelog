@@ -1,3 +1,11 @@
+gcl (2.5.0.cvs20020625-33) unstable; urgency=high
+
+  * chmod +x for subconfigures
+  * dlopen for appropriate arches in debian/rules
+  * add custreloc configure option
+
+ -- Camm Maguire <camm@enhanced.com>  Fri,  9 Aug 2002 10:16:55 -0400
+
 gcl (2.5.0.cvs20020625-32) unstable; urgency=high
 
   * Local bfd build option to prepare for arch-specific patches

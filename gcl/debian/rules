@@ -19,6 +19,22 @@ endif
 ifeq ($(ARCHT),hppa)
 MCC:=gcc-3.1
 endif
+RELOC=locbfd
+ifeq ($(ARCHT),alpha)
+RELOC=dlopen
+endif
+ifeq ($(ARCHT),mips)
+RELOC=dlopen
+endif
+ifeq ($(ARCHT),mipsel)
+RELOC=dlopen
+endif
+ifeq ($(ARCHT),ia64)
+RELOC=dlopen
+endif
+ifeq ($(ARCHT),hppa)
+RELOC=dlopen
+endif
 
 configure: configure-stamp
 configure-stamp:
