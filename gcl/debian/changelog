@@ -24,8 +24,12 @@ gclcvs (2.7.0-1) unstable; urgency=low
   * Remove some 64 bit warnings
   * Turn off def_static on ia64 for now -- its broken
   * Redefine temporary files in elisp/makefile
+  * Remove build-dependency on autoconf as a temporary work around to
+    Debian autoconf's dependency bug on emacsen-common
+  * Fix permissions bug in temporary gzipped file handling
+  * Propagate control changes correctly with package extension
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  8 Sep 2003 21:49:55 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue,  9 Sep 2003 16:59:47 +0000
 
 gcl (2.6.1-1) unstable; urgency=low
 

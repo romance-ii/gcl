@@ -53,7 +53,9 @@ VERS=$(shell echo $$(cat majvers).$$(cat minvers))
 EXT:=cvs
 
 CFG:=$(addsuffix /config.,. binutils) gmp3/configfsf.
-CFGS:=$(addsuffix .ori,configure $(addsuffix guess,$(CFG)) $(addsuffix sub,$(CFG)))
+# Bug in autocont dependency on emacsen-common workaround
+#CFGS:=$(addsuffix .ori,configure $(addsuffix guess,$(CFG)) $(addsuffix sub,$(CFG)))
+CFGS:=$(addsuffix .ori,$(addsuffix guess,$(CFG)) $(addsuffix sub,$(CFG)))
 
 $(filter %.guess.ori,$(CFGS)): %.ori: /usr/share/misc/config.guess %
 	! [ -e $* ] || [ -e $@ ] || cp $* $@

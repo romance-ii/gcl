@@ -32,6 +32,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #define IN_FILE
 #include "include.h"
@@ -368,35 +370,56 @@ object if_exists, if_does_not_exist;
 	      AGAIN:
 		if (fp == NULL) {
 		        if (sSAallow_gzipped_fileA->s.s_dbind != sLnil)
-			  { char buf[256];
-			    sprintf(buf,"%s.gz",fname);
-			    fp = fopen(buf,"r");
-			    if (fp)
-			      { 
-#ifdef NO_MKSTEMP
-	                        char *tmp;
-#else
-	                        char tmp[200];
-#endif
-				char command [500];
-				fclose(fp);
-#ifdef NO_MKSTEMP
-				tmp = tmpnam(0);
-#else
-				snprintf(tmp,sizeof(tmp),"uzipXXXXXX");
-				mkstemp(tmp); /* fixme: catch errors */
-#endif
-				unzipped = make_simple_string(tmp);
-				sprintf(command,"gzip -dc %s > %s",buf,tmp);
-				fp = 0;
-				if (0 == system(command))
-				  {
-				    fp = fopen(tmp,"r");
-				    if (fp) 
-				      goto AGAIN;
-				    /* should not get here */
-				    else { unlink(tmp);}}
-			      }}
+			  { 
+			    struct stat ss;
+			    char buf[256];
+			    if (snprintf(buf,sizeof(buf),"%s.gz",fname)<=0)
+			      FEerror("Cannot write .gz filename",0);
+			    if (!stat(fname,&ss)) {
+			      FILE *pp;
+			      int n;
+			      if (!(fp=tmpfile()))
+				FEerror("Cannot create temporary file",0);
+			      if (snprintf(buf,sizeof(buf),"zcat %s.gz",fname)<=0)
+				FEerror("Cannot write zcat pipe name",0);
+			      if (!(pp=popen(buf,"r")))
+				FEerror("Cannot open zcat pipe",0);
+			      while((n=fread(buf,1,sizeof(buf),pp)))
+				if (!fwrite(buf,1,n,fp))
+				  FEerror("Cannot write pipe output to temporary file",0);
+			      if (pclose(pp)<0)
+				FEerror("Cannot close zcat pipe",0);
+			      goto AGAIN;
+			    }
+			  }
+			      
+/* 			    fp = fopen(buf,"r"); */
+/* 			    if (fp) */
+/* 			      {  */
+/* #ifdef NO_MKSTEMP */
+/* 	                        char *tmp; */
+/* #else */
+/* 	                        char tmp[200]; */
+/* #endif */
+/* 				char command [500]; */
+/* 				fclose(fp); */
+/* #ifdef NO_MKSTEMP */
+/* 				tmp = tmpnam(0); */
+/* #else */
+/* 				snprintf(tmp,sizeof(tmp),"uzipXXXXXX"); */
+				/* mkstemp(tmp); */ /* fixme: catch errors */
+/* #endif */
+/* 				unzipped = make_simple_string(tmp); */
+/* 				sprintf(command,"gzip -dc %s > %s",buf,tmp); */
+/* 				fp = 0; */
+/* 				if (0 == system(command)) */
+/* 				  { */
+/* 				    fp = fopen(tmp,"r"); */
+/* 				    if (fp)  */
+/* 				      goto AGAIN; */
+/* 				    /\* should not get here *\/ */
+/* 				    else { unlink(tmp);}} */
+/* 			      }} */
 			if (if_does_not_exist == sKerror)
 				cannot_open(fn);
 			else if (if_does_not_exist == sKcreate) {
