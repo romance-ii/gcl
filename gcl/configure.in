@@ -10,8 +10,10 @@ AC_CONFIG_HEADER(h/gclincl.h)
 AC_MSG_CHECKING([system version (for dynamic loading)])
 if machine=`uname -m` ; then true; else machine=unknown ; fi
 
+AC_CHECK_PROGS(AWK,awk nawk,"")
+
 if test -f /usr/lib/NextStep/software_version; then
-    system=NEXTSTEP-`awk '/3/,/3/' /usr/lib/NextStep/software_version`
+    system=NEXTSTEP-`${AWK} '/3/,/3/' /usr/lib/NextStep/software_version`
 else
     system=`uname -s`-`uname -r`
     if test "$?" -ne 0 ; then
@@ -22,7 +24,7 @@ else
 	# results, and the version is kept in special file).
     
 	if test -r /etc/.relid -a "X`uname -n`" = "X`uname -s`" ; then
-	    system=MP-RAS-`awk '{print $3}' /etc/.relid'`
+	    system=MP-RAS-`${AWK} '{print $3}' /etc/.relid'`
 	fi
 	if test "`uname -s`" = "AIX" ; then
 	    system=AIX-`uname -v`.`uname -r`
@@ -212,8 +214,8 @@ AC_CHECK_LIB(readline,main,
 AC_CHECK_HEADER(bfd.h,
 	AC_CHECK_LIB(bfd,bfd_init,
 		AC_DEFINE(HAVE_LIBBFD)
-		echo "int main() {bfd_init();return 0;}" >foo.c
-		MP=`$GCC -t -o foo foo.c -lbfd -liberty 2>&1 |tr -d '()' | awk '/\/libbfd/ || /\/libiberty/ {for (j=1;j<=NF;j++) {sub("\.so$",".a",$j); if ($j ~ "/libbfd") a=$j; if ($j ~ "/libiberty") b=$j;}} END {print a " " b}'`
+		echo "int main() {bfd_init();bfd_perror();return 0;}" >foo.c
+		MP=`$GCC -t -o foo foo.c -lbfd -liberty 2>&1 |tr '()' '  ' | ${AWK} '/\/libbfd/ || /\/libiberty/ {for (j=1;j<=NF;j++) {sub("\.so$",".a",$j); if ($j ~ "/libbfd") a=$j; if ($j ~ "/libiberty") b=$j;}} END {print a " " b}'`
 		LIBS="$LIBS  $MP"
 		,,-liberty))
 
@@ -693,7 +695,7 @@ else
 #fi
 
 if test "${TCLSH}" = "" ; then true ; else
-	TK_CONFIG_PREFIX=`echo tcl_findLibrary \"tk\" \"${TCL_VERSION}\" \"\" \"tkConfig.sh\" \"TK_LIBRARY\" tk_library | ${TCLSH} 2>&1 | awk '/"source / {if (i++) next;sub("/[[^/]]*$","",$2);print $2}'`
+	TK_CONFIG_PREFIX=`echo tcl_findLibrary \"tk\" \"${TCL_VERSION}\" \"\" \"tkConfig.sh\" \"TK_LIBRARY\" tk_library | ${TCLSH} 2>&1 | ${AWK} '/"source / {if (i++) next;sub("/[[^/]]*$","",$2);print $2}'`
 fi
 
 fi
