@@ -100,7 +100,7 @@ void rsym_doit2 (struct nlist *symbols, unsigned long nsyms, char *outfile)
     }
     
     if (verbose) {
-        fprintf (stdout, "%d/%d symbol(s) reviewed\n", tab.n_symbols, nsyms);
+        fprintf (stdout, "%d/%ld symbol(s) reviewed\n", tab.n_symbols, nsyms);
     }
     
     fseek (symout, 0, 0);
@@ -153,6 +153,10 @@ void rsym_doit1 (char *infile, char *outfile)
         lc = (struct load_command *) ((char *) lc + lc->cmdsize);
     }
     
+    if (!st) {
+        rsym_error ("no symbol table information");
+    }
+
     symtab = (struct nlist *) ((char *) addr + st->symoff);
     
     s = sizeof(struct nlist) * st->nsyms;
