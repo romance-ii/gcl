@@ -34,6 +34,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 typedef int (*func) ();
 
+/* Externalize the command line used to build loadable object files (a.k.a. bundles).  */
 object sSAmacosx_ldcmdA = 0L;
 
 static void sfasl_error (char *format, ...)
@@ -104,16 +105,16 @@ static func prepare_bundle (object faslfile, char *filename)
         {
             struct mach_header *mh = _dyld_get_image_header (n);
             struct load_command *lc = (struct load_command *) (mh+1);
- 	    unsigned long i;
+            unsigned long i;
 	    
-	    vmsize = 0;
+            vmsize = 0;
 	    
             for (i=0 ; i < mh->ncmds ; i++) {
                 if (lc->cmd == LC_SEGMENT) {
-		  if (base_addr == (unsigned long) -1) {
-		    base_addr = ((struct segment_command *) lc)->vmaddr;
-		  }
-                  vmsize += ((struct segment_command *) lc)->vmsize;
+                    if (base_addr == (unsigned long) -1) {
+                        base_addr = ((struct segment_command *) lc)->vmaddr;
+                    }
+                vmsize += ((struct segment_command *) lc)->vmsize;
                 }
                 lc = (struct load_command *) ((char *) lc + lc->cmdsize);
             }
@@ -125,9 +126,9 @@ static func prepare_bundle (object faslfile, char *filename)
     }
     
     if (base_addr != (unsigned long) -1) {
-      mark_region (vmaddr_slide - base_addr, vmsize);
+        mark_region (vmaddr_slide - base_addr, vmsize);
     } else {
-      sfasl_error ("could not retrieve newly created bundle image\n");
+        sfasl_error ("could not retrieve newly created bundle image\n");
     }
 
     return (fptr);
@@ -155,9 +156,9 @@ int fasload (object faslfile)
     extern int seek_to_end_ofile (FILE *);
     
     if (count == 0) {
-      /* DEFVAR ("*MACOSX-LDCMD*",sSAmacosx_ldcmdA,LISP,make_simple_string(ldfmt),""); */
-      sSAmacosx_ldcmdA = make_special ("*MACOSX-LDCMD*", make_simple_string (ldfmt));
-      count = time (0);
+     /* DEFVAR ("*MACOSX-LDCMD*",sSAmacosx_ldcmdA,LISP,make_simple_string(ldfmt),""); */
+        sSAmacosx_ldcmdA = make_special ("*MACOSX-LDCMD*", make_simple_string (ldfmt));
+        count = time (0);
     }
     
     coerce_to_filename (truename (faslfile), filename);
