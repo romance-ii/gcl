@@ -177,7 +177,8 @@
     (if (null symbol-types)
 	(specific-error :too-few-arguments "Symbol type specifiers must be supplied"))
     `(let ((,p (cons t (if (atom ,plist) (list ,plist) ,plist))) (,q nil) (,l nil)
-	   (,i -1) (,x 0) (,y 0))
+	   (,i -1) (,x 0) (,y 0) (,dum nil) (,access nil))
+       (declare (fixnum ,x ,y))
        (flet ((,name () 
 		     (tagbody ,name
 			      (when (null (setq ,l (cdr ,l)))
@@ -213,7 +214,6 @@
 					 (not (eq (car ,p) (car ,q))))
 				(go ,name)))
 		     (values 't (car ,l) ,access (car ,p))))
-	     (declare (fixnum ,x ,y))
 	     ,@declaration
 	     ,@body))))
 
