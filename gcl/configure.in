@@ -222,6 +222,24 @@ AC_TRY_RUN([#define _GNU_SOURCE
 		HAVE_IEEEFP=0 AC_MSG_RESULT(no),HAVE_IEEEFP=0 AC_MSG_RESULT(no))
 	,HAVE_ISNORMAL=0 AC_MSG_RESULT(no),HAVE_ISNORMAL=0 AC_MSG_RESULT(no))
 
+AC_MSG_CHECKING([for isfinite])
+AC_TRY_RUN([#define _GNU_SOURCE
+	    #include <math.h>
+	    int main() {
+		float f;
+		return isfinite(f) || !isfinite(f) ? 0 : 1;
+		}],
+		AC_DEFINE(HAVE_ISFINITE) AC_MSG_RESULT(yes),
+		AC_MSG_CHECKING([for finite()])
+		AC_TRY_RUN([#include <math.h>
+			    int main() {
+				float f;
+				return finite(f) || !finite(f) ? 0 : 1;
+				}],
+		AC_DEFINE(HAVE_FINITE) AC_MSG_RESULT(yes),
+		HAVE_FINITE=0 AC_MSG_RESULT(no),HAVE_FINITE=0 AC_MSG_RESULT(no))
+	,HAVE_ISFINITE=0 AC_MSG_RESULT(no),HAVE_ISFINITE=0 AC_MSG_RESULT(no))
+
 
 
 #--------------------------------------------------------------------

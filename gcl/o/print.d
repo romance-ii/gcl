@@ -22,7 +22,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	print.d
 */
 
-#define _GNU_SOURCE
+#define NEED_ISFINITE
 #include "include.h"
 
 #define LINE_LENGTH line_length

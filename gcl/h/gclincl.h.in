@@ -120,6 +120,24 @@
 #endif
 #endif
 
+#undef HAVE_ISFINITE
+#undef HAVE_FINITE
+
+#ifdef NEED_ISFINITE
+#ifdef HAVE_ISFINITE
+#define _GNU_SOURCE
+#include <math.h>
+#define ISFINITE(a) isfinite(a)
+#else
+#ifdef HAVE_FINITE
+#include <math.h>
+#define ISFINITE(a) finite(a)
+#else
+#error "No isfinite found"
+#endif
+#endif
+#endif
+
 /* math.h for definitions in generated C code */
 #undef NEED_MATH_H
 

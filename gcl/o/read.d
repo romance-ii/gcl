@@ -22,7 +22,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	read.d
 */
 
-#define _GNU_SOURCE
+#define NEED_ISFINITE
 #include "include.h"
 
 
