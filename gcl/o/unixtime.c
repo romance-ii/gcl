@@ -113,10 +113,11 @@ Lsleep(void)
 	check_type_or_rational_float(&vs_base[0]);
 	if (number_minusp(vs_base[0]) == TRUE)
 		FEerror("~S is not a non-negative number.", 1, vs_base[0]);
+	vs_base[0]=number_times(vs_base[0],make_fixnum(1000000));
 	Lround();
 	z = vs_base[0];
 	if (type_of(z) == t_fixnum)
-		sleep(fix(z));
+		usleep(fix(z));
 	else
 		for(;;)
 			sleep(1000);

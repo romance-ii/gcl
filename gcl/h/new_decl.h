@@ -363,7 +363,6 @@ EXTER object  sScdefn ;
 EXTER object  sLAlink_arrayA ; 
 EXTER  object   fSprofile  (); 
 EXTER  object   fSfunction_start  (); 
-EXTER  object   fSread_externals  (); 
 EXTER  object   fSset_up_combined  (); 
 EXTER  object   fSdisplay_profile  (); 
 EXTER  object   fSarray_adress  (); 

@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-53) unstable; urgency=high
+
+  * Sleep with (in principle) microsecond precision
+
+ -- Camm Maguire <camm@enhanced.com>  Mon, 16 Sep 2002 13:30:31 -0400
+
 gcl (2.5.0.cvs20020625-52) unstable; urgency=high
 
   * Fixed gcc version bug in debian/rules
