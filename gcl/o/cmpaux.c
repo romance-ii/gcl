@@ -455,16 +455,16 @@ init_or_load1(void (*fn)(void),char *file)
 
 DEFUN_NEW("INIT-CMP-ANON", object, fSinit_cmp_anon, SI, 0, 0,
        NONE, OO, OO, OO,OO,(void),
-      "Initialize previously compiled and linked anonymous function from the
-.text section of the running executable.  This function is inherently
-dangerous, and is meant as a work-around to facilitate the production
-of an ansi GCL image on systems which must currently link using
-dlopen.  On such systems, it is imposible to compile and load
-anonymous functions as part of the initialization sequence of the lisp
-image, as is done in pcl, and preserve that function across a
-save-system call.  The approach here is to provide a flag to GCL's
-compile function which will direct the algorithm to forgo
-recompilation and loading in favor of initialization via this
+      "Initialize previously compiled and linked anonymous function from the \
+.text section of the running executable.  This function is inherently \
+dangerous, and is meant as a work-around to facilitate the production \
+of an ansi GCL image on systems which must currently link using \
+dlopen.  On such systems, it is imposible to compile and load \
+anonymous functions as part of the initialization sequence of the lisp \
+image, as is done in pcl, and preserve that function across a \
+save-system call.  The approach here is to provide a flag to GCL's \
+compile function which will direct the algorithm to forgo \
+recompilation and loading in favor of initialization via this \
 function.")
 {
 
