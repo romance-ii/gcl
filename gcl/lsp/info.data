@@ -23,6 +23,7 @@
 " "[]" "
  - [A-Za-z ]+: " "[ 
 ]" "
+
  - [A-Z]" "Cant find node  ~a?" system::node system::*default-info-files* "~%From ~a:~%" "~% ~d: ~@[~a :~]~@[(~a)~]~a." 2147483646 "~%Enter n, all, none, or multiple choices eg 1 3 : " "" :start "ALL" "~%Info from file ~a:" "hotlist" :direction :output :if-exists :append :if-does-not-exist :create "
 File:	hotlist	Node: Top
 

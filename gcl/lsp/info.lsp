@@ -376,7 +376,7 @@
 		      (let ((e
 			     (if (and (>= subnode 0)
 				      (f >=
-					 (string-match #u"\n - [A-Z]"
+					 (string-match #u"\n\n - [A-Z]"
 						       s (+ beg 1
 							    initial-offset)
 						       end)
