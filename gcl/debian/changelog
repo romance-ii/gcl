@@ -77,8 +77,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * complete readline version detection commit
   * Minor cleanup in eval-when code
   * Autodetect GNU ld and add -Wl,-Map only when appropriate
+  * Fix GNU_LD autodetection in configure.in
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 10 Mar 2004 22:57:40 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 01:18:17 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

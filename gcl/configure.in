@@ -582,8 +582,7 @@ fi
 AC_MSG_CHECKING("for GNU ld option -Map")
 touch map
 $CC -o foo [ -Wl,-Map ] map foo.o >/dev/null 2>&1
-MAP_SIZE=`cat map | wc -l`
-if test "$MAP_SIZE" != "0" ; then
+if test `cat map | wc -l` != "0" ; then
 	AC_MSG_RESULT("yes")
 	AC_DEFINE(HAVE_GNU_LD)
 	GNU_LD=1
