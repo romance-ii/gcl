@@ -146,7 +146,8 @@ eg to add 20 more do (si::set-hole-size %ld %d)\n...start over ", new_holepage, 
 	if (n <= m)
 		return(e);
 
-	IF_ALLOCATE_ERR error("Can't allocate.  Good-bye!");
+
+	IF_ALLOCATE_ERR fputs("Can't allocate.  Good-bye!",stderr);
 #ifdef SGC
 	if (sgc_enabled)
 	  make_writable(page(core_end),page(core_end)+n-m);

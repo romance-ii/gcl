@@ -113,8 +113,10 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Allow for white space chars in compiled filenames
   * Autodetect and work around sbrk randomization, e.g. on Fedora 1
   * Probe for sbrk before probing for randomized sbrk
+  * Openbsd changes -- maximize data seg resource if possible, avoid
+    mallocing error message when allocation routines fails
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 30 Mar 2004 19:30:13 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 30 Mar 2004 20:47:01 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
