@@ -28,7 +28,7 @@ gmpfiles: $(shell find ../$(GMPDIR) -name "*.o" |grep -v '\.lib')
 	rm -rf gmp
 	mkdir gmp
 	a="$^" ; \
-	for i in $^ ; do \
+	for i in $$a ; do \
 		cp $$i gmp/$$(echo $$i | sed -e 's,\.\./,,1' -e 's,/,_,g') ; \
 	done
 	touch $@
