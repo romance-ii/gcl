@@ -608,8 +608,10 @@ object s, p;
 	object *ip;
 
 	find_symbol(s, p);
-	if (intern_flag == INTERNAL || intern_flag == EXTERNAL)
+	if (intern_flag == INTERNAL || intern_flag == EXTERNAL) {
+		p->p.p_shadowings = make_cons(s, p->p.p_shadowings);
 		return;
+	}
 	j = pack_hash(s);
 	ip = &P_INTERNAL(p ,j);
 	vs_push(make_symbol(s));

@@ -2,8 +2,9 @@ gcl (2.5.0.cvs20020625-57) unstable; urgency=low
 
   * Capitalization changes to names of special characters;graphic-char-p
     fix
+  * fix shadowing of existing symbols in package.d
 
- -- Camm Maguire <camm@m.enhanced.com>  Sat,  5 Oct 2002 23:06:48 -0400
+ -- Camm Maguire <camm@m.enhanced.com>  Sat,  5 Oct 2002 23:59:16 -0400
 
 gcl (2.5.0.cvs20020625-56) unstable; urgency=high
 
