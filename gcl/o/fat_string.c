@@ -46,7 +46,12 @@ DEFUNO("FUNCTION-START",object,fSfunction_start,SI
    ,1,1,NONE,OO,OO,OO,OO,siLfunction_start,"")(funobj)
 object funobj;
 {/* 1 args */
- if(type_of(funobj)!=t_cfun) FEerror("not compiled function",0);
+ if(type_of(funobj)!=t_cfun
+    && type_of(funobj)!=t_sfun
+    && type_of(funobj)!=t_vfun
+    && type_of(funobj)!=t_afun
+    && type_of(funobj)!=t_gfun)
+    FEerror("not compiled function",0);
  funobj=make_fixnum((int) (funobj->cf.cf_self));
  RETURN1(funobj);
 }

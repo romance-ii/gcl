@@ -6,4 +6,3 @@ exec /home/wfs/cvs/gcl/unixport/saved_gcl \
    -eval '(setq si::*tk-library* "/usr/lib/tk8.3")' \
      "$@"
 # other options: -load /tmp/foo.o -load jo.lsp -eval "(joe 3)"
-# other options: -load /tmp/foo.o -load jo.lsp -eval "(joe 3)"

@@ -80,7 +80,12 @@ main()
   if (sizeof(long long int) == 2*sizeof(long)) return 0;
   return 1;
 }
-],AC_DEFINE(HAVE_LONG_LONG),,)
+],[AC_DEFINE(HAVE_LONG_LONG)
+AC_MSG_RESULT(yes)],
+AC_MSG_RESULT(no),
+AC_MSG_RESULT(no)
+)
+
 AC_SUBST(HAVE_LONG_LONG)
 
 
@@ -95,7 +100,7 @@ AC_ARG_ENABLE(maxpage,[ --enable-maxpage=XXXX will compile in a page table of si
 AC_ARG_ENABLE(machine,[ --enable-machine=XXXX will force the use of one of the definitions in h/XXXX.defs] ,
 [enable_machine=$enableval],[enable_machine=""])
 
-AC_ARG_ENABLE(use_gmp,[ --enable-gmp=no will disable use of GMP gnu multiprecision arithmetic, (default is =yes)] ,
+AC_ARG_ENABLE(gmp,[ --enable-gmp=no will disable use of GMP gnu multiprecision arithmetic, (default is =yes)] ,
 [use_gmp=$enableval],[use_gmp="yes"])
 
 AC_ARG_ENABLE(notify,[ --enable-notify=no will disable the automatic notification of gcl maintainers of successful builds/problems] ,

@@ -53,7 +53,7 @@ MPFILES=$(MPDIR)/mpi-386_no_under.o $(MPDIR)/libmport.a
 prefix=/usr/local
 
 # where to place the info files
-INFO_DIR=
+INFO_DIR=/usr/info/
 
 # where to put emacs lisp files.
 EMACS_SITE_LISP=/usr/share/emacs/20.7/site-lisp
@@ -102,7 +102,7 @@ LBINDIR=/usr/local/bin
 OFLAG	=  -O 
 LIBS	= -lm 
 
-ODIR_DEBUG= -O4 
+ODIR_DEBUG= -O -pg -g
 
 # This CC string will be used for compilation of the system,
 # and also in the compiler::*cc* variable for later compilation of

@@ -11,6 +11,7 @@
 
 #define MP_ALLOCATED(x) MP(x)->_mp_alloc
 #define MP_SELF(x) MP(x)->_mp_d
+#define MP_SIZE(x) MP(x)->_mp_size
 #define MP_LIMB_SIZE sizeof(mp_limb_t)
 
 
@@ -19,7 +20,6 @@
 
 #define MP(x) (&((x)->big.big_mpz_t))
 #define MP_ASSIGN_OBJECT(u,x) (type_of(x) == t_bignum ? mpz_set(u,MP(x)) : mpz_set_si(u,fix(x)))
-
 
 /* temporary holders to put fixnums in ... */
 
@@ -42,12 +42,16 @@ typedef struct
 #define MPOP(action,function,x1,x2) \
   do {  \
    function(MP(big_fixnum2) ,x1,x2); \
-   action maybe_replace_big(&big_fixnum2); \
+   action maybe_replace_big(big_fixnum2); \
   } while(0)
 
 
 #define MPOP_DEST(where,function,x1,x2) \
-  function(MP(where),x1,x2)
+  do { extern MP_INT *verify_mp(); \
+  function(MP(where),x1,x2); \
+  verify_big(where); \
+      } while(0)
+
 
 #define MYmake_fixnum(action,x) \
   do{register int CMPt1; \

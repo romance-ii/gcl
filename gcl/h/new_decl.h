@@ -357,6 +357,7 @@ EXTER  int   fSgetpid ();
 EXTER  object   fSuse_fast_links (); 
 EXTER object  sScdefn ; 
 EXTER object  sLAlink_arrayA ; 
+EXTER  object   fSprofile  (); 
 EXTER  object   fSfunction_start  (); 
 EXTER  object   fSread_externals  (); 
 EXTER  object   fSset_up_combined  (); 

@@ -499,6 +499,9 @@ DEFUN("USE-FAST-LINKS",object,fSuse_fast_links,SI,1,2,0 ,OO,OO,OO,OO,
       "Usage: (use-fast-links {nil,t} &optional fun) turns on or off the fast linking depending on FLAG, so that things will either go faster, or turns it off so that stack information is kept.  If SYMBOL is supplied and FLAG is nil, then this function is deleted from the fast links")
 DEF_ORDINARY("CDEFN",sScdefn,SI,"")
 DEFVAR("*LINK-ARRAY*",sLAlink_arrayA,LISP,((object)&Cnil_body) ,"")
+DEFUNO("PROFILE",object,fSprofile,SI
+   ,2,2,0 ,OO,OO,OO,OO,siLprofile,
+       "Sets up profiling with START-ADDRESS and  SCALE where scale is   between 0 and 256")
 DEFUNO("FUNCTION-START",object,fSfunction_start,SI
    ,1,1,0 ,OO,OO,OO,OO,siLfunction_start,"")
 DEFUNO("READ-EXTERNALS",object,fSread_externals,SI
