@@ -4,8 +4,9 @@ gcl (2.5.0.cvs20020625-54) unstable; urgency=high
   * character and string-char equal in type hierarchy
   * concatenate/make-sequence fixes
   * merge takes nil key argument
+  * make-sequence checks size against result type
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 21 Sep 2002 19:21:26 -0400
+ -- Camm Maguire <camm@enhanced.com>  Tue, 24 Sep 2002 10:46:21 -0400
 
 gcl (2.5.0.cvs20020625-53) unstable; urgency=high
 
