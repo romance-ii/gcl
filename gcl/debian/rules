@@ -25,6 +25,7 @@ configure-stamp:
 	dh_testdir
 
 	if [ configure.in -nt configure ]; then autoconf; fi
+	chmod -R +x gmp3/*
 	[ "$(ARCHT)" != "i386" ] || ( cd gmp && CC=$(MCC) ./configure --target=i486 )
 	CC=$(MCC) ./configure --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
 

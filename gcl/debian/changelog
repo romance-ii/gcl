@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-25) unstable; urgency=high
+
+  * Move chmod +x gmp3/* into debian/rules
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 31 Jul 2002 09:31:36 -0400
+
 gcl (2.5.0.cvs20020625-24) unstable; urgency=high
 
   * chmod +x gmp3/configure
