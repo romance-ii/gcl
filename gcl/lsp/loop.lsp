@@ -2046,7 +2046,7 @@ collected result will be returned as the value of the LOOP."
     (loop-error "Destructuring is not valid for package symbol iteration."))
   (let ((pkg-var (loop-gentemp 'loop-pkgsym-))
 	(next-fn (loop-gentemp 'loop-pkgsym-next-)))
-    (push `(with-package-iterator (,next-fn ,pkg-var ,@symbol-types)) *loop-wrappers*)
+    (push `(lisp::with-package-iterator (,next-fn ,pkg-var ,@symbol-types)) *loop-wrappers*)
     `(((,variable nil ,data-type) (,pkg-var ,(cadar prep-phrases)))
       ()
       ()

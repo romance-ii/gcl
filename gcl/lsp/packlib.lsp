@@ -25,7 +25,7 @@
 (in-package 'lisp)
 
 
-(export '(find-all-symbols do-symbols do-external-symbols do-all-symbols))
+(export '(find-all-symbols do-symbols do-external-symbols do-all-symbols with-package-iterator))
 (export '(apropos apropos-list))
 
 
@@ -169,4 +169,48 @@
            (when (substringp string (string symbol))
                  (setq list (cons symbol list))))))
   list)
+
+(defmacro with-package-iterator ((name plist &rest symbol-types) . body)
+  (let ((p (gensym)) (i (gensym)) (l (gensym)) (q (gensym))
+        (x (gensym))(y (gensym)) (advance (gensym)) declaration)
+    (multiple-value-setq (declaration body) (find-declarations body))
+    `(let ((,p nil) (,q nil) (,l nil)
+	   (,i -1) (,x 0) (,y 0))
+       (macrolet ((,name () 
+			 '(block ,name
+			    (setq ,l (cdr ,l))
+			    (if (null ,l) 
+				(progn
+				  (setq ,i (1+ ,i))
+				  (if (eql ,i (+ ,x ,y))
+				      (progn 
+					(setq ,q (cdr ,q))
+					(if (null ,q) 
+					    (progn 
+					      (if (null ,p) (setq ,p (if (atom ,plist) (list ,plist) ,plist)) 
+						(setq ,p (cdr ,p)))
+					      (if (null ,p)
+						  (return-from ,name nil))
+					      (setq ,q (list (coerce-to-package (car ,p))))
+					      (if (member :inherited (list ,@symbol-types))
+						  (rplacd ,q (package-use-list (car ,q))))))
+					(setq ,x (multiple-value-list (package-size (car ,q))))
+					(setq ,y (second ,x))
+					(setq ,x (first ,x))
+					(if (or (not (member :internal (list ,@symbol-types)))
+						(not (eq (car ,p) (car ,q))))
+					    (setq ,x 0))
+					(if (not (member :external (list ,@symbol-types)))
+					    (setq ,y 0))
+					(setq ,i 0)))
+				  (setq ,l (if (< ,i ,x)
+					       (package-internal (car ,q) ,i)
+					     (package-external (car ,q) (- ,i ,x))))))
+			    (format t "~S ~S ~S ~S ~%" ,i ,x ,y ,l)
+			    (values 't (car ,l)
+				    (second (multiple-value-list (find-symbol (symbol-name (car ,l)) (car ,q))))
+				   (car ,q)))))
+		 (declare (fixnum ,x ,y))
+		 ,@declaration
+		 ,@body))))
 

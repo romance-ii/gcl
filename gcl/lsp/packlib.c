@@ -173,7 +173,7 @@ static void L3()
 	V26= Cnil;
 	base[6]= base[5];
 	vs_top=(vs_base=base+6)+1;
-	(void) (*Lnk43)();
+	(void) (*Lnk46)();
 	if(vs_base<vs_top){
 	V26= vs_base[0];
 	vs_base++;
@@ -265,7 +265,7 @@ static void L4()
 	V55= Cnil;
 	base[6]= base[5];
 	vs_top=(vs_base=base+6)+1;
-	(void) (*Lnk43)();
+	(void) (*Lnk46)();
 	if(vs_base<vs_top){
 	V55= vs_base[0];
 	vs_base++;
@@ -581,9 +581,9 @@ T148:;
 goto T154;
 T154:;
 	V104= coerce_to_string((V89));
-	if(((*(LnkLI44))((V86),/* INLINE-ARGS */V104))==Cnil){
+	if(((*(LnkLI47))((V86),/* INLINE-ARGS */V104))==Cnil){
 	goto T163;}
-	(void)((*(LnkLI45))((V89)));
+	(void)((*(LnkLI48))((V89)));
 goto T163;
 T163:;
 goto T153;
@@ -672,9 +672,9 @@ goto T209;
 T209:;
 	V107= car((V108));
 	V112= coerce_to_string((V107));
-	if(((*(LnkLI44))((V86),/* INLINE-ARGS */V112))==Cnil){
+	if(((*(LnkLI47))((V86),/* INLINE-ARGS */V112))==Cnil){
 	goto T214;}
-	(void)((*(LnkLI45))((V107)));
+	(void)((*(LnkLI48))((V107)));
 goto T214;
 T214:;
 	V108= cdr((V108));
@@ -830,9 +830,9 @@ T281:;
 goto T287;
 T287:;
 	V131= coerce_to_string((V116));
-	if(((*(LnkLI44))((V86),/* INLINE-ARGS */V131))==Cnil){
+	if(((*(LnkLI47))((V86),/* INLINE-ARGS */V131))==Cnil){
 	goto T297;}
-	(void)((*(LnkLI45))((V116)));
+	(void)((*(LnkLI48))((V116)));
 goto T297;
 T297:;
 goto T286;
@@ -1017,7 +1017,7 @@ T375:;
 goto T381;
 T381:;
 	V152= coerce_to_string((V137));
-	if(((*(LnkLI44))((V133),/* INLINE-ARGS */V152))==Cnil){
+	if(((*(LnkLI47))((V133),/* INLINE-ARGS */V152))==Cnil){
 	goto T390;}
 	V135= make_cons((V137),(V135));
 goto T390;
@@ -1179,7 +1179,7 @@ T461:;
 goto T467;
 T467:;
 	V170= coerce_to_string((V155));
-	if(((*(LnkLI44))((V133),/* INLINE-ARGS */V170))==Cnil){
+	if(((*(LnkLI47))((V133),/* INLINE-ARGS */V170))==Cnil){
 	goto T476;}
 	V135= make_cons((V155),(V135));
 goto T476;
@@ -1344,7 +1344,7 @@ T549:;
 goto T555;
 T555:;
 	V189= coerce_to_string((V174));
-	if(((*(LnkLI44))((V133),/* INLINE-ARGS */V189))==Cnil){
+	if(((*(LnkLI47))((V133),/* INLINE-ARGS */V189))==Cnil){
 	goto T565;}
 	V135= make_cons((V174),(V135));
 goto T565;
@@ -1378,10 +1378,88 @@ T323:;
 	base[0]=base[0];
 	return Cnil;}
 	}
-static object  LnkTLI45(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[45],(void **)&LnkLI45,1,ap);va_end(ap);return V1;} /* PRINT-SYMBOL-APROPOS */
-static object  LnkTLI44(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[44],(void **)&LnkLI44,2,ap);va_end(ap);return V1;} /* SUBSTRINGP */
+/*	macro definition for WITH-PACKAGE-ITERATOR	*/
+
+static void L10()
+{register object *base=vs_base;
+	register object *sup=base+VM10; VC10
+	vs_reserve(VM10);
+	check_arg(2);
+	vs_top=sup;
+	{object V191=base[0]->c.c_cdr;
+	if(endp(V191))invalid_macro_call();
+	{object V192= (V191->c.c_car);
+	if(endp(V192))invalid_macro_call();
+	base[2]= (V192->c.c_car);
+	V192=V192->c.c_cdr;
+	if(endp(V192))invalid_macro_call();
+	base[3]= (V192->c.c_car);
+	V192=V192->c.c_cdr;
+	base[4]= V192;}
+	V191=V191->c.c_cdr;
+	base[5]= V191;}
+	{object V193;
+	object V194;
+	object V195;
+	object V196;
+	object V197;
+	object V198;
+	object V199;
+	vs_base=vs_top;
+	Lgensym();
+	vs_top=sup;
+	V193= vs_base[0];
+	vs_base=vs_top;
+	Lgensym();
+	vs_top=sup;
+	V194= vs_base[0];
+	vs_base=vs_top;
+	Lgensym();
+	vs_top=sup;
+	V195= vs_base[0];
+	vs_base=vs_top;
+	Lgensym();
+	vs_top=sup;
+	V196= vs_base[0];
+	vs_base=vs_top;
+	Lgensym();
+	vs_top=sup;
+	V197= vs_base[0];
+	vs_base=vs_top;
+	Lgensym();
+	vs_top=sup;
+	V198= vs_base[0];
+	V199= Cnil;
+	base[6]= base[5];
+	vs_top=(vs_base=base+6)+1;
+	(void) (*Lnk46)();
+	if(vs_base<vs_top){
+	V199= vs_base[0];
+	vs_base++;
+	}else{
+	V199= Cnil;}
+	if(vs_base<vs_top){
+	base[5]= vs_base[0];
+	}else{
+	base[5]= Cnil;}
+	vs_top=sup;
+	V200= list(2,VV[43],base[3]);
+	V201= list(2,(V193),list(4,VV[2],/* INLINE-ARGS */V200,list(2,VV[44],base[3]),base[3]));
+	V202= list(2,(V196),Cnil);
+	V203= list(2,(V194),small_fixnum(-1));
+	V204= list(2,(V197),small_fixnum(0));
+	V205= list(5,/* INLINE-ARGS */V201,/* INLINE-ARGS */V202,/* INLINE-ARGS */V203,/* INLINE-ARGS */V204,list(2,(V198),small_fixnum(0)));
+	V206= list(2,VV[16],list(3,VV[17],(V197),(V198)));
+	V207= make_cons(VV[45],base[5]);
+	V208= make_cons(/* INLINE-ARGS */V207,Cnil);
+	base[6]= listA(4,VV[1],/* INLINE-ARGS */V205,/* INLINE-ARGS */V206,append((V199),/* INLINE-ARGS */V208));
+	vs_top=(vs_base=base+6)+1;
+	return;}
+}
+static object  LnkTLI48(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[48],(void **)&LnkLI48,1,ap);va_end(ap);return V1;} /* PRINT-SYMBOL-APROPOS */
+static object  LnkTLI47(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[47],(void **)&LnkLI47,2,ap);va_end(ap);return V1;} /* SUBSTRINGP */
 static void LnkT15(){ call_or_link(VV[15],(void **)&Lnk15);} /* PACKAGE-SIZE */
-static void LnkT43(){ call_or_link(VV[43],(void **)&Lnk43);} /* FIND-DECLARATIONS */
+static void LnkT46(){ call_or_link(VV[46],(void **)&Lnk46);} /* FIND-DECLARATIONS */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT
