@@ -16,8 +16,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
     automake and autoconf here
   * Add bfd/po makefiles
   * Macosx defaults in configure.in
+  * Regenerate generated autotools files in binutils/bfd subdir
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 25 Feb 2004 22:38:13 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 25 Feb 2004 22:44:24 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
