@@ -7,8 +7,9 @@ gclcvs (2.7.0-30) unstable; urgency=low
   * More descriptive compiled C function names for use in gprof when
     profiling is compiled in
   * Allow sharp numbers to be bignums
+  * lintian fix in string-match
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  5 Aug 2004 22:19:55 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  5 Aug 2004 22:21:50 +0000
 
 gclcvs (2.7.0-29) unstable; urgency=low
 

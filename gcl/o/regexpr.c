@@ -76,7 +76,7 @@ be over written.   \
   static regexp *compiled_regexp;
   va_list ap;
   object v = sSAmatch_dataA->s.s_dbind;
-  char **pp,*str,save_c;
+  char **pp,*str,save_c=0;
   unsigned np;
 
   if (type_of(pattern)!= t_string && type_of(pattern)!=t_symbol)
