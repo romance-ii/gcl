@@ -703,10 +703,12 @@ dump_bss_and_heap (file_data *p_infile, file_data *p_outfile)
     size = get_committed_heap_size ();
     heap_data = get_heap_start ();
 
+#if 0    
     printf ("\t0x%p Heap start in process.\n", heap_data);
     printf ("\t0x%08lx Heap offset in executable.\n", index);
     printf ("\t0x%08lx Heap size in bytes.\n", size);
-
+#endif
+    
     memcpy ((PUCHAR) p_outfile->file_base + index, heap_data, size);
 
     printf ("Dumping .bss into executable...\n");
@@ -714,12 +716,13 @@ dump_bss_and_heap (file_data *p_infile, file_data *p_outfile)
     index += size;
     size = bss_size;
     bss_data = bss_start;
-    
+#if 0    
     printf ("\t0x%p BSS start in process.\n", bss_data);
     printf ("\t0x%08lx BSS offset in executable.\n", index);
     printf ("\t0x%08lx BSS size in bytes.\n", size);
     printf ("\t0x%08lx file base.\n", p_outfile->file_base );
     printf ("\t0x%08lx file base + index.\n", p_outfile->file_base + index );
+#endif    
     memcpy ((char *) p_outfile->file_base + index, bss_data, size);
 }
 
@@ -759,11 +762,12 @@ read_in_bss (char *filename)
       i = GetLastError ();
       exit (1);
     }
+#if 0  
     printf ("\t0x%p BSS start in memory.\n", bss_start);
     printf ("\t0x%08lx BSS offset in saved executable.\n", index);
     printf ("\t0x%08lx BSS size in bytes.\n", bss_size);
     printf ("\t0x%08lx bytes read.\n", n_read);
-
+#endif
   CloseHandle (file);
 }
 
@@ -798,11 +802,13 @@ map_in_heap (char *filename)
   file_base = MapViewOfFileEx (file_mapping, FILE_MAP_COPY, 0, 
 			       heap_index_in_executable, size,
 			       get_heap_start ());
+#if 0  
     printf ("\t0x%p Heap start in memory.\n", get_heap_start() );
     printf ("\t0x%08lx Heap offset in executable.\n", heap_index_in_executable);
     printf ("\t0x%08lx Heap size in bytes.\n", size);
     printf ("\t0x%08lx file base.\n", file_base);
-
+#endif
+  
   if (file_base != 0) 
     {
       return;
