@@ -11,8 +11,9 @@ gcl (2.5.0.cvs20020625-77) unstable; urgency=low
   * README.Debian explaining the toggling of the ANSI image
   * Typo in debian/rules
   * Remove debian/gcl.conffiles
+  * Add config.log config.status and config.cache to clean target
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 27 Feb 2003 15:25:41 -0500
+ -- Camm Maguire <camm@enhanced.com>  Thu, 27 Feb 2003 15:56:11 -0500
 
 gcl (2.5.0.cvs20020625-76) unstable; urgency=low
 
