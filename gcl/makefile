@@ -57,14 +57,14 @@ $(MPDIR)/libmport.a:
 gmp/libgmp.a: gmp/Makefile
 	(cd gmp/mpn ; make)
 	(cd gmp/mpz ; make)
-	(cd gmp ; make `echo *.c | sed -e "s:\.c:.o :g"` )
+	(cd gmp ; make `echo *.c | sed -e "s!\.c!.o !g"` )
 	(cd gmp ; rm -f libgmp.a ;  ar qc libgmp.a *.o */*.o)
 
 
 
 command:
 	rm -f bin/gcl xbin/gcl
-	GCLDIR=`echo ${GCLDIR} | sed -e 'sX^/cygdrive/\([a-z]\)X\1:Xg' -e 'sX^//\([a-z]\)X\1:Xg'` ; \
+	GCLDIR=`echo ${GCLDIR} | sed -e 'sX^/cygdrive/\([a-z]\)X\1!Xg' -e 'sX^//\([a-z]\)X\1!Xg'` ; \
 	make install-command "INSTALL_LIB_DIR=$${GCLDIR}" "prefix=$${GCLDIR}" 
 	(cd xbin ; ln -s ../bin/gcl .)
 
@@ -101,8 +101,8 @@ install1:
 	 $(DESTDIR)${prefix}/bin/gcl.exe
 	if [ -d "${TK_CONFIG_PREFIX}" ] ; then  \
 	cat gcl-tk/gcltksrv$(BAT) | \
-	sed -e "s:GCL_TK_DIR=.*:GCL_TK_DIR=${INSTALL_LIB_DIR}/gcl-tk:g"  \
-	-e "s:TK_LIBRARY=.*:TK_LIBRARY=${TK_LIBRARY}:g" > \
+	sed -e "s!GCL_TK_DIR=.*!GCL_TK_DIR=${INSTALL_LIB_DIR}/gcl-tk!g"  \
+	-e "s!TK_LIBRARY=.*!TK_LIBRARY=${TK_LIBRARY}!g" > \
 	$(DESTDIR)${INSTALL_LIB_DIR}/gcl-tk/gcltksrv$(BAT) ; \
 	chmod a+x $(DESTDIR)${INSTALL_LIB_DIR}/gcl-tk/gcltksrv$(BAT) ; fi
 	if [ -d "${TK_CONFIG_PREFIX}" ] ; then  \
