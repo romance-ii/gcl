@@ -25,7 +25,7 @@ MCC:=gcc
 #endif
 
 #RELOC=locbfd
-RELOC=statsysbfd
+RELOC?=statsysbfd
 ifeq ($(ARCHT),alpha)
 RELOC=dlopen
 endif
