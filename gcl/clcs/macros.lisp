@@ -11,7 +11,9 @@
     (LET ((KEYS (CAAR C)))
       (COND ((ATOM KEYS)
 	     (COND ((NULL KEYS))
-		   ((MEMBER KEYS '(OTHERWISE T))
+		   ((and (MEMBER KEYS '(OTHERWISE T))
+			 (not (eq macro-name 'ecase))
+			 (not (eq macro-name 'ccase)))
 		    (ERROR "OTHERWISE is not allowed in ~S expressions."
 			   MACRO-NAME))
 		   (T (PUSH KEYS L))))

@@ -95,7 +95,7 @@
     ("FEundefined_function" :undefined-function "The function ~S is undefined."
      internal-undefined-function :name)
     ("FEinvalid_function" :invalid-function "~S is invalid as a function."
-     internal-simple-program-error) ; |obj|
+     internal-type-error) ; |obj|
     ("check_arg_failed" :too-few-arguments "~S [or a callee] requires ~R argument~:p,~%\
 but only ~R ~:*~[were~;was~:;were~] supplied."
      internal-simple-program-error) ; |<function>| |n| |top - base|

@@ -5,8 +5,10 @@ gcl (2.5.0.cvs20020625-60) unstable; urgency=low
   * Implicit tagbody in do-symbols and do-all-symbols
   * Better epsilon handling in ieee case
   * Add setf (values ... support
+  * invalid-function errors are type errors
+  * ecase and ccase take t and otherwise clauses
 
- -- Camm Maguire <camm@m.enhanced.com>  Fri, 18 Oct 2002 17:28:44 -0400
+ -- Camm Maguire <camm@m.enhanced.com>  Sat, 19 Oct 2002 07:42:01 -0400
 
 gcl (2.5.0.cvs20020625-59) unstable; urgency=low
 
