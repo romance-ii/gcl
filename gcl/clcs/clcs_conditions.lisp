@@ -149,6 +149,8 @@
 )
 
 (DEFMACRO DEFINE-CONDITION (NAME PARENT-LIST SLOT-SPECS &REST OPTIONS)
+  (unless (or parent-list (eq name 'condition))
+	  (setq parent-list (list 'condition)))
   (let* ((REPORT-FUNCTION nil)
 	 (DOCUMENTATION nil))
     (DO ((O OPTIONS (CDR O)))
