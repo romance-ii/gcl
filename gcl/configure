@@ -1812,7 +1812,7 @@ then
 				TLIBS="$TLIBS -lgmp"
 				echo "#include \"gmp.h\"" >foo.c
 				echo "int main() {return 0;}" >>foo.c
-				MP_INCLUDE=`cpp foo.c | grep /gmp.h | head -1l | $AWK '{print $3}' | tr -d '"'`
+				MP_INCLUDE=`cpp foo.c | grep /gmp.h | head -n 1 | $AWK '{print $3}' | tr -d '"'`
 				rm -f foo.c
 else
   echo "configure: failed program was:" >&5
