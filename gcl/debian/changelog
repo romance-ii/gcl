@@ -14,8 +14,10 @@ gclcvs (2.7.0-31) unstable; urgency=low
     when using gprof
   * Fix (setf (get ...) ...) return bug when interpreted
   * Fix overwrite end of sgc_type_map bug
+  * Versioned depends on binutils-dev manually installed by Debian build
+    process
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 12 Aug 2004 16:42:53 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 12 Aug 2004 16:47:46 +0000
 
 gclcvs (2.7.0-30) unstable; urgency=high
 

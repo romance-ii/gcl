@@ -7,7 +7,7 @@ Standards-Version: 3.6.1
 
 Package: gcl
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, ${gcc}
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${gcc}, ${binutils}
 Suggests: gcl-doc
 Description: GNU Common Lisp compiler
  GNU Common Lisp (GCL) is a Common Lisp compiler and interpreter
