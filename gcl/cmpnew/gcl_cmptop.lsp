@@ -955,7 +955,7 @@
 		    (setq first nil)
 		    (wt "}")
 		    (when (caddr opt) (c2bind-loc (caddr opt) t)))
-	  (unless (or first (not (ll-rest ll)))
+	  (when (and (not first) (or (ll-rest ll) (ll-keywords ll)))
 	    (wt-nl "first=va_arg(ap,object);"))))
       (setq labels (nreverse labels))
       

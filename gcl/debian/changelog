@@ -1,3 +1,10 @@
+gclcvs (2.7.0-30) unstable; urgency=low
+
+  * Slightly modify proclaimed vararg function handling fix
+    (gcl_cmptop.lsp)
+
+ -- Camm Maguire <camm@enhanced.com>  Mon,  2 Aug 2004 21:39:12 +0000
+
 gclcvs (2.7.0-29) unstable; urgency=low
 
   * Remove references to external functions by static names in file.d
