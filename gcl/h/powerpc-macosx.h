@@ -15,9 +15,6 @@
 /* #define DONT_NEED_MALLOC */
 /* #define GNU_MALLOC */
 
-/* move this to configure */
-#define HAVE_UNISTD_H
-
 /* correct value for ppc (we should detect this automatically) */
 /* alternatively, we could use the global variable vm_page_size */
 #define PAGEWIDTH 12
@@ -91,13 +88,30 @@ do {int c=0;\
 #define FCLOSE_SETBUF_OK 
 
 
-/**** enable stratified garbage collection */
+/** enable stratified garbage collection */
 
 #define SGC
+
+/*
+#define INSTALL_MPROTECT_HANDLER \
+do { \
+     struct sigaction sact; \
+     sigfillset(&(sact.sa_mask)); \
+     sact.sa_flags = SA_SIGINFO; \
+     sact.sa_sigaction = (void (*)()) memprotect_handler; \
+     sigaction (SIGSEGV, &sact, 0); \
+     sigaction (SIGBUS, &sact, 0); \
+} while (0);
+*/
+
 #define SIGPROTV SIGBUS
 
+/* si_addr not containing the faulting address is a bug in Darwin */
+/* work around this bug by looking at the dar field of the exception state */
+#define GET_FAULT_ADDR(sig,code,scp,addr) ((char *) (((ucontext_t *) scp)->uc_mcontext->es.dar))
 
-/**** cache synchronization code */
+
+/** cache synchronization code */
 
 /* This is based on powerpc-linux.h.  See equivalent code in dyld. */
 
