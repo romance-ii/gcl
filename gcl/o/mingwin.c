@@ -1009,5 +1009,14 @@ fix_filename(object pathname, char *filename1)
 
 }
 
-
-
+char *GCLExeName ( void )
+{
+    static char module_name_buf[128];
+    char *rv = NULL;
+    module_name_buf[0] = 0;
+    DWORD result = GetModuleFileName ( (HMODULE) NULL, (LPTSTR) &module_name_buf, 128 );
+    if ( result != 0 ) {
+      rv = module_name_buf;
+    }
+    return ( (char *) rv );
+}
