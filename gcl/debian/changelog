@@ -85,8 +85,10 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Don't try to open map file if doesn't stat (macosx)
   * Add earlier forgotten branch patch to sfaslbfd.c for macosx
   * minor variable name change
+  * Perhormance improvement to gcl_seqlib.lsp -- no inner loop over
+    bignums
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 01:48:38 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 01:58:50 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

@@ -228,9 +228,12 @@
 	      (if (eq key nil) (setq key #'identity))
        (with-start-end start end sequence
 	  (let ,@(if countp
-		     '(((count (if (null count)
-				   most-positive-fixnum count)))))	       
-              ,@(if countp '((declare (integer count))))
+		     '(((count
+			 (cond ((null count) most-positive-fixnum)
+			       ((< count 0) 0)
+			       ((> count most-positive-fixnum) most-positive-fixnum)
+			       (t count))))))
+              ,@(if countp '((declare (fixnum count))))
               nil
 	      (and test test-not (test-error))
                 (if (not from-end)
@@ -327,7 +330,6 @@
            (let (,number-satisfied)
              (declare (fixnum n))
              (when (< n count) (setq count n))
-	     (when (< count 0) (setq count 0))
              (do ((newseq
                    (make-sequence (seqtype sequence)
                                   (the fixnum (f- l count))))
@@ -343,7 +345,6 @@
       `(let (,number-satisfied)
          (declare (fixnum n))
          (when (< n count) (setq count n))
-	 (when (< count 0) (setq count 0))
          (do ((newseq
                (make-sequence (seqtype sequence) (the fixnum (f- l count))))
               ,iterate-i-everywhere
