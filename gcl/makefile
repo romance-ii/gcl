@@ -9,6 +9,9 @@ prefix=/usr/local
 # This prefix may be overridden e.g. with
 # ./configure --prefix=/usr/share
 
+# Allow platform defs file to override this.
+TK_LISP_LIB=gcl-tk/tkl.o gcl-tk/tinfo.o gcl-tk/decode.tcl gcl-tk/demos/*.lsp gcl-tk/demos/*.lisp gcl-tk/demos/*.o
+TCL_EXES=gcl-tk/gcl.tcl gcl-tk/gcltkaux$(EXE)
 
 -include makedefs
 
@@ -116,7 +119,7 @@ command:
 merge:
 	${CC} -o merge merge.c
 
-LISP_LIB=cmpnew/collectfn.o lsp/gprof.lsp lsp/info.o lsp/profile.lsp gcl-tk/tkl.o  gcl-tk/tinfo.o gcl-tk/decode.tcl gcl-tk/demos/*.lsp gcl-tk/demos/*.lisp gcl-tk/demos/*.o $(RL_LIB)
+LISP_LIB=cmpnew/collectfn.o lsp/gprof.lsp lsp/info.o lsp/profile.lsp $(TK_LISP_LIB) $(RL_LIB)
 
 install-command:
 	rm -f $(DESTDIR)${prefix}/bin/gcl
@@ -147,7 +150,7 @@ install1:
 	make install-command "INSTALL_LIB_DIR=${INSTALL_LIB_DIR}" "prefix=${prefix}" DESTDIR=$(DESTDIR)
 	rm -f $(DESTDIR)${prefix}/bin/gcl.exe
 	tar cf - $(PORTDIR)/$(FLISP)$(EXE) info/*.info* ${LISP_LIB} \
-	gcl-tk/gcl.tcl gcl-tk/gcltkaux$(EXE)  |  (cd $(DESTDIR)${INSTALL_LIB_DIR} ;tar xf -)
+	$(TCL_EXES)  |  (cd $(DESTDIR)${INSTALL_LIB_DIR} ;tar xf -)
 #	ln ${SYMB} ${INSTALL_LIB_DIR}/$(PORTDIR)/$(FLISP)$(EXE) \
 #	 $(DESTDIR)${prefix}/bin/gcl.exe
 	if [ -d "${TK_CONFIG_PREFIX}" ] ; then  \
