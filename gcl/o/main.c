@@ -361,7 +361,7 @@ void
 error(char *s)
 {
         if (catch_fatal>0 && interrupt_enable )
-	  {catch_fatal = -1;
+            {catch_fatal = -1;
 	   if (sgc_enabled)
 	     { sgc_quit();}
 	   if (sgc_enabled==0)
@@ -463,7 +463,7 @@ initlisp(void) {
 	init_print();
 	init_GBC();
 
-#ifdef UNIX
+#if defined ( UNIX ) || defined ( __MINGW32__ )
 #ifndef DGUX
 	init_unixfasl();
 	init_unixsys();
