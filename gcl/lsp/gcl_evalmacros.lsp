@@ -277,11 +277,61 @@
 	((endp ,temp) ,val)
 	,@body))
 
-(defmacro dotimes ((var form &optional (val nil)) &rest body
-                                                  &aux (temp (gensym)))
-  `(do* ((,temp ,form) (,var 0 (1+ ,var)))
-        ((>= ,var ,temp) ,val)
-        ,@body))
+;; In principle, a more complete job could be done here by trying to
+;; capture fixnum type declarations from the surrounding context or
+;; environment, or from within the compiler's internal structures at
+;; compile time.  See gcl-devel archives for examples.  This
+;; implementation relies on the fact that the gcc optimizer will
+;; eliminate the bignum branch if the supplied form is a symbol
+;; declared to be fixnum, as the comparison of a long integer variable
+;; with most-positive-fixnum is then vacuous.  Care must be taken in
+;; making comparisons with most-negative-fixnum, as the C environment
+;; appears to treat this as positive or negative depending on the sign
+;; of the other argument in the comparison, apparently to symmetrize
+;; the long integer range.  20040403 CM.
+(defmacro dotimes ((var form &optional (val nil)) &rest body)
+  (cond ((symbolp form)
+	 `(cond ((< ,form 0)
+		 (let ((,var 0))
+		   (declare (fixnum ,var) (ignorable ,var))
+		   ,val))
+		((<= ,form most-positive-fixnum)
+		 (let ((,form ,form))
+		   (declare (fixnum ,form))
+		   (do* ((,var 0 (1+ ,var))) ((>= ,var ,form) ,val)
+		     (declare (fixnum ,var))
+		     ,@body)))
+		(t 
+		 (do* ((,var 0 (1+ ,var))) ((>= ,var ,form) ,val)
+		   ,@body))))
+	((constantp form)
+	 (cond ((< form 0)
+		`(let ((,var 0))
+		   (declare (fixnum ,var) (ignorable ,var))
+		   ,val))
+	       ((<= form most-positive-fixnum)
+		`(do* ((,var 0 (1+ ,var))) ((>= ,var ,form) ,val)
+		   (declare (fixnum ,var))
+		   ,@body))
+	       (t
+		`(do* ((,var 0 (1+ ,var))) ((>= ,var ,form) ,val)
+		   ,@body))))
+	(t
+	 (let ((temp (gensym)))
+	 `(let ((,temp ,form))
+	    (cond ((< ,temp 0)
+		   (let ((,var 0))
+		     (declare (fixnum ,var) (ignorable ,var))
+		     ,val))
+		  ((<= ,temp most-positive-fixnum)
+		   (let ((,temp ,temp))
+		     (declare (fixnum ,temp))
+		     (do* ((,var 0 (1+ ,var))) ((>= ,var ,temp) ,val)
+		       (declare (fixnum ,var))
+		       ,@body)))
+		  (t 
+		   (do* ((,var 0 (1+ ,var))) ((>= ,var ,temp) ,val)
+		     ,@body))))))))
 
 (defmacro declaim (&rest l)
  `(eval-when (compile eval load)

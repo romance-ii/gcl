@@ -11,23 +11,26 @@
 (defmacro assq (item list) `(assoc ,item ,list :test #'eq))
 (defmacro posq (item list) `(position ,item ,list :test #'eq))
 
-(defmacro dotimes ((var form &optional (val nil)) &rest body &environment env)
-  (multiple-value-bind (doc decls bod)
-      (extract-declarations body env)
-    (declare (ignore doc))
-    (let ((limit (gensym))
-          (label (gensym)))
-      `(let ((,limit ,form)
-             (,var 0))
-         (declare (fixnum ,limit ,var))
-         ,@decls
-         (block nil
-           (tagbody
-            ,label
-              (when (>= ,var ,limit) (return-from nil ,val))
-              ,@bod
-              (setq ,var (the fixnum (1+ ,var)))
-              (go ,label)))))))
+;; The generic dotimes macro is now sufficient for the performance
+;; gains sought here.  Even the declaration extraction should be the
+;; same as that provided in do* which dotimes invokes.  20040403 CM
+;(defmacro dotimes ((var form &optional (val nil)) &rest body &environment env)
+;  (multiple-value-bind (doc decls bod)
+;      (extract-declarations body env)
+;    (declare (ignore doc))
+;    (let ((limit (gensym))
+;          (label (gensym)))
+;      `(let ((,limit ,form)
+;             (,var 0))
+;         (declare (fixnum ,limit ,var))
+;         ,@decls
+;         (block nil
+;           (tagbody
+;            ,label
+;              (when (>= ,var ,limit) (return-from nil ,val))
+;              ,@bod
+;              (setq ,var (the fixnum (1+ ,var)))
+;              (go ,label)))))))
 
 (defun printing-random-thing-internal (thing stream)
   (format stream "~O" (si:address thing)))
