@@ -16,7 +16,6 @@
 #else
 #include "cyglacks.h"
 #endif
-#include <varargs.h>
 
 struct aouthdr {AOUTHDR x;};   
 

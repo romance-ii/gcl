@@ -1,8 +1,16 @@
-#include <varargs.h>     
 #include <stdio.h>
 #include "att.h"
 
 FILE *fopen_binary(char *name,char *mode);
+
+/* bfd support */
+#undef HAVE_LIBBFD
+#ifdef HAVE_LIBBFD
+#define IN_GCC
+#include <bfd.h>
+#include <bfdlink.h>
+#endif
+
 
 #define MP386
 #define WINDOWSNT
