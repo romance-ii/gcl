@@ -18,8 +18,11 @@ gclcvs (2.7.0-18) unstable; urgency=low
   * Default hole is maxpages/10, holesize configure option added
   * Build depend on emacs21 | emacsen
   * Remove calls to init-readline with new automatic readline setup
+  * Always check args in compiled macro functions to ensure safe calls
+    for now.  FIXME compile these in the future as sfn instead of cf
+    types so that arg checking is only done when called from safe code
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 28 Jan 2004 16:41:11 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 30 Jan 2004 00:12:19 +0000
 
 gclcvs (2.7.0-17) unstable; urgency=low
 

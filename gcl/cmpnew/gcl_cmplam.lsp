@@ -854,8 +854,11 @@
 
 (defun c2dm (whole env vl body
                    &aux (cvar (next-cvar)))
-  (when (or *safe-compile* *compiler-check-args*)
-    (wt-nl "check_arg(2);"))
+; FIXME Compile macros as sfn instead of cf -- need this to guarantee safe calls
+; CM 20040129
+;  (when (or *safe-compile* *compiler-check-args*)
+  (wt-nl "check_arg(2);")
+;    )
   (cond (whole (setf (var-ref whole) (vs-push)))
         (t (vs-push)))
   (cond (env (setf (var-ref env) (vs-push)))
