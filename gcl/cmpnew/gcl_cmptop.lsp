@@ -364,12 +364,9 @@
   (when (endp args) (too-few-args 'eval-when 1 0))
   (dolist** (situation (car args))
     (case situation
-          (load (setq load-flag t))
-          (:load-toplevel (setq load-flag t))
-          (compile (setq compile-flag t))
-          (:compile-toplevel (setq compile-flag t))
-          (eval)
-          (:execute)
+          ((load :load-toplevel) (setq load-flag t))
+          ((compile :compile-toplevel) (setq compile-flag t))
+          ((eval :execute))
           (otherwise (cmperr "The EVAL-WHEN situation ~s is illegal."
                              situation))))
   (let ((*eval-when-defaults* (car args)))
