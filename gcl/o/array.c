@@ -83,7 +83,7 @@ DEFUNO_NEW("AREF", object, fLaref, LISP, 1, ARRAY_RANK_LIMIT,
      rank-- ;
      while(1) 
        {
-	 if ( k >= x->a.a_dims[m])
+           if ( ( k >= x->a.a_dims[m] ) || ( k < 0 ) )
 	   FEerror("Index ~a to array is too large",1,make_fixnum (m));
 	 i1 += k;
 	 m ++;
@@ -109,16 +109,9 @@ DEFUNO_NEW("AREF", object, fLaref, LISP, 1, ARRAY_RANK_LIMIT,
 static void
 fScheck_bounds_bounds(object x, int i)
 {
-  switch (type_of(x)) {
-  case t_array:
-  case t_vector:
-  case t_bitvector:
-  case t_string:
-    if ((unsigned int) i >= x->a.a_dim)
-    FEerror("Array index ~a out of bounds for ~a", 2,  make_fixnum(i),x);
-  default:
-    FEerror("not an array",0);
-  }
+    if ( ( (unsigned int) i >= x->a.a_dim ) || ( (unsigned int) i < 0 ) ) {
+        FEerror("Array index ~a out of bounds for ~a", 2,  make_fixnum(i),x);
+    }
 }
 
 DEFUNO_NEW("SVREF", object, fLsvref, LISP, 2, 2,
@@ -143,8 +136,7 @@ DEFUN_NEW("ROW-MAJOR-AREF", object, fLrow_major_aref, LISP, 2, 2,
   case t_array:
   case t_vector:
   case t_bitvector:
-    if (x->v.v_dim <= (unsigned int)i)
-      /*  i =  */fScheck_bounds_bounds(x, i);
+    fScheck_bounds_bounds(x, i);
     switch (x->v.v_elttype) {
     case aet_object:
       return x->v.v_self[i];
@@ -172,8 +164,7 @@ DEFUN_NEW("ROW-MAJOR-AREF", object, fLrow_major_aref, LISP, 2, 2,
       FEerror("unknown array type",0);
     }
   case t_string:
-    if (x->v.v_dim <= i)
-      /*  i =  */fScheck_bounds_bounds(x, i);
+    fScheck_bounds_bounds(x, i);
     return code_char(x->st.st_self[i]);
   default:
     FEerror("not an array",0);
@@ -198,8 +189,7 @@ DEFUN_NEW("ASET1", object, fSaset1, SI, 3, 3, NONE, OO, IO, OO,OO,(object x, fix
   case t_array:
   case t_vector:
   case t_bitvector:
-    if (x->v.v_dim <= i)
-      /*  i =  */fScheck_bounds_bounds(x, i);
+    fScheck_bounds_bounds(x, i);
     switch (x->v.v_elttype) {
     case aet_object:
       x->v.v_self[i] = val;
@@ -251,8 +241,7 @@ DEFUN_NEW("ASET1", object, fSaset1, SI, 3, 3, NONE, OO, IO, OO,OO,(object x, fix
     }
     break;
   case t_string:
-    if (x->v.v_dim <= i)
-      /*  i =  */fScheck_bounds_bounds(x, i);
+    fScheck_bounds_bounds(x, i);
     ASSURE_TYPE(val,t_character);
     x->st.st_self[i] = char_code(val);
     break;
@@ -292,7 +281,7 @@ DEFUNO_NEW("ASET", object, fSaset, SI, 1, ARG_LIMIT, NONE, OO,
      rank-- ;
      while(1) 
        {
-	 if (k >= x->a.a_dims[m]) {
+           if ( ( k >= x->a.a_dims[m] ) || ( k < 0 ) ) {
 	   object x,x1;
 	   x=make_fixnum(m);
 	   x1=make_fixnum(k);
@@ -669,6 +658,9 @@ displace(object from_array, object dest_array, int offset)
     }
   if (offset + from_array->a.a_dim > dest_array->a.a_dim)
     { FEerror("Destination array too small to hold other array",0);
+    }
+  if ( offset < 0 )
+    { FEerror("Negative offset",0);
     }
   /* ensure that we have a cons */
   if (dest_array->a.a_displaced == Cnil)
