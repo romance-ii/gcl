@@ -84,6 +84,9 @@ gcl_init_system(object no_init)
   ar_check_init(gcl_assert,no_init);
   ar_check_init(gcl_defstruct,no_init);
   ar_check_init(gcl_describe,no_init);
+#ifdef HAVE_JAPI_H
+  lsp_init("../mod/gcl_japi.lsp"); /* Needed for package declaration when compiling later. */
+#endif
   ar_check_init(gcl_iolib,no_init);
   ar_check_init(gcl_listlib,no_init);
   ar_check_init(gcl_mislib,no_init);
