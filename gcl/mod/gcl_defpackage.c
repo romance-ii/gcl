@@ -1316,7 +1316,7 @@ T504:;
 	return;}}
 	}
 }
-static void LnkT75(){ call_or_link(VV[75],(void **)(void *)&Lnk75);} /* TYPE-ERROR */
+static void LnkT75(){ call_or_link(VV[75],(void **)(void *)&Lnk75);} /* SLOOP-TYPE-ERROR */
 static void LnkT74(){ call_or_link(VV[74],(void **)(void *)&Lnk74);} /* FIND */
 static void LnkT72(){ call_or_link(VV[72],(void **)(void *)&Lnk72);} /* SPECIFIC-ERROR */
 static void LnkT71(){ call_or_link(VV[71],(void **)(void *)&Lnk71);} /* COUNT */

@@ -2,7 +2,7 @@
 #include "cmpinclude.h"
 #include "pcl_env.h"
 void init_pcl_env(){do_init(VV);}
-/*	function definition for (DEFGENERIC DESCRIBE-OBJECT)9136	*/
+/*	function definition for (DEFGENERIC DESCRIBE-OBJECT)9170	*/
 
 static void L1()
 {register object *base=vs_base;
@@ -1231,7 +1231,7 @@ T530:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	function definition for Defclass TRACED-METHOD9257	*/
+/*	function definition for Defclass TRACED-METHOD9291	*/
 
 static void L12()
 {register object *base=vs_base;

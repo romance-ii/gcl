@@ -264,9 +264,126 @@ static void L10()
 	vs_top=(vs_base=old_base)+1;
 	vs_base[0]=x;
 }
+
+static void
+set_cclosure_env(object cc,object val) {
+ if (type_of(cc)==t_cclosure)
+   cc->cc.cc_env=val;
+}
+
+/*	function definition for SET-CCLOSURE-ENV	*/
+
+static void L11()
+{	object *old_base=vs_base;
+	set_cclosure_env(
+	vs_base[0],
+	vs_base[1]);
+	vs_top=(vs_base=old_base)+1;
+	vs_base[0]=Cnil;
+}
+/*	function definition for %SET-CCLOSURE-ENV	*/
+
+static void L12()
+{	object *old_base=vs_base;
+	set_cclosure_env(
+	vs_base[0],
+	vs_base[1]);
+	vs_top=(vs_base=old_base)+1;
+	vs_base[0]=Cnil;
+}
+
+static object
+cclosurep(object o) {
+  return type_of(o)==t_cclosure ? Ct : Cnil;
+}
+
+/*	function definition for CCLOSUREP	*/
+
+static void L13()
+{	object *old_base=vs_base;
+	object x;
+	x=
+	cclosurep(
+	vs_base[0]);
+	vs_top=(vs_base=old_base)+1;
+	vs_base[0]=x;
+}
+
+static object
+cclosure_env(object o) {
+  return type_of(o)==t_cclosure ? o->cc.cc_env : Cnil;
+}
+
+/*	function definition for CCLOSURE-ENV	*/
+
+static void L14()
+{	object *old_base=vs_base;
+	object x;
+	x=
+	cclosure_env(
+	vs_base[0]);
+	vs_top=(vs_base=old_base)+1;
+	vs_base[0]=x;
+}
+/*	function definition for %CCLOSURE-ENV	*/
+
+static void L15()
+{	object *old_base=vs_base;
+	object x;
+	x=
+	cclosure_env(
+	vs_base[0]);
+	vs_top=(vs_base=old_base)+1;
+	vs_base[0]=x;
+}
+
+static void
+set_compiled_function_name(object o,object n) {
+/* check type here */
+  o->cf.cf_name=n;
+}
+
+/*	function definition for SET-COMPILED-FUNCTION-NAME	*/
+
+static void L16()
+{	object *old_base=vs_base;
+	set_compiled_function_name(
+	vs_base[0],
+	vs_base[1]);
+	vs_top=(vs_base=old_base)+1;
+	vs_base[0]=Cnil;
+}
+/*	function definition for %SET-COMPILED-FUNCTION-NAME	*/
+
+static void L17()
+{	object *old_base=vs_base;
+	set_compiled_function_name(
+	vs_base[0],
+	vs_base[1]);
+	vs_top=(vs_base=old_base)+1;
+	vs_base[0]=Cnil;
+}
+
+static object
+__fboundp(object o) {
+/* FIXME check type here*/
+return o->s.s_gfdef==OBJNULL ? Cnil : Ct;
+}
+
+/*	function definition for %FBOUNDP	*/
+
+static void L18()
+{	object *old_base=vs_base;
+	object x;
+	x=
+	__fboundp(
+	vs_base[0]);
+	vs_top=(vs_base=old_base)+1;
+	vs_base[0]=x;
+}
 /*	local entry for function MAKE-FUNCTION-INLINE	*/
 
-static object LI11(V35)
+static object LI19(V35)
 
 register object V35;
 {	 VMB9 VMS9 VMV9
@@ -335,7 +452,7 @@ T18:;
 }
 /*	macro definition for DEFINE-INLINES	*/
 
-static void L12()
+static void L20()
 {register object *base=vs_base;
 	register object *sup=base+VM10; VC10
 	vs_check;
@@ -453,7 +570,7 @@ T40:;
 }
 /*	local entry for function %FBOUNDP	*/
 
-static object LI13(V71)
+static object LI21(V71)
 
 object V71;
 {	 VMB11 VMS11 VMV11
@@ -465,7 +582,7 @@ TTL:;
 }
 /*	local entry for function %SYMBOL-FUNCTION	*/
 
-static object LI14(V74)
+static object LI22(V74)
 
 object V74;
 {	 VMB12 VMS12 VMV12
@@ -477,7 +594,7 @@ TTL:;
 }
 /*	local entry for function %STRUCTURE-NAME	*/
 
-static object LI15(V77)
+static object LI23(V77)
 
 object V77;
 {	 VMB13 VMS13 VMV13
@@ -489,7 +606,7 @@ TTL:;
 }
 /*	local entry for function %COMPILED-FUNCTION-NAME	*/
 
-static object LI16(V80)
+static object LI24(V80)
 
 object V80;
 {	 VMB14 VMS14 VMV14
@@ -501,7 +618,7 @@ TTL:;
 }
 /*	local entry for function %SET-COMPILED-FUNCTION-NAME	*/
 
-static object LI17(V84,V85)
+static object LI25(V84,V85)
 
 object V84;object V85;
 {	 VMB15 VMS15 VMV15
@@ -513,7 +630,7 @@ TTL:;
 }
 /*	local entry for function CCLOSUREP	*/
 
-static object LI18(V88)
+static object LI26(V88)
 
 object V88;
 {	 VMB16 VMS16 VMV16
@@ -525,7 +642,7 @@ TTL:;
 }
 /*	local entry for function SFUN-P	*/
 
-static object LI19(V91)
+static object LI27(V91)
 
 object V91;
 {	 VMB17 VMS17 VMV17
@@ -537,7 +654,7 @@ TTL:;
 }
 /*	local entry for function %CCLOSURE-ENV	*/
 
-static object LI20(V94)
+static object LI28(V94)
 
 object V94;
 {	 VMB18 VMS18 VMV18
@@ -549,7 +666,7 @@ TTL:;
 }
 /*	local entry for function %SET-CCLOSURE-ENV	*/
 
-static object LI21(V98,V99)
+static object LI29(V98,V99)
 
 object V98;object V99;
 {	 VMB19 VMS19 VMV19
@@ -561,7 +678,7 @@ TTL:;
 }
 /*	local entry for function %CCLOSURE-ENV-NTHCDR	*/
 
-static object LI22(V103,V104)
+static object LI30(V103,V104)
 
 long V103;object V104;
 {	 VMB20 VMS20 VMV20
@@ -573,7 +690,7 @@ TTL:;
 }
 /*	local entry for function SET-FUNCTION-NAME-1	*/
 
-static object LI23(V109,V110,V111)
+static object LI31(V109,V110,V111)
 
 register object V109;register object V110;object V111;
 {	 VMB21 VMS21 VMV21
@@ -653,7 +770,7 @@ object set_cclosure (result_cc,value_cc,available_size)
 }
 /*	function definition for %SET-CCLOSURE	*/
 
-static void L24()
+static void L32()
 {	object *old_base=vs_base;
 	object x;
 	x=
@@ -666,7 +783,7 @@ static void L24()
 }
 /*	local entry for function STRUCTURE-FUNCTIONS-EXIST-P	*/
 
-static object LI25()
+static object LI33()
 
 {	 VMB22 VMS22 VMV22
 	goto TTL;
@@ -677,7 +794,7 @@ TTL:;
 }
 /*	local entry for function STRUCTURE-TYPE	*/
 
-static object LI26(V121)
+static object LI34(V121)
 
 object V121;
 {	 VMB23 VMS23 VMV23
@@ -695,7 +812,7 @@ T89:;
 }
 /*	local entry for function STRUCTURE-TYPE-P	*/
 
-static object LI27(V125)
+static object LI35(V125)
 
 object V125;
 {	 VMB24 VMS24 VMV24
@@ -744,7 +861,7 @@ T98:;
 }
 /*	local entry for function STRUCTURE-TYPE-INCLUDED-TYPE-NAME	*/
 
-static object LI28(V134)
+static object LI36(V134)
 
 object V134;
 {	 VMB25 VMS25 VMV25
@@ -787,7 +904,7 @@ T109:;
 }
 /*	local entry for function STRUCTURE-TYPE-INTERNAL-SLOTDS	*/
 
-static object LI29(V144)
+static object LI37(V144)
 
 object V144;
 {	 VMB26 VMS26 VMV26
@@ -809,7 +926,7 @@ T111:;
 }
 /*	local entry for function STRUCTURE-TYPE-SLOT-DESCRIPTION-LIST	*/
 
-static object LI31(V149)
+static object LI39(V149)
 
 object V149;
 {	 VMB27 VMS27 VMV27
@@ -867,9 +984,9 @@ T117:;
 	{object V162;
 	object V163;
 	V162= 
-	make_cclosure_new(LC38,Cnil,base[2],Cdata);
+	make_cclosure_new(LC46,Cnil,base[2],Cdata);
 	V163= 
-	make_cclosure_new(LC39,Cnil,base[2],Cdata);
+	make_cclosure_new(LC47,Cnil,base[2],Cdata);
 	base[3]= (V162);
 	vs_top=(vs_base=base+3)+1;
 	(void) (*Lnk66)();
@@ -940,7 +1057,7 @@ T124:;
 }
 /*	local entry for function STRUCTURE-SLOTD-NAME	*/
 
-static object LI32(V174)
+static object LI40(V174)
 
 object V174;
 {	 VMB28 VMS28 VMV28
@@ -952,7 +1069,7 @@ TTL:;
 }
 /*	local entry for function STRUCTURE-SLOTD-ACCESSOR-SYMBOL	*/
 
-static object LI33(V177)
+static object LI41(V177)
 
 object V177;
 {	 VMB29 VMS29 VMV29
@@ -964,7 +1081,7 @@ TTL:;
 }
 /*	local entry for function STRUCTURE-SLOTD-READER-FUNCTION	*/
 
-static object LI34(V180)
+static object LI42(V180)
 
 object V180;
 {	 VMB30 VMS30 VMV30
@@ -976,7 +1093,7 @@ TTL:;
 }
 /*	local entry for function STRUCTURE-SLOTD-WRITER-FUNCTION	*/
 
-static object LI35(V183)
+static object LI43(V183)
 
 object V183;
 {	 VMB31 VMS31 VMV31
@@ -988,7 +1105,7 @@ TTL:;
 }
 /*	local entry for function RENEW-SYS-FILES	*/
 
-static object LI36()
+static object LI44()
 
 {	 VMB32 VMS32 VMV32
 	goto TTL;
@@ -1274,7 +1391,7 @@ T283:;
 }
 /*	local function CLOSURE	*/
 
-static void LC39(base0)
+static void LC47(base0)
 register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM33; VC33
@@ -1296,7 +1413,7 @@ register object *base0;
 }
 /*	local function CLOSURE	*/
 
-static void LC38(base0)
+static void LC46(base0)
 register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM34; VC34
@@ -1314,7 +1431,7 @@ register object *base0;
 }
 /*	local function CLOSURE	*/
 
-static void LC37(base0)
+static void LC45(base0)
 register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM35; VC35

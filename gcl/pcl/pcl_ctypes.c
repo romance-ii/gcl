@@ -2,7 +2,7 @@
 #include "cmpinclude.h"
 #include "pcl_ctypes.h"
 void init_pcl_ctypes(){do_init(VV);}
-/*	function definition for (DEFINE-METHOD-COMBINATION +)9093	*/
+/*	function definition for (DEFINE-METHOD-COMBINATION +)9127	*/
 
 static void L1()
 {register object *base=vs_base;
@@ -20,7 +20,7 @@ TTL:;
 	(void) (*Lnk10)();
 	return;
 }
-/*	function definition for (DEFINE-METHOD-COMBINATION AND)9093	*/
+/*	function definition for (DEFINE-METHOD-COMBINATION AND)9127	*/
 
 static void L2()
 {register object *base=vs_base;
@@ -38,7 +38,7 @@ TTL:;
 	(void) (*Lnk10)();
 	return;
 }
-/*	function definition for (DEFINE-METHOD-COMBINATION APPEND)9093	*/
+/*	function definition for (DEFINE-METHOD-COMBINATION APPEND)9127	*/
 
 static void L3()
 {register object *base=vs_base;
@@ -56,7 +56,7 @@ TTL:;
 	(void) (*Lnk10)();
 	return;
 }
-/*	function definition for (DEFINE-METHOD-COMBINATION LIST)9093	*/
+/*	function definition for (DEFINE-METHOD-COMBINATION LIST)9127	*/
 
 static void L4()
 {register object *base=vs_base;
@@ -74,7 +74,7 @@ TTL:;
 	(void) (*Lnk10)();
 	return;
 }
-/*	function definition for (DEFINE-METHOD-COMBINATION MAX)9093	*/
+/*	function definition for (DEFINE-METHOD-COMBINATION MAX)9127	*/
 
 static void L5()
 {register object *base=vs_base;
@@ -92,7 +92,7 @@ TTL:;
 	(void) (*Lnk10)();
 	return;
 }
-/*	function definition for (DEFINE-METHOD-COMBINATION MIN)9093	*/
+/*	function definition for (DEFINE-METHOD-COMBINATION MIN)9127	*/
 
 static void L6()
 {register object *base=vs_base;
@@ -110,7 +110,7 @@ TTL:;
 	(void) (*Lnk10)();
 	return;
 }
-/*	function definition for (DEFINE-METHOD-COMBINATION NCONC)9093	*/
+/*	function definition for (DEFINE-METHOD-COMBINATION NCONC)9127	*/
 
 static void L7()
 {register object *base=vs_base;
@@ -128,7 +128,7 @@ TTL:;
 	(void) (*Lnk10)();
 	return;
 }
-/*	function definition for (DEFINE-METHOD-COMBINATION OR)9093	*/
+/*	function definition for (DEFINE-METHOD-COMBINATION OR)9127	*/
 
 static void L8()
 {register object *base=vs_base;
@@ -146,7 +146,7 @@ TTL:;
 	(void) (*Lnk10)();
 	return;
 }
-/*	function definition for (DEFINE-METHOD-COMBINATION PROGN)9093	*/
+/*	function definition for (DEFINE-METHOD-COMBINATION PROGN)9127	*/
 
 static void L9()
 {register object *base=vs_base;

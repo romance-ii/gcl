@@ -2,7 +2,7 @@
 #include "cmpinclude.h"
 #include "clcs_debugger.h"
 void init_clcs_debugger(){do_init(VV);}
-/*	local entry for function progn 'compile2191	*/
+/*	local entry for function progn 'compile2168	*/
 
 static object LI1()
 
@@ -18,7 +18,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2203	*/
+/*	local entry for function progn 'compile2180	*/
 
 static object LI2()
 
@@ -37,7 +37,7 @@ T3:;
 	VMR2(V2)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2216	*/
+/*	local entry for function progn 'compile2193	*/
 
 static object LI3()
 
@@ -48,7 +48,7 @@ TTL:;
 	VMR3(V3)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2232	*/
+/*	local entry for function progn 'compile2209	*/
 
 static object LI4()
 
@@ -64,7 +64,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2244	*/
+/*	local entry for function progn 'compile2221	*/
 
 static object LI5()
 
@@ -83,7 +83,7 @@ T10:;
 	VMR5(V5)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2257	*/
+/*	local entry for function progn 'compile2234	*/
 
 static object LI6()
 
@@ -94,7 +94,7 @@ TTL:;
 	VMR6(V6)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2273	*/
+/*	local entry for function progn 'compile2250	*/
 
 static object LI7()
 
@@ -110,7 +110,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2285	*/
+/*	local entry for function progn 'compile2262	*/
 
 static object LI8()
 
@@ -129,7 +129,7 @@ T17:;
 	VMR8(V8)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2298	*/
+/*	local entry for function progn 'compile2275	*/
 
 static object LI9()
 
@@ -140,7 +140,7 @@ TTL:;
 	VMR9(V9)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2314	*/
+/*	local entry for function progn 'compile2291	*/
 
 static object LI10()
 
@@ -156,7 +156,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2326	*/
+/*	local entry for function progn 'compile2303	*/
 
 static object LI11()
 
@@ -175,7 +175,7 @@ T24:;
 	VMR11(V11)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2339	*/
+/*	local entry for function progn 'compile2316	*/
 
 static object LI12()
 
@@ -186,7 +186,7 @@ TTL:;
 	VMR12(V12)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2355	*/
+/*	local entry for function progn 'compile2332	*/
 
 static object LI13()
 
@@ -202,7 +202,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2367	*/
+/*	local entry for function progn 'compile2344	*/
 
 static object LI14()
 
@@ -221,7 +221,7 @@ T31:;
 	VMR14(V14)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2380	*/
+/*	local entry for function progn 'compile2357	*/
 
 static object LI15()
 
@@ -232,7 +232,7 @@ TTL:;
 	VMR15(V15)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2396	*/
+/*	local entry for function progn 'compile2373	*/
 
 static object LI16()
 
@@ -248,7 +248,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2408	*/
+/*	local entry for function progn 'compile2385	*/
 
 static object LI17()
 
@@ -267,7 +267,7 @@ T38:;
 	VMR17(V17)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2421	*/
+/*	local entry for function progn 'compile2398	*/
 
 static object LI18()
 
@@ -278,7 +278,7 @@ TTL:;
 	VMR18(V18)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2437	*/
+/*	local entry for function progn 'compile2414	*/
 
 static object LI19()
 
@@ -294,7 +294,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2449	*/
+/*	local entry for function progn 'compile2426	*/
 
 static object LI20()
 
@@ -313,7 +313,7 @@ T45:;
 	VMR20(V20)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2462	*/
+/*	local entry for function progn 'compile2439	*/
 
 static object LI21()
 
@@ -324,7 +324,7 @@ TTL:;
 	VMR21(V21)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2478	*/
+/*	local entry for function progn 'compile2455	*/
 
 static object LI22()
 
@@ -340,7 +340,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2490	*/
+/*	local entry for function progn 'compile2467	*/
 
 static object LI23()
 
@@ -359,7 +359,7 @@ T52:;
 	VMR23(V23)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2507	*/
+/*	local entry for function progn 'compile2484	*/
 
 static object LI24()
 
@@ -518,7 +518,7 @@ T62:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2619	*/
+/*	local entry for function progn 'compile2596	*/
 
 static object LI29()
 
@@ -531,7 +531,7 @@ TTL:;
 	VMR29(V44)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2647	*/
+/*	local entry for function progn 'compile2624	*/
 
 static object LI30()
 
@@ -543,7 +543,7 @@ TTL:;
 	VMR30(V45)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2659	*/
+/*	local entry for function progn 'compile2636	*/
 
 static object LI31()
 
@@ -554,7 +554,7 @@ TTL:;
 	VMR31(V46)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2683	*/
+/*	local entry for function progn 'compile2660	*/
 
 static object LI32()
 
@@ -567,7 +567,7 @@ TTL:;
 	VMR32(V48)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2707	*/
+/*	local entry for function progn 'compile2684	*/
 
 static object LI33()
 
@@ -579,7 +579,7 @@ TTL:;
 	VMR33(V49)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2719	*/
+/*	local entry for function progn 'compile2696	*/
 
 static object LI34()
 
@@ -590,7 +590,7 @@ TTL:;
 	VMR34(V50)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2743	*/
+/*	local entry for function progn 'compile2720	*/
 
 static object LI35()
 
@@ -603,7 +603,7 @@ TTL:;
 	VMR35(V52)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2767	*/
+/*	local entry for function progn 'compile2744	*/
 
 static object LI36()
 
@@ -615,7 +615,7 @@ TTL:;
 	VMR36(V53)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2779	*/
+/*	local entry for function progn 'compile2756	*/
 
 static object LI37()
 
@@ -626,7 +626,7 @@ TTL:;
 	VMR37(V54)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2803	*/
+/*	local entry for function progn 'compile2780	*/
 
 static object LI38()
 
@@ -639,7 +639,7 @@ TTL:;
 	VMR38(V56)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2827	*/
+/*	local entry for function progn 'compile2804	*/
 
 static object LI39()
 
@@ -651,7 +651,7 @@ TTL:;
 	VMR39(V57)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2839	*/
+/*	local entry for function progn 'compile2816	*/
 
 static object LI40()
 
@@ -662,7 +662,7 @@ TTL:;
 	VMR40(V58)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2863	*/
+/*	local entry for function progn 'compile2840	*/
 
 static object LI41()
 
@@ -675,7 +675,7 @@ TTL:;
 	VMR41(V60)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2887	*/
+/*	local entry for function progn 'compile2864	*/
 
 static object LI42()
 
@@ -687,7 +687,7 @@ TTL:;
 	VMR42(V61)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2899	*/
+/*	local entry for function progn 'compile2876	*/
 
 static object LI43()
 
@@ -698,7 +698,7 @@ TTL:;
 	VMR43(V62)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2915	*/
+/*	local entry for function progn 'compile2892	*/
 
 static object LI44()
 
@@ -714,7 +714,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2927	*/
+/*	local entry for function progn 'compile2904	*/
 
 static object LI45()
 
@@ -733,7 +733,7 @@ T125:;
 	VMR45(V64)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2940	*/
+/*	local entry for function progn 'compile2917	*/
 
 static object LI46()
 
@@ -919,7 +919,7 @@ T142:;
 	base[0]=base[0];
 	return Cnil;}
 	}
-/*	local entry for function progn 'compile3031	*/
+/*	local entry for function progn 'compile3008	*/
 
 static object LI48()
 
@@ -935,7 +935,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile3043	*/
+/*	local entry for function progn 'compile3020	*/
 
 static object LI49()
 
@@ -954,7 +954,7 @@ T216:;
 	VMR49(V81)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile3056	*/
+/*	local entry for function progn 'compile3033	*/
 
 static object LI50()
 
@@ -965,7 +965,7 @@ TTL:;
 	VMR50(V82)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile3072	*/
+/*	local entry for function progn 'compile3049	*/
 
 static object LI51()
 
@@ -981,7 +981,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile3084	*/
+/*	local entry for function progn 'compile3061	*/
 
 static object LI52()
 
@@ -1000,7 +1000,7 @@ T223:;
 	VMR52(V84)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile3097	*/
+/*	local entry for function progn 'compile3074	*/
 
 static object LI53()
 

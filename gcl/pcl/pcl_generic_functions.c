@@ -2,7 +2,7 @@
 #include "cmpinclude.h"
 #include "pcl_generic_functions.h"
 void init_pcl_generic_functions(){do_init(VV);}
-/*	function definition for (DEFGENERIC CLASS-EQ-SPECIALIZER-P)5896	*/
+/*	function definition for (DEFGENERIC CLASS-EQ-SPECIALIZER-P)5865	*/
 
 static void L1()
 {register object *base=vs_base;
@@ -18,7 +18,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASSP)5896	*/
+/*	function definition for (DEFGENERIC CLASSP)5865	*/
 
 static void L2()
 {register object *base=vs_base;
@@ -34,7 +34,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC EQL-SPECIALIZER-P)5896	*/
+/*	function definition for (DEFGENERIC EQL-SPECIALIZER-P)5865	*/
 
 static void L3()
 {register object *base=vs_base;
@@ -50,7 +50,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC EXACT-CLASS-SPECIALIZER-P)5896	*/
+/*	function definition for (DEFGENERIC EXACT-CLASS-SPECIALIZER-P)5865	*/
 
 static void L4()
 {register object *base=vs_base;
@@ -66,7 +66,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC FORWARD-REFERENCED-CLASS-P)5896	*/
+/*	function definition for (DEFGENERIC FORWARD-REFERENCED-CLASS-P)5865	*/
 
 static void L5()
 {register object *base=vs_base;
@@ -82,7 +82,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC FUNCALLABLE-STANDARD-CLASS-P)5896	*/
+/*	function definition for (DEFGENERIC FUNCALLABLE-STANDARD-CLASS-P)5865	*/
 
 static void L6()
 {register object *base=vs_base;
@@ -98,7 +98,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC GENERIC-FUNCTION-P)5896	*/
+/*	function definition for (DEFGENERIC GENERIC-FUNCTION-P)5865	*/
 
 static void L7()
 {register object *base=vs_base;
@@ -114,7 +114,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC LEGAL-LAMBDA-LIST-P)5896	*/
+/*	function definition for (DEFGENERIC LEGAL-LAMBDA-LIST-P)5865	*/
 
 static void L8()
 {register object *base=vs_base;
@@ -130,7 +130,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC METHOD-COMBINATION-P)5896	*/
+/*	function definition for (DEFGENERIC METHOD-COMBINATION-P)5865	*/
 
 static void L9()
 {register object *base=vs_base;
@@ -146,7 +146,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC METHOD-P)5896	*/
+/*	function definition for (DEFGENERIC METHOD-P)5865	*/
 
 static void L10()
 {register object *base=vs_base;
@@ -162,7 +162,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SHORT-METHOD-COMBINATION-P)5896	*/
+/*	function definition for (DEFGENERIC SHORT-METHOD-COMBINATION-P)5865	*/
 
 static void L11()
 {register object *base=vs_base;
@@ -178,7 +178,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-CLASS-P)5896	*/
+/*	function definition for (DEFGENERIC SLOT-CLASS-P)5865	*/
 
 static void L12()
 {register object *base=vs_base;
@@ -194,7 +194,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SPECIALIZERP)5896	*/
+/*	function definition for (DEFGENERIC SPECIALIZERP)5865	*/
 
 static void L13()
 {register object *base=vs_base;
@@ -210,7 +210,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC STANDARD-ACCESSOR-METHOD-P)5896	*/
+/*	function definition for (DEFGENERIC STANDARD-ACCESSOR-METHOD-P)5865	*/
 
 static void L14()
 {register object *base=vs_base;
@@ -226,7 +226,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC STANDARD-BOUNDP-METHOD-P)5896	*/
+/*	function definition for (DEFGENERIC STANDARD-BOUNDP-METHOD-P)5865	*/
 
 static void L15()
 {register object *base=vs_base;
@@ -242,7 +242,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC STANDARD-CLASS-P)5896	*/
+/*	function definition for (DEFGENERIC STANDARD-CLASS-P)5865	*/
 
 static void L16()
 {register object *base=vs_base;
@@ -258,7 +258,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC STANDARD-GENERIC-FUNCTION-P)5896	*/
+/*	function definition for (DEFGENERIC STANDARD-GENERIC-FUNCTION-P)5865	*/
 
 static void L17()
 {register object *base=vs_base;
@@ -274,7 +274,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC STANDARD-METHOD-P)5896	*/
+/*	function definition for (DEFGENERIC STANDARD-METHOD-P)5865	*/
 
 static void L18()
 {register object *base=vs_base;
@@ -290,7 +290,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC STANDARD-READER-METHOD-P)5896	*/
+/*	function definition for (DEFGENERIC STANDARD-READER-METHOD-P)5865	*/
 
 static void L19()
 {register object *base=vs_base;
@@ -306,7 +306,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC STANDARD-WRITER-METHOD-P)5896	*/
+/*	function definition for (DEFGENERIC STANDARD-WRITER-METHOD-P)5865	*/
 
 static void L20()
 {register object *base=vs_base;
@@ -322,7 +322,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC STRUCTURE-CLASS-P)5896	*/
+/*	function definition for (DEFGENERIC STRUCTURE-CLASS-P)5865	*/
 
 static void L21()
 {register object *base=vs_base;
@@ -338,7 +338,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC ACCESSOR-METHOD-SLOT-DEFINITION)5896	*/
+/*	function definition for (DEFGENERIC ACCESSOR-METHOD-SLOT-DEFINITION)5865	*/
 
 static void L22()
 {register object *base=vs_base;
@@ -354,7 +354,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-CAN-PRECEDE-LIST)5896	*/
+/*	function definition for (DEFGENERIC CLASS-CAN-PRECEDE-LIST)5865	*/
 
 static void L23()
 {register object *base=vs_base;
@@ -370,7 +370,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-DEFSTRUCT-CONSTRUCTOR)5896	*/
+/*	function definition for (DEFGENERIC CLASS-DEFSTRUCT-CONSTRUCTOR)5865	*/
 
 static void L24()
 {register object *base=vs_base;
@@ -386,7 +386,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-DEFSTRUCT-FORM)5896	*/
+/*	function definition for (DEFGENERIC CLASS-DEFSTRUCT-FORM)5865	*/
 
 static void L25()
 {register object *base=vs_base;
@@ -402,7 +402,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-DIRECT-SUBCLASSES)5896	*/
+/*	function definition for (DEFGENERIC CLASS-DIRECT-SUBCLASSES)5865	*/
 
 static void L26()
 {register object *base=vs_base;
@@ -418,7 +418,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-DIRECT-SUPERCLASSES)5896	*/
+/*	function definition for (DEFGENERIC CLASS-DIRECT-SUPERCLASSES)5865	*/
 
 static void L27()
 {register object *base=vs_base;
@@ -434,7 +434,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-EQ-SPECIALIZER)5896	*/
+/*	function definition for (DEFGENERIC CLASS-EQ-SPECIALIZER)5865	*/
 
 static void L28()
 {register object *base=vs_base;
@@ -450,7 +450,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-INCOMPATIBLE-SUPERCLASS-LIST)5896	*/
+/*	function definition for (DEFGENERIC CLASS-INCOMPATIBLE-SUPERCLASS-LIST)5865	*/
 
 static void L29()
 {register object *base=vs_base;
@@ -466,7 +466,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-INITIALIZE-INFO)5896	*/
+/*	function definition for (DEFGENERIC CLASS-INITIALIZE-INFO)5865	*/
 
 static void L30()
 {register object *base=vs_base;
@@ -482,7 +482,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-NAME)5896	*/
+/*	function definition for (DEFGENERIC CLASS-NAME)5865	*/
 
 static void L31()
 {register object *base=vs_base;
@@ -498,7 +498,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-PRECEDENCE-LIST)5896	*/
+/*	function definition for (DEFGENERIC CLASS-PRECEDENCE-LIST)5865	*/
 
 static void L32()
 {register object *base=vs_base;
@@ -514,7 +514,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-PREDICATE-NAME)5896	*/
+/*	function definition for (DEFGENERIC CLASS-PREDICATE-NAME)5865	*/
 
 static void L33()
 {register object *base=vs_base;
@@ -530,7 +530,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-WRAPPER)5896	*/
+/*	function definition for (DEFGENERIC CLASS-WRAPPER)5865	*/
 
 static void L34()
 {register object *base=vs_base;
@@ -546,7 +546,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC DEFINITION-SOURCE)5896	*/
+/*	function definition for (DEFGENERIC DEFINITION-SOURCE)5865	*/
 
 static void L35()
 {register object *base=vs_base;
@@ -562,7 +562,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC EQL-SPECIALIZER-OBJECT)5896	*/
+/*	function definition for (DEFGENERIC EQL-SPECIALIZER-OBJECT)5865	*/
 
 static void L36()
 {register object *base=vs_base;
@@ -578,7 +578,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC GENERIC-FUNCTION-METHOD-CLASS)5896	*/
+/*	function definition for (DEFGENERIC GENERIC-FUNCTION-METHOD-CLASS)5865	*/
 
 static void L37()
 {register object *base=vs_base;
@@ -594,7 +594,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC GENERIC-FUNCTION-METHOD-COMBINATION)5896	*/
+/*	function definition for (DEFGENERIC GENERIC-FUNCTION-METHOD-COMBINATION)5865	*/
 
 static void L38()
 {register object *base=vs_base;
@@ -610,7 +610,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC GENERIC-FUNCTION-METHODS)5896	*/
+/*	function definition for (DEFGENERIC GENERIC-FUNCTION-METHODS)5865	*/
 
 static void L39()
 {register object *base=vs_base;
@@ -626,7 +626,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC GENERIC-FUNCTION-NAME)5896	*/
+/*	function definition for (DEFGENERIC GENERIC-FUNCTION-NAME)5865	*/
 
 static void L40()
 {register object *base=vs_base;
@@ -642,7 +642,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC GF-ARG-INFO)5896	*/
+/*	function definition for (DEFGENERIC GF-ARG-INFO)5865	*/
 
 static void L41()
 {register object *base=vs_base;
@@ -658,7 +658,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC GF-DFUN-STATE)5896	*/
+/*	function definition for (DEFGENERIC GF-DFUN-STATE)5865	*/
 
 static void L42()
 {register object *base=vs_base;
@@ -674,7 +674,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC GF-PRETTY-ARGLIST)5896	*/
+/*	function definition for (DEFGENERIC GF-PRETTY-ARGLIST)5865	*/
 
 static void L43()
 {register object *base=vs_base;
@@ -690,7 +690,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC LONG-METHOD-COMBINATION-FUNCTION)5896	*/
+/*	function definition for (DEFGENERIC LONG-METHOD-COMBINATION-FUNCTION)5865	*/
 
 static void L44()
 {register object *base=vs_base;
@@ -706,7 +706,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC METHOD-COMBINATION-DOCUMENTATION)5896	*/
+/*	function definition for (DEFGENERIC METHOD-COMBINATION-DOCUMENTATION)5865	*/
 
 static void L45()
 {register object *base=vs_base;
@@ -722,7 +722,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC METHOD-COMBINATION-OPTIONS)5896	*/
+/*	function definition for (DEFGENERIC METHOD-COMBINATION-OPTIONS)5865	*/
 
 static void L46()
 {register object *base=vs_base;
@@ -738,7 +738,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC METHOD-COMBINATION-TYPE)5896	*/
+/*	function definition for (DEFGENERIC METHOD-COMBINATION-TYPE)5865	*/
 
 static void L47()
 {register object *base=vs_base;
@@ -754,7 +754,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC METHOD-FAST-FUNCTION)5896	*/
+/*	function definition for (DEFGENERIC METHOD-FAST-FUNCTION)5865	*/
 
 static void L48()
 {register object *base=vs_base;
@@ -770,7 +770,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC METHOD-GENERIC-FUNCTION)5896	*/
+/*	function definition for (DEFGENERIC METHOD-GENERIC-FUNCTION)5865	*/
 
 static void L49()
 {register object *base=vs_base;
@@ -786,7 +786,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC OBJECT-PLIST)5896	*/
+/*	function definition for (DEFGENERIC OBJECT-PLIST)5865	*/
 
 static void L50()
 {register object *base=vs_base;
@@ -802,7 +802,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SHORT-COMBINATION-IDENTITY-WITH-ONE-ARGUMENT)5896	*/
+/*	function definition for (DEFGENERIC SHORT-COMBINATION-IDENTITY-WITH-ONE-ARGUMENT)5865	*/
 
 static void L51()
 {register object *base=vs_base;
@@ -818,7 +818,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SHORT-COMBINATION-OPERATOR)5896	*/
+/*	function definition for (DEFGENERIC SHORT-COMBINATION-OPERATOR)5865	*/
 
 static void L52()
 {register object *base=vs_base;
@@ -834,7 +834,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-DEFINITION-BOUNDP-FUNCTION)5896	*/
+/*	function definition for (DEFGENERIC SLOT-DEFINITION-BOUNDP-FUNCTION)5865	*/
 
 static void L53()
 {register object *base=vs_base;
@@ -850,7 +850,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-DEFINITION-CLASS)5896	*/
+/*	function definition for (DEFGENERIC SLOT-DEFINITION-CLASS)5865	*/
 
 static void L54()
 {register object *base=vs_base;
@@ -866,7 +866,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-DEFINITION-DEFSTRUCT-ACCESSOR-SYMBOL)5896	*/
+/*	function definition for (DEFGENERIC SLOT-DEFINITION-DEFSTRUCT-ACCESSOR-SYMBOL)5865	*/
 
 static void L55()
 {register object *base=vs_base;
@@ -882,7 +882,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-DEFINITION-INITARGS)5896	*/
+/*	function definition for (DEFGENERIC SLOT-DEFINITION-INITARGS)5865	*/
 
 static void L56()
 {register object *base=vs_base;
@@ -898,7 +898,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-DEFINITION-INITFORM)5896	*/
+/*	function definition for (DEFGENERIC SLOT-DEFINITION-INITFORM)5865	*/
 
 static void L57()
 {register object *base=vs_base;
@@ -914,7 +914,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-DEFINITION-INITFUNCTION)5896	*/
+/*	function definition for (DEFGENERIC SLOT-DEFINITION-INITFUNCTION)5865	*/
 
 static void L58()
 {register object *base=vs_base;
@@ -930,7 +930,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-DEFINITION-INTERNAL-READER-FUNCTION)5896	*/
+/*	function definition for (DEFGENERIC SLOT-DEFINITION-INTERNAL-READER-FUNCTION)5865	*/
 
 static void L59()
 {register object *base=vs_base;
@@ -946,7 +946,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-DEFINITION-INTERNAL-WRITER-FUNCTION)5896	*/
+/*	function definition for (DEFGENERIC SLOT-DEFINITION-INTERNAL-WRITER-FUNCTION)5865	*/
 
 static void L60()
 {register object *base=vs_base;
@@ -962,7 +962,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-DEFINITION-LOCATION)5896	*/
+/*	function definition for (DEFGENERIC SLOT-DEFINITION-LOCATION)5865	*/
 
 static void L61()
 {register object *base=vs_base;
@@ -978,7 +978,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-DEFINITION-NAME)5896	*/
+/*	function definition for (DEFGENERIC SLOT-DEFINITION-NAME)5865	*/
 
 static void L62()
 {register object *base=vs_base;
@@ -994,7 +994,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-DEFINITION-READER-FUNCTION)5896	*/
+/*	function definition for (DEFGENERIC SLOT-DEFINITION-READER-FUNCTION)5865	*/
 
 static void L63()
 {register object *base=vs_base;
@@ -1010,7 +1010,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-DEFINITION-READERS)5896	*/
+/*	function definition for (DEFGENERIC SLOT-DEFINITION-READERS)5865	*/
 
 static void L64()
 {register object *base=vs_base;
@@ -1026,7 +1026,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-DEFINITION-TYPE)5896	*/
+/*	function definition for (DEFGENERIC SLOT-DEFINITION-TYPE)5865	*/
 
 static void L65()
 {register object *base=vs_base;
@@ -1042,7 +1042,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-DEFINITION-WRITER-FUNCTION)5896	*/
+/*	function definition for (DEFGENERIC SLOT-DEFINITION-WRITER-FUNCTION)5865	*/
 
 static void L66()
 {register object *base=vs_base;
@@ -1058,7 +1058,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-DEFINITION-WRITERS)5896	*/
+/*	function definition for (DEFGENERIC SLOT-DEFINITION-WRITERS)5865	*/
 
 static void L67()
 {register object *base=vs_base;
@@ -1074,7 +1074,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SPECIALIZER-OBJECT)5896	*/
+/*	function definition for (DEFGENERIC SPECIALIZER-OBJECT)5865	*/
 
 static void L68()
 {register object *base=vs_base;
@@ -1090,7 +1090,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SPECIALIZER-TYPE)5896	*/
+/*	function definition for (DEFGENERIC SPECIALIZER-TYPE)5865	*/
 
 static void L69()
 {register object *base=vs_base;
@@ -1106,7 +1106,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF CLASS-DEFSTRUCT-CONSTRUCTOR))5896	*/
+/*	function definition for (DEFGENERIC (SETF CLASS-DEFSTRUCT-CONSTRUCTOR))5865	*/
 
 static void L70()
 {register object *base=vs_base;
@@ -1122,7 +1122,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF CLASS-DEFSTRUCT-FORM))5896	*/
+/*	function definition for (DEFGENERIC (SETF CLASS-DEFSTRUCT-FORM))5865	*/
 
 static void L71()
 {register object *base=vs_base;
@@ -1138,7 +1138,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF CLASS-DIRECT-SLOTS))5896	*/
+/*	function definition for (DEFGENERIC (SETF CLASS-DIRECT-SLOTS))5865	*/
 
 static void L72()
 {register object *base=vs_base;
@@ -1154,7 +1154,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF CLASS-INCOMPATIBLE-SUPERCLASS-LIST))5896	*/
+/*	function definition for (DEFGENERIC (SETF CLASS-INCOMPATIBLE-SUPERCLASS-LIST))5865	*/
 
 static void L73()
 {register object *base=vs_base;
@@ -1170,7 +1170,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF CLASS-INITIALIZE-INFO))5896	*/
+/*	function definition for (DEFGENERIC (SETF CLASS-INITIALIZE-INFO))5865	*/
 
 static void L74()
 {register object *base=vs_base;
@@ -1186,7 +1186,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF CLASS-NAME))5896	*/
+/*	function definition for (DEFGENERIC (SETF CLASS-NAME))5865	*/
 
 static void L75()
 {register object *base=vs_base;
@@ -1202,7 +1202,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF CLASS-SLOTS))5896	*/
+/*	function definition for (DEFGENERIC (SETF CLASS-SLOTS))5865	*/
 
 static void L76()
 {register object *base=vs_base;
@@ -1218,7 +1218,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF GENERIC-FUNCTION-METHOD-CLASS))5896	*/
+/*	function definition for (DEFGENERIC (SETF GENERIC-FUNCTION-METHOD-CLASS))5865	*/
 
 static void L77()
 {register object *base=vs_base;
@@ -1234,7 +1234,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF GENERIC-FUNCTION-METHOD-COMBINATION))5896	*/
+/*	function definition for (DEFGENERIC (SETF GENERIC-FUNCTION-METHOD-COMBINATION))5865	*/
 
 static void L78()
 {register object *base=vs_base;
@@ -1250,7 +1250,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF GENERIC-FUNCTION-METHODS))5896	*/
+/*	function definition for (DEFGENERIC (SETF GENERIC-FUNCTION-METHODS))5865	*/
 
 static void L79()
 {register object *base=vs_base;
@@ -1266,7 +1266,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF GENERIC-FUNCTION-NAME))5896	*/
+/*	function definition for (DEFGENERIC (SETF GENERIC-FUNCTION-NAME))5865	*/
 
 static void L80()
 {register object *base=vs_base;
@@ -1282,7 +1282,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF GF-DFUN-STATE))5896	*/
+/*	function definition for (DEFGENERIC (SETF GF-DFUN-STATE))5865	*/
 
 static void L81()
 {register object *base=vs_base;
@@ -1298,7 +1298,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF GF-PRETTY-ARGLIST))5896	*/
+/*	function definition for (DEFGENERIC (SETF GF-PRETTY-ARGLIST))5865	*/
 
 static void L82()
 {register object *base=vs_base;
@@ -1314,7 +1314,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF METHOD-GENERIC-FUNCTION))5896	*/
+/*	function definition for (DEFGENERIC (SETF METHOD-GENERIC-FUNCTION))5865	*/
 
 static void L83()
 {register object *base=vs_base;
@@ -1330,7 +1330,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF OBJECT-PLIST))5896	*/
+/*	function definition for (DEFGENERIC (SETF OBJECT-PLIST))5865	*/
 
 static void L84()
 {register object *base=vs_base;
@@ -1346,7 +1346,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-ALLOCATION))5896	*/
+/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-ALLOCATION))5865	*/
 
 static void L85()
 {register object *base=vs_base;
@@ -1362,7 +1362,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-BOUNDP-FUNCTION))5896	*/
+/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-BOUNDP-FUNCTION))5865	*/
 
 static void L86()
 {register object *base=vs_base;
@@ -1378,7 +1378,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-CLASS))5896	*/
+/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-CLASS))5865	*/
 
 static void L87()
 {register object *base=vs_base;
@@ -1394,7 +1394,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-DEFSTRUCT-ACCESSOR-SYMBOL))5896	*/
+/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-DEFSTRUCT-ACCESSOR-SYMBOL))5865	*/
 
 static void L88()
 {register object *base=vs_base;
@@ -1410,7 +1410,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-INITARGS))5896	*/
+/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-INITARGS))5865	*/
 
 static void L89()
 {register object *base=vs_base;
@@ -1426,7 +1426,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-INITFORM))5896	*/
+/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-INITFORM))5865	*/
 
 static void L90()
 {register object *base=vs_base;
@@ -1442,7 +1442,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-INITFUNCTION))5896	*/
+/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-INITFUNCTION))5865	*/
 
 static void L91()
 {register object *base=vs_base;
@@ -1458,7 +1458,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-INTERNAL-READER-FUNCTION))5896	*/
+/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-INTERNAL-READER-FUNCTION))5865	*/
 
 static void L92()
 {register object *base=vs_base;
@@ -1474,7 +1474,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-INTERNAL-WRITER-FUNCTION))5896	*/
+/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-INTERNAL-WRITER-FUNCTION))5865	*/
 
 static void L93()
 {register object *base=vs_base;
@@ -1490,7 +1490,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-LOCATION))5896	*/
+/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-LOCATION))5865	*/
 
 static void L94()
 {register object *base=vs_base;
@@ -1506,7 +1506,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-NAME))5896	*/
+/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-NAME))5865	*/
 
 static void L95()
 {register object *base=vs_base;
@@ -1522,7 +1522,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-READER-FUNCTION))5896	*/
+/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-READER-FUNCTION))5865	*/
 
 static void L96()
 {register object *base=vs_base;
@@ -1538,7 +1538,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-READERS))5896	*/
+/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-READERS))5865	*/
 
 static void L97()
 {register object *base=vs_base;
@@ -1554,7 +1554,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-TYPE))5896	*/
+/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-TYPE))5865	*/
 
 static void L98()
 {register object *base=vs_base;
@@ -1570,7 +1570,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-WRITER-FUNCTION))5896	*/
+/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-WRITER-FUNCTION))5865	*/
 
 static void L99()
 {register object *base=vs_base;
@@ -1586,7 +1586,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-WRITERS))5896	*/
+/*	function definition for (DEFGENERIC (SETF SLOT-DEFINITION-WRITERS))5865	*/
 
 static void L100()
 {register object *base=vs_base;
@@ -1602,7 +1602,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC ACCESSOR-METHOD-CLASS)5896	*/
+/*	function definition for (DEFGENERIC ACCESSOR-METHOD-CLASS)5865	*/
 
 static void L101()
 {register object *base=vs_base;
@@ -1618,7 +1618,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC ACCESSOR-METHOD-SLOT-NAME)5896	*/
+/*	function definition for (DEFGENERIC ACCESSOR-METHOD-SLOT-NAME)5865	*/
 
 static void L102()
 {register object *base=vs_base;
@@ -1634,7 +1634,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-CONSTRUCTORS)5896	*/
+/*	function definition for (DEFGENERIC CLASS-CONSTRUCTORS)5865	*/
 
 static void L103()
 {register object *base=vs_base;
@@ -1650,7 +1650,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-DEFAULT-INITARGS)5896	*/
+/*	function definition for (DEFGENERIC CLASS-DEFAULT-INITARGS)5865	*/
 
 static void L104()
 {register object *base=vs_base;
@@ -1666,7 +1666,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-DIRECT-DEFAULT-INITARGS)5896	*/
+/*	function definition for (DEFGENERIC CLASS-DIRECT-DEFAULT-INITARGS)5865	*/
 
 static void L105()
 {register object *base=vs_base;
@@ -1682,7 +1682,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-DIRECT-SLOTS)5896	*/
+/*	function definition for (DEFGENERIC CLASS-DIRECT-SLOTS)5865	*/
 
 static void L106()
 {register object *base=vs_base;
@@ -1698,7 +1698,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-FINALIZED-P)5896	*/
+/*	function definition for (DEFGENERIC CLASS-FINALIZED-P)5865	*/
 
 static void L107()
 {register object *base=vs_base;
@@ -1714,7 +1714,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-PROTOTYPE)5896	*/
+/*	function definition for (DEFGENERIC CLASS-PROTOTYPE)5865	*/
 
 static void L108()
 {register object *base=vs_base;
@@ -1730,7 +1730,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-SLOT-CELLS)5896	*/
+/*	function definition for (DEFGENERIC CLASS-SLOT-CELLS)5865	*/
 
 static void L109()
 {register object *base=vs_base;
@@ -1746,7 +1746,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-SLOTS)5896	*/
+/*	function definition for (DEFGENERIC CLASS-SLOTS)5865	*/
 
 static void L110()
 {register object *base=vs_base;
@@ -1762,7 +1762,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC COMPUTE-CLASS-PRECEDENCE-LIST)5896	*/
+/*	function definition for (DEFGENERIC COMPUTE-CLASS-PRECEDENCE-LIST)5865	*/
 
 static void L111()
 {register object *base=vs_base;
@@ -1778,7 +1778,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC COMPUTE-DEFAULT-INITARGS)5896	*/
+/*	function definition for (DEFGENERIC COMPUTE-DEFAULT-INITARGS)5865	*/
 
 static void L112()
 {register object *base=vs_base;
@@ -1794,7 +1794,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC COMPUTE-DISCRIMINATING-FUNCTION)5896	*/
+/*	function definition for (DEFGENERIC COMPUTE-DISCRIMINATING-FUNCTION)5865	*/
 
 static void L113()
 {register object *base=vs_base;
@@ -1810,7 +1810,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC COMPUTE-DISCRIMINATING-FUNCTION-ARGLIST-INFO)5896	*/
+/*	function definition for (DEFGENERIC COMPUTE-DISCRIMINATING-FUNCTION-ARGLIST-INFO)5865	*/
 
 static void L114()
 {register object *base=vs_base;
@@ -1826,7 +1826,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC COMPUTE-SLOTS)5896	*/
+/*	function definition for (DEFGENERIC COMPUTE-SLOTS)5865	*/
 
 static void L115()
 {register object *base=vs_base;
@@ -1842,7 +1842,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC FINALIZE-INHERITANCE)5896	*/
+/*	function definition for (DEFGENERIC FINALIZE-INHERITANCE)5865	*/
 
 static void L116()
 {register object *base=vs_base;
@@ -1858,7 +1858,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC FUNCTION-KEYWORDS)5896	*/
+/*	function definition for (DEFGENERIC FUNCTION-KEYWORDS)5865	*/
 
 static void L117()
 {register object *base=vs_base;
@@ -1874,7 +1874,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC GENERIC-FUNCTION-LAMBDA-LIST)5896	*/
+/*	function definition for (DEFGENERIC GENERIC-FUNCTION-LAMBDA-LIST)5865	*/
 
 static void L118()
 {register object *base=vs_base;
@@ -1890,7 +1890,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC GENERIC-FUNCTION-PRETTY-ARGLIST)5896	*/
+/*	function definition for (DEFGENERIC GENERIC-FUNCTION-PRETTY-ARGLIST)5865	*/
 
 static void L119()
 {register object *base=vs_base;
@@ -1906,7 +1906,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC GF-FAST-METHOD-FUNCTION-P)5896	*/
+/*	function definition for (DEFGENERIC GF-FAST-METHOD-FUNCTION-P)5865	*/
 
 static void L120()
 {register object *base=vs_base;
@@ -1922,7 +1922,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC INITIALIZE-INTERNAL-SLOT-FUNCTIONS)5896	*/
+/*	function definition for (DEFGENERIC INITIALIZE-INTERNAL-SLOT-FUNCTIONS)5865	*/
 
 static void L121()
 {register object *base=vs_base;
@@ -1938,7 +1938,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC MAKE-INSTANCES-OBSOLETE)5896	*/
+/*	function definition for (DEFGENERIC MAKE-INSTANCES-OBSOLETE)5865	*/
 
 static void L122()
 {register object *base=vs_base;
@@ -1954,7 +1954,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC METHOD-FUNCTION)5896	*/
+/*	function definition for (DEFGENERIC METHOD-FUNCTION)5865	*/
 
 static void L123()
 {register object *base=vs_base;
@@ -1970,7 +1970,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC METHOD-LAMBDA-LIST)5896	*/
+/*	function definition for (DEFGENERIC METHOD-LAMBDA-LIST)5865	*/
 
 static void L124()
 {register object *base=vs_base;
@@ -1986,7 +1986,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC METHOD-PRETTY-ARGLIST)5896	*/
+/*	function definition for (DEFGENERIC METHOD-PRETTY-ARGLIST)5865	*/
 
 static void L125()
 {register object *base=vs_base;
@@ -2002,7 +2002,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC METHOD-QUALIFIERS)5896	*/
+/*	function definition for (DEFGENERIC METHOD-QUALIFIERS)5865	*/
 
 static void L126()
 {register object *base=vs_base;
@@ -2018,7 +2018,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC METHOD-SPECIALIZERS)5896	*/
+/*	function definition for (DEFGENERIC METHOD-SPECIALIZERS)5865	*/
 
 static void L127()
 {register object *base=vs_base;
@@ -2034,7 +2034,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC RAW-INSTANCE-ALLOCATOR)5896	*/
+/*	function definition for (DEFGENERIC RAW-INSTANCE-ALLOCATOR)5865	*/
 
 static void L128()
 {register object *base=vs_base;
@@ -2050,7 +2050,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-DEFINITION-ALLOCATION)5896	*/
+/*	function definition for (DEFGENERIC SLOT-DEFINITION-ALLOCATION)5865	*/
 
 static void L129()
 {register object *base=vs_base;
@@ -2066,7 +2066,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOTS-FETCHER)5896	*/
+/*	function definition for (DEFGENERIC SLOTS-FETCHER)5865	*/
 
 static void L130()
 {register object *base=vs_base;
@@ -2082,7 +2082,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SPECIALIZER-CLASS)5896	*/
+/*	function definition for (DEFGENERIC SPECIALIZER-CLASS)5865	*/
 
 static void L131()
 {register object *base=vs_base;
@@ -2098,7 +2098,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SPECIALIZER-DIRECT-GENERIC-FUNCTIONS)5896	*/
+/*	function definition for (DEFGENERIC SPECIALIZER-DIRECT-GENERIC-FUNCTIONS)5865	*/
 
 static void L132()
 {register object *base=vs_base;
@@ -2114,7 +2114,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SPECIALIZER-DIRECT-METHODS)5896	*/
+/*	function definition for (DEFGENERIC SPECIALIZER-DIRECT-METHODS)5865	*/
 
 static void L133()
 {register object *base=vs_base;
@@ -2130,7 +2130,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SPECIALIZER-METHOD-TABLE)5896	*/
+/*	function definition for (DEFGENERIC SPECIALIZER-METHOD-TABLE)5865	*/
 
 static void L134()
 {register object *base=vs_base;
@@ -2146,7 +2146,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC UPDATE-CONSTRUCTORS)5896	*/
+/*	function definition for (DEFGENERIC UPDATE-CONSTRUCTORS)5865	*/
 
 static void L135()
 {register object *base=vs_base;
@@ -2162,7 +2162,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC WRAPPER-FETCHER)5896	*/
+/*	function definition for (DEFGENERIC WRAPPER-FETCHER)5865	*/
 
 static void L136()
 {register object *base=vs_base;
@@ -2178,7 +2178,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC ADD-DEPENDENT)5896	*/
+/*	function definition for (DEFGENERIC ADD-DEPENDENT)5865	*/
 
 static void L137()
 {register object *base=vs_base;
@@ -2194,7 +2194,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC ADD-DIRECT-METHOD)5896	*/
+/*	function definition for (DEFGENERIC ADD-DIRECT-METHOD)5865	*/
 
 static void L138()
 {register object *base=vs_base;
@@ -2210,7 +2210,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC ADD-DIRECT-SUBCLASS)5896	*/
+/*	function definition for (DEFGENERIC ADD-DIRECT-SUBCLASS)5865	*/
 
 static void L139()
 {register object *base=vs_base;
@@ -2226,7 +2226,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC ADD-METHOD)5896	*/
+/*	function definition for (DEFGENERIC ADD-METHOD)5865	*/
 
 static void L140()
 {register object *base=vs_base;
@@ -2242,7 +2242,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CHANGE-CLASS)5896	*/
+/*	function definition for (DEFGENERIC CHANGE-CLASS)5865	*/
 
 static void L141()
 {register object *base=vs_base;
@@ -2258,7 +2258,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC CLASS-SLOT-VALUE)5896	*/
+/*	function definition for (DEFGENERIC CLASS-SLOT-VALUE)5865	*/
 
 static void L142()
 {register object *base=vs_base;
@@ -2274,7 +2274,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC COMPATIBLE-META-CLASS-CHANGE-P)5896	*/
+/*	function definition for (DEFGENERIC COMPATIBLE-META-CLASS-CHANGE-P)5865	*/
 
 static void L143()
 {register object *base=vs_base;
@@ -2290,7 +2290,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC COMPUTE-APPLICABLE-METHODS)5896	*/
+/*	function definition for (DEFGENERIC COMPUTE-APPLICABLE-METHODS)5865	*/
 
 static void L144()
 {register object *base=vs_base;
@@ -2306,7 +2306,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC COMPUTE-APPLICABLE-METHODS-USING-CLASSES)5896	*/
+/*	function definition for (DEFGENERIC COMPUTE-APPLICABLE-METHODS-USING-CLASSES)5865	*/
 
 static void L145()
 {register object *base=vs_base;
@@ -2322,7 +2322,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC COMPUTE-EFFECTIVE-SLOT-DEFINITION)5896	*/
+/*	function definition for (DEFGENERIC COMPUTE-EFFECTIVE-SLOT-DEFINITION)5865	*/
 
 static void L146()
 {register object *base=vs_base;
@@ -2338,7 +2338,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC COMPUTE-EFFECTIVE-SLOT-DEFINITION-INITARGS)5896	*/
+/*	function definition for (DEFGENERIC COMPUTE-EFFECTIVE-SLOT-DEFINITION-INITARGS)5865	*/
 
 static void L147()
 {register object *base=vs_base;
@@ -2354,7 +2354,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC DEFAULT-INITARGS)5896	*/
+/*	function definition for (DEFGENERIC DEFAULT-INITARGS)5865	*/
 
 static void L148()
 {register object *base=vs_base;
@@ -2370,7 +2370,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC DESCRIBE-OBJECT)5896	*/
+/*	function definition for (DEFGENERIC DESCRIBE-OBJECT)5865	*/
 
 static void L149()
 {register object *base=vs_base;
@@ -2386,7 +2386,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC DIRECT-SLOT-DEFINITION-CLASS)5896	*/
+/*	function definition for (DEFGENERIC DIRECT-SLOT-DEFINITION-CLASS)5865	*/
 
 static void L150()
 {register object *base=vs_base;
@@ -2402,7 +2402,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC EFFECTIVE-SLOT-DEFINITION-CLASS)5896	*/
+/*	function definition for (DEFGENERIC EFFECTIVE-SLOT-DEFINITION-CLASS)5865	*/
 
 static void L151()
 {register object *base=vs_base;
@@ -2418,7 +2418,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC INFORM-TYPE-SYSTEM-ABOUT-CLASS)5896	*/
+/*	function definition for (DEFGENERIC INFORM-TYPE-SYSTEM-ABOUT-CLASS)5865	*/
 
 static void L152()
 {register object *base=vs_base;
@@ -2434,7 +2434,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC LEGAL-DOCUMENTATION-P)5896	*/
+/*	function definition for (DEFGENERIC LEGAL-DOCUMENTATION-P)5865	*/
 
 static void L153()
 {register object *base=vs_base;
@@ -2450,7 +2450,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC LEGAL-METHOD-FUNCTION-P)5896	*/
+/*	function definition for (DEFGENERIC LEGAL-METHOD-FUNCTION-P)5865	*/
 
 static void L154()
 {register object *base=vs_base;
@@ -2466,7 +2466,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC LEGAL-QUALIFIER-P)5896	*/
+/*	function definition for (DEFGENERIC LEGAL-QUALIFIER-P)5865	*/
 
 static void L155()
 {register object *base=vs_base;
@@ -2482,7 +2482,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC LEGAL-QUALIFIERS-P)5896	*/
+/*	function definition for (DEFGENERIC LEGAL-QUALIFIERS-P)5865	*/
 
 static void L156()
 {register object *base=vs_base;
@@ -2498,7 +2498,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC LEGAL-SLOT-NAME-P)5896	*/
+/*	function definition for (DEFGENERIC LEGAL-SLOT-NAME-P)5865	*/
 
 static void L157()
 {register object *base=vs_base;
@@ -2514,7 +2514,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC LEGAL-SPECIALIZER-P)5896	*/
+/*	function definition for (DEFGENERIC LEGAL-SPECIALIZER-P)5865	*/
 
 static void L158()
 {register object *base=vs_base;
@@ -2530,7 +2530,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC LEGAL-SPECIALIZERS-P)5896	*/
+/*	function definition for (DEFGENERIC LEGAL-SPECIALIZERS-P)5865	*/
 
 static void L159()
 {register object *base=vs_base;
@@ -2546,7 +2546,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC MAKE-BOUNDP-METHOD-FUNCTION)5896	*/
+/*	function definition for (DEFGENERIC MAKE-BOUNDP-METHOD-FUNCTION)5865	*/
 
 static void L160()
 {register object *base=vs_base;
@@ -2562,7 +2562,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC MAKE-READER-METHOD-FUNCTION)5896	*/
+/*	function definition for (DEFGENERIC MAKE-READER-METHOD-FUNCTION)5865	*/
 
 static void L161()
 {register object *base=vs_base;
@@ -2578,7 +2578,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC MAKE-WRITER-METHOD-FUNCTION)5896	*/
+/*	function definition for (DEFGENERIC MAKE-WRITER-METHOD-FUNCTION)5865	*/
 
 static void L162()
 {register object *base=vs_base;
@@ -2594,7 +2594,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC MAP-DEPENDENTS)5896	*/
+/*	function definition for (DEFGENERIC MAP-DEPENDENTS)5865	*/
 
 static void L163()
 {register object *base=vs_base;
@@ -2610,7 +2610,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC PRINT-OBJECT)5896	*/
+/*	function definition for (DEFGENERIC PRINT-OBJECT)5865	*/
 
 static void L164()
 {register object *base=vs_base;
@@ -2626,7 +2626,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC REMOVE-BOUNDP-METHOD)5896	*/
+/*	function definition for (DEFGENERIC REMOVE-BOUNDP-METHOD)5865	*/
 
 static void L165()
 {register object *base=vs_base;
@@ -2642,7 +2642,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC REMOVE-DEPENDENT)5896	*/
+/*	function definition for (DEFGENERIC REMOVE-DEPENDENT)5865	*/
 
 static void L166()
 {register object *base=vs_base;
@@ -2658,7 +2658,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC REMOVE-DIRECT-METHOD)5896	*/
+/*	function definition for (DEFGENERIC REMOVE-DIRECT-METHOD)5865	*/
 
 static void L167()
 {register object *base=vs_base;
@@ -2674,7 +2674,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC REMOVE-DIRECT-SUBCLASS)5896	*/
+/*	function definition for (DEFGENERIC REMOVE-DIRECT-SUBCLASS)5865	*/
 
 static void L168()
 {register object *base=vs_base;
@@ -2690,7 +2690,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC REMOVE-METHOD)5896	*/
+/*	function definition for (DEFGENERIC REMOVE-METHOD)5865	*/
 
 static void L169()
 {register object *base=vs_base;
@@ -2706,7 +2706,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC REMOVE-READER-METHOD)5896	*/
+/*	function definition for (DEFGENERIC REMOVE-READER-METHOD)5865	*/
 
 static void L170()
 {register object *base=vs_base;
@@ -2722,7 +2722,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC REMOVE-WRITER-METHOD)5896	*/
+/*	function definition for (DEFGENERIC REMOVE-WRITER-METHOD)5865	*/
 
 static void L171()
 {register object *base=vs_base;
@@ -2738,7 +2738,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SAME-SPECIALIZER-P)5896	*/
+/*	function definition for (DEFGENERIC SAME-SPECIALIZER-P)5865	*/
 
 static void L172()
 {register object *base=vs_base;
@@ -2754,7 +2754,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-ACCESSOR-FUNCTION)5896	*/
+/*	function definition for (DEFGENERIC SLOT-ACCESSOR-FUNCTION)5865	*/
 
 static void L173()
 {register object *base=vs_base;
@@ -2770,7 +2770,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-ACCESSOR-STD-P)5896	*/
+/*	function definition for (DEFGENERIC SLOT-ACCESSOR-STD-P)5865	*/
 
 static void L174()
 {register object *base=vs_base;
@@ -2786,7 +2786,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOTS-TO-INSPECT)5896	*/
+/*	function definition for (DEFGENERIC SLOTS-TO-INSPECT)5865	*/
 
 static void L175()
 {register object *base=vs_base;
@@ -2802,7 +2802,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC UPDATE-GF-DFUN)5896	*/
+/*	function definition for (DEFGENERIC UPDATE-GF-DFUN)5865	*/
 
 static void L176()
 {register object *base=vs_base;
@@ -2818,7 +2818,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC VALIDATE-SUPERCLASS)5896	*/
+/*	function definition for (DEFGENERIC VALIDATE-SUPERCLASS)5865	*/
 
 static void L177()
 {register object *base=vs_base;
@@ -2834,7 +2834,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC ADD-BOUNDP-METHOD)5896	*/
+/*	function definition for (DEFGENERIC ADD-BOUNDP-METHOD)5865	*/
 
 static void L178()
 {register object *base=vs_base;
@@ -2850,7 +2850,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC ADD-READER-METHOD)5896	*/
+/*	function definition for (DEFGENERIC ADD-READER-METHOD)5865	*/
 
 static void L179()
 {register object *base=vs_base;
@@ -2866,7 +2866,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC ADD-WRITER-METHOD)5896	*/
+/*	function definition for (DEFGENERIC ADD-WRITER-METHOD)5865	*/
 
 static void L180()
 {register object *base=vs_base;
@@ -2882,7 +2882,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF CLASS-SLOT-VALUE))5897	*/
+/*	function definition for (DEFGENERIC (SETF CLASS-SLOT-VALUE))5865	*/
 
 static void L181()
 {register object *base=vs_base;
@@ -2898,7 +2898,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC COMPUTE-EFFECTIVE-METHOD)5897	*/
+/*	function definition for (DEFGENERIC COMPUTE-EFFECTIVE-METHOD)5865	*/
 
 static void L182()
 {register object *base=vs_base;
@@ -2914,7 +2914,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC COMPUTE-SLOT-ACCESSOR-INFO)5897	*/
+/*	function definition for (DEFGENERIC COMPUTE-SLOT-ACCESSOR-INFO)5865	*/
 
 static void L183()
 {register object *base=vs_base;
@@ -2930,7 +2930,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC FIND-METHOD-COMBINATION)5897	*/
+/*	function definition for (DEFGENERIC FIND-METHOD-COMBINATION)5865	*/
 
 static void L184()
 {register object *base=vs_base;
@@ -2946,7 +2946,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF SLOT-ACCESSOR-FUNCTION))5898	*/
+/*	function definition for (DEFGENERIC (SETF SLOT-ACCESSOR-FUNCTION))5865	*/
 
 static void L185()
 {register object *base=vs_base;
@@ -2962,7 +2962,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF SLOT-ACCESSOR-STD-P))5899	*/
+/*	function definition for (DEFGENERIC (SETF SLOT-ACCESSOR-STD-P))5865	*/
 
 static void L186()
 {register object *base=vs_base;
@@ -2978,7 +2978,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-BOUNDP-USING-CLASS)5899	*/
+/*	function definition for (DEFGENERIC SLOT-BOUNDP-USING-CLASS)5865	*/
 
 static void L187()
 {register object *base=vs_base;
@@ -2994,7 +2994,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-MAKUNBOUND-USING-CLASS)5899	*/
+/*	function definition for (DEFGENERIC SLOT-MAKUNBOUND-USING-CLASS)5865	*/
 
 static void L188()
 {register object *base=vs_base;
@@ -3010,7 +3010,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-UNBOUND)5899	*/
+/*	function definition for (DEFGENERIC SLOT-UNBOUND)5865	*/
 
 static void L189()
 {register object *base=vs_base;
@@ -3026,7 +3026,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-VALUE-USING-CLASS)5899	*/
+/*	function definition for (DEFGENERIC SLOT-VALUE-USING-CLASS)5865	*/
 
 static void L190()
 {register object *base=vs_base;
@@ -3042,7 +3042,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC MAKE-METHOD-LAMBDA)5899	*/
+/*	function definition for (DEFGENERIC MAKE-METHOD-LAMBDA)5865	*/
 
 static void L191()
 {register object *base=vs_base;
@@ -3058,7 +3058,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF SLOT-VALUE-USING-CLASS))5899	*/
+/*	function definition for (DEFGENERIC (SETF SLOT-VALUE-USING-CLASS))5865	*/
 
 static void L192()
 {register object *base=vs_base;
@@ -3074,7 +3074,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC MAKE-METHOD-INITARGS-FORM)5899	*/
+/*	function definition for (DEFGENERIC MAKE-METHOD-INITARGS-FORM)5865	*/
 
 static void L193()
 {register object *base=vs_base;
@@ -3090,7 +3090,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC (SETF DOCUMENTATION))5900	*/
+/*	function definition for (DEFGENERIC (SETF DOCUMENTATION))5865	*/
 
 static void L194()
 {register object *base=vs_base;
@@ -3106,7 +3106,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC DOCUMENTATION)5900	*/
+/*	function definition for (DEFGENERIC DOCUMENTATION)5865	*/
 
 static void L195()
 {register object *base=vs_base;
@@ -3122,7 +3122,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC GET-METHOD)5900	*/
+/*	function definition for (DEFGENERIC GET-METHOD)5865	*/
 
 static void L196()
 {register object *base=vs_base;
@@ -3138,7 +3138,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC REMOVE-NAMED-METHOD)5900	*/
+/*	function definition for (DEFGENERIC REMOVE-NAMED-METHOD)5865	*/
 
 static void L197()
 {register object *base=vs_base;
@@ -3154,7 +3154,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SLOT-MISSING)5900	*/
+/*	function definition for (DEFGENERIC SLOT-MISSING)5865	*/
 
 static void L198()
 {register object *base=vs_base;
@@ -3170,7 +3170,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC ALLOCATE-INSTANCE)5900	*/
+/*	function definition for (DEFGENERIC ALLOCATE-INSTANCE)5865	*/
 
 static void L199()
 {register object *base=vs_base;
@@ -3186,7 +3186,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC ENSURE-CLASS-USING-CLASS)5900	*/
+/*	function definition for (DEFGENERIC ENSURE-CLASS-USING-CLASS)5865	*/
 
 static void L200()
 {register object *base=vs_base;
@@ -3202,7 +3202,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC ENSURE-GENERIC-FUNCTION-USING-CLASS)5900	*/
+/*	function definition for (DEFGENERIC ENSURE-GENERIC-FUNCTION-USING-CLASS)5865	*/
 
 static void L201()
 {register object *base=vs_base;
@@ -3218,7 +3218,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC INITIALIZE-INSTANCE)5900	*/
+/*	function definition for (DEFGENERIC INITIALIZE-INSTANCE)5865	*/
 
 static void L202()
 {register object *base=vs_base;
@@ -3234,7 +3234,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC MAKE-INSTANCE)5900	*/
+/*	function definition for (DEFGENERIC MAKE-INSTANCE)5865	*/
 
 static void L203()
 {register object *base=vs_base;
@@ -3250,7 +3250,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC NO-APPLICABLE-METHOD)5900	*/
+/*	function definition for (DEFGENERIC NO-APPLICABLE-METHOD)5865	*/
 
 static void L204()
 {register object *base=vs_base;
@@ -3266,7 +3266,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC READER-METHOD-CLASS)5900	*/
+/*	function definition for (DEFGENERIC READER-METHOD-CLASS)5865	*/
 
 static void L205()
 {register object *base=vs_base;
@@ -3282,7 +3282,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC REINITIALIZE-INSTANCE)5900	*/
+/*	function definition for (DEFGENERIC REINITIALIZE-INSTANCE)5865	*/
 
 static void L206()
 {register object *base=vs_base;
@@ -3298,7 +3298,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC SHARED-INITIALIZE)5900	*/
+/*	function definition for (DEFGENERIC SHARED-INITIALIZE)5865	*/
 
 static void L207()
 {register object *base=vs_base;
@@ -3314,7 +3314,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC UPDATE-DEPENDENT)5900	*/
+/*	function definition for (DEFGENERIC UPDATE-DEPENDENT)5865	*/
 
 static void L208()
 {register object *base=vs_base;
@@ -3330,7 +3330,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC UPDATE-INSTANCE-FOR-DIFFERENT-CLASS)5900	*/
+/*	function definition for (DEFGENERIC UPDATE-INSTANCE-FOR-DIFFERENT-CLASS)5865	*/
 
 static void L209()
 {register object *base=vs_base;
@@ -3346,7 +3346,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC UPDATE-INSTANCE-FOR-REDEFINED-CLASS)5900	*/
+/*	function definition for (DEFGENERIC UPDATE-INSTANCE-FOR-REDEFINED-CLASS)5865	*/
 
 static void L210()
 {register object *base=vs_base;
@@ -3362,7 +3362,7 @@ TTL:;
 	(void) (*Lnk422)();
 	return;
 }
-/*	function definition for (DEFGENERIC WRITER-METHOD-CLASS)5900	*/
+/*	function definition for (DEFGENERIC WRITER-METHOD-CLASS)5865	*/
 
 static void L211()
 {register object *base=vs_base;

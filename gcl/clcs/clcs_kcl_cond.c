@@ -2,7 +2,7 @@
 #include "cmpinclude.h"
 #include "clcs_kcl_cond.h"
 void init_clcs_kcl_cond(){do_init(VV);}
-/*	local entry for function progn 'compile2191	*/
+/*	local entry for function progn 'compile2168	*/
 
 static object LI1()
 
@@ -18,7 +18,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2203	*/
+/*	local entry for function progn 'compile2180	*/
 
 static object LI2()
 
@@ -43,7 +43,7 @@ T3:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2216	*/
+/*	local entry for function progn 'compile2193	*/
 
 static object LI3()
 
@@ -300,7 +300,7 @@ T67:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2366	*/
+/*	local entry for function progn 'compile2343	*/
 
 static object LI8()
 
@@ -316,7 +316,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2378	*/
+/*	local entry for function progn 'compile2355	*/
 
 static object LI9()
 
@@ -328,7 +328,7 @@ TTL:;
 	VMR9(V43)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2390	*/
+/*	local entry for function progn 'compile2367	*/
 
 static object LI10()
 
@@ -339,7 +339,7 @@ TTL:;
 	VMR10(V44)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2495	*/
+/*	local entry for function progn 'compile2475	*/
 
 static object LI11()
 
@@ -412,7 +412,7 @@ T87:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2523	*/
+/*	local entry for function progn 'compile2503	*/
 
 static object LI13()
 
@@ -428,7 +428,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2535	*/
+/*	local entry for function progn 'compile2515	*/
 
 static object LI14()
 
@@ -447,7 +447,7 @@ T100:;
 	VMR14(V53)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2548	*/
+/*	local entry for function progn 'compile2528	*/
 
 static object LI15()
 
@@ -550,7 +550,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2640	*/
+/*	local entry for function progn 'compile2620	*/
 
 static object LI18()
 
@@ -562,7 +562,7 @@ TTL:;
 	VMR18(V67)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2672	*/
+/*	local entry for function progn 'compile2652	*/
 
 static object LI19()
 
@@ -574,7 +574,7 @@ TTL:;
 	VMR19(V68)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2704	*/
+/*	local entry for function progn 'compile2684	*/
 
 static object LI20()
 
@@ -586,7 +586,7 @@ TTL:;
 	VMR20(V69)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2716	*/
+/*	local entry for function progn 'compile2696	*/
 
 static object LI21()
 

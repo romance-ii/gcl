@@ -115,7 +115,7 @@ static void L6()
 	vs_top=(vs_base=base+4)+1;
 	return;
 }
-/*	function definition for G2581	*/
+/*	function definition for G2521	*/
 
 static void L7()
 {register object *base=vs_base;

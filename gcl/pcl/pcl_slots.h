@@ -52,7 +52,7 @@ static object LI10();
 #define VC13
 #define VC14
 static object LI15();
-#define VMB15 object  V135;
+#define VMB15 object  V136;
 #define VMS15
 #define VMV15
 #define VMR15(VMT15) return(VMT15);
@@ -67,19 +67,19 @@ static object LI18();
 #define VMS18
 #define VMV18
 #define VMR18(VMT18) return(VMT18);
-#define VC19 object  V161;
+#define VC19 object  V162;
 static object LI20();
-#define VMB20 register object *base=vs_top; object  V180;
+#define VMB20 register object *base=vs_top; object  V181;
 #define VMS20  register object *sup=vs_top+3;vs_top=sup;
 #define VMV20 vs_check;
 #define VMR20(VMT20) vs_top=base ; return(VMT20);
 static object LI21();
-#define VMB21 register object *base=vs_top; object  V203;
+#define VMB21 register object *base=vs_top; object  V204;
 #define VMS21  register object *sup=vs_top+5;vs_top=sup;
 #define VMV21 vs_check;
 #define VMR21(VMT21) vs_top=base ; return(VMT21);
 static object LI22();
-#define VMB22 register object *base=vs_top; object  V220;
+#define VMB22 register object *base=vs_top; object  V221;
 #define VMS22  register object *sup=vs_top+3;vs_top=sup;
 #define VMV22 vs_check;
 #define VMR22(VMT22) vs_top=base ; return(VMT22);
@@ -105,9 +105,9 @@ static object LI28();
 #define VMS28  register object *sup=vs_top+3;vs_top=sup;
 #define VMV28 vs_check;
 #define VMR28(VMT28) vs_top=base ; return(VMT28);
-#define VC29 object  V298;
+#define VC29 object  V299;
 static object LI30();
-#define VMB30 register object *base=vs_top; object  V309;
+#define VMB30 register object *base=vs_top; object  V310;
 #define VMS30  register object *sup=vs_top+1;vs_top=sup;
 #define VMV30 vs_check;
 #define VMR30(VMT30) vs_top=base ; return(VMT30);
@@ -131,7 +131,7 @@ static object LI30();
 #define VM15 0
 #define VM14 8
 #define VM13 8
-#define VM12 9
+#define VM12 10
 #define VM11 8
 #define VM10 3
 #define VM9 9
@@ -143,8 +143,8 @@ static object LI30();
 #define VM3 0
 #define VM2 0
 #define VM1 0
-static char * VVi[65]={
-#define Cdata VV[64]
+static char * VVi[64]={
+#define Cdata VV[63]
 (char *)(LI1),
 (char *)(LI2),
 (char *)(LI3),
@@ -178,35 +178,35 @@ static char * VVi[65]={
 (char *)(L31)
 };
 #define VV ((object *)VVi)
-static object *Lclptr63;
-static void LnkT63();
-static void (*Lnk63)() = LnkT63;
 static object *Lclptr62;
 static void LnkT62();
 static void (*Lnk62)() = LnkT62;
-static object  LnkTLI2(object,...);
-static object  (*LnkLI2)() = (object (*)()) LnkTLI2;
 static object *Lclptr61;
 static void LnkT61();
 static void (*Lnk61)() = LnkT61;
+static object  LnkTLI2(object,...);
+static object  (*LnkLI2)() = (object (*)()) LnkTLI2;
 static object *Lclptr60;
 static void LnkT60();
 static void (*Lnk60)() = LnkT60;
+static object *Lclptr59;
 static void LnkT59();
 static void (*Lnk59)() = LnkT59;
-static object  LnkTLI58(object,...);
-static object  (*LnkLI58)() = (object (*)()) LnkTLI58;
-static object *Lclptr57;
-static void LnkT57();
-static void (*Lnk57)() = LnkT57;
+static void LnkT58();
+static void (*Lnk58)() = LnkT58;
+static object  LnkTLI57(object,...);
+static object  (*LnkLI57)() = (object (*)()) LnkTLI57;
 static object *Lclptr56;
 static void LnkT56();
 static void (*Lnk56)() = LnkT56;
-static object  LnkTLI55(object,...);
-static object  (*LnkLI55)() = (object (*)()) LnkTLI55;
-static object *Lclptr54;
-static void LnkT54();
-static void (*Lnk54)() = LnkT54;
+static object *Lclptr55;
+static void LnkT55();
+static void (*Lnk55)() = LnkT55;
+static object  LnkTLI54(object,...);
+static object  (*LnkLI54)() = (object (*)()) LnkTLI54;
+static object *Lclptr53;
+static void LnkT53();
+static void (*Lnk53)() = LnkT53;
 static void LnkT9();
 static void (*Lnk9)() = LnkT9;
 static void LnkT12();
@@ -217,9 +217,6 @@ static void (*Lnk30)() = LnkT30;
 static object *Lclptr26;
 static void LnkT26();
 static void (*Lnk26)() = LnkT26;
-static object *Lclptr53;
-static void LnkT53();
-static void (*Lnk53)() = LnkT53;
 static object *Lclptr18;
 static void LnkT18();
 static void (*Lnk18)() = LnkT18;
