@@ -17,8 +17,9 @@ gclcvs (2.7.0-33) unstable; urgency=low
   * complete si::debug -> si::debugger name change
   * open probe ANSI fixes
   * array-dimension fix for bitvectors, adjust-array ansi fixes
+  * bfd version independent section size semantics
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 23 Nov 2004 22:34:21 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 24 Nov 2004 15:56:50 +0000
 
 gclcvs (2.7.0-32) unstable; urgency=high
 
