@@ -44,27 +44,27 @@ To make the whole system, if you have obtained gcl.tgz.
 UNCOMPRESS and UNTAR the SOURCES:
 --------------------------------
 
-Change to a directory in which you wish to put gcl, eg /usr/local,
-which we shall call PREFIX-DIR.
-Copy the file gcl.tgz to the PREFIX-DIR.
+Change to a directory in which you wish to build gcl, eg ~/tmp.
+Copy the file gcl.tgz to this directory.
 
-% gzip -dc gcl.tgz | tar  xvf -
+	% gzip -dc gcl.tgz | tar  xvf -
 
-This will create the directory ${PREFIX-DIR}/gcl-1.xxx with
-all the sources in it
-
+This will create the subdirectory gcl-y.xxx with all the sources in it.
 
       
 ADD MACHINE DEFINITIONS TO MAKEFILES:
 ------------------------------------
 
-Determine the NAME of your machine by looking in the MACHINES file (e.g.
-sun3-os4).
-
-        % cd gcl-2.xxx 
+	% cd gcl-y.xxx 
 	% ./configure
 
-	You should finally be ready to go!
+This will analyze your system, generate a file called makedefs, insert
+it into the various makefiles and create a proper h/config.h header
+file for your system.
+
+Some command line options can be used with the configure script; try
+./configure --help to find out about them.
+
 Note that if you have tcl/tk (version 4.2 tk or 7.6 tcl or later),
 then a file tclConfig.sh and tkConfig.sh should exist in some place
 such as /usr/local/lib.  
@@ -80,7 +80,16 @@ warnings from the C compiler, but all files should compile successfully
 producing .o files.
 
 At the end you should see a message at the end "Make of GCL xxx
-completed", where xxx stands for the version number.
+completed", where xxx stands for the version number. Every successful
+compilation generates an automatic notification email to
+gcl@math.utexas.edu to help in determininig on which machines and
+levels of the OS compilation has been successful. If you don't want to
+assist in the maintenance in this way do
+        
+	% ./configure  --enable-notify=no
+
+before make.
+
 
 TRY IT OUT:
 ----------
@@ -88,8 +97,10 @@ TRY IT OUT:
 When it has finally finished you may invoke GCL by using
 
 % xbin/gcl
-GCL (GNU Common Lisp)  Version(1.0)  Apr 21 00:52:31 CDT 1994
+GCL (GNU Common Lisp)  Version(2.3) Sun May  7 14:11:30 CDT 2000
+Licensed under GNU Library General Public License
 Contains Enhancements by W. Schelter
+
 >(+ 2 3)
 
 >5
@@ -106,38 +117,31 @@ based on an older version of tcl/tk.
 
 INSTALLING:
 ----------
-	To install under /usr/local do
 
-		make install
+	To install under /usr/local (or under the directory specified
+        with the --prefix= option of the ./configure script)
 
-	To specify an alternative directory such as /lusr
-   	do 
-
-	make install PREFIX_DIR=/lusr
+	% make install
 
 	The default installation puts a full executable in
 
-        /usr/local/lib/gcl-version/unixport/saved_gcl
+	  /usr/local/lib/gcl-version/unixport/saved_gcl
 
 	and some documentation in
           
-          /usr/local/lib/gcl-x.x/info/
+	  /usr/local/lib/gcl-x.x/info/
 
 	and some autoloading files in
 
 	  /usr/local/lib/gcl-x.x/lsp
 
-        and a shell script in /usr/local/lib/gcl-x.x/xbin/gcl
+        and a shell script in 
+	  
+	  /usr/local/lib/gcl-x.x/xbin/gcl
+
 	This script is also copied to
 
-	/usr/local/bin
-
-
-        On a successful make, the xbin/notify script sends a note to
-maintainers, so that they can know which newer software platforms, need
-attention and which do not.   To disable this you may remove this file
-and replace it with a dummy one (see makefile).
-
+	  /usr/local/bin
 
 
 FUTURE DIRECTIONS
@@ -216,6 +220,7 @@ on since it is necessary for window development.
 
   * Construct a Common Lisp test suite to help debug new releases.
 
+
 DOCUMENTATION:
 ==============
    If you use GNU emacs, a convenient method for viewing documentation
@@ -233,6 +238,7 @@ the describe command inside Lisp.  For example (describe 'print) will
 print out information about print.  It will access the gcl-si.info,
 gcl-tk.info, and gcl.info if these exist.  gcl.info (containing the
 ansi proposed definitions) is on ftp.ma.utexas.edu:pub/gcl/gcl.info.tgz
+
 
 TROUBLE SHOOTING (some common problems reported):
 ----------------   

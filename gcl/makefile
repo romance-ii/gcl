@@ -1,15 +1,13 @@
-#  Compiling gcl
-# select a machine-type from ./MACHINES
-
-# ./add-defs machine-type
-# make
-
-# For more details see README
+# Compiling gcl:
+#   ./configure
+#   make
+# For more details see the file readme
 
 prefix=/usr/local
 # This would cause make install to create /usr/local/bin/gcl and
-# /usr/local/lib/gcl-1-??/* with some basic files.
-# this may be overridden in the makedefs
+# /usr/local/lib/gcl-x.yy/* with some basic files.
+# This prefix may be overridden e.g. with
+# ./configure --prefix=/usr/share
 
 ##########################
 
