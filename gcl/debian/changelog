@@ -13,8 +13,9 @@ gclcvs (2.7.0-27) unstable; urgency=low
     *eval-when-defaults* to '(:compile-toplevel :load-toplevel :execute)
   * revert erroneously changed eval-when-defaults
   * Fix value stack leak in rare compiled call sequence
+  * Better sed separator for LI-CC in unixport/makefile
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 13 Jul 2004 10:13:31 -0400
+ -- Camm Maguire <camm@enhanced.com>  Tue, 13 Jul 2004 10:32:41 -0400
 
 gclcvs (2.7.0-26) unstable; urgency=low
 

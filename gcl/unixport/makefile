@@ -100,7 +100,7 @@ init_%.lsp: init_%.lsp.tmp
 		-e "s#@LI-EXTVERS@#`cat ../minvers | cut -f2 -d.`#1" \
 		-e "s#@LI-MINVERS@#`cat ../minvers | cut -f1 -d.`#1" \
 		-e "s#@LI-MAJVERS@#`cat ../majvers`#1" \
-		-e "s/@LI-CC@/\"$(CC) -c $(FINAL_CFLAGS)\"/1" \
+		-e "s#@LI-CC@#\"$(CC) -c $(FINAL_CFLAGS)\"#1" \
 		-e "s#@LI-LD@#\"$(CC) -o \"#1" \
 		-e "s#@LI-LD-LIBS@#\" $(LD_LIBS_PRE) -l$* $(LD_LIBS_POST)\"#1" \
 		-e "s#@LI-OPT-THREE@#\"$(O3FLAGS)\"#1" \
