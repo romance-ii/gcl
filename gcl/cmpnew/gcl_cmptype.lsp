@@ -125,17 +125,12 @@
 
 (defun promoted-c-type (type)
   (let ((type (coerce-to-one-value type)))
-    (if (bounded-type type)
+    (if (integer-typep type)
 	(cond ;((subtypep type 'signed-char) 'signed-char)
 	 ((subtypep type 'fixnum) 'fixnum)
 	 ((subtypep type 'integer) 'integer)
 	 (t  (error "Cannot promote type ~S to C type~%" type)))
       type)))
-
-(defun coerce-to-bounded-type (t1)
-  (if (bounded-type t1) t1
-    (let ((t1 (si::normalize-type t1)))
-      (if (bounded-type t1) t1))))
 
 (defun ash-propagator (f t1 t2)
   (and
@@ -143,52 +138,89 @@
    (type>= '(integer #.most-negative-fixnum #.(integer-length most-positive-fixnum)) t2)
    (super-range f t1 t2)))
 
-(defun floor-propagator (f t1 t2)
-  (let ((t1 (coerce-to-bounded-type t1))
-	(t2 (coerce-to-bounded-type t2)))
-    (and t2 (> (* (cadr t2) (caddr t2)) 0)
-	 (let ((sr (super-range f t1 t2)))
-	   (and sr
-		(list 'values sr
-		      (let ((outer (if (< (cadr t2) 0) (cadr t2) (caddr t2))))
-			(let ((a (cadr (multiple-value-list
-					(funcall (symbol-function f) 1 outer))))
-			      (b (cadr (multiple-value-list
-					(funcall (symbol-function f) -1 outer))))
-			      (c (cadr (multiple-value-list
-					(funcall (symbol-function f) (1+ outer) outer))))
-			      (d (cadr (multiple-value-list
-					(funcall (symbol-function f) (1- outer) outer)))))
-			  (let ((p (min a b c d)))
-			    (if (< p 0)
-				(list (car t2) p 0)
-			      (list (car t2) 0 (max a b c d))))))))))))
+(defun floor-propagator (f t1 &optional (t2 '(integer 1 1)))
+  (let ((t1 (coerce-to-integer-type t1))
+	(t2 (coerce-to-integer-type t2)))
+    (and t2
+	 (let ((i21 (integerp (cadr t2)))
+	       (i22 (integerp (caddr t2))))
+	   (and i21 i22 (> (* (cadr t2) (caddr t2)) 0)
+		(let ((sr (super-range f t1 t2)))
+		  (and sr
+		       (list 'values sr
+			     (let ((outer (if (< (cadr t2) 0) (cadr t2) (caddr t2))))
+			       (let ((a (cadr (multiple-value-list
+					      (funcall (symbol-function f) 1 outer))))
+				     (b (cadr (multiple-value-list
+					       (funcall (symbol-function f) -1 outer))))
+				     (c (cadr (multiple-value-list
+					       (funcall (symbol-function f) (1+ outer) outer))))
+				     (d (cadr (multiple-value-list
+					       (funcall (symbol-function f) (1- outer) outer)))))
+				 (let ((p (min a b c d)))
+				   (if (< p 0)
+				       (list (car t2) p 0)
+				     (list (car t2) 0 (max a b c d))))))))))))))
 
 
-
-(defun super-range (f ot1 ot2)
-  (let ((t1 (coerce-to-bounded-type ot1))
-	(t2 (coerce-to-bounded-type ot2)))
+(defun super-range (f t1 &optional (t2 nil t2p))
+  (let ((t1 (coerce-to-integer-type t1)))
     (and t1
-	 (if ot2
-	     (and 
-	      t2
-	      (eq (car t1) (car t2))
-	      (let ((a (funcall (symbol-function f) (cadr t1) (cadr t2)))
-		    (b (funcall (symbol-function f) (cadr t1) (caddr t2)))
-		    (c (funcall (symbol-function f) (caddr t1) (cadr t2)))
-		    (d (funcall (symbol-function f) (caddr t1) (caddr t2))))
-		(list (car t1) (min a b c d) (max a b c d))))
-	     (let ((a (funcall (symbol-function f) (cadr t1)))
-		   (b (funcall (symbol-function f) (caddr t1))))
-	       (list (car t1) (min a b) (max a b)))))))
+	 (let ((i11 (integerp (cadr t1)))
+	       (i12 (integerp (caddr t1))))
+	   (if (and i11 i12)
+	       (if t2p
+		   (let ((t2 (coerce-to-integer-type t2)))
+		     (and t2 (eq (car t1) (car t2))
+			  (let ((i21 (integerp (cadr t2)))
+				(i22 (integerp (caddr t2))))
+			    (if (and i21 i22)
+				(let ((a (funcall (symbol-function f) (cadr t1) (cadr t2)))
+				      (b (funcall (symbol-function f) (cadr t1) (caddr t2)))
+				      (c (funcall (symbol-function f) (caddr t1) (cadr t2)))
+				      (d (funcall (symbol-function f) (caddr t1) (caddr t2))))
+				  (list (car t1) (min a b c d) (max a b c d)))
+			      (list (car t1) '* '*)))))
+		 (let ((a (funcall (symbol-function f) (cadr t1)))
+		       (b (funcall (symbol-function f) (caddr t1))))
+		   (list (car t1) (min a b) (max a b))))
+	     (list (car t1) '* '*))))))
 
-(defun bounded-type (type)
+(defun integer-typep (type)
   (and (consp type)
-       (= (length type) 3)
        (member (car type) '(integer signed-byte unsigned-byte) :test #'eq)
-       (integerp (cadr type))
-       (integerp (caddr type))))
+       (let ((l (length type)))
+	 (and (<= 1 l 3)
+	      (or (< l 2) (integerp (cadr type)) (eq (cadr type) '*))
+	      (or (< l 3) (integerp (caddr type)) (eq (caddr type) '*)))))))
+
+(defun coerce-to-integer-type (t1)
+  (if (integer-typep t1) t1
+    (let ((t1 (si::normalize-type t1)))
+      (if (integer-typep t1) t1))))
+
+(defun integer-type-and (type1 type2)
+  (let ((ct1 (coerce-to-integer-type type1))
+	(ct2 (coerce-to-integer-type type2)))
+    (and ct1 ct2
+	 (eq (car ct1) (car ct2))
+	 (let ((b1 (cadr ct1))
+	       (e1 (caddr ct1))
+	       (b2 (cadr ct2))
+	       (e2 (caddr ct2)))
+	   (let ((i11 (integerp b1))
+		 (i12 (integerp e1))
+		 (i21 (integerp b2))
+		 (i22 (integerp e2)))
+	     (let ((br (if i11 (if i21 (max b1 b2) b1) (if i21 b2 '*)))
+		   (er (if i12 (if i22 (min e1 e2) e1) (if i22 e2 '*))))
+	       (let ((t12 (and (eql br b1) (eql er e1) type1))
+		     (t21 (and (eql br b2) (eql er e2) type2)))
+		     (or (and t12 t21)
+			 t12 t21
+			 (and (or (eq br '*) (eq er '*) (<= br er))
+			      (list (car ct1) br er))))))))))
+    
 
 (defun type-and (type1 type2)
   
@@ -209,16 +241,8 @@
 	((eq type2 'object) type1)
         ((eq type2 t) type1)
 	((eq type2 '*) type1)
-	((or (bounded-type type1) (bounded-type type2))
-	 (let ((t12 (and (subtypep type1 type2) type1))
-	       (t21 (and (subtypep type2 type1) type2)))
-	   (or (and t12 t21)
-	       t12 t21
-	       (let ((ct1 (coerce-to-bounded-type type1))
-		     (ct2 (coerce-to-bounded-type type2)))
-		 (and ct1 ct2
-		      (eq (car ct1) (car ct2))
-		      (list (car ct1) (max (cadr ct1) (cadr ct2)) (min (caddr ct1) (caddr ct2))))))))
+	((or (integer-typep type1) (integer-typep type2))
+	 (integer-type-and type1 type2))
         ((consp type1)
          (case (car type1)
                (array
