@@ -50,11 +50,6 @@ EXTRAS       = ${OD}mingwin.o ${OD}mingfile.o
 # the  make to use for saved_kcp the profiler.
 KCP          = kcp-bsd
 
-# using gcc so dont need
-GNULIB1      =
-
-WINKILL      = winkill.exe tclwinkill.dll
-
 # Work around install problem caused by non-support of GCL TK
 # on Windows platforms.
 TK_LISP_LIB  =
