@@ -31,7 +31,7 @@ GCL_MAN= chap-1.texi chap-2.texi chap-3.texi chap-4.texi chap-5.texi \
 gcl-si.dvi: ${GCL_SI} gcl-si.texi
 	TEXINPUTS=.:$$TEXINPUTS tex --interaction nonstopmode gcl-si.texi || true
 
-gcl-si.info:
+gcl-si.info: ${GCL_SI} gcl-si.texi
 	-$(MAKEINFO) gcl-si.texi	
 
 gcl-tk.dvi: ${GCL_TK} gcl-tk.texi
@@ -46,10 +46,10 @@ gcl.dvi: ${GCL_MAN} gcl.texi
 gcl.info: ${GCL_MAN} gcl.texi
 	-$(MAKEINFO) gcl.texi
 
-gcl-si_toc.html:
+gcl-si_toc.html: ${GCL_SI} gcl-si.texi
 	$(HTML_CMD) gcl-si.texi
 
-gcl-tk_toc.html:
+gcl-tk_toc.html: ${GCL_TK} gcl-tk.texi
 	$(HTML_CMD) gcl-tk.texi
 
 gcl_toc.html:
@@ -61,11 +61,11 @@ install-html: gcl-tk_toc.html gcl-si_toc.html gcl_toc.html
 install:
 	mkdir -p $(DESTDIR)${INFO_DIR}
 	[ -f $(DESTDIR)$(INFO_DIR)dir ] || touch $(DESTDIR)$(INFO_DIR)dir
-	! grep -q gcl-si $(DESTDIR)${INFO_DIR}dir || \
+	grep -q gcl-si $(DESTDIR)${INFO_DIR}dir || \
 	echo "* GCL Doc: (gcl-si.info).	GNU Common Lisp specific Documentation." >> $(DESTDIR)${INFO_DIR}dir
-	! grep -q gcl-tk $(DESTDIR)${INFO_DIR}dir || \
+	grep -q gcl-tk $(DESTDIR)${INFO_DIR}dir || \
 	echo "* GCL TK Doc: (gcl-tk.info).	TK window GCL interface." >> $(DESTDIR)${INFO_DIR}dir
-	! grep -q gcl.info $(DESTDIR)${INFO_DIR}dir || \
+	grep -q gcl.info $(DESTDIR)${INFO_DIR}dir || \
 	echo "* GCL Ansi Doc: (gcl.info).  Ansi Common Lisp Specification." >> $(DESTDIR)${INFO_DIR}dir
 	cp *.info* $(DESTDIR)${INFO_DIR}
 	mkdir -p $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl.html

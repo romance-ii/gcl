@@ -45,7 +45,18 @@
 ;;If the following is a string, then it is inserted instead of
 ;; the include file cmpinclude.h, EXCEPT for system-p calls.
 (defvar *cmpinclude-string* t)
+(defvar *compiler-default-type* #p".lsp")
+(defvar *compiler-normal-type* #p".lsp")
 
+(defun compiler-default-type (pname) 
+  "Set the default file extension (type) for compilable file names."
+  (setf *compiler-default-type* (if (pathnamep pname)
+				    pname
+				  (make-pathname :type (string-left-trim "." pname)))))
+
+(defun compiler-reset-type ()
+  "Set the default file extension (type) to <.lsp>."
+  (compiler-default-type *compiler-normal-type*))
 
 ;; Let the user write dump c-file etc to  /dev/null.
 (defun get-output-pathname (file ext name &optional (dir (pathname-directory *default-pathname-defaults*)))
@@ -179,26 +190,26 @@
   (cond (*compiler-in-use*
          (format t "~&The compiler was called recursively.~%~
 Cannot compile ~a.~%"
-                 (namestring (merge-pathnames input-pathname #".lsp")))
+                 (namestring (merge-pathnames input-pathname *compiler-default-type*)))
          (setq *error-p* t)
          (return-from compile-file1 (values)))
         (t (setq *error-p* nil)
            (setq *compiler-in-use* t)))  
 
-  (unless (probe-file (merge-pathnames input-pathname #".lsp"))
+  (unless (probe-file (merge-pathnames input-pathname *compiler-default-type*))
     (format t "~&The source file ~a is not found.~%"
-            (namestring (merge-pathnames input-pathname #".lsp")))
+            (namestring (merge-pathnames input-pathname *compiler-default-type*)))
     (setq *error-p* t)
     (return-from compile-file1 (values)))
 
   (when *compile-verbose*
     (format t "~&Compiling ~a.~%"
-            (namestring (merge-pathnames input-pathname #".lsp"))))
+            (namestring (merge-pathnames input-pathname *compiler-default-type*))))
 
   (and *record-call-info* (clear-call-table))
 
   (with-open-file
-          (*compiler-input* (merge-pathnames input-pathname #".lsp"))
+          (*compiler-input* (merge-pathnames input-pathname *compiler-default-type*))
 
 
     (cond ((numberp *split-files*)

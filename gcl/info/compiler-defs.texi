@@ -102,24 +102,59 @@ or
 @end example
 
 @end defun
-@defun WHO-CALLS  (function-name)
+@defun COMPILER-DEFAULT-TYPE  (pathname)
 Package:COMPILER
 
+Allows you to set the default file extension for compiler source files.
+The argument can either be a pathname or a string.  For example, imagine 
+you have two files, ``foo.lisp'' and ``foo1.lsp'' in your working 
+directory.  (Note the different extensions.)  Then:
 
-List all functions in the data base [see emit-fn] which call FUNCTION-NAME.
+@example
+
+>(compile-file "foo")
+
+The source file foo.lsp is not found.
+NIL
+
+>(compile-file "foo1")
+
+Compiling foo1.lsp.
+End of Pass 1.
+End of Pass 2.
+OPTIMIZE levels: Safety=0 (No runtime error checking), Space=0, Speed=3
+Finished compiling foo1.
+#p"foo1.o"
+
+>(compiler::COMPILER-default-TYPE "lisp")
+
+#p".lisp"
+
+>(compile-file "foo")
+
+Compiling foo.lisp.
+End of Pass 1.
+End of Pass 2.
+OPTIMIZE levels: Safety=0 (No runtime error checking), Space=0, Speed=3
+Finished compiling foo.
+#p"foo.o"
+
+>(compile-file "foo1")
+
+The source file foo1.lisp is not found.
+NIL
+
+>
+
+@end example
 
 
 @end defun
-@defun LIST-UNCALLED-FUNCTIONS ()
+@defun  COMPILER-RESET-TYPE ()
 Package:COMPILER
 
-
-Examine the current data base [see emit-fn] for any functions or macros which
-are called but are not: fboundp, OR defined in the data base, OR having
-special compiler optimizer properties which would eliminate an actual call.
-
-
-
+Resets the default compiler input file extension to the GCL historical
+value of #''.lsp''.
 
 @end defun
 @defvar *CC* 
