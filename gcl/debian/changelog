@@ -1,8 +1,9 @@
 gclcvs (2.7.0-18) unstable; urgency=low
 
   * Automatic readline initialization
+  * Add watch file
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  7 Jan 2004 17:56:39 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  7 Jan 2004 18:00:51 +0000
 
 gclcvs (2.7.0-17) unstable; urgency=low
 
