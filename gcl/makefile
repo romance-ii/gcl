@@ -160,6 +160,9 @@ install-command:
 	 echo 'set unixportdir=%libdir%\unixport'; \
 	 echo 'path %cd%\..\mingw\bin;%PATH%'; \
 	 echo "start %unixportdir%\saved_gcl.exe -dir %unixportdir% -libdir %libdir% -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9" ) > $(DESTDIR)$(prefix)/bin/gclm.bat
+	rm -f $(DESTDIR)$(prefix)/bin/gclfinal.bat
+	(echo 'ECHO path %1\mingw\bin;%PATH% > gcli.bat'; \
+	 echo "ECHO start %1\lib\gcl-2.5.0\unixport\saved_gcl.exe -dir %1\lib\gcl-2.5.0\unixport -libdir %1\lib\gcl-2.5.0 -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9 >> gcli.bat" ) > $(DESTDIR)$(prefix)/bin/gclfinal.bat
 
 install: 
 	$(MAKE) install1 "INSTALL_LIB_DIR=$(prefix)/lib/gcl-`cat majvers`.`cat minvers`" "prefix=$(prefix)" "DESTDIR=$(DESTDIR)"
@@ -187,6 +190,8 @@ install1:
 #	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../$(PORTDIR)/$(FLISP)$(EXE)) ; fi
 	if test "$(EMACS_SITE_LISP)" != "" ; then (cd elisp ; $(MAKE) install DESTDIR=$(DESTDIR)) ; fi
 	if test "$(INFO_DIR)" != "unknown"; then (cd info ; $(MAKE) ; $(MAKE) install DESTDIR=$(DESTDIR)) ; fi
+	if [ "gcc --version | grep mingw" ] ; then cp COPYING.LIB-2.0 readme-bin.mingw $(prefix) ; fi
+	if [ "gcc --version | grep mingw" ] ; then cp bin/gcl.bat gcl.ico $(prefix)/bin ; fi
 
 clean:
 	(cd $(BINDIR); $(MAKE) clean)
