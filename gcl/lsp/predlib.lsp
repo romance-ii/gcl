@@ -148,7 +148,7 @@
 ;;; FIXME --optimize with most likely cases first
 (defun typep (object type &aux tp i tem)
   (when (classp type)
-    (return-from typep (eq (funcall 'class-of object) type)))
+    (return-from typep (if (member type (class-precedence-list (funcall 'class-of object))) t nil)))
   (if (atom type)
       (setq tp type i nil)
       (setq tp (car type) i (cdr type)))

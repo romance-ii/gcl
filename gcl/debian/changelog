@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-73) unstable; urgency=low
+
+  * typep fixes for class types
+
+ -- Camm Maguire <camm@enhanced.com>  Sun,  9 Feb 2003 18:28:49 -0500
+
 gcl (2.5.0.cvs20020625-72) unstable; urgency=high
 
   * Fix to siLbit_array_op for 0 dimension arrays
