@@ -887,13 +887,13 @@ type_of(#0)==t_bitvector")
 ;;MAX
  (push '((t t) t #.(flags)"@01;(number_compare(#0,#1)>=0?(#0):#1)")
    (get 'max 'inline-always))
-(push '((fixnum fixnum) fixnum #.(flags rfa)"@01;(#0)>=(#1)?(#0):#1")
+(push '((fixnum fixnum) fixnum #.(flags rfa)"@01;((#0)>=(#1)?(#0):#1)")
    (get 'max 'inline-always))
 
 ;;MIN
  (push '((t t) t #.(flags)"@01;(number_compare(#0,#1)<=0?(#0):#1)")
    (get 'min 'inline-always))
-(push '((fixnum fixnum) fixnum #.(flags rfa)"@01;(#0)<=(#1)?(#0):#1")
+(push '((fixnum fixnum) fixnum #.(flags rfa)"@01;((#0)<=(#1)?(#0):#1)")
    (get 'min 'inline-always))
 
 ;;MINUSP

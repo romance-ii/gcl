@@ -1,3 +1,10 @@
+gclcvs (2.7.0-9) unstable; urgency=low
+
+  * Fix compiler optimization bug in gcl_cmpopt.lsp -- missing parens
+    around inliner for max and min
+
+ -- Camm Maguire <camm@intech.m.enhanced.com>  Wed,  8 Oct 2003 23:09:52 +0000
+
 gclcvs (2.7.0-8) unstable; urgency=low
 
   * Parse errors implemented; recompile generated .c, .h, and .data
