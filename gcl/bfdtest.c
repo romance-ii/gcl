@@ -3,6 +3,10 @@
 #include <bfdlink.h>
 #include <string.h>
 #include <stdio.h>
+#define MY_BFD_BOOLEAN bfd_boolean
+#define MY_BFD_FALSE FALSE
+#define MY_BFD_TRUE TRUE
+
 
 static bfd *exe_bfd = NULL;
 struct bfd_link_info link_info;
@@ -50,14 +54,17 @@ int build_symbol_table_bfd ( char *oname ) {
         char *c;
         if ( ( c = (char *) strstr ( q[u]->name, "_" ) ) ) {
             struct bfd_link_hash_entry *h;
-            if ( ! ( h = bfd_link_hash_lookup ( link_info.hash, q[u]->name, true, true, true ) ) )
+            if ( ( h = bfd_link_hash_lookup ( link_info.hash,
+                                                q[u]->name, MY_BFD_TRUE,MY_BFD_TRUE,MY_BFD_TRUE ) ) ) {
+                h->type=bfd_link_hash_defined;
+                if ( !q[u]->section )
+                    fprintf ( stderr, "Symbol is missing section.\n" );
+                h->u.def.value   = q[u]->value + q[u]->section->vma;
+                h->u.def.section = q[u]->section;
+                fprintf ( stderr, "Processed %s\n", q[u]->name );
+            } else {
                 fprintf ( stderr, "Cannot make new hash entry.\n" );
-            h->type=bfd_link_hash_defined;
-            if ( !q[u]->section )
-                fprintf ( stderr, "Symbol is missing section.\n" );
-            h->u.def.value   = q[u]->value + q[u]->section->vma;
-            h->u.def.section = q[u]->section;
-            fprintf ( stderr, "Processed %s\n", q[u]->name );
+            }
         }
     }
 #else    
@@ -66,7 +73,7 @@ int build_symbol_table_bfd ( char *oname ) {
         if ((c=(char *)strstr(q[u]->name,"@@GLIBC\n" ))) {
             struct bfd_link_hash_entry *h;
             *c=0;
-            if (!(h=bfd_link_hash_lookup(link_info.hash,q[u]->name,true,true,true)))
+            if (!(h=bfd_link_hash_lookup(link_info.hash,q[u]->name,MY_BFD_TRUE,MY_BFD_TRUE,MY_BFD_TRUE)))
                 fprintf ( stderr, "Cannot make new hash entry.\n" );
             h->type=bfd_link_hash_defined;
             if (!q[u]->section)
@@ -96,16 +103,16 @@ static void *
 #define ROUND_UP(a,b) round_up(a,b) 
 
 
-static boolean
+static MY_BFD_BOOLEAN
     madd_archive_element (struct bfd_link_info * link_info,
                            bfd *abfd,
                            const char *name) {
         fprintf ( stderr, "madd_archive_element\n");
-        return false;
+        return MY_BFD_FALSE;
 
     }
 
-static boolean
+static MY_BFD_BOOLEAN
     mmultiple_definition (struct bfd_link_info * link_info,
                            const char *name,
                            bfd *obfd,
@@ -116,11 +123,11 @@ static boolean
                            bfd_vma nval) {
 
         fprintf ( stderr, "mmultiple_definition\n");
-        return false;
+        return MY_BFD_FALSE;
 
     }
 
-static boolean
+static MY_BFD_BOOLEAN
     mmultiple_common (struct bfd_link_info * link_info,
                        const char *name,
                        bfd *obfd,
@@ -131,54 +138,54 @@ static boolean
                        bfd_vma nsize) {
 
         fprintf ( stderr, " mmultiple_common\n");
-        return false;
+        return MY_BFD_FALSE;
 
     }
 
-static boolean
+static MY_BFD_BOOLEAN
     madd_to_set (struct bfd_link_info * link_info,
                   struct bfd_link_hash_entry *entry,
                   bfd_reloc_code_real_type reloc,
                   bfd *abfd, asection *sec, bfd_vma value) {
 
         fprintf ( stderr, "madd_to_set\n");
-        return false;
+        return MY_BFD_FALSE;
 
     }
 
-static  boolean 
-    mconstructor (struct bfd_link_info * link_info,boolean constructor,
+static  MY_BFD_BOOLEAN 
+    mconstructor (struct bfd_link_info * link_info,MY_BFD_BOOLEAN constructor,
                    const char *name, bfd *abfd, asection *sec,
                    bfd_vma value) {
 
         fprintf ( stderr, "mconstructor\n");
-        return false;
+        return MY_BFD_FALSE;
 
     }
 
-static boolean
+static MY_BFD_BOOLEAN
     mwarning (struct bfd_link_info * link_info,
                const char *warning, const char *symbol,
                bfd *abfd, asection *section,
                bfd_vma address) {
 
         fprintf ( stderr, "mwarning\n");
-        return false;
+        return MY_BFD_FALSE;
 
     }
 
-static boolean
+static MY_BFD_BOOLEAN
     mundefined_symbol (struct bfd_link_info * link_info,
                         const char *name, bfd *abfd,
                         asection *section,
                         bfd_vma address,
-                        boolean fatal) {
+                        MY_BFD_BOOLEAN fatal) {
 
         printf("mundefined_symbol %s is undefined\n",name);
-        return false;
+        return MY_BFD_FALSE;
     }
 
-static boolean
+static MY_BFD_BOOLEAN
     mreloc_overflow (struct bfd_link_info * link_info,
                       const char *name,
                       const char *reloc_name, bfd_vma addend,
@@ -186,38 +193,38 @@ static boolean
                       bfd_vma address) {
 
         printf("mreloc_overflow reloc for %s is overflowing\n",name);
-        return false;
+        return MY_BFD_FALSE;
 
     }
 
-static boolean
+static MY_BFD_BOOLEAN
     mreloc_dangerous (struct bfd_link_info * link_info,
                        const char *message,
                        bfd *abfd, asection *section,
                        bfd_vma address) {
 
         printf("mreloc_dangerous reloc is dangerous %s\n",message);
-        return false;
+        return MY_BFD_FALSE;
 
     }
 
-static boolean
+static MY_BFD_BOOLEAN
     munattached_reloc (struct bfd_link_info * link_info,
                         const char *name,
                         bfd *abfd, asection *section,
                         bfd_vma address) {
 
         fprintf ( stderr, " munattached_reloc\n");
-        return false;
+        return MY_BFD_FALSE;
 
     }
 
-static boolean
+static MY_BFD_BOOLEAN
     mnotice (struct bfd_link_info * link_info, const char *name,
               bfd *abfd, asection *section, bfd_vma address) {
 
         fprintf ( stderr, "mnotice\n");
-        return false;
+        return MY_BFD_FALSE;
 
     }
 
@@ -310,8 +317,11 @@ int main ( int argc, char ** argv )
 
             current+=s->_raw_size;
 
-            fprintf ( stderr, "Section %s: owner = %x, output_offset = %x, output_section = %x (%s)\n",
-                      s->name, s->owner, s->output_offset, s->output_section, s->output_section->name );
+            fprintf ( stderr,
+                      "Section %s: owner = %x, output_offset = %x, "
+                      "output_section = %x (%s)\n",
+                      s->name, s->owner, s->output_offset, s->output_section,
+                      s->output_section->name );
         }
 
         fprintf ( stderr, "1\n");
@@ -353,9 +363,9 @@ int main ( int argc, char ** argv )
             fprintf ( stderr, "Section address %x\n", s );
             fprintf ( stderr, "m loop Section %s: owner = %x, output_offset = %x, "
                       "output_section = %x (%s), vma = %x, m = %x\n",
-                      s->name, s->owner, s->output_offset, s->output_section, s->output_section->name,
+                      s->name, s->owner, s->output_offset,
+                      s->output_section, s->output_section->name,
                       s->output_section->vma, m );
-           
         }
 
         fprintf ( stderr, "\n\nDOING SOMETHING WITH THE HASHED SYMBOLS\n\n" );
@@ -376,7 +386,7 @@ int main ( int argc, char ** argv )
                 continue;
             }
 
-            if (!(h=bfd_link_hash_lookup(link_info.hash,q[u]->name, false, false, true))) 
+            if (!(h=bfd_link_hash_lookup(link_info.hash,q[u]->name, MY_BFD_FALSE, MY_BFD_FALSE, MY_BFD_TRUE))) 
                 continue;
 
             if (h->type!=bfd_link_hash_defined) 
