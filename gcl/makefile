@@ -240,6 +240,7 @@ OTHERS=$(HDIR)notcomp.h $(HDIR)rgbc.h $(HDIR)stacks.h
 $(HDIR)cmpinclude.h: $(CMPINCLUDE_FILES) $(HDIR)config.h
 	cat $(HDIR)config.h | sed -e "1,/Begin for cmpincl/d" \
 		-e "/End for cmpinclude/,50000d" > tmpx
+	echo -e '#include "h/config.h\n#ifdef SGC\n"#define SGC"\n#else\n"#undef SGC"\n#endif' | cpp 2>/dev/null| tail -1l | tr -d '"' >>tmpx
 	cat $(CMPINCLUDE_FILES) >> tmpx
 	./xbin/move-if-changed mv tmpx h/cmpinclude.h
 	./xbin/move-if-changed cp h/cmpinclude.h o/cmpinclude.h
