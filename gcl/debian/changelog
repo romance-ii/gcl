@@ -4,8 +4,10 @@ gclcvs (2.7.0-11) unstable; urgency=low
     fixed equivalents in gcl_cmpopt.lsp
   * Init newly introduced gazonk8.o in pcl package for arches that can't
     save natively relocated objects, Closes: #215501
+  * Fix some allow-other-keys errors in pcl_fast_init.lisp:  TODO
+    verify and test this
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 13 Oct 2003 21:43:27 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 13 Oct 2003 21:47:14 +0000
 
 gclcvs (2.7.0-10) unstable; urgency=low
 

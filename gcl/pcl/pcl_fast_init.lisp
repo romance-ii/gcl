@@ -225,14 +225,19 @@
 	     (eq *initialize-info-cache-initargs* initargs))
 	(setq info *initialize-info-cache-info*)
 	(let ((initargs-tail initargs)
+	      allow-other-keys-p
 	      (cell (or (class-initialize-info class)
 			(setf (class-initialize-info class) (cons nil nil)))))
 	  (loop (when (null initargs-tail) (return nil))
 		(let ((keyword (pop initargs-tail))
 		      (alist-cell cell))
 		  (when plist-p
-		    (if (eq keyword :allow-other-keys)
-			(setq allow-other-keys-arg (pop initargs-tail))
+		    ;; leftmost occurrence only
+		    ;; FIXME check that this is correct
+		    (if (and (not allow-other-keys-p) (eq keyword :allow-other-keys))
+			(progn
+			  (setq allow-other-keys-arg (pop initargs-tail))
+			  (setq allow-other-keys-p t))
 			(pop initargs-tail)))
 		  (loop (let ((alist (cdr alist-cell)))
 			  (when (null alist)
@@ -294,7 +299,7 @@
 			(check-initargs-values class methods)
 		      (or (not (null allow-other-keys))
 			  (dolist (key keys t)
-			    (unless (member key legal)
+			    (unless (or (member key legal) (eq key :allow-other-keys))
 			      (return (cons :invalid key)))))))))
 	 (let ((proto (class-prototype class)))
 	   (setf (initialize-info-cached-valid-p info)
