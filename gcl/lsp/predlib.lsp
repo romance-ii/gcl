@@ -149,7 +149,8 @@
 
 ;;; TYPEP predicate.
 ;;; FIXME --optimize with most likely cases first
-(defun typep (object type &aux tp i tem)
+(defun typep (object type &optional env &aux tp i tem)
+  (declare (ignore env))
   (when (classp type)
     (return-from typep (if (member type (class-precedence-list (funcall 'class-of object))) t nil)))
   (if (atom type)
@@ -297,7 +298,8 @@
 
 
 ;;; SUBTYPEP predicate.
-(defun subtypep (type1 type2 &aux t1 t2 i1 i2 ntp1 ntp2 tem)
+(defun subtypep (type1 type2 &optional env &aux t1 t2 i1 i2 ntp1 ntp2 tem)
+  (declare (ignore env))
   (let ((c1 (classp type1)) (c2 (classp type2)))
     (when (and c1 c2)
       (return-from subtypep 
