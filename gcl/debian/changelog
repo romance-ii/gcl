@@ -53,8 +53,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Do not define symbols with no value, either in bfd/rsym, or in
     plt.c.  Generates a clear and explicit error of an undefined symbol
     when we've missed an address
+  * Define the external symbols known to be written at present in plt.c
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  6 Mar 2004 02:00:29 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat,  6 Mar 2004 02:00:52 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
