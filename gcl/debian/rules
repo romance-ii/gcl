@@ -24,8 +24,8 @@ MCC:=gcc
 #MCC:=gcc-3.2
 #endif
 
-#RELOC=locbfd
-RELOC?=statsysbfd
+RELOC=locbfd
+#RELOC?=statsysbfd
 ifeq ($(ARCHT),alpha)
 RELOC=dlopen
 endif
@@ -76,7 +76,7 @@ configure-%-stamp: $(CFGS)
 
 	dh_testdir
 
-	! [ -e unixport/saved_pre_gcl ] || $(MAKE) clean
+	! [ -e unixport/saved_pre_gcl ] || ( for i in o lsp cmpnew unixport pcl clcs ; do $(MAKE) -C $$i clean ; done )
 
 	chmod -R +x gmp3/*
 
@@ -125,7 +125,7 @@ ansi-tests/test_results: build-ansi-stamp
 	$(MAKE) $@
 
 build: build-stamp
-build-stamp: build-gprof-stamp build-ansi-gprof-stamp build-trad-stamp build-ansi-stamp ansi-tests/test_results
+build-stamp:  build-trad-stamp build-gprof-stamp build-ansi-gprof-stamp build-ansi-stamp ansi-tests/test_results
 	touch $@
 
 debian/control.rm:
@@ -271,7 +271,8 @@ binary-arch: build install #debian/substvars
 	dh_fixperms -a
 	dh_installdeb -a
 	dh_shlibdeps -a
-	dh_gencontrol -a -u"-Vgcc=$(MCC) -Vbinutils=binutils-dev(>=$(BVER)),binutils-dev(<=$(BVERB)-999)"
+	[ "$(RELOC)" != statsysbfd ] || dh_gencontrol -a -u"-Vgcc=$(MCC) -Vbinutils=binutils-dev(>=$(BVER)),binutils-dev(<=$(BVERB)-999)"
+	[ "$(RELOC)" = statsysbfd ] || dh_gencontrol -a -u"-Vgcc=$(MCC)"
 	dh_md5sums -a
 	dh_builddeb -a
 
