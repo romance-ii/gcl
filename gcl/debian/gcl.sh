@@ -1,6 +1,6 @@
 #!/bin/sh
 export C_INCLUDE_PATH=/fix/s/camm/gcl/h:$C_INCLUDE_PATH
-if [ "$ANSI_COMMON_LISP" != "" ] ; then
+if [ "$GCL_ANSI" != "" ] ; then
 exec /fix/s/camm/gcl/unixport/saved_ansi_gcl \
    -dir /fix/s/camm/gcl/unixport/ \
    -libdir /fix/s/camm/gcl/ \

@@ -150,7 +150,7 @@ gclean:
 	rm *stamp
 
 install: install-pre install-trad-stamp gclean install-ansi-stamp
-	cp debian/gcl.sh debian/gcl/usr/bin/
+	cp debian/gcl.sh debian/gcl/usr/bin/gcl
 	chmod 0755 debian/gcl/usr/bin/gcl
 
 # Build architecture-independent files here.
