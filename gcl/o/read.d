@@ -687,274 +687,253 @@ ENDUP:
 
 double pow();
 /*
-	Parse_number(s, end, ep, radix) parses C string s
-	up to (but not including) s[end]
-	using radix as the radix for the rational number.
-	(For floating numbers, radix should be 10.)
-	When parsing has been succeeded,
-	the index of the next character is assigned to *ep,
-	and the number is returned as a lisp data object.
-	If not, OBJNULL is returned.
+	Parse_number(s, end, ep, radix) parses C string s up to (but
+	not including) s[end] using radix as the radix for the
+	rational number.  (For floating numbers, radix should be 10.)
+	When parsing has been succeeded, the index of the next
+	character is assigned to *ep, and the number is returned as a
+	lisp data object.  If not, OBJNULL is returned.
 */
 static object
-parse_number(s, end, ep, radix)
-char *s;
-int end, *ep, radix;
-{
-	object x=Cnil;
-	fixnum sign;
-	object integer_part;
-	double fraction, fraction_unit, f;
-	char exponent_marker;
-	int exponent;
-	int i, j, k;
-	int d;
-	vs_mark;
+parse_number(char *s, int end, int *ep, int radix) {
 
-	if (s[end-1] == '.')
-		radix = 10;
-		/*
-			DIRTY CODE!!
-		*/
-BEGIN:
-	exponent_marker = 'E';
-	i = 0;
-	sign = 1;
-	if (s[i] == '+')
-		i++;
-	else if (s[i] == '-') {
-		sign = -1;
-		i++;
-	}
-	integer_part = (object)  big_register_0;
-	zero_big(big_register_0);
-	vs_push((object)integer_part);
-	if (i >= end)
-		goto NO_NUMBER;
-	if (s[i] == '.') {
-		if (radix != 10) {
-			radix = 10;
-			goto BEGIN;
-		}
-		i++;
-		goto FRACTION;
-	}
-	if ((d = digitp(s[i], radix)) < 0)
-		goto NO_NUMBER;
+  object x=Cnil;
+  fixnum sign;
+  object integer_part;
+  double fraction, fraction_unit, f;
+  char exponent_marker;
+  int exponent;
+  int i, j, k;
+  int d;
+  vs_mark;
+  
+ BEGIN:
+  exponent_marker = 'E';
+  i = 0;
+  sign = 1;
+  if (s[i] == '+')
+    i++;
+  else if (s[i] == '-') {
+    sign = -1;
+    i++;
+  }
+  integer_part = (object)  big_register_0;
+  zero_big(big_register_0);
+  vs_push((object)integer_part);
+  if (i >= end)
+    goto NO_NUMBER;
+  
 #define MOST_POSITIVE_FIX (((unsigned int) (~0) ) /2)
 #define TEN_EXPT_9 1000000000
+  
+  if (radix == 10 && TEN_EXPT_9 <MOST_POSITIVE_FIX ) {
+    
+    int chunk = 0;
+    int sum = 0;
+    
+    while (i < end && (d = digitp(s[i], radix)) >= 0) {    
+      sum = 10*sum+d;
+      chunk++;
+      if (chunk == 9) {
+	mul_int_big(1000000000, integer_part);
+	add_int_big(sum, integer_part);
+	chunk=0; sum=0;
+      } 
+      i++;
+    }
+    
+    if (chunk) {
+      
+      int fac=10;
+      
+      while(--chunk> 0) 
+	fac *=10;
+      
+      mul_int_big(fac,integer_part);
+      add_int_big(sum,integer_part);
+      
+    }
+    
+  } else 
+    
+    while (i < end && (d = digitp(s[i], radix)) >= 0) {
+      mul_int_big(radix, integer_part);
+      add_int_big(d, integer_part);
+      i++;
+    }
+  
+  if (i >= end)
+    goto MAKE_INTEGER;
+  if (s[i] == '/') {
+    i++;
+    goto DENOMINATOR;
+  }
 
-      if (radix == 10 && TEN_EXPT_9 <MOST_POSITIVE_FIX ) {
-        int chunk = 0;
-        int sum = 0;
-	do {    sum = 10*sum+d;
-                chunk++;
-                if (chunk == 9) {
-		mul_int_big(1000000000, integer_part);
-		add_int_big(sum, integer_part);
-                chunk=0; sum=0;
-            } 
-	     i++;
-	} while (i < end && (d = digitp(s[i], radix)) >= 0);
-        if (chunk) {
-          int fac=10;
-          while(--chunk> 0) {fac *=10;}
-          mul_int_big(fac,integer_part);
-          add_int_big(sum,integer_part);
-        }
-
-    } else {
-                
-        
-	do {
-		mul_int_big(radix, integer_part);
-		add_int_big(d, integer_part);
-		i++;
-	} while (i < end && (d = digitp(s[i], radix)) >= 0);
-     }
-
-
-	if (i >= end)
-		goto MAKE_INTEGER;
-	if (s[i] == '.') {
-		if (radix != 10) {
-			radix = 10;
-			goto BEGIN;
-		}
-		if (++i >= end)
-			goto MAKE_INTEGER;
-		else if (digitp(s[i], radix) >= 0)
-			goto FRACTION;
-		else if (is_exponent_marker(s[i])) {
-			fraction
-			= (double)sign * big_to_double(integer_part);
-			goto EXPONENT;
-		} else
-			goto MAKE_INTEGER;
-	}
-	if (s[i] == '/') {
-		i++;
-		goto DENOMINATOR;
-	}
-	if (is_exponent_marker(s[i])) {
-		fraction = (double)sign * big_to_double(integer_part);
-		goto EXPONENT;
-	}
-/*
-	goto NO_NUMBER;
-*/
-
-MAKE_INTEGER:
-	if (sign < 0 && signe(MP(integer_part)))
-		set_big_sign(integer_part,-1);
-	x = normalize_big_to_object(integer_part);
-/**/
-	if (x == big_register_0)
-		big_register_0 = alloc_object(t_bignum);
-	zero_big(big_register_0);
-
-/**/
-	goto END;
-
-FRACTION:
-/*
-	if (radix != 10)
-		goto NO_NUMBER;
-*/
-	radix = 10;
-	if ((d = digitp(s[i], radix)) < 0)
-		goto NO_NUMBER;
-	fraction = 0.0;
-	fraction_unit = 1000000000.0;
-	for (;;) {
-		k = j = 0;
-		do {
-			j = 10*j + d;
-			i++;
-			k++;
-			if (i < end)
-				d = digitp(s[i], radix);
-			else
-				break;
-		} while (k < 9 && d >= 0);
-		while (k++ < 9)
-			j *= 10;
-		fraction += ((double)j /fraction_unit);
-		if (i >= end || d < 0)
-			break;
-		fraction_unit *= 1000000000.0;
-	}
-	fraction += big_to_double(integer_part);
-	fraction *= (double)sign;
-	if (i >= end)
-		goto MAKE_FLOAT;
-	if (is_exponent_marker(s[i]))
-		goto EXPONENT;
-	goto MAKE_FLOAT;
-
-EXPONENT:
-/*
-	if (radix != 10)
-		goto NO_NUMBER;
-*/
-	radix = 10;
-	exponent_marker = s[i];
-	i++;
-	if (i >= end)
-		goto NO_NUMBER;
-	sign = 1;
-	if (s[i] == '+')
-		i++;
-	else if (s[i] == '-') {
-		sign = -1;
-		i++;
-	}
-	if (i >= end)
-		goto NO_NUMBER;
-	if ((d = digitp(s[i], radix)) < 0)
-		goto NO_NUMBER;
-	exponent = 0;
-	do {
-		exponent = 10 * exponent + d;
-		i++;
-	} while (i < end && (d = digitp(s[i], radix)) >= 0);
-	d = exponent;
-	f = 10.0;
-	/* Use pow because it is more accurate */
-	{ double po = pow(10.0,(double)(sign * d));
-          if (po == 0.0)
-            { fraction = fraction *pow(10.0,(double)(sign * (d-1)));
-               fraction /= 10.0;}  
-          else     
-        fraction = fraction * po;}
-
-MAKE_FLOAT:
+  if (radix!=10) 
+    for (j=i;j<end;j++)
+      if (s[j]=='.'|| is_exponent_marker(s[j])) {
+	radix=10;
+	goto BEGIN;
+      }
+  
+  if (s[i] == '.') {
+    if (++i >= end)
+      goto MAKE_INTEGER;
+    else if (digitp(s[i], radix) >= 0)
+      goto FRACTION;
+    else if (is_exponent_marker(s[i])) {
+      fraction
+	= (double)sign * big_to_double(integer_part);
+      goto EXPONENT;
+    } else
+      goto MAKE_INTEGER;
+  }
+  if (is_exponent_marker(s[i])) {
+    fraction = (double)sign * big_to_double(integer_part);
+    goto EXPONENT;
+  }
+  
+  /*
+    goto NO_NUMBER;
+  */
+  
+ MAKE_INTEGER:
+  if (sign < 0 && signe(MP(integer_part)))
+    set_big_sign(integer_part,-1);
+  x = normalize_big_to_object(integer_part);
+  if (x == big_register_0)
+    big_register_0 = alloc_object(t_bignum);
+  zero_big(big_register_0);
+  
+  goto END;
+  
+ FRACTION:
+  if (radix!=10)
+    FEerror("Parse_number radix error", 0);
+  if ((d = digitp(s[i], radix)) < 0)
+    goto NO_NUMBER;
+  fraction = 0.0;
+  fraction_unit = 1000000000.0;
+  for (;;) {
+    k = j = 0;
+    do {
+      j = 10*j + d;
+      i++;
+      k++;
+      if (i < end)
+	d = digitp(s[i], radix);
+      else
+	break;
+    } while (k < 9 && d >= 0);
+    while (k++ < 9)
+      j *= 10;
+    fraction += ((double)j /fraction_unit);
+    if (i >= end || d < 0)
+      break;
+    fraction_unit *= 1000000000.0;
+  }
+  fraction += big_to_double(integer_part);
+  fraction *= (double)sign;
+  if (i >= end)
+    goto MAKE_FLOAT;
+  if (is_exponent_marker(s[i]))
+    goto EXPONENT;
+  goto MAKE_FLOAT;
+  
+ EXPONENT:
+  if (radix!=10)
+    FEerror("Parse_number radix error", 0);
+  exponent_marker = s[i];
+  i++;
+  if (i >= end)
+    goto NO_NUMBER;
+  sign = 1;
+  if (s[i] == '+')
+    i++;
+  else if (s[i] == '-') {
+    sign = -1;
+    i++;
+  }
+  if (i >= end)
+    goto NO_NUMBER;
+  if ((d = digitp(s[i], radix)) < 0)
+    goto NO_NUMBER;
+  exponent = 0;
+  do {
+    exponent = 10 * exponent + d;
+    i++;
+  } while (i < end && (d = digitp(s[i], radix)) >= 0);
+  d = exponent;
+  f = 10.0;
+  /* Use pow because it is more accurate */
+  { double po = pow(10.0,(double)(sign * d));
+  if (po == 0.0)
+    { fraction = fraction *pow(10.0,(double)(sign * (d-1)));
+    fraction /= 10.0;}  
+  else     
+    fraction = fraction * po;}
+  
+ MAKE_FLOAT:
 #ifdef IEEEFLOAT
-/*	if ((*((int *)&fraction +HIND) & 0x7ff00000) == 0x7ff00000)*/
-	if (!ISFINITE(fraction))
-		FEerror("Floating-point overflow.", 0);
+  if (!ISFINITE(fraction))
+    FEerror("Floating-point overflow.", 0);
 #endif
-	switch (exponent_marker) {
+  switch (exponent_marker) {
+    
+  case 'e':  case 'E':
+    exponent_marker = READdefault_float_format;
+    goto MAKE_FLOAT;
+    
+  case 's':  case 'S':
+    x = make_shortfloat((shortfloat)fraction);
+    break;
+    
+  case 'f':  case 'F':  case 'd':  case 'D':  case 'l':  case 'L':
+    x = make_longfloat((longfloat)fraction);
+    break;
+    
+  case 'b':  case 'B':
+    goto NO_NUMBER;
+  }
 
-	case 'e':  case 'E':
-		exponent_marker = READdefault_float_format;
-		goto MAKE_FLOAT;
+  zero_big(big_register_0);
+  
+  goto END;
+  
+ DENOMINATOR:
+  if (sign < 0)
+    set_big_sign(integer_part,-1);
+  vs_push(normalize_big_to_object(integer_part));
 
-	case 's':  case 'S':
-		x = make_shortfloat((shortfloat)fraction);
-		break;
+  if (vs_head == big_register_0)
+    big_register_0 = new_bignum();
+  zero_big(big_register_0);
+  
+  if ((d = digitp(s[i], radix)) < 0)
+    goto NO_NUMBER;
+  integer_part = big_register_0;
+  /*	zero_big(integer_part); */
+  do {
+    mul_int_big(radix, integer_part);
+    add_int_big(d, integer_part);
+    i++;
+  } while (i < end && (d = digitp(s[i], radix)) >= 0);
+  vs_push(normalize_big_to_object(integer_part));
+  x = make_ratio(vs_top[-2], vs_top[-1]);
+  goto END;
+  
+ END:
+  *ep = i;
+  vs_reset;
+  return(x);
+  
+ NO_NUMBER:
+  *ep = i;
+  vs_reset;
+  zero_big(big_register_0);
+  
+  return(OBJNULL);
 
-	case 'f':  case 'F':  case 'd':  case 'D':  case 'l':  case 'L':
-		x = make_longfloat((longfloat)fraction);
-		break;
-
-	case 'b':  case 'B':
-		goto NO_NUMBER;
-	}
-/**/
-	zero_big(big_register_0);
-
-
-/**/
-	goto END;
-
-DENOMINATOR:
-	if (sign < 0)
-		set_big_sign(integer_part,-1);
-	vs_push(normalize_big_to_object(integer_part));
-/**/
-	if (vs_head == big_register_0)
-		big_register_0 = new_bignum();
-	zero_big(big_register_0);
-
-/**/
-	if ((d = digitp(s[i], radix)) < 0)
-		goto NO_NUMBER;
-	integer_part = big_register_0;
-	/*	zero_big(integer_part); */
-	do {
-		mul_int_big(radix, integer_part);
-		add_int_big(d, integer_part);
-		i++;
-	} while (i < end && (d = digitp(s[i], radix)) >= 0);
-	vs_push(normalize_big_to_object(integer_part));
-	x = make_ratio(vs_top[-2], vs_top[-1]);
-	goto END;
-
-END:
-	*ep = i;
-	vs_reset;
-	return(x);
-
-NO_NUMBER:
-	*ep = i;
-	vs_reset;
-/**/
-	zero_big(big_register_0);
-
-
- /**/
-	return(OBJNULL);
 }
 
 static object
