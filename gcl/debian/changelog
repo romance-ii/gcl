@@ -42,8 +42,13 @@ gcl (2.5.4-1) unstable; urgency=low
   * Small patch for fix xgcl demo (thanks  Michael Koehne)
   * Better bfd symbol table strategy
   * Fix bfd table symbol counting for combined_table profiling
+  * amd64 linux support
+  * O6 -> O3
+  * static linking on ia64 to work around current mechanism for runtime
+    generated function descriptors
+  * enable-static configure option
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 12 Aug 2003 01:33:22 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 21 Aug 2003 04:37:48 +0000
 
 gcl (2.5.3-2) unstable; urgency=low
 
