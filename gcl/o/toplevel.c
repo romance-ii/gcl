@@ -187,15 +187,19 @@ Fthe(object args)
 	eval(MMcadr(args));
 	args = MMcar(args);
 	if (type_of(args) == t_cons && MMcar(args) == sLvalues) {
-		vs = vs_base;
-		for (args=MMcdr(args); !endp(args); args=MMcdr(args), vs++){
-			if (vs >= vs_top)
-				FEerror("Too many return values.", 0);
-			if (ifuncall2(sLtypep, *vs, MMcar(args)) == Cnil)
-				FEwrong_type_argument(MMcar(args), *vs);
-		}
+	  vs = vs_base;
+	  for (args=MMcdr(args); !endp(args) && vs<vs_top; args=MMcdr(args), vs++)
+	    /*			{ if (vs >= vs_top)
+				FEerror("Too many return values.", 0);*/
+	    if (ifuncall2(sLtypep, *vs, MMcar(args)) == Cnil)
+	      FEwrong_type_argument(MMcar(args), *vs);
+	  /*}
 		if (vs < vs_top)
-			FEerror("Too few return values.", 0);
+			FEerror("Too few return values.", 0);*/
+	  for (args=MMcdr(args); !endp(args); args=MMcdr(args))
+	    if (ifuncall2(sLtypep, Cnil, MMcar(args)) == Cnil)
+	      FEwrong_type_argument(MMcar(args), Cnil);
+	  
 	} else {
 		if (ifuncall2(sLtypep, vs_base[0], args) == Cnil)
 			FEwrong_type_argument(args, vs_base[0]);
