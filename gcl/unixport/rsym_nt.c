@@ -1,8 +1,8 @@
 /* defining IN_SFASL gets us fopen_binary  */
+#define IN_RSYM
 
-/* #include "config.h" */
+#include "config.h"
 #include <stdio.h>
-
 #include "ext_sym.h"
 
 
