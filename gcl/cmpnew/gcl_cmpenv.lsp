@@ -26,6 +26,7 @@
 (defvar *compiler-push-events* nil)
 (defvar *speed* 3)
 (defvar *space* 0)
+(defvar *debug* 0)
 
 ;;; Only these flags are set by the user.
 ;;; If *safe-compile* is ON, some kind of run-time checks are not
@@ -321,6 +322,7 @@
                (not (<= 0 (cadr x) 3)))
            (warn "The OPTIMIZE proclamation ~s is illegal." x)
            (case (car x)
+		 (debug (setq *debug* (cadr x)))
                  (safety (setq *compiler-check-args* (>= (cadr x) 1))
                          (setq *safe-compile* (>= (cadr x) 2))
                          (setq *compiler-push-events* (>= (cadr x) 3)))
@@ -512,6 +514,8 @@
                          (not (<= 0 (cadr x) 3)))
                      (warn "The OPTIMIZE proclamation ~s is illegal." x)
                      (case (car x)
+			   (debug (setq *debug* (cadr x))
+				  (push (list 'debug (cadr x)) dl))
                            (safety
 			     (setq *safe-compile*
 				   (>= (the fixnum (cadr x)) 2))
@@ -575,9 +579,11 @@
         (*compiler-push-events* *compiler-push-events*)
         (*notinline* *notinline*)
         (*space* *space*)
+        (*debug* *debug*)
 	)
        (dolist** (decl decls)
          (case (car decl)
+               (debug (setq *debug* (cadr decl)))
                (safety
                 (let ((level (cadr decl)))
                      (declare (fixnum level))
@@ -627,6 +633,7 @@
                           (return nil)))
                  (space (unless (= (cadr x) *space*) (return nil)))
                  (speed (unless (= (cadr x) *speed*) (return nil)))
+                 (debug (unless (= (cadr x) *debug*) (return nil)))
                  (compilation-speed
                   (unless (= (- 3 (cadr x)) *speed*) (return nil)))
                  (t (warn "The OPTIMIZE quality ~s is unknown."

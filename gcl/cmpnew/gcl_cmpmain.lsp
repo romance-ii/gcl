@@ -685,12 +685,12 @@ SYSTEM_SPECIAL_INIT
 			 (namestring o-pathname)))))
 
 (defun print-compiler-info ()
-  (format t "~&OPTIMIZE levels: Safety=~d~:[ (No runtime error checking)~;~], Space=~d, Speed=~d~%"
+  (format t "~&OPTIMIZE levels: Safety=~d~:[ (No runtime error checking)~;~], Space=~d, Speed=~d, (Debug quality ignored)~%"
           (cond ((null *compiler-check-args*) 0)
                 ((null *safe-compile*) 1)
                 ((null *compiler-push-events*) 2)
                 (t 3))
-          *safe-compile* *space* *speed*))
+          *safe-compile* *space* *speed* *debug*))
 
 (defun nconc-files (a b)
   (let* ((n 256)

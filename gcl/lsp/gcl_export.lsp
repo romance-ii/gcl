@@ -278,6 +278,7 @@ optimize
 speed
 space
 safety
+debug
 compilation-speed
 declaration
 
