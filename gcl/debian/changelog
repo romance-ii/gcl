@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs-3) unstable; urgency=medium
+
+  * Build-depend on texi2html, Closes: #133699
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 13 Feb 2002 16:22:35 -0500
+
 gcl (2.5.0.cvs-2) unstable; urgency=medium
 
   * Put in versioned dependency on binutils for libbfd support, rebuilt
