@@ -375,7 +375,8 @@ fi
 if test -f /proc/sys/kernel/exec-shield ; then
 	exec_stat=`cat /proc/sys/kernel/exec-shield`
 	if test "$exec_stat" != "0" ; then
-		TCFLAGS="$TCFLAGS -Wa,--execstack"
+		# CFLAGS here to hopefully cover the DBEGIN routine below
+		CFLAGS="$CFLAGS -Wa,--execstack"
 	fi
 fi
 

@@ -66,8 +66,9 @@ gclcvs (2.7.0-16) unstable; urgency=low
   * Add -Wa,--execstack if on an exec-shield enabled system, can be
     explicitly added otherwise by setting the CFLAGS variable before the
     configure step, remove oldgmp configure option
+  * Better execstack flag handling in configure
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  2 Dec 2003 15:18:38 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue,  2 Dec 2003 15:44:33 +0000
 
 gclcvs (2.7.0-15) unstable; urgency=low
 
