@@ -33,6 +33,8 @@ MPDIR	= mp
 TESTDIR = ansi-tests
 #GMP_DIR = gmp3/
 
+VERSION=`cat majvers`.`cat minvers`
+
 all: $(BUILD_BFD) $(PORTDIR)/$(FLISP) command cmpnew/gcl_collectfn.o lsp/gcl_info.o do-gcl-tk do-info
 
 xgcl: $(PORTDIR)/saved_xgcl
@@ -156,13 +158,13 @@ install-command:
 	 echo 'PROMPT %promp$%'; \
 	 echo 'FOR %%c IN (CALL DEL) DO %%c %temp%.\setdir.bat'; \
 	 echo 'set cwd=%cd%'; \
-	 echo 'set libdir=%cd%\..\lib\gcl-2.5.0'; \
+	 echo 'set libdir=%cd%\..\lib\gcl-'$(VERSION); \
 	 echo 'set unixportdir=%libdir%\unixport'; \
 	 echo 'path %cd%\..\mingw\bin;%PATH%'; \
 	 echo "start %unixportdir%\saved_gcl.exe -dir %unixportdir% -libdir %libdir% -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9" ) > $(DESTDIR)$(prefix)/bin/gclm.bat ; fi
 	rm -f $(DESTDIR)$(prefix)/bin/gclfinal.bat
 	if gcc --version | grep -i mingw >/dev/null 2>&1 ; then (echo 'ECHO path %1\mingw\bin;%PATH% > gcli.bat'; \
-	 echo "ECHO start %1\lib\gcl-2.5.0\unixport\saved_gcl.exe -dir %1\lib\gcl-2.5.0\unixport -libdir %1\lib\gcl-2.5.0 -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9 >> gcli.bat" ) > $(DESTDIR)$(prefix)/bin/gclfinal.bat ; fi
+	 echo "ECHO start %1\lib\gcl-$(VERSION)\unixport\saved_gcl.exe -dir %1\lib\gcl-$(VERSION)\unixport -libdir %1\lib\gcl-$(VERSION) -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9 >> gcli.bat" ) > $(DESTDIR)$(prefix)/bin/gclfinal.bat ; fi
 
 install: 
 	$(MAKE) install1 "INSTALL_LIB_DIR=$(prefix)/lib/gcl-`cat majvers`.`cat minvers`" "prefix=$(prefix)" "DESTDIR=$(DESTDIR)"
