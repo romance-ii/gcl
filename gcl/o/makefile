@@ -147,9 +147,15 @@ grab_defs: grab_defs.c
 #	awk '/my_plt/ {next} {printf("extern void *%s;\n",$$1);}'>$@
 
 plt.h: plttest.o
-	nm $< | awk '/ U / {printf("MY_PLT(%s)\n",$$2)}' | sort | \
-		awk '{A[++k]=$$0} END {for (i=1;i<=k;i++) \
-			printf("%s%s\n",A[i],i==k ? "" : ",");}' >$@
+	nm $< | awk '/ U / {a=$$2;if (k) sub("^_","",a);\
+                            b=a;gsub("_","",b);\
+                            if (match(j,b)) printf("MY_PLT(%s)\n",a)}' \
+			j="$$(awk '/main/ {i=1;next} {if (!i) next} \
+				/^ *[a-zA-Z_]*\(/ {sub("\\(.*$$","",$$1);print $$1}' plttest.c)" \
+			k=$(LEADING_UNDERSCORE) |\
+			sort | \
+			awk '{A[++k]=$$0} END {for (i=1;i<=k;i++) \
+				printf("%s%s\n",A[i],i==k ? "" : ",");}' >$@
 
 plt.o: plt.c plt.h
 	$(CC) -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO) 

@@ -2,18 +2,21 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "include.h"
+
 /*  We try here to compile in function addresses to which it is known
     that the compiler will make *direct* reference.  20040308 CM */
 
 
-int main() {
+int
+main(int argc,char * argv[],char *envp[]) {
 
   FILE *f=NULL;
-  char ch;
+  char ch=0;
   jmp_buf env;
   double d=0.1;
 
-  ch=getc(f);
+  getc(f);
   putc(ch,f);
 
   setjmp(env);
@@ -30,9 +33,11 @@ int main() {
   sinh(d);
   tanh(d);
 
+#ifndef _WIN32
   acosh(d);
   asinh(d);
   atanh(d);
+#endif
 
   exp(d);
   log(d);

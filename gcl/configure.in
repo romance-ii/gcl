@@ -566,6 +566,21 @@ if test "$MP_INCLUDE" = "" ; then
 
 fi
 
+AC_MSG_CHECKING("for leading underscore in object symbols")
+cat>foo.c <<EOFF
+#include <math.h>
+int main() {double d=0.0;cos(d);return 0;}
+EOFF
+$CC -c foo.c -o foo.o
+if nm foo.o |grep " U " | grep "_cos" >/dev/null ; then
+	LEADING_UNDERSCORE=1
+	AC_MSG_RESULT("yes")
+else
+	LEADING_UNDERSCORE=""
+	AC_MSG_RESULT("no")
+fi
+rm -f foo.c foo.o
+
  AC_MSG_CHECKING("for size of gmp limbs")
  AC_TRY_RUN([#include <stdio.h>
 	#include "$MP_INCLUDE"
@@ -1563,6 +1578,7 @@ O2FLAGS=$TO2FLAGS
 AC_SUBST(O2FLAGS)
 
 AC_SUBST(EXTRA_LOBJS)
+AC_SUBST(LEADING_UNDERSCORE)
 if test -f h/$use.defs  ; then
 
   AC_SUBST(use)
