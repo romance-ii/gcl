@@ -1686,6 +1686,7 @@ def_statsysbfd="yes"
 def_custreloc="no"
 def_oldgmp="no"
 def_pic="no";
+def_static="no";
 case $use in
      *linux)
 	ln -snf linux.defs h/$use.defs;
@@ -1696,8 +1697,10 @@ case $use in
 			def_dlopen="yes" ; def_statsysbfd="no" ;;
 		mips*)
 			def_dlopen="yes" ; def_statsysbfd="no" ;;
+# def_static -- Function descriptors are currently realized at runtime in a non-reproducible fashion
+# on these architectures -- CM
 		ia64*)
-			def_dlopen="yes" ; def_statsysbfd="no" ;;
+			def_dlopen="yes" ; def_statsysbfd="no" ; def_static = "yes" ;;
 		hppa*)
 			def_dlopen="yes" ; def_statsysbfd="no" def_pic="yes" ;;
 #		m68k*)
@@ -1748,6 +1751,13 @@ if test "${enable_debug+set}" = set; then
 
 else
   enable_debug="no"
+fi;
+# Check whether --enable-static or --disable-static was given.
+if test "${enable_static+set}" = set; then
+  enableval="$enable_static"
+  enable_static=$enableval
+else
+  enable_static="$def_static"
 fi;
 # Check whether --enable-pic or --disable-pic was given.
 if test "${enable_pic+set}" = set; then
@@ -1811,6 +1821,10 @@ fi
 if test "$load_opt" != "1" ; then
 	echo "Exactly one loader option must be chosen: dlopen=$enable_dlopen statsysbfd=$enable_statsysbfd dynsysbfd=$enable_dynsysbfd locbfd=$enable_locbfd custreloc=$enable_custreloc"
 	exit 1
+fi
+
+if test "$enable_static" = "yes" ; then
+   TLIBS="-static $TLIBS";
 fi
 
 ## finally warn if we did not find a recognized machine.s
@@ -3006,6 +3020,8 @@ test -n "$AWK" || AWK=""""
 case $use in
      *linux)
 	case $use in
+		amd64*)
+			TCFLAGS="$TCFLAGS -m64";;
 		alpha*)
 			TCFLAGS="$TCFLAGS -mieee";;
 #		m68k*)
