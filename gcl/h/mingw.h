@@ -6,11 +6,10 @@ FILE *fopen_binary(char *name,char *mode);
 
 #define MP386
 #define WINDOWSNT
-#define MINGW
 #define GCL
 
 /* #define filehdr _IMAGE_FILE_HEADER */
-/* #define RUN_PROCESS */
+/* #define RUN_PROCESS*/
 
 #define f_symptr PointerToSymbolTable
 #define f_nsyms NumberOfSymbols
@@ -71,7 +70,6 @@ extern unsigned int _stacktop, _stackbottom, _dbegin;
 
 /* the result of 'getenv' is malloc'd */
 #define FREE_GETENV_RESULT
-#define OUR_NSOCKET "winnsocket.c"
 
 #define SIGBUS		 7
 #ifndef SIGKILL
