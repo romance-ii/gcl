@@ -25,7 +25,7 @@
 (in-package 'lisp)
 
 
-(export '(make-array vector
+(export '(make-array array-displacement vector
           array-element-type array-rank array-dimension
           array-dimensions
           array-in-bounds-p array-row-major-index
@@ -64,6 +64,10 @@
 			  (return v))))
 	       t))))
 	 
+(defun array-displacement (array)
+  (let ((x (si:array-displacement1 array)))
+  (values (car x) (cdr x)))
+  )
 
 (defun make-array (dimensions
 		   &key (element-type t)

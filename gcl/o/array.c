@@ -555,7 +555,7 @@ DEFUN("MAKE-ARRAY1",object,fSmake_array1,SI,6,6,
 (defun array-displacement1 ( array )
 */
 
-DEFUNO("ARRAY-DISPLACEMENT",object,fSarray_displacement,SI,1,1,
+DEFUNO("ARRAY-DISPLACEMENT1",object,fSarray_displacement,SI,1,1,
       NONE,OO,OO,OO,OO,siLarray_displacement,"")
      (object array) {
 
