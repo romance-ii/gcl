@@ -28,328 +28,296 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <unistd.h>
 #include <string.h>
 
-static void
-init_main(void);
-
-static void
-initlisp(void);
-
-static int
-multiply_stacks(int);
+static void init_main(void);
+static void initlisp(void);
+static int  multiply_stacks(int);
+void install_segmentation_catcher(void);
 
 #define IN_MAIN
 
 #ifdef KCLOVM
-#include <ovm/ovm.h>
+#  include <ovm/ovm.h>
 void change_contexts();
 int ovm_process_created; 
 void initialize_process();
 #endif
 
 #include "include.h"
+
 #ifdef UNIX
-#include <signal.h>
-
-
+#  include <signal.h>
 #endif
+
 #include "page.h"
 
-bool saving_system ;
-
 #ifdef BSD
-#include <sys/time.h>
-#ifndef SGI
-#include <sys/resource.h>
-#endif
-#endif
-
-#ifdef AOSVS
-
+#  include <sys/time.h>
+#  ifndef SGI
+#    include <sys/resource.h>
+#  endif
 #endif
 
 #ifdef _WIN32
-#include <fcntl.h>
+#  include <fcntl.h>
 #endif
 
 #define LISP_IMPLEMENTATION_VERSION "April 1994"
-
-char *system_directory;
-
-int page_multiple=1;
-
 
 #define EXTRA_BUFSIZE 8
 char stdin_buf[BUFSIZ + EXTRA_BUFSIZE];
 char stdout_buf[BUFSIZ + EXTRA_BUFSIZE];
 
-int debug;			/* debug switch */
-int initflag = FALSE;		/* initialized flag */
+char *system_directory   = NULL;
+int page_multiple        = 1;
 
-long real_maxpage;
-object sSAlisp_maxpagesA;
+int    debug             = FALSE;		/* debug switch */
+int    initflag          = FALSE;		/* initialized flag */
 
-object siClisp_pagesize;
-
-object sStop_level;
-
-
-object sSAmultiply_stacksA;
-int stack_multiple=1;
-static object stack_space;
+int    stack_multiple    = 1;
+int    cssize            = 0;
 
 #ifdef _WIN32
-unsigned int _dbegin = 0x10100000;
+unsigned int _dbegin     = 0x10100000;
+#  ifndef AV
 unsigned int _stacktop, _stackbottom;
+#  endif
 #endif
 
-int cssize;
+extern bool saving_system;
+extern long real_maxpage;
+extern int sgc_enabled;
 
-int sgc_enabled;
-void install_segmentation_catcher(void);
+
+object sSAlisp_maxpagesA;
+object siClisp_pagesize;
+object sStop_level;
+object sSAmultiply_stacksA;
+
+static object stack_space;
 
 #ifndef SIG_STACK_SIZE
-#define SIG_STACK_SIZE 1000
+#  define SIG_STACK_SIZE 1000
 #endif
+
 #ifndef SETUP_SIG_STACK
-#if defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC)
-        struct sigstack estack;
-#endif
+#  if defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC)
+      struct sigstack estack;
+#  endif
 #endif
 
 int
 main(int argc, char **argv, char **envp) {
-#ifdef BSD
-#ifdef RLIMIT_STACK
-	struct rlimit rl;
-#endif
+#if defined ( BSD ) && defined ( RLIMIT_STACK )
+    struct rlimit rl;
 #endif
 
 #ifdef RECREATE_HEAP
-	RECREATE_HEAP
+    RECREATE_HEAP
 #endif
 	
-#ifdef _WIN32
-	  {
-	    unsigned int dummy;
+#if defined ( _WIN32 ) && !defined ( AV )
+    {
+        unsigned int dummy;
 	    
-	    _stackbottom = (unsigned int ) &dummy;
-	    _stacktop    = _stackbottom - 0x10000; // ???
+        _stackbottom = (unsigned int ) &argc;
+        _stacktop    = _stackbottom - CSSIZE; // ???
 
-	  }
+    }
 #endif
-        setbuf(stdin, stdin_buf); 
-	setbuf(stdout, stdout_buf);
+    setbuf(stdin, stdin_buf); 
+    setbuf(stdout, stdout_buf);
 #ifdef _WIN32
-	_fmode = _O_BINARY;
+    _fmode = _O_BINARY;
 #endif
-	ARGC = argc;
-	ARGV = argv;
+    ARGC = argc;
+    ARGV = argv;
 #ifdef UNIX
-	ENVP = envp;
-#endif
-
-#ifdef UNIX
-/*
-	if (argv[0][0] != '/')
-		error("can't get the program name");
-*/
-	kcl_self = argv[0];
+    ENVP = envp;
+    kcl_self = argv[0];
 #ifdef FIX_FILENAME
-	{ int n = strlen(kcl_self);
-	 FIX_FILENAME(Cnil,kcl_self);
-	 if (strlen(kcl_self)> n) error("name grew");
-	}
+    {
+        int n = strlen ( kcl_self );
+        FIX_FILENAME ( Cnil, kcl_self );
+        if ( strlen ( kcl_self ) > n ) {
+            error ( "name grew" );
+        }
+    }
 #endif	
-	if (!initflag) {
+    if ( !initflag ) {
+        /* An uninitialised system eg raw_gcl */
+        if ( argc < 2 ) {
+            /* Provide the current directory as a default */
+            system_directory = (char *) malloc ( strlen ( "./" ) + 3 );
+            strcpy ( system_directory, "./" );
+        } else {
+            int lastchar = strlen ( argv[1] ) - 1;
+            /* Squirrel away the system directory provided as argv[1] */
+            system_directory = (char *) malloc ( strlen ( argv[1] ) + 3 );
+            strcpy ( system_directory, argv[1] );
+            if ( system_directory[0] != '/' ) {
+                strcpy ( system_directory, "./" );
+            } else {
+                int j;
+                for ( j = strlen ( system_directory ); system_directory[j-1] != '/'; --j );
+                system_directory[j] = '\0';
+            }
+            
+            if ( argv[1][lastchar] != '/') {
+                error ( "Can't get the system directory." );
+            }
+            strcpy ( system_directory, argv[1] );
+        }
+    }
+#else  /* UNIX */
+    if (!initflag && argc > 1) {
+        error("can't get the system directory");
+        strcpy(system_directory, argv[1]);
+    }
+#endif /* UNIX */
+    GBC_enable = FALSE;
 
-		system_directory= (char *) malloc(strlen(argv[1])+3);
-					
-		strcpy(system_directory, argv[1]);
-		if (system_directory[0] != '/')
-			strcpy(system_directory, "./");
-		else {
-			int j;
-
-			for (j = strlen(system_directory);
-                             system_directory[j-1] != '/';  --j)
-				;
-			system_directory[j] = '\0';
-		}
-	}
-
-#endif
-#ifdef AOSVS
-
-
-
-
-
-
-
-
-
-
-
-
-#endif
-
-	if (!initflag && argc > 1) {
-#ifdef UNIX
-		if (argv[1][strlen(argv[1])-1] != '/')
-#endif
-#ifdef AOSVS
-
-#endif
-			error("can't get the system directory");
-		strcpy(system_directory, argv[1]);
-	}
-
-	GBC_enable = FALSE;
-
-	/* if stack_space not zero we have grown the stack space */
-	if (stack_space == 0)
-	  {
-	    vs_org = value_stack;
-	    vs_limit = &vs_org[VSSIZE];
-	    frs_org = frame_stack;
-	    frs_limit = &frs_org[FRSSIZE];
-	    bds_org = bind_stack;
-	    bds_limit = &bds_org[BDSSIZE];
+    /* if stack_space not zero we have grown the stack space */
+    if ( stack_space == 0 ) {
+        vs_org = value_stack;
+        vs_limit = &vs_org[VSSIZE];
+        frs_org = frame_stack;
+        frs_limit = &frs_org[FRSSIZE];
+        bds_org = bind_stack;
+        bds_limit = &bds_org[BDSSIZE];
 #ifdef KCLOVM
-	    bds_save_org = save_bind_stack;
-	    bds_save_top = bds_save_org - 1;
-	    bds_save_limit = &bds_save_org[BDSSIZE];
+        bds_save_org = save_bind_stack;
+        bds_save_top = bds_save_org - 1;
+        bds_save_limit = &bds_save_org[BDSSIZE];
 #endif
-	    ihs_org = ihs_stack;
-	    ihs_limit = &ihs_org[IHSSIZE];}
+        ihs_org = ihs_stack;
+        ihs_limit = &ihs_org[IHSSIZE];
+    }
 
-	vs_top = vs_base = vs_org;
-	clear_stack(vs_top,vs_top+200);
-	ihs_top = ihs_org-1;
-	bds_top = bds_org-1;
-	frs_top = frs_org-1;
-	cs_org = &argc;
-
-	cssize = CSSIZE;
-	install_segmentation_catcher();
+    vs_top = vs_base = vs_org;
+    clear_stack ( vs_top, vs_top+200 );
+    ihs_top = ihs_org-1;
+    bds_top = bds_org-1;
+    frs_top = frs_org-1;
+    cs_org = &argc;
+    cssize = CSSIZE;
+    install_segmentation_catcher();
 
 #ifdef BSD
-#ifndef MAX_STACK_SIZE
-#define MAX_STACK_SIZE (1<<23) /* 8Mb */
-#endif
-#ifdef RLIMIT_STACK
-	getrlimit(RLIMIT_STACK, &rl);
-        if (rl.rlim_cur == RLIM_INFINITY || 
-	    rl.rlim_cur > MAX_STACK_SIZE)
-	  rl.rlim_cur=MAX_STACK_SIZE;
-	cssize = rl.rlim_cur/4 - 4*CSGETA;
-#endif	
-#endif
+#  ifndef MAX_STACK_SIZE
+#    define MAX_STACK_SIZE (1<<23) /* 8Mb */
+#  endif
+#  ifdef RLIMIT_STACK
+    getrlimit(RLIMIT_STACK, &rl);
+    if (rl.rlim_cur == RLIM_INFINITY || 
+         rl.rlim_cur > MAX_STACK_SIZE)
+        rl.rlim_cur=MAX_STACK_SIZE;
+    cssize = rl.rlim_cur/4 - 4*CSGETA;
+#  endif	
+#endif /* BSD */
 
 #ifdef AV
-	cs_limit = cs_org - cssize;
+    cs_limit = cs_org - cssize;
 #endif
-#ifdef MV
 
-#endif
-        
-	set_maxpage();
+    set_maxpage();
+
 #ifdef SETUP_SIG_STACK
-	SETUP_SIG_STACK
+    SETUP_SIG_STACK
 #else
-#if defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC)
-	  {
-	    /* make sure the stack is 8 byte aligned */
-#ifdef SETJMP_ONE_DIRECTION
-	    static
-#endif
+
+#  if defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC)
+    {
+        /* make sure the stack is 8 byte aligned */
+#    ifdef SETJMP_ONE_DIRECTION
+        static
+#    endif /* SETUP_SIG_STACK */
 	    double estack_buf[SIG_STACK_SIZE];
 	    
-	    bzero(estack_buf,sizeof(estack_buf));
-	    estack.ss_sp = (char *) &estack_buf[SIG_STACK_SIZE-1];
-	    estack.ss_onstack=0;
-	    sigstack(&estack,0);
-	  }
-#endif	
-#endif	
+        bzero(estack_buf,sizeof(estack_buf));
+        estack.ss_sp = (char *) &estack_buf[SIG_STACK_SIZE-1];
+        estack.ss_onstack=0;
+        sigstack(&estack,0);
+    }
+#  endif /* defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC) */
+
+#endif /* SETUP_SIG_STACK */	
 	
-
-	if (initflag) {
-		if (saving_system) {
-			saving_system = FALSE;
-			terminal_io->sm.sm_object0->sm.sm_fp = stdin;
-			terminal_io->sm.sm_object1->sm.sm_fp = stdout;
-			init_big1();
+    if (initflag) {
+        if (saving_system) {
+            saving_system = FALSE;
+            terminal_io->sm.sm_object0->sm.sm_fp = stdin;
+            terminal_io->sm.sm_object1->sm.sm_fp = stdout;
+            init_big1();
 #ifdef INIT_CORE_END
-			INIT_CORE_END
+            INIT_CORE_END
 #endif			  
-			alloc_page(-(holepage + nrbpage));
-		}
+                alloc_page(-(holepage + nrbpage));
+        }
 
-		initflag = FALSE;
-		GBC_enable = TRUE;
-		vs_base = vs_top;
-		ihs_push(Cnil);
-		lex_new();
-		vs_base = vs_top;
+        initflag = FALSE;
+        GBC_enable = TRUE;
+        vs_base = vs_top;
+        ihs_push(Cnil);
+        lex_new();
+        vs_base = vs_top;
 
-		interrupt_enable = TRUE;
-		install_default_signals();
+        interrupt_enable = TRUE;
+        install_default_signals();
 
-		sSAlisp_maxpagesA->s.s_dbind = make_fixnum(real_maxpage);
-		initflag = TRUE;
+        sSAlisp_maxpagesA->s.s_dbind = make_fixnum(real_maxpage);
+        initflag = TRUE;
 #ifdef KCLOVM
-		ovm_user_context_change = change_contexts;
-		ovm_user_context_initialize = initialize_process;
+        ovm_user_context_change = change_contexts;
+        ovm_user_context_initialize = initialize_process;
 
-		v_init_processes();
-		ovm_process_created = 1;
+        v_init_processes();
+        ovm_process_created = 1;
 #endif
 #ifdef HAVE_READLINE
-		init_readline_function();
+        init_readline_function();
 #endif
-	      again:
-		super_funcall(sStop_level);
-		if (type_of(sSAmultiply_stacksA->s.s_dbind)==t_fixnum) {
-                    multiply_stacks(fix(sSAmultiply_stacksA->s.s_dbind));
-                    goto  again;
-                }
-                    
+    again:
+        super_funcall(sStop_level);
+        if (type_of(sSAmultiply_stacksA->s.s_dbind)==t_fixnum) {
+            multiply_stacks(fix(sSAmultiply_stacksA->s.s_dbind));
+            goto  again;
+        }
+        
 #ifdef USE_DLOPEN
  	unlink_loaded_files();
 #endif			
 
-		exit(0);
-	}
+        exit(0);
+    }
 
-	printf("GCL (GNU Common Lisp)  %s  %d pages\n",
-	       LISP_IMPLEMENTATION_VERSION,
-	       MAXPAGE);
-	fflush(stdout);
+    printf("GCL (GNU Common Lisp)  %s  %d pages\n",
+            LISP_IMPLEMENTATION_VERSION,
+            MAXPAGE);
+    fflush(stdout);
 
-	initlisp();
+    initlisp();
 
-	vs_base = vs_top;
-	ihs_push(Cnil);
-	lex_new();
+    vs_base = vs_top;
+    ihs_push(Cnil);
+    lex_new();
 
-	GBC_enable = TRUE;
+    GBC_enable = TRUE;
 
-	CMPtemp = CMPtemp1 = CMPtemp2 = CMPtemp3 = OBJNULL;
+    CMPtemp = CMPtemp1 = CMPtemp2 = CMPtemp3 = OBJNULL;
 
-	init_init();
+    init_init();
 
-	sLApackageA->s.s_dbind = user_package;
+    sLApackageA->s.s_dbind = user_package;
 
-	lex_new();
-	vs_base = vs_top;
-	initflag = TRUE;
+    lex_new();
+    vs_base = vs_top;
+    initflag = TRUE;
 
-	interrupt_enable = TRUE;
+    interrupt_enable = TRUE;
 
-	super_funcall(sStop_level);
+    super_funcall(sStop_level);
 
-	return 0;
+    return 0;
 
 }
 
@@ -357,11 +325,11 @@ main(int argc, char **argv, char **envp) {
 void install_segmentation_catcher(void)
 {
 #ifdef INSTALL_SEGMENTATION_CATCHER
-  INSTALL_SEGMENTATION_CATCHER;
+   INSTALL_SEGMENTATION_CATCHER;
 #else
-#ifdef SIGSEGV
+#  ifdef SIGSEGV
        (void) gcl_signal(SIGSEGV,segmentation_catcher);
-#endif
+#  endif
 #endif
 }
 
@@ -373,13 +341,12 @@ error(char *s)
         catch_fatal = -1;
         if ( sgc_enabled ) {
             sgc_quit();
-        }
-        if ( sgc_enabled == 0 ) {
+        } else {
 	    install_segmentation_catcher();
         }
         FEerror("Caught fatal error [memory may be damaged]",0);
     }
-    printf("\nUnrecoverable error: %s.\n", s);
+    printf ( "\nUnrecoverable error: %s.\n", s );
     fflush(stdout);
 #ifdef UNIX
     abort();
@@ -388,9 +355,7 @@ error(char *s)
 
 static void
 initlisp(void) {
-
-	int j;
-
+        int j;
 	if (NULL_OR_ON_C_STACK(&j) == 0
 	    || NULL_OR_ON_C_STACK(Cnil) != 0
 	    || (((unsigned long )core_end) !=0
@@ -398,7 +363,8 @@ initlisp(void) {
 	  { /* check person has correct definition of above */
 	    error("NULL_OR_ON_C_STACK macro invalid");
 	  }
-	init_alloc();
+
+        init_alloc();
 
 	Dotnil_body.t = (short)t_symbol;
 	Dotnil_body.s_dbind = Dotnil;
@@ -476,16 +442,16 @@ initlisp(void) {
 	init_GBC();
 
 #if defined ( UNIX ) || defined ( __MINGW32__ )
-#ifndef DGUX
+#  ifndef DGUX
 	init_unixfasl();
 	init_unixsys();
 	init_unixsave();
-#else
+#  else
 
 
 
-#endif
-#endif
+#  endif
+#endif /* defined ( UNIX ) || defined ( __MINGW32__ ) */
 
 	init_alloc_function();
 	init_array_function();
@@ -591,26 +557,6 @@ segmentation_catcher(int i) {
   error("Segmentation violation.");
 }
 
-/* static void */
-/* cs_overflow(void) { */
-/* #ifdef AV */
-/* 	if (cs_limit < cs_org - cssize) */
-/* 		error("control stack overflow"); */
-/* 	cs_limit -= CSGETA; */
-/* #endif */
-/* #ifdef MV */
-
-
-
-/* #endif */
-/* 	FEerror("Control stack overflow.", 0); */
-/* } */
-
-/* static void */
-/* end_of_file(void) { */
-/* 	error("end of file"); */
-/* } */
-
 DEFUNO_NEW("BYE",object,fLbye,LISP
        ,0,1,NONE,OI,OO,OO,OO,void,Lby,(fixnum exitc),"")
 {	int n=VFUN_NARGS;
@@ -618,7 +564,6 @@ DEFUNO_NEW("BYE",object,fLbye,LISP
 	if (n>=1) exit_code=exitc;else exit_code=0;
 
 #ifdef UNIX
-/*	printf("Bye.\n"); */
 	exit(exit_code);
 #else
 	RETURN(1,int,exit_code, 0); 
@@ -634,13 +579,6 @@ DEFUN_NEW("EXIT",object,fLexit,LISP
        ,0,1,NONE,OI,OO,OO,OO,(fixnum exitc),"")
 {	return fLbye(exitc); }
  
-
-/*  c_trace(void) */
-/*  { */
-/*  #ifdef AOSVS */
-
-/*  #endif */
-/*  } */
 
 static void
 siLargc(void) {
@@ -681,14 +619,13 @@ siLgetenv(void) {
     {vs_base[0] = make_simple_string(value);
 #ifdef FREE_GETENV_RESULT
     free(value);
-    
 #endif		
     }
   else
     vs_base[0] = Cnil;
 
 }
-#endif
+#endif /* UNIX */
 
 object *vs_marker;
 
@@ -929,27 +866,31 @@ init_main(void) {
 			 make_cons(make_ordinary("KCL"), Cnil));
   ADD_FEATURE("AKCL");
   ADD_FEATURE("GCL");
+
 #ifdef BROKEN_O4_OPT
   ADD_FEATURE("BROKEN_O4_OPT");
 #endif
+
 #ifdef GMP
   ADD_FEATURE("GMP");
 #endif	 
   
-#ifdef UNIX
-#ifndef _WIN32	 
+#if defined ( UNIX ) && !defined ( _WIN32 )
   ADD_FEATURE("UNIX");
-#endif	
 #endif
+   
 #ifdef IEEEFLOAT
   ADD_FEATURE("IEEE-FLOATING-POINT");
 #endif
+
 #ifdef SGC
   ADD_FEATURE("SGC");
 #endif	 
+
 #ifdef  ADDITIONAL_FEATURES
   ADDITIONAL_FEATURES;
 #endif
+
 #ifdef  BSD
   ADD_FEATURE("BSD");
 #endif
@@ -974,9 +915,7 @@ init_main(void) {
 	 && ((-Seven)/ (-Three)) == 2)
       { ADD_FEATURE("TRUNCATE_USE_C");
       }  }
-#endif	 
-  
-  
+#endif /* PECULIAR_MACHINE */
   
   make_special("*FEATURES*",features);}
   
