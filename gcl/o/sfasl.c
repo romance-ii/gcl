@@ -111,12 +111,12 @@ void describe_sym1 ( int n, int aux_to_go )
         }
     }
     if ( aux_to_go > 0 ) {
-        fprintf ( stderr,"    symbol_table[%3d] (%8x): auxiliary entry (%d to go)\n", n, &symbol_table[n], aux_to_go - 1 );
+        fprintf ( stderr," symbol_table[%3d] (%8x): auxiliary entry (%d to go)\n", n, &symbol_table[n], aux_to_go - 1 );
     } else {
         if ( sym->n_zeroes == 0 ) {
             fprintf ( stderr,
                       "symbol_table[%3d] (%8x) (%22s): "
-                      "n_offset %d, n_value %d, n_scnum %d, n_type %d, "
+                      "n_offset %x, n_value %x, n_scnum %d, n_type %d, "
                       "n_sclass %d, n_numaux %d\n",
                       n,
                       &symbol_table[n],
@@ -130,7 +130,7 @@ void describe_sym1 ( int n, int aux_to_go )
         } else {
             fprintf ( stderr,
                       "symbol_table[%3d] (%8x) (%22s): "
-                      "n_value %d, n_scnum %d, n_type %d, "
+                      "n_value %x, n_scnum %d, n_type %d, "
                       "n_sclass %d, n_numaux %d\n",
                       n,
                       &symbol_table[n],
@@ -258,7 +258,7 @@ int fasload ( object faslfile )
 
 #ifdef READ_IN_STRING_TABLE
     my_string_table=READ_IN_STRING_TABLE(fp,string_size);
-#else  
+#else 
 #  ifdef MUST_SEEK_TO_STROFF
     fseek(fp,N_STROFF(fileheader),0);
 #  endif	
@@ -277,25 +277,6 @@ int fasload ( object faslfile )
             FEerror ( "Could not read whole string table", 0, 0 );
 	}
 #endif
-#ifdef DEBUG
-        /* Output the symbol table for debugging.
-         * 
-         * Must do this after the string table has been read,
-         * rather than while reading in the symbol table as
-         * done previously. */
-        aux_to_go = 0;
-	for (i = 0;  i < nsyms;  i++) {
-            if ( aux_to_go <= 0 ) {
-                aux_to_go = symbol_table[i].n_numaux;
-            }
-	    if ( debug ) {
-                describe_sym ( i, aux_to_go );
-            }
-            if ( aux_to_go > 0 ) {
-                aux_to_go--;
-            }
-        }
-#endif
         
 #ifdef SEEK_TO_END_OFILE
         SEEK_TO_END_OFILE(fp);	
@@ -308,6 +289,9 @@ int fasload ( object faslfile )
 	fasl_vector_start=ftell(fp);
 
         if ( ! ( (c_table.ptable) && *(c_table.ptable) ) ) {
+#ifdef DEBUG            
+            fprintf ( stderr, "About to build symbol table.\n" );
+#endif            
             build_symbol_table();
         }
 
@@ -349,7 +333,13 @@ int fasload ( object faslfile )
         /* relocate the actual loaded text  */
 
         dprintf(" the_start (%x)\n", the_start);
-
+#ifdef DEBUG        
+        fprintf ( stderr,
+                  "fasload %s: memory->cfd.cfd_start %x,  memory->cfd.cfd_start +  memory->cfd.cfd_size %x\n",
+                  filename,
+                  memory->cfd.cfd_start,
+                  memory->cfd.cfd_start +  memory->cfd.cfd_size );
+#endif        
 	/* record which symbols are used */
         
 #ifdef SYM_USED
@@ -391,6 +381,7 @@ int fasload ( object faslfile )
             }
         }
 #endif
+        
 #ifdef BSD
         fseek(fp,N_RELOFF(fileheader),0);
 	{
@@ -422,6 +413,26 @@ int fasload ( object faslfile )
         dprintf(" invoking init function at %x", start_address);
         dprintf(" textsize is %x",textsize);
         dprintf(" datasize is %x\n",datasize);
+
+#ifdef DEBUG
+        /* Output the symbol table for debugging.
+         * 
+         * Must do this after the string table has been read,
+         * rather than while reading in the symbol table as
+         * done previously. */
+        aux_to_go = 0;
+	for (i = 0;  i < nsyms;  i++) {
+            if ( aux_to_go <= 0 ) {
+                aux_to_go = symbol_table[i].n_numaux;
+            }
+	    if ( debug ) {
+                describe_sym ( i, aux_to_go );
+            }
+            if ( aux_to_go > 0 ) {
+                aux_to_go--;
+            }
+        }
+#endif
 
         /* read in the fasl vector */
 	fseek(fp,fasl_vector_start,0);
@@ -617,8 +628,21 @@ void relocate_symbols ( unsigned int length )
 #endif /* _WIN32 */
 #endif /* COFF */
             str=SYM_NAME(sym);
-            dprintf(" for sym %s \n",str);
-            dprintf(" new value will be start %x\n", start_address);
+#ifdef DEBUG
+            fprintf ( stderr, "relocate_symbols: type %x ", typ );
+            switch ( typ )
+            case TEXT_NSCN: {
+                fprintf ( stderr, "(TEXT_NSCN)");
+                break;
+            case DATA_NSCN:
+                fprintf ( stderr, "(DATA_NSCN)");
+                break;
+            case BSS_NSCN:
+                fprintf ( stderr, "(BSS_NSCN)");
+                break;
+            }
+            fprintf ( stderr, " new value will be start %x for sym %s,  \n", start_address, str );
+#endif            
 #ifdef AIX3 
             if ( N_SECTION(sym) == DATA_NSCN
                  && NUM_AUX(sym) 
@@ -629,15 +653,15 @@ void relocate_symbols ( unsigned int length )
             break;
         case  N_UNDEF:
             str=SYM_NAME(sym);
-            dprintf(" undef symbol %s \n",str);	
-            dprintf(" symbol diff %d \n", sym - symbol_table);
+            dprintf("relocate_symbols: N_UNDEF symbol %s \n", str);	
+            dprintf("relocate_symbols:    symbol diff %d \n", sym - symbol_table);
             describe_sym ( sym-symbol_table, 0 );
             set_symbol_address(sym,str);
             describe_sym ( sym-symbol_table, 0 );
             break;
         default:
 #ifdef COFF
-            dprintf("am ignoring a scnum %d\n",(sym->n_scnum));
+            dprintf("relocate_symbols: am ignoring a scnum %d\n",(sym->n_scnum));
 #endif
             break;
         }
@@ -666,7 +690,7 @@ void set_symbol_address ( struct syment *sym, char *string )
 {
     struct node *answ;
     if ( c_table.ptable ) {
-        dprintf("string %s\n", string);
+        dprintf("set_symbol_address: string %s\n", string);
         answ = find_sym(sym,string);
         dprintf("answ %d \n", (answ ? answ->address : -1) );
         if ( answ ) {

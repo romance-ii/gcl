@@ -14,6 +14,23 @@ Fast linking method for kcl by W. Schelter University of Texas
 #define DO_FUNLINK_DEBUG
 #endif
 
+#ifdef DO_FUNLINK_DEBUG
+void print_lisp_string ( char *boilerplate, object s )
+{
+    if ( s && s->st.s_fillp && s->st.st_self ) {
+        int last = s->st.s_fillp;
+        int i;
+        fprintf ( stderr, "%s", boilerplate ); 
+        for (i = 0;  (i < last) && (i < 30);  i++) {
+            fputc ( s->st.st_self[i], stderr );
+        }
+        fputc ( '\n', stderr );
+    } else {
+        fprintf ( stderr, "Object %x not a string or empty\n", s );
+    }
+}
+#endif
+
 static int
 clean_link_array(object *,object *);
 
@@ -33,12 +50,13 @@ call_or_link(object sym, void **link )
     object fun;
     fun = sym->s.s_gfdef;
 #ifdef DO_FUNLINK_DEBUG
-    fprintf ( stderr, "call_or_link: fun %x START\n", fun );
+    fprintf ( stderr, "call_or_link: fun %x START for function ", fun );
+    print_lisp_string ( "name: ", fun->cf.cf_name );
 #endif 
     if (fun == OBJNULL) {
         FEinvalid_function(sym);
 #ifdef DO_FUNLINK_DEBUG
-        fprintf ( stderr, "call_or_link: fun %x ERROR END\n", fun );
+        fprintf ( stderr, "call_or_link: fun %x Invalid function EXIT\n", fun );
 #endif 
         return;
     }
@@ -49,7 +67,7 @@ call_or_link(object sym, void **link )
             (*(fun)->cf.cf_self)(fun->cc.cc_turbo);
         }
 #ifdef DO_FUNLINK_DEBUG
-        fprintf ( stderr, "call_or_link: fun %x END 1\n", fun );
+        fprintf ( stderr, "call_or_link: fun %x EXIT POINT 1 closure and turbo branch\n", fun );
 #endif 
     return;
     }
@@ -60,14 +78,11 @@ call_or_link(object sym, void **link )
             (void) vpush_extend ( link,sLAlink_arrayA->s.s_dbind );
             (void) vpush_extend ( *link,sLAlink_arrayA->s.s_dbind );	 
             *link = (void *) (fun->cf.cf_self);
-#if 1
-            fprintf ( stderr, "call_or_link: cf %x\n", fun->cf );
-            fprintf ( stderr, "call_or_link: cf_name %x\n", fun->cf.cf_name );
-            fprintf ( stderr, "call_or_link: cf_data %x\n", fun->cf.cf_data );
-            fprintf ( stderr, "call_or_link: cf_self %x\n", fun->cf.cf_self );
+#ifdef DO_FUNLINK_DEBUG
+            fprintf ( stderr, "call_or_link: fun %x, fun->cf %x (cf_name %x, cf_data %x, cf_self %x), ",
+                      fun, fun->cf, fun->cf.cf_name, fun->cf.cf_data, fun->cf.cf_self );
             fflush ( stderr );
-            fprintf ( stderr, "call_or_link: staddr %x\n", fun->cf.cf_name->st.st_self );
-            fprintf ( stderr, "call_or_link: ststring %s\n", fun->cf.cf_name->st.st_self );
+            print_lisp_string ( "name: ", fun->cf.cf_name );
             fflush ( stderr );
 #endif         
             ( *(void (*)()) (fun->cf.cf_self)) ();
@@ -76,7 +91,7 @@ call_or_link(object sym, void **link )
         }
     }
 #ifdef DO_FUNLINK_DEBUG
-    fprintf ( stderr, "call_or_link: fun %x END 2\n", fun );
+    fprintf ( stderr, "call_or_link: fun %x EXIT POINT 2\n", fun );
 #endif 
 }
 
@@ -84,10 +99,12 @@ void
 call_or_link_closure ( object sym, void **link, void **ptr )
 {
     object fun;
-#ifdef DO_FUNLINK_DEBUG
-    fprintf ( stderr, "call_or_link_closure: START sym %x, link %x, *link %x, ptr %x, *ptr %x, sym->s.s_gfdef (fun) %x\n", sym, link, *link, ptr, *ptr, sym->s.s_gfdef );
-#endif 
     fun = sym->s.s_gfdef;
+#ifdef DO_FUNLINK_DEBUG
+    fprintf ( stderr, "call_or_link_closure: START sym %x, link %x, *link %x, ptr %x, *ptr %x, sym->s.s_gfdef (fun) %x ",
+              sym, link, *link, ptr, *ptr, fun );
+    print_lisp_string ( "Function name: ", fun->cf.cf_name );
+#endif 
     if (fun == OBJNULL) {
 #ifdef DO_FUNLINK_DEBUG
         fprintf ( stderr, "call_or_link_closure: fun %x ERROR END\n", fun );
@@ -100,7 +117,8 @@ call_or_link_closure ( object sym, void **link, void **ptr )
             (void) vpush_extend ( link, sLAlink_arrayA->s.s_dbind );
             (void) vpush_extend ( *link, sLAlink_arrayA->s.s_dbind );
 #ifdef DO_FUNLINK_DEBUG
-	    fprintf ( stderr, "call_or_link_closure: About to set *ptr %x to %x (after vpush_extend 1), sym->s.s_self %s (%d chars long)\n", *ptr, fun->cc.cc_turbo, sym->s.s_self, sym->s.s_fillp );
+	    fprintf ( stderr, "call_or_link_closure: About to change %x to %x at ptr %x, %x to %x at %x, then MMccall fun (after t_cclosure vpush_extend)", *ptr, fun->cc.cc_turbo, ptr, *link, fun->cf.cf_self, link );
+            print_lisp_string ( ": ", fun->cf.cf_name );
 #endif 
             *ptr = (void *) ( fun->cc.cc_turbo );
             *link = (void *) ( fun->cf.cf_self );
@@ -123,7 +141,7 @@ call_or_link_closure ( object sym, void **link, void **ptr )
             (void) vpush_extend ( link, sLAlink_arrayA->s.s_dbind );
             (void) vpush_extend ( *link, sLAlink_arrayA->s.s_dbind );	 
 #ifdef DO_FUNLINK_DEBUG
-	    fprintf ( stderr, "call_or_link_closure: About to set *link %x to %x and execute it (after vpush_extend 2), sym->s %x, sym->s.s_self %s (%d chars long)\n", *link, fun->cf.cf_self, sym->s, sym->s.s_self, sym->s.s_fillp );
+	    fprintf ( stderr, "call_or_link_closure: About to change *link %x to %x at link %x and execute it (after t_cfun vpush_extend), sym->s %x, sym->s.s_self %s (%d chars long)\n", *link, fun->cf.cf_self, link, sym->s, sym->s.s_self, sym->s.s_fillp );
 #endif 
             *link = (void *) (fun->cf.cf_self);
             ( *(void (*)()) (fun->cf.cf_self) ) ();
