@@ -27,7 +27,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "num_include.h"
 
-static void
+void
 zero_divisor(void);
 
 object fixnum_add(int i, int j)
@@ -1028,7 +1028,7 @@ LFD(Llcm)(void)
 	vs_top = vs_base+1;
 }
 
-static void
+void
 zero_divisor(void)
 {
 	FEerror("Zero divisor.", 0);

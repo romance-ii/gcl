@@ -34,7 +34,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "num_include.h"
 
 object plus_half, minus_half;
-
+extern void zero_divisor(void);
 #ifdef CONVEX
 #define VAX
 #endif
@@ -504,6 +504,9 @@ TWO_ARG:
 		too_many_arguments();
 	x = vs_base[0];
 	y = vs_base[1];
+        if ( number_zerop ( y ) == TRUE ) {
+            zero_divisor();
+        }
 	if ((type_of(x) == t_fixnum || type_of(x) == t_bignum) &&
 	    (type_of(y) == t_fixnum || type_of(y) == t_bignum)) {
 		vs_base = vs_top;
@@ -627,6 +630,9 @@ TWO_ARG:
 		too_many_arguments();
 	x = vs_base[0];
 	y = vs_base[1];
+        if ( number_zerop ( y ) == TRUE ) {
+            zero_divisor();
+        }
 	if ((type_of(x) == t_fixnum || type_of(x) == t_bignum) &&
 	    (type_of(y) == t_fixnum || type_of(y) == t_bignum)) {
 		vs_base = vs_top;
@@ -736,6 +742,9 @@ TWO_ARG:
 		too_many_arguments();
 	x = vs_base[0];
 	y = vs_base[1];
+        if ( number_zerop ( y ) == TRUE ) {
+            zero_divisor();
+        }
 	if ((type_of(x) == t_fixnum || type_of(x) == t_bignum) &&
 	    (type_of(y) == t_fixnum || type_of(y) == t_bignum)) {
 		integer_quotient_remainder_1(x, y, &vs_base[0], &vs_base[1]);
