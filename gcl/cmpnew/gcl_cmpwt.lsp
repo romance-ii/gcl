@@ -34,15 +34,15 @@
 (defun wt-comment (message &optional (symbol nil))
   (princ "
 /*	" *compiler-output1*)
-  (princ message *compiler-output1*)
-  (when symbol
-        (let ((s (symbol-name symbol)))
-             (declare (string s))
-             (dotimes** (n (length s))
-                        (let ((c (schar s n)))
-                             (declare (character c))
-                             (unless (char= c #\/)
-                                     (princ c *compiler-output1*))))))
+  (let* ((mlist (and symbol (list (string symbol))))
+	 (mlist (cons message mlist)))
+    (dolist (s mlist)
+      (declare (string s))
+      (dotimes** (n (length s))
+		 (let ((c (schar s n)))
+		   (declare (character c))
+		   (unless (char= c #\/)
+		     (princ c *compiler-output1*))))))
   (princ "	*/
 " *compiler-output1*)
   nil
@@ -69,8 +69,9 @@
 (defvar *fasd-data*)
 
 (defun push-data-incf (x)
-  (vector-push-extend (cons (si::hash-equal x -1000) x) (data-vector))
-  (incf *next-vv*))
+  (let ((x (or (setf-function-base-symbol x) x)))
+    (vector-push-extend (cons (si::hash-equal x -1000) x) (data-vector))
+    (incf *next-vv*)))
 
 (defun wt-data1 (expr)
   (let ((*print-radix* nil)

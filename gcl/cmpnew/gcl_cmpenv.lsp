@@ -43,6 +43,7 @@
   (setq *constants* nil)
   (setq *local-funs* nil)
   (setq *global-funs* nil)
+  (setq *setf-function-proxy-symbols* nil)
   (setq *global-entries* nil)
   (setq *undefined-vars* nil)
   (setq *reservations* nil)
@@ -192,45 +193,59 @@
 	     (let ((tem  (if (eq (car v) '*) '* (type-filter (car v)))))
 	       (if (eq tem 'integer) (setq tem t))
 	       (push  tem result))))))
-		
+
+(defun put-procls (fname arg-types return-types procl)
+
+  (if (eq arg-types '*)
+      (remprop fname  'proclaimed-arg-types)
+    (si:putprop fname  arg-types  'proclaimed-arg-types))
+
+  (si:putprop fname return-types  'proclaimed-return-type)
+
+  (if procl  (si:putprop fname t 'proclaimed-function)
+    (remprop fname 'proclaimed-function)))
+
+
 (defun add-function-proclamation (fname decl list &aux (procl t)
 					arg-types return-types)
   (cond
-    ((and (symbolp fname)
-	  (listp decl) (listp (cdr decl)))
-     (cond ((or (null decl)(eq (car decl) '*)) (setq arg-types '(*)))
-	   (t (setq arg-types (function-arg-types (car decl)))
-
-	      ))
-     (setq return-types (function-return-type (cdr decl)))
-     (cond ((and (consp return-types)  ; ie not nil
-		 (endp (cdr return-types))
-		 (not (eq (car return-types) '*)))
-	    (setq return-types
-		  ;; varargs must return type t currently.
-		  (if (member '* (and (consp arg-types) arg-types)) t
-		      (car return-types))))
-	   (t (setq procl nil)))
-     (cond ((and (listp arg-types)
-		 (< (length arg-types) call-arguments-limit)))
-	   (t (setq procl nil)))
-     (do ((fname fname (car list)))
-	 (())
-	 (or (symbolp fname)
-	     (return (add-function-proclamation fname decl nil)))
-	 (if (eq arg-types '*)
-	     (remprop fname  'proclaimed-arg-types)
-	   (si:putprop fname  arg-types  'proclaimed-arg-types))
-	 (si:putprop fname return-types  'proclaimed-return-type)
-     
-	 ;;; A non-local function may have local entry only if it returns
-	 ;;; a single value.
-
-	 (if procl  (si:putprop fname t 'proclaimed-function)
-	   (remprop fname 'proclaimed-function))
-	 (setq list (cdr list))
-	 (or (consp list) (return 'done))
-	 ))
+   ((and (symbolp fname)
+	 (listp decl) (listp (cdr decl)))
+    (cond ((or (null decl)(eq (car decl) '*)) (setq arg-types '(*)))
+	  (t (setq arg-types (function-arg-types (car decl)))
+	     ))
+    (setq return-types (function-return-type (cdr decl)))
+    (cond ((and (consp return-types)	; ie not nil
+		(endp (cdr return-types))
+		(not (eq (car return-types) '*)))
+	   (setq return-types
+		 ;; varargs must return type t currently.
+		 (if (member '* (and (consp arg-types) arg-types)) t
+		   (car return-types))))
+	  (t (setq procl nil)))
+    (cond ((and (listp arg-types)
+		(< (length arg-types) call-arguments-limit)))
+	  (t (setq procl nil)))
+    (do ((fname fname (car list)))
+	(())
+      (cond ((is-setf-function fname)
+	     (let ((*setf-function-proxy-symbols* *setf-function-proxy-symbols*))
+	       (let ((new (make-setf-function-proxy-symbol (cadr fname))))
+		 (put-procls new arg-types return-types procl)
+		 (let (alist)
+		   (dolist (l '(proclaimed-arg-types proclaimed-return-type proclaimed-function))
+		     (let ((prop (get new l)))
+		       (when prop
+			 (push (cons l prop) alist))))
+		   (when alist
+		     (si::putprop (cadr fname) alist 'setf-proclamations))))))
+	    ((symbolp fname)
+	     (put-procls fname arg-types return-types procl))
+	    (t
+	     (return (add-function-proclamation fname decl nil))))
+      (setq list (cdr list))
+      (or (consp list) (return 'done))
+      ))
     (t (warn "The function procl ~s ~s is not valid." fname decl))))
 
 (defun add-function-declaration (fname arg-types return-types)

@@ -36,7 +36,7 @@
 
 (defvar *other-form* (make-fn))
 (defvar *all-fns* nil)
-(defvar *call-table* (make-hash-table))
+(defvar *call-table* (make-hash-table :test #'equal))
 (defvar *current-fn* nil)
 (defun add-callee (fname)
   (cond ((consp fname)
@@ -76,9 +76,10 @@
 (defun current-fn ()
   (cond ((and (consp *current-form*)
 	      (member (car *current-form*) '(defun defmacro))
-	      (symbolp  (second *current-form*))
-	      (symbol-package (second *current-form*));;don't record gensym'd
-	      )
+	      (or (is-setf-function (second *current-form*))
+		  (and
+		   (symbolp  (second *current-form*))
+		   (symbol-package (second *current-form*)))));;don't record gensym'd
 	 (cond ((and *current-fn*
 		     (equal (second *current-form*)  (fn-name *current-fn*)))
 		*current-fn*)

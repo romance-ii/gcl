@@ -100,13 +100,6 @@
                                     (null (get fun 'no-sp-change)))))
                             (list 'function info (list 'call-global info fun))
                             ))))
-        ;; FIXME centralize this bit
-	     ((and (consp fun) (eq (car fun) 'setf)
-		       (consp (cdr fun)) (symbolp (cadr fun))
-		       (endp (cddr fun)))
-	      (let ((info (make-info
-			   :sp-change t)))
-		(list 'function info (list 'call-setf info fun))))
              ((and (consp fun) (eq (car fun) 'lambda))
               (cmpck (endp (cdr fun))
                      "The lambda expression ~s is illegal." fun)
@@ -123,8 +116,6 @@
   (case (car funob)
         (call-global
          (unwind-exit (list 'symbol-function (add-symbol (caddr funob)))))
-        (call-setf
-         (unwind-exit (list 'setf-function (add-symbol (cadr (caddr funob))))))
         (call-local
          (if (cadddr funob)
              (unwind-exit (list 'ccb-vs (fun-ref-ccb (caddr funob))))
@@ -149,22 +140,11 @@
 
 (si:putprop 'symbol-function 'wt-symbol-function 'wt-loc)
 (si:putprop 'make-cclosure 'wt-make-cclosure 'wt-loc)
-(si:putprop 'setf-function 'wt-setf-function 'wt-loc)
 
 (defun wt-symbol-function (vv)
        (if *safe-compile*
            (wt "symbol_function(VV[" vv "])")
            (wt "(VV[" vv "]->s.s_gfdef)")))
-
-(defun wt-setf-function (vv)
-; FIXME don't inline all of this
-  (wt "({object _tmp=get(VV[" vv "],sSsetf_function,Cnil);")
-  (wt "if (_tmp==Cnil) {")
-  (wt "int bs=((object)VV[" vv "])->s.s_fillp+8;")
-  (wt "char *b=alloca(bs);")
-  (wt "snprintf(b,bs,\"(SETF %-.*s)\",bs-8,((object)VV[" vv "])->s.s_self);")
-  (wt "FEundefined_function(make_simple_string(b));}")
-  (wt "_tmp;})"))
 
 (defun wt-make-cclosure (cfun clink)
        (wt-nl "make_cclosure_new(LC" cfun ",Cnil,")

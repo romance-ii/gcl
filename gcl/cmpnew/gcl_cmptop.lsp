@@ -96,6 +96,11 @@
 
 ;;; *global-entries* holds (... ( fname cfun return-types arg-type ) ...).
 
+(defvar *setf-function-proxy-symbols* nil)
+
+;; alist of proxy sybmols to name functions defun'ed as (setf foo)
+
+
 ;;; Package operations.
 
 (si:putprop 'make-package t 'package-operation)
@@ -398,30 +403,53 @@
 	(t (setf lam (append lam (cons '&aux bind)))))
   (list* (car args) lam (cddr args)))
 
+(defmacro setf-function-proxy-symbol (sym)
+  `(cdr (assoc ,sym *setf-function-proxy-symbols*)))
 
-(defun function-name (name)
-  (let (setf-symbol)
-    (cond
-     ((symbolp name)
-      name)
-;; FIXME centralize this bit
-     ((and (consp name) (eq (car name) 'setf) 
-	   (consp (cdr name)) (symbolp (setq setf-symbol (cadr name)))
-	   (endp (cddr name)))
-      (multiple-value-bind 
-       (setf-new-symbol status)
-       (intern (symbol-name (gensym)))
-       (declare (ignore status))
-       (si::putprop setf-new-symbol setf-symbol 'compiler::setf-function-base-name)
-       setf-new-symbol))
-     (t
-      nil))))
-	   
+(defmacro setf-function-base-symbol (sym)
+  `(car (rassoc ,sym *setf-function-proxy-symbols*)))
+
+(defun make-setf-function-proxy-symbol (sym)
+  (unless (symbolp sym)
+    (error "~S not a symbol" sym))
+  (or
+   (setf-function-proxy-symbol sym)
+   (let ((new (gensym))
+	 (prop (get sym 'setf-proclamations)))
+     (push (cons sym new) *setf-function-proxy-symbols*)
+     (when prop
+       (dolist (l '(proclaimed-arg-types proclaimed-return-type proclaimed-function))
+	 (let ((prop (assoc l prop)))
+	   (when prop
+	     (si::putprop new (cdr prop) l)))))
+     new)))
+
+(defmacro is-setf-function (name)
+  `(and (consp ,name) (eq (car ,name) 'setf) 
+	(consp (cdr ,name)) (symbolp (cadr ,name))
+	(null (cddr ,name))))
+
+(defun function-symbol (name)
+  (cond
+   ((symbolp name)
+    name)
+   ((is-setf-function name)
+    (make-setf-function-proxy-symbol (cadr name)))
+   (t
+    nil))))
+
+(defun function-string (name)
+  (unless (symbolp name)
+    (error "function names must be symbols~%"))
+  (let ((sname (setf-function-base-symbol name)))
+    (if sname
+	(si::string-concatenate "(SETF " (symbol-name sname) ")")
+      (symbol-name name))))
 
 (defun t1defun (args &aux (setjmps *setjmps*) (defun 'defun) (*sharp-commas* nil) name)
   (when (or (endp args) (endp (cdr args)))
         (too-few-args 'defun 2 (length args)))
-  (cmpck (not (setq name (function-name (car args))))
+  (cmpck (not (setq name (function-symbol (car args))))
          "The function name ~s is not valid." (car args))
   (maybe-eval nil  (cons 'defun args))
  (tagbody
@@ -670,7 +698,7 @@
         (t (wt-h cfun "();")
 	   (add-init `(si::mf ',fname ,(add-address "" cfun )) )))
            
-  (let ((base-name (get fname 'compiler::setf-function-base-name)))
+  (let ((base-name (setf-function-base-symbol fname)))
     (when base-name
       (add-init `(si::putprop ',base-name #',fname 'si::setf-function))))
 
@@ -743,7 +771,7 @@
                          (otherwise 'OBJECT))))
                    )
              (setf (var-loc (car vl)) (next-cvar)))
-         (wt-comment "local entry for function " fname)
+         (wt-comment "local entry for function " (function-string fname))
          (wt-h "static " (declaration-type (rep-type (caddr inline-info))) "LI" cfun "();")
          (wt-nl1 "static " (declaration-type (rep-type (caddr inline-info))) "LI" cfun "(")
          (wt-requireds  requireds
@@ -800,7 +828,7 @@
   (dolist (v (car ll))
 	  (push (list 'cvar (next-cvar)) reqs))
  
-  (wt-comment "local entry for function " fname)
+  (wt-comment "local entry for function " (function-string fname))
 
   (let ((tmp ""))
     (wt-nl1 "static object LI" cfun "(")
@@ -1095,7 +1123,7 @@
     ))
 
 (defun t3defun-normal (fname cfun lambda-expr sp)
-         (wt-comment "function definition for " fname)
+         (wt-comment "function definition for " (function-string fname))
          (if (numberp cfun)
              (wt-nl1 "static void L" cfun "()")
              (wt-nl1 cfun "()"))
@@ -1251,7 +1279,7 @@
 
 (defun wt-global-entry (fname cfun arg-types return-type)
     (cond ((get fname 'no-global-entry)(return-from wt-global-entry nil)))
-    (wt-comment "global entry for the function " fname)
+    (wt-comment "global entry for the function " (function-string fname))
     (wt-nl1 "static void L" cfun "()")
     (wt-nl1 "{	register object *base=vs_base;")
     (when (or *safe-compile* *compiler-check-args*)

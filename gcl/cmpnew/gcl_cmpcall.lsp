@@ -102,7 +102,19 @@
                                  :sp-change
                                  (null (get (cadr fun) 'no-sp-change)))
                                 (cadr fun)))
-                      )))))
+                      )
+		 (and
+		  (is-setf-function (cadr fun))
+		  (let ((new (make-setf-function-proxy-symbol (cadadr fun))))
+		    (or (and (setq fd (c1local-fun new))
+			     (eq (car fd) 'call-local)
+			     fd)
+			(list 'call-global
+			      (make-info
+			       :sp-change
+				   (null (get new 'no-sp-change)))
+			      new))))
+		 ))))
    (let ((x (c1expr fun)) (info (make-info :sp-change t)))
         (add-info info (cadr x))
         (list 'ordinary info x))
@@ -404,15 +416,16 @@
   (let ((name (first x))
 	(num (second x))
 	(type (third x))
-	(args (fourth x)))
+	(args (fourth x))
+	(setf (setf-function-base-symbol (first x))))
     (cond
       ((null type)
        (wt-nl1 "static void LnkT"
-	       num "(){ call_or_link(VV[" num "],(void **)(void *)&Lnk" num");}"
+	       num "(){ call_or_link(VV[" num "]," (if setf "1" "0") ",(void **)(void *)&Lnk" num");}"
 	       ))
       ((eql type 'proclaimed-closure)
        (wt-nl1 "static void LnkT" num
-	       "(ptr) object *ptr;{ call_or_link_closure(VV[" num "],(void **)(void *)&Lnk" num",(void **)(void *)&Lclptr" num");}"))
+	       "(ptr) object *ptr;{ call_or_link_closure(VV[" num "]," (if setf "1" "0") ",(void **)(void *)&Lnk" num",(void **)(void *)&Lclptr" num");}"))
       (t
        ;;change later to include above.
        ;;(setq type (cdr (assoc type '((t . "object")(:btpr . "bptr")))))
@@ -423,13 +436,13 @@
 		    (declaration-type (rep-type type)) "V1;"
 		    "va_list ap;va_start(ap,first);V1=call_"
 		    (if vararg "v" "") "proc_new(VV["
-		    (add-object name)"],(void **)(void *)&Lnk" num )
+		    (add-object name)"]," (if setf "1" "0") ",(void **)(void *)&Lnk" num )
 		(or vararg (wt "," (proclaimed-argd args type)))
 		(wt   ",first,ap);va_end(ap);return V1;}" )))
 	     (t (wt "(){return call_proc0(VV[" (add-object name)
-		    "],(void **)(void *)&Lnk" num ");}" ))))
+		    "]," (if setf "1" "0") ",(void **)(void *)&Lnk" num ");}" ))))
       (t (error "unknown link type ~a" type)))
-    (setq name (symbol-name name))
+    (setq name (function-string name))
     (if (find #\/ name) (setq name (remove #\/ name)))
     (wt " /* " name " */")
     ))

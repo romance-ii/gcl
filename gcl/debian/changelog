@@ -21,8 +21,9 @@ gclcvs (2.7.0-27) unstable; urgency=low
   * Remove local bfd libraries from libs variables as their objects are
     incorporated into libgcl and as the source directory may not be
     available at runtime
+  * Support for optimized and inlined calls to setf fuctions
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 15 Jul 2004 12:30:38 -0400
+ -- Camm Maguire <camm@enhanced.com>  Thu, 15 Jul 2004 23:00:49 +0000
 
 gclcvs (2.7.0-26) unstable; urgency=low
 
