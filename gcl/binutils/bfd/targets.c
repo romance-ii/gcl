@@ -155,7 +155,8 @@ DESCRIPTION
 .  bfd_target_msdos_flavour,
 .  bfd_target_ovax_flavour,
 .  bfd_target_evax_flavour,
-.  bfd_target_mmo_flavour
+.  bfd_target_mmo_flavour,
+.  bfd_target_mach_o_flavour
 .};
 .
 .enum bfd_endian { BFD_ENDIAN_BIG, BFD_ENDIAN_LITTLE, BFD_ENDIAN_UNKNOWN };
@@ -636,6 +637,9 @@ extern const bfd_target m68knetbsd_vec;
 extern const bfd_target m68ksysvcoff_vec;
 extern const bfd_target m88kbcs_vec;
 extern const bfd_target m88kmach3_vec;
+extern const bfd_target mach_o_be_vec;
+extern const bfd_target mach_o_le_vec;
+extern const bfd_target mach_o_fat_vec;
 extern const bfd_target mcore_pe_big_vec;
 extern const bfd_target mcore_pe_little_vec;
 extern const bfd_target mcore_pei_big_vec;
@@ -931,6 +935,9 @@ static const bfd_target * const _bfd_target_vector[] = {
 	&m68ksysvcoff_vec,
 	&m88kbcs_vec,
 	&m88kmach3_vec,
+	&mach_o_be_vec,
+	&mach_o_le_vec,
+	&mach_o_fat_vec,
 	&mcore_pe_big_vec,
 	&mcore_pe_little_vec,
 	&mcore_pei_big_vec,

@@ -267,6 +267,7 @@ BFD32_BACKENDS = \
 	m68klynx.lo \
 	m68knetbsd.lo \
 	m88kmach3.lo \
+	mach-o.lo \
 	mipsbsd.lo \
 	newsos3.lo \
 	nlm.lo \
@@ -424,6 +425,7 @@ BFD32_BACKENDS_CFILES = \
 	m68klynx.c \
 	m68knetbsd.c \
 	m88kmach3.c \
+	mach-o.c \
 	mipsbsd.c \
 	newsos3.c \
 	nlm.c \
@@ -566,7 +568,7 @@ SOURCE_HFILES = \
 	elf-bfd.h elf-hppa.h elf32-arm.h elf32-hppa.h elf64-hppa.h \
 	elfcode.h elfcore.h elflink.h freebsd.h genlink.h go32stub.h \
 	libaout.h libbfd.h libcoff.h libecoff.h libhppa.h \
-	libieee.h libnlm.h liboasys.h libpei.h netbsd.h nlm-target.h \
+	libieee.h libnlm.h liboasys.h libpei.h mach-o.h netbsd.h nlm-target.h\
 	nlmcode.h nlmswap.h ns32k.h peicode.h som.h vms.h libxcoff.h \
 	xcoff-target.h version.h
 
@@ -1340,6 +1342,8 @@ m68knetbsd.lo: m68knetbsd.c netbsd.h $(INCDIR)/filenames.h \
 m88kmach3.lo: m88kmach3.c $(INCDIR)/filenames.h libaout.h \
   $(INCDIR)/bfdlink.h aout-target.h $(INCDIR)/aout/aout64.h \
   $(INCDIR)/aout/stab_gnu.h $(INCDIR)/aout/stab.def $(INCDIR)/aout/ar.h
+mach-o.lo: mach-o.c mach-o.h $(INCDIR)/filenames.h \
+  $(INCDIR)/libiberty.h mach-o-target.c
 mipsbsd.lo: mipsbsd.c $(INCDIR)/filenames.h libaout.h \
   $(INCDIR)/bfdlink.h aout-target.h $(INCDIR)/aout/aout64.h \
   $(INCDIR)/aout/stab_gnu.h $(INCDIR)/aout/stab.def $(INCDIR)/aout/ar.h

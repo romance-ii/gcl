@@ -856,6 +856,11 @@ case "${targ}" in
     targ_selvecs="rs6000coff_vec bfd_elf32_powerpcle_vec ppcboot_vec"
     targ64_selvecs="bfd_elf64_powerpc_vec bfd_elf64_powerpcle_vec"
     ;;
+  powerpc-*-darwin* | powerpc-*-macos10* | powerpc-*-rhapsody*)
+    targ_defvec=mach_o_be_vec
+    targ_selvecs="mach_o_be_vec mach_o_le_vec mach_o_fat_vec"
+    targ_archs="bfd_powerpc_arch bfd_rs6000_arch bfd_i386_arch"
+    ;;
   powerpc-*-macos* | powerpc-*-mpw*)
     targ_defvec=pmac_xcoff_vec
     ;;
