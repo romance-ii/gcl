@@ -35,19 +35,19 @@ int debug;
 #endif
 #define PTABLE_EXTRA 20
 
-#define COFF_SECTIONS 10   /* Numbner of section headers in section header buffer */
+#define COFF_SECTIONS 10 /* Numbner of section headers in section header buffer */
 
-#define INVALID_NSCN 64000   /* A number greater than the number of sections ever likely to be read in. */
+#define INVALID_NSCN 64000 /* A number greater than the number of sections ever likely to be read in. */
 
 #define SYMNMLEN 8
 #define SYM_NAME(p) \
-  (((p)->N.Name.Short == 0) ? \
-	    &my_string_table[(p)->N.Name.Long] : \
-               ((p)->N.ShortName[7] ? \
-				 ( strncpy ( tem, (p)->N.ShortName,  \
-					   8 ), \
-				  (char *) tem) : \
-				  (p)->N.ShortName ))
+    (((p)->N.Name.Short == 0) ? \
+      &my_string_table[(p)->N.Name.Long] : \
+      ((p)->N.ShortName[7] ? \
+        ( strncpy ( tem, (p)->N.ShortName,  \
+                    8 ), \
+          (char *) tem) : \
+        (p)->N.ShortName ))
 
 /*
  * names of "special" sections
@@ -62,9 +62,9 @@ int debug;
 #define _LIB        ".lib"
 
 unsigned int TEXT_NSCN = INVALID_NSCN, DATA_NSCN = INVALID_NSCN,
-  BSS_NSCN = INVALID_NSCN, STAB_NSCN = INVALID_NSCN,
-  STABSTR_NSCN = INVALID_NSCN, RDATA_NSCN = INVALID_NSCN,
-  BIGGEST_NSCN_FOUND = 0;
+    BSS_NSCN = INVALID_NSCN, STAB_NSCN = INVALID_NSCN,
+    STABSTR_NSCN = INVALID_NSCN, RDATA_NSCN = INVALID_NSCN,
+    BIGGEST_NSCN_FOUND = 0;
 
 struct sfasl_info {
     PIMAGE_SYMBOL s_symbol_table;
@@ -142,38 +142,38 @@ void describe_sym1 ( int n, int aux_to_go )
 
 /* This function does the low level relocation. */
 void
-relocate()
+    relocate()
 {
-  char *where;
-  /* describe_sym ( relocation_info.r_symndx, 0 ); */
-  where = the_start + relocation_info.VirtualAddress;
-  if ( relocation_info.Type == IMAGE_REL_I386_ABSOLUTE ) {
-    return;
-  }
-  
-  switch(relocation_info.Type)
-    {
-
-    case IMAGE_REL_I386_DIR32:
-      *(int *)where = *((int *)where) + 
-	symbol_table[relocation_info.SymbolTableIndex].Value;
-      break;
-      
-    case IMAGE_REL_I386_REL32:
-      /* the following is logical, except the address offset is
-	 not where the 'where' is but where the 'call' is just
-	 AFTER the 'where'.
-      */
-      *(int *)where = symbol_table[relocation_info.SymbolTableIndex].Value
-	- (int) where - sizeof(int *);
-
-      break;
-
-    default:
-      fprintf ( stderr, "%d: unsupported relocation type.\n",
-		relocation_info.Type);
-      FEerror("The relocation type was unknown\n",0,0);
+    char *where;
+    /* describe_sym ( relocation_info.r_symndx, 0 ); */
+    where = the_start + relocation_info.VirtualAddress;
+    if ( relocation_info.Type == IMAGE_REL_I386_ABSOLUTE ) {
+        return;
     }
+    
+    switch(relocation_info.Type)
+        {
+
+        case IMAGE_REL_I386_DIR32:
+            *(int *)where = *((int *)where) + 
+                symbol_table[relocation_info.SymbolTableIndex].Value;
+            break;
+            
+        case IMAGE_REL_I386_REL32:
+            /* the following is logical, except the address offset is
+               not where the 'where' is but where the 'call' is just
+               AFTER the 'where'.
+               */
+            *(int *)where = symbol_table[relocation_info.SymbolTableIndex].Value
+                - (int) where - sizeof(int *);
+
+            break;
+
+        default:
+            fprintf ( stderr, "%d: unsupported relocation type.\n",
+                      relocation_info.Type);
+            FEerror("The relocation type was unknown\n",0,0);
+        }
 
 }
 
@@ -190,37 +190,37 @@ void set_symbol_address ( PIMAGE_SYMBOL sym, char *string );
  */
 static void work_out_section_indices ( IMAGE_SECTION_HEADER *section )
 {
-  unsigned int i;
+    unsigned int i;
 
-  /* Initialise the global *_NSCN variables to INVALID_NSCN */
-  TEXT_NSCN = DATA_NSCN = BSS_NSCN = STAB_NSCN = STABSTR_NSCN = RDATA_NSCN = INVALID_NSCN;
-  
-  for ( i = 1; i < COFF_SECTIONS; i++ ) {
-    if ( strcmp(section[i].Name, _TEXT) == 0 ) {
-      TEXT_NSCN = i;
-      if ( i > BIGGEST_NSCN_FOUND ) BIGGEST_NSCN_FOUND = i;
+    /* Initialise the global *_NSCN variables to INVALID_NSCN */
+    TEXT_NSCN = DATA_NSCN = BSS_NSCN = STAB_NSCN = STABSTR_NSCN = RDATA_NSCN = INVALID_NSCN;
+    
+    for ( i = 1; i < COFF_SECTIONS; i++ ) {
+        if ( strcmp(section[i].Name, _TEXT) == 0 ) {
+            TEXT_NSCN = i;
+            if ( i > BIGGEST_NSCN_FOUND ) BIGGEST_NSCN_FOUND = i;
+        }
+        if ( strcmp(section[i].Name, _DATA) == 0 ) {
+            DATA_NSCN = i;
+            if ( i > BIGGEST_NSCN_FOUND ) BIGGEST_NSCN_FOUND = i;
+        }
+        if ( strcmp(section[i].Name, _BSS ) == 0 ) {
+            BSS_NSCN = i;
+            if ( i > BIGGEST_NSCN_FOUND ) BIGGEST_NSCN_FOUND = i;
+        }
+        if ( strcmp(section[i].Name, _STAB ) == 0 ) {
+            STAB_NSCN = i;
+            if ( i > BIGGEST_NSCN_FOUND ) BIGGEST_NSCN_FOUND = i;
+        }
+        if ( strcmp(section[i].Name, _STABSTR) == 0 ) {
+            STABSTR_NSCN = i;
+            if ( i > BIGGEST_NSCN_FOUND ) BIGGEST_NSCN_FOUND = i;
+        }
+        if ( strcmp(section[i].Name, _RDATA) == 0 ) {
+            RDATA_NSCN = i;
+            if ( i > BIGGEST_NSCN_FOUND ) BIGGEST_NSCN_FOUND = i;
+        }
     }
-    if ( strcmp(section[i].Name, _DATA) == 0 ) {
-      DATA_NSCN = i;
-      if ( i > BIGGEST_NSCN_FOUND ) BIGGEST_NSCN_FOUND = i;
-    }
-    if ( strcmp(section[i].Name, _BSS ) == 0 ) {
-      BSS_NSCN = i;
-      if ( i > BIGGEST_NSCN_FOUND ) BIGGEST_NSCN_FOUND = i;
-    }
-    if ( strcmp(section[i].Name, _STAB ) == 0 ) {
-      STAB_NSCN = i;
-      if ( i > BIGGEST_NSCN_FOUND ) BIGGEST_NSCN_FOUND = i;
-    }
-    if ( strcmp(section[i].Name, _STABSTR) == 0 ) {
-      STABSTR_NSCN = i;
-      if ( i > BIGGEST_NSCN_FOUND ) BIGGEST_NSCN_FOUND = i;
-    }
-    if ( strcmp(section[i].Name, _RDATA) == 0 ) {
-      RDATA_NSCN = i;
-      if ( i > BIGGEST_NSCN_FOUND ) BIGGEST_NSCN_FOUND = i;
-    }
-  }
 }
 
 int fasload ( object faslfile )
@@ -231,7 +231,7 @@ int fasload ( object faslfile )
     IMAGE_SECTION_HEADER section[COFF_SECTIONS];
     IMAGE_OPTIONAL_HEADER optional_header;
     int textsize = 0, datasize = 0, bsssize = 0, stabsize = 0,
-      stabstrsize = 0, rdatasize = 0, nsyms = 0;
+    stabstrsize = 0, rdatasize = 0, nsyms = 0;
     object memory, data;
     FILE *fp;
     char filename[MAXPATHLEN];
@@ -283,35 +283,35 @@ int fasload ( object faslfile )
 
     /* Check for text section that does not come first - not currently handled. */
     if ( ( INVALID_NSCN != TEXT_NSCN ) && ( TEXT_NSCN != 1 ) ) {
-      FEerror ("Can't handle a Text section at other than index 1.",0);
+        FEerror ("Can't handle a Text section at other than index 1.",0);
     }
 
     /* Determine the section sizes used later to allocate storage and to calculate
      * the offsets of the sections once read in. Allow for the possibility
      * of an invalid index, that is, that a section may not be present. */
     if ( INVALID_NSCN != TEXT_NSCN ) {
-      textsize = section[TEXT_NSCN].SizeOfRawData;
+        textsize = section[TEXT_NSCN].SizeOfRawData;
     }
     if ( INVALID_NSCN != DATA_NSCN ) {
-      datasize = section[DATA_NSCN].SizeOfRawData;
+        datasize = section[DATA_NSCN].SizeOfRawData;
     }
     if ( INVALID_NSCN != BSS_NSCN ) {
-      bsssize = section[BSS_NSCN].SizeOfRawData;
+        bsssize = section[BSS_NSCN].SizeOfRawData;
     }
     if ( INVALID_NSCN != STAB_NSCN ) {
-      stabsize = section[STAB_NSCN].SizeOfRawData;
+        stabsize = section[STAB_NSCN].SizeOfRawData;
     }
     if ( INVALID_NSCN != STABSTR_NSCN ) {
-      stabstrsize = section[STABSTR_NSCN].SizeOfRawData;
+        stabstrsize = section[STABSTR_NSCN].SizeOfRawData;
     }
     if ( INVALID_NSCN != RDATA_NSCN ) {
-      rdatasize = section[RDATA_NSCN].SizeOfRawData;
+        rdatasize = section[RDATA_NSCN].SizeOfRawData;
     }
 
     /* Allocate space for the symbol table */
     symbol_table =
         (PIMAGE_SYMBOL) OUR_ALLOCA ( sizeof ( IMAGE_SYMBOL ) *
-                                      (unsigned int) nsyms );
+                                     (unsigned int) nsyms );
     memset ( symbol_table, 0, sizeof ( IMAGE_SYMBOL ) * (unsigned int) nsyms );
     /* move the file pointer to the start of the symbol table */
     fseek ( fp, (int) fileheader.PointerToSymbolTable,  0 );
@@ -344,15 +344,15 @@ int fasload ( object faslfile )
 	/* Go to the end of the C compiler generated object data
 	   in preparation for loading the GCL fasl data. */
 	{
-	  struct filehdr fileheader;
-	  int i;
-	  fseek ( fp, 0, 0 );
-	  fread ( &fileheader, sizeof ( fileheader ), 1, fp );
-	  fseek ( fp, fileheader.f_symptr + fileheader.f_nsyms * SYMESZ, 0 );
-	  fread ( &i, sizeof ( i ), 1, fp );
-	  fseek ( fp, i - sizeof ( i ), 1 );
-	  while ( ( i = fgetc ( fp ) ) == 0 );
-	  ungetc ( i, fp );
+            struct filehdr fileheader;
+            int i;
+            fseek ( fp, 0, 0 );
+            fread ( &fileheader, sizeof ( fileheader ), 1, fp );
+            fseek ( fp, fileheader.f_symptr + fileheader.f_nsyms * SYMESZ, 0 );
+            fread ( &i, sizeof ( i ), 1, fp );
+            fseek ( fp, i - sizeof ( i ), 1 );
+            while ( ( i = fgetc ( fp ) ) == 0 );
+            ungetc ( i, fp );
 	}
 
 #endif
@@ -366,12 +366,12 @@ int fasload ( object faslfile )
 
         /* figure out if there is more bss space needed */
 	extra_bss = 
-	  get_extra_bss ( symbol_table,
-			  nsyms,
-			  datasize + textsize + bsssize +
-			  stabsize + stabstrsize + rdatasize,
-			  &init_address,
-			  bsssize );
+            get_extra_bss ( symbol_table,
+                            nsyms,
+                            datasize + textsize + bsssize +
+                            stabsize + stabstrsize + rdatasize,
+                            &init_address,
+                            bsssize );
 	
         /* allocate some memory */
 	{
@@ -380,15 +380,15 @@ int fasload ( object faslfile )
             memory->cfd.cfd_self = 0;
             memory->cfd.cfd_start = 0;
             memory->cfd.cfd_size =
-	      datasize + textsize + bsssize +
-	      stabsize + stabstrsize + rdatasize + extra_bss;
+                datasize + textsize + bsssize +
+                    stabsize + stabstrsize + rdatasize + extra_bss;
             vs_push(memory);
             the_start = start_address =        
                 memory->cfd.cfd_start =	
                     alloc_contblock ( memory->cfd.cfd_size );
             sfaslp->s_start_data  = start_address + textsize;
             sfaslp->s_start_rdata = sfaslp->s_start_data + datasize
-	      + stabsize + stabstrsize;
+                + stabsize + stabstrsize;
             sfaslp->s_start_bss   = sfaslp->s_start_rdata + rdatasize;
             END_NO_INTERRUPT;
         }
@@ -412,18 +412,18 @@ int fasload ( object faslfile )
 		     ( 0 != section[j].NumberOfRelocations ) ) {
                     fseek ( fp, section[j].PointerToRelocations, 0 );
                     if ( j == TEXT_NSCN ) {
-		      the_start = memory->cfd.cfd_start;
+                        the_start = memory->cfd.cfd_start;
 		    } else {
-		      if ( j == DATA_NSCN ) {
-			the_start = sfaslp->s_start_data;
-		      } else {
-			if ( j == RDATA_NSCN ) {
-			  the_start = sfaslp->s_start_rdata;
-			} else {
-			  the_start = 0;
-			  FEerror ( "The_start was set to 0.\n", 0 );
-			}
-		      }
+                        if ( j == DATA_NSCN ) {
+                            the_start = sfaslp->s_start_data;
+                        } else {
+                            if ( j == RDATA_NSCN ) {
+                                the_start = sfaslp->s_start_rdata;
+                            } else {
+                                the_start = 0;
+                                FEerror ( "The_start was set to 0.\n", 0 );
+                            }
+                        }
 		    }
                     for ( i=0; i < section[j].NumberOfRelocations; i++ ) {
 		        fread ( &relocation_info, sizeof (IMAGE_RELOCATION), 1, fp );
@@ -456,52 +456,52 @@ int fasload ( object faslfile )
 }
 
 int get_extra_bss(sym_table,length,start,ptr,bsssize)
-     int length,bsssize;
-     PIMAGE_SYMBOL sym_table;
-     int *ptr;                   /* store init address offset here */
+    int length,bsssize;
+    PIMAGE_SYMBOL sym_table;
+    int *ptr;                   /* store init address offset here */
 {
-  int result = start;
-  IMAGE_SYMBOL *end, *sym;
+    int result = start;
+    IMAGE_SYMBOL *end, *sym;
 
-  end =sym_table + length;
+    end =sym_table + length;
 
-  for ( sym = sym_table; sym < end; sym++ ) {
-    /* The C compiler optimiser sometimes moves object initialisation
-       code around. */
-    if ( ( *ptr == 0 ) && ( sym->SectionNumber == TEXT_NSCN ) && sym->Value ) {
-      char tem [9];
-      char *str = SYM_NAME ( sym );
-      if ( str[1] == 'i' && str[2] == 'n' && str[3] == 'i' &&
-	   str[4] == 't' && str[5] == '_' && str[0] == '_' ) {
-	*ptr=  sym->Value ;
-      }
+    for ( sym = sym_table; sym < end; sym++ ) {
+        /* The C compiler optimiser sometimes moves object initialisation
+           code around. */
+        if ( ( *ptr == 0 ) && ( sym->SectionNumber == TEXT_NSCN ) && sym->Value ) {
+            char tem [9];
+            char *str = SYM_NAME ( sym );
+            if ( str[1] == 'i' && str[2] == 'n' && str[3] == 'i' &&
+                 str[4] == 't' && str[5] == '_' && str[0] == '_' ) {
+                *ptr=  sym->Value ;
+            }
+        }
+        if(0)
+            /* what we really want is
+               if (sym->n_scnum==0 && sym->n_sclass == C_EXT
+               && !(bsearch(..in ptable for this symbol)))
+               Since this won't allow loading in of a new external array
+               char foo[10]  not ok
+               static foo[10] ok.
+               for the moment we give undefined symbol warning..
+               Should really go through the symbols, recording the external addr
+               for ones found in ptable, and for the ones not in ptable
+               set some flag, and add up the extra_bss required.  Then
+               when you have the new memory chunk in hand,
+               you could make the pass setting the relative addresses.
+               for the ones you flagged last time.
+               */
+            /* external bss so not included in size of bss for file */
+            {int val=sym->Value;
+             if (val && c_table.ptable
+                  && (0== find_sym(sym,0)))
+                 { sym->Value=result;
+                   result += val;}}
+        
+        sym += sym->NumberOfAuxSymbols; 
+
     }
-    if(0)
-      /* what we really want is
-	 if (sym->n_scnum==0 && sym->n_sclass == C_EXT
-	 && !(bsearch(..in ptable for this symbol)))
-	 Since this won't allow loading in of a new external array
-	 char foo[10]  not ok
-	 static foo[10] ok.
-	 for the moment we give undefined symbol warning..
-	 Should really go through the symbols, recording the external addr
-	 for ones found in ptable, and for the ones not in ptable
-	 set some flag, and add up the extra_bss required.  Then
-	 when you have the new memory chunk in hand,
-	 you could make the pass setting the relative addresses.
-	 for the ones you flagged last time.
-      */
-      /* external bss so not included in size of bss for file */
-      {int val=sym->Value;
-	if (val && c_table.ptable
-	    && (0== find_sym(sym,0)))
-	  { sym->Value=result;
-	    result += val;}}
-            
-    sym += sym->NumberOfAuxSymbols; 
-
-  }
-  return (result-start);
+    return (result-start);
 }
 
 
@@ -519,25 +519,25 @@ void relocate_symbols ( unsigned int length )
 
     end = symbol_table + length;
     for ( sym = symbol_table; sym < end; sym++ ) {
-      typ = sym->SectionNumber;
+        typ = sym->SectionNumber;
 
 	if ( typ == TEXT_NSCN || typ == DATA_NSCN ||
 	     typ == RDATA_NSCN || typ == BSS_NSCN ) {
-	  if ( typ == TEXT_NSCN )  Value = (int)start_address;
-	  if ( typ == DATA_NSCN )  Value = (int)sfaslp->s_start_data;
-	  if ( typ == RDATA_NSCN ) Value = (int)sfaslp->s_start_rdata;
-	  if ( typ == BSS_NSCN )   Value = (int)sfaslp->s_start_bss;
-	  str=SYM_NAME(sym);
-	  sym->Value = Value;
-        } else {
-          if ( typ == 0 ) {
+            if ( typ == TEXT_NSCN )  Value = (int)start_address;
+            if ( typ == DATA_NSCN )  Value = (int)sfaslp->s_start_data;
+            if ( typ == RDATA_NSCN ) Value = (int)sfaslp->s_start_rdata;
+            if ( typ == BSS_NSCN )   Value = (int)sfaslp->s_start_bss;
             str=SYM_NAME(sym);
-            /* describe_sym ( sym-symbol_table, 0 );*/
-            set_symbol_address(sym,str);
-            /* describe_sym ( sym-symbol_table, 0 ); */
-          } else {
-            printf ("relocate_symbols: am ignoring section number %d\n",
-		   (sym->SectionNumber) );	  }
+            sym->Value = Value;
+        } else {
+            if ( typ == 0 ) {
+                str=SYM_NAME(sym);
+                /* describe_sym ( sym-symbol_table, 0 );*/
+                set_symbol_address(sym,str);
+                /* describe_sym ( sym-symbol_table, 0 ); */
+            } else {
+                printf ("relocate_symbols: am ignoring section number %d\n",
+                         (sym->SectionNumber) );	  }
         }
         sym += sym->NumberOfAuxSymbols;
     }
@@ -566,7 +566,7 @@ void set_symbol_address ( PIMAGE_SYMBOL sym, char *string )
     if ( c_table.ptable ) {
         answ = find_sym(sym,string);
         if ( answ ) {
-                sym->Value = answ->address - sym->Value;
+            sym->Value = answ->address - sym->Value;
             /* for symbols in the local  data,text and bss this gets added
                on when we add the current value */
         } else {
