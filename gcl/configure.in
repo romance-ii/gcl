@@ -416,13 +416,14 @@ fi
 TO3FLAGS=""
 TO2FLAGS=""
 
-TFPFLAG="-fomit-frame-pointer"
-#case "$use" in
-#  *mingw*)
-#	TFPFLAG="-fomit-frame-pointer";;
-#  *)
-#	TFPFLAG="-fomit-frame-pointer";;
-#esac
+#TFPFLAG="-fomit-frame-pointer"
+# FIXME -- remove when mingw compiler issues are fixed
+case "$use" in
+  *mingw*)
+	TFPFLAG="-fomit-frame-pointer";;
+  *)
+	TFPFLAG="-fomit-frame-pointer";;
+esac
 
 if test "$enable_gprof" = "yes" ; then
 	TCFLAGS="$TCFLAGS -pg"
@@ -436,13 +437,14 @@ if test "$enable_debug" = "yes" ; then
 	# for subconfigurations
 	CFLAGS="$CFLAGS -g"
 else
-#	case "$use" in
-#	  *mingw*)
-#		TO3FLAGS="-O3 $TFPFLAG";;
-#	  *)
-#		TO3FLAGS="-O3 $TFPFLAG";;
-#	esac
-	TO3FLAGS="-O3 $TFPFLAG"
+# FIXME -- remove when mingw compiler issues are fixed
+	case "$use" in
+	  *mingw*)
+		TO3FLAGS="-O3 $TFPFLAG";;
+	  *)
+		TO3FLAGS="-O3 $TFPFLAG";;
+	esac
+#	TO3FLAGS="-O3 $TFPFLAG"
 	TO2FLAGS="-O"
 fi
 

@@ -13,8 +13,9 @@ gclcvs (2.7.0-23) unstable; urgency=low
     handle situations where page numbers are ints, but npage*PAGESIZE is
     a long, need to handle npage >MAX_INT later.  This is to support the
     'billion cons element acl2 image' requested by a gcl user
+  * Revert winnt features and debugging aids in configure.in
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  3 May 2004 16:58:31 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  3 May 2004 17:05:24 +0000
 
 gclcvs (2.7.0-22) unstable; urgency=low
 
