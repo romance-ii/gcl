@@ -31,6 +31,10 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "include.h"
 #define dcheck_type(a,b) check_type(a,b)
 
+#if 0
+#define CMPAUX_DEBUG
+#endif
+
 DEFUNO_NEW("SPECIALP",object,fSspecialp,SI
        ,1,1,NONE,OO,OO,OO,OO,void,siLspecialp,(object sym),"")
 {
@@ -342,6 +346,11 @@ do_init(object *statVV)
   int n=fasl_vec->v.v_fillp -1;
   int i;
   object form;
+#ifdef CMPAUX_DEBUG
+         fprintf ( stderr,
+                   "do_init: START\n" );
+         fflush ( stderr );
+#endif /* CMPAUX_DEBUG */         
   check_type(fasl_vec,t_vector);
   form = fasl_vec->v.v_self[n];
   dcheck_type(form,t_cons);  
@@ -378,8 +387,19 @@ do_init(object *statVV)
   {object *top=vs_top;
    
    for(i=0 ; i< form->v.v_fillp; i++)
-     { 
-       eval(form->v.v_self[i]);
+     {
+#ifdef CMPAUX_DEBUG
+         fprintf ( stderr,
+                   "do_init: second for loop - i = %d, form->v.v_fillp = %d, form->v.v_self[%d] = %x....",
+                   i, form->v.v_fillp, i, form->v.v_self[i] );
+         fflush ( stderr );
+#endif /* CMPAUX_DEBUG */         
+        eval(form->v.v_self[i]);
+#ifdef CMPAUX_DEBUG
+         fprintf ( stderr,
+                   "  eval succeeded\n" ); 
+         fflush ( stderr );
+#endif /* CMPAUX_DEBUG */         
        vs_top=top;
      }
  }

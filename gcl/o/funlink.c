@@ -10,6 +10,8 @@ Fast linking method for kcl by W. Schelter University of Texas
 #include "sfun_argd.h"
 #include "page.h"
 
+#undef DO_FUNLINK_DEBUG
+
 static int
 clean_link_array(object *,object *);
 
@@ -25,65 +27,106 @@ int Rset = 0;
 /* cleanup link */
 void
 call_or_link(object sym, void **link )
-{object fun;
- fun = sym->s.s_gfdef;
-#if 0
- fprintf ( stderr, "call_or_link: fun %x\n", fun );
+{
+    object fun;
+    fun = sym->s.s_gfdef;
+#ifdef DO_FUNLINK_DEBUG
+    fprintf ( stderr, "call_or_link: fun %x START\n", fun );
 #endif 
- if (fun == OBJNULL) {FEinvalid_function(sym); return;}
- if (type_of(fun) == t_cclosure
-     && (fun->cc.cc_turbo))
-   {if (Rset==0) {MMccall(fun, fun->cc.cc_turbo);}
-    else (*(fun)->cf.cf_self)(fun->cc.cc_turbo);
-    return;}
- if (Rset==0) funcall(fun);
-   else
-   if (type_of(fun) == t_cfun)
-       { (void) vpush_extend( link,sLAlink_arrayA->s.s_dbind);
-	  (void) vpush_extend( *link,sLAlink_arrayA->s.s_dbind);	 
-         *link = (void *) (fun->cf.cf_self);
+    if (fun == OBJNULL) {
+        FEinvalid_function(sym);
+#ifdef DO_FUNLINK_DEBUG
+        fprintf ( stderr, "call_or_link: fun %x ERROR END\n", fun );
+#endif 
+        return;
+    }
+    if ( type_of ( fun ) == t_cclosure && (fun->cc.cc_turbo) ) {
+        if ( Rset ==0 ) {
+            MMccall ( fun, fun->cc.cc_turbo );
+        } else {
+            (*(fun)->cf.cf_self)(fun->cc.cc_turbo);
+        }
+#ifdef DO_FUNLINK_DEBUG
+        fprintf ( stderr, "call_or_link: fun %x END 1\n", fun );
+#endif 
+    return;
+    }
+    if ( Rset == 0 ) {
+        funcall(fun);
+    } else {
+        if ( type_of(fun) == t_cfun ) {
+            (void) vpush_extend ( link,sLAlink_arrayA->s.s_dbind );
+            (void) vpush_extend ( *link,sLAlink_arrayA->s.s_dbind );	 
+            *link = (void *) (fun->cf.cf_self);
 #if 0
-         fprintf ( stderr, "call_or_link: cf %x\n", fun->cf );
-         fprintf ( stderr, "call_or_link: cf_name %x\n", fun->cf.cf_name );
-         fprintf ( stderr, "call_or_link: cf_data %x\n", fun->cf.cf_data );
-         fprintf ( stderr, "call_or_link: cf_self %x\n", fun->cf.cf_self );
-         fflush ( stderr );
-         fprintf ( stderr, "call_or_link: staddr %x\n", fun->cf.cf_name->st.st_self );
-         fprintf ( stderr, "call_or_link: ststring %s\n", fun->cf.cf_name->st.st_self );
-         fflush ( stderr );
+            fprintf ( stderr, "call_or_link: cf %x\n", fun->cf );
+            fprintf ( stderr, "call_or_link: cf_name %x\n", fun->cf.cf_name );
+            fprintf ( stderr, "call_or_link: cf_data %x\n", fun->cf.cf_data );
+            fprintf ( stderr, "call_or_link: cf_self %x\n", fun->cf.cf_self );
+            fflush ( stderr );
+            fprintf ( stderr, "call_or_link: staddr %x\n", fun->cf.cf_name->st.st_self );
+            fprintf ( stderr, "call_or_link: ststring %s\n", fun->cf.cf_name->st.st_self );
+            fflush ( stderr );
 #endif         
-	 (*(void (*)())(fun->cf.cf_self))();
-       }
-   else funcall(fun);}
+            ( *(void (*)()) (fun->cf.cf_self)) ();
+        } else {
+            funcall(fun);
+        }
+    }
+#ifdef DO_FUNLINK_DEBUG
+    fprintf ( stderr, "call_or_link: fun %x END 2\n", fun );
+#endif 
+}
 
 void
-call_or_link_closure(object sym, void **link, void **ptr)
-{object fun;
- fun = sym->s.s_gfdef;
- if (fun == OBJNULL) {FEinvalid_function(sym); return;}
- if (type_of(fun) == t_cclosure
-     && (fun->cc.cc_turbo))
-   {if (Rset) {
-     (void) vpush_extend( link,sLAlink_arrayA->s.s_dbind);
-     (void) vpush_extend( *link,sLAlink_arrayA->s.s_dbind);
-     *ptr = (void *)(fun->cc.cc_turbo);
-     *link = (void *) (fun->cf.cf_self);
-     MMccall(fun, fun->cc.cc_turbo);}
-    else
-      {MMccall(fun, fun->cc.cc_turbo);}
-    return;}
- if (Rset==0) funcall(fun);
-   else
-     /* can't do this if invoking foo(a) is illegal when foo is not defined
-	to take any arguments.   In the majority of C's this is legal */
-     
-   if (type_of(fun) == t_cfun)
-       { (void) vpush_extend( link,sLAlink_arrayA->s.s_dbind);
-	  (void) vpush_extend( *link,sLAlink_arrayA->s.s_dbind);	 
-         *link = (void *) (fun->cf.cf_self);
-	 (*(void (*)())(fun->cf.cf_self))();
-       }
-   else funcall(fun);}
+call_or_link_closure ( object sym, void **link, void **ptr )
+{
+    object fun;
+#ifdef DO_FUNLINK_DEBUG
+    fprintf ( stderr, "call_or_link_closure: fun %x START\n", fun );
+#endif 
+    fun = sym->s.s_gfdef;
+    if (fun == OBJNULL) {
+#ifdef DO_FUNLINK_DEBUG
+        fprintf ( stderr, "call_or_link: fun %x ERROR END\n", fun );
+#endif 
+        FEinvalid_function(sym);
+        return;
+    }
+    if ( type_of ( fun ) == t_cclosure && ( fun->cc.cc_turbo ) ) {
+        if ( Rset ) {
+            (void) vpush_extend ( link, sLAlink_arrayA->s.s_dbind );
+            (void) vpush_extend ( *link, sLAlink_arrayA->s.s_dbind );
+            *ptr = (void *) ( fun->cc.cc_turbo );
+            *link = (void *) ( fun->cf.cf_self );
+            MMccall (fun, fun->cc.cc_turbo);
+        } else {
+            MMccall ( fun, fun->cc.cc_turbo );
+        }
+#ifdef DO_FUNLINK_DEBUG
+        fprintf ( stderr, "call_or_link: fun %x END 1\n", fun );
+#endif 
+        return;
+    }
+    if ( Rset == 0 ) {
+        funcall ( fun );
+    } else {
+        /* can't do this if invoking foo(a) is illegal when foo is not defined
+           to take any arguments.   In the majority of C's this is legal */
+        
+        if ( type_of ( fun ) == t_cfun ) {
+            (void) vpush_extend ( link, sLAlink_arrayA->s.s_dbind );
+            (void) vpush_extend ( *link, sLAlink_arrayA->s.s_dbind );	 
+            *link = (void *) (fun->cf.cf_self);
+            ( *(void (*)()) (fun->cf.cf_self) ) ();
+        } else {
+            funcall(fun);
+        }
+    }
+#ifdef DO_FUNLINK_DEBUG
+    fprintf ( stderr, "call_or_link: fun %x END 2\n", fun );
+#endif 
+}
 
 /* for pushing item into an array, where item is an address if array-type = t
 or a fixnum if array-type = fixnum */
@@ -91,7 +134,11 @@ or a fixnum if array-type = fixnum */
 #define SET_ITEM(ar,ind,val) (*((object *)(&((ar)->ust.ust_self[ind]))))= val
 static int     
 vpush_extend(void *item, object ar)
-{ register int ind = ar->ust.ust_fillp;
+{ register int ind;
+#ifdef DO_FUNLINK_DEBUG
+ fprintf ( stderr, "vpush_extend: item %x, ar %x\n", item, ar );
+#endif 
+ ind = ar->ust.ust_fillp;  
  AGAIN:
   if (ind < ar->ust.ust_dim)
    {SET_ITEM(ar,ind,item);
@@ -106,7 +153,11 @@ vpush_extend(void *item, object ar)
       ar->ust.ust_dim=newdim;
       ar->ust.ust_self=newself;
       goto AGAIN;
-    }}
+    }
+#ifdef DO_FUNLINK_DEBUG
+ fprintf ( stderr, "vpush_extend: item %x, ar %x END\n", item, ar );
+#endif 
+}
 
 
 /* if we unlink a bunch of functions, this will mean there are some
@@ -117,6 +168,9 @@ static int number_unlinked=0;
 static void
 delete_link(void *address, object link_ar)
 {object *ar,*ar_end,*p;
+#ifdef DO_FUNLINK_DEBUG
+ fprintf ( stderr, "delete_link: address %x, link_ar %x START\n", address, link_ar );
+#endif 
  p=0;
  ar = link_ar->v.v_self;
  ar_end = (object *)&(link_ar->ust.ust_self[link_ar->v.v_fillp]);
@@ -129,7 +183,11 @@ delete_link(void *address, object link_ar)
      ar=ar+2;}
  if (number_unlinked > 40)
    link_ar->v.v_fillp=
-     clean_link_array(link_ar->v.v_self,ar_end); }
+     clean_link_array(link_ar->v.v_self,ar_end);
+#ifdef DO_FUNLINK_DEBUG
+ fprintf ( stderr, "delete_link: address %x, link_ar %x END\n", address, link_ar );
+#endif 
+}
 
 
 DEFUN_NEW("USE-FAST-LINKS",object,fSuse_fast_links,SI,1,2,NONE,OO,OO,OO,OO,(object flag,...),
@@ -219,6 +277,9 @@ static int
 clean_link_array(object *ar, object *ar_end)
 {int i=0;
  object *orig;
+#ifdef DO_FUNLINK_DEBUG
+ fprintf ( stderr, "clean_link_array: ar %x, ar_end %x START\n", ar, ar_end );
+#endif 
  orig=ar;
  number_unlinked=0;
   while( ar<ar_end)
@@ -228,6 +289,9 @@ clean_link_array(object *ar, object *ar_end)
        }
    else ar=ar+2;       
     }
+#ifdef DO_FUNLINK_DEBUG
+ fprintf ( stderr, "clean_link_array: ar %x, ar_end %x END\n", ar, ar_end );
+#endif 
  return(i*sizeof(object *));
  }
 
@@ -246,6 +310,9 @@ clean_link_array(object *ar, object *ar_end)
 object
 c_apply_n(object (*fn)(), int n, object *x)
 {object res=Cnil;
+#ifdef DO_FUNLINK_DEBUG
+    fprintf ( stderr, "c_apply_n: n %d, x %x START\n", n, x );
+#endif 
  switch(n){
     case 0:  res=LCAST(fn)();break;
     case 1:  res=LCAST(fn)(x[0]);break;
@@ -567,6 +634,9 @@ c_apply_n(object (*fn)(), int n, object *x)
   default: FEerror("Exceeded call-arguments-limit ",0);
   } 
 
+#ifdef DO_FUNLINK_DEBUG
+    fprintf ( stderr, "c_apply_n: res %x END\n", n, res );
+#endif 
  return res;
 }
   
@@ -578,6 +648,9 @@ static object
 call_proc(object sym, void **link, int argd, va_list ll)
 {object fun;
  int nargs;
+#ifdef DO_FUNLINK_DEBUG
+    fprintf ( stderr, "call_proc: sym %x START\n", sym );
+#endif 
  check_type_symbol(&sym);
  fun=sym->s.s_gfdef;
  if (fun && (type_of(fun)==t_sfun
@@ -705,6 +778,9 @@ object
 call_proc_new(object sym, void **link, int argd, object first, va_list ll)
 {object fun;
  int nargs;
+#ifdef DO_FUNLINK_DEBUG
+    fprintf ( stderr, "call_proc_new: sym %x START\n", sym );
+#endif 
  check_type_symbol(&sym);
  fun=sym->s.s_gfdef;
  if (fun && (type_of(fun)==t_sfun
