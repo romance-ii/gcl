@@ -485,7 +485,7 @@ DEFVAR("*GENSYM-COUNTER*",sLgensym_counter,LISP,make_fixnum(0),"");
 @(defun gensym (&optional (x gensym_prefix) &aux sym)
 	int i, j, sign, size;
         fixnum f;
-        char *q,*p;
+        char *q=NULL,*p=NULL;
         object this_gensym_prefix,big;
         object this_gensym_counter;
 @

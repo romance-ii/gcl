@@ -88,6 +88,7 @@ parse_plt() {
   char *c,*d;
   object st,fi,li,ar,*op;
   Plt *p=mplt,*pe=p+sizeof(mplt)/sizeof(*mplt);
+  struct stat ss;
 
   if (snprintf(b,sizeof(b),"%s",kcl_self)<=0)
     FEerror("Cannot write map filename",0);
