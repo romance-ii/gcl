@@ -9,7 +9,7 @@ exec /fix/s/camm/gcl/unixport/saved_ansi_gcl \
    -eval '(si::init-readline)' \
      "$@"
 else
-exec /fix/s/camm/gcl/unixport/saved_ansi_gcl \
+exec /fix/s/camm/gcl/unixport/saved_gcl \
    -dir /fix/s/camm/gcl/unixport/ \
    -libdir /fix/s/camm/gcl/ \
    -eval '(setq si::*allow-gzipped-file* t)' \
