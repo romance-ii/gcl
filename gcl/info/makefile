@@ -4,8 +4,10 @@
 INFO_DIR=${prefix}/lib/info
 
 GCL_DVI=gcl-tk.dvi gcl-si.dvi gcl.dvi
-GCL_HTML=gcl-si_toc.html gcl-tk_toc.html gcl_toc.html
-HTML_CMD=texi2html -split_chapter
+#GCL_HTML=gcl-si_toc.html gcl-tk_toc.html gcl_toc.html
+GCL_HTML=gcl-si/index.html gcl-tk/index.html gcl/index.html
+#HTML_CMD=texi2html -split_chapter
+HTML_CMD=makeinfo --html 
 
 -include ../makedefs
 
@@ -46,13 +48,22 @@ gcl.dvi: ${GCL_MAN} gcl.texi
 gcl.info: ${GCL_MAN} gcl.texi
 	-$(MAKEINFO) gcl.texi
 
-gcl-si_toc.html: ${GCL_SI} gcl-si.texi
+#gcl-si_toc.html: ${GCL_SI} gcl-si.texi
+#	$(HTML_CMD) gcl-si.texi
+
+#gcl-tk_toc.html: ${GCL_TK} gcl-tk.texi
+#	$(HTML_CMD) gcl-tk.texi
+
+#gcl_toc.html:
+#	$(HTML_CMD) gcl.texi
+
+gcl-si/index.html: ${GCL_SI} gcl-si.texi
 	$(HTML_CMD) gcl-si.texi
 
-gcl-tk_toc.html: ${GCL_TK} gcl-tk.texi
+gcl-tk/index.html: ${GCL_TK} gcl-tk.texi
 	$(HTML_CMD) gcl-tk.texi
 
-gcl_toc.html:
+gcl/index.html: gcl.texi
 	$(HTML_CMD) gcl.texi
 
 install-html: gcl-tk_toc.html gcl-si_toc.html gcl_toc.html
@@ -71,9 +82,12 @@ install: $(GCL_DVI) $(GCL_HTML)
 	-mkdir -p $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl.html
 	-mkdir -p $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl-si.html
 	-mkdir -p $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl-tk.html
-	-cp gcl*html $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl.html
-	-cp gcl-si*html $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl-si.html
-	-cp gcl-tk*html $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl-tk.html
+#	-cp gcl_*html gcl.html $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl.html
+#	-cp gcl-si*html $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl-si.html
+#	-cp gcl-tk*html $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl-tk.html
+	-cp gcl/* $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl.html
+	-cp gcl-si/* $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl-si.html
+	-cp gcl-tk/* $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl-tk.html
 	-cp *dvi $(DESTDIR)$(INFO_DIR)../doc/gcl-doc
 
 FILE=gcl-si.texi
@@ -90,4 +104,4 @@ tex:
 
 clean:
 	rm -f *.info* *.html *.dvi *.cp *.ky *.vr *.tp *.pg *.toc *.aux *.log *.fn
-	rm -rf gcl.IC gcl.IE gcl.IG gcl.IP gcl.IR gcl.IT gcl.fu 
+	rm -rf gcl.IC gcl.IE gcl.IG gcl.IP gcl.IR gcl.IT gcl.fu gcl gcl-si gcl-tk
