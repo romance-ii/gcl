@@ -299,7 +299,7 @@ fasload(object faslfile) {
     struct bfd_link_hash_entry *h;
 
     if (!strncmp(entry_name_ptr,q[u]->name,5)) {
-      init_address=q[u]->value;
+      init_address=q[u]->value+(q[u]->section->output_section->vma-(unsigned long)memory->cfd.cfd_start);
       continue;
     }
 

@@ -132,13 +132,12 @@ char *the_start,*start_address;
 
 
 /* align for power of two n */
-static void *
-round_up(address,n)
-     unsigned int address,n;
-{
- return  (void *)((address + n -1) & ~(n-1)) ;
-}
-#define ROUND_UP(a,b) round_up(a,b) 
+/* static void * */
+/* round_up(unsigned long address,unsigned long n) { */
+/* { */
+/*  return  (void *)((address + n -1) & ~(n-1)) ; */
+/* } */
+#define ROUND_UP(_addr,_ps) ((void *)(((unsigned long)_addr + (unsigned long)_ps -1) & ~((unsigned long)_ps-1)))
 
 int use_mmap;
 
@@ -308,46 +307,31 @@ fasload(faslfile)
      }
 
    { 
-     int j=0;
-     for (j=1 ; j <  file_h->e_shnum ; j++)
-       {
+     int j;
+
+     for (j=1 ; j <  file_h->e_shnum ; j++) {
+
 	 shp = &SECTION_H(j); 
 	 if ((shp->sh_type == SHT_RELA || shp->sh_type == SHT_REL) &&
 	     shp->sh_info<file_h->e_shnum &&
-	     (SECTION_H(shp->sh_info).sh_flags & SHF_ALLOC))
-	   {
-	     int index_to_relocate = shp->sh_info;
-	     if (symtab_index != shp->sh_link)
-	       FEerror("unexpected symbol table used",0);
-	     the_start = start_address + section[index_to_relocate].start;
-	   }
-/*  	 else if (shp->sh_type == SHT_REL */
-/*  	     && (SECTION_H(shp->sh_info).sh_flags & SHF_ALLOC)) */
-/*  	   { */
-/*  	     int index_to_relocate = shp->sh_info; */
-/*  	     if (symtab_index != shp->sh_link) */
-/*  	       FEerror("unexpected symbol table used"); */
-/*  	     the_start = start_address + section[index_to_relocate].start; */
-/*  	   } */
-	 
-	 else if ( (shp->sh_type == SHT_REL) || (shp->sh_type == SHT_RELA) )
-	   {  if (/* get_section_number(".rel.stab") == j || */
-		  /* Newer gcc uses these section name -- CMM 20040224*/
-		  !strncmp(section_names+SECTION_H(j).sh_name,".rel.debug",10) ||
-		  /* old in for backward compatibility */
-		  !strcmp(section_names+SECTION_H(j).sh_name,".rel.stab"))
-	         continue;
-	     FEerror("unknown rel type",0);
-	   }
-	 else
-	   continue;
-	 {
-	   int k=0;
+	     (SECTION_H(shp->sh_info).sh_flags & SHF_ALLOC) 
+	     && (SECTION_H(shp->sh_info).sh_type == SHT_PROGBITS
+		|| SECTION_H(shp->sh_info).sh_type == SHT_NOBITS)) {
+
+	   int k;
 	   char *rel = (char *) base +   shp->sh_offset;
+
+	   if (symtab_index != shp->sh_link)
+	     FEerror("unexpected symbol table used",0);
+	   the_start = start_address + section[shp->sh_info].start;
+
 	   for (k= 0; k< shp->sh_size ; k+= shp->sh_entsize) 
 	     relocate(symbol_table,(Elf32_Rela *)(rel + k),shp->sh_type);
+
 	 }
-       }
+
+     }
+
    }
 
 #ifdef STAND
@@ -691,7 +675,7 @@ relocate_symbols(sym,nsyms,nscns,init_address_ptr)
 		  default:
 		    printf("[unknown rel secn %d type=%d]",
 			   sym->st_shndx,
-			   SECTION_H(sym->st_shndx).sh_type);
+			   (int)SECTION_H(sym->st_shndx).sh_type);
 		  }
 	      }
 	    else
@@ -707,7 +691,7 @@ relocate_symbols(sym,nsyms,nscns,init_address_ptr)
 	      if (sym->st_shndx == text_index &&
 		  bcmp("init_",string_table + sym->st_name,4) == 0)
 		{
-		  *init_address_ptr = sym->st_value;
+		  *init_address_ptr = sym->st_value+section[sym->st_shndx].start;
 
 		  }
 	    else	
