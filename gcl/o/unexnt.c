@@ -975,7 +975,7 @@ allocate_heap (void)
      the region below the 256MB line for our malloc arena - 229MB is
      still a pretty decent arena to play in!  */
 
-#if 0
+#if 1
   unsigned long base = DBEGIN;   /*  27MB */
 #else  
   unsigned long base = 0x10100000 /*0x01B00000*/;  /*  27MB */
