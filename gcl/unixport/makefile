@@ -10,7 +10,7 @@ LSPDIR	= ../lsp
 CMPDIR	= ../cmpnew
 CLCSDIR = ../clcs
 PCLDIR  = ../pcl
-PORTDIR = .
+PORTDIR = $(shell pwd)
 
 LD_LIBS_PRE=$(addprefix -u ,$(PATCHED_SYMBOLS))
 LD_LIBS_POST=$(LIBS) $(LIBC) -lgclp

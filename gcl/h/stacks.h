@@ -1,26 +1,30 @@
 #ifndef MAXPAGE
-#define MAXPAGE (32 * 1024)
+#define MAXPAGE (128 * 1024)
 #endif
 #ifndef VSSIZE
-#define VSSIZE 8192
+#define VSSIZE 128*1024
 #endif
 
 #define VSGETA 128
 EXTER object value_stack[VSSIZE + (STACK_OVER +1) *VSGETA];     
 
-#define BDSSIZE		1024
-#define	BDSGETA		40
+#ifndef BDSSIZE
+#define BDSSIZE		2*1024
+#endif
+#define	BDSGETA		64
 EXTER struct bds_bd bind_stack[BDSSIZE + (STACK_OVER +1)* BDSGETA];
 
      
-/*  #define	IHSSIZE		1024 */
-/*  #define	IHSGETA		32 */
-#define	IHSSIZE		4096
-#define	IHSGETA		64
+#ifndef IHSSIZE
+#define	IHSSIZE		4*1024
+#endif
+#define	IHSGETA		96
 EXTER struct invocation_history ihs_stack[IHSSIZE + (STACK_OVER +1) * IHSGETA];     
 
 
-#define FRSSIZE		1024
-#define	FRSGETA		16
+#ifndef FRSSIZE
+#define FRSSIZE		4*1024
+#endif
+#define	FRSGETA		96
 EXTER struct frame frame_stack[FRSSIZE + (STACK_OVER +1) * FRSGETA];
 

@@ -542,8 +542,9 @@ SYSTEM_SPECIAL_INIT
      (setq na  (namestring
 		(make-pathname :name name :type (pathname-type(first args)))))
    #+(or dos winnt)
-      (format nil "~a ~a ~a -c -w ~a -o ~a"
+      (format nil "~a -I~a ~a ~a -c -w ~a -o ~a"
 	      *cc*
+	      (concatenate 'string si::*system-directory* "../h")
 	      (if (and (boundp '*c-debug*) *c-debug*) " -g " "")
 	      (case *speed*
 		    (3 *opt-three* )
@@ -557,8 +558,9 @@ SYSTEM_SPECIAL_INIT
 	      )
 
    #-(or dos winnt)
-   (format nil  "(cd ~a ;~a ~a ~a -c ~a ~a)"
+   (format nil  "(cd ~a ;~a -I~a ~a ~a -c ~a ~a)"
 	   dir *cc*
+	   (concatenate 'string si::*system-directory* "../h")
 	   (if (and (boundp '*c-debug*) *c-debug*) " -g " "")
 ;           (case *speed*
 ;		 (3 #+broken_o4_opt "-O" #-broken_o4_opt"-O4")
@@ -760,7 +762,8 @@ SYSTEM_SPECIAL_INIT
 		    (format st "  return 0;~%")
 		    (format st "}~%~%")))
 		    
-  (system (format nil "~a ~a" *cc* tem))
+  (compiler-cc tem (concatenate 'string out ".o"))
+;  (system (format nil "~a ~a" *cc* tem))
   (delete-file tem)
   
 )
@@ -772,7 +775,7 @@ SYSTEM_SPECIAL_INIT
   (setq init (format nil "init_~a.lsp" (pathname-name image)))
 
   (system 
-   (format nil "~a ~a user-init.o ~a -L ~a ~a ~a"
+   (format nil "~a ~a user-init.o ~a -L~a ~a ~a"
 	   *ld* 
 	   raw
 	   (let ((sfiles ""))

@@ -167,6 +167,10 @@ install1:
 	rm -f $(DESTDIR)$(prefix)/bin/gcl.exe
 	tar cf - $(PORTDIR)/$(FLISP)$(EXE) info/*.info* $(LISP_LIB) \
 	$(TCL_EXES)  |  (cd $(DESTDIR)$(INSTALL_LIB_DIR) ;tar xf -)
+	cd $(DESTDIR)$(INSTALL_LIB_DIR)/$(PORTDIR) && \
+		mv $(FLISP)$(EXE) temp && \
+		echo "(setq si::*system-directory* \"$(INSTALL_LIB_DIR)/$(PORTDIR)\")(si::save-system \"$(FLISP)$(EXE)\")" | ./temp && \
+		rm -f temp
 	if [ -e "unixport/rsym$(EXE)" ] ; then cp unixport/rsym$(EXE) $(DESTDIR)$(INSTALL_LIB_DIR)/unixport/ ; fi
 #	ln $(SYMB) $(INSTALL_LIB_DIR)/$(PORTDIR)/$(FLISP)$(EXE) \
 #	 $(DESTDIR)$(prefix)/bin/gcl.exe

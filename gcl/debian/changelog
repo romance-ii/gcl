@@ -12,8 +12,9 @@ gclcvs (2.7.0-1) unstable; urgency=low
   * fixup config.guess,sub rules in debian/rules
   * remove  windows/install.ansi.lsp (build generated file) from CVS
   * Remove unused definitions of Vcs
+  * Merge changes from 2.6.1
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  2 Sep 2003 20:33:23 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  4 Sep 2003 03:10:11 +0000
 
 gcl (2.6.1-1) unstable; urgency=low
 
@@ -56,8 +57,17 @@ gcl (2.6.1-1) unstable; urgency=low
   * syntax fix to lsp/gprof.hc
   * Add support for SGC contblock pages
   * Fixes to debian/rules
+  * Remove unused definitions of Vcs
+  * Increase default maxpages and stack sizes
+  * Maintain a persisten *system-directory* binding
+  * Push installed /h directory onto -I flags on cc command line
+  * Escape old in-package behavior with #ifdef ANSI_COMMON_LISP
+  * define HAVE_XDR in linux.h
+  * reduce resolution of contblock mark_table in gbc.c to match new
+    minimum granularity introduced via CPTR_ALIGN
+  * Remove exit function in main.c
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  2 Sep 2003 17:24:30 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  4 Sep 2003 02:20:52 +0000
 
 gcl (2.6.0cvs-1) experimental; urgency=low
 

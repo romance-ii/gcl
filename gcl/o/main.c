@@ -575,9 +575,9 @@ DEFUN_NEW("QUIT",object,fLquit,LISP
        ,0,1,NONE,OI,OO,OO,OO,(fixnum exitc),"")
 {	return fLbye(exitc); }
  
-DEFUN_NEW("EXIT",object,fLexit,LISP
-       ,0,1,NONE,OI,OO,OO,OO,(fixnum exitc),"")
-{	return fLbye(exitc); }
+/* DEFUN_NEW("EXIT",object,fLexit,LISP */
+/*        ,0,1,NONE,OI,OO,OO,OO,(fixnum exitc),"") */
+/* {	return fLbye(exitc); } */
  
 
 static void

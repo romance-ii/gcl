@@ -2795,8 +2795,8 @@ object in;
 		old_sharp_eq_context[SHARP_EQ_CONTEXT_SIZE];
 	int old_backq_level;
 
-	/* to prevent longjmp clobber */
-	i=(int)&vsp;
+        /* to prevent longjmp clobber */
+        i=(int)&vsp;
 	vsp=&vspo;
 	old_READtable = READtable;
 	old_READdefault_float_format = READdefault_float_format;

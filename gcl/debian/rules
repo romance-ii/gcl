@@ -149,8 +149,8 @@ install-stamp: build-stamp debian/control $(INS)
 	dh_installdirs
 
 	mkdir -p debian/tmp
-	cp -a debian/trad/* debian/tmp/
 	cp -a debian/ansi/* debian/tmp/
+	cp -a debian/trad/* debian/tmp/
 
 	mkdir -p debian/tmp/usr/share/emacs/site-lisp
 	cp -a $$(find debian/tmp/usr/local -name site-lisp -type d) \

@@ -741,8 +741,9 @@ First directory is checked for first name and all extensions etc."
      (setq *load-path* (cons (si::string-concatenate *lib-directory*
 						     "gcl-tk/") *load-path*))
 	    )
-    (setq si::*system-directory* (namestring
-        (truename (make-pathname :name nil :type nil :defaults (si::argv 0)))))
+    (when (not (boundp 'si::*system-directory*)) 
+      (setq si::*system-directory* (namestring
+        (truename (make-pathname :name nil :type nil :defaults (si::argv 0))))))
     (set-dir  'si::*system-directory* "-dir")
     (if (multiple-value-setq (tem tem) (get-command-arg "-f"))
 	(let (*load-verbose*)

@@ -10,8 +10,11 @@ is usually 4K or 8K bytes.  From 1 to 3 bytes per page are
 preallocated in a table at compile time.  this must be a power of 2 if
 SGC is enabled.  */
 
-#define MAXPAGE 32*1024
-#define VSSIZE 32768
+#define MAXPAGE 128*1024
+#define VSSIZE 128*1024
+#define BDSSIZE 2*1024
+#define IHSSIZE 4*1024
+#define FRSSIZE 4*1024
 
 
 /* check to see if getcwd exists
@@ -216,7 +219,7 @@ SGC is enabled.  */
 /*  #define PAGESIZE (1<<PAGEWIDTH) */
 /*  #endif */
 
-#undef SIZEOF_LONG_P
+#undef SIZEOF_LONG
 
 #undef USE_DLOPEN
 
@@ -230,5 +233,7 @@ SGC is enabled.  */
 /* Define if we have the JAPI library on board */
 #undef HAVE_JAPI_H
 
-/* Define if we have XDR functions on board */
 #undef HAVE_XDR
+#undef ENDIAN_ALREADY_DEFINED
+#undef USE_CLEANUP
+#undef SIZEOF_CONTBLOCK

@@ -220,10 +220,13 @@ int isize,esize;
 
 	x = find_package(n);
 	if (x == Cnil) {
+#ifdef ANSI_COMMON_LISP
  	   	FEpackage_error(n,"No such package");  
  		return Cnil; 
-/*  		x = make_package(n, ns, ul,isize,esize);  */
-/*  		goto L;  */
+#else
+  		x = make_package(n, ns, ul,isize,esize);
+  		goto L;
+#endif
 	}
 	if (isize) rehash_pack(&(x->p.p_internal),
 		&x->p.p_internal_size,isize);
@@ -243,7 +246,9 @@ int isize,esize;
 	}
 	for (;  !endp(ul);  ul = ul->c.c_cdr)
 		use_package(ul->c.c_car, x);
-/* L:  */
+#ifndef ANSI_COMMON_LISP
+L:
+#endif
 	sLApackageA->s.s_dbind = x;
 	vs_reset;
 	return(x);

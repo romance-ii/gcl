@@ -848,6 +848,9 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
  --enable-maxpage=XXXX will compile in a page table of size XXX (eg '--enable-maxpage=64*1024' would give 64K pages allowing 256 MB if pages are 4K each)
  --enable-vssize=XXXX will compile in a value stack of size XXX
+ --enable-bdssize=XXXX will compile in a binding stack of size XXX
+ --enable-ihssize=XXXX will compile in a invocation history stack of size XXX
+ --enable-frssize=XXXX will compile in a frame stack of size XXX
  --enable-machine=XXXX will force the use of one of the definitions in h/XXXX.defs
  --enable-static will link your GCL against static as opposed to shared system libraries
  --enable-gmp=no will disable use of GMP gnu multiprecision arithmetic, (default is =yes)
@@ -1321,7 +1324,6 @@ if test "${enable_maxpage+set}" = set; then
 #define MAXPAGE $enable_maxpage
 _ACEOF
 
-
 fi;
 
 # Check whether --enable-vssize or --disable-vssize was given.
@@ -1331,6 +1333,32 @@ if test "${enable_vssize+set}" = set; then
 #define VSSIZE $enable_vssize
 _ACEOF
 
+fi;
+
+# Check whether --enable-bdssize or --disable-bdssize was given.
+if test "${enable_bdssize+set}" = set; then
+  enableval="$enable_bdssize"
+  cat >>confdefs.h <<_ACEOF
+#define BDSSIZE $enable_bdssize
+_ACEOF
+
+fi;
+
+# Check whether --enable-ihssize or --disable-ihssize was given.
+if test "${enable_ihssize+set}" = set; then
+  enableval="$enable_ihssize"
+  cat >>confdefs.h <<_ACEOF
+#define IHSSIZE $enable_ihssize
+_ACEOF
+
+fi;
+
+# Check whether --enable-frssize or --disable-frssize was given.
+if test "${enable_frssize+set}" = set; then
+  enableval="$enable_frssize"
+  cat >>confdefs.h <<_ACEOF
+#define FRSSIZE $enable_frssize
+_ACEOF
 
 fi;
 
@@ -5765,9 +5793,9 @@ fi
 # mechanism, in the PAGE macro.  This offset is subtracted from
 # addresses, in calculating a page for an address in the heap.
 
-echo "$as_me:$LINENO: checking for long *" >&5
-echo $ECHO_N "checking for long *... $ECHO_C" >&6
-if test "${ac_cv_type_long_p+set}" = set; then
+echo "$as_me:$LINENO: checking for long" >&5
+echo $ECHO_N "checking for long... $ECHO_C" >&6
+if test "${ac_cv_type_long+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   cat >conftest.$ac_ext <<_ACEOF
@@ -5781,9 +5809,9 @@ $ac_includes_default
 int
 main ()
 {
-if ((long * *) 0)
+if ((long *) 0)
   return 0;
-if (sizeof (long *))
+if (sizeof (long))
   return 0;
   ;
   return 0;
@@ -5801,24 +5829,24 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  ac_cv_type_long_p=yes
+  ac_cv_type_long=yes
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-ac_cv_type_long_p=no
+ac_cv_type_long=no
 fi
 rm -f conftest.$ac_objext conftest.$ac_ext
 fi
-echo "$as_me:$LINENO: result: $ac_cv_type_long_p" >&5
-echo "${ECHO_T}$ac_cv_type_long_p" >&6
+echo "$as_me:$LINENO: result: $ac_cv_type_long" >&5
+echo "${ECHO_T}$ac_cv_type_long" >&6
 
-echo "$as_me:$LINENO: checking size of long *" >&5
-echo $ECHO_N "checking size of long *... $ECHO_C" >&6
-if test "${ac_cv_sizeof_long_p+set}" = set; then
+echo "$as_me:$LINENO: checking size of long" >&5
+echo $ECHO_N "checking size of long... $ECHO_C" >&6
+if test "${ac_cv_sizeof_long+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test "$ac_cv_type_long_p" = yes; then
+  if test "$ac_cv_type_long" = yes; then
   # The cast to unsigned long works around a bug in the HP C Compiler
   # version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
   # declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
@@ -5836,7 +5864,7 @@ $ac_includes_default
 int
 main ()
 {
-static int test_array [1 - 2 * !(((long) (sizeof (long *))) >= 0)];
+static int test_array [1 - 2 * !(((long) (sizeof (long))) >= 0)];
 test_array [0] = 0
 
   ;
@@ -5868,7 +5896,7 @@ $ac_includes_default
 int
 main ()
 {
-static int test_array [1 - 2 * !(((long) (sizeof (long *))) <= $ac_mid)];
+static int test_array [1 - 2 * !(((long) (sizeof (long))) <= $ac_mid)];
 test_array [0] = 0
 
   ;
@@ -5916,7 +5944,7 @@ $ac_includes_default
 int
 main ()
 {
-static int test_array [1 - 2 * !(((long) (sizeof (long *))) < 0)];
+static int test_array [1 - 2 * !(((long) (sizeof (long))) < 0)];
 test_array [0] = 0
 
   ;
@@ -5948,7 +5976,7 @@ $ac_includes_default
 int
 main ()
 {
-static int test_array [1 - 2 * !(((long) (sizeof (long *))) >= $ac_mid)];
+static int test_array [1 - 2 * !(((long) (sizeof (long))) >= $ac_mid)];
 test_array [0] = 0
 
   ;
@@ -6004,7 +6032,7 @@ $ac_includes_default
 int
 main ()
 {
-static int test_array [1 - 2 * !(((long) (sizeof (long *))) <= $ac_mid)];
+static int test_array [1 - 2 * !(((long) (sizeof (long))) <= $ac_mid)];
 test_array [0] = 0
 
   ;
@@ -6033,10 +6061,10 @@ fi
 rm -f conftest.$ac_objext conftest.$ac_ext
 done
 case $ac_lo in
-?*) ac_cv_sizeof_long_p=$ac_lo;;
-'') { { echo "$as_me:$LINENO: error: cannot compute sizeof (long *), 77
+?*) ac_cv_sizeof_long=$ac_lo;;
+'') { { echo "$as_me:$LINENO: error: cannot compute sizeof (long), 77
 See \`config.log' for more details." >&5
-echo "$as_me: error: cannot compute sizeof (long *), 77
+echo "$as_me: error: cannot compute sizeof (long), 77
 See \`config.log' for more details." >&2;}
    { (exit 1); exit 1; }; } ;;
 esac
@@ -6056,8 +6084,8 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 $ac_includes_default
-long longval () { return (long) (sizeof (long *)); }
-unsigned long ulongval () { return (long) (sizeof (long *)); }
+long longval () { return (long) (sizeof (long)); }
+unsigned long ulongval () { return (long) (sizeof (long)); }
 #include <stdio.h>
 #include <stdlib.h>
 int
@@ -6067,17 +6095,17 @@ main ()
   FILE *f = fopen ("conftest.val", "w");
   if (! f)
     exit (1);
-  if (((long) (sizeof (long *))) < 0)
+  if (((long) (sizeof (long))) < 0)
     {
       long i = longval ();
-      if (i != ((long) (sizeof (long *))))
+      if (i != ((long) (sizeof (long))))
 	exit (1);
       fprintf (f, "%ld\n", i);
     }
   else
     {
       unsigned long i = ulongval ();
-      if (i != ((long) (sizeof (long *))))
+      if (i != ((long) (sizeof (long))))
 	exit (1);
       fprintf (f, "%lu\n", i);
     }
@@ -6098,16 +6126,16 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  ac_cv_sizeof_long_p=`cat conftest.val`
+  ac_cv_sizeof_long=`cat conftest.val`
 else
   echo "$as_me: program exited with status $ac_status" >&5
 echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
 ( exit $ac_status )
-{ { echo "$as_me:$LINENO: error: cannot compute sizeof (long *), 77
+{ { echo "$as_me:$LINENO: error: cannot compute sizeof (long), 77
 See \`config.log' for more details." >&5
-echo "$as_me: error: cannot compute sizeof (long *), 77
+echo "$as_me: error: cannot compute sizeof (long), 77
 See \`config.log' for more details." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -6116,13 +6144,66 @@ fi
 fi
 rm -f conftest.val
 else
-  ac_cv_sizeof_long_p=0
+  ac_cv_sizeof_long=0
 fi
 fi
-echo "$as_me:$LINENO: result: $ac_cv_sizeof_long_p" >&5
-echo "${ECHO_T}$ac_cv_sizeof_long_p" >&6
+echo "$as_me:$LINENO: result: $ac_cv_sizeof_long" >&5
+echo "${ECHO_T}$ac_cv_sizeof_long" >&6
 cat >>confdefs.h <<_ACEOF
-#define SIZEOF_LONG_P $ac_cv_sizeof_long_p
+#define SIZEOF_LONG $ac_cv_sizeof_long
+_ACEOF
+
+
+echo "$as_me:$LINENO: checking sizeof struct contblock" >&5
+echo $ECHO_N "checking sizeof struct contblock... $ECHO_C" >&6
+if test "$cross_compiling" = yes; then
+  echo Cannot find sizeof struct contblock;exit 1
+else
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <stdio.h>
+	#define EXTER
+	#include "$MP_INCLUDE"
+	#include "h/enum.h"
+	#include "h/object.h"
+	int main(int argc,char **argv,char **envp) {
+	FILE *f=fopen("conftest1","w");
+	fprintf(f,"%u",sizeof(struct contblock));
+	fclose(f);
+	return 0;
+	}
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  sizeof_contblock=`cat conftest1`
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+echo Cannot find sizeof struct contblock;exit 1
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $sizeof_contblock" >&5
+echo "${ECHO_T}$sizeof_contblock" >&6
+cat >>confdefs.h <<_ACEOF
+#define SIZEOF_CONTBLOCK $sizeof_contblock
 _ACEOF
 
 

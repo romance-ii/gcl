@@ -3366,6 +3366,8 @@ T1321:;
 	(VV[130]->s.s_dbind)= make_cons(V277,(VV[130]->s.s_dbind));
 	goto T1320;
 T1320:;
+	if((VV[142])->s.s_dbind!=OBJNULL){
+	goto T1334;}
 	base[2]= VV[143];
 	base[3]= Cnil;
 	base[4]= VV[144];
@@ -3388,6 +3390,8 @@ T1320:;
 	Lnamestring();
 	vs_top=sup;
 	(VV[142]->s.s_dbind)= vs_base[0];
+	goto T1334;
+T1334:;
 	base[0]= VV[142];
 	base[1]= VV[146];
 	vs_top=(vs_base=base+0)+2;
@@ -3407,7 +3411,7 @@ T1320:;
 	V272= Cnil;}
 	vs_top=sup;
 	if(((V272))==Cnil){
-	goto T1349;}
+	goto T1351;}
 	bds_bind(VV[15],Cnil);
 	base[1]= (VV[16]->s.s_dbind);
 	vs_top=(vs_base=base+1)+1;
@@ -3419,8 +3423,8 @@ T1320:;
 	(void) (*Lnk215)();
 	bds_unwind1;
 	return;
-	goto T1349;
-T1349:;
+	goto T1351;
+T1351:;
 	base[0]= Cnil;
 	vs_top=(vs_base=base+0)+1;
 	return;}}
@@ -3444,7 +3448,7 @@ TTL:;
 	if(nlj_active)
 	{nlj_active=FALSE;frs_pop();
 	vs_top=sup;
-	goto T1358;}
+	goto T1360;}
 	else{
 	base[5]= (V278);
 	vs_top=(vs_base=base+5)+1;
@@ -3459,8 +3463,8 @@ TTL:;
 	vs_top=(vs_base=base+6)+1;
 	Lread_line();
 	vs_top=sup;
-	goto T1367;
-T1367:;
+	goto T1369;
+T1369:;
 	base[6]= base[4];
 	base[7]= Cnil;
 	base[8]= base[1];
@@ -3469,19 +3473,19 @@ T1367:;
 	vs_top=sup;
 	base[2]= vs_base[0];
 	if(!((base[1])==(base[2]))){
-	goto T1374;}
+	goto T1376;}
 	base[6]= Cnil;
 	vs_top=(vs_base=base+6)+1;
-	goto T1363;
-	goto T1374;
-T1374:;
+	goto T1365;
+	goto T1376;
+T1376:;
 	base[6]= base[2];
 	vs_top=(vs_base=base+6)+1;
 	Leval();
 	vs_top=sup;
-	goto T1367;
-	goto T1363;
-T1363:;
+	goto T1369;
+	goto T1365;
+T1365:;
 	active=FALSE;}
 	base[5]=Cnil;
 	while(vs_base<vs_top)
@@ -3489,13 +3493,13 @@ T1363:;
 	vs_top=sup;
 	nlj_active=FALSE;frs_pop();
 	if((base[4])==Cnil){
-	goto T1379;}
+	goto T1381;}
 	base[6]= base[4];
 	vs_top=(vs_base=base+6)+1;
 	Lclose();
 	vs_top=sup;
-	goto T1379;
-T1379:;
+	goto T1381;
+T1381:;
 	vs_base=vs_top=base+6;
 	for(p= base[5];!endp(p);p=MMcdr(p))vs_push(MMcar(p));
 	if(active)unwind(fr,tag);else{
@@ -3504,8 +3508,8 @@ T1379:;
 	Lby();
 	vs_top=sup;
 	frs_pop();}
-	goto T1358;
-T1358:;
+	goto T1360;
+T1360:;
 	base[4]= small_fixnum(1);
 	vs_top=(vs_base=base+4)+1;
 	Lby();

@@ -31,6 +31,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "include.h"
+#include "page.h"
 
 
 #ifdef SGC
@@ -66,18 +67,26 @@ mark_object(object);
 */ 
 #define BBITS_CHAR 3
 
-#if SIZEOF_LONG_P == 4
+#if SIZEOF_LONG == 4
 #define BBYTES_LONG 2
-#elif SIZEOF_LONG_P == 8
+#elif SIZEOF_LONG == 8
 #define BBYTES_LONG 3
 #else
-#error Do not recognize SIZEOF_LONG_P
+#error Do not recognize SIZEOF_LONG
+#endif
+
+#if CPTR_ALIGN == 8
+#define BBYTES_CONTBLOCK 3
+#elif CPTR_ALIGN == 16
+#define BBYTES_CONTBLOCK 4
+#else
+#error Do not recognize CPTR_ALIGN
 #endif
 
 #define BBITS_LONG (BBYTES_LONG+BBITS_CHAR)
-#define BCHARS_TABLE (BBITS_LONG+BBYTES_LONG)
+#define BCHARS_TABLE (BBITS_LONG+BBYTES_CONTBLOCK)
 
-#define Shamt(x) (((((unsigned long) x) >> BBYTES_LONG) & ~(~0 << BBITS_LONG)))
+#define Shamt(x) (((((unsigned long) x) >> BBYTES_CONTBLOCK) & ~(~0 << BBITS_LONG)))
 #define Madr(x) (mark_table+((((unsigned long) x) - ((unsigned long)DBEGIN)) >> (BCHARS_TABLE)))
 #define get_mark_bit(x) (*(Madr(x)) >> Shamt(x) & 1)
 #define set_mark_bit(x) ((*(Madr(x))) |= ((unsigned long)1 << Shamt(x)))
@@ -104,7 +113,6 @@ int runtime(void);
 
 static char *copy_relblock(char *p, int s);
 
-#include "page.h"
 
 extern bool saving_system;
 extern long real_maxpage;
@@ -162,6 +170,7 @@ struct {
 } mark_origin_block[MARK_ORIGIN_BLOCK_MAX];
 int mark_origin_block_max;
 
+/* must be a long * to match with SIZEOF_LONG usage above*/
 long *mark_table;
 
 enum type what_to_collect;
@@ -1095,7 +1104,7 @@ GBC(enum type t) {
   maxpage = page(heap_end);
   
   if ((int)t >= (int)t_contiguous) {
-    j = maxpage*(PAGESIZE/(sizeof(int)*sizeof(int)*CHAR_SIZE)) ;
+    j = maxpage*(PAGESIZE/(CPTR_ALIGN*SIZEOF_LONG*CHAR_SIZE)) ;
     /*
       (PAGESIZE / sizeof(int)) = x * (sizeof(int)*CHAR_SIZE)
       eg if PAGESIZE = 2048  x=16
@@ -1415,16 +1424,16 @@ static void
 mark_contblock(void *p, int s) {
 
   STATIC char *q;
-  STATIC int *x, *y;
+  STATIC char *x, *y;
   
   if (!MAYBE_DATA_P(p) || (enum type)type_map[page(p)] != t_contiguous)
     return;
   q = p + s;
   /* SGC cont pages: contblock pages must be no smaller than
      sizeof(struct contblock).  CM 20030827 */
-  x = (int *)ROUND_DOWN_PTR_CONT(p);
-  y = (int *)ROUND_UP_PTR_CONT(q);
-  for (;  x < y;  x++)
+  x = (char *)ROUND_DOWN_PTR_CONT(p);
+  y = (char *)ROUND_UP_PTR_CONT(q);
+  for (;  x < y;  x+=CPTR_ALIGN)
     set_mark_bit(x);
 }
 

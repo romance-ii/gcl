@@ -1,23 +1,49 @@
-/* h/gclincl.h.in.  Generated automatically from configure.in by autoheader 2.13.  */
-
-/* Define if you have alloca, as a function or macro.  */
-#undef HAVE_ALLOCA
-
-/* Define if you have <alloca.h> and it should be used (not on Ultrix).  */
-#undef HAVE_ALLOCA_H
-
-/* Define if the X Window System is missing or not being used.  */
-#undef X_DISPLAY_MISSING
+/* h/gclincl.h.in.  Generated from configure.in by autoheader.  */
+/* define where the heap could begin.   Normally should
+be the smallest value returned by sbrk().   Underestimating
+by 10-20 megabytes is not a problem. */
 
 #define DBEGIN 0
 
-#define MAXPAGE 32*1024
-#define VSSIZE 32768
+
+/* the size of the page tables for gcl.  Each page is PAGESIZE which
+is usually 4K or 8K bytes.  From 1 to 3 bytes per page are
+preallocated in a table at compile time.  this must be a power of 2 if
+SGC is enabled.  */
+
+#define MAXPAGE 128*1024
+#define VSSIZE 128*1024
+#define BDSSIZE 2*1024
+#define IHSSIZE 4*1024
+#define FRSSIZE 4*1024
+
+
+/* check to see if getcwd exists
+*/
+#define HAVE_GETCWD 0
+
+
+/* if we dont have USEGETCWD, we will use GETWD unless following defined
+*/
+#undef HAVE_GETWD
+
+
+/* no gettimeofday function */
 
 #undef NO_GETTOD
 
+/* define if have <asm/signal.h> */
+#undef HAVE_ASM_SIGNAL_H
+
+/* define if have <asm/sigcontext.h> */
+#undef HAVE_ASM_SIGCONTEXT_H
+
 /* define if have struct sigcontext in one of above */
 #undef HAVE_SIGCONTEXT
+
+
+/* define if have <sys/ioctl.h> */
+#undef HAVE_SYS_IOCTL_H
 
 /* define if we can use the file nsocket.c   */
 #undef HAVE_NSOCKET  
@@ -27,6 +53,7 @@
 #undef HAVE_ALLOCA 
 #endif
 
+
 /* define if need alloca.h */
 #undef NEED_ALLOCA_H
 
@@ -34,18 +61,22 @@
 #include <alloca.h>
 #endif
 
+
 /* define LISTEN_USE_FCNTL  if we can check for input using fcntl */
 #undef LISTEN_USE_FCNTL
 
 /* if signal.h alone contains the stuff necessary for sgc */
 #undef SIGNAL_H_HAS_SIGCONTEXT
 
+
 /* define if the profil system call is not defined in libc */
 #undef NO_PROFILE 
+
 
 /* define if the _cleanup() function exists and should be called
    before saving */
 /* #define USE_CLEANUP  */
+
 
 /* define if BIG_ENDIAN or LITTLE_ENDIAN is defined by including
    the standard includes */
@@ -54,17 +85,33 @@
 /* define if SV_ONSTACK is defined in signal.h */
 #undef HAVE_SV_ONSTACK 
 
+
+/*
+   define to be a typical stack address.   We use this to decide
+   whether we can use a cheap test for NULL_OR_ON_C_STACK, or whether
+   it has to be more complex..
+
+*/
+
 #define CSTACK_ADDRESS 0
+
+/* define if SIGSYS is defined in signal.h */
 
 #undef HAVE_SIGSYS
 
+/* define if SIGEMT is defined in signal.h */
+
 #undef HAVE_SIGEMT
+
 
 /* define if setenv  is define */
 #undef HAVE_SETENV
 
 /* define if putenv  is define */
 #undef HAVE_PUTENV
+
+
+/* define if long long int works to multiply to ints, */
 
 #undef HAVE_LONG_LONG
 
@@ -155,6 +202,8 @@
 #endif
 #endif
 
+
+
 /* math.h for definitions in generated C code */
 #undef HAVE_MATH_H
 
@@ -171,6 +220,8 @@
 /*  #define PAGESIZE (1<<PAGEWIDTH) */
 /*  #endif */
 
+#undef SIZEOF_LONG
+
 #undef USE_DLOPEN
 
 #define MP_LIMB_BYTES 0
@@ -180,39 +231,94 @@
 #undef __SHORT_LIMB
 #undef __LONG_LONG_LIMB
 
+/* Define if we have the JAPI library on board */
 #undef HAVE_JAPI_H
 
 #undef HAVE_XDR
+#undef ENDIAN_ALREADY_DEFINED
+#undef USE_CLEANUP
+#undef SIZEOF_CONTBLOCK
 
-/* The number of bytes in a long *.  */
-#undef SIZEOF_LONG_P
-
-/* Define if you have the getcwd function.  */
-#undef HAVE_GETCWD
-
-/* Define if you have the getwd function.  */
-#undef HAVE_GETWD
-
-/* Define if you have the <asm/sigcontext.h> header file.  */
+/* Define to 1 if you have the <asm/sigcontext.h> header file. */
 #undef HAVE_ASM_SIGCONTEXT_H
 
-/* Define if you have the <asm/signal.h> header file.  */
+/* Define to 1 if you have the <asm/signal.h> header file. */
 #undef HAVE_ASM_SIGNAL_H
 
-/* Define if you have the <endian.h> header file.  */
+/* Define to 1 if you have the <endian.h> header file. */
 #undef HAVE_ENDIAN_H
 
-/* Define if you have the <float.h> header file.  */
+/* Define to 1 if you have the <float.h> header file. */
 #undef HAVE_FLOAT_H
 
-/* Define if you have the <japi.h> header file.  */
+/* Define to 1 if you have the `getcwd' function. */
+#undef HAVE_GETCWD
+
+/* Define to 1 if you have the `getwd' function. */
+#undef HAVE_GETWD
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <japi.h> header file. */
 #undef HAVE_JAPI_H
 
-/* Define if you have the <math.h> header file.  */
+/* Define to 1 if you have the <math.h> header file. */
 #undef HAVE_MATH_H
 
-/* Define if you have the <sys/ioctl.h> header file.  */
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the <rpc/rpc.h> header file. */
+#undef HAVE_RPC_RPC_H
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/ioctl.h> header file. */
 #undef HAVE_SYS_IOCTL_H
 
-/* Define if you have the <values.h> header file.  */
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the <values.h> header file. */
 #undef HAVE_VALUES_H
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* The size of a `long', as computed by sizeof. */
+#undef SIZEOF_LONG
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define to 1 if the X Window System is missing or not being used. */
+#undef X_DISPLAY_MISSING

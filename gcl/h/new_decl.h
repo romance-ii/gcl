@@ -1,6 +1,5 @@
 EXTER object fLbye (fixnum exitc);
 EXTER object fLquit (fixnum exitc);
-EXTER object fLexit (fixnum exitc);
 EXTER object sSAno_initA;
 EXTER object fLidentity (object x0);
 EXTER object fLlisp_implementation_version (void);

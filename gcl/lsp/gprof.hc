@@ -1,3 +1,5 @@
+#include <bfd.h>
+#include <bfdlink.h>
 #define CF_FLAG (1 << 31) 
 
 static
@@ -6,7 +8,7 @@ mymonitor(low,high,x)
      int low,high;
      object x;
 { if (0 == x) {monitor(0); return 0;}
-  if (type_of(x)!=t_string) FEerror("expected string", 0);
+  if (type_of(x)!=t_string) FEerror("expected string",0);
   monitor(low,high,x->ust.ust_self,x->ust.ust_dim,1000);
 }
 */
