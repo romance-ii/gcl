@@ -1,3 +1,10 @@
+gcl (2.5.0.cvs20020625-35) unstable; urgency=high
+
+  * Don't build bfd/po subdir
+  * Build-depend on automake and gettext
+
+ -- Camm Maguire <camm@enhanced.com>  Fri,  9 Aug 2002 14:36:58 -0400
+
 gcl (2.5.0.cvs20020625-34) unstable; urgency=high
 
   * fix zero length array support
