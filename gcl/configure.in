@@ -243,7 +243,6 @@ fi
 def_dlopen="no"
 def_statsysbfd="yes"
 def_custreloc="no"
-def_oldgmp="no"
 def_pic="no";
 def_static="no";
 case $use in 
@@ -260,8 +259,6 @@ case $use in
 			def_dlopen="yes" ; def_statsysbfd="no" ; def_static="no" ;;
 		hppa*)
 			def_dlopen="yes" ; def_statsysbfd="no" def_pic="yes" ;;
-#		m68k*)
-#			def_oldgmp="yes" ;;
 	esac;;
     *mingw*)
 	def_statsysbfd="no" ; def_custreloc="yes" ;;
@@ -290,10 +287,6 @@ AC_ARG_ENABLE(static,[ --enable-static will link your GCL against static as oppo
 AC_ARG_ENABLE(pic,
 	[ --enable-pic builds gcl with -fPIC in CFLAGS ]
 	,,enable_pic="$def_pic")
-
-AC_ARG_ENABLE(oldgmp,
-	[ --enable-oldgmp will link against gmp2 instead of gmp3 ]
-	,,enable_oldgmp="$def_oldgmp")
 
 AC_ARG_ENABLE(dynsysgmp,
 	[ --enable-dynsysgmp will link against the system libgmp3 overriding certain functions with patched versions from the local source ]
@@ -379,13 +372,19 @@ TCFLAGS="-Wall -DVOL=volatile -fsigned-char"
 if test "$GCC" = "yes" ; then
 	TCFLAGS="$TCFLAGS -fwritable-strings -pipe"
 fi
+if test -f /proc/sys/kernel/exec-shield ; then
+	exec_stat=`cat /proc/sys/kernel/exec-shield`
+	if test "$exec_stat" != "0" ; then
+		TCFLAGS="$TCFLAGS -Wa,--execstack"
+	fi
+fi
 
 TO3FLAGS=""
 TO2FLAGS=""
 if test "$enable_debug" = "yes" ; then
 	TCFLAGS="$TCFLAGS -g"
 	# for subconfigurations
-	CFLAGS=-g
+	CFLAGS="$CFLAGS -g"
 else
 	TO3FLAGS="-O3 -fomit-frame-pointer"
 	TO2FLAGS="-O"

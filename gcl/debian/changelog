@@ -63,8 +63,11 @@ gclcvs (2.7.0-16) unstable; urgency=low
   * Cleanup compiler warning in sys_mod_gcl.c
   * malloc -> gcl_gmp_alloc in recent setjmp frame protected bignum
     allocation
+  * Add -Wa,--execstack if on an exec-shield enabled system, can be
+    explicitly added otherwise by setting the CFLAGS variable before the
+    configure step, remove oldgmp configure option
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  2 Dec 2003 15:00:13 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue,  2 Dec 2003 15:18:38 +0000
 
 gclcvs (2.7.0-15) unstable; urgency=low
 
