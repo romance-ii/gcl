@@ -777,16 +777,21 @@ vfun_wrong_number_of_args(object x)
 
 void
 check_arg_range(int n, int m)
-{  if (VFUN_NARGS < n)
-     Icall_error_handler(
-			 sKtoo_few_arguments,
+{  
+  object x,x1;
+
+  x=make_fixnum(n);
+  x1=make_fixnum(VFUN_NARGS);
+  if (VFUN_NARGS < n)
+    Icall_error_handler(
+			sKtoo_few_arguments,
 			 make_simple_string("Needed at least ~D args, but received ~d"),
-			 2,make_fixnum(n),make_fixnum(VFUN_NARGS));
+			 2,x,x1);
    else if (VFUN_NARGS > m)
           Icall_error_handler(
 			 sKtoo_many_arguments,
 			 make_simple_string("Needed no more than ~D args, but received ~d"),
-			 2,make_fixnum(m),make_fixnum(VFUN_NARGS));
+			 2,x,x1);
  }
 			 
      

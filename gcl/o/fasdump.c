@@ -1399,9 +1399,12 @@ read_fasd1(int i, object *loc)
 
       case DP(d_begin_dump:)
 	{int vers=GETD("version=%d");
-	 if(vers!=FASD_VERSION)
-	   FEerror("This file was dumped with FASD version ~a not ~a.",
-		   2,make_fixnum(vers),make_fixnum(FASD_VERSION));}
+	if(vers!=FASD_VERSION) {
+	  object x,x1;
+	  x=make_fixnum(vers);
+	  x1=make_fixnum(FASD_VERSION);
+	  FEerror("This file was dumped with FASD version ~a not ~a.",
+		  2,x,x1);}}
 	{int leng;
 	 GET4(leng);
 	 current_fasd.table_length=make_fixnum(leng);}

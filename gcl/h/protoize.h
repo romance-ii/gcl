@@ -501,6 +501,7 @@ typedef void (*funcvoid)(void);
 /* unixfsys.c:329:OF */ extern bool file_exists (object file); /* (file) object file; */
 /* unixfsys.c:359:OF */ extern FILE *backup_fopen (char *filename, char *option); /* (filename, option) char *filename; char *option; */
 /* unixfsys.c:372:OF */ extern int file_len (FILE *fp); /* (fp) FILE *fp; */
+/* unixfsys.c:382:OF */ extern object truename (object); /* () */
 /* unixfsys.c:382:OF */ extern void Ltruename (void); /* () */
 /* unixfsys.c:418:OF */ extern object fSsetenv (object variable, object value); /* (variable, value) object variable; object value; */
 /* unixfsys.c:442:OF */ extern object fLdelete_file (object path); /* (path) object path; */

@@ -280,9 +280,13 @@ DEFUNO_NEW("ASET", object, fSaset, SI, 1, ARG_LIMIT, NONE, OO,
      rank-- ;
      while(1) 
        {
-	 if (k >= x->a.a_dims[m])
+	 if (k >= x->a.a_dims[m]) {
+	   object x,x1;
+	   x=make_fixnum(m);
+	   x1=make_fixnum(k);
 	   FEerror("Index number  ~a: ~a to array is out of bounds",
-		   2,make_fixnum (m),make_fixnum(k));
+		   2,x,x1);
+	 }
 	 i1 += k;
 	 if (m < rank)
 	   {object u;
