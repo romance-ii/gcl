@@ -1,3 +1,14 @@
+gcl (2.5.0.cvs20020625-27) unstable; urgency=high
+
+  * Use generic lshift.c in gmp3 for m68k
+  * use SGC for ia64
+  * m68k workaround, cast (object(*)()) to (long(*)()) in funlink.c and
+    eval.c
+  * GBC register spiil asm for hppa
+  * fix hash_equal declaration error in hash.d
+
+ -- Camm Maguire <camm@enhanced.com>  Thu,  1 Aug 2002 18:12:49 -0400
+
 gcl (2.5.0.cvs20020625-26) unstable; urgency=high
 
   * Remove extra load of tkl.o in install target of main makefile

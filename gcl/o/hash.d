@@ -185,7 +185,7 @@ object x;
 int depth;
 {
 
-	return make_fixnum(ihash_equal(x,length));
+	return make_fixnum(ihash_equal(x,depth));
 
 }
 
@@ -516,7 +516,7 @@ object table;
   RETURN1(sLnil);
 }
 
-DEFUN("HASH-TABLE-SIZE",object,fLhash_table_size,LISP,1,1,NONE,IO,OO,OO,OO,"")
+DEFUN("HASH-TABLE-SIZE",object,fLhash_table_size,LISP,1,1,NONE,OO,OO,OO,OO,"")
 (table)
 object table;
 {
@@ -546,6 +546,6 @@ init_hash()
 	make_function("HASH-TABLE-COUNT", Lhash_table_count);
    	make_function("SXHASH", Lsxhash);
 	make_si_sfun("HASH-EQUAL",hash_equal,ARGTYPE2(f_object,f_fixnum)
-						| RESTYPE(f_fixnum));
+						| RESTYPE(f_object));
 	make_si_function("HASH-SET", siLhash_set);
 }

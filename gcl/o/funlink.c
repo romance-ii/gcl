@@ -218,209 +218,221 @@ clean_link_array(object *ar, object *ar_end)
 
 #include <varargs.h>
 
+/* This is a temporary workaround.  m68k cannot find the result 
+   of a function returning long when invoked via a function pointer
+   declared as a function returning a pointer, in this case, an 
+   object.  A proper fix will require rewriting sections of the lisp
+   compiler to separate the calling procedures for functions returning
+   an object from functions returning a long.  CM  20020801 */
+#if defined(__mc68020__)
+#define LCAST(a) (object)(*(long(*)())a)
+#else
+#define LCAST(a) (*a)
+#endif
+
 object
 c_apply_n(object (*fn)(), int n, object *x)
 {object res=Cnil;
  switch(n){
-    case 0:  res=(*fn)();break;
-    case 1:  res=(*fn)(x[0]);break;
-    case 2:  res=(*fn)(x[0],x[1]);break;
-    case 3:  res=(*fn)(x[0],x[1],x[2]);break;
-    case 4:  res=(*fn)(x[0],x[1],x[2],x[3]);break;
-    case 5:  res=(*fn)(x[0],x[1],x[2],x[3],x[4]);break;
-    case 6:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5]);break;
-    case 7:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6]);break;
-    case 8:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7]);break;
-    case 9:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 0:  res=LCAST(fn)();break;
+    case 1:  res=LCAST(fn)(x[0]);break;
+    case 2:  res=LCAST(fn)(x[0],x[1]);break;
+    case 3:  res=LCAST(fn)(x[0],x[1],x[2]);break;
+    case 4:  res=LCAST(fn)(x[0],x[1],x[2],x[3]);break;
+    case 5:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4]);break;
+    case 6:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5]);break;
+    case 7:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6]);break;
+    case 8:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7]);break;
+    case 9:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8]);break;
-    case 10:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 10:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9]);break;
-    case 11:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 11:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10]);break;
-    case 12:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 12:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11]);break;
-    case 13:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 13:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12]);break;
-    case 14:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 14:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13]);break;
-    case 15:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 15:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14]);break;
-    case 16:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 16:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15]);break;
-    case 17:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 17:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16]);break;
-    case 18:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 18:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17]);break;
-    case 19:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 19:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18]);break;
-    case 20:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 20:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19]);break;
-    case 21:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 21:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20]);break;
-    case 22:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 22:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21]);break;
-    case 23:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 23:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22]);break;
-    case 24:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 24:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23]);break;
-    case 25:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 25:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24]);break;
-    case 26:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 26:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25]);break;
-    case 27:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 27:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26]);break;
-    case 28:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 28:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27]);break;
-    case 29:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 29:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28]);break;
-    case 30:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 30:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29]);break;
-    case 31:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 31:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30]);break;
-    case 32:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 32:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31]);break;
-    case 33:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 33:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32]);break;
-    case 34:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 34:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33]);break;
-    case 35:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 35:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34]);break;
-    case 36:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 36:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35]);break;
-    case 37:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 37:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36]);break;
-    case 38:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 38:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37]);break;
-    case 39:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 39:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38]);break;
-    case 40:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 40:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39]);break;
-    case 41:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 41:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40]);break;
-    case 42:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 42:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40],x[41]);break;
-    case 43:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 43:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40],x[41],x[42]);break;
-    case 44:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 44:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43]);break;
-    case 45:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 45:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44]);break;
-    case 46:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 46:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45]);break;
-    case 47:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 47:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46]);break;
-    case 48:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 48:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47]);break;
-    case 49:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 49:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47],x[48]);break;
-    case 50:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 50:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47],x[48],x[49]);break;
-    case 51:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 51:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -428,7 +440,7 @@ c_apply_n(object (*fn)(), int n, object *x)
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50]);break;
-    case 52:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 52:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -436,7 +448,7 @@ c_apply_n(object (*fn)(), int n, object *x)
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51]);break;
-    case 53:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 53:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -444,7 +456,7 @@ c_apply_n(object (*fn)(), int n, object *x)
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52]);break;
-    case 54:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 54:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -452,7 +464,7 @@ c_apply_n(object (*fn)(), int n, object *x)
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53]);break;
-    case 55:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 55:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -460,7 +472,7 @@ c_apply_n(object (*fn)(), int n, object *x)
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53],x[54]);break;
-    case 56:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 56:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -468,7 +480,7 @@ c_apply_n(object (*fn)(), int n, object *x)
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53],x[54],x[55]);break;
-    case 57:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 57:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -476,7 +488,7 @@ c_apply_n(object (*fn)(), int n, object *x)
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53],x[54],x[55],x[56]);break;
-    case 58:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 58:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -485,7 +497,7 @@ c_apply_n(object (*fn)(), int n, object *x)
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53],x[54],x[55],x[56],
          x[57]);break;
-    case 59:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 59:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -494,7 +506,7 @@ c_apply_n(object (*fn)(), int n, object *x)
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53],x[54],x[55],x[56],
          x[57],x[58]);break;
-    case 60:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 60:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -503,7 +515,7 @@ c_apply_n(object (*fn)(), int n, object *x)
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53],x[54],x[55],x[56],
          x[57],x[58],x[59]);break;
-    case 61:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 61:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -512,7 +524,7 @@ c_apply_n(object (*fn)(), int n, object *x)
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53],x[54],x[55],x[56],
          x[57],x[58],x[59],x[60]);break;
-    case 62:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 62:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -521,7 +533,7 @@ c_apply_n(object (*fn)(), int n, object *x)
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53],x[54],x[55],x[56],
          x[57],x[58],x[59],x[60],x[61]);break;
-    case 63:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 63:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -530,7 +542,7 @@ c_apply_n(object (*fn)(), int n, object *x)
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53],x[54],x[55],x[56],
          x[57],x[58],x[59],x[60],x[61],x[62]);break;
-    case 64:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 64:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -594,37 +606,37 @@ call_proc(object sym, void **link, int argd, va_list ll)
        if (nargs-- > 0)
 	 x0=va_arg(ll,object);
        else
-	 {return((object)(*fn)());}
+	 {return(LCAST(fn)());}
        if (nargs-- > 0)
 	 x1=va_arg(ll,object);
        else
-	 { return((object)(*fn)(x0));}
+	 { return(LCAST(fn)(x0));}
        if (nargs-- > 0)
 	 x2=va_arg(ll,object);
        else
-	 {return((object)(*fn)(x0,x1));}
+	 {return(LCAST(fn)(x0,x1));}
        if (nargs-- > 0)  x3=va_arg(ll,object);
        else
-	 return((object)(*fn)(x0,x1,x2));
+	 return(LCAST(fn)(x0,x1,x2));
        if (nargs-- > 0)  x4=va_arg(ll,object);
        else
-	 return((object)(*fn)(x0,x1,x2,x3));
+	 return(LCAST(fn)(x0,x1,x2,x3));
        if (nargs-- > 0)  x5=va_arg(ll,object);
        else
-	 return((object)(*fn)(x0,x1,x2,x3,x4));
+	 return(LCAST(fn)(x0,x1,x2,x3,x4));
        if (nargs-- > 0)  x6=va_arg(ll,object);
        else
-	 return((object)(*fn)(x0,x1,x2,x3,x4,x5));
+	 return(LCAST(fn)(x0,x1,x2,x3,x4,x5));
        if (nargs-- > 0)  x7=va_arg(ll,object);
        else
-	 return((object)(*fn)(x0,x1,x2,x3,x4,x5,x6));
+	 return(LCAST(fn)(x0,x1,x2,x3,x4,x5,x6));
        if (nargs-- > 0)  x8=va_arg(ll,object);
        else
-	 return((object)(*fn)(x0,x1,x2,x3,x4,x5,x6,x7));
+	 return(LCAST(fn)(x0,x1,x2,x3,x4,x5,x6,x7));
        if (nargs-- > 0)  x9=va_arg(ll,object);
        else
-	 return((object)(*fn)(x0,x1,x2,x3,x4,x5,x6,x7,x8));
-       return((object)(*fn)(x0,x1,x2,x3,x4,x5,x6,x7,x8,x9));
+	 return(LCAST(fn)(x0,x1,x2,x3,x4,x5,x6,x7,x8));
+       return(LCAST(fn)(x0,x1,x2,x3,x4,x5,x6,x7,x8,x9));
  
      }
   else {object *new;

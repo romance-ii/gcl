@@ -1030,6 +1030,10 @@ if test $use_gmp = yes ; then
  esac
  [[ "`ls -1 gmp3/mpn/add_n.* 2>/dev/null`" != "" ]] || cp gmp3/mpn/generic/*.c gmp/mpn/
  cp gmp3/gmp.h h/gmp.h
+ if test "$use" = "m68k-linux" ; then
+	ln -snf generic/lshift.c gmp3/mpn/
+	rm gmp3/mpn/lshift.asm
+ fi
  AC_MSG_CHECKING("for size of gmp limbs")
  AC_TRY_RUN([#include <stdio.h>
 	#include "h/gmp.h"

@@ -52,19 +52,31 @@ object sSAbreak_pointsA;
 object sSAbreak_stepA;
 
 
+/* This is a temporary workaround.  m68k cannot find the result 
+   of a function returning long when invoked via a function pointer
+   declared as a function returning a pointer, in this case, an 
+   object.  A proper fix will require rewriting sections of the lisp
+   compiler to separate the calling procedures for functions returning
+   an object from functions returning a long.  CM  20020801 */
+#if defined(__mc68020__)
+#define LCAST(a) (object)(*(long(*)())a)
+#else
+#define LCAST(a) (*a)
+#endif
+
 #define SET_TO_APPLY(res,f,n,x) \
  switch(n) {\
- case 0:   res=(*f)(); break;\
-  case 1:  res=(*f)(x[0]); break; \
-  case 2:  res=(*f)(x[0],x[1]);break; \
-  case 3:  res=(*f)(x[0],x[1],x[2]);break; \
-  case 4:  res=(*f)(x[0],x[1],x[2],x[3]);break; \
-  case 5:  res=(*f)(x[0],x[1],x[2],x[3],x[4]);break; \
-  case 6:  res=(*f)(x[0],x[1],x[2],x[3],x[4],x[5]);  break;\
-  case 7:  res=(*f)(x[0],x[1],x[2],x[3],x[4],x[5], x[6]); break;\
-  case 8:  res=(*f)(x[0],x[1],x[2],x[3],x[4],x[5], x[6],x[7]); break;\
-  case 9:  res=(*f)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8]);break;\
-  case 10: res=(*f)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8],x[9]);break;\
+ case 0:   res=LCAST(f)(); break;\
+  case 1:  res=LCAST(f)(x[0]); break; \
+  case 2:  res=LCAST(f)(x[0],x[1]);break; \
+  case 3:  res=LCAST(f)(x[0],x[1],x[2]);break; \
+  case 4:  res=LCAST(f)(x[0],x[1],x[2],x[3]);break; \
+  case 5:  res=LCAST(f)(x[0],x[1],x[2],x[3],x[4]);break; \
+  case 6:  res=LCAST(f)(x[0],x[1],x[2],x[3],x[4],x[5]);  break;\
+  case 7:  res=LCAST(f)(x[0],x[1],x[2],x[3],x[4],x[5], x[6]); break;\
+  case 8:  res=LCAST(f)(x[0],x[1],x[2],x[3],x[4],x[5], x[6],x[7]); break;\
+  case 9:  res=LCAST(f)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8]);break;\
+  case 10: res=LCAST(f)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8],x[9]);break;\
    default: res=c_apply_n(*f,n,x); break;}
 
 /*
@@ -98,7 +110,7 @@ quick_call_sfun(object fun)
      for (j=0; j<n ; j++)
        {enum ftype typ=SFUN_NEXT_TYPE(i);
 	x[j]=COERCE_ARG(vs_base[j],typ);}}
-  SET_TO_APPLY(res,(object (*)())fun->sfn.sfn_self,n,x);
+  SET_TO_APPLY(res,fun->sfn.sfn_self,n,x);
   base[0]=
     (restype==f_object ?  res :
      restype==f_fixnum ? make_fixnum((long)res)
@@ -115,7 +127,7 @@ call_sfun_no_check(object fun)
   int n;
   object *base=vs_base;
   n=vs_top - base;
-  SET_TO_APPLY(base[0],(object (*)())fun->sfn.sfn_self,n,base);
+  SET_TO_APPLY(base[0],fun->sfn.sfn_self,n,base);
   vs_top=(vs_base=base)+1;
   CHECK_AVMA;
   return;
@@ -131,7 +143,7 @@ call_vfun(object fun)
   if (n > fun->vfn.vfn_maxargs)
     {FEtoo_many_arguments(base,vs_top); return;}
   VFUN_NARGS = n;
-  SET_TO_APPLY(base[0],(object (*)())fun->sfn.sfn_self,n,base);
+  SET_TO_APPLY(base[0],fun->sfn.sfn_self,n,base);
   vs_top=(vs_base=base)+1;
   CHECK_AVMA;
   return;
