@@ -511,21 +511,17 @@ SYSTEM_SPECIAL_INIT
 	  (t (setq dir ".")))
      (setq na  (namestring
 		(make-pathname :name name :type (pathname-type(first args)))))
-
    #+(or dos winnt)
-      (format nil "~a ~a ~a -c -I~a -w ~a -o ~a"
+      (format nil "~a ~a ~a -c -w ~a -o ~a"
 	      *cc*
 	      (if (and (boundp '*c-debug*) *c-debug*) " -g " "")
               (case *speed* 
 		    (3 #+broken_o4_opt "-O2" #-broken_o4_opt"-O4")
 		    (2 "-O") (t ""))
-	      dir
 	      (namestring (make-pathname  :type "c" :defaults (first args)))
 	      (namestring (make-pathname  :type "o" :defaults (first args)))
 	      )
 
-
-	       
    #-(or dos winnt)
    (format nil  "(cd ~a ;~a ~a ~a -c ~a ~a)"
 	   dir *cc*
