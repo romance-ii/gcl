@@ -1,3 +1,7 @@
+#ifdef __MINGW32__
+#  include <string.h>
+#endif
+
 #include <stdlib.h>
 #include "../h/include.h"
 

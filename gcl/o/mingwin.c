@@ -646,8 +646,8 @@ TcpOutputProc ( int fd, char *buf, int toWrite, int *errorCodePtr, int block )
 	
 	if (error == WSAEWOULDBLOCK) {
 		*errorCodePtr = EWOULDBLOCK;
-		CHECK_INTERRUPT;	 		
-		sleep(30);
+		CHECK_INTERRUPT;
+		Sleep(30);
 		bytesWritten = -1;
 		if (--count < 0)
 		  break;
@@ -878,7 +878,7 @@ void init_shared_memory (void)
    but delivering it later in the unblock code time ... ie in the
 */
 
-static _current_set=0;
+static sigset_t _current_set=0;
 void
 sigemptyset( sigset_t *set)
 {
