@@ -54,7 +54,8 @@ AC_SUBST(GCC)
 
 AC_CHECK_HEADERS(endian.h,
 	AC_MSG_CHECKING("endianness")
-	AC_TRY_RUN([#include <endian.h> 
+	AC_TRY_RUN([#define __ARMEB__
+		#include <endian.h> 
 		int main() { return BYTE_ORDER == __LITTLE_ENDIAN ? 0 : 1;}],
 	AC_DEFINE(LITTLE_END) AC_MSG_RESULT(little),
 	AC_MSG_RESULT(big),AC_MSG_RESULT(big)))
