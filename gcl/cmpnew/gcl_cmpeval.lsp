@@ -197,6 +197,69 @@
 ; (push '((integer integer) integer #.(flags const raf) "addii(#0,#1)")
 ;         (get '+ 'inline-always))
 
+(defun binary-nest (form env)
+  (if (> (length form) 3)
+      (binary-nest (cons (car form)
+			 (cons (list (car form) (cadr form) (caddr form))
+			       (cdddr form)))
+		   env)
+    form))
+
+(si::putprop '* (function binary-nest) 'compiler-macro)
+(si::putprop '+ (function binary-nest) 'compiler-macro)
+
+(si::putprop 'logand (function binary-nest) 'compiler-macro)
+(si::putprop 'logior (function binary-nest) 'compiler-macro)
+(si::putprop 'logxor (function binary-nest) 'compiler-macro)
+
+(si::putprop 'max (function binary-nest) 'compiler-macro)
+(si::putprop 'min (function binary-nest) 'compiler-macro)
+
+(defun invert-binary-nest (form env)
+  (declare (ignore env))
+  (if (> (length form) 3)
+      (let* ((op (car form))
+	     (recip (cond
+		     ((eq op '-) '+)
+		     ((eq op '/) '*)
+		     (t (error "Bad op ~S~%" op)))))
+	(list op (cadr form) (cons recip (cddr form))))
+    form))
+
+(si::putprop '- (function invert-binary-nest) 'compiler-macro)
+(si::putprop '/ (function invert-binary-nest) 'compiler-macro)
+
+(defun logical-binary-nest (form env)
+  (declare (ignore env))
+  (if (> (length form) 3)
+      (let (r)
+	(do ((f (cdr form) (cdr f))) ((null (cdr f)) (cons 'and (nreverse r)))
+	  (push (list (car form) (car f) (cadr f)) r)))
+    form))
+
+(si::putprop '> (function logical-binary-nest) 'compiler-macro)
+(si::putprop '>= (function logical-binary-nest) 'compiler-macro)
+(si::putprop '< (function logical-binary-nest) 'compiler-macro)
+(si::putprop '<= (function logical-binary-nest) 'compiler-macro)
+(si::putprop '= (function logical-binary-nest) 'compiler-macro)
+
+(si::putprop 'char> (function logical-binary-nest) 'compiler-macro)
+(si::putprop 'char>= (function logical-binary-nest) 'compiler-macro)
+(si::putprop 'char< (function logical-binary-nest) 'compiler-macro)
+(si::putprop 'char<= (function logical-binary-nest) 'compiler-macro)
+(si::putprop 'char= (function logical-binary-nest) 'compiler-macro)
+
+(defun logical-outer-nest (form env)
+  (declare (ignore env))
+  (if (> (length form) 3)
+      (let (r)
+	(do ((f (cdr form) (cdr f))) ((null (cdr f)) (cons 'and (nreverse r)))
+	  (do ((g (cdr f) (cdr g))) ((null g))
+	    (push (list (car form) (car f) (car g)) r))))
+    form))
+
+(si::putprop '/= (function logical-outer-nest) 'compiler-macro)
+(si::putprop 'char/= (function logical-outer-nest) 'compiler-macro)
 
 
 (defun c1symbol-fun (fname args &aux fd)
@@ -247,8 +310,12 @@
 	;;continue
         ((setq fd (macro-function fname))
          (c1expr (cmp-expand-macro fd fname args)))
-        ((setq fd (get fname 'compiler-macro))
-         (c1expr (cmp-eval `(funcall ',fd ',(cons fname args) nil))))
+        ((let ((fn (get fname 'compiler-macro)) res)
+	   (and fn
+		(setq res (cons fname args))
+		(setq fd (cmp-eval `(funcall ',fn ',res nil)))
+		(not (eq res fd))))
+         (c1expr fd))
         ((and (setq fd (get fname 'si::structure-access))
               (inline-possible fname)
               ;;; Structure hack.
