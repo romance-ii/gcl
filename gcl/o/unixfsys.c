@@ -588,7 +588,7 @@ LFD(Lfile_author)(void)
 	coerce_to_local_filename(vs_base[0], filename);
 	if (stat(filename, &filestatus) < 0) { vs_base[0] = Cnil; return;}
 	pwent = getpwuid(filestatus.st_uid);
-	vs_base[0] = make_simple_string(pwent->pw_name);
+	vs_base[0] = pwent ? make_simple_string(pwent->pw_name) : Cnil;
 #else
 	vs_base[0] = Cnil; return;
 #endif	
