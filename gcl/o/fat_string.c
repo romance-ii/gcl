@@ -128,7 +128,7 @@ object x0;
   n=x->st.st_fillp;
  check_type_string(&x);
  str=malloc(n+1);
-  str[n]=NULL;
+  str[n]=0;
  (void) strncpy(str,x->st.st_self,n);
  read_special_symbols(str);
   /* we sort them since these are used by the sfasl loader too */
