@@ -23,7 +23,7 @@ SPECIAL_RSYM = rsym.c
 # use=386-linux
 
 # for main link of raw_gcl
-LIBS= -lm -lreadline -lncurses -lbfd -liberty
+LIBS= -lm -lreadline -lncurses  /usr/lib/libbfd.a /usr/lib/libiberty.a
 
 #The multi precision library stuff
 MPFILES=$(MPDIR)/@MPI_FILE@ $(MPDIR)/libmport.a
@@ -32,7 +32,7 @@ MPFILES=$(MPDIR)/@MPI_FILE@ $(MPDIR)/libmport.a
 # root for the installation, eg /usr/local
 # This would cause make install to create /usr/local/bin/gcl and
 # /usr/local/lib/gcl-2-??/* with some basic files.
-prefix=/usr/local
+prefix=/usr
 
 # where to place the info files
 INFO_DIR=/usr/info/
@@ -66,7 +66,7 @@ RL_OBJS=readline.o
 
 RL_LIB=lsp/readline.o
 
-GCLDIR=/fix/f/debian/mm/gcl/gcl-2.5.0
+GCLDIR=/home/camm/gcl/gcl-2.5.0
 SHELL=/bin/sh
 MACHINE=386-linux
 
@@ -169,6 +169,7 @@ LSPOBJS	= $(LSPDIR)/defmacro.o $(LSPDIR)/evalmacros.o $(LSPDIR)/top.o \
 	$(LSPDIR)/sloop.o  $(LSPDIR)/debug.o \
 	$(LSPDIR)/serror.o $(LSPDIR)/info.o $(LSPDIR)/destructuring_bind.o \
         $(LSPDIR)/defpackage.o $(LSPDIR)/make_defpackage.o \
+	$(LSPDIR)/loop.o\
 	$(addprefix $(LSPDIR)/,$(RL_OBJS))
 
 CMPOBJS	= $(CMPDIR)/cmpinline.o $(CMPDIR)/cmputil.o $(CMPDIR)/cmptype.o \
