@@ -545,7 +545,7 @@ Elf32_Word sh_type;
 /*      do_bfd_reloc(ELF32_R_TYPE(reloc_info->r_info),s+a,(unsigned int *)where); */
 /*  #else */
     switch(ELF32_R_TYPE(reloc_info->r_info)){
-#if (defined(__svr4__) || defined(__linux__)) && defined(__i386__)
+#if (defined(__svr4__) || defined(__linux__) || defined(__FreeBSD__)) && defined(__i386__)
     case     R_386_NONE:
       FEerror("Unsupported ELF type R_386_NONE",0);
       break;
