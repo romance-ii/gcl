@@ -1,8 +1,10 @@
 gcl (2.5.0.cvs20020625-31) unstable; urgency=high
 
   * #undef bool in object.h for some gcc-3.1 installations
+  * New number_tan implementation using real tan, so optimized compiled
+    code will find symbol in -lm
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  6 Aug 2002 11:02:19 -0400
+ -- Camm Maguire <camm@enhanced.com>  Tue,  6 Aug 2002 18:37:52 -0400
 
 gcl (2.5.0.cvs20020625-30) unstable; urgency=high
 
