@@ -123,7 +123,11 @@ the socket.  If PORT is zero do automatic allocation of port")
   
   /* Using TCP layer */
   s = socket(PF_INET, SOCK_STREAM, 0);
+#ifdef __MINGW32__
+    if ( s == INVALID_SOCKET )  
+#else    
   if (s < 0)
+#endif      
     {
       perror("ERROR !!! socket creation failed in sock_connect_to_name\n");
       return Cnil;
