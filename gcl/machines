@@ -11,6 +11,7 @@ names for various supported machines.
 * hp300:  Hp 350, 370 under HPUX.
 * hp800:  Hp 720,730 under HPUX (version 8).  Possibly hp 800 also
 * mac2:  Macintosh under AUX (unix) 
+* mingw: Windows NT (Win9? untested) with Mingw32 gcc hosted by Cygwin
 * mp386: intel 386 under System V 3 (eg microport,interactive)
 * NeXT30-m68k: NeXT (M68K) under NeXTSTEP 3.0
 * NeXT32-m68k: NeXT (M68K) under NeXTSTEP 3.2, 3.3 (gcc-2.6.3 is required)
