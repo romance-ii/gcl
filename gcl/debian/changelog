@@ -97,8 +97,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Fix rare infinite loop bug in array.c
   * Import si::info into 'user
   * , -> # as sed separator
+  * Fix find-class proclamation
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 02:20:03 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 02:31:17 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
