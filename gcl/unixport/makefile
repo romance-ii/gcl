@@ -246,5 +246,6 @@ hpbsd-crt0-mod.o:
 	emacs -batch -l hpbsd-crt0.el
 
 
+GCL=gcl
 clean:
 	rm -f saved_$(GCL) raw_$(GCL) *.o core a.out rsym foo *maxima*
