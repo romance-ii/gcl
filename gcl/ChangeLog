@@ -1,3 +1,8 @@
+2001-04-13  Bill Schelter  <wfs@sonia.ma.utexas.edu>
+
+	* fix the NULL_OR_ON_C_STACK macro for x86 linux in notcomp.h
+	  and in 386-linux.h
+
 2001-01-30  Bill Schelter  <wfs@sonia.ma.utexas.edu>
 
 	* many changes added for MS windows version..

@@ -75,7 +75,11 @@ do {static struct sigaction action; \
 /* is #define ELF_TEXT_BASE 0x8000000   on current linux */
 #define ELF_TEXT_BASE  DBEGIN
 
-
+/* on some linux x86 machines the C stack starts in positive number
+   range, however since we might compile on one and run on another
+   we will have to do this:
+*/   
+#define NULL_OR_ON_C_STACK(x) ((x)==0 || ((unsigned int)x) > (unsigned int)(pagetochar(MAXPAGE+1)))
 
 #undef SET_REAL_MAXPAGE
 #define SET_REAL_MAXPAGE do { struct rlimit data_rlimit; \
