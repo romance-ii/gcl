@@ -212,9 +212,9 @@ coerce_to_filename(object pathname, char *p)
   object namestring;
   namestring = coerce_to_namestring(pathname);
 #ifndef NO_PWD_H  
-  int n;
   if(namestring->st.st_self[0]=='~')
     {char name[20];
+     int n;
      char *q = namestring->st.st_self;
 #ifndef __STDC__
      extern struct passwd *getpwuid();
