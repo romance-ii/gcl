@@ -17,7 +17,7 @@
 #define GCL
 
 /* #define filehdr _IMAGE_FILE_HEADER */
-/* #define RUN_PROCESS*/
+/*#define RUN_PROCESS*/
 
 #define f_symptr PointerToSymbolTable
 #define f_nsyms NumberOfSymbols
@@ -106,10 +106,11 @@ extern DBEGIN_TY _stacktop, _stackbottom, _dbegin;
 #  define HAVE_NSOCKET
 #endif
 
-#define brk(x) fprintf( stderr, "not doing brk(%d)\n", x);
+#define brk(x) ;
 
 /* use the slightly older unexec */
-#define UNIXSAVE "unexnt.c" 
+#define UNIXSAVE "unexnt.c"
+    
 #define RECREATE_HEAP if (initflag) { recreate_heap1(); \
      terminal_io->sm.sm_object1->sm.sm_fp=stdout; \
      terminal_io->sm.sm_object0->sm.sm_fp=stdin; }
