@@ -661,26 +661,32 @@ copy_executable_and_dump_data_section (file_data *p_infile,
   data_va = data_start_va;
     
   size = (DWORD) data_file - (DWORD) p_outfile->file_base;
+#if 0  
   printf ("Copying executable up to data section...\n");
   printf ("\t0x%08x Offset in input file.\n", 0);
   printf ("\t0x%08x Offset in output file.\n", 0);
   printf ("\t0x%08lx Size in bytes.\n", size);
+#endif  
   memcpy (p_outfile->file_base, p_infile->file_base, size);
   
   size = data_size;
+#if 0  
   printf ("Dumping .data section...\n");
   printf ("\t0x%p Address in process.\n", data_va);
   printf ("\t0x%08x Offset in output file.\n", 
 	  data_file - p_outfile->file_base);
   printf ("\t0x%08lx Size in bytes.\n", size);
+#endif  
   memcpy (data_file, data_va, size);
   
   index = (DWORD) data_file + size - (DWORD) p_outfile->file_base;
   size = p_infile->size - index;
+#if 0  
   printf ("Copying rest of executable...\n");
   printf ("\t0x%08lx Offset in input file.\n", index);
   printf ("\t0x%08lx Offset in output file.\n", index);
   printf ("\t0x%08lx Size in bytes.\n", size);
+#endif  
   memcpy ((char *) p_outfile->file_base + index, 
 	  (char *) p_infile->file_base + index, size);
 }
