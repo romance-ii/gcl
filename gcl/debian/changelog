@@ -36,8 +36,9 @@ gclcvs (2.7.0-37) unstable; urgency=low
   * Disable SGC on macosx until the sgc/save problem can be fixed.
   * Push latest mingfile.c from 2.6.6pre
   * Fix nil types in room report
+  * Fix Mac SGC/save bug, at least in part
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 15 Jan 2005 21:25:17 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 16 Jan 2005 02:29:41 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 

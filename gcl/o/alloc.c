@@ -823,6 +823,15 @@ init_tm(enum type t, char *name, int elsize, int nelts, int sgc,int distinct) {
   
 }
 
+/* FIXME this is a work-around for the special MacOSX memory
+   initialization sequence, which sets heap_end, traditionally
+   initialized in gcl_init_alloc.  Mac and windows have non-std
+   sbrk-emulating memory subsystems, and their internals need to be
+   homogenized and integrated into the traditional unix sequence for
+   simplicity.  set_maxpage is overloaded, and the positioning of its
+   call is too fragile.  20050115 CM*/
+static int gcl_alloc_initialized;
+
 void
 set_maxpage(void) {
 
@@ -831,7 +840,7 @@ set_maxpage(void) {
 #ifdef SGC
   page_multiple=getpagesize()/PAGESIZE;
   if (page_multiple==0) error("PAGESIZE must be factor of getpagesize()");
-  if (heap_end) {
+  if (gcl_alloc_initialized) {
     extern long maxpage;
     maxpage=page(heap_end);
     memory_protect(sgc_enabled ? 1 : 0);
@@ -852,14 +861,12 @@ void
 gcl_init_alloc(void) {
 
   long i;
-  static int initialized;
 #ifdef GCL_GPROF
    extern void *GCL_GPROF_START;
    unsigned textpage=2*((void *)&etext-(void *)&GCL_GPROF_START)/PAGESIZE;
 #endif
   
-  if (initialized) return;
-  initialized=1;
+  if (gcl_alloc_initialized) return;
   
   
 #ifdef BSD
@@ -983,6 +990,7 @@ gcl_init_alloc(void) {
   if (maxcbpage<textpage)
      maxcbpage=textpage;
 #endif
+  gcl_alloc_initialized=1;
   
 }
 
