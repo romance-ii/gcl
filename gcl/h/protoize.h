@@ -494,14 +494,6 @@ typedef void (*funcvoid)(void);
 /* typespec.c:497:OF */ extern void init_typespec_function (void); /* () */
 /* unexec-19.29.c:1016:OF */ extern int write_segment (int new, register char *ptr, register char *end); /* (new, ptr, end) int new; register char *ptr; register char *end; */
 /* unexec.c:1016:OF */ extern int write_segment (int new, register char *ptr, register char *end); /* (new, ptr, end) int new; register char *ptr; register char *end; */
-#ifdef _WIN32
-    char *new_name,
-    char *old_name,
-    void *start_data,
-    void *start_bss,
-    void *entry_address );
-#else
-#endif
 /* unexlin.c:808:OF */ extern int write_segment (int new, register char *ptr, register char *end); /* (new, ptr, end) int new; register char *ptr; register char *end; */
 /* unixfasl.c:409:OF */ extern void init_unixfasl (void); /* () */
 /* unixfsys.c:145:OF */ extern char *getwd (char *buffer); /* (buffer) char *buffer; */

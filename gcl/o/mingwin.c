@@ -84,6 +84,7 @@ static struct {
 
 static int SocketsEnabled();
 static void close_winsock();
+extern void doReverse ( char *s, int n );
 
 
 /*

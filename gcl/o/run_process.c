@@ -275,7 +275,7 @@ void siLrun_process()
     signals_allowed = old;
 }
 
-static void
+void
 init_socket_function()
 {
   make_si_function("RUN-PROCESS", siLrun_process);
@@ -572,7 +572,7 @@ siLmake_socket_pair()
   make_socket_pair();
 }
 
-static void
+void
 init_socket_function()
 {
   make_si_function("MAKE-SOCKET-STREAM", siLmake_socket_stream); 

@@ -20,19 +20,19 @@ CROSS_PREFIX =
 # MPIOBJS      = $(MPIDIR)/mpi_glue.o
 # LIBS        += -L$(MPICHDIR)/lib -lmpich
 
-# CFLAGS       = -Wall -fwritable-strings -DVOL=volatile -fsigned-char $(PROCESSOR_FLAGS) -I$(GCLDIR)/o 
-# FINAL_CFLAGS = -Wall -fwritable-strings -DVOL=volatile -fsigned-char $(PROCESSOR_FLAGS)
-# O3FLAGS      = -O2 -fomit-frame-pointer
-# O2FLAGS      = -O
+CFLAGS       = -Wall -fwritable-strings -DVOL=volatile -fsigned-char $(PROCESSOR_FLAGS) -I$(GCLDIR)/o 
+FINAL_CFLAGS = -Wall -fwritable-strings -DVOL=volatile -fsigned-char $(PROCESSOR_FLAGS)
+O3FLAGS      = -O2 -fomit-frame-pointer
+O2FLAGS      = -O
 
 # Unexec dependency
 
 UNIX_SAVE_DEP  = unexnt.c
 
-CFLAGS         = -Wall -DVOL=volatile -fsigned-char -fwritable-strings $(PROCESSOR_FLAGS) -I$(GCLDIR)/o 
-FINAL_CFLAGS   = -Wall -DVOL=volatile -fsigned-char -fwritable-strings $(PROCESSOR_FLAGS)
-O3FLAGS        = -O2 -fomit-frame-pointer
-O2FLAGS        = -O
+# CFLAGS         = -g -Wall -DVOL=volatile -fsigned-char -fwritable-strings $(PROCESSOR_FLAGS) -I$(GCLDIR)/o 
+# FINAL_CFLAGS   = -g -Wall -DVOL=volatile -fsigned-char -fwritable-strings $(PROCESSOR_FLAGS)
+# O3FLAGS        = 
+# O2FLAGS        = 
 
 #CC             = ${CROSS_PREFIX}gcc
 

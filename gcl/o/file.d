@@ -288,7 +288,7 @@ BEGIN:
 }
 
 #ifndef NO_SETBUF
-static void
+void
 setup_stream_buffer(x)
      object x;
 {char *buf=alloc_contblock(BUFSIZ);
@@ -580,7 +580,7 @@ BEGIN:
 	}
 }
 
-static object
+object
 make_two_way_stream(istrm, ostrm)
 object istrm, ostrm;
 {

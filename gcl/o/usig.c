@@ -148,7 +148,7 @@ sigpipe(void)
 }
 
 
-static void
+void
 sigint(void)
 {
   unblock_signals(SIGINT,SIGINT);
