@@ -29,12 +29,12 @@ EMACS_DEFAULT_EL=/usr/local/share/emacs/20.7/site-lisp/default.el
 
 # numerous TCL/TK variables culled from the tkConfig.sh and tclConfig.sh
 # if these are found.
-TK_CONFIG_PREFIX=/usr/lib
-TK_LIBRARY=/usr/lib/tk8.2
-TCL_LIBRARY=/usr/lib/tcl8.2
+TK_CONFIG_PREFIX=/usr/lib/tk8.2
+TK_LIBRARY=/usr/lib/tk8.2/../tk8.2
+TCL_LIBRARY=/usr/lib/tk8.2/../tcl8.2
 TK_XINCLUDES=-I/usr/X11R6/include
-TK_INCLUDE=-I/usr/lib/../include
-TCL_INCLUDE=-I/usr/lib/../include
+TK_INCLUDE=-I/usr/include/tcl8.2
+TCL_INCLUDE=-I/usr/include/tcl8.2
 TK_LIB_SPEC=-L/usr/lib -ltk8.2
 TK_BUILD_LIB_SPEC=-L/usr/lib -ltk8.2
 TK_XLIBSW=-L/usr/X11R6/lib -lX11
@@ -50,7 +50,7 @@ GCC=gcc
 
 
 
-GCLDIR=/fix/f/debian/mm/gcl/gcl
+GCLDIR=/mnt/i19/f/debian/mm/gcl/gcl
 SHELL=/bin/sh
 MACHINE=386-linux
 
