@@ -24,7 +24,7 @@
 #include "ptable.h"
 
 struct node *find_sym ( PIMAGE_SYMBOL sym, char *name );
-int          get_extra_bss ( PIMAGE_SYMBOL sym_table, int length, int start, int *ptr, int bsssize);
+int          get_extra_bss ( PIMAGE_SYMBOL sym_table, int length, int start, int *ptr, int bsssize );
 void         relocate_symbols ( unsigned int length );
 void         set_symbol_address ( PIMAGE_SYMBOL sym, char *string );
 
@@ -64,6 +64,13 @@ IMAGE_RELOCATION relocation_info;
 #define _COMMENT    ".comment"
 #define _LIB        ".lib"
 
+
+#define symbol_table    sfaslp->s_symbol_table
+#define start_address   sfaslp->s_start_address
+#define my_string_table sfaslp->s_my_string_table
+#define extra_bss       sfaslp->s_extra_bss
+#define the_start       sfaslp->s_the_start
+
 unsigned int TEXT_NSCN = INVALID_NSCN, DATA_NSCN = INVALID_NSCN,
     BSS_NSCN = INVALID_NSCN, STAB_NSCN = INVALID_NSCN,
     STABSTR_NSCN = INVALID_NSCN, RDATA_NSCN = INVALID_NSCN,
@@ -81,12 +88,6 @@ struct sfasl_info {
 };
 
 struct sfasl_info *sfaslp;
-
-#define symbol_table sfaslp->s_symbol_table
-#define start_address sfaslp->s_start_address
-#define my_string_table sfaslp->s_my_string_table
-#define extra_bss sfaslp->s_extra_bss
-#define the_start sfaslp->s_the_start
 
 #if 0
 #define describe_sym describe_sym1
@@ -146,15 +147,10 @@ void describe_sym1 ( int n, int aux_to_go )
 /* This function does the low level relocation. */
 void relocate()
 {
-    char *where;
-    where = the_start + relocation_info.VirtualAddress;
-    if ( relocation_info.Type == IMAGE_REL_I386_ABSOLUTE ) {
-        return;
-    }
+    char *where = the_start + relocation_info.VirtualAddress;
     
-    switch ( relocation_info.Type )
-        {
-
+    if ( relocation_info.Type != IMAGE_REL_I386_ABSOLUTE ) {
+        switch ( relocation_info.Type ) {
         case IMAGE_REL_I386_DIR32:
             *(int *) where = *( (int *) where ) + 
                 symbol_table [ relocation_info.SymbolTableIndex ].Value;
@@ -174,6 +170,7 @@ void relocate()
                       relocation_info.Type );
             FEerror ( "The relocation type was unknown\n", 0 );
         }
+    }
 }
 
 /* Loop through the section headers to determine the index fo each section header
@@ -226,7 +223,7 @@ int fasload ( object faslfile )
     IMAGE_SECTION_HEADER section[COFF_SECTIONS];
     IMAGE_OPTIONAL_HEADER optional_header;
     int textsize = 0, datasize = 0, bsssize = 0, stabsize = 0,
-    stabstrsize = 0, rdatasize = 0, nsyms = 0;
+        stabstrsize = 0, rdatasize = 0, nsyms = 0;
     object memory, data;
     FILE *fp;
     char filename[MAXPATHLEN];
@@ -421,7 +418,7 @@ int fasload ( object faslfile )
                         }
 		    }
                     for ( i=0; i < section[j].NumberOfRelocations; i++ ) {
-		        fread ( &relocation_info, sizeof (IMAGE_RELOCATION), 1, fp );
+		        fread ( &relocation_info, sizeof ( IMAGE_RELOCATION ), 1, fp );
                         relocate() ;
                     }
                 }
@@ -431,7 +428,7 @@ int fasload ( object faslfile )
         /* Finished relocation, read in the fasl vector. */
 	fseek ( fp, fasl_vector_start, 0 );
         if ( feof ( fp ) ) {
-            data=0;
+            data = 0;
         } else {
             data = read_fasl_vector ( faslfile );
             vs_push ( data );
@@ -440,7 +437,7 @@ int fasload ( object faslfile )
 
 	ALLOCA_FREE ( my_string_table );
 	ALLOCA_FREE ( symbol_table );
-	call_init ( init_address, memory, data, 0);
+	call_init ( init_address, memory, data, 0 );
         vs_base = old_vs_base;
 	vs_top  = old_vs_top;
         if ( symbol_value ( sLAload_verboseA ) != Cnil ) {
@@ -507,7 +504,7 @@ void relocate_symbols ( unsigned int length )
     unsigned int typ;
     char *str;
     char tem[SYMNMLEN+1];
-    int Value     = (int) start_address;
+    int  Value = (int) start_address;
     
     end = symbol_table + length;
     for ( sym = symbol_table; sym < end; sym++ ) {
