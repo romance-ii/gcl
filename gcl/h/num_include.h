@@ -51,5 +51,5 @@ object Vrandom_state;
 #endif
 
 #define LOG_WORD_SIZE           (8*SIZEOF_LONG)
-#define MOST_POSITIVE_FIX	((((unsigned long)1)<<(LOG_WORD_SIZE-1))-1)
+#define MOST_POSITIVE_FIX	((long)((((unsigned long)1)<<(LOG_WORD_SIZE-1))-1))
 #define MOST_NEGATIVE_FIX	( - MOST_POSITIVE_FIX - 1 )
