@@ -100,11 +100,11 @@ install1:
 	ln ${SYMB} ${INSTALL_LIB_DIR}/unixport/saved_gcl$(EXE) \
 	 $(DESTDIR)${prefix}/bin/gcl.exe
 	if [ -d "${TK_CONFIG_PREFIX}" ] ; then  \
-	cat gcl-tk/gcltksrv | \
+	cat gcl-tk/gcltksrv$(BAT) | \
 	sed -e "s:GCL_TK_DIR=.*:GCL_TK_DIR=${INSTALL_LIB_DIR}/gcl-tk:g"  \
 	-e "s:TK_LIBRARY=.*:TK_LIBRARY=${TK_LIBRARY}:g" > \
-	$(DESTDIR)${INSTALL_LIB_DIR}/gcl-tk/gcltksrv ; \
-	chmod a+x $(DESTDIR)${INSTALL_LIB_DIR}/gcl-tk/gcltksrv ; fi
+	$(DESTDIR)${INSTALL_LIB_DIR}/gcl-tk/gcltksrv$(BAT) ; \
+	chmod a+x $(DESTDIR)${INSTALL_LIB_DIR}/gcl-tk/gcltksrv$(BAT) ; fi
 	if [ -d "${TK_CONFIG_PREFIX}" ] ; then  \
 	(cd $(DESTDIR)${INSTALL_LIB_DIR}/gcl-tk/demos ; \
 	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../unixport/saved_gcl$(EXE)) ; fi
