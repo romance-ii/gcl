@@ -7,8 +7,9 @@ gcl (2.5.0.cvs20020625-58) unstable; urgency=low
   * Prepend instead of overwrite C_INCLUDE_PATH in shell wrapper
   * More shell variable fixes in main makefile
   * Corrected order of push and pushnew
+  * Set bfd_error appropriately
 
- -- Camm Maguire <camm@m.enhanced.com>  Fri, 11 Oct 2002 14:16:29 -0400
+ -- Camm Maguire <camm@m.enhanced.com>  Fri, 11 Oct 2002 15:47:13 -0400
 
 gcl (2.5.0.cvs20020625-57) unstable; urgency=low
 

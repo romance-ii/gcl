@@ -186,6 +186,7 @@ fasload(object faslfile) {
   object *old_vs_top=vs_top;
   static int nbfd;
   bfd *b;
+  bfd_error_type myerr;
   unsigned u,v;
   asymbol **q;
   asection *s;
@@ -223,9 +224,14 @@ fasload(object faslfile) {
 
   if (!(b=bfd_openr(filename,0)))
     FEerror("Cannot open bfd");
+  if ((myerr=bfd_get_error()) && myerr!=3) 
+    FEerror("Unknown bfd error code on openr");
   if (!bfd_check_format(b,bfd_object))
     FEerror("Unknown bfd format");
-  
+  if ((myerr=bfd_get_error()) && myerr!=3)
+    FEerror("Unknown bfd error code on check_format");
+  bfd_set_error(0);
+
   current=NULL;
   for (s=b->sections;s;s=s->next) {
 
