@@ -180,7 +180,8 @@
 		       SLOT-SPECS))
 		  *condition-class-list*)
 	 #+kcl (setf (get ',name #+akcl 'si::s-data #-akcl 'si::is-a-structure) nil)
-	 (setf (get ',name 'documentation) ',documentation))
+;	 (setf (get ',name 'documentation) ',documentation)
+	 )
       ,@(when REPORT-FUNCTION
 	   `((DEFMETHOD PRINT-OBJECT ((X ,NAME) STREAM)
 	       (IF *PRINT-ESCAPE*

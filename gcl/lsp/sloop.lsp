@@ -163,12 +163,12 @@ a symbol for the purposes of being a keyword in a sloop")
 	      ((eql (car v) :no-body)
 	       `((parse-no-body  .item.) ,@ (cdr v)))
 	      ((setq tem
-		     (member (car v) '(:sloop-macro :sloop-for :sloop-map)))
-	       `((and (symbolp .item.)(get .item. ,(car tem))) ,@ (cdr v)))
+		     (member (car v) '(sloop-macro sloop-for sloop-map)))
+	       `((and (symbolp .item.)(get .item. ',(car tem))) ,@ (cdr v)))
 	      (t
 	       `((l-equal .item. ',(car v)) ,@ (cdr v))))
 	bod))
-    (or last-case (push `(t (error "lcase fell off end ~a  " .item.)) bod))
+     (or last-case (push `(t (error "lcase fell off end ~a  " .item.)) bod))
     `(let ((.item. (translate-name ,item)))
        (cond ,@ (nreverse bod)))))
 
@@ -389,7 +389,7 @@ otherwise nil"
 	     (end-test  (setq *loop-end-test*
 			      (append (parse-loop-do) *loop-end-test*)))
 	     (with-unique (parse-loop-with nil t))
-	     (:sloop-macro (parse-loop-macro v :sloop-macro))
+	     (sloop-macro (parse-loop-macro v 'sloop-macro))
 	     (t
 	       (cond (first
 		       (setf found nil))
@@ -569,7 +569,7 @@ otherwise nil"
   (declare (special *loop-prologue* *last-val*
 		    *loop-collect-var* *loop-epilogue* ))
   (let* ((com  (find command *additional-collections* :test 'l-equal))
-	 (helper (get com :sloop-collect)))
+	 (helper (get com 'sloop-collect)))
     (let ((form (funcall helper collect-var name-val)))
       (let ((*loop-form* form) *last-val*)
 	(declare (special  *loop-form* *last-val*))
@@ -784,10 +784,10 @@ recompile."))
 	       (to
 		 (setq from-data (add-from-data from-data
 						var nil (loop-pop) nil nil t)))
-	       (:sloop-for (parse-loop-macro (translate-name v)
-					     :sloop-for var )
+	       (sloop-for (parse-loop-macro (translate-name v)
+					     'sloop-for var )
 			   (return 'done))
-	       (:sloop-map (parse-loop-map (translate-name v) var )
+	       (sloop-map (parse-loop-map (translate-name v) var )
 			   (return nil))
 	       (t(or			
 		   (loop-un-pop))
@@ -848,11 +848,11 @@ recompile."))
   (let ((helper (get v type)) args)
     (setq args
 	  (ecase type
-	    (:sloop-for
-	     (let ((tem (get v :sloop-for-args)))
+	    (sloop-for
+	     (let ((tem (get v 'sloop-for-args)))
 	       (or (cdr tem) (error "sloop-for macro needs at least one arg"))
 	       (cdr tem)))
-	    (:sloop-macro(get v :sloop-macro-args))))
+	    (sloop-macro(get v 'sloop-macro-args))))
     (let ((last-helper-apply-arg
 	    (cond ((member '&rest args)
 		   (prog1 *loop-form* (setf *loop-form* nil)))
@@ -862,15 +862,15 @@ recompile."))
       (setq *loop-form*
 	    (append 
 	      (case type
-		    (:sloop-for (apply helper initial last-helper-apply-arg))
-		    (:sloop-macro(apply helper  last-helper-apply-arg)))
+		    (sloop-for (apply helper initial last-helper-apply-arg))
+		    (sloop-macro(apply helper  last-helper-apply-arg)))
 	      *loop-form*)))))
 
 (defun parse-loop-map (v var)
   (declare (special *loop-map* *loop-map-declares* *loop-form*))
   (and *loop-map* (error "Sorry only one allowed loop-map per sloop"))
-  (let ((helper (get v :sloop-map))
-	(args  (get v :sloop-map-args)))
+  (let ((helper (get v 'sloop-map))
+	(args  (get v 'sloop-map-args)))
     (or args (error "map needs one arg before the key word"))
     (cond ((member '&rest args)
 	   (error "Build this in two steps if you want &rest")))
@@ -912,10 +912,10 @@ recompile."))
 	      (defun ,helper ,args
 		,@ body)
 	      ,@ (and list `((pushnew ',name ,list)))
-	      (setf (get ',name ,(intern (format nil "SLOOP-~a" type)
-					 (find-package 'keyword))) ',helper)
-	      (setf (get ',name ,(intern (format nil "SLOOP-~a-ARGS" type)
-					 (find-package 'keyword))) ',args)))
+	      (setf (get ',name ',(intern (format nil "SLOOP-~a" type)
+					 (find-package 'sloop))) ',helper)
+	      (setf (get ',name ',(intern (format nil "SLOOP-~a-ARGS" type)
+					 (find-package 'sloop))) ',args)))
 )
 		
 
