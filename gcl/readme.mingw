@@ -4,9 +4,17 @@ BUILDING NATIVE WIN32 GNU COMMON LISP FROM CVS
 
 The preferred build host system for the Mingw32 compiler is MSYS.
 
-I use gcc version 3.3.1, but earlier versions back to 2.95 certainly 
-work provided that you remove the "-fno-zero-initialized-in-bss" flag 
-in "h/mingw.defs" before running "configure".
+I use gcc version 3.3.1 and binutils 2.14.90, but earlier versions
+of gcc back to 2.95 are OK provided that you remove the
+"-fno-zero-initialized-in-bss" flag in "h/mingw.defs" before running
+"configure".
+
+Note that gcc 3.3.3 and gcc 3.4.0 do NOT work; likewise binutils 2.13.90
+and 2.15.90.
+
+The working binutils version can be found at:
+
+ftp://ftp.sf.net/m/mi/mingw/binutils-2.14.90-20030807-1.tar.gz
 
 
 ===============================================
@@ -24,12 +32,9 @@ BUILD TOOLS
 - Source code for GCL.
     http://savannah.gnu.org/projects/gcl/
 
-It is a good idea to keep up to date with Mingw32 and MSYS.  There
-are usually updates for various parts of these packages to be found
-on the web site. 
-
-Avoid using MSYS 1.10 RC3 as it has some annoying bugs. RC2 is fine
-as I write in January 2004.
+Subject to the above warnings, it is usually a good idea to keep up to
+date with Mingw32 and MSYS.  Updates for various parts of these packages
+are available on the web site.
 
 
 SHORT SETUP NOTES
@@ -105,7 +110,10 @@ BUILDING
   "traditional" GCL executable which will build the current CVS version of
   Maxima.  The BFD option will depend on someone with knowledge of BFD and 
   PE-COFF linking fixing some problems with the BFD library - I am slowly
-  absorbing the info needed, but we really need input from an expert.
+  absorbing the info needed, but we really need input from an expert.  My
+  inclination is to stick with custom relocation as BFD is less efficient.
 
 
-Mike Thomas, 19 February 2004
+Mike Thomas
+
+15 June 2004
