@@ -113,8 +113,6 @@
  (setq compiler::*default-system-p* nil)
  (setq compiler::*keep-gaz* nil)
  
- 
- 
  (setq clcs_shadow
        '(CONDITIONS::BREAK
 	 CONDITIONS::ERROR
@@ -207,7 +205,9 @@
        (symbol-function 'pcl::class-precedence-list))
  (setf (symbol-function 'si::find-class) 
        (symbol-function 'pcl::find-class))
- 
+ (setf (symbol-function 'si::find-class-no-error) 
+	(symbol-function 'conditions::find-class-no-error))
+
  (do-external-symbols (s "CONDITIONS")
 		      (if (member s clcs_shadow)
 			  (progn 
