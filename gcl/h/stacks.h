@@ -8,8 +8,8 @@
 #define VSGETA 128
 EXTER object value_stack[VSSIZE + (STACK_OVER +1) *VSGETA];     
 
-#define BDSSIZE		4096
-#define	BDSGETA		160
+#define BDSSIZE		1024
+#define	BDSGETA		40
 EXTER struct bds_bd bind_stack[BDSSIZE + (STACK_OVER +1)* BDSGETA];
 
      
