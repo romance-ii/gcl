@@ -213,6 +213,7 @@ unexec (char *new_name, char *old_name, void *start_data, void *start_bss,
 {
   file_data in_file, out_file;
   char out_filename[MAX_PATH], in_filename[MAX_PATH];
+  char filename[MAX_PATH];
   unsigned long size;
   char *ptr;
 
@@ -230,15 +231,15 @@ unexec (char *new_name, char *old_name, void *start_data, void *start_bss,
   
   /* Make sure that the input and output filenames have the
      ".exe" extension...patch them up if they don't.  */
-  strcpy (in_filename, old_name);
-  ptr = in_filename + strlen (in_filename) - 4;
-  if  (strcmp (ptr, ".exe") && strcmp (ptr, ".EXE")  )
-    strcat (in_filename, ".exe");
+  ptr = old_name + strlen (old_name) - 4;
+  strcpy(filename, old_name);
+  strcat(filename, (strcmp (ptr, ".exe") && strcmp (ptr, ".EXE"))?".exe":"");
+  cygwin_conv_to_full_win32_path(filename,in_filename);
 
-  strcpy (out_filename, new_name);
-  ptr = out_filename + strlen (out_filename) - 4;
-  if (strcmp (ptr, ".exe") && strcmp (ptr, ".EXE")  )
-    strcat (out_filename, ".exe");
+  ptr = new_name + strlen (new_name) - 4;
+  strcpy(filename, new_name);
+  strcat(filename, (strcmp (ptr, ".exe") && strcmp (ptr, ".EXE"))?".exe":"");
+  cygwin_conv_to_full_win32_path(filename,out_filename);
 
   printf ("Dumping from %s\n", in_filename);
   printf ("          to %s\n", out_filename);
@@ -323,25 +324,12 @@ int
 open_input_file (file_data *p_file, char *filename)
 {
   HANDLE file;
-  int changed =0;
   HANDLE file_mapping;
   void  *file_base;
   DWORD size, upper_size;
-  /* fix for cygnus pathnames */
-  if (filename[0]=='/' && filename[1]=='/' ) {
-    filename[1]=filename[2];
-    filename[2]=':';
-    filename ++;
-    changed = 1;
-  }
 
   file = CreateFile (filename, GENERIC_READ, FILE_SHARE_READ, NULL,
 		     OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-  if (changed) {
-    filename --;
-    filename[2]=filename[1];
-    filename[0]=filename[1]='/';
-  }
   if (file == INVALID_HANDLE_VALUE) 
     return FALSE;
 
