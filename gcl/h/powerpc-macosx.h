@@ -11,8 +11,6 @@
 
 #include "bsd.h"
 
-#include <sys/param.h>
-
 #define DARWIN
 
 /* Mac OS X has its own executable file format (Mach-O).  */
