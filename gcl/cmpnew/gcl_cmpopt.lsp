@@ -775,8 +775,11 @@ type_of(#0)==t_bitvector")
    (get 'floatp 'inline-always))
 
 ;;FLOOR
+; (push '((fixnum fixnum) fixnum #.(flags rfa)
+;  "@01;(#0>=0&&(#1)>0?(#0)/(#1):ifloor(#0,#1))")
+;   (get 'floor 'inline-always))
  (push '((fixnum fixnum) fixnum #.(flags rfa)
-  "@01;(#0>=0&&(#1)>0?(#0)/(#1):ifloor(#0,#1))")
+  "@01;({fixnum _t=(#0)/(#1);((#1)<0  && (#0)<=0) || ((#1)>0 && (#0)>=0) || ((#1)*_t == (#0)) ? _t : _t - 1;})")
    (get 'floor 'inline-always))
 
 ;;FOURTH
@@ -903,7 +906,9 @@ type_of(#0)==t_bitvector")
    (get 'minusp 'inline-always))
 
 ;;MOD
- (push '((fixnum fixnum) fixnum #.(flags rfa)"@01;(#0>=0&&(#1)>0?(#0)%(#1):imod(#0,#1))")
+; (push '((fixnum fixnum) fixnum #.(flags rfa)"@01;(#0>=0&&(#1)>0?(#0)%(#1):imod(#0,#1))")
+;   (get 'mod 'inline-always))
+ (push '((fixnum fixnum) fixnum #.(flags rfa)"@01;({fixnum _t=(#0)-((#0)/(#1))*(#1);((#1)<0 && _t<=0) || ((#1)>0 && _t>=0) ? _t : _t + (#1);})")
    (get 'mod 'inline-always))
 
 ;;NCONC

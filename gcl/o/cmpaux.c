@@ -31,10 +31,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "include.h"
 #define dcheck_type(a,b) check_type(a,b)
 
-#if 0
-#define CMPAUX_DEBUG
-#endif
-
 DEFUNO_NEW("SPECIALP",object,fSspecialp,SI
        ,1,1,NONE,OO,OO,OO,OO,void,siLspecialp,(object sym),"")
 {
@@ -102,32 +98,33 @@ gcl_init_cmpaux(void)
 }
 
   
-int
-ifloor(int x, int y)
-{
-  if (y == 0) {
-    FEerror("Zero divizor", 0);
-    return 0;
-  }
-  if (y > 0) {
-    if (x >= 0)
-      return(x/y);
-    else
+/* Now inlined directly by optimizer  */
+/* int */
+/* ifloor(int x, int y) */
+/* { */
+/*   if (y == 0) { */
+/*     FEerror("Zero divizor", 0); */
+/*     return 0; */
+/*   } */
+/*   if (y > 0) { */
+/*     if (x >= 0) */
+/*       return(x/y); */
+/*     else */
       /* FIXME, deal with possible overflow here*/
-      return(-((-x-1))/y-1);
-  }
-  if (x >= 0)
+/*       return(-((-x-1))/y-1); */
+/*   } */
+/*   if (x >= 0) */
       /* FIXME, deal with possible overflow here*/
-    return(-((x-1)/(-y))-1);
-  else
-    return((-x)/(-y));
-}
+/*     return(-((x-1)/(-y))-1); */
+/*   else */
+/*     return((-x)/(-y)); */
+/* } */
 
-int
-imod(int x, int y)
-{
-  return(x - ifloor(x, y)*y);
-}
+/* int */
+/* imod(int x, int y) */
+/* { */
+/*   return(x - ifloor(x, y)*y); */
+/* } */
 
 /* static void */
 /* set_VV(object *, int, object); */
@@ -296,38 +293,62 @@ object_to_string(object x)
 /* #endif */
 
 void
-call_init ( int init_address, object memory, object fasl_vec, FUNC fptr )
-{
-    object form; 
-    FUNC at;
+call_init(int init_address, object memory, object fasl_vec, FUNC fptr)
+{object form;
+ FUNC at;
+/* #ifdef CLEAR_CACHE */
+/*  static int n; */
+/*  static sigset_t ss; */
 
-    check_type ( fasl_vec, t_vector );
-    form = ( fasl_vec->v.v_self [ fasl_vec->v.v_fillp - 1 ] );
+/*  if (!n) { */
+/*      struct sigaction sa={{(void *)sigh},{{0}},SA_RESTART|SA_SIGINFO,NULL}; */
 
-    if (fptr) {
-        at = fptr;
-    } else { 
-        at = (FUNC) ( memory->cfd.cfd_start + init_address );
-    }
+/*      sigaction(SIGILL,&sa,NULL); */
+/*      sigemptyset(&ss); */
+/*      sigaddset(&ss,SIGILL); */
+/*      sigprocmask(SIG_BLOCK,&ss,NULL); */
+/*      n=1; */
+/*  } */
+/* #endif */
+
+
+  check_type(fasl_vec,t_vector);
+  form=(fasl_vec->v.v_self[fasl_vec->v.v_fillp -1]);
+
+ if (fptr) at = fptr;
+  else 
+ at=(FUNC)(memory->cfd.cfd_start+ init_address );
  
 #ifdef VERIFY_INIT
-    VERIFY_INIT;
+ VERIFY_INIT
 #endif
    
-    if ( type_of ( form ) == t_cons &&
-         form->c.c_car == sSPinit ) {
-        bds_bind(sSPinit,fasl_vec);
-        bds_bind(sSPmemory,memory);
-        (*at)();
-        bds_unwind1;
-        bds_unwind1;
-    } else {
-        /* old style three arg init, with all init being done by C code. */
-        memory->cfd.cfd_self = fasl_vec->v.v_self;
-        memory->cfd.cfd_fillp = fasl_vec->v.v_fillp;
-        (*at)(memory->cfd.cfd_start, memory->cfd.cfd_size, memory);
-    }
-}
+ if (type_of(form)==t_cons &&
+     form->c.c_car == sSPinit)
+   {bds_bind(sSPinit,fasl_vec);
+    bds_bind(sSPmemory,memory);
+/* #ifdef CLEAR_CACHE */
+/*     sigprocmask(SIG_UNBLOCK,&ss,NULL); */
+/* #endif */
+    (*at)();
+/* #ifdef CLEAR_CACHE */
+/*     sigprocmask(SIG_BLOCK,&ss,NULL); */
+/* #endif */
+    bds_unwind1;
+    bds_unwind1;
+  }
+ else
+   /* old style three arg init, with all init being done by C code. */
+   {memory->cfd.cfd_self = fasl_vec->v.v_self;
+    memory->cfd.cfd_fillp = fasl_vec->v.v_fillp;
+/* #ifdef CLEAR_CACHE */
+/*     sigprocmask(SIG_UNBLOCK,&ss,NULL); */
+/* #endif */
+    (*at)(memory->cfd.cfd_start, memory->cfd.cfd_size, memory);
+/* #ifdef CLEAR_CACHE */
+/*     sigprocmask(SIG_BLOCK,&ss,NULL); */
+/* #endif */
+}}
 
 /* statVV is the address of some static storage, which is used by the
    cfunctions to refer to global variables,..
@@ -348,11 +369,6 @@ do_init(object *statVV)
   int n=fasl_vec->v.v_fillp -1;
   int i;
   object form;
-#ifdef CMPAUX_DEBUG
-         fprintf ( stderr,
-                   "do_init: START\n" );
-         fflush ( stderr );
-#endif /* CMPAUX_DEBUG */         
   check_type(fasl_vec,t_vector);
   form = fasl_vec->v.v_self[n];
   dcheck_type(form,t_cons);  
@@ -389,19 +405,8 @@ do_init(object *statVV)
   {object *top=vs_top;
    
    for(i=0 ; i< form->v.v_fillp; i++)
-     {
-#ifdef CMPAUX_DEBUG
-         fprintf ( stderr,
-                   "do_init: second for loop - i = %d, form->v.v_fillp = %d, form->v.v_self[%d] = %x....",
-                   i, form->v.v_fillp, i, form->v.v_self[i] );
-         fflush ( stderr );
-#endif /* CMPAUX_DEBUG */         
-        eval(form->v.v_self[i]);
-#ifdef CMPAUX_DEBUG
-         fprintf ( stderr,
-                   "  eval succeeded\n" ); 
-         fflush ( stderr );
-#endif /* CMPAUX_DEBUG */         
+     { 
+       eval(form->v.v_self[i]);
        vs_top=top;
      }
  }

@@ -137,8 +137,8 @@ struct key {short n,allow_other_keys;
 /* cmpaux.c:73:OF */ extern object fSdebug (object sym, object val); /* (sym, val) object sym; object val; */
 /* cmpaux.c:82:OF */ extern object fSsetvv (object index, object val); /* (index, val) object index; object val; */
 /* cmpaux.c:95:OF */ extern void gcl_init_cmpaux (void); /* () */
-/* cmpaux.c:106:OF */ extern int ifloor (int x, int y); /* (x, y) int x; int y; */
-/* cmpaux.c:124:OF */ extern int imod (int x, int y); /* (x, y) int x; int y; */
+/* cmpaux.c:106:OF */ /* extern int ifloor (int x, int y); */ /* (x, y) int x; int y; */
+/* cmpaux.c:124:OF */ /* extern int imod (int x, int y); */ /* (x, y) int x; int y; */
 /* cmpaux.c:185:OF */ extern int object_to_int (object x); /* (x) object x; */
 /* cmpaux.c:263:OF */ extern char *object_to_string (object x); /* (x) object x; */
 typedef int (*FUNC)();
