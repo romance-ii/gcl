@@ -1,5 +1,5 @@
 #!/bin/sh
-LISP=akcl
+LISP=gcl
 if [ $# = 2 ] ; then LISP=$2 ; fi
 
 TMP=/tmp/tmpd$$
