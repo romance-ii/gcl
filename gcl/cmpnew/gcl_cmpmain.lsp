@@ -479,32 +479,35 @@ Cannot compile ~a.~%"
 	   (with-open-file
 	     (st gaz :direction :output)
 	     (prin1-cmp `(defun ,name ,@ (cddr tem))       st))
-	 (compile-file gaz 
-;                      :c-debug t 
-		       :h-file t 
-		       :c-file t
-		       :system-p 't
-		       :data-file t
-		       :o-file t)
-	 (let ((cn (get-output-pathname gaz "c" gaz ))
-	       (dn (get-output-pathname gaz "data" gaz ))
-	       (hn (get-output-pathname gaz "h" gaz ))
-	       (on (get-output-pathname gaz "o" gaz )))
-	   (with-open-file (st cn)
-	     (si::copy-stream st *standard-output*))
-	   (with-open-file (st dn)
-	     (si::copy-stream st *standard-output*))
-	   (with-open-file (st hn)
-	     (si::copy-stream st *standard-output*))
-	   (system (si::string-concatenate "objdump -d -l "
-					   (namestring on)))
-	   (delete-file cn)
-	   (delete-file dn)
-	   (delete-file hn)
-	   (delete-file on)
-	   (unless *keep-gaz* (delete-file gaz)))))
+	   (let (*fasd-data*)
+	     (compile-file gaz 
+			   :h-file t 
+			   :c-file t
+			   :data-file t
+			   :o-file t))
+	   (let ((cn (get-output-pathname gaz "c" gaz ))
+		 (dn (get-output-pathname gaz "data" gaz ))
+		 (hn (get-output-pathname gaz "h" gaz ))
+		 (on (get-output-pathname gaz "o" gaz )))
+	     (with-open-file (st cn)
+			     (do () ((let ((a (read-line st)))
+				       (when (>= (si::string-match "gazonk[0-9]*.h" a) 0)
+					 (format t "~%~d~%" a)
+					 a))))
+			     (si::copy-stream st *standard-output*))
+	     (with-open-file (st dn)
+			     (si::copy-stream st *standard-output*))
+	     (with-open-file (st hn)
+			     (si::copy-stream st *standard-output*))
+	     (system (si::string-concatenate "objdump -d -l "
+					     (namestring on)))
+	     (delete-file cn)
+	     (delete-file dn)
+	     (delete-file hn)
+	     (delete-file on)
+	     (unless *keep-gaz* (delete-file gaz)))))
 	(t (error "can't disassemble ~a" name))))
-	 
+
 
 (defun compiler-pass2 (c-pathname h-pathname system-p )
   (with-open-file (st c-pathname :direction :output)

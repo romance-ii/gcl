@@ -2,8 +2,9 @@ gclcvs (2.7.0-30) unstable; urgency=low
 
   * Slightly modify proclaimed vararg function handling fix
     (gcl_cmptop.lsp)
+  * Make disassemble work when original system directory is gone
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  2 Aug 2004 21:39:12 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  5 Aug 2004 22:00:12 +0000
 
 gclcvs (2.7.0-29) unstable; urgency=low
 
