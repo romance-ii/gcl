@@ -212,10 +212,9 @@ AC_CHECK_LIB(readline,main,
 AC_CHECK_HEADER(bfd.h,
 	AC_CHECK_LIB(bfd,bfd_init,
 		AC_DEFINE(HAVE_LIBBFD)
-		echo "int main() {return 0;}" >foo.c
-		MP=`$GCC -t -o foo foo.c -lbfd -liberty 2>&1 |grep '^\-lbfd' | awk '{print $2}' | tr -d '()'`
-		MPD=`dirname $MP` 
-		LIBS="$LIBS  $MPD/libbfd.a $MPD/libiberty.a"
+		echo "int main() {bfd_init();return 0;}" >foo.c
+		MP=`$GCC -t -o foo foo.c -lbfd -liberty 2>&1 |tr -d '()' | awk '/\/libbfd/ || /\/libiberty/ {for (j=1;j<=NF;j++) {sub("\.so$",".a",$j); if ($j ~ "/libbfd") a=$j; if ($j ~ "/libiberty") b=$j;}} END {print a " " b}'`
+		LIBS="$LIBS  $MP"
 		,,-liberty))
 
 AC_SUBST(LIBS)
@@ -855,7 +854,7 @@ if test $use_gmp = yes ; then
    *)
       (cd gmp ; ./configure) ;;
  esac
- test -f gmp/mpn/add_n.* || cp gmp/mpn/generic/*.c gmp/mpn/
+ [[ "`ls -1 gmp/mpn/add_n.* 2>/dev/null`" != "" ]] || cp gmp/mpn/generic/*.c gmp/mpn/
  GMP=1
  AC_DEFINE(GMP)
  AC_SUBST(GMP)
