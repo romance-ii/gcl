@@ -322,6 +322,8 @@ case $use in
 	case $use in
 		alpha*)
 			TCFLAGS="$TCFLAGS -mieee";;
+		m68k*)
+			TCFLAGS="$TCFLAGS -ffloat-store";;
 #		hppa*)
 #			TCFLAGS="$TCFLAGS -fPIC";;
 	esac;;

@@ -24,6 +24,10 @@
 			/* correct addr on misaligned access */ \
             ea = (ea+4095)&(~4095); \
 	} \
+        else {\
+           FEerror("Unknown m68k cpu",0);\
+           ea=0;\
+        } \
 	(char *)ea; })
 #endif
 
@@ -39,6 +43,7 @@
 #define SGC
 
 #include <asm/cachectl.h>
+int cacheflush(void *,int,int,int);
 #define CLEAR_CACHE do {void *v=memory->cfd.cfd_start,*ve=v+memory->cfd.cfd_size; \
                         cacheflush(v,FLUSH_SCOPE_LINE,FLUSH_CACHE_BOTH,ve-v);\
                     } while(0)

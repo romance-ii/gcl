@@ -2,8 +2,11 @@ gcl (2.5.0.cvs20020625-53) unstable; urgency=high
 
   * Sleep with (in principle) microsecond precision
   * nth-value macro added
+  * \-ffloat\-store and warning cleanups for m68k
+  * Compile hppa with debugging, will get a build but a broken one, ok
+    for now, Closes: #159591
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 18 Sep 2002 22:21:27 -0400
+ -- Camm Maguire <camm@enhanced.com>  Fri, 20 Sep 2002 09:48:35 -0400
 
 gcl (2.5.0.cvs20020625-52) unstable; urgency=high
 
