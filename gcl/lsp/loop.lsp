@@ -61,6 +61,8 @@
 #-(or allegro ecls)
 (in-package :ansi-loop)
 
+(export '(loop loop-finish))
+
 #-ecls
 (provide :loop)
 
