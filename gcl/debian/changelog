@@ -15,8 +15,9 @@ gclcvs (2.7.0-16) unstable; urgency=low
     and --enable-infodir work when arg contains ${prefix}
   * Install myload1.lisp and clcs_macros.lisp to fix compiler::link with
     ansi image
+  * Fix typo in chap-6.texi
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 24 Nov 2003 16:17:39 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 24 Nov 2003 16:33:03 +0000
 
 gclcvs (2.7.0-15) unstable; urgency=low
 

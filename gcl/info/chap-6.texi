@@ -2715,7 +2715,7 @@ For details, see @ref{The LOOP Facility}.
    (loop (format t "~&Number: ")
          (let ((n (parse-integer (read-line) :junk-allowed t)))
            (when (not n) (return))
-           (format t "~&The square root of ~D is ~D.~
+           (format t "~&The square root of ~D is ~D.~%" n (sqrt n)))))
 @result{}  SQRT-ADVISOR
  (sqrt-advisor)
 @t{ |> } Number: @b{|>>}@t{5 @t{@i{[<--}~]}}@b{<<|}
