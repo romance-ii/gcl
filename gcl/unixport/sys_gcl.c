@@ -86,6 +86,9 @@ init_system(object no_init)
   ar_check_init(assert,no_init);
   ar_check_init(defstruct,no_init);
   ar_check_init(describe,no_init);
+#ifdef HAVE_JAPI_H
+  ar_check_init(japi,no_init);
+#endif
   ar_check_init(iolib,no_init);
   ar_check_init(listlib,no_init);
   ar_check_init(mislib,no_init);

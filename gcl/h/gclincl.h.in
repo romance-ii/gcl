@@ -209,3 +209,6 @@
 
 /* Define if you have the <values.h> header file.  */
 #undef HAVE_VALUES_H
+
+/* Define if you have the <japi.h> header file. */
+#undef HAVE_JAPI_H
