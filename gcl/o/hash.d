@@ -19,6 +19,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #define NEED_MP_H
+#include <string.h>
 #include "include.h"
 
 
@@ -184,7 +185,7 @@ object x;
 int depth;
 {
 
-	return make_fixnum(ihash_equal(x,depth));
+	return make_fixnum(ihash_equal(x,length));
 
 }
 
