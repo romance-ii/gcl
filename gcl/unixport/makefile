@@ -1,3 +1,4 @@
+SPECIAL_RSYM = rsym.c
 
 -include ../makedefs
 
@@ -13,15 +14,13 @@ GMP_DIR	= ../gmp3/
 
 #CFLAGS	= -c $(DEFS) -I$(HDIR)
 #LDCC    = $(CC) -g
-LIBC	= -lc
+LIBC	= 
 #LIBS	= -lm # -lpixrect -lc
 OLDDATE = "DATE"
 GCLIB	= $(ODIR)/gcllib.a
 #MPFILES= $(MPDIR)/mpi.o $(MPDIR)/mp2.o  $(MPDIR)/libmport.a
 #MPFILES= $(MPDIR)/mpi.o $(MPDIR)/mp2.o  $(MPDIR)/libmport.a
 INIT_SYSTEM_LSP=init_$(SYSTEM).lsp
-SPECIAL_RSYM = rsym.c
-
 
 LIBS1= $(LIBS) $(LIBSYSTEM) $(GCLIB)
 
