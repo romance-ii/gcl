@@ -36,13 +36,18 @@ unwind(frame_ptr fr, object tag)
 	nlj_tag = tag;
 	nlj_active = TRUE;
 	while (frs_top != fr
-		&& frs_top->frs_class == FRS_CATCH
+	       && frs_top->frs_class == FRS_CATCH
+	       && frs_top >= frs_org
 		/*
 		&& frs_top->frs_class != FRS_PROTECT
 		&& frs_top->frs_class != FRS_CATCHALL
 		*/
 	      ) {
 		--frs_top;
+	}
+	if (frs_top<frs_org) {
+	  frs_top=frs_org;
+	  FEerror("Cannot unwind frame", 0);
 	}
 	lex_env = frs_top->frs_lex;
 	ihs_top = frs_top->frs_ihs;
