@@ -187,7 +187,7 @@ int m;
   if ((fix(FFN(fScheck_fd_for_input)(sfd->fd,sfd->write_timeout))>0));
      again:
         {char *start = sfd->valid_data+sfd->valid_data_size;
-        nread = read(sfd->fd,start,
+        nread = SAFE_READ(sfd->fd,start,
 		     sfd->read_buffer_size - (start -  sfd->read_buffer));
        }
         if (nread<0)

@@ -197,7 +197,9 @@ int w32_socket_exit(void)
    (giving a human debugger time to attach to the forked process).
  */
 
-
+#ifdef SGC
+int sgc_enabled=0;
+#endif
 
 int delay;
 int main(argc, argv,envp)

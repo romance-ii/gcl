@@ -635,7 +635,7 @@ getCharGclSocket(object strm, object block)
       if (high > 0)
 	{ object bufp = SOCKET_STREAM_BUFFER(strm);
 	int n;
-	n = read(fd,bufp->ust.ust_self ,bufp->ust.ust_dim);
+	n = SAFE_READ(fd,bufp->ust.ust_self ,bufp->ust.ust_dim);
 	doReverse(bufp->ust.ust_self,n);
 	bufp->ust.ust_fillp=n;
 	if (n > 0)

@@ -262,7 +262,7 @@ fread1(p,n1,n2,st)
      int n1;
      int n2;
 {int i,j;
- j=fread(p,n1,n2,st);
+ j=SAFE_FREAD(p,n1,n2,st);
  if(debug)
  {printf("[");
   n1=n1*n2;
@@ -317,7 +317,7 @@ getd(str)
 #define GET_OP GET
 #define PUT_OP PUT
 #define D_FWRITE fwrite
-#define D_FREAD fread
+#define D_FREAD SAFE_FREAD
 #define DP(sw)  sw
 #define PUTD(a,b) PUT(b)
 #define GETD(a) GET()
@@ -449,7 +449,8 @@ getd(str)
 #define  READ_STRING(leng,loc) do {BEGIN_NO_INTERRUPT;     \
      *loc = alloc_simple_string(leng); \
      (*loc)->st.st_self=alloc_relblock(leng); END_NO_INTERRUPT; \
-  memset((*loc)->st.st_self,0,leng); /* fread won't restart if it triggers an SGC segfault -- CM */ \
+/* Now handled in SAFE_FREAD -- CM 20040210 */ \
+/*   memset((*loc)->st.st_self,0,leng); */ /* fread won't restart if it triggers an SGC segfault -- CM */ \
   D_FREAD((*loc)->st.st_self,1,leng,fas_stream);} while(0)
 
 /* if try_hash finds it we don't need to write the object

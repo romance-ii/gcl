@@ -48,7 +48,7 @@ struct node * find_sym();
 int node_compare();
 #ifndef _WIN32
 void *malloc();
-char *bsearch();
+void *bsearch();
 #endif
 
 struct reloc relocation_info;
@@ -331,7 +331,7 @@ int fasload ( object faslfile )
 	if ( fseek ( fp, N_TXTOFF(fileheader), 0) < 0 ) {
             FEerror("file seek error",0,0);
         }
-	fread ( the_start, textsize + datasize, 1, fp );
+	SAFE_FREAD ( the_start, textsize + datasize, 1, fp );
 	dprintf("read %d bytes of text + data into memory at ", textsize + datasize );
         /* relocate the actual loaded text  */
 
@@ -601,6 +601,8 @@ void relocate_symbols ( unsigned int length )
     unsigned int typ;
     char *str;
     char tem[SYMNMLEN +1];
+    int n_value=(int)start_address;
+
     tem[SYMNMLEN]=0;
     int n_value=(int)start_address;
 

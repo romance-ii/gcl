@@ -2130,7 +2130,7 @@ FFN(siLfp_input_stream)()
   p = vector->ust.ust_self;
   beg = ((type_of(start)==t_fixnum) ? fix(start) : 0);
   n = ((type_of(count)==t_fixnum) ? fix(count) : (vector->st.st_fillp - beg));
-  if ((n=fread(p+beg,1,n,stream->sm.sm_fp)))
+  if ((n=SAFE_FREAD(p+beg,1,n,stream->sm.sm_fp)))
       @(return `make_fixnum(n)`);
   @(return Cnil);
 @)

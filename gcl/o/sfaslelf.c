@@ -203,7 +203,7 @@ fasload(faslfile)
      base = mmap (0, stat_buf.st_size,PROT_READ|PROT_WRITE, MAP_PRIVATE, file, 0); } else {
 
    base = malloc(stat_buf.st_size);
-   fread(base,1,stat_buf.st_size,fp);
+   SAFE_FREAD(base,1,stat_buf.st_size,fp);
    fseek(fp,0,SEEK_CUR);
      }
 
