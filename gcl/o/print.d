@@ -1325,6 +1325,7 @@ int level;
 	case t_pathname:
 		if (1 || PRINTescape) {
 			write_ch('#');
+			write_ch('p');
 			vs_push(namestring(x));
 			write_object(vs_head, level);
 			vs_pop;

@@ -32,25 +32,26 @@ MPFILES=$(MPDIR)/mpi-386_no_under.o $(MPDIR)/libmport.a
 prefix=/usr/local
 
 # where to place the info files
-INFO_DIR=/usr/info/
+INFO_DIR=/usr/local/info/
 
 # where to put emacs lisp files.
-EMACS_SITE_LISP=
+EMACS_SITE_LISP=/usr/share/emacs/20.3/site-lisp
 
 # the default.el file
-EMACS_DEFAULT_EL=/default.el
+EMACS_DEFAULT_EL=/usr/share/emacs/20.3/site-lisp/default.el
 
 # numerous TCL/TK variables culled from the tkConfig.sh and tclConfig.sh
 # if these are found.
-TK_CONFIG_PREFIX=/usr/local/lib
-TK_LIBRARY=/usr/local/lib/tk8.2
-TCL_LIBRARY=/usr/local/lib/tcl8.2
-TK_XINCLUDES=-I/usr/X11R6/include
-TK_INCLUDE=-I/usr/local/lib/../include
-TK_LIB_SPEC=-L/usr/local/lib -ltk8.2
-TK_BUILD_LIB_SPEC=-L/home/wfs/src/tk8.2.1/unix -ltk8.2
-TK_XLIBSW=-L/usr/X11R6/lib -lX11
-TK_XINCLUDES=-I/usr/X11R6/include
+TK_CONFIG_PREFIX=
+TK_LIBRARY=
+TCL_LIBRARY=
+TK_XINCLUDES=
+TK_INCLUDE=
+TCL_INCLUDE=-I/usr/local/lib/../include
+TK_LIB_SPEC=
+TK_BUILD_LIB_SPEC=
+TK_XLIBSW=
+TK_XINCLUDES=
 TCL_LIB_SPEC=-L/usr/local/lib -ltcl8.2${TCL_DBGX}
 TCL_DL_LIBS=-ldl
 TCL_LIBS=-ldl  -lm
@@ -62,7 +63,7 @@ GCC=gcc
 
 
 
-GCLDIR=/home/wfs/gcl-2.3
+GCLDIR=/home/wfs/cvs/gcl
 SHELL=/bin/sh
 MACHINE=386-linux
 
@@ -88,10 +89,10 @@ ODIR_DEBUG= -O4
 # (the -pipe is just since our file system is slow..)
 CC = ${GCC} -pipe -fwritable-strings  -DVOL=volatile -I$(GCLDIR)/o -fsigned-char
 
-# under redhat 6.1 and slackware 7.0 we need to have this
-# link be static for now ...
+# under redhat 6.1 and slackware 7.0 we needed to have this
+# link be static, but should be ok with the fix to unixport/rsym_elf.c
 LDCC=${CC} -static
-LDCC=${CC} 
+LDCC=${CC}
 
 # note for linuxaout on an elf machine add -b i486-linuxaout 
 # CC = gcc -pipe -fwritable-strings  -DVOL=volatile -I$(GCLDIR)/o -fsigned-char -b i486-linuxaout 

@@ -3499,3 +3499,8 @@ static object  LnkTLI249(va_alist)va_dcl{va_list ap;va_start(ap);return(object )
 static object  LnkTLI248(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[248],&LnkLI248,ap);} /* DEF-LOOP-INTERNAL */
 static object  LnkTLI247(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[247],&LnkLI247,1,ap);} /* PARSE-LOOP */
 static object  LnkTLI246(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[246],&LnkLI246,2,ap);} /* DESETQ1 */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

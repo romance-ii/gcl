@@ -28,7 +28,7 @@ is usually 4K or 8K bytes.  From 1 to 3 bytes per page are
 preallocated in a table at compile time.  this must be a power of 2 if
 SGC is enabled.  */
 
-#define MAXPAGE 128*1024
+#define MAXPAGE 32*1024
 
 
 /* check to see if getcwd exists

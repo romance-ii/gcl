@@ -1,5 +1,5 @@
-This is Info file gcl-tk.info, produced by Makeinfo version 1.67 from
-the input file gcl-tk.texi.
+This is Info file gcl-tk.info, produced by Makeinfo-1.55 from the input
+file gcl-tk.texi.
 
    This is a Texinfo GCL TK Manual
 
@@ -7,68 +7,68 @@ the input file gcl-tk.texi.
 
 
 Indirect:
-gcl-tk.info-1: 174
-gcl-tk.info-2: 48940
-gcl-tk.info-3: 109799
-gcl-tk.info-4: 154100
-gcl-tk.info-5: 198705
-gcl-tk.info-6: 245765
-gcl-tk.info-7: 291101
-gcl-tk.info-8: 335292
+gcl-tk.info-1: 166
+gcl-tk.info-2: 48932
+gcl-tk.info-3: 109791
+gcl-tk.info-4: 154092
+gcl-tk.info-5: 198697
+gcl-tk.info-6: 245757
+gcl-tk.info-7: 291093
+gcl-tk.info-8: 335284
 
 Tag Table:
 (Indirect)
-Node: Top174
-Node: General1005
-Node: Introduction1288
-Node: Getting Started2783
-Node: Common Features of Widgets4381
-Node: Return Values8057
-Node: Argument Lists12090
-Node: Lisp Functions Invoked from Graphics15494
-Node: Linked Variables20557
-Node: tkconnect24289
-Node: Widgets26211
-Node: button26495
-Node: listbox33234
-Node: scale41675
-Node: canvas48940
-Node: menu109799
-Node: scrollbar129018
-Node: checkbutton136330
-Node: menubutton146090
-Node: text154100
-Node: entry188326
-Node: message198705
-Node: frame204677
-Node: label208690
-Node: radiobutton212110
-Node: toplevel221567
-Node: Control225419
-Node: after225794
-Node: bind226952
-Node: destroy242672
-Node: tk-dialog243260
-Node: exit245085
-Node: focus245765
-Node: grab250486
-Node: tk-listbox-single-select255166
-Node: lower256074
-Node: tk-menu-bar256956
-Node: option262634
-Node: options265724
-Node: pack-old283324
-Node: pack291101
-Node: place301215
-Node: raise310056
-Node: selection310917
-Node: send316135
-Node: tk317961
-Node: tkerror319799
-Node: tkvars321523
-Node: tkwait323798
-Node: update325278
-Node: winfo326805
-Node: wm335292
+Node: Top166
+Node: General997
+Node: Introduction1280
+Node: Getting Started2775
+Node: Common Features of Widgets4373
+Node: Return Values8049
+Node: Argument Lists12082
+Node: Lisp Functions Invoked from Graphics15486
+Node: Linked Variables20549
+Node: tkconnect24281
+Node: Widgets26203
+Node: button26487
+Node: listbox33226
+Node: scale41667
+Node: canvas48932
+Node: menu109791
+Node: scrollbar129010
+Node: checkbutton136322
+Node: menubutton146082
+Node: text154092
+Node: entry188318
+Node: message198697
+Node: frame204669
+Node: label208682
+Node: radiobutton212102
+Node: toplevel221559
+Node: Control225411
+Node: after225786
+Node: bind226944
+Node: destroy242664
+Node: tk-dialog243252
+Node: exit245077
+Node: focus245757
+Node: grab250478
+Node: tk-listbox-single-select255158
+Node: lower256066
+Node: tk-menu-bar256948
+Node: option262626
+Node: options265716
+Node: pack-old283316
+Node: pack291093
+Node: place301207
+Node: raise310048
+Node: selection310909
+Node: send316127
+Node: tk317953
+Node: tkerror319791
+Node: tkvars321515
+Node: tkwait323790
+Node: update325270
+Node: winfo326797
+Node: wm335284
 
 End Tag Table

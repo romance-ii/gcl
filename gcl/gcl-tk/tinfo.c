@@ -1,6 +1,4 @@
 
-/* yes we have alloca */
-#define HAVE_ALLOCA
 
 /* NOTE: If you don't have the system call mprotect DON'T
    define this.
@@ -15,6 +13,90 @@
 
 
 #define EXTER extern
+/* h/gclincl.h.  Generated automatically by configure.  */
+
+
+/* define where the heap could begin.   Normally should
+be the smallest value returned by sbrk().   Underestimating
+by 10-20 megabytes is not a problem. */
+
+#define DBEGIN 0x8000000 /* where data begins */
+
+
+/* the size of the page tables for gcl.  Each page is PAGESIZE which
+is usually 4K or 8K bytes.  From 1 to 3 bytes per page are
+preallocated in a table at compile time.  this must be a power of 2 if
+SGC is enabled.  */
+
+#define MAXPAGE 32*1024
+
+
+/* check to see if getcwd exists
+*/
+#define HAVE_GETCWD 1
+
+
+/* if we dont have USEGETCWD, we will use GETWD unless following defined
+*/
+#define HAVE_GETWD 1
+
+
+/* no gettimeofday function */
+
+/* #undef NO_GETTOD */
+
+/* define if have <asm/signal.h> */
+#define HAVE_ASM_SIGNAL_H 1
+
+/* define if have <asm/sigcontext.h> */
+#define HAVE_ASM_SIGCONTEXT_H 1
+
+/* define if have struct sigcontext in one of above */
+#define HAVE_SIGCONTEXT 1
+
+
+/* define if have <sys/ioctl.h> */
+#define HAVE_SYS_IOCTL_H 1
+
+/* define if we can use the file nsocket.c   */
+#define HAVE_NSOCKET 1  
+
+#ifndef HAVE_ALLOCA
+/* define this if you have alloca */
+#define HAVE_ALLOCA 1 
+#endif
+
+
+/* define if need alloca.h */
+/* #undef NEED_ALLOCA_H */
+
+#ifdef NEED_ALLOCA_H
+#include <alloca.h>
+#endif
+
+
+/* define LISTEN_USE_FCNTL  if we can check for input using fcntl */
+#define LISTEN_USE_FCNTL 1
+
+/* if signal.h alone contains the stuff necessary for sgc */
+/* #undef SIGNAL_H_HAS_SIGCONTEXT */
+
+
+/* define if the profil system call is not defined in libc */
+#define NO_PROFILE 1 
+
+
+/* define if the _cleanup() function exists and should be called
+   before saving */
+/* #define USE_CLEANUP  */
+
+
+/* define if BIG_ENDIAN or LITTLE_ENDIAN is defined by including
+   the standard includes */
+/* #define ENDIAN_ALREADY_DEFINED */
+
+/* define if SV_ONSTACK is defined in signal.h */
+/* #undef HAVE_SV_ONSTACK */ 
 
 #include <varargs.h>
 #include <setjmp.h>
@@ -528,8 +610,32 @@ enum smmode {			/*  stream mode  */
 	smm_echo,		/*  echo  */
 	smm_string_input,	/*  string input  */
 	smm_string_output,	/*  string output  */
-	smm_user_defined        /*  for user defined */ 
+	smm_user_defined,        /*  for user defined */
+	smm_socket		/*  Socket stream  */
 };
+
+/* for any stream that takes writec_char, directly (not two_way or echo)
+   ie. 	 smm_output,smm_io, smm_string_output, smm_socket
+ */
+#define STREAM_FILE_COLUMN(str) ((str)->sm.sm_int1)
+
+/* for smm_echo */
+#define ECHO_STREAM_N_UNREAD(strm) ((strm)->sm.sm_int0)
+
+/* file fd for socket */
+#define SOCKET_STREAM_FD(strm) ((strm)->sm.sm_fd)
+#define SOCKET_STREAM_BUFFER(strm) ((strm)->sm.sm_object1)
+
+/*  for     smm_string_input  */
+#define STRING_INPUT_STREAM_NEXT(strm) ((strm)->sm.sm_int0)
+#define STRING_INPUT_STREAM_END(strm) ((strm)->sm.sm_int1)
+
+/* for smm_two_way and smm_echo */
+#define STREAM_OUTPUT_STREAM(strm) ((strm)->sm.sm_object1)
+#define STREAM_INPUT_STREAM(strm) ((strm)->sm.sm_object0)
+
+/* for smm_string_{input,output} */
+#define STRING_STREAM_STRING(strm) ((strm)->sm.sm_object0)
 
 struct stream {
 		FIRSTWORD;
@@ -537,13 +643,31 @@ struct stream {
 	object	sm_object0;	/*  some object  */
 	object	sm_object1;	/*  some object */
 	int	sm_int0;	/*  some int  */
-	int	sm_int1;	/*  some int  */
+	int	sm_int1;	/*  column for input or output, stream */
 	char  	*sm_buffer;     /*  ptr to BUFSIZE block of storage */
-	short	sm_mode;	/*  stream mode  */
-				/*  of enum smmode  */
+	char	sm_mode;	/*  stream mode  */
+        unsigned char    sm_flags;         /* flags from gcl_sm_flags */
+        short sm_fd;         /* stream fd */
+     
 };
+/* flags */
+#define GET_STREAM_FLAG(strm,name) ((strm)->sm.sm_flags & (1<<(name)))
+#define SET_STREAM_FLAG(strm,name,val) (val ? \
+                     	((strm)->sm.sm_flags |= (1<<(name))) : \
+			((strm)->sm.sm_flags &= ~(1<<(name)))) 
 
-
+#define GCL_MODE_BLOCKING 1
+#define GCL_MODE_NON_BLOCKING 0
+#define GCL_TCP_ASYNC 1
+     
+enum gcl_sm_flags {
+  gcl_sm_blocking=1,
+  gcl_sm_tcp_async,
+  gcl_sm_input,
+  gcl_sm_output
+  
+};
+  
 #ifdef BSD
 #ifdef SUN3
 #define	BASEFF		(unsigned char *)0xffffffff
@@ -865,7 +989,7 @@ int FIXtemp;
 /*  For IEEEFLOAT, the double may have exponent in the second word
 (little endian) or first word.*/
 
-#if defined(I386) || defined(LITTLE_ENDIAN)
+#if defined(I386) || defined(LITTLE_END)
 #define HIND 1  /* (int) of double where the exponent and most signif is */
 #define LIND 0  /* low part of a double */
 #else /* big endian */
@@ -2303,10 +2427,8 @@ EXTER object  sLfill_pointer ;
 EXTER object  sLget ; 
 EXTER object  sLgethash ; 
 EXTER object  sLincf ; 
-EXTER object  sLlist ; 
 EXTER object  sLpop ; 
 EXTER object  sLpush ; 
-EXTER object  sLschar ; 
 EXTER object  sLschar ; 
 EXTER object  sLsetf ; 
 EXTER object  sSsetf_lambda ; 
@@ -2401,6 +2523,12 @@ EXTER object  sLvalues ;
 EXTER object  sSvariable_documentation ; 
 EXTER object  sLwarn ; 
 EXTER object  sSAallow_gzipped_fileA ; 
+EXTER object  sKmyaddr ; 
+EXTER object  sKmyport ; 
+EXTER object  sKasync ; 
+EXTER object  sKhost ; 
+EXTER object  sKserver ; 
+EXTER object  sSsocket ; 
 EXTER object  sLAstandard_inputA ; 
 EXTER object  sLAstandard_outputA ; 
 EXTER object  sLAerror_outputA ; 
@@ -2438,7 +2566,6 @@ EXTER object  sLAread_suppressA ;
 EXTER object  sSY ; 
 EXTER object  sSYB ; 
 EXTER object  sSYZ ; 
-EXTER object  sLlist ; 
 EXTER object  sLlistA ; 
 EXTER object  sLappend ; 
 EXTER object  sLnconc ; 
@@ -2509,6 +2636,7 @@ EXTER object  sKcatch ;
 EXTER object  sKprotect ; 
 EXTER object  sKcatchall ; 
 EXTER  object   fLget_universal_time  (); 
+EXTER  int   fLget_internal_real_time (); 
 EXTER object  sSAdefault_time_zoneA ; 
 EXTER  int   fSgetpid (); 
 EXTER  object   fSuse_fast_links (); 
@@ -2546,6 +2674,9 @@ EXTER  object   fSset_sigio_for_fd ();
 EXTER  object   fSreset_string_input_stream (); 
 EXTER  int    fScheck_state_input (); 
 EXTER  int   fSclear_connection_state (); 
+EXTER  object   fSgetpeername (); 
+EXTER  object   fSgetsockname (); 
+EXTER  int   fSset_blocking (); 
 /* if already mp.h has been included skip */
 typedef  plong *GEN1;
 /* if genpari.h not loaded */

@@ -740,3 +740,8 @@ static LnkT60(){ call_or_link(VV[60],&Lnk60);} /* SUBTYPEP */
 static object  LnkTLI59(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[59],&LnkLI59,2,ap);} /* SUB-INTERVAL-P */
 static object  LnkTLI58(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[58],&LnkLI58,1,ap);} /* BEST-ARRAY-ELEMENT-TYPE */
 static object  LnkTLI56(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[56],&LnkLI56,1,ap);} /* NORMALIZE-TYPE */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

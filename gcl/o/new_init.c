@@ -254,6 +254,7 @@ DEFUNO("CTIMES",object,fSctimes,SI
    ,2,2,0 ,OO,OO,OO,OO,siLctimes,"")
 DEFUNO("CDIFFERENCE",object,fScdifference,SI
    ,2,2,0 ,OO,OO,OO,OO,siLcdifference,"")
+
 DEFUNO("NTH",object,fLnth,LISP,2,2,NONE,OI,OO,OO,OO,Lnth,"")
 DEFUN("FIRST",object,fLfirst,LISP,0,0,NONE,OO,OO,OO,OO,"")
 DEFUNO("SECOND",object,fLsecond,LISP,1,1,NONE,OO,OO,OO,OO,Lsecond,"")
