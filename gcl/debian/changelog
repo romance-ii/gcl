@@ -33,8 +33,9 @@ gclcvs (2.7.0-25) unstable; urgency=low
   * Fix load path of clcs_macros.lisp in myload1.lisp to reenable
     compiler::link in the ansi build
   * readme.mingw updates
+  * solaris.h updates for custreloc option
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 17 Jun 2004 20:34:30 -0400
+ -- Camm Maguire <camm@enhanced.com>  Thu, 17 Jun 2004 20:38:42 -0400
 
 gclcvs (2.7.0-24) unstable; urgency=low
 

@@ -1,6 +1,9 @@
 #define __ELF__
 #define ElfW(a) Elf32_ ## a
-
+#if !defined(HAVE_LIBBFD) && !defined(USE_DLOPEN)
+#define __ELF_NATIVE_CLASS 32
+#include <sys/elf_SPARC.h>
+#endif
 #include "linux.h"
 
 #ifdef IN_GBC
