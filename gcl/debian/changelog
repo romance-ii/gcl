@@ -9,8 +9,10 @@ gclcvs (2.7.0-27) unstable; urgency=low
   * Fix segfault in string-match
   * Add with-standard-io-syntax in mod/gcl_ansi_io.lsp greatly reducing
     ansi test failures
+  * Protect against compiling references to macro functions; set sane
+    *eval-when-defaults* to '(:compile-toplevel :load-toplevel :execute)
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  2 Jul 2004 22:58:53 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  7 Jul 2004 21:59:04 +0000
 
 gclcvs (2.7.0-26) unstable; urgency=low
 

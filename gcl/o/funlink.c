@@ -53,7 +53,7 @@ call_or_link(object sym, void **link )
     fprintf ( stderr, "call_or_link: fun %x START for function ", fun );
     print_lisp_string ( "name: ", fun->cf.cf_name );
 #endif 
-    if (fun == OBJNULL) {
+    if (fun == OBJNULL || sym->s.s_sfdef != NOT_SPECIAL || sym->s.s_mflag) {
         FEinvalid_function(sym);
 #ifdef DO_FUNLINK_DEBUG
         fprintf ( stderr, "call_or_link: fun %x Invalid function EXIT\n", fun );
@@ -105,7 +105,7 @@ call_or_link_closure ( object sym, void **link, void **ptr )
               sym, link, *link, ptr, *ptr, fun );
     print_lisp_string ( "Function name: ", fun->cf.cf_name );
 #endif 
-    if (fun == OBJNULL) {
+    if (fun == OBJNULL || sym->s.s_sfdef != NOT_SPECIAL || sym->s.s_mflag) {
 #ifdef DO_FUNLINK_DEBUG
         fprintf ( stderr, "call_or_link_closure: fun %x ERROR END\n", fun );
 #endif 
@@ -784,7 +784,7 @@ call_proc(object sym, void **link, int argd, va_list ll)
      if(type_of(sym)==t_symbol) fun = symbol_function(sym);
      else fun = sym;
      vs_base= (base =   vs_top);
-     if (fun == OBJNULL) FEinvalid_function(sym);
+     if (fun == OBJNULL || sym->s.s_sfdef != NOT_SPECIAL || sym->s.s_mflag) FEinvalid_function(sym);
      /* push the args */
 /*     if (type_of(fun)==t_vfun) argd=fcall.argd; */ /*remove this! */
      nargs=SFUN_NARGS(argd);
@@ -916,7 +916,7 @@ call_proc_new(object sym, void **link, int argd, object first, va_list ll)
      if(type_of(sym)==t_symbol) fun = symbol_function(sym);
      else fun = sym;
      vs_base= (base =   vs_top);
-     if (fun == OBJNULL) FEinvalid_function(sym);
+     if (fun == OBJNULL || sym->s.s_sfdef != NOT_SPECIAL || sym->s.s_mflag) FEinvalid_function(sym);
      /* push the args */
 /*     if (type_of(fun)==t_vfun) argd=fcall.argd; */ /*remove this! */
      nargs=SFUN_NARGS(argd);
