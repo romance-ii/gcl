@@ -3,6 +3,9 @@
 
 INFO_DIR=/usr/local/lib/info
 
+GCL_DVI=gcl-tk.dvi gcl-si.dvi gcl.dvi
+GCL_HTML=gcl-si_toc.html gcl-tk_toc.html gcl_toc.html
+
 -include ../makedefs
 
 all: gcl-tk.info gcl-si.info gcl.info $(GCL_DVI) $(GCL_HTML)
