@@ -53,21 +53,22 @@ VERS=$(shell echo $$(cat majvers).$$(cat minvers))
 EXT:=cvs
 
 CFG:=$(addsuffix /config.,. binutils) gmp3/configfsf.
-CFGS:=$(addsuffix guess,$(CFG)) $(addsuffix sub,$(CFG)) #configure
+CFGS:=$(addsuffix .ori,configure $(addsuffix guess,$(CFG)) $(addsuffix sub,$(CFG)))
 
-FORCE:
+$(filter %.guess.ori,$(CFGS)): %.ori: /usr/share/misc/config.guess %
+	! [ -e $* ] || [ -e $@ ] || cp $* $@
+	[ $$($< -t | tr -d '-') -le $$(./$* -t | tr -d '-') ] || cp $< $*
+	touch $@
 
-$(filter %.guess,$(CFGS)): /usr/share/misc/config.guess FORCE
-	! [ -e $@ ] || [ -e $@.ori ] || cp $@ $@.ori
-	[ $$($< -t | tr -d '-') -le $$($@ -t | tr -d '-') ] || cp $< $@
+$(filter %.sub.ori,$(CFGS)): %.ori: /usr/share/misc/config.sub %
+	! [ -e $* ] || [ -e $@ ] || cp $* $@
+	[ $$($< -t | tr -d '-') -le $$(./$* -t | tr -d '-') ] || cp $< $*
+	touch $@
 
-$(filter %.sub,$(CFGS)): /usr/share/misc/config.sub FORCE
-	! [ -e $@ ] || [ -e $@.ori ] || cp $@ $@.ori
-	[ $$($< -t | tr -d '-') -le $$($@ -t | tr -d '-') ] || cp $< $@
-
-#configure: configure.in
-#	! [ -e $@ ] || [ -e $@.ori ] || mv $@ $@.ori
-#	cd $(@D) && autoconf 
+configure.ori: %.ori: configure.in 
+	! [ -e $* ] || [ -e $@ ] || cp $* $@
+	cd $(@D) && autoconf 
+	touch $@
 
 configure-%-stamp: $(CFGS)
 
@@ -128,7 +129,7 @@ clean: debian/control
 
 	dh_clean
 	rm -rf debian/trad debian/ansi $(INS) debian/substvars
-	for i in $(CFGS) ; do ! [ -e $$i.ori ] || mv $$i.ori $$i ; done
+	for i in $(CFGS) ; do ! [ -e $$i ] || mv $$i $${i%.ori} ; done
 
 
 BVER:=$(shell dpkg -s binutils |grep ^Version: | cut -f2 -d\  | cut -f1 -d\-)

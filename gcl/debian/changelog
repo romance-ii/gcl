@@ -62,8 +62,9 @@ gcl (2.5.4-1) unstable; urgency=low
   * Add gazonk*.lsp to clean target
   * syntax fix to lsp/gprof.hc
   * Add support for SGC contblock pages
+  * Fixes to debian/rules
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 29 Aug 2003 18:34:00 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue,  2 Sep 2003 17:24:30 +0000
 
 gcl (2.5.3-2) unstable; urgency=low
 
