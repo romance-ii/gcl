@@ -265,7 +265,7 @@ fasload(object faslfile) {
     FEerror("Cannot get symtab uppoer bound");
   q=(asymbol **)alloca(u);
   if ((v=bfd_canonicalize_symtab(b,q))<0)
-    FEerror("cannot canonilcalize symtab");
+    FEerror("cannot canonicalize symtab");
   for (u=0;u<v;u++) {
 
     struct bfd_link_hash_entry *h;
@@ -284,6 +284,10 @@ fasload(object faslfile) {
     if (h->u.def.section) {
       q[u]->value=h->u.def.value+h->u.def.section->vma;
       q[u]->flags|=BSF_WEAK;
+/*        if (!strcmp(q[u]->name,"_gp_disp")) { */
+/*  	q[u]->section=b->sections; */
+/*  	_bfd_set_gp_value(b,q[u]->value); */
+/*        } */
     } else 
       FEerror("Symbol without section");
 
@@ -305,6 +309,10 @@ fasload(object faslfile) {
   }
   
   dum.sm.sm_fp=b->iostream;
+
+  /* Find a way of doing this in bfd -- use this for now.  Unfortunately, 
+     we're not always at file end after reading in the sections -- CM */
+  SEEK_TO_END_OFILE(dum.sm.sm_fp);
 
   if (feof(dum.sm.sm_fp))
     data=0;
