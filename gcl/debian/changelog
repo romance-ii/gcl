@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-41) unstable; urgency=high
+
+  * Minor rules revision for i164
+
+ -- Camm Maguire <camm@enhanced.com>  Sun, 11 Aug 2002 13:49:03 -0400
+
 gcl (2.5.0.cvs20020625-40) unstable; urgency=high
 
   * revamp CONST configure test for certain bfd versions

@@ -49,7 +49,7 @@ configure-stamp:
 	chmod -R +x gmp3/*
 	[ "$(ARCHT)" != "i386" ] || ( cd gmp3 && CC=$(MCC) ./configure --build=i486-unknown-linux-gnu )
 	CC=$(MCC) ./configure --disable-statsysbfd --enable-$(RELOC) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
-	[ "$(ARCHT)" != "ia64" ] || ( cd o && gcc -c -Wall -DVOL=volatile -I. -fsigned-char -fwritable-strings -pipe -O -fomit-frame-pointer -I../h -I../gcl-tk num_log.c  )
+	[ "$(ARCHT)" != "ia64" ] || ( cd o && $(MCC) -c -Wall -DVOL=volatile -I. -fsigned-char -fwritable-strings -pipe -O -fomit-frame-pointer -I../h -I../gcl-tk num_log.c  )
 	touch configure-stamp
 
 build: build-stamp
