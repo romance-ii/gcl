@@ -4,11 +4,12 @@ gclcvs (2.6.0-2) unstable; urgency=low
   * rpm spec file added
   * Merge changes from 2.5.4
   * Add additional pop to loose package stack in read.d for dotted pairs
-  * Back to unstable distribution for cvs snapshots, reflect snapshot in 
+  * Back to unstable distribution for cvs snapshots, reflect snapshot in
     source package name instead of version, enable concurrent stable and
     cvs snapshot installation
+  * add gazonk*.lsp to clean targets
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 21 Aug 2003 16:01:42 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 22 Aug 2003 15:27:38 +0000
 
 gcl (2.6.0cvs-1) experimental; urgency=low
 
