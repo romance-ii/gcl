@@ -1124,7 +1124,7 @@ static void
 no_package(n)
 object n;
 {
-	FEwrong_type_argument(TSor_symbol_string_package,n);
+  FEpackage_error(n,"A package with this name does not exist");
 }
 
 static void
