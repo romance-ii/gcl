@@ -203,7 +203,7 @@ case $canonical in
      i*mingw*)
        if test "$use_common_binary" = "yes"; then
          host=i386-pc-mingw32
-	 PROCESSOR_FLAGS="-march=i386 "
+	 PROCESSOR_FLAGS="-mcpu=i386 -march=i386 "
          echo "The host is canonicalised to $host"
        fi
      use=mingw;;
@@ -1416,7 +1416,7 @@ AC_SUBST(EXTRA_LOBJS)
 if test -f h/$use.defs  ; then
 
   AC_SUBST(use)
-  AC_OUTPUT(makedefc windows/gcl.iss bin/gcl.bat)
+  AC_OUTPUT(makedefc windows/gcl.iss)
   echo makedefc
   cat makedefc
 
