@@ -313,8 +313,8 @@
 (defun subtypep (type1 type2 &optional env &aux t1 t2 i1 i2 ntp1 ntp2 tem)
   (declare (ignore env))
   (let* ((c1 (classp type1)) (c2 (classp type2)) 
-	(t1 (if c1 type1 (find-class type1 nil))) 
-	(t2 (if c2 type2 (find-class type2 nil))))
+	(t1 (if c1 type1 (when (symbolp type1) (find-class type1 nil))))
+	(t2 (if c2 type2 (when (symbolp type2) (find-class type2 nil)))))
     (when (and t1 t2)
       (return-from subtypep 
 		   (if (member t2 (class-precedence-list t1))
