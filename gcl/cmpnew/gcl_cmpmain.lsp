@@ -592,7 +592,17 @@ SYSTEM_SPECIAL_INIT
 	   )
    )
   )
-        
+
+; Windows short form paths may contain tilde (~) which conflicts with
+; format directives.
+#+winnt (defun prep-win-path-acc ( s acc)
+  (let ((pos (search "\~" s)))
+    (if pos
+      (let ((start (subseq s 0 (1+ pos)))
+            (finish (subseq s (1+ pos))))
+        (prep-win-path-acc finish (concatenate 'string acc start "~")))
+      (concatenate 'string acc s))))
+#+winnt (defun prep-win-path ( s ) (prep-win-path-acc s ""))        
 
 (defun compiler-cc (c-pathname o-pathname  )
   (safe-system
@@ -602,7 +612,9 @@ SYSTEM_SPECIAL_INIT
 	 #+irix5 (compiler-command c-pathname o-pathname )
 	 #+vax "~a ~@[~*-O ~]-S -I. -w ~a ; as -J -W -o ~A ~A"
 	 #+(or system-v e15 dgux sgi ) "~a ~@[~*-O ~]-c -I. ~a 2> /dev/null"
-	(compiler-command c-pathname o-pathname ))
+	 #+winnt (prep-win-path (compiler-command c-pathname o-pathname ))
+	 #-winnt (compiler-command c-pathname o-pathname)
+	 )
      *cc*
      (if (or (= *speed* 2) (= *speed* 3)) t nil)
             (namestring c-pathname)
