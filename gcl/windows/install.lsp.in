@@ -74,7 +74,7 @@
 		(format s "#!/bin/sh~%")
 		(format s "export C_INCLUDE_PATH=~a~%" *h-directory* )
 		(format s "export PATH=~a/mingw/bin:${PATH}~%" *msys-root-directory* )
-		(format s "exec ~asaved_gcl.exe -dir ~a -libdir ~a -eval \"(setq si::*allow-gzipped-file* t)\" \"$@\""
+		(format s "exec ~a@FLISP@.exe -dir ~a -libdir ~a -eval \"(setq si::*allow-gzipped-file* t)\" \"$@\""
 			*msys-system-directory*
 			(kill-double-forwards *system-directory*)
 			*lib-directory* ))
@@ -97,7 +97,7 @@
 		(format s "@echo off~%")
 		(format s "set C_INCLUDE_PATH=~a~%" *dos-h-directory* )
 		(format s "path ~amingw\\bin;%PATH%~%" *dos-root-directory* )
-		(format s "start ~asaved_gcl.exe -dir ~a -libdir ~a -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9~%"
+		(format s "start ~a@FLISP@.exe -dir ~a -libdir ~a -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9~%"
 			*dos-system-directory*
 			(kill-double-forwards *system-directory*)
 			*lib-directory* ))

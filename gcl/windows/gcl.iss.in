@@ -3,16 +3,16 @@
 ; -- $Id$ --
 
 [Setup]
-AppName=GNU Common Lisp
-AppVerName=GNU Common Lisp @VERSION@
+AppName=GNU Common Lisp (@CLSTANDARD@ build)
+AppVerName=GNU Common Lisp @VERSION@ (@CLSTANDARD@ build)
 AppPublisher=The GNU Common Lisp Development Team
 AppPublisherURL=http://savannah.gnu.org/projects/gcl/
 AppSupportURL=http://savannah.gnu.org/projects/gcl/
 AppUpdatesURL=http://savannah.gnu.org/projects/gcl/
 AppVersion=@VERSION@
-OutputBaseFilename=gcl-@VERSION@
-DefaultDirName={sd}\Progra~1\GCL-@VERSION@
-DefaultGroupName=GCL-@VERSION@
+OutputBaseFilename=gcl-@VERSION@-@CLSTANDARD@
+DefaultDirName={sd}\Progra~1\GCL-@VERSION@-@CLSTANDARD@
+DefaultGroupName=GCL-@VERSION@-@CLSTANDARD@
 AllowNoIcons=yes
 ; AlwaysCreateUninstallIcon=yes
 LicenseFile=@prefix@\COPYING.LIB-2.0
@@ -30,18 +30,18 @@ Source: "@prefix@\*.*"; DestDir: "{app}\";  Flags: recursesubdirs
 Source: "c:\lang\MinGW32-gcl\*.*"; DestDir: "{app}\mingw";  Flags: recursesubdirs
 
 [Icons]
-Name: "{group}\GNU Common Lisp @VERSION@"; Filename: "{app}\bin\gcl.bat"; IconFilename: "{app}\bin\gcl.ico"
-Name: "{group}\GCL System Manual"; Filename: "{app}\doc\gcl-si.html"
-Name: "{group}\Common Lisp HyperSpec"; Filename: "{app}\doc\gcl.html"
+Name: "{group}\GNU Common Lisp @VERSION@ @CLSTANDARD@"; Filename: "{app}\bin\gcl.bat"; IconFilename: "{app}\bin\gcl.ico"
+Name: "{group}\GCL System Manual"; Filename: "{app}\lib\gcl-@VERSION@\doc\gcl-si\index.html"
+Name: "{group}\Common Lisp HyperSpec"; Filename: "{app}\lib\gcl-@VERSION@\doc\gcl\index.html"
 Name: "{userdesktop}\GNU Common Lisp"; Filename: "{app}\bin\gcl.bat"; MinVersion: 4,4; Tasks: desktopicon; IconFilename: "{app}\bin\gcl.ico"
 
 [Run]
 Filename: "{app}\bin\sysdir.bat";  Parameters: "{app}/lib/gcl-@VERSION@/unixport/"
-Filename: "{app}\lib\gcl-@VERSION@\unixport\saved_gcl.exe"; Parameters: -load {app}/install/install.lsp
+Filename: "{app}\lib\gcl-@VERSION@\unixport\@FLISP@.exe"; Parameters: -load {app}/install/install.lsp
 Filename: "{app}\bin\gcl.bat"; Description: "Launch GNU Common Lisp"; Flags: postinstall skipifsilent
 
 [UninstallDelete]
 Type: files; Name: "{app}\bin\gcl.bat"
 Type: files; Name: "{app}\bin\gcl"
-Type: files; Name: "{app}\lib\gcl-@VERSION@\unixport\saved_gcl_orig.exe"
+Type: files; Name: "{app}\lib\gcl-@VERSION@\unixport\@FLISP@_orig.exe"
 

@@ -854,13 +854,16 @@ AC_ARG_ENABLE(ansi,[--enable-ansi builds a large gcl aiming for ansi compliance,
 if test "$enable_ansi" = "yes" ; then
 	SYSTEM=ansi_gcl
 	AC_DEFINE(ANSI_COMMON_LISP)
+	CLSTANDARD=ANSI
 else
 	SYSTEM=gcl
+	CLSTANDARD=CLtL1
 fi
 
 FLISP="saved_$SYSTEM"
 AC_SUBST(FLISP)
 AC_SUBST(SYSTEM)
+AC_SUBST(CLSTANDARD)
 
 # pagewidth
 AC_MSG_CHECKING(for pagewidth)
@@ -1524,7 +1527,7 @@ AC_SUBST(EXTRA_LOBJS)
 if test -f h/$use.defs  ; then
 
   AC_SUBST(use)
-  AC_OUTPUT(makedefc windows/gcl.iss windows/gcl.ansi.iss windows/install.ansi.lsp windows/install.lsp )
+  AC_OUTPUT(makedefc windows/gcl.iss windows/sysdir.bat windows/install.lsp )
   echo makedefc
   cat makedefc
 
