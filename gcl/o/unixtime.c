@@ -225,7 +225,8 @@ int system_time_zone_helper(void)
 }
 #endif
 
-#ifdef __GNUC__
+/* At GCC 3.2, Mingw struct tm does not include tm_gmtoff so avoid this version */
+#if defined ( __GNUC__ ) && !defined ( __MINGW32__ )
 int system_time_zone_helper(void){
   
   struct tm *local;
