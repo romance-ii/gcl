@@ -152,6 +152,7 @@
   (unless (or parent-list (eq name 'condition))
 	  (setq parent-list (list 'condition)))
   (let* ((REPORT-FUNCTION nil)
+	 (DEFAULT-INITARGS nil)
 	 (DOCUMENTATION nil))
     (DO ((O OPTIONS (CDR O)))
 	((NULL O))
@@ -162,14 +163,16 @@
 					        (DECLARE (IGNORE CONDITION))
 					        (WRITE-STRING ,(CADR OPTION) STREAM))
 					     (CADR OPTION))))
+	  (:DEFAULT-INITARGS (SETQ DEFAULT-INITARGS OPTION)) 
 	  (:DOCUMENTATION (SETQ DOCUMENTATION (CADR OPTION)))
 	  (OTHERWISE (CERROR "Ignore this DEFINE-CONDITION option."
 			     "Invalid DEFINE-CONDITION option: ~S" OPTION)))))
     `(progn
        (eval-when (compile)
 	 #+pcl (setq pcl::*defclass-times* '(compile load eval)))
-       (defclass ,name ,parent-list
-	 ,slot-specs)
+       ,(if default-initargs
+       `(defclass ,name ,parent-list ,slot-specs ,default-initargs)
+       `(defclass ,name ,parent-list ,slot-specs))
        (eval-when (compile load eval)
 	 (pushnew '(,name ,parent-list
 		    ,@(mapcan #'(lambda (slot-spec)

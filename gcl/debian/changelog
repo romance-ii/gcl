@@ -1,3 +1,9 @@
+gclcvs (2.7.0-7) unstable; urgency=low
+
+  * ANSI :default-initarg fixes to define-condition
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 25 Sep 2003 16:12:41 +0000
+
 gclcvs (2.7.0-6) unstable; urgency=low
 
   * Enable NIFLAGS variable to work around ppc compiler bug
