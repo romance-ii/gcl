@@ -98,7 +98,8 @@ get_section_number(name)
 		  name))
        return k;
    }
- fprintf(stderr,"could not find section %s\n", name);
+ if (strcmp(".sbss",name))
+   fprintf(stderr,"could not find section %s\n", name);
  return -1;
 }
 
