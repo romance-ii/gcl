@@ -1,8 +1,9 @@
 gcl (2.6.0cvs-2) experimental; urgency=low
 
   * New files for macosx
+  * rpm spec file added
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 17 Jul 2003 21:09:59 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 18 Jul 2003 19:22:39 +0000
 
 gcl (2.6.0cvs-1) experimental; urgency=low
 
