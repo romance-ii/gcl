@@ -1,14 +1,9 @@
-=============================================================
-BUILDING A NATIVE WIN32 GNU COMMON LISP FROM CVS (DRAFT ONLY)
-=============================================================
+===============================================
+BUILDING NATIVE WIN32 GNU COMMON LISP FROM CVS
+===============================================
 
 The preferred build host system for the Mingw32 compiler is 
-MSYS, rather than Cygwin.  I prefer to  use gcc 3.2, but 
-gcc 2.95 certainly works.
-
-The older Cygwin hosted method is set out further into this file
-below the MSYS method described here.  It is not recommended, not
-supported and the instructions are not up to date.
+MSYS.  I use gcc version 3.2, but version 2.95 certainly works.
 
 
 ===============================================
@@ -17,20 +12,18 @@ BUILDING GCL USING MSYS AS THE HOST
 
 BUILD TOOLS
 
-- Mingw32 2 Windows native gcc from Source Forge:
-    http://sourceforge.net/projects/mingw/
+- Mingw32 Version 2 Windows native gcc:
+    http://www.mingw.org/
 
 - MSYS Mingw build environment, including the MSYS DTK
-    http://sourceforge.net/projects/mingw/
-
-- tcl/tk 8.3 from the http (ftp seems to be broken) links at:
-    http://members1.chello.nl/~j.nijtmans/mingw.html
+    http://www.mingw.org/
 
 - Source code for GCL.
     http://savannah.gnu.org/projects/gcl/
 
-It is a good idea to keep up to date with Mingw32 and MSYS.  GCL is 
-known to build with both gcc 3.2 and gcc 2.95.
+It is a good idea to keep up to date with Mingw32 and MSYS.  There
+are usually updates for various parts of these packages to be found
+on the web site. 
 
 
 SHORT SETUP NOTES
@@ -55,7 +48,7 @@ DETAILED SETUP NOTES
 
 - Remove the Mingw version of "make" from the bin directory - it has serious
   bugs and will not work properly for most tasks including building GCL and 
-  Maxima.
+  Maxima.  We will be using the MSYS version.
 
 - Get MSYS and install it - follow the instructions - subscribe to the
   mailing list and read the archives.
@@ -76,14 +69,10 @@ BUILDING
   ./configure --prefix="c:/gcl" > configure.log 2>&1
 
   Change the prefix directory as required for your final installation path.  
-  Note that it is helpful to redirect output from configure and make into log
+  I find it helpful to redirect output from "configure" and "make" into log
   files for debugging and checking.
 
-- Check the log.  If all is well, check the value of GCLDIR in "makedefs".
-
-  If it is in the "/c/" form, change to the colon form "c:/" (eg "/c/cvs/gcl").
-  This will ensure that the compiler can find headers, and driver scripts
-  are correct (forward slashes are OK however).
+- Check the log.
 
 - Type:
 
@@ -102,16 +91,11 @@ BUILDING
 
   It is necessary to install GCL before building Maxima.
 
-- You may also need to edit the gcl script to ensure the path 
-  uses colon format.  
-
 - The batch file "gclm.bat" can be used to make a Windows desktop 
-  shortcut.  You will need to alter the path command in that batch file
-  so that your Mingw32 bin directory is visible.  This will enable you
-  to compile lisp code.
+  shortcut.
 
-- BFD fasloading and Stratified Garbage Collection (SGC) do not work under
-  Windows.  The configuration options above provide a "traditional" GCL 
+- BFD fasloading, Stratified Garbage Collection (SGC) and GCL-TK don't work
+  under Windows.  The configuration options above provide a "traditional" GCL
   executable which will build the current CVS version of Maxima.  The BFD
   option will depend on someone with knowledge of BFD and PE-COFF linking
   fixing some problems with the BFD library - I am slowly absorbing the info
@@ -124,161 +108,4 @@ BUILDING
   experimental and will not compile Maxima at present.
 
 
-Mike Thomas, 15 October 2002
-
-
-
-===================================================
-BUILDING GCL USING CYGWIN AS THE HOST - UNSUPPORTED
-===================================================
-
-BUILD TOOLS
-
-- Mingw32 1.1 Windows native gcc from Source Forge:
-    http://sourceforge.net/projects/mingw/
-
-- Cygwin Unix emulation tools - the configuration and build environment:
-    http://sources.redhat.com/cygwin/
-
-- tcl/tk 8.3 from the http (ftp seems to be broken) links at:
-    http://members1.chello.nl/~j.nijtmans/mingw.html
-
-- Source code for GCL.
-    http://savannah.gnu.org/projects/gcl/
-
-It is a good idea to keep up to date with Mingw32 and Cygwin, especially 
-the latest Mingw32 runtime (30 April 2002).  Having said that, 
-I have not yet tried the recently released version 3.1 of Mingw32 gcc.
-
-Only gcc 2.95 is known to work (3.1 may well work, it just hasn't been tried yet).
-
-
-
-SETUP
-
-- Install Cygwin and Mingw32 using the instructions at those sites. 
-
-- Install the Tcl/Tk packages directly into your Mingw32 directory. You don't
-  need these packages if you don't want to build "tclwinkill.dll" or
-  (perhaps one day) gcl-tk.
-
-- After installing Cygwin, set your Bash path so that Mingw32 is first eg:
-  
-	export PATH=/c/mingw32/bin:${PATH}
-
-  This means that Mingw32 gcc is used for the build, enabling a proper
-  native Win32 build, not dependent on the Cygwin runtime.
-
-- Make sure that Cygwin make is in the path, not Mingw32 make.
-
-
-BUILDING
-
-- Change to your GCL source directory eg:
-
-	cd c:/cvs/gcl
-
-  Ensure that the colon format is used for the path, NOT "/c/cvs/gcl".  This
-  allows the configure script to properly set the GCLDIR makefile macro,
-  which finds it's way into the final GCL executable.  If the Cygwin format
-  is used, you'll have startup problems as native executables don't understand
-  that format (forward slashes are OK however).
-
-- Make sure that "cp" is used instead of "ln -s" in the gmp library build by 
-  searching for and replacing all occurrences of "cp -p" in gmp/configure.
-
-  Mingw32 tools don't know about Cygwin symbolic links (nor should they).
-
-- We are now ready to configure:
-
-   ./configure --enable-custreloc --enable-machine=mingw --prefix="c:/gcl" >& con.log
-
-  Change the prefix directory as required for your final installation path.  
-  Note that it is helpful to redirect output from configure and make into log
-  files for future debugging and checking.
-
-- Check the log.  If all is well, type:
-
-    make >& make.log 
-
-- The "saved_gcl.exe" should turn up eventually in the unixport directory.  You
-  can try it out directly by typing:
-
-    ./unixport/saved_gcl.exe
-
-  at the command prompt.
-
-- To install:
-
-    make install >& install.log
-
-  You may need to fiddle with the install target a little as it is not very
-  Windows friendly at the moment.
-
-- At this point, BFD fasloading and PCL/ANSI do not work, but the configuration
-  options above are sufficient to get a "traditional" gcl executable which
-  will build the current CVS version of Maxima.
-
-
-Mike Thomas, 10 July 2002
-
-
-
-==================================================================
-HISTORICAL VERSION (IGNORE FOR CURRENT MINGW32 BUILDS)
-==================================================================
-
-GCL 2.3.8 compiles for MS windows win32 under mingw. 
-The mingw version of GCC comes equipped with include files  
-which allow it to make a regular windows executable which links 
-with msvcrt.dll (or an older microsoft dll as well). 
-
-
-I have tested it using the msvcrt.dll support.
-
-I did the compiles on a system with cygwin support installed during
-the compile, although the resulting image does NOT use the cygwin
-libraries, but only the microsoft msvcrt.dll which should be on all
-systems.
-
-copy the sh.exe from the cygwin/bin directory to /bin, so that 
-configure and friends can find it.   
-Check it is not buggy:
-
-/bin/sh -c 'echo */makefile' 
-
-should give the actual list of makefiles in each subdirectory... if not
-you may try using bash.exe instead.
-
-and have installed the mingw compilers and includes under
-g:/progs/mingw-msvrt/bin
-then in bash add
-bash$ export PATH=//g/progs/mingw-msvrt/bin:$PATHxcs
-
-There is a bug in winsock2.h in the mingw distribution at line 46,
-the 'ifdef' should have '#' in front of it.   You will see this when 
-you compile mingwin.c, if yours is buggy, just correct it at that time.
-
-Also we will use the make.exe from the cygwin/bin, so move aside the 
-mingw one:  
-
-in g:/progs/mingw-msvrt/bin
-cd g:/progs/mingw-msvrt/bin
-mv make.exe make.exe-ming
-
-
-so now your path will fall through to the cygwin make, and the ming gcc.
-
-Now you are ready to go!!
-
-bash$ ./configure --enable-machine=mingw
-# edit the unixport/makefile so that GCLDIR does not have /cygdrive etc..
-# since otherwise gcc will have that in it.. 
-#GCLDIR=h:/wfs2/tmp/gcl-2.3.8
-bash$ mak
-
-
- 
- 
-
-
+Mike Thomas, 17 December 2002
