@@ -50,8 +50,9 @@ gclcvs (2.7.0-37) unstable; urgency=low
   * Avoid adding duplicate data to data file
   * Fix info processing for new texinfo format; allow for precompiled
     regexps
+  * Fix a read error condition allowing the ansi test suite to complete
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  2 Apr 2005 16:13:42 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat,  2 Apr 2005 16:13:53 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 

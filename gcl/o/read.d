@@ -1404,7 +1404,7 @@ Lsharp_asterisk_reader()
 			FEerror("Too many elements in #*....", 0);
 		else {
 			if (dimcount == 0)
-				error("Cannot fill the bit-vector #*.");
+				FEerror("Cannot fill the bit-vector #*.",0);
 			x = vs_head;
 			for (;  dimcount < dim;  dimcount++)
 				vs_push(x);
