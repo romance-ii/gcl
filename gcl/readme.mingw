@@ -1,19 +1,31 @@
 BUILDING A NATIVE WIN32 GNU COMMON LISP (DRAFT ONLY)
 
-TOOLS
+BUILD TOOLS
 
-- Mingw32 Windows native gcc from Source Forge.
-  I used the latest version (1.1), although this is probably not important.
+- Mingw32 1.1 Windows native gcc from Source Forge:
+    http://sourceforge.net/projects/mingw/
 
-- Cygwin from Redhat.  This supplies the configuration and build environment. 
-  The latest version is probably best.
+- Cygwin Unix emulation tools, which supply the configuration and build environment:
+    http://sources.redhat.com/cygwin/
+
+- tcl/tk 8.3 from the http (ftp seems to be broken) links at:
+    http://members1.chello.nl/~j.nijtmans/mingw.html
 
 - Source code for GCL.
+    http://savannah.gnu.org/projects/gcl/
+
+As a general rule it is a good idea to keep up to date with Mingw32 and Cygwin.
+At the moment, Mingw32 gcc is version 2.95 and I don't know whether the imminent 
+move to version 3.1 will affect GCL.
 
 
 SETUP
 
-- Install Cygwin and Mingw32.  
+- Install Cygwin and Mingw32 per the instructions at those sites. 
+
+- Install the Tcl/Tk packages directly into your Mingw32 directory. You don't
+  need these packages if you don't want to build "tclwinkill.dll" or
+  (perhaps one day, gcl-tk).
 
 - After installing Cygwin, set your Bash path so that Mingw32 is first eg:
   
@@ -37,8 +49,8 @@ BUILDING
   is used, you'll have startup problems as native executables don't understand
   that format (forward slashes are OK however).
 
-- Make sure that "cp" is used instead of "ln" in the gmp library build by 
-  setting all occurrences of ac_cv_prog_LN_S="cp -p" in gmp/configure.
+- Make sure that "cp" is used instead of "ln -s" in the gmp library build by 
+  searching for and replacing all occurrences of "cp -p" in gmp/configure.
 
   Mingw32 tools don't know about Cygwin symbolic links (nor should they).
 
@@ -54,14 +66,22 @@ BUILDING
 
   	make >& make.log 
 
-- The "saved_gcl.exe" should turn up eventually in the unixport directory.
+- The "saved_gcl.exe" should turn up eventually in the unixport directory.  You
+  can try it out directly by typing:
+
+	./unixport/saved_gcl.exe
+
+  at the command prompt.
 
 - To install:
 
 	make install >& install.log
 
+  You may need to fiddle with the install target a little as it is not very
+  Windows friendly at the moment.
 
-Mike Thomas, 23 March 2002
+
+Mike Thomas, 4 April 2002
 
 
 
