@@ -11,7 +11,7 @@
 LBINDIR=/usr/local/bin
 
 #OFLAG	=  -g 
-OFLAG	=  -O 
+OFLAG	=  -O4
 #LIBS	= -lm 
 
 ODIR_DEBUG= -O4 
@@ -34,7 +34,9 @@ LDCC=${CC}
 # Enable the fastloading mechanism which does not use ld -A
 # requires c/rel_.. machine dependent code.
 
+ifeq ($(findstring libbfd,$(LIBS)),) 
 RSYM	= rsym
+endif
 SFASL	= $(ODIR)/sfasl.o
 
 

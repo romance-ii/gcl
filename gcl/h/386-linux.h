@@ -92,8 +92,12 @@ do {static struct sigaction action; \
 	if (real_maxpage > MAXPAGE) \
 		real_maxpage = MAXPAGE ; } while(0)
 
+#ifdef HAVE_LIBBFD
+#define SEPARATE_SFASL_FILE "sfaslbfd.c"
+#else
 #define SPECIAL_RSYM "rsym_elf.c"
 #define SEPARATE_SFASL_FILE "sfaslelf.c"
+#endif
 
 #define UNEXEC_USE_MAP_PRIVATE
 #define UNIXSAVE "unexelf.c"
