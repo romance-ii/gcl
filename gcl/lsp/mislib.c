@@ -37,7 +37,7 @@ TTL:;
 	goto T1;}
 	{object V5 = Cnil;
 	VMR2(V5)}
-goto T1;
+	goto T1;
 T1:;
 	base[0]= (V3);
 	base[1]= small_fixnum(100);
@@ -49,7 +49,7 @@ T1:;
 	goto T6;}
 	{object V7 = Ct;
 	VMR2(V7)}
-goto T6;
+	goto T6;
 T6:;
 	base[0]= (V3);
 	base[1]= small_fixnum(400);
@@ -118,10 +118,10 @@ static void L4()
 	V17=(base[1]);
 	vs_top=sup;
 	goto T28;
-goto T27;
+	goto T27;
 T27:;
 	V17= symbol_value(VV[9]);
-goto T28;
+	goto T28;
 T28:;
 	{object V18;
 	object V19;
@@ -196,7 +196,7 @@ T28:;
 	V23= number_plus(VV[8],V26);
 	{register object V27;
 	V27= Cnil;
-goto T55;
+	goto T55;
 T55:;
 	V28= (*(LnkLI17))((V23));
 	V27= number_minus((V21),/* INLINE-ARGS */V28);
@@ -204,20 +204,20 @@ T55:;
 	goto T62;}
 	V29= small_fixnum(366);
 	goto T60;
-goto T62;
+	goto T62;
 T62:;
 	V29= small_fixnum(365);
-goto T60;
+	goto T60;
 T60:;
 	if(!(number_compare((V27),V29)<0)){
 	goto T56;}
 	V21= one_plus((V27));
 	goto T53;
-goto T56;
+	goto T56;
 T56:;
 	V23= number_plus((V23),small_fixnum(1));
 	goto T55;}
-goto T53;
+	goto T53;
 T53:;
 	if(((*(LnkLI18))((V23)))==Cnil){
 	goto T70;}
@@ -234,28 +234,28 @@ T53:;
 	base[10]= (V17);
 	vs_top=(vs_base=base+2)+9;
 	return;
-goto T73;
+	goto T73;
 T73:;
 	if(!(number_compare((V21),small_fixnum(60))>0)){
 	goto T70;}
 	V21= number_minus((V21),small_fixnum(1));
-goto T70;
+	goto T70;
 T70:;
 	{register object V30;
 	V30= VV[12];
-goto T90;
+	goto T90;
 T90:;
 	if(!(number_compare((V21),car((V30)))<=0)){
 	goto T91;}
 	V31 = make_fixnum((long)length((V30)));
 	V22= number_minus(small_fixnum(13),V31);
 	goto T88;
-goto T91;
+	goto T91;
 T91:;
 	V21= number_minus((V21),car((V30)));
 	V30= cdr((V30));
 	goto T90;}
-goto T88;
+	goto T88;
 T88:;
 	base[2]= (V18);
 	base[3]= (V19);
@@ -297,10 +297,10 @@ static object LI5(object V37,object V36,object V35,object V34,object V33,object 
 	else {
 	V44= first;}
 	--narg; goto T111;
-goto T110;
+	goto T110;
 T110:;
 	V44= symbol_value(VV[9]);
-goto T111;
+	goto T111;
 T111:;
 	V40= number_plus((V40),(V44));
 	base[0]= small_fixnum(0);
@@ -350,34 +350,34 @@ T111:;
 	V53= vs_base[0];
 	vs_top=sup;
 	goto T131;
-goto T122;
+	goto T122;
 T122:;
 	V45= Cnil;
-goto T123;
+	goto T123;
 T123:;
 	V46= Cnil;
-goto T124;
+	goto T124;
 T124:;
 	V47= Cnil;
-goto T125;
+	goto T125;
 T125:;
 	V48= Cnil;
-goto T126;
+	goto T126;
 T126:;
 	V49= Cnil;
-goto T127;
+	goto T127;
 T127:;
 	V50= Cnil;
-goto T128;
+	goto T128;
 T128:;
 	V51= Cnil;
-goto T129;
+	goto T129;
 T129:;
 	V52= Cnil;
-goto T130;
+	goto T130;
 T130:;
 	V53= Cnil;
-goto T131;
+	goto T131;
 T131:;
 	base[0]= (V50);
 	base[1]= small_fixnum(100);
@@ -392,22 +392,22 @@ T131:;
 	goto T138;}
 	V43= number_plus((V43),small_fixnum(100));
 	goto T115;
-goto T138;
+	goto T138;
 T138:;
 	V57= number_minus((V43),(V50));
 	if(!(number_compare(/* INLINE-ARGS */V57,small_fixnum(50))>=0)){
 	goto T115;}
 	V43= number_minus((V43),small_fixnum(100));}
-goto T115;
+	goto T115;
 T115:;
 	if(((*(LnkLI18))((V43)))==Cnil){
 	goto T145;}
 	if(number_compare((V42),small_fixnum(2))>0){
 	goto T144;}
-goto T145;
+	goto T145;
 T145:;
 	V41= number_minus((V41),small_fixnum(1));
-goto T144;
+	goto T144;
 T144:;
 	base[1]= (V41);
 	base[2]= (*(LnkLI17))((V43));

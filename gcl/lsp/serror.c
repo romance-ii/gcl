@@ -53,7 +53,7 @@ static void L2()
 	if(base[2]!=Cnil){
 	goto T8;}
 	base[2]= VV[1];
-goto T8;
+	goto T8;
 T8:;
 	{object V8;
 	base[5]= VV[2];
@@ -70,7 +70,7 @@ T8:;
 	V12= Cnil;
 	goto T13;}
 	base[5]=V13=MMcons(Cnil,Cnil);
-goto T14;
+	goto T14;
 T14:;
 	(V13->c.c_car)= car((V14->c.c_car));
 	V14=MMcdr(V14);
@@ -79,7 +79,7 @@ T14:;
 	goto T13;}
 	V13=MMcdr(V13)=MMcons(Cnil,Cnil);
 	goto T14;}
-goto T13;
+	goto T13;
 T13:;
 	V15= make_cons(VV[13],V12);
 	V16= list(3,VV[3],/* INLINE-ARGS */V10,list(3,VV[5],VV[6],list(3,VV[7],list(3,VV[8],list(3,VV[9],list(2,VV[10],list(4,VV[11],base[2],/* INLINE-ARGS */V11,list(3,VV[12],/* INLINE-ARGS */V15,list(2,VV[4],(V8))))),VV[14]),base[3]),VV[15])));
@@ -89,10 +89,10 @@ T13:;
 	goto T18;}
 	V9= listA(3,VV[18],base[2],(V9));
 	goto T16;
-goto T18;
+	goto T18;
 T18:;
 	V9= make_cons(VV[8],(V9));
-goto T16;
+	goto T16;
 T16:;
 	base[5]= list(3,VV[19],VV[6],(V9));
 	vs_top=(vs_base=base+5)+1;
@@ -124,10 +124,10 @@ static void L3()
 	goto T25;}
 	V19= listA(3,VV[18],base[2],(V19));
 	goto T23;
-goto T25;
+	goto T25;
 T25:;
 	V19= make_cons(VV[8],(V19));
-goto T23;
+	goto T23;
 T23:;
 	base[5]= list(3,VV[19],VV[6],(V19));
 	vs_top=(vs_base=base+5)+1;
@@ -156,7 +156,7 @@ static object LI4(object first,...)
 	vs_base=vs_top;
 	(void) (*Lnk74)();
 	vs_top=sup;
-goto T29;
+	goto T29;
 T29:;
 	{register object V26;
 	base[0]= VV[25];
@@ -195,7 +195,7 @@ T29:;
 	base[0]= (V26);
 	vs_top=(vs_base=base+0)+1;
 	unwind(fr,VV[32]);}
-goto T51;
+	goto T51;
 T51:;
 	{object V27;
 	{register object V28;
@@ -208,13 +208,13 @@ T51:;
 	Lfill_pointer();
 	vs_top=sup;
 	V30= fix(vs_base[0]);
-goto T59;
+	goto T59;
 T59:;
 	if(!((V29)>=(V30))){
 	goto T60;}
 	V27= Cnil;
 	goto T54;
-goto T60;
+	goto T60;
 T60:;
 	V31= aref1(symbol_value(VV[14]),V29);
 	V28= (
@@ -231,17 +231,17 @@ T60:;
 	base[0]= (V26);
 	vs_top=(vs_base=base+0)+1;
 	unwind(fr,(V28));}
-goto T64;
+	goto T64;
 T64:;
 	V29= (long)(V29)+1;
 	goto T59;}}
-goto T54;
+	goto T54;
 T54:;
 	if(((V27))==Cnil){
 	goto T73;}
 	{object V33 = (V27);
 	VMR4(V33)}
-goto T73;
+	goto T73;
 T73:;
 	base[0]= get(symbol_value(VV[33]),VV[34],Cnil);
 	{object V34;
@@ -733,15 +733,15 @@ static void L31()
 	V73= Cnil;
 	V74= Cnil;
 	V75= Cnil;
-goto T87;
+	goto T87;
 T87:;
 	if(((V71))==Cnil){
 	goto T90;}
 	goto T89;
-goto T90;
+	goto T90;
 T90:;
 	goto T88;
-goto T89;
+	goto T89;
 T89:;
 	{register object V76;
 	V76= car((V71));
@@ -761,12 +761,12 @@ T89:;
 	if(type_of((V79))!=t_cons)FEwrong_type_argument(Scons,(V79));
 	((V79))->c.c_cdr = (V80);
 	goto T95;}
-goto T102;
+	goto T102;
 T102:;
 	V73= make_cons((V74),Cnil);
 	V72= (V73);
 	goto T95;
-goto T97;
+	goto T97;
 T97:;
 	V81= list(3,VV[71],(V67),list(2,VV[4],car((V70))));
 	V75= make_cons(/* INLINE-ARGS */V81,cdr((V70)));
@@ -780,15 +780,15 @@ T97:;
 	if(type_of((V82))!=t_cons)FEwrong_type_argument(Scons,(V82));
 	((V82))->c.c_cdr = (V83);
 	goto T95;}
-goto T113;
+	goto T113;
 T113:;
 	V73= make_cons((V75),Cnil);
 	V72= (V73);
-goto T95;
+	goto T95;
 T95:;
 	V71= cdr((V71));
 	goto T87;
-goto T88;
+	goto T88;
 T88:;
 	V69= (V72);
 	goto T85;
@@ -796,7 +796,7 @@ T88:;
 	goto T85;
 	V69= Cnil;
 	goto T85;}}
-goto T85;
+	goto T85;
 T85:;
 	base[5]= listA(4,VV[70],/* INLINE-ARGS */V68,base[3],V69);
 	vs_top=(vs_base=base+5)+1;

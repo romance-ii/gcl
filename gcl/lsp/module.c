@@ -41,14 +41,14 @@ static object LI2(object V4,object first,...)
 	else {
 	V6= first;}
 	--narg; goto T7;
-goto T6;
+	goto T6;
 T6:;
 	base[0]= coerce_to_string((V5));
 	vs_top=(vs_base=base+0)+1;
 	Lstring_downcase();
 	vs_top=sup;
 	V6= vs_base[0];
-goto T7;
+	goto T7;
 T7:;
 	bds_bind(VV[2],VV[3]);
 	base[1]= coerce_to_string((V5));
@@ -69,18 +69,18 @@ T7:;
 	{object V7 = vs_base[0];
 	bds_unwind1;
 	VMR2(V7)}
-goto T18;
+	goto T18;
 T18:;
 	{register object V8;
 	V8= (V6);
-goto T22;
+	goto T22;
 T22:;
 	if(!(endp_prop((V8)))){
 	goto T23;}
 	{object V9 = Cnil;
 	bds_unwind1;
 	VMR2(V9)}
-goto T23;
+	goto T23;
 T23:;
 	base[1]= car((V8));
 	vs_top=(vs_base=base+1)+1;
@@ -88,7 +88,7 @@ T23:;
 	vs_top=sup;
 	V8= cdr((V8));
 	goto T22;}
-goto T11;
+	goto T11;
 T11:;
 	{object V10 = Cnil;
 	bds_unwind1;
@@ -109,27 +109,27 @@ TTL:;
 	if((V15!= VV[15]))goto T32;
 	{object V16 = get((V13),VV[4],Cnil);
 	VMR3(V16)}
-goto T32;
+	goto T32;
 T32:;
 	if((V15!= VV[16]))goto T33;
 	{object V17 = get((V13),VV[5],Cnil);
 	VMR3(V17)}
-goto T33;
+	goto T33;
 T33:;
 	if((V15!= VV[17]))goto T34;
 	{object V18 = get((V13),VV[6],Cnil);
 	VMR3(V18)}
-goto T34;
+	goto T34;
 T34:;
 	if((V15!= VV[18]))goto T35;
 	{object V19 = get((V13),VV[7],Cnil);
 	VMR3(V19)}
-goto T35;
+	goto T35;
 T35:;
 	if((V15!= VV[19]))goto T36;
 	{object V20 = get((V13),VV[8],Cnil);
 	VMR3(V20)}
-goto T36;
+	goto T36;
 T36:;
 	base[0]= (V13);
 	vs_top=(vs_base=base+0)+1;
@@ -149,7 +149,7 @@ T36:;
 	V21= vs_base[0];
 	{object V22 = get(V21,VV[10],Cnil);
 	VMR3(V22)}
-goto T38;
+	goto T38;
 T38:;
 	base[0]= VV[11];
 	base[1]= (V14);
@@ -173,11 +173,11 @@ TTL:;
 	goto T47;}
 	if(!(endp_prop(cdr((V25))))){
 	goto T48;}
-goto T47;
+	goto T47;
 T47:;
 	{object V26 = Cnil;
 	VMR4(V26)}
-goto T48;
+	goto T48;
 T48:;
 	{register object V27;
 	base[0]= car((V25));
@@ -189,7 +189,7 @@ T48:;
 	goto T55;}
 	{object V28 = (V27);
 	VMR4(V28)}
-goto T55;
+	goto T55;
 T55:;
 	if(!(type_of((V27))==t_cons)){
 	goto T58;}
@@ -197,7 +197,7 @@ T55:;
 	goto T58;}
 	V25= cdr((V25));
 	goto TTL;
-goto T58;
+	goto T58;
 T58:;
 	{object V29 = Cnil;
 	VMR4(V29)}}
