@@ -110,7 +110,8 @@ AC_SUBST(HAVE_LONG_LONG)
 # bfd probe
 
 AC_ARG_ENABLE(bfd,
-	[ --disable-bfd prevents gcl from using libbfd.a for fast object loading and symbol table lookups ] ,,)
+	[ --disable-bfd prevents gcl from using libbfd.a for fast object loading and symbol table lookups ] ,,
+	enable_bfd="yes")
 
 
 # Maximum number of pages
