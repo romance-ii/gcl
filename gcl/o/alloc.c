@@ -106,8 +106,11 @@ alloc_page(int n)
 		    {
 			holepage = new_holepage + n;
 
-			{int in_sgc=sgc_enabled;
+			{
+#ifdef SGC
+			  int in_sgc=sgc_enabled;
 			 if (in_sgc) sgc_quit();
+#endif
 			if(in_signal_handler)
 			  {fprintf(stderr,
 				   "Cant do relocatable gc in signal handler. \
@@ -115,12 +118,14 @@ Try to allocate more space to save for allocation during signals: \
 eg to add 20 more do (si::set-hole-size %ld %d)\n...start over ", new_holepage, 20+ reserve_pages_for_signal_handler); fflush(stderr); exit(1);}
 
 			GBC(t_relocatable);
+#ifdef SGC
 			if (in_sgc)
 			  {sgc_start();
 			   /* starting sgc can use up some pages
 			      and may move heap end, so start over
 			    */
 			   return alloc_page(n);}
+#endif
 		       }
 		}
 		holepage -= n;
@@ -145,7 +150,6 @@ eg to add 20 more do (si::set-hole-size %ld %d)\n...start over ", new_holepage, 
 #ifdef SGC
 	if (sgc_enabled)
 	  make_writable(page(core_end),page(core_end)+n-m);
-
 #endif	
 	core_end += PAGESIZE*(n - m);
 	return(e);}
@@ -249,8 +253,13 @@ ONCE_MORE:
 	obj->d.t = (short)t;
 	obj->d.m = FALSE;
 	return(obj);
+#ifdef SGC
 #define TOTAL_THIS_TYPE(tm) \
 	(tm->tm_nppage * (sgc_enabled ? sgc_count_type(tm->tm_type) : tm->tm_npage))
+#else
+#define TOTAL_THIS_TYPE(tm) \
+	(tm->tm_nppage * tm->tm_npage)
+#endif
 CALL_GBC:
 	GBC(tm->tm_type);
 	if (tm->tm_nfree == 0 ||
@@ -489,8 +498,10 @@ Use ALLOCATE-CONTIGUOUS-PAGES to expand the space.",
 		   pages for SGC, causing no contiguous pages to be
 		   swept when SGC was on.  Here we follow the behavior
 		   for other pages in add_to_freelist. CM 20030827  */
+#ifdef SGC
 		if (SGC_CONT_ENABLED)
 		  sgc_type_map[page(p)+i]|= SGC_PAGE_FLAG;
+#endif
 	}
 	ncbpage += m;
 	insert_contblock(p+n, PAGESIZE*m - n);
@@ -500,6 +511,7 @@ Use ALLOCATE-CONTIGUOUS-PAGES to expand the space.",
 /* SGC cont pages: explicit free calls can come at any time, and we
    must make sure to add the newly deallocated block to the right
    list.  CM 20030827*/
+#ifdef SGC
 void
 insert_maybe_sgc_contblock(char *p,int s) {
 
@@ -517,6 +529,7 @@ insert_maybe_sgc_contblock(char *p,int s) {
     insert_contblock(p,s);
 
 }
+#endif
 
 #ifdef SGC_CONT_DEBUG
 extern void overlap_check(struct contblock *,struct contblock *);
@@ -547,7 +560,6 @@ insert_contblock(char *p, int s) {
       }
       if (sgc_enabled) 
 	overlap_check(old_cb_pointer,cb_pointer);
-      
 #endif
       cbp->cb_link = *cbpp;
       *cbpp = cbp;
@@ -985,8 +997,10 @@ DEFUN_NEW("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
        pages for SGC, causing no contiguous pages to be
        swept when SGC was on.  Here we follow the behavior
        for other pages in add_to_freelist. CM 20030827  */
+#ifdef SGC
     if (SGC_CONT_ENABLED)
       sgc_type_map[page(p)+i]|= SGC_PAGE_FLAG;
+#endif
   }
 
   ncbpage += m;
@@ -1232,8 +1246,13 @@ free(void *ptr)
 	for (p = &malloc_list; *p && !endp(*p);  p = &((*p)->c.c_cdr))
 		if ((*p)->c.c_car->st.st_self == ptr) {
 /* SGC contblock pages: Its possible this is on an old page CM 20030827 */
+#ifdef SGC
  			insert_maybe_sgc_contblock((*p)->c.c_car->st.st_self,
 						   (*p)->c.c_car->st.st_dim);
+#else
+ 			insert_contblock((*p)->c.c_car->st.st_self,
+					 (*p)->c.c_car->st.st_dim);
+#endif
 			(*p)->c.c_car->st.st_self = NULL;
 			*p = (*p)->c.c_cdr;
 			return ;
@@ -1282,7 +1301,11 @@ realloc(void *ptr, size_t size) {
 	for (i = 0;  i < size;  i++)
 	  x->st.st_self[i] = ((char *)ptr)[i];
 /* SGC contblock pages: Its possible this is on an old page CM 20030827 */
+#ifdef SGC
  	insert_maybe_sgc_contblock(ptr, j);
+#else
+ 	insert_contblock(ptr, j);
+#endif
 	return(x->st.st_self);
       }
     }

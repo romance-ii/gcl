@@ -306,7 +306,12 @@ object strm;
 
 /* SGC contblock pages: Its possible this is on an old page CM 20030827 */
   if (strm->sm.sm_buffer) 
-    {insert_maybe_sgc_contblock(strm->sm.sm_buffer, BUFSIZ); 
+    {
+#ifdef SGC
+      insert_maybe_sgc_contblock(strm->sm.sm_buffer, BUFSIZ); 
+#else
+      insert_contblock(strm->sm.sm_buffer, BUFSIZ); 
+#endif
     strm->sm.sm_buffer = 0;} 
   else 
     printf("no buffer? %p  \n",strm->sm.sm_fp); 
