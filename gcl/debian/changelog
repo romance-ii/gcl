@@ -46,8 +46,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Eliminate extraneous warning message when allocating fewer pages
     than already allocated
   * Rework internal plt symbol address capture
+  * Cleanup sfaslelf compiler warning
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  3 Mar 2004 00:19:20 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  3 Mar 2004 00:26:11 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
