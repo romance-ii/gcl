@@ -22,7 +22,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	read.d
 */
 
-
+#define _GNU_SOURCE
 #include "include.h"
 
 
@@ -837,7 +837,8 @@ EXPONENT:
 
 MAKE_FLOAT:
 #ifdef IEEEFLOAT
-	if ((*((int *)&fraction +HIND) & 0x7ff00000) == 0x7ff00000)
+/*	if ((*((int *)&fraction +HIND) & 0x7ff00000) == 0x7ff00000)*/
+	if (!isfinite(fraction))
 		FEerror("Floating-point overflow.", 0);
 #endif
 	switch (exponent_marker) {

@@ -22,7 +22,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	print.d
 */
 
-
+#define _GNU_SOURCE
 #include "include.h"
 
 #define LINE_LENGTH line_length
@@ -297,7 +297,8 @@ int *ep;
 	int i;
 
 #ifdef IEEEFLOAT
-	if ((*((int *)&d +HIND) & 0x7ff00000) == 0x7ff00000)
+/*	if ((*((int *)&d +HIND) & 0x7ff00000) == 0x7ff00000)*/
+	if (!isfinite(d))
            {if (sSAprint_nansA->s.s_dbind !=Cnil)
 	      {sprintf(s, "%e",d);
 	       *sp = 2;
