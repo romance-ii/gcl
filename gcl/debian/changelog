@@ -38,8 +38,9 @@ gclcvs (2.7.0-37) unstable; urgency=low
   * Fix nil types in room report
   * Fix Mac SGC/save bug, at least in part
   * Fix listen to work with readline
+  * Don't write into rl_line_buffer if null
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 15 Feb 2005 21:14:49 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 16 Feb 2005 14:31:38 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 

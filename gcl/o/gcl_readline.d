@@ -283,7 +283,7 @@ int rl_getc_em(FILE *f) {
 		free(line);
 		line = NULL;
 		linepos = 0;
-		*rl_line_buffer=0;
+		if (rl_line_buffer) *rl_line_buffer=0;
 		return '\n';
 	}
 
