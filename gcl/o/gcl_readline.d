@@ -51,7 +51,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <history.h>
 #endif
 
-static int readline_on = 0;		/* On (1) or off (0) */
+int readline_on = 0;		/* On (1) or off (0) */
 static int rl_ungetc_em_char = -1;
 static unsigned char *rl_putc_em_line = NULL;
 
@@ -283,6 +283,7 @@ int rl_getc_em(FILE *f) {
 		free(line);
 		line = NULL;
 		linepos = 0;
+		*rl_line_buffer=0;
 		return '\n';
 	}
 

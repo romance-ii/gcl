@@ -39,6 +39,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "include.h"
 
 #ifdef HAVE_READLINE
+#include <readline/readline.h>
 #define kclgetc(FP)		rl_getc_em(FP)
 #define kclungetc(C, FP)	rl_ungetc_em(C, FP)
 #define kclputc(C, FP)		rl_putc_em(C, FP)
@@ -1523,6 +1524,8 @@ BEGIN:
 	case smm_input:
 	case smm_io:
 
+	  if (readline_on && strm->sm.sm_fp==rl_instream)
+	    return *rl_line_buffer ? TRUE : FALSE;
 
 		if (strm->sm.sm_fp == NULL)
 			closed_stream(strm);
