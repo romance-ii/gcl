@@ -201,6 +201,10 @@ IapplyVector(object fun, int nargs, object *base)
     ihs_check;
     VFUN_NARGS=nargs;
     fcall.fun = fun;
+    if (nargs < F_MIN_ARGS(fun->sfn.sfn_argd))
+      FEtoo_few_arguments(base,vs_top);
+    if (nargs > F_MAX_ARGS(fun->sfn.sfn_argd))
+      FEtoo_many_arguments(base,vs_top);
     atypes = F_TYPES(fun->sfn.sfn_argd) >> F_TYPE_WIDTH;
     if (atypes==0) {abase = base;}
     else { abase = vs_top;

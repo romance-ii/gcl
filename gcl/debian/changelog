@@ -9,8 +9,9 @@ gcl (2.5.0.cvs20020625-71) unstable; urgency=high
   * aref1 -> row-major-aref
   * Fixes to certain numerical functions to handle denormalized floating
     point numbers
+  * Number of argument check in IapplyVector
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  7 Jan 2003 01:20:05 -0500
+ -- Camm Maguire <camm@enhanced.com>  Sun, 12 Jan 2003 19:48:31 -0500
 
 gcl (2.5.0.cvs20020625-70) unstable; urgency=high
 
