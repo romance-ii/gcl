@@ -71,6 +71,20 @@ int sfasldebug=1;
 #endif
 #define PTABLE_EXTRA 20
 
+#ifdef COFF
+#  define COFF_SECTIONS 10   /* Numbner of section headers in section header buffer */
+#endif
+
+#define INVALID_NSCN 64000   /* A number greater than the number of sections ever likely to be read in. */
+
+#ifdef _WIN32
+unsigned int TEXT_NSCN = INVALID_NSCN, DATA_NSCN = INVALID_NSCN,
+  BSS_NSCN = INVALID_NSCN, STAB_NSCN = INVALID_NSCN,
+  STABSTR_NSCN = INVALID_NSCN, RDATA_NSCN = INVALID_NSCN,
+  BIGGEST_NSCN_FOUND = 0;
+#endif
+
+
 struct sfasl_info {
     struct syment *s_symbol_table;
     char *s_start_address;
@@ -112,7 +126,7 @@ void describe_sym1 ( int n, int aux_to_go )
         }
     }
     if ( aux_to_go > 0 ) {
-        fprintf ( stderr," symbol_table[%3d] (%8x): auxiliary entry (%d to go)\n", n, &symbol_table[n], aux_to_go - 1 );
+        fprintf ( stderr," symbol_table[%3d] (%8x): auxiliary entry (%d to go)\n", n, &symbol_table[n], aux_to_go - 1 ); 
     } else {
         if ( sym->n_zeroes == 0 ) {
             fprintf ( stderr,
@@ -161,16 +175,61 @@ int get_extra_bss ( struct syment *sym_table, int length, int start, int *ptr, i
 void relocate_symbols ( unsigned int length );
 void set_symbol_address ( struct syment *sym, char *string );
 
+/* Loop through the section headers to determine the index fo each section header
+ * This is needed because depending on the compiler flags, different sections
+ * can be at different indices, eg if stabs output is not present then .rdata
+ * is adjacent to .bss (index 3), rather than after .stabstr (index 6).
+ * This will make it easier to handle object files from other compilers than
+ * our old friend gcc too, for example Visual C++.
+ */
+static void work_out_section_indices ( struct scnhdr *section )
+{
+#ifdef _WIN32
+  unsigned int i;
+
+  /* Initialise the global *_NSCN variables to INVALID_NSCN */
+  TEXT_NSCN = DATA_NSCN = BSS_NSCN = STAB_NSCN = STABSTR_NSCN = RDATA_NSCN = INVALID_NSCN;
+  
+  for ( i = 1; i < COFF_SECTIONS; i++ ) {
+    if ( strcmp(section[i].s_name, _TEXT) == 0 ) {
+      TEXT_NSCN = i;
+      if ( i > BIGGEST_NSCN_FOUND ) BIGGEST_NSCN_FOUND = i;
+    }
+    if ( strcmp(section[i].s_name, _DATA) == 0 ) {
+      DATA_NSCN = i;
+      if ( i > BIGGEST_NSCN_FOUND ) BIGGEST_NSCN_FOUND = i;
+    }
+    if ( strcmp(section[i].s_name, _BSS ) == 0 ) {
+      BSS_NSCN = i;
+      if ( i > BIGGEST_NSCN_FOUND ) BIGGEST_NSCN_FOUND = i;
+    }
+    if ( strcmp(section[i].s_name, _STAB ) == 0 ) {
+      STAB_NSCN = i;
+      if ( i > BIGGEST_NSCN_FOUND ) BIGGEST_NSCN_FOUND = i;
+    }
+    if ( strcmp(section[i].s_name, _STABSTR) == 0 ) {
+      STABSTR_NSCN = i;
+      if ( i > BIGGEST_NSCN_FOUND ) BIGGEST_NSCN_FOUND = i;
+    }
+    if ( strcmp(section[i].s_name, _RDATA) == 0 ) {
+      RDATA_NSCN = i;
+      if ( i > BIGGEST_NSCN_FOUND ) BIGGEST_NSCN_FOUND = i;
+    }
+  }
+#endif
+}
+
 int fasload ( object faslfile )
 {
     long fasl_vector_start;
     struct filehdr fileheader;
     struct sfasl_info sfasl_info_buf;
 #ifdef COFF
-    struct scnhdr section[10];
+    struct scnhdr section[COFF_SECTIONS];
     struct aouthdr header;
 #endif
-    int textsize, datasize, bsssize, stabsize, stabstrsize, rdatasize, nsyms;
+    int textsize = 0, datasize = 0, bsssize = 0, stabsize = 0,
+      stabstrsize = 0, rdatasize = 0, nsyms = 0;
 #if defined ( READ_IN_STRING_TABLE ) || defined ( HPUX )
     int string_size=0;
 #endif        
@@ -187,8 +246,9 @@ int fasload ( object faslfile )
     object *old_vs_base = vs_base;
     object *old_vs_top = vs_top;
 #endif
-    
-    memset ( section, 0, 10 * sizeof ( struct scnhdr ) );
+
+    /* Zero out the COFF section header storage space */    
+    memset ( section, 0, COFF_SECTIONS * sizeof ( struct scnhdr ) );
 
     sfaslp = &sfasl_info_buf;
 
@@ -203,6 +263,7 @@ int fasload ( object faslfile )
     fp = faslfile->sm.sm_fp;
 #endif	
 
+    /* Read the object file header */
     HEADER_SEEK(fp);
     if ( !fread ( (char *) &fileheader, sizeof(struct filehdr), 1, fp ) ) {
         FEerror("Could not get the header",0);
@@ -214,7 +275,13 @@ int fasload ( object faslfile )
     setup_for_aix_load();
 #  endif	
 
+    /* Read the optional object file header */
     fread ( &header, 1, fileheader.f_opthdr, fp );
+
+    /* Read the object file section headers */
+    if ( fileheader.f_nscns > ( COFF_SECTIONS - 1 ) ) {
+        FEerror("Too many section headers to be read into the static storage space", 0);
+    }
     sections_read = fread ( &section[1],
                             sizeof ( struct  scnhdr ),
                             fileheader.f_nscns,
@@ -225,31 +292,33 @@ int fasload ( object faslfile )
 	fflush ( stderr );
     }
 
-    textsize = section[TEXT_NSCN].s_size;
-    datasize = section[DATA_NSCN].s_size; 
-    if (strcmp(section[BSS_NSCN].s_name, _BSS) == 0) {
-        bsssize=section[BSS_NSCN].s_size;
-    } else {
-        bsssize=section[BSS_NSCN].s_size = 0;
+    /* For platforms which have variable section header offsets/indices,
+     * work out the indices. */
+    work_out_section_indices ( section );
+
+
+    /* Determine the section sizes used later to allocate storage and to calculate
+     * the offsets of the sections once read in. Allow for the possibility
+     * of an invalid index, that is, that a section may not be present. */
+    if ( INVALID_NSCN != TEXT_NSCN ) {
+      textsize = section[TEXT_NSCN].s_size;
+    }
+    if ( INVALID_NSCN != DATA_NSCN ) {
+      datasize = section[DATA_NSCN].s_size;
+    }
+    if ( INVALID_NSCN != BSS_NSCN ) {
+      bsssize = section[BSS_NSCN].s_size;
+    }
+    if ( INVALID_NSCN != STAB_NSCN ) {
+      stabsize = section[STAB_NSCN].s_size;
+    }
+    if ( INVALID_NSCN != STABSTR_NSCN ) {
+      stabstrsize = section[STABSTR_NSCN].s_size;
+    }
+    if ( INVALID_NSCN != RDATA_NSCN ) {
+      rdatasize = section[RDATA_NSCN].s_size;
     }
 
-    if (strcmp(section[STAB_NSCN].s_name, _STAB) == 0) {
-        stabsize=section[STAB_NSCN].s_size;
-    } else {
-        stabsize=section[STAB_NSCN].s_size = 0;
-    }
-
-    if (strcmp(section[STABSTR_NSCN].s_name, _STABSTR) == 0) {
-        stabstrsize=section[STABSTR_NSCN].s_size;
-    } else {
-        stabstrsize=section[STABSTR_NSCN].s_size = 0;
-    }
-
-    if ( strcmp ( section[RDATA_NSCN].s_name, _RDATA ) == 0 ) {
-        rdatasize = section[RDATA_NSCN].s_size;
-    } else {
-        rdatasize = section[RDATA_NSCN].s_size = 0;
-    }       
 #endif
 
 #ifdef BSD
@@ -295,7 +364,7 @@ int fasload ( object faslfile )
         int ii=0;
 	if ( !fread ( (char *) &ii, sizeof(int), 1, fp ) ) {
             FEerror ( "The string table of this file did not have any length",
-                      0, 0 );
+                      0 );
         }
         fseek(fp,-4,1);
         /* at present the string table is located just after the symbols */
@@ -303,7 +372,7 @@ int fasload ( object faslfile )
         memset ( my_string_table, 0, ii );
         dprintf( " string table length = %d \n", ii);
         if ( ii != fread ( my_string_table, 1, ii, fp ) ) {
-            FEerror ( "Could not read whole string table", 0, 0 );
+            FEerror ( "Could not read whole string table", 0 );
 	}
 #endif
         
@@ -364,7 +433,7 @@ int fasload ( object faslfile )
 #endif
 	dprintf(" Code size %d, ", datasize+rdatasize+textsize+bsssize + extra_bss);
 	if ( fseek ( fp, N_TXTOFF(fileheader), 0) < 0 ) {
-            FEerror("file seek error",0,0);
+            FEerror("file seek error",0);
         }
 	SAFE_FREAD ( the_start, textsize + datasize + stabsize + stabstrsize + rdatasize, 1, fp );
 	dprintf("read %d bytes of text + data into memory at ", textsize + datasize + stabsize + stabstrsize + rdatasize );
@@ -404,23 +473,30 @@ int fasload ( object faslfile )
 #ifdef COFF
         {
             int j = 0;
-            for ( j = 1; j <= RDATA_NSCN ; j++ ) {
-                if ( ( j != BSS_NSCN ) && ( j != STAB_NSCN ) &&
-                     ( j != STABSTR_NSCN ) && ( 0 != section[j].s_nreloc ) ) {
+
+	    /* Here the assumption remains that RDATA_NSCN is the highest section number. */
+            for ( j = 1; j <= BIGGEST_NSCN_FOUND ; j++ ) {
+                if ( ( j == TEXT_NSCN || j == DATA_NSCN || j == RDATA_NSCN ) &&
+		     ( 0 != section[j].s_nreloc ) ) {
                     dprintf ( "relocating section %d \n", j );
                     fseek ( fp, section[j].s_relptr, 0 );
-                    switch ( j ) {
-                    case TEXT_NSCN:  the_start = memory->cfd.cfd_start; break;
-                    case DATA_NSCN:  the_start = sfaslp->s_start_data;  break;
-                    case RDATA_NSCN: the_start = sfaslp->s_start_rdata; break;
-                    default:
-                        the_start = memory->cfd.cfd_start;
-                    }
+                    if ( j == TEXT_NSCN ) {
+		      the_start = memory->cfd.cfd_start;
+		    } else {
+		      if ( j == DATA_NSCN ) {
+			the_start = sfaslp->s_start_data;
+		      } else {
+			if ( j == RDATA_NSCN ) {
+			  the_start = sfaslp->s_start_rdata;
+			} else {
+			  the_start = 0;
+			  fprintf ( stderr, "Warning: the_start set to 0\n" ); fflush(stderr);
+			}
+		      }
+		    }
                     for ( i=0; i < section[j].s_nreloc; i++ ) {
                         fread ( &relocation_info, RELSZ, 1, fp );
                         dprintf ( "    item %3d: ", i );
-			if ( j == RDATA_NSCN    ) {
-			}
                         relocate() ;
                     }
                 }
@@ -566,7 +642,7 @@ int get_extra_bss(sym_table,length,start,ptr,bsssize)
                  strcmp(sym->n_name,"_ptrgl")==0)
                 {struct syment* s =
                      get_symbol("._ptrgl",TEXT_NSCN,sym_table,length);
-                 if (s ==0) FEerror("bad glue",0,0);
+                 if (s ==0) FEerror("bad glue",0);
                  sym->n_value = next_bss ;
                  ptrgl_offset = next_bss;
                  ptrgl_text = s->n_value;
@@ -653,8 +729,9 @@ void relocate_symbols ( unsigned int length )
     tem[SYMNMLEN]=0;
 
     end =symbol_table + length;
-    for(sym=symbol_table; sym < end; sym++) {
-        typ=NTYPE(sym);
+    for ( sym = symbol_table; sym < end; sym++ ) {
+      typ = NTYPE ( sym );
+
 #ifdef BSD
 #  ifdef N_STAB    
         if (N_STAB & sym->n_type) continue; /* skip: It  is for dbx only */
@@ -662,65 +739,39 @@ void relocate_symbols ( unsigned int length )
         typ=N_SECTION(sym);
         /* if(sym->n_type  &  N_EXT) should add the symbol name,
            so it would be accessible by future loads  */
+        if ( typ == N_ABS || typ == N_TEXT || typ == N_DATA || typ == N_BSS ) {
 #endif
-        switch (typ)	{
-#ifdef BSD
-        case N_ABS : case N_TEXT: case N_DATA: case N_BSS:
-#endif
+
 #ifdef COFF
-        case TEXT_NSCN : case DATA_NSCN: case RDATA_NSCN: case BSS_NSCN :
+	if ( typ == TEXT_NSCN || typ == DATA_NSCN || typ == RDATA_NSCN || typ == BSS_NSCN ) {
 #ifdef  _WIN32
-	  if (typ==DATA_NSCN)
-	    n_value = (int)sfaslp->s_start_data;
-	  if (typ==RDATA_NSCN) {
-              n_value = (int)sfaslp->s_start_rdata;
-          }
-	  if (typ==BSS_NSCN)
-	    n_value = (int)sfaslp->s_start_bss;
-	  if (typ==TEXT_NSCN)
-            n_value = (int)start_address;
+	  if ( typ == TEXT_NSCN )  n_value = (int)start_address;
+	  if ( typ == DATA_NSCN )  n_value = (int)sfaslp->s_start_data;
+	  if ( typ == RDATA_NSCN ) n_value = (int)sfaslp->s_start_rdata;
+	  if ( typ == BSS_NSCN )   n_value = (int)sfaslp->s_start_bss;
 #endif /* _WIN32 */
 #endif /* COFF */
-            str=SYM_NAME(sym);
-#ifdef DEBUG
-            fprintf ( stderr, "relocate_symbols: type %x ", typ );
-            switch ( typ )
-            case TEXT_NSCN: {
-                fprintf ( stderr, "(TEXT_NSCN)");
-                break;
-            case DATA_NSCN:
-                fprintf ( stderr, "(DATA_NSCN)");
-                break;
-            case RDATA_NSCN:
-                fprintf ( stderr, "(RDATA_NSCN)");
-                break;
-            case BSS_NSCN:
-                fprintf ( stderr, "(BSS_NSCN)");
-                break;
-            }
-            fprintf ( stderr, " new value will be start %x for sym %s,  \n", n_value, str );
-#endif            
+	  str=SYM_NAME(sym);
 #ifdef AIX3 
-            if ( N_SECTION(sym) == DATA_NSCN
-                 && NUM_AUX(sym) 
-                 && allocate_toc(sym) )
-                break;
+	  if ( N_SECTION(sym) == DATA_NSCN
+	       && NUM_AUX(sym) 
+	       && allocate_toc(sym) )
+	    break;
 #endif     
-            sym->n_value = n_value;
-            break;
-        case  N_UNDEF:
+	  sym->n_value = n_value;
+        } else {
+          if ( typ == N_UNDEF ) {
             str=SYM_NAME(sym);
             dprintf("relocate_symbols: N_UNDEF symbol %s \n", str);	
             dprintf("relocate_symbols:    symbol diff %d \n", sym - symbol_table);
             describe_sym ( sym-symbol_table, 0 );
             set_symbol_address(sym,str);
             describe_sym ( sym-symbol_table, 0 );
-            break;
-        default:
+          } else {
 #ifdef COFF
             dprintf("relocate_symbols: am ignoring a scnum %d\n",(sym->n_scnum));
 #endif
-            break;
+	  }
         }
         sym += NUM_AUX(sym);
     }
@@ -775,7 +826,7 @@ void set_symbol_address ( struct syment *sym, char *string )
             fflush(stdout);
         }
     } else {
-        FEerror("symbol table not loaded",0,0);
+        FEerror("symbol table not loaded",0);
     }
 }
 
