@@ -23,4 +23,4 @@ tclwinkill.dll: ../o/tclwinkill.c
 	-(cd ../o; $(CC) -I../h -shared tclwinkill.c -ltclstub83 -o ../bin/tclwinkill.dll)
 
 clean:
-	rm -f dpp dpp${EXE} append append${EXE} file-sub${EXE} core a.out *.o gcl
+	rm -f dpp dpp${EXE} append append${EXE} file-sub${EXE} core a.out *.o gcl winkill.exe tclwinkill.dll

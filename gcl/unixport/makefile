@@ -159,4 +159,4 @@ hpbsd-crt0-mod.o:
 
 GCL:=gcl
 clean:
-	rm -f saved_$(SYSTEM) raw_$(SYSTEM) saved_$(GCL) saved_ansi_$(GCL) raw_$(GCL) *.o core a.out $(RSYM) $(LSPDIR)/auto_new.lsp foo *maxima*
+	rm -f saved_$(SYSTEM)$(EXE) raw_$(SYSTEM)$(EXE) saved_$(GCL)$(EXE) saved_ansi_$(GCL)$(EXE) raw_$(GCL)$(EXE) *.o core a.out $(RSYM) $(LSPDIR)/auto_new.lsp foo *maxima*

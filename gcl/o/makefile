@@ -114,7 +114,7 @@ $(GCLIB): ${ALIB}
 	$(AR) gcllib.a ${ALIB}
 	${RANLIB} gcllib.a
 clean:
-	rm -f $(OBJS) ${ALIB} new_init.o *.a grab_defs *.ini tmpx foo.c cmpinclude.h new_init.c
+	rm -f $(OBJS) ${ALIB} new_init.o *.a grab_defs$(EXE) *.ini tmpx foo.c cmpinclude.h new_init.c
 
 fsavres.o: /lib/libc.a
 	ar xv /lib/libc.a fsavres.o
