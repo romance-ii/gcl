@@ -881,7 +881,7 @@ if test -f h/$use.defs  ; then
   cat makedefc
 
   echo    add-defs1 $use
-  sh CC=$CC add-defs1 $use
+  CC=$CC add-defs1 $use
 
 else
   echo "Unable to guess machine type"
