@@ -160,7 +160,7 @@ DEFUNO("ROW-MAJOR-AREF", object, fLrow_major_aref, LISP, 2, 2,
     case aet_fix:
       return make_fixnum(x->fixa.fixa_self[i]);
     case aet_sf:
-      return make_longfloat(x->sfa.sfa_self[i]);
+      return make_shortfloat(x->sfa.sfa_self[i]);
     case aet_lf:
       return make_longfloat(x->lfa.lfa_self[i]);
     case aet_char:
