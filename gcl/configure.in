@@ -62,6 +62,7 @@ AC_SUBST(LITTLE_END)
 
 AC_MSG_CHECKING("finding DBEGIN")
 AC_TRY_RUN([#include <stdio.h>
+            #include <stdlib.h>
 main()
 {
   char *b = (void *) malloc(1000);
