@@ -49,7 +49,7 @@ DEFUN_NEW("PROFILE",object,fSprofile,SI
   if( type_of(start_address)!=t_fixnum ||   type_of(scale)!=t_fixnum)
     FEerror("Needs start address and scale as args",0);
 
-  profil((void *) (ar->ust.ust_self), (ar->ust.ust_dim),
+  profil(!(fix(start_address)*fix(scale)) ? NULL : (void *) (ar->ust.ust_self), (ar->ust.ust_dim),
 	 fix(start_address),fix(scale) << 8);
   RETURN1(start_address);
 }

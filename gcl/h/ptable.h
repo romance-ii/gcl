@@ -50,7 +50,7 @@ struct  string_address_table
 #ifdef SPECIAL_RSYM
 struct string_address_table c_table;
 #else
-static struct bfd_link_info link_info;
+struct bfd_link_info link_info;
 #endif
 struct string_address_table combined_table;
 
