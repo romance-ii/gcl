@@ -268,6 +268,10 @@ truename(object pathname)
         if ( 0 == current_directory_length ) {
             FEerror ( "truename could not determine the current directory.", 1, "" );
         }
+        {
+            object x;
+            fix_filename(x, current_directory);
+        }
 #else
         getwd(current_directory);
 #endif        
@@ -315,6 +319,10 @@ truename(object pathname)
                     FEerror ( "truename could not determine the current directory.", 1, "" );
                 }
                 p = directory;
+                {
+                    object x;
+                    fix_filename(x, directory);
+                }
 #else
 		p = getwd(directory);
 #endif                
@@ -841,8 +849,13 @@ FFN(siLmkdir)(void)
 	}
 	coerce_to_local_filename(vs_base[0], filename);
 
+#ifdef __MINGW32__
+	if (mkdir(filename) < 0)
+	    FEerror("Cannot make the directory ~S.", 1, vs_base[0]);
+#else        
 	if (mkdir(filename,01777) < 0)
 	    FEerror("Cannot make the directory ~S.", 1, vs_base[0]);
+#endif        
 }
 
 static void
