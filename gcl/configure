@@ -920,7 +920,7 @@ if test "${enable_custreloc+set}" = set; then
   enableval="$enable_custreloc"
   :
 else
-  enable_custreloc="def_custreloc"
+  enable_custreloc="$def_custreloc"
 fi
 
 # Check whether --enable-debug or --disable-debug was given.
