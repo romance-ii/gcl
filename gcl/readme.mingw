@@ -1,3 +1,73 @@
+BUILDING A NATIVE WIN32 GNU COMMON LISP (DRAFT ONLY)
+
+TOOLS
+
+- Mingw32 Windows native gcc from Source Forge.
+  I used the latest version (1.1), although this is probably not important.
+
+- Cygwin from Redhat.  This supplies the configuration and build environment. 
+  The latest version is probably best.
+
+- Source code for GCL.
+
+
+SETUP
+
+- Install Cygwin and Mingw32.  
+
+- After installing Cygwin, set your Bash path so that Mingw32 is first eg:
+  
+	export PATH=/c/mingw32/bin:${PATH}
+
+  This means that Mingw32 gcc is used for the build, enabling a proper
+  native Win32 build, not dependent on the Cygwin runtime.
+
+- Make sure that Cygwin make is in the path, not Mingw32 make.
+
+
+BUILDING
+
+- Change to your GCL source directory eg:
+
+	cd c:/cvs/gcl
+
+  Ensure that the colon format is used for the path, NOT "/c/cvs/gcl".  This
+  allows the configure script to properly set the GCLDIR makefile macro,
+  which finds it's way into the final GCL executable.  If the Cygwin format
+  is used, you'll have startup problems as native executables don't understand
+  that format (forward slashes are OK however).
+
+- Make sure that "cp" is used instead of "ln" in the gmp library build by 
+  setting all occurrences of ac_cv_prog_LN_S="cp -p" in gmp/configure.
+
+  Mingw32 tools don't know about Cygwin symbolic links (nor should they).
+
+- We are now ready to configure:
+
+        ./configure --enable-machine=mingw --prefix="f:/lang/gclcvs" >& con.log
+
+  Change the prefix directory as required for your final installation path.  
+  Note that it is helpful to redirect output from configure and make into log
+  files for future debugging and checking.
+
+- Check the log.  If all is well, type:
+
+  	make >& make.log 
+
+- The "saved_gcl.exe" should turn up eventually in the unixport directory.
+
+- To install:
+
+	make install >& install.log
+
+
+Mike Thomas, 23 March 2002
+
+
+
+==================================================================
+HISTORICAL VERSION (IGNORE FOR CURRENT MINGW32 BUILDS)
+==================================================================
 
 GCL 2.3.8 compiles for MS windows win32 under mingw. 
 The mingw version of GCC comes equipped with include files  
