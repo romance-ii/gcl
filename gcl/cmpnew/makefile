@@ -13,17 +13,17 @@ OBJS	= cmpbind.o cmpblock.o cmpcall.o cmpcatch.o cmpenv.o cmpeval.o \
 	cmploc.o cmpmap.o cmpmulti.o cmpspecial.o cmptag.o cmptop.o \
 	cmptype.o cmputil.o cmpvar.o cmpvs.o cmpwt.o # cmpmain.o cmpopt.o lfun_list.o
 
-COMPILE_FILE=$(PORTDIR)/saved_$(SYSTEM) $(PORTDIR) -system-p -c-file -data-file \
+COMPILE_FILE=$(PORTDIR)/saved_gcl $(PORTDIR) -system-p -c-file -data-file \
 	-o-file nil -h-file -compile
 #CFLAGS	= -c -O -I../h 
 
 .lsp.c:
-	@ ../xbin/if-exists $(PORTDIR)/saved_$(SYSTEM) \
+	@ ../xbin/if-exists $(PORTDIR)/saved_gcl \
 	"rm -f $*.c $*.h $*.data $*.o" \
 	"$(COMPILE_FILE) $* "
 
 .lsp.o:
-	@ ../xbin/if-exists $(PORTDIR)/saved_$(SYSTEM) \
+	@ ../xbin/if-exists $(PORTDIR)/saved_gcl \
 	"rm -f $*.c $*.h $*.data $*.o" \
 	"$(COMPILE_FILE) $* " \
 	"$(CC) $(OFLAG) $(CFLAGS) -c $*.c" \
@@ -40,11 +40,11 @@ all:	$(OBJS)
 	${APPEND} ${NULLFILE} $*.data  $*.o
 
 collectfn.o:
-	$(PORTDIR)/saved_$(SYSTEM) $(PORTDIR)/ -compile $*.lsp
+	$(PORTDIR)/saved_gcl $(PORTDIR)/ -compile $*.lsp
 
 .lisp.o:
-	@ ../xbin/if-exists $(PORTDIR)/saved_$(SYSTEM) \
-	"$(PORTDIR)/saved_$(SYSTEM) $(PORTDIR)/ -compile $*.lisp " 
+	@ ../xbin/if-exists $(PORTDIR)/saved_gcl \
+	"$(PORTDIR)/saved_gcl $(PORTDIR)/ -compile $*.lisp " 
 sys-proclaim.lisp:
 	echo '(in-package "COMPILER")' \
 	'(load "../cmpnew/collectfn")(load "../lsp/sys-proclaim.lisp")'\
