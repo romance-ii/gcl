@@ -1,3 +1,10 @@
+gclcvs (2.7.0-35) unstable; urgency=low
+
+  * Evaluate all args to function operators rewritten in binary pairs
+    via compiler macros, closing recent test failures misc.lsp
+
+ -- Camm Maguire <camm@enhanced.com>  Sat, 27 Nov 2004 15:35:47 +0000
+
 gclcvs (2.7.0-34) unstable; urgency=low
 
   * revert changes to local bfd.h files, a users might have them as
