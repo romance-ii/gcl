@@ -50,7 +50,8 @@
 	(INTEGER
 	 (wt-nl "SETQ_IO(V" (var-loc var)","
 		"V" (var-loc var)"alloc,")
-	 (wt "(") (wt-vs (var-ref var)) (wt "));"))
+	 (wt "(") (wt-vs (var-ref var)) (wt "),")
+	 (wt (bignum-expansion-storage) ");"))
         (t
          (wt-nl "V" (var-loc var) "=")
          (case (var-kind var)

@@ -50,8 +50,14 @@ gclcvs (2.7.0-16) unstable; urgency=low
     t3local-fun and t3local-dcfun, which default to the original ccb-vs.
     We then bind *initial-ccb-vs* to this new optional parameter instead
     of the former *ccb-vs, which was only appropriate for closures.
+  * Put in rudimentary logic for the selection of stack vs. heap storage
+    for bignums depending on the frame context.  FIXME, this logic is
+    too conservative at present.  SETQ_II and SETQ_IO take an additional
+    parameter which is malloc when *unwind-exit* is bound and contains
+    'frame and  alloca otherwise.  New macro bignum-expansion-storage.
+    FIXME, ensure that IDECL does not need similar modification.
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  1 Dec 2003 01:50:26 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  1 Dec 2003 17:02:24 +0000
 
 gclcvs (2.7.0-15) unstable; urgency=low
 

@@ -253,6 +253,14 @@
            (wt "(V" (var-loc var) ")"))
         ))
 
+;; When setting bignums across setjmps, cannot use alloca as longjmp
+;; restores the C stack.  FIXME -- only need malloc when reading variable
+;; outside frame.  CM 20031201
+(defmacro bignum-expansion-storage ()
+  `(if (and (boundp '*unwind-exit*) (member 'frame *unwind-exit*))
+       "malloc"
+     "alloca"))
+
 (defun set-var (loc var ccb)
   (unless (and (consp loc)
                (eq (car loc) 'var)
@@ -283,16 +291,19 @@
 
 		 (var
 		  (case (var-kind (cadr loc))
-		    (integer (wt "SETQ_II(V"n",V"n"alloc,V" (var-loc (cadr loc))))
+		    (integer (wt "SETQ_II(V"n",V"n"alloc,V" (var-loc (cadr loc)) ","
+				 (bignum-expansion-storage)))
 		    (fixnum  (wt "ISETQ_FIX(V"n",V"n"alloc,V" (var-loc (cadr loc))))
-		    (otherwise (wt "SETQ_IO(V"n",V"n"alloc,"loc ))))
-		 (vs (wt "SETQ_IO(V"n",V"n"alloc,"loc ))
+		    (otherwise (wt "SETQ_IO(V"n",V"n"alloc,"loc ","
+				   (bignum-expansion-storage)))))
+		 (vs (wt "SETQ_IO(V"n",V"n"alloc,"loc ","
+			 (bignum-expansion-storage)))
 		 (otherwise
 		  (let ((*inline-blocks* 0) (*restore-avma* *restore-avma*))
 		    (save-avma '(nil integer))
 		    (wt-nl "SETQ_II(V"n",V" n"alloc,")
 		    (wt-integer-loc loc  (cons 'set-var var))
-		    (wt ");")
+		    (wt "," (bignum-expansion-storage) ");")
 		    (close-inline-blocks))
 		  (return-from set-var nil))
 		  )
