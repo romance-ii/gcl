@@ -643,4 +643,25 @@ extern const bfd_target mach_o_be_vec;
 extern const bfd_target mach_o_le_vec;
 extern const bfd_target mach_o_fat_vec;
 
+struct bfd_preserve
+{
+  PTR marker;
+  PTR tdata;
+  flagword flags;
+  const struct bfd_arch_info *arch_info;
+  struct sec *sections;
+  struct sec **section_tail;
+  unsigned int section_count;
+  struct bfd_hash_table section_htab;
+};
+
+boolean
+bfd_preserve_save PARAMS ((bfd *, struct bfd_preserve *));
+
+void
+bfd_preserve_restore PARAMS ((bfd *, struct bfd_preserve *));
+
+void
+bfd_preserve_finish PARAMS ((bfd *, struct bfd_preserve *));
+
 #endif /* _BFD_MACH_O_H_ */
