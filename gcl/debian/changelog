@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-69) unstable; urgency=high
+
+  * eval fix
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 22 Nov 2002 21:39:33 -0500
+
 gcl (2.5.0.cvs20020625-68) unstable; urgency=high
 
   * enable emacsdir configure option

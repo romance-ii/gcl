@@ -1175,7 +1175,8 @@ object x0;
 
 	/* 1 args */
 	lex_new();
-	eval(vs_base[0]);
+	/* 	eval(vs_base[0]); */
+	eval(x0);
 	lex_env = lex;
 	return Ivs_values();
 }
