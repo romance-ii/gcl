@@ -178,7 +178,7 @@ binary-arch: build install debian/substvars
 	dh_installemacsen -a
 	dh_installmanpages -a gcl/gmp3/ansi2knr.1
 	dh_installchangelogs ChangeLog -a
-	dh_strip -a -Xlibgcl
+	dh_strip -a -Xlibgcl -Xlibansi_gcl
 	dh_link -a
 	dh_compress -a
 	dh_fixperms -a
