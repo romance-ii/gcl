@@ -1,7 +1,12 @@
+gcl (2.5.0.cvs20020523-2) unstable; urgency=high
+
+  * configure updates for better tk detection
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 24 May 2002 18:50:22 -0400
+
 gcl (2.5.0.cvs20020523-1) unstable; urgency=high
 
   * New upstream release
-  * configure updates for better tk detection
 
  -- Camm Maguire <camm@enhanced.com>  Fri, 24 May 2002 18:50:22 -0400
 
