@@ -1328,15 +1328,15 @@ GBC(enum type t) {
       }
     core_end = heap_end + PAGESIZE;
     
-    for (i = 0;  i < maxpage;  i++)
-      if ((enum type)type_map[i] == t_contiguous)
-	type_map[i] = (char)t_other;
-    cb_pointer = NULL;
-    maxcbpage -= ncbpage;
-    if (maxcbpage < 100)
-      maxcbpage = 100;
-    ncbpage = 0;
-    ncb = 0;
+/*     for (i = 0;  i < maxpage;  i++) */
+/*       if ((enum type)type_map[i] == t_contiguous) */
+/* 	type_map[i] = (char)t_other; */
+/*     cb_pointer = NULL; */
+/*     maxcbpage -= ncbpage; */
+/*     if (maxcbpage < 100) */
+/*       maxcbpage = 100; */
+/*     ncbpage = 0; */
+/*     ncb = 0; */
     
     /* hmm.... why is this test necessary.*/
 #ifdef SGC
