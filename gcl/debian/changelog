@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-66) unstable; urgency=high
+
+  * Fix SIGILL trap in cmpaux.c
+
+ -- Camm Maguire <camm@enhanced.com>  Mon, 11 Nov 2002 11:14:07 -0500
+
 gcl (2.5.0.cvs20020625-65) unstable; urgency=high
 
   * Miscellaneous Freebsd patches

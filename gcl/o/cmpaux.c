@@ -25,7 +25,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include <string.h>
-
+#include <signal.h>
 #define NEED_MP_H
 #include "include.h"
 #define dcheck_type(a,b) check_type(a,b)
@@ -296,13 +296,18 @@ call_init(int init_address, object memory, object fasl_vec, FUNC fptr)
 {object form;
  FUNC at;
 #ifdef CLEAR_CACHE
- static sigaction sa={{sigh},{{0}},SA_RESTART|SA_SIGINFO,NULL);
+ static int n;
  static sigset_t ss;
 
- sigaction(SIGILL,&sa,NULL);
- sigemptyset(&ss);
- sigaddset(&ss,SIGILL);
- sigprocmask(SIG_BLOCK,&ss,NULL);
+ if (!n) {
+     struct sigaction sa={{(void *)sigh},{{0}},SA_RESTART|SA_SIGINFO,NULL};
+
+     sigaction(SIGILL,&sa,NULL);
+     sigemptyset(&ss);
+     sigaddset(&ss,SIGILL);
+     sigprocmask(SIG_BLOCK,&ss,NULL);
+     n=1;
+ }
 #endif
 
 
