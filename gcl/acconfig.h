@@ -167,7 +167,9 @@ SGC is enabled.  */
 #define ISNORMAL(a) (fpclass(a)>=FP_NZERO)
 #else
 #include <math.h>
-#define ISNORMAL(a) (finite(a) && (a) != 0.0)
+#define ISNORMAL(a) ((sizeof (a) == sizeof (float)) ? \
+		     gcl_isnormal_float(a) : \
+		     gcl_isnormal_double(a))
 #endif
 #endif
 #endif
