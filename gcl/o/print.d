@@ -1052,7 +1052,7 @@ int level;
 			break;
 		}
 		write_str("#*");
-		for (i = 0;  i < x->bv.bv_fillp;  i++)
+		for (i = x->bv.bv_offset;  i < x->bv.bv_fillp + x->bv.bv_offset;  i++)
 			if (x->bv.bv_self[i/8] & (0200 >> i%8))
 				write_ch('1');
 			else
