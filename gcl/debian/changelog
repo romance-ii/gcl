@@ -1,3 +1,10 @@
+gcl (2.5.0.cvs20020625-44) unstable; urgency=high
+
+  * Handle second argument to last; treat dotted lists correctly in
+    ldiff et. al., tailp fix
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 20 Aug 2002 01:42:27 -0400
+
 gcl (2.5.0.cvs20020625-43) unstable; urgency=high
 
   * Larger ihs stack;fix array-total-size-limit;check negative

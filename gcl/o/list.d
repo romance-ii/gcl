@@ -152,7 +152,7 @@ object x;
 
 	if (type_of(x) == t_cons)
 		return(FALSE);
-	else if (x == Cnil)
+	else/* if (x == Cnil)*/
 		return(TRUE);
 	vs_push(x);
 	FEwrong_type_argument(sLlist, x);
@@ -786,12 +786,30 @@ object x;
 
 void
 Llast()
-{	object endp_temp;
-	check_arg(1);
+{	object endp_temp,t;
+	int n;
+
+	n=vs_top-vs_base;
+	if (n!=1 && n!=2)
+		FEerror("Expected one or two arguments, received ~D.",1,make_fixnum(n));
 	if (endp(vs_base[0]))
 		return;
-        while (type_of(vs_base[0]->c.c_cdr) == t_cons)
+	if (n==2) {
+		if (type_of(vs_base[1])!=t_fixnum || (n=fix(vs_base[1]))<1)
+			FEerror("Expected fixed integer type greater than or equal to one in second argument: ~S",
+				1,vs_base[1]);
+		vs_popp;
+	}	
+	
+	t=vs_base[0];
+        while (type_of(vs_base[0]->c.c_cdr) == t_cons && --n)
 		vs_base[0] = vs_base[0]->c.c_cdr;
+        while (type_of(vs_base[0]->c.c_cdr) == t_cons) {
+		t=t->c.c_cdr;
+		vs_base[0] = vs_base[0]->c.c_cdr;
+	}
+	vs_base[0]=t;
+
 }
 
 void
@@ -1186,7 +1204,7 @@ Ltailp()
 			vs_popp;
 			return;
 		}
-	vs_base[0] = Cnil;
+	vs_base[0] = x == vs_base[0] ? Ct : Cnil;
 	vs_popp;
 	return;
 }
