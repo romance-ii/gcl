@@ -207,6 +207,13 @@
          (if (eq (car fd) 'call-local)
              (let* ((info (make-info :sp-change t))
                     (forms (c1args args info)))
+	       ;; fun-info, CM 20031008  accumulate local function info, particularly changed-vars,
+	       ;; and pass upwards to call-local and call-global to prevent certain inlining in inline-args
+	       ;; via args-info-changed-vars		 
+	       ;;
+	       ;; FIXME find out where fun-info can be nil
+	       (when (fun-info (caddr fd))
+		 (add-info info (fun-info (caddr fd))))
                   (let ((return-type (get-local-return-type (caddr fd))))
                        (when return-type (setf (info-type info) return-type)))
                   (let ((arg-types (get-local-arg-types (caddr fd))))
@@ -265,6 +272,14 @@
         (t (let* ((info (make-info
                         :sp-change (null (get fname 'no-sp-change))))
                   (forms (c1args args info)))
+	     ;; fun-info, CM 20031008  accumulate local function info, particularly changed-vars,
+	     ;; and pass upwards to call-local and call-global to prevent certain inlining in inline-args
+	     ;; via args-info-changed-vars		 
+	     ;;
+	     ;; FIXME find out where fun-info can be nil
+	     (do ((form forms (cdr form))) ((endp form))
+	       (when (cadar form)
+		 (add-info info (cadar form))))
                 (let ((return-type (get-return-type fname)))
 		  (when return-type
 			(if (equal return-type '(*))

@@ -2,8 +2,13 @@ gclcvs (2.7.0-9) unstable; urgency=low
 
   * Fix compiler optimization bug in gcl_cmpopt.lsp -- missing parens
     around inliner for max and min
+  * collect info structures for local functions in flet and labels
+    processing (gcl_cmpflet.lsp), and pass upwards to call-local and
+    call-global (gcl_cmpeval.lsp) to fix certain inlining bugs in via
+    more proper operation of args-info-changed-vars (gcl_cmpinline.lsp,
+    inline-args, gcl_cmplet.lsp, c2let)
 
- -- Camm Maguire <camm@intech.m.enhanced.com>  Wed,  8 Oct 2003 23:09:52 +0000
+ -- Camm Maguire <camm@intech.m.enhanced.com>  Fri, 10 Oct 2003 02:39:10 +0000
 
 gclcvs (2.7.0-8) unstable; urgency=low
 

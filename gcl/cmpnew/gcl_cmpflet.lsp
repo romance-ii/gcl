@@ -42,6 +42,18 @@
            			;;; function closure, or NIL.
            cfun			;;; The cfun for the function.
            level		;;; The level of the function.
+
+	   info                 ;;; fun-info;  CM, 20031008
+	                        ;;; collect info structure when processing
+	                        ;;; function lambda list in flet and labels
+	                        ;;; and pass upwards to call-local and call-global
+	                        ;;; to determine more accurately when
+	                        ;;; args-info-changed-vars should prevent certain
+	                        ;;; inlining
+	                        ;;; examples: (defun foo (a) (flet ((%f8 nil (setq a 0)))
+	                        ;;;     (let ((v9 a)) (- (%f8) v9))))
+	                        ;;;           (defun foo (a) (flet ((%f8 nil (setq a 2)))
+                                ;;;     (* a (%f8))))
            )
 
 (defvar *funs* nil)
@@ -54,49 +66,79 @@
 (defun c1flet (args &aux body ss ts is other-decl info
                          (defs1 nil) (local-funs nil) (closures nil))
   (when (endp args) (too-few-args 'flet 1 0))
+
   (let ((*funs* *funs*))
-       (dolist** (def (car args))
-         (cmpck (or (endp def)
-                    (not (symbolp (car def)))
-                    (endp (cdr def)))
-                "The function definition ~s is illegal." def)
-         (let ((fun (make-fun :name (car def) :ref nil :ref-ccb nil)))
-              (push fun *funs*)
-              (push (list fun (cdr def)) defs1)))
+    (dolist** (def (car args))
+	      (cmpck (or (endp def)
+			 (not (symbolp (car def)))
+			 (endp (cdr def)))
+		     "The function definition ~s is illegal." def)
+	      (let ((fun (make-fun :name (car def) :ref nil :ref-ccb nil :info (make-info :sp-change t))))
+		(push fun *funs*)
+		(push (list fun (cdr def)) defs1)))
 
-       (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
+    (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
+    
+    (let ((*vars* *vars*))
+      (c1add-globals ss)
+      (check-vdecl nil ts is)
+      (setq body (c1decl-body other-decl body)))
 
-       (let ((*vars* *vars*))
-            (c1add-globals ss)
-            (check-vdecl nil ts is)
-            (setq body (c1decl-body other-decl body)))
-       (setq info (copy-info (cadr body))))
-
+    (setq info (copy-info (cadr body))))
+  
   (dolist* (def (reverse defs1))
-    (when (fun-ref-ccb (car def))
-          (let ((*vars* (cons 'cb *vars*))
-                (*funs* (cons 'cb *funs*))
-                (*blocks* (cons 'cb *blocks*))
-                (*tags* (cons 'cb *tags*)))
+	   (when (fun-ref-ccb (car def))
+	     (let ((*vars* (cons 'cb *vars*))
+		   (*funs* (cons 'cb *funs*))
+		   (*blocks* (cons 'cb *blocks*))
+		   (*tags* (cons 'cb *tags*)))
                (let ((lam (c1lambda-expr (cadr def) (fun-name (car def)))))
-                    (add-info info (cadr lam))
-                    (push (list (car def) lam) closures))))
+		 (add-info info (cadr lam))
+		 ;; fun-info, CM 20031008  accumulate local function info, particularly changed-vars,
+		 ;; and pass upwards to call-local and call-global to prevent certain inlining in inline-args
+		 ;; via args-info-changed-vars		 
+		 (add-info (fun-info (car def)) (cadr lam))
+		 (push (list (car def) lam) closures))))
 
-    (when (fun-ref (car def))
-          (let ((*blocks* (cons 'lb *blocks*))
-                (*tags* (cons 'lb *tags*))
-                (*vars* (cons 'lb *vars*)))
+	   (when (fun-ref (car def))
+	     (let ((*blocks* (cons 'lb *blocks*))
+		   (*tags* (cons 'lb *tags*))
+		   (*vars* (cons 'lb *vars*)))
                (let ((lam (c1lambda-expr (cadr def) (fun-name (car def)))))
-                    (add-info info (cadr lam))
-                    (push (list (car def) lam) local-funs))))
+		 (add-info info (cadr lam))
+		 ;; fun-info, CM 20031008  accumulate local function info, particularly changed-vars,
+		 ;; and pass upwards to call-local and call-global to prevent certain inlining in inline-args
+		 ;; via args-info-changed-vars		 
+		 (add-info (fun-info (car def)) (cadr lam))
+		 (push (list (car def) lam) local-funs))))
 
-    (when (or (fun-ref (car def)) (fun-ref-ccb (car def)))
-          (setf (fun-cfun (car def)) (next-cfun)))
-    )
+	   (when (or (fun-ref (car def)) (fun-ref-ccb (car def)))
+	     (setf (fun-cfun (car def)) (next-cfun))))
+
+  ;; fun-info, CM 20031008  accumulate local function info, particularly changed-vars,
+  ;; and pass upwards to call-local and call-global to prevent certain inlining in inline-args
+  ;; via args-info-changed-vars		 
+  ;;
+  ;; walk body a second time to incorporate changed variable info from local function
+  ;; lambda lists
+
+  (let ((*funs* *funs*))
+    (dolist* (def defs1)
+	     (push (car def) *funs*))
+    
+    (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
+    
+    (let ((*vars* *vars*))
+      (c1add-globals ss)
+      (check-vdecl nil ts is)
+      (setq body (c1decl-body other-decl body)))
+
+    ;; Apparently this is not scricttly necessary, just changes to body
+    (add-info info (cadr body)))
+  
   (if (or local-funs closures)
       (list 'flet info (reverse local-funs) (reverse closures) body)
-      body)
-  )
+      body))
 
 (defun c2flet (local-funs closures body
                &aux (*vs* *vs*) (*clink* *clink*) (*ccb-vs* *ccb-vs*))
@@ -141,7 +183,7 @@
     (cmpck (member (car def) fnames)
            "The function ~s was already defined." (car def))
     (push (car def) fnames)
-    (let ((fun (make-fun :name (car def) :ref nil :ref-ccb nil)))
+    (let ((fun (make-fun :name (car def) :ref nil :ref-ccb nil :info (make-info :sp-change t))))
          (push fun *funs*)
          (push (list fun nil nil (cdr def)) defs1)))
 
@@ -169,6 +211,10 @@
                (*vars* (cons 'lb *vars*)))
               (let ((lam (c1lambda-expr (cadddr def) (fun-name (car def)))))
                    (add-info info (cadr lam))
+		   ;; fun-info, CM 20031008  accumulate local function info, particularly changed-vars,
+		   ;; and pass upwards to call-local and call-global to prevent certain inlining in inline-args
+		   ;; via args-info-changed-vars		 
+		   (add-info (fun-info (car def)) (cadr lam))
                    (push (list (car def) lam) local-funs)))))
      (unless processed-flag (return-from local-process))
      )) ;;; end local process
@@ -187,6 +233,10 @@
                (*tags* (cons 'cb *tags*)))
               (let ((lam (c1lambda-expr (cadddr def) (fun-name (car def)))))
                    (add-info info (cadr lam))
+		   ;; fun-info, CM 20031008  accumulate local function info, particularly changed-vars,
+		   ;; and pass upwards to call-local and call-global to prevent certain inlining in inline-args
+		   ;; via args-info-changed-vars		 
+		   (add-info (fun-info (car def)) (cadr lam))
                    (push (list (car def) lam) closures))))
        )
      (unless processed-flag (return-from closure-process))
@@ -196,10 +246,22 @@
     (when (or (fun-ref (car def)) (fun-ref-ccb (car def)))
           (setf (fun-cfun (car def)) (next-cfun))))
 
+  ;; fun-info, CM 20031008  accumulate local function info, particularly changed-vars,
+  ;; and pass upwards to call-local and call-global to prevent certain inlining in inline-args
+  ;; via args-info-changed-vars		 
+  ;;
+  ;; walk body a second time to gather info in labels lambda lists
+
+  (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
+  (let ((*vars* *vars*))
+    (c1add-globals ss)
+    (check-vdecl nil ts is)
+    (setq body (c1decl-body other-decl body)))
+  (add-info info (cadr body))
+
   (if (or local-funs closures)
       (list 'labels info (reverse local-funs) (reverse closures) body)
-      body)
-  )
+      body))
 
 (defun c2labels (local-funs closures body &aux (*vs* *vs*) (*clink* *clink*))
 
