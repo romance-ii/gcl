@@ -44,8 +44,9 @@ gclcvs (2.7.0-37) unstable; urgency=low
   * Fix :q, package error triggering in defpackage, defpackage symbol
     finding logic (thanks Peter Wood)
   * Reenable run-process on Linux
+  * Remove debugging break from gcl_cmpspecial.lsp
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  7 Mar 2005 23:25:21 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 29 Mar 2005 22:31:07 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 

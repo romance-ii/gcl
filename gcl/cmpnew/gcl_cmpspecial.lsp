@@ -109,7 +109,7 @@
                     (*tags* (cons 'cb *tags*)))
                    (setq fun (c1lambda-expr (cdr fun)))
                    (list 'function (cadr fun) fun)))
-             (t (break "bar")(cmperr "The function ~s is illegal." fun))))
+             (t (cmperr "The function ~s is illegal." fun))))
   )
 
 (defun c2function (funob)
