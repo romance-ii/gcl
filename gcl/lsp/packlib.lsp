@@ -78,7 +78,7 @@
 			 (if (or (eq ,q ,p) 
 				 (eq :inherited (car (last (multiple-value-list 
 							    (find-symbol (symbol-name ,var) ,p))))))
-			     (progn ,@body))
+			     (tagbody ,@body))
 			 (setq ,l (cdr ,l))
 			 (go ,loop)
 			 ,break))))))
@@ -106,7 +106,7 @@
 (defmacro do-all-symbols((var &optional (result-form nil)) . body)
   `(dolist (.v (list-all-packages) ,result-form)
 	   (do-symbols (,var .v)
-		       ,@ body)))
+		       (tagbody ,@ body))))
 	   
 
 (defun substringp (sub str)
