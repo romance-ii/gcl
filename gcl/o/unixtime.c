@@ -51,6 +51,8 @@ which is usually 60 maybe 100 or something else. */
 #if defined __MINGW32__ || !defined NO_SYSTEM_TIME_ZONE
 
 #  ifdef __MINGW32__
+#    include <windows.h>
+#    include <time.h>
 #    include <sys/timeb.h>
 
 static struct timeb t0;
@@ -141,8 +143,13 @@ Lsleep(void)
 	if (type_of(z) == t_fixnum)
 		usleep(fix(z));
 	else
+            /* What is this for? -- MJT */
 		for(;;)
+#ifdef __MINGW32__
+			Sleep ( 10000 );
+#else                    
 			sleep(1000);
+#endif        
 	vs_top = vs_base;
 	vs_push(Cnil);
 }
@@ -225,7 +232,6 @@ init_unixtime(void)
 }
 
 #ifdef __MINGW32__
-#include <windows.h>
 int usleep ( unsigned int microseconds )
 {
     unsigned int milliseconds = microseconds / 1000;

@@ -79,6 +79,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <elf.h>
 #endif
 
+extern void tcpCloseSocket (int fd);
+
 object terminal_io;
 
 object Vverbose;

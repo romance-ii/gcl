@@ -130,7 +130,7 @@ littleXwin.o:
 	${CC} ${CFLAGS} $(DEFS) ${X11_INCLUDE} -c  littleXwin.o
 
 character.o: $(HFILES)
-file.o:	$(HFILES)
+file.o:	$(HFILES) file.d
 hash.o: $(HFILES) ${MP}
 list.o:	$(HFILES)
 package.o: $(HFILES)
@@ -189,7 +189,7 @@ unixfsys.o: $(HFILES)
 unixint.o: $(HFILES)
 unixsave.o: $(HFILES) $(UNIX_SAVE_DEP)
 unixsys.o: $(HFILES)
-unixtime.o: $(HFILES)
+unixtime.o: $(HFILES) unixtime.c
 funlink.o: $(HFILES)
 fat_string.o: $(HFILES)
 fasdump.o: $(HFILES)

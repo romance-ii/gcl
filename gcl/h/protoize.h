@@ -1013,7 +1013,11 @@ extern void unexec (
 /* usig.c:182:OF */ extern void install_default_signals (void); /* () */
 /* usig2.c:142:OF */ extern void init_safety (void); /* () */
 /* usig2.c:158:OF */ extern object sSsignal_safety_required (int signo, int safety); /* (signo, safety) int signo; int safety; */
+#ifdef __MINGW32__
+/* usig2.c:167:OF */ extern void main_signal_handler (int signo); /* (signo) int signo */
+#else
 /* usig2.c:167:OF */ extern void main_signal_handler (int signo, int a, int b); /* (signo, a, b) int signo; int a; int b; */
+#endif
 /* usig2.c:194:OF */ extern void invoke_handler (int signo, int allowed); /* (signo, allowed) int signo; int allowed; */
 /* usig2.c:328:OF */ extern object MakeCons (object a, object b); /* (a, b) object a; object b; */
 /* usig2.c:375:OF */ extern void raise_pending_signals (int cond); /* (cond) int cond; */
