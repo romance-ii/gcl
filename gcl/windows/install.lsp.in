@@ -79,6 +79,7 @@
 			(kill-double-forwards *system-directory*)
 			*lib-directory* ))
 
+; Now make a batch file to launch GCL
 (setq *dos-system-directory* (kill-double-backs (kill-forwards  *system-directory*)))
 
 (setq *dos-root-directory* 
