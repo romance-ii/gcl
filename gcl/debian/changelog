@@ -12,8 +12,9 @@ gclcvs (2.7.0-36) unstable; urgency=low
   * Fix bignum2 function broken recently by accident
   * Use side-effect flag in optimizer to prevent exponential growth in C
     expressions on nesting certain optimized forms
+  * Old pathname-name case behavior in CLtL1
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 30 Nov 2004 03:50:31 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  1 Dec 2004 17:41:23 +0000
 
 gclcvs (2.7.0-35) unstable; urgency=high
 

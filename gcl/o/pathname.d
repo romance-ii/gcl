@@ -267,6 +267,9 @@ pathname_case_word(word, casekey)
 object word, casekey;
 {
 	object x=word;
+
+#ifdef ANSI_COMMON_LISP
+
 	int seen_lower=0;
 	int seen_upper=0;
 	int i;
@@ -289,11 +292,7 @@ object word, casekey;
 		}
 	    } else
 	    if (casekey == sKdowncase) {
-#ifdef ANSI_COMMON_LISP
 		if ((seen_lower != seen_upper) || pathname_resolve(pathKansi))
-#else
-		if (seen_lower != seen_upper) 
-#endif
 		{   x=copy_simple_string(word);
 		    for (i=0; i<word->st.st_fillp; i++)
 			if (isupper(word->st.st_self[i]))
@@ -301,7 +300,8 @@ object word, casekey;
 	    	}
 	    }
 	}
-	
+#endif	
+
 	vs_push(x); /* make-pathname will vs_reset later */
 	return(x);
 }
