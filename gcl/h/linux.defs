@@ -34,9 +34,14 @@ LDCC=${CC}
 # Enable the fastloading mechanism which does not use ld -A
 # requires c/rel_.. machine dependent code.
 
-ifeq ($(findstring libbfd,$(LIBS)),) 
 RSYM	= rsym
+ifneq ($(findstring bfd,$(LIBS)),) 
+RSYM    = 
 endif
+#ifneq ($(findstring -ldl,$(LIBS)),) 
+#RSYM    = 
+#endif
+
 SFASL	= $(ODIR)/sfasl.o
 
 

@@ -47,6 +47,8 @@ void
 init_init()
 {
 
+  build_symbol_table();
+
   lsp_init("../lsp/export.lsp");
 
   ar_init(defmacro);
@@ -125,7 +127,7 @@ init_system(object no_init)
   ar_check_init(cmpvs,no_init);
   ar_check_init(cmpwt,no_init);
 
-  build_symbol_table();
+/*    build_symbol_table(); */
 	     
   sLApackageA->s.s_dbind = user_package;
     user_init();

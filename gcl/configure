@@ -1573,7 +1573,7 @@ else
 
 	cp $GMPDIR/gmp.h h/gmp.h
 	MP_INCLUDE=h/gmp.h
-	MPFILES=$GMPDIR/libgmp.a
+	MPFILES=gmp_all
 
 fi
 

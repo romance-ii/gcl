@@ -43,9 +43,9 @@ RELOC=dlopen
 endif
 
 GMP=--enable-dynsysgmp
-ifeq ($(ARCHT),m68k)
-GMP=
-endif
+#ifeq ($(ARCHT),m68k)
+#GMP=
+#endif
 
 configure: configure-stamp
 configure-stamp:

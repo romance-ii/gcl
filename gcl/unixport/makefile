@@ -27,6 +27,10 @@ LIBS1= $(LIBS) $(LIBSYSTEM) $(GCLIB)
 OD=$(ODIR)/
 NEW_INIT=$(OD)new_init.o
 
+ifeq ($(MPFILES),gmp_all)
+	MPFILES:=$(shell cd .. && echo $(GMPDIR)/*.o $(GMPDIR)/*/*.o)
+endif
+
 
 OBJS	=  $(OD)main.o $(OD)alloc.o $(OD)gbc.o \
 	$(OD)bitop.o $(OD)typespec.o $(OD)eval.o \
@@ -126,7 +130,8 @@ saved_kcn:
 FOR_RAW= $(FIRST_FILE) $(OBJS) $(LSPOBJS) $(CMPOBJS) $(SYSTEM_OBJS) sys_gcl.o $(LAST_FILE)
 
 libgcl.a: $(FOR_RAW)
-	ar r $@ $^
+	rm -rf $@
+	ar rs $@ $^
 
 raw_$(SYSTEM):  libgcl.a
 	$(CC)  -o raw_$(SYSTEM)$(EXE) -L. -lgcl ${LIBC} $(LIBS1)

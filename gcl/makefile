@@ -107,6 +107,10 @@ $(MPDIR)/libmport.a:
 $(GMPDIR)/libgmp.a: $(GMPDIR)/Makefile
 	cd $(GMPDIR) && make && rm -f libgmp.a &&  ar qc libgmp.a *.o */*.o
 
+gmp_all: $(GMPDIR)/Makefile
+	cd $(GMPDIR) && make 
+	touch $@
+
 $(GMPDIR)/mpn/mul_n.o $(GMPDIR)/mpn/lshift.o $(GMPDIR)/mpn/rshift.o: $(GMPDIR)/Makefile
 	cd $(@D) && make $(@F)
 
@@ -181,7 +185,7 @@ clean:
 	rm -f foo.tcl config.log makedefs makedefsafter config.cache config.status makedefc
 	rm -f h/config.h h/gclincl.h h/cmpinclude.h h/gmp.h
 	rm -rf $(GMPDIR)/.deps $(GMPDIR)/libgmp.a
-	rm -f xbin/gcl foo foo.c bin/gclm.bat
+	rm -f xbin/gcl foo foo.c bin/gclm.bat gmp_all
 	rm -f h/*-linux.defs h/bfd.h h/bfdlink.h h/ansidecl.h h/symcat.h
 	-cd binutils/bfd && make distclean
 	-cd binutils/libiberty && make distclean
