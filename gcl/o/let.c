@@ -222,9 +222,6 @@ Fflet(object args)
 		    type_of(MMcar(def)) != t_symbol)
 		  /* FIXME need t read environment for setf functions
 		     && !setf_fn_form(MMcar(def)) */
-		     (type_of(MMcar(def))!=t_cons || type_of(MMcadar(def))!=t_symbol
-		      || MMcadar(def)==Cnil 
-		      || !endp(MMcddar(def)))))
 			FEerror("~S~%\
 is an illegal function definition in FLET.",
 				1, def);
