@@ -43,8 +43,9 @@ gclcvs (2.7.0-37) unstable; urgency=low
     when no function is defined
   * Fix :q, package error triggering in defpackage, defpackage symbol
     finding logic (thanks Peter Wood)
+  * Reenable run-process on Linux
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  7 Mar 2005 18:31:33 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  7 Mar 2005 23:25:21 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 

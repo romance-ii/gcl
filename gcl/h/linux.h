@@ -93,7 +93,7 @@ do {static struct sigaction action; \
     result = (current_mask & sigmask(m) ? signal_mask(m) : 0) \
       | (current_mask & sigmask(n) ? signal_mask(n) : 0);
 
-#undef RUN_PROCESS
+#define RUN_PROCESS
 
 #define	IEEEFLOAT
        

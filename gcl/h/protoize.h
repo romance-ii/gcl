@@ -601,6 +601,9 @@ void
 gcl_init_symbol_function(void);
 
 void
+gcl_init_socket_function(void);
+
+void
 gcl_init_hash(void);
 
 void
