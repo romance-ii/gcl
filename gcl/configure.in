@@ -213,8 +213,7 @@ AC_CHECK_HEADER(bfd.h,
 	AC_CHECK_LIB(bfd,bfd_init,
 		AC_DEFINE(HAVE_LIBBFD)
 		echo "int main() {return 0;}" >foo.c
-		$GCC -o foo foo.c -lbfd -liberty
-		MP=`ldd foo | grep bfd | awk '{print $3}'`
+		MP=`$GCC -t -o foo foo.c -lbfd -liberty 2>&1 |grep '^\-lbfd' | awk '{print $2}' | tr -d '()'`
 		MPD=`dirname $MP` 
 		LIBS="$LIBS  $MPD/libbfd.a $MPD/libiberty.a"
 		,,-liberty))
