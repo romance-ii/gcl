@@ -210,6 +210,18 @@ extern char *GCLExeName ( void );
    (a_)=GCLExeName();\
 } while(0)
 
+/* Needed if optimiser moves object initialisation code around. */
+#define FIND_INIT \
+{ if (*ptr==0 && (NTYPE(sym) == TEXT_NSCN) && sym->n_value ) \
+  { char tem [9]; \
+    char *str=SYM_NAME(sym); \
+     dprintf(find init: %s ,str); \
+  if (str[1]=='i'    && str[2]=='n'  && str[3]=='i' && str[4]== 't' \
+      && str[5]=='_' && str[0]== '_' &&  str[strlen(str)-1] !='X')  \
+	*ptr=  sym->n_value ; \
+   else {/* printf("The first data symbol was not the init");*/}  \
+ }}
+
 /* Begin for cmpinclude */
 
 

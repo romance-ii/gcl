@@ -408,7 +408,14 @@ fi
 
 TO3FLAGS=""
 TO2FLAGS=""
-TFPFLAG="-fomit-frame-pointer"
+
+case "$use" in
+  *mingw*)
+	TFPFLAG="-fomit-frame-pointer";;
+  *)
+	TFPFLAG="-fomit-frame-pointer";;
+esac
+
 if test "$enable_gprof" = "yes" ; then
 	TCFLAGS="$TCFLAGS -pg"
 	TLIBS="$TLIBS -pg"
@@ -423,7 +430,7 @@ if test "$enable_debug" = "yes" ; then
 else
 	case "$use" in
 	  *mingw*)
-		TO3FLAGS="-O $TFPFLAG";;
+		TO3FLAGS="-O3 $TFPFLAG";;
 	  *)
 		TO3FLAGS="-O3 $TFPFLAG";;
 	esac

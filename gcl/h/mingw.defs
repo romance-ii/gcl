@@ -4,8 +4,6 @@
 # using Mingw32 compiler tools. (h/mingw.defs)
 #
 
-SHELL        = sh
-
 LIBS	    += -lwsock32
 LIBC 	     =
 
