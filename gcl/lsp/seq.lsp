@@ -46,18 +46,22 @@
               (t
                (setq type (normalize-type type))
                (when (subtypep (car type) 'list)
-		 (if (and (eq 'null (car type)) (not (equal size 0)))
-		     (error "Cannot make 'null sequence of size ~S." size))
+		 (if (or (and (eq 'null (car type)) (not (equal size 0)))
+			 (and (eq 'cons (car type)) (equal size 0)))
+		     (specific-error :wrong-type-argument "~S is not of type ~S." 
+				     type (format nil "list (size ~S)" size)))
                      (return-from make-sequence
                       (if iesp
                           (make-list size :initial-element initial-element)
                           (make-list size))))
                (unless (or (eq (car type) 'array)
 			   (eq (car type) 'simple-array))
-                       (error "~S is not a sequence type." type))
+		 (specific-error :wrong-type-argument "~S is not of type ~S." 
+				 type "sequence"))
                (unless (or (not (si::fixnump (car (caddr type))))
 			   (equal (car (caddr type)) size))
-                       (error "Cannot make-sequence of type ~S and size ~S." type size))
+		 (specific-error :wrong-type-argument "~S is not of type ~S." 
+				 type (format nil "~S (size ~S)" type size)))
                (or (cadr type) t))))
   (setq element-type (si::best-array-element-type element-type))
   (setq sequence (si:make-vector element-type size nil nil nil nil nil))

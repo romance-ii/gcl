@@ -323,6 +323,7 @@ EXTER object  sSAindent_formatted_outputA ;
 EXTER  object   fSsetenv (); 
 EXTER  object   fLdelete_file  (); 
 EXTER  object   fLerror  (); 
+EXTER  object   fLspecific_error  (); 
 EXTER  object   fLcerror  (); 
 EXTER  object   fSihs_top  (); 
 EXTER  object   fSihs_fun  (); 

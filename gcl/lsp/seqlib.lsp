@@ -225,6 +225,7 @@
                              (list '&aux '(l (length sequence)))
                              nil))
 	      ,@(if everywherep '((declare (fixnum l))))
+	      (if (eq key nil) (setq key #'identity))
        (with-start-end start end sequence
 	  (let ,@(if countp
 		     '(((count (if (null count)
@@ -249,6 +250,7 @@
                       start end
                       ,@(if countp '(count))
                       (key #'identity))
+		(if (eq key nil) (setq key #'identity))
            (,f ,@args predicate sequence
                :from-end from-end
                :test #'funcall
@@ -261,6 +263,7 @@
                  &key from-end start end
                       ,@(if countp '(count))
                       (key #'identity))
+		(if (eq key nil) (setq key #'identity))
            (,f ,@args predicate sequence
                :from-end from-end
                :test-not #'funcall

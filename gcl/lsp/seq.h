@@ -11,8 +11,8 @@ static object VK1defaults[1]={(void *)-1};
 static struct { short n,allow_other_keys;object *defaults;
 	 KEYTYPE keys[1];} LI1key={1,0,VK1defaults,{(void *)1}};
 #define VMB1 register object *base=vs_top; object Vcs[4];
-#define VMS1  register object *sup=vs_top+7;vs_top=sup;
-#define VMV1 vs_reserve(7);
+#define VMS1  register object *sup=vs_top+8;vs_top=sup;
+#define VMV1 vs_reserve(8);
 #define VMR1(VMT1) vs_top=base ; return(VMT1);
 static object LI2();
 #define VMB2 register object *base=vs_top; object  V31 ,V24 ,V20; object Vcs[2];
@@ -50,9 +50,9 @@ static object LI7();
 #define VM4 2
 #define VM3 2
 #define VM2 2
-#define VM1 7
-static char * VVi[23]={
-#define Cdata VV[22]
+#define VM1 8
+static char * VVi[29]={
+#define Cdata VV[28]
 (char *)(LI1),
 (char *)(&LI1key),
 (char *)(LI2),
@@ -63,15 +63,17 @@ static char * VVi[23]={
 (char *)(LI7)
 };
 #define VV ((object *)VVi)
-static void LnkT21() ;
-static void (*Lnk21)() = LnkT21;
-static void LnkT20() ;
-static void (*Lnk20)() = LnkT20;
-static object  LnkTLI19() ;
-static object  (*LnkLI19)() = LnkTLI19;
-static object  LnkTLI18() ;
-static object  (*LnkLI18)() = LnkTLI18;
-static void LnkT17() ;
-static void (*Lnk17)() = LnkT17;
-static object  LnkTLI16() ;
-static object  (*LnkLI16)() = LnkTLI16;
+static void LnkT27() ;
+static void (*Lnk27)() = LnkT27;
+static void LnkT26() ;
+static void (*Lnk26)() = LnkT26;
+static object  LnkTLI25() ;
+static object  (*LnkLI25)() = LnkTLI25;
+static object  LnkTLI24() ;
+static object  (*LnkLI24)() = LnkTLI24;
+static void LnkT23() ;
+static void (*Lnk23)() = LnkT23;
+static void LnkT22() ;
+static void (*Lnk22)() = LnkT22;
+static object  LnkTLI21() ;
+static object  (*LnkLI21)() = LnkTLI21;

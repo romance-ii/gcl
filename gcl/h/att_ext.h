@@ -221,6 +221,7 @@ object lex_block_sch();
 EXTER object sKtest;
 EXTER object sKtest_not;
 EXTER object sKkey;
+EXTER object sKrev;
 object car();
 object cdr();
 object kar();

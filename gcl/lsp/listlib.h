@@ -4,10 +4,12 @@ static object LI2();
 static object LI3();
 static object LI4();
 static object LI5();
-static object LI6();
+static void L6();
 static object LI7();
-static object LI8();
+static void L8();
 static object LI9();
+static object LI10();
+static object LI11();
 static object LI1();
 #define VMB1 register object *base=vs_top; object  V13 ,V6; object Vcs[3];
 #define VMS1  register object *sup=vs_top+3;vs_top=sup;
@@ -33,57 +35,65 @@ static object LI5();
 #define VMS5  register object *sup=vs_top+3;vs_top=sup;
 #define VMV5 vs_check;
 #define VMR5(VMT5) vs_top=base ; return(VMT5);
-static object LI6();
-#define VMB6 register object *base=vs_top; object  V62; object Vcs[3];
-#define VMS6  register object *sup=vs_top+3;vs_top=sup;
-#define VMV6 vs_check;
-#define VMR6(VMT6) vs_top=base ; return(VMT6);
+#define VC6
 static object LI7();
-static struct { short n,allow_other_keys;object *defaults;
-	 KEYTYPE keys[3];} LI7key={3,0,Cstd_key_defaults,{(void *)9,(void *)10,(void *)11}};
-#define VMB7 register object *base=vs_top; object  V79 ,V77 ,V76; object Vcs[9];
-#define VMS7  register object *sup=vs_top+2;vs_top=sup;
+#define VMB7 register object *base=vs_top; object  V68; object Vcs[3];
+#define VMS7  register object *sup=vs_top+3;vs_top=sup;
 #define VMV7 vs_check;
 #define VMR7(VMT7) vs_top=base ; return(VMT7);
-static object LI8();
-#define VMB8 register object *base=vs_top; object  V93 ,V87; object Vcs[3];
-#define VMS8  register object *sup=vs_top+3;vs_top=sup;
-#define VMV8 vs_check;
-#define VMR8(VMT8) vs_top=base ; return(VMT8);
+#define VC8
 static object LI9();
 static struct { short n,allow_other_keys;object *defaults;
-	 KEYTYPE keys[3];} LI9key={3,0,Cstd_key_defaults,{(void *)9,(void *)10,(void *)11}};
-#define VMB9 register object *base=vs_top; object  V107; object Vcs[9];
-#define VMS9  register object *sup=vs_top+3;vs_top=sup;
+	 KEYTYPE keys[3];} LI9key={3,0,Cstd_key_defaults,{(void *)12,(void *)13,(void *)14}};
+#define VMB9 register object *base=vs_top; object  V92 ,V90 ,V89; object Vcs[9];
+#define VMS9  register object *sup=vs_top+2;vs_top=sup;
 #define VMV9 vs_check;
 #define VMR9(VMT9) vs_top=base ; return(VMT9);
-#define VM9 3
-#define VM8 3
-#define VM7 2
-#define VM6 3
+static object LI10();
+#define VMB10 register object *base=vs_top; object  V106 ,V100; object Vcs[3];
+#define VMS10  register object *sup=vs_top+3;vs_top=sup;
+#define VMV10 vs_check;
+#define VMR10(VMT10) vs_top=base ; return(VMT10);
+static object LI11();
+static struct { short n,allow_other_keys;object *defaults;
+	 KEYTYPE keys[3];} LI11key={3,0,Cstd_key_defaults,{(void *)12,(void *)13,(void *)14}};
+#define VMB11 register object *base=vs_top; object  V120; object Vcs[9];
+#define VMS11  register object *sup=vs_top+3;vs_top=sup;
+#define VMV11 vs_check;
+#define VMR11(VMT11) vs_top=base ; return(VMT11);
+#define VM11 3
+#define VM10 3
+#define VM9 2
+#define VM8 8
+#define VM7 3
+#define VM6 8
 #define VM5 3
 #define VM4 3
 #define VM3 3
 #define VM2 3
 #define VM1 3
-static char * VVi[15]={
-#define Cdata VV[14]
+static char * VVi[19]={
+#define Cdata VV[18]
 (char *)(LI1),
 (char *)(LI2),
 (char *)(LI3),
 (char *)(LI4),
 (char *)(LI5),
-(char *)(LI6),
+(char *)(L6),
 (char *)(LI7),
-(char *)(&LI7key),
-(char *)(LI8),
+(char *)(L8),
 (char *)(LI9),
-(char *)(&LI9key)
+(char *)(&LI9key),
+(char *)(LI10),
+(char *)(LI11),
+(char *)(&LI11key)
 };
 #define VV ((object *)VVi)
-static void LnkT13() ;
-static void (*Lnk13)() = LnkT13;
-static void LnkT12() ;
-static void (*Lnk12)() = LnkT12;
-static void LnkT8() ;
-static void (*Lnk8)() = LnkT8;
+static void LnkT17() ;
+static void (*Lnk17)() = LnkT17;
+static void LnkT16() ;
+static void (*Lnk16)() = LnkT16;
+static void LnkT15() ;
+static void (*Lnk15)() = LnkT15;
+static void LnkT11() ;
+static void (*Lnk11)() = LnkT11;

@@ -172,6 +172,27 @@ va_dcl
 /*  		       &ap)); */
 }
 
+DEFUNO("SPECIFIC-ERROR",object,fLspecific_error,LISP
+   ,1,F_ARG_LIMIT,NONE,OO,OO,OO,OO,Lspecific_error,"")(error_name,fmt_string,va_alist)
+object error_name,fmt_string;
+va_dcl
+{ int n = VFUN_NARGS,i=0;
+  object b[F_ARG_LIMIT];
+  va_list ap;
+
+  b[0]=error_name;
+  b[1]=Cnil;
+  b[2]=ihs_top_function_name(ihs_top-1);
+  b[3]=null_string;
+  b[4]=fmt_string;
+  i=4;
+  va_start(ap);
+  while (--n)
+    b[++i]=va_arg(ap,object);
+  va_end(ap);
+  RETURN1(IapplyVector(sSuniversal_error_handler,++i,b));
+}
+
 
 DEFUNO("CERROR",object,fLcerror,LISP
    ,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,Lcerror,"")

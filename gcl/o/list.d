@@ -26,6 +26,10 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 
+static int reverse_comparison;
+
+#define TARG1(a,b) (reverse_comparison ? (b) : (a))
+#define TARG2(a,b) (reverse_comparison ? (a) : (b))
 
 object sKinitial_element;
 
@@ -66,7 +70,9 @@ object x;
 	object b;
 
 	vs_push((*kf)(x));
-	b = ifuncall2(test_function, item_compared, vs_head);
+	b = ifuncall2(test_function, 
+		TARG1(item_compared, vs_head),
+		TARG2(item_compared, vs_head));
 	vs_popp;
 	return(b != Cnil);
 }
@@ -78,7 +84,9 @@ object x;
 	object b;
 
 	vs_push((*kf)(x));
-	b = ifuncall2(test_function, item_compared, vs_head);
+	b = ifuncall2(test_function, 
+		TARG1(item_compared, vs_head),
+		TARG2(item_compared, vs_head));
 	vs_popp;
 	return(b == Cnil);
 }
@@ -1164,12 +1172,14 @@ check_alist(alist)
 
 PREDICATE(Lmember, Lmember_if, Lmember_if_not, 2)
 
-@(defun member1 (item list &key test test_not key)
+@(defun member1 (item list &key test test_not key rev)
 	saveTEST;
 @
 	protectTEST;
 	if (key != Cnil)
 		item = ifuncall1(key, item);
+	if (rev != Cnil)
+		reverse_comparison=1;
 	setupTEST(item, test, test_not, key);
 	while (!endp(list)) {
 		if (TEST(list->c.c_car))
@@ -1177,6 +1187,7 @@ PREDICATE(Lmember, Lmember_if, Lmember_if_not, 2)
 		list = list->c.c_cdr;
 	}
 	restoreTEST;
+	reverse_comparison=0;
 	@(return list)
 @)
 
@@ -1340,6 +1351,7 @@ init_list_function()
 	sKtest = make_keyword("TEST");
 	sKtest_not = make_keyword("TEST-NOT");
 	sKkey = make_keyword("KEY");
+	sKrev = make_keyword("REV");
 
 	sKinitial_element = make_keyword("INITIAL-ELEMENT");
 

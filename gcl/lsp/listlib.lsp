@@ -119,6 +119,12 @@
     (or (consp x) (error "SET-DIFFERENCE not passed a list"))
     (if (not (apply #'member1 (car x) list2 rest))
         (setq ans (cons (car x) ans))))  )
+(defun set-difference-rev (list1 list2 &rest rest &aux ans)
+  (do ((x list1 (cdr x)))
+      ((null x) (return ans))
+    (or (consp x) (error "SET-DIFFERENCE not passed a list"))
+    (if (not (apply #'member1 (car x) list2 :rev t rest))
+        (setq ans (cons (car x) ans))))  )
 
 ;(defun nset-difference (list1 list2 &rest rest &key test test-not key)
 ;  (declare (ignore test test-not key))
@@ -135,6 +141,14 @@
 	(progn (if last (rplacd last x)
 		        (setq first x))
 	       (setq last x))) ) )
+(defun nset-difference-rev (list1 list2 &rest rest &aux first last)
+  (do ((x list1 (cdr x)))
+      ((null x) (if last (rplacd last nil)) (return first))
+    (or (consp x) (error "NSET-DIFFERENCE not passed a list"))
+    (if (not (apply #'member1 (car x) list2 :rev t rest))
+	(progn (if last (rplacd last x)
+		        (setq first x))
+	       (setq last x))) ) )
 
 ;(defun set-exclusive-or (list1 list2 &rest rest &key test test-not key)
 ;  (declare (ignore test test-not key))
@@ -143,7 +157,7 @@
 (defun set-exclusive-or (list1 list2 &rest rest &key test test-not key)
   (declare (ignore test test-not key))
   (nconc (apply #'set-difference list1 list2 rest)
-         (apply #'set-difference list2 list1 rest)))
+         (apply #'set-difference-rev list2 list1 rest)))
 
 ;(defun nset-exclusive-or (list1 list2 &rest rest &key test test-not key)
 ;  (declare (ignore test test-not key))
@@ -154,9 +168,9 @@
       ((null x) (if lint (rplacd lint nil))
                 (if last
 		    (progn (rplacd last
-				   (apply #'nset-difference list2 fint rest))
+				   (apply #'nset-difference-rev list2 fint rest))
 			   (return first))
-		    (return (apply #'nset-difference list2 fint rest))))
+		    (return (apply #'nset-difference-rev list2 fint rest))))
     (or (consp x) (error "NSET-EXCLUSIVE-OR not passed a list"))
     (if (apply #'member1 (car x) list2 rest)
 	(progn (if lint (rplacd lint x)
