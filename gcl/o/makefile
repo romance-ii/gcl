@@ -146,8 +146,13 @@ grab_defs: grab_defs.c
 #	join -v1 $^ | \
 #	awk '/my_plt/ {next} {printf("extern void *%s;\n",$$1);}'>$@
 
-#plt.o: plt.c void.h undef.h
-#	$(CC) -c $(CFLAGS) $(DEFS) -fno-builtin $< -o $@
+plt.h: plttest.o
+	nm $< | awk '/ U / {printf("MY_PLT(%s)\n",$$2)}' | sort | \
+		awk '{A[++k]=$$0} END {for (i=1;i<=k;i++) \
+			printf("%s%s\n",A[i],i==k ? "" : ",");}' >$@
+
+plt.o: plt.c plt.h
+	$(CC) -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO) 
 
 
 ALIB=${LIBFILES} #user_init.o ${EXTRA_LIB}
@@ -157,7 +162,7 @@ $(GCLIB): ${ALIB}
 	$(AR) gcllib.a ${ALIB}
 	${RANLIB} gcllib.a
 clean:
-	rm -f $(OBJS) ${ALIB} new_init.o  $(LAST_FILE) $(FIRST_FILE) *.a grab_defs$(EXE) *.ini tmpx foo.c cmpinclude.h new_init.c $(DECL) def undef udef.h void.h #plt.o
+	rm -f $(OBJS) ${ALIB} new_init.o  $(LAST_FILE) $(FIRST_FILE) *.a grab_defs$(EXE) *.ini tmpx foo.c cmpinclude.h new_init.c $(DECL) def undef udef.h void.h plt.h plttest.o
 
 fsavres.o: /lib/libc.a
 	ar xv /lib/libc.a fsavres.o

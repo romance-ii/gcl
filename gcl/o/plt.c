@@ -35,28 +35,7 @@ static Plt mplt[]={
 	   in sfasli.c.  FIXME -- this should be made synchronous with
 	   compiler changes; sort the list automatically.  SORT THIS
 	   LIST BY HAND FOR THE TIME BEING. */
-#ifdef _WIN32
-	MY_PLT(__setjmp),
-	MY_PLT(_getc),
-	MY_PLT(_putc),
-#else
-	MY_PLT(_IO_getc),
-	MY_PLT(_IO_putc),
-#endif
-	MY_PLT(_setjmp),
-	MY_PLT(acos),
-	MY_PLT(asin),
-	MY_PLT(atan),
-	MY_PLT(cos),
-	MY_PLT(exp),
-	MY_PLT(feof),
-	MY_PLT(log),
-#ifndef _WIN32
-	MY_PLT(setjmp),
-#endif
-	MY_PLT(sin),
-	MY_PLT(sqrt),
-	MY_PLT(tan)
+#include "plt.h"
 };
 
 object sSAplt_tableA;
