@@ -1,4 +1,4 @@
-(load "../clcs/clcs_macros.lisp")
+(load (merge-pathnames "../clcs/clcs_macros.lisp" system:*system-directory*))
 
 (in-package "CONDITIONS")
 

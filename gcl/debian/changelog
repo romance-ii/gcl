@@ -30,8 +30,10 @@ gclcvs (2.7.0-25) unstable; urgency=low
   * Allow for elf_abi.h in FreeBSD.h
   * Add envp arg to main in rsym_nt.c
   * Add README.openbsd file
+  * Fix load path of clcs_macros.lisp in myload1.lisp to reenable
+    compiler::link in the ansi build
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 13 Jun 2004 04:02:51 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 14 Jun 2004 12:47:41 -0400
 
 gclcvs (2.7.0-24) unstable; urgency=low
 
