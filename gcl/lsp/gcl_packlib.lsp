@@ -68,7 +68,7 @@
        (dolist (,q (cons ,p (package-use-list ,p)) (progn (setq ,var nil) ,result-form))
 	       (multiple-value-bind 
 		(,y ,x) (package-size ,q)
-		(declare (fixnum ,x ,y))
+		(declare ((integer 0 1048573) ,x ,y))
 		(if (not (eq ,p ,q)) (setq ,x 0))
 		(dotimes (,i (+ ,x ,y))
 			 (setq ,l (if (< ,i ,x)
@@ -186,7 +186,7 @@
 	(specific-error :too-few-arguments "Symbol type specifiers must be supplied."))
     `(let ((,p (cons t (if (atom ,plist) (list ,plist) ,plist))) (,q nil) (,l nil)
 	   (,i -1) (,x 0) (,y 0) (,dum nil) (,access nil))
-       (declare (fixnum ,x ,y))
+       (declare ((integer 0 1048573) ,x ,y))
        (flet ((,name () 
 		     (tagbody ,name
 			      (when (null (setq ,l (cdr ,l)))
