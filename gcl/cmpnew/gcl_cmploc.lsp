@@ -197,15 +197,12 @@
               (eq (car loc) 'var)
               (eq (var-kind (cadr loc)) 'FIXNUM))
          (wt "V" (var-loc (cadr loc))))
-        ((and (consp loc) (eq (car loc) 'INLINE-FIXNUM))
-         (wt "(long)")(wt-inline-loc (caddr loc) (cadddr loc)))
+        ((and (consp loc)
+	      (member (car loc)
+		      '(INLINE-FIXNUM INLINE-SHORT-FLOAT INLINE-LONG-FLOAT) :test #'eq))
+         (wt "(fixnum)")(wt-inline-loc (caddr loc) (cadddr loc)))
         ((and (consp loc) (eq (car loc) 'fixnum-value))
-         (wt "(long)")(wt (caddr loc)))
-        ((and (consp loc) (member (car loc) '(INLINE-SHORT-FLOAT
-					      INLINE-LONG-FLOAT)))
-	 (wt "((long)(")
-	 (wt-inline-loc  (caddr loc) (cadddr loc))
-	 (wt "))"))
+         (wt "(fixnum)")(wt (caddr loc)))
         (t (wt "fix(" loc ")"))))
 
 (defun wt-integer-loc (loc &optional type

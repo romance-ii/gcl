@@ -812,7 +812,6 @@
     ((string-char signed-char) "char")
     (fixnum "fixnum")
     (unsigned-char "unsigned char")
-    (unsigned-short "unsigned short")
     (signed-short "short")
     (unsigned-short "unsigned short")
     (long-float "longfloat")

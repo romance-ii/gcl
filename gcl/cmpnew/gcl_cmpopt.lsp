@@ -6,13 +6,14 @@
 ;; ( arglist result-type flags {string | function})
 
 ;; meaning of the flags slot.
-;       '((allocates-new-storage ans); might invoke gbc
-;	 (side-effect-p set)        ; no effect on arguments
-;	 (constantp)                ; always returns same result,
-;	                            ;double eval ok.
-;	 (result-type-from-args rfa); if passed args of matching
-;					;type result is of result type
-;         (is)))                     ;; extends the `integer stack'.
+;;       '((allocates-new-storage ans)          ;; might invoke gbc
+;;	 (side-effect-p set)                    ;; no effect on arguments
+;;	 (constantp)                            ;; always returns same result,
+;;	                                        ;; double eval ok.
+;;	 (result-type-from-args rfa)            ;; if passed args of matching
+;;					        ;; type result is of result type
+;;       (is)                                   ;; extends the `integer stack'.
+;;	 (result-type-from-bounded-args rfba))) ;; result bounds inferred from arg bounds
 ;    (cond ((member flag v :test 'eq)
 ;
 ;;;   valid properties are 'inline-always 'inline-safe 'inline-unsafe
@@ -252,6 +253,8 @@
 (push '((fixnum fixnum) fixnum #.(flags)"(#0)*(#1)")
    (get '* 'inline-always))
 
+(push '((fixnum fixnum) fixnum #.(flags rfba)"(#0)*(#1)")
+   (get '* 'inline-always))
 
 ;;+
 (push '((t t) t #.(flags ans)"number_plus(#0,#1)")
@@ -265,10 +268,11 @@
 (push '((short-float short-float) short-float #.(flags rfa)"(#0)+(#1)")
    (get '+ 'inline-always))
 
-
 (push '((fixnum fixnum) fixnum #.(flags)"(#0)+(#1)")
    (get '+ 'inline-always))
 
+(push '((fixnum fixnum) fixnum #.(flags rfba)"(#0)+(#1)")
+   (get '+ 'inline-always))
 
 ;;-
  (push '((t) t #.(flags ans)"number_negate(#0)")
@@ -292,6 +296,9 @@
 (push '((fixnum fixnum) fixnum #.(flags)"(#0)-(#1)")
    (get '- 'inline-always))
 (push '((fixnum) fixnum #.(flags)"-(#0)")
+   (get '- 'inline-always))
+
+(push '((fixnum fixnum) fixnum #.(flags rfba)"(#0)-(#1)")
    (get '- 'inline-always))
 
 

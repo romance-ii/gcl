@@ -37,16 +37,26 @@
 			(caddr (si:defmacro* (car def) (cadr def) (cddr def))))
 		  *funs*)))
 
+(defun cmp-macroexp-with-compiler-macros (form)
+  (let ((form (cmp-macroexpand form)))
+    (if (and (consp form) (symbolp (car form)))
+	(let ((cmf (get (car form) 'compiler-macro)))
+	  (if cmf
+	      (cmp-eval `(funcall ',cmf ',form nil))
+	    form))
+      form)))
+
 (defun recursively-cmp-macroexpand (form &optional bf &aux (*funs* *funs*))
   (if (atom form)
       form
     (let ((cf (car form)))
-      (let ((new-cdr-bf (or (and (consp bf) (if (atom (car bf)) bf
-					      (and (member (caar bf) '(flet labels macrolet) :test #'eq) 'lambda)))
+      (let ((new-cdr-bf (or (and (consp bf)
+				 (if (atom (car bf)) bf
+				   (and (member (caar bf) '(flet labels macrolet) :test #'eq) 'lambda)))
 			    (car (member cf '(let let* lambda flet labels macrolet quote)))))
 	    (new-car-bf (and (consp cf) bf (list bf)))
 	    (new-cf (if (or bf (atom cf) (eq (car cf) 'lambda))
-			cf (cmp-macroexpand cf))))
+			cf (cmp-macroexp-with-compiler-macros cf))))
 	(cons (recursively-cmp-macroexpand new-cf new-car-bf)
 	      (progn
 		(when (eq bf 'macrolet)
@@ -88,6 +98,20 @@
 (defun t-to-nil (x)
   (if (eq x t) nil x))
 
+(defun nil-to-t (x)
+  (if x x t))
+
+(defun fun-ret-type (form)
+  (cond ((symbolp form) (nil-to-t (cdr (assoc form *decls*))))
+	((integerp form) (list 'integer form form))
+	((atom form) (type-of form))
+	((eq (car form) 'quote) (type-of (cadr form)))
+	((symbolp (car form))
+	 (nil-to-t (or (result-type-from-args (car form) (mapcar #'fun-ret-type (cdr form)))
+		       (let ((proc (get (car form) 'proclaimed-return-type)))
+			 (and (symbolp proc) proc)))))
+	(t t)))
+
 (defun binding-decls (bindings body star)
   (cond ((atom bindings) nil)
 	((atom (car bindings)) (binding-decls (cdr bindings) body star))
@@ -97,19 +121,19 @@
 	   (let ((outer (and (symbolp (cadr bf)) (cdr (assoc (cadr bf) *decls*))))
 		 (inf (t-to-nil (var-is-inferred var body)))
 		 (exp (and (consp (cadr bf)) (eq (caadr bf) 'the) (cadadr bf)))
-		 (proc (and (consp (cadr bf))
-			    (symbolp (caadr bf))
-			    (t-to-nil (get (caadr bf) 'compiler::proclaimed-return-type))))
+		 (frt (and (consp (cadr bf))
+			   (symbolp (caadr bf))
+			   (t-to-nil (fun-ret-type (cadr bf)))))
 		 (dec (var-is-declared var body))
 		 (chb (var-is-changed var body))
 		 (chc (and star (var-is-changed var (cdr bindings)))))
-	     (let ((type (or exp (and (symbolp proc) proc) inf outer))
+	     (let ((type (or exp frt inf outer))
 		   (ublk (not (or dec chb chc))))
 	       (if type
 		   (progn
 		     (cmpnote "var ~S is type ~S from ~a, ~a~%"
 			      var type (cond (exp "explicit declaration")
-					     ((and (symbolp proc) proc) "proclamation")
+					     (frt "deduced function return type")
 					     (inf "argument inference")
 					     (outer "outer scope"))
 			      (cond (dec "but is already declared")

@@ -328,7 +328,7 @@
 			       (wt-loc loc))
 			      (t (setq cvar (next-cvar))
 				 (wt-nl "{" (rep-type type) "V" cvar "= ")
-				 (case type
+				 (case (promoted-c-type type)
 				   (fixnum (wt-fixnum-loc loc))
 				   (integer (wt-integer-loc loc 'inline-args))
 				   (character (wt-character-loc loc))
@@ -381,13 +381,13 @@
 		     (push (coerce-loc temp type) locs))))))))
 
 (defun coerce-loc (loc type)
-  (case type
-        (fixnum (list 'FIXNUM-LOC loc))
-	(integer (list 'integer-loc loc ))
-        (character (list 'CHARACTER-LOC loc))
-        (long-float (list 'LONG-FLOAT-LOC loc))
-        (short-float (list 'SHORT-FLOAT-LOC loc))
-        (t loc)))
+  (case (promoted-c-type type)
+    (fixnum (list 'FIXNUM-LOC loc))
+    (integer (list 'integer-loc loc ))
+    (character (list 'CHARACTER-LOC loc))
+    (long-float (list 'LONG-FLOAT-LOC loc))
+    (short-float (list 'SHORT-FLOAT-LOC loc))
+    (t loc)))
 
 (defun get-inline-loc (ii args &aux (fun (car (cdddr ii))) locs)
   ;;; Those functions that use GET-INLINE-LOC must rebind the variable *VS*.
@@ -464,7 +464,7 @@
     (t . INLINE)))
 
 (defun inline-type (type)
-  (or (cdr (assoc type *inline-types*)) 'inline))
+  (or (cdr (assoc (promoted-c-type type) *inline-types*)) 'inline))
 
 (defun get-inline-info (fname args return-type &aux x ii)
   (and  (fast-link-proclaimed-type-p fname args)

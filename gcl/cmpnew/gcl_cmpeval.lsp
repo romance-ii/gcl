@@ -113,13 +113,14 @@
   (declare (fixnum i))
   (dolist
       (v
-       '((allocates-new-storage ans); might invoke gbc
-	 (side-effect-p set)        ; no effect on arguments
-	 (constantp)                ; always returns same result,
-	                            ;double eval ok.
-	 (result-type-from-args rfa); if passed args of matching
-					;type result is of result type
-         (is)))                     ;; extends the `integer stack'.
+       '((allocates-new-storage ans)            ;; might invoke gbc
+	 (side-effect-p set)                    ;; no effect on arguments
+	 (constantp)                            ;; always returns same result,
+	                                        ;; double eval ok.
+	 (result-type-from-args rfa)            ;; if passed args of matching
+					        ;; type result is of result type
+         (is)                                   ;; extends the `integer stack'.
+	 (result-type-from-bounded-args rfba))) ;; result bounds inferred from arg bounds
     (cond ((member flag v :test 'eq)
 	   (return-from flags-pos i)))
     (setq i (+ i 1)))
@@ -203,10 +204,16 @@
 		    (b (car w) (cdr b)))
 		   ((null a) t)
 		 (unless (or  (eq (car a) (car b))
-			      (type>= (car b)(car a) ))
+			      (type>= (car b) (car a)))
 			 (return nil))))
-	  (return-from result-type-from-args (second w)))))))
-		      
+	  (return-from result-type-from-args (second w)))
+	(when (and
+	       (flag-p (third w) result-type-from-bounded-args)
+	       (= 2 (length args) (length (car w)))
+	       (type>= (caar w) (car args))
+	       (type>= (cadar w) (cadr args)))
+	  (return-from result-type-from-args (super-range f (car args) (cadr args))))))))
+
 
 ;; omitting a flag means it is set to nil.
 (defmacro flags (&rest lis &aux (i 0))
@@ -289,10 +296,9 @@
 ;     ,form)))
 
 (defmacro let-wrap (lets form)
-  (let ((decls (gensym)))
-    `(if lets
-	 (list 'let* ,lets ,form)
-     ,form)))
+  `(if lets
+       (list 'let* ,lets ,form)
+     ,form))
 
 (defun binary-nest (form env)
   (declare (ignore env))
@@ -366,6 +372,17 @@
 (si::putprop 'char/= (function logical-outer-nest) 'compiler-macro)
 
 
+(defun incr-to-plus (form env)
+  (declare (ignore env))
+  `(+ ,(cadr form) 1))
+
+(defun decr-to-minus (form env)
+  (declare (ignore env))
+  `(- ,(cadr form) 1))
+
+(si::putprop '1+ (function incr-to-plus) 'compiler-macro)
+(si::putprop '1- (function decr-to-minus) 'compiler-macro)
+
 (defun c1symbol-fun (fname args &aux fd)
   (cond ((setq fd (get fname 'c1special)) (funcall fd args))
 	((and (setq fd (get fname 'co1special))
@@ -438,7 +455,7 @@
         (t (let* ((info (make-info
                         :sp-change (null (get fname 'no-sp-change))))
                   (forms (c1args args info))) ;; info updated by args here
-                (let ((return-type (get-return-type fname)))
+	     (let ((return-type (get-return-type fname)))
 		  (when return-type
 			(if (equal return-type '(*))
 			    (setf return-type nil)
@@ -505,7 +522,7 @@
                                   ))))
 		;; some functions can have result type deduced from
 		;; arg types.
-		
+
 		(let ((tem (result-type-from-args fname
 						  (mapcar #'(lambda (x) (info-type (cadr x)))
 							  forms))))
@@ -747,7 +764,7 @@
         (list x y (list 'call-global (make-info) 'side-effects nil))
         (if (eq type t) '(t t t)
    `(t ,tftype t))))
-  
+
   (setq ix (car locs))
   (setq iy (cadr locs))
   (if *safe-compile* (wfs-error))
@@ -762,7 +779,7 @@
    ((eq val nil) (c1nil))
    ((eq val t) (c1t))
    ((si:fixnump val)
-    (list 'LOCATION (make-info :type 'fixnum)
+    (list 'LOCATION (make-info :type (list 'integer val val)) ;;FIXME -- 1024 should be small fixnum limit
           (list 'FIXNUM-VALUE (and (>= (abs val) 1024)(add-object val))
 		val)))
    ((characterp val)

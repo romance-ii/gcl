@@ -769,12 +769,12 @@
     ;;; Local entry
     (analyze-regs (cadr lambda-expr) 0)
     (t3defun-aux 't3defun-local-entry
-		 (case (caddr inline-info)
+		 (case (promoted-c-type (caddr inline-info))
 		   (fixnum 'return-fixnum)
-                         (character 'return-character)
-                         (long-float 'return-long-float)
-                         (short-float 'return-short-float)
-                         (otherwise 'return-object))
+		   (character 'return-character)
+		   (long-float 'return-long-float)
+		   (short-float 'return-short-float)
+		   (otherwise 'return-object))
 		 fname cfun lambda-expr sp inline-info
     ))
    ((vararg-p fname)
@@ -802,7 +802,7 @@
               (push (cons (car vl) (var-loc (car vl))) specials))
             (t
              (setf (var-kind (car vl))
-                   (case (car types)
+                   (case (promoted-c-type (car types))
                          (fixnum 'FIXNUM)
                          (character 'CHARACTER)
                          (long-float 'LONG-FLOAT)
@@ -1325,7 +1325,7 @@
     (wt-nl1 "{	register object *base=vs_base;")
     (when (or *safe-compile* *compiler-check-args*)
           (wt-nl "check_arg(" (length arg-types) ");"))
-    (wt-nl "base[0]=" (case return-type
+    (wt-nl "base[0]=" (case (promoted-c-type return-type)
                             (fixnum (if (zerop *space*)
                                         "CMPmake_fixnum"
                                         "make_fixnum"))
@@ -1338,7 +1338,7 @@
          (n 0 (1+ n)))
         ((endp types))
         (declare (object types) (fixnum n))
-        (wt (case (car types)
+        (wt (case (promoted-c-type (car types))
                   (fixnum "fix")
                   (character "char_code")
                   (long-float "lf")
@@ -1352,13 +1352,13 @@
     )
 
 (defun rep-type (type)
-       (case type
-             (fixnum "long ")
-	     (integer "GEN ")
-             (character "unsigned char ")
-             (short-float "float ")
-             (long-float "double ")
-             (otherwise "object ")))
+  (case (promoted-c-type type)
+    (fixnum "long ")
+    (integer "GEN ")
+    (character "unsigned char ")
+    (short-float "float ")
+    (long-float "double ")
+    (otherwise "object ")))
 
 
 (defun t1defmacro (args)

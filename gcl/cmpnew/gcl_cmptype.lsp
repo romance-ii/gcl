@@ -86,12 +86,7 @@
                          (bit 'bit-vector)
                          (t (list 'vector element-type))))
                       (t (list 'array element-type))))
-               (integer
-                (if (si::sub-interval-p (cdr type)
-                                        (list most-negative-fixnum
-                                              most-positive-fixnum))
-                    'fixnum
-                    'integer))
+               ((integer signed-byte unsigned-byte) type)
                ((short-float) 'short-float)
                ((long-float double-float single-float) 'long-float)
 	       ((stream) 'stream)
@@ -127,7 +122,31 @@
                         (t t)))
                )))))
 
+(defun promoted-c-type (type)
+  (if (bounded-type type)
+      (cond ;((subtypep type 'signed-char) 'signed-char)
+	    ((subtypep type 'fixnum) 'fixnum)
+	    ((subtypep type 'integer) 'integer)
+	    (t  (error "Cannot promote type ~S to C type~%" type)))
+    type)))
 
+(defun super-range (f t1 t2)
+  (and
+   (bounded-type t1)
+   (bounded-type t2)
+   (eq (car t1) (car t2))
+   (let ((a (funcall (symbol-function f) (cadr t1) (cadr t2)))
+	 (b (funcall (symbol-function f) (cadr t1) (caddr t2)))
+	 (c (funcall (symbol-function f) (caddr t1) (cadr t2)))
+	 (d (funcall (symbol-function f) (caddr t1) (caddr t2))))
+     (list (car t1) (min a b c d) (max a b c d)))))
+	 
+(defun bounded-type (type)
+  (and (consp type)
+       (eql (length type) 3)
+       (member (car type) '(integer signed-byte unsigned-byte) :test #'eq)
+       (integerp (cadr type))
+       (integerp (caddr type))))
 
 (defun type-and (type1 type2)
   
@@ -148,6 +167,10 @@
 	((eq type2 'object) type1)
         ((eq type2 t) type1)
 	((eq type2 '*) type1)
+	((or (bounded-type type1) (bounded-type type2))
+	 (cond ((subtypep type1 type2) type1)
+	       ((subtypep type2 type1) type2)
+	       (t nil)))
         ((consp type1)
          (case (car type1)
                (array
@@ -222,7 +245,7 @@
         (cmpwarn "The type of the form ~s is not ~s." original-form type)))
 
 (defun default-init (type)
-  (case type
+  (case (promoted-c-type type)
         (fixnum (cmpwarn "The default value of NIL is not FIXNUM."))
         (character (cmpwarn "The default value of NIL is not CHARACTER."))
         (long-float (cmpwarn "The default value of NIL is not LONG-FLOAT."))
