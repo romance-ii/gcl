@@ -13,8 +13,8 @@ CLCSDIR = ../clcs
 PCLDIR  = ../pcl
 PORTDIR = $(shell pwd)
 
-LD_LIBS_PRE=$(addprefix -u ,$(PATCHED_SYMBOLS))
-LD_LIBS_POST=$(LIBS) $(LIBC) -lgclp
+LD_LIBS_PRE=$(FIRST_FILE) $(addprefix -u ,$(PATCHED_SYMBOLS))
+LD_LIBS_POST=$(LIBS) $(LIBC) -lgclp $(LAST_FILE)
 
 ifeq ($(ARRS),)
 ARRS:=ar rs
@@ -98,7 +98,7 @@ init_%.lsp: init_%.lsp.tmp
 		-e "s,@LI-MAJVERS@,`cat ../majvers`,1" \
 		-e "s/@LI-CC@/\"$(CC) -c $(FINAL_CFLAGS)\"/1" \
 		-e "s,@LI-LD@,\"$(CC) -o \",1" \
-		-e "s,@LI-LD-LIBS@,\"$(LD_LIBS_PRE) -l$* $(LD_LIBS_POST)\",1" \
+		-e "s,@LI-LD-LIBS@,\" $(LD_LIBS_PRE) -l$* $(LD_LIBS_POST)\",1" \
 		-e "s,@LI-OPT-THREE@,\"$(O3FLAGS)\",1" \
 		-e "s,@LI-OPT-TWO@,\"$(O2FLAGS)\",1" \
 		-e "s,@LI-INIT-LSP@,\"$@\",1" >$@
@@ -119,26 +119,26 @@ $(RSYM): $(SPECIAL_RSYM) $(HDIR)/mdefs.h
 $(HDIR)/mdefs.h: $(HDIR)/include.h
 	cat $(HDIR)/include.h | sed -e "/include/d" > $(HDIR)/mdefs.h
 
-libgcl.a: $(FIRST_FILE) $(OBJS) sys_gcl.o $(LAST_FILE) gmpfiles bfdfiles
+libgcl.a: $(OBJS) sys_gcl.o gmpfiles bfdfiles
 	rm -rf $@
 	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
-libpre_gcl.a: $(FIRST_FILE) $(OOBJS) sys_pre_gcl.o $(LAST_FILE) gmpfiles bfdfiles
+libpre_gcl.a: $(OOBJS) sys_pre_gcl.o gmpfiles bfdfiles
 	rm -rf $@
 	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
-libmod_gcl.a: $(FIRST_FILE) $(OBJS) $(MODOBJS) sys_mod_gcl.o $(LAST_FILE) gmpfiles bfdfiles
+libmod_gcl.a: $(OBJS) $(MODOBJS) sys_mod_gcl.o gmpfiles bfdfiles
 	rm -rf $@
 	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
 libxgcl.a: libgcl.a
 	ln -snf $< $@
 
-libansi_gcl.a: $(FIRST_FILE) $(OBJS) $(ANSIOBJS) sys_ansi_gcl.o $(LAST_FILE) gmpfiles bfdfiles
+libansi_gcl.a: $(OBJS) $(ANSIOBJS) sys_ansi_gcl.o gmpfiles bfdfiles
 	rm -rf $@
 	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
-libpcl_gcl.a: $(FIRST_FILE) $(OBJS) $(PCLOBJS) sys_pcl_gcl.o $(LAST_FILE) gmpfiles bfdfiles
+libpcl_gcl.a: $(OBJS) $(PCLOBJS) sys_pcl_gcl.o gmpfiles bfdfiles
 	rm -rf $@
 	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 

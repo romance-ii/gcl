@@ -1,3 +1,10 @@
+gclcvs (2.7.0-20) unstable; urgency=low
+
+  * Rework compiler::*ld-libs*, compiler::link, and unixport/makefile to
+    accomodate mingw need for firstfile.o and lastfile.o
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 17 Feb 2004 16:15:18 +0000
+
 gclcvs (2.7.0-19) unstable; urgency=low
 
   * Revert unixport/makefile link order fix for windows, breaks
