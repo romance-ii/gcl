@@ -23,10 +23,6 @@
 #define f_nsyms NumberOfSymbols
 #define NO_PWD_H
 
-/* page width, (1 <<PAGEWIDTH) should be a multiple of 2 of
-   the native system page width  */
-
-#define PAGEWIDTH 12 
 #define MAXPATHLEN 512
 
 /* alter pathToAlter to fit in with the Clibrary of the system.
@@ -44,9 +40,7 @@
 
 #define signals_pending *signalsPendingPtr
 
-#undef DBEGIN
 #undef DBEGIN_TY
-#define DBEGIN _dbegin
 #define DBEGIN_TY unsigned int
 extern DBEGIN_TY _stacktop, _stackbottom, _dbegin;
 
@@ -56,9 +50,6 @@ extern DBEGIN_TY _stacktop, _stackbottom, _dbegin;
 #define CLEANUP_CODE \
   setbuf(stdin,0); \
   setbuf(stdout,0);
-
-/* size to use for mallocs done  */
-/* #define BABY_MALLOC_SIZE 0x5000 */
 
 #define NO_SYS_PARAM_H
 #define NO_SYS_TIMES_H
@@ -76,11 +67,6 @@ extern DBEGIN_TY _stacktop, _stackbottom, _dbegin;
 #ifdef IN_UNIXFSYS
 #  undef ATT
 #  define HAVE_RENAME
-#endif
-
-#if 0
-/* the result of 'getenv' is malloc'd */
-#define FREE_GETENV_RESULT
 #endif
 
 #define SIGBUS		 7
@@ -102,11 +88,11 @@ extern DBEGIN_TY _stacktop, _stackbottom, _dbegin;
 #define HAVE_SIGPROCMASK
 #define NEED_TO_REINSTALL_SIGNALS
 
-#if 0
-#ifndef SIGIO
-#  define SIGIO 23
-#endif
-#endif
+/* #define HAVE_SIGACTION */
+/* a noop */
+#define SETUP_SIG_STACK
+#define SV_ONSTACK 0
+#define SA_RESTART 0
 
 /* on most machines this will test in one instruction
    if the pointe/r is on the C stack or the 0 pointer
@@ -119,12 +105,6 @@ extern DBEGIN_TY _stacktop, _stackbottom, _dbegin;
 #if defined ( IN_FILE ) || defined ( IN_SOCKETS )
 #  define HAVE_NSOCKET
 #endif
-
-/* #define HAVE_SIGACTION */
-/* a noop */
-#define SETUP_SIG_STACK
-#define SV_ONSTACK 0
-#define SA_RESTART 0
 
 #define brk(x) fprintf( stderr, "not doing brk(%d)\n", x);
 
