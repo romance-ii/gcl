@@ -84,9 +84,6 @@ gcl_init_system(object no_init)
   ar_check_init(gcl_assert,no_init);
   ar_check_init(gcl_defstruct,no_init);
   ar_check_init(gcl_describe,no_init);
-#ifdef HAVE_JAPI_H
-  ar_check_init(gcl_japi,no_init);
-#endif
   ar_check_init(gcl_iolib,no_init);
   ar_check_init(gcl_listlib,no_init);
   ar_check_init(gcl_mislib,no_init);
@@ -97,11 +94,6 @@ gcl_init_system(object no_init)
   ar_check_init(gcl_trace,no_init);
   ar_check_init(gcl_sloop,no_init);
   ar_check_init(gcl_serror,no_init);
-  ar_check_init(gcl_destructuring_bind,no_init);
-  ar_check_init(gcl_loop,no_init);
-  ar_check_init(gcl_defpackage,no_init);
-  ar_check_init(gcl_make_defpackage,no_init);
-
 	
   ar_check_init(gcl_cmpinline,no_init);
   ar_check_init(gcl_cmputil,no_init);

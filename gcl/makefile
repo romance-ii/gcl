@@ -27,6 +27,7 @@ LSPDIR	= lsp
 CMPDIR	= cmpnew
 PORTDIR	= unixport
 CLCSDIR = clcs
+MODDIR = mod
 PCLDIR = pcl
 MPDIR	= mp
 TESTDIR = ansi-tests
@@ -60,7 +61,11 @@ $(PORTDIR)/saved_gcl: $(HDIR)cmpinclude.h
 	(cd $(CMPDIR); $(MAKE) all)
 	cd $(@D) && $(MAKE) $(@F)
 
-$(PORTDIR)/saved_pcl_gcl: $(PORTDIR)/saved_gcl
+$(PORTDIR)/saved_mod_gcl: $(PORTDIR)/saved_gcl
+	(cd $(MODDIR); rm -f *.c; $(MAKE) all)
+	cd $(@D) && $(MAKE) $(@F)
+
+$(PORTDIR)/saved_pcl_gcl: $(PORTDIR)/saved_mod_gcl
 	(cd $(PCLDIR); rm -f *.c; $(MAKE) all)
 	cd $(@D) && $(MAKE) $(@F)
 
@@ -195,6 +200,7 @@ clean:
 	(cd mp ; $(MAKE) clean)
 	(cd $(ODIR); $(MAKE) clean)
 	(cd $(LSPDIR); $(MAKE) clean)
+	(cd $(MODDIR); $(MAKE) clean)
 	(cd $(CMPDIR); $(MAKE) clean)
 	(cd $(PORTDIR); $(MAKE) clean)
 	(cd gcl-tk ; $(MAKE) clean)
@@ -211,7 +217,8 @@ clean:
 	rm -f h/*-linux.defs h/bfd.h h/bfdlink.h h/ansidecl.h h/symcat.h
 	rm -f windows/gcl.iss bin/gcl.bat windows/gcl.ansi.iss windows/install.ansi.lsp \
 		windows/install.lsp
-	rm -f ansi-tests/test_results ansi-tests/gazonk*lsp
+	rm -f ansi-tests/test_results ansi-tests/gazonk* \
+		ansi-tests/generated-eval-when-test-file.lisp
 	rm -f config.log config.cache config.status
 	-cd binutils/bfd && $(MAKE) distclean
 	-cd binutils/libiberty && $(MAKE) distclean

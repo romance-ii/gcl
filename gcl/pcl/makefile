@@ -23,7 +23,7 @@ SETUP='(load "sys-package.lisp")' \
 
 all: $(addsuffix .c,$(AFILES)) $(addsuffix .o,$(AFILES)) 
 
-saved_gcl_pcl: ../unixport/saved_gcl
+saved_gcl_pcl: ../unixport/saved_mod_gcl
 	cp ../h/cmpinclude.h .
 	echo $(SETUP) '(pcl::compile-pcl)' | $< 
 	echo $(SETUP) '(pcl::load-pcl)(si::save-system "$@")' | $<
@@ -33,7 +33,7 @@ $(addsuffix .c,$(AFILES)) $(addsuffix .data,$(AFILES))\
 	$(addsuffix .lisp,$(subst pcl_gcl_low,impl/gcl/pcl_gcl_low,$(FILES)))
 	rm -f *.o *gazonk*
 	cp ../h/cmpinclude.h .
-	echo ${SETUP} '(pcl::compile-pcl)' | ../unixport/saved_gcl ../unixport/
+	echo ${SETUP} '(pcl::compile-pcl)' | ../unixport/saved_mod_gcl ../unixport/
 # FIXME -- small compiler setjmp/volatile detection bug -- CM
 	patch -p0 <pcl_methods.patch
 	rm -f pcl_methods.o
@@ -54,10 +54,10 @@ remake-sys-files:
 	rm -f *.o *gazonk*
 	cp ../h/cmpinclude.h .
 	echo ${SETUP} '(load "../cmpnew/collectfn.lsp")(compiler::emit-fn t)' \
-		'(pcl::compile-pcl)' | ../unixport/saved_gcl ../unixport/
+		'(pcl::compile-pcl)' | ../unixport/saved_mod_gcl ../unixport/
 	echo ${SETUP} '(load "../cmpnew/collectfn.lsp") '\
 		'(pcl::load-pcl)(in-package "PCL")(renew-sys-files)' | \
-		../unixport/saved_gcl ../unixport/
+		../unixport/saved_mod_gcl ../unixport/
 	cp sys-proclaim.lisp xxx
 	cat xxx | sed -e "s/COMPILER::CMP-ANON//g" > sys-proclaim.lisp
 	rm xxx

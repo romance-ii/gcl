@@ -4711,7 +4711,7 @@ EOF
  
 		TLIBS="$TLIBS -lreadline -lncurses"
 		RL_OBJS=gcl_readline.o
-		RL_LIB=lsp/gcl_readline.o
+		RL_LIB=mod/gcl_readline.o
 else
   echo "$ac_t""no" 1>&6
 fi

@@ -14,8 +14,7 @@ OBJS	= gcl_arraylib.o gcl_assert.o gcl_defmacro.o gcl_defstruct.o \
 	  gcl_iolib.o gcl_listlib.o gcl_mislib.o gcl_module.o gcl_numlib.o \
 	  gcl_packlib.o gcl_predlib.o \
 	  gcl_seq.o gcl_seqlib.o gcl_setf.o gcl_top.o gcl_trace.o gcl_sloop.o \
-          gcl_debug.o gcl_info.o gcl_serror.o \
-	  gcl_destructuring_bind.o gcl_defpackage.o gcl_make_defpackage.o gcl_loop.o $(EXTRA_LOBJS)
+          gcl_debug.o gcl_info.o gcl_serror.o 
 # export.o autoload.o auto_new.o
 
 
@@ -36,7 +35,7 @@ COMPILE_FILE=$(PORTDIR)/saved_gcl $(PORTDIR) -system-p -c-file -data-file \
 	"${APPEND} ${NULLFILE} $*.data $*.o "
 
 
-all:	$(OBJS) $(RL_OBJS)
+all:	$(OBJS)
 
 
 

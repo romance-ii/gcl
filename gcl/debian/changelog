@@ -1,3 +1,14 @@
+gclcvs (2.7.0-5) unstable; urgency=low
+
+  * Separate lsp modules not in wfs' original tree into mod directory,
+    and rebuild from lisp source as an intermediary step between trad
+    and pcl.  Needed as the new loop macro, and hence possibly other
+    code we might use from cmucl, compiles structure references which
+    are machine word size dependent, and will break on 64bit machines
+    for example if compiled only from C with 32bit C sources.
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 23 Sep 2003 15:04:58 +0000
+
 gclcvs (2.7.0-4) unstable; urgency=low
 
   * Mac OSX GET_FULL_PATH_SELF
