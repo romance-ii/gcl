@@ -86,33 +86,33 @@ static object LI2();
 #define VC28
 #define VC29
 #define VC30
-#define VC31 object  V201 ,V195;
-#define VC32 object  V212;
+#define VC31 object  V202 ,V196;
+#define VC32 object  V213;
 #define VC33
 #define VC34
-#define VC35 object  V233 ,V231 ,V230 ,V228 ,V226;
-#define VC36 object  V254 ,V253 ,V252 ,V251 ,V250 ,V239 ,V238;
-#define VC37 object  V260;
-#define VC38 object  V266;
-#define VC39 object  V270;
+#define VC35 object  V234 ,V232 ,V231 ,V229 ,V227;
+#define VC36 object  V255 ,V254 ,V253 ,V252 ,V251 ,V240 ,V239;
+#define VC37 object  V261;
+#define VC38 object  V267;
+#define VC39 object  V271;
 #define VC40
 #define VC41
 #define VC42
-#define VC43 object  V315 ,V314 ,V313 ,V311 ,V308 ,V307 ,V306 ,V305 ,V304;
+#define VC43 object  V316 ,V315 ,V314 ,V312 ,V309 ,V308 ,V307 ,V306 ,V305;
 #define VC44
 #define VC45
-#define VC46 object  V344 ,V343 ,V340 ,V339;
-#define VC47 object  V350 ,V348 ,V347;
-#define VC48 object  V358;
-#define VC49 object  V366 ,V365 ,V364 ,V363 ,V362;
-#define VC50 object  V370;
-#define VC51 object  V376;
-#define VC52 object  V380;
+#define VC46 object  V345 ,V344 ,V341 ,V340;
+#define VC47 object  V351 ,V349 ,V348;
+#define VC48 object  V360;
+#define VC49 object  V368 ,V367 ,V366 ,V365 ,V364;
+#define VC50 object  V372;
+#define VC51 object  V378;
+#define VC52 object  V382;
 #define VM52 7
 #define VM51 6
 #define VM50 3
 #define VM49 4
-#define VM48 17
+#define VM48 18
 #define VM47 2
 #define VM46 10
 #define VM45 9
@@ -136,7 +136,7 @@ static object LI2();
 #define VM27 6
 #define VM26 8
 #define VM25 2
-#define VM24 1
+#define VM24 2
 #define VM23 2
 #define VM22 2
 #define VM21 9

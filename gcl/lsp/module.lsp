@@ -64,9 +64,10 @@
     (structure (get symbol 'structure-documentation))
     (type (get symbol 'type-documentation))
     (setf (get symbol 'setf-documentation))
-;FIXME
-    (t nil)))
-;    (t (error "~S is an illegal documentation type." doc-type))))
+    (t
+     (if (packagep symbol) 
+	 (get (find-symbol (package-name symbol) :keyword) 'package-documentation)
+       (error "~S is an illegal documentation type." doc-type)))))
 
 
 (defun find-documentation (body)

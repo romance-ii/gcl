@@ -58,25 +58,30 @@
 
 (defmacro do-symbols ((var &optional (package '*package*) (result-form nil))
                       . body)
-  (let ((p (gensym)) (i (gensym)) (l (gensym))
+  (let ((p (gensym)) (i (gensym)) (l (gensym)) (q (gensym))
         (loop (gensym)) (x (gensym))(y (gensym)) (break (gensym)) declaration)
     (multiple-value-setq (declaration body) (find-declarations body))
-    `(let ((,p (coerce-to-package ,package)) ,var ,l)
+    `(let ((,p (coerce-to-package ,package)) ,var ,l )
        ,@declaration
-       (multiple-value-bind (,y ,x)
-	    (package-size ,p)
-            (declare (fixnum ,x ,y))
-       (dotimes (,i (+ ,x ,y) (progn (setq ,var nil) ,result-form))
-         (setq ,l (if (< ,i ,x)
-                      (si:package-internal ,p ,i)
-                      (si:package-external ,p (- ,i ,x))))
-       ,loop
-         (when (null ,l) (go ,break))
-         (setq ,var (car ,l))
-         ,@body
-         (setq ,l (cdr ,l))
-         (go ,loop)
-       ,break)))))
+       (dolist (,q (cons ,p (package-use-list ,p)) (progn (setq ,var nil) ,result-form))
+	       (multiple-value-bind 
+		(,y ,x) (package-size ,q)
+		(declare (fixnum ,x ,y))
+		(if (not (eq ,p ,q)) (setq ,x 0))
+		(dotimes (,i (+ ,x ,y))
+			 (setq ,l (if (< ,i ,x)
+				      (si:package-internal ,q ,i)
+				    (si:package-external ,q (- ,i ,x))))
+			 ,loop
+			 (when (null ,l) (go ,break))
+			 (setq ,var (car ,l))
+			 (if (or (eq ,q ,p) 
+				 (eq :inherited (car (last (multiple-value-list 
+							    (find-symbol (symbol-name ,var) ,p))))))
+			     (progn ,@body))
+			 (setq ,l (cdr ,l))
+			 (go ,loop)
+			 ,break))))))
        
 
 (defmacro do-external-symbols

@@ -1123,7 +1123,7 @@ siLpackage_internal()
 	check_type_package(&vs_base[0]);
 	if (type_of(vs_base[1]) != t_fixnum ||
 	    (j = fix(vs_base[1])) < 0 || j >= vs_base[0]->p.p_internal_size)
-		FEerror("~S is an illgal index to a package hashtable.",
+		FEerror("~S is an illegal index to a package hashtable.",
 			1, vs_base[1]);
 	vs_base[0] = P_INTERNAL(vs_base[0],j);
 	vs_popp;
