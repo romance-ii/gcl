@@ -45,7 +45,7 @@
 #elif SIZEOF_LONG_P == 8
 #define BBYTES_LONG 3
 #else
-#error Do not recognize PTR_ALIGN
+#error Do not recognize SIZEOF_LONG_P
 #endif
 
 #define BBITS_LONG (BBYTES_LONG+BBITS_CHAR)

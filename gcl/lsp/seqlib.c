@@ -857,7 +857,7 @@ T281:;
 	V171= 0;
 goto T279;
 T279:;
-	{register long V172;
+	{long V172;
 	V172= (long)(*(LnkLI35))((V167),(V162));
 	if(!((V171)<=(V172))){
 	goto T285;}
@@ -1020,7 +1020,7 @@ T374:;
 	V206 = make_fixnum((long)(V170)-(V175));
 	V201= (VFUN_NARGS=2,(*(LnkLI46))(/* INLINE-ARGS */V205,V206));
 	V202= (long)(-1)+(V170);
-	V203= (long)((long)(-1)+(V172))-(V197);
+	V203= (long)(-1)+((long)(V170)-(V175));
 	V204= 0;
 goto T383;
 T383:;

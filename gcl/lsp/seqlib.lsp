@@ -342,7 +342,8 @@
          (do ((newseq
                (make-sequence (seqtype sequence) (the fixnum (f- l count))))
               ,iterate-i-everywhere
-              (j (f- (the fixnum (f+ -1  end)) n))
+              (j (f+ -1 (the fixnum (f- l count))))
+;              (j (f- (the fixnum (f+ -1  end)) n))
               ,kount-0)
              (,endp-i-everywhere newseq)
            (declare (fixnum i j k))
