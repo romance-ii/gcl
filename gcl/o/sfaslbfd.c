@@ -337,6 +337,8 @@ fasload(object faslfile) {
 
    for (s=b->sections;s;s=s->next) {
      
+     unsigned long ss=bfd_section_size(b,s);
+
      if (!(s->flags & SEC_LOAD))
        continue;
      
@@ -346,9 +348,10 @@ fasload(object faslfile) {
 					     v,0,q)) 
        FEerror("Cannot get relocated section contents\n",0);
 
-     memcpy((void *)(unsigned long)s->output_section->vma,v,bfd_section_size(b,s));
+     memcpy((void *)(unsigned long)s->output_section->vma,v,ss);
      
    }
+
  }
    
   dum.sm.sm_object1=faslfile;

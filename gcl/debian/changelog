@@ -1,3 +1,10 @@
+gclcvs (2.7.0-34) unstable; urgency=low
+
+  * revert changes to local bfd.h files, a users might have them as
+    system headers -- instead workaround reloc_done abort in sfaslbfd.c
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 25 Nov 2004 13:02:51 -0500
+
 gclcvs (2.7.0-33) unstable; urgency=high
 
   * Temporary workaround to restore xgcl
