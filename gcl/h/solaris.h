@@ -1,4 +1,4 @@
-#define __ELF__
+#define SPARC_ELF
 struct sigcontext {
   unsigned u;
 }
