@@ -121,6 +121,14 @@
       ((endp l)
        (if (or ref-ccb ref-clb ref)
            (progn (setq body1 (reverse body1))
+		  ;; If ref-ccb is set, we will cons up the environment, hence
+		  ;; all tags which had level boundary references must be changed
+		  ;; to ccb references.  FIXME -- review this logic carefully
+		  ;; CM 20040228
+		  (when ref-ccb
+		    (dolist (l body1)
+		      (when (and (typep l 'tag) (tag-ref-clb l))
+			(setf (tag-ref-ccb l) t))))
 	          (cond ((or  ref-clb ref-ccb)
                          (incf *setjmps*))
 			(t
