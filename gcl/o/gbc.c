@@ -1086,6 +1086,7 @@ GBC(enum type t) {
   what_to_collect = t;
   
   tm_table[(int)t].tm_gbccount++;
+  tm_table[(int)t].tm_adjgbccnt++;
   
 #ifdef DEBUG
   if (debug || (sSAnotify_gbcA->s.s_dbind != Cnil)) {
@@ -1420,7 +1421,7 @@ FFN(siLreset_gbc_count)(void) {
   check_arg(0);
   
   for (i = 0;  i < (int)t_other;  i++)
-    tm_table[i].tm_gbccount = 0;
+    tm_table[i].tm_gbccount = tm_table[i].tm_adjgbccnt = 0;
 }
 
 /* copy S bytes starting at P to beyond rb_pointer1 (temporarily)

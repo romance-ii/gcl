@@ -1753,6 +1753,9 @@ my_plt(const char *,unsigned long *);
 int
 parse_plt(void);
 
+int
+sgc_count_read_only_type(int);
+
 #ifdef SGC
 void
 memprotect_test_reset(void);

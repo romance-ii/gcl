@@ -239,14 +239,6 @@ main(int argc, char **argv, char **envp) {
          rl.rlim_cur > MAX_STACK_SIZE)
         rl.rlim_cur=MAX_STACK_SIZE;
     cssize = rl.rlim_cur/4 - 4*CSGETA;
-
-    getrlimit(RLIMIT_DATA, &rl);
-    if (rl.rlim_cur != RLIM_INFINITY &&
-	(rl.rlim_max == RLIM_INFINITY ||
-	 rl.rlim_max > rl.rlim_cur)) {
-      rl.rlim_cur = rl.rlim_max;
-      setrlimit(RLIMIT_DATA, &rl);
-    }
 #endif	
 #endif /* BSD */
 
@@ -864,10 +856,10 @@ FFN(siLsave_system)(void) {
 /*  #ifdef AOSVS */
   
 /*  #endif */
-  cbgbccount = 0;
-  rbgbccount = 0;
+  cbgbccount = tm_table[t_contiguous].tm_adjgbccnt = 0;
+  rbgbccount = tm_table[t_relocatable].tm_adjgbccnt = 0;
   for (i = 0;  i < (int)t_end;  i++)
-    tm_table[i].tm_gbccount = 0;
+    tm_table[i].tm_gbccount = tm_table[i].tm_adjgbccnt = 0;
   Lsave();
   saving_system = FALSE;
   alloc_page(-(holepage+nrbpage));

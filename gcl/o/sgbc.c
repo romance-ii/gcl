@@ -970,6 +970,23 @@ sgc_count_type(int t) {
   return count;
 }
 
+int
+sgc_count_read_only_type(int t) {
+
+  int j = first_protectable_page -1;
+  int hp_end = page(heap_end);
+  int end = page(core_end);
+  int count=0;
+  while(j++ < hp_end)
+    if ((type_map[j]==t || (t<0 && type_map[j]!=t_other)) && !WRITABLE_PAGE_P(j))
+      count++;
+  j= page(rb_start)-1;
+  while(j++ < end) /* FIXME: relocatable pages are marked as type t_other */
+    if ((t==t_relocatable || t<0) && !WRITABLE_PAGE_P(j))
+      count++;
+  return count;
+}
+
 #ifdef SGC_CONT_DEBUG
 void
 overlap_check(struct contblock *t1,struct contblock *t2) {

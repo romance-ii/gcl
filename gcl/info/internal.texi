@@ -13,10 +13,21 @@ exit status and any possible terminating signal respectively.
 @end defun
 
 @defvar *IGNORE-MAXIMUM-PAGES* 
-Package:LISP
+Package:SI
 GCL specific: Tells the GCL memory manager whether (non-NIL) or not (NIL) it
 should expand memory whenever the maximum allocatable pages have been used
 up.
+
+
+@end defvar
+
+@defvar *OPTIMIZE-MAXIMUM-PAGES* 
+Package:SI
+
+GCL specific: Tells the GCL memory manager whether to attempt to
+adjust the maximum allowable pages for each type to approximately
+optimize the garbage collection load in the current process.  Defaults
+to T.  Set to NIL if you cat more about memory usage than runtime.
 
 
 @end defvar
