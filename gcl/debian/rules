@@ -55,13 +55,15 @@ EXT:=cvs
 CFG:=$(addsuffix /config.,. binutils) gmp3/configfsf.
 CFGS:=$(addsuffix guess,$(CFG)) $(addsuffix sub,$(CFG)) #configure
 
-$(filter %.guess,$(CFGS)): /usr/share/misc/config.guess
-	! [ -e $@ ] || [ -e $@.ori ] || mv $@ $@.ori
-	cp $< $@
+FORCE:
 
-$(filter %.sub,$(CFGS)): /usr/share/misc/config.sub
-	! [ -e $@ ] || [ -e $@.ori ] || mv $@ $@.ori
-	cp $< $@
+$(filter %.guess,$(CFGS)): /usr/share/misc/config.guess FORCE
+	! [ -e $@ ] || [ -e $@.ori ] || cp $@ $@.ori
+	[ $$($< -t | tr -d '-') -le $$($@ -t | tr -d '-') ] || cp $< $@
+
+$(filter %.sub,$(CFGS)): /usr/share/misc/config.sub FORCE
+	! [ -e $@ ] || [ -e $@.ori ] || cp $@ $@.ori
+	[ $$($< -t | tr -d '-') -le $$($@ -t | tr -d '-') ] || cp $< $@
 
 #configure: configure.in
 #	! [ -e $@ ] || [ -e $@.ori ] || mv $@ $@.ori
