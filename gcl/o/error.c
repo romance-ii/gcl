@@ -355,8 +355,8 @@ FEinvalid_macro_call(void)
 
 void
 FEunexpected_keyword(object key)
-{	if (!keywordp(key))
-		not_a_keyword(key);
+{/* 	if (!keywordp(key)) */
+/* 		not_a_keyword(key); */
 
   Icall_error_handler(sKunexpected_keyword,
 		      make_simple_string("~S does not allow the keyword ~S."),
@@ -673,8 +673,10 @@ object x0,x1,x2,x3,error_fmt_string;
 void
 check_arg_failed(int n)
 {
-  FEerror("Expected ~S args but received ~S args",2,
-	 make_fixnum(n),make_fixnum(vs_top-vs_base));
+  if (n<vs_top-vs_base)
+    FEtoo_many_arguments(vs_base,vs_top);
+  else
+    FEtoo_few_arguments(vs_base,vs_top);
 }
 
 void
@@ -719,7 +721,7 @@ keyword_value_mismatch(void)
 void
 not_a_keyword(object x)
 {
-	FEerror("~S is not a keyword.", 1, x);
+	FEunexpected_keyword(x);
 }
 
 void

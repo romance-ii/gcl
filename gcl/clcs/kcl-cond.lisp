@@ -79,17 +79,17 @@
     ("FEpackage_error" :package-error "A package error occurred on ~S: ~S."
      internal-package-error :package :message) ; |<function>| |top - base|
     ("FEtoo_few_arguments" :too-few-arguments "~S [or a callee] requires more than ~R argument~:p." 
-     internal-simple-control-error) ; |<function>| |top - base|
-    ("FEtoo_few_argumentsF" :too-few-arguments "Too few arguments."
-     internal-simple-control-error) ; |<function>| |args|
+     internal-simple-program-error) ; |<function>| |top - base|
+;    ("FEtoo_few_argumentsF" :too-few-arguments "Too few arguments."
+;     internal-simple-control-error) ; |<function>| |args|
     ("FEtoo_many_arguments" :too-many-arguments "~S [or a callee] requires less than ~R argument~:p."
-     internal-simple-control-error) ; |<function>| |top - base|
-    ("FEtoo_many_argumentsF" :too-many-arguments "Too many arguments."
-     internal-simple-control-error) ; |<function>| |args|
+     internal-simple-program-error) ; |<function>| |top - base|
+;    ("FEtoo_many_argumentsF" :too-many-arguments "Too many arguments."
+;     internal-simple-control-error) ; |<function>| |args|
     ("FEinvalid_macro_call" :invalid-form "Invalid macro call to ~S."
      internal-simple-program-error) ; |<function>|
     ("FEunexpected_keyword" :unexpected-keyword "~S does not allow the keyword ~S."
-     internal-simple-control-error) ; |<function>| |key|
+     internal-simple-program-error) ; |<function>| |key|
     ("FEunbound_variable" :unbound-variable "The variable ~S is unbound."
      internal-unbound-variable :name) ; |sym|
     ("FEundefined_function" :undefined-function "The function ~S is undefined."
@@ -98,18 +98,18 @@
      internal-simple-program-error) ; |obj|
     ("check_arg_failed" :too-few-arguments "~S [or a callee] requires ~R argument~:p,~%\
 but only ~R ~:*~[were~;was~:;were~] supplied."
-     internal-simple-control-error) ; |<function>| |n| |top - base|
-    ("check_arg_failed" :too-many-arguments "~S [or a callee] requires only ~R argument~:p,~%\
-but ~R ~:*~[were~;was~:;were~] supplied."
-     internal-simple-control-error) ; |<function>| |n| |top - base|
+     internal-simple-program-error) ; |<function>| |n| |top - base|
+;    ("check_arg_failed" :too-many-arguments "~S [or a callee] requires only ~R argument~:p,~%\
+;but ~R ~:*~[were~;was~:;were~] supplied."
+;     internal-simple-program-error) ; |<function>| |n| |top - base|
     ("ck_larg_at_least" :error "APPLY sended too few arguments to LAMBDA."
      internal-simple-control-error) 
     ("ck_larg_exactly" :error "APPLY sended too few arguments to LAMBDA."
      internal-simple-control-error) 
     ("keyword_value_mismatch" :error "Keywords and values do not match."
-     internal-simple-error) ;??
+     internal-simple-program-error) ;??
     ("not_a_keyword" :error "~S is not a keyword."
-     internal-simple-error) ;??
+     internal-simple-program-error) ;??
     ("illegal_declare" :invalid-form "~S is an illegal declaration form."
      internal-simple-program-error)
     ("not_a_symbol" :invalid-variable "~S is not a symbol."
@@ -120,7 +120,6 @@ but ~R ~:*~[were~;was~:;were~] supplied."
      internal-simple-error)
     ("vfun_wrong_number_of_args" :error "Expected ~S args but received ~S args"
      internal-simple-control-error)
-    
     ("end_of_stream" :error "Unexpected end of ~S."
      internal-end-of-file :stream)
     ("open_stream" :error "~S is an illegal IF-DOES-NOT-EXIST option."

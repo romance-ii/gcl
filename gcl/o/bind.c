@@ -227,8 +227,8 @@ KEYWORD:
 		if (type_of(x) == t_cons) {
 			if (type_of(x->c.c_car) == t_cons) {
 				if (!keywordp(x->c.c_car->c.c_car))
-					FEerror("~S is not a keyword.",
-						1, x->c.c_car->c.c_car);
+				  /* FIXME better message */
+					FEunexpected_keyword(x->c.c_car->c.c_car);
 				vs_push(x->c.c_car->c.c_car);
 				if (endp(x->c.c_car->c.c_cdr))
 					illegal_lambda();
@@ -437,12 +437,12 @@ SEARCH_DECLARE:
 	if (key_flag) {
 		i = narg - nreq - nopt;
 		if (i >= 0 && i%2 != 0)
-			FEerror("Keyword values are missing.", 0);
+		  /* FIXME better message */
+		  FEunexpected_keyword(Cnil);
 		other_keys_appeared = FALSE;
 		for (i = nreq + nopt;  i < narg;  i += 2) {
 			if (!keywordp(base[i]))
-				FEerror("~S is not a keyword.",
-					1, base[i]);
+				FEunexpected_keyword(base[i]);
 			if (base[i] == sKallow_other_keys &&
 			    base[i+1] != Cnil)
 				allow_other_keys_flag = TRUE;
@@ -464,7 +464,8 @@ SEARCH_DECLARE:
 			continue;
 		}
 		if (other_keys_appeared && !allow_other_keys_flag)
-			FEerror("Other-keys are not allowed.", 0);
+		  /* FIXME better message */
+		  FEunexpected_keyword(Ct);
 	}
 	for (i = 0;  i < nkey;  i++)
 		if (keyword[i].key_svar_val != Cnil) {
@@ -728,11 +729,12 @@ parse_key(object *base, bool rest, bool allow_other_keys, register int n, ...)
 		return;
 	}
 	if (narg%2 != 0)
-		FEerror("Odd number of arguments for keywords.", 0);
+	  /* FIXME better message */
+	  FEunexpected_keyword(Cnil);
 	if (narg == 2) {
 		k = base[0];
 		if (!keywordp(k))
-			FEerror("~S is not a keyword.", 1, k);
+		  FEunexpected_keyword(k);
 		if (k == sKallow_other_keys && base[1] != Cnil)
 			allow_other_keys = TRUE;
 		temporary = base[1];
@@ -758,7 +760,7 @@ parse_key(object *base, bool rest, bool allow_other_keys, register int n, ...)
 			base[-1] = make_cons(k, temporary);
 		}
 		if (other_key != OBJNULL && !allow_other_keys)
-			FEerror("The keyword ~S is not allowed.",1,other_key);
+			FEunexpected_keyword(other_key);
 		return;
 	}
 	va_start(ap,n);
@@ -804,9 +806,9 @@ parse_key(object *base, bool rest, bool allow_other_keys, register int n, ...)
 	}
 	va_end(ap);
 	if (error_flag == NOT_KEYWORD)
-		FEerror("~S is not a keyword.", 1, other_key);
+	  FEunexpected_keyword(other_key);
 	if (other_key != OBJNULL && !allow_other_keys)
-		FEerror("The keyword ~S is not allowed.", 1, other_key);
+	  FEunexpected_keyword(other_key);
 }
 
 void
@@ -821,9 +823,10 @@ check_other_key(object l, int n, ...)
 	for (;  !endp(l);  l = l->c.c_cdr->c.c_cdr) {
 		k = l->c.c_car;
 		if (!keywordp(k))
-			FEerror("~S is not a keyword.", 1, k);
+		  FEunexpected_keyword(k);
 		if (endp(l->c.c_cdr))
-			FEerror("Odd number of arguments for keywords.", 0);
+		  /* FIXME better message */
+		  FEunexpected_keyword(Cnil);
 		if (k == sKallow_other_keys && l->c.c_cdr->c.c_car != Cnil) {
 			allow_other_keys = TRUE;
 		} else {
@@ -838,8 +841,7 @@ check_other_key(object l, int n, ...)
 		}
 	}
 	if (other_key != OBJNULL && !allow_other_keys)
-		FEerror("The keyword ~S is not allowed or is duplicated.",
-			1, other_key);
+	  FEunexpected_keyword(other_key);
 }
 
 
@@ -893,10 +895,11 @@ parse_key_new(int n, object *base, struct key *keys, va_list ap)
 	   m -= 2;}
 	if (allow) n = n -2 ; else goto error;}
    }
-  if (n!=0) FEerror("Odd number of keys",0);
+  /* FIXME better message */
+  if (n!=0) FEunexpected_keyword(Cnil);
   return 0;
  error:
-  FEerror("Unrecognized key ~a",1,k);
+  FEunexpected_keyword(k);
   return -1;
 }}}
 
@@ -948,10 +951,11 @@ parse_key_rest(object rest, int n, object *base, struct key *keys, va_list ap)
 	if (allow) n = n -2 ; else goto error;}
 
    }
-  if (n!=0) FEerror("Odd number of keys",0);
+  /* FIXME better message */
+  if (n!=0) FEunexpected_keyword(Cnil);
   return 0;
  error:
-  FEerror("Unrecognized key ~a",1,k);
+  FEunexpected_keyword(k);
   return -1;
 }}}
 

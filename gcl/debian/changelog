@@ -1,3 +1,10 @@
+gcl (2.5.0.cvs20020625-59) unstable; urgency=low
+
+  * wrong number of arguments, keyword errors in lambda list bindings,
+    are program errors
+
+ -- Camm Maguire <camm@m.enhanced.com>  Wed, 16 Oct 2002 07:24:14 -0400
+
 gcl (2.5.0.cvs20020625-58) unstable; urgency=low
 
   * GENSYM fixes
