@@ -24,14 +24,14 @@
 /* The following value determines the running process size. */
 #define BIG_HEAP_SIZE   0x50000000
 
-/* based on NeXT32-m68k.h */
-#undef SET_REAL_MAXPAGE
-#define SET_REAL_MAXPAGE \
-  { extern int mach_maplimit; my_sbrk(0); real_maxpage = mach_maplimit/PAGESIZE; }
-
 extern char *mach_mapstart;
 extern char *mach_maplimit;
 extern char *mach_brkpt;
+
+/* based on NeXT32-m68k.h */
+#undef SET_REAL_MAXPAGE
+#define SET_REAL_MAXPAGE \
+  { my_sbrk(0); real_maxpage = (int) mach_maplimit/PAGESIZE; }
 
 #define sbrk my_sbrk
 extern char *my_sbrk(int incr);
@@ -147,7 +147,7 @@ do {\
 #undef calloc
 #define calloc my_calloc
 
-#define GET_FULL_PATH_SELF (a_) \
+#define GET_FULL_PATH_SELF(a_) \
 do { \
 extern int _NSGetExecutablePath (char *, unsigned long *); \
 unsigned long bufsize = PATH_MAX; \
@@ -155,5 +155,5 @@ static char buf [PATH_MAX]; \
 if (_NSGetExecutablePath (buf, &bufsize) != 0) { \
     error ("_NSGetExecutablePath failed"); \
 } \
-(a_) = q; \
+(a_) = buf; \
 } while (0);
