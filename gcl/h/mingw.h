@@ -1,4 +1,12 @@
 #include <stdio.h>
+#include <limits.h>
+#include <sys/param.h>
+
+#ifdef getc
+  #undef getc
+#endif
+#define getc fgetc
+
 #include "att.h"
 
 /* bfd support */
@@ -26,7 +34,7 @@
 #define f_nsyms NumberOfSymbols
 #define NO_PWD_H
 
-#define MAXPATHLEN 512
+#define MAXPATHLEN PATH_MAX
 
 /* alter pathToAlter to fit in with the Clibrary of the system.
    and report error using name 'x' if you cant do it.
@@ -47,13 +55,8 @@
 #define DBEGIN_TY unsigned int
 extern DBEGIN_TY _dbegin;
 
-#define AV
-#ifdef AV
-#  define _stacktop cs_limit
-#  define _stackbottom cs_org
-#else
-extern DBEGIN_TY _stacktop, _stackbottom;
-#endif
+#define _stacktop cs_limit
+#define _stackbottom cs_org
 
 /* define if there is no _cleanup,   do here what needs
    to be done before calling unexec
@@ -71,7 +74,6 @@ extern DBEGIN_TY _stacktop, _stackbottom;
 #endif
 
 #undef NEED_GETWD 
-#define GETCWD
 
 #define IS_DIR_SEPARATOR(x) ((x=='/')||(x=='\\'))
 
@@ -88,9 +90,6 @@ extern DBEGIN_TY _stacktop, _stackbottom;
 #define SIGUSR2		12
 #define SIGPIPE		13
 #define SIGALRM		14
-#if 0
-#define SIGIO		23
-#endif
 #define SIGIO		29
 
 #define OTHER_SIGNALS_HANDLED SIGTERM,SIGKILL,SIGABRT,
@@ -102,7 +101,6 @@ extern DBEGIN_TY _stacktop, _stackbottom;
 #define HAVE_SIGPROCMASK
 #define NEED_TO_REINSTALL_SIGNALS
 
-/*#define HAVE_SIGACTION*/
 #define SETUP_SIG_STACK
 #define SV_ONSTACK 0
 #define SA_RESTART 0
@@ -111,15 +109,9 @@ extern DBEGIN_TY _stacktop, _stackbottom;
    if the pointe/r is on the C stack or the 0 pointer
    in winnt our heap starts at DBEGIN
    */
-#ifdef AV
 #define NULL_OR_ON_C_STACK(y) \
     ((y) == 0 || \
     ((y) > _stacktop && (y) < _stackbottom))     
-#else
-#define NULL_OR_ON_C_STACK(y) \
-    (((unsigned int)(y)) == 0 || \
-    (((unsigned int)(y)) > _stacktop && ((unsigned int)(y)) < _stackbottom))     
-#endif
 
 #if defined ( IN_FILE ) || defined ( IN_SOCKETS )
 #  define HAVE_NSOCKET
@@ -222,10 +214,8 @@ extern char *GCLExeName ( void );
    else {/* printf("The first data symbol was not the init");*/}  \
  }}
 
-#ifdef getc
-  #undef getc
-#endif
-#define getc fgetc
+#define INSTALL_SEGMENTATION_CATCHER \
+  	 (void) signal(SIGSEGV,segmentation_catcher)
 
 /* Begin for cmpinclude */
 

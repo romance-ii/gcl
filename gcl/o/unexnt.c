@@ -45,7 +45,7 @@ Boston, MA 02111-1307, USA.
 #endif
 #endif
 
-extern sigint();
+extern void sigint(void);
 
 /* Include relevant definitions from IMAGEHLP.H, which can be found
    in \\win32sdk\mstools\samples\image\include\imagehlp.h. */
@@ -987,38 +987,18 @@ allocate_heap (void)
      the region below the 256MB line for our malloc arena - 229MB is
      still a pretty decent arena to play in!  */
 
-#if 1
-  unsigned long base = DBEGIN;   /*  27MB */
-#else  
-  unsigned long base = 0x10100000 /*0x01B00000*/;  /*  27MB */
-#endif  
+  unsigned long base = DBEGIN /*0x01B00000*/;  /*  27MB */
   unsigned long end  = 2*PAGESIZE*MAXPAGE;
   void *ptr = NULL;
 
-#define NTHEAP_PROBE_BASE 0
-#if NTHEAP_PROBE_BASE /* This is never normally defined */
-  /* Macros in gbc.c depend on DBEGIN being divisible by 32 */
-  /* Try various addresses looking for one the kernel will let us have.  */
-  while (!ptr && (base < end))
-    {
-      reserved_heap_size = end - base;
-      ptr = VirtualAlloc ((void *) base,
-			  get_reserved_heap_size (),
-			  MEM_RESERVE,
-			  PAGE_NOACCESS);
-      base += 0x00100000;  /* 1MB increment */
-      DBEGIN = (DBEGIN_TY) ptr;
-    }
-#else
   reserved_heap_size = end - base;
   ptr = VirtualAlloc ((void *) base,
 		      get_reserved_heap_size (),
 		      MEM_RESERVE,
 		      PAGE_NOACCESS);
-  DBEGIN = (DBEGIN_TY) ptr;
-  base = DBEGIN;
-#endif
-
+  if ( 0 == ptr ) {
+    FEerror ( "Can't allocate storage.", 1, "");
+  }
   return ptr;
 }
 

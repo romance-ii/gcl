@@ -1242,12 +1242,25 @@ DEFUN_NEW("GPROF-QUIT",object,fSgprof_quit,SI
   char b[PATH_MAX],b1[PATH_MAX];
   FILE *pp;
   unsigned n;
-
+#ifdef _WIN32
+  DWORD current_dir_size = 0;
+#endif
   if (!gprof_on)
     return Cnil;
 
+#ifdef _WIN32
+  current_dir_size = GetCurrentDirectory ( PATH_MAX, b );
+  if ( 0 == current_dir_size ) {
+    FEerror("Cannot get working directory", 0);
+  }
+  if ( PATH_MAX < current_dir_size ) {
+    FEerror("Working directory exceeds string storage space.", 0);
+  }
+
+#else
   if (!getwd(b))
     FEerror("Cannot get working directory", 0);
+#endif
   if (chdir(P_tmpdir))
     FEerror("Cannot change directory to tmpdir", 0);
   _mcleanup();

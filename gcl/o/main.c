@@ -76,13 +76,6 @@ int    initflag          = FALSE;		/* initialized flag */
 int    stack_multiple    = 1;
 int    cssize            = 0;
 
-#ifdef _WIN32
-unsigned int _dbegin     = 0x10100000;
-#  ifndef AV
-unsigned int _stacktop, _stackbottom;
-#  endif
-#endif
-
 extern bool saving_system;
 extern long real_maxpage;
 extern int sgc_enabled;

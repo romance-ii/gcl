@@ -42,10 +42,10 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "usig.h"
 
 EXTER
-char signals_handled[6];
+char signals_handled[32];
 
 void
-gcl_signal(int signo, void (*handler) (/* ??? */))
+gcl_signal(int signo, handler_function_type handler)
 {
   char *p = signals_handled;
   while (*p)
