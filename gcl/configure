@@ -3057,7 +3057,7 @@ echo "configure:3054: checking use_gmp=yes, doing configure in gmp directory" >&
    *)
       (cd gmp ; ./configure) ;;
  esac
- test -e gmp/mpn/add_n.* || cp gmp/mpn/generic/*.c gmp/mpn/
+ test -f gmp/mpn/add_n.* || cp gmp/mpn/generic/*.c gmp/mpn/
  GMP=1
  cat >> confdefs.h <<\EOF
 #define GMP 1
