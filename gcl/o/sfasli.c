@@ -30,6 +30,7 @@ static int
 build_symbol_table_bfd(void) {
 
   int u,v;
+  unsigned long pa;
   asymbol **q;
 
   bfd_init();
@@ -45,6 +46,7 @@ build_symbol_table_bfd(void) {
     FEerror("Cannot add self symbols\n",0);
   if ((u=bfd_get_symtab_upper_bound(bself))<0)
     FEerror("Cannot get self's symtab upper bound",0);
+
 #ifdef HAVE_ALLOCA
   q=(asymbol **)alloca(u);
 #else
@@ -52,6 +54,7 @@ build_symbol_table_bfd(void) {
 #endif
   if ((v=bfd_canonicalize_symtab(bself,q))<0)
     FEerror("Cannot canonicalize self's symtab",0);
+
   for (u=0;u<v;u++) {
     char *c=NULL;
     struct bfd_link_hash_entry *h;
@@ -76,7 +79,13 @@ build_symbol_table_bfd(void) {
       h->type=bfd_link_hash_defined;
       if (!q[u]->section)
 	FEerror("Symbol ~S is missing section",1,make_simple_string(q[u]->name));
-      h->u.def.value=q[u]->value+q[u]->section->vma;
+      if (q[u]->value || q[u]->flags != BSF_FUNCTION)
+	h->u.def.value=q[u]->value+q[u]->section->vma;
+      else if (!my_plt(q[u]->name,&pa)) {
+	printf("my_plt %s %lu\n",q[u]->name,pa);
+	h->u.def.value=pa+q[u]->section->vma;
+      } /* else */
+/* 	printf("missing %s\n",q[u]->name); */
       h->u.def.section=q[u]->section;
     }
 
@@ -105,6 +114,14 @@ LFD(build_symbol_table)(void) {
   {
 
     char tmpfile1[80],command[300];
+    unsigned long v;
+
+    /* Link in my_plt for SPECIAL_RSYM case required for binutils >=2.14.90.0.8*/
+    /* FIXME use my_plt as in build_symbol_table_bfd here for safety */
+    /* 20040227 CM */
+    my_plt("",&v);
+
+
     snprintf(tmpfile1,sizeof(tmpfile1),"rsym%d",getpid());
 #ifndef STAND
     coerce_to_filename(symbol_value(sSAsystem_directoryA),
