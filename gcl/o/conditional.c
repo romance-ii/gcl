@@ -33,7 +33,6 @@ object sLotherwise;
 void
 Fif(object form)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 
@@ -59,7 +58,6 @@ Fif(object form)
 void
 Fcond(object args)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 	object clause;
@@ -93,7 +91,6 @@ Fcond(object args)
 void
 Fcase(object arg)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 	object clause;
@@ -144,7 +141,6 @@ FOUND:
 void
 Fwhen(object form)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 
@@ -171,7 +167,6 @@ Fwhen(object form)
 void
 Funless(object form)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 

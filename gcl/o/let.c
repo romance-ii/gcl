@@ -28,7 +28,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 void
 let_var_list(object var_list)
 {
-	object endp_temp;
 
 	object x, y;
 
@@ -61,7 +60,6 @@ let_var_list(object var_list)
 void
 Flet(object form)
 {
-	object endp_temp;
 
 	object body;
 	struct bind_temp *start;
@@ -90,7 +88,6 @@ Flet(object form)
 void
 FletA(object form)
 {
-	object endp_temp;
 
 	object body;
 	struct bind_temp *start;
@@ -119,7 +116,6 @@ FletA(object form)
 void
 Fmultiple_value_bind(object form)
 {
-	object endp_temp;
 
 	object body, values_form, x, y;
         int n, m, i;
@@ -174,7 +170,6 @@ Fmultiple_value_bind(object form)
 void
 Fcompiler_let(object form)
 {
-	object endp_temp;
 
 	object body;
 	object *old_lex;
@@ -210,7 +205,6 @@ Fcompiler_let(object form)
 void
 Fflet(object args)
 {
-	object endp_temp;
 
 	object def_list;
 	object def;
@@ -244,7 +238,6 @@ is an illegal function definition in FLET.",
 void
 Flabels(object args)
 {
-	object endp_temp;
 
 	object def_list;
 	object def;
@@ -286,7 +279,6 @@ is an illegal function definition in LABELS.",
 void
 Fmacrolet(object args)
 {
-	object endp_temp;
 
 	object def_list;
 	object def;

@@ -235,7 +235,6 @@ object
 stream_element_type(strm)
 object strm;
 {
- 	object endp_temp;
 	object x;
 
 BEGIN:
@@ -493,7 +492,6 @@ close_stream(strm)
 object strm;
 /*bool abort_flag; */	/*  Not used now!  */
 {
-	object endp_temp;
 	object x;
 
 BEGIN:
@@ -670,7 +668,6 @@ closed_stream(object);
 readc_stream(strm)
 object strm;
 {
-	object endp_temp;
 	int c;
 
 BEGIN:
@@ -785,10 +782,7 @@ int
 rl_ungetc_em(int, FILE *);
 
 void
-unreadc_stream(c, strm)
-int c;
-object strm;
-{ 	object endp_temp;
+unreadc_stream(int c, object strm) {
 BEGIN:
 	switch (strm->sm.sm_mode) {
 	case smm_socket:
@@ -873,10 +867,7 @@ void
 cannot_write(object);
 
 int
-writec_stream(c, strm)
-int c;
-object strm;
-{ 	object endp_temp;
+writec_stream(int c, object strm) {
 	object x;
 	char *p;
 	int i;
@@ -1000,9 +991,7 @@ object strm;
 }
 
 void
-flush_stream(strm)
-object strm;
-{ 	object endp_temp;
+flush_stream(object strm) {
 	object x;
 
 BEGIN:
@@ -1067,9 +1056,7 @@ BEGIN:
 
 
 bool
-stream_at_end(strm)
-object strm;
-{ 	object endp_temp;
+stream_at_end(object strm) {
 #define NON_CHAR -1000
 	VOL int c = NON_CHAR;
 
@@ -1169,9 +1156,7 @@ BEGIN:
 #endif
 
 bool
-listen_stream(strm)
-object strm;
-{ 	object endp_temp;
+listen_stream(object strm) {
 
 BEGIN:
 
@@ -1384,9 +1369,7 @@ BEGIN:
 }
 
 int
-file_column(strm)
-object strm;
-{ 	object endp_temp;
+file_column(object strm) {
 	int i;
 	object x;
 

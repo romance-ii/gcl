@@ -683,7 +683,7 @@ T243:;
 	goto T245;}
 	if((V124)>=(V118)){
 	goto T245;}
-	if(!(endp((V119)))){
+	if(!(endp_prop((V119)))){
 	goto T244;}
 goto T245;
 T245:;
@@ -920,7 +920,7 @@ T319:;
 	goto T321;}
 	if((V181)>=(V175)){
 	goto T321;}
-	if(!(endp(cdr((V177))))){
+	if(!(endp_prop(cdr((V177))))){
 	goto T320;}
 goto T321;
 T321:;
@@ -2406,7 +2406,7 @@ T753:;
 	goto T754;}
 	if(((V523))!=Cnil){
 	goto T754;}
-	if(!(endp((V518)))){
+	if(!(endp_prop((V518)))){
 	goto T763;}
 	{object V525 = Cnil;
 	VMR35(V525)}
@@ -2418,7 +2418,7 @@ T763:;
 	V527= Cnil;
 goto T767;
 T767:;
-	if(!(endp(cdr((V526))))){
+	if(!(endp_prop(cdr((V526))))){
 	goto T768;}
 	base[0]= (V527);
 	base[1]= (V526);
@@ -2503,7 +2503,7 @@ T791:;
 	goto T792;}
 	if(((V536))!=Cnil){
 	goto T792;}
-	if(!(endp((V531)))){
+	if(!(endp_prop((V531)))){
 	goto T801;}
 	{object V539 = Cnil;
 	VMR36(V539)}
@@ -2513,7 +2513,7 @@ T801:;
 	V540= (V531);
 goto T805;
 T805:;
-	if(!(endp(cdr((V540))))){
+	if(!(endp_prop(cdr((V540))))){
 	goto T806;}
 	{object V541 = (V531);
 	VMR36(V541)}
@@ -3465,7 +3465,8 @@ T1217:;
 	Llength();
 	vs_top=sup;
 	(V699->c.c_car)= vs_base[0];
-	if(endp(V700=MMcdr(V700))){
+	V700=MMcdr(V700);
+	if(endp(V700)){
 	V697= base[4];
 	goto T1216;}
 	V699=MMcdr(V699)=MMcons(Cnil,Cnil);
@@ -3525,7 +3526,8 @@ T1242:;
 	{register object V708;
 	V708= (V707->c.c_car);
 	(V706->c.c_car)= elt((V708),fixint((V703)));}
-	if(endp(V707=MMcdr(V707))){
+	V707=MMcdr(V707);
+	if(endp(V707)){
 	V705= base[4];
 	goto T1241;}
 	V706=MMcdr(V706)=MMcons(Cnil,Cnil);
@@ -3687,14 +3689,14 @@ T1279:;
 	L41(base0);
 	vs_top=sup;
 	V721= vs_base[0];
-	if(!(endp((V720)))){
+	if(!(endp_prop((V720)))){
 	goto T1303;}
 	base[1]= (V721);
 	vs_top=(vs_base=base+1)+1;
 	return;
 goto T1303;
 T1303:;
-	if(!(endp((V721)))){
+	if(!(endp_prop((V721)))){
 	goto T1301;}
 	base[1]= (V720);
 	vs_top=(vs_base=base+1)+1;
@@ -3738,7 +3740,7 @@ T1253:;
 	((V723))->c.c_cdr = (V720);
 	V723= cdr((V723));
 	V720= cdr((V720));
-	if(!(endp((V720)))){
+	if(!(endp_prop((V720)))){
 	goto T1329;}
 	if(type_of((V723))!=t_cons)FEwrong_type_argument(Scons,(V723));
 	((V723))->c.c_cdr = (V721);
@@ -3757,7 +3759,7 @@ T1254:;
 	((V723))->c.c_cdr = (V721);
 	V723= cdr((V723));
 	V721= cdr((V721));
-	if(!(endp((V721)))){
+	if(!(endp_prop((V721)))){
 	goto T1340;}
 	if(type_of((V723))!=t_cons)FEwrong_type_argument(Scons,(V723));
 	((V723))->c.c_cdr = (V720);

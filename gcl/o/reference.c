@@ -94,7 +94,6 @@ Lsymbol_function(void)
 void
 Fquote(object form)
 {
-	object endp_temp;
 
 	if (endp(form))
 		FEtoo_few_argumentsF(form);
@@ -107,7 +106,6 @@ Fquote(object form)
 void
 Ffunction(object form)
 {
-	object endp_temp;
 
 	object fun;
 	object fd;

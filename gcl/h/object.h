@@ -988,3 +988,57 @@ void raise_pending_signals();
 
 EXTER unsigned plong signals_allowed, signals_pending  ;
 
+EXTER struct cons my_dot,my_dot_pit;
+
+#define	global_endp(x)	({\
+    object _x=(x);\
+    bool _b=FALSE;\
+    \
+    if (type_of(_x)==t_cons) {\
+       if (type_of(_x->c.c_cdr)!=t_cons && _x->c.c_cdr!=Cnil)\
+          my_dot.c_car=_x->c.c_cdr;\
+       else \
+          my_dot.c_car=(object)&my_dot_pit;\
+    } else {\
+       if (_x==my_dot.c_car)\
+          x=(object)&my_dot;\
+       else {\
+         my_dot.c_car=(object)&my_dot_pit;\
+         if (_x==Cnil || _x==(object)&my_dot_pit)\
+             _b=TRUE;\
+         else\
+             FEwrong_type_argument(sLlist, _x);\
+       }\
+    }\
+    _b;\
+    })
+
+#define	endp(x)	({\
+    static struct cons s_my_dot={t_cons,0,0,0,(object)&my_dot_pit,(object)&my_dot_pit};\
+    object _x=(x);\
+    bool _b=FALSE;\
+    \
+    if (type_of(_x)==t_cons) {\
+       if (type_of(_x->c.c_cdr)!=t_cons && _x->c.c_cdr!=Cnil)\
+          s_my_dot.c_car=_x->c.c_cdr;\
+       else \
+          s_my_dot.c_car=(object)&my_dot_pit;\
+    } else {\
+       if (_x==s_my_dot.c_car)\
+          x=(object)&s_my_dot;\
+       else {\
+         s_my_dot.c_car=(object)&my_dot_pit;\
+         if (_x==Cnil || _x==(object)&my_dot_pit)\
+             _b=TRUE;\
+         else\
+             FEwrong_type_argument(sLlist, _x);\
+       }\
+    }\
+    _b;\
+    })
+
+#define endp_prop(a) (type_of(a)==t_cons ? FALSE : ((a)==Cnil ? TRUE : (FEwrong_type_argument(sLlist, (a)),FALSE)))
+    
+#define dot_list_eq(a,b) ((a)==(b) || ((a)->c.c_cdr==(object)&my_dot_pit && (a)->c.c_car==(b)))
+#define proper_list(a) (type_of(a)==t_cons || (a)==Cnil)
+#define proper_cons(a) (type_of(a)==t_cons && (a)->c.c_cdr!=(object)&my_dot_pit)

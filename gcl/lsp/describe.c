@@ -260,7 +260,7 @@ T85:;
 	V11= car((V10));
 goto T101;
 T101:;
-	if(!(endp((V10)))){
+	if(!(endp_prop((V10)))){
 	goto T102;}
 	goto T34;
 goto T102;
@@ -592,7 +592,7 @@ T179:;
 	V33= vs_base[0];
 goto T214;
 T214:;
-	if(!(endp((V33)))){
+	if(!(endp_prop((V33)))){
 	goto T215;}
 	goto T210;
 goto T215;
@@ -1711,7 +1711,7 @@ TTL:;
 	V122= car((V121));
 goto T677;
 T677:;
-	if(!(endp((V121)))){
+	if(!(endp_prop((V121)))){
 	goto T678;}
 	{object V123 = Cnil;
 	VMR16(V123)}
@@ -2606,7 +2606,7 @@ T949:;
 	V169= car((V168));
 goto T1004;
 T1004:;
-	if(!(endp((V168)))){
+	if(!(endp_prop((V168)))){
 	goto T1005;}
 	goto T947;
 goto T1005;

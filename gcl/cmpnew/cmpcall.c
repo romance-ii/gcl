@@ -81,7 +81,7 @@ T14:;
 	V14= car((V13));
 goto T21;
 T21:;
-	if(!(endp((V13)))){
+	if(!(endp_prop((V13)))){
 	goto T22;}
 	{object V15 = Ct;
 	VMR1(V15)}
@@ -183,13 +183,13 @@ T57:;{object V31;
 	goto T60;
 goto T61;
 T61:;
-	if(((endp(cdr((V28)))?Ct:Cnil))==Cnil){
+	if(((endp_prop(cdr((V28)))?Ct:Cnil))==Cnil){
 	goto T63;}
 	V31= Cnil;
 	goto T60;
 goto T63;
 T63:;
-	if(endp(cddr((V28)))){
+	if(endp_prop(cddr((V28)))){
 	goto T65;}
 	V31= Cnil;
 	goto T60;
@@ -201,7 +201,7 @@ T65:;{object V32;
 	goto T68;
 goto T69;
 T69:;
-	if(((endp(cdadr((V28)))?Ct:Cnil))==Cnil){
+	if(((endp_prop(cdadr((V28)))?Ct:Cnil))==Cnil){
 	goto T71;}
 	V32= Cnil;
 	goto T68;
@@ -275,13 +275,13 @@ T59:;}
 	goto T56;
 goto T86;
 T86:;
-	if(((endp(cdr((V28)))?Ct:Cnil))==Cnil){
+	if(((endp_prop(cdr((V28)))?Ct:Cnil))==Cnil){
 	goto T88;}
 	V30= Cnil;
 	goto T56;
 goto T88;
 T88:;
-	if(endp(cddr((V28)))){
+	if(endp_prop(cddr((V28)))){
 	goto T90;}
 	V30= Cnil;
 	goto T56;
@@ -299,7 +299,7 @@ T94:;
 	goto T93;
 goto T96;
 T96:;
-	if(((endp(cdadr((V28)))?Ct:Cnil))==Cnil){
+	if(((endp_prop(cdadr((V28)))?Ct:Cnil))==Cnil){
 	goto T98;}
 	V38= Cnil;
 	goto T93;
@@ -596,7 +596,7 @@ T218:;
 	V77= car((V76));
 goto T234;
 T234:;
-	if(!(endp((V76)))){
+	if(!(endp_prop((V76)))){
 	goto T235;}
 	goto T226;
 goto T235;
@@ -838,7 +838,8 @@ T327:;
 goto T337;
 T337:;
 	(V115->c.c_car)= list(2,(V116->c.c_car),Cnil);
-	if(endp(V116=MMcdr(V116))){
+	V116=MMcdr(V116);
+	if(endp(V116)){
 	V114= base[4];
 	goto T336;}
 	V115=MMcdr(V115)=MMcons(Cnil,Cnil);
@@ -1664,7 +1665,7 @@ T720:;
 	V226= car((V225));
 goto T731;
 T731:;
-	if(!(endp((V225)))){
+	if(!(endp_prop((V225)))){
 	goto T732;}
 	goto T727;
 goto T732;
@@ -1710,7 +1711,7 @@ TTL:;
 	V234= car((V233));
 goto T753;
 T753:;
-	if(!(endp((V233)))){
+	if(!(endp_prop((V233)))){
 	goto T754;}
 	{object V235 = Cnil;
 	VMR19(V235)}

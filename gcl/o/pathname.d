@@ -348,7 +348,6 @@ object
 namestring(x)
 object x;
 {
-	object endp_temp;
 
 	int i, j;
 	object l, y;

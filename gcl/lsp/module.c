@@ -77,7 +77,7 @@ T18:;
 	V8= (V6);
 goto T22;
 T22:;
-	if(!(endp((V8)))){
+	if(!(endp_prop((V8)))){
 	goto T23;}
 	{object V9 = Cnil;
 	bds_unwind1;
@@ -151,9 +151,9 @@ register object V23;
 {	 VMB4 VMS4 VMV4
 goto TTL;
 TTL:;
-	if(endp((V23))){
+	if(endp_prop((V23))){
 	goto T39;}
-	if(!(endp(cdr((V23))))){
+	if(!(endp_prop(cdr((V23))))){
 	goto T40;}
 goto T39;
 T39:;

@@ -332,7 +332,6 @@ void
 turbo_closure(object fun)
 {
   object l,*block;
-  object endp_temp;
   int n;
 
   if(fun->cc.cc_turbo==NULL)

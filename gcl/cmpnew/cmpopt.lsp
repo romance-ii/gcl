@@ -699,7 +699,10 @@ type_of(#0)==t_bitvector")
    (get 'elt 'inline-unsafe))
 
 ;;ENDP
- (push '((t) boolean #.(flags)"endp(#0)")
+;;Must use endp_prop here as generic lisp code containing (endp 
+;;can be compiled to take function output as its argument, which
+;;cannot be redirected via a macro, e.g. endp(cdr(V20)).  CM
+ (push '((t) boolean #.(flags)"endp_prop(#0)")
    (get 'endp 'inline-safe))
 (push '((t) boolean #.(flags)"(#0)==Cnil")
    (get 'endp 'inline-unsafe))

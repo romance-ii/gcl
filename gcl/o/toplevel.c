@@ -41,7 +41,6 @@ object sLtypep;
 void
 Fdefun(object args)
 {
-	object endp_temp;
 
 	object name;
 	object body, form;
@@ -125,7 +124,6 @@ siLAmake_constant(void)
 void
 Feval_when(object arg)
 {
-	object endp_temp;
 
 	object *base = vs_base;
 	object ss;
@@ -170,7 +168,6 @@ Flocally(object body)
 void
 Fthe(object args)
 {
-	object endp_temp;
 
 	object *vs;
 

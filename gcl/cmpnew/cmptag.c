@@ -243,7 +243,8 @@ T88:;
 	(V39->c.c_car)= (V40->c.c_car);
 goto T86;
 T86:;
-	if(endp(V40=MMcdr(V40))){
+	V40=MMcdr(V40);
+	if(endp(V40)){
 	V37= base[2];
 	goto T84;}
 	V39=MMcdr(V39)=MMcons(Cnil,Cnil);
@@ -272,7 +273,8 @@ T100:;
 	(V43->c.c_car)= (*(LnkLI50))((V44->c.c_car),(V38));
 goto T98;
 T98:;
-	if(endp(V44=MMcdr(V44))){
+	V44=MMcdr(V44);
+	if(endp(V44)){
 	V37= base[2];
 	goto T96;}
 	V43=MMcdr(V43)=MMcons(Cnil,Cnil);
@@ -291,7 +293,7 @@ T96:;
 	V50= Cnil;
 goto T105;
 T105:;
-	if(!(endp((V46)))){
+	if(!(endp_prop((V46)))){
 	goto T106;}
 	if(((V50))!=Cnil){
 	goto T109;}
@@ -413,7 +415,7 @@ TTL:;
 	V74= car((V73));
 goto T167;
 T167:;
-	if(!(endp((V73)))){
+	if(!(endp_prop((V73)))){
 	goto T168;}
 	goto T163;
 goto T168;
@@ -459,7 +461,7 @@ TTL:;
 	V80= Cnil;
 goto T186;
 T186:;
-	if(!(endp(cdr((V79))))){
+	if(!(endp_prop(cdr((V79))))){
 	goto T187;}
 	if(((V80))==Cnil){
 	goto T191;}
@@ -644,7 +646,7 @@ TTL:;
 	V99= car((V98));
 goto T298;
 T298:;
-	if(!(endp((V98)))){
+	if(!(endp_prop((V98)))){
 	goto T299;}
 	goto T294;
 goto T299;
@@ -737,7 +739,7 @@ TTL:;
 	V111= car((V110));
 goto T366;
 T366:;
-	if(!(endp((V110)))){
+	if(!(endp_prop((V110)))){
 	goto T367;}
 	goto T362;
 goto T367;
@@ -805,13 +807,13 @@ object V118;
 {	 VMB11 VMS11 VMV11
 goto TTL;
 TTL:;
-	if(!(endp((V118)))){
+	if(!(endp_prop((V118)))){
 	goto T407;}
 	(void)((*(LnkLI68))(VV[1],small_fixnum(1),small_fixnum(0)));
 	goto T405;
 goto T407;
 T407:;
-	if(endp(cdr((V118)))){
+	if(endp_prop(cdr((V118)))){
 	goto T410;}
 	V119 = make_fixnum((long)length((V118)));
 	(void)((*(LnkLI69))(VV[1],small_fixnum(1),V119));
@@ -836,7 +838,7 @@ T405:;
 	V124= Cnil;
 goto T420;
 T420:;
-	if(!(endp((V121)))){
+	if(!(endp_prop((V121)))){
 	goto T421;}
 	{object V125 = (VFUN_NARGS=2,(*(LnkLI70))(VV[23],(V122)));
 	VMR11(V125)}
@@ -1098,7 +1100,8 @@ T514:;
 	(V170->c.c_car)= (V172);}
 goto T512;
 T512:;
-	if(endp(V171=MMcdr(V171))){
+	V171=MMcdr(V171);
+	if(endp(V171)){
 	V165= base[4];
 	goto T510;}
 	V170=MMcdr(V170)=MMcons(Cnil,Cnil);
@@ -1185,7 +1188,7 @@ static void L19()
 	V194= car((V193));
 goto T547;
 T547:;
-	if(!(endp((V193)))){
+	if(!(endp_prop((V193)))){
 	goto T548;}
 	goto T543;
 goto T548;

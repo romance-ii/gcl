@@ -92,9 +92,12 @@
                save)
              (wt-label *exit*))
        (cond (*safe-compile*
-              (wt-nl "if(endp(" (car handies) "=MMcdr(" (car handies) "))")
+	      (wt-nl (car handies) "=MMcdr(" (car handies) ");")
               (dolist** (loc (cdr handies))
-                        (wt "||endp(" loc "=MMcdr(" loc "))"))
+			(wt-nl loc "=MMcdr(" loc ");"))
+              (wt-nl "if(endp(" (car handies)  ")")
+              (dolist** (loc (cdr handies))
+                        (wt "||endp(" loc ")"))
               (wt "){"))
              (t
               (wt-nl "if((" (car handies) "=MMcdr(" (car handies) "))==Cnil")
@@ -155,9 +158,12 @@
                save)
              (wt-label *exit*))
        (cond (*safe-compile*
-              (wt-nl "if(endp(" (car handies) "=MMcdr(" (car handies) "))")
+	      (wt-nl (car handies) "=MMcdr(" (car handies) ");")
               (dolist** (loc (cdr handies))
-                        (wt "||endp(" loc "=MMcdr(" loc "))"))
+			(wt-nl loc "=MMcdr(" loc ");"))
+              (wt-nl "if(endp(" (car handies)  ")")
+              (dolist** (loc (cdr handies))
+                        (wt "||endp(" loc ")"))
               (wt "){"))
              (t
               (wt-nl "if((" (car handies) "=MMcdr(" (car handies) "))==Cnil")
@@ -220,9 +226,13 @@
              (wt-label *exit*))
        (cond
         (*safe-compile*
-         (wt-nl "while(!endp(MMcdr(" handy ")))" handy "=MMcdr(" handy ");")
-         (wt-nl "if(endp(" (car handies) "=MMcdr(" (car handies) "))")
-         (dolist** (loc (cdr handies)) (wt "||endp(" loc "=MMcdr(" loc "))"))
+         (wt-nl "{object cdr_" handy "=MMcdr(" handy ");while(!endp(cdr_" handy ")) {cdr_" handy "=MMcdr(cdr_" handy ");" handy "=MMcdr(" handy ");}}")
+          (wt-nl (car handies) "=MMcdr(" (car handies) ");")
+          (dolist** (loc (cdr handies))
+		    (wt-nl loc "=MMcdr(" loc ");"))
+          (wt-nl "if(endp(" (car handies)  ")")
+          (dolist** (loc (cdr handies))
+                    (wt "||endp(" loc ")"))
          (wt "){"))
         (t
          (wt-nl "while(MMcdr(" handy ")!=Cnil)" handy "=MMcdr(" handy ");")

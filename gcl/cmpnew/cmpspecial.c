@@ -10,12 +10,12 @@ register object V2;
 {	 VMB1 VMS1 VMV1
 goto TTL;
 TTL:;
-	if(!(endp((V2)))){
+	if(!(endp_prop((V2)))){
 	goto T1;}
 	(void)((*(LnkLI45))(VV[0],small_fixnum(1),small_fixnum(0)));
 goto T1;
 T1:;
-	if(endp(cdr((V2)))){
+	if(endp_prop(cdr((V2)))){
 	goto T4;}
 	V3 = make_fixnum((long)length((V2)));
 	(void)((*(LnkLI46))(VV[0],small_fixnum(1),V3));
@@ -33,7 +33,7 @@ register object V6;
 {	 VMB2 VMS2 VMV2
 goto TTL;
 TTL:;
-	if(!(endp((V6)))){
+	if(!(endp_prop((V6)))){
 	goto T7;}
 	(void)((*(LnkLI45))(VV[1],small_fixnum(1),small_fixnum(0)));
 goto T7;
@@ -44,7 +44,7 @@ T7:;
 	V8= car((V7));
 goto T13;
 T13:;
-	if(!(endp((V7)))){
+	if(!(endp_prop((V7)))){
 	goto T14;}
 	{object V9 = (*(LnkLI48))();
 	VMR2(V9)}
@@ -97,9 +97,9 @@ TTL:;
 	V18= Cnil;
 	V19= Cnil;
 	V20= Cnil;
-	if(endp((V17))){
+	if(endp_prop((V17))){
 	goto T30;}
-	if(!(endp(cdr((V17))))){
+	if(!(endp_prop(cdr((V17))))){
 	goto T29;}
 goto T30;
 T30:;
@@ -107,7 +107,7 @@ T30:;
 	(void)((*(LnkLI45))(VV[5],small_fixnum(2),V21));
 goto T29;
 T29:;
-	if(endp(cddr((V17)))){
+	if(endp_prop(cddr((V17)))){
 	goto T34;}
 	V22 = make_fixnum((long)length((V17)));
 	(void)((*(LnkLI46))(VV[5],small_fixnum(2),V22));
@@ -146,7 +146,7 @@ TTL:;
 	register object V30;
 	V29= Cnil;
 	V30= Cnil;
-	if(!(endp((V28)))){
+	if(!(endp_prop((V28)))){
 	goto T50;}
 	(void)((*(LnkLI45))(VV[8],small_fixnum(1),small_fixnum(0)));
 goto T50;
@@ -157,7 +157,7 @@ T50:;
 	V32= car((V31));
 goto T57;
 T57:;
-	if(!(endp((V31)))){
+	if(!(endp_prop((V31)))){
 	goto T58;}
 	goto T53;
 goto T58;
@@ -166,9 +166,9 @@ T58:;
 	goto T64;}
 	if(!(type_of(car((V32)))==t_symbol)){
 	goto T67;}
-	if(endp(cdr((V32)))){
+	if(endp_prop(cdr((V32)))){
 	goto T66;}
-	if(endp(cddr((V32)))){
+	if(endp_prop(cddr((V32)))){
 	goto T66;}
 goto T67;
 T67:;
@@ -176,7 +176,7 @@ T67:;
 goto T66;
 T66:;
 	V29= make_cons(car((V32)),(V29));
-	if(!(endp(cdr((V32))))){
+	if(!(endp_prop(cdr((V32))))){
 	goto T78;}
 	V33= Cnil;
 	goto T76;
@@ -278,12 +278,12 @@ goto TTL;
 TTL:;
 	{object V43;
 	V43= Cnil;
-	if(!(endp((V42)))){
+	if(!(endp_prop((V42)))){
 	goto T104;}
 	(void)((*(LnkLI45))(VV[11],small_fixnum(1),small_fixnum(0)));
 goto T104;
 T104:;
-	if(endp(cdr((V42)))){
+	if(endp_prop(cdr((V42)))){
 	goto T107;}
 	V44 = make_fixnum((long)length((V42)));
 	(void)((*(LnkLI46))(VV[11],small_fixnum(1),V44));
@@ -313,7 +313,7 @@ T112:;
 	goto T123;}
 	if(!((car((V45)))==(VV[17]))){
 	goto T123;}
-	if(!(endp(cdr((V45))))){
+	if(!(endp_prop(cdr((V45))))){
 	goto T127;}
 	(void)((VFUN_NARGS=2,(*(LnkLI53))(VV[18],(V45))));
 goto T127;

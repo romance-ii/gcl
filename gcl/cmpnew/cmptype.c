@@ -119,7 +119,7 @@ T18:;
 	{object V25= car((V23));
 	if((V25!= VV[57])
 	&& (V25!= VV[2]))goto T20;
-	if(endp(cdr((V23)))){
+	if(endp_prop(cdr((V23)))){
 	goto T21;}
 	if(!((VV[7])==(cadr((V23))))){
 	goto T28;}
@@ -146,7 +146,7 @@ T21:;
 	VMR2(V27)}
 goto T22;
 T22:;
-	if(endp(cddr((V23)))){
+	if(endp_prop(cddr((V23)))){
 	goto T35;}
 	if((caddr((V23)))==(VV[7])){
 	goto T35;}

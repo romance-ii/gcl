@@ -189,7 +189,7 @@ T41:;
 	V26= car((V25));
 goto T60;
 T60:;
-	if(!(endp((V25)))){
+	if(!(endp_prop((V25)))){
 	goto T61;}
 	{object V27 = (*(LnkLI50))();
 	bds_unwind1;
@@ -490,7 +490,7 @@ TTL:;
 	V55= car((V54));
 goto T217;
 T217:;
-	if(!(endp((V54)))){
+	if(!(endp_prop((V54)))){
 	goto T218;}
 	{object V56 = (*(LnkLI50))();
 	VMR7(V56)}
@@ -593,7 +593,7 @@ TTL:;
 	V66= car((V65));
 goto T269;
 T269:;
-	if(!(endp((V65)))){
+	if(!(endp_prop((V65)))){
 	goto T270;}
 	{object V67 = (*(LnkLI50))();
 	VMR8(V67)}

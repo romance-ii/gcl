@@ -900,7 +900,7 @@ T215:;
 	V103= car((V102));
 goto T225;
 T225:;
-	if(!(endp((V102)))){
+	if(!(endp_prop((V102)))){
 	goto T226;}
 	goto T221;
 goto T226;
@@ -1618,7 +1618,7 @@ T513:;
 	V180= car((V179));
 goto T524;
 T524:;
-	if(!(endp((V179)))){
+	if(!(endp_prop((V179)))){
 	goto T525;}
 	base[4]= make_fixnum(V173);
 	vs_top=(vs_base=base+4)+1;
@@ -2080,7 +2080,7 @@ T673:;
 	V216= car((V215));
 goto T693;
 T693:;
-	if(!(endp((V215)))){
+	if(!(endp_prop((V215)))){
 	goto T694;}
 	goto T689;
 goto T694;
@@ -2099,7 +2099,7 @@ T694:;
 	V222= car((V221));
 goto T707;
 T707:;
-	if(!(endp((V221)))){
+	if(!(endp_prop((V221)))){
 	goto T708;}
 	goto T703;
 goto T708;
@@ -4933,7 +4933,8 @@ T1682:;
 goto T1714;
 T1714:;
 	(V460->c.c_car)= symbol_name((V461->c.c_car));
-	if(endp(V461=MMcdr(V461))){
+	V461=MMcdr(V461);
+	if(endp(V461)){
 	base[10]= base[11];
 	goto T1713;}
 	V460=MMcdr(V460)=MMcons(Cnil,Cnil);
@@ -4962,7 +4963,8 @@ T1725:;
 	(V462->c.c_car)= make_cons((V463->c.c_car),Cnil);
 goto T1723;
 T1723:;
-	if(endp(V463=MMcdr(V463))){
+	V463=MMcdr(V463);
+	if(endp(V463)){
 	base[16]= base[17];
 	goto T1721;}
 	V462=MMcdr(V462)=MMcons(Cnil,Cnil);
@@ -4981,7 +4983,7 @@ T1721:;
 	V466= car((V465));
 goto T1733;
 T1733:;
-	if(!(endp((V465)))){
+	if(!(endp_prop((V465)))){
 	goto T1734;}
 	goto T1729;
 goto T1734;
@@ -5336,8 +5338,9 @@ T1877:;
 	Lcopy_list();
 	vs_top=sup;
 	(V501->c.c_cdr)= vs_base[0];
-	while(!endp(MMcdr(V501)))V501=MMcdr(V501);
-	if(endp(V502=MMcdr(V502))){
+	{object cdr_V501=MMcdr(V501);while(!endp(cdr_V501)) {cdr_V501=MMcdr(cdr_V501);V501=MMcdr(V501);}}
+	V502=MMcdr(V502);
+	if(endp(V502)){
 	base[4]=base[4]->c.c_cdr;
 	V499= base[4];
 	goto T1876;}
@@ -5353,7 +5356,8 @@ T1876:;
 goto T1882;
 T1882:;
 	(V506->c.c_car)= car((V507->c.c_car));
-	if(endp(V507=MMcdr(V507))){
+	V507=MMcdr(V507);
+	if(endp(V507)){
 	V500= base[4];
 	goto T1881;}
 	V506=MMcdr(V506)=MMcons(Cnil,Cnil);
@@ -5380,7 +5384,7 @@ T1886:;
 	V509= car((V508));
 goto T1896;
 T1896:;
-	if(!(endp((V508)))){
+	if(!(endp_prop((V508)))){
 	goto T1897;}
 	goto T1892;
 goto T1897;
@@ -7018,7 +7022,7 @@ TTL:;
 	V648= car((V647));
 goto T2557;
 T2557:;
-	if(!(endp((V647)))){
+	if(!(endp_prop((V647)))){
 	goto T2558;}
 	base[2]= make_fixnum(V646);
 	vs_top=(vs_base=base+2)+1;
@@ -7135,7 +7139,7 @@ TTL:;
 	V666= car((V665));
 goto T2592;
 T2592:;
-	if(!(endp((V665)))){
+	if(!(endp_prop((V665)))){
 	goto T2593;}
 	goto T2588;
 goto T2593;
@@ -7281,8 +7285,9 @@ T2642:;
 	(V675->c.c_cdr)= make_cons((V677),Cnil);}
 goto T2639;
 T2639:;
-	while(!endp(MMcdr(V675)))V675=MMcdr(V675);
-	if(endp(V676=MMcdr(V676))){
+	{object cdr_V675=MMcdr(V675);while(!endp(cdr_V675)) {cdr_V675=MMcdr(cdr_V675);V675=MMcdr(V675);}}
+	V676=MMcdr(V676);
+	if(endp(V676)){
 	base[3]=base[3]->c.c_cdr;
 	vs_top=(vs_base=base+3)+1;
 	return;}
@@ -7437,7 +7442,7 @@ T2693:;
 	V698= car((V697));
 goto T2703;
 T2703:;
-	if(!(endp((V697)))){
+	if(!(endp_prop((V697)))){
 	goto T2704;}
 	goto T2699;
 goto T2704;

@@ -14,12 +14,12 @@ TTL:;
 	object V4;
 	V3= Cnil;
 	V4= Cnil;
-	if(!(endp((V2)))){
+	if(!(endp_prop((V2)))){
 	goto T3;}
 	(void)((*(LnkLI38))(VV[0],small_fixnum(1),small_fixnum(0)));
 goto T3;
 T3:;
-	if(!(endp(cdr((V2))))){
+	if(!(endp_prop(cdr((V2))))){
 	goto T7;}
 	{object V5 = (*(LnkLI39))((V2));
 	VMR1(V5)}
@@ -51,7 +51,7 @@ TTL:;
 	bds_bind(VV[1],symbol_value(VV[1]));
 	V11= Cnil;
 	V12= Cnil;
-	if(!(endp(cdr((V10))))){
+	if(!(endp_prop(cdr((V10))))){
 	goto T19;}
 	V11= (*(LnkLI43))((V9));
 	bds_bind(VV[2],VV[3]);
@@ -77,7 +77,7 @@ T19:;
 	V16= car((V15));
 goto T41;
 T41:;
-	if(!(endp((V15)))){
+	if(!(endp_prop((V15)))){
 	goto T42;}
 	goto T37;
 goto T42;
@@ -122,7 +122,7 @@ TTL:;
 	object V22;
 	V21= (VFUN_NARGS=0,(*(LnkLI48))());
 	V22= Cnil;
-	if(!(endp((V20)))){
+	if(!(endp_prop((V20)))){
 	goto T72;}
 	(void)((*(LnkLI38))(VV[8],small_fixnum(1),small_fixnum(0)));
 goto T72;
@@ -170,7 +170,7 @@ TTL:;
 	V32= car((V31));
 goto T99;
 T99:;
-	if(!(endp((V31)))){
+	if(!(endp_prop((V31)))){
 	goto T100;}
 	goto T95;
 goto T100;
@@ -294,7 +294,7 @@ T153:;
 	V46= car((V45));
 goto T166;
 T166:;
-	if(!(endp((V45)))){
+	if(!(endp_prop((V45)))){
 	goto T167;}
 	goto T162;
 goto T167;
@@ -337,16 +337,16 @@ TTL:;
 	register object V55;
 	V54= (VFUN_NARGS=0,(*(LnkLI48))());
 	V55= Cnil;
-	if(endp((V53))){
+	if(endp_prop((V53))){
 	goto T188;}
-	if(!(endp(cdr((V53))))){
+	if(!(endp_prop(cdr((V53))))){
 	goto T187;}
 goto T188;
 T188:;
 	(void)((*(LnkLI38))(VV[19],small_fixnum(2),small_fixnum(0)));
 goto T187;
 T187:;
-	if(endp(cddr((V53)))){
+	if(endp_prop(cddr((V53)))){
 	goto T192;}
 	V56 = make_fixnum((long)length((V53)));
 	(void)((*(LnkLI55))(VV[19],small_fixnum(2),V56));
@@ -358,7 +358,7 @@ T192:;
 	V58= car((V57));
 goto T199;
 T199:;
-	if(!(endp((V57)))){
+	if(!(endp_prop((V57)))){
 	goto T200;}
 	goto T195;
 goto T200;
@@ -472,7 +472,7 @@ T243:;
 	V80= (V77);
 goto T246;
 T246:;
-	if(!(endp((V80)))){
+	if(!(endp_prop((V80)))){
 	goto T247;}
 	goto T244;
 goto T247;
@@ -481,7 +481,7 @@ T247:;
 	V81= car((V80));
 	princ_str("\n	if(vs_base<vs_top){",VV[6]);
 	(void)((*(LnkLI60))(VV[11],car((V81)),cadr((V81))));
-	if(endp(cdr((V80)))){
+	if(endp_prop(cdr((V80)))){
 	goto T256;}
 	princ_str("\n	vs_base++;",VV[6]);
 goto T256;
@@ -540,9 +540,9 @@ TTL:;
 	V94= Cnil;
 	V95= Cnil;
 	bds_bind(VV[31],symbol_value(VV[31]));
-	if(endp((V86))){
+	if(endp_prop((V86))){
 	goto T286;}
-	if(!(endp(cdr((V86))))){
+	if(!(endp_prop(cdr((V86))))){
 	goto T285;}
 goto T286;
 T286:;
@@ -586,7 +586,7 @@ T285:;
 	V98= car((V97));
 goto T299;
 T299:;
-	if(!(endp((V97)))){
+	if(!(endp_prop((V97)))){
 	goto T300;}
 	goto T295;
 goto T300;
@@ -607,7 +607,7 @@ T295:;
 	V101= car((V100));
 goto T320;
 T320:;
-	if(!(endp((V100)))){
+	if(!(endp_prop((V100)))){
 	goto T321;}
 	goto T316;
 goto T321;
@@ -629,7 +629,7 @@ T316:;
 	V104= car((V103));
 goto T341;
 T341:;
-	if(!(endp((V103)))){
+	if(!(endp_prop((V103)))){
 	goto T342;}
 	goto T337;
 goto T342;
@@ -672,7 +672,7 @@ TTL:;
 	V116= car((V115));
 goto T360;
 T360:;
-	if(!(endp((V115)))){
+	if(!(endp_prop((V115)))){
 	goto T361;}
 	goto T356;
 goto T361;
@@ -727,7 +727,7 @@ T390:;
 	V120= (V109);
 goto T393;
 T393:;
-	if(!(endp((V120)))){
+	if(!(endp_prop((V120)))){
 	goto T394;}
 	bds_unwind1;
 	bds_unwind1;
@@ -748,7 +748,7 @@ T394:;
 	princ_char(59,VV[6]);
 	princ_char(125,VV[6]);
 	(void)((*(LnkLI71))(car((V120)),VV[37]));
-	if(endp(cdr((V120)))){
+	if(endp_prop(cdr((V120)))){
 	goto T412;}
 	princ_str("\n	vs_base++;",VV[6]);
 goto T412;
@@ -775,7 +775,7 @@ T391:;
 	V124= car((V123));
 goto T436;
 T436:;
-	if(!(endp((V123)))){
+	if(!(endp_prop((V123)))){
 	goto T437;}
 	goto T432;
 goto T437;

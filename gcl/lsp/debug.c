@@ -27,7 +27,7 @@ T5:;
 	V3= car((V2));
 goto T11;
 T11:;
-	if(!(endp((V2)))){
+	if(!(endp_prop((V2)))){
 	goto T12;}
 	goto T7;
 goto T12;
@@ -96,7 +96,7 @@ TTL:;
 	V8= car((V7));
 goto T43;
 T43:;
-	if(!(endp((V7)))){
+	if(!(endp_prop((V7)))){
 	goto T44;}
 	{object V10 = Cnil;
 	VMR2(V10)}
@@ -725,7 +725,7 @@ TTL:;
 	V68= car((V67));
 goto T282;
 T282:;
-	if(!(endp((V67)))){
+	if(!(endp_prop((V67)))){
 	goto T283;}
 	base[1]= Cnil;
 	vs_top=(vs_base=base+1)+1;
@@ -763,7 +763,7 @@ TTL:;{object V70;
 	V72= car((V71));
 goto T302;
 T302:;
-	if(!(endp((V71)))){
+	if(!(endp_prop((V71)))){
 	goto T303;}
 	V70= Cnil;
 	goto T298;
@@ -1316,7 +1316,7 @@ T506:;
 	V140= car((V139));
 goto T529;
 T529:;
-	if(!(endp((V139)))){
+	if(!(endp_prop((V139)))){
 	goto T530;}
 	base[3]= Cnil;
 	vs_top=(vs_base=base+3)+1;
@@ -1815,7 +1815,7 @@ TTL:;
 	V187= car((V186));
 goto T673;
 T673:;
-	if(!(endp((V186)))){
+	if(!(endp_prop((V186)))){
 	goto T674;}
 	goto T669;
 goto T674;
@@ -3676,7 +3676,7 @@ T1402:;
 	V383= car((V382));
 goto T1417;
 T1417:;
-	if(!(endp((V382)))){
+	if(!(endp_prop((V382)))){
 	goto T1418;}
 	base[3]= Cnil;
 	vs_top=(vs_base=base+3)+1;

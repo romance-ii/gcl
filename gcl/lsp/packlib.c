@@ -92,8 +92,9 @@ T19:;
 	(V8->c.c_cdr)= Cnil;}
 goto T11;
 T11:;
-	while(!endp(MMcdr(V8)))V8=MMcdr(V8);
-	if(endp(V9=MMcdr(V9))){
+	{object cdr_V8=MMcdr(V8);while(!endp(cdr_V8)) {cdr_V8=MMcdr(cdr_V8);V8=MMcdr(V8);}}
+	V9=MMcdr(V9);
+	if(endp(V9)){
 	base[0]=base[0]->c.c_cdr;
 	{object V15 = base[0];
 	VMR2(V15)}}
@@ -644,7 +645,7 @@ T97:;
 	V103= car((V102));
 goto T197;
 T197:;
-	if(!(endp((V102)))){
+	if(!(endp_prop((V102)))){
 	goto T198;}
 	goto T95;
 goto T198;
@@ -1023,7 +1024,7 @@ T263:;
 	V149= car((V148));
 goto T374;
 T374:;
-	if(!(endp((V148)))){
+	if(!(endp_prop((V148)))){
 	goto T375;}
 	goto T261;
 goto T375;

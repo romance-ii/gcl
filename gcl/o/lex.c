@@ -32,7 +32,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 object
 assoc_eq(object key, object alist)
 {
-	object endp_temp;
 
 	while (!endp(alist)) {
 		if (MMcaar(alist) == key)
@@ -92,7 +91,6 @@ lex_block_bind(object name, object id)
 object
 lex_tag_sch(object tag)
 {
-	object endp_temp;
 
 	object alist = lex_env[2];
 
@@ -106,7 +104,6 @@ lex_tag_sch(object tag)
 
 object lex_block_sch(object name)
 {
-	object endp_temp;
 
 	object alist = lex_env[2];
 

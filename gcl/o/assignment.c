@@ -61,7 +61,6 @@ object sSAinhibit_macro_specialA;
 void
 setq(object sym, object val)
 {
- 	object endp_temp;
 	object vd;
 	enum stype type;
 
@@ -85,7 +84,6 @@ setq(object sym, object val)
 void
 Fsetq(object form)
 {
- 	object endp_temp;
 	object ans;
 	if (endp(form)) {
 		vs_base = vs_top;
@@ -108,7 +106,6 @@ Fsetq(object form)
 void
 Fpsetq(object arg)
 {
- 	object endp_temp;
 	object *old_top = vs_top;
 	object *top;
 	object argsv = arg;
@@ -188,7 +185,6 @@ Fmultiple_value_setq(object form)
 {
 	object vars;
 	int n, i;
- 	object endp_temp;
 
 	if (endp(form) || endp(form->c.c_cdr) ||
 	    !endp(form->c.c_cdr->c.c_cdr))
@@ -254,7 +250,6 @@ object sym;
 void
 Fsetf(object form)
 {
- 	object endp_temp;
 	object result;
 	if (endp(form)) {
 		vs_base = vs_top;
@@ -285,7 +280,6 @@ Fsetf(object form)
 object
 setf(object place, object form)
 {
- 	object endp_temp;
 	object fun;
 	object *vs = vs_top;
 	void (*f)();
@@ -405,7 +399,6 @@ void
 Fpush(object form)
 {
 	object var;
- 	object endp_temp;
 	
 	if (endp(form) || endp(MMcdr(form)))
 		FEtoo_few_argumentsF(form);
@@ -437,7 +430,6 @@ void
 Fpop(object form)
 {
 	object var;
- 	object endp_temp;
 
 	if (endp(form))
 		FEtoo_few_argumentsF(form);
@@ -468,7 +460,6 @@ Fincf(object form)
 {
 	object var;
 	object one_plus(object x), number_plus(object x, object y);
- 	object endp_temp;
 
 	if (endp(form))
 		FEtoo_few_argumentsF(form);
@@ -507,7 +498,6 @@ Fdecf(object form)
 {
 	object var;
 	object one_minus(object x), number_minus(object x, object y);
- 	object endp_temp;
 
 	if (endp(form))
 		FEtoo_few_argumentsF(form);

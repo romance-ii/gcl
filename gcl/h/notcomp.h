@@ -52,11 +52,11 @@ EXTER object user_package;
 			 else *__p++ = va_arg(ap,object);} \
   va_end(ap)
 
-#undef endp
+/*  #undef endp */
 
-#define	endp(obje)	((enum type)((endp_temp = (obje))->d.t) == t_cons ? \
-			 FALSE : endp_temp == Cnil ? TRUE : \
-			 endp1(endp_temp))
+/*  #define	endp(obje)	((enum type)((endp_temp = (obje))->d.t) == t_cons ? \ */
+/*  			 FALSE : endp_temp == Cnil ? TRUE : \ */
+/*  			 endp1(endp_temp)) */
 
 #ifndef NO_DEFUN
 #undef DEFUN

@@ -92,7 +92,7 @@ T14:;
 	V26= car((V25));
 goto T18;
 T18:;
-	if(!(endp((V25)))){
+	if(!(endp_prop((V25)))){
 	goto T19;}
 	{object V27 = Cnil;
 	VMR3(V27)}
@@ -127,7 +127,7 @@ T31:;
 	V33= car((V32));
 goto T35;
 T35:;
-	if(!(endp((V32)))){
+	if(!(endp_prop((V32)))){
 	goto T36;}
 	{object V34 = Cnil;
 	VMR3(V34)}
@@ -178,7 +178,7 @@ T51:;
 	V45= car((V44));
 goto T55;
 T55:;
-	if(!(endp((V44)))){
+	if(!(endp_prop((V44)))){
 	goto T56;}
 	{object V46 = Cnil;
 	VMR4(V46)}
@@ -208,7 +208,7 @@ T50:;
 	V51= car((V50));
 goto T71;
 T71:;
-	if(!(endp((V50)))){
+	if(!(endp_prop((V50)))){
 	goto T72;}
 	{object V52 = Cnil;
 	VMR4(V52)}
@@ -299,7 +299,7 @@ T94:;
 	V66= (V61);
 goto T99;
 T99:;
-	if(!(endp((V65)))){
+	if(!(endp_prop((V65)))){
 	goto T100;}
 	{object V67 = reverse((V63));
 	VMR6(V67)}
@@ -767,7 +767,7 @@ T300:;
 	V141= Cnil;
 goto T320;
 T320:;
-	if(!(endp((V139)))){
+	if(!(endp_prop((V139)))){
 	goto T321;}
 	V134= reverse((V141));
 	goto T292;
@@ -990,7 +990,8 @@ T412:;
 goto T417;
 T417:;
 	(V169->c.c_car)= structure_ref(cadr((V170->c.c_car)),VV[0],2);
-	if(endp(V170=MMcdr(V170))){
+	V170=MMcdr(V170);
+	if(endp(V170)){
 	V166= base[1];
 	goto T416;}
 	V169=MMcdr(V169)=MMcons(Cnil,Cnil);
@@ -1016,7 +1017,7 @@ T421:;
 	V173= car((V172));
 goto T430;
 T430:;
-	if(!(endp((V172)))){
+	if(!(endp_prop((V172)))){
 	goto T431;}
 	goto T419;
 goto T431;
@@ -1042,7 +1043,7 @@ T419:;
 	V176= car((V175));
 goto T451;
 T451:;
-	if(!(endp((V175)))){
+	if(!(endp_prop((V175)))){
 	goto T452;}
 	goto T444;
 goto T452;
@@ -1065,7 +1066,7 @@ T444:;
 	V179= car((V178));
 goto T469;
 T469:;
-	if(!(endp((V178)))){
+	if(!(endp_prop((V178)))){
 	goto T470;}
 	goto T465;
 goto T470;
@@ -1158,19 +1159,19 @@ T509:;
 	V198= car((V197));
 goto T520;
 T520:;
-	if(!(endp((V197)))){
+	if(!(endp_prop((V197)))){
 	goto T521;}
 	if(!(equal((V196),VV[41]))){
 	goto T524;}
 	goto T515;
 goto T524;
 T524:;
-	if(!(endp((V196)))){
+	if(!(endp_prop((V196)))){
 	goto T513;}
 	goto T515;
 goto T521;
 T521:;
-	if(!(endp((V196)))){
+	if(!(endp_prop((V196)))){
 	goto T527;}
 	goto T513;
 goto T527;
@@ -1248,7 +1249,7 @@ TTL:;
 	V209= (V206);
 goto T566;
 T566:;
-	if(!(endp((V208)))){
+	if(!(endp_prop((V208)))){
 	goto T567;}
 	{object V210 = Cnil;
 	VMR12(V210)}
@@ -1768,7 +1769,7 @@ TTL:;
 	V305= car((V304));
 goto T792;
 T792:;
-	if(!(endp((V304)))){
+	if(!(endp_prop((V304)))){
 	goto T793;}
 	{object V306 = Cnil;
 	VMR23(V306)}
@@ -1872,7 +1873,7 @@ T820:;
 	V321= car((V320));
 goto T839;
 T839:;
-	if(!(endp((V320)))){
+	if(!(endp_prop((V320)))){
 	goto T840;}
 	goto T835;
 goto T840;
@@ -1939,7 +1940,7 @@ T861:;
 	V330= car((V329));
 goto T876;
 T876:;
-	if(!(endp((V329)))){
+	if(!(endp_prop((V329)))){
 	goto T877;}
 	goto T872;
 goto T877;
@@ -1994,7 +1995,8 @@ T900:;
 	(V347->c.c_car)= (*(LnkLI108))((V348->c.c_car));
 goto T898;
 T898:;
-	if(endp(V348=MMcdr(V348))){
+	V348=MMcdr(V348);
+	if(endp(V348)){
 	V346= base[0];
 	goto T896;}
 	V347=MMcdr(V347)=MMcons(Cnil,Cnil);

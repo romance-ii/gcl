@@ -118,7 +118,8 @@ T20:;
 goto T43;
 T43:;
 	(V21->c.c_car)= coerce_to_string((V22->c.c_car));
-	if(endp(V22=MMcdr(V22))){
+	V22=MMcdr(V22);
+	if(endp(V22)){
 	V12= base[5];
 	goto T42;}
 	V21=MMcdr(V21)=MMcons(Cnil,Cnil);
@@ -154,7 +155,8 @@ T42:;
 goto T57;
 T57:;
 	(V26->c.c_car)= coerce_to_string((V27->c.c_car));
-	if(endp(V27=MMcdr(V27))){
+	V27=MMcdr(V27);
+	if(endp(V27)){
 	V15= base[5];
 	goto T56;}
 	V26=MMcdr(V26)=MMcons(Cnil,Cnil);
@@ -176,7 +178,8 @@ T56:;
 goto T63;
 T63:;
 	(V29->c.c_car)= coerce_to_string((V30->c.c_car));
-	if(endp(V30=MMcdr(V30))){
+	V30=MMcdr(V30);
+	if(endp(V30)){
 	V16= base[5];
 	goto T62;}
 	V29=MMcdr(V29)=MMcons(Cnil,Cnil);
@@ -198,7 +201,8 @@ T62:;
 goto T69;
 T69:;
 	(V32->c.c_car)= coerce_to_string((V33->c.c_car));
-	if(endp(V33=MMcdr(V33))){
+	V33=MMcdr(V33);
+	if(endp(V33)){
 	V17= base[5];
 	goto T68;}
 	V32=MMcdr(V32)=MMcons(Cnil,Cnil);
@@ -243,7 +247,8 @@ T81:;
 goto T90;
 T90:;
 	(V43->c.c_car)= coerce_to_string((V44->c.c_car));
-	if(endp(V44=MMcdr(V44))){
+	V44=MMcdr(V44);
+	if(endp(V44)){
 	V42= base[5];
 	goto T89;}
 	V43=MMcdr(V43)=MMcons(Cnil,Cnil);
@@ -317,7 +322,8 @@ T113:;
 goto T122;
 T122:;
 	(V55->c.c_car)= coerce_to_string((V56->c.c_car));
-	if(endp(V56=MMcdr(V56))){
+	V56=MMcdr(V56);
+	if(endp(V56)){
 	V54= base[5];
 	goto T121;}
 	V55=MMcdr(V55)=MMcons(Cnil,Cnil);
@@ -368,7 +374,8 @@ T106:;
 goto T139;
 T139:;
 	(V59->c.c_car)= coerce_to_string((V60->c.c_car));
-	if(endp(V60=MMcdr(V60))){
+	V60=MMcdr(V60);
+	if(endp(V60)){
 	V20= base[5];
 	goto T138;}
 	V59=MMcdr(V59)=MMcons(Cnil,Cnil);
@@ -804,7 +811,8 @@ goto T336;
 T336:;
 	V122= list(2,VV[47],list(3,VV[48],VV[49],list(3,VV[50],VV[51],car((V120->c.c_car)))));
 	(V119->c.c_car)= list(2,VV[46],list(3,VV[44],/* INLINE-ARGS */V122,list(2,VV[29],cdr((V120->c.c_car)))));
-	if(endp(V120=MMcdr(V120))){
+	V120=MMcdr(V120);
+	if(endp(V120)){
 	base[6]= base[7];
 	goto T332;}
 	V119=MMcdr(V119)=MMcons(Cnil,Cnil);
@@ -829,7 +837,8 @@ T332:;{object V124;
 goto T342;
 T342:;
 	(V125->c.c_car)= coerce_to_string((V126->c.c_car));
-	if(endp(V126=MMcdr(V126))){
+	V126=MMcdr(V126);
+	if(endp(V126)){
 	V124= base[8];
 	goto T341;}
 	V125=MMcdr(V125)=MMcons(Cnil,Cnil);
@@ -857,7 +866,8 @@ goto T352;
 T352:;
 	V133= list(2,VV[47],list(3,VV[48],VV[55],list(3,VV[50],VV[51],car((V131->c.c_car)))));
 	(V130->c.c_car)= list(2,VV[54],list(3,VV[44],/* INLINE-ARGS */V133,list(2,VV[29],cdr((V131->c.c_car)))));
-	if(endp(V131=MMcdr(V131))){
+	V131=MMcdr(V131);
+	if(endp(V131)){
 	base[8]= base[9];
 	goto T348;}
 	V130=MMcdr(V130)=MMcons(Cnil,Cnil);

@@ -52,7 +52,6 @@ Use of VS in mapfunctions:
 void
 Lmapcar(void)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 	object *base = vs_base;
@@ -97,7 +96,6 @@ LOOP:
 void
 Lmaplist(void)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 	object *base = vs_base;
@@ -142,7 +140,6 @@ LOOP:
 void
 Lmapc(void)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 	object *base = vs_base;
@@ -183,7 +180,6 @@ LOOP:
 void
 Lmapl(void)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 	object *base = vs_base;
@@ -224,7 +220,6 @@ LOOP:
 void
 Lmapcan(void)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 	object *base = vs_base;
@@ -276,7 +271,6 @@ LOOP:
 void
 Lmapcon(void)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 	object *base = vs_base;

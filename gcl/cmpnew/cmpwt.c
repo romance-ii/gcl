@@ -359,7 +359,7 @@ T108:;
 	V51= car((V50));
 goto T117;
 T117:;
-	if(!(endp((V50)))){
+	if(!(endp_prop((V50)))){
 	goto T118;}
 	goto T113;
 goto T118;
@@ -410,7 +410,7 @@ TTL:;
 	V55= car((V54));
 goto T146;
 T146:;
-	if(!(endp((V54)))){
+	if(!(endp_prop((V54)))){
 	goto T147;}
 	goto T139;
 goto T147;
@@ -499,7 +499,7 @@ static void L13()
 	V65= car((V64));
 goto T173;
 T173:;
-	if(!(endp((V64)))){
+	if(!(endp_prop((V64)))){
 	goto T174;}
 	V66= make_cons(Cnil,base[3]);
 	V67= reverse(/* INLINE-ARGS */V66);
@@ -534,7 +534,7 @@ static void L14()
 	{object V70=base[0]->c.c_cdr;
 	base[2]= V70;
 	base[3]= Cnil;}
-	if(!(endp(base[2]))){
+	if(!(endp_prop(base[2]))){
 	goto T191;}
 	base[4]= VV[32];
 	vs_top=(vs_base=base+4)+1;
@@ -549,7 +549,7 @@ T191:;
 	V72= car((V71));
 goto T199;
 T199:;
-	if(!(endp((V71)))){
+	if(!(endp_prop((V71)))){
 	goto T200;}
 	V73= (VFUN_NARGS=3,(*(LnkLI55))(VV[33],VV[34],car(base[2])));
 	V74= list(3,VV[30],/* INLINE-ARGS */V73,VV[5]);
@@ -581,7 +581,7 @@ T194:;
 	V79= car((V78));
 goto T218;
 T218:;
-	if(!(endp((V78)))){
+	if(!(endp_prop((V78)))){
 	goto T219;}
 	V80= make_cons(Cnil,base[3]);
 	base[5]= listA(3,VV[29],VV[36],reverse(/* INLINE-ARGS */V80));
@@ -615,7 +615,7 @@ static void L15()
 	{object V83=base[0]->c.c_cdr;
 	base[2]= V83;
 	base[3]= Cnil;}
-	if(!(endp(base[2]))){
+	if(!(endp_prop(base[2]))){
 	goto T236;}
 	base[4]= VV[37];
 	vs_top=(vs_base=base+4)+1;
@@ -630,7 +630,7 @@ T236:;
 	V85= car((V84));
 goto T244;
 T244:;
-	if(!(endp((V84)))){
+	if(!(endp_prop((V84)))){
 	goto T245;}
 	V86= (VFUN_NARGS=3,(*(LnkLI55))(VV[33],VV[38],car(base[2])));
 	V87= list(3,VV[30],/* INLINE-ARGS */V86,VV[0]);
@@ -662,7 +662,7 @@ T239:;
 	V92= car((V91));
 goto T263;
 T263:;
-	if(!(endp((V91)))){
+	if(!(endp_prop((V91)))){
 	goto T264;}
 	V93= make_cons(Cnil,base[3]);
 	base[5]= listA(3,VV[29],VV[39],reverse(/* INLINE-ARGS */V93));
@@ -696,7 +696,7 @@ static void L16()
 	{object V96=base[0]->c.c_cdr;
 	base[2]= V96;
 	base[3]= Cnil;}
-	if(!(endp(base[2]))){
+	if(!(endp_prop(base[2]))){
 	goto T281;}
 	base[4]= VV[40];
 	vs_top=(vs_base=base+4)+1;
@@ -711,7 +711,7 @@ T281:;
 	V98= car((V97));
 goto T289;
 T289:;
-	if(!(endp((V97)))){
+	if(!(endp_prop((V97)))){
 	goto T290;}
 	V99= (VFUN_NARGS=3,(*(LnkLI55))(VV[33],VV[41],car(base[2])));
 	V100= list(3,VV[30],/* INLINE-ARGS */V99,VV[0]);
@@ -743,7 +743,7 @@ T284:;
 	V105= car((V104));
 goto T308;
 T308:;
-	if(!(endp((V104)))){
+	if(!(endp_prop((V104)))){
 	goto T309;}
 	V106= make_cons(Cnil,base[3]);
 	base[5]= listA(3,VV[29],VV[42],reverse(/* INLINE-ARGS */V106));

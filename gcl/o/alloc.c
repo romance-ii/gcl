@@ -1142,7 +1142,6 @@ free(void *ptr)
       
 {
 	object *p;
- 	object endp_temp;
 	if (ptr == 0)
 	  return;
 #ifdef BABY_MALLOC_SIZE
@@ -1170,7 +1169,6 @@ realloc(void *ptr, size_t size) {
 
   object x;
   int i, j;
-  object endp_temp;
   /* was allocated by baby_malloc */
 #ifdef BABY_MALLOC_SIZE	
   if (ptr >= baby_malloc_data && ptr -baby_malloc_data <BABY_MALLOC_SIZE)

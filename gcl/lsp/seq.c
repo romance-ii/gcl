@@ -214,7 +214,8 @@ T91:;
 	Llength();
 	vs_top=sup;
 	(V26->c.c_car)= vs_base[0];
-	if(endp(V27=MMcdr(V27))){
+	V27=MMcdr(V27);
+	if(endp(V27)){
 	V25= base[0];
 	goto T90;}
 	V26=MMcdr(V26)=MMcons(Cnil,Cnil);
@@ -300,7 +301,8 @@ T123:;
 	Llength();
 	vs_top=sup;
 	(V42->c.c_car)= vs_base[0];
-	if(endp(V43=MMcdr(V43))){
+	V43=MMcdr(V43);
+	if(endp(V43)){
 	V41= base[0];
 	goto T122;}
 	V42=MMcdr(V42)=MMcons(Cnil,Cnil);
@@ -341,7 +343,8 @@ T140:;
 	{register object V50;
 	V50= (V49->c.c_car);
 	(V48->c.c_car)= elt((V50),V44);}
-	if(endp(V49=MMcdr(V49))){
+	V49=MMcdr(V49);
+	if(endp(V49)){
 	V47= base[1];
 	goto T139;}
 	V48=MMcdr(V48)=MMcons(Cnil,Cnil);
@@ -385,7 +388,8 @@ T158:;
 	{register object V59;
 	V59= (V58->c.c_car);
 	(V57->c.c_car)= elt((V59),V52);}
-	if(endp(V58=MMcdr(V58))){
+	V58=MMcdr(V58);
+	if(endp(V58)){
 	V56= base[1];
 	goto T157;}
 	V57=MMcdr(V57)=MMcons(Cnil,Cnil);
@@ -443,7 +447,8 @@ T168:;
 	Llength();
 	vs_top=sup;
 	(V69->c.c_car)= vs_base[0];
-	if(endp(V70=MMcdr(V70))){
+	V70=MMcdr(V70);
+	if(endp(V70)){
 	V68= base[0];
 	goto T167;}
 	V69=MMcdr(V69)=MMcons(Cnil,Cnil);
@@ -479,7 +484,8 @@ T181:;
 	{register object V76;
 	V76= (V75->c.c_car);
 	(V74->c.c_car)= elt((V76),V66);}
-	if(endp(V75=MMcdr(V75))){
+	V75=MMcdr(V75);
+	if(endp(V75)){
 	V73= base[1];
 	goto T180;}
 	V74=MMcdr(V74)=MMcons(Cnil,Cnil);
@@ -542,7 +548,8 @@ T193:;
 	Llength();
 	vs_top=sup;
 	(V87->c.c_car)= vs_base[0];
-	if(endp(V88=MMcdr(V88))){
+	V88=MMcdr(V88);
+	if(endp(V88)){
 	V86= base[0];
 	goto T192;}
 	V87=MMcdr(V87)=MMcons(Cnil,Cnil);
@@ -577,7 +584,8 @@ T207:;
 	{register object V93;
 	V93= (V92->c.c_car);
 	(V91->c.c_car)= elt((V93),V84);}
-	if(endp(V92=MMcdr(V92))){
+	V92=MMcdr(V92);
+	if(endp(V92)){
 	V90= base[1];
 	goto T206;}
 	V91=MMcdr(V91)=MMcons(Cnil,Cnil);

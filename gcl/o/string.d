@@ -416,7 +416,6 @@ member_char(c, char_bag)
 int c;
 object char_bag;
 {
-	object endp_temp;
 
 	int i, f;
 

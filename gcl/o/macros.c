@@ -72,7 +72,6 @@ siLdefine_macro(void)
 void
 Fdefmacro(object form)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 	object name;

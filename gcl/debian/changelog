@@ -5,8 +5,9 @@ gcl (2.5.0.cvs20020625-54) unstable; urgency=high
   * concatenate/make-sequence fixes
   * merge takes nil key argument
   * make-sequence checks size against result type
+  * install endp macro for dotted list support
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 24 Sep 2002 10:46:21 -0400
+ -- Camm Maguire <camm@enhanced.com>  Tue, 24 Sep 2002 14:57:44 -0400
 
 gcl (2.5.0.cvs20020625-53) unstable; urgency=high
 

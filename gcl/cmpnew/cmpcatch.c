@@ -15,7 +15,7 @@ TTL:;
 	V3= (VFUN_NARGS=2,(*(LnkLI23))(VV[0],Ct));
 	V4= Cnil;
 	setq(VV[1],number_plus(symbol_value(VV[1]),small_fixnum(1)));
-	if(!(endp((V2)))){
+	if(!(endp_prop((V2)))){
 	goto T5;}
 	(void)((*(LnkLI24))(VV[2],small_fixnum(1),small_fixnum(0)));
 goto T5;
@@ -90,7 +90,7 @@ TTL:;
 	V17= (VFUN_NARGS=2,(*(LnkLI23))(VV[0],Ct));
 	V18= Cnil;
 	setq(VV[1],number_plus(symbol_value(VV[1]),small_fixnum(1)));
-	if(!(endp((V16)))){
+	if(!(endp_prop((V16)))){
 	goto T35;}
 	(void)((*(LnkLI24))(VV[11],small_fixnum(1),small_fixnum(0)));
 goto T35;
@@ -191,9 +191,9 @@ TTL:;
 	object V33;
 	V32= (VFUN_NARGS=0,(*(LnkLI23))());
 	V33= Cnil;
-	if(endp((V31))){
+	if(endp_prop((V31))){
 	goto T100;}
-	if(!(endp(cdr((V31))))){
+	if(!(endp_prop(cdr((V31))))){
 	goto T99;}
 goto T100;
 T100:;
@@ -201,7 +201,7 @@ T100:;
 	(void)((*(LnkLI24))(VV[21],small_fixnum(2),V34));
 goto T99;
 T99:;
-	if(endp(cddr((V31)))){
+	if(endp_prop(cddr((V31)))){
 	goto T104;}
 	V35 = make_fixnum((long)length((V31)));
 	(void)((*(LnkLI34))(VV[21],small_fixnum(2),V35));

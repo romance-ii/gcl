@@ -698,7 +698,6 @@ object x0,x1;
 void
 Fand(object args)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 
@@ -723,7 +722,6 @@ Fand(object args)
 void
 For(object args)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 

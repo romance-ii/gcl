@@ -73,7 +73,8 @@ T8:;
 goto T14;
 T14:;
 	(V13->c.c_car)= car((V14->c.c_car));
-	if(endp(V14=MMcdr(V14))){
+	V14=MMcdr(V14);
+	if(endp(V14)){
 	V12= base[5];
 	goto T13;}
 	V13=MMcdr(V13)=MMcons(Cnil,Cnil);

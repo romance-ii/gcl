@@ -329,8 +329,6 @@ bool
 remf(p, i)
 object *p, i;
 {
-	object endp_temp;
-
 	object l0 = *p;
 
 	for(;  !endp(*p);  p = &(*p)->c.c_cdr->c.c_cdr) {
@@ -408,7 +406,6 @@ Lsymbol_plist()
 
 @(defun get_properties (place indicator_list)
 	object l, m;
-	object endp_temp;
 
 @
 	for (l = place;  !endp(l);  l = l->c.c_cdr->c.c_cdr) {

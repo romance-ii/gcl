@@ -76,7 +76,7 @@ void
 lambda_bind(object *arg_top)
 {
   
- 	object endp_temp,temporary;
+        object temporary;
 	object lambda, lambda_list, body, form=Cnil, x, ds, vs, v;
 	int narg, i, j;
 	object *base = vs_base;
@@ -612,7 +612,6 @@ object
 find_special(object body, struct bind_temp *start, struct bind_temp *end)
 { 
         object temporary;
- 	object endp_temp;
 	object form=Cnil;
 	object ds, vs, v;
 	struct bind_temp *bt;
@@ -813,7 +812,6 @@ parse_key(object *base, bool rest, bool allow_other_keys, register int n, ...)
 void
 check_other_key(object l, int n, ...)
 {
- 	object endp_temp;
 	va_list ap;
 	object other_key = OBJNULL;
 	object k;

@@ -54,7 +54,7 @@ register object V10;
 	bds_check;
 goto TTL;
 TTL:;
-	if(!(endp((V10)))){
+	if(!(endp_prop((V10)))){
 	goto T9;}
 	(void)((*(LnkLI26))(VV[1],small_fixnum(1),small_fixnum(0)));
 goto T9;
@@ -265,15 +265,15 @@ object V43;
 {	 VMB7 VMS7 VMV7
 goto TTL;
 TTL:;
-	if(!(endp((V43)))){
+	if(!(endp_prop((V43)))){
 	goto T107;}
 	(void)((*(LnkLI26))(VV[19],small_fixnum(1),small_fixnum(0)));
 	goto T105;
 goto T107;
 T107:;
-	if(endp(cdr((V43)))){
+	if(endp_prop(cdr((V43)))){
 	goto T110;}
-	if(endp(cddr((V43)))){
+	if(endp_prop(cddr((V43)))){
 	goto T110;}
 	V44 = make_fixnum((long)length((V43)));
 	(void)((*(LnkLI43))(VV[19],small_fixnum(2),V44));
@@ -295,7 +295,7 @@ T105:;
 	V48= Cnil;
 goto T120;
 T120:;
-	if(!(endp((V45)))){
+	if(!(endp_prop((V45)))){
 	goto T121;}
 	{object V49 = (VFUN_NARGS=2,(*(LnkLI27))(VV[21],(V46)));
 	VMR7(V49)}

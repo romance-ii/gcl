@@ -1612,8 +1612,7 @@ fmt_asterisk(bool colon, bool atsign)
 }	
 
 void
-fmt_indirection(bool colon, bool atsign)
-{ 	object endp_temp;
+fmt_indirection(bool colon, bool atsign) {
 	object s, l;
 	fmt_old;
 	jmp_buf fmt_jmp_buf0;
@@ -1813,8 +1812,7 @@ fmt_conditional(bool colon, bool atsign)
 }	
 
 void
-fmt_iteration(bool colon, bool atsign)
-{ 	object endp_temp;
+fmt_iteration(bool colon, bool atsign) {
 	int i,n;
 	VOL int j;
 	int o;

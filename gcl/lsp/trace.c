@@ -521,7 +521,7 @@ TTL:;
 	V70= car((V69));
 goto T206;
 T206:;
-	if(!(endp((V69)))){
+	if(!(endp_prop((V69)))){
 	goto T207;}
 	goto T202;
 goto T207;
@@ -1243,7 +1243,7 @@ T488:;
 	V119= car((V118));
 goto T515;
 T515:;
-	if(!(endp((V118)))){
+	if(!(endp_prop((V118)))){
 	goto T516;}
 	goto T380;
 goto T516;
@@ -1399,7 +1399,7 @@ T574:;
 	return;
 goto T573;
 T573:;
-	if(!(endp((V110)))){
+	if(!(endp_prop((V110)))){
 	goto T583;}
 	base[3]= symbol_value(VV[50]);
 	base[4]= VV[95];
@@ -1416,7 +1416,7 @@ T583:;
 	V124= Ct;
 goto T589;
 T589:;
-	if(!(endp((V123)))){
+	if(!(endp_prop((V123)))){
 	goto T590;}
 	goto T581;
 goto T590;

@@ -37,7 +37,6 @@ Lvalues(void)
 void
 Lvalues_list(void)
 {
-	object endp_temp;
 
 	object list;
 
@@ -54,7 +53,6 @@ Lvalues_list(void)
 void
 Fmultiple_value_list(object form)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 
@@ -75,7 +73,6 @@ Fmultiple_value_list(object form)
 void
 Fmultiple_value_call(object form)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 	object *top1;
@@ -105,7 +102,6 @@ Fmultiple_value_call(object form)
 void
 Fmultiple_value_prog1(object forms)
 {
-	object endp_temp;
 
 	object *top;
 	object *base = vs_top;

@@ -614,16 +614,14 @@ too_many_arguments(void)
 }
 
 void
-ck_larg_at_least(int n, object x)
-{ 	object endp_temp;
+ck_larg_at_least(int n, object x) {
 	for(; n > 0; n--, x = x->c.c_cdr)
 		if(endp(x))
 		  FEerror("APPLY sended too few arguments to LAMBDA.", 0);
 }
 
 void
-ck_larg_exactly(int n, object x)
-{ 	object endp_temp;
+ck_larg_exactly(int n, object x) {
 	for(; n > 0; n--, x = x->c.c_cdr)
 		if(endp(x))
 		  FEerror("APPLY sended too few arguments to LAMBDA.", 0);

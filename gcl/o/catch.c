@@ -29,9 +29,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "include.h"
 
 void
-Fcatch(object args)
+Fcatch(VOL object args)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 
@@ -89,9 +88,8 @@ volatile object x0;
 }
 
 void
-Funwind_protect(object args)
+Funwind_protect(VOL object args)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 	object *value_top;
@@ -137,7 +135,6 @@ Funwind_protect(object args)
 void
 Fthrow(object args)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 	object tag;

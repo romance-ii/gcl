@@ -47,7 +47,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 void
 Ftagbody(object body)
 {
-	object endp_temp;
 
 	object *old_top = vs_top;
 	object *new_top;
@@ -105,9 +104,8 @@ Ftagbody(object body)
 }
 
 void
-Fprog(object arg)
+Fprog(VOL object arg)
 {
-	object endp_temp;
 
 	object *oldlex = lex_env;
 	struct bind_temp *start;
@@ -139,9 +137,8 @@ END:
 }
 
 void
-FprogA(object arg)
+FprogA(VOL object arg)
 {
-	object endp_temp;
 
 	object *oldlex = lex_env;
 	struct bind_temp *start;
@@ -175,7 +172,6 @@ END:
 void
 Fgo(object args)
 {
-	object endp_temp;
 
 	object lex_tag;
 	frame_ptr fr;
@@ -198,7 +194,6 @@ Fgo(object args)
 void
 Fprogv(object args)
 {
-	object endp_temp;
 
 	object *top;
 	object symbols;
@@ -244,7 +239,6 @@ Fprogv(object args)
 void
 Fprogn(object body)
 {
-	object endp_temp;
 
 	if(endp(body)) {
 		vs_base=vs_top;
@@ -262,7 +256,6 @@ Fprogn(object body)
 void
 Fprog1(object arg)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 
@@ -280,7 +273,6 @@ Fprog1(object arg)
 void
 Fprog2(object arg)
 {
-	object endp_temp;
 
 	object *top = vs_top;
 

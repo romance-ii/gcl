@@ -532,7 +532,7 @@ TTL:;
 	V69= car((V68));
 goto T108;
 T108:;
-	if(!(endp((V68)))){
+	if(!(endp_prop((V68)))){
 	goto T109;}
 	goto T104;
 goto T109;
@@ -600,7 +600,7 @@ TTL:;
 	V80= car((V79));
 goto T144;
 T144:;
-	if(!(endp((V79)))){
+	if(!(endp_prop((V79)))){
 	goto T145;}
 	goto T140;
 goto T145;
@@ -662,7 +662,7 @@ TTL:;
 	V94= car((V93));
 goto T176;
 T176:;
-	if(!(endp((V93)))){
+	if(!(endp_prop((V93)))){
 	goto T177;}
 	goto T172;
 goto T177;

@@ -133,7 +133,7 @@ static void L4()
 	vs_top=sup;
 	{object V16=base[0]->c.c_cdr;
 	base[2]= V16;}
-	if(!(endp(base[2]))){
+	if(!(endp_prop(base[2]))){
 	goto T20;}
 	base[3]= Ct;
 	vs_top=(vs_base=base+3)+1;
@@ -148,7 +148,7 @@ T20:;
 	V19= car((V17));
 goto T26;
 T26:;
-	if(!(endp((V18)))){
+	if(!(endp_prop((V18)))){
 	goto T27;}
 	base[3]= (V19);
 	vs_top=(vs_base=base+3)+1;
@@ -171,7 +171,7 @@ static void L5()
 	vs_top=sup;
 	{object V21=base[0]->c.c_cdr;
 	base[2]= V21;}
-	if(!(endp(base[2]))){
+	if(!(endp_prop(base[2]))){
 	goto T36;}
 	base[3]= Cnil;
 	vs_top=(vs_base=base+3)+1;
@@ -186,7 +186,7 @@ T36:;
 	V24= car((V22));
 goto T42;
 T42:;
-	if(!(endp((V23)))){
+	if(!(endp_prop((V23)))){
 	goto T43;}
 	base[3]= (V24);
 	vs_top=(vs_base=base+3)+1;
@@ -344,7 +344,7 @@ static void L10()
 	V52= Cnil;
 goto T64;
 T64:;
-	if(!(endp((V50)))){
+	if(!(endp_prop((V50)))){
 	goto T65;}
 	V53= reverse((V52));
 	V54= make_cons(Cnil,(V51));
@@ -382,13 +382,13 @@ static void L11()
 	V60= car((V59));
 goto T81;
 T81:;
-	if(!(endp((V59)))){
+	if(!(endp_prop((V59)))){
 	goto T82;}
 	vs_top=(vs_base=base+3)+1;
 	return;
 goto T82;
 T82:;
-	if(!(endp(cdr((V60))))){
+	if(!(endp_prop(cdr((V60))))){
 	goto T88;}
 	if(!((car((V60)))==(Ct))){
 	goto T91;}
@@ -409,7 +409,7 @@ goto T88;
 T88:;
 	if(!((car((V60)))==(Ct))){
 	goto T97;}
-	if(!(endp(cddr((V60))))){
+	if(!(endp_prop(cddr((V60))))){
 	goto T101;}
 	base[3]= cadr((V60));
 	goto T99;
@@ -421,7 +421,7 @@ T99:;
 	goto T86;
 goto T97;
 T97:;
-	if(!(endp(cddr((V60))))){
+	if(!(endp_prop(cddr((V60))))){
 	goto T105;}
 	base[3]= list(4,VV[11],car((V60)),cadr((V60)),base[3]);
 	goto T103;
@@ -488,7 +488,7 @@ static void L14()
 	base[4]= Cnil;}
 goto T114;
 T114:;
-	if(endp(base[3])){
+	if(endp_prop(base[3])){
 	goto T116;}
 	if(!(type_of(car(base[3]))==t_cons)){
 	goto T116;}
@@ -525,7 +525,7 @@ static void L15()
 	base[4]= Cnil;}
 goto T133;
 T133:;
-	if(endp(base[3])){
+	if(endp_prop(base[3])){
 	goto T135;}
 	if(!(type_of(car(base[3]))==t_cons)){
 	goto T135;}
@@ -643,7 +643,7 @@ static void L19()
 	V88= Cnil;
 goto T155;
 T155:;
-	if(!(endp((V86)))){
+	if(!(endp_prop((V86)))){
 	goto T156;}
 	V90= list(2,(V87),list(2,VV[29],base[3]));
 	base[4]= listA(3,VV[12],make_cons(/* INLINE-ARGS */V90,Cnil),(V88));
@@ -688,7 +688,7 @@ static void L20()
 	V97= Cnil;
 goto T169;
 T169:;
-	if(!(endp((V95)))){
+	if(!(endp_prop((V95)))){
 	goto T170;}
 	V99= list(2,(V96),list(2,VV[29],base[3]));
 	V100= reverse((V97));
@@ -734,7 +734,7 @@ static void L21()
 	base[9]= Cnil;}
 goto T186;
 T186:;
-	if(endp(base[5])){
+	if(endp_prop(base[5])){
 	goto T188;}
 	if(!(type_of(car(base[5]))==t_cons)){
 	goto T188;}
@@ -758,7 +758,7 @@ T184:;
 	V108= car((V107));
 goto T207;
 T207:;
-	if(!(endp((V107)))){
+	if(!(endp_prop((V107)))){
 	goto T208;}
 	goto T203;
 goto T208;
@@ -770,7 +770,7 @@ goto T212;
 T212:;
 	V109= list(2,car((V108)),cadr((V108)));
 	base[8]= make_cons(/* INLINE-ARGS */V109,base[8]);
-	if(endp(cddr((V108)))){
+	if(endp_prop(cddr((V108)))){
 	goto T218;}
 	base[9]= make_cons(car((V108)),base[9]);
 	base[9]= make_cons(caddr((V108)),base[9]);
@@ -821,7 +821,7 @@ static void L22()
 	base[9]= Cnil;}
 goto T235;
 T235:;
-	if(endp(base[5])){
+	if(endp_prop(base[5])){
 	goto T237;}
 	if(!(type_of(car(base[5]))==t_cons)){
 	goto T237;}
@@ -845,7 +845,7 @@ T233:;
 	V121= car((V120));
 goto T256;
 T256:;
-	if(!(endp((V120)))){
+	if(!(endp_prop((V120)))){
 	goto T257;}
 	goto T252;
 goto T257;
@@ -857,7 +857,7 @@ goto T261;
 T261:;
 	V122= list(2,car((V121)),cadr((V121)));
 	base[8]= make_cons(/* INLINE-ARGS */V122,base[8]);
-	if(endp(cddr((V121)))){
+	if(endp_prop(cddr((V121)))){
 	goto T267;}
 	base[9]= make_cons(car((V121)),base[9]);
 	base[9]= make_cons(caddr((V121)),base[9]);
@@ -903,7 +903,7 @@ static void L23()
 	V132= car((V131));
 goto T283;
 T283:;
-	if(!(endp((V131)))){
+	if(!(endp_prop((V131)))){
 	goto T284;}
 	V133= list(2,base[5],base[2]);
 	base[8]= list(3,VV[12],make_cons(/* INLINE-ARGS */V133,Cnil),base[4]);
@@ -1047,7 +1047,8 @@ static void L27()
 goto T313;
 T313:;
 	(V148->c.c_car)= list(2,VV[45],list(2,VV[2],(V149->c.c_car)));
-	if(endp(V149=MMcdr(V149))){
+	V149=MMcdr(V149);
+	if(endp(V149)){
 	V147= base[3];
 	goto T312;}
 	V148=MMcdr(V148)=MMcons(Cnil,Cnil);

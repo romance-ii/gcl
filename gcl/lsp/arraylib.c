@@ -45,7 +45,7 @@ T7:;
 	V7= car((V6));
 goto T17;
 T17:;
-	if(!(endp((V6)))){
+	if(!(endp_prop((V6)))){
 	goto T18;}
 	{object V8 = VV[1];
 	VMR1(V8)}
@@ -79,7 +79,7 @@ T33:;{object V11;
 	V13= car((V12));
 goto T40;
 T40:;
-	if(!(endp((V12)))){
+	if(!(endp_prop((V12)))){
 	goto T41;}
 	V11= Cnil;
 	goto T36;

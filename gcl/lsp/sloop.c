@@ -668,7 +668,7 @@ T163:;
 	V94= car((V93));
 goto T172;
 T172:;
-	if(!(endp((V93)))){
+	if(!(endp_prop((V93)))){
 	goto T173;}
 	goto T168;
 goto T173;
@@ -1059,7 +1059,7 @@ TTL:;
 	V145= car((V144));
 goto T348;
 T348:;
-	if(!(endp((V144)))){
+	if(!(endp_prop((V144)))){
 	goto T349;}
 	{object V146 = Cnil;
 	VMR25(V146)}
@@ -1923,7 +1923,7 @@ T672:;
 	V267= car((V266));
 goto T682;
 T682:;
-	if(!(endp((V266)))){
+	if(!(endp_prop((V266)))){
 	goto T683;}
 	V264= Cnil;
 	goto T671;
@@ -2066,7 +2066,7 @@ T722:;
 	V286= car((V285));
 goto T732;
 T732:;
-	if(!(endp((V285)))){
+	if(!(endp_prop((V285)))){
 	goto T733;}
 	goto T728;
 goto T733;
@@ -2178,7 +2178,7 @@ T771:;
 	V296= car((V295));
 goto T782;
 T782:;
-	if(!(endp((V295)))){
+	if(!(endp_prop((V295)))){
 	goto T783;}
 	{object V297 = Cnil;
 	VMR36(V297)}
@@ -3695,7 +3695,7 @@ T1460:;
 	V592= car((V591));
 goto T1468;
 T1468:;
-	if(!(endp((V591)))){
+	if(!(endp_prop((V591)))){
 	goto T1469;}
 	goto T1464;
 goto T1469;

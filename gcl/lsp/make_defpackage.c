@@ -58,7 +58,8 @@ T10:;
 	Lpackage_name();
 	vs_top=sup;
 	(V13->c.c_car)= vs_base[0];
-	if(endp(V14=MMcdr(V14))){
+	V14=MMcdr(V14);
+	if(endp(V14)){
 	V6= base[6];
 	goto T9;}
 	V13=MMcdr(V13)=MMcons(Cnil,Cnil);
@@ -297,7 +298,8 @@ T124:;
 goto T133;
 T133:;
 	(V41->c.c_car)= symbol_name((V42->c.c_car));
-	if(endp(V42=MMcdr(V42))){
+	V42=MMcdr(V42);
+	if(endp(V42)){
 	V40= base[10];
 	goto T132;}
 	V41=MMcdr(V41)=MMcons(Cnil,Cnil);
@@ -333,7 +335,8 @@ T139:;
 	V47= vs_base[0];
 	V48= list(3,VV[5],V47,symbol_name((V45->c.c_car)));
 	(V44->c.c_car)= make_cons(/* INLINE-ARGS */V48,Cnil);
-	if(endp(V45=MMcdr(V45))){
+	V45=MMcdr(V45);
+	if(endp(V45)){
 	base[10]= base[11];
 	goto T135;}
 	V44=MMcdr(V44)=MMcons(Cnil,Cnil);
@@ -364,7 +367,8 @@ T148:;
 	V52= vs_base[0];
 	V53= list(3,VV[6],V52,symbol_name((V50->c.c_car)));
 	(V49->c.c_car)= make_cons(/* INLINE-ARGS */V53,Cnil);
-	if(endp(V50=MMcdr(V50))){
+	V50=MMcdr(V50);
+	if(endp(V50)){
 	base[11]= base[12];
 	goto T144;}
 	V49=MMcdr(V49)=MMcons(Cnil,Cnil);

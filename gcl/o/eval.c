@@ -154,7 +154,6 @@ void
 funcall(object fun)
 { 
         object temporary;
- 	object endp_temp;
 	object x;
 	 object * VOL top;
 	object *lex;
@@ -340,7 +339,6 @@ END:
 void
 funcall_no_event(object fun)
 {
-	object endp_temp;
  DEBUG_AVMA
 	if (fun == OBJNULL)
 		FEerror("Undefined function.", 0);
@@ -384,7 +382,7 @@ funcall_no_event(object fun)
 void
 lispcall(object *funp, int narg)
 {
-	object endp_temp; DEBUG_AVMA
+        DEBUG_AVMA
 	object fun = *funp;
 
 	vs_base = funp + 1;
@@ -425,7 +423,8 @@ lispcall(object *funp, int narg)
 
 void
 lispcall_no_event(object *funp, int narg)
-{ 	object endp_temp;        DEBUG_AVMA
+{
+        DEBUG_AVMA
 	object fun = *funp;
 
 	vs_base = funp + 1;
@@ -468,8 +467,7 @@ lispcall_no_event(object *funp, int narg)
 void
 symlispcall(object sym, object *base, int narg)
 {
-	object endp_temp;
-       DEBUG_AVMA
+        DEBUG_AVMA
 	object fun = symbol_function(sym);
 
 	vs_base = base;
@@ -510,8 +508,7 @@ symlispcall(object sym, object *base, int narg)
 void
 symlispcall_no_event(object sym, object *base, int narg)
 {
-	object endp_temp;
-       DEBUG_AVMA
+        DEBUG_AVMA
 	object fun = symbol_function(sym);
 
 	vs_base = base;
@@ -553,8 +550,7 @@ symlispcall_no_event(object sym, object *base, int narg)
 object
 simple_lispcall(object *funp, int narg)
 {
-	object endp_temp;
-       DEBUG_AVMA
+        DEBUG_AVMA
 	object fun = *funp;
 	object *sup = vs_top;
 
@@ -599,8 +595,7 @@ simple_lispcall(object *funp, int narg)
 object
 simple_lispcall_no_event(object *funp, int narg)
 {
-	object endp_temp;
-       DEBUG_AVMA 
+        DEBUG_AVMA 
 	object fun = *funp;
 	object *sup = vs_top;
 
@@ -645,8 +640,7 @@ simple_lispcall_no_event(object *funp, int narg)
 object
 simple_symlispcall(object sym, object *base, int narg)
 {
-	object endp_temp;
-       DEBUG_AVMA
+        DEBUG_AVMA
 	object fun = symbol_function(sym);
 	object *sup = vs_top;
 
@@ -691,8 +685,7 @@ simple_symlispcall(object sym, object *base, int narg)
 object
 simple_symlispcall_no_event(object sym, object *base, int narg)
 {
-	object endp_temp;
-       DEBUG_AVMA
+        DEBUG_AVMA
 	object fun = symbol_function(sym);
 	object *sup = vs_top;
 
@@ -775,7 +768,6 @@ object
 Ieval(form)
 object form;
 {
-	object endp_temp;
        DEBUG_AVMA
 	object fun, x;
 	object *top;
@@ -938,8 +930,7 @@ void
 eval(object form)
 { 
         object temporary;
-	object endp_temp;
-       DEBUG_AVMA
+        DEBUG_AVMA
 	object fun, x;
 	object *top;
 	object *base;
@@ -1223,7 +1214,6 @@ Levalhook(void)
 void
 Lapplyhook(void)
 {
-	object endp_temp;
 
 	object env;
 	bds_ptr old_bds_top = bds_top;
@@ -1370,7 +1360,6 @@ funcall_with_catcher(object fname, object fun)
 object 
 fcalln_cclosure(va_list ap)
 {
-object endp_temp;
 int i=fcall.argd;
  {object *base=vs_top;
   DEBUG_AVMA

@@ -364,7 +364,6 @@ object x, y;
 {
 	object z;
 
-	object endp_temp;
 	if (endp(x))
 		return(y);
 	z = make_cons(Cnil, Cnil);
@@ -411,7 +410,6 @@ object x;
 {
 	object y;
 
-	object endp_temp;
 	if (endp(x))
 		return(Cnil);
 	y = make_cons(Cnil, Cnil);
@@ -495,7 +493,6 @@ sublis(alist, tree)
 object alist, tree;
 {
 	object x;
-	object endp_temp;
 	cs_check(alist);
 
 
@@ -524,7 +521,6 @@ nsublis(alist, treep)
 object alist, *treep;
 {
 	object x;
-	object endp_temp;
 
 	cs_check(alist);
 
@@ -715,7 +711,6 @@ Llist_length()
 {
 	int n;
 	object fast, slow;
-	object endp_temp;
 	check_arg(1);
 	n = 0;
 	fast = slow = vs_base[0];
@@ -740,10 +735,8 @@ Llist_length()
 
 
 object
-nth(n, x)
-int n;
-object x;
-{	object endp_temp;
+nth(int n, object x) {
+
 	if (n < 0) {
 		vs_push(make_fixnum(n));
 		FEerror("Negative index: ~D.", 1, vs_head);
@@ -768,10 +761,8 @@ Lnthcdr()
 }
 
 object
-nthcdr(n, x)
-int n;
-object x;
-{	object endp_temp;
+nthcdr(int n, object x) {
+
 	if (n < 0) {
 		vs_push(make_fixnum(n));
 		FEerror("Negative index: ~D.", 1, vs_head);
@@ -785,8 +776,8 @@ object x;
 }
 
 void
-Llast()
-{	object endp_temp,t;
+Llast() {
+	object t;
 	int n;
 
 	n=vs_top-vs_base;
@@ -921,8 +912,7 @@ Lcopy_tree()
 }
 
 void
-Lrevappend()
-{	object endp_temp;
+Lrevappend() {
 	object x, y;
 
 	check_arg(2);
@@ -937,9 +927,7 @@ Lrevappend()
 }
 
 object
-nconc(x, y)
-object x, y;
-{	object endp_temp;
+nconc(object x, object y) {
 	object x1;
 
 	if (endp(x))
@@ -951,8 +939,7 @@ object x, y;
 }
 
 void
-Lnconc()
-{	object endp_temp;
+Lnconc() {
 	object x, l, m=Cnil;
         int i, narg;
 	
@@ -981,8 +968,7 @@ Lnconc()
 }
 
 void
-Lreconc()
-{	object endp_temp;
+Lreconc() {
 	object x, y, z;
 
 	check_arg(2);
@@ -998,12 +984,11 @@ Lreconc()
 
 @(defun butlast (lis &optional (nn `make_fixnum(1)`))
 	int i;
-	object endp_temp;
 @
 	check_type_non_negative_integer(&nn);
 	if (type_of(nn) != t_fixnum)
 		@(return Cnil)
-	for (i = 0;  !endp(lis);  i++, lis = lis->c.c_cdr)
+	for (i = 0;  !endp(lis) && proper_cons(lis);  i++, lis = lis->c.c_cdr)
 		vs_check_push(lis->c.c_car);
 	if (i <= fix((nn))) {
 		vs_top -= i;
@@ -1021,12 +1006,11 @@ Lreconc()
 @(defun nbutlast (lis &optional (nn `make_fixnum(1)`))
 	int i;
 	object x;
-	object endp_temp;
 @
 	check_type_non_negative_integer(&nn);
 	if (type_of(nn) != t_fixnum)
 		@(return Cnil)
-	for (i = 0, x = lis;  !endp(x);  i++, x = x->c.c_cdr)
+	for (i = 0, x = lis;  !endp(x) && proper_cons(x);  i++, x = x->c.c_cdr)
 		;
 	if (i <= fix((nn)))
 		@(return Cnil)
@@ -1037,18 +1021,20 @@ Lreconc()
 @)
 
 void
-Lldiff()
-{	object endp_temp;
+Lldiff() {
 	int i;
 	object x;
 
 	check_arg(2);
 	for (i = 0, x = vs_base[0];  !endp(x);  i++, x = x->c.c_cdr)
-		if (x == vs_base[1])
+		if (dot_list_eq(x,vs_base[1]))
 			break;
 		else
 			vs_check_push(x->c.c_car);
-	vs_push(Cnil);
+        if (proper_list(x))
+		vs_push(Cnil);
+	else
+		i--;
 	while (i-- > 0)
 		stack_cons();
 	vs_base[0] = vs_pop;
@@ -1126,7 +1112,6 @@ void
 check_alist(alist)
      object alist;
 {object v;
-object endp_temp;
    for (v=alist ; !endp(v) ; v=v->c.c_cdr)
    {if (type_of(v->c.c_car) != t_cons
          && v->c.c_car != Cnil)
@@ -1158,7 +1143,6 @@ object endp_temp;
 @)
 
 @(defun member (item list &key test test_not key)
-	object endp_temp;
 	saveTEST;
 
 @
@@ -1176,7 +1160,6 @@ object endp_temp;
 PREDICATE(Lmember, Lmember_if, Lmember_if_not, 2)
 
 @(defun member1 (item list &key test test_not key)
- 	object endp_temp;
 	saveTEST;
 @
 	protectTEST;
@@ -1193,18 +1176,17 @@ PREDICATE(Lmember, Lmember_if, Lmember_if_not, 2)
 @)
 
 void
-Ltailp()
-{	object endp_temp; 
+Ltailp() {
 	object x;
 
 	check_arg(2);
 	for (x = vs_base[1];  !endp(x);  x = x->c.c_cdr)
-		if (x == vs_base[0]) {
+		if (dot_list_eq(x,vs_base[0])) {
 			vs_base[0] = Ct;
 			vs_popp;
 			return;
 		}
-	vs_base[0] = x == vs_base[0] ? Ct : Cnil;
+	vs_base[0] = Cnil;
 	vs_popp;
 	return;
 }
@@ -1236,7 +1218,6 @@ Lacons()
 }
 
 @(defun pairlis (keys data &optional a_list)
- 	object endp_temp;
 	object *vp, k, d;
 @
 	vp = vs_top + 1;
@@ -1261,7 +1242,6 @@ Lacons()
 @)
 
 @(defun assoc_or_rassoc (item a_list &key test test_not key)
- 	object endp_temp;
 	saveTEST;
 @
 	protectTEST;
@@ -1284,7 +1264,6 @@ void Lrassoc() { car_or_cdr = cdr; Lassoc_or_rassoc(); }
 static bool true_or_false;
 
 @(defun assoc_or_rassoc_predicate (predicate a_list &key key)
- 	object endp_temp;
 	object x;
 @
 	while (!endp(a_list)) {
@@ -1357,6 +1336,14 @@ init_list_function()
 	sKkey = make_keyword("KEY");
 
 	sKinitial_element = make_keyword("INITIAL-ELEMENT");
+
+	memset(&my_dot_pit,0,sizeof(my_dot_pit));
+	my_dot_pit.t=t_symbol;
+	my_dot_pit.c_car=my_dot_pit.c_cdr=(object)&my_dot_pit;
+
+	memset(&my_dot,0,sizeof(my_dot));
+	my_dot.t=t_cons;
+	my_dot.c_car=my_dot.c_cdr=(object)&my_dot_pit;
 
 	make_function("CAR", Lcar);
 	make_function("CDR", Lcdr);

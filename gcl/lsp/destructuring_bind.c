@@ -995,7 +995,7 @@ T432:;
 	V113= (V108);
 goto T435;
 T435:;
-	if(!(endp((V113)))){
+	if(!(endp_prop((V113)))){
 	goto T436;}
 	base[3]= (V113);
 	base[4]= nreverse((V111));

@@ -1247,7 +1247,6 @@ object siScomma;
 void
 Lsharp_left_parenthesis_reader()
 {
-	object endp_temp;
 
 	int dim=0;
 	int dimcount;

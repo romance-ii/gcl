@@ -89,6 +89,7 @@ int
 unblock_signals(int n, int m)
 {
   int result = 0;
+  int current_mask;
 #ifdef  SIG_UNBLOCK_SIGNALS
   SIG_UNBLOCK_SIGNALS(result,n,n);
 #else  
@@ -104,7 +105,6 @@ unblock_signals(int n, int m)
   }
 #else
 
-  int current_mask;
   current_mask = sigblock(0);
   sigsetmask(~(sigmask(m)) & ~(sigmask(n)) & current_mask);
   result = (current_mask & sigmask(m) ? signal_mask(m) : 0)

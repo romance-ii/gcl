@@ -1237,7 +1237,7 @@ T409:;
 	V122= car((V121));
 goto T414;
 T414:;
-	if(!(endp((V121)))){
+	if(!(endp_prop((V121)))){
 	goto T415;}
 	goto T408;
 goto T415;
@@ -1885,7 +1885,7 @@ TTL:;
 	V191= car((V190));
 goto T683;
 T683:;
-	if(!(endp((V190)))){
+	if(!(endp_prop((V190)))){
 	goto T684;}
 	base[3]= Cnil;
 	vs_top=(vs_base=base+3)+1;

@@ -1136,7 +1136,6 @@ DEFUNO("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
        NONE,OO,OO,OO,OO,siLaset_by_cursor,"")(array,val,cursor)
 object array,val,cursor;
 {
- 	object endp_temp;
 	object x;
 	int i;
 	object ind[ARRAY_RANK_LIMIT];

@@ -30,7 +30,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 void
 Floop(object form)
 {
-	object endp_temp;
 
 	object x;
 	object *oldlex = lex_env;
@@ -83,7 +82,6 @@ LOOP:
 void
 do_var_list(object var_list)
 {
-	object endp_temp;
 
 	object is, x, y;
 
@@ -123,9 +121,8 @@ do_var_list(object var_list)
 }
 
 void
-Fdo(object arg)
+Fdo(VOL object arg)
 {
-	object endp_temp;
 
 	object *oldlex = lex_env;
 	object *old_top;
@@ -209,9 +206,8 @@ END:
 }
 
 void
-FdoA(object arg)
+FdoA(VOL object arg)
 {
-	object endp_temp;
 
 	object *oldlex = lex_env;
 	object *old_top;
@@ -288,9 +284,8 @@ END:
 }
 
 void
-Fdolist(object arg)
+Fdolist(VOL object arg)
 {
-	object endp_temp;
 
 	object *oldlex = lex_env;
 	object *old_top;
@@ -370,9 +365,8 @@ END:
 }
 
 void
-Fdotimes(object arg)
+Fdotimes(VOL object arg)
 {
-	object endp_temp;
 
 	object *oldlex = lex_env;
 	object *old_top;

@@ -169,7 +169,7 @@ T64:;
 	V20= car((V19));
 goto T74;
 T74:;
-	if(!(endp((V19)))){
+	if(!(endp_prop((V19)))){
 	goto T75;}
 	goto T70;
 goto T75;
@@ -190,7 +190,7 @@ T70:;
 	V26= car((V25));
 goto T90;
 T90:;
-	if(!(endp((V25)))){
+	if(!(endp_prop((V25)))){
 	goto T91;}
 	goto T86;
 goto T91;
@@ -410,7 +410,7 @@ T208:;
 goto T232;
 T232:;
 	V60= car((V52));
-	if(endp(cdr((V52)))){
+	if(endp_prop(cdr((V52)))){
 	goto T230;}
 	V61= cadr((V52));
 goto T230;
@@ -465,10 +465,10 @@ T259:;
 	V65= caar((V52));
 goto T257;
 T257:;
-	if(endp(cdr((V52)))){
+	if(endp_prop(cdr((V52)))){
 	goto T248;}
 	V66= cadr((V52));
-	if(endp(cddr((V52)))){
+	if(endp_prop(cddr((V52)))){
 	goto T248;}
 	V67= caddr((V52));
 goto T248;
@@ -505,10 +505,10 @@ T244:;
 goto T291;
 T291:;
 	V72= car((V52));
-	if(endp(cdr((V52)))){
+	if(endp_prop(cdr((V52)))){
 	goto T289;}
 	V73= cadr((V52));
-	if(endp(cddr((V52)))){
+	if(endp_prop(cddr((V52)))){
 	goto T289;}
 	V74= caddr((V52));
 goto T289;
@@ -812,7 +812,7 @@ static void L11()
 	vs_top=sup;
 goto TTL;
 TTL:;
-	if(!(endp((V129)))){
+	if(!(endp_prop((V129)))){
 	goto T389;}
 	base[2]= Cnil;
 	base[3]= Cnil;
@@ -829,7 +829,7 @@ T389:;
 	V131= vs_base[0];
 	if(!(type_of((V131))==t_string)){
 	goto T397;}
-	if(endp(cdr((V129)))){
+	if(endp_prop(cdr((V129)))){
 	goto T399;}
 	if(((V130))==Cnil){
 	goto T400;}
@@ -935,7 +935,7 @@ static void L12()
 	vs_top=sup;
 goto TTL;
 TTL:;
-	if(!(endp((V138)))){
+	if(!(endp_prop((V138)))){
 	goto T436;}
 	base[1]= Cnil;
 	base[2]= Cnil;
@@ -951,7 +951,7 @@ T436:;
 	V139= vs_base[0];
 	if(!(type_of((V139))==t_string)){
 	goto T443;}
-	if(!(endp(cdr((V138))))){
+	if(!(endp_prop(cdr((V138))))){
 	goto T446;}
 	base[1]= Cnil;
 	base[2]= make_cons((V139),Cnil);

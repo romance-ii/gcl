@@ -105,7 +105,6 @@ make_package(n, ns, ul,isize,esize)
 object n, ns, ul;
 int isize,esize;
 {
-	object endp_temp;
 
 	object x, y;
 	int i;
@@ -179,7 +178,6 @@ in_package(n, ns, ul,isize,esize)
 object n, ns, ul;
 int isize,esize;
 {
-	object endp_temp;
 
 	object x, y;
 	vs_mark;
@@ -217,7 +215,6 @@ object
 rename_package(x, n, ns)
 object x, n, ns;
 {
-	object endp_temp;
 
 	object y;
 	vs_mark;
@@ -820,7 +817,6 @@ Llist_all_packages()
 
 @(defun export (symbols &o (pack `current_package()`))
 	object l;
-	object endp_temp;
 
 @
 	check_type_or_symbol_string_package(&pack);
@@ -847,7 +843,6 @@ BEGIN:
 
 @(defun unexport (symbols &o (pack `current_package()`))
 	object l;
-	object endp_temp;
 
 @
 	check_type_or_symbol_string_package(&pack);
@@ -873,7 +868,6 @@ BEGIN:
 @)
 
 @(defun import (symbols &o (pack `current_package()`))
-	object endp_temp;
 	object l;
 @
 	check_type_or_symbol_string_package(&pack);
@@ -900,7 +894,6 @@ BEGIN:
 
 @(defun shadowing_import (symbols &o (pack `current_package()`))
 	object l;
-	object endp_temp;
 @
 	check_type_or_symbol_string_package(&pack);
 	pack = coerce_to_package(pack);
@@ -926,7 +919,6 @@ BEGIN:
 
 @(defun shadow (symbols &o (pack `current_package()`))
 	object l;
-	object endp_temp;
 @
 	check_type_or_symbol_string_package(&pack);
 	pack = coerce_to_package(pack);
@@ -952,7 +944,6 @@ BEGIN:
 
 @(defun use_package (pack &o (pa `current_package()`))
 	object l;
-	object endp_temp;
 @
 	check_type_or_symbol_string_package(&pa);
 	pa = coerce_to_package(pa);
@@ -981,7 +972,6 @@ BEGIN:
 
 @(defun unuse_package (pack &o (pa `current_package()`))
 	object l;
-	object endp_temp;
 @
 	check_type_or_symbol_string_package(&pa);
 	pa = coerce_to_package(pa);
