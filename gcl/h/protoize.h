@@ -1747,6 +1747,9 @@ Icall_error_handler(object,object,int,...);
 void *
 gcl_gmp_alloc(size_t);
 
+int
+my_plt(const char *,unsigned long *);
+
 #ifdef SGC
 void
 memprotect_test_reset(void);

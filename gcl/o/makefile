@@ -86,7 +86,9 @@ OBJS	= $(OD)main.o $(OD)alloc.o $(OD)gbc.o \
 
 INI_FILES=$(patsubst %.o,%.ini,${OBJS})
 
-all:  $(OBJS) $(LIBFILES) new_init.o  $(GCLIB) $(LAST_FILE)  $(FIRST_FILE) 
+OBJECTS:=$(OBJS) $(LIBFILES) new_init.o  $(GCLIB) $(LAST_FILE)  $(FIRST_FILE) 
+
+all:  $(OBJECTS) plt.o
 
 go:
 	$(MAKE) "CFLAGS=${CFLAGS} -pg"
@@ -124,6 +126,29 @@ $(DECL): $(HDIR)/make-decl.h $(INI_FILES)
 grab_defs: grab_defs.c
 	${CC} $(OFLAGS) -o grab_defs  grab_defs.c
 
+#
+# This section added to ensure that ld generates symbol values for undefined
+# symbols in external dynamic libraries with binutils >=2.14.90.0.8
+# CM 20040227
+#
+
+def: $(OBJECTS)
+	nm $^ | awk '/ [TBCD] / {print $$3}' | sort |uniq >def
+
+undef: $(OBJECTS)
+	nm $^ | awk '/ [U] / {print $$2}' | sort |uniq >undef
+
+undef.h: undef def
+	join -v1 $^ | \
+	awk '{if (i++) printf("MY_PLT(%s),\n",a);a=$$1} END {printf("MY_PLT(%s)\n",a)}'>$@
+
+void.h: undef def
+	join -v1 $^ | \
+	awk '/my_plt/ {next} {printf("extern void *%s;\n",$$1);}'>$@
+
+plt.o: plt.c void.h undef.h
+	$(CC) -c $(CFLAGS) $(DEFS) -fno-builtin $< -o $@
+
 
 ALIB=${LIBFILES} #user_init.o ${EXTRA_LIB}
 
@@ -132,7 +157,7 @@ $(GCLIB): ${ALIB}
 	$(AR) gcllib.a ${ALIB}
 	${RANLIB} gcllib.a
 clean:
-	rm -f $(OBJS) ${ALIB} new_init.o  $(LAST_FILE) $(FIRST_FILE) *.a grab_defs$(EXE) *.ini tmpx foo.c cmpinclude.h new_init.c $(DECL)
+	rm -f $(OBJS) ${ALIB} new_init.o  $(LAST_FILE) $(FIRST_FILE) *.a grab_defs$(EXE) *.ini tmpx foo.c cmpinclude.h new_init.c $(DECL) def undef udef.h void.h plt.o
 
 fsavres.o: /lib/libc.a
 	ar xv /lib/libc.a fsavres.o

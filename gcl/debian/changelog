@@ -24,8 +24,11 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * mach-o compatible changes in sfaslbfd.c
   * Support for new debugging section names in sfaslelf.c
   * Modify default banner slightly
+  * Homebrew plt-like mechanism for ensuring that valid internal
+    addresses exist to which undefined symbols in compiled lisp objects
+    referring to external shared libraries can be relocated
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 26 Feb 2004 15:32:34 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 27 Feb 2004 23:44:03 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
