@@ -49,6 +49,8 @@ ifeq ($(ARCHT),hppa)
 DEBUG=--enable-debug
 endif
 
+VERS=2.5.1
+
 configure:
 
 configure-%-stamp:
@@ -120,9 +122,9 @@ install-%-stamp: build-%-stamp
 	cp -a $$(find debian/tmp/usr/local -name site-lisp -type d) debian/tmp/usr/share/emacs/site-lisp/gcl
 	rm -rf debian/tmp/usr/local
 
-	cat debian/tmp/usr/lib/gcl-2.5.0/gcl-tk/demos/index.lsp | \
+	cat debian/tmp/usr/lib/gcl-$(VERS)/gcl-tk/demos/index.lsp | \
 		sed "s,$$(pwd)/debian/tmp,,1" >debian/foo
-	mv debian/foo debian/tmp/usr/lib/gcl-2.5.0/gcl-tk/demos/index.lsp
+	mv debian/foo debian/tmp/usr/lib/gcl-$(VERS)/gcl-tk/demos/index.lsp
 
 	rm -f debian/tmp/usr/bin/*.exe debian/tmp/usr/bin/*.bat
 
@@ -150,7 +152,7 @@ gclean:
 	rm *stamp
 
 install: install-pre install-trad-stamp gclean install-ansi-stamp
-	cp debian/gcl.sh debian/gcl/usr/bin/gcl
+	cat debian/gcl.sh | sed "s,gcl/,/usr/lib/gcl-$(VERS)/,g" >debian/gcl/usr/bin/gcl
 	chmod 0755 debian/gcl/usr/bin/gcl
 
 # Build architecture-independent files here.
