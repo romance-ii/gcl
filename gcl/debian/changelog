@@ -3,8 +3,9 @@ gclcvs (2.7.0-24) unstable; urgency=low
   * Fix segfault in referencing (sgc_)type_map out of bounds which can
     occurr when C stack is below heap, as on alpha.
   * Cleanup compiler warnings on bcmp.c bzero.c and bcopy.c
+  * Clean up compiler warning in file.d
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  7 May 2004 21:46:32 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri,  7 May 2004 21:49:08 +0000
 
 gclcvs (2.7.0-23) unstable; urgency=low
 

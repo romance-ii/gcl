@@ -2476,8 +2476,8 @@ read_fasl_data(str)
 char *str;
 {
 	object faslfile, data;
-#ifdef UNIX
-#ifdef BSD
+#ifndef SEEK_TO_END_OFILE
+#if defined(BSD) && defined(UNIX)
 	FILE *fp;
 	int i;
 #ifdef HAVE_AOUT
