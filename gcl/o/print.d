@@ -68,7 +68,7 @@ object sSAprint_structureA;
 #define	INDENT1		0404
 #define	INDENT2		0405
 
-
+extern object coerce_stream(object,int);
 
 writec_queue(c)
 int c;
