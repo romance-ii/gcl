@@ -94,6 +94,7 @@ static char *rl_completion_words(char *text, int state) {
    the word to complete.  We can use the entire contents of rl_line_buffer
    in case we want to do some simple parsing.  Return the array of matches,
    or NULL if there aren't any. */
+extern char **completion_matches(char *,char *(*)(char *,int));
 static char **rl_completion(char *text, int start, int end) {
 	return completion_matches(text, rl_completion_words);
 }
@@ -224,13 +225,17 @@ static siLreadline_init() {
 		readline_on = 1;
 
 		if (type_of(program_name)==t_string) {
-			if (rl_readline_name)
-				free(rl_readline_name);
-			rl_readline_name = malloc(program_name->st.st_fillp+1);
-			if (rl_readline_name==NULL) FEerror("Out of memory.", 0); 
+
+			static char *mrln;
+
+			if (mrln)
+				free(mrln);
+			mrln = malloc(program_name->st.st_fillp+1);
+			if (!mrln) FEerror("Out of memory.", 0); 
 			for (i=0; i<program_name->st.st_fillp; i++)
-				rl_readline_name[i] = program_name->ust.ust_self[i];
-			rl_readline_name[i] = 0;
+				mrln[i] = program_name->ust.ust_self[i];
+			mrln[i] = 0;
+			rl_readline_name=mrln;
 			rl_initialize();
 		} else {
 			FEerror("~S is not a string.", 1, program_name);
