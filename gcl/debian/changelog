@@ -1,3 +1,18 @@
+gcl (2.5.0.cvs20020625-46) unstable; urgency=high
+
+  * Keep a *much* smaller piece of gmp.h in cmpinclude.h, reducing image
+    size by almost 100k
+  * Check for _SHORT_LIMB and _LONG_LONG_LIMB in configure
+  * Remove build specific include directories from compile command in
+    final executable
+  * Include local regexp.h explicitly in cmpinclude.h, to eliminate
+    intereference with system regexp.h, and to fix bug in which gcl
+    compilation depended on existing build directories
+  * Correctly add directory paths to extra gmp file targets in
+    unixport/makefile for m68k
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 29 Aug 2002 21:56:28 -0400
+
 gcl (2.5.0.cvs20020625-45) unstable; urgency=high
 
   * Fix typo in rshift target for m68k

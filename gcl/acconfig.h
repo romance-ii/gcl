@@ -210,3 +210,6 @@ SGC is enabled.  */
 #define MP_LIMB_BYTES 0
 
 #undef ANSI_COMMON_LISP
+
+#undef __SHORT_LIMB
+#undef __LONG_LONG_LIMB

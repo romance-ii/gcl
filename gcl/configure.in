@@ -300,7 +300,7 @@ AC_SUBST(CC)
 # subst GCC not only under 386-linux, but where available -- CM
 
 
-TCFLAGS="-Wall -DVOL=volatile -I\$(GCLDIR)/o -fsigned-char"
+TCFLAGS="-Wall -DVOL=volatile -fsigned-char"
 if test "$GCC" = "yes" ; then
 	TCFLAGS="$TCFLAGS -fwritable-strings -pipe"
 fi
@@ -322,7 +322,6 @@ case $use in
 			TCFLAGS="$TCFLAGS -fPIC";;
 	esac;;
 esac
-
 
 
 # Step 1: set the variable "system" to hold the name and version number
@@ -436,11 +435,31 @@ fi
  AC_DEFINE_UNQUOTED(MP_LIMB_BYTES,$mpsize)
  AC_MSG_RESULT($mpsize) 
 
+ AC_MSG_CHECKING("_SHORT_LIMB")
+ AC_TRY_RUN([#include <stdio.h>
+	#include "$MP_INCLUDE"
+	int main() {
+	#ifdef _SHORT_LIMB
+	return 0;
+	#else
+	return 1;
+	#endif
+	}],AC_DEFINE(__SHORT_LIMB) AC_MSG_RESULT(yes),AC_MSG_RESULT(no),AC_MSG_RESULT(no))
+ AC_MSG_CHECKING("_LONG_LONG_LIMB")
+ AC_TRY_RUN([#include <stdio.h>
+	#include "$MP_INCLUDE"
+	int main() {
+	#ifdef _LONG_LONG_LIMB
+	return 0;
+	#else
+	return 1;
+	#endif
+	}],AC_DEFINE(__LONG_LONG_LIMB) AC_MSG_RESULT(yes),AC_MSG_RESULT(no),AC_MSG_RESULT(no))
+
  GMP=1
  AC_DEFINE(GMP)
  AC_SUBST(GMP)
  AC_SUBST(GMPDIR)
- AC_SUBST(MP_INCLUDE)
  echo > makedefsafter
  echo "MPFILES=$MPFILES" >> makedefsafter
  echo >> makedefsafter
@@ -1262,7 +1281,9 @@ fi
 
 LIBS="$LIBS $TLIBS"
 AC_SUBST(LIBS)
-CFLAGS="$TCFLAGS"
+FINAL_CFLAGS="$TCFLAGS"
+AC_SUBST(FINAL_CFLAGS)
+CFLAGS="$TCFLAGS  -I\$(GCLDIR)/o"
 AC_SUBST(CFLAGS)
 
 if test -f h/$use.defs  ; then

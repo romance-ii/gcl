@@ -1,10 +1,13 @@
-/* h/gclincl.h.in.  Generated automatically from configure.in by autoheader.  */
+/* h/gclincl.h.in.  Generated automatically from configure.in by autoheader 2.13.  */
 
 /* Define if you have alloca, as a function or macro.  */
 #undef HAVE_ALLOCA
 
 /* Define if you have <alloca.h> and it should be used (not on Ultrix).  */
 #undef HAVE_ALLOCA_H
+
+/* Define if the X Window System is missing or not being used.  */
+#undef X_DISPLAY_MISSING
 
 #define DBEGIN 0
 
@@ -158,6 +161,9 @@
 #define MP_LIMB_BYTES 0
 
 #undef ANSI_COMMON_LISP
+
+#undef __SHORT_LIMB
+#undef __LONG_LONG_LIMB
 
 /* The number of bytes in a long *.  */
 #undef SIZEOF_LONG_P

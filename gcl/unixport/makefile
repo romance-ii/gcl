@@ -51,7 +51,7 @@ OBJS	=  $(OD)main.o $(OD)alloc.o $(OD)gbc.o \
 	$(OD)fat_string.o ${ODIR}/run_process.o \
 	$(OD)nfunlink.o $(OD)usig.o $(OD)usig2.o $(OD)utils.o \
 	$(OD)makefun.o $(OD)sockets.o  $(OD)clxsocket.o  \
-	$(OD)init_pari.o $(OD)nsocket.o $(NEW_INIT) ../$(MPFILES) $(SFASL) $(EXTRAS) \
+	$(OD)init_pari.o $(OD)nsocket.o $(NEW_INIT) $(addprefix ../,$(MPFILES)) $(SFASL) $(EXTRAS) \
 	$(addprefix $(OD),$(RL_OBJS))
 
 LSPOBJS	= $(LSPDIR)/defmacro.o $(LSPDIR)/evalmacros.o $(LSPDIR)/top.o \
@@ -96,7 +96,7 @@ saved_$(SYSTEM):raw_$(SYSTEM) $(RSYM) $(INIT_SYSTEM_LSP) \
 	cat $(INIT_SYSTEM_LSP) | \
 	sed -e "s$(OLDDATE)Version(`cat ../majvers`.`cat ../minvers`) `date`g" \
 	-e 'ssaved_gclsaved_$(SYSTEM)g' \
-	-e 'slinks t)links t)(setq compiler::*cc* "$(CC) -c -I$(HDIR) $(CFLAGS)")$(INITFORM)g' \
+	-e 'slinks t)links t)(setq compiler::*cc* "$(CC) -c $(FINAL_CFLAGS)")$(INITFORM)g' \
 	-e "sGCLDIR${GCLDIR}g" \
 	-e "s(defun lisp-imp(setq si::*gcl-version* `cat ../minvers` si::*gcl-major-version* `cat ../majvers`)(defun lisp-impg" \
 	-e "s:GCL-1:GCL-"`cat ../majvers`":g" 	> foo 

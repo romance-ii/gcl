@@ -878,7 +878,7 @@ typedef void (*funcvoid)(void);
 /* reference.c:169:OF */ extern void Lmacro_function (void); /* () */
 /* reference.c:180:OF */ extern void Lspecial_form_p (void); /* () */
 /* reference.c:191:OF */ extern void init_reference (void); /* () */
-#include "regexp.h"
+/*  #include "regexp.h" */
 /* regexp.c:230:OF */ extern regexp *regcomp (char *exp); /* (exp) char *exp; */
 /* regexp.c:782:OF */ extern int regexec (register regexp *prog, register char *string, char *start, int length); /* (prog, string, start, length) register regexp *prog; register char *string; char *start; int length; */
 /* regexp.c:1485:OF */ extern int min_initial_branch_length (regexp *x, unsigned char *buf, int advance); /* (x, buf, advance) regexp *x; unsigned char *buf; int advance; */
