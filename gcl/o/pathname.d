@@ -579,8 +579,14 @@ from ~S to ~S.",
 	@(return `merge_pathnames(path, defaults, default_version)`)
 @)
 
-@(defun make_pathname (&key host device directory name
-			    type version defaults
+@(defun make_pathname (&key
+        (host `Cnil` host_supplied_p)
+	(device `Cnil` device_supplied_p)
+	(directory `Cnil` directory_supplied_p)
+	(name `Cnil` name_supplied_p)
+	(type `Cnil` type_supplied_p)
+	(version `Cnil` version_supplied_p)
+	defaults
 		       &aux x)
 @
 	if (defaults == Cnil) {
@@ -594,6 +600,12 @@ from ~S to ~S.",
 		defaults = coerce_to_pathname(defaults);
 	x = make_pathname(host, device, directory, name, type, version);
 	x = merge_pathnames(x, defaults, Cnil);
+        if ( host_supplied_p) x->pn.pn_host = host;
+	if (device_supplied_p) x->pn.pn_device = device;
+	if (directory_supplied_p) x->pn.pn_directory = directory;
+	if (name_supplied_p) x->pn.pn_name = name;
+	if (type_supplied_p) x->pn.pn_type = type;
+	if (version_supplied_p) x->pn.pn_version = version;
 	@(return x)
 @)
 
