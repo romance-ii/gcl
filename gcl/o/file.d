@@ -2180,7 +2180,7 @@ char *myaddrPtr=buf1,*hostPtr=buf2;
    if (myaddr != Cnil) {
      myaddrPtr=lisp_copy_to_null_terminated(myaddr,myaddrPtr,sizeof(buf2));
    } else   { myaddrPtr = NULL; }
-   if (server == 0 && hostPtr == NULL) {
+   if (isServer == 0 && hostPtr == NULL) {
      FEerror("You must supply at least one of :host hostname or :server function",0);
    }
    Iis_fixnum(port);
