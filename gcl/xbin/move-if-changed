@@ -6,8 +6,7 @@ F1=$1
 F2=$2
 
 
-if
-cmp $1 $2 > /dev/null
+if [ -e $2 ] && cmp $1 $2 > /dev/null
 then  echo $1 and $2  are identical ;
 else
 echo $1 and $2 were not the same.
