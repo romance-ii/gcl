@@ -221,7 +221,8 @@ char **argv, **envp;
 #endif
 #ifdef RLIMIT_STACK
 	getrlimit(RLIMIT_STACK, &rl);
-        if (rl.rlim_cur == RLIM_INFINITY)
+        if (rl.rlim_cur == RLIM_INFINITY ||
+	    rl.rlim_cur > MAX_STACK_SIZE)
 	  rl.rlim_cur=MAX_STACK_SIZE;
 	cssize = rl.rlim_cur/4 - 4*CSGETA;
 #endif	
