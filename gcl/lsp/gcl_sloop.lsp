@@ -76,7 +76,7 @@
 
 (export '(loop-return sloop def-loop-collect def-loop-map
 		      def-loop-for def-loop-macro local-finish
-		      loop-finish) (find-package "SLOOP"))
+		      sloop-finish) (find-package "SLOOP"))
 
 )
 
@@ -192,7 +192,7 @@ a symbol for the purposes of being a keyword in a sloop")
 	 `(return ,@ vals))
 	(t`(return (values  ,@ vals)))))
 
-(defmacro loop-finish ()
+(defmacro sloop-finish ()
   `(go finish-loop))
 
 (defmacro local-finish ()
@@ -296,7 +296,7 @@ a symbol for the purposes of being a keyword in a sloop")
 	  (or *loop-name* (setf *loop-name* (gensym "SLOOP")))
 	  (and (eql 'finish-loop finish-loop)
 	       (setf finish-loop (gensym "FINISH"))))
-;;; some one might use local-finish,local-return or loop-finish, so they might
+;;; some one might use local-finish,local-return or sloop-finish, so they might
 ;;; be bound at an outer level.  WE have to always include this since
 ;;; loop-return may be being bound outside.
     (and				; *loop-name*
@@ -305,7 +305,7 @@ a symbol for the purposes of being a keyword in a sloop")
 		      `(return-from ,',*loop-name* (values ,@ vals)))
 	local-macros))
     (when  t;; (or (> *loop-level* 1) (not (eql finish-loop 'finish-loop)))
-	   (push 	 `(loop-finish () `(go ,',finish-loop)) local-macros)
+	   (push 	 `(sloop-finish () `(go ,',finish-loop)) local-macros)
 	   (push 	 `(local-finish () `(go ,',finish-loop)) local-macros))
     (and *loop-collect-var*
 	 (push   `(return-from ,*loop-name* , *loop-collect-var*)

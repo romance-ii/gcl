@@ -116,8 +116,10 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Openbsd changes -- maximize data seg resource if possible, avoid
     mallocing error message when allocation routines fails
   * Fix sigcontext configure tests
+  * Rename loop-finish -> sloop-finish in sloop package so that sloop
+    and ansi loop can be used simultaneously
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 30 Mar 2004 21:02:04 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 30 Mar 2004 21:14:32 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
