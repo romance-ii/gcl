@@ -38,7 +38,7 @@
   )
 (defentry get_c_string_2 (object) (object get_c_string))
 
-/* make sure string is null terminated */
+;; make sure string is null terminated
 
 (defentry get-c-string (object) (object "(object)object_to_string"))
 
@@ -63,7 +63,7 @@
   )
 (defentry get-st-point2 (object) (int get_c_string))
 
-/* make sure string is null terminated */
+;; make sure string is null terminated
 (defun  get-st-point (string)
   ( get-st-point2 (concatenate 'string string "")))
 

@@ -39,8 +39,9 @@ gcl (2.5.4-1) unstable; urgency=low
   * Small fixes for profiling support
   * Restore pp() function for debugging; print out undefined symbol
     names
+  * Small patch for fix xgcl demo (thanks  Michael Koehne)
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  6 Aug 2003 17:01:26 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri,  8 Aug 2003 13:42:40 +0000
 
 gcl (2.5.3-2) unstable; urgency=low
 
