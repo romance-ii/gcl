@@ -98,6 +98,7 @@ gcl_init_system(object no_init)
   ar_check_init(gcl_loop,no_init);
   ar_check_init(gcl_defpackage,no_init);
   ar_check_init(gcl_make_defpackage,no_init);
+  ar_check_init(gcl_ansi_io,no_init);
 
 	
   ar_check_init(gcl_cmpinline,no_init);

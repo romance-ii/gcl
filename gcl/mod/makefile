@@ -9,7 +9,7 @@ PORTDIR	= ../unixport
 CAT=cat
 APPEND=../xbin/append
 
-OBJS	= gcl_destructuring_bind.o gcl_defpackage.o gcl_make_defpackage.o gcl_loop.o $(EXTRA_LOBJS)
+OBJS	= gcl_ansi_io.o gcl_destructuring_bind.o gcl_defpackage.o gcl_make_defpackage.o gcl_loop.o $(EXTRA_LOBJS)
 # export.o autoload.o auto_new.o
 
 
