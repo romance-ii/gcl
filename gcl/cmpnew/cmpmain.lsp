@@ -527,9 +527,13 @@ SYSTEM_SPECIAL_INIT
       (format nil "~a ~a ~a -c -w ~a -o ~a"
 	      *cc*
 	      (if (and (boundp '*c-debug*) *c-debug*) " -g " "")
-              (case *speed* 
-		    (3 #+broken_o4_opt "-O2" #-broken_o4_opt"-O4")
-		    (2 "-O") (t ""))
+	      (case *speed*
+		    (3 *opt-three* )
+		    (2 *opt-two*) 
+		    (t ""))	
+;              (case *speed* 
+;		    (3 #+broken_o4_opt "-O2" #-broken_o4_opt"-O4")
+;		    (2 "-O") (t ""))
 	      (namestring (make-pathname  :type "c" :defaults (first args)))
 	      (namestring (make-pathname  :type "o" :defaults (first args)))
 	      )
