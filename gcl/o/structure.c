@@ -68,7 +68,7 @@ structure_ref(object x, object name, int i)
  switch((SLOT_TYPE(x->str.str_def,i)))
    {
    case aet_object: return(STREF(object,x,s_pos[i]));
-   case aet_fix:  return(make_fixnum((STREF(int,x,s_pos[i]))));
+   case aet_fix:  return(make_fixnum((STREF(fixnum,x,s_pos[i]))));
    case aet_ch:  return(code_char(STREF(char,x,s_pos[i])));
    case aet_bit:
    case aet_char: return(small_fixnum(STREF(char,x,s_pos[i])));
@@ -121,7 +121,7 @@ structure_set(object x, object name, int i, object v)
  switch(SLOT_TYPE(x->str.str_def,i)){
    
    case aet_object: STREF(object,x,s_pos[i])=v; break;
-   case aet_fix:  (STREF(int,x,s_pos[i]))=fix(v); break;
+   case aet_fix:  (STREF(fixnum,x,s_pos[i]))=fix(v); break;
    case aet_ch:  STREF(char,x,s_pos[i])=char_code(v); break;
    case aet_bit:
    case aet_char: STREF(char,x,s_pos[i])=fix(v); break;
@@ -216,7 +216,7 @@ siLmake_structure(void)
       switch(s_type[i]){
 	     
       case aet_object: STREF(object,x,s_pos[i])=v; break;
-      case aet_fix:  (STREF(int,x,s_pos[i]))=fix(v); break;
+      case aet_fix:  (STREF(fixnum,x,s_pos[i]))=fix(v); break;
       case aet_ch:  STREF(char,x,s_pos[i])=char_code(v); break;
       case aet_bit:
       case aet_char: STREF(char,x,s_pos[i])=fix(v); break;

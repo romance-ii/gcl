@@ -635,18 +635,21 @@ BEGIN:
 		   {if (!equalp(STREF(object,x,*s_pos),STREF(object,y,*s_pos)))
 		       return FALSE;}
 		  else
-		   if (! (*s_pos & (sizeof(object)-1)))
+/* 		   if (! (*s_pos & (sizeof(object)-1))) */
 		    switch(s_type[i]){
 		    case aet_lf:
-		     if(STREF(longfloat,x,*s_pos) != STREF(longfloat,y,*s_pos))
+		     if((! (*s_pos & (sizeof(longfloat)-1))) &&
+			STREF(longfloat,x,*s_pos) != STREF(longfloat,y,*s_pos))
 			return(FALSE);
 		      break;
 		    case aet_sf:
-		     if(STREF(shortfloat,x,*s_pos)!=STREF(shortfloat,y,*s_pos))
+		     if((! (*s_pos & (sizeof(shortfloat)-1))) &&
+			STREF(shortfloat,x,*s_pos)!=STREF(shortfloat,y,*s_pos))
 			return(FALSE);
 		      break;
 		    default:
-		      if(STREF(int,x,*s_pos)!=STREF(int,y,*s_pos))
+		      if((! (*s_pos & (sizeof(fixnum)-1))) &&
+			 STREF(fixnum,x,*s_pos)!=STREF(fixnum,y,*s_pos))
 			return(FALSE);
 		      break;}}
 		return(TRUE);

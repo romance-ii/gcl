@@ -847,7 +847,7 @@ char *tmp_alloc;
 
 #define	TIME_ZONE	(-9)
 EXTER 
-int FIXtemp;
+fixnum FIXtemp;
 
 /*  For IEEEFLOAT, the double may have exponent in the second word
 (little endian) or first word.*/
