@@ -82,6 +82,10 @@
 ;; is :system-p we use it on all files.   If nil use it on none.
 (defvar *fasd-data* t)
 (defvar *data* nil)
+(defvar *default-system-p* nil)
+(defvar *default-c-file* nil)
+(defvar *default-h-file* nil)
+(defvar *default-data-file* nil)
 
 ;;  (list section-length split-file-names next-section-start-file-position)
 ;;  Many c compilers cannot handle the large C files resulting from large lisp files.
@@ -145,12 +149,12 @@
 (defun compile-file1 (input-pathname
                       &key (output-file input-pathname)
                            (o-file t)
-                           (c-file nil)
-                           (h-file nil)
-                           (data-file nil)
+                           (c-file *default-c-file*)
+                           (h-file *default-h-file*)
+                           (data-file *default-data-file*)
 			   (c-debug nil)
                            #+aosvs (ob-file nil)
-                           (system-p nil)
+                           (system-p *default-system-p*)
 			   (print nil)
                            (load nil)
                       &aux (*standard-output* *standard-output*)
@@ -694,23 +698,60 @@ SYSTEM_SPECIAL_INIT
   
   (setq tem (concatenate 'string out ".c"))
   (with-open-file (st tem :direction :output)
-		  (format st "#include ~a~%" *cmpinclude*)
-		  (format st "#define init_or_load(fn,file) do {extern void fn(void); init_or_load1(fn,file);}  while(0)~%")
-		  (format st "object user_init() {~%")
-		  (dolist (tem files)
-			  (cond ((equal (pathname-type tem) "o")
-				 (format st "init_or_load(init_~a,\"~a\");~%" 
-					 (substitute #\_ #\- (pathname-name tem)) tem))
-				(t 
-				 (format st "load(\"~a\");~%" tem))))
-		  (format st "return Cnil;}~%")
-		  )
+		  (format st "#include <string.h>~%")
+		  (format st "#include ~a~%~%" *cmpinclude*)
+
+		  (format st "#define load2(a) do {")
+		  (format st "printf(\"Loading %s...\\n\",(a));")
+		  (format st "load(a);")
+		  (format st "printf(\"Finished %s...\\n\",(a));} while(0)~%~%")
+
+		  (let ((p nil))
+		    (dolist (tem files)
+		      (when (equal (pathname-type tem) "o")
+			(push (list (substitute #\_ #\- (pathname-name tem)) tem) p)))
+
+		    (setq p (nreverse p))
+
+		    (dolist (tem p)
+		      (format st "extern void init_~a(void);~%" (car tem)))
+		    (format st "~%")
+
+		    (format st "typedef struct {void (*fn)(void);char *s;} Fnlst;~%")
+		    (format st "#define NF ~a~%" (length p))
+		    (format st "static Fnlst my_fnlst[NF]={")
+		    (dolist (tem p)
+		      (when (not (eq tem (car p)))
+			(format st ",~%"))
+		      (format st "{init_~a,\"~a\"}" (car tem) (cadr tem)))
+		    (format st "};~%~%")
+		    
+		    (format st "object user_init(void) {~%")
+		    (dolist (tem files)
+		      (cond ((equal (cadr (car p)) tem)
+			     (format st "init_or_load1(init_~a,\"~a\");~%" (car (car p)) (cadr (car p)))
+			     (setq p (cdr p)))
+			    (t 
+			     (format st "load2(\"~a\");~%" tem))))
+		    (format st "return Cnil;}~%~%")
+
+		    (format st "int user_match(const char *s,int n) {~%")
+		    (format st "  const Fnlst *f;~%")
+		    (format st "  for (f=my_fnlst;f<my_fnlst+NF;f++){~%")
+		    (format st "     if (!strncmp(s,f->s,n)) {~%")
+		    (format st "        init_or_load1(f->fn,f->s);~%")
+		    (format st "        return 1;~%")
+		    (format st "     }~%")
+		    (format st "  }~%")
+		    (format st "  return 0;~%")
+		    (format st "}~%~%")))
+		    
   (system (format nil "~a ~a" *cc* tem))
   (delete-file tem)
-
+  
 )
 
-(defun link (files image &optional post extra-libs &aux raw init) 
+(defun link (files image &optional post extra-libs (run-user-init t) &aux raw init) 
 
   (make-user-init files "user-init")
   (setq raw (format nil "raw_~a" (pathname-name image)))
@@ -732,6 +773,8 @@ SYSTEM_SPECIAL_INIT
   (delete-file "user-init.o")
 
   (with-open-file (st init :direction :output)
+		  (unless run-user-init
+		    (format st "(fmakunbound 'si::user-init)~%"))
 		  (format st "(setq si::*no-init* '(")
 		  (dolist (tem files)
 			  (format st " \"~a\"" (pathname-name tem)))
@@ -742,7 +785,7 @@ SYSTEM_SPECIAL_INIT
 		  (if (stringp post) (format st "~a~%" post))
 		  (format st "(si::save-system \"~a\")~%" image))
 
-  (system (format nil "~a ~a < ~a" 
+  (system (format nil "./~a ~a < ~a" 
 		  raw
 		  si::*system-directory*
 		  init))

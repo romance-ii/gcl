@@ -1000,6 +1000,7 @@ extern void unexec (
 /* unixtime.c:144:OF */ extern object fLget_internal_real_time (void); /* () */
 /* unixtime.c:173:OF */ extern void init_unixtime (void); /* () */
 /* user_init.c:2:OF */ extern object user_init (void); /* () */
+/* user_init.c:2:OF */ extern int user_match (const char *,int n); /* () */
 /* usig.c:49:OF */ extern void gcl_signal (int signo, void (*handler) (/* ??? */)); /* (signo, handler) int signo; void (*handler)(); */
 /* usig.c:92:OF */ extern int unblock_signals (int n, int m); /* (n, m) int n; int m; */
 /* usig.c:119:OF */ extern void unblock_sigusr_sigio (void); /* () */

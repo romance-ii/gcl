@@ -14,7 +14,7 @@ ODIR	= .
 GCLIB  = ${ODIR}/gcllib.a
 RANLIB=ranlib
 AR = ar qc
-LIBFILES= bcmp.o bcopy.o bzero.o user_init.o
+LIBFILES= bcmp.o bcopy.o bzero.o user_init.o user_match.o
 # compile main.c with -g, since signalling may not be ok on -O
 MAIN_DEBUG=
 DPP	= ../bin/dpp
@@ -109,7 +109,7 @@ grab_defs: grab_defs.c
 	${CC} $(OFLAGS) -o grab_defs  grab_defs.c
 
 
-ALIB=${LIBFILES} user_init.o ${EXTRA_LIB}
+ALIB=${LIBFILES} #user_init.o ${EXTRA_LIB}
 
 $(GCLIB): ${ALIB} 
 	rm -f gcllib.a

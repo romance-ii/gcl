@@ -19,7 +19,7 @@ NIL, these files are automatically deleted after compilation.
 
 @end defun
 
-@defun LINK (files image &optional post extra-libs &aux raw init) 
+@defun LINK (files image &optional post extra-libs (run-user-init t) &aux raw init) 
 Package:LISP
 
 On systems where dlopen is used for relocations, one cannot make custom
@@ -27,21 +27,38 @@ images containing loaded binary object files simply by loading the files
 and executing save-system.  This function is provided for such cases.
 
 After compiling source files into objects, LINK can be called with a
-list of binary and source FILES which would otherwise normally be loaded
-in sequence before saving the image to IMAGE.  LINK will use the system
-C linker to link the binary files thus supplied with GCL's objects,
-using EXTRA-LIBS as well if provided, and producing a raw_IMAGE
-executable. This executable is then run to initialize first GCL's
-objects, and then the supplied files, in order.  Source files are loaded
-at their position in the sequence.  Any optional code which should be
-run after file initialization can be supplied in the POST variable.  The
+list of binary and source FILES which would otherwise normally be
+loaded in sequence before saving the image to IMAGE.  LINK will use
+the system C linker to link the binary files thus supplied with GCL's
+objects, using EXTRA-LIBS as well if provided, and producing a
+raw_IMAGE executable. This executable is then run to initialize first
+GCL's objects, followed by the supplied files, in order, if
+RUN-USER-INIT is set.  In such a case, source files are loaded at
+their position in the sequence.  Any optional code which should be run
+after file initialization can be supplied in the POST variable.  The
 image is then saved using save-system to IMAGE.
 
-This method of creating lisp images may also have the advantage that all
-new object files are kept out of the lisp core and placed instead in the
-final image's .text section.  This should in principle reduce the core
-size and speed up garbage collection.
+This method of creating lisp images may also have the advantage that
+all new object files are kept out of the lisp core and placed instead
+in the final image's .text section.  This should in principle reduce
+the core size, speed up garbage collection, and forego any performance
+penalty induced by data cache flushing on some machines.
 
+
+In both the RAW and SAVED image, any calls to LOAD binary object files
+which have been specified in this list will bypass the normal load
+procedure, and simply initialize the already linked in module.  One
+can rely on this feature by disabling RUN-USER-INIT, and instead
+passing the normal build commands in POST.  In the course of executing
+this code, binary modules previously linked into the .text section of
+the executable will be initialized at the same point at which they
+would have normally been loaded into the lisp core, in the
+executable's .data section.  In this way, the user can choose to take
+advantage of the aforementioned possible benefits of this linking
+method in a relatively transparent way.
+
+All binary objects specified in FILES must have been compiled with
+:SYSTEM-P set to T.
 
 @end defun
 
@@ -212,10 +229,6 @@ Adds the specified module to the list of modules maintained in *MODULES*.
 
 @end defun
 
-
-
-
-
 @defun COMPILED-FUNCTION-P (x)
 Package:LISP
 
@@ -224,8 +237,25 @@ Returns T if X is a compiled function; NIL otherwise.
 
 @end defun
 
+@defvar *DEFAULT-SYSTEM-P*
+Pakcage:COMPILER
+Specifies the default setting of :SYSTEM-P used by COMPILE.  Defaults to NIL.
+@end defvar
 
+@defvar *DEFAULT-C-FILE*
+Pakcage:COMPILER
+Specifies the default setting of :C-FILE used by COMPILE.  Defaults to NIL.
+@end defvar
 
+@defvar *DEFAULT-H-FILE*
+Pakcage:COMPILER
+Specifies the default setting of :H-FILE used by COMPILE.  Defaults to NIL.
+@end defvar
+
+@defvar *DEFAULT-DATA-FILE*
+Pakcage:COMPILER
+Specifies the default setting of :DATA-FILE used by COMPILE.  Defaults to NIL.
+@end defvar
 
 @defvar *FEATURES* 
 Package:LISP

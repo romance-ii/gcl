@@ -282,10 +282,29 @@ object_to_string(object x)
    where f1 f2 are forms to be evaled.
 */
 
+#ifdef CLEAR_CACHE
+static int
+sigh(int sig,long code,void *scp, char *addr) {
+
+    fprintf(stderr,"Received SIGILL at %p\n",((siginfo_t *)code)->si_addr);
+    exit(1);
+}
+#endif
+
 void
 call_init(int init_address, object memory, object fasl_vec, FUNC fptr)
 {object form;
  FUNC at;
+#ifdef CLEAR_CACHE
+ static sigaction sa={{sigh},{{0}},SA_RESTART|SA_SIGINFO,NULL);
+ static sigset_t ss;
+
+ sigaction(SIGILL,&sa,NULL);
+ sigemptyset(&ss);
+ sigaddset(&ss,SIGILL);
+ sigprocmask(SIG_BLOCK,&ss,NULL);
+#endif
+
 
   check_type(fasl_vec,t_vector);
   form=(fasl_vec->v.v_self[fasl_vec->v.v_fillp -1]);
@@ -302,7 +321,13 @@ call_init(int init_address, object memory, object fasl_vec, FUNC fptr)
      form->c.c_car == sSPinit)
    {bds_bind(sSPinit,fasl_vec);
     bds_bind(sSPmemory,memory);
+#ifdef CLEAR_CACHE
+    sigprocmask(SIG_UNBLOCK,&ss,NULL);
+#endif
     (*at)();
+#ifdef CLEAR_CACHE
+    sigprocmask(SIG_BLOCK,&ss,NULL);
+#endif
     bds_unwind1;
     bds_unwind1;
   }
@@ -310,7 +335,13 @@ call_init(int init_address, object memory, object fasl_vec, FUNC fptr)
    /* old style three arg init, with all init being done by C code. */
    {memory->cfd.cfd_self = fasl_vec->v.v_self;
     memory->cfd.cfd_fillp = fasl_vec->v.v_fillp;
+#ifdef CLEAR_CACHE
+    sigprocmask(SIG_UNBLOCK,&ss,NULL);
+#endif
     (*at)(memory->cfd.cfd_start, memory->cfd.cfd_size, memory);
+#ifdef CLEAR_CACHE
+    sigprocmask(SIG_BLOCK,&ss,NULL);
+#endif
 }}
 
 /* statVV is the address of some static storage, which is used by the
@@ -419,15 +450,3 @@ init_or_load1(void (*fn)(void),char *file)
   {printf("loading %s\n",file); fflush(stdout);  load(file);}
 }
 
-  
-
-  
-  
-     
-  
-  
- 
-
-    
-    
-   

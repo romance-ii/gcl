@@ -1,11 +1,9 @@
-;(in-package "COMPILER")
 (make-package "COMPILER" :use '("LISP"))
 (in-package "SYSTEM")
 (defvar *command-args* nil)
 (in-package "USER")
 (in-package "LISP")
 
-;(lisp::in-package "SLOOP")
 (make-package "SLOOP" :use '("LISP"))
 (make-package "SERROR" :use '("LISP" "SLOOP"))
 (make-package "ANSI-LOOP" :use '("LISP"))
@@ -19,12 +17,8 @@
 
 (in-package "USER")
 (progn 
-;(allocate 'cons 100) (allocate 'string 40)
  (system:init-system) (gbc t)
  (load (concatenate 'string si::*system-directory* "../gcl-tk/tk-package.lsp"))
-; (si::build-symbol-table)
-;#+gmp (defun si::multiply-bignum-stack (n) "nothing")
-; (si::multiply-bignum-stack 25)
  (or lisp::*link-array*
   (setq lisp::*link-array*
      (make-array (ash 1 11)  :element-type 'string-char :fill-pointer 0)))
@@ -47,11 +41,9 @@
 			  :static t)))
       (if (si::fread tem 0 (length tem) st)
 	  (setq compiler::*cmpinclude-string* tem)))))
- ;;compile-file is in cmpmain.lsp
 
  (setf (symbol-function 'si:clear-compiler-properties)
        (symbol-function 'compiler::compiler-clear-compiler-properties))
-; (load "../lsp/setdoc.lsp")
  (setq system::*old-top-level* (symbol-function 'system:top-level))
 
 (defvar si::*lib-directory* (namestring "../"))
@@ -99,14 +91,10 @@
   (in-package 'system::user) (incf system::*ihs-top* 2)
   (funcall system::*old-top-level*))
 
-; (setq si::*gcl-version* 600) 
  (defun lisp-implementation-version nil (format nil "GCL-~a-~a" si::*gcl-major-version* si::*gcl-version*))
  (terpri)
  (setq si:*inhibit-macro-special* t)
- ;(setq *modules* nil)
  (gbc t) (system:reset-gbc-count)
-
-; (allocate 'cons 200)
 
  (defun system:top-level nil (system::gcl-top-level))
 
@@ -114,10 +102,15 @@
  (unintern 'lisp)
  (unintern 'compiler)
  (unintern 'user)
- ;system-init
 
- (if (fboundp 'user-init) (user-init))
+ (if (fboundp 'si::user-init) (si::user-init))
  (si::set-up-top-level))
 ; (in-package "USER")
 ; (system:save-system "saved_gcl") (bye)
+
+;
+; FIXME Leave the following in until maxima 5.6 is replaced
+;
+;system-init
+
 

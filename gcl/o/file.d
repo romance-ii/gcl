@@ -1429,6 +1429,8 @@ char *s;
 	object filename, strm, x;
 	vs_mark;
 
+	if (user_match(s,strlen(s)))
+		return;
 	filename = make_simple_string(s);
 	vs_push(filename);
 	strm = open_stream(filename, smm_input, Cnil, sKerror);
@@ -1757,6 +1759,8 @@ object sSAload_pathnameA;
 	pathname = merge_pathnames(pathname, defaults, sKnewest);
 	pntype = pathname->pn.pn_type;
 	filename = coerce_to_namestring(pathname);
+	if (user_match(filename->st.st_self,filename->st.st_fillp))
+		@(return Cnil)
         old_bds_top=bds_top;
   	if (pntype == Cnil || pntype == sKwild ||
 	    (type_of(pntype) == t_string &&

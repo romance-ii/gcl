@@ -794,6 +794,14 @@ siLinit_system(void) {
 }
 
 void
+siLuser_init(void) {
+  check_arg(0);
+  sLApackageA->s.s_dbind = user_package;
+  user_init();
+  vs_base[0] = Cnil;
+}
+
+void
 siLaddress(void) {
   check_arg(1);
   vs_base[0] = make_fixnum((long)vs_base[0]);
@@ -899,6 +907,7 @@ init_main(void) {
   make_si_function("CHECK-VS", siLcheck_vs);
   make_si_function("RESET-STACK-LIMITS", siLreset_stack_limits);
   make_si_function("INIT-SYSTEM", siLinit_system);
+  make_si_function("USER-INIT", siLuser_init);
   make_si_function("ADDRESS", siLaddress);
   make_si_function("NANI", siLnani);
   make_si_function("INITIALIZATION-FAILURE",

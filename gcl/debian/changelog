@@ -1,10 +1,11 @@
-gcl (2.5.0.cvs20020625-65) unstable; urgency=low
+gcl (2.5.0.cvs20020625-65) unstable; urgency=high
 
   * Miscellaneous Freebsd patches
   * non-recursive with-package-iterator
   * map-into fill-pointer fixes
+  * changes to the user-init mechanism for portable acl2 build
 
- -- Camm Maguire <camm@enhanced.com>  Sun,  3 Nov 2002 20:43:59 -0500
+ -- Camm Maguire <camm@enhanced.com>  Sun, 10 Nov 2002 12:33:59 -0500
 
 gcl (2.5.0.cvs20020625-64) unstable; urgency=low
 
