@@ -175,12 +175,13 @@ T65:;
 	V25= Cnil;
 	{object V27;
 	register object V28;
+	V29 = (V23);
 	base[7]= (V23);
 	vs_top=(vs_base=base+7)+1;
 	Lpackage_use_list();
 	vs_top=sup;
-	V29= vs_base[0];
-	V27= make_cons((V23),V29);
+	V30= vs_base[0];
+	V27= make_cons(V29,V30);
 	V28= CMPcar((V27));
 	goto T81;
 T81:;
@@ -190,49 +191,49 @@ T81:;
 	goto T63;
 	goto T82;
 T82:;
-	{long V30;
-	long V31;
+	{long V31;
+	long V32;
 	base[7]= (V28);
 	vs_top=(vs_base=base+7)+1;
 	(void) (*Lnk12)();
 	if(vs_base>=vs_top){vs_top=sup;goto T91;}
-	V30= fix(vs_base[0]);
+	V31= fix(vs_base[0]);
 	vs_base++;
 	if(vs_base>=vs_top){vs_top=sup;goto T92;}
-	V31= fix(vs_base[0]);
+	V32= fix(vs_base[0]);
 	vs_top=sup;
 	goto T93;
 	goto T91;
 T91:;
-	V30= fix(Cnil);
+	V31= fix(Cnil);
 	goto T92;
 T92:;
-	V31= fix(Cnil);
+	V32= fix(Cnil);
 	goto T93;
 T93:;
 	if(((V23))==((V28))){
 	goto T94;}
-	V31= 0;
+	V32= 0;
 	goto T94;
 T94:;
-	{object V32;
-	register object V33;
-	V34 = CMPmake_fixnum(V31);
-	V35 = CMPmake_fixnum(V30);
-	V32= number_plus(V34,V35);
-	V33= small_fixnum(0);
+	{object V33;
+	register object V34;
+	V35 = CMPmake_fixnum(V32);
+	V36 = CMPmake_fixnum(V31);
+	V33= number_plus(V35,V36);
+	V34= small_fixnum(0);
 	goto T101;
 T101:;
-	if(!(number_compare((V33),(V32))>=0)){
+	if(!(number_compare((V34),(V33))>=0)){
 	goto T102;}
 	goto T88;
 	goto T102;
 T102:;
-	V36 = CMPmake_fixnum(V31);
-	if(!(number_compare((V33),V36)<0)){
+	V37 = CMPmake_fixnum(V32);
+	if(!(number_compare((V34),V37)<0)){
 	goto T111;}
 	base[8]= (V28);
-	base[9]= (V33);
+	base[9]= (V34);
 	vs_top=(vs_base=base+8)+2;
 	siLpackage_internal();
 	vs_top=sup;
@@ -241,8 +242,8 @@ T102:;
 	goto T111;
 T111:;
 	base[8]= (V28);
-	V37 = CMPmake_fixnum(V31);
-	base[9]= number_minus((V33),V37);
+	V38 = CMPmake_fixnum(V32);
+	base[9]= number_minus((V34),V38);
 	vs_top=(vs_base=base+8)+2;
 	siLpackage_external();
 	vs_top=sup;
@@ -269,17 +270,18 @@ T117:;
 	vs_top=(vs_base=base+8)+1;
 	Llast();
 	vs_top=sup;
-	V38= vs_base[0];
-	if(!((VV[2])==(CMPcar(V38)))){
+	V39= vs_base[0];
+	if(!((VV[2])==(CMPcar(V39)))){
 	goto T122;}
 	goto T123;
 T123:;
+	V40 = (V3);
 	base[8]= (V24);
 	vs_top=(vs_base=base+8)+1;
 	Lsymbol_package();
 	vs_top=sup;
-	V39= vs_base[0];
-	if(((V3))==(V39)){
+	V41= vs_base[0];
+	if((V40)==(V41)){
 	goto T132;}
 	base[9]= (V24);
 	vs_top=(vs_base=base+9)+1;
@@ -304,7 +306,7 @@ T108:;
 	goto T105;
 	goto T105;
 T105:;
-	V33= one_plus((V33));
+	V34= one_plus((V34));
 	goto T101;}}
 	goto T88;
 T88:;
@@ -331,10 +333,11 @@ T63:;
 	(void) (*Lnk15)();
 	vs_top=sup;
 	V13= vs_base[0];
+	V43 = (V4);
 	if(((V5))==Cnil){
 	goto T168;}
-	V42= make_cons(VV[4],(V5));
-	base[5]= make_cons(/* INLINE-ARGS */V42,Cnil);
+	V45= make_cons(VV[4],(V5));
+	base[5]= make_cons(/* INLINE-ARGS */V45,Cnil);
 	goto T166;
 	goto T168;
 T168:;
@@ -343,8 +346,8 @@ T168:;
 T166:;
 	if(((V7))==Cnil){
 	goto T172;}
-	V43= make_cons(VV[5],(V7));
-	base[6]= make_cons(/* INLINE-ARGS */V43,Cnil);
+	V46= make_cons(VV[5],(V7));
+	base[6]= make_cons(/* INLINE-ARGS */V46,Cnil);
 	goto T170;
 	goto T172;
 T172:;
@@ -353,8 +356,8 @@ T172:;
 T170:;
 	if(((V8))==Cnil){
 	goto T176;}
-	V44= make_cons(VV[6],(V8));
-	base[7]= make_cons(/* INLINE-ARGS */V44,Cnil);
+	V47= make_cons(VV[6],(V8));
+	base[7]= make_cons(/* INLINE-ARGS */V47,Cnil);
 	goto T174;
 	goto T176;
 T176:;
@@ -363,24 +366,24 @@ T176:;
 T174:;
 	if(((V12))==Cnil){
 	goto T180;}
-	{object V46;
-	object V47= (V12);
-	if(V47==Cnil){
-	V45= Cnil;
+	{object V49;
+	object V50= (V12);
+	if(V50==Cnil){
+	V48= Cnil;
 	goto T182;}
-	base[9]=V46=MMcons(Cnil,Cnil);
+	base[9]=V49=MMcons(Cnil,Cnil);
 	goto T183;
 T183:;
-	(V46->c.c_car)= symbol_name((V47->c.c_car));
-	if((V47=MMcdr(V47))==Cnil){
-	V45= base[9];
+	(V49->c.c_car)= symbol_name((V50->c.c_car));
+	if((V50=MMcdr(V50))==Cnil){
+	V48= base[9];
 	goto T182;}
-	V46=MMcdr(V46)=MMcons(Cnil,Cnil);
+	V49=MMcdr(V49)=MMcons(Cnil,Cnil);
 	goto T183;}
 	goto T182;
 T182:;
-	V48= make_cons(VV[7],V45);
-	base[8]= make_cons(/* INLINE-ARGS */V48,Cnil);
+	V51= make_cons(VV[7],V48);
+	base[8]= make_cons(/* INLINE-ARGS */V51,Cnil);
 	goto T178;
 	goto T180;
 T180:;
@@ -389,15 +392,15 @@ T180:;
 T178:;
 	if(((V11))==Cnil){
 	goto T187;}
-	{object V49;
-	object V50= (V11);
-	if(V50==Cnil){
+	{object V52;
+	object V53= (V11);
+	if(V53==Cnil){
 	base[9]= Cnil;
 	goto T185;}
-	base[10]=V49=MMcons(Cnil,Cnil);
+	base[10]=V52=MMcons(Cnil,Cnil);
 	goto T189;
 T189:;
-	base[12]= (V50->c.c_car);
+	base[12]= (V53->c.c_car);
 	vs_top=(vs_base=base+12)+1;
 	Lsymbol_package();
 	vs_top=sup;
@@ -405,13 +408,13 @@ T189:;
 	vs_top=(vs_base=base+11)+1;
 	Lpackage_name();
 	vs_top=sup;
-	V52= vs_base[0];
-	V53= list(3,VV[8],V52,symbol_name((V50->c.c_car)));
-	(V49->c.c_car)= make_cons(/* INLINE-ARGS */V53,Cnil);
-	if((V50=MMcdr(V50))==Cnil){
+	V55= vs_base[0];
+	V56= list(3,VV[8],V55,symbol_name((V53->c.c_car)));
+	(V52->c.c_car)= make_cons(/* INLINE-ARGS */V56,Cnil);
+	if((V53=MMcdr(V53))==Cnil){
 	base[9]= base[10];
 	goto T185;}
-	V49=MMcdr(V49)=MMcons(Cnil,Cnil);
+	V52=MMcdr(V52)=MMcons(Cnil,Cnil);
 	goto T189;}
 	goto T187;
 T187:;
@@ -420,15 +423,15 @@ T187:;
 T185:;
 	if(((V13))==Cnil){
 	goto T196;}
-	{object V54;
-	object V55= (V13);
-	if(V55==Cnil){
+	{object V57;
+	object V58= (V13);
+	if(V58==Cnil){
 	base[10]= Cnil;
 	goto T194;}
-	base[11]=V54=MMcons(Cnil,Cnil);
+	base[11]=V57=MMcons(Cnil,Cnil);
 	goto T198;
 T198:;
-	base[13]= (V55->c.c_car);
+	base[13]= (V58->c.c_car);
 	vs_top=(vs_base=base+13)+1;
 	Lsymbol_package();
 	vs_top=sup;
@@ -436,13 +439,13 @@ T198:;
 	vs_top=(vs_base=base+12)+1;
 	Lpackage_name();
 	vs_top=sup;
-	V57= vs_base[0];
-	V58= list(3,VV[9],V57,symbol_name((V55->c.c_car)));
-	(V54->c.c_car)= make_cons(/* INLINE-ARGS */V58,Cnil);
-	if((V55=MMcdr(V55))==Cnil){
+	V60= vs_base[0];
+	V61= list(3,VV[9],V60,symbol_name((V58->c.c_car)));
+	(V57->c.c_car)= make_cons(/* INLINE-ARGS */V61,Cnil);
+	if((V58=MMcdr(V58))==Cnil){
 	base[10]= base[11];
 	goto T194;}
-	V54=MMcdr(V54)=MMcons(Cnil,Cnil);
+	V57=MMcdr(V57)=MMcons(Cnil,Cnil);
 	goto T198;}
 	goto T196;
 T196:;
@@ -452,9 +455,9 @@ T194:;
 	vs_top=(vs_base=base+5)+6;
 	Lappend();
 	vs_top=sup;
-	V41= vs_base[0];
-	{object V59 = listA(3,VV[3],(V4),V41);
-	VMR1(V59)}}}
+	V44= vs_base[0];
+	{object V62 = listA(3,VV[3],V43,V44);
+	VMR1(V62)}}}
 	base[0]=base[0];
 	return Cnil;
 }

@@ -201,16 +201,17 @@ T40:;
 	goto T33;
 	goto T46;
 T46:;
+	V22 = (V20);
 	base[0]= (V21);
 	vs_top=(vs_base=base+0)+1;
 	(void) (*Lnk35)();
 	vs_top=sup;
-	V22= vs_base[0];
-	(void)((*(LnkLI34))((V20),V22));
+	V23= vs_base[0];
+	(void)((*(LnkLI34))(V22,V23));
 	goto T33;
 T33:;
-	{object V23 = (V20);
-	VMR7(V23)}
+	{object V24 = (V20);
+	VMR7(V24)}
 	base[0]=base[0];
 	return Cnil;
 }
@@ -222,30 +223,30 @@ static void L8()
 	vs_check;
 	check_arg(2);
 	vs_top=sup;
-	{object V24=base[0]->c.c_cdr;
-	if(endp(V24))invalid_macro_call();
-	base[2]= (V24->c.c_car);
-	V24=V24->c.c_cdr;
-	if(endp(V24))invalid_macro_call();
-	base[3]= (V24->c.c_car);
-	V24=V24->c.c_cdr;
-	if(!endp(V24))invalid_macro_call();}
-	{object V25;
-	object V26;
+	{object V25=base[0]->c.c_cdr;
+	if(endp(V25))invalid_macro_call();
+	base[2]= (V25->c.c_car);
+	V25=V25->c.c_cdr;
+	if(endp(V25))invalid_macro_call();
+	base[3]= (V25->c.c_car);
+	V25=V25->c.c_cdr;
+	if(!endp(V25))invalid_macro_call();}
+	{object V26;
+	object V27;
 	base[6]= list(2,VV[16],base[3]);
 	base[7]= base[1];
 	vs_top=(vs_base=base+6)+2;
 	Lmacroexpand();
 	vs_top=sup;
-	V25= vs_base[0];
-	base[6]= (V25);
+	V26= vs_base[0];
+	base[6]= (V26);
 	vs_top=(vs_base=base+6)+1;
 	Lconstantp();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
 	goto T60;}
 	base[6]= small_fixnum(15);
-	base[8]= (V25);
+	base[8]= (V26);
 	vs_top=(vs_base=base+8)+1;
 	Leval();
 	vs_top=sup;
@@ -254,14 +255,14 @@ static void L8()
 	vs_top=(vs_base=base+6)+3;
 	Lminus();
 	vs_top=sup;
-	V26= vs_base[0];
+	V27= vs_base[0];
 	goto T58;
 	goto T60;
 T60:;
-	V26= list(4,VV[17],VV[18],list(2,VV[16],base[3]),small_fixnum(2));
+	V27= list(4,VV[17],VV[18],list(2,VV[16],base[3]),small_fixnum(2));
 	goto T58;
 T58:;
-	base[6]= list(2,VV[9],list(3,VV[19],(V26),base[2]));
+	base[6]= list(2,VV[9],list(3,VV[19],(V27),base[2]));
 	vs_top=(vs_base=base+6)+1;
 	return;}
 }
@@ -317,11 +318,11 @@ static void L10()
 	vs_check;
 	check_arg(2);
 	vs_top=sup;
-	{object V27=base[0]->c.c_cdr;
-	if(endp(V27))invalid_macro_call();
-	base[2]= (V27->c.c_car);
-	V27=V27->c.c_cdr;
-	if(!endp(V27))invalid_macro_call();}
+	{object V28=base[0]->c.c_cdr;
+	if(endp(V28))invalid_macro_call();
+	base[2]= (V28->c.c_car);
+	V28=V28->c.c_cdr;
+	if(!endp(V28))invalid_macro_call();}
 	base[3]= list(2,VV[20],base[2]);
 	vs_top=(vs_base=base+3)+1;
 	return;
@@ -334,11 +335,11 @@ static void L11()
 	vs_check;
 	check_arg(2);
 	vs_top=sup;
-	{object V28=base[0]->c.c_cdr;
-	if(endp(V28))invalid_macro_call();
-	base[2]= (V28->c.c_car);
-	V28=V28->c.c_cdr;
-	if(!endp(V28))invalid_macro_call();}
+	{object V29=base[0]->c.c_cdr;
+	if(endp(V29))invalid_macro_call();
+	base[2]= (V29->c.c_car);
+	V29=V29->c.c_cdr;
+	if(!endp(V29))invalid_macro_call();}
 	base[3]= list(2,VV[21],list(3,VV[22],base[2],VV[23]));
 	vs_top=(vs_base=base+3)+1;
 	return;
@@ -351,11 +352,11 @@ static void L12()
 	vs_check;
 	check_arg(2);
 	vs_top=sup;
-	{object V29=base[0]->c.c_cdr;
-	if(endp(V29))invalid_macro_call();
-	base[2]= (V29->c.c_car);
-	V29=V29->c.c_cdr;
-	if(!endp(V29))invalid_macro_call();}
+	{object V30=base[0]->c.c_cdr;
+	if(endp(V30))invalid_macro_call();
+	base[2]= (V30->c.c_car);
+	V30=V30->c.c_cdr;
+	if(!endp(V30))invalid_macro_call();}
 	base[3]= list(3,VV[22],base[2],VV[24]);
 	vs_top=(vs_base=base+3)+1;
 	return;
@@ -368,11 +369,11 @@ static void L13()
 	vs_check;
 	check_arg(2);
 	vs_top=sup;
-	{object V30=base[0]->c.c_cdr;
-	if(endp(V30))invalid_macro_call();
-	base[2]= (V30->c.c_car);
-	V30=V30->c.c_cdr;
-	if(!endp(V30))invalid_macro_call();}
+	{object V31=base[0]->c.c_cdr;
+	if(endp(V31))invalid_macro_call();
+	base[2]= (V31->c.c_car);
+	V31=V31->c.c_cdr;
+	if(!endp(V31))invalid_macro_call();}
 	base[3]= list(3,VV[22],base[2],VV[25]);
 	vs_top=(vs_base=base+3)+1;
 	return;
@@ -384,11 +385,11 @@ register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM13; VC13
 	vs_check;
-	{object V31;
+	{object V32;
 	vs_top[0]=Cnil;
 	{object *p=vs_top;
 	 for(;p>vs_base;p--)p[-1]=MMcons(p[-1],p[0]);}
-	V31=(base[0]);
+	V32=(base[0]);
 	vs_top=sup;
 	(void)simple_symlispcall(VV[36],base+1,0);
 	base[1]= (base0[0]->c.c_car);

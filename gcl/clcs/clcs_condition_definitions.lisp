@@ -111,6 +111,9 @@
 (DEFINE-CONDITION CONTROL-ERROR (ERROR)
   ())
 
+(DEFINE-CONDITION PARSE-ERROR (ERROR)
+  ())
+
 (DEFINE-CONDITION STREAM-ERROR (ERROR)
   #-(or clos pcl)
   (STREAM)
@@ -254,6 +257,15 @@
   #-(or clos pcl)(:conc-name %%internal-simple-program-error-)
   #-(or clos pcl)(:report internal-simple-error-printer))
 
+(define-condition internal-simple-parse-error 
+    (#+(or clos pcl) internal-simple-error parse-error)
+  #-(or clos pcl)
+  ((function-name nil) format-string (format-arguments '()))
+  #+(or clos pcl)
+  ()
+  #-(or clos pcl)(:conc-name %%internal-simple-parse-error-)
+  #-(or clos pcl)(:report internal-simple-error-printer))
+
 (define-condition internal-simple-control-error 
     (#+(or clos pcl) internal-simple-error control-error)
   #-(or clos pcl)
@@ -334,6 +346,8 @@
      (%%internal-type-error-function-name condition))
     (internal-simple-program-error
      (%%internal-simple-program-error-function-name condition))
+    (internal-simple-parse-error
+     (%%internal-simple-parse-error-function-name condition))
     (internal-simple-control-error
      (%%internal-simple-control-error-function-name condition))
     (internal-unbound-variable  
@@ -361,6 +375,8 @@
 	  (%%internal-simple-error-format-string condition))
     #+kcl(internal-simple-program-error
 	  (%%internal-simple-program-error-format-string condition))
+    #+kcl(internal-simple-parse-error
+	  (%%internal-simple-parse-error-format-string condition))
     #+kcl(internal-simple-control-error
 	  (%%internal-simple-control-error-format-string condition))
     #+kcl(internal-simple-file-error
@@ -378,6 +394,8 @@
 	  (%%internal-simple-error-format-arguments condition))
     #+kcl(internal-simple-program-error
 	  (%%internal-simple-program-error-format-arguments condition))
+    #+kcl(internal-simple-parse-error
+	  (%%internal-simple-parse-error-format-arguments condition))
     #+kcl(internal-simple-control-error
 	  (%%internal-simple-control-error-format-arguments condition))
     #+kcl(internal-simple-file-error
@@ -389,6 +407,7 @@
   (member type '(SIMPLE-CONDITION SIMPLE-WARNING SIMPLE-TYPE-ERROR SIMPLE-ERROR
 		 #+kcl internal-simple-error
 		 #+kcl internal-simple-program-error
+		 #+kcl internal-simple-parse-error
 		 #+kcl internal-simple-control-error
 		 #+kcl internal-simple-file-error
 		 #+kcl internal-simple-stream-error)))

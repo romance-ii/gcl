@@ -49,7 +49,7 @@ static object LI7();
 #define VMV7 vs_check;
 #define VMR7(VMT7) vs_top=base ; return(VMT7);
 #define VC8
-#define VC9 object  V34 ,V33 ,V32;
+#define VC9 object  V40 ,V34 ,V33 ,V32;
 static object LI10();
 #define VMB10 register object *base=vs_top;
 #define VMS10  register object *sup=vs_top+1;vs_top=sup;
@@ -66,7 +66,7 @@ static object LI12();
 #define VMV12
 #define VMR12(VMT12) return(VMT12);
 static object LI13(object,...);
-#define VMB13 register object *base=vs_top; object  V47 ,V44;
+#define VMB13 register object *base=vs_top; object  V48 ,V45;
 #define VMS13  register object *sup=vs_top+3;vs_top=sup;
 #define VMV13 vs_check;
 #define VMR13(VMT13) vs_top=base ; return(VMT13);
@@ -104,12 +104,12 @@ static object LI20();
 #define VMV20
 #define VMR20(VMT20) return(VMT20);
 static object LI22();
-#define VMB21 register object *base=vs_top; object  V65 ,V64;
+#define VMB21 register object *base=vs_top; object  V66 ,V65;
 #define VMS21 vs_top += 1;
 #define VMV21 vs_check;
 #define VMR21(VMT21) vs_top=base ; return(VMT21);
 static object LI23();
-#define VMB22 register object *base=vs_top; object  V74 ,V72 ,V69;
+#define VMB22 register object *base=vs_top; object  V76 ,V75 ,V73 ,V70;
 #define VMS22 vs_top += 1;
 #define VMV22 vs_check;
 #define VMR22(VMT22) vs_top=base ; return(VMT22);
@@ -119,7 +119,7 @@ static object LI24();
 #define VMV23 vs_check;
 #define VMR23(VMT23) vs_top=base ; return(VMT23);
 #define VC24
-#define VC25 object  V95 ,V91;
+#define VC25 object  V97 ,V93;
 static object LI27(object,object,...);
 #define VMB26 register object *base=vs_top;
 #define VMS26 vs_top += 2;
@@ -127,21 +127,21 @@ static object LI27(object,object,...);
 #define VMR26(VMT26) vs_top=base ; return(VMT26);
 #define VC27
 #define VC28
-#define VC29 object  V144 ,V143 ,V142 ,V135 ,V134 ,V133 ,V132 ,V131 ,V130;
-#define VC30 object  V153;
+#define VC29 object  V147 ,V146 ,V145 ,V138 ,V137 ,V136 ,V135 ,V134 ,V133 ,V132;
+#define VC30 object  V156;
 #define VC31
 #define VC32
 #define VC33
 #define VC34
 #define VC35
 static void L31();
-#define VC36 object  V159;
+#define VC36 object  V163 ,V162;
 static void LC40();
 #define VC37
 static void LC39();
-#define VC38 object  V163;
+#define VC38 object  V167;
 static void LC38();
-#define VC39 object  V165;
+#define VC39 object  V169;
 static void LC40();
 static void LC39();
 static void LC38();

@@ -2,7 +2,7 @@
 #include "cmpinclude.h"
 #include "clcs_kcl_cond.h"
 void init_clcs_kcl_cond(){do_init(VV);}
-/*	local entry for function progn 'compile2186	*/
+/*	local entry for function progn 'compile2191	*/
 
 static object LI1()
 
@@ -18,7 +18,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2198	*/
+/*	local entry for function progn 'compile2203	*/
 
 static object LI2()
 
@@ -43,7 +43,7 @@ T3:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2211	*/
+/*	local entry for function progn 'compile2216	*/
 
 static object LI3()
 
@@ -300,7 +300,7 @@ T67:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2361	*/
+/*	local entry for function progn 'compile2366	*/
 
 static object LI8()
 
@@ -316,7 +316,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2373	*/
+/*	local entry for function progn 'compile2378	*/
 
 static object LI9()
 
@@ -328,7 +328,7 @@ TTL:;
 	VMR9(V43)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2385	*/
+/*	local entry for function progn 'compile2390	*/
 
 static object LI10()
 
@@ -339,7 +339,7 @@ TTL:;
 	VMR10(V44)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2487	*/
+/*	local entry for function progn 'compile2495	*/
 
 static object LI11()
 
@@ -412,7 +412,7 @@ T87:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2515	*/
+/*	local entry for function progn 'compile2523	*/
 
 static object LI13()
 
@@ -428,7 +428,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2527	*/
+/*	local entry for function progn 'compile2535	*/
 
 static object LI14()
 
@@ -447,7 +447,7 @@ T100:;
 	VMR14(V53)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2540	*/
+/*	local entry for function progn 'compile2548	*/
 
 static object LI15()
 
@@ -550,7 +550,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2632	*/
+/*	local entry for function progn 'compile2640	*/
 
 static object LI18()
 
@@ -562,7 +562,7 @@ TTL:;
 	VMR18(V67)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2664	*/
+/*	local entry for function progn 'compile2672	*/
 
 static object LI19()
 
@@ -574,7 +574,7 @@ TTL:;
 	VMR19(V68)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2696	*/
+/*	local entry for function progn 'compile2704	*/
 
 static object LI20()
 
@@ -586,7 +586,7 @@ TTL:;
 	VMR20(V69)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2708	*/
+/*	local entry for function progn 'compile2716	*/
 
 static object LI21()
 
@@ -621,7 +621,8 @@ TTL:;
 	Lfind_package();
 	vs_top=sup;
 	V73= vs_base[0];
-	bds_bind(VV[38],make_cons(V73,(VV[38]->s.s_dbind)));
+	V74 = (VV[38]->s.s_dbind);
+	bds_bind(VV[38],make_cons(V73,V74));
 	base[4]= (V71);
 	vs_top=(vs_base=base+4)+1;
 	(void) (*Lnk28)();
@@ -638,23 +639,23 @@ register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM23; VC23
 	vs_check;
-	{object V74;
-	V74=(base[0]);
+	{object V75;
+	V75=(base[0]);
 	vs_top=sup;
 	if(((VV[33]->s.s_dbind))!=Cnil){
 	goto T131;}
 	if(((VV[27]->s.s_dbind))!=Cnil){
 	goto T131;}
-	(void)((*(LnkLI51))((V74)));
+	(void)((*(LnkLI51))((V75)));
 	{frame_ptr fr;
 	fr=frs_sch((base0[3]->c.c_car));
 	if(fr==NULL) FEerror("The block ~s is missing.",1,VV[49]);
-	base[1]= (V74);
+	base[1]= (V75);
 	vs_top=(vs_base=base+1)+1;
 	unwind(fr,Cnil);}
 	goto T131;
 T131:;
-	(base0[2]->c.c_car)= (V74);
+	(base0[2]->c.c_car)= (V75);
 	base[1]= Cnil;
 	vs_top=(vs_base=base+1)+1;
 	return;
@@ -667,10 +668,10 @@ register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM24; VC24
 	vs_check;
-	{object V75;
-	V75=(base[0]);
+	{object V76;
+	V76=(base[0]);
 	vs_top=sup;
-	base[1]= (V75);
+	base[1]= (V76);
 	base[2]= VV[29];
 	base[3]= list(2,VV[28],list(2,VV[30],(base0[4]->c.c_car)));
 	vs_top=(vs_base=base+1)+3;
@@ -685,13 +686,13 @@ register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM25; VC25
 	vs_check;
-	{object V76;
+	{object V77;
 	vs_top[0]=Cnil;
 	{object *p=vs_top;
 	 for(;p>vs_base;p--)p[-1]=MMcons(p[-1],p[0]);}
-	V76=(base[0]);
+	V77=(base[0]);
 	vs_top=sup;
-	(base0[1]->c.c_car)= (V76);
+	(base0[1]->c.c_car)= (V77);
 	{frame_ptr fr;
 	fr=frs_sch((base0[0]->c.c_car));
 	if(fr==NULL)FEerror("The GO tag ~s is missing.",1,VV[34]);
@@ -706,18 +707,18 @@ register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM26; VC26
 	vs_check;
-	{object V77;
-	V77=(base[0]);
+	{object V78;
+	V78=(base[0]);
 	vs_top=sup;
-	base[1]= (V77);
+	base[1]= (V78);
 	base[2]= VV[10];
 	base[4]= Cnil;
 	base[5]= (base0[3]->c.c_car);
-	{object V78;
-	V78= (base0[2]->c.c_car);
+	{object V79;
+	V79= (base0[2]->c.c_car);
 	 vs_top=base+6;
-	 while(V78!=Cnil)
-	 {vs_push((V78)->c.c_car);V78=(V78)->c.c_cdr;}
+	 while(V79!=Cnil)
+	 {vs_push((V79)->c.c_car);V79=(V79)->c.c_cdr;}
 	vs_base=base+4;}
 	Lformat();
 	vs_top=sup;
@@ -734,13 +735,13 @@ register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM27; VC27
 	vs_check;
-	{object V79;
+	{object V80;
 	vs_top[0]=Cnil;
 	{object *p=vs_top;
 	 for(;p>vs_base;p--)p[-1]=MMcons(p[-1],p[0]);}
-	V79=(base[0]);
+	V80=(base[0]);
 	vs_top=sup;
-	(base0[1]->c.c_car)= (V79);
+	(base0[1]->c.c_car)= (V80);
 	{frame_ptr fr;
 	fr=frs_sch((base0[0]->c.c_car));
 	if(fr==NULL)FEerror("The GO tag ~s is missing.",1,VV[14]);

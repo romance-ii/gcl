@@ -26,9 +26,9 @@ static object LI7();
 #define VMS7
 #define VMV7
 #define VMR7(VMT7) return(VMT7);
-#define VC8 object  V130 ,V129 ,V128 ,V127 ,V126 ,V125 ,V121 ,V120 ,V119 ,V118 ,V117 ,V116 ,V115 ,V114 ,V113 ,V111 ,V110 ,V109 ,V108 ,V107 ,V104 ,V102 ,V101 ,V100 ,V93 ,V89 ,V88 ,V87 ,V86;
+#define VC8 object  V135 ,V134 ,V133 ,V132 ,V131 ,V130 ,V126 ,V125 ,V124 ,V123 ,V122 ,V121 ,V120 ,V119 ,V118 ,V117 ,V116 ,V115 ,V114 ,V112 ,V111 ,V110 ,V109 ,V108 ,V107 ,V104 ,V102 ,V101 ,V100 ,V93 ,V89 ,V88 ,V87 ,V86;
 static object LI9();
-#define VMB9 register object *base=vs_top; object  V150 ,V149 ,V148 ,V147 ,V146 ,V145;
+#define VMB9 register object *base=vs_top; object  V155 ,V154 ,V153 ,V152 ,V151 ,V150;
 #define VMS9  register object *sup=vs_top+1;vs_top=sup;
 #define VMV9 vs_check;
 #define VMR9(VMT9) vs_top=base ; return(VMT9);
@@ -37,9 +37,9 @@ static object LI10(object,object,object,object,...);
 #define VMS10
 #define VMV10
 #define VMR10(VMT10) return(VMT10);
-#define VC11 object  V174;
+#define VC11 object  V179;
 #define VC12
-#define VC13 object  V189 ,V188 ,V187;
+#define VC13 object  V194 ,V193 ,V192;
 #define VM13 15
 #define VM12 6
 #define VM11 13

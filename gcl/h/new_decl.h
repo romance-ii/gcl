@@ -414,6 +414,7 @@ EXTER object sKinvalid_variable;
 EXTER object sKundefined_function;
 EXTER object sKinvalid_function;
 EXTER object sKpackage_error;
+EXTER object sKparse_error;
 EXTER object sKcatch;
 EXTER object sKprotect;
 EXTER object sKcatchall;

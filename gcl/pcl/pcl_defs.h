@@ -53,14 +53,14 @@ static void L75();
 static void L76();
 static void L77();
 static void L78();
-#define VC1 object  V25 ,V24 ,V20 ,V19 ,V18 ,V17 ,V16 ,V15 ,V14 ,V13 ,V12;
+#define VC1 object  V26 ,V25 ,V24 ,V20 ,V19 ,V18 ,V17 ,V16 ,V15 ,V14 ,V13 ,V12;
 static object LI2();
-#define VMB2 register object *base=vs_top; object  V32 ,V31;
+#define VMB2 register object *base=vs_top; object  V34 ,V33 ,V32;
 #define VMS2  register object *sup=vs_top+2;vs_top=sup;
 #define VMV2 vs_check;
 #define VMR2(VMT2) vs_top=base ; return(VMT2);
 static object LI3();
-#define VMB3 register object *base=vs_top; object  V42 ,V41;
+#define VMB3 register object *base=vs_top; object  V45 ,V44 ,V43;
 #define VMS3  register object *sup=vs_top+2;vs_top=sup;
 #define VMV3 vs_check;
 #define VMR3(VMT3) vs_top=base ; return(VMT3);
@@ -75,12 +75,12 @@ static object LI5();
 #define VMV5 vs_check;
 #define VMR5(VMT5) vs_top=base ; return(VMT5);
 static object LI6();
-#define VMB6 register object *base=vs_top; object  V65;
+#define VMB6 register object *base=vs_top; object  V68;
 #define VMS6  register object *sup=vs_top+4;vs_top=sup;
 #define VMV6 vs_check;
 #define VMR6(VMT6) vs_top=base ; return(VMT6);
 static object LI7();
-#define VMB7 register object *base=vs_top; object  V75;
+#define VMB7 register object *base=vs_top; object  V79 ,V78;
 #define VMS7  register object *sup=vs_top+4;vs_top=sup;
 #define VMV7 vs_check;
 #define VMR7(VMT7) vs_top=base ; return(VMT7);
@@ -94,7 +94,7 @@ static object LI11();
 #define VMR11(VMT11) vs_top=base ; return(VMT11);
 #define VC12
 static object LI13();
-#define VMB13 object  V102;
+#define VMB13 object  V107 ,V106;
 #define VMS13
 #define VMV13
 #define VMR13(VMT13) return(VMT13);
@@ -119,8 +119,8 @@ static object LI20();
 #define VMV17 vs_check;
 #define VMR17(VMT17) vs_top=base ; return(VMT17);
 #define VC18
-#define VC19 object  V120 ,V119;
-#define VC20 object  V128 ,V127;
+#define VC19 object  V125 ,V124;
+#define VC20 object  V133 ,V132;
 #define VC21
 static object LI25();
 #define VMB22 register object *base=vs_top;
@@ -133,21 +133,21 @@ static object LI26(object,object,...);
 #define VMV23 vs_check;
 #define VMR23(VMT23) vs_top=base ; return(VMT23);
 static object LI27();
-#define VMB24 register object *base=vs_top; object  V149;
+#define VMB24 register object *base=vs_top; object  V154;
 #define VMS24  register object *sup=vs_top+4;vs_top=sup;
 #define VMV24 vs_check;
 #define VMR24(VMT24) vs_top=base ; return(VMT24);
 static object LI28();
-#define VMB25 register object *base=vs_top; object  V158;
+#define VMB25 register object *base=vs_top; object  V163;
 #define VMS25  register object *sup=vs_top+4;vs_top=sup;
 #define VMV25 vs_check;
 #define VMR25(VMT25) vs_top=base ; return(VMT25);
 static object LI29();
-#define VMB26 object  V168;
+#define VMB26 object  V173;
 #define VMS26
 #define VMV26
 #define VMR26(VMT26) return(VMT26);
-#define VC27 object  V176 ,V172 ,V171;
+#define VC27 object  V181 ,V177 ,V176;
 #define VC28
 static object LI32();
 #define VMB29 register object *base=vs_top;
@@ -171,49 +171,49 @@ static struct { short n,allow_other_keys;object *defaults;
 #define VMR34(VMT34) vs_top=base ; return(VMT34);
 #define VC35
 #define VC36
-#define VC37 object  V201;
-#define VC38 object  V203;
-#define VC39 object  V204;
+#define VC37 object  V206;
+#define VC38 object  V208;
+#define VC39 object  V209;
 #define VC40
 #define VC41
-#define VC42 object  V211 ,V210 ,V209 ,V208 ,V207 ,V206;
-#define VC43 object  V216 ,V215 ,V214 ,V213 ,V212;
-#define VC44 object  V219 ,V218 ,V217;
+#define VC42 object  V216 ,V215 ,V214 ,V213 ,V212 ,V211;
+#define VC43 object  V221 ,V220 ,V219 ,V218 ,V217;
+#define VC44 object  V224 ,V223 ,V222;
 #define VC45
 #define VC46
 #define VC47
 #define VC48
 #define VC49
-#define VC50 object  V222 ,V221 ,V220;
+#define VC50 object  V227 ,V226 ,V225;
 #define VC51
 #define VC52
-#define VC53 object  V223;
-#define VC54 object  V224;
-#define VC55 object  V225;
+#define VC53 object  V228;
+#define VC54 object  V229;
+#define VC55 object  V230;
 static object LI59();
 #define VMB56 register object *base=vs_top;
 #define VMS56  register object *sup=vs_top+4;vs_top=sup;
 #define VMV56 vs_check;
 #define VMR56(VMT56) vs_top=base ; return(VMT56);
-#define VC57 object  V243 ,V242 ,V241 ,V240 ,V239 ,V238 ,V237 ,V236 ,V235;
-#define VC58 object  V245;
-#define VC59 object  V248 ,V247 ,V246;
+#define VC57 object  V248 ,V247 ,V246 ,V245 ,V244 ,V243 ,V242 ,V241 ,V240;
+#define VC58 object  V250;
+#define VC59 object  V253 ,V252 ,V251;
 #define VC60
-#define VC61 object  V252 ,V251 ,V250 ,V249;
+#define VC61 object  V257 ,V256 ,V255 ,V254;
 #define VC62
-#define VC63 object  V253;
+#define VC63 object  V258;
 #define VC64
 #define VC65
 #define VC66
-#define VC67 object  V258 ,V257 ,V256 ,V255 ,V254;
-#define VC68 object  V260 ,V259;
+#define VC67 object  V263 ,V262 ,V261 ,V260 ,V259;
+#define VC68 object  V265 ,V264;
 #define VC69
 #define VC70
 #define VC71
 #define VC72
-#define VC73 object  V271 ,V270 ,V269 ,V268 ,V267 ,V266 ,V265 ,V264;
+#define VC73 object  V276 ,V275 ,V274 ,V273 ,V272 ,V271 ,V270 ,V269;
 #define VC74
-#define VC75 object  V273 ,V272;
+#define VC75 object  V278 ,V277;
 static void LC89();
 #define VC76
 static void LC88();
@@ -231,9 +231,9 @@ static void LC83();
 static void LC82();
 #define VC83
 static void LC81();
-#define VC84 object  V276;
+#define VC84 object  V282 ,V281;
 static void LC80();
-#define VC85 object  V279;
+#define VC85 object  V286 ,V285;
 static void LC79();
 #define VC86
 static void LC89();

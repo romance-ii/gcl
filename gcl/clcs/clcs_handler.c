@@ -2,7 +2,7 @@
 #include "cmpinclude.h"
 #include "clcs_handler.h"
 void init_clcs_handler(){do_init(VV);}
-/*	local entry for function progn 'compile2186	*/
+/*	local entry for function progn 'compile2191	*/
 
 static object LI1()
 
@@ -18,7 +18,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2198	*/
+/*	local entry for function progn 'compile2203	*/
 
 static object LI2()
 
@@ -37,7 +37,7 @@ T3:;
 	VMR2(V2)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2211	*/
+/*	local entry for function progn 'compile2216	*/
 
 static object LI3()
 
@@ -93,7 +93,7 @@ T14:;
 	vs_top=(vs_base=base+4)+1;
 	return;
 }
-/*	local entry for function progn 'compile2249	*/
+/*	local entry for function progn 'compile2254	*/
 
 static object LI5()
 
@@ -109,7 +109,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2261	*/
+/*	local entry for function progn 'compile2266	*/
 
 static object LI6()
 
@@ -128,7 +128,7 @@ T19:;
 	VMR6(V11)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2274	*/
+/*	local entry for function progn 'compile2279	*/
 
 static object LI7()
 
@@ -667,7 +667,8 @@ T186:;
 	Lgensym();
 	vs_top=sup;
 	V86= vs_base[0];
-	(V83->c.c_car)= make_cons(V86,(V84->c.c_car));
+	V87 = (V84->c.c_car);
+	(V83->c.c_car)= make_cons(V86,V87);
 	if((V84=MMcdr(V84))==Cnil){
 	V82= base[4];
 	goto T185;}
@@ -675,78 +676,79 @@ T186:;
 	goto T186;}
 	goto T185;
 T185:;
-	V87= list(2,(V81),Cnil);
-	V88= make_cons(/* INLINE-ARGS */V87,Cnil);
-	{object V90;
-	object V91= (V82);
-	if(V91==Cnil){
-	V89= Cnil;
+	V88= list(2,(V81),Cnil);
+	V89= make_cons(/* INLINE-ARGS */V88,Cnil);
+	{object V91;
+	object V92= (V82);
+	if(V92==Cnil){
+	V90= Cnil;
 	goto T189;}
-	base[4]=V90=MMcons(Cnil,Cnil);
+	base[4]=V91=MMcons(Cnil,Cnil);
 	goto T190;
 T190:;
-	V93= CMPcadr((V91->c.c_car));
-	if((CMPcaddr((V91->c.c_car)))==Cnil){
+	V94= CMPcadr((V92->c.c_car));
+	if((CMPcaddr((V92->c.c_car)))==Cnil){
 	goto T194;}
-	V95= list(3,VV[61],(V81),VV[62]);
-	V94= make_cons(/* INLINE-ARGS */V95,Cnil);
+	V96= list(3,VV[61],(V81),VV[62]);
+	V95= make_cons(/* INLINE-ARGS */V96,Cnil);
 	goto T192;
 	goto T194;
 T194:;
-	V94= Cnil;
+	V95= Cnil;
 	goto T192;
 T192:;
-	V96= list(2,VV[63],CMPcar((V91->c.c_car)));
-	V97= make_cons(/* INLINE-ARGS */V96,Cnil);
-	(V90->c.c_car)= list(2,/* INLINE-ARGS */V93,list(2,VV[54],listA(3,VV[55],VV[60],append(V94,/* INLINE-ARGS */V97))));
-	if((V91=MMcdr(V91))==Cnil){
-	V89= base[4];
+	V97= list(2,VV[63],CMPcar((V92->c.c_car)));
+	V98= make_cons(/* INLINE-ARGS */V97,Cnil);
+	(V91->c.c_car)= list(2,/* INLINE-ARGS */V94,list(2,VV[54],listA(3,VV[55],VV[60],append(V95,/* INLINE-ARGS */V98))));
+	if((V92=MMcdr(V92))==Cnil){
+	V90= base[4];
 	goto T189;}
-	V90=MMcdr(V90)=MMcons(Cnil,Cnil);
+	V91=MMcdr(V91)=MMcons(Cnil,Cnil);
 	goto T190;}
 	goto T189;
 T189:;
-	V98= list(3,VV[59],V89,list(3,VV[56],(V80),base[2]));
-	{object V100;
-	object V101= (V82);
-	if(V101==Cnil){
-	V99= Cnil;
+	V99= list(3,VV[59],V90,list(3,VV[56],(V80),base[2]));
+	{object V101;
+	object V102= (V82);
+	if(V102==Cnil){
+	V100= Cnil;
 	goto T196;}
-	base[4]=V100=MMcons(Cnil,Cnil);
+	base[4]=V101=MMcons(Cnil,Cnil);
 	goto T197;
 T197:;
-	{register object V102;
-	V102= (V101->c.c_car);
-	V103= CMPcar((V102));
-	{register object V105;
-	V105= CMPcdddr((V102));
-	if((CMPcaddr((V102)))==Cnil){
+	{register object V103;
+	V103= (V102->c.c_car);
+	V104= CMPcar((V103));
+	{register object V106;
+	V106= CMPcdddr((V103));
+	V107 = (V80);
+	if((CMPcaddr((V103)))==Cnil){
 	goto T203;}
-	V107= list(2,CMPcaaddr((V102)),(V81));
-	V106= listA(3,VV[2],make_cons(/* INLINE-ARGS */V107,Cnil),(V105));
+	V109= list(2,CMPcaaddr((V103)),(V81));
+	V108= listA(3,VV[2],make_cons(/* INLINE-ARGS */V109,Cnil),(V106));
 	goto T201;
 	goto T203;
 T203:;
-	if((CMPcdr((V105)))!=Cnil){
+	if((CMPcdr((V106)))!=Cnil){
 	goto T206;}
-	V106= CMPcar((V105));
+	V108= CMPcar((V106));
 	goto T201;
 	goto T206;
 T206:;
-	V106= make_cons(VV[64],(V105));
+	V108= make_cons(VV[64],(V106));
 	goto T201;
 T201:;
-	V104= list(3,VV[56],(V80),V106);}
-	(V100->c.c_cdr)= list(2,/* INLINE-ARGS */V103,V104);}
-	while(MMcdr(V100)!=Cnil)V100=MMcdr(V100);
-	if((V101=MMcdr(V101))==Cnil){
+	V105= list(3,VV[56],V107,V108);}
+	(V101->c.c_cdr)= list(2,/* INLINE-ARGS */V104,V105);}
+	while(MMcdr(V101)!=Cnil)V101=MMcdr(V101);
+	if((V102=MMcdr(V102))==Cnil){
 	base[4]=base[4]->c.c_cdr;
-	V99= base[4];
+	V100= base[4];
 	goto T196;}
 	goto T197;}
 	goto T196;
 T196:;
-	base[4]= list(3,VV[52],(V80),list(4,VV[2],/* INLINE-ARGS */V88,(V81),listA(3,VV[58],/* INLINE-ARGS */V98,V99)));
+	base[4]= list(3,VV[52],(V80),list(4,VV[2],/* INLINE-ARGS */V89,(V81),listA(3,VV[58],/* INLINE-ARGS */V99,V100)));
 	vs_top=(vs_base=base+4)+1;
 	return;}}
 }
@@ -757,8 +759,8 @@ static void L15()
 	register object *sup=base+VM15; VC15
 	vs_check;
 	vs_top=sup;
-	{object V108=base[0]->c.c_cdr;
-	base[2]= V108;}
+	{object V110=base[0]->c.c_cdr;
+	base[2]= V110;}
 	base[3]= list(3,VV[57],make_cons(VV[64],base[2]),VV[65]);
 	vs_top=(vs_base=base+3)+1;
 	return;
@@ -770,8 +772,8 @@ static void L16()
 	register object *VOL sup=base+VM16; VC16
 	vs_check;
 	bds_check;
-	{VOL object V109;
-	V109=(base[0]);
+	{VOL object V111;
+	V111=(base[0]);
 	vs_top=sup;
 	goto TTL;
 TTL:;
@@ -784,13 +786,13 @@ TTL:;
 	if(eql(nlj_tag,VV[66]))goto T210;
 	FEerror("The GO tag ~s is not established.",1,nlj_tag);
 	}
-	V110= 
+	V112= 
 	make_cclosure_new(LC26,Cnil,base[2],Cdata);
-	V111= make_cons(VV[21],V110);
-	V112= make_cons(/* INLINE-ARGS */V111,Cnil);
-	base[3]= make_cons(/* INLINE-ARGS */V112,(VV[0]->s.s_dbind));
+	V113= make_cons(VV[21],V112);
+	V114= make_cons(/* INLINE-ARGS */V113,Cnil);
+	base[3]= make_cons(/* INLINE-ARGS */V114,(VV[0]->s.s_dbind));
 	bds_bind(VV[0],base[3]);
-	base[4]= (V109);
+	base[4]= (V111);
 	vs_top=(vs_base=base+4)+1;
 	(void) (*Lnk81)();
 	frs_pop();
@@ -798,10 +800,10 @@ TTL:;
 	return;
 	goto T210;
 T210:;
-	{object V113;
-	V113= (base[1]->c.c_car);
+	{object V115;
+	V115= (base[1]->c.c_car);
 	base[3]= Cnil;
-	base[4]= (V113);
+	base[4]= (V115);
 	vs_top=(vs_base=base+3)+2;
 	frs_pop();
 	return;}
@@ -818,10 +820,10 @@ register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM17; VC17
 	vs_check;
-	{object V114;
-	V114=(base[0]);
+	{object V116;
+	V116=(base[0]);
 	vs_top=sup;
-	(base0[1]->c.c_car)= (V114);
+	(base0[1]->c.c_car)= (V116);
 	{frame_ptr fr;
 	fr=frs_sch((base0[0]->c.c_car));
 	if(fr==NULL)FEerror("The GO tag ~s is missing.",1,VV[66]);
@@ -836,11 +838,11 @@ register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM18; VC18
 	vs_check;
-	{object V115;
-	V115=(base[0]);
+	{object V117;
+	V117=(base[0]);
 	vs_top=sup;
 	base[1]= VV[45];
-	base[2]= (V115);
+	base[2]= (V117);
 	vs_top=(vs_base=base+1)+2;
 	Lwrite_string();
 	return;
@@ -853,13 +855,13 @@ register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM19; VC19
 	vs_check;
-	{object V116;
+	{object V118;
 	vs_top[0]=Cnil;
 	{object *p=vs_top;
 	 for(;p>vs_base;p--)p[-1]=MMcons(p[-1],p[0]);}
-	V116=(base[0]);
+	V118=(base[0]);
 	vs_top=sup;
-	(base0[1]->c.c_car)= (V116);
+	(base0[1]->c.c_car)= (V118);
 	{frame_ptr fr;
 	fr=frs_sch((base0[0]->c.c_car));
 	if(fr==NULL)FEerror("The GO tag ~s is missing.",1,VV[46]);
@@ -874,10 +876,10 @@ register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM20; VC20
 	vs_check;
-	{register object V117;
-	V117=(base[0]);
+	{register object V119;
+	V119=(base[0]);
 	vs_top=sup;
-	base[1]= (V117);
+	base[1]= (V119);
 	base[2]= VV[36];
 	base[3]= VV[37];
 	vs_top=(vs_base=base+1)+3;
@@ -892,13 +894,13 @@ register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM21; VC21
 	vs_check;
-	{register object V118;
+	{register object V120;
 	vs_top[0]=Cnil;
 	{object *p=vs_top;
 	 for(;p>vs_base;p--)p[-1]=MMcons(p[-1],p[0]);}
-	V118=(base[0]);
+	V120=(base[0]);
 	vs_top=sup;
-	(base0[1]->c.c_car)= (V118);
+	(base0[1]->c.c_car)= (V120);
 	{frame_ptr fr;
 	fr=frs_sch((base0[0]->c.c_car));
 	if(fr==NULL)FEerror("The GO tag ~s is missing.",1,VV[41]);
@@ -913,10 +915,10 @@ register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM22; VC22
 	vs_check;
-	{object V119;
-	V119=(base[0]);
+	{object V121;
+	V121=(base[0]);
 	vs_top=sup;
-	base[1]= (V119);
+	base[1]= (V121);
 	base[2]= VV[30];
 	vs_top=(vs_base=base+1)+2;
 	Lformat();
@@ -930,13 +932,13 @@ register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM23; VC23
 	vs_check;
-	{object V120;
+	{object V122;
 	vs_top[0]=Cnil;
 	{object *p=vs_top;
 	 for(;p>vs_base;p--)p[-1]=MMcons(p[-1],p[0]);}
-	V120=(base[0]);
+	V122=(base[0]);
 	vs_top=sup;
-	(base0[1]->c.c_car)= (V120);
+	(base0[1]->c.c_car)= (V122);
 	{frame_ptr fr;
 	fr=frs_sch((base0[0]->c.c_car));
 	if(fr==NULL)FEerror("The GO tag ~s is missing.",1,VV[31]);
@@ -951,18 +953,18 @@ register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM24; VC24
 	vs_check;
-	{object V121;
-	V121=(base[0]);
+	{object V123;
+	V123=(base[0]);
 	vs_top=sup;
-	base[1]= (V121);
+	base[1]= (V123);
 	base[2]= VV[27];
 	base[4]= Cnil;
 	base[5]= (base0[3]->c.c_car);
-	{object V122;
-	V122= (base0[2]->c.c_car);
+	{object V124;
+	V124= (base0[2]->c.c_car);
 	 vs_top=base+6;
-	 while(V122!=Cnil)
-	 {vs_push((V122)->c.c_car);V122=(V122)->c.c_cdr;}
+	 while(V124!=Cnil)
+	 {vs_push((V124)->c.c_car);V124=(V124)->c.c_cdr;}
 	vs_base=base+4;}
 	Lformat();
 	vs_top=sup;
@@ -979,13 +981,13 @@ register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM25; VC25
 	vs_check;
-	{object V123;
+	{object V125;
 	vs_top[0]=Cnil;
 	{object *p=vs_top;
 	 for(;p>vs_base;p--)p[-1]=MMcons(p[-1],p[0]);}
-	V123=(base[0]);
+	V125=(base[0]);
 	vs_top=sup;
-	(base0[1]->c.c_car)= (V123);
+	(base0[1]->c.c_car)= (V125);
 	{frame_ptr fr;
 	fr=frs_sch((base0[0]->c.c_car));
 	if(fr==NULL)FEerror("The GO tag ~s is missing.",1,VV[28]);
@@ -1000,17 +1002,17 @@ register object *base0;
 {	register object *base=vs_base;
 	register object *sup=base+VM26; VC26
 	vs_check;
-	{object V124;
-	V124=(base[0]);
+	{object V126;
+	V126=(base[0]);
 	vs_top=sup;
-	if(type_of((V124))==t_cons||((V124))==Cnil){
+	if(type_of((V126))==t_cons||((V126))==Cnil){
 	goto T240;}
 	base[1]= Cnil;
 	vs_top=(vs_base=base+1)+1;
 	return;
 	goto T240;
 T240:;
-	base[1]= (((long)length((V124)))==(2)?Ct:Cnil);
+	base[1]= (((long)length((V126)))==(2)?Ct:Cnil);
 	vs_top=(vs_base=base+1)+1;
 	return;
 	}

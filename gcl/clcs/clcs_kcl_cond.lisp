@@ -81,6 +81,8 @@
      internal-package-error :package :message) ; |<function>| |top - base|
     ("FEtoo_few_arguments" :too-few-arguments "~S [or a callee] requires more than ~R argument~:p." 
      internal-simple-program-error) ; |<function>| |top - base|
+    ("FEparse_error" :parse-error "parse error" 
+     internal-simple-parse-error) ; |<function>| |top - base|
 ;    ("FEtoo_few_argumentsF" :too-few-arguments "Too few arguments."
 ;     internal-simple-control-error) ; |<function>| |args|
     ("FEtoo_many_arguments" :too-many-arguments "~S [or a callee] requires less than ~R argument~:p."

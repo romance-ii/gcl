@@ -1,3 +1,10 @@
+gclcvs (2.7.0-8) unstable; urgency=low
+
+  * Parse errors implemented; recompile generated .c, .h, and .data
+    files with prior compiler fixes
+
+ -- Camm Maguire <camm@enhanced.com>  Fri,  3 Oct 2003 16:04:04 +0000
+
 gclcvs (2.7.0-7) unstable; urgency=low
 
   * ANSI :default-initarg fixes to define-condition

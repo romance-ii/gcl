@@ -1,6 +1,6 @@
 
 static void L1();
-#define VC1 object  V35 ,V34 ,V33 ,V32 ,V31 ,V30 ,V25 ,V18 ,V17 ,V16 ,V15 ,V14 ,V13 ,V8;
+#define VC1 object  V38 ,V37 ,V36 ,V35 ,V34 ,V33 ,V32 ,V27 ,V26 ,V19 ,V18 ,V17 ,V16 ,V15 ,V14 ,V9 ,V8;
 #define VM1 6
 static char * VVi[11]={
 #define Cdata VV[10]

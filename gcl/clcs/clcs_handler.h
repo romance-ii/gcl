@@ -58,9 +58,9 @@ static object LI13(object,object,...);
 #define VMS13  register object *VOL sup=vs_top+7;vs_top=sup;
 #define VMV13 vs_check;
 #define VMR13(VMT13) vs_top=base ; return(VMT13);
-#define VC14 object  V107 ,V106 ,V104 ,V103 ,V99 ,V98 ,V97 ,V96 ,V95 ,V94 ,V93 ,V89 ,V88 ,V87 ,V86 ,V79 ,V78 ,V77;
+#define VC14 object  V109 ,V108 ,V107 ,V105 ,V104 ,V100 ,V99 ,V98 ,V97 ,V96 ,V95 ,V94 ,V90 ,V89 ,V88 ,V87 ,V86 ,V79 ,V78 ,V77;
 #define VC15
-#define VC16 object  V112 ,V111 ,V110;
+#define VC16 object  V114 ,V113 ,V112;
 static void LC26();
 #define VC17
 static void LC25();

@@ -2280,7 +2280,8 @@ READ:
 		       &aux x)
 	int s, e, ep;
 @
-	check_type_string(&strng);
+        if (junk_allowed==Cnil)
+	    check_type_string(&strng);
 	get_string_start_end(strng, start, end, &s, &e);
 	if (type_of(radix) != t_fixnum ||
 	    fix(radix) < 2 || fix(radix) > 36)
@@ -2316,7 +2317,9 @@ READ:
 	@(return x `make_fixnum(e)`)
 
 CANNOT_PARSE:
-	FEerror("Cannot parse an integer in the string ~S.", 1, strng);
+	Icall_error_handler(sKparse_error,
+			    make_simple_string("Cannot parse an integer in the string ~S."), 
+			    1, strng);
 @)
 
 @(defun read_byte (binary_input_stream
