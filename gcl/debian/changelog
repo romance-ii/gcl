@@ -21,8 +21,9 @@ gclcvs (2.7.0-16) unstable; urgency=low
     the definition of SGC_TOUCH there to prevent GBC errors.  FIXME --
     handle header dependencies more robustly.  Thanks to Robert Boyer
     for the report
+  * Improve SGC define extraction for cmpinclude.h
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 25 Nov 2003 19:01:22 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 26 Nov 2003 15:28:15 +0000
 
 gclcvs (2.7.0-15) unstable; urgency=low
 
