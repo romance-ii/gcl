@@ -805,8 +805,8 @@ EXTER struct contblock *old_cb_pointer;	/*  old contblock pointer when in SGC  *
 EXTER int ncb;			/*  number of contblocks  */
 /* int ncbpage;			  number of contblock pages  */
 #define ncbpage tm_table[t_contiguous].tm_npage
-#define maxcbpage   tm_table[t_contiguous].tm_maxpage
-#define cbgbccount tm_table[t_relocatable].tm_gbccount  
+#define maxcbpage tm_table[t_contiguous].tm_maxpage
+#define cbgbccount tm_table[t_contiguous].tm_gbccount  
   
 
 /* int maxcbpage; maximum number of contblock pages  */
