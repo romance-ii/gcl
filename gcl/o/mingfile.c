@@ -52,37 +52,4 @@ void Ldirectory ( void )
 
 	}
 }
-#if 0
-int 
-rename(const char *file, const char *tofile)
-{  return MoveFile(file,tofile);
-}
-
-int setenv(const char *variable,const char *value,int force)
-{
-  char buf [3];
-  
-  if (force || GetEnvironmentVariable(variable,buf,sizeof(buf)-1)==0) 
-    /* return value is the opposite to setenv */
-    return (!SetEnvironmentVariable(variable,value));
-
-}
-
-
-/* callers of this mingw version should know to
-   free the result */
-
-char *
-getenv(const char *variable)
-{
-  char buf [2];
-  int n ;
-  char *res;
-  n=GetEnvironmentVariable(variable,buf,sizeof(buf)-1);
-  if (n == 0) return NULL;
-  res = malloc(n);
-  GetEnvironmentVariable(variable,res,n);
-  return res;
-}
-#endif
 

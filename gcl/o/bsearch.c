@@ -1,7 +1,6 @@
-	  
-	  
+#include <stdlib.h>
 char *
-bsearch(char *key, char *base, unsigned int nel, unsigned int keysize, int (*compar) (/* ??? */))
+bsearch(const void *key, const void *base, size_t nel, size_t keysize, int (*compar)(const void *, const void *))
 {
   char *beg=base;
   char *end=base+keysize*(nel-1);
