@@ -1,3 +1,10 @@
+gcl (2.5.0.cvs20020625-4) unstable; urgency=high
+
+  * gcc 3.0 for arm
+  * cachectl header for m68k
+
+ -- Camm Maguire <camm@enhanced.com>  Mon,  1 Jul 2002 15:47:53 -0400
+
 gcl (2.5.0.cvs20020625-3) unstable; urgency=high
 
   * Better libbfd detection for arm/alpha
