@@ -102,6 +102,75 @@
 			       (cons (if type type name) offset)))))))
     nil))
 
+(defmacro key-name (key prior-keyword)
+  `(cond
+   ((not (consp ,key))
+    ,key)
+   (t 
+    (unless (endp (cdddr ,key))
+      (error "Bad key ~S~%" ,key))
+    (cond 
+     ((not (consp (car ,key)))
+      (car ,key))
+     ((and (eq ,prior-keyword '&key) (not (consp (caar ,key))))
+      (unless (endp (cddar ,key))
+	(error "Bad key ~S~%" ,key))
+      (cadar ,key))
+     (t
+      (error "Bad key ~S~%" ,key))))))
+
+(defmacro maybe-add-keydef (key keydefs prior-keyword)
+  `(let ((def (cadar 
+	       (member (key-name ,key ,prior-keyword) ,keydefs
+		       :key #'(lambda (k) (when (consp k) (car k)))))))
+     (if def
+	 (cond ((not (consp ,key))
+		(list ,key def))
+	       (t
+		(if (cdr ,key) ,key (list (car ,key) def))))
+       ,key)))
+
+(defun parse-boa-lambda-list (lambda-list keydefs)
+  (let ((keywords '(none &optional &rest &key &allow-other-keys &aux))
+	vs res tk restvar seen-keys)
+    (do ((ll lambda-list (cdr ll))) ((endp ll))
+      (let ((key (car ll)))
+	(cond ((setq tk (member key keywords))
+	       (setq keywords tk)
+	       (push key res)
+	       (push key seen-keys))
+	      ((member key lambda-list-keywords)
+	       (error "Keyword ~S appeared in a bad place in BOA lambda list" key))
+	      (t
+	       (let ((prior-keyword (car keywords)))
+		 (case prior-keyword
+		   ((none &rest)
+		    (unless (symbolp key)
+		      (error "non-symbol appeared in bad place in BOA lambda list" key))
+		    (push key res)
+		    (push key vs)
+		    (when (eq prior-keyword '&rest)
+		      (when restvar
+			(error "Multiple variables after &rest in BOA lambda list"))
+		      (setq restvar t)))
+		   ((&optional &key)
+		    (push (maybe-add-keydef key keydefs prior-keyword) res)
+		    (push (key-name key prior-keyword) vs))
+		   (&allow-other-keys
+		    (error "Variable ~S appeared after &allow-other-keys in BOA list" key))
+		   (&aux
+		    (push key res)
+		    (push (key-name key prior-keyword) vs))))))))
+    (when (and (member '&rest seen-keys) (not restvar))
+      (error "Missing &rest variable in BOA list"))
+    (unless (member '&aux seen-keys)
+      (push '&aux res))
+    (do ((ll keydefs (cdr ll))) ((endp ll))
+      (let* ((keydef (car ll))
+	     (keydef-name (if (atom keydef) keydef (car keydef))))
+	(unless (member keydef-name vs)
+	  (push keydef res))))
+    (nreverse res)))
 
 (defun make-constructor (name constructor type named
                          slot-descriptions)
@@ -129,140 +198,7 @@
                            (t (list (list  (car x) (cadr x))))))
                  slot-descriptions)))
     (cond ((consp constructor)
-           ;; The case for a BOA constructor.
-           ;; Dirty code!!
-           ;; We must add an initial value for an optional parameter,
-           ;;  if the default value is not specified
-           ;;  in the given parameter list and yet the initial value
-           ;;  is supplied in the slot description.
-           (do ((a (cadr constructor) (cdr a)) (l nil) (vs nil))
-               ((endp a)
-                ;; Add those options that do not appear in the parameter list
-                ;;  as auxiliary paramters.
-                ;; The parameters are accumulated in the variable VS.
-                (setq keys
-                      (nreconc (cons '&aux l)
-                               (mapcan #'(lambda (k)
-                                           (if (member (if (atom k) k (car k))
-                                                       vs)
-                                               nil
-                                               (list k)))
-                                       keys))))
-             ;; Skip until &OPTIONAL appears.
-	     (when (member (car a) lambda-list-keywords)
-	       (or (eq (car a) '&optional) (push '&optional a)))
-             (cond ((eq (car a) '&optional)
-                    (setq l (cons '&optional l))
-                    (do ((aa (cdr a) (cdr aa)) (ov) (y))
-                        ((endp aa)
-                         ;; Add those options that do not appear in the
-                         ;;  parameter list.
-                         (setq keys
-                               (nreconc (cons '&aux l)
-                                        (mapcan #'(lambda (k)
-                                                    (if (member (if (atom k)
-                                                                    k
-                                                                    (car k))
-                                                                vs)
-                                                        nil
-                                                        (list k)))
-                                                keys)))
-                         (return nil))
-                      (when (member (car aa) lambda-list-keywords)
-                            (when (eq (car aa) '&rest)
-                                  ;; &REST is found.
-                                  (setq l (cons '&rest l))
-                                  (setq aa (cdr aa))
-                                  (unless (and (not (endp aa))
-                                               (symbolp (car aa)))
-                                          (illegal-boa))
-                                  (setq vs (cons (car aa) vs))
-                                  (setq l (cons (car aa) l))
-                                  (setq aa (cdr aa))
-                                  (when (endp aa)
-                                        (setq keys
-                                              (nreconc
-                                               (cons '&aux l)
-                                               (mapcan
-                                                #'(lambda (k)
-                                                    (if (member (if (atom k)
-                                                                    k
-                                                                    (car k))
-                                                                vs)
-                                                        nil
-                                                        (list k)))
-                                                keys)))
-                                        (return nil)))
-                            ;; &AUX should follow.
-                            (unless (eq (car aa) '&aux)
-                                    (illegal-boa))
-                            (setq l (cons '&aux l))
-                            (do ((aaa (cdr aa) (cdr aaa)))
-                                ((endp aaa))
-                              (setq l (cons (car aaa) l))
-                              (cond ((and (atom (car aaa))
-                                          (symbolp (car aaa)))
-                                     (setq vs (cons (car aaa) vs)))
-                                    ((and (symbolp (caar aaa))
-                                          (or (endp (cdar aaa))
-                                              (endp (cddar aaa))))
-                                     (setq vs (cons (caar aaa) vs)))
-                                    (t (illegal-boa))))
-                            ;; End of the parameter list.
-                            (setq keys
-                                  (nreconc l
-                                           (mapcan
-                                            #'(lambda (k)
-                                                (if (member (if (atom k)
-                                                                k
-                                                                (car k))
-                                                            vs)
-                                                    nil
-                                                    (list k)))
-                                            keys)))
-                            (return nil))
-                      ;; Checks if the optional paramter without a default
-                      ;;  value has a default value in the slot-description.
-                      (if (and (cond ((atom (car aa)) (setq ov (car aa)) t)
-                                     ((endp (cdar aa)) (setq ov (caar aa)) t)
-                                     (t nil))
-                               (setq y (member ov
-                                               keys
-                                               :key
-                                               #'(lambda (x)
-                                                   (if (consp x)
-                                                       ;; With default value.
-                                                       (car x))))))
-                          ;; If no default value is supplied for
-                          ;;  the optional parameter and yet appears
-                          ;;  in KEYS with a default value,
-                          ;;  then cons the pair to L,
-                          (setq l (cons (car y) l))
-                          ;;  otherwise cons just the parameter to L.
-                          (setq l (cons (car aa) l)))
-                      ;; Checks the form of the optional parameter.
-                      (cond ((atom (car aa))
-                             (unless (symbolp (car aa))
-                                     (illegal-boa))
-                             (setq vs (cons (car aa) vs)))
-                            ((not (symbolp (caar aa)))
-                             (illegal-boa))
-                            ((or (endp (cdar aa)) (endp (cddar aa)))
-                             (setq vs (cons (caar aa) vs)))
-                            ((not (symbolp (caddar aa)))
-                             (illegal-boa))
-                            ((not (endp (cdddar aa)))
-                             (illegal-boa))
-                            (t
-                             (setq vs (cons (caar aa) vs))
-                             (setq vs (cons (caddar aa) vs)))))
-                    ;; RETURN from the outside DO.
-                    (return nil))
-                   (t
-                    (unless (symbolp (car a))
-                            (illegal-boa))
-                    (setq l (cons (car a) l))
-                    (setq vs (cons (car a) vs)))))
+	   (setq keys (parse-boa-lambda-list (cadr constructor) keys))
            (setq constructor (car constructor)))
           (t
            ;; If not a BOA constructor, just cons &KEY.
@@ -278,9 +214,6 @@
            `(defun ,constructor ,keys
               (list ,@slot-names)))
           ((error "~S is an illegal structure type" type)))))
-
-(defun illegal-boa ()
-  (error "An illegal BOA constructor."))
 
 (defun make-predicate (name predicate type named name-offset)
   (cond ((null type))

@@ -13,8 +13,9 @@ gclcvs (2.7.0-7) unstable; urgency=low
     -- make sure VOL modifier is inserted where needed to prevent
     longjmp clobbers
   * Add mod directory to *load-path*
+  * Fix BOA defstruct ansi tests
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  2 Oct 2003 14:53:36 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  2 Oct 2003 17:57:21 +0000
 
 gclcvs (2.7.0-6) unstable; urgency=low
 
