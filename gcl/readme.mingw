@@ -2,13 +2,11 @@
 BUILDING NATIVE WIN32 GNU COMMON LISP FROM CVS
 ===============================================
 
-The preferred build host system for the Mingw32 compiler is 
-MSYS.
+The preferred build host system for the Mingw32 compiler is MSYS.
 
-I use gcc version 3.3.1, but earlier versions back to
-2.95 certainly work provided that you remove the 
-"-fno-zero-initialized-in-bss" flag in "h/mingw.defs" before
-running "configure".
+I use gcc version 3.3.1, but earlier versions back to 2.95 certainly 
+work provided that you remove the "-fno-zero-initialized-in-bss" flag 
+in "h/mingw.defs" before running "configure".
 
 
 ===============================================
@@ -29,6 +27,9 @@ BUILD TOOLS
 It is a good idea to keep up to date with Mingw32 and MSYS.  There
 are usually updates for various parts of these packages to be found
 on the web site. 
+
+Avoid using MSYS 1.10 RC3 as it has some annoying bugs. RC2 is fine
+as I write in January 2004.
 
 
 SHORT SETUP NOTES
@@ -99,18 +100,17 @@ BUILDING
 - The batch file "gclm.bat" can be used to make a Windows desktop 
   shortcut.
 
-- BFD fasloading, Stratified Garbage Collection (SGC) and GCL-TK don't work
-  under Windows.  The configuration options above provide a "traditional" GCL
-  executable which will build the current CVS version of Maxima.  The BFD
-  option will depend on someone with knowledge of BFD and PE-COFF linking
-  fixing some problems with the BFD library - I am slowly absorbing the info
-  needed, but we really need input from an expert.
+- BFD fasloading, Stratified Garbage Collection (SGC) readline and GCL-TK 
+  don't work under Windows.  The configuration options above provide a
+  "traditional" GCL executable which will build the current CVS version of
+  Maxima.  The BFD option will depend on someone with knowledge of BFD and 
+  PE-COFF linking fixing some problems with the BFD library - I am slowly
+  absorbing the info needed, but we really need input from an expert.
 
-- A PCL/ANSI build ("configure --enable-ansi --enable-custreloc") can be 
-  obtained by adding "(si::use-fast-links nil)" to the end of the list of
-  commands in the SETUP makefile macro in "pcl/makefile".  I don't know 
-  why this is necessary on Windows.  The PCL/ANSI version of GCL is still
-  experimental.
+- A PCL/ANSI build ("configure --enable-ansi") can be obtained by adding 
+  "(si::use-fast-links nil)" to the end of the list of commands in the SETUP 
+  makefile macro in "pcl/makefile".  I don't know why this is necessary on 
+  Windows.  The PCL/ANSI version of GCL is still experimental.
 
 
-Mike Thomas, 29 December 2003
+Mike Thomas, 13 January 2004
