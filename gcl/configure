@@ -5070,12 +5070,12 @@ EOF
 
 echo $ac_n "checking emacs info/dir""... $ac_c" 1>&6
 echo "configure:5073: checking emacs info/dir" >&5
-if [ "$EMACS" != "" ] ; then
+if [ "$EMACS" != "" ] && [ "$INFO_DIR" = "unknown" ] ; then
 	INFO_DIR=`$EMACS -q -batch --no-site-file -l conftest.el 2>&1 | sed -e /Loading/d | sed -e /load/d `
 fi
 if  test -f "${INFO_DIR}dir"  ; then true;else
 if test -f /usr/info/dir ; then
-  INFO_DIR=/usr/info/
+  INFO_DIR=/usr/share/info/
 else true;
 fi
 fi
