@@ -214,6 +214,7 @@ case $use in
 		ia64*)
 			enable_dlopen="yes" ;;
 		hppa*)
+			EXTRA_CFLAGS=-fPIC; 
 			enable_dlopen="yes" ;;
 	esac;;
 esac

@@ -100,7 +100,7 @@ fasload(faslfile)
 #endif
   {
     char com[600];
-    snprintf(com,sizeof(com),"ld -shared %s -o %s",filename,buf);
+    snprintf(com,sizeof(com),"cc -shared %s -o %s",filename,buf);
     system(com);
   }
 

@@ -646,7 +646,7 @@ call_proc(object sym, void **link, int argd, va_list ll)
 /*     if (type_of(fun)==t_vfun) argd=fcall.argd; */ /*remove this! */
      nargs=SFUN_NARGS(argd);
      result_type=SFUN_RETURN_TYPE(argd);
-     argd=SFUN_START_ARG_TYPES(argd);
+     SFUN_START_ARG_TYPES(argd);
      {int i=0;
       if (argd==0)
 	{while(i < nargs)

@@ -1,3 +1,15 @@
+gcl (2.5.0.cvs20020625-26) unstable; urgency=high
+
+  * Remove extra load of tkl.o in install target of main makefile
+  * gcc-3.1 for hppa
+  * Remove gcc version spec for m68k
+  * \-fPIC for hppa, needed for dlopen
+  * cleanup gcc 3.1 warning in funlink.c
+  * cc instead of ld for -shared linking in fasldlsym.c (needed for
+    hppa)
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 31 Jul 2002 18:46:54 -0400
+
 gcl (2.5.0.cvs20020625-25) unstable; urgency=high
 
   * Move chmod +x gmp3/* into debian/rules

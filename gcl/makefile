@@ -143,9 +143,9 @@ install1:
 	-e "s!TK_LIBRARY=.*!TK_LIBRARY=${TK_LIBRARY}!g" > \
 	$(DESTDIR)${INSTALL_LIB_DIR}/gcl-tk/gcltksrv$(BAT) ; \
 	chmod a+x $(DESTDIR)${INSTALL_LIB_DIR}/gcl-tk/gcltksrv$(BAT) ; fi
-	if [ -d "${TK_CONFIG_PREFIX}" ] ; then  \
-	(cd $(DESTDIR)${INSTALL_LIB_DIR}/gcl-tk/demos ; \
-	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../$(PORTDIR)/$(FLISP)$(EXE)) ; fi
+#	if [ -d "${TK_CONFIG_PREFIX}" ] ; then  \
+#	(cd $(DESTDIR)${INSTALL_LIB_DIR}/gcl-tk/demos ; \
+#	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../$(PORTDIR)/$(FLISP)$(EXE)) ; fi
 	(cd elisp ; make install DESTDIR=$(DESTDIR))
 	(cd info ; make ; make install DESTDIR=$(DESTDIR))
 
@@ -164,7 +164,7 @@ clean:
 	rm -f foo.tcl config.log makedefs makedefsafter config.cache config.status makedefc
 	rm -f h/config.h h/gclincl.h h/cmpinclude.h
 	rm -rf gmp3/.deps gmp3/libgmp.a
-	rm -f xbin/gcl foo foo.c
+	rm -f xbin/gcl foo foo.c bin/gclm.bat
 	rm -f h/*-linux.defs
 
 CMPINCLUDE_FILES=${HDIR}cmpincl1.h ${HDIR}gclincl.h ${HDIR}compbas.h ${HDIR}enum.h $(MP_INCLUDE) ${HDIR}object.h ${HDIR}vs.h \
