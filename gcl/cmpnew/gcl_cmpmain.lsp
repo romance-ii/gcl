@@ -446,7 +446,7 @@ Cannot compile ~a.~%"
 	((and (setq tem (symbol-function name))
 	      (consp tem))
 	 (let ((na (if (symbol-package name) name 'cmp-anon))
-	       (tem (wrap-literals tem)))
+	       (tem (if *keep-gaz* tem (wrap-literals tem))))
 	   (unless (and (fboundp 'si::init-cmp-anon) (or (si::init-cmp-anon) (fmakunbound 'si::init-cmp-anon)))
 	     (with-open-file
 	      (st (setq gaz (gazonk-name)) :direction :output)

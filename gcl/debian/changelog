@@ -8,8 +8,12 @@ gclcvs (2.7.0-33) unstable; urgency=low
   * install target depends on all in main makefile to comply with GNU
     standards
   * load-time-value support; close compile bugs in ansi test suite
+  * Only wrap-literals when not keeping temporary gazonk lisp files
+    (e.g. for possible future use in compiler::link and the like).
+    *keep-gaz* is effectively a switch turning compile into compile-
+    file.  Make wrapping algorithm a bit more thorough.
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 19 Nov 2004 21:34:03 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 22 Nov 2004 14:56:12 +0000
 
 gclcvs (2.7.0-32) unstable; urgency=high
 
