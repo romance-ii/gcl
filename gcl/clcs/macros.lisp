@@ -8,28 +8,46 @@
   (DO ((L '())
        (C CASES (CDR C)))
       ((NULL C) (NREVERSE L))
-    (LET ((KEYS (CAAR C)))
-      (COND ((ATOM KEYS)
-	     (COND ((NULL KEYS))
-		   ((and (MEMBER KEYS '(OTHERWISE T))
-			 (not (eq macro-name 'ecase))
-			 (not (eq macro-name 'ccase)))
-		    (ERROR "OTHERWISE is not allowed in ~S expressions."
-			   MACRO-NAME))
-		   (T (PUSH KEYS L))))
-	    (LIST-IS-ATOM-P
-	     (PUSH KEYS L))
-	    (T
-	     (DOLIST (KEY KEYS) (PUSH KEY L)))))))
-
+      (LET ((KEYS (CAAR C)))
+	   (COND ((ATOM KEYS)
+		  (COND ((NULL KEYS))
+			((MEMBER KEYS '(OTHERWISE T))
+			 (IF (NOT (MEMBER MACRO-NAME '( ECASE CCASE)))
+			     (ERROR "OTHERWISE is not allowed in ~S expressions." MACRO-NAME))
+			   (PUSH (LIST KEYS) L))
+			(T (PUSH KEYS L))))
+		 (LIST-IS-ATOM-P
+		  (PUSH KEYS L))
+		 (T (DOLIST (KEY KEYS) (PUSH KEY L)))))))
 );NEHW-LAVE
+
+;(DEFUN ESCAPE-SPECIAL-CASES (CASES)
+;  (DO ((L '())
+;       (C CASES (CDR C)))
+;      ((NULL C) (NREVERSE L))
+;      (LET ((KEYS (CAAR C)))
+;	   (COND ((ATOM KEYS)
+;		  (COND ((NULL KEYS))
+;			((MEMBER KEYS '(OTHERWISE T))
+;			  (PUSH (CONS (LIST KEYS) (CDR (CAR C))) L))
+;			(T (PUSH (CONS KEYS (CDR (CAR C))) L))))
+;		 (T
+;		  (PUSH (CONS KEYS (CDR (CAR C))) L))))))
+
+(DEFUN ESCAPE-SPECIAL-CASES-REPLACE (CASES)
+  (DO ((C CASES (CDR C)))
+      ((NULL C) CASES)
+      (LET ((KEYS (CAAR C)))
+	   (IF (MEMBER KEYS '(OTHERWISE T))
+	       (RPLACA (CAR C) (LIST KEYS))))))
 
 (DEFMACRO ECASE (KEYFORM &REST CASES)
   (LET ((KEYS (ACCUMULATE-CASES 'ECASE CASES NIL))
+	(NCASES (ESCAPE-SPECIAL-CASES-REPLACE CASES))
 	(VAR (GENSYM)))
     `(LET ((,VAR ,KEYFORM))
        (CASE ,VAR
-	 ,@CASES
+	 ,@NCASES
 	 (OTHERWISE
 	   (ERROR 'CASE-FAILURE :NAME 'ECASE
 		  		:DATUM ,VAR
@@ -38,13 +56,14 @@
 
 (DEFMACRO CCASE (KEYPLACE &REST CASES)
   (LET ((KEYS (ACCUMULATE-CASES 'CCASE CASES NIL))
+	(NCASES (ESCAPE-SPECIAL-CASES-REPLACE CASES))
 	(TAG1 (GENSYM))
 	(TAG2 (GENSYM)))
     `(BLOCK ,TAG1
        (TAGBODY ,TAG2
 	 (RETURN-FROM ,TAG1
 	   (CASE ,KEYPLACE
-	     ,@CASES
+	     ,@NCASES
 	     (OTHERWISE
 	       (RESTART-CASE (ERROR 'CASE-FAILURE
 				    :NAME 'CCASE
