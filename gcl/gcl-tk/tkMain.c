@@ -50,7 +50,6 @@
 #include <signal.h>
 #include <errno.h>
 
-#define _GNU_SOURCE
 #include "guis.h"
 struct connection_state *dsfd;
 /*-------------------------------------------------------------------*/

@@ -1,9 +1,6 @@
 
 static void L1();
-static object LI2();
 static void L3();
-static object LI6();
-static object LI7();
 static void L11();
 static void L12();
 static void L13();
@@ -11,7 +8,7 @@ static void L14();
 static void L15();
 static void L19();
 #define VC1
-static object LI2();
+static object LI2(object,object,...);
 #define VMB2 register object *base=vs_top; object  V5; object Vcs[2];
 #define VMS2  register object *sup=vs_top+3;vs_top=sup;
 #define VMV2 vs_reserve(3);
@@ -27,12 +24,12 @@ static object LI5();
 #define VMS5  register object *sup=vs_top+6;vs_top=sup;
 #define VMV5 vs_reserve(6);
 #define VMR5(VMT5) vs_top=base ; return(VMT5);
-static object LI6();
+static object LI6(object,object,...);
 #define VMB6 register object *base=vs_top; object  V23; object Vcs[2];
 #define VMS6  register object *sup=vs_top+3;vs_top=sup;
 #define VMV6 vs_reserve(3);
 #define VMR6(VMT6) vs_top=base ; return(VMT6);
-static object LI7();
+static object LI7(object,object,...);
 #define VMB7 register object *base=vs_top; object  V29; object Vcs[2];
 #define VMS7  register object *sup=vs_top+3;vs_top=sup;
 #define VMV7 vs_reserve(3);
@@ -129,17 +126,17 @@ static char * VVi[66]={
 (char *)(LI21)
 };
 #define VV ((object *)VVi)
-static object  LnkTLI64() ;
-static object  (*LnkLI64)() = LnkTLI64;
-static void LnkT63() ;
+static object  LnkTLI64(object,...);
+static object  (*LnkLI64)() = (object (*)()) LnkTLI64;
+static void LnkT63();
 static void (*Lnk63)() = LnkT63;
-static void LnkT62() ;
+static void LnkT62();
 static void (*Lnk62)() = LnkT62;
-static object  LnkTLI61() ;
-static object  (*LnkLI61)() = LnkTLI61;
-static void LnkT60() ;
+static object  LnkTLI61(object,...);
+static object  (*LnkLI61)() = (object (*)()) LnkTLI61;
+static void LnkT60();
 static void (*Lnk60)() = LnkT60;
-static object  LnkTLI59() ;
-static object  (*LnkLI59)() = LnkTLI59;
-static object  LnkTLI58() ;
+static object  LnkTLI59(object,...);
+static object  (*LnkLI59)() = (object (*)()) LnkTLI59;
+static object  LnkTLI58();
 static object  (*LnkLI58)() = LnkTLI58;

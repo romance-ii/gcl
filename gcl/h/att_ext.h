@@ -30,8 +30,8 @@ void *realloc(void *,size_t);
 void * memalign(size_t,size_t);
 void *alloc_contblock(size_t);
 void *alloc_relblock(size_t);
-object fSallocate_contiguous_pages();
-object fSallocate_relocatable_pages();
+/* object fSallocate_contiguous_pages(); */
+/* object fSallocate_relocatable_pages(); */
 
 /*  array.c  */
 enum aelttype Iarray_element_type();
@@ -40,7 +40,7 @@ object fSaset1();
 EXTER object sLarray_dimension_limit;
 EXTER object sLarray_total_size_limit;
 object fSmake_array1();
-object fSmake_vector1();
+/* object fSmake_vector1(); */
 
 /*  assignment.c  */
 object setf();
@@ -143,11 +143,12 @@ object simple_symlispcall_no_event();
 EXTER object Vevalhook;
 EXTER object Vapplyhook;
 object ieval();
-object ifuncall();
+object ifuncall(object,int,...);
 object ifuncall1();
 object ifuncall2();
 object ifuncall3();
-object fcalln();
+object fcalln1(object,...);
+#define fcalln ((object (*)())fcalln1)
 object Ieval();
 object Imacro_expand1();
 
@@ -258,8 +259,8 @@ object cddddr();
 object nth();
 object nthcdr();
 object make_cons();
-object list();
-object listA();
+object list(int,...);
+object listA(int,...);
 object append();
 object copy_list();
 object make_list();
@@ -627,6 +628,7 @@ object Icall_proc();
 float Icall_proc_float();
 object ImakeStructure();
 object list_vector();
+object list_vector_new();
 object Iapply_ap();
 object IisFboundp();
 object IapplyVector();

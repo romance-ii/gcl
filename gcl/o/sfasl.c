@@ -41,7 +41,6 @@ via #include "../c/sfasl.c"
 #include SEPARATE_SFASL_FILE
 #else
 
-#include <varargs.h>
 #include "ext_sym.h"
 struct node * find_sym();
 int node_compare();

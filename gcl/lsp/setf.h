@@ -115,17 +115,17 @@ static char * VVi[106]={
 (char *)(L25)
 };
 #define VV ((object *)VVi)
-static object  LnkTLI104() ;
-static object  (*LnkLI104)() = LnkTLI104;
-static object  LnkTLI103() ;
-static object  (*LnkLI103)() = LnkTLI103;
-static void LnkT101() ;
+static object  LnkTLI104(object,...);
+static object  (*LnkLI104)() = (object (*)()) LnkTLI104;
+static object  LnkTLI103(object,...);
+static object  (*LnkLI103)() = (object (*)()) LnkTLI103;
+static void LnkT101();
 static void (*Lnk101)() = LnkT101;
-static object  LnkTLI100() ;
-static object  (*LnkLI100)() = LnkTLI100;
-static void LnkT99() ;
+static object  LnkTLI100(object,...);
+static object  (*LnkLI100)() = (object (*)()) LnkTLI100;
+static void LnkT99();
 static void (*Lnk99)() = LnkT99;
-static void LnkT98() ;
+static void LnkT98();
 static void (*Lnk98)() = LnkT98;
-static object  LnkTLI97() ;
-static object  (*LnkLI97)() = LnkTLI97;
+static object  LnkTLI97(object,...);
+static object  (*LnkLI97)() = (object (*)()) LnkTLI97;

@@ -223,13 +223,13 @@ fasload(object faslfile) {
   coerce_to_filename(faslfile, filename);
 
   if (!(b=bfd_openr(filename,0)))
-    FEerror("Cannot open bfd");
+    FEerror("Cannot open bfd",0);
   if ((myerr=bfd_get_error()) && myerr!=3) 
-    FEerror("Unknown bfd error code on openr");
+    FEerror("Unknown bfd error code on openr",0);
   if (!bfd_check_format(b,bfd_object))
-    FEerror("Unknown bfd format");
+    FEerror("Unknown bfd format",0);
   if ((myerr=bfd_get_error()) && myerr!=3)
-    FEerror("Unknown bfd error code on check_format");
+    FEerror("Unknown bfd error code on check_format",0);
   bfd_set_error(0);
 
   current=NULL;
@@ -277,10 +277,10 @@ fasload(object faslfile) {
   }
 
   if ((u=bfd_get_symtab_upper_bound(b))<0)
-    FEerror("Cannot get symtab uppoer bound");
+    FEerror("Cannot get symtab uppoer bound",0);
   q=(asymbol **)alloca(u);
   if ((v=bfd_canonicalize_symtab(b,q))<0)
-    FEerror("cannot canonicalize symtab");
+    FEerror("cannot canonicalize symtab",0);
   for (u=0;u<v;u++) {
 
     struct bfd_link_hash_entry *h;
@@ -294,13 +294,13 @@ fasload(object faslfile) {
       continue;
 
     if (h->type!=bfd_link_hash_defined) 
-      FEerror("Undefined symbol");
+      FEerror("Undefined symbol",0);
       
     if (h->u.def.section) {
       q[u]->value=h->u.def.value+h->u.def.section->vma;
       q[u]->flags|=BSF_WEAK;
     } else 
-      FEerror("Symbol without section");
+      FEerror("Symbol without section",0);
 
   }
 
@@ -315,7 +315,7 @@ fasload(object faslfile) {
    void *v=alloca(memory->cfd.cfd_size);
    
    if (!v)
-     FEerror("Cannot alloca for bfd");
+     FEerror("Cannot alloca for bfd",0);
 
    for (s=b->sections;s;s=s->next) {
      
@@ -326,7 +326,7 @@ fasload(object faslfile) {
      
      if (!bfd_get_relocated_section_contents(b,&link_info,&link_order,
 					     v,0,q)) 
-       FEerror("Cannot get relocated section contents\n");
+       FEerror("Cannot get relocated section contents\n",0);
 
      memcpy((void *)s->output_section->vma,v,s->_raw_size);
      

@@ -1320,9 +1320,9 @@ T496:;
 	}
 }
 static object  LnkTLI75(){return call_proc0(VV[75],(void **)&LnkLI75);} /* TYPE-ERROR */
-static object  LnkTLI73(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[73],(void **)&LnkLI73,ap);va_end(ap);return V1;} /* FIND */
+static object  LnkTLI73(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[73],(void **)&LnkLI73,first,ap);va_end(ap);return V1;} /* FIND */
 static void LnkT72(){ call_or_link(VV[72],(void **)&Lnk72);} /* SPECIFIC-ERROR */
-static object  LnkTLI70(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[70],(void **)&LnkLI70,ap);va_end(ap);return V1;} /* COUNT */
+static object  LnkTLI70(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[70],(void **)&LnkLI70,first,ap);va_end(ap);return V1;} /* COUNT */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

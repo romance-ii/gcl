@@ -2929,22 +2929,22 @@ TTL:;
 	return;
 	}
 }
-static object  LnkTLI195(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[195],(void **)&LnkLI195,2,ap);va_end(ap);return V1;} /* SUBSTRINGP */
+static object  LnkTLI195(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[195],(void **)&LnkLI195,2,first,ap);va_end(ap);return V1;} /* SUBSTRINGP */
 static void LnkT194(){ call_or_link(VV[194],(void **)&Lnk194);} /* PACKAGE-SIZE */
 static void LnkT193(){ call_or_link(VV[193],(void **)&Lnk193);} /* IDESCRIBE */
-static object  LnkTLI192(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[192],(void **)&LnkLI192,2,ap);va_end(ap);return V1;} /* DOCUMENTATION */
-static object  LnkTLI191(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[191],(void **)&LnkLI191,1,ap);va_end(ap);return V1;} /* INSPECT-STRUCTURE */
-static object  LnkTLI190(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[190],(void **)&LnkLI190,1,ap);va_end(ap);return V1;} /* INSPECT-ARRAY */
-static object  LnkTLI189(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[189],(void **)&LnkLI189,1,ap);va_end(ap);return V1;} /* INSPECT-VECTOR */
-static object  LnkTLI188(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[188],(void **)&LnkLI188,1,ap);va_end(ap);return V1;} /* INSPECT-STRING */
-static object  LnkTLI187(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[187],(void **)&LnkLI187,1,ap);va_end(ap);return V1;} /* INSPECT-CONS */
-static object  LnkTLI186(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[186],(void **)&LnkLI186,1,ap);va_end(ap);return V1;} /* INSPECT-NUMBER */
-static object  LnkTLI185(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[185],(void **)&LnkLI185,1,ap);va_end(ap);return V1;} /* INSPECT-CHARACTER */
-static object  LnkTLI184(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[184],(void **)&LnkLI184,1,ap);va_end(ap);return V1;} /* INSPECT-PACKAGE */
-static object  LnkTLI183(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[183],(void **)&LnkLI183,1,ap);va_end(ap);return V1;} /* INSPECT-SYMBOL */
+static object  LnkTLI192(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[192],(void **)&LnkLI192,2,first,ap);va_end(ap);return V1;} /* DOCUMENTATION */
+static object  LnkTLI191(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[191],(void **)&LnkLI191,1,first,ap);va_end(ap);return V1;} /* INSPECT-STRUCTURE */
+static object  LnkTLI190(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[190],(void **)&LnkLI190,1,first,ap);va_end(ap);return V1;} /* INSPECT-ARRAY */
+static object  LnkTLI189(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[189],(void **)&LnkLI189,1,first,ap);va_end(ap);return V1;} /* INSPECT-VECTOR */
+static object  LnkTLI188(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[188],(void **)&LnkLI188,1,first,ap);va_end(ap);return V1;} /* INSPECT-STRING */
+static object  LnkTLI187(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[187],(void **)&LnkLI187,1,first,ap);va_end(ap);return V1;} /* INSPECT-CONS */
+static object  LnkTLI186(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[186],(void **)&LnkLI186,1,first,ap);va_end(ap);return V1;} /* INSPECT-NUMBER */
+static object  LnkTLI185(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[185],(void **)&LnkLI185,1,first,ap);va_end(ap);return V1;} /* INSPECT-CHARACTER */
+static object  LnkTLI184(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[184],(void **)&LnkLI184,1,first,ap);va_end(ap);return V1;} /* INSPECT-PACKAGE */
+static object  LnkTLI183(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[183],(void **)&LnkLI183,1,first,ap);va_end(ap);return V1;} /* INSPECT-SYMBOL */
 static void LnkT182(){ call_or_link(VV[182],(void **)&Lnk182);} /* STRUCTURE-REF1 */
 static void LnkT181(){ call_or_link(VV[181],(void **)&Lnk181);} /* ARRAY-TOTAL-SIZE */
-static object  LnkTLI180(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[180],(void **)&LnkLI180,1,ap);va_end(ap);return V1;} /* ARRAY-DIMENSIONS */
+static object  LnkTLI180(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[180],(void **)&LnkLI180,1,first,ap);va_end(ap);return V1;} /* ARRAY-DIMENSIONS */
 static void LnkT179(){ call_or_link(VV[179],(void **)&Lnk179);} /* ARRAY-HAS-FILL-POINTER-P */
 static void LnkT165(){ call_or_link(VV[165],(void **)&Lnk165);} /* PACKAGE-SHADOWING-SYMBOLS */
 static void LnkT164(){ call_or_link(VV[164],(void **)&Lnk164);} /* PRINT-DOC */

@@ -25,6 +25,16 @@
   {extern ret fname(); \
      MAKEFUN(pack,string,fname,F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));}
 
+#undef DEFUN_NEW
+#define DEFUN_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) \
+  {extern ret fname args; \
+     MAKEFUN(pack,string,(ret (*)())fname,F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));}
+
+#undef DEFUNO_NEW
+#define DEFUNO_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,old,args,doc) \
+  {extern ret fname args; \
+     MAKEFUN(pack,string,(ret (*)())fname,F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));}
+
 #undef DEFCOMP
 #define DEFCOMP(type, fun,doc) Ineed_in_image(fun);
 

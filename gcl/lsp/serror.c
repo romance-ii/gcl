@@ -135,16 +135,15 @@ T23:;
 }
 /*	local entry for function UNIVERSAL-ERROR-HANDLER	*/
 
-static object LI4(va_alist)
-	va_dcl 
+static object LI4(object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB4 VMS4 VMV4
 	{register object V24;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	narg= narg - 0;
-	V25 = list_vector(narg,ap);
+	V25 = list_vector_new(narg,first,ap);
 	V24= V25;
 	if((symbol_value(VV[24]))==Cnil){
 	goto T29;}

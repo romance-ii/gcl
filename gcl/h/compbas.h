@@ -1,10 +1,6 @@
-
-#ifndef _GNU_SOURCE
-#include <varargs.h>
-#else
 #include <stdarg.h>
 #define _VA_LIST_DEFINED
-#endif
+
 #include <setjmp.h>
 #include <stdio.h>
 

@@ -35,34 +35,34 @@ build_symbol_table_bfd(void) {
 
   bfd_init();
   if (!(bself=bfd_openr(kcl_self,0)))
-    FEerror("Cannot open self\n");
+    FEerror("Cannot open self\n",0);
   if (!bfd_check_format(bself,bfd_object))
-    FEerror("I'm not an object");
+    FEerror("I'm not an object",0);
 /*    if (link_info.hash) */
 /*      bfd_link_hash_table_free(bself,link_info.hash); */
   if (!(link_info.hash = bfd_link_hash_table_create (bself)))
-    FEerror("Cannot make hash table");
+    FEerror("Cannot make hash table",0);
   if (!bfd_link_add_symbols(bself,&link_info))
-    FEerror("Cannot add self symbols\n");
+    FEerror("Cannot add self symbols\n",0);
   if ((u=bfd_get_symtab_upper_bound(bself))<0)
-    FEerror("Cannot get self's symtab upper bound");
+    FEerror("Cannot get self's symtab upper bound",0);
 #ifdef HAVE_ALLOC
   q=(asymbol **)alloca(u);
 #else
   q=(asymbol **)malloc(u);
 #endif
   if ((v=bfd_canonicalize_symtab(bself,q))<0)
-    FEerror("Cannot canonicalize self's symtab");
+    FEerror("Cannot canonicalize self's symtab",0);
   for (u=0;u<v;u++) {
     char *c;
     if ((c=(char *)strstr(q[u]->name,"@@"))) {
       struct bfd_link_hash_entry *h;
       *c=0;
       if (!(h=bfd_link_hash_lookup(link_info.hash,q[u]->name,true,true,true)))
-	FEerror("Cannot make new hash entry");
+	FEerror("Cannot make new hash entry",0);
       h->type=bfd_link_hash_defined;
       if (!q[u]->section)
-	FEerror("Symbol is missing section");
+	FEerror("Symbol is missing section",0);
       h->u.def.value=q[u]->value+q[u]->section->vma;
       h->u.def.section=q[u]->section;
       *c='@';

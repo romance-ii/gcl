@@ -313,17 +313,28 @@
  
   (dolist (x *function-links* )
 	  (let ((num (second x))
-		(type (third x)))
+		(type (third x))
+		(args (fourth x))
+		(newtype nil))
 	    (cond ((eq type 'proclaimed-closure)
 		   (wt-h "static object *Lclptr"num";")
-		   (setq type ""))
+		   (setq newtype ""))
 		  (t
-		   (setq type (if type (Rep-type type) ""))))
+		   (setq newtype (if type (Rep-type type) ""))))
 
-	    (wt-h "static " (declaration-type type) " LnkT" num "() ;") ;initial function.
-   #-sgi3d    (wt-h "static "  (declaration-type type) " (*Lnk" num ")() = LnkT" num ";")
-   #+sgi3d    (wt-h "static "  (declaration-type type) " (*Lnk" num ")();")))
-  )
+	    (if (and (not (null type))
+		     (not (eq type 'proclaimed-closure))
+		     (or args (not (eq t type))))
+		(progn
+		  (wt-h "static " (declaration-type newtype) " LnkT" num "(object,...);")
+		  #-sgi3d (wt-h "static "  (declaration-type newtype) " (*Lnk" num ")() = ("
+				(declaration-type newtype) "(*)()) LnkT" num ";")
+		  #+sgi3d (wt-h "static "  (declaration-type newtype) " (*Lnk" num ")();"))
+	      (progn 
+		(wt-h "static " (declaration-type newtype) " LnkT" num "();")
+		#-sgi3d (wt-h "static "  (declaration-type newtype) " (*Lnk" num ")() = LnkT" num ";")
+		#+sgi3d (wt-h "static "  (declaration-type newtype) " (*Lnk" num ")();"))))))
+)
 
 
 ;; this default will be as close to the the decision of the x3j13 committee
@@ -615,7 +626,7 @@
   (cond ((wt-if-proclaimed fname cfun lambda-expr))
 	((vararg-p fname)
 	 (let ((keyp (ll-keywords-p (lambda-list lambda-expr))))
-	   (wt-h "static object LI" cfun "();")
+;	   (wt-h "static object LI" cfun "();")
 	   (if keyp
 	     (add-init `(si::mfvfun-key
 		     ',fname ,(add-address "LI" cfun)
@@ -760,16 +771,29 @@
 	  (push (list 'cvar (next-cvar)) reqs))
  
   (wt-comment "local entry for function " fname)
-  (wt-h "static object LI" cfun "();")
-  (wt-nl1 "static object LI" cfun "(")
-  (wt-list reqs)
-  (when is-var-arg
-	(if reqs (wt ","))
-	(wt "va_alist"))
-  (wt ")")
-  (when reqs (wt-nl "object ")
-	(wt-list reqs)  (wt ";"))
-  (if is-var-arg (wt-nl "va_dcl "))
+
+  (let ((tmp ""))
+    (wt-nl1 "static object LI" cfun "(")
+    (when reqs 
+      (do ((v reqs (cdr v)))
+	  ((null v))
+	  (wt "object " (car v))
+	  (setq tmp (concatenate 'string tmp "object"))
+	  (or (null (cdr v)) 
+	      (progn 
+		(wt ",")
+		(setq tmp (concatenate 'string tmp ","))))))
+    (when is-var-arg
+      (when reqs (progn (wt ",") (setq tmp (concatenate 'string tmp ","))))
+      (wt "object first,...")
+      (setq tmp (concatenate 'string tmp "object,...")))
+    (wt ")")
+    (wt-h "static object LI" cfun "(" tmp ");"))
+
+
+;  (when reqs (wt-nl "object ")
+;	(wt-list reqs)  (wt ";"))
+;  (if is-var-arg (wt-nl "va_dcl "))
          ;;; Now the body.
    
   (let ((cm *reservation-cmacro*)
@@ -830,7 +854,7 @@
 
   ;;; start va_list at beginning
     (if (or (ll-optionals ll) (ll-rest ll) (ll-keywords-p ll))
-	(unless va-start (setq va-start t) (wt-nl "va_start(ap);")))
+	(unless va-start (setq va-start t) (wt-nl "va_start(ap,first);")))
       
   ;;; Check arguments.
     (when (and (or *safe-compile* *compiler-check-args*) (car ll))
@@ -860,15 +884,17 @@
 	    (*unwind-exit* *unwind-exit*)
 	    (*ccb-vs* *ccb-vs*))
 	(wt-nl "narg = narg - " (length reqs) ";")
-	(dolist** (opt (ll-optionals ll))
-		  (push (next-label) labels)
-		  (wt-nl "if (" (if (cdr labels) "--" "") "narg <= 0) ")
-		  (wt-go (car labels))
-		  (wt-nl "else {" )
-		  (unless va-start (setq va-start t) (wt-nl "va_start(ap);"))
-		  (c2bind-loc (car opt) (list 'next-var-arg))
-		  (wt "}")
-		  (when (caddr opt) (c2bind-loc (caddr opt) t))))
+	(let ((first t))
+	  (dolist** (opt (ll-optionals ll))
+		    (push (next-label) labels)
+		    (wt-nl "if (" (if (cdr labels) "--" "") "narg <= 0) ")
+		    (wt-go (car labels))
+		    (wt-nl "else {" )
+		    (unless va-start (setq va-start t) (wt-nl "va_start(ap,first);"))
+		    (c2bind-loc (car opt) (if first (list 'first-var-arg) (list 'next-var-arg)))
+		    (setq first nil)
+		    (wt "}")
+		    (when (caddr opt) (c2bind-loc (caddr opt) t)))))
       (setq labels (nreverse labels))
       
       (let ((label (next-label)))
@@ -891,7 +917,7 @@
 	  (setq rest-var (cs-push))
 	  (cond ((ll-optionals ll))
 		(t (wt-nl "narg= narg - " (length (car ll)) ";")))
-	  (unless va-start (setq va-start t) (wt-nl "va_start(ap);"))
+	  (unless va-start (setq va-start t) (wt-nl "va_start(ap,first);"))
 	  (wt-nl "V" rest-var " = ")
 	  
 	  (let ((*rest-on-stack*
@@ -902,16 +928,16 @@
 		       (wt "(ALLOCA_CONS(narg),ON_STACK_MAKE_LIST(narg));"))
 		      (t (wt "make_list(narg);")))
 	      (cond (*rest-on-stack*
-		     (wt "(ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR(narg,ap));"
+		     (wt "(ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));"
 			 ))
-		    (t  (wt "list_vector(narg,ap);"))))
+		    (t  (wt "list_vector_new(narg,first,ap);"))))
 	    (c2bind-loc (ll-rest ll) (list 'cvar rest-var)))))
     (when (ll-keywords-p ll)
       (cond ((ll-rest ll))
 	    ((ll-optionals ll))
 	    (t (wt-nl "narg= narg - " (length (car ll)) ";")))
       
-      (unless va-start (setq va-start t) (wt-nl "va_start(ap);"))
+      (unless va-start (setq va-start t) (wt-nl "va_start(ap,first);"))
       (setq deflt (mapcar 'caddr (ll-keywords ll)))
       (let ((vkdefaults nil)
 	    (n (length (ll-keywords ll))))
@@ -982,11 +1008,11 @@
 	  (wt "};")
 	  )
 	(cond ((ll-rest ll)
-	       (wt-nl "parse_key_rest(" (list 'cvar rest-var) ","))
-	      (t (wt-nl "parse_key_new(")))
+	       (wt-nl "parse_key_rest_new(" (list 'cvar rest-var) ","))
+	      (t (wt-nl "parse_key_new_new(")))
 	(if (eql 0 *cs*)(setq *cs* 1))
 	(wt "narg," (if *vararg-use-vs* "base " "Vcs ")
-	    "+" key-offset",(struct key *)&LI" cfun "key,ap);")
+	    "+" key-offset",(struct key *)&LI" cfun "key,first,ap);")
 	
 	))
     

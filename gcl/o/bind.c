@@ -23,10 +23,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	bind.c
 */
 
-#define _GNU_SOURCE
 #include "include.h"
 #include <string.h>
-/*  #include "varargs.h" */
 
 struct nil3 { object nil3_self[3]; } three_nils;
 struct nil6 { object nil6_self[6]; } six_nils;
@@ -910,9 +908,111 @@ parse_key_new(int n, object *base, struct key *keys, va_list ap)
 }}}
 
 int
+parse_key_new_new(int n, object *base, struct key *keys, object first, va_list ap)
+{object *new;
+ COERCE_VA_LIST_NEW(new,first,ap,n);
+
+ /* from here down identical to parse_key_rest */
+ new = new + n ;
+  {int j=keys->n;
+   object *p= (object *)(keys->defaults);
+   while (--j >=0) base[j]=p[j];
+ }
+ {if (n==0){ return 0;}
+ {int allow = keys->allow_other_keys;
+  object k;
+
+  if (!allow) {
+    int i;
+    for (i=n;i>0 && new[-i]!=sKallow_other_keys;i-=2);
+    if (i>0 && new[-i+1]!=Cnil)
+      allow=1;
+  }
+
+ top:
+  while (n>=2)
+    {int i= keys->n;
+     iobject *ke=keys->keys ;
+     new = new -2;
+     k = *new;
+     while(--i >= 0)
+       {if ((*(ke++)).o == k)
+	  {base[i]= new[1];
+	   n=n-2;
+	   goto top;
+	 }}
+     /* the key is a new one */
+     if (allow || k==sKallow_other_keys) 
+       n=n-2;
+     else
+       goto error;
+   }
+  /* FIXME better message */
+  if (n!=0) FEunexpected_keyword(Cnil);
+  return 0;
+ error:
+  FEunexpected_keyword(k);
+  return -1;
+}}}
+
+int
 parse_key_rest(object rest, int n, object *base, struct key *keys, va_list ap)
 {object *new;
  COERCE_VA_LIST(new,ap,n);
+
+ /* copy the rest arg */
+ {object *p = new;
+  int m = n;
+  while (--m >= 0)
+    {rest->c.c_car = *p++;
+     rest = rest->c.c_cdr;}}
+    
+ new = new + n ;
+  {int j=keys->n;
+   object *p= (object *)(keys->defaults);
+   while (--j >=0) base[j]=p[j];
+ }
+ {if (n==0){ return 0;}
+ {int allow = keys->allow_other_keys;
+  object k;
+
+  if (!allow) {
+    int i;
+    for (i=n;i>0 && new[-i]!=sKallow_other_keys;i-=2);
+    if (i>0 && new[-i+1]!=Cnil)
+      allow=1;
+  }
+
+ top:
+  while (n>=2)
+    {int i= keys->n;
+     iobject *ke=keys->keys ;
+     new = new -2;
+     k = *new;
+     while(--i >= 0)
+       {if ((*(ke++)).o == k)
+	  {base[i]= new[1];
+	   n=n-2;
+	   goto top;
+	 }}
+     /* the key is a new one */
+     if (allow || k==sKallow_other_keys) 
+       n=n-2;
+     else
+       goto error;
+   }
+  /* FIXME better message */
+  if (n!=0) FEunexpected_keyword(Cnil);
+  return 0;
+ error:
+  FEunexpected_keyword(k);
+  return -1;
+}}}
+
+int
+parse_key_rest_new(object rest, int n, object *base, struct key *keys, object first,va_list ap)
+{object *new;
+ COERCE_VA_LIST_NEW(new,first,ap,n);
 
  /* copy the rest arg */
  {object *p = new;

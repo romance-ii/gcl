@@ -59,11 +59,11 @@ static char * VVi[60]={
 (char *)(LI11)
 };
 #define VV ((object *)VVi)
-static object  LnkTLI58() ;
-static object  (*LnkLI58)() = LnkTLI58;
-static object  LnkTLI57() ;
-static object  (*LnkLI57)() = LnkTLI57;
-static object  LnkTLI56() ;
-static object  (*LnkLI56)() = LnkTLI56;
-static object  LnkTLI53() ;
-static object  (*LnkLI53)() = LnkTLI53;
+static object  LnkTLI58(object,...);
+static object  (*LnkLI58)() = (object (*)()) LnkTLI58;
+static object  LnkTLI57(object,...);
+static object  (*LnkLI57)() = (object (*)()) LnkTLI57;
+static object  LnkTLI56(object,...);
+static object  (*LnkLI56)() = (object (*)()) LnkTLI56;
+static object  LnkTLI53(object,...);
+static object  (*LnkLI53)() = (object (*)()) LnkTLI53;

@@ -126,15 +126,11 @@ delete_link(void *address, object link_ar)
      clean_link_array(link_ar->v.v_self,ar_end); }
 
 
-DEFUN("USE-FAST-LINKS",object,fSuse_fast_links,SI,1,2,NONE,OO,OO,OO,OO,
-
+DEFUN_NEW("USE-FAST-LINKS",object,fSuse_fast_links,SI,1,2,NONE,OO,OO,OO,OO,(object flag,...),
       "Usage: (use-fast-links {nil,t} &optional fun) turns on or off \
 the fast linking depending on FLAG, so that things will either go \
 faster, or turns it off so that stack information is kept.  If SYMBOL \
 is supplied and FLAG is nil, then this function is deleted from the fast links")
-(flag,va_alist)
-     object flag;
-va_dcl
 {int n = VFUN_NARGS;
  object sym;
  va_list ap;
@@ -142,7 +138,7 @@ va_dcl
  object link_ar;
  object fun=Cnil;
 
-{ va_start(ap);
+{ va_start(ap,flag);
  if (n>=2) sym=va_arg(ap,object);else goto LDEFAULT2;
  goto LEND_VARARG;
  LDEFAULT2: sym = Cnil ;
@@ -228,8 +224,6 @@ clean_link_array(object *ar, object *ar_end)
     }
  return(i*sizeof(object *));
  }
-
-#include <varargs.h>
 
 /* This is a temporary workaround.  m68k cannot find the result 
    of a function returning long when invoked via a function pointer
@@ -681,7 +675,7 @@ call_proc(object sym, void **link, int argd, va_list ll)
 	{while(i < nargs)
 	    {enum ftype typ=SFUN_NEXT_TYPE(argd);
 	      vs_push((typ==f_object? va_arg(ll,object):
-		       make_fixnum(va_arg(ll,int))));
+		       make_fixnum(va_arg(ll,long))));
 	     i++;}}
     }
 
@@ -699,17 +693,142 @@ call_proc(object sym, void **link, int argd, va_list ll)
 object call_vproc(object sym, void *link, va_list ll)
 {return call_proc(sym,link,VFUN_NARGS | VFUN_NARG_BIT,ll);}
 
+/* For ANSI C stdarg */
+
+object
+call_proc_new(object sym, void **link, int argd, object first, va_list ll)
+{object fun;
+ int nargs;
+ check_type_symbol(&sym);
+ fun=sym->s.s_gfdef;
+ if (fun && (type_of(fun)==t_sfun
+	     || type_of(fun)==t_gfun
+	     || type_of(fun)== t_vfun)
+     && Rset) /* the && Rset is to allow tracing */
+   {object (*fn)();
+   fn = fun->sfn.sfn_self;
+   if (type_of(fun)==t_vfun)
+     { /* argd=VFUN_NARGS; */ /*remove this! */
+       nargs=SFUN_NARGS(argd);
+       if (nargs < fun->vfn.vfn_minargs || nargs > fun->vfn.vfn_maxargs
+	   || (argd & (SFUN_ARG_TYPE_MASK | SFUN_RETURN_MASK)))
+	 goto WRONG_ARGS;
+       if ((VFUN_NARG_BIT & argd) == 0)
+	 /* don't link */
+	 { 
+	   VFUN_NARGS = nargs;
+	   goto   AFTER_LINK;
+	 }
+     }
+   else /* t_gfun,t_sfun */
+     { nargs= SFUN_NARGS(argd);
+     if ((argd & (~VFUN_NARG_BIT)) != fun->sfn.sfn_argd) 
+       WRONG_ARGS:    
+     FEerror("Arg or result mismatch in call to  ~s",1,sym);
+     }
+   
+   (void) vpush_extend(link,sLAlink_arrayA->s.s_dbind);
+   (void) vpush_extend(*link,sLAlink_arrayA->s.s_dbind);	 
+   *link = (void *)fn;
+   AFTER_LINK:	
+   
+   if (nargs < 10) 
+     /* code below presumes sizeof(int) == sizeof(object)
+	Should probably not bother special casing the < 10 args
+     */
+     {object x0,x1,x2,x3,x4,x5,x6,x7,x8,x9;    
+     if (nargs-- > 0)
+       /* 	 x0=va_arg(ll,object); */
+       x0=first;
+     else
+       {return(LCAST(fn)());}
+     if (nargs-- > 0)
+       x1=va_arg(ll,object);
+     else
+       { return(LCAST(fn)(x0));}
+     if (nargs-- > 0)
+       x2=va_arg(ll,object);
+     else
+       {return(LCAST(fn)(x0,x1));}
+     if (nargs-- > 0)  x3=va_arg(ll,object);
+     else
+       return(LCAST(fn)(x0,x1,x2));
+     if (nargs-- > 0)  x4=va_arg(ll,object);
+     else
+       return(LCAST(fn)(x0,x1,x2,x3));
+     if (nargs-- > 0)  x5=va_arg(ll,object);
+     else
+       return(LCAST(fn)(x0,x1,x2,x3,x4));
+     if (nargs-- > 0)  x6=va_arg(ll,object);
+     else
+       return(LCAST(fn)(x0,x1,x2,x3,x4,x5));
+     if (nargs-- > 0)  x7=va_arg(ll,object);
+     else
+       return(LCAST(fn)(x0,x1,x2,x3,x4,x5,x6));
+     if (nargs-- > 0)  x8=va_arg(ll,object);
+     else
+       return(LCAST(fn)(x0,x1,x2,x3,x4,x5,x6,x7));
+     if (nargs-- > 0)  x9=va_arg(ll,object);
+     else
+       return(LCAST(fn)(x0,x1,x2,x3,x4,x5,x6,x7,x8));
+     return(LCAST(fn)(x0,x1,x2,x3,x4,x5,x6,x7,x8,x9));
+     
+     }
+   else {
+     object *new;
+     COERCE_VA_LIST_NEW(new,first,ll,nargs);
+     return(c_apply_n(fn,nargs,new));}
+   }
+ else				/* there is no cdefn property */
+   /* regular_call: */
+   { 
+     object fun;
+     register object *base;
+     enum ftype result_type;
+     /* we check they are valid functions before calling this */
+     if(type_of(sym)==t_symbol) fun = symbol_function(sym);
+     else fun = sym;
+     vs_base= (base =   vs_top);
+     if (fun == OBJNULL) FEinvalid_function(sym);
+     /* push the args */
+/*     if (type_of(fun)==t_vfun) argd=fcall.argd; */ /*remove this! */
+     nargs=SFUN_NARGS(argd);
+     result_type=SFUN_RETURN_TYPE(argd);
+     SFUN_START_ARG_TYPES(argd);
+     {int i=0;
+      if (argd==0)
+	{while(i < nargs)
+	    {vs_push(i ? va_arg(ll,object) : first);
+	     i++;}}
+      else
+	{while(i < nargs)
+	    {enum ftype typ=SFUN_NEXT_TYPE(argd);
+	      vs_push((typ==f_object? (i ? va_arg(ll,object) : first):
+		       make_fixnum(i ? va_arg(ll,long) : (long)first)));
+	     i++;}}
+    }
+
+     vs_check;
+     
+     funcall(fun);
+     vs_top=base;
+     /* vs_base=oldbase;
+	The caller won't expect us to restore these.  */
+     return((result_type==f_object? vs_base[0] : (object)fix(vs_base[0])));
+   }
+}
+
+
+object call_vproc_new(object sym, void *link, object first,va_list ll)
+{return call_proc_new(sym,link,VFUN_NARGS | VFUN_NARG_BIT,first,ll);}
+
 static object
-mcall_proc0(sym,link,argd,va_alist) 
-     object sym;
-     void *link;
-     int argd;
-     va_dcl
+mcall_proc0(object sym,void *link,int argd,...) 
 {
   object res;
   va_list ap;
 
-  va_start(ap);
+  va_start(ap,argd);
   res=call_proc(sym,link,argd,ap);
   va_end(ap);
 
@@ -723,22 +842,17 @@ call_proc0(object sym, void *link)
 
 #if 0
 object
-call_proc1(sym,link,va_alist)
-     object sym,x0;void *link;
-     va_dcl
-     
+call_proc1(object sym,void *link,...)
 {  va_list ll;
-   va_start(ll);
+   va_start(ll,link);
 return (call_proc(sym,link,1,ll));
     va_end(ll);
 }
 
 object
-call_proc2(sym,link,va_alist)
-     object sym,x0,x1;void *link;
-     va_dcl  
+call_proc2(object sym,object link,...)
 { va_list ll;
-   va_start(ll);
+   va_start(ll,link);
    return (call_proc(sym,link,2,ll));
     va_end(ll);
 }
@@ -748,10 +862,7 @@ call_proc2(sym,link,va_alist)
    
 
 object
-ifuncall(sym,n,va_alist)
-     object sym;
-     int n;
-     va_dcl
+ifuncall(object sym,int n,...)
 { va_list ap;
   int i;
   object *old_vs_base;
@@ -762,7 +873,7 @@ ifuncall(sym,n,va_alist)
   vs_base = old_vs_top;
   vs_top=old_vs_top+n;
   vs_check;
-  va_start(ap);
+  va_start(ap,n);
   for(i=0;i<n;i++)
     old_vs_top[i]= va_arg(ap,object);
   va_end(ap);
@@ -778,10 +889,7 @@ ifuncall(sym,n,va_alist)
 
 
 object
-imfuncall(sym,n,va_alist)
-     object sym;
-     int n;
-     va_dcl
+imfuncall(object sym,int n,...)
 { va_list ap;
   int i;
   object *old_vs_top;
@@ -789,7 +897,7 @@ imfuncall(sym,n,va_alist)
   vs_base = old_vs_top;
   vs_top=old_vs_top+n;
   vs_check;
-  va_start(ap);
+  va_start(ap,n);
   for(i=0;i<n;i++)
     old_vs_top[i]= va_arg(ap,object);
   va_end(ap);

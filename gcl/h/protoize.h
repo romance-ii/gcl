@@ -153,6 +153,8 @@ struct key {short n,allow_other_keys;
 
 /* bind.c:866:OF */ extern int parse_key_new (int n, object *base, struct key *keys, va_list ap); /* (n, base, keys, ap) int n; object *base; struct key *keys; va_list ap; */
 /* bind.c:916:OF */ extern int parse_key_rest (object rest, int n, object *base, struct key *keys, va_list ap); /* (rest, n, base, keys, ap) object rest; int n; object *base; struct key *keys; va_list ap; */
+/* bind.c:866:OF */ extern int parse_key_new_new (int n, object *base, struct key *keys, object first, va_list ap); /* (n, base, keys, ap) int n; object *base; struct key *keys; va_list ap; */
+/* bind.c:916:OF */ extern int parse_key_rest_new (object rest, int n, object *base, struct key *keys, object first, va_list ap); /* (rest, n, base, keys, ap) object rest; int n; object *base; struct key *keys; va_list ap; */
 /* bind.c:975:OF */ extern void set_key_struct (struct key *ks, object data); /* (ks, data) struct key *ks; object data; */
 /* bind.c:995:OF */ extern void init_bind (void); /* () */
 /* bitop.c:4:OF */ extern void get_mark_bit (void); /* () */
@@ -254,7 +256,7 @@ typedef int (*FUNC)();
 /* error.c:118:OF */ extern void call_error_handler (void); /* () */
 /* error.c:147:OF */ extern void Lerror (void); /* () */
 /* error.c:164:OF */ extern void Lcerror (void); /* () */
-/* error.c:184:OF */ extern void FEerror (/*  char *s, int num, ... */); /* (s, num, arg1, arg2, arg3, arg4) char *s; int num; object arg1; object arg2; object arg3; object arg4; */
+/* error.c:184:OF */ extern void FEerror (char *s, int num, ... ); /* (s, num, arg1, arg2, arg3, arg4) char *s; int num; object arg1; object arg2; object arg3; object arg4; */
 /* error.c:203:OF */ extern void FEwrong_type_argument (object type, object value); /* (type, value) object type; object value; */
 /* error.c:210:OF */ extern void FEtoo_few_arguments (object *base, object *top); /* (base, top) object *base; object *top; */
 /* error.c:219:OF */ extern void FEtoo_few_argumentsF (object args); /* (args) object args; */
@@ -358,9 +360,9 @@ typedef int (*FUNC)();
 /* eval.c:1328:OF */ extern object ifuncall2 (object fun, object arg1, object arg2); /* (fun, arg1, arg2) object fun; object arg1; object arg2; */
 /* eval.c:1348:OF */ extern object ifuncall3 (object fun, object arg1, object arg2, object arg3); /* (fun, arg1, arg2, arg3) object fun; object arg1; object arg2; object arg3; */
 /* eval.c:1368:OF */ extern void funcall_with_catcher (object fname, object fun); /* (fname, fun) object fname; object fun; */
-/* eval.c:1384:OF */ extern object fcalln_cclosure (va_list ap); /* (ap) va_list ap; */
-/* eval.c:1431:OF */ extern object fcalln_general (va_list ap); /* (ap) va_list ap; */
-/* eval.c:1464:OF */ extern object fcalln_vfun (va_list vl); /* (vl) va_list vl; */
+/* eval.c:1384:OF */ extern object fcalln_cclosure (object,va_list ap); /* (ap) va_list ap; */
+/* eval.c:1431:OF */ extern object fcalln_general (object,va_list ap); /* (ap) va_list ap; */
+/* eval.c:1464:OF */ extern object fcalln_vfun (object,va_list vl); /* (vl) va_list vl; */
 typedef void (*funcvoid)(void);
 /* eval.c:1545:OF */ extern void init_eval (void); /* () */
 /* fasdump.c:436:OF */ extern enum circ_ind do_hash (object obj, int dot); /* (obj, dot) object obj; int dot; */
@@ -1027,6 +1029,7 @@ extern void unexec (
 /* utils.c:30:OF */ extern object IisArray (object f); /* (f) object f; */
 /* utils.c:44:OF */ extern object Iis_fixnum (object f); /* (f) object f; */
 /* utils.c:61:OF */ extern object Iapply_ap (object (*f) (/* ??? */), va_list ap); /* (f, ap) object (*f)(); va_list ap; */
+/* utils.c:61:OF */ extern object Iapply_ap_new (object (*f) (/* ??? */), object first, va_list ap); /* (f, ap) object (*f)(); va_list ap; */
 /* utils.c:164:OF */ extern object ImakeStructure (int n, object *p); /* (n, p) int n; object *p; */
 /* utils.c:178:OF */ extern object Icheck_one_type (object x, enum type t); /* (x, t) object x; enum type t; */
 /* utils.c:189:OF */ extern object fSincorrect_type (object val, object type); /* (val, type) object val; object type; */
@@ -1791,6 +1794,13 @@ FEpackage_error(object,const char *s);
 
 int
 system_time_zone_helper(void);
+
+object
+call_proc_new(object,void **,int,object,va_list);
+
+object 
+call_vproc_new(object,void *,object,va_list);
+
 
 #if defined (__MINGW32__)
 int bcmp ( const void *s1, const void *s2, size_t n );

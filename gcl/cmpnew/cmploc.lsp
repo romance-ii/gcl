@@ -96,6 +96,10 @@
 (si:putprop 'short-float-value 'wt-short-float-value 'wt-loc)
 (si:putprop 'short-float-loc 'wt-short-float-loc 'wt-loc)
 (si::putprop 'next-var-arg  'wt-next-var-arg 'wt-loc)
+(si::putprop 'first-var-arg  'wt-first-var-arg 'wt-loc)
+
+(defun wt-first-var-arg ()
+  (wt "first"))
 
 (defun wt-next-var-arg ()
   (wt "va_arg(ap,object)"))

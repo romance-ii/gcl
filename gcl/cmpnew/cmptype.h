@@ -59,21 +59,21 @@ static char * VVi[72]={
 (char *)(LI8)
 };
 #define VV ((object *)VVi)
-static object  LnkTLI70() ;
+static object  LnkTLI70();
 static object  (*LnkLI70)() = LnkTLI70;
-static object  LnkTLI69() ;
-static object  (*LnkLI69)() = LnkTLI69;
-static void LnkT68() ;
+static object  LnkTLI69(object,...);
+static object  (*LnkLI69)() = (object (*)()) LnkTLI69;
+static void LnkT68();
 static void (*Lnk68)() = LnkT68;
-static object  LnkTLI67() ;
-static object  (*LnkLI67)() = LnkTLI67;
-static object  LnkTLI36() ;
-static object  (*LnkLI36)() = LnkTLI36;
-static void LnkT60() ;
+static object  LnkTLI67(object,...);
+static object  (*LnkLI67)() = (object (*)()) LnkTLI67;
+static object  LnkTLI36(object,...);
+static object  (*LnkLI36)() = (object (*)()) LnkTLI36;
+static void LnkT60();
 static void (*Lnk60)() = LnkT60;
-static object  LnkTLI59() ;
-static object  (*LnkLI59)() = LnkTLI59;
-static object  LnkTLI58() ;
-static object  (*LnkLI58)() = LnkTLI58;
-static object  LnkTLI56() ;
-static object  (*LnkLI56)() = LnkTLI56;
+static object  LnkTLI59(object,...);
+static object  (*LnkLI59)() = (object (*)()) LnkTLI59;
+static object  LnkTLI58(object,...);
+static object  (*LnkLI58)() = (object (*)()) LnkTLI58;
+static object  LnkTLI56(object,...);
+static object  (*LnkLI56)() = (object (*)()) LnkTLI56;

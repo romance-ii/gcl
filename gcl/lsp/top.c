@@ -673,9 +673,7 @@ T210:;
 }
 /*	local entry for function WARN	*/
 
-static object LI5(V30,va_alist)
-	object V30;
-	va_dcl 
+static object LI5(object V30,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB5 VMS5 VMV5
@@ -683,10 +681,10 @@ static object LI5(V30,va_alist)
 	{object V31;
 	object V32;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	V31= V30;
 	narg= narg - 1;
-	V33 = list_vector(narg,ap);
+	V33 = list_vector_new(narg,first,ap);
 	V32= V33;
 	bds_bind(VV[56],small_fixnum(4));
 	bds_bind(VV[57],small_fixnum(4));
@@ -737,9 +735,7 @@ T309:;
 	}
 /*	local entry for function UNIVERSAL-ERROR-HANDLER	*/
 
-static object LI6(V42,V41,V40,V39,V38,va_alist)
-	object V42,V41,V40,V39,V38;
-	va_dcl 
+static object LI6(object V42,object V41,object V40,object V39,object V38,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB6 VMS6 VMV6
@@ -751,14 +747,14 @@ static object LI6(V42,V41,V40,V39,V38,va_alist)
 	register object V47;
 	register object V48;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	V43= V42;
 	V44= V41;
 	V45= V40;
 	V46= V39;
 	V47= V38;
 	narg= narg - 5;
-	V49 = list_vector(narg,ap);
+	V49 = list_vector_new(narg,first,ap);
 	V48= V49;
 	{object V50;
 	V50= Cnil;
@@ -929,8 +925,7 @@ T388:;
 	}
 /*	local entry for function BREAK	*/
 
-static object LI7(va_alist)
-	va_dcl 
+static object LI7(object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB7 VMS7 VMV7
@@ -938,18 +933,18 @@ static object LI7(va_alist)
 	{object V56;
 	object V57;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	narg = narg - 0;
 	if (narg <= 0) goto T391;
 	else {
-	V56= va_arg(ap,object);}
+	V56= first;}
 	--narg; goto T392;
 goto T391;
 T391:;
 	V56= Cnil;
 goto T392;
 T392:;
-	V58 = list_vector(narg,ap);
+	V58 = list_vector_new(narg,first,ap);
 	V57= V58;
 	{object V59;
 	V59= Cnil;
@@ -3583,30 +3578,30 @@ static void LnkT207(){ call_or_link(VV[207],(void **)&Lnk207);} /* FIX-LOAD-PATH
 static void LnkT206(){ call_or_link(VV[206],(void **)&Lnk206);} /* COERCE-SLASH-TERMINATED */
 static void LnkT205(){ call_or_link(VV[205],(void **)&Lnk205);} /* PACKAGE-SIZE */
 static void LnkT204(){ call_or_link(VV[204],(void **)&Lnk204);} /* BREAK-GO */
-static object  LnkTLI202(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[202],(void **)&LnkLI202,ap);va_end(ap);return V1;} /* SEARCH */
+static object  LnkTLI202(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[202],(void **)&LnkLI202,first,ap);va_end(ap);return V1;} /* SEARCH */
 static void LnkT201(){ call_or_link(VV[201],(void **)&Lnk201);} /* INTERNAL-SUPER-GO */
-static object  LnkTLI200(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[200],(void **)&LnkLI200,2,ap);va_end(ap);return V1;} /* LIST-DELQ */
+static object  LnkTLI200(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[200],(void **)&LnkLI200,2,first,ap);va_end(ap);return V1;} /* LIST-DELQ */
 static void LnkT199(){ call_or_link(VV[199],(void **)&Lnk199);} /* IHS-NOT-INTERPRETED-ENV */
 static void LnkT198(){ call_or_link(VV[198],(void **)&Lnk198);} /* COMPILED-FUNCTION-NAME */
-static object  LnkTLI196(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[196],(void **)&LnkLI196,ap);va_end(ap);return V1;} /* REMOVE */
+static object  LnkTLI196(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[196],(void **)&LnkLI196,first,ap);va_end(ap);return V1;} /* REMOVE */
 static void LnkT193(){ call_or_link(VV[193],(void **)&Lnk193);} /* SPICEP */
 static void LnkT192(){ call_or_link(VV[192],(void **)&Lnk192);} /* FRS-TAG */
 static void LnkT190(){ call_or_link(VV[190],(void **)&Lnk190);} /* FRS-CLASS */
 static void LnkT189(){ call_or_link(VV[189],(void **)&Lnk189);} /* FRS-VS */
-static object  LnkTLI188(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[188],(void **)&LnkLI188,1,ap);va_end(ap);return V1;} /* FRS-KIND */
+static object  LnkTLI188(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[188],(void **)&LnkLI188,1,first,ap);va_end(ap);return V1;} /* FRS-KIND */
 static void LnkT184(){ call_or_link(VV[184],(void **)&Lnk184);} /* IHS-FUN */
 static void LnkT183(){ call_or_link(VV[183],(void **)&Lnk183);} /* FRS-IHS */
 static void LnkT182(){ call_or_link(VV[182],(void **)&Lnk182);} /* BDS-VAL */
-static object  LnkTLI181(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[181],(void **)&LnkLI181,1,ap);va_end(ap);return V1;} /* PRINT-FRS */
+static object  LnkTLI181(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[181],(void **)&LnkLI181,1,first,ap);va_end(ap);return V1;} /* PRINT-FRS */
 static void LnkT180(){ call_or_link(VV[180],(void **)&Lnk180);} /* BDS-VAR */
 static void LnkT179(){ call_or_link(VV[179],(void **)&Lnk179);} /* FRS-BDS */
 static void LnkT178(){ call_or_link(VV[178],(void **)&Lnk178);} /* BREAK-VS */
 static void LnkT177(){ call_or_link(VV[177],(void **)&Lnk177);} /* VS */
-static object  LnkTLI176(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[176],(void **)&LnkLI176,1,ap);va_end(ap);return V1;} /* PRINT-IHS */
+static object  LnkTLI176(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[176],(void **)&LnkLI176,1,first,ap);va_end(ap);return V1;} /* PRINT-IHS */
 static void LnkT175(){ call_or_link(VV[175],(void **)&Lnk175);} /* IHS-VS */
 static void LnkT174(){ call_or_link(VV[174],(void **)&Lnk174);} /* BREAK-PREVIOUS */
 static void LnkT173(){ call_or_link(VV[173],(void **)&Lnk173);} /* IHS-FNAME */
-static object  LnkTLI172(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[172],(void **)&LnkLI172,1,ap);va_end(ap);return V1;} /* IHS-VISIBLE */
+static object  LnkTLI172(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[172],(void **)&LnkLI172,1,first,ap);va_end(ap);return V1;} /* IHS-VISIBLE */
 static object  LnkTLI171(){return call_proc0(VV[171],(void **)&LnkLI171);} /* SET-ENV */
 static void LnkT170(){ call_or_link(VV[170],(void **)&Lnk170);} /* COMPLETE-PROP */
 static void LnkT169(){ call_or_link(VV[169],(void **)&Lnk169);} /* BREAK-LEVEL */

@@ -56,12 +56,8 @@ extern short aet_sizes[];
 
 #define N_FIXNUM_ARGS 6
 
-DEFUNO("AREF", object, fLaref, LISP, 1, ARRAY_RANK_LIMIT,
-       NONE, OO, II, II, II,Laref,"")
-(x, i, va_alist)
-  object x;
-  int i;
-  va_dcl
+DEFUNO_NEW("AREF", object, fLaref, LISP, 1, ARRAY_RANK_LIMIT,
+       NONE, OO, II, II, II,Laref,(object x, int i, ...),"")
 { int n = VFUN_NARGS;
   int i1;
   va_list ap;
@@ -73,7 +69,7 @@ DEFUNO("AREF", object, fLaref, LISP, 1, ARRAY_RANK_LIMIT,
        FEerror(" ~a has wrong rank",1,x);
      if (rank == 1) return fLrow_major_aref(x,i);
      if (rank == 0) return fLrow_major_aref(x,0);
-     va_start(ap);
+     va_start(ap,i);
      m = 0;
      k = i;
      /* index into 1 dimensional array */
@@ -119,12 +115,9 @@ fScheck_bounds_bounds(object x, int i)
   }
 }
 
-DEFUN("SVREF", object, fLsvref, LISP, 2, 2,
-      ONE_VAL, OO, IO, OO,OO,
+DEFUN_NEW("SVREF", object, fLsvref, LISP, 2, 2,
+      ONE_VAL, OO, IO, OO,OO,(object x, unsigned int i),
       "For array X and index I it returns (aref x i) ")
-     (x, i)
-     object x;
-     unsigned int i;
 {
  if (type_of(x)==t_vector
      && (enum aelttype)x->v.v_elttype == aet_object
@@ -135,13 +128,10 @@ DEFUN("SVREF", object, fLsvref, LISP, 2, 2,
  return(Cnil);
 }
     
-DEFUNO("ROW-MAJOR-AREF", object, fLrow_major_aref, LISP, 2, 2,
-       NONE, OO, IO, OO,OO,Lrow_major_aref,
+DEFUNO_NEW("ROW-MAJOR-AREF", object, fLrow_major_aref, LISP, 2, 2,
+       NONE, OO, IO, OO,OO,Lrow_major_aref,(object x, int i),
       "For array X and index I it returns (aref x i) as if x were \
 1 dimensional, even though its rank may be bigger than 1")
-(x, i)
-  object x;
-  int i;
 {
   switch (type_of(x)) {
   case t_array:
@@ -190,11 +180,7 @@ aset1(object x,int i,object val) {
   return fSaset1(x,make_fixnum(i),val);
 }
 
-DEFUN("ASET1", object, fSaset1, SI, 3, 3, NONE, OO, OO, OO,OO,"")
-(x, ii,val)
-  object x;
-  object ii;
-  object val;
+DEFUN_NEW("ASET1", object, fSaset1, SI, 3, 3, NONE, OO, OO, OO,OO,(object x, object ii,object val),"")
 {
   int i;
   i=fix(ii);
@@ -266,12 +252,8 @@ DEFUN("ASET1", object, fSaset1, SI, 3, 3, NONE, OO, OO, OO,OO,"")
   return val;
 }
 
-DEFUNO("ASET", object, fSaset, SI, 1, ARG_LIMIT, NONE, OO,
-       OO, OO, OO,siLaset,"")
- (x,ii,y, va_alist)
-  object x,y;
-  object ii;
-  va_dcl
+DEFUNO_NEW("ASET", object, fSaset, SI, 1, ARG_LIMIT, NONE, OO,
+       OO, OO, OO,siLaset,(object x,object ii,object y, ...),"")
 { int i1;
   int n = VFUN_NARGS;
   int i;
@@ -287,7 +269,7 @@ DEFUNO("ASET", object, fSaset, SI, 1, ARG_LIMIT, NONE, OO,
      i = fix(ii);
      if (rank == 1)
        return fSaset1(x,ii,y);
-     va_start(ap);
+     va_start(ap,y);
      m = 0;
      k = i;
      /* index into 1 dimensional array body */
@@ -326,11 +308,8 @@ DEFUNO("ASET", object, fSaset, SI, 1, ARG_LIMIT, NONE, OO,
    
 }
 
-DEFUNO("SVSET", object, fSsvset, SI, 3, 3, NONE, OO, IO, OO,
-       OO,siLsvset,"")
-     (x,i,val)
-     object x,val;
-     int i;
+DEFUNO_NEW("SVSET", object, fSsvset, SI, 3, 3, NONE, OO, IO, OO,
+       OO,siLsvset,(object x,int i,object val),"")
 { if (TYPE_OF(x) != t_vector
       || DISPLACED_TO(x) != Cnil)
     Wrong_type_error("simple array",0);
@@ -348,10 +327,9 @@ DEFUNO("SVSET", object, fSsvset, SI, 3, 3, NONE, OO, IO, OO,
 */ 
 
 
-DEFUN("MAKE-VECTOR1",object,fSmake_vector1,SI,3,8,NONE,OI,
-      IO,OO,OO,"")
-  (n,elt_type,staticp,va_alist)
-int n;int elt_type;object staticp;va_dcl 
+DEFUNO_NEW("MAKE-VECTOR1",object,fSmake_vector1,SI,3,8,NONE,OI,
+      IO,OO,OO,LSmake_vector1,(int n,int elt_type,object staticp,...),"")
+  
 { 
     int displaced_index_offset=0;
     int Inargs = VFUN_NARGS - 3;
@@ -381,7 +359,7 @@ int n;int elt_type;object staticp;va_dcl
 	  
       if( --Inargs < 0)goto LA1;
       else {
-	va_start(Iap);
+	va_start(Iap,staticp);
 	fillp=va_arg(Iap,object);
 	if (fillp == Cnil)
 	  {x->v.v_hasfillp = 0;
@@ -463,9 +441,7 @@ static struct { char * dflt; object *namep;} aet_types[] =
     {(char *)	&DFLT_aet_short, &sLunsigned_short},    /*  unsigned short   */
 	};
 
-DEFUN("GET-AELTTYPE",object,fSget_aelttype,SI,1,1,NONE,OO,OO,OO,OO,"")
-     (x)
-object x;
+DEFUN_NEW("GET-AELTTYPE",object,fSget_aelttype,SI,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { int i;
   for (i=0 ; i <   aet_last ; i++)
     if (x == * aet_types[i].namep)
@@ -484,15 +460,13 @@ object x;
 	displaced-index-offset 5
 	static 6 &optional initial-element)
 */
-DEFUNO("MAKE-VECTOR",object,fSmake_vector,SI,7,8,NONE,
-       OO,OO,OO,OO,siLmake_vector,"")(x0,x1,x2,x3,x4,x5,x6,va_alist)
-object x0,x1,x2,x3,x4,x5,x6;
-va_dcl
+DEFUNO_NEW("MAKE-VECTOR",object,fSmake_vector,SI,7,8,NONE,
+       OO,OO,OO,OO,siLmake_vector,(object x0,object x1,object x2,object x3,object x4,object x5,object x6,...),"")
 {int narg=VFUN_NARGS;
  object initial_elt;
  va_list ap;
  object x;
- {va_start(ap);
+ {va_start(ap,x6);
  if (narg>=8) initial_elt=va_arg(ap,object);else goto LDEFAULT8;
  goto LEND_VARARG;
  LDEFAULT8: initial_elt = Cnil ;
@@ -519,14 +493,10 @@ va_dcl
   (declare (fixnum n elt-type displaced-index-offset))
 */
 
-DEFUN("MAKE-ARRAY1",object,fSmake_array1,SI,6,6,
-      NONE,OI,OO,OI,OO,"")
-  (elt_type,staticp,initial_element,displaced_to, displaced_index_offset,
-   dimensions)
- int elt_type;
- object staticp,initial_element,displaced_to;
- int displaced_index_offset;
- object dimensions;
+DEFUN_NEW("MAKE-ARRAY1",object,fSmake_array1,SI,6,6,
+      NONE,OI,OO,OI,OO,
+      (int elt_type,object staticp,object initial_element,object displaced_to, int displaced_index_offset,
+       object dimensions),"")
 {   
   int rank = length(dimensions);
   { object x,v;
@@ -562,7 +532,7 @@ DEFUN("MAKE-ARRAY1",object,fSmake_array1,SI,6,6,
 (defun array-displacement1 ( array )
 */
 
-/*  DEFUNO("ARRAY-DISPLACEMENT1",object,fSarray_displacement,SI,1,1, */
+/*  DEFUNO_NEW("ARRAY-DISPLACEMENT1",object,fSarray_displacement,SI,1,1, */
 /*        NONE,OO,OO,OO,OO,siLarray_displacement,"") */
 /*       (object array) { */
 
@@ -819,14 +789,12 @@ gset(void *p1, void *val, int n, int typ)
   /*
    */
 
-DEFUN("COPY-ARRAY-PORTION",object,fScopy_array_portion,SI,4,
-      5,NONE,OO,OI,IO,OO,
+DEFUN_NEW("COPY-ARRAY-PORTION",object,fScopy_array_portion,SI,4,
+      5,NONE,OO,OI,IO,OO,(object x,object y,int i1,int i2,object n1o),
    "Copy elements from X to Y starting at x[i1] to x[i2] and doing N1 \
 elements if N1 is supplied otherwise, doing the length of X - I1 \
 elements.  If the types of the arrays are not the same, this has \
 implementation dependent results.")
-     (x,y,i1,i2,n1o)
-     object x,y; int i1,i2; object n1o;
 { enum aelttype typ1=Iarray_element_type(x);
   enum aelttype typ2=Iarray_element_type(y);
   int n1=fix(n1o),nc;
@@ -916,11 +884,8 @@ array_allocself(object x, int staticp, object dflt)
 	
 }
 
-DEFUNO("FILL-POINTER-SET",object,fSfill_pointer_set,SI,2,2,
-       NONE,OO,IO,OO,OO,siLfill_pointer_set,"")
-     (x,i)
-     object x;
-     int i;
+DEFUNO_NEW("FILL-POINTER-SET",object,fSfill_pointer_set,SI,2,2,
+       NONE,OO,IO,OO,OO,siLfill_pointer_set,(object x,int i),"")
 {
 
     if (!(TS_MEMBER(type_of(x),TS(t_vector)|
@@ -940,10 +905,8 @@ DEFUNO("FILL-POINTER-SET",object,fSfill_pointer_set,SI,2,2,
   return make_fixnum(0);
 }
 
-DEFUNO("FILL-POINTER",object,fLfill_pointer,LISP,1,1,NONE,OO,
-       OO,OO,OO,Lfill_pointer,"")
-     (x)
-     object x;
+DEFUNO_NEW("FILL-POINTER",object,fLfill_pointer,LISP,1,1,NONE,OO,
+       OO,OO,OO,Lfill_pointer,(object x),"")
 {
   if (!(TS_MEMBER(type_of(x),TS(t_vector)|
 		    TS(t_bitvector)|
@@ -958,10 +921,8 @@ DEFUNO("FILL-POINTER",object,fLfill_pointer,LISP,1,1,NONE,OO,
   return make_fixnum(0);
 } 
 
-DEFUN("ARRAY-HAS-FILL-POINTER-P",object,
-      fLarray_has_fill_pointer_p,LISP,1,1,NONE,OO,OO,OO,OO,"")
-     (x)
-     object x;
+DEFUN_NEW("ARRAY-HAS-FILL-POINTER-P",object,
+      fLarray_has_fill_pointer_p,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 {
   if (TS_MEMBER(type_of(x),TS(t_vector)|
 		    TS(t_bitvector)|
@@ -976,50 +937,40 @@ DEFUN("ARRAY-HAS-FILL-POINTER-P",object,
 
 
 	
-/* DEFUN("MAKE-ARRAY-INTERNAL",object,fSmake_array_internal,SI,0,0,NONE,OO,OO,OO,OO)
+/* DEFUN_NEW("MAKE-ARRAY-INTERNAL",object,fSmake_array_internal,SI,0,0,NONE,OO,OO,OO,OO)
  (element_type,adjustable,displaced_to,displaced_index_offset,static,initial_element,dimensions)
   object element_type,adjustable,displaced_to,displaced_index_offset,static,initial_element,dimensions;
      
 */
 
-DEFUNO("ARRAY-ELEMENT-TYPE",object,fLarray_element_type,
-       LISP,1,1,NONE,OO,OO,OO,OO,Larray_element_type,"")
-     (x)
-     object x;
+DEFUNO_NEW("ARRAY-ELEMENT-TYPE",object,fLarray_element_type,
+       LISP,1,1,NONE,OO,OO,OO,OO,Larray_element_type,(object x),"")
 { enum aelttype t;
   t = Iarray_element_type(x);
   return * aet_types[(int)t].namep;
 }
 
-DEFUNO("ADJUSTABLE-ARRAY-P",object,fLadjustable_array_p,
-       LISP,1,1,NONE,OO,OO,OO,OO,Ladjustable_array_p,"")
-     (x)
-     object x;
+DEFUNO_NEW("ADJUSTABLE-ARRAY-P",object,fLadjustable_array_p,
+       LISP,1,1,NONE,OO,OO,OO,OO,Ladjustable_array_p,(object x),"")
 { return sLt;
 }
 
-DEFUNO("DISPLACED-ARRAY-P",object,fSdisplaced_array_p,SI,1,
-       1,NONE,OO,OO,OO,OO,siLdisplaced_array_p,"")
-     (x)
-     object x;
+DEFUNO_NEW("DISPLACED-ARRAY-P",object,fSdisplaced_array_p,SI,1,
+       1,NONE,OO,OO,OO,OO,siLdisplaced_array_p,(object x),"")
 { IisArray(x);
   return (x->a.a_displaced == Cnil ? Cnil : sLt);
 }
 
-DEFUNO("ARRAY-RANK",object,fLarray_rank,LISP,1,1,NONE,OO,OO,OO,
-       OO,Larray_rank,"")
-     (x)
-     object x;
+DEFUNO_NEW("ARRAY-RANK",object,fLarray_rank,LISP,1,1,NONE,OO,OO,OO,
+       OO,Larray_rank,(object x),"")
 { if (type_of(x) == t_array)
     return make_fixnum(x->a.a_rank);
   IisArray(x);
   return make_fixnum(1);
 }
 
-DEFUNO("ARRAY-DIMENSION",object,fLarray_dimension,LISP,2,2,
-       NONE,OO,IO,OO,OO,Larray_dimension,"")
-     (x,i)
-     object x; int i;
+DEFUNO_NEW("ARRAY-DIMENSION",object,fLarray_dimension,LISP,2,2,
+       NONE,OO,IO,OO,OO,Larray_dimension,(object x,int i),"")
 { 
   if (type_of(x) == t_array)
    {  if ((unsigned int)i >= x->a.a_rank)
@@ -1085,10 +1036,8 @@ Iundisplace(object ar)
  }
 }
 
-DEFUNO("REPLACE-ARRAY",object,fSreplace_array,SI,2,2,NONE,
-       OO,OO,OO,OO,siLreplace_array,"")
- (old,new)
-     object old,new;
+DEFUNO_NEW("REPLACE-ARRAY",object,fSreplace_array,SI,2,2,NONE,
+       OO,OO,OO,OO,siLreplace_array,(object old,object new),"")
 { struct dummy fw ;
   fw = old->d;
 
@@ -1123,18 +1072,15 @@ DEFUNO("REPLACE-ARRAY",object,fSreplace_array,SI,2,2,NONE,
   return old;
 }
 
-DEFUNO("ARRAY-TOTAL-SIZE",object,fLarray_total_size,LISP,1,1,
-       NONE,OO,OO,OO,OO,Larray_total_size,"")
-     (x)
-     object x;
+DEFUNO_NEW("ARRAY-TOTAL-SIZE",object,fLarray_total_size,LISP,1,1,
+       NONE,OO,OO,OO,OO,Larray_total_size,(object x),"")
 { x = IisArray(x);
   return make_fixnum(x->a.a_dim);
 }
 
 
-DEFUNO("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
-       NONE,OO,OO,OO,OO,siLaset_by_cursor,"")(array,val,cursor)
-object array,val,cursor;
+DEFUNO_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
+       NONE,OO,OO,OO,OO,siLaset_by_cursor,(object array,object val,object cursor),"")
 {
 	object x;
 	int i;
@@ -1148,7 +1094,7 @@ object array,val,cursor;
 	  { ind[i++] = MMcar(x);}
 	ind[i]=val;
 	VFUN_NARGS=i+1;
-	c_apply_n(fSaset,i+1,ind);
+	c_apply_n((object (*)())fSaset,i+1,ind);
 	RETURN1(array);
 }
 

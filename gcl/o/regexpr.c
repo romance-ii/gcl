@@ -40,10 +40,10 @@ DEFVAR("*MATCH-DATA*",sSAmatch_dataA,SI,sLnil,"");
 DEFVAR("*CASE-FOLD-SEARCH*",sSAcase_fold_searchA,SI,sLnil,
        "Non nil means that a string-match should ignore case");
 
-DEFUN("MATCH-BEGINNING",object,fSmatch_beginning,SI,1,1,NONE,OI,OO,OO,OO,
+DEFUN_NEW("MATCH-BEGINNING",object,fSmatch_beginning,SI,1,1,NONE,OI,OO,OO,OO,(int i),
    "Returns the beginning of the I'th match from the previous STRING-MATCH, \
 where the 0th is for the whole regexp and the subsequent ones match parenthetical expressions.  -1 is returned if there is no match, or if the *match-data* \
-vector is not a fixnum array.")(i)
+vector is not a fixnum array.")
 { object v = sSAmatch_dataA->s.s_dbind;
   if (type_of(v)==t_vector
       && (v->v.v_elttype == aet_fix))
@@ -51,8 +51,8 @@ vector is not a fixnum array.")(i)
   RETURN1(make_fixnum(-1));
 }
 
-DEFUN("MATCH-END",object,fSmatch_end,SI,1,1,NONE,OI,OO,OO,OO,
-   "Returns the end of the I'th match from the previous STRING-MATCH")(i) 
+DEFUN_NEW("MATCH-END",object,fSmatch_end,SI,1,1,NONE,OI,OO,OO,OO,(int i),
+   "Returns the end of the I'th match from the previous STRING-MATCH")
 { object v = sSAmatch_dataA->s.s_dbind;
   if (type_of(v)==t_vector
       && (v->v.v_elttype == aet_fix))
@@ -61,7 +61,7 @@ DEFUN("MATCH-END",object,fSmatch_end,SI,1,1,NONE,OI,OO,OO,OO,
 }
 
 
-DEFUN("STRING-MATCH",object,fSstring_match,SI,2,4,NONE,OO,OI,IO,OO,
+DEFUN_NEW("STRING-MATCH",object,fSstring_match,SI,2,4,NONE,OO,OI,IO,OO,(object pattern,object string,...),
       "Match regexp PATTERN in STRING starting in string starting at START \
 and ending at END.  Return -1 if match not found, otherwise \
 return the start index  of the first matchs.  The variable \
@@ -70,9 +70,6 @@ the matches, to be obtained with match-beginning and match-end. \
 If it already contains such an array, then the contents of it will \
 be over written.   \
 ")
-     (pattern,string,va_alist)
-     object pattern,string;
-va_dcl
 {  int nargs=VFUN_NARGS;
    static char buf[400];
    static char case_fold;
@@ -83,7 +80,7 @@ va_dcl
    va_list ap;
    object v = sSAmatch_dataA->s.s_dbind;
 
-   { va_start(ap);
+   { va_start(ap,string);
      if (nargs>=3) start=va_arg(ap,int);else goto LDEFAULT3;
      if (nargs>=4) end=va_arg(ap,int);else goto LDEFAULT4;
      goto LEND_VARARG;

@@ -78,19 +78,19 @@ static char * VVi[62]={
 (char *)(L12)
 };
 #define VV ((object *)VVi)
-static void LnkT60() ;
+static void LnkT60();
 static void (*Lnk60)() = LnkT60;
-static object  LnkTLI59() ;
-static object  (*LnkLI59)() = LnkTLI59;
-static object  LnkTLI58() ;
-static object  (*LnkLI58)() = LnkTLI58;
-static object  LnkTLI57() ;
-static object  (*LnkLI57)() = LnkTLI57;
-static object  LnkTLI56() ;
-static object  (*LnkLI56)() = LnkTLI56;
-static object  LnkTLI55() ;
-static object  (*LnkLI55)() = LnkTLI55;
-static void LnkT54() ;
+static object  LnkTLI59(object,...);
+static object  (*LnkLI59)() = (object (*)()) LnkTLI59;
+static object  LnkTLI58(object,...);
+static object  (*LnkLI58)() = (object (*)()) LnkTLI58;
+static object  LnkTLI57(object,...);
+static object  (*LnkLI57)() = (object (*)()) LnkTLI57;
+static object  LnkTLI56(object,...);
+static object  (*LnkLI56)() = (object (*)()) LnkTLI56;
+static object  LnkTLI55(object,...);
+static object  (*LnkLI55)() = (object (*)()) LnkTLI55;
+static void LnkT54();
 static void (*Lnk54)() = LnkT54;
-static void LnkT53() ;
+static void LnkT53();
 static void (*Lnk53)() = LnkT53;

@@ -113,9 +113,7 @@ T35:;}
 }
 /*	local entry for function MAKE-ARRAY	*/
 
-static object LI2(V16,va_alist)
-	object V16;
-	va_dcl 
+static object LI2(object V16,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB2 VMS2 VMV2
@@ -130,12 +128,12 @@ static object LI2(V16,va_alist)
 	object V25;
 	object V26;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V17= V16;
 	narg= narg - 1;
 	{
-	parse_key_new(narg,Vcs +1,(struct key *)&LI2key,ap);
+	parse_key_new_new(narg,Vcs +1,(struct key *)&LI2key,first,ap);
 	if(Vcs[1]==0){
 	V18= Ct;
 	}else{
@@ -314,16 +312,15 @@ T137:;
 }
 /*	local entry for function VECTOR	*/
 
-static object LI5(va_alist)
-	va_dcl 
+static object LI5(object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB5 VMS5 VMV5
 	{object V51;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	narg= narg - 0;
-	V52 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR(narg,ap));
+	V52 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));
 	V51= V52;
 	{object V53;
 	V54 = make_fixnum((long)length((V51)));
@@ -372,20 +369,18 @@ T147:;
 }
 /*	local entry for function ARRAY-IN-BOUNDS-P	*/
 
-static object LI7(V62,va_alist)
-	object V62;
-	va_dcl 
+static object LI7(object V62,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB7 VMS7 VMV7
 	{register object V63;
 	object V64;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V63= V62;
 	narg= narg - 1;
-	V65 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR(narg,ap));
+	V65 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));
 	V64= V65;
 	{register object V66;
 	base[1]= (V63);
@@ -442,20 +437,18 @@ T174:;
 	}
 /*	local entry for function ARRAY-ROW-MAJOR-INDEX	*/
 
-static object LI8(V74,va_alist)
-	object V74;
-	va_dcl 
+static object LI8(object V74,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB8 VMS8 VMV8
 	{register object V75;
 	object V76;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V75= V74;
 	narg= narg - 1;
-	V77 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR(narg,ap));
+	V77 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));
 	V76= V77;
 	{register object V78;
 	register object V79;
@@ -490,20 +483,18 @@ T188:;
 	}
 /*	local entry for function BIT	*/
 
-static object LI9(V85,va_alist)
-	object V85;
-	va_dcl 
+static object LI9(object V85,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB9 VMS9 VMV9
 	{object V86;
 	object V87;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V86= V85;
 	narg= narg - 1;
-	V88 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR(narg,ap));
+	V88 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));
 	V87= V88;
 	base[0]= (V86);
 	{object V89;
@@ -522,20 +513,18 @@ static object LI9(V85,va_alist)
 	}
 /*	local entry for function SBIT	*/
 
-static object LI10(V91,va_alist)
-	object V91;
-	va_dcl 
+static object LI10(object V91,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB10 VMS10 VMV10
 	{object V92;
 	object V93;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V92= V91;
 	narg= narg - 1;
-	V94 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR(narg,ap));
+	V94 = (ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));
 	V93= V94;
 	base[0]= (V92);
 	{object V95;
@@ -554,9 +543,7 @@ static object LI10(V91,va_alist)
 	}
 /*	local entry for function BIT-AND	*/
 
-static object LI11(V98,V97,va_alist)
-	object V98,V97;
-	va_dcl 
+static object LI11(object V98,object V97,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB11 VMS11 VMV11
@@ -564,14 +551,14 @@ static object LI11(V98,V97,va_alist)
 	object V100;
 	object V101;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V99= V98;
 	V100= V97;
 	narg = narg - 2;
 	if (narg <= 0) goto T204;
 	else {
-	V101= va_arg(ap,object);}
+	V101= first;}
 	--narg; goto T205;
 goto T204;
 T204:;
@@ -593,9 +580,7 @@ T205:;
 	}
 /*	local entry for function BIT-IOR	*/
 
-static object LI12(V104,V103,va_alist)
-	object V104,V103;
-	va_dcl 
+static object LI12(object V104,object V103,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB12 VMS12 VMV12
@@ -603,14 +588,14 @@ static object LI12(V104,V103,va_alist)
 	object V106;
 	object V107;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V105= V104;
 	V106= V103;
 	narg = narg - 2;
 	if (narg <= 0) goto T211;
 	else {
-	V107= va_arg(ap,object);}
+	V107= first;}
 	--narg; goto T212;
 goto T211;
 T211:;
@@ -632,9 +617,7 @@ T212:;
 	}
 /*	local entry for function BIT-XOR	*/
 
-static object LI13(V110,V109,va_alist)
-	object V110,V109;
-	va_dcl 
+static object LI13(object V110,object V109,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB13 VMS13 VMV13
@@ -642,14 +625,14 @@ static object LI13(V110,V109,va_alist)
 	object V112;
 	object V113;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V111= V110;
 	V112= V109;
 	narg = narg - 2;
 	if (narg <= 0) goto T218;
 	else {
-	V113= va_arg(ap,object);}
+	V113= first;}
 	--narg; goto T219;
 goto T218;
 T218:;
@@ -671,9 +654,7 @@ T219:;
 	}
 /*	local entry for function BIT-EQV	*/
 
-static object LI14(V116,V115,va_alist)
-	object V116,V115;
-	va_dcl 
+static object LI14(object V116,object V115,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB14 VMS14 VMV14
@@ -681,14 +662,14 @@ static object LI14(V116,V115,va_alist)
 	object V118;
 	object V119;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V117= V116;
 	V118= V115;
 	narg = narg - 2;
 	if (narg <= 0) goto T225;
 	else {
-	V119= va_arg(ap,object);}
+	V119= first;}
 	--narg; goto T226;
 goto T225;
 T225:;
@@ -710,9 +691,7 @@ T226:;
 	}
 /*	local entry for function BIT-NAND	*/
 
-static object LI15(V122,V121,va_alist)
-	object V122,V121;
-	va_dcl 
+static object LI15(object V122,object V121,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB15 VMS15 VMV15
@@ -720,14 +699,14 @@ static object LI15(V122,V121,va_alist)
 	object V124;
 	object V125;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V123= V122;
 	V124= V121;
 	narg = narg - 2;
 	if (narg <= 0) goto T232;
 	else {
-	V125= va_arg(ap,object);}
+	V125= first;}
 	--narg; goto T233;
 goto T232;
 T232:;
@@ -749,9 +728,7 @@ T233:;
 	}
 /*	local entry for function BIT-NOR	*/
 
-static object LI16(V128,V127,va_alist)
-	object V128,V127;
-	va_dcl 
+static object LI16(object V128,object V127,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB16 VMS16 VMV16
@@ -759,14 +736,14 @@ static object LI16(V128,V127,va_alist)
 	object V130;
 	object V131;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V129= V128;
 	V130= V127;
 	narg = narg - 2;
 	if (narg <= 0) goto T239;
 	else {
-	V131= va_arg(ap,object);}
+	V131= first;}
 	--narg; goto T240;
 goto T239;
 T239:;
@@ -788,9 +765,7 @@ T240:;
 	}
 /*	local entry for function BIT-ANDC1	*/
 
-static object LI17(V134,V133,va_alist)
-	object V134,V133;
-	va_dcl 
+static object LI17(object V134,object V133,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB17 VMS17 VMV17
@@ -798,14 +773,14 @@ static object LI17(V134,V133,va_alist)
 	object V136;
 	object V137;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V135= V134;
 	V136= V133;
 	narg = narg - 2;
 	if (narg <= 0) goto T246;
 	else {
-	V137= va_arg(ap,object);}
+	V137= first;}
 	--narg; goto T247;
 goto T246;
 T246:;
@@ -827,9 +802,7 @@ T247:;
 	}
 /*	local entry for function BIT-ANDC2	*/
 
-static object LI18(V140,V139,va_alist)
-	object V140,V139;
-	va_dcl 
+static object LI18(object V140,object V139,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB18 VMS18 VMV18
@@ -837,14 +810,14 @@ static object LI18(V140,V139,va_alist)
 	object V142;
 	object V143;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V141= V140;
 	V142= V139;
 	narg = narg - 2;
 	if (narg <= 0) goto T253;
 	else {
-	V143= va_arg(ap,object);}
+	V143= first;}
 	--narg; goto T254;
 goto T253;
 T253:;
@@ -866,9 +839,7 @@ T254:;
 	}
 /*	local entry for function BIT-ORC1	*/
 
-static object LI19(V146,V145,va_alist)
-	object V146,V145;
-	va_dcl 
+static object LI19(object V146,object V145,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB19 VMS19 VMV19
@@ -876,14 +847,14 @@ static object LI19(V146,V145,va_alist)
 	object V148;
 	object V149;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V147= V146;
 	V148= V145;
 	narg = narg - 2;
 	if (narg <= 0) goto T260;
 	else {
-	V149= va_arg(ap,object);}
+	V149= first;}
 	--narg; goto T261;
 goto T260;
 T260:;
@@ -905,9 +876,7 @@ T261:;
 	}
 /*	local entry for function BIT-ORC2	*/
 
-static object LI20(V152,V151,va_alist)
-	object V152,V151;
-	va_dcl 
+static object LI20(object V152,object V151,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB20 VMS20 VMV20
@@ -915,14 +884,14 @@ static object LI20(V152,V151,va_alist)
 	object V154;
 	object V155;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V153= V152;
 	V154= V151;
 	narg = narg - 2;
 	if (narg <= 0) goto T267;
 	else {
-	V155= va_arg(ap,object);}
+	V155= first;}
 	--narg; goto T268;
 goto T267;
 T267:;
@@ -944,22 +913,20 @@ T268:;
 	}
 /*	local entry for function BIT-NOT	*/
 
-static object LI21(V157,va_alist)
-	object V157;
-	va_dcl 
+static object LI21(object V157,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB21 VMS21 VMV21
 	{object V158;
 	object V159;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V158= V157;
 	narg = narg - 1;
 	if (narg <= 0) goto T274;
 	else {
-	V159= va_arg(ap,object);}
+	V159= first;}
 	--narg; goto T275;
 goto T274;
 T274:;
@@ -1018,9 +985,7 @@ T284:;
 }
 /*	local entry for function VECTOR-PUSH-EXTEND	*/
 
-static object LI23(V170,V169,va_alist)
-	object V170,V169;
-	va_dcl 
+static object LI23(object V170,object V169,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB23 VMS23 VMV23
@@ -1028,14 +993,14 @@ static object LI23(V170,V169,va_alist)
 	register object V172;
 	object V173;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V171= V170;
 	V172= V169;
 	narg = narg - 2;
 	if (narg <= 0) goto T293;
 	else {
-	V173= va_arg(ap,object);}
+	V173= first;}
 	--narg; goto T294;
 goto T293;
 T293:;
@@ -1151,9 +1116,7 @@ T329:;
 }
 /*	local entry for function ADJUST-ARRAY	*/
 
-static object LI25(V190,V189,va_alist)
-	object V190,V189;
-	va_dcl 
+static object LI25(object V190,object V189,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB25 VMS25 VMV25
@@ -1168,7 +1131,7 @@ static object LI25(V190,V189,va_alist)
 	object V199;
 	object V200;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V191= V190;
 	V192= V189;
@@ -1176,7 +1139,7 @@ static object LI25(V190,V189,va_alist)
 	V201 = (ALLOCA_CONS(narg),ON_STACK_MAKE_LIST(narg));
 	V193= V201;
 	{
-	parse_key_rest(V201,narg,Vcs +3,(struct key *)&LI25key,ap);
+	parse_key_rest_new(V201,narg,Vcs +3,(struct key *)&LI25key,first,ap);
 	V194=(Vcs[3]);
 	V195=(Vcs[4]);
 	V196=(Vcs[5]);
@@ -1403,18 +1366,18 @@ T430:;
 static void LnkT35(){ call_or_link(VV[35],(void **)&Lnk35);} /* ARRAY-IN-BOUNDS-P */
 static void LnkT34(){ call_or_link(VV[34],(void **)&Lnk34);} /* COPY-ARRAY-PORTION */
 static void LnkT33(){ call_or_link(VV[33],(void **)&Lnk33);} /* ARRAY-TOTAL-SIZE */
-static object  LnkTLI32(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[32],(void **)&LnkLI32,1,ap);va_end(ap);return V1;} /* ARRAY-DIMENSIONS */
+static object  LnkTLI32(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[32],(void **)&LnkLI32,1,first,ap);va_end(ap);return V1;} /* ARRAY-DIMENSIONS */
 static void LnkT28(){ call_or_link(VV[28],(void **)&Lnk28);} /* MAKE-ARRAY */
 static void LnkT31(){ call_or_link(VV[31],(void **)&Lnk31);} /* STATICP */
 static void LnkT30(){ call_or_link(VV[30],(void **)&Lnk30);} /* ARRAY-HAS-FILL-POINTER-P */
-static object  LnkTLI29(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[29],(void **)&LnkLI29,ap);va_end(ap);return V1;} /* ADJUST-ARRAY */
-static object  LnkTLI28(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[28],(void **)&LnkLI28,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
-static object  LnkTLI27(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[27],(void **)&LnkLI27,2,ap);va_end(ap);return V1;} /* INCREMENT-CURSOR */
+static object  LnkTLI29(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[29],(void **)&LnkLI29,first,ap);va_end(ap);return V1;} /* ADJUST-ARRAY */
+static object  LnkTLI28(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[28],(void **)&LnkLI28,first,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
+static object  LnkTLI27(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[27],(void **)&LnkLI27,2,first,ap);va_end(ap);return V1;} /* INCREMENT-CURSOR */
 static void LnkT26(){ call_or_link(VV[26],(void **)&Lnk26);} /* ASET-BY-CURSOR */
-static object  LnkTLI25(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[25],(void **)&LnkLI25,2,ap);va_end(ap);return V1;} /* SEQUENCE-CURSOR */
+static object  LnkTLI25(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[25],(void **)&LnkLI25,2,first,ap);va_end(ap);return V1;} /* SEQUENCE-CURSOR */
 static void LnkT24(){ call_or_link(VV[24],(void **)&Lnk24);} /* MAKE-ARRAY1 */
 static void LnkT23(){ call_or_link(VV[23],(void **)&Lnk23);} /* GET-AELTTYPE */
-static object  LnkTLI22(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[22],(void **)&LnkLI22,1,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
+static object  LnkTLI22(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[22],(void **)&LnkLI22,1,first,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
 static void LnkT18(){ call_or_link(VV[18],(void **)&Lnk18);} /* SUBTYPEP */
 
 #ifdef SYSTEM_SPECIAL_INIT

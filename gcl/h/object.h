@@ -908,6 +908,20 @@ EXTER object MVloc[10];
   if (n >= 65) FEerror("Too plong vl",0); \
   for (i=0 ; i < (n); i++) new[i]=va_arg(vl,object);}
 #endif
+
+#ifdef DONT_COPY_VA_LIST
+#error Cannot set DONT_COPY_VA_LIST in ANSI C
+#else
+#define COERCE_VA_LIST_NEW(new,fst,vl,n) \
+ object Xxvl[65]; \
+ {int i; \
+  new=Xxvl; \
+  if (n >= 65) FEerror("va_list too long",0); \
+  for (i=0 ; i < (n); i++) new[i]=i ? va_arg(vl,object) : fst;}
+#endif
+
+
+
 #define make_si_vfun(s,f,min,max) \
   make_si_vfun1(s,f,min | (max << 8))
 
@@ -950,7 +964,7 @@ EXTER struct call_data fcall;
 #define SGC_TOUCH(x)
 #endif
 
-object funcall_cfun();
+object funcall_cfun(void(*)(),int,...);
 object clear_compiler_properties();
 EXTER object sSlambda_block_expanded;
 

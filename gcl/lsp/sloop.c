@@ -921,19 +921,18 @@ T245:;
 }
 /*	local entry for function PARSE-LOOP-WITH	*/
 
-static object LI23(va_alist)
-	va_dcl 
+static object LI23(object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB23 VMS23 VMV23
 	{object V126;
 	object V127;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	narg = narg - 0;
 	if (narg <= 0) goto T298;
 	else {
-	V126= va_arg(ap,object);}
+	V126= first;}
 	if (--narg <= 0) goto T299;
 	else {
 	V127= va_arg(ap,object);}
@@ -1815,9 +1814,7 @@ T604:;
 }
 /*	local entry for function LOOP-ADD-BINDING	*/
 
-static object LI34(V256,V255,va_alist)
-	object V256,V255;
-	va_dcl 
+static object LI34(object V256,object V255,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB34 VMS34 VMV34
@@ -1829,14 +1826,14 @@ static object LI34(V256,V255,va_alist)
 	object V262;
 	object V263;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V257= V256;
 	V258= V255;
 	narg = narg - 2;
 	if (narg <= 0) goto T656;
 	else {
-	V259= va_arg(ap,object);}
+	V259= first;}
 	if (--narg <= 0) goto T657;
 	else {
 	V260= va_arg(ap,object);}
@@ -2014,9 +2011,7 @@ T719:;
 	}
 /*	local entry for function LOOP-DECLARE-BINDING	*/
 
-static object LI35(V283,V282,V281,va_alist)
-	object V283,V282,V281;
-	va_dcl 
+static object LI35(object V283,object V282,object V281,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB35 VMS35 VMV35
@@ -2025,7 +2020,7 @@ static object LI35(V283,V282,V281,va_alist)
 	object V286;
 	object V287;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <3) too_few_arguments();
 	V284= V283;
 	V285= V282;
@@ -2033,7 +2028,7 @@ static object LI35(V283,V282,V281,va_alist)
 	narg = narg - 3;
 	if (narg <= 0) goto T720;
 	else {
-	V287= va_arg(ap,object);}
+	V287= first;}
 	--narg; goto T721;
 goto T720;
 T720:;
@@ -2154,19 +2149,18 @@ T733:;
 	}
 /*	local entry for function PARSE-LOOP-DECLARE	*/
 
-static object LI36(va_alist)
-	va_dcl 
+static object LI36(object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB36 VMS36 VMV36
 	{register object V297;
 	register object V298;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	narg = narg - 0;
 	if (narg <= 0) goto T778;
 	else {
-	V297= va_arg(ap,object);}
+	V297= first;}
 	if (--narg <= 0) goto T779;
 	else {
 	V298= va_arg(ap,object);}
@@ -2212,9 +2206,7 @@ T796:;
 	}
 /*	local entry for function LOOP-ADD-TEMPS	*/
 
-static object LI37(V304,va_alist)
-	object V304;
-	va_dcl 
+static object LI37(object V304,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB37 VMS37 VMV37
@@ -2224,13 +2216,13 @@ static object LI37(V304,va_alist)
 	object V308;
 	object V309;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V305= V304;
 	narg = narg - 1;
 	if (narg <= 0) goto T806;
 	else {
-	V306= va_arg(ap,object);}
+	V306= first;}
 	if (--narg <= 0) goto T807;
 	else {
 	V307= va_arg(ap,object);}
@@ -2283,20 +2275,18 @@ T823:;
 	}
 /*	local entry for function ADD-FROM-DATA	*/
 
-static object LI38(V315,va_alist)
-	object V315;
-	va_dcl 
+static object LI38(object V315,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB38 VMS38 VMV38
 	{register object V316;
 	object V317;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V316= V315;
 	narg= narg - 1;
-	V318 = list_vector(narg,ap);
+	V318 = list_vector_new(narg,first,ap);
 	V317= V318;
 	if((V316)!=Cnil){
 	goto T826;}
@@ -2698,9 +2688,7 @@ T1029:;
 }
 /*	local entry for function PARSE-LOOP-MACRO	*/
 
-static object LI40(V365,V364,va_alist)
-	object V365,V364;
-	va_dcl 
+static object LI40(object V365,object V364,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB40 VMS40 VMV40
@@ -2708,14 +2696,14 @@ static object LI40(V365,V364,va_alist)
 	object V367;
 	object V368;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V366= V365;
 	V367= V364;
 	narg = narg - 2;
 	if (narg <= 0) goto T1034;
 	else {
-	V368= va_arg(ap,object);}
+	V368= first;}
 	--narg; goto T1035;
 goto T1034;
 T1034:;
@@ -2974,9 +2962,7 @@ T1128:;
 }
 /*	local entry for function DEF-LOOP-INTERNAL	*/
 
-static object LI43(V411,V410,V409,V408,va_alist)
-	object V411,V410,V409,V408;
-	va_dcl 
+static object LI43(object V411,object V410,object V409,object V408,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB43 VMS43 VMV43
@@ -2989,7 +2975,7 @@ static object LI43(V411,V410,V409,V408,va_alist)
 	object V417;
 	object V418;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <4) too_few_arguments();
 	V412= V411;
 	V413= V410;
@@ -2998,7 +2984,7 @@ static object LI43(V411,V410,V409,V408,va_alist)
 	narg = narg - 4;
 	if (narg <= 0) goto T1141;
 	else {
-	V416= va_arg(ap,object);}
+	V416= first;}
 	if (--narg <= 0) goto T1142;
 	else {
 	V417= va_arg(ap,object);}
@@ -3317,9 +3303,7 @@ TTL:;
 }
 /*	local entry for function IN-ARRAY-SLOOP-FOR	*/
 
-static object LI57(V506,V505,va_alist)
-	object V506,V505;
-	va_dcl 
+static object LI57(object V506,object V505,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB57 VMS57 VMV57
@@ -3327,12 +3311,12 @@ static object LI57(V506,V505,va_alist)
 	object V508;
 	object V509;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V507= V506;
 	V508= V505;
 	narg= narg - 2;
-	V510 = list_vector(narg,ap);
+	V510 = list_vector_new(narg,first,ap);
 	V509= V510;
 	{object V511;
 	object V512;
@@ -3999,39 +3983,39 @@ TTL:;
 	return Cnil;
 }
 static void LnkT277(){ call_or_link(VV[277],(void **)&Lnk277);} /* SUBTYPEP */
-static object  LnkTLI276(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[276],(void **)&LnkLI276,2,ap);va_end(ap);return V1;} /* THE-TYPE */
-static object  LnkTLI275(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[275],(void **)&LnkLI275,2,ap);va_end(ap);return V1;} /* PARSE-LOOP-MAP */
-static object  LnkTLI274(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[274],(void **)&LnkLI274,ap);va_end(ap);return V1;} /* ADD-FROM-DATA */
-static object  LnkTLI273(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[273],(void **)&LnkLI273,ap);va_end(ap);return V1;} /* LOOP-DECLARE-BINDING */
-static object  LnkTLI272(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[272],(void **)&LnkLI272,2,ap);va_end(ap);return V1;} /* MAKE-VALUE */
+static object  LnkTLI276(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[276],(void **)&LnkLI276,2,first,ap);va_end(ap);return V1;} /* THE-TYPE */
+static object  LnkTLI275(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[275],(void **)&LnkLI275,2,first,ap);va_end(ap);return V1;} /* PARSE-LOOP-MAP */
+static object  LnkTLI274(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[274],(void **)&LnkLI274,first,ap);va_end(ap);return V1;} /* ADD-FROM-DATA */
+static object  LnkTLI273(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[273],(void **)&LnkLI273,first,ap);va_end(ap);return V1;} /* LOOP-DECLARE-BINDING */
+static object  LnkTLI272(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[272],(void **)&LnkLI272,2,first,ap);va_end(ap);return V1;} /* MAKE-VALUE */
 static void LnkT129(){ call_or_link(VV[129],(void **)&Lnk129);} /* TYPEP */
-static object  LnkTLI271(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[271],(void **)&LnkLI271,3,ap);va_end(ap);return V1;} /* LOOP-PARSE-ADDITIONAL-COLLECTIONS */
-static object  LnkTLI270(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[270],(void **)&LnkLI270,1,ap);va_end(ap);return V1;} /* POINTER-FOR-COLLECT */
+static object  LnkTLI271(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[271],(void **)&LnkLI271,3,first,ap);va_end(ap);return V1;} /* LOOP-PARSE-ADDITIONAL-COLLECTIONS */
+static object  LnkTLI270(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[270],(void **)&LnkLI270,1,first,ap);va_end(ap);return V1;} /* POINTER-FOR-COLLECT */
 static object  LnkTLI269(){return call_proc0(VV[269],(void **)&LnkLI269);} /* PARSE-ONE-WHEN-CLAUSE */
-static object  LnkTLI268(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[268],(void **)&LnkLI268,ap);va_end(ap);return V1;} /* LOOP-ADD-TEMPS */
-static object  LnkTLI267(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[267],(void **)&LnkLI267,ap);va_end(ap);return V1;} /* LOOP-ADD-BINDING */
+static object  LnkTLI268(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[268],(void **)&LnkLI268,first,ap);va_end(ap);return V1;} /* LOOP-ADD-TEMPS */
+static object  LnkTLI267(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[267],(void **)&LnkLI267,first,ap);va_end(ap);return V1;} /* LOOP-ADD-BINDING */
 static object  LnkTLI266(){return call_proc0(VV[266],(void **)&LnkLI266);} /* LOOP-UN-POP */
-static object  LnkTLI265(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[265],(void **)&LnkLI265,ap);va_end(ap);return V1;} /* PARSE-LOOP-MACRO */
-static object  LnkTLI264(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[264],(void **)&LnkLI264,ap);va_end(ap);return V1;} /* PARSE-LOOP-DECLARE */
-static object  LnkTLI263(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[263],(void **)&LnkLI263,ap);va_end(ap);return V1;} /* PARSE-LOOP-WITH */
-static object  LnkTLI262(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[262],(void **)&LnkLI262,1,ap);va_end(ap);return V1;} /* PARSE-LOOP-INITIALLY */
+static object  LnkTLI265(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[265],(void **)&LnkLI265,first,ap);va_end(ap);return V1;} /* PARSE-LOOP-MACRO */
+static object  LnkTLI264(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[264],(void **)&LnkLI264,first,ap);va_end(ap);return V1;} /* PARSE-LOOP-DECLARE */
+static object  LnkTLI263(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[263],(void **)&LnkLI263,first,ap);va_end(ap);return V1;} /* PARSE-LOOP-WITH */
+static object  LnkTLI262(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[262],(void **)&LnkLI262,1,first,ap);va_end(ap);return V1;} /* PARSE-LOOP-INITIALLY */
 static object  LnkTLI261(){return call_proc0(VV[261],(void **)&LnkLI261);} /* PARSE-LOOP-COLLECT */
-static object  LnkTLI260(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[260],(void **)&LnkLI260,1,ap);va_end(ap);return V1;} /* LOOP-COLLECT-KEYWORD-P */
+static object  LnkTLI260(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[260],(void **)&LnkLI260,1,first,ap);va_end(ap);return V1;} /* LOOP-COLLECT-KEYWORD-P */
 static object  LnkTLI259(){return call_proc0(VV[259],(void **)&LnkLI259);} /* PARSE-LOOP-WHEN */
 static object  LnkTLI258(){return call_proc0(VV[258],(void **)&LnkLI258);} /* PARSE-LOOP-DO */
 static object  LnkTLI257(){return call_proc0(VV[257],(void **)&LnkLI257);} /* PARSE-LOOP-FOR */
-static object  LnkTLI256(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[256],(void **)&LnkLI256,1,ap);va_end(ap);return V1;} /* PARSE-NO-BODY */
+static object  LnkTLI256(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[256],(void **)&LnkLI256,1,first,ap);va_end(ap);return V1;} /* PARSE-NO-BODY */
 static object  LnkTLI255(){return call_proc0(VV[255],(void **)&LnkLI255);} /* LOOP-POP */
-static object  LnkTLI10(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[10],(void **)&LnkLI10,2,ap);va_end(ap);return V1;} /* L-EQUAL */
+static object  LnkTLI10(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[10],(void **)&LnkLI10,2,first,ap);va_end(ap);return V1;} /* L-EQUAL */
 static object  LnkTLI254(){return call_proc0(VV[254],(void **)&LnkLI254);} /* LOOP-PEEK */
-static object  LnkTLI13(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[13],(void **)&LnkLI13,1,ap);va_end(ap);return V1;} /* TRANSLATE-NAME */
-static object  LnkTLI253(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[253],(void **)&LnkLI253,1,ap);va_end(ap);return V1;} /* LOOP-LET-BINDINGS */
-static object  LnkTLI252(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[252],(void **)&LnkLI252,1,ap);va_end(ap);return V1;} /* SUBSTITUTE-SLOOP-BODY */
+static object  LnkTLI13(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[13],(void **)&LnkLI13,1,first,ap);va_end(ap);return V1;} /* TRANSLATE-NAME */
+static object  LnkTLI253(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[253],(void **)&LnkLI253,1,first,ap);va_end(ap);return V1;} /* LOOP-LET-BINDINGS */
+static object  LnkTLI252(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[252],(void **)&LnkLI252,1,first,ap);va_end(ap);return V1;} /* SUBSTITUTE-SLOOP-BODY */
 static object  LnkTLI251(){return call_proc0(VV[251],(void **)&LnkLI251);} /* PARSE-LOOP1 */
-static object  LnkTLI249(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[249],(void **)&LnkLI249,ap);va_end(ap);return V1;} /* FIND */
-static object  LnkTLI248(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[248],(void **)&LnkLI248,ap);va_end(ap);return V1;} /* DEF-LOOP-INTERNAL */
-static object  LnkTLI247(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[247],(void **)&LnkLI247,1,ap);va_end(ap);return V1;} /* PARSE-LOOP */
-static object  LnkTLI246(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[246],(void **)&LnkLI246,2,ap);va_end(ap);return V1;} /* DESETQ1 */
+static object  LnkTLI249(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[249],(void **)&LnkLI249,first,ap);va_end(ap);return V1;} /* FIND */
+static object  LnkTLI248(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[248],(void **)&LnkLI248,first,ap);va_end(ap);return V1;} /* DEF-LOOP-INTERNAL */
+static object  LnkTLI247(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[247],(void **)&LnkLI247,1,first,ap);va_end(ap);return V1;} /* PARSE-LOOP */
+static object  LnkTLI246(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[246],(void **)&LnkLI246,2,first,ap);va_end(ap);return V1;} /* DESETQ1 */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

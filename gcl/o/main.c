@@ -599,17 +599,15 @@ end_of_file(void) {
 	error("end of file");
 }
 
-DEFUNO("BYE",object,fLbye,LISP
-   ,0,1,NONE,OI,OO,OO,OO,Lby,"")(va_alist)
-va_dcl
+DEFUNO_NEW("BYE",object,fLbye,LISP
+       ,0,1,NONE,OI,OO,OO,OO,Lby,(int exitc),"")
 {	int n=VFUN_NARGS;
 	int exit_code;
-	va_list ap;
-	{ va_start(ap);
-	  if (n>=1) exit_code=va_arg(ap,int);else goto LDEFAULT1;
+	{ 
+	  if (n>=1) exit_code=exitc;else goto LDEFAULT1;
 	  goto LEND_VARARG;
 	LDEFAULT1: exit_code = 0;
-	LEND_VARARG: va_end(ap);}
+	LEND_VARARG: }
 
 #ifdef UNIX
 /*	printf("Bye.\n"); */
@@ -620,15 +618,13 @@ va_dcl
 
 }
 
-DEFUNO("QUIT",object,fLquit,LISP
-   ,0,1,NONE,OI,OO,OO,OO,Lquit,"")(va_alist)
-va_dcl
-{	return fLbye(va_alist); }
+DEFUNO_NEW("QUIT",object,fLquit,LISP
+       ,0,1,NONE,OI,OO,OO,OO,Lquit,(int exitc),"")
+{	return fLbye(exitc); }
  
-DEFUNO("EXIT",object,fLexit,LISP
-   ,0,1,NONE,OI,OO,OO,OO,Lexit,"")(va_alist)
-va_dcl
-{	return fLbye(va_alist); }
+DEFUNO_NEW("EXIT",object,fLexit,LISP
+       ,0,1,NONE,OI,OO,OO,OO,Lexit,(int exitc),"")
+{	return fLbye(exitc); }
  
 
 /*  c_trace(void) */
@@ -820,16 +816,15 @@ siLinitialization_failure(void) {
   exit(0);
 }
 
-DEFUNO("IDENTITY",object,fLidentity,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lidentity,"")(x0)
-object x0;
+DEFUNO_NEW("IDENTITY",object,fLidentity,LISP
+       ,1,1,NONE,OO,OO,OO,OO,Lidentity,(object x0),"")
 {
 	/* 1 args */
   RETURN1 (x0);
 }
 
-DEFUNO("LISP-IMPLEMENTATION-VERSION",object,fLlisp_implementation_version,LISP
-   ,0,0,NONE,OO,OO,OO,OO,Llisp_implementation_version,"")()
+DEFUNO_NEW("LISP-IMPLEMENTATION-VERSION",object,fLlisp_implementation_version,LISP
+       ,0,0,NONE,OO,OO,OO,OO,Llisp_implementation_version,(void),"")
 {
 	/* 0 args */
 	RETURN1((make_simple_string(LISP_IMPLEMENTATION_VERSION)));

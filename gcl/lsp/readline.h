@@ -7,7 +7,7 @@ static char * VVi[8]={
 (char *)(L1)
 };
 #define VV ((object *)VVi)
-static void LnkT0() ;
+static void LnkT0();
 static void (*Lnk0)() = LnkT0;
-static void LnkT6() ;
+static void LnkT6();
 static void (*Lnk6)() = LnkT6;

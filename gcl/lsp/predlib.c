@@ -3372,27 +3372,27 @@ T1420:;
 	return;
 	}
 }
-static object  LnkTLI151(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[151],(void **)&LnkLI151,2,ap);va_end(ap);return V1;} /* COERCE */
-static object  LnkTLI150(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[150],(void **)&LnkLI150,ap);va_end(ap);return V1;} /* MAKE-SEQUENCE */
+static object  LnkTLI151(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[151],(void **)&LnkLI151,2,first,ap);va_end(ap);return V1;} /* COERCE */
+static object  LnkTLI150(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[150],(void **)&LnkLI150,first,ap);va_end(ap);return V1;} /* MAKE-SEQUENCE */
 static void LnkT149(){ call_or_link(VV[149],(void **)&Lnk149);} /* SPECIFIC-ERROR */
-static object  LnkTLI147(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[147],(void **)&LnkLI147,2,ap);va_end(ap);return V1;} /* SUB-INTERVAL-P */
-static object  LnkTLI146(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[146],(void **)&LnkLI146,1,ap);va_end(ap);return V1;} /* KNOWN-TYPE-P */
+static object  LnkTLI147(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[147],(void **)&LnkLI147,2,first,ap);va_end(ap);return V1;} /* SUB-INTERVAL-P */
+static object  LnkTLI146(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[146],(void **)&LnkLI146,1,first,ap);va_end(ap);return V1;} /* KNOWN-TYPE-P */
 static void LnkT145(){ call_or_link(VV[145],(void **)&Lnk145);} /* SUBTYPEP */
-static object  LnkTLI144(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[144],(void **)&LnkLI144,1,ap);va_end(ap);return V1;} /* NORMALIZE-TYPE */
+static object  LnkTLI144(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[144],(void **)&LnkLI144,1,first,ap);va_end(ap);return V1;} /* NORMALIZE-TYPE */
 static void LnkT143(){ call_or_link(VV[143],(void **)&Lnk143);} /* CLASS-PRECEDENCE-LIST */
 static void LnkT142(){ call_or_link(VV[142],(void **)&Lnk142);} /* STRUCTURE-SUBTYPE-P */
-static object  LnkTLI141(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[141],(void **)&LnkLI141,1,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
-static object  LnkTLI140(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[140],(void **)&LnkLI140,1,ap);va_end(ap);return V1;} /* SIMPLE-ARRAY-P */
-static object  LnkTLI134(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[134],(void **)&LnkLI134,1,ap);va_end(ap);return V1;} /* ARRAY-DIMENSIONS */
-static object  LnkTLI133(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[133],(void **)&LnkLI133,2,ap);va_end(ap);return V1;} /* MATCH-DIMENSIONS */
+static object  LnkTLI141(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[141],(void **)&LnkLI141,1,first,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
+static object  LnkTLI140(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[140],(void **)&LnkLI140,1,first,ap);va_end(ap);return V1;} /* SIMPLE-ARRAY-P */
+static object  LnkTLI134(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[134],(void **)&LnkLI134,1,first,ap);va_end(ap);return V1;} /* ARRAY-DIMENSIONS */
+static object  LnkTLI133(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[133],(void **)&LnkLI133,2,first,ap);va_end(ap);return V1;} /* MATCH-DIMENSIONS */
 static void LnkT128(){ call_or_link(VV[128],(void **)&Lnk128);} /* REALP */
 static void LnkT127(){ call_or_link(VV[127],(void **)&Lnk127);} /* RATIONALP */
-static object  LnkTLI126(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[126],(void **)&LnkLI126,2,ap);va_end(ap);return V1;} /* IN-INTERVAL-P */
+static object  LnkTLI126(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[126],(void **)&LnkLI126,2,first,ap);va_end(ap);return V1;} /* IN-INTERVAL-P */
 static void LnkT124(){ call_or_link(VV[124],(void **)&Lnk124);} /* TYPEP */
 static void LnkT123(){ call_or_link(VV[123],(void **)&Lnk123);} /* CLASS-OF */
 static void LnkT122(){ call_or_link(VV[122],(void **)&Lnk122);} /* CLASSP */
 static void LnkT121(){ call_or_link(VV[121],(void **)&Lnk121);} /* ARRAY-HAS-FILL-POINTER-P */
-static object  LnkTLI120(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[120],(void **)&LnkLI120,1,ap);va_end(ap);return V1;} /* FIND-DOCUMENTATION */
+static object  LnkTLI120(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[120],(void **)&LnkLI120,1,first,ap);va_end(ap);return V1;} /* FIND-DOCUMENTATION */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

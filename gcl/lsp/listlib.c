@@ -44,9 +44,7 @@ T14:;
 }
 /*	local entry for function UNION	*/
 
-static object LI2(V12,V11,va_alist)
-	object V12,V11;
-	va_dcl 
+static object LI2(object V12,object V11,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB2 VMS2 VMV2
@@ -56,12 +54,12 @@ static object LI2(V12,V11,va_alist)
 	register object V16;
 	register object V17;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	V13= V12;
 	V14= V11;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI2key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI2key,first,ap);
 	V15=(Vcs[2]);
 	V16=(Vcs[3]);
 	V17=(Vcs[4]);
@@ -137,9 +135,7 @@ T35:;
 	}}
 /*	local entry for function NUNION	*/
 
-static object LI3(V26,V25,va_alist)
-	object V26,V25;
-	va_dcl 
+static object LI3(object V26,object V25,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB3 VMS3 VMV3
@@ -149,12 +145,12 @@ static object LI3(V26,V25,va_alist)
 	register object V30;
 	register object V31;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	V27= V26;
 	V28= V25;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI3key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI3key,first,ap);
 	V29=(Vcs[2]);
 	V30=(Vcs[3]);
 	V31=(Vcs[4]);
@@ -230,9 +226,7 @@ T70:;
 	}}
 /*	local entry for function INTERSECTION	*/
 
-static object LI4(V39,V38,va_alist)
-	object V39,V38;
-	va_dcl 
+static object LI4(object V39,object V38,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB4 VMS4 VMV4
@@ -242,12 +236,12 @@ static object LI4(V39,V38,va_alist)
 	register object V43;
 	register object V44;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	V40= V39;
 	V41= V38;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI4key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI4key,first,ap);
 	V42=(Vcs[2]);
 	V43=(Vcs[3]);
 	V44=(Vcs[4]);
@@ -304,9 +298,7 @@ T99:;
 	}}
 /*	local entry for function NINTERSECTION	*/
 
-static object LI5(V50,V49,va_alist)
-	object V50,V49;
-	va_dcl 
+static object LI5(object V50,object V49,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB5 VMS5 VMV5
@@ -316,12 +308,12 @@ static object LI5(V50,V49,va_alist)
 	register object V54;
 	register object V55;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	V51= V50;
 	V52= V49;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI5key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI5key,first,ap);
 	V53=(Vcs[2]);
 	V54=(Vcs[3]);
 	V55=(Vcs[4]);
@@ -394,9 +386,7 @@ T127:;
 	}}
 /*	local entry for function SET-DIFFERENCE	*/
 
-static object LI6(V62,V61,va_alist)
-	object V62,V61;
-	va_dcl 
+static object LI6(object V62,object V61,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB6 VMS6 VMV6
@@ -406,12 +396,12 @@ static object LI6(V62,V61,va_alist)
 	register object V66;
 	register object V67;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	V63= V62;
 	V64= V61;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI6key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI6key,first,ap);
 	V65=(Vcs[2]);
 	V66=(Vcs[3]);
 	V67=(Vcs[4]);
@@ -538,9 +528,7 @@ T180:;
 }
 /*	local entry for function NSET-DIFFERENCE	*/
 
-static object LI8(V81,V80,va_alist)
-	object V81,V80;
-	va_dcl 
+static object LI8(object V81,object V80,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB8 VMS8 VMV8
@@ -550,12 +538,12 @@ static object LI8(V81,V80,va_alist)
 	register object V85;
 	register object V86;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	V82= V81;
 	V83= V80;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI8key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI8key,first,ap);
 	V84=(Vcs[2]);
 	V85=(Vcs[3]);
 	V86=(Vcs[4]);
@@ -714,9 +702,7 @@ T243:;
 }
 /*	local entry for function SET-EXCLUSIVE-OR	*/
 
-static object LI10(V102,V101,va_alist)
-	object V102,V101;
-	va_dcl 
+static object LI10(object V102,object V101,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB10 VMS10 VMV10
@@ -726,12 +712,12 @@ static object LI10(V102,V101,va_alist)
 	object V106;
 	object V107;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	V103= V102;
 	V104= V101;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI10key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI10key,first,ap);
 	V105=(Vcs[2]);
 	V106=(Vcs[3]);
 	V107=(Vcs[4]);
@@ -777,9 +763,7 @@ static object LI10(V102,V101,va_alist)
 	}}
 /*	local entry for function NSET-EXCLUSIVE-OR	*/
 
-static object LI11(V114,V113,va_alist)
-	object V114,V113;
-	va_dcl 
+static object LI11(object V114,object V113,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB11 VMS11 VMV11
@@ -789,12 +773,12 @@ static object LI11(V114,V113,va_alist)
 	register object V118;
 	register object V119;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	V115= V114;
 	V116= V113;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI11key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI11key,first,ap);
 	V117=(Vcs[2]);
 	V118=(Vcs[3]);
 	V119=(Vcs[4]);
@@ -924,9 +908,7 @@ T311:;
 	}}
 /*	local entry for function SUBSETP	*/
 
-static object LI12(V132,V131,va_alist)
-	object V132,V131;
-	va_dcl 
+static object LI12(object V132,object V131,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB12 VMS12 VMV12
@@ -936,12 +918,12 @@ static object LI12(V132,V131,va_alist)
 	register object V136;
 	register object V137;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	V133= V132;
 	V134= V131;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI12key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI12key,first,ap);
 	V135=(Vcs[2]);
 	V136=(Vcs[3]);
 	V137=(Vcs[4]);

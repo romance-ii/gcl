@@ -24,7 +24,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "include.h"
-#include <varargs.h>
 object sSAindent_formatted_outputA;
 
 
@@ -2084,11 +2083,8 @@ fmt_semicolon(bool colon, bool atsign)
 	fmt_set_param(1, &fmt_line_length, fmt_int, 72);
 }
 
-DEFUNO("FORMAT",object,fLformat,LISP
-   ,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,Lformat,"")(strm, control, va_alist)
-     object strm;
-     object control;
-     va_dcl
+DEFUNO_NEW("FORMAT",object,fLformat,LISP
+       ,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,Lformat,(object strm, object control,...),"")
 {       va_list ap; 
         VOL int nargs= VFUN_NARGS;
 	VOL object x = OBJNULL;
@@ -2119,7 +2115,7 @@ DEFUNO("FORMAT",object,fLformat,LISP
 		goto L;
 	}
 	
-	va_start(ap);
+	va_start(ap,control);
 	{object *l;
 	 COERCE_VA_LIST(l,ap,nargs);
 	fmt_base = l;

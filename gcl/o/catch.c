@@ -80,7 +80,7 @@ volatile object x0;
 	lex_env = old_lex;
 	{int i = fcall.nvalues;
 	if (i+1>=sizeof(fcall.values)/sizeof(*fcall.values))
-	  FEerror("Too many function call values");
+	  FEerror("Too many function call values",0);
 	while (i > 0)
 	{ fcall.values[i+1] = fcall.values[i];
 	  i--;}

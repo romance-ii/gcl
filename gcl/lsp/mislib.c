@@ -272,9 +272,7 @@ T88:;
 }
 /*	local entry for function ENCODE-UNIVERSAL-TIME	*/
 
-static object LI5(V37,V36,V35,V34,V33,V32,va_alist)
-	object V37,V36,V35,V34,V33,V32;
-	va_dcl 
+static object LI5(object V37,object V36,object V35,object V34,object V33,object V32,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB5 VMS5 VMV5
@@ -286,7 +284,7 @@ static object LI5(V37,V36,V35,V34,V33,V32,va_alist)
 	register object V43;
 	object V44;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <6) too_few_arguments();
 	V38= V37;
 	V39= V36;
@@ -297,7 +295,7 @@ static object LI5(V37,V36,V35,V34,V33,V32,va_alist)
 	narg = narg - 6;
 	if (narg <= 0) goto T110;
 	else {
-	V44= va_arg(ap,object);}
+	V44= first;}
 	--narg; goto T111;
 goto T110;
 T110:;
@@ -556,8 +554,8 @@ register object *base0;
 	}
 }
 static void LnkT19(){ call_or_link(VV[19],(void **)&Lnk19);} /* GET-DECODED-TIME */
-static object  LnkTLI18(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[18],(void **)&LnkLI18,1,ap);va_end(ap);return V1;} /* LEAP-YEAR-P */
-static object  LnkTLI17(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[17],(void **)&LnkLI17,1,ap);va_end(ap);return V1;} /* NUMBER-OF-DAYS-FROM-1900 */
+static object  LnkTLI18(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[18],(void **)&LnkLI18,1,first,ap);va_end(ap);return V1;} /* LEAP-YEAR-P */
+static object  LnkTLI17(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[17],(void **)&LnkLI17,1,first,ap);va_end(ap);return V1;} /* NUMBER-OF-DAYS-FROM-1900 */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

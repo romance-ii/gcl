@@ -5,8 +5,9 @@ gcl (2.5.0.cvs20020625-72) unstable; urgency=high
   * nconc can take dotted lists
   * tailp returns t if first arg is nil
   * Repair nconc and tailp fixes
+  * varargs->stdarg for gcc 3.3 and higher
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 28 Jan 2003 10:42:39 -0500
+ -- Camm Maguire <camm@enhanced.com>  Sun,  9 Feb 2003 16:57:33 -0500
 
 gcl (2.5.0.cvs20020625-71) unstable; urgency=high
 

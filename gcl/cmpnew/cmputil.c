@@ -18,9 +18,7 @@ static void L1()
 }
 /*	local entry for function CMPERR	*/
 
-static object LI2(V2,va_alist)
-	object V2;
-	va_dcl 
+static object LI2(object V2,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB2 VMS2 VMV2
@@ -28,11 +26,11 @@ static object LI2(V2,va_alist)
 	{object V3;
 	object V4;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V3= V2;
 	narg= narg - 1;
-	V5 = list_vector(narg,ap);
+	V5 = list_vector_new(narg,first,ap);
 	V4= V5;
 	bds_bind(VV[3],VV[2]);
 	(void)((*(LnkLI58))());
@@ -142,9 +140,7 @@ TTL:;
 }
 /*	local entry for function CMPWARN	*/
 
-static object LI6(V20,va_alist)
-	object V20;
-	va_dcl 
+static object LI6(object V20,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB6 VMS6 VMV6
@@ -152,11 +148,11 @@ static object LI6(V20,va_alist)
 	{object V21;
 	object V22;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V21= V20;
 	narg= narg - 1;
-	V23 = list_vector(narg,ap);
+	V23 = list_vector_new(narg,first,ap);
 	V22= V23;
 	bds_bind(VV[3],VV[2]);
 	if((symbol_value(VV[12]))!=Cnil){
@@ -189,9 +185,7 @@ T32:;
 	}
 /*	local entry for function CMPNOTE	*/
 
-static object LI7(V26,va_alist)
-	object V26;
-	va_dcl 
+static object LI7(object V26,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB7 VMS7 VMV7
@@ -199,11 +193,11 @@ static object LI7(V26,va_alist)
 	{object V27;
 	object V28;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V27= V26;
 	narg= narg - 1;
-	V29 = list_vector(narg,ap);
+	V29 = list_vector_new(narg,first,ap);
 	V28= V29;
 	bds_bind(VV[3],VV[2]);
 	if((symbol_value(VV[14]))!=Cnil){
@@ -817,12 +811,12 @@ T222:;
 	base[0]=base[0];
 	return Cnil;
 }
-static object  LnkTLI64(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[64],(void **)&LnkLI64,2,ap);va_end(ap);return V1;} /* COMPILER-DEF-HOOK */
+static object  LnkTLI64(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[64],(void **)&LnkLI64,2,first,ap);va_end(ap);return V1;} /* COMPILER-DEF-HOOK */
 static void LnkT63(){ call_or_link(VV[63],(void **)&Lnk63);} /* ERROR-SET */
 static void LnkT62(){ call_or_link(VV[62],(void **)&Lnk62);} /* IHS-TOP */
-static object  LnkTLI61(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[61],(void **)&LnkLI61,1,ap);va_end(ap);return V1;} /* ADD-MACRO-CALLEE */
+static object  LnkTLI61(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[61],(void **)&LnkLI61,1,first,ap);va_end(ap);return V1;} /* ADD-MACRO-CALLEE */
 static void LnkT60(){ call_or_link(VV[60],(void **)&Lnk60);} /* CMP-TOPLEVEL-EVAL */
-static object  LnkTLI59(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[59],(void **)&LnkLI59,ap);va_end(ap);return V1;} /* BREAK */
+static object  LnkTLI59(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[59],(void **)&LnkLI59,first,ap);va_end(ap);return V1;} /* BREAK */
 static object  LnkTLI58(){return call_proc0(VV[58],(void **)&LnkLI58);} /* PRINT-CURRENT-FORM */
 
 #ifdef SYSTEM_SPECIAL_INIT

@@ -393,26 +393,25 @@ T64:;
 }
 /*	local entry for function Y-OR-N-P	*/
 
-static object LI9(va_alist)
-	va_dcl 
+static object LI9(object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB9 VMS9 VMV9
 	{register object V64;
 	register object V65;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	narg = narg - 0;
 	if (narg <= 0) goto T65;
 	else {
-	V64= va_arg(ap,object);}
+	V64= first;}
 	--narg; goto T66;
 goto T65;
 T65:;
 	V64= Cnil;
 goto T66;
 T66:;
-	V66 = list_vector(narg,ap);
+	V66 = list_vector_new(narg,first,ap);
 	V65= V66;
 	{register object V67;
 	V67= Cnil;
@@ -463,26 +462,25 @@ T82:;
 	}
 /*	local entry for function YES-OR-NO-P	*/
 
-static object LI10(va_alist)
-	va_dcl 
+static object LI10(object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB10 VMS10 VMV10
 	{register object V70;
 	register object V71;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	narg = narg - 0;
 	if (narg <= 0) goto T94;
 	else {
-	V70= va_arg(ap,object);}
+	V70= first;}
 	--narg; goto T95;
 goto T94;
 T94:;
 	V70= Cnil;
 goto T95;
 T95:;
-	V72 = list_vector(narg,ap);
+	V72 = list_vector_new(narg,first,ap);
 	V71= V72;
 	{register object V73;
 	V73= Cnil;
@@ -586,8 +584,7 @@ T140:;
 }
 /*	local entry for function DRIBBLE	*/
 
-static object LI12(va_alist)
-	va_dcl 
+static object LI12(object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB12 VMS12 VMV12
@@ -595,11 +592,11 @@ static object LI12(va_alist)
 	object V91;
 	object V92;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	narg = narg - 0;
 	if (narg <= 0) goto T145;
 	else {
-	V90= va_arg(ap,object);}
+	V90= first;}
 	V91= Ct;
 	if (--narg <= 0) goto T146;
 	else {
@@ -764,8 +761,8 @@ T207:;
 	}
 static void LnkT58(){ call_or_link(VV[58],(void **)&Lnk58);} /* GET-DECODED-TIME */
 static void LnkT11(){ call_or_link(VV[11],(void **)&Lnk11);} /* OPEN */
-static object  LnkTLI57(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[57],(void **)&LnkLI57,ap);va_end(ap);return V1;} /* WARN */
-static object  LnkTLI56(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[56],(void **)&LnkLI56,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
+static object  LnkTLI57(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[57],(void **)&LnkLI57,first,ap);va_end(ap);return V1;} /* WARN */
+static object  LnkTLI56(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[56],(void **)&LnkLI56,first,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
 static void LnkT9(){ call_or_link(VV[9],(void **)&Lnk9);} /* GET-OUTPUT-STREAM-STRING */
 static void LnkT55(){ call_or_link(VV[55],(void **)&Lnk55);} /* MAKE-STRING-OUTPUT-STREAM */
 static void LnkT6(){ call_or_link(VV[6],(void **)&Lnk6);} /* GET-STRING-INPUT-STREAM-INDEX */

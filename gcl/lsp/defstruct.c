@@ -4,9 +4,7 @@
 void init_defstruct(){do_init(VV);}
 /*	local entry for function MAKE-ACCESS-FUNCTION	*/
 
-static object LI1(V11,V10,V9,V8,V7,V6,V5,V4,V3,V2,V1,va_alist)
-	object V11,V10,V9,V8,V7,V6,V5,V4,V3,V2,V1;
-	va_dcl 
+static object LI1(object V11,object V10,object V9,object V8,object V7,object V6,object V5,object V4,object V3,object V2,object V1,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB1 VMS1 VMV1
@@ -22,7 +20,7 @@ static object LI1(V11,V10,V9,V8,V7,V6,V5,V4,V3,V2,V1,va_alist)
 	object V21;
 	object V22;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <11) too_few_arguments();
 	V12= V11;
 	V13= V10;
@@ -38,7 +36,7 @@ static object LI1(V11,V10,V9,V8,V7,V6,V5,V4,V3,V2,V1,va_alist)
 	narg = narg - 11;
 	if (narg <= 0) goto T1;
 	else {
-	V22= va_arg(ap,object);}
+	V22= first;}
 	--narg; goto T2;
 goto T1;
 T1:;
@@ -1323,9 +1321,7 @@ T549:;
 }
 /*	local entry for function DEFINE-STRUCTURE	*/
 
-static object LI10(V229,V228,V227,V226,V225,V224,V223,V222,V221,V220,V219,V218,va_alist)
-	object V229,V228,V227,V226,V225,V224,V223,V222,V221,V220,V219,V218;
-	va_dcl 
+static object LI10(object V229,object V228,object V227,object V226,object V225,object V224,object V223,object V222,object V221,object V220,object V219,object V218,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB10 VMS10 VMV10
@@ -1343,7 +1339,7 @@ static object LI10(V229,V228,V227,V226,V225,V224,V223,V222,V221,V220,V219,V218,v
 	object V241;
 	register object V242;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <12) too_few_arguments();
 	Vcs[0]=MMcons(V229,Cnil);
 	V230= V228;
@@ -1360,7 +1356,7 @@ static object LI10(V229,V228,V227,V226,V225,V224,V223,V222,V221,V220,V219,V218,v
 	narg = narg - 12;
 	if (narg <= 0) goto T595;
 	else {
-	V241= va_arg(ap,object);}
+	V241= first;}
 	if (--narg <= 0) goto T596;
 	else {
 	V242= va_arg(ap,object);}
@@ -2142,8 +2138,7 @@ T970:;
 }
 /*	local entry for function MAKE-S-DATA	*/
 
-static object LI12(va_alist)
-	va_dcl 
+static object LI12(object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB12 VMS12 VMV12
@@ -2166,10 +2161,10 @@ static object LI12(va_alist)
 	object V335;
 	object V336;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	narg= narg - 0;
 	{
-	parse_key_new(narg,Vcs +0,(struct key *)&LI12key,ap);
+	parse_key_new_new(narg,Vcs +0,(struct key *)&LI12key,first,ap);
 	V319=(Vcs[0]);
 	V320=(Vcs[1]);
 	V321=(Vcs[2]);
@@ -2488,30 +2483,30 @@ T1070:;
 }
 static void LnkT147(){ call_or_link(VV[147],(void **)&Lnk147);} /* STRUCTURE-REF1 */
 static void LnkT146(){ call_or_link(VV[146],(void **)&Lnk146);} /* STRUCTURE-SUBTYPE-P */
-static object  LnkTLI142(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[142],(void **)&LnkLI142,5,ap);va_end(ap);return V1;} /* MAKE-PREDICATE */
-static object  LnkTLI141(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[141],(void **)&LnkLI141,5,ap);va_end(ap);return V1;} /* MAKE-CONSTRUCTOR */
-static object  LnkTLI140(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[140],(void **)&LnkLI140,2,ap);va_end(ap);return V1;} /* PARSE-SLOT-DESCRIPTION */
-static object  LnkTLI134(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[134],(void **)&LnkLI134,3,ap);va_end(ap);return V1;} /* CHECK-S-DATA */
-static object  LnkTLI133(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[133],(void **)&LnkLI133,ap);va_end(ap);return V1;} /* MAKE-S-DATA */
-static object  LnkTLI132(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[132],(void **)&LnkLI132,3,ap);va_end(ap);return V1;} /* GET-SLOT-POS */
-static object  LnkTLI131(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[131],(void **)&LnkLI131,ap);va_end(ap);return V1;} /* WARN */
+static object  LnkTLI142(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[142],(void **)&LnkLI142,5,first,ap);va_end(ap);return V1;} /* MAKE-PREDICATE */
+static object  LnkTLI141(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[141],(void **)&LnkLI141,5,first,ap);va_end(ap);return V1;} /* MAKE-CONSTRUCTOR */
+static object  LnkTLI140(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[140],(void **)&LnkLI140,2,first,ap);va_end(ap);return V1;} /* PARSE-SLOT-DESCRIPTION */
+static object  LnkTLI134(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[134],(void **)&LnkLI134,3,first,ap);va_end(ap);return V1;} /* CHECK-S-DATA */
+static object  LnkTLI133(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[133],(void **)&LnkLI133,first,ap);va_end(ap);return V1;} /* MAKE-S-DATA */
+static object  LnkTLI132(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[132],(void **)&LnkLI132,3,first,ap);va_end(ap);return V1;} /* GET-SLOT-POS */
+static object  LnkTLI131(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[131],(void **)&LnkLI131,first,ap);va_end(ap);return V1;} /* WARN */
 static void LnkT130(){ call_or_link(VV[130],(void **)&Lnk130);} /* MAKE-S-DATA-STRUCTURE */
-static object  LnkTLI129(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[129],(void **)&LnkLI129,3,ap);va_end(ap);return V1;} /* MAKE-T-TYPE */
+static object  LnkTLI129(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[129],(void **)&LnkLI129,3,first,ap);va_end(ap);return V1;} /* MAKE-T-TYPE */
 static void LnkT125(){ call_or_link(VV[125],(void **)&Lnk125);} /* MAKE-ACCESS-FUNCTION */
-static object  LnkTLI124(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[124],(void **)&LnkLI124,20738,ap);va_end(ap);return V1;} /* ROUND-UP */
+static object  LnkTLI124(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[124],(void **)&LnkLI124,20738,first,ap);va_end(ap);return V1;} /* ROUND-UP */
 static void LnkT123(){ call_or_link(VV[123],(void **)&Lnk123);} /* SIZE-OF */
-static object  LnkTLI122(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[122],(void **)&LnkLI122,2,ap);va_end(ap);return V1;} /* COERCE */
+static object  LnkTLI122(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[122],(void **)&LnkLI122,2,first,ap);va_end(ap);return V1;} /* COERCE */
 static void LnkT121(){ call_or_link(VV[121],(void **)&Lnk121);} /* TYPEP */
 static void LnkT120(){ call_or_link(VV[120],(void **)&Lnk120);} /* AET-TYPE */
 static void LnkT119(){ call_or_link(VV[119],(void **)&Lnk119);} /* ALIGNMENT */
-static object  LnkTLI118(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[118],(void **)&LnkLI118,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
-static object  LnkTLI117(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[117],(void **)&LnkLI117,2,ap);va_end(ap);return V1;} /* OVERWRITE-SLOT-DESCRIPTIONS */
-static object  LnkTLI116(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[116],(void **)&LnkLI116,1,ap);va_end(ap);return V1;} /* NORMALIZE-TYPE */
-static object  LnkTLI115(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[115],(void **)&LnkLI115,1,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
+static object  LnkTLI118(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[118],(void **)&LnkLI118,first,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
+static object  LnkTLI117(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[117],(void **)&LnkLI117,2,first,ap);va_end(ap);return V1;} /* OVERWRITE-SLOT-DESCRIPTIONS */
+static object  LnkTLI116(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[116],(void **)&LnkLI116,1,first,ap);va_end(ap);return V1;} /* NORMALIZE-TYPE */
+static object  LnkTLI115(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[115],(void **)&LnkLI115,1,first,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
 static object  LnkTLI111(){return call_proc0(VV[111],(void **)&LnkLI111);} /* ILLEGAL-BOA */
 static void LnkT110(){ call_or_link(VV[110],(void **)&Lnk110);} /* SUBTYPEP */
 static void LnkT109(){ call_or_link(VV[109],(void **)&Lnk109);} /* RECORD-FN */
-static object  LnkTLI108(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[108],(void **)&LnkLI108,ap);va_end(ap);return V1;} /* ADJUST-ARRAY */
+static object  LnkTLI108(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[108],(void **)&LnkLI108,first,ap);va_end(ap);return V1;} /* ADJUST-ARRAY */
 static void LnkT107(){ call_or_link(VV[107],(void **)&Lnk107);} /* STRING-CONCATENATE */
 
 #ifdef SYSTEM_SPECIAL_INIT

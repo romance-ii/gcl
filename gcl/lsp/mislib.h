@@ -1,7 +1,6 @@
 
 static void L1();
 static void L4();
-static object LI5();
 static void L6();
 static void L7();
 static void L8();
@@ -18,7 +17,7 @@ static object LI3();
 #define VMV3 vs_reserve(6);
 #define VMR3(VMT3) vs_top=base ; return(VMT3);
 #define VC4 object  V31 ,V29 ,V28 ,V26 ,V25;
-static object LI5();
+static object LI5(object,object,object,object,object,object,object,...);
 #define VMB5 register object *base=vs_top; object  V58 ,V57 ,V56 ,V55 ,V54; object Vcs[7];
 #define VMS5  register object *sup=vs_top+5;vs_top=sup;
 #define VMV5 vs_reserve(5);
@@ -57,9 +56,9 @@ static char * VVi[21]={
 (char *)(L9)
 };
 #define VV ((object *)VVi)
-static void LnkT19() ;
+static void LnkT19();
 static void (*Lnk19)() = LnkT19;
-static object  LnkTLI18() ;
-static object  (*LnkLI18)() = LnkTLI18;
-static object  LnkTLI17() ;
-static object  (*LnkLI17)() = LnkTLI17;
+static object  LnkTLI18(object,...);
+static object  (*LnkLI18)() = (object (*)()) LnkTLI18;
+static object  LnkTLI17(object,...);
+static object  (*LnkLI17)() = (object (*)()) LnkTLI17;

@@ -4,22 +4,20 @@
 void init_cmpwt(){do_init(VV);}
 /*	local entry for function WT-COMMENT	*/
 
-static object LI1(V1,va_alist)
-	object V1;
-	va_dcl 
+static object LI1(object V1,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB1 VMS1 VMV1
 	{object V2;
 	object V3;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V2= V1;
 	narg = narg - 1;
 	if (narg <= 0) goto T1;
 	else {
-	V3= va_arg(ap,object);}
+	V3= first;}
 	--narg; goto T2;
 goto T1;
 T1:;
@@ -261,22 +259,20 @@ T64:;
 }
 /*	local entry for function ADD-INIT	*/
 
-static object LI7(V32,va_alist)
-	object V32;
-	va_dcl 
+static object LI7(object V32,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB7 VMS7 VMV7
 	{object V33;
 	object V34;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V33= V32;
 	narg = narg - 1;
 	if (narg <= 0) goto T85;
 	else {
-	V34= va_arg(ap,object);}
+	V34= first;}
 	--narg; goto T86;
 goto T85;
 T85:;
@@ -780,17 +776,17 @@ T325:;
 	V106= car((V105));
 	goto T320;}
 }
-static object  LnkTLI55(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[55],(void **)&LnkLI55,ap);va_end(ap);return V1;} /* CONCATENATE */
+static object  LnkTLI55(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[55],(void **)&LnkLI55,first,ap);va_end(ap);return V1;} /* CONCATENATE */
 static void LnkT54(){ call_or_link(VV[54],(void **)&Lnk54);} /* CLOSE-FASD */
 static void LnkT53(){ call_or_link(VV[53],(void **)&Lnk53);} /* WRITE-FASD-TOP */
 static void LnkT52(){ call_or_link(VV[52],(void **)&Lnk52);} /* FIND-SHARING-TOP */
-static object  LnkTLI51(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[51],(void **)&LnkLI51,1,ap);va_end(ap);return V1;} /* WT-DATA1 */
+static object  LnkTLI51(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[51],(void **)&LnkLI51,1,first,ap);va_end(ap);return V1;} /* WT-DATA1 */
 static void LnkT50(){ call_or_link(VV[50],(void **)&Lnk50);} /* WT-FASD-DATA-FILE */
-static object  LnkTLI49(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[49],(void **)&LnkLI49,2,ap);va_end(ap);return V1;} /* COERCE */
-static object  LnkTLI48(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[48],(void **)&LnkLI48,1,ap);va_end(ap);return V1;} /* VERIFY-DATA-VECTOR */
-static object  LnkTLI47(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[47],(void **)&LnkLI47,ap);va_end(ap);return V1;} /* CMPWARN */
+static object  LnkTLI49(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[49],(void **)&LnkLI49,2,first,ap);va_end(ap);return V1;} /* COERCE */
+static object  LnkTLI48(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[48],(void **)&LnkLI48,1,first,ap);va_end(ap);return V1;} /* VERIFY-DATA-VECTOR */
+static object  LnkTLI47(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[47],(void **)&LnkLI47,first,ap);va_end(ap);return V1;} /* CMPWARN */
 static void LnkT46(){ call_or_link(VV[46],(void **)&Lnk46);} /* HASH-EQUAL */
-static object  LnkTLI45(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[45],(void **)&LnkLI45,ap);va_end(ap);return V1;} /* VECTOR-PUSH-EXTEND */
+static object  LnkTLI45(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[45],(void **)&LnkLI45,first,ap);va_end(ap);return V1;} /* VECTOR-PUSH-EXTEND */
 static void LnkT44(){ call_or_link(VV[44],(void **)&Lnk44);} /* CMPILER-ERROR */
 static void LnkT43(){ call_or_link(VV[43],(void **)&Lnk43);} /* WT-LOC */
 

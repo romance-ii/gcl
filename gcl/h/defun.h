@@ -7,6 +7,11 @@
 #define DEFUNO(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,old,doc) \
 EXTER ret fname ();
 
+#define DEFUN_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) EXTER ret fname args;
+
+#define DEFUNO_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,old,args,doc) \
+EXTER ret fname args;
+
 
 #define DO_INIT(x)   
 #define DEFUNL DEFUN

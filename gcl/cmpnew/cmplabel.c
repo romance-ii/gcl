@@ -107,9 +107,7 @@ T15:;
 }
 /*	local entry for function UNWIND-EXIT	*/
 
-static object LI6(V16,va_alist)
-	object V16;
-	va_dcl 
+static object LI6(object V16,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB6 VMS6 VMV6
@@ -118,13 +116,13 @@ static object LI6(V16,va_alist)
 	object V18;
 	object V19;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V17= V16;
 	narg = narg - 1;
 	if (narg <= 0) goto T24;
 	else {
-	V18= va_arg(ap,object);}
+	V18= first;}
 	if (--narg <= 0) goto T25;
 	else {
 	V19= va_arg(ap,object);}
@@ -646,18 +644,18 @@ T274:;
 	base[0]=base[0];
 	return Cnil;
 }
-static object  LnkTLI56(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[56],(void **)&LnkLI56,1,ap);va_end(ap);return V1;} /* REP-TYPE */
+static object  LnkTLI56(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[56],(void **)&LnkLI56,1,first,ap);va_end(ap);return V1;} /* REP-TYPE */
 static object  LnkTLI55(){return call_proc0(VV[55],(void **)&LnkLI55);} /* WFS-ERROR */
 static object  LnkTLI54(){return call_proc0(VV[54],(void **)&LnkLI54);} /* VS-PUSH */
-static object  LnkTLI53(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[53],(void **)&LnkLI53,ap);va_end(ap);return V1;} /* CS-PUSH */
+static object  LnkTLI53(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[53],(void **)&LnkLI53,first,ap);va_end(ap);return V1;} /* CS-PUSH */
 static void LnkT52(){ call_or_link(VV[52],(void **)&Lnk52);} /* SET-LOC */
-static object  LnkTLI51(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[51],(void **)&LnkLI51,2,ap);va_end(ap);return V1;} /* UNWIND-BDS */
+static object  LnkTLI51(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[51],(void **)&LnkLI51,2,first,ap);va_end(ap);return V1;} /* UNWIND-BDS */
 static object  LnkTLI50(){return call_proc0(VV[50],(void **)&LnkLI50);} /* BABOON */
-static object  LnkTLI49(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[49],(void **)&LnkLI49,2,ap);va_end(ap);return V1;} /* SET-JUMP-FALSE */
-static object  LnkTLI48(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[48],(void **)&LnkLI48,2,ap);va_end(ap);return V1;} /* SET-JUMP-TRUE */
+static object  LnkTLI49(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[49],(void **)&LnkLI49,2,first,ap);va_end(ap);return V1;} /* SET-JUMP-FALSE */
+static object  LnkTLI48(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[48],(void **)&LnkLI48,2,first,ap);va_end(ap);return V1;} /* SET-JUMP-TRUE */
 static object  LnkTLI47(){return call_proc0(VV[47],(void **)&LnkLI47);} /* RESET-TOP */
-static object  LnkTLI46(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[46],(void **)&LnkLI46,2,ap);va_end(ap);return V1;} /* RECORD-CALL-INFO */
-static object  LnkTLI45(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[45],(void **)&LnkLI45,1,ap);va_end(ap);return V1;} /* WT1 */
+static object  LnkTLI46(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[46],(void **)&LnkLI46,2,first,ap);va_end(ap);return V1;} /* RECORD-CALL-INFO */
+static object  LnkTLI45(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[45],(void **)&LnkLI45,1,first,ap);va_end(ap);return V1;} /* WT1 */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

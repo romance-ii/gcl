@@ -360,7 +360,7 @@ TTL:;
 	VMR4(V74)}
 	return Cnil;
 }
-static object  LnkTLI34(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[34],(void **)&LnkLI34,1,ap);va_end(ap);return V1;} /* C2EXPR* */
+static object  LnkTLI34(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[34],(void **)&LnkLI34,1,first,ap);va_end(ap);return V1;} /* C2EXPR* */
 static void LnkT33(){ call_or_link(VV[33],(void **)&Lnk33);} /* WT-SHORT-FLOAT-LOC */
 static void LnkT32(){ call_or_link(VV[32],(void **)&Lnk32);} /* WT-LONG-FLOAT-LOC */
 static void LnkT31(){ call_or_link(VV[31],(void **)&Lnk31);} /* WT-CHARACTER-LOC */
@@ -371,11 +371,11 @@ static void LnkT27(){ call_or_link(VV[27],(void **)&Lnk27);} /* WT-INTEGER-LOC *
 static void LnkT26(){ call_or_link(VV[26],(void **)&Lnk26);} /* SAVE-AVMA */
 static object  LnkTLI25(){return call_proc0(VV[25],(void **)&LnkLI25);} /* BABOON */
 static object  LnkTLI18(){return call_proc0(VV[18],(void **)&LnkLI18);} /* WFS-ERROR */
-static object  LnkTLI17(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[17],(void **)&LnkLI17,1,ap);va_end(ap);return V1;} /* WT1 */
+static object  LnkTLI17(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[17],(void **)&LnkLI17,1,first,ap);va_end(ap);return V1;} /* WT1 */
 static object  LnkTLI15(){return call_proc0(VV[15],(void **)&LnkLI15);} /* CCB-VS-PUSH */
-static object  LnkTLI14(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[14],(void **)&LnkLI14,1,ap);va_end(ap);return V1;} /* CLINK */
-static object  LnkTLI13(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[13],(void **)&LnkLI13,ap);va_end(ap);return V1;} /* WT-CLINK */
-static object  LnkTLI12(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[12],(void **)&LnkLI12,1,ap);va_end(ap);return V1;} /* WT-VS */
+static object  LnkTLI14(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[14],(void **)&LnkLI14,1,first,ap);va_end(ap);return V1;} /* CLINK */
+static object  LnkTLI13(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[13],(void **)&LnkLI13,first,ap);va_end(ap);return V1;} /* WT-CLINK */
+static object  LnkTLI12(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[12],(void **)&LnkLI12,1,first,ap);va_end(ap);return V1;} /* WT-VS */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

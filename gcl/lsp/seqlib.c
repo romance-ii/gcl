@@ -140,22 +140,20 @@ TTL:;
 }
 /*	local entry for function BAD-SEQ-LIMIT	*/
 
-static object LI5(V28,va_alist)
-	object V28;
-	va_dcl 
+static object LI5(object V28,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB5 VMS5 VMV5
 	{object V29;
 	object V30;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V29= V28;
 	narg = narg - 1;
 	if (narg <= 0) goto T39;
 	else {
-	V30= va_arg(ap,object);}
+	V30= first;}
 	--narg; goto T40;
 goto T39;
 T39:;
@@ -378,9 +376,7 @@ T112:;
 }
 /*	local entry for function FILL	*/
 
-static object LI9(V64,V63,va_alist)
-	object V64,V63;
-	va_dcl 
+static object LI9(object V64,object V63,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB9 VMS9 VMV9
@@ -389,13 +385,13 @@ static object LI9(V64,V63,va_alist)
 	object V67;
 	object V68;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V65= V64;
 	V66= V63;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI9key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI9key,first,ap);
 	V67=(Vcs[2]);
 	V68=(Vcs[3]);
 	{long V69;
@@ -438,9 +434,7 @@ T134:;
 	}}
 /*	local entry for function REPLACE	*/
 
-static object LI10(V76,V75,va_alist)
-	object V76,V75;
-	va_dcl 
+static object LI10(object V76,object V75,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB10 VMS10 VMV10
@@ -451,13 +445,13 @@ static object LI10(V76,V75,va_alist)
 	object V81;
 	object V82;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V77= V76;
 	V78= V75;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI10key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI10key,first,ap);
 	V79=(Vcs[2]);
 	V80=(Vcs[3]);
 	V81=(Vcs[4]);
@@ -577,9 +571,7 @@ T193:;
 	}}
 /*	local entry for function REMOVE	*/
 
-static object LI11(V104,V103,va_alist)
-	object V104,V103;
-	va_dcl 
+static object LI11(object V104,object V103,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB11 VMS11 VMV11
@@ -593,13 +585,13 @@ static object LI11(V104,V103,va_alist)
 	object V112;
 	object V113;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V105= V104;
 	V106= V103;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI11key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI11key,first,ap);
 	V107=(Vcs[2]);
 	V108=(Vcs[3]);
 	V109=(Vcs[4]);
@@ -749,9 +741,7 @@ T223:;
 	}}
 /*	local entry for function REMOVE-IF	*/
 
-static object LI12(V142,V141,va_alist)
-	object V142,V141;
-	va_dcl 
+static object LI12(object V142,object V141,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB12 VMS12 VMV12
@@ -763,13 +753,13 @@ static object LI12(V142,V141,va_alist)
 	object V148;
 	object V149;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V143= V142;
 	V144= V141;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI12key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI12key,first,ap);
 	V145=(Vcs[2]);
 	V146=(Vcs[3]);
 	V147=(Vcs[4]);
@@ -791,9 +781,7 @@ T281:;
 	}}
 /*	local entry for function REMOVE-IF-NOT	*/
 
-static object LI13(V153,V152,va_alist)
-	object V153,V152;
-	va_dcl 
+static object LI13(object V153,object V152,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB13 VMS13 VMV13
@@ -805,13 +793,13 @@ static object LI13(V153,V152,va_alist)
 	object V159;
 	object V160;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V154= V153;
 	V155= V152;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI13key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI13key,first,ap);
 	V156=(Vcs[2]);
 	V157=(Vcs[3]);
 	V158=(Vcs[4]);
@@ -833,9 +821,7 @@ T287:;
 	}}
 /*	local entry for function DELETE	*/
 
-static object LI14(V164,V163,va_alist)
-	object V164,V163;
-	va_dcl 
+static object LI14(object V164,object V163,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB14 VMS14 VMV14
@@ -849,13 +835,13 @@ static object LI14(V164,V163,va_alist)
 	object V172;
 	object V173;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V165= V164;
 	V166= V163;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI14key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI14key,first,ap);
 	V167=(Vcs[2]);
 	V168=(Vcs[3]);
 	V169=(Vcs[4]);
@@ -1108,9 +1094,7 @@ T415:;
 	}}
 /*	local entry for function DELETE-IF	*/
 
-static object LI15(V230,V229,va_alist)
-	object V230,V229;
-	va_dcl 
+static object LI15(object V230,object V229,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB15 VMS15 VMV15
@@ -1122,13 +1106,13 @@ static object LI15(V230,V229,va_alist)
 	object V236;
 	object V237;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V231= V230;
 	V232= V229;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI15key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI15key,first,ap);
 	V233=(Vcs[2]);
 	V234=(Vcs[3]);
 	V235=(Vcs[4]);
@@ -1150,9 +1134,7 @@ T434:;
 	}}
 /*	local entry for function DELETE-IF-NOT	*/
 
-static object LI16(V241,V240,va_alist)
-	object V241,V240;
-	va_dcl 
+static object LI16(object V241,object V240,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB16 VMS16 VMV16
@@ -1164,13 +1146,13 @@ static object LI16(V241,V240,va_alist)
 	object V247;
 	object V248;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V242= V241;
 	V243= V240;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI16key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI16key,first,ap);
 	V244=(Vcs[2]);
 	V245=(Vcs[3]);
 	V246=(Vcs[4]);
@@ -1192,9 +1174,7 @@ T440:;
 	}}
 /*	local entry for function COUNT	*/
 
-static object LI17(V252,V251,va_alist)
-	object V252,V251;
-	va_dcl 
+static object LI17(object V252,object V251,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB17 VMS17 VMV17
@@ -1207,13 +1187,13 @@ static object LI17(V252,V251,va_alist)
 	object V259;
 	register object V260;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V253= V252;
 	V254= V251;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI17key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI17key,first,ap);
 	V255=(Vcs[2]);
 	V256=(Vcs[3]);
 	V257=(Vcs[4]);
@@ -1315,9 +1295,7 @@ T487:;
 	}}
 /*	local entry for function COUNT-IF	*/
 
-static object LI18(V274,V273,va_alist)
-	object V274,V273;
-	va_dcl 
+static object LI18(object V274,object V273,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB18 VMS18 VMV18
@@ -1328,13 +1306,13 @@ static object LI18(V274,V273,va_alist)
 	object V279;
 	object V280;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V275= V274;
 	V276= V273;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI18key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI18key,first,ap);
 	V277=(Vcs[2]);
 	V278=(Vcs[3]);
 	V279=(Vcs[4]);
@@ -1355,9 +1333,7 @@ T497:;
 	}}
 /*	local entry for function COUNT-IF-NOT	*/
 
-static object LI19(V284,V283,va_alist)
-	object V284,V283;
-	va_dcl 
+static object LI19(object V284,object V283,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB19 VMS19 VMV19
@@ -1368,13 +1344,13 @@ static object LI19(V284,V283,va_alist)
 	object V289;
 	object V290;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V285= V284;
 	V286= V283;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI19key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI19key,first,ap);
 	V287=(Vcs[2]);
 	V288=(Vcs[3]);
 	V289=(Vcs[4]);
@@ -1395,9 +1371,7 @@ T503:;
 	}}
 /*	local entry for function INTERNAL-COUNT	*/
 
-static object LI20(V294,V293,va_alist)
-	object V294,V293;
-	va_dcl 
+static object LI20(object V294,object V293,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB20 VMS20 VMV20
@@ -1411,13 +1385,13 @@ static object LI20(V294,V293,va_alist)
 	object V302;
 	register object V303;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V295= V294;
 	V296= V293;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI20key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI20key,first,ap);
 	V297=(Vcs[2]);
 	V298=(Vcs[3]);
 	V299=(Vcs[4]);
@@ -1537,9 +1511,7 @@ T557:;
 	}}
 /*	local entry for function INTERNAL-COUNT-IF	*/
 
-static object LI21(V322,V321,va_alist)
-	object V322,V321;
-	va_dcl 
+static object LI21(object V322,object V321,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB21 VMS21 VMV21
@@ -1551,13 +1523,13 @@ static object LI21(V322,V321,va_alist)
 	object V328;
 	object V329;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V323= V322;
 	V324= V321;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI21key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI21key,first,ap);
 	V325=(Vcs[2]);
 	V326=(Vcs[3]);
 	V327=(Vcs[4]);
@@ -1579,9 +1551,7 @@ T569:;
 	}}
 /*	local entry for function INTERNAL-COUNT-IF-NOT	*/
 
-static object LI22(V333,V332,va_alist)
-	object V333,V332;
-	va_dcl 
+static object LI22(object V333,object V332,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB22 VMS22 VMV22
@@ -1593,13 +1563,13 @@ static object LI22(V333,V332,va_alist)
 	object V339;
 	object V340;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V334= V333;
 	V335= V332;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI22key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI22key,first,ap);
 	V336=(Vcs[2]);
 	V337=(Vcs[3]);
 	V338=(Vcs[4]);
@@ -1621,9 +1591,7 @@ T575:;
 	}}
 /*	local entry for function SUBSTITUTE	*/
 
-static object LI23(V345,V344,V343,va_alist)
-	object V345,V344,V343;
-	va_dcl 
+static object LI23(object V345,object V344,object V343,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB23 VMS23 VMV23
@@ -1638,14 +1606,14 @@ static object LI23(V345,V344,V343,va_alist)
 	object V354;
 	object V355;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <3) too_few_arguments();
 	V346= V345;
 	V347= V344;
 	V348= V343;
 	narg= narg - 3;
 	{
-	parse_key_new(narg,Vcs +3,(struct key *)&LI23key,ap);
+	parse_key_new_new(narg,Vcs +3,(struct key *)&LI23key,first,ap);
 	V349=(Vcs[3]);
 	V350=(Vcs[4]);
 	V351=(Vcs[5]);
@@ -1795,9 +1763,7 @@ T638:;
 	}}
 /*	local entry for function SUBSTITUTE-IF	*/
 
-static object LI24(V384,V383,V382,va_alist)
-	object V384,V383,V382;
-	va_dcl 
+static object LI24(object V384,object V383,object V382,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB24 VMS24 VMV24
@@ -1810,14 +1776,14 @@ static object LI24(V384,V383,V382,va_alist)
 	object V391;
 	object V392;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <3) too_few_arguments();
 	V385= V384;
 	V386= V383;
 	V387= V382;
 	narg= narg - 3;
 	{
-	parse_key_new(narg,Vcs +3,(struct key *)&LI24key,ap);
+	parse_key_new_new(narg,Vcs +3,(struct key *)&LI24key,first,ap);
 	V388=(Vcs[3]);
 	V389=(Vcs[4]);
 	V390=(Vcs[5]);
@@ -1839,9 +1805,7 @@ T656:;
 	}}
 /*	local entry for function SUBSTITUTE-IF-NOT	*/
 
-static object LI25(V397,V396,V395,va_alist)
-	object V397,V396,V395;
-	va_dcl 
+static object LI25(object V397,object V396,object V395,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB25 VMS25 VMV25
@@ -1854,14 +1818,14 @@ static object LI25(V397,V396,V395,va_alist)
 	object V404;
 	object V405;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <3) too_few_arguments();
 	V398= V397;
 	V399= V396;
 	V400= V395;
 	narg= narg - 3;
 	{
-	parse_key_new(narg,Vcs +3,(struct key *)&LI25key,ap);
+	parse_key_new_new(narg,Vcs +3,(struct key *)&LI25key,first,ap);
 	V401=(Vcs[3]);
 	V402=(Vcs[4]);
 	V403=(Vcs[5]);
@@ -1883,9 +1847,7 @@ T662:;
 	}}
 /*	local entry for function NSUBSTITUTE	*/
 
-static object LI26(V410,V409,V408,va_alist)
-	object V410,V409,V408;
-	va_dcl 
+static object LI26(object V410,object V409,object V408,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB26 VMS26 VMV26
@@ -1900,14 +1862,14 @@ static object LI26(V410,V409,V408,va_alist)
 	object V419;
 	register object V420;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <3) too_few_arguments();
 	V411= V410;
 	V412= V409;
 	V413= V408;
 	narg= narg - 3;
 	{
-	parse_key_new(narg,Vcs +3,(struct key *)&LI26key,ap);
+	parse_key_new_new(narg,Vcs +3,(struct key *)&LI26key,first,ap);
 	V414=(Vcs[3]);
 	V415=(Vcs[4]);
 	V416=(Vcs[5]);
@@ -2029,9 +1991,7 @@ T717:;
 	}}
 /*	local entry for function NSUBSTITUTE-IF	*/
 
-static object LI27(V440,V439,V438,va_alist)
-	object V440,V439,V438;
-	va_dcl 
+static object LI27(object V440,object V439,object V438,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB27 VMS27 VMV27
@@ -2044,14 +2004,14 @@ static object LI27(V440,V439,V438,va_alist)
 	object V447;
 	object V448;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <3) too_few_arguments();
 	V441= V440;
 	V442= V439;
 	V443= V438;
 	narg= narg - 3;
 	{
-	parse_key_new(narg,Vcs +3,(struct key *)&LI27key,ap);
+	parse_key_new_new(narg,Vcs +3,(struct key *)&LI27key,first,ap);
 	V444=(Vcs[3]);
 	V445=(Vcs[4]);
 	V446=(Vcs[5]);
@@ -2073,9 +2033,7 @@ T730:;
 	}}
 /*	local entry for function NSUBSTITUTE-IF-NOT	*/
 
-static object LI28(V453,V452,V451,va_alist)
-	object V453,V452,V451;
-	va_dcl 
+static object LI28(object V453,object V452,object V451,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB28 VMS28 VMV28
@@ -2088,14 +2046,14 @@ static object LI28(V453,V452,V451,va_alist)
 	object V460;
 	object V461;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <3) too_few_arguments();
 	V454= V453;
 	V455= V452;
 	V456= V451;
 	narg= narg - 3;
 	{
-	parse_key_new(narg,Vcs +3,(struct key *)&LI28key,ap);
+	parse_key_new_new(narg,Vcs +3,(struct key *)&LI28key,first,ap);
 	V457=(Vcs[3]);
 	V458=(Vcs[4]);
 	V459=(Vcs[5]);
@@ -2117,9 +2075,7 @@ T736:;
 	}}
 /*	local entry for function FIND	*/
 
-static object LI29(V465,V464,va_alist)
-	object V465,V464;
-	va_dcl 
+static object LI29(object V465,object V464,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB29 VMS29 VMV29
@@ -2132,13 +2088,13 @@ static object LI29(V465,V464,va_alist)
 	object V472;
 	register object V473;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V466= V465;
 	V467= V464;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI29key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI29key,first,ap);
 	V468=(Vcs[2]);
 	V469=(Vcs[3]);
 	V470=(Vcs[4]);
@@ -2238,9 +2194,7 @@ T780:;
 	}}
 /*	local entry for function FIND-IF	*/
 
-static object LI30(V487,V486,va_alist)
-	object V487,V486;
-	va_dcl 
+static object LI30(object V487,object V486,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB30 VMS30 VMV30
@@ -2251,13 +2205,13 @@ static object LI30(V487,V486,va_alist)
 	object V492;
 	object V493;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V488= V487;
 	V489= V486;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI30key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI30key,first,ap);
 	V490=(Vcs[2]);
 	V491=(Vcs[3]);
 	V492=(Vcs[4]);
@@ -2278,9 +2232,7 @@ T789:;
 	}}
 /*	local entry for function FIND-IF-NOT	*/
 
-static object LI31(V497,V496,va_alist)
-	object V497,V496;
-	va_dcl 
+static object LI31(object V497,object V496,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB31 VMS31 VMV31
@@ -2291,13 +2243,13 @@ static object LI31(V497,V496,va_alist)
 	object V502;
 	object V503;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V498= V497;
 	V499= V496;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI31key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI31key,first,ap);
 	V500=(Vcs[2]);
 	V501=(Vcs[3]);
 	V502=(Vcs[4]);
@@ -2318,9 +2270,7 @@ T795:;
 	}}
 /*	local entry for function POSITION	*/
 
-static object LI32(V507,V506,va_alist)
-	object V507,V506;
-	va_dcl 
+static object LI32(object V507,object V506,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB32 VMS32 VMV32
@@ -2333,13 +2283,13 @@ static object LI32(V507,V506,va_alist)
 	object V514;
 	register object V515;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V508= V507;
 	V509= V506;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI32key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI32key,first,ap);
 	V510=(Vcs[2]);
 	V511=(Vcs[3]);
 	V512=(Vcs[4]);
@@ -2439,9 +2389,7 @@ T839:;
 	}}
 /*	local entry for function POSITION-IF	*/
 
-static object LI33(V529,V528,va_alist)
-	object V529,V528;
-	va_dcl 
+static object LI33(object V529,object V528,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB33 VMS33 VMV33
@@ -2452,13 +2400,13 @@ static object LI33(V529,V528,va_alist)
 	object V534;
 	object V535;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V530= V529;
 	V531= V528;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI33key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI33key,first,ap);
 	V532=(Vcs[2]);
 	V533=(Vcs[3]);
 	V534=(Vcs[4]);
@@ -2479,9 +2427,7 @@ T848:;
 	}}
 /*	local entry for function POSITION-IF-NOT	*/
 
-static object LI34(V539,V538,va_alist)
-	object V539,V538;
-	va_dcl 
+static object LI34(object V539,object V538,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB34 VMS34 VMV34
@@ -2492,13 +2438,13 @@ static object LI34(V539,V538,va_alist)
 	object V544;
 	object V545;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V540= V539;
 	V541= V538;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI34key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI34key,first,ap);
 	V542=(Vcs[2]);
 	V543=(Vcs[3]);
 	V544=(Vcs[4]);
@@ -2519,9 +2465,7 @@ T854:;
 	}}
 /*	local entry for function REMOVE-DUPLICATES	*/
 
-static object LI35(V548,va_alist)
-	object V548;
-	va_dcl 
+static object LI35(object V548,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB35 VMS35 VMV35
@@ -2533,12 +2477,12 @@ static object LI35(V548,va_alist)
 	object V554;
 	register object V555;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V549= V548;
 	narg= narg - 1;
 	{
-	parse_key_new(narg,Vcs +1,(struct key *)&LI35key,ap);
+	parse_key_new_new(narg,Vcs +1,(struct key *)&LI35key,first,ap);
 	V550=(Vcs[1]);
 	V551=(Vcs[2]);
 	V552=(Vcs[3]);
@@ -2614,9 +2558,7 @@ T861:;
 	}}
 /*	local entry for function DELETE-DUPLICATES	*/
 
-static object LI36(V561,va_alist)
-	object V561;
-	va_dcl 
+static object LI36(object V561,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB36 VMS36 VMV36
@@ -2628,12 +2570,12 @@ static object LI36(V561,va_alist)
 	object V567;
 	register object V568;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V562= V561;
 	narg= narg - 1;
 	{
-	parse_key_new(narg,Vcs +1,(struct key *)&LI36key,ap);
+	parse_key_new_new(narg,Vcs +1,(struct key *)&LI36key,first,ap);
 	V563=(Vcs[1]);
 	V564=(Vcs[2]);
 	V565=(Vcs[3]);
@@ -2884,9 +2826,7 @@ T1019:;
 	}}
 /*	local entry for function MISMATCH	*/
 
-static object LI37(V610,V609,va_alist)
-	object V610,V609;
-	va_dcl 
+static object LI37(object V610,object V609,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB37 VMS37 VMV37
@@ -2901,13 +2841,13 @@ static object LI37(V610,V609,va_alist)
 	object V619;
 	object V620;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V611= V610;
 	V612= V609;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI37key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI37key,first,ap);
 	V613=(Vcs[2]);
 	V614=(Vcs[3]);
 	V615=(Vcs[4]);
@@ -3066,9 +3006,7 @@ T1090:;
 	}}
 /*	local entry for function SEARCH	*/
 
-static object LI38(V644,V643,va_alist)
-	object V644,V643;
-	va_dcl 
+static object LI38(object V644,object V643,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB38 VMS38 VMV38
@@ -3083,13 +3021,13 @@ static object LI38(V644,V643,va_alist)
 	object V653;
 	object V654;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V645= V644;
 	V646= V643;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI38key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI38key,first,ap);
 	V647=(Vcs[2]);
 	V648=(Vcs[3]);
 	V649=(Vcs[4]);
@@ -3446,9 +3384,7 @@ T1247:;
 }
 /*	local entry for function MERGE	*/
 
-static object LI44(V705,V704,V703,V702,va_alist)
-	object V705,V704,V703,V702;
-	va_dcl 
+static object LI44(object V705,object V704,object V703,object V702,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB43 VMS43 VMV43
@@ -3458,7 +3394,7 @@ static object LI44(V705,V704,V703,V702,va_alist)
 	object V709;
 	register object V710;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <4) too_few_arguments();
 	V706= V705;
 	V707= V704;
@@ -3466,7 +3402,7 @@ static object LI44(V705,V704,V703,V702,va_alist)
 	V709= V702;
 	narg= narg - 4;
 	{
-	parse_key_new(narg,Vcs +4,(struct key *)&LI44key,ap);
+	parse_key_new_new(narg,Vcs +4,(struct key *)&LI44key,first,ap);
 	if(Vcs[4]==0){
 	V710= symbol_function(VV[35]);
 	}else{
@@ -3941,27 +3877,27 @@ T1449:;
 }
 static void LnkT62(){ call_or_link(VV[62],(void **)&Lnk62);} /* ARRAY-HAS-FILL-POINTER-P */
 static void LnkT61(){ call_or_link(VV[61],(void **)&Lnk61);} /* SUBTYPEP */
-static object  LnkTLI60(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[60],(void **)&LnkLI60,2,ap);va_end(ap);return V1;} /* COERCE */
+static object  LnkTLI60(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[60],(void **)&LnkLI60,2,first,ap);va_end(ap);return V1;} /* COERCE */
 static void LnkT59(){ call_or_link(VV[59],(void **)&Lnk59);} /* SORT */
-static object  LnkTLI58(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[58],(void **)&LnkLI58,81925,ap);va_end(ap);return V1;} /* QUICK-SORT */
+static object  LnkTLI58(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[58],(void **)&LnkLI58,81925,first,ap);va_end(ap);return V1;} /* QUICK-SORT */
 static void LnkT57(){ call_or_link(VV[57],(void **)&Lnk57);} /* LIST-MERGE-SORT */
-static object  LnkTLI56(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[56],(void **)&LnkLI56,ap);va_end(ap);return V1;} /* DELETE-DUPLICATES */
+static object  LnkTLI56(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[56],(void **)&LnkLI56,first,ap);va_end(ap);return V1;} /* DELETE-DUPLICATES */
 static void LnkT55(){ call_or_link(VV[55],(void **)&Lnk55);} /* MEMBER1 */
-static object  LnkTLI54(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[54],(void **)&LnkLI54,ap);va_end(ap);return V1;} /* POSITION */
-static object  LnkTLI53(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[53],(void **)&LnkLI53,ap);va_end(ap);return V1;} /* FIND */
-static object  LnkTLI52(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[52],(void **)&LnkLI52,ap);va_end(ap);return V1;} /* NSUBSTITUTE */
-static object  LnkTLI51(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[51],(void **)&LnkLI51,ap);va_end(ap);return V1;} /* SUBSTITUTE */
-static object  LnkTLI50(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[50],(void **)&LnkLI50,ap);va_end(ap);return V1;} /* COUNT */
-static object  LnkTLI49(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[49],(void **)&LnkLI49,1,ap);va_end(ap);return V1;} /* SEQTYPE */
-static object  LnkTLI48(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[48],(void **)&LnkLI48,ap);va_end(ap);return V1;} /* MAKE-SEQUENCE */
-static object  LnkTLI47(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[47],(void **)&LnkLI47,ap);va_end(ap);return V1;} /* INTERNAL-COUNT */
-static object  LnkTLI45(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[45],(void **)&LnkLI45,ap);va_end(ap);return V1;} /* REMOVE */
-static object  LnkTLI44(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[44],(void **)&LnkLI44,ap);va_end(ap);return V1;} /* DELETE */
-static object  LnkTLI43(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[43],(void **)&LnkLI43,4,ap);va_end(ap);return V1;} /* CALL-TEST */
+static object  LnkTLI54(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[54],(void **)&LnkLI54,first,ap);va_end(ap);return V1;} /* POSITION */
+static object  LnkTLI53(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[53],(void **)&LnkLI53,first,ap);va_end(ap);return V1;} /* FIND */
+static object  LnkTLI52(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[52],(void **)&LnkLI52,first,ap);va_end(ap);return V1;} /* NSUBSTITUTE */
+static object  LnkTLI51(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[51],(void **)&LnkLI51,first,ap);va_end(ap);return V1;} /* SUBSTITUTE */
+static object  LnkTLI50(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[50],(void **)&LnkLI50,first,ap);va_end(ap);return V1;} /* COUNT */
+static object  LnkTLI49(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[49],(void **)&LnkLI49,1,first,ap);va_end(ap);return V1;} /* SEQTYPE */
+static object  LnkTLI48(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[48],(void **)&LnkLI48,first,ap);va_end(ap);return V1;} /* MAKE-SEQUENCE */
+static object  LnkTLI47(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[47],(void **)&LnkLI47,first,ap);va_end(ap);return V1;} /* INTERNAL-COUNT */
+static object  LnkTLI45(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[45],(void **)&LnkLI45,first,ap);va_end(ap);return V1;} /* REMOVE */
+static object  LnkTLI44(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[44],(void **)&LnkLI44,first,ap);va_end(ap);return V1;} /* DELETE */
+static object  LnkTLI43(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[43],(void **)&LnkLI43,4,first,ap);va_end(ap);return V1;} /* CALL-TEST */
 static object  LnkTLI42(){return call_proc0(VV[42],(void **)&LnkLI42);} /* TEST-ERROR */
-static object  LnkTLI37(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[37],(void **)&LnkLI37,258,ap);va_end(ap);return V1;} /* THE-END */
-static object  LnkTLI36(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[36],(void **)&LnkLI36,257,ap);va_end(ap);return V1;} /* THE-START */
-static object  LnkTLI33(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[33],(void **)&LnkLI33,ap);va_end(ap);return V1;} /* BAD-SEQ-LIMIT */
+static object  LnkTLI37(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[37],(void **)&LnkLI37,258,first,ap);va_end(ap);return V1;} /* THE-END */
+static object  LnkTLI36(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[36],(void **)&LnkLI36,257,first,ap);va_end(ap);return V1;} /* THE-START */
+static object  LnkTLI33(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[33],(void **)&LnkLI33,first,ap);va_end(ap);return V1;} /* BAD-SEQ-LIMIT */
 static void LnkT32(){ call_or_link(VV[32],(void **)&Lnk32);} /* SPECIFIC-ERROR */
 
 #ifdef SYSTEM_SPECIAL_INIT

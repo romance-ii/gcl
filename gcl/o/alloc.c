@@ -24,7 +24,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	IMPLEMENTATION-DEPENDENT
 */
 
-/*  #define _GNU_SOURCE */
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -375,9 +374,7 @@ object on_stack_cons(object x, object y)
 }
 
 
-DEFUN("ALLOCATED",object,fSallocated,SI
-   ,2,2,NONE,OO,OO,OO,OO,"")(typ)
-object typ;
+DEFUN_NEW("ALLOCATED",object,fSallocated,SI,2,2,NONE,OO,OO,OO,OO,(object typ),"")
 { struct typemanager *tm=(&tm_table[t_from_type(typ)]);
   tm = & tm_table[tm->tm_type];
   if (tm->tm_type == t_relocatable)
@@ -401,8 +398,7 @@ object typ;
 	     ));
 }
  
-DEFUN("RESET-NUMBER-USED",object,fSreset_number_used,SI,0,1,NONE,OO,OO,OO,OO,"")(typ)
-     object typ;
+DEFUN_NEW("RESET-NUMBER-USED",object,fSreset_number_used,SI,0,1,NONE,OO,OO,OO,OO,(object typ),"")
 {int i;
  if (VFUN_NARGS == 1)
    { tm_table[t_from_type(typ)].tm_nused = 0;}
@@ -732,8 +728,7 @@ init_alloc(void) {
   
 }
 
-DEFUN("STATICP",object,fSstaticp,SI,1,1,NONE,OO,OO,OO,OO,"Tell if the string or vector is static") (x)
-object x;
+DEFUN_NEW("STATICP",object,fSstaticp,SI,1,1,NONE,OO,OO,OO,OO,(object x),"Tell if the string or vector is static") 
 { RETURN1((inheap(x->ust.ust_self) ? sLt : sLnil));
 }
 
@@ -742,11 +737,8 @@ cant_get_a_type(void) {
   FEerror("Can't get a type.", 0);
 }
 
-DEFUNO("ALLOCATE",object,fSallocate,SI
-       ,2,3,NONE,OO,IO,OO,OO,siLallocate,"")(type,npages,va_alist) 
-     object type;
-     int npages;
-     va_dcl
+DEFUNO_NEW("ALLOCATE",object,fSallocate,SI
+       ,2,3,NONE,OO,IO,OO,OO,siLallocate,(object type,int npages,...),"")
 {
 
   int nargs=VFUN_NARGS;
@@ -758,7 +750,7 @@ DEFUNO("ALLOCATE",object,fSallocate,SI
   
   really_do=Cnil;
   if (nargs>=3) {
-    va_start(ap);
+    va_start(ap,npages);
     really_do=va_arg(ap,object);
     va_end(ap);
   }
@@ -818,8 +810,8 @@ t_from_type(object type) {
    when the sgc is turned on.  FREE_PERCENT is an integer between 0 and 100. 
    */
 
-DEFUN("ALLOCATE-SGC",object,fSallocate_sgc,SI
-      ,4,4,NONE,OO,II,II,OO,"")(object type,int min,int max,int free_percent) {
+DEFUN_NEW("ALLOCATE-SGC",object,fSallocate_sgc,SI
+      ,4,4,NONE,OO,II,II,OO,(object type,int min,int max,int free_percent),"") {
 
   int t=t_from_type(type);
   struct typemanager *tm;
@@ -842,10 +834,8 @@ DEFUN("ALLOCATE-SGC",object,fSallocate_sgc,SI
 /* Growth of TYPE will be by at least MIN pages and at most MAX pages.
    It will try to grow PERCENT of the current pages.
    */
-DEFUN("ALLOCATE-GROWTH",object,fSallocate_growth,SI,5,5,NONE,OO,II,II,OO,"")
-     (type,min,max,percent,percent_free)
-int min,max,percent,percent_free;
-object type;
+DEFUN_NEW("ALLOCATE-GROWTH",object,fSallocate_growth,SI,5,5,NONE,OO,II,II,OO,
+      (object type,int min,int max,int percent,int percent_free),"")
 {int  t=t_from_type(type);
  struct typemanager *tm=tm_of(t);
  object res;
@@ -868,10 +858,8 @@ object type;
 
 
 
-DEFUNO("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
-       ,1,2,NONE,OI,OO,OO,OO,siLalloc_contpage,"")(npages,va_alist) 
-     int npages;
-     va_dcl
+DEFUNO_NEW("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
+       ,1,2,NONE,OI,OO,OO,OO,siLalloc_contpage,(int npages,...),"")
 {
 
   int nargs=VFUN_NARGS,i,m;
@@ -881,7 +869,7 @@ DEFUNO("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
   
   really_do=Cnil;
   if (nargs>=2) {
-    va_start(ap);
+    va_start(ap,npages);
     really_do=va_arg(ap,object);
     va_end(ap);
   }
@@ -911,25 +899,23 @@ DEFUNO("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
 }
 
 
-DEFUNO("ALLOCATED-CONTIGUOUS-PAGES",object,fSallocated_contiguous_pages,SI
-   ,0,0,NONE,OO,OO,OO,OO,siLncbpage,"")()
+DEFUNO_NEW("ALLOCATED-CONTIGUOUS-PAGES",object,fSallocated_contiguous_pages,SI
+       ,0,0,NONE,OO,OO,OO,OO,siLncbpage,(void),"")
 {
 	/* 0 args */
 	RETURN1((make_fixnum(ncbpage)));
 }
 
-DEFUNO("MAXIMUM-CONTIGUOUS-PAGES",object,fSmaximum_contiguous_pages,SI
-   ,0,0,NONE,OO,OO,OO,OO,siLmaxcbpage,"")()
+DEFUNO_NEW("MAXIMUM-CONTIGUOUS-PAGES",object,fSmaximum_contiguous_pages,SI
+       ,0,0,NONE,OO,OO,OO,OO,siLmaxcbpage,(void),"")
 {
 	/* 0 args */
 	RETURN1((make_fixnum(maxcbpage)));
 }
 
 
-DEFUNO("ALLOCATE-RELOCATABLE-PAGES",object,fSallocate_relocatable_pages,SI
-       ,1,2,NONE,OI,OO,OO,OO,siLalloc_relpage,"")(npages,va_alist) 
-     int npages;
-     va_dcl
+DEFUNO_NEW("ALLOCATE-RELOCATABLE-PAGES",object,fSallocate_relocatable_pages,SI
+       ,1,2,NONE,OI,OO,OO,OO,siLalloc_relpage,(int npages,...),"")
 {
 
   int nargs=VFUN_NARGS;
@@ -938,7 +924,7 @@ DEFUNO("ALLOCATE-RELOCATABLE-PAGES",object,fSallocate_relocatable_pages,SI
   
   really_do=Cnil;
   if (nargs>=2) {
-    va_start(ap);
+    va_start(ap,npages);
     really_do=va_arg(ap,object);
     va_end(ap);
   }
@@ -960,24 +946,22 @@ DEFUNO("ALLOCATE-RELOCATABLE-PAGES",object,fSallocate_relocatable_pages,SI
 
 }
 
-DEFUNO("ALLOCATED-RELOCATABLE-PAGES",object,fSallocated_relocatable_pages,SI
-   ,0,0,NONE,OO,OO,OO,OO,siLnrbpage,"")()
+DEFUNO_NEW("ALLOCATED-RELOCATABLE-PAGES",object,fSallocated_relocatable_pages,SI
+       ,0,0,NONE,OO,OO,OO,OO,siLnrbpage,(void),"")
 {
 	/* 0 args */
 	RETURN1(make_fixnum(nrbpage));
 }
 
-DEFUNO("GET-HOLE-SIZE",object,fSget_hole_size,SI
-   ,0,0,NONE,OO,OO,OO,OO,siLget_hole_size,"")()
+DEFUNO_NEW("GET-HOLE-SIZE",object,fSget_hole_size,SI
+       ,0,0,NONE,OO,OO,OO,OO,siLget_hole_size,(void),"")
 {
 	/* 0 args */
 	RETURN1((make_fixnum(new_holepage)));
 }
 
-DEFUNO("SET-HOLE-SIZE",object,fSset_hole_size,SI
-       ,1,2,NONE,OI,IO,OO,OO,siLset_hole_size,"")(npages,va_alist) 
-     int npages;
-     va_dcl
+DEFUNO_NEW("SET-HOLE-SIZE",object,fSset_hole_size,SI
+       ,1,2,NONE,OI,IO,OO,OO,siLset_hole_size,(int npages,...),"")
 {
 
   int nargs=VFUN_NARGS;
@@ -986,7 +970,7 @@ DEFUNO("SET-HOLE-SIZE",object,fSset_hole_size,SI
 
   reserve=30;
   if (nargs>=2) {
-    va_start(ap);
+    va_start(ap,npages);
     reserve=va_arg(ap,int);
     va_end(ap);
   }

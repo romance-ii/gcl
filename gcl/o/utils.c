@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 #include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -61,6 +60,18 @@ Iapply_ap(object (*f) (/* ??? */), va_list ap)
 { int n = VFUN_NARGS;
   object *new;
   COERCE_VA_LIST(new,ap,n);
+  return c_apply_n(f,n,new);
+}
+
+object
+Iapply_ap_new(object (*f) (/* ??? */), object first, va_list ap)
+/* Apply f to the va_list ap, with an implicit number of args
+   passed in VFUN_NARGS */
+           
+              
+{ int n = VFUN_NARGS;
+  object *new;
+  COERCE_VA_LIST_NEW(new,first,ap,n);
   return c_apply_n(f,n,new);
 }
 
@@ -197,7 +208,7 @@ Ivs_values(void)
   object *b = vs_base,*p=&fcall.values[0];
   object res = (n > 0 ? b[0] : sLnil);
   if (n>=sizeof(fcall.values)/sizeof(*fcall.values))
-    FEerror("Too many function call values");
+    FEerror("Too many function call values",0);
   while (--n > 0)
     { *++p= *++b;}
   return res;

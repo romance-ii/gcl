@@ -1126,14 +1126,12 @@ call_applyhook(object fun)
 }
 
 
-DEFUNO("FUNCALL",object,fLfuncall,LISP
-   ,1,MAX_ARGS,NONE,OO,OO,OO,OO,Lfuncall,"")(fun,va_alist)
-object fun;
-va_dcl
+DEFUNO_NEW("FUNCALL",object,fLfuncall,LISP
+       ,1,MAX_ARGS,NONE,OO,OO,OO,OO,Lfuncall,(object fun,...),"")
 { va_list ap;
   object *new;
   int n = VFUN_NARGS;
-  va_start(ap);
+  va_start(ap,fun);
   {COERCE_VA_LIST(new,ap,n);
   return IapplyVector(fun,n-1,new);
   va_end(ap);
@@ -1141,16 +1139,14 @@ va_dcl
 }
 
 
-DEFUNO("APPLY",object,fLapply,LISP
-   ,2,MAX_ARGS,NONE,OO,OO,OO,OO,Lapply,"")(fun,va_alist)
-     object fun;
-va_dcl
+DEFUNO_NEW("APPLY",object,fLapply,LISP
+       ,2,MAX_ARGS,NONE,OO,OO,OO,OO,Lapply,(object fun,...),"")
 {	int m,n=VFUN_NARGS;
 	object list;
 	object buf[MAX_ARGS];
 	object *base=buf;
 	va_list ap;
-	va_start(ap);
+	va_start(ap,fun);
 	m = n-1;
 	while (--m >0)
 	  {*base++ = va_arg(ap,object);
@@ -1167,9 +1163,8 @@ va_dcl
       }
 	
 
-DEFUNO("EVAL",object,fLeval,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Leval,"")(x0)
-object x0;
+DEFUNO_NEW("EVAL",object,fLeval,LISP
+       ,1,1,NONE,OO,OO,OO,OO,Leval,(object x0),"")
 {
 	object *lex = lex_env;
 
@@ -1249,9 +1244,8 @@ Lapplyhook(void)
 	bds_unwind(old_bds_top);
 }
 
-DEFUNO("CONSTANTP",object,fLconstantp,LISP
-   ,1,1,NONE,OO,OO,OO,OO,Lconstantp,"")(x0)
-object x0;
+DEFUNO_NEW("CONSTANTP",object,fLconstantp,LISP
+       ,1,1,NONE,OO,OO,OO,OO,Lconstantp,(object x0),"")
 {
 	enum type x;
 	/* 1 args */
@@ -1356,15 +1350,17 @@ funcall_with_catcher(object fname, object fun)
 	frs_pop();
 }
 
-#include <varargs.h>
-
 object 
-fcalln_cclosure(va_list ap)
+fcalln_cclosure(object first,va_list ap)
 {
 int i=fcall.argd;
  {object *base=vs_top;
   DEBUG_AVMA
     vs_base=base;
+  if (i) {
+    *(base++)=first;
+    i--;
+  }
     switch(i){
     case 10: *(base++)=va_arg(ap,object);
     case 9: *(base++)=va_arg(ap,object);
@@ -1404,7 +1400,7 @@ int i=fcall.argd;
 }}
 
 object 
-fcalln_general(va_list ap) {
+fcalln_general(object first,va_list ap) {
   int i=fcall.argd;
 
   {
@@ -1415,17 +1411,21 @@ fcalln_general(va_list ap) {
     enum ftype typ,restype=SFUN_RETURN_TYPE(i);
     vs_top =  vs_base = old_vs_top;
     SFUN_START_ARG_TYPES(i);
-    if (i==0)
+    if (i==0) {
+      int jj=0;
       while (n-- > 0) {
 	typ= SFUN_NEXT_TYPE(i);
 	x =
-	  (typ==f_object ?	va_arg(ap,object):
-	   typ==f_fixnum ? make_fixnum(va_arg(ap,fixnum)):
+	  (typ==f_object ?	(jj ? va_arg(ap,object) : first):
+	   typ==f_fixnum ? make_fixnum((jj ? va_arg(ap,fixnum) : (fixnum)first)):
 	   (object) (FEerror("bad type",0),Cnil));
 	*(vs_top++) = x;
+	jj++;
       }
-    else {
+    } else {
       object *base=vs_top;
+      *(base++)=first;
+      n--;
       while (n-- > 0) 
 	*(base++) = va_arg(ap,object);
      vs_top=base;
@@ -1441,27 +1441,29 @@ fcalln_general(va_list ap) {
 }
 
 object
-fcalln_vfun(va_list vl)
+fcalln_vfun(object first,va_list vl)
 {object *new,res;
  DEBUG_AVMA
- {COERCE_VA_LIST(new,vl,fcall.argd);
+ COERCE_VA_LIST_NEW(new,first,vl,fcall.argd);
  res = c_apply_n(fcall.fun->vfn.vfn_self,fcall.argd,new);
  CHECK_AVMA;
  return res;
- }
 }
 
 object 
-fcalln(va_alist)
-va_dcl
+fcalln1(object first,...)
 {  va_list ap;
    object fun=fcall.fun;
    DEBUG_AVMA
-   va_start(ap);
+   va_start(ap,first);
    if(type_of(fun)==t_cfun)
      {object *base=vs_top;
       int i=fcall.argd;
       vs_base=base;
+      if (i) {
+	*(base++)=first;
+	i--;
+      }
       switch(i){
       case 10: *(base++)=va_arg(ap,object);
       case 9: *(base++)=va_arg(ap,object);
@@ -1484,10 +1486,10 @@ va_dcl
       return(vs_base[0]);
     }
    if(type_of(fun)==t_cclosure)
-     return(fcalln_cclosure(ap));
+     return(fcalln_cclosure(first,ap));
    if(type_of(fun)==t_vfun)
-     return(fcalln_vfun(ap));
-   return(fcalln_general(ap));
+     return(fcalln_vfun(first,ap));
+   return(fcalln_general(first,ap));
   va_end(ap);
  }
 
@@ -1495,17 +1497,14 @@ va_dcl
 /*  typedef void (*funcvoid)(); */
 
 object
-funcall_cfun(fn,n,va_alist)
-     funcvoid fn;
-     int n;
-     va_dcl
+funcall_cfun(funcvoid fn,int n,...)
 {object *old_top = vs_top;
  object *old_base= vs_base;
  object result;
  va_list ap;
  DEBUG_AVMA
  vs_base=vs_top;
- va_start(ap);
+ va_start(ap,n);
  while(n-->0) vs_push(va_arg(ap,object));
  va_end(ap);
  (*fn)();

@@ -30,7 +30,6 @@ the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
 #include <sys/file.h>
 #include <sys/stat.h>
 #include <stdio.h>
-#include <varargs.h>
 #include <filehdr.h>
 #include <aouthdr.h>
 #include <scnhdr.h>
@@ -324,15 +323,14 @@ mark_x (name)
 }
 
 static void
-fatal_unexec (s, va_alist)
-    va_dcl
+fatal_unexec (const char *s, ...)
 {
   va_list ap;
   if (errno == EEOF)
     fputs ("unexec: unexpected end of file, ", stderr);
   else
     fprintf (stderr, "unexec: %s, ", strerror (errno));
-  va_start (ap);
+  va_start (ap,s);
   _doprnt (s, ap, stderr);
   fputs (".\n", stderr);
   exit (1);

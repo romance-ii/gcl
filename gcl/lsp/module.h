@@ -1,11 +1,10 @@
 
-static object LI2();
 static object LI1();
 #define VMB1 register object *base=vs_top;
 #define VMS1  register object *sup=vs_top+4;vs_top=sup;
 #define VMV1 vs_reserve(4);
 #define VMR1(VMT1) vs_top=base ; return(VMT1);
-static object LI2();
+static object LI2(object,object,...);
 #define VMB2 register object *base=vs_top; object Vcs[2];
 #define VMS2  register object *sup=vs_top+5;vs_top=sup;
 #define VMV2 vs_reserve(5);
@@ -32,5 +31,5 @@ static char * VVi[21]={
 (char *)(LI4)
 };
 #define VV ((object *)VVi)
-static void LnkT14() ;
+static void LnkT14();
 static void (*Lnk14)() = LnkT14;

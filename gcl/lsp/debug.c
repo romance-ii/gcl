@@ -3778,31 +3778,31 @@ static void LnkT148(){ call_or_link(VV[148],(void **)&Lnk148);} /* INSERT-BREAK-
 static void LnkT147(){ call_or_link(VV[147],(void **)&Lnk147);} /* BREAK-FUNCTION */
 static void LnkT146(){ call_or_link(VV[146],(void **)&Lnk146);} /* DWIM */
 static void LnkT145(){ call_or_link(VV[145],(void **)&Lnk145);} /* MAYBE-BREAK */
-static object  LnkTLI144(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[144],(void **)&LnkLI144,ap);va_end(ap);return V1;} /* POSITION */
+static object  LnkTLI144(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[144],(void **)&LnkLI144,first,ap);va_end(ap);return V1;} /* POSITION */
 static void LnkT143(){ call_or_link(VV[143],(void **)&Lnk143);} /* CURRENT-STEP-FUN */
 static void LnkT142(){ call_or_link(VV[142],(void **)&Lnk142);} /* INIT-BREAK-POINTS */
 static void LnkT141(){ call_or_link(VV[141],(void **)&Lnk141);} /* IHS-FNAME */
 static void LnkT140(){ call_or_link(VV[140],(void **)&Lnk140);} /* ITERATE-OVER-BKPTS */
 static void LnkT139(){ call_or_link(VV[139],(void **)&Lnk139);} /* MAKE-BREAK-POINT */
-static object  LnkTLI138(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[138],(void **)&LnkLI138,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
+static object  LnkTLI138(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[138],(void **)&LnkLI138,first,ap);va_end(ap);return V1;} /* MAKE-ARRAY */
 static void LnkT137(){ call_or_link(VV[137],(void **)&Lnk137);} /* WALK-THROUGH */
-static object  LnkTLI136(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[136],(void **)&LnkLI136,ap);va_end(ap);return V1;} /* VECTOR-PUSH-EXTEND */
+static object  LnkTLI136(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[136],(void **)&LnkLI136,first,ap);va_end(ap);return V1;} /* VECTOR-PUSH-EXTEND */
 static void LnkT135(){ call_or_link(VV[135],(void **)&Lnk135);} /* INSTREAM-NAME */
 static void LnkT134(){ call_or_link(VV[134],(void **)&Lnk134);} /* LOAD */
 static void LnkT133(){ call_or_link(VV[133],(void **)&Lnk133);} /* SETUP-LINEINFO */
 static void LnkT132(){ call_or_link(VV[132],(void **)&Lnk132);} /* CLEANUP */
 static void LnkT129(){ call_or_link(VV[129],(void **)&Lnk129);} /* READ-FROM-STRING */
-static object  LnkTLI128(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[128],(void **)&LnkLI128,ap);va_end(ap);return V1;} /* COUNT */
+static object  LnkTLI128(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[128],(void **)&LnkLI128,first,ap);va_end(ap);return V1;} /* COUNT */
 static void LnkT127(){ call_or_link(VV[127],(void **)&Lnk127);} /* GET-INSTREAM */
 static void LnkT126(){ call_or_link(VV[126],(void **)&Lnk126);} /* MAKE-INSTREAM */
 static void LnkT125(){ call_or_link(VV[125],(void **)&Lnk125);} /* STREAM-NAME */
-static object  LnkTLI124(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[124],(void **)&LnkLI124,ap);va_end(ap);return V1;} /* DELETE */
+static object  LnkTLI124(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[124],(void **)&LnkLI124,first,ap);va_end(ap);return V1;} /* DELETE */
 static void LnkT123(){ call_or_link(VV[123],(void **)&Lnk123);} /* CLOSEDP */
 static void LnkT122(){ call_or_link(VV[122],(void **)&Lnk122);} /* BREAK-LEVEL */
-static object  LnkTLI121(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[121],(void **)&LnkLI121,1,ap);va_end(ap);return V1;} /* SHOW-ENVIRONMENT */
+static object  LnkTLI121(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[121],(void **)&LnkLI121,1,first,ap);va_end(ap);return V1;} /* SHOW-ENVIRONMENT */
 static void LnkT120(){ call_or_link(VV[120],(void **)&Lnk120);} /* BREAK-LOCALS */
 static void LnkT119(){ call_or_link(VV[119],(void **)&Lnk119);} /* BREAK-GO */
-static object  LnkTLI118(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[118],(void **)&LnkLI118,ap);va_end(ap);return V1;} /* SEARCH */
+static object  LnkTLI118(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[118],(void **)&LnkLI118,first,ap);va_end(ap);return V1;} /* SEARCH */
 static void LnkT117(){ call_or_link(VV[117],(void **)&Lnk117);} /* COMPILED-FUNCTION-NAME */
 static void LnkT116(){ call_or_link(VV[116],(void **)&Lnk116);} /* IHS-FUN */
 static object  LnkTLI115(){return call_proc0(VV[115],(void **)&LnkLI115);} /* TYPE-ERROR */

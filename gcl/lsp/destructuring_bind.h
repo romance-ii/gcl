@@ -55,23 +55,23 @@ static char * VVi[97]={
 (char *)(L13)
 };
 #define VV ((object *)VVi)
-static void LnkT95() ;
+static void LnkT95();
 static void (*Lnk95)() = LnkT95;
-static void LnkT94() ;
+static void LnkT94();
 static void (*Lnk94)() = LnkT94;
-static void LnkT93() ;
+static void LnkT93();
 static void (*Lnk93)() = LnkT93;
-static void LnkT92() ;
+static void LnkT92();
 static void (*Lnk92)() = LnkT92;
-static void LnkT91() ;
+static void LnkT91();
 static void (*Lnk91)() = LnkT91;
-static void LnkT90() ;
+static void LnkT90();
 static void (*Lnk90)() = LnkT90;
-static void LnkT49() ;
+static void LnkT49();
 static void (*Lnk49)() = LnkT49;
-static void LnkT89() ;
+static void LnkT89();
 static void (*Lnk89)() = LnkT89;
-static void LnkT88() ;
+static void LnkT88();
 static void (*Lnk88)() = LnkT88;
-static void LnkT30() ;
+static void LnkT30();
 static void (*Lnk30)() = LnkT30;

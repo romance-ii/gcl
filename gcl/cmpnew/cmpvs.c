@@ -135,18 +135,17 @@ TTL:;
 }
 /*	local entry for function WT-CLINK	*/
 
-static object LI7(va_alist)
-	va_dcl 
+static object LI7(object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB7 VMS7 VMV7
 	{object V25;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	narg = narg - 0;
 	if (narg <= 0) goto T48;
 	else {
-	V25= va_arg(ap,object);}
+	V25= first;}
 	--narg; goto T49;
 goto T48;
 T48:;
@@ -222,8 +221,8 @@ T67:;
 	goto T60;}
 	return Cnil;
 }
-static object  LnkTLI12(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[12],(void **)&LnkLI12,1,ap);va_end(ap);return V1;} /* WT1 */
-static object  LnkTLI11(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[11],(void **)&LnkLI11,1,ap);va_end(ap);return V1;} /* WT-VS */
+static object  LnkTLI12(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[12],(void **)&LnkLI12,1,first,ap);va_end(ap);return V1;} /* WT1 */
+static object  LnkTLI11(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[11],(void **)&LnkLI11,1,first,ap);va_end(ap);return V1;} /* WT-VS */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

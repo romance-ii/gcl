@@ -37,11 +37,10 @@ profil(void)
 
 
 #ifndef NO_PROFILE
-DEFUNO("PROFILE",object,fSprofile,SI
-   ,2,2,NONE,OO,OO,OO,OO,siLprofile,
+DEFUNO_NEW("PROFILE",object,fSprofile,SI
+       ,2,2,NONE,OO,OO,OO,OO,siLprofile,(object start_address,object scale),
        "Sets up profiling with START-ADDRESS and  SCALE where scale is \
-  between 0 and 256")(start_address,scale) 
-object start_address,scale;
+  between 0 and 256")
 {				/* 2 args */
   
   object ar=sSAprofile_arrayA->s.s_dbind;
@@ -56,9 +55,8 @@ object start_address,scale;
 }
 
 #endif
-DEFUNO("FUNCTION-START",object,fSfunction_start,SI
-   ,1,1,NONE,OO,OO,OO,OO,siLfunction_start,"")(funobj)
-object funobj;
+DEFUNO_NEW("FUNCTION-START",object,fSfunction_start,SI
+       ,1,1,NONE,OO,OO,OO,OO,siLfunction_start,(object funobj),"")
 {/* 1 args */
  if(type_of(funobj)!=t_cfun
     && type_of(funobj)!=t_sfun
@@ -135,9 +133,8 @@ node_compare(const void *node1,const void *node2)
 
 
 
-DEFUNO("READ-EXTERNALS",object,fSread_externals,SI
-   ,1,1,NONE,OO,OO,OO,OO,siLread_externals,"")(x0)
-object x0;
+DEFUNO_NEW("READ-EXTERNALS",object,fSread_externals,SI
+       ,1,1,NONE,OO,OO,OO,OO,siLread_externals,(object x0),"")
 {/* 1 args */
  {object x=x0;
   unsigned int n;
@@ -235,7 +232,7 @@ bfd_combined_table_update(struct bfd_link_hash_entry *h,PTR ct) {
     return true;
 
   if (!h->u.def.section) {
-    FEerror("Symbol without section");
+    FEerror("Symbol without section",0);
     return false;
   }
 
@@ -250,19 +247,18 @@ bfd_combined_table_update(struct bfd_link_hash_entry *h,PTR ct) {
 #endif
 
 
-DEFUNO("SET-UP-COMBINED",object,fSset_up_combined,SI
-   ,0,1,NONE,OO,OO,OO,OO,siLset_up_combined,"")(va_alist)
-va_dcl
+DEFUNO_NEW("SET-UP-COMBINED",object,fSset_up_combined,SI
+       ,0,1,NONE,OO,OO,OO,OO,siLset_up_combined,(object first,...),"")
 {
   int nargs=VFUN_NARGS;
   unsigned int n;
   object siz;
-  va_list ap;
+/*   va_list ap; */
 
   { 
-    va_start(ap);
+/*     va_start(ap,first); */
     if (nargs>=1) 
-      siz=va_arg(ap,object);
+      siz=first;
     else 
       goto LDEFAULT1;
     
@@ -271,7 +267,7 @@ va_dcl
   LDEFAULT1: 
     siz = small_fixnum(0);
   LEND_VARARG: 
-    va_end(ap);
+/*     va_end(ap); */
   }
 
   CHECK_ARG_RANGE(0,1);
@@ -340,9 +336,8 @@ endar=aar+dim;
 }
 
 
-DEFUNO("DISPLAY-PROFILE",object,fSdisplay_profile,SI
-   ,2,2,NONE,OO,OO,OO,OO,siLdisplay_profile,"")(start_addr,scal)
-object start_addr,scal;
+DEFUNO_NEW("DISPLAY-PROFILE",object,fSdisplay_profile,SI
+       ,2,2,NONE,OO,OO,OO,OO,siLdisplay_profile,(object start_addr,object scal),"")
 {if (!combined_table.ptable)
    FEerror("must symbols first",0);
    /* 2 args */
@@ -400,9 +395,8 @@ object start_addr,scal;
    of an array body, and to allow jumping to inside the body
    of the array */
 
-DEFUNO("ARRAY-ADRESS",object,fSarray_adress,SI
-   ,1,1,NONE,OO,OO,OO,OO,siLarray_adress,"")(array)
-object array;
+DEFUNO_NEW("ARRAY-ADRESS",object,fSarray_adress,SI
+       ,1,1,NONE,OO,OO,OO,OO,siLarray_adress,(object array),"")
 {/* 1 args */
  array=make_fixnum((long) (&(array->st.st_self[0])));
  RETURN1(array);
@@ -428,8 +422,8 @@ char *ar;
  asm("moveml a6@(-44),#0x7cfc");
 }
 
-/* DEFUNO("SAVE-REGS-INVOKE",object,fSsave_regs_invoke,SI
-   ,2,2,NONE,OO,OO,OO,OO,siLsave_regs_invoke,"")(x0,x1)
+/* DEFUNO_NEW("SAVE-REGS-INVOKE",object,fSsave_regs_invoke,SI
+   ,2,2,NONE,OO,OO,OO,OO,siLsave_regs_invoke,"",(x0,x1))
 object x0,x1;
 {int x;
   check_type_integer(&x1);

@@ -76,6 +76,22 @@ void old(void) \
     return;} \
   ret fname
 
+#define DEFUN_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) ret fname args
+/* eg.
+   A function taking from 2 to 8 args
+   returning object the first args is object, the next 6 int, and last defaults to object.
+   note the return type must also be put in the signature.
+  DEFUN("AREF",object,fSaref,SI,2,8,NONE,oo,ii,ii,ii)
+*/
+
+/* for defining old style */
+#define DEFUNO_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,old,args,doc) \
+  ret fname args; \
+void old(void) \
+{   Iinvoke_c_function_from_value_stack((ret (*)())fname,F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
+    return;} \
+  ret fname args
+
   /* these will come later */
 #define DEFUNL DEFUN
   /* these are needed to be linked in to be called by incrementally

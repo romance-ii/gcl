@@ -115,5 +115,5 @@ static char * VVi[48]={
 (char *)(L28)
 };
 #define VV ((object *)VVi)
-static void LnkT46() ;
+static void LnkT46();
 static void (*Lnk46)() = LnkT46;

@@ -167,10 +167,12 @@ EXTER char *alloca_val;
 #define ON_STACK_CONS(x,y) (alloca_val=alloca(sizeof(struct cons)), on_stack_cons(x,y)) 
 #define ON_STACK_LIST on_stack_list
 #define ON_STACK_LIST_VECTOR on_stack_list_vector
+#define ON_STACK_LIST_VECTOR_NEW on_stack_list_vector_new
 #define ON_STACK_MAKE_LIST on_stack_make_list
 object on_stack_cons();
-object on_stack_list();
+object on_stack_list(int,...);
 object on_stack_list_vector(int,va_list);
+object on_stack_list_vector_new(int,object,va_list);
 object on_stack_make_list();
 #else /* no HAVE_ALLOCA */
 #define OUR_ALLOCA(n) malloc(n)

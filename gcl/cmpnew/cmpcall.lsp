@@ -419,13 +419,13 @@
        (wt-nl1 "static " (declaration-type (rep-type type)) " LnkT" num )
        (cond ((or args (not (eq t type)))
 	      (let ((vararg (member '* args)))
-		(wt "(va_alist)va_dcl{"
+		(wt "(object first,...){"
 		    (declaration-type (rep-type type)) "V1;"
-		    "va_list ap;va_start(ap);V1=call_"
-		    (if vararg "v" "") "proc(VV["
+		    "va_list ap;va_start(ap,first);V1=call_"
+		    (if vararg "v" "") "proc_new(VV["
 		    (add-object name)"],(void **)&Lnk" num )
 		(or vararg (wt "," (proclaimed-argd args type)))
-		(wt   ",ap);va_end(ap);return V1;}" )))
+		(wt   ",first,ap);va_end(ap);return V1;}" )))
 	     (t (wt "(){return call_proc0(VV[" (add-object name)
 		    "],(void **)&Lnk" num ");}" ))))
       (t (error "unknown link type ~a" type)))

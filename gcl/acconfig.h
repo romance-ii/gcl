@@ -1,5 +1,3 @@
-
-
 /* define where the heap could begin.   Normally should
 be the smallest value returned by sbrk().   Underestimating
 by 10-20 megabytes is not a problem. */

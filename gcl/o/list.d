@@ -222,9 +222,6 @@ stack_cons(void)
 	*vs_top++ = c;
 }
 
-#include <varargs.h>
-
-
 object on_stack_list_vector(n,ap)
      int n;
      va_list ap;
@@ -237,6 +234,27 @@ object on_stack_list_vector(n,ap)
  p->t = (int)t_cons;
  p->m=FALSE;
  p->c_car= va_arg(ap,object);
+ if (--n == 0)
+   {p->c_cdr = Cnil;
+    return res;}
+ else
+   { x= (object) p;
+     x->c.c_cdr= (object) ( ++p);}
+ goto TOP;
+}
+
+object on_stack_list_vector_new(int n,object first,va_list ap)
+{object res=(object) alloca_val;
+ struct cons *p;
+ object x;
+ int jj=0;
+ p=(struct cons *) res;
+ if (n<=0) return Cnil;
+ TOP:
+ p->t = (int)t_cons;
+ p->m=FALSE;
+ p->c_car= jj ? va_arg(ap,object) : first;
+ jj=1;
  if (--n == 0)
    {p->c_cdr = Cnil;
     return res;}
@@ -260,14 +278,24 @@ object list_vector(n,ap)
    }
  return ans;}
 
+object list_vector_new(int n,object first,va_list ap)
+{object ans,*p;
+ 
+ if (n == 0) return Cnil;
+ ans = make_cons(first,Cnil);
+ p = & (ans->c.c_cdr); 
+ while (--n > 0)
+   { *p = make_cons(va_arg(ap,object),Cnil);
+     p = & ((*p)->c.c_cdr);
+   }
+ return ans;}
+
    
 /* clean this up */
-object on_stack_list(n, va_alist)
-int n;
-va_dcl
+object on_stack_list(int n, ...)
 {va_list ap;
  object res;
- va_start(ap);
+ va_start(ap,n);
  res=on_stack_list_vector(n,ap);
  va_end(ap);
  return res;
@@ -275,12 +303,10 @@ va_dcl
 
    
 
-object list(n, va_alist)
-int n;
-va_dcl
+object list(int n,...)
 { va_list ap;
   struct typemanager *tm=(&tm_table[(int)t_cons]);
-  va_start(ap);
+  va_start(ap,n);
   CHECK_INTERRUPT;
   if (tm->tm_nfree < n )
      {
@@ -324,12 +350,10 @@ va_dcl
 
 }
 
-object listA(n, va_alist)
-int n;
-va_dcl
+object listA(int n, ...)
 {       va_list ap;
 	object *p = vs_top;
-	va_start(ap);
+	va_start(ap,n);
 	vs_push(Cnil);
 	while(--n>0)
 	  { *p=make_cons(va_arg(ap,object),Cnil);
@@ -626,9 +650,7 @@ void Lcddadr(){check_arg(1); vs_base[0] = cdr(cdr(car(cdr(vs_base[0]))));}
 void Lcdddar(){check_arg(1); vs_base[0] = cdr(cdr(cdr(car(vs_base[0]))));}
 void Lcddddr(){check_arg(1); vs_base[0] = cdr(cdr(cdr(cdr(vs_base[0]))));}
 
-DEFUNO("NTH",object,fLnth,LISP,2,2,NONE,OI,OO,OO,OO,Lnth,"")(index,list)
-int index;
-object list;
+DEFUNO_NEW("NTH",object,fLnth,LISP,2,2,NONE,OI,OO,OO,OO,Lnth,(int index,object list),"")
 { object x = list;
   if (index < 0)
     FEerror("Negative index: ~D.", 1, make_fixnum(index));
@@ -642,36 +664,26 @@ object list;
 }   
 
 
-DEFUN("FIRST",object,fLfirst,LISP,0,0,NONE,OO,OO,OO,OO,"") (x)
-object x;
+DEFUN_NEW("FIRST",object,fLfirst,LISP,0,0,NONE,OO,OO,OO,OO,(object x),"") 
 { RETURN1(car(x)) ;}
 
-DEFUNO("SECOND",object,fLsecond,LISP,1,1,NONE,OO,OO,OO,OO,Lsecond,"") (x)
-object x;
+DEFUNO_NEW("SECOND",object,fLsecond,LISP,1,1,NONE,OO,OO,OO,OO,Lsecond,(object x),"")
 { return fLnth(1,x);}
-DEFUNO("THIRD",object,fLthird,LISP,1,1,NONE,OO,OO,OO,OO,Lthird,"") (x)
-object x;
+DEFUNO_NEW("THIRD",object,fLthird,LISP,1,1,NONE,OO,OO,OO,OO,Lthird,(object x),"")
 { return fLnth(2,x);}
-DEFUNO("FOURTH",object,fLfourth,LISP,1,1,NONE,OO,OO,OO,OO,Lfourth,"") (x)
-object x;
+DEFUNO_NEW("FOURTH",object,fLfourth,LISP,1,1,NONE,OO,OO,OO,OO,Lfourth,(object x),"")
 { return fLnth(3,x);}
-DEFUNO("FIFTH",object,fLfifth,LISP,1,1,NONE,OO,OO,OO,OO,Lfifth,"")(x)
-object x;
+DEFUNO_NEW("FIFTH",object,fLfifth,LISP,1,1,NONE,OO,OO,OO,OO,Lfifth,(object x),"")
 { return fLnth(4,x);}
-DEFUNO("SIXTH",object,fLsixth,LISP,1,1,NONE,OO,OO,OO,OO,Lsixth,"")(x)
-object x;
+DEFUNO_NEW("SIXTH",object,fLsixth,LISP,1,1,NONE,OO,OO,OO,OO,Lsixth,(object x),"")
 { return fLnth(5,x);}
-DEFUNO("SEVENTH",object,fLseventh,LISP,1,1,NONE,OO,OO,OO,OO,Lseventh,"")(x)
-object x;
+DEFUNO_NEW("SEVENTH",object,fLseventh,LISP,1,1,NONE,OO,OO,OO,OO,Lseventh,(object x),"")
 { return fLnth(6,x);}
-DEFUNO("EIGHTH",object,fLeighth,LISP,1,1,NONE,OO,OO,OO,OO,Leighth,"")(x)
-object x;
+DEFUNO_NEW("EIGHTH",object,fLeighth,LISP,1,1,NONE,OO,OO,OO,OO,Leighth,(object x),"")
 { return fLnth(7,x);}
-DEFUNO("NINTH",object,fLninth,LISP,1,1,NONE,OO,OO,OO,OO,Lninth,"")(x)
-object x;
+DEFUNO_NEW("NINTH",object,fLninth,LISP,1,1,NONE,OO,OO,OO,OO,Lninth,(object x),"")
 { return fLnth(8,x);}
-DEFUNO("TENTH",object,fLtenth,LISP,1,1,NONE,OO,OO,OO,OO,Ltenth,"")(x)
-object x;
+DEFUNO_NEW("TENTH",object,fLtenth,LISP,1,1,NONE,OO,OO,OO,OO,Ltenth,(object x),"")
 { return fLnth(9,x);}
 
 void

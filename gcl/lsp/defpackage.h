@@ -20,11 +20,11 @@ static char * VVi[77]={
 (char *)(L1)
 };
 #define VV ((object *)VVi)
-static object  LnkTLI75() ;
+static object  LnkTLI75();
 static object  (*LnkLI75)() = LnkTLI75;
-static object  LnkTLI73() ;
-static object  (*LnkLI73)() = LnkTLI73;
-static void LnkT72() ;
+static object  LnkTLI73(object,...);
+static object  (*LnkLI73)() = (object (*)()) LnkTLI73;
+static void LnkT72();
 static void (*Lnk72)() = LnkT72;
-static object  LnkTLI70() ;
-static object  (*LnkLI70)() = LnkTLI70;
+static object  LnkTLI70(object,...);
+static object  (*LnkLI70)() = (object (*)()) LnkTLI70;

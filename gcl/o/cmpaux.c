@@ -30,9 +30,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "include.h"
 #define dcheck_type(a,b) check_type(a,b)
 
-DEFUNO("SPECIALP",object,fSspecialp,SI
-   ,1,1,NONE,OO,OO,OO,OO,siLspecialp,"")(sym)
-object sym;
+DEFUNO_NEW("SPECIALP",object,fSspecialp,SI
+       ,1,1,NONE,OO,OO,OO,OO,siLspecialp,(object sym),"")
 {
 	/* 1 args */
 	if (type_of(sym) == t_symbol &&
@@ -45,14 +44,12 @@ object sym;
 
 DEF_ORDINARY("DEBUG",sSdebug,SI,"");
 
-DEFUNO("DEFVAR1",object,fSdefvar1,SI
-   ,2,3,NONE,OO,OO,OO,OO,siLdefvar1,"")(sym,val,va_alist)
-object sym,val;
-va_dcl
+DEFUNO_NEW("DEFVAR1",object,fSdefvar1,SI
+       ,2,3,NONE,OO,OO,OO,OO,siLdefvar1,(object sym,object val,...),"")
 {	int n=VFUN_NARGS;
 	object doc;
 	va_list ap;
-	{ va_start(ap);
+	{ va_start(ap,val);
 	  if (n>=3) doc=va_arg(ap,object);else goto LDEFAULT3;
 	  goto LEND_VARARG;
 	LDEFAULT3: doc = Cnil;
@@ -68,18 +65,16 @@ va_dcl
       }
 
 
-DEFUNO("DEBUG",object,fSdebug,SI
-   ,2,2,NONE,OO,OO,OO,OO,siLdebug,"")(sym,val)
-object sym,val;
+DEFUNO_NEW("DEBUG",object,fSdebug,SI
+       ,2,2,NONE,OO,OO,OO,OO,siLdebug,(object sym,object val),"")
 { /* 2 args */
   putprop(sym,val,sSdebug);
   RETURN1(sym);
 }
 
 
-DEFUNO("SETVV",object,fSsetvv,SI
-   ,2,2,NONE,OO,OO,OO,OO,siLsetvv,"")(index,val)
-object index,val;
+DEFUNO_NEW("SETVV",object,fSsetvv,SI
+       ,2,2,NONE,OO,OO,OO,OO,siLsetvv,(object index,object val),"")
 { /* 2 args */
   if(type_of(sSPmemory->s.s_dbind)==t_cfdata)
   sSPmemory->s.s_dbind->cfd.cfd_self[fix(index)]=val;

@@ -31,14 +31,10 @@ fSmakefun(object sym, object (*addr) (/* ??? */), unsigned int argd)
 }
 
 object
-ImakeClosure(addr,argd,n,va_alist)
-     object (*addr)();
-     int argd;
-     int n;
-     va_dcl
+ImakeClosure(object (*addr)(),int argd,int n,...)
 { object x = fSmakefun(Cnil,addr,argd);
   va_list ap;
-  va_start(ap);
+  va_start(ap,n);
   IsetClosure(x,n,ap);
   va_end(ap);
   return x;
@@ -64,18 +60,17 @@ IsetClosure(object x, int n, va_list ap)
     }
 }
 
-DEFUN("INITFUN",object,fSinitfun,SI,3,ARG_LIMIT,NONE,OO,OO,OO,OO,
+DEFUN_NEW("INITFUN",object,fSinitfun,SI,3,ARG_LIMIT,NONE,OO,OO,OO,OO,
+      (object sym,object addr_ind,object argd,...),
       "Store a compiled function on SYMBOL whose body is in the VV array at \
 INDEX, and whose argd descriptor is ARGD.  If more arguments IND1, IND2,.. \
 are supplied these are indices in the VV array for the environment of this \
 closure.")
-     (sym,addr_ind,argd,va_alist)
-object sym,addr_ind,argd; va_dcl
 { int nargs = F_NARGS(VFUN_NARGS) -3;
   va_list ap;
   object fun = fSmakefun(IisSymbol(sym),PADDR(addr_ind),Mfix(argd));
   if (nargs > 0)
-    { va_start(ap);
+    { va_start(ap,argd);
       IsetClosure(fun,nargs,ap);
       while (--nargs >= 0)
 	/* the things put in by IsetClosure were only the indices
@@ -87,26 +82,21 @@ object sym,addr_ind,argd; va_dcl
   return sym;
 }
 
-DEFUN("INITMACRO",object,fSinitmacro,SI,3,ARG_LIMIT,NONE,OO,OO,OO,OO,
+DEFUN_NEW("INITMACRO",object,fSinitmacro,SI,4,ARG_LIMIT,NONE,OO,OO,OO,OO,(object first,...),
       "Like INITFUN, but makes then sets the 'macro' flag on this symbol")
- (va_alist)
-va_dcl     
 {va_list ap;
  object res;
- va_start(ap);
- res = Iapply_ap(fSinitfun,ap);
+ va_start(ap,first);
+ res = Iapply_ap_new((object (*)())fSinitfun,first,ap);
  va_end(ap);
  res->s.s_mflag = 1;
  return res;
 }
 
-DEFUN("SET-KEY-STRUCT",object,fSset_key_struct,SI,1,1,NONE,OO,OO,OO,OO,
+DEFUN_NEW("SET-KEY-STRUCT",object,fSset_key_struct,SI,1,1,NONE,OO,OO,OO,OO,(object key_struct_ind),
       "Called inside the loader.  The keystruct is set up in the file with \
    indexes rather than the actual entries.  We change these indices to \
    the objects")
-     (key_struct_ind)
-object key_struct_ind;
-
 { set_key_struct(PADDR(key_struct_ind),sSPmemory->s.s_dbind);
   return Cnil;
 }
@@ -126,12 +116,7 @@ LISP_makefun(char *strg, object (*fn) (/* ??? */), unsigned int argd)
 
 
 object 
-MakeClosure(n,argd,data,fn,va_alist)
-     int n;
-     int argd;
-     object data;
-     object (*fn)();
-     va_dcl
+MakeClosure(int n,int argd,object data,object (*fn)(),...)
 { object x;
   va_list ap;
   x = alloc_object(t_closure);
@@ -142,7 +127,7 @@ MakeClosure(n,argd,data,fn,va_alist)
   x->cl.cl_env = 0;
   x->cl.cl_env = (object *)alloc_contblock(n*sizeof(object));
   x->cl.cl_envdim=n;
-  va_start(ap);
+  va_start(ap,fn);
   { object *p = x->cl.cl_env;
   while (--n>= 0)
     { *p++ = va_arg(ap,object);}
@@ -151,10 +136,8 @@ MakeClosure(n,argd,data,fn,va_alist)
   return x;
 }
       
-DEFUN("INVOKE",object,fSinvoke,SI,1,ARG_LIMIT,NONE,OO,OO,OO,OO,
+DEFUN_NEW("INVOKE",object,fSinvoke,SI,1,ARG_LIMIT,NONE,OO,OO,OO,OO,(object x),
       "Invoke a C function whose body is at INDEX in the VV array")
- (x)
-object x;
 { int (*fn)();
   fn = (void *) PADDR(x);
   (*fn)();

@@ -4,9 +4,7 @@
 void init_seq(){do_init(VV);}
 /*	local entry for function MAKE-SEQUENCE	*/
 
-static object LI1(V2,V1,va_alist)
-	object V2,V1;
-	va_dcl 
+static object LI1(object V2,object V1,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB1 VMS1 VMV1
@@ -15,13 +13,13 @@ static object LI1(V2,V1,va_alist)
 	register object V5;
 	object V6;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V3= V2;
 	V4= V1;
 	narg= narg - 2;
 	{
-	parse_key_new(narg,Vcs +2,(struct key *)&LI1key,ap);
+	parse_key_new_new(narg,Vcs +2,(struct key *)&LI1key,first,ap);
 	if(Vcs[2]==0){
 	V5= Cnil;
 	V6= Cnil;
@@ -229,20 +227,18 @@ T103:;
 	}}
 /*	local entry for function CONCATENATE	*/
 
-static object LI2(V18,va_alist)
-	object V18;
-	va_dcl 
+static object LI2(object V18,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB2 VMS2 VMV2
 	{object V19;
 	object V20;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V19= V18;
 	narg= narg - 1;
-	V21 = list_vector(narg,ap);
+	V21 = list_vector_new(narg,first,ap);
 	V20= V21;
 	{register object V22;
 	register object V23;
@@ -313,9 +309,7 @@ T131:;
 	}
 /*	local entry for function MAP	*/
 
-static object LI3(V35,V34,V33,va_alist)
-	object V35,V34,V33;
-	va_dcl 
+static object LI3(object V35,object V34,object V33,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB3 VMS3 VMV3
@@ -324,13 +318,13 @@ static object LI3(V35,V34,V33,va_alist)
 	object V38;
 	register object V39;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <3) too_few_arguments();
 	V36= V35;
 	V37= V34;
 	V38= V33;
 	narg= narg - 3;
-	V40 = list_vector(narg,ap);
+	V40 = list_vector_new(narg,first,ap);
 	V39= V40;
 	V39= make_cons((V38),(V39));
 	{object V41;
@@ -459,9 +453,7 @@ T187:;
 	}
 /*	local entry for function SOME	*/
 
-static object LI4(V62,V61,va_alist)
-	object V62,V61;
-	va_dcl 
+static object LI4(object V62,object V61,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB4 VMS4 VMV4
@@ -469,12 +461,12 @@ static object LI4(V62,V61,va_alist)
 	object V64;
 	register object V65;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V63= V62;
 	V64= V61;
 	narg= narg - 2;
-	V66 = list_vector(narg,ap);
+	V66 = list_vector_new(narg,first,ap);
 	V65= V66;
 	V65= make_cons((V64),(V65));
 	{register long V67;
@@ -560,9 +552,7 @@ T207:;
 	}
 /*	local entry for function EVERY	*/
 
-static object LI5(V80,V79,va_alist)
-	object V80,V79;
-	va_dcl 
+static object LI5(object V80,object V79,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB5 VMS5 VMV5
@@ -570,12 +560,12 @@ static object LI5(V80,V79,va_alist)
 	object V82;
 	register object V83;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V81= V80;
 	V82= V79;
 	narg= narg - 2;
-	V84 = list_vector(narg,ap);
+	V84 = list_vector_new(narg,first,ap);
 	V83= V84;
 	V83= make_cons((V82),(V83));
 	{register long V85;
@@ -659,9 +649,7 @@ T232:;
 	}
 /*	local entry for function NOTANY	*/
 
-static object LI6(V97,V96,va_alist)
-	object V97,V96;
-	va_dcl 
+static object LI6(object V97,object V96,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB6 VMS6 VMV6
@@ -669,12 +657,12 @@ static object LI6(V97,V96,va_alist)
 	object V99;
 	object V100;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V98= V97;
 	V99= V96;
 	narg= narg - 2;
-	V101 = list_vector(narg,ap);
+	V101 = list_vector_new(narg,first,ap);
 	V100= V101;
 	base[0]= (V98);
 	base[1]= (V99);
@@ -695,9 +683,7 @@ static object LI6(V97,V96,va_alist)
 	}
 /*	local entry for function NOTEVERY	*/
 
-static object LI7(V106,V105,va_alist)
-	object V106,V105;
-	va_dcl 
+static object LI7(object V106,object V105,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB7 VMS7 VMV7
@@ -705,12 +691,12 @@ static object LI7(V106,V105,va_alist)
 	object V108;
 	object V109;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <2) too_few_arguments();
 	V107= V106;
 	V108= V105;
 	narg= narg - 2;
-	V110 = list_vector(narg,ap);
+	V110 = list_vector_new(narg,first,ap);
 	V109= V110;
 	base[0]= (V107);
 	base[1]= (V108);
@@ -731,11 +717,11 @@ static object LI7(V106,V105,va_alist)
 	}
 static void LnkT27(){ call_or_link(VV[27],(void **)&Lnk27);} /* EVERY */
 static void LnkT26(){ call_or_link(VV[26],(void **)&Lnk26);} /* SOME */
-static object  LnkTLI25(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_vproc(VV[25],(void **)&LnkLI25,ap);va_end(ap);return V1;} /* MAKE-SEQUENCE */
-static object  LnkTLI24(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[24],(void **)&LnkLI24,1,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
+static object  LnkTLI25(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[25],(void **)&LnkLI25,first,ap);va_end(ap);return V1;} /* MAKE-SEQUENCE */
+static object  LnkTLI24(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[24],(void **)&LnkLI24,1,first,ap);va_end(ap);return V1;} /* BEST-ARRAY-ELEMENT-TYPE */
 static void LnkT23(){ call_or_link(VV[23],(void **)&Lnk23);} /* SPECIFIC-ERROR */
 static void LnkT22(){ call_or_link(VV[22],(void **)&Lnk22);} /* SUBTYPEP */
-static object  LnkTLI21(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[21],(void **)&LnkLI21,1,ap);va_end(ap);return V1;} /* NORMALIZE-TYPE */
+static object  LnkTLI21(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[21],(void **)&LnkLI21,1,first,ap);va_end(ap);return V1;} /* NORMALIZE-TYPE */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

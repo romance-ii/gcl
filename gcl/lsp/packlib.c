@@ -865,22 +865,20 @@ T96:;
 }
 /*	local entry for function APROPOS-LIST	*/
 
-static object LI9(V132,va_alist)
-	object V132;
-	va_dcl 
+static object LI9(object V132,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB9 VMS9 VMV9
 	{object V133;
 	object V134;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V133= V132;
 	narg = narg - 1;
 	if (narg <= 0) goto T315;
 	else {
-	V134= va_arg(ap,object);}
+	V134= first;}
 	--narg; goto T316;
 goto T315;
 T315:;
@@ -1517,8 +1515,8 @@ T595:;
 	return;}
 }
 static void LnkT62(){ call_or_link(VV[62],(void **)&Lnk62);} /* SPECIFIC-ERROR */
-static object  LnkTLI61(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[61],(void **)&LnkLI61,1,ap);va_end(ap);return V1;} /* PRINT-SYMBOL-APROPOS */
-static object  LnkTLI60(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[60],(void **)&LnkLI60,2,ap);va_end(ap);return V1;} /* SUBSTRINGP */
+static object  LnkTLI61(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[61],(void **)&LnkLI61,1,first,ap);va_end(ap);return V1;} /* PRINT-SYMBOL-APROPOS */
+static object  LnkTLI60(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_proc_new(VV[60],(void **)&LnkLI60,2,first,ap);va_end(ap);return V1;} /* SUBSTRINGP */
 static void LnkT15(){ call_or_link(VV[15],(void **)&Lnk15);} /* PACKAGE-SIZE */
 static void LnkT59(){ call_or_link(VV[59],(void **)&Lnk59);} /* FIND-DECLARATIONS */
 

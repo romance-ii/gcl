@@ -22,7 +22,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 /*
 	macros.c
 */
-
 #include "include.h"
 
 
@@ -168,10 +167,8 @@ macro_def(object form)
 		return(Cnil);
 }
 
-DEFUNO("MACROEXPAND",object,fLmacroexpand,LISP
-   ,1,2,NONE,OO,OO,OO,OO,Lmacroexpand,"")(form,va_alist)
-object form ;
-va_dcl
+DEFUNO_NEW("MACROEXPAND",object,fLmacroexpand,LISP
+       ,1,2,NONE,OO,OO,OO,OO,Lmacroexpand,(object form,...),"")
 {	int n=VFUN_NARGS;
 	object envir;
 	object exp_fun;
@@ -179,7 +176,7 @@ va_dcl
 	object buf[3];
 	
 	va_list ap;
-	{ va_start(ap);
+	{ va_start(ap,form);
 	  if (n>=2) envir=va_arg(ap,object);else goto LDEFAULT2;
 	  goto LEND_VARARG;
 	LDEFAULT2: envir = Cnil;

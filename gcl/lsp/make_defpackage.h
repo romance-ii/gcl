@@ -7,13 +7,13 @@ static char * VVi[14]={
 (char *)(L1)
 };
 #define VV ((object *)VVi)
-static object  LnkTLI12() ;
-static object  (*LnkLI12)() = LnkTLI12;
-static object  LnkTLI11() ;
-static object  (*LnkLI11)() = LnkTLI11;
-static object  LnkTLI10() ;
-static object  (*LnkLI10)() = LnkTLI10;
-static void LnkT9() ;
+static object  LnkTLI12(object,...);
+static object  (*LnkLI12)() = (object (*)()) LnkTLI12;
+static object  LnkTLI11(object,...);
+static object  (*LnkLI11)() = (object (*)()) LnkTLI11;
+static object  LnkTLI10(object,...);
+static object  (*LnkLI10)() = (object (*)()) LnkTLI10;
+static void LnkT9();
 static void (*Lnk9)() = LnkT9;
-static void LnkT8() ;
+static void LnkT8();
 static void (*Lnk8)() = LnkT8;

@@ -25,9 +25,7 @@ TTL:;
 }
 /*	local entry for function REQUIRE	*/
 
-static object LI2(V4,va_alist)
-	object V4;
-	va_dcl 
+static object LI2(object V4,object first,...)
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB2 VMS2 VMV2
@@ -35,13 +33,13 @@ static object LI2(V4,va_alist)
 	{object V5;
 	object V6;
 	Vcs[0]=Vcs[0];
-	va_start(ap);
+	va_start(ap,first);
 	if(narg <1) too_few_arguments();
 	V5= V4;
 	narg = narg - 1;
 	if (narg <= 0) goto T6;
 	else {
-	V6= va_arg(ap,object);}
+	V6= first;}
 	--narg; goto T7;
 goto T6;
 T6:;
