@@ -2,8 +2,12 @@ gclcvs (2.7.0-14) unstable; urgency=low
 
   * Portability patches to makefiles to support non-GNU grep (no -q),
     and non-bash sh, C_INCLUDE_PATH=...;export C_INCLUDE_PATH
+  * copy the global *info* parameter in c1flet and c1labels to prevent
+    accumulation of old data -- FIXME -- make sure there are no other
+    copies required, and eventually replace this global parameter with
+    local variables
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 31 Oct 2003 16:28:22 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  6 Nov 2003 15:43:07 +0000
 
 gclcvs (2.7.0-13) unstable; urgency=low
 
