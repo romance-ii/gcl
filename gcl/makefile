@@ -47,7 +47,7 @@ h/bfdlink.h h/ansidecl.h h/symcat.h: binutils/bfd/libbfd.a binutils/libiberty/li
 #$(PORTDIR)/saved_gcl: $(PORTDIR)/$(FLISP)
 #	cp $< $@
 
-$(PORTDIR)/saved_gcl: ${HDIR}cmpinclude.h
+$(PORTDIR)/saved_gcl: $(HDIR)cmpinclude.h
 	(cd $(BINDIR); make all)
 	make mpfiles
 	rm -f o/cmpinclude.h ; cp h/cmpinclude.h o
@@ -69,10 +69,10 @@ $(PORTDIR)/saved_gcl: ${HDIR}cmpinclude.h
 #	(cd lsp ; make info.o)
 #	@- if  [ -f cmpnew/collectfn.o ]  ; \
 #	then echo "Make of GCL `cat majvers`.`cat minvers` completed." ; \
-#        if [ "${NOTIFY}" = "yes" ] ; then \
-#	./xbin/notify "CC=${CC}" ;  fi ;\
+#        if [ "$(NOTIFY)" = "yes" ] ; then \
+#	./xbin/notify "CC=$(CC)" ;  fi ;\
 #	else echo "The new image failed to compile collectfn.lsp" ;fi ; \
-#	if [ -d "${TK_CONFIG_PREFIX}" ] ; \
+#	if [ -d "$(TK_CONFIG_PREFIX)" ] ; \
 #	then (cd gcl-tk ; make) ; \
 #	else echo "gcl-tk not made..missing include or lib" ; fi 
 #	(cd info ; make)
@@ -90,7 +90,7 @@ cmpnew/collectfn.o lsp/info.o:
 	cd $(@D) && make $(@F)
 
 do-gcl-tk:
-	if [ -d "${TK_CONFIG_PREFIX}" ] ; then \
+	if [ -d "$(TK_CONFIG_PREFIX)" ] ; then \
 		cd gcl-tk && make ; \
 	else \
 		echo "gcl-tk not made..missing include or lib" ; \
@@ -99,7 +99,7 @@ do-gcl-tk:
 do-info:
 	cd info && make
 
-mpfiles: ${MPFILES}
+mpfiles: $(MPFILES)
 
 $(MPDIR)/libmport.a:
 	(cd mp ; make all)
@@ -116,32 +116,32 @@ $(GMPDIR)/mpn/mul_n.o $(GMPDIR)/mpn/lshift.o $(GMPDIR)/mpn/rshift.o: $(GMPDIR)/M
 
 command:
 	rm -f bin/gcl xbin/gcl
-	MGCLDIR=`echo ${GCLDIR} | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
-	GCLDIR=`echo ${GCLDIR}` ; \
-	make install-command "INSTALL_LIB_DIR=$${GCLDIR}" "prefix=$${GCLDIR}" "BINDIR=$${MGCLDIR}/$(PORTDIR)"
+	MGCLDIR=`echo $(GCLDIR) | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
+	GCLDIR=`echo $(GCLDIR)` ; \
+	make install-command "INSTALL_LIB_DIR=$(GCLDIR)" "prefix=$(GCLDIR)" "BINDIR=$(MGCLDIR)/$(PORTDIR)"
 	(cd xbin ; cp ../bin/gcl .)
 
-#	GCLDIR=`echo ${GCLDIR} | sed -e 'sX^/cygdrive/\([a-z]\)X\1!Xg' -e 'sX^//\([a-z]\)X\1!Xg'` ; \
+#	GCLDIR=`echo $(GCLDIR) | sed -e 'sX^/cygdrive/\([a-z]\)X\1!Xg' -e 'sX^//\([a-z]\)X\1!Xg'` ; \
 
 merge:
-	${CC} -o merge merge.c
+	$(CC) -o merge merge.c
 
 LISP_LIB=cmpnew/collectfn.o lsp/gprof.lsp lsp/info.o lsp/profile.lsp lsp/export.lsp lsp/autoload.lsp cmpnew/cmpmain.lsp cmpnew/cmpopt.lsp cmpnew/lfun_list.lsp lsp/auto_new.lsp h/cmpinclude.h unixport/init_gcl.lsp unixport/libgcl.a unixport/libgclp.a gcl-tk/tk-package.lsp $(TK_LISP_LIB) $(RL_LIB)
 
 install-command:
-	rm -f $(DESTDIR)${prefix}/bin/gcl
+	rm -f $(DESTDIR)$(prefix)/bin/gcl
 	(echo '#!/bin/sh' ; \
-	echo export C_INCLUDE_PATH=${INSTALL_LIB_DIR}/h;\
-	echo exec ${BINDIR}/$(FLISP)$(EXE) \\ ; \
-	echo '   -dir' ${INSTALL_LIB_DIR}/unixport/ \\ ; \
-	echo '   -libdir' ${INSTALL_LIB_DIR}/ \\ ; \
+	echo export C_INCLUDE_PATH=$(INSTALL_LIB_DIR)/h:\$$C_INCLUDE_PATH;\
+	echo exec $(BINDIR)/$(FLISP)$(EXE) \\ ; \
+	echo '   -dir' $(INSTALL_LIB_DIR)/unixport/ \\ ; \
+	echo '   -libdir' $(INSTALL_LIB_DIR)/ \\ ; \
 	echo '   -eval '\''(setq si::*allow-gzipped-file* t)'\' \\ ;\
-	! [ -d "${TK_CONFIG_PREFIX}" ] || echo '   -eval '\''(setq si::*tk-library* '\"${TK_LIBRARY}\"')'\' \\;\
+	! [ -d "$(TK_CONFIG_PREFIX)" ] || echo '   -eval '\''(setq si::*tk-library* '\"$(TK_LIBRARY)\"')'\' \\;\
 	[ "$(RL_OBJS)" = "" ] || echo '   -eval '\''(si::init-readline)'\' \\;\
-	echo '     '\"\$$@\" ) > $(DESTDIR)${prefix}/bin/gcl;
-	echo '#' other options: -load "/tmp/foo.o" -load "jo.lsp" -eval '"(joe 3)"' >> $(DESTDIR)${prefix}/bin/gcl
-	chmod a+x $(DESTDIR)${prefix}/bin/gcl
-	rm -f $(DESTDIR)${prefix}/bin/gclm.bat
+	echo '     '\"\$$@\" ) > $(DESTDIR)$(prefix)/bin/gcl;
+	echo '#' other options: -load "/tmp/foo.o" -load "jo.lsp" -eval '"(joe 3)"' >> $(DESTDIR)$(prefix)/bin/gcl
+	chmod a+x $(DESTDIR)$(prefix)/bin/gcl
+	rm -f $(DESTDIR)$(prefix)/bin/gclm.bat
 	(echo '@SET cd='; \
 	 echo '@SET promp$=%prompt%'; \
 	 echo '@PROMPT SET cd$Q$P'; \
@@ -153,31 +153,31 @@ install-command:
 	 echo 'FOR %%c IN (CALL DEL) DO %%c %temp%.\setdir.bat'; \
 	 echo 'set cwd=%cd%'; \
 	 echo 'path %cd%\..\mingw\bin;%PATH%'; \
-	 echo "start %cd%\..\lib\gcl-2.5.0\unixport\saved_gcl.exe -dir %cd%/../lib/gcl-2.5.0/unixport/ -libdir  %cd%/lib/gcl-2.5.0/ -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9" ) > $(DESTDIR)${prefix}/bin/gclm.bat
+	 echo "start %cd%\..\lib\gcl-2.5.0\unixport\saved_gcl.exe -dir %cd%/../lib/gcl-2.5.0/unixport/ -libdir  %cd%/lib/gcl-2.5.0/ -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9" ) > $(DESTDIR)$(prefix)/bin/gclm.bat
 
 install: 
-	make install1 "INSTALL_LIB_DIR=${prefix}/lib/gcl-`cat majvers`.`cat minvers`" "prefix=${prefix}" "DESTDIR=$(DESTDIR)"
+	make install1 "INSTALL_LIB_DIR=$(prefix)/lib/gcl-`cat majvers`.`cat minvers`" "prefix=$(prefix)" "DESTDIR=$(DESTDIR)"
 INSTALL_LIB_DIR=
 install1:
-	mkdir -p $(DESTDIR)${prefix}/lib 
-	mkdir -p $(DESTDIR)${prefix}/bin
-	mkdir -p $(DESTDIR)${INSTALL_LIB_DIR}
-	MINSTALL_LIB_DIR=`echo ${INSTALL_LIB_DIR} | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
-	make install-command "INSTALL_LIB_DIR=$(INSTALL_LIB_DIR)" "prefix=$(prefix)" "DESTDIR=$(DESTDIR)" "BINDIR=$(MINSTALL_LIB_DIR)/unixport"
-	rm -f $(DESTDIR)${prefix}/bin/gcl.exe
-	tar cf - $(PORTDIR)/$(FLISP)$(EXE) info/*.info* ${LISP_LIB} \
-	$(TCL_EXES)  |  (cd $(DESTDIR)${INSTALL_LIB_DIR} ;tar xf -)
+	mkdir -p $(DESTDIR)$(prefix)/lib 
+	mkdir -p $(DESTDIR)$(prefix)/bin
+	mkdir -p $(DESTDIR)$(INSTALL_LIB_DIR)
+	MINSTALL_LIB_DIR=`echo $(INSTALL_LIB_DIR) | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
+	make install-command "INSTALL_LIB_DIR=$(INSTALL_LIB_DIR)" "prefix=$(prefix)" "DESTDIR=$(DESTDIR)" "BINDIR=$$MINSTALL_LIB_DIR/unixport"
+	rm -f $(DESTDIR)$(prefix)/bin/gcl.exe
+	tar cf - $(PORTDIR)/$(FLISP)$(EXE) info/*.info* $(LISP_LIB) \
+	$(TCL_EXES)  |  (cd $(DESTDIR)$(INSTALL_LIB_DIR) ;tar xf -)
 	if [ -e "unixport/rsym$(EXE)" ] ; then cp unixport/rsym$(EXE) $(DESTDIR)$(INSTALL_LIB_DIR)/unixport/ ; fi
-#	ln ${SYMB} ${INSTALL_LIB_DIR}/$(PORTDIR)/$(FLISP)$(EXE) \
-#	 $(DESTDIR)${prefix}/bin/gcl.exe
-	if [ -d "${TK_CONFIG_PREFIX}" ] ; then  \
+#	ln $(SYMB) $(INSTALL_LIB_DIR)/$(PORTDIR)/$(FLISP)$(EXE) \
+#	 $(DESTDIR)$(prefix)/bin/gcl.exe
+	if [ -d "$(TK_CONFIG_PREFIX)" ] ; then  \
 	cat gcl-tk/gcltksrv$(BAT) | \
-	sed -e "s!GCL_TK_DIR=.*!GCL_TK_DIR=${INSTALL_LIB_DIR}/gcl-tk!g"  \
-	-e "s!TK_LIBRARY=.*!TK_LIBRARY=${TK_LIBRARY}!g" > \
-	$(DESTDIR)${INSTALL_LIB_DIR}/gcl-tk/gcltksrv$(BAT) ; \
-	chmod a+x $(DESTDIR)${INSTALL_LIB_DIR}/gcl-tk/gcltksrv$(BAT) ; fi
-#	if [ -d "${TK_CONFIG_PREFIX}" ] ; then  \
-#	(cd $(DESTDIR)${INSTALL_LIB_DIR}/gcl-tk/demos ; \
+	sed -e "s!GCL_TK_DIR=.*!GCL_TK_DIR=$(INSTALL_LIB_DIR)/gcl-tk!g"  \
+	-e "s!TK_LIBRARY=.*!TK_LIBRARY=$(TK_LIBRARY)!g" > \
+	$(DESTDIR)$(INSTALL_LIB_DIR)/gcl-tk/gcltksrv$(BAT) ; \
+	chmod a+x $(DESTDIR)$(INSTALL_LIB_DIR)/gcl-tk/gcltksrv$(BAT) ; fi
+#	if [ -d "$(TK_CONFIG_PREFIX)" ] ; then  \
+#	(cd $(DESTDIR)$(INSTALL_LIB_DIR)/gcl-tk/demos ; \
 #	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../$(PORTDIR)/$(FLISP)$(EXE)) ; fi
 	if test "$(EMACS_SITE_LISP)" != "" ; then (cd elisp ; make install DESTDIR=$(DESTDIR)) ; fi
 	if test "$(INFO_DIR)" != "unknown"; then (cd info ; make ; make install DESTDIR=$(DESTDIR)) ; fi
@@ -203,18 +203,18 @@ clean:
 	-cd binutils/bfd && make distclean
 	-cd binutils/libiberty && make distclean
 
-CMPINCLUDE_FILES=${HDIR}cmpincl1.h ${HDIR}gclincl.h ${HDIR}compbas.h ${HDIR}enum.h $(HDIR)mgmp.h ${HDIR}object.h ${HDIR}vs.h \
-	${HDIR}bds.h ${HDIR}frame.h \
-	${HDIR}lex.h ${HDIR}eval.h    ${HDIR}funlink.h \
-	${HDIR}att_ext.h ${HDIR}new_decl.h ${HDIR}compbas2.h \
-	${HDIR}compat.h ${HDIR}cmponly.h $(ODIR)/regexp.h ${HDIR}/protoize.h
+CMPINCLUDE_FILES=$(HDIR)cmpincl1.h $(HDIR)gclincl.h $(HDIR)compbas.h $(HDIR)enum.h $(HDIR)mgmp.h $(HDIR)object.h $(HDIR)vs.h \
+	$(HDIR)bds.h $(HDIR)frame.h \
+	$(HDIR)lex.h $(HDIR)eval.h    $(HDIR)funlink.h \
+	$(HDIR)att_ext.h $(HDIR)new_decl.h $(HDIR)compbas2.h \
+	$(HDIR)compat.h $(HDIR)cmponly.h $(ODIR)/regexp.h $(HDIR)/protoize.h
 
-OTHERS=${HDIR}notcomp.h ${HDIR}rgbc.h ${HDIR}stacks.h 
+OTHERS=$(HDIR)notcomp.h $(HDIR)rgbc.h $(HDIR)stacks.h 
 
-${HDIR}cmpinclude.h: ${CMPINCLUDE_FILES} ${HDIR}config.h
-	cat ${HDIR}config.h | sed -e "1,/Begin for cmpincl/d" \
+$(HDIR)cmpinclude.h: $(CMPINCLUDE_FILES) $(HDIR)config.h
+	cat $(HDIR)config.h | sed -e "1,/Begin for cmpincl/d" \
 		-e "/End for cmpinclude/,50000d" > tmpx
-	cat ${CMPINCLUDE_FILES} >> tmpx
+	cat $(CMPINCLUDE_FILES) >> tmpx
 	./xbin/move-if-changed mv tmpx h/cmpinclude.h
 	./xbin/move-if-changed cp h/cmpinclude.h o/cmpinclude.h
 

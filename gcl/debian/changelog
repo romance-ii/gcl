@@ -3,8 +3,10 @@ gcl (2.5.0.cvs20020625-58) unstable; urgency=low
   * GENSYM fixes
   * add complement and constantly
   * import certain symbols into common-lisp package
+  * Fix makefile bug in install target
+  * Prepend instead of overwrite C_INCLUDE_PATH in shell wrapper
 
- -- Camm Maguire <camm@m.enhanced.com>  Thu, 10 Oct 2002 06:52:16 -0400
+ -- Camm Maguire <camm@m.enhanced.com>  Thu, 10 Oct 2002 11:17:31 -0400
 
 gcl (2.5.0.cvs20020625-57) unstable; urgency=low
 
