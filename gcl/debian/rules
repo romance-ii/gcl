@@ -124,11 +124,11 @@ bclean-stamp:
 	-$(MAKE) clean
 	touch $@
 
-ansi-test/test_results: build-ansi-stamp
+ansi-tests/test_results: build-ansi-stamp
 	$(MAKE) $@
 
 build: build-stamp
-build-stamp: build-trad-stamp bclean-stamp build-ansi-stamp ansi-test/test_results
+build-stamp: build-trad-stamp bclean-stamp build-ansi-stamp ansi-tests/test_results
 	touch $@
 
 clean:

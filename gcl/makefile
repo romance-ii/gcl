@@ -238,3 +238,5 @@ configure: configure.in
 kcp:
 	(cd go ; $(MAKE)  "CFLAGS = -I../h -pg  -c -g ")
 	(cd unixport ; $(MAKE) gcp)
+
+.INTERMEDIATE: unixport/saved_pcl_gcl
