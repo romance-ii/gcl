@@ -1211,10 +1211,12 @@ cat >> conftest.el <<EOF
 EOF
 
 AC_MSG_CHECKING([emacs site lisp directory])
-if [[ "$EMACS" != "" ]]  && [[ "$EMACS_SITE_LISP" = "unknown" ]] ; then
-	EMACS_SITE_LISP=`$EMACS -q -batch --no-site-file -l conftest.el 2>&1 | sed -e /Loading/d | sed -e /load/d `
-else
-	EMACS_SITE_LISP=""
+if [[ "$EMACS_SITE_LISP" = "unknown" ]] ; then
+	if [[ "$EMACS" != "" ]] ; then
+		EMACS_SITE_LISP=`$EMACS -q -batch --no-site-file -l conftest.el 2>&1 | sed -e /Loading/d | sed -e /load/d `
+	else
+		EMACS_SITE_LISP=""
+	fi
 fi
 AC_MSG_RESULT($EMACS_SITE_LISP)
 AC_SUBST(EMACS_SITE_LISP)

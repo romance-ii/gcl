@@ -4,8 +4,9 @@ gclcvs (2.7.0-16) unstable; urgency=low
     rebind
   * Remove duplicate tags from compiled C switch statements
   * Minor merges for DARWIN support
+  * Path to configure to make --enable-emacsdir work
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 12 Nov 2003 15:47:00 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 15 Nov 2003 17:18:53 +0000
 
 gclcvs (2.7.0-15) unstable; urgency=low
 
