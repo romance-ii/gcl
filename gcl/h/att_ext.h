@@ -350,7 +350,9 @@ object shift_integer();
 /*  package.d  */
 EXTER object lisp_package;
 EXTER object user_package;
+#ifdef ANSI_COMMON_LISP
 EXTER object common_lisp_package;
+#endif
 EXTER object keyword_package;
 EXTER object system_package;
 EXTER object sLApackageA;

@@ -208,3 +208,5 @@ SGC is enabled.  */
 #undef USE_DLOPEN
 
 #define MP_LIMB_BYTES 0
+
+#undef ANSI_COMMON_LISP

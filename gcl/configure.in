@@ -585,6 +585,7 @@ AC_ARG_ENABLE(ansi,[--enable-ansi builds a large gcl aiming for ansi compliance,
 
 if test "$enable_ansi" = "yes" ; then
 	FLISP=saved_ansi_gcl;
+	AC_DEFINE(ANSI_COMMON_LISP)
 else
 	FLISP=saved_gcl
 fi

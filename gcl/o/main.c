@@ -420,6 +420,7 @@ initlisp(void) {
 	import(Ct, lisp_package);
 	export(Ct, lisp_package);
 
+#ifdef ANSI_COMMON_LISP
 /*  	Cnil->s.s_hpack = common_lisp_package; */
 	import(Cnil, common_lisp_package);
 	export(Cnil, common_lisp_package);
@@ -427,6 +428,7 @@ initlisp(void) {
 /*  	Ct->s.s_hpack = common_lisp_package; */
 	import(Ct, common_lisp_package);
 	export(Ct, common_lisp_package);
+#endif
 
 	sLquote = make_ordinary("QUOTE");
 	sLfunction = make_ordinary("FUNCTION");

@@ -2,8 +2,10 @@ gcl (2.5.0.cvs20020625-43) unstable; urgency=high
 
   * Larger ihs stack;fix array-total-size-limit;check negative
     fillp;allow #P
+  * don't make common_lisp package when not configuring with --enable-
+    ansi
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 14 Aug 2002 17:06:01 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed, 14 Aug 2002 18:01:52 -0400
 
 gcl (2.5.0.cvs20020625-42) unstable; urgency=high
 
