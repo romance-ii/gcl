@@ -483,6 +483,10 @@ object if_exists, if_does_not_exist;
 
 	setup_stream_buffer(x);
 	vs_reset;
+
+	if (smm==smm_probe)
+	  close_stream(x);
+
 	return(x);
 }
 
@@ -1982,6 +1986,14 @@ LFD(Lopen_stream_p)()
 	vs_base[0] = open_stream_p(vs_base[0]);
 }
 
+LFD(Lstream_external_format)()
+{
+	check_arg(1);
+
+	check_type_stream(&vs_base[0]);
+	vs_base[0] = sKdefault;
+}
+
 LFD(Linteractive_stream_p)()
 {
 	check_arg(1);
@@ -2010,6 +2022,7 @@ LFD(Lstream_element_type)()
 		   (element_type sLstring_char)
 		   (if_exists Cnil iesp)
 		   (if_does_not_exist Cnil idnesp)
+                   (external_format sKdefault iefp)  
 	      &aux strm)
 	enum smmode smm=0;
 	vs_mark;
@@ -2726,6 +2739,7 @@ DEF_ORDINARY("ABORT",sKabort,KEYWORD,"");
 DEF_ORDINARY("APPEND",sKappend,KEYWORD,"");
 DEF_ORDINARY("CREATE",sKcreate,KEYWORD,"");
 DEF_ORDINARY("DEFAULT",sKdefault,KEYWORD,"");
+DEF_ORDINARY("EXTERNAL-FORMAT",sKexternal_format,KEYWORD,"");
 DEF_ORDINARY("DIRECTION",sKdirection,KEYWORD,"");
 DEF_ORDINARY("ELEMENT-TYPE",sKelement_type,KEYWORD,"");
 DEF_ORDINARY("ERROR",sKerror,KEYWORD,"");
@@ -2785,6 +2799,7 @@ gcl_init_file_function()
 	make_function("INPUT-STREAM-P", Linput_stream_p);
 	make_function("OUTPUT-STREAM-P", Loutput_stream_p);
 	make_function("OPEN-STREAM-P", Lopen_stream_p);
+	make_function("STREAM-EXTERNAL-FORMAT", Lstream_external_format);
 	make_function("INTERACTIVE-STREAM-P", Linteractive_stream_p);
 	make_function("STREAM-ELEMENT-TYPE", Lstream_element_type);
 	make_function("CLOSE", Lclose);

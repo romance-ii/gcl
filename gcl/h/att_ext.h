@@ -159,6 +159,7 @@ EXTER object sKabort;
 EXTER object sKappend;
 EXTER object sKcreate;
 EXTER object sKdefault;
+EXTER object sKexternal_format;
 EXTER object sKdirection;
 EXTER object sKelement_type;
 EXTER object sKif_does_not_exist;

@@ -15,8 +15,9 @@ gclcvs (2.7.0-33) unstable; urgency=low
   * Fix method-combintion ANSI failures, from cmucl
   * compiler-macro and method-combination documentation types
   * complete si::debug -> si::debugger name change
+  * open probe ANSI fixes
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 23 Nov 2004 22:32:01 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 23 Nov 2004 22:32:44 +0000
 
 gclcvs (2.7.0-32) unstable; urgency=high
 
