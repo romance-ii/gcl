@@ -2,7 +2,7 @@
 #include "cmpinclude.h"
 #include "clcs_top_patches.h"
 void init_clcs_top_patches(){do_init(VV);}
-/*	local entry for function progn 'compile2203	*/
+/*	local entry for function progn 'compile2202	*/
 
 static object LI1()
 
@@ -18,7 +18,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile2215	*/
+/*	local entry for function progn 'compile2214	*/
 
 static object LI2()
 
@@ -37,7 +37,7 @@ T3:;
 	VMR2(V2)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2228	*/
+/*	local entry for function progn 'compile2227	*/
 
 static object LI3()
 
@@ -601,7 +601,7 @@ T236:;
 	base[0]=base[0];
 	return Cnil;}
 	}
-/*	local entry for function progn 'compile2522	*/
+/*	local entry for function progn 'compile2521	*/
 
 static object LI9()
 
@@ -613,7 +613,7 @@ TTL:;
 	VMR9(V52)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2534	*/
+/*	local entry for function progn 'compile2533	*/
 
 static object LI10()
 
@@ -643,7 +643,7 @@ TTL:;
 	(void) (*Lnk91)();
 	return;
 }
-/*	local entry for function progn 'compile2554	*/
+/*	local entry for function progn 'compile2553	*/
 
 static object LI12()
 
@@ -655,7 +655,7 @@ TTL:;
 	VMR12(V54)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile2566	*/
+/*	local entry for function progn 'compile2565	*/
 
 static object LI13()
 
