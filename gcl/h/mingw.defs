@@ -54,3 +54,8 @@ KCP          = kcp-bsd
 GNULIB1      =
 
 WINKILL      = winkill.exe tclwinkill.dll
+
+# Work around install problem caused by non-support of GCL TK
+# on Windows platforms.
+TK_LISP_LIB  =
+TCL_EXES     =
