@@ -1404,7 +1404,7 @@ FFN(siLroom_report)(void) {
   for (i = 0;  i < (int)t_end;  i++) {
     if (tm_table[i].tm_type == (enum type)i) {
       vs_check_push(make_fixnum(TM_NUSED(tm_table[i])));
-      vs_push(make_fixnum(tm_table[i].tm_nfree));
+      vs_push(make_fixnum(tm_table[i].tm_nfree+tm_table[i].tm_alt_nfree));
       vs_push(make_fixnum(tm_table[i].tm_npage));
       vs_push(make_fixnum(tm_table[i].tm_maxpage));
       vs_push(make_fixnum(tm_table[i].tm_gbccount));

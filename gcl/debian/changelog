@@ -16,8 +16,9 @@ gclcvs (2.7.0-27) unstable; urgency=low
   * Better sed separator for LI-CC in unixport/makefile
   * vs_top=sup -> (reset-top) where possible in compiler.  FIXME: a few
     items of a different form which need to set *sup-used* too.
+  * Correct room report to show proper percentages when sgc is on
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 14 Jul 2004 14:35:14 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed, 14 Jul 2004 16:48:53 -0400
 
 gclcvs (2.7.0-26) unstable; urgency=low
 

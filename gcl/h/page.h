@@ -122,7 +122,7 @@ struct sgc_firstword {short t; short sm;};
 #endif     
 
 extern int sgc_enabled;
-#define TM_NUSED(pt) (((pt).tm_npage*(pt).tm_nppage) - (pt).tm_nfree)
+#define TM_NUSED(pt) (((pt).tm_npage*(pt).tm_nppage) - (pt).tm_nfree - (pt).tm_alt_nfree)
 
 
 
