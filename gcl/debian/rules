@@ -15,13 +15,13 @@ ARCHT:=$(shell dpkg --print-architecture)
 
 MCC:=gcc
 ifeq ($(ARCHT),arm)
-MCC:=gcc-3.0
+MCC:=gcc-3.2
 endif
 ifeq ($(ARCHT),hppa)
-MCC:=gcc-3.1
+MCC:=gcc-3.2
 endif
 ifeq ($(ARCHT),ia64)
-MCC:=gcc-3.1
+MCC:=gcc-3.2
 endif
 
 #RELOC=locbfd
