@@ -74,8 +74,6 @@
   (c1constant-value (cons 'si:|#,| arg) t))
 
 (defun wrap-literals (form)
-  #-native-reloc form
-  #+native-reloc
   (cond ((consp form)
 	 (if (eq (car form) 'quote )
 	     `(load-time-value (si::nani ,(si::address (cadr form))))
