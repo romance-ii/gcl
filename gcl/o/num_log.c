@@ -676,9 +676,10 @@ siLbit_array_op(void)
 	L2:
 		if (r == Cnil) {
 		  object b[F_ARG_LIMIT];
+		  b[0]=Cnil;
 		  for (i = 0;  i < x->a.a_rank;  i++)
 		    b[i] = (make_fixnum(x->a.a_dims[i]));
-		  r=Iapply_fun_n1(fSmake_array1,5,x->a.a_rank,
+		  r=Iapply_fun_n1(fSmake_array1,5,x->a.a_rank ? x->a.a_rank : 1,
 			       aet_bit,
 			       Cnil,
 			       small_fixnum(0),
