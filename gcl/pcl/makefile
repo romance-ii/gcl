@@ -46,7 +46,7 @@ $(addsuffix .c,$(AFILES)) $(addsuffix .data,$(AFILES))\
 	../xbin/append $*.data $@
 
 clean:
-	rm -f *.o *.fn *.exe *.dll saved_gcl_pcl cmpinclude.h
+	rm -f *.o *.fn *.exe *.dll saved_gcl_pcl cmpinclude.h *.c *.h *.data
 
 
 # remake the sys-package.lisp and sys-proclaim.lisp files

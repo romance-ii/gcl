@@ -1,5 +1,0 @@
-       
-#(#! 
-(lisp::in-package :pcl)
-#(lisp::+ "" lisp::and lisp::append lisp::list lisp::max lisp::min lisp::nconc lisp::or lisp::progn pcl::load-short-defcombin (system::%init . #((system::mf (lisp::quote #0=#:|(DEFINE-METHOD-COMBINATION +)10207|) 0) (#0#) (system::mf (lisp::quote #1=#:|(DEFINE-METHOD-COMBINATION AND)10207|) 1) (#1#) (system::mf (lisp::quote #2=#:|(DEFINE-METHOD-COMBINATION APPEND)10207|) 2) (#2#) (system::mf (lisp::quote #3=#:|(DEFINE-METHOD-COMBINATION LIST)10207|) 3) (#3#) (system::mf (lisp::quote #4=#:|(DEFINE-METHOD-COMBINATION MAX)10207|) 4) (#4#) (system::mf (lisp::quote #5=#:|(DEFINE-METHOD-COMBINATION MIN)10207|) 5) (#5#) (system::mf (lisp::quote #6=#:|(DEFINE-METHOD-COMBINATION NCONC)10207|) 6) (#6#) (system::mf (lisp::quote #7=#:|(DEFINE-METHOD-COMBINATION OR)10207|) 7) (#7#) (system::mf (lisp::quote #8=#:|(DEFINE-METHOD-COMBINATION PROGN)10207|) 8) (#8#))))
-)

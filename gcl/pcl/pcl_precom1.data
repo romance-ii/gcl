@@ -1,5 +1,0 @@
-       
-#(#! 
-(lisp::in-package :pcl)
-#((system::%init . #((lisp::flet ((system::allocate (pcl::n pcl::size) (lisp::mapcar (lisp::function pcl::free-cache-vector) (lisp::mapcar (lisp::function pcl::get-cache-vector) (lisp::make-list pcl::n :initial-element pcl::size))))) (system::allocate 128 4) (system::allocate 64 8) (system::allocate 64 9) (system::allocate 32 16) (system::allocate 16 17) (system::allocate 16 32) (system::allocate 1 64)))))
-)

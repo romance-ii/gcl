@@ -1,4 +1,0 @@
-       
-#(
-#((system::%init . #((system::mf (lisp::quote compiler::cmp-anon) 0) (system::debug (lisp::quote compiler::cmp-anon) (lisp::quote (#:g10137 #:g10138))))))
-)

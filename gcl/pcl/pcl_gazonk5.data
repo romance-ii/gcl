@@ -1,4 +1,0 @@
-       
-#(
-#(lisp::generic-function pcl::fast-method-call pcl::method-call conditions::case-failure :name conditions::etypecase :datum :expected-type :possibilities lisp::typep system::structure-subtype-p conditions::error (system::%init . #((system::mf (lisp::quote compiler::cmp-anon) 0) (system::debug (lisp::quote compiler::cmp-anon) (lisp::quote (#:g10150 #:g10151 #:g10152 #:g10156 #:g10157))))))
-)

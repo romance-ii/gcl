@@ -1,4 +1,0 @@
-       
-#(
-#(pcl::fast-method-call pcl::method-call conditions::case-failure :name conditions::etypecase :datum :expected-type (lisp::or . #0=(pcl::method-call lisp::function)) :possibilities #0# (lisp::or . #1=(pcl::method-call lisp::function)) #1# (lisp::or . #2=(pcl::method-call lisp::function)) #2# system::structure-subtype-p conditions::error (system::%init . #((system::mf (lisp::quote compiler::cmp-anon) 0) (system::debug (lisp::quote compiler::cmp-anon) (lisp::quote (pcl::effective-method-gensym-0 pcl::effective-method-gensym-1 pcl::effective-method-gensym-2))))))
-)

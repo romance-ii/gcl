@@ -1,5 +1,0 @@
-       
-#(
-#(:package-error "Cannot coerce ~S to a package~%" :inherited user::defpackage :nicknames :use :export :shadow :shadowing-import-from :import-from lisp::package-shadowing-symbols lisp::specific-error system::package-size lisp::find lisp::intersection lisp::set-difference (system::%init . #((system::putprop (lisp::quote user::make-defpackage-form) "Given a package, returns a defpackage form that could recreate the 
-   current state of the package, more or less." (lisp::quote system::function-documentation)) (system::mfsfun (lisp::quote user::make-defpackage-form) 0 1) (system::debug (lisp::quote user::make-defpackage-form) (lisp::quote (user::name user::nicknames lisp::package-use-list user::use-list user::shadowed-symbols #:g1400 #:g1392 #:g1403))))))
-)

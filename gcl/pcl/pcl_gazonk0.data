@@ -1,4 +1,0 @@
-       
-#(
-#(pcl::fast-method-call (system::%init . #((system::mf (lisp::quote compiler::cmp-anon) 0) (system::debug (lisp::quote compiler::cmp-anon) (lisp::quote (pcl::effective-method-gensym-0 pcl::effective-method-gensym-1 pcl::effective-method-gensym-2))))))
-)

@@ -1,5 +1,0 @@
-       
-#(#! 
-(lisp::in-package :pcl)
-#(pcl::print-object (system::%init . #((pcl::fix-early-generic-functions) (lisp::setq pcl::*boot-state* (lisp::quote pcl::complete)) (system::mfsfun (lisp::quote pcl::print-std-instance) 0 3))))
-)

@@ -53,7 +53,7 @@ fns:	../cmpnew/gcl_collectfn.o
 
 
 clean:
-	rm -f *.o core a.out *.fn
+	rm -f *.o core a.out *.fn *.c *.h *.data
 allclean:
 	rm -f *.h *.data *.c
 

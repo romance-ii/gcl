@@ -1,5 +1,0 @@
-       
-#(#! 
-(lisp::in-package :pcl)
-#((system::%init . #()))
-)

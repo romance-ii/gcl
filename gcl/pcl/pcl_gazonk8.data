@@ -1,4 +1,0 @@
-       
-#(
-#(pcl::fast-method-call lisp::nil pcl::std-instance pcl::*funcallable-instance-marker* pcl::method-call conditions::case-failure :name conditions::etypecase :datum :expected-type :possibilities system::structure-subtype-p pcl::cclosure-env-nthcdr pcl::%cclosure-env-nthcdr conditions::error (system::%init . #((system::setvv 1 (compiler::name-to-sd (lisp::quote pcl::std-instance))) (system::mf (lisp::quote compiler::cmp-anon) 0) (system::debug (lisp::quote compiler::cmp-anon) (lisp::quote (#:g10546 #:g10550 #:g10551))))))
-)

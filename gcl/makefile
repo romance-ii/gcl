@@ -237,6 +237,9 @@ CMPINCLUDE_FILES=$(HDIR)cmpincl1.h $(HDIR)gclincl.h $(HDIR)compbas.h $(HDIR)enum
 
 OTHERS=$(HDIR)notcomp.h $(HDIR)rgbc.h $(HDIR)stacks.h 
 
+$(HDIR)new_decl.h:
+	(cd o && $(MAKE) ../$@)
+
 $(HDIR)cmpinclude.h: $(CMPINCLUDE_FILES) $(HDIR)config.h
 	cat $(HDIR)config.h | sed -e "1,/Begin for cmpincl/d" \
 		-e "/End for cmpinclude/,50000d" > tmpx

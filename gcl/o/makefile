@@ -19,7 +19,7 @@ LIBFILES= bcmp.o bcopy.o bzero.o user_init.o user_match.o
 MAIN_DEBUG=
 DPP	= ../bin/dpp$(EXE)
 
-DECL := $(HDIR)/new_decl.h
+DECL := $(HDIR)new_decl.h
 
 # AUX_INFO=-aux-info $*.X
 %.o: %.c $(DECL)
