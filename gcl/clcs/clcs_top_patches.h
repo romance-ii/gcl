@@ -78,8 +78,8 @@ static void LC15();
 #define VM3 0
 #define VM2 1
 #define VM1 1
-static char * VVi[91]={
-#define Cdata VV[90]
+static char * VVi[93]={
+#define Cdata VV[92]
 (char *)(LI1),
 (char *)(LI2),
 (char *)(LI3),
@@ -96,6 +96,10 @@ static char * VVi[91]={
 (char *)(L14)
 };
 #define VV ((object *)VVi)
+static void LnkT91();
+static void (*Lnk91)() = LnkT91;
+static void LnkT90();
+static void (*Lnk90)() = LnkT90;
 static void LnkT89();
 static void (*Lnk89)() = LnkT89;
 static void LnkT88();

@@ -57,9 +57,12 @@ $(PORTDIR)/saved_gcl: $(HDIR)cmpinclude.h
 	(cd $(CMPDIR); $(MAKE) all)
 	cd $(@D) && $(MAKE) $(@F)
 
-$(PORTDIR)/saved_ansi_gcl: $(PORTDIR)/saved_gcl
-	(cd $(PCLDIR); $(MAKE) all)
-	(cd $(CLCSDIR); $(MAKE) all)
+$(PORTDIR)/saved_pcl_gcl: $(PORTDIR)/saved_gcl
+	(cd $(PCLDIR); rm -f *.c; $(MAKE) all)
+	cd $(@D) && $(MAKE) $(@F)
+
+$(PORTDIR)/saved_ansi_gcl: $(PORTDIR)/saved_pcl_gcl
+	(cd $(CLCSDIR); rm -f *.c; $(MAKE) all)
 	cd $(@D) && $(MAKE) $(@F)
 
 ansi-tests/test_results: $(PORTDIR)/saved_ansi_gcl

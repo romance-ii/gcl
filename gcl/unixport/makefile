@@ -40,7 +40,8 @@ OBJS:=$(shell j=$$(ar t $(ODIR)/gcllib.a) ; for i in $$(ls -1 $(ODIR)/*.o) ; do 
 OBJS:=$(OBJS) $(shell ls -1 $(LSPDIR)/*.o)
 OBJS:=$(OBJS) $(shell ls -1 $(CMPDIR)/*.o | grep -v collectfn.o)
 
-ANSIOBJS:=$(shell ls -1 $(PCLDIR)/*.o) $(shell ls -1 $(CLCSDIR)/*.o)
+PCLOBJS:=$(shell ls -1 $(PCLDIR)/*.o)
+ANSIOBJS:=$(PCLOBJS) $(shell ls -1 $(CLCSDIR)/*.o)
 
 $(LSPDIR)/auto_new.lsp: $(LSPDIR)/auto.lsp
 	cp $< $@
@@ -49,6 +50,15 @@ $(LSPDIR)/auto_new.lsp: $(LSPDIR)/auto.lsp
 
 init_gcl.lsp.tmp: init_gcl.lsp.in
 	cp $< $@
+
+init_pcl_gcl.lsp.tmp: init_pcl_gcl.lsp.in ../cmpnew/cmpmain.lsp \
+		../pcl/sys-package.lisp ../clcs/package.lisp \
+		$(shell ls -1 ../clcs/clcs_*.lisp)
+
+	awk '/^ *@LI-PCL-PACKAGE@/{i=1;next} {if (i==0) print}' $< >$@
+	cat ../cmpnew/cmpmain.lsp >>$@
+	cat ../pcl/sys-package.lisp >>$@
+	awk '/^ *@LI-PCL-PACKAGE@/{i=1;next} {if (i==1) print}' $< >>$@
 
 init_ansi_gcl.lsp.tmp: init_ansi_gcl.lsp.in ../cmpnew/cmpmain.lsp \
 		../pcl/sys-package.lisp ../clcs/package.lisp
@@ -98,6 +108,10 @@ libgcl.a: $(FIRST_FILE) $(OBJS) sys_gcl.o $(LAST_FILE) gmpfiles bfdfiles
 	ar rs $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
 libansi_gcl.a: $(FIRST_FILE) $(OBJS) $(ANSIOBJS) sys_ansi_gcl.o $(LAST_FILE) gmpfiles bfdfiles
+	rm -rf $@
+	ar rs $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
+
+libpcl_gcl.a: $(FIRST_FILE) $(OBJS) $(PCLOBJS) sys_pcl_gcl.o $(LAST_FILE) gmpfiles bfdfiles
 	rm -rf $@
 	ar rs $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 

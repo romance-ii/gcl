@@ -2,7 +2,7 @@
 #include "cmpinclude.h"
 #include "clcs_top_patches.h"
 void init_clcs_top_patches(){do_init(VV);}
-/*	local entry for function progn 'compile1788	*/
+/*	local entry for function progn 'compile2189	*/
 
 static object LI1()
 
@@ -18,7 +18,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile1788	*/
+/*	local entry for function progn 'compile2201	*/
 
 static object LI2()
 
@@ -42,7 +42,7 @@ T3:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile1789	*/
+/*	local entry for function progn 'compile2214	*/
 
 static object LI3()
 
@@ -600,13 +600,13 @@ TTL:;
 	base[1]= VV[58];
 	base[2]= VV[59];
 	vs_top=(vs_base=base+1)+2;
-	Lcerror();
+	(void) (*Lnk89)();
 	return;
 	goto T244;
 T244:;
 	base[1]= VV[60];
 	vs_top=(vs_base=base+1)+1;
-	Lerror();
+	(void) (*Lnk90)();
 	return;
 	}
 }
@@ -643,7 +643,7 @@ T252:;
 	return;
 	}
 }
-/*	local entry for function progn 'compile1805	*/
+/*	local entry for function progn 'compile2508	*/
 
 static object LI9()
 
@@ -655,7 +655,7 @@ TTL:;
 	VMR9(V43)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile1805	*/
+/*	local entry for function progn 'compile2520	*/
 
 static object LI10()
 
@@ -683,10 +683,10 @@ TTL:;
 	return;}
 	base[0]= symbol_value(VV[32]);
 	vs_top=(vs_base=base+0)+1;
-	(void) (*Lnk89)();
+	(void) (*Lnk91)();
 	return;
 }
-/*	local entry for function progn 'compile1805	*/
+/*	local entry for function progn 'compile2540	*/
 
 static object LI12()
 
@@ -698,7 +698,7 @@ TTL:;
 	VMR12(V45)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile1805	*/
+/*	local entry for function progn 'compile2552	*/
 
 static object LI13()
 
@@ -809,7 +809,9 @@ register object *base0;
 	unwind(fr,VV[46]);}
 	}
 }
-static void LnkT89(){ call_or_link(VV[89],(void **)&Lnk89);} /* INVOKE-RESTART */
+static void LnkT91(){ call_or_link(VV[91],(void **)&Lnk91);} /* INVOKE-RESTART */
+static void LnkT90(){ call_or_link(VV[90],(void **)&Lnk90);} /* ERROR */
+static void LnkT89(){ call_or_link(VV[89],(void **)&Lnk89);} /* CERROR */
 static void LnkT88(){ call_or_link(VV[88],(void **)&Lnk88);} /* BREAK-CURRENT */
 static void LnkT85(){ call_or_link(VV[85],(void **)&Lnk85);} /* CLCS-BREAK-LEVEL-INVOKE-RESTART */
 static void LnkT83(){ call_or_link(VV[83],(void **)&Lnk83);} /* DBL-READ */

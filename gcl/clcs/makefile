@@ -1,13 +1,16 @@
 -include ../makedefs
 
-COMPILE_FILE=../unixport/saved_ansi_gcl ./unixport/ -system-p -c-file -data-file \
+COMPILE_FILE=./saved_clcs_gcl ./ -system-p -c-file -data-file \
 	-o-file nil -h-file -compile
 
 FILES:=$(shell ls -1 clcs_*.lisp | sed 's,\.lisp,,1')
 
 all: $(addsuffix .c,$(FILES)) $(addsuffix .o,$(FILES))
 
-%.h %.data %.c : %.lisp
+saved_clcs_gcl: ../unixport/saved_pcl_gcl
+	echo '(load "package.lisp")(load "myload.lisp")(si::save-system "$@")' | $< $(<D)/
+
+%.h %.data %.c : %.lisp saved_clcs_gcl
 	cp ../h/cmpinclude.h .
 	$(COMPILE_FILE) $<
 
@@ -28,3 +31,4 @@ saved_full_gcl: ${LISP}
 
 clean:
 	rm -f *.o *.fn saved_full_gcl$(EXE) saved_full_gcl cmpinclude.h
+.INTERMEDIATE: saved_clcs_gcl

@@ -2,7 +2,7 @@
 #include "cmpinclude.h"
 #include "clcs_conditions.h"
 void init_clcs_conditions(){do_init(VV);}
-/*	local entry for function progn 'compile1788	*/
+/*	local entry for function progn 'compile2181	*/
 
 static object LI1()
 
@@ -25,7 +25,7 @@ T1:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile1788	*/
+/*	local entry for function progn 'compile2197	*/
 
 static object LI2()
 
@@ -41,7 +41,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile1788	*/
+/*	local entry for function progn 'compile2209	*/
 
 static object LI3()
 
@@ -65,7 +65,7 @@ T7:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile1789	*/
+/*	local entry for function progn 'compile2222	*/
 
 static object LI4()
 
@@ -209,7 +209,7 @@ T51:;
 	vs_top=(vs_base=base+6)+1;
 	return;}
 }
-/*	function definition for Defclass CONDITION1794	*/
+/*	function definition for Defclass CONDITION2295	*/
 
 static void L6()
 {register object *base=vs_base;
@@ -228,7 +228,7 @@ TTL:;
 	symlispcall(VV[54],base+0,6);
 	return;
 }
-/*	local entry for function progn 'compile1794	*/
+/*	local entry for function progn 'compile2311	*/
 
 static object LI7()
 
@@ -243,7 +243,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile1795	*/
+/*	local entry for function progn 'compile2328	*/
 
 static object LI8()
 
@@ -261,7 +261,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile1795	*/
+/*	local entry for function progn 'compile2352	*/
 
 static object LI9()
 
@@ -273,7 +273,7 @@ TTL:;
 	VMR9(V30)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile1795	*/
+/*	local entry for function progn 'compile2364	*/
 
 static object LI10()
 
@@ -284,7 +284,7 @@ TTL:;
 	VMR10(V31)}
 	return Cnil;
 }
-/*	local entry for function progn 'compile1795	*/
+/*	local entry for function progn 'compile2380	*/
 
 static object LI11()
 
@@ -338,7 +338,7 @@ TTL:;
 	return;
 	}
 }
-/*	local entry for function progn 'compile1795	*/
+/*	local entry for function progn 'compile2404	*/
 
 static object LI13()
 
@@ -408,7 +408,7 @@ T84:;
 	return;
 	}
 }
-/*	local entry for function progn 'compile1804	*/
+/*	local entry for function progn 'compile2473	*/
 
 static object LI15()
 
@@ -431,7 +431,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile1804	*/
+/*	local entry for function progn 'compile2485	*/
 
 static object LI16()
 
@@ -447,7 +447,7 @@ TTL:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile1804	*/
+/*	local entry for function progn 'compile2497	*/
 
 static object LI17()
 
@@ -475,7 +475,7 @@ T108:;
 	base[0]=base[0];
 	return Cnil;
 }
-/*	local entry for function progn 'compile1805	*/
+/*	local entry for function progn 'compile2510	*/
 
 static object LI18()
 
@@ -597,7 +597,7 @@ static void LnkT58(){ call_or_link(VV[58],(void **)&Lnk58);} /* CLASS-OF */
 static void LnkT57(){ call_or_link(VV[57],(void **)&Lnk57);} /* PROCLAIM-DEFGENERIC */
 static void LnkT56(){ call_or_link(VV[56],(void **)&Lnk56);} /* TYPEP */
 static void LnkT32(){ call_or_link(VV[32],(void **)&Lnk32);} /* PROCLAIM-INCOMPATIBLE-SUPERCLASSES */
-static void LnkT55(){ call_or_link(VV[55],(void **)&Lnk55);} /* Defclass CONDITION1794 */
+static void LnkT55(){ call_or_link(VV[55],(void **)&Lnk55);} /* Defclass CONDITION2295 */
 static void LnkT53(){ call_or_link(VV[53],(void **)&Lnk53);} /* CERROR */
 static void LnkT50(){ call_or_link(VV[50],(void **)&Lnk50);} /* *MAKE-SPECIAL */
 static void LnkT0(){ call_or_link(VV[0],(void **)&Lnk0);} /* REMOVE-CLCS-SYMBOLS */
