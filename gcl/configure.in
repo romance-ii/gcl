@@ -112,12 +112,12 @@ AC_ARG_ENABLE(ansi,[--enable-ansi builds a large gcl aiming for ansi compliance,
 		    --disable-ansi builds the smaller traditional CLtL1 image],,enable_ansi="yes")
 
 if test "$enable_ansi" = "yes" ; then
-	LISP=saved_ansi_gcl;
+	FLISP=saved_ansi_gcl;
 else
-	LISP=saved_trad_gcl
+	FLISP=saved_trad_gcl
 fi
 
-AC_SUBST(LISP)
+AC_SUBST(FLISP)
 
 
 # bfd probe

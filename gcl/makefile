@@ -27,7 +27,7 @@ GMP_DIR = gmp/
 
 all: $(PORTDIR)/saved_gcl command cmpnew/collectfn.o lsp/info.o do-gcl-tk do-info
 
-$(PORTDIR)/saved_gcl: $(PORTDIR)/$(LISP)
+$(PORTDIR)/saved_gcl: $(PORTDIR)/$(FLISP)
 	cp $< $@
 
 $(PORTDIR)/saved_trad_gcl: ${HDIR}cmpinclude.h

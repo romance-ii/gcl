@@ -1157,9 +1157,9 @@ fi
 
 
 if test "$enable_ansi" = "yes" ; then
-	LISP=saved_ansi_gcl;
+	FLISP=saved_ansi_gcl;
 else
-	LISP=saved_trad_gcl
+	FLISP=saved_trad_gcl
 fi
 
 
@@ -3766,7 +3766,7 @@ s%@GCC@%$GCC%g
 s%@CPP@%$CPP%g
 s%@LITTLE_END@%$LITTLE_END%g
 s%@HAVE_LONG_LONG@%$HAVE_LONG_LONG%g
-s%@LISP@%$LISP%g
+s%@FLISP@%$FLISP%g
 s%@RL_OBJS@%$RL_OBJS%g
 s%@RL_LIB@%$RL_LIB%g
 s%@NO_PROFILE@%$NO_PROFILE%g
