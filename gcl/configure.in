@@ -71,8 +71,13 @@ AC_ARG_ENABLE(xdr,[ --enable-xdr=yes will compile in support for XDR],
 
 AC_CANONICAL_HOST
 canonical=$host
+my_host_kernel=`echo $host_os | awk '{j=split($1,A,"-");print A[[1]]}'`
+my_host_system=`echo $host_os | awk '{j=split($1,A,"-");if (j>=2) print A[[2]]}'`
 AC_DEFINE_UNQUOTED(HOST_CPU,"`echo $host_cpu | awk '{print toupper($0)}'`")
-AC_DEFINE_UNQUOTED(HOST_OS,"`echo $host_os | awk '{print toupper($0)}'`")
+AC_DEFINE_UNQUOTED(HOST_KERNEL,"`echo $my_host_kernel | awk '{print toupper($0)}'`")
+if test "$my_host_system" != "" ; then 
+	AC_DEFINE_UNQUOTED(HOST_SYSTEM,"`echo $my_host_system | awk '{print toupper($0)}'`")
+fi
 AC_MSG_RESULT(host=$host)
 
 PROCESSOR_FLAGS=${PROCESSOR_FLAGS:-""}
@@ -411,12 +416,13 @@ fi
 TO3FLAGS=""
 TO2FLAGS=""
 
-case "$use" in
-  *mingw*)
-	TFPFLAG="-fomit-frame-pointer";;
-  *)
-	TFPFLAG="-fomit-frame-pointer";;
-esac
+TFPFLAG="-fomit-frame-pointer";;
+#case "$use" in
+#  *mingw*)
+#	TFPFLAG="-fomit-frame-pointer";;
+#  *)
+#	TFPFLAG="-fomit-frame-pointer";;
+#esac
 
 if test "$enable_gprof" = "yes" ; then
 	TCFLAGS="$TCFLAGS -pg"
@@ -430,12 +436,13 @@ if test "$enable_debug" = "yes" ; then
 	# for subconfigurations
 	CFLAGS="$CFLAGS -g"
 else
-	case "$use" in
-	  *mingw*)
-		TO3FLAGS="-O3 $TFPFLAG";;
-	  *)
-		TO3FLAGS="-O3 $TFPFLAG";;
-	esac
+#	case "$use" in
+#	  *mingw*)
+#		TO3FLAGS="-O3 $TFPFLAG";;
+#	  *)
+#		TO3FLAGS="-O3 $TFPFLAG";;
+#	esac
+	TO3FLAGS="-O3 $TFPFLAG";;
 	TO2FLAGS="-O"
 fi
 

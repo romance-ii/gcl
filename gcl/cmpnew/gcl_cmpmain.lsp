@@ -63,7 +63,8 @@
   (compiler-default-type *compiler-normal-type*))
 
 ;; Let the user write dump c-file etc to  /dev/null.
-(defun get-output-pathname (file ext name &optional (dir (pathname-directory *default-pathname-defaults*)))
+(defun get-output-pathname (file ext name &optional (dir (pathname-directory *default-pathname-defaults*))
+				 (device (pathname-device *default-pathname-defaults*)))
   (cond 
 	((equal file "/dev/null") (pathname file))
 	#+aix3
@@ -71,7 +72,11 @@
 	      (equal ext "h"))
 	 (get-output-pathname file ext "Float" ))
 	(t
-	 (make-pathname :directory (or (and (not (null file))
+	 (make-pathname :device (or (and (not (null file))
+					 (not (eq file t))
+					 (pathname-device file))
+				       device)
+			:directory (or (and (not (null file))
 					    (not (eq file t))
 					    (pathname-directory file))
 				       dir)
@@ -245,13 +250,16 @@ Cannot compile ~a.~%"
          (name (or (and (not (null output-file))
                         (pathname-name output-file))
                    (pathname-name input-pathname)))
+	 (device (or (and (not (null output-file))
+                        (pathname-device output-file))
+                   (pathname-device input-pathname)))
 
-         (o-pathname (get-output-pathname o-file "o" name dir))
-         (c-pathname (get-output-pathname c-file "c" name dir))
-         (h-pathname (get-output-pathname h-file "h" name dir))
-         (data-pathname (get-output-pathname data-file "data" name dir))
+         (o-pathname (get-output-pathname o-file "o" name dir device))
+         (c-pathname (get-output-pathname c-file "c" name dir device))
+         (h-pathname (get-output-pathname h-file "h" name dir device))
+         (data-pathname (get-output-pathname data-file "data" name dir device))
 ;	 (i-pathname  (get-output-pathname data-file "i" name dir))
-         #+aosvs (ob-pathname (get-output-pathname ob-file "ob" name dir))
+         #+aosvs (ob-pathname (get-output-pathname ob-file "ob" name dir device))
          )
     (declare (special dir name ))
 
@@ -368,7 +376,7 @@ Cannot compile ~a.~%"
         (progn
           (when *compile-verbose* (format t "~&End of Pass 2.  ~%"))
 	  (cond (*record-call-info*
-		 (dump-fn-data (get-output-pathname output-file "fn" name dir))))
+		 (dump-fn-data (get-output-pathname output-file "fn" name dir device))))
           (cond (o-file
                  (compiler-cc c-pathname o-pathname  )
                  (cond ((probe-file o-pathname)

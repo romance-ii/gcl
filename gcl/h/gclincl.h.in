@@ -198,7 +198,8 @@
 #undef HAVE_GNU_LD
 #undef NEED_NONRANDOM_SBRK
 #undef HOST_CPU
-#undef HOST_OS
+#undef HOST_KERNEL
+#undef HOST_SYSTEM
 
 /* The number of bytes in a long.  */
 #undef SIZEOF_LONG

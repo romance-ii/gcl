@@ -5,8 +5,9 @@ gclcvs (2.7.0-23) unstable; urgency=low
     ADDITIONAL_FEATURES macro in main.c
   * Fix merge-pathanames bug in concatenating default and supplied
     directory lists
+  * Minor pathname and *features* fixes
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 22 Apr 2004 18:23:56 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 23 Apr 2004 19:36:04 +0000
 
 gclcvs (2.7.0-22) unstable; urgency=low
 

@@ -932,7 +932,10 @@ init_main(void) {
 /* #endif */
   
   ADD_FEATURE(HOST_CPU);
-  ADD_FEATURE(HOST_OS);
+  ADD_FEATURE(HOST_KERNEL);
+#ifdef HOST_SYSTEM
+  ADD_FEATURE(HOST_SYSTEM);
+#endif
 
 #ifdef  BSD
   ADD_FEATURE("BSD");

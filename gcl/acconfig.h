@@ -244,4 +244,5 @@ SGC is enabled.  */
 #undef HAVE_GNU_LD
 #undef NEED_NONRANDOM_SBRK
 #undef HOST_CPU
-#undef HOST_OS
+#undef HOST_KERNEL
+#undef HOST_SYSTEM

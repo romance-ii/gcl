@@ -276,7 +276,9 @@ object path, defaults, default_version;
 	    && path->pn.pn_directory->c.c_car==sKroot))
 		directory=path->pn.pn_directory;
 	else 
-	  directory=append(defaults->pn.pn_directory,path->pn.pn_directory);
+	  directory=path->pn.pn_directory==Cnil ? 
+	    defaults->pn.pn_directory :
+	    append(defaults->pn.pn_directory,path->pn.pn_directory);
 
 	if (path->pn.pn_name == Cnil)
 		name = defaults->pn.pn_name;
