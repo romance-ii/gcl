@@ -187,7 +187,7 @@ AC_TRY_RUN([#define _GNU_SOURCE
 		AC_TRY_RUN([#include <ieeefp.h>
 			    int main() {
 				float f;
-				return fpclass(f)>=FP_NZERO || fpclass<FP_NZERO ? 0 : 1;
+				return fpclass(f)>=FP_NZERO || fpclass(f)<FP_NZERO ? 0 : 1;
 				}],
 		AC_DEFINE(HAVE_IEEEFP) AC_MSG_RESULT(yes),
 		HAVE_IEEEFP=0 AC_MSG_RESULT(no),HAVE_IEEEFP=0 AC_MSG_RESULT(no))

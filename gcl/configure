@@ -1652,7 +1652,7 @@ else
 #include <ieeefp.h>
 			    int main() {
 				float f;
-				return fpclass(f)>=FP_NZERO || fpclass<FP_NZERO ? 0 : 1;
+				return fpclass(f)>=FP_NZERO || fpclass(f)<FP_NZERO ? 0 : 1;
 				}
 EOF
 if { (eval echo configure:1659: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
