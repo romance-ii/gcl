@@ -681,11 +681,39 @@ BEGIN:
 	}
 	if ((d = digitp(s[i], radix)) < 0)
 		goto NO_NUMBER;
+#define MOST_POSITIVE_FIX (((unsigned int) (~0) ) /2)
+#define TEN_EXPT_9 1000000000
+
+      if (radix == 10 && TEN_EXPT_9 <MOST_POSITIVE_FIX ) {
+        int chunk = 0;
+        int sum = 0;
+	do {    sum = 10*sum+d;
+                chunk++;
+                if (chunk == 9) {
+		mul_int_big(1000000000, integer_part);
+		add_int_big(sum, integer_part);
+                chunk=0; sum=0;
+            } 
+	     i++;
+	} while (i < end && (d = digitp(s[i], radix)) >= 0);
+        if (chunk) {
+          int fac=10;
+          while(--chunk> 0) {fac *=10;}
+          mul_int_big(fac,integer_part);
+          add_int_big(sum,integer_part);
+        }
+
+    } else {
+                
+        
 	do {
 		mul_int_big(radix, integer_part);
 		add_int_big(d, integer_part);
 		i++;
 	} while (i < end && (d = digitp(s[i], radix)) >= 0);
+     }
+
+
 	if (i >= end)
 		goto MAKE_INTEGER;
 	if (s[i] == '.') {
@@ -893,11 +921,14 @@ int end, *ep, radix;
 		goto NO_NUMBER;
 	if ((d = digitp(s[i], radix)) < 0)
 		goto NO_NUMBER;
+        
 	do {
 		mul_int_big(radix, integer_part);
 		add_int_big(d, integer_part);
 		i++;
 	} while (i < end && (d = digitp(s[i], radix)) >= 0);
+
+
 	if (sign < 0)
 		set_big_sign(integer_part,-1);
 	x = normalize_big_to_object(integer_part);

@@ -20,7 +20,7 @@
 ;;;;    export.lsp
 ;;;;
 ;;;;                    Exporting external symbols of LISP package
-(setq me 1234567891)
+
 
 (in-package 'lisp)
 

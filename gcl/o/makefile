@@ -99,7 +99,7 @@ MACHINE=386-linux
 
 LBINDIR=/usr/local/bin
 
-OFLAG	=  -O 
+OFLAG	=  -O  -g
 LIBS	= -lm 
 
 ODIR_DEBUG= -O4 
