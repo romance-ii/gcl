@@ -297,6 +297,11 @@ int fasload ( object faslfile )
     work_out_section_indices ( section );
 
 
+    /* Check for text section that does not come first - not currently handled. */
+    if ( ( INVALID_NSCN != TEXT_NSCN ) && ( TEXT_NSCN != 1 ) ) {
+      FEerror ("Can't handle a Text section at other than index 1.",0);
+    }
+
     /* Determine the section sizes used later to allocate storage and to calculate
      * the offsets of the sections once read in. Allow for the possibility
      * of an invalid index, that is, that a section may not be present. */
