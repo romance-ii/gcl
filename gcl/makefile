@@ -178,7 +178,8 @@ install1:
 	if gcc --version | grep -i mingw >/dev/null 2>&1 ; then if grep -i oncrpc makedefs >/dev/null 2>&1 ; then cp /mingw/bin/oncrpc.dll $(DESTDIR)$(INSTALL_LIB_DIR)/$(PORTDIR); fi ; fi
 	cd $(DESTDIR)$(INSTALL_LIB_DIR)/$(PORTDIR) && \
 		mv $(FLISP)$(EXE) temp$(EXE) && \
-		echo "(setq si::*system-directory* \"$(INSTALL_LIB_DIR)/$(PORTDIR)\")(si::save-system \"$(FLISP)$(EXE)\")" | ./temp$(EXE) && \
+		echo '(reset-sys-paths "$(INSTALL_LIB_DIR)/")\
+		      (si::save-system "$(FLISP)$(EXE)")' | ./temp$(EXE) && \
 		rm -f temp$(EXE)
 	if [ -e "unixport/rsym$(EXE)" ] ; then cp unixport/rsym$(EXE) $(DESTDIR)$(INSTALL_LIB_DIR)/unixport/ ; fi
 #	ln $(SYMB) $(INSTALL_LIB_DIR)/$(PORTDIR)/$(FLISP)$(EXE) \
@@ -223,7 +224,7 @@ gclclean:
 	rm -rf windows/Output
 	rm -f ansi-tests/test_results ansi-tests/gazonk* \
 		ansi-tests/generated-eval-when-test-file.lisp
-	rm -f config.log config.cache config.status
+	rm -f config.log config.cache config.status $(PORTDIR)/gmon.out
 
 
 clean: gclclean

@@ -15,8 +15,9 @@ gclcvs (2.7.0-30) unstable; urgency=low
     all four by default via debconf
   * reset-sys-paths lisp function for moving image installation
     directories, show profiling support in banner if present
+  * reset sys paths on installation
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  5 Aug 2004 22:37:46 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  5 Aug 2004 22:51:15 +0000
 
 gclcvs (2.7.0-29) unstable; urgency=low
 
