@@ -103,20 +103,21 @@ feof1(fp)
 FILE *fp;
 {
 
+#ifdef HAVE_READLINE
   if (readline_on && fp==rl_instream && rl_line_buffer && *rl_line_buffer==EOF)
     return TRUE;
-
-	if (!feof(fp))
-		return(FALSE);
-	if (fp == terminal_io->sm.sm_object0->sm.sm_fp) {
-		if (symbol_value(sSAignore_eof_on_terminal_ioA) == Cnil)
-			return(TRUE);
-		fp = freopen("/dev/tty", "r", fp);
-		if (fp == NULL)
-			error("can't reopen the console");
-		return(FALSE);
-	}
+#endif
+  if (!feof(fp))
+    return(FALSE);
+  if (fp == terminal_io->sm.sm_object0->sm.sm_fp) {
+     if (symbol_value(sSAignore_eof_on_terminal_ioA) == Cnil)
 	return(TRUE);
+     fp = freopen("/dev/tty", "r", fp);
+     if (fp == NULL)
+	error("can't reopen the console");
+     return(FALSE);
+  }
+  return(TRUE);
 }
 
 #undef	feof
