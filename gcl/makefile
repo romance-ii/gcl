@@ -136,8 +136,6 @@ LISP_LIB=clcs/myload1.lisp clcs/clcs_macros.lisp cmpnew/gcl_collectfn.o cmpnew/g
 install-command:
 	rm -f $(DESTDIR)$(prefix)/bin/gcl
 	(echo '#!/bin/sh' ; \
-	if gcc --version | grep -i mingw >/dev/null 2>&1 ; then echo "C_INCLUDE_PATH=`echo $$INSTALL_LIB_DIR`/h"; else echo "C_INCLUDE_PATH=$(INSTALL_LIB_DIR)/h:\$$C_INCLUDE_PATH"; fi ;\
-	echo "export C_INCLUDE_PATH";\
 	echo exec $(BINDIR)/$(FLISP)$(EXE) \\ ; \
 	echo '   -dir' $(INSTALL_LIB_DIR)/unixport/ \\ ; \
 	echo '   -libdir' $(INSTALL_LIB_DIR)/ \\ ; \

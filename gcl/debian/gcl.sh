@@ -1,6 +1,4 @@
 #!/bin/sh
-C_INCLUDE_PATH=gcl/h:$C_INCLUDE_PATH
-export C_INCLUDE_PATH
 if [ "$GCL_ANSI" != "" ] ; then
 exec gcl/unixport/saved_ansi_gcl \
    -dir gcl/unixport/ \
