@@ -76,7 +76,7 @@ LISP_LIB=cmpnew/collectfn.o lsp/gprof.lsp lsp/info.o lsp/profile.lsp gcl-tk/tkl.
 install-command:
 	rm -f $(DESTDIR)${prefix}/bin/gcl
 	(echo '#!/bin/sh' ; \
-	echo exec ${INSTALL_LIB_DIR}/unixport/saved_gcl \\ ; \
+	echo exec ${INSTALL_LIB_DIR}/unixport/saved_gcl$(EXE) \\ ; \
 	echo '   -dir' ${INSTALL_LIB_DIR}/unixport/ \\ ; \
 	echo '   -libdir' ${INSTALL_LIB_DIR}/ \\ ; \
 	echo '   -eval '\''(setq si::*allow-gzipped-file* t)'\' \\ ;\
@@ -95,9 +95,9 @@ install1:
 	mkdir -p $(DESTDIR)${INSTALL_LIB_DIR}
 	make install-command "INSTALL_LIB_DIR=${INSTALL_LIB_DIR}" "prefix=${prefix}" DESTDIR=$(DESTDIR)
 	rm -f $(DESTDIR)${prefix}/bin/gcl.exe
-	tar cf - unixport/saved_gcl info/*.info* ${LISP_LIB} \
-	gcl-tk/gcl.tcl gcl-tk/gcltkaux  |  (cd $(DESTDIR)${INSTALL_LIB_DIR} ;tar xf -)
-	ln ${SYMB} ${INSTALL_LIB_DIR}/unixport/saved_gcl \
+	tar cf - unixport/saved_gcl$(EXE) info/*.info* ${LISP_LIB} \
+	gcl-tk/gcl.tcl gcl-tk/gcltkaux$(EXE)  |  (cd $(DESTDIR)${INSTALL_LIB_DIR} ;tar xf -)
+	ln ${SYMB} ${INSTALL_LIB_DIR}/unixport/saved_gcl$(EXE) \
 	 $(DESTDIR)${prefix}/bin/gcl.exe
 	if [ -d "${TK_CONFIG_PREFIX}" ] ; then  \
 	cat gcl-tk/gcltksrv | \
@@ -107,7 +107,7 @@ install1:
 	chmod a+x $(DESTDIR)${INSTALL_LIB_DIR}/gcl-tk/gcltksrv ; fi
 	if [ -d "${TK_CONFIG_PREFIX}" ] ; then  \
 	(cd $(DESTDIR)${INSTALL_LIB_DIR}/gcl-tk/demos ; \
-	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../unixport/saved_gcl) ; fi
+	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../unixport/saved_gcl$(EXE)) ; fi
 	(cd elisp ; make install DESTDIR=$(DESTDIR))
 	(cd info ; make ; make install DESTDIR=$(DESTDIR))
 
