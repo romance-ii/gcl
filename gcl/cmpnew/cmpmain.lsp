@@ -508,7 +508,7 @@ SYSTEM_SPECIAL_INIT
 	      *cc*
 	      (if (and (boundp '*c-debug*) *c-debug*) " -g " "")
               (case *speed* 
-		    (3 #+broken_o4_opt "-O" #-broken_o4_opt"-O4")
+		    (3 #+broken_o4_opt "-O2" #-broken_o4_opt"-O4")
 		    (2 "-O") (t ""))
 	      dir
 	      (namestring (make-pathname  :type "c" :defaults (first args)))
