@@ -12,8 +12,9 @@ gclcvs (2.7.0-31) unstable; urgency=low
     and build automatically if needed either because gmp not present or
     patched symbols are needed; autodetect and set the _start symbol
     when using gprof
+  * Fix (setf (get ...) ...) return bug when interpreted
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 12 Aug 2004 16:39:32 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 12 Aug 2004 16:41:36 +0000
 
 gclcvs (2.7.0-30) unstable; urgency=high
 
