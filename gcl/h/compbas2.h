@@ -159,6 +159,7 @@ EXTER object MVloc[10];
 /* #ifndef alloca */
 /* char *alloca(); */
 /* #endif */
+#include <stdlib.h>
 EXTER char *alloca_val;
 #define OUR_ALLOCA(n) alloca(n)
 #define ALLOCA_FREE(n) 
