@@ -109,7 +109,7 @@ typedef int sigset_t ;
     (((unsigned int)(y)) == 0 || \
     (((unsigned int)(y)) > _stacktop && ((unsigned int)(y)) < _stackbottom))     
       
-#ifdef IN_FILE
+#if defined ( IN_FILE ) || defined ( IN_SOCKETS )
 #  define HAVE_NSOCKET
 #endif
 
