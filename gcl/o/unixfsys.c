@@ -145,8 +145,9 @@ DEV_FOUND:
 char *
 getwd(char *buffer)
 {
+#ifndef _WIN32    
 	char *getcwd(char *, size_t);
-
+#endif
 	return(getcwd(buffer, MAXPATHLEN));
 }
 #endif
