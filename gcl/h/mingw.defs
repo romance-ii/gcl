@@ -6,8 +6,6 @@ SHELL        = sh
 OFLAG	     = -O 
 LIBS	    += -lwsock32
 LIBC 	     =
-LIBGCLP      =
-GCLP         =
 
 ODIR_DEBUG   = -g
 

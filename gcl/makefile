@@ -116,8 +116,9 @@ $(GMPDIR)/mpn/mul_n.o $(GMPDIR)/mpn/lshift.o $(GMPDIR)/mpn/rshift.o: $(GMPDIR)/M
 
 command:
 	rm -f bin/gcl xbin/gcl
-	GCLDIR=`echo ${GCLDIR} | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
-	make install-command "INSTALL_LIB_DIR=$${GCLDIR}" "prefix=$${GCLDIR}" 
+	MGCLDIR=`echo ${GCLDIR} | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
+	GCLDIR=`echo ${GCLDIR}` ; \
+	make install-command "INSTALL_LIB_DIR=$${GCLDIR}" "prefix=$${GCLDIR}" "BINDIR=$${MGCLDIR}"
 	(cd xbin ; cp ../bin/gcl .)
 
 #	GCLDIR=`echo ${GCLDIR} | sed -e 'sX^/cygdrive/\([a-z]\)X\1!Xg' -e 'sX^//\([a-z]\)X\1!Xg'` ; \
@@ -130,8 +131,8 @@ LISP_LIB=cmpnew/collectfn.o lsp/gprof.lsp lsp/info.o lsp/profile.lsp lsp/export.
 install-command:
 	rm -f $(DESTDIR)${prefix}/bin/gcl
 	(echo '#!/bin/sh' ; \
-	echo export C_INCLUDE_PATH=${INSTALL_LIB_DIR}/h:\$$C_INCLUDE_PATH;\
-	echo exec ${INSTALL_LIB_DIR}/$(PORTDIR)/$(FLISP)$(EXE) \\ ; \
+	echo export C_INCLUDE_PATH=${INSTALL_LIB_DIR}/h;\
+	echo exec ${BINDIR}/$(PORTDIR)/$(FLISP)$(EXE) \\ ; \
 	echo '   -dir' ${INSTALL_LIB_DIR}/unixport/ \\ ; \
 	echo '   -libdir' ${INSTALL_LIB_DIR}/ \\ ; \
 	echo '   -eval '\''(setq si::*allow-gzipped-file* t)'\' \\ ;\
@@ -155,13 +156,15 @@ install-command:
 	 echo "start %cd%\..\lib\gcl-2.5.0\unixport\saved_gcl.exe -dir %cd%/../lib/gcl-2.5.0/unixport/ -libdir  %cd%/lib/gcl-2.5.0/ -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9" ) > $(DESTDIR)${prefix}/bin/gclm.bat
 
 install: 
-	make install1 "INSTALL_LIB_DIR=${prefix}/lib/gcl-`cat majvers`.`cat minvers`" "prefix=${prefix}" DESTDIR=$(DESTDIR)
+	make install1 "INSTALL_LIB_DIR=${prefix}/lib/gcl-`cat majvers`.`cat minvers`" "prefix=${prefix}" "DESTDIR=$(DESTDIR)"
 INSTALL_LIB_DIR=
 install1:
 	mkdir -p $(DESTDIR)${prefix}/lib 
 	mkdir -p $(DESTDIR)${prefix}/bin
 	mkdir -p $(DESTDIR)${INSTALL_LIB_DIR}
-	make install-command "INSTALL_LIB_DIR=${INSTALL_LIB_DIR}" "prefix=${prefix}" DESTDIR=$(DESTDIR)
+	MPREFIX=`echo ${prefix} | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
+	make install-command "INSTALL_LIB_DIR=${INSTALL_LIB_DIR}" "prefix=${prefix}" "DESTDIR=$(DESTDIR)" \
+                             "BINDIR=$${MPREFIX}"
 	rm -f $(DESTDIR)${prefix}/bin/gcl.exe
 	tar cf - $(PORTDIR)/$(FLISP)$(EXE) info/*.info* ${LISP_LIB} \
 	$(TCL_EXES)  |  (cd $(DESTDIR)${INSTALL_LIB_DIR} ;tar xf -)
