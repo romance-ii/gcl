@@ -313,9 +313,12 @@
   (setq fun (complete-prop key 'keyword prop))
   (or fun (return-from break-call nil))
   (setq fun (get fun prop))
-  (if fun
-      (evalhook (cons fun args) nil nil *break-env*)
-      (format *debug-io* "~&~S is undefined break command.~%" key)))
+  (cond (fun
+	 (setq args (cons fun args))
+	 (or (symbolp fun) (setq args (cons 'funcall args)))
+	 (evalhook args nil nil *break-env*)
+	 )
+	(t (format *debug-io* "~&~S is undefined break command.~%" key))))
 
 (defun break-quit (&optional (level 0)
                    &aux (current-level (length *break-level*)))

@@ -202,7 +202,7 @@
 	       (return v))))
       (car (setq *stream-alist*
 		 (cons  (make-instream :stream str
-                                     :name (if (streamp str)
+                                     :stream-name (if (streamp str)
                                                (stream-name str))
    ) *stream-alist*)))))
 
