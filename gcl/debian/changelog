@@ -1,3 +1,10 @@
+gclcvs (2.7.0-10) unstable; urgency=low
+
+  * generate less garbage in add-info (gcl_cmpinline.lsp), enabling
+    maxima compile to complete in a finite time :-)
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 10 Oct 2003 22:15:28 +0000
+
 gclcvs (2.7.0-9) unstable; urgency=low
 
   * Fix compiler optimization bug in gcl_cmpopt.lsp -- missing parens
