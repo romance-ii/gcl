@@ -160,7 +160,7 @@ int infd, outfd;
 
 int in_dumped_exec = 0;
 
-malloc_zone_t *emacs_zone = 0L;
+malloc_zone_t *gcl_zone = 0L;
 
 unsigned num_marked_regions;
 
@@ -168,7 +168,7 @@ unsigned num_marked_regions;
 #include <mach-o/nlist.h>
 
 #ifndef BIG_HEAP_SIZE
-#define BIG_HEAP_SIZE   0x5000000
+#define BIG_HEAP_SIZE   0x50000000
 #endif
 
 int	big_heap = BIG_HEAP_SIZE;
@@ -297,7 +297,7 @@ print_regions ()
     {
       zone = malloc_zone_from_ptr ((void *) address);
       
-      print_region (address, size, info.protection, info.max_protection, zone ? zone->zone_name : "n/a");
+      print_region (address, size, info.protection, info.max_protection, zone ? zone->zone_name : "(no zone)");
 
       if (object_name != MACH_PORT_NULL)
 	mach_port_deallocate (target_task, object_name);
@@ -339,7 +339,7 @@ build_region_list ()
 	break;
       
       zone = malloc_zone_from_ptr ((void *) address);
-      zone_name = zone ? (zone->zone_name ? zone->zone_name : "n/a") : "n/a";
+      zone_name = zone ? (zone->zone_name ? zone->zone_name : "(no zone name)") : "(no zone)";
       
 #if VERBOSE
       print_region (address, size, info.protection, info.max_protection, zone_name);
@@ -424,14 +424,14 @@ unexec_reader (task_t task, vm_address_t address, vm_size_t size, void **ptr)
 }
 
 void
-find_emacs_zone_regions ()
+find_gcl_zone_regions ()
 {
   num_unexec_regions = 0;
 
-  emacs_zone->introspect->enumerator (mach_task_self(), 0,
+  gcl_zone->introspect->enumerator (mach_task_self(), 0,
 				      MALLOC_PTR_REGION_RANGE_TYPE
 				      | MALLOC_ADMIN_REGION_RANGE_TYPE,
-				      (vm_address_t) emacs_zone,
+				      (vm_address_t) gcl_zone,
 				      unexec_reader,
 				      unexec_regions_recorder);
 }
@@ -724,8 +724,9 @@ copy_data_segment (struct load_command *lc)
       sc.vmsize = unexec_regions[j].size;
       sc.fileoff = file_offset;
       sc.filesize = unexec_regions[j].size;
-      sc.maxprot = VM_PROT_READ | VM_PROT_WRITE;
-      sc.initprot = VM_PROT_READ | VM_PROT_WRITE;
+   /* the heap will contain executable code, so promote maxprot to allow execution */ 
+      sc.maxprot = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXECUTE;
+      sc.initprot = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXECUTE;
       sc.nsects = 1;
       sc.flags = 0;
       
@@ -742,7 +743,7 @@ copy_data_segment (struct load_command *lc)
       strncpy (section.sectname,SECT_DATA,sizeof(section.sectname));
       strncpy (section.segname,SEG_DATA,sizeof(section.segname));
       section.addr = unexec_regions[j].address;
-      section.size = sc.filesize /* unexec_regions[j].size */;
+      section.size = sc.filesize;
       section.offset = file_offset;
       section.align = 4;
       section.reloff = 0;
@@ -911,7 +912,8 @@ dump_it ()
 
 vm_range_t marked_regions[MAX_MARKED_REGIONS];
 
-void mark_region (unsigned long address, unsigned long size)
+void
+mark_region (unsigned long address, unsigned long size)
 {
     if (num_marked_regions < MAX_MARKED_REGIONS)
     {
@@ -925,7 +927,8 @@ void mark_region (unsigned long address, unsigned long size)
     }
 }
 
-void add_marked_regions ()
+static void
+add_marked_regions ()
 {
     unsigned n;
     
@@ -944,7 +947,9 @@ void add_marked_regions ()
 void
 unexec (char *outfile, char *infile, void *start_data, void *start_bss,
         void *entry_address)
-{  
+{ 
+/*extern malloc_zone_t *debug_zone __attribute__((weak_import));*/
+  
   infd = open (infile, O_RDONLY, 0);
   if (infd < 0)
     {
@@ -970,8 +975,18 @@ unexec (char *outfile, char *infile, void *start_data, void *start_bss,
   build_region_list ();
   read_load_commands ();
   
-/*find_emacs_zone_regions ();*/
+/*find_gcl_zone_regions ();*/
   add_marked_regions ();
+  
+  /*
+  if (debug_zone != NULL)
+  debug_zone->introspect->enumerator (mach_task_self(), 0,
+				      MALLOC_PTR_REGION_RANGE_TYPE
+				      | MALLOC_ADMIN_REGION_RANGE_TYPE,
+				      (vm_address_t) debug_zone,
+				      unexec_reader,
+				      unexec_regions_recorder);
+  */
   
   in_dumped_exec = 1;
 
@@ -980,24 +995,10 @@ unexec (char *outfile, char *infile, void *start_data, void *start_bss,
   close (outfd);
 }
 
-void
-unexec_init_emacs_zone ()
-{
-  if (!emacs_zone) {
-    emacs_zone = malloc_create_zone (0, 0);
-    malloc_set_zone_name (emacs_zone, "EmacsZone");
-  }
-  else {
-    if (!malloc_zone_check (emacs_zone))
-      unexec_error ("emacs_zone is smashed\n");
-    malloc_zone_register (emacs_zone);
-  }
-}
-
 static size_t stub_size (malloc_zone_t *zone, const void *ptr)
 {
-    object *p;
     extern object malloc_list;
+    object *p;
     
     for (p = &malloc_list ; *p && !endp(*p) ; p = &((*p)->c.c_cdr)) {
         if ((*p)->c.c_car->st.st_self == ptr) {
@@ -1044,14 +1045,14 @@ void init_darwin_zone_compat ()
         
     default_zone = malloc_default_zone ();
     
-    emacs_zone = malloc_create_zone (0,0);
+    gcl_zone = malloc_create_zone (0,0);
     
-    emacs_zone->size       = (void *) stub_size;
-    emacs_zone->malloc     = (void *) stub_malloc;
-    emacs_zone->calloc     = (void *) stub_calloc;
-    emacs_zone->valloc     = (void *) stub_valloc;
-    emacs_zone->realloc    = (void *) stub_realloc;
-    emacs_zone->free       = (void *) stub_free;
+    gcl_zone->size       = (void *) stub_size;
+    gcl_zone->malloc     = (void *) stub_malloc;
+    gcl_zone->calloc     = (void *) stub_calloc;
+    gcl_zone->valloc     = (void *) stub_valloc;
+    gcl_zone->realloc    = (void *) stub_realloc;
+    gcl_zone->free       = (void *) stub_free;
  /* if the zone introspector is ever called, the program will crash */
     
  /* we could support any number of zones, but I'm being lazy */
@@ -1060,51 +1061,13 @@ void init_darwin_zone_compat ()
     if (default_zone)
     {
         malloc_zone_unregister (default_zone);
-        malloc_zone_unregister (emacs_zone);
+        malloc_zone_unregister (gcl_zone);
             
-        malloc_zone_register (emacs_zone);
+        malloc_zone_register (gcl_zone);
         malloc_zone_register (default_zone);
     }
-}
-
-void term_darwin_zone_compat ()
-{
-
-}
-
-static void dump_regionXXX (vm_address_t start, vm_size_t size)
-{
-    task_t target_task = mach_task_self ();
-    kern_return_t rtn;
-    struct vm_region_basic_info info;
-    mach_msg_type_number_t info_count = VM_REGION_BASIC_INFO_COUNT;
-    mach_port_t object_name;
-    vm_prot_t prot, maxprot;
     
-    fprintf (stderr, "introspecting between %x and %x\n", start, start+size);
-    
-    fflush (stderr);
-    
-    rtn = vm_region (target_task, &start, &size, VM_REGION_BASIC_INFO,
-        (vm_region_info_t) &info, &info_count, &object_name);
-    
-    if (rtn != KERN_SUCCESS || info_count != VM_REGION_BASIC_INFO_COUNT) {
-        mach_error ("[dump_regionXXX] vm_region() failed: ", rtn);
-        return;
-    }
-
-    if (object_name != MACH_PORT_NULL)
-        mach_port_deallocate (target_task, object_name);    
-    
-    prot = info.protection;
-    maxprot = info.max_protection;
-    
-    fprintf (stderr, "region_start=%x region_size=%x region_end=%x prot=%c%c%c maxprot=%c%c%c\n",
-        start, size, start+size, prot & VM_PROT_READ ? 'r' : '-', prot & VM_PROT_WRITE ? 'w' : '-',
-        prot & VM_PROT_EXECUTE ? 'x' : '-', maxprot & VM_PROT_READ ? 'r' : '-',
-        maxprot & VM_PROT_WRITE ? 'w' : '-', maxprot & VM_PROT_EXECUTE ? 'x' : '-');
-    
-    fflush (stderr);
+    malloc_set_zone_name (gcl_zone, "GNU Common Lisp");
 }
 
 char *my_sbrk (int incr)
@@ -1140,15 +1103,6 @@ char *my_sbrk (int incr)
 	    fflush (stderr);
 	    return ((char *)-1);
 	}
-    }
-}
-
-void prot_debug () {
-    if (mach_brkpt >= mach_mapstart+0x2000) {
-        dump_regionXXX ((vm_address_t) (mach_mapstart+0x1000),(vm_size_t) 0x1000);
-    }
-    else {
-        printf ("mach_brkpt < mach_mapstart+0x2000\n"); fflush (stdout);
     }
 }
 
