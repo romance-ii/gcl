@@ -265,8 +265,6 @@ fasload(object faslfile) {
   memory->cfd.cfd_size = memory->cfd.cfd_size - (start_address - the_start);
   memory->cfd.cfd_start = (void *)start_address;	
 
-  memset(memory->cfd.cfd_start,0,memory->cfd.cfd_size);
-  
   for (m=start_address,s=b->sections;s;s=s->next) {
 
     if (!(s->flags & SEC_ALLOC))
@@ -301,30 +299,40 @@ fasload(object faslfile) {
     if (h->u.def.section) {
       q[u]->value=h->u.def.value+h->u.def.section->vma;
       q[u]->flags|=BSF_WEAK;
-/*        if (!strcmp(q[u]->name,"_gp_disp")) { */
-/*  	q[u]->section=b->sections; */
-/*  	_bfd_set_gp_value(b,q[u]->value); */
-/*        } */
     } else 
       FEerror("Symbol without section");
 
   }
 
-  for (s=b->sections;s;s=s->next) {
+#ifndef HAVE_ALLOCA
+#error Cannot use bfd relocations without alloca at present
+#endif
+  /* We have to do this  to avoid the possibility that 
+     bfd_get_relocated_section_contents will run GBC via its alloc, thereby 
+     write protecting the pages of memory->cfd again and causing bfd reads of 
+     the section contents to return an error code after a 'stratified' segfault */
+ {
+   void *v=alloca(memory->cfd.cfd_size);
+   
+   if (!v)
+     FEerror("Cannot alloca for bfd");
 
-    if (!(s->flags & SEC_LOAD))
-      continue;
+   for (s=b->sections;s;s=s->next) {
+     
+     if (!(s->flags & SEC_LOAD))
+       continue;
+     
+     link_order.u.indirect.section=s;
+     
+     if (!bfd_get_relocated_section_contents(b,&link_info,&link_order,
+					     v,0,q)) 
+       FEerror("Cannot get relocated section contents\n");
 
-    link_order.u.indirect.section=s;
-
-/*      s->orelocation=alloca(2*bfd_get_reloc_upper_bound (b, s)); */
-
-    if (!bfd_get_relocated_section_contents(b,&link_info,&link_order,
-					    (void *)(unsigned long)s->output_section->vma,0,q)) 
-      FEerror("Cannot get relocated section contents\n");
-      
-  }
-  
+     memcpy((void *)s->output_section->vma,v,s->_raw_size);
+     
+   }
+ }
+   
   dum.sm.sm_fp=b->iostream;
 
   /* Find a way of doing this in bfd -- use this for now.  Unfortunately, 

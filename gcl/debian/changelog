@@ -13,8 +13,9 @@ gcl (2.5.0.cvs20020625-60) unstable; urgency=low
   * ETYPECASE/CTYPECASE can take t and otherwise
   * Backout of restart-clusters export
   * fix handler.lisp
+  * Fix to bfd/GBC interaction
 
- -- Camm Maguire <camm@m.enhanced.com>  Wed, 23 Oct 2002 04:15:35 -0400
+ -- Camm Maguire <camm@m.enhanced.com>  Wed, 23 Oct 2002 08:38:08 -0400
 
 gcl (2.5.0.cvs20020625-59) unstable; urgency=low
 
