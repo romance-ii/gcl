@@ -66,8 +66,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Try to automatically determine the form used for the explicitly
     compiled in external function addresses in plt.c
   * No need to explicitly write cr-lf on windows
+  * Autodetection of machine on FreeBSD
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  8 Mar 2004 19:35:38 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  8 Mar 2004 21:48:03 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

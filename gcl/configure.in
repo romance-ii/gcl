@@ -134,7 +134,7 @@ case $canonical in
      old)
      use=dos-go32;;
 
-     *86*-freebsd)
+     *86*-freebsd*)
      use=FreeBSD;;
 
      hp3*-*hpux*)
