@@ -28,13 +28,15 @@
 (in-package :pcl)
 
 (defmacro slot-symbol (slot-name type)
-  `(if (and (symbolp ,slot-name) (symbol-package ,slot-name))
+  `(if (symbolp ,slot-name)
        (or (get ,slot-name ',(ecase type
 			       (reader 'reader-symbol)
 			       (writer 'writer-symbol)
 			       (boundp 'boundp-symbol)))
 	   (intern (format nil "~A ~A slot ~a" 
-			   (package-name (symbol-package ,slot-name))
+			   (if (symbol-package ,slot-name)
+			       (package-name (symbol-package ,slot-name))
+			     "UNINTERNED")
 			   (symbol-name ,slot-name)
 			   ,(symbol-name type))
 	           *slot-accessor-name-package*))
