@@ -19,8 +19,11 @@ gcl (2.5.0.cvs20020625-58) unstable; urgency=low
     packages in defpackage.lsp and module.lsp;do-symbols loops over
     inherited symbols too in packlib.lsp
   * Reworked EXTRAS variable handling in unixport/makefile
+  * Build-depend on autotools-dev and automatic update of config.sub and
+    config.guess;newer config.sub and config.guess in cvs tree; Closes:
+    #164526
 
- -- Camm Maguire <camm@m.enhanced.com>  Tue, 15 Oct 2002 14:38:22 -0400
+ -- Camm Maguire <camm@m.enhanced.com>  Tue, 15 Oct 2002 14:52:39 -0400
 
 gcl (2.5.0.cvs20020625-57) unstable; urgency=low
 

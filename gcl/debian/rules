@@ -56,6 +56,12 @@ configure: configure-stamp
 configure-stamp:
 	dh_testdir
 
+	if [ /usr/share/misc/config.guess -nt config.guess ] ; then \
+		cp /usr/share/misc/config.guess .;\
+	fi
+	if [ /usr/share/misc/config.sub -nt config.sub ] ; then \
+		cp /usr/share/misc/config.sub .;\
+	fi
 	if [ configure.in -nt configure ]; then autoconf; fi
 	chmod -R +x gmp3/*
 	[ "$(ARCHT)" != "i386" ] || ( cd gmp3 && CC=$(MCC) ./configure --build=i486-unknown-linux-gnu )
