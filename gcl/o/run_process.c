@@ -107,7 +107,7 @@ int	server;
 		FEerror("No Sockets!",0);
 	}
 
-	if(connect(sock, (char *)&sock_add, sizeof(sock_add)) < 0)
+	if(connect(sock, (const struct sockaddr *)&sock_add, sizeof(sock_add)) < 0)
 	{
 		close(sock);
 		FEerror("Connection Failed.",0);

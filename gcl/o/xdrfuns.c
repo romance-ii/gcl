@@ -47,7 +47,7 @@ siGxdr_write(str,elt)
 
   switch (type_of(elt))
    { case t_fixnum:
-       if(!xdr_long(xdrp,&fix(elt))) goto error;
+       if(!xdr_int(xdrp,&fix(elt))) goto error;
         return elt;
      case t_longfloat:
        if(!xdr_double(xdrp,&lf(elt))) goto error;
@@ -56,7 +56,7 @@ siGxdr_write(str,elt)
        if(!xdr_float(xdrp,&sf(elt))) goto error;
         return elt;
      case t_vector:
-       if(!xdr_array(xdrp,&elt->v.v_self,
+       if(!xdr_array(xdrp,(char **)&elt->v.v_self,
 		 &elt->v.v_fillp,
 		 elt->v.v_dim,
 		 aet_sizes[elt->v.v_elttype],
@@ -83,7 +83,7 @@ siGxdr_read(str,elt)
    { case t_fixnum:
        {int l;
 	
-       if(!xdr_long(xdrp,&l)) goto error;
+       if(!xdr_int(xdrp,&l)) goto error;
 	return make_fixnum(l);}
        break;
      case t_longfloat:
@@ -95,7 +95,7 @@ siGxdr_read(str,elt)
        if(!xdr_float(xdrp,&x)) goto error;
         return make_shortfloat(x);}
      case t_vector:
-      if(! xdr_array(xdrp,&elt->v.v_self,
+      if(! xdr_array(xdrp,(char **)&elt->v.v_self,
 		 &elt->v.v_fillp,
 		 elt->v.v_dim,
 		 aet_sizes[elt->v.v_elttype],

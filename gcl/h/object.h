@@ -38,6 +38,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define	PAGEWIDTH	11	/*  page width  */
 #endif
 				/*  log2(PAGESIZE)  */
+#undef PAGESIZE
 #define	PAGESIZE	(1 << PAGEWIDTH)	/*  page size in bytes  */
 
 

@@ -31,7 +31,7 @@
 #endif
 
 #define GET_FAULT_ADDR(sig,code,scp,addr) \
-  (code ? ((siginfo_t *)code )->si_addr : (error("no address info"),0))
+  (code ? ((siginfo_t *)code )->si_addr : (char *)(error("no address info"),0))
 
 #define SETUP_SIG_STACK \
 { static stack_t estack ; \
@@ -160,7 +160,7 @@ do {static struct sigaction action; \
 #endif     
 /* we have to make the pages executable */
 #define CLEAR_CACHE do { unsigned long ps = getpagesize(); \
-			 char *beg = (unsigned long )(memory->cfd.cfd_start) & ~(ps-1); \
+			 char *beg = (char *)((unsigned long )(memory->cfd.cfd_start) & ~(ps-1)); \
 			 char *end =  ROUND_UP(memory->cfd.cfd_start + \
 				          memory->cfd.cfd_size,ps); \
 			   mprotect(beg,end-beg,PROT_READ|PROT_WRITE|PROT_EXEC);} while(0)

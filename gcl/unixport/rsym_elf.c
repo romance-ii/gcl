@@ -10,7 +10,7 @@ This information will be used for relocation.
 to compile use cc rsym.c -o rsym  -I../h
 */
 
-#include "string.h"
+#include <string.h>
 #ifdef __linux__
 /* Needed these to get it working with Linux.  Bill Metzenthen 23 May 95 */
 #define IN_RSYM 1
