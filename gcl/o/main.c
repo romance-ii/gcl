@@ -918,7 +918,12 @@ init_main(void) {
 #if defined ( UNIX ) && !defined ( _WIN32 )
   ADD_FEATURE("UNIX");
 #endif
-   
+
+#if defined ( _WIN32 ) 
+  ADD_FEATURE("WINNT");
+  ADD_FEATURE("WIN32");
+#endif
+  
 #ifdef IEEEFLOAT
   ADD_FEATURE("IEEE-FLOATING-POINT");
 #endif
