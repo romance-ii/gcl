@@ -209,7 +209,7 @@
         (catch *quit-tag*
           (setq - (locally (declare (notinline read))
 			   (dbl-read *debug-io* nil *top-eof*)))
-          (when (eq - *top-eof*) (bye))
+          (when (eq - *top-eof*) (bye -1))
           (let* ( break-command
 		 (values
 		  (multiple-value-list

@@ -9,8 +9,9 @@ gclcvs (2.7.0-19) unstable; urgency=low
   * use standard sgc fault recovery element for hppa as recommended by
     hppa kernel experts
   * Document system return codes
+  * exit with -1 when standard in ends in lisp debug mode
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 14 Feb 2004 17:38:00 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 14 Feb 2004 17:39:38 +0000
 
 gclcvs (2.7.0-18) unstable; urgency=low
 
