@@ -463,6 +463,7 @@ EXTER object default_dispatch_macro;
 EXTER object big_register_0;
 EXTER int sharp_eq_context_max;
 object read_char();
+object read_char1(object,object);
 object peek_char();
 object read_object_recursive();
 object read_object_non_recursive();

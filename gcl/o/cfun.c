@@ -54,7 +54,8 @@ int size;
 object
 make_sfun(name,self,argd, data)
 int argd;
-object (*self)();
+int (*self)();
+/*  object (*self)(); */
 object name, data;
 {object sfn;
        

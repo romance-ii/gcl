@@ -7,7 +7,8 @@ MakeAfun(addr,F_ARGD(min,max,flags,ARGTYPES(a,b,c,d)),0);
 MakeAfun(addr,F_ARGD(2,3,NONE,ARGTYPES(OO,OO,OO,OO)),0);
 */
 object MakeAfun(addr,argd,data)
-object data, (*addr) ();
+object data;
+int (*addr) ();
 unsigned int argd;
 {int type = (F_ARG_FLAGS_P(argd,F_requires_fun_passed) ? t_closure : t_afun);
   object x = alloc_object(type);
@@ -138,7 +139,7 @@ LISP_makefun(strg,fn,argd)
 object 
 MakeClosure(n,argd,data,fn,va_alist)
 int n;
-object (*fn)();
+int (*fn)();
 object data;
 va_dcl
 { object x;

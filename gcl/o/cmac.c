@@ -3,7 +3,7 @@
 #include "include.h"
 #endif
 
-#include "arith.h"  
+/*  #include "arith.h"   */
 
 
 
@@ -26,10 +26,10 @@ object *gclModulus;
 
 
 
-#define MYmake_fixnum(doto,x) \
-  {register int CMPt1; \
-   doto \
-   ((((CMPt1=(x))+1024)&-2048)==0?small_fixnum(CMPt1):make_fixnum(CMPt1));}
+/*  #define MYmake_fixnum(doto,x) \ */
+/*    {register int CMPt1; \ */
+/*     doto \ */
+/*     ((((CMPt1=(x))+1024)&-2048)==0?small_fixnum(CMPt1):make_fixnum(CMPt1));} */
 
 
 

@@ -175,6 +175,11 @@ static void		StdinProc _ANSI_ARGS_((ClientData clientData,
 int
 main(argc, argv)
 */
+
+/* FIXME, should come in from tk header or not be called */
+EXTERN Tk_Window	TkCreateMainWindow _ANSI_ARGS_((Tcl_Interp * interp, 
+				char * screenName, char * baseName));
+
 void
 TkX_Wish (argc, argv)
     int argc;				/* Number of arguments. */
@@ -226,7 +231,7 @@ TkX_Wish (argc, argv)
      * Initialize the Tk application.
      */
 
-    mainWindow = TkCreateMainWindow(interp, display, name, "Tk"); 
+    mainWindow = TkCreateMainWindow(interp, display, name/*  , "Tk" */); 
     if (mainWindow == NULL) {
 	fprintf(stderr, "%s\n", interp->result);
 	exit(1);

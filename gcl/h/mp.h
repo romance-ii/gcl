@@ -84,7 +84,7 @@ typedef struct
 #define SET_BIG_SIGN(x,sign) \
   do{if (sign < 0) {if (big_sign(x) > 0) mpz_neg(MP(x),MP(x)); } \
       else { if (big_sign(x) < 0)  mpz_neg(MP(x),MP(x)); } } while(0)
-#define MP_LOW(u,n) ((u)->_mp_d)
+#define MP_LOW(u,n) (*(u)->_mp_d)
      
 /* the bit length of each word in bignum representation */
 #define BIG_RADIX 32

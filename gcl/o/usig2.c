@@ -27,7 +27,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef USIG2
 #include <signal.h>
 #include "usig.h"
-#include "arith.h"
+/*  #include "arith.h" */
 #endif
 #endif
 

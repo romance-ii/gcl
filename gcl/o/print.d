@@ -561,6 +561,7 @@ L:
 	}
 }
 object copy_big();
+object coerce_big_to_string(object,int);
 
 write_object(x, level)
 object x;

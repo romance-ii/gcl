@@ -32,6 +32,11 @@ via #include "../c/sfasl.c"
 /*  #include "mdefs.h" */
 
 /*  #else */
+#include "gclincl.h"
+#ifdef HAVE_LIBBFD
+#include <bfd.h>
+#endif
+
 #include "include.h"
 #undef S_DATA
 /*  #endif */

@@ -6,6 +6,7 @@
 */
 
 object big_log_op();
+object normalize_big(object);
 
 object
 log_op(op,mp_op)
