@@ -21,8 +21,15 @@ gclcvs (2.7.0-33) unstable; urgency=high
   * Bug fix: "c-l-c for gclcvs creates directories in root", thanks to
     Richard M Kreuter (Closes: #282535). Fix error in clc script.
   * Make local bfd source compatible with new section size semantics
+  * Fix install-command target in main makefile, DESTDIR and prefix should
+    only be used in install1.
+  * Bug fix: "gclcvs: FTBFS: error making tests.", thanks to Kurt Roeckx
+    (Closes: #282809).file-author returns nil when pwent is null.
+  * Bug fix: "FTBFS: segmentation fault", thanks to Matt Kraai (Closes:
+    #274319).file-author returns nil when pwent is null.
+  * Support for SC_CLK_TICK for different system time increments
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 24 Nov 2004 18:42:06 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 24 Nov 2004 23:59:05 +0000
 
 gclcvs (2.7.0-32) unstable; urgency=high
 

@@ -554,6 +554,26 @@ else
     fi
 fi
 
+# sysconf
+
+AC_CHECK_HEADER(unistd.h,
+	AC_CHECK_LIB(c,sysconf,
+		AC_MSG_CHECKING("for _SC_CLK_TCK")
+		AC_TRY_RUN([#include <unistd.h>
+		            #include <stdio.h>
+		            int
+			    main() {
+			   	FILE *fp=fopen("conftest1","w");
+				fprintf(fp,"%lu\n",sysconf(_SC_CLK_TCK));
+				fclose(fp);
+			        return 0;
+			    }],
+			    hz=`cat conftest1`
+			    AC_DEFINE_UNQUOTED(HZ,$hz)
+			    ,hz=0,hz=0)
+	        AC_MSG_RESULT($hz)))
+
+
 #MY_SUBDIRS=
 
 #

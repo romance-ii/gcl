@@ -12,11 +12,11 @@
 #define DBEGIN 0
 
 #define MAXPAGE 128*1024
-#define VSSIZE  128*1024
+#define VSSIZE 128*1024
 #define BDSSIZE 2*1024
 #define IHSSIZE 4*1024
 #define FRSSIZE 4*1024
-#define CSSIZE  0
+#define CSSIZE  2*1024*1024
 
 #define HOLEPAGE (MAXPAGE/10)
 
@@ -205,6 +205,7 @@
 #undef HOST_KERNEL
 #undef HOST_SYSTEM
 #undef GCL_GPROF_START
+#undef HZ
 
 /* The number of bytes in a long.  */
 #undef SIZEOF_LONG
