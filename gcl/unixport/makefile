@@ -1,5 +1,6 @@
 SPECIAL_RSYM = rsym.c
 
+LIBC	= -lc
 -include ../makedefs
 
 HDIR	= ../h
@@ -10,7 +11,6 @@ CLCSDIR = ../clcs
 PCLDIR  = ../pcl
 PORTDIR = .
 
-LIBC	= -lc
 OLDDATE = "DATE"
 
 LD_LIBS=$(addprefix -u ,$(PATCHED_SYMBOLS)) -lgcl $(LIBS) $(LIBC) -lgclp

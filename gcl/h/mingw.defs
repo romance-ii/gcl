@@ -45,7 +45,7 @@ EXE          = .exe
 BAT          = .bat
 
 LIBFILES     = bcmp.o bzero.o bcopy.o
-EXTRAS       = ${OD}mingwin.o ${OD}mingfile.o
+EXTRAS       = ${ODIR}/mingwin.o ${ODIR}/mingfile.o
 
 # Work around install problem caused by non-support of GCL TK
 # on Windows platforms.
