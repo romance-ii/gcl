@@ -154,10 +154,13 @@
 (defun tanh (x) (/ (sinh x) (cosh x)))
 
 (defun asinh (x) (log (+ x (sqrt (+ 1.0d0 (* x x))))))
+;(defun acosh (x)
+;       (log (+ x
+;               (* (1+ x)
+;                    (sqrt (/ (1- x) (1+ x)))))))
 (defun acosh (x)
        (log (+ x
-               (* (1+ x)
-                    (sqrt (/ (1- x) (1+ x)))))))
+	       (sqrt (* (1- x) (1+ x))))))
 (defun atanh (x)
        (when (or (= x 1.0d0) (= x -1.0d0))
              (error "The argument, ~s, is a logarithmic singularity.~
