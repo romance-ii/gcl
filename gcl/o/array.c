@@ -530,6 +530,8 @@ DEFUN_NEW("MAKE-ARRAY1",object,fSmake_array1,SI,6,6,
        object dimensions),"")
 {   
   int rank = length(dimensions);
+  if (rank > ARRAY_RANK_LIMIT)
+    FEerror("Array rank limit exceeded.",0);
   { object x,v;
     char *tmp_alloc;
     int dim =1,i; 

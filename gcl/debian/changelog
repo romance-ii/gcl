@@ -15,8 +15,10 @@ gclcvs (2.7.0-25) unstable; urgency=low
     bug on mingw
   * Patch to mingwin.c:fix_filename to close long standing 'maxima
     ignore-errors filename corruption' bug on mingw
+  * Trigger error when trying to make an array of rank greater than the
+    limit set at compile time
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  5 Jun 2004 18:22:10 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  7 Jun 2004 10:53:07 -0400
 
 gclcvs (2.7.0-24) unstable; urgency=low
 
