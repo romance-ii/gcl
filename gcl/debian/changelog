@@ -1,4 +1,4 @@
-gclcvs (2.7.0-33) unstable; urgency=low
+gclcvs (2.7.0-33) unstable; urgency=high
 
   * Temporary workaround to restore xgcl
   * Properly negate integers in mp.h on 64bit machines, allowing for the
@@ -18,8 +18,11 @@ gclcvs (2.7.0-33) unstable; urgency=low
   * open probe ANSI fixes
   * array-dimension fix for bitvectors, adjust-array ansi fixes
   * bfd version independent section size semantics
+  * Bug fix: "c-l-c for gclcvs creates directories in root", thanks to
+    Richard M Kreuter (Closes: #282535). Fix error in clc script.
+  * Make local bfd source compatible with new section size semantics
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 24 Nov 2004 15:56:50 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 24 Nov 2004 18:42:06 +0000
 
 gclcvs (2.7.0-32) unstable; urgency=high
 
