@@ -1,3 +1,10 @@
+gclcvs (2.7.0-15) unstable; urgency=low
+
+  * Insert some forgotten STATIC_FUNCTION_POINTERS fixes into comm.c and
+    sheader.h in the gcl-tk directory
+
+ -- Camm Maguire <camm@enhanced.com>  Thu,  6 Nov 2003 20:48:35 +0000
+
 gclcvs (2.7.0-14) unstable; urgency=low
 
   * Portability patches to makefiles to support non-GNU grep (no -q),

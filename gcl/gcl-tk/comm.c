@@ -42,6 +42,12 @@ available on FD, 0 if timeout reached and -1 if failed.")
   else
     return make_fixnum1(0);
 }
+#ifdef STATIC_FUNCTION_POINTERS
+object
+fScheck_fd_for_input(fixnum fd,fixnum timeout) {
+  return FFN(fScheck_fd_for_input)(fd,timeout);
+}
+#endif
 
 
 
@@ -267,6 +273,12 @@ DEFUN_NEW("CLEAR-CONNECTION",object,fSclear_connection,SI,1,1,NONE,OI,OO,OO,OO,(
  
  return make_fixnum1(n);
 }
+#ifdef STATIC_FUNCTION_POINTERS
+object
+fSclear_connection(fixnum fd) {
+  return FFN(fSclear_connection)(fd);
+}
+#endif
 
 
 
