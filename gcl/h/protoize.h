@@ -1784,6 +1784,7 @@ unlink_loaded_files(void);
 #if defined (__MINGW32__)
 int bcmp ( const void *s1, const void *s2, size_t n );
 void bcopy ( const void *s1, void *s2, size_t n );
+void bzero(void *b, size_t length);
 int TcpOutputProc ( int fd, char *buf, int toWrite, int *errorCodePtr, int block );
 void recreate_heap1 ( void );
 void init_shared_memory ( void );
