@@ -75,7 +75,7 @@ LISP_LIB=cmpnew/collectfn.o lsp/gprof.lsp lsp/info.o lsp/profile.lsp gcl-tk/tkl.
 
 install-command:
 	rm -f $(DESTDIR)${prefix}/bin/gcl
-	(echo "#!/bin/sh" ; \
+	(echo '#!/bin/sh' ; \
 	echo exec ${INSTALL_LIB_DIR}/unixport/saved_gcl \\ ; \
 	echo '   -dir' ${INSTALL_LIB_DIR}/unixport/ \\ ; \
 	echo '   -libdir' ${INSTALL_LIB_DIR}/ \\ ; \
