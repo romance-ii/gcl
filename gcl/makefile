@@ -156,8 +156,10 @@ install-command:
 	 echo 'PROMPT %promp$%'; \
 	 echo 'FOR %%c IN (CALL DEL) DO %%c %temp%.\setdir.bat'; \
 	 echo 'set cwd=%cd%'; \
+	 echo 'set libdir=%cd%\..\lib\gcl-2.5.0'; \
+	 echo 'set unixportdir=%libdir%\unixport'; \
 	 echo 'path %cd%\..\mingw\bin;%PATH%'; \
-	 echo "start %cd%\..\lib\gcl-2.5.0\unixport\saved_gcl.exe -dir %cd%/../lib/gcl-2.5.0/unixport/ -libdir  %cd%/lib/gcl-2.5.0/ -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9" ) > $(DESTDIR)$(prefix)/bin/gclm.bat
+	 echo "start %unixportdir%\saved_gcl.exe -dir %unixportdir% -libdir %libdir% -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9" ) > $(DESTDIR)$(prefix)/bin/gclm.bat
 
 install: 
 	$(MAKE) install1 "INSTALL_LIB_DIR=$(prefix)/lib/gcl-`cat majvers`.`cat minvers`" "prefix=$(prefix)" "DESTDIR=$(DESTDIR)"
