@@ -1,0 +1,212 @@
+README for Xgcl: Gnu Common Lisp with interface to X windows.    15 Mar 95
+
+Copyright (c) 1995 Gordon S. Novak Jr., Hiep Huu Nguyen, William F. Schelter,
+and The University of Texas at Austin.
+
+Copyright 1987 by Digital Equipment Corporation and Massachusetts Institute
+of Technology.
+
+See the files gnu.license and dec.copyright for copyright details.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 1, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+Written by: Gordon S. Novak Jr., Hiep Huu Nguyen, and William F. Schelter,
+Department of Computer Sciences, University of Texas at Austin  78712.
+
+Xgcl contains an interface from Gnu Common Lisp to the X library, Xlib,
+adapted from X Consortium code by Hiep Huu Nguyen (hiep@cs.utexas.edu).
+Xgcl has been tested on the HP9000, SUN4, and IBM RS/6000.
+It has been modified by W. Schelter to make on machines that do not
+support the faslink.   In order to compile it you must have gcl sources.
+
+dwindow.lsp is an "easy to use" interface from Lisp to the Xlib,
+written by Gordon S. Novak Jr. (novak@cs.utexas.edu)  It is written in
+GLISP and has been translated into the Common Lisp file dwtrans.lsp,
+which is incorporated into the make of Xgcl.  Documentation is
+provided in the LaTeX file dwdoc.tex .  Test files are dwtest.lsp,
+pcalc.lsp , and drawtrans.lsp .
+
+
+This software and GCL can be ftp'ed from:
+   math.utexas.edu                  /pub/gcl/
+   cli.com           192.31.85.1    /pub/gcl/
+
+The file is called xgcl-2.tgz .  ftp it to your site and uncompress it:
+    gzip -dc xgcl-2.tgz | tar xvf -
+
+The directory xgcl-2 will then contain the files:
+
+Events.c
+README
+X.lsp
+X10.lsp
+XAtom.lsp
+XStruct-2.c
+XStruct-4.c
+XStruct-l-3.lsp
+Xakcl.example.lsp
+Xakcl.paper
+Xinit.lsp
+Xlib.lsp
+Xstruct.lsp
+Xutil-2.c
+Xutil.lsp
+dec.copyright
+defentry-events.lsp
+dispatch-events.lsp
+draw-gates.lsp
+draw.lsp
+drawtrans.lsp
+dwdoc.tex
+dwimports.lsp
+dwindow.lsp
+dwsyms.lsp
+dwtest.lsp
+dwtrans.lsp
+general-c.c
+general.lsp
+gnu.license
+ice-cream.lsp
+imports.lsp
+init_xgcl.lsp
+keysymdef.lsp
+makefile
+menu-set.lsp
+pcalc.lsp
+sysdef.lisp
+sysinit.lsp
+version
+
+
+These files contain:
+
+c code necesary for some general facilities and	interface into X, in the files:
+
+Events.c  
+XStruct-4.c 
+XStruct-2.c          
+Xutil-2.c  
+general-c.c 
+
+
+The shell makefile that compiles and creates Xgcl is:
+
+makefile
+
+
+For reference the lisp interfaces to functions reside in:
+
+Xlib.lsp 
+Xstruct.lsp
+general.lsp
+Xutil.lsp
+XStruct-l-3.lsp      
+defentry-events.lsp
+
+
+Constant declarations are in:
+
+X.lsp                
+XAtom.lsp            
+keysymdef.lsp
+X10.lsp
+
+
+These files correspond to C header files for X windows:
+
+Xlib.lsp
+Xutil.lsp 
+X.lsp                
+XAtom.lsp            
+keysymdef.lsp
+X10.lsp
+
+What little documentation there is:  Xakcl.paper
+Also see Xakcl.example.lsp for some PRIMITIVE examples.
+
+The dwindow files are as follows:
+
+dwindow.lsp    source code, written in GLISP ("documentation" of dwtrans.lsp)
+dwtrans.lsp    dwindow.lsp translated to plain Common Lisp
+dwdoc.tex      documentation in LaTeX
+dwtest.lsp     examples of use of dwindow
+pcalc.lsp      pocket calculator
+menu-set.lsp   multiple active menus in a single window (GLISP)
+draw.lsp       interactive drawing program (GLISP)
+draw-gates.lsp draw nand gates etc.
+drawtrans.lsp  draw.lsp and menu-set.lsp translated to plain Common Lisp
+imports.lsp    imports the window symbols into the :user package
+dwimports.lsp  a shorter set of imports used by the dwindow package
+dwsyms.lsp     imports symbols needed to run dwtrans from Lisp source
+
+To make Xgcl:
+
+1. Make GCL first.  A running GCL is required to make Xgcl.
+
+2. Put the xgcl-2.tgz file in the gcl-1.1 directory.
+
+3. Uncompress it with:      gzip -dc xgcl-2.tgz | tar xvf -
+
+4. cd xgcl-2
+
+5. edit the makefile and change the variables GCLDIR and SYSDIR
+   to point to the gcl-1.1 and xgcl-2 directories, respectively.
+   If needed, edit the X library paths.
+
+6. make
+   This makes an image saved_xgcl in the GCLDIR/unixport directory.
+   It will also make a one-line command Xgcl that will execute it.
+
+7. You can try out the basic system as follows (where % is the Unix prompt):
+   % Xgcl
+
+   GCL (GNU Common Lisp)  Version(1.1) Tue Sep 27 19:37:50 CDT 1994
+   Contains Enhancements by W. Schelter
+   >(in-package "XLIB")
+
+   XLIB>(Xinit)
+   NIL
+
+   XLIB>(open-window)
+   10485761
+
+   >(bye)
+   Bye.
+
+As you can see, all that happened was that a simple window appeared.
+Read the paper Xakcl.paper for more details.
+
+
+To try the dwindow package, do the following (in xgcl-2 directory):
+
+% Xgcl
+(load "imports.lsp")  ; import window symbols -- do this before anything else
+(load "dwtest.lsp")   ; load the test functions
+(wtesta)              ; make a window
+(wtestb)              ; draw some stuff
+(wtestc)              ; choose from menu, then click in window
+(wtestd)              ; a menu with icons
+(wteste)              ; a picture menu with sensitive points
+(wtesth)              ; arrows
+(wtesti)              ; arrows in color
+(wtestj)              ; character input: type with cursor in the window
+(wtestk)              ; character input in color
+(load "pcalc.lsp")
+(pcalc)               ; pocket calculator
+(load "drawtrans.lsp")
+(load "ice-cream.lsp"); an existing drawing
+(draw 'ice-cream)     ; examine / edit the drawing
+(draw 'foo)           ; make a drawing named foo.
+                      ; when done, do Origin (to Zero), Program, LaTex
