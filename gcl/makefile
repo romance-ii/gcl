@@ -193,6 +193,7 @@ install1:
 	-if [ "${TK_CONFIG_PREFIX}" != "unknown" ] ; then  \
 	(cd ${INSTALL_LIB_DIR}/gcl-tk/demos ; \
 	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ${prefix}/bin/gcl) ; fi
+	(cd elisp ; make install)
 	(cd info ; make ; make install)
 
 clean:

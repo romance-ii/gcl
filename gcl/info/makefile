@@ -127,8 +127,10 @@ gcl-si.dvi: ${GCL_SI} gcl-si.texi
 gcl-si.info:
 	makeinfo gcl-si.texi	
 
-gcl-tk.dvi gcl-tk.info: ${GCL_TK} gcl-tk.texi
+gcl-tk.dvi: ${GCL_TK} gcl-tk.texi
 	tex gcl-tk.texi
+
+gcl-tk.info: ${GCL_TK} gcl-tk.texi
 	makeinfo gcl-tk.texi
 
 gcl-si_toc.html:
