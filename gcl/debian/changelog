@@ -61,8 +61,10 @@ gclcvs (2.7.0-20) unstable; urgency=low
     remaining bug found by the random-tester
   * Allow args-info-referred-vars to match replaced vars, clearing bug
     report submitted by Matt Kauffman
+  * Rework plt code yet again to be compatible with compiler::link for
+    axiom, and mingw32
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  6 Mar 2004 14:44:37 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  8 Mar 2004 12:20:59 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

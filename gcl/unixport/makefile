@@ -101,12 +101,12 @@ init_%.lsp: init_%.lsp.tmp
 		-e "s,@LI-MAJVERS@,`cat ../majvers`,1" \
 		-e "s/@LI-CC@/\"$(CC) -c $(FINAL_CFLAGS)\"/1" \
 		-e "s,@LI-LD@,\"$(CC) -o \",1" \
-		-e "s,@LI-LD-LIBS@,\" $(LD_LIBS_PRE) -l$* $(LD_LIBS_POST)\",1" \
+		-e "s#@LI-LD-LIBS@#\" $(LD_LIBS_PRE) -l$* $(LD_LIBS_POST)\"#1" \
 		-e "s,@LI-OPT-THREE@,\"$(O3FLAGS)\",1" \
 		-e "s,@LI-OPT-TWO@,\"$(O2FLAGS)\",1" \
 		-e "s,@LI-INIT-LSP@,\"$@\",1" >$@
 
-saved_%:raw_% $(RSYM) init_%.lsp \
+saved_%:raw_% $(RSYM) init_%.lsp raw_%_map \
 		$(CMPDIR)/gcl_cmpmain.lsp \
 		$(CMPDIR)/gcl_lfun_list.lsp \
 		$(CMPDIR)/gcl_cmpopt.lsp $(HDIR)/cmpinclude.h \
@@ -122,35 +122,35 @@ $(RSYM): $(SPECIAL_RSYM) $(HDIR)/mdefs.h
 $(HDIR)/mdefs.h: $(HDIR)/include.h
 	cat $(HDIR)/include.h | sed -e "/include/d" > $(HDIR)/mdefs.h
 
-libgcl.a: $(OBJS) sys_gcl.o gmpfiles bfdfiles plt_gcl.o
+libgcl.a: $(OBJS) sys_gcl.o gmpfiles bfdfiles # plt_gcl.o
 	rm -rf $@
 	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
-libpre_gcl.a: $(OOBJS) sys_pre_gcl.o gmpfiles bfdfiles plt_pre_gcl.o
+libpre_gcl.a: $(OOBJS) sys_pre_gcl.o gmpfiles bfdfiles # plt_pre_gcl.o
 	rm -rf $@
 	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
-libmod_gcl.a: $(OBJS) $(MODOBJS) sys_mod_gcl.o gmpfiles bfdfiles plt_mod_gcl.o
+libmod_gcl.a: $(OBJS) $(MODOBJS) sys_mod_gcl.o gmpfiles bfdfiles # plt_mod_gcl.o
 	rm -rf $@
 	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
 libxgcl.a: libgcl.a
 	ln -snf $< $@
 
-libansi_gcl.a: $(OBJS) $(ANSIOBJS) sys_ansi_gcl.o gmpfiles bfdfiles plt_ansi_gcl.o
+libansi_gcl.a: $(OBJS) $(ANSIOBJS) sys_ansi_gcl.o gmpfiles bfdfiles # plt_ansi_gcl.o
 	rm -rf $@
 	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
-libpcl_gcl.a: $(OBJS) $(PCLOBJS) sys_pcl_gcl.o gmpfiles bfdfiles plt_pcl_gcl.o
+libpcl_gcl.a: $(OBJS) $(PCLOBJS) sys_pcl_gcl.o gmpfiles bfdfiles # plt_pcl_gcl.o
 	rm -rf $@
 	$(ARRS) $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
-raw_%: lib%.a libgclp.a $(SYSTEM_OBJS) $(EXTRAS)
-	touch map_$*
-	$(CC) -Wl,-Map map_$* -o raw_$*$(EXE) $(filter %.o,$^) \
-		-L. $(EXTRA_LD_LIBS) $(LD_LIBS_PRE) -l$* $(LD_LIBS_POST)
-	diff map_$* map_$*.old >/dev/null || (cp map_$* map_$*.old && rm -f $@ && $(MAKE) $@)
-	cp map_$*.old map_$*
+raw_%_map raw_%: lib%.a libgclp.a $(SYSTEM_OBJS) $(EXTRAS)
+	touch raw_$*_map
+	$(CC) -o raw_$*$(EXE) $(filter %.o,$^) \
+		-L. $(EXTRA_LD_LIBS) -Wl,-Map raw_$*_map $(LD_LIBS_PRE) -l$* $(LD_LIBS_POST)
+#	diff map_$* map_$*.old >/dev/null || (cp map_$* map_$*.old && rm -f $@ && $(MAKE) $@)
+#	cp map_$*.old map_$*
 
 map_%:
 	touch $@
@@ -169,7 +169,7 @@ plt_%.o: plt_%.h plt.c
 clean:
 	rm -rf  saved_*$(EXE) raw_*$(EXE) *.o core a.out $(RSYM) \
 		$(LSPDIR)/auto_new.lsp foo *maxima* init_*.lsp lib*.a gmp* bfd* *.lsp.tmp \
-		gazonk*.lsp plt*h map_*
+		gazonk*.lsp plt*h *_map
 
 .INTERMEDIATE: init_ansi_gcl.lsp.tmp init_gcl.lsp.tmp raw_gcl raw_ansi_gcl
 .PRECIOUS: init_gcl.lsp init_ansi_gcl.lsp

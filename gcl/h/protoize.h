@@ -1750,6 +1750,9 @@ gcl_gmp_alloc(size_t);
 int
 my_plt(const char *,unsigned long *);
 
+int
+parse_plt(void);
+
 #ifdef SGC
 void
 memprotect_test_reset(void);

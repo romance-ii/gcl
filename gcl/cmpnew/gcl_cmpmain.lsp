@@ -823,12 +823,17 @@ SYSTEM_SPECIAL_INIT
 				 :type "lsp") raw))
 	 (raw (merge-pathnames raw (make-pathname :directory (list :current))))
 	 (raw (merge-pathnames (make-pathname
-				:name (concatenate 'string "raw_" (pathname-name raw))
-				#+winnt :type #+winnt "exe")
-			       raw)))
-    
+				:name (concatenate 'string "raw_" (pathname-name raw)))
+			       raw))
+	 (map (merge-pathnames (make-pathname
+				:name (concatenate 'string (pathname-name raw) "_map")) raw))
+	 #+winnt (raw (merge-pathnames (make-pathname :type "exe") raw))
+	 )
+
+
+    (system (format nil "touch ~a" (namestring map)))
     (system 
-     (format nil "~a ~a ~a ~a -L~a ~a ~a"
+     (format nil "~a ~a ~a ~a -L~a -Wl,-Map ~a ~a ~a"
 	     *ld* 
 	     (namestring raw)
 	     (namestring ui)
@@ -838,6 +843,7 @@ SYSTEM_SPECIAL_INIT
 		     (setq sfiles (concatenate 'string sfiles " " (namestring tem)))))
 	       sfiles) 
 	     si::*system-directory*
+	     (namestring map)
 	     (let* ((par (namestring (make-pathname :directory '(:parent))))
 		    (i (concatenate 'string " " par))
 		    (j (concatenate 'string " " si::*system-directory* par)))

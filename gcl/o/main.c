@@ -321,6 +321,7 @@ main(int argc, char **argv, char **envp) {
 
     CMPtemp = CMPtemp1 = CMPtemp2 = CMPtemp3 = OBJNULL;
 
+    parse_plt();
     gcl_init_init();
 
     sLApackageA->s.s_dbind = user_package;

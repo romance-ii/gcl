@@ -77,7 +77,7 @@ OBJS	= $(OD)main.o $(OD)alloc.o $(OD)gbc.o \
 	$(OD)print.o $(OD)format.o $(OD)pathname.o \
 	$(OD)unixfsys.o $(OD)unixfasl.o $(OD)error.o \
 	$(OD)unixtime.o $(OD)unixsys.o $(OD)unixsave.o \
-	$(OD)funlink.o  \
+	$(OD)funlink.o  $(OD)plt.o \
 	$(OD)fat_string.o ${ODIR}/run_process.o \
 	$(OD)nfunlink.o $(OD)usig.o $(OD)usig2.o $(OD)utils.o \
 	$(OD)makefun.o $(OD)sockets.o $(OD)clxsocket.o  \
