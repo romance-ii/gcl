@@ -230,7 +230,7 @@
 	  (let ,@(if countp
 		     '(((count (if (null count)
 				   most-positive-fixnum count)))))	       
-              ,@(if countp '((declare (fixnum count))))
+              ,@(if countp '((declare (integer count))))
               nil
 	      (and test test-not (test-error))
                 (if (not from-end)
@@ -327,6 +327,7 @@
            (let (,number-satisfied)
              (declare (fixnum n))
              (when (< n count) (setq count n))
+	     (when (< count 0) (setq count 0))
              (do ((newseq
                    (make-sequence (seqtype sequence)
                                   (the fixnum (f- l count))))
@@ -342,6 +343,7 @@
       `(let (,number-satisfied)
          (declare (fixnum n))
          (when (< n count) (setq count n))
+	 (when (< count 0) (setq count 0))
          (do ((newseq
                (make-sequence (seqtype sequence) (the fixnum (f- l count))))
               ,iterate-i-everywhere

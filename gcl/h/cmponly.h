@@ -48,7 +48,7 @@ MP_INT * otoi(object x);
 #error Need alloca for GMP
 #endif
 
-#define IDECL(a,b,c) MP_INT b={1,1,alloca(1*sizeof(mp_limb_t))}; a = &b ; object c
+#define IDECL(a,b,c) mp_limb_t *c=(mp_limb_t *)alloca(1*sizeof(mp_limb_t));MP_INT b={1,1,c}; a = &b 
 #define SETQ_IO(var,alloc,val) { object _xx = (val); \
                                  int _n; \
                                  if ((_n=obj_to_mpz(_xx,(var)))) {\
