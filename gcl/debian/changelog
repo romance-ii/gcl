@@ -12,8 +12,9 @@ gcl (2.5.0.cvs20020625-71) unstable; urgency=high
   * Number of argument check in IapplyVector
   * Print offset bit vectors correctly
   * Correct precision for formatting short and long doubles
+  * Added si::modf
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 12 Jan 2003 20:57:41 -0500
+ -- Camm Maguire <camm@enhanced.com>  Sun, 12 Jan 2003 21:37:27 -0500
 
 gcl (2.5.0.cvs20020625-70) unstable; urgency=high
 

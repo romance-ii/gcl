@@ -1274,6 +1274,14 @@ Returns the second result of (FLOOR NUMBER DIVISOR).
 
 @end defun
 
+@defun MODF (number)
+Package:SYSTEM
+
+Returns the integer and fractional part of a floating point number mod 1.0.
+
+
+@end defun
+
 @defvr {Constant} BOOLE-ORC1 
 Package:LISP
 Makes BOOLE return LOGORC1 of INTEGER1 and INTEGER2.

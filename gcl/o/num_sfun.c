@@ -590,6 +590,24 @@ Latan(void)
 }
 
 void
+siLmodf(void)
+{
+  
+  object x;
+  double d,ip;
+
+  check_arg(1);
+  check_type_float(&vs_base[0]);
+  x=vs_base[0];
+  vs_base=vs_top;
+  d=type_of(x) == t_longfloat ? lf(x) : (double)sf(x);
+  d=modf(d,&ip);
+  vs_push(make_fixnum((int)ip));
+  vs_push(type_of(x) == t_longfloat ? make_longfloat(d) : make_shortfloat((shortfloat)d));
+
+}
+
+void
 init_num_sfun(void)
 {
 	imag_unit
@@ -615,4 +633,5 @@ init_num_sfun(void)
 	make_function("COS", Lcos);
 	make_function("TAN", Ltan);
 	make_function("ATAN", Latan);
+	make_si_function("MODF", siLmodf);
 }
