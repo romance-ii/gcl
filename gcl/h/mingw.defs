@@ -36,8 +36,10 @@ INITFORM     = (si::build-symbol-table)
 SYMB         = -s -f
 APPEND       = ../bin/append
 
-# suffix for executables
+# suffixes for executables and batch files
 EXE          = .exe
+BAT          = .bat
+
 LIBFILES     = bsearch.o bcmp.o bzero.o bcopy.o
 EXTRAS       = ${OD}mingwin.o ${OD}mingfile.o
 
