@@ -968,8 +968,11 @@ Lnconc() {
 			m->c.c_cdr = l;
 			m = l;
 		}
-		for (;  !endp(m->c.c_cdr);  m = m->c.c_cdr)
-			;
+		for (;  m->c.c_cdr!=Cnil && type_of(m->c.c_cdr)==t_cons;  m = m->c.c_cdr);
+		if (m->c.c_cdr!=Cnil) {
+			m->c.c_cdr=make_cons(m->c.c_cdr,Cnil);
+			m = m->c.c_cdr;
+		}
 	}
 	if (x == Cnil) vs_base[0] = vs_top[-1];
 	else {
@@ -1203,7 +1206,7 @@ Ltailp() {
 			vs_popp;
 			return;
 		}
-	vs_base[0] = Cnil;
+	vs_base[0] = vs_base[0]==Cnil ? Ct : Cnil;
 	vs_popp;
 	return;
 }
