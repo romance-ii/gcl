@@ -5,8 +5,9 @@ gclcvs (2.7.0-19) unstable; urgency=low
   * runtime SGC fault recovery test
   * Protect read/fread in case SGC is enabled with safe (restartable)
     versions
+  * SGC on for arm and hppa
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 12 Feb 2004 05:24:55 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 12 Feb 2004 05:25:15 +0000
 
 gclcvs (2.7.0-18) unstable; urgency=low
 
