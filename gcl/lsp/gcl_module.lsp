@@ -64,6 +64,8 @@
     (structure (get symbol 'structure-documentation))
     (type (get symbol 'type-documentation))
     (setf (get symbol 'setf-documentation))
+    (compiler-macro (get symbol 'compiler-macro-documentation))
+    (method-combination (get symbol 'method-combination-documentation))
     (t
      (if (packagep symbol) 
 	 (get (find-symbol (package-name symbol) :keyword) 'package-documentation)

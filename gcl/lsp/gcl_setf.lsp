@@ -225,6 +225,8 @@
      (structure (si:putprop ,s ,v 'structure-documentation))
      (type (si:putprop ,s ,v 'type-documentation))
      (setf (si:putprop ,s ,v 'setf-documentation))
+     (compiler-macro (si:putprop ,s ,v 'compiler-macro-documentation))
+     (method-combination (si:putprop ,s ,v 'method-combination-documentation))
      (t (error "~S is an illegal documentation type." ,d))))
 
 
