@@ -180,8 +180,8 @@ install1:
 #	if [ -d "${TK_CONFIG_PREFIX}" ] ; then  \
 #	(cd $(DESTDIR)${INSTALL_LIB_DIR}/gcl-tk/demos ; \
 #	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../$(PORTDIR)/$(FLISP)$(EXE)) ; fi
-	(cd elisp ; make install DESTDIR=$(DESTDIR))
-	(cd info ; make ; make install DESTDIR=$(DESTDIR))
+	if test "$(EMACS_SITE_LISP)" != "" ; then (cd elisp ; make install DESTDIR=$(DESTDIR)) ; fi
+	if test "$(INFO_DIR)" != "unknown"; then (cd info ; make ; make install DESTDIR=$(DESTDIR)) ; fi
 
 clean:
 	(cd $(BINDIR); make clean)
