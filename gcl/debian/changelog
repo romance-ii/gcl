@@ -11,8 +11,10 @@ gclcvs (2.6.0-2) unstable; urgency=low
   * 6.0 minor version for CVS snapshots, stable releases will start at
     .1
   * syntax fix to lsp/gprof.hc
+  * Rework debian package structure to handle stable and cvs packages
+    simultaneously
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 22 Aug 2003 15:30:39 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 22 Aug 2003 15:31:55 +0000
 
 gcl (2.6.0cvs-1) experimental; urgency=low
 

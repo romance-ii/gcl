@@ -6,7 +6,7 @@
 # <sanvila@ctv.es> and octave by Dirk Eddelbuettel <edd@debian.org>.
 
 FLAVOR=$1
-PACKAGE=gcl
+PACKAGE=gcl@EXT@
 
 if [ ${FLAVOR} = emacs ]; then exit 0; fi
 

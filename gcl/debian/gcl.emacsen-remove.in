@@ -2,7 +2,7 @@
 # /usr/lib/emacsen-common/packages/remove/#PACKAGE#
 
 FLAVOR=$1
-PACKAGE=gcl
+PACKAGE=gcl@EXT@
 
 if [ ${FLAVOR} != emacs ]; then
     if test -x /usr/sbin/install-info-altdir; then

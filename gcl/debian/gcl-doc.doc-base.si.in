@@ -1,0 +1,12 @@
+Document: gcl@EXT@-si-doc
+Title: GNU Common Lisp Documentation -- System Internals 
+Author: W. Schelter
+Abstract: Documentation on GCL-specific Lisp system functions
+Section: Apps/Programming
+
+Format: DVI
+Files: /usr/share/doc/gcl@EXT@-doc/gcl-si*.dvi.gz /usr/share/doc/gcl@EXT@-doc/gcl-si*.dvi
+
+Format: HTML
+Index: /usr/share/doc/gcl@EXT@-doc/gcl-si.html/gcl-si_toc.html
+Files: /usr/share/doc/gcl@EXT@-doc/gcl-si.html/gcl-si*.html
