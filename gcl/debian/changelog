@@ -109,8 +109,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * cleanup room report and give more space to modern large heaps
   * room report formatting
   * Add old test failures to misc.lsp
+  * Properly gensymmed time macro
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 21 Mar 2004 16:06:56 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 22 Mar 2004 02:43:14 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

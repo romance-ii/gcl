@@ -35,27 +35,29 @@
 
 
 (defmacro time (form)
-  `(let (real-start real-end run-start run-end child-run-start child-run-end
-		    (gbc-time-start (si::gbc-time)) gbc-time x)
-     (setq real-start (get-internal-real-time))
-     (multiple-value-bind (run-start child-run-start) (get-internal-run-time)
+  (let ((real-start (gensym)) (real-end (gensym)) (gbc-time-start (gensym))
+	(gbc-time (gensym)) (x (gensym)) (run-start (gensym)) (run-end (gensym))
+	(child-run-start (gensym)) (child-run-end (gensym)))
+  `(let (,real-start ,real-end (,gbc-time-start (si::gbc-time)) ,gbc-time ,x)
+     (setq ,real-start (get-internal-real-time))
+     (multiple-value-bind (,run-start ,child-run-start) (get-internal-run-time)
        (si::gbc-time 0)
-       (setq x (multiple-value-list ,form))
-       (setq gbc-time (si::gbc-time))
-       (si::gbc-time (+ gbc-time-start gbc-time))
-       (multiple-value-bind (run-end child-run-end) (get-internal-run-time)
-	 (setq real-end (get-internal-real-time))
+       (setq ,x (multiple-value-list ,form))
+       (setq ,gbc-time (si::gbc-time))
+       (si::gbc-time (+ ,gbc-time-start ,gbc-time))
+       (multiple-value-bind (,run-end ,child-run-end) (get-internal-run-time)
+	 (setq ,real-end (get-internal-real-time))
 	 (fresh-line *trace-output*)
 	 (format *trace-output*
 		 "real time       : ~10,3F secs~%~
                   run-gbc time    : ~10,3F secs~%~
                   child run time  : ~10,3F secs~%~
                   gbc time        : ~10,3F secs~%"
-		 (/ (- real-end real-start) internal-time-units-per-second)
-		 (/ (- (- run-end run-start) gbc-time) internal-time-units-per-second)
-		 (/ (- child-run-end child-run-start) internal-time-units-per-second)
-		 (/ gbc-time internal-time-units-per-second))))
-       (values-list x)))
+		 (/ (- ,real-end ,real-start) internal-time-units-per-second)
+		 (/ (- (- ,run-end ,run-start) ,gbc-time) internal-time-units-per-second)
+		 (/ (- ,child-run-end ,child-run-start) internal-time-units-per-second)
+		 (/ ,gbc-time internal-time-units-per-second))))
+       (values-list ,x))))
 
 
 (defconstant month-days-list '(31 28 31 30 31 30 31 31 30 31 30 31))
