@@ -2,8 +2,10 @@ gclcvs (2.7.0-32) unstable; urgency=low
 
   * Use GMP gcd in bignum case, for performance improvement and better
     binary algorithm
+  * Optimize some ratio calculations by advance call of get_gcd, also
+    bring forward gmp functions mpz_divexact and mpz_divexact_ui
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 20 Aug 2004 15:23:50 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 20 Aug 2004 21:45:35 +0000
 
 gclcvs (2.7.0-31) unstable; urgency=high
 
