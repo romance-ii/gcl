@@ -237,6 +237,49 @@ Returns T if X is a compiled function; NIL otherwise.
 
 @end defun
 
+@defun GPROF-START ()
+Package:SYSTEM
+
+GCL now has preliminary support for profiling with gprof, an
+externally supplied profiling tool at the C level which typically
+accompanies gcc.  Support must be enabled at compile time with
+--enable-gprof.  This function starts the profiling timers and
+counters.
+
+@end defun
+
+
+@defun GPROF-QUIT ()
+Package:SYSTEM
+
+GCL now has preliminary support for profiling with gprof, an
+externally supplied profiling tool at the C level which typically
+accompanies gcc.  Support must be enabled at compile time with
+--enable-gprof.  This function reports the profiling results in the
+form of a call graph to standard output, and clears the profiling
+arrays.  Please note that lisp functions are not (yet) displayed with
+their lisp names.  Please see also the PROFILE function.
+
+@end defun
+
+
+@defun GPROF-SET (begin end)
+Package:SYSTEM
+
+GCL now has preliminary support for profiling with gprof, an
+externally supplied profiling tool at the C level which typically
+accompanies gcc.  Support must be enabled at compile time with
+--enable-gprof.  This function sets the address range used by
+GPROF-START in specifying the section of the running program which is
+to be profiled.  All subsequent calls to GPROF-START will use this new
+address range.  By default, the range is set to begin at the starting
+address of the .text section, and to end at the current end of the
+running core.  These default values can be restored by calling
+GPROF-SET with both argments set to 0.
+
+@end defun
+
+
 @defvar *DEFAULT-SYSTEM-P*
 Pakcage:COMPILER
 Specifies the default setting of :SYSTEM-P used by COMPILE.  Defaults to NIL.

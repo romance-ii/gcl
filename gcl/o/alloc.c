@@ -718,13 +718,15 @@ set_maxpage(void) {
 }
 
 
-
-
 void
 gcl_init_alloc(void) {
 
   int i;
   static int initialized;
+#ifdef GCL_GPROF
+   extern void *_start;
+   unsigned textpage=2*((void *)&etext-(void *)&_start)/PAGESIZE;
+#endif
   
   if (initialized) return;
   initialized=1;
@@ -740,6 +742,11 @@ gcl_init_alloc(void) {
 #endif	
   
   holepage = INIT_HOLEPAGE;
+#ifdef GCL_GPROF
+  if (holepage<textpage)
+     holepage=textpage;
+#endif
+
   new_holepage = HOLEPAGE;
   nrbpage = INIT_NRBPAGE;
   
@@ -824,6 +831,10 @@ gcl_init_alloc(void) {
   ncb = 0;
   ncbpage = 0;
   maxcbpage = 512;
+#ifdef GCL_GPROF
+  if (maxcbpage<textpage)
+     maxcbpage=textpage;
+#endif
   
 }
 
@@ -1069,6 +1080,74 @@ DEFUN_NEW("GET-HOLE-SIZE",object,fSget_hole_size,SI
 	/* 0 args */
 	RETURN1((make_fixnum(new_holepage)));
 }
+
+
+#ifdef GCL_GPROF
+
+static unsigned long start,end,gprof_on;
+
+DEFUN_NEW("GPROF-START",object,fSgprof_start,SI
+       ,0,0,NONE,OO,OO,OO,OO,(void),"")
+{
+  extern void monstartup(unsigned long,unsigned long);
+  extern void *_start;
+
+  if (!gprof_on) {
+    start=start ? start : (unsigned long)&_start;
+    end=end ? end : (unsigned long)core_end;
+    monstartup(start,end);
+    gprof_on=1;
+  }
+
+  return Cnil;
+
+}
+
+DEFUN_NEW("GPROF-SET",object,fSgprof_set,SI
+       ,2,2,NONE,OI,IO,OO,OO,(fixnum dstart,fixnum dend),"")
+{
+
+  start=dstart;
+  end=dend;
+
+  return Cnil;
+
+}
+
+DEFUN_NEW("GPROF-QUIT",object,fSgprof_quit,SI
+       ,0,0,NONE,OO,OO,OO,OO,(void),"")
+{
+  extern void _mcleanup(void);
+  char b[PATH_MAX],b1[PATH_MAX];
+  FILE *pp;
+  unsigned n;
+
+  if (!gprof_on)
+    return Cnil;
+
+  if (!getwd(b))
+    FEerror("Cannot get working directory", 0);
+  if (chdir(P_tmpdir))
+    FEerror("Cannot change directory to tmpdir", 0);
+  _mcleanup();
+  if (snprintf(b1,sizeof(b1),"gprof %s",kcl_self)<=0)
+    FEerror("Cannot write gprof command line", 0);
+  if (!(pp=popen(b1,"r")))
+    FEerror("Cannot open gprof pipe", 0);
+  while ((n=fread(b1,1,sizeof(b1),pp)))
+    if (!fwrite(b1,1,n,stdout))
+      FEerror("Cannot write gprof output",0);
+  if (pclose(pp)<0)
+    FEerror("Cannot close gprof pipe", 0);
+  if (chdir(b))
+    FEerror("Cannot restore working directory", 0);
+  gprof_on=0;
+
+  return Cnil;
+
+}
+
+#endif
 
 DEFUN_NEW("SET-HOLE-SIZE",object,fSset_hole_size,SI
        ,1,2,NONE,OI,IO,OO,OO,(fixnum npages,...),"")

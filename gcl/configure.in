@@ -282,6 +282,9 @@ AC_ARG_ENABLE(custreloc,
 AC_ARG_ENABLE(debug,
 	[ --enable-debug builds gcl with -g in CFLAGS to enable running under gdb ]
 	,,enable_debug="no")
+AC_ARG_ENABLE(gprof,
+	[ --enable-gprof builds gcl with -pg in CFLAGS to enable profiling with gprof ]
+	,,enable_gprof="no")
 AC_ARG_ENABLE(static,[ --enable-static will link your GCL against static as opposed to shared system libraries ] ,
         [enable_static=$enableval],[enable_static="$def_static"])
 AC_ARG_ENABLE(pic,
@@ -332,6 +335,7 @@ if test "$load_opt" != "1" ; then
 	exit 1
 fi
 
+TLIBS=""
 if test "$enable_static" = "yes" ; then
    TLIBS="-static $TLIBS";
 fi
@@ -389,6 +393,12 @@ if test "$enable_debug" = "yes" ; then
 else
 	TO3FLAGS="-O3 -fomit-frame-pointer"
 	TO2FLAGS="-O"
+fi
+
+if test "$enable_gprof" = "yes" ; then
+	TCFLAGS="$TCFLAGS -pg"
+	TLIBS="$TLIBS -pg"
+	AC_DEFINE(GCL_GPROF)
 fi
 
 AC_CHECK_PROGS(AWK,gawk nawk awk,"")

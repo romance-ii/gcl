@@ -72,8 +72,9 @@ gclcvs (2.7.0-16) unstable; urgency=low
     .data source for the mod, pcl, and clcs subsystems are now found in
     the c subdir of the respective dir
   * Some FreeBSD cleanups
+  * Preliminary gprof profiling support
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  3 Dec 2003 16:02:36 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 30 Dec 2003 16:43:30 +0000
 
 gclcvs (2.7.0-15) unstable; urgency=low
 

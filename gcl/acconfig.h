@@ -230,10 +230,11 @@ SGC is enabled.  */
 #undef __SHORT_LIMB
 #undef __LONG_LONG_LIMB
 
-/* Define if we have the JAPI library on board */
 #undef HAVE_JAPI_H
 
 #undef HAVE_XDR
 #undef ENDIAN_ALREADY_DEFINED
 #undef USE_CLEANUP
 #undef SIZEOF_CONTBLOCK
+
+#undef GCL_GPROF
