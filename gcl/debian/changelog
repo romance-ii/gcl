@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-36) unstable; urgency=high
+
+  * Fix rsym compilation when not using bfd
+
+ -- Camm Maguire <camm@enhanced.com>  Fri,  9 Aug 2002 19:10:16 -0400
+
 gcl (2.5.0.cvs20020625-35) unstable; urgency=high
 
   * Don't build bfd/po subdir

@@ -104,7 +104,7 @@ saved_$(SYSTEM):raw_$(SYSTEM) $(RSYM) $(INIT_SYSTEM_LSP) \
 	$(PORTDIR)/raw_$(SYSTEM)$(EXE) $(PORTDIR)/ -libdir ${GCLDIR}/ < foo
 
 ${RSYM}:	${SPECIAL_RSYM} $(HDIR)/mdefs.h
-	$(LDCC) $(DEFS) -g -I../h -o ${RSYM} ${SPECIAL_RSYM}
+	$(CC) $(CFLAGS) -I$(HDIR) -I$(ODIR) -o ${RSYM} ${SPECIAL_RSYM}
 
 $(HDIR)/mdefs.h: $(HDIR)/include.h
 	cat $(HDIR)/include.h | sed -e "/include/d" > $(HDIR)/mdefs.h
@@ -115,7 +115,7 @@ saved_kcn:
 FOR_RAW= $(FIRST_FILE) $(OBJS) $(LSPOBJS) $(CMPOBJS) $(SYSTEM_OBJS) sys_gcl.o $(LAST_FILE)
 
 raw_$(SYSTEM):  $(FOR_RAW)
-	$(LDCC)  -o raw_$(SYSTEM)$(EXE) $(FOR_RAW) ${LIBC} $(LIBS1)
+	$(CC)  -o raw_$(SYSTEM)$(EXE) $(FOR_RAW) ${LIBC} $(LIBS1)
 
 sys_gcl.o:	sys_gcl.c ${HDIR}/object.h ${HDIR}/config.h
 	$(CC) $(CFLAGS) -c -I$(HDIR) sys_gcl.c
