@@ -1,3 +1,11 @@
+gcl (2.5.1-1) unstable; urgency=high
+
+  * some optimization now on hppa
+  * Add RELEASE-2.5.1 file
+  * Add dedication notice to the memory of W. Schelter
+
+ -- Camm Maguire <camm@enhanced.com>  Sun,  2 Mar 2003 10:20:26 -0500
+
 gcl (2.5.0.cvs20020625-80) unstable; urgency=low
 
   * enable japi configure flag, defaults to no

@@ -376,8 +376,8 @@ case $use in
 #			TCFLAGS="$TCFLAGS -ffloat-store";;
 		hppa*)
 			TCFLAGS="$TCFLAGS -ffunction-sections"
-			TO3FLAGS=""
-			TO2FLAGS=""
+			TO3FLAGS="-O -fomit-frame-pointer"
+			TO2FLAGS="-O"
 			;;
 		arm*)
 			TCFLAGS="$TCFLAGS -mlong-calls";;	

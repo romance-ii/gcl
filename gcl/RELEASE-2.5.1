@@ -1,0 +1,138 @@
+RELEASE NOTES FOR 2.5.1:
+========================
+The GNU Common Lisp (GCL) development team is pleased to release
+Version 2.5.1, the first major release since the untimely death of the
+former maintainer Dr William Schelter over a year ago.  This release
+is dedicated to his memory.  The project is now hosted on
+http://savannah.gnu.org/projects/gcl/ and is maintained and developed
+by a team of thirteen programmers.  Our home page lives at
+http://www.gnu.org/software/gcl/.
+
+This release stabilizes the CLtL1 compliant build of GCL on most major
+Unices including 11 Debian Linux 64 and 32 bit architectures and modern
+versions of Microsoft Windows (TM).  A rapidly progressing, partially ANSI
+compliant version is also available on the Linux platforms.
+
+GCL plays a substantial role in development of the Maxima computer
+algebra system (http://maxima.sourceforge.net/), ACL2, a computational
+logic system (http://www.cs.utexas.edu/users/moore/acl2/), and the
+forthcoming public release of the Axiom computer algebra system..  The
+compiler is a descendant of the famous KCL and AKCL Common Lisp
+compilers and is licensed under version two of the GNU Library General
+Public License.
+
+As with any Lisp system GCL is a lot of fun to work with.  We welcome all
+comments and feedback.   Developers are particularly welcome too.  You will
+find that the project offers a wide variety of challenges on various
+platforms to anyone with an interest in compilers, low level C programming
+or Common Lisp.
+
+-----
+
+Features:
+
+    * Compiles itself, maxima, and acl2, passing all tests, on 11
+        Debian GNU/Linux platforms (i386, sparc, powerpc, s390, ia64, alpha,
+        mips, mipsel, hppa, arm, and m68k), Sparc Solaris, and recent Windows
+        systems.
+
+    * Compilation to native object code.  Lisp disassembly shows intermediate 
+	C source and native assembler. 
+   
+    * Native code relocation on all supported platforms except alpha, mips, 
+	mipsel, ia64, and hppa. 
+
+    * Can save its running memory image to a file on all systems where native object 
+	code relocation is supported, thus producing standalone executables.
+
+    * Compiles Lisp function calls to C function calls with inlined
+	arguments, when function proclamation/declamations are made.
+
+    * Quite fast, particularly if one pre-allocates memory to be commensurate
+	 with that typically available on modern computer systems. (see below)
+
+    * A foreign function interface as flexible in principle as the C interface.
+
+    * Socket support via streams
+
+    * Support for numbers of arbitrary precision via the GNU
+	Multiprecision Library.  If you build GCL on your own system,
+	multiprecision numerical support will make use of ISA extension
+	instructions available on your system for maximum large number
+	performance.
+
+    * An exact garbage collector with no (known) leaks.
+
+    * An ANSI mode on Unix systems which passes approximately 97% of
+	the ANSI compliance tests currently developed for the project.
+	On Debian GNU/Linux systems, this mode can be selected by setting the
+	GCL_ANSI environment variable to any non-empty string.  See
+	/usr/share/doc/gcl/test_results on Debian GNU/Linux systems.
+
+    * An MPI extension for cluster computing support.  See the website for details. 
+
+    * A long history of leveraging GCC compiler technology for use in
+	production lisp applications.
+
+-----
+
+GCL is one of the oldest Lisp systems still in use, and as such has
+served as the basis for large lisp applications when computers were
+much more limited than they are today, particularly in terms of
+available memory.  Considerable effort was therefore made in the past
+to keep the memory image as small as possible.  As of the present
+time, the GCL team has not tuned the default memory allocation scheme
+to be more in line with modern systems.  One can therefore often get
+significant performance increases by preallocating memory, as in for
+example
+
+(progn
+(si::allocate 'cons 10000 t)
+(si::allocate 'fixnum 200 t)
+(si::allocate 'symbol 100 t)
+(si::allocate-relocatable-pages 2000 t)
+(si::allocate 'cfun 1000 t))
+
+Optimal values will no doubt vary by application and machine.  One
+user/developer reports effects of the following magnitude when
+using preallocation:
+
+########
+
+Take a look on some funny numbers below.  This is time and RAM
+required to compute ratsimp((x+y+z)^300)$ on Linux AthlonXP 2400+.
+For GCL run time is in the form T - G = N, where T is the total
+time as shown by showtime:true; G is total GC tome and N
+is run time without GC.
+
+Lisp            Time            RAM      RAM    RAM
+                 [sec]          before    max   after
+              T  -  G  = N       [Mb]    [Mb]    [Mb]
+=====================================================
+
+CLISP       4.6                 5.5      29      16
+
+CMUCL       1.6                 6.5      31      31
+
+GCL class   5.9 - 5.2 = 0.7      8       24      24
+GCL ansi    9.5 - 8.9 = 0.6     9.5      29      29
+
+GCL class   1.0 - 0.4 = 0.6     24       31      31
+GCL ansi    1.1 - 0.6 = 0.5     25       32      32
+
+GCL class   0.7 - 0.1 = 0.6     48       55      55
+GCL ansi    0.5 - 0.0 = 0.5     49       56      56
+
+====================================================
+
+########
+
+
+TO DO:
+
+	1) Full ANSI compliance
+	2) Native optimized blas support
+	3) Integrate MPI support
+	4) GCL as a suported GCC front end.
+	5) Performance/memory optimization
+

@@ -82,7 +82,7 @@
 	  ;; must be printed (see License).
 	  (format t "GCL (GNU Common Lisp)  ~A~%~a~%~a~%~%~a~%" "@LI-VERS@"
 		  "Licensed under GNU Library General Public License"
-		  "Contains Enhancements by W. Schelter"
+		  "Dedicated to the memory of W. Schelter"
 		  "Use (help) to get some basic information on how to use GCL.")))
    (setq si::*ihs-top* 1)
    (in-package 'system::user) (incf system::*ihs-top* 2)
