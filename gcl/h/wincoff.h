@@ -11,7 +11,7 @@
 #undef va_start
 
 #include "windows.h"
-#ifdef MINGW
+#ifdef __MINGW32__
 #include "minglacks.h"
 #else
 #include "cyglacks.h"
