@@ -2017,14 +2017,14 @@ object sym;
 
 }
 
-/*
+
 static void
 pp(x)
 object x;
 {
 princ(x,Cnil);
 flush_stream(symbol_value(sLAstandard_outputA));
-}*/
+}
 
 static object
 set_line_length(n)

@@ -294,7 +294,7 @@ fasload(object faslfile) {
       continue;
 
     if (h->type!=bfd_link_hash_defined) 
-      FEerror("Undefined symbol",0);
+      FEerror("Undefined symbol ~S",1,make_simple_string(q[u]->name));
       
     if (h->u.def.section) {
       q[u]->value=h->u.def.value+h->u.def.section->vma;
