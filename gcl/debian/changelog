@@ -1,8 +1,9 @@
 gclcvs (2.7.0-12) unstable; urgency=low
 
   * Fix sh syntax in debian/gcl.sh
+  * init_or_load1 -> gcl_init_or_load1 in xgcl-2/sysinit.lsp
 
- -- Camm Maguire <camm@intech.m.enhanced.com>  Sat, 18 Oct 2003 22:21:01 -0400
+ -- Camm Maguire <camm@intech.m.enhanced.com>  Sat, 18 Oct 2003 22:21:51 -0400
 
 gclcvs (2.7.0-11) unstable; urgency=low
 

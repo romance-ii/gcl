@@ -31,7 +31,7 @@
 ;;define a function USER::USER-INIT, which will run the init code for a set
 ;;of files which are linked into an image.
 
-(clines "#define init_or_load(fn,file) do {extern void fn(void); init_or_load1(fn,file);}  while(0)")
+(clines "#define init_or_load(fn,file) do {extern void fn(void); gcl_init_or_load1(fn,file);}  while(0)")
 (clines "static void")
 (clines "load1(char *x) {")
 (clines "printf(\"loading %s\\n\",x);")
