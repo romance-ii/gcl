@@ -10,7 +10,7 @@
 
 struct lsymbol_table tab;
 
-int main(int argc,char *argv[])
+int main(int argc,char *argv[],char **envp)
 {
     char buf[1000];
     char *in = argv[1];

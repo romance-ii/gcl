@@ -28,8 +28,9 @@ gclcvs (2.7.0-25) unstable; urgency=low
   * reenable SA_SIGINFO on amd64 to restore SGC there
   * Include elf.h in FreeBSD.h
   * Allow for elf_abi.h in FreeBSD.h
+  * Add envp arg to main in rsym_nt.c
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 12 Jun 2004 16:28:40 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 12 Jun 2004 16:31:32 +0000
 
 gclcvs (2.7.0-24) unstable; urgency=low
 
