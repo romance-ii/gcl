@@ -4,19 +4,19 @@
 
 LBINDIR=/usr/local/bin
 
-OFLAG	= -pipe -O2 
-CFLAGS	= -fwritable-strings -fomit-frame-pointer -DVOL=volatile -I$(GCLDIR)/o -I/usr/local/lib/gcl-2.0/h -fsigned-char -I/usr/local/lib
-LIBS    = -lm -L/usr/local/lib
-ODIR_DEBUG=
+#OFLAG	= -pipe -O2 
+#CFLAGS	= -fwritable-strings -fomit-frame-pointer -DVOL=volatile -I$(GCLDIR)/o -I/usr/local/lib/gcl-2.0/h -fsigned-char -I/usr/local/lib
+#LIBS    = -lm -L/usr/local/lib
+#ODIR_DEBUG=
 NULLFILE=../h/twelve_null
 
 # This CC string will be used for compilation of the system,
 # and also in the compiler::*cc* variable for later compilation of
 # lisp files.
 
-CC = gcc
+#CC = gcc
 
-LDCC = $(CC) -static
+#LDCC = $(CC) -static
 
 #  Use the mp.s file on 68k machine 
 MPFILES= $(MPDIR)/mpi-386.o $(MPDIR)/libmport.a
