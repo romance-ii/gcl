@@ -597,6 +597,7 @@ EXTER object sLcommon,sLnull,sLcons,sLlist,sLsymbol,sLarray,sLvector,sLbit_vecto
 EXTER object sLsequence,sLsimple_array,sLsimple_vector,sLsimple_bit_vector,sLsimple_string;
 EXTER object sLcompiled_function,sLpathname,sLcharacter,sLnumber,sLrational,sLfloat,sLstring_char;
 EXTER object sLinteger,sLratio,sLshort_float,sLstandard_char,sLfixnum,sLpositive_fixnum, sLcomplex;
+EXTER object sLpositive_short,sLpositive_char;
 EXTER object sLsingle_float,sLpackage,sLbignum,sLrandom_state,sLdouble_float,sLstream,sLbit,sLreadtable;
 EXTER object sLlong_float,sLhash_table,sLstructure,sLboolean,sLfile_stream;
 

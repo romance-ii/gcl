@@ -366,7 +366,7 @@
   (dolist (v slot-descriptions)
 	  (when (and v (car v))
 		(setf type 
-		      (best-array-element-type (caddr v))
+		      (or (best-array-element-type (caddr v)) t)
 		      (caddr v) type)
 		(let ((val (second v)))
 		  (unless (typep val type)

@@ -297,7 +297,7 @@ enum aelttype {			/*  array element type  */
 	aet_sf,			/*  short-float  */
 	aet_lf,			/*  plong-float  */
 	aet_char,               /* signed char */
-        aet_uchar,               /* unsigned char */
+        aet_uchar,              /* unsigned char */
 	aet_short,              /* signed short */
 	aet_ushort,             /*  unsigned short   */
 	aet_last

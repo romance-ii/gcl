@@ -64,9 +64,17 @@
 ;;; Some DEFTYPE definitions.
 (deftype fixnum ()
   `(integer ,most-negative-fixnum ,most-positive-fixnum))
+(deftype positive-fixnum ()
+  `(integer 0 ,most-positive-fixnum))
+(deftype fixnum ()
+  `(integer ,most-negative-fixnum ,most-positive-fixnum))
 (deftype bit () '(integer 0 1))
 (deftype mod (n)
   `(integer 0 ,(1- n)))
+(deftype positive-byte (&optional s)
+  (if (eq s '*)
+      `(integer * *)
+      `(integer 0 ,(1- (expt 2 (1- s))))))
 (deftype signed-byte (&optional s)
   (if (eq s '*)
       `(integer * *)
@@ -75,8 +83,10 @@
   (if (eq s '*)
       `(integer 0 *)
       `(integer 0 ,(1- (expt 2 s)))))
+(deftype positive-char () `(positive-byte ,char-size))
 (deftype signed-char ()`(signed-byte ,char-size))
 (deftype unsigned-char ()`(unsigned-byte ,char-size))
+(deftype positive-short () `(positive-byte ,short-size))
 (deftype signed-short ()`(signed-byte ,short-size))
 (deftype unsigned-short ()`(unsigned-byte ,short-size))
 
@@ -165,7 +175,7 @@
       (setq tp type i nil)
       (setq tp (car type) i (cdr type)))
   (if (eq tp 'structure-object) (setq tp 'structure))
-  (let ((f (get tp 'type-predicate)))
+  (let ((f (and (not i) (get tp 'type-predicate))))
     (when f (return-from typep (funcall f object))))
   (case tp
     (member (member object i))
@@ -293,7 +303,9 @@
   (if (or (equal (string type) "ERROR")
 	  (member type
                   '(t nil boolean null symbol keyword atom cons list sequence
-		      signed-char unsigned-char signed-short unsigned-short
+		      positive-char negative-char signed-char unsigned-char
+		      positive-short negative-short signed-short unsigned-short
+		      positive-fixnum negative-fixnum
 		      number integer bignum rational ratio float method-combination
 		      short-float single-float double-float long-float complex
 		      character standard-char string-char real 
@@ -317,13 +329,21 @@
       t
       nil))
 
+(defun implicit-symbol (x)
+  (cond ((symbolp x) x)
+	((consp x)
+	 (let ((is (car x)))
+	   (when (symbolp is)
+	     (dolist (y (cdr x) is)
+	       (unless (or (eq y t) (eq y '*))
+		 (return-from implicit-symbol nil))))))))
 
 ;;; SUBTYPEP predicate.
 (defun subtypep (type1 type2 &optional env &aux t1 t2 i1 i2 ntp1 ntp2 tem)
   (declare (ignore env))
   (let* ((c1 (classp type1)) (c2 (classp type2)) 
-	(t1 (if c1 type1 (when (symbolp type1) (find-class type1 nil))))
-	(t2 (if c2 type2 (when (symbolp type2) (find-class type2 nil)))))
+	(t1 (if c1 type1 (let ((nt (implicit-symbol type1))) (and nt (find-class nt nil)))))
+	(t2 (if c2 type2 (let ((nt (implicit-symbol type2))) (and nt (find-class nt nil))))))
     (when (and t1 t2)
       (return-from subtypep 
 		   (if (member t2 (class-precedence-list t1))
@@ -336,22 +356,20 @@
   (setq type2 (if (eq (car t2) 'satisfies) (list type2) t2))
 ;  (setq type1 (normalize-type type1))
 ;  (setq type2 (normalize-type type2))  
-  (when (equal type1 type2)
-    (return-from subtypep (values t t)))
   (setq t1 (car type1) t2 (car type2))
-  (setq i1 (cdr type1) i2 (cdr type2))
+  (setq i1 (effective-range t1 (cdr type1)) i2 (effective-range t2 (cdr type2)))
   (cond ((eq t1 'member)
          (dolist (e i1)
            (unless (typep e type2) (return-from subtypep (values nil t))))
          (return-from subtypep (values t t)))
         ((eq t1 'or)
          (dolist (tt i1)
-           (multiple-value-bind (tv flag) (subtypep tt type2)
+           (multiple-value-bind (tv flag) (subtypep tt (if i2 type2 t2))
              (unless tv (return-from subtypep (values tv flag)))))
          (return-from subtypep (values t t)))
         ((eq t1 'and)
          (dolist (tt i1)
-           (let ((tv (subtypep tt type2)))
+           (let ((tv (subtypep tt (if i2 type2 t2))))
              (when tv (return-from subtypep (values t t)))))
          (return-from subtypep (values nil nil)))
         ((eq t1 'not)
@@ -364,22 +382,38 @@
          (return-from subtypep (values nil nil)))
         ((eq t2 'or)
          (dolist (tt i2)
-           (let ((tv (subtypep type1 tt)))
+           (let ((tv (subtypep (if i1 type1 t1) tt)))
              (when tv (return-from subtypep (values t t)))))
          (return-from subtypep (values nil nil)))
         ((eq t2 'and)
          (dolist (tt i2)
-           (multiple-value-bind (tv flag) (subtypep type1 tt)
+           (multiple-value-bind (tv flag) (subtypep (if i1 type1 t1) tt)
              (unless tv (return-from subtypep (values tv flag)))))
          (return-from subtypep (values t t)))
         ((eq t2 'not)
 	 (return-from subtypep (subtypep `(and ,type1 ,(car i2)) nil))))
 	
+  (when (equal type1 type2)
+    (return-from subtypep (values t t)))
   (setq ntp1 (known-type-p type1) ntp2 (known-type-p type2))
-  (cond	((or (eq t1 'nil) (eq t2 't) (eq t2 'common)) (values t t))
-       	((eq t2 'nil) (values nil ntp1))
+  (cond	((or (eq t1 'nil) (eq t2 't) (eq t2 'common)
+	     (and (eq t1 'cons) (or (and i1 (not (car i1))) (and (cdr i1) (not (cadr i1))))))
+	 (values t t))
+       	((eq t2 'nil) (values (eq t1 'extended-char) ntp1))
        	((eq t1 't) (values nil ntp2))
        	((eq t1 'common) (values nil ntp2))
+	((eq t2 'cons)
+	 (cond ((eq t1 'cons)
+		(macrolet ((ct (f x)
+			       (let ((tmp (gensym)))
+				 `(let ((,tmp (,f ,x)))
+				    (cond ((eq ,tmp '*) t)
+					  ((null ,tmp) t)
+					  (t ,tmp))))))
+		  (return-from subtypep (values (and (subtypep (ct car i1) (ct car i2))
+						     (subtypep (ct cadr i1) (ct cadr i2))) t))))
+	       (t
+		(values nil ntp1))))
        	((eq t2 'list)
        	 (cond ((member t1 '(null cons)) (values t t))
        	       (t (values nil ntp1))))
@@ -579,20 +613,20 @@
 	    (if (member t2 '(character string-char))
 	        (values t t)
 	        (values nil ntp2)))
-       	   (extended-char
-	    (if (member t2 '(character string-char))
+       	   (string-char
+	    (if (member t2 '(character base-char))
 	        (values t t)
 	        (values nil ntp2)))
-	   (string-char
+       	   (extended-char
 	    (if (eq t2 'character)
 	        (values t t)
 	        (values nil ntp2)))
 	   (character
-	    (if (eq t2 'string-char)
+	    (if (member t2 '(string-char base-char))
 	        (values t t)
 	        (values nil ntp2)))
 	   (integer
-	    (if (member t2 '(integer rational))
+	    (if (member t2 '(integer rational bignum))
 		(values (sub-interval-p i1 i2) t)
 		(values nil ntp2)))
 	   (rational
@@ -615,50 +649,41 @@
 	    (if (eq t2 'complex)
 		(subtypep (or (car i1) t) (or (car i2) t))
 	        (values nil ntp2)))
-	   (simple-array
-	    (cond ((or (eq t2 'simple-array) (eq t2 'array))
-	           (if (or (endp i1) (eq (car i1) '*))
-	               (unless (or (endp i2) (eq (car i2) '*))
-	                       (return-from subtypep (values nil t)))
-	               (unless (or (endp i2) (eq (car i2) '*))
-	                       (unless (or (equal (car i1) (car i2))
-					   ; FIXME
-					   (and (eq (car i1) 'base-char)
-						(eq (car i2) 'string-char)))
-	                               ;; Unless the element type matches,
-	                               ;;  return NIL T.
-	                               ;; Is this too strict?
-	                               (return-from subtypep
-	                                            (values nil t)))))
-	           (when (or (endp (cdr i1)) (eq (cadr i1) '*))
-		         (if (or (endp (cdr i2)) (eq (cadr i2) '*))
-		             (return-from subtypep (values t t))
-		             (return-from subtypep (values nil t))))
-		   (when (or (endp (cdr i2)) (eq (cadr i2) '*))
-		         (return-from subtypep (values t t)))
-		   (values (match-dimensions (cadr i1) (cadr i2)) t))
-	          (t (values nil ntp2))))
-	   (array
-	    (cond ((eq t2 'array)
-	           (if (or (endp i1) (eq (car i1) '*))
-	               (unless (or (endp i2) (eq (car i2) '*))
-	                       (return-from subtypep (values nil t)))
-	               (unless (or (endp i2) (eq (car i2) '*))
-	                       (unless (or (equal (car i1) (car i2))
-					   ; FIXME
-					   (and (eq (car i1) 'base-char)
-						(eq (car i2) 'string-char)))
-	                               (return-from subtypep
-	                                            (values nil t)))))
-	           (when (or (endp (cdr i1)) (eq (cadr i1) '*))
-		         (if (or (endp (cdr i2)) (eq (cadr i2) '*))
-		             (return-from subtypep (values t t))
-		             (return-from subtypep (values nil t))))
-		   (when (or (endp (cdr i2)) (eq (cadr i2) '*))
-		         (return-from subtypep (values t t)))
-		   (values (match-dimensions (cadr i1) (cadr i2)) t))
+	   ((simple-array array)
+	    (cond ((or (eq t1 t2) (eq t2 'array))
+		   (macrolet ((ty (x) (let ((tmp (gensym)))
+					`(or (not ,x)
+					     (let ((,tmp (car ,x)))
+					       (or (eq ,tmp '*) ,tmp)))))
+			      (di (x) (let ((tmp (gensym)))
+					`(or (not (cdr ,x))
+					     (let ((,tmp (cadr ,x)))
+					       (or (eq ,tmp '*)
+						   (and (consp ,tmp) ,tmp)
+						   (and (integerp ,tmp)
+							(make-list ,tmp :initial-element '*))))))))
+		   (let* ((at1 (ty i1))
+			  (at2 (ty i2))
+			  (at2 (or (and (eq at2 'string-char) 'character) at2)))
+		     (unless (equal at1 at2)
+		       (return-from subtypep (values nil t))))
+		   (let ((ad1 (di i1))
+			 (ad2 (di i2)))
+		     (when (eq ad2 t)
+		       (return-from subtypep (values t t)))
+		     (when (eq ad1 t)
+		       (return-from subtypep (values nil t)))
+		     (values (match-dimensions ad1 ad2) t))))
 	          (t (values nil ntp2))))
 	   (t (if ntp1 (values (eq t1 t2) t) (values nil nil)))))))
+
+(defun effective-range (tp i)
+  (unless (member tp '(integer bignum))
+    (return-from effective-range i))
+  (let (r d)
+    (dolist (j i (nreverse r))
+      (push (if (consp j) (if d (1- (car j)) (1+ (car j))) j) r)
+      (setq d t))))
 
 
 (defun sub-interval-p (i1 i2)
@@ -723,13 +748,14 @@
     (return-from in-interval-p t)))
 
 (defun match-dimensions (dim pat)
-  (if (null dim)
-      (null pat)
-      (and (or (eq (car pat) '*)
-	       (eql (car dim) (car pat)))
-	   (match-dimensions (cdr dim) (cdr pat)))))
-
-
+  (cond ((null dim)
+	 (null pat))
+	((not (consp dim))
+	 (eql dim pat))
+	(t 
+	 (and (or (eq (car pat) '*)
+		  (eql (car dim) (car pat)))
+	      (match-dimensions (cdr dim) (cdr pat))))))
 
 ;;; COERCE function.
 (defun coerce (object type)

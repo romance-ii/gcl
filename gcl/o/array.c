@@ -462,6 +462,12 @@ DEFUN_NEW("GET-AELTTYPE",object,fSget_aelttype,SI,1,1,NONE,OO,OO,OO,OO,(object x
       return make_fixnum((enum aelttype) i);
   if (x == sLlong_float || x == sLsingle_float || x == sLdouble_float)
     return make_fixnum(aet_lf);
+  if (x==sLpositive_char)
+    return make_fixnum(aet_char);
+  if (x==sLpositive_short)
+    return make_fixnum(aet_short);
+  if (x==sLpositive_fixnum)
+    return make_fixnum(aet_fix);
   return make_fixnum(aet_object);
 }
 #ifdef STATIC_FUNCTION_POINTERS

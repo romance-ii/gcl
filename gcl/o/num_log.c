@@ -203,16 +203,17 @@ count_bits(object x)
 
 
 object
-shift_integer(object x, int w)
-{ 
-  if (type_of(x) == t_fixnum)
-    { if (w <= 0)
-      {   w = -w;
-	  if (w >= WSIZ) return small_fixnum(fix(x) < 0 ? -1 :0);
-	  else
-	return make_fixnum (fix(x) >> (w));}
-    MPOP(return, shifti,SI_TO_MP(fix(x),big_fixnum1),w);
+shift_integer(object x, int w) { 
+  if (type_of(x) == t_fixnum) { 
+    if (w <= 0){   
+      w = -w;
+      if (w >= WSIZ || w<0 /*most-negative-fixnum*/) 
+	return small_fixnum(fix(x) < 0 ? -1 :0);
+      else
+	return make_fixnum (fix(x) >> (w));
     }
+    MPOP(return, shifti,SI_TO_MP(fix(x),big_fixnum1),w);
+  }
   else
     if (type_of(x) == t_bignum) {
       MPOP(return,shifti,MP(x),w);

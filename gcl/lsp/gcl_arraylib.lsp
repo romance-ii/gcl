@@ -43,16 +43,14 @@
 (proclaim '(optimize (safety 2) (space 3)))
 
 (defun best-array-element-type (type)
-  (cond ((or (eql t type) (null type))
-	 t)
+  (cond ((null type) nil)
+	((eql t type) t)
 	((memq type '(bit unsigned-char signed-char
 				    unsigned-short
 				    signed-short fixnum))
 	       type)
 	((subtypep type 'fixnum)
-	 (dolist (v '(bit unsigned-char signed-char
-				    unsigned-short
-				    signed-short)
+	 (dolist (v '(bit positive-char signed-char unsigned-char positive-short signed-short unsigned-short)
 		    'fixnum)
 		 (cond ((subtypep type v)
 			(return v)))))

@@ -20,8 +20,9 @@ gclcvs (2.7.0-32) unstable; urgency=low
     results for negative reals and to preserve precision, precision
     corrections in number_atan2, fix inverse trig, sqrt, and all floor
     related ansi tests
+  * subtypep, upgraded array-element-type and ash ansi fixes
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 25 Aug 2004 03:09:25 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 25 Aug 2004 22:47:44 +0000
 
 gclcvs (2.7.0-31) unstable; urgency=high
 
