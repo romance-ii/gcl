@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-6) unstable; urgency=high
+
+  * cvs updates for arm build
+
+ -- Camm Maguire <camm@enhanced.com>  Tue,  9 Jul 2002 16:09:26 -0400
+
 gcl (2.5.0.cvs20020625-5) unstable; urgency=high
 
   * CC environment variable setting in debian/rules to aid in porting
