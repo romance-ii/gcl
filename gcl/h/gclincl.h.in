@@ -162,6 +162,8 @@
 /*  #define PAGESIZE (1<<PAGEWIDTH) */
 /*  #endif */
 
+#undef USE_DLOPEN
+
 /* The number of bytes in a long *.  */
 #undef SIZEOF_LONG_P
 

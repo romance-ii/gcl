@@ -1764,3 +1764,6 @@ read_special_symbols(char *);
 int
 node_compare(const void *,const void *);
 #endif
+
+void
+unlink_loaded_files(void);

@@ -213,3 +213,5 @@ SGC is enabled.  */
 /*  #endif */
 
 #undef SIZEOF_LONG_P
+
+#undef USE_DLOPEN

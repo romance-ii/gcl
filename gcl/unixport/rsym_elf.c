@@ -10,6 +10,7 @@ This information will be used for relocation.
 to compile use cc rsym.c -o rsym  -I../h
 */
 
+#include <stdlib.h>
 #include <string.h>
 #ifdef __linux__
 /* Needed these to get it working with Linux.  Bill Metzenthen 23 May 95 */
@@ -40,7 +41,7 @@ char *my_string_table;
 char *start_address;
 int symbol_index;
 
-static void get_myself();
+static void get_myself(char *);
 
 #ifdef RSYM_AUX
 #include RSYM_AUX
@@ -66,6 +67,8 @@ int debug =0;
 /*  this program will get the external symbols from a file writing
 them out to a file together with their addresses */
 static char *outfile;
+int
+output_externals(char *);
 
 int
 main(argc,argv)
@@ -130,7 +133,6 @@ char *filename;
 {
 	unsigned int i;
 	FILE *fp;
-	int string_size=0;
 	int symsize;
 	extern char *malloc();
 	

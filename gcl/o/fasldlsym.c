@@ -21,13 +21,18 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 #include <string.h>
+#include <stdlib.h>
 #include <dlfcn.h>
+#include <sys/param.h>
+#include <time.h>
 #ifdef HAVE_AOUT
 #include HAVE_AOUT
 #endif
 #ifdef HAVE_ELF
 #include <elf.h>
 #endif
+
+#include "ptable.h"
 
 /* cc -DVOL=volatile -G 0 -c foo.c ; ld  -shared foo.o -o jim.o ; cat foo.data >> jim.o */
 int did_a_dynamic_load;
@@ -38,14 +43,13 @@ struct name_list
 } ;
 static struct name_list *loaded_files;
 
-  
+void  
 get_init_name(faslfile,init_fun)
      object faslfile;
      char *init_fun;
 {
   object path = coerce_to_pathname(faslfile);
   char *p;
-  int n;
   strcpy(init_fun,"init_");
   coerce_to_filename(path->pn.pn_name,init_fun+5);
   p = init_fun +5;
@@ -54,12 +58,13 @@ get_init_name(faslfile,init_fun)
      p++;}
 }
 
+int
 fasload(faslfile)
      object faslfile;
 { void *dlp ;
   int (*fptr)();
   char buf[200];
-  static count=0;
+  static int count=0;
   object memory;
   object data;
   char filename[MAXPATHLEN];
@@ -79,7 +84,8 @@ fasload(faslfile)
     strcpy(nl->name,buf);
   }
   faslstream = open_stream(faslfile, smm_input, Cnil, sKerror);
-#define MAKE_SHARED_LIB  
+/*  #define MAKE_SHARED_LIB   */
+#undef MAKE_SHARED_LIB
 #ifdef MAKE_SHARED_LIB
   { struct filehdr fhdr;
     fread(&fhdr,1,sizeof(fhdr),faslstream->sm.sm_fp);
@@ -92,10 +98,17 @@ fasload(faslfile)
       }
   }
 #endif
-  
+  {
+    char com[600];
+    snprintf(com,sizeof(com),"ld -shared %s -o %s",filename,buf);
+    system(com);
+  }
+
   dlp = dlopen(buf,RTLD_NOW);
-  if (dlp ==0)
+  if (dlp ==0) {
+    fputs(dlerror(),stderr);
     FEerror("Cant open for dynamic link ~a",1,make_simple_string(faslfile));
+  }
   
   fptr = (int (*)())dlsym(dlp, "init_code");
   if (fptr == 0)
@@ -113,17 +126,19 @@ fasload(faslfile)
   memory->cfd.cfd_start = NULL;
   memory->cfd.cfd_size = 0;
   if(symbol_value(sLAload_verboseA)!=Cnil)	
-    printf(" start address (dynamic) 0x%x ",fptr);
+    printf(" start address (dynamic) %p ",fptr);
   call_init(0,memory,data,fptr);
   unlink(buf);
   did_a_dynamic_load = 1;
   return memory->cfd.cfd_size;
 }
 
-unlink_loaded_files()
+void
+unlink_loaded_files(void)
 { while(loaded_files)
     { unlink(loaded_files->name);
       loaded_files= loaded_files->next;
     }
 }
   
+#include "sfasli.c"

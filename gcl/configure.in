@@ -2,10 +2,254 @@ AC_INIT()
 AC_CONFIG_HEADER(h/gclincl.h)
 # some parts of this configure script are taken from the tcl configure.in
 
+#
+# Arguments
+#
+
+help="--enable-maxpage=XXXX will compile in a page table of size XXX (default ${default_maxpage})"
+AC_ARG_ENABLE(maxpage,[ --enable-maxpage=XXXX will compile in a page table of size XXX (eg '--enable-maxpage=64*1024' would give 64K pages allowing 256 MB if pages are 4K each)] ,
+[AC_DEFINE_UNQUOTED(MAXPAGE,$enable_maxpage)]
+)
+
+AC_ARG_ENABLE(vssize,[ --enable-vssize=XXXX will compile in a value stack of size XXX] ,
+[AC_DEFINE_UNQUOTED(VSSIZE,$enable_vssize)]
+)
+
+AC_ARG_ENABLE(machine,[ --enable-machine=XXXX will force the use of one of the definitions in h/XXXX.defs] ,
+[enable_machine=$enableval],[enable_machine=""])
+
+AC_ARG_ENABLE(gmp,[ --enable-gmp=no will disable use of GMP gnu multiprecision arithmetic, (default is =yes)] ,
+[use_gmp=$enableval],[use_gmp="yes"])
+
+AC_ARG_ENABLE(notify,[ --enable-notify=no will disable the automatic notification of gcl maintainers of successful builds/problems] ,
+[enable_notify=$enableval],[enable_notify="yes"])
+
+AC_ARG_ENABLE(tkconfig,[ --enable-tkconfig=XXXX will force the use of a TK_CONFIG_PREFIX=XXXXX as place to look for tkConfig.sh and tclConfig.sh ] ,
+[TK_CONFIG_PREFIX=$enableval],[TK_CONFIG_PREFIX="unknown"])
+
+
+AC_ARG_ENABLE(tclconfig,[ --enable-tclconfig=XXXX will force the use of a TCL_CONFIG_PREFIX=XXXXX as place to look for tclConfig.sh and tclConfig.sh ] ,
+[TCL_CONFIG_PREFIX=$enableval],[TCL_CONFIG_PREFIX="unknown"])
+
+AC_ARG_ENABLE(infodir,[ --enable-infodir=XXXX will force the use of a INFO_DIR=XXXXX as place to look for info ] ,
+[INFO_DIR=$enableval],[INFO_DIR="unknown"])
+
+AC_ARG_ENABLE(dlopen,
+	[ --enable-dlopen uses dlopen for loading objects, which can then not be retained  in saved images ] ,,enable_dlopen="no")
+AC_ARG_ENABLE(bfd,
+	[ --disable-bfd prevents gcl from using libbfd.a for fast object loading and symbol table lookups ] ,,enable_bfd="yes")
+
+#
+# Host information 
+#
+
+
+AC_CANONICAL_HOST
+canonical=$host
+## host=CPU-COMPANY-SYSTEM
+AC_MSG_RESULT(host=$host)
+
+use=unknown
+case $canonical in
+     older)
+     use=386-bsd;;
+
+     *86*linux*)
+	use=386-linux;;
+
+     m68k*linux*)
+     	use=m68k-linux;;
+
+     alpha*linux*)
+     	use=alpha-linux;;
+
+     mips*linux*)
+     	use=mips-linux;;
+
+     mipsel*linux*)
+     	use=mipsel-linux;;
+
+     sparc*linux*)
+     	use=sparc-linux;;
+
+     arm*linux*)
+     	use=arm-linux;;
+
+     s390*linux*)
+     	use=s390-linux;;
+
+     ia64*linux*)
+     	use=ia64-linux;;
+
+     hppa*linux*)
+     	use=hppa-linux;;
+
+     powerpc*linux*)
+     	use=powerpc-linux;;
+
+     alpha-dec-osf)
+     use=alpha-osf1;;
+
+     mips-dec-ultrix)
+     use=dec3100;;
+
+     old)
+     use=dos-go32;;
+
+     *86*-freebsd)
+     use=FreeBSD;;
+
+     hp3*-*hpux*)
+     use=hp300;;
+
+     hp3*-*-*bsd*)
+     use=hp300-bsd;;
+
+     hppa*-*hpux*)
+     use=hp800;;
+
+     mips-sgi-irix)
+       case $system in
+           IRIX5*)
+            use=irix5;;
+           IRIX6*)
+            use=irix6;;
+           IRIX3*)
+            use=sgi4d;;
+       esac ;;
+ 
+
+     m68k-apple-aux*)
+     use=mac2;;
+
+     old)
+     use=mp386;;
+
+     *86-ncr-sysv4)
+     use=ncr;;
+
+     *[3-9]86-*netbsd*)
+     use=NetBSD;;
+
+     old)
+     use=NeXT;;
+
+     old)
+     use=NeXT30-m68k;;
+
+     *86-*nextstep*)
+     use=NeXT32-i386;;
+
+     *m68*-*nextstep*)
+     use=NeXT32-m68k;;
+
+     *rs6000-*-aix4*)
+     use=rios;;
+
+     *rs6000-*-aix3*)
+     use=rios-aix3;;
+
+     old)
+     use=rt_aix;;
+
+     old)
+     use=sgi;;
+
+     sparc-sun-solaris*)
+     use=solaris;;
+
+     i?86-pc-solaris*)
+     use=solaris-i386;;
+
+     old)
+     use=sun2r3;;
+
+     old)
+     use=sun3;;
+
+     m68*-sunos*)
+     use=sun3-os4;;
+
+     old)
+     use=sun386i;;
+
+     sparc*sunos*)
+     use=sun4;;
+
+     *86-sequent-dynix)
+     use=symmetry;;
+
+     u370*aix)
+     use=u370_aix;;
+
+     old)
+     use=vax;;
+
+     i*cygwin*)
+	if $CC -v 2>&1 | fgrep ming > /dev/null ;
+            then use=mingw
+          else  use=gnuwin95
+        fi;;
+  
+
+esac
+
+echo enable_machine=$enable_machine
+if test "x$enable_machine" != "x" ; then
+  use=$enable_machine
+fi
+
+EXTRA_CFLAGS=""
+case $use in 
+     *linux)
+	ln -snf linux.defs h/$use.defs;
+	case $use in
+		alpha*)
+			EXTRA_CFLAGS=-mieee; 
+			enable_dlopen="yes" ;;
+		mips*)
+			enable_dlopen="yes" ;;
+		ia64*)
+			enable_dlopen="yes" ;;
+		hppa*)
+			enable_dlopen="yes" ;;
+	esac;;
+esac
+
+## finally warn if we did not find a recognized machine.s
+##
+#if test "$use" = "unknown" ; then
+#types=`echo h/*.defs` | sed -e "s:h/::g" -e "s:\.defs:g"`
+#echo got canonical=$canonical, but was not recognized. 
+#echo Unable to guess type to use.  Try one of 
+#exit(1)
+#fi
+
+AC_MSG_RESULT(use=$use)	
+
+
+#
+# System programs
+#
+
+
+AC_PROG_CC
+AC_PROG_CPP
+# can only test for numbers -- CM
+# if test "${GCC}" -eq "yes" ; then
+if [[ "${GCC}" = "yes" ]] ; then
+# Allog for environment variable overrides on compiler selection -- CM
+GCC=$CC
+else
+GCC=""
+fi
+# subst GCC not only under 386-linux, but where available -- CM
+AC_SUBST(GCC)
+
+
 # Step 1: set the variable "system" to hold the name and version number
 # for the system.  This can usually be done via the "uname" command, but
 # there are a few systems, like Next, where this doesn't work.
-
 
 AC_MSG_CHECKING([system version (for dynamic loading)])
 if machine=`uname -m` ; then true; else machine=unknown ; fi
@@ -36,21 +280,62 @@ else
     fi
 fi
 
+
+
+#
+# Dynamic loading
+#
+
+if test "$enable_dlopen" = "yes" ; then
+
+	AC_CHECK_LIB(dl,dlopen,have_dl=1,have_dl=0)
+	if test "$have_dl" = "0" ; then
+		echo "Cannot find dlopen in -dl"
+		exit 1
+	fi
+
+	LIBS="$LIBS -ldl -rdynamic"
+	AC_DEFINE(USE_DLOPEN)
+
+else	
+
+	if test "$enable_bfd" = "yes" ; then
+		AC_CHECK_HEADER(bfd.h,
+			AC_CHECK_LIB(bfd,bfd_init,
+				echo 'int main() {bfd_init();bfd_openr("/dev/null",0);return 0;}' >foo.c
+				MP=`$GCC [[ -Wl,-M ]] -static -o foo foo.c -lbfd -liberty 2>&1 | tr '()' '\012\012' | $AWK '{print $NF}' | sort | uniq`
+				rm -f foo.c foo
+				BFDLIB=`echo $MP | tr ' ' '\012' | grep libbfd.a`
+				IBRLIB=`echo $MP | tr ' ' '\012' | grep libiberty.a`
+	#
+	# Old binutils appear to need CONST defined to const
+	#
+				AC_MSG_CHECKING(if need to define CONST for bfd)
+				AC_TRY_RUN([#define IN_GCC
+					    #include <bfd.h>
+					    int main() { symbol_info t; return 0;}],
+					AC_MSG_RESULT(no)
+					AC_DEFINE(HAVE_LIBBFD)
+					LIBS="$LIBS  $BFDLIB $IBRLIB",
+					AC_TRY_RUN([#define IN_GCC
+						    #include <bfd.h>
+	                                            #define CONST const
+						    int main() {symbol_info t; return 0;}],
+						AC_MSG_RESULT(yes) 
+						AC_DEFINE(NEED_CONST)
+						AC_DEFINE(HAVE_LIBBFD)
+						LIBS="$LIBS  $BFDLIB $IBRLIB",
+						AC_MSG_RESULT(cannot use bfd),AC_MSG_RESULT(cannot use bfd)),
+					AC_MSG_RESULT(cannot use bfd))
+						
+				,,-liberty))
+	fi
+
+fi
+
 # Find where Data begins.  This is used by the storage allocation
 # mechanism, in the PAGE macro.  This offset is subtracted from
 # addresses, in calculating a page for an address in the heap.
-
-AC_PROG_CC
-# can only test for numbers -- CM
-# if test "${GCC}" -eq "yes" ; then
-if [[ "${GCC}" = "yes" ]] ; then
-# Allog for environment variable overrides on compiler selection -- CM
-GCC=$CC
-else
-GCC=""
-fi
-# subst GCC not only under 386-linux, but where available -- CM
-AC_SUBST(GCC)
 
 AC_CHECK_SIZEOF(long *,0)
 
@@ -141,44 +426,7 @@ AC_MSG_RESULT($PAGEWIDTH)
 AC_DEFINE_UNQUOTED(PAGEWIDTH,$PAGEWIDTH)
 AC_SUBST(PAGEWIDTH)
 
-# bfd probe
-
-AC_ARG_ENABLE(bfd,
-	[ --disable-bfd prevents gcl from using libbfd.a for fast object loading and symbol table lookups ] ,,
-	enable_bfd="yes")
-
-
 # Maximum number of pages
-
-help="--enable-maxpage=XXXX will compile in a page table of size XXX (default ${default_maxpage})"
-AC_ARG_ENABLE(maxpage,[ --enable-maxpage=XXXX will compile in a page table of size XXX (eg '--enable-maxpage=64*1024' would give 64K pages allowing 256 MB if pages are 4K each)] ,
-[AC_DEFINE_UNQUOTED(MAXPAGE,$enable_maxpage)]
-)
-
-AC_ARG_ENABLE(vssize,[ --enable-vssize=XXXX will compile in a value stack of size XXX] ,
-[AC_DEFINE_UNQUOTED(VSSIZE,$enable_vssize)]
-)
-
-AC_ARG_ENABLE(machine,[ --enable-machine=XXXX will force the use of one of the definitions in h/XXXX.defs] ,
-[enable_machine=$enableval],[enable_machine=""])
-
-AC_ARG_ENABLE(gmp,[ --enable-gmp=no will disable use of GMP gnu multiprecision arithmetic, (default is =yes)] ,
-[use_gmp=$enableval],[use_gmp="yes"])
-
-AC_ARG_ENABLE(notify,[ --enable-notify=no will disable the automatic notification of gcl maintainers of successful builds/problems] ,
-[enable_notify=$enableval],[enable_notify="yes"])
-
-AC_ARG_ENABLE(tkconfig,[ --enable-tkconfig=XXXX will force the use of a TK_CONFIG_PREFIX=XXXXX as place to look for tkConfig.sh and tclConfig.sh ] ,
-[TK_CONFIG_PREFIX=$enableval],[TK_CONFIG_PREFIX="unknown"])
-
-
-AC_ARG_ENABLE(tclconfig,[ --enable-tclconfig=XXXX will force the use of a TCL_CONFIG_PREFIX=XXXXX as place to look for tclConfig.sh and tclConfig.sh ] ,
-[TCL_CONFIG_PREFIX=$enableval],[TCL_CONFIG_PREFIX="unknown"])
-
-
-AC_ARG_ENABLE(infodir,[ --enable-infodir=XXXX will force the use of a INFO_DIR=XXXXX as place to look for info ] ,
-[INFO_DIR=$enableval],[INFO_DIR="unknown"])
-
 
 
 
@@ -308,38 +556,6 @@ if test "$enable_readline" = "yes" ; then
 		RL_LIB=lsp/readline.o,,-lncurses)
 fi
 
-if test "$enable_bfd" = "yes" ; then
-	AC_CHECK_HEADER(bfd.h,
-		AC_CHECK_LIB(bfd,bfd_init,
-			echo 'int main() {bfd_init();bfd_openr("/dev/null",0);return 0;}' >foo.c
-			MP=`$GCC [[ -Wl,-M ]] -static -o foo foo.c -lbfd -liberty 2>&1 | tr '()' '\012\012' | $AWK '{print $NF}' | sort | uniq`
-			rm -f foo.c foo
-			BFDLIB=`echo $MP | tr ' ' '\012' | grep libbfd.a`
-			IBRLIB=`echo $MP | tr ' ' '\012' | grep libiberty.a`
-#
-# Old binutils appear to need CONST defined to const
-#
-			AC_MSG_CHECKING(if need to define CONST for bfd)
-			AC_TRY_RUN([#define IN_GCC
-				    #include <bfd.h>
-				    int main() { symbol_info t; return 0;}],
-				AC_MSG_RESULT(no)
-				AC_DEFINE(HAVE_LIBBFD)
-				LIBS="$LIBS  $BFDLIB $IBRLIB",
-				AC_TRY_RUN([#define IN_GCC
-					    #include <bfd.h>
-                                            #define CONST const
-					    int main() {symbol_info t; return 0;}],
-					AC_MSG_RESULT(yes) 
-					AC_DEFINE(NEED_CONST)
-					AC_DEFINE(HAVE_LIBBFD)
-					LIBS="$LIBS  $BFDLIB $IBRLIB",
-					AC_MSG_RESULT(cannot use bfd),AC_MSG_RESULT(cannot use bfd)),
-				AC_MSG_RESULT(cannot use bfd))
-					
-			,,-liberty))
-fi
-
 AC_SUBST(LIBS)
 AC_SUBST(RL_OBJS)
 AC_SUBST(RL_LIB)
@@ -432,159 +648,6 @@ case $system in
 esac
 
 
-AC_CANONICAL_HOST
-canonical=$host
-## host=CPU-COMPANY-SYSTEM
-AC_MSG_RESULT(host=$host)
-
-use=unknown
-EXTRA_CFLAGS=""
-case $canonical in
-     older)
-     use=386-bsd;;
-
-     *86-*-linux*)
-     use=386-linux; ln -snf linux.defs h/$use.defs;;
-
-     m68k-*-linux*)
-     use=m68k-linux; ln -snf linux.defs h/$use.defs;;
-
-     alpha*-*-linux*)
-     use=alpha-linux; EXTRA_CFLAGS=-mieee; ln -snf linux.defs h/$use.defs;;
-
-     mips-*-linux*)
-     use=mips-linux; ln -snf linux.defs h/$use.defs;;
-
-     mipsel-*-linux*)
-     use=mipsel-linux; ln -snf linux.defs h/$use.defs;;
-
-     sparc*-*-linux*)
-     use=sparc-linux; ln -snf linux.defs h/$use.defs;;
-
-     arm*-*-linux*)
-     use=arm-linux; ln -snf linux.defs h/$use.defs;;
-
-     s390-*-linux*)
-     use=s390-linux; ln -snf linux.defs h/$use.defs;;
-
-     ia64-*-linux*)
-     use=ia64-linux; ln -snf linux.defs h/$use.defs;;
-
-     hppa*-*-linux*)
-     use=hppa-linux; ln -snf linux.defs h/$use.defs;;
-
-     powerpc-*-linux*)
-     use=powerpc-linux; ln -snf linux.defs h/$use.defs;;
-
-     alpha-dec-osf)
-     use=alpha-osf1;;
-
-     mips-dec-ultrix)
-     use=dec3100;;
-
-     old)
-     use=dos-go32;;
-
-     *86*-freebsd)
-     use=FreeBSD;;
-
-     hp3*-*hpux*)
-     use=hp300;;
-
-     hp3*-*-*bsd*)
-     use=hp300-bsd;;
-
-     hppa*-*hpux*)
-     use=hp800;;
-
-     mips-sgi-irix)
-       case $system in
-           IRIX5*)
-            use=irix5;;
-           IRIX6*)
-            use=irix6;;
-           IRIX3*)
-            use=sgi4d;;
-       esac ;;
- 
-
-     m68k-apple-aux*)
-     use=mac2;;
-
-     old)
-     use=mp386;;
-
-     *86-ncr-sysv4)
-     use=ncr;;
-
-     *[3-9]86-*netbsd*)
-     use=NetBSD;;
-
-     old)
-     use=NeXT;;
-
-     old)
-     use=NeXT30-m68k;;
-
-     *86-*nextstep*)
-     use=NeXT32-i386;;
-
-     *m68*-*nextstep*)
-     use=NeXT32-m68k;;
-
-     *rs6000-*-aix4*)
-     use=rios;;
-
-     *rs6000-*-aix3*)
-     use=rios-aix3;;
-
-     old)
-     use=rt_aix;;
-
-     old)
-     use=sgi;;
-
-     sparc-sun-solaris*)
-     use=solaris;;
-
-     i?86-pc-solaris*)
-     use=solaris-i386;;
-
-     sparc-*-linux*)
-     use=sparc-linux;;
-
-     old)
-     use=sun2r3;;
-
-     old)
-     use=sun3;;
-
-     m68*-sunos*)
-     use=sun3-os4;;
-
-     old)
-     use=sun386i;;
-
-     sparc*sunos*)
-     use=sun4;;
-
-     *86-sequent-dynix)
-     use=symmetry;;
-
-     u370*aix)
-     use=u370_aix;;
-
-     old)
-     use=vax;;
-
-     i*cygwin*)
-	if $CC -v 2>&1 | fgrep ming > /dev/null ;
-            then use=mingw
-          else  use=gnuwin95
-        fi;;
-  
-
-esac
 AC_MSG_CHECKING(check for SV_ONSTACK)
 AC_TRY_COMPILE([#include <signal.h>
 int joe=SV_ONSTACK;
@@ -856,7 +919,6 @@ AC_CHECK_LIB(lieee,main,have_ieee=1,have_ieee=0)
 if test "$have_ieee" = "0" ; then
  TCL_LIBS=`echo ${TCL_LIBS} | sed -e "s:-lieee::g" `
 fi
-AC_CHECK_LIB(dl,dlopen,have_dl=1,have_dl=0)
 if test "$have_dl" = "0" ; then
  TCL_LIBS=`echo ${TCL_LIBS} | sed -e "s:-ldl::g"`
 fi
@@ -889,26 +951,6 @@ fi
 
 NOTIFY=$enable_notify
 AC_SUBST(NOTIFY)
-
-
-
-
-
-echo enable_machine=$enable_machine
-if test "x$enable_machine" != "x" ; then
-  use=$enable_machine
-fi
-
-## finally warn if we did not find a recognized machine.s
-##
-#if test "$use" = "unknown" ; then
-#types=`echo h/*.defs` | sed -e "s:h/::g" -e "s:\.defs:g"`
-#echo got canonical=$canonical, but was not recognized. 
-#echo Unable to guess type to use.  Try one of 
-#exit(1)
-#fi
-
-AC_MSG_RESULT(use=$use)	
 
       
 
