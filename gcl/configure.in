@@ -164,6 +164,7 @@ AC_EGREP_HEADER(gettimeofday, sys/time.h, AC_MSG_RESULT(present), [
 
 
 AC_CHECK_LIB(m,sin,LIBS="${LIBS} -lm",true)
+AC_CHECK_LIB(mingwex,main,LIBS="${LIBS} -lmingwex",true)
 
 # Should really find a way to check for prototypes, but this 
 # basically works for now.  CM
