@@ -85,36 +85,28 @@
 
 (defun add-object (object &aux x)
   ;;; Used only during Pass 1.
-  (cond ((si:contains-sharp-comma object)
-         ;;; SI:CONTAINS-SHARP-COMMA returns T iff OBJECT
-         ;;; contains a sharp comma OR a structure.
-	 ;; there will be an eval and we want the eval to happen
-	 (cond ((and
-		 (consp object)
-		 (eq (car object) 'si::|#,|)
-		 (not (si:contains-sharp-comma (cdr object))))
-		(setq object (cdr object)))
-	       (t (setq object `(si::string-to-object
-				 ,(wt-to-string object)))))
-	 (push-data-incf nil)
-         (push (list *next-vv* object) *sharp-commas*)
-         *next-vv*)
-        ((setq x (assoc object *objects*))
-         (cadr x))
-	((typep object 'compiled-function)
-	 (push-data-incf nil)
-         (push (list *next-vv* `(function 
-				 ,(or (si::compiled-function-name
-				       object)
-				      (cmperr "Can't dump un named compiled funs")
-				      )))
-				 *sharp-commas*)
-         *next-vv*
-	 )
-        (t 
-	   (push-data-incf object)
-           (push (list object *next-vv*) *objects*)
-           *next-vv*)))
+  (let ((object1 (cond ((and 
+			 (consp object)
+			 (eq (car object) 'si::|#,|)
+			 (not (si:contains-sharp-comma (cdr object))))
+			(cdr object))
+		       ((si:contains-sharp-comma object)
+			`(si::string-to-object ,(wt-to-string object)))
+		       ((typep object 'compiled-function)
+			`(function ,(or (si::compiled-function-name object)
+					(cmperr "Can't dump un named compiled funs"))))
+		       (t object))))
+
+    (or 
+     (cadr (assoc object1 *objects*))
+     (caar (member object1 *sharp-commas* :key #'cadr :test #'equal))
+     (progn
+       (push-data-incf (if (eq object1 object) object1))
+       (if (eq object1 object)
+	   (push (list object1 *next-vv*) *objects*)
+	 (push (list *next-vv* object1) *sharp-commas*))
+       *next-vv*))))
+
 
 (defun add-constant (symbol &aux x)
   ;;; Used only during Pass 1.
