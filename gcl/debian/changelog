@@ -105,8 +105,10 @@ gclcvs (2.7.0-20) unstable; urgency=low
     (declare ((vector t) foo)), etc.
   * Better 'time macro
   * allow universe file to be loaded by 2.6.1
+  * rebuild pcl_gaz* files
+  * cleanup room report and give more space to modern large heaps
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 17:44:19 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 18:07:21 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

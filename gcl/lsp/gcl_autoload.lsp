@@ -282,8 +282,9 @@
                      (nconc a (list typename))
                      (push (list (nth nfree *type-list*) typename)
                            link-alist))))))
+    (terpri)
     (dolist (info (reverse info-list))
-      (apply #'format t "~4D/~D~10T~5,1F%~@[~3D~]~20T~{~A~^ ~}"
+      (apply #'format t "~6D/~D~12T~6,1F%~@[~6D~]~28T~{~A~^ ~}"
              (append (cdr info)
                      (if  (assoc (car info) link-alist)
                           (list (assoc (car info) link-alist))
@@ -291,18 +292,18 @@
       (terpri)
       )
     (terpri)
-    (format t "~4D/~D~16T~@[~3D~]~20Tcontiguous (~D blocks)~%"
+    (format t "~6D/~D~18T~@[~6D~]~28Tcontiguous (~D blocks)~%"
             ncbpage maxcbpage (if (zerop cbgbccount) nil cbgbccount) ncb)
-    (format t "~5T~D~20Thole~%" holepage)
-    (format t "~5T~D~10T~5,1F%~@[~3D~]~20Trelocatable~%~%"
+    (format t "~7T~D~28Thole~%" holepage)
+    (format t "~7T~D~12T~6,1F%~@[~6D~]~28Trelocatable~%~%"
             nrbpage (/ rbused 0.01 (+ rbused rbfree))
             (if (zerop rbgbccount) nil rbgbccount))
-    (format t "~5D pages for cells~%" npage)
-    (format t "~5D total pages~%" (+ npage ncbpage holepage nrbpage))
-    (format t "~5D pages available~%" leftpage)
-    (format t "~5D pages in heap but not gc'd + pages needed for gc marking~%"
+    (format t "~10D pages for cells~%" npage)
+    (format t "~10D total pages~%" (+ npage ncbpage holepage nrbpage))
+    (format t "~10D pages available~%" leftpage)
+    (format t "~10D pages in heap but not gc'd + pages needed for gc marking~%"
 	    (- maxpage (+ npage ncbpage holepage nrbpage leftpage)))
-    (format t "~5D maximum pages~%" maxpage)
+    (format t "~10D maximum pages~%" maxpage)
     (values)
     ))
 
