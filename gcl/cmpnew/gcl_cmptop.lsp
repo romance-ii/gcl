@@ -212,17 +212,18 @@
 
 ;; FIXME consider making this a macro
 (defun c-function-name (prefix num fname)
-  (let ((fname (string fname)))
-    (si::string-concatenate
-     (string prefix)
-     (write-to-string num)
-     #+gprof(si::string-concatenate
-	     "__"
-	     (dash-to-underscore fname)
-	     "__"
-	     (if *compiler-input*
-		 (dash-to-underscore (namestring *compiler-input*))
-	       "")))))
+  #-gprof (declare (ignore fname))
+  (si::string-concatenate
+   (string prefix)
+   (write-to-string num)
+   #+gprof  (let ((fname (string fname)))
+	      (si::string-concatenate
+	       "__"
+	       (dash-to-underscore fname)
+	       "__"
+	       (if *compiler-input*
+		   (dash-to-underscore (namestring *compiler-input*))
+		 "")))))
 
 (defun t1expr (form &aux (*current-form* form) (*first-error* t))
   (catch *cmperr-tag*
