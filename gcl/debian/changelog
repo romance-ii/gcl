@@ -6,8 +6,10 @@ gclcvs (2.7.0-19) unstable; urgency=low
   * Protect read/fread in case SGC is enabled with safe (restartable)
     versions
   * SGC on for arm and hppa
+  * use standard sgc fault recovery element for hppa as recommended by
+    hppa kernel experts
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 12 Feb 2004 05:25:15 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 14 Feb 2004 17:36:38 +0000
 
 gclcvs (2.7.0-18) unstable; urgency=low
 
