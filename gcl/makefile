@@ -223,7 +223,7 @@ clean:
 	rm -f xbin/gcl foo foo.c bin/gclm.bat gmp_all
 	rm -f h/*-linux.defs h/bfd.h h/bfdlink.h h/ansidecl.h h/symcat.h
 	rm -f windows/gcl.iss bin/gcl.bat windows/gcl.ansi.iss windows/install.ansi.lsp \
-		windows/install.lsp
+		windows/install.lsp windows/sysdir.bat
 	rm -rf windows/Output
 	rm -f ansi-tests/test_results ansi-tests/gazonk* \
 		ansi-tests/generated-eval-when-test-file.lisp

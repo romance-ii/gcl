@@ -13,8 +13,9 @@ gclcvs (2.7.0-18) unstable; urgency=low
     0.1*MAXPAGE (max), 0.5 (increase), 0.3 (percent free), holepage is
     4*MAXPAGE/1024, INIT_HOLEPAGE, INIT_NRBPAGE and RB_GETA scale
     accordingly
+  * Clean windows/sysdir.bat
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 12 Jan 2004 15:15:09 -0500
+ -- Camm Maguire <camm@enhanced.com>  Mon, 12 Jan 2004 15:16:56 -0500
 
 gclcvs (2.7.0-17) unstable; urgency=low
 
