@@ -627,6 +627,8 @@ FFN(Larray_displacement)(void) {
 
   s=aet_sizes[Iarray_element_type(a)];
   n=(void *)array->a.a_self-(void *)a->a.a_self;
+  if (Iarray_element_type(a)==aet_bit)
+    n=n*BV_BITS+BV_OFFSET(array);
   if (n%s)
     FEerror("Array is displaced by fractional elements",0);
 
