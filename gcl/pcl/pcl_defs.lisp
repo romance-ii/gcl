@@ -105,14 +105,14 @@
 	      (symbol-function symbol))
   #+xerox (il:virginfn symbol)
   #+setf (fdefinition symbol)
-  #+kcl (symbol-function
-	  (let ((sym (get symbol 'si::traced)) first-form)
-	    (if (and sym
-		     (consp (symbol-function symbol))
-		     (consp (setq first-form (nth 3 (symbol-function symbol))))
-		     (eq (car first-form) 'si::trace-call))
-		sym
-		symbol)))
+;  #+kcl (symbol-function
+;	  (let ((sym (when (symbolp symbol) (get symbol 'si::traced))) first-form)
+;	    (if (and sym
+;		     (consp (symbol-function symbol))
+;		     (consp (setq first-form (nth 3 (symbol-function symbol))))
+;		     (eq (car first-form) 'si::trace-call))
+;		sym
+;		symbol)))
   #-(or Lispm Lucid excl Xerox setf kcl) (symbol-function symbol))
 
 ;;;
@@ -134,9 +134,11 @@
             (setf (symbol-function name) new-definition)
             (when brokenp (xcl:rebreak-function name))
             (when advisedp (xcl:readvise-function name)))
-  #+(and setf (not cmu)) (setf (fdefinition name) new-definition)
+  ;; FIXME add setf expander for fdefinition -- right now we go through
+  ;; the following code which expands to a call to si::fset
+  #+(and setf (not cmu) (not kcl)) (setf (fdefinition name) new-definition)
   #+kcl (setf (symbol-function 
-	       (let ((sym (get name 'si::traced)) first-form)
+	       (let ((sym (when (symbolp name) (get name 'si::traced))) first-form)
 		 (if (and sym
 			  (consp (symbol-function name))
 			  (consp (setq first-form
@@ -539,12 +541,13 @@
     (number     (t)        (complex float rational) (t))
     (complex    (number)   ()                       (number t)
      #c(1 1))
-    (float      (number)   ()                       (number t)
+    (float      (real)     ()                       (real number t)
      1.0)
-    (rational   (number)   (integer ratio)          (number t))
-    (integer    (rational) ()                       (rational number t)
+    (real       (number)   (rational float)         (number t))
+    (rational   (real)     (integer ratio)          (real number t))
+    (integer    (rational) ()                       (rational real number t)
      1)
-    (ratio      (rational) ()                       (rational number t)
+    (ratio      (rational) ()                       (rational real number t)
      1/2)
 
     (sequence   (t)        (list vector)            (t))

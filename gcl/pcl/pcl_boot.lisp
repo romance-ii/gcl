@@ -165,7 +165,9 @@ work during bootstrapping.
 
 (defun expand-defgeneric (function-specifier lambda-list options)
   (when (listp function-specifier) (do-standard-defsetf-1 (cadr function-specifier)))
-  (let ((initargs ()))
+  (let ((initargs ())
+	(methods ()))
+
     (flet ((duplicate-option (name)
 	     (error "The option ~S appears more than once." name)))
       ;;
@@ -215,8 +217,10 @@ work during bootstrapping.
     `(progn
        (proclaim-defgeneric ',function-specifier ',lambda-list)
        ,(make-top-level-form `(defgeneric ,function-specifier)
-	  *defgeneric-times*
-	  `(load-defgeneric ',function-specifier ',lambda-list ,@initargs)))))
+			     *defgeneric-times*
+			     `(load-defgeneric ',function-specifier ',lambda-list ,@initargs))
+       ,@methods
+       `,(function ,function-specifier))))
 
 (defun load-defgeneric (function-specifier lambda-list &rest initargs)
   (when (listp function-specifier) (do-standard-defsetf-1 (cadr function-specifier)))
@@ -1243,7 +1247,9 @@ work during bootstrapping.
 	(decl `(ftype ,(ftype-declaration-from-lambda-list lambda-list #+cmu spec)
 		      ,spec)))
     #+cmu (proclaim decl)
-    #+kcl (setf (get spec 'compiler::proclaimed-closure) t)))
+;;FIXME  proclaim setf compiled closures too
+    #+kcl (when (symbolp spec)
+	    (setf (get spec 'compiler::proclaimed-closure) t))))
 
 ;;;; Early generic-function support
 ;;;

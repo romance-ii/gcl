@@ -375,7 +375,7 @@ void
 FEinvalid_function(object obj)
 {Icall_error_handler(sKinvalid_function,
 		     make_simple_string("~S is invalid as a function."),
-		     1,(obj));
+		     2,(obj),sLfunction);
 		     
 }
 

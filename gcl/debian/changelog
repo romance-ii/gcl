@@ -2,8 +2,10 @@ gclcvs (2.7.0-8) unstable; urgency=low
 
   * Parse errors implemented; recompile generated .c, .h, and .data
     files with prior compiler fixes
+  * Initial setf function implementation, removes about 1/5 of ansi test
+    failures
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  3 Oct 2003 16:04:04 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue,  7 Oct 2003 21:05:16 +0000
 
 gclcvs (2.7.0-7) unstable; urgency=low
 

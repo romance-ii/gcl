@@ -400,21 +400,40 @@
   (list* (car args) lam (cddr args)))
 
 
+(defun function-name (name)
+  (let (setf-symbol)
+    (cond
+     ((symbolp name)
+      name)
+;; FIXME centralize this bit
+     ((and (consp name) (eq (car name) 'setf) 
+	   (consp (cdr name)) (symbolp (setq setf-symbol (cadr name)))
+	   (endp (cddr name)))
+      (multiple-value-bind 
+       (setf-new-symbol status)
+       (intern (symbol-name (gensym)))
+       (declare (ignore status))
+       (si::putprop setf-new-symbol setf-symbol 'compiler::setf-function-base-name)
+       setf-new-symbol))
+     (t
+      nil))))
+	   
 
-(defun t1defun (args &aux (setjmps *setjmps*) (defun 'defun) (*sharp-commas* nil))
+(defun t1defun (args &aux (setjmps *setjmps*) (defun 'defun) (*sharp-commas* nil) name)
   (when (or (endp args) (endp (cdr args)))
         (too-few-args 'defun 2 (length args)))
-  (cmpck (not (symbolp (car args)))
-         "The function name ~s is not a symbol." (car args))
+  (cmpck (not (setq name (function-name (car args))))
+         "The function name ~s is not valid." (car args))
   (maybe-eval nil  (cons 'defun args))
  (tagbody
    top
   (setq *non-package-operation* t)
   (setq *local-functions* nil)
-  (let ((*vars* nil) (*funs* nil) (*blocks* nil) (*tags* nil) lambda-expr
+  (let* ((*vars* nil) (*funs* nil) (*blocks* nil) (*tags* nil) lambda-expr
          (*special-binding* nil)
-        (cfun (or (get (car args) 'Ufun) (next-cfun)))
-        (doc nil) (fname (car args)))
+	 (fname name)
+	 (cfun (or (get fname 'Ufun) (next-cfun)))
+	 (doc nil))
        (declare (object fname))
        (setq lambda-expr (c1lambda-expr (cdr args) fname))
   (or (eql setjmps *setjmps*) (setf (info-volatile (cadr lambda-expr)) t))
@@ -639,25 +658,29 @@
 	 (let ((keyp (ll-keywords-p (lambda-list lambda-expr))))
 ;	   (wt-h "static object LI" cfun "();")
 	   (if keyp
-	     (add-init `(si::mfvfun-key
-		     ',fname ,(add-address "LI" cfun)
-		     ,(vargd (length (car (lambda-list lambda-expr)))
-			     (maxargs (lambda-list lambda-expr)))
-		     ,(add-address (format nil "&LI~akey" cfun) ""))
-		   )
+	       (add-init `(si::mfvfun-key
+			   ',fname ,(add-address "LI" cfun)
+			   ,(vargd (length (car (lambda-list lambda-expr)))
+				   (maxargs (lambda-list lambda-expr)))
+			   ,(add-address (format nil "&LI~akey" cfun) ""))
+			 )
 	     (add-init `(si::mfvfun ',fname ,(add-address "LI" cfun)
-				,(vargd (length (car (lambda-list lambda-expr)))
-				       (maxargs (lambda-list lambda-expr))))
-		   ))))
+				    ,(vargd (length (car (lambda-list lambda-expr)))
+					    (maxargs (lambda-list lambda-expr))))
+		       ))))
 	((numberp cfun)
          (wt-h "static void L" cfun "();")
 	 (add-init `(si::mf ',fname ,(add-address "L" cfun)) ))
         (t (wt-h cfun "();")
 	   (add-init `(si::mf ',fname ,(add-address "" cfun )) )))
            
-    (cond ((< *space* 2)
-           (setf (get fname 'debug-prop) t)
-	   )))
+  (let ((base-name (get fname 'compiler::setf-function-base-name)))
+    (when base-name
+      (add-init `(si::putprop ',base-name #',fname 'si::setf-function))))
+
+  (cond ((< *space* 2)
+	 (setf (get fname 'debug-prop) t)
+	 )))
 
 (defun si::add-debug (fname x)
   (si::putprop fname x  'si::debug))

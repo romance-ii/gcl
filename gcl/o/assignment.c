@@ -144,8 +144,13 @@ DEFUNO_NEW("FSET",object,fSfset,SI
 
 {
 	/* 2 args */
-	if (type_of(sym) != t_symbol)
-		not_a_symbol(sym);
+        if (type_of(sym) != t_symbol) {
+	  if (setf_fn_form(sym)) {
+	    putprop(MMcadr(sym),function,sSsetf_function);
+	    return(function);
+	  } else
+	    not_a_symbol(sym);
+	}
 	if (sym->s.s_sfdef != NOT_SPECIAL) {
 		if (sym->s.s_mflag) {
 			if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
@@ -300,9 +305,9 @@ setf(object place, object form)
 	extern void siLhash_set();
 
 	if (type_of(place) != t_cons) {
-		setq(place, result=Ieval(form));
-		vs_top=vs_base+1;
-		return result;
+	  setq(place, result=Ieval(form));
+	  vs_top=vs_base+1;
+	  return result;
 	}
 	fun = place->c.c_car;
 	if (type_of(fun) != t_symbol)
@@ -338,6 +343,17 @@ setf(object place, object form)
 			FEerror("~S is not a cons.", 1, x);
 		Mcdr(x) = result;
 		return result;
+	}
+
+	/* FIXME should this be removed as it appears to usurp setf-expanders? */
+	if ((x=getf(fun->s.s_plist,sSsetf_function,Cnil))!=Cnil) {
+	  object y=args;
+	  /* FIXME do a direct funcall here */
+	  y=append(list(1,form),y);
+	  y=MMcons(x,y);
+	  y=MMcons(sLfuncall,y);
+	  result=Ieval(y);
+	  return result;
 	}
 
 	x = getf(fun->s.s_plist, sSstructure_access, Cnil);

@@ -50,50 +50,58 @@ Fdefun(object args)
 	if (MMcadr(args) != Cnil && type_of(MMcadr(args)) != t_cons)
 		FEerror("~S is an illegal lambda-list.", 1, MMcadr(args));
 	name = MMcar(args);
-	if (type_of(name) != t_symbol)
-		not_a_symbol(name);
+	if (type_of(name) != t_symbol) {
+	  if (setf_fn_form(name)) {
+	    vs_base = vs_top;
+	    vs_push(MMcons(sLlambda, MMcdr(args)));
+	    putprop(MMcadr(name),vs_base[0],sSsetf_function);
+	    vs_base[0]=name;
+	    return;
+	  } else
+	    not_a_symbol(name);
+	}
 	if (name->s.s_sfdef != NOT_SPECIAL) {
-		if (name->s.s_mflag) {
-			if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
-				name->s.s_sfdef = NOT_SPECIAL;
-		} else if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
-		 FEerror("~S, a special form, cannot be redefined.", 1, name);
+	  if (name->s.s_mflag) {
+	    if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
+	      name->s.s_sfdef = NOT_SPECIAL;
+	  } else if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
+	    FEerror("~S, a special form, cannot be redefined.", 1, name);
 	}
 	if (name->s.s_hpack == lisp_package &&
 	    name->s.s_gfdef != OBJNULL && initflag) {
-		vs_push(make_simple_string(
-			"~S is being redefined."));
-		ifuncall2(sLwarn, vs_head, name);
-		vs_popp;
+	  vs_push(make_simple_string(
+				     "~S is being redefined."));
+	  ifuncall2(sLwarn, vs_head, name);
+	  vs_popp;
 	}
 	vs_base = vs_top;
 	if (lex_env[0] == Cnil && lex_env[1] == Cnil && lex_env[2] == Cnil) {
-		vs_push(MMcons(sLlambda_block, args));
+	  vs_push(MMcons(sLlambda_block, args));
 	} else {
-		vs_push(MMcons(lex_env[2], args));
-		vs_base[0] = MMcons(lex_env[1], vs_base[0]);
-		vs_base[0] = MMcons(lex_env[0], vs_base[0]);
-		vs_base[0] = MMcons(sLlambda_block_closure, vs_base[0]);
+	  vs_push(MMcons(lex_env[2], args));
+	  vs_base[0] = MMcons(lex_env[1], vs_base[0]);
+	  vs_base[0] = MMcons(lex_env[0], vs_base[0]);
+	  vs_base[0] = MMcons(sLlambda_block_closure, vs_base[0]);
 	}
 	{object fname =  clear_compiler_properties(name,vs_base[0]);
-	 fname->s.s_gfdef = vs_base[0];
-	 fname->s.s_mflag = FALSE;}
+	fname->s.s_gfdef = vs_base[0];
+	fname->s.s_mflag = FALSE;}
 	vs_base[0] = name;
 	for (body = MMcddr(args);  !endp(body);  body = body->c.c_cdr) {
-		form = macro_expand(body->c.c_car);
-		if (type_of(form) == t_string) {
-			if (endp(body->c.c_cdr))
-				break;
-			vs_push(form);
-			name->s.s_plist =
-			putf(name->s.s_plist,
-			     form,
-			     sSfunction_documentation);
-			vs_popp;
-			break;
-		}
-		if (type_of(form) != t_cons || form->c.c_car != sLdeclare)
-			break;
+	  form = macro_expand(body->c.c_car);
+	  if (type_of(form) == t_string) {
+	    if (endp(body->c.c_cdr))
+	      break;
+	    vs_push(form);
+	    name->s.s_plist =
+	      putf(name->s.s_plist,
+		   form,
+		   sSfunction_documentation);
+	    vs_popp;
+	    break;
+	  }
+	  if (type_of(form) != t_cons || form->c.c_car != sLdeclare)
+	    break;
 	}
 }
 	
@@ -206,6 +214,7 @@ DEF_ORDINARY("PROGN",sLprogn,LISP,"");
 DEF_ORDINARY("TYPEP",sLtypep,LISP,"");
 DEF_ORDINARY("VALUES",sLvalues,LISP,"");
 DEF_ORDINARY("VARIABLE-DOCUMENTATION",sSvariable_documentation,SI,"");
+DEF_ORDINARY("SETF-FUNCTION",sSsetf_function,SI,"");
 DEF_ORDINARY("WARN",sLwarn,LISP,"");
 
 void

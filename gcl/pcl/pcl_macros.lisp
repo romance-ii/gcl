@@ -657,6 +657,7 @@
 (defun do-standard-defsetfs-for-defclass (accessors)
   (dolist (name accessors) (do-standard-defsetf-1 name)))
 
+;; FIXME remove this when all is well
 (defun do-standard-defsetf-1 (function-name)
   #+setf
   (declare (ignore function-name))
@@ -697,7 +698,8 @@
 			 (bindings (mapcar #'(lambda (x) `(,(gensym) ,x)) loc-args))
 			 (vars (mapcar #'car bindings)))
 		    `(let ,bindings
-		       (,setf-function-name ,(car (last form)) ,@vars)))))
+		       (funcall #',setf-function-name ,(car (last form)) ,@vars)))))
+	(format t "defsetfinf ~S~%" `(defsetf ,function-name ,helper))
 	(eval `(defsetf ,function-name ,helper)))
       #+Xerox
       (flet ((setf-expander (body env)

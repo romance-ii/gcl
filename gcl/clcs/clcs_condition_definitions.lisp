@@ -189,6 +189,19 @@
 
 #+kcl
 (progn
+(define-condition internal-warning ( warning)
+  #-(or clos pcl)
+  ((function-name nil))
+  #+(or clos pcl)
+  ((function-name :initarg :function-name
+		  :reader internal-error-function-name
+		  :initform 'nil))
+  (:report (lambda (condition stream)
+	     (when (internal-error-function-name condition)
+	       (format stream "Warning in ~S [or a callee]: "
+		       (internal-error-function-name condition)))
+	     #+(or clos pcl)(call-next-method))))
+
 (define-condition internal-error ( error)
   #-(or clos pcl)
   ((function-name nil))
@@ -209,6 +222,13 @@
   (apply #'format stream (simple-condition-format-string    condition)
 	 		 (simple-condition-format-arguments condition)))
 
+(defun internal-simple-warning-printer (condition stream)
+  (when (internal-error-function-name condition)
+    (format stream "Warning in ~S [or a callee]: "
+	    (internal-error-function-name condition)))
+  (apply #'format stream (simple-condition-format-string    condition)
+	 		 (simple-condition-format-arguments condition)))
+
 (define-condition internal-simple-error 
     (internal-error #+(or clos pcl) simple-condition)
   #-(or clos pcl)
@@ -217,6 +237,15 @@
   ()
   #-(or clos pcl)(:conc-name %%internal-simple-error-)
   (:report internal-simple-error-printer))
+
+(define-condition internal-simple-warning 
+    (internal-warning #+(or clos pcl) simple-condition)
+  #-(or clos pcl)
+  ((function-name nil) format-string (format-arguments '()))
+  #+(or clos pcl)
+  ()
+  #-(or clos pcl)(:conc-name %%internal-simple-warning-)
+  (:report internal-simple-warning-printer))
 
 (define-condition internal-type-error 
     (#+(or clos pcl) internal-error type-error)

@@ -38,6 +38,27 @@
       (expand-long-defcombin form)
       (expand-short-defcombin form)))
 
+;;;
+;;; Implementation of INVALID-METHOD-ERROR and METHOD-COMBINATION-ERROR
+;;;
+;;; See combin.lisp for rest of the implementation.  This method is
+;;; defined here because compute-effective-method is still a function
+;;; in combin.lisp.
+;;;
+(defmethod compute-effective-method :around
+    ((generic-function generic-function)
+     (method-combination method-combination)
+     applicable-methods)
+  (declare (ignore applicable-methods))
+  (flet ((real-invalid-method-error (method format-string &rest args)
+	   (declare (ignore method))
+	   (apply #'error format-string args))
+	 (real-method-combination-error (format-string &rest args)
+	   (apply #'error format-string args)))
+    (let ((*invalid-method-error* #'real-invalid-method-error)
+	  (*method-combination-error* #'real-method-combination-error))
+      (call-next-method))))
+
 
 ;;;
 ;;; STANDARD method combination
@@ -107,10 +128,14 @@
 	    :qualifiers ()
 	    :specializers specializers
 	    :lambda-list '(generic-function type options)
-	    :function #'(lambda (gf type options)
-			  (declare (ignore gf))
-			  (do-short-method-combination
-			    type options operator ioa new-method doc))
+	    :function #'(lambda (args nms &rest cm-args)
+			(declare (ignore nms cm-args))
+			(apply 
+			 (lambda (gf type options)
+			   (declare (ignore gf))
+			   (do-short-method-combination
+			       type options operator ioa new-method doc))
+			 args))
 	    :definition-source `((define-method-combination ,type) ,truename)))
     (when old-method
       (remove-method #'find-method-combination old-method))
@@ -140,6 +165,7 @@
   (let ((type (method-combination-type combin))
 	(operator (short-combination-operator combin))
 	(ioa (short-combination-identity-with-one-argument combin))
+	(order (car (method-combination-options combin)))
 	(around ())
 	(primary ()))
     (dolist (m applicable-methods)
@@ -163,8 +189,9 @@
 		 (push m primary))
 		(t
 		 (lose m "has an illegal qualifier"))))))
-    (setq around (nreverse around)
-	  primary (nreverse primary))
+    (setq around (nreverse around))
+    (unless (eq order :most-specific-last)
+      (setq primary (nreverse primary)))
     (let ((main-method
 	    (if (and (null (cdr primary))
 		     (not (null ioa)))

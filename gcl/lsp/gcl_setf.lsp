@@ -99,6 +99,9 @@
 
 ;;;; GET-SETF-METHOD-MULTIPLE-VALUE.
 
+;; FIXME  when all is well, remove this and the setf tests in the pcl directory
+(push 'setf *features*)
+
 (defun get-setf-method-multiple-value (form &optional env &aux tem)
   (cond ((symbolp form)
 	 (let ((store (gensym)))
@@ -141,8 +144,17 @@
 		   (cons (car form) vars))))
 	((macro-function (car form))
 	 (get-setf-method-multiple-value (macroexpand form)))
-	(t
-	 (error "Cannot expand the SETF form ~S." form))))
+	(t 
+	 (let ((vars (mapcar #'(lambda (x)
+	                         (declare (ignore x))
+	                         (gensym))
+	                     (cdr form)))
+	       (store (gensym)))
+	   (values vars (cdr form) (list store)
+	           `(funcall
+		     #'(setf ,(car form))
+		     ,store ,@vars )
+		   (cons (car form) vars))))))
 
 
 ;;;; SETF definitions.
@@ -372,7 +384,7 @@
 (defun setf-helper (rest env)
   (setq rest (cdr rest))
   (cond ((endp rest) nil)
-        ((endp (cdr rest)) (error "~S is an illegal SETF form." rest))
+;        ((endp (cdr rest)) (error "~S is an illegal SETF form." rest))
         ((endp (cddr rest)) (setf-expand-1 (car rest) (cadr rest) env))
         (t (cons 'progn (setf-expand rest env)))))
 

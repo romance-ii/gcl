@@ -295,6 +295,7 @@ EXTER object sLprogn;
 EXTER object sLtypep;
 EXTER object sLvalues;
 EXTER object sSvariable_documentation;
+EXTER object sSsetf_function;
 EXTER object sLwarn;
 EXTER object sSAallow_gzipped_fileA;
 EXTER object sSAcollect_binary_modulesA;

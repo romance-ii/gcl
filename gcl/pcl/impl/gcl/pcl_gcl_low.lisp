@@ -91,6 +91,61 @@ int n; object cc;
 ;; This is the unsafe but fast version.
 (defentry %cclosure-env-nthcdr (int object) (object cclosure_env_nthcdr))
 
+;; FIXME The non-inlined versions should really check for uncompiled 
+;; closeres and set the environment properly in them.  In reality,
+;; trying to build pcl interpreted takes forever!  Also clean the list
+;; of inlines and make sure there are real function versions for each used case.
+(clines "
+static void
+set_cclosure_env(object cc,object val) {
+ if (type_of(cc)==t_cclosure)
+   cc->cc.cc_env=val;
+}
+")
+
+(defentry set-cclosure-env (object object) (void set_cclosure_env))
+(defentry %set-cclosure-env (object object) (void set_cclosure_env))
+
+(clines "
+static object
+cclosurep(object o) {
+  return type_of(o)==t_cclosure ? Ct : Cnil;
+}
+")
+
+(defentry cclosurep (object) (object cclosurep))
+
+(clines "
+static object
+cclosure_env(object o) {
+  return type_of(o)==t_cclosure ? o->cc.cc_env : Cnil;
+}
+")
+
+(defentry cclosure-env (object) (object cclosure_env))
+(defentry %cclosure-env (object) (object cclosure_env))
+
+(clines "
+static void
+set_compiled_function_name(object o,object n) {
+/* check type here */
+  o->cf.cf_name=n;
+}
+")
+
+(defentry si::set-compiled-function-name (object object) (void set_compiled_function_name))
+(defentry si::%set-compiled-function-name (object object) (void set_compiled_function_name))
+
+(clines "
+static object
+__fboundp(object o) {
+/* FIXME check type here*/
+return o->s.s_gfdef==OBJNULL ? Cnil : Ct;
+}
+")
+
+(defentry %fboundp (object) (object __fboundp))
+
 (eval-when (compile eval load)
 (defparameter *gcl-function-inlines*
   '( (%fboundp (t) compiler::boolean nil nil "(#0)->s.s_gfdef!=OBJNULL")

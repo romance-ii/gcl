@@ -35,8 +35,13 @@ Lfboundp(void)
 
 	check_arg(1);
 	sym = vs_base[0];
-	if (type_of(sym) != t_symbol)
-		not_a_symbol(sym);
+	if (type_of(sym) != t_symbol) {
+	  if (setf_fn_form(sym)) {
+	    vs_base[0]=get(MMcadr(sym),sSsetf_function,Cnil);
+	    return;
+	  } else
+	    not_a_symbol(sym);
+	}
 	if (sym->s.s_sfdef != NOT_SPECIAL)
 		vs_base[0] = Ct;
 	else if (sym->s.s_gfdef == OBJNULL)
@@ -44,7 +49,7 @@ Lfboundp(void)
 	else
 		vs_base[0]= Ct;
 }
-
+/* FIXME find out where this is called and if it needs to handle setf functions */
 object
 symbol_function(object sym)
 {
@@ -65,15 +70,20 @@ symbol_function(object sym)
 		(macro . function-closure)	for macros
 		(special . address)		for special forms.
 */
-void
-Lsymbol_function(void)
-{
+
+static void
+symbol_function_internal(int allow_setf) {
 	object sym;
 
 	check_arg(1);
 	sym = vs_base[0];
-	if (type_of(sym) != t_symbol)
+	if (type_of(sym) != t_symbol) {
+	  if (allow_setf && setf_fn_form(sym)) {
+	    vs_base[0]=getf(MMcadr(sym)->s.s_plist,sSsetf_function,Cnil);
+	    return;
+	  } else
 		not_a_symbol(sym);
+	}
 	if (sym->s.s_sfdef != NOT_SPECIAL) {
 		vs_push(make_fixnum((long)(sym->s.s_sfdef)));
 		vs_base[0] = sLspecial;
@@ -90,6 +100,19 @@ Lsymbol_function(void)
 	}
 	vs_base[0] = sym->s.s_gfdef;
 }
+
+void
+Lsymbol_function(void)
+{
+  symbol_function_internal(0);
+}
+/* FIXME add setf expander for fdefinition */
+void
+Lfdefinition(void) {
+
+  symbol_function_internal(1);
+
+}  
 
 static void
 Fquote(object form)
@@ -134,6 +157,14 @@ Ffunction(object form)
 		vs_base[0] = MMcons(lex_env[1], vs_base[0]);
 		vs_base[0] = MMcons(lex_env[0], vs_base[0]);
 		vs_base[0] = MMcons(sLlambda_closure, vs_base[0]);
+	} else if (setf_fn_form(fun)) {
+	        object setf_fn_def=get(MMcadr(fun),sSsetf_function,Cnil);
+		if (setf_fn_def==Cnil)
+		  FEundefined_function(fun);
+		else {
+		  vs_base = vs_top;
+		  vs_push(setf_fn_def);
+		}
 	} else
 		FEinvalid_function(fun);
 }
@@ -194,6 +225,7 @@ void
 gcl_init_reference(void)
 {
 	make_function("SYMBOL-FUNCTION", Lsymbol_function);
+	make_function("FDEFINITION", Lfdefinition);
 	make_function("FBOUNDP", Lfboundp);
 	make_special_form("QUOTE", Fquote);
 	sLfunction = make_special_form("FUNCTION", Ffunction);
