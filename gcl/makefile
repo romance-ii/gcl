@@ -25,7 +25,7 @@ MPFILES=$(MPDIR)/@MPI_FILE@ $(MPDIR)/libmport.a
 # root for the installation, eg /usr/local
 # This would cause make install to create /usr/local/bin/gcl and
 # /usr/local/lib/gcl-2-??/* with some basic files.
-prefix=/usr/local
+prefix=/usr
 
 # where to place the info files
 INFO_DIR=/usr/info/
@@ -59,7 +59,7 @@ RL_OBJS=readline.o
 
 RL_LIB=lsp/readline.o
 
-GCLDIR=/fix/f/debian/mm/gcl/gcl-2.5.0
+GCLDIR=/fix/f/debian/mm/gcl/gcl
 SHELL=/bin/sh
 MACHINE=386-linux
 
@@ -232,6 +232,7 @@ clean:
 	rm -f foo.tcl config.log makedefs makedefsafter config.cache config.status makedefc
 	rm -f h/config.h h/gclincl.h h/cmpinclude.h
 	rm -rf gmp/.deps gmp/libgmp.a
+	rm -f xbin/gcl
 
 CMPINCLUDE_FILES=${HDIR}cmpincl1.h ${HDIR}gclincl.h ${HDIR}compbas.h ${HDIR}enum.h ${HDIR}object.h ${HDIR}vs.h \
 	${HDIR}bds.h ${HDIR}frame.h \
