@@ -35,6 +35,7 @@
 ;; 20031130.
 (defvar *initial-ccb-vs* 0)
 (defvar *level* 0)
+(defvar *vcs-used*)
 
 ;;; *vs* holds the offset of the current vs-top.
 ;;; *max-vs* holds the maximum offset so far.

@@ -56,8 +56,9 @@ gclcvs (2.7.0-16) unstable; urgency=low
     parameter which is malloc when *unwind-exit* is bound and contains
     'frame and  alloca otherwise.  New macro bignum-expansion-storage.
     FIXME, ensure that IDECL does not need similar modification.
+  * Cleanup a few compiler warnings in the compiler
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  1 Dec 2003 17:02:24 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  1 Dec 2003 17:02:48 +0000
 
 gclcvs (2.7.0-15) unstable; urgency=low
 

@@ -198,6 +198,7 @@
 
 (defun wt-integer-loc (loc &optional type
 			   &aux (avma t)(first (and (consp loc) (car loc))))
+  (declare (ignore type))
   (case first
     (inline-fixnum
      (wt "stoi(")
