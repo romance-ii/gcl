@@ -63,7 +63,7 @@ extern short aet_sizes[];
 #define N_FIXNUM_ARGS 6
 
 DEFUNO_NEW("AREF", object, fLaref, LISP, 1, ARRAY_RANK_LIMIT,
-       NONE, OO, II, II, II,void,Laref,(object x,fixnum i, ...),"")
+       ONE_VAL, OO, II, II, II,void,Laref,(object x,fixnum i, ...),"")
 { int n = VFUN_NARGS;
   int i1;
   va_list ap;

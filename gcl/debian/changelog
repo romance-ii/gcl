@@ -26,8 +26,10 @@ gclcvs (2.7.0-37) unstable; urgency=low
     analysis.  Prevent recursive macroexpansion of (function ...) forms
   * bounded-type -> integer-typep et. al. in gcl_cmptype.lsp to support
     half bounded integer range type propagation
+  * Correct flag construction for function attributes -- aref needs
+    one_val flag
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 27 Dec 2004 22:16:36 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 27 Dec 2004 22:17:34 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 

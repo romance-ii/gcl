@@ -45,9 +45,9 @@ A link arg descriptor:
        | (max << (F_NARG_WIDTH+F_end)) \
        | (argtypes<< (2* F_NARG_WIDTH + F_end )))
 
-#define ONE_VAL  (1 << F_caller_sets_one_val)
-#define CLOS (1 << F_requires_fun_passed)
-#define VARARG (1 << F_requires_nargs)
+#define ONE_VAL  (1 << (F_NARG_WIDTH + F_caller_sets_one_val))
+#define CLOS (1 << (F_NARG_WIDTH + F_requires_fun_passed))
+#define VARARG (1 << (F_NARG_WIDTH + F_requires_nargs))
    /* the following may be used as an argument to DEFUN even in the case
       of varargs, since the F_ARGD macro detects minargs<maxargs and sets this.*/
 #define NONE 0    
