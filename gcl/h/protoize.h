@@ -1747,6 +1747,12 @@ Icall_error_handler(object,object,int,...);
 void *
 gcl_gmp_alloc(size_t);
 
+#ifdef SGC
+void
+memprotect_test_reset(void);
+#endif
+
+
 #if defined (__MINGW32__)
 int bcmp ( const void *s1, const void *s2, size_t n );
 void bcopy ( const void *s1, void *s2, size_t n );

@@ -1035,6 +1035,135 @@ tcc(struct contblock *t) {
 
 #endif	  
 
+typedef enum {memprotect_none,memprotect_cannot_protect,memprotect_sigaction,
+	      memprotect_bad_return,memprotect_no_signal,
+	      memprotect_multiple_invocations,memprotect_no_restart,
+	      memprotect_bad_fault_address,memprotect_success} memprotect_enum;
+static memprotect_enum memprotect_result;
+static int memprotect_handler_invocations,memprotect_print_enable;
+static void *memprotect_test_address;
+
+#define MEM_ERR_CASE(a_) \
+  case a_: \
+    fprintf(stderr,"The SGC segfault recovery test failed with %s, SGC disabled\n",#a_); \
+    break
+
+static void
+memprotect_print(void) {
+
+  if (!memprotect_print_enable)
+    return;
+
+  switch(memprotect_result) {
+  case memprotect_none: case memprotect_success:
+    break;
+
+    MEM_ERR_CASE(memprotect_cannot_protect);
+    MEM_ERR_CASE(memprotect_sigaction);
+    MEM_ERR_CASE(memprotect_bad_return);
+    MEM_ERR_CASE(memprotect_no_signal);
+    MEM_ERR_CASE(memprotect_no_restart);
+    MEM_ERR_CASE(memprotect_bad_fault_address);
+    MEM_ERR_CASE(memprotect_multiple_invocations);
+
+  }
+
+}
+
+
+static void
+memprotect_handler_test(int sig, long code, void *scp, char *addr) {
+
+  char *faddr;
+  faddr=GET_FAULT_ADDR(sig,code,scp,addr); 
+
+  if (memprotect_handler_invocations) {
+    memprotect_result=memprotect_multiple_invocations;
+    exit(-1);
+  }
+  memprotect_handler_invocations=1;
+  if (faddr!=memprotect_test_address)
+    memprotect_result=memprotect_bad_fault_address;
+  else
+    memprotect_result=memprotect_none;
+  mprotect(memprotect_test_address,PAGESIZE,PROT_READ|PROT_WRITE);
+
+}
+
+static int
+memprotect_test(void) {
+
+  char b1[2*PAGESIZE],b2[PAGESIZE];
+  struct sigaction sa,sao;
+
+  if (memprotect_result!=memprotect_none)
+    return memprotect_result!=memprotect_success;
+  if (atexit(memprotect_print)) {
+    fprintf(stderr,"Cannot setup memprotect_print on exit\n");
+    exit(-1);
+  }
+
+  memset(b1,32,sizeof(b1));
+  memset(b2,0,sizeof(b2));
+  memprotect_test_address=(void *)(((unsigned long)b1+PAGESIZE-1) & ~(PAGESIZE-1));
+  if (mprotect(memprotect_test_address,PAGESIZE,PROT_READ)) {
+    memprotect_result=memprotect_cannot_protect;
+    return -1;
+  }
+  sa.sa_sigaction=(void *)memprotect_handler_test;
+  sa.sa_flags=MPROTECT_ACTION_FLAGS;
+  if (sigaction(SIGSEGV,&sa,&sao)) {
+    memprotect_result=memprotect_sigaction;
+    return -1;
+  }
+  memprotect_result=memprotect_bad_return;
+  memset(memprotect_test_address,0,PAGESIZE);
+  if (memprotect_result==memprotect_bad_return)
+    memprotect_result=memprotect_no_signal;
+  if (memprotect_result!=memprotect_none) {
+    sigaction(SIGSEGV,&sao,NULL);
+    return -1;
+  }
+  if (memcmp(memprotect_test_address,b2,PAGESIZE)) {
+    memprotect_result=memprotect_no_restart;
+    sigaction(SIGSEGV,&sao,NULL);
+    return -1;
+  }
+  memprotect_result=memprotect_success;
+  sigaction(SIGSEGV,&sao,NULL);
+  return 0;
+
+}
+
+static int
+do_memprotect_test(void) {
+
+  int rc=0;
+
+  memprotect_print_enable=1;
+  if (memprotect_test()) {
+    memprotect_print();
+    if (sgc_enabled)
+      sgc_quit();
+    rc=-1;
+  }
+  memprotect_print_enable=0;
+  return rc;
+
+}
+
+void
+memprotect_test_reset(void) {
+
+  memprotect_result=memprotect_none;
+  memprotect_handler_invocations=0;
+  memprotect_test_address=NULL;
+
+  if (sgc_enabled)
+    do_memprotect_test();
+
+}
+
 int
 sgc_start(void) {
 
@@ -1044,6 +1173,10 @@ sgc_start(void) {
   object f;
   struct typemanager *tm;
   int npages;
+
+  if (memprotect_result!=memprotect_success && do_memprotect_test())
+    return 0;
+
   if (sgc_type_map[page((&sgc_type_map[0]))] != SGC_PERM_WRITABLE)
     perm_writable(&sgc_type_map[0],sizeof(sgc_type_map));
   if (sgc_enabled)
@@ -1566,7 +1699,8 @@ FFN(siLsgc_on)(void) {
   check_arg(1);
   if(vs_base[0]==Cnil) 
     sgc_quit();
-  else sgc_start();
+  else 
+    vs_base[0]=sgc_start() ? Ct : Cnil;
 }
 
 /* make permanently writable pages containing pointers p thru p+n-1 */

@@ -251,6 +251,10 @@ main(int argc, char **argv, char **envp) {
 
 #endif /* SETUP_SIG_STACK */	
 	
+#ifdef SGC
+    memprotect_test_reset();
+#endif
+
     if (initflag) {
         if (saving_system) {
             saving_system = FALSE;

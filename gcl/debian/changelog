@@ -2,8 +2,9 @@ gclcvs (2.7.0-19) unstable; urgency=low
 
   * Revert unixport/makefile link order fix for windows, breaks
     compiler::link, find another way
+  * runtime SGC fault recovery test
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 11 Feb 2004 19:16:55 -0500
+ -- Camm Maguire <camm@enhanced.com>  Thu, 12 Feb 2004 05:24:35 +0000
 
 gclcvs (2.7.0-18) unstable; urgency=low
 
