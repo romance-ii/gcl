@@ -1,218 +1,432 @@
-2001-12-29  Camm Maguire <camm@enhanced.com>
+2002-01-23  Camm Maguire  <camm@intech19.enhanced.com>
 
-        * gmp/configure.in update for darwin
-        * #ifdef'ed R_386_NUM in sfaslelf.c for old libc
-	* changes to configure.in and elisp/makefile to handle emacs not
-	being present
-	* fix to gmp/ltconfig to avoid exec'ing '""'
-	* Added DESTDIR to makefiles to support installing under arbitrary
-	subdir
-	* good 'clean' targets
-	* correct building in absense of tcl/tk
+	* /cvsroot/gcl/gcl/o/mingfile.c, /cvsroot/gcl/gcl/configure, /cvsroot/gcl/gcl/configure.in, /cvsroot/gcl/gcl/h/minglacks.h, /cvsroot/gcl/gcl/h/mingw.h:
+	Mingw support fixes
 
+2002-01-20  Camm Maguire  <camm@intech19.enhanced.com>
 
-2001-12-18  David Billinghurst <David.Billinghurst@riotinto.com>
+	* /cvsroot/gcl/gcl/gcl.png: gif -> png for logo
 
-        * h/gnuwin95.h:  Cruft removal and update
-	(SA_RESTART): Surround by #if 0/#endif 
-	(fopen_binary): Remove
-	(fopen): Remove redefinition to fopen_binary
+2002-01-15  Camm Maguire  <camm@intech19.enhanced.com>
 
+	* /cvsroot/gcl/gcl/h/gnuwin95.h, /cvsroot/gcl/gcl/o/unexnt.c:
+	Changes to get a preliminary NT build
 
-2001-04-15  Bill Schelter  <wfs@linux163.ma.utexas.edu>
+2002-01-13  Camm Maguire  <camm@intech19.enhanced.com>
 
-	*  Added changes to allow the loading .o files compiled
-	on -O4 under linux, and also added this to be the default
-	optimize level if speed = 3.   speed = 2 gives -O still
+	* /cvsroot/gcl/gcl/configure, /cvsroot/gcl/gcl/configure.in:
+	Emacs site list dir fix
 
-2001-04-13  Bill Schelter  <wfs@sonia.ma.utexas.edu>
+2002-01-11  Camm Maguire  <camm@intech19.enhanced.com>
 
-	* fix the NULL_OR_ON_C_STACK macro for x86 linux in notcomp.h
-	  and in 386-linux.h
+	* /cvsroot/gcl/gcl/gmp/assert.c, /cvsroot/gcl/gcl/gmp/extract-dbl.c, /cvsroot/gcl/gcl/gmp/gmp-impl.h, /cvsroot/gcl/gcl/gmp/mpn/generic/gcdext.c, /cvsroot/gcl/gcl/gmp/mpn/generic/tdiv_qr.c, /cvsroot/gcl/gcl/gmp/mpn/tests/addmul_1.c, /cvsroot/gcl/gcl/gmp/mpn/tests/add_n.c, /cvsroot/gcl/gcl/gmp/mpn/tests/copy.c, /cvsroot/gcl/gcl/gmp/mpn/tests/divmod_1.c, /cvsroot/gcl/gcl/gmp/mpn/tests/divrem.c, /cvsroot/gcl/gcl/gmp/mpn/tests/lshift.c, /cvsroot/gcl/gcl/gmp/mpn/tests/Makefile.in, /cvsroot/gcl/gcl/gmp/mpn/tests/mul_1.c, /cvsroot/gcl/gcl/gmp/mpn/tests/rshift.c, /cvsroot/gcl/gcl/gmp/mpn/tests/submul_1.c, /cvsroot/gcl/gcl/gmp/mpn/tests/sub_n.c, /cvsroot/gcl/gcl/gmp/mpz/bin_uiui.c, /cvsroot/gcl/gcl/gmp/mpz/fac_ui.c, /cvsroot/gcl/gcl/gmp/mpz/pprime_p.c, /cvsroot/gcl/gcl/gmp/mpz/root.c, /cvsroot/gcl/gcl/gmp/mpz/set_d.c, /cvsroot/gcl/gcl/gmp/mpz/tests/bit.c, /cvsroot/gcl/gcl/gmp/mpz/tests/convert.c, /cvsroot/gcl/gcl/gmp/mpz/tests/dive.c, /cvsroot/gcl/gcl/gmp/mpz/tests/io.c, /cvsroot/gcl/gcl/gmp/mpz/tests/logic.c, /cvsroot/gcl/gcl/gmp/mpz/tests/Makefile.in, /cvsroot/gcl/gcl/gmp/mpz/tests/reuse.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-2exp.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-bin.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-fdiv.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-fdiv_ui.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-gcd.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-jac.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-misc.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-mul.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-powm.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-powm_ui.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-pow_ui.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-root.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-sqrtrem.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-tdiv.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-tdiv_ui.c, /cvsroot/gcl/gcl/gmp/randlc.c, /cvsroot/gcl/gcl/gmp/randraw.c, /cvsroot/gcl/gcl/gmp/urandom.h:
+	Changes submitted by Robert Byer for VMS (thanks\!)
 
-2001-01-30  Bill Schelter  <wfs@sonia.ma.utexas.edu>
+2002-01-09  Camm Maguire  <camm@intech19.enhanced.com>
 
-	* many changes added for MS windows version..
-	* add check on CSTACK_ADDRESS to configure for NULL_OR_ON_C_STACK
+	* /cvsroot/gcl/gcl/info/makefile:
+	Removed info files from tree, created now at build time from texi files
 
-2000-10-27  Bill Schelter  <wfs@sonia.ma.utexas.edu>
+2002-01-07  Camm Maguire  <camm@intech19.enhanced.com>
 
-	*  o/file.d bug in close_stream
-	*  add xbin/386-linux-fix to knock the -O4 flag off of gcc if
-	it is version 2.96 because of a C compiler bug
-	*  fixes to configure.in to better find the tcl tk stuff.
+	* /cvsroot/gcl/gcl/configure, /cvsroot/gcl/gcl/configure.in:
+	Changes to better detect tcl/tk locations
 
-2000-06-01  Bill Schelter  <wfs@sonia.ma.utexas.edu>
+	* /cvsroot/gcl/gcl/h/386-linux.defs:
+	Optimization flags by default in 386-linux.defs
 
-	* o/print.d: change printing of pathnames to use the more
-	standard #p"foo.bar"  instead of #"foo.bar"
-	* o/read.d: allow pathnames #p"foo.bar" instead of just #"foo.bar"
-	as many implementations do.
-	
-	
+	* /cvsroot/gcl/gcl/unixport/makefile, /cvsroot/gcl/gcl/unixport/make_kcn, /cvsroot/gcl/gcl/bin/gcl, /cvsroot/gcl/gcl/bin/makefile, /cvsroot/gcl/gcl/clcs/makefile, /cvsroot/gcl/gcl/cmpnew/makefile, /cvsroot/gcl/gcl/comp/makefile, /cvsroot/gcl/gcl/doc/makefile, /cvsroot/gcl/gcl/dos/makefile, /cvsroot/gcl/gcl/elisp/makefile, /cvsroot/gcl/gcl/gcl-tk/makefile, /cvsroot/gcl/gcl/go/makefile, /cvsroot/gcl/gcl/h/386-linux.defs, /cvsroot/gcl/gcl/h/386-linux.h, /cvsroot/gcl/gcl/info/gcl-si.info, /cvsroot/gcl/gcl/info/gcl-tk.info, /cvsroot/gcl/gcl/info/makefile, /cvsroot/gcl/gcl/lsp/makefile, /cvsroot/gcl/gcl/mp/makefile, /cvsroot/gcl/gcl/o/alloc.c, /cvsroot/gcl/gcl/o/makefile, /cvsroot/gcl/gcl/makefile:
+	Removed some build-generated files
 
-2000-05-13  Bill Schelter  <wfs@sonia.ma.utexas.edu>
+2002-01-06  Camm Maguire  <camm@intech19.enhanced.com>
 
-	* fix readme file
-	* update gcl-2.3/mp/mpi-sol-sparc.s for the 'sparc' version.
-	* number of changes to 'configure.in' to handle finding
-	paths correctly. 
+	* /cvsroot/gcl/gcl/o/main.c, /cvsroot/gcl/gcl/o/unexelf.c, /cvsroot/gcl/gcl/unixport/rsym_elf.c:
+	Refinement to max stack size handling, better fix to unexelf section numbering bug, revert sigsetjmp change in rsym_elf.c
 
-2000-05-02  Bill Schelter  <wfs@linux119.ma.utexas.edu>
+	* /cvsroot/gcl/gcl/configure, /cvsroot/gcl/gcl/configure.in:
+	configure changes to detect newer as well as older tcl/tk libraries
 
-	* rsym_elf.c (out;): strip off the @@GLIB* from symbols,
-	in the base image, since this is not added to .o files
-	With advent of GLIB2.0 this addition to the symbol was made.
-	This will allow dynamic linking of the raw_gcl with the C library.
-	* remove the -static default from the 386-linux.defs file,
-	so that links will by default be dynamic for libc ..
-	
+	* /cvsroot/gcl/gcl/o/unexelf.c:
+	Protect against sh_info=0, causing occasional segfaults, in unexelf.c
 
-Fri Mar 28 16:23:18 1997  Bill Schelter  <wfs@marie.ma.utexas.edu>
+2002-01-04  Camm Maguire  <camm@intech19.enhanced.com>
 
-	* fix o/unexelf.c for section following bss overlapping it.
-	* fix some of the install sections in makefile
-	* add man page.
-	
+	* /cvsroot/gcl/gcl/o/main.c:
+	Protect against unlimited stack resource environments
 
-Wed Mar 12 14:11:01 1997  Bill Schelter  <wfs@marie.ma.utexas.edu>
+	* /cvsroot/gcl/gcl/unixport/rsym_elf.c:
+	_setjmp -> __sigsetjmp for glibc systems in rsym_elf.c
 
-	* makefile (go): change to remove typo o${..} in makefile
-	in the install script
-	* change DIR= to GCL_TK_DIR= in gcl-tk/gcltksrv* and in
-	makefile, gcl-tk/makefile.   Plain DIR= was causing the
-	replacement (in sed in makefiles) of other other variables
-	ending in DIR= ..
-	
-	
+2001-12-29  Camm Maguire  <camm@intech19.enhanced.com>
 
-Sun Dec  8 18:31:38 1996  Bill Schelter  <wfs@marie.ma.utexas.edu>
+	* /cvsroot/gcl/gcl/ChangeLog: *** empty log message ***
 
-	* release 2.2.1 contains various fixes to unexec and to
-	makefiles, for building on current systems.
+	* /cvsroot/gcl/gcl/unixport/makefile:
+	Added DESTDIR to makefiles to support installing under arbitrary subdir; good 'clean' targets; correct building in absense of tcl/tk
 
-Mon Dec  2 20:36:28 1996  Bill Schelter  <wfs@linux13.ma.utexas.edu>
+	* /cvsroot/gcl/gcl/gcl-tk/makefile:
+	Add gcl-tk/demos/index.lsp to clean target
 
-	* o/gbc.c:  make the marking of MVloc go in the right direction.
-	important for problems that use mv_ref methods.. 
+	* /cvsroot/gcl/gcl/o/makefile, /cvsroot/gcl/gcl/elisp/makefile, /cvsroot/gcl/gcl/info/makefile, /cvsroot/gcl/gcl/makefile:
+	Added DESTDIR to makefiles to support installing under arbitrary subdir; good 'clean' targets; correct building in absense of tcl/tk
 
-Thu Nov  9 18:09:01 1995  Bill Schelter  <wfs@jany.ma.utexas.edu>
+	* /cvsroot/gcl/gcl/configure, /cvsroot/gcl/gcl/configure.in, /cvsroot/gcl/gcl/elisp/makefile:
+	changes to configure.in and elisp/makefile to handle emacs not being present
 
-	* fixes for format and structure printing.
-	* fixes to calls to FEerror
-	* arrange so that static arrays stay static on growing via
-	adjust-array or via output with string stream stuff
+	* /cvsroot/gcl/gcl/gmp/ltconfig:
+	fix to gmp/ltconfig to avoid exec'ing empty string
 
-Mon Oct 30 20:42:17 1995  Bill Schelter  <wfs@jany.ma.utexas.edu>
+	* /cvsroot/gcl/gcl/gmp/configure, /cvsroot/gcl/gcl/gmp/configure.in:
+	gmp/configure.in update for darwin
 
-	* o/print.d (BEGIN): fix (defstruct (foo (:print-function
-                                	print-foo))  junk)
-	  (defun print-foo (foo stream depth)
-	       (format stream "#<foo ~S>" (foo-junk foo)))
-         bug. [with the printStructBufp value being nulled]
-	* add-defs sets TCL_LIBRARY, and gcltksrv sets it..
-	* fixes to support solaris-i386 [in rsym_elf.c, sfaslelf.c
-	* ./add-defs fix order of tests of paths...
-	
+2001-12-20  Camm Maguire  <camm@intech19.enhanced.com>
 
-Fri Oct 20 01:15:47 1995  Bill Schelter  <wfs@jany.ma.utexas.edu>
+	* /cvsroot/gcl/gcl/h/gnuwin95.h: Apply fopen patch
 
-	*  fix initialization of *link-array* to be a string..
-	[remove from cmptop.lsp]
-	*  misc fixes in gbc.c and sgbc.c
-	* fix to profiling.
-	
-Wed Oct 18 00:16:59 1995  Bill Schelter  <wfs@jany.ma.utexas.edu>
+2001-12-18  Camm Maguire  <camm@intech19.enhanced.com>
 
-	* (format nil "~5,,X" 10) made to work.   Note the ansi draft
-	neither condones nor prohibits this.   Normally the , is a place
-	holder and there is a argument after the last , and then comes the
-	directive.   Here the commas dont hold a place.  
+	* /cvsroot/gcl/gcl/configure, /cvsroot/gcl/gcl/configure.in:
+	FCNTL check opens bad file 'jim', now opens configure.in read-only
 
-	* fix bv.bv_offset problem... the move to 64 bit machines caused
-	it to be impossible to have some structure fields overlap the way
-	they once did.    added BV_OFFSET(x) and SET_BV_OFFSET(x,val)
-	macros.
-	* fix add-defs to make clxsocket.o not be compiled in case of
-	no X11 include files found.
+	* /cvsroot/gcl/gcl/configure, /cvsroot/gcl/gcl/configure.in:
+	s/cygwin32/ cygwin\*/ in configure
 
-Tue Oct 17 13:21:38 1995  Bill Schelter  <wfs@jany.ma.utexas.edu>
+	* /cvsroot/gcl/gcl/h/gnuwin95.defs: Tidy up h/gnuwin95.defs
 
-	* fix the (write 3) bug... in print.d
+	* /cvsroot/gcl/gcl/h/cyglacks.h: Remove cruft from h/cyglacks.h
 
-Wed Oct 11 23:00:34 1995  Bill Schelter  <wfs@jany.ma.utexas.edu>
+	* /cvsroot/gcl/gcl/h/gnuwin95.h: Tidy up h/gnuwin95.defs
 
-	* merge in billm's elf support for linux, and repair the
-	changes effects on regular a.out linux
-	* switch to unexec from 19.29 for versions using either the
-	regular or elf unexec from emacs
-	
+	* /cvsroot/gcl/gcl/h/coff/i386.h: Remove cruft from h/coff/i386.h
 
-Sun Oct  1 19:52:45 1995  Bill Schelter  <wfs@jany.ma.utexas.edu>
+	* /cvsroot/gcl/gcl/o/print.d: Prototype definition for coerce_stream
 
-	* Many changes to gcl 2.1 to support 64 bit machines (eg Dec
-	alpha).  Layout of structures etc changed.
-	* a gcl-2.2 beta was released in the summer.
-	since then there have been several bugs fixed.  One in cmpfun.lsp
-	affecting write, and another in init_gcl.lsp to make sure the
-	link array is a string array (changed from fixnum which are no
-	longer sufficient to hold pointers).
-	* changes to fix for PA risc hpux in the hp800.h
-	* changes to unexec-19.27.c to allow MUCH faster saving in NFS
-	environment.
-	* testing with maxima 5.1
-	* reworking makefiles
-	* (write 2) bug fixed.  (in compiler)
-	* (aref #*11111 0) fixed  (was different bv_elttype field)
-	
-	
-Sun Apr 30 18:28:07 1995  Bill Schelter  <wfs@pythagoras.ma.utexas.edu>
+	* /cvsroot/gcl/gcl/o/fat_string.c:
+	Compiler warning cleanup, strings end with char 0, not NULL
 
-	* various fixes to array.c for bitarrays and non 1 dimensional arrays
-	* fix to Ieval
-	* verify that pcl and clx work with these changes.
+	* /cvsroot/gcl/gcl/info/control.texi, /cvsroot/gcl/gcl/info/gcl-si.texi:
+	Minor changes to .texi files to compile cleanly on standard texinfo installations
 
-Sun Apr  9 21:24:38 1995  Bill Schelter  <wfs@jany.ma.utexas.edu>
+	* /cvsroot/gcl/gcl/h/num_include.h:
+	Clear up a compiler warning with MOST_NEGATIVE_FIX
 
-	*  (ln): 
+	* /cvsroot/gcl/gcl/gcl-tk/gcltksrv.in.interp, /cvsroot/gcl/gcl/gcl-tk/ngcltksrv:
+	Remove version dependence on wish in shell scripts -- if need a dependency, will put in configure later
 
-Sat Apr  1 14:01:35 1995  Bill Schelter  <wfs@jany.ma.utexas.edu>
+	* /cvsroot/gcl/gcl/elisp/smart-complete.el:
+	Rename split-string to split-string-gcl to avoid name conflicts with other elisp packages
 
-	* There have been an infinite number of changes for gcl-2.0
+	* /cvsroot/gcl/gcl/bin/dpp.c, /cvsroot/gcl/gcl/bin/file-sub.c, /cvsroot/gcl/gcl/o/cmpaux.c, /cvsroot/gcl/gcl/o/fasldlsym.c, /cvsroot/gcl/gcl/o/main.c, /cvsroot/gcl/gcl/o/symbol.d, /cvsroot/gcl/gcl/o/unixfsys.c:
+	Added missing headers for str... and exit standard functions
 
-	* GCL now contains a tcl/tk windowing interface.
-	 It is based on TCL 7.3 and TK 3.6 available from
-	 ftp.cs.berkeley.edu and many mirrors.
+	* /cvsroot/gcl/gcl/bin/append.c, /cvsroot/gcl/gcl/gcl-tk/decode.tcl, /cvsroot/gcl/gcl/gcl-tk/tinfo.c, /cvsroot/gcl/gcl/h/cyglacks.h, /cvsroot/gcl/gcl/o/big.c, /cvsroot/gcl/gcl/o/try.c, /cvsroot/gcl/gcl/unixport/rsym_nt.c, /cvsroot/gcl/gcl/unixport/tryserv.tcl, /cvsroot/gcl/gcl/makdefs, /cvsroot/gcl/gcl/readme.mingw:
+	Removed CR from all compilable files; removed one useless file
 
-	 See the gcl-tk/demos/widget.lisp file for the demos.
-	 
+2001-12-17  Camm Maguire  <camm@intech19.enhanced.com>
 
-	* support for gzipped files
-	(setq si::*allow-gzipped-file* t)
-	to allow it.   (load "foo.o") will look for "foo.o.gz" if
-	it does not find foo.o.   Writing gzipped files is not
-	supported.
+	* /cvsroot/gcl/gcl/config.guess, /cvsroot/gcl/gcl/config.sub:
+	New versions of config.sub and config.guess
 
-	* Command line args:
-	See the documentaion in the info directory under command line.
-	`-eval' `-load' etc.
-	
-	`-f'   allows shell scripts to be made such as
-	==================
-	#!/usr/local/bin/gcl.exe -f
-	(print "hello world")
-	==================
+2001-12-16  Camm Maguire  <camm@intech19.enhanced.com>
 
-	* All documentation converted to texinfo, info format and
-	extended.   Ansi common lisp documentation converted to texinfo
+	* /cvsroot/gcl/gcl/configure, /cvsroot/gcl/gcl/configure.in:
+	Allow setting compiler in CC env variable
 
-	* interrupts completely changed, to be more robust and to
-	allow communication with tk.
+	* /cvsroot/gcl/gcl/h/compbas2.h, /cvsroot/gcl/gcl/o/alloc.c, /cvsroot/gcl/gcl/o/file.d:
+	Commented labels at end of #endifs
 
-	* regexp matching introduced see 'string-match'
+	* /cvsroot/gcl/gcl/h/ptable.h: removed carriage returns
 
-	
+2001-12-15  Camm Maguire  <camm@intech19.enhanced.com>
 
-	
-	
+	* /cvsroot/gcl/gcl/gmp/mpn/hppa/hppa1_1/pa7100/addmul_1.S, /cvsroot/gcl/gcl/gmp/mpn/hppa/hppa1_1/pa7100/add_n.s, /cvsroot/gcl/gcl/gmp/mpn/hppa/hppa1_1/pa7100/lshift.s, /cvsroot/gcl/gcl/gmp/mpn/hppa/hppa1_1/pa7100/rshift.s, /cvsroot/gcl/gcl/gmp/mpn/hppa/hppa1_1/pa7100/submul_1.S, /cvsroot/gcl/gcl/gmp/mpn/hppa/hppa1_1/pa7100/sub_n.s, /cvsroot/gcl/gcl/gmp/mpn/sparc32/v8/supersparc/udiv.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k6/k62mmx/copyd.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k6/k62mmx/copyi.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k6/k62mmx/lshift.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k6/k62mmx/rshift.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k6/mmx/com_n.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k6/mmx/logops_n.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k6/mmx/lshift.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k6/mmx/popham.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k6/mmx/rshift.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k7/mmx/copyd.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k7/mmx/copyi.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k7/mmx/divrem_1.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k7/mmx/lshift.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k7/mmx/mod_1.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k7/mmx/popham.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k7/mmx/rshift.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/p6/mmx/divrem_1.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/p6/mmx/mod_1.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/p6/mmx/popham.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/p6/p3mmx/popham.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/pentium/mmx/gmp-mparam.h, /cvsroot/gcl/gcl/gmp/mpn/x86/pentium/mmx/lshift.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/pentium/mmx/popham.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/pentium/mmx/rshift.asm, /cvsroot/gcl/gcl/gmp/mpbsd/tests/Makefile.in, /cvsroot/gcl/gcl/gmp/mpfr/tests/Makefile.in, /cvsroot/gcl/gcl/gmp/mpf/tests/Makefile.in, /cvsroot/gcl/gcl/gmp/mpn/alpha/ev5/add_n.asm, /cvsroot/gcl/gcl/gmp/mpn/alpha/ev5/lshift.asm, /cvsroot/gcl/gcl/gmp/mpn/alpha/ev5/rshift.asm, /cvsroot/gcl/gcl/gmp/mpn/alpha/ev5/sub_n.asm, /cvsroot/gcl/gcl/gmp/mpn/alpha/ev6/addmul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/alpha/ev6/gmp-mparam.h, /cvsroot/gcl/gcl/gmp/mpn/hppa/hppa1_1/addmul_1.s, /cvsroot/gcl/gcl/gmp/mpn/hppa/hppa1_1/mul_1.s, /cvsroot/gcl/gcl/gmp/mpn/hppa/hppa1_1/submul_1.s, /cvsroot/gcl/gcl/gmp/mpn/hppa/hppa1_1/udiv_qrnnd.S, /cvsroot/gcl/gcl/gmp/mpn/hppa/hppa1_1/umul.s, /cvsroot/gcl/gcl/gmp/mpn/hppa/hppa2_0/add_n.s, /cvsroot/gcl/gcl/gmp/mpn/hppa/hppa2_0/sub_n.s, /cvsroot/gcl/gcl/gmp/mpn/m68k/mc68020/addmul_1.S, /cvsroot/gcl/gcl/gmp/mpn/m68k/mc68020/mul_1.S, /cvsroot/gcl/gcl/gmp/mpn/m68k/mc68020/submul_1.S, /cvsroot/gcl/gcl/gmp/mpn/m68k/mc68020/udiv.S, /cvsroot/gcl/gcl/gmp/mpn/m68k/mc68020/umul.S, /cvsroot/gcl/gcl/gmp/mpn/m88k/mc88110/addmul_1.s, /cvsroot/gcl/gcl/gmp/mpn/m88k/mc88110/add_n.S, /cvsroot/gcl/gcl/gmp/mpn/m88k/mc88110/mul_1.s, /cvsroot/gcl/gcl/gmp/mpn/m88k/mc88110/sub_n.S, /cvsroot/gcl/gcl/gmp/mpn/sh/sh2/addmul_1.s, /cvsroot/gcl/gcl/gmp/mpn/sh/sh2/mul_1.s, /cvsroot/gcl/gcl/gmp/mpn/sh/sh2/submul_1.s, /cvsroot/gcl/gcl/gmp/mpn/sparc32/v8/addmul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc32/v8/mul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc32/v8/submul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc32/v8/umul.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc32/v9/addmul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc32/v9/gmp-mparam.h, /cvsroot/gcl/gcl/gmp/mpn/sparc32/v9/mul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc32/v9/README, /cvsroot/gcl/gcl/gmp/mpn/sparc32/v9/submul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k6/aorsmul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k6/aors_n.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k6/cross.pl, /cvsroot/gcl/gcl/gmp/mpn/x86/k6/diveby3.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k6/gmp-mparam.h, /cvsroot/gcl/gcl/gmp/mpn/x86/k6/mul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k6/mul_basecase.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k6/README, /cvsroot/gcl/gcl/gmp/mpn/x86/k6/sqr_basecase.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k7/aorsmul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k7/aors_n.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k7/diveby3.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k7/gmp-mparam.h, /cvsroot/gcl/gcl/gmp/mpn/x86/k7/mul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k7/mul_basecase.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/k7/README, /cvsroot/gcl/gcl/gmp/mpn/x86/k7/sqr_basecase.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/p6/aorsmul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/p6/diveby3.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/p6/gmp-mparam.h, /cvsroot/gcl/gcl/gmp/mpn/x86/p6/README, /cvsroot/gcl/gcl/gmp/mpn/x86/p6/sqr_basecase.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/pentium/aorsmul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/pentium/aors_n.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/pentium/diveby3.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/pentium/gmp-mparam.h, /cvsroot/gcl/gcl/gmp/mpn/x86/pentium/lshift.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/pentium/mul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/pentium/mul_basecase.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/pentium/README, /cvsroot/gcl/gcl/gmp/mpn/x86/pentium/rshift.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/pentium/sqr_basecase.asm, /cvsroot/gcl/gcl/gmp/mpq/tests/Makefile.in, /cvsroot/gcl/gcl/gmp/tests/rand/Makefile.in, /cvsroot/gcl/gcl/gmp/mpn/tests/submul_1.c, /cvsroot/gcl/gcl/gmp/mpn/tests/sub_n.c, /cvsroot/gcl/gcl/gmp/mpn/tests/trace.c, /cvsroot/gcl/gcl/gmp/mpn/tests/try.c, /cvsroot/gcl/gcl/gmp/mpn/tests/try.h, /cvsroot/gcl/gcl/gmp/mpn/tests/tst-addsub.c, /cvsroot/gcl/gcl/gmp/mpn/tests/x86call.asm, /cvsroot/gcl/gcl/gmp/mpn/tests/x86check.c, /cvsroot/gcl/gcl/gmp/mpn/thumb/add_n.s, /cvsroot/gcl/gcl/gmp/mpn/thumb/sub_n.s, /cvsroot/gcl/gcl/gmp/mpn/vax/addmul_1.s, /cvsroot/gcl/gcl/gmp/mpn/vax/add_n.s, /cvsroot/gcl/gcl/gmp/mpn/vax/lshift.s, /cvsroot/gcl/gcl/gmp/mpn/vax/mul_1.s, /cvsroot/gcl/gcl/gmp/mpn/vax/rshift.s, /cvsroot/gcl/gcl/gmp/mpn/vax/submul_1.s, /cvsroot/gcl/gcl/gmp/mpn/vax/sub_n.s, /cvsroot/gcl/gcl/gmp/mpn/x86/addsub_n.S, /cvsroot/gcl/gcl/gmp/mpn/x86/aorsmul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/aors_n.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/copyd.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/copyi.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/diveby3.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/divrem_1.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/lshift.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/mod_1.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/mul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/mul_basecase.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/README, /cvsroot/gcl/gcl/gmp/mpn/x86/README.family, /cvsroot/gcl/gcl/gmp/mpn/x86/rshift.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/udiv.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/umul.asm, /cvsroot/gcl/gcl/gmp/mpn/x86/x86-defs.m4, /cvsroot/gcl/gcl/gmp/mpn/z8000/add_n.s, /cvsroot/gcl/gcl/gmp/mpn/z8000/gmp-mparam.h, /cvsroot/gcl/gcl/gmp/mpn/z8000/mul_1.s, /cvsroot/gcl/gcl/gmp/mpn/z8000/sub_n.s, /cvsroot/gcl/gcl/gmp/mpn/z8000x/add_n.s, /cvsroot/gcl/gcl/gmp/mpn/z8000x/sub_n.s, /cvsroot/gcl/gcl/gmp/mpq/Makefile.in, /cvsroot/gcl/gcl/gmp/mpz/tests/bit.c, /cvsroot/gcl/gcl/gmp/mpz/tests/convert.c, /cvsroot/gcl/gcl/gmp/mpz/tests/dive.c, /cvsroot/gcl/gcl/gmp/mpz/tests/io.c, /cvsroot/gcl/gcl/gmp/mpz/tests/logic.c, /cvsroot/gcl/gcl/gmp/mpz/tests/Makefile.am, /cvsroot/gcl/gcl/gmp/mpz/tests/Makefile.in, /cvsroot/gcl/gcl/gmp/mpz/tests/reuse.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-2exp.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-bin.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-fdiv.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-fdiv_ui.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-gcd.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-jac.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-misc.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-mul.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-powm.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-powm_ui.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-pow_ui.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-root.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-sqrtrem.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-tdiv.c, /cvsroot/gcl/gcl/gmp/mpz/tests/t-tdiv_ui.c, /cvsroot/gcl/gcl/gmp/tests/Makefile.in, /cvsroot/gcl/gcl/gmp/tune/Makefile.in, /cvsroot/gcl/gcl/gmp/demos/Makefile.in, /cvsroot/gcl/gcl/gmp/macos/Makefile.in, /cvsroot/gcl/gcl/gmp/mpbsd/Makefile.in, /cvsroot/gcl/gcl/gmp/mpf/Makefile.in, /cvsroot/gcl/gcl/gmp/mpfr/Makefile.in, /cvsroot/gcl/gcl/gmp/mpn/a29k/addmul_1.s, /cvsroot/gcl/gcl/gmp/mpn/a29k/add_n.s, /cvsroot/gcl/gcl/gmp/mpn/a29k/lshift.s, /cvsroot/gcl/gcl/gmp/mpn/a29k/mul_1.s, /cvsroot/gcl/gcl/gmp/mpn/a29k/rshift.s, /cvsroot/gcl/gcl/gmp/mpn/a29k/submul_1.s, /cvsroot/gcl/gcl/gmp/mpn/a29k/sub_n.s, /cvsroot/gcl/gcl/gmp/mpn/a29k/udiv.s, /cvsroot/gcl/gcl/gmp/mpn/a29k/umul.s, /cvsroot/gcl/gcl/gmp/mpn/alpha/addmul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/alpha/add_n.asm, /cvsroot/gcl/gcl/gmp/mpn/alpha/cntlz.asm, /cvsroot/gcl/gcl/gmp/mpn/alpha/default.m4, /cvsroot/gcl/gcl/gmp/mpn/alpha/gmp-mparam.h, /cvsroot/gcl/gcl/gmp/mpn/alpha/invert_limb.asm, /cvsroot/gcl/gcl/gmp/mpn/alpha/lshift.asm, /cvsroot/gcl/gcl/gmp/mpn/alpha/mul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/alpha/README, /cvsroot/gcl/gcl/gmp/mpn/alpha/rshift.asm, /cvsroot/gcl/gcl/gmp/mpn/alpha/submul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/alpha/sub_n.asm, /cvsroot/gcl/gcl/gmp/mpn/alpha/udiv_qrnnd.S, /cvsroot/gcl/gcl/gmp/mpn/alpha/umul.asm, /cvsroot/gcl/gcl/gmp/mpn/alpha/unicos.m4, /cvsroot/gcl/gcl/gmp/mpn/arm/addmul_1.S, /cvsroot/gcl/gcl/gmp/mpn/arm/add_n.S, /cvsroot/gcl/gcl/gmp/mpn/arm/gmp-mparam.h, /cvsroot/gcl/gcl/gmp/mpn/arm/mul_1.S, /cvsroot/gcl/gcl/gmp/mpn/arm/sub_n.S, /cvsroot/gcl/gcl/gmp/mpn/clipper/add_n.s, /cvsroot/gcl/gcl/gmp/mpn/clipper/mul_1.s, /cvsroot/gcl/gcl/gmp/mpn/clipper/sub_n.s, /cvsroot/gcl/gcl/gmp/mpn/cray/addmul_1.c, /cvsroot/gcl/gcl/gmp/mpn/cray/add_n.c, /cvsroot/gcl/gcl/gmp/mpn/cray/gmp-mparam.h, /cvsroot/gcl/gcl/gmp/mpn/cray/mul_1.c, /cvsroot/gcl/gcl/gmp/mpn/cray/mulww.f, /cvsroot/gcl/gcl/gmp/mpn/cray/mulww.s, /cvsroot/gcl/gcl/gmp/mpn/cray/README, /cvsroot/gcl/gcl/gmp/mpn/cray/submul_1.c, /cvsroot/gcl/gcl/gmp/mpn/cray/sub_n.c, /cvsroot/gcl/gcl/gmp/mpn/hppa/add_n.s, /cvsroot/gcl/gcl/gmp/mpn/hppa/gmp-mparam.h, /cvsroot/gcl/gcl/gmp/mpn/hppa/lshift.s, /cvsroot/gcl/gcl/gmp/mpn/hppa/README, /cvsroot/gcl/gcl/gmp/mpn/hppa/rshift.s, /cvsroot/gcl/gcl/gmp/mpn/hppa/sub_n.s, /cvsroot/gcl/gcl/gmp/mpn/hppa/udiv_qrnnd.s, /cvsroot/gcl/gcl/gmp/mpn/i960/addmul_1.s, /cvsroot/gcl/gcl/gmp/mpn/i960/add_n.s, /cvsroot/gcl/gcl/gmp/mpn/i960/mul_1.s, /cvsroot/gcl/gcl/gmp/mpn/i960/README, /cvsroot/gcl/gcl/gmp/mpn/i960/sub_n.s, /cvsroot/gcl/gcl/gmp/mpn/lisp/gmpasm-mode.el, /cvsroot/gcl/gcl/gmp/mpn/m68k/add_n.S, /cvsroot/gcl/gcl/gmp/mpn/m68k/lshift.S, /cvsroot/gcl/gcl/gmp/mpn/m68k/rshift.S, /cvsroot/gcl/gcl/gmp/mpn/m68k/sub_n.S, /cvsroot/gcl/gcl/gmp/mpn/m68k/syntax.h, /cvsroot/gcl/gcl/gmp/mpn/m88k/add_n.s, /cvsroot/gcl/gcl/gmp/mpn/m88k/mul_1.s, /cvsroot/gcl/gcl/gmp/mpn/m88k/sub_n.s, /cvsroot/gcl/gcl/gmp/mpn/mips2/addmul_1.s, /cvsroot/gcl/gcl/gmp/mpn/mips2/add_n.s, /cvsroot/gcl/gcl/gmp/mpn/mips2/lshift.s, /cvsroot/gcl/gcl/gmp/mpn/mips2/mul_1.s, /cvsroot/gcl/gcl/gmp/mpn/mips2/rshift.s, /cvsroot/gcl/gcl/gmp/mpn/mips2/submul_1.s, /cvsroot/gcl/gcl/gmp/mpn/mips2/sub_n.s, /cvsroot/gcl/gcl/gmp/mpn/mips2/umul.s, /cvsroot/gcl/gcl/gmp/mpn/mips3/addmul_1.s, /cvsroot/gcl/gcl/gmp/mpn/mips3/add_n.s, /cvsroot/gcl/gcl/gmp/mpn/mips3/gmp-mparam.h, /cvsroot/gcl/gcl/gmp/mpn/mips3/lshift.s, /cvsroot/gcl/gcl/gmp/mpn/mips3/mul_1.s, /cvsroot/gcl/gcl/gmp/mpn/mips3/README, /cvsroot/gcl/gcl/gmp/mpn/mips3/rshift.s, /cvsroot/gcl/gcl/gmp/mpn/mips3/submul_1.s, /cvsroot/gcl/gcl/gmp/mpn/mips3/sub_n.s, /cvsroot/gcl/gcl/gmp/mpn/ns32k/addmul_1.s, /cvsroot/gcl/gcl/gmp/mpn/ns32k/add_n.s, /cvsroot/gcl/gcl/gmp/mpn/ns32k/mul_1.s, /cvsroot/gcl/gcl/gmp/mpn/ns32k/submul_1.s, /cvsroot/gcl/gcl/gmp/mpn/ns32k/sub_n.s, /cvsroot/gcl/gcl/gmp/mpn/pa64/addmul_1.S, /cvsroot/gcl/gcl/gmp/mpn/pa64/add_n.s, /cvsroot/gcl/gcl/gmp/mpn/pa64/gmp-mparam.h, /cvsroot/gcl/gcl/gmp/mpn/pa64/lshift.s, /cvsroot/gcl/gcl/gmp/mpn/pa64/mul_1.S, /cvsroot/gcl/gcl/gmp/mpn/pa64/README, /cvsroot/gcl/gcl/gmp/mpn/pa64/rshift.s, /cvsroot/gcl/gcl/gmp/mpn/pa64/submul_1.S, /cvsroot/gcl/gcl/gmp/mpn/pa64/sub_n.s, /cvsroot/gcl/gcl/gmp/mpn/pa64/udiv_qrnnd.c, /cvsroot/gcl/gcl/gmp/mpn/pa64/umul_ppmm.S, /cvsroot/gcl/gcl/gmp/mpn/pa64w/addmul_1.S, /cvsroot/gcl/gcl/gmp/mpn/pa64w/add_n.s, /cvsroot/gcl/gcl/gmp/mpn/pa64w/gmp-mparam.h, /cvsroot/gcl/gcl/gmp/mpn/pa64w/lshift.s, /cvsroot/gcl/gcl/gmp/mpn/pa64w/mul_1.S, /cvsroot/gcl/gcl/gmp/mpn/pa64w/README, /cvsroot/gcl/gcl/gmp/mpn/pa64w/rshift.s, /cvsroot/gcl/gcl/gmp/mpn/pa64w/submul_1.S, /cvsroot/gcl/gcl/gmp/mpn/pa64w/sub_n.s, /cvsroot/gcl/gcl/gmp/mpn/pa64w/udiv_qrnnd.c, /cvsroot/gcl/gcl/gmp/mpn/pa64w/umul_ppmm.S, /cvsroot/gcl/gcl/gmp/mpn/power/addmul_1.s, /cvsroot/gcl/gcl/gmp/mpn/power/add_n.s, /cvsroot/gcl/gcl/gmp/mpn/power/lshift.s, /cvsroot/gcl/gcl/gmp/mpn/power/mul_1.s, /cvsroot/gcl/gcl/gmp/mpn/powerpc32/addmul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/powerpc32/add_n.asm, /cvsroot/gcl/gcl/gmp/mpn/powerpc32/aix.m4, /cvsroot/gcl/gcl/gmp/mpn/powerpc32/gmp-mparam.h, /cvsroot/gcl/gcl/gmp/mpn/powerpc32/lshift.asm, /cvsroot/gcl/gcl/gmp/mpn/powerpc32/mul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/powerpc32/regmap.m4, /cvsroot/gcl/gcl/gmp/mpn/powerpc32/rshift.asm, /cvsroot/gcl/gcl/gmp/mpn/powerpc32/submul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/powerpc32/sub_n.asm, /cvsroot/gcl/gcl/gmp/mpn/powerpc32/umul.asm, /cvsroot/gcl/gcl/gmp/mpn/powerpc64/addmul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/powerpc64/add_n.asm, /cvsroot/gcl/gcl/gmp/mpn/powerpc64/addsub_n.asm, /cvsroot/gcl/gcl/gmp/mpn/powerpc64/aix.m4, /cvsroot/gcl/gcl/gmp/mpn/powerpc64/copyd.asm, /cvsroot/gcl/gcl/gmp/mpn/powerpc64/copyi.asm, /cvsroot/gcl/gcl/gmp/mpn/powerpc64/gmp-mparam.h, /cvsroot/gcl/gcl/gmp/mpn/powerpc64/lshift.asm, /cvsroot/gcl/gcl/gmp/mpn/powerpc64/mul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/powerpc64/README, /cvsroot/gcl/gcl/gmp/mpn/powerpc64/rshift.asm, /cvsroot/gcl/gcl/gmp/mpn/powerpc64/submul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/powerpc64/sub_n.asm, /cvsroot/gcl/gcl/gmp/mpn/power/rshift.s, /cvsroot/gcl/gcl/gmp/mpn/power/sdiv.s, /cvsroot/gcl/gcl/gmp/mpn/power/submul_1.s, /cvsroot/gcl/gcl/gmp/mpn/power/sub_n.s, /cvsroot/gcl/gcl/gmp/mpn/power/umul.s, /cvsroot/gcl/gcl/gmp/mpn/pyr/addmul_1.s, /cvsroot/gcl/gcl/gmp/mpn/pyr/add_n.s, /cvsroot/gcl/gcl/gmp/mpn/pyr/mul_1.s, /cvsroot/gcl/gcl/gmp/mpn/pyr/sub_n.s, /cvsroot/gcl/gcl/gmp/mpn/sh/add_n.s, /cvsroot/gcl/gcl/gmp/mpn/sh/sub_n.s, /cvsroot/gcl/gcl/gmp/mpn/sparc32/addmul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc32/add_n.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc32/lshift.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc32/mul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc32/README, /cvsroot/gcl/gcl/gmp/mpn/sparc32/rshift.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc32/submul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc32/sub_n.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc32/udiv_fp.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc32/udiv_nfp.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc32/umul.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc64/addmul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc64/addmul1h.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc64/add_n.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc64/copyi.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc64/gmp-mparam.h, /cvsroot/gcl/gcl/gmp/mpn/sparc64/lshift.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc64/mul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc64/mul_1h.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc64/README, /cvsroot/gcl/gcl/gmp/mpn/sparc64/rshift.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc64/submul_1.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc64/submul1h.asm, /cvsroot/gcl/gcl/gmp/mpn/sparc64/sub_n.asm, /cvsroot/gcl/gcl/gmp/mpn/tests/addmul_1.c, /cvsroot/gcl/gcl/gmp/mpn/tests/add_n.c, /cvsroot/gcl/gcl/gmp/mpn/tests/copy.c, /cvsroot/gcl/gcl/gmp/mpn/tests/divmod_1.c, /cvsroot/gcl/gcl/gmp/mpn/tests/divrem.c, /cvsroot/gcl/gcl/gmp/mpn/tests/lshift.c, /cvsroot/gcl/gcl/gmp/mpn/tests/Makefile.am, /cvsroot/gcl/gcl/gmp/mpn/tests/Makefile.in, /cvsroot/gcl/gcl/gmp/mpn/tests/mul_1.c, /cvsroot/gcl/gcl/gmp/mpn/tests/README, /cvsroot/gcl/gcl/gmp/mpn/tests/ref.c, /cvsroot/gcl/gcl/gmp/mpn/tests/ref.h, /cvsroot/gcl/gcl/gmp/mpn/tests/rshift.c, /cvsroot/gcl/gcl/gmp/mpn/tests/spinner.c, /cvsroot/gcl/gcl/gmp/ansi2knr.c, /cvsroot/gcl/gcl/gmp/configure.in, /cvsroot/gcl/gcl/gmp/mpn/asm-defs.m4, /cvsroot/gcl/gcl/gmp/mpn/generic/addmul_1.c, /cvsroot/gcl/gcl/gmp/mpn/generic/add_n.c, /cvsroot/gcl/gcl/gmp/mpn/generic/addsub_n.c, /cvsroot/gcl/gcl/gmp/mpn/generic/bdivmod.c, /cvsroot/gcl/gcl/gmp/mpn/generic/bz_divrem_n.c, /cvsroot/gcl/gcl/gmp/mpn/generic/cmp.c, /cvsroot/gcl/gcl/gmp/mpn/generic/diveby3.c, /cvsroot/gcl/gcl/gmp/mpn/generic/divrem_1.c, /cvsroot/gcl/gcl/gmp/mpn/generic/divrem_2.c, /cvsroot/gcl/gcl/gmp/mpn/generic/divrem.c, /cvsroot/gcl/gcl/gmp/mpn/generic/dump.c, /cvsroot/gcl/gcl/gmp/mpn/generic/gcd_1.c, /cvsroot/gcl/gcl/gmp/mpn/generic/gcd.c, /cvsroot/gcl/gcl/gmp/mpn/generic/gcdext.c, /cvsroot/gcl/gcl/gmp/mpn/generic/get_str.c, /cvsroot/gcl/gcl/gmp/mpn/generic/gmp-mparam.h, /cvsroot/gcl/gcl/gmp/mpn/generic/hamdist.c, /cvsroot/gcl/gcl/gmp/mpn/generic/inlines.c, /cvsroot/gcl/gcl/gmp/mpn/generic/jacbase.c, /cvsroot/gcl/gcl/gmp/mpn/generic/lshift.c, /cvsroot/gcl/gcl/gmp/mpn/generic/mod_1.c, /cvsroot/gcl/gcl/gmp/mpn/generic/mod_1_rs.c, /cvsroot/gcl/gcl/gmp/mpn/generic/mul_1.c, /cvsroot/gcl/gcl/gmp/mpn/generic/mul_basecase.c, /cvsroot/gcl/gcl/gmp/mpn/generic/mul.c, /cvsroot/gcl/gcl/gmp/mpn/generic/mul_fft.c, /cvsroot/gcl/gcl/gmp/mpn/generic/perfsqr.c, /cvsroot/gcl/gcl/gmp/mpn/generic/popcount.c, /cvsroot/gcl/gcl/gmp/mpn/generic/pre_mod_1.c, /cvsroot/gcl/gcl/gmp/mpn/generic/random2.c, /cvsroot/gcl/gcl/gmp/mpn/generic/random.c, /cvsroot/gcl/gcl/gmp/mpn/generic/rshift.c, /cvsroot/gcl/gcl/gmp/mpn/generic/sb_divrem_mn.c, /cvsroot/gcl/gcl/gmp/mpn/generic/scan0.c, /cvsroot/gcl/gcl/gmp/mpn/generic/scan1.c, /cvsroot/gcl/gcl/gmp/mpn/generic/set_str.c, /cvsroot/gcl/gcl/gmp/mpn/generic/sqr_basecase.c, /cvsroot/gcl/gcl/gmp/mpn/generic/sqrtrem.c, /cvsroot/gcl/gcl/gmp/mpn/generic/submul_1.c, /cvsroot/gcl/gcl/gmp/mpn/generic/sub_n.c, /cvsroot/gcl/gcl/gmp/mpn/generic/tdiv_qr.c, /cvsroot/gcl/gcl/gmp/mpn/generic/udiv_w_sdiv.c, /cvsroot/gcl/gcl/gmp/mpn/Makefile.am, /cvsroot/gcl/gcl/gmp/mpn/Makefile.in, /cvsroot/gcl/gcl/gmp/mpn/mp_bases.c, /cvsroot/gcl/gcl/gmp/mpn/README, /cvsroot/gcl/gcl/gmp/mpz/abs.c, /cvsroot/gcl/gcl/gmp/mpz/add.c, /cvsroot/gcl/gcl/gmp/mpz/addmul_ui.c, /cvsroot/gcl/gcl/gmp/mpz/add_ui.c, /cvsroot/gcl/gcl/gmp/mpz/and.c, /cvsroot/gcl/gcl/gmp/mpz/array_init.c, /cvsroot/gcl/gcl/gmp/mpz/bin_ui.c, /cvsroot/gcl/gcl/gmp/mpz/bin_uiui.c, /cvsroot/gcl/gcl/gmp/mpz/cdiv_q.c, /cvsroot/gcl/gcl/gmp/mpz/cdiv_qr.c, /cvsroot/gcl/gcl/gmp/mpz/cdiv_qr_ui.c, /cvsroot/gcl/gcl/gmp/mpz/cdiv_q_ui.c, /cvsroot/gcl/gcl/gmp/mpz/cdiv_r.c, /cvsroot/gcl/gcl/gmp/mpz/cdiv_r_ui.c, /cvsroot/gcl/gcl/gmp/mpz/cdiv_ui.c, /cvsroot/gcl/gcl/gmp/mpz/clear.c, /cvsroot/gcl/gcl/gmp/mpz/clrbit.c, /cvsroot/gcl/gcl/gmp/mpz/cmpabs.c, /cvsroot/gcl/gcl/gmp/mpz/cmpabs_ui.c, /cvsroot/gcl/gcl/gmp/mpz/cmp.c, /cvsroot/gcl/gcl/gmp/mpz/cmp_si.c, /cvsroot/gcl/gcl/gmp/mpz/cmp_ui.c, /cvsroot/gcl/gcl/gmp/mpz/com.c, /cvsroot/gcl/gcl/gmp/mpz/divexact.c, /cvsroot/gcl/gcl/gmp/mpz/dump.c, /cvsroot/gcl/gcl/gmp/mpz/fac_ui.c, /cvsroot/gcl/gcl/gmp/mpz/fdiv_q_2exp.c, /cvsroot/gcl/gcl/gmp/mpz/fdiv_q.c, /cvsroot/gcl/gcl/gmp/mpz/fdiv_qr.c, /cvsroot/gcl/gcl/gmp/mpz/fdiv_qr_ui.c, /cvsroot/gcl/gcl/gmp/mpz/fdiv_q_ui.c, /cvsroot/gcl/gcl/gmp/mpz/fdiv_r.c, /cvsroot/gcl/gcl/gmp/mpz/fdiv_r_ui.c, /cvsroot/gcl/gcl/gmp/mpz/fdiv_ui.c, /cvsroot/gcl/gcl/gmp/mpz/fib_ui.c, /cvsroot/gcl/gcl/gmp/mpz/fits_sint_p.c, /cvsroot/gcl/gcl/gmp/mpz/fits_slong_p.c, /cvsroot/gcl/gcl/gmp/mpz/fits_sshort_p.c, /cvsroot/gcl/gcl/gmp/mpz/fits_uint_p.c, /cvsroot/gcl/gcl/gmp/mpz/fits_ulong_p.c, /cvsroot/gcl/gcl/gmp/mpz/fits_ushort_p.c, /cvsroot/gcl/gcl/gmp/mpz/gcdext.c, /cvsroot/gcl/gcl/gmp/mpz/gcd_ui.c, /cvsroot/gcl/gcl/gmp/mpz/get_d.c, /cvsroot/gcl/gcl/gmp/mpz/getlimbn.c, /cvsroot/gcl/gcl/gmp/mpz/get_si.c, /cvsroot/gcl/gcl/gmp/mpz/get_str.c, /cvsroot/gcl/gcl/gmp/mpz/get_ui.c, /cvsroot/gcl/gcl/gmp/mpz/hamdist.c, /cvsroot/gcl/gcl/gmp/mpz/init.c, /cvsroot/gcl/gcl/gmp/mpz/inp_raw.c, /cvsroot/gcl/gcl/gmp/mpz/inp_str.c, /cvsroot/gcl/gcl/gmp/mpz/invert.c, /cvsroot/gcl/gcl/gmp/mpz/ior.c, /cvsroot/gcl/gcl/gmp/mpz/iset.c, /cvsroot/gcl/gcl/gmp/mpz/iset_d.c, /cvsroot/gcl/gcl/gmp/mpz/iset_si.c, /cvsroot/gcl/gcl/gmp/mpz/iset_str.c, /cvsroot/gcl/gcl/gmp/mpz/iset_ui.c, /cvsroot/gcl/gcl/gmp/mpz/jacobi.c, /cvsroot/gcl/gcl/gmp/mpz/kronsz.c, /cvsroot/gcl/gcl/gmp/mpz/kronuz.c, /cvsroot/gcl/gcl/gmp/mpz/kronzs.c, /cvsroot/gcl/gcl/gmp/mpz/kronzu.c, /cvsroot/gcl/gcl/gmp/mpz/lcm.c, /cvsroot/gcl/gcl/gmp/mpz/legendre.c, /cvsroot/gcl/gcl/gmp/mpz/Makefile.am, /cvsroot/gcl/gcl/gmp/mpz/Makefile.in, /cvsroot/gcl/gcl/gmp/mpz/mod.c, /cvsroot/gcl/gcl/gmp/mpz/mul_2exp.c, /cvsroot/gcl/gcl/gmp/mpz/mul_siui.c, /cvsroot/gcl/gcl/gmp/mpz/neg.c, /cvsroot/gcl/gcl/gmp/mpz/nextprime.c, /cvsroot/gcl/gcl/gmp/mpz/out_raw.c, /cvsroot/gcl/gcl/gmp/mpz/out_str.c, /cvsroot/gcl/gcl/gmp/mpz/perfpow.c, /cvsroot/gcl/gcl/gmp/mpz/perfsqr.c, /cvsroot/gcl/gcl/gmp/mpz/popcount.c, /cvsroot/gcl/gcl/gmp/mpz/powm.c, /cvsroot/gcl/gcl/gmp/mpz/powm_ui.c, /cvsroot/gcl/gcl/gmp/mpz/pow_ui.c, /cvsroot/gcl/gcl/gmp/mpz/pprime_p.c, /cvsroot/gcl/gcl/gmp/mpz/random2.c, /cvsroot/gcl/gcl/gmp/mpz/random.c, /cvsroot/gcl/gcl/gmp/mpz/README, /cvsroot/gcl/gcl/gmp/mpz/realloc.c, /cvsroot/gcl/gcl/gmp/mpz/remove.c, /cvsroot/gcl/gcl/gmp/mpz/root.c, /cvsroot/gcl/gcl/gmp/mpz/rrandomb.c, /cvsroot/gcl/gcl/gmp/mpz/scan0.c, /cvsroot/gcl/gcl/gmp/mpz/scan1.c, /cvsroot/gcl/gcl/gmp/mpz/setbit.c, /cvsroot/gcl/gcl/gmp/mpz/set.c, /cvsroot/gcl/gcl/gmp/mpz/set_d.c, /cvsroot/gcl/gcl/gmp/mpz/set_f.c, /cvsroot/gcl/gcl/gmp/mpz/set_q.c, /cvsroot/gcl/gcl/gmp/mpz/set_si.c, /cvsroot/gcl/gcl/gmp/mpz/set_str.c, /cvsroot/gcl/gcl/gmp/mpz/set_ui.c, /cvsroot/gcl/gcl/gmp/mpz/size.c, /cvsroot/gcl/gcl/gmp/mpz/sizeinbase.c, /cvsroot/gcl/gcl/gmp/mpz/sqrt.c, /cvsroot/gcl/gcl/gmp/mpz/sqrtrem.c, /cvsroot/gcl/gcl/gmp/mpz/sub.c, /cvsroot/gcl/gcl/gmp/mpz/sub_ui.c, /cvsroot/gcl/gcl/gmp/mpz/swap.c, /cvsroot/gcl/gcl/gmp/mpz/tdiv_q_2exp.c, /cvsroot/gcl/gcl/gmp/mpz/tdiv_q.c, /cvsroot/gcl/gcl/gmp/mpz/tdiv_qr.c, /cvsroot/gcl/gcl/gmp/mpz/tdiv_qr_ui.c, /cvsroot/gcl/gcl/gmp/mpz/tdiv_q_ui.c, /cvsroot/gcl/gcl/gmp/mpz/tdiv_r_2exp.c, /cvsroot/gcl/gcl/gmp/mpz/tdiv_r.c, /cvsroot/gcl/gcl/gmp/mpz/tdiv_r_ui.c, /cvsroot/gcl/gcl/gmp/mpz/tdiv_ui.c, /cvsroot/gcl/gcl/gmp/mpz/tstbit.c, /cvsroot/gcl/gcl/gmp/mpz/ui_pow_ui.c, /cvsroot/gcl/gcl/gmp/mpz/urandomb.c, /cvsroot/gcl/gcl/gmp/mpz/urandomm.c, /cvsroot/gcl/gcl/gmp/mpz/xor.c:
+	Complete file additions for gmp configure and build
+
+	* /cvsroot/gcl/gcl/gmp/ansi2knr.c, /cvsroot/gcl/gcl/gmp/assert.c, /cvsroot/gcl/gcl/gmp/compat.c, /cvsroot/gcl/gcl/gmp/config.guess, /cvsroot/gcl/gcl/gmp/config.in, /cvsroot/gcl/gcl/gmp/config.sub, /cvsroot/gcl/gcl/gmp/configure, /cvsroot/gcl/gcl/gmp/configure.in, /cvsroot/gcl/gcl/gmp/COPYING, /cvsroot/gcl/gcl/gmp/errno.c, /cvsroot/gcl/gcl/gmp/extract-dbl.c, /cvsroot/gcl/gcl/gmp/gmp.h, /cvsroot/gcl/gcl/gmp/gmp-impl.h, /cvsroot/gcl/gcl/gmp/insert-dbl.c, /cvsroot/gcl/gcl/gmp/install-sh, /cvsroot/gcl/gcl/gmp/longlong.h, /cvsroot/gcl/gcl/gmp/ltconfig, /cvsroot/gcl/gcl/gmp/ltmain.sh, /cvsroot/gcl/gcl/gmp/Makefile.in, /cvsroot/gcl/gcl/gmp/memory.c, /cvsroot/gcl/gcl/gmp/missing, /cvsroot/gcl/gcl/gmp/mp_bpl.c, /cvsroot/gcl/gcl/gmp/mp_clz_tab.c, /cvsroot/gcl/gcl/gmp/mp.h, /cvsroot/gcl/gcl/gmp/mp_minv_tab.c, /cvsroot/gcl/gcl/gmp/mp_set_fns.c, /cvsroot/gcl/gcl/gmp/rand.c, /cvsroot/gcl/gcl/gmp/randclr.c, /cvsroot/gcl/gcl/gmp/randlc2x.c, /cvsroot/gcl/gcl/gmp/randlc.c, /cvsroot/gcl/gcl/gmp/randraw.c, /cvsroot/gcl/gcl/gmp/randsd.c, /cvsroot/gcl/gcl/gmp/randsdui.c, /cvsroot/gcl/gcl/gmp/README, /cvsroot/gcl/gcl/gmp/stack-alloc.c, /cvsroot/gcl/gcl/gmp/stack-alloc.h, /cvsroot/gcl/gcl/gmp/urandom.h, /cvsroot/gcl/gcl/gmp/version.c:
+	gmp configure and build restoration
+
+	* /cvsroot/gcl/gcl/configure, /cvsroot/gcl/gcl/configure.in:
+	Run emacs with --no-site-file to avoid errors; default ix86 gmp target is i486
+
+	* /cvsroot/gcl/gcl/h/gmp.h:
+	Link needed to get gmp bignums working with new gmp_big.c file
+
+	* /cvsroot/gcl/gcl/h/386-linux.h:
+	Patch submitted via email months ago by Dr. Schelter to enable reliable dynamic linking on i386 Linux
+
+2001-07-03  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/configure, /cvsroot/gcl/gcl/configure.in, /cvsroot/gcl/gcl/h/gclincl.h:
+	fix to configure
+
+2001-06-06  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/lsp/info.data, /cvsroot/gcl/gcl/lsp/info.lsp:
+	fix info to handle defunx
+
+2001-05-18  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/h/gclincl.h, /cvsroot/gcl/gcl/o/gmp_big.c, /cvsroot/gcl/gcl/o/gmp.c, /cvsroot/gcl/gcl/o/gmp_num_log.c, /cvsroot/gcl/gcl/o/makefile, /cvsroot/gcl/gcl/o/pari_big.c, /cvsroot/gcl/gcl/o/pari_num_log.c, /cvsroot/gcl/gcl/unixport/makefile, /cvsroot/gcl/gcl/elisp/gcl.el, /cvsroot/gcl/gcl/h/mp.h:
+	changes for bignum code, now relocatable bignums ok, worked around bug in gmp code which does not detect 0 as fitting in an int
+
+2001-05-16  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/dos/makefile, /cvsroot/gcl/gcl/elisp/makefile, /cvsroot/gcl/gcl/gcl-tk/makefile, /cvsroot/gcl/gcl/go/makefile, /cvsroot/gcl/gcl/h/cmpinclude.h, /cvsroot/gcl/gcl/h/gclincl.h, /cvsroot/gcl/gcl/h/mp.h, /cvsroot/gcl/gcl/h/new_decl.h, /cvsroot/gcl/gcl/info/makefile, /cvsroot/gcl/gcl/lsp/makefile, /cvsroot/gcl/gcl/mp/makefile, /cvsroot/gcl/gcl/o/cmpinclude.h, /cvsroot/gcl/gcl/o/fat_string.c, /cvsroot/gcl/gcl/o/makefile, /cvsroot/gcl/gcl/o/new_init.c, /cvsroot/gcl/gcl/unixport/makefile, /cvsroot/gcl/gcl/unixport/make_kcn, /cvsroot/gcl/gcl/bin/gcl, /cvsroot/gcl/gcl/bin/makefile, /cvsroot/gcl/gcl/clcs/makefile, /cvsroot/gcl/gcl/cmpnew/makefile, /cvsroot/gcl/gcl/comp/makefile, /cvsroot/gcl/gcl/configure, /cvsroot/gcl/gcl/configure.in, /cvsroot/gcl/gcl/doc/makefile, /cvsroot/gcl/gcl/makefile:
+	changes for gmp
+
+2001-05-15  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/comp/makefile, /cvsroot/gcl/gcl/doc/makefile, /cvsroot/gcl/gcl/dos/makefile, /cvsroot/gcl/gcl/elisp/makefile, /cvsroot/gcl/gcl/gcl-tk/demos/index.lsp, /cvsroot/gcl/gcl/gcl-tk/gcltksrv, /cvsroot/gcl/gcl/gcl-tk/makefile, /cvsroot/gcl/gcl/go/makefile, /cvsroot/gcl/gcl/h/cmpinclude.h, /cvsroot/gcl/gcl/h/gclincl.h, /cvsroot/gcl/gcl/h/gclincl.h.in, /cvsroot/gcl/gcl/info/makefile, /cvsroot/gcl/gcl/lsp/makefile, /cvsroot/gcl/gcl/mp/makefile, /cvsroot/gcl/gcl/o/cmpinclude.h, /cvsroot/gcl/gcl/o/main.c, /cvsroot/gcl/gcl/o/makefile, /cvsroot/gcl/gcl/o/num_log.c, /cvsroot/gcl/gcl/unixport/makefile, /cvsroot/gcl/gcl/unixport/make_kcn, /cvsroot/gcl/gcl/bin/gcl, /cvsroot/gcl/gcl/bin/makefile, /cvsroot/gcl/gcl/clcs/makefile, /cvsroot/gcl/gcl/cmpnew/cmpmain.lsp, /cvsroot/gcl/gcl/cmpnew/cmpopt.lsp, /cvsroot/gcl/gcl/cmpnew/makefile, /cvsroot/gcl/gcl/configure, /cvsroot/gcl/gcl/configure.in, /cvsroot/gcl/gcl/makefile:
+	fix to ash, and for buggy redhat/cygnus compiler
+
+2001-05-11  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/readme.gmp, /cvsroot/gcl/gcl/readme.mingw, /cvsroot/gcl/gcl/unixport/init_gcl.lsp:
+	fix the error code on compile from command line
+
+2001-05-06  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/gmp/mpn/generic/mul_n.c, /cvsroot/gcl/gcl/gmp/mpz/fdiv_r_2exp.c, /cvsroot/gcl/gcl/gmp/mpz/gcd.c, /cvsroot/gcl/gcl/gmp/mpz/mul.c:
+	changes to gmp from 3.1.1 for gcl
+
+	* /cvsroot/gcl/gcl/add-defs1, /cvsroot/gcl/gcl/bin/makefile, /cvsroot/gcl/gcl/clcs/makefile, /cvsroot/gcl/gcl/cmpnew/cmpopt.lsp, /cvsroot/gcl/gcl/cmpnew/makefile, /cvsroot/gcl/gcl/comp/makefile, /cvsroot/gcl/gcl/configure, /cvsroot/gcl/gcl/configure.in, /cvsroot/gcl/gcl/doc/makefile, /cvsroot/gcl/gcl/dos/makefile, /cvsroot/gcl/gcl/elisp/dbl.el, /cvsroot/gcl/gcl/elisp/gcl.el, /cvsroot/gcl/gcl/elisp/makefile, /cvsroot/gcl/gcl/elisp/smart-complete.el, /cvsroot/gcl/gcl/gcl-tk/makefile, /cvsroot/gcl/gcl/gmp/mpn/generic/mul_n.c, /cvsroot/gcl/gcl/gmp/mpz/fdiv_r_2exp.c, /cvsroot/gcl/gcl/gmp/mpz/gcd.c, /cvsroot/gcl/gcl/gmp/mpz/mul.c, /cvsroot/gcl/gcl/go/makefile, /cvsroot/gcl/gcl/h/386-linux.h, /cvsroot/gcl/gcl/h/att_ext.h, /cvsroot/gcl/gcl/h/cmpinclude.h, /cvsroot/gcl/gcl/h/cmponly.h, /cvsroot/gcl/gcl/h/compbas2.h, /cvsroot/gcl/gcl/h/gclincl.h, /cvsroot/gcl/gcl/h/gclincl.h.in, /cvsroot/gcl/gcl/h/include.h, /cvsroot/gcl/gcl/h/mdefs.h, /cvsroot/gcl/gcl/h/mp.h, /cvsroot/gcl/gcl/h/new_decl.h, /cvsroot/gcl/gcl/h/object.h, /cvsroot/gcl/gcl/info/makefile, /cvsroot/gcl/gcl/lsp/makefile, /cvsroot/gcl/gcl/makefile, /cvsroot/gcl/gcl/minvers, /cvsroot/gcl/gcl/mp/makefile, /cvsroot/gcl/gcl/o/big.c, /cvsroot/gcl/gcl/o/cmac.c, /cvsroot/gcl/gcl/o/cmpaux.c, /cvsroot/gcl/gcl/o/cmpinclude.h, /cvsroot/gcl/gcl/o/fasdump.c, /cvsroot/gcl/gcl/o/gbc.c, /cvsroot/gcl/gcl/o/hash.d, /cvsroot/gcl/gcl/o/init_pari.c, /cvsroot/gcl/gcl/o/main.c, /cvsroot/gcl/gcl/o/makefile, /cvsroot/gcl/gcl/o/new_init.c, /cvsroot/gcl/gcl/o/num_arith.c, /cvsroot/gcl/gcl/o/number.c, /cvsroot/gcl/gcl/o/num_log.c, /cvsroot/gcl/gcl/o/num_pred.c, /cvsroot/gcl/gcl/o/print.d, /cvsroot/gcl/gcl/o/read.d, /cvsroot/gcl/gcl/o/sgbc.c, /cvsroot/gcl/gcl/o/unixfsys.c, /cvsroot/gcl/gcl/o/usig2_aux.c, /cvsroot/gcl/gcl/unixport/init_gcl.lsp, /cvsroot/gcl/gcl/unixport/makefile, /cvsroot/gcl/gcl/unixport/make_kcn, /cvsroot/gcl/gcl/xbin/new-files:
+	many changes adding gmp bignums
+
+2001-04-17  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/h/cmpinclude.h, /cvsroot/gcl/gcl/h/new_decl.h, /cvsroot/gcl/gcl/lsp/debug.c, /cvsroot/gcl/gcl/lsp/debug.data, /cvsroot/gcl/gcl/lsp/debug.h, /cvsroot/gcl/gcl/lsp/debug.lsp, /cvsroot/gcl/gcl/lsp/top.c, /cvsroot/gcl/gcl/lsp/top.data, /cvsroot/gcl/gcl/lsp/top.h, /cvsroot/gcl/gcl/lsp/top.lsp, /cvsroot/gcl/gcl/o/cmpinclude.h, /cvsroot/gcl/gcl/o/new_init.c:
+	minor change to break-call
+
+	* /cvsroot/gcl/gcl/o/sfaslelf.c, /cvsroot/gcl/gcl/unixport/rsym_nt.c, /cvsroot/gcl/gcl/add-defs1, /cvsroot/gcl/gcl/bin/makefile, /cvsroot/gcl/gcl/ChangeLog, /cvsroot/gcl/gcl/cmpnew/cmpmain.lsp, /cvsroot/gcl/gcl/gcl-tk/makefile, /cvsroot/gcl/gcl/h/mingw.defs, /cvsroot/gcl/gcl/h/mingw.h, /cvsroot/gcl/gcl/lsp/autoload.lsp, /cvsroot/gcl/gcl/lsp/debug.lsp:
+	removed the o/*.ini files since these are generated automatically.
+	fixed things in h/mingw.{h,defs}, made o/sfaslelf.c so it can
+	load things compiled under -O4 (since init_ is searched for),
+	repaired rsym_nt.c for mingw port
+
+2001-04-13  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/ChangeLog, /cvsroot/gcl/gcl/h/386-linux.h, /cvsroot/gcl/gcl/h/notcomp.h:
+	changes for clisp, and to sysdef
+
+2001-03-22  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/lsp/evalmacros.c, /cvsroot/gcl/gcl/lsp/evalmacros.data, /cvsroot/gcl/gcl/lsp/evalmacros.h, /cvsroot/gcl/gcl/lsp/evalmacros.lsp, /cvsroot/gcl/gcl/o/makefile, /cvsroot/gcl/gcl/o/unexelf.c:
+	Fix the unexelf to make the data section executable
+
+2001-02-24  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/bin/append, /cvsroot/gcl/gcl/bin/makefile, /cvsroot/gcl/gcl/ChangeLog, /cvsroot/gcl/gcl/configure, /cvsroot/gcl/gcl/configure.in, /cvsroot/gcl/gcl/gcl-tk/guis.c, /cvsroot/gcl/gcl/gcl-tk/tinfo.c, /cvsroot/gcl/gcl/h/386-linux.h, /cvsroot/gcl/gcl/h/cmpinclude.h, /cvsroot/gcl/gcl/h/gclincl.h, /cvsroot/gcl/gcl/h/gclincl.h.in, /cvsroot/gcl/gcl/h/notcomp.h, /cvsroot/gcl/gcl/h/OpenBSD.defs, /cvsroot/gcl/gcl/h/OpenBSD.h, /cvsroot/gcl/gcl/o/cmpinclude.h, /cvsroot/gcl/gcl/o/main.c, /cvsroot/gcl/gcl/o/unexec.c, /cvsroot/gcl/gcl/xbin/new-files:
+	fix for debian, for stdout corruption after save
+
+2000-12-09  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/add-defs1, /cvsroot/gcl/gcl/add-defs, /cvsroot/gcl/gcl/bin/append, /cvsroot/gcl/gcl/bin/file-sub.c, /cvsroot/gcl/gcl/bin/gcl, /cvsroot/gcl/gcl/bin/makefile, /cvsroot/gcl/gcl/bin/winkill.c, /cvsroot/gcl/gcl/ChangeLog, /cvsroot/gcl/gcl/clcs/makefile, /cvsroot/gcl/gcl/cmpnew/cmpmain.lsp, /cvsroot/gcl/gcl/cmpnew/makefile, /cvsroot/gcl/gcl/comp/makefile, /cvsroot/gcl/gcl/configure, /cvsroot/gcl/gcl/configure.in, /cvsroot/gcl/gcl/doc/makefile, /cvsroot/gcl/gcl/dos/makefile, /cvsroot/gcl/gcl/elisp/dbl.el, /cvsroot/gcl/gcl/elisp/makefile, /cvsroot/gcl/gcl/gcl-tk/gcltksrv, /cvsroot/gcl/gcl/gcl-tk/makefile, /cvsroot/gcl/gcl/gcl-tk/tinfo.c, /cvsroot/gcl/gcl/go/makefile, /cvsroot/gcl/gcl/h/cmpinclude.h, /cvsroot/gcl/gcl/h/coff/i386.h, /cvsroot/gcl/gcl/h/gclincl.h, /cvsroot/gcl/gcl/h/gnuwin95.h, /cvsroot/gcl/gcl/h/mingw.defs, /cvsroot/gcl/gcl/h/mingw.h, /cvsroot/gcl/gcl/h/new_decl.h, /cvsroot/gcl/gcl/h/object.h, /cvsroot/gcl/gcl/h/wincoff.h, /cvsroot/gcl/gcl/info/makefile, /cvsroot/gcl/gcl/lsp/info.c, /cvsroot/gcl/gcl/lsp/info.lsp, /cvsroot/gcl/gcl/lsp/makefile, /cvsroot/gcl/gcl/lsp/top.c, /cvsroot/gcl/gcl/lsp/top.data, /cvsroot/gcl/gcl/lsp/top.h, /cvsroot/gcl/gcl/lsp/top.lsp, /cvsroot/gcl/gcl/makedefc.in, /cvsroot/gcl/gcl/makefile, /cvsroot/gcl/gcl/minvers, /cvsroot/gcl/gcl/mp/makefile, /cvsroot/gcl/gcl/o/cmpinclude.h, /cvsroot/gcl/gcl/o/file.d, /cvsroot/gcl/gcl/o/main.c, /cvsroot/gcl/gcl/o/makefile, /cvsroot/gcl/gcl/o/mingwin.c, /cvsroot/gcl/gcl/o/new_init.c, /cvsroot/gcl/gcl/o/nsocket.c, /cvsroot/gcl/gcl/o/pathname.d, /cvsroot/gcl/gcl/o/read.d, /cvsroot/gcl/gcl/o/save.c, /cvsroot/gcl/gcl/o/sockets.c, /cvsroot/gcl/gcl/o/tclwinkill.c, /cvsroot/gcl/gcl/o/unexnt.c, /cvsroot/gcl/gcl/o/unixfsys.c, /cvsroot/gcl/gcl/o/unixfsys.ini, /cvsroot/gcl/gcl/o/unixtime.c, /cvsroot/gcl/gcl/o/usig2.c, /cvsroot/gcl/gcl/o/usig.c, /cvsroot/gcl/gcl/unixport/makefile, /cvsroot/gcl/gcl/unixport/make_kcn, /cvsroot/gcl/gcl/unixport/rsym_nt.c, /cvsroot/gcl/gcl/xbin/386-linux-fix:
+	many changes for xmaxima and for windows
+
+2000-10-28  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/xbin/386-linux-fix: changes for redhat 7.0
+
+2000-10-27  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/h/386-linux.h, /cvsroot/gcl/gcl/h/bsd.h, /cvsroot/gcl/gcl/h/sparc-linux.h, /cvsroot/gcl/gcl/o/file.d, /cvsroot/gcl/gcl/configure.in:
+	changes for close_stream, and to configure for redhat 7.0
+
+	* /cvsroot/gcl/gcl/gcl-tk/demos/index.lsp, /cvsroot/gcl/gcl/go/makefile, /cvsroot/gcl/gcl/h/object.h, /cvsroot/gcl/gcl/info/makefile, /cvsroot/gcl/gcl/lsp/makefile, /cvsroot/gcl/gcl/mp/makefile, /cvsroot/gcl/gcl/o/makefile, /cvsroot/gcl/gcl/unixport/makefile, /cvsroot/gcl/gcl/unixport/make_kcn, /cvsroot/gcl/gcl/bin/append, /cvsroot/gcl/gcl/bin/gcl, /cvsroot/gcl/gcl/bin/makefile, /cvsroot/gcl/gcl/clcs/makefile, /cvsroot/gcl/gcl/cmpnew/makefile, /cvsroot/gcl/gcl/comp/makefile, /cvsroot/gcl/gcl/doc/makefile, /cvsroot/gcl/gcl/dos/makefile, /cvsroot/gcl/gcl/elisp/makefile, /cvsroot/gcl/gcl/elisp/sshell.el, /cvsroot/gcl/gcl/gcl-tk/gcltksrv, /cvsroot/gcl/gcl/gcl-tk/makefile, /cvsroot/gcl/gcl/gcl-tk/tinfo.c, /cvsroot/gcl/gcl/makefile:
+	abort() is void so fixed BV_OFFSET macro
+
+2000-06-27  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/info/io.texi, /cvsroot/gcl/gcl/o/file.d:
+	allow open of a file '| command' to open a pipe
+
+2000-06-26  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/lsp/export.lsp, /cvsroot/gcl/gcl/o/makefile, /cvsroot/gcl/gcl/o/read.d:
+	change parse_number to do bignums much faster
+
+2000-06-15  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/configure.in: fixes to configure
+
+2000-06-13  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/info/makefile, /cvsroot/gcl/gcl/makefile, /cvsroot/gcl/gcl/unixport/init_maxima.lsp:
+	fix info compilation in makefile
+
+2000-06-04  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/o/pathname.d:
+	fix so make-pathname when given an :type nil makes the type nil independent of the default
+
+	* /cvsroot/gcl/gcl/lsp/sloop.c, /cvsroot/gcl/gcl/mp/makefile, /cvsroot/gcl/gcl/o/cmpinclude.h, /cvsroot/gcl/gcl/o/macros.ini, /cvsroot/gcl/gcl/o/makefile, /cvsroot/gcl/gcl/o/new_init.c, /cvsroot/gcl/gcl/o/number.ini, /cvsroot/gcl/gcl/o/package.ini, /cvsroot/gcl/gcl/o/predicate.ini, /cvsroot/gcl/gcl/o/print.d, /cvsroot/gcl/gcl/o/read.d, /cvsroot/gcl/gcl/o/structure.ini, /cvsroot/gcl/gcl/o/toplevel.ini, /cvsroot/gcl/gcl/o/typespec.ini, /cvsroot/gcl/gcl/o/unixsys.ini, /cvsroot/gcl/gcl/o/usig.ini, /cvsroot/gcl/gcl/unixport/makefile, /cvsroot/gcl/gcl/unixport/make_kcn, /cvsroot/gcl/gcl/bin/gcl, /cvsroot/gcl/gcl/bin/makefile, /cvsroot/gcl/gcl/ChangeLog, /cvsroot/gcl/gcl/clcs/makefile, /cvsroot/gcl/gcl/cmpnew/cmplam.c, /cvsroot/gcl/gcl/cmpnew/cmptype.c, /cvsroot/gcl/gcl/cmpnew/makefile, /cvsroot/gcl/gcl/comp/makefile, /cvsroot/gcl/gcl/doc/makefile, /cvsroot/gcl/gcl/dos/makefile, /cvsroot/gcl/gcl/elisp/makefile, /cvsroot/gcl/gcl/gcl-tk/gcltksrv, /cvsroot/gcl/gcl/gcl-tk/makefile, /cvsroot/gcl/gcl/gcl-tk/tinfo.c, /cvsroot/gcl/gcl/go/makefile, /cvsroot/gcl/gcl/h/cmpinclude.h, /cvsroot/gcl/gcl/h/new_decl.h, /cvsroot/gcl/gcl/info/gcl-tk.info, /cvsroot/gcl/gcl/info/makefile, /cvsroot/gcl/gcl/lsp/makefile, /cvsroot/gcl/gcl/makefile:
+	change the # syntax for pathnames to be #p
+
+2000-05-25  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/minvers: fix version to 3.6
+
+	* /cvsroot/gcl/gcl/info/makefile, /cvsroot/gcl/gcl/configure:
+	update configure from configure.in
+
+2000-05-16  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/h/386-linux.defs:
+	remove the -static declaration for the link
+
+2000-05-15  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/readme, /cvsroot/gcl/gcl/makefile:
+	fix some cosmetic and documentation items
+
+2000-05-13  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/xbin/distribute, /cvsroot/gcl/gcl/xbin/new-files:
+	fix xbin/distribute
+
+	* /cvsroot/gcl/gcl/o/sfaslelf.c, /cvsroot/gcl/gcl/unixport/makefile, /cvsroot/gcl/gcl/unixport/make_kcn, /cvsroot/gcl/gcl/unixport/rsym_elf.c, /cvsroot/gcl/gcl/doc/makefile, /cvsroot/gcl/gcl/dos/makefile, /cvsroot/gcl/gcl/elisp/makefile, /cvsroot/gcl/gcl/gcl-tk/makefile, /cvsroot/gcl/gcl/go/makefile, /cvsroot/gcl/gcl/h/cmpinclude.h, /cvsroot/gcl/gcl/h/new_decl.h, /cvsroot/gcl/gcl/info/makefile, /cvsroot/gcl/gcl/lsp/makefile, /cvsroot/gcl/gcl/mp/makefile, /cvsroot/gcl/gcl/mp/mpi-sol-sparc.s, /cvsroot/gcl/gcl/o/cmac.c, /cvsroot/gcl/gcl/o/cmpinclude.h, /cvsroot/gcl/gcl/o/earith.c, /cvsroot/gcl/gcl/o/earith.ini, /cvsroot/gcl/gcl/o/makefile, /cvsroot/gcl/gcl/o/new_init.c, /cvsroot/gcl/gcl/bin/makefile, /cvsroot/gcl/gcl/ChangeLog, /cvsroot/gcl/gcl/clcs/makefile, /cvsroot/gcl/gcl/cmpnew/makefile, /cvsroot/gcl/gcl/comp/makefile, /cvsroot/gcl/gcl/configure, /cvsroot/gcl/gcl/configure.in, /cvsroot/gcl/gcl/makedefs.in, /cvsroot/gcl/gcl/makefile, /cvsroot/gcl/gcl/readme:
+	bring cvs tree up to date with my development tree
+
+	* /cvsroot/gcl/gcl/cmpnew/cmpmain.lsp, /cvsroot/gcl/gcl/makefile, /cvsroot/gcl/gcl/readme:
+	some cosmetic and readme changes
+
+1999-12-06  wfs  <wfs@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/ChangeLog: *** empty log message ***
+
+	* /cvsroot/gcl/gcl/utils/replace, /cvsroot/gcl/gcl/utils/repls1.sed, /cvsroot/gcl/gcl/utils/repls2.sed, /cvsroot/gcl/gcl/utils/repls3.sed, /cvsroot/gcl/gcl/utils/repls4.sed, /cvsroot/gcl/gcl/utils/repls5.sed, /cvsroot/gcl/gcl/utils/revstruct.sed, /cvsroot/gcl/gcl/xbin/add-dir, /cvsroot/gcl/gcl/xbin/append, /cvsroot/gcl/gcl/xbin/append.bat, /cvsroot/gcl/gcl/xbin/compare.c, /cvsroot/gcl/gcl/xbin/compare-src, /cvsroot/gcl/gcl/xbin/comp_rel, /cvsroot/gcl/gcl/xbin/dfiles, /cvsroot/gcl/gcl/xbin/distrib-help, /cvsroot/gcl/gcl/xbin/dos-files, /cvsroot/gcl/gcl/xbin/dosmake.bat, /cvsroot/gcl/gcl/xbin/exists, /cvsroot/gcl/gcl/xbin/fix-copyright, /cvsroot/gcl/gcl/xbin/get-externals, /cvsroot/gcl/gcl/xbin/get-internal-calls, /cvsroot/gcl/gcl/xbin/get-machine, /cvsroot/gcl/gcl/xbin/ibm, /cvsroot/gcl/gcl/xbin/if-exist.bat, /cvsroot/gcl/gcl/xbin/if-exists, /cvsroot/gcl/gcl/xbin/if-have-gcc, /cvsroot/gcl/gcl/xbin/inc-version, /cvsroot/gcl/gcl/xbin/is-V-newest, /cvsroot/gcl/gcl/xbin/make-fn, /cvsroot/gcl/gcl/xbin/maketest1, /cvsroot/gcl/gcl/xbin/maketest, /cvsroot/gcl/gcl/xbin/move-if-changed, /cvsroot/gcl/gcl/xbin/notify, /cvsroot/gcl/gcl/xbin/setup-tmptest, /cvsroot/gcl/gcl/xbin/spp.c, /cvsroot/gcl/gcl/xbin/strip-ifdef, /cvsroot/gcl/gcl/xbin/test1, /cvsroot/gcl/gcl/xbin/test, /cvsroot/gcl/gcl/xbin/test-distrib, /cvsroot/gcl/gcl/xbin/update:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/xbin/distribute, /cvsroot/gcl/gcl/xbin/file-sub, /cvsroot/gcl/gcl/xbin/new-files:
+	New file.
+
+	* /cvsroot/gcl/gcl/o/unexaix.c, /cvsroot/gcl/gcl/unixport/aix-crt0.el, /cvsroot/gcl/gcl/unixport/aix_exports, /cvsroot/gcl/gcl/unixport/boots, /cvsroot/gcl/gcl/unixport/bsd_rsym.c, /cvsroot/gcl/gcl/unixport/cmpboots, /cvsroot/gcl/gcl/unixport/gcldos.lsp, /cvsroot/gcl/gcl/unixport/gcrt0.el, /cvsroot/gcl/gcl/unixport/init_kcn.lsp, /cvsroot/gcl/gcl/unixport/init_xgcl.lsp, /cvsroot/gcl/gcl/unixport/lspboots, /cvsroot/gcl/gcl/unixport/makefile.dos, /cvsroot/gcl/gcl/unixport/ncrt0.el, /cvsroot/gcl/gcl/unixport/rsym.c, /cvsroot/gcl/gcl/unixport/so_locations, /cvsroot/gcl/gcl/unixport/sys_boot.c, /cvsroot/gcl/gcl/unixport/sys_gcl.c, /cvsroot/gcl/gcl/unixport/sys-init.lsp, /cvsroot/gcl/gcl/unixport/sys_kcn.c:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/o/nsocket.ini, /cvsroot/gcl/gcl/o/prev/unexnt.c, /cvsroot/gcl/gcl/unixport/gcl-2.3/cmpnew/cmptop.c, /cvsroot/gcl/gcl/unixport/init_gcl.lsp, /cvsroot/gcl/gcl/unixport/init_maxima.lsp, /cvsroot/gcl/gcl/unixport/makefile, /cvsroot/gcl/gcl/unixport/make_kcn, /cvsroot/gcl/gcl/unixport/rsym_elf.c, /cvsroot/gcl/gcl/unixport/rsym_nt.c, /cvsroot/gcl/gcl/unixport/tryserv.tcl:
+	New file.
+
+	* /cvsroot/gcl/gcl/o/faslnt.c, /cvsroot/gcl/gcl/o/firstfile.c, /cvsroot/gcl/gcl/o/lastfile.c, /cvsroot/gcl/gcl/o/ntheap.h, /cvsroot/gcl/gcl/o/num_co.c, /cvsroot/gcl/gcl/o/rel_coff.c, /cvsroot/gcl/gcl/o/rel_stand.c, /cvsroot/gcl/gcl/o/sfasl.c, /cvsroot/gcl/gcl/o/unexelfsgi.c, /cvsroot/gcl/gcl/o/unexhp9k800.c, /cvsroot/gcl/gcl/o/unexlin.c, /cvsroot/gcl/gcl/o/unexmips.c, /cvsroot/gcl/gcl/o/unexsgi.c, /cvsroot/gcl/gcl/o/unixfasl.c, /cvsroot/gcl/gcl/o/unixsave.c, /cvsroot/gcl/gcl/o/unixsys.c, /cvsroot/gcl/gcl/o/user_init.c, /cvsroot/gcl/gcl/o/utils.c, /cvsroot/gcl/gcl/o/Vmalloc.c, /cvsroot/gcl/gcl/o/xdrfuns.c:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/o/clxsocket.ini, /cvsroot/gcl/gcl/o/fasdump.c, /cvsroot/gcl/gcl/o/fat_string.ini, /cvsroot/gcl/gcl/o/file.d, /cvsroot/gcl/gcl/o/init_pari.ini, /cvsroot/gcl/gcl/o/main.c, /cvsroot/gcl/gcl/o/makefun.ini, /cvsroot/gcl/gcl/o/nsocket.c, /cvsroot/gcl/gcl/o/run_process.ini, /cvsroot/gcl/gcl/o/sfasl.ini, /cvsroot/gcl/gcl/o/sockets.ini, /cvsroot/gcl/gcl/o/try.c, /cvsroot/gcl/gcl/o/unixfsys.c, /cvsroot/gcl/gcl/o/unixtime.c, /cvsroot/gcl/gcl/o/usig2_aux.c, /cvsroot/gcl/gcl/o/usig2.c, /cvsroot/gcl/gcl/o/usig.c, /cvsroot/gcl/gcl/o/utils.ini:
+	New file.
+
+	* /cvsroot/gcl/gcl/o/regexp.c, /cvsroot/gcl/gcl/o/regexp.h, /cvsroot/gcl/gcl/o/regexpr.c, /cvsroot/gcl/gcl/o/rel_aix.c, /cvsroot/gcl/gcl/o/rel_hp300.c, /cvsroot/gcl/gcl/o/rel_mac2.c, /cvsroot/gcl/gcl/o/rel_ps2aix.c, /cvsroot/gcl/gcl/o/rel_rios.c, /cvsroot/gcl/gcl/o/rel_sun3.c, /cvsroot/gcl/gcl/o/rel_sun4.c, /cvsroot/gcl/gcl/o/rel_u370aix.c, /cvsroot/gcl/gcl/o/run_process.c, /cvsroot/gcl/gcl/o/saveaix3.c, /cvsroot/gcl/gcl/o/savedec31.c, /cvsroot/gcl/gcl/o/save_sgi4.c, /cvsroot/gcl/gcl/o/saveu370.c, /cvsroot/gcl/gcl/o/sbrk.c, /cvsroot/gcl/gcl/o/sequence.d, /cvsroot/gcl/gcl/o/sfasli.c, /cvsroot/gcl/gcl/o/sgi4d_emul.s, /cvsroot/gcl/gcl/o/strcspn.c, /cvsroot/gcl/gcl/o/string.d, /cvsroot/gcl/gcl/o/structure.c, /cvsroot/gcl/gcl/o/test_memprotect.c, /cvsroot/gcl/gcl/o/toplevel.c, /cvsroot/gcl/gcl/o/typespec.c, /cvsroot/gcl/gcl/o/u370_emul.s, /cvsroot/gcl/gcl/o/unexec-19.29.c:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/o/error.ini, /cvsroot/gcl/gcl/o/funlink.ini, /cvsroot/gcl/gcl/o/nfunlink.ini, /cvsroot/gcl/gcl/o/pathname.ini, /cvsroot/gcl/gcl/o/save.c, /cvsroot/gcl/gcl/o/sfaslelf.c, /cvsroot/gcl/gcl/o/sgbc.c, /cvsroot/gcl/gcl/o/sockets.c, /cvsroot/gcl/gcl/o/symbol.d, /cvsroot/gcl/gcl/o/unexec.c, /cvsroot/gcl/gcl/o/unexelf.c, /cvsroot/gcl/gcl/o/unixfasl.ini, /cvsroot/gcl/gcl/o/unixfsys.ini, /cvsroot/gcl/gcl/o/unixsave.ini, /cvsroot/gcl/gcl/o/unixsys.ini, /cvsroot/gcl/gcl/o/unixtime.ini, /cvsroot/gcl/gcl/o/usig2.ini, /cvsroot/gcl/gcl/o/usig.ini:
+	New file.
+
+	* /cvsroot/gcl/gcl/o/mapfun.c, /cvsroot/gcl/gcl/o/multival.c, /cvsroot/gcl/gcl/o/ndiv.c, /cvsroot/gcl/gcl/o/NeXTunixfasl.c, /cvsroot/gcl/gcl/o/NeXTunixsave.c, /cvsroot/gcl/gcl/o/nfunlink.c, /cvsroot/gcl/gcl/o/nmul.c, /cvsroot/gcl/gcl/o/num_comp.c, /cvsroot/gcl/gcl/o/num_rand.c, /cvsroot/gcl/gcl/o/num_sfun.c, /cvsroot/gcl/gcl/o/package.d, /cvsroot/gcl/gcl/o/peculiar.c, /cvsroot/gcl/gcl/o/predicate.c, /cvsroot/gcl/gcl/o/pre_init.c, /cvsroot/gcl/gcl/o/prog.c, /cvsroot/gcl/gcl/o/readme, /cvsroot/gcl/gcl/o/reference.c:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/o/array.ini, /cvsroot/gcl/gcl/o/backq.ini, /cvsroot/gcl/gcl/o/character.ini, /cvsroot/gcl/gcl/o/earith.ini, /cvsroot/gcl/gcl/o/file.ini, /cvsroot/gcl/gcl/o/format.ini, /cvsroot/gcl/gcl/o/hash.ini, /cvsroot/gcl/gcl/o/list.ini, /cvsroot/gcl/gcl/o/new_init.c, /cvsroot/gcl/gcl/o/num_arith.c, /cvsroot/gcl/gcl/o/number.c, /cvsroot/gcl/gcl/o/num_co.ini, /cvsroot/gcl/gcl/o/num_log.c, /cvsroot/gcl/gcl/o/num_log.ini, /cvsroot/gcl/gcl/o/num_pred.c, /cvsroot/gcl/gcl/o/num_rand.ini, /cvsroot/gcl/gcl/o/pathname.d, /cvsroot/gcl/gcl/o/print.d, /cvsroot/gcl/gcl/o/print.ini, /cvsroot/gcl/gcl/o/read.d, /cvsroot/gcl/gcl/o/read.ini, /cvsroot/gcl/gcl/o/regexpr.ini, /cvsroot/gcl/gcl/o/sequence.ini, /cvsroot/gcl/gcl/o/string.ini, /cvsroot/gcl/gcl/o/structure.ini, /cvsroot/gcl/gcl/o/toplevel.ini:
+	New file.
+
+	* /cvsroot/gcl/gcl/o/faslsgi4.c, /cvsroot/gcl/gcl/o/fix-structref.el, /cvsroot/gcl/gcl/o/format.c, /cvsroot/gcl/gcl/o/frame.c, /cvsroot/gcl/gcl/o/funlink.c, /cvsroot/gcl/gcl/o/funs, /cvsroot/gcl/gcl/o/gdb_commands, /cvsroot/gcl/gcl/o/gnumalloc.c, /cvsroot/gcl/gcl/o/grab_defs.c, /cvsroot/gcl/gcl/o/grab_defs.u, /cvsroot/gcl/gcl/o/help.el, /cvsroot/gcl/gcl/o/internal-calls.lisp, /cvsroot/gcl/gcl/o/iteration.c, /cvsroot/gcl/gcl/o/let.c, /cvsroot/gcl/gcl/o/lex.c, /cvsroot/gcl/gcl/o/list.d, /cvsroot/gcl/gcl/o/littleXwin.c, /cvsroot/gcl/gcl/o/macros.c, /cvsroot/gcl/gcl/o/makefun.c, /cvsroot/gcl/gcl/o/mych:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/o/big.ini, /cvsroot/gcl/gcl/o/catch.ini, /cvsroot/gcl/gcl/o/cfun.ini, /cvsroot/gcl/gcl/o/cmpaux.ini, /cvsroot/gcl/gcl/o/conditional.ini, /cvsroot/gcl/gcl/o/fat_string.c, /cvsroot/gcl/gcl/o/gbc.c, /cvsroot/gcl/gcl/o/hash.d, /cvsroot/gcl/gcl/o/init_pari.c, /cvsroot/gcl/gcl/o/multival.ini, /cvsroot/gcl/gcl/o/num_arith.ini, /cvsroot/gcl/gcl/o/number.ini, /cvsroot/gcl/gcl/o/num_comp.ini, /cvsroot/gcl/gcl/o/num_pred.ini, /cvsroot/gcl/gcl/o/num_sfun.ini, /cvsroot/gcl/gcl/o/package.ini, /cvsroot/gcl/gcl/o/prog.ini, /cvsroot/gcl/gcl/o/symbol.ini, /cvsroot/gcl/gcl/o/unexnt.c:
+	New file.
+
+	* /cvsroot/gcl/gcl/o/assignment.c, /cvsroot/gcl/gcl/o/backq.c, /cvsroot/gcl/gcl/o/bcmp.c, /cvsroot/gcl/gcl/o/bcopy.c, /cvsroot/gcl/gcl/o/bds.c, /cvsroot/gcl/gcl/o/before_init.c, /cvsroot/gcl/gcl/o/bind.c, /cvsroot/gcl/gcl/o/bind.texi, /cvsroot/gcl/gcl/o/bitop.c, /cvsroot/gcl/gcl/o/block.c, /cvsroot/gcl/gcl/o/bsearch.c, /cvsroot/gcl/gcl/o/bzero.c, /cvsroot/gcl/gcl/o/catch.c, /cvsroot/gcl/gcl/o/cfun.c, /cvsroot/gcl/gcl/o/ChangeLog, /cvsroot/gcl/gcl/o/character.d, /cvsroot/gcl/gcl/o/clxsocket.c, /cvsroot/gcl/gcl/o/conditional.c, /cvsroot/gcl/gcl/o/egrep-def, /cvsroot/gcl/gcl/o/error.c, /cvsroot/gcl/gcl/o/eval.c, /cvsroot/gcl/gcl/o/external_funs.h, /cvsroot/gcl/gcl/o/fasldlsym.c.link, /cvsroot/gcl/gcl/o/faslhp800.c, /cvsroot/gcl/gcl/o/malloc.c:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/o/alloc.c, /cvsroot/gcl/gcl/o/assignment.ini, /cvsroot/gcl/gcl/o/bds.ini, /cvsroot/gcl/gcl/o/big.c, /cvsroot/gcl/gcl/o/bind.ini, /cvsroot/gcl/gcl/o/bitop.ini, /cvsroot/gcl/gcl/o/block.ini, /cvsroot/gcl/gcl/o/cmac.c, /cvsroot/gcl/gcl/o/cmpaux.c, /cvsroot/gcl/gcl/o/earith.c, /cvsroot/gcl/gcl/o/eval.ini, /cvsroot/gcl/gcl/o/fasldlsym.c, /cvsroot/gcl/gcl/o/frame.ini, /cvsroot/gcl/gcl/o/gbc.ini, /cvsroot/gcl/gcl/o/iteration.ini, /cvsroot/gcl/gcl/o/let.ini, /cvsroot/gcl/gcl/o/lex.ini, /cvsroot/gcl/gcl/o/macros.ini, /cvsroot/gcl/gcl/o/mapfun.ini, /cvsroot/gcl/gcl/o/predicate.ini, /cvsroot/gcl/gcl/o/reference.ini, /cvsroot/gcl/gcl/o/st, /cvsroot/gcl/gcl/o/typespec.ini:
+	New file.
+
+	* /cvsroot/gcl/gcl/misc/warn-slow.lsp, /cvsroot/gcl/gcl/mp/fplus.c, /cvsroot/gcl/gcl/mp/gcclab, /cvsroot/gcl/gcl/mp/gcclab.awk, /cvsroot/gcl/gcl/mp/gnulib1.c, /cvsroot/gcl/gcl/mp/lo-ibmrt.s, /cvsroot/gcl/gcl/mp/lo-rios1.s, /cvsroot/gcl/gcl/mp/lo-rios.s, /cvsroot/gcl/gcl/mp/lo-sgi4d.s, /cvsroot/gcl/gcl/mp/lo-u370_aix.s, /cvsroot/gcl/gcl/mp/make.defs, /cvsroot/gcl/gcl/mp/mp2.c, /cvsroot/gcl/gcl/mp/mp_addmul.c, /cvsroot/gcl/gcl/mp/mp_bfffo.c, /cvsroot/gcl/gcl/mp/mp_dblrsl3.c, /cvsroot/gcl/gcl/mp/mp_dblrul3.c, /cvsroot/gcl/gcl/mp/mp_divul3.c, /cvsroot/gcl/gcl/mp/mp_divul3_word.c, /cvsroot/gcl/gcl/mp/mpi-386d.S, /cvsroot/gcl/gcl/mp/mpi-386_no_under.s, /cvsroot/gcl/gcl/mp/mpi-bsd68k.s, /cvsroot/gcl/gcl/mp/mpi.c, /cvsroot/gcl/gcl/mp/mpi-sparc.s, /cvsroot/gcl/gcl/mp/mp_mulul3.c, /cvsroot/gcl/gcl/mp/mp_shiftl.c, /cvsroot/gcl/gcl/mp/mp_sl3todivul3.c, /cvsroot/gcl/gcl/mp/readme, /cvsroot/gcl/gcl/mp/sparcdivul3.s, /cvsroot/gcl/gcl/o/array.c1, /cvsroot/gcl/gcl/o/array.c, /cvsroot/gcl/gcl/o/array.c.prev:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/mp/makefile, /cvsroot/gcl/gcl/mp/mpi-sol-sparc.s, /cvsroot/gcl/gcl/o/alloc.ini, /cvsroot/gcl/gcl/o/cmpinclude.h, /cvsroot/gcl/gcl/o/main.ini, /cvsroot/gcl/gcl/o/makefile:
+	New file.
+
+	* /cvsroot/gcl/gcl/lsp/serror.data, /cvsroot/gcl/gcl/lsp/serror.h, /cvsroot/gcl/gcl/lsp/sloop.data, /cvsroot/gcl/gcl/lsp/sloop.h, /cvsroot/gcl/gcl/lsp/sloop.lsp, /cvsroot/gcl/gcl/lsp/stack-problem.lsp, /cvsroot/gcl/gcl/lsp/stdlisp.lsp, /cvsroot/gcl/gcl/lsp/sys-proclaim.lisp, /cvsroot/gcl/gcl/lsp/trace.c, /cvsroot/gcl/gcl/lsp/trace.data, /cvsroot/gcl/gcl/lsp/trace.h, /cvsroot/gcl/gcl/lsp/trace.lsp, /cvsroot/gcl/gcl/lsp/ucall.lisp, /cvsroot/gcl/gcl/lsp/ustreams.lisp, /cvsroot/gcl/gcl/man/man1/gcl.1, /cvsroot/gcl/gcl/misc/check.c, /cvsroot/gcl/gcl/misc/check_obj.c, /cvsroot/gcl/gcl/misc/cstruct.lsp, /cvsroot/gcl/gcl/misc/foreign.lsp, /cvsroot/gcl/gcl/misc/mprotect.ch, /cvsroot/gcl/gcl/misc/rusage.lsp, /cvsroot/gcl/gcl/misc/test-seek.c, /cvsroot/gcl/gcl/misc/test-sgc.lsp:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/lsp/makefile, /cvsroot/gcl/gcl/lsp/top.c, /cvsroot/gcl/gcl/lsp/top.data, /cvsroot/gcl/gcl/lsp/top.h, /cvsroot/gcl/gcl/lsp/top.lsp:
+	New file.
+
+	* /cvsroot/gcl/gcl/lsp/littleXlsp.lsp, /cvsroot/gcl/gcl/lsp/loadcmp.lsp, /cvsroot/gcl/gcl/lsp/make-declare.lsp, /cvsroot/gcl/gcl/lsp/make.lisp, /cvsroot/gcl/gcl/lsp/mislib.c, /cvsroot/gcl/gcl/lsp/mislib.data, /cvsroot/gcl/gcl/lsp/mislib.h, /cvsroot/gcl/gcl/lsp/mislib.lsp, /cvsroot/gcl/gcl/lsp/module.c, /cvsroot/gcl/gcl/lsp/module.data, /cvsroot/gcl/gcl/lsp/module.h, /cvsroot/gcl/gcl/lsp/module.lsp, /cvsroot/gcl/gcl/lsp/numlib.c, /cvsroot/gcl/gcl/lsp/numlib.data, /cvsroot/gcl/gcl/lsp/numlib.h, /cvsroot/gcl/gcl/lsp/numlib.lsp, /cvsroot/gcl/gcl/lsp/packages.lsp, /cvsroot/gcl/gcl/lsp/packlib.c, /cvsroot/gcl/gcl/lsp/packlib.data, /cvsroot/gcl/gcl/lsp/packlib.h, /cvsroot/gcl/gcl/lsp/packlib.lsp, /cvsroot/gcl/gcl/lsp/predlib.c, /cvsroot/gcl/gcl/lsp/predlib.data, /cvsroot/gcl/gcl/lsp/predlib.h, /cvsroot/gcl/gcl/lsp/predlib.lsp, /cvsroot/gcl/gcl/lsp/profile.lsp, /cvsroot/gcl/gcl/lsp/seq.c, /cvsroot/gcl/gcl/lsp/seq.data, /cvsroot/gcl/gcl/lsp/seq.h, /cvsroot/gcl/gcl/lsp/seqlib.c, /cvsroot/gcl/gcl/lsp/seqlib.data, /cvsroot/gcl/gcl/lsp/seqlib.h, /cvsroot/gcl/gcl/lsp/seqlib.lsp, /cvsroot/gcl/gcl/lsp/seq.lsp, /cvsroot/gcl/gcl/lsp/serror.lsp, /cvsroot/gcl/gcl/lsp/setf.c, /cvsroot/gcl/gcl/lsp/setf.data, /cvsroot/gcl/gcl/lsp/setf.h, /cvsroot/gcl/gcl/lsp/setf.lsp:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/lsp/sloop.c: New file.
+
+	* /cvsroot/gcl/gcl/lsp/defmacro.c, /cvsroot/gcl/gcl/lsp/defmacro.data, /cvsroot/gcl/gcl/lsp/defmacro.h, /cvsroot/gcl/gcl/lsp/defmacro.lsp, /cvsroot/gcl/gcl/lsp/defstruct.c, /cvsroot/gcl/gcl/lsp/defstruct.data, /cvsroot/gcl/gcl/lsp/defstruct.h, /cvsroot/gcl/gcl/lsp/defstruct.lsp, /cvsroot/gcl/gcl/lsp/describe.c, /cvsroot/gcl/gcl/lsp/describe.data, /cvsroot/gcl/gcl/lsp/describe.h, /cvsroot/gcl/gcl/lsp/describe.lsp, /cvsroot/gcl/gcl/lsp/desetq.lsp, /cvsroot/gcl/gcl/lsp/doc-file.lsp, /cvsroot/gcl/gcl/lsp/dummy.lisp, /cvsroot/gcl/gcl/lsp/fasd.lisp, /cvsroot/gcl/gcl/lsp/fast-mv.lisp, /cvsroot/gcl/gcl/lsp/fdecl.lsp, /cvsroot/gcl/gcl/lsp/gprof1.lisp, /cvsroot/gcl/gcl/lsp/gprof_aix.hc, /cvsroot/gcl/gcl/lsp/gprof.hc, /cvsroot/gcl/gcl/lsp/gprof.lsp, /cvsroot/gcl/gcl/lsp/info.h, /cvsroot/gcl/gcl/lsp/iolib.c, /cvsroot/gcl/gcl/lsp/iolib.data, /cvsroot/gcl/gcl/lsp/iolib.h, /cvsroot/gcl/gcl/lsp/iolib.lsp, /cvsroot/gcl/gcl/lsp/listlib.c, /cvsroot/gcl/gcl/lsp/listlib.data, /cvsroot/gcl/gcl/lsp/listlib.h, /cvsroot/gcl/gcl/lsp/listlib.lsp, /cvsroot/gcl/gcl/lsp/serror.c:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/lsp/debug.h, /cvsroot/gcl/gcl/lsp/debug.lsp, /cvsroot/gcl/gcl/lsp/evalmacros.c, /cvsroot/gcl/gcl/lsp/evalmacros.data, /cvsroot/gcl/gcl/lsp/evalmacros.h, /cvsroot/gcl/gcl/lsp/evalmacros.lsp, /cvsroot/gcl/gcl/lsp/export.lsp, /cvsroot/gcl/gcl/lsp/info.c, /cvsroot/gcl/gcl/lsp/info.data, /cvsroot/gcl/gcl/lsp/info.lsp, /cvsroot/gcl/gcl/lsp/jim:
+	New file.
+
+	* /cvsroot/gcl/gcl/info/sequence.texi, /cvsroot/gcl/gcl/info/si-defs.texi, /cvsroot/gcl/gcl/info/structure.texi, /cvsroot/gcl/gcl/info/symbol.texi, /cvsroot/gcl/gcl/info/system.texi, /cvsroot/gcl/gcl/info/texinfo.tex, /cvsroot/gcl/gcl/info/type.texi, /cvsroot/gcl/gcl/info/user-interface.texi, /cvsroot/gcl/gcl/info/widgets.texi, /cvsroot/gcl/gcl/lsp/arraylib.c, /cvsroot/gcl/gcl/lsp/arraylib.data, /cvsroot/gcl/gcl/lsp/arraylib.h, /cvsroot/gcl/gcl/lsp/arraylib.lsp, /cvsroot/gcl/gcl/lsp/assert.c, /cvsroot/gcl/gcl/lsp/assert.data, /cvsroot/gcl/gcl/lsp/assert.h, /cvsroot/gcl/gcl/lsp/assert.lsp, /cvsroot/gcl/gcl/lsp/autocmp.lsp, /cvsroot/gcl/gcl/lsp/auto.lsp, /cvsroot/gcl/gcl/lsp/cmpinit.lsp, /cvsroot/gcl/gcl/lsp/dbind.lisp:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/info/gcl-si.info-1.gz, /cvsroot/gcl/gcl/info/gcl-tk.info-1.gz, /cvsroot/gcl/gcl/lsp/autoload.lsp, /cvsroot/gcl/gcl/lsp/debug.c, /cvsroot/gcl/gcl/lsp/debug.data:
+	New file.
+
+	* /cvsroot/gcl/gcl/info/character.texi, /cvsroot/gcl/gcl/info/compiler-defs.texi, /cvsroot/gcl/gcl/info/compile.texi, /cvsroot/gcl/gcl/info/debug.texi, /cvsroot/gcl/gcl/info/doc.texi, /cvsroot/gcl/gcl/info/form.texi, /cvsroot/gcl/gcl/info/gcl-si-index.texi, /cvsroot/gcl/gcl/info/gcl-tk.texi, /cvsroot/gcl/gcl/info/general.texi, /cvsroot/gcl/gcl/info/internal.texi, /cvsroot/gcl/gcl/info/iteration.texi, /cvsroot/gcl/gcl/info/list.texi, /cvsroot/gcl/gcl/info/misc.texi, /cvsroot/gcl/gcl/info/number.texi:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/info/control.texi, /cvsroot/gcl/gcl/info/gcl-si.cp, /cvsroot/gcl/gcl/info/gcl-si.info, /cvsroot/gcl/gcl/info/gcl-si.info-2.gz, /cvsroot/gcl/gcl/info/gcl-si.info-3.gz, /cvsroot/gcl/gcl/info/gcl-si.info-4.gz, /cvsroot/gcl/gcl/info/gcl-si.info-5.gz, /cvsroot/gcl/gcl/info/gcl-si.info-6.gz, /cvsroot/gcl/gcl/info/gcl-si.ky, /cvsroot/gcl/gcl/info/gcl-si.pg, /cvsroot/gcl/gcl/info/gcl-si.texi, /cvsroot/gcl/gcl/info/gcl-si.toc, /cvsroot/gcl/gcl/info/gcl-si.tp, /cvsroot/gcl/gcl/info/gcl-si.vr, /cvsroot/gcl/gcl/info/gcl-tk.cp, /cvsroot/gcl/gcl/info/gcl-tk.info, /cvsroot/gcl/gcl/info/gcl-tk.info-2.gz, /cvsroot/gcl/gcl/info/gcl-tk.info-3.gz, /cvsroot/gcl/gcl/info/gcl-tk.info-4.gz, /cvsroot/gcl/gcl/info/gcl-tk.info-5.gz, /cvsroot/gcl/gcl/info/gcl-tk.info-6.gz, /cvsroot/gcl/gcl/info/gcl-tk.info-7.gz, /cvsroot/gcl/gcl/info/gcl-tk.info-8.gz, /cvsroot/gcl/gcl/info/gcl-tk.ky, /cvsroot/gcl/gcl/info/gcl-tk.pg, /cvsroot/gcl/gcl/info/gcl-tk.toc, /cvsroot/gcl/gcl/info/gcl-tk.tp, /cvsroot/gcl/gcl/info/gcl-tk.vr, /cvsroot/gcl/gcl/info/io.texi, /cvsroot/gcl/gcl/info/makefile:
+	New file.
+
+	* /cvsroot/gcl/gcl/h/att.h, /cvsroot/gcl/gcl/h/cmplrs/stsupport.h, /cvsroot/gcl/gcl/h/ext_sym.h, /cvsroot/gcl/gcl/h/options.h, /cvsroot/gcl/gcl/h/rgbc.h, /cvsroot/gcl/gcl/h/rios-aix3.defs, /cvsroot/gcl/gcl/h/rios-aix3.h, /cvsroot/gcl/gcl/h/rios.defs, /cvsroot/gcl/gcl/h/rios.h, /cvsroot/gcl/gcl/h/rt_aix.defs, /cvsroot/gcl/gcl/h/rt_aix.h, /cvsroot/gcl/gcl/h/s3000.h, /cvsroot/gcl/gcl/h/secondary_sun_magic, /cvsroot/gcl/gcl/h/sfun_argd.h, /cvsroot/gcl/gcl/h/sgi4d.defs, /cvsroot/gcl/gcl/h/sgi4d.h, /cvsroot/gcl/gcl/h/sgi.defs, /cvsroot/gcl/gcl/h/sgi.h, /cvsroot/gcl/gcl/h/solaris.defs, /cvsroot/gcl/gcl/h/solaris.h, /cvsroot/gcl/gcl/h/solaris-i386.defs, /cvsroot/gcl/gcl/h/solaris-i386.h, /cvsroot/gcl/gcl/h/sparc.h, /cvsroot/gcl/gcl/h/sparc-linux.defs, /cvsroot/gcl/gcl/h/stacks.h, /cvsroot/gcl/gcl/h/sun2r3.defs, /cvsroot/gcl/gcl/h/sun2r3.h, /cvsroot/gcl/gcl/h/sun386i.defs, /cvsroot/gcl/gcl/h/sun386i.h, /cvsroot/gcl/gcl/h/sun3.defs, /cvsroot/gcl/gcl/h/sun3.h, /cvsroot/gcl/gcl/h/sun3-os4.defs, /cvsroot/gcl/gcl/h/sun3-os4.h, /cvsroot/gcl/gcl/h/sun4.defs, /cvsroot/gcl/gcl/h/sun4.h, /cvsroot/gcl/gcl/h/sun.h, /cvsroot/gcl/gcl/h/symbol.h, /cvsroot/gcl/gcl/h/symmetry.defs, /cvsroot/gcl/gcl/h/symmetry.h, /cvsroot/gcl/gcl/h/twelve_null, /cvsroot/gcl/gcl/h/u370_aix.defs, /cvsroot/gcl/gcl/h/u370_aix.h, /cvsroot/gcl/gcl/h/usig.h, /cvsroot/gcl/gcl/h/vax.defs, /cvsroot/gcl/gcl/h/vax.h, /cvsroot/gcl/gcl/h/vs.h, /cvsroot/gcl/gcl/info/bind.texi, /cvsroot/gcl/gcl/info/c-interface.texi:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/h/coff/i386.h, /cvsroot/gcl/gcl/h/cyglacks.h, /cvsroot/gcl/gcl/h/gclincl.h.in, /cvsroot/gcl/gcl/h/gnuwin95.defs, /cvsroot/gcl/gcl/h/gnuwin95.h, /cvsroot/gcl/gcl/h/ptable.h, /cvsroot/gcl/gcl/h/sparc-linux.h, /cvsroot/gcl/gcl/h/wincoff.h:
+	New file.
+
+	* /cvsroot/gcl/gcl/h/coff_encap.h, /cvsroot/gcl/gcl/h/compat.h, /cvsroot/gcl/gcl/h/compbas.h, /cvsroot/gcl/gcl/h/convex.h, /cvsroot/gcl/gcl/h/dec3100.defs, /cvsroot/gcl/gcl/h/dec3100.h, /cvsroot/gcl/gcl/h/defun.h, /cvsroot/gcl/gcl/h/dos-go32.defs, /cvsroot/gcl/gcl/h/dos-go32.h, /cvsroot/gcl/gcl/h/e15.h, /cvsroot/gcl/gcl/h/enum.h, /cvsroot/gcl/gcl/h/erreurs.h, /cvsroot/gcl/gcl/h/eval.h, /cvsroot/gcl/gcl/h/frame.h, /cvsroot/gcl/gcl/h/FreeBSD.defs, /cvsroot/gcl/gcl/h/FreeBSD.h, /cvsroot/gcl/gcl/h/funlink.h, /cvsroot/gcl/gcl/h/gencom.h, /cvsroot/gcl/gcl/h/genpari.h, /cvsroot/gcl/gcl/h/genport.h, /cvsroot/gcl/gcl/h/getpagesize.h, /cvsroot/gcl/gcl/h/hp300-bsd.defs, /cvsroot/gcl/gcl/h/hp300-bsd.h, /cvsroot/gcl/gcl/h/hp300.defs, /cvsroot/gcl/gcl/h/hp300.h, /cvsroot/gcl/gcl/h/hp800.defs, /cvsroot/gcl/gcl/h/hp800.h, /cvsroot/gcl/gcl/h/irix5.defs, /cvsroot/gcl/gcl/h/irix5.h, /cvsroot/gcl/gcl/h/irix6.defs, /cvsroot/gcl/gcl/h/irix6.h, /cvsroot/gcl/gcl/h/lex.h, /cvsroot/gcl/gcl/h/mac2.defs, /cvsroot/gcl/gcl/h/mac2.h, /cvsroot/gcl/gcl/h/make-decl.h, /cvsroot/gcl/gcl/h/make-init.h, /cvsroot/gcl/gcl/h/mc68k.h, /cvsroot/gcl/gcl/h/mips.h, /cvsroot/gcl/gcl/h/mp386.defs, /cvsroot/gcl/gcl/h/mp386.h, /cvsroot/gcl/gcl/h/ncr.defs, /cvsroot/gcl/gcl/h/ncr.h, /cvsroot/gcl/gcl/h/NetBSD.defs, /cvsroot/gcl/gcl/h/NetBSD.h, /cvsroot/gcl/gcl/h/news.h, /cvsroot/gcl/gcl/h/NeXT30-m68k.defs, /cvsroot/gcl/gcl/h/NeXT30-m68k.h, /cvsroot/gcl/gcl/h/NeXT32-i386.defs, /cvsroot/gcl/gcl/h/NeXT32-i386.h, /cvsroot/gcl/gcl/h/NeXT32-m68k.defs, /cvsroot/gcl/gcl/h/NeXT32-m68k.h, /cvsroot/gcl/gcl/h/NeXT.defs, /cvsroot/gcl/gcl/h/NeXT.h, /cvsroot/gcl/gcl/h/page.h:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/h/cmponly.h, /cvsroot/gcl/gcl/h/compbas2.h, /cvsroot/gcl/gcl/h/include.h, /cvsroot/gcl/gcl/h/mdefs.h, /cvsroot/gcl/gcl/h/mp.h, /cvsroot/gcl/gcl/h/new_decl.h, /cvsroot/gcl/gcl/h/notcomp.h, /cvsroot/gcl/gcl/h/num_include.h, /cvsroot/gcl/gcl/h/object.h:
+	New file.
+
+	* /cvsroot/gcl/gcl/gcl-tk/demos-4.1/items.lisp, /cvsroot/gcl/gcl/gcl-tk/demos-4.2/widget, /cvsroot/gcl/gcl/gcl-tk/demos-4.2/widget.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/mkForm.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/mkForm.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkHScale.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/mkHScale.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkIcon.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkItems.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/mkItems.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkLabel.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/mkLabel.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkListbox2.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkListbox3.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkListbox.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/mkListbox.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkPlot.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/mkPlot.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkPuzzle.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkRadio.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/mkRadio.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkRuler.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/mkRuler.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkScroll.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkSearch.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/mkSearch.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkStyles.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/mkStyles.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkTear.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkTextBind.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/mkTextBind.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkVScale.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/mkVScale.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/nqthm-stack.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/showVars.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/showVars.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/tclIndex, /cvsroot/gcl/gcl/gcl-tk/demos/widget.lisp, /cvsroot/gcl/gcl/h/386-bsd.defs, /cvsroot/gcl/gcl/h/386-bsd.h, /cvsroot/gcl/gcl/h/386.h, /cvsroot/gcl/gcl/h/alpha-osf1.defs, /cvsroot/gcl/gcl/h/alpha-osf1.h, /cvsroot/gcl/gcl/h/arith.h, /cvsroot/gcl/gcl/h/att3b2.h, /cvsroot/gcl/gcl/h/bds.h, /cvsroot/gcl/gcl/h/cmpincl1.h:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/go/makefile, /cvsroot/gcl/gcl/h/386-linux.defs, /cvsroot/gcl/gcl/h/386-linux.h, /cvsroot/gcl/gcl/h/att_ext.h, /cvsroot/gcl/gcl/h/bsd.h, /cvsroot/gcl/gcl/h/cmpinclude.h, /cvsroot/gcl/gcl/h/gclincl.h:
+	New file.
+
+	* /cvsroot/gcl/gcl/gcl-tk/demos/gc-monitor.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/mkArrow.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkBasic.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/mkBasic.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkBitmaps.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkButton.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkCanvText.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/mkCanvText.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkCheck.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkdialog.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/mkDialog.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkEntry2.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/mkEntry2.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkEntry.lisp, /cvsroot/gcl/gcl/gcl-tk/demos/mkEntry.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/mkFloor.tcl, /cvsroot/gcl/gcl/gcl-tk/gcl_guisl.h, /cvsroot/gcl/gcl/gcl-tk/gcltksrv.prev, /cvsroot/gcl/gcl/gcl-tk/guis.h, /cvsroot/gcl/gcl/gcl-tk/helpers.lisp, /cvsroot/gcl/gcl/gcl-tk/index.lsp, /cvsroot/gcl/gcl/gcl-tk/intrs.h, /cvsroot/gcl/gcl/gcl-tk/makefile.prev, /cvsroot/gcl/gcl/gcl-tk/our_io.c, /cvsroot/gcl/gcl/gcl-tk/sheader.h, /cvsroot/gcl/gcl/gcl-tk/socketsl.lisp, /cvsroot/gcl/gcl/gcl-tk/socks.h, /cvsroot/gcl/gcl/gcl-tk/sysdep-sunos.h, /cvsroot/gcl/gcl/gcl-tk/tinfo.lsp, /cvsroot/gcl/gcl/gcl-tk/tkAppInit.c, /cvsroot/gcl/gcl/gcl-tk/tkl.lisp, /cvsroot/gcl/gcl/gcl-tk/tkMain.c, /cvsroot/gcl/gcl/gcl-tk/tk-package.lsp, /cvsroot/gcl/gcl/gcl-tk/tktst.c, /cvsroot/gcl/gcl/gcl-tk/tkXAppInit.c, /cvsroot/gcl/gcl/gcl-tk/tkXshell.c:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/gcl-tk/decode.tcl, /cvsroot/gcl/gcl/gcl-tk/demos/index.lsp, /cvsroot/gcl/gcl/gcl-tk/gcltksrv, /cvsroot/gcl/gcl/gcl-tk/gcltksrv.in.interp, /cvsroot/gcl/gcl/gcl-tk/guis.c, /cvsroot/gcl/gcl/gcl-tk/makefile, /cvsroot/gcl/gcl/gcl-tk/ngcltksrv, /cvsroot/gcl/gcl/gcl-tk/tinfo.c:
+	New file.
+
+	* /cvsroot/gcl/gcl/comp/top1.lsp, /cvsroot/gcl/gcl/comp/top2.lsp, /cvsroot/gcl/gcl/comp/try1.lsp, /cvsroot/gcl/gcl/comp/try.lsp, /cvsroot/gcl/gcl/comp/utils.lsp, /cvsroot/gcl/gcl/comp/var.lsp, /cvsroot/gcl/gcl/comp/wr.lsp, /cvsroot/gcl/gcl/doc/bignum, /cvsroot/gcl/gcl/doc/c-gc, /cvsroot/gcl/gcl/doc/c-gc.doc, /cvsroot/gcl/gcl/doc/compile-file-handling-of-top-level-forms, /cvsroot/gcl/gcl/doc/contributors, /cvsroot/gcl/gcl/doc/debug, /cvsroot/gcl/gcl/doc/enhancements, /cvsroot/gcl/gcl/doc/fast-link, /cvsroot/gcl/gcl/doc/format, /cvsroot/gcl/gcl/doc/funcall-comp, /cvsroot/gcl/gcl/doc/funcall.lsp, /cvsroot/gcl/gcl/doc/multiple-values, /cvsroot/gcl/gcl/doc/profile, /cvsroot/gcl/gcl/dos/dostimes.c, /cvsroot/gcl/gcl/dos/dum_dos.c, /cvsroot/gcl/gcl/dos/readme, /cvsroot/gcl/gcl/dos/read.s, /cvsroot/gcl/gcl/dos/sigman.s, /cvsroot/gcl/gcl/dos/signal.c, /cvsroot/gcl/gcl/dos/signal.h, /cvsroot/gcl/gcl/elisp/add-default.el, /cvsroot/gcl/gcl/elisp/ansi-doc.el, /cvsroot/gcl/gcl/elisp/doc-to-texi.el, /cvsroot/gcl/gcl/elisp/man1-to-texi.el, /cvsroot/gcl/gcl/elisp/readme, /cvsroot/gcl/gcl/gcl-tk/cmpinit.lsp, /cvsroot/gcl/gcl/gcl-tk/comm.c, /cvsroot/gcl/gcl/gcl-tk/convert.el, /cvsroot/gcl/gcl/gcl-tk/dir.sed, /cvsroot/gcl/gcl/gcl-tk/gcl-1.tcl, /cvsroot/gcl/gcl/gcl-tk/gcl.tcl, /cvsroot/gcl/gcl/gcl-tk/gcltksrv.in:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/doc/makefile, /cvsroot/gcl/gcl/dos/makefile, /cvsroot/gcl/gcl/elisp/dbl.el, /cvsroot/gcl/gcl/elisp/gcl.el, /cvsroot/gcl/gcl/elisp/lisp-complete.el, /cvsroot/gcl/gcl/elisp/makefile, /cvsroot/gcl/gcl/elisp/smart-complete.el, /cvsroot/gcl/gcl/elisp/sshell.el:
+	New file.
+
+	* /cvsroot/gcl/gcl/cmpnew/cmptype.h, /cvsroot/gcl/gcl/cmpnew/cmptype.lsp, /cvsroot/gcl/gcl/cmpnew/cmputil.c, /cvsroot/gcl/gcl/cmpnew/cmputil.data, /cvsroot/gcl/gcl/cmpnew/cmputil.h, /cvsroot/gcl/gcl/cmpnew/cmputil.lsp, /cvsroot/gcl/gcl/cmpnew/cmpvar.c, /cvsroot/gcl/gcl/cmpnew/cmpvar.data, /cvsroot/gcl/gcl/cmpnew/cmpvar.h, /cvsroot/gcl/gcl/cmpnew/cmpvar.lsp, /cvsroot/gcl/gcl/cmpnew/cmpvs.c, /cvsroot/gcl/gcl/cmpnew/cmpvs.data, /cvsroot/gcl/gcl/cmpnew/cmpvs.h, /cvsroot/gcl/gcl/cmpnew/cmpvs.lsp, /cvsroot/gcl/gcl/cmpnew/cmpwt.c, /cvsroot/gcl/gcl/cmpnew/cmpwt.data, /cvsroot/gcl/gcl/cmpnew/cmpwt.h, /cvsroot/gcl/gcl/cmpnew/cmpwt.lsp, /cvsroot/gcl/gcl/cmpnew/collectfn.lsp, /cvsroot/gcl/gcl/cmpnew/fasdmacros.lsp, /cvsroot/gcl/gcl/cmpnew/init.lsp, /cvsroot/gcl/gcl/cmpnew/lfun_list.lsp, /cvsroot/gcl/gcl/cmpnew/make-fn.lsp, /cvsroot/gcl/gcl/cmpnew/make_ufun.lsp, /cvsroot/gcl/gcl/cmpnew/nocmpinc.lsp, /cvsroot/gcl/gcl/cmpnew/so_locations, /cvsroot/gcl/gcl/cmpnew/sys-proclaim.lisp, /cvsroot/gcl/gcl/comp/bo1.lsp, /cvsroot/gcl/gcl/comp/cmpinit.lsp, /cvsroot/gcl/gcl/comp/comptype.lsp, /cvsroot/gcl/gcl/comp/c-pass1.lsp, /cvsroot/gcl/gcl/comp/data.lsp, /cvsroot/gcl/gcl/comp/defmacro.lsp, /cvsroot/gcl/gcl/comp/defs.lsp, /cvsroot/gcl/gcl/comp/exit.lsp, /cvsroot/gcl/gcl/comp/fasdmacros.lsp, /cvsroot/gcl/gcl/comp/inline.lsp, /cvsroot/gcl/gcl/comp/integer.doc, /cvsroot/gcl/gcl/comp/lambda.lsp, /cvsroot/gcl/gcl/comp/lisp-decls.doc, /cvsroot/gcl/gcl/comp/macros.lsp, /cvsroot/gcl/gcl/comp/mangle.lsp, /cvsroot/gcl/gcl/comp/opts-base.lsp, /cvsroot/gcl/gcl/comp/opts.lsp, /cvsroot/gcl/gcl/comp/proclaim.lsp, /cvsroot/gcl/gcl/comp/smash-oldcmp.lsp, /cvsroot/gcl/gcl/comp/stmt.lsp, /cvsroot/gcl/gcl/comp/sysdef.lsp, /cvsroot/gcl/gcl/comp/top.lsp:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/cmpnew/cmpmain.lsp, /cvsroot/gcl/gcl/cmpnew/makefile, /cvsroot/gcl/gcl/comp/makefile:
+	New file.
+
+	* /cvsroot/gcl/gcl/cmpnew/cmplam.data, /cvsroot/gcl/gcl/cmpnew/cmplam.h, /cvsroot/gcl/gcl/cmpnew/cmplam.lsp, /cvsroot/gcl/gcl/cmpnew/cmplet.c, /cvsroot/gcl/gcl/cmpnew/cmplet.data, /cvsroot/gcl/gcl/cmpnew/cmplet.h, /cvsroot/gcl/gcl/cmpnew/cmplet.lsp, /cvsroot/gcl/gcl/cmpnew/cmploc.c, /cvsroot/gcl/gcl/cmpnew/cmploc.data, /cvsroot/gcl/gcl/cmpnew/cmploc.h, /cvsroot/gcl/gcl/cmpnew/cmploc.lsp, /cvsroot/gcl/gcl/cmpnew/cmpmap.c, /cvsroot/gcl/gcl/cmpnew/cmpmap.data, /cvsroot/gcl/gcl/cmpnew/cmpmap.h, /cvsroot/gcl/gcl/cmpnew/cmpmap.lsp, /cvsroot/gcl/gcl/cmpnew/cmpmulti.c, /cvsroot/gcl/gcl/cmpnew/cmpmulti.data, /cvsroot/gcl/gcl/cmpnew/cmpmulti.h, /cvsroot/gcl/gcl/cmpnew/cmpmulti.lsp, /cvsroot/gcl/gcl/cmpnew/cmpspecial.c, /cvsroot/gcl/gcl/cmpnew/cmpspecial.data, /cvsroot/gcl/gcl/cmpnew/cmpspecial.h, /cvsroot/gcl/gcl/cmpnew/cmpspecial.lsp, /cvsroot/gcl/gcl/cmpnew/cmptag.c, /cvsroot/gcl/gcl/cmpnew/cmptag.data, /cvsroot/gcl/gcl/cmpnew/cmptag.h, /cvsroot/gcl/gcl/cmpnew/cmptag.lsp, /cvsroot/gcl/gcl/cmpnew/cmptest.lsp, /cvsroot/gcl/gcl/cmpnew/cmptop.c, /cvsroot/gcl/gcl/cmpnew/cmptop.data, /cvsroot/gcl/gcl/cmpnew/cmptop.h, /cvsroot/gcl/gcl/cmpnew/cmptop.lsp, /cvsroot/gcl/gcl/cmpnew/cmptype.data:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/cmpnew/cmpopt.lsp, /cvsroot/gcl/gcl/cmpnew/cmptype.c:
+	New file.
+
+	* /cvsroot/gcl/gcl/cmpnew/cmpenv.c, /cvsroot/gcl/gcl/cmpnew/cmpenv.data, /cvsroot/gcl/gcl/cmpnew/cmpenv.h, /cvsroot/gcl/gcl/cmpnew/cmpenv.lsp, /cvsroot/gcl/gcl/cmpnew/cmpeval.c, /cvsroot/gcl/gcl/cmpnew/cmpeval.data, /cvsroot/gcl/gcl/cmpnew/cmpeval.h, /cvsroot/gcl/gcl/cmpnew/cmpeval.lsp, /cvsroot/gcl/gcl/cmpnew/cmpflet.c, /cvsroot/gcl/gcl/cmpnew/cmpflet.data, /cvsroot/gcl/gcl/cmpnew/cmpflet.h, /cvsroot/gcl/gcl/cmpnew/cmpflet.lsp, /cvsroot/gcl/gcl/cmpnew/cmpfun.c, /cvsroot/gcl/gcl/cmpnew/cmpfun.data, /cvsroot/gcl/gcl/cmpnew/cmpfun.h, /cvsroot/gcl/gcl/cmpnew/cmpfun.lsp, /cvsroot/gcl/gcl/cmpnew/cmpif.c, /cvsroot/gcl/gcl/cmpnew/cmpif.data, /cvsroot/gcl/gcl/cmpnew/cmpif.h, /cvsroot/gcl/gcl/cmpnew/cmpif.lsp, /cvsroot/gcl/gcl/cmpnew/cmpinit.lsp, /cvsroot/gcl/gcl/cmpnew/cmpinline.c, /cvsroot/gcl/gcl/cmpnew/cmpinline.data, /cvsroot/gcl/gcl/cmpnew/cmpinline.h, /cvsroot/gcl/gcl/cmpnew/cmpinline.lsp, /cvsroot/gcl/gcl/cmpnew/cmplabel.c, /cvsroot/gcl/gcl/cmpnew/cmplabel.data, /cvsroot/gcl/gcl/cmpnew/cmplabel.h, /cvsroot/gcl/gcl/cmpnew/cmplabel.lsp:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/cmpnew/cmplam.c: New file.
+
+	* /cvsroot/gcl/gcl/bin/info1, /cvsroot/gcl/gcl/bin/info, /cvsroot/gcl/gcl/bin/tkinfo, /cvsroot/gcl/gcl/clcs/condition-definitions.lisp, /cvsroot/gcl/gcl/clcs/condition-precom.lisp, /cvsroot/gcl/gcl/clcs/conditions.lisp, /cvsroot/gcl/gcl/clcs/debugger.lisp, /cvsroot/gcl/gcl/clcs/doload.lisp, /cvsroot/gcl/gcl/clcs/handler.lisp, /cvsroot/gcl/gcl/clcs/install.lisp, /cvsroot/gcl/gcl/clcs/kcl-cond.lisp, /cvsroot/gcl/gcl/clcs/loading.lisp, /cvsroot/gcl/gcl/clcs/macros.lisp, /cvsroot/gcl/gcl/clcs/package.lisp, /cvsroot/gcl/gcl/clcs/precom.lisp, /cvsroot/gcl/gcl/clcs/readme, /cvsroot/gcl/gcl/clcs/reload.lisp, /cvsroot/gcl/gcl/clcs/restart.lisp, /cvsroot/gcl/gcl/clcs/sysdef.lisp, /cvsroot/gcl/gcl/clcs/test2.lisp, /cvsroot/gcl/gcl/clcs/test3.lisp, /cvsroot/gcl/gcl/clcs/test4.lisp, /cvsroot/gcl/gcl/clcs/test5.lisp, /cvsroot/gcl/gcl/clcs/tester.lisp, /cvsroot/gcl/gcl/clcs/test.lisp, /cvsroot/gcl/gcl/clcs/top-patches.lisp, /cvsroot/gcl/gcl/cmpnew/cmpbind.c, /cvsroot/gcl/gcl/cmpnew/cmpbind.data, /cvsroot/gcl/gcl/cmpnew/cmpbind.h, /cvsroot/gcl/gcl/cmpnew/cmpbind.lsp, /cvsroot/gcl/gcl/cmpnew/cmpblock.c, /cvsroot/gcl/gcl/cmpnew/cmpblock.data, /cvsroot/gcl/gcl/cmpnew/cmpblock.h, /cvsroot/gcl/gcl/cmpnew/cmpblock.lsp, /cvsroot/gcl/gcl/cmpnew/cmpcall.c, /cvsroot/gcl/gcl/cmpnew/cmpcall.data, /cvsroot/gcl/gcl/cmpnew/cmpcall.h, /cvsroot/gcl/gcl/cmpnew/cmpcall.lsp, /cvsroot/gcl/gcl/cmpnew/cmpcatch.c, /cvsroot/gcl/gcl/cmpnew/cmpcatch.data, /cvsroot/gcl/gcl/cmpnew/cmpcatch.h, /cvsroot/gcl/gcl/cmpnew/cmpcatch.lsp, /cvsroot/gcl/gcl/gcl1.jpg, /cvsroot/gcl/gcl/gcl2.jpg, /cvsroot/gcl/gcl/gcl.jpg:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/bin/append, /cvsroot/gcl/gcl/bin/append.c, /cvsroot/gcl/gcl/bin/dpp.c, /cvsroot/gcl/gcl/bin/gcl, /cvsroot/gcl/gcl/bin/makefile, /cvsroot/gcl/gcl/clcs/makefile, /cvsroot/gcl/gcl/gcl.gif:
+	New file.
+
+	* /cvsroot/gcl/gcl/AC_FD_CC, /cvsroot/gcl/gcl/AC_FD_MSG, /cvsroot/gcl/gcl/add-defs.bat, /cvsroot/gcl/gcl/COPYING.LIB-2.0, /cvsroot/gcl/gcl/eval.html, /cvsroot/gcl/gcl/eval.tcl, /cvsroot/gcl/gcl/faq, /cvsroot/gcl/gcl/install.sh, /cvsroot/gcl/gcl/machine, /cvsroot/gcl/gcl/machines, /cvsroot/gcl/gcl/majvers, /cvsroot/gcl/gcl/merge.c:
+	initial checkin
+
+	* /cvsroot/gcl/gcl/add-defs1, /cvsroot/gcl/gcl/add-defs, /cvsroot/gcl/gcl/ChangeLog, /cvsroot/gcl/gcl/config.guess, /cvsroot/gcl/gcl/config.sub, /cvsroot/gcl/gcl/configure, /cvsroot/gcl/gcl/configure.in, /cvsroot/gcl/gcl/makdefs, /cvsroot/gcl/gcl/makedefs.in, /cvsroot/gcl/gcl/makedf, /cvsroot/gcl/gcl/makedf.in, /cvsroot/gcl/gcl/makefile, /cvsroot/gcl/gcl/minvers, /cvsroot/gcl/gcl/readme:
+	New file.
 
