@@ -121,8 +121,11 @@
 	   ;; when necessary.  CM 20040301
 	   ((eq (car ue) 'sup)
 	    (wt-nl "sup=V" (cdr ue) ";")
-	    (wt-nl)
-	    (reset-top))
+	    (when (and (eq loc 'fun-val)
+		       (not (eq *value-to-go* 'return))
+		       (not (eq *value-to-go* 'top)))
+	      (wt-nl)
+	      (reset-top)))
 	   (t (setq jump-p t))))
     ((numberp ue) (setq bds-cvar ue bds-bind 0))
     ((eq ue 'bds-bind) (incf bds-bind))

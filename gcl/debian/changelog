@@ -54,8 +54,11 @@ gclcvs (2.7.0-20) unstable; urgency=low
     plt.c.  Generates a clear and explicit error of an undefined symbol
     when we've missed an address
   * Define the external symbols known to be written at present in plt.c
+  * fix some more compiler errors found by the random tester -- all
+    related to proper unwinding of temporary reductions of vs_top from
+    te local supremum
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  6 Mar 2004 02:00:52 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat,  6 Mar 2004 02:05:11 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
