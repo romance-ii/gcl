@@ -41,8 +41,10 @@ gclcvs (2.7.0-37) unstable; urgency=low
   * Don't write into rl_line_buffer if null
   * Fix fmakunbound to handle setf functions, and to give a type error
     when no function is defined
+  * Fix :q, package error triggering in defpackage, defpackage symbol
+    finding logic (thanks Peter Wood)
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  7 Mar 2005 15:33:28 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  7 Mar 2005 18:31:33 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 

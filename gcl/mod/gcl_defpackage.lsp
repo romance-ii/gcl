@@ -267,12 +267,15 @@
 			      (mapcar #'(lambda (list)
 					  `(SHADOWING-IMPORT 
 					    (mapcar #'(lambda (symbol) 
-							(if (find-symbol symbol ,(first list))
-							    (intern symbol ,(first list))
+							(multiple-value-bind (sym fnd) (find-symbol symbol ,(first list))
+							  (unless fnd
+							    (specific-correctable-error 
+							     :package-error
+							     "A package error occurred on ~S: ~S." ,(first list) 
+							     (format nil "~%Symbol ~a not present" symbol)))
+							  (intern symbol ,(first list))))
 ; FIXME better error messages
-							  (specific-correctable-error :package-error
-									  "" ,(first list) 
-									  (format nil "Symbol ~S not present~%" symbol))))
+
 						    ',(rest list))))
 				      SHADOWING-IMPORTed-from-symbol-names-list))
 			  (USE-PACKAGE ',(if (member ':USE options ':test #'option-test)
@@ -281,12 +284,14 @@
 			  ,@(when IMPORTed-from-symbol-names-list
 			      (mapcar #'(lambda (list) 
 					  `(IMPORT (mapcar #'(lambda (symbol) 
-							(if (find-symbol symbol ,(first list))
-							       (intern symbol ,(first list))
+							(multiple-value-bind (sym fnd) (find-symbol symbol ,(first list))
+							  (unless fnd
+							    (specific-correctable-error 
+							     :package-error
+							     "A package error occurred on ~S: ~S." ,(first list) 
+							     (format nil "~%Symbol ~a not present" symbol)))
+							  (intern symbol ,(first list))))
 ; FIXME better error messages
-							  (specific-correctable-error :package-error
-									  "" ,(first list) 
-									  (format nil "Symbol ~S not present~%" symbol))))
 							   ',(rest list))))
 				      IMPORTed-from-symbol-names-list))
 			  ,@(when INTERNed-symbol-names 

@@ -100,9 +100,7 @@
 (defvar *kcl-top-restarts* nil)
 
 (defun make-kcl-top-restart (quit-tag)
-  ;; FIXME need this restart for :q, but invoke-restarts must signal
-  ;; a control error if abort called outside a defined restart
-  (make-restart :name 'abort1
+  (make-restart :name 'gcl-top-restart
 		:function #'(lambda () (throw (car (list quit-tag)) quit-tag))
 		:report-function 
 		#'(lambda (stream) 

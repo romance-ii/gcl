@@ -124,7 +124,7 @@
       (error "Console interrupt -- cannot continue.")))
 
 (defun clcs-break-quit (&optional (level 0))
-  (let ((abort (nth level (reverse *abort-restarts*))))
+  (let ((abort (nth level (cons (find-restart 'conditions::gcl-top-restart) (reverse *abort-restarts*)))))
     (when abort (invoke-restart-interactively abort)))
   (break-current))
 
