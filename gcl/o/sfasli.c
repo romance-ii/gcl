@@ -45,7 +45,7 @@ build_symbol_table_bfd(void) {
     FEerror("Cannot add self symbols\n",0);
   if ((u=bfd_get_symtab_upper_bound(bself))<0)
     FEerror("Cannot get self's symtab upper bound",0);
-#ifdef HAVE_ALLOC
+#ifdef HAVE_ALLOCA
   q=(asymbol **)alloca(u);
 #else
   q=(asymbol **)malloc(u);

@@ -1,11 +1,14 @@
-gcl (2.6.0cvs-2) experimental; urgency=low
+gclcvs (2.6.0-2) unstable; urgency=low
 
   * New files for macosx
   * rpm spec file added
   * Merge changes from 2.5.4
   * Add additional pop to loose package stack in read.d for dotted pairs
+  * Back to unstable distribution for cvs snapshots, reflect snapshot in 
+    source package name instead of version, enable concurrent stable and
+    cvs snapshot installation
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  5 Aug 2003 20:20:36 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 21 Aug 2003 16:01:42 +0000
 
 gcl (2.6.0cvs-1) experimental; urgency=low
 
@@ -49,8 +52,9 @@ gcl (2.5.4-1) unstable; urgency=low
   * enable-static configure option
   * Fix debian/gcl-doc.docs for latest texinfo file splitting policy,
     Closes: #206017
+  * Fix typo in o/sfasli.c
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 21 Aug 2003 15:54:11 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 21 Aug 2003 18:44:27 +0000
 
 gcl (2.5.3-2) unstable; urgency=low
 
