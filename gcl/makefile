@@ -118,6 +118,11 @@ install-command:
 	echo '     '\"\$$@\" ) > $(DESTDIR)${prefix}/bin/gcl;
 	echo '#' other options: -load "/tmp/foo.o" -load "jo.lsp" -eval '"(joe 3)"' >> $(DESTDIR)${prefix}/bin/gcl
 	chmod a+x $(DESTDIR)${prefix}/bin/gcl
+	rm -f $(DESTDIR)${prefix}/bin/gcl.bat
+	(echo 'REM Gnu Common Lisp startup batch file' ; \
+	echo "start ${INSTALL_LIB_DIR}/$(PORTDIR)/$(FLISP)$(EXE) -dir ${INSTALL_LIB_DIR}/unixport/ -libdir ${INSTALL_LIB_DIR}/ -eval '(setq si::*allow-gzipped-file* t)'"  ) > $(DESTDIR)${prefix}/bin/gclm.bat;
+	echo 'REM' Add other options like this: -load "/tmp/foo.o" -load "jo.lsp" -eval '"(joe 3)"' >> $(DESTDIR)${prefix}/bin/gclm.bat
+	chmod a+x $(DESTDIR)${prefix}/bin/gclm.bat
 
 install: 
 	make install1 "INSTALL_LIB_DIR=${prefix}/lib/gcl-`cat majvers`.`cat minvers`" "prefix=${prefix}" DESTDIR=$(DESTDIR)
