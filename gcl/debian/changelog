@@ -40,8 +40,9 @@ gcl (2.5.0.cvs20020625-76) unstable; urgency=low
   * Spruce up clean target
   * Use saved_gcl to recompile cmpnew files
   * Toggle ansi image with GCL_ANSI environment variable
+  * Version 2.5.1
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 26 Feb 2003 19:51:01 -0500
+ -- Camm Maguire <camm@enhanced.com>  Wed, 26 Feb 2003 21:31:04 -0500
 
 gcl (2.5.0.cvs20020625-75) unstable; urgency=low
 
