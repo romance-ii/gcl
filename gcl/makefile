@@ -104,7 +104,8 @@ $(MPDIR)/libmport.a:
 $(GMPDIR)/libgmp.a: $(GMPDIR)/Makefile
 	cd $(GMPDIR) && make && rm -f libgmp.a &&  ar qc libgmp.a *.o */*.o
 
-
+$(GMPDIR)/mpn/mul_n.o $(GMPDIR)/mpn/lshift.o $(GMPDIR)/mpn/rshift.o: $(GMPDIR)/Makefile
+	cd $(@D) && make $(@F)
 
 command:
 	rm -f bin/gcl xbin/gcl
