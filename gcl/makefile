@@ -142,6 +142,7 @@ INSTALL_LIB_DIR=
 install1:
 	mkdir -p $(DESTDIR)${prefix}/lib 
 	mkdir -p $(DESTDIR)${prefix}/bin
+	mkdir -p $(DESTDIR)${prefix}/include && cp h/cmpinclude.h $(DESTDIR)${prefix}/include/
 	mkdir -p $(DESTDIR)${INSTALL_LIB_DIR}
 	make install-command "INSTALL_LIB_DIR=${INSTALL_LIB_DIR}" "prefix=${prefix}" DESTDIR=$(DESTDIR)
 	rm -f $(DESTDIR)${prefix}/bin/gcl.exe

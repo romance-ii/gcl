@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-47) unstable; urgency=high
+
+  * Install cmpinclude.h in system include directory
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 29 Aug 2002 23:31:55 -0400
+
 gcl (2.5.0.cvs20020625-46) unstable; urgency=high
 
   * Keep a *much* smaller piece of gmp.h in cmpinclude.h, reducing image
