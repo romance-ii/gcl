@@ -234,7 +234,7 @@
 		 (dec (var-is-declared var body))
 		 (chb (var-is-changed var body)))
 	     (let ((type (or exp typ frt inf outer))
-		   (ublk (not (or dec chb))))
+		   (ublk (not (or chb))))
 	       (if type
 		   (progn
 		     (cmpnote "var ~S is type ~S from ~a, ~a~%"
@@ -243,7 +243,7 @@
 					     (frt "deduced function return type")
 					     (inf "argument inference")
 					     (outer "outer scope"))
-			      (cond (dec "but is already declared")
+			      (cond (dec "is already declared, but amending declaration")
 				    (chb "but is changed in body")
 				    (t "declaring")))
 		     (if ublk

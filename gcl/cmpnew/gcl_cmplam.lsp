@@ -417,7 +417,7 @@
              nil)))
     (let ((*rest-on-stack*
 	    (cond ((and (caddr lambda-list)
-			(eq (var-type (caddr lambda-list)) :dynamic-extent))
+			(/= (var-dynamic (caddr lambda-list)) 0))
 		   t)
 		  (t *rest-on-stack*))))
        (if (cadddr lambda-list) ;;; key-flag

@@ -703,17 +703,32 @@
 
 ;;; Borrowed from CMPOPT.LSP
 
+(defmacro can-allocate-on-stack ()
+  `(and (consp *value-to-go*)
+	(eq (car *value-to-go*) 'var)
+	(/= (var-dynamic (second *value-to-go*)) 0)))
+
 (defun list-inline (&rest x &aux tem (n (length x)))
-   (cond ((setq tem
-		(and (consp *value-to-go*)
-		     (eq (car *value-to-go*) 'var)
-		     (eq (var-type (second *value-to-go*)) :dynamic-extent)))
-	  (wt "(ALLOCA_CONS(" n "),ON_STACK_LIST(" n))
-	 (t (wt "list(" (length x))))
-   (dolist (loc x) (wt #\, loc))
-   (wt #\))
-   (if tem (wt #\)))
-)
+  (let ((tem (can-allocate-on-stack)))
+    (if tem
+	(wt "(ALLOCA_CONS(" n "),ON_STACK_LIST(" n)
+      (wt "list(" (length x)))
+    (dolist (loc x) (wt #\, loc))
+    (wt #\))
+    (if tem (wt #\)))))
+
+(defun make-list-inline (n)
+  (let ((tem (can-allocate-on-stack)))
+    (if tem
+	(wt "({fixnum _t=" n ";(ALLOCA_CONS(_t),ON_STACK_LIST(_t));})")
+      (wt "make_list(" n ")"))))
+
+
+(defun cons-inline (x y)
+  (let ((tem (can-allocate-on-stack)))
+    (if tem
+	(wt "ON_STACK_CONS(" x "," y ")")
+      (wt "make_cons(" x "," y ")"))))
 
 
 (defun list*-inline (&rest x)

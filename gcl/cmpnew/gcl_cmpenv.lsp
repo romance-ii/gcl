@@ -478,7 +478,7 @@
 				   (cmpck (not (symbolp var))
 					  "The type declaration ~s contains a non-symbol ~s."
 					  decl var)
-				   (push (cons var :dynamic-extent) ts)))
+				   (push (cons var 'dynamic-extent) ts)))
 			((fixnum character double-float short-float array atom bignum bit
 				 bit-vector common compiled-function complex cons float hash-table
 				 integer keyword list long-float nil null number package pathname

@@ -693,10 +693,10 @@ type_of(#0)==t_bitvector")
    (get 'code-char 'inline-always))
 
 ;;CONS
- (push '((t t) t #.(flags ans)"make_cons(#0,#1)")
+ (push '((t t) t #.(flags ans) CONS-INLINE)
    (get 'cons 'inline-always))
-(push '((t t) :dynamic-extent #.(flags ans)"ON_STACK_CONS(#0,#1)")
-   (get 'cons 'inline-always))
+;(push '((t t) :dynamic-extent #.(flags ans)"ON_STACK_CONS(#0,#1)")
+;   (get 'cons 'inline-always))
 
 ;;CONSP
  (push '((t) boolean #.(flags)"type_of(#0)==t_cons")
@@ -922,8 +922,7 @@ type_of(#0)==t_bitvector")
    (get 'lognot 'inline-always))
 
 ;;MAKE-LIST
- (push '((fixnum) :dynamic-extent #.(flags ans)
-  "@0;(ALLOCA_CONS(#0),ON_STACK_MAKE_LIST(#0))")
+ (push '((fixnum) t #.(flags ans) MAKE-LIST-INLINE)
    (get 'make-list 'inline-always))
 
 ;;MAX

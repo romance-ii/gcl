@@ -138,7 +138,7 @@
 		 (chb (var-is-changed var body))
 		 (chc (and star (var-is-changed var (cdr bindings)))))
 	     (let ((type (or exp frt inf outer))
-		   (ublk (not (or dec chb chc))))
+		   (ublk (not (or chb chc))))
 	       (let ((*vars* (if (not star) *vars*
 				 (cons (c1make-var var nil nil (list (cons var (nil-to-t type)))) *vars*))))
 		 (if type
@@ -148,7 +148,7 @@
 					       (frt "deduced function return type")
 					       (inf "argument inference")
 					       (outer "outer scope"))
-				(cond (dec "but is already declared")
+				(cond (dec "is already declared, but amending declaration")
 				      (chb "but is changed in body")
 				      (chc "but is changed in other bindings")
 				      (t "declaring")))

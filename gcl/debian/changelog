@@ -28,8 +28,10 @@ gclcvs (2.7.0-37) unstable; urgency=low
     half bounded integer range type propagation
   * Correct flag construction for function attributes -- aref needs
     one_val flag
+  * Fix dynamic extent declarations, ammend existing declarations with
+    auto-determined ones where possible
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 27 Dec 2004 22:17:34 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 28 Dec 2004 22:22:39 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 

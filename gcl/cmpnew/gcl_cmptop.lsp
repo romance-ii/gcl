@@ -800,7 +800,7 @@
       (declare (object vl types))
       (cond ((eq (var-kind (car vl)) 'special)
               (push (cons (car vl) (var-loc (car vl))) specials))
-            (t
+            (t 
              (setf (var-kind (car vl))
                    (case (promoted-c-type (car types))
                          (fixnum 'FIXNUM)
@@ -1020,7 +1020,7 @@
 	  (wt-nl "V" rest-var " = ")
 	  
 	  (let ((*rest-on-stack*
-		 (or (eq (var-type (ll-rest ll)) :dynamic-extent)
+		 (or (/= (var-dynamic (ll-rest ll)) 0)
 		     *rest-on-stack*)))
 	    (if (ll-keywords-p ll)
 		(cond (*rest-on-stack*

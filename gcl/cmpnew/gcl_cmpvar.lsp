@@ -57,7 +57,8 @@
   		;;; OBJECT, the cvar for the C variable that holds the value.
   		;;; Not used for LEXICAL.
   (type t)	;;; Type of the variable.
-  (register 0)  ;;; If greater than specified am't this goes into register.
+  (register 0 :type unsigned-short)  ;;; If greater than specified am't this goes into register.
+  (dynamic 0 :type unsigned-short)   ;;; If variable is declared dynamic-extent
   )
 
 ;;; A special binding creates a var object with the kind field SPECIAL,
@@ -80,26 +81,25 @@
 
 (defun c1make-var (name specials ignores types &aux x)
   (let ((var (make-var :name name)))
-       (cmpck (not (symbolp name)) "The variable ~s is not a symbol." name)
-       (cmpck (constantp name) "The constant ~s is being bound." name)
+    (cmpck (not (symbolp name)) "The variable ~s is not a symbol." name)
+    (cmpck (constantp name)     "The constant ~s is being bound." name)
 
+    (dolist**
+     (v types)
+     (when (eq (car v) name)
+       (case (cdr v)
+	 (object (setf (var-loc var) 'object))
+	 (register (setf (var-register var) (+ (var-register var) 100)))
+	 (dynamic-extent  (setf (var-dynamic var) 1))
+	 (t (setf (var-type var) (nil-to-t (type-and (var-type var) (cdr v))))))))
+    
        (cond ((or (member name specials) (si:specialp name))
               (setf (var-kind var) 'SPECIAL)
               (setf (var-loc var) (add-symbol name))
-              (cond ((setq x (assoc name types))
-                     (setf (var-type var) (cdr x)))
-                    ((setq x (get name 'cmp-type))
-                     (setf (var-type var) x)))
+	      (when (and (not (assoc name types)) (setq x (get name 'cmp-type)))
+                     (setf (var-type var) x))
               (setq *special-binding* t))
              (t
-	      (dolist** (v types)
-			(cond ((eq (car v) name)
-			       (case (cdr v)
-				     (object (setf (var-loc var) 'object))
-				     (register
-				      (setf (var-register var)
-					    (+ (var-register var) 100)))
-				     (t (setf (var-type var) (cdr v)))))))
 	      (and (boundp '*c-gc*) *c-gc*
 		   (or (null (var-type var))
 		       (eq t (var-type var)))
@@ -108,8 +108,7 @@
        (let ((ign (member name ignores)))
         (when ign
          (setf (var-ref var) (if (eq (cadr ign) 'ignorable) 'IGNORABLE 'IGNORE))))
-       var)
-  )
+       var))
 
 (defun check-vref (var)
   (when (and (eq (var-kind var) 'LEXICAL)
