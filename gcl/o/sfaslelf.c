@@ -330,7 +330,11 @@ fasload(faslfile)
 /*  	   } */
 	 
 	 else if ( (shp->sh_type == SHT_REL) || (shp->sh_type == SHT_RELA) )
-	   {  if (get_section_number(".rel.stab") == j)
+	   {  if (/* get_section_number(".rel.stab") == j || */
+		  /* Newer gcc uses these section name -- CMM 20040224*/
+		  !strncmp(section_names+SECTION_H(j).sh_name,".rel.debug",10) ||
+		  /* old in for backward compatibility */
+		  !strcmp(section_names+SECTION_H(j).sh_name,".rel.stab"))
 	         continue;
 	     FEerror("unknown rel type",0);
 	   }

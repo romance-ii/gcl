@@ -23,8 +23,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Support for both sigbus and sigsegv in sgbc.c as is customary in .h
     files
   * mach-o compatible changes in sfaslbfd.c
+  * Support for new debugging section names in sfaslelf.c
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 25 Feb 2004 23:03:25 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 25 Feb 2004 23:04:46 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
