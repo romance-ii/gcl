@@ -2179,10 +2179,12 @@ fi
 
 fi
 
+
 echo $ac_n "checking for gettimeofday declaration""... $ac_c" 1>&6
-echo "configure:2184: checking for gettimeofday declaration" >&5
+echo "configure:2185: checking for gettimeofday declaration" >&5
+
 cat > conftest.$ac_ext <<EOF
-#line 2186 "configure"
+#line 2188 "configure"
 #include "confdefs.h"
 #include <sys/time.h>
 EOF
@@ -2192,12 +2194,10 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
   echo "$ac_t""present" 1>&6
 else
   rm -rf conftest*
-  
-    echo "$ac_t""missing" 1>&6
-    cat >> confdefs.h <<\EOF
+  echo "$ac_t""missing" 1>&6
+    		 cat >> confdefs.h <<\EOF
 #define GETTOD_NOT_DECLARED 1
 EOF
-
 
 fi
 rm -f conftest*
@@ -3840,7 +3840,7 @@ echo "configure:3839: checking use_gmp=yes, doing configure in gmp directory" >&
 #   i[[5-9]]86* | pentium* | k6* | athlon*)
 #      (cd gmp3 ; ./configure --target=i486) ;;
    *)
-      (cd gmp3 ; ./configure) ;;
+      (cd gmp3 && chmod +x ./configure && ./configure) ;;
  esac
  [ "`ls -1 gmp3/mpn/add_n.* 2>/dev/null`" != "" ] || cp gmp3/mpn/generic/*.c gmp/mpn/
  cp gmp3/gmp.h h/gmp.h

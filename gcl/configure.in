@@ -1025,7 +1025,7 @@ if test $use_gmp = yes ; then
 #   i[[5-9]]86* | pentium* | k6* | athlon*)
 #      (cd gmp3 ; ./configure --target=i486) ;;
    *)
-      (cd gmp3 ; ./configure) ;;
+      (cd gmp3 && chmod +x ./configure && ./configure) ;;
  esac
  [[ "`ls -1 gmp3/mpn/add_n.* 2>/dev/null`" != "" ]] || cp gmp3/mpn/generic/*.c gmp/mpn/
  cp gmp3/gmp.h h/gmp.h

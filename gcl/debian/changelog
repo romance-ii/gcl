@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-24) unstable; urgency=high
+
+  * chmod +x gmp3/configure
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 31 Jul 2002 07:55:17 -0400
+
 gcl (2.5.0.cvs20020625-23) unstable; urgency=high
 
   * 64bit SGC support
