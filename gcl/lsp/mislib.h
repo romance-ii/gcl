@@ -4,6 +4,8 @@ static void L4();
 static object LI5();
 static void L6();
 static void L7();
+static void L8();
+static void L9();
 #define VC1
 static object LI2();
 #define VMB2 register object *base=vs_top; object  V8 ,V6 ,V4;
@@ -23,6 +25,18 @@ static object LI5();
 #define VMR5(VMT5) vs_top=base ; return(VMT5);
 #define VC6
 #define VC7
+#define VC8
+#define VC9
+static void LC11();
+#define VC10 object  V64;
+static void LC10();
+#define VC11
+static void LC11();
+static void LC10();
+#define VM11 2
+#define VM10 2
+#define VM9 2
+#define VM8 2
 #define VM7 5
 #define VM6 5
 #define VM5 5
@@ -38,7 +52,9 @@ static char * VVi[21]={
 (char *)(L4),
 (char *)(LI5),
 (char *)(L6),
-(char *)(L7)
+(char *)(L7),
+(char *)(L8),
+(char *)(L9)
 };
 #define VV ((object *)VVi)
 static void LnkT19() ;

@@ -209,6 +209,7 @@ EXTER object  sStraced ;
 EXTER object  sLvector ; 
 EXTER object  sKallow_other_keys ; 
 EXTER  object   fSerror_set  (); 
+EXTER object  sLgensym_counter ; 
 EXTER  object   fSmc  (); 
 EXTER  object   fSmfsfun  (); 
 EXTER  object   fSmfvfun  (); 

@@ -25,7 +25,7 @@
 
 (export 'time)
 (export 'nth-value)
-(export '(decode-universal-time encode-universal-time compile-file-pathname))
+(export '(decode-universal-time encode-universal-time compile-file-pathname complement constantly))
 
 
 (in-package 'system)
@@ -107,3 +107,9 @@
   `(nth ,n (multiple-value-list ,expr)))
 (defun compile-file-pathname (pathname)
 (make-pathname :defaults pathname :type "o"))
+(defun constantly (x)
+#'(lambda (&rest args)
+(declare (ignore args) (dynamic-extent args))
+x))
+(defun complement (fn)
+#'(lambda (&rest args) (not (apply fn args))))

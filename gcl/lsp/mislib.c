@@ -481,6 +481,80 @@ TTL:;
 	return;
 	}
 }
+/*	function definition for CONSTANTLY	*/
+
+static void L8()
+{register object *base=vs_base;
+	register object *sup=base+VM8; VC8
+	vs_reserve(VM8);
+	check_arg(1);
+	base[0]=MMcons(base[0],Cnil);
+	vs_top=sup;
+	base[1]= 
+	make_cclosure_new(LC10,Cnil,base[0],Cdata);
+	vs_top=(vs_base=base+1)+1;
+	return;
+}
+/*	function definition for COMPLEMENT	*/
+
+static void L9()
+{register object *base=vs_base;
+	register object *sup=base+VM9; VC9
+	vs_reserve(VM9);
+	check_arg(1);
+	base[0]=MMcons(base[0],Cnil);
+	vs_top=sup;
+	base[1]= 
+	make_cclosure_new(LC11,Cnil,base[0],Cdata);
+	vs_top=(vs_base=base+1)+1;
+	return;
+}
+/*	local function CLOSURE	*/
+
+static void LC11(base0)
+register object *base0;
+{	register object *base=vs_base;
+	register object *sup=base+VM10; VC10
+	vs_reserve(VM10);
+	{object V63;
+	vs_top[0]=Cnil;
+	{object *p=vs_top;
+	 for(;p>vs_base;p--)p[-1]=MMcons(p[-1],p[0]);}
+	V63=(base[0]);
+	vs_top=sup;
+	base[1]= (base0[0]->c.c_car);
+	{object V65;
+	V65= (V63);
+	 vs_top=base+2;
+	 while(!endp(V65))
+	 {vs_push(car(V65));V65=cdr(V65);}
+	vs_base=base+2;}
+	super_funcall_no_event(base[1]);
+	vs_top=sup;
+	V64= vs_base[0];
+	base[1]= ((V64)==Cnil?Ct:Cnil);
+	vs_top=(vs_base=base+1)+1;
+	return;
+	}
+}
+/*	local function CLOSURE	*/
+
+static void LC10(base0)
+register object *base0;
+{	register object *base=vs_base;
+	register object *sup=base+VM11; VC11
+	vs_reserve(VM11);
+	{object V66;
+	vs_top[0]=Cnil;
+	{object *p=vs_top;
+	 for(;p>vs_base;p--)p[-1]=MMcons(p[-1],p[0]);}
+	V66=(base[0]);
+	vs_top=sup;
+	base[1]= (base0[0]->c.c_car);
+	vs_top=(vs_base=base+1)+1;
+	return;
+	}
+}
 static void LnkT19(){ call_or_link(VV[19],(void **)&Lnk19);} /* GET-DECODED-TIME */
 static object  LnkTLI18(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[18],(void **)&LnkLI18,1,ap);va_end(ap);return V1;} /* LEAP-YEAR-P */
 static object  LnkTLI17(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[17],(void **)&LnkLI17,1,ap);va_end(ap);return V1;} /* NUMBER-OF-DAYS-FROM-1900 */

@@ -1,3 +1,11 @@
+gcl (2.5.0.cvs20020625-58) unstable; urgency=low
+
+  * GENSYM fixes
+  * add complement and constantly
+  * import certain symbols into common-lisp package
+
+ -- Camm Maguire <camm@m.enhanced.com>  Thu, 10 Oct 2002 06:52:16 -0400
+
 gcl (2.5.0.cvs20020625-57) unstable; urgency=low
 
   * Capitalization changes to names of special characters;graphic-char-p

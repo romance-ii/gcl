@@ -475,37 +475,39 @@ Lmake_symbol()
 	@(return x)
 @)
 
+DEFVAR("*GENSYM-COUNTER*",sLgensym_counter,LISP,make_fixnum(0),"");
+
 @(defun gensym (&optional (x gensym_prefix) &aux sym)
 	int i, j;
+        object this_gensym_prefix;
+        object this_gensym_counter;
+        object this_gensym_counter_string;
 @
+        this_gensym_prefix=gensym_prefix;
+	this_gensym_counter=sLgensym_counter->s.s_dbind;
 	if (type_of(x) == t_string)
-		gensym_prefix = x;
+		this_gensym_prefix = x;
 	else {
 		check_type_non_negative_integer(&x);
-		if (type_of(x) == t_fixnum)
-			gensym_counter = fix(x);
-		else
-			gensym_counter = 0;
-			/*  incorrect implementation  */
+		this_gensym_counter=x;
 	}
-	for (j = gensym_counter, i = 0;  j > 0;  j /= 10)
-		i++;
-	if (i == 0)
-		i++;
-	i += gensym_prefix->st.st_fillp;
+        if (x==gensym_prefix) 
+                sLgensym_counter->s.s_dbind=number_plus(sLgensym_counter->s.s_dbind,small_fixnum(1));
+/*         FIXME: come up with a better call sequence */
+        VFUN_NARGS=3;
+        this_gensym_counter_string=fLformat(Cnil,make_simple_string("~S"),this_gensym_counter);
+        i=this_gensym_counter_string->st.st_fillp;
+	i += this_gensym_prefix->st.st_fillp;
 	set_up_string_register("");
 	sym = make_symbol(string_register);
 	{BEGIN_NO_INTERRUPT;	
 	sym->s.s_fillp = i;
 	sym->s.s_self = alloc_relblock(i);
-	for (j = 0;  j < gensym_prefix->st.st_fillp;  j++)
-		sym->s.s_self[j] = gensym_prefix->st.st_self[j];
-	if ((j = gensym_counter) == 0)
-		sym->s.s_self[--i] = '0';
-	else
-		for (;  j > 0;  j /= 10)
-			sym->s.s_self[--i] = j%10 + '0';
-	gensym_counter++;
+	i=this_gensym_prefix->st.st_fillp;
+	for (j = 0;  j < i;  j++)
+		sym->s.s_self[j] = this_gensym_prefix->st.st_self[j];
+	for (;j<sym->s.s_fillp;j++)
+               sym->s.s_self[j] = this_gensym_counter_string->st.st_self[j-i];
 	END_NO_INTERRUPT;}	
 	@(return sym)
 @)
@@ -638,7 +640,7 @@ init_symbol()
 {
 	string_register = alloc_simple_string(0);
 	gensym_prefix = make_simple_string("G");
-	gensym_counter = 0;
+/* 	gensym_counter = 0; */
 	gentemp_prefix = make_simple_string("T");
 	gentemp_counter = 0;
 	token = alloc_simple_string(INITIAL_TOKEN_LENGTH);
@@ -679,4 +681,5 @@ init_symbol_function()
 
 	siSpname = make_si_ordinary("PNAME");
 	enter_mark_origin(&siSpname);
+/* 	enter_mark_origin(&sLgensym_counter); */
 }

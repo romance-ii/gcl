@@ -518,7 +518,8 @@ EXTER int string_sign, string_boundary;
 /*  symbol.d  */
 EXTER object string_register;
 EXTER object gensym_prefix;
-EXTER int gensym_counter;
+/* EXTER int gensym_counter; */
+EXTER object sLgensym_counter;
 EXTER object gentemp_prefix;
 EXTER int gentemp_counter;
 EXTER object token;

@@ -63,6 +63,12 @@
    LISP::KYOTO
    LISP::CCLOSURE))
 
+;(dolist (s '(*compile-file-pathname* *compile-file-truename*
+;*compile-print* *compile-verbose* *load-pathname* *load-print*
+;*load-truename* *print-lines* *print-miser-width*
+;*print-pprint-dispatch* *print-right-margin* *read-eval*))
+;	(import (list s) "COMMON-LISP"))
+
 (do-external-symbols (s "LISP")
   (if (not(member s lisp_unexport))
       (progn 
@@ -81,6 +87,37 @@
       (progn
         (import (list s) "COMMON-LISP")
         (import (list s) "USER"))))
+
+(dolist (s '(*compile-file-pathname* *compile-file-truename*
+*compile-print* *compile-verbose* *load-pathname* *load-print*
+*load-truename* *print-lines* *print-miser-width*
+*print-pprint-dispatch* *print-right-margin* *read-eval*
+lisp::arithmetic-error broadcast-stream-streams cell-error
+cell-error-name compile compile-file compiler-macro
+compiler-macro-function complement concatenated-stream-streams
+condition control-error copy-pprint-dispatch copy-structure count
+debug define-compiler-macro define-setf-expander define-symbol-macro
+defpackage describe describe-object division-by-zero dynamic-extent
+echo-stream-input-stream echo-stream-output-stream
+ensure-directories-exist fdefinition file-string-length formatter
+function-lambda-expression get-setf-expansion hash-table-rehash-size
+hash-table-rehash-threshold ignorable interactive-stream-p
+load-logical-pathname-translations load-time-value
+logical-pathname-translations make-load-form
+make-load-form-saving-slots make-method open-stream-p pathname-match-p
+pprint-dispatch pprint-exit-if-list-exhausted pprint-fill
+pprint-indent pprint-linear pprint-logical-block pprint-newline
+pprint-pop pprint-tab pprint-tabular print-not-readable-object
+print-unreadable-object read-sequence readtable-case row-major-aref
+set-pprint-dispatch simple-condition-format-control
+stream-external-format synonym-stream-symbol
+translate-logical-pathname translate-pathname
+two-way-stream-input-stream two-way-stream-output-stream
+unbound-slot-instance upgraded-array-element-type
+upgraded-complex-part-type wild-pathname-p with-compilation-unit
+with-condition-restarts with-package-iterator with-standard-io-syntax
+write-sequence ))
+	(import (list s) "COMMON-LISP"))
 
 (use-package "ANSI-LOOP" "COMMON-LISP")
 (use-package "ANSI-LOOP" "USER")
