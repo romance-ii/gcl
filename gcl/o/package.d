@@ -720,27 +720,18 @@ delete_package(object n) {
   struct package *p,*pp;
   object t;
 
-/*    if (type_of(n)!=t_package && type_of(n)!=t_symbol && type_of(n)!=t_string) */
-/*      FEwrong_type_argument(TSor_symbol_string_package, n); */
-
   for (p = pack_pointer,pp=NULL;  p != NULL;  pp=p,p = p->p_link) 
-
+    
     if (designate_package(n,p)) {
-
+      
       if (p->p_usedbylist!=Cnil) {
-/* 	VFUN_NARGS=4; */
-/* 	fLspecific_correctable_error(sKpackage_error,make_simple_string("Package ~S is used by other packages: ~S"), */
-/* 				     p,p->p_usedbylist); */
-/* 	FEpackage_error((object)p,"Package used by other packages."); */
+ 	
+	/* 	FEpackage_error((object)p,"Package used by other packages."); */
 	for (t=p->p_usedbylist;!endp(t);t=t->c.c_cdr)
 	  unuse_package(p,t->c.c_car);
       }
 
       if (p->p_uselist!=Cnil) {
-/* 	VFUN_NARGS=4; */
-/* 	fLspecific_correctable_error(sKpackage_error,make_simple_string("Package ~S is used by other packages: ~S"), */
-/* 				     p,p->p_usedbylist); */
-/* 	FEpackage_error((object)p,"Package used by other packages."); */
 	for (t=p->p_uselist;!endp(t);t=t->c.c_cdr)
 	  unuse_package(t->c.c_car,p);
       }
@@ -751,14 +742,12 @@ delete_package(object n) {
 	pp->p_link=p->p_link;
       else
 	pack_pointer=p->p_link;
-
+	
       return(Ct);
-
+      
     }
   
-/*   VFUN_NARGS=3; */
-/*   fLspecific_correctable_error(sKpackage_error,make_simple_string("~S does not designate a package"),n); */
-/*    FEpackage_error(n,"No such pachage."); */
+    /*   FEpackage_error(n,"No such pachage."); */
 
   return(Cnil);
   

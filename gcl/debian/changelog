@@ -22,8 +22,9 @@ gcl (2.5.0.cvs20020625-58) unstable; urgency=low
   * Build-depend on autotools-dev and automatic update of config.sub and
     config.guess;newer config.sub and config.guess in cvs tree; Closes:
     #164526
+  * Remove stray comments in package.d
 
- -- Camm Maguire <camm@m.enhanced.com>  Tue, 15 Oct 2002 14:52:39 -0400
+ -- Camm Maguire <camm@m.enhanced.com>  Tue, 15 Oct 2002 14:59:15 -0400
 
 gcl (2.5.0.cvs20020625-57) unstable; urgency=low
 
