@@ -56,15 +56,15 @@
 	      (equal ext "h"))
 	 (get-output-pathname file ext "Float" ))
 	(t
-	  (make-pathname :directory (or (and (not (null file))
-					     (not (eq file t))
-					     (pathname-directory file))
-					dir)
-			 :name (or (and (not (null file))
-					(not (eq file t))
-					(pathname-name file))
-				   name)
-			 :type ext))))
+	 (make-pathname :directory (or (and (not (null file))
+					    (not (eq file t))
+					    (pathname-directory file))
+				       dir)
+			:name (or (and (not (null file))
+				       (not (eq file t))
+				       (pathname-name file))
+				  name)
+			:type ext))))
 
 
 (defun safe-system (string)
@@ -439,24 +439,30 @@ Cannot compile ~a.~%"
 	 (with-open-file
 	     (st (setq gaz (gazonk-name)) :direction :output)
 	   (prin1-cmp `(defun ,name ,@ (cddr tem))       st))
-	 (let ((fi (compile-file gaz :h-file t :c-file t
-				  :system-p 't
-				 :data-file t :o-file t)))
-	   (with-open-file (st (get-output-pathname gaz "c" gaz ))
-	     (si::copy-stream st *standard-output*)(delete-file st))
-	   (with-open-file (st (get-output-pathname gaz "data" gaz ))
-	     (si::copy-stream st *standard-output*)(delete-file st))
-	   (with-open-file (st (get-output-pathname gaz "h" gaz ))
-	     (si::copy-stream st *standard-output*)(delete-file st))
-	   (with-open-file (st
-			    (si::string-concatenate
-			     "| objdump -d "
-			     (namestring (get-output-pathname gaz "o" gaz ))
-			     " 2>/dev/null || echo No objdump found"))
-			   (si::copy-stream st *standard-output*))
-	   (delete-file (get-output-pathname gaz "o" gaz ))
-	   (delete-file gaz)
-	   ))
+	 (let ((fi (compile-file gaz 
+				 :c-debug t 
+				 :h-file t 
+				 :c-file t
+				 :system-p 't
+				 :data-file t
+				 :o-file t))
+	       (cn (get-output-pathname gaz "c" gaz ))
+	       (dn (get-output-pathname gaz "data" gaz ))
+	       (hn (get-output-pathname gaz "h" gaz ))
+	       (on (get-output-pathname gaz "o" gaz )))
+	   (with-open-file (st cn)
+	     (si::copy-stream st *standard-output*))
+	   (with-open-file (st dn)
+	     (si::copy-stream st *standard-output*))
+	   (with-open-file (st hn)
+	     (si::copy-stream st *standard-output*))
+	   (system (si::string-concatenate "objdump -d -l "
+					   (namestring on)))
+	   (delete-file cn)
+	   (delete-file dn)
+	   (delete-file hn)
+	   (delete-file on)
+	   (delete-file gaz)))
 	(t (error "can't disassemble ~a" name))))
 	 
 
