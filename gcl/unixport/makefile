@@ -106,7 +106,7 @@ libgcl.a: $(OBJS) $(LSPOBJS) $(CMPOBJS) sys_gcl.o gmpfiles bfdfiles
 	ar rs $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
 raw_$(SYSTEM): libgcl.a libgclp.a $(SYSTEM_OBJS)
-	$(CC) -o raw_$(SYSTEM)$(EXE) $(filter %.o,$^) -L. $(LD_LIBS)
+	$(CC) -o raw_$(SYSTEM)$(EXE) $(FIRST_FILE) $(filter %.o,$^) $(LAST_FILE) -L. $(LD_LIBS)
 
 sys_gcl.o: sys_gcl.c $(HDIR)/object.h $(HDIR)/config.h
 	$(CC) $(CFLAGS) -c -I$(HDIR) sys_gcl.c
