@@ -76,7 +76,7 @@ install: build
 	mkdir -p debian/tmp/usr/share/doc/gcl-doc/gcl-tk.html
 	cp info/gcl-tk*html debian/tmp/usr/share/doc/gcl-doc/gcl-tk.html/
 
-	rm -f debian/tmp/usr/bin/gcl.exe
+	rm -f debian/tmp/usr/bin/gcl.exe debian/tmp/usr/bin/gclm.bat
 
 	find debian/tmp -type f -name "*.lsp" -exec chmod -x {} \;
 	find debian/tmp -type f -name "*.lisp" -exec chmod -x {} \;

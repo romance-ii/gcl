@@ -1,8 +1,10 @@
 gcl (2.5.0.cvs20020625-25) unstable; urgency=high
 
   * Move chmod +x gmp3/* into debian/rules
+  * Remove gclm.bat from Debian package
+  * Build-Depend on autoconf, Closes: #154909
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 31 Jul 2002 09:31:36 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed, 31 Jul 2002 09:44:20 -0400
 
 gcl (2.5.0.cvs20020625-24) unstable; urgency=high
 
