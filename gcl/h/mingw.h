@@ -185,6 +185,9 @@ extern DBEGIN_TY _stacktop, _stackbottom, _dbegin;
 /* Use this pending test in configure */
 #define NO_MKSTEMP
 
+#define WRITEC_NEWLINE(strm) (writec_stream('\r',strm),\
+                         writec_stream('\n', strm))
+
 /* Begin for cmpinclude */
 
 
