@@ -1022,7 +1022,7 @@ if (!syscall(SYS_personality,PER_LINUX))
   fp = fopen("conftest1","w");
 
 #ifdef _WIN32
-  fprintf(fp,"_dbegin");
+  fprintf ( fp,"0x%lx", 0x1a000000 );  /* Windows custom allocation from this point up */
 #else
 #if defined (__APPLE__) && defined (__MACH__)
   fprintf(fp,"get_dbegin()");
