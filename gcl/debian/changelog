@@ -12,8 +12,10 @@ gclcvs (2.7.0-19) unstable; urgency=low
   * exit with -1 when standard in ends in lisp debug mode
   * rl_putc_em a carriage return after invoking readline to ensure the
     prompt in rl_putc_em_line is cleared.
+  * Store banner in si::*system-banner* for possible modificationin
+    compatibly licensed programs
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 14 Feb 2004 17:40:58 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 14 Feb 2004 17:42:42 +0000
 
 gclcvs (2.7.0-18) unstable; urgency=low
 

@@ -14,6 +14,15 @@
 
 (in-package "SYSTEM")
 (defvar *command-args* nil)
+ ;; if ANY header or license information is printed by the
+ ;; program, then the following License and Enhancement notice
+ ;; must be printed (see License).
+(defvar *system-banner* (format nil "GCL (GNU Common Lisp)  ~A~%~a~%~a~%~a~%~%~a~%" 
+		    "@LI-VERS@"
+       		    "Licensed under GNU Library General Public License"
+		    "Modifications of this banner must retain notice of a compatible license"
+                    "Dedicated to the memory of W. Schelter"
+       		    "Use (help) to get some basic information on how to use GCL."))
 
 (progn 
  (system:init-system) 
@@ -84,13 +93,7 @@
    (cond ((si::get-command-arg "-batch")
 	  (setq si::*top-level-hook* 'bye))
 	 ((si::get-command-arg "-f"))
-	 (t  ;; if ANY header or license information is printed by the
-	  ;; program, then the following License and Enhancement notice
-	  ;; must be printed (see License).
-	  (format t "GCL (GNU Common Lisp)  ~A~%~a~%~a~%~%~a~%" "@LI-VERS@"
-		  "Licensed under GNU Library General Public License"
-		  "Dedicated to the memory of W. Schelter"
-		  "Use (help) to get some basic information on how to use GCL.")))
+	 (t (format t si::*system-banner*)))
    (setq si::*ihs-top* 1)
    (in-package 'system::user) (incf system::*ihs-top* 2)
    (funcall system::*old-top-level*))
