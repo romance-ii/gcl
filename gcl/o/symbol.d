@@ -408,6 +408,7 @@ LFD(Lsymbol_plist)()
 
 @(defun getf (place indicator &optional deflt)
 @
+	check_proper_list(place);
 	@(return `getf(place, indicator, deflt)`)
 @)
 
@@ -415,6 +416,8 @@ LFD(Lsymbol_plist)()
 	object l, m;
 
 @
+	check_proper_list(place);
+	check_proper_list(indicator_list);
 	for (l = place;  !endp(l);  l = l->c.c_cdr->c.c_cdr) {
 		if (endp(l->c.c_cdr))
 			odd_plist(place);

@@ -1,3 +1,21 @@
+gclcvs (2.7.0-28) unstable; urgency=high
+
+  * Michael Koehne's ANSI patches  (Thanks!)
+  * Bug fix: "the function (setf fdefinition) is undefined", thanks to
+    Eric Marsden (Closes: #256673).  setf fdefinition support
+  * Bug fix: "MAKE-PATHNAME does not support relative directories", thanks
+    to Eric Marsden (Closes: #256676).  from Michael's patches
+  * Bug fix: "COMPILE-FILE does not accept :VERBOSE argument", thanks to
+    Eric Marsden (Closes: #256674).  From Michael's patches.  FIXME make
+    more functional
+  * Bug fix: "~@; FORMAT directive is not implemented (CLtS 22.3.5.2)",
+    thanks to Eric Marsden (Closes: #256696).  FIXME cleanup
+  * Restore debugging function pp
+  * remove old with-standard-io-syntax frm gcl_ansi_io.lsp
+  * preliminary support for common-lisp-controller, Closes: #130569.
+
+ -- Camm Maguire <camm@enhanced.com>  Sat, 24 Jul 2004 13:11:10 +0000
+
 gclcvs (2.7.0-27) unstable; urgency=low
 
   * Fixup bad extern declaration of signals_handled in usig.c

@@ -39,7 +39,8 @@ void Ldirectory ( void )
 				    path->pn.pn_directory,
 				    new->pn.pn_name,
 				    new->pn.pn_type,
-				    new->pn.pn_version));
+				    new->pn.pn_version,
+				    Cnil));
 	    }
 	  } while (FindNextFile(dirHandle,&data));
 	  FindClose(dirHandle);

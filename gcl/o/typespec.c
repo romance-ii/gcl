@@ -392,12 +392,39 @@ LFD(Ltype_of)(void)
 		break;
 
 	case t_stream:
+#ifdef ANSI_COMMON_LISP
+		if ((vs_base[0]->sm.sm_mode == smm_input) ||
+		    (vs_base[0]->sm.sm_mode == smm_output) ||
+		    (vs_base[0]->sm.sm_mode == smm_probe) ||
+		    (vs_base[0]->sm.sm_mode == smm_io))
+			vs_base[0] = sLfile_stream;
+		else
+		if ((vs_base[0]->sm.sm_mode == smm_string_input) ||
+		    (vs_base[0]->sm.sm_mode == smm_string_output))
+			vs_base[0] = sLstring_stream;
+		else
+		if (vs_base[0]->sm.sm_mode == smm_synonym)
+			vs_base[0] = sLsynonym_stream;
+		else
+		if (vs_base[0]->sm.sm_mode == smm_broadcast)
+			vs_base[0] = sLbroadcast_stream;
+		else
+		if (vs_base[0]->sm.sm_mode == smm_concatenated)
+			vs_base[0] = sLconcatenated_stream;
+		else
+		if (vs_base[0]->sm.sm_mode == smm_two_way)
+			vs_base[0] = sLtwo_way_stream;
+		else
+		if (vs_base[0]->sm.sm_mode == smm_echo)
+			vs_base[0] = sLecho_stream;
+		else
 #ifdef USER_DEFINED_STREAMS
 		if (vs_base[0]->sm.sm_mode == (int)smm_user_defined)
 		   vs_base[0]= vs_base[0]->sm.sm_object1->str.str_self[8];
 		else
 #endif
-		vs_base[0] = sLstream;
+#endif
+			vs_base[0] = sLstream;
 		break;
 
 	case t_readtable:
@@ -484,6 +511,10 @@ DEF_ORDINARY("SIGNED-SHORT",sLsigned_short,LISP,"");
 DEF_ORDINARY("UNSIGNED-SHORT",sLunsigned_short,LISP,"");
 DEF_ORDINARY("*",sLA,LISP,"");
 DEF_ORDINARY("PLUSP",sLplusp,LISP,"");
+DEF_ORDINARY("FILE-STREAM",sLfile_stream,LISP,"");
+
+/* logical pathnames exist even in non ansi gcl */
+DEF_ORDINARY("LOGICAL-PATHNAME",sLlogical_pathname,LISP,"");
 
 #ifdef ANSI_COMMON_LISP
 /* New ansi types */
@@ -504,13 +535,11 @@ DEF_ORDINARY("END-OF-FILE",sLend_of_file,LISP,"");
 DEF_ORDINARY("ERROR",sLerror,LISP,"");
 DEF_ORDINARY("EXTENDED-CHAR",sLextended_char,LISP,"");
 DEF_ORDINARY("FILE-ERROR",sLfile_error,LISP,"");
-DEF_ORDINARY("FILE-STREAM",sLfile_stream,LISP,"");
 DEF_ORDINARY("FLOATING-POINT-INEXACT",sLfloating_point_inexact,LISP,"");
 DEF_ORDINARY("FLOATING-POINT-INVALID-OPERATION",sLfloating_point_invalid_operation,LISP,"");
 DEF_ORDINARY("FLOATING-POINT-OVERFLOW",sLfloating_point_overflow,LISP,"");
 DEF_ORDINARY("FLOATING-POINT-UNDERFLOW",sLfloating_point_underflow,LISP,"");
 DEF_ORDINARY("GENERIC-FUNCTION",sLgeneric_function,LISP,"");
-DEF_ORDINARY("LOGICAL-PATHNAME",sLlogical_pathname,LISP,"");
 DEF_ORDINARY("METHOD",sLmethod,LISP,"");
 /* FIXME -- need this for types in predlib.lsp, why can't we use the keyword sKpackage_error ? */
 DEF_ORDINARY("PACKAGE-ERROR",sLpackage_error,LISP,"");

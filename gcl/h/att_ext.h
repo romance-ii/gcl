@@ -378,8 +378,6 @@ object find_symbol();
 
 /*  pathname.d  */
 EXTER object Vdefault_pathname_defaults;
-EXTER object sKwild;
-EXTER object sKnewest;
 EXTER object sKstart;
 EXTER object sKend;
 EXTER object sKjunk_allowed;
@@ -390,16 +388,37 @@ EXTER object sKname;
 EXTER object sKtype;
 EXTER object sKversion;
 EXTER object sKdefaults;
+EXTER object sKlocal;
+EXTER object sKcommon;
+
+EXTER object sKpathname_error;
+
+EXTER object sKabsolute;
+EXTER object sKrelative;
 EXTER object sKroot;
+EXTER object sKhome;
+EXTER object sKwild;
+EXTER object sKwildinf;
+EXTER object sKnewest;
 EXTER object sKcurrent;
 EXTER object sKparent;
-EXTER object sKper;
-/* object parse_namestring(); */
-object coerce_to_pathname();
-/* object default_device(); */
+EXTER object sKback;
+EXTER object sKup;
+EXTER object sKunspecific;
+
 object merge_pathnames();
 object namestring();
 object coerce_to_namestring();
+object coerce_to_pathname();
+object file_error();
+object wild_pathname_p();
+
+extern int pathname_resolve();
+extern object pathname_lookup();
+extern object translate_logical_pathname();
+extern object search_local_pathname();
+extern object coerce_to_local_namestring();
+extern object expand_pathname();
 
 /*  prediate.c  */
 
@@ -454,6 +473,12 @@ object terpri();
 EXTER object sSpretty_print_format;
 EXTER int  line_length;
 
+/*  file.d definied but not yet implemented */
+EXTER object sLAprint_linesA;
+EXTER object sLAprint_miser_widthA;
+EXTER object sLAprint_right_marginA;
+EXTER object sLAread_evalA;
+
 /*  Read.d  */
 EXTER object standard_readtable;
 EXTER object Vreadtable;
@@ -503,6 +528,8 @@ object elt();
 object elt_set();
 object reverse();
 object nreverse();
+
+void check_proper_list();
 
 /*  structure.c  */
 EXTER object sSs_data;
@@ -571,13 +598,13 @@ EXTER object sLsequence,sLsimple_array,sLsimple_vector,sLsimple_bit_vector,sLsim
 EXTER object sLcompiled_function,sLpathname,sLcharacter,sLnumber,sLrational,sLfloat,sLstring_char;
 EXTER object sLinteger,sLratio,sLshort_float,sLstandard_char,sLfixnum,sLpositive_fixnum, sLcomplex;
 EXTER object sLsingle_float,sLpackage,sLbignum,sLrandom_state,sLdouble_float,sLstream,sLbit,sLreadtable;
-EXTER object sLlong_float,sLhash_table,sLstructure,sLboolean;
+EXTER object sLlong_float,sLhash_table,sLstructure,sLboolean,sLfile_stream;
 
 #ifdef ANSI_COMMON_LISP
 /* new ansi types */
 EXTER object sLarithmetic_error,sLbase_char,sLbase_string,sLbroadcast_stream,sLbuilt_in_class;
 EXTER object sLcell_error,sLclass,sLconcatenated_stream,sLcondition,sLcontrol_error,sLdivision_by_zero;
-EXTER object sLecho_stream,sLend_of_file,sLerror,sLextended_char,sLfile_error,sLfile_stream;
+EXTER object sLecho_stream,sLend_of_file,sLerror,sLextended_char,sLfile_error;
 EXTER object sLfloating_point_inexact,sLfloating_point_invalid_operation,sLfloating_point_overflow;
 EXTER object sLfloating_point_underflow,sLgeneric_function,sLlogical_pathname,sLmethod,sLpackage_error;
 EXTER object sLparse_error,sLprint_not_readable,sLprogram_error,sLreader_error,sLserious_condition;

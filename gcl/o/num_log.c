@@ -363,7 +363,7 @@ LFD(Llogbitp)(void)
 	int	i;
 
 	check_arg(2);
-	check_type_integer(&vs_base[0]);
+	check_type_non_negative_integer(&vs_base[0]);
 	check_type_integer(&vs_base[1]);
 	p = vs_base[0];
 	x = vs_base[1];

@@ -553,3 +553,18 @@
 		    (append vals (list (list 'cdr access-form))))
        (prog1 (car ,access-form)
               ,store-form))))
+
+(defun (setf fdefinition) (def fn)
+  (when (not (functionp def))
+    (specific-error :wrong-type-argument "~S is not of type ~S~%" def 'function))
+  (cond ((symbolp fn)
+	 (when (special-operator-p fn)
+	   (specific-error :wrong-type-argument
+			   "~S is a special operator and cannot be chenged by (set fdefinition), expect ~S~%"
+			   fn '(or symbol function)))
+	 (setf (symbol-function fn) def))
+	(t
+	 (unless (and (consp fn) (eq (car fn) 'setf) (symbolp (cadr fn)) (null (cddr fn)))
+	   (specific-error :wrong-type-argument
+			   "~S is not of type ~S~%" fn 'function))
+	 (setf (get (cadr fn) 'setf-function) def))))

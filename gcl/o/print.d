@@ -22,13 +22,28 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	print.d
 */
 
+/* hacked by Michael Koehne (c) GNU LGPL
+ *           kraehe (at) copyleft.de
+ *	     Sun Apr 25 07:43:08 CEST 2004
+ *
+ * beware of new bugs^h^h^h^h features !
+ *
+ * many thanks to pfdietz - not only for ircing at #lisp to explain a
+ * few bits to me, but even more for writing the ansi-test. This hack
+ * would never been possible without his regression test !
+ * ------------------------------------------------------------------------- */
+
 #define NEED_ISFINITE
 
 #include "include.h"
 #include <unistd.h>
 
-#define LINE_LENGTH line_length
-int  line_length = 72;
+#define LINE_LENGTH get_line_length()
+#define MINIMUM_RIGHT_MARGIN 1
+#define DEFAULT_RIGHT_MARGIN 72
+
+static int
+get_line_length(void);
 
 #ifndef WRITEC_NEWLINE
 #define  WRITEC_NEWLINE(strm) (writec_stream('\n',strm))
@@ -195,6 +210,12 @@ PUT_INDENT:
 	--qc;
 	
         WRITEC_NEWLINE(PRINTstream);
+	{ extern object per_line_prefix_string;
+	int i;
+	if (per_line_prefix_string)
+	  for (i=0;i<per_line_prefix_string->st.st_fillp;i++)
+	    writec_stream(per_line_prefix_string->st.st_self[i],PRINTstream);
+	}
 	for (i = indent_stack[isp];  i > 0;  --i)
 		writec_stream(' ', PRINTstream);
 	iisp = isp;
@@ -454,8 +475,8 @@ bool shortp;
 }
 
 static void
-call_structure_print_function(x, level)
-object x;
+call_print_function(func,x, level, nargs)
+object func,x;
 int level;
 {
 	int i;
@@ -539,8 +560,12 @@ ONCE_MORE:
 		goto L;
 	}
 
-	ifuncall3(S_DATA(x->str.str_def)->print_function,
-		  x, PRINTstream, vs_head);
+	if (nargs == 3)
+	    ifuncall3(func, x, PRINTstream, vs_head);
+	else
+	if (nargs == 2) /* pprint is other way round */
+	    ifuncall2(func, PRINTstream, x);
+
 	vs_popp;
 	eflag = FALSE;
 
@@ -584,11 +609,73 @@ L:
 		unwind(nlj_fr, nlj_tag);
 	}
 }
+
+static void
+call_structure_print_function(x, level)
+object x;
+int level;
+{
+    call_print_function(S_DATA(x->str.str_def)->print_function, x, level, 3);
+}
+
 object copy_big();
 object coerce_big_to_string(object,int);
+extern object cLtype_of(object);
+static bool potential_number_p(object,int);
 
-static bool
-potential_number_p(object,int);
+static object
+pprint_dispatch(obj,a_list)
+object obj,a_list;
+{
+	object ret=Cnil;
+	object pri=Cnil;
+
+	if ((sLtypep->s.s_gfdef == OBJNULL) ||
+	    (sLtypep->s.s_gfdef == Cnil))
+	    return Cnil; /* we may not have typep in raw_gcl */
+	if (a_list == Cnil)
+	    return Cnil;
+	if (type_of(a_list) == t_symbol)
+	    a_list = symbol_value(a_list);
+	if (type_of(a_list) == t_cons)
+	    a_list = a_list->c.c_cdr;
+
+	while ((a_list != Cnil) &&
+	       (type_of(a_list) == t_cons) &&
+	        !endp(a_list)) {
+	    if ((a_list->c.c_car != Cnil) &&
+		(type_of(a_list->c.c_car) == t_cons) &&
+		(a_list->c.c_car->c.c_car != Cnil) &&
+		(a_list->c.c_car->c.c_cdr != Cnil) &&
+		(ifuncall2(sLtypep,obj,a_list->c.c_car->c.c_car) != Cnil)) {
+		    if (pri == Cnil) {
+			    ret =a_list->c.c_car->c.c_cdr;
+			    if ((type_of(a_list->c.c_car->c.c_cdr) == t_cons) &&
+				(type_of(a_list->c.c_car->c.c_cdr->c.c_cdr) == t_cons) &&
+		      (ifuncall2(sLtypep,a_list->c.c_car->c.c_cdr->c.c_cdr->c.c_car,sLnumber) != Cnil))
+				    pri =a_list->c.c_car->c.c_cdr->c.c_cdr->c.c_car;
+			    else
+				    pri =make_fixnum(0);
+		    } else
+		    if ((type_of(a_list->c.c_car->c.c_cdr) == t_cons) &&
+		        (type_of(a_list->c.c_car->c.c_cdr->c.c_cdr) == t_cons) &&
+	      (ifuncall2(sLtypep,a_list->c.c_car->c.c_cdr->c.c_cdr->c.c_car,sLnumber) != Cnil) &&
+		 (number_compare(a_list->c.c_car->c.c_cdr->c.c_cdr->c.c_car,pri)>0)) {
+			    ret =a_list->c.c_car->c.c_cdr;
+			    pri =a_list->c.c_car->c.c_cdr->c.c_cdr->c.c_car;
+		    }
+	    }
+	    a_list = a_list->c.c_cdr;
+	}
+	if (type_of(ret) == t_cons)
+	    ret = ret->c.c_car;
+	return ret;
+}
+
+@(defun get_pprint_dispatch (obj &o (table `symbol_value(sLApprint_dispatchA)`))
+@
+	@(return `pprint_dispatch(obj,table)`)
+@)
 
 void
 write_object(x, level)
@@ -598,6 +685,7 @@ int level;
 	object r, y;
 	int i, j, k,lw;
 	object *vp;
+	object ppfun;
 
 	cs_check(x);
 
@@ -611,9 +699,28 @@ int level;
 		write_str(">");
 		return;
 	}
-
+	if (PRINTpretty &&
+	    ((ppfun = pprint_dispatch(x,sLApprint_dispatchA)) != Cnil)) {
+		vs_mark;
+		if (ppfun != Ct)
+		switch (type_of(ppfun)) {
+		    case t_cfun:
+		    case t_gfun:
+		    case t_sfun:
+		    case t_vfun:
+		    case t_afun:
+		    case t_closure:
+		    case t_cclosure:
+		    case t_symbol:
+		    case t_cons:
+			call_print_function(ppfun, x, 0, 2);
+			vs_reset;
+			return;
+		    default:
+			FEwrong_type_argument(sLfunction,ppfun);
+		}
+	}
 	switch (type_of(x)) {
-
 	case t_fixnum:
 	{
 		object *vsp;
@@ -1341,16 +1448,23 @@ int level;
 		break;
 
 	case t_pathname:
-		if (1 || PRINTescape) {
+		if (x == sSApathname_errorA->s.s_dbind) {
 			write_ch('#');
-			write_ch('p');
+			write_ch('P');
+			vs_push(expand_pathname(x));
+			write_object(vs_head, level);
+			vs_popp;
+		} else
+		if (PRINTescape) {
+			write_ch('#');
+			write_ch('P');
 			vs_push(namestring(x));
 			write_object(vs_head, level);
 			vs_popp;
 		} else {
-			write_str("#<pathname ");
-			write_addr(x);
-			write_str(">");
+			vs_push(namestring(x));
+			write_object(vs_head, level);
+			vs_popp;
 		}
 		break;
 	case t_sfun:
@@ -1593,10 +1707,27 @@ int base;
 		    (length `symbol_value(sLAprint_lengthA)`)
 		    ((:case cas) `symbol_value(sLAprint_caseA)`)
 		    (gensym `symbol_value(sLAprint_gensymA)`)
-		    (array `symbol_value(sLAprint_arrayA)`))
+		    (array `symbol_value(sLAprint_arrayA)`)
+		    (pprint_dispatch `symbol_value(sLApprint_dispatchA)`)
+		    (lines `symbol_value(sLAprint_linesA)`)
+		    (right_margin `symbol_value(sLAprint_right_marginA)`)
+		    (miser_width `symbol_value(sLAprint_miser_widthA)`))
         struct printStruct printStructBuf; 
         struct printStruct *old_printStructBufp = printStructBufp;  
+	object changer;
 @
+	changer = sLApprint_dispatchA->s.s_dbind;
+	sLApprint_dispatchA->s.s_dbind = pprint_dispatch;
+	pprint_dispatch = changer;
+	changer = sLAprint_linesA->s.s_dbind;
+	sLAprint_linesA->s.s_dbind = lines;
+	lines = changer;
+	changer = sLAprint_right_marginA->s.s_dbind;
+	sLAprint_right_marginA->s.s_dbind = right_margin;
+	right_margin = changer;
+	changer = sLAprint_miser_widthA->s.s_dbind;
+	sLAprint_miser_widthA->s.s_dbind = miser_width;
+	miser_width = changer;
 
 	printStructBufp = &printStructBuf; 
 	if (strm == Cnil)
@@ -1647,6 +1778,12 @@ int base;
 	write_object(x, 0);
 	CLEANUP_PRINT_DEFAULT;
 	flush_stream(PRINTstream);
+
+	sLApprint_dispatchA->s.s_dbind = pprint_dispatch;
+	sLAprint_linesA->s.s_dbind = lines;
+	sLAprint_right_marginA->s.s_dbind = right_margin;
+	sLAprint_miser_widthA->s.s_dbind = miser_width;
+
 	@(return x)
 @)
 
@@ -1682,6 +1819,25 @@ int base;
 	write_object(obj, 0);
 	CLEANUP_PRINT_DEFAULT;
 	flush_stream(strm);}
+	@(return)
+@)
+
+@(defun default_pprint_object (strm obj)
+@
+	if (strm == Cnil)
+		strm = symbol_value(sLAstandard_outputA);
+	else if (strm == Ct)
+		strm = symbol_value(sLAterminal_ioA);
+	check_type_stream(&strm);
+	{   SETUP_PRINT_DEFAULT(obj);
+	    PRINTstream = strm;
+	    qh = qt = qc = 0;
+	    isp = iisp = 0;
+	    indent_stack[0] = 0;
+	    write_ch_fun = writec_queue;
+	    write_object(obj, 0);
+	    CLEANUP_PRINT_DEFAULT;
+	}
 	@(return)
 @)
 
@@ -1820,6 +1976,10 @@ DEF_ORDINARY("GENSYM",sKgensym,KEYWORD,"");
 DEF_ORDINARY("LEVEL",sKlevel,KEYWORD,"");
 DEF_ORDINARY("LENGTH",sKlength,KEYWORD,"");
 DEF_ORDINARY("ARRAY",sKarray,KEYWORD,"");
+DEF_ORDINARY("PPRINT-DISPATCH",sKpprint_dispatch,KEYWORD,"");
+DEF_ORDINARY("LINES",sKlines,KEYWORD,"");
+DEF_ORDINARY("RIGHT-MARGIN",sKright_margin,KEYWORD,"");
+DEF_ORDINARY("MISER-WIDTH",sKmiser_width,KEYWORD,"");
 DEFVAR("*PRINT-ESCAPE*",sLAprint_escapeA,LISP,Ct,"");
 DEFVAR("*PRINT-READABLY*",sLAprint_readablyA,LISP,Ct,"");
 DEFVAR("*PRINT-PRETTY*",sLAprint_prettyA,LISP,Ct,"");
@@ -1834,6 +1994,19 @@ DEFVAR("*PRINT-ARRAY*",sLAprint_arrayA,LISP,Ct,"");
 DEFVAR("*PRINT-PACKAGE*",sSAprint_packageA,SI,Cnil,"");
 DEFVAR("*PRINT-STRUCTURE*",sSAprint_structureA,SI,Cnil,"");
 DEF_ORDINARY("PRETTY-PRINT-FORMAT",sSpretty_print_format,SI,"");
+DEFVAR("*PRINT-NANS*",sSAprint_nansA,SI,Cnil,"");
+
+
+/*
+ * those variables are only defined to make the ansi-test happy
+ * they are NOT YET implemented
+ */
+
+DEFVAR("*PRINT-PPRINT-DISPATCH*",sLApprint_dispatchA,LISP,Cnil,"");
+DEFVAR("*PRINT-LINES*",sLAprint_linesA,LISP,Cnil,"");
+DEFVAR("*PRINT-MISER-WIDTH*",sLAprint_miser_widthA,LISP,Cnil,"");
+DEFVAR("*PRINT-RIGHT-MARGIN*",sLAprint_right_marginA,LISP,Cnil,"");
+DEFVAR("*READ-EVAL*",sLAread_evalA,LISP,Ct,"");
 
 void
 gcl_init_print()
@@ -2017,6 +2190,17 @@ object sym;
 
 }
 
+static int
+get_line_length(void)
+{
+    int l=0;
+    object o=symbol_value(sLAprint_right_marginA);
+    if ((o!=Cnil) && (type_of(o)==t_fixnum))
+        l=fix(o);
+    if (l<MINIMUM_RIGHT_MARGIN)
+        l=DEFAULT_RIGHT_MARGIN;
+    return l;
+}
 
 static void
 pp(x)
@@ -2026,15 +2210,13 @@ princ(x,Cnil);
 flush_stream(symbol_value(sLAstandard_outputA));
 }
 
-static object
-FFN(set_line_length)(n)
-int n;
+LFD(Lset_line_length)(void)
 {
-  line_length=n;
-  return make_fixnum(line_length);
-}
+  check_arg(1);
 
-DEFVAR("*PRINT-NANS*",sSAprint_nansA,SI,Cnil,"");
+  if ((vs_base[0] == Cnil) || (type_of(vs_base[0]) == t_fixnum))
+      sLAprint_right_marginA->s.s_dbind = vs_base[0];
+}
 
 void
 gcl_init_print_function()
@@ -2054,11 +2236,9 @@ gcl_init_print_function()
 	make_function("FORCE-OUTPUT", Lforce_output);
 	make_function("CLEAR-OUTPUT", Lclear_output);
 	make_function("WRITE-BYTE", Lwrite_byte);
-        make_si_sfun("SET-LINE-LENGTH",set_line_length,ARGTYPE1(f_fixnum)
-		| RESTYPE(f_fixnum));
+	make_si_function("DEFAULT-PPRINT-OBJECT", Ldefault_pprint_object);
+	make_si_function("GET-PPRINT-DISPATCH", Lget_pprint_dispatch);
+
+	/* KCL compatibility function */
+        make_function("SET-LINE-LENGTH",Lset_line_length);
 }
-
-
-
-
-

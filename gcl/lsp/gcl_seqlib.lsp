@@ -72,7 +72,7 @@
   (error "both test and test not supplied"))
 
 (defun bad-seq-limit (x &optional y)
-  (specific-error :wrong-type-argument "bad sequence limit ~a" (if y (list x y) x)))
+  (specific-error :wrong-type-argument "The value of ~S is not ~S." (if y (list x y) x) "in sequence limit"))
 
 
 (eval-when (compile eval)

@@ -157,6 +157,10 @@ BEGIN:
 		h += ihash_equal(x->pn.pn_directory,depth);
 		h += ihash_equal(x->pn.pn_name,depth);
 		h += ihash_equal(x->pn.pn_type,depth);
+		/* version is ignored unless logical host */
+		if ((type_of(x->pn.pn_host) == t_string) &&
+		    (pathname_lookup(x->pn.pn_host,sSApathname_logicalA) != Cnil))
+			h += ihash_equal(x->pn.pn_version,depth);
 		h += ihash_equal(x->pn.pn_version,depth);
 		return(h);
 /*  CLTLII says don't descend into structures
@@ -495,7 +499,9 @@ DEFUN_NEW("NEXT-HASH-TABLE-ENTRY",object,fSnext_hash_table_entry,SI,2,2,NONE,OO,
 
 DEFUN_NEW("HASH-TABLE-TEST",object,fLhash_table_test,LISP,1,1,NONE,OO,OO,OO,OO,(object table),
  "Given a HASH-TABLE return a symbol which specifies the function used in its test") 
-{ switch(table->ht.ht_test) {
+{ 
+  check_type_hash_table(&table);
+  switch(table->ht.ht_test) {
      case htt_equal: RETURN1(sLequal);
      case htt_eq: RETURN1(sLeq);
      case htt_eql: RETURN1(sLeql);
@@ -506,8 +512,8 @@ DEFUN_NEW("HASH-TABLE-TEST",object,fLhash_table_test,LISP,1,1,NONE,OO,OO,OO,OO,(
 
 DEFUN_NEW("HASH-TABLE-SIZE",object,fLhash_table_size,LISP,1,1,NONE,OO,OO,OO,OO,(object table),"")
 {
+  check_type_hash_table(&table);
   RETURN1(make_fixnum(table->ht.ht_size));
-
 }
 
 

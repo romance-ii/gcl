@@ -261,6 +261,9 @@ with-output-to-string
 write-to-string
 y-or-n-p
 yes-or-no-p
+with-standard-io-syntax
+logical-pathname-translations
+ensure-directories-exist
 
 proclaim
 proclamation

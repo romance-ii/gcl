@@ -120,8 +120,9 @@ decls1: $(INI_FILES)
 $(DECL): $(HDIR)/make-decl.h $(INI_FILES)
 	echo '#include "make-decl.h"' > foo.c
 	cat ${INI_FILES} >> foo.c
-	${CC} -E -I${HDIR} foo.c | sed -n -e '/#/d' -e '/DO_/d' -e '/[a-zA-Z;]/p' > $@
-	rm foo.c
+	${CC} -E -I${HDIR} foo.c | sed -n -e '/#/d' -e '/DO_/d' -e '/[a-zA-Z;]/p' > tmpini
+	../xbin/move-if-changed mv tmpini $@
+	-rm foo.c tmpini
 
 grab_defs: grab_defs.c
 	${CC} $(OFLAGS) -o grab_defs  grab_defs.c

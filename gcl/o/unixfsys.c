@@ -156,107 +156,66 @@ getwd(char *buffer)
 }
 #endif
 
-#ifdef DGUX
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#endif
-
 void
 coerce_to_filename(object pathname, char *p)
 {
-  object namestring;
-  if ( pathname == Cnil ) {
-      FEerror ( "NIL argument.", 1, pathname );
-  }
-        
-  namestring = coerce_to_namestring(pathname);
-#ifndef NO_PWD_H  
-  if(namestring->st.st_self[0]=='~')
-    {char name[20];
-     int n;
-     char *q = namestring->st.st_self;
-#ifndef __STDC__
-     extern struct passwd *getpwuid();
-     extern struct passwd *getpwnam();
-#endif
+    object namestring;
 
-     struct passwd *pwent;
-     int m=0;
-     q=namestring->st.st_self;
-     for (n=0; n< namestring->st.st_fillp; n++)
-       if (q[n]=='/') break;
-     bcopy(q+1,name,n-1);
-     name[n-1]= 0;
-     pwent = (n==1 ? getpwuid(getuid()) : getpwnam(name));
-     if (pwent==0 || ((m = strlen(pwent->pw_dir))
-		     && (m + namestring->st.st_fillp -n) >= MAXPATHLEN -16))
-       {FEerror("Can't expand pathname ~a", 1,namestring);}
-     bcopy(pwent->pw_dir,p,m);
-     bcopy(namestring->st.st_self+n,p+m,namestring->st.st_fillp-n);
-     p[m+namestring->st.st_fillp-n]=0;}
-  else
+    vs_mark;
+    namestring = coerce_to_namestring(pathname);
+    vs_push(namestring);
+
+#ifndef NO_PWD_H  
+    if(namestring->st.st_self[0]=='~') {
+	char name[20];
+	int n;
+	char *q = namestring->st.st_self;
+#ifndef __STDC__
+	extern struct passwd *getpwuid();
+	extern struct passwd *getpwnam();
 #endif
-    {if (namestring->st.st_fillp >= MAXPATHLEN - 16) {
-      vs_push(namestring);
-      FEerror("Too long filename: ~S.", 1, namestring);}
-     bcopy(namestring->st.st_self,p,namestring->st.st_fillp);
-     p[namestring->st.st_fillp]=0;}
+	struct passwd *pwent;
+	int m=0;
+
+	q=namestring->st.st_self;
+	for (n=0; n< namestring->st.st_fillp; n++)
+	    if (q[n]=='/') break;
+	bcopy(q+1,name,n-1);
+	name[n-1]= 0;
+	pwent = (n==1 ? getpwuid(getuid()) : getpwnam(name));
+	if (pwent==0 || ((m = strlen(pwent->pw_dir)) &&
+		    (m + namestring->st.st_fillp -n) >= MAXPATHLEN -16)) {
+		FEerror("Can't expand pathname ~a", 1,namestring);
+	}
+	bcopy(pwent->pw_dir,p,m);
+	bcopy(namestring->st.st_self+n,p+m,namestring->st.st_fillp-n);
+	p[m+namestring->st.st_fillp-n]=0;
+    } else
+#endif
+    {	if (namestring->st.st_fillp >= MAXPATHLEN - 16) {
+	    FEerror("Too long filename: ~S.", 1, namestring);
+	}
+	bcopy(namestring->st.st_self,p,namestring->st.st_fillp);
+	p[namestring->st.st_fillp]=0;
+    }
 #ifdef FIX_FILENAME
     FIX_FILENAME(pathname,p);
 #endif
-    
+    vs_reset;
 }
 
+void
+coerce_to_local_filename(object pathname, char *p)
+{
+    object namestring;
 
+    vs_mark; /* gbc paranoia */
+    vs_push(pathname); 
+    namestring=coerce_to_local_namestring(pathname);
+    vs_push(namestring);
+    coerce_to_filename(namestring, p);
+    vs_reset;
+}
 
 object
 truename(object pathname)
@@ -267,6 +226,39 @@ truename(object pathname)
 	char current_directory[MAXPATHLEN];
 	char directory[MAXPATHLEN];
 	static char *getwd(char *buffer);
+	int islinkcount=8;
+	struct stat filestatus;
+
+	vs_mark;
+	vs_push(pathname);
+
+	if (wild_pathname_p(pathname,Cnil) == Ct)
+	    return(file_error("File ~S is wild.",pathname));
+
+	coerce_to_local_filename(pathname, filename);
+
+#ifdef S_IFLNK
+	if (lstat(filename, &filestatus) >= 0)
+	while (((filestatus.st_mode&S_IFMT) == S_IFLNK) && (--islinkcount>0)) {
+	    char newname[MAXPATHLEN];
+	    int newlen;
+	    newlen=readlink(filename,newname,MAXPATHLEN-1);
+	    if (newlen < 0)
+		return(file_error("Symlink broken at ~S.",pathname));
+	    for (p = filename, q = 0;  *p != '\0';  p++)
+		    if (*p == '/') q = p;
+	    if (q == 0)
+		q = filename;
+	    else
+		q++;
+            memcpy(q,newname,newlen);
+	    q[newlen]=0;
+	    if (lstat(filename, &filestatus) < 0) 
+		islinkcount=0; /* It would be ANSI to do the following :
+		return(file_error("Symlink broken at ~S.",pathname));
+		but this would break DIRECTORY if a file points to nowhere */
+	}
+#endif
 
 #ifdef __MINGW32__
         DWORD current_directory_length = GetCurrentDirectory ( MAXPATHLEN, current_directory );
@@ -279,16 +271,11 @@ truename(object pathname)
 #else
         getwd(current_directory);
 #endif        
-	
-        if ( pathname == Cnil ) {
-            FEerror("Cannot get the truename of NIL.", 1, pathname );
-        }
-        
-        coerce_to_filename(pathname, filename);
 
 	for (p = filename, q = 0;  *p != '\0';  p++)
 		if (*p == '/')
 			q = p;
+
 	if (q == filename) {
 		q++;
 		p = "/";
@@ -297,7 +284,7 @@ truename(object pathname)
 		p = current_directory;
 	} else
 #ifdef __MINGW32__
-	  if ( ( q > filename ) && ( q[-1] == ':' ) ) {
+	if ( ( q > filename ) && ( q[-1] == ':' ) ) {
 	    int current = (q++, q[0]);
 	    q[0]=0;
 	    if (chdir(filename) < 0)
@@ -312,11 +299,11 @@ truename(object pathname)
 	    p = directory;
 	    if ( p[1]==':' && ( p[2]=='\\' || p[2]=='/' ) && p[3]==0 ) p[2]=0;
 	    q[0]=current;
-          }
-	  else
+        } else
 #endif	
-	  {
+	{
 		*q++ = '\0';
+		getwd(current_directory);
 		if (chdir(filename) < 0)
 		    FEerror("Cannot get the truename of ~S.", 1, pathname);
 #ifdef __MINGW32__
@@ -331,7 +318,7 @@ truename(object pathname)
 #else
 		p = getwd(directory);
 #endif                
-          }
+	}
 	if (p[0] == '/' && p[1] == '\0') {
 		if (strcmp(q, "..") == 0)
 			strcpy(truefilename, "/.");
@@ -353,10 +340,10 @@ truename(object pathname)
 	chdir(current_directory);
 	vs_push(make_simple_string(truefilename));
 	pathname = coerce_to_pathname(vs_head);
-	vs_popp;
+	vs_reset;
 	return(pathname);
 }
-object sSAallow_gzipped_fileA;
+extern object sSAallow_gzipped_fileA;
 
 bool
 file_exists(object file)
@@ -364,7 +351,7 @@ file_exists(object file)
 	char filename[MAXPATHLEN];
 	struct stat filestatus;
 
-	coerce_to_filename(file, filename);
+	coerce_to_local_filename(file, filename);
 
 #ifdef __MINGW32__
         {
@@ -377,26 +364,21 @@ file_exists(object file)
         }
 #endif        
 
-	if (stat(filename, &filestatus) >= 0)
-	  {
+	if (stat(filename, &filestatus) >= 0) {
 #ifdef AIX
 	    /* if /tmp/foo is not a directory /tmp/foo/ should not exist */
 	    if (filename[strlen(filename)-1] == '/' &&
 		!( filestatus.st_mode & S_IFDIR))
 		return(FALSE);
 #endif	    
-
 	    return TRUE;
-	  }
-	else
-	  if (sSAallow_gzipped_fileA->s.s_dbind != sLnil
+	} else
+	if (sSAallow_gzipped_fileA->s.s_dbind != sLnil
 	      && (strcat(filename,".gz"),
 		  stat(filename, &filestatus) >= 0))
-	      
-	      return TRUE;
-
+	    return TRUE;
 	else
-		return(FALSE);
+	    return(FALSE);
 }
 
 FILE *
@@ -424,8 +406,29 @@ file_len(FILE *fp)
 LFD(Ltruename)(void)
 {
 	check_arg(1);
+
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
-	vs_base[0] = truename(vs_base[0]);
+	vs_base[0]=coerce_to_pathname(vs_base[0]);
+
+	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
+	    file_error("File ~S is wild.",vs_base[0]);
+	    vs_base[0] = Cnil;
+	    return;
+	}
+
+	if ((((vs_base[0]->pn.pn_name != Cnil) &&
+		(vs_base[0]->pn.pn_name != sKunspecific)) || 
+             ((vs_base[0]->pn.pn_type != Cnil) &&
+		(vs_base[0]->pn.pn_type != sKunspecific))) &&
+	    !file_exists(vs_base[0])) {
+	    file_error("File ~S does not exist.",vs_base[0]);
+	    vs_base[0] = Cnil;
+	} else {
+	    if ((vs_base[0]->pn.pn_directory == Cnil) || 
+		    (vs_base[0]->pn.pn_directory == sKunspecific))
+		vs_base[0]->pn.pn_directory=make_cons(sKrelative,Cnil);
+	    vs_base[0] = truename(vs_base[0]);
+	}
 }
 
 LFD(Lrename_file)(void)
@@ -436,11 +439,25 @@ LFD(Lrename_file)(void)
 	check_arg(2);
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 	check_type_or_Pathname_string_symbol(&vs_base[1]);
-	coerce_to_filename(vs_base[0], filename);
+
+	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
+	    file_error("File ~S is wild.",vs_base[0]);
+	    vs_base[0] = Cnil;
+	    return;
+	}
+
+	coerce_to_local_filename(vs_base[0], filename);
 	vs_base[0] = coerce_to_pathname(vs_base[0]);
 	vs_base[1] = coerce_to_pathname(vs_base[1]);
 	vs_base[1] = merge_pathnames(vs_base[1], vs_base[0], Cnil);
-	coerce_to_filename(vs_base[1], newfilename);
+
+	if (wild_pathname_p(vs_base[1],Cnil) == Ct) {
+	    file_error("File ~S is wild.",vs_base[1]);
+	    vs_base[0] = Cnil;
+	    return;
+	}
+
+	coerce_to_local_filename(vs_base[1], newfilename);
 #ifdef HAVE_RENAME
 	if (rename(filename, newfilename) < 0)
 		FEerror("Cannot rename the file ~S to ~S.",
@@ -486,7 +503,11 @@ DEFUNO_NEW("DELETE-FILE",object,fLdelete_file,LISP
 
 	/* 1 args */
 	check_type_or_pathname_string_symbol_stream(&path);
-	coerce_to_filename(path, filename);
+
+	if (wild_pathname_p(path,Cnil) == Ct)
+	    RETURN1(file_error("File ~S is wild.",path));
+
+	coerce_to_local_filename(path, filename);
 	if (unlink(filename) < 0)
 		FEerror("Cannot delete the file ~S.", 1, path);
 	path = Ct;
@@ -504,6 +525,13 @@ LFD(Lprobe_file)(void)
 	check_arg(1);
 
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
+
+	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
+	    file_error("File ~S is wild.",vs_base[0]);
+	    vs_base[0] = Cnil;
+	    return;
+	}
+
 	if (file_exists(vs_base[0]))
 		vs_base[0] = truename(vs_base[0]);
 	else
@@ -517,7 +545,15 @@ LFD(Lfile_write_date)(void)
 
 	check_arg(1);
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
-	coerce_to_filename(vs_base[0], filename);
+
+	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
+	    file_error("File ~S is wild.",vs_base[0]);
+	    vs_base[0] = Cnil;
+	    return;
+	}
+
+
+	coerce_to_local_filename(vs_base[0], filename);
 	if (stat(filename, &filestatus) < 0) { vs_base[0] = Cnil; return;}
 	vs_base[0] = unix_time_to_universal_time(filestatus.st_mtime);
 }
@@ -534,7 +570,14 @@ LFD(Lfile_author)(void)
 
 	check_arg(1);
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
-	coerce_to_filename(vs_base[0], filename);
+
+	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
+	    file_error("File ~S is wild.",vs_base[0]);
+	    vs_base[0] = Cnil;
+	    return;
+	}
+
+	coerce_to_local_filename(vs_base[0], filename);
 	if (stat(filename, &filestatus) < 0) { vs_base[0] = Cnil; return;}
 	pwent = getpwuid(filestatus.st_uid);
 	vs_base[0] = make_simple_string(pwent->pw_name);
@@ -573,7 +616,6 @@ FFN(Luser_homedir_pathname)(void)
 	
 }
 
-
 #ifdef BSD
 LFD(Ldirectory)(void)
 {
@@ -581,27 +623,35 @@ LFD(Ldirectory)(void)
 	char command[MAXPATHLEN * 2];
 	FILE *fp;
 	register int i, c;
-	object *top = vs_top;
+	object *top;
 	char iobuffer[BUFSIZ];
 	extern FILE *popen(const char *, const char *);
 
-	check_arg(1);
+	if (vs_top - vs_base < 1)
+	    too_few_arguments();
+	while (vs_top - vs_base > 1)
+	    vs_popp;
+
+	top = vs_top;
 
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 	vs_base[0] = coerce_to_pathname(vs_base[0]);
+
 	if (vs_base[0]->pn.pn_name==Cnil && vs_base[0]->pn.pn_type==Cnil) {
-		coerce_to_filename(vs_base[0], filename);
+		coerce_to_local_filename(vs_base[0], filename);
 		strcat(filename, "*");
 	} else if (vs_base[0]->pn.pn_name==Cnil) {
 		vs_base[0]->pn.pn_name = sKwild;
-		coerce_to_filename(vs_base[0], filename);
+		coerce_to_local_filename(vs_base[0], filename);
 		vs_base[0]->pn.pn_name = Cnil;
 	} else if (vs_base[0]->pn.pn_type==Cnil) {
-		coerce_to_filename(vs_base[0], filename);
+		coerce_to_local_filename(vs_base[0], filename);
 		strcat(filename, "*");
 	} else
-		coerce_to_filename(vs_base[0], filename);
+		coerce_to_local_filename(vs_base[0], filename);
+
 	sprintf(command, "ls -d %s 2> /dev/null", filename);
+
 	fp = popen(command, "r");
 	setbuf(fp, iobuffer);
 	for (;;) {
@@ -641,11 +691,12 @@ LFD(Ldirectory)()
 
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 	vs_base[0] = coerce_to_pathname(vs_base[0]);
+
 	vs_push(vs_base[0]->pn.pn_name);
 	vs_push(vs_base[0]->pn.pn_type);
 	vs_base[0]->pn.pn_name = Cnil;
 	vs_base[0]->pn.pn_type = Cnil;
-	coerce_to_filename(vs_base[0], filename);
+	coerce_to_local_filename(vs_base[0], filename);
 	type = vs_base[0]->pn.pn_type = vs_pop;
 	name = vs_base[0]->pn.pn_name = vs_pop;
 	i = strlen(filename);
@@ -706,13 +757,15 @@ LFD(Ldirectory)()
 
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 	vs_base[0] = coerce_to_pathname(vs_base[0]);
+
 	vs_push(vs_base[0]->pn.pn_name);
 	vs_push(vs_base[0]->pn.pn_type);
 	vs_base[0]->pn.pn_name = Cnil;
 	vs_base[0]->pn.pn_type = Cnil;
-	coerce_to_filename(vs_base[0], filename);
+	coerce_to_local_filename(vs_base[0], filename);
 	type = vs_base[0]->pn.pn_type = vs_pop;
 	name = vs_base[0]->pn.pn_name = vs_pop;
+
 	i = strlen(filename);
 	if (i > 1 && filename[i-1] == '/')
 		filename[i-1] = '\0';
@@ -753,58 +806,6 @@ LFD(Ldirectory)()
 }
 #endif
 
-
-#ifdef DGUX
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#endif
-
 static void
 FFN(siLchdir)(void)
 {
@@ -812,10 +813,55 @@ FFN(siLchdir)(void)
 
 	check_arg(1);
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
-	coerce_to_filename(vs_base[0], filename);
+
+	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
+	    file_error("File ~S is wild.",vs_base[0]);
+	    vs_base[0] = Cnil;
+	    return;
+	}
+	coerce_to_local_filename(vs_base[0], filename);
 
 	if (chdir(filename) < 0)
-		FEerror("Can't change the current directory to ~S.",
+		FEerror("Cannot change the current directory to ~S.",
+			1, vs_base[0]);
+}
+
+static void
+FFN(siLmkdir)(void)
+{
+	char filename[MAXPATHLEN];
+
+	check_arg(1);
+	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
+
+	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
+	    file_error("File ~S is wild.",vs_base[0]);
+	    vs_base[0] = Cnil;
+	    return;
+	}
+	coerce_to_local_filename(vs_base[0], filename);
+
+	if (mkdir(filename,01777) < 0)
+	    FEerror("Cannot make the directory ~S.", 1, vs_base[0]);
+}
+
+static void
+FFN(siLrmdir)(void)
+{
+	char filename[MAXPATHLEN];
+
+	check_arg(1);
+	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
+
+	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
+	    file_error("File ~S is wild.",vs_base[0]);
+	    vs_base[0] = Cnil;
+	    return;
+	}
+	coerce_to_local_filename(vs_base[0], filename);
+
+	if (rmdir(filename) < 0)
+		FEerror("Cannot remove the directory ~S.",
 			1, vs_base[0]);
 }
 
@@ -832,4 +878,6 @@ gcl_init_unixfsys(void)
 	make_function("DIRECTORY", Ldirectory);
 
 	make_si_function("CHDIR", siLchdir);
+	make_si_function("MKDIR", siLmkdir);
+	make_si_function("RMDIR", siLrmdir);
 }

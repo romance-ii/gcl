@@ -172,7 +172,7 @@ object_to_char(object x)
 	case t_character:
 		c = char_code(x);  break;
 	default:
-		FEerror("~S cannot be coerce to a C char.", 1, x);
+		FEcannot_coerce(sLcharacter,x);
 	}
 	return(c);
 }
@@ -197,7 +197,7 @@ object_to_int(object x)
 	case t_longfloat:
 		i = lf(x);  break;
 	default:
-		FEerror("~S cannot be coerce to a C int.", 1, x);
+		FEcannot_coerce(sLinteger,x);
 	}
 	return(i);
 }
@@ -220,7 +220,7 @@ object_to_float(object x)
 	case t_longfloat: 
 		f = lf(x);  break; 
 	default: 
-		FEerror("~S cannot be coerce to a C float.", 1, x); 
+		FEcannot_coerce(sLfloat,x);
 	} 
 	return(f); 
 } 
@@ -243,7 +243,7 @@ object_to_double(object x)
 	case t_longfloat: 
 		d = lf(x);  break; 
 	default: 
-		FEerror("~S cannot be coerce to a C double.", 1, x); 
+		FEcannot_coerce(sLdouble_float,x);
 	} 
 	return(d); 
 } 

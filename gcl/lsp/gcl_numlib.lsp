@@ -46,7 +46,8 @@
 
 (defun isqrt (i)
        (unless (and (integerp i) (>= i 0))
-               (error "~S is not a non-negative integer." i))
+	       (specific-error :wrong-type-argument "~S is not of type ~S."
+			       i `(integer 0 ,most-positive-fixnum)))
        (if (zerop i)
            0
            (let ((n (integer-length i)))
@@ -165,9 +166,8 @@
   (* 2 (log (+ (sqrt (/ (1+ x) 2)) (sqrt (/ (1- x) 2))))))
 (defun atanh (x)
        (when (or (= x 1.0d0) (= x -1.0d0))
-             (error "The argument, ~s, is a logarithmic singularity.~
-                    ~%Don't be foolish, GLS."
-                    x))
+             (error "The argument ~S for ~S, is a logarithmic singularity."
+                    x 'atan))
        (log (/ (1+ x) (sqrt (- 1.0d0 (* x x))))))
 
 

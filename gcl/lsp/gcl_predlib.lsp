@@ -252,6 +252,16 @@
 	      (if (listp (cadr i))
 		  (match-dimensions (array-dimensions object) (cadr i))
 		(eql (array-rank object) (cadr i))))))
+    (file-stream (eq (type-of object) 'file-stream))
+    (string-stream (eq (type-of object) 'string-stream))
+    (synonym-stream (eq (type-of object) 'synonym-stream))
+    (concatenated-stream (eq (type-of object) 'concatenated-stream))
+    (two-way-stream (eq (type-of object) 'two-way-stream))
+    (echo-stream (eq (type-of object) 'echo-stream))
+    (logical-pathname
+      (and (pathnamep object)
+	   (not (endp (si:pathname-lookup (pathname-host object)
+				    	  si:*pathname-logical*)))))
     (t 
      (cond ((setq tem (get tp 'si::s-data))
 	    (structure-subtype-p object tem))
@@ -727,7 +737,7 @@
         ;; Just return as it is.
         (return-from coerce object))
   (when (classp type)
-    (specific-error :wrong-type-argument "Cannot coerce ~S to class ~S~%" object type))
+    (specific-error :wrong-type-argument "Cannot coerce ~S to class ~S." object type))
   (setq type (normalize-type type))
   (case (car type)
     (list
@@ -739,7 +749,7 @@
                  (endp (cddr type))
                  (eq (caddr type) '*)
                  (endp (cdr (caddr type))))
-             (error "Cannot coerce to an multi-dimensional array."))
+	    (specific-error :wrong-type-argument "Cannot coerce ~S to class ~S." object type))
      (do ((seq (make-sequence type (length object)))
           (i 0 (1+ i))
           (l (length object)))
@@ -754,7 +764,7 @@
          (complex (realpart object) (imagpart object))
          (complex (coerce (realpart object) (cadr type))
                   (coerce (imagpart object) (cadr type)))))
-    (t (error "Cannot coerce ~S to ~S." object type))))
+    (t (specific-error :wrong-type-argument "Cannot coerce ~S to class ~S." object type))))
 
 ;; set by unixport/init_kcl.lsp
 ;; warn if a file was comopiled in another version

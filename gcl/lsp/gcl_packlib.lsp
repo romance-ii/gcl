@@ -43,7 +43,7 @@
            (unless (or
                     (packagep ,g)
                     (setq ,g (find-package (string ,g))))
-            (specific-error :package-error "Cannot coerce ~S to a package~%" ,p))
+            (specific-error :package-error "A package error occurred on ~S: ~S." ,p "Cannot coerce"))
           ,g))))
 
 (defun find-all-symbols (string-or-symbol)
@@ -183,7 +183,7 @@
         (x (gensym))(y (gensym)) (access (gensym)) declaration)
     (multiple-value-setq (declaration body) (si::find-declarations body))
     (if (null symbol-types)
-	(specific-error :too-few-arguments "Symbol type specifiers must be supplied"))
+	(specific-error :too-few-arguments "Symbol type specifiers must be supplied."))
     `(let ((,p (cons t (if (atom ,plist) (list ,plist) ,plist))) (,q nil) (,l nil)
 	   (,i -1) (,x 0) (,y 0) (,dum nil) (,access nil))
        (declare (fixnum ,x ,y))

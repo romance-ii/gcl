@@ -1407,8 +1407,7 @@
       (setq 	gcltksrv
 	 (cond (host "gcltksrv")
 	       ((si::getenv "GCL_TK_SERVER"))
-	       ((probe-file (tk-conc si::*lib-directory* "/gcl-tk/gcltksrv")))
-	       ((probe-file (tk-conc si::*lib-directory* "gcl-tk/gcltksrv")))
+	       ((probe-file (merge-pathnames "gcl-tk/gcltksrv" si::*lib-directory*)))
 	       (t (error "Must setenv GCL_TK_SERVER ")))))
   (let ((pid (if host  -1 (si::getpid)))
 	(tk-socket  (si::open-named-socket 0))
@@ -1442,8 +1441,8 @@ on ~a as in: ~s~%" host command )))
       (if (eql pid -1)
 	  (si::SET-SIGIO-FOR-FD  (car (car *tk-connection*))))
       (setf *sigusr1* nil)
-      (tk-do (tk-conc "source "  si::*lib-directory* "gcl-tk/gcl.tcl"))
-      )))
+      (tk-do (tk-conc "source " (namestring
+      	(merge-pathnames "gcl-tk/gcl.tcl" si::*lib-directory*)) )))))
 
 
   

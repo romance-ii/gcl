@@ -934,8 +934,10 @@ LFD(Lrevappend)() {
 	object x, y;
 
 	check_arg(2);
+	/* check_proper_list(vs_base[0]); */
+	/* endp_prop does check */
 	y = vs_pop;
-	for (x = vs_base[0];  !endp(x);  x = x->c.c_cdr) {
+	for (x = vs_base[0];  !endp_prop(x);  x = x->c.c_cdr) {
 		vs_push(x->c.c_car);
 		vs_push(y);
 		stack_cons();
@@ -1123,13 +1125,26 @@ object x,y;
 
 void
 check_alist(alist)
-     object alist;
-{object v;
-   for (v=alist ; !endp(v) ; v=v->c.c_cdr)
-   {if (type_of(v->c.c_car) != t_cons
-         && v->c.c_car != Cnil)
- FEerror("Not alist",0);}
- return ;
+object alist;
+{
+    object v;
+    for (v=alist ; !endp(v) ; v=v->c.c_cdr)
+        if (type_of(v->c.c_car) != t_cons && v->c.c_car != Cnil)
+	     FEwrong_type_argument(sLlist, v);
+}
+ 
+void
+check_proper_list(alist)
+object alist;
+{
+    object v;
+    /*
+    if (alist == Cnil)
+	 FEwrong_type_argument(sLlist, alist);
+    */
+    for (v=alist ; type_of(v) == t_cons ; v=v->c.c_cdr);
+    if (v != Cnil)
+	 FEwrong_type_argument(sLlist, alist);
 }
  
 
@@ -1181,7 +1196,7 @@ PREDICATE(Lmember,Lmember_if,Lmember_if_not, 2)
 	if (rev != Cnil)
 		reverse_comparison=1;
 	setupTEST(item, test, test_not, key);
-	while (!endp(list)) {
+	while (!endp_prop(list)) {
 		if (TEST(list->c.c_car))
 			goto L;
 		list = list->c.c_cdr;
@@ -1215,6 +1230,8 @@ LFD(Ladjoin)()
 
 	if (vs_top - vs_base < 2)
 		too_few_arguments();
+	/* member1 does now check */
+	/* check_proper_list(vs_base[1]); */
 	while (vs_base < top)
 		vs_push(*vs_base++);
 	FFN(Lmember1)();
@@ -1239,8 +1256,10 @@ LFD(Lacons)()
 	vp = vs_top + 1;
 	k = keys;
 	d = data;
-	while (!endp(k)) {
-		if (endp(d))
+	/* check_proper_list(k);
+	check_proper_list(d); */
+	while (!endp_prop(k)) {
+		if (endp_prop(d))
 		 FEerror(
 		  "The keys ~S and the data ~S are not of the same length",
 		  2, keys, data);
@@ -1248,7 +1267,7 @@ LFD(Lacons)()
 		k = k->c.c_cdr;
 		d = d->c.c_cdr;
 	}
-	if (!endp(d))
+	if (!endp_prop(d))
 	    FEerror("The keys ~S and the data ~S are not of the same length",
 		    2, keys, data);
 	vs_push(a_list);

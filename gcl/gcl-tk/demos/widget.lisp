@@ -18,11 +18,11 @@
 ;; add teh current path to the auto_path so that we find the
 ;; .tcl demos for older demos not in new releases..
 (tk-do  (concatenate 'string
-		    "lappend auto_path  [file dirname "  (namestring  (truename si::*load-pathname*)) "]"))
+		    "lappend auto_path  [file dirname "  (namestring  (truename *load-pathname*)) "]"))
 
 
 ;(setq si::*load-path* (cons (tk-conc si::*lib-directory* "gcl-tk/demos/") si::*load-path*))
-(load (merge-pathnames "index.lsp" si::*load-pathname*))
+(load (merge-pathnames "index.lsp" *load-pathname*))
 
 (wm :title '|.| "Widget Demonstration")
 

@@ -675,9 +675,10 @@ and load your system with:
     ;; 3.0 it's in the LUCID-COMMON-LISP package.
     ;;
     #+LUCID (or lucid::*source-pathname* (bad-time))
-    #+akcl   si:*load-pathname*
+    #+gcl *load-pathname*
+    #+(and akcl (not gcl))  si:*load-pathname*
     #+cmu17 *load-truename*
-    #-(or Lispm excl Xerox (and dec vax common) LUCID akcl cmu17) nil))
+    #-(or Lispm excl Xerox (and dec vax common) LUCID akcl gcl cmu17) nil))
 
 #-(or cmu Symbolics)
 (defvar *pcl-directory* (concatenate 'string user::*system-directory* "../pcl/"))

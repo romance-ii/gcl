@@ -104,6 +104,8 @@
 ;;; Package operations.
 
 (si:putprop 'make-package t 'package-operation)
+(if (fboundp 'si::kcl-in-package)
+    (si:putprop 'si::kcl-in-package t 'package-operation))
 (si:putprop 'in-package t 'package-operation)
 (si:putprop 'shadow t 'package-operation)
 (si:putprop 'shadowing-import t 'package-operation)

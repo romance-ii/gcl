@@ -85,7 +85,7 @@ int index;
 {
 	object endp_temp;
 
-	int i;
+	int i,max;
 	object l;
 
 	if (index < 0) {
@@ -95,36 +95,49 @@ int index;
 	switch (type_of(seq)) {
 	case t_cons:
 		for (i = index, l = seq;  i > 0;  --i)
-			if (endp(l))
+			if (endp(l)) {
+				max=i;
 				goto E;
-			else
+			} else
 				l = l->c.c_cdr;
-		if (endp(l))
+		if (endp(l)) {
+			max=i;
 			goto E;
+		} 
 		return(l->c.c_car);
 
 	case t_vector:
 	case t_bitvector:
-		if (index >= seq->v.v_fillp)
+		if (index >= seq->v.v_fillp) {
+			max=seq->v.v_fillp;
 			goto E;
+		}
 		return(aref(seq, index));
 
 	case t_string:
-		if (index >= seq->st.st_fillp)
+		if (index >= seq->st.st_fillp) {
+			max=seq->st.st_fillp;
 			goto E;
+		}
 		return(code_char(seq->ust.ust_self[index]));
 
 	default:
-		if (seq == Cnil) goto E;
+		/* if (seq == Cnil) goto E; */
 		FEwrong_type_argument(sLsequence, seq);
+		return(Cnil);
 	}
 
 E:
+	l = vs_push( make_fixnum(max) );
+	vs_push( make_fixnum(0) );
+	l = vs_head = make_cons(vs_head, l);
+	l = vs_head = make_cons(sLinteger, l);
 	vs_push(make_fixnum(index));
-	/* FIXME message should indicate out of range */
+	/* FIXME message should indicate out of range
 	Icall_error_handler(sKwrong_type_argument,
 		     make_simple_string("The index, ~S, is too large."),
-		     1,vs_head);
+		     1,vs_head); */
+	FEwrong_type_argument(l,vs_head);
 	return(Cnil);
 }
 
@@ -144,7 +157,7 @@ object val;
 {
 	object endp_temp;
 
-	int i;
+	int i,max;
 	object l;
 
 	if (index < 0) {
@@ -154,37 +167,50 @@ object val;
 	switch (type_of(seq)) {
 	case t_cons:
 		for (i = index, l = seq;  i > 0;  --i)
-			if (endp(l))
+			if (endp(l)) {
+				max=i;
 				goto E;
-			else
+			} else
 				l = l->c.c_cdr;
-		if (endp(l))
+		if (endp(l)) {
+			max=i;
 			goto E;
+		}
 		return(l->c.c_car = val);
 
 	case t_vector:
 	case t_bitvector:
-		if (index >= seq->v.v_fillp)
+		if (index >= seq->v.v_fillp) {
+			max=seq->v.v_fillp;
 			goto E;
+		}
 		return(aset(seq, index, val));
 
 	case t_string:
-		if (index >= seq->st.st_fillp)
+		if (index >= seq->st.st_fillp) {
+			max=seq->st.st_fillp;
 			goto E;
+		}
 		if (type_of(val) != t_character)
 			FEwrong_type_argument(sLcharacter, val);
 		seq->st.st_self[index] = val->ch.ch_code;
 		return(val);
 
 	default:
-		if (seq == Cnil) goto E;
+		max=0;
 		FEwrong_type_argument(sLsequence, seq);
 	}
 
 E:
+	l = vs_push( make_fixnum(max) );
+	vs_push( make_fixnum(0) );
+	l = vs_head = make_cons(vs_head, l);
+	l = vs_head = make_cons(sLinteger, l);
 	vs_push(make_fixnum(index));
-	/* FIXME error message should indicate value out of range */
-	FEwrong_type_argument(sLpositive_fixnum, vs_head);
+
+	/* FIXME error message should indicate value out of range -
+	   fixed kraehe */
+	FEwrong_type_argument(l, vs_head);
 	return(Cnil);	
 }
 

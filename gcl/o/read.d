@@ -2116,7 +2116,7 @@ READ:
 	check_type_stream(&strm);
 	if (stream_at_end(strm)) {
 		if (eof_errorp == Cnil && recursivep == Cnil)
-			@(return eof_value)
+			@(return eof_value Ct)
 		else
 			end_of_stream(strm);
 	}
@@ -2253,9 +2253,12 @@ READ:
 	else if (strm == Ct)
 		strm = symbol_value(sLAterminal_ioA);
 	check_type_stream(&strm);
-	if (!listen_stream(strm))
-		/* Incomplete! */
-		@(return Cnil)
+	if (!listen_stream(strm)) {
+		if (eof_errorp == Cnil)
+			@(return eof_value)
+		else
+			end_of_stream(strm);
+	}
 	@(return `read_char(strm)`)
 @)
 
@@ -2323,7 +2326,7 @@ CANNOT_PARSE:
 @)
 
 @(defun read_byte (binary_input_stream
-		   &optional eof_errorp eof_value)
+		   &optional (eof_errorp Ct) eof_value)
 	int c;
 @
 	check_type_stream(&binary_input_stream);

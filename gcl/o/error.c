@@ -296,6 +296,13 @@ FEwrong_type_argument(object type, object value)
 }
 
 void
+FEcannot_coerce(object type, object value)
+{Icall_error_handler(sKwrong_type_argument,
+		     make_simple_string("Cannot coerce ~S to class ~S."),
+		     2,(value),(type));
+}
+
+void
 FEtoo_few_arguments(object *base, object *top)
 {    Icall_error_handler(sKtoo_few_arguments,
 			 (make_simple_string("~S [or a callee] requires more than ~R argument~:p.")),
@@ -373,10 +380,14 @@ FEundefined_function(object fname)
 
 void
 FEinvalid_function(object obj)
-{Icall_error_handler(sKinvalid_function,
+{
+#ifdef ANSI_COMMON_LISP
+    FEwrong_type_argument(obj,sLfunction);
+#else
+    Icall_error_handler(sKinvalid_function,
 		     make_simple_string("~S is invalid as a function."),
 		     2,(obj),sLfunction);
-		     
+#endif
 }
 
 void

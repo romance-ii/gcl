@@ -211,6 +211,10 @@ install-stamp: build-stamp debian/control $(INS)
 
 	rm -rf debian/tmp/usr/lib/gcl-$(VERS)/info
 
+	mkdir -p debian/tmp/usr/lib/common-lisp/bin
+	chmod +x debian/gclcvs.sh
+	cp debian/gclcvs.sh debian/tmp/usr/lib/common-lisp/bin
+
 	dh_install
 
 	touch $@

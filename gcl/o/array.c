@@ -167,7 +167,7 @@ DEFUN_NEW("ROW-MAJOR-AREF", object, fLrow_major_aref, LISP, 2, 2,
     fScheck_bounds_bounds(x, i);
     return code_char(x->st.st_self[i]);
   default:
-    FEerror("not an array",0);
+    FEwrong_type_argument(sLarray,x);
     return(Cnil);
   }
 }
@@ -246,7 +246,7 @@ DEFUN_NEW("ASET1", object, fSaset1, SI, 3, 3, NONE, OO, IO, OO,OO,(object x, fix
     x->st.st_self[i] = char_code(val);
     break;
   default:
-    FEerror("not an array",0);
+    FEwrong_type_argument(sLarray,x);
   }
   return val;
 }
@@ -706,7 +706,7 @@ Iarray_element_type(object x)
 	 t = aet_ch;
 	 break;
        default:
-	 FEerror("Not an array ~a ",1,x);
+	 FEwrong_type_argument(sLarray,x);
        }
   return t;
 }

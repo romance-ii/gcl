@@ -163,12 +163,12 @@
        (TAGBODY ,TAG2
 	 (IF (TYPEP ,PLACE ',TYPE) (RETURN-FROM ,TAG1 NIL))
 	 (RESTART-CASE ,(IF TYPE-STRING
-			    `(ERROR "The value of ~S is ~S, ~
-				     which is not ~A."
-				    ',PLACE ,PLACE ,TYPE-STRING)
-			    `(ERROR "The value of ~S is ~S, ~
-				     which is not of type ~S."
-				    ',PLACE ,PLACE ',TYPE))
+	   `(specific-error :wrong-type-argument
+			    "The value of ~S is not ~S."
+			    ',PLACE ,TYPE-STRING)
+	   `(specific-error :wrong-type-argument
+			    "The value of ~S is not of type ~S."
+			    ',PLACE ',TYPE))
 	   (STORE-VALUE (VALUE)
 	       :REPORT (LAMBDA (STREAM)
 			 (FORMAT STREAM "Supply a new value of ~S."

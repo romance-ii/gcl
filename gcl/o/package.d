@@ -777,6 +777,62 @@ delete_package(object n) {
 	@(return `in_package(pack_name, nicknames, use,fix(internal),fix(external))`)
 @)
 
+#ifdef ANSI_COMMON_LISP
+extern object sKuse;
+extern object sKnicknames;
+static void
+FFN(Fin_package)(object form)
+{
+	object pack,ret,*mark;
+
+	if (endp(form))
+		FEtoo_few_argumentsF(form);
+	vs_base = vs_top;
+	vs_push(MMcar(form));
+	mark = vs_top;
+ 
+ 	if ((type_of(vs_head) == t_cons) &&
+	    (vs_head->c.c_car == sLquote) &&
+	    (type_of(vs_head->c.c_cdr) == t_cons) &&
+	    (vs_head->c.c_cdr->c.c_cdr = Cnil))
+	    vs_head = vs_head->c.c_cdr->c.c_car;
+	if ((type_of(vs_head) == t_character) ||
+	    (type_of(vs_head) == t_symbol))
+	    vs_head = coerce_to_string(vs_head);
+	if (type_of(vs_head) != t_string)
+	    FEerror("Wrong thing in-package ~S.",1,vs_head);
+
+	pack=vs_head;
+
+	if (endp(MMcdr(form)))
+	    ret=in_package(pack, Cnil, Cnil, 0, 0);
+	else {
+	    object use=Cnil;
+	    object nick=Cnil;
+	    object q=Cnil;
+	    object p=form->c.c_cdr;
+
+	    while ((type_of(p) == t_cons) &&
+	    	   ((p->c.c_car == sKuse) || (p->c.c_car == sKnicknames)) &&
+	           (type_of(p->c.c_cdr) == t_cons)) {
+		q=p->c.c_cdr->c.c_car;
+		if (q->c.c_car == sLquote)
+		    q = q->c.c_cdr->c.c_car;
+	        if (p->c.c_car == sKuse)
+		    use=q;
+		else
+	        if (p->c.c_car == sKnicknames)
+		    nick=q;
+	        p=p->c.c_cdr->c.c_cdr;
+		q=Cnil;
+	    }
+	    ret=in_package(pack, nick, use, 0, 0);
+        }
+	vs_top = mark;
+	vs_head = ret;
+}
+#endif
+
 LFD(Lfind_package)()
 {
 	check_arg(1);
@@ -1191,7 +1247,12 @@ gcl_init_package_function()
 {
 	make_function("MAKE-PACKAGE", Lmake_package);
 	make_function("DELETE-PACKAGE", Ldelete_package);
+#ifdef ANSI_COMMON_LISP
+	make_si_function("KCL-IN-PACKAGE", Lin_package);
+	make_special_form("IN-PACKAGE", Fin_package);
+#else
 	make_function("IN-PACKAGE", Lin_package);
+#endif
 	make_function("FIND-PACKAGE", Lfind_package);
 	make_function("PACKAGE-NAME", Lpackage_name);
 	make_function("PACKAGE-NICKNAMES", Lpackage_nicknames);

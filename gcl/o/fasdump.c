@@ -1499,7 +1499,8 @@ read_fasl_vector(object in)
 		       d->pn.pn_directory,
 		       d->pn.pn_name,
 		       make_simple_string("data"),
-		       d->pn.pn_version);
+		       d->pn.pn_version,
+		       Cnil);
      d = coerce_to_namestring(d);
      in = open_stream(d,smm_input,Cnil,Cnil);
      if (in == Cnil) 

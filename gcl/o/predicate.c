@@ -538,20 +538,22 @@ BEGIN:
 	}
 
 	case t_pathname:
-#ifdef UNIX
 		if (equal(x->pn.pn_host, y->pn.pn_host) &&
 		    equal(x->pn.pn_device, y->pn.pn_device) &&
 		    equal(x->pn.pn_directory, y->pn.pn_directory) &&
 		    equal(x->pn.pn_name, y->pn.pn_name) &&
-		    equal(x->pn.pn_type, y->pn.pn_type) &&
-		    equal(x->pn.pn_version, y->pn.pn_version))
-#endif
+		    equal(x->pn.pn_type, y->pn.pn_type)) {
+		    /* version is ignored unless logical host */
+		    if ((type_of(x->pn.pn_host) == t_string) &&
+			(pathname_lookup(x->pn.pn_host,sSApathname_logicalA) != Cnil))
+			return(equal(x->pn.pn_version, y->pn.pn_version) ?
+				TRUE : FALSE);
+		    else
 			return(TRUE);
-		else
+		} else
 			return(FALSE);
-
 	default:
-	  break;
+		break;
 	}
 	return(eql(x,y));
 }

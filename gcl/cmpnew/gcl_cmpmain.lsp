@@ -176,13 +176,15 @@
 			   (c-debug nil)
                            #+aosvs (ob-file nil)
                            (system-p *default-system-p*)
-			   (print nil)
+			   (print *compile-print*)
+			   (verbose *compile-verbose*)
                            (load nil)
                       &aux (*standard-output* *standard-output*)
                            (*error-output* *error-output*)
                            (*compiler-in-use* *compiler-in-use*)
 			   (*c-debug* c-debug)
-			   (*compile-print* (or print *compile-print*))
+			   (*compile-print* print)
+			   (*compile-verbose* verbose)
                            (*package* *package*)
 			   (*DEFAULT-PATHNAME-DEFAULTS* #"")
 			   (*data* (list (make-array 50 :fill-pointer 0
@@ -195,6 +197,10 @@
 			   (*fasd-data* *fasd-data*)
                            (*error-count* 0))
   (declare (special *c-debug* *init-name* system-p))
+  (when input-pathname
+    (setq input-pathname (si:search-local-pathname input-pathname)))
+  (when output-file
+    (setq output-file (si:search-local-pathname output-file)))
 
   (cond (*compiler-in-use*
          (format t "~&The compiler was called recursively.~%~
