@@ -1,0 +1,24 @@
+INSTALL:
+
+Just upzip this file anywhere you like and then edit 
+the path names in the "bin/gcl" shell script.
+
+The file "bin/gclm.bat" which can be used as a 
+Windows shortcut.
+
+
+MINGW32 GCC:
+
+MinGW is provided under the terms of the files "COPYING"
+and "COPYING.LIB" in the mingw sub-directory.  The source 
+code and updated binary packages can be obtained via the 
+official MinGW web site:
+
+http://sourceforge.net/projects/mingw/
+
+It is recommended that you use the compiler provided
+when working with this GCL package to ensure C compiler
+compatibility.  
+
+Clean and rebuild pre-existing projects whenever you
+upgrade the GCL binary package for this reason.
