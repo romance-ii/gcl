@@ -148,31 +148,30 @@ imod(int x, int y)
 	Conversions to C
 */
 
-/* static char */
-/* object_to_char(object x) */
-/* { */
-/* 	int c=0; */
-
-/* 	switch (type_of(x)) { */
-/* 	case t_fixnum: */
-/* 		c = fix(x);  break; */
-/* 	case t_bignum: */
-/* 	  {object *to = vs_top; */
-/* 	  vs_push(x); */
-/* 	  vs_push(small_fixnum(0xff)); */
-/* 	  Llogand(); */
-/* 	  x = vs_base[0]; */
-/* 	  vs_top = to; */
-/* 	  c = (char) fix(x); */
-/* 	  break; */
-/* 	  } */
-/* 	case t_character: */
-/* 		c = char_code(x);  break; */
-/* 	default: */
-/* 		FEerror("~S cannot be coerce to a C char.", 1, x); */
-/* 	} */
-/* 	return(c); */
-/* } */
+static char
+object_to_char(object x)
+{
+	int c=0;
+ 	switch (type_of(x)) {
+	case t_fixnum:
+		c = fix(x);  break;
+	case t_bignum:
+	  {object *to = vs_top;
+	  vs_push(x);
+	  vs_push(small_fixnum(0xff));
+	  Llogand();
+	  x = vs_base[0];
+	  vs_top = to;
+	  c = (char) fix(x);
+	  break;
+	  }
+	case t_character:
+		c = char_code(x);  break;
+	default:
+		FEerror("~S cannot be coerce to a C char.", 1, x);
+	}
+	return(c);
+}
 
 int
 object_to_int(object x)
