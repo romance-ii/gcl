@@ -320,9 +320,13 @@ setf(object place, object form)
 		goto OTHERWISE;
 	args = place->c.c_cdr;
 	if (fun == sLget) {
-	  object sym,val,key;
+            object sym,val,key,deflt,deflt1;
 	  sym = Ieval(car(args));
 	  key = Ieval(car(Mcdr(args)));
+          deflt1 = Mcddr(args);
+          if ( type_of(deflt1) == t_cons ) {
+              deflt = Ieval(car(deflt1));
+          }
 	  val = Ieval(form);
 	  return putprop(sym,val,key); 
 	}
