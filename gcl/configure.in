@@ -104,6 +104,10 @@ AC_ARG_ENABLE(maxpage,[ --enable-maxpage=XXXX will compile in a page table of si
 [AC_DEFINE_UNQUOTED(MAXPAGE,$enable_maxpage)]
 )
 
+AC_ARG_ENABLE(vssize,[ --enable-vssize=XXXX will compile in a value stack of size XXX] ,
+[AC_DEFINE_UNQUOTED(VSSIZE,$enable_vssize)]
+)
+
 AC_ARG_ENABLE(machine,[ --enable-machine=XXXX will force the use of one of the definitions in h/XXXX.defs] ,
 [enable_machine=$enableval],[enable_machine=""])
 
@@ -876,11 +880,3 @@ else
   echo "Unable to guess machine type"
   echo use configure --enable-machine=XXX,  for XXX such that h/XXX.defs exists, ie in h/*.defs
 fi
-
-
-
-
-
-
-
-

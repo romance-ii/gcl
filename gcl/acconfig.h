@@ -13,6 +13,7 @@ preallocated in a table at compile time.  this must be a power of 2 if
 SGC is enabled.  */
 
 #define MAXPAGE 32*1024
+#define VSSIZE 32768
 
 
 /* check to see if getcwd exists

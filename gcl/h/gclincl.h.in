@@ -9,6 +9,7 @@
 #define DBEGIN 0
 
 #define MAXPAGE 32*1024
+#define VSSIZE 32768
 
 #undef NO_GETTOD
 
