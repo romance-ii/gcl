@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020610-1) unstable; urgency=high
+
+  * cvs updates
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 12 Jun 2002 23:04:57 -0400
+
 gcl (2.5.0.cvs20020523-2) unstable; urgency=high
 
   * configure updates for better tk detection
