@@ -240,13 +240,15 @@
 ;(defun allocated-relocatable-pages ()
 ;  (si::nrbpage))
 
+;; FIXME  This has to come straight from enum.h. CM 20050114
 (defvar *type-list*
         '(cons
           fixnum bignum ratio short-float long-float complex
           character symbol package hash-table
           array vector string bit-vector
           structure stream random-state readtable pathname
-          cfun cclosure sfun gfun cfdata spice fat-string ))
+          cfun cclosure sfun gfun vfun afun closure cfdata spice))
+
 
 (defun room (&optional x)
   (let ((l (multiple-value-list (si:room-report)))
