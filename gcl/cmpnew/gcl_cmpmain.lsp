@@ -307,7 +307,8 @@ Cannot compile ~a.~%"
             (do ((form (read *compiler-input* nil eof)
                        (read *compiler-input* nil eof))
 		 (load-flag (or (eq :defaults *eval-when-defaults*)
-				(member 'load *eval-when-defaults*))))
+				(member 'load *eval-when-defaults*)
+				(member :load-toplevel *eval-when-defaults*))))
                 (nil)
               (cond
 	       ((eq form eof))
@@ -593,7 +594,8 @@ SYSTEM_SPECIAL_INIT
 			 #+expect-unresolved "-expect_unresolved '*'"
 			 na na na))	
 			    
-	     #+bsd "-w"
+	     #+bsd ""
+;	     #+bsd "-w"
 	     #-(or aix3 bsd irix3) " 2> /dev/null ")
 		  
 		 

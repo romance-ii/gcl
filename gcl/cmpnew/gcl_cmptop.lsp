@@ -355,7 +355,9 @@
   (or default-action (and (symbolp (car form))
 			    (setq default-action (get (car form) 'eval-at-compile))))
   (cond ((or (and default-action (eq :defaults *eval-when-defaults*))
-	     (and (consp *eval-when-defaults*)(member 'compile *eval-when-defaults* )))
+	     (and (consp *eval-when-defaults*)
+		  (or (member 'compile *eval-when-defaults* )
+		      (member :compile-toplevel *eval-when-defaults* ))))
 	  (if form  (cmp-eval form))
 	  t)))
 
@@ -370,10 +372,10 @@
           (otherwise (cmperr "The EVAL-WHEN situation ~s is illegal."
                              situation))))
   (let ((*eval-when-defaults* (car args)))
-    (cond (load-flag
+    (when load-flag
 	   (t1progn (cdr args)))
-	  (compile-flag
-	   (cmp-eval (cons 'progn (cdr args)))))))
+    (when compile-flag
+	   (cmp-eval (cons 'progn (cdr args))))))
 
 
 (defvar *compile-ordinaries* nil)

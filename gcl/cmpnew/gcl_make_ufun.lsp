@@ -49,10 +49,12 @@
            (eval form))
           (progn (mapc #'do-form (cdr form)))
           (eval-when
-           (if (member 'load (cadr form))
-               (mapc #'do-form (cddr form))
-               (if (member 'compile (cadr form))
-                   (mapc #'eval (cddr form)))))
+           (when (or (member 'load (cadr form))
+		     (member :load-toplevel (cadr form)))
+		     (mapc #'do-form (cddr form)))
+	   (when (or (member 'compile (cadr form))
+		     (member :compile-toplevel (cadr form)))
+                   (mapc #'eval (cddr form))))
           (t
            (if (macro-function (car form))
                (do-form (macroexpand-1 form))

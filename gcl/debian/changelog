@@ -34,8 +34,12 @@ gclcvs (2.7.0-25) unstable; urgency=low
     compiler::link in the ansi build
   * readme.mingw updates
   * solaris.h updates for custreloc option
+  * Fix eval-when behavior in compiler -- in addition to extending
+    support for the new keywords :execute, :compile-toplevel, and :load-
+    toplevel throughout, repair the logic in which load trumped compile.
+    Closes: #226859
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 17 Jun 2004 20:38:42 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed, 23 Jun 2004 16:23:09 +0000
 
 gclcvs (2.7.0-24) unstable; urgency=low
 
