@@ -14,8 +14,7 @@
 ;;;
 ;;; HOW TO USE THIS FILE
 ;;;
-;;; (compile-file "c:/cvs/gcl/japitest.lsp")
-;;; (load "c:/cvs/gcl/japitest.o")
+;;; (compile-file "c:/cvs/gcl/japitest.lsp") (load "c:/cvs/gcl/japitest.o")
 ;;;
 ;;; Requires either "java" or "jre" in the path to work.
 ;;;
@@ -23,49 +22,87 @@
 (in-package :japi-primitives)
 
 ;; Start up the Japi server (needs to find either "java" or "jre" in your path
-(defmacro with-japi-server ((app-name debug-level) . body)
+(defmacro with-server ((app-name debug-level) . body)
   (multiple-value-bind (ds b)
-      (si::find-declarations body)
-    `(if (= 0 (j_start))
-       (format t (format nil "~S can't connect to the Japi GUI server." ,app-name))
-       (progn
-	 (j_setdebug ,debug-level)
-	 ,@ds
-	 (unwind-protect
-	     (progn ,@b)
-	   (j_quit))))))
+		       (si::find-declarations body)
+		       `(if (= 0 (j_start))
+			    (format t (format nil "~S can't connect to the Japi GUI server." ,app-name))
+			  (progn
+			    (j_setdebug ,debug-level)
+			    ,@ds
+			    (unwind-protect
+				(progn ,@b)
+			      (j_quit))))))
 
+;; Use a frame and clean up afterwards even if trouble ensues
 (defmacro with-frame ((frame-var-name title) . body)
   (multiple-value-bind (ds b)
-      (si::find-declarations body)
-    `(let ((,frame-var-name (j_frame ,title)))
-       ,@ds
-       (unwind-protect
-         (progn ,@b)
-         (j_dispose ,frame-var-name)))))
+		       (si::find-declarations body)
+		       `(let ((,frame-var-name (j_frame ,title)))
+			  ,@ds
+			  (unwind-protect
+			      (progn ,@b)
+			    (j_dispose ,frame-var-name)))))
 
+;; Use a canvas and clean up afterwards even if trouble ensues
 (defmacro with-canvas ((canvas-var-name frame-obj x-size y-size) . body)
   (multiple-value-bind (ds b)
-      (si::find-declarations body)
-    `(let ((,canvas-var-name (j_canvas ,frame-obj ,x-size ,y-size)))
-       ,@ds
-       (unwind-protect
-         (progn ,@b)
-         (j_dispose ,canvas-var-name)))))
+		       (si::find-declarations body)
+		       `(let ((,canvas-var-name (j_canvas ,frame-obj ,x-size ,y-size)))
+			  ,@ds
+			  (unwind-protect
+			      (progn ,@b)
+			    (j_dispose ,canvas-var-name)))))
 
-(defmacro event-loop (frame-name &rest body)
-  `(loop as obj = (j_nextaction)
-	 while (not (= obj ,frame-name))
-	 do (,@body)))
+;; Use a pulldown menu bar and clean up afterwards even if trouble ensues
+(defmacro with-menu-bar ((bar-var-name frame-obj) . body)
+  (multiple-value-bind (ds b)
+		       (si::find-declarations body)
+		       `(let ((,bar-var-name (j_menubar ,frame-obj)))
+			  ,@ds
+			  (unwind-protect
+			      (progn ,@b)
+			    (j_dispose ,bar-var-name)))))
 
-(with-japi-server ("GCL Japi library test GUI 1" 2)
-      (with-frame (frame "Five Second Blank Test Frame") 
-		  (j_show frame)
-		  (j_sleep 5000)))
+;; Add a pulldown menu and clean up afterwards even if trouble ensues
+(defmacro with-menu ((menu-var-name bar-obj title) . body)
+  (multiple-value-bind (ds b)
+		       (si::find-declarations body)
+		       `(let ((,menu-var-name (j_menu ,bar-obj ,title)))
+			  ,@ds
+			  (unwind-protect
+			      (progn ,@b)
+			    (j_dispose ,menu-var-name)))))
+
+;; Add a pulldown menu item and clean up afterwards even if trouble ensues
+(defmacro with-menu-item ((item-var-name menu-obj title) . body)
+  (multiple-value-bind (ds b)
+		       (si::find-declarations body)
+		       `(let ((,item-var-name (j_menuitem ,menu-obj ,title)))
+			  ,@ds
+			  (unwind-protect
+			      (progn ,@b)
+			    (j_dispose ,item-var-name)))))
+
+;; Add a mouse listener and clean up afterwards even if trouble ensues
+(defmacro with-mouse-listener ((var-name obj type) . body)
+  (multiple-value-bind (ds b)
+		       (si::find-declarations body)
+		       `(let ((,var-name (j_mouselistener ,obj ,type)))
+			  ,@ds
+			  (unwind-protect
+			      (progn ,@b)
+			    (j_dispose ,var-name)))))
+
+;; Run a five second frame in a Japi server
+(with-server ("GCL Japi library test GUI 1" 0)
+	     (with-frame (frame "Five Second Blank Test Frame") 
+			 (j_show frame)
+			 (j_sleep 5000)))
 
 ;; Get a pointer to an array of ints
 (defCfun "static void* inta_ptr(object s)" 0 
-" return(s->fixa.fixa_self);")
+  " return(s->fixa.fixa_self);")
 (defentry inta-ptr (object) (int "inta_ptr"))
 
 ;; Draw function
@@ -105,115 +142,116 @@
 	      (setf y (+ y (j_getfontheight drawable)))
 	      (j_drawstring drawable x y teststr))))))
 
-(with-japi-server ("GCL Japi library test GUI 2" 2)
-      (with-frame (frame "Draw")
-		  (j_show frame)
-		  (let ((alert (j_messagebox frame "label1" "label2"))) 
-		    (j_sleep 2000)
-		    (j_dispose alert))
-		  (let ((result1 (j_alertbox frame "label1" "label2" "OK"))
-			(result2 (j_choicebox2 frame "label1" "label2" "Yes" "No"))
-			(result3 (j_choicebox3 frame "label1" "label2" "Yes" "No" "Cancel")))
-		    (format t "Requestor results were: ~D, ~D, ~D~%" result1 result2 result3))
-		  (j_setborderlayout frame)
-		  (let* ((menubar (j_menubar frame))
-			 (file    (j_menu menubar "File"))
-			 (print   (j_menuitem file "Print"))
-			 (save    (j_menuitem file "Save BMP"))
-			 (quit    (j_menuitem file "Quit")))
-		    (with-canvas  (canvas frame 400 600)
-				  (j_pack frame)
-				  (drawgraphics canvas 0 0 (j_getwidth canvas) (j_getheight canvas))
-				  (j_show frame)
-				  (loop as obj = (j_nextaction)
-					while (and (not (= obj frame)) (not (= obj quit)))
-					do 
-					(when (= obj canvas)
-					  (j_setnamedcolorbg canvas J_WHITE)
-					  (drawgraphics canvas 10 10
-							(- (j_getwidth canvas) 10)
-							(- (j_getheight canvas) 10)))
-					(when (= obj print)
-					  (let ((printer (j_printer frame)))
-					    (when (> 0 printer)
-					      (drawgraphics printer 40 40
-							    (- (j_getwidth printer) 80)
-							    (- (j_getheight printer) 80))
-					      (j_print printer))))
-					(when (= obj save)
-					  (let ((image (j_image 600 800)))
-					    (drawgraphics image 0 0 600 800)
-					    (when (= 0 (j_saveimage image "test.bmp" J_BMP))
-					      (j_alertbox frame "Problems" "Can't save the image" "OK"))))))
-			 (j_dispose menubar)
-			 (j_dispose file)
-			 (j_dispose print)
-			 (j_dispose save)
-			 (j_dispose quit)))
-      ;; Try some mouse handling
-      (with-frame (frame "Move and drag the mouse")
-		  (j_setsize frame 430 240)
-		  (j_setnamedcolorbg frame J_LIGHT_GRAY)
-		  (with-canvas (canvas1 frame 200 200)
-			       (with-canvas (canvas2 frame 200 200)
-					    (j_setpos canvas1 10 30)
-					    (j_setpos canvas2 220 30)
-					    (let ((pressed (j_mouselistener canvas1 J_PRESSED))
-						  (dragged (j_mouselistener canvas1 J_DRAGGED))
-						  (released (j_mouselistener canvas1 J_RELEASED))
-						  (entered (j_mouselistener canvas2 J_ENTERERD))
-						  (moved (j_mouselistener canvas2 J_MOVED))
-						  (exited (j_mouselistener canvas2 J_EXITED))
-					      ;; First allocate some unmovable storage for passing data back from C land.
-					      ;; This uses the GCL make-array specific keyword :static to freeze
-					      ;; the array.
-						  (xa (make-array 1 :initial-element 0 :element-type 'fixnum :static t))
-						  (ya (make-array 1 :initial-element 0 :element-type 'fixnum :static t))
-						  (x 0)
-						  (y 0)
-						  (startx 0)
-						  (starty 0))
-					      (j_show frame)
-					      (loop as obj = (j_nextaction)
-						    while (and (not (= obj frame)) (not (= obj quit)))
-						    do 
-						    (when (= obj pressed)
-						      (j_getmousepos pressed (inta-ptr xa) (inta-ptr ya))
-						      (setf x (aref xa 0))
-						      (setf y (aref ya 0))
-						      (setf startx x)
-						      (setf starty y))
-						    (when (= obj dragged)
-						      (j_getmousepos dragged (inta-ptr xa) (inta-ptr ya))
-						      (setf x (aref xa 0))
-						      (setf y (aref ya 0))
-						      (j_drawrect canvas1 startx starty (- x startx) (- y starty)))
-						    (when (= obj released)
-						      (j_getmousepos released (inta-ptr xa) (inta-ptr ya))
-						      (setf x (aref xa 0))
-						      (setf y (aref ya 0))
-						      (j_drawrect canvas1 startx starty (- x startx) (- y starty)))
-						    (when (= obj entered)
-						      (j_getmousepos entered (inta-ptr xa) (inta-ptr ya))
-						      (setf x (aref xa 0))
-						      (setf y (aref ya 0))
-						      (setf startx x)
-						      (setf starty y))
-						    (when (= obj moved)
-						      (j_getmousepos moved (inta-ptr xa) (inta-ptr ya))
-						      (setf x (aref xa 0))
-						      (setf y (aref ya 0))
-						      (setf startx x)
-						      (setf starty y)
-						      (j_drawline canvas2 startx starty x y))
-						    (when (= obj exited)
-						      (j_getmousepos exited (inta-ptr xa) (inta-ptr ya))
-						      (setf x (aref xa 0))
-						      (setf y (aref ya 0))
-						      (j_drawline canvas2 startx starty x y))))
-					    (j_dispose pressed)
-					    (j_dispose dragged)
-					    (j_dispose released)
-					    (j_dispose entered)
-					    (j_dispose moved)
-					    (j_dispose exited)))))
+;; Run some more extensive tests
+(with-server
+ ("GCL Japi library test GUI 2" 0)
+ (with-frame
+  (frame "Draw")
+  (j_show frame)
+  (let ((alert (j_messagebox frame "Two second alert box" "label"))) 
+    (j_sleep 2000)
+    (j_dispose alert))
+  (let ((result1 (j_alertbox frame "label1" "label2" "OK"))
+	(result2 (j_choicebox2 frame "label1" "label2" "Yes" "No"))
+	(result3 (j_choicebox3 frame "label1" "label2" "Yes" "No" "Cancel")))
+    (format t "Requestor results were: ~D, ~D, ~D~%" result1 result2 result3))
+  (j_setborderlayout frame)
+  (with-menu-bar
+   (menubar frame)
+   (with-menu
+    (file menubar "File")
+    (with-menu-item
+     (print file "Print")
+     (with-menu-item
+      (save file "Save BMP")
+      (with-menu-item
+       (quit file "Quit")
+       (with-canvas  
+	(canvas frame 400 600)
+	(j_pack frame)
+	(drawgraphics canvas 0 0 (j_getwidth canvas) (j_getheight canvas))
+	(j_show frame)
+	(loop as obj = (j_nextaction)
+	      while (and (not (= obj frame)) (not (= obj quit)))
+	      do 
+	      (when (= obj canvas)
+		(j_setnamedcolorbg canvas J_WHITE)
+		(drawgraphics canvas 10 10
+			      (- (j_getwidth canvas) 10)
+			      (- (j_getheight canvas) 10)))
+	      (when (= obj print)
+		(let ((printer (j_printer frame)))
+		  (when (> 0 printer)
+		    (drawgraphics printer 40 40
+				  (- (j_getwidth printer) 80)
+				  (- (j_getheight printer) 80))
+		    (j_print printer))))
+	      (when (= obj save)
+		(let ((image (j_image 600 800)))
+		  (drawgraphics image 0 0 600 800)
+		  (when (= 0 (j_saveimage image "test.bmp" J_BMP))
+		    (j_alertbox frame "Problems" "Can't save the image" "OK"))))))))))))
+ ;; Try some mouse handling
+ (with-frame
+  (frame "Move and drag the mouse")
+  (j_setsize frame 430 240)
+  (j_setnamedcolorbg frame J_LIGHT_GRAY)
+  (with-canvas
+   (canvas1 frame 200 200)
+   (with-canvas
+    (canvas2 frame 200 200)
+    (j_setpos canvas1 10 30)
+    (j_setpos canvas2 220 30)
+    (with-mouse-listener
+     (pressed canvas1 J_PRESSED)
+     (with-mouse-listener
+      (dragged canvas1 J_DRAGGED)
+      (with-mouse-listener
+       (released canvas1 J_RELEASED)
+       (with-mouse-listener
+	(entered canvas2 J_ENTERERD)
+	(with-mouse-listener
+	 (moved canvas2 J_MOVED)
+	 (with-mouse-listener
+	  (exited canvas2 J_EXITED)
+	  (j_show frame)
+	  ;; Allocate immovable storage for passing data back from C land.
+	  ;; Uses the GCL only make-array keyword :static
+	  (let* ((xa (make-array 1 :initial-element 0 :element-type 'fixnum :static t))
+		 (ya (make-array 1 :initial-element 0 :element-type 'fixnum :static t))
+		 (pxa (inta-ptr xa))
+		 (pya (inta-ptr ya))
+		 (x 0)
+		 (y 0)
+		 (get-mouse-xy (lambda (obj)
+				 (progn (j_getmousepos obj pxa pya)
+					(setf x (aref xa 0))
+					(setf y (aref ya 0)))))
+		 (startx 0)
+		 (starty 0))
+	    (loop as obj = (j_nextaction)
+		  while (not (= obj frame))
+		  do 
+		  (when (= obj pressed)
+		    (funcall get-mouse-xy pressed)
+		    (setf startx x)
+		    (setf starty y))
+		  (when (= obj dragged)
+		    (funcall get-mouse-xy dragged)
+		    (j_drawrect canvas1 startx starty (- x startx) (- y starty)))
+		  (when (= obj released)
+		    (funcall get-mouse-xy released)
+		    (j_drawrect canvas1 startx starty (- x startx) (- y starty)))
+		  (when (= obj entered)
+		    (funcall get-mouse-xy entered)
+		    (setf startx x)
+		    (setf starty y))
+		  (when (= obj moved)
+		    (funcall get-mouse-xy moved)
+		    (j_drawline canvas2 startx starty x y))
+		    (setf startx x)
+		    (setf starty y)
+		  (when (= obj exited)
+		    (funcall get-mouse-xy exited)
+		    (j_drawline canvas2 startx starty x y))))))))))))))
+
