@@ -60,8 +60,9 @@ gclcvs (2.7.0-16) unstable; urgency=low
   * Eliminate unneeded transformatio of contniguous pages to other pages
     on save-system.
   * Cleanup compiler warning in alloc.c
+  * Cleanup compiler warning in sys_mod_gcl.c
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  1 Dec 2003 17:25:42 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  1 Dec 2003 17:26:25 +0000
 
 gclcvs (2.7.0-15) unstable; urgency=low
 
