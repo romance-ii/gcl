@@ -3,8 +3,9 @@ gcl (2.5.0.cvs20020625-77) unstable; urgency=low
   * Lintian cleanups
   * Don't strip libansi_gcl.a, need .data at end of .o, as with libgcl.a
   * Take newlines out of doc string for init-cmp-anon
+  * Cleanup gcc-3.2 compiler warning
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 27 Feb 2003 09:11:12 -0500
+ -- Camm Maguire <camm@enhanced.com>  Thu, 27 Feb 2003 10:35:38 -0500
 
 gcl (2.5.0.cvs20020625-76) unstable; urgency=low
 

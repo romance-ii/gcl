@@ -819,11 +819,12 @@ DEFUN_NEW("ALLOCATE-SGC",object,fSallocate_sgc,SI
 
   int t=t_from_type(type);
   struct typemanager *tm;
-  object res;
+  object res,x,x1,x2;
   tm=tm_of(t);
-  res= list(3,make_fixnum(tm->tm_sgc),
-	    make_fixnum(tm->tm_sgc_max),
-	    make_fixnum((100*tm->tm_sgc_minfree)/tm->tm_nppage));
+  x=make_fixnum(tm->tm_sgc);
+  x1=make_fixnum(tm->tm_sgc_max);
+  x2=make_fixnum((100*tm->tm_sgc_minfree)/tm->tm_nppage);
+  res= list(3,x,x1,x2);
   
   if(min<0 || max< min || min > 3000 || free_percent < 0 || free_percent > 100)
     goto END;
@@ -842,11 +843,12 @@ DEFUN_NEW("ALLOCATE-GROWTH",object,fSallocate_growth,SI,5,5,NONE,OO,II,II,OO,
       (object type,int min,int max,int percent,int percent_free),"")
 {int  t=t_from_type(type);
  struct typemanager *tm=tm_of(t);
- object res;
- res= list(4,make_fixnum(tm->tm_min_grow),
-	   make_fixnum(tm->tm_max_grow),
-	   make_fixnum(tm->tm_growth_percent),
-	   make_fixnum(tm->tm_percent_free));
+ object res,x,x1,x2,x3;
+ x=make_fixnum(tm->tm_min_grow);
+ x1=make_fixnum(tm->tm_max_grow);
+ x2=make_fixnum(tm->tm_growth_percent);
+ x3=make_fixnum(tm->tm_percent_free);
+ res= list(4,x,x1,x2,x3);
  
  if(min<0 || max< min || min > 3000 || percent < 0 || percent > 500 
     || percent_free <0 || percent_free > 100
