@@ -137,3 +137,9 @@ SGC is enabled.  */
 /* bfd support */
 #undef HAVE_LIBBFD
 
+/* math.h for definitions in generated C code */
+#undef NEED_MATH_H
+
+#ifdef NEED_MATH_H
+#include <math.h>
+#endif

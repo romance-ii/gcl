@@ -89,6 +89,13 @@
 /* bfd support */
 #undef HAVE_LIBBFD
 
+/* math.h for definitions in generated C code */
+#undef NEED_MATH_H
+
+#ifdef NEED_MATH_H
+#include <math.h>
+#endif
+
 /* Define if you have the getcwd function.  */
 #undef HAVE_GETCWD
 
@@ -100,6 +107,9 @@
 
 /* Define if you have the <asm/signal.h> header file.  */
 #undef HAVE_ASM_SIGNAL_H
+
+/* Define if you have the <math.h> header file.  */
+#undef HAVE_MATH_H
 
 /* Define if you have the <sys/ioctl.h> header file.  */
 #undef HAVE_SYS_IOCTL_H
