@@ -68,8 +68,11 @@ gclcvs (2.7.0-16) unstable; urgency=low
     configure step, remove oldgmp configure option
   * Better execstack flag handling in configure
   * Allow for commas in CFLAGS in sed command writing *cc*
+  * Remove generated files from working part of repository, .c, .h, and
+    .data source for the mod, pcl, and clcs subsystems are now found in
+    the c subdir of the respective dir
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  2 Dec 2003 20:18:26 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  3 Dec 2003 14:56:04 +0000
 
 gclcvs (2.7.0-15) unstable; urgency=low
 

@@ -17,21 +17,25 @@ AR = ar qc
 LIBFILES= bcmp.o bcopy.o bzero.o user_init.o user_match.o
 # compile main.c with -g, since signalling may not be ok on -O
 MAIN_DEBUG=
-DPP	= ../bin/dpp
+DPP	= ../bin/dpp$(EXE)
+
+DECL := $(HDIR)/new_decl.h
 
 # AUX_INFO=-aux-info $*.X
-.c.o:
+%.o: %.c $(DECL)
 	$(CC) -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO) 
-.d.o:
+%.o: %.d $(DECL)
 	$(DPP) $*
 	$(CC) -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO)
 	rm $*.c
 
 CPP=
-.c.ini:
+%.ini: %.c grab_defs
+	[ -e $(DECL) ] || touch $(DECL)
 	$(CC) -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c | sed -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
 
-.d.ini:
+%.ini: %.d $(DPP) grab_defs
+	[ -e $(DECL) ] || touch $(DECL)
 	$(DPP) $*
 	./grab_defs < $*.c > $*.ini
 	rm $*.c
@@ -80,17 +84,19 @@ OBJS	= $(OD)main.o $(OD)alloc.o $(OD)gbc.o \
 	$(OD)init_pari.o $(OD)nsocket.o $(NEW_INIT) $(MPFILES) $(SFASL) $(EXTRAS) \
 	$(RL_OBJS)
 
-all:  ../bin/dpp${EXE} $(OBJS) new-init $(LIBFILES) new_init.o  $(GCLIB) $(LAST_FILE)  $(FIRST_FILE) 
+INI_FILES=$(patsubst %.o,%.ini,${OBJS})
+
+all:  $(OBJS) $(LIBFILES) new_init.o  $(GCLIB) $(LAST_FILE)  $(FIRST_FILE) 
 
 go:
 	$(MAKE) "CFLAGS=${CFLAGS} -pg"
 
-../bin/dpp${EXE}:	../bin/dpp.c
-	${CC} ${DEFS} -o ../bin/dpp${EXE} ../bin/dpp.c
+$(DPP):	../bin/dpp.c
+	${CC} ${DEFS} -o $@ $<
 
 
-new-init: grab_defs
-	$(MAKE) new_init.c decls1 "INI_FILES=`echo ${OBJS} | sed -e 's:\.o:.ini:g'  -e 's:new_init.o::g' `"
+new-init: 
+	$(MAKE) new_init.c decls1
 
 new_init.c: ${INI_FILES}
 	echo '#include "make-init.h"' > new_init.c
@@ -99,16 +105,21 @@ new_init.c: ${INI_FILES}
 	echo '}' >> new_init.c
 
 ifneq ($(NIFLAGS),)
-new_init.o: new_init.c
+new_init.o: new_init.c $(DECL)
 	$(CC) -c $(NIFLAGS) $(DEFS) $< -o $@
 endif
 
-decls1:
+decls1: $(INI_FILES)
 	echo '#include "make-decl.h"' > foo.c
 	cat ${INI_FILES} >> foo.c
 	${CC} -E -I${HDIR} foo.c | sed -n -e '/#/d' -e '/DO_/d' -e '/[a-zA-Z;]/p' > tmpx
 	../xbin/move-if-changed mv tmpx ${HDIR}new_decl.h
 
+$(DECL): $(HDIR)/make-decl.h $(INI_FILES)
+	echo '#include "make-decl.h"' > foo.c
+	cat ${INI_FILES} >> foo.c
+	${CC} -E -I${HDIR} foo.c | sed -n -e '/#/d' -e '/DO_/d' -e '/[a-zA-Z;]/p' > $@
+	rm foo.c
 
 grab_defs: grab_defs.c
 	${CC} $(OFLAGS) -o grab_defs  grab_defs.c
@@ -121,7 +132,7 @@ $(GCLIB): ${ALIB}
 	$(AR) gcllib.a ${ALIB}
 	${RANLIB} gcllib.a
 clean:
-	rm -f $(OBJS) ${ALIB} new_init.o  $(LAST_FILE) $(FIRST_FILE) *.a grab_defs$(EXE) *.ini tmpx foo.c cmpinclude.h new_init.c
+	rm -f $(OBJS) ${ALIB} new_init.o  $(LAST_FILE) $(FIRST_FILE) *.a grab_defs$(EXE) *.ini tmpx foo.c cmpinclude.h new_init.c $(DECL)
 
 fsavres.o: /lib/libc.a
 	ar xv /lib/libc.a fsavres.o
