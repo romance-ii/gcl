@@ -3,7 +3,12 @@ BUILDING NATIVE WIN32 GNU COMMON LISP FROM CVS
 ===============================================
 
 The preferred build host system for the Mingw32 compiler is 
-MSYS.  I use gcc version 3.2, but version 2.95 certainly works.
+MSYS.
+
+I use gcc version 3.3.1, but earlier versions back to
+2.95 certainly work provided that you remove the 
+"-fno-zero-initialized-in-bss" flag in "h/mingw.defs" before
+running "configure".
 
 
 ===============================================
@@ -105,7 +110,7 @@ BUILDING
   obtained by adding "(si::use-fast-links nil)" to the end of the list of
   commands in the SETUP makefile macro in "pcl/makefile".  I don't know 
   why this is necessary on Windows.  The PCL/ANSI version of GCL is still
-  experimental and will not compile Maxima at present.
+  experimental.
 
 
-Mike Thomas, 17 December 2002
+Mike Thomas, 29 December 2003
