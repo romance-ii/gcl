@@ -111,7 +111,7 @@
 (DEFSYSFUN 'SET "Lset" '(T T) 'T NIL NIL) 
 (DEFSYSFUN 'FUNCTIONP "Lfunctionp" '(T) 'T NIL T) 
 (DEFSYSFUN 'WRITE-BYTE "Lwrite_byte" '(T T) 'T NIL NIL) 
-(DEFSYSFUN 'LAST "Llast" '(T) 'T NIL NIL) 
+(DEFSYSFUN 'LAST "Llast" '(T *) 'T NIL NIL) 
 (DEFSYSFUN 'MAKE-STRING "Lmake_string" '(T *) 'STRING NIL NIL) 
 (DEFSYSFUN 'CAAAR "Lcaaar" '(T) 'T NIL NIL) 
 (DEFSYSFUN 'LIST-LENGTH "Llist_length" '(T) 'T NIL NIL) 

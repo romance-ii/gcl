@@ -24,8 +24,9 @@ gclcvs (2.7.0-32) unstable; urgency=low
   * Build with local bfd in libgcl to ease migration into testing, as
     current binutils is long-term buggy
   * gmp_wrapper variable declaration order change for older gcc
+  * fix wrongprototype for Llast
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 16 Sep 2004 20:55:25 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 16 Sep 2004 20:56:43 +0000
 
 gclcvs (2.7.0-31) unstable; urgency=high
 
