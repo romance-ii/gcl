@@ -1494,7 +1494,7 @@ read_fasl_vector(object in)
 		       d->pn.pn_version);
      d = coerce_to_namestring(d);
      in = open_stream(d,smm_input,Cnil,Cnil);
-     if (in == Cnil)
+     if (in == Cnil) 
        FEerror("Can't open file ~s",1,d);
    }
  else if (tem != EOF)

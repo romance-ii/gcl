@@ -153,9 +153,9 @@ main(int argc, char **argv, char **envp) {
 #endif	
 	if (!initflag) {
 
-		system_directory= (char *) malloc(strlen(argv[0])+3);
+		system_directory= (char *) malloc(strlen(argv[1])+3);
 					
-		strcpy(system_directory, argv[0]);
+		strcpy(system_directory, argv[1]);
 		if (system_directory[0] != '/')
 			strcpy(system_directory, "./");
 		else {
@@ -770,10 +770,12 @@ multiply_stacks(int m) {
   return stack_multiple;
 }
 
+DEFVAR("*NO-INIT*",sSAno_initA,SI,Cnil,"");
+
 void
 siLinit_system(void) {
   check_arg(0);
-  init_system();
+  init_system(sSAno_initA);
   vs_base[0] = Cnil;
 }
 

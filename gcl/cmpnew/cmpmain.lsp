@@ -230,7 +230,7 @@ Cannot compile ~a.~%"
          (c-pathname (get-output-pathname c-file "c" name dir))
          (h-pathname (get-output-pathname h-file "h" name dir))
          (data-pathname (get-output-pathname data-file "data" name dir))
-	 (i-pathname  (get-output-pathname data-file "i" name dir))
+;	 (i-pathname  (get-output-pathname data-file "i" name dir))
          #+aosvs (ob-pathname (get-output-pathname ob-file "ob" name dir))
          )
     (declare (special dir name ))
@@ -422,7 +422,7 @@ Cannot compile ~a.~%"
 	     )))
 	(t (error "can't compile ~a" name))))
 
-(defun disassemble (name &aux tem form)
+(defun disassemble (name &aux tem)
   (cond ((and (consp name)
 	      (eq (car name) 'lambda))
 	 (eval `(defun cmp-anon ,@ (cdr name)))
@@ -436,17 +436,18 @@ Cannot compile ~a.~%"
 	((and (setq tem (symbol-function name))
 	      (consp tem)
 	      (eq (car tem) 'lambda-block))
-	 (with-open-file
-	     (st (setq gaz (gazonk-name)) :direction :output)
-	   (prin1-cmp `(defun ,name ,@ (cddr tem))       st))
-	 (let ((fi (compile-file gaz 
-;				 :c-debug t 
-				 :h-file t 
-				 :c-file t
-				 :system-p 't
-				 :data-file t
-				 :o-file t))
-	       (cn (get-output-pathname gaz "c" gaz ))
+	 (let ((gaz (gazonk-name)))
+	   (with-open-file
+	     (st gaz :direction :output)
+	     (prin1-cmp `(defun ,name ,@ (cddr tem))       st))
+	 (compile-file gaz 
+;                      :c-debug t 
+		       :h-file t 
+		       :c-file t
+		       :system-p 't
+		       :data-file t
+		       :o-file t)
+	 (let ((cn (get-output-pathname gaz "c" gaz ))
 	       (dn (get-output-pathname gaz "data" gaz ))
 	       (hn (get-output-pathname gaz "h" gaz ))
 	       (on (get-output-pathname gaz "o" gaz )))
@@ -462,7 +463,7 @@ Cannot compile ~a.~%"
 	   (delete-file dn)
 	   (delete-file hn)
 	   (delete-file on)
-	   (delete-file gaz)))
+	   (delete-file gaz))))
 	(t (error "can't disassemble ~a" name))))
 	 
 
@@ -504,6 +505,9 @@ SYSTEM_SPECIAL_INIT
 
 
 (defvar *cc* "cc")
+(defvar *ld* "ld")
+(defvar *ld-libs* "ld-libs")
+(defvar *init-lsp* "init-lsp")
 
 (defvar *use-buggy* nil)
 
@@ -669,10 +673,70 @@ SYSTEM_SPECIAL_INIT
 (defun user-homedir-pathname ()
   (or (si::getenv "HOME") "/"))
 
+)
 
+;
+;  These functions are added to build custom images requiring
+;  the loading of binary objects on systems relocating with dlopen.
+;
 
-    
-
+(defun make-user-init (files out &aux tem)
+  
+  (setq tem (concatenate 'string out ".c"))
+  (with-open-file (st tem :direction :output)
+		  (format st "#include ~a~%" *cmpinclude*)
+		  (format st "#define init_or_load(fn,file) do {extern void fn(void); init_or_load1(fn,file);}  while(0)~%")
+		  (format st "object user_init() {~%")
+		  (dolist (tem files)
+			  (cond ((equal (pathname-type tem) "o")
+				 (format st "init_or_load(init_~a,\"~a\");~%" 
+					 (substitute #\_ #\- (pathname-name tem)) tem))
+				(t 
+				 (format st "load(\"~a\");~%" tem))))
+		  (format st "return Cnil;}~%")
+		  )
+  (system (format nil "~a ~a" *cc* tem))
+  (delete-file tem)
 
 )
 
+(defun link (files image &optional post &aux raw init) 
+
+  (make-user-init files "user-init")
+  (setq raw (format nil "raw_~a" (pathname-name image)))
+  (setq init (format nil "init_~a.lsp" (pathname-name image)))
+
+  (system 
+   (format nil "~a ~a user-init.o ~a -L ~a ~a"
+	   *ld* 
+	   raw
+	   (let ((sfiles ""))
+			  (dolist (tem files)
+				  (if (equal (pathname-type tem) "o")
+				  (setq sfiles (concatenate 'string sfiles " " tem))))
+			  sfiles) 
+	   si::*system-directory*
+	   *ld-libs*))
+
+  (delete-file "user-init.o")
+
+  (with-open-file (st init :direction :output)
+		  (format st "(setq si::*no-init* '(")
+		  (dolist (tem files)
+			  (format st " \"~a\"" (pathname-name tem)))
+		  (format st "))~%")
+		  (with-open-file (st1 
+				   (format nil "~a~a" si::*system-directory* *init-lsp*))
+				  (si::copy-stream st1 st))
+		  (if (stringp post) (format st "~a~%" post))
+		  (format st "(si::save-system \"~a\")~%" image))
+
+  (system (format nil "~a ~a < ~a" 
+		  raw
+		  si::*system-directory*
+		  init))
+
+  (delete-file raw)
+  (delete-file init)
+
+)

@@ -9,22 +9,31 @@
 ;;Appropriate for Austin
 (setq SYSTEM:*DEFAULT-TIME-ZONE*  6)
 (in-package "USER")
-(load "../gcl-tk/tk-package.lsp")
-(progn (allocate 'cons 100) (allocate 'string 40)
+(load (concatenate si::*system-directory* "../gcl-tk/tk-package.lsp"))
+(progn 
+;(allocate 'cons 100) (allocate 'string 40)
  (system:init-system) (gbc t)
-#+gmp (defun si::multiply-bignum-stack (n) "nothing")
- (si::multiply-bignum-stack 25)
+ (load (concatenate 'string si::*system-directory* "../gcl-tk/tk-package.lsp"))
+; (si::build-symbol-table)
+;#+gmp (defun si::multiply-bignum-stack (n) "nothing")
+; (si::multiply-bignum-stack 25)
  (or lisp::*link-array*
   (setq lisp::*link-array*
      (make-array (ash 1 11)  :element-type 'string-char :fill-pointer 0)))
  (si::use-fast-links t)
-(setq compiler::*cmpinclude* "\"cmpinclude.h\"") (load #"../cmpnew/cmpmain.lsp") (gbc t)
- (load #"../cmpnew/lfun_list.lsp")
- (gbc t) (load #"../cmpnew/cmpopt.lsp") (gbc t)
-(load #"../lsp/auto_new.lsp") (gbc t)
+
+ (setq compiler::*cmpinclude* "\"cmpinclude.h\"") 
+ (load (concatenate 'string si::*system-directory* "../cmpnew/cmpmain.lsp")) 
+ (gbc t)
+ (load (concatenate 'string si::*system-directory* "../cmpnew/lfun_list.lsp"))
+ (gbc t) 
+ (load (concatenate 'string si::*system-directory* "../cmpnew/cmpopt.lsp"))
+ (gbc t)
+ (load (concatenate 'string si::*system-directory* "../lsp/auto_new.lsp")) 
+ (gbc t)
 
  (when compiler::*cmpinclude-string*
-  (with-open-file (st "../h/cmpinclude.h")
+  (with-open-file (st (concatenate 'string si::*system-directory* "../h/cmpinclude.h"))
     (let
 	((tem (make-array (file-length st) :element-type 'standard-char
 			  :static t)))
@@ -81,14 +90,18 @@
      (setq si::*ihs-top* 1)
   (in-package 'system::user) (incf system::*ihs-top* 2)
   (funcall system::*old-top-level*))
- (setq si::*gcl-version* 600) 
- (defun lisp-implementation-version nil (format nil "GCL-1-~a" si::*gcl-version*))
+
+; (setq si::*gcl-version* 600) 
+ (defun lisp-implementation-version nil (format nil "GCL-~a-~a" si::*gcl-major-version* si::*gcl-version*))
  (terpri)
  (setq si:*inhibit-macro-special* t)
  ;(setq *modules* nil)
  (gbc t) (system:reset-gbc-count)
- (allocate 'cons 200)
+
+; (allocate 'cons 200)
+
  (defun system:top-level nil (system::gcl-top-level))
+
  (unintern 'system)
  (unintern 'lisp)
  (unintern 'compiler)
@@ -96,8 +109,7 @@
  ;system-init
 
  (if (fboundp 'user-init) (user-init))
- (si::set-up-top-level)
- (in-package "USER")
- (system:save-system "saved_gcl") (bye)
- (defun system:top-level nil (system::gcl-top-level))
- (save "saved_gcl") (bye))
+ (si::set-up-top-level))
+; (in-package "USER")
+; (system:save-system "saved_gcl") (bye)
+

@@ -11,7 +11,7 @@ APPEND=../xbin/append
 OBJS	= cmpbind.o cmpblock.o cmpcall.o cmpcatch.o cmpenv.o cmpeval.o \
 	cmpflet.o cmpfun.o cmpif.o cmpinline.o cmplabel.o cmplam.o cmplet.o \
 	cmploc.o cmpmap.o cmpmulti.o cmpspecial.o cmptag.o cmptop.o \
-	cmptype.o cmputil.o cmpvar.o cmpvs.o cmpwt.o
+	cmptype.o cmputil.o cmpvar.o cmpvs.o cmpwt.o # cmpmain.o cmpopt.o lfun_list.o
 
 COMPILE_FILE=$(PORTDIR)/saved_gcl $(PORTDIR) -system-p -c-file -data-file \
 	-o-file nil -h-file -compile

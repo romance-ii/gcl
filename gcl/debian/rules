@@ -24,7 +24,8 @@ ifeq ($(ARCHT),ia64)
 MCC:=gcc-3.1
 endif
 
-RELOC=locbfd
+#RELOC=locbfd
+RELOC=statsysbfd
 ifeq ($(ARCHT),alpha)
 RELOC=dlopen
 endif
@@ -99,6 +100,9 @@ install: build
 
 	rm -f debian/tmp/usr/bin/gcl.exe debian/tmp/usr/bin/gclm.bat
 
+	mkdir -p debian/tmp/usr/include && \
+		ln -snf $$(find debian/tmp -name "cmpinclude.h" |sed 's,debian/tmp,,1') debian/tmp/usr/include/
+
 	find debian/tmp -type f -name "*.lsp" -exec chmod -x {} \;
 	find debian/tmp -type f -name "*.lisp" -exec chmod -x {} \;
 	find debian/tmp -type f -name "*.el" -exec chmod -x {} \;
@@ -135,7 +139,7 @@ binary-arch: build install debian/substvars
 	dh_installemacsen -a
 	dh_installmanpages -a gcl/gmp3/ansi2knr.1
 	dh_installchangelogs ChangeLog -a
-	dh_strip -a
+	dh_strip -a -Xlibgcl
 	dh_link -a
 	dh_compress -a
 	dh_fixperms -a

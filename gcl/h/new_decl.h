@@ -1,6 +1,7 @@
 EXTER  object   fLbye  (); 
 EXTER  object   fLquit  (); 
 EXTER  object   fLexit  (); 
+EXTER object  sSAno_initA ; 
 EXTER  object   fLidentity  (); 
 EXTER  object   fLlisp_implementation_version  (); 
 EXTER object  sSAlisp_maxpagesA ; 

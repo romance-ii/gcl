@@ -63,8 +63,9 @@ LSPOBJS	= $(LSPDIR)/defmacro.o $(LSPDIR)/evalmacros.o $(LSPDIR)/top.o \
 	$(LSPDIR)/sloop.o  $(LSPDIR)/debug.o \
 	$(LSPDIR)/serror.o $(LSPDIR)/info.o $(LSPDIR)/destructuring_bind.o \
         $(LSPDIR)/defpackage.o $(LSPDIR)/make_defpackage.o \
-	$(LSPDIR)/loop.o\
+	$(LSPDIR)/loop.o \
 	$(addprefix $(LSPDIR)/,$(RL_OBJS))
+#	$(LSPDIR)/auto_new.o $(LSPDIR)/export.o $(LSPDIR)/autoload.o
 
 CMPOBJS	= $(CMPDIR)/cmpinline.o $(CMPDIR)/cmputil.o $(CMPDIR)/cmptype.o \
 	$(CMPDIR)/cmpbind.o $(CMPDIR)/cmpblock.o $(CMPDIR)/cmpcall.o \
@@ -74,6 +75,7 @@ CMPOBJS	= $(CMPDIR)/cmpinline.o $(CMPDIR)/cmputil.o $(CMPDIR)/cmptype.o \
 	$(CMPDIR)/cmploc.o $(CMPDIR)/cmpmap.o $(CMPDIR)/cmpmulti.o \
 	$(CMPDIR)/cmpspecial.o $(CMPDIR)/cmptag.o $(CMPDIR)/cmptop.o \
 	$(CMPDIR)/cmpvar.o $(CMPDIR)/cmpvs.o $(CMPDIR)/cmpwt.o
+#	$(CMPDIR)/cmpmain.o $(CMPDIR)/cmpopt.o $(CMPDIR)/lfun_list.o
 
 SYSTEM=gcl
 
@@ -85,6 +87,21 @@ $(LSPDIR)/auto_new.lsp: $(LSPDIR)/auto.lsp
 	[ "$(RL_OBJS)" = "" ] || \
 		echo "(AUTOLOAD 'init-readline '|readline|)" >>$@
 
+init_gcl.lsp: init_gcl.lsp.in
+
+	cat $< |\
+	sed -e "s$(OLDDATE)Version(`cat ../majvers`.`cat ../minvers`) `date`g" > $@
+	echo "(setq si::*gcl-version* `cat ../minvers` si::*gcl-major-version* `cat ../majvers`)" >>$@
+#	cat ../cmpnew/cmpmain.lsp >>$@
+#	cat ../cmpnew/lfun_list.lsp >>$@
+#	cat ../cmpnew/cmpopt.lsp >>$@
+#	cat ../lsp/auto_new.lsp >>$@
+	echo "(setq compiler::*cc* \"$(CC) -c $(FINAL_CFLAGS)\")" >>$@
+	echo "(setq compiler::*ld* \"$(CC) -o \")" >>$@
+	echo "(setq compiler::*ld-libs* \"-lgcl $(LIBC) $(LIBS)\")" >>$@
+	echo "(setq compiler::*init-lsp* \"$@\")" >>$@
+
+
 saved_$(SYSTEM):raw_$(SYSTEM) $(RSYM) $(INIT_SYSTEM_LSP) \
 		$(CMPDIR)/cmpmain.lsp \
 		$(CMPDIR)/lfun_list.lsp \
@@ -93,13 +110,8 @@ saved_$(SYSTEM):raw_$(SYSTEM) $(RSYM) $(INIT_SYSTEM_LSP) \
 # if you are wfs on rascal increment the minor version number.
 	../xbin/if-exists /usr/u9/wfs/schelter "../xbin/inc-version"
 	../xbin/if-exists saved_$(SYSTEM) "rm -f saved_$(SYSTEM)"
-	cat $(INIT_SYSTEM_LSP) | \
-	sed -e "s$(OLDDATE)Version(`cat ../majvers`.`cat ../minvers`) `date`g" \
-	-e 'ssaved_gclsaved_$(SYSTEM)g' \
-	-e 'slinks t)links t)(setq compiler::*cc* "$(CC) -c $(FINAL_CFLAGS)")$(INITFORM)g' \
-	-e "sGCLDIR${GCLDIR}g" \
-	-e "s(defun lisp-imp(setq si::*gcl-version* `cat ../minvers` si::*gcl-major-version* `cat ../majvers`)(defun lisp-impg" \
-	-e "s:GCL-1:GCL-"`cat ../majvers`":g" 	> foo 
+	cp $(INIT_SYSTEM_LSP) foo
+	echo " (in-package \"USER\")(system:save-system \"saved_$(SYSTEM)\")" >>foo
 	$(PORTDIR)/raw_$(SYSTEM)$(EXE) $(PORTDIR)/ -libdir ${GCLDIR}/ < foo
 
 ${RSYM}:	${SPECIAL_RSYM} $(HDIR)/mdefs.h
@@ -113,8 +125,11 @@ saved_kcn:
 
 FOR_RAW= $(FIRST_FILE) $(OBJS) $(LSPOBJS) $(CMPOBJS) $(SYSTEM_OBJS) sys_gcl.o $(LAST_FILE)
 
-raw_$(SYSTEM):  $(FOR_RAW)
-	$(CC)  -o raw_$(SYSTEM)$(EXE) $(FOR_RAW) ${LIBC} $(LIBS1)
+libgcl.a: $(FOR_RAW)
+	ar r $@ $^
+
+raw_$(SYSTEM):  libgcl.a
+	$(CC)  -o raw_$(SYSTEM)$(EXE) -L. -lgcl ${LIBC} $(LIBS1)
 
 sys_gcl.o:	sys_gcl.c ${HDIR}/object.h ${HDIR}/config.h
 	$(CC) $(CFLAGS) -c -I$(HDIR) sys_gcl.c
@@ -159,4 +174,4 @@ hpbsd-crt0-mod.o:
 
 GCL:=gcl
 clean:
-	rm -f saved_$(SYSTEM)$(EXE) raw_$(SYSTEM)$(EXE) saved_$(GCL)$(EXE) saved_ansi_$(GCL)$(EXE) raw_$(GCL)$(EXE) *.o core a.out $(RSYM) $(LSPDIR)/auto_new.lsp foo *maxima*
+	rm -f saved_$(SYSTEM)$(EXE) raw_$(SYSTEM)$(EXE) saved_$(GCL)$(EXE) saved_ansi_$(GCL)$(EXE) raw_$(GCL)$(EXE) *.o core a.out $(RSYM) $(LSPDIR)/auto_new.lsp foo *maxima* init_gcl.lsp

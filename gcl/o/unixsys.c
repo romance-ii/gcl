@@ -60,12 +60,12 @@ char *command;
 void
 Lsystem(void)
 {
-	char command[1024];
+	char command[32768];
 	int i;
 
 	check_arg(1);
 	check_type_string(&vs_base[0]);
-	if (vs_base[0]->st.st_fillp >= 1024)
+	if (vs_base[0]->st.st_fillp >= 32768)
 		FEerror("Too long command line: ~S.", 1, vs_base[0]);
 	for (i = 0;  i < vs_base[0]->st.st_fillp;  i++)
 		command[i] = vs_base[0]->st.st_self[i];

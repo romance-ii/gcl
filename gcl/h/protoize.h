@@ -1102,7 +1102,7 @@ void
 NewInit(void);
 
 void
-init_system(void);
+init_system(object);
 
 void
 set_up_string_register(char *);

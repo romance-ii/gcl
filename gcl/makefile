@@ -119,7 +119,7 @@ command:
 merge:
 	${CC} -o merge merge.c
 
-LISP_LIB=cmpnew/collectfn.o lsp/gprof.lsp lsp/info.o lsp/profile.lsp $(TK_LISP_LIB) $(RL_LIB)
+LISP_LIB=cmpnew/collectfn.o lsp/gprof.lsp lsp/info.o lsp/profile.lsp lsp/export.lsp lsp/autoload.lsp cmpnew/cmpmain.lsp cmpnew/cmpopt.lsp cmpnew/lfun_list.lsp lsp/auto_new.lsp h/cmpinclude.h unixport/init_gcl.lsp unixport/libgcl.a gcl-tk/tk-package.lsp $(TK_LISP_LIB) $(RL_LIB)
 
 install-command:
 	rm -f $(DESTDIR)${prefix}/bin/gcl
@@ -145,12 +145,12 @@ INSTALL_LIB_DIR=
 install1:
 	mkdir -p $(DESTDIR)${prefix}/lib 
 	mkdir -p $(DESTDIR)${prefix}/bin
-	mkdir -p $(DESTDIR)${prefix}/include && cp h/cmpinclude.h $(DESTDIR)${prefix}/include/
 	mkdir -p $(DESTDIR)${INSTALL_LIB_DIR}
 	make install-command "INSTALL_LIB_DIR=${INSTALL_LIB_DIR}" "prefix=${prefix}" DESTDIR=$(DESTDIR)
 	rm -f $(DESTDIR)${prefix}/bin/gcl.exe
 	tar cf - $(PORTDIR)/$(FLISP)$(EXE) info/*.info* ${LISP_LIB} \
 	$(TCL_EXES)  |  (cd $(DESTDIR)${INSTALL_LIB_DIR} ;tar xf -)
+	if [ -e "unixport/rsym" ] ; then cp unixport/rsym $(DESTDIR)$(INSTALL_LIB_DIR)/unixport/ ; fi
 #	ln ${SYMB} ${INSTALL_LIB_DIR}/$(PORTDIR)/$(FLISP)$(EXE) \
 #	 $(DESTDIR)${prefix}/bin/gcl.exe
 	if [ -d "${TK_CONFIG_PREFIX}" ] ; then  \

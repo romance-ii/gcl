@@ -1,3 +1,10 @@
+gcl (2.5.0.cvs20020625-48) unstable; urgency=high
+
+  * Rework build and install so that custom images can be made without
+    the source tree, even when using dlopen
+
+ -- Camm Maguire <camm@enhanced.com>  Mon,  9 Sep 2002 23:26:47 -0400
+
 gcl (2.5.0.cvs20020625-47) unstable; urgency=high
 
   * Install cmpinclude.h in system include directory

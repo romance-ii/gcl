@@ -200,6 +200,7 @@ def_dlopen="no"
 def_statsysbfd="yes"
 def_custreloc="no"
 def_oldgmp="no"
+def_pic="no";
 case $use in 
      *linux)
 	ln -snf linux.defs h/$use.defs;
@@ -211,7 +212,7 @@ case $use in
 		ia64*)
 			def_dlopen="yes" ; def_statsysbfd="no" ;;
 		hppa*)
-			def_dlopen="yes" ; def_statsysbfd="no" ;;
+			def_dlopen="yes" ; def_statsysbfd="no" def_pic="yes" ;;
 #		m68k*)
 #			def_oldgmp="yes" ;;
 	esac;;
@@ -237,6 +238,9 @@ AC_ARG_ENABLE(custreloc,
 AC_ARG_ENABLE(debug,
 	[ --enable-debug builds gcl with -g in CFLAGS to enable running under gdb ]
 	,,enable_debug="no")
+AC_ARG_ENABLE(pic,
+	[ --enable-pic builds gcl with -fPIC in CFLAGS ]
+	,,enable_pic="$def_pic")
 
 AC_ARG_ENABLE(oldgmp,
 	[ --enable-oldgmp will link against gmp2 instead of gmp3 ]
@@ -318,10 +322,13 @@ case $use in
 	case $use in
 		alpha*)
 			TCFLAGS="$TCFLAGS -mieee";;
-		hppa*)
-			TCFLAGS="$TCFLAGS -fPIC";;
+#		hppa*)
+#			TCFLAGS="$TCFLAGS -fPIC";;
 	esac;;
 esac
+if test "$enable_pic" = "yes" ; then
+	TCFLAGS="$TCFLAGS -fPIC"
+fi
 
 
 # Step 1: set the variable "system" to hold the name and version number
