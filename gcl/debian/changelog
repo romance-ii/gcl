@@ -25,8 +25,9 @@ gclcvs (2.7.0-25) unstable; urgency=low
     settings.  Cast fixnum constant C arguments in gcl_cmploc.lsp
     explicitly to (long) to ensure they can be extracted via
     va_arg(,fixnum)
+  * reenable SA_SIGINFO on amd64 to restore SGC there
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 11 Jun 2004 03:07:57 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 11 Jun 2004 03:43:01 +0000
 
 gclcvs (2.7.0-24) unstable; urgency=low
 
