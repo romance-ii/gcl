@@ -21,7 +21,7 @@ void segmentation_catcher();
 EXTER int gc_enabled, saving_system;
 
 EXTER object lisp_package,user_package;
-EXTER object common_lisp_package,common_lisp_user_package;
+EXTER object common_lisp_package;
 EXTER char *core_end;
 EXTER int catch_fatal;
 EXTER int real_maxpage;

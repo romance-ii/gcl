@@ -69,6 +69,6 @@ remake:
 	(cd .. ; make)
 
 clean:
-	rm -f *.o core a.out
+	rm -f *.o core a.out *.fn
 allclean:
 	rm -f *.h *.data *.c

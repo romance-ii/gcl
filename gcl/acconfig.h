@@ -137,7 +137,12 @@ SGC is enabled.  */
 
 /* bfd support */
 #undef HAVE_LIBBFD
+#undef NEED_CONST
+
 #ifdef HAVE_LIBBFD
+#ifdef NEED_CONST
+#define CONST const
+#endif
 #define IN_GCC
 #include <bfd.h>
 #include <bfdlink.h>

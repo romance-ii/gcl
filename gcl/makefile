@@ -20,34 +20,67 @@ ODIR	= o
 LSPDIR	= lsp
 CMPDIR	= cmpnew
 PORTDIR	= unixport
+CLCSDIR = clcs
+PCLDIR = pcl
 MPDIR	= mp
 GMP_DIR = gmp/
 
-all:   ${HDIR}cmpinclude.h
+all: $(PORTDIR)/saved_gcl command cmpnew/collectfn.o lsp/info.o do-gcl-tk do-info
+
+$(PORTDIR)/saved_gcl: $(PORTDIR)/$(LISP)
+	cp $< $@
+
+$(PORTDIR)/saved_trad_gcl: ${HDIR}cmpinclude.h
 	(cd $(BINDIR); make all)
 	make mpfiles
 	rm -f o/cmpinclude.h ; ln h/cmpinclude.h o
 	(cd $(ODIR); make all)
 	(cd $(LSPDIR); make all)
 	(cd $(CMPDIR); make all)
-	(cd $(PORTDIR); make saved_gcl)
-	make command
+	cd $(@D) && make $(@F)
+#	(cd $(PORTDIR); make saved_gcl)
+#	(cd $(PCLDIR); make compile; make saved_gcl_pcl)
+#	(cd $(CLCSDIR); make compile; make saved_full_gcl)
+#	(cd $(PORTDIR); make saved_ansi_gcl)
+#	make command
 
 # 	After making successfully send in a notification to
 #	gcl@nicolas.ma.utexas.edu.   This is extremely helpful in
 #	tracking on which machines and OS versions there are problems.
 #	This will be done automatically by the  xbin/notify line.
-	(cd  cmpnew ; make collectfn.o)
-	(cd lsp ; make info.o)
-	@- if  [ -f cmpnew/collectfn.o ]  ; \
-	then echo "Make of GCL `cat majvers`.`cat minvers` completed." ; \
-        if [ "${NOTIFY}" = "yes" ] ; then \
-	./xbin/notify "CC=${CC}" ;  fi ;\
-	else echo "The new image failed to compile collectfn.lsp" ;fi ; \
-	if [ -d "${TK_CONFIG_PREFIX}" ] ; \
-	then (cd gcl-tk ; make) ; \
-	else echo "gcl-tk not made..missing include or lib" ; fi 
-	(cd info ; make)
+#	(cd  cmpnew ; make collectfn.o)
+#	(cd lsp ; make info.o)
+#	@- if  [ -f cmpnew/collectfn.o ]  ; \
+#	then echo "Make of GCL `cat majvers`.`cat minvers` completed." ; \
+#        if [ "${NOTIFY}" = "yes" ] ; then \
+#	./xbin/notify "CC=${CC}" ;  fi ;\
+#	else echo "The new image failed to compile collectfn.lsp" ;fi ; \
+#	if [ -d "${TK_CONFIG_PREFIX}" ] ; \
+#	then (cd gcl-tk ; make) ; \
+#	else echo "gcl-tk not made..missing include or lib" ; fi 
+#	(cd info ; make)
+
+$(PCLDIR)/saved_gcl_pcl: $(PORTDIR)/saved_trad_gcl
+	cd $(@D) &&  make compile LISP="../$<" &&  make $(@F) LISP="../$<"
+
+$(CLCSDIR)/saved_full_gcl: $(PCLDIR)/saved_gcl_pcl
+	cd $(@D) &&  make compile LISP="../$<" &&  make $(@F) LISP="../$<"
+
+$(PORTDIR)/saved_ansi_gcl: $(CLCSDIR)/saved_full_gcl
+	cd $(@D) &&  make $(@F)
+
+cmpnew/collectfn.o lsp/info.o:
+	cd $(@D) && make $(@F)
+
+do-gcl-tk:
+	if [ -d "${TK_CONFIG_PREFIX}" ] ; then \
+		cd gcl-tk && make ; \
+	else \
+		echo "gcl-tk not made..missing include or lib" ; \
+	fi 
+
+do-info:
+	cd info && make
 
 mpfiles: ${MPFILES}
 
@@ -120,6 +153,8 @@ clean:
 	(cd $(PORTDIR); make clean)
 	(cd gcl-tk ; make clean)
 	-(cd gmp ; make distclean)
+	cd $(CLCSDIR) && make clean
+	cd $(PCLDIR) && make clean
 	(cd info ; make clean)
 	rm -f foo.tcl config.log makedefs makedefsafter config.cache config.status makedefc
 	rm -f h/config.h h/gclincl.h h/cmpinclude.h
