@@ -7,8 +7,11 @@ gclcvs (2.7.0-16) unstable; urgency=low
   * Path to configure to make --enable-emacsdir work
   * Check for readline/readline.h header before configuring for readline
   * Improve system bfd library location detection
+  * Make sure external gmp lib is compatible via __GNU_MP_VERSION, else
+    backoff to local gmp build;  prepend externally defined CFLAGS into
+    output CFLAGS, FINAL_CFLAGS, and NIFLAGS
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 16 Nov 2003 19:09:29 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 17 Nov 2003 01:19:52 +0000
 
 gclcvs (2.7.0-15) unstable; urgency=low
 

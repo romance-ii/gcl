@@ -501,21 +501,33 @@ if test $use_gmp = yes ; then
  if test "$enable_dynsysgmp" = "yes" ; then
 	AC_CHECK_HEADER(gmp.h,
 		AC_CHECK_LIB(gmp,__gmpz_init,
-			MPFILES=$GMPDIR/mpn/mul_n.o
-			PATCHED_SYMBOLS=__gmpn_toom3_mul_n
-			if test "$use" = "m68k-linux" ; then
-				MPFILES="$MPFILES $GMPDIR/mpn/lshift.o $GMPDIR/mpn/rshift.o"
-				PATCHED_SYMBOLS="$PATCHED_SYMBOLS __gmpn_lshift __gmpn_rshift"
-			fi
-			TLIBS="$TLIBS -lgmp"
-			echo "#include \"gmp.h\"" >foo.c
-			echo "int main() {return 0;}" >>foo.c
-			MP_INCLUDE=`cpp foo.c | grep /gmp.h | head -1l | $AWK '{print $3}' | tr -d '"'`
-			rm -f foo.c,
-			echo "Cannot use dynamic gmp lib" ; exit 1,),
-		echo "Cannot use dynamic gmp lib" ; exit 1,)
+			AC_MSG_CHECKING("for external gmp version")
+			AC_TRY_RUN([#include <gmp.h>
+				    int main() {
+				    #if __GNU_MP_VERSION == 4
+					return 0;
+				    #else
+					return -1;
+				    #endif
+				    }],
+				MPFILES=$GMPDIR/mpn/mul_n.o
+				PATCHED_SYMBOLS=__gmpn_toom3_mul_n
+				if test "$use" = "m68k-linux" ; then
+					MPFILES="$MPFILES $GMPDIR/mpn/lshift.o $GMPDIR/mpn/rshift.o"
+					PATCHED_SYMBOLS="$PATCHED_SYMBOLS __gmpn_lshift __gmpn_rshift"
+				fi
+				TLIBS="$TLIBS -lgmp"
+				echo "#include \"gmp.h\"" >foo.c
+				echo "int main() {return 0;}" >>foo.c
+				MP_INCLUDE=`cpp foo.c | grep /gmp.h | head -1l | $AWK '{print $3}' | tr -d '"'`
+				rm -f foo.c,
+				echo "Cannot use dynamic gmp lib" , echo "Cannot use dynamic gmp lib" ),
+			echo "Cannot use dynamic gmp lib" ,),
+		echo "Cannot use dynamic gmp lib" ,)
 
-else			
+fi
+
+if test "$MP_INCLUDE" = "" ; then			
 
 	cp $GMPDIR/gmp.h h/gmp.h
 	MP_INCLUDE=h/gmp.h
@@ -1483,13 +1495,13 @@ fi
 
 LIBS="$LIBS $TLIBS"
 AC_SUBST(LIBS)
-FINAL_CFLAGS="$TCFLAGS $PROCESSOR_FLAGS"
+FINAL_CFLAGS="$CFLAGS $TCFLAGS $PROCESSOR_FLAGS"
 AC_SUBST(FINAL_CFLAGS)
-CFLAGS="$TCFLAGS $TO3FLAGS $PROCESSOR_FLAGS -I\$(GCLDIR)/o"
-AC_SUBST(CFLAGS)
 # Work around bug with gcc on ppc -- CM
-NIFLAGS="$TCFLAGS $TONIFLAGS $PROCESSOR_FLAGS -I\$(GCLDIR)/o"
+NIFLAGS="$CFLAGS $TCFLAGS $TONIFLAGS $PROCESSOR_FLAGS -I\$(GCLDIR)/o"
 AC_SUBST(NIFLAGS)
+CFLAGS="$CFLAGS $TCFLAGS $TO3FLAGS $PROCESSOR_FLAGS -I\$(GCLDIR)/o"
+AC_SUBST(CFLAGS)
 O3FLAGS=$TO3FLAGS
 AC_SUBST(O3FLAGS)
 O2FLAGS=$TO2FLAGS
