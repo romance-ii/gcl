@@ -2,8 +2,10 @@ gclcvs (2.7.0-6) unstable; urgency=low
 
   * Enable NIFLAGS variable to work around ppc compiler bug
   * VERSION correction in configure
+  * Merge in compilation from lsp step in lsp and cmpnew directories via
+    saved_pre_gcl from 2.6.1
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 24 Sep 2003 15:40:14 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 24 Sep 2003 16:28:59 +0000
 
 gclcvs (2.7.0-5) unstable; urgency=low
 

@@ -15,17 +15,17 @@ OBJS	= gcl_cmpbind.o gcl_cmpblock.o gcl_cmpcall.o gcl_cmpcatch.o gcl_cmpenv.o gc
 
 FNS:= $(OBJS:.o=.fn)
 
-COMPILE_FILE=$(PORTDIR)/saved_gcl $(PORTDIR) -system-p -c-file -data-file \
+COMPILE_FILE=$(PORTDIR)/saved_pre_gcl $(PORTDIR) -system-p -c-file -data-file \
 	-o-file nil -h-file -compile
 #CFLAGS	= -c -O -I../h 
 
 .lsp.c:
-	@ ../xbin/if-exists $(PORTDIR)/saved_gcl \
+	@ ../xbin/if-exists $(PORTDIR)/saved_pre_gcl \
 	"rm -f $*.c $*.h $*.data $*.o" \
 	"$(COMPILE_FILE) $* "
 
 .lsp.o:
-	@ ../xbin/if-exists $(PORTDIR)/saved_gcl \
+	@ ../xbin/if-exists $(PORTDIR)/saved_pre_gcl \
 	"rm -f $*.c $*.h $*.data $*.o" \
 	"$(COMPILE_FILE) $* " \
 	"$(CC) $(OFLAG) $(CFLAGS) -c $*.c" \
@@ -42,11 +42,11 @@ all:	$(OBJS)
 	${APPEND} ${NULLFILE} $*.data  $*.o
 
 gcl_collectfn.o:
-	$(PORTDIR)/saved_gcl $(PORTDIR)/ -compile $*.lsp
+	$(PORTDIR)/saved_pre_gcl $(PORTDIR)/ -compile $*.lsp
 
 .lisp.o:
-	@ ../xbin/if-exists $(PORTDIR)/saved_gcl \
-	"$(PORTDIR)/saved_gcl $(PORTDIR)/ -compile $*.lisp " 
+	@ ../xbin/if-exists $(PORTDIR)/saved_pre_gcl \
+	"$(PORTDIR)/saved_pre_gcl $(PORTDIR)/ -compile $*.lisp " 
 sys-proclaim.lisp: $(FNS)
 	echo '(in-package "COMPILER")' \
 	'(load "../cmpnew/gcl_collectfn")(load "../lsp/sys-proclaim.lisp")'\
@@ -70,6 +70,6 @@ remake:
 	(cd .. ; $(MAKE))
 
 clean:
-	rm -f *.o core a.out *.fn
+	rm -f *.o core a.out *.fn *.c *.h *.data
 allclean:
 	rm -f *.h *.data *.c

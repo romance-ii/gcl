@@ -49,7 +49,7 @@ h/bfd.h: binutils/bfd/libbfd.a binutils/libiberty/libiberty.a
 h/bfdlink.h h/ansidecl.h h/symcat.h: binutils/bfd/libbfd.a binutils/libiberty/libiberty.a
 	cp $(<D)/../include/$(@F) $@
 
-$(PORTDIR)/saved_gcl: $(HDIR)cmpinclude.h
+$(PORTDIR)/saved_pre_gcl: $(HDIR)cmpinclude.h
 	(cd $(BINDIR); $(MAKE) all)
 	$(MAKE) mpfiles
 	rm -f o/cmpinclude.h ; cp h/cmpinclude.h o
@@ -57,8 +57,11 @@ $(PORTDIR)/saved_gcl: $(HDIR)cmpinclude.h
 	$(MAKE) $<
 	rm -f o/cmpinclude.h ; cp h/cmpinclude.h o
 	(cd $(ODIR); $(MAKE) all)
-	(cd $(LSPDIR); $(MAKE) all)
-	(cd $(CMPDIR); $(MAKE) all)
+	cd $(@D) && $(MAKE) $(@F)
+
+$(PORTDIR)/saved_gcl: $(HDIR)cmpinclude.h $(PORTDIR)/saved_pre_gcl
+	(cd $(LSPDIR); touch *.lsp ; $(MAKE) all)
+	(cd $(CMPDIR); touch *.lsp ; $(MAKE) all)
 	cd $(@D) && $(MAKE) $(@F)
 
 $(PORTDIR)/saved_mod_gcl: $(PORTDIR)/saved_gcl

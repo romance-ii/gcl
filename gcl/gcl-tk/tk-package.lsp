@@ -26,7 +26,6 @@ si::match-beginning si::idescribe
 			      si::*tk-library*
 			      si::*tk-connection*
 			      si::show-info
-			      si::tkerror
 			      si::tkconnect
                               si::*match-data*)
    "TK")

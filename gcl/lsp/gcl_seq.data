@@ -1,7 +1,0 @@
-       
-#(#! 
-(lisp::in-package (lisp::quote user::lisp))#! 
-(lisp::export (lisp::quote (lisp::make-sequence lisp::concatenate lisp::map lisp::some lisp::every lisp::notany lisp::notevery)))#! 
-(lisp::in-package (lisp::quote lisp::system))
-#(lisp::list :initial-element lisp::simple-string lisp::string lisp::string-char lisp::simple-bit-vector lisp::bit-vector lisp::bit lisp::simple-vector lisp::vector lisp::null lisp::cons :wrong-type-argument "~S is not of type ~S." "list (size ~S)" lisp::array lisp::simple-array "~S is not of type ~S." lisp::sequence "~S is not of type ~S." "~S (size ~S)" system::normalize-type lisp::subtypep lisp::specific-error system::best-array-element-type lisp::make-sequence lisp::some lisp::every (system::%init . #((lisp::proclaim (lisp::quote (lisp::optimize (lisp::safety 2) (lisp::space 3)))) (system::mfvfun-key (lisp::quote lisp::make-sequence) 0 16386 1) (system::mfvfun (lisp::quote lisp::concatenate) 2 16385) (system::mfvfun (lisp::quote lisp::map) 3 16387) (system::mfvfun (lisp::quote lisp::some) 4 16386) (system::mfvfun (lisp::quote lisp::every) 5 16386) (system::mfvfun (lisp::quote lisp::notany) 6 16386) (system::mfvfun (lisp::quote lisp::notevery) 7 16386))))
-)

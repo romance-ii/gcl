@@ -37,8 +37,8 @@ bfdfiles: $(shell find ../binutils -name "*.o")
 	done 
 	touch $@
 
-OBJS:=$(shell j=$$(ar t $(ODIR)/gcllib.a) ; for i in $$(ls -1 $(ODIR)/*.o) ; do if ! echo $$j |grep -q $$(basename $$i) ; then echo $$i ; fi ; done)
-OBJS:=$(OBJS) $(shell ls -1 $(LSPDIR)/*.o)
+OOBJS:=$(shell j=$$(ar t $(ODIR)/gcllib.a) ; for i in $$(ls -1 $(ODIR)/*.o) ; do if ! echo $$j |grep -q $$(basename $$i) ; then echo $$i ; fi ; done)
+OBJS:=$(OOBJS) $(shell ls -1 $(LSPDIR)/*.o)
 OBJS:=$(OBJS) $(shell ls -1 $(CMPDIR)/*.o | grep -v collectfn.o)
 
 MODOBJS:=$(shell ls -1 $(MDIR)/*.o)
@@ -51,6 +51,9 @@ $(LSPDIR)/auto_new.lsp: $(LSPDIR)/auto.lsp
 		echo "(AUTOLOAD 'init-readline '|readline|)" >>$@
 
 init_gcl.lsp.tmp: init_gcl.lsp.in
+	cp $< $@
+
+init_pre_gcl.lsp.tmp: init_pre_gcl.lsp.in
 	cp $< $@
 
 init_mod_gcl.lsp.tmp: init_mod_gcl.lsp.in
@@ -112,6 +115,10 @@ $(HDIR)/mdefs.h: $(HDIR)/include.h
 	cat $(HDIR)/include.h | sed -e "/include/d" > $(HDIR)/mdefs.h
 
 libgcl.a: $(FIRST_FILE) $(OBJS) sys_gcl.o $(LAST_FILE) gmpfiles bfdfiles
+	rm -rf $@
+	ar rs $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
+
+libpre_gcl.a: $(FIRST_FILE) $(OOBJS) sys_pre_gcl.o $(LAST_FILE) gmpfiles bfdfiles
 	rm -rf $@
 	ar rs $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 

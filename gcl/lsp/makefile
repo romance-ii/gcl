@@ -18,17 +18,17 @@ OBJS	= gcl_arraylib.o gcl_assert.o gcl_defmacro.o gcl_defstruct.o \
 # export.o autoload.o auto_new.o
 
 
-COMPILE_FILE=$(PORTDIR)/saved_gcl $(PORTDIR) -system-p -c-file -data-file \
+COMPILE_FILE=$(PORTDIR)/saved_pre_gcl $(PORTDIR) -system-p -c-file -data-file \
 	-o-file nil -h-file -compile
 #CFLAGS	= -c -O -I../h 
 
 .lsp.c: 
-	@ ../xbin/if-exists $(PORTDIR)/saved_gcl \
+	@ ../xbin/if-exists $(PORTDIR)/saved_pre_gcl \
 	"rm -f $*.c $*.h $*.data $*.o" \
 	"$(COMPILE_FILE) $* "
 
 .lsp.o: 
-	 @ ../xbin/if-exists $(PORTDIR)/saved_gcl \
+	 @ ../xbin/if-exists $(PORTDIR)/saved_pre_gcl \
 	"rm -f $*.c $*.h $*.data $*.o" \
 	"$(COMPILE_FILE) $* " \
 	"$(CC) $(OFLAG) $(CFLAGS) -c $*.c " \
@@ -58,7 +58,7 @@ fns:	../cmpnew/gcl_collectfn.o
 
 
 clean:
-	rm -f *.o core a.out *.fn
+	rm -f *.o core a.out *.fn *.c *.h *.data
 allclean:
 	rm -f *.h *.data *.c
 
