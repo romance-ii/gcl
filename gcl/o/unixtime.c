@@ -44,15 +44,22 @@ which is usually 60 maybe 100 or something else. */
 #define HZ1 (HZ > 100 ? 100 : HZ)
 
 #ifdef USE_ATT_TIME
-#undef BSD
-#define ATT
+#  undef BSD
+#  define ATT
 #endif
+
 #if defined __MINGW32__ || !defined NO_SYSTEM_TIME_ZONE
-#ifdef __MINGW32__
-#include <sys/timeb.h>
+
+#  ifdef __MINGW32__
+#    include <sys/timeb.h>
+
+static struct timeb t0;
 int usleep ( unsigned int microseconds );
-#endif
+
+#  endif
+
 void siLget_system_time_zone(void);
+
 #endif /* __MINGW32__ or  !defined NO_SYSTEM_TIME_ZONE */
 
 #ifdef BSD
@@ -75,7 +82,18 @@ runtime(void)
 {
 
 #ifdef USE_INTERNAL_REAL_TIME_FOR_RUNTIME
-    return fLget_internal_real_time();
+
+#  ifdef __MINGW32__    
+    struct timeb t;
+    if ( t0.time == 0 ) {
+        ftime(&t0);
+    }
+    ftime ( &t );
+    return ( ( t.time - t0.time ) * HZ1 + ( (t.millitm) * HZ1 ) / 1000 );
+#  else
+#  error Need to return runtime without generating a fixnum (else GBC(t_fixnum) will loop)
+#  endif
+    
 #else	
 	{
 	  struct tms buf;
@@ -153,11 +171,12 @@ DEFUN("GET-INTERNAL-REAL-TIME",object,fLget_internal_real_time,LISP,0,0,NONE,OO,
      ()
 {
 #ifdef __MINGW32__
-    static struct timeb t0;
     struct timeb t;
-    if (t0.time == 0) ftime(&t0);
+    if ( t0.time == 0 ) {
+        ftime ( &t0 );
+    }
     ftime(&t);
-    return make_fixnum((t.time - t0.time)*HZ1 + ((t.millitm)*HZ1)/1000);
+    return ( make_fixnum ( ( t.time - t0.time ) * HZ1 + ( (t.millitm) * HZ1 ) / 1000 ) );
 #endif  
 #ifdef BSD
 	static struct timeval begin_tzp;
@@ -192,6 +211,9 @@ init_unixtime(void)
 #ifdef ATT
 	beginning = time(0);
 #endif
+#  if defined __MINGW32__
+        ftime(&t0);
+#  endif        
 
 	make_constant("INTERNAL-TIME-UNITS-PER-SECOND", make_fixnum(HZ1));
 
@@ -226,7 +248,7 @@ int system_time_zone_helper(void)
 #endif
 
 /* At GCC 3.2, Mingw struct tm does not include tm_gmtoff so avoid this version */
-#if !defined NO_SYSTEM_TIME_ZONE && !defined ( __MINGW32__ )
+#if !defined ( NO_SYSTEM_TIME_ZONE ) && !defined ( __MINGW32__ )
 int system_time_zone_helper(void){
   
   struct tm *local;
@@ -243,7 +265,8 @@ int system_time_zone_helper(void){
 }
 #endif /* !defined NO_SYSTEM_TIME_ZONE */
 
-#if defined __MINGW32__ || !defined NO_SYSTEM_TIME_ZONE 
+#if defined __MINGW32__ || !defined NO_SYSTEM_TIME_ZONE
+
 void
 siLget_system_time_zone(void)
 {
