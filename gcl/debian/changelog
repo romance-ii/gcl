@@ -10,8 +10,9 @@ gclcvs (2.7.0-4) unstable; urgency=low
     normalize-type, some more predicate type pairs added
   * Allow for non-keyword type keywords, and fix some allow-other-keys
     processing
+  * Fix typo in fasldlsym.c, Closes: #212239
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 22 Sep 2003 22:02:13 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 22 Sep 2003 22:02:57 +0000
 
 gclcvs (2.7.0-3) unstable; urgency=low
 
