@@ -819,29 +819,15 @@ integer_divide1(object x, object y)
 object
 get_gcd(object x, object y)
 {
-	object	q, r;
+	object	r;
 
 	if (number_minusp(x))
 		x = number_negate(x);
 	if (number_minusp(y))
 		y = number_negate(y);
 
-L:
 	if (type_of(x) == t_fixnum && type_of(y) == t_fixnum) {
-	  /* LL: */
-	  /* 		if (i < j) { */
-	  /* 			k = i; */
-	  /* 			i = j; */
-	  /* 			j = k; */
-	  /* 		} */
-	  /* 		if (j == 0) { */
-	  /* 			return(make_fixnum(i)); */
-	  /* 		} */
-	  /* 		k = i % j; */
-	  /* 		i = j; */
-	  /* 		j = k; */
-	  /* 		goto LL; */
-	  
+
 	  register fixnum i, j, k, t;
 
 	  if (!(i = fix(x)))
@@ -869,13 +855,17 @@ L:
 		x = y;
 		y = r;
 	}
-	if (type_of(y) == t_fixnum && fix(y) == 0) {
-		return(x);
+	if (type_of(y) == t_fixnum) {
+	  if (fix(y))
+	    return make_fixnum(mpz_gcd_ui(NULL,MP(x),fix(y)));
+	  else
+	    return(x);
 	}
-	integer_quotient_remainder_1(x, y, &q, &r);
-	 x = y;
-	 y = r;
-	goto L;
+
+	r=new_bignum();
+	mpz_gcd(MP(r),MP(x),MP(y));
+	return normalize_big(r);
+	  
 }
 
 /* (+          )   */

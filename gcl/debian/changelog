@@ -1,4 +1,11 @@
-gclcvs (2.7.0-31) unstable; urgency=low
+gclcvs (2.7.0-32) unstable; urgency=low
+
+  * Use GMP gcd in bignum case, for performance improvement and better
+    binary algorithm
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 20 Aug 2004 15:23:50 +0000
+
+gclcvs (2.7.0-31) unstable; urgency=high
 
   * New gmp_wrappers.{c,h} files that prevent all GBC within gmp,
     obviating the need for gmp patches and a local gmp configure.  FIXME
