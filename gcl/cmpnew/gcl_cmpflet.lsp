@@ -323,8 +323,14 @@
            (if ccb
                (setf (fun-ref-ccb fun) t)
                (setf (fun-ref fun) t))
-           (return (list 'call-local *info* fun ccb)))))
-  )
+	   ;; Add fun-info here at the bottom of the call-local processing tree
+	   ;; FIXME -- understand why special variable *info* is used in certain
+	   ;; cases and copy-info in othes.
+	   ;; This extends local call arg side-effect protection (via args-info-changed-vars)
+	   ;; through c1funob to other call methods than previously supported c1symbol-fun,
+	   ;; e.g. c1multiple-value-call, etc.  CM 20031030
+	   (add-info *info* (fun-info fun))
+	   (return (list 'call-local *info* fun ccb))))))
 
 (defun sch-local-fun (fname)
   ;;; Returns fun-ob for the local function (not locat macro) named FNAME,
@@ -345,8 +351,14 @@
            (when (eq (car fun) fname) (return (cadr fun))))
           ((eq (fun-name fun) fname)
            (setf (fun-ref-ccb fun) t)
-           (return (list 'call-local *info* fun ccb)))))
-  )
+	   ;; Add fun-info here at the bottom of the call-local processing tree
+	   ;; FIXME -- understand why special variable *info* is used in certain
+	   ;; cases and copy-info in othes.
+	   ;; This extends local call arg side-effect protection (via args-info-changed-vars)
+	   ;; through c1funob to other call methods than previously supported c1symbol-fun,
+	   ;; e.g. c1multiple-value-call, etc.  CM 20031030
+	   (add-info *info* (fun-info fun))
+           (return (list 'call-local *info* fun ccb))))))
 
 (defun c2call-local (fd args &aux (*vs* *vs*))
   ;;; FD is a list ( fun-object ccb ).

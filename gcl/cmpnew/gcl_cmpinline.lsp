@@ -37,21 +37,19 @@
 (defvar *info* (make-info))
 
 (defun add-info (to-info from-info)
+  ;; Allow nil from-info without error CM 20031030
+  (unless from-info
+    (return-from add-info to-info))
  (dolist (v (info-changed-vars from-info))
    (unless (member v (info-changed-vars to-info))
-     (push v (info-changed-vars to-info) )))
+     (push v (info-changed-vars to-info))))
  (dolist (v (info-referred-vars from-info))
    (unless (member v (info-referred-vars to-info))
-     (push v (info-referred-vars to-info) )))
-;  (setf (info-changed-vars to-info)
-;        (append (info-changed-vars from-info)
-;                (info-changed-vars to-info)))
-;  (setf (info-referred-vars to-info)
-;        (append (info-referred-vars from-info)
-;                (info-referred-vars to-info)))
+     (push v (info-referred-vars to-info))))
   (when (info-sp-change from-info)
         (setf (info-sp-change to-info) t))
-  )
+  ;; Return to-info, CM 20031030
+  to-info)
 
 (defun args-info-changed-vars (var forms)
   (case (var-kind var)

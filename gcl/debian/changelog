@@ -1,8 +1,14 @@
 gclcvs (2.7.0-13) unstable; urgency=low
 
   * Repair weak symbol addition to the bfd symbol table in sfasli.c
+  * Be more thorough about adding fun-info to call-local info in
+    gcl_cmpflet.lsp, accompanying simplifications in gcl_cmpeval.lsp
+    (call-global lists have info updated by args already in (c1args args
+    info)), small changes in add-info in gcl_cmpinline.lsp, FIXME --
+    study rational for *info* special variable in certain places as
+    opposed to more common copy-info
 
- -- Camm Maguire <camm@intech.m.enhanced.com>  Thu, 30 Oct 2003 20:10:31 -0500
+ -- Camm Maguire <camm@intech.m.enhanced.com>  Thu, 30 Oct 2003 20:23:17 -0500
 
 gclcvs (2.7.0-12) unstable; urgency=low
 

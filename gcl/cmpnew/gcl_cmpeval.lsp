@@ -205,15 +205,10 @@
 	      (funcall fd fname args)))
         ((setq fd (c1local-fun fname))
          (if (eq (car fd) 'call-local)
-             (let* ((info (make-info :sp-change t))
+	     ;; c1local-fun now adds fun-info into (cadr fd), so we need no longer
+	     ;; do it explicitly here.  CM 20031030
+             (let* ((info (add-info (make-info :sp-change t) (cadr fd)))
                     (forms (c1args args info)))
-	       ;; fun-info, CM 20031008  accumulate local function info, particularly changed-vars,
-	       ;; and pass upwards to call-local and call-global to prevent certain inlining in inline-args
-	       ;; via args-info-changed-vars		 
-	       ;;
-	       ;; FIXME find out where fun-info can be nil
-	       (when (fun-info (caddr fd))
-		 (add-info info (fun-info (caddr fd))))
                   (let ((return-type (get-local-return-type (caddr fd))))
                        (when return-type (setf (info-type info) return-type)))
                   (let ((arg-types (get-local-arg-types (caddr fd))))
@@ -271,15 +266,7 @@
          (cmperr "Sharp-comma-macro was found in a bad place."))
         (t (let* ((info (make-info
                         :sp-change (null (get fname 'no-sp-change))))
-                  (forms (c1args args info)))
-	     ;; fun-info, CM 20031008  accumulate local function info, particularly changed-vars,
-	     ;; and pass upwards to call-local and call-global to prevent certain inlining in inline-args
-	     ;; via args-info-changed-vars		 
-	     ;;
-	     ;; FIXME find out where fun-info can be nil
-	     (do ((form forms (cdr form))) ((endp form))
-	       (when (cadar form)
-		 (add-info info (cadar form))))
+                  (forms (c1args args info))) ;; info updated by args here
                 (let ((return-type (get-return-type fname)))
 		  (when return-type
 			(if (equal return-type '(*))
