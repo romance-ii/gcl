@@ -432,9 +432,9 @@ if test "$enable_statsysbfd" = "yes" || test "$enable_dynsysbfd" = "yes" ; then
 				    #include <bfd.h>
 				    int main() { symbol_info t; return 0;}],
 				AC_MSG_RESULT(no),
-				AC_TRY_RUN([#define IN_GCC
+				AC_TRY_RUN([#define CONST const
+                                            #define IN_GCC
 					    #include <bfd.h>
-                                            #define CONST const
 					    int main() {symbol_info t; return 0;}],
 					AC_MSG_RESULT(yes) 
 					AC_DEFINE(NEED_CONST),

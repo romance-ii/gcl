@@ -1638,9 +1638,9 @@ else
   cat > conftest.$ac_ext <<EOF
 #line 1640 "configure"
 #include "confdefs.h"
-#define IN_GCC
+#define CONST const
+                                            #define IN_GCC
 					    #include <bfd.h>
-                                            #define CONST const
 					    int main() {symbol_info t; return 0;}
 EOF
 if { (eval echo configure:1647: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null

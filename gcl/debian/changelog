@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-40) unstable; urgency=high
+
+  * revamp CONST configure test for certain bfd versions
+
+ -- Camm Maguire <camm@enhanced.com>  Sun, 11 Aug 2002 12:31:35 -0400
+
 gcl (2.5.0.cvs20020625-39) unstable; urgency=high
 
   * gcc-3.1 for ia64 fixes a compilation bug in num_co.c for -O3 and
