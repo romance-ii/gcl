@@ -6,38 +6,12 @@
 
 SHELL        = sh
 
-OFLAG	     = -O 
-LIBS	    += -lws2_32
+LIBS	    += -lwsock32
 LIBC 	     =
-
-ODIR_DEBUG   = -g
-
-CROSS_PREFIX =
-
-# MPICHDIR     = "c:/Program Files/Argonne National Lab/MPICH.NT.1.2.3/SDK.gcc"
-# MPIDIR       = $(GCLDIR)/gcl-mpi
-# MPILSP       = $(MPIDIR)/mpi_glue.lsp
-# MPIOBJS      = $(MPIDIR)/mpi_glue.o
-# LIBS        += -L$(MPICHDIR)/lib -lmpich
-
-# Remove -fno-zero-initialized-in-bss if using gcc less than 3.3.1
-# It is needed for the Unexec stuff to work with 3.3.1 at least
-CFLAGS       = -fno-zero-initialized-in-bss -mms-bitfields -Wall -fwritable-strings -DVOL=volatile -fsigned-char $(PROCESSOR_FLAGS) $(ODIR_DEBUG) -I$(GCLDIR)/o 
-FINAL_CFLAGS = -fno-zero-initialized-in-bss -mms-bitfields -Wall -fwritable-strings -DVOL=volatile -fsigned-char $(PROCESSOR_FLAGS) $(ODIR_DEBUG)
-NIFLAGS      = -fno-zero-initialized-in-bss -mms-bitfields -Wall -fwritable-strings -DVOL=volatile -fsigned-char $(PROCESSOR_FLAGS) $(ODIR_DEBUG) -I$(GCLDIR)/o
-O3FLAGS      = -O2 -fomit-frame-pointer
-O2FLAGS      = -O
 
 # Unexec dependency
 
-UNIX_SAVE_DEP  = unexnt.c
-
-AS             = ${CROSS_PREFIX}as
-AR             = ${CROSS_PREFIX}ar q
-RANLIB         = ${CROSS_PREFIX}ranlib
-
-
-LDCC           = ${CC}
+UNIX_SAVE_DEP = unexnt.c
 
 # Enable the fastloading mechanism which does not use ld -A
 # requires c/rel_.. machine dependent code.
@@ -45,9 +19,10 @@ LDCC           = ${CC}
 RSYM	     = rsym.exe
 SPECIAL_RSYM = rsym_nt.c
 SFASL	     = $(ODIR)/sfasl.o
-
 FIRST_FILE   = $(ODIR)/firstfile.o
 LAST_FILE    = $(ODIR)/lastfile.o
+LIBFILES     = bcmp.o bzero.o bcopy.o
+EXTRAS       = ${ODIR}/mingwin.o ${ODIR}/mingfile.o
 
 # When using SFASL it is good to have (si::build-symbol-table)
 INITFORM     = (si::build-symbol-table)
@@ -59,28 +34,6 @@ APPEND       = ../bin/append
 # suffixes for executables and batch files
 EXE          = .exe
 BAT          = .bat
-
-LIBFILES     = bcmp.o bzero.o bcopy.o
-EXTRAS       = ${ODIR}/mingwin.o ${ODIR}/mingfile.o
-
-# Work around install problem caused by non-support of GCL TK
-# on Windows platforms.
-
-TK_CONFIG_PREFIX=
-TK_LIBRARY=
-TCL_LIBRARY=
-TK_XINCLUDES=
-TK_INCLUDE=
-TCL_INCLUDE=
-TK_LIB_SPEC=
-TK_BUILD_LIB_SPEC=
-TK_XLIBSW=
-TK_XINCLUDES=
-TCL_LIB_SPEC=
-TCL_DL_LIBS=
-TCL_LIBS=
-TK_LISP_LIB=
-TCL_EXES=
 
 # Don't do dvi on Windows, just HTML
 GCL_DVI=

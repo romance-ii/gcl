@@ -71,7 +71,6 @@ AC_ARG_ENABLE(xdr,[ --enable-xdr=yes will compile in support for XDR],
 
 AC_CANONICAL_HOST
 canonical=$host
-## host=CPU-COMPANY-SYSTEM
 AC_MSG_RESULT(host=$host)
 
 PROCESSOR_FLAGS=${PROCESSOR_FLAGS:-""}
@@ -226,10 +225,11 @@ case $canonical in
      i*mingw*)
        if test "$use_common_binary" = "yes"; then
          host=i386-pc-mingw32
-	 PROCESSOR_FLAGS="-mcpu=i386 -march=i386 "
+	 PROCESSOR_FLAGS="-mcpu=i386 -march=i386"
          echo "The host is canonicalised to $host"
        fi
-     use=mingw;;
+
+       use=mingw;;
 
      i*cygwin*)
 	if $CC -v 2>&1 | fgrep ming > /dev/null ;
@@ -391,6 +391,12 @@ AC_SUBST(CC)
 TCFLAGS="-Wall -DVOL=volatile -fsigned-char"
 if test "$GCC" = "yes" ; then
 	TCFLAGS="$TCFLAGS -fwritable-strings -pipe"
+	case $use in
+	     *mingw*)
+	        echo "WARNING: Remove -fno-zero-initialized-in-bss from makedefs if gcc less than 3.3.1."
+	        echo "         It is ptherwise needed for the Unexec stuff to work."
+		TCFLAGS="$TCFLAGS -fno-zero-initialized-in-bss -mms-bitfields";;
+        esac
 fi
 #if test -f /proc/sys/kernel/exec-shield ; then
 #	exec_stat=`cat /proc/sys/kernel/exec-shield`
@@ -415,7 +421,12 @@ if test "$enable_debug" = "yes" ; then
 	# for subconfigurations
 	CFLAGS="$CFLAGS -g"
 else
-	TO3FLAGS="-O3 $TFPFLAG"
+	case "$use" in
+	  *mingw*)
+		TO3FLAGS="-O $TFPFLAG";;
+	  *)
+		TO3FLAGS="-O3 $TFPFLAG";;
+	esac
 	TO2FLAGS="-O"
 fi
 
@@ -1104,12 +1115,12 @@ AC_EGREP_HEADER([gettimeofday],
 
 AC_CHECK_LIB(m,sin,LIBS="${LIBS} -lm",true)
 AC_CHECK_LIB(mingwex,main,LIBS="${LIBS} -lmingwex",true)
-# AC_CHECK_LIB(japi,j_start,LIBS="${LIBS} -ljapi -lws2_32",true)
+
 EXTRA_LOBJS=
 if test "$try_japi" = "yes" ; then
    AC_CHECK_HEADERS(japi.h,[AC_DEFINE(HAVE_JAPI_H)
 				 EXTRA_LOBJS="${EXTRA_LOBJS} gcl_japi.o"
-			 	 LIBS="${LIBS} -ljapi -lws2_32"] )
+			 	 LIBS="${LIBS} -ljapi -lwsock32"] )
 fi
 if test "$use" = "mingw" ; then
  if test "$try_xdr" = "yes" ; then

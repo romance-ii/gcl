@@ -159,8 +159,10 @@ extern DBEGIN_TY _stacktop, _stackbottom;
 #define ADDITIONAL_FEATURES \
 	 ADD_FEATURE("I386"); \
          ADD_FEATURE("WINNT"); \
-         ADD_FEATURE("BROKEN_O4_OPT"); \
          ADD_FEATURE("MINGW32");
+
+/*         ADD_FEATURE("BROKEN_O4_OPT"); \ */
+
   
 #undef SET_REAL_MAXPAGE  
 #define SET_REAL_MAXPAGE \
