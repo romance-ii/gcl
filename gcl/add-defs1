@@ -6,7 +6,7 @@ if test "$1" = "mingw" -o  "$1" = "gnuwin95"  ; then
    rm -f o/*.ini
 fi
  
-(cd bin ; make file-sub EXE=${EXE} CC=${CC})
+#(cd bin ; make file-sub EXE=${EXE} CC=${CC})
 
 if [ $# -le 0 ]  ; then
   echo usage: ./add-defs machine-type;
@@ -53,15 +53,15 @@ echo $1 > machine
   echo "# end makedefs" >> makedefs
    
 
-  echo inserting h/$1.defs in ..
-  for v in makefile unixport/make_kcn */makefile ; 
-  do
-  echo " $v,"
-  ./bin/file-sub makedefs $v "# begin makedefs" "# end makedefs" tmpx
-  mv tmpx $v
-  done
-
-echo ""
+#  echo inserting h/$1.defs in ..
+#  for v in makefile unixport/make_kcn */makefile ; 
+#  do
+#  echo " $v,"
+#  ./bin/file-sub makedefs $v "# begin makedefs" "# end makedefs" tmpx
+#  mv tmpx $v
+#  done
+#
+#echo ""
 
 # Copy the config.h over.
 
