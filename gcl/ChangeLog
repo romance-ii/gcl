@@ -1,3 +1,8 @@
+2001-01-30  Bill Schelter  <wfs@sonia.ma.utexas.edu>
+
+	* many changes added for MS windows version..
+	* add check on CSTACK_ADDRESS to configure for NULL_OR_ON_C_STACK
+
 2000-10-27  Bill Schelter  <wfs@sonia.ma.utexas.edu>
 
 	*  o/file.d bug in close_stream

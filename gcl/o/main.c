@@ -243,6 +243,8 @@ char **argv, **envp;
 	if (initflag) {
 		if (saving_system) {
 			saving_system = FALSE;
+			terminal_io->sm.sm_object0->sm.sm_fp = stdin;
+			terminal_io->sm.sm_object1->sm.sm_fp = stdout;
 #ifdef INIT_CORE_END
 			INIT_CORE_END
 #endif			  
@@ -850,7 +852,9 @@ init_main()
 	 ADD_FEATURE("GCL");	 
 
 #ifdef UNIX
+#ifndef WINDOWSNT	 
 	ADD_FEATURE("UNIX");
+#endif	
 #endif
 #ifdef IEEEFLOAT
        ADD_FEATURE("IEEE-FLOATING-POINT");

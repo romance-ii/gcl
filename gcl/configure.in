@@ -36,6 +36,12 @@ fi
 # addresses, in calculating a page for an address in the heap.
 
 AC_PROG_CC
+if test "${GCC}" -eq "yes" ; then
+GCC=gcc
+else
+GCC=""
+fi
+
 
 AC_MSG_CHECKING("finding DBEGIN")
 AC_TRY_RUN([#include <stdio.h>
@@ -50,6 +56,20 @@ AC_DEFINE_UNQUOTED(DBEGIN,$dbegin \
 /* where data begins */
 )
 AC_MSG_RESULT(got $dbegin)
+
+
+AC_MSG_CHECKING("finding CSTACK_ADDRESS")
+AC_TRY_RUN([#include <stdio.h>
+main()
+{
+  char *b ;
+  FILE *fp = fopen("conftest1","w");
+  fprintf(fp,"%d",((int) &b));
+  fclose(fp);
+}],cstack_address=`cat conftest1`,cstack_address=0,cstack_address=0)
+AC_DEFINE_UNQUOTED(CSTACK_ADDRESS,$cstack_address \
+)
+AC_MSG_RESULT(got $cstack_address)
 
 
 # Maximum number of pages
@@ -359,6 +379,30 @@ int joe=SV_ONSTACK;
  AC_SUBST(HAVE_SV_ONSTACK)
  AC_MSG_RESULT(yes)],
 AC_MSG_RESULT(no))
+
+
+AC_MSG_CHECKING(check for SIGSYS)
+AC_TRY_COMPILE([#include <signal.h>
+int joe=SIGSYS;
+],
+[],
+[AC_DEFINE(HAVE_SIGSYS)
+ AC_SUBST(HAVE_SIGSYS)
+ AC_MSG_RESULT(yes)],
+AC_MSG_RESULT(no))
+
+
+AC_MSG_CHECKING(check for SIGEMT)
+AC_TRY_COMPILE([#include <signal.h>
+int joe=SIGEMT;
+],
+[],
+[AC_DEFINE(HAVE_SIGEMT)
+ AC_SUBST(HAVE_SIGEMT)
+ AC_MSG_RESULT(yes)],
+AC_MSG_RESULT(no))
+
+
 
 
 if test $use = "386-linux" ; then

@@ -114,10 +114,10 @@ dpp${EXE}:	dpp.c
 	${CC} ${DEFS} -o dpp${EXE} dpp.c
 
 file-sub${EXE}:	file-sub.c
-	${CC} ${DEFS} -o file-sub${EXE} file-sub.c
+	cc ${DEFS} -o file-sub${EXE} file-sub.c
 
 ${APPEND}${EXE}: append.c
-	gcc  ${DEFS} -o append${EXE}  append.c
+	${CC}  ${DEFS} -o append${EXE}  append.c
 
 winkill.exe: winkill.c
 	${CC} ${CFLAGS} winkill.c -o winkill.exe

@@ -194,8 +194,13 @@ do { int c = 0; \
 /* if you are in an early version of linux without SIGBUS, uncomment
    the next line */
 /* #define SIGBUS SIGSEGV */
+#ifndef HAVE_SIGSYS
 #define SIGSYS SIGSEGV
+#endif
+
+#ifndef HAVE_SIGEMT
 #define SIGEMT SIGSEGV
+#endif
 
 
 /* get the fileno of a FILE* */
@@ -212,6 +217,9 @@ do { int c = 0; \
             main,start,input,ldarg,output)
 
 #define SET_SESSION_ID() (setpgrp() ? -1 : 0)
+
+
+
 
 /* NOTE: The following text will be automatically included in a
    constructed file cmpinclude.h */

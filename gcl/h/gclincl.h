@@ -82,3 +82,23 @@ SGC is enabled.  */
 
 /* define if SV_ONSTACK is defined in signal.h */
 #define HAVE_SV_ONSTACK 1 
+
+
+/*
+   define to be a typical stack address.   We use this to decide
+   whether we can use a cheap test for NULL_OR_ON_C_STACK, or whether
+   it has to be more complex..
+
+*/
+
+#define CSTACK_ADDRESS -1073743836 
+
+/* define if SIGSYS is defined in signal.h */
+
+#define HAVE_SIGSYS 1
+
+/* define if SIGEMT is defined in signal.h */
+
+/* #undef HAVE_SIGEMT */
+
+

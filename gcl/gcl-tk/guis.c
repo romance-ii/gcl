@@ -20,6 +20,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #define IN_GUIS
+#include "gclincl.h"
 #include "config.h"
 
 #include <stdio.h>

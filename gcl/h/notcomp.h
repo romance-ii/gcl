@@ -178,10 +178,21 @@ EXTER struct printStruct *printStructBufp;
 
 
 /* on most machines this will test in one instruction
-   if the pointer is on the C stack or the 0 pointer */
+   if the pointer is on the C stack or the 0 pointer
+   but if the CSTACK_ADDRESS is not negative then we can't use this cheap
+   test..
+*/
 #ifndef NULL_OR_ON_C_STACK
+
+
+#if (CSTACK_ADDRESS > 0)
+#define NULL_OR_ON_C_STACK(x) ((x)==0 || ((int)x) > (int)(pagetochar(MAXPAGE+1)))
+#else
 #define NULL_OR_ON_C_STACK(x) ((int)x <= 0)     
 #endif
+
+#endif /* NULL_OR_ON_C_STACK */
+
 /* more readable name */
 #define siScomma sSY
 EXTER object sSY;
