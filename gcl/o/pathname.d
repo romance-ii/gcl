@@ -74,7 +74,7 @@ parse_namestring(s, start, end, ep)
 object s;
 int start, end, *ep;
 {
-	int i, j, k;
+	int i, j, k, founddosdev = FALSE, oldstart=start, oldend=end;
 	int d;
 	object *vsp;
 	object x;
@@ -83,10 +83,25 @@ int start, end, *ep;
 #ifndef IS_DIR_SEPARATOR
 #define IS_DIR_SEPARATOR(x) (x == '/')
 #endif
+
 	vsp = vs_top + 1;
 	for (;--end >= start && isspace((int)s->st.st_self[end]););
-       /* fprintf ( stderr, "1 %s \n", s->st.st_self );*/
-	for (i = j = start;  i <= end;  ) {
+
+	/* Check for a DOS path and process later */
+	if ( ( (start+1) <= end) &&  (s->st.st_self[start+1] == ':' )) {
+	    start+=2;
+	    founddosdev = TRUE;
+	    *ep=oldend;
+        }
+        if ( start > end ) {
+	    vs_push(Cnil);
+	    while (vs_top > vsp)
+		stack_cons();
+	    vs_push(Cnil);
+	    make_one(&s->st.st_self[0], 0);
+	    *ep=oldend;
+	} else {
+	    for (i = j = start;  i <= end;  ) {
 #ifdef UNIX
 		if (IS_DIR_SEPARATOR(s->st.st_self[i])) {
 #endif
@@ -105,50 +120,33 @@ int start, end, *ep;
 			}
 			/* END OF BUG FIX */
 			if (i-j == 1 && s->st.st_self[j] == '.') {
-				/*fprintf ( stderr, "1 pushing sKcurrent\n" );*/
 				vs_push(sKcurrent);
 			} else if (i-j==2 && s->st.st_self[j]=='.' && s->st.st_self[j+1]=='.') {
-				/*fprintf ( stderr, "2 pushing sKparent\n" );*/
 				vs_push(sKparent);
 			} else {
-				/*fprintf ( stderr, "3 pushing %d %d, %c\n", j, i-j, s->st.st_self[j] );*/
 				make_one(&s->st.st_self[j], i-j);
                         }
 #endif
 			i++;
 			j = i;
 		} else {
-		    /* DOS drive character ':' after one drive letter */
-		    if ( (s->st.st_self[i] == ':') && (i == start+1) ) {
-			/*fprintf ( stderr, "4 pushing %d %d, %c\n", j, 2, s->st.st_self[j] );*/
-			make_one(&s->st.st_self[j], 2);
 			i++;
-			/* Skip any succeeding path separators */
-			if ( ( i+1 <= end ) && ( s->st.st_self[i+1] == '/' ) ) {
-			    i++;
-			} 
-			j = i;
-		    } else {
-			i++;
-		    }
 		}
-	}
-	*ep = i;
-	vs_push(Cnil);
-	while (vs_top > vsp)
+	    }
+	    *ep = i;
+	    vs_push(Cnil);
+	    while (vs_top > vsp)
 		stack_cons();
-	if (i == j) {
+	    if (i == j) {
 		/*  no file and no type  */
-		/*fprintf ( stderr, "a2 pushing 2 Cnils\n" );*/
 		vs_push(Cnil);
 		vs_push(Cnil);
 		goto L;
-	}
-	for (k = j, d = -1;  k < i;  k++)
+	    }
+	    for (k = j, d = -1;  k < i;  k++)
 		if (s->st.st_self[k] == '.')
 			d = k;
-	/*fprintf ( stderr, "9 d %d i %d j %d start %d end %d %c %c \n", d, i, j, start, end, s->st.st_self[i], s->st.st_self[j]  );*/
-	if (d == -1) {
+	    if (d == -1) {
 		/*  no file type  */
 #ifdef UNIX
 		if (i-j == 1 && s->st.st_self[j] == '*')
@@ -158,8 +156,7 @@ int start, end, *ep;
 			make_one(&s->st.st_self[j], i-j);
 	        
 		vs_push(Cnil);
-		/*fprintf ( stderr, "10 i %d j %d start %d end %d %c %c \n", i, j, start, end, s->st.st_self[i], s->st.st_self[j]  );*/
-	} else if (d == j) {
+	    } else if (d == j) {
 		/*  no file name  */
 		vs_push(Cnil);
 #ifdef UNIX
@@ -168,15 +165,13 @@ int start, end, *ep;
 			vs_push(sKwild);
 		else
 			make_one(&s->st.st_self[d+1], i-d-1);
-		/*fprintf ( stderr, "11 i %d j %d start %d end %d %c %c \n", i, j, start, end, s->st.st_self[i], s->st.st_self[j]  );*/
-	} else {
+	    } else {
 		/*  file name and file type  */
 #ifdef UNIX
 		if (d-j == 1 && s->st.st_self[j] == '*')
 #endif
 			vs_push(sKwild);
 		else {
-			/*fprintf ( stderr, "a1 pushing %d %d, %c\n", j, d-j, s->st.st_self[j] );*/
 			make_one(&s->st.st_self[j], d-j);
 	             }
 #ifdef UNIX
@@ -184,18 +179,25 @@ int start, end, *ep;
 #endif
 			vs_push(sKwild);
 		else
-#ifdef __MINGW32__
-			/* I don't understand this */
 			make_one(&s->st.st_self[d+1], i-d-1);
-			/*vs_push(Cnil);*/
-#else
-			make_one(&s->st.st_self[d+1], i-d-1);
-#endif
-		/*fprintf ( stderr, "12 i %d j %d start %d end %d %c %c \n", i, j, start, end, s->st.st_self[j], s->st.st_self[d]  );*/
-	}
+	    }
+        }
 L:
-	/*fprintf ( stderr, "13 i %d j %d start %d end %d %c %c \n", i, j, start, end, s->st.st_self[i], s->st.st_self[j]  );*/
-	x = make_pathname ( Cnil, Cnil, vs_top[-3], vs_top[-2], vs_top[-1], Cnil );
+	/* Process DOS device name found earlier, build a string in a list and push it */
+	if ( founddosdev ) {
+	    /* Drive letter */
+	    token->st.st_self[0] = s->st.st_self[oldstart];
+	    /* Colon */
+	    token->st.st_self[1] = s->st.st_self[oldstart+1];
+	    /* Fill pointer */
+	    token->st.st_fillp = 2;
+	    /* Push */
+	    vs_push(make_cons(copy_simple_string(token),Cnil));
+	} else {
+	    /* No device name */
+	    vs_push(Cnil);
+	}
+	x = make_pathname ( Cnil, vs_top[-1], vs_top[-4], vs_top[-3], vs_top[-2], Cnil );
 	vs_reset;
 	return(x);
 }
@@ -322,7 +324,18 @@ object x;
 	object l, y;
 
 	i = 0;
-	l = x->pn.pn_directory;
+
+	l = x->pn.pn_device;
+	if (endp(l)) {
+		goto D;
+	}
+	y = l->c.c_car;
+	y = coerce_to_string(y);
+	for (j = 0;  j < y->st.st_fillp;  j++) {
+	    token->st.st_self[i++] = y->st.st_self[j];
+	}
+
+D:	l = x->pn.pn_directory;
 	if (endp(l))
 		goto L;
 	y = l->c.c_car;
@@ -330,26 +343,8 @@ object x;
 #ifdef UNIX
 		token->st.st_self[i++] = '/';
 #endif
-#ifdef AOSVS
-
-#endif
 		l = l->c.c_cdr;
 	}
-#ifdef AOSVS
-
-
-
-
-
-
-
-
-
-
-
-
-
-#endif
 	for (;  !endp(l);  l = l->c.c_cdr) {
 		y = l->c.c_car;
 #ifdef UNIX
