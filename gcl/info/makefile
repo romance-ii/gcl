@@ -3,7 +3,7 @@
 
 INFO_DIR=/usr/local/lib/info
 
-include ../makedefs
+-include ../makedefs
 
 all: gcl-tk.info gcl-si.info gcl-tk.dvi gcl-si.dvi gcl-si_toc.html gcl-tk_toc.html
 

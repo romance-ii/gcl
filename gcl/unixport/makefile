@@ -18,7 +18,7 @@ MPFILES= $(MPDIR)/mpi.o $(MPDIR)/mp2.o  $(MPDIR)/libmport.a
 INIT_SYSTEM_LSP=init_$(SYSTEM).lsp
 SPECIAL_RSYM = rsym.c
 
-include ../makedefs
+-include ../makedefs
 
 LIBS1= $(LIBS) $(LIBSYSTEM) $(GCLIB)
 

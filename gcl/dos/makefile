@@ -5,7 +5,7 @@ HDIR	= ../h
 OFLAG	= -O
 ODIR	= .
 
-include ../makedefs
+-include ../makedefs
 
 DOS_ODIR=.
 

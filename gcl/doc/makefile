@@ -6,4 +6,4 @@
 
 ELISP=gcl.el dbl.el ansi-doc.el lisp-complete.el sshell.el
 
-include ../makedefs
+-include ../makedefs

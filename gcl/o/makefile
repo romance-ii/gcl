@@ -34,7 +34,7 @@ CPP=
 	./grab_defs < $*.c > $*.ini
 	rm $*.c
 
-include ../makedefs
+-include ../makedefs
 
 X11_INCLUDE=${TK_XINCLUDES} ${HAVE_X11}
 CFLAGS	=  -I../gcl-tk -I$(HDIR) $(ODIR_DEBUG) 

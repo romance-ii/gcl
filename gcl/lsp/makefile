@@ -30,7 +30,7 @@ CFLAGS	= -c -O -I../h
 	"$(CC) $(OFLAG) $(CFLAGS) $*.c " \
 	"${APPEND} ${NULLFILE} $*.data $*.o "
 
-include ../makedefs
+-include ../makedefs
 
 all:	$(OBJS) $(RL_OBJS)
 

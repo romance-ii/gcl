@@ -34,4 +34,4 @@ tests2:
 	- (cd /u11/wfs/nqthm1 ; rm *.o ; make "LISP=nacl")
 
 
-include ../makedefs
+-include ../makedefs

@@ -33,7 +33,7 @@ AUX_INFO=-aux-info $*.X
 	rm $*.c
 
 
-include ../makedefs
+-include ../makedefs
 
 CFLAGS	=  -I../gcl-tk -I$(HDIR) $(ODIR_DEBUG)
 

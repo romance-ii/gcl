@@ -14,7 +14,7 @@ ODIR	= ../o
 GCLIB  = ../o/gcllib.a
 
 
-include ../makedefs
+-include ../makedefs
 
 
 CFLAGS1=$(CFLAGS) -I../o -I../h ${TK_INCLUDE} ${TCL_INCLUDE} ${TK_XINCLUDES}

@@ -3,7 +3,7 @@ CFLAGS  = $(DEFS) -I../h
 CC=cc
 APPEND=../bin/append
 
-include ../makedefs
+-include ../makedefs
 
 all:	dpp${EXE} ${APPEND}${EXE} file-sub${EXE} ${WINKILL}
 

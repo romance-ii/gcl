@@ -1,6 +1,6 @@
 
 
-include ../makedefs
+-include ../makedefs
 
 install:
 	mkdir -p $(DESTDIR)$(EMACS_SITE_LISP)

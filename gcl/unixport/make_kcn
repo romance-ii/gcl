@@ -2,4 +2,4 @@ PORTDIR	= ../unixport
 
 LDCC = ${CC}
 
-include ../makedefs
+-include ../makedefs

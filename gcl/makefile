@@ -10,7 +10,7 @@ prefix=/usr/local
 # ./configure --prefix=/usr/share
 
 
-include makedefs
+-include makedefs
 
 
 BINDIR	= bin
