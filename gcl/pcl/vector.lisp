@@ -202,7 +202,8 @@
 #|| ; Need to finish this, then write the maintenance functions.
 (defun compute-emf-from-wrappers (call wrappers)
   (when call
-    (destructuring-bind (gf-name nreq restp arg-info) call
+    ; FIXME use regular destructuring-bind
+    (pcl-destructuring-bind (gf-name nreq restp arg-info) call
       (if (eq gf-name 'make-instance)
 	  (error "should not get here") ; there is another mechanism for this.
 	  #'(lambda (&rest args)
@@ -463,21 +464,24 @@
 
 (defun optimize-slot-value (slots sparameter form)
   (if sparameter
-      (destructuring-bind (ignore ignore slot-name-form) form
+    ; FIXME use regular destructuring-bind
+      (pcl-destructuring-bind (ignore ignore slot-name-form) form
 	(let ((slot-name (eval slot-name-form)))
 	  (optimize-instance-access slots :read sparameter slot-name nil)))
       `(accessor-slot-value ,@(cdr form))))
 
 (defun optimize-set-slot-value (slots sparameter form)
   (if sparameter
-      (destructuring-bind (ignore ignore slot-name-form new-value) form
+    ; FIXME use regular destructuring-bind
+      (pcl-destructuring-bind (ignore ignore slot-name-form new-value) form
 	(let ((slot-name (eval slot-name-form)))
 	  (optimize-instance-access slots :write sparameter slot-name new-value)))
       `(accessor-set-slot-value ,@(cdr form))))
 
 (defun optimize-slot-boundp (slots sparameter form)
   (if sparameter
-      (destructuring-bind (ignore ignore slot-name-form new-value) form
+    ; FIXME use regular destructuring-bind
+      (pcl-destructuring-bind (ignore ignore slot-name-form new-value) form
 	(let ((slot-name (eval slot-name-form)))
 	  (optimize-instance-access slots :boundp sparameter slot-name new-value)))
       `(accessor-slot-boundp ,@(cdr form))))
@@ -489,7 +493,8 @@
 
 (defun optimize-writer (slots sparameter gf-name form)
   (if sparameter
-      (destructuring-bind (ignore ignore new-value) form
+    ; FIXME use regular destructuring-bind
+      (pcl-destructuring-bind (ignore ignore new-value) form
 	(optimize-accessor-call slots :write sparameter gf-name new-value))
       form))
 ;;;

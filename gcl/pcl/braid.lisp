@@ -470,7 +470,8 @@
   ;;
   (let ((class-eq-wrapper (class-wrapper (find-class 'class-eq-specializer))))
     (dolist (e *built-in-classes*)
-      (destructuring-bind (name supers subs cpl prototype) e
+    ; FIXME use regular destructuring-bind
+      (pcl-destructuring-bind (name supers subs cpl prototype) e
 	(let* ((class (find-class name))
 	       #+cmu17
 	       (lclass (lisp:find-class name))

@@ -30,6 +30,17 @@
 
 ;;;; Stuff to parse DEFMACRO, MACROLET, DEFINE-SETF-METHOD, and DEFTYPE.
 
+;;; We save space in macro definitions by callig this function.
+;;;
+(defun do-arg-count-error (error-kind name arg lambda-list minimum maximum)
+  (error "Error in do-arg-count-error: ~S ~S ~S ~S ~S ~S~%"
+	 error-kind
+	 name
+	 arg
+	 lambda-list
+	 minimum
+	 maximum))
+
 ;;; PARSE-DEFMACRO returns, as multiple-values, a body, possibly a declare
 ;;; form to put where this code is inserted, and the documentation for the
 ;;; parsed body.
@@ -68,11 +79,57 @@
 	 minimum
 	 maximum)))))
 
-(defun make-keyword (a) 
-	(error "Need to write make-keyword ~S" a))
+(defun make-keyword (symbol)
+  "Takes a non-keyword symbol, symbol, and returns the corresponding keyword."
+  (intern (symbol-name symbol) (find-package "KEYWORD")))
 
-(defun defmacro-error (a b c) 
-	(error "Need to write defmacro-error ~S ~S ~S" a b c))
+(defun defmacro-error (problem kind name)
+; FIXME check this
+  (declare (ignore kind))
+  (specific-error :wrong-type-argument "~S is not of type ~S~%" problem name))
+
+(defun verify-keywords (key-list valid-keys allow-other-keys)
+  (do ((already-processed nil)
+       (unknown-keyword nil)
+       (remaining key-list (cddr remaining)))
+      ((null remaining)
+       (if (and unknown-keyword
+		(not allow-other-keys)
+		(not (lookup-keyword :allow-other-keys key-list)))
+	   (values :unknown-keyword (list unknown-keyword valid-keys))
+	   (values nil nil)))
+    (cond ((not (and (consp remaining) (listp (cdr remaining))))
+	   (return (values :dotted-list key-list)))
+	  ((null (cdr remaining))
+	   (return (values :odd-length key-list)))
+	  #+nil ;; Not ANSI compliant to disallow duplicate keywords.
+	  ((member (car remaining) already-processed)
+	   (return (values :duplicate (car remaining))))
+	  ((or (eq (car remaining) :allow-other-keys)
+	       (member (car remaining) valid-keys))
+	   (push (car remaining) already-processed))
+	  (t
+	   (setf unknown-keyword (car remaining))))))
+
+(defun lookup-keyword (keyword key-list)
+  (do ((remaining key-list (cddr remaining)))
+      ((endp remaining))
+    (when (eq keyword (car remaining))
+      (return (cadr remaining)))))
+;;;
+(defun keyword-supplied-p (keyword key-list)
+  (do ((remaining key-list (cddr remaining)))
+      ((endp remaining))
+    (when (eq keyword (car remaining))
+      (return t))))
+
+
+
+;(defun make-keyword (a) 
+;	(error "Need to write make-keyword ~S" a))
+
+;(defun defmacro-error (a b c) 
+;	(error "Need to write defmacro-error ~S ~S ~S" a b c))
 
 (defun parse-defmacro-lambda-list
        (lambda-list arg-list-name name error-kind error-fun

@@ -208,7 +208,9 @@
 ;;; Common Lisp BUG:
 ;;;    Common Lisp should have destructuring-bind.
 ;;;    
-(defmacro destructuring-bind (pattern form &body body)
+;#-gcl
+; FIXME use regular destructuring-bind
+(defmacro pcl-destructuring-bind (pattern form &body body)
   (multiple-value-bind (ignore declares body)
       (extract-declarations body)
     (declare (ignore ignore))

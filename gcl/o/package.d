@@ -737,7 +737,8 @@ delete_package(object n) {
       
     }
   
-    FEpackage_error(n,"No such pachage.");
+    if (type_of(n)!=t_package)	
+       FEpackage_error(n,"No such pachage.");
 
   return(Cnil);
   

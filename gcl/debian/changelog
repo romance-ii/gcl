@@ -4,8 +4,11 @@ gcl (2.5.0.cvs20020625-61) unstable; urgency=low
   * defpackage error on importing non-existent symbols
   * working with-package-iterator macro
   * various package errors reported as :package-error
+  * Destructuring-bind fixes
+  * delete-package error fix
+  * pcl functions use pcl-destructuring-bind for now -- fix later
 
- -- Camm Maguire <camm@m.enhanced.com>  Thu, 24 Oct 2002 18:09:44 -0400
+ -- Camm Maguire <camm@m.enhanced.com>  Fri, 25 Oct 2002 06:40:39 -0400
 
 gcl (2.5.0.cvs20020625-60) unstable; urgency=low
 
