@@ -38,6 +38,7 @@
 #define	M68K
 #define SGC
 
+#include <asm/cachectl.h>
 #define CLEAR_CACHE do {void *v=memory->cfd.cfd_start,*ve=v+memory->cfd.cfd_size; \
                         cacheflush(v,FLUSH_SCOPE_LINE,FLUSH_CACHE_BOTH,ve-v);\
                     } while(0)
