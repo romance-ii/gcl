@@ -1,3 +1,11 @@
+gcl (2.5.0.cvs20020625-67) unstable; urgency=high
+
+  * Align cache flushes for powerpc and m68k on 32 byte boundaries,
+    should fix acl2 build
+  * Removed diagnostic SIGILL trapping in cmpaux.c
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 12 Nov 2002 23:25:49 -0500
+
 gcl (2.5.0.cvs20020625-66) unstable; urgency=high
 
   * Fix SIGILL trap in cmpaux.c

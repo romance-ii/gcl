@@ -44,6 +44,8 @@
 
 #include <asm/cachectl.h>
 int cacheflush(void *,int,int,int);
+#define CLEAR_CACHE_LINE_SIZE
 #define CLEAR_CACHE do {void *v=memory->cfd.cfd_start,*ve=v+memory->cfd.cfd_size; \
+                        v=(void *)((unsigned long)v & ~(CLEAR_CACHE_LINE_SIZE - 1));\
                         cacheflush(v,FLUSH_SCOPE_LINE,FLUSH_CACHE_BOTH,ve-v);\
                     } while(0)
