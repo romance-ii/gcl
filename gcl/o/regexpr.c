@@ -21,6 +21,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <stdlib.h>
 #include "include.h"
+#include "page.h"
 
 #undef STATIC
 #define regerror gcl_regerror
@@ -60,7 +61,6 @@ DEFUN_NEW("MATCH-END",object,fSmatch_end,SI,1,1,NONE,OI,OO,OO,OO,(fixnum i),
   RETURN1(make_fixnum(-1));
 }
 
-
 DEFUN_NEW("STRING-MATCH",object,fSstring_match,SI,2,4,NONE,OO,OI,IO,OO,(object pattern,object string,...),
       "Match regexp PATTERN in STRING starting in string starting at START \
 and ending at END.  Return -1 if match not found, otherwise \
@@ -69,91 +69,105 @@ return the start index  of the first matchs.  The variable \
 the matches, to be obtained with match-beginning and match-end. \
 If it already contains such an array, then the contents of it will \
 be over written.   \
-")
-{  int nargs=VFUN_NARGS;
-   static char buf[400];
-   static char case_fold;
-   static regexp *compiled_regexp;
-   int len;
-   int start;
-   int end;
-   va_list ap;
-   object v = sSAmatch_dataA->s.s_dbind;
+") {  
 
-   { va_start(ap,string);
-     if (nargs>=3) start=va_arg(ap,fixnum);else goto LDEFAULT3;
-     if (nargs>=4) end=va_arg(ap,fixnum);else goto LDEFAULT4;
-     goto LEND_VARARG;
-   LDEFAULT3: start = 0;
-   LDEFAULT4: end = string->st.st_fillp;
-   LEND_VARARG: va_end(ap);}
-   if (type_of(v) != t_vector
-       || v->v.v_elttype != aet_fix
-       || v->v.v_dim < (NSUBEXP *2))
-     v= sSAmatch_dataA->s.s_dbind =
-       fSmake_vector1_1((NSUBEXP *2),aet_fix,sLnil);
-   if (type_of(string)!= t_string && type_of(string)!=t_symbol)
-        not_a_string_or_symbol(string);
-   if (type_of(pattern)!= t_string && type_of(pattern)!=t_symbol)
-             not_a_string_or_symbol(string);
+  int i,ans,nargs=VFUN_NARGS,len,start,end;
+  static char buf[400],case_fold;
+  static regexp *compiled_regexp;
+  va_list ap;
+  object v = sSAmatch_dataA->s.s_dbind;
+  char **pp,*str,save_c;
+  unsigned np;
 
-   if (start < 0
-       || end > string->st.st_fillp
-       || start > end)
+  if (type_of(pattern)!= t_string && type_of(pattern)!=t_symbol)
+    not_a_string_or_symbol(string);
+  if (type_of(string)!= t_string && type_of(string)!=t_symbol)
+    not_a_string_or_symbol(string);
+  
+  if (type_of(v) != t_vector || v->v.v_elttype != aet_fix || v->v.v_dim < NSUBEXP*2)
+    v=sSAmatch_dataA->s.s_dbind=fSmake_vector1_1((NSUBEXP *2),aet_fix,sLnil);
+  
+  start=0;
+  end=string->st.st_fillp;
+  if (nargs>2) {
+    va_start(ap,string);
+    start=va_arg(ap,fixnum);
+    if (nargs>3)
+      end=va_arg(ap,fixnum);
+    va_end(ap);
+  }
+  if (start < 0 || end > string->st.st_fillp || start > end)
      FEerror("Bad start or end",0);
-   len = pattern->ust.ust_fillp;
+
+  len=pattern->ust.ust_fillp;
    if (len==0) {
      /* trivial case of empty pattern */
-     int i = 0;
-     while (i< NSUBEXP) {
-     v->fixa.fixa_self[i] = (i== 0? 0 : -1);
-     v->fixa.fixa_self[NSUBEXP+ i] = (i== 0? 0 : -1);
-     i++;
-       };
+     for (i=0;i<NSUBEXP;i++) 
+       v->fixa.fixa_self[i]=i ? -1 : 0;
+     memcpy(v->fixa.fixa_self+NSUBEXP,v->fixa.fixa_self,NSUBEXP*sizeof(*v->fixa.fixa_self));
      RETURN1(make_fixnum(0));
    }
-   {BEGIN_NO_INTERRUPT;
-    case_fold_search = (sSAcase_fold_searchA->s.s_dbind != sLnil);
-    if ( case_fold != case_fold_search
-	|| bcmp(pattern->ust.ust_self,buf,len) != 0
-	|| len != strlen(buf))
-      { char *tmp = (sizeof(buf) >= len-1 ? buf :(char *) malloc(len+1)) ;
-	case_fold = case_fold_search;
-	bcopy(pattern->st.st_self,tmp,len);
-	tmp[len]=0;
-	if (compiled_regexp) {free((void *)compiled_regexp);
-			      compiled_regexp = 0;}
-	compiled_regexp = regcomp(tmp);
-	if (tmp!=buf) free(tmp);
-      }
-    if (compiled_regexp ==0) {END_NO_INTERRUPT;RETURN1(make_fixnum(-1));}
-    { char *str = string->st.st_self;
-      char save_c = str[end];
-      int ans;
-      if (&(str[end])  == (void *)core_end 
-	  || &(str[end]) == (void *)compiled_regexp)
-	{
-	  /* these are just about impossible, and should be the only
-	     situations where it is not safe to alter str[end]
-	     during the running of regexec...
-	     */
-	  str = (char *)malloc(string->st.st_fillp+1);
-	  bcopy(string->st.st_self, str, string->st.st_fillp);}
-      str[end]=0;
-      ans = regexec(compiled_regexp,str+start,str,end - start);
-      str[end] = save_c;
-      if (str!=string->st.st_self) free(str);
-      if (ans == 0 ) {END_NO_INTERRUPT;RETURN1(make_fixnum(-1));}
-      {int i = -1;
-       regexp *r=compiled_regexp;
-       while (++i < NSUBEXP)
-	 { char *p = r->startp[i] ;
-	   v->fixa.fixa_self[i] = (p == 0 ? -1 : p - str);
-	   p = r->endp[i] ;
-	   v->fixa.fixa_self[NSUBEXP+ i] = (p == 0 ? -1 : p - str);}
+
+   {
+     BEGIN_NO_INTERRUPT;
+
+     case_fold_search = sSAcase_fold_searchA->s.s_dbind != sLnil ? 1 : 0;
+     if (case_fold != case_fold_search || len != strlen(buf) ||	 memcmp(pattern->ust.ust_self,buf,len)) {
+
+       char *tmp=len+1<sizeof(buf) ? buf : (char *) alloca(len+1);
+       if (!tmp)
+	 FEerror("Cannot allocate memory on C stack",0);
+
+       case_fold = case_fold_search;
+       memcpy(tmp,pattern->st.st_self,len);
+       tmp[len]=0;
+
+       if (compiled_regexp) {
+	 free((void *)compiled_regexp);
+	 compiled_regexp = 0;
+       }
+       
+       if (!(compiled_regexp=regcomp(tmp))) {
+	 END_NO_INTERRUPT;
+	 RETURN1(make_fixnum(-1));
+       }
+
+     }
+
+     str=string->st.st_self;
+     np=page(str);
+     if (np>=MAXPAGE || (type_map[np] != t_contiguous && type_map[np] != t_relocatable) ||
+	 str+end==(void *)core_end || str+end==(void *)compiled_regexp) {
+
+       if (!(str=alloca(string->st.st_fillp+1)))
+	 FEerror("Cannot allocate memory on C stack",0);
+       memcpy(str,string->st.st_self,string->st.st_fillp);
+
+     } else
+       save_c=str[end];
+     str[end]=0;
+
+     ans = regexec(compiled_regexp,str+start,str,end-start);
+
+     str[end] = save_c;
+
+     if (!ans ) {
        END_NO_INTERRUPT;
-       RETURN1(make_fixnum(v->fixa.fixa_self[0]));
-     }}
-  }}		  
+       RETURN1(make_fixnum(-1));
+     }
+
+     pp=compiled_regexp->startp;
+     for (i=0;i<NSUBEXP;i++,pp++)
+       v->fixa.fixa_self[i]=*pp ? *pp-str : -1;
+     pp=compiled_regexp->endp;
+     for (;i<2*NSUBEXP;i++,pp++)
+       v->fixa.fixa_self[i]=*pp ? *pp-str : -1;
+
+     END_NO_INTERRUPT;
+     RETURN1(make_fixnum(v->fixa.fixa_self[0]));
+
+   }
+
+}
 	
 

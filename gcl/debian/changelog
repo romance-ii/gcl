@@ -6,8 +6,9 @@ gclcvs (2.7.0-27) unstable; urgency=low
   * Remove unnecessary arguments from FEerror calls in pathname.d
   * handler_function_type is void (*)(int)
   * Fix variable capture error in dotimes macro
+  * Fix segfault in string-match
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 30 Jun 2004 20:38:51 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri,  2 Jul 2004 18:28:35 +0000
 
 gclcvs (2.7.0-26) unstable; urgency=low
 
