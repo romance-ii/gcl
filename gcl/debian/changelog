@@ -3,8 +3,9 @@ gcl (2.5.0.cvs20020625-54) unstable; urgency=high
   * Fix delete et. al. :from-end error; typo in gbc.c
   * character and string-char equal in type hierarchy
   * concatenate/make-sequence fixes
+  * merge takes nil key argument
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 21 Sep 2002 19:14:45 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sat, 21 Sep 2002 19:21:26 -0400
 
 gcl (2.5.0.cvs20020625-53) unstable; urgency=high
 

@@ -695,6 +695,7 @@
 	      &key (key #'identity)
 	      &aux (l1 (length sequence1)) (l2 (length sequence2)))
   (declare (fixnum l1 l2))
+  (when (equal key 'nil) (setq key #'identity))
   (do ((newseq (make-sequence result-type (the fixnum (f+ l1 l2))))
        (j 0 (f+ 1  j))
        (i1 0)
