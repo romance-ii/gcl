@@ -248,7 +248,7 @@
 	    (structure-subtype-p object tem))
            ((setq tem (get tp 'deftype-definition))
 	      (typep object
-		     (apply tem nil)))))))
+		     (apply tem i)))))))
 
 
 ;;; NORMALIZE-TYPE normalizes the type using the DEFTYPE definitions.

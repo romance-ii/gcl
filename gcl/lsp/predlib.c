@@ -1349,7 +1349,7 @@ T327:;
 	goto T333;}
 	base[2]= (V48);
 	{object V84;
-	V84= Cnil;
+	V84= (V47);
 	 vs_top=base+3;
 	 while(!endp(V84))
 	 {vs_push(car(V84));V84=cdr(V84);}
