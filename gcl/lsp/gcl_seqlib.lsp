@@ -597,7 +597,7 @@
               ((= i 2)
                (setq key-left (funcall key (car l)))
                (setq key-right (funcall key (cadr l)))
-               (cond ((funcall predicate key-left key-right) (return l))
+               (cond ;((funcall predicate key-left key-right) (return l))
                      ((funcall predicate key-right key-left)
                       (return (nreverse l)))
                      (t (return l)))))
@@ -617,7 +617,7 @@
         (setq key-left (funcall key (car left)))
         (setq key-right (funcall key (car right)))
       loop
-        (cond ((funcall predicate key-left key-right) (go left))
+        (cond ;((funcall predicate key-left key-right) (go left))
               ((funcall predicate key-right key-left) (go right))
               (t (go left)))
       left

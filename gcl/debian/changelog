@@ -9,8 +9,10 @@ gclcvs (2.7.0-9) unstable; urgency=low
     inline-args, gcl_cmplet.lsp, c2let)
   * Fix an obviou int overflow in ifloor (o/cmpaux.c), handle more
     proper fixnum/integer determination from declarations later
+  * eliminate duplicate predicate calls in list-merge-srot in
+    gcl_seqlib.lsp
 
- -- Camm Maguire <camm@intech.m.enhanced.com>  Fri, 10 Oct 2003 02:40:45 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 10 Oct 2003 02:54:28 +0000
 
 gclcvs (2.7.0-8) unstable; urgency=low
 
