@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmpmap.h"
 init_cmpmap(){do_init(VV);}
 /*	local entry for function C1MAPCAR	*/

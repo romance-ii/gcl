@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "seqlib.h"
 init_seqlib(){do_init(VV);}
 /*	local entry for function SEQTYPE	*/

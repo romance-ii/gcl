@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "debug.h"
 init_debug(){do_init(VV);}
 /*	function definition for SHOW-BREAK-VARIABLES	*/

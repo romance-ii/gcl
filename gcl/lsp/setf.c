@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "setf.h"
 init_setf(){do_init(VV);}
 /*	macro definition for DEFSETF	*/

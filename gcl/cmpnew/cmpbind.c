@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmpbind.h"
 init_cmpbind(){do_init(VV);}
 /*	local entry for function C2BIND	*/

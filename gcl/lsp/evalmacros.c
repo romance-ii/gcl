@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "evalmacros.h"
 init_evalmacros(){do_init(VV);}
 /*	macro definition for DEFVAR	*/

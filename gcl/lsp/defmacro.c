@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "defmacro.h"
 init_defmacro(){do_init(VV);}
 /*	function definition for GET-&ENVIRONMENT	*/

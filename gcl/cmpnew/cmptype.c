@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmptype.h"
 init_cmptype(){do_init(VV);}
 /*	local entry for function OBJECT-TYPE	*/

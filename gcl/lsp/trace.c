@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "trace.h"
 init_trace(){do_init(VV);}
 /*	macro definition for TRACE	*/

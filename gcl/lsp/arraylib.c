@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "arraylib.h"
 init_arraylib(){do_init(VV);}
 /*	local entry for function BEST-ARRAY-ELEMENT-TYPE	*/

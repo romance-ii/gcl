@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmpif.h"
 init_cmpif(){do_init(VV);}
 /*	local entry for function C1IF	*/

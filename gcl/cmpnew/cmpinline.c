@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmpinline.h"
 init_cmpinline(){do_init(VV);}
 /*	local entry for function MAKE-INFO	*/

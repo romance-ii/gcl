@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmpblock.h"
 init_cmpblock(){do_init(VV);}
 /*	local entry for function MAKE-BLK	*/

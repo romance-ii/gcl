@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmptop.h"
 init_cmptop(){do_init(VV);}
 /*	function definition for T1EXPR	*/

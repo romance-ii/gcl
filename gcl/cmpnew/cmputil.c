@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmputil.h"
 init_cmputil(){do_init(VV);}
 /*	macro definition for SAFE-COMPILE	*/

@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmplet.h"
 init_cmplet(){do_init(VV);}
 /*	local entry for function C1LET	*/

@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmpvs.h"
 init_cmpvs(){do_init(VV);}
 /*	local entry for function VS-PUSH	*/

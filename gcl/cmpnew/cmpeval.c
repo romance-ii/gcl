@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmpeval.h"
 init_cmpeval(){do_init(VV);}
 /*	local entry for function C1EXPR*	*/

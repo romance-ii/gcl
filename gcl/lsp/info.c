@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "info.h"
 init_info(){do_init(VV);}
 /*	function definition for SHARP-U-READER	*/

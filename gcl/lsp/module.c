@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "module.h"
 init_module(){do_init(VV);}
 /*	local entry for function PROVIDE	*/

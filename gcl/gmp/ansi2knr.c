@@ -111,7 +111,7 @@ program under the GPL.
 /* or without the GNU configure machinery. */
 
 #if HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 #endif
 
 #include <stdio.h>

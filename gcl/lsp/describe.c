@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "describe.h"
 init_describe(){do_init(VV);}
 /*	local entry for function INSPECT-READ-LINE	*/

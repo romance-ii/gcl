@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmpwt.h"
 init_cmpwt(){do_init(VV);}
 /*	local entry for function WT-COMMENT	*/

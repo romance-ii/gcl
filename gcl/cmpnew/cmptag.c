@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmptag.h"
 init_cmptag(){do_init(VV);}
 /*	local entry for function MAKE-TAG	*/

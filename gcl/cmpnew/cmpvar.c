@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmpvar.h"
 init_cmpvar(){do_init(VV);}
 /*	local entry for function MAKE-VAR	*/

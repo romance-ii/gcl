@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmpspecial.h"
 init_cmpspecial(){do_init(VV);}
 /*	local entry for function C1QUOTE	*/

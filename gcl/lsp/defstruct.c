@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "defstruct.h"
 init_defstruct(){do_init(VV);}
 /*	local entry for function MAKE-ACCESS-FUNCTION	*/

@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "sloop.h"
 init_sloop(){do_init(VV);}
 /*	macro definition for LCASE	*/

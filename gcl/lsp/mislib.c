@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "mislib.h"
 init_mislib(){do_init(VV);}
 /*	macro definition for TIME	*/

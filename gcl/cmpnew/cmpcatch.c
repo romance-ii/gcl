@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmpcatch.h"
 init_cmpcatch(){do_init(VV);}
 /*	local entry for function C1CATCH	*/

@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "seq.h"
 init_seq(){do_init(VV);}
 /*	local entry for function MAKE-SEQUENCE	*/

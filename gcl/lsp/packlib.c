@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "packlib.h"
 init_packlib(){do_init(VV);}
 /*	macro definition for COERCE-TO-PACKAGE	*/

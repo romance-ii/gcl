@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmpflet.h"
 init_cmpflet(){do_init(VV);}
 /*	local entry for function MAKE-FUN	*/

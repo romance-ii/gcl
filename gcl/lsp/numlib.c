@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "numlib.h"
 init_numlib(){do_init(VV);}
 /*	local entry for function ISQRT	*/

@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "assert.h"
 init_assert(){do_init(VV);}
 /*	macro definition for CHECK-TYPE	*/

@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmpmulti.h"
 init_cmpmulti(){do_init(VV);}
 /*	local entry for function C1MULTIPLE-VALUE-CALL	*/

@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "serror.h"
 init_serror(){do_init(VV);}
 /*	function definition for MAKE-ERROR-CONDITION	*/

@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmplabel.h"
 init_cmplabel(){do_init(VV);}
 /*	macro definition for NEXT-LABEL	*/

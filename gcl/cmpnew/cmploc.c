@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmploc.h"
 init_cmploc(){do_init(VV);}
 /*	local entry for function WT-NEXT-VAR-ARG	*/

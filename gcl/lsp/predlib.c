@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "predlib.h"
 init_predlib(){do_init(VV);}
 /*	macro definition for DEFTYPE	*/

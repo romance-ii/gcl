@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmpenv.h"
 init_cmpenv(){do_init(VV);}
 /*	local entry for function INIT-ENV	*/

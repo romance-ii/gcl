@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmpcall.h"
 init_cmpcall(){do_init(VV);}
 /*	local entry for function FAST-LINK-PROCLAIMED-TYPE-P	*/

@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "top.h"
 init_top(){do_init(VV);}
 /*	local entry for function TOP-LEVEL	*/

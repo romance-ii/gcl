@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "cmpfun.h"
 init_cmpfun(){do_init(VV);}
 /*	local entry for function C1PRINC	*/

@@ -1,5 +1,5 @@
 #ifndef UNIXSAVE
-#include <config.h>
+#include "config.h"
 #endif
 /* #include <stdlib.h> */ 	/* _fmode */
 #include <stdio.h>

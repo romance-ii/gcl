@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "iolib.h"
 init_iolib(){do_init(VV);}
 /*	macro definition for WITH-OPEN-STREAM	*/
