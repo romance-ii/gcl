@@ -374,6 +374,10 @@
 	    (if (member t2 '(string-char character))
 	        (values t t)
 	        (values nil ntp2)))
+	   (character
+	    (if (member t2 '(string-char character))
+	        (values t t)
+	        (values nil ntp2)))
 	   (integer
 	    (if (member t2 '(integer rational))
 		(values (sub-interval-p i1 i2) t)
