@@ -1,7 +1,6 @@
 /* DO NOT EDIT!  -*- buffer-read-only: t -*-  This file is automatically 
-   generated from "bfd-in.h", "init.c", "opncls.c", "libbfd.c", 
-   "section.c", "archures.c", "reloc.c", "syms.c", "bfd.c", "archive.c", 
-   "corefile.c", "targets.c" and "format.c".
+   generated from "bfd-in.h", "init.c", "opncls.c", "libbfd.c" and 
+   "section.c".
    Run "make headers" in your build bfd/ to regenerate.  */
 
 /* Main header file for the bfd library -- portable access to object files.
@@ -3465,6 +3464,11 @@ struct _bfd
       struct cisco_core_struct *cisco_core_data;
       struct versados_data_struct *versados_data;
       struct netbsd_core_struct *netbsd_core_data;
+      struct mach_o_data_struct *mach_o_data;
+      struct mach_o_fat_data_struct *mach_o_fat_data;
+      struct bfd_pef_data_struct *pef_data;
+      struct bfd_pef_xlib_data_struct *pef_xlib_data;
+      struct bfd_sym_data_struct *sym_data;
       PTR any;
     }
   tdata;
@@ -3665,6 +3669,27 @@ extern bfd_byte *bfd_get_relocated_section_contents
 boolean
 bfd_alt_mach_code PARAMS ((bfd *abfd, int index));
 
+struct bfd_preserve
+{
+  PTR marker;
+  PTR tdata;
+  flagword flags;
+  const struct bfd_arch_info *arch_info;
+  struct sec *sections;
+  struct sec **section_tail;
+  unsigned int section_count;
+  struct bfd_hash_table section_htab;
+};
+
+boolean
+bfd_preserve_save PARAMS ((bfd *, struct bfd_preserve *));
+
+void
+bfd_preserve_restore PARAMS ((bfd *, struct bfd_preserve *));
+
+void
+bfd_preserve_finish PARAMS ((bfd *, struct bfd_preserve *));
+
 /* Extracted from archive.c.  */
 symindex
 bfd_get_next_mapent PARAMS ((bfd *abfd, symindex previous, carsym **sym));
@@ -3727,7 +3752,11 @@ enum bfd_flavour
   bfd_target_msdos_flavour,
   bfd_target_ovax_flavour,
   bfd_target_evax_flavour,
-  bfd_target_mmo_flavour
+  bfd_target_mmo_flavour,
+  bfd_target_mach_o_flavour,
+  bfd_target_pef_flavour,
+  bfd_target_pef_xlib_flavour,
+  bfd_target_sym_flavour
 };
 
 enum bfd_endian { BFD_ENDIAN_BIG, BFD_ENDIAN_LITTLE, BFD_ENDIAN_UNKNOWN };
