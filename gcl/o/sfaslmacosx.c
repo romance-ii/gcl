@@ -239,7 +239,9 @@ int fasload (object faslfile)
     fptr = prepare_bundle (faslfile, tmpfile);
     
     seek_to_end_ofile (faslstream->sm.sm_fp);
-    data = read_fasl_vector(faslstream);
+    data = read_fasl_vector (faslstream);
+    
+    close_stream (faslstream);
     
     memory = alloc_object(t_cfdata);
     memory->cfd.cfd_self = NULL;
