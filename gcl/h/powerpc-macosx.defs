@@ -16,6 +16,9 @@ RSYM = rsym
 ifneq ($(findstring bfd,$(LIBS)),) 
 RSYM = 
 endif
+ifneq ($(BUILD_BFD),) 
+RSYM    = 
+endif
 
 # Define this in order to compile sfasl.c.
 SFASL = $(ODIR)/sfasl.o

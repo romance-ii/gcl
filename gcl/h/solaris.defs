@@ -38,6 +38,9 @@ RSYM	= rsym
 ifneq ($(findstring bfd,$(LIBS)),) 
 RSYM    = 
 endif
+ifneq ($(BUILD_BFD),) 
+RSYM    = 
+endif
 #ifneq ($(findstring -ldl,$(LIBS)),) 
 #RSYM    = 
 #endif

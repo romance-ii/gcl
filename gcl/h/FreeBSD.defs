@@ -28,6 +28,9 @@ RSYM	= rsym
 ifneq ($(findstring bfd,$(LIBS)),) 
 RSYM    = 
 endif
+ifneq ($(BUILD_BFD),) 
+RSYM    = 
+endif
 SFASL	= $(ODIR)/sfasl.o
 
 # When using SFASL it is good to have (si::build-symbol-table)

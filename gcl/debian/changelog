@@ -18,8 +18,11 @@ gclcvs (2.7.0-27) unstable; urgency=low
     items of a different form which need to set *sup-used* too.
   * Correct room report to show proper percentages when sgc is on
   * Read in RELOC environment variable if set as default in debian/rules
+  * Remove local bfd libraries from libs variables as their objects are
+    incorporated into libgcl and as the source directory may not be
+    available at runtime
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 14 Jul 2004 18:43:16 -0400
+ -- Camm Maguire <camm@enhanced.com>  Thu, 15 Jul 2004 12:30:38 -0400
 
 gclcvs (2.7.0-26) unstable; urgency=low
 

@@ -823,7 +823,7 @@ if test "$enable_locbfd" = "yes" ; then
 	echo "# Subconfigure of BFD done"
 	echo "# ------------------------"
 	echo "#"
-	TLIBS="$TLIBS `pwd`/binutils/bfd/libbfd.a `pwd`/binutils/libiberty/libiberty.a"
+#	TLIBS="$TLIBS `pwd`/binutils/bfd/libbfd.a `pwd`/binutils/libiberty/libiberty.a"
 	AC_DEFINE(HAVE_LIBBFD)
 	BUILD_BFD="h/bfd.h h/bfdlink.h h/ansidecl.h h/symcat.h"
 	AC_SUBST(BUILD_BFD)
