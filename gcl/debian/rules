@@ -26,8 +26,8 @@ configure-stamp:
 
 	if [ configure.in -nt configure ]; then autoconf; fi
 	chmod -R +x gmp3/*
-	[ "$(ARCHT)" != "i386" ] || ( cd gmp && CC=$(MCC) ./configure --target=i486 )
-	CC=$(MCC) ./configure --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
+	[ "$(ARCHT)" != "i386" ] || ( cd gmp3 && CC=$(MCC) ./configure --build=i486-unknown-linux-gnu )
+	CC=$(MCC) ./configure --disable-statsysbfd --enable-locbfd --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
 
 	touch configure-stamp
 

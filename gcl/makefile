@@ -25,7 +25,16 @@ PCLDIR = pcl
 MPDIR	= mp
 GMP_DIR = gmp3/
 
-all: $(PORTDIR)/$(FLISP) command cmpnew/collectfn.o lsp/info.o do-gcl-tk do-info
+all: $(BUILD_BFD) $(PORTDIR)/$(FLISP) command cmpnew/collectfn.o lsp/info.o do-gcl-tk do-info
+
+binutils/bfd/libbfd.a binutils/libiberty/libiberty.a:
+	cd $(@D) && make
+
+h/bfd.h: binutils/bfd/libbfd.a binutils/libiberty/libiberty.a
+	cp $(<D)/$(@F) $@
+
+h/bfdlink.h: binutils/bfd/libbfd.a binutils/libiberty/libiberty.a
+	cp $(<D)/../include/$(@F) $@
 
 #$(PORTDIR)/saved_gcl: $(PORTDIR)/$(FLISP)
 #	cp $< $@
@@ -165,7 +174,9 @@ clean:
 	rm -f h/config.h h/gclincl.h h/cmpinclude.h
 	rm -rf gmp3/.deps gmp3/libgmp.a
 	rm -f xbin/gcl foo foo.c bin/gclm.bat
-	rm -f h/*-linux.defs
+	rm -f h/*-linux.defs h/bfd.h h/bfdlink.h
+	cd binutils/bfd && make clean
+	cd binutils/libiberty && make clean
 
 CMPINCLUDE_FILES=${HDIR}cmpincl1.h ${HDIR}gclincl.h ${HDIR}compbas.h ${HDIR}enum.h $(MP_INCLUDE) ${HDIR}object.h ${HDIR}vs.h \
 	${HDIR}bds.h ${HDIR}frame.h \

@@ -34,11 +34,6 @@ AC_ARG_ENABLE(tclconfig,[ --enable-tclconfig=XXXX will force the use of a TCL_CO
 AC_ARG_ENABLE(infodir,[ --enable-infodir=XXXX will force the use of a INFO_DIR=XXXXX as place to look for info ] ,
 [INFO_DIR=$enableval],[INFO_DIR="unknown"])
 
-AC_ARG_ENABLE(dlopen,
-	[ --enable-dlopen uses dlopen for loading objects, which can then not be retained  in saved images ] ,,enable_dlopen="no")
-AC_ARG_ENABLE(bfd,
-	[ --disable-bfd prevents gcl from using libbfd.a for fast object loading and symbol table lookups ] ,,enable_bfd="yes")
-
 #
 # Host information 
 #
@@ -201,23 +196,57 @@ if test "x$enable_machine" != "x" ; then
   use=$enable_machine
 fi
 
-EXTRA_CFLAGS=""
+def_dlopen="no"
+def_statsysbfd="yes"
 case $use in 
      *linux)
 	ln -snf linux.defs h/$use.defs;
 	case $use in
 		alpha*)
-			EXTRA_CFLAGS=-mieee; 
-			enable_dlopen="yes" ;;
+			def_dlopen="yes" ; def_statsysbfd="no" ;;
 		mips*)
-			enable_dlopen="yes" ;;
+			def_dlopen="yes" ; def_statsysbfd="no" ;;
 		ia64*)
-			enable_dlopen="yes" ;;
+			def_dlopen="yes" ; def_statsysbfd="no" ;;
 		hppa*)
-			EXTRA_CFLAGS=-fPIC; 
-			enable_dlopen="yes" ;;
+			def_dlopen="yes" ; def_statsysbfd="no" ;;
 	esac;;
 esac
+
+AC_ARG_ENABLE(dlopen,
+	[ --enable-dlopen uses dlopen for loading objects, which can then not be retained  in saved images ]
+	,,enable_dlopen="$def_dlopen")
+AC_ARG_ENABLE(statsysbfd,
+	[ --enable-statsysbfd uses a static sytem bfd library for loading and relocationing object files ]
+	,,enable_statsysbfd="$def_statsysbfd")
+AC_ARG_ENABLE(dynsysbfd,
+	[ --enable-dynsysbfd uses a dynamic shared sytem bfd library for loading and relocationing object files ]
+	,,enable_dynsysbfd="no")
+AC_ARG_ENABLE(locbfd,
+	[ --enable-locbfd uses a static bfd library built from this source tree for loading and relocationing object files ]
+	,,enable_locbfd="no")
+AC_ARG_ENABLE(debug,
+	[ --enable-debug builds gcl with -g in CFLAGS to enable running under gdb ]
+	,,enable_debug="no")
+
+load_opt="0"
+if test "$enable_dlopen" = "yes" ; then
+	load_opt=$(($load_opt+1))
+fi
+if test "$enable_statsysbfd" = "yes" ; then
+	load_opt=$(($load_opt+1))
+fi
+if test "$enable_dynsysbfd" = "yes" ; then
+	load_opt=$(($load_opt+1))
+fi
+if test "$enable_locbfd" = "yes" ; then
+	load_opt=$(($load_opt+1))
+fi
+
+if test "$load_opt" != "1" ; then
+	echo "Exactly one loader option must be chosen: dlopen=$enable_dlopen statsysbfd=$enable_statsysbfd dynsysbfd=$enable_dynsysbfd locbfd=$enable_locbfd"
+	exit 1
+fi
 
 ## finally warn if we did not find a recognized machine.s
 ##
@@ -235,19 +264,45 @@ AC_MSG_RESULT(use=$use)
 # System programs
 #
 
-
 AC_PROG_CC
 AC_PROG_CPP
+AC_SUBST(CC)
+
+
 # can only test for numbers -- CM
 # if test "${GCC}" -eq "yes" ; then
-if [[ "${GCC}" = "yes" ]] ; then
+#if [[ "${GCC}" = "yes" ]] ; then
 # Allog for environment variable overrides on compiler selection -- CM
-GCC=$CC
-else
-GCC=""
-fi
+#GCC=$CC
+#else
+#GCC=""
+#fi
 # subst GCC not only under 386-linux, but where available -- CM
-AC_SUBST(GCC)
+
+
+TCFLAGS="-Wall -DVOL=volatile -I\$(GCLDIR)/o -fsigned-char"
+if test "$GCC" = "yes" ; then
+	TCFLAGS="$TCFLAGS -fwritable-strings -pipe"
+fi
+
+if test "$enable_debug" = "yes" ; then
+	TCFLAGS="$TCFLAGS -g"
+	# for subconfigurations
+	CFLAGS=-g
+else
+	TCFLAGS="$TCFLAGS -O6 -fomit-frame-pointer"
+fi
+
+case $use in 
+     *linux)
+	case $use in
+		alpha*)
+			TCFLAGS="$TCFLAGS -mieee";;
+		hppa*)
+			TCFLAGS="$TCFLAGS -fPIC";;
+	esac;;
+esac
+
 
 
 # Step 1: set the variable "system" to hold the name and version number
@@ -284,6 +339,62 @@ else
 fi
 
 
+#
+# GMP
+#
+
+rm -f makedefsafter
+
+MP_INLCUDE=""
+if test $use_gmp = yes ; then
+ AC_MSG_CHECKING([use_gmp=yes, doing configure in gmp directory])
+ echo
+ echo "#"
+ echo "#"
+ echo "# -------------------"
+ echo "# Subconfigure of GMP"
+ echo "#"
+ echo "#"
+ case "$use" in
+#  Seem to be some problems with gmp3 on 68060 machines.  CM
+#   m68k-linux)
+#      (cd gmp3 && ./configure --build=none-unknown-linux-gnu) ;;
+   *)
+      (cd gmp3 && ./configure) ;;
+ esac
+ echo "#"
+ echo "#"
+ echo "#"
+ echo "# Subconfigure of GMP done"
+ echo "# ------------------------"
+ echo "#"
+ cp gmp3/gmp.h h/gmp.h
+ AC_MSG_CHECKING("for size of gmp limbs")
+ AC_TRY_RUN([#include <stdio.h>
+	#include "h/gmp.h"
+	int main() {
+	FILE *fp=fopen("conftest1","w");
+	fprintf(fp,"%u",sizeof(mp_limb_t));
+	fclose(fp);
+	return 0;
+}],mpsize=`cat conftest1`,mpsize=0,mpsize=0)
+ if test "$mpsize" = "0" ; then
+	echo "Cannot determine mpsize"
+	exit 1
+ fi
+ AC_DEFINE_UNQUOTED(MP_LIMB_BYTES,$mpsize)
+ AC_MSG_RESULT($mpsize) 
+ GMP=1
+ AC_DEFINE(GMP)
+ AC_SUBST(GMP)
+ MP_INCLUDE=h/gmp.h
+ echo > makedefsafter
+ echo 'MPFILES=${GMP_DIR}libgmp.a' >> makedefsafter
+ echo >> makedefsafter
+fi
+AC_SUBST(MP_INCLUDE)
+ 
+
 
 #
 # Dynamic loading
@@ -297,48 +408,79 @@ if test "$enable_dlopen" = "yes" ; then
 		exit 1
 	fi
 
-	LIBS="$LIBS -ldl -rdynamic"
+	TLIBS="$TLIBS -ldl -rdynamic"
 	AC_DEFINE(USE_DLOPEN)
+fi
 
-else	
-
-	if test "$enable_bfd" = "yes" ; then
-		AC_CHECK_HEADER(bfd.h,
-				AC_CHECK_LIB(bfd,bfd_init,
-					if $CC -v 2>&1 | fgrep ming > /dev/null ; then
-					       BFDLIB="-lbfd"
-					       IBRLIB="-liberty"
-					else
-						echo 'int main() {bfd_init();bfd_openr("/dev/null",0);return 0;}' >foo.c
-						MP=`$GCC [[ -Wl,-M ]] -static -o foo foo.c -lbfd -liberty 2>&1 | tr '()' '\012\012' | $AWK '{print $NF}' | sort | uniq`
-						rm -f foo.c foo
-						BFDLIB=`echo $MP | tr ' ' '\012' | grep libbfd.a`
-						IBRLIB=`echo $MP | tr ' ' '\012' | grep libiberty.a`
-					fi
-	#
-	# Old binutils appear to need CONST defined to const
-	#
-				AC_MSG_CHECKING(if need to define CONST for bfd)
+if test "$enable_statsysbfd" = "yes" || test "$enable_dynsysbfd" = "yes" ; then
+	AC_CHECK_HEADER(bfd.h,
+		AC_CHECK_LIB(bfd,bfd_init,
+		#
+		# Old binutils appear to need CONST defined to const
+		#
+			AC_MSG_CHECKING(if need to define CONST for bfd)
+			AC_TRY_RUN([#define IN_GCC
+				    #include <bfd.h>
+				    int main() { symbol_info t; return 0;}],
+				AC_MSG_RESULT(no),
 				AC_TRY_RUN([#define IN_GCC
 					    #include <bfd.h>
-					    int main() { symbol_info t; return 0;}],
-					AC_MSG_RESULT(no)
-					AC_DEFINE(HAVE_LIBBFD)
-					LIBS="$LIBS  $BFDLIB $IBRLIB",
-					AC_TRY_RUN([#define IN_GCC
-						    #include <bfd.h>
-	                                            #define CONST const
-						    int main() {symbol_info t; return 0;}],
-						AC_MSG_RESULT(yes) 
-						AC_DEFINE(NEED_CONST)
-						AC_DEFINE(HAVE_LIBBFD)
-						LIBS="$LIBS  $BFDLIB $IBRLIB",
-						AC_MSG_RESULT(cannot use bfd),AC_MSG_RESULT(cannot use bfd)),
-					AC_MSG_RESULT(cannot use bfd))
-						
-				,,-liberty))
-	fi
+                                            #define CONST const
+					    int main() {symbol_info t; return 0;}],
+					AC_MSG_RESULT(yes) 
+					AC_DEFINE(NEED_CONST),
+					AC_MSG_RESULT(cannot use bfd) exit 1;,
+					AC_MSG_RESULT(cannot use bfd) exit 1;),
+				AC_MSG_RESULT(cannot use bfd) exit 1;)
+			,,-liberty))
 
+	AC_DEFINE(HAVE_LIBBFD)
+
+#
+# FIXME: Need to workaround mingw before this point -- CM
+#
+	if test "$enable_statsysbfd" = "yes" && ! $CC -v 2>&1 | fgrep ming > /dev/null ; then
+		echo 'int main() {bfd_init();bfd_openr("/dev/null",0);return 0;}' >foo.c
+		MP=`$CC [ -Wl,-M ] -static -o foo foo.c -lbfd -liberty 2>&1 | tr '()' '\012\012' | $AWK '{print $NF}' | sort | uniq`
+		rm -f foo.c foo
+		TLIBS="$TLIBS `echo $MP | tr ' ' '\012' | grep libbfd.a`"
+		TLIBS="$TLIBS `echo $MP | tr ' ' '\012' | grep libiberty.a`"
+	else
+		TLIBS="$TLIBS -lbfd -liberty"
+	fi
+fi
+
+if test "$enable_locbfd" = "yes" ; then
+	echo "#"
+	echo "#"
+	echo "# -------------------"
+	echo "# Subconfigure of BFD"
+	echo "#"
+	echo "#"
+	cd binutils/bfd && ./configure && cd ../..
+	echo "#"
+	echo "#"
+	echo "#"
+	echo "# Subconfigure of BFD done"
+	echo "# ------------------------"
+	echo "#"
+	echo "#"
+	echo "#"
+	echo "# -------------------------"
+	echo "# Subconfigure of LIBIBERTY"
+	echo "#"
+	echo "#"
+	cd binutils/libiberty && ./configure && cd ../..
+	echo "#"
+	echo "#"
+	echo "#"
+	echo "# Subconfigure of LIBIBERTY done"
+	echo "# ------------------------------"
+	echo "#"
+	TLIBS="$TLIBS `pwd`/binutils/bfd/libbfd.a `pwd`/binutils/libiberty/libiberty.a"
+	AC_DEFINE(HAVE_LIBBFD)
+	BUILD_BFD="h/bfd.h h/bfdlink.h"
+	AC_SUBST(BUILD_BFD)
 fi
 
 # Find where Data begins.  This is used by the storage allocation
@@ -554,26 +696,25 @@ AC_MSG_CHECKING([for sockets])
 tcl_checkBoth=0
 AC_CHECK_FUNC(connect, tcl_checkSocket=0, tcl_checkSocket=1)
 if test "$tcl_checkSocket" = 1; then
-    AC_CHECK_LIB(socket, main, LIBS="$LIBS -lsocket", tcl_checkBoth=1)
+    AC_CHECK_LIB(socket, main, TLIBS="$TLIBS -lsocket", tcl_checkBoth=1)
 fi
 
 
 if test "$tcl_checkBoth" = 1; then
-    tk_oldLibs=$LIBS
-    LIBS="$LIBS -lsocket -lnsl"
-    AC_CHECK_FUNC(accept, tcl_checkNsl=0, [LIBS=$tk_oldLibs])
+    tk_oldLibs=$TLIBS
+    TLIBS="$TLIBS -lsocket -lnsl"
+    AC_CHECK_FUNC(accept, tcl_checkNsl=0, [TLIBS=$tk_oldLibs])
 fi
-AC_CHECK_FUNC(gethostbyname, , AC_CHECK_LIB(nsl, main, [LIBS="$LIBS -lnsl"]))
+AC_CHECK_FUNC(gethostbyname, , AC_CHECK_LIB(nsl, main, [TLIBS="$TLIBS -lnsl"]))
 
 if test "$enable_readline" = "yes" ; then
 	AC_CHECK_LIB(readline,main,
 		AC_DEFINE(HAVE_READLINE) 
-		LIBS="$LIBS -lreadline -lncurses"
+		TLIBS="$TLIBS -lreadline -lncurses"
 		RL_OBJS=readline.o
 		RL_LIB=lsp/readline.o,,-lncurses)
 fi
 
-AC_SUBST(LIBS)
 AC_SUBST(RL_OBJS)
 AC_SUBST(RL_LIB)
 
@@ -674,7 +815,6 @@ int joe=SV_ONSTACK;
  AC_SUBST(HAVE_SV_ONSTACK)
  AC_MSG_RESULT(yes)],
 AC_MSG_RESULT(no))
-AC_SUBST(EXTRA_CFLAGS)
 
 AC_MSG_CHECKING(check for SIGSYS)
 AC_TRY_COMPILE([#include <signal.h>
@@ -1026,48 +1166,6 @@ if test $gcl_ok = no ; then     AC_MSG_RESULT(no) ; fi
 
 # fionread or block
 
-rm -f makedefsafter
-
-MP_INLCUDE=""
-if test $use_gmp = yes ; then
- AC_MSG_CHECKING([use_gmp=yes, doing configure in gmp directory])
- case "$use" in
-#   i[[5-9]]86* | pentium* | k6* | athlon*)
-#      (cd gmp3 ; ./configure --target=i486) ;;
-#  Seem to be some problems with gmp3 on 68060 machines.  CM
-   m68k-linux)
-      (cd gmp3 && ./configure --build=none-unknown-linux-gnu) ;;
-   *)
-      (cd gmp3 && ./configure) ;;
- esac
-# [[ "`ls -1 gmp3/mpn/add_n.* 2>/dev/null`" != "" ]] || cp gmp3/mpn/generic/*.c gmp3/mpn/
- cp gmp3/gmp.h h/gmp.h
- AC_MSG_CHECKING("for size of gmp limbs")
- AC_TRY_RUN([#include <stdio.h>
-	#include "h/gmp.h"
-	
-	int main() {
-	FILE *fp=fopen("conftest1","w");
-	fprintf(fp,"%u",sizeof(mp_limb_t));
-	fclose(fp);
-	return 0;
-}],mpsize=`cat conftest1`,mpsize=0,mpsize=0)
- if test "$mpsize" = "0" ; then
-	echo "Cannot determine mpsize"
-	exit 1
- fi
- AC_DEFINE_UNQUOTED(MP_LIMB_BYTES,$mpsize)
- AC_MSG_RESULT($mpsize) 
- GMP=1
- AC_DEFINE(GMP)
- AC_SUBST(GMP)
- MP_INCLUDE=h/gmp.h
- echo > makedefsafter
- echo 'MPFILES=${GMP_DIR}libgmp.a' >> makedefsafter
- echo >> makedefsafter
-fi
-AC_SUBST(MP_INCLUDE)
- 
 # redhat/cygnus released for some reason a buggy version of gcc,
 # which no one else released.   Catch that here.
 AC_MSG_CHECKING([Checking for buggy gcc version from redhat])
@@ -1083,6 +1181,10 @@ if  2>&1 $CC -v | fgrep "gcc version 2.96" > /dev/null
 	AC_MSG_RESULT([no])
 fi 
 
+LIBS="$LIBS $TLIBS"
+AC_SUBST(LIBS)
+CFLAGS="$TCFLAGS"
+AC_SUBST(CFLAGS)
 
 if test -f h/$use.defs  ; then
 
@@ -1098,3 +1200,4 @@ else
   echo "Unable to guess machine type"
   echo use configure --enable-machine=XXX,  for XXX such that h/XXX.defs exists, ie in h/*.defs
 fi
+

@@ -2,11 +2,13 @@
 .SUFFIXES:
 .SUFFIXES: .d .o  .c .ini
 
+-include ../makedefs
+
 HDIR	= ../h/
 CDIR	= ./
 MPDIR	= ../mp
 
-OFLAG	= -O
+#OFLAG	= -O
 DEFS	= -I../h -I../gcl-tk
 ODIR	= .
 GCLIB  = ${ODIR}/gcllib.a
@@ -19,25 +21,23 @@ DPP	= ../bin/dpp
 
 # AUX_INFO=-aux-info $*.X
 .c.o:
-	$(CC) -c $(OFLAG) $(CFLAGS) $*.c $(AUX_INFO) 
+	$(CC) -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO) 
 .d.o:
 	$(DPP) $*
-	$(CC) -c $(OFLAG) $(CFLAGS) $*.c $(AUX_INFO)
+	$(CC) -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO)
 	rm $*.c
 
 CPP=
 .c.ini:
-	$(CC) -DNO_DEFUN $(CFLAGS) -E $*.c | sed -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
+	$(CC) -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c | sed -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
 
 .d.ini:
 	$(DPP) $*
 	./grab_defs < $*.c > $*.ini
 	rm $*.c
 
--include ../makedefs
-
 X11_INCLUDE=${TK_XINCLUDES} ${HAVE_X11}
-CFLAGS	=  -I../gcl-tk -I$(HDIR) $(ODIR_DEBUG) 
+#CFLAGS	=  -I../gcl-tk -I$(HDIR) $(ODIR_DEBUG) 
 
 
 MP 	= $(HDIR)mp.h
@@ -122,12 +122,12 @@ fsavres.o: /lib/libc.a
 	ar xv /lib/libc.a fsavres.o
 
 sockets.o: sockets.c
-	${CC} ${CFLAGS} ${X11_INCLUDE} -c  sockets.c
+	${CC} ${CFLAGS} $(DEFS) ${X11_INCLUDE} -c  sockets.c
 
 clxsocket.o:
-	${CC} ${CFLAGS}  ${X11_INCLUDE} -c  clxsocket.c
+	${CC} ${CFLAGS} $(DEFS) ${X11_INCLUDE} -c  clxsocket.c
 littleXwin.o:
-	${CC} ${CFLAGS} ${X11_INCLUDE} -c  littleXwin.o
+	${CC} ${CFLAGS} $(DEFS) ${X11_INCLUDE} -c  littleXwin.o
 
 character.o: $(HFILES)
 file.o:	$(HFILES)

@@ -1,4 +1,6 @@
 
+-include ../makedefs
+
 HDIR	= ../h
 ODIR	= ../o
 LSPDIR	= ../lsp
@@ -6,21 +8,20 @@ CMPDIR	= ../cmpnew
 PORTDIR	= ../unixport
 CLCSDIR = ../clcs
 PCLDIR = ../pcl
-MPDIR	= ../mp
+#MPDIR	= ../mp
 GMP_DIR	= ../gmp3/
 
-CFLAGS	= -c $(DEFS) -I$(HDIR)
-LDCC    = $(CC) -g
+#CFLAGS	= -c $(DEFS) -I$(HDIR)
+#LDCC    = $(CC) -g
 LIBC	= -lc
-LIBS	= -lm # -lpixrect -lc
+#LIBS	= -lm # -lpixrect -lc
 OLDDATE = "DATE"
 GCLIB	= $(ODIR)/gcllib.a
-MPFILES= $(MPDIR)/mpi.o $(MPDIR)/mp2.o  $(MPDIR)/libmport.a
-MPFILES= $(MPDIR)/mpi.o $(MPDIR)/mp2.o  $(MPDIR)/libmport.a
+#MPFILES= $(MPDIR)/mpi.o $(MPDIR)/mp2.o  $(MPDIR)/libmport.a
+#MPFILES= $(MPDIR)/mpi.o $(MPDIR)/mp2.o  $(MPDIR)/libmport.a
 INIT_SYSTEM_LSP=init_$(SYSTEM).lsp
 SPECIAL_RSYM = rsym.c
 
--include ../makedefs
 
 LIBS1= $(LIBS) $(LIBSYSTEM) $(GCLIB)
 
@@ -96,7 +97,7 @@ saved_$(SYSTEM):raw_$(SYSTEM) $(RSYM) $(INIT_SYSTEM_LSP) \
 	cat $(INIT_SYSTEM_LSP) | \
 	sed -e "s$(OLDDATE)Version(`cat ../majvers`.`cat ../minvers`) `date`g" \
 	-e 'ssaved_gclsaved_$(SYSTEM)g' \
-	-e 'slinks t)links t)(setq compiler::*cc* "$(CC)")$(INITFORM)g' \
+	-e 'slinks t)links t)(setq compiler::*cc* "$(CC) -c -I$(HDIR) $(CFLAGS)")$(INITFORM)g' \
 	-e "sGCLDIR${GCLDIR}g" \
 	-e "s(defun lisp-imp(setq si::*gcl-version* `cat ../minvers` si::*gcl-major-version* `cat ../majvers`)(defun lisp-impg" \
 	-e "s:GCL-1:GCL-"`cat ../majvers`":g" 	> foo 
@@ -117,7 +118,7 @@ raw_$(SYSTEM):  $(FOR_RAW)
 	$(LDCC)  -o raw_$(SYSTEM)$(EXE) $(FOR_RAW) ${LIBC} $(LIBS1)
 
 sys_gcl.o:	sys_gcl.c ${HDIR}/object.h ${HDIR}/config.h
-	$(CC) $(CFLAGS) sys_gcl.c
+	$(CC) $(CFLAGS) -c -I$(HDIR) sys_gcl.c
 
 #init_trad_gcl.lsp: init_gcl.lsp
 #	ln -s $< $@

@@ -2,6 +2,7 @@
 .SUFFIXES:
 .SUFFIXES: .fn .o .c .lsp
 
+-include ../makedefs
 
 
 PORTDIR	= ../unixport
@@ -16,7 +17,7 @@ OBJS	= arraylib.o assert.o defmacro.o defstruct.o describe.o evalmacros.o \
 
 COMPILE_FILE=$(PORTDIR)/saved_gcl $(PORTDIR) -system-p -c-file -data-file \
 	-o-file nil -h-file -compile
-CFLAGS	= -c -O -I../h 
+#CFLAGS	= -c -O -I../h 
 
 .lsp.c: 
 	@ ../xbin/if-exists $(PORTDIR)/saved_gcl \
@@ -27,17 +28,16 @@ CFLAGS	= -c -O -I../h
 	 @ ../xbin/if-exists $(PORTDIR)/saved_gcl \
 	"rm -f $*.c $*.h $*.data $*.o" \
 	"$(COMPILE_FILE) $* " \
-	"$(CC) $(OFLAG) $(CFLAGS) $*.c " \
+	"$(CC) $(OFLAG) $(CFLAGS) -c $*.c " \
 	"${APPEND} ${NULLFILE} $*.data $*.o "
 
--include ../makedefs
 
 all:	$(OBJS) $(RL_OBJS)
 
 
 
 .c.o:
-	$(CC) $(OFLAG) $(CFLAGS) $*.c
+	$(CC) $(OFLAG) $(CFLAGS) -c $*.c
 	${APPEND} ${NULLFILE} $*.data  $*.o
 
 .lsp.fn: ../cmpnew/collectfn.o

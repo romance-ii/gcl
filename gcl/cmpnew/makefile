@@ -2,6 +2,7 @@
 .SUFFIXES:
 .SUFFIXES: .o .c .lsp .lisp .fn
 
+-include ../makedefs
 
 PORTDIR	= ../unixport
 CAT=cat
@@ -14,7 +15,7 @@ OBJS	= cmpbind.o cmpblock.o cmpcall.o cmpcatch.o cmpenv.o cmpeval.o \
 
 COMPILE_FILE=$(PORTDIR)/saved_gcl $(PORTDIR) -system-p -c-file -data-file \
 	-o-file nil -h-file -compile
-CFLAGS	= -c -O -I../h 
+#CFLAGS	= -c -O -I../h 
 
 .lsp.c:
 	@ ../xbin/if-exists $(PORTDIR)/saved_gcl \
@@ -25,10 +26,8 @@ CFLAGS	= -c -O -I../h
 	@ ../xbin/if-exists $(PORTDIR)/saved_gcl \
 	"rm -f $*.c $*.h $*.data $*.o" \
 	"$(COMPILE_FILE) $* " \
-	"$(CC) $(OFLAG) $(CFLAGS) $*.c" \
+	"$(CC) $(OFLAG) $(CFLAGS) -c $*.c" \
 	"${APPEND} ${NULLFILE} $*.data $*.o"
-
--include ../makedefs
 
 all:	$(OBJS)
 
@@ -37,7 +36,7 @@ all:	$(OBJS)
 
 
 .c.o:  
-	$(CC) $(OFLAG) $(CFLAGS) $*.c
+	$(CC) $(OFLAG) $(CFLAGS) -c $*.c
 	${APPEND} ${NULLFILE} $*.data  $*.o
 
 collectfn.o:

@@ -306,10 +306,26 @@ object path, defaults, default_version;
 			device = default_device(path->pn.pn_host);
 	else
 		device = path->pn.pn_device;
+
+	if (defaults->pn.pn_directory==Cnil || 
+	   (type_of(path->pn.pn_directory)==t_cons
+	    && path->pn.pn_directory->c.c_car==sKroot))
+		directory=path->pn.pn_directory;
+	else {
+		object t,t1;
+
+		directory=defaults->pn.pn_directory;
+		if (type_of(directory)==t_cons) {
+			for (t1=directory,t=t1->c.c_cdr;t!=Cnil;t1=t,t=t->c.c_cdr);
+			t1->c.c_cdr=path->pn.pn_directory;
+		}
+	}
+/*
 	if (path->pn.pn_directory == Cnil)
 		directory = defaults->pn.pn_directory;
 	else
 		directory = path->pn.pn_directory;
+*/
 	if (path->pn.pn_name == Cnil)
 		name = defaults->pn.pn_name;
 	else
