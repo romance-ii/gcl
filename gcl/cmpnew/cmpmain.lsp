@@ -439,13 +439,22 @@ Cannot compile ~a.~%"
 	 (with-open-file
 	     (st (setq gaz (gazonk-name)) :direction :output)
 	   (prin1-cmp `(defun ,name ,@ (cddr tem))       st))
-	 (let ((fi (compile-file gaz :h-file t
-				  :system-p 'disassemble
-				 :data-file t :o-file nil)))
+	 (let ((fi (compile-file gaz :h-file t :c-file t
+				  :system-p 't
+				 :data-file t :o-file t)))
+	   (with-open-file (st (get-output-pathname gaz "c" gaz ))
+	     (si::copy-stream st *standard-output*)(delete-file st))
 	   (with-open-file (st (get-output-pathname gaz "data" gaz ))
 	     (si::copy-stream st *standard-output*)(delete-file st))
 	   (with-open-file (st (get-output-pathname gaz "h" gaz ))
 	     (si::copy-stream st *standard-output*)(delete-file st))
+	   (with-open-file (st
+			    (si::string-concatenate
+			     "| objdump -d "
+			     (namestring (get-output-pathname gaz "o" gaz ))
+			     " 2>/dev/null || echo No objdump found"))
+			   (si::copy-stream st *standard-output*))
+	   (delete-file (get-output-pathname gaz "o" gaz ))
 	   (delete-file gaz)
 	   ))
 	(t (error "can't disassemble ~a" name))))
