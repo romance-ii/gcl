@@ -1,6 +1,4 @@
-
-
-\input /tmp/texinfo-3.9/texinfo.tex
+\input texinfo
 @c -*-texinfo-*-
 @c IMPORTANT....
 @c some versions of texinfo.tex cause an error message 'unmatched paren

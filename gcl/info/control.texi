@@ -82,7 +82,7 @@ If an error occurs while executing the delayed command then the
 
 The @b{after} command always returns an empty string.
 
-@xref{tkerror}
+@xref{tkerror}.
 
 @unnumberedsubsec Keywords
 delay, sleep, time
@@ -476,7 +476,7 @@ If an error occurs in executing the command for a binding then the
 The command will be executed at global level (outside the context
 of any Tcl procedure).
 
-@xref{tkerror}
+@xref{tkerror}.
 
 @unnumberedsubsec Keywords
 form, manual
