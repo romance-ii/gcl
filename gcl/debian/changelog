@@ -6,8 +6,9 @@ gclcvs (2.7.0-30) unstable; urgency=low
   * New debian/support files for debconf image default selection support
   * More descriptive compiled C function names for use in gprof when
     profiling is compiled in
+  * Allow sharp numbers to be bignums
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  5 Aug 2004 22:17:00 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  5 Aug 2004 22:19:55 +0000
 
 gclcvs (2.7.0-29) unstable; urgency=low
 

@@ -1084,7 +1084,7 @@ static void
 Ldispatch_reader()
 {
 	object c, x;
-	int i, d;
+	int i, j;
 	object in;
 
 	check_arg(2);
@@ -1095,19 +1095,25 @@ Ldispatch_reader()
 	if (READtable->rt.rt_self[char_code(c)].rte_dtab == NULL)
 		FEerror("~C is not a dispatching macro character", 1, c);
 
-	c = read_char(in);
-	d = digitp(char_code(c), 10);
-	if (d >= 0) {
-		i = 0;
-		do {
-			i = 10*i + d;
-			c = read_char(in);
-			d = digitp(char_code(c), 10);
-		} while (d >= 0);
-		vs_push(make_fixnum(i));
-	} else
-		vs_push(Cnil);
 
+	for (i=0;i<token->st.st_dim;i++) {
+	  c=read_char(in);
+	  j=char_code(c);
+	  if (digitp(j,10)<0)
+	    break;
+	  token->st.st_self[i]=j;
+	}
+	if (i==token->st.st_dim)
+	  FEerror("Dispatch number too long", 0);
+	if (i) {
+	  token->st.st_fillp=i;
+	  x=parse_number(token->st.st_self,token->st.st_fillp, &i, 10);
+	  if (x == OBJNULL || i != token->st.st_fillp)
+	    FEerror("Cannot parse the dispatch macro number.", 0);
+	} else
+	  x=Cnil;
+	vs_push(x);
+	
 	x =
 	READtable->rt.rt_self[char_code(vs_base[1])].rte_dtab[char_code(c)];
 	vs_base[1] = c;
