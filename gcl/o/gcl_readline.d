@@ -212,46 +212,6 @@ static char **rl_completion(char *text, int start, int end) {
 }
 #endif
 
-int rl_getc_em(FILE *f) {
-	static unsigned char *line = NULL;
-	static int linepos = 0;
-	int r;
-	
-	if (f!=stdin || !isatty(fileno(f)) ) return getc(f);
-	
-	if (rl_ungetc_em_char!=-1) {
-		r = rl_ungetc_em_char;
-		rl_ungetc_em_char = -1;
-		return r;
-	}
-	
-	if (line==NULL) {
-		if (readline_on==1) {
-			putc('\r', stdout);
-			line = readline(rl_putc_em_line);
-			if (line==NULL) return EOF;
-			if (line[0] != 0) add_history(line);
-		} else {
-			return getc(f);
-		}
-	}
-
-	if (line[linepos]==0) {
-		free(line);
-		line = NULL;
-		linepos = 0;
-		return '\n';
-	}
-
-	return line[linepos++];
-}
-
-int rl_ungetc_em(int c, FILE *f) {
-	if (f!=stdin || !isatty(fileno(f)) ) return ungetc(c, f);
-	rl_ungetc_em_char = ((unsigned char)c);
-	return c;
-}
-
 int rl_putc_em(int c, FILE *f) {
 	static int allocated_length = 0;
 	static int current_length = 0;
@@ -283,6 +243,48 @@ int rl_putc_em(int c, FILE *f) {
 	tail:
 	return putc(c, f);
 }
+
+int rl_getc_em(FILE *f) {
+	static unsigned char *line = NULL;
+	static int linepos = 0;
+	int r;
+	
+	if (f!=stdin || !isatty(fileno(f)) ) return getc(f);
+	
+	if (rl_ungetc_em_char!=-1) {
+		r = rl_ungetc_em_char;
+		rl_ungetc_em_char = -1;
+		return r;
+	}
+	
+	if (line==NULL) {
+		if (readline_on==1) {
+ 			putc('\r', stdout);
+			line = readline(rl_putc_em_line);
+ 			rl_putc_em('\r', stdout);
+			if (line==NULL) return EOF;
+			if (line[0] != 0) add_history(line);
+		} else {
+			return getc(f);
+		}
+	}
+
+	if (line[linepos]==0) {
+		free(line);
+		line = NULL;
+		linepos = 0;
+		return '\n';
+	}
+
+	return line[linepos++];
+}
+
+int rl_ungetc_em(int c, FILE *f) {
+	if (f!=stdin || !isatty(fileno(f)) ) return ungetc(c, f);
+	rl_ungetc_em_char = ((unsigned char)c);
+	return c;
+}
+
 
 /* readline support now initialized automatically -- 20040102 CM */
 #if 0
