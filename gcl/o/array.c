@@ -551,6 +551,35 @@ DEFUN("MAKE-ARRAY1",object,fSmake_array1,SI,6,6,
  }}
 
 /*
+(proclaim '(ftype (function (object t  *)) array-displacement1))
+(defun array-displacement1 ( array )
+*/
+
+DEFUNO("ARRAY-DISPLACEMENT",object,fSarray_displacement,SI,1,1,
+      NONE,OO,OO,OO,OO,siLarray_displacement,"")
+     (object array) {
+
+  object a;
+  int s,n;
+
+  BEGIN_NO_INTERRUPT;
+  if (type_of(array)!=t_array && type_of(array)!=t_vector)
+    FEerror("Argument is not an array",0);
+  a=array->a.a_displaced->c.c_car;
+  if (a==Cnil) {
+    END_NO_INTERRUPT;
+    return make_cons(Cnil,make_fixnum(0));
+  }
+  s=aet_sizes[Iarray_element_type(a)];
+  n=(void *)array->a.a_self-(void *)a->a.a_self;
+  if (n%s)
+    FEerror("Array is displaced by fractional elements",0);
+  END_NO_INTERRUPT;
+  return make_cons(a,make_fixnum(n/s));
+
+}
+
+/*
   For the X->a.a_displaced field, the CAR is an array which X
   's body is displaced to (ie body of X is part of Another array)
   and the (CDR) is the LIST of arrays whose bodies are displaced
