@@ -8,8 +8,9 @@ gclcvs (2.7.0-7) unstable; urgency=low
   * Make sure to push stack variables onto newly allocated C variable
     when inlining args and args cause side effects, in inline-args,
     gcl_cmpinline.lsp
+  * Fix bug related to gcc-3.3 fixes in set_exponent in num_co.c
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 29 Sep 2003 15:25:30 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  2 Oct 2003 14:04:58 +0000
 
 gclcvs (2.7.0-6) unstable; urgency=low
 

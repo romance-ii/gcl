@@ -263,7 +263,6 @@ double_exponent(double d)
 static double
 set_exponent(double d, int e)
 {
-	double dummy;
 	union {double d;int i[2];} u;
 
 	if (d == 0.0)
@@ -290,8 +289,7 @@ set_exponent(double d, int e)
 #ifdef S3000
 	= *(int *)(&d) & 0x80ffffff | ((e + 64) << 24) & 0x7f000000;
 #endif
-	dummy = d*d;
-	return(d);
+	return(u.d);
 }
 
 
