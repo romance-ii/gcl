@@ -4,38 +4,35 @@
 #include <string.h>
 #include <stdio.h>
 
-static bfd *bself = NULL;
+static bfd *exe_bfd = NULL;
 struct bfd_link_info link_info;
 
 int build_symbol_table_bfd ( char *oname ) {
 
     int u,v;
-
     asymbol **q;
 
-    bfd_init();
-
-    if ( ! ( bself = bfd_openr ( oname, 0 ) ) ) {
+    if ( ! ( exe_bfd = bfd_openr ( oname, 0 ) ) ) {
         fprintf ( stderr, "Cannot open self.\n" );
         exit ( 0 );
     }
     
-    if (!bfd_check_format(bself,bfd_object)) {
+    if ( ! bfd_check_format ( exe_bfd, bfd_object ) ) {
         fprintf ( stderr, "I'm not an object.\n" );
         exit ( 0 );
     }
     
-    if (!(link_info.hash = bfd_link_hash_table_create (bself))) {
+    if (!(link_info.hash = bfd_link_hash_table_create (exe_bfd))) {
         fprintf ( stderr, "Cannot make hash table.\n" );
         exit ( 0 );
     }
     
-    if (!bfd_link_add_symbols(bself,&link_info)) {
+    if (!bfd_link_add_symbols(exe_bfd,&link_info)) {
         fprintf ( stderr, "Cannot add self symbols\n.\n" );
         exit ( 0 );
     }
     
-    if ((u=bfd_get_symtab_upper_bound(bself))<0) {
+    if ((u=bfd_get_symtab_upper_bound(exe_bfd))<0) {
         fprintf ( stderr, "Cannot get self's symtab upper bound.\n" );
         exit ( 0 );
     }
@@ -43,7 +40,7 @@ int build_symbol_table_bfd ( char *oname ) {
     fprintf ( stderr, "Allocating symbol table (%d bytes)\n", u );
     q = (asymbol **) malloc ( u );
 
-    if ( ( v = bfd_canonicalize_symtab ( bself, q ) ) < 0 ) {
+    if ( ( v = bfd_canonicalize_symtab ( exe_bfd, q ) ) < 0 ) {
         fprintf ( stderr, "Cannot canonicalize self's symtab.\n" );
         exit ( 0 );
     }
@@ -80,7 +77,7 @@ int build_symbol_table_bfd ( char *oname ) {
         }
     }
 #endif        
-    bfd_close(bself);
+    bfd_close ( exe_bfd );
     free(q);
     return 0;
     
@@ -230,7 +227,7 @@ int main ( int argc, char ** argv )
     int init_address=-1;
     int max_align = 0;
     unsigned long curr_size = 0;
-    bfd *b = NULL;
+    bfd *obj_bfd = NULL;
     bfd_error_type myerr;
     unsigned u = 0, v = 0;
     asymbol **q = NULL;
@@ -255,6 +252,9 @@ int main ( int argc, char ** argv )
         memset ( &link_order, 0, sizeof (link_order) );
         memset ( &link_callbacks, 0, sizeof (link_callbacks) );
         
+
+        bfd_init();
+
         fprintf ( stderr, "BUILDING EXECUTABLE SYMBOL TABLE (ARGV[1]) \n\n" );
         build_symbol_table_bfd ( argv[1] );        
 
@@ -272,31 +272,32 @@ int main ( int argc, char ** argv )
         link_info.callbacks = &link_callbacks;
         link_order.type = bfd_indirect_link_order;
 
-        if ( ! ( b = bfd_openr ( argv[2], 0 ) ) ) {
+        if ( ! ( obj_bfd = bfd_openr ( argv[2], 0 ) ) ) {
             fprintf ( stderr, "Cannot open bfd.\n" );
         }
         
         if ( ( myerr = bfd_get_error () ) && myerr != 3 ) {
             fprintf ( stderr, "Unknown bfd error code on openr %s %d\n.", argv[2], myerr );
         }
-        if ( ! bfd_check_format ( b, bfd_object ) ) {
-            fprintf ( stderr, "Unknown bfd format\n.\n" );
+        fflush ( stderr );
+        if ( ! bfd_check_format ( obj_bfd, bfd_object ) ) {
+            fprintf ( stderr, "Unknown bfd format %s.\n", argv[2] );
         }
 
         if ( ( myerr = bfd_get_error () ) && myerr != 3 ) {
-            fprintf ( stderr, "Unknown bfd error code on check_format\n" );
+            fprintf ( stderr, "Unknown bfd error code on check_format %s\n", argv[2] );
         }
 
         bfd_set_error(0);
 
-        current=NULL;
+        current = NULL;
 
-        fprintf ( stderr, "CALCULATING CURRENT, MAX_ALIGN and ALLOCATING ) \n\n" );
+        fprintf ( stderr, "CALCULATING CURRENT, MAX_ALIGN and ALLOCATING \n\n" );
 
-        for (s=b->sections;s;s=s->next) {
+        for ( s= obj_bfd->sections;s;s=s->next) {
 
-            s->owner=b;
-            s->output_section=(s->flags & SEC_ALLOC) ? s : b->sections;
+            s->owner = obj_bfd;
+            s->output_section = ( s->flags & SEC_ALLOC) ? s : obj_bfd->sections;
             s->output_offset=0;
 
             if (!(s->flags & SEC_ALLOC))
@@ -341,7 +342,7 @@ int main ( int argc, char ** argv )
 
         memset ( cfd_start, 0, cfd_size );
         
-        for ( m = start_address, s=b->sections; s; s=s->next ) {
+        for ( m = start_address, s = obj_bfd->sections; s; s=s->next ) {
 
             if (!(s->flags & SEC_ALLOC))
                 continue;
@@ -358,10 +359,10 @@ int main ( int argc, char ** argv )
         }
 
         fprintf ( stderr, "\n\nDOING SOMETHING WITH THE HASHED SYMBOLS\n\n" );
-        if ((u=bfd_get_symtab_upper_bound(b))<0)
+        if ((u=bfd_get_symtab_upper_bound(obj_bfd))<0)
             fprintf ( stderr, "Cannot get symtab uppoer bound.\n" );
         q = (asymbol **) alloca ( u );
-        if ( ( v = bfd_canonicalize_symtab ( b, q ) ) < 0 )
+        if ( ( v = bfd_canonicalize_symtab ( obj_bfd, q ) ) < 0 )
             fprintf ( stderr, "cannot canonicalize symtab.\n" );
         fprintf ( stderr, "u = %d, v = %d\n", u, v );
         for (u=0;u<v;u++) {
@@ -389,29 +390,29 @@ int main ( int argc, char ** argv )
 
         }
 
-        fprintf ( stderr, "\n\nDOING RELOCATIONS", cfd_size );
+        fprintf ( stderr, "\n\nDOING RELOCATIONS\n\n", cfd_size );
         fflush ( stderr );
-        for (s=b->sections;s;s=s->next) {
+        for ( s = obj_bfd->sections; s; s = s->next ) {
 
             fprintf ( stderr, "s->name %s, s->flags = %x\n", s->name, s->flags );
-            if (!(s->flags & SEC_LOAD))
+            if ( ! ( s->flags & SEC_LOAD ) )
                 continue;
 
             link_order.u.indirect.section=s;
 
             fprintf ( stderr, "About to get reloc section contents\n" );
 
-            fprintf ( stderr, "b = %x, section %s, s->output_section = %x, q = %x\n",
-                      b, s->name, s->output_section, q);
+            fprintf ( stderr, "obj_bfd = %x, section %s, s->output_section = %x, q = %x\n",
+                      obj_bfd, s->name, s->output_section, q);
 
             fflush ( stderr );
-            if (!bfd_get_relocated_section_contents(b,&link_info,&link_order,
+            if (!bfd_get_relocated_section_contents(obj_bfd, &link_info,&link_order,
                                                      (void *)(unsigned long)s->output_section->vma,0,q)) 
                 fprintf ( stderr, "Cannot get relocated section contents\n");
             
         }
         
-        bfd_close(b);
+        bfd_close ( obj_bfd );
         printf("start address -T %x \n", cfd_start);
     }
 }
