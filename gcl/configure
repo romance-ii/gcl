@@ -3843,6 +3843,46 @@ echo "configure:3839: checking use_gmp=yes, doing configure in gmp directory" >&
       (cd gmp ; ./configure) ;;
  esac
  [ "`ls -1 gmp/mpn/add_n.* 2>/dev/null`" != "" ] || cp gmp/mpn/generic/*.c gmp/mpn/
+ cp gmp/gmp.h h/gmp.h
+ echo $ac_n "checking "for size of gmp limbs"""... $ac_c" 1>&6
+echo "configure:3849: checking "for size of gmp limbs"" >&5
+ if test "$cross_compiling" = yes; then
+  mpsize=0
+else
+  cat > conftest.$ac_ext <<EOF
+#line 3854 "configure"
+#include "confdefs.h"
+#include <stdio.h>
+	#include "h/gmp.h"
+	
+	int main() {
+	FILE *fp=fopen("conftest1","w");
+	fprintf(fp,"%u",sizeof(mp_limb_t));
+	fclose(fp);
+	return 0;
+}
+EOF
+if { (eval echo configure:3866: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+then
+  mpsize=`cat conftest1`
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  rm -fr conftest*
+  mpsize=0
+fi
+rm -fr conftest*
+fi
+
+ if test "$mpsize" = "0" ; then
+	echo "Cannot determine mpsize"
+	exit 1
+ fi
+ cat >> confdefs.h <<EOF
+#define MP_LIMB_BYTES $mpsize
+EOF
+
+ echo "$ac_t""$mpsize" 1>&6 
  GMP=1
  cat >> confdefs.h <<\EOF
 #define GMP 1
@@ -3859,7 +3899,7 @@ fi
 # redhat/cygnus released for some reason a buggy version of gcc,
 # which no one else released.   Catch that here.
 echo $ac_n "checking Checking for buggy gcc version from redhat""... $ac_c" 1>&6
-echo "configure:3863: checking Checking for buggy gcc version from redhat" >&5
+echo "configure:3903: checking Checking for buggy gcc version from redhat" >&5
 if  2>&1 $CC -v | fgrep "gcc version 2.96" > /dev/null 
    then 
         BROKEN_O4_OPT=1

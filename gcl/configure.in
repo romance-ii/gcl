@@ -1021,6 +1021,23 @@ if test $use_gmp = yes ; then
       (cd gmp ; ./configure) ;;
  esac
  [[ "`ls -1 gmp/mpn/add_n.* 2>/dev/null`" != "" ]] || cp gmp/mpn/generic/*.c gmp/mpn/
+ cp gmp/gmp.h h/gmp.h
+ AC_MSG_CHECKING("for size of gmp limbs")
+ AC_TRY_RUN([#include <stdio.h>
+	#include "h/gmp.h"
+	
+	int main() {
+	FILE *fp=fopen("conftest1","w");
+	fprintf(fp,"%u",sizeof(mp_limb_t));
+	fclose(fp);
+	return 0;
+}],mpsize=`cat conftest1`,mpsize=0,mpsize=0)
+ if test "$mpsize" = "0" ; then
+	echo "Cannot determine mpsize"
+	exit 1
+ fi
+ AC_DEFINE_UNQUOTED(MP_LIMB_BYTES,$mpsize)
+ AC_MSG_RESULT($mpsize) 
  GMP=1
  AC_DEFINE(GMP)
  AC_SUBST(GMP)

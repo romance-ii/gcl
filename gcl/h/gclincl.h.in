@@ -164,6 +164,8 @@
 
 #undef USE_DLOPEN
 
+#define MP_LIMB_BYTES 0
+
 /* The number of bytes in a long *.  */
 #undef SIZEOF_LONG_P
 

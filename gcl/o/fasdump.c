@@ -801,12 +801,13 @@ write_fasd(object obj)
      /* if (sizeof(mp_limb_t) != 4) { FEerror("fix for gmp",0);} */
      PUT4(l);
      while (-- m >=0) {
-       if (sizeof(unsigned long)==8)
+#if MP_LIMB_BYTES == 8
 	 PUT8(*u);
-       else if (sizeof(unsigned long)==4)
+#elif MP_LIMB_BYTES == 4
 	 PUT4(*u); 
-       else
-	 FEerror("Fix for gmp",0);
+#else
+#error Bad MP_LIMB_BYTES
+#endif
        u++;
      }
      break;}
@@ -1285,12 +1286,13 @@ read_fasd1(int i, object *loc)
 	
 #endif	 
 	while ( --j >=0) {
-	  if (sizeof(unsigned long)==8)
+#if MP_LIMB_BYTES == 8
 	    GET8(*u);
-	  else if (sizeof(unsigned long)==4)
+#elif MP_LIMB_BYTES == 4
 	    GET4(*u);
-	  else
-	    FEerror("Bad sizeof(unsigned long)",0);
+#else
+#error Bad MP_LIMB_BYTES
+#endif
 	  u++;
 	}
 	*loc=tem; return;}

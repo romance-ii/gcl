@@ -215,3 +215,5 @@ SGC is enabled.  */
 #undef SIZEOF_LONG_P
 
 #undef USE_DLOPEN
+
+#define MP_LIMB_BYTES 0
