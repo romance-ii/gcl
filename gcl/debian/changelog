@@ -1,4 +1,4 @@
-gcl (2.5.0.cvs-4) unstable; urgency=medium
+gcl (2.5.0.cvs20020219-1) unstable; urgency=medium
 
   * Updated package descriptions, Closes: #134402
   * Static linking of libbfd, Closes: #134647
