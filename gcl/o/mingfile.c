@@ -52,7 +52,7 @@ void Ldirectory ( void )
 
 	}
 }
-
+#if 0
 int 
 rename(const char *file, const char *tofile)
 {  return MoveFile(file,tofile);
@@ -67,6 +67,7 @@ int setenv(const char *variable,const char *value,int force)
     return (!SetEnvironmentVariable(variable,value));
 
 }
+
 
 /* callers of this mingw version should know to
    free the result */
@@ -83,5 +84,5 @@ getenv(const char *variable)
   GetEnvironmentVariable(variable,res,n);
   return res;
 }
-
+#endif
 

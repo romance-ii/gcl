@@ -49,8 +49,10 @@ via #include "../c/sfasl.c"
 #include "ext_sym.h"
 struct node * find_sym();
 int node_compare();
+#ifndef _WIN32
 char *malloc();
 char *bsearch();
+#endif
 
 struct reloc relocation_info;
 /* next 5 static after debug */
@@ -511,7 +513,7 @@ unsigned int length;
    case N_ABS : case N_TEXT: case N_DATA: case N_BSS:
 #endif
 #ifdef COFF
-#ifdef  WINDOWSNT
+#ifdef  _WIN32
    case TEXT_NSCN:
      sym->n_value = (int)start_address;
      break;

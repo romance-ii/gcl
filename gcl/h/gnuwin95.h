@@ -1,5 +1,4 @@
 #define MP386
-#define WINDOWSNT
 #include "att.h"
 /* #include "386.h" */
 /* #include "fcntl.h" */

@@ -21,7 +21,7 @@ Boston, MA 02111-1307, USA.  */
 
 #include "config.h"
 
-#ifdef WINDOWSNT
+#ifdef _WIN32
 /* See comments in lastfile.c.  */
 char my_begdata[] = "Beginning of Emacs initialized data";
 char my_begbss[1];  /* Do not initialize this variable.  */

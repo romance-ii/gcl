@@ -28,7 +28,7 @@ relocate()
       dprintf( r_pcrlong new value = %x ,
 	      *((int *)where)  - (int)start_address
 	      + symbol_table[relocation_info.r_symndx].n_value );
-#ifdef WINDOWSNT
+#ifdef _WIN32
       /* the following is logical, except the address offset is
 	 not where the 'where' is but where the 'call' is just
 	 AFTER the 'where'.

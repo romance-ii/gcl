@@ -7,7 +7,7 @@
 #include HAVE_AOUT 
 #endif
 
-#ifdef WINDOWSNT
+#ifdef _WIN32
 #define TEXT_NSCN 1
 #define DATA_NSCN 2
 #define BSS_NSCN 3

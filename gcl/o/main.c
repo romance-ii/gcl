@@ -907,7 +907,7 @@ init_main(void) {
 #endif	 
   
 #ifdef UNIX
-#ifndef WINDOWSNT	 
+#ifndef _WIN32	 
   ADD_FEATURE("UNIX");
 #endif	
 #endif

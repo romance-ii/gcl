@@ -582,13 +582,6 @@ error:
 
 int
 TcpOutputProc ( int fd, char *buf, int toWrite, int *errorCodePtr, int block )
-#if 0    
-     int fd;       /* socket */
-    char *buf;				/* Where to get data. */
-    int toWrite;			/* Maximum number of bytes to write. */
-    int *errorCodePtr;			/* Where to store error codes. */
-     int block;
-#endif    
 {
     int bytesWritten;
     int error;
@@ -931,61 +924,84 @@ sigprocmask (int how , const sigset_t *set,sigset_t *oldset)
 
 fix_filename(object pathname, char *filename1)
 {
-  char current_directory[MAXPATHLEN];
-  char directory[MAXPATHLEN];
-  char *filename = filename1;
-  extern char *getwd();
+    char current_directory[MAXPATHLEN];
+    char directory[MAXPATHLEN];
+    char *filename = filename1;
+    char *p;
+    extern char *getwd();
+    /*    fprintf ( stderr, "fix_filename: At start %s\n", filename1 );*/
+    p = filename;
+    while ( *p ) {
+        if (*p=='\\') *p='/';
+        p++;
+    }
  AGAIN:
-	/* grok filename to have only '/' not '\',
-	   fix up for cygnus:  /cygdrive/h/   becomes h:/
-	   //h/ab is h:/ab
-           and
-	   change h:a/b to check what the current directory
-	   is on 'h:' and then prepend this to a/b
-	*/  
-	if (filename[0]=='/' && filename[1]=='c' &&
-	    strncmp(filename,"/cygdrive/",10)==0 && filename[11]=='/')
-	  {
-	    filename[9]=filename[10];
-	    filename[10]=':';
-	    filename += 9;
-	  } else if (filename[0]=='/' && filename[1]=='/' && filename[3]=='/')
-	    {
-	    filename[1]=filename[2];
-	    filename[2] = ':';
-	    filename += 1;
-	  }
-	{ char *p = filename;
-	while ( *p )
-	  {if (*p=='\\') *p='/';
-	  p++;
-	  }
-	if (filename[1]==':' && filename[2]!='/') {
-	  char buf[4];
-	  bcopy(filename,buf,2);
-	  buf[2]='/';
-	  buf[3]=0;
-	  getwd(current_directory);
-	  if (chdir(buf) < 0)
-	    FEerror("Cannot get the truename of ~S.", 1, pathname);
-	  p = getwd(directory);
-	  chdir(current_directory);
-	  /*	  strncat(directory,"/",2); */
-	  strncat(directory,filename+2,MAXPATHLEN-strlen(directory)-2);
-	  strcpy(filename1,directory);
-	  filename=filename1;
-	  goto AGAIN;
-	}
-	}
-	/* move the name back to beginning of buffer */
-	if (filename > filename1) {
-	  while (*filename) {
+    /* grok filename to have only '/' not '\',
+       fix up for cygnus:  /cygdrive/h/   becomes h:/
+       //h/ab and /h/ab become h:/ab
+       and
+       change h:a/b to check what the current directory
+       is on 'h:' and then prepend this to a/b
+       */  
+
+    if ( filename[0] == '/' &&
+         filename[1] == 'c' &&
+         strncmp ( filename, "/cygdrive/", 10 ) == 0 &&
+         filename[11] == '/' ) {
+        /* /cygdrive/... */
+        /*        fprintf ( stderr, "fix_filename: In cygdrive phase\n" );*/
+        filename[9]  = filename[10];
+        filename[10] = ':';
+        filename    += 9;
+    } else {
+        if ( filename[0]=='/' &&
+             filename[1]=='/' &&
+             filename[3]=='/' ) {
+            /* //h/... */
+            /*            fprintf ( stderr, "fix_filename: In // phase\n" );*/
+            filename[1] = filename[2];
+            filename[2] = ':';
+            filename   += 1;
+        } else {
+            if ( filename[0] == '/' &&
+                 filename[2] == '/' &&
+                 isalpha ( filename[1] ) ) {
+                /* /h/... */
+                /*                fprintf ( stderr, "fix_filename: In / phase\n" );*/
+                filename[0] = filename[1];
+                filename[1] = ':';
+            }
+        }
+    }
+
+    if ( filename[1] == ':' && filename[2] != '/' ) {
+        char buf[4];
+        /*        fprintf ( stderr, "fix_filename: In current dir fixup phase\n" );*/
+        bcopy(filename,buf,2);
+        buf[2]='/';
+        buf[3]=0;
+        getwd(current_directory);
+        if ( chdir(buf) < 0 ) {
+            FEerror("fix_filename: Cannot get the truename of ~S.", 1, pathname);
+        }
+        p = getwd ( directory );
+        chdir ( current_directory );
+        strncat ( directory, filename+2, MAXPATHLEN-strlen(directory)-2 );
+        strcpy ( filename1, directory );
+        filename = filename1;
+        goto AGAIN;
+    }
+
+    /* move the name back to beginning of buffer */
+    if ( filename > filename1 ) {
+        while ( *filename ) {
 	    *filename1++ = *filename++;
-	  }
-	  *filename1=0;
-	}
+        }
+        *filename1=0;
+    }
+    /*    fprintf ( stderr, "fix_filename: At end %s\n", filename1 );*/
+
 }
-	
-	/* done fixup for mingwin ...*/
+
 
 

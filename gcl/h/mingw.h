@@ -13,10 +13,7 @@
       sprintf(command,"rsym %s %s",kcl_self,tmpfile1);
 #endif
 
-#define SIZEOF_LONG_P 4
-
 #define MP386
-#define WINDOWSNT
 #define GCL
 
 /* #define filehdr _IMAGE_FILE_HEADER */
@@ -81,8 +78,10 @@ extern DBEGIN_TY _stacktop, _stackbottom, _dbegin;
 #  define HAVE_RENAME
 #endif
 
+#if 0
 /* the result of 'getenv' is malloc'd */
 #define FREE_GETENV_RESULT
+#endif
 
 #define SIGBUS		 7
 #ifndef SIGKILL
@@ -101,9 +100,12 @@ extern DBEGIN_TY _stacktop, _stackbottom, _dbegin;
 #define SIG_SETMASK        2	/* for setting the signal mask */
 
 #define HAVE_SIGPROCMASK
-#define NEED_TO_REINSTALL_SIGNALS 
+#define NEED_TO_REINSTALL_SIGNALS
+
+#if 0
 #ifndef SIGIO
 #  define SIGIO 23
+#endif
 #endif
 
 /* on most machines this will test in one instruction

@@ -1,7 +1,7 @@
 # Machine dependent makefile definitions for Intel X86 under Microsoft Windows,
 # using Mingw32 compiler tools.
 
-SHELL        = bash
+SHELL        = sh
 
 OFLAG	     = -O 
 LIBS	    += -lwsock32
