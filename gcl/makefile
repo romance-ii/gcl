@@ -33,7 +33,7 @@ all: $(PORTDIR)/$(FLISP) command cmpnew/collectfn.o lsp/info.o do-gcl-tk do-info
 $(PORTDIR)/saved_gcl: ${HDIR}cmpinclude.h
 	(cd $(BINDIR); make all)
 	make mpfiles
-	rm -f o/cmpinclude.h ; ln h/cmpinclude.h o
+	rm -f o/cmpinclude.h ; cp h/cmpinclude.h o
 	(cd $(ODIR); make all)
 	(cd $(LSPDIR); make all)
 	(cd $(CMPDIR); make all)
@@ -99,7 +99,7 @@ command:
 	rm -f bin/gcl xbin/gcl
 	GCLDIR=`echo ${GCLDIR} | sed -e 'sX^/cygdrive/\([a-z]\)X\1!Xg' -e 'sX^//\([a-z]\)X\1!Xg'` ; \
 	make install-command "INSTALL_LIB_DIR=$${GCLDIR}" "prefix=$${GCLDIR}" 
-	(cd xbin ; ln -s ../bin/gcl .)
+	(cd xbin ; cp ../bin/gcl .)
 
 merge:
 	${CC} -o merge merge.c
@@ -175,11 +175,11 @@ ${HDIR}cmpinclude.h: ${CMPINCLUDE_FILES} ${HDIR}config.h
 		-e "/End for cmpinclude/,50000d" > tmpx
 	cat ${CMPINCLUDE_FILES} >> tmpx
 	./xbin/move-if-changed mv tmpx h/cmpinclude.h
-	./xbin/move-if-changed ln h/cmpinclude.h o/cmpinclude.h
+	./xbin/move-if-changed cp h/cmpinclude.h o/cmpinclude.h
 
 go:
 	mkdir go
-	(cd go ; ln -s ../o/makefile ../o/*.o ../o/*.c ../o/*.d ../o/*.ini  .)
+	(cd go ; cp -s ../o/makefile ../o/*.o ../o/*.c ../o/*.d ../o/*.ini  .)
 	(cd go ; make  go)
 
 tar:
