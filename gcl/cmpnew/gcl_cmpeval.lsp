@@ -237,11 +237,15 @@
 	   (cons-to-right (cdr x)))))
 ;	   (arg-appears (car x) (cdr x) nil))))
 
+(defun bind-before-cons (x y)
+  (and y (consp (car y)) (atom (cadar y))
+       (if (eq x (cadar y)) (caar y)
+	 (bind-before-cons x (cdr y)))))
+  
 (defun pull-evals-int (x form lets)
   (if (atom x)
       (list (nreverse form) (nreverse lets))
-    (let* ((s (if (needs-pre-eval x) nil (car x)))
-	   (s (or s (caar (member (car x) lets :test (lambda (x y) (eq x (cadr y)))))))
+    (let* ((s (if (needs-pre-eval x) (bind-before-cons (car x) lets) (car x)))
 	   (lets (if s lets (cons (list (gensym) (car x)) lets)))
 	   (s (or s (caar lets))))
       (pull-evals-int (cdr x) (cons s form) lets))))

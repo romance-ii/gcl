@@ -7,8 +7,10 @@ gclcvs (2.7.0-36) unstable; urgency=low
   * int ->fixnum in list.d
   * Don't pull-eval function slot of binary-op forms
   * Yet more conservative binary-op compiler-macro strategy
+  * Choose right binding when pre-evaluating vars in binary-op compiler-
+    macros, using cons args as divisors
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 29 Nov 2004 01:29:09 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 29 Nov 2004 21:39:09 +0000
 
 gclcvs (2.7.0-35) unstable; urgency=high
 
