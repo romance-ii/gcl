@@ -4361,6 +4361,9 @@ case "$target" in
       *-*-aix*)
 	gmp_m4postinc="powerpc32/regmap.m4 powerpc32/aix.m4"
         ;;
+      *-*-darwin*)
+	gmp_m4postinc=""
+        ;;
       *)
 	gmp_m4postinc="powerpc32/regmap.m4"
 	;;
