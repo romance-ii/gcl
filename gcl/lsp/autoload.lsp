@@ -290,8 +290,8 @@
   (if s (si::print-doc symbol)
       (progn
         (princ "
-Welcome to Kyoto Common Lisp (KCL for short).
-Here are the few functions you should learn first.
+Welcome to GNU Common Lisp (GCL for short).
+Here are some functions you should learn first.
 
 	(HELP symbol) prints the online documentation associated with the
 	symbol.  For example, (HELP 'CONS) will print the useful information
@@ -302,14 +302,17 @@ Here are the few functions you should learn first.
 	(HELP* \"PROG\") will print the documentation of the symbols such as
 	PROG, PROGN, and MULTIPLE-VALUE-PROG1.
 
-	(BYE) ends the current KCL session.
+	(SI::INFO <some string>) chooses from a list of all references in the
+        on-line documentation to <some string>.
 
-For the precise language specification, refere to Guy Steele's \"Common Lisp,
-the Language\" and our \"KCL Report\".  \"KCL Dictionary\", the hard-copied
-version of KCL online documentation, will be useful as a handbook.
+	(APROPOS <some string>) or (APROPOS <some string> '<a package>) list
+        all symbols containing <some string>.
 
-Good luck!				 Taiichi Yuasa and Masami Hagiya
-						Kyoto, Japan; March 1986")
+	(DESCRIBE '<symbol>) or (HELP '<symbol>) describe particular symbols.
+
+	(BYE) or (BY) ends the current GCL session.
+
+Good luck!				 The GCL Development Team")
         (values))))
 
 (defun help* (string &optional (package (find-package "LISP")))
