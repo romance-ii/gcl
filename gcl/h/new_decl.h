@@ -208,7 +208,6 @@ EXTER  object   fSmake_vector1 ();
 EXTER  enum aelttype   fSget_aelttype (); 
 EXTER  object   fSmake_vector  (); 
 EXTER  object   fSmake_array1 (); 
-EXTER  object   fSarray_displacement  (); 
 EXTER  object   fScopy_array_portion (); 
 EXTER  int   fSfill_pointer_set  (); 
 EXTER  int   fLfill_pointer  (); 
