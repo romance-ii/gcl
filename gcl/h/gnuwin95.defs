@@ -9,7 +9,7 @@ SHELL=bash
 LBINDIR=/usr/local/bin
 
 OFLAG	=  -O 
-LIBS	= -lm 
+#LIBS	= -lm 
 LIBC 	=
 
 ODIR_DEBUG= -O4
