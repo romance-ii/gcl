@@ -445,8 +445,34 @@ fi
  echo "MPFILES=$MPFILES" >> makedefsafter
  echo >> makedefsafter
 fi
- 
 
+
+#
+# X windows
+# 
+
+AC_PATH_XTRA
+echo $X_CFLAGS
+echo $X_LIBS
+echo $X_EXTRA_LIBS
+echo $X_PRE_LIBS
+
+miss=0
+AC_CHECK_LIB(Xaw,main,X_LIBS="$X_LIBS -lXaw",miss=1,$X_LIBS)
+AC_CHECK_LIB(Xmu,main,X_LIBS="$X_LIBS -lXmu",miss=1,$X_LIBS)
+AC_CHECK_LIB(Xt,main,X_LIBS="$X_LIBS -lXt",miss=1,$X_LIBS)
+AC_CHECK_LIB(Xext,main,X_LIBS="$X_LIBS -lXext",miss=1,$X_LIBS)
+AC_CHECK_LIB(X11,main,X_LIBS="$X_LIBS -lX11",miss=1,$X_LIBS)
+ 
+if test "$miss" = "1" ; then
+	X_CFLAGS=
+	X_LIBS=
+	echo missing x libraries -- cannot compile xgcl
+fi
+
+
+AC_SUBST(X_LIBS)
+AC_SUBST(X_CFLAGS)
 
 #
 # Dynamic loading

@@ -4,8 +4,9 @@ gcl (2.5.0.cvs20020625-44) unstable; urgency=high
     ldiff et. al., tailp fix
   * optional key argument for assoc-if et.al.;eval getf deflt if in setf
   * Fix infinite loop in assoc-if et.al.
+  * X_LIBS and X_CFLAGS determination in configure script
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 21 Aug 2002 00:36:03 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed, 21 Aug 2002 18:22:37 -0400
 
 gcl (2.5.0.cvs20020625-43) unstable; urgency=high
 

@@ -9,12 +9,12 @@
 # The current directory:
 SYSDIR	= $(GCLDIR)/xgcl-2
 # way to get xlibraries:
-X_LIBS	= -L/usr/X11R6/lib -lXaw -lXmu -lXt -lXext -lX11
+#X_LIBS	= -L/usr/X11R6/lib -lXaw -lXmu -lXt -lXext -lX11
 # for RS6000 at UT:
 #X_LIBS	= -L/usr/local/X11R5/lib -lXaw -lXmu -lXt -lXext -lX11
 
 # for Sun's at UT use -I/usr/local/X11R5/include
-IFLAGS		= -I../h -I../o -I/usr/include/X11
+IFLAGS		= -I../h -I../o $(X_CFLAGS)
 
 ############  END Things you may have to change ############### 
 
