@@ -1056,6 +1056,13 @@ init_package()
 	= make_package(make_simple_string("USER"),
 		       Cnil,
 		       make_cons(lisp_package, Cnil),509,97);
+	common_lisp_package
+	= make_package(make_simple_string("COMMON-LISP"),
+		       Cnil, Cnil,47,509);
+	common_lisp_user_package
+	= make_package(make_simple_string("COMMON-LISP-USER"),
+		       Cnil,
+		       make_cons(common_lisp_package, Cnil),509,97);
 	keyword_package
 	= make_package(make_simple_string("KEYWORD"),
 		       Cnil, Cnil,11,509);

@@ -420,6 +420,14 @@ initlisp()
 	import(Ct, lisp_package);
 	export(Ct, lisp_package);
 
+/*  	Cnil->s.s_hpack = common_lisp_package; */
+	import(Cnil, common_lisp_package);
+	export(Cnil, common_lisp_package);
+
+/*  	Ct->s.s_hpack = common_lisp_package; */
+	import(Ct, common_lisp_package);
+	export(Ct, common_lisp_package);
+
 	sLquote = make_ordinary("QUOTE");
 	sLfunction = make_ordinary("FUNCTION");
 	sLlambda = make_ordinary("LAMBDA");

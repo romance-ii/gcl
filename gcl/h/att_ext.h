@@ -347,6 +347,8 @@ object shift_integer();
 /*  package.d  */
 EXTER object lisp_package;
 EXTER object user_package;
+EXTER object common_lisp_package;
+EXTER object common_lisp_user_package;
 EXTER object keyword_package;
 EXTER object system_package;
 EXTER object sLApackageA;
