@@ -96,16 +96,16 @@ init_ansi_gcl.lsp.tmp: init_ansi_gcl.lsp.in ../cmpnew/gcl_cmpmain.lsp \
 init_%.lsp: init_%.lsp.tmp
 
 	cat $< | sed \
-		-e "s,@LI-VERS@,(`cat ../majvers`.`cat ../minvers`) `date`,1" \
-		-e "s,@LI-EXTVERS@,`cat ../minvers | cut -f2 -d.`,1" \
-		-e "s,@LI-MINVERS@,`cat ../minvers | cut -f1 -d.`,1" \
-		-e "s,@LI-MAJVERS@,`cat ../majvers`,1" \
+		-e "s#@LI-VERS@#(`cat ../majvers`.`cat ../minvers`) `date`#1" \
+		-e "s#@LI-EXTVERS@#`cat ../minvers | cut -f2 -d.`#1" \
+		-e "s#@LI-MINVERS@#`cat ../minvers | cut -f1 -d.`#1" \
+		-e "s#@LI-MAJVERS@#`cat ../majvers`#1" \
 		-e "s/@LI-CC@/\"$(CC) -c $(FINAL_CFLAGS)\"/1" \
-		-e "s,@LI-LD@,\"$(CC) -o \",1" \
+		-e "s#@LI-LD@#\"$(CC) -o \"#1" \
 		-e "s#@LI-LD-LIBS@#\" $(LD_LIBS_PRE) -l$* $(LD_LIBS_POST)\"#1" \
-		-e "s,@LI-OPT-THREE@,\"$(O3FLAGS)\",1" \
-		-e "s,@LI-OPT-TWO@,\"$(O2FLAGS)\",1" \
-		-e "s,@LI-INIT-LSP@,\"$@\",1" >$@
+		-e "s#@LI-OPT-THREE@#\"$(O3FLAGS)\"#1" \
+		-e "s#@LI-OPT-TWO@#\"$(O2FLAGS)\"#1" \
+		-e "s#@LI-INIT-LSP@#\"$@\"#1" >$@
 
 saved_%:raw_% $(RSYM) init_%.lsp raw_%_map \
 		$(CMPDIR)/gcl_cmpmain.lsp \
