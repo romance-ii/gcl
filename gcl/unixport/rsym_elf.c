@@ -229,9 +229,12 @@ char *out;
        if (name 
 	   && tmp
 	   && tmp[1]=='@'
-	   && tmp[2]=='G'
-	   && tmp[3]=='L'
-	   && tmp[4]=='I') 
+	   /* also do translation for similar libc, like solaris, where symbol is */
+	   /* e.g. setjmp@@SYSVABI_1.3 */
+/*  	   && tmp[2]=='G' */
+/*  	   && tmp[3]=='L' */
+/*  	   && tmp[4]=='I' */
+	   ) 
 	 *tmp=0;      
      }
 
