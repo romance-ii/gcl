@@ -18,9 +18,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-/* Kinda primitive and temporary support for fasloading on Mac OS X
-   Aurelien Chanudet (aurelienDOTchanudetATm4xDOTorg) */
-
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -32,9 +29,12 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <mach/mach.h>
 #include <mach-o/loader.h>
 #include <mach-o/dyld.h>
-#include <mach-o/nlist.h>
 
 #include "ptable.h"
+
+typedef int (*func) ();
+
+object sSAmacosx_ldcmdA = 0L;
 
 static void sfasl_error (char *format, ...)
 {
@@ -48,103 +48,29 @@ static void sfasl_error (char *format, ...)
     exit (1);
 }
 
-/* TODO : update to reflect the improvements of Mach-O */
-
-int seek_to_end_ofile (FILE *fp)
-{
-    struct mach_header mach_header;
-    char *hdrbuf;
-    struct load_command *load_command;
-    struct segment_command *segment_command;
-    struct section *section;
-    struct symtab_command *symtab_command;
-    struct symseg_command *symseg_command;
-    int len, cmd, seg;
-    int end_sec, end_ofile;
-    
-  #ifdef DEBUG
-    fprintf(stderr,"seeking to end of Mach-O file\n");
-  #endif
-    
-    end_ofile = 0;
-    fseek(fp, 0L, 0);
-    len = fread((char *)&mach_header, sizeof(struct mach_header), 1, fp);
-    if (len == 1 && mach_header.magic == MH_MAGIC) {
-     /* hdrbuf = (char *)malloc(mach_header.sizeofcmds); */
-        hdrbuf = (char *)alloca(mach_header.sizeofcmds);
-	len = fread(hdrbuf, mach_header.sizeofcmds, 1, fp);
-	if (len != 1) {
-	    fprintf(stderr, "seek_to_end_ofile(): failure reading Mach-O load commands\n");
-	    return 0;
-	}
-	load_command = (struct load_command *) hdrbuf;
-	for (cmd = 0; cmd < mach_header.ncmds; ++cmd) {
-	    switch (load_command->cmd) {
-	    case LC_SEGMENT:
-		segment_command = (struct segment_command *) load_command;
-		section = (struct section *) ((char *)(segment_command + 1));
-		for (seg = 0; seg < segment_command->nsects; ++seg, ++section) {
-		    end_sec = section->offset + section->size;
-		    if (end_sec > end_ofile)
-			end_ofile = end_sec;
-		}
-		break;
-	    case LC_SYMTAB:
-		symtab_command = (struct symtab_command *) load_command;
-		end_sec = symtab_command->symoff + symtab_command->nsyms * sizeof(struct nlist);
-		if (end_sec > end_ofile)
-		    end_ofile = end_sec;
-		end_sec = symtab_command->stroff + symtab_command->strsize;
-		if (end_sec > end_ofile)
-		    end_ofile = end_sec;
-		break;
-	    case LC_SYMSEG:
-		symseg_command = (struct symseg_command *) load_command;
-		end_sec = symseg_command->offset + symseg_command->size;
-		if (end_sec > end_ofile)
-		    end_ofile = end_sec;
-		break;
-	    }
-	    load_command = (struct load_command *)
-	      ((char *)load_command + load_command->cmdsize);
-	}
-     /* free(hdrbuf); */
-	fseek(fp, end_ofile, 0);
-	return 1;
-    }
-    return 0;
-}
-
-void get_init_name (object faslfile, char *init_fun)
+static void get_init_name (object faslfile, char *init_fun)
 {
     object path = coerce_to_pathname (faslfile);
     char *p;
   
-    strcpy (init_fun,"init_");
-    coerce_to_filename (path->pn.pn_name,init_fun+5);
+    strcpy (init_fun, "_init_");
+    coerce_to_filename (path->pn.pn_name, init_fun + 6);
   
-    p = init_fun +5;
-  
-    while(*p) {
-        if (*p == '-') *p = '_';
-        p++;
-    }
+    for (p = init_fun + 6 ; *p ; p++)
+      if (*p == '-') *p = '_';
 }
 
-typedef int (*func) ();
-
-func prepare_bundle (object faslfile, char *filename)
+static func prepare_bundle (object faslfile, char *filename)
 {
     NSObjectFileImage image;
     NSModule module;
     NSSymbol nssym;
     int (*fptr) ();
     
-    unsigned long i, n, image_count;
-    unsigned long vmaddr_slide;
-    struct mach_header *header;
+    unsigned long n;
     unsigned long vmsize = 0;
-    struct load_command *lc;
+    unsigned long vmaddr_slide = 0;
+    unsigned long base_addr = (unsigned long) -1;
     
     extern void mark_region (unsigned long address, unsigned long size);
     
@@ -152,53 +78,58 @@ func prepare_bundle (object faslfile, char *filename)
         sfasl_error ("cannot create object file image\n");
     }
     
-    if (!(module = NSLinkModule (image, filename, NSLINKMODULE_OPTION_RETURN_ON_ERROR))) {
+    if (!(module = NSLinkModule (image, filename, NSLINKMODULE_OPTION_RETURN_ON_ERROR |
+				 NSLINKMODULE_OPTION_PRIVATE | NSLINKMODULE_OPTION_BINDNOW))) {
         sfasl_error ("cannot link bundle\n");
     }
     
     if (!(nssym = NSLookupSymbolInModule (module, "_init_code")))
     {
-        char init_fun [201];
+        char init_fun [256];
         
-        init_fun[0] = '_';
-        get_init_name (faslfile, &init_fun[1]);
+        get_init_name (faslfile, init_fun);
         
         if (!(nssym = NSLookupSymbolInModule (module, init_fun))) {
             sfasl_error ("cannot retrieve entry point symbol in bundle\n");
         }
     }
     
-    if (!(fptr = (int (*) ()) NSAddressOfSymbol(nssym))) {
+    if (!(fptr = (int (*) ()) NSAddressOfSymbol (nssym))) {
         sfasl_error ("cannot retrieve entry point address\n");
     }
     
-    if (!_dyld_present ()) {
-        sfasl_error ("how can _dyld_present return false at this point !?\n");
-    }
-    
-    image_count = _dyld_image_count ();
-    
-    for (n=0 ; n < image_count ; n++) {
+    for (n = _dyld_image_count () ; --n != (unsigned long) -1 ; )
+    {
         if (strstr (filename, _dyld_get_image_name (n)))
         {
-            vmaddr_slide = _dyld_get_image_vmaddr_slide (n);
-            header = _dyld_get_image_header (n);
-            
-            lc = (struct load_command *) (header + 1);
-            
-            for (i=0 ; i < header->ncmds ; i++) {
+            struct mach_header *mh = _dyld_get_image_header (n);
+            struct load_command *lc = (struct load_command *) (mh+1);
+ 	    unsigned long i;
+	    
+	    vmsize = 0;
+	    
+            for (i=0 ; i < mh->ncmds ; i++) {
                 if (lc->cmd == LC_SEGMENT) {
-                    vmsize += ((struct segment_command *) lc)->vmsize;
+		  if (base_addr == (unsigned long) -1) {
+		    base_addr = ((struct segment_command *) lc)->vmaddr;
+		  }
+                  vmsize += ((struct segment_command *) lc)->vmsize;
                 }
                 lc = (struct load_command *) ((char *) lc + lc->cmdsize);
             }
-            
+	    
+            vmaddr_slide = _dyld_get_image_vmaddr_slide (n);
+	    
             break;
         }
     }
     
-    mark_region (vmaddr_slide, vmsize);
-    
+    if (base_addr != (unsigned long) -1) {
+      mark_region (vmaddr_slide - base_addr, vmsize);
+    } else {
+      sfasl_error ("could not retrieve newly created bundle image\n");
+    }
+
     return (fptr);
 }
 
@@ -217,39 +148,57 @@ int fasload (object faslfile)
     
     static int count = 0;
     
-    if (count == 0) count = time (0);
+    static char ldfmt [] = "gcc -bind_at_load -bundle -bundle_loader %s -o %s %s";
+
+    char fmt [MAXPATHLEN];
+    
+    extern int seek_to_end_ofile (FILE *);
+    
+    if (count == 0) {
+      /* DEFVAR ("*MACOSX-LDCMD*",sSAmacosx_ldcmdA,LISP,make_simple_string(ldfmt),""); */
+      sSAmacosx_ldcmdA = make_special ("*MACOSX-LDCMD*", make_simple_string (ldfmt));
+      count = time (0);
+    }
     
     coerce_to_filename (truename (faslfile), filename);
     
-    snprintf (tmpfile, sizeof(tmpfile), "/tmp/ufas%dx.so", count++);
+    snprintf (tmpfile, sizeof (tmpfile), "/tmp/ufas%dx.so", count++);
 
     mkstemp (tmpfile);
     symlink (filename, tmpfile);
     
     faslstream = open_stream (faslfile, smm_input, Cnil, sKerror);
     
-    /* we could do a -flat_namespace build */
-    snprintf (cmd, sizeof(cmd),
-        "gcc -bind_at_load -bundle -bundle_loader %s %s -o %s", kcl_self, filename, tmpfile);
+    /* I guess the program will crash if a dumped image is ever dynamically relinked against
+       a version of a shared library different from the one used at the time the bundle got
+       loaded (if the bundle makes reference to this shared library).  To avoid this, we
+       would need all external bundle calls to be indirected through the loader image stubs. */
+
+    coerce_to_filename (symbol_value (sSAmacosx_ldcmdA), fmt);
+    
+    snprintf (cmd, sizeof(cmd), fmt, kcl_self, tmpfile, filename);
     
     if (system (cmd) != 0) {
-        sfasl_error ("cannot execute command: `%s'\n", cmd);
+        sfasl_error ("cannot execute command `%s'\n", cmd);
     }
     
     fptr = prepare_bundle (faslfile, tmpfile);
     
-    seek_to_end_ofile (faslstream->sm.sm_fp);
+    if (seek_to_end_ofile (faslstream->sm.sm_fp) != 1) {
+        sfasl_error ("error seeking to end of object file");
+    }
+
     data = read_fasl_vector (faslstream);
     
     close_stream (faslstream);
     
-    memory = alloc_object(t_cfdata);
+    memory = alloc_object (t_cfdata);
     memory->cfd.cfd_self = NULL;
     memory->cfd.cfd_start = NULL;
     memory->cfd.cfd_size = 0;
     
     if (symbol_value (sLAload_verboseA) != Cnil)	
-        printf (" start address (dynamic) %p ",fptr);
+        printf (" start address (dynamic) %p ", fptr);
     
     call_init (0, memory, data, fptr);
     
