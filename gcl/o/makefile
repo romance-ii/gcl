@@ -119,7 +119,7 @@ clean:
 fsavres.o: /lib/libc.a
 	ar xv /lib/libc.a fsavres.o
 
-sockets.o:
+sockets.o: sockets.c
 	${CC} ${CFLAGS} ${X11_INCLUDE} -c  sockets.c
 
 clxsocket.o:
