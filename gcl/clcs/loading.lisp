@@ -11,9 +11,9 @@
 		"kcl-cond"
 		"top-patches"
 		"install")))
-     (load "package.lisp")
+;     (load "package.lisp")
     (when (eql :compile mode)
-	  (load "package.lisp")
+;	  (load "package.lisp")
 	  (load "precom.lisp"))
     (mapc #'(lambda (file)
 	      (ecase mode

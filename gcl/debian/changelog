@@ -3,8 +3,25 @@ gcl (2.5.0.cvs20020625-57) unstable; urgency=low
   * Capitalization changes to names of special characters;graphic-char-p
     fix
   * fix shadowing of existing symbols in package.d
+  * (simple-)base-string not a subtype of (simple-)vector
+  * add package-error condition(preliminary);hash conditions only by the
+    error name, not the format string;pass error types for both
+    correctable and non-correctable situations;eliminate duplicate
+    loading of clcs/package.lisp;Allow t doc-types in documentation
+    (returning nil) for now;fix final type errors in predlib.lsp
+    (regarding base-string);other error functions to pass continuable
+    errors (needs cleaning up);package designators can be
+    characters;delete-package added;make-package doesn't :use lisp by
+    default;in-package returns error if package does not exist instead
+    of making the package(relatively big change -- need to address
+    instances of in-package in .lsp code);call make-package on relevant
+    packages in init_gcl.lsp.in and pcl/sys-package.lisp;
+  * \-ffunction-sections for hppa with no-optimization -- enables first
+    maxima build here
+  * separate lisp variables to specify optimization flags for level 2
+    and 3
 
- -- Camm Maguire <camm@m.enhanced.com>  Sat,  5 Oct 2002 23:59:16 -0400
+ -- Camm Maguire <camm@m.enhanced.com>  Wed,  9 Oct 2002 07:38:49 -0400
 
 gcl (2.5.0.cvs20020625-56) unstable; urgency=high
 

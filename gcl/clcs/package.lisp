@@ -12,6 +12,7 @@
 ;;; file will define a bunch of functions which work like a condition system. Redefining
 ;;; existing condition systems is beyond the goal of this implementation attempt.
 
+(MAKE-PACKAGE "CONDITIONS" :USE '("LISP" #+lucid "LUCID-COMMON-LISP"))
 (IN-PACKAGE "CONDITIONS" :USE '("LISP" #+lucid "LUCID-COMMON-LISP"))
 
 #-(or lucid excl genera cmu )

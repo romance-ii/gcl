@@ -49,6 +49,38 @@ object x, l;
 	return(FALSE);
 }
 
+static bool
+designate_package(object x,struct package *p) {
+
+  switch(type_of(x)) {
+  case t_string: case t_symbol:
+    return string_equal(x,p->p_name) || member_string_equal(x, p->p_nicknames);
+    break;
+  case t_character:
+    return designate_package(coerce_to_string(x),p);
+    break;
+  case t_package:
+    return x==(object)p;
+    break;
+  default:
+    FEwrong_type_argument(TSor_symbol_string_package,x);
+    break;
+  }
+  return FALSE;
+
+}
+
+/* #define bad_package_name(a) (type_of(a)==t_string &&\ */
+/*                              (memchr((a)->st.st_self,'-',(a)->st.st_fillp) || \ */
+/* 			      ((a)->st.st_self[0]=='*' && (a)->st.st_fillp==1))) */
+
+#define check_package_designator(a) if (type_of(a)!=t_string && \
+                                        type_of(a)!=t_character && \
+					type_of(a)!=t_symbol && \
+					type_of(a)!=t_package) \
+					   FEwrong_type_argument(TSor_symbol_string_package,(a))
+#define check_type_or_symbol_string_package(a) check_package_designator(*a)
+
 void
 rehash_pack(ptab,n,m)
      object **ptab;
@@ -115,6 +147,8 @@ int isize,esize;
 		vs_head->st.st_self = n->s.s_self;
 		n = vs_head;
 	}
+	if (type_of(n)==t_character) 
+	  n=coerce_to_string(n);
 	if (find_package(n) != Cnil)
 		package_already(n);
 	x = alloc_object(t_package);
@@ -138,6 +172,8 @@ int isize,esize;
 			vs_head->st.st_self = n->s.s_self;
 			n = vs_head;
 		}
+		if (type_of(n)==t_character)
+		  n=coerce_to_string(n);
 		if (find_package(n) != Cnil) {
 			vs_reset;
 			package_already(n);
@@ -184,8 +220,10 @@ int isize,esize;
 
 	x = find_package(n);
 	if (x == Cnil) {
-		x = make_package(n, ns, ul,isize,esize);
-		goto L;
+ 	   	FEpackage_error(n,"No such package");  
+ 		return Cnil; 
+/*  		x = make_package(n, ns, ul,isize,esize);  */
+/*  		goto L;  */
 	}
 	if (isize) rehash_pack(&(x->p.p_internal),
 		&x->p.p_internal_size,isize);
@@ -205,7 +243,7 @@ int isize,esize;
 	}
 	for (;  !endp(ul);  ul = ul->c.c_cdr)
 		use_package(ul->c.c_car, x);
-L:
+/* L:  */
 	sLApackageA->s.s_dbind = x;
 	vs_reset;
 	return(x);
@@ -224,6 +262,8 @@ object x, n, ns;
 		vs_head->st.st_self = n->s.s_self;
 		n = vs_head;
 	}
+	if (type_of(n)==t_character)
+	  n=coerce_to_string(n);
    	if (!(equal(x->p.p_name,n)) &&
 	    find_package(n) != Cnil)
 		package_already(n);
@@ -236,6 +276,8 @@ object x, n, ns;
 			vs_head->st.st_self = n->s.s_self;
 			n = vs_head;
 		}
+		if (type_of(n)==t_character)
+		  n=coerce_to_string(n);
 		y = find_package(n);
 		if (x == y)
 			continue;
@@ -246,6 +288,7 @@ object x, n, ns;
 	vs_reset;
 	return(x);
 }
+
 
 /*
 	Find_package(n) seaches for a package with name n,
@@ -258,16 +301,10 @@ object n;
 {
 	struct package *p;
 
-	if (type_of(n) == t_symbol)
-		;
-	else if (type_of(n) != t_string)
-		FEwrong_type_argument(TSor_string_symbol, n);
-	for (p = pack_pointer;  p != NULL;  p = p->p_link) {
-		if (string_equal(p->p_name, n))
-			return((object)p);
-		if (member_string_equal(n, p->p_nicknames))
-			return((object)p);
-	}
+	check_package_designator(n);
+	for (p = pack_pointer;  p != NULL;  p = p->p_link) 
+	  if (designate_package(n,p))
+	    return ((object)p);
 	return(Cnil);
 }
 
@@ -406,6 +443,7 @@ object st, p;
 	int j;
 	object *ip, *ep, l, ul;
 	{BEGIN_NO_INTERRUPT;
+	if (type_of(st)==t_character) st=coerce_to_string(st);
 	j = pack_hash(st);
 	ip = &P_INTERNAL(p ,j);
 	for (l = *ip;  type_of(l) == t_cons;  l = l->c.c_cdr)
@@ -607,6 +645,7 @@ object s, p;
 	int j;
 	object *ip;
 
+	if (type_of(s)==t_character) s=coerce_to_string(s);
 	find_symbol(s, p);
 	if (intern_flag == INTERNAL || intern_flag == EXTERNAL) {
 		p->p.p_shadowings = make_cons(s, p->p.p_shadowings);
@@ -673,13 +712,69 @@ object x0, p;
 	delete_eq(p, &x->p.p_usedbylist);
 }
 
+
+
+object
+delete_package(object n) {
+
+  struct package *p,*pp;
+  object t;
+
+/*    if (type_of(n)!=t_package && type_of(n)!=t_symbol && type_of(n)!=t_string) */
+/*      FEwrong_type_argument(TSor_symbol_string_package, n); */
+
+  for (p = pack_pointer,pp=NULL;  p != NULL;  pp=p,p = p->p_link) 
+
+    if (designate_package(n,p)) {
+
+      if (p->p_usedbylist!=Cnil) {
+/* 	VFUN_NARGS=4; */
+/* 	fLspecific_correctable_error(sKpackage_error,make_simple_string("Package ~S is used by other packages: ~S"), */
+/* 				     p,p->p_usedbylist); */
+/* 	FEpackage_error((object)p,"Package used by other packages."); */
+	for (t=p->p_usedbylist;!endp(t);t=t->c.c_cdr)
+	  unuse_package(p,t->c.c_car);
+      }
+
+      if (p->p_uselist!=Cnil) {
+/* 	VFUN_NARGS=4; */
+/* 	fLspecific_correctable_error(sKpackage_error,make_simple_string("Package ~S is used by other packages: ~S"), */
+/* 				     p,p->p_usedbylist); */
+/* 	FEpackage_error((object)p,"Package used by other packages."); */
+	for (t=p->p_uselist;!endp(t);t=t->c.c_cdr)
+	  unuse_package(t->c.c_car,p);
+      }
+
+      p->p_name=Cnil;
+
+      if (pp) 
+	pp->p_link=p->p_link;
+      else
+	pack_pointer=p->p_link;
+
+      return(Ct);
+
+    }
+  
+/*   VFUN_NARGS=3; */
+/*   fLspecific_correctable_error(sKpackage_error,make_simple_string("~S does not designate a package"),n); */
+/*    FEpackage_error(n,"No such pachage."); */
+
+  return(Cnil);
+  
+}
+  
+/*  			   (use `make_cons(lisp_package, Cnil)`) */
+
+
 @(defun make_package (pack_name
 		      &key nicknames
-			   (use `make_cons(lisp_package, Cnil)`)
+			   (use Cnil)
 		      (internal `small_fixnum(0)`)
 		      (external `small_fixnum(0)`)
 		      )
 @
+        if (type_of(pack_name)==t_character) pack_name=coerce_to_string(pack_name);
 	check_type_or_string_symbol(&pack_name);
 	@(return `make_package(pack_name, nicknames, use,
 			       fix(internal),fix(external))`)
@@ -690,6 +785,7 @@ object x0, p;
 		      (external `small_fixnum(0)`)
 		    )
 @
+        if (type_of(pack_name)==t_character) pack_name=coerce_to_string(pack_name);
 	check_type_or_string_symbol(&pack_name);
 	if (find_package(pack_name) == Cnil && !(use_sp))
 		use = make_cons(lisp_package, Cnil);
@@ -705,12 +801,24 @@ Lfind_package()
 }
 
 void
-Lpackage_name()
+Ldelete_package()
 {
 	check_arg(1);
 
-	check_type_package(&vs_base[0]);
-	vs_base[0] = vs_base[0]->p.p_name;
+	vs_base[0] = delete_package(vs_base[0]);
+}
+
+void
+Lpackage_name()
+{
+  object t;
+
+  check_arg(1);
+
+  check_package_designator(vs_base[0]);
+  t=coerce_to_package(vs_base[0]);
+  vs_base[0]=t==Cnil ? t : t->p.p_name;
+
 }
 
 void
@@ -718,15 +826,16 @@ Lpackage_nicknames()
 {
 	check_arg(1);
 
-	check_type_or_symbol_string_package(&vs_base[0]);
+	check_package_designator(vs_base[0]);
 	vs_base[0] = coerce_to_package(vs_base[0]);
 	vs_base[0] = vs_base[0]->p.p_nicknames;
 }
 
 @(defun rename_package (pack new_name &o new_nicknames)
 @
-	check_type_or_symbol_string_package(&pack);
+	check_package_designator(pack);
 	pack = coerce_to_package(pack);
+        if (type_of(new_name)==t_character) new_name=coerce_to_string(new_name);
 	check_type_or_string_symbol(&new_name);
 	@(return `rename_package(pack, new_name, new_nicknames)`)
 @)
@@ -736,7 +845,7 @@ Lpackage_use_list()
 {
 	check_arg(1);
 
-	check_type_or_symbol_string_package(&vs_base[0]);
+	check_package_designator(vs_base[0]);
 	vs_base[0] = coerce_to_package(vs_base[0]);
 	vs_base[0] = vs_base[0]->p.p_uselist;
 }
@@ -746,7 +855,7 @@ Lpackage_used_by_list()
 {
 	check_arg(1);
 
-	check_type_or_symbol_string_package(&vs_base[0]);
+	check_package_designator(vs_base[0]);
 	vs_base[0] = coerce_to_package(vs_base[0]);
 	vs_base[0] = vs_base[0]->p.p_usedbylist;
 }
@@ -756,7 +865,7 @@ Lpackage_shadowing_symbols()
 {
 	check_arg(1);
 
-	check_type_or_symbol_string_package(&vs_base[0]);
+	check_package_designator(vs_base[0]);
 	vs_base[0] = coerce_to_package(vs_base[0]);
 	vs_base[0] = vs_base[0]->p.p_shadowings;
 }
@@ -778,7 +887,7 @@ Llist_all_packages()
 @(defun intern (strng &optional (p `current_package()`) &aux sym)
 @
 	check_type_string(&strng);
-	check_type_or_symbol_string_package(&p);
+	check_package_designator(p);
 	p = coerce_to_package(p);
 	sym = intern(strng, p);
 	if (intern_flag == INTERNAL)
@@ -794,7 +903,7 @@ Llist_all_packages()
 	object x;
 @
 	check_type_string(&strng);
-	check_type_or_symbol_string_package(&p);
+	check_package_designator(p);
 	p = coerce_to_package(p);
 	x = find_symbol(strng, p);
 	if (intern_flag == INTERNAL)
@@ -809,7 +918,7 @@ Llist_all_packages()
 @(defun unintern (symbl &optional (p `current_package()`))
 @
 	check_type_symbol(&symbl);
-	check_type_or_symbol_string_package(&p);
+	check_package_designator(p);
 	p = coerce_to_package(p);
 	if (unintern(symbl, p))
 		@(return Ct)
@@ -821,7 +930,7 @@ Llist_all_packages()
 	object l;
 
 @
-	check_type_or_symbol_string_package(&pack);
+	check_package_designator(pack);
 	pack = coerce_to_package(pack);
 BEGIN:
 	switch (type_of(symbols)) {
@@ -847,7 +956,7 @@ BEGIN:
 	object l;
 
 @
-	check_type_or_symbol_string_package(&pack);
+	check_package_designator(pack);
 	pack = coerce_to_package(pack);
 BEGIN:
 	switch (type_of(symbols)) {
@@ -872,7 +981,7 @@ BEGIN:
 @(defun import (symbols &o (pack `current_package()`))
 	object l;
 @
-	check_type_or_symbol_string_package(&pack);
+	check_package_designator(pack);
 	pack = coerce_to_package(pack);
 BEGIN:
 	switch (type_of(symbols)) {
@@ -897,7 +1006,7 @@ BEGIN:
 @(defun shadowing_import (symbols &o (pack `current_package()`))
 	object l;
 @
-	check_type_or_symbol_string_package(&pack);
+	check_package_designator(pack);
 	pack = coerce_to_package(pack);
 BEGIN:
 	switch (type_of(symbols)) {
@@ -922,11 +1031,13 @@ BEGIN:
 @(defun shadow (symbols &o (pack `current_package()`))
 	object l;
 @
-	check_type_or_symbol_string_package(&pack);
+	check_package_designator(pack);
 	pack = coerce_to_package(pack);
 BEGIN:
 	switch (type_of(symbols)) {
-	case t_symbol:
+	case t_symbol: 
+	case t_string: 
+	case t_character:
 		if (symbols == Cnil)
 			break;
 		shadow(symbols, pack);
@@ -938,7 +1049,7 @@ BEGIN:
 		break;
 
 	default:
-		check_type_symbol(&symbols);
+		check_type_or_symbol_string(&symbols);
 		goto BEGIN;
 	}
 	@(return Ct)
@@ -947,7 +1058,7 @@ BEGIN:
 @(defun use_package (pack &o (pa `current_package()`))
 	object l;
 @
-	check_type_or_symbol_string_package(&pa);
+	check_package_designator(pa);
 	pa = coerce_to_package(pa);
 BEGIN:
 	switch (type_of(pack)) {
@@ -957,6 +1068,7 @@ BEGIN:
 
 	case t_string:
 	case t_package:
+	case t_character:
 		use_package(pack, pa);
 		break;
 
@@ -975,7 +1087,7 @@ BEGIN:
 @(defun unuse_package (pack &o (pa `current_package()`))
 	object l;
 @
-	check_type_or_symbol_string_package(&pa);
+	check_package_designator(pa);
 	pa = coerce_to_package(pa);
 BEGIN:
 	switch (type_of(pack)) {
@@ -985,6 +1097,7 @@ BEGIN:
 
 	case t_string:
 	case t_package:
+	case t_character:
 		unuse_package(pack, pa);
 		break;
 
@@ -1035,7 +1148,7 @@ void
 no_package(n)
 object n;
 {
-	FEerror("There is no package with the name ~A.", 1, n);
+	FEwrong_type_argument(TSor_symbol_string_package,n);
 }
 
 void
@@ -1101,6 +1214,7 @@ void
 init_package_function()
 {
 	make_function("MAKE-PACKAGE", Lmake_package);
+	make_function("DELETE-PACKAGE", Ldelete_package);
 	make_function("IN-PACKAGE", Lin_package);
 	make_function("FIND-PACKAGE", Lfind_package);
 	make_function("PACKAGE-NAME", Lpackage_name);

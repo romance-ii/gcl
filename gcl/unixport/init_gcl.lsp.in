@@ -1,10 +1,16 @@
-(in-package "COMPILER")
+;(in-package "COMPILER")
+(make-package "COMPILER" :use '("LISP"))
 (in-package "SYSTEM")
 (defvar *command-args* nil)
 (in-package "USER")
 (in-package "LISP")
 
-(lisp::in-package "SLOOP")
+;(lisp::in-package "SLOOP")
+(make-package "SLOOP" :use '("LISP"))
+(make-package "SERROR" :use '("LISP" "SLOOP"))
+(make-package "ANSI-LOOP" :use '("LISP"))
+(make-package "DEFPACKAGE" :use '("LISP"))
+(make-package "TK" :use '("LISP" "SLOOP"))
 
 ;;Appropriate for Austin
 #-winnt

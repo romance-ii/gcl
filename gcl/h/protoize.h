@@ -1781,6 +1781,9 @@ node_compare(const void *,const void *);
 void
 unlink_loaded_files(void);
 
+void
+FEpackage_error(object,const char *s);
+
 #if defined (__MINGW32__)
 int bcmp ( const void *s1, const void *s2, size_t n );
 void bcopy ( const void *s1, void *s2, size_t n );

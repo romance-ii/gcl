@@ -64,7 +64,9 @@
     (structure (get symbol 'structure-documentation))
     (type (get symbol 'type-documentation))
     (setf (get symbol 'setf-documentation))
-    (t (error "~S is an illegal documentation type." doc-type))))
+;FIXME
+    (t nil)))
+;    (t (error "~S is an illegal documentation type." doc-type))))
 
 
 (defun find-documentation (body)

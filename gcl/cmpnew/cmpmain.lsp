@@ -507,6 +507,8 @@ SYSTEM_SPECIAL_INIT
 (defvar *cc* "cc")
 (defvar *ld* "ld")
 (defvar *ld-libs* "ld-libs")
+(defvar *opt-three* "")
+(defvar *opt-two* "")
 (defvar *init-lsp* "init-lsp")
 
 (defvar *use-buggy* nil)
@@ -536,9 +538,13 @@ SYSTEM_SPECIAL_INIT
    (format nil  "(cd ~a ;~a ~a ~a -c ~a ~a)"
 	   dir *cc*
 	   (if (and (boundp '*c-debug*) *c-debug*) " -g " "")
+;           (case *speed*
+;		 (3 #+broken_o4_opt "-O" #-broken_o4_opt"-O4")
+;	         (2 "-O") (t ""))	
            (case *speed*
-		 (3 #+broken_o4_opt "-O" #-broken_o4_opt"-O4")
-		 (2 "-O") (t ""))	
+		 (3 *opt-three* )
+		 (2 *opt-two*) 
+		 (t ""))	
 	   na
 	   (prog1
 	       #+aix3

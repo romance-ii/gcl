@@ -222,6 +222,20 @@
 				    (type-error-datum condition)
 				    (type-error-expected-type condition)))))
 
+(define-condition internal-package-error 
+    (#+(or clos pcl) internal-error simple-condition)
+  #-(or clos pcl)
+  ((function-name nil))
+  #+(or clos pcl)
+  ()
+  #-(or clos pcl)(:conc-name %%internal-package-error-)
+  #-(or clos pcl)(:report (lambda (condition stream)
+			    (when (internal-error-function-name condition)
+			      (format stream "Error in ~S [or a callee]: "
+				      (internal-error-function-name condition)))
+			    (format stream "A package error occurred on ~S."
+				    (type-error-datum condition)))))
+
 (define-condition internal-simple-program-error 
     (#+(or clos pcl) internal-simple-error program-error)
   #-(or clos pcl)

@@ -145,6 +145,29 @@ Icall_error_handler(error_name,error_format_string,nfmt_args,va_alist)
   return IapplyVector(sSuniversal_error_handler,nfmt_args+5,b);
 }
 
+static object
+Icall_continue_error_handler(error_name,error_format_string,nfmt_args,va_alist)
+     object error_name,error_format_string;
+     int nfmt_args;
+     va_dcl
+     /* n is the total number of args passed to this function */
+{ object b[20];
+  b[0]= error_name;
+  b[1]= Ct;  /* continue format */
+  b[2] = ihs_top_function_name(ihs_top);
+  b[3] = null_string;  /*continue format arg*/
+  b[4] = error_format_string;
+  {int i = 0;
+   va_list ap;
+   va_start(ap);
+   while (i++ < nfmt_args)
+     { b[i+4]= va_arg(ap,object);
+     }
+    va_end(ap);
+  }
+  return IapplyVector(sSuniversal_error_handler,nfmt_args+5,b);
+}
+
 DEFUNO("ERROR",object,fLerror,LISP
    ,1,F_ARG_LIMIT,NONE,OO,OO,OO,OO,Lerror,"")(fmt_string,va_alist)
 object fmt_string;
@@ -187,6 +210,30 @@ va_dcl
   b[4]=fmt_string;
   i=4;
   va_start(ap);
+  n--;
+  while (--n)
+    b[++i]=va_arg(ap,object);
+  va_end(ap);
+  RETURN1(IapplyVector(sSuniversal_error_handler,++i,b));
+}
+
+
+DEFUNO("SPECIFIC-CORRECTABLE-ERROR",object,fLspecific_correctable_error,LISP
+   ,1,F_ARG_LIMIT,NONE,OO,OO,OO,OO,Lspecific_correctable_error,"")(error_name,fmt_string,va_alist)
+object error_name,fmt_string;
+va_dcl
+{ int n = VFUN_NARGS,i=0;
+  object b[F_ARG_LIMIT];
+  va_list ap;
+
+  b[0]=error_name;
+  b[1]=Ct;
+  b[2]=ihs_top_function_name(ihs_top-1);
+  b[3]=null_string;
+  b[4]=fmt_string;
+  i=4;
+  va_start(ap);
+  n--;
   while (--n)
     b[++i]=va_arg(ap,object);
   va_end(ap);
@@ -349,6 +396,14 @@ FEinvalid_function(object obj)
 {Icall_error_handler(sKinvalid_function,
 		     make_simple_string("~S is invalid as a function."),
 		     1,(obj));
+		     
+}
+
+void
+FEpackage_error(object obj,const char *s)
+{Icall_continue_error_handler(sKpackage_error,
+		     make_simple_string("A package error occurred on ~S:~S."),
+		     2,(obj),make_simple_string(s));
 		     
 }
 
@@ -638,15 +693,15 @@ void
 ck_larg_at_least(int n, object x) {
 	for(; n > 0; n--, x = x->c.c_cdr)
 		if(endp(x))
-		  FEerror("APPLY sended too few arguments to LAMBDA.", 0);
+		  FEerror("APPLY sent too few arguments to LAMBDA.", 0);
 }
 
 void
 ck_larg_exactly(int n, object x) {
 	for(; n > 0; n--, x = x->c.c_cdr)
 		if(endp(x))
-		  FEerror("APPLY sended too few arguments to LAMBDA.", 0);
-	if(!endp(x)) FEerror("APPLY sended too many arguments to LAMBDA.", 0);
+		  FEerror("APPLY sent too few arguments to LAMBDA.", 0);
+	if(!endp(x)) FEerror("APPLY sent too many arguments to LAMBDA.", 0);
 }
 
 void
@@ -778,6 +833,7 @@ DEF_ORDINARY("UNBOUND-VARIABLE",sKunbound_variable,KEYWORD,"");
 DEF_ORDINARY("INVALID-VARIABLE",sKinvalid_variable,KEYWORD,"");
 DEF_ORDINARY("UNDEFINED-FUNCTION",sKundefined_function,KEYWORD,"");
 DEF_ORDINARY("INVALID-FUNCTION",sKinvalid_function,KEYWORD,"");
+DEF_ORDINARY("PACKAGE-ERROR",sKpackage_error,KEYWORD,"");
 DEF_ORDINARY("CATCH",sKcatch,KEYWORD,"");
 DEF_ORDINARY("PROTECT",sKprotect,KEYWORD,"");
 DEF_ORDINARY("CATCHALL",sKcatchall,KEYWORD,"");

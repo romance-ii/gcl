@@ -4,36 +4,67 @@
 
 (defvar *internal-error-table* (make-hash-table :test 'equal))
 
-(defmacro find-internal-error-data (error-name error-format-string)
-  `(gethash (list ,error-name ,error-format-string) *internal-error-table*))
+;(defmacro find-internal-error-data (error-name error-format-string)
+;  `(gethash (list ,error-name ,error-format-string) *internal-error-table*))
+(defmacro find-internal-error-data (error-name)
+  `(gethash (list ,error-name) *internal-error-table*))
+
+;(defun clcs-universal-error-handler (error-name correctable function-name
+;			             continue-format-string error-format-string
+;			             &rest args)
+;  (if correctable
+;      (with-simple-restart 
+;	  (continue "~a" (apply #'format nil continue-format-string args))
+;	(error 'internal-simple-error 
+;	       :function-name function-name
+;	       :format-string error-format-string 
+;	       :format-arguments args))
+;      (let ((e-d (find-internal-error-data error-name error-format-string)))
+;	(if e-d
+;	    (let ((condition-name (car e-d)))
+;	      (apply #'error condition-name
+;		     :function-name function-name
+;		     (let ((k-a (mapcan #'list (cdr e-d) args)))
+;		       (if (simple-condition-class-p condition-name)
+;			   (list* :format-string error-format-string
+;				  :format-arguments args
+;				  k-a)
+;			   k-a))))
+;	    (error 'internal-simple-error :function-name function-name
+;		   :format-string error-format-string :format-arguments args)))))
 
 (defun clcs-universal-error-handler (error-name correctable function-name
 			             continue-format-string error-format-string
 			             &rest args)
-  (if correctable
-      (with-simple-restart 
-	  (continue "~a" (apply #'format nil continue-format-string args))
-	(error 'internal-simple-error 
-	       :function-name function-name
-	       :format-string error-format-string 
-	       :format-arguments args))
-      (let ((e-d (find-internal-error-data error-name error-format-string)))
-	(if e-d
-	    (let ((condition-name (car e-d)))
-	      (apply #'error condition-name
-		     :function-name function-name
-		     (let ((k-a (mapcan #'list (cdr e-d) args)))
-		       (if (simple-condition-class-p condition-name)
-			   (list* :format-string error-format-string
-				  :format-arguments args
-				  k-a)
-			   k-a))))
-	    (error 'internal-simple-error :function-name function-name
-		   :format-string error-format-string :format-arguments args)))))
+  (let ((e-d (find-internal-error-data error-name)))
+    (if e-d
+	(let ((condition-name (car e-d)))
+	  (if correctable
+	      (with-simple-restart 
+	       (continue "~a" (apply #'format nil continue-format-string args))
+	       (apply #'error condition-name
+		      :function-name function-name
+		      (let ((k-a (mapcan #'list (cdr e-d) args)))
+			(if (simple-condition-class-p condition-name)
+			    (list* :format-string error-format-string
+				   :format-arguments args
+				   k-a)
+			  k-a))))
+	    (apply #'error condition-name
+		   :function-name function-name
+		   (let ((k-a (mapcan #'list (cdr e-d) args)))
+		     (if (simple-condition-class-p condition-name)
+			 (list* :format-string error-format-string
+				:format-arguments args
+				k-a)
+		       k-a)))))
+      (error 'internal-simple-error :function-name function-name
+	     :format-string error-format-string :format-arguments args))))
 
 (defun set-internal-error (error-keyword error-format condition-name
 					 &rest keyword-list)
-  (setf (find-internal-error-data error-keyword error-format)
+;  (setf (find-internal-error-data error-keyword error-format)
+  (setf (find-internal-error-data error-keyword)
 	(cons condition-name keyword-list)))
 
 (defun initialize-internal-error-table ()
@@ -45,6 +76,8 @@
 (defparameter *internal-error-list*
   '(("FEwrong_type_argument" :wrong-type-argument "~S is not of type ~S."
      internal-type-error :datum :expected-type)
+    ("FEpackage_error" :package-error "A package error occurred on ~S:~S."
+     internal-package-error) ; |<function>| |top - base|
     ("FEtoo_few_arguments" :too-few-arguments "~S [or a callee] requires more than ~R argument~:p." 
      internal-simple-control-error) ; |<function>| |top - base|
     ("FEtoo_few_argumentsF" :too-few-arguments "Too few arguments."

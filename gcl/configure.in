@@ -309,12 +309,15 @@ if test "$GCC" = "yes" ; then
 	TCFLAGS="$TCFLAGS -fwritable-strings -pipe"
 fi
 
+TO3FLAGS=""
+TO2FLAGS=""
 if test "$enable_debug" = "yes" ; then
 	TCFLAGS="$TCFLAGS -g"
 	# for subconfigurations
 	CFLAGS=-g
 else
-	TCFLAGS="$TCFLAGS -O6 -fomit-frame-pointer"
+	TO3FLAGS="-O6 -fomit-frame-pointer"
+	TO2FLAGS="-O"
 fi
 
 case $use in 
@@ -324,8 +327,11 @@ case $use in
 			TCFLAGS="$TCFLAGS -mieee";;
 #		m68k*)
 #			TCFLAGS="$TCFLAGS -ffloat-store";;
-#		hppa*)
-#			TCFLAGS="$TCFLAGS -fPIC";;
+		hppa*)
+			TCFLAGS="$TCFLAGS -ffunction-sections"
+			TO3FLAGS=""
+			TO2FLAGS=""
+			;;
 	esac;;
 esac
 if test "$enable_pic" = "yes" ; then
@@ -1296,8 +1302,12 @@ LIBS="$LIBS $TLIBS"
 AC_SUBST(LIBS)
 FINAL_CFLAGS="$TCFLAGS"
 AC_SUBST(FINAL_CFLAGS)
-CFLAGS="$TCFLAGS  -I\$(GCLDIR)/o"
+CFLAGS="$TCFLAGS $TO3FLAGS -I\$(GCLDIR)/o"
 AC_SUBST(CFLAGS)
+O3FLAGS=$TO3FLAGS
+AC_SUBST(O3FLAGS)
+O2FLAGS=$TO2FLAGS
+AC_SUBST(O2FLAGS)
 
 if test -f h/$use.defs  ; then
 

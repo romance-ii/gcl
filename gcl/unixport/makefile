@@ -83,6 +83,8 @@ init_gcl.lsp: init_gcl.lsp.in
 	echo "(setq compiler::*cc* \"$(CC) -c $(FINAL_CFLAGS)\")" >>$@
 	echo "(setq compiler::*ld* \"$(CC) -o \")" >>$@
 	echo "(setq compiler::*ld-libs* \"$(LD_LIBS)\")" >>$@
+	echo "(setq compiler::*opt-three* \"$(O3FLAGS)\")" >>$@
+	echo "(setq compiler::*opt-two* \"$(O2FLAGS)\")" >>$@
 	echo "(setq compiler::*init-lsp* \"$@\")" >>$@
 
 

@@ -13,7 +13,7 @@ TTL:;
 	base[0]= coerce_to_string((V2));
 	base[1]= symbol_value(VV[0]);
 	base[2]= VV[1];
-	base[3]= symbol_function(VV[11]);
+	base[3]= symbol_function(VV[10]);
 	vs_top=(vs_base=base+0)+4;
 	Ladjoin();
 	vs_top=sup;
@@ -56,7 +56,7 @@ T7:;
 	base[1]= coerce_to_string((V5));
 	base[2]= symbol_value(VV[0]);
 	base[3]= VV[1];
-	base[4]= symbol_function(VV[11]);
+	base[4]= symbol_function(VV[10]);
 	vs_top=(vs_base=base+1)+4;
 	Lmember();
 	vs_top=sup;
@@ -66,7 +66,7 @@ T7:;
 	goto T18;}
 	base[1]= (V6);
 	vs_top=(vs_base=base+1)+1;
-	(void) (*Lnk12)();
+	(void) (*Lnk11)();
 	vs_top=sup;
 	{object V7 = vs_base[0];
 	bds_unwind1;
@@ -86,7 +86,7 @@ goto T23;
 T23:;
 	base[1]= car((V8));
 	vs_top=(vs_base=base+1)+1;
-	(void) (*Lnk12)();
+	(void) (*Lnk11)();
 	vs_top=sup;
 	V8= cdr((V8));
 	goto T22;}
@@ -108,39 +108,33 @@ register object V13;object V14;
 goto TTL;
 TTL:;
 	{object V15= (V14);
-	if((V15!= VV[13]))goto T32;
+	if((V15!= VV[12]))goto T32;
 	{object V16 = get((V13),VV[4],Cnil);
 	VMR3(V16)}
 goto T32;
 T32:;
-	if((V15!= VV[14]))goto T33;
+	if((V15!= VV[13]))goto T33;
 	{object V17 = get((V13),VV[5],Cnil);
 	VMR3(V17)}
 goto T33;
 T33:;
-	if((V15!= VV[15]))goto T34;
+	if((V15!= VV[14]))goto T34;
 	{object V18 = get((V13),VV[6],Cnil);
 	VMR3(V18)}
 goto T34;
 T34:;
-	if((V15!= VV[16]))goto T35;
+	if((V15!= VV[15]))goto T35;
 	{object V19 = get((V13),VV[7],Cnil);
 	VMR3(V19)}
 goto T35;
 T35:;
-	if((V15!= VV[17]))goto T36;
+	if((V15!= VV[16]))goto T36;
 	{object V20 = get((V13),VV[8],Cnil);
 	VMR3(V20)}
 goto T36;
 T36:;
-	base[0]= VV[9];
-	base[1]= (V14);
-	vs_top=(vs_base=base+0)+2;
-	Lerror();
-	vs_top=sup;
-	{object V21 = vs_base[0];
+	{object V21 = Cnil;
 	VMR3(V21)}}
-	base[0]=base[0];
 	return Cnil;
 }
 /*	local entry for function FIND-DOCUMENTATION	*/
@@ -152,15 +146,15 @@ register object V23;
 goto TTL;
 TTL:;
 	if(endp_prop((V23))){
-	goto T39;}
+	goto T37;}
 	if(!(endp_prop(cdr((V23))))){
-	goto T40;}
-goto T39;
-T39:;
+	goto T38;}
+goto T37;
+T37:;
 	{object V24 = Cnil;
 	VMR4(V24)}
-goto T40;
-T40:;
+goto T38;
+T38:;
 	{register object V25;
 	base[0]= car((V23));
 	vs_top=(vs_base=base+0)+1;
@@ -168,25 +162,25 @@ T40:;
 	vs_top=sup;
 	V25= vs_base[0];
 	if(!(type_of((V25))==t_string)){
-	goto T47;}
+	goto T45;}
 	{object V26 = (V25);
 	VMR4(V26)}
-goto T47;
-T47:;
+goto T45;
+T45:;
 	if(!(type_of((V25))==t_cons)){
-	goto T50;}
-	if(!((car((V25)))==(VV[10]))){
-	goto T50;}
+	goto T48;}
+	if(!((car((V25)))==(VV[9]))){
+	goto T48;}
 	V23= cdr((V23));
 	goto TTL;
-goto T50;
-T50:;
+goto T48;
+T48:;
 	{object V27 = Cnil;
 	VMR4(V27)}}
 	base[0]=base[0];
 	return Cnil;
 }
-static void LnkT12(){ call_or_link(VV[12],(void **)&Lnk12);} /* LOAD */
+static void LnkT11(){ call_or_link(VV[11],(void **)&Lnk11);} /* LOAD */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

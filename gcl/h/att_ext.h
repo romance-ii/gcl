@@ -129,6 +129,7 @@ EXTER object sKunbound_variable;
 EXTER object sKinvalid_variable;
 EXTER object sKundefined_function;
 EXTER object sKinvalid_function;
+EXTER object sKpackage_error;
 object wrong_type_argument();
 EXTER object sSuniversal_error_handler;
 

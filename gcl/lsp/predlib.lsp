@@ -86,6 +86,8 @@
   `(array ,element-type (,size)))
 (deftype string (&optional size)
   `(vector string-char ,size))
+(deftype base-string (&optional size)
+  `(vector base-char ,size))
 (deftype bit-vector (&optional size)
   `(vector bit ,size))
 
@@ -93,6 +95,8 @@
   `(simple-array t (,size)))
 (deftype simple-string (&optional size)
   `(simple-array string-char (,size)))
+(deftype simple-base-string (&optional size)
+  `(simple-array base-char (,size)))
 (deftype simple-bit-vector (&optional size)
   `(simple-array bit (,size)))
 
@@ -182,13 +186,13 @@
               (typep (imagpart object) (car i))))
      ))
     (sequence (or (listp object) (vectorp object)))
-    (string
+    ((base-string string) ;FIXME
      (and (stringp object)
           (or (null i) (match-dimensions (array-dimensions object) i))))
     (bit-vector
      (and (bit-vector-p object)
           (or (null i) (match-dimensions (array-dimensions object) i))))
-    (simple-string
+    ((simple-base-string simple-string) ;FIXME
      (and (simple-string-p object)
           (or (null i) (match-dimensions (array-dimensions object) i))))
     (simple-bit-vector
@@ -320,7 +324,7 @@
        	 (cond ((member t1 '(null cons)) (values t t))
        	       (t (values nil ntp1))))
        	((eq t2 'sequence)
-       	 (cond ((member t1 '(null cons list base-string simple-base-string)) 
+       	 (cond ((member t1 '(null cons list)) 
 		(values t t))
        	       ((or (eq t1 'simple-array) (eq t1 'array))
        	        (if (and (cdr i1) (consp (cadr i1)) (null (cdadr i1)))
@@ -511,21 +515,12 @@
 	    (if (member t2 '(base-char string-char character))
 	        (values t t)
 	        (values nil ntp2)))
-       	   (base-string
-	    (if (member t2 '(string vector array sequence))
-	        (values t t)
-	        (values nil ntp2)))
        	   (base-char
 	    (if (member t2 '(character string-char))
 	        (values t t)
 	        (values nil ntp2)))
        	   (extended-char
 	    (if (member t2 '(character string-char))
-	        (values t t)
-	        (values nil ntp2)))
-       	   (simple-base-string
-	    (if (member t2 '(string simple-string base-string vector
-				    simple-vector simple-array array sequence))
 	        (values t t)
 	        (values nil ntp2)))
 	   (string-char
@@ -566,7 +561,10 @@
 	               (unless (or (endp i2) (eq (car i2) '*))
 	                       (return-from subtypep (values nil t)))
 	               (unless (or (endp i2) (eq (car i2) '*))
-	                       (unless (equal (car i1) (car i2))
+	                       (unless (or (equal (car i1) (car i2))
+					   ; FIXME
+					   (and (eq (car i1) 'base-char)
+						(eq (car i2) 'string-char)))
 	                               ;; Unless the element type matches,
 	                               ;;  return NIL T.
 	                               ;; Is this too strict?
@@ -586,7 +584,10 @@
 	               (unless (or (endp i2) (eq (car i2) '*))
 	                       (return-from subtypep (values nil t)))
 	               (unless (or (endp i2) (eq (car i2) '*))
-	                       (unless (equal (car i1) (car i2))
+	                       (unless (or (equal (car i1) (car i2))
+					   ; FIXME
+					   (and (eq (car i1) 'base-char)
+						(eq (car i2) 'string-char)))
 	                               (return-from subtypep
 	                                            (values nil t)))))
 	           (when (or (endp (cdr i1)) (eq (cadr i1) '*))
