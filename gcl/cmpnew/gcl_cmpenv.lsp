@@ -421,7 +421,8 @@
 ;;		       (dft (and (symbolp dtype) (get dtype 'si::deftype-definition)))
 ;;		       (dtype (or (and dft (funcall dft)) dtype)))
 		  (if (consp dtype)
-		    (let ((stype (car dtype)))
+		    (let* ((dtype (si::normalize-type dtype))
+			   (stype (car dtype)))
 		      (cmpck (or (not (symbolp stype)) (cdddr dtype)) "The declaration ~s is illegal." decl)
 		      (case stype
 			(satisfies
