@@ -222,6 +222,8 @@ address_node_compare(const void *node1, const void *node2)
 
 #if defined(HAVE_LIBBFD) && ! defined(SPECIAL_RSYM)
 
+static int bfd_update;
+
 static MY_BFD_BOOLEAN
 bfd_combined_table_update(struct bfd_link_hash_entry *h,PTR ct) {
 
@@ -236,9 +238,14 @@ bfd_combined_table_update(struct bfd_link_hash_entry *h,PTR ct) {
     return MY_BFD_FALSE;
   }
 
-  SYM_ADDRESS(combined_table,combined_table.length)=h->u.def.value+h->u.def.section->vma;
-  SYM_STRING(combined_table,combined_table.length)=(char *)h->root.string;
-  
+  if (bfd_update) {
+    if (combined_table.length>=combined_table.alloc_length)
+      FEerror("combined table overflow", 0);
+    
+    SYM_ADDRESS(combined_table,combined_table.length)=h->u.def.value+h->u.def.section->vma;
+    SYM_STRING(combined_table,combined_table.length)=(char *)h->root.string;
+  }
+
   combined_table.length++;
 
   return MY_BFD_TRUE;
@@ -288,12 +295,17 @@ DEFUN_NEW("SET-UP-COMBINED",object,fSset_up_combined,SI
 #if defined(HAVE_LIBBFD)
   if (link_info.hash) {
 
-    if (combined_table.length+link_info.hash->table.size >=
-	combined_table.alloc_length)
-      cfuns_to_combined_table(combined_table.length+link_info.hash->table.size+20);
-
+    bfd_update=0;
     bfd_link_hash_traverse(link_info.hash,
 				 bfd_combined_table_update,&combined_table);
+
+    if (combined_table.length >=combined_table.alloc_length)
+      cfuns_to_combined_table(combined_table.length);
+
+    bfd_update=1;
+    bfd_link_hash_traverse(link_info.hash,
+				 bfd_combined_table_update,&combined_table);
+    bfd_update=0;
 
   }
 #endif
