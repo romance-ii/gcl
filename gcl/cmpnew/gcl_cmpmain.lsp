@@ -847,7 +847,7 @@ SYSTEM_SPECIAL_INIT
 		     (setq sfiles (concatenate 'string sfiles " " (namestring tem)))))
 	       sfiles) 
 	     si::*system-directory*
-	     #+gnu-ld (format nil "-Wl,-Map ~a" (namestring map))
+	     #+gnu-ld (format nil "-Wl,-Map ~a" (namestring map)) #-gnu-ld ""
 	     (let* ((par (namestring (make-pathname :directory '(:parent))))
 		    (i (concatenate 'string " " par))
 		    (j (concatenate 'string " " si::*system-directory* par)))
