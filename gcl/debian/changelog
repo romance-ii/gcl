@@ -24,8 +24,9 @@ gcl (2.5.0.cvs20020625-58) unstable; urgency=low
     #164526
   * Remove stray comments in package.d
   * elt errors of type type error
+  * bad-sequence limit returns type error
 
- -- Camm Maguire <camm@m.enhanced.com>  Tue, 15 Oct 2002 15:31:45 -0400
+ -- Camm Maguire <camm@m.enhanced.com>  Tue, 15 Oct 2002 15:39:19 -0400
 
 gcl (2.5.0.cvs20020625-57) unstable; urgency=low
 
