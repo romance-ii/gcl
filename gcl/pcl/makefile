@@ -4,7 +4,7 @@
 
 FILES:=$(shell ls -1 pcl_*.lisp | sed 's,\.lisp,,1') pcl_gcl_low
 
-GFILES1:= 0 1 2 3 4 5 6 7
+GFILES1:= 0 1 2 3 4 5 6 7 8
 GFILES:=$(addprefix pcl_gazonk,$(GFILES1))
 
 AFILES:=$(FILES) $(GFILES)

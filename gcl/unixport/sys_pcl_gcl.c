@@ -197,6 +197,9 @@ gcl_init_cmp_anon(void) {
     break;
   case 7:
     ar_check_init(pcl_gazonk7,Cnil);
+    break;
+  case 8:
+    ar_check_init(pcl_gazonk8,Cnil);
     i=1;
     break;
   default:
