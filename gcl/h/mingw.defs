@@ -20,8 +20,10 @@ CROSS_PREFIX =
 # MPIOBJS      = $(MPIDIR)/mpi_glue.o
 # LIBS        += -L$(MPICHDIR)/lib -lmpich
 
-CFLAGS       = -mms-bitfields -Wall -fwritable-strings -DVOL=volatile -fsigned-char $(PROCESSOR_FLAGS) $(ODIR_DEBUG) -I$(GCLDIR)/o 
-FINAL_CFLAGS = -mms-bitfields -Wall -fwritable-strings -DVOL=volatile -fsigned-char $(PROCESSOR_FLAGS) $(ODIR_DEBUG)
+# Remove -fno-zero-initialized-in-bss if using gcc less than 3.3.1
+# It is needed for the Unexec stuff to work with 3.3.1 at least
+CFLAGS       = -fno-zero-initialized-in-bss -mms-bitfields -Wall -fwritable-strings -DVOL=volatile -fsigned-char $(PROCESSOR_FLAGS) $(ODIR_DEBUG) -I$(GCLDIR)/o 
+FINAL_CFLAGS = -fno-zero-initialized-in-bss -mms-bitfields -Wall -fwritable-strings -DVOL=volatile -fsigned-char $(PROCESSOR_FLAGS) $(ODIR_DEBUG)
 O3FLAGS      = -O2 -fomit-frame-pointer
 O2FLAGS      = -O
 
@@ -79,8 +81,9 @@ TCL_LIBS=
 TK_LISP_LIB=
 TCL_EXES=
 
-# Don't do dvi on Windows
+# Don't do dvi on Windows, just HTML
 GCL_DVI=
+GCL_HTML=gcl-si_toc.html gcl-tk_toc.html gcl_toc.html
 
 # Use MSYS makeinfo
 HTML_CMD=makeinfo --html --no-split

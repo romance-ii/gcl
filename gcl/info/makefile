@@ -58,7 +58,7 @@ gcl_toc.html:
 install-html: gcl-tk_toc.html gcl-si_toc.html gcl_toc.html
 	cp *.html /d/www/gcl
 
-install:
+install: $(GCL_DVI) $(GCL_HTML)
 	mkdir -p $(DESTDIR)${INFO_DIR}
 	[ -f $(DESTDIR)$(INFO_DIR)dir ] || touch $(DESTDIR)$(INFO_DIR)dir
 	grep -q gcl-si $(DESTDIR)${INFO_DIR}dir || \
@@ -67,14 +67,14 @@ install:
 	echo "* GCL TK Doc: (gcl-tk.info).	TK window GCL interface." >> $(DESTDIR)${INFO_DIR}dir
 	grep -q gcl.info $(DESTDIR)${INFO_DIR}dir || \
 	echo "* GCL Ansi Doc: (gcl.info).  Ansi Common Lisp Specification." >> $(DESTDIR)${INFO_DIR}dir
-	cp *.info* $(DESTDIR)${INFO_DIR}
-	mkdir -p $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl.html
-	mkdir -p $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl-si.html
-	mkdir -p $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl-tk.html
-	cp gcl_*html $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl.html
-	cp gcl-si_*html $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl-si.html
-	cp gcl-tk_*html $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl-tk.html
-	cp *dvi $(DESTDIR)$(INFO_DIR)../doc/gcl-doc
+	-cp *.info* $(DESTDIR)${INFO_DIR}
+	-mkdir -p $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl.html
+	-mkdir -p $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl-si.html
+	-mkdir -p $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl-tk.html
+	-cp gcl*html $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl.html
+	-cp gcl-si*html $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl-si.html
+	-cp gcl-tk*html $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl-tk.html
+	-cp *dvi $(DESTDIR)$(INFO_DIR)../doc/gcl-doc
 
 FILE=gcl-si.texi
 srcs:
