@@ -31,13 +31,13 @@ Source: "c:\lang\MinGW32-gcl\*.*"; DestDir: "{app}\mingw";  Flags: recursesubdir
 
 [Icons]
 Name: "{group}\GNU Common Lisp @VERSION@"; Filename: "{app}\bin\gcl.bat"; IconFilename: "{app}\bin\gcl.ico"
-; Name: "{group}\Introduction"; Filename: "{app}\share\maxima\@VERSION@\doc\html\intromax.html"; WorkingDir: "{app}\share\maxima\@VERSION@"
-; Name: "{group}\Reference Manual"; Filename: "{app}\share\maxima\@VERSION@\doc\html\maxima_toc.html"; WorkingDir: "{app}\share\maxima\@VERSION@"
-Name: "{group}\GCL System Manual"; Filename: "{app}\doc\gcl-si_toc.html"
-Name: "{group}\Common Lisp HyperSpec"; Filename: "{app}\doc\gcl_toc.html"
+Name: "{group}\GCL System Manual"; Filename: "{app}\doc\gcl-si.html"
+Name: "{group}\Common Lisp HyperSpec"; Filename: "{app}\doc\gcl.html"
 Name: "{userdesktop}\GNU Common Lisp"; Filename: "{app}\bin\gcl.bat"; MinVersion: 4,4; Tasks: desktopicon; IconFilename: "{app}\bin\gcl.ico"
 
 [Run]
-;Filename: "{app}\bin\gclfinal.bat"; Parameters: {app}
 Filename: "{app}\lib\gcl-@VERSION@\unixport\saved_gcl.exe"; Parameters: -load {app}/install/install.lsp
 Filename: "{app}\bin\gcl.bat"; Description: "Launch GNU Common Lisp"; Flags: postinstall skipifsilent
+
+[UninstallDelete]
+Type: files; Name: "{app}\bin\gcl.bat"
