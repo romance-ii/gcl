@@ -228,8 +228,9 @@ object set_cclosure (result_cc,value_cc,available_size)
 
 (defun structure-type-included-type-name (type)
   (or (car (gethash type *structure-table*))
-      (si::s-data-included (get type 'si::s-data))
-      ))
+      (let ((includes (si::s-data-includes (get type 'si::s-data))))
+	(when includes
+	  (si::s-data-name includes)))))
 
 (defun structure-type-internal-slotds (type)
    (si::s-data-slot-descriptions (get type 'si::s-data))
