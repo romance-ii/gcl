@@ -15,7 +15,6 @@ License for more details.
 
 */
 
-
 #ifdef HAVE_XDR
 
 #ifdef AIX3
@@ -35,85 +34,122 @@ siGxdr_open(f)
   xdrstdio_create(xdrs, f->sm.sm_fp,
 		  (f->sm.sm_mode == smm_input ?  XDR_DECODE :
 		   f->sm.sm_mode == smm_output ?  XDR_ENCODE :
-		   FEerror("stream not input or output",0)))
+		   (FEerror("stream not input or output",0),XDR_ENCODE)))
 		   ;
   return ar;
 }
 
 object
-siGxdr_write(str,elt)
-     object str,elt;
-{ XDR *xdrp= (XDR *) str->ust.ust_self;
+siGxdr_write(object str,object elt) {
 
-  switch (type_of(elt))
-   { case t_fixnum:
-       if(!xdr_int(xdrp,&fix(elt))) goto error;
-        return elt;
-     case t_longfloat:
-       if(!xdr_double(xdrp,&lf(elt))) goto error;
-        return elt;
-     case t_shortfloat:
-       if(!xdr_float(xdrp,&sf(elt))) goto error;
-        return elt;
-     case t_vector:
-       if(!xdr_array(xdrp,(char **)&elt->v.v_self,
-		 &elt->v.v_fillp,
-		 elt->v.v_dim,
-		 aet_sizes[elt->v.v_elttype],
-		 (elt->v.v_elttype == aet_lf ? xdr_double :
-		  elt->v.v_elttype == aet_sf ? xdr_float :
-		  elt->v.v_elttype == aet_fix ? xdr_int :
-		  elt->v.v_elttype == aet_short ? xdr_short :
-		  (FEerror("unsupported xdr size",0),xdr_short))))
-	 goto error ;
-       return elt;
-     default:
-       FEerror("unsupported xdr ~a",1,elt);
-     }
+  XDR *xdrp= (XDR *) str->ust.ust_self;
+  xdrproc_t e;
+
+  switch (type_of(elt)) {
+  case t_fixnum:
+    if(!xdr_long(xdrp,&fix(elt))) goto error;
+    break;
+  case t_longfloat:
+    if(!xdr_double(xdrp,&lf(elt))) goto error;
+    break;
+  case t_shortfloat:
+    if(!xdr_float(xdrp,&sf(elt))) goto error;
+    break;
+  case t_vector:
+    
+    switch(elt->v.v_elttype) {
+    case aet_lf:
+      e=(xdrproc_t)xdr_double;
+      break;
+    case aet_sf:
+      e=(xdrproc_t)xdr_float;
+      break;
+    case aet_fix:
+      e=(xdrproc_t)xdr_long;
+      break;
+    case aet_short:
+      e=(xdrproc_t)xdr_short;
+      break;
+    default:
+      FEerror("unsupported xdr size",0);
+      goto error;
+      break;
+    }
+    if(!xdr_array(xdrp,(char **)&elt->v.v_self,
+		  &elt->v.v_fillp,
+		  elt->v.v_dim,
+		  aet_sizes[elt->v.v_elttype],
+		  e))
+      goto error;
+    break;
+  default:
+    FEerror("unsupported xdr ~a",1,elt);
+    break;
+  }
   return elt;
  error:
   FEerror("bad xdr read",0);
-     }
+  return elt;
+}
 
 object
-siGxdr_read(str,elt)
-          object str,elt;
-{ XDR *xdrp= (XDR *) str->ust.ust_self;
-  switch (type_of(elt))
-   { case t_fixnum:
-       {int l;
-	
-       if(!xdr_int(xdrp,&l)) goto error;
-	return make_fixnum(l);}
-       break;
-     case t_longfloat:
-       { double x;
-       if(!xdr_double(xdrp,&x)) goto error;
-        return make_longfloat(x);}
-     case t_shortfloat:
-       { float x;
-       if(!xdr_float(xdrp,&x)) goto error;
-        return make_shortfloat(x);}
-     case t_vector:
-      if(! xdr_array(xdrp,(char **)&elt->v.v_self,
-		 &elt->v.v_fillp,
-		 elt->v.v_dim,
-		 aet_sizes[elt->v.v_elttype],
-		 (elt->v.v_elttype == aet_lf ? xdr_double :
-		  elt->v.v_elttype == aet_sf ? xdr_float :
-		  elt->v.v_elttype == aet_fix ? xdr_int :
-		  elt->v.v_elttype == aet_short ? xdr_short :
-		  (FEerror("unsupported xdr size",0),xdr_short))))
-	goto error;
-       return elt;
-     default:
-       FEerror("unsupported xdr ~a",1,elt);
-     }
-     error:
+siGxdr_read(object str,object elt) {
+
+  XDR *xdrp= (XDR *) str->ust.ust_self;
+  xdrproc_t e;
+
+  switch (type_of(elt)) { 
+  case t_fixnum:
+    {fixnum l;
+    if(!xdr_long(xdrp,&l)) goto error;
+    return make_fixnum(l);}
+    break;
+  case t_longfloat:
+    {double x;
+    if(!xdr_double(xdrp,&x)) goto error;
+    return make_longfloat(x);}
+  case t_shortfloat:
+    {float x;
+    if(!xdr_float(xdrp,&x)) goto error;
+    return make_shortfloat(x);}
+  case t_vector:
+    switch(elt->v.v_elttype) {
+    case aet_lf:
+      e=(xdrproc_t)xdr_double;
+      break;
+    case aet_sf:
+      e=(xdrproc_t)xdr_float;
+      break;
+    case aet_fix:
+      e=(xdrproc_t)xdr_long;
+      break;
+    case aet_short:
+      e=(xdrproc_t)xdr_short;
+      break;
+    default:
+      FEerror("unsupported xdr size",0);
+      goto error;
+      break;
+    }
+
+    if(!xdr_array(xdrp,(char **)&elt->v.v_self,
+		  &elt->v.v_fillp,
+		  elt->v.v_dim,
+		  aet_sizes[elt->v.v_elttype],
+		  e))
+      goto error;
+    return elt;
+    break;
+  default:
+    FEerror("unsupported xdr ~a",1,elt);
+    return elt;
+    break;
+  }
+ error:
   FEerror("bad xdr read",0);
   return elt;
 }
-static 
+static void
 init_xdrfuns()
 { make_si_sfun("XDR-WRITE",siGxdr_write,
 	       ARGTYPE2(f_object,f_object)|RESTYPE(f_object));

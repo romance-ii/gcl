@@ -21,6 +21,7 @@
 ; Some of the files that interface to the Xlib are adapted from DEC/MIT files.
 ; See the file dec.copyright for details. */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>

@@ -51,6 +51,9 @@ $(LSPDIR)/auto_new.lsp: $(LSPDIR)/auto.lsp
 init_gcl.lsp.tmp: init_gcl.lsp.in
 	cp $< $@
 
+init_xgcl.lsp.tmp: init_gcl.lsp.tmp
+	ln -snf $< $@
+
 init_pcl_gcl.lsp.tmp: init_pcl_gcl.lsp.in ../cmpnew/cmpmain.lsp \
 		../pcl/sys-package.lisp ../clcs/package.lisp \
 		$(shell ls -1 ../clcs/clcs_*.lisp)
@@ -106,6 +109,9 @@ $(HDIR)/mdefs.h: $(HDIR)/include.h
 libgcl.a: $(FIRST_FILE) $(OBJS) sys_gcl.o $(LAST_FILE) gmpfiles bfdfiles
 	rm -rf $@
 	ar rs $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
+
+libxgcl.a: libgcl.a
+	ln -snf $< $@
 
 libansi_gcl.a: $(FIRST_FILE) $(OBJS) $(ANSIOBJS) sys_ansi_gcl.o $(LAST_FILE) gmpfiles bfdfiles
 	rm -rf $@

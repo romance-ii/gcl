@@ -1,3 +1,11 @@
+gcl (2.5.2-1) unstable; urgency=low
+
+  * New upstream release
+  * Cleanup xdrfuns.c for Axiom
+  * Reenable xgcl build
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 20 Mar 2003 09:15:54 -0500
+
 gcl (2.5.1-1) unstable; urgency=high
 
   * some optimization now on hppa

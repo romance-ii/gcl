@@ -38,7 +38,7 @@ maxobjs: $(shell echo *.lsp) $(PORTDIR)/saved_gcl
 	'(xlib::compile-xgcl)' | $(LISP)
 
 $(PORTDIR)/saved_$(SYSTEM): $(C_OBJS) maxobjs
-	(cd $(PORTDIR) ; $(MAKE) saved_xgcl "INIT_SYSTEM_LSP=init_gcl.lsp" "SYSTEM=$(SYSTEM)" "SYSTEM_OBJS=`cat $(SYSDIR)/maxobjs` $(C_OBJS) " "LIBSYSTEM= $(X_LIBS) " "PORTDIR=$(PORTDIR)")
+	(cd $(PORTDIR) ; $(MAKE) saved_xgcl "INIT_SYSTEM_LSP=init_gcl.lsp" "SYSTEM=$(SYSTEM)" "SYSTEM_OBJS=`cat $(SYSDIR)/maxobjs` $(C_OBJS) " "EXTRA_LD_LIBS= $(X_LIBS) " "PORTDIR=$(PORTDIR)")
 	rm -f $(PORTDIR)/raw_$(SYSTEM)
 
 Xgcl:
@@ -47,19 +47,22 @@ Xgcl:
 
 ############   the C code ###############
 
-$(SYSDIR)/Xutil-2.o: $(SYSDIR)/Xutil-2.c
+cmpinclude.h: ../h/cmpinclude.h
+	ln -snf $< $@
+
+$(SYSDIR)/Xutil-2.o: cmpinclude.h $(SYSDIR)/Xutil-2.c
 	$(CC) -c Xutil-2.c $(CFLAGS)
 
-$(SYSDIR)/Events.o: $(SYSDIR)/Events.c
+$(SYSDIR)/Events.o: cmpinclude.h $(SYSDIR)/Events.c
 	$(CC) -c Events.c  $(CFLAGS)
 
-$(SYSDIR)/XStruct-2.o: $(SYSDIR)/XStruct-2.c
+$(SYSDIR)/XStruct-2.o: cmpinclude.h $(SYSDIR)/XStruct-2.c
 	$(CC) -c XStruct-2.c  $(CFLAGS)
 
-$(SYSDIR)/XStruct-4.o: $(SYSDIR)/XStruct-4.c
+$(SYSDIR)/XStruct-4.o: cmpinclude.h $(SYSDIR)/XStruct-4.c
 	$(CC) -c XStruct-4.c  $(CFLAGS)
 
-general-c.o: general-c.c
+general-c.o: cmpinclude.h general-c.c
 	$(CC) -c general-c.c  $(CFLAGS)
 
 tar:
@@ -69,5 +72,5 @@ tar1:
 	(cd .. ; tar cvf - $(TARD)/*.lsp $(TARD)/*.lisp $(TARD)/*.c $(TARD)/*.paper $(TARD)/README $(TARD)/makefile $(TARD)/version | gzip -c > $(TARD).tgz)
 
 clean:
-	rm -f *.o *.data Xgcl maxobjs $(PORTDIR)/saved_$(SYSTEM)
+	rm -f *.o *.data Xgcl maxobjs $(PORTDIR)/saved_$(SYSTEM) cmpinclude.h
 

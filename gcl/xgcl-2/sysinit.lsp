@@ -32,6 +32,12 @@
 ;;of files which are linked into an image.
 
 (clines "#define init_or_load(fn,file) do {extern void fn(void); init_or_load1(fn,file);}  while(0)")
+(clines "static void")
+(clines "load1(char *x) {")
+(clines "printf(\"loading %s\\n\",x);")
+(clines "fflush(stdout);")
+(clines "load(x);")
+(clines "}")
 
 #.  
 (let ((files  *files*))
@@ -39,6 +45,7 @@
     (with-open-file (st "maxobjs" :direction :output)
     `(progn
        (clines "object user_init() {")
+       (clines "load1(\"../xgcl-2/sysdef.lisp\");")
      ,@(sloop::sloop for x  in files
 	for f  = (substitute #\_ #\-  x)
 	for ff =  (namestring (truename (format nil "~a.o" x)))
