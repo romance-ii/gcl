@@ -367,4 +367,9 @@ so a second comment-region adds another comment character"
 	(send-region current-lisp-process (point) end)
 	(send-string current-lisp-process ")\n")))))
 
+(defun gcl-mode ()
+  (interactive)
+  (lisp-mode)
+  )
+
 (provide 'gcl)

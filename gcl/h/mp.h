@@ -49,7 +49,7 @@ typedef struct
 #define MPOP_DEST(where,function,x1,x2) \
   do { extern MP_INT *verify_mp(); \
   function(MP(where),x1,x2); \
-  verify_big(where); \
+  verify_big_or_zero(where); \
       } while(0)
 
 
