@@ -36,14 +36,16 @@ mpz_fdiv_r_2exp (res, in, cnt)
   mp_size_t in_size = ABS (in->_mp_size);
   mp_size_t res_size;
   mp_size_t limb_cnt = cnt / BITS_PER_MP_LIMB;
-  mp_srcptr in_ptr = in->_mp_d;
+  /*  dont't cache in->_mp_d
+      across realloc, since it may move
+  */
 
   if (in_size > limb_cnt)
     {
       /* The input operand is (probably) greater than 2**CNT.  */
       mp_limb_t x;
 
-      x = in_ptr[limb_cnt] & (((mp_limb_t) 1 << cnt % BITS_PER_MP_LIMB) - 1);
+      x = in->_mp_d[limb_cnt] & (((mp_limb_t) 1 << cnt % BITS_PER_MP_LIMB) - 1);
       if (x != 0)
 	{
 	  res_size = limb_cnt + 1;
@@ -55,7 +57,7 @@ mpz_fdiv_r_2exp (res, in, cnt)
       else
 	{
 	  res_size = limb_cnt;
-	  MPN_NORMALIZE (in_ptr, res_size);
+	  MPN_NORMALIZE (in->_mp_d, res_size);
 
 	  if (res->_mp_alloc < res_size)
 	    _mpz_realloc (res, res_size);

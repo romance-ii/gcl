@@ -1330,9 +1330,15 @@ mpn_mul_n (p, a, b, n)
        * multiplication will take much longer than malloc()/free().  */
       mp_limb_t wsLen, *ws;
       wsLen = 2 * n + 3 * BITS_PER_MP_LIMB;
+#ifdef BAD_ALLOCA     
       ws = (mp_ptr) (*_mp_allocate_func) ((size_t) wsLen * sizeof (mp_limb_t));
+#else
+      ws = (mp_ptr) TMP_ALLOC ((size_t) wsLen * sizeof (mp_limb_t));
+#endif      
       mpn_toom3_mul_n (p, a, b, n, ws);
+#ifdef BAD_ALLOCA     
       (*_mp_free_func) (ws, (size_t) wsLen * sizeof (mp_limb_t));
+#endif
     }
 #if WANT_FFT || TUNE_PROGRAM_BUILD
   else

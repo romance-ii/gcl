@@ -68,7 +68,7 @@ gcd (u, v, g)
 	return;
       if (g->_mp_alloc < vsize)
 	_mpz_realloc (g, vsize);
-      MPN_COPY (g->_mp_d, vp, vsize);
+      MPN_COPY (g->_mp_d, v->_mp_d, vsize);
       return;
     }
 
@@ -80,7 +80,7 @@ gcd (u, v, g)
 	return;
       if (g->_mp_alloc < usize)
 	_mpz_realloc (g, usize);
-      MPN_COPY (g->_mp_d, up, usize);
+      MPN_COPY (g->_mp_d, u->_mp_d, usize);
       return;
     }
 

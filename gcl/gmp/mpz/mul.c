@@ -71,45 +71,59 @@ mult (u, v, w)
       {mp_size_t t = usize; usize = vsize; vsize = t;}
     }
 
-  up = u->_mp_d;
-  vp = v->_mp_d;
-  wp = w->_mp_d;
+  /* we keep referring to w->_mp_d or u->_mp_d instead
+     of 'wp = w->_mp_d' until after any 'malloc' allocations are done.
+     The reason is that if there is an intervening function call
+     which causes a 'malloc' then the value of w->_mp_d may change
+     during a garbage collection.
 
+     Note that if you have references which do NOT span function calls
+     then the c compiler knows how to eliminate multiple memory
+     references.   So the cost is minimal.
+
+  */
+     
   /* Ensure W has space enough to store the result.  */
   wsize = usize + vsize;
   if (w->_mp_alloc < wsize)
     {
-      if (wp == up || wp == vp)
+      if (w->_mp_d == u->_mp_d || w->_mp_d == v->_mp_d)
 	{
-	  free_me = wp;
+	  free_me = w->_mp_d;
 	  free_me_size = w->_mp_alloc;
 	}
       else
-	(*_mp_free_func) (wp, w->_mp_alloc * BYTES_PER_MP_LIMB);
+	(*_mp_free_func) (w->_mp_d, w->_mp_alloc * BYTES_PER_MP_LIMB);
 
-      w->_mp_alloc = wsize;
-      wp = (mp_ptr) (*_mp_allocate_func) (wsize * BYTES_PER_MP_LIMB);
-      w->_mp_d = wp;
+      w->_mp_d  = (mp_ptr) (*_mp_allocate_func) (wsize * BYTES_PER_MP_LIMB);
+      w->_mp_alloc = wsize;  /* keep consistent state in case allocate_func
+				looks at all mpz_t's  (eg gcl during garbage
+				collection)*/
+      /* safe to set these now */
+      up = u->_mp_d;
+      vp = v->_mp_d;
     }
   else
     {
       /* Make U and V not overlap with W.  */
-      if (wp == up)
+      up = u->_mp_d;
+      vp = v->_mp_d;
+      if (w->_mp_d == up)
 	{
 	  /* W and U are identical.  Allocate temporary space for U.  */
 	  up = (mp_ptr) TMP_ALLOC (usize * BYTES_PER_MP_LIMB);
 	  /* Is V identical too?  Keep it identical with U.  */
-	  if (wp == vp)
+	  if (w->_mp_d == vp)
 	    vp = up;
 	  /* Copy to the temporary space.  */
-	  MPN_COPY (up, wp, usize);
+	  MPN_COPY (up, w->_mp_d, usize);
 	}
-      else if (wp == vp)
+      else if (w->_mp_d == vp)
 	{
 	  /* W and V are identical.  Allocate temporary space for V.  */
 	  vp = (mp_ptr) TMP_ALLOC (vsize * BYTES_PER_MP_LIMB);
 	  /* Copy to the temporary space.  */
-	  MPN_COPY (vp, wp, vsize);
+	  MPN_COPY (vp, w->_mp_d, vsize);
 	}
     }
 
@@ -119,7 +133,7 @@ mult (u, v, w)
     }
   else
     {
-      cy_limb = mpn_mul (wp, up, usize, vp, vsize);
+      cy_limb = mpn_mul (w->_mp_d, up, usize, vp, vsize);
       wsize = usize + vsize;
       wsize -= cy_limb == 0;
     }
