@@ -1343,7 +1343,8 @@ void
 funcall_with_catcher(object fname, object fun)
 {
 	int n = vs_top - vs_base;
-	if (n > 64) n = 64;
+	if (n > MAX_ARGS+1) 
+	  FEerror("Call argument linit exceeded",0);
 	frs_push(FRS_CATCH, make_cons(fname, make_fixnum(n)));
 	if (nlj_active)
 		nlj_active = FALSE;
