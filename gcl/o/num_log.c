@@ -691,7 +691,7 @@ siLbit_array_op()
 		  object b[F_ARG_LIMIT];
 		  for (i = 0;  i < x->a.a_rank;  i++)
 		    b[i] = (make_fixnum(x->a.a_dims[i]));
-		  r=Iapply_fun_n(fSmake_array1,5,x->a.a_rank,
+		  r=Iapply_fun_n1(fSmake_array1,5,x->a.a_rank,
 			       aet_bit,
 			       Cnil,
 			       small_fixnum(0),

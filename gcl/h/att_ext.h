@@ -626,8 +626,10 @@ object Icheck_one_type();
 
 /* utils.c */
 object Iis_fixnum();
-object Iapply_fun_n();
-object Ifuncall_n();
+object Iapply_fun_n(object,int,int,...);
+object Iapply_fun_n1(object (*)(),int,int,...);
+object Iapply_fun_n2(object,int,int,...);
+object Ifuncall_n(object,int,...);
 object Ivs_values();
 object Icheck_one_type();
 object fSincorrect_type();

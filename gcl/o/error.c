@@ -151,12 +151,12 @@ va_dcl
 { int n = VFUN_NARGS;
   va_list ap;
   va_start(ap);
-  RETURN1(Iapply_fun_n(sSuniversal_error_handler,5,n-1,
+  RETURN1(Iapply_fun_n2(sSuniversal_error_handler,5,n-1,
 			  sKerror,
 			  Cnil,
 			  ihs_top_function_name(ihs_top-1),
 			  null_string,fmt_string,
-		       ap));
+		       &ap));
   va_end(ap);
 }
 
@@ -169,12 +169,12 @@ va_dcl
 { int n = VFUN_NARGS;
   va_list ap;
   va_start(ap);
-  RETURN1(Iapply_fun_n(sSuniversal_error_handler,5,n-2,
+  RETURN1(Iapply_fun_n2(sSuniversal_error_handler,5,n-2,
 			  sKerror,
 			  Ct,
 			  ihs_top_function_name(ihs_top-1),
 		       continue_fmt_string,fmt_string,
-		       ap));
+		       &ap));
   va_end(ap);
 }
 

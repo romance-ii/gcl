@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+#include <stdarg.h>
 #include "include.h"
 
 /* The functions IisProp check the property holds, and return the
@@ -48,11 +50,8 @@ Iis_fixnum(f)
     }
 }
 
-void Wrong_type_error(str,n,va_alist)
-     char *str;
-     int n;
-     va_dcl
-{ FEerror("Wrong type error",0);
+void Wrong_type_error(char *str,int n,...) {
+  FEerror("Wrong type error",0);
 }
 
 object
@@ -68,42 +67,93 @@ object (*f)();
 }
 
 object
-Ifuncall_n(fun,n,va_alist)
+Ifuncall_n(object fun,int n,...) {
 /* call fun on the n optional args supplied, and set the fcall.nvalues etc
    return the first value */
-object fun;
-int n;
-va_dcl
-{va_list ap;
- object *new;
- va_start(ap);
- {COERCE_VA_LIST(new,ap,n);
- return IapplyVector(fun,n,new);
- va_end(ap);
-}
+  va_list ap;
+  object *new;
+  va_start(ap,n);
+  {
+    COERCE_VA_LIST(new,ap,n);
+  }
+  va_end(ap);
+  return IapplyVector(fun,n,new);
 }
 
 
 
 /* For applying FUN to args in VA_LIST, where n are supplied directly
    and the last one is itself a va_list */
-object
-Iapply_fun_n(fun,n,m,va_alist)
-object fun;
-int n,m;
-va_dcl
-{va_list ap1,ap;
- object b[F_ARG_LIMIT];
- int i = 0;
- va_start(ap1);
+/*  object */
+/*  Iapply_fun_n(object fun,int n,int m,...) { */
 
- while (--n >= 0)
-   { b[i++] = va_arg(ap1,object);}
- if (m > 0) {
-   ap =	 va_arg(ap1,va_list);
-   while (--m >= 0)
-     { b[i++] = va_arg(ap,object);}
- }
+/*    va_list ap1,ap; */
+/*    object b[F_ARG_LIMIT]; */
+/*    int i = 0; */
+
+/*    va_start(ap1,m); */
+  
+/*    while (--n >= 0) */
+/*      { b[i++] = va_arg(ap1,object);} */
+/*    if (m > 0) { */
+/*      ap =	 va_arg(ap1,va_list); */
+/*      while (--m >= 0) */
+/*        { b[i++] = va_arg(ap,object);} */
+/*    } */
+
+/*    va_end(ap1); */
+
+/*    return IapplyVector(fun,i,b); */
+
+/*  } */
+ 
+
+
+/* For applying FUN to args in VA_LIST, where n are supplied directly
+   and the last one is itself a va_list */
+object
+Iapply_fun_n1(object (*fun)(),int n,int m,...) {
+
+  va_list ap;
+  object b[F_ARG_LIMIT],*bb;
+  int i = 0;
+
+  va_start(ap,m);
+
+  while (--n >= 0) { 
+    b[i++] = va_arg(ap,object);}
+  if (m > 0) {
+    bb = va_arg(ap,object *);
+    while (--m >= 0)
+      b[i++] = *bb++;
+  }
+
+  va_end(ap);
+
+ return IapplyVector(fun,i,b);
+}
+ 
+/* For applying FUN to args in VA_LIST, where n are supplied directly
+   and the last one is itself a va_list */
+object
+Iapply_fun_n2(object fun,int n,int m,...) {
+
+  va_list ap,*app;
+  object b[F_ARG_LIMIT];
+  int i = 0;
+
+  va_start(ap,m);
+
+  while (--n >= 0) { 
+    b[i++] = va_arg(ap,object);}
+  if (m > 0) {
+    app = va_arg(ap,va_list *);
+    while (--m >= 0)
+      b[i++] = va_arg(*app,object);
+  }
+
+  va_end(ap);
+
  return IapplyVector(fun,i,b);
 }
  

@@ -105,7 +105,7 @@ TS_MEMBER(t0,TS(t1)|TS(t2)|TS(t3)...)
 
 object IisArray();
 
-void Wrong_type_error();
+void Wrong_type_error(char *,int,...);
 
 /* array to which X is has its body displaced */
 #define DISPLACED_TO(x) Mcar(x->a.a_displaced)
