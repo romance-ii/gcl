@@ -1,3 +1,6 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
 #include <setjmp.h>
@@ -97,6 +100,8 @@ parse_plt() {
     FEerror("Cannot write map filename",0);
   strcpy(c,"_map");
   strcpy(b1,b);
+  if (stat(b1,&ss))
+    return 0;
   if (!(f=fopen(b1,"r")))
     FEerror("Cannot open map file", 0);
   for (i=j=0,li=Cnil;fgets(b,sizeof(b),f);) {
