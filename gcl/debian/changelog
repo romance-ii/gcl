@@ -4,8 +4,9 @@ gcl (2.5.0.cvs20020625-60) unstable; urgency=low
   * Better epsilon contant determination in ieee case
   * Implicit tagbody in do-symbols and do-all-symbols
   * Better epsilon handling in ieee case
+  * Add setf (values ... support
 
- -- Camm Maguire <camm@m.enhanced.com>  Fri, 18 Oct 2002 11:00:35 -0400
+ -- Camm Maguire <camm@m.enhanced.com>  Fri, 18 Oct 2002 17:28:44 -0400
 
 gcl (2.5.0.cvs20020625-59) unstable; urgency=low
 

@@ -319,6 +319,16 @@
   (when (and (consp place) (eq (car place) 'the))
         (return-from setf-expand-1
           (setf-expand-1 (caddr place) `(the ,(cadr place) ,newvalue) env)))
+  (when (and (consp place) (eq (car place) 'values))
+    (do ((vl (cdr place) (cdr vl))
+	 (sym (gensym))
+	 (forms nil)
+	 (n 0 (1+ n)))
+	((endp vl) (return-from setf-expand-1 
+				`(let ((,sym (multiple-value-list ,newvalue))) 
+				   (values ,@(nreverse forms)))))
+	 (declare (fixnum n) (object vl))
+	 (push `(setq ,(car vl) (nth ,n ,sym)) forms)))
   (when (symbolp place)
         (return-from setf-expand-1 `(setq ,place ,newvalue)))
   (when (and (consp place)

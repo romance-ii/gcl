@@ -250,7 +250,7 @@ object sym;
 void
 Fsetf(object form)
 {
-	object result;
+	object result,*t,*t1;
 	if (endp(form)) {
 		vs_base = vs_top;
 		vs_push(Cnil);
@@ -263,8 +263,11 @@ Fsetf(object form)
 			result = setf(MMcar(form), MMcadr(form));
 			form = MMcddr(form);
 		} while (!endp(form));
+		t=vs_base;
+		t1=vs_top;
 		vs_top = vs_base = top;
-		vs_push(result);
+		for (;t<t1;t++)
+		  vs_push(*t);
 
 	}
 }
@@ -295,6 +298,7 @@ setf(object place, object form)
 
 	if (type_of(place) != t_cons) {
 		setq(place, result=Ieval(form));
+		vs_top=vs_base+1;
 		return result;
 	}
 	fun = place->c.c_car;
