@@ -61,11 +61,11 @@ install-html: gcl-tk_toc.html gcl-si_toc.html gcl_toc.html
 install: $(GCL_DVI) $(GCL_HTML)
 	mkdir -p $(DESTDIR)${INFO_DIR}
 	[ -f $(DESTDIR)$(INFO_DIR)dir ] || touch $(DESTDIR)$(INFO_DIR)dir
-	grep -q gcl-si $(DESTDIR)${INFO_DIR}dir || \
+	grep gcl-si $(DESTDIR)${INFO_DIR}dir >/dev/null 2>&1 || \
 	echo "* GCL Doc: (gcl-si.info).	GNU Common Lisp specific Documentation." >> $(DESTDIR)${INFO_DIR}dir
-	grep -q gcl-tk $(DESTDIR)${INFO_DIR}dir || \
+	grep gcl-tk $(DESTDIR)${INFO_DIR}dir >/dev/null 2>&1 || \
 	echo "* GCL TK Doc: (gcl-tk.info).	TK window GCL interface." >> $(DESTDIR)${INFO_DIR}dir
-	grep -q gcl.info $(DESTDIR)${INFO_DIR}dir || \
+	grep gcl.info $(DESTDIR)${INFO_DIR}dir >/dev/null 2>&1 || \
 	echo "* GCL Ansi Doc: (gcl.info).  Ansi Common Lisp Specification." >> $(DESTDIR)${INFO_DIR}dir
 	-cp *.info* $(DESTDIR)${INFO_DIR}
 	-mkdir -p $(DESTDIR)$(INFO_DIR)../doc/gcl-doc/gcl.html
