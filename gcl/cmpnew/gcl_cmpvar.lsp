@@ -258,7 +258,7 @@
 ;; outside frame.  CM 20031201
 (defmacro bignum-expansion-storage ()
   `(if (and (boundp '*unwind-exit*) (member 'frame *unwind-exit*))
-       "malloc"
+       "gcl_gmp_alloc"
      "alloca"))
 
 (defun set-var (loc var ccb)

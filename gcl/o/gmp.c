@@ -1,6 +1,6 @@
 #define ALLOCATE(n) (*gcl_gmp_allocfun)(n)
 
-static void *gcl_gmp_alloc(size_t size)
+void *gcl_gmp_alloc(size_t size)
 {
    return (void *) ALLOCATE(size);
 }
