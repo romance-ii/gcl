@@ -9,6 +9,9 @@ gcl (2.6.0cvs-1) experimental; urgency=low
   * Fix compiler error which had not recognized defpackage as a package
     operation
   * Fix tkl.lisp call to open-named-socket
+  * Make values-list and nreconc signal errors when they should on
+    dotted lists.
+  * Avoid use of windows.h types as macros.
 
  -- Camm Maguire <camm@enhanced.com>  Tue, 15 Jul 2003 13:41:33 -0400
 
