@@ -4,8 +4,9 @@ gclcvs (2.7.0-4) unstable; urgency=low
   * Add conditions::find-class-no-error, si::find-class-no-error pair a
     la find-class for use in fixing subtypep when passed symbols naming
     classes
+  * Newest loop macro from cmucl with a few edits
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 22 Sep 2003 21:56:59 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 22 Sep 2003 21:58:31 +0000
 
 gclcvs (2.7.0-3) unstable; urgency=low
 
