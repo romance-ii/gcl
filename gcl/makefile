@@ -192,6 +192,7 @@ install1:
 	if test "$(INFO_DIR)" != "unknown"; then (cd info ; $(MAKE) ; $(MAKE) install DESTDIR=$(DESTDIR)) ; fi
 	if [ "gcc --version | grep mingw" ] ; then cp COPYING.LIB-2.0 readme-bin.mingw $(prefix) ; fi
 	if [ "gcc --version | grep mingw" ] ; then cp gcl.ico $(prefix)/bin ; fi
+	if [ "gcc --version | grep mingw" ] ; then rm -rf $(prefix)/install; mkdir $(prefix)/install ; cp windows/install.lsp $(prefix)/install ;fi
 
 clean:
 	(cd $(BINDIR); $(MAKE) clean)

@@ -1,16 +1,20 @@
-INSTALL:
+Hi there!
 
-Just upzip this file anywhere you like and then edit 
-the path names in the "bin/gcl" shell script.
+WHAT NOW:
 
-The file "bin/gclm.bat" which can be used as a 
-Windows shortcut.
+You are installing GNU Common Lisp for Windows, 2.5.0 RC1
+This compiler depends on Mingw32 GCC (see below).
+
+DO NOT INSTALL INTO A DIRECTORY WITH SPACES IN THE NAME.
 
 
 MINGW32 GCC:
 
-MinGW is provided under the terms of the files "COPYING"
-and "COPYING.LIB" in the mingw sub-directory.  The source 
+The MinGW compiler is provided under the terms of the files:
+
+ "COPYING" and "COPYING.LIB"
+
+which are located in the mingw sub-directory.  The source 
 code and updated binary packages can be obtained via the 
 official MinGW web site:
 
