@@ -3,8 +3,10 @@ gcl (2.5.0.cvs20020625-29) unstable; urgency=high
   * Back out of hppa assembler register flush for hppa, apparently issue
     is cleared by long/object function declaration fix
   * Remove ansi2knr.1 man page, Closes: #155067
+  * hppa still has gc leak, possibly due to faulty setjmp.  Try Lamont
+    Jones' latest assembler to flush regs
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  2 Aug 2002 20:29:19 -0400
+ -- Camm Maguire <camm@enhanced.com>  Fri,  2 Aug 2002 20:50:21 -0400
 
 gcl (2.5.0.cvs20020625-28) unstable; urgency=high
 

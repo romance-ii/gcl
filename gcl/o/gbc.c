@@ -786,16 +786,61 @@ mark_phase(void) {
 void * GC_save_regs_in_stack();
 #endif
 
+#if defined(__hppa__) /* Courtesy of Lamont Jones */
+/* the calling sequence */
+struct regs {
+	void *callee_saves[16];
+};
+void hppa_save_regs(struct regs);
+
+/* the code */
+
+	asm(".code");
+	asm(".export hppa_save_regs, entry");
+	asm(".proc");
+	asm(".callinfo");
+	asm(".label	hppa_save_regs");
+	asm(".entry");
+
+	asm("stw	%r3,0(%arg0)");
+	asm("stw	%r4,4(%arg0)");
+	asm("stw	%r5,8(%arg0)");
+	asm("stw	%r6,12(%arg0)");
+	asm("stw	%r7,16(%arg0)");
+	asm("stw	%r8,20(%arg0)");
+	asm("stw	%r9,24(%arg0)");
+	asm("stw	%r10,28(%arg0)");
+	asm("stw	%r11,32(%arg0)");
+	asm("stw	%r12,36(%arg0)");
+	asm("stw	%r13,40(%arg0)");
+	asm("stw	%r14,44(%arg0)");
+	asm("stw	%r15,48(%arg0)");
+	asm("stw	%r16,52(%arg0)");
+	asm("stw	%r17,56(%arg0)");
+	asm("bv	0(%rp)");
+	asm("stw	%r18,60(%arg0)");
+
+	asm(".exit");
+	asm(".procend");
+	asm(".end");
+#endif
 
 void
 mark_c_stack(jmp_buf env1, int n, void (*fn)(void *,void *,int)) {
 
+#if defined(__hppa__)
+  struct regs hppa_regs;
+#endif
   jmp_buf env;
   int where;
   if (n== N_RECURSION_REQD)
     c_stack_where = (long *) (void *) &env;
   if (n > 0 ) {  
+#if defined(__hppa__)
+    hppa_save_regs(hppa_regs);
+#else    
     setjmp(env);
+#endif
     mark_c_stack(env,n - 1,fn);
   } else {
       
@@ -970,64 +1015,8 @@ int (*GBC_enter_hook)() = NULL;
 int (*GBC_exit_hook)() = NULL;
 char *old_rb_start;
 
-/*  #if defined(__hppa__) */
-/*  asm( */
-/*          ".code\n\t" */
-/*          ".export GBC,entry\n\t" */
-/*  	".import GBC1,code\n\t" */
-/*  	".proc\n\t" */
-/*          ".callinfo entry_gr=18, calls, save_rp\n\t" */
-/*  	".label	GBC\n\t" */
-/*  	".entry\n\t" */
-/*  	"stw	%rp,-20(%sp)\n\t" */
-/*          "stwm	%r3,128(%sp)\n\t" */
-/*  	"stw	%r4,-124(%sp)\n\t" */
-/*  	"stw	%r5,-120(%sp)\n\t" */
-/*  	"stw	%r6,-116(%sp)\n\t" */
-/*  	"stw	%r7,-112(%sp)\n\t" */
-/*  	"stw	%r8,-108(%sp)\n\t" */
-/*  	"stw	%r9,-104(%sp)\n\t" */
-/*  	"stw	%r10,-100(%sp)\n\t" */
-/*  	"stw	%r11,-96(%sp)\n\t" */
-/*  	"stw	%r12,-92(%sp)\n\t" */
-/*  	"stw	%r13,-88(%sp)\n\t" */
-/*  	"stw	%r14,-84(%sp)\n\t" */
-/*  	"stw	%r15,-80(%sp)\n\t" */
-/*  	"stw	%r16,-76(%sp)\n\t" */
-/*  	"stw	%r17,-72(%sp)\n\t" */
-/*  	"stw	%r18,-68(%sp)\n\t" */
-/*          "bl      GBC1,%rp\n\t" */
-/*          "nop\n\t" */
-/*  	"ldw	-148(%sp),%rp\n\t" */
-/*  	"ldw	-72(%sp),%r18\n\t" */
-/*  	"ldw	-68(%sp),%r17\n\t" */
-/*  	"ldw	-76(%sp),%r16\n\t" */
-/*  	"ldw	-80(%sp),%r15\n\t" */
-/*  	"ldw	-84(%sp),%r14\n\t" */
-/*  	"ldw	-88(%sp),%r13\n\t" */
-/*  	"ldw	-92(%sp),%r12\n\t" */
-/*  	"ldw	-96(%sp),%r11\n\t" */
-/*  	"ldw	-100(%sp),%r10\n\t" */
-/*  	"ldw	-104(%sp),%r9\n\t" */
-/*  	"ldw	-108(%sp),%r8\n\t" */
-/*  	"ldw	-112(%sp),%r7\n\t" */
-/*  	"ldw	-116(%sp),%r6\n\t" */
-/*  	"ldw	-120(%sp),%r5\n\t" */
-/*  	"ldw	-124(%sp),%r4\n\t" */
-/*  	"bv	0(%rp)\n\t" */
-/*          "ldwm	128(%sp),%r3\n\t" */
-
-/*  	".exit\n\t" */
-/*          ".procend\n\t" */
-/*  	".end\n\t" */
-/*  ); */
-
-/*  void */
-/*  GBC1(enum type t) { */
-/*  #else */
 void
 GBC(enum type t) {
-/*  #endif */
 
   int i, j;
   struct apage *pp, *qq;
