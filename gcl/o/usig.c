@@ -133,22 +133,14 @@ unblock_sigusr_sigio(void)
 
 
 static void
-#ifdef __MINGW32__
 sigfpe1(int a)
-#else
-sigfpe1(void)
-#endif
 {
 	gcl_signal(SIGFPE, sigfpe1);
 	FEerror("Floating-point exception.", 0);
 }
 
 static void
-#ifdef __MINGW32__
 sigpipe(int a)
-#else
-sigpipe(void)
-#endif
 {
 	gcl_signal(SIGPIPE, sigpipe);
 	perror("");
@@ -156,22 +148,14 @@ sigpipe(void)
 }
 
 void
-#ifdef __MINGW32__
 sigint(int a)
-#else
-sigint(void)
-#endif
 {
   unblock_signals(SIGINT,SIGINT);
   terminal_interrupt(1);
 }
 
 static void
-#ifdef __MINGW32__
 sigalrm(int a)
-#else
-sigalrm(void)
-#endif
 {
   unblock_signals(SIGALRM,SIGALRM);
   raise_pending_signals(sig_try_to_delay);
@@ -183,19 +167,11 @@ DEF_ORDINARY("SIGUSR1-INTERRUPT",sSsigusr1_interrupt,SI,"");
 DEF_ORDINARY("SIGIO-INTERRUPT",sSsigio_interrupt,SI,"");
 
 static void
-#ifdef __MINGW32__
 sigusr1(int a)
-#else
-sigusr1(void)
-#endif
 {ifuncall1(sSsigusr1_interrupt,Cnil);}
 
 static void
-#ifdef __MINGW32__
 sigio(int a)
-#else
-sigio(void)
-#endif
 {ifuncall1(sSsigio_interrupt,Cnil);}
 
 

@@ -1,9 +1,4 @@
-
-#ifdef __MINGW32__
 typedef void (*handler_function_type)(int);
-#else
-typedef void (*handler_function_type)();
-#endif
 
 EXTER handler_function_type our_signal_handler[32];
 #ifdef __MINGW32__

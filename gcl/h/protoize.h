@@ -528,11 +528,7 @@ typedef void (*funcvoid)(void);
 /* usig.c:182:OF */ extern void install_default_signals (void); /* () */
 /* usig2.c:142:OF */ extern void gcl_init_safety (void); /* () */
 /* usig2.c:158:OF */ extern object sSsignal_safety_required (fixnum signo,fixnum safety); /* (signo, safety) int signo; int safety; */
-#ifdef __MINGW32__
 /* usig2.c:167:OF */ extern void main_signal_handler (int signo); /* (signo) int signo */
-#else
-/* usig2.c:167:OF */ extern void main_signal_handler (int signo, int a, int b); /* (signo, a, b) int signo; int a; int b; */
-#endif
 /* usig2.c:375:OF */ extern void raise_pending_signals (int cond); /* (cond) int cond; */
 /* usig2.c:407:OF */ extern object fSallow_signal (fixnum n); /* (n) int n; */
 /* utils.c:12:OF */ extern object IisSymbol (object f); /* (f) object f; */

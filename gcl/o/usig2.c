@@ -167,11 +167,7 @@ only in very SAFE places.")
      
 
 void
-#ifdef __MINGW32__
 main_signal_handler(int signo)
-#else    
-main_signal_handler(int signo, int a, int b)
-#endif    
 {  int allowed = signals_allowed;
 #ifdef NEED_TO_REINSTALL_SIGNALS
        signal(signo,main_signal_handler);
