@@ -1518,7 +1518,7 @@ TO2FLAGS=""
 # FIXME -- remove when mingw compiler issues are fixed
 case "$use" in
   *mingw*)
-	TFPFLAG="-fomit-frame-pointer";;
+	TFPFLAG="";;
   *)
 	TFPFLAG="-fomit-frame-pointer";;
 esac

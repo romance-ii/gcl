@@ -7,8 +7,9 @@ gclcvs (2.7.0-25) unstable; urgency=low
   * acconfig.h update for isnormal default
   * Fix bug in setting elements (si::aset) of 0 rank arrays uncovered by
     the random tester
+  * No -fomit-frame-pointer on mingw
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 31 May 2004 18:35:01 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sat,  5 Jun 2004 18:20:11 +0000
 
 gclcvs (2.7.0-24) unstable; urgency=low
 
