@@ -5,8 +5,10 @@ gclcvs (2.7.0-33) unstable; urgency=low
     fact that (int)2^31=-(int)2^31
   * Fix CSSIZE configure handling
   * Trigger error in funcall_with_catcher on too many call arguments
+  * install target depends on all in main makefile to comply with GNU
+    standards
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  2 Nov 2004 17:29:24 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 18 Nov 2004 13:56:57 +0000
 
 gclcvs (2.7.0-32) unstable; urgency=high
 

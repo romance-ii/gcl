@@ -163,7 +163,7 @@ install-command:
 	if gcc --version | grep -i mingw >/dev/null 2>&1 ; then (echo 'ECHO path %1\mingw\bin;%PATH% > gcli.bat'; \
 	 echo "ECHO start %1\lib\gcl-$(VERSION)\unixport\$(FLISP).exe -dir %1\lib\gcl-$(VERSION)\unixport -libdir %1\lib\gcl-$(VERSION) -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9 >> gcli.bat" ) > $(DESTDIR)$(prefix)/bin/gclfinal.bat ; fi
 
-install: 
+install: all
 	$(MAKE) install1 "INSTALL_LIB_DIR=$(prefix)/lib/gcl-`cat majvers`.`cat minvers`" "prefix=$(prefix)" "DESTDIR=$(DESTDIR)"
 INSTALL_LIB_DIR=
 install1:
