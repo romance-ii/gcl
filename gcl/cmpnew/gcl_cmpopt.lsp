@@ -908,7 +908,7 @@ type_of(#0)==t_bitvector")
 ;;MOD
 ; (push '((fixnum fixnum) fixnum #.(flags rfa)"@01;(#0>=0&&(#1)>0?(#0)%(#1):imod(#0,#1))")
 ;   (get 'mod 'inline-always))
- (push '((fixnum fixnum) fixnum #.(flags rfa)"@01;({fixnum _t=(#0)-((#0)/(#1))*(#1);((#1)<0 && _t<=0) || ((#1)>0 && _t>=0) ? _t : _t + (#1);})")
+ (push '((fixnum fixnum) fixnum #.(flags rfa)"@01;({fixnum _t=(#0)%(#1);((#1)<0 && _t<=0) || ((#1)>0 && _t>=0) ? _t : _t + (#1);})")
    (get 'mod 'inline-always))
 
 ;;NCONC
