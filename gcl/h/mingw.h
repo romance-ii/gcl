@@ -206,7 +206,7 @@ FILE *fopen_binary(char *name,char *mode)
 #define I386
 
 #define ADDITIONAL_FEATURES \
-		     ADD_FEATURE("I386"); ADD_FEATURE("WINNT")
+		     ADD_FEATURE("I386"); ADD_FEATURE("WINNT"); ADD_FEATURE("BROKEN_O4_OPT"); ADD_FEATURE("MINGW32");
   
 #undef SET_REAL_MAXPAGE  
 #define SET_REAL_MAXPAGE \
@@ -250,6 +250,8 @@ FILE *fopen_binary(char *name,char *mode)
 
 
 #define USE_INTERNAL_REAL_TIME_FOR_RUNTIME     
+
+#define  SHARP_EQ_CONTEXT_SIZE 1024
 
 /* Begin for cmpinclude */
 
