@@ -449,8 +449,7 @@ bignum2( int h,  int l)
   object x = new_bignum();
   mpz_set_si(MP(x),h);
   mpz_mul_2exp(MP(x),MP(x),32);
-  addsi(MP(x),l,MP(x));
-/*   mpz_add_ui(MP(x),MP(x),l); */
+  mpz_add_ui(MP(x),MP(x),((unsigned int)l));
   return normalize_big(x);
 }
 
