@@ -32,8 +32,11 @@ gclcvs (2.7.0-12) unstable; urgency=low
   * Protect find-class with when symbolp in subtypep
   * Map t and nil stream indicators properly in optimized compiled
     references to read_char1 and read_byte1 (in read.d)
+  * Load weak symbols as well as undefined symbols in
+    bfd_build_symbol_table, for the purposes of the static build
+    possibility
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 23 Oct 2003 16:46:02 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 23 Oct 2003 16:46:22 +0000
 
 gclcvs (2.7.0-11) unstable; urgency=low
 
