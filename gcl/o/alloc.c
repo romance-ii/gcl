@@ -1149,7 +1149,7 @@ int size;
 	  }
 
 	  }
-#endif BABY_MALLOC_SIZE	
+#endif /*  BABY_MALLOC_SIZE	 */
 
 	
 	if(ptr == NULL) return malloc(size);

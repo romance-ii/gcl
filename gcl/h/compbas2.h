@@ -36,7 +36,7 @@ EXTER GEN1 icopy_x;
 #endif
 
 #endif /* NO GMP */
-#endif _MP_H
+#endif /*  _MP_H */
 
   /* copy x to y, increasing space by factor of 2  */
 object make_integer();

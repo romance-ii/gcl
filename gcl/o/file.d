@@ -2199,7 +2199,7 @@ DEF_ORDINARY("SOCKET",sSsocket,SI,"");
 
 
      
-#endif HAVE_NSOCKET     
+#endif /* HAVE_NSOCKET */
 
 object standard_io;
 DEFVAR("*STANDARD-INPUT*",sLAstandard_inputA,LISP,(init_file(),standard_io),""); 
