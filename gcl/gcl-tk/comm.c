@@ -96,7 +96,7 @@ scan_headers(sfd)
 }
 
 static int
-write1(struct connection_state *,char *,int);
+write1(struct connection_state *,const char *,int);
 
 
 static void
@@ -213,7 +213,7 @@ connection_failure(char *);
 int
 write1(sfd,p,bytes)
      struct connection_state *sfd;
-     char *p;
+     const char *p;
      int bytes;
 { 
   int bs;

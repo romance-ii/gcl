@@ -391,7 +391,7 @@ struct connection_state *sfd;
 enum mtype type;
  char *hdr;
 int hdrsize;
- char *text;
+const char *text;
 int length;
      
 {

@@ -71,7 +71,7 @@ extern char *		strrchr _ANSI_ARGS_((CONST char *string, int c));
  * Global variables used by the main program:
  */
 
-static Tk_Window mainWindow;	/* The main window for the application.  If
+/* static Tk_Window mainWindow;    The main window for the application.  If
 				 * NULL then the application no longer
 				 * exists. */
 static Tcl_Interp *interp;	/* Interpreter for this application. */
@@ -190,7 +190,8 @@ TkX_Wish (argc, argv)
     int argc;				/* Number of arguments. */
     char **argv;			/* Array of argument strings. */
 {
-    char *args, *p, *msg;
+    char *args, *p;
+    const char *msg;
     char buf[20];
     int code;
 
@@ -203,7 +204,7 @@ TkX_Wish (argc, argv)
      * Parse command-line arguments.
      */
 
-    if (Tk_ParseArgv(interp, (Tk_Window) NULL, &argc, argv, argTable, 0)
+    if (Tk_ParseArgv(interp, (Tk_Window) NULL, &argc, (const char **)argv, argTable, 0)
 	    != TCL_OK) {
 	fprintf(stderr, "%s\n", interp->result);
 	exit(1);
@@ -236,18 +237,18 @@ TkX_Wish (argc, argv)
      * Initialize the Tk application.
      */
 
-    mainWindow = TkCreateMainWindow(interp, display, name/*  , "Tk" */); 
-    if (mainWindow == NULL) {
-	fprintf(stderr, "%s\n", interp->result);
-	exit(1);
-    }
-#ifndef __MINGW32__    
-    if (synchronize) {
-	XSynchronize(Tk_Display(mainWindow), True);
-    }
-#endif    
-    Tk_GeometryRequest(mainWindow, 200, 200);
-    Tk_UnmapWindow(mainWindow);
+/*     mainWindow = TkCreateMainWindow(interp, display, name/\*  , "Tk" *\/);  */
+/*     if (mainWindow == NULL) { */
+/* 	fprintf(stderr, "%s\n", interp->result); */
+/* 	exit(1); */
+/*     } */
+/* #ifndef __MINGW32__     */
+/*     if (synchronize) { */
+/* 	XSynchronize(Tk_Display(mainWindow), True); */
+/*     } */
+/* #endif     */
+/*     Tk_GeometryRequest(mainWindow, 200, 200); */
+/*     Tk_UnmapWindow(mainWindow); */
 
     /*
      * Make command-line arguments available in the Tcl variables "argc"
@@ -255,7 +256,7 @@ TkX_Wish (argc, argv)
      * specified on the command line.
      */
 
-    args = Tcl_Merge(argc-1, argv+1);
+    args = Tcl_Merge(argc-1, (const char **)argv+1);
     Tcl_SetVar(interp, "argv", args, TCL_GLOBAL_ONLY);
     ckfree(args);
     sprintf(buf, "%d", argc-1);
@@ -279,10 +280,10 @@ TkX_Wish (argc, argv)
      * interpreter.
      */
 
-#ifdef SQUARE_DEMO
-    Tcl_CreateCommand(interp, "square", SquareCmd, (ClientData) mainWindow,
-	    (void (*)()) NULL);
-#endif
+/* #ifdef SQUARE_DEMO */
+/*     Tcl_CreateCommand(interp, "square", SquareCmd, (ClientData) mainWindow, */
+/* 	    (void (*)()) NULL); */
+/* #endif */
 
     /*
      * Invoke application-specific initialization.
@@ -396,7 +397,7 @@ tell_lisp_var_changed(
 {
 
   if (being_set_by_lisp == 0)
-    { char *val = Tcl_GetVar2(interp,name1,name2, TCL_GLOBAL_ONLY);
+    { const char *val = Tcl_GetVar2(interp,name1,name2, TCL_GLOBAL_ONLY);
       char buf[3];
       STORE_3BYTES(buf,(long) clientData);
       if(sock_write_str2(dsfd,   m_set_lisp_loc, buf, 3 ,

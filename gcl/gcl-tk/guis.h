@@ -85,7 +85,7 @@ int guiBindCallback();
 
 int
 sock_write_str2(struct connection_state *,enum mtype, char *,
-		int,char *,int);
+		int,const char *,int);
 
 
 object
