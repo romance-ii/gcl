@@ -118,7 +118,7 @@ command:
 	rm -f bin/gcl xbin/gcl
 	MGCLDIR=`echo ${GCLDIR} | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
 	GCLDIR=`echo ${GCLDIR}` ; \
-	make install-command "INSTALL_LIB_DIR=$${GCLDIR}" "prefix=$${GCLDIR}" "BINDIR=$${MGCLDIR}"
+	make install-command "INSTALL_LIB_DIR=$${GCLDIR}" "prefix=$${GCLDIR}" "BINDIR=$${MGCLDIR}/$(PORTDIR)"
 	(cd xbin ; cp ../bin/gcl .)
 
 #	GCLDIR=`echo ${GCLDIR} | sed -e 'sX^/cygdrive/\([a-z]\)X\1!Xg' -e 'sX^//\([a-z]\)X\1!Xg'` ; \
@@ -132,7 +132,7 @@ install-command:
 	rm -f $(DESTDIR)${prefix}/bin/gcl
 	(echo '#!/bin/sh' ; \
 	echo export C_INCLUDE_PATH=${INSTALL_LIB_DIR}/h;\
-	echo exec ${BINDIR}/$(PORTDIR)/$(FLISP)$(EXE) \\ ; \
+	echo exec ${BINDIR}/$(FLISP)$(EXE) \\ ; \
 	echo '   -dir' ${INSTALL_LIB_DIR}/unixport/ \\ ; \
 	echo '   -libdir' ${INSTALL_LIB_DIR}/ \\ ; \
 	echo '   -eval '\''(setq si::*allow-gzipped-file* t)'\' \\ ;\
@@ -162,9 +162,9 @@ install1:
 	mkdir -p $(DESTDIR)${prefix}/lib 
 	mkdir -p $(DESTDIR)${prefix}/bin
 	mkdir -p $(DESTDIR)${INSTALL_LIB_DIR}
-	MPREFIX=`echo ${prefix} | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
-	make install-command "INSTALL_LIB_DIR=${INSTALL_LIB_DIR}" "prefix=${prefix}" "DESTDIR=$(DESTDIR)" \
-                             "BINDIR=$${MPREFIX}"
+	MINSTALL_LIB_DIR=`echo ${INSTALL_LIB_DIR} | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
+	make install-command "INSTALL_LIB_DIR=$${INSTALL_LIB_DIR}" "prefix=$${prefix}" "DESTDIR=$$(DESTDIR)" \
+                             "BINDIR=$${MINSTALL_LIB_DIR}/unixport"
 	rm -f $(DESTDIR)${prefix}/bin/gcl.exe
 	tar cf - $(PORTDIR)/$(FLISP)$(EXE) info/*.info* ${LISP_LIB} \
 	$(TCL_EXES)  |  (cd $(DESTDIR)${INSTALL_LIB_DIR} ;tar xf -)
