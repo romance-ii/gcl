@@ -133,7 +133,11 @@ main(int argc, char **argv, char **envp) {
     ARGV = argv;
 #ifdef UNIX
     ENVP = envp;
-    kcl_self = argv[0];
+#ifdef GET_FULL_PATH_SELF
+	GET_FULL_PATH_SELF(kcl_self);
+#else
+	kcl_self = argv[0];
+#endif
 #ifdef FIX_FILENAME
     {
         int n = strlen ( kcl_self );
