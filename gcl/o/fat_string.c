@@ -222,18 +222,18 @@ address_node_compare(const void *node1, const void *node2)
 
 #if defined(HAVE_LIBBFD) && ! defined(SPECIAL_RSYM)
 
-boolean
+MY_BFD_BOOLEAN
 bfd_combined_table_update(struct bfd_link_hash_entry *h,PTR ct) {
 
   if (ct!=&combined_table)
-    return false;
+    return MY_BFD_FALSE;
 
   if (h->type!=bfd_link_hash_defined)
-    return true;
+    return MY_BFD_TRUE;
 
   if (!h->u.def.section) {
     FEerror("Symbol without section",0);
-    return false;
+    return MY_BFD_FALSE;
   }
 
   SYM_ADDRESS(combined_table,combined_table.length)=h->u.def.value+h->u.def.section->vma;
@@ -241,7 +241,7 @@ bfd_combined_table_update(struct bfd_link_hash_entry *h,PTR ct) {
   
   combined_table.length++;
 
-  return true;
+  return MY_BFD_TRUE;
 
 }
 #endif

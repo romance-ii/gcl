@@ -595,7 +595,7 @@ if test "$enable_statsysbfd" = "yes" || test "$enable_dynsysbfd" = "yes" ; then
 	AC_MSG_CHECKING(for useable bfd_boolean)
 	AC_TRY_RUN([#define IN_GCC
 		    #include <bfd.h>
-		    bfd_boolean foo() {return FALSE}
+		    bfd_boolean foo() {return FALSE;}
 		    int main() {return 0;}],
 		AC_MSG_RESULT(yes) 
 		AC_DEFINE(HAVE_BFD_BOOLEAN),

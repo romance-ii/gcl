@@ -51,16 +51,16 @@ round_up(void *address, unsigned long n)
 #define ROUND_UP(a,b) round_up(a,b) 
 
 
-static boolean
+static MY_BFD_BOOLEAN
 madd_archive_element (struct bfd_link_info * link_info,
 		       bfd *abfd,
 		       const char *name) {
 
-return false;
+return MY_BFD_FALSE;
 
 }
 
-static boolean
+static MY_BFD_BOOLEAN
 mmultiple_definition (struct bfd_link_info * link_info,
 		      const char *name,
 		      bfd *obfd,
@@ -70,11 +70,11 @@ mmultiple_definition (struct bfd_link_info * link_info,
 		      asection *nsec,
 		      bfd_vma nval) {
 
-return false;
+return MY_BFD_FALSE;
 
 }
 
-static boolean
+static MY_BFD_BOOLEAN
 mmultiple_common (struct bfd_link_info * link_info,
 		  const char *name,
 		  bfd *obfd,
@@ -84,51 +84,51 @@ mmultiple_common (struct bfd_link_info * link_info,
 		  enum bfd_link_hash_type ntype,
 		  bfd_vma nsize) {
 
-return false;
+return MY_BFD_FALSE;
 
 }
 
-static boolean
+static MY_BFD_BOOLEAN
 madd_to_set (struct bfd_link_info * link_info,
 	     struct bfd_link_hash_entry *entry,
 	     bfd_reloc_code_real_type reloc,
 	     bfd *abfd, asection *sec, bfd_vma value) {
 
-return false;
+return MY_BFD_FALSE;
 
 }
 
-static  boolean 
-mconstructor (struct bfd_link_info * link_info,boolean constructor,
+static  MY_BFD_BOOLEAN 
+mconstructor (struct bfd_link_info * link_info,MY_BFD_BOOLEAN constructor,
 	      const char *name, bfd *abfd, asection *sec,
 	      bfd_vma value) {
 
-return false;
+return MY_BFD_FALSE;
 
 }
 
-static boolean
+static MY_BFD_BOOLEAN
 mwarning (struct bfd_link_info * link_info,
 	  const char *warning, const char *symbol,
 	  bfd *abfd, asection *section,
 	  bfd_vma address) {
 
-return false;
+return MY_BFD_FALSE;
 
 }
 
-static boolean
+static MY_BFD_BOOLEAN
 mundefined_symbol (struct bfd_link_info * link_info,
 		   const char *name, bfd *abfd,
 		   asection *section,
 		   bfd_vma address,
-		   boolean fatal) {
+		   MY_BFD_BOOLEAN fatal) {
 
   printf("%s is undefined\n",name);
-  return false;
+  return MY_BFD_FALSE;
 }
 
-static boolean
+static MY_BFD_BOOLEAN
 mreloc_overflow (struct bfd_link_info * link_info,
 		 const char *name,
 		 const char *reloc_name, bfd_vma addend,
@@ -136,36 +136,36 @@ mreloc_overflow (struct bfd_link_info * link_info,
 		 bfd_vma address) {
 
   printf("reloc for %s is overflowing\n",name);
-  return false;
+  return MY_BFD_FALSE;
 
 }
 
-static boolean
+static MY_BFD_BOOLEAN
 mreloc_dangerous (struct bfd_link_info * link_info,
 		  const char *message,
 		  bfd *abfd, asection *section,
 		  bfd_vma address) {
 
   printf("reloc is dangerous %s\n",message);
-  return false;
+  return MY_BFD_FALSE;
 
 }
 
-static boolean
+static MY_BFD_BOOLEAN
 munattached_reloc (struct bfd_link_info * link_info,
 		   const char *name,
 		   bfd *abfd, asection *section,
 		   bfd_vma address) {
 
-return false;
+return MY_BFD_FALSE;
 
 }
 
-static boolean
+static MY_BFD_BOOLEAN
 mnotice (struct bfd_link_info * link_info, const char *name,
 	 bfd *abfd, asection *section, bfd_vma address) {
 
-return false;
+return MY_BFD_FALSE;
 
 }
 
@@ -290,7 +290,7 @@ fasload(object faslfile) {
       continue;
     }
 
-    if (!(h=bfd_link_hash_lookup(link_info.hash,q[u]->name,false,false,true))) 
+    if (!(h=bfd_link_hash_lookup(link_info.hash,q[u]->name,MY_BFD_FALSE,MY_BFD_FALSE,MY_BFD_TRUE))) 
       continue;
 
     if (h->type!=bfd_link_hash_defined) 

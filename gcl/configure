@@ -3005,7 +3005,7 @@ else
 #include "confdefs.h"
 #define IN_GCC
 		    #include <bfd.h>
-		    bfd_boolean foo() {return FALSE}
+		    bfd_boolean foo() {return FALSE;}
 		    int main() {return 0;}
 EOF
 if { (eval echo configure:3012: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null

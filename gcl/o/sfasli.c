@@ -58,7 +58,7 @@ build_symbol_table_bfd(void) {
     if ((c=(char *)strstr(q[u]->name,"@@"))) {
       struct bfd_link_hash_entry *h;
       *c=0;
-      if (!(h=bfd_link_hash_lookup(link_info.hash,q[u]->name,true,true,true)))
+      if (!(h=bfd_link_hash_lookup(link_info.hash,q[u]->name,MY_BFD_TRUE,MY_BFD_TRUE,MY_BFD_TRUE)))
 	FEerror("Cannot make new hash entry",0);
       h->type=bfd_link_hash_defined;
       if (!q[u]->section)
