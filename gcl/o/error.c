@@ -723,7 +723,8 @@ not_a_string_or_symbol(object x)
 void
 not_a_symbol(object obj)
 {
-	FEinvalid_variable("~S is not a symbol.", obj);
+/* 	FEinvalid_variable("~S is not a symbol.", obj); */
+	FEwrong_type_argument(sLsymbol,obj);
 }
 
 int

@@ -97,7 +97,7 @@
     ("FEinvalid_function" :invalid-function "~S is invalid as a function."
      internal-type-error) ; |obj|
     ("FEinvalid_variable" :invalid-variable "~S is an invalid variable."
-     internal-type-error) ; |obj|
+     internal-program-error) ; |obj|
     ("check_arg_failed" :too-few-arguments "~S [or a callee] requires ~R argument~:p,~%\
 but only ~R ~:*~[were~;was~:;were~] supplied."
      internal-simple-program-error) ; |<function>| |n| |top - base|

@@ -13,8 +13,9 @@ gcl (2.5.0.cvs20020625-76) unstable; urgency=low
   * eliminate Iapply_fun_n1
   * Dummy system find-class in traditional image, overwritten by pcl
     version in ANSI
+  * Invalid variable is a program error, not a symbol is a type error
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 17 Feb 2003 11:47:03 -0500
+ -- Camm Maguire <camm@enhanced.com>  Mon, 17 Feb 2003 23:00:35 -0500
 
 gcl (2.5.0.cvs20020625-75) unstable; urgency=low
 
