@@ -935,7 +935,6 @@ fix_filename(object pathname, char *filename1)
         if (*p=='\\') *p='/';
         p++;
     }
- AGAIN:
     /* grok filename to have only '/' not '\',
        fix up for cygnus:  /cygdrive/h/   becomes h:/
        //h/ab and /h/ab become h:/ab
@@ -974,22 +973,29 @@ fix_filename(object pathname, char *filename1)
         }
     }
 
-    if ( filename[1] == ':' && filename[2] != '/' ) {
+    /* If the drive is just a letter with a colon eg "c:" or "c:hello.txt" it needs to
+     * be resolved to the current directory on that device */
+    if ( ( filename[1] == ':' ) && (( strlen ( filename ) == 2 ) || ( filename[2] != '/' ) ) ) {
         char buf[4];
+        int len;
         /*        fprintf ( stderr, "fix_filename: In current dir fixup phase\n" );*/
         bcopy(filename,buf,2);
         buf[2]='/';
         buf[3]=0;
         getwd(current_directory);
-        if ( chdir(buf) < 0 ) {
-            FEerror("fix_filename: Cannot get the truename of ~S.", 1, pathname);
-        }
-        p = getwd ( directory );
-        chdir ( current_directory );
-        strncat ( directory, filename+2, MAXPATHLEN-strlen(directory)-2 );
-        strcpy ( filename1, directory );
+        len = strlen ( current_directory );
+        strcpy ( directory, filename );
+        strncpy ( filename, current_directory, MAXPATHLEN-1 );
+        filename[len]='/';
+        filename[len+1]='\0';
+        strncat ( filename, directory+2, MAXPATHLEN - 2 - strlen ( current_directory ) );
+        filename [MAXPATHLEN-1] = '\0';
         filename = filename1;
-        goto AGAIN;
+        p = filename;
+        while ( *p ) {
+            if (*p=='\\') *p='/';
+            p++;
+        }
     }
 
     /* move the name back to beginning of buffer */

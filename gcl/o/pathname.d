@@ -69,12 +69,12 @@ int end;
    TLC from someone who feels pedantic. MJT */
 
 /* !!!!! Bug Fix. NLG */
-static object
+object
 parse_namestring(s, start, end, ep)
 object s;
 int start, end, *ep;
 {
-	int i, j, k, founddosdev = FALSE, oldstart=start, oldend=end;
+	int i, j, k, founddosdev = FALSE, oldstart=start, oldend=end, justdevice = FALSE;
 	int d;
 	object *vsp;
 	object x;
@@ -84,6 +84,7 @@ int start, end, *ep;
 #define IS_DIR_SEPARATOR(x) (x == '/')
 #endif
 
+	*ep=oldend;
 	vsp = vs_top + 1;
 	for (;--end >= start && isspace((int)s->st.st_self[end]););
 
@@ -91,34 +92,22 @@ int start, end, *ep;
 	if ( ( (start+1) <= end) &&  (s->st.st_self[start+1] == ':' )) {
 	    start+=2;
 	    founddosdev = TRUE;
-	    *ep=oldend;
         }
         if ( start > end ) {
-	    vs_push(Cnil);
-	    while (vs_top > vsp)
-		stack_cons();
-	    vs_push(Cnil);
 	    make_one(&s->st.st_self[0], 0);
-	    *ep=oldend;
+	    justdevice = TRUE;
 	} else {
 	    for (i = j = start;  i <= end;  ) {
 #ifdef UNIX
 		if (IS_DIR_SEPARATOR(s->st.st_self[i])) {
 #endif
-			if (j == 0 && i == 0) {
+			if (j == start && i == start) {
 				i++;
 				vs_push(sKroot);
 				j = i;
 				continue;
 			}
 #ifdef UNIX
-			/* BUG FIX by Grant J. Munsey */
-			if ( 0 && i == j) {
-				i++;
-				j = i;
-				continue;
-			}
-			/* END OF BUG FIX */
 			if (i-j == 1 && s->st.st_self[j] == '.') {
 				vs_push(sKcurrent);
 			} else if (i-j==2 && s->st.st_self[j]=='.' && s->st.st_self[j+1]=='.') {
@@ -197,7 +186,11 @@ L:
 	    /* No device name */
 	    vs_push(Cnil);
 	}
-	x = make_pathname ( Cnil, vs_top[-1], vs_top[-4], vs_top[-3], vs_top[-2], Cnil );
+	if ( justdevice ) {
+	    x = make_pathname ( Cnil, vs_top[-1], Cnil, Cnil, Cnil, Cnil );
+	} else {
+	    x = make_pathname ( Cnil, vs_top[-1], vs_top[-4], vs_top[-3], vs_top[-2], Cnil );
+	}
 	vs_reset;
 	return(x);
 }
@@ -416,7 +409,7 @@ N:
          FIX_FILENAME(x,buf);
          return (make_simple_string(buf));
          }
-#endif        
+#endif
 	return(copy_simple_string(token));
 }
 
