@@ -193,11 +193,10 @@ fi
 AC_CHECK_FUNC(gethostbyname, , AC_CHECK_LIB(nsl, main, [LIBS="$LIBS -lnsl"]))
 
 AC_CHECK_LIB(readline,main,
-	AC_CHECK_LIB(ncurses,main,
-		AC_DEFINE(HAVE_READLINE) 
-		LIBS="$LIBS -lreadline -lncurses"
-		RL_OBJS=readline.o
-		RL_LIB=lsp/readline.o))
+	AC_DEFINE(HAVE_READLINE) 
+	LIBS="$LIBS -lreadline -lncurses"
+	RL_OBJS=readline.o
+	RL_LIB=lsp/readline.o,,-lncurses)
 
 AC_CHECK_HEADER(bfd.h,
 	AC_CHECK_LIB(bfd,bfd_init,
