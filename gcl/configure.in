@@ -273,12 +273,14 @@ if test "$enable_bfd" = "yes" ; then
 # Old binutils appear to need CONST defined to const
 #
 			AC_MSG_CHECKING(if need to define CONST for bfd)
-			AC_TRY_RUN([#include <bfd.h>
+			AC_TRY_RUN([#define IN_GCC
+				    #include <bfd.h>
 				    int main() { symbol_info t; return 0;}],
 				AC_MSG_RESULT(no)
 				AC_DEFINE(HAVE_LIBBFD)
 				LIBS="$LIBS  $BFDLIB $IBRLIB",
-				AC_TRY_RUN([#include <bfd.h>
+				AC_TRY_RUN([#define IN_GCC
+					    #include <bfd.h>
                                             #define CONST const
 					    int main() {symbol_info t; return 0;}],
 					AC_MSG_RESULT(yes) 
