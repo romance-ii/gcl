@@ -238,27 +238,46 @@ DEFUNO_NEW("FMAKUNBOUND",object,fLfmakunbound,LISP
    ,1,1,NONE,OO,OO,OO,OO,void,Lfmakunbound,(object sym),"")
 
 {
-	/* 1 args */
-	if(type_of(sym) != t_symbol)
-		not_a_symbol(sym);
-	if (sym->s.s_sfdef != NOT_SPECIAL) {
-		if (sym->s.s_mflag) {
-			if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
-				sym->s.s_sfdef = NOT_SPECIAL;
-		} else if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
-			FEerror("~S, a special form, cannot be redefined.",
-				1, sym);
-	}
-	remf(&(sym->s.s_plist),sStraced);
-	clear_compiler_properties(sym,Cnil);
-	if (sym->s.s_hpack == lisp_package &&
-	    sym->s.s_gfdef != OBJNULL && initflag) {
-		ifuncall2(sLwarn, make_simple_string(
-			"~S is being redefined."), sym);
-	}
-	sym->s.s_gfdef = OBJNULL;
-	sym->s.s_mflag = FALSE;
-	RETURN1(sym);
+
+  /*FIXME -- store a symbol in plist for setf functions as opposed to
+    the function itself, and centralize function name resolution.
+    Allow for tracing, etc. thereby. 20050307 CM*/
+
+  if (type_of(sym)==t_cons && sym->c.c_car==sLsetf
+      && type_of(sym->c.c_cdr->c.c_car)==t_symbol
+      && sym->c.c_cdr->c.c_cdr==Cnil) {
+
+    if (get(sym->c.c_cdr->c.c_car,sSsetf_function,OBJNULL)==OBJNULL)
+      FEundefined_function(sym);
+    remf(&sym->c.c_cdr->c.c_car->s.s_plist,sSsetf_function);
+    RETURN1(sym);
+
+  }
+
+  /* 1 args */
+  if(type_of(sym) != t_symbol)
+    not_a_symbol(sym);
+  if (sym->s.s_gfdef==OBJNULL)
+    FEundefined_function(sym);
+
+  if (sym->s.s_sfdef != NOT_SPECIAL) {
+    if (sym->s.s_mflag) {
+      if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
+	sym->s.s_sfdef = NOT_SPECIAL;
+    } else if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
+      FEerror("~S, a special form, cannot be redefined.", 1, sym);
+  }
+  remf(&(sym->s.s_plist),sStraced);
+  clear_compiler_properties(sym,Cnil);
+  if (sym->s.s_hpack == lisp_package &&
+      sym->s.s_gfdef != OBJNULL && initflag) {
+    ifuncall2(sLwarn, make_simple_string("~S is being redefined."), sym);
+  }
+
+  sym->s.s_gfdef = OBJNULL;
+  sym->s.s_mflag = FALSE;
+  RETURN1(sym);
+
 }
 
 static void

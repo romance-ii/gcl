@@ -106,7 +106,7 @@
  (unintern 'lisp)
  (unintern 'compiler)
  (unintern 'user)
- (fmakunbound 'si::init-cmp-anon)
+ (when (fboundp 'si::init-cmp-anon) (fmakunbound 'si::init-cmp-anon))
  
  (eval-when (load)
 	    (if (fboundp 'get-system-time-zone)
