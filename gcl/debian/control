@@ -2,14 +2,14 @@ Source: gcl
 Section: interpreters
 Priority: optional
 Maintainer: Camm Maguire <camm@enhanced.com>
-Build-Depends: debhelper, gcc-3.2 [ hppa ia64 arm ], emacsen, libreadline4-dev, m4, tk8.3-dev, tetex-bin, texinfo, binutils-dev, texi2html, autoconf, automake, gettext, libgmp3-dev, autotools-dev
-Standards-Version: 3.5.2
+Build-Depends: debhelper ( >= 4.1.0 ), gcc-3.2 [ hppa ia64 arm ], emacsen, libreadline4-dev, m4, tk8.3-dev, tetex-bin, texinfo, binutils-dev, texi2html, autoconf, automake, gettext, libgmp3-dev, autotools-dev
+Standards-Version: 3.5.8
 
 Package: gcl
 Architecture: any
 Depends: ${shlibs:Depends}, ${gcc}
 Suggests: gcl-doc
-Description: GNU Common Lisp compiler.
+Description: GNU Common Lisp compiler
  GNU Common Lisp (GCL) is a Common Lisp compiler and interpreter
  implemented in C, and complying mostly with the standard set 
  forth in the book "Common Lisp, the Language I".  It attempts
@@ -24,7 +24,7 @@ Section: doc
 Architecture: all
 Conflicts: gclinfo
 Replaces: gclinfo
-Description: Documentation for GNU Common Lisp.
+Description: Documentation for GNU Common Lisp
  GNU Common Lisp (GCL) is a Common Lisp compiler and interpreter
  implemented in C, and complying mostly with the standard set 
  forth in the book "Common Lisp, the Language I".  It attempts
