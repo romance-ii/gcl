@@ -59,34 +59,16 @@
 /* a noop */
 #define SETUP_SIG_STACK
 #define SV_ONSTACK 0
+#if 0  /* Different definition in <sys/signal.h> - 2001-12-18 */
 #define SA_RESTART 0
-
-
-
+#endif
 
 #define brk(x) printf("not doing break\n");
 #include <varargs.h>     
 #include <stdio.h>
-FILE *fopen_binary(char *name,char *mode);
 #define UNIXSAVE "unexnt.c"
 
 #define SPECIAL_RSYM "rsym_nt.c"
-     
-#ifdef IN_SFASL
-#undef fopen
-FILE *fopen_binary(char *name,char *mode)
-{
-  char buf[10];
-  char *p=buf;
-  while (*mode)
-    *p++=*mode++;
-  *p++='b';
-  *p++=0;
-  return fopen(name,buf);
-}
-#endif
-     
-#define fopen fopen_binary
 
 #define HAVE_AOUT "wincoff.h"
 /* we dont need to worry about zeroing fp->_base , to prevent  */
