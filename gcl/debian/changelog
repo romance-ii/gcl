@@ -13,8 +13,10 @@ gclcvs (2.7.0-30) unstable; urgency=low
     effect and the hole is overrun
   * Build a profiling set of images as well for Debian, toggle between
     all four by default via debconf
+  * reset-sys-paths lisp function for moving image installation
+    directories, show profiling support in banner if present
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  5 Aug 2004 22:34:55 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  5 Aug 2004 22:37:46 +0000
 
 gclcvs (2.7.0-29) unstable; urgency=low
 

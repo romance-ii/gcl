@@ -25,7 +25,7 @@
 
 (export 'time)
 (export 'nth-value)
-(export '(decode-universal-time encode-universal-time compile-file-pathname complement constantly))
+(export '(reset-sys-paths decode-universal-time encode-universal-time compile-file-pathname complement constantly))
 
 
 (in-package 'system)
@@ -129,9 +129,10 @@ x))
     (dolist (l '(:unexec :bfd :readline))
       (when (member l *features*)
 	(push l gpled-modules)))
-    (format nil "GCL (GNU Common Lisp)  ~a.~a.~a ~a   ~a~%~a~%~a ~a~%~a~%~a~%~%~a~%" 
+    (format nil "GCL (GNU Common Lisp)  ~a.~a.~a ~a  ~a  ~a~%~a~%~a ~a~%~a~%~a~%~%~a~%" 
 	    *gcl-major-version* *gcl-minor-version* *gcl-extra-version*
 	    (if (member :ansi-cl *features*) "ANSI" "CLtL1")
+	    (if (member :gprof *features*) "profiling" "")
 	    (si::gcl-compile-time)
 	    "Source License: LGPL(gcl,gmp), GPL(unexec,bfd)"
 	    "Binary License: "
@@ -154,3 +155,13 @@ x))
     (if (< y 0)
 	(if (< x 0) (< x y) t)
       (if (< x 0) nil (< x y)))))
+
+(defun reset-sys-paths (s)
+  (declare (string s))
+  (setq si::*lib-directory* s)
+  (setq si::*system-directory* (si::string-concatenate s "unixport/"))
+  (let (nl)
+    (dolist (l '("cmpnew/" "gcl-tk/" "lsp/"))
+      (push (si::string-concatenate s l) nl))
+    (setq si::*load-path* nl))
+  nil)
