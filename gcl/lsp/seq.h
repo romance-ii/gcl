@@ -63,10 +63,10 @@ static char * VVi[19]={
 (char *)(LI7)
 };
 #define VV ((object *)VVi)
-static  LnkT17() ;
-static  (*Lnk17)() = LnkT17;
-static  LnkT16() ;
-static  (*Lnk16)() = LnkT16;
+static void LnkT17() ;
+static void (*Lnk17)() = LnkT17;
+static void LnkT16() ;
+static void (*Lnk16)() = LnkT16;
 static object  LnkTLI15() ;
 static object  (*LnkLI15)() = LnkTLI15;
 static object  LnkTLI14() ;

@@ -25,9 +25,9 @@
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-#ifndef lint
-static char rcsid[] = "/usr/home/gah/repository/blt/tkAppInit.c,v 1.3 1994/04/02 04:37:26 gah Exp SPRITE (Berkeley) $Revision";
-#endif /* not lint */
+/*  #ifndef lint */
+/*  static char rcsid[] = "/usr/home/gah/repository/blt/tkAppInit.c,v 1.3 1994/04/02 04:37:26 gah Exp SPRITE (Berkeley) $Revision"; */
+/*  #endif */
 
 #include "tk.h"
 
@@ -64,11 +64,11 @@ int
 Tcl_AppInit(interp)
     Tcl_Interp *interp;		/* Interpreter for application. */
 {
-    Tk_Window main;
+    Tk_Window mmain;
 /*
     extern int Blt_Init _ANSI_ARGS_((Tcl_Interp *interp));
 */
-    main = Tk_MainWindow(interp);
+    mmain = Tk_MainWindow(interp);
 
     /*
      * Call the init procedures for included packages.  Each call should

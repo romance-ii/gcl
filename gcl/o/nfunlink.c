@@ -57,22 +57,17 @@ union {int i;
      } bill;
 
 
-static object coerce_df(x)
-object x;
-{if (type_of(x)==t_longfloat) return x;
- if (type_of(x)==t_shortfloat) return make_longfloat(Msf(x));
- FEerror("Not of float type ~a" ,1,x);
- return Cnil;
-}
+/*  static object coerce_df(object x) */
+/*  {if (type_of(x)==t_longfloat) return x; */
+/*   if (type_of(x)==t_shortfloat) return make_longfloat(Msf(x)); */
+/*   FEerror("Not of float type ~a" ,1,x); */
+/*   return Cnil; */
+/*  } */
 
  
 
 object
-Icall_proc(fun_name,link_desk,link_loc,ap)
-     object fun_name;
-     int link_desk;
-     object (**link_loc)();
-     va_list ap;
+Icall_proc(object fun_name, int link_desk, object (**link_loc) (/* ??? */), va_list ap)
 { object fun,res;
   object (*fn)();
   int nargs;
@@ -98,12 +93,11 @@ Icall_proc(fun_name,link_desk,link_loc,ap)
       && F_MAX_ARGS(fargd) >= F_MIN_ARGS(link_desk)
       && F_TYPES(fargd) == F_TYPES(link_desk))
     {				/* do the link */
-      (void) vpush_extend((long) link_loc,sLAlink_arrayA->s.s_dbind); 
-      (void) vpush_extend((long) *link_loc,sLAlink_arrayA->s.s_dbind);
+      (void) vpush_extend(link_loc,sLAlink_arrayA->s.s_dbind); 
+      (void) vpush_extend(*link_loc,sLAlink_arrayA->s.s_dbind);
       *link_loc = fn;}
   /* make this call */
 
-  call_nopush:
   /* figure out the true number of args passed */
   nargs = (F_ARG_FLAGS_P(link_desk,F_requires_nargs) ?
 	   F_NARGS(VFUN_NARGS) : F_NARGS(link_desk));
@@ -172,11 +166,7 @@ Icall_proc(fun_name,link_desk,link_loc,ap)
  */
 
 float
-Icall_proc_float(fun_name,link_desk,link_loc,ap)
-     object fun_name;
-     int link_desk;
-     object (**link_loc)();
-     va_list ap;
+Icall_proc_float(object fun_name, int link_desk, object (**link_loc) (/* ??? */), va_list ap)
 { object val;
   val = Icall_proc(fun_name,link_desk,link_loc,ap);
   { union { void *p;
@@ -186,9 +176,9 @@ Icall_proc_float(fun_name,link_desk,link_loc,ap)
 }
 
 object
-IapplyVector(fun,nargs,base)
-     object fun,*base;
-     int nargs;
+IapplyVector(object fun, int nargs, object *base)
+                      
+               
 /* Call FUN a lisp objectect on NARGS which are loaded into an array
    starting at BASE.  This pushes on the CallHist, and puts the args onto
    the arg stack, so that debuggers may examine them.  It sets
@@ -265,10 +255,9 @@ Iinvoke_c_function_from_value_stack(fLaref,F_ARGD(2,2,0,ARGTYPES(oo,io,oo,oo)));
 }
    
 */   
-Iinvoke_c_function_from_value_stack(f,fargd)
-object (*f)();
-int fargd;
-{ int restype = F_RESULT_TYPE(fargd);
+void
+Iinvoke_c_function_from_value_stack(object (*f)(), int fargd)
+{ 
   int atypes = F_TYPES(fargd)>> F_TYPE_WIDTH;
   object *base = vs_base;
   int i;
@@ -317,12 +306,12 @@ int fargd;
 
 #define TYPE_STRING(i) (i == F_object ? "object" : i == F_int ?  "int" : i == F_double_ptr ? "double ptr" : "unknown")
 
-print_fargd(fargd)
-     int fargd;
-{ int m,i,ftyp;
+int
+print_fargd(int fargd)
+{ int i;
   int nargs = 7;
   unsigned int  ftypes = (F_TYPES(fargd) >> F_TYPE_WIDTH);
-  int fret_type = F_TYPES(fargd) & MASK_RANGE(0,F_TYPE_WIDTH);
+
   printf("minargs=%d,maxargs=%d, arg_types=(",F_MIN_ARGS(fargd),
 	 F_MAX_ARGS(fargd));
   for (i = 0; i < F_MAX_ARGS(fargd) ; i++, ftypes >>= F_TYPE_WIDTH)

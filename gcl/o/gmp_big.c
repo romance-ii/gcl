@@ -48,19 +48,17 @@ read.d: normalize_big_to_object
 #define DEBUG_GMP
 #ifdef DEBUG_GMP
 #define ABS(x) ((x) < 0 ? -(x) : (x))
-static object
-verify_big(big)
-     object big;
-{ int size;
-  if(type_of(big)!=t_bignum) FEerror("Not a bignum",0);
-  size = MP_SIZE(big);
-  if ( size ==0 ||  (MP_SELF(big))[ABS(size)-1]==0)
-    FEerror("badly formed",0);
-  return big;
-}
+/*  static object */
+/*  verify_big(object big) */
+/*  { int size; */
+/*    if(type_of(big)!=t_bignum) FEerror("Not a bignum",0); */
+/*    size = MP_SIZE(big); */
+/*    if ( size ==0 ||  (MP_SELF(big))[ABS(size)-1]==0) */
+/*      FEerror("badly formed",0); */
+/*    return big; */
+/*  } */
 
-static object verify_big_or_zero(big)
-     object big;
+static object verify_big_or_zero(object big)
 { int size;
   if(type_of(big)!=t_bignum) FEerror("Not a bignum",0);
   size = MP_SIZE(big);
@@ -69,15 +67,14 @@ static object verify_big_or_zero(big)
   return big;
 }
 
-static
-MP_INT*
-verify_mp(u)
-     MP_INT *u;
-{ int size = u->_mp_size;
- if (size != 0 && u->_mp_d[ABS(size)] == 0)
-   FEerror("bad mp",0);
- return u;
-}
+/*  static */
+/*  MP_INT* */
+/*  verify_mp(MP_INT *u) */
+/*  { int size = u->_mp_size; */
+/*   if (size != 0 && u->_mp_d[ABS(size)] == 0) */
+/*     FEerror("bad mp",0); */
+/*   return u; */
+/*  } */
 #else
 #define verify_mp(x)
 #define verify_big(x)
@@ -93,7 +90,8 @@ object big_gcprotect;
 object big_fixnum1;
 
 #include "gmp.c"
-init_big1(){
+void
+init_big1(void) {
     mp_set_memory_functions( gcl_gmp_alloc,gcl_gmp_realloc,gcl_gmp_free);
 }
 
@@ -104,7 +102,7 @@ init_big1()
 #endif  
 
 object
-new_bignum()
+new_bignum(void)
 { object ans;
  {BEGIN_NO_INTERRUPT;
  ans = alloc_object(t_bignum);
@@ -129,11 +127,9 @@ new_bignum()
 
 
 object
-make_bignum(u)
-mpz_t u;
+make_bignum(__mpz_struct *u)
 { object ans ;
  int size;
- mp_ptr wp, up;
  {BEGIN_NO_INTERRUPT;
  /* make sure we follow the bignum body of u if it gets moved... */
  { GCPROTECT(u);
@@ -157,12 +153,10 @@ mpz_t u;
 /* coerce a mpz_t to a bignum or fixnum */
 
 object
-make_integer(u)
-mpz_t u;
+make_integer(__mpz_struct *u)
 {
   if ((u)->_mp_size == 0) return small_fixnum(0);
   if (mpz_fits_sint_p(u)) {
-    signed long int x = mpz_get_si(u);
     return make_fixnum(mpz_get_si(u));
       }
   return make_bignum(u);
@@ -199,50 +193,44 @@ mpz_t u;
 }
 #endif /* obsolete */
 
-big_zerop(x)
- object x;
+int
+big_zerop(object x)
 { return (mpz_sgn(MP(x))== 0);}
 
-big_compare(x, y)
-     object x,y;
+int
+big_compare(object x, object y)
 {return   mpz_cmp(MP(x),MP(y));
 }
 
 
 object
-normalize_big_to_object(x)
- object x;
+normalize_big_to_object(object x)
 {
   return maybe_replace_big(x);
 }
 
 
-
-gcopy_to_big(res,x)
-     mpz_t res;
-     object x;
+void
+gcopy_to_big(__mpz_struct *res, object x)
 {
   mpz_set(MP(x),res);
 }
 
 /* destructively modifies x = i - x; */
-add_int_big(i, x)
-int i;
-object x;
+void
+add_int_big(int i, object x)
 {
        MPOP_DEST(x,addsi,i,MP(x));
 }
 
-sub_int_big(i, x)
-int i;
-object x;
-{  SI_TEMP_DECL(mpz_int_temp);
+void
+sub_int_big(int i, object x)
+{  /*  SI_TEMP_DECL(mpz_int_temp); */
   MPOP_DEST(x,subsi,i,MP(x));
 }
 
-mul_int_big(i, x)
-int i;
-object x;
+void
+mul_int_big(int i, object x)
 { MPOP_DEST(x,mulsi,i,MP(x));
 }    
 
@@ -257,24 +245,21 @@ object x;
 	X should be non-negative.
 */
 
-div_int_big(i, x)
-int i;
-object x;
+int
+div_int_big(int i, object x)
 {
   return mpz_tdiv_q_ui(MP(x),MP(x),i);
 }
 
 
 object
-big_plus(x, y)
-object x,y;
+big_plus(object x, object y)
 {
   MPOP(return,addii,MP(x),MP(y));
 }
 
 object
-big_times(x, y)
-object x,y;
+big_times(object x, object y)
 {
  MPOP(return,mulii,MP(x),MP(y));
 
@@ -285,8 +270,7 @@ object x,y;
    
 */
 object
-normalize_big(x)
-     object x;
+normalize_big(object x)
 {
  if (MP_SIZE(x) == 0) return small_fixnum(0);
   if (mpz_fits_sint_p(MP(x))) {
@@ -298,16 +282,15 @@ normalize_big(x)
 }
 
 object
-big_minus(x)
-     object x;
+big_minus(object x)
 { object y = new_bignum();
  mpz_neg(MP(y),MP(x));
  return normalize_big(y);
 }
 
 
-big_quotient_remainder(x0, y0, qp, rp)
-     object x0,y0,*qp,*rp;
+void
+big_quotient_remainder(object x0, object y0, object *qp, object *rp)
 {
   object res,quot;
   res = new_bignum();
@@ -320,15 +303,13 @@ big_quotient_remainder(x0, y0, qp, rp)
 
 	
 double
-big_to_double(x)
-     object x;
+big_to_double(object x)
 {
   return mpz_get_d(MP(x));
 }
 
 
-object copy_big(x)
-     object x;
+object copy_big(object x)
 {
   if (type_of(x)==t_bignum)
     return make_bignum(MP(x));
@@ -341,9 +322,7 @@ object copy_big(x)
    copy a bignum.
 */   
 object
-copy_to_big(x)
-     object x;
-{object y;
+copy_to_big(object x) {
  if (type_of(x) == t_fixnum) {
    object ans = new_bignum();
    mpz_set_si(MP(ans),fix(x));
@@ -450,9 +429,8 @@ otoi(object x) {
    or return the actual bignum replacing it with another
 */
 object
-maybe_replace_big(x)
-     object x;
-{ object ans;
+maybe_replace_big(object x)
+{ 
 /* note  mpz_fits_sint_p(MP(x)) returns arbitrary result if
    passed 0 in bignum form.
    bug or feature of gmp..
@@ -468,8 +446,7 @@ maybe_replace_big(x)
 
 
 object
-bignum2(h,l)
- unsigned  int h,l;
+bignum2(unsigned int h, unsigned int l)
 {
   object x = new_bignum();
   mpz_set_ui(MP(x),h);
@@ -478,9 +455,8 @@ bignum2(h,l)
   return normalize_big(x);
 }
 
-integer_quotient_remainder_1(x, y, qp, rp)
-object x, y;
-object *qp, *rp;
+void
+integer_quotient_remainder_1(object x, object y, object *qp, object *rp)
 {
   *qp = new_bignum();
   *rp = new_bignum();
@@ -498,9 +474,7 @@ object *qp, *rp;
 #define HAVE_MP_COERCE_TO_STRING
      
 object
-coerce_big_to_string(x,printbase)
-     int printbase;
-     object x;
+coerce_big_to_string(object x, int printbase)
 { int i;
  int sign = BIG_SIGN(x);
  int ss = mpz_sizeinbase(MP(x),printbase);
@@ -517,7 +491,8 @@ coerce_big_to_string(x,printbase)
 }
 
 
-init_big()
+void
+init_big(void)
 {
   big_gcprotect=alloc_object(t_bignum);
   MP_SELF(big_gcprotect)=0;
@@ -531,13 +506,3 @@ init_big()
 
 
 }
-
-  
-
-
-
-
-
-
-
-

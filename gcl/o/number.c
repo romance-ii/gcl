@@ -31,8 +31,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 long
-fixint(x)
-object x;
+fixint(object x)
 {
 	if (type_of(x) != t_fixnum)
 		FEerror("~S is not a fixnum.", 1, x);
@@ -40,8 +39,7 @@ object x;
 }
 
 int
-fixnnint(x)
-object x;
+fixnnint(object x)
 {
 	if (type_of(x) != t_fixnum || fix(x) < 0)
 		FEerror("~S is not a non-negative fixnum.", 1, x);
@@ -77,8 +75,7 @@ DEFUN("ALLOCATE-BIGGER-FIXNUM-RANGE",object,fSallocate_bigger_fixnum_range,
 
 
 object
-make_fixnum(i)
-int i;
+make_fixnum(long i)
 {
 	object x;
 
@@ -98,10 +95,9 @@ int i;
 }
 
 object
-make_ratio(num, den)
-object num, den;
+make_ratio(object num, object den)
 {
-	object g, r, integer_divide1(), get_gcd();
+	object g, r, integer_divide1(object x, object y), get_gcd(object x, object y);
 	vs_mark;
 
 	if (number_zerop(den))
@@ -139,9 +135,7 @@ object num, den;
 }
 
 object
-make_shortfloat(f)
-
-double f;
+make_shortfloat(double f)
 {
 	object x;
 
@@ -153,8 +147,7 @@ double f;
 }
 
 object
-make_longfloat(f)
-longfloat f;
+make_longfloat(longfloat f)
 {
 	object x;
 
@@ -166,8 +159,7 @@ longfloat f;
 }
 
 object
-make_complex(r, i)
-object r, i;
+make_complex(object r, object i)
 {
 	object c;
 	vs_mark;
@@ -189,6 +181,8 @@ object r, i;
 			r = make_longfloat(number_to_double(r));
 			vs_push(r);
 			break;
+		default:
+		  break;
 		}
 		break;
 	case t_shortfloat:
@@ -203,6 +197,8 @@ object r, i;
 			r = make_longfloat((double)(sf(r)));
 			vs_push(r);
 			break;
+		default:
+		  break;
 		}
 		break;
 	case t_longfloat:
@@ -214,8 +210,12 @@ object r, i;
 			i = make_longfloat(number_to_double(i));
 			vs_push(i);
 			break;
+		default:
+		  break;
 		}
 		break;
+	default:
+	  break;
 	}			
 	c = alloc_object(t_complex);
 	c->cmp.cmp_real = r;
@@ -225,15 +225,14 @@ object r, i;
 }
 
 double
-number_to_double(x)
-object x;
+number_to_double(object x)
 {
 	switch(type_of(x)) {
 	case t_fixnum:
 		return((double)(fix(x)));
 
 	case t_bignum:
-		return(big_to_double((struct bignum *)x));
+		return(big_to_double(/*  (struct bignum *) */x));
 
 	case t_ratio:
 		return(number_to_double(x->rat.rat_num) /
@@ -247,13 +246,14 @@ object x;
 
 	default:
 		wrong_type_argument(TSor_rational_float, x);
+		return(0.0);
 	}
 }
 
-init_number()
+void
+init_number(void)
 {
 	int i;
-	object x;
 
 	for (i = -SMALL_FIXNUM_LIMIT;  i < SMALL_FIXNUM_LIMIT;  i++) {
 		small_fixnum_table[i + SMALL_FIXNUM_LIMIT].t

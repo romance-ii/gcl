@@ -25,7 +25,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 object imag_unit, minus_imag_unit, imag_two;
 
 int
-fixnum_expt(x, y)
+fixnum_expt(int x, int y)
 {
 	int z;
 
@@ -42,10 +42,9 @@ fixnum_expt(x, y)
 }
 
 object
-number_exp(x)
-object x;
+number_exp(object x)
 {
-	double exp();
+	double exp(double);
 
 	switch (type_of(x)) {
 
@@ -63,7 +62,7 @@ object x;
 	case t_complex:
 	{
 		object y, y1;
-		object number_sin(), number_cos();
+		object number_sin(object x), number_cos(object x);
 	        vs_mark;
 	
 		y = x->cmp.cmp_imag;
@@ -83,15 +82,15 @@ object x;
 
 	default:
 		FEwrong_type_argument(sLnumber, x);
+		return(Cnil);
 	}
 }
 
 object
-number_expt(x, y)
-object x, y;
+number_expt(object x, object y)
 {
 	enum type tx, ty;
-	object z, number_nlog();
+	object z, number_nlog(object x);
 	vs_mark;
 
 	tx = type_of(x);
@@ -161,11 +160,10 @@ object x, y;
 }
 
 object
-number_nlog(x)
-object x;
+number_nlog(object x)
 {
-	double log();
-	object r, i, a, p, number_sqrt(), number_atan2();
+	double log(double);
+	object r=Cnil, i=Cnil, a, p, number_sqrt(object x), number_atan2(object y, object x);
 	vs_mark;
 
 	if (type_of(x) == t_complex) {
@@ -215,8 +213,7 @@ COMPLEX:
 }
 
 object
-number_log(x, y)
-object x, y;
+number_log(object x, object y)
 {
 	object z;
 	vs_mark;
@@ -235,11 +232,10 @@ object x, y;
 }
 
 object
-number_sqrt(x)
-object x;
+number_sqrt(object x)
 {
 	object z;
-	double sqrt();
+	double sqrt(double);
 	vs_mark;
 
 	if (type_of(x) == t_complex)
@@ -272,11 +268,10 @@ COMPLEX:
 }
 
 object
-number_atan2(y, x)
-object y, x;
+number_atan2(object y, object x)
 {
 	object z;
-	double atan(), dy, dx, dz;
+	double atan(double), dy, dx, dz=0.0;
 
 	dy = number_to_double(y);
 	dx = number_to_double(x);
@@ -309,8 +304,7 @@ object y, x;
 }
 
 object
-number_atan(y)
-object y;
+number_atan(object y)
 {
 	object z, z1;
         vs_mark;
@@ -338,10 +332,9 @@ object y;
 }
 
 object
-number_sin(x)
-object x;
+number_sin(object x)
 {
-	double sin();
+	double sin(double);
 
 	switch (type_of(x)) {
 
@@ -380,15 +373,15 @@ object x;
 
 	default:
 		FEwrong_type_argument(sLnumber, x);
+		return(Cnil);
 
 	}
 }
 
 object
-number_cos(x)
-object x;
+number_cos(object x)
 {
-	double cos();
+	double cos(double);
 
 	switch (type_of(x)) {
 
@@ -427,13 +420,13 @@ object x;
 
 	default:
 		FEwrong_type_argument(sLnumber, x);
+		return(Cnil);
 
 	}
 }
 
 object
-number_tan(x)
-object x;
+number_tan(object x)
 {
 	object r, s, c;
 	vs_mark;
@@ -449,23 +442,26 @@ object x;
 	return(r);
 }
 
-Lexp()
+void
+Lexp(void)
 {
 	check_arg(1);
 	check_type_number(&vs_base[0]);
 	vs_base[0] = number_exp(vs_base[0]);
 }
 
-Lexpt()
+void
+Lexpt(void)
 {
 	check_arg(2);
 	check_type_number(&vs_base[0]);
 	check_type_number(&vs_base[1]);
 	vs_base[0] = number_expt(vs_base[0], vs_base[1]);
-	vs_pop;
+	vs_popp;
 }
 
-Llog()
+void
+Llog(void)
 {
 	int narg;
 	
@@ -479,40 +475,45 @@ Llog()
 		check_type_number(&vs_base[0]);
 		check_type_number(&vs_base[1]);
 		vs_base[0] = number_log(vs_base[1], vs_base[0]);
-		vs_pop;
+		vs_popp;
 	} else
 		too_many_arguments();
 }
 
-Lsqrt()
+void
+Lsqrt(void)
 {
 	check_arg(1);
 	check_type_number(&vs_base[0]);
 	vs_base[0] = number_sqrt(vs_base[0]);
 }
 
-Lsin()
+void
+Lsin(void)
 {
 	check_arg(1);
 	check_type_number(&vs_base[0]);
 	vs_base[0] = number_sin(vs_base[0]);
 }
 
-Lcos()
+void
+Lcos(void)
 {
 	check_arg(1);
 	check_type_number(&vs_base[0]);
 	vs_base[0] = number_cos(vs_base[0]);
 }
 
-Ltan()
+void
+Ltan(void)
 {
 	check_arg(1);
 	check_type_number(&vs_base[0]);
 	vs_base[0] = number_tan(vs_base[0]);
 }
 
-Latan()
+void
+Latan(void)
 {
 	int narg;
 
@@ -526,12 +527,13 @@ Latan()
 		check_type_or_rational_float(&vs_base[0]);
 		check_type_or_rational_float(&vs_base[1]);
 		vs_base[0] = number_atan2(vs_base[0], vs_base[1]);
-		vs_pop;
+		vs_popp;
 	} else
 		too_many_arguments();
 }
 
-init_num_sfun()
+void
+init_num_sfun(void)
 {
 	imag_unit
 	= make_complex(make_longfloat((longfloat)0.0),

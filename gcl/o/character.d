@@ -33,7 +33,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	if (char_font(c) != 0 || char_bits(c) != 0)
 		@(return Cnil)
 	i = char_code(c);
-	if (' ' <= i && i < '\177' || i == '\n')
+	if ((' ' <= i && i < '\177') || i == '\n')
 		@(return Ct)
 	@(return Cnil)
 @)
@@ -107,6 +107,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	as a digit of radix r.
 	If r > 36 or i is not a digit, -1 is returned.
 */
+int
 digitp(i, r)
 int i, r;
 {
@@ -159,6 +160,7 @@ object x, y;
 @(defun char_eq (c &rest)
 	int i;
 @
+	check_type_character(&c);
 	for (i = 0;  i < narg;  i++)
 		check_type_character(&vs_base[i]);
 	for (i = 1;  i < narg;  i++)
@@ -170,6 +172,7 @@ object x, y;
 @(defun char_neq (c &rest)
 	int i, j;
 @
+	check_type_character(&c);
 	for (i = 0;  i < narg;  i++)
 		check_type_character(&vs_base[i]);
 	if (narg == 0)
@@ -201,6 +204,7 @@ object x, y;
 	return(0);
 }
 
+void
 Lchar_cmp(s, t)
 int s, t;
 {
@@ -221,10 +225,10 @@ int s, t;
 	vs_base[0] = Ct;
 }
 
-Lchar_l()  { Lchar_cmp( 1, 1); }
-Lchar_g()  { Lchar_cmp(-1, 1); }
-Lchar_le() { Lchar_cmp( 1, 0); }
-Lchar_ge() { Lchar_cmp(-1, 0); }
+void Lchar_l()  { Lchar_cmp( 1, 1); }
+void Lchar_g()  { Lchar_cmp(-1, 1); }
+void Lchar_le() { Lchar_cmp( 1, 0); }
+void Lchar_ge() { Lchar_cmp(-1, 0); }
 
 
 bool
@@ -245,6 +249,7 @@ object x, y;
 @(defun char_equal (c &rest)
 	int i;
 @
+	check_type_character(&c);
 	for (i = 0;  i < narg;  i++)
 		check_type_character(&vs_base[i]);
 	for (i = 1;  i < narg;  i++)
@@ -256,6 +261,7 @@ object x, y;
 @(defun char_not_equal (c &rest)
 	int i, j;
 @
+	check_type_character(&c);
 	for (i = 0;  i < narg;  i++)
 		check_type_character(&vs_base[i]);
 	for (i = 1;  i < narg;  i++)
@@ -286,6 +292,7 @@ object x, y;
 		return(1);
 }
 
+void
 Lchar_compare(s, t)
 int s, t;
 {
@@ -306,10 +313,10 @@ int s, t;
 	vs_base[0] = Ct;
 }
 
-Lchar_lessp()        { Lchar_compare( 1, 1); }
-Lchar_greaterp()     { Lchar_compare(-1, 1); }
-Lchar_not_greaterp() { Lchar_compare( 1, 0); }
-Lchar_not_lessp()    { Lchar_compare(-1, 0); }
+void Lchar_lessp()        { Lchar_compare( 1, 1); }
+void Lchar_greaterp()     { Lchar_compare(-1, 1); }
+void Lchar_not_greaterp() { Lchar_compare( 1, 0); }
+void Lchar_not_lessp()    { Lchar_compare(-1, 0); }
 
 
 object
@@ -331,10 +338,12 @@ BEGIN:
 		if (x->st.st_fillp == 1)
 			return(code_char(x->ust.ust_self[0]));
 		break;
+	default:
+		break;
 	}
 	vs_push(x);
 	x = wrong_type_argument(sLcharacter, x);
-	vs_pop;
+	vs_popp;
 	goto BEGIN;
 }
 
@@ -566,9 +575,9 @@ int w, r;
 	FEerror("Cannot set char-bit of ~S.", 1, c);
 @)
 
+void
 init_character()
 {
-	object ch;
 	int i;
 
 	for (i = 0;  i < CHCODELIM;  i++) {
@@ -614,6 +623,7 @@ init_character()
 	make_constant("CHAR-HYPER-BIT", make_fixnum(0));
 }
 
+void
 init_character_function()
 {
 	make_function("STANDARD-CHAR-P", Lstandard_char_p);

@@ -340,7 +340,7 @@ dlsym()
 #endif
 
 #else /* no RUN_PROCESS */
-
-init_socket_function(){;}
+void
+init_socket_function(void) {;}
 
 #endif     

@@ -1,8 +1,8 @@
 
-static L15();
-static L16();
-static L17();
-static L18();
+static void L15();
+static void L16();
+static void L17();
+static void L18();
 static object LI1();
 #define VMB1 register object *base=vs_top;
 #define VMS1  register object *sup=vs_top+4;vs_top=sup;
@@ -243,8 +243,8 @@ static object  LnkTLI18() ;
 static object  (*LnkLI18)() = LnkTLI18;
 static object  LnkTLI17() ;
 static object  (*LnkLI17)() = LnkTLI17;
-static  LnkT16() ;
-static  (*Lnk16)() = LnkT16;
+static void LnkT16() ;
+static void (*Lnk16)() = LnkT16;
 static object  LnkTLI15() ;
 static object  (*LnkLI15)() = LnkTLI15;
 static object  LnkTLI14() ;

@@ -8,7 +8,8 @@
 #endif
 
 #ifdef GMP
-init_pari()
+void
+init_pari(void)
 {
   ;
 }

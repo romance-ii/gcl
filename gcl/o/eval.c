@@ -46,7 +46,7 @@ warn_avma()
 
 
 
-object c_apply_n();
+/*  object c_apply_n(long int (*fn)(), int n, object *x); */
 
 object sSAbreak_pointsA;
 object sSAbreak_stepA;
@@ -54,18 +54,18 @@ object sSAbreak_stepA;
 
 #define SET_TO_APPLY(res,f,n,x) \
  switch(n) {\
- case 0:   res=(object)((long (*)())(f))(); break;\
-  case 1:  res=(object)((long (*)())(f))(x[0]); break; \
-  case 2:  res=(object)((long (*)())(f))(x[0],x[1]);break; \
-  case 3:  res=(object)((long (*)())(f))(x[0],x[1],x[2]);break; \
-  case 4:  res=(object)((long (*)())(f))(x[0],x[1],x[2],x[3]);break; \
-  case 5:  res=(object)((long (*)())(f))(x[0],x[1],x[2],x[3],x[4]);break; \
-  case 6:  res=(object)((long (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5]);  break;\
-  case 7:  res=(object)((long (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5], x[6]); break;\
-  case 8:  res=(object)((long (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5], x[6],x[7]); break;\
-  case 9:  res=(object)((long (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8]);break;\
-  case 10: res=(object)((long (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8],x[9]);break;\
-   default: res=c_apply_n(f,n,x); break;}
+ case 0:   res=(*f)(); break;\
+  case 1:  res=(*f)(x[0]); break; \
+  case 2:  res=(*f)(x[0],x[1]);break; \
+  case 3:  res=(*f)(x[0],x[1],x[2]);break; \
+  case 4:  res=(*f)(x[0],x[1],x[2],x[3]);break; \
+  case 5:  res=(*f)(x[0],x[1],x[2],x[3],x[4]);break; \
+  case 6:  res=(*f)(x[0],x[1],x[2],x[3],x[4],x[5]);  break;\
+  case 7:  res=(*f)(x[0],x[1],x[2],x[3],x[4],x[5], x[6]); break;\
+  case 8:  res=(*f)(x[0],x[1],x[2],x[3],x[4],x[5], x[6],x[7]); break;\
+  case 9:  res=(*f)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8]);break;\
+  case 10: res=(*f)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8],x[9]);break;\
+   default: res=c_apply_n(*f,n,x); break;}
 
 /*
 #undef SET_TO_APPLY
@@ -74,8 +74,8 @@ object sSAbreak_stepA;
 
 /* for t_sfun,t_gfun with args on vs stack */
 
-quick_call_sfun(fun)
-     object fun;
+void
+quick_call_sfun(object fun)
 { DEBUG_AVMA
   int i,n;
   enum ftype restype;
@@ -109,8 +109,8 @@ quick_call_sfun(fun)
   return;}
 
 /* only for sfun not gfun !!  Does not check number of args */
-call_sfun_no_check(fun)
-     object fun;
+void
+call_sfun_no_check(object fun)
 { DEBUG_AVMA
   int n;
   object *base=vs_base;
@@ -120,8 +120,8 @@ call_sfun_no_check(fun)
   CHECK_AVMA;
   return;
 }
-call_vfun(fun)
-     object fun;
+void
+call_vfun(object fun)
 { DEBUG_AVMA
   int n;
   object *base=vs_base;
@@ -138,9 +138,8 @@ call_vfun(fun)
 }
 
 
-
-funcall(fun)
-object fun;
+void
+funcall(object fun)
 { 
         object temporary;
  	object endp_temp;
@@ -326,9 +325,8 @@ END:
 	CHECK_AVMA;
 }}
 
-
-funcall_no_event(fun)
-object fun;
+void
+funcall_no_event(object fun)
 {
 	object endp_temp;
  DEBUG_AVMA
@@ -371,9 +369,8 @@ object fun;
 	}
 }
 
-lispcall(funp, narg)
-object *funp;
-int narg;
+void
+lispcall(object *funp, int narg)
 {
 	object endp_temp; DEBUG_AVMA
 	object fun = *funp;
@@ -414,9 +411,8 @@ int narg;
   CHECK_AVMA;
 }
 
-lispcall_no_event(funp, narg)
-object *funp;
-int narg;
+void
+lispcall_no_event(object *funp, int narg)
 { 	object endp_temp;        DEBUG_AVMA
 	object fun = *funp;
 
@@ -457,9 +453,8 @@ int narg;
 	 CHECK_AVMA;
 }
 
-symlispcall(sym, base, narg)
-object sym, *base;
-int narg;
+void
+symlispcall(object sym, object *base, int narg)
 {
 	object endp_temp;
        DEBUG_AVMA
@@ -500,9 +495,8 @@ int narg;
 	CHECK_AVMA;
 }
 
-symlispcall_no_event(sym, base, narg)
-object sym, *base;
-int narg;
+void
+symlispcall_no_event(object sym, object *base, int narg)
 {
 	object endp_temp;
        DEBUG_AVMA
@@ -545,9 +539,7 @@ int narg;
 }
 
 object
-simple_lispcall(funp, narg)
-object *funp;
-int narg;
+simple_lispcall(object *funp, int narg)
 {
 	object endp_temp;
        DEBUG_AVMA
@@ -593,9 +585,7 @@ int narg;
 }
 
 object
-simple_lispcall_no_event(funp, narg)
-object *funp;
-int narg;
+simple_lispcall_no_event(object *funp, int narg)
 {
 	object endp_temp;
        DEBUG_AVMA 
@@ -641,9 +631,7 @@ int narg;
 }
 
 object
-simple_symlispcall(sym, base, narg)
-object sym, *base;
-int narg;
+simple_symlispcall(object sym, object *base, int narg)
 {
 	object endp_temp;
        DEBUG_AVMA
@@ -689,9 +677,7 @@ int narg;
 }
 
 object
-simple_symlispcall_no_event(sym, base, narg)
-object sym, *base;
-int narg;
+simple_symlispcall_no_event(object sym, object *base, int narg)
 {
 	object endp_temp;
        DEBUG_AVMA
@@ -735,8 +721,8 @@ int narg;
 	return(vs_base[0]);
 }
 
-super_funcall(fun)
-object fun;
+void
+super_funcall(object fun)
 {
 	if (type_of(fun) == t_symbol) {
 		if (fun->s.s_sfdef != NOT_SPECIAL || fun->s.s_mflag)
@@ -748,8 +734,8 @@ object fun;
 	funcall(fun);
 }
 
-super_funcall_no_event(fun)
-object fun;
+void
+super_funcall_no_event(object fun)
 {
 #ifdef DEBUGGING_AVMA
   funcall_no_event(fun); return;
@@ -808,7 +794,6 @@ EVAL:
 
 	if (type_of(form) != t_symbol)  RETURN1(form);
 
-SYMBOL:
 	switch (form->s.s_stype) {
 	case stp_constant:
 	  RETURN1((form->s.s_dbind));
@@ -876,7 +861,6 @@ APPLICATION:
 			goto EVAL_ARGS;
 		}
 
-GFDEF:
 	if ((x = fun->s.s_gfdef) == OBJNULL)
 		FEundefined_function(fun);
 
@@ -932,16 +916,14 @@ LAMBDA:
 #else  
 
 object
-Ieval(form)
-     object form;
+Ieval(object form)
 { eval(form);
   return Ivs_values();
 }
 #endif
   
-
-eval(form)
-object form;
+void
+eval(object form)
 { 
         object temporary;
 	object endp_temp;
@@ -949,7 +931,6 @@ object form;
 	object fun, x;
 	object *top;
 	object *base;
-	object orig_form;
 
 	cs_check(form);
 
@@ -988,7 +969,6 @@ EVAL:
 		return;
 	}
 
-SYMBOL:
 	switch (form->s.s_stype) {
 	case stp_constant:
 		vs_base = vs_top;
@@ -1064,7 +1044,6 @@ APPLICATION:
 			goto EVAL_ARGS;
 		}
 
-GFDEF:
 	if ((x = fun->s.s_gfdef) == OBJNULL)
 		FEundefined_function(fun);
 
@@ -1120,8 +1099,8 @@ LAMBDA:
 	FEinvalid_function(fun);
 }	
 
-call_applyhook(fun)
-object fun;
+void
+call_applyhook(object fun)
 {
 	object ah;
 	object *v;
@@ -1164,7 +1143,6 @@ DEFUNO("APPLY",object,fLapply,LISP
      object fun;
 va_dcl
 {	int m,n=VFUN_NARGS;
-	object *new;
 	object list;
 	object buf[MAX_ARGS];
 	object *base=buf;
@@ -1199,7 +1177,8 @@ object x0;
 	return Ivs_values();
 }
 
-Levalhook()
+void
+Levalhook(void)
 {
 	object env;
 	bds_ptr old_bds_top = bds_top;
@@ -1229,7 +1208,8 @@ Levalhook()
 	bds_unwind(old_bds_top);
 }
 
-Lapplyhook()
+void
+Lapplyhook(void)
 {
 	object endp_temp;
 
@@ -1289,8 +1269,7 @@ object x0;
 }
 
 object
-ieval(x)
-object x;
+ieval(object x)
 {
 	object *old_vs_base;
 	object *old_vs_top;
@@ -1305,8 +1284,7 @@ object x;
 }
 
 object
-ifuncall1(fun, arg1)
-object fun, arg1;
+ifuncall1(object fun, object arg1)
 {
 	object *old_vs_base;
 	object *old_vs_top;
@@ -1324,8 +1302,7 @@ object fun, arg1;
 }
 
 object
-ifuncall2(fun, arg1, arg2)
-object fun, arg1, arg2;
+ifuncall2(object fun, object arg1, object arg2)
 {
 	object *old_vs_base;
 	object *old_vs_top;
@@ -1344,8 +1321,7 @@ object fun, arg1, arg2;
 }
 
 object
-ifuncall3(fun, arg1, arg2, arg3)
-object fun, arg1, arg2, arg3;
+ifuncall3(object fun, object arg1, object arg2, object arg3)
 {
 	object *old_vs_base;
 	object *old_vs_top;
@@ -1364,8 +1340,8 @@ object fun, arg1, arg2, arg3;
 	return(x);
 }
 
-funcall_with_catcher(fname, fun)
-object fname, fun;
+void
+funcall_with_catcher(object fname, object fun)
 {
 	int n = vs_top - vs_base;
 	if (n > 64) n = 64;
@@ -1380,8 +1356,7 @@ object fname, fun;
 #include <varargs.h>
 
 object 
-fcalln_cclosure(ap)
-va_list ap;
+fcalln_cclosure(va_list ap)
 {
 object endp_temp;
 int i=fcall.argd;
@@ -1427,41 +1402,44 @@ int i=fcall.argd;
 }}
 
 object 
-fcalln_general(ap)
-va_list ap;
-{int i=fcall.argd;
- object fun=fcall.fun;
- {int n= SFUN_NARGS(i);
-  /*  object *old_vs_base=vs_base; */
-  object *old_vs_top=vs_top;
-  object x;
-  enum ftype typ,restype=SFUN_RETURN_TYPE(i);
-  vs_top =  vs_base = old_vs_top;
-  SFUN_START_ARG_TYPES(i);
-  if (i==0)
-    while (n-- > 0)
-      { typ= SFUN_NEXT_TYPE(i);
+fcalln_general(va_list ap) {
+  int i=fcall.argd;
+
+  {
+    int n= SFUN_NARGS(i);
+    /*  object *old_vs_base=vs_base; */
+    object *old_vs_top=vs_top;
+    object x;
+    enum ftype typ,restype=SFUN_RETURN_TYPE(i);
+    vs_top =  vs_base = old_vs_top;
+    SFUN_START_ARG_TYPES(i);
+    if (i==0)
+      while (n-- > 0) {
+	typ= SFUN_NEXT_TYPE(i);
 	x =
 	  (typ==f_object ?	va_arg(ap,object):
 	   typ==f_fixnum ? make_fixnum(va_arg(ap,fixnum)):
 	   (object) (FEerror("bad type",0),Cnil));
-	*(vs_top++) = x;}
-  else
-    {object *base=vs_top;
-     while (n-- > 0)
-       { *(base++) = va_arg(ap,object);}
-     vs_top=base;}
-  funcall(fcall.fun);
-  x= vs_base[0];
-  vs_top=old_vs_top;
-  /* vs_base=old_vs_base; */
-  return (restype== f_object ? x :
-	  restype== f_fixnum ? (object) (fix(x)):
-	  (object) (FEerror("bad type",0),Cnil));
-}}
+	*(vs_top++) = x;
+      }
+    else {
+      object *base=vs_top;
+      while (n-- > 0) 
+	*(base++) = va_arg(ap,object);
+     vs_top=base;
+    }
+    funcall(fcall.fun);
+    x= vs_base[0];
+    vs_top=old_vs_top;
+    /* vs_base=old_vs_base; */
+    return (restype== f_object ? x :
+	    restype== f_fixnum ? (object) (fix(x)):
+	    (object) (FEerror("bad type",0),Cnil));
+  }
+}
+
 object
-fcalln_vfun(vl)
-  va_list vl;
+fcalln_vfun(va_list vl)
 {object *new,res;
  DEBUG_AVMA
  {COERCE_VA_LIST(new,vl,fcall.argd);
@@ -1472,8 +1450,7 @@ fcalln_vfun(vl)
 }
 
 object 
-fcalln(va_alist)
-va_dcl
+fcalln(__builtin_va_alist_t __builtin_va_alist)
 {  va_list ap;
    object fun=fcall.fun;
    DEBUG_AVMA
@@ -1512,13 +1489,10 @@ va_dcl
  }
 
 /* call a cfun eg funcall_cfun(Lmake_hash_table,2,sKtest,sLeq) */
-typedef void (*funcvoid)();
+/*  typedef void (*funcvoid)(); */
 
 object
-funcall_cfun(fn,n,va_alist)
-     int n;
-     funcvoid fn;
-     va_dcl
+funcall_cfun(funcvoid fn, int n, __builtin_va_alist_t __builtin_va_alist)
 {object *old_top = vs_top;
  object *old_base= vs_base;
  object result;
@@ -1540,8 +1514,8 @@ DEF_ORDINARY("LAMBDA-BLOCK-EXPANDED",sSlambda_block_expanded,SI,"");
 DEFVAR("*BREAK-POINTS*",sSAbreak_pointsA,SI,Cnil,"");
 DEFVAR("*BREAK-STEP*",sSAbreak_stepA,SI,Cnil,"");
 
-
-init_eval()
+void
+init_eval(void)
 {
 
 

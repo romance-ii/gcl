@@ -25,8 +25,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #undef STATIC
 #define regerror gcl_regerror
 void
-gcl_regerror(s)
-     char *s;
+gcl_regerror(char *s)
 { 
   FEerror("Regexp Error: ~a",1,make_simple_string(s));
 }
@@ -41,28 +40,28 @@ DEFVAR("*MATCH-DATA*",sSAmatch_dataA,SI,sLnil,"");
 DEFVAR("*CASE-FOLD-SEARCH*",sSAcase_fold_searchA,SI,sLnil,
        "Non nil means that a string-match should ignore case");
 
-DEFUN("MATCH-BEGINNING",int,fSmatch_beginning,SI,1,1,NONE,II,OO,OO,OO,
+DEFUN("MATCH-BEGINNING",object,fSmatch_beginning,SI,1,1,NONE,OI,OO,OO,OO,
    "Returns the beginning of the I'th match from the previous STRING-MATCH, \
 where the 0th is for the whole regexp and the subsequent ones match parenthetical expressions.  -1 is returned if there is no match, or if the *match-data* \
 vector is not a fixnum array.")(i)
 { object v = sSAmatch_dataA->s.s_dbind;
   if (type_of(v)==t_vector
       && (v->v.v_elttype == aet_fix))
-  RETURN1(sSAmatch_dataA->s.s_dbind->fixa.fixa_self[i]);
-  RETURN1(-1);
+  RETURN1(make_fixnum(sSAmatch_dataA->s.s_dbind->fixa.fixa_self[i]));
+  RETURN1(make_fixnum(-1));
 }
 
-DEFUN("MATCH-END",int,fSmatch_end,SI,1,1,NONE,II,OO,OO,OO,
+DEFUN("MATCH-END",object,fSmatch_end,SI,1,1,NONE,OI,OO,OO,OO,
    "Returns the end of the I'th match from the previous STRING-MATCH")(i) 
 { object v = sSAmatch_dataA->s.s_dbind;
   if (type_of(v)==t_vector
       && (v->v.v_elttype == aet_fix))
-  RETURN1(sSAmatch_dataA->s.s_dbind->fixa.fixa_self[i+NSUBEXP]);
-  RETURN1(-1);
+  RETURN1(make_fixnum(sSAmatch_dataA->s.s_dbind->fixa.fixa_self[i+NSUBEXP]));
+  RETURN1(make_fixnum(-1));
 }
 
 
-DEFUN("STRING-MATCH",int,fSstring_match,SI,2,4,NONE,IO,OI,IO,OO,
+DEFUN("STRING-MATCH",object,fSstring_match,SI,2,4,NONE,OO,OI,IO,OO,
       "Match regexp PATTERN in STRING starting in string starting at START \
 and ending at END.  Return -1 if match not found, otherwise \
 return the start index  of the first matchs.  The variable \
@@ -75,11 +74,9 @@ be over written.   \
      object pattern,string;
 va_dcl
 {  int nargs=VFUN_NARGS;
-   char *compiled_reggexp;
    static char buf[400];
    static char case_fold;
    static regexp *compiled_regexp;
-   char *tmp = 0;
    int len;
    int start;
    int end;
@@ -118,7 +115,7 @@ va_dcl
      v->fixa.fixa_self[NSUBEXP+ i] = (i== 0? 0 : -1);
      i++;
        };
-     RETURN1(0);
+     RETURN1(make_fixnum(0));
    }
    {BEGIN_NO_INTERRUPT;
     case_fold_search = (sSAcase_fold_searchA->s.s_dbind != sLnil);
@@ -134,7 +131,7 @@ va_dcl
 	compiled_regexp = regcomp(tmp);
 	if (tmp!=buf) free(tmp);
       }
-    if (compiled_regexp ==0) {END_NO_INTERRUPT;RETURN1(-1);}
+    if (compiled_regexp ==0) {END_NO_INTERRUPT;RETURN1(make_fixnum(-1));}
     { char *str = string->st.st_self;
       char save_c = str[end];
       int ans;
@@ -151,7 +148,7 @@ va_dcl
       ans = regexec(compiled_regexp,str+start,str,end - start);
       str[end] = save_c;
       if (str!=string->st.st_self) free(str);
-      if (ans == 0 ) {END_NO_INTERRUPT;RETURN1(-1);}
+      if (ans == 0 ) {END_NO_INTERRUPT;RETURN1(make_fixnum(-1));}
       {int i = -1;
        regexp *r=compiled_regexp;
        while (++i < NSUBEXP)
@@ -160,7 +157,7 @@ va_dcl
 	   p = r->endp[i] ;
 	   v->fixa.fixa_self[NSUBEXP+ i] = (p == 0 ? -1 : p - str);}
        END_NO_INTERRUPT;
-       RETURN1(v->fixa.fixa_self[0]);
+       RETURN1(make_fixnum(v->fixa.fixa_self[0]));
      }}
   }}		  
 	

@@ -62,7 +62,7 @@ EXTER ihs_ptr ihs_top;
 	x = alloc_frame_id();  \
 	vs_push(x);  \
 	lex_block_bind(Cnil, x);  \
-	vs_pop;  \
+	vs_popp;  \
 	frs_push(FRS_CATCH, x);  \
 }
 

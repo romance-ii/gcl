@@ -30,7 +30,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #define	endp(obje)	((enum type)((endp_temp = (obje))->d.t) == t_cons ? \
 			 FALSE : endp_temp == Cnil ? TRUE : \
-			 (bool)FEwrong_type_argument(sLlist, endp_temp))
+			 (FEwrong_type_argument(sLlist, endp_temp),FALSE))
 
 object endp_temp;
 
@@ -42,8 +42,6 @@ alloc_simple_vector(l, aet)
 int l;
 enum aelttype aet;
 {
-	object endp_temp;
-
 	object x;
 
 	x = alloc_object(t_vector);
@@ -73,11 +71,12 @@ int l;
 	return(x);
 }
 
+void
 Lelt()
 {
 	check_arg(2);
 	vs_base[0] = elt(vs_base[0], fixint(vs_base[1]));
-	vs_pop;
+	vs_popp;
 }
 
 object
@@ -124,14 +123,16 @@ int index;
 E:
 	vs_push(make_fixnum(index));
 	FEerror("The index, ~D, is too large", 1, vs_head);
+	return(Cnil);
 }
 
+void
 siLelt_set()
 {
 	check_arg(3);
 	vs_base[0] = elt_set(vs_base[0], fixint(vs_base[1]), vs_base[2]);
-	vs_pop;
-	vs_pop;
+	vs_popp;
+	vs_popp;
 }
 
 object
@@ -182,6 +183,7 @@ object val;
 E:
 	vs_push(make_fixnum(index));
 	FEerror("The index, ~D, is too large", 1, vs_head);
+	return(Cnil);	
 }
 
 @(defun subseq (sequence start &optional end &aux x)
@@ -311,6 +313,7 @@ ILLEGAL_START_END:
 for the sequence ~S.", 3, start, end, sequence);
 @)
 
+void
 Lcopy_seq()
 {
 	check_arg(1);
@@ -322,8 +325,6 @@ int
 length(x)
 object x;
 {
-	object endp_temp;
-
 	int i;
 
 	switch (type_of(x)) {
@@ -331,7 +332,7 @@ object x;
 		if (x == Cnil)
 			return(0);
 		FEwrong_type_argument(sLsequence, x);
-
+		return(0);
 	case t_cons:
 
 #define cendp(obj) ((type_of(obj)!=t_cons))
@@ -339,6 +340,7 @@ object x;
 			;
 		if (x==Cnil) return(i);
 		FEwrong_type_argument(sLlist,x);
+		return(0);
 
 
 	case t_vector:
@@ -348,15 +350,18 @@ object x;
 
 	default:
 		FEwrong_type_argument(sLsequence, x);
+		return(0);
 	}
 }
 
+void
 Llength()
 {
 	check_arg(1);
 	vs_base[0] = make_fixnum(length(vs_base[0]));
 }
 
+void
 Lreverse()
 {
 	check_arg(1);
@@ -447,9 +452,11 @@ object seq;
 
 	default:
 		FEwrong_type_argument(sLsequence, seq);
+		return(Cnil);
 	}
 }
 
+void
 Lnreverse()
 {
 	check_arg(1);
@@ -552,10 +559,12 @@ object seq;
 
 	default:
 		FEwrong_type_argument(sLsequence, seq);
+		return(Cnil);
 	}
 }
 
 
+void
 init_sequence_function()
 {
 	make_function("ELT", Lelt);

@@ -131,13 +131,13 @@ int fmt_line_length;
 
 
 int
-fmt_tempstr(s)
-int s;
+fmt_tempstr(int s)
 {
 	return(fmt_temporary_string->st.st_self[s]);
 }
 
-ctl_advance()
+int
+ctl_advance(void)
 {
 	if (ctl_index >= ctl_end)
 		fmt_error("unexpected end of control string");
@@ -145,7 +145,7 @@ ctl_advance()
 }
 
 object
-fmt_advance()
+fmt_advance(void)
 {
 	if (fmt_index >= fmt_end)
 		fmt_error("arguments exhausted");
@@ -153,10 +153,8 @@ fmt_advance()
 }
 
 
-format(fmt_stream0, ctl_origin0, ctl_end0)
-object fmt_stream0;
-int ctl_origin0;
-int ctl_end0;
+void
+format(object fmt_stream0, int ctl_origin0, int ctl_end0)
 {
 	int c, i, n;
 	bool colon, atsign;
@@ -400,7 +398,8 @@ DIRECTIVE:
 
 
 
-fmt_skip()
+int
+fmt_skip(void)
 {
 	int c, level = 0;
 	
@@ -448,36 +447,36 @@ DIRECTIVE:
 }
 
 
-fmt_max_param(n)
-int n;
+void
+fmt_max_param(int n)
 {
 	if (fmt_nparam > n)
 		fmt_error("too many parameters");
 }
 
-fmt_not_colon(colon)
-bool colon;
+void
+fmt_not_colon(bool colon)
 {
 	if (colon)
 		fmt_error("illegal :");
 }
 
-fmt_not_atsign(atsign)
-bool atsign;
+void
+fmt_not_atsign(bool atsign)
 {
 	if (atsign)
 		fmt_error("illegal @");
 }
 
-fmt_not_colon_atsign(colon, atsign)
-bool colon, atsign;
+void
+fmt_not_colon_atsign(bool colon, bool atsign)
 {
 	if (colon && atsign)
 		fmt_error("illegal :@");
 }
 
-fmt_set_param(i, p, t, v)
-int i, *p, t, v;
+void
+fmt_set_param(int i, int *p, int t, int v)
 {
 	if (i >= fmt_nparam || FMT_PARAM[i].fmt_param_type == fmt_null)
 		*p = v;
@@ -488,12 +487,12 @@ int i, *p, t, v;
 }	
 
 
-fmt_ascii(colon, atsign)
-     bool colon,atsign;
+void
+fmt_ascii(bool colon, bool atsign)
 {
 	int mincol, colinc, minpad, padchar;
 	object x;
-	int c, l, i;
+	int l, i;
 
 	fmt_max_param(4);
 	fmt_set_param(0, &mincol, fmt_int, 0);
@@ -526,12 +525,12 @@ fmt_ascii(colon, atsign)
 	}
 }
 
-fmt_S_expression(colon, atsign)
-     bool colon,atsign;
+void
+fmt_S_expression(bool colon, bool atsign)
 {
 	int mincol, colinc, minpad, padchar;
 	object x;
-	int c, l, i;
+	int l, i;
 
 	fmt_max_param(4);
 	fmt_set_param(0, &mincol, fmt_int, 0);
@@ -564,8 +563,8 @@ fmt_S_expression(colon, atsign)
 	}
 }
 
-fmt_decimal(colon, atsign)
-     bool colon,atsign;
+void
+fmt_decimal(bool colon, bool atsign)
 {
 	int mincol, padchar, commachar;
 
@@ -577,8 +576,8 @@ fmt_decimal(colon, atsign)
 		    10, mincol, padchar, commachar);
 }
 
-fmt_binary(colon, atsign)
-     bool colon,atsign;
+void
+fmt_binary(bool colon, bool atsign)
 {
 	int mincol, padchar, commachar;
 
@@ -590,8 +589,8 @@ fmt_binary(colon, atsign)
 		    2, mincol, padchar, commachar);
 }
 
-fmt_octal(colon, atsign)
-     bool colon,atsign;
+void
+fmt_octal(bool colon, bool atsign)
 {
 	int mincol, padchar, commachar;
 
@@ -603,8 +602,8 @@ fmt_octal(colon, atsign)
 		    8, mincol, padchar, commachar);
 }
 
-fmt_hexadecimal(colon, atsign)
-     bool colon,atsign;
+void
+fmt_hexadecimal(bool colon, bool atsign)
 {
 	int mincol, padchar, commachar;
 
@@ -616,15 +615,15 @@ fmt_hexadecimal(colon, atsign)
 		    16, mincol, padchar, commachar);
 }
 
-fmt_radix(colon, atsign)
-     bool colon,atsign;
+void
+fmt_radix(bool colon, bool atsign)
 {
 	int radix, mincol, padchar, commachar;
 	object x;
 	int i, j, k;
 	int s, t;
 	bool b;
-	extern (*write_ch_fun)(), writec_PRINTstream();
+	extern void (*write_ch_fun)(int), writec_PRINTstream(int);
 
 	if (fmt_nparam == 0) {
 		x = fmt_advance();
@@ -634,8 +633,8 @@ fmt_radix(colon, atsign)
 				i = fix(x);
 			else
 				i = -1;
-			if (!colon && (i <= 0 || i >= 4000) ||
-			    colon && (i <= 0 || i >= 5000)) {
+			if ((!colon && (i <= 0 || i >= 4000)) ||
+			    (colon && (i <= 0 || i >= 5000))) {
 				fmt_integer(x, FALSE, FALSE, 10, 0, ' ', ',');
 				return;
 			}
@@ -697,14 +696,12 @@ fmt_radix(colon, atsign)
 	fmt_integer(x, colon, atsign, radix, mincol, padchar, commachar);
 }	
 
-fmt_integer(x, colon, atsign, radix, mincol, padchar, commachar)
-     bool colon,atsign;
-     int radix, mincol, padchar, commachar;
-     object x;
+void
+fmt_integer(object x, bool colon, bool atsign, int radix, int mincol, int padchar, int commachar)
 {
 	int l, l1;
 	int s;
-	extern (*write_ch_fun)(), writec_PRINTstream();
+	extern void (*write_ch_fun)(int), writec_PRINTstream(int);
 
 	if (type_of(x) != t_fixnum && type_of(x) != t_bignum) {
 		fmt_temporary_string->st.st_fillp = 0;
@@ -756,10 +753,8 @@ fmt_integer(x, colon, atsign, radix, mincol, padchar, commachar)
 	}
 }
 
-fmt_nonillion(s, i, b, o, t)
-int s, t;
-int i;
-bool b, o;
+int
+fmt_nonillion(int s, int i, bool b, bool o, int t)
 {
 	int j;
 
@@ -779,10 +774,8 @@ bool b, o;
 	return(fmt_thousand(s, i, b, o, t));
 }		
 
-fmt_thousand(s, i, b, o, t)
-int s, t;
-int i;
-bool b, o;
+int
+fmt_thousand(int s, int i, bool b, bool o, int t)
 {
 	if (i == 3 && fmt_tempstr(s) > '0') {
 		if (b)
@@ -792,7 +785,7 @@ bool b, o;
 		--i;
 		s++;
 		b = TRUE;
-		if (o & s > t)
+		if (o && s > t)
 			writestr_stream("th", fmt_stream);
 	}
 	if (i == 3) {
@@ -838,32 +831,32 @@ bool b, o;
 	return(b);
 }
 	
-fmt_write_numeral(s, i)
-int s, i;
+void
+fmt_write_numeral(int s, int i)
 {
 	writestr_stream(fmt_numeral[fmt_tempstr(s) - '0' + i], fmt_stream);
 }
 
-fmt_write_ordinal(s, i)
-int s, i;
+void
+fmt_write_ordinal(int s, int i)
 {
 	writestr_stream(fmt_ordinal[fmt_tempstr(s) - '0' + i], fmt_stream);
 }
 
-fmt_roman(i, one, five, ten, colon)
-     int i, one, five, ten, colon;
+void
+fmt_roman(int i, int one, int five, int ten, int colon)
 {
 	int j;
 
 	if (i == 0)
 		return;
-	if (!colon && i < 4 || colon && i < 5)
+	if ((!colon && i < 4) || (colon && i < 5))
 		for (j = 0;  j < i;  j++)
 			writec_stream(one, fmt_stream);
 	else if (!colon && i == 4) {
 		writec_stream(one, fmt_stream);
 		writec_stream(five, fmt_stream);
-	} else if (!colon && i < 9 || colon) {
+	} else if ((!colon && i < 9) || colon) {
 		writec_stream(five, fmt_stream);
 		for (j = 5;  j < i;  j++)
 			writec_stream(one, fmt_stream);
@@ -873,8 +866,8 @@ fmt_roman(i, one, five, ten, colon)
 	}
 }
 
-fmt_plural(colon, atsign)
-     bool colon,atsign;
+void
+fmt_plural(bool colon, bool atsign)
 {
 	fmt_max_param(0);
 	if (colon) {
@@ -894,8 +887,8 @@ fmt_plural(colon, atsign)
 			writec_stream('s', fmt_stream);
 }
 
-fmt_character(colon, atsign)
-     bool colon,atsign;
+void
+fmt_character(bool colon, bool atsign)
 {
 	object x;
 	int i;
@@ -915,8 +908,8 @@ fmt_character(colon, atsign)
 		writec_stream(fmt_tempstr(i), fmt_stream);
 }
 
-fmt_fix_float(colon, atsign)
-     bool colon,atsign;
+void
+fmt_fix_float(bool colon, bool atsign)
 {
 	int w, d, k, overflowchar, padchar;
 	double f;
@@ -1071,8 +1064,7 @@ OVER:
 }
 
 int
-fmt_exponent_length(e)
- int e;
+fmt_exponent_length(int e)
 {
 	int i;
 
@@ -1085,8 +1077,8 @@ fmt_exponent_length(e)
 	return(i);
 }
 
-fmt_exponent(e)
- int e;
+void
+fmt_exponent(int e)
 {
 	if (e == 0) {
 		writec_stream('0', fmt_stream);
@@ -1097,8 +1089,8 @@ fmt_exponent(e)
 	fmt_exponent1(e);
 }
 	
-fmt_exponent1(e)
- int e;
+void
+fmt_exponent1(int e)
 {
 	if (e == 0)
 		return;
@@ -1106,8 +1098,8 @@ fmt_exponent1(e)
 	writec_stream('0' + e%10, fmt_stream);
 }
 
-fmt_exponential_float(colon, atsign)
-     bool colon,atsign;
+void
+fmt_exponential_float(bool colon, bool atsign)
 {
 	int w, d, e, k, overflowchar, padchar, exponentchar;
 	double f;
@@ -1308,8 +1300,8 @@ OVER:
 	return;
 }
 
-fmt_general_float(colon, atsign)
-     bool colon,atsign;
+void
+fmt_general_float(bool colon, bool atsign)
 {
 	int w, d, e, k, overflowchar, padchar, exponentchar;
 	int sign, exp;
@@ -1398,8 +1390,8 @@ fmt_general_float(colon, atsign)
 	vs_reset;
 }
 
-fmt_dollars_float(colon, atsign)
-     bool colon,atsign;
+void
+fmt_dollars_float(bool colon, bool atsign)
 {
 	int d, n, w, padchar;
 	double f;
@@ -1483,8 +1475,8 @@ fmt_dollars_float(colon, atsign)
 	vs_reset;
 }
 
-fmt_percent(colon, atsign)
-     bool colon,atsign;
+void
+fmt_percent(bool colon, bool atsign)
 {
 	int n, i;
 
@@ -1500,8 +1492,8 @@ fmt_percent(colon, atsign)
 	}
 }
 
-fmt_ampersand(colon, atsign)
-     bool colon,atsign;
+void
+fmt_ampersand(bool colon, bool atsign)
 {
 	int n;
 
@@ -1518,8 +1510,8 @@ fmt_ampersand(colon, atsign)
 	fmt_indents = 0;
 }
 
-fmt_bar(colon, atsign)
-     bool colon,atsign;
+void
+fmt_bar(bool colon, bool atsign)
 {
 	int n;
 
@@ -1531,8 +1523,8 @@ fmt_bar(colon, atsign)
 		writec_stream('\f', fmt_stream);
 }
 
-fmt_tilde(colon, atsign)
-     bool colon,atsign;
+void
+fmt_tilde(bool colon, bool atsign)
 {
 	int n;
 
@@ -1544,10 +1536,9 @@ fmt_tilde(colon, atsign)
 		writec_stream('~', fmt_stream);
 }
 
-fmt_newline(colon, atsign)
-     bool colon,atsign;
+void
+fmt_newline(bool colon, bool atsign)
 {
-	int c;
 
 	fmt_max_param(0);
 	fmt_not_colon_atsign(colon, atsign);
@@ -1560,8 +1551,8 @@ fmt_newline(colon, atsign)
 	}
 }
 
-fmt_tabulate(colon, atsign)
-     bool colon,atsign;
+void
+fmt_tabulate(bool colon, bool atsign)
 {
 	int colnum, colinc;
 	int c, i;
@@ -1596,8 +1587,8 @@ fmt_tabulate(colon, atsign)
 	}
 }
 
-fmt_asterisk(colon, atsign)
-     bool colon,atsign;
+void
+fmt_asterisk(bool colon, bool atsign)
 {
 	int n;
 
@@ -1620,14 +1611,15 @@ fmt_asterisk(colon, atsign)
 	}
 }	
 
-fmt_indirection(colon, atsign)
-     bool colon,atsign;
+void
+fmt_indirection(bool colon, bool atsign)
 { 	object endp_temp;
 	object s, l;
 	fmt_old;
 	jmp_buf fmt_jmp_buf0;
 	int up_colon;
 
+	up_colon=(int)&old_fmt_paramp;
 	fmt_max_param(0);
 	fmt_not_colon(colon);
 	s = fmt_advance();
@@ -1637,7 +1629,7 @@ fmt_indirection(colon, atsign)
 		fmt_save;
 		fmt_jmp_bufp = &fmt_jmp_buf0;
 		fmt_string = s;
-		if (up_colon = setjmp(*fmt_jmp_bufp)) {
+		if ((up_colon = setjmp(*fmt_jmp_bufp))) {
 			if (--up_colon)
 				fmt_error("illegal ~:^");
 		} else
@@ -1652,7 +1644,7 @@ fmt_indirection(colon, atsign)
 			vs_check_push(l->c.c_car);
 		fmt_jmp_bufp = &fmt_jmp_buf0;
 		fmt_string = s;
-		if (up_colon = setjmp(*fmt_jmp_bufp)) {
+		if ((up_colon = setjmp(*fmt_jmp_bufp))) {
 			if (--up_colon)
 				fmt_error("illegal ~:^");
 		} else
@@ -1662,8 +1654,8 @@ fmt_indirection(colon, atsign)
 	}
 }
 
-fmt_case(colon, atsign)
-     bool colon,atsign;
+void
+fmt_case(bool colon, bool atsign)
 {
 	VOL object x;
 	VOL int i, j;
@@ -1680,7 +1672,7 @@ fmt_case(colon, atsign)
 		fmt_error("~) expected");
 	fmt_save;
 	fmt_jmp_bufp = &fmt_jmp_buf0;
-	if (up_colon = setjmp(*fmt_jmp_bufp))
+	if ((up_colon = setjmp(*fmt_jmp_bufp)))
 		;
 	else
 		format(x, ctl_origin + i, j - i);
@@ -1725,13 +1717,13 @@ fmt_case(colon, atsign)
 				j -= 'a' - 'A';
 			writec_stream(j, fmt_stream);
 		}
-	vs_pop;
+	vs_popp;
 	if (up_colon)
 		longjmp(*fmt_jmp_bufp, up_colon);
 }
 
-fmt_conditional(colon, atsign)
-     bool colon,atsign;
+void
+fmt_conditional(bool colon, bool atsign)
 {
 	int i, j, k;
 	object x;
@@ -1819,8 +1811,8 @@ fmt_conditional(colon, atsign)
 	}
 }	
 
-fmt_iteration(colon, atsign)
-     bool colon,atsign;
+void
+fmt_iteration(bool colon, bool atsign)
 { 	object endp_temp;
 	int i,n;
 	VOL int j;
@@ -1832,6 +1824,7 @@ fmt_iteration(colon, atsign)
 	jmp_buf fmt_jmp_buf0;
 	int up_colon;
 
+	up_colon=(int)&old_fmt_paramp;
 	fmt_max_param(1);
 	fmt_set_param(0, &n, fmt_int, 1000000);
 	i = ctl_index;
@@ -1859,7 +1852,7 @@ fmt_iteration(colon, atsign)
 		L1:
 			if (n-- <= 0)
 				break;
-			if (up_colon = setjmp(*fmt_jmp_bufp)) {
+			if ((up_colon = setjmp(*fmt_jmp_bufp))) {
 				if (--up_colon)
 					fmt_error("illegal ~:^");
 				break;
@@ -1884,7 +1877,7 @@ fmt_iteration(colon, atsign)
 			fmt_index = 0;
 			for (fmt_end = 0; !endp(l); fmt_end++, l = l->c.c_cdr)
 				vs_check_push(l->c.c_car);
-			if (up_colon = setjmp(*fmt_jmp_bufp)) {
+			if ((up_colon = setjmp(*fmt_jmp_bufp))) {
 				vs_top = fmt_base;
 				if (--up_colon)
 					break;
@@ -1904,7 +1897,7 @@ fmt_iteration(colon, atsign)
 		L3:
 			if (n-- <= 0)
 				break;
-			if (up_colon = setjmp(*fmt_jmp_bufp)) {
+			if ((up_colon = setjmp(*fmt_jmp_bufp))) {
 				if (--up_colon)
 					fmt_error("illegal ~:^");
 				break;
@@ -1926,7 +1919,7 @@ fmt_iteration(colon, atsign)
 			for (fmt_end = 0; !endp(l); fmt_end++, l = l->c.c_cdr)
 				vs_check_push(l->c.c_car);
 			fmt_jmp_bufp = &fmt_jmp_buf0;
-			if (up_colon = setjmp(*fmt_jmp_bufp)) {
+			if ((up_colon = setjmp(*fmt_jmp_bufp))) {
 				vs_top = fmt_base;
 				fmt_restore;
 				if (--up_colon)
@@ -1943,8 +1936,8 @@ fmt_iteration(colon, atsign)
 
 #define FORMAT_DIRECTIVE_LIMIT 100
 
-fmt_justification(colon, atsign)
-     bool colon,atsign;
+void
+fmt_justification(volatile bool colon, bool atsign)
 {
 	int mincol, colinc, minpad, padchar;
 	object fields[FORMAT_DIRECTIVE_LIMIT];
@@ -1954,9 +1947,10 @@ fmt_justification(colon, atsign)
 	int k,l,m,l0;
 	int up_colon;
 	VOL int special = 0;
-	int spare_spaces, line_length;
+	volatile int spare_spaces=0, line_length=0;
 	vs_mark;
 
+	up_colon=(int)&old_fmt_paramp;
 	fmt_max_param(4);
 	fmt_set_param(0, &mincol, fmt_int, 0);
 	fmt_set_param(1, &colinc, fmt_int, 1);
@@ -1975,7 +1969,7 @@ fmt_justification(colon, atsign)
 		vs_push(fields[n]);
 		fmt_save;
 		fmt_jmp_bufp = &fmt_jmp_buf0;
-		if (up_colon = setjmp(*fmt_jmp_bufp)) {
+		if ((up_colon = setjmp(*fmt_jmp_bufp))) {
 			--n;
 			if (--up_colon)
 				fmt_error("illegal ~:^");
@@ -2041,8 +2035,8 @@ fmt_justification(colon, atsign)
 }
 
 
-fmt_up_and_out(colon, atsign)
-     bool colon,atsign;
+void
+fmt_up_and_out(bool colon, bool atsign)
 {
 	int i, j, k;
 
@@ -2070,8 +2064,8 @@ fmt_up_and_out(colon, atsign)
 }
 
 
-fmt_semicolon(colon, atsign)
-     bool colon,atsign;
+void
+fmt_semicolon(bool colon, bool atsign)
 {
 	fmt_not_atsign(atsign);
 	if (!colon)
@@ -2128,7 +2122,7 @@ DEFUNO("FORMAT",object,fLformat,LISP
 	else
 		fmt_indents = 0;
 	fmt_string = control;
-	if (colon = setjmp(*fmt_jmp_bufp)) {
+	if ((colon = setjmp(*fmt_jmp_bufp))) {
 		if (--colon)
 			fmt_error("illegal ~:^");
 		vs_base = vs_top;
@@ -2154,11 +2148,10 @@ L:
 	RETURN1 (x ==0 ? Cnil : x);  
 }
 
-object c_apply_n();
+/*  object c_apply_n(long int (*fn) (), int n, object *x); */
 
-
-fmt_error(s)
-     char *s;
+void
+fmt_error(char *s)
 {
 	vs_push(make_simple_string(s));
 	vs_push(make_fixnum(&ctl_string[ctl_index] - fmt_string->st.st_self));
@@ -2167,7 +2160,8 @@ fmt_error(s)
 }
 
 DEFVAR("*INDENT-FORMATTED-OUTPUT*",sSAindent_formatted_outputA,SI,Cnil,"");
-init_format()
+void
+init_format(void)
 {
 	fmt_temporary_stream = make_string_output_stream(64);
 	enter_mark_origin(&fmt_temporary_stream);

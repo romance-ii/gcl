@@ -94,9 +94,8 @@ object plus_half, minus_half;
 	LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
 */
 #endif
-integer_decode_double(d, hp, lp, ep, sp)
-double d;
-int *hp, *lp, *ep, *sp;
+void
+integer_decode_double(double d, int *hp, int *lp, int *ep, int *sp)
 {
 	int h, l;
 
@@ -123,7 +122,7 @@ int *hp, *lp, *ep, *sp;
 #ifdef IEEEFLOAT
 	if (ISNORMAL(d)) {
 	  *ep = ((h & 0x7ff00000) >> 20) - 1022 - 53;
-	  h = (h & 0x000fffff | 0x00100000);
+	  h = ((h & 0x000fffff) | 0x00100000);
 	} else {
 	  *ep = ((h & 0x7fe00000) >> 20) - 1022 - 53 + 1;
 	  h = (h & 0x001fffff);
@@ -183,9 +182,8 @@ int *hp, *lp, *ep, *sp;
 	SEEEEEEEMMMMMMMMMMMMMMMMMMMMMMMM
 */
 #endif
-integer_decode_float(d, mp, ep, sp)
-double d;
-int *mp, *ep, *sp;
+void
+integer_decode_float(double d, int *mp, int *ep, int *sp)
 {
 	float f;
 	int m;
@@ -209,7 +207,7 @@ int *mp, *ep, *sp;
 #ifdef IEEEFLOAT
 	if (ISNORMAL(f)) {
 	  *ep = ((m & 0x7f800000) >> 23) - 126 - 24;
-	  *mp = m & 0x007fffff | 0x00800000;
+	  *mp = (m & 0x007fffff) | 0x00800000;
 	} else {
 	  *ep = ((m & 0x7f000000) >> 23) - 126 - 24 + 1;
 	  *mp = m & 0x00ffffff;
@@ -227,8 +225,7 @@ int *mp, *ep, *sp;
 }
 
 int
-double_exponent(d)
-double d;
+double_exponent(double d)
 {
 	if (d == 0.0)
 		return(0);
@@ -254,9 +251,7 @@ double d;
 }
 
 double
-set_exponent(d, e)
-double d;
-int e;
+set_exponent(double d, int e)
 {
 	double dummy;
 
@@ -273,7 +268,7 @@ int e;
 #ifdef NS32K
 
 #else
-	= *((int *)(&d) + HIND) & 0x800fffff | ((e + 1022) << 20) & 0x7ff00000;
+	= (*((int *)(&d) + HIND) & 0x800fffff) | (((e + 1022) << 20) & 0x7ff00000);
 #endif
 #endif
 #ifdef MV
@@ -288,12 +283,11 @@ int e;
 
 
 object
-double_to_integer(d)
-double d;
+double_to_integer(double d)
 {
 	int h, l, e, s;
-	object x, y;
-	object shift_integer();
+	object x;
+	object shift_integer(object x, int w);
 	vs_mark;
 
 	if (d == 0.0)
@@ -353,27 +347,27 @@ double d;
 }
 
 object
-num_remainder(x, y, q)
-object x, y, q;
+num_remainder(object x, object y, object q)
 {
 	object z;
 
 	z = number_times(q, y);
 	vs_push(z);
 	z = number_minus(x, z);
-	vs_pop;
+	vs_popp;
 	return(z);
 }
 
 /* Coerce X to single-float if one arg,
    otherwise coerce to same float type as second arg */
 
-Lfloat()
+void
+Lfloat(void)
 {
 	double	d;
 	int narg;
 	object	x;
-	enum type t;
+	enum type t=t_other;
 
 	narg = vs_top - vs_base;
 	if (narg < 1)
@@ -420,7 +414,8 @@ Lfloat()
 	vs_push(x);
 }
 
-Lnumerator()
+void
+Lnumerator(void)
 {
 	check_arg(1);
 	check_type_rational(&vs_base[0]);
@@ -428,7 +423,8 @@ Lnumerator()
 		vs_base[0] = vs_base[0]->rat.rat_num;
 }
 
-Ldenominator()
+void
+Ldenominator(void)
 {
 	check_arg(1);
 	check_type_rational(&vs_base[0]);
@@ -438,12 +434,13 @@ Ldenominator()
 		vs_base[0] = small_fixnum(1);
 }
 
-Lfloor()
+void
+Lfloor(void)
 {
 	object x, y, q, q1;
 	double d;
 	int n;
-	object one_minus();
+	object one_minus(object x);
 
 	n = vs_top - vs_base;
 	if (n == 0)
@@ -556,15 +553,18 @@ TWO_ARG:
 		vs_push(q1);
 		vs_push(num_remainder(x, y, q1));
 		return;
+	default:
+	  break;
 	}
 }
 
-Lceiling()
+void
+Lceiling(void)
 {
 	object x, y, q, q1;
 	double d;
 	int n;
-	object one_plus();
+	object one_plus(object x);
 
 	n = vs_top - vs_base;
 	if (n == 0)
@@ -677,10 +677,13 @@ TWO_ARG:
 		vs_push(q1);
 		vs_push(num_remainder(x, y, q1));
 		return;
+	default:
+	  break;
 	}
 }
 
-Ltruncate()
+void
+Ltruncate(void)
 {
 	object x, y, q, q1;
 	int n;
@@ -759,15 +762,18 @@ TWO_ARG:
 		vs_push(q1);
 		vs_push(num_remainder(x, y, q1));
 		return;
+	default:
+	  break;
 	}
 }
 
-Lround()
+void
+Lround(void)
 {
 	object x, y, q, q1, r;
 	double d;
 	int n, c;
-	object one_plus(), one_minus();
+	object one_plus(object x), one_minus(object x);
 
 	n = vs_top - vs_base;
 	if (n == 0)
@@ -889,17 +895,21 @@ TWO_ARG:
 		vs_push(q1);
 		vs_push(num_remainder(x, y, q1));
 		return;
+	default:
+	  break;
 	}
 }
 
-Lmod()
+void
+Lmod(void)
 {
 	check_arg(2);
 	Lfloor();
 	vs_base++;
 }
 
-Lrem()
+void
+Lrem(void)
 {
 	check_arg(2);
 	Ltruncate();
@@ -907,7 +917,8 @@ Lrem()
 }
 
 
-Ldecode_float()
+void
+Ldecode_float(void)
 {
 	object x;
 	double d;
@@ -940,11 +951,12 @@ Ldecode_float()
 	}
 }
 
-Lscale_float()
+void
+Lscale_float(void)
 {
 	object x;
 	double d;
-	int e, k;
+	int e, k=0;
 
 	check_arg(2);
 	check_type_float(&vs_base[0]);
@@ -965,8 +977,8 @@ Lscale_float()
 
 #endif
 #ifdef IEEEFLOAT
-	if (type_of(x) == t_shortfloat && (e <= -126 || e >= 130) ||
-	    type_of(x) == t_longfloat && (e <= -1022 || e >= 1026))
+	if ((type_of(x) == t_shortfloat && (e <= -126 || e >= 130)) ||
+	    (type_of(x) == t_longfloat && (e <= -1022 || e >= 1026)))
 #endif
 #ifdef MV
 
@@ -976,14 +988,15 @@ Lscale_float()
 #endif
 		FEerror("~S is an illegal exponent.", 1, vs_base[1]);
 	d = set_exponent(d, e);
-	vs_pop;
+	vs_popp;
 	if (type_of(x) == t_shortfloat)
 		vs_base[0] = make_shortfloat((shortfloat)d);
 	else
 		vs_base[0] = make_longfloat(d);
 }
 
-Lfloat_radix()
+void
+Lfloat_radix(void)
 {
 	check_arg(1);
 	check_type_float(&vs_base[0]);
@@ -1004,7 +1017,8 @@ Lfloat_radix()
 #endif
 }
 
-Lfloat_sign()
+void
+Lfloat_sign(void)
 {
 	object x;
 	int narg;
@@ -1042,7 +1056,8 @@ Lfloat_sign()
 		vs_push(make_longfloat(f));
 }
 
-Lfloat_digits()
+void
+Lfloat_digits(void)
 {
 	check_arg(1);
 	check_type_float(&vs_base[0]);
@@ -1052,7 +1067,8 @@ Lfloat_digits()
 		vs_base[0] = small_fixnum(53);
 }
 
-Lfloat_precision()
+void
+Lfloat_precision(void)
 {
 	object x;
 
@@ -1085,7 +1101,8 @@ Lfloat_precision()
 #endif
 }
 
-Linteger_decode_float()
+void
+Linteger_decode_float(void)
 {
 	object x;
 	int h, l, e, s;
@@ -1110,9 +1127,10 @@ Linteger_decode_float()
 	}
 }
 
-Lcomplex()
+void
+Lcomplex(void)
 {
-	object	x, r, i;
+	object	r, i;
 	int narg;
 
 	narg = vs_top - vs_base;
@@ -1132,9 +1150,10 @@ Lcomplex()
 	vs_push(make_complex(r, i));
 }
 
-Lrealpart()
+void
+Lrealpart(void)
 {
-	object	r, x;
+	object	x;
 
 	check_arg(1);
 	check_type_number(&vs_base[0]);
@@ -1143,7 +1162,8 @@ Lrealpart()
 		vs_base[0] = x->cmp.cmp_real;
 }
 
-Limagpart()
+void
+Limagpart(void)
 {
 	object x;
 
@@ -1165,25 +1185,27 @@ Limagpart()
 	case t_complex:
 		vs_base[0] = x->cmp.cmp_imag;
 		break;
+	default:
+	  break;
 	}
 }
 
 static float sf1,sf2;
-static sf_eql()
+static int sf_eql(void)
 {return(sf1==sf2);}
 
 
 
-int lf_eqlp();
+int lf_eqlp(double *p, double *q);
 #define LF_EQL(a,b) (lf1=a,lf2=b,lf_eqlp(&lf1,&lf2))
 #define SF_EQL(a,b) (sf1=a,sf2=b,sf_eql())
 
-void  _assure_in_memory ();
+void  _assure_in_memory (void *p);
 
 #define FMEM(f) _assure_in_memory(&f)
-init_num_co()
+void
+init_num_co(void)
 {
-	int l[2];
 	float smallest_float, smallest_norm_float, biggest_float;
 	double smallest_double, smallest_norm_double, biggest_double;
 	float float_epsilon, float_negative_epsilon;

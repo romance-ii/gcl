@@ -34,6 +34,7 @@ EXTER object *vs_top;		/*  value stack top  */
 #define	vs_push(obje)	(*vs_top++ = (obje))
 
 #define	vs_pop		(*--vs_top)
+#define	vs_popp		(--vs_top)
 #define	vs_head		vs_top[-1]
 
 #define	vs_mark		object *old_vs_top = vs_top

@@ -1,11 +1,11 @@
 
-static L1();
-static L2();
-static L4();
-static L5();
-static L6();
-static L7();
-static L8();
+static void L1();
+static void L2();
+static void L4();
+static void L5();
+static void L6();
+static void L7();
+static void L8();
 #define VC1 object  V6 ,V5 ,V4 ,V3 ,V2;
 #define VC2 object  V10 ,V9 ,V8;
 static object LI3();

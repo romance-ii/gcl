@@ -28,9 +28,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 
-unwind(fr, tag)
-frame_ptr fr;
-object tag;
+void
+unwind(frame_ptr fr, object tag)
 {
         signals_allowed = 0;
 	nlj_fr = fr;
@@ -54,8 +53,7 @@ object tag;
 	/* never reached */
 }
 
-frame_ptr frs_sch (frame_id)
-object frame_id;
+frame_ptr frs_sch (object frame_id)
 {
 	frame_ptr top;
 
@@ -65,17 +63,16 @@ object frame_id;
 	return(NULL);
 }
 
-frame_ptr frs_sch_catch(frame_id)
-object frame_id;
+frame_ptr frs_sch_catch(object frame_id)
 {
-	frame_ptr top;
-
-	for(top = frs_top;  top >= frs_org  ;top--)
-		if (top->frs_val == frame_id && top->frs_class == FRS_CATCH
-		    || top->frs_class == FRS_CATCHALL
-		   )
-			return(top);
-	return(NULL);
+  frame_ptr top;
+  
+  for(top = frs_top;  top >= frs_org  ;top--)
+    if ((top->frs_val == frame_id && top->frs_class == FRS_CATCH)
+	|| top->frs_class == FRS_CATCHALL
+	)
+      return(top);
+  return(NULL);
 }
 
 

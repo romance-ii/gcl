@@ -10,7 +10,7 @@ int Smallm = -BIGM-1;
 int Seven = 7;
 int Three = 3;
 
-main()
+main(void)
 {
 #define BIGM    (int)((((unsigned int)(-1))/2))	 
 	{ 

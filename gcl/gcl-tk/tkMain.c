@@ -27,10 +27,11 @@
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-#ifndef lint
-static char rcsid[] = "$Header$ SPRITE (Berkeley)";
-#endif
+/*  #ifndef lint */
+/*  static char rcsid[] = "$Header$ SPRITE (Berkeley)"; */
+/*  #endif */
 
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <tcl.h>
@@ -49,6 +50,7 @@ static char rcsid[] = "$Header$ SPRITE (Berkeley)";
 #include <signal.h>
 #include <errno.h>
 
+#define _GNU_SOURCE
 #include "guis.h"
 struct connection_state *dsfd;
 /*-------------------------------------------------------------------*/
@@ -99,26 +101,30 @@ int debug = 0;
 
 void guiCreateCommand _ANSI_ARGS_((int idLispObject, int iSlot , char *arglist));
 
-dfprintf(fp,s,x0,x1,x2,x3,x4,x5)
-     char *s;
-     FILE *fp;
-     int x0,x1,x2,x3,x4,x5;
-{if (debug)
-   {fprintf(fp,"\nguis:");
-    fprintf(fp,s,x0,x1,x2,x3,x4,x5);
-    fflush(stderr);
+void
+dfprintf(FILE *fp,char *s,...) {
+
+  va_list args;
+
+  if (debug) {
+    va_start(args,s);
+    fprintf(fp,"\nguis:");
+    vfprintf(fp,s,args);
+    fflush(fp);
+    va_end(args);
   }
 }
 
 #define CMD_SIZE 4000
 #define SIGNAL_ERROR TCL_signal_error
 
+void
 TCL_signal_error(x)
      char *x;
 {char buf[300] ;
  sprintf("error %s",x);
  Tcl_Eval(interp,buf);
- dfprintf(x);
+ dfprintf(stderr,x);
 }
 
 
@@ -457,7 +463,6 @@ StdinProc(clientData, mask)
 
   do
     { 
-      char *p;
 
       msg = guiParseMsg1(dsfd,buf,sizeof(buf));
 
@@ -475,10 +480,7 @@ StdinProc(clientData, mask)
       switch (msg->type){
       case m_create_command:
 	  {
-	    int idLispObject;
 	    int iSlot;
-	    char *arglist;
-	    int matches;
 	    GET_3BYTES(msg->body,iSlot);
 	    guiCreateCommand(0, iSlot, &(msg->body[3]));
 	  }
@@ -495,7 +497,6 @@ StdinProc(clientData, mask)
 	    {
 	      unsigned char buf[4];
 	      unsigned char *p = buf;
-	      int cb;
 	      /*header */
 	      *p++ = (code ? '1' : '0');
 	      bcopy(msg->msg_id,p,3);
@@ -525,7 +526,7 @@ StdinProc(clientData, mask)
 	  break;
 	case m_tcl_set_text_variable:
 	  { int n = strlen(msg->body);
-	    if(being_set_by_lisp) fprintf(stderr,"recursive set %d?");
+	    if(being_set_by_lisp) fprintf(stderr,"recursive set?");
 	    /* avoid a trace on this set!! */
 	    
 	    being_set_by_lisp = msg->body;
@@ -537,7 +538,6 @@ StdinProc(clientData, mask)
 
 	case m_tcl_link_text_variable:
 	  {int i;
-	   char buf[30];
 	   GET_3BYTES(msg->body,i);
 	   Tcl_TraceVar2(interp,msg->body+3 ,0,
 			   TCL_TRACE_WRITES
@@ -549,7 +549,6 @@ StdinProc(clientData, mask)
 
 	case m_tcl_unlink_text_variable:
 	  {int i;
-	   char buf[30];
 	   GET_3BYTES(msg->body,i);
 	   Tcl_UntraceVar2(interp,msg->body+3 ,0,
 			   TCL_TRACE_WRITES
@@ -563,8 +562,7 @@ StdinProc(clientData, mask)
 	  dfprintf(stderr, "Error !!! Unknown command %d\n"
 		   , msg->type);
 	}
-    prompt:
-      fNotDone = fScheck_dsfd_for_input(dsfd,0);
+      fNotDone = fix(fScheck_dsfd_for_input(dsfd,0));
       
       if (fNotDone > 0)
 	{

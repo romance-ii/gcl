@@ -37,15 +37,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 object sSYB;
 object sSYZ;
 
-
-
-
-
-
-
-
-
-kwote_cdr()
+void
+kwote_cdr(void)
 {
 	object x;
 
@@ -64,7 +57,8 @@ KWOTE:
 	vs_head = make_cons(sLquote, vs_head);
 }
 
-kwote_car()
+void
+kwote_car(void)
 {
 	object x;
 
@@ -94,8 +88,7 @@ KWOTE:
 		NCONC		the form should be applied to NCONC
 */
 int
-backq_cdr(x)
-object x;
+backq_cdr(object x)
 {
 	int a, d;
 
@@ -116,7 +109,7 @@ object x;
 	if (d == QUOTE)
 		switch (a) {
 		case QUOTE:
-			vs_pop;
+			vs_popp;
 			vs_head = x;
 			return(QUOTE);
 
@@ -138,7 +131,7 @@ object x;
 
 		case APPEND:
 			if (vs_head == Cnil) {
-				vs_pop;
+				vs_popp;
 				return(EVAL);
 			}
 			kwote_cdr();
@@ -147,7 +140,7 @@ object x;
 
 		case NCONC:
 			if (vs_head == Cnil) {
-				vs_pop;
+				vs_popp;
 				return(EVAL);
 			}
 			kwote_cdr();
@@ -241,6 +234,7 @@ object x;
 
 	default:
 		error("backquote botch");
+		return(0);
 	}
 }
 
@@ -255,8 +249,7 @@ object x;
 				into the outer form
 */
 int
-backq_car(x)
-object x;
+backq_car(object x)
 {
 	int d;
 
@@ -309,8 +302,7 @@ object x;
 }
 
 object
-backq(x)
-object x;
+backq(object x)
 {
 	int a;
 
@@ -322,8 +314,7 @@ object x;
 	return(vs_pop);
 }
 
-object fLcomma_reader(x0,x1)
-object x0,x1;
+object fLcomma_reader(object x0, object x1)
 { object w;
 	object in, c;
 
@@ -347,8 +338,7 @@ object x0,x1;
 	RETURN1(x0);
 }
 
-object fLbackquote_reader(x0,x1)
-object x0,x1;
+object fLbackquote_reader(object x0, object x1)
 {
 	object in;
 
@@ -377,7 +367,8 @@ DEF_ORDINARY("APPLY",sLapply,LISP,"");
 DEF_ORDINARY("VECTOR",sLvector,LISP,"");
 
 
-init_backq()
+void
+init_backq(void)
 {
 	object r;
 

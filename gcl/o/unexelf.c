@@ -398,7 +398,7 @@ Filesz      Memsz       Flags       Align
  */
 
 #ifndef emacs
-#define fatal(a, b, c...) fprintf (stderr, a, b, ##c), exit (1)
+#define fatal(a, b...) fprintf (stderr, a, ##b), exit (1)
 #else
 #include "config.h"
 extern void fatal (char *, ...);
@@ -581,13 +581,7 @@ round_up (x, y)
    if NOERROR is 0; we return -1 if NOERROR is nonzero.  */
 
 static int
-find_section (name, section_names, file_name, old_file_h, old_section_h, noerror)
-     char *name;
-     char *section_names;
-     char *file_name;
-     ElfW(Ehdr) *old_file_h;
-     ElfW(Shdr) *old_section_h;
-     int noerror;
+find_section (char *name, char *section_names, char *file_name, Elf32_Ehdr *old_file_h, Elf32_Shdr *old_section_h, int noerror)
 {
   int idx;
 
@@ -606,7 +600,7 @@ find_section (name, section_names, file_name, old_file_h, old_section_h, noerror
       if (noerror)
 	return -1;
       else
-	fatal ("Can't find %s in %s.\n", name, file_name, 0);
+	fatal ("Can't find %s in %s.\n", name, file_name);
     }
 
   return idx;
@@ -622,9 +616,7 @@ find_section (name, section_names, file_name, old_file_h, old_section_h, noerror
  *
  */
 void
-unexec (new_name, old_name, data_start, bss_start, entry_address)
-     char *new_name, *old_name;
-     unsigned data_start, bss_start, entry_address;
+unexec (char *new_name, char *old_name, unsigned int data_start, unsigned int bss_start, unsigned int entry_address)
 {
   int new_file, old_file, new_file_size;
 
@@ -740,7 +732,7 @@ unexec (new_name, old_name, data_start, bss_start, entry_address)
 #endif
 
   if ((unsigned) new_bss_addr < (unsigned) old_bss_addr + old_bss_size)
-    fatal (".bss shrank when undumping???\n", 0, 0);
+    fatal (".bss shrank when undumping???\n");
 
   /* Set the output file to the right size and mmap it.  Set
    * pointers to various interesting objects.  stat_buf still has
@@ -823,7 +815,7 @@ unexec (new_name, old_name, data_start, bss_start, entry_address)
 	  > (old_sbss_index == -1
 	     ? old_bss_addr
 	     : round_up (old_bss_addr, alignment)))
-	  fatal ("Program segment above .bss in %s\n", old_name, 0);
+	  fatal ("Program segment above .bss in %s\n", old_name);
 
       if (NEW_PROGRAM_H (n).p_type == PT_LOAD
 	  && (round_up ((NEW_PROGRAM_H (n)).p_vaddr
@@ -833,7 +825,7 @@ unexec (new_name, old_name, data_start, bss_start, entry_address)
 	break;
     }
   if (n < 0)
-    fatal ("Couldn't find segment next to .bss in %s\n", old_name, 0);
+    fatal ("Couldn't find segment next to .bss in %s\n", old_name);
 
   /* Make sure that the size includes any padding before the old .bss
      section.  */
@@ -864,7 +856,7 @@ unexec (new_name, old_name, data_start, bss_start, entry_address)
 		 ".data"))
       break;
   if (old_data_index == old_file_h->e_shnum)
-    fatal ("Can't find .data in %s.\n", old_name, 0);
+    fatal ("Can't find .data in %s.\n", old_name);
 
   /* Walk through all section headers, insert the new data2 section right
      before the new bss section. */

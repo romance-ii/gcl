@@ -1,7 +1,7 @@
 
 #include "cmpinclude.h"
 #include "listlib.h"
-init_listlib(){do_init(VV);}
+void init_listlib(){do_init(VV);}
 /*	local entry for function UNION	*/
 
 static object LI1(V2,V1,va_alist)
@@ -13,10 +13,11 @@ static object LI1(V2,V1,va_alist)
 	{object V3;
 	register object V4;
 	register object V5;
+	Vcs[0]=Vcs[0];
+	va_start(ap);
 	V3= V2;
 	V4= V1;
 	narg= narg - 2;
-	va_start(ap);
 	V6 = list_vector(narg,ap);
 	V5= V6;
 	{register object V7;
@@ -25,27 +26,32 @@ static object LI1(V2,V1,va_alist)
 	V8= Cnil;
 	{register object V9;
 	V9= (V3);
+goto T4;
 T4:;
 	if(((V9))!=Cnil){
 	goto T5;}
 	if(((V8))==Cnil){
 	goto T8;}
 	((V8))->c.c_cdr = (V4);
+goto T8;
 T8:;
 	if((V7)!=Cnil){
 	{object V10 = (V7);
 	VMR1(V10)}}
 	{object V11 = (V4);
 	VMR1(V11)}
+goto T5;
 T5:;
 	if(!(type_of((V9))==t_cons)){
 	goto T13;}
 	goto T12;
+goto T13;
 T13:;
 	base[0]= VV[0];
 	vs_top=(vs_base=base+0)+1;
 	Lerror();
 	vs_top=sup;
+goto T12;
 T12:;
 	base[0]=VV[8]->s.s_gfdef;
 	base[1]= CMPcar((V9));
@@ -66,12 +72,17 @@ T12:;
 	((V8))->c.c_cdr = /* INLINE-ARGS */V13;
 	V8= CMPcdr((V8));
 	goto T16;
+goto T23;
 T23:;
 	V7= make_cons(CMPcar((V9)),Cnil);
 	V8= (V7);
+goto T16;
 T16:;
 	V9= CMPcdr((V9));
-	goto T4;}}}
+	goto T4;}}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}
 /*	local entry for function NUNION	*/
 
@@ -84,10 +95,11 @@ static object LI2(V15,V14,va_alist)
 	{object V16;
 	register object V17;
 	register object V18;
+	Vcs[0]=Vcs[0];
+	va_start(ap);
 	V16= V15;
 	V17= V14;
 	narg= narg - 2;
-	va_start(ap);
 	V19 = list_vector(narg,ap);
 	V18= V19;
 	{register object V20;
@@ -96,27 +108,32 @@ static object LI2(V15,V14,va_alist)
 	V21= Cnil;
 	{register object V22;
 	V22= (V16);
+goto T36;
 T36:;
 	if(((V22))!=Cnil){
 	goto T37;}
 	if(((V21))==Cnil){
 	goto T40;}
 	((V21))->c.c_cdr = (V17);
+goto T40;
 T40:;
 	if((V20)!=Cnil){
 	{object V23 = (V20);
 	VMR2(V23)}}
 	{object V24 = (V17);
 	VMR2(V24)}
+goto T37;
 T37:;
 	if(!(type_of((V22))==t_cons)){
 	goto T45;}
 	goto T44;
+goto T45;
 T45:;
 	base[0]= VV[1];
 	vs_top=(vs_base=base+0)+1;
 	Lerror();
 	vs_top=sup;
+goto T44;
 T44:;
 	base[0]=VV[8]->s.s_gfdef;
 	base[1]= CMPcar((V22));
@@ -135,13 +152,19 @@ T44:;
 	goto T56;}
 	((V21))->c.c_cdr = (V22);
 	goto T54;
+goto T56;
 T56:;
 	V20= (V22);
+goto T54;
 T54:;
 	V21= (V22);
+goto T48;
 T48:;
 	V22= CMPcdr((V22));
-	goto T36;}}}
+	goto T36;}}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}
 /*	local entry for function INTERSECTION	*/
 
@@ -154,30 +177,35 @@ static object LI3(V27,V26,va_alist)
 	{object V28;
 	register object V29;
 	register object V30;
+	Vcs[0]=Vcs[0];
+	va_start(ap);
 	V28= V27;
 	V29= V26;
 	narg= narg - 2;
-	va_start(ap);
 	V31 = list_vector(narg,ap);
 	V30= V31;
 	{register object V32;
 	V32= Cnil;
 	{register object V33;
 	V33= (V28);
+goto T65;
 T65:;
 	if(((V33))!=Cnil){
 	goto T66;}
 	{object V34 = (V32);
 	VMR3(V34)}
+goto T66;
 T66:;
 	if(!(type_of((V33))==t_cons)){
 	goto T71;}
 	goto T70;
+goto T71;
 T71:;
 	base[0]= VV[2];
 	vs_top=(vs_base=base+0)+1;
 	Lerror();
 	vs_top=sup;
+goto T70;
 T70:;
 	base[0]=VV[8]->s.s_gfdef;
 	base[1]= CMPcar((V33));
@@ -193,9 +221,13 @@ T70:;
 	if((vs_base[0])==Cnil){
 	goto T74;}
 	V32= make_cons(CMPcar((V33)),(V32));
+goto T74;
 T74:;
 	V33= CMPcdr((V33));
-	goto T65;}}}
+	goto T65;}}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}
 /*	local entry for function NINTERSECTION	*/
 
@@ -208,10 +240,11 @@ static object LI4(V37,V36,va_alist)
 	{object V38;
 	register object V39;
 	register object V40;
+	Vcs[0]=Vcs[0];
+	va_start(ap);
 	V38= V37;
 	V39= V36;
 	narg= narg - 2;
-	va_start(ap);
 	V41 = list_vector(narg,ap);
 	V40= V41;
 	{register object V42;
@@ -220,24 +253,29 @@ static object LI4(V37,V36,va_alist)
 	V43= Cnil;
 	{register object V44;
 	V44= (V38);
+goto T87;
 T87:;
 	if(((V44))!=Cnil){
 	goto T88;}
 	if(((V43))==Cnil){
 	goto T91;}
 	((V43))->c.c_cdr = Cnil;
+goto T91;
 T91:;
 	{object V45 = (V42);
 	VMR4(V45)}
+goto T88;
 T88:;
 	if(!(type_of((V44))==t_cons)){
 	goto T96;}
 	goto T95;
+goto T96;
 T96:;
 	base[0]= VV[3];
 	vs_top=(vs_base=base+0)+1;
 	Lerror();
 	vs_top=sup;
+goto T95;
 T95:;
 	base[0]=VV[8]->s.s_gfdef;
 	base[1]= CMPcar((V44));
@@ -256,13 +294,19 @@ T95:;
 	goto T107;}
 	((V43))->c.c_cdr = (V44);
 	goto T105;
+goto T107;
 T107:;
 	V42= (V44);
+goto T105;
 T105:;
 	V43= (V44);
+goto T99;
 T99:;
 	V44= CMPcdr((V44));
-	goto T87;}}}
+	goto T87;}}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}
 /*	local entry for function SET-DIFFERENCE	*/
 
@@ -275,30 +319,35 @@ static object LI5(V48,V47,va_alist)
 	{object V49;
 	register object V50;
 	register object V51;
+	Vcs[0]=Vcs[0];
+	va_start(ap);
 	V49= V48;
 	V50= V47;
 	narg= narg - 2;
-	va_start(ap);
 	V52 = list_vector(narg,ap);
 	V51= V52;
 	{register object V53;
 	V53= Cnil;
 	{register object V54;
 	V54= (V49);
+goto T116;
 T116:;
 	if(((V54))!=Cnil){
 	goto T117;}
 	{object V55 = (V53);
 	VMR5(V55)}
+goto T117;
 T117:;
 	if(!(type_of((V54))==t_cons)){
 	goto T122;}
 	goto T121;
+goto T122;
 T122:;
 	base[0]= VV[4];
 	vs_top=(vs_base=base+0)+1;
 	Lerror();
 	vs_top=sup;
+goto T121;
 T121:;
 	base[0]=VV[8]->s.s_gfdef;
 	base[1]= CMPcar((V54));
@@ -314,9 +363,13 @@ T121:;
 	if((vs_base[0])!=Cnil){
 	goto T125;}
 	V53= make_cons(CMPcar((V54)),(V53));
+goto T125;
 T125:;
 	V54= CMPcdr((V54));
-	goto T116;}}}
+	goto T116;}}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}
 /*	local entry for function NSET-DIFFERENCE	*/
 
@@ -329,10 +382,11 @@ static object LI6(V58,V57,va_alist)
 	{object V59;
 	register object V60;
 	register object V61;
+	Vcs[0]=Vcs[0];
+	va_start(ap);
 	V59= V58;
 	V60= V57;
 	narg= narg - 2;
-	va_start(ap);
 	V62 = list_vector(narg,ap);
 	V61= V62;
 	{register object V63;
@@ -341,24 +395,29 @@ static object LI6(V58,V57,va_alist)
 	V64= Cnil;
 	{register object V65;
 	V65= (V59);
+goto T138;
 T138:;
 	if(((V65))!=Cnil){
 	goto T139;}
 	if(((V64))==Cnil){
 	goto T142;}
 	((V64))->c.c_cdr = Cnil;
+goto T142;
 T142:;
 	{object V66 = (V63);
 	VMR6(V66)}
+goto T139;
 T139:;
 	if(!(type_of((V65))==t_cons)){
 	goto T147;}
 	goto T146;
+goto T147;
 T147:;
 	base[0]= VV[5];
 	vs_top=(vs_base=base+0)+1;
 	Lerror();
 	vs_top=sup;
+goto T146;
 T146:;
 	base[0]=VV[8]->s.s_gfdef;
 	base[1]= CMPcar((V65));
@@ -377,13 +436,19 @@ T146:;
 	goto T158;}
 	((V64))->c.c_cdr = (V65);
 	goto T156;
+goto T158;
 T158:;
 	V63= (V65);
+goto T156;
 T156:;
 	V64= (V65);
+goto T150;
 T150:;
 	V65= CMPcdr((V65));
-	goto T138;}}}
+	goto T138;}}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}
 /*	local entry for function SET-EXCLUSIVE-OR	*/
 
@@ -399,14 +464,15 @@ static object LI7(V69,V68,va_alist)
 	object V73;
 	object V74;
 	object V75;
+	Vcs[0]=Vcs[0];
+	va_start(ap);
 	V70= V69;
 	V71= V68;
 	narg= narg - 2;
-	va_start(ap);
 	V76 = make_list(narg);
 	V72= V76;
 	{
-	parse_key_rest(V76,narg,Vcs +3,&LI7key,ap);
+	parse_key_rest(V76,narg,Vcs +3,(struct key *)&LI7key,ap);
 	V73=(Vcs[3]);
 	V74=(Vcs[4]);
 	V75=(Vcs[5]);
@@ -433,7 +499,10 @@ static object LI7(V69,V68,va_alist)
 	vs_top=sup;
 	V79= vs_base[0];
 	{object V81 = nconc(V77,V79);
-	VMR7(V81)}}
+	VMR7(V81)}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}}
 /*	local entry for function NSET-EXCLUSIVE-OR	*/
 
@@ -446,10 +515,11 @@ static object LI8(V83,V82,va_alist)
 	{object V84;
 	register object V85;
 	register object V86;
+	Vcs[0]=Vcs[0];
+	va_start(ap);
 	V84= V83;
 	V85= V82;
 	narg= narg - 2;
-	va_start(ap);
 	V87 = list_vector(narg,ap);
 	V86= V87;
 	{object V88;
@@ -462,12 +532,14 @@ static object LI8(V83,V82,va_alist)
 	V91= Cnil;
 	{register object V92;
 	V92= (V84);
+goto T178;
 T178:;
 	if(((V92))!=Cnil){
 	goto T179;}
 	if(((V91))==Cnil){
 	goto T182;}
 	((V91))->c.c_cdr = Cnil;
+goto T182;
 T182:;
 	if(((V89))==Cnil){
 	goto T186;}
@@ -485,6 +557,7 @@ T182:;
 	((V89))->c.c_cdr = V93;
 	{object V95 = (V88);
 	VMR8(V95)}
+goto T186;
 T186:;
 	base[0]= (V85);
 	base[1]= (V90);
@@ -498,15 +571,18 @@ T186:;
 	vs_top=sup;
 	{object V97 = vs_base[0];
 	VMR8(V97)}
+goto T179;
 T179:;
 	if(!(type_of((V92))==t_cons)){
 	goto T198;}
 	goto T197;
+goto T198;
 T198:;
 	base[0]= VV[6];
 	vs_top=(vs_base=base+0)+1;
 	Lerror();
 	vs_top=sup;
+goto T197;
 T197:;
 	base[0]=VV[8]->s.s_gfdef;
 	base[1]= CMPcar((V92));
@@ -525,23 +601,32 @@ T197:;
 	goto T210;}
 	((V91))->c.c_cdr = (V92);
 	goto T208;
+goto T210;
 T210:;
 	V90= (V92);
+goto T208;
 T208:;
 	V91= (V92);
 	goto T201;
+goto T203;
 T203:;
 	if(((V89))==Cnil){
 	goto T216;}
 	((V89))->c.c_cdr = (V92);
 	goto T214;
+goto T216;
 T216:;
 	V88= (V92);
+goto T214;
 T214:;
 	V89= (V92);
+goto T201;
 T201:;
 	V92= CMPcdr((V92));
-	goto T178;}}}
+	goto T178;}}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}
 /*	local entry for function SUBSETP	*/
 
@@ -557,33 +642,38 @@ static object LI9(V100,V99,va_alist)
 	object V104;
 	object V105;
 	object V106;
+	Vcs[0]=Vcs[0];
+	va_start(ap);
 	V101= V100;
 	V102= V99;
 	narg= narg - 2;
-	va_start(ap);
 	V107 = make_list(narg);
 	V103= V107;
 	{
-	parse_key_rest(V107,narg,Vcs +3,&LI9key,ap);
+	parse_key_rest(V107,narg,Vcs +3,(struct key *)&LI9key,ap);
 	V104=(Vcs[3]);
 	V105=(Vcs[4]);
 	V106=(Vcs[5]);
 	{register object V108;
 	V108= (V101);
+goto T224;
 T224:;
 	if(((V108))!=Cnil){
 	goto T225;}
 	{object V109 = Ct;
 	VMR9(V109)}
+goto T225;
 T225:;
 	if(!(type_of((V108))==t_cons)){
 	goto T230;}
 	goto T229;
+goto T230;
 T230:;
 	base[0]= VV[7];
 	vs_top=(vs_base=base+0)+1;
 	Lerror();
 	vs_top=sup;
+goto T229;
 T229:;
 	base[0]=VV[8]->s.s_gfdef;
 	base[1]= CMPcar((V108));
@@ -600,13 +690,17 @@ T229:;
 	goto T233;}
 	{object V111 = Cnil;
 	VMR9(V111)}
+goto T233;
 T233:;
 	V108= CMPcdr((V108));
-	goto T224;}}
+	goto T224;}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}}
-static LnkT13(){ call_or_link(VV[13],&Lnk13);} /* NSET-DIFFERENCE */
-static LnkT12(){ call_or_link(VV[12],&Lnk12);} /* SET-DIFFERENCE */
-static LnkT8(){ call_or_link(VV[8],&Lnk8);} /* MEMBER1 */
+static void LnkT13(){ call_or_link(VV[13],(void **)&Lnk13);} /* NSET-DIFFERENCE */
+static void LnkT12(){ call_or_link(VV[12],(void **)&Lnk12);} /* SET-DIFFERENCE */
+static void LnkT8(){ call_or_link(VV[8],(void **)&Lnk8);} /* MEMBER1 */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

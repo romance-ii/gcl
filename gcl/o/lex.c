@@ -30,8 +30,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 object
-assoc_eq(key, alist)
-object key, alist;
+assoc_eq(object key, object alist)
 {
 	object endp_temp;
 
@@ -43,8 +42,8 @@ object key, alist;
 	return(Cnil);
 }
 
-lex_fun_bind(name, fun)
-object name, fun;
+void
+lex_fun_bind(object name, object fun)
 {
 	object *top = vs_top;
 
@@ -55,8 +54,8 @@ object name, fun;
 	vs_top = top;
 }
 
-lex_macro_bind(name, exp_fun)
-object name, exp_fun;
+void
+lex_macro_bind(object name, object exp_fun)
 {
 	object *top = vs_top;
 	vs_push(make_cons(exp_fun, Cnil));
@@ -66,8 +65,8 @@ object name, exp_fun;
 	vs_top = top;
 }
 
-lex_tag_bind(tag, id)
-object tag, id;
+void
+lex_tag_bind(object tag, object id)
 {
 	object *top = vs_top;
 
@@ -78,8 +77,8 @@ object tag, id;
 	vs_top = top;
 }
 
-lex_block_bind(name, id)
-object name, id;
+void
+lex_block_bind(object name, object id)
 {
 	object *top = vs_top;
 
@@ -91,8 +90,7 @@ object name, id;
 }
 
 object
-lex_tag_sch(tag)
-object tag;
+lex_tag_sch(object tag)
 {
 	object endp_temp;
 
@@ -106,8 +104,7 @@ object tag;
 	return(Cnil);
 }
 
-object lex_block_sch(name)
-object name;
+object lex_block_sch(object name)
 {
 	object endp_temp;
 
@@ -121,7 +118,8 @@ object name;
 	return(Cnil);
 }
 
-init_lex()
+void
+init_lex(void)
 {
 	sLfunction = make_ordinary("FUNCTION");
 	enter_mark_origin(&sLfunction);

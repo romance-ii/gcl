@@ -1,13 +1,14 @@
 
 #include "cmpinclude.h"
 #include "cmpcatch.h"
-init_cmpcatch(){do_init(VV);}
+void init_cmpcatch(){do_init(VV);}
 /*	local entry for function C1CATCH	*/
 
 static object LI1(V2)
 
 register object V2;
 {	 VMB1 VMS1 VMV1
+goto TTL;
 TTL:;
 	{object V3;
 	object V4;
@@ -17,6 +18,7 @@ TTL:;
 	if(!(endp((V2)))){
 	goto T5;}
 	(void)((*(LnkLI24))(VV[2],small_fixnum(1),small_fixnum(0)));
+goto T5;
 T5:;
 	V4= (*(LnkLI25))(car((V2)));
 	(void)((*(LnkLI26))((V3),cadr((V4))));
@@ -24,6 +26,8 @@ T5:;
 	(void)((*(LnkLI26))((V3),cadr((V2))));
 	{object V5 = list(4,VV[2],(V3),(V4),(V2));
 	VMR1(V5)}}
+	base[0]=base[0];
+	return Cnil;
 }
 /*	local entry for function C2CATCH	*/
 
@@ -32,6 +36,7 @@ static object LI2(V8,V9)
 object V8;object V9;
 {	 VMB2 VMS2 VMV2
 	bds_check;
+goto TTL;
 TTL:;
 	bds_bind(VV[3],symbol_value(VV[3]));
 	bds_bind(VV[4],VV[5]);
@@ -53,6 +58,8 @@ TTL:;
 	{object V11 = Cnil;
 	bds_unwind1;
 	VMR2(V11)}
+	base[0]=base[0];
+	return Cnil;
 }
 /*	local entry for function SET-PUSH-CATCH-FRAME	*/
 
@@ -60,12 +67,14 @@ static object LI3(V13)
 
 object V13;
 {	 VMB3 VMS3 VMV3
+goto TTL;
 TTL:;
 	princ_str("\n	frs_push(FRS_CATCH,",VV[6]);
 	(void)((*(LnkLI31))((V13)));
 	princ_str(");",VV[6]);
 	{object V14 = Cnil;
 	VMR3(V14)}
+	return Cnil;
 }
 /*	local entry for function C1UNWIND-PROTECT	*/
 
@@ -74,6 +83,7 @@ static object LI4(V16)
 register object V16;
 {	 VMB4 VMS4 VMV4
 	bds_check;
+goto TTL;
 TTL:;
 	{object V17;
 	object V18;
@@ -83,6 +93,7 @@ TTL:;
 	if(!(endp((V16)))){
 	goto T35;}
 	(void)((*(LnkLI24))(VV[11],small_fixnum(1),small_fixnum(0)));
+goto T35;
 T35:;
 	base[1]= make_cons(VV[13],symbol_value(VV[12]));
 	base[2]= make_cons(VV[13],symbol_value(VV[14]));
@@ -100,6 +111,8 @@ T35:;
 	(void)((*(LnkLI26))((V17),cadr((V16))));
 	{object V20 = list(4,VV[11],(V17),(V18),(V16));
 	VMR4(V20)}}
+	base[0]=base[0];
+	return Cnil;
 }
 /*	local entry for function C2UNWIND-PROTECT	*/
 
@@ -108,14 +121,15 @@ static object LI5(V23,V24)
 object V23;object V24;
 {	 VMB5 VMS5 VMV5
 	bds_check;
+goto TTL;
 TTL:;
 	{register object V25;
 	object V26;
 	bds_bind(VV[3],symbol_value(VV[3]));
 	V25= list(2,VV[16],(*(LnkLI32))());
 	V26= Cnil;
-	princ_str("\n	{object tag;frame_ptr fr;object p;bool active;",VV[6]);
 	princ_str("\n	frs_push(FRS_PROTECT,Cnil);",VV[6]);
+	princ_str("\n	{object tag=Cnil;frame_ptr fr=NULL;object p;bool active;",VV[6]);
 	princ_str("\n	if(nlj_active){tag=nlj_tag;fr=nlj_fr;active=TRUE;}",VV[6]);
 	princ_str("\n	else{",VV[6]);
 	bds_bind(VV[4],VV[17]);
@@ -152,14 +166,18 @@ TTL:;
 	goto T94;}
 	V28= car((V26));
 	goto T92;
+goto T94;
 T94:;
 	V28= Cnil;
+goto T92;
 T92:;
 	(void)((VFUN_NARGS=3,(*(LnkLI29))(VV[7],Cnil,V28)));
 	princ_str("}}",VV[6]);
 	{object V29 = Cnil;
 	bds_unwind1;
 	VMR5(V29)}}
+	base[0]=base[0];
+	return Cnil;
 }
 /*	local entry for function C1THROW	*/
 
@@ -167,6 +185,7 @@ static object LI6(V31)
 
 register object V31;
 {	 VMB6 VMS6 VMV6
+goto TTL;
 TTL:;
 	{object V32;
 	object V33;
@@ -176,14 +195,17 @@ TTL:;
 	goto T100;}
 	if(!(endp(cdr((V31))))){
 	goto T99;}
+goto T100;
 T100:;
 	V34 = make_fixnum(length((V31)));
 	(void)((*(LnkLI24))(VV[21],small_fixnum(2),V34));
+goto T99;
 T99:;
 	if(endp(cddr((V31)))){
 	goto T104;}
 	V35 = make_fixnum(length((V31)));
 	(void)((*(LnkLI34))(VV[21],small_fixnum(2),V35));
+goto T104;
 T104:;
 	V33= (*(LnkLI25))(car((V31)));
 	(void)((*(LnkLI26))((V32),cadr((V33))));
@@ -191,6 +213,8 @@ T104:;
 	(void)((*(LnkLI26))((V32),cadr((V31))));
 	{object V36 = list(4,VV[21],(V32),(V33),(V31));
 	VMR6(V36)}}
+	base[0]=base[0];
+	return Cnil;
 }
 /*	local entry for function C2THROW	*/
 
@@ -199,6 +223,7 @@ static object LI7(V39,V40)
 register object V39;object V40;
 {	 VMB7 VMS7 VMV7
 	bds_check;
+goto TTL;
 TTL:;
 	{register object V41;
 	bds_bind(VV[3],symbol_value(VV[3]));
@@ -208,15 +233,18 @@ TTL:;
 	if((V42!= VV[35]))goto T117;
 	V41= caddr((V39));
 	goto T116;
+goto T117;
 T117:;
 	if((V42!= VV[22]))goto T119;
 	V41= make_cons(VV[22],caddr((V39)));
 	goto T116;
+goto T119;
 T119:;
 	V41= list(2,VV[16],(*(LnkLI32))());
 	bds_bind(VV[4],(V41));
 	V43= (*(LnkLI28))((V39));
 	bds_unwind1;}
+goto T116;
 T116:;
 	princ_str("\n	fr=frs_sch_catch(",VV[6]);
 	(void)((*(LnkLI31))((V41)));
@@ -233,19 +261,21 @@ T116:;
 	{object V45 = Cnil;
 	bds_unwind1;
 	VMR7(V45)}}
+	base[0]=base[0];
+	return Cnil;
 }
-static object  LnkTLI34(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[34],&LnkLI34,3,ap);} /* TOO-MANY-ARGS */
-static object  LnkTLI33(){return call_proc0(VV[33],&LnkLI33);} /* RESET-TOP */
-static object  LnkTLI32(){return call_proc0(VV[32],&LnkLI32);} /* VS-PUSH */
-static object  LnkTLI31(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[31],&LnkLI31,1,ap);} /* WT1 */
-static LnkT30(){ call_or_link(VV[30],&Lnk30);} /* C2EXPR */
-static object  LnkTLI29(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[29],&LnkLI29,ap);} /* UNWIND-EXIT */
-static object  LnkTLI28(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[28],&LnkLI28,1,ap);} /* C2EXPR* */
-static object  LnkTLI27(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[27],&LnkLI27,1,ap);} /* C1PROGN */
-static object  LnkTLI26(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[26],&LnkLI26,2,ap);} /* ADD-INFO */
-static object  LnkTLI25(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[25],&LnkLI25,1,ap);} /* C1EXPR */
-static object  LnkTLI24(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[24],&LnkLI24,3,ap);} /* TOO-FEW-ARGS */
-static object  LnkTLI23(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[23],&LnkLI23,ap);} /* MAKE-INFO */
+static object  LnkTLI34(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[34],(void **)&LnkLI34,3,ap);} /* TOO-MANY-ARGS */
+static object  LnkTLI33(){return call_proc0(VV[33],(void **)&LnkLI33);} /* RESET-TOP */
+static object  LnkTLI32(){return call_proc0(VV[32],(void **)&LnkLI32);} /* VS-PUSH */
+static object  LnkTLI31(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[31],(void **)&LnkLI31,1,ap);} /* WT1 */
+static void LnkT30(){ call_or_link(VV[30],(void **)&Lnk30);} /* C2EXPR */
+static object  LnkTLI29(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[29],(void **)&LnkLI29,ap);} /* UNWIND-EXIT */
+static object  LnkTLI28(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[28],(void **)&LnkLI28,1,ap);} /* C2EXPR* */
+static object  LnkTLI27(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[27],(void **)&LnkLI27,1,ap);} /* C1PROGN */
+static object  LnkTLI26(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[26],(void **)&LnkLI26,2,ap);} /* ADD-INFO */
+static object  LnkTLI25(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[25],(void **)&LnkLI25,1,ap);} /* C1EXPR */
+static object  LnkTLI24(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[24],(void **)&LnkLI24,3,ap);} /* TOO-FEW-ARGS */
+static object  LnkTLI23(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[23],(void **)&LnkLI23,ap);} /* MAKE-INFO */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

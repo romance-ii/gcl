@@ -187,8 +187,8 @@ extern char *start_of_data ();		/* Start of initialized data */
 #define start_of_text() ( (char *) 0 )
 extern char etext;
 
-static int make_hdr (), copy_text_and_data (), copy_sym ();
-static int mark_x ();
+static int make_hdr (int new, int a_out, unsigned int data_start, unsigned int bss_start, unsigned int entry_address, char *a_name, char *new_name), copy_text_and_data (int new, int a_out), copy_sym (int new, int a_out, char *a_name, char *new_name);
+static int mark_x (char *name);
 
 #ifdef COFF
 #ifndef USG
@@ -239,7 +239,7 @@ static EXEC_HDR_TYPE hdr, ohdr;
 
 #else /* not HPUX */
 
-extern char *sbrk ();
+extern char *sbrk (int n);
 
 #if defined (USG) && !defined (IBMRTAIX) && !defined (IRIS) && !defined(linux)
 static struct bhdr hdr, ohdr;
@@ -294,10 +294,7 @@ report_error (file, fd)
 #define ERROR2(msg,x,y) report_error_1 (new, msg, x, y); return -1
 
 static
-report_error_1 (fd, msg, a1, a2)
-     int fd;
-     char *msg;
-     int a1, a2;
+report_error_1 (int fd, char *msg, int a1, int a2)
 {
   close (fd);
 #ifdef emacs
@@ -313,9 +310,7 @@ report_error_1 (fd, msg, a1, a2)
  *
  * driving logic.
  */
-unexec (new_name, a_name, data_start, bss_start, entry_address)
-     char *new_name, *a_name;
-     unsigned data_start, bss_start, entry_address;
+unexec (char *new_name, char *a_name, unsigned int data_start, unsigned int bss_start, unsigned int entry_address)
 {
   int new, a_out = -1;
 
@@ -354,11 +349,7 @@ unexec (new_name, a_name, data_start, bss_start, entry_address)
  * Modify the text and data sizes.
  */
 static int
-make_hdr (new, a_out, data_start, bss_start, entry_address, a_name, new_name)
-     int new, a_out;
-     unsigned data_start, bss_start, entry_address;
-     char *a_name;
-     char *new_name;
+make_hdr (int new, int a_out, unsigned int data_start, unsigned int bss_start, unsigned int entry_address, char *a_name, char *new_name)
 {
   int tem;
 #ifdef COFF
@@ -686,8 +677,7 @@ make_hdr (new, a_out, data_start, bss_start, entry_address, a_name, new_name)
  * Copy the text and data segments from memory to the new a.out
  */
 static int
-copy_text_and_data (new, a_out)
-     int new, a_out;
+copy_text_and_data (int new, int a_out)
 {
   register char *end;
   register char *ptr;
@@ -804,9 +794,7 @@ copy_text_and_data (new, a_out)
   return 0;
 }
 
-write_segment (new, ptr, end)
-     int new;
-     register char *ptr, *end;
+write_segment (int new, register char *ptr, register char *end)
 {
   register int i, nwrite, ret;
   char buf[80];
@@ -846,9 +834,7 @@ write_segment (new, ptr, end)
  * Copy the relocation information and symbol table from the a.out to the new
  */
 static int
-copy_sym (new, a_out, a_name, new_name)
-     int new, a_out;
-     char *a_name, *new_name;
+copy_sym (int new, int a_out, char *a_name, char *new_name)
 {
   char page[1024];
   int n;
@@ -888,8 +874,7 @@ copy_sym (new, a_out, a_name, new_name)
  * After succesfully building the new a.out, mark it executable
  */
 static int
-mark_x (name)
-     char *name;
+mark_x (char *name)
 {
   struct stat sbuf;
   int um;

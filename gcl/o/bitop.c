@@ -1,10 +1,13 @@
 
 #include "include.h"
-get_mark_bit()
+void
+get_mark_bit(void)
 {error("get_mark_bit called");}
-set_mark_bit()
+void
+set_mark_bit(void)
 {error("set_mark_bit called");}
-get_set_mark_bit()
+void
+get_set_mark_bit(void)
 {error("get_set_mark_bit called");}
 
 

@@ -90,8 +90,9 @@ object index,val;
 DEF_ORDINARY("%MEMORY",sSPmemory,SI,"");
 DEF_ORDINARY("%INIT",sSPinit,SI,"");
 
-void Lidentity();
-init_cmpaux()
+void Lidentity(void);
+void
+init_cmpaux(void)
 {
 
 
@@ -102,43 +103,39 @@ init_cmpaux()
 
   
 int
-ifloor(x, y)
-int x, y;
+ifloor(int x, int y)
 {
-	if (y == 0)
-		FEerror("Zero divizor", 0);
-	else if (y > 0)
-		if (x >= 0)
-			return(x/y);
-		else
-			return(-((-x+y-1))/y);
-	else
-		if (x >= 0)
-			return(-((x-y-1)/(-y)));
-		else
-			return((-x)/(-y));
+  if (y == 0) {
+    FEerror("Zero divizor", 0);
+    return 0;
+  }
+  if (y > 0) {
+    if (x >= 0)
+      return(x/y);
+    else
+      return(-((-x+y-1))/y);
+  }
+  if (x >= 0)
+    return(-((x-y-1)/(-y)));
+  else
+    return((-x)/(-y));
 }
 
 int
-imod(x, y)
-int x, y;
+imod(int x, int y)
 {
-	return(x - ifloor(x, y)*y);
+  return(x - ifloor(x, y)*y);
 }
 
-set_VV_data(VV,n,data,start,size)
-object VV[],data;
-int size,n;
-char *start;
+void
+set_VV_data(object *VV, int n, object data, char *start, int size)
 {set_VV(VV,n,data);
  data->cfd.cfd_start=start;
  data->cfd.cfd_size = size;
 }
 
-set_VV(VV, n, data)
-object VV[];
-int n;
-object data;
+void
+set_VV(object *VV, int n, object data)
 {
 	object *p, *q;
 
@@ -154,10 +151,9 @@ object data;
 */
 
 char
-object_to_char(x)
-object x;
+object_to_char(object x)
 {
-	int c;
+	int c=0;
 
 	switch (type_of(x)) {
 	case t_fixnum:
@@ -181,10 +177,9 @@ object x;
 }
 
 int
-object_to_int(x)
-object x;
+object_to_int(object x)
 {
-	int i;
+	int i=0;
 
 	switch (type_of(x)) {
 	case t_character:
@@ -207,10 +202,9 @@ object x;
 }
 
 float
-object_to_float(x)
-object x;
+object_to_float(object x)
 {
-	float f;
+	float f=0.0;
 
 	switch (type_of(x)) {
 	case t_character:
@@ -231,10 +225,9 @@ object x;
 }
 
 double
-object_to_double(x)
-object x;
+object_to_double(object x)
 {
-	double d;
+	double d=0.0;
 
 	switch (type_of(x)) {
 	case t_character:
@@ -259,8 +252,7 @@ object x;
    have a null character in the fillpointer position. */
 
 char *
-object_to_string(x)
-     object x;
+object_to_string(object x)
 { unsigned int leng;
   if (type_of(x)!=t_string) FEwrong_type_argument(sLstring,x);
   leng= x->st.st_fillp;
@@ -281,7 +273,7 @@ object_to_string(x)
    }}
 
 
-typedef int (*FUNC)();
+/*  typedef int (*FUNC)(); */
 
 /* perform the actual invocation of the init function durint a fasload
    init_address is the offset from the place in memory where the code is loaded
@@ -290,11 +282,8 @@ typedef int (*FUNC)();
    where f1 f2 are forms to be evaled.
 */
 
-call_init(init_address,memory,fasl_vec,fptr)
-     int init_address;
-     object memory,fasl_vec;
-     FUNC fptr;
-       
+void
+call_init(int init_address, object memory, object fasl_vec, FUNC fptr)
 {object form;
  FUNC at;
 
@@ -335,13 +324,11 @@ call_init(init_address,memory,fasl_vec,fptr)
 
    */
 
-do_init(statVV)
-     object *statVV;
-     
-
+void
+do_init(object *statVV)
 {object fasl_vec=sSPinit->s.s_dbind;
  object data = sSPmemory->s.s_dbind;
- {object *p,*q,x,y;
+ {object *p,*q,y;
   int n=fasl_vec->v.v_fillp -1;
   int i;
   object form;
@@ -412,9 +399,7 @@ char *s;
 #endif
 
 void
-init_or_load1(fn,file)
-     int (*fn)();
-     char *file;
+init_or_load1(int (*fn) (/* ??? */), char *file)
 {int n=strlen(file);
  if (file[n-1]=='o')
    { object memory;

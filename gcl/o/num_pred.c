@@ -27,8 +27,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "num_include.h"
 
 
-number_zerop(x)
-object	x;
+int
+number_zerop(object x)
 {
 	switch (type_of(x)) {
 
@@ -60,11 +60,12 @@ object	x;
 
 	default:
 		FEwrong_type_argument(sLnumber, x);
+		return(0);
 	}
 }
 
-number_plusp(x)
-object	x;
+int
+number_plusp(object x)
 {
 	switch (type_of(x)) {
 
@@ -100,11 +101,12 @@ object	x;
 
 	default:
 		FEwrong_type_argument(TSor_rational_float,x);
+		return(0);
 	}
 }
 
-number_minusp(x)
-object	x;
+int
+number_minusp(object x)
 {
 	switch (type_of(x)) {
 
@@ -140,13 +142,14 @@ object	x;
 
 	default:
 		FEwrong_type_argument(TSor_rational_float,x);
+		return(0);
 	}
 }
 
-number_oddp(x)
-object x;
+int
+number_oddp(object x)
 {
-	int	i;
+	int i=0;
 
 	if (type_of(x) == t_fixnum)
 		i = fix(x);
@@ -157,10 +160,10 @@ object x;
 	return(i & 1);
 }
 
-number_evenp(x)
-object x;
+int
+number_evenp(object x)
 {
-	int	i;
+	int i=0;
 
 	if (type_of(x) == t_fixnum)
 		i = fix(x);
@@ -171,7 +174,8 @@ object x;
 	return(~i & 1);
 }
 
-Lzerop()
+void
+Lzerop(void)
 {
 	check_arg(1);
 	check_type_number(&vs_base[0]);
@@ -181,7 +185,8 @@ Lzerop()
 		vs_base[0] = Cnil;
 }
 
-Lplusp()
+void
+Lplusp(void)
 {
 	check_arg(1);
 	check_type_or_rational_float(&vs_base[0]);
@@ -191,7 +196,8 @@ Lplusp()
 		vs_base[0] = Cnil;
 }
 
-Lminusp()
+void
+Lminusp(void)
 {
 	check_arg(1);
 	check_type_or_rational_float(&vs_base[0]);
@@ -201,7 +207,8 @@ Lminusp()
 		vs_base[0] = Cnil;
 }
 
-Loddp()
+void
+Loddp(void)
 {
 	check_arg(1);
 	check_type_integer(&vs_base[0]);
@@ -211,7 +218,8 @@ Loddp()
 		vs_base[0] = Cnil;
 }
 
-Levenp()
+void
+Levenp(void)
 {
 	check_arg(1);
 	check_type_integer(&vs_base[0]);
@@ -222,21 +230,20 @@ Levenp()
 }
 
 /* this is just to force things into memory in num_co.c */
-void  _assure_in_memory (p)
-     void *p;
+void  _assure_in_memory (void *p)
 {
 ;
 }
 
 int
-lf_eqlp(p,q)
-     double *p,*q;
+lf_eqlp(double *p, double *q)
 {
   return *p == *q;
 }
 
 
-init_num_pred()
+void
+init_num_pred(void)
 {
 #ifndef GMP
         big_register_1 = new_bignum();

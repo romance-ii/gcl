@@ -70,8 +70,9 @@
 (defun c2unwind-protect (form body
                          &aux (*vs* *vs*) (loc (list 'vs (vs-push)))
 			 top-data)
-  (wt-nl "{object tag;frame_ptr fr;object p;bool active;")
+  ;;;  exchanged following two lines to eliminate setjmp clobbering warning
   (wt-nl "frs_push(FRS_PROTECT,Cnil);")
+  (wt-nl "{object tag=Cnil;frame_ptr fr=NULL;object p;bool active;")
   (wt-nl "if(nlj_active){tag=nlj_tag;fr=nlj_fr;active=TRUE;}")
   (wt-nl "else{")
   (let ((*value-to-go* 'top)
@@ -117,6 +118,7 @@
   (wt-nl "if(fr==NULL) FEerror(\"The tag ~s is undefined.\",1," loc ");")
   (let ((*value-to-go* 'top)) (c2expr* val))
   (wt-nl "unwind(fr," loc ");}")
+;  (wt-nl "return Cnil;}")
   )
 
 

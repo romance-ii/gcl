@@ -1,15 +1,15 @@
 
-static L1();
+static void L1();
 static object LI2();
-static L3();
+static void L3();
 static object LI6();
 static object LI7();
-static L11();
-static L12();
-static L13();
-static L14();
-static L15();
-static L19();
+static void L11();
+static void L12();
+static void L13();
+static void L14();
+static void L15();
+static void L19();
 #define VC1
 static object LI2();
 #define VMB2 register object *base=vs_top; object  V5; object Vcs[2];
@@ -131,14 +131,14 @@ static char * VVi[66]={
 #define VV ((object *)VVi)
 static object  LnkTLI64() ;
 static object  (*LnkLI64)() = LnkTLI64;
-static  LnkT63() ;
-static  (*Lnk63)() = LnkT63;
-static  LnkT62() ;
-static  (*Lnk62)() = LnkT62;
+static void LnkT63() ;
+static void (*Lnk63)() = LnkT63;
+static void LnkT62() ;
+static void (*Lnk62)() = LnkT62;
 static object  LnkTLI61() ;
 static object  (*LnkLI61)() = LnkTLI61;
-static  LnkT60() ;
-static  (*Lnk60)() = LnkT60;
+static void LnkT60() ;
+static void (*Lnk60)() = LnkT60;
 static object  LnkTLI59() ;
 static object  (*LnkLI59)() = LnkTLI59;
 static object  LnkTLI58() ;

@@ -2,22 +2,23 @@
 extern char end;
 
 static caddr_t curbrk = &end;
-caddr_t sbrk();
+caddr_t sbrk(int n);
 
-caddr_t
-sbrk(n)
-     int n;
-{ int res;
+void *
+sbrk(ptrdiff_t n) { 
+  int res;
   if (n==0) return curbrk;
-  { caddr_t x=curbrk;
+  { 
+    void * x=curbrk;
     char *p;
     p=curbrk;
     p=p+n;
     res = brk(p);
-  
+    
     if (res==-1) error("can't set brk");
     else curbrk = p;
-    return (x);}
+    return (x);
+  }
 }
 
 

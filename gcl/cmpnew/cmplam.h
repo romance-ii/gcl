@@ -1,12 +1,12 @@
 
-static L1();
-static L2();
-static L3();
+static void L1();
+static void L2();
+static void L3();
 static object LI9();
 static object LI12();
-static L19();
-static L20();
-static L22();
+static void L19();
+static void L20();
+static void L22();
 #define VC1
 #define VC2
 #define VC3
@@ -108,9 +108,9 @@ static object LI27();
 #define VMS25 vs_top += 4;
 #define VMV25 vs_reserve(4);
 #define VMR25(VMT25) vs_top=base ; return(VMT25);
-static L16();
+static void L16();
 #define VC26
-static L14();
+static void L14();
 #define VC27
 #define VM27 2
 #define VM26 2
@@ -168,8 +168,8 @@ static char * VVi[124]={
 (char *)(LI27)
 };
 #define VV ((object *)VVi)
-static  LnkT122() ;
-static  (*Lnk122)() = LnkT122;
+static void LnkT122() ;
+static void (*Lnk122)() = LnkT122;
 static object  LnkTLI121() ;
 static object  (*LnkLI121)() = LnkTLI121;
 static object  LnkTLI120() ;
@@ -188,18 +188,18 @@ static object  LnkTLI114() ;
 static object  (*LnkLI114)() = LnkTLI114;
 static object  LnkTLI113() ;
 static object  (*LnkLI113)() = LnkTLI113;
-static  LnkT112() ;
-static  (*Lnk112)() = LnkT112;
-static  LnkT111() ;
-static  (*Lnk111)() = LnkT111;
-static  LnkT110() ;
-static  (*Lnk110)() = LnkT110;
+static void LnkT112() ;
+static void (*Lnk112)() = LnkT112;
+static void LnkT111() ;
+static void (*Lnk111)() = LnkT111;
+static void LnkT110() ;
+static void (*Lnk110)() = LnkT110;
 static object  LnkTLI109() ;
 static object  (*LnkLI109)() = LnkTLI109;
 static object  LnkTLI108() ;
 static object  (*LnkLI108)() = LnkTLI108;
-static  LnkT107() ;
-static  (*Lnk107)() = LnkT107;
+static void LnkT107() ;
+static void (*Lnk107)() = LnkT107;
 static object  LnkTLI106() ;
 static object  (*LnkLI106)() = LnkTLI106;
 static object  LnkTLI105() ;
@@ -238,8 +238,8 @@ static object  LnkTLI89() ;
 static object  (*LnkLI89)() = LnkTLI89;
 static object  LnkTLI88() ;
 static object  (*LnkLI88)() = LnkTLI88;
-static  LnkT87() ;
-static  (*Lnk87)() = LnkT87;
+static void LnkT87() ;
+static void (*Lnk87)() = LnkT87;
 static object  LnkTLI86() ;
 static object  (*LnkLI86)() = LnkTLI86;
 static object  LnkTLI85() ;

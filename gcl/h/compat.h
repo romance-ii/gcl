@@ -2,8 +2,8 @@
 #define Scons sLcons
 #define aref1 fSaref1 
 #define aref  fSaref1
-#define aset1 fSaset1
-#define aset  fSaset1
+/*  #define aset1 fSaset1 */
+#define aset  aset1
 #define siSPinit sSPinit
 #define siSPmemory sSPmemory
 #define siSdefmacroA sSdefmacroA

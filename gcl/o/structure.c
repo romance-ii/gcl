@@ -37,8 +37,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 bool
-structure_subtypep(x, y)
-object x, y;
+structure_subtypep(object x, object y)
 { if (x==y) return 1;
   if (type_of(x)!= t_structure
       || type_of(y)!=t_structure)
@@ -49,15 +48,13 @@ object x, y;
    return 0;
  }}
 
-static
-bad_raw_type()
+static void
+bad_raw_type(void)
 {     	  FEerror("Bad raw struct type",0);}
 
 
 object
-structure_ref(x, name, i)
-object x, name;
-int i;
+structure_ref(object x, object name, int i)
 {unsigned short *s_pos;
  COERCE_DEF(name);
  if (type_of(x) != t_structure ||
@@ -86,7 +83,7 @@ int i;
 
 
 void
-siLstructure_ref1()
+siLstructure_ref1(void)
 {object x=vs_base[0];
  int n=fix(vs_base[1]);
  object def;
@@ -103,9 +100,7 @@ siLstructure_ref1()
 
 
 object
-structure_set(x, name, i, v)
-object x, name, v;
-int i;
+structure_set(object x, object name, int i, object v)
 {unsigned short *s_pos;
  
  COERCE_DEF(name);
@@ -142,7 +137,7 @@ int i;
 }
 
 void
-siLstructure_subtype_p()
+siLstructure_subtype_p(void)
 {object x,y;
  check_arg(2);
  x=vs_base[0];
@@ -160,8 +155,7 @@ siLstructure_subtype_p()
      
 
 object
-structure_to_list(x)
-object x;
+structure_to_list(object x)
 {
 	object endp_temp;
 
@@ -184,10 +178,10 @@ object x;
 }
 
 void
-siLmake_structure()
+siLmake_structure(void)
 {
   object x,name,*base;
-  struct s_data *def;
+  struct s_data *def=NULL;
   int narg, i,size;
   base=vs_base;
   if ((narg = vs_top - base) == 0)
@@ -242,7 +236,7 @@ siLmake_structure()
 }
 
 void
-siLcopy_structure()
+siLcopy_structure(void)
 {
 	object x, y;
 	struct s_data *def;
@@ -261,7 +255,7 @@ siLcopy_structure()
 }
 
 void
-siLstructure_name()
+siLstructure_name(void)
 {
 	check_arg(1);
 	check_type_structure(vs_base[0]);
@@ -269,7 +263,7 @@ siLstructure_name()
 }
 
 void
-siLstructure_ref()
+siLstructure_ref(void)
 {
 	check_arg(3);
 	vs_base[0]=structure_ref(vs_base[0],vs_base[1],fix(vs_base[2]));
@@ -277,7 +271,7 @@ siLstructure_ref()
 }
 
 void
-siLstructure_set()
+siLstructure_set(void)
 {
 	check_arg(4);
 	structure_set(vs_base[0],vs_base[1],fix(vs_base[2]),vs_base[3]);
@@ -285,7 +279,7 @@ siLstructure_set()
 }
 
 void
-siLstructurep()
+siLstructurep(void)
 {
 	check_arg(1);
 	if (type_of(vs_base[0]) == t_structure)
@@ -294,7 +288,8 @@ siLstructurep()
 		vs_base[0] = Cnil;
 }
 
-siLrplaca_nthcdr()
+void
+siLrplaca_nthcdr(void)
 {
 	object endp_temp;
 
@@ -322,7 +317,8 @@ siLrplaca_nthcdr()
 	vs_base = vs_base + 2;
 }
 
-siLlist_nth()
+void
+siLlist_nth(void)
 {
 	object endp_temp;
 
@@ -347,12 +343,12 @@ siLlist_nth()
 	}
 
 	vs_base[0] = l->c.c_car;
-	vs_pop;
+	vs_popp;
 }
 
 
 void
-siLmake_s_data_structure()
+siLmake_s_data_structure(void)
 {object x,y,raw,*base;
  int i;
  check_arg(5);
@@ -376,7 +372,7 @@ siLmake_s_data_structure()
 }
 
 void
-siLstructure_def()
+siLstructure_def(void)
 {check_arg(1);
  check_type_structure(vs_base[0]);
   vs_base[0]=vs_base[0]->str.str_def;
@@ -400,16 +396,16 @@ sizeof(short)  /* aet_ushort  unsigned short   */
 
 
 void
-siLsize_of() 
+siLsize_of(void)
 { object x= vs_base[0];
   int i;
-  i= aet_sizes[fSget_aelttype(x)];
+  i= aet_sizes[fix(fSget_aelttype(x))];
   vs_base[0]=make_fixnum(i);
 }
   
 void
-siLaet_type()
-{vs_base[0]=make_fixnum(fSget_aelttype(vs_base[0]));}
+siLaet_type(void)
+{vs_base[0]=fSget_aelttype(vs_base[0]);}
 
 
 /* Return N such that something of type ARG can be aligned on
@@ -417,7 +413,7 @@ siLaet_type()
 
 
 void
-siLalignment()
+siLalignment(void)
 {struct {double x; int y; double z;
 	 float x1; int y1; float z1;}
  joe;
@@ -435,7 +431,8 @@ siLalignment()
  
 DEF_ORDINARY("S-DATA",sSs_data,SI,"");
 
-init_structure_function()
+void
+init_structure_function(void)
 {
 
 

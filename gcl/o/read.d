@@ -42,6 +42,7 @@ object dispatch_reader;
 #define	SHARP_EQ_CONTEXT_SIZE	250
 #endif
 
+void
 setup_READtable()
 {
 	READtable = current_readtable();
@@ -61,6 +62,7 @@ struct sharp_eq_context_struct {
 */
 
 
+void
 setup_READ()
 {
 	object x;
@@ -90,6 +92,7 @@ setup_READ()
 	backq_level = 0;
 }
 
+void
 setup_standard_READ()
 {
 	READtable = standard_readtable;
@@ -109,6 +112,7 @@ object in;
 
 #define	read_char(in)	code_char(readc_stream(in))
 
+void
 unread_char(c, in)
 object c, in;
 {
@@ -196,7 +200,7 @@ L:
 	READsuppress = old_READsuppress;
 
 	/* BUG FIX by Toshiba */
-	vs_pop;
+	vs_popp;
 
 	if (e) {
 		nlj_active = FALSE;
@@ -264,9 +268,9 @@ L:
 		nlj_active = FALSE;
 		unwind(nlj_fr, nlj_tag);
 	}
-	vs_pop;
+	vs_popp;
 	/* BUG FIX by Toshiba */
-	vs_pop;
+	vs_popp;
 	return(x);
 }
 
@@ -328,9 +332,9 @@ L:
 		nlj_active = FALSE;
 		unwind(nlj_fr, nlj_tag);
 	}
-	vs_pop;
+	vs_popp;
 	/* BUG FIX by Toshiba */
-	vs_pop;
+	vs_popp;
 	return(x);
 }
 #ifdef UNIX  /* faster code for inner loop from file stream */
@@ -351,7 +355,7 @@ L:
 
 #define read_char_to(res,in,eof_code) \
   do{FILE *fp; \
-      if(fp=in->sm.sm_fp) \
+      if((fp=in->sm.sm_fp)) \
 	{int ch = getc(fp); \
       if (ch==EOF && feof(fp))  \
 	 { eof_code;} \
@@ -373,6 +377,8 @@ L:
    } while(0)
 #endif
 
+void
+too_long_token(void);
 /*
 	Read_object(in) reads an object from stream in.
 	This routine corresponds to COMMON Lisp function READ.
@@ -382,13 +388,13 @@ read_object(in)
 object in;
 {
 	object x;
-	object c;
+	object c=Cnil;
 	enum chattrib a;
 	object *old_vs_base;
 	object result;
 	object p;
-	int  colon, colon_type;
-	int i, d;
+	int  colon=0, colon_type;
+	int i;
 	bool df, ilf;
 	VOL int length;
 	vs_mark;
@@ -586,6 +592,7 @@ SYMBOL:
 	return(x);
 }
 
+void
 Lleft_parenthesis_reader()
 {
 	object in, c, x;
@@ -617,7 +624,7 @@ Lleft_parenthesis_reader()
 		}
 		vs_push(x);
 		*p = make_cons(x, Cnil);
-		vs_pop;
+		vs_popp;
 		p = &((*p)->c.c_cdr);
 	}
 
@@ -648,7 +655,7 @@ parse_number(s, end, ep, radix)
 char *s;
 int end, *ep, radix;
 {
-	object x, r;
+	object x=Cnil;
 	fixnum sign;
 	object integer_part;
 	double fraction, fraction_unit, f;
@@ -909,7 +916,7 @@ parse_integer(s, end, ep, radix)
 char *s;
 int end, *ep, radix;
 {
-	object x, r;
+	object x;
 	fixnum sign;
 	object integer_part;
 	int i, d;
@@ -958,12 +965,18 @@ NO_NUMBER:
 /**/
 	return(OBJNULL);
 }
-/*
+
+
+void
+too_long_string(void);
+
+/*
 	Read_string(delim, in) reads
 	a simple string	terminated by character code delim
 	and places it in token.
 	Delim is not included in the string but discarded.
 */
+void
 read_string(delim, in)
 int delim;
 object in;
@@ -990,6 +1003,7 @@ object in;
 	a sequence of constituent characters from stream in
 	and places it in token_buffer.
 */
+void
 read_constituent(in)
 object in;
 {
@@ -1011,14 +1025,16 @@ object in;
 	
 }
 
+void
 Ldouble_quote_reader()
 {
 	check_arg(2);
-	vs_pop;
+	vs_popp;
 	read_string('"', vs_base[0]);
 	vs_base[0] = copy_simple_string(token);
 }
 
+void
 Ldispatch_reader()
 {
 	object c, x;
@@ -1052,10 +1068,11 @@ Ldispatch_reader()
 	super_funcall(x);
 }
 
+void
 Lsingle_quote_reader()
 {
 	check_arg(2);
-	vs_pop;
+	vs_popp;
 	vs_push(sLquote);
 	vs_push(read_object(vs_base[0]));
 	vs_push(Cnil);
@@ -1064,11 +1081,12 @@ Lsingle_quote_reader()
 	vs_base[0] = vs_pop;
 }
 
+void
 Lright_parenthesis_reader()
 {
 	check_arg(2);
-	vs_pop;
-	vs_pop;
+	vs_popp;
+	vs_popp;
 		/*  no result  */
 }
 
@@ -1076,17 +1094,18 @@ Lright_parenthesis_reader()
 Lcomma_reader(){}
 */
 
+void
 Lsemicolon_reader()
 {
 	object c;
 	object str= vs_base[0];
 	check_arg(2);
-	vs_pop;
+	vs_popp;
 	do
 	{ read_char_to(c,str, goto L); }
 		while (char_code(c) != '\n');
 L:	
-	vs_pop;
+	vs_popp;
 	vs_base[0] = Cnil;
 	/*  no result  */
 }
@@ -1098,7 +1117,10 @@ Lbackquote_reader(){}
 /*
 	sharpmacro routines
 */
+void
+extra_argument(int);
 
+void
 Lsharp_C_reader()
 {
 	object x, c;
@@ -1106,8 +1128,8 @@ Lsharp_C_reader()
 	check_arg(3);
 	if (vs_base[2] != Cnil && !READsuppress)
 		extra_argument('C');
-	vs_pop;
-	vs_pop;
+	vs_popp;
+	vs_popp;
 	c = read_char(vs_base[0]);
 	if (char_code(c) != '(')
 		FEerror("A left parenthesis is expected.", 0);
@@ -1140,6 +1162,7 @@ Lsharp_C_reader()
 	vs_top = vs_base + 1;
 }
 
+void
 Lsharp_backslash_reader()
 {
 	object c;
@@ -1150,8 +1173,8 @@ Lsharp_backslash_reader()
 		    fix(vs_base[2]) != 0)
 			FEerror("~S is an illegal CHAR-FONT.", 1, vs_base[2]);
 			/*  assuming that CHAR-FONT-LIMIT is 1  */
-	vs_pop;
-	vs_pop;
+	vs_popp;
+	vs_popp;
 	unread_char(code_char('\\'), vs_base[0]);
 	if (READsuppress) {
 		(void)read_object(vs_base[0]);
@@ -1194,14 +1217,15 @@ Lsharp_backslash_reader()
 		FEerror("~S is an illegal character name.", 1, c);
 }
 
+void
 Lsharp_single_quote_reader()
 {
 
 	check_arg(3);
 	if(vs_base[2] != Cnil && !READsuppress)
 		extra_argument('#');
-	vs_pop;
-	vs_pop;
+	vs_popp;
+	vs_popp;
 	vs_push(sLfunction);
 	vs_push(read_object(vs_base[0]));
 	vs_push(Cnil);
@@ -1219,11 +1243,12 @@ Lsharp_single_quote_reader()
 
 object siScomma;
 
+void
 Lsharp_left_parenthesis_reader()
 {
 	object endp_temp;
 
-	int dim;
+	int dim=0;
 	int dimcount;
 	object in, x;
 	int a;
@@ -1234,8 +1259,8 @@ Lsharp_left_parenthesis_reader()
 		dim = -1;
 	else if (type_of(vs_base[2]) == t_fixnum)
 		dim = fix(vs_base[2]);
-	vs_pop;
-	vs_pop;
+	vs_popp;
+	vs_popp;
 	in = vs_base[0];
 	if (backq_level > 0) {
 		unreadc_stream('(', in);
@@ -1295,7 +1320,7 @@ L:
 	vs_push(x);
 	x->v.v_self
 	= (object *)alloc_relblock(dimcount * sizeof(object));
-	vs_pop;
+	vs_popp;
 	for (dim = 0; dim < dimcount; dim++)
 		x->v.v_self[dim] = vsp[dim];
 	vs_top = vs_base;
@@ -1303,9 +1328,10 @@ L:
 	vs_push(x);
 }
 
+void
 Lsharp_asterisk_reader()
 {
-	int dim;
+	int dim=0;
 	int dimcount;
 	object in, x;
 	object *vsp;		
@@ -1313,8 +1339,8 @@ Lsharp_asterisk_reader()
 	check_arg(3);
 	if (READsuppress) {
 		read_constituent(vs_base[0]);
-		vs_pop;
-		vs_pop;
+		vs_popp;
+		vs_popp;
 		vs_base[0] = Cnil;
 		return;
 	}
@@ -1322,8 +1348,8 @@ Lsharp_asterisk_reader()
 		dim = -1;
 	else if (type_of(vs_head) == t_fixnum)
 		dim = fix(vs_head);
-	vs_pop;
-	vs_pop;
+	vs_popp;
+	vs_popp;
 	in = vs_head;
 	vsp = vs_top;
 	dimcount = 0;
@@ -1353,7 +1379,7 @@ Lsharp_asterisk_reader()
 	x = alloc_simple_bitvector(dimcount);
 	vs_push(x);
 	x->bv.bv_self = alloc_relblock((dimcount + 7)/8);
-	vs_pop;
+	vs_popp;
 	for (dim = 0; dim < dimcount; dim++)
 		if (char_code(vsp[dim]) == '0')
 			x->bv.bv_self[dim/8] &= ~(0200 >> dim%8);
@@ -1364,6 +1390,7 @@ Lsharp_asterisk_reader()
 	vs_push(x);
 }
 
+void
 Lsharp_colon_reader()
 {
 	object in;
@@ -1373,8 +1400,8 @@ Lsharp_colon_reader()
 
 	if (vs_base[2] != Cnil && !READsuppress)
 		extra_argument(':');
-	vs_pop;
-	vs_pop;
+	vs_popp;
+	vs_popp;
 	in = vs_base[0];
 	c = read_char(in);
 	a = cat(c);
@@ -1430,13 +1457,14 @@ M:
 	vs_base[0] = make_symbol(vs_base[0]);
 }
 
+void
 Lsharp_dot_reader()
 {
 	check_arg(3);
 	if(vs_base[2] != Cnil && !READsuppress)
 		extra_argument('.');
-	vs_pop;
-	vs_pop;
+	vs_popp;
+	vs_popp;
 	if (READsuppress) {
 		read_object(vs_base[0]);	
 		vs_base[0] = Cnil;
@@ -1446,13 +1474,14 @@ Lsharp_dot_reader()
 	vs_base[0] = ieval(vs_base[0]);
 }
 
+void
 Lsharp_comma_reader()
 {
 	check_arg(3);
 	if(vs_base[2] != Cnil && !READsuppress)
 		extra_argument(',');
-	vs_pop;
-	vs_pop;
+	vs_popp;
+	vs_popp;
 	if (READsuppress) {
 		read_object(vs_base[0]);
 		vs_base[0] = Cnil;
@@ -1462,13 +1491,14 @@ Lsharp_comma_reader()
 	vs_base[0] = ieval(vs_base[0]);
 }
 
+void
 siLsharp_comma_reader_for_compiler()
 {
 	check_arg(3);
 	if(vs_base[2] != Cnil && !READsuppress)
 		extra_argument(',');
-	vs_pop;
-	vs_pop;
+	vs_popp;
+	vs_popp;
 	if (READsuppress) {
 		vs_base[0] = Cnil;
 		return;
@@ -1480,30 +1510,32 @@ siLsharp_comma_reader_for_compiler()
 /*
 	For fasload.
 */
+void
 Lsharp_exclamation_reader()
 {
 	check_arg(3);
 	if(vs_base[2] != Cnil && !READsuppress)
 		extra_argument('!');
-	vs_pop;
-	vs_pop;
+	vs_popp;
+	vs_popp;
 	if (READsuppress) {
 		vs_base[0] = Cnil;
 		return;
 	}
 	vs_base[0] = read_object(vs_base[0]);
 	ieval(vs_base[0]);
-	vs_pop;
+	vs_popp;
 }
 
+void
 Lsharp_B_reader()
 {
 	int i;
 
 	if(vs_base[2] != Cnil && !READsuppress)
 		extra_argument('B');
-	vs_pop;
-	vs_pop;
+	vs_popp;
+	vs_popp;
 	read_constituent(vs_base[0]);
 	if (READsuppress) {
 		vs_base[0] = Cnil;
@@ -1519,14 +1551,15 @@ Lsharp_B_reader()
 			1, vs_base[0]);
 }
 
+void
 Lsharp_O_reader()
 {
 	int i;
 
 	if(vs_base[2] != Cnil && !READsuppress)
 		extra_argument('O');
-	vs_pop;
-	vs_pop;
+	vs_popp;
+	vs_popp;
 	read_constituent(vs_base[0]);
 	if (READsuppress) {
 		vs_base[0] = Cnil;
@@ -1542,14 +1575,15 @@ Lsharp_O_reader()
 			1, vs_base[0]);
 }
 
+void
 Lsharp_X_reader()
 {
 	int i;
 
 	if(vs_base[2] != Cnil && !READsuppress)
 		extra_argument('X');
-	vs_pop;
-	vs_pop;
+	vs_popp;
+	vs_popp;
 	read_constituent(vs_base[0]);
 	if (READsuppress) {
 		vs_base[0] = Cnil;
@@ -1565,9 +1599,10 @@ Lsharp_X_reader()
 			1, vs_base[0]);
 }
 
+void
 Lsharp_R_reader()
 {
-	int radix, i;
+	int radix=0, i;
 
 	check_arg(3);
 	if (READsuppress)
@@ -1578,8 +1613,8 @@ Lsharp_R_reader()
 			FEerror("~S is an illegal radix.", 1, vs_base[2]);
 	} else
 		FEerror("No radix was supplied in the #R readmacro.", 0);
-	vs_pop;
-	vs_pop;
+	vs_popp;
+	vs_popp;
 	read_constituent(vs_base[0]);
 	if (READsuppress) {
 		vs_base[0] = Cnil;
@@ -1595,10 +1630,11 @@ Lsharp_R_reader()
 			1, vs_base[0]);
 }
 
-Lsharp_A_reader(){}
+void Lsharp_A_reader(){}
 
-Lsharp_S_reader(){}
+void Lsharp_S_reader(){}
 
+void
 Lsharp_eq_reader()
 {
 	int i;
@@ -1629,14 +1665,15 @@ Lsharp_eq_reader()
 	vs_top = vs_base+1;
 }
 
+void
 Lsharp_sharp_reader()
 {
 	int i;
 
 	check_arg(3);
 	if (READsuppress) {
-		vs_pop;
-		vs_pop;
+		vs_popp;
+		vs_popp;
 		vs_base[0] = Cnil;
 	}
 	if (vs_base[2] == Cnil)
@@ -1655,6 +1692,7 @@ Lsharp_sharp_reader()
 	vs_top = vs_base+1;
 }
 
+void
 patch_sharp_cons(x)
 object x;
 {
@@ -1726,20 +1764,23 @@ object x;
 	 break;
        }
 	
+	default:
+		break;
 	}
 	return(x);
 }
 
-Lsharp_plus_reader(){}
+void Lsharp_plus_reader(){}
 
-Lsharp_minus_reader(){}
+void Lsharp_minus_reader(){}
 
-Lsharp_less_than_reader(){}
+void Lsharp_less_than_reader(){}
 
-Lsharp_whitespace_reader(){}
+void Lsharp_whitespace_reader(){}
 
-Lsharp_right_parenthesis_reader(){}
+void Lsharp_right_parenthesis_reader(){}
 
+void
 Lsharp_vertical_bar_reader()
 {
 	int c;
@@ -1748,8 +1789,8 @@ Lsharp_vertical_bar_reader()
 	check_arg(3);
 	if (vs_base[2] != Cnil && !READsuppress)
 		extra_argument('|');
-	vs_pop;
-	vs_pop;
+	vs_popp;
+	vs_popp;
 	for (;;) {
 		c = readc_stream(vs_base[0]);
 	L:
@@ -1768,11 +1809,12 @@ Lsharp_vertical_bar_reader()
 				goto L;
 		}
 	}
-	vs_pop;
+	vs_popp;
 	vs_base[0] = Cnil;
 	/*  no result  */
 }
 
+void
 Ldefault_dispatch_macro()
 {
 	FEerror("The default dispatch macro signalled an error.", 0);
@@ -1781,14 +1823,14 @@ Ldefault_dispatch_macro()
 /*
 	#p" ... " returns the pathname with namestring ... .
 */
-static
+static void
 Lsharp_p_reader()
 {
 	check_arg(3);
 	if (vs_base[2] != Cnil && !READsuppress)
 		extra_argument('p');
-	vs_pop;
-	vs_pop;
+	vs_popp;
+	vs_popp;
 	vs_base[0] = read_object(vs_base[0]);
 	vs_base[0] = coerce_to_pathname(vs_base[0]);
 }
@@ -1796,15 +1838,16 @@ Lsharp_p_reader()
 /*
 	#" ... " returns the pathname with namestring ... .
 */
+void
 Lsharp_double_quote_reader()
 {
 	check_arg(3);
 
 	if (vs_base[2] != Cnil && !READsuppress)
 		extra_argument('"');
-	vs_pop;
+	vs_popp;
 	unread_char(vs_base[1], vs_base[0]);
-	vs_pop;
+	vs_popp;
 	vs_base[0] = read_object(vs_base[0]);
 	vs_base[0] = coerce_to_pathname(vs_base[0]);
 }
@@ -1813,6 +1856,7 @@ Lsharp_double_quote_reader()
 	#$ fixnum returns a random-state with the fixnum
 	as its content.
 */
+void
 Lsharp_dollar_reader()
 {
 	int i;
@@ -1820,8 +1864,8 @@ Lsharp_dollar_reader()
 	check_arg(3);
 	if (vs_base[2] != Cnil && !READsuppress)
 		extra_argument('$');
-	vs_pop;
-	vs_pop;
+	vs_popp;
+	vs_popp;
 	vs_base[0] = read_object(vs_base[0]);
 	if (type_of(vs_base[0]) != t_fixnum)
 		FEerror("Cannot make a random-state with the value ~S.",
@@ -1957,10 +2001,10 @@ READ:
 
 	int i;
 	bool e;
-	int old_sharp_eq_context_max;
+	volatile int old_sharp_eq_context_max=0;
 	struct sharp_eq_context_struct
 		old_sharp_eq_context[SHARP_EQ_CONTEXT_SIZE];
-	int old_backq_level;
+	volatile int old_backq_level=0;
 
 @
 
@@ -2176,7 +2220,7 @@ READ:
 		strm = symbol_value(sLAterminal_ioA);
 	check_type_stream(&strm);
 #ifdef LISTEN_FOR_INPUT
-	while(listen_stream(strm)) {read_char(strm);}
+	while(listen_stream(strm)) {readc_stream(strm);}
 #endif
 	@(return Cnil)
 @)
@@ -2195,7 +2239,7 @@ READ:
 	    fix(radix) < 2 || fix(radix) > 36)
 		FEerror("~S is an illegal radix.", 1, radix);
 	setup_READtable();
-	while (READtable->rt.rt_self[strng->st.st_self[s]].rte_chattrib
+	while (READtable->rt.rt_self[(unsigned char)strng->st.st_self[s]].rte_chattrib
 	       == cat_whitespace && s < e)
 		s++;
 	if (s >= e) {
@@ -2218,7 +2262,7 @@ READ:
 	if (junk_allowed != Cnil)
 		@(return x `make_fixnum(ep+s)`)
 	for (s += ep ;  s < e;  s++)
-		if (READtable->rt.rt_self[strng->st.st_self[s]]
+		if (READtable->rt.rt_self[(unsigned char)strng->st.st_self[s]]
 		    .rte_chattrib
 		    != cat_whitespace)
 			goto CANNOT_PARSE;
@@ -2276,6 +2320,7 @@ object str,eof;
 	@(return `copy_readtable(from, to)`)
 @)
 
+void
 Lreadtablep()
 {
 	check_arg(1);
@@ -2424,6 +2469,7 @@ object x;
 	return(x);
 }
 	
+void
 siLstring_to_object()
 {
 	check_arg(1);
@@ -2433,6 +2479,7 @@ siLstring_to_object()
 }
 
 
+void
 siLstandard_readtable()
 {
 	check_arg(0);
@@ -2440,7 +2487,8 @@ siLstandard_readtable()
 	vs_push(standard_readtable);
 }
 
-too_long_token()
+void
+too_long_token(void)
 {
 	char *q;
 	int i;
@@ -2458,7 +2506,8 @@ too_long_token()
 */
 }
 
-too_long_string()
+void
+too_long_string(void)
 {
 	char *q;
 	int i;
@@ -2475,6 +2524,7 @@ too_long_string()
 */
 }
 
+void
 extra_argument(c)
 int c;
 {
@@ -2491,6 +2541,7 @@ DEFVAR("*READ-BASE*",sLAread_baseA,LISP,make_fixnum(10),"");
 DEFVAR("*READ-SUPPRESS*",sLAread_suppressA,LISP,Cnil,"");
 
 
+void
 init_read()
 {
 	struct rtent *rtab;
@@ -2636,6 +2687,7 @@ init_read()
 */
 }
 
+void
 init_read_function()
 {
 	make_function("READ", Lread);
@@ -2682,7 +2734,6 @@ object in;
 {
 	int dimcount, dim;
 	object *vsp;		
-
 	VOL object x;
 	int i;
 	bool e;
@@ -2695,6 +2746,7 @@ object in;
 		old_sharp_eq_context[SHARP_EQ_CONTEXT_SIZE];
 	int old_backq_level;
 
+	vsp=(object *)&vsp;
 	old_READtable = READtable;
 	old_READdefault_float_format = READdefault_float_format;
 	old_READbase = READbase;

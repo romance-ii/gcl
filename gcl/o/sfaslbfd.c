@@ -35,10 +35,9 @@ License for more details.
 
 /* align for power of two n */
 static void *
-round_up(address,n)
-     unsigned long address,n;
+round_up(void *address, unsigned long n)
 {
- return  (void *)((address + n -1) & ~(n-1)) ;
+ return  (void *)(((unsigned long)address + n -1) & ~(n-1)) ;
 }
 #define ROUND_UP(a,b) round_up(a,b) 
 
@@ -171,7 +170,9 @@ fasload(object faslfile) {
   char filename[256];
   int init_address=-1;
   object memory;
-  long current = 0,max_align = 0;
+  int max_align=0;
+  void *current;
+  unsigned long curr_size;
   object *old_vs_base=vs_base;
   object *old_vs_top=vs_top;
   static int nbfd;
@@ -216,7 +217,7 @@ fasload(object faslfile) {
   if (!bfd_check_format(b,bfd_object))
     FEerror("Unknown bfd format");
   
-  current=0;
+  current=NULL;
   for (s=b->sections;s;s=s->next) {
 
     s->owner=b;
@@ -229,17 +230,18 @@ fasload(object faslfile) {
     if (max_align<s->alignment_power)
       max_align=s->alignment_power;
 
-    current=(long)round_up(current,1<<s->alignment_power);
+    current=round_up(current,1<<s->alignment_power);
 
     current+=s->_raw_size;
 
   }
+  curr_size=(unsigned long)current;
   max_align=1<<max_align;
 
   memory = alloc_object(t_cfdata);
   memory->cfd.cfd_self = 0;
   memory->cfd.cfd_start = 0;
-  memory->cfd.cfd_size = current + (max_align > sizeof(char *) ? max_align :0);
+  memory->cfd.cfd_size = curr_size + (max_align > sizeof(char *) ? max_align :0);
   
   memory->cfd.cfd_start=alloc_contblock(memory->cfd.cfd_size);
   the_start=start_address=memory->cfd.cfd_start;
@@ -331,7 +333,7 @@ fasload(object faslfile) {
   vs_top=old_vs_top;
   
   if(symbol_value(sLAload_verboseA)!=Cnil)
-    printf("start address -T %x ",memory->cfd.cfd_start);
+    printf("start address -T %p ",memory->cfd.cfd_start);
 
   return memory->cfd.cfd_size;
 

@@ -125,5 +125,5 @@ init_xdrfuns()
   
 }
 #else
-init_xdrfuns(){;}
+void init_xdrfuns(void) {;}
 #endif     

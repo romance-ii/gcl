@@ -99,7 +99,7 @@ int w32_socket_exit(void)
 #define BIND_ADDRESS_INCREMENT	16
 #define BIND_INITIAL_ADDRESS	5000
 #define BIND_LAST_ADDRESS	65534
-static iLastAddressUsed = BIND_INITIAL_ADDRESS;
+static unsigned int iLastAddressUsed = BIND_INITIAL_ADDRESS;
 
 DEFUN("OPEN-NAMED-SOCKET",object,fSopen_named_socket,SI,1,1,NONE,OI,OO,OO,OO,
 "Open a socket on PORT and return (cons fd portname) where file \
@@ -248,7 +248,7 @@ sock_hostname_to_hostid_list(host_name)
       
 
 DEFUN("HOSTNAME-TO-HOSTID",object,fShostname_to_hostid,SI,1,1,
-      NONE,OO,OO,OO,OO,"")(host)
+      NONE,OO,OO,OO,OO,"")(object host)
 {
   struct hostent *h;
   char buf[300];
@@ -308,26 +308,26 @@ sock_get_name(s)
 #include "comm.c"
 
 
-DEFUN("CONNECTION-STATE-FD",int,fSconnection_state_fd,SI,1,1,NONE,IO,OO,OO,OO,"") (sfd)
+DEFUN("CONNECTION-STATE-FD",object,fSconnection_state_fd,SI,1,1,NONE,OO,OO,OO,OO,"") (sfd)
      object sfd;
-{ return OBJ_TO_CONNECTION_STATE(sfd)->fd;
+{ return make_fixnum(OBJ_TO_CONNECTION_STATE(sfd)->fd);
 }
      
-DEFUN("OUR-WRITE",int,fSour_write,SI,3,3,NONE,IO,OI,OO,OO,"")
+DEFUN("OUR-WRITE",object,fSour_write,SI,3,3,NONE,OO,OI,OO,OO,"")
      (sfd,buffer,nbytes)
      object buffer;
      object sfd;
      int nbytes;
-{ return write1(OBJ_TO_CONNECTION_STATE(sfd),buffer->ust.ust_self,nbytes);
+{ return make_fixnum(write1(OBJ_TO_CONNECTION_STATE(sfd),buffer->ust.ust_self,nbytes));
 }
 
-DEFUN("OUR-READ-WITH-OFFSET",int,fSour_read_with_offset,SI,5,5,NONE,
-      IO,OI,II,OO,
+DEFUN("OUR-READ-WITH-OFFSET",object,fSour_read_with_offset,SI,5,5,NONE,
+      OO,OI,II,OO,
       "Read from STATE-FD into string BUFFER putting data at OFFSET and reading NBYTES, waiting for TIMEOUT before failing")
      (fd,buffer,offset,nbytes,timeout)
      int offset,nbytes,timeout;
      object buffer,fd;
-{ return read1(OBJ_TO_CONNECTION_STATE(fd),&((buffer)->ust.ust_self[offset]),nbytes,timeout);
+{ return make_fixnum(read1(OBJ_TO_CONNECTION_STATE(fd),&((buffer)->ust.ust_self[offset]),nbytes,timeout));
 }
 
 
@@ -355,7 +355,7 @@ enum print_arglist_codes {
 #define BEGIN_QUOTE '"'
 #define END_QUOTE '"'
 
-static needs_quoting[256];
+static int needs_quoting[256];
 
 DEFUN("PRINT-TO-STRING1",object,fSprint_to_string1,SI,3,3,NONE,OO,OO,OO,OO,
       "Print to STRING the object X according to CODE.   The string must have \
@@ -438,18 +438,18 @@ object the_code;
      while (--len>=0)
        { char c = *p++;
 	 c=tolower(c);
-	 if(needs_quoting[c])
+	 if(needs_quoting[(unsigned char)c])
 	   PUSH('\\');
 	 PUSH(c);}
      else
        while (--len>=0)
        { char c = *p++;
-	 if(needs_quoting[c])
+	 if(needs_quoting[(unsigned char)c])
 	   PUSH('\\');	 
 	 PUSH(c);}}
    break;
    case t_fixnum:
-     sprintf(buf,"%d",fix(x));
+     sprintf(buf,"%ld",fix(x));
      p = buf;
      while(*p) {PUSH(*p);p++;}
      break;
@@ -488,7 +488,7 @@ not_defined_for_os()
 DEFUN("SET-SIGIO-FOR-FD",object,fSset_sigio_for_fd,SI,1,1,NONE,OI,OO,OO,OO,"")
      (fd)
      int fd;
-{ int flags;
+{ 
   /* for the moment we will use SIGUSR1 to notify, instead of depending on SIGIO,
      since LINUX does not support the latter yet...
      So right  now this does nothing... 
@@ -527,7 +527,7 @@ and positioning the ouput/input to start at START and end at END")
   return strm;
 }
 
-DEFUN("CHECK-STATE-INPUT",int ,fScheck_state_input,SI,2,2,NONE,IO,IO,OO,OO,
+DEFUN("CHECK-STATE-INPUT",object,fScheck_state_input,SI,2,2,NONE,OO,IO,OO,OO,
       "") (osfd,timeout)
      object osfd;
      int timeout;
@@ -536,19 +536,19 @@ DEFUN("CHECK-STATE-INPUT",int ,fScheck_state_input,SI,2,2,NONE,IO,IO,OO,OO,
 
 }
 
-DEFUN("CLEAR-CONNECTION-STATE",int,fSclear_connection_state,
-      SI,1,1,NONE,IO,OO,OO,OO,
+DEFUN("CLEAR-CONNECTION-STATE",object,fSclear_connection_state,
+      SI,1,1,NONE,OO,OO,OO,OO,
       "Read on FD until nothing left to read.  Return number of bytes read")
      (osfd)
      object osfd;
 { 
   struct connection_state *sfd = OBJ_TO_CONNECTION_STATE(osfd);
- int n=fSclear_connection(sfd->fd);;
+  int n=fix(fSclear_connection(sfd->fd));
   
   sfd->valid_data = sfd->read_buffer;
   sfd->valid_data_size = 0;
   sfd->bytes_received_not_confirmed += n;
- return n;
+ return make_fixnum(n);
 }
 
 #endif

@@ -27,8 +27,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "num_include.h"
 
-object fixnum_add(i,j)
-     int i,j;
+object fixnum_add(int i, int j)
 {
 
   if (i>=0)
@@ -44,8 +43,7 @@ object fixnum_add(i,j)
    }
 }
 /* return i - j */
-object fixnum_sub(i,j)
-     int i,j;
+object fixnum_sub(int i, int j)
 {  
 
   if (i>=0)
@@ -62,16 +60,14 @@ object fixnum_sub(i,j)
 }
 
 object
-fixnum_times(i, j)
-int i, j;
+fixnum_times(int i, int j)
 {
 
   MPOP(return,mulss,i,j);
 }
 
 object
-number_to_complex(x)
-object x;
+number_to_complex(object x)
 {
 	object z;
 
@@ -92,16 +88,15 @@ object x;
 
 	default:
 		FEwrong_type_argument(sLnumber, x);
+		return(Cnil);
 	}
 }
 
 object
-number_plus(x, y)
-object x, y;
+number_plus(object x, object y)
 {
-	int i, j, k;
 	double dx, dy;
-	object z, z1;
+	object z;
 	switch (type_of(x)) {
 	case t_fixnum:
 		switch(type_of(y)) {
@@ -238,16 +233,15 @@ object x, y;
 
 	default:
 		FEwrong_type_argument(sLnumber, x);
+		return(Cnil);
 	}
 }
 
 object
-one_plus(x)
-object x;
+one_plus(object x)
 {
-	int i;
 	double dx;
-	object z, z1;
+	object z;
 
 	
 	switch (type_of(x)) {
@@ -278,22 +272,20 @@ object x;
 		return(z);
 
 	case t_complex:
-	COMPLEX:
 		z = make_complex(one_plus(x->cmp.cmp_real), x->cmp.cmp_imag);
 		return(z);
 
 	default:
 		FEwrong_type_argument(sLnumber, x);
+		return(Cnil);
 	}
 }
 
 object
-number_minus(x, y)
-object x, y;
+number_minus(object x, object y)
 {
-	int i, j, k;
 	double dx, dy;
-	object z, z1;
+	object z;
 
 	
 	switch (type_of(x)) {
@@ -430,16 +422,15 @@ object x, y;
 
 	default:
 		FEwrong_type_argument(sLnumber, x);
+		return(Cnil);
 	}
 }
 
 object
-one_minus(x)
-object x;
+one_minus(object x)
 {
-	int i;
 	double dx;
-	object z, z1;
+	object z;
 	switch (type_of(x)) {
 
 	case t_fixnum:
@@ -464,18 +455,17 @@ object x;
 		return(z);
 
 	case t_complex:
-	COMPLEX:
 		z = make_complex(one_minus(x->cmp.cmp_real), x->cmp.cmp_imag);
 		return(z);
 
 	default:
 		FEwrong_type_argument(sLnumber, x);
+		return(Cnil);
 	}
 }
 
 object
-number_negate(x)
-object x;
+number_negate(object x)
 {
 	object	z, z1;
 
@@ -512,12 +502,12 @@ object x;
 
 	default:
 		FEwrong_type_argument(sLnumber, x);
+		return(Cnil);
 	}
 }
 
 object
-number_times(x, y)
-object x, y;
+number_times(object x, object y)
 {  
 	object z;
 	double dx, dy;
@@ -662,12 +652,12 @@ object x, y;
 
 	default:
 		FEwrong_type_argument(sLnumber, x);
+		return(Cnil);
 	}
 }
 
 object
-number_divide(x, y)
-object x, y;
+number_divide(object x, object y)
 {
 	object z;
 	double dx, dy;
@@ -810,12 +800,12 @@ object x, y;
 
 	default:
 		FEwrong_type_argument(sLnumber, x);
+		return(Cnil);
 	}
 }
 
 object
-integer_divide1(x, y)
-object x, y;
+integer_divide1(object x, object y)
 {
 	object q, r;
 
@@ -824,8 +814,7 @@ object x, y;
 }
 
 object
-get_gcd(x, y)
-object	x, y;
+get_gcd(object x, object y)
 {
 	int	i, j, k;
 	object	q, r;
@@ -869,7 +858,8 @@ LL:
 }
 
 /* (+          )   */
-Lplus()
+void
+Lplus(void)
 {
         int i, j;
 	
@@ -885,7 +875,8 @@ Lplus()
 	vs_top = vs_base+1;
 }
 
-Lminus()
+void
+Lminus(void)
 {
 	int i, j;
 
@@ -903,7 +894,8 @@ Lminus()
 	vs_top = vs_base+1;
 }
 
-Ltimes()
+void
+Ltimes(void)
 {
 	int i, j;
 
@@ -919,7 +911,8 @@ Ltimes()
 	vs_top = vs_base+1;
 }
 
-Ldivide()
+void
+Ldivide(void)
 {
 	int i, j;
 
@@ -937,25 +930,26 @@ Ldivide()
 	vs_top = vs_base+1;
 }
 
-Lone_plus()
+void
+Lone_plus(void)
 {
-	object x;
 	
 	check_arg(1);
 	check_type_number(&vs_base[0]);
 	vs_base[0] = one_plus(vs_base[0]);
 }
 
-Lone_minus()
+void
+Lone_minus(void)
 {
-	object x;
 	
 	check_arg(1);
 	check_type_number(&vs_base[0]);
 	vs_base[0] = one_minus(vs_base[0]);
 }
 
-Lconjugate()
+void
+Lconjugate(void)
 {
 	object	c, i;
 
@@ -966,11 +960,12 @@ Lconjugate()
 		i = number_negate(c->cmp.cmp_imag);
 		vs_push(i);
 		vs_base[0] = make_complex(c->cmp.cmp_real, i);
-		vs_pop;
+		vs_popp;
 	}
 }
 
-Lgcd()
+void
+Lgcd(void)
 {
 	int i, narg;
 
@@ -991,7 +986,8 @@ Lgcd()
 	vs_top = vs_base+1;
 }
 
-Llcm()
+void
+Llcm(void)
 {
 	object t, g;
 	int i, narg;
@@ -1012,20 +1008,22 @@ Llcm()
 		g = get_gcd(vs_base[0], vs_base[i]);
 		vs_push(g);
 		vs_base[0] = number_divide(t, g);
-		vs_pop;
-		vs_pop;
+		vs_popp;
+		vs_popp;
 	}
 	if (number_minusp(vs_base[0]))
 		vs_base[0] = number_negate(vs_base[0]);
 	vs_top = vs_base+1;
 }
 
-zero_divisor()
+void
+zero_divisor(void)
 {
 	FEerror("Zero divisor.", 0);
 }
 
-init_num_arith()
+void
+init_num_arith(void)
 {
 	make_function("+", Lplus);
 	make_function("-", Lminus);

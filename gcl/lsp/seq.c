@@ -1,7 +1,7 @@
 
 #include "cmpinclude.h"
 #include "seq.h"
-init_seq(){do_init(VV);}
+void init_seq(){do_init(VV);}
 /*	local entry for function MAKE-SEQUENCE	*/
 
 static object LI1(V2,V1,va_alist)
@@ -14,13 +14,14 @@ static object LI1(V2,V1,va_alist)
 	register object V4;
 	register object V5;
 	object V6;
+	Vcs[0]=Vcs[0];
+	va_start(ap);
 	if(narg <2) too_few_arguments();
 	V3= V2;
 	V4= V1;
 	narg= narg - 2;
-	va_start(ap);
 	{
-	parse_key_new(narg,Vcs +2,&LI1key,ap);
+	parse_key_new(narg,Vcs +2,(struct key *)&LI1key,ap);
 	if(Vcs[2]==0){
 	V5= Cnil;
 	V6= Cnil;
@@ -43,6 +44,7 @@ static object LI1(V2,V1,va_alist)
 	vs_top=sup;
 	{object V9 = vs_base[0];
 	VMR1(V9)}
+goto T10;
 T10:;
 	base[0]= (V4);
 	vs_top=(vs_base=base+0)+1;
@@ -50,30 +52,37 @@ T10:;
 	vs_top=sup;
 	{object V10 = vs_base[0];
 	VMR1(V10)}
+goto T7;
 T7:;
 	if(((V3))==(VV[2])){
 	goto T16;}
 	if(!(((V3))==(VV[3]))){
 	goto T17;}
+goto T16;
 T16:;
 	V7= VV[4];
 	goto T5;
+goto T17;
 T17:;
 	if(((V3))==(VV[5])){
 	goto T21;}
 	if(!(((V3))==(VV[6]))){
 	goto T22;}
+goto T21;
 T21:;
 	V7= VV[7];
 	goto T5;
+goto T22;
 T22:;
 	if(((V3))==(VV[8])){
 	goto T26;}
 	if(!(((V3))==(VV[9]))){
 	goto T27;}
+goto T26;
 T26:;
 	V7= Ct;
 	goto T5;
+goto T27;
 T27:;
 	V3= (*(LnkLI13))((V3));
 	if(!((car((V3)))==(VV[0]))){
@@ -88,6 +97,7 @@ T27:;
 	vs_top=sup;
 	{object V11 = vs_base[0];
 	VMR1(V11)}
+goto T37;
 T37:;
 	base[0]= (V4);
 	vs_top=(vs_base=base+0)+1;
@@ -95,6 +105,7 @@ T37:;
 	vs_top=sup;
 	{object V12 = vs_base[0];
 	VMR1(V12)}
+goto T33;
 T33:;
 	if((car((V3)))==(VV[10])){
 	goto T43;}
@@ -105,13 +116,16 @@ T33:;
 	vs_top=(vs_base=base+0)+2;
 	Lerror();
 	vs_top=sup;
+goto T43;
 T43:;{object V13;
 	V13= cadr((V3));
 	if(V13==Cnil)goto T50;
 	V7= V13;
 	goto T5;
+goto T50;
 T50:;}
 	V7= Ct;
+goto T5;
 T5:;
 	V7= (*(LnkLI14))((V7));
 	base[0]= (V7);
@@ -131,17 +145,23 @@ T5:;
 	register long V15;
 	V14= 0;
 	V15= fix((V4));
+goto T69;
 T69:;
 	if(!((V14)>=(V15))){
 	goto T70;}
 	goto T63;
+goto T70;
 T70:;
 	(void)(elt_set((V8),V14,(V5)));
 	V14= (V14)+1;
 	goto T69;}
+goto T63;
 T63:;
 	{object V16 = (V8);
-	VMR1(V16)}}}
+	VMR1(V16)}}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}}
 /*	local entry for function CONCATENATE	*/
 
@@ -153,10 +173,11 @@ static object LI2(V17,va_alist)
 	int narg = VFUN_NARGS; VMB2 VMS2 VMV2
 	{object V18;
 	object V19;
+	Vcs[0]=Vcs[0];
+	va_start(ap);
 	if(narg <1) too_few_arguments();
 	V18= V17;
 	narg= narg - 1;
-	va_start(ap);
 	V20 = list_vector(narg,ap);
 	V19= V20;
 	{register object V21;
@@ -169,6 +190,7 @@ static object LI2(V17,va_alist)
 	V25= Cnil;
 	goto T80;}
 	base[0]=V26=MMcons(Cnil,Cnil);
+goto T81;
 T81:;
 	base[1]= (V27->c.c_car);
 	vs_top=(vs_base=base+1)+1;
@@ -180,6 +202,7 @@ T81:;
 	goto T80;}
 	V26=MMcdr(V26)=MMcons(Cnil,Cnil);
 	goto T81;}
+goto T80;
 T80:;
 	 vs_top=base+0;
 	 while(!endp(V25))
@@ -191,29 +214,37 @@ T80:;
 	V21= (VFUN_NARGS=2,(*(LnkLI15))((V18),V24));
 	V23= 0;
 	V22= (V19);
+goto T86;
 T86:;
 	if(((V22))!=Cnil){
 	goto T87;}
 	{object V28 = (V21);
 	VMR2(V28)}
+goto T87;
 T87:;
 	{register long V29;
 	register long V30;
 	V29= 0;
 	V30= length(car((V22)));
+goto T95;
 T95:;
 	if(!((V29)>=(V30))){
 	goto T96;}
 	goto T91;
+goto T96;
 T96:;
 	V31= elt(car((V22)),V29);
 	(void)(elt_set((V21),V23,/* INLINE-ARGS */V31));
 	V23= (V23)+(1);
 	V29= (V29)+1;
 	goto T95;}
+goto T91;
 T91:;
 	V22= cdr((V22));
-	goto T86;}}
+	goto T86;}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}
 /*	local entry for function MAP	*/
 
@@ -227,12 +258,13 @@ static object LI3(V34,V33,V32,va_alist)
 	register object V36;
 	object V37;
 	register object V38;
+	Vcs[0]=Vcs[0];
+	va_start(ap);
 	if(narg <3) too_few_arguments();
 	V35= V34;
 	V36= V33;
 	V37= V32;
 	narg= narg - 3;
-	va_start(ap);
 	V39 = list_vector(narg,ap);
 	V38= V39;
 	V38= make_cons((V37),(V38));
@@ -244,6 +276,7 @@ static object LI3(V34,V33,V32,va_alist)
 	V41= Cnil;
 	goto T112;}
 	base[0]=V42=MMcons(Cnil,Cnil);
+goto T113;
 T113:;
 	base[1]= (V43->c.c_car);
 	vs_top=(vs_base=base+1)+1;
@@ -255,6 +288,7 @@ T113:;
 	goto T112;}
 	V42=MMcdr(V42)=MMcons(Cnil,Cnil);
 	goto T113;}
+goto T112;
 T112:;
 	 vs_top=base+0;
 	 while(!endp(V41))
@@ -269,11 +303,13 @@ T112:;
 	long V45;
 	V44= 0;
 	V45= fix((V40));
+goto T122;
 T122:;
 	if(!((V44)>=(V45))){
 	goto T123;}
 	{object V46 = Cnil;
 	VMR3(V46)}
+goto T123;
 T123:;
 	base[0]= (V36);
 	{object V47;
@@ -283,6 +319,7 @@ T123:;
 	V47= Cnil;
 	goto T129;}
 	base[1]=V48=MMcons(Cnil,Cnil);
+goto T130;
 T130:;
 	{register object V50;
 	V50= (V49->c.c_car);
@@ -292,6 +329,7 @@ T130:;
 	goto T129;}
 	V48=MMcdr(V48)=MMcons(Cnil,Cnil);
 	goto T130;}
+goto T129;
 T129:;
 	 vs_top=base+1;
 	 while(!endp(V47))
@@ -301,6 +339,7 @@ T129:;
 	vs_top=sup;
 	V44= (V44)+1;
 	goto T122;}
+goto T117;
 T117:;
 	{register object V51;
 	V51= (VFUN_NARGS=2,(*(LnkLI15))((V35),(V40)));
@@ -308,11 +347,13 @@ T117:;
 	long V53;
 	V52= 0;
 	V53= fix((V40));
+goto T139;
 T139:;
 	if(!((V52)>=(V53))){
 	goto T140;}
 	{object V54 = (V51);
 	VMR3(V54)}
+goto T140;
 T140:;
 	base[0]= (V36);
 	{object V56;
@@ -322,6 +363,7 @@ T140:;
 	V56= Cnil;
 	goto T147;}
 	base[1]=V57=MMcons(Cnil,Cnil);
+goto T148;
 T148:;
 	{register object V59;
 	V59= (V58->c.c_car);
@@ -331,6 +373,7 @@ T148:;
 	goto T147;}
 	V57=MMcdr(V57)=MMcons(Cnil,Cnil);
 	goto T148;}
+goto T147;
 T147:;
 	 vs_top=base+1;
 	 while(!endp(V56))
@@ -341,7 +384,10 @@ T147:;
 	V55= vs_base[0];
 	(void)(elt_set((V51),V52,V55));
 	V52= (V52)+1;
-	goto T139;}}}}
+	goto T139;}}}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}
 /*	local entry for function SOME	*/
 
@@ -354,11 +400,12 @@ static object LI4(V61,V60,va_alist)
 	{register object V62;
 	object V63;
 	register object V64;
+	Vcs[0]=Vcs[0];
+	va_start(ap);
 	if(narg <2) too_few_arguments();
 	V62= V61;
 	V63= V60;
 	narg= narg - 2;
-	va_start(ap);
 	V65 = list_vector(narg,ap);
 	V64= V65;
 	V64= make_cons((V63),(V64));
@@ -372,6 +419,7 @@ static object LI4(V61,V60,va_alist)
 	V68= Cnil;
 	goto T157;}
 	base[0]=V69=MMcons(Cnil,Cnil);
+goto T158;
 T158:;
 	base[1]= (V70->c.c_car);
 	vs_top=(vs_base=base+1)+1;
@@ -383,6 +431,7 @@ T158:;
 	goto T157;}
 	V69=MMcdr(V69)=MMcons(Cnil,Cnil);
 	goto T158;}
+goto T157;
 T157:;
 	 vs_top=base+0;
 	 while(!endp(V68))
@@ -391,11 +440,13 @@ T157:;
 	Lmin();
 	vs_top=sup;
 	V67= fix(vs_base[0]);
+goto T162;
 T162:;
 	if(!((V66)>=(V67))){
 	goto T163;}
 	{object V71 = Cnil;
 	VMR4(V71)}
+goto T163;
 T163:;
 	{register object V72;
 	base[0]= (V62);
@@ -406,6 +457,7 @@ T163:;
 	V73= Cnil;
 	goto T170;}
 	base[1]=V74=MMcons(Cnil,Cnil);
+goto T171;
 T171:;
 	{register object V76;
 	V76= (V75->c.c_car);
@@ -415,6 +467,7 @@ T171:;
 	goto T170;}
 	V74=MMcdr(V74)=MMcons(Cnil,Cnil);
 	goto T171;}
+goto T170;
 T170:;
 	 vs_top=base+1;
 	 while(!endp(V73))
@@ -427,9 +480,13 @@ T170:;
 	goto T167;}
 	{object V77 = (V72);
 	VMR4(V77)}}
+goto T167;
 T167:;
 	V66= (V66)+1;
-	goto T162;}}
+	goto T162;}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}
 /*	local entry for function EVERY	*/
 
@@ -442,11 +499,12 @@ static object LI5(V79,V78,va_alist)
 	{register object V80;
 	object V81;
 	register object V82;
+	Vcs[0]=Vcs[0];
+	va_start(ap);
 	if(narg <2) too_few_arguments();
 	V80= V79;
 	V81= V78;
 	narg= narg - 2;
-	va_start(ap);
 	V83 = list_vector(narg,ap);
 	V82= V83;
 	V82= make_cons((V81),(V82));
@@ -460,6 +518,7 @@ static object LI5(V79,V78,va_alist)
 	V86= Cnil;
 	goto T182;}
 	base[0]=V87=MMcons(Cnil,Cnil);
+goto T183;
 T183:;
 	base[1]= (V88->c.c_car);
 	vs_top=(vs_base=base+1)+1;
@@ -471,6 +530,7 @@ T183:;
 	goto T182;}
 	V87=MMcdr(V87)=MMcons(Cnil,Cnil);
 	goto T183;}
+goto T182;
 T182:;
 	 vs_top=base+0;
 	 while(!endp(V86))
@@ -479,11 +539,13 @@ T182:;
 	Lmin();
 	vs_top=sup;
 	V85= fix(vs_base[0]);
+goto T187;
 T187:;
 	if(!((V84)>=(V85))){
 	goto T188;}
 	{object V89 = Ct;
 	VMR5(V89)}
+goto T188;
 T188:;
 	base[0]= (V80);
 	{object V90;
@@ -493,6 +555,7 @@ T188:;
 	V90= Cnil;
 	goto T196;}
 	base[1]=V91=MMcons(Cnil,Cnil);
+goto T197;
 T197:;
 	{register object V93;
 	V93= (V92->c.c_car);
@@ -502,6 +565,7 @@ T197:;
 	goto T196;}
 	V91=MMcdr(V91)=MMcons(Cnil,Cnil);
 	goto T197;}
+goto T196;
 T196:;
 	 vs_top=base+1;
 	 while(!endp(V90))
@@ -513,9 +577,13 @@ T196:;
 	goto T192;}
 	{object V94 = Cnil;
 	VMR5(V94)}
+goto T192;
 T192:;
 	V84= (V84)+1;
-	goto T187;}}
+	goto T187;}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}
 /*	local entry for function NOTANY	*/
 
@@ -528,11 +596,12 @@ static object LI6(V96,V95,va_alist)
 	{object V97;
 	object V98;
 	object V99;
+	Vcs[0]=Vcs[0];
+	va_start(ap);
 	if(narg <2) too_few_arguments();
 	V97= V96;
 	V98= V95;
 	narg= narg - 2;
-	va_start(ap);
 	V100 = list_vector(narg,ap);
 	V99= V100;
 	base[0]= (V97);
@@ -547,7 +616,10 @@ static object LI6(V96,V95,va_alist)
 	vs_top=sup;
 	V101= vs_base[0];
 	{object V103 = ((V101)==Cnil?Ct:Cnil);
-	VMR6(V103)}}
+	VMR6(V103)}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}
 /*	local entry for function NOTEVERY	*/
 
@@ -560,11 +632,12 @@ static object LI7(V105,V104,va_alist)
 	{object V106;
 	object V107;
 	object V108;
+	Vcs[0]=Vcs[0];
+	va_start(ap);
 	if(narg <2) too_few_arguments();
 	V106= V105;
 	V107= V104;
 	narg= narg - 2;
-	va_start(ap);
 	V109 = list_vector(narg,ap);
 	V108= V109;
 	base[0]= (V106);
@@ -579,13 +652,16 @@ static object LI7(V105,V104,va_alist)
 	vs_top=sup;
 	V110= vs_base[0];
 	{object V112 = ((V110)==Cnil?Ct:Cnil);
-	VMR7(V112)}}
+	VMR7(V112)}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}
-static LnkT17(){ call_or_link(VV[17],&Lnk17);} /* EVERY */
-static LnkT16(){ call_or_link(VV[16],&Lnk16);} /* SOME */
-static object  LnkTLI15(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[15],&LnkLI15,ap);} /* MAKE-SEQUENCE */
-static object  LnkTLI14(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[14],&LnkLI14,1,ap);} /* BEST-ARRAY-ELEMENT-TYPE */
-static object  LnkTLI13(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[13],&LnkLI13,1,ap);} /* NORMALIZE-TYPE */
+static void LnkT17(){ call_or_link(VV[17],(void **)&Lnk17);} /* EVERY */
+static void LnkT16(){ call_or_link(VV[16],(void **)&Lnk16);} /* SOME */
+static object  LnkTLI15(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[15],(void **)&LnkLI15,ap);} /* MAKE-SEQUENCE */
+static object  LnkTLI14(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[14],(void **)&LnkLI14,1,ap);} /* BEST-ARRAY-ELEMENT-TYPE */
+static object  LnkTLI13(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[13],(void **)&LnkLI13,1,ap);} /* NORMALIZE-TYPE */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

@@ -44,7 +44,7 @@ object host, device, directory, name, type, version;
 	return(x);
 }
 
-static
+static void
 make_one(s, end)
 char *s;
 int end;
@@ -226,7 +226,6 @@ L:
 	vs_reset;
 	return(x);
 
-NO:
 	*ep = i;
 	vs_reset;
 	return(OBJNULL);
@@ -276,6 +275,7 @@ L:
 	default:
 	CANNOT_COERCE:
 		FEerror("~S cannot be coerced to a pathname.", 1, x);
+		return(Cnil);
 	}
 }
 
@@ -445,8 +445,6 @@ object
 coerce_to_namestring(x)
 object x;
 {
-	object y;
-	int e;
 
 L:
 	switch (type_of(x)) {
@@ -493,10 +491,12 @@ L:
 	default:
 	CANNOT_COERCE:
 		FEerror("~S cannot be coerced to a namestring.", 1, x);
+		return(Cnil);
 	}
 }
 
-Lpathname()
+void
+Lpathname(void)
 {
 	check_arg(1);
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
@@ -618,7 +618,8 @@ from ~S to ~S.",
 	@(return x)
 @)
 
-Lpathnamep()
+void
+Lpathnamep(void)
 {
 	check_arg(1);
 
@@ -628,7 +629,8 @@ Lpathnamep()
 		vs_base[0] = Cnil;
 }
 
-Lpathname_host()
+void
+Lpathname_host(void)
 {
 	check_arg(1);
 
@@ -637,7 +639,8 @@ Lpathname_host()
 	vs_base[0] = vs_base[0]->pn.pn_host;
 }
 
-Lpathname_device()
+void
+Lpathname_device(void)
 {
 	check_arg(1);
 
@@ -646,7 +649,8 @@ Lpathname_device()
 	vs_base[0] = vs_base[0]->pn.pn_device;
 }
 
-Lpathname_directory()
+void
+Lpathname_directory(void)
 {
 	check_arg(1);
 
@@ -655,7 +659,8 @@ Lpathname_directory()
 	vs_base[0] = vs_base[0]->pn.pn_directory;
 }
 
-Lpathname_name()
+void
+Lpathname_name(void)
 {
 	check_arg(1);
 
@@ -664,7 +669,8 @@ Lpathname_name()
 	vs_base[0] = vs_base[0]->pn.pn_name;
 }
 
-Lpathname_type()
+void
+Lpathname_type(void)
 {
 	check_arg(1);
 
@@ -673,7 +679,8 @@ Lpathname_type()
 	vs_base[0] = vs_base[0]->pn.pn_type;
 }
 
-Lpathname_version()
+void
+Lpathname_version(void)
 {
 	check_arg(1);
 
@@ -682,7 +689,8 @@ Lpathname_version()
 	vs_base[0] = vs_base[0]->pn.pn_version;
 }
 
-Lnamestring()
+void
+Lnamestring(void)
 {
 	check_arg(1);
 
@@ -690,7 +698,8 @@ Lnamestring()
 	vs_base[0] = coerce_to_namestring(vs_base[0]);
 }
 
-Lfile_namestring()
+void
+Lfile_namestring(void)
 {
 	check_arg(1);
 
@@ -704,7 +713,8 @@ Lfile_namestring()
 	vs_base[0] = namestring(vs_base[0]);
 }
 
-Ldirectory_namestring()
+void
+Ldirectory_namestring(void)
 {
 	check_arg(1);
 
@@ -717,7 +727,8 @@ Ldirectory_namestring()
 	vs_base[0] = namestring(vs_base[0]);
 }
 
-Lhost_namestring()
+void
+Lhost_namestring(void)
 {
 	check_arg(1);
 
@@ -754,7 +765,8 @@ Lhost_namestring()
 	@(return `namestring(path)`)
 @)
 
-init_pathname()
+void
+init_pathname(void)
 {
 	Vdefault_pathname_defaults =
 	make_special("*DEFAULT-PATHNAME-DEFAULTS*",
@@ -781,6 +793,7 @@ init_pathname()
 	sKper = make_keyword("PER");
 }
 
+void
 init_pathname_function()
 {
 	make_function("PATHNAME", Lpathname);

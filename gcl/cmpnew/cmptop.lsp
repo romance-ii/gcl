@@ -227,7 +227,7 @@
   (setq *top-level-forms* (reverse *top-level-forms*))
 
   ;;; Initialization function.
-  (wt-nl1     "init_" name "(){"
+  (wt-nl1     "void init_" name "(){"
 	      #+sgi3d "Init_Links ();"
 	       "do_init(VV);"
 	      "}")
@@ -266,14 +266,14 @@
 	   )
   #+sgi3d
   (progn
-    (wt-nl1 "" "static Init_Links () {")
+    (wt-nl1 "" "static void Init_Links () {")
     (dolist* (x *function-links*)
 	     (let ((num (second x)))
 	       (wt-nl "Lnk" num " = LnkT" num ";")))
     (wt-nl1 "}"))
 
   ;;; Declarations in h-file.
-  (dolist* (fun *closures*) (wt-h "static LC" (fun-cfun fun) "();"))
+  (dolist* (fun *closures*) (wt-h "static void LC" (fun-cfun fun) "();"))
   (dolist* (x *reservations*)
            (wt-h "#define VM" (car x) " " (cdr x)))
 
@@ -315,9 +315,9 @@
 		  (t
 		   (setq type (if type (Rep-type type) ""))))
 
-	    (wt-h "static " type " LnkT" num "() ;") ;initial function.
-   #-sgi3d    (wt-h "static "  type " (*Lnk" num ")() = LnkT" num ";")
-   #+sgi3d    (wt-h "static "  type " (*Lnk" num ")();")))
+	    (wt-h "static " (if (equal type "") "void" type) " LnkT" num "() ;") ;initial function.
+   #-sgi3d    (wt-h "static "  (if (equal type "") "void" type) " (*Lnk" num ")() = LnkT" num ";")
+   #+sgi3d    (wt-h "static "  (if (equal type "") "void" type) " (*Lnk" num ")();")))
   )
 
 
@@ -620,7 +620,7 @@
 				       (maxargs (lambda-list lambda-expr))))
 		   ))))
 	((numberp cfun)
-         (wt-h "static L" cfun "();")
+         (wt-h "static void L" cfun "();")
 	 (add-init `(si::mf ',fname ,(add-address "L" cfun)) ))
         (t (wt-h cfun "();")
 	   (add-init `(si::mf ',fname ,(add-address "" cfun )) )))
@@ -713,7 +713,7 @@
               (when *compiler-push-events* (wt-nl "ihs_check;"))
               (when *tail-recursion-info*
                     (push 'tail-recursion-mark *unwind-exit*)
-                    (wt-nl1 "TTL:;"))
+                    (wt-nl1 "goto TTL;") (wt-nl1 "TTL:;"))
               (dolist
                 (v specials)
 	          (wt-nl "bds_bind(VV[" (cdr v)"],V" (var-loc (car v))");")
@@ -722,6 +722,12 @@
 		  (setf (var-loc (car v)) (cdr v)))
               (c2expr (caddr (cddr lambda-expr)))
               
+;;; Use base if defined for lint
+	      (if (and (zerop *max-vs*) (not *sup-used*) (not *base-used*)) t (wt-nl "base[0]=base[0];"))
+
+;;; Make sure to return object if necessary
+	      (if (equal "object " (rep-type (caddr inline-info))) (wt-nl "return Cnil;"))
+
               (wt-nl1 "}")
 	      (wt-V*-macros cm (caddr inline-info))
          ))
@@ -811,6 +817,13 @@
 		    (when (cadddr kwd) (do-decl (cadddr kwd))))
 	  )
 
+  ;;; Use Vcs for lint
+    (if *vararg-use-vs* t (progn (wt-nl "Vcs[0]=Vcs[0];")))
+
+  ;;; start va_list at beginning
+    (if (or (ll-optionals ll) (ll-rest ll) (ll-keywords-p ll))
+	(unless va-start (setq va-start t) (wt-nl "va_start(ap);")))
+      
   ;;; Check arguments.
     (when (and (or *safe-compile* *compiler-check-args*) (car ll))
 	  (wt-nl "if(narg <" (length (car ll))
@@ -834,73 +847,73 @@
 	 (vl (car ll) (cdr vl)))
 	((null v))
 	(c2bind-loc (car vl) (car v)))
-   (when (ll-optionals ll)
-	 (let ((*clink* *clink*)
-	       (*unwind-exit* *unwind-exit*)
-	       (*ccb-vs* *ccb-vs*))
-	   (wt-nl "narg = narg - " (length reqs) ";")
-    (dolist** (opt (ll-optionals ll))
-     (push (next-label) labels)
-     (wt-nl "if (" (if (cdr labels) "--" "") "narg <= 0) ")
-     (wt-go (car labels))
-     (wt-nl "else {" )
-     (unless va-start (setq va-start t) (wt-nl "va_start(ap);"))
-     (c2bind-loc (car opt) (list 'next-var-arg))
-     (wt "}")
-     (when (caddr opt) (c2bind-loc (caddr opt) t))))
-	 (setq labels (nreverse labels))
-
-    (let ((label (next-label)))
-             (wt-nl "--narg; ")
-             (wt-go label)
-
+    (when (ll-optionals ll)
+      (let ((*clink* *clink*)
+	    (*unwind-exit* *unwind-exit*)
+	    (*ccb-vs* *ccb-vs*))
+	(wt-nl "narg = narg - " (length reqs) ";")
+	(dolist** (opt (ll-optionals ll))
+		  (push (next-label) labels)
+		  (wt-nl "if (" (if (cdr labels) "--" "") "narg <= 0) ")
+		  (wt-go (car labels))
+		  (wt-nl "else {" )
+		  (unless va-start (setq va-start t) (wt-nl "va_start(ap);"))
+		  (c2bind-loc (car opt) (list 'next-var-arg))
+		  (wt "}")
+		  (when (caddr opt) (c2bind-loc (caddr opt) t))))
+      (setq labels (nreverse labels))
+      
+      (let ((label (next-label)))
+	(wt-nl "--narg; ")
+	(wt-go label)
+	
              ;;; Bind unspecified optional parameters.
-
-             (dolist** (opt (ll-optionals ll))
-                       (wt-label (car labels))
-                       (pop labels)
-                       (c2bind-init (car opt) (cadr opt))
-                       (when (caddr opt) (c2bind-loc (caddr opt) nil)))
-;	     (if (or (ll-rest ll)(ll-keywords-p ll))(wt-nl "narg=0;"))
-
-             (wt-label label)
-             ))
-   (if (ll-rest ll)
-       (progn
-	 (setq rest-var (cs-push))
-	 (cond ((ll-optionals ll))
-	       (t (wt-nl "narg= narg - " (length (car ll)) ";")))
-	 (unless va-start (setq va-start t) (wt-nl "va_start(ap);"))
-	 (wt-nl "V" rest-var " = ")
-	 
-	 (let ((*rest-on-stack*
-		(or (eq (var-type (ll-rest ll)) :dynamic-extent)
-		    *rest-on-stack*)))
-	   (if (ll-keywords-p ll)
-	     (cond (*rest-on-stack*
-		    (wt "(ALLOCA_CONS(narg),ON_STACK_MAKE_LIST(narg));"))
-		   (t (wt "make_list(narg);")))
-	     (cond (*rest-on-stack*
-		    (wt "(ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR(narg,ap));"
-			))
-		   (t  (wt "list_vector(narg,ap);"))))
-	   (c2bind-loc (ll-rest ll) (list 'cvar rest-var)))))
-   (when (ll-keywords-p ll)
-	 (cond ((ll-rest ll))
-	       ((ll-optionals ll))
-	       (t (wt-nl "narg= narg - " (length (car ll)) ";")))
-		
-	 (unless va-start (setq va-start t) (wt-nl "va_start(ap);"))
-	 (setq deflt (mapcar 'caddr (ll-keywords ll)))
-	 (let ((vkdefaults nil)
-	       (n (length (ll-keywords ll))))
-	 (do* ((v deflt (cdr v))
+	
+	(dolist** (opt (ll-optionals ll))
+		  (wt-label (car labels))
+		  (pop labels)
+		  (c2bind-init (car opt) (cadr opt))
+		  (when (caddr opt) (c2bind-loc (caddr opt) nil)))
+					;	     (if (or (ll-rest ll)(ll-keywords-p ll))(wt-nl "narg=0;"))
+	
+	(wt-label label)
+	))
+    (if (ll-rest ll)
+	(progn
+	  (setq rest-var (cs-push))
+	  (cond ((ll-optionals ll))
+		(t (wt-nl "narg= narg - " (length (car ll)) ";")))
+	  (unless va-start (setq va-start t) (wt-nl "va_start(ap);"))
+	  (wt-nl "V" rest-var " = ")
+	  
+	  (let ((*rest-on-stack*
+		 (or (eq (var-type (ll-rest ll)) :dynamic-extent)
+		     *rest-on-stack*)))
+	    (if (ll-keywords-p ll)
+		(cond (*rest-on-stack*
+		       (wt "(ALLOCA_CONS(narg),ON_STACK_MAKE_LIST(narg));"))
+		      (t (wt "make_list(narg);")))
+	      (cond (*rest-on-stack*
+		     (wt "(ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR(narg,ap));"
+			 ))
+		    (t  (wt "list_vector(narg,ap);"))))
+	    (c2bind-loc (ll-rest ll) (list 'cvar rest-var)))))
+    (when (ll-keywords-p ll)
+      (cond ((ll-rest ll))
+	    ((ll-optionals ll))
+	    (t (wt-nl "narg= narg - " (length (car ll)) ";")))
+      
+      (unless va-start (setq va-start t) (wt-nl "va_start(ap);"))
+      (setq deflt (mapcar 'caddr (ll-keywords ll)))
+      (let ((vkdefaults nil)
+	    (n (length (ll-keywords ll))))
+	(do* ((v deflt (cdr v))
 	      (kwds (ll-keywords ll) (cdr kwds))
 	      (kwd (car kwds) (car kwds)))
 	     ((null v))
 	     (unless (and (eq (caar v)  'location)
 			  (eq (third (car v)) nil))
-		     (setq vkdefaults t))
+	       (setq vkdefaults t))
 	     (when (or (not (and (eq (caar v) 'location)
 				 (let ((tem (third (car v))))
 				   (or (eq tem nil)
@@ -910,106 +923,117 @@
 					    )))))
 		       ;; the supplied-p variable is not there
 		       (not (eq (var-kind (cadddr kwd)) 'DUMMY)))
-		   (setf Vkdefaults t)
-		   (setf (car v) 0)))
-	 (if (> (length deflt) 15) (setq vkdefaults t))
-
-	 (wt-nl "{")
-	 (inc-inline-blocks)
-	 (let ((*compiler-output1* *compiler-output2*))
-	   (when vkdefaults
-		 (terpri *compiler-output2*)
-		 (wt "static object VK" cfun
-			"defaults[" (length deflt) "]={")
-		 (do ((v deflt(cdr v))(tem))
-		     ((null v))
-		    (wt "(void *)")
-		     (cond ((eql (car v) 0)
-			    (wt "-1"))
-			   ;; must be location
-			   ((and (eq (setq tem (third (car v))) nil))
-			    (wt "-2"))
-			   ((and (consp tem) (eq (car tem) 'vv))
-			    (wt  (second tem) ))
-			   ((and (consp tem) (eq (car tem) 'fixnum-value))
-			    (wt (add-object(third tem)) ))
-			   (t (baboon)))
-			      
-		     (if (cdr v) (wt ",")))
-		 (wt "};"))
-	   (terpri *compiler-output2*)
-	   (wt "static struct { short n,allow_other_keys;"
-		  "object *defaults;")
-	   (wt-nl " KEYTYPE keys[" (max n 1) "];")
-	   (wt "} LI"cfun "key=")
+	       (setf Vkdefaults t)
+	       (setf (car v) 0)))
+	(if (> (length deflt) 15) (setq vkdefaults t))
+	
+	(wt-nl "{")
+	(inc-inline-blocks)
+	(let ((*compiler-output1* *compiler-output2*))
+	  (when vkdefaults
+	    (terpri *compiler-output2*)
+	    (wt "static object VK" cfun
+		"defaults[" (length deflt) "]={")
+	    (do ((v deflt(cdr v))(tem))
+		((null v))
+		(wt "(void *)")
+		(cond ((eql (car v) 0)
+		       (wt "-1"))
+		      ;; must be location
+		      ((and (eq (setq tem (third (car v))) nil))
+		       (wt "-2"))
+		      ((and (consp tem) (eq (car tem) 'vv))
+		       (wt  (second tem) ))
+		      ((and (consp tem) (eq (car tem) 'fixnum-value))
+		       (wt (add-object(third tem)) ))
+		      (t (baboon)))
 		
-	   (wt "{" (length (ll-keywords ll)) ","
-	       (if (ll-allow-other-keys ll) 1 0)
-	       ",")
-	   (if vkdefaults (wt "VK" cfun "defaults")
-	     (wt "Cstd_key_defaults"))
-	   (when (ll-keywords ll)
-		 (wt ",{")
-		 (do ((v (reverse (ll-keywords ll)) (cdr v)))
-		     ((null v))
-		     ;; We write this list backwards for convenience
-		     ;; in stepping through it in parse_key
-		     (wt "(void *)")
-		     (wt  (add-symbol (caar v))  )
-		     (if (cdr v) (wt ",")))
-		 (wt "}"))
-	   (wt "};")
-	   )
-	 (cond ((ll-rest ll)
-		(wt-nl "parse_key_rest(" (list 'cvar rest-var) ","))
-	       (t (wt-nl "parse_key_new(")))
-	 (if (eql 0 *cs*)(setq *cs* 1))
-	 (wt "narg," (if *vararg-use-vs* "base " "Vcs ")
-	     "+" key-offset",&LI" cfun "key,ap);")
-       
-       ))
+		(if (cdr v) (wt ",")))
+	    (wt "};"))
+	  (terpri *compiler-output2*)
+	  (wt "static struct { short n,allow_other_keys;"
+	      "object *defaults;")
+	  (wt-nl " KEYTYPE keys[" (max n 1) "];")
+	  (wt "} LI"cfun "key=")
+	  
+	  (wt "{" (length (ll-keywords ll)) ","
+	      (if (ll-allow-other-keys ll) 1 0)
+	      ",")
+	  (if vkdefaults (wt "VK" cfun "defaults")
+	    (wt "Cstd_key_defaults"))
+	  (when (ll-keywords ll)
+	    (wt ",{")
+	    (do ((v (reverse (ll-keywords ll)) (cdr v)))
+		((null v))
+		;; We write this list backwards for convenience
+		;; in stepping through it in parse_key
+		(wt "(void *)")
+		(wt  (add-symbol (caar v))  )
+		(if (cdr v) (wt ",")))
+	    (wt "}"))
+	  (wt "};")
+	  )
+	(cond ((ll-rest ll)
+	       (wt-nl "parse_key_rest(" (list 'cvar rest-var) ","))
+	      (t (wt-nl "parse_key_new(")))
+	(if (eql 0 *cs*)(setq *cs* 1))
+	(wt "narg," (if *vararg-use-vs* "base " "Vcs ")
+	    "+" key-offset",(struct key *)&LI" cfun "key,ap);")
+	
+	))
+    
+    
+    
+    ;; bind keywords
+    
+    (dolist** (kwd (ll-keywords ll))
+	      (cond ((not (eql 0 (pop deflt)))
+		     ;; keyword default bound by parse_key.. and no supplied-p
+		     (c2bind (cadr kwd)))
+		    (t
+		     (wt-nl "if(") (wt-vs (var-ref (cadr kwd))) (wt "==0){")
+		     (let ((*clink* *clink*)
+			   (*unwind-exit* *unwind-exit*)
+			   (*ccb-vs* *ccb-vs*))
+		       (c2bind-init (cadr kwd) (caddr kwd)))
+		     (unless (eq (var-kind (cadddr kwd)) 'DUMMY) (c2bind-loc (cadddr kwd) nil))
+		     
+		     (wt-nl "}else{")
+		     (c2bind (cadr kwd))
+		     (unless (eq (var-kind (cadddr kwd)) 'DUMMY) (c2bind-loc (cadddr kwd)
+									     t))
+		     
+		     (wt "}")))
+	      
+	      
+	      
+	      )
 
+    (when *tail-recursion-info*
+      (push 'tail-recursion-mark *unwind-exit*)
+      (wt-nl1 "goto TTL;") (wt-nl1 "TTL:;"))
+    (c2expr (caddr (cddr lambda-expr)))
+    
+    ;;; End va_list at function end
 
+    (when va-start (setq va-start nil) (wt-nl "va_end(ap);"))
 
-   ;; bind keywords
+;;; Use base if defined for lint
+    (if (and (zerop *max-vs*) (not *sup-used*) (not *base-used*)) t (wt-nl "base[0]=base[0];"))
 
-   (dolist** (kwd (ll-keywords ll))
-    (cond ((not (eql 0 (pop deflt)))
-	   ;; keyword default bound by parse_key.. and no supplied-p
-           (c2bind (cadr kwd)))
-          (t
-           (wt-nl "if(") (wt-vs (var-ref (cadr kwd))) (wt "==0){")
-           (let ((*clink* *clink*)
-                 (*unwind-exit* *unwind-exit*)
-                 (*ccb-vs* *ccb-vs*))
-                (c2bind-init (cadr kwd) (caddr kwd)))
-	   (unless (eq (var-kind (cadddr kwd)) 'DUMMY) (c2bind-loc (cadddr kwd) nil))
+;;; Need to ensure return of type object
+    (wt-nl "return Cnil;")
 
-           (wt-nl "}else{")
-           (c2bind (cadr kwd))
-	   (unless (eq (var-kind (cadddr kwd)) 'DUMMY) (c2bind-loc (cadddr kwd)
-								   t))
-
-           (wt "}")))
-
-
-
-   )
-   (when *tail-recursion-info*
-	 (push 'tail-recursion-mark *unwind-exit*)
-	 (wt-nl1 "TTL:;"))
-   (c2expr (caddr (cddr lambda-expr)))
-		
-  (wt "}") 
-  (when block-p (wt-nl "}"))
-  (close-inline-blocks)
-  (wt-V*-macros cm (get fname 'proclaimed-return-type))
-  	      ))
+    (wt "}") 
+    (when block-p (wt-nl "}"))
+    (close-inline-blocks)
+    (wt-V*-macros cm (get fname 'proclaimed-return-type))
+    ))
 
 (defun t3defun-normal (fname cfun lambda-expr sp)
          (wt-comment "function definition for " fname)
          (if (numberp cfun)
-             (wt-nl1 "static L" cfun "()")
+             (wt-nl1 "static void L" cfun "()")
              (wt-nl1 cfun "()"))
          (wt-nl1 "{" "register object *"  *volatile*"base=vs_base;")
 	 (assign-down-vars (info-referred-vars (cadr lambda-expr)) cfun
@@ -1164,7 +1188,7 @@
 (defun wt-global-entry (fname cfun arg-types return-type)
     (cond ((get fname 'no-global-entry)(return-from wt-global-entry nil)))
     (wt-comment "global entry for the function " fname)
-    (wt-nl1 "static L" cfun "()")
+    (wt-nl1 "static void L" cfun "()")
     (wt-nl1 "{	register object *base=vs_base;")
     (when (or *safe-compile* *compiler-check-args*)
           (wt-nl "check_arg(" (length arg-types) ");"))
@@ -1230,7 +1254,7 @@
   (when doc (add-init `(si::putprop ',fname ,doc 'si::function-documentation) ))
   (when ppn
 	(add-init `(si::putprop ',fname ',ppn 'si::pretty-print-format) ))
-  (wt-h "static L" cfun "();")
+  (wt-h "static void L" cfun "();")
   (add-init `(si::MM ',fname ,(add-address "L" cfun)) )
   )
 
@@ -1241,7 +1265,7 @@
   (let-pass3
    ((*exit* 'return))
    (wt-comment "macro definition for " fname)
-   (wt-nl1 "static L" cfun "()")
+   (wt-nl1 "static void L" cfun "()")
    (wt-nl1 "{register object *" *volatile* "base=vs_base;")
    (assign-down-vars (info-referred-vars (nth 4 macro-lambda)) cfun ;*dm-info*
 		     't3defun)
@@ -1480,13 +1504,13 @@
 
 (defun t2defentry (fname cfun arg-types type cname)
   (declare (ignore arg-types type cname))
-  (wt-h "static L" cfun "();")
+  (wt-h "static void L" cfun "();")
   (add-init `(si::mf ',fname ,(add-address "L" cfun)) )
   )
 
 (defun t3defentry (fname cfun arg-types type cname)
   (wt-comment "function definition for " fname)
-  (wt-nl1 "static L" cfun "()")
+  (wt-nl1 "static void L" cfun "()")
   (wt-nl1 "{	object *old_base=vs_base;")
   (case type
     (void)
@@ -1555,7 +1579,7 @@
 	     *downward-closures*
 	     (requireds (caaddr lambda-expr)))
   (wt-comment "local dc function " (if (fun-name fun) (fun-name fun) nil))
-  (wt-nl1 "static " (if closure-p "LC" "L") (fun-cfun fun) "(")
+  (wt-nl1 "static void " (if closure-p "LC" "L") (fun-cfun fun) "(")
   (wt "base0" (if requireds "," ""))
   (analyze-regs (info-referred-vars (cadr lambda-expr)) 2)
   (wt-requireds (caaddr lambda-expr) nil) ;;nil = arg types all t
@@ -1572,6 +1596,8 @@
 	(when *compiler-push-events* (wt-nl "ihs_check;"))
 	(c2expr (caddr (cddr lambda-expr)))
 	;(c2lambda-expr (lambda-list lambda-expr) (caddr (cddr lambda-expr)))
+;;; Use base if defined for lint
+	(if (and (zerop *max-vs*) (not *sup-used*) (not *base-used*)) t (wt-nl "base[0]=base[0];"))
 	(wt-nl1 "}")
 	(wt-V*-macros cm t)
 	(wt-downward-closure-macro (fun-cfun fun))
@@ -1587,8 +1613,8 @@
       (return-from t3local-fun
 		   (t3local-dcfun closure-p clink ccb-vs fun lambda-expr)))
   (wt-comment "local function " (if (fun-name fun) (fun-name fun) nil))
-  (wt-h   "static " (if closure-p "LC" "L") (fun-cfun fun) "();")
-  (wt-nl1 "static " (if closure-p "LC" "L") (fun-cfun fun) "(")
+  (wt-h   "static void " (if closure-p "LC" "L") (fun-cfun fun) "();")
+  (wt-nl1 "static void " (if closure-p "LC" "L") (fun-cfun fun) "(")
   (dotimes* (n level (wt "base" n ")")) (wt "base" n ","))
   (wt-nl1  "register object ")
   (dotimes* (n level (wt "*"*volatile*"base" n ";"))
@@ -1634,6 +1660,9 @@
        ))
  (and *c-vars* (format *compiler-output2* ";"))
  (unless (eql *cs* 0)
+;	 (format *compiler-output2* " object Vcs[~a]={Cnil" *cs*)
+;	 (dotimes (temp (- *cs* 1) t) (format *compiler-output2* ",Cnil"))
+;	 (format *compiler-output2* "};"))
 	 (format *compiler-output2* " object Vcs[~a];" *cs*))
   )
 

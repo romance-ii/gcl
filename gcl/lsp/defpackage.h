@@ -1,15 +1,15 @@
 
-static L1();
+static void L1();
 #define VC1 object  V138 ,V137 ,V136 ,V135 ,V134 ,V133 ,V129 ,V128 ,V127 ,V123 ,V122 ,V118 ,V117 ,V116 ,V115 ,V114 ,V113 ,V112 ,V111 ,V110 ,V109 ,V108 ,V107 ,V106 ,V105 ,V104 ,V103 ,V102 ,V61 ,V54 ,V53 ,V42 ,V41 ,V34 ,V31 ,V28 ,V25 ,V24 ,V23 ,V11 ,V10 ,V9;
-static L2();
+static void L2();
 #define VC2 object  V166 ,V165 ,V164 ,V163 ,V162 ,V159 ,V154 ,V152 ,V151;
-static LC3();
+static void LC3();
 #define VC3
-static L5();
+static void L5();
 #define VC4
-static L4();
+static void L4();
 #define VC5
-static LC3();
+static void LC3();
 #define VM5 6
 #define VM4 6
 #define VM3 3

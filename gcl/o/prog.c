@@ -44,8 +44,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 			   VS			  |<-------- body1 -------->|
 */
 
-Ftagbody(body)
-object body;
+void
+Ftagbody(object body)
 {
 	object endp_temp;
 
@@ -104,8 +104,8 @@ object body;
 	vs_base[0] = Cnil;
 }
 
-Fprog(arg)
-object arg;
+void
+Fprog(object arg)
 {
 	object endp_temp;
 
@@ -138,13 +138,12 @@ END:
 	lex_env = oldlex;
 }
 
-FprogA(arg)
-object arg;
+void
+FprogA(object arg)
 {
 	object endp_temp;
 
 	object *oldlex = lex_env;
-	object *top;
 	struct bind_temp *start;
 	object body;
 	bds_ptr old_bds_top = bds_top;
@@ -173,8 +172,8 @@ END:
 	lex_env = oldlex;
 }
 
-Fgo(args)
-object args;
+void
+Fgo(object args)
 {
 	object endp_temp;
 
@@ -196,8 +195,8 @@ object args;
 	/*  never reached  */
 }
 
-Fprogv(args)
-object args;
+void
+Fprogv(object args)
 {
 	object endp_temp;
 
@@ -242,8 +241,8 @@ object args;
 	bds_unwind(old_bds_top);
 }
 
-Fprogn(body)
-object body;
+void
+Fprogn(object body)
 {
 	object endp_temp;
 
@@ -260,8 +259,8 @@ object body;
 	}
 }
 
-Fprog1(arg)
-object arg;
+void
+Fprog1(object arg)
 {
 	object endp_temp;
 
@@ -278,8 +277,8 @@ object arg;
 	vs_top = top + 1;
 }
 
-Fprog2(arg)
-object arg;
+void
+Fprog2(object arg)
 {
 	object endp_temp;
 
@@ -299,7 +298,8 @@ object arg;
 	vs_top = top+1;
 }
 
-init_prog()
+void
+init_prog(void)
 {
 	make_special_form("TAGBODY", Ftagbody);
 	make_special_form("PROG", Fprog);

@@ -30,8 +30,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 object sLotherwise;
 
-Fif(form)
-object form;
+void
+Fif(object form)
 {
 	object endp_temp;
 
@@ -56,8 +56,8 @@ object form;
 	}
 }
 
-Fcond(args)
-object args;
+void
+Fcond(object args)
 {
 	object endp_temp;
 
@@ -90,8 +90,8 @@ object args;
 	vs_push(Cnil);
 }
 
-Fcase(arg)
-object arg;
+void
+Fcase(object arg)
 {
 	object endp_temp;
 
@@ -141,8 +141,8 @@ FOUND:
 	return;
 }
 
-Fwhen(form)
-object form;
+void
+Fwhen(object form)
 {
 	object endp_temp;
 
@@ -168,8 +168,8 @@ object form;
 	}
 }
 
-Funless(form)
-object form;
+void
+Funless(object form)
 {
 	object endp_temp;
 
@@ -196,7 +196,8 @@ object form;
 	}
 }
 
-init_conditional()
+void
+init_conditional(void)
 {
 	make_special_form("IF",Fif);
 	make_special_form("COND",Fcond);

@@ -1,10 +1,10 @@
 
 #include "cmpinclude.h"
 #include "serror.h"
-init_serror(){do_init(VV);}
+void init_serror(){do_init(VV);}
 /*	function definition for MAKE-ERROR-CONDITION	*/
 
-static L1()
+static void L1()
 {register object *base=vs_base;
 	register object *sup=base+VM1; VC1
 	vs_reserve(VM1);
@@ -36,7 +36,7 @@ static L1()
 }
 /*	macro definition for COND-ERROR	*/
 
-static L2()
+static void L2()
 {register object *base=vs_base;
 	register object *sup=base+VM2; VC2
 	vs_reserve(VM2);
@@ -53,6 +53,7 @@ static L2()
 	if(base[2]!=Cnil){
 	goto T8;}
 	base[2]= VV[1];
+goto T8;
 T8:;
 	{object V8;
 	base[5]= VV[2];
@@ -69,6 +70,7 @@ T8:;
 	V12= Cnil;
 	goto T13;}
 	base[5]=V13=MMcons(Cnil,Cnil);
+goto T14;
 T14:;
 	(V13->c.c_car)= car((V14->c.c_car));
 	if(endp(V14=MMcdr(V14))){
@@ -76,6 +78,7 @@ T14:;
 	goto T13;}
 	V13=MMcdr(V13)=MMcons(Cnil,Cnil);
 	goto T14;}
+goto T13;
 T13:;
 	V15= make_cons(VV[13],V12);
 	V16= list(3,VV[3],/* INLINE-ARGS */V10,list(3,VV[5],VV[6],list(3,VV[7],list(3,VV[8],list(3,VV[9],list(2,VV[10],list(4,VV[11],base[2],/* INLINE-ARGS */V11,list(3,VV[12],/* INLINE-ARGS */V15,list(2,VV[4],(V8))))),VV[14]),base[3]),VV[15])));
@@ -85,8 +88,10 @@ T13:;
 	goto T18;}
 	V9= listA(3,VV[18],base[2],(V9));
 	goto T16;
+goto T18;
 T18:;
 	V9= make_cons(VV[8],(V9));
+goto T16;
 T16:;
 	base[5]= list(3,VV[19],VV[6],(V9));
 	vs_top=(vs_base=base+5)+1;
@@ -94,7 +99,7 @@ T16:;
 }
 /*	macro definition for COND-ANY-ERROR	*/
 
-static L3()
+static void L3()
 {register object *base=vs_base;
 	register object *sup=base+VM3; VC3
 	vs_reserve(VM3);
@@ -118,8 +123,10 @@ static L3()
 	goto T25;}
 	V19= listA(3,VV[18],base[2],(V19));
 	goto T23;
+goto T25;
 T25:;
 	V19= make_cons(VV[8],(V19));
+goto T23;
 T23:;
 	base[5]= list(3,VV[19],VV[6],(V19));
 	vs_top=(vs_base=base+5)+1;
@@ -133,8 +140,9 @@ static object LI4(va_alist)
 	va_list ap;
 	int narg = VFUN_NARGS; VMB4 VMS4 VMV4
 	{register object V24;
-	narg= narg - 0;
+	Vcs[0]=Vcs[0];
 	va_start(ap);
+	narg= narg - 0;
 	V25 = list_vector(narg,ap);
 	V24= V25;
 	if((symbol_value(VV[24]))==Cnil){
@@ -148,6 +156,7 @@ static object LI4(va_alist)
 	vs_base=vs_top;
 	(void) (*Lnk74)();
 	vs_top=sup;
+goto T29;
 T29:;
 	{register object V26;
 	base[0]= VV[25];
@@ -186,6 +195,7 @@ T29:;
 	base[0]= (V26);
 	vs_top=(vs_base=base+0)+1;
 	unwind(fr,VV[32]);}
+goto T51;
 T51:;
 	{object V27;
 	{register object V28;
@@ -198,11 +208,13 @@ T51:;
 	Lfill_pointer();
 	vs_top=sup;
 	V30= fix(vs_base[0]);
+goto T59;
 T59:;
 	if(!((V29)>=(V30))){
 	goto T60;}
 	V27= Cnil;
 	goto T54;
+goto T60;
 T60:;
 	V31= aref1(symbol_value(VV[14]),V29);
 	V28= (
@@ -219,14 +231,17 @@ T60:;
 	base[0]= (V26);
 	vs_top=(vs_base=base+0)+1;
 	unwind(fr,(V28));}
+goto T64;
 T64:;
 	V29= (V29)+1;
 	goto T59;}}
+goto T54;
 T54:;
 	if(((V27))==Cnil){
 	goto T73;}
 	{object V33 = (V27);
 	VMR4(V33)}
+goto T73;
 T73:;
 	base[0]= get(symbol_value(VV[33]),VV[34],Cnil);
 	{object V34;
@@ -238,11 +253,14 @@ T73:;
 	super_funcall_no_event(base[0]);
 	vs_top=sup;
 	{object V35 = vs_base[0];
-	VMR4(V35)}}}}
+	VMR4(V35)}}}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}
 /*	function definition for INF-SIGNAL	*/
 
-static L5()
+static void L5()
 {register object *base=vs_base;
 	register object *sup=base+VM5; VC5
 	vs_reserve(VM5);
@@ -265,7 +283,7 @@ static L5()
 }
 /*	macro definition for DEF-ERROR-TYPE	*/
 
-static L6()
+static void L6()
 {register object *base=vs_base;
 	register object *sup=base+VM6; VC6
 	vs_reserve(VM6);
@@ -302,7 +320,7 @@ static L6()
 }
 /*	function definition for WTA-tester	*/
 
-static L7()
+static void L7()
 {register object *base=vs_base;
 	register object *sup=base+VM7; VC7
 	vs_reserve(VM7);
@@ -310,6 +328,7 @@ static L7()
 	check_arg(1);
 	V42=(base[0]);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	V43= structure_ref((V42),VV[0],0);
 	base[1]= (eql(/* INLINE-ARGS */V43,VV[44])?Ct:Cnil);
@@ -319,12 +338,13 @@ TTL:;
 }
 /*	function definition for G1031	*/
 
-static L8()
+static void L8()
 {register object *base=vs_base;
 	register object *sup=base+VM8; VC8
 	vs_reserve(VM8);
 	check_arg(0);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	base[0]= list(3,VV[45],VV[0],list(2,VV[46],VV[47]));
 	vs_top=(vs_base=base+0)+1;
@@ -332,7 +352,7 @@ TTL:;
 }
 /*	function definition for SUBSCRIPT-OUT-OF-BOUNDS-tester	*/
 
-static L9()
+static void L9()
 {register object *base=vs_base;
 	register object *sup=base+VM9; VC9
 	vs_reserve(VM9);
@@ -340,6 +360,7 @@ static L9()
 	check_arg(1);
 	V44=(base[0]);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	V45= structure_ref((V44),VV[0],1);
 	base[1]= (equal(/* INLINE-ARGS */V45,VV[48])?Ct:Cnil);
@@ -349,12 +370,13 @@ TTL:;
 }
 /*	function definition for G1032	*/
 
-static L10()
+static void L10()
 {register object *base=vs_base;
 	register object *sup=base+VM10; VC10
 	vs_reserve(VM10);
 	check_arg(0);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	base[0]= list(3,VV[45],VV[0],list(2,VV[46],VV[49]));
 	vs_top=(vs_base=base+0)+1;
@@ -362,7 +384,7 @@ TTL:;
 }
 /*	function definition for ERROR-tester	*/
 
-static L11()
+static void L11()
 {register object *base=vs_base;
 	register object *sup=base+VM11; VC11
 	vs_reserve(VM11);
@@ -370,6 +392,7 @@ static L11()
 	check_arg(1);
 	V46=(base[0]);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	V47= structure_ref((V46),VV[0],0);
 	base[1]= (eql(/* INLINE-ARGS */V47,VV[50])?Ct:Cnil);
@@ -379,12 +402,13 @@ TTL:;
 }
 /*	function definition for G1033	*/
 
-static L12()
+static void L12()
 {register object *base=vs_base;
 	register object *sup=base+VM12; VC12
 	vs_reserve(VM12);
 	check_arg(0);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	base[0]= list(3,VV[45],VV[0],list(2,VV[46],VV[51]));
 	vs_top=(vs_base=base+0)+1;
@@ -392,7 +416,7 @@ TTL:;
 }
 /*	function definition for WRONG-TYPE-ARGUMENT-tester	*/
 
-static L13()
+static void L13()
 {register object *base=vs_base;
 	register object *sup=base+VM13; VC13
 	vs_reserve(VM13);
@@ -400,6 +424,7 @@ static L13()
 	check_arg(1);
 	V48=(base[0]);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	V49= structure_ref((V48),VV[0],0);
 	base[1]= (eql(/* INLINE-ARGS */V49,VV[52])?Ct:Cnil);
@@ -409,12 +434,13 @@ TTL:;
 }
 /*	function definition for G1034	*/
 
-static L14()
+static void L14()
 {register object *base=vs_base;
 	register object *sup=base+VM14; VC14
 	vs_reserve(VM14);
 	check_arg(0);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	base[0]= list(3,VV[45],VV[0],list(2,VV[46],VV[53]));
 	vs_top=(vs_base=base+0)+1;
@@ -422,7 +448,7 @@ TTL:;
 }
 /*	function definition for TOO-FEW-ARGUMENTS-tester	*/
 
-static L15()
+static void L15()
 {register object *base=vs_base;
 	register object *sup=base+VM15; VC15
 	vs_reserve(VM15);
@@ -430,6 +456,7 @@ static L15()
 	check_arg(1);
 	V50=(base[0]);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	V51= structure_ref((V50),VV[0],0);
 	base[1]= (eql(/* INLINE-ARGS */V51,VV[54])?Ct:Cnil);
@@ -439,12 +466,13 @@ TTL:;
 }
 /*	function definition for G1035	*/
 
-static L16()
+static void L16()
 {register object *base=vs_base;
 	register object *sup=base+VM16; VC16
 	vs_reserve(VM16);
 	check_arg(0);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	base[0]= list(3,VV[45],VV[0],list(2,VV[46],VV[55]));
 	vs_top=(vs_base=base+0)+1;
@@ -452,7 +480,7 @@ TTL:;
 }
 /*	function definition for TOO-MANY-ARGUMENTS-tester	*/
 
-static L17()
+static void L17()
 {register object *base=vs_base;
 	register object *sup=base+VM17; VC17
 	vs_reserve(VM17);
@@ -460,6 +488,7 @@ static L17()
 	check_arg(1);
 	V52=(base[0]);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	V53= structure_ref((V52),VV[0],0);
 	base[1]= (eql(/* INLINE-ARGS */V53,VV[56])?Ct:Cnil);
@@ -469,12 +498,13 @@ TTL:;
 }
 /*	function definition for G1036	*/
 
-static L18()
+static void L18()
 {register object *base=vs_base;
 	register object *sup=base+VM18; VC18
 	vs_reserve(VM18);
 	check_arg(0);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	base[0]= list(3,VV[45],VV[0],list(2,VV[46],VV[57]));
 	vs_top=(vs_base=base+0)+1;
@@ -482,7 +512,7 @@ TTL:;
 }
 /*	function definition for UNEXPECTED-KEYWORD-tester	*/
 
-static L19()
+static void L19()
 {register object *base=vs_base;
 	register object *sup=base+VM19; VC19
 	vs_reserve(VM19);
@@ -490,6 +520,7 @@ static L19()
 	check_arg(1);
 	V54=(base[0]);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	V55= structure_ref((V54),VV[0],0);
 	base[1]= (eql(/* INLINE-ARGS */V55,VV[58])?Ct:Cnil);
@@ -499,12 +530,13 @@ TTL:;
 }
 /*	function definition for G1037	*/
 
-static L20()
+static void L20()
 {register object *base=vs_base;
 	register object *sup=base+VM20; VC20
 	vs_reserve(VM20);
 	check_arg(0);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	base[0]= list(3,VV[45],VV[0],list(2,VV[46],VV[59]));
 	vs_top=(vs_base=base+0)+1;
@@ -512,7 +544,7 @@ TTL:;
 }
 /*	function definition for INVALID-FORM-tester	*/
 
-static L21()
+static void L21()
 {register object *base=vs_base;
 	register object *sup=base+VM21; VC21
 	vs_reserve(VM21);
@@ -520,6 +552,7 @@ static L21()
 	check_arg(1);
 	V56=(base[0]);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	V57= structure_ref((V56),VV[0],0);
 	base[1]= (eql(/* INLINE-ARGS */V57,VV[60])?Ct:Cnil);
@@ -529,12 +562,13 @@ TTL:;
 }
 /*	function definition for G1038	*/
 
-static L22()
+static void L22()
 {register object *base=vs_base;
 	register object *sup=base+VM22; VC22
 	vs_reserve(VM22);
 	check_arg(0);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	base[0]= list(3,VV[45],VV[0],list(2,VV[46],VV[61]));
 	vs_top=(vs_base=base+0)+1;
@@ -542,7 +576,7 @@ TTL:;
 }
 /*	function definition for UNBOUND-VARIABLE-tester	*/
 
-static L23()
+static void L23()
 {register object *base=vs_base;
 	register object *sup=base+VM23; VC23
 	vs_reserve(VM23);
@@ -550,6 +584,7 @@ static L23()
 	check_arg(1);
 	V58=(base[0]);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	V59= structure_ref((V58),VV[0],0);
 	base[1]= (eql(/* INLINE-ARGS */V59,VV[62])?Ct:Cnil);
@@ -559,12 +594,13 @@ TTL:;
 }
 /*	function definition for G1039	*/
 
-static L24()
+static void L24()
 {register object *base=vs_base;
 	register object *sup=base+VM24; VC24
 	vs_reserve(VM24);
 	check_arg(0);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	base[0]= list(3,VV[45],VV[0],list(2,VV[46],VV[63]));
 	vs_top=(vs_base=base+0)+1;
@@ -572,7 +608,7 @@ TTL:;
 }
 /*	function definition for INVALID-VARIABLE-tester	*/
 
-static L25()
+static void L25()
 {register object *base=vs_base;
 	register object *sup=base+VM25; VC25
 	vs_reserve(VM25);
@@ -580,6 +616,7 @@ static L25()
 	check_arg(1);
 	V60=(base[0]);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	V61= structure_ref((V60),VV[0],0);
 	base[1]= (eql(/* INLINE-ARGS */V61,VV[64])?Ct:Cnil);
@@ -589,12 +626,13 @@ TTL:;
 }
 /*	function definition for G1040	*/
 
-static L26()
+static void L26()
 {register object *base=vs_base;
 	register object *sup=base+VM26; VC26
 	vs_reserve(VM26);
 	check_arg(0);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	base[0]= list(3,VV[45],VV[0],list(2,VV[46],VV[65]));
 	vs_top=(vs_base=base+0)+1;
@@ -602,7 +640,7 @@ TTL:;
 }
 /*	function definition for UNDEFINED-FUNCTION-tester	*/
 
-static L27()
+static void L27()
 {register object *base=vs_base;
 	register object *sup=base+VM27; VC27
 	vs_reserve(VM27);
@@ -610,6 +648,7 @@ static L27()
 	check_arg(1);
 	V62=(base[0]);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	V63= structure_ref((V62),VV[0],0);
 	base[1]= (eql(/* INLINE-ARGS */V63,VV[66])?Ct:Cnil);
@@ -619,12 +658,13 @@ TTL:;
 }
 /*	function definition for G1041	*/
 
-static L28()
+static void L28()
 {register object *base=vs_base;
 	register object *sup=base+VM28; VC28
 	vs_reserve(VM28);
 	check_arg(0);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	base[0]= list(3,VV[45],VV[0],list(2,VV[46],VV[67]));
 	vs_top=(vs_base=base+0)+1;
@@ -632,7 +672,7 @@ TTL:;
 }
 /*	function definition for INVALID-FUNCTION-tester	*/
 
-static L29()
+static void L29()
 {register object *base=vs_base;
 	register object *sup=base+VM29; VC29
 	vs_reserve(VM29);
@@ -640,6 +680,7 @@ static L29()
 	check_arg(1);
 	V64=(base[0]);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	V65= structure_ref((V64),VV[0],0);
 	base[1]= (eql(/* INLINE-ARGS */V65,VV[68])?Ct:Cnil);
@@ -649,12 +690,13 @@ TTL:;
 }
 /*	function definition for G1042	*/
 
-static L30()
+static void L30()
 {register object *base=vs_base;
 	register object *sup=base+VM30; VC30
 	vs_reserve(VM30);
 	check_arg(0);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	base[0]= list(3,VV[45],VV[0],list(2,VV[46],VV[69]));
 	vs_top=(vs_base=base+0)+1;
@@ -662,7 +704,7 @@ TTL:;
 }
 /*	macro definition for CONDITION-CASE	*/
 
-static L31()
+static void L31()
 {register object *base=vs_base;
 	register object *sup=base+VM31; VC31
 	vs_reserve(VM31);
@@ -691,12 +733,15 @@ static L31()
 	V73= Cnil;
 	V74= Cnil;
 	V75= Cnil;
+goto T87;
 T87:;
 	if(((V71))==Cnil){
 	goto T90;}
 	goto T89;
+goto T90;
 T90:;
 	goto T88;
+goto T89;
 T89:;
 	{register object V76;
 	V76= car((V71));
@@ -716,10 +761,12 @@ T89:;
 	if(type_of((V79))!=t_cons)FEwrong_type_argument(Scons,(V79));
 	((V79))->c.c_cdr = (V80);
 	goto T95;}
+goto T102;
 T102:;
 	V73= make_cons((V74),Cnil);
 	V72= (V73);
 	goto T95;
+goto T97;
 T97:;
 	V81= list(3,VV[71],(V67),list(2,VV[4],car((V70))));
 	V75= make_cons(/* INLINE-ARGS */V81,cdr((V70)));
@@ -733,12 +780,15 @@ T97:;
 	if(type_of((V82))!=t_cons)FEwrong_type_argument(Scons,(V82));
 	((V82))->c.c_cdr = (V83);
 	goto T95;}
+goto T113;
 T113:;
 	V73= make_cons((V75),Cnil);
 	V72= (V73);
+goto T95;
 T95:;
 	V71= cdr((V71));
 	goto T87;
+goto T88;
 T88:;
 	V69= (V72);
 	goto T85;
@@ -746,16 +796,17 @@ T88:;
 	goto T85;
 	V69= Cnil;
 	goto T85;}}
+goto T85;
 T85:;
 	base[5]= listA(4,VV[70],/* INLINE-ARGS */V68,base[3],V69);
 	vs_top=(vs_base=base+5)+1;
 	return;}
 }
-static LnkT76(){ call_or_link(VV[76],&Lnk76);} /* MAKE-ERROR-CONDITION */
-static LnkT75(){ call_or_link(VV[75],&Lnk75);} /* FIFTH */
-static LnkT74(){ call_or_link(VV[74],&Lnk74);} /* BREAK-VS */
-static LnkT73(){ call_or_link(VV[73],&Lnk73);} /* BACKTRACE */
-static LnkT72(){ call_or_link(VV[72],&Lnk72);} /* SIMPLE-BACKTRACE */
+static void LnkT76(){ call_or_link(VV[76],(void **)&Lnk76);} /* MAKE-ERROR-CONDITION */
+static void LnkT75(){ call_or_link(VV[75],(void **)&Lnk75);} /* FIFTH */
+static void LnkT74(){ call_or_link(VV[74],(void **)&Lnk74);} /* BREAK-VS */
+static void LnkT73(){ call_or_link(VV[73],(void **)&Lnk73);} /* BACKTRACE */
+static void LnkT72(){ call_or_link(VV[72],(void **)&Lnk72);} /* SIMPLE-BACKTRACE */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

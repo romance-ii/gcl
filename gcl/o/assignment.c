@@ -57,9 +57,8 @@ object sLwarn;
 
 object sSAinhibit_macro_specialA;
 
-
-setq(sym, val)
-object sym, val;
+void
+setq(object sym, object val)
 {
  	object endp_temp;
 	object vd;
@@ -82,8 +81,8 @@ object sym, val;
 	}
 }
 
-Fsetq(form)
-object form;
+void
+Fsetq(object form)
 {
  	object endp_temp;
 	object ans;
@@ -105,8 +104,8 @@ object form;
 	}
 }
 
-Fpsetq(arg)
-object arg;
+void
+Fpsetq(object arg)
 {
  	object endp_temp;
 	object *old_top = vs_top;
@@ -183,13 +182,12 @@ object sym,function;
 	RETURN1(function);
 }
 
-Fmultiple_value_setq(form)
-object form;
+void
+Fmultiple_value_setq(object form)
 {
 	object vars;
 	int n, i;
  	object endp_temp;
-	object result;
 
 	if (endp(form) || endp(form->c.c_cdr) ||
 	    !endp(form->c.c_cdr->c.c_cdr))
@@ -252,8 +250,8 @@ object sym;
 	RETURN1(sym);
 }
 
-Fsetf(form)
-object form;
+void
+Fsetf(object form)
 {
  	object endp_temp;
 	object result;
@@ -284,22 +282,21 @@ object form;
 }
 
 object
-setf(place, form)
-object place, form;
+setf(object place, object form)
 {
  	object endp_temp;
 	object fun;
 	object *vs = vs_top;
-	int (*f)();
+	void (*f)();
 	object args;
 	object x,result,y;
 	int i;
-	extern siLaset();
-	extern siLsvset();
-	extern siLelt_set();
-	extern siLchar_set();
-	extern siLfill_pointer_set();
-	extern siLhash_set();
+/*  	extern void siLaset(void); */
+/*  	extern void siLsvset(void); */
+	extern void siLelt_set();
+	extern void siLchar_set();
+/*  	extern void siLfill_pointer_set(void); */
+	extern void siLhash_set();
 
 	if (type_of(place) != t_cons) {
 		setq(place, result=Ieval(form));
@@ -401,8 +398,8 @@ OTHERWISE:
 	return Ieval(vs_base[0]);
 }
 
-Fpush(form)
-object form;
+void
+Fpush(object form)
 {
 	object var;
  	object endp_temp;
@@ -433,8 +430,8 @@ object form;
 	eval(vs_base[0]);
 }
 
-Fpop(form)
-object form;
+void
+Fpop(object form)
 {
 	object var;
  	object endp_temp;
@@ -463,11 +460,11 @@ object form;
 	eval(vs_base[0]);
 }
 
-Fincf(form)
-object form;
+void
+Fincf(object form)
 {
 	object var;
-	object one_plus(), number_plus();
+	object one_plus(object x), number_plus(object x, object y);
  	object endp_temp;
 
 	if (endp(form))
@@ -502,11 +499,11 @@ object form;
 	eval(vs_base[0]);
 }
 
-Fdecf(form)
-object form;
+void
+Fdecf(object form)
 {
 	object var;
-	object one_minus(), number_minus();
+	object one_minus(object x), number_minus(object x, object y);
  	object endp_temp;
 
 	if (endp(form))
@@ -543,9 +540,7 @@ object form;
 
 
 object
-clear_compiler_properties(sym,code)
-object sym;
-object code;
+clear_compiler_properties(object sym, object code)
 { object tem;
   VFUN_NARGS=2; fSuse_fast_links(Cnil,sym);
   tem = getf(sym->s.s_plist,sStraced,Cnil);
@@ -586,8 +581,8 @@ DEF_ORDINARY("SVREF",sLsvref,LISP,"");
 DEF_ORDINARY("TRACED",sStraced,SI,"");
 DEF_ORDINARY("VECTOR",sLvector,LISP,"");
 
-
-init_assignment()
+void
+init_assignment(void)
 {
 	make_special_form("SETQ", Fsetq);
 	make_special_form("PSETQ", Fpsetq);

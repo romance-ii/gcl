@@ -1,6 +1,6 @@
 
-static L1();
-static L4();
+static void L1();
+static void L4();
 static object LI5();
 #define VC1
 static object LI2();
@@ -33,8 +33,8 @@ static char * VVi[17]={
 (char *)(LI5)
 };
 #define VV ((object *)VVi)
-static  LnkT15() ;
-static  (*Lnk15)() = LnkT15;
+static void LnkT15() ;
+static void (*Lnk15)() = LnkT15;
 static object  LnkTLI14() ;
 static object  (*LnkLI14)() = LnkTLI14;
 static object  LnkTLI13() ;

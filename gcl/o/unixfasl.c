@@ -278,12 +278,11 @@ AGAIN:
 #ifndef PRIVATE_FASLINK
 
 int
-faslink(faslfile, ldargstring)
-
-object faslfile, ldargstring;
+faslink(object faslfile, object ldargstring)
 {
 #if defined(__linux__) && defined(__ELF__)
   FEerror("faslink() not supported for ELF yet",0);
+  return 0;
 #else
 	struct exec header, faslheader;
 	object memory, data, tempfile;
@@ -380,7 +379,8 @@ SEEK_TO_END_OFILE(faslfile->sm.sm_fp);
 
 #endif
 
-siLfaslink()
+void
+siLfaslink(void)
 {
 	bds_ptr old_bds_top;
 	int i;
@@ -405,7 +405,8 @@ siLfaslink()
 #endif/*  svr4 */
 #endif /* UNIXFASL */
 
-init_unixfasl()
+void
+init_unixfasl(void)
 {
 #ifdef FASLINK
 	make_si_function("FASLINK", siLfaslink);

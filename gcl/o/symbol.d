@@ -27,9 +27,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 object siSpname;
 
-set_up_string_register(s)
-char *s;
-{
+void
+set_up_string_register(char *s) {
 	string_register->st.st_fillp =
 	string_register->st.st_dim = strlen(s);
 	string_register->st.st_self = s;
@@ -76,7 +75,7 @@ object
 make_ordinary(s)
 char *s;
 {
-	int i, j;
+	int j;
 	object x, l, *ep;
 	vs_mark;
 
@@ -141,7 +140,7 @@ object
 make_si_ordinary(s)
 char *s;
 {
-	int i, j;
+	int j;
 	object x, l, *ep;
 	vs_mark;
 
@@ -206,7 +205,7 @@ object
 make_keyword(s)
 char *s;
 {
-	int i, j;
+	int j;
 	object x, l, *ep;
 	vs_mark;
 
@@ -255,6 +254,7 @@ object place, indicator, deflt;
 	}
 	if(l==Cnil) return deflt;
 	FEerror("Bad plist ~a",1,place);	
+	return Cnil;
 }
 
 object
@@ -274,9 +274,7 @@ object
 putf(p, v, i)
 object p, v, i;
 {
-	object endp_temp;
-
-	object l, l0 = p;
+	object l;
 	vs_mark;
 
 	for (l = p;  !cendp(l);  l = l->c.c_cdr->c.c_cdr) {
@@ -381,6 +379,7 @@ object s;
 	@(return `getf(sym->s.s_plist, indicator, deflt)`)
 @)
 
+void
 Lremprop()
 {
 	check_arg(2);
@@ -390,9 +389,10 @@ Lremprop()
 		vs_base[0] = Ct;
 	else
 		vs_base[0] = Cnil;
-	vs_pop;
+	vs_popp;
 }
 
+void
 Lsymbol_plist()
 {
 	check_arg(1);
@@ -443,17 +443,19 @@ object y;
 			y->st.st_self[i] = x->s.s_self[i];
 	}
    x->s.s_plist = putf(x->s.s_plist, y, siSpname);
-	vs_pop;
+	vs_popp;
    END_NO_INTERRUPT;	}	
     return(y);
 }
 
+void
 Lsymbol_name()
 {
 	check_arg(1);
         vs_base[0]=symbol_name(vs_base[0]);
 }
 
+void
 Lmake_symbol()
 {
 	check_arg(1);
@@ -546,6 +548,7 @@ ONCE_MORE:
 	@(return smbl)
 @)
 
+void
 Lsymbol_package()
 {
 	check_arg(1);
@@ -554,6 +557,7 @@ Lsymbol_package()
 	vs_base[0] = vs_base[0]->s.s_hpack;
 }
 
+void
 Lkeywordp()
 {
 	check_arg(1);
@@ -569,6 +573,7 @@ Lkeywordp()
 	returns the new property list with value for property indicator.
 	It will be used in SETF for GETF.
 */
+void
 siLput_f()
 {
 	check_arg(3);
@@ -588,6 +593,7 @@ siLput_f()
 
 	It will be used for macro REMF.
 */
+void
 siLrem_f()
 {
 	check_arg(2);
@@ -598,6 +604,7 @@ siLrem_f()
 		vs_base[1] = Cnil;
 }
 
+void
 siLset_symbol_plist()
 {
 	check_arg(2);
@@ -605,9 +612,10 @@ siLset_symbol_plist()
 	check_type_symbol(&vs_base[0]);
 	vs_base[0]->s.s_plist = vs_base[1];
 	vs_base[0] = vs_base[1];
-	vs_pop;
+	vs_popp;
 }
 
+void
 siLputprop()
 {
 	check_arg(3);
@@ -620,6 +628,7 @@ siLputprop()
 }
 
 
+void
 odd_plist(place)
 object place;
 {
@@ -627,6 +636,7 @@ object place;
 }
 
 
+void
 init_symbol()
 {
 	string_register = alloc_simple_string(0);
@@ -646,6 +656,7 @@ init_symbol()
 	enter_mark_origin(&token);
 }
 
+void
 init_symbol_function()
 {
 	make_function("GET", Lget);

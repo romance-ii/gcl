@@ -1,6 +1,6 @@
 
 static object LI5();
-static L8();
+static void L8();
 static object LI9();
 static object LI10();
 static object LI11();
@@ -31,12 +31,12 @@ static object LI35();
 static object LI36();
 static object LI37();
 static object LI38();
-static L39();
-static L40();
-static L43();
+static void L39();
+static void L40();
+static void L43();
 static object LI44();
-static L45();
-static L46();
+static void L45();
+static void L46();
 static object LI1();
 #define VMB1 register object *base=vs_top; object  V6;
 #define VMS1  register object *sup=vs_top+2;vs_top=sup;
@@ -329,7 +329,7 @@ static struct { short n,allow_other_keys;object *defaults;
 #define VMR43(VMT43) vs_top=base ; return(VMT43);
 #define VC44 object  V704 ,V701 ,V698;
 #define VC45 object  V717 ,V716 ,V715 ,V714 ,V713;
-static L41();
+static void L41();
 #define VC46
 #define VM46 3
 #define VM45 6
@@ -457,20 +457,20 @@ static char * VVi[76]={
 (char *)(L46)
 };
 #define VV ((object *)VVi)
-static  LnkT59() ;
-static  (*Lnk59)() = LnkT59;
+static void LnkT59() ;
+static void (*Lnk59)() = LnkT59;
 static object  LnkTLI58() ;
 static object  (*LnkLI58)() = LnkTLI58;
-static  LnkT57() ;
-static  (*Lnk57)() = LnkT57;
+static void LnkT57() ;
+static void (*Lnk57)() = LnkT57;
 static object  LnkTLI56() ;
 static object  (*LnkLI56)() = LnkTLI56;
-static  LnkT55() ;
-static  (*Lnk55)() = LnkT55;
+static void LnkT55() ;
+static void (*Lnk55)() = LnkT55;
 static object  LnkTLI54() ;
 static object  (*LnkLI54)() = LnkTLI54;
-static  LnkT53() ;
-static  (*Lnk53)() = LnkT53;
+static void LnkT53() ;
+static void (*Lnk53)() = LnkT53;
 static object  LnkTLI52() ;
 static object  (*LnkLI52)() = LnkTLI52;
 static object  LnkTLI51() ;

@@ -1,5 +1,5 @@
 
-static L6();
+static void L6();
 static object LI1();
 #define VMB1 object  V3;
 #define VMS1
@@ -92,16 +92,16 @@ static object  LnkTLI61() ;
 static object  (*LnkLI61)() = LnkTLI61;
 static object  LnkTLI60() ;
 static object  (*LnkLI60)() = LnkTLI60;
-static  LnkT59() ;
-static  (*Lnk59)() = LnkT59;
+static void LnkT59() ;
+static void (*Lnk59)() = LnkT59;
 static object  LnkTLI58() ;
 static object  (*LnkLI58)() = LnkTLI58;
 static object  LnkTLI57() ;
 static object  (*LnkLI57)() = LnkTLI57;
 static object  LnkTLI56() ;
 static object  (*LnkLI56)() = LnkTLI56;
-static  LnkT55() ;
-static  (*Lnk55)() = LnkT55;
+static void LnkT55() ;
+static void (*Lnk55)() = LnkT55;
 static object  LnkTLI54() ;
 static object  (*LnkLI54)() = LnkTLI54;
 static object  LnkTLI53() ;

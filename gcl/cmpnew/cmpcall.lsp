@@ -400,12 +400,12 @@
 	(args (fourth x)))
     (cond
       ((null type)
-       (wt-nl1 "static LnkT"
-	       num "(){ call_or_link(VV[" num "],&Lnk" num");}"
+       (wt-nl1 "static void LnkT"
+	       num "(){ call_or_link(VV[" num "],(void **)&Lnk" num");}"
 	       ))
       ((eql type 'proclaimed-closure)
-       (wt-nl1 "static LnkT" num
-	       "(ptr) object *ptr;{ call_or_link_closure(VV[" num "],&Lnk" num",&Lclptr" num");}"))
+       (wt-nl1 "static void LnkT" num
+	       "(ptr) object *ptr;{ call_or_link_closure(VV[" num "],(void **)&Lnk" num",&Lclptr" num");}"))
       (t
        ;;change later to include above.
        ;;(setq type (cdr (assoc type '((t . "object")(:btpr . "bptr")))))
@@ -414,11 +414,11 @@
 	      (let ((vararg (member '* args)))
 		(wt "(va_alist)va_dcl{va_list ap;va_start(ap);return("
 		    (rep-type type)")call_" (if vararg "v" "") "proc(VV["
-		    (add-object name)"],&Lnk" num )
+		    (add-object name)"],(void **)&Lnk" num )
 		(or vararg (wt "," (proclaimed-argd args type)))
 		(wt   ",ap);}" )))
 	     (t (wt "(){return call_proc0(VV[" (add-object name)
-		    "],&Lnk" num ");}" ))))
+		    "],(void **)&Lnk" num ");}" ))))
       (t (error "unknown link type ~a" type)))
     (setq name (symbol-name name))
     (if (find #\/ name) (setq name (remove #\/ name)))

@@ -199,7 +199,8 @@ static int qsort_compare(const void *a, const void *b) {
  */
 
 /* Should this return void or what? Should input args be void? */
-static siLreadline_init() {
+static void
+siLreadline_init() {
 	object on_or_off;
 	object program_name;
 	object case_type;
@@ -300,8 +301,8 @@ static siLreadline_init() {
 	}
 }
 
-init_readline_function()
-{
+void
+init_readline_function(void) {
 	rl_readline_name = NULL;
 #ifdef RL_COMPLETION
 	rl_attempted_completion_function = (CPPFunction *)rl_completion;

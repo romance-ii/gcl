@@ -26,14 +26,15 @@ License for more details.
 */
 int pos = 0;
 #define GETC(x) (pos++,getc(x))
-read_some(buf,n,start_ch,copy)
+int
+read_some(char *buf, int n, int start_ch, int copy)
      /* if copy is not 0 then copy characters to stdout while scanning
 	to find start_ch.   When you find it, read n characters into buf,
 	return the number of characters read into buf, but these characters
 	MUST be free of start_ch.
 	*/
-     char *buf;
-     int n,start_ch,copy;
+               
+                         
 { int ch;
   int prev = 0;
   while (1)
@@ -66,9 +67,9 @@ read_some(buf,n,start_ch,copy)
 	  
 	
 
-
-main()
-{ int ch,ch1;
+int
+main(void)
+{ 
   char buf[20];
   while (3==read_some(buf,3,'\n',0))
    { buf[3] = 0;

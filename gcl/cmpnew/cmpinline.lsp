@@ -475,9 +475,9 @@
 					     (char-code #\0)))
 				  (when (and
 					 (> (length fun) (+ i 2))
-					 (setq ch (char (the string fun)
+					 (progn (setq ch (char (the string fun)
 							(+ i 2)))
-					 (digit-char-p ch))
+					 (digit-char-p ch)))
 					(setq n (+ (* n 10)
 						   (- (char-code ch)
 						      (char-code #\0))))

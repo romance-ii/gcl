@@ -195,8 +195,11 @@ object x;
 
 	case t_string:
 		return(x);
+	default:
+		break;
 	}
 	FEerror("~S cannot be coerced to a string.", 1, x);
+	return(Cnil);
 }
 
 @(defun char (s i)
@@ -210,6 +213,7 @@ object x;
 	@(return `code_char(s->ust.ust_self[j])`)
 @)
 
+void
 siLchar_set()
 {
 	int j;
@@ -225,6 +229,7 @@ siLchar_set()
 	vs_base += 2;
 }
 
+void
 get_string_start_end(string, start, end, ps, pe)
 object string, start, end;
 int *ps, *pe;
@@ -333,11 +338,11 @@ int string_sign, string_boundary;
 	@(return `string_sign>=0 ? make_fixnum(s1) : Cnil`)
 @)
 
-Lstring_l()  { string_sign =  1;  string_boundary = 1;  Lstring_cmp(); }
-Lstring_g()  { string_sign = -1;  string_boundary = 1;  Lstring_cmp(); }
-Lstring_le() { string_sign =  1;  string_boundary = 0;  Lstring_cmp(); }
-Lstring_ge() { string_sign = -1;  string_boundary = 0;  Lstring_cmp(); }
-Lstring_neq() { string_sign = 0;  string_boundary = 1;  Lstring_cmp(); }
+void Lstring_l()  { string_sign =  1;  string_boundary = 1;  Lstring_cmp(); }
+void Lstring_g()  { string_sign = -1;  string_boundary = 1;  Lstring_cmp(); }
+void Lstring_le() { string_sign =  1;  string_boundary = 0;  Lstring_cmp(); }
+void Lstring_ge() { string_sign = -1;  string_boundary = 0;  Lstring_cmp(); }
+void Lstring_neq() { string_sign = 0;  string_boundary = 1;  Lstring_cmp(); }
 
 @(defun string_compare (string1 string2
 			&key start1 end1 start2 end2)
@@ -376,11 +381,11 @@ Lstring_neq() { string_sign = 0;  string_boundary = 1;  Lstring_cmp(); }
 	@(return `string_sign>=0 ? make_fixnum(s1) : Cnil`)
 @)
 
-Lstring_lessp()      { string_sign =  1; string_boundary = 1;  Lstring_compare(); }
-Lstring_greaterp()   { string_sign = -1; string_boundary = 1;  Lstring_compare(); }
-Lstring_not_greaterp(){ string_sign =  1; string_boundary = 0;  Lstring_compare(); }
-Lstring_not_lessp()   { string_sign = -1; string_boundary = 0;  Lstring_compare(); }
-Lstring_not_equal()   { string_sign =  0; string_boundary = 1;  Lstring_compare(); }
+void Lstring_lessp()      { string_sign =  1; string_boundary = 1;  Lstring_compare(); }
+void Lstring_greaterp()   { string_sign = -1; string_boundary = 1;  Lstring_compare(); }
+void Lstring_not_greaterp(){ string_sign =  1; string_boundary = 0;  Lstring_compare(); }
+void Lstring_not_lessp()   { string_sign = -1; string_boundary = 0;  Lstring_compare(); }
+void Lstring_not_equal()   { string_sign =  0; string_boundary = 1;  Lstring_compare(); }
 
 
 @(defun make_string (size
@@ -446,13 +451,14 @@ object char_bag;
 
 	default:
 		FEerror("~S is not a sequence.", 1, char_bag);
+		return(FALSE);
 	}
 }
 
-
-Lstring_trim() { left_trim = right_trim = TRUE; Lstring_trim0(); }
-Lstring_left_trim() { left_trim = TRUE; right_trim = FALSE; Lstring_trim0(); }
-Lstring_right_trim() { left_trim = FALSE; right_trim = TRUE; Lstring_trim0();}
+void Lstring_trim0();
+void Lstring_trim() { left_trim = right_trim = TRUE; Lstring_trim0(); }
+void Lstring_left_trim() { left_trim = TRUE; right_trim = FALSE; Lstring_trim0(); }
+void Lstring_right_trim() { left_trim = FALSE; right_trim = TRUE; Lstring_trim0();}
 
 @(defun string_trim0 (char_bag strng &aux res)
 	int i, j, k;
@@ -478,7 +484,7 @@ Lstring_right_trim() { left_trim = FALSE; right_trim = TRUE; Lstring_trim0();}
 	@(return res)
 @)
 
-static char_upcase(c, bp)
+static int char_upcase(c, bp)
 int c, *bp;
 {
 	if (isLower(c))
@@ -487,7 +493,7 @@ int c, *bp;
 		return(c);
 }
 
-static char_downcase(c, bp)
+static int char_downcase(c, bp)
 int c, *bp;
 {
 	if (isUpper(c))
@@ -496,7 +502,7 @@ int c, *bp;
 		return(c);
 }
 
-static char_capitalize(c, bp)
+static int char_capitalize(c, bp)
 int c, *bp;
 {
 	if (isLower(c)) {
@@ -526,9 +532,9 @@ int c, *bp;
 	@(return conv)
 @)
 
-Lstring_upcase()     { casefun =     char_upcase;  Lstring_case(); }
-Lstring_downcase()   { casefun =   char_downcase;  Lstring_case(); }
-Lstring_capitalize() { casefun = char_capitalize;  Lstring_case(); }
+void Lstring_upcase()     { casefun =     char_upcase;  Lstring_case(); }
+void Lstring_downcase()   { casefun =   char_downcase;  Lstring_case(); }
+void Lstring_capitalize() { casefun = char_capitalize;  Lstring_case(); }
 
 
 @(defun nstring_case (strng &key start end)
@@ -544,9 +550,9 @@ Lstring_capitalize() { casefun = char_capitalize;  Lstring_case(); }
 	@(return strng)
 @)
 
-Lnstring_upcase()     { casefun =     char_upcase;  Lnstring_case(); }
-Lnstring_downcase()   { casefun =   char_downcase;  Lnstring_case(); }
-Lnstring_capitalize() { casefun = char_capitalize;  Lnstring_case(); }
+void Lnstring_upcase()     { casefun =     char_upcase;  Lnstring_case(); }
+void Lnstring_downcase()   { casefun =   char_downcase;  Lnstring_case(); }
+void Lnstring_capitalize() { casefun = char_capitalize;  Lnstring_case(); }
 
 
 @(defun string (x)
@@ -554,6 +560,7 @@ Lnstring_capitalize() { casefun = char_capitalize;  Lnstring_case(); }
 	@(return `coerce_to_string(x)`)
 @)
 
+void
 siLstring_concatenate()
 {
 	int narg, i, l, m;
@@ -577,6 +584,7 @@ siLstring_concatenate()
 	END_NO_INTERRUPT;}	
 }
 
+void
 init_string_function()
 {
 	sKstart1 = make_keyword("START1");

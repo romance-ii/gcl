@@ -1,16 +1,12 @@
 	  
 	  
 char *
-bsearch(key,base,nel,keysize,compar)
-	  char *key,*base;
-	  unsigned int nel,keysize;
-	  int (*compar)();
+bsearch(char *key, char *base, unsigned int nel, unsigned int keysize, int (*compar) (/* ??? */))
 {
   char *beg=base;
   char *end=base+keysize*(nel-1);
   char *mid;
   int cmp,tem;
- top:
   if (nel==0) return 0;
   cmp=(*compar)(beg,key);
   if (cmp==0) return beg;

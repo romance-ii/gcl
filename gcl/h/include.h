@@ -75,3 +75,4 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "compat.h"
 
 #include "../h/rgbc.h"
+#include "../h/protoize.h"

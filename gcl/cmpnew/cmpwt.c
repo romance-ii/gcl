@@ -1,7 +1,7 @@
 
 #include "cmpinclude.h"
 #include "cmpwt.h"
-init_cmpwt(){do_init(VV);}
+void init_cmpwt(){do_init(VV);}
 /*	local entry for function WT-COMMENT	*/
 
 static object LI1(V1,va_alist)
@@ -12,16 +12,19 @@ static object LI1(V1,va_alist)
 	int narg = VFUN_NARGS; VMB1 VMS1 VMV1
 	{object V2;
 	object V3;
+	Vcs[0]=Vcs[0];
+	va_start(ap);
 	if(narg <1) too_few_arguments();
 	V2= V1;
 	narg = narg - 1;
 	if (narg <= 0) goto T1;
 	else {
-	va_start(ap);
 	V3= va_arg(ap,object);}
 	--narg; goto T2;
+goto T1;
 T1:;
 	V3= Cnil;
+goto T2;
 T2:;
 	princ_str("\n/*	",VV[0]);
 	(void)(princ((V2),symbol_value(VV[0])));
@@ -33,10 +36,12 @@ T2:;
 	register long V6;
 	V5= length((V4));
 	V6= 0;
+goto T13;
 T13:;
 	if(!((V6)>=(V5))){
 	goto T14;}
 	goto T6;
+goto T14;
 T14:;
 	{register unsigned char V7;
 	V7= char_code(elt((V4),V6));
@@ -48,13 +53,18 @@ T14:;
 	if((vs_base[0])!=Cnil){
 	goto T18;}
 	(void)(princ(code_char(V7),symbol_value(VV[0])));}
+goto T18;
 T18:;
 	V6= (V6)+1;
 	goto T13;}}
+goto T6;
 T6:;
 	princ_str("	*/\n",VV[0]);
 	{object V8 = Cnil;
-	VMR1(V8)}}
+	VMR1(V8)}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}
 /*	local entry for function WT1	*/
 
@@ -62,6 +72,7 @@ static object LI2(V10)
 
 register object V10;
 {	 VMB2 VMS2 VMV2
+goto TTL;
 TTL:;
 	if(type_of((V10))==t_string){
 	goto T29;}
@@ -69,14 +80,17 @@ TTL:;
 	goto T29;}
 	if(!(type_of((V10))==t_character)){
 	goto T30;}
+goto T29;
 T29:;
 	(void)(princ((V10),symbol_value(VV[0])));
 	goto T28;
+goto T30;
 T30:;
 	if(type_of((V10))==t_longfloat){
 	goto T36;}
 	if(!(type_of((V10))==t_shortfloat)){
 	goto T37;}
+goto T36;
 T36:;
 	base[0]= symbol_value(VV[0]);
 	base[1]= VV[2];
@@ -85,14 +99,18 @@ T36:;
 	Lformat();
 	vs_top=sup;
 	goto T28;
+goto T37;
 T37:;
 	base[0]= (V10);
 	vs_top=(vs_base=base+0)+1;
 	(void) (*Lnk43)();
 	vs_top=sup;
+goto T28;
 T28:;
 	{object V11 = Cnil;
 	VMR2(V11)}
+	base[0]=base[0];
+	return Cnil;
 }
 /*	local entry for function WT-H1	*/
 
@@ -100,6 +118,7 @@ static object LI3(V13)
 
 register object V13;
 {	 VMB3 VMS3 VMV3
+goto TTL;
 TTL:;
 	if(!(type_of((V13))==t_cons)){
 	goto T47;}
@@ -117,6 +136,7 @@ TTL:;
 	super_funcall_no_event(base[0]);
 	vs_top=sup;
 	goto T45;
+goto T51;
 T51:;
 	base[0]= VV[4];
 	base[1]= (V13);
@@ -124,11 +144,15 @@ T51:;
 	(void) (*Lnk44)();
 	vs_top=sup;
 	goto T45;}
+goto T47;
 T47:;
 	(void)(princ((V13),symbol_value(VV[5])));
+goto T45;
 T45:;
 	{object V16 = Cnil;
 	VMR3(V16)}
+	base[0]=base[0];
+	return Cnil;
 }
 /*	local entry for function PUSH-DATA-INCF	*/
 
@@ -136,6 +160,7 @@ static object LI4(V18)
 
 object V18;
 {	 VMB4 VMS4 VMV4
+goto TTL;
 TTL:;
 	base[0]= (V18);
 	base[1]= small_fixnum(-1000);
@@ -148,6 +173,8 @@ TTL:;
 	setq(VV[7],number_plus(symbol_value(VV[7]),small_fixnum(1)));
 	{object V21 = symbol_value(VV[7]);
 	VMR4(V21)}
+	base[0]=base[0];
+	return Cnil;
 }
 /*	local entry for function WT-DATA1	*/
 
@@ -156,6 +183,7 @@ static object LI5(V23)
 object V23;
 {	 VMB5 VMS5 VMV5
 	bds_check;
+goto TTL;
 TTL:;
 	bds_bind(VV[8],Cnil);
 	bds_bind(VV[9],small_fixnum(10));
@@ -184,6 +212,8 @@ TTL:;
 	bds_unwind1;
 	bds_unwind1;
 	VMR5(V24)}
+	base[0]=base[0];
+	return Cnil;
 }
 /*	local entry for function VERIFY-DATA-VECTOR	*/
 
@@ -191,6 +221,7 @@ static object LI6(V26)
 
 register object V26;
 {	 VMB6 VMS6 VMV6
+goto TTL;
 TTL:;
 	{register object V27;
 	V27= Cnil;
@@ -198,10 +229,12 @@ TTL:;
 	register object V29;
 	V28= make_fixnum(length((V26)));
 	V29= small_fixnum(0);
+goto T68;
 T68:;
 	if(!(number_compare((V29),(V28))>=0)){
 	goto T69;}
 	goto T64;
+goto T69;
 T69:;
 	V27= aref1((V26),fixint((V29)));
 	{register object V30;
@@ -214,13 +247,17 @@ T69:;
 	if(eql(car((V27)),(V30))){
 	goto T75;}
 	(void)((VFUN_NARGS=2,(*(LnkLI47))(VV[22],cdr((V27)))));}
+goto T75;
 T75:;
 	(void)(aset1((V26),fixint((V29)),cdr((V27))));
 	V29= one_plus((V29));
 	goto T68;}
+goto T64;
 T64:;
 	{object V31 = (V26);
 	VMR6(V31)}}
+	base[0]=base[0];
+	return Cnil;
 }
 /*	local entry for function ADD-INIT	*/
 
@@ -232,16 +269,19 @@ static object LI7(V32,va_alist)
 	int narg = VFUN_NARGS; VMB7 VMS7 VMV7
 	{object V33;
 	object V34;
+	Vcs[0]=Vcs[0];
+	va_start(ap);
 	if(narg <1) too_few_arguments();
 	V33= V32;
 	narg = narg - 1;
 	if (narg <= 0) goto T85;
 	else {
-	va_start(ap);
 	V34= va_arg(ap,object);}
 	--narg; goto T86;
+goto T85;
 T85:;
 	V34= Cnil;
+goto T86;
 T86:;
 	{object V35;
 	base[0]= (V33);
@@ -260,23 +300,29 @@ T86:;
 	V40= make_cons((V35),Cnil);
 	V38= nconc(/* INLINE-ARGS */V39,/* INLINE-ARGS */V40);
 	goto T94;
+goto T96;
 T96:;
 	V38= make_cons((V35),cadr(symbol_value(VV[6])));
+goto T94;
 T94:;
 	if(type_of(cdr((V37)))!=t_cons)FEwrong_type_argument(Scons,cdr((V37)));
 	(cdr((V37)))->c.c_car = (V38);
 	(void)(cdr((V37)));}
 	{object V41 = (V33);
-	VMR7(V41)}}}
+	VMR7(V41)}}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}
 /*	function definition for WT-DATA-FILE	*/
 
-static L8()
+static void L8()
 {register object *base=vs_base;
 	register object *sup=base+VM8; VC8
 	vs_reserve(VM8);
 	check_arg(0);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	(void)((*(LnkLI48))(car(symbol_value(VV[6]))));
 	{object V42;
@@ -300,6 +346,7 @@ TTL:;
 	vs_base=vs_top;
 	(void) (*Lnk50)();
 	return;
+goto T108;
 T108:;
 	base[1]= symbol_value(VV[21]);
 	base[2]= VV[26];
@@ -310,10 +357,12 @@ T108:;
 	register object V51;
 	V50= caddr(symbol_value(VV[6]));
 	V51= car((V50));
+goto T117;
 T117:;
 	if(!(endp((V50)))){
 	goto T118;}
 	goto T113;
+goto T118;
 T118:;
 	base[3]= symbol_value(VV[21]);
 	base[4]= VV[27];
@@ -324,6 +373,7 @@ T118:;
 	V50= cdr((V50));
 	V51= car((V50));
 	goto T117;}
+goto T113;
 T113:;
 	(void)((*(LnkLI51))(car(symbol_value(VV[6]))));
 	base[1]= symbol_value(VV[21]);
@@ -334,12 +384,13 @@ T113:;
 }
 /*	function definition for WT-FASD-DATA-FILE	*/
 
-static L9()
+static void L9()
 {register object *base=vs_base;
 	register object *sup=base+VM9; VC9
 	vs_reserve(VM9);
 	check_arg(0);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	{object V52;
 	object V53;
@@ -357,10 +408,12 @@ TTL:;
 	register object V55;
 	V54= (V53);
 	V55= car((V54));
+goto T146;
 T146:;
 	if(!(endp((V54)))){
 	goto T147;}
 	goto T139;
+goto T147;
 T147:;
 	base[2]= small_fixnum(1);
 	base[3]= symbol_value(VV[21]);
@@ -375,6 +428,7 @@ T147:;
 	V54= cdr((V54));
 	V55= car((V54));
 	goto T146;}
+goto T139;
 T139:;
 	base[1]= (V52);
 	base[2]= car(symbol_value(VV[25]));
@@ -391,18 +445,22 @@ T139:;
 static object LI10()
 
 {	 VMB10 VMS10 VMV10
+goto TTL;
 TTL:;
 	{object V56 = Cnil;
 	VMR10(V56)}
+	return Cnil;
 }
 /*	local entry for function WT-DATA-END	*/
 
 static object LI11()
 
 {	 VMB11 VMS11 VMV11
+goto TTL;
 TTL:;
 	{object V57 = Cnil;
 	VMR11(V57)}
+	return Cnil;
 }
 /*	local entry for function WT-DATA-PACKAGE-OPERATION	*/
 
@@ -410,6 +468,7 @@ static object LI12(V59)
 
 object V59;
 {	 VMB12 VMS12 VMV12
+goto TTL;
 TTL:;
 	{object V60;
 	object V61;
@@ -420,10 +479,12 @@ TTL:;
 	(void)(cddr((V60)));
 	{object V62 = (V61);
 	VMR12(V62)}}
+	base[0]=base[0];
+	return Cnil;
 }
 /*	macro definition for WT	*/
 
-static L13()
+static void L13()
 {register object *base=vs_base;
 	register object *sup=base+VM13; VC13
 	vs_reserve(VM13);
@@ -436,6 +497,7 @@ static L13()
 	register object V65;
 	V64= base[2];
 	V65= car((V64));
+goto T173;
 T173:;
 	if(!(endp((V64)))){
 	goto T174;}
@@ -444,15 +506,18 @@ T173:;
 	base[5]= make_cons(VV[29],/* INLINE-ARGS */V67);
 	vs_top=(vs_base=base+5)+1;
 	return;
+goto T174;
 T174:;
 	if(!(type_of((V65))==t_string)){
 	goto T180;}
 	V68= list(3,VV[30],(V65),VV[0]);
 	base[3]= make_cons(/* INLINE-ARGS */V68,base[3]);
 	goto T178;
+goto T180;
 T180:;
 	V69= list(2,VV[31],(V65));
 	base[3]= make_cons(/* INLINE-ARGS */V69,base[3]);
+goto T178;
 T178:;
 	V64= cdr((V64));
 	V65= car((V64));
@@ -460,7 +525,7 @@ T178:;
 }
 /*	macro definition for WT-H	*/
 
-static L14()
+static void L14()
 {register object *base=vs_base;
 	register object *sup=base+VM14; VC14
 	vs_reserve(VM14);
@@ -474,6 +539,7 @@ static L14()
 	base[4]= VV[32];
 	vs_top=(vs_base=base+4)+1;
 	return;
+goto T191;
 T191:;
 	if(!(type_of(car(base[2]))==t_string)){
 	goto T194;}
@@ -481,6 +547,7 @@ T191:;
 	register object V72;
 	V71= cdr(base[2]);
 	V72= car((V71));
+goto T199;
 T199:;
 	if(!(endp((V71)))){
 	goto T200;}
@@ -490,24 +557,29 @@ T199:;
 	base[6]= listA(3,VV[29],/* INLINE-ARGS */V74,reverse(/* INLINE-ARGS */V75));
 	vs_top=(vs_base=base+6)+1;
 	return;
+goto T200;
 T200:;
 	if(!(type_of((V72))==t_string)){
 	goto T206;}
 	V76= list(3,VV[30],(V72),VV[5]);
 	base[3]= make_cons(/* INLINE-ARGS */V76,base[3]);
 	goto T204;
+goto T206;
 T206:;
 	V77= list(2,VV[35],(V72));
 	base[3]= make_cons(/* INLINE-ARGS */V77,base[3]);
+goto T204;
 T204:;
 	V71= cdr((V71));
 	V72= car((V71));
 	goto T199;}
+goto T194;
 T194:;
 	{register object V78;
 	register object V79;
 	V78= base[2];
 	V79= car((V78));
+goto T218;
 T218:;
 	if(!(endp((V78)))){
 	goto T219;}
@@ -515,15 +587,18 @@ T218:;
 	base[5]= listA(3,VV[29],VV[36],reverse(/* INLINE-ARGS */V80));
 	vs_top=(vs_base=base+5)+1;
 	return;
+goto T219;
 T219:;
 	if(!(type_of((V79))==t_string)){
 	goto T225;}
 	V81= list(3,VV[30],(V79),VV[5]);
 	base[3]= make_cons(/* INLINE-ARGS */V81,base[3]);
 	goto T223;
+goto T225;
 T225:;
 	V82= list(2,VV[35],(V79));
 	base[3]= make_cons(/* INLINE-ARGS */V82,base[3]);
+goto T223;
 T223:;
 	V78= cdr((V78));
 	V79= car((V78));
@@ -531,7 +606,7 @@ T223:;
 }
 /*	macro definition for WT-NL	*/
 
-static L15()
+static void L15()
 {register object *base=vs_base;
 	register object *sup=base+VM15; VC15
 	vs_reserve(VM15);
@@ -545,6 +620,7 @@ static L15()
 	base[4]= VV[37];
 	vs_top=(vs_base=base+4)+1;
 	return;
+goto T236;
 T236:;
 	if(!(type_of(car(base[2]))==t_string)){
 	goto T239;}
@@ -552,6 +628,7 @@ T236:;
 	register object V85;
 	V84= cdr(base[2]);
 	V85= car((V84));
+goto T244;
 T244:;
 	if(!(endp((V84)))){
 	goto T245;}
@@ -561,24 +638,29 @@ T244:;
 	base[6]= listA(3,VV[29],/* INLINE-ARGS */V87,reverse(/* INLINE-ARGS */V88));
 	vs_top=(vs_base=base+6)+1;
 	return;
+goto T245;
 T245:;
 	if(!(type_of((V85))==t_string)){
 	goto T251;}
 	V89= list(3,VV[30],(V85),VV[0]);
 	base[3]= make_cons(/* INLINE-ARGS */V89,base[3]);
 	goto T249;
+goto T251;
 T251:;
 	V90= list(2,VV[31],(V85));
 	base[3]= make_cons(/* INLINE-ARGS */V90,base[3]);
+goto T249;
 T249:;
 	V84= cdr((V84));
 	V85= car((V84));
 	goto T244;}
+goto T239;
 T239:;
 	{register object V91;
 	register object V92;
 	V91= base[2];
 	V92= car((V91));
+goto T263;
 T263:;
 	if(!(endp((V91)))){
 	goto T264;}
@@ -586,15 +668,18 @@ T263:;
 	base[5]= listA(3,VV[29],VV[39],reverse(/* INLINE-ARGS */V93));
 	vs_top=(vs_base=base+5)+1;
 	return;
+goto T264;
 T264:;
 	if(!(type_of((V92))==t_string)){
 	goto T270;}
 	V94= list(3,VV[30],(V92),VV[0]);
 	base[3]= make_cons(/* INLINE-ARGS */V94,base[3]);
 	goto T268;
+goto T270;
 T270:;
 	V95= list(2,VV[31],(V92));
 	base[3]= make_cons(/* INLINE-ARGS */V95,base[3]);
+goto T268;
 T268:;
 	V91= cdr((V91));
 	V92= car((V91));
@@ -602,7 +687,7 @@ T268:;
 }
 /*	macro definition for WT-NL1	*/
 
-static L16()
+static void L16()
 {register object *base=vs_base;
 	register object *sup=base+VM16; VC16
 	vs_reserve(VM16);
@@ -616,6 +701,7 @@ static L16()
 	base[4]= VV[40];
 	vs_top=(vs_base=base+4)+1;
 	return;
+goto T281;
 T281:;
 	if(!(type_of(car(base[2]))==t_string)){
 	goto T284;}
@@ -623,6 +709,7 @@ T281:;
 	register object V98;
 	V97= cdr(base[2]);
 	V98= car((V97));
+goto T289;
 T289:;
 	if(!(endp((V97)))){
 	goto T290;}
@@ -632,24 +719,29 @@ T289:;
 	base[6]= listA(3,VV[29],/* INLINE-ARGS */V100,reverse(/* INLINE-ARGS */V101));
 	vs_top=(vs_base=base+6)+1;
 	return;
+goto T290;
 T290:;
 	if(!(type_of((V98))==t_string)){
 	goto T296;}
 	V102= list(3,VV[30],(V98),VV[0]);
 	base[3]= make_cons(/* INLINE-ARGS */V102,base[3]);
 	goto T294;
+goto T296;
 T296:;
 	V103= list(2,VV[31],(V98));
 	base[3]= make_cons(/* INLINE-ARGS */V103,base[3]);
+goto T294;
 T294:;
 	V97= cdr((V97));
 	V98= car((V97));
 	goto T289;}
+goto T284;
 T284:;
 	{register object V104;
 	register object V105;
 	V104= base[2];
 	V105= car((V104));
+goto T308;
 T308:;
 	if(!(endp((V104)))){
 	goto T309;}
@@ -657,33 +749,36 @@ T308:;
 	base[5]= listA(3,VV[29],VV[42],reverse(/* INLINE-ARGS */V106));
 	vs_top=(vs_base=base+5)+1;
 	return;
+goto T309;
 T309:;
 	if(!(type_of((V105))==t_string)){
 	goto T315;}
 	V107= list(3,VV[30],(V105),VV[0]);
 	base[3]= make_cons(/* INLINE-ARGS */V107,base[3]);
 	goto T313;
+goto T315;
 T315:;
 	V108= list(2,VV[31],(V105));
 	base[3]= make_cons(/* INLINE-ARGS */V108,base[3]);
+goto T313;
 T313:;
 	V104= cdr((V104));
 	V105= car((V104));
 	goto T308;}
 }
-static object  LnkTLI55(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[55],&LnkLI55,ap);} /* CONCATENATE */
-static LnkT54(){ call_or_link(VV[54],&Lnk54);} /* CLOSE-FASD */
-static LnkT53(){ call_or_link(VV[53],&Lnk53);} /* WRITE-FASD-TOP */
-static LnkT52(){ call_or_link(VV[52],&Lnk52);} /* FIND-SHARING-TOP */
-static object  LnkTLI51(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[51],&LnkLI51,1,ap);} /* WT-DATA1 */
-static LnkT50(){ call_or_link(VV[50],&Lnk50);} /* WT-FASD-DATA-FILE */
-static object  LnkTLI49(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[49],&LnkLI49,2,ap);} /* COERCE */
-static object  LnkTLI48(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[48],&LnkLI48,1,ap);} /* VERIFY-DATA-VECTOR */
-static object  LnkTLI47(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[47],&LnkLI47,ap);} /* CMPWARN */
-static LnkT46(){ call_or_link(VV[46],&Lnk46);} /* HASH-EQUAL */
-static object  LnkTLI45(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[45],&LnkLI45,ap);} /* VECTOR-PUSH-EXTEND */
-static LnkT44(){ call_or_link(VV[44],&Lnk44);} /* CMPILER-ERROR */
-static LnkT43(){ call_or_link(VV[43],&Lnk43);} /* WT-LOC */
+static object  LnkTLI55(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[55],(void **)&LnkLI55,ap);} /* CONCATENATE */
+static void LnkT54(){ call_or_link(VV[54],(void **)&Lnk54);} /* CLOSE-FASD */
+static void LnkT53(){ call_or_link(VV[53],(void **)&Lnk53);} /* WRITE-FASD-TOP */
+static void LnkT52(){ call_or_link(VV[52],(void **)&Lnk52);} /* FIND-SHARING-TOP */
+static object  LnkTLI51(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[51],(void **)&LnkLI51,1,ap);} /* WT-DATA1 */
+static void LnkT50(){ call_or_link(VV[50],(void **)&Lnk50);} /* WT-FASD-DATA-FILE */
+static object  LnkTLI49(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[49],(void **)&LnkLI49,2,ap);} /* COERCE */
+static object  LnkTLI48(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[48],(void **)&LnkLI48,1,ap);} /* VERIFY-DATA-VECTOR */
+static object  LnkTLI47(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[47],(void **)&LnkLI47,ap);} /* CMPWARN */
+static void LnkT46(){ call_or_link(VV[46],(void **)&Lnk46);} /* HASH-EQUAL */
+static object  LnkTLI45(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[45],(void **)&LnkLI45,ap);} /* VECTOR-PUSH-EXTEND */
+static void LnkT44(){ call_or_link(VV[44],(void **)&Lnk44);} /* CMPILER-ERROR */
+static void LnkT43(){ call_or_link(VV[43],(void **)&Lnk43);} /* WT-LOC */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

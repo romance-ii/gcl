@@ -36,7 +36,7 @@
 #define MPROTECT_ACTION_FLAGS SA_RESTART
 #define INSTALL_MPROTECT_HANDLER \
 do {static struct sigaction action; \
-      action.sa_handler = memprotect_handler; \
+      action.sa_handler = (void *)memprotect_handler; \
       action.sa_flags = MPROTECT_ACTION_FLAGS; \
       action.sa_restorer = 0; \
       sigemptyset(&action.sa_mask); \

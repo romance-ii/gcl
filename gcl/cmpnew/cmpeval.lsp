@@ -398,6 +398,9 @@
   (base-used)
   (wt-nl "{register object *base=V" top ";")
   (wt-nl "register object *sup=vs_base+VM" *reservation-cmacro* ";")
+  ;;; Dummy assignments for lint
+  (wt-nl "base" (1- *level*) "[0]=base" (1- *level*) "[0];")
+  (wt-nl "base[0]=base[0];")
   (if *safe-compile*
       (wt-nl "vs_reserve(VM" *reservation-cmacro* ");")
       (wt-nl "vs_check;"))

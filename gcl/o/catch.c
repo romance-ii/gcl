@@ -28,13 +28,12 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 
-Fcatch(args)
-object args;
+void
+Fcatch(object args)
 {
 	object endp_temp;
 
 	object *top = vs_top;
-	object tag;
 
 	if (endp(args))
 		FEtoo_few_argumentsF(args);
@@ -58,10 +57,8 @@ course of the evaluation, a non-local jump from the FORM is atempted, \
 SI:ERROR-SET traps the jump and returns the corresponding jump tag as its \
 value.")
    (x0)
-object x0;
+volatile object x0;
 {
-	object *old_base = vs_base;
-	object *value_top;
 	object *old_lex = lex_env;
 
 	/* 1 args */
@@ -91,8 +88,8 @@ object x0;
 	return Cnil;
 }
 
-Funwind_protect(args)
-object args;
+void
+Funwind_protect(object args)
 {
 	object endp_temp;
 
@@ -104,7 +101,6 @@ object args;
 	if (nlj_active) {
 		object tag = nlj_tag;
 		frame_ptr fr = nlj_fr;
-		object *base;
 
 		value_top = vs_top;
 		vs_top = top;
@@ -138,8 +134,8 @@ object args;
 	}
 }
 
-Fthrow(args)
-object args;
+void
+Fthrow(object args)
 {
 	object endp_temp;
 
@@ -162,7 +158,8 @@ object args;
 	/* never reached */
 }
 
-init_catch()
+void
+init_catch(void)
 {
 	make_special_form("CATCH", Fcatch);
 	make_special_form("UNWIND-PROTECT", Funwind_protect);

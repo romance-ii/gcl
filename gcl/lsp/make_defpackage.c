@@ -1,10 +1,10 @@
 
 #include "cmpinclude.h"
 #include "make_defpackage.h"
-init_make_defpackage(){do_init(VV);}
+void init_make_defpackage(){do_init(VV);}
 /*	function definition for MAKE-DEFPACKAGE-FORM	*/
 
-static L1()
+static void L1()
 {register object *base=vs_base;
 	register object *sup=base+VM1; VC1
 	vs_reserve(VM1);
@@ -12,6 +12,7 @@ static L1()
 	check_arg(1);
 	V1=(base[0]);
 	vs_top=sup;
+goto TTL;
 TTL:;
 	{object V2;
 	base[1]= (V1);
@@ -50,6 +51,7 @@ TTL:;
 	V6= Cnil;
 	goto T9;}
 	base[6]=V13=MMcons(Cnil,Cnil);
+goto T10;
 T10:;
 	base[7]= (V14->c.c_car);
 	vs_top=(vs_base=base+7)+1;
@@ -61,6 +63,7 @@ T10:;
 	goto T9;}
 	V13=MMcdr(V13)=MMcons(Cnil,Cnil);
 	goto T10;}
+goto T9;
 T9:;
 	V7= Cnil;
 	base[6]= (V2);
@@ -83,12 +86,14 @@ T9:;
 	goto T23;}
 	V15= V2;
 	goto T21;
+goto T23;
 T23:;
 	base[6]= coerce_to_string(V2);
 	vs_top=(vs_base=base+6)+1;
 	Lfind_package();
 	vs_top=sup;
 	V15= vs_base[0];
+goto T21;
 T21:;
 	V16= Cnil;
 	V17= Cnil;
@@ -100,11 +105,13 @@ T21:;
 	vs_top=sup;
 	V19= vs_base[0];
 	V20= small_fixnum(0);
+goto T31;
 T31:;
 	if(!(number_compare((V20),(V19))>=0)){
 	goto T32;}
 	V16= Cnil;
 	goto T20;
+goto T32;
 T32:;
 	base[7]= (V15);
 	base[8]= (V20);
@@ -112,21 +119,26 @@ T32:;
 	siLpackage_external();
 	vs_top=sup;
 	V17= vs_base[0];
+goto T39;
 T39:;
 	if(((V17))!=Cnil){
 	goto T44;}
 	goto T40;
+goto T44;
 T44:;
 	V16= car((V17));
 	V21= symbol_name((V16));
 	V7= make_cons(/* INLINE-ARGS */V21,(V7));
 	V17= cdr((V17));
 	goto T39;
+goto T40;
 T40:;
 	goto T37;
+goto T37;
 T37:;
 	V20= one_plus((V20));
 	goto T31;}}
+goto T20;
 T20:;
 	{object V22;
 	register object V23;
@@ -139,12 +151,14 @@ T20:;
 	goto T59;}
 	V22= V2;
 	goto T57;
+goto T59;
 T59:;
 	base[6]= coerce_to_string(V2);
 	vs_top=(vs_base=base+6)+1;
 	Lfind_package();
 	vs_top=sup;
 	V22= vs_base[0];
+goto T57;
 T57:;
 	V23= Cnil;
 	V24= Cnil;
@@ -160,10 +174,13 @@ T57:;
 	V27= fix(vs_base[0]);
 	vs_top=sup;
 	goto T67;
+goto T65;
 T65:;
 	V26= fix(Cnil);
+goto T66;
 T66:;
 	V27= fix(Cnil);
+goto T67;
 T67:;
 	{object V28;
 	register object V29;
@@ -171,11 +188,13 @@ T67:;
 	V31 = make_fixnum(V26);
 	V28= number_plus(V30,V31);
 	V29= small_fixnum(0);
+goto T71;
 T71:;
 	if(!(number_compare((V29),(V28))>=0)){
 	goto T72;}
 	V23= Cnil;
 	goto T56;
+goto T72;
 T72:;
 	V32 = make_fixnum(V27);
 	if(!(number_compare((V29),V32)<0)){
@@ -187,6 +206,7 @@ T72:;
 	vs_top=sup;
 	V24= vs_base[0];
 	goto T81;
+goto T83;
 T83:;
 	base[7]= (V22);
 	V33 = make_fixnum(V27);
@@ -195,11 +215,14 @@ T83:;
 	siLpackage_external();
 	vs_top=sup;
 	V24= vs_base[0];
+goto T81;
 T81:;
+goto T79;
 T79:;
 	if(((V24))!=Cnil){
 	goto T89;}
 	goto T80;
+goto T89;
 T89:;
 	V23= car((V24));
 	base[7]= (V23);
@@ -217,14 +240,18 @@ T89:;
 	if(((VFUN_NARGS=2,(*(LnkLI9))(V35,(V5))))!=Cnil){
 	goto T94;}
 	V9= make_cons((V23),(V9));
+goto T94;
 T94:;
 	V24= cdr((V24));
 	goto T79;
+goto T80;
 T80:;
 	goto T77;
+goto T77;
 T77:;
 	V29= one_plus((V29));
 	goto T71;}}}
+goto T56;
 T56:;
 	V10= (VFUN_NARGS=2,(*(LnkLI10))((V8),(V9)));
 	V11= (VFUN_NARGS=2,(*(LnkLI11))((V8),(V10)));
@@ -234,24 +261,30 @@ T56:;
 	V37= make_cons(VV[1],(V4));
 	base[6]= make_cons(/* INLINE-ARGS */V37,Cnil);
 	goto T116;
+goto T118;
 T118:;
 	base[6]= Cnil;
+goto T116;
 T116:;
 	if(((V6))==Cnil){
 	goto T122;}
 	V38= make_cons(VV[2],(V6));
 	base[7]= make_cons(/* INLINE-ARGS */V38,Cnil);
 	goto T120;
+goto T122;
 T122:;
 	base[7]= Cnil;
+goto T120;
 T120:;
 	if(((V7))==Cnil){
 	goto T126;}
 	V39= make_cons(VV[3],(V7));
 	base[8]= make_cons(/* INLINE-ARGS */V39,Cnil);
 	goto T124;
+goto T126;
 T126:;
 	base[8]= Cnil;
+goto T124;
 T124:;
 	if(((V11))==Cnil){
 	goto T130;}
@@ -261,6 +294,7 @@ T124:;
 	V40= Cnil;
 	goto T132;}
 	base[10]=V41=MMcons(Cnil,Cnil);
+goto T133;
 T133:;
 	(V41->c.c_car)= symbol_name((V42->c.c_car));
 	if(endp(V42=MMcdr(V42))){
@@ -268,12 +302,15 @@ T133:;
 	goto T132;}
 	V41=MMcdr(V41)=MMcons(Cnil,Cnil);
 	goto T133;}
+goto T132;
 T132:;
 	V43= make_cons(VV[4],V40);
 	base[9]= make_cons(/* INLINE-ARGS */V43,Cnil);
 	goto T128;
+goto T130;
 T130:;
 	base[9]= Cnil;
+goto T128;
 T128:;
 	if(((V10))==Cnil){
 	goto T137;}
@@ -283,6 +320,7 @@ T128:;
 	base[10]= Cnil;
 	goto T135;}
 	base[11]=V44=MMcons(Cnil,Cnil);
+goto T139;
 T139:;
 	base[13]= (V45->c.c_car);
 	vs_top=(vs_base=base+13)+1;
@@ -300,8 +338,10 @@ T139:;
 	goto T135;}
 	V44=MMcdr(V44)=MMcons(Cnil,Cnil);
 	goto T139;}
+goto T137;
 T137:;
 	base[10]= Cnil;
+goto T135;
 T135:;
 	if(((V12))==Cnil){
 	goto T146;}
@@ -311,6 +351,7 @@ T135:;
 	base[11]= Cnil;
 	goto T144;}
 	base[12]=V49=MMcons(Cnil,Cnil);
+goto T148;
 T148:;
 	base[14]= (V50->c.c_car);
 	vs_top=(vs_base=base+14)+1;
@@ -328,8 +369,10 @@ T148:;
 	goto T144;}
 	V49=MMcdr(V49)=MMcons(Cnil,Cnil);
 	goto T148;}
+goto T146;
 T146:;
 	base[11]= Cnil;
+goto T144;
 T144:;
 	vs_top=(vs_base=base+6)+6;
 	Lappend();
@@ -340,11 +383,11 @@ T144:;
 	return;}}
 	}
 }
-static object  LnkTLI11(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[11],&LnkLI11,ap);} /* SET-DIFFERENCE */
-static object  LnkTLI10(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[10],&LnkLI10,ap);} /* INTERSECTION */
-static object  LnkTLI9(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[9],&LnkLI9,ap);} /* FIND */
-static LnkT8(){ call_or_link(VV[8],&Lnk8);} /* PACKAGE-SIZE */
-static LnkT7(){ call_or_link(VV[7],&Lnk7);} /* PACKAGE-SHADOWING-SYMBOLS */
+static object  LnkTLI11(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[11],(void **)&LnkLI11,ap);} /* SET-DIFFERENCE */
+static object  LnkTLI10(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[10],(void **)&LnkLI10,ap);} /* INTERSECTION */
+static object  LnkTLI9(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[9],(void **)&LnkLI9,ap);} /* FIND */
+static void LnkT8(){ call_or_link(VV[8],(void **)&Lnk8);} /* PACKAGE-SIZE */
+static void LnkT7(){ call_or_link(VV[7],(void **)&Lnk7);} /* PACKAGE-SHADOWING-SYMBOLS */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

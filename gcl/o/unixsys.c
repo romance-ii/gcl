@@ -19,6 +19,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+#include <stdlib.h>
 #include "include.h"
 
 #ifdef ATT3B2
@@ -55,7 +56,8 @@ char *command;
 }
 #endif
 
-Lsystem()
+void
+Lsystem(void)
 {
 	char command[1024];
 	int i;
@@ -78,12 +80,13 @@ Lsystem()
        }
 }
 
-DEFUN("GETPID",int,fSgetpid,SI,0,0,NONE,IO,OO,OO,OO,
+DEFUN("GETPID",object,fSgetpid,SI,0,0,NONE,OO,OO,OO,OO,
       "getpid  returns  the  process  ID  of the current process")()
-{ return getpid();
+{ return make_fixnum(getpid());
 }
 
-init_unixsys()
+void
+init_unixsys(void)
 {
 	make_function("SYSTEM", Lsystem);
 }

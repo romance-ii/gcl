@@ -137,15 +137,15 @@ char safety_required[]={XX,XX,XX,XX,XX,XX,XX,XX,
 			XX,XX,XX,XX,XX,XX,XX,XX,
 			XX,XX,XX,XX,XX,XX,XX,XX};
 
-int
-init_safety()
+void
+init_safety(void)
 { safety_required[SIGINT]=sig_try_to_delay;
   safety_required[SIGALRM]=sig_normal;
 }
   
 DO_INIT(init_safety();)
-DEFUN("SIGNAL-SAFETY-REQUIRED",int,sSsignal_safety_required,SI,2,2,
-      NONE,II,IO,OO,OO,
+DEFUN("SIGNAL-SAFETY-REQUIRED",object,sSsignal_safety_required,SI,2,2,
+      NONE,OI,IO,OO,OO,
       "Set the safety level required for handling SIGNO to SAFETY, or if \
 SAFETY is negative just return the current safety level for that \
 signal number.  Value of 1 means allow interrupt at any place not \
@@ -158,13 +158,12 @@ only in very SAFE places.")
 { if (signo > sizeof(safety_required))
     {FEerror("Illegal signo:~a.",1,make_fixnum(signo));}
   if (safety >=0) safety_required[signo] = safety;
-  return   safety_required[signo] ;
+  return make_fixnum(safety_required[signo]) ;
 }
      
 
 void
-main_signal_handler(signo, a,b)
-     int signo,a,b;
+main_signal_handler(int signo, int a, int b)
 {  int allowed = signals_allowed;
 #ifdef NEED_TO_REINSTALL_SIGNALS
        signal(signo,main_signal_handler);
@@ -186,12 +185,12 @@ main_signal_handler(signo, a,b)
 
  }
 
-static void before_interrupt();
-static void after_interrupt();
+static void before_interrupt(struct save_for_interrupt *p, int allowed);
+static void after_interrupt(struct save_for_interrupt *p, int allowed);
 
 /* caller saves and restores the global signals_allowed; */
-invoke_handler(signo,allowed)
-     int signo,allowed;
+void
+invoke_handler(int signo, int allowed)
 {struct save_for_interrupt buf;
  before_interrupt(&buf,allowed);
  signals_pending &= ~(signal_mask(signo));
@@ -206,9 +205,7 @@ invoke_handler(signo,allowed)
 
 int tok_leng;
 static void
-before_interrupt(p,allowed)
-   struct save_for_interrupt *p;
-     int allowed;
+before_interrupt(struct save_for_interrupt *p, int allowed)
 {int i;
  /* all this must be run in no interrupts mode */
  if ( allowed < sig_safe)
@@ -264,9 +261,7 @@ before_interrupt(p,allowed)
 }
 
 static void
-after_interrupt(p,allowed)
-  struct save_for_interrupt *p;
-  int allowed;
+after_interrupt(struct save_for_interrupt *p, int allowed)
 {int i;
  /* all this must be run in no interrupts mode */
  if ( allowed < sig_safe)
@@ -324,8 +319,7 @@ after_interrupt(p,allowed)
 */
 
 object
-MakeCons(a,b)
-     object a,b;
+MakeCons(object a, object b)
 { struct typemanager*ad = &tm_table[t_cons];
   object new = (object) ad->tm_free;
   if (new == 0)
@@ -371,11 +365,9 @@ MakeCons(a,b)
    Might be sig_safe (eg at cons). */
    
 void
-raise_pending_signals(cond)
-     int cond;
+raise_pending_signals(int cond)
 {unsigned int allowed = signals_allowed ;
  if (cond == sig_use_signals_allowed_value)
-   { cond == allowed ;}
  if (cond == sig_none  || interrupt_enable ==0) return ;
  
  
@@ -385,7 +377,7 @@ raise_pending_signals(cond)
    if (pending)
      while(*p)
        { if (signal_mask(*p) & pending
-	     && cond >= safety_required[*p])
+	     && cond >= safety_required[(unsigned char)*p])
 	   {
 	     signals_pending &= ~(signal_mask(*p));
 	     if (*p == SIGALRM && cond >= sig_safe)
@@ -401,21 +393,21 @@ raise_pending_signals(cond)
  }}
 
 
-DEFUN("ALLOW-SIGNAL",int,fSallow_signal,SI,1,1,NONE,II,OO,OO,OO,
+DEFUN("ALLOW-SIGNAL",object,fSallow_signal,SI,1,1,NONE,OI,OO,OO,OO,
       "Install the default signal handler on signal N")
      (n)
      int n;
-{int ma ;
- int ans = 0;
+{
+
  signals_allowed |= signal_mask(n);
  unblock_signals(n,n);
  /* sys v ?? just restore the signal ?? */
  if (our_signal_handler[n])
    {gcl_signal(n,our_signal_handler[n]);
-    return 1;
+    return make_fixnum(1);
   }
  else
-   return 0;
+   return make_fixnum(0);
 }
 
 

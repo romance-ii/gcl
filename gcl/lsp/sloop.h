@@ -1,15 +1,15 @@
 
-static L1();
-static L3();
-static L4();
-static L5();
-static L6();
-static L7();
-static L8();
-static L9();
-static L10();
-static L11();
-static L12();
+static void L1();
+static void L3();
+static void L4();
+static void L5();
+static void L6();
+static void L7();
+static void L8();
+static void L9();
+static void L10();
+static void L11();
+static void L12();
 static object LI23();
 static object LI34();
 static object LI35();
@@ -19,7 +19,7 @@ static object LI38();
 static object LI40();
 static object LI43();
 static object LI57();
-static L63();
+static void L63();
 #define VC1 object  V13 ,V12 ,V11 ,V10 ,V9 ,V7;
 static object LI2();
 #define VMB2 register object *base=vs_top; object  V28 ,V27 ,V26 ,V25 ,V24 ,V23 ,V22 ,V21 ,V20;
@@ -172,47 +172,47 @@ static object LI39();
 #define VMV39 vs_reserve(6);
 #define VMR39(VMT39) vs_top=base ; return(VMT39);
 static object LI40();
-#define VMB40 register object *base=vs_top; object  V373; object Vcs[3];
+#define VMB40 register object *base=vs_top; object  V374; object Vcs[3];
 #define VMS40  register object *sup=vs_top+2;vs_top=sup;
 #define VMV40 vs_reserve(2);
 #define VMR40(VMT40) vs_top=base ; return(VMT40);
 static object LI41();
-#define VMB41 register object *base=vs_top; object  V392 ,V389;
+#define VMB41 register object *base=vs_top; object  V393 ,V390;
 #define VMS41  register object *sup=vs_top+3;vs_top=sup;
 #define VMV41 vs_reserve(3);
 #define VMR41(VMT41) vs_top=base ; return(VMT41);
 static object LI42();
-#define VMB42 register object *base=vs_top; object  V397;
+#define VMB42 register object *base=vs_top; object  V398;
 #define VMS42  register object *sup=vs_top+3;vs_top=sup;
 #define VMV42 vs_reserve(3);
 #define VMR42(VMT42) vs_top=base ; return(VMT42);
 static object LI43();
-#define VMB43 register object *base=vs_top; object  V423 ,V422 ,V421 ,V420 ,V419 ,V418 ,V417 ,V416 ,V415 ,V414 ,V413 ,V412 ,V411; object Vcs[7];
+#define VMB43 register object *base=vs_top; object  V424 ,V423 ,V422 ,V421 ,V420 ,V419 ,V418 ,V417 ,V416 ,V415 ,V414 ,V413 ,V412; object Vcs[7];
 #define VMS43  register object *sup=vs_top+7;vs_top=sup;
 #define VMV43 vs_reserve(7);
 #define VMR43(VMT43) vs_top=base ; return(VMT43);
 static object LI44();
-#define VMB44 object  V429;
+#define VMB44 object  V430;
 #define VMS44
 #define VMV44
 #define VMR44(VMT44) return(VMT44);
 static object LI45();
-#define VMB45 object  V436 ,V435;
+#define VMB45 object  V437 ,V436;
 #define VMS45
 #define VMV45
 #define VMR45(VMT45) return(VMT45);
 static object LI46();
-#define VMB46 object  V443 ,V442;
+#define VMB46 object  V444 ,V443;
 #define VMS46
 #define VMV46
 #define VMR46(VMT46) return(VMT46);
 static object LI47();
-#define VMB47 object  V450 ,V449;
+#define VMB47 object  V451 ,V450;
 #define VMS47
 #define VMV47
 #define VMR47(VMT47) return(VMT47);
 static object LI48();
-#define VMB48 object  V456;
+#define VMB48 object  V457;
 #define VMS48
 #define VMV48
 #define VMR48(VMT48) return(VMT48);
@@ -222,12 +222,12 @@ static object LI49();
 #define VMV49
 #define VMR49(VMT49) return(VMT49);
 static object LI50();
-#define VMB50 object  V467;
+#define VMB50 object  V468;
 #define VMS50
 #define VMV50
 #define VMR50(VMT50) return(VMT50);
 static object LI51();
-#define VMB51 object  V473;
+#define VMB51 object  V474;
 #define VMS51
 #define VMV51
 #define VMR51(VMT51) return(VMT51);
@@ -242,7 +242,7 @@ static object LI53();
 #define VMV53
 #define VMR53(VMT53) return(VMT53);
 static object LI54();
-#define VMB54 object  V484;
+#define VMB54 object  V485;
 #define VMS54
 #define VMV54
 #define VMR54(VMT54) return(VMT54);
@@ -257,17 +257,17 @@ static object LI56();
 #define VMV56
 #define VMR56(VMT56) return(VMT56);
 static object LI57();
-#define VMB57 register object *base=vs_top; object  V512 ,V511 ,V501; object Vcs[3];
+#define VMB57 register object *base=vs_top; object  V513 ,V512 ,V502; object Vcs[3];
 #define VMS57  register object *sup=vs_top+1;vs_top=sup;
 #define VMV57 vs_reserve(1);
 #define VMR57(VMT57) vs_top=base ; return(VMT57);
 static object LI58();
-#define VMB58 object  V520 ,V519;
+#define VMB58 object  V521 ,V520;
 #define VMS58
 #define VMV58
 #define VMR58(VMT58) return(VMT58);
 static object LI59();
-#define VMB59 register object *VOL base=vs_top; object  V596 ,V595 ,V594 ,V593 ,V590 ,V589 ,V588 ,V587 ,V555;
+#define VMB59 register object *VOL base=vs_top; object  V597 ,V596 ,V595 ,V594 ,V591 ,V590 ,V589 ,V588 ,V556;
 #define VMS59  register object *VOL sup=vs_top+11;vs_top=sup;
 #define VMV59 vs_reserve(11);
 #define VMR59(VMT59) vs_top=base ; return(VMT59);
@@ -277,23 +277,23 @@ static object LI60();
 #define VMV60 vs_reserve(13);
 #define VMR60(VMT60) vs_top=base ; return(VMT60);
 static object LI61();
-#define VMB61 register object *base=vs_top; object  V623;
+#define VMB61 register object *base=vs_top; object  V624;
 #define VMS61  register object *sup=vs_top+1;vs_top=sup;
 #define VMV61 vs_reserve(1);
 #define VMR61(VMT61) vs_top=base ; return(VMT61);
 static object LI62();
-#define VMB62 register object *base=vs_top; object  V638 ,V637 ,V634;
+#define VMB62 register object *base=vs_top; object  V639 ,V638 ,V635;
 #define VMS62  register object *sup=vs_top+1;vs_top=sup;
 #define VMV62 vs_reserve(1);
 #define VMR62(VMT62) vs_top=base ; return(VMT62);
 #define VC63
 static object LI64();
-#define VMB64 object  V650 ,V649;
+#define VMB64 object  V651 ,V650;
 #define VMS64
 #define VMV64
 #define VMR64(VMT64) return(VMT64);
 static object LI65();
-#define VMB65 register object *base=vs_top; object  V672 ,V671 ,V670 ,V669 ,V668 ,V667 ,V666 ,V665 ,V664 ,V663 ,V662 ,V661 ,V660 ,V659 ,V658 ,V657;
+#define VMB65 register object *base=vs_top; object  V673 ,V672 ,V671 ,V670 ,V669 ,V668 ,V667 ,V666 ,V665 ,V664 ,V663 ,V662 ,V661 ,V660 ,V659 ,V658;
 #define VMS65  register object *sup=vs_top+0;vs_top=sup;
 #define VMV65
 #define VMR65(VMT65) return(VMT65);
@@ -431,8 +431,8 @@ static char * VVi[279]={
 (char *)(LI65)
 };
 #define VV ((object *)VVi)
-static  LnkT277() ;
-static  (*Lnk277)() = LnkT277;
+static void LnkT277() ;
+static void (*Lnk277)() = LnkT277;
 static object  LnkTLI276() ;
 static object  (*LnkLI276)() = LnkTLI276;
 static object  LnkTLI275() ;
@@ -443,8 +443,8 @@ static object  LnkTLI273() ;
 static object  (*LnkLI273)() = LnkTLI273;
 static object  LnkTLI272() ;
 static object  (*LnkLI272)() = LnkTLI272;
-static  LnkT129() ;
-static  (*Lnk129)() = LnkT129;
+static void LnkT129() ;
+static void (*Lnk129)() = LnkT129;
 static object  LnkTLI271() ;
 static object  (*LnkLI271)() = LnkTLI271;
 static object  LnkTLI270() ;

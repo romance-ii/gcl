@@ -404,7 +404,7 @@
       (wt-label label)))
 
   (if (eq default 't)
-      (wt-nl "FEerror(\"The ECASE key value ~s is illegal.\",1,V" cvar ");")
+      (progn (wt-nl "FEerror(\"The ECASE key value ~s is illegal.\",1,V" cvar ");")(c2expr (cdr (first clauses))))
       (c2expr default))
 
   (wt "}")

@@ -1,10 +1,10 @@
 
 #include "cmpinclude.h"
 #include "mislib.h"
-init_mislib(){do_init(VV);}
+void init_mislib(){do_init(VV);}
 /*	macro definition for TIME	*/
 
-static L1()
+static void L1()
 {register object *base=vs_base;
 	register object *sup=base+VM1; VC1
 	vs_reserve(VM1);
@@ -25,6 +25,7 @@ static object LI2(V3)
 
 object V3;
 {	 VMB2 VMS2 VMV2
+goto TTL;
 TTL:;
 	base[0]= (V3);
 	base[1]= small_fixnum(4);
@@ -36,6 +37,7 @@ TTL:;
 	goto T1;}
 	{object V5 = Cnil;
 	VMR2(V5)}
+goto T1;
 T1:;
 	base[0]= (V3);
 	base[1]= small_fixnum(100);
@@ -47,6 +49,7 @@ T1:;
 	goto T6;}
 	{object V7 = Ct;
 	VMR2(V7)}
+goto T6;
 T6:;
 	base[0]= (V3);
 	base[1]= small_fixnum(400);
@@ -56,6 +59,8 @@ T6:;
 	V8= vs_base[0];
 	{object V9 = (number_compare(small_fixnum(0),V8)==0?Ct:Cnil);
 	VMR2(V9)}
+	base[0]=base[0];
+	return Cnil;
 }
 /*	local entry for function NUMBER-OF-DAYS-FROM-1900	*/
 
@@ -63,6 +68,7 @@ static object LI3(V11)
 
 object V11;
 {	 VMB3 VMS3 VMV3
+goto TTL;
 TTL:;
 	{object V12;
 	V12= one_minus((V11));
@@ -93,10 +99,12 @@ TTL:;
 	vs_top=sup;
 	{object V15 = vs_base[0];
 	VMR3(V15)}}
+	base[0]=base[0];
+	return Cnil;
 }
 /*	function definition for DECODE-UNIVERSAL-TIME	*/
 
-static L4()
+static void L4()
 {register object *base=vs_base;
 	register object *sup=base+VM4; VC4
 	vs_reserve(VM4);
@@ -110,8 +118,10 @@ static L4()
 	V17=(base[1]);
 	vs_top=sup;
 	goto T28;
+goto T27;
 T27:;
 	V17= symbol_value(VV[9]);
+goto T28;
 T28:;
 	{object V18;
 	object V19;
@@ -186,6 +196,7 @@ T28:;
 	V23= number_plus(VV[8],V26);
 	{register object V27;
 	V27= Cnil;
+goto T55;
 T55:;
 	V28= (*(LnkLI13))((V23));
 	V27= number_minus((V21),/* INLINE-ARGS */V28);
@@ -193,16 +204,20 @@ T55:;
 	goto T62;}
 	V29= small_fixnum(366);
 	goto T60;
+goto T62;
 T62:;
 	V29= small_fixnum(365);
+goto T60;
 T60:;
 	if(!(number_compare((V27),V29)<0)){
 	goto T56;}
 	V21= one_plus((V27));
 	goto T53;
+goto T56;
 T56:;
 	V23= number_plus((V23),small_fixnum(1));
 	goto T55;}
+goto T53;
 T53:;
 	if(((*(LnkLI14))((V23)))==Cnil){
 	goto T70;}
@@ -219,23 +234,28 @@ T53:;
 	base[10]= (V17);
 	vs_top=(vs_base=base+2)+9;
 	return;
+goto T73;
 T73:;
 	if(!(number_compare((V21),small_fixnum(60))>0)){
 	goto T70;}
 	V21= number_minus((V21),small_fixnum(1));
+goto T70;
 T70:;
 	{register object V30;
 	V30= VV[12];
+goto T90;
 T90:;
 	if(!(number_compare((V21),car((V30)))<=0)){
 	goto T91;}
 	V31 = make_fixnum(length((V30)));
 	V22= number_minus(small_fixnum(13),V31);
 	goto T88;
+goto T91;
 T91:;
 	V21= number_minus((V21),car((V30)));
 	V30= cdr((V30));
 	goto T90;}
+goto T88;
 T88:;
 	base[2]= (V18);
 	base[3]= (V19);
@@ -265,6 +285,8 @@ static object LI5(V37,V36,V35,V34,V33,V32,va_alist)
 	object V42;
 	register object V43;
 	object V44;
+	Vcs[0]=Vcs[0];
+	va_start(ap);
 	if(narg <6) too_few_arguments();
 	V38= V37;
 	V39= V36;
@@ -275,11 +297,12 @@ static object LI5(V37,V36,V35,V34,V33,V32,va_alist)
 	narg = narg - 6;
 	if (narg <= 0) goto T110;
 	else {
-	va_start(ap);
 	V44= va_arg(ap,object);}
 	--narg; goto T111;
+goto T110;
 T110:;
 	V44= symbol_value(VV[9]);
+goto T111;
 T111:;
 	V40= number_plus((V40),(V44));
 	base[0]= small_fixnum(0);
@@ -329,24 +352,34 @@ T111:;
 	V53= vs_base[0];
 	vs_top=sup;
 	goto T131;
+goto T122;
 T122:;
 	V45= Cnil;
+goto T123;
 T123:;
 	V46= Cnil;
+goto T124;
 T124:;
 	V47= Cnil;
+goto T125;
 T125:;
 	V48= Cnil;
+goto T126;
 T126:;
 	V49= Cnil;
+goto T127;
 T127:;
 	V50= Cnil;
+goto T128;
 T128:;
 	V51= Cnil;
+goto T129;
 T129:;
 	V52= Cnil;
+goto T130;
 T130:;
 	V53= Cnil;
+goto T131;
 T131:;
 	base[0]= (V50);
 	base[1]= small_fixnum(100);
@@ -361,18 +394,22 @@ T131:;
 	goto T138;}
 	V43= number_plus((V43),small_fixnum(100));
 	goto T115;
+goto T138;
 T138:;
 	V57= number_minus((V43),(V50));
 	if(!(number_compare(/* INLINE-ARGS */V57,small_fixnum(50))>=0)){
 	goto T115;}
 	V43= number_minus((V43),small_fixnum(100));}
+goto T115;
 T115:;
 	if(((*(LnkLI14))((V43)))==Cnil){
 	goto T145;}
 	if(number_compare((V42),small_fixnum(2))>0){
 	goto T144;}
+goto T145;
 T145:;
 	V41= number_minus((V41),small_fixnum(1));
+goto T144;
 T144:;
 	base[1]= (V41);
 	base[2]= (*(LnkLI13))((V43));
@@ -398,11 +435,14 @@ T144:;
 	Lplus();
 	vs_top=sup;
 	{object V60 = vs_base[0];
-	VMR5(V60)}}
+	VMR5(V60)}
+	va_end(ap);
+	base[0]=base[0];
+	return Cnil;}
 	}
-static LnkT15(){ call_or_link(VV[15],&Lnk15);} /* GET-DECODED-TIME */
-static object  LnkTLI14(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[14],&LnkLI14,1,ap);} /* LEAP-YEAR-P */
-static object  LnkTLI13(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[13],&LnkLI13,1,ap);} /* NUMBER-OF-DAYS-FROM-1900 */
+static void LnkT15(){ call_or_link(VV[15],(void **)&Lnk15);} /* GET-DECODED-TIME */
+static object  LnkTLI14(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[14],(void **)&LnkLI14,1,ap);} /* LEAP-YEAR-P */
+static object  LnkTLI13(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[13],(void **)&LnkLI13,1,ap);} /* NUMBER-OF-DAYS-FROM-1900 */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

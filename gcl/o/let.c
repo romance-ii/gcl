@@ -25,8 +25,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 
-let_var_list(var_list)
-object var_list;
+void
+let_var_list(object var_list)
 {
 	object endp_temp;
 
@@ -58,8 +58,8 @@ object var_list;
 	}
 }
 
-Flet(form)
-object form;
+void
+Flet(object form)
 {
 	object endp_temp;
 
@@ -87,8 +87,8 @@ object form;
 	bds_unwind(old_bds_top);
 }
 
-FletA(form)
-object form;
+void
+FletA(object form)
 {
 	object endp_temp;
 
@@ -116,8 +116,8 @@ object form;
 	bds_unwind(old_bds_top);
 }
 
-Fmultiple_value_bind(form)
-object form;
+void
+Fmultiple_value_bind(object form)
 {
 	object endp_temp;
 
@@ -171,12 +171,12 @@ object form;
 	bds_unwind(old_bds_top);
 }
 
-Fcompiler_let(form)
-object form;
+void
+Fcompiler_let(object form)
 {
 	object endp_temp;
 
-	object body, x, y;
+	object body;
 	object *old_lex;
 	bds_ptr old_bds_top;
 	struct bind_temp *start, *end, *bt;
@@ -207,8 +207,8 @@ object form;
 	bds_unwind(old_bds_top);
 }
 
-Fflet(args)
-object args;
+void
+Fflet(object args)
 {
 	object endp_temp;
 
@@ -241,8 +241,8 @@ is an illegal function definition in FLET.",
 	lex_env = lex;
 }
 
-Flabels(args)
-object args;
+void
+Flabels(object args)
 {
 	object endp_temp;
 
@@ -283,8 +283,8 @@ is an illegal function definition in LABELS.",
 	lex_env = lex;
 }
 
-Fmacrolet(args)
-object args;
+void
+Fmacrolet(object args)
 {
 	object endp_temp;
 
@@ -317,7 +317,8 @@ is an illegal macro definition in MACROFLET.",
 	lex_env = lex;
 }
 
-init_let()
+void
+init_let(void)
 {
 	make_special_form("LET", Flet);
 	make_special_form("LET*", FletA);

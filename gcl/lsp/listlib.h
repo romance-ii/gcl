@@ -81,9 +81,9 @@ static char * VVi[15]={
 (char *)(&LI9key)
 };
 #define VV ((object *)VVi)
-static  LnkT13() ;
-static  (*Lnk13)() = LnkT13;
-static  LnkT12() ;
-static  (*Lnk12)() = LnkT12;
-static  LnkT8() ;
-static  (*Lnk8)() = LnkT8;
+static void LnkT13() ;
+static void (*Lnk13)() = LnkT13;
+static void LnkT12() ;
+static void (*Lnk12)() = LnkT12;
+static void LnkT8() ;
+static void (*Lnk8)() = LnkT8;

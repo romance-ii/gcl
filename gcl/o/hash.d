@@ -86,7 +86,7 @@ object x;
 }
 
 unsigned int
-hash_equal(x,depth)
+ihash_equal(x,depth)
 object x;
 int depth;
 {
@@ -100,7 +100,7 @@ BEGIN:
 	if (depth++ >3) return h;
 	switch (type_of(x)) {
 	case t_cons:
-		h += hash_equal(x->c.c_car,depth);
+		h += ihash_equal(x->c.c_car,depth);
 		x = x->c.c_cdr;
 		goto BEGIN;
 
@@ -151,12 +151,12 @@ BEGIN:
 	 return(h);
        }
 	case t_pathname:
-		h += hash_equal(x->pn.pn_host,depth);
-		h += hash_equal(x->pn.pn_device,depth);
-		h += hash_equal(x->pn.pn_directory,depth);
-		h += hash_equal(x->pn.pn_name,depth);
-		h += hash_equal(x->pn.pn_type,depth);
-		h += hash_equal(x->pn.pn_version,depth);
+		h += ihash_equal(x->pn.pn_host,depth);
+		h += ihash_equal(x->pn.pn_device,depth);
+		h += ihash_equal(x->pn.pn_directory,depth);
+		h += ihash_equal(x->pn.pn_name,depth);
+		h += ihash_equal(x->pn.pn_type,depth);
+		h += ihash_equal(x->pn.pn_version,depth);
 		return(h);
 /*  CLTLII says don't descend into structures
 	case t_structure:
@@ -164,10 +164,10 @@ BEGIN:
 		 struct s_data *def;
 		 def=S_DATA(x->str.str_def);
 		 s_type= & SLOT_TYPE(x->str.str_def,0);
-		 h += hash_equal(def->name,depth);
+		 h += ihash_equal(def->name,depth);
 		 for (i = 0;  i < def->length;  i++)
 		   if (s_type[i]==0)
-		     h += hash_equal(x->str.str_self[i],depth);
+		     h += ihash_equal(x->str.str_self[i],depth);
 		   else
 		     h += ((int)x->str.str_self[i]) + depth++;
 		 return(h);}
@@ -178,6 +178,16 @@ BEGIN:
 	}
 }
 		
+object
+hash_equal(x,depth)
+object x;
+int depth;
+{
+
+	return make_fixnum(ihash_equal(x,length));
+
+}
+
 struct htent *
 gethash(key, hashtable)
 object key;
@@ -187,8 +197,8 @@ object hashtable;
 	int hsize;
 	struct htent *e;
 	object hkey;
-	int i, j = -1, k; /* k added by chou */
-	bool b;
+	int i=0, j = -1, k; /* k added by chou */
+	bool b=FALSE;
 
 	htest = (enum httest)hashtable->ht.ht_test;
 	hsize = hashtable->ht.ht_size;
@@ -197,7 +207,7 @@ object hashtable;
 	else if (htest == htt_eql)
 		i = hash_eql(key);
 	else if (htest == htt_equal)
-		i = hash_equal(key,0);
+		i = ihash_equal(key,0);
 	i &= 0x7fffffff;
 	for (i %= hsize, k = 0; k < hsize;  i = (i + 1) % hsize, k++) { /* k added by chou */
 		e = &hashtable->ht.ht_self[i];
@@ -230,11 +240,15 @@ object hashtable;
 	return(&hashtable->ht.ht_self[j]);	/* added by chou */
 }
 
+void
+extend_hashtable(object);
+
+void
 sethash(key, hashtable, value)
 object key, hashtable, value;
 {
 	int i;
-	bool over;
+	bool over=FALSE;
 	struct htent *e;
 	
 	i = hashtable->ht.ht_nent + 1;
@@ -255,11 +269,12 @@ object key, hashtable, value;
 	e->hte_value = value;
 }
 	
+void
 extend_hashtable(hashtable)
 object hashtable;
 {
 	object old;
-	int new_size, i;
+	int new_size=0, i;
 
 	if (type_of(hashtable->ht.ht_rhsize) == t_fixnum)
 		new_size = 
@@ -293,7 +308,7 @@ object hashtable;
 				old->ht.ht_self[i].hte_value);
 	}
 	hashtable->ht.ht_nent = old->ht.ht_nent;
-	vs_pop;
+	vs_popp;
 	END_NO_INTERRUPT;}
 }
 
@@ -305,7 +320,7 @@ object hashtable;
 			      (rehash_threshold
 			       `make_shortfloat((shortfloat)0.7)`)
 			 &aux h)
-	enum httest htt;
+	enum httest htt=0;
 	int i;
 @
 	if (test == sLeq || test == sLeq->s.s_gfdef)
@@ -321,19 +336,19 @@ object hashtable;
 		;
 	else
 		FEerror("~S is an illegal hash-table size.", 1, size);
-	if (type_of(rehash_size) == t_fixnum && 0 < fix(rehash_size) ||
-	    type_of(rehash_size) == t_shortfloat && 1.0 < sf(rehash_size) ||
-	    type_of(rehash_size) == t_longfloat && 1.0 < lf(rehash_size))
+	if ((type_of(rehash_size) == t_fixnum && 0 < fix(rehash_size)) ||
+	    (type_of(rehash_size) == t_shortfloat && 1.0 < sf(rehash_size)) ||
+	    (type_of(rehash_size) == t_longfloat && 1.0 < lf(rehash_size)))
 		;
 	else
 		FEerror("~S is an illegal hash-table rehash-size.",
 			1, rehash_size);
-	if (type_of(rehash_threshold) == t_fixnum &&
-	    0 < fix(rehash_threshold) && fix(rehash_threshold) < fix(size) ||
-	    type_of(rehash_threshold) == t_shortfloat &&
-	    0.0 < sf(rehash_threshold) && sf(rehash_threshold) < 1.0 ||
-	    type_of(rehash_threshold) == t_longfloat &&
-	    0.0 < lf(rehash_threshold) && lf(rehash_threshold) < 1.0)
+	if ((type_of(rehash_threshold) == t_fixnum &&
+	    0 < fix(rehash_threshold) && fix(rehash_threshold) < fix(size)) ||
+	    (type_of(rehash_threshold) == t_shortfloat &&
+	    0.0 < sf(rehash_threshold) && sf(rehash_threshold) < 1.0) ||
+	    (type_of(rehash_threshold) == t_longfloat &&
+	    0.0 < lf(rehash_threshold) && lf(rehash_threshold) < 1.0))
 		;
 	else
 		FEerror("~S is an illegal hash-table rehash-threshold.",
@@ -356,6 +371,7 @@ object hashtable;
 	@(return h)
 @)
 
+void
 Lhash_table_p()
 {
 	check_arg(1);
@@ -366,6 +382,7 @@ Lhash_table_p()
 		vs_base[0] = Cnil;
 }
 
+void
 Lgethash()
 {
 	int narg;
@@ -387,9 +404,10 @@ Lgethash()
 		vs_base[0] = vs_base[2];
 		vs_base[1] = Cnil;
 	}
-	vs_pop;
+	vs_popp;
 }
 
+void
 siLhash_set()
 {
 	check_arg(3);
@@ -399,6 +417,7 @@ siLhash_set()
 	vs_base += 2;
 }
 	
+void
 Lremhash()
 {
 	struct htent *e;
@@ -416,6 +435,7 @@ Lremhash()
 	vs_top = vs_base + 1;
 }
 
+void
 Lclrhash()
 {
 	int i;
@@ -429,9 +449,9 @@ Lclrhash()
 	vs_base[0]->ht.ht_nent = 0;
 }
 
+void
 Lhash_table_count()
 {
-	object z;
 
 	check_arg(1);
 	check_type_hash_table(&vs_base[0]);
@@ -439,13 +459,15 @@ Lhash_table_count()
 }
 
 
+void
 Lsxhash()
 {
 	check_arg(1);
 
-	vs_base[0] = make_fixnum(hash_equal(vs_base[0],0) & 0x7fffffff);
+	vs_base[0] = make_fixnum(ihash_equal(vs_base[0],0) & 0x7fffffff);
 }
 
+void
 Lmaphash()
 {
 	object *base = vs_base;
@@ -462,7 +484,7 @@ Lmaphash()
 				  hashtable->ht.ht_self[i].hte_value);
 	}
 	vs_base[0] = Cnil;
-	vs_pop;
+	vs_popp;
 }
 
 DEFUN("NEXT-HASH-TABLE-ENTRY",object,fSnext_hash_table_entry,SI,2,2,NONE,OO,OO,OO,OO,"For HASH-TABLE and for index I return three values: NEXT-START, the next KEY and its  VALUE.   NEXT-START will be -1 if there are no more entries, otherwise it will be a value suitable for passing as an index")
@@ -493,16 +515,17 @@ object table;
   RETURN1(sLnil);
 }
 
-DEFUN("HASH-TABLE-SIZE",int,fLhash_table_size,LISP,1,1,NONE,IO,OO,OO,OO,"")
+DEFUN("HASH-TABLE-SIZE",object,fLhash_table_size,LISP,1,1,NONE,IO,OO,OO,OO,"")
 (table)
 object table;
 {
-  RETURN1(table->ht.ht_size);
+  RETURN1(make_fixnum(table->ht.ht_size));
 
 }
 
 
 
+void
 init_hash()
 {
 	sLeq = make_ordinary("EQ");

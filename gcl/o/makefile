@@ -80,11 +80,13 @@ OBJS	= $(OD)main.o $(OD)alloc.o $(OD)gbc.o \
 	$(OD)init_pari.o $(OD)nsocket.o $(NEW_INIT) $(MPFILES) $(SFASL) $(EXTRAS) \
 	$(RL_OBJS)
 
-all:  $(OBJS) new-init $(LIBFILES) new_init.o  $(GCLIB) $(LAST_FILE)  $(FIRST_FILE) 
+all:  ../bin/dpp${EXE} $(OBJS) new-init $(LIBFILES) new_init.o  $(GCLIB) $(LAST_FILE)  $(FIRST_FILE) 
 
 go:
 	make "CFLAGS=${CFLAGS} -pg"
 
+../bin/dpp${EXE}:	../bin/dpp.c
+	${CC} ${DEFS} -DUNIX -o ../bin/dpp${EXE} ../bin/dpp.c
 
 
 new-init: grab_defs
@@ -92,7 +94,7 @@ new-init: grab_defs
 
 new_init.c: ${INI_FILES}
 	echo '#include "make-init.h"' > new_init.c
-	echo 'NewInit(){' >> new_init.c
+	echo 'void NewInit(void){' >> new_init.c
 	cat ${INI_FILES} >> new_init.c
 	echo '}' >> new_init.c
 

@@ -137,10 +137,10 @@ main(argc,argv)
  */
 
 static int
-CreateSocketAddress(sockaddrPtr, host, port)
-    struct sockaddr_in *sockaddrPtr;	/* Socket address */
-    char *host;				/* Host.  NULL implies INADDR_ANY */
-    int port;				/* Port number */
+CreateSocketAddress(struct sockaddr_in *sockaddrPtr, char *host, int port)
+                                    	/* Socket address */
+               				/* Host.  NULL implies INADDR_ANY */
+             				/* Port number */
 {
     struct hostent *hostent;		/* Host database entry */
     struct in_addr addr;		/* For 64/32 bit madness */
@@ -186,15 +186,15 @@ CreateSocketAddress(sockaddrPtr, host, port)
 
 /* return -1 on failure, or else an fd */
 int 
-CreateSocket(port, host, server, myaddr, myport, async)
-    int port;			/* Port number to open. */
-    char *host;			/* Name of host on which to open port.
+CreateSocket(int port, char *host, int server, char *myaddr, int myport, int async)
+             			/* Port number to open. */
+               			/* Name of host on which to open port.
 				 * NULL implies INADDR_ANY */
-    int server;			/* 1 if socket should be a server socket,
+               			/* 1 if socket should be a server socket,
 				 * else 0 for a client socket. */
-    char *myaddr;		/* Optional client-side address */
-    int myport;			/* Optional client-side port */
-    int async;			/* If nonzero and creating a client socket,
+                 		/* Optional client-side address */
+               			/* Optional client-side port */
+              			/* If nonzero and creating a client socket,
                                  * attempt to do an async connect. Otherwise
                                  * do a synchronous connect or bind. */
 {
@@ -354,7 +354,7 @@ object sock;
 { struct sockaddr_in sockname;
  int size = sizeof(struct sockaddr_in);
  struct hostent *hostEntPtr;
- object address,host,port;
+ object address,host;
 
  check_socket(sock);
  if (getsockname(SOCKET_FD(sock), (struct sockaddr *) &sockname, &size)
@@ -380,14 +380,13 @@ object sock;
      the channel is setto blocking or nonblocking mode. 
 */  
 
-DEFUN("SET-BLOCKING",int,fSset_blocking,SI,2,2,NONE,IO,OO,OO,OO,
+DEFUN("SET-BLOCKING",object,fSset_blocking,SI,2,2,NONE,OO,OO,OO,OO,
       "Set blocking on if MODE is T otherwise off.  Return 0 if succeeds. Otherwise the error number.")(sock,setBlocking)
       object sock;
       object setBlocking;
 {
       int setting;
       int fd ;
-      FILE *fp;
    AGAIN:
       check_stream(sock);
       /* set our idea of whether blocking on or off 
@@ -409,19 +408,19 @@ DEFUN("SET-BLOCKING",int,fSset_blocking,SI,2,2,NONE,IO,OO,OO,OO,
 	  }
 	else
 	{
-	  int x1 = fSset_blocking(STREAM_INPUT_STREAM(sock),setBlocking);
-	  int x2 = fSset_blocking(STREAM_OUTPUT_STREAM(sock),setBlocking);
+	  int x1 = fix(fSset_blocking(STREAM_INPUT_STREAM(sock),setBlocking));
+	  int x2 = fix(fSset_blocking(STREAM_OUTPUT_STREAM(sock),setBlocking));
 	  /* if either is negative result return negative. (ie fail)
 	     If either is positive return positive (ie fail)
 	     Zero result means both ok.  (ie succeed)
 	     */       
 	  
-	  return (x1 < 0 || x2 < 0 ? -2 : x1 > 0  ? x1 : x2);
+	  return make_fixnum(x1 < 0 || x2 < 0 ? -2 : x1 > 0  ? x1 : x2);
 	}
       }
 	
       if (sock->sm.sm_fp == NULL)
-	return -2;
+	return make_fixnum(-2);
       fd = SOCKET_FD(sock);
 
 
@@ -433,7 +432,7 @@ DEFUN("SET-BLOCKING",int,fSset_blocking,SI,2,2,NONE,IO,OO,OO,OO,
       setting |= O_NONBLOCK;
     }
     if (fcntl(fd, F_SETFL, setting) < 0) {
-        return errno;
+        return make_fixnum(errno);
     }
 #endif
 
@@ -441,16 +440,16 @@ DEFUN("SET-BLOCKING",int,fSset_blocking,SI,2,2,NONE,IO,OO,OO,OO,
     if (setBlocking != Cnil) {
         setting = 0;
         if (ioctl(fd, (int) FIONBIO, &setting) == -1) {
-            return errno;
+            return make_fixnum(errno);
         }
     } else {
         setting = 1;
         if (ioctl(fd, (int) FIONBIO, &setting) == -1) {
-            return errno;
+            return make_fixnum(errno);
         }
     }
 #endif
-  return 0;
+  return make_fixnum(0);
 }
 
 /* with 2 args return the function if any.
@@ -480,17 +479,16 @@ joe(int x) { return x; }
   get a character from FP but block, if it would return
   the EOF, but the stream is not closed.
 */   
-getOneChar(fp)
-     FILE *fp;
+int
+getOneChar(FILE *fp)
 {
   fd_set readfds;
   struct timeval timeout;
   int fd= fileno(fp);
-  int ch;
   int high;
   /*  fprintf(stderr,"<socket 0x%x>",fp);
   fflush(stderr); */
-  fprintf(stderr,"in getOneChar, fd=%d,fp=0x%x",fd,fp);
+  fprintf(stderr,"in getOneChar, fd=%d,fp=%p",fd,fp);
   fflush(stderr);
   if (fd == 0)
    { joe(fd);
@@ -507,7 +505,7 @@ getOneChar(fp)
   if (high > 0)
     {
       int ch ;
-      fprintf(stderr,"in getOneChar, fd=%d,fp=0x%x",fd,fp);
+      fprintf(stderr,"in getOneChar, fd=%d,fp=%p",fd,fp);
       fflush(stderr);
       ch = getc(fp);
       if ( ch != EOF || feof(fp) ) {
@@ -534,10 +532,10 @@ getOneChar(fp)
 #define dprintf(s,arg)
 #endif     
      
-
-ungetCharGclSocket(c,strm)
-     int c;       /* the character to unget */
-     object strm; /* stream */
+void
+ungetCharGclSocket(int c, object strm)
+                  /* the character to unget */
+                  /* stream */
 {  object bufp = SOCKET_STREAM_BUFFER(strm);
   if (c == EOF) return;
   dprintf("pushing back %c\n",c);
@@ -571,11 +569,11 @@ ungetCharGclSocket(c,strm)
  */
 
 int
-TcpOutputProc(fd, buf, toWrite, errorCodePtr)
-     int fd;		/* Socket state. */
-    char *buf;				/* The data buffer. */
-    int toWrite;			/* How many bytes to write? */
-    int *errorCodePtr;			/* Where to store error code. */
+TcpOutputProc(int fd, char *buf, int toWrite, int *errorCodePtr)
+            		/* Socket state. */
+              				/* The data buffer. */
+                			/* How many bytes to write? */
+                      			/* Where to store error code. */
 {
     int written;
 
@@ -588,14 +586,15 @@ TcpOutputProc(fd, buf, toWrite, errorCodePtr)
     return -1;
 }
 
-tcpCloseSocket(fd)
+void
+tcpCloseSocket(int fd)
 {
   close(fd);
 
 }
 
-doReverse(s,n)
-     char *s;
+void
+doReverse(char *s, int n)
 { char *p=&s[n-1];
   int m = n/2;
   while (--m>=0) {
@@ -615,9 +614,8 @@ doReverse(s,n)
   Side Effects:  The buffer may be filled, and the fill pointer
   of the buffer may be changed.
  */
-getCharGclSocket(strm,block)
-  object strm;
-  object block;
+int
+getCharGclSocket(object strm, object block)
 {
   object bufp = SOCKET_STREAM_BUFFER(strm);
   if (bufp->ust.ust_fillp > 0) {

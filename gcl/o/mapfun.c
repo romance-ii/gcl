@@ -49,7 +49,8 @@ Use of VS in mapfunctions:
 		   VS
 */
 
-Lmapcar()
+void
+Lmapcar(void)
 {
 	object endp_temp;
 
@@ -93,7 +94,8 @@ LOOP:
 	goto LOOP;
 }
 
-Lmaplist()
+void
+Lmaplist(void)
 {
 	object endp_temp;
 
@@ -137,7 +139,8 @@ LOOP:
 	goto LOOP;
 }
 
-Lmapc()
+void
+Lmapc(void)
 {
 	object endp_temp;
 
@@ -177,7 +180,8 @@ LOOP:
 	goto LOOP;
 }
 
-Lmapl()
+void
+Lmapl(void)
 {
 	object endp_temp;
 
@@ -217,7 +221,8 @@ LOOP:
 	goto LOOP;
 }
 
-Lmapcan()
+void
+Lmapcan(void)
 {
 	object endp_temp;
 
@@ -268,7 +273,8 @@ LOOP:
 	goto LOOP;
 }
 
-Lmapcon()
+void
+Lmapcon(void)
 {
 	object endp_temp;
 
@@ -320,7 +326,8 @@ LOOP:
 	goto LOOP;
 }
 
-init_mapfun()
+void
+init_mapfun(void)
 {
 	make_function("MAPCAR", Lmapcar);
 	make_function("MAPLIST", Lmaplist);

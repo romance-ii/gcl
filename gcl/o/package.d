@@ -26,7 +26,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #define	HASHCOEF	12345		/*  hashing coefficient  */
 
-int check_type_or_symbol_string_package();
+void check_type_or_symbol_string_package(object *);
 
 #define	INTERNAL	1
 #define	EXTERNAL	2
@@ -48,6 +48,7 @@ object x, l;
 	return(FALSE);
 }
 
+void
 rehash_pack(ptab,n,m)
      object **ptab;
      int *n,m;
@@ -79,6 +80,7 @@ static int package_sizes[]={
   97,251, 509, 1021, 2039, 4093, 8191, 16381,
   32749, 65521, 131071, 262139,   524287, 1048573};
 
+int
 suitable_package_size(n)
 {int *i=package_sizes;
  if (n>= 1000000) return 1048573;
@@ -92,6 +94,11 @@ suitable_package_size(n)
 	and uses packages in list ul, which must be a list of packages
 	or package names i.e. strings or symbols.
 */
+void
+package_already(object);
+void
+no_package(object);
+
 object
 make_package(n, ns, ul,isize,esize)
 object n, ns, ul;
@@ -163,6 +170,9 @@ int isize,esize;
 	return(x);
 }
 
+void
+use_package(object,object);
+
 object
 in_package(n, ns, ul,isize,esize)
 object n, ns, ul;
@@ -171,7 +181,6 @@ int isize,esize;
 	object endp_temp;
 
 	object x, y;
-	int i;
 	vs_mark;
 
 	x = find_package(n);
@@ -472,6 +481,7 @@ UNINTERN:
 	END_NO_INTERRUPT;return(TRUE);
 }}
 
+void
 export(s, p)
 object s, p;
 {
@@ -514,6 +524,7 @@ in ~S.", 3, s, p, l->c.c_car);
 	*ep = make_cons(s, *ep);
 }
 
+void
 unexport(s, p)
 object s, p;
 {
@@ -536,12 +547,13 @@ of the package.", 2, s, p);
 	*ip = make_cons(s, *ip);
 }
 
+void
 import(s, p)
 object s, p;
 {
 	object x;
 	int j;
-	object *ip, l;
+	object *ip;
 
 	x = find_symbol(s, p);
 	if (intern_flag) {
@@ -559,6 +571,7 @@ in the package.", 2, s, p);
 	*ip = make_cons(s, *ip);
 }
 
+void
 shadowing_import(s, p)
 object s, p;
 {
@@ -589,6 +602,7 @@ object s, p;
 	p->p.p_shadowings = make_cons(s, p->p.p_shadowings);
 }
 
+void
 shadow(s, p)
 object s, p;
 {
@@ -605,9 +619,10 @@ object s, p;
 	*ip = make_cons(vs_head, *ip);
 	p->p.p_internal_fp++;
 	p->p.p_shadowings = make_cons(vs_head, p->p.p_shadowings);
-	vs_pop;
+	vs_popp;
 }
 
+void
 use_package(x0, p)
 object x0, p;
 {
@@ -643,6 +658,7 @@ a name conflict.", 4, x, p, l->c.c_car, y);
 	x->p.p_usedbylist = make_cons(p, x->p.p_usedbylist);
 }
 
+void
 unuse_package(x0, p)
 object x0, p;
 {
@@ -680,6 +696,7 @@ object x0, p;
 	@(return `in_package(pack_name, nicknames, use,fix(internal),fix(external))`)
 @)
 
+void
 Lfind_package()
 {
 	check_arg(1);
@@ -687,6 +704,7 @@ Lfind_package()
 	vs_base[0] = find_package(vs_base[0]);
 }
 
+void
 Lpackage_name()
 {
 	check_arg(1);
@@ -695,6 +713,7 @@ Lpackage_name()
 	vs_base[0] = vs_base[0]->p.p_name;
 }
 
+void
 Lpackage_nicknames()
 {
 	check_arg(1);
@@ -712,6 +731,7 @@ Lpackage_nicknames()
 	@(return `rename_package(pack, new_name, new_nicknames)`)
 @)
 
+void
 Lpackage_use_list()
 {
 	check_arg(1);
@@ -721,6 +741,7 @@ Lpackage_use_list()
 	vs_base[0] = vs_base[0]->p.p_uselist;
 }
 
+void
 Lpackage_used_by_list()
 {
 	check_arg(1);
@@ -730,6 +751,7 @@ Lpackage_used_by_list()
 	vs_base[0] = vs_base[0]->p.p_usedbylist;
 }
 
+void
 Lpackage_shadowing_symbols()
 {
 	check_arg(1);
@@ -739,6 +761,7 @@ Lpackage_shadowing_symbols()
 	vs_base[0] = vs_base[0]->p.p_shadowings;
 }
 
+void
 Llist_all_packages()
 {
 	struct package *p;
@@ -784,7 +807,6 @@ Llist_all_packages()
 @)
 
 @(defun unintern (symbl &optional (p `current_package()`))
-	object x;
 @
 	check_type_symbol(&symbl);
 	check_type_or_symbol_string_package(&p);
@@ -985,10 +1007,11 @@ BEGIN:
 	@(return Ct)
 @)
 
+void
 siLpackage_internal()
 {
 
-	int j;
+	int j=0;
 
 	check_arg(2);
 	check_type_package(&vs_base[0]);
@@ -997,12 +1020,13 @@ siLpackage_internal()
 		FEerror("~S is an illgal index to a package hashtable.",
 			1, vs_base[1]);
 	vs_base[0] = P_INTERNAL(vs_base[0],j);
-	vs_pop;
+	vs_popp;
 }
 
+void
 siLpackage_external()
 {
-	int j;
+	int j=0;
 
 	check_arg(2);
 	check_type_package(&vs_base[0]);
@@ -1011,15 +1035,17 @@ siLpackage_external()
 		FEerror("~S is an illegal index to a package hashtable.",
 			1, vs_base[1]);
 	vs_base[0] = P_EXTERNAL(vs_base[0],j);
-	vs_pop;
+	vs_popp;
 }
 
+void
 no_package(n)
 object n;
 {
 	FEerror("There is no package with the name ~A.", 1, n);
 }
 
+void
 package_already(n)
 object n;
 {
@@ -1046,6 +1072,7 @@ DEF_ORDINARY("USE",sKuse,KEYWORD,"");
 DEFVAR("*PACKAGE*",sLApackageA,LISP,lisp_package,"");
 
 
+void
 init_package()
 {
 
@@ -1075,6 +1102,7 @@ init_package()
 	enter_mark_origin(&uninterned_list);
 }
 
+void
 init_package_function()
 {
 	make_function("MAKE-PACKAGE", Lmake_package);

@@ -23,8 +23,9 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	bind.c
 */
 
+#define _GNU_SOURCE
 #include "include.h"
-#include "varargs.h"
+/*  #include "varargs.h" */
 
 struct nil3 { object nil3_self[3]; } three_nils;
 struct nil6 { object nil6_self[6]; } six_nils;
@@ -70,25 +71,25 @@ struct aux {
 
 #define	isdeclare(x)	((x) == sLdeclare)
 
-lambda_bind(arg_top)
-object *arg_top;
+void
+lambda_bind(object *arg_top)
 {
   
  	object endp_temp,temporary;
-	object lambda, lambda_list, body, form, x, ds, vs, v;
+	object lambda, lambda_list, body, form=Cnil, x, ds, vs, v;
 	int narg, i, j;
 	object *base = vs_base;
 	struct required *required;
 	int nreq;
-	struct optional *optional;
+	struct optional *optional=NULL;
 	int nopt;
-	struct rest *rest;
+	struct rest *rest=NULL;
 	bool rest_flag;
-	struct keyword *keyword;
+	struct keyword *keyword=NULL;
 	bool key_flag;
 	bool allow_other_keys_flag, other_keys_appeared;
 	int nkey;
-	struct aux *aux;
+	struct aux *aux=NULL;
 	int naux;
 	bool special_processed;
 	vs_mark;
@@ -560,8 +561,8 @@ REQUIRED_ONLY:
 	}
 }
 
-bind_var(var, val, spp)
-object var, val, spp;
+void
+bind_var(object var, object val, object spp)
 { 
         object temporary;
 	vs_mark;
@@ -591,7 +592,8 @@ object var, val, spp;
 	vs_reset;
 }
 
-illegal_lambda()
+void
+illegal_lambda(void)
 {
 	FEerror("Illegal lambda expression.", 0);
 }
@@ -606,13 +608,11 @@ struct bind_temp {
 */
 
 object
-find_special(body, start, end)
-object body;
-struct bind_temp *start, *end;
+find_special(object body, struct bind_temp *start, struct bind_temp *end)
 { 
         object temporary;
  	object endp_temp;
-	object form;
+	object form=Cnil;
 	object ds, vs, v;
 	struct bind_temp *bt;
 	bool special_processed;
@@ -666,9 +666,7 @@ struct bind_temp *start, *end;
 }
 
 object
-let_bind(body, start, end)
-object body;
-struct bind_temp *start, *end;
+let_bind(object body, struct bind_temp *start, struct bind_temp *end)
 {
 	struct bind_temp *bt;
 
@@ -684,9 +682,7 @@ struct bind_temp *start, *end;
 }
 
 object
-letA_bind(body, start, end)
-object body;
-struct bind_temp *start, *end;
+letA_bind(object body, struct bind_temp *start, struct bind_temp *end)
 {
 	struct bind_temp *bt;
 	
@@ -708,11 +704,8 @@ struct bind_temp *start, *end;
 #define	FOUND		11
 #define	NOT_KEYWORD	1
 
-parse_key(base, rest, allow_other_keys, n, va_alist)
-object *base;
-bool rest, allow_other_keys;
-register int n;
-va_dcl
+void
+parse_key(object *base, bool rest, bool allow_other_keys, register int n, .../*  __builtin_va_alist_t __builtin_va_alist */)
 { 
         object temporary;
 	va_list ap;
@@ -747,7 +740,7 @@ va_dcl
 			base++;
 		top = base + n;
 		other_key = k;
-		va_start(ap);
+		va_start(ap,n);
 		for (i = 0;  i < n;  i++) {
 		    
 			if (va_arg(ap,object) == k) {
@@ -768,7 +761,7 @@ va_dcl
 			FEerror("The keyword ~S is not allowed.",1,other_key);
 		return;
 	}
-	va_start(ap);
+	va_start(ap,n);
 	for (i = 0;  i < n;  i++) {
 		k = va_arg(ap,object);
 		k->s.s_stype = NOT_YET;
@@ -801,7 +794,7 @@ va_dcl
 		vs_top = top;
 	}
 	top = base + n;
-	va_start(ap);
+	va_start(ap,n);
 	for (i = 0;  i < n;  i++) {
 		k = va_arg(ap,object);
 		base[i] = k->s.s_dbind;
@@ -816,10 +809,8 @@ va_dcl
 		FEerror("The keyword ~S is not allowed.", 1, other_key);
 }
 
-check_other_key(l, n, va_alist)
-object l;
-int n;
-va_dcl
+void
+check_other_key(object l, int n, .../*  __builtin_va_alist_t __builtin_va_alist */)
 {
  	object endp_temp;
 	va_list ap;
@@ -836,15 +827,15 @@ va_dcl
 			FEerror("Odd number of arguments for keywords.", 0);
 		if (k == sKallow_other_keys && l->c.c_cdr->c.c_car != Cnil) {
 			allow_other_keys = TRUE;
-		} else {register object *loc;
-			char buf [100];
-			bzero(buf,n);
-			va_start(ap);
-			for (i = 0;  i < n;  i++)
-			  { if (va_arg(ap,object) == k &&
-				buf[i] ==0) {buf[i]=1; break;}}
-			va_end(ap);
-			if (i >= n) other_key = k;
+		} else {
+		  char buf [100];
+		  bzero(buf,n);
+		  va_start(ap,n);
+		  for (i = 0;  i < n;  i++)
+		    { if (va_arg(ap,object) == k &&
+			  buf[i] ==0) {buf[i]=1; break;}}
+		  va_end(ap);
+		  if (i >= n) other_key = k;
 		}
 	}
 	if (other_key != OBJNULL && !allow_other_keys)
@@ -853,20 +844,17 @@ va_dcl
 }
 
 
-struct key {short n,allow_other_keys;
-	    iobject *defaults;
-	    iobject keys[1];
-	   };
+/*  struct key {short n,allow_other_keys; */
+/*  	    iobject *defaults; */
+/*  	    iobject keys[1]; */
+/*  	   }; */
 
 
 object Cstd_key_defaults[15]={Cnil,Cnil,Cnil,Cnil,Cnil,Cnil,Cnil,
 				Cnil,Cnil,Cnil,Cnil,Cnil,Cnil,Cnil,Cnil};
 
-parse_key_new(n,base,keys,ap)
-     int n;
-     object *base;
-     struct key *keys;
-     va_list ap;
+int
+parse_key_new(int n, object *base, struct key *keys, va_list ap)
 {object *new;
  COERCE_VA_LIST(new,ap,n);
 
@@ -876,7 +864,7 @@ parse_key_new(n,base,keys,ap)
    object *p= (object *)(keys->defaults);
    while (--j >=0) base[j]=p[j];
  }
- {if (n==0){ return;}
+ {if (n==0){ return 0;}
  {int allow = keys->allow_other_keys;
   object k;
  top:
@@ -910,14 +898,11 @@ parse_key_new(n,base,keys,ap)
   return 0;
  error:
   FEerror("Unrecognized key ~a",1,k);
+  return -1;
 }}}
 
-parse_key_rest(rest,n,base,keys,ap)
-     int n;
-     object *base;
-     struct key *keys;
-     va_list ap;
-     object rest;
+int
+parse_key_rest(object rest, int n, object *base, struct key *keys, va_list ap)
 {object *new;
  COERCE_VA_LIST(new,ap,n);
 
@@ -933,7 +918,7 @@ parse_key_rest(rest,n,base,keys,ap)
    object *p= (object *)(keys->defaults);
    while (--j >=0) base[j]=p[j];
  }
- {if (n==0){ return;}
+ {if (n==0){ return 0;}
  {int allow = keys->allow_other_keys;
   object k;
  top:
@@ -968,12 +953,12 @@ parse_key_rest(rest,n,base,keys,ap)
   return 0;
  error:
   FEerror("Unrecognized key ~a",1,k);
+  return -1;
 }}}
 
   
-set_key_struct(ks,data)
-     object data;
-     struct key *ks;
+void
+set_key_struct(struct key *ks, object data)
 {int i=ks->n;
  while (--i >=0)
    {ks->keys[i].o =   data->cfd.cfd_self[ ks->keys[i].i ];
@@ -990,8 +975,8 @@ set_key_struct(ks,data)
 DEF_ORDINARY("ALLOW-OTHER-KEYS",sKallow_other_keys,KEYWORD,"");
 
 
-
-init_bind()
+void
+init_bind(void)
 {
 	ANDoptional = make_ordinary("&OPTIONAL");
 	enter_mark_origin(&ANDoptional);

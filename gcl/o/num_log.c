@@ -35,113 +35,97 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 int
-ior_op(i, j)
-int	i, j;
+ior_op(int i, int j)
 {
 	return(i | j);
 }
 
 int
-xor_op(i, j)
-int	i, j;
+xor_op(int i, int j)
 {
 	return(i ^ j);
 }
 
 int
-and_op(i, j)
-int	i, j;
+and_op(int i, int j)
 {
 	return(i & j);
 }
 
 int
-eqv_op(i, j)
-int	i, j;
+eqv_op(int i, int j)
 {
 	return(~(i ^ j));
 }
 
 int
-nand_op(i, j)
-int	i, j;
+nand_op(int i, int j)
 {
 	return(~(i & j));
 }
 
 int
-nor_op(i, j)
-int	i, j;
+nor_op(int i, int j)
 {
 	return(~(i | j));
 }
 
 int
-andc1_op(i, j)
-int	i, j;
+andc1_op(int i, int j)
 {
 	return((~i) & j);
 }
 
 int
-andc2_op(i, j)
-int	i, j;
+andc2_op(int i, int j)
 {
 	return(i & (~j));
 }
 
 int
-orc1_op(i, j)
-int	i, j;
+orc1_op(int i, int j)
 {
 	return((~i) | j);
 }
 
 int
-orc2_op(i, j)
-int	i, j;
+orc2_op(int i, int j)
 {
 	return(i | (~j));
 }
 
 int
-b_clr_op(i, j)
-int	i, j;
+b_clr_op(int i, int j)
 {
 	return(0);
 }
 
 int
-b_set_op(i, j)
-int	i, j;
+b_set_op(int i, int j)
 {
 	return(-1);
 }
 
 int
-b_1_op(i, j)
-int	i, j;
+b_1_op(int i, int j)
 {
 	return(i);
 }
 
 int
-b_2_op(i, j)
-int	i, j;
+b_2_op(int i, int j)
 {
 	return(j);
 }
 
 int
-b_c1_op(i, j)
-int	i, j;
+b_c1_op(int i, int j)
 {
 	return(~i);
 }
 
 int
-b_c2_op(i, j)
-int	i, j;
+b_c2_op(int i, int j)
 {
 	return(~j);
 }
@@ -169,21 +153,19 @@ int (*intLogOps)()[16]= {
 
 
 int
-fix_bitp(x, p)
-object	x;
-int	p;
+fix_bitp(object x, int p)
 {
-	if (p > 30)		/* fix = sign + bit0-30 */
+	if (p > 30) {		/* fix = sign + bit0-30 */
 		if (fix(x) < 0)
 			return(1);
 		else
 			return(0);
+	}
 	return((fix(x) >> p) & 1);
 }	
 
 int
-count_int_bits(x)
-int	x;
+count_int_bits(int x)
 {
 	int	i, count;
 
@@ -193,10 +175,9 @@ int	x;
 }
 
 int
-count_bits(x)
-object	x;
+count_bits(object x)
 {
-	int	i, count, sign;
+	int i, count=0;
 
 	if (type_of(x) == t_fixnum) {
 		i = fix(x);
@@ -220,9 +201,7 @@ object	x;
 
 
 object
-shift_integer(x, w)
-object	x;
-int	w;
+shift_integer(object x, int w)
 { 
   if (type_of(x) == t_fixnum)
     { if (w <= 0)
@@ -237,12 +216,12 @@ int	w;
       MPOP(return,shifti,MP(x),w);
     }
   FEwrong_type_argument(sLinteger, x);
+  return(Cnil);
 }
 	
 
 int
-int_bit_length(i)
-int	i;
+int_bit_length(int i)
 {
 	int	count, j;
 
@@ -254,11 +233,12 @@ int	i;
 
 
 
-Llogior()
+void
+Llogior(void)
 {
 	object  x;
 	int	narg, i;
-	int	ior_op();
+	int	ior_op(int i, int j);
 
 	narg = vs_top - vs_base;
 	for (i = 0; i < narg; i++)
@@ -275,11 +255,12 @@ Llogior()
 	vs_push(x);
 }
 
-Llogxor()
+void
+Llogxor(void)
 {
 	object  x;
 	int	narg, i;
-	int	xor_op();
+	int	xor_op(int i, int j);
 
 	narg = vs_top - vs_base;
 	for (i = 0; i < narg; i++)
@@ -295,11 +276,12 @@ Llogxor()
 	vs_push(x);
 }
 
-Llogand()
+void
+Llogand(void)
 {
 	object  x;
 	int	narg, i;
-	int	and_op();
+	int	and_op(int i, int j);
 
 	narg = vs_top - vs_base;
 	for (i = 0; i < narg; i++)
@@ -315,11 +297,12 @@ Llogand()
 	vs_push(x);
 }
 
-Llogeqv()
+void
+Llogeqv(void)
 {
 	object  x;
 	int	narg, i;
-	int	eqv_op();
+	int	eqv_op(int i, int j);
 
 	narg = vs_top - vs_base;
 	for (i = 0; i < narg; i++)
@@ -335,11 +318,12 @@ Llogeqv()
 	vs_push(x);
 }
 
-Lboole()
+void
+Lboole(void)
 {
 	object  x;
-	object	o, r;
-	int	(*op)();
+	object	o;
+	int	(*op)()=NULL;
 	void	(*mp_op)() = (void *) 0;
 
 	check_arg(3);
@@ -376,7 +360,8 @@ Lboole()
 	vs_push(x);
 }
 
-Llogbitp()
+void
+Llogbitp(void)
 {
 	object	x, p;
 	int	i;
@@ -416,9 +401,10 @@ Llogbitp()
 		vs_push(Cnil);
 }
 
-Lash()
+void
+Lash(void)
 {
-	object	r, x, y;
+	object	r=Cnil, x, y;
 	int	w, sign_x;
 
 	check_arg(2);
@@ -465,7 +451,8 @@ BYE:
 	vs_push(r);
 }
 
-Llogcount()
+void
+Llogcount(void)
 {
 	object	x;
 	int	i;
@@ -478,10 +465,11 @@ Llogcount()
 	vs_push(make_fixnum(i));
 }
 
-Linteger_length()
+void
+Linteger_length(void)
 {
 	object	x;
-	int	count, cell, i;
+	int count=0, i;
 
 	check_arg(1);
 	x = vs_base[0];
@@ -499,8 +487,7 @@ Linteger_length()
 
 #define W_SIZE (8*sizeof(int))
 object
-bitand(a,b,c)
-     object a,b,c;
+bitand(object a, object b, object c)
 { int d= a->bv.bv_fillp;
   int *ap,*bp,*cp;
   d=(d+W_SIZE-1)/W_SIZE;
@@ -514,8 +501,7 @@ bitand(a,b,c)
 }
 
 object
-bitior(a,b,c)
-     object a,b,c;
+bitior(object a, object b, object c)
 { int *ap,*cp,*bp, d= a->bv.bv_fillp;
   d=(d+W_SIZE-1)/W_SIZE;
    ap= (int *)((a->bv.bv_self));
@@ -530,8 +516,8 @@ bitior(a,b,c)
 /* Note in order to be equal we assume that the part above the
    fill pointer is 0 up to the next word */
 
-bvequal(a,b)
-     object a,b;
+int
+bvequal(object a, object b)
 { int *ap,*bp, d= a->bv.bv_fillp;
   d=(d+W_SIZE-1)/W_SIZE;
  ap= (int *)(a->bv.bv_self);
@@ -544,10 +530,10 @@ bvequal(a,b)
 
   
 
-
-init_num_log()
+void
+init_num_log(void)
 {
-	int siLbit_array_op();
+/*  	int siLbit_array_op(void); */
 
 	make_constant("BOOLE-CLR", make_fixnum(BOOLCLR));
 	make_constant("BOOLE-SET", make_fixnum(BOOLSET));
@@ -580,12 +566,12 @@ init_num_log()
 	make_si_function("BIT-ARRAY-OP", siLbit_array_op);
 }
 
-
-siLbit_array_op()
+void
+siLbit_array_op(void)
 {
 	int i, j, n, d;
-	object  o, x, y, r, r0;
-	int (*op)();
+	object  o, x, y, r, r0=Cnil;
+	int (*op)()=NULL;
 	bool replace = FALSE;
 	int xi, yi, ri;
 	char *xp, *yp, *rp;
@@ -615,14 +601,14 @@ siLbit_array_op()
 			if (r->bv.bv_dim != d)
 				goto ERROR;
 			i = (r->bv.bv_self - xp)*8 + (BV_OFFSET(r) - xo);
-			if (i > 0 && i < d || i < 0 && -i < d) {
+			if ((i > 0 && i < d) || (i < 0 && -i < d)) {
 				r0 = r;
 				r = Cnil;
 				replace = TRUE;
 				goto L1;
 			}
 			i = (r->bv.bv_self - yp)*8 + (BV_OFFSET(r) - yo);
-			if (i > 0 && i < d || i < 0 && -i < d) {
+			if ((i > 0 && i < d) || (i < 0 && -i < d)) {
 				r0 = r;
 				r = Cnil;
 				replace = TRUE;
@@ -673,14 +659,14 @@ siLbit_array_op()
 				if (r->a.a_dims[i] != x->a.a_dims[i])
 					goto ERROR;
 			i = (r->bv.bv_self - xp)*8 + (BV_OFFSET(r) - xo);
-			if (i > 0 && i < d || i < 0 && -i < d) {
+			if ((i > 0 && i < d) || (i < 0 && -i < d)) {
 				r0 = r;
 				r = Cnil;
 				replace = TRUE;
 				goto L2;
 			} 
 			i = (r->bv.bv_self - yp)*8 + (BV_OFFSET(r) - yo);
-			if (i > 0 && i < d || i < 0 && -i < d) {
+			if ((i > 0 && i < d) || (i < 0 && -i < d)) {
 				r0 = r;
 				r = Cnil;
 				replace = TRUE;
@@ -724,10 +710,10 @@ siLbit_array_op()
 	}
 
 #define	set_high(place, nbits, value) \
-	((place)=((place)&~(-0400>>(nbits))|(value)&(-0400>>(nbits))))
+	((place)=(((place)&~(-0400>>(nbits)))|((value)&(-0400>>(nbits)))))
 
 #define	set_low(place, nbits, value) \
-	((place)=((place)&(-0400>>(8-(nbits)))|(value)&~(-0400>>(8-(nbits)))))
+	((place)=(((place)&(-0400>>(8-(nbits))))|((value)&~(-0400>>(8-(nbits))))))
 
 #define	extract_byte(integer, pointer, index, offset) \
 	(integer) = (pointer)[(index)+1] & 0377; \

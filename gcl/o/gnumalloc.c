@@ -277,14 +277,12 @@ static int gotpool;
 
 char *_malloc_base;
 
-static void getpool ();
+static void getpool (void);
 
 /* Cause reinitialization based on job parameters;
   also declare where the end of pure storage is. */
 void
-malloc_init (start, warnfun)
-     char *start;
-     void (*warnfun) ();
+malloc_init (char *start, void (*warnfun) (/* ??? */))
 {
   if (start)
     data_space_start = start;
@@ -297,8 +295,7 @@ malloc_init (start, warnfun)
    without actually requiring copying.  */
 
 int
-malloc_usable_size (mem)
-     char *mem;
+malloc_usable_size (char *mem)
 {
   int blocksize = 8 << (((struct mhead *) mem) - 1) -> mh_index;
 
@@ -306,10 +303,10 @@ malloc_usable_size (mem)
 }
 
 static void
-morecore (nu)			/* ask system for more memory */
-     register int nu;		/* size index to get more of  */
+morecore (register int nu)			/* ask system for more memory */
+                     		/* size index to get more of  */
 {
-  char *sbrk ();
+  char *sbrk (int n);
   register char *cp;
   register int nblks;
   register unsigned int siz;
@@ -418,10 +415,10 @@ morecore (nu)			/* ask system for more memory */
 }
 
 static void
-getpool ()
+getpool (void)
 {
   register int nu;
-  char * sbrk ();
+  char * sbrk (int n);
   register char *cp = sbrk (0);
 
   if ((int) cp & 0x3ff)	/* land on 1K boundaries */
@@ -456,9 +453,9 @@ getpool ()
     }
 }
 
-char *
-malloc (n)		/* get a block */
-     unsigned n;
+voi *
+malloc(size_t n)		/* get a block */
+                
 {
   register struct mhead *p;
   register unsigned int nbytes;
@@ -525,8 +522,8 @@ malloc (n)		/* get a block */
   return (char *) (p + 1);
 }
 
-free (mem)
-     char *mem;
+void
+free (void *mem)
 {
   register struct mhead *p;
   {
@@ -572,10 +569,8 @@ free (mem)
   }
 }
 
-char *
-realloc (mem, n)
-     char *mem;
-     register unsigned n;
+void *
+realloc (void *mem, register size_t n)
 {
   register struct mhead *p;
   register unsigned int tocopy;
@@ -634,9 +629,8 @@ realloc (mem, n)
 
 #ifndef VMS
 
-char *
-memalign (alignment, size)
-     unsigned alignment, size;
+void *
+memalign (long alignment, size_t size)
 {
   register char *ptr = malloc (size + alignment);
   register char *aligned;
@@ -662,7 +656,7 @@ memalign (alignment, size)
 /* This runs into trouble with getpagesize on HPUX.
    Patching out seems cleaner than the ugly fix needed.  */
 char *
-valloc (size)
+valloc (int size)
 {
   return memalign (getpagesize (), size);
 }
@@ -733,7 +727,7 @@ get_lim_data ()
 
 #else /* BSD42 */
 
-get_lim_data ()
+get_lim_data (void)
 {
   struct rlimit XXrlimit;
 

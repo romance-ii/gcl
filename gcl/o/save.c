@@ -2,8 +2,8 @@
 #include "include.h"
 #endif
 
-memory_save(original_file,save_file)
-     char *original_file,*save_file;
+void
+memory_save(char *original_file, char *save_file)
 {
 #ifdef DO_BEFORE_SAVE
   DO_BEFORE_SAVE ;
@@ -12,8 +12,8 @@ memory_save(original_file,save_file)
   unexec(save_file,original_file,0,0,0);
 }
 
-
-Lsave()
+void
+Lsave(void)
 {
 	char filename[256];
         extern char *kcl_self ;

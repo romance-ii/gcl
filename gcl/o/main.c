@@ -24,6 +24,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	IMPLEMENTATION-DEPENDENT
 */
 
+#include <unistd.h>
 #include <string.h>
 
 #define IN_MAIN
@@ -96,7 +97,7 @@ unsigned int _stacktop, _stackbottom;
 int cssize;
 
 int sgc_enabled;
-void install_segmentation_catcher();
+void install_segmentation_catcher(void);
 
 #ifndef SIG_STACK_SIZE
 #define SIG_STACK_SIZE 1000
@@ -107,24 +108,12 @@ void install_segmentation_catcher();
 #endif
 #endif
 
-main(argc, argv, envp) 
-int argc;
-char **argv, **envp;
-{
-	FILE *i;
-        unsigned int dummy;
+int
+main(int argc, char **argv, char **envp) {
 #ifdef BSD
 #ifdef RLIMIT_STACK
 	struct rlimit rl;
 #endif
-#endif
-#if defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC)
-
-#ifdef SETJMP_ONE_DIRECTION
-	static
-#endif
-	  /* make sure the stack is 8 byte aligned */
-	double estack_buf[SIG_STACK_SIZE];
 #endif
 
 #ifdef RECREATE_HEAP
@@ -132,8 +121,13 @@ char **argv, **envp;
 #endif
 	
 #ifdef _WIN32
-        _stackbottom = (unsigned int ) &dummy;
-        _stacktop    = _stackbottom - 0x10000; // ???
+	  {
+	    unsigned int dummy;
+	    
+	    _stackbottom = (unsigned int ) &dummy;
+	    _stacktop    = _stackbottom - 0x10000; // ???
+
+	  }
 #endif
         setbuf(stdin, stdin_buf); 
 	setbuf(stdout, stdout_buf);
@@ -258,10 +252,18 @@ char **argv, **envp;
 	SETUP_SIG_STACK
 #else
 #if defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC)
-	bzero(estack_buf,sizeof(estack_buf));
-	estack.ss_sp = (char *) &estack_buf[SIG_STACK_SIZE-1];
-	estack.ss_onstack=0;
-	sigstack(&estack,0);
+	  {
+	    /* make sure the stack is 8 byte aligned */
+#ifdef SETJMP_ONE_DIRECTION
+	    static
+#endif
+	    double estack_buf[SIG_STACK_SIZE];
+	    
+	    bzero(estack_buf,sizeof(estack_buf));
+	    estack.ss_sp = (char *) &estack_buf[SIG_STACK_SIZE-1];
+	    estack.ss_onstack=0;
+	    sigstack(&estack,0);
+	  }
 #endif	
 #endif	
 	
@@ -339,10 +341,12 @@ char **argv, **envp;
 
 	super_funcall(sStop_level);
 
+	return 0;
+
 }
 
 /* catch certain signals */
-void install_segmentation_catcher()
+void install_segmentation_catcher(void)
 {
 #ifdef INSTALL_SEGMENTATION_CATCHER
   INSTALL_SEGMENTATION_CATCHER;
@@ -355,8 +359,7 @@ void install_segmentation_catcher()
 
 int catch_fatal=1;
 void
-error(s)
-char *s;
+error(char *s)
 {
         if (catch_fatal>0 && interrupt_enable )
 	  {catch_fatal = -1;
@@ -372,9 +375,9 @@ char *s;
 #endif
 }
 
+void
+initlisp(void) {
 
-initlisp()
-{
 	int j;
 
 	if (NULL_OR_ON_C_STACK(&j) == 0
@@ -515,17 +518,17 @@ initlisp()
 
 }
 object
-vs_overflow()
+vs_overflow(void)
 {
 	if (vs_limit > vs_org + stack_multiple *  VSSIZE)
 		error("value stack overflow");
 	vs_limit += STACK_OVER*VSGETA;
-	FEerror("Value stack overflow.", 0);return Cnil;
+	FEerror("Value stack overflow.", 0);
+	return Cnil;
 }
 
-
-bds_overflow()
-{
+void
+bds_overflow(void) {
 	--bds_top;
 	if (bds_limit > bds_org + stack_multiple *  BDSSIZE)
 		error("bind stack overflow");
@@ -533,8 +536,8 @@ bds_overflow()
 	FEerror("Bind stack overflow.", 0);
 }
 
-frs_overflow()
-{
+void
+frs_overflow(void) {
 	--frs_top;
 	if (frs_limit > frs_org + stack_multiple *  FRSSIZE)
 		error("frame stack overflow");
@@ -542,8 +545,8 @@ frs_overflow()
 	FEerror("Frame stack overflow.", 0);
 }
 
-ihs_overflow()
-{
+void
+ihs_overflow(void) {
 	--ihs_top;
 	if (ihs_limit > ihs_org + stack_multiple *  IHSSIZE)
 		error("invocation history stack overflow");
@@ -552,20 +555,19 @@ ihs_overflow()
 }
 
 void
-segmentation_catcher()
-{int x;
+segmentation_catcher(int i) {
 #ifndef SIG_STACK_SIZE 
- if (&x < cs_limit)
-	cs_overflow();
- else 
-  {printf("Segmentation violation: c stack ok:signalling error");
-	}
+  int x;
+  if (&x < cs_limit)
+    cs_overflow();
+  else 
+    printf("Segmentation violation: c stack ok:signalling error");
 #endif
   error("Segmentation violation.");
 }
 
-cs_overflow()
-{
+void
+cs_overflow(void) {
 #ifdef AV
 	if (cs_limit < cs_org - cssize)
 		error("control stack overflow");
@@ -579,13 +581,13 @@ cs_overflow()
 	FEerror("Control stack overflow.", 0);
 }
 
-end_of_file()
-{
+void
+end_of_file(void) {
 	error("end of file");
 }
 
-DEFUNO("BYE",int,fLbye,LISP
-   ,0,1,NONE,II,OO,OO,OO,Lby,"")(va_alist)
+DEFUNO("BYE",object,fLbye,LISP
+   ,0,1,NONE,OI,OO,OO,OO,Lby,"")(va_alist)
 va_dcl
 {	int n=VFUN_NARGS;
 	int exit_code;
@@ -599,130 +601,139 @@ va_dcl
 #ifdef UNIX
 /*	printf("Bye.\n"); */
 	exit(exit_code);
-#endif
-
+#else
 	RETURN(1,int,exit_code, 0); 
-}
-
-DEFUNO("QUIT",int,fLquit,LISP
-   ,0,1,NONE,II,OO,OO,OO,Lquit,"")(va_alist)
-va_dcl
-{	return fLbye(va_alist); }
- 
-DEFUNO("EXIT",int,fLexit,LISP
-   ,0,1,NONE,II,OO,OO,OO,Lexit,"")(va_alist)
-va_dcl
-{	return fLbye(va_alist); }
- 
-
-c_trace()
-{
-#ifdef AOSVS
-
 #endif
+
 }
 
-siLargc()
-{
-	check_arg(0);
-	vs_push(make_fixnum(ARGC));
+DEFUNO("QUIT",object,fLquit,LISP
+   ,0,1,NONE,OI,OO,OO,OO,Lquit,"")(va_alist)
+va_dcl
+{	return fLbye(va_alist); }
+ 
+DEFUNO("EXIT",object,fLexit,LISP
+   ,0,1,NONE,OI,OO,OO,OO,Lexit,"")(va_alist)
+va_dcl
+{	return fLbye(va_alist); }
+ 
+
+/*  c_trace(void) */
+/*  { */
+/*  #ifdef AOSVS */
+
+/*  #endif */
+/*  } */
+
+void
+siLargc(void) {
+  check_arg(0);
+  vs_push(make_fixnum(ARGC));
 }
 
-siLargv()
-{
-	int i;
+void
+siLargv(void) {
+  int i=0;
+  
+  check_arg(1);
+  if (type_of(vs_base[0]) != t_fixnum ||
+      (i = fix(vs_base[0])) < 0 ||
+      i >= ARGC)
+    FEerror("Illegal argument index: ~S.", 1, vs_base[0]);
+  vs_base[0] = make_simple_string(ARGV[i]);
 
-	check_arg(1);
-	if (type_of(vs_base[0]) != t_fixnum ||
-	    (i = fix(vs_base[0])) < 0 ||
-	    i >= ARGC)
-		FEerror("Illegal argument index: ~S.", 1, vs_base[0]);
-	vs_base[0] = make_simple_string(ARGV[i]);
 }
 
 #ifdef UNIX
-siLgetenv()
-{
-	char name[256];
-	int i;
-	char *value;
-	extern char *getenv();
+void
+siLgetenv(void) {
 
-	check_arg(1);
-	check_type_string(&vs_base[0]);
-	if (vs_base[0]->st.st_fillp >= 256)
-		FEerror("Too long name: ~S.", 1, vs_base[0]);
-	for (i = 0;  i < vs_base[0]->st.st_fillp;  i++)
-		name[i] = vs_base[0]->st.st_self[i];
-	name[i] = '\0';
-	if ((value = getenv(name)) != NULL)
-		{vs_base[0] = make_simple_string(value);
+  char name[256];
+  int i;
+  char *value;
+  extern char *getenv(const char *);
+  
+  check_arg(1);
+  check_type_string(&vs_base[0]);
+  if (vs_base[0]->st.st_fillp >= 256)
+    FEerror("Too long name: ~S.", 1, vs_base[0]);
+  for (i = 0;  i < vs_base[0]->st.st_fillp;  i++)
+    name[i] = vs_base[0]->st.st_self[i];
+  name[i] = '\0';
+  if ((value = getenv(name)) != NULL)
+    {vs_base[0] = make_simple_string(value);
 #ifdef FREE_GETENV_RESULT
-		free(value);
-		
+    free(value);
+    
 #endif		
-		}
-	else
-		vs_base[0] = Cnil;
+    }
+  else
+    vs_base[0] = Cnil;
+
 }
 #endif
 
 object *vs_marker;
 
-siLmark_vs()
-{
-	check_arg(0);
-	vs_marker = vs_base;
-	vs_base[0] = Cnil;
+void
+siLmark_vs(void) {
+  check_arg(0);
+  vs_marker = vs_base;
+  vs_base[0] = Cnil;
 }
 
-siLcheck_vs()
-{
-	check_arg(0);
-	if (vs_base != vs_marker)
-		FEerror("Value stack is flawed.", 0);
-	vs_base[0] = Cnil;
+void
+siLcheck_vs(void) {
+  check_arg(0);
+  if (vs_base != vs_marker)
+    FEerror("Value stack is flawed.", 0);
+  vs_base[0] = Cnil;
 }
 
 object
-siLcatch_fatal(i)
-{catch_fatal=i;
- return Cnil;}
+siLcatch_fatal(int i) {
+  catch_fatal=i;
+  return Cnil;
+}
 
+static void
+reset_cstack_limit(int arg) {
+#ifdef AV
+  if (&arg > cs_org - cssize + 16)
+    cs_limit = cs_org - cssize;
+  else
+    error("can't reset cs_limit");
+#endif
+}
 
 void
-siLreset_stack_limits(arg)
-int arg;
+siLreset_stack_limits(void)
 {
-	check_arg(0);
-	if(catch_fatal <0) catch_fatal=1;
-#ifdef SGC	
-	{extern int fault_count ; fault_count = 0;}
-#endif 
-	if (vs_top < vs_org + stack_multiple *  VSSIZE)
-		vs_limit = vs_org + stack_multiple *  VSSIZE;
-	else
-		error("can't reset vs_limit");
-	if (bds_top < bds_org + stack_multiple *  BDSSIZE)
-		bds_limit = bds_org + stack_multiple *  BDSSIZE;
-	else
-		error("can't reset bds_limit");
-	if (frs_top < frs_org + stack_multiple *  FRSSIZE)
-		frs_limit = frs_org + stack_multiple *  FRSSIZE;
-	else
-		error("can't reset frs_limit");
-	if (ihs_top < ihs_org + stack_multiple *  IHSSIZE)
-		ihs_limit = ihs_org + stack_multiple *  IHSSIZE;
-	else
-		error("can't reset ihs_limit");
-#ifdef AV
-	if (&arg > cs_org - cssize + 16)
-		cs_limit = cs_org - cssize;
+  int i=0;
 
-	else
-		error("can't reset cs_limit");
-#endif
-	vs_base[0] = Cnil;
+  check_arg(0);
+  if(catch_fatal <0) catch_fatal=1;
+#ifdef SGC	
+  {extern int fault_count ; fault_count = 0;}
+#endif 
+  if (vs_top < vs_org + stack_multiple *  VSSIZE)
+    vs_limit = vs_org + stack_multiple *  VSSIZE;
+  else
+    error("can't reset vs_limit");
+  if (bds_top < bds_org + stack_multiple *  BDSSIZE)
+    bds_limit = bds_org + stack_multiple *  BDSSIZE;
+  else
+    error("can't reset bds_limit");
+  if (frs_top < frs_org + stack_multiple *  FRSSIZE)
+    frs_limit = frs_org + stack_multiple *  FRSSIZE;
+  else
+    error("can't reset frs_limit");
+  if (ihs_top < ihs_org + stack_multiple *  IHSSIZE)
+    ihs_limit = ihs_org + stack_multiple *  IHSSIZE;
+  else
+    error("can't reset ihs_limit");
+  reset_cstack_limit(i);
+  vs_base[0] = Cnil;
 }
 
 #define COPYSTACK(org,p,typ,lim,top,geta,size) \
@@ -734,64 +745,56 @@ int arg;
   lim = ((typ *)p) - (STACK_OVER+1)*geta;   \
   }while (0)
 
-multiply_stacks(m)
-     int m;
-{  int n;
-   object x;
-   object gc_pro=stack_space;
-   char *p;
-   int vs,bd,frs,ihs;
-   stack_multiple=stack_multiple*m;
+int
+multiply_stacks(int m) {  
+/*    int n; */
+/*    object x; */
+/*    object gc_pro=stack_space; */
+  char *p;
+  int vs,bd,frs,ihs;
+  stack_multiple=stack_multiple*m;
 #define ELTSIZE(x) (((char *)((x)+1)) - ((char *) x))
-   vs  = (stack_multiple*VSSIZE  + (STACK_OVER+1)*VSGETA)* ELTSIZE(vs_org);
-   bd  = (stack_multiple*BDSSIZE + (STACK_OVER+1)*BDSGETA)*ELTSIZE(bds_org);
-   frs = (stack_multiple*FRSSIZE + (STACK_OVER+1)*FRSGETA)*ELTSIZE(frs_org);
-   ihs = (stack_multiple*IHSSIZE + (STACK_OVER+1)*IHSGETA)*ELTSIZE(ihs_org);
-   if (stack_space==0) {enter_mark_origin(&stack_space);}
-   stack_space = alloc_simple_string(vs+bd+frs+ihs);
-   array_allocself(stack_space,1,code_char(0));
-   p=stack_space->st.st_self;
-   COPYSTACK(vs_org,p,object,vs_limit,vs_top,VSGETA,VSSIZE);
-   COPYSTACK(bds_org,p,struct bds_bd,bds_limit,bds_top,BDSGETA,BDSSIZE);
-   COPYSTACK(frs_org,p,struct frame,frs_limit,frs_top,FRSGETA,FRSSIZE);
-   COPYSTACK(ihs_org,p,struct invocation_history,ihs_limit,ihs_top,
-	     IHSGETA,IHSSIZE);
-   vs_base=vs_top;
-   return stack_multiple;
- }
-
-
-
-
-
-
- 
-  
-
-siLinit_system()
-{
-	check_arg(0);
-	init_system();
-	vs_base[0] = Cnil;
+  vs  = (stack_multiple*VSSIZE  + (STACK_OVER+1)*VSGETA)* ELTSIZE(vs_org);
+  bd  = (stack_multiple*BDSSIZE + (STACK_OVER+1)*BDSGETA)*ELTSIZE(bds_org);
+  frs = (stack_multiple*FRSSIZE + (STACK_OVER+1)*FRSGETA)*ELTSIZE(frs_org);
+  ihs = (stack_multiple*IHSSIZE + (STACK_OVER+1)*IHSGETA)*ELTSIZE(ihs_org);
+  if (stack_space==0) {enter_mark_origin(&stack_space);}
+  stack_space = alloc_simple_string(vs+bd+frs+ihs);
+  array_allocself(stack_space,1,code_char(0));
+  p=stack_space->st.st_self;
+  COPYSTACK(vs_org,p,object,vs_limit,vs_top,VSGETA,VSSIZE);
+  COPYSTACK(bds_org,p,struct bds_bd,bds_limit,bds_top,BDSGETA,BDSSIZE);
+  COPYSTACK(frs_org,p,struct frame,frs_limit,frs_top,FRSGETA,FRSSIZE);
+  COPYSTACK(ihs_org,p,struct invocation_history,ihs_limit,ihs_top,
+	    IHSGETA,IHSSIZE);
+  vs_base=vs_top;
+  return stack_multiple;
 }
 
-siLaddress()
-{
-	check_arg(1);
-	vs_base[0] = make_fixnum((long)vs_base[0]);
+void
+siLinit_system(void) {
+  check_arg(0);
+  init_system();
+  vs_base[0] = Cnil;
 }
 
-siLnani()
-{
-	check_arg(1);
-	vs_base[0] = (object)fixint(vs_base[0]);
+void
+siLaddress(void) {
+  check_arg(1);
+  vs_base[0] = make_fixnum((long)vs_base[0]);
 }
 
-siLinitialization_failure()
-{
-	check_arg(0);
-	printf("lisp initialization failed\n");
-	exit(0);
+void
+siLnani(void) {
+  check_arg(1);
+  vs_base[0] = (object)fixint(vs_base[0]);
+}
+
+void
+siLinitialization_failure(void) {
+  check_arg(0);
+  printf("lisp initialization failed\n");
+  exit(0);
 }
 
 DEFUNO("IDENTITY",object,fLidentity,LISP
@@ -806,58 +809,58 @@ DEFUNO("LISP-IMPLEMENTATION-VERSION",object,fLlisp_implementation_version,LISP
    ,0,0,NONE,OO,OO,OO,OO,Llisp_implementation_version,"")()
 {
 	/* 0 args */
-
 	RETURN1((make_simple_string(LISP_IMPLEMENTATION_VERSION)));
 }
 
 
-siLsave_system()
-{
-	int i;
-
+void
+siLsave_system(void) {
+  int i;
+  
 #ifdef HAVE_YP_UNBIND
-	extern object truename(),namestring();
-	check_arg(1);
-	/* prevent subsequent consultation of yp by getting
-	   truename now*/
-	vs_base[0]=namestring(truename(vs_base[0]));
-	{char name[200];
-	 char *dom = name;
-	 if (0== getdomainname(dom,sizeof(name)))
-	   yp_unbind(dom);}
+  extern object truename(),namestring();
+  check_arg(1);
+  /* prevent subsequent consultation of yp by getting
+     truename now*/
+  vs_base[0]=namestring(truename(vs_base[0]));
+  {char name[200];
+  char *dom = name;
+  if (0== getdomainname(dom,sizeof(name)))
+    yp_unbind(dom);}
 #endif
-
+  
 #ifdef DO_BEFORE_SAVE
-	DO_BEFORE_SAVE
+  DO_BEFORE_SAVE
 #endif	
-	
-	saving_system = TRUE;
-	GBC(t_contiguous);
-
-
-
+    
+    saving_system = TRUE;
+  GBC(t_contiguous);
+  
+  
+  
 #if defined(BSD) || defined(ATT)  
-	brk(core_end);
+  brk(core_end);
   /* printf( "(breaking at core_end = %x in main ,)",core_end); */
 #endif
+  
+/*  #ifdef DGUX */
+  
+/*  #endif */
+  
+/*  #ifdef AOSVS */
+  
+  
+  
+  
+/*  #endif */
+  cbgbccount = 0;
+  rbgbccount = 0;
+  for (i = 0;  i < (int)t_end;  i++)
+    tm_table[i].tm_gbccount = 0;
+  Lsave();
+  saving_system = FALSE;
+  alloc_page(-(holepage+nrbpage));
 
-#ifdef DGUX
-
-#endif
-
-#ifdef AOSVS
-
-
-
-
-#endif
-	cbgbccount = 0;
-	rbgbccount = 0;
-	for (i = 0;  i < (int)t_end;  i++)
-		tm_table[i].tm_gbccount = 0;
-	Lsave();
-	saving_system = FALSE;
-	alloc_page(-(holepage+nrbpage));
 }
 
 DEFVAR("*LISP-MAXPAGES*",sSAlisp_maxpagesA,SI,make_fixnum(real_maxpage),"");
@@ -866,90 +869,91 @@ DEFVAR("*MULTIPLY-STACKS*",sSAmultiply_stacksA,SI,Cnil,"");
 DEF_ORDINARY("TOP-LEVEL",sStop_level,SI,"");
 DEFVAR("*COMMAND-ARGS*",sSAcommand_argsA,SI,sLnil,"");
 
-init_main()
-{
-	make_function("BY", Lby);
-	make_si_function("ARGC", siLargc);
-	make_si_function("ARGV", siLargv);
+void
+init_main(void) {
 
+  make_function("BY", Lby);
+  make_si_function("ARGC", siLargc);
+  make_si_function("ARGV", siLargv);
+  
 #ifdef UNIX
-	make_si_function("GETENV", siLgetenv);
+  make_si_function("GETENV", siLgetenv);
 #endif
-
-	make_si_function("MARK-VS", siLmark_vs);
-	make_si_function("CHECK-VS", siLcheck_vs);
-	make_si_function("RESET-STACK-LIMITS", siLreset_stack_limits);
-	make_si_function("INIT-SYSTEM", siLinit_system);
-	make_si_function("ADDRESS", siLaddress);
-	make_si_function("NANI", siLnani);
-	make_si_function("INITIALIZATION-FAILURE",
-			 siLinitialization_failure);
-
-	siClisp_pagesize =
-	make_si_constant("LISP-PAGESIZE", make_fixnum(PAGESIZE));
-
-
-	{object features;
-
+  
+  make_si_function("MARK-VS", siLmark_vs);
+  make_si_function("CHECK-VS", siLcheck_vs);
+  make_si_function("RESET-STACK-LIMITS", siLreset_stack_limits);
+  make_si_function("INIT-SYSTEM", siLinit_system);
+  make_si_function("ADDRESS", siLaddress);
+  make_si_function("NANI", siLnani);
+  make_si_function("INITIALIZATION-FAILURE",
+		   siLinitialization_failure);
+  
+  siClisp_pagesize =
+    make_si_constant("LISP-PAGESIZE", make_fixnum(PAGESIZE));
+  
+  
+  {object features;
+  
 #define ADD_FEATURE(name) \
 	 features=  make_cons(make_ordinary(name),features)
-
-	   features=    make_cons(make_ordinary("COMMON"),
-		     make_cons(make_ordinary("KCL"), Cnil));
-	 ADD_FEATURE("AKCL");
-	 ADD_FEATURE("GCL");
+  
+  features=    make_cons(make_ordinary("COMMON"),
+			 make_cons(make_ordinary("KCL"), Cnil));
+  ADD_FEATURE("AKCL");
+  ADD_FEATURE("GCL");
 #ifdef BROKEN_O4_OPT
-	 ADD_FEATURE("BROKEN_O4_OPT");
+  ADD_FEATURE("BROKEN_O4_OPT");
 #endif
 #ifdef GMP
-	 ADD_FEATURE("GMP");
+  ADD_FEATURE("GMP");
 #endif	 
-
+  
 #ifdef UNIX
 #ifndef WINDOWSNT	 
-	ADD_FEATURE("UNIX");
+  ADD_FEATURE("UNIX");
 #endif	
 #endif
 #ifdef IEEEFLOAT
-       ADD_FEATURE("IEEE-FLOATING-POINT");
+  ADD_FEATURE("IEEE-FLOATING-POINT");
 #endif
 #ifdef SGC
-       ADD_FEATURE("SGC");
+  ADD_FEATURE("SGC");
 #endif	 
 #ifdef  ADDITIONAL_FEATURES
-     	             ADDITIONAL_FEATURES;
+  ADDITIONAL_FEATURES;
 #endif
 #ifdef  BSD
-	ADD_FEATURE("BSD");
+  ADD_FEATURE("BSD");
 #endif
-
+  
 #ifdef LITTLE_END	 
-	 ADD_FEATURE("CLX-LITTLE-ENDIAN");
+  ADD_FEATURE("CLX-LITTLE-ENDIAN");
 #endif
-
+  
 #ifndef PECULIAR_MACHINE
 #define BIGM    (int)((((unsigned int)(-1))/2))	 
-	{ 
-	  int ONEM = -1;
-	  int Bigm  = BIGM;
-	  int Smallm = -BIGM-1;
-	  int Seven = 7;
-	  int Three = 3;
-	  if ( (Smallm / Seven)  < 0
-	      && (Smallm / (-Seven))  > 0
-	      && (Bigm / (-Seven)) < 0 
-	      && ((-Seven) / Three) == -2
-	      && (Seven / (-Three)) == -2
-	      && ((-Seven)/ (-Three)) == 2)
-	    { ADD_FEATURE("TRUNCATE_USE_C");
-	    }  }
+  { 
+/*      int ONEM = -1; */
+    int Bigm  = BIGM;
+    int Smallm = -BIGM-1;
+    int Seven = 7;
+    int Three = 3;
+    if ( (Smallm / Seven)  < 0
+	 && (Smallm / (-Seven))  > 0
+	 && (Bigm / (-Seven)) < 0 
+	 && ((-Seven) / Three) == -2
+	 && (Seven / (-Three)) == -2
+	 && ((-Seven)/ (-Three)) == 2)
+      { ADD_FEATURE("TRUNCATE_USE_C");
+      }  }
 #endif	 
-
-
-	 
-	make_special("*FEATURES*",features);}
-
-	make_si_function("SAVE-SYSTEM", siLsave_system);
-	make_si_sfun("CATCH-FATAL",siLcatch_fatal,ARGTYPE1(f_fixnum));
-
+  
+  
+  
+  make_special("*FEATURES*",features);}
+  
+  make_si_function("SAVE-SYSTEM", siLsave_system);
+  make_si_sfun("CATCH-FATAL",siLcatch_fatal,ARGTYPE1(f_fixnum));
+  
 }

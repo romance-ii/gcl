@@ -8,10 +8,12 @@
 
 #define NONE 0
 
-void SI_makefun(),LISP_makefun(),error();
+/*  void SI_makefun(),LISP_makefun(),error(); */
 
 #define MAKEFUN(pack,string,fname,argd) \
-  (pack == SI ? SI_makefun : pack == LISP ? LISP_makefun : error)(string,fname,argd)
+  (pack == SI ? SI_makefun(string,fname,argd) : \
+   pack == LISP ? LISP_makefun(string,fname,argd) : \
+   error("Bad pack variable in MAKEFUN\n"))
 
 #undef DEFUN
 #define DEFUN(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,doc) \
@@ -32,14 +34,14 @@ void SI_makefun(),LISP_makefun(),error();
  { extern object cname; \
    cname = (pack == LISP ? make_special(name,val) : \
 	   pack == SI ?  make_si_special(name,val): \
-	   (error(name,val),(object)0));}
+	   (error("Bad pack variable in DEFVAR\n"),(object)0));}
 
 #undef DEFCONST
 #define DEFCONST(name,cname,pack,val,doc) \
  { extern object cname; \
    cname = (pack == LISP ? make_constant(name,val) : \
 	   pack == SI ?  make_si_constant(name,val): \
-	   (error(name,val),(object)0));}
+	   (error("Bad pack variable in DEFCONST\n"),(object)0));}
 
 
 #undef DEF_ORDINARY
@@ -47,7 +49,7 @@ void SI_makefun(),LISP_makefun(),error();
    { extern object cname ; cname = (pack == LISP ? make_ordinary(name) : \
 	   pack == SI ?  make_si_ordinary(name): \
 	   pack == KEYWORD ?  make_keyword(name):   \
-   	   (error(name),(object)0));} 
+   	   (error("Bad pack variable in DEF_ORDINARY\n"),(object)0));} 
 
 
 #undef DO_INIT

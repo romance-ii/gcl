@@ -198,14 +198,14 @@ enum stype {			/*  symbol type  */
 #define sLnil Cnil
 #define sLt Ct
 
-#define	NOT_SPECIAL		((int (*)())Cnil)
+#define	NOT_SPECIAL		((void (*)())Cnil)
 #define	s_fillp		st_fillp
 #define	s_self		st_self
 
 struct symbol {
 		FIRSTWORD;
 	object	s_dbind;	/*  dynamic binding  */
-	int	(*s_sfdef)();	/*  special form definition  */
+	void	(*s_sfdef)();	/*  special form definition  */
 				/*  This field coincides with c_car  */
 	char	*s_self;	/*  print name  */
 				/*  These fields coincide with  */
@@ -594,7 +594,7 @@ struct pathname {
 struct cfun {			/*  compiled function header  */
 		FIRSTWORD;
 	object	cf_name;	/*  compiled function name  */
-	int	(*cf_self)();	/*  entry address  */
+	void	(*cf_self)();	/*  entry address  */
 	object	cf_data;	/*  data the function uses  */
 				/*  for GBC  */
 };
@@ -602,7 +602,7 @@ struct cfun {			/*  compiled function header  */
 struct cclosure {		/*  compiled closure header  */
 		FIRSTWORD;
 	object	cc_name;	/*  compiled closure name  */
-	int	(*cc_self)();	/*  entry address  */
+	void	(*cc_self)();	/*  entry address  */
 	object	cc_env;		/*  environment  */
 	object	cc_data;	/*  data the closure uses  */
 				/*  for GBC  */
@@ -613,7 +613,7 @@ struct cclosure {		/*  compiled closure header  */
 struct closure {
 	FIRSTWORD; 
 	object	cl_name;       /* name */
-	int	(*cl_self)();  /* C start address of code */
+	object	(*cl_self)();  /* C start address of code */
 	object	cl_data;       /* To object holding VV vector */
 	int cl_argd;           /* description of args + number */
 	int cl_envdim;         /* length of the environment vector */
@@ -623,7 +623,7 @@ struct closure {
 struct sfun {
 		FIRSTWORD; 
 	object	sfn_name;       /* name */
-	int	(*sfn_self)();  /* C start address of code */
+	object	(*sfn_self)();  /* C start address of code */
 	object	sfn_data;       /* To object holding VV vector */
 	int sfn_argd;           /* description of args + number */
 
@@ -632,7 +632,7 @@ struct sfun {
 struct vfun {
 		FIRSTWORD; 
 	object	vfn_name;       /* name */
-	int	(*vfn_self)();  /* C start address of code */
+	object	(*vfn_self)();  /* C start address of code */
 	object	vfn_data;       /* To object holding VV data */
 	unsigned short vfn_minargs; /* Min args and where varargs start */
 	unsigned short vfn_maxargs;    /* Max number of args */
@@ -904,7 +904,7 @@ EXTER object MVloc[10];
  object Xxvl[65]; \
  {int i; \
   new=Xxvl; \
-  if (n >= 65) FEerror("Too plong vl"); \
+  if (n >= 65) FEerror("Too plong vl",0); \
   for (i=0 ; i < (n); i++) new[i]=va_arg(vl,object);}
 #endif
 #define make_si_vfun(s,f,min,max) \
@@ -922,7 +922,7 @@ struct call_data { object fun;
 EXTER struct call_data fcall;
 
 #define  VFUN_NARGS fcall.argd
-#define RETURN2(x,y) do{object _x = (void *) x; \
+#define RETURN2(x,y) do{/*  object _x = (void *) x;  */\
 			  fcall.values[2]=y;fcall.nvalues=2; \
 			  return (x) ;} while(0)
 #define RETURN1(x) do{fcall.nvalues=1; return (x) ;} while(0)

@@ -28,7 +28,7 @@ XGCValues the_solid_GC_values,
 Colormap cmap;
 XFontStruct *the_fontstruct;       /* the font info to be used */
 
-Window open_window()
+Window open_window(void)
 {
   Window the_window;              /* the window that will be opened */
   int i, stop;
@@ -98,26 +98,21 @@ Window open_window()
   return(the_window);
 }
 
-int close_window(the_window)
-  Window the_window;
+int close_window(Window the_window)
 {
   XDestroyWindow(the_display, the_window);
   XFlush(the_display);
   return(1);
 }
 
-int draw_line(the_window, x1, y1, x2, y2)
-  Window the_window;
-  int x1, y1, x2, y2;
+int draw_line(Window the_window, int x1, int y1, int x2, int y2)
 {
   XDrawLine(the_display, the_window, the_solid_GC, x1, y1, x2, y2);
   XFlush(the_display);
   return(1);
 }
 
-int draw_arc(the_window, x, y, width, height, angle1, angle2)
-  Window the_window;
-  int x, y, width, height, angle1, angle2;
+int draw_arc(Window the_window, int x, int y, int width, int height, int angle1, int angle2)
 {
   XDrawArc(the_display, the_window, the_solid_GC,
 	   x, y, width, height, angle1, angle2);
@@ -125,9 +120,7 @@ int draw_arc(the_window, x, y, width, height, angle1, angle2)
   return(1);
 }
 
-int fill_arc(the_window, x, y, width, height, angle1, angle2)
-  Window the_window;
-  int x, y, width, height, angle1, angle2;
+int fill_arc(Window the_window, int x, int y, int width, int height, int angle1, int angle2)
 {
   XFillArc(the_display, the_window, the_solid_GC,
 	   x, y, width, height, angle1, angle2);
@@ -135,9 +128,7 @@ int fill_arc(the_window, x, y, width, height, angle1, angle2)
   return(1);
 }
 
-int clear_arc(the_window, x, y, width, height, angle1, angle2)
-  Window the_window;
-  int x, y, width, height, angle1, angle2;
+int clear_arc(Window the_window, int x, int y, int width, int height, int angle1, int angle2)
 {
   XFillArc(the_display, the_window, the_clear_GC,
 	   x, y, width, height, angle1, angle2);
@@ -145,7 +136,7 @@ int clear_arc(the_window, x, y, width, height, angle1, angle2)
   return(1);
 }
 
-int set_arc_mode (pie_or_chord)
+int set_arc_mode (int pie_or_chord)
 {
   if (pie_or_chord == 0) {
     XSetArcMode(the_display, the_solid_GC, ArcChord);
@@ -158,19 +149,14 @@ int set_arc_mode (pie_or_chord)
   return(1);
 }
 
-int erase_line(the_window, x1, y1, x2, y2)
-  Window the_window;
-  int x1, y1, x2, y2;
+int erase_line(Window the_window, int x1, int y1, int x2, int y2)
 {
   XDrawLine(the_display, the_window, the_clear_GC, x1, y1, x2, y2);
   XFlush(the_display);
   return(1);
 }
 
-int draw_text(the_window, string, x, y)
-  Window the_window;
-  char *string;
-  int x, y;
+int draw_text(Window the_window, char *string, int x, int y)
 {
   XDrawString(the_display, the_window, the_solid_GC, x, y,
 	      string, strlen(string));
@@ -178,10 +164,7 @@ int draw_text(the_window, string, x, y)
   return(1);
 }
 
-int erase_text(the_window, string, x, y)
-  Window the_window;
-  char *string;
-  int x, y;
+int erase_text(Window the_window, char *string, int x, int y)
 {
   XDrawString(the_display, the_window, the_clear_GC, x, y,
 	      string, strlen(string));
@@ -189,33 +172,28 @@ int erase_text(the_window, string, x, y)
   return(1);
 }
 
-int clear_window(the_window)
-  Window the_window;
+int clear_window(Window the_window)
 {
   XClearWindow(the_display, the_window);
   XFlush(the_display);
   return(1);
 }
 
-int resize_window(the_window, width, height)
-  Window the_window;
-  int width, height;
+int resize_window(Window the_window, int width, int height)
 {
   XResizeWindow(the_display, the_window, width, height);
   XFlush(the_display);
   return(1);
 }
 
-int raise_window(the_window)
-  Window the_window;
+int raise_window(Window the_window)
 {
   XRaiseWindow(the_display, the_window);
   XFlush(the_display);
   return(1);
 }
 
-int use_font (font_name)
-  char *font_name;
+int use_font (char *font_name)
 {
   if ((the_fontstruct = XLoadQueryFont(the_display, font_name)) == NULL)
     return(-1);
@@ -229,9 +207,7 @@ int use_font (font_name)
 
 
 
-int set_background (the_window, color_string)
-  Window the_window;
-  char *color_string;
+int set_background (Window the_window, char *color_string)
 {
   XColor color;
   int result;
@@ -247,8 +223,7 @@ int set_background (the_window, color_string)
   return(result);
 }
 
-int set_foreground (color_string)
-  char *color_string;
+int set_foreground (char *color_string)
 {
   XColor color;
   int result;

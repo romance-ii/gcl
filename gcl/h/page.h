@@ -33,7 +33,7 @@
 #ifdef SGC
 
 char sgc_type_map[MAXPAGE];
-int memory_protect();
+/*  int memory_protect(); */
 
 #define NORMAL_PAGE 0
 

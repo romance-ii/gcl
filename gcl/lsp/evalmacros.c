@@ -1,10 +1,10 @@
 
 #include "cmpinclude.h"
 #include "evalmacros.h"
-init_evalmacros(){do_init(VV);}
+void init_evalmacros(){do_init(VV);}
 /*	macro definition for DEFVAR	*/
 
-static L1()
+static void L1()
 {register object *base=vs_base;
 	register object *sup=base+VM1; VC1
 	vs_reserve(VM1);
@@ -32,16 +32,20 @@ static L1()
 	goto T5;}
 	V3= list(4,VV[3],list(2,VV[2],base[2]),base[5],VV[4]);
 	goto T3;
+goto T5;
 T5:;
 	V3= Cnil;
+goto T3;
 T3:;
 	if((base[4])==Cnil){
 	goto T9;}
 	V5= list(2,VV[6],list(2,VV[2],base[2]));
 	V4= list(3,VV[5],/* INLINE-ARGS */V5,list(3,VV[7],base[2],base[3]));
 	goto T7;
+goto T9;
 T9:;
 	V4= Cnil;
+goto T7;
 T7:;
 	base[6]= list(5,VV[0],/* INLINE-ARGS */V2,V3,V4,list(2,VV[2],base[2]));
 	vs_top=(vs_base=base+6)+1;
@@ -49,7 +53,7 @@ T7:;
 }
 /*	macro definition for DEFPARAMETER	*/
 
-static L2()
+static void L2()
 {register object *base=vs_base;
 	register object *sup=base+VM2; VC2
 	vs_reserve(VM2);
@@ -76,6 +80,7 @@ static L2()
 	base[5]= list(5,VV[0],/* INLINE-ARGS */V7,/* INLINE-ARGS */V8,/* INLINE-ARGS */V9,list(2,VV[2],base[2]));
 	vs_top=(vs_base=base+5)+1;
 	return;
+goto T13;
 T13:;
 	V10= list(2,VV[1],list(2,VV[2],base[2]));
 	V11= list(3,VV[7],base[2],base[3]);
@@ -85,7 +90,7 @@ T13:;
 }
 /*	macro definition for DEFCONSTANT	*/
 
-static L3()
+static void L3()
 {register object *base=vs_base;
 	register object *sup=base+VM3; VC3
 	vs_reserve(VM3);
@@ -111,6 +116,7 @@ static L3()
 	base[5]= list(4,VV[0],/* INLINE-ARGS */V13,/* INLINE-ARGS */V14,list(2,VV[2],base[2]));
 	vs_top=(vs_base=base+5)+1;
 	return;
+goto T17;
 T17:;
 	V15= list(3,VV[9],list(2,VV[2],base[2]),base[3]);
 	base[5]= list(3,VV[0],/* INLINE-ARGS */V15,list(2,VV[2],base[2]));
@@ -119,7 +125,7 @@ T17:;
 }
 /*	macro definition for AND	*/
 
-static L4()
+static void L4()
 {register object *base=vs_base;
 	register object *sup=base+VM4; VC4
 	vs_reserve(VM4);
@@ -132,6 +138,7 @@ static L4()
 	base[3]= Ct;
 	vs_top=(vs_base=base+3)+1;
 	return;
+goto T20;
 T20:;
 	{object V17;
 	V17= reverse(base[2]);
@@ -139,12 +146,14 @@ T20:;
 	register object V19;
 	V18= cdr((V17));
 	V19= car((V17));
+goto T26;
 T26:;
 	if(!(endp((V18)))){
 	goto T27;}
 	base[3]= (V19);
 	vs_top=(vs_base=base+3)+1;
 	return;
+goto T27;
 T27:;
 	{object V20;
 	V20= cdr((V18));
@@ -154,7 +163,7 @@ T27:;
 }
 /*	macro definition for OR	*/
 
-static L5()
+static void L5()
 {register object *base=vs_base;
 	register object *sup=base+VM5; VC5
 	vs_reserve(VM5);
@@ -167,6 +176,7 @@ static L5()
 	base[3]= Cnil;
 	vs_top=(vs_base=base+3)+1;
 	return;
+goto T36;
 T36:;
 	{object V22;
 	V22= reverse(base[2]);
@@ -174,12 +184,14 @@ T36:;
 	register object V24;
 	V23= cdr((V22));
 	V24= car((V22));
+goto T42;
 T42:;
 	if(!(endp((V23)))){
 	goto T43;}
 	base[3]= (V24);
 	vs_top=(vs_base=base+3)+1;
 	return;
+goto T43;
 T43:;
 	{object V25;
 	V25= cdr((V23));
@@ -196,7 +208,7 @@ T43:;
 }
 /*	macro definition for LOCALLY	*/
 
-static L6()
+static void L6()
 {register object *base=vs_base;
 	register object *sup=base+VM6; VC6
 	vs_reserve(VM6);
@@ -210,7 +222,7 @@ static L6()
 }
 /*	macro definition for LOOP	*/
 
-static L7()
+static void L7()
 {register object *base=vs_base;
 	register object *sup=base+VM7; VC7
 	vs_reserve(VM7);
@@ -229,7 +241,7 @@ static L7()
 }
 /*	macro definition for DEFMACRO	*/
 
-static L8()
+static void L8()
 {register object *base=vs_base;
 	register object *sup=base+VM8; VC8
 	vs_reserve(VM8);
@@ -252,7 +264,7 @@ static L8()
 }
 /*	macro definition for DEFUN	*/
 
-static L9()
+static void L9()
 {register object *base=vs_base;
 	register object *sup=base+VM9; VC9
 	vs_reserve(VM9);
@@ -283,12 +295,16 @@ static L9()
 	V39= vs_base[0];
 	vs_top=sup;
 	goto T59;
+goto T56;
 T56:;
 	V37= Cnil;
+goto T57;
 T57:;
 	V38= Cnil;
+goto T58;
 T58:;
 	V39= Cnil;
+goto T59;
 T59:;
 	if(((V37))==Cnil){
 	goto T61;}
@@ -300,6 +316,7 @@ T59:;
 	base[5]= list(4,VV[0],/* INLINE-ARGS */V40,/* INLINE-ARGS */V44,list(2,VV[2],base[2]));
 	vs_top=(vs_base=base+5)+1;
 	return;
+goto T61;
 T61:;
 	V45= list(2,VV[21],list(2,VV[2],base[2]));
 	V46= listA(3,VV[13],base[2],(V39));
@@ -311,7 +328,7 @@ T61:;
 }
 /*	macro definition for PSETQ	*/
 
-static L10()
+static void L10()
 {register object *base=vs_base;
 	register object *sup=base+VM10; VC10
 	vs_reserve(VM10);
@@ -325,6 +342,7 @@ static L10()
 	V50= base[2];
 	V51= Cnil;
 	V52= Cnil;
+goto T64;
 T64:;
 	if(!(endp((V50)))){
 	goto T65;}
@@ -333,6 +351,7 @@ T64:;
 	base[3]= listA(3,VV[24],/* INLINE-ARGS */V53,reverse(/* INLINE-ARGS */V54));
 	vs_top=(vs_base=base+3)+1;
 	return;
+goto T65;
 T65:;
 	{register object V55;
 	vs_base=vs_top;
@@ -348,7 +367,7 @@ T65:;
 }
 /*	macro definition for COND	*/
 
-static L11()
+static void L11()
 {register object *base=vs_base;
 	register object *sup=base+VM11; VC11
 	vs_reserve(VM11);
@@ -361,11 +380,13 @@ static L11()
 	register object V60;
 	V59= reverse(base[2]);
 	V60= car((V59));
+goto T81;
 T81:;
 	if(!(endp((V59)))){
 	goto T82;}
 	vs_top=(vs_base=base+3)+1;
 	return;
+goto T82;
 T82:;
 	if(!(endp(cdr((V60))))){
 	goto T88;}
@@ -373,6 +394,7 @@ T82:;
 	goto T91;}
 	base[3]= Ct;
 	goto T86;
+goto T91;
 T91:;
 	{register object V61;
 	vs_base=vs_top;
@@ -383,6 +405,7 @@ T91:;
 	V63= make_cons(/* INLINE-ARGS */V62,Cnil);
 	base[3]= list(3,VV[12],/* INLINE-ARGS */V63,list(4,VV[11],(V61),(V61),base[3]));
 	goto T86;}
+goto T88;
 T88:;
 	if(!((car((V60)))==(Ct))){
 	goto T97;}
@@ -390,19 +413,25 @@ T88:;
 	goto T101;}
 	base[3]= cadr((V60));
 	goto T99;
+goto T101;
 T101:;
 	base[3]= make_cons(VV[0],cdr((V60)));
+goto T99;
 T99:;
 	goto T86;
+goto T97;
 T97:;
 	if(!(endp(cddr((V60))))){
 	goto T105;}
 	base[3]= list(4,VV[11],car((V60)),cadr((V60)),base[3]);
 	goto T103;
+goto T105;
 T105:;
 	V64= car((V60));
 	base[3]= list(4,VV[11],/* INLINE-ARGS */V64,make_cons(VV[0],cdr((V60))),base[3]);
+goto T103;
 T103:;
+goto T86;
 T86:;
 	V59= cdr((V59));
 	V60= car((V59));
@@ -410,7 +439,7 @@ T86:;
 }
 /*	macro definition for WHEN	*/
 
-static L12()
+static void L12()
 {register object *base=vs_base;
 	register object *sup=base+VM12; VC12
 	vs_reserve(VM12);
@@ -427,7 +456,7 @@ static L12()
 }
 /*	macro definition for UNLESS	*/
 
-static L13()
+static void L13()
 {register object *base=vs_base;
 	register object *sup=base+VM13; VC13
 	vs_reserve(VM13);
@@ -445,7 +474,7 @@ static L13()
 }
 /*	macro definition for PROG	*/
 
-static L14()
+static void L14()
 {register object *base=vs_base;
 	register object *sup=base+VM14; VC14
 	vs_reserve(VM14);
@@ -457,6 +486,7 @@ static L14()
 	V68=V68->c.c_cdr;
 	base[3]= V68;
 	base[4]= Cnil;}
+goto T114;
 T114:;
 	if(endp(base[3])){
 	goto T116;}
@@ -464,12 +494,14 @@ T114:;
 	goto T116;}
 	if((caar(base[3]))==(VV[26])){
 	goto T115;}
+goto T116;
 T116:;
 	V69= make_cons(VV[14],base[3]);
 	V70= make_cons(/* INLINE-ARGS */V69,Cnil);
 	base[5]= list(3,VV[13],Cnil,listA(3,VV[12],base[2],append(base[4],/* INLINE-ARGS */V70)));
 	vs_top=(vs_base=base+5)+1;
 	return;
+goto T115;
 T115:;
 	base[4]= make_cons(car(base[3]),base[4]);
 	{register object V71;
@@ -479,7 +511,7 @@ T115:;
 }
 /*	macro definition for PROG*	*/
 
-static L15()
+static void L15()
 {register object *base=vs_base;
 	register object *sup=base+VM15; VC15
 	vs_reserve(VM15);
@@ -491,6 +523,7 @@ static L15()
 	V72=V72->c.c_cdr;
 	base[3]= V72;
 	base[4]= Cnil;}
+goto T133;
 T133:;
 	if(endp(base[3])){
 	goto T135;}
@@ -498,12 +531,14 @@ T133:;
 	goto T135;}
 	if((caar(base[3]))==(VV[26])){
 	goto T134;}
+goto T135;
 T135:;
 	V73= make_cons(VV[14],base[3]);
 	V74= make_cons(/* INLINE-ARGS */V73,Cnil);
 	base[5]= list(3,VV[13],Cnil,listA(3,VV[24],base[2],append(base[4],/* INLINE-ARGS */V74)));
 	vs_top=(vs_base=base+5)+1;
 	return;
+goto T134;
 T134:;
 	base[4]= make_cons(car(base[3]),base[4]);
 	{register object V75;
@@ -513,7 +548,7 @@ T134:;
 }
 /*	macro definition for PROG1	*/
 
-static L16()
+static void L16()
 {register object *base=vs_base;
 	register object *sup=base+VM16; VC16
 	vs_reserve(VM16);
@@ -537,7 +572,7 @@ static L16()
 }
 /*	macro definition for PROG2	*/
 
-static L17()
+static void L17()
 {register object *base=vs_base;
 	register object *sup=base+VM17; VC17
 	vs_reserve(VM17);
@@ -564,7 +599,7 @@ static L17()
 }
 /*	macro definition for MULTIPLE-VALUE-LIST	*/
 
-static L18()
+static void L18()
 {register object *base=vs_base;
 	register object *sup=base+VM18; VC18
 	vs_reserve(VM18);
@@ -581,7 +616,7 @@ static L18()
 }
 /*	macro definition for MULTIPLE-VALUE-SETQ	*/
 
-static L19()
+static void L19()
 {register object *base=vs_base;
 	register object *sup=base+VM19; VC19
 	vs_reserve(VM19);
@@ -606,6 +641,7 @@ static L19()
 	V89= 0;
 	V86= base[2];
 	V88= Cnil;
+goto T155;
 T155:;
 	if(!(endp((V86)))){
 	goto T156;}
@@ -613,6 +649,7 @@ T155:;
 	base[4]= listA(3,VV[12],make_cons(/* INLINE-ARGS */V90,Cnil),(V88));
 	vs_top=(vs_base=base+4)+1;
 	return;
+goto T156;
 T156:;
 	V91= car((V86));
 	V92 = make_fixnum(V89);
@@ -624,7 +661,7 @@ T156:;
 }
 /*	macro definition for MULTIPLE-VALUE-BIND	*/
 
-static L20()
+static void L20()
 {register object *base=vs_base;
 	register object *sup=base+VM20; VC20
 	vs_reserve(VM20);
@@ -649,6 +686,7 @@ static L20()
 	V98= 0;
 	V95= base[2];
 	V97= Cnil;
+goto T169;
 T169:;
 	if(!(endp((V95)))){
 	goto T170;}
@@ -657,6 +695,7 @@ T169:;
 	base[5]= listA(3,VV[24],make_cons(/* INLINE-ARGS */V99,/* INLINE-ARGS */V100),base[4]);
 	vs_top=(vs_base=base+5)+1;
 	return;
+goto T170;
 T170:;
 	V101= car((V95));
 	V102 = make_fixnum(V98);
@@ -668,7 +707,7 @@ T170:;
 }
 /*	macro definition for DO	*/
 
-static L21()
+static void L21()
 {register object *base=vs_base;
 	register object *sup=base+VM21; VC21
 	vs_reserve(VM21);
@@ -693,6 +732,7 @@ static L21()
 	base[7]= vs_base[0];
 	base[8]= Cnil;
 	base[9]= Cnil;}
+goto T186;
 T186:;
 	if(endp(base[5])){
 	goto T188;}
@@ -700,27 +740,33 @@ T186:;
 	goto T188;}
 	if((caar(base[5]))==(VV[26])){
 	goto T187;}
+goto T188;
 T188:;
 	goto T184;
+goto T187;
 T187:;
 	base[6]= make_cons(car(base[5]),base[6]);
 	{register object V106;
 	V106= car(base[5]);
 	base[5]= cdr(base[5]);}
 	goto T186;
+goto T184;
 T184:;
 	{register object V107;
 	register object V108;
 	V107= base[2];
 	V108= car((V107));
+goto T207;
 T207:;
 	if(!(endp((V107)))){
 	goto T208;}
 	goto T203;
+goto T208;
 T208:;
 	if(!(type_of((V108))==t_symbol)){
 	goto T212;}
 	V108= make_cons((V108),Cnil);
+goto T212;
 T212:;
 	V109= list(2,car((V108)),cadr((V108)));
 	base[8]= make_cons(/* INLINE-ARGS */V109,base[8]);
@@ -728,10 +774,12 @@ T212:;
 	goto T218;}
 	base[9]= make_cons(car((V108)),base[9]);
 	base[9]= make_cons(caddr((V108)),base[9]);
+goto T218;
 T218:;
 	V107= cdr((V107));
 	V108= car((V107));
 	goto T207;}
+goto T203;
 T203:;
 	V110= reverse(base[8]);
 	V111= list(3,VV[11],base[3],list(2,VV[31],make_cons(VV[0],base[4])));
@@ -746,7 +794,7 @@ T203:;
 }
 /*	macro definition for DO*	*/
 
-static L22()
+static void L22()
 {register object *base=vs_base;
 	register object *sup=base+VM22; VC22
 	vs_reserve(VM22);
@@ -771,6 +819,7 @@ static L22()
 	base[7]= vs_base[0];
 	base[8]= Cnil;
 	base[9]= Cnil;}
+goto T235;
 T235:;
 	if(endp(base[5])){
 	goto T237;}
@@ -778,27 +827,33 @@ T235:;
 	goto T237;}
 	if((caar(base[5]))==(VV[26])){
 	goto T236;}
+goto T237;
 T237:;
 	goto T233;
+goto T236;
 T236:;
 	base[6]= make_cons(car(base[5]),base[6]);
 	{register object V119;
 	V119= car(base[5]);
 	base[5]= cdr(base[5]);}
 	goto T235;
+goto T233;
 T233:;
 	{register object V120;
 	register object V121;
 	V120= base[2];
 	V121= car((V120));
+goto T256;
 T256:;
 	if(!(endp((V120)))){
 	goto T257;}
 	goto T252;
+goto T257;
 T257:;
 	if(!(type_of((V121))==t_symbol)){
 	goto T261;}
 	V121= make_cons((V121),Cnil);
+goto T261;
 T261:;
 	V122= list(2,car((V121)),cadr((V121)));
 	base[8]= make_cons(/* INLINE-ARGS */V122,base[8]);
@@ -806,10 +861,12 @@ T261:;
 	goto T267;}
 	base[9]= make_cons(car((V121)),base[9]);
 	base[9]= make_cons(caddr((V121)),base[9]);
+goto T267;
 T267:;
 	V120= cdr((V120));
 	V121= car((V120));
 	goto T256;}
+goto T252;
 T252:;
 	V123= reverse(base[8]);
 	V124= list(3,VV[11],base[3],list(2,VV[31],make_cons(VV[0],base[4])));
@@ -824,7 +881,7 @@ T252:;
 }
 /*	macro definition for CASE	*/
 
-static L23()
+static void L23()
 {register object *base=vs_base;
 	register object *sup=base+VM23; VC23
 	vs_reserve(VM23);
@@ -844,6 +901,7 @@ static L23()
 	register object V132;
 	V131= reverse(base[3]);
 	V132= car((V131));
+goto T283;
 T283:;
 	if(!(endp((V131)))){
 	goto T284;}
@@ -851,25 +909,30 @@ T283:;
 	base[8]= list(3,VV[12],make_cons(/* INLINE-ARGS */V133,Cnil),base[4]);
 	vs_top=(vs_base=base+8)+1;
 	return;
+goto T284;
 T284:;
 	if((car((V132)))==(Ct)){
 	goto T289;}
 	if(!((car((V132)))==(VV[33]))){
 	goto T290;}
+goto T289;
 T289:;
 	base[4]= make_cons(VV[0],cdr((V132)));
 	goto T288;
+goto T290;
 T290:;
 	if(!(type_of(car((V132)))==t_cons)){
 	goto T296;}
 	V134= list(3,VV[34],base[5],list(2,VV[2],car((V132))));
 	base[4]= list(4,VV[11],/* INLINE-ARGS */V134,make_cons(VV[0],cdr((V132))),base[4]);
 	goto T288;
+goto T296;
 T296:;
 	if((car((V132)))==Cnil){
 	goto T288;}
 	V135= list(3,VV[35],base[5],list(2,VV[2],car((V132))));
 	base[4]= list(4,VV[11],/* INLINE-ARGS */V135,make_cons(VV[0],cdr((V132))),base[4]);
+goto T288;
 T288:;
 	V131= cdr((V131));
 	V132= car((V131));
@@ -877,7 +940,7 @@ T288:;
 }
 /*	macro definition for RETURN	*/
 
-static L24()
+static void L24()
 {register object *base=vs_base;
 	register object *sup=base+VM24; VC24
 	vs_reserve(VM24);
@@ -896,7 +959,7 @@ static L24()
 }
 /*	macro definition for DOLIST	*/
 
-static L25()
+static void L25()
 {register object *base=vs_base;
 	register object *sup=base+VM25; VC25
 	vs_reserve(VM25);
@@ -932,7 +995,7 @@ static L25()
 }
 /*	macro definition for DOTIMES	*/
 
-static L26()
+static void L26()
 {register object *base=vs_base;
 	register object *sup=base+VM26; VC26
 	vs_reserve(VM26);
@@ -967,7 +1030,7 @@ static L26()
 }
 /*	macro definition for DECLAIM	*/
 
-static L27()
+static void L27()
 {register object *base=vs_base;
 	register object *sup=base+VM27; VC27
 	vs_reserve(VM27);
@@ -981,6 +1044,7 @@ static L27()
 	V147= Cnil;
 	goto T312;}
 	base[3]=V148=MMcons(Cnil,Cnil);
+goto T313;
 T313:;
 	(V148->c.c_car)= list(2,VV[45],list(2,VV[2],(V149->c.c_car)));
 	if(endp(V149=MMcdr(V149))){
@@ -988,6 +1052,7 @@ T313:;
 	goto T312;}
 	V148=MMcdr(V148)=MMcons(Cnil,Cnil);
 	goto T313;}
+goto T312;
 T312:;
 	base[3]= listA(3,VV[43],VV[44],V147);
 	vs_top=(vs_base=base+3)+1;
@@ -995,7 +1060,7 @@ T312:;
 }
 /*	macro definition for LAMBDA	*/
 
-static L28()
+static void L28()
 {register object *base=vs_base;
 	register object *sup=base+VM28; VC28
 	vs_reserve(VM28);
@@ -1007,7 +1072,7 @@ static L28()
 	vs_top=(vs_base=base+3)+1;
 	return;
 }
-static LnkT46(){ call_or_link(VV[46],&Lnk46);} /* FIND-DOC */
+static void LnkT46(){ call_or_link(VV[46],(void **)&Lnk46);} /* FIND-DOC */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

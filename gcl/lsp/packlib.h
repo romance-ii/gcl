@@ -1,9 +1,9 @@
 
-static L1();
-static L3();
-static L4();
-static L5();
-static L8();
+static void L1();
+static void L3();
+static void L4();
+static void L5();
+static void L8();
 static object LI9();
 #define VC1 object  V5 ,V4 ,V3;
 static object LI2();
@@ -56,7 +56,7 @@ static object  LnkTLI34() ;
 static object  (*LnkLI34)() = LnkTLI34;
 static object  LnkTLI33() ;
 static object  (*LnkLI33)() = LnkTLI33;
-static  LnkT10() ;
-static  (*Lnk10)() = LnkT10;
-static  LnkT32() ;
-static  (*Lnk32)() = LnkT32;
+static void LnkT10() ;
+static void (*Lnk10)() = LnkT10;
+static void LnkT32() ;
+static void (*Lnk32)() = LnkT32;

@@ -14,10 +14,9 @@ typedef object (*object_func)();
 object sLAlink_arrayA;
 int Rset = 0;
 
+/* cleanup link */
 void
-call_or_link(sym,link)
-void **link;
-object sym;
+call_or_link(object sym, void **link )
 {object fun;
  fun = sym->s.s_gfdef;
  if (fun == OBJNULL) {FEinvalid_function(sym); return;}
@@ -37,10 +36,7 @@ object sym;
    else funcall(fun);}
 
 void
-call_or_link_closure(sym,link,ptr)
-void **link;
-object sym;
-object *ptr;
+call_or_link_closure(object sym, void **link, object *ptr)
 {object fun;
  fun = sym->s.s_gfdef;
  if (fun == OBJNULL) {FEinvalid_function(sym); return;}
@@ -73,8 +69,7 @@ or a fixnum if array-type = fixnum */
 
 #define SET_ITEM(ar,ind,val) (*((object *)(&((ar)->ust.ust_self[ind]))))= val
 int     
-vpush_extend(item,ar)
-void *item; object ar;
+vpush_extend(void *item, object ar)
 { register int ind = ar->ust.ust_fillp;
  AGAIN:
   if (ind < ar->ust.ust_dim)
@@ -82,7 +77,7 @@ void *item; object ar;
     ind += sizeof(void *); 
     return(ar->v.v_fillp = ind);}
        else
-    { register int *oldp ;
+    { 
       int newdim= ROUND_UP_PTR((2 + (int) (1.3 * ind)));
       unsigned char *newself;
       newself = (void *)alloc_relblock(newdim);
@@ -99,9 +94,7 @@ void *item; object ar;
 static int number_unlinked=0;
 
 void
-delete_link(address,link_ar) 
-     void *address;
-     object link_ar;
+delete_link(void *address, object link_ar)
 {object *ar,*ar_end,*p;
  p=0;
  ar = link_ar->v.v_self;
@@ -115,7 +108,7 @@ delete_link(address,link_ar)
      ar=ar+2;}
  if (number_unlinked > 40)
    link_ar->v.v_fillp=
-     clean_link_array(link_ar->ust.ust_self,ar_end); }
+     clean_link_array(link_ar->v.v_self,ar_end); }
 
 
 DEFUN("USE-FAST-LINKS",object,fSuse_fast_links,SI,1,2,NONE,OO,OO,OO,OO,
@@ -132,7 +125,7 @@ va_dcl
  va_list ap;
  object *p,*ar,*ar_end;
  object link_ar;
- object fun;
+ object fun=Cnil;
 
 { va_start(ap);
  if (n>=2) sym=va_arg(ap,object);else goto LDEFAULT2;
@@ -174,7 +167,6 @@ va_dcl
        fun = sym;
    else {FEerror("Second arg: ~a must be symbol or closure",0,sym);
        }
- BEGIN:
    if(Rset)
      {
       if(!fun) RETURN1(Cnil);
@@ -207,8 +199,7 @@ va_dcl
 }
 
 int
-clean_link_array(ar,ar_end)
-object *ar,*ar_end;
+clean_link_array(object *ar, object *ar_end)
 {int i=0;
  object *orig;
  orig=ar;
@@ -226,211 +217,208 @@ object *ar,*ar_end;
 #include <varargs.h>
 
 object
-c_apply_n(fn,n,x)
-     object *x;
-     int n;
-     long (*fn)();
-{object res;
+c_apply_n(object (*fn)(), int n, object *x)
+{object res=Cnil;
  switch(n){
-    case 0:  res=(object)(*fn)();break;
-    case 1:  res=(object)(*fn)(x[0]);break;
-    case 2:  res=(object)(*fn)(x[0],x[1]);break;
-    case 3:  res=(object)(*fn)(x[0],x[1],x[2]);break;
-    case 4:  res=(object)(*fn)(x[0],x[1],x[2],x[3]);break;
-    case 5:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4]);break;
-    case 6:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5]);break;
-    case 7:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6]);break;
-    case 8:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7]);break;
-    case 9:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 0:  res=(*fn)();break;
+    case 1:  res=(*fn)(x[0]);break;
+    case 2:  res=(*fn)(x[0],x[1]);break;
+    case 3:  res=(*fn)(x[0],x[1],x[2]);break;
+    case 4:  res=(*fn)(x[0],x[1],x[2],x[3]);break;
+    case 5:  res=(*fn)(x[0],x[1],x[2],x[3],x[4]);break;
+    case 6:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5]);break;
+    case 7:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6]);break;
+    case 8:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7]);break;
+    case 9:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8]);break;
-    case 10:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 10:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9]);break;
-    case 11:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 11:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10]);break;
-    case 12:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 12:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11]);break;
-    case 13:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 13:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12]);break;
-    case 14:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 14:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13]);break;
-    case 15:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 15:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14]);break;
-    case 16:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 16:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15]);break;
-    case 17:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 17:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16]);break;
-    case 18:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 18:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17]);break;
-    case 19:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 19:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18]);break;
-    case 20:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 20:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19]);break;
-    case 21:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 21:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20]);break;
-    case 22:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 22:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21]);break;
-    case 23:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 23:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22]);break;
-    case 24:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 24:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23]);break;
-    case 25:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 25:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24]);break;
-    case 26:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 26:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25]);break;
-    case 27:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 27:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26]);break;
-    case 28:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 28:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27]);break;
-    case 29:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 29:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28]);break;
-    case 30:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 30:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29]);break;
-    case 31:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 31:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30]);break;
-    case 32:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 32:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31]);break;
-    case 33:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 33:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32]);break;
-    case 34:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 34:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33]);break;
-    case 35:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 35:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34]);break;
-    case 36:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 36:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35]);break;
-    case 37:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 37:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36]);break;
-    case 38:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 38:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37]);break;
-    case 39:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 39:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38]);break;
-    case 40:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 40:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39]);break;
-    case 41:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 41:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40]);break;
-    case 42:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 42:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40],x[41]);break;
-    case 43:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 43:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40],x[41],x[42]);break;
-    case 44:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 44:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43]);break;
-    case 45:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 45:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44]);break;
-    case 46:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 46:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45]);break;
-    case 47:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 47:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46]);break;
-    case 48:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 48:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47]);break;
-    case 49:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 49:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47],x[48]);break;
-    case 50:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 50:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
          x[29],x[30],x[31],x[32],x[33],x[34],x[35],
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47],x[48],x[49]);break;
-    case 51:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 51:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -438,7 +426,7 @@ c_apply_n(fn,n,x)
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50]);break;
-    case 52:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 52:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -446,7 +434,7 @@ c_apply_n(fn,n,x)
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51]);break;
-    case 53:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 53:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -454,7 +442,7 @@ c_apply_n(fn,n,x)
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52]);break;
-    case 54:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 54:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -462,7 +450,7 @@ c_apply_n(fn,n,x)
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53]);break;
-    case 55:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 55:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -470,7 +458,7 @@ c_apply_n(fn,n,x)
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53],x[54]);break;
-    case 56:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 56:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -478,7 +466,7 @@ c_apply_n(fn,n,x)
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53],x[54],x[55]);break;
-    case 57:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 57:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -486,7 +474,7 @@ c_apply_n(fn,n,x)
          x[36],x[37],x[38],x[39],x[40],x[41],x[42],
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53],x[54],x[55],x[56]);break;
-    case 58:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 58:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -495,7 +483,7 @@ c_apply_n(fn,n,x)
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53],x[54],x[55],x[56],
          x[57]);break;
-    case 59:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 59:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -504,7 +492,7 @@ c_apply_n(fn,n,x)
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53],x[54],x[55],x[56],
          x[57],x[58]);break;
-    case 60:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 60:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -513,7 +501,7 @@ c_apply_n(fn,n,x)
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53],x[54],x[55],x[56],
          x[57],x[58],x[59]);break;
-    case 61:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 61:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -522,7 +510,7 @@ c_apply_n(fn,n,x)
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53],x[54],x[55],x[56],
          x[57],x[58],x[59],x[60]);break;
-    case 62:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 62:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -531,7 +519,7 @@ c_apply_n(fn,n,x)
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53],x[54],x[55],x[56],
          x[57],x[58],x[59],x[60],x[61]);break;
-    case 63:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 63:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -540,7 +528,7 @@ c_apply_n(fn,n,x)
          x[43],x[44],x[45],x[46],x[47],x[48],x[49],
          x[50],x[51],x[52],x[53],x[54],x[55],x[56],
          x[57],x[58],x[59],x[60],x[61],x[62]);break;
-    case 64:  res=(object)(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+    case 64:  res=(*fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
          x[8],x[9],x[10],x[11],x[12],x[13],x[14],
          x[15],x[16],x[17],x[18],x[19],x[20],x[21],
          x[22],x[23],x[24],x[25],x[26],x[27],x[28],
@@ -560,11 +548,7 @@ value.  This function is called by the static lnk function in the reference
 file */
 
 object
-call_proc(sym,link,argd,ll)
-object sym;
-int argd;
-void  **link;
-va_list ll;
+call_proc(object sym, void **link, int argd, va_list ll)
 {object fun;
  int nargs;
  check_type_symbol(&sym);
@@ -573,8 +557,8 @@ va_list ll;
 	     || type_of(fun)==t_gfun
 	     || type_of(fun)== t_vfun)
 	     && Rset) /* the && Rset is to allow tracing */
-   {long (*fn)();
-    fn =  (long (*)()) fun->sfn.sfn_self;
+   {object (*fn)();
+    fn = fun->sfn.sfn_self;
     if (type_of(fun)==t_vfun)
       { /* argd=VFUN_NARGS; */ /*remove this! */
 	nargs=SFUN_NARGS(argd);
@@ -685,16 +669,11 @@ va_list ll;
 }
 
 
-object call_vproc(sym,link,ll)
-object sym;
-void *link;
-va_list ll;     
+object call_vproc(object sym, void *link, va_list ll)
 {return call_proc(sym,link,VFUN_NARGS | VFUN_NARG_BIT,ll);}
 
 object
-call_proc0(sym,link)
-object sym;
-void *link;
+call_proc0(object sym, void *link)
 {return call_proc(sym,link,0,0);}
 
 #if 0
@@ -724,9 +703,7 @@ call_proc2(sym,link,va_alist)
    
 
 object
-ifuncall(sym,n,va_alist)
-object sym; int n;
-va_dcl
+ifuncall(object sym, int n, __builtin_va_alist_t __builtin_va_alist)
 { va_list ap;
   int i;
   object *old_vs_base;
@@ -753,9 +730,7 @@ va_dcl
 
 
 object
-imfuncall(sym,n,va_alist)
-object sym; int n;
-va_dcl
+imfuncall(object sym, int n, __builtin_va_alist_t __builtin_va_alist)
 { va_list ap;
   int i;
   object *old_vs_top;
@@ -780,8 +755,7 @@ va_dcl
 #define FRESH 40
 
 int
-clear_stack(beg,limit)
-object *beg,*limit;
+clear_stack(object *beg, object *limit)
 {int i=0;
  while (++beg < limit)
   {if (*beg==0) i++;
@@ -789,9 +763,7 @@ object *beg,*limit;
    ;*beg=0;} return 0;}
 
 object
-set_mv(i,val)
-     int i;
-     object val;
+set_mv(int i, object val)
 { if (i >= (sizeof(MVloc)/sizeof(object)))
      FEerror("Bad mv index",0);
   return(MVloc[i]=val);
@@ -799,8 +771,7 @@ set_mv(i,val)
 
 
 object
-mv_ref(i)
-     unsigned int i;
+mv_ref(unsigned int i)
 { object x;
   if (i >= (sizeof(MVloc)/sizeof(object)))
      FEerror("Bad mv index",0);
@@ -817,7 +788,7 @@ DEF_ORDINARY("CDEFN",sScdefn,SI,"");
 DEFVAR("*LINK-ARRAY*",sLAlink_arrayA,LISP,Cnil,"");
 
 void
-init_links()
+init_links(void)
 {	
 
 	make_si_sfun("SET-MV",set_mv, ARGTYPE2(f_fixnum,f_object) |

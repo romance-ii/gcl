@@ -20,6 +20,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include <string.h>
+#include <stdlib.h>
 
 #define IN_UNIXFSYS
 #include "include.h"
@@ -33,7 +34,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define HAVE_RENAME
 #endif
 
-void Ldirectory();
+void Ldirectory(void);
 
 
 
@@ -141,10 +142,9 @@ DEV_FOUND:
 
 #ifdef HAVE_GETCWD
 char *
-getwd(buffer)
-char *buffer;
+getwd(char *buffer)
 {
-	char *getcwd();
+	char *getcwd(char *, size_t);
 
 	return(getcwd(buffer, MAXPATHLEN));
 }
@@ -204,10 +204,8 @@ char *buffer;
 
 #endif
 
-
-coerce_to_filename(pathname, p)
-object pathname;
-char *p;
+void
+coerce_to_filename(object pathname, char *p)
 {
   int n;
   object namestring;
@@ -215,17 +213,14 @@ char *p;
 #ifndef NO_PWD_H  
   if(namestring->st.st_self[0]=='~')
     {char name[20];
-     int j;
-     object ans;
      char *q = namestring->st.st_self;
 #ifndef __STDC__
      extern struct passwd *getpwuid();
      extern struct passwd *getpwnam();
 #endif
 
-     char filename[MAXPATHLEN];
      struct passwd *pwent;
-     int m;
+     int m=0;
      q=namestring->st.st_self;
      for (n=0; n< namestring->st.st_fillp; n++)
        if (q[n]=='/') break;
@@ -254,15 +249,14 @@ char *p;
 
 
 object
-truename(pathname)
-object pathname;
+truename(object pathname)
 {
 	register char *p, *q;
 	char filename[MAXPATHLEN];
 	char truefilename[MAXPATHLEN];
 	char current_directory[MAXPATHLEN];
 	char directory[MAXPATHLEN];
-	char *getwd();
+	char *getwd(char *buffer);
 	coerce_to_filename(pathname, filename);
 
 
@@ -319,14 +313,13 @@ object pathname;
 	chdir(current_directory);
 	vs_push(make_simple_string(truefilename));
 	pathname = coerce_to_pathname(vs_head);
-	vs_pop;
+	vs_popp;
 	return(pathname);
 }
 object sSAallow_gzipped_fileA;
 
 bool
-file_exists(file)
-object file;
+file_exists(object file)
 {
 	char filename[MAXPATHLEN];
 	struct stat filestatus;
@@ -355,8 +348,7 @@ object file;
 }
 
 FILE *
-backup_fopen(filename, option)
-char *filename,*option;
+backup_fopen(char *filename, char *option)
 {
 	char backupfilename[MAXPATHLEN];
 	char command[MAXPATHLEN * 2];
@@ -368,8 +360,7 @@ char *filename,*option;
 }
 
 int
-file_len(fp)
-FILE *fp;
+file_len(FILE *fp)
 {
 	struct stat filestatus;
 
@@ -378,18 +369,19 @@ FILE *fp;
 	else return 0;
 }
 
-Ltruename()
+void
+Ltruename(void)
 {
 	check_arg(1);
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 	vs_base[0] = truename(vs_base[0]);
 }
 
-Lrename_file()
+void
+Lrename_file(void)
 {
 	char filename[MAXPATHLEN];
 	char newfilename[MAXPATHLEN];
-	char command[MAXPATHLEN * 2];
 
 	check_arg(2);
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
@@ -452,7 +444,8 @@ object path;
 	RETURN1(path);
 }
 
-Lprobe_file()
+void
+Lprobe_file(void)
 {
 	check_arg(1);
 
@@ -463,7 +456,8 @@ Lprobe_file()
 		vs_base[0] = Cnil;
 }
 
-Lfile_write_date()
+void
+Lfile_write_date(void)
 {
 	char filename[MAXPATHLEN];
 	struct stat filestatus;
@@ -475,7 +469,8 @@ Lfile_write_date()
 	vs_base[0] = unix_time_to_universal_time(filestatus.st_mtime);
 }
 
-Lfile_author()
+void
+Lfile_author(void)
 {
 	char filename[MAXPATHLEN];
 #ifndef NO_PWD_H
@@ -497,8 +492,8 @@ Lfile_author()
 	
 }
 
-Luser_homedir_pathname()
-
+void
+Luser_homedir_pathname(void)
 {
 #ifndef NO_PWD_H  
 	struct passwd *pwent;
@@ -529,15 +524,15 @@ Luser_homedir_pathname()
 
 #ifdef BSD
 void
-Ldirectory()
+Ldirectory(void)
 {
 	char filename[MAXPATHLEN];
 	char command[MAXPATHLEN * 2];
 	FILE *fp;
-	register i, c;
+	register int i, c;
 	object *top = vs_top;
 	char iobuffer[BUFSIZ];
-	extern FILE *popen();
+	extern FILE *popen(const char *, const char *);
 
 	check_arg(1);
 
@@ -559,7 +554,7 @@ Ldirectory()
 	fp = popen(command, "r");
 	setbuf(fp, iobuffer);
 	for (;;) {
-		for (i = 0;  c = getc(fp);  i++)
+		for (i = 0;  (c = getc(fp));  i++)
 			if (c <= 0)
 				goto L;
 			else if (c == '\n')
@@ -760,7 +755,8 @@ Ldirectory()
 
 #endif
 
-siLchdir()
+void
+siLchdir(void)
 {
 	char filename[MAXPATHLEN];
 
@@ -773,7 +769,8 @@ siLchdir()
 			1, vs_base[0]);
 }
 
-init_unixfsys()
+void
+init_unixfsys(void)
 {
 	make_function("TRUENAME", Ltruename);
 	make_function("RENAME-FILE", Lrename_file);

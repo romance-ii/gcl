@@ -20,8 +20,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #define IN_GUIS
-#include "gclincl.h"
-#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -76,12 +74,12 @@ extern char *inet_ntoa ( struct in_addr in );
 #endif
 
 
+#include "guis.h"
+
 #ifndef TRUE
 #define TRUE (1)
 #define FALSE (0)
 #endif
-
-#include "guis.h"
 
 FILE *pstreamDebug;
 int fDebugSockets;
@@ -209,9 +207,10 @@ int w32_socket_exit(void)
 
 
 int delay;
-int main(argc, argv)
+int main(argc, argv,envp)
 int argc;
 char *argv[];
+char *envp[];
 {
     int rv = 0; 
     {
@@ -309,7 +308,6 @@ char *argv[];
                        to set waiting to 0 */
                     while (-- delay >=0) sleep(1);
                     {
-                        char *buf = "\0\0";
                         TkX_Wish(argc, argv);
                     }
                     
@@ -406,7 +404,6 @@ int length;
 {
   char buf[0x1000];
   char *p = buf;
-  int cb;
   int m;
   int n_written;
   struct message_header *msg;
@@ -461,7 +458,6 @@ struct connection_state *sfd;
 { int m;
   int body_length;
   int tot;
-  char *p = buf;
   struct message_header *msg;
   msg = (struct message_header *) buf;
   m= read1(sfd,msg,MESSAGE_HEADER_SIZE,DEFAULT_TIMEOUT_FOR_TK_READ);
@@ -482,8 +478,7 @@ struct connection_state *sfd;
      if (m == body_length)
        { return msg;}}
   if (m < 0) exit(1);
- fail:
-  { static bad_read_allowed=4;
+  { static int bad_read_allowed=4;
     if (bad_read_allowed-- < 0) exit(1);
   }
     
@@ -491,20 +486,29 @@ struct connection_state *sfd;
   return 0;
 }  
       
+void
 error(s)
      char *s;
 { fprintf(stderr,"%s",s); abort();
 }
 
+void
 write_timeout_error(s)
      char *s;
 { fprintf(stderr,"write timeout: %s",s); abort();
 }
+void
 connection_failure(s)
      char *s;
 { fprintf(stderr,"connection_failure:%s",s); abort();
 }
 
+object
+make_fixnum(long i) {
 
+  static union lispunion lu;
 
+  lu.FIX.FIXVAL=i;
+  return &lu;
 
+}

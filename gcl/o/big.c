@@ -68,21 +68,17 @@ DEFUN("SET-GMP-ALLOCATE-RELOCATABLE",object,fSset_gmp_allocate_relocatable,SI,1,
 
 
 
-int big_sign(x)
-     object x;
+int big_sign(object x)
 {
   return BIG_SIGN(x);
 }
 
-void set_big_sign(x,sign)
-     object x;
-     int sign;
+void set_big_sign(object x, int sign)
 {
   SET_BIG_SIGN(x,sign);
 }
 
-void zero_big(x)
-     object x;
+void zero_big(object x)
 {
   ZERO_BIG(x);
 }

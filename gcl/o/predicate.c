@@ -389,8 +389,7 @@ object x0,x1;
     ;}
 
 bool
-eql(x, y)
-object x, y;
+eql(object x, object y)
 {
 	enum type t;
 
@@ -407,8 +406,7 @@ object x, y;
 			return(FALSE);
 
 	case t_bignum:
-		if (big_compare((struct bignum *)x,
-				(struct bignum *)y) == 0)
+		if (big_compare(x,y) == 0)
 			return(TRUE);
 		else
 			return(FALSE);
@@ -446,6 +444,8 @@ object x, y;
 			return(TRUE);
 		else
 			return(FALSE);
+	default:
+	  break;
 	}
 	return(FALSE);
 }
@@ -465,12 +465,12 @@ RETURN1(x0);}
 
 bool
 
-equal(x, y)
-register object x;
+equal(register object x, register object y)
+                  
 #ifdef UNIX   /* in non unix case cs_check want's an address */
-register
+        
 #endif
-object y;
+         
 {
 register enum type t;
 
@@ -504,7 +504,7 @@ BEGIN:
 	return(x->LF.LFVAL==y->LF.LFVAL);
 
  	case t_string:
-		return(string_eq(x, y));
+	  return(string_eq(x, y));
 
 	case t_bitvector:
 	{
@@ -534,6 +534,8 @@ BEGIN:
 		else
 			return(FALSE);
 
+	default:
+	  break;
 	}
 	return(eql(x,y));
 }
@@ -548,13 +550,12 @@ object x0,x1;
 		x0 = Ct;
 	else
 		x0 = Cnil;
-	vs_pop;
+	vs_popp;
 	RETURN1(x0);
 }
 
 bool
-equalp(x, y)
-object x, y;
+equalp(object x, object y)
 {
 	enum type tx, ty;
 	int j;
@@ -605,6 +606,8 @@ BEGIN:
 		    goto ARRAY;}
 		else
 			return(FALSE);
+	default:
+	  break;
 	}
 	if (tx != ty)
 		return(FALSE);
@@ -651,6 +654,8 @@ BEGIN:
 
 	case t_pathname:
 		return(equal(x, y));
+	default:
+	  break;
 	}
 	return(FALSE);
 
@@ -665,13 +670,13 @@ ARRAY:
 			vs_top[-2] = aref(x, i);
 			vs_top[-1] = aref(y, i);
 			if (!equalp(vs_top[-2], vs_top[-1])) {
-				vs_pop;
-				vs_pop;
+				vs_popp;
+				vs_popp;
 				return(FALSE);
 			}
 		}
-		vs_pop;
-		vs_pop;
+		vs_popp;
+		vs_popp;
 		return(TRUE);
 	}
 }
@@ -689,8 +694,8 @@ object x0,x1;
 	RETURN1(x0);
 }
 
-Fand(args)
-object args;
+void
+Fand(object args)
 {
 	object endp_temp;
 
@@ -714,8 +719,8 @@ object args;
 	eval(MMcar(args));
 }
 
-For(args)
-object args;
+void
+For(object args)
 {
 	object endp_temp;
 
@@ -746,8 +751,7 @@ object args;
 	Refer to the compiler about this magic.
 */
 bool
-contains_sharp_comma(x)
-object x;
+contains_sharp_comma(object x)
 {
 	enum type tx;
 
@@ -829,7 +833,8 @@ object x0;
 	RETURN1(x0);
 }
 
-init_predicate_function()
+void
+init_predicate_function(void)
 {
 
 	make_special_form("AND",Fand);

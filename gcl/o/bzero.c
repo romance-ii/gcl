@@ -1,7 +1,5 @@
-
-bzero(b, length)
-    char *b;
-    int length;
+void
+bzero(void *b, size_t length)
 {while(length-->0)
    *b++ = 0;
 }

@@ -28,7 +28,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 
-Lfboundp()
+void
+Lfboundp(void)
 {
 	object sym;
 
@@ -45,8 +46,7 @@ Lfboundp()
 }
 
 object
-symbol_function(sym)
-object sym;
+symbol_function(object sym)
 {
 /*
 	if (type_of(sym) != t_symbol)
@@ -65,7 +65,8 @@ object sym;
 		(macro . function-closure)	for macros
 		(special . address)		for special forms.
 */
-Lsymbol_function()
+void
+Lsymbol_function(void)
 {
 	object sym;
 
@@ -90,8 +91,8 @@ Lsymbol_function()
 	vs_base[0] = sym->s.s_gfdef;
 }
 
-Fquote(form)
-object form;
+void
+Fquote(object form)
 {
 	object endp_temp;
 
@@ -103,8 +104,8 @@ object form;
 	vs_push(MMcar(form));
 }
 
-Ffunction(form)
-object form;
+void
+Ffunction(object form)
 {
 	object endp_temp;
 
@@ -139,7 +140,8 @@ object form;
 		FEinvalid_function(fun);
 }
 
-Lsymbol_value()
+void
+Lsymbol_value(void)
 {
 	object sym;
 	check_arg(1);
@@ -152,7 +154,8 @@ Lsymbol_value()
 		vs_base[0] = sym->s.s_dbind;
 }
 
-Lboundp()
+void
+Lboundp(void)
 {
 	object sym;
 	check_arg(1);
@@ -165,7 +168,8 @@ Lboundp()
 		vs_base[0] = Ct;
 }
 
-Lmacro_function()
+void
+Lmacro_function(void)
 {
 	check_arg(1);
 	if (type_of(vs_base[0]) != t_symbol)
@@ -176,7 +180,8 @@ Lmacro_function()
 		vs_base[0] = Cnil;
 }
 
-Lspecial_form_p()
+void
+Lspecial_form_p(void)
 {
 	check_arg(1);
 	if (type_of(vs_base[0]) != t_symbol)
@@ -187,7 +192,8 @@ Lspecial_form_p()
 		vs_base[0] = Cnil;
 }
 
-init_reference()
+void
+init_reference(void)
 {
 	make_function("SYMBOL-FUNCTION", Lsymbol_function);
 	make_function("FBOUNDP", Lfboundp);

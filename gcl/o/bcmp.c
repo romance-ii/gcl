@@ -1,6 +1,4 @@
-int bcmp(s1,s2,n)
-char *s1,*s2;
-int n;
+int bcmp(const void *s1, const void *s2, size_t n)
 {     while (n-- > 0)
 	{if (*s1++ != *s2++)
 	 return 1;}

@@ -1,11 +1,11 @@
 
-static L2();
-static L4();
-static L7();
-static L8();
-static L18();
-static L22();
-static L24();
+static void L2();
+static void L4();
+static void L7();
+static void L8();
+static void L18();
+static void L22();
+static void L24();
 static object LI1();
 #define VMB1
 #define VMS1
@@ -164,8 +164,8 @@ static char * VVi[188]={
 (char *)(LI26)
 };
 #define VV ((object *)VVi)
-static  LnkT186() ;
-static  (*Lnk186)() = LnkT186;
+static void LnkT186() ;
+static void (*Lnk186)() = LnkT186;
 static object  LnkTLI185() ;
 static object  (*LnkLI185)() = LnkTLI185;
 static object  LnkTLI184() ;
@@ -182,8 +182,8 @@ static object  LnkTLI141() ;
 static object  (*LnkLI141)() = LnkTLI141;
 static object  LnkTLI135() ;
 static object  (*LnkLI135)() = LnkTLI135;
-static  LnkT130() ;
-static  (*Lnk130)() = LnkT130;
+static void LnkT130() ;
+static void (*Lnk130)() = LnkT130;
 static object  LnkTLI128() ;
 static object  (*LnkLI128)() = LnkTLI128;
 static object  LnkTLI127() ;
@@ -200,19 +200,19 @@ static object  LnkTLI122() ;
 static object  (*LnkLI122)() = LnkTLI122;
 static object  LnkTLI121() ;
 static object  (*LnkLI121)() = LnkTLI121;
-static  LnkT120() ;
-static  (*Lnk120)() = LnkT120;
-static  LnkT119() ;
-static  (*Lnk119)() = LnkT119;
-static  LnkT118() ;
-static  (*Lnk118)() = LnkT118;
-static  LnkT117() ;
-static  (*Lnk117)() = LnkT117;
-static  LnkT116() ;
-static  (*Lnk116)() = LnkT116;
+static void LnkT120() ;
+static void (*Lnk120)() = LnkT120;
+static void LnkT119() ;
+static void (*Lnk119)() = LnkT119;
+static void LnkT118() ;
+static void (*Lnk118)() = LnkT118;
+static void LnkT117() ;
+static void (*Lnk117)() = LnkT117;
+static void LnkT116() ;
+static void (*Lnk116)() = LnkT116;
 static object  LnkTLI115() ;
 static object  (*LnkLI115)() = LnkTLI115;
-static  LnkT114() ;
-static  (*Lnk114)() = LnkT114;
+static void LnkT114() ;
+static void (*Lnk114)() = LnkT114;
 static object  LnkTLI113() ;
 static object  (*LnkLI113)() = LnkTLI113;

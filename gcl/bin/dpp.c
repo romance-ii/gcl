@@ -124,6 +124,7 @@ int naux;
 char *result[MAXRES];
 int nres;
 
+void
 error(s)
 char *s;
 {
@@ -131,6 +132,7 @@ char *s;
 	exit(0);
 }
 
+int
 readc()
 {
 	int c;
@@ -149,6 +151,7 @@ readc()
 	return(c);
 }
 
+int
 nextc()
 {
 	int c;
@@ -158,6 +161,7 @@ nextc()
 	return(c);
 }
 
+void
 unreadc(c)
 int c;
 {
@@ -168,6 +172,7 @@ int c;
 	ungetc(c, in);
 }
 
+void
 put_tabs(n)
 int n;
 {
@@ -177,6 +182,7 @@ int n;
 		putc('\t', out);
 }
 
+void
 pushc(c)
 int c;
 {
@@ -206,6 +212,7 @@ read_token()
 	return(p);
 }
 
+void
 reset()
 {
 	int i;
@@ -238,11 +245,13 @@ reset()
 		= NULL;
 }
 
+void
 get_function()
 {
 	function = read_token();
 }
 
+void
 get_lambda_list()
 {
 	int c;
@@ -386,6 +395,7 @@ AUX_L:
 	}
 }
 
+void
 get_return()
 {
 	int c;
@@ -399,11 +409,13 @@ get_return()
 	}
 }
 
+void
 put_fhead()
 {
-	fprintf(out, "L%s()\n{", function);
+	fprintf(out, "void\nL%s()\n{", function);
 }
 
+void
 put_declaration()
 {
 	int i;
@@ -508,6 +520,7 @@ put_declaration()
 			fprintf(out, "\tvs_push(Cnil);\n");
 }
 
+void
 put_ftail()
 {
 	int i;
@@ -523,6 +536,7 @@ put_ftail()
 	fprintf(out, "}");
 }
 
+void
 put_return()
 {
 	int i, t;
@@ -571,6 +585,7 @@ put_return()
 	}
 }
 
+void
 main_loop()
 {
 	int c;
@@ -616,6 +631,7 @@ LOOP:
 		error("illegal symbol");
 }
 
+int
 main(argc, argv)
 int argc;
 char **argv;
@@ -645,4 +661,5 @@ char **argv;
 	printf("%s\n", filename);
 	q[1] = 'd';
 	main_loop();
+	return 0;
 }

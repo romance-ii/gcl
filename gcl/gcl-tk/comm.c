@@ -19,8 +19,8 @@
 #endif
 
 
-DEFUN("CHECK-FD-FOR-INPUT",int,fScheck_fd_for_input,
-      SI,2,2,NONE,II,IO,OO,OO,
+DEFUN("CHECK-FD-FOR-INPUT",object,fScheck_fd_for_input,
+      SI,2,2,NONE,OI,IO,OO,OO,
 
 "Check FD a file descriptor for data to read, waiting TIMEOUT clicks \
 for data to become available.  Here there are \
@@ -40,11 +40,11 @@ int timeout;
   FD_SET(fd, &inp);
   n = select(fd + 1, &inp, NULL, NULL, &t);
   if (n < 0)
-    return -1;
+    return make_fixnum(-1);
   else if (FD_ISSET(fd, &inp))
-    return 1;
+    return make_fixnum(1);
   else
-    return 0;
+    return make_fixnum(0);
 }
 
 
@@ -99,8 +99,12 @@ scan_headers(sfd)
     }
 }
 
+static int
+write1(struct connection_state *,char *,int);
+
+
 static void
-send_confirmation(sfd)
+send_confirmation(struct connection_state *sfd)
 { write1(sfd,0,0);
 }
 
@@ -123,7 +127,6 @@ int m;
 { int nread=0;
   int wanted = m;
   int length;
-  int ncopy;
   struct our_header *hdr;
   if (wanted == 0)
     goto READ_SOME;
@@ -179,7 +182,7 @@ int m;
     { bcopy(sfd->valid_data,sfd->read_buffer,sfd->valid_data_size);
       sfd->valid_data=sfd->read_buffer;}
    /* there is at least a packet size of space available */   
-  if ((fScheck_fd_for_input(sfd->fd,sfd->write_timeout)>0));
+  if ((fix(fScheck_fd_for_input(sfd->fd,sfd->write_timeout))>0));
      again:
         {char *start = sfd->valid_data+sfd->valid_data_size;
         nread = read(sfd->fd,start,
@@ -252,17 +255,17 @@ write1(sfd,p,bytes)
       
 }	  
 
-DEFUN("CLEAR-CONNECTION",int,fSclear_connection,SI,1,1,NONE,II,OO,OO,OO,
+DEFUN("CLEAR-CONNECTION",object,fSclear_connection,SI,1,1,NONE,OI,OO,OO,OO,
       "Read on FD until nothing left to read.  Return number of bytes read")
      (fd)
      int fd;
 {char buffer[0x1000];
  int n=0;
- while (fScheck_fd_for_input(fd,0))
+ while (fix(fScheck_fd_for_input(fd,0)))
    { n+=read(fd,buffer,sizeof(buffer));
    }
  
- return n;
+ return make_fixnum(n);
 }
 
 

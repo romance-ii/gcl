@@ -29,15 +29,11 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define dcheck_vs do{if (vs_base < vs_org || vs_top < vs_org) error("bad vs");} while (0)
 #define dcheck_type(a,b) check_type(a,b) ; dcheck_vs 
 
-#define PADDR(i) ((char *)(long)(sSPinit->s.s_dbind->v.v_self[fix(i)]))
+#define PADDR(i) ((void *)(long)(sSPinit->s.s_dbind->v.v_self[fix(i)]))
 object sSPinit,sSPmemory;
 
 object
-make_cfun(self, name, data, start, size)
-int (*self)();
-object name, data;
-char *start;
-int size;
+make_cfun(void (*self)(), object name, object data, char *start, int size)
 {
 	object cf;
 
@@ -52,11 +48,11 @@ int size;
 	return(cf);
 }
 object
-make_sfun(name,self,argd, data)
-int argd;
-int (*self)();
+make_sfun(object name, object (*self)(), int argd, object data)
+         
+              
 /*  object (*self)(); */
-object name, data;
+                  
 {object sfn;
        
 	sfn = alloc_object(t_sfun);
@@ -72,9 +68,7 @@ object name, data;
 #define VFUN_MAX_ARGS(argd) ((argd) >> 8)
 
 object
-make_vfun(name,self,argd, data)
-int (*self)(),argd;
-object name, data;
+make_vfun(object name, object (*self)(), int argd, object data)
 {object vfn;
        
 	vfn = alloc_object(t_vfun);
@@ -87,9 +81,7 @@ object name, data;
 }
 
 object
-make_cclosure_new(self, name, env, data)
-int (*self)();
-object name, env, data;
+make_cclosure_new(void (*self)(), object name, object env, object data)
 {
 	object cc;
 
@@ -104,11 +96,7 @@ object name, env, data;
 
 
 object
-make_cclosure(self, name, env, data, start, size)
-int (*self)();
-object name, env, data;
-char *start;
-int size;
+make_cclosure(void (*self)(), object name, object env, object data, char *start, int size)
 {
 	if(data && type_of(data)==t_cfdata)
 	  { data->cfd.cfd_start=start; 
@@ -132,9 +120,7 @@ object name,address;
 }
 
 object
-MFsfun(sym,self,argd,data)
-     object sym,data;
-     int argd,(*self)();
+MFsfun(object sym, object (*self)(), int argd, object data)
 {object sfn;
  if (type_of(sym)!=t_symbol) not_a_symbol(sym);
  if (sym->s.s_sfdef != NOT_SPECIAL && sym->s.s_mflag)
@@ -143,6 +129,7 @@ MFsfun(sym,self,argd,data)
  sym = clear_compiler_properties(sym,sfn);
  sym->s.s_gfdef = sfn;
  sym->s.s_mflag = FALSE;
+ return sym;
 }
 
 DEFUNO("MFSFUN",object,fSmfsfun,SI
@@ -150,14 +137,12 @@ DEFUNO("MFSFUN",object,fSmfsfun,SI
 object name,address,argd;
 { /* 3 args */
   dcheck_type(address,t_fixnum);
-  MFsfun(name,PADDR(address),fix(argd),sSPmemory->s.s_dbind);RETURN1(name);
+  return MFsfun(name,PADDR(address),fix(argd),sSPmemory->s.s_dbind);RETURN1(name);
 }
 
 
 object
-MFvfun(sym,self,argd,data)
-     object sym,data;
-     int argd,(*self)();
+MFvfun(object sym, object (*self)(), int argd, object data)
 {object vfn;
  if (type_of(sym)!=t_symbol) not_a_symbol(sym);
  if (sym->s.s_sfdef != NOT_SPECIAL && sym->s.s_mflag)
@@ -167,6 +152,7 @@ MFvfun(sym,self,argd,data)
  sym = clear_compiler_properties(sym,vfn);
  sym->s.s_gfdef = vfn;
  sym->s.s_mflag = FALSE;
+ return sym;
 }
 
 DEFUNO("MFVFUN",object,fSmfvfun,SI
@@ -180,10 +166,7 @@ object name,address,argd;
 
 
 object
-MFvfun_key(sym,self,argd,data,keys)
-     object sym,data;
-     int argd,(*self)();
-     char *keys;
+MFvfun_key(object sym, object (*self)(), int argd, object data, struct key *keys)
 {if (data) set_key_struct(keys,data);
  return MFvfun(sym,self,argd,data);
 }
@@ -197,9 +180,7 @@ object symbol,address,argd,keys;
 }
 
 
-object MFnew(sym,self,data)
-     object sym,data;
- int (*self)();
+object MFnew(object sym, void (*self)(), object data)
 {
 	object cf;
 
@@ -214,6 +195,7 @@ object MFnew(sym,self,data)
 	sym = clear_compiler_properties(sym,cf);
  	sym->s.s_gfdef = cf;
 	sym->s.s_mflag = FALSE;
+	return sym;
 }
 
 DEFUNO("MF",object,fSmf,SI
@@ -226,12 +208,7 @@ object name,addr;
 
 
 object
-MF(sym, self, start, size, data)
-object sym;
-int (*self)();
-char *start;
-int size;
-object data;
+MF(object sym, void (*self)(), char *start, int size, object data)
 { if(data && type_of(data)==t_cfdata)
 	  { data->cfd.cfd_start=start; 
 	    data->cfd.cfd_size=size;}
@@ -240,12 +217,7 @@ object data;
 }
 
 object
-MM(sym, self, start, size, data)
-object sym;
-int (*self)();
-char *start;
-int size;
-object data;
+MM(object sym, void (*self)(), char *start, int size, object data)
 {
 	object cf;
 
@@ -262,6 +234,7 @@ object data;
 	sym = 	clear_compiler_properties(sym,cf);
 	sym->s.s_gfdef = cf;
 	sym->s.s_mflag = TRUE;
+	return sym;
 }
 
 DEFUNO("MM",object,fSmm,SI
@@ -279,9 +252,7 @@ object name,addr;
   
 
 object
-make_function(s, f)
-char *s;
-int (*f)();
+make_function(char *s, void (*f)())
 {
 	object x;
 	vs_mark;
@@ -295,21 +266,15 @@ int (*f)();
 }
 
 object
-make_si_sfun(s, f,argd)
-char *s;
-int (*f)();
-int argd;
-{  object x= make_si_ordinary(s);
-   x->s.s_gfdef = make_sfun( x,f,argd, Cnil);
-   x->s.s_mflag = FALSE;
-   return(x);
+make_si_sfun(char *s, object (*f) (), int argd) {  
+  object x= make_si_ordinary(s);
+  x->s.s_gfdef = make_sfun( x,f,argd, Cnil);
+  x->s.s_mflag = FALSE;
+  return(x);
 }
 
 object
-make_si_vfun1(s, f,argd)
-char *s;
-int (*f)();
-int argd;
+make_si_vfun1(char *s, object (*f)(), int argd)
 {  object x= make_si_ordinary(s);
    x->s.s_gfdef = make_vfun( x,f,argd, Cnil);
    x->s.s_mflag = FALSE;
@@ -318,9 +283,7 @@ int argd;
 
 
 object
-make_si_function(s, f)
-char *s;
-int (*f)();
+make_si_function(char *s, void (*f)())
 {
 	object x;
 	vs_mark;
@@ -337,9 +300,7 @@ int (*f)();
 
 
 object
-make_special_form(s, f)
-char *s;
-int (*f)();
+make_special_form(char *s, void (*f)())
 {
 	object x;
 	x = make_ordinary(s);
@@ -367,8 +328,8 @@ object fun;
 	}RETURN1(fun);
 }
 
-turbo_closure(fun)
-object fun;
+void
+turbo_closure(object fun)
 {
   object l,*block;
   object endp_temp;
@@ -399,7 +360,8 @@ object funobj;
 
 
 
-init_cfun()
+void
+init_cfun(void)
 {
 	
 }

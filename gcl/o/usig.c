@@ -45,9 +45,7 @@ EXTER
 char signals_handled[6];
 
 void
-gcl_signal(signo,handler)
-     int signo;
-     void (*handler)();
+gcl_signal(int signo, void (*handler) (/* ??? */))
 {
   char *p = signals_handled;
   while (*p)
@@ -87,8 +85,8 @@ gcl_signal(signo,handler)
 }
 
 /* remove the signal n from the signal mask */
-
-unblock_signals(n,m)
+int
+unblock_signals(int n, int m)
 { int current_mask;
   int result;
 #ifdef  SIG_UNBLOCK_SIGNALS
@@ -115,8 +113,9 @@ unblock_signals(n,m)
   return result;
 }
 
-unblock_sigusr_sigio()
-{ int current_mask;
+void
+unblock_sigusr_sigio(void)
+{ 
 #ifdef HAVE_SIGPROCMASK
   /* posix */
   { sigset_t set;
@@ -133,12 +132,13 @@ unblock_sigusr_sigio()
 
 
 void
-sigfpe1()
+sigfpe1(void)
 {
 	gcl_signal(SIGFPE, sigfpe1);
 	FEerror("Floating-point exception.", 0);
 }
-sigpipe()
+void
+sigpipe(void)
 {
 	gcl_signal(SIGPIPE, sigpipe);
 	perror("");
@@ -147,7 +147,7 @@ sigpipe()
 
 
 void
-sigint()
+sigint(void)
 {
   unblock_signals(SIGINT,SIGINT);
   terminal_interrupt(1);
@@ -156,7 +156,7 @@ sigint()
 
 
 void
-sigalrm()
+sigalrm(void)
 {
   unblock_signals(SIGALRM,SIGALRM);
   raise_pending_signals(sig_try_to_delay);
@@ -168,17 +168,17 @@ DEF_ORDINARY("SIGUSR1-INTERRUPT",sSsigusr1_interrupt,SI,"");
 DEF_ORDINARY("SIGIO-INTERRUPT",sSsigio_interrupt,SI,"");
 
 void
-sigusr1()
+sigusr1(void)
 {ifuncall1(sSsigusr1_interrupt,Cnil);}
 
 void
-sigio()
+sigio(void)
 {ifuncall1(sSsigio_interrupt,Cnil);}
 
 
 
 void
-install_default_signals()
+install_default_signals(void)
 {	gcl_signal(SIGFPE, sigfpe1);
 	gcl_signal(SIGPIPE, sigpipe);
 	gcl_signal(SIGINT, sigint);

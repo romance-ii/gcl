@@ -63,7 +63,8 @@ static struct timeb beginning;
 long beginning;
 #endif
 
-runtime()
+int
+runtime(void)
 {
 
 #ifdef USE_INTERNAL_REAL_TIME_FOR_RUNTIME
@@ -78,8 +79,7 @@ runtime()
 }
 
 object
-unix_time_to_universal_time(i)
-int i;
+unix_time_to_universal_time(int i)
 {
 	object x;
 	vs_mark;
@@ -101,7 +101,8 @@ DEFUNO("GET-UNIVERSAL-TIME",object,fLget_universal_time,LISP
 	RETURN1(unix_time_to_universal_time(time(0)));
 }
 
-Lsleep()
+void
+Lsleep(void)
 {
 	object z;
 	
@@ -120,7 +121,8 @@ Lsleep()
 	vs_push(Cnil);
 }
 
-Lget_internal_run_time()
+void
+Lget_internal_run_time(void)
 {
 
 #ifdef USE_INTERNAL_REAL_TIME_FOR_RUNTIME
@@ -139,7 +141,7 @@ Lget_internal_run_time()
 }
 
 
-DEFUN("GET-INTERNAL-REAL-TIME",int,fLget_internal_real_time,LISP,0,0,NONE,IO,OO,OO,OO,"Run time relative to beginning")
+DEFUN("GET-INTERNAL-REAL-TIME",object,fLget_internal_real_time,LISP,0,0,NONE,OO,OO,OO,OO,"Run time relative to beginning")
      ()
 {
 #ifdef __MINGW32__
@@ -147,7 +149,7 @@ DEFUN("GET-INTERNAL-REAL-TIME",int,fLget_internal_real_time,LISP,0,0,NONE,IO,OO,
   struct timeb t;
     if (t0.time == 0) ftime(&t0);
     ftime(&t);
-    return (t.time - t0.time)*HZ1 + ((t.millitm)*HZ1)/1000;
+    return make_fixnum((t.time - t0.time)*HZ1 + ((t.millitm)*HZ1)/1000);
 #endif  
 #ifdef BSD
 	static struct timeval begin_tzp;
@@ -159,17 +161,18 @@ DEFUN("GET-INTERNAL-REAL-TIME",int,fLget_internal_real_time,LISP,0,0,NONE,IO,OO,
    plus the fraction of a second.  We must make it relative, so this
    will only wrap if the process lasts longer than 818 days
    */
-	return ((tzp.tv_sec-begin_tzp.tv_sec)*HZ1
-			    + ((tzp.tv_usec)*HZ1)/1000000);
+	return make_fixnum(((tzp.tv_sec-begin_tzp.tv_sec)*HZ1
+			    + ((tzp.tv_usec)*HZ1)/1000000));
 #endif
 #ifdef ATT
-	return ((time(0) - beginning)*HZ1);
+	return make_fixnum((time(0) - beginning)*HZ1);
 #endif
 }
 
 DEFVAR("*DEFAULT-TIME-ZONE*",sSAdefault_time_zoneA,SI,make_fixnum(TIME_ZONE),"");
 
-init_unixtime()
+void
+init_unixtime(void)
 {
 #ifdef BSD
 	ftime(&beginning);

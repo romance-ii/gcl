@@ -4,6 +4,7 @@
    if only cat were binary... but by some wonderful dos like deicision,
    it is not under cygnus..
    */   
+int
 main(int argc,char *argv[])
 { int i;
   FILE *out ;

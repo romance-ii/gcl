@@ -1,15 +1,12 @@
 #include "include.h"
 #include "funlink.h"
 
-#define PADDR(i) ((char *)(sSPinit->s.s_dbind->fixa.fixa_self[Mfix(i)]))
+#define PADDR(i) ((void *)(sSPinit->s.s_dbind->fixa.fixa_self[Mfix(i)]))
 /* eg:
 MakeAfun(addr,F_ARGD(min,max,flags,ARGTYPES(a,b,c,d)),0);
 MakeAfun(addr,F_ARGD(2,3,NONE,ARGTYPES(OO,OO,OO,OO)),0);
 */
-object MakeAfun(addr,argd,data)
-object data;
-int (*addr) ();
-unsigned int argd;
+object MakeAfun(object (*addr)(object,object), unsigned int argd, object data)
 {int type = (F_ARG_FLAGS_P(argd,F_requires_fun_passed) ? t_closure : t_afun);
   object x = alloc_object(type);
   x->sfn.sfn_name = Cnil;
@@ -24,9 +21,7 @@ unsigned int argd;
  
 
 object
-fSmakefun(sym,addr,argd)
-object sym, (*addr) ();
-unsigned int argd;
+fSmakefun(object sym, object (*addr) (/* ??? */), unsigned int argd)
 {object ans = MakeAfun(addr,argd,
 		      (sSPmemory && sSPmemory->s.s_dbind &&
 		       type_of(sSPmemory->s.s_dbind)==t_cfdata) ?
@@ -36,10 +31,7 @@ unsigned int argd;
 }
 
 object
-ImakeClosure(addr,argd,n,va_alist)
-     object (*addr)();
-     int n,argd;
-     va_dcl
+ImakeClosure(object (*addr) (/* ??? */), int argd, int n, __builtin_va_alist_t __builtin_va_alist)
 { object x = fSmakefun(Cnil,addr,argd);
   va_list ap;
   va_start(ap);
@@ -47,10 +39,9 @@ ImakeClosure(addr,argd,n,va_alist)
   va_end(ap);
   return x;
 }
-     
-IsetClosure(x,n,ap)
-object x;
-int n; va_list ap;
+
+void     
+IsetClosure(object x, int n, va_list ap)
 {  /* this will change so that we can allocate 'hunks' which will be little
    blocks the size of an array header say with only one header word.   This
    will be more economical. Because of gc, we can't allocate relblock, it
@@ -97,7 +88,7 @@ DEFUN("INITMACRO",object,fSinitmacro,SI,3,ARG_LIMIT,NONE,OO,OO,OO,OO,
  (va_alist)
 va_dcl     
 {va_list ap;
- object res,name;
+ object res;
  va_start(ap);
  res = Iapply_ap(fSinitfun,ap);
  va_end(ap);
@@ -118,30 +109,20 @@ object key_struct_ind;
      
 
 void
-SI_makefun(strg,fn,argd)
-     char *strg;
-     unsigned int argd;
-     object (*fn)();
+SI_makefun(char *strg, object (*fn) (/* ??? */), unsigned int argd)
 { object sym = make_si_ordinary(strg);
  fSfset(sym, fSmakefun(sym,fn,argd));
 }
 
 void
-LISP_makefun(strg,fn,argd)
-     char *strg;
-     unsigned int argd;
-     object (*fn)();
+LISP_makefun(char *strg, object (*fn) (/* ??? */), unsigned int argd)
 { object sym = make_ordinary(strg);
  fSfset(sym, fSmakefun(sym,fn,argd));
 }
 
 
 object 
-MakeClosure(n,argd,data,fn,va_alist)
-int n;
-int (*fn)();
-object data;
-va_dcl
+MakeClosure(int n, int argd, object data, object (*fn)(), __builtin_va_alist_t __builtin_va_alist)
 { object x;
   va_list ap;
   x = alloc_object(t_closure);

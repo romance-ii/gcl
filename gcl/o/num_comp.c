@@ -36,11 +36,10 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	If x or y is complex, 0 or 1 is returned.
 */
 int
-number_compare(x, y)
-object x, y;
+number_compare(object x, object y)
 {
 	int i;
-	double dx, dy;
+	double dx, dy=0.0;
 	vs_mark;
 
 	switch (type_of(x)) {
@@ -165,6 +164,8 @@ object x, y;
 			goto LONGFLOAT;
 		case t_complex:
 			goto Y_COMPLEX;
+		default:
+		  break;
 		}
 	LONGFLOAT:
 		if (dx == dy)
@@ -184,26 +185,29 @@ object x, y;
 			return(1);
 
 	case t_complex:
-		if (type_of(y) != t_complex)
-			if (number_zerop(x->cmp.cmp_imag))
-				if (number_compare(x->cmp.cmp_real, y) == 0)
-					return(0);
-				else
-					return(1);
-			else
-				return(1);
-		if (number_compare(x->cmp.cmp_real, y->cmp.cmp_real) == 0 &&
-		    number_compare(x->cmp.cmp_imag, y->cmp.cmp_imag) == 0 )
-			return(0);
-		else
-			return(1);
+	  if (type_of(y) != t_complex) {
+	    if (number_zerop(x->cmp.cmp_imag))
+	      if (number_compare(x->cmp.cmp_real, y) == 0)
+		return(0);
+	      else
+		return(1);
+	    else
+	      return(1);
+	  }
+	  if (number_compare(x->cmp.cmp_real, y->cmp.cmp_real) == 0 &&
+	      number_compare(x->cmp.cmp_imag, y->cmp.cmp_imag) == 0 )
+	    return(0);
+	  else
+	    return(1);
 
 	default:
 		FEwrong_type_argument(sLnumber, x);
+		return(0);
 	}
 }
 
-Lall_the_same()
+void
+Lall_the_same(void)
 {
 	int narg, i;
 
@@ -222,7 +226,8 @@ Lall_the_same()
 	vs_base[0] = Ct;
 }
 
-Lall_different()
+void
+Lall_different(void)
 {
 	int narg, i, j;
 
@@ -246,8 +251,8 @@ Lall_different()
 	vs_base[0] = Ct;
 }
 
-Lnumber_compare(s, t)
-int s, t;
+void
+Lnumber_compare(int s, int t)
 {
 	int narg, i;
 
@@ -266,12 +271,13 @@ int s, t;
 	vs_base[0] = Ct;
 }
 
-Lmonotonically_increasing()    { Lnumber_compare( 1, 1); }
-Lmonotonically_decreasing()    { Lnumber_compare(-1, 1); }
-Lmonotonically_nondecreasing() { Lnumber_compare( 1, 0); }
-Lmonotonically_nonincreasing() { Lnumber_compare(-1, 0); }
+void Lmonotonically_increasing(void) { Lnumber_compare( 1, 1); }
+void Lmonotonically_decreasing(void) { Lnumber_compare(-1, 1); }
+void Lmonotonically_nondecreasing(void) { Lnumber_compare( 1, 0); }
+void Lmonotonically_nonincreasing(void) { Lnumber_compare(-1, 0); }
 
-Lmax()
+void
+Lmax(void)
 {
 	object max;
 	int narg, i;
@@ -288,7 +294,8 @@ Lmax()
 	vs_base[0] = max;
 }
 
-Lmin()
+void
+Lmin(void)
 {
 	object min;
 	int narg, i;
@@ -305,7 +312,8 @@ Lmin()
 	vs_base[0] = min;
 }
 
-init_num_comp()
+void
+init_num_comp(void)
 {
 	make_function("=", Lall_the_same);
 	make_function("/=", Lall_different);

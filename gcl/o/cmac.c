@@ -33,9 +33,9 @@ object *gclModulus;
 
 
 
-object ctimes(),cplus(),cdifference(),cmod();
+object ctimes(object a, object b),cplus(object a, object b),cdifference(object a, object b),cmod(object x);
 	  
-object make_integer();  
+object make_integer(__mpz_struct *u);  
  	  
 #define our_minus(a,b) ((FIXNUMP(a)&&FIXNUMP(b))?fixnum_sub(fix(a),fix(b)): \
 			number_minus(a,b))
@@ -45,8 +45,8 @@ object make_integer();
 
 
 #ifdef HAVE_LONG_LONG
-dblrem(a,b,mod)
-int a,b,mod;
+long long int
+dblrem(int a, int b, int mod)
 {
   return  (((long long int)a*(long long int)b)%(long long int) mod);
 }
@@ -69,8 +69,7 @@ int a,b,mod;
 #endif
 
 object	  
-cmod(x)
-object x;
+cmod(object x)
 {register object mod = *gclModulus;
  if (mod==Cnil) return(x);
 else
@@ -100,8 +99,7 @@ else
 #define MOST_POSITIVE_FIX (((unsigned int) (~0) ) /2)
 #define SMALL_MODULUS_P(mod) (FIXNUMP(mod) && (fix(mod) < (MOST_POSITIVE_FIX)/2))
 object
-ctimes(a,b)
-object a,b;
+ctimes(object a, object b)
 {object mod = *gclModulus;
  if (FIXNUMP(mod))
      {register int res, m ;
@@ -114,8 +112,7 @@ return cmod(number_times(a,b));}
 
 
 object
-cdifference(a,b)
-object a,b;
+cdifference(object a, object b)
 {object mod = *gclModulus;
  if (SMALL_MODULUS_P(mod))
    {register int res,m;
@@ -127,8 +124,7 @@ object a,b;
  else return(cmod(number_minus(a,b)));}
 
 object
-cplus(a,b)
-object a,b;
+cplus(object a, object b)
 {object mod = *gclModulus;
  if (SMALL_MODULUS_P(mod))
    {register int res,m;
@@ -179,15 +175,14 @@ object x0,x1;
 }
 
 object 
-memq(a,b)
-register object a,b;
+memq(register object a, register object b)
 {while (1)
     {if ((a==b->c.c_car)||b==Cnil) return b;
     b=b->c.c_cdr;}}
 
 
-     
-init_cmac()
+void     
+init_cmac(void)
 {
 /* add_symbol("ctimes",&ctimes,"cplus",&cplus,"cdifference",&cdifference,"cmod",
  &cmod, 0); */

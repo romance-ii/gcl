@@ -70,6 +70,10 @@ object sSAprint_structureA;
 
 extern object coerce_stream(object,int);
 
+void
+flush_queue(int);
+
+void
 writec_queue(c)
 int c;
 {
@@ -82,7 +86,8 @@ int c;
 	qc++;
 }
 
-flush_queue(force)
+void
+flush_queue(int force)
 {
 	int c, i, j, k, l, i0;
 
@@ -90,13 +95,13 @@ BEGIN:
 	while (qc > 0) {
 		c = queue[qh];
 		if (c == MARK)
-			goto DO_MARK;
+			goto MDO_MARK;
 		else if (c == UNMARK)
 			isp -= 2;
 		else if (c == SET_INDENT)
 			indent_stack[isp] = file_column(PRINTstream);
 		else if (c == INDENT) {
-			goto DO_INDENT;
+			goto MDO_INDENT;
 		} else if (c == INDENT1) {
 			i = file_column(PRINTstream)-indent_stack[isp];
 			if (i < 8 && indent_stack[isp] < LINE_LENGTH/2) {
@@ -108,7 +113,7 @@ BEGIN:
 					indent_stack[isp]
 					= indent_stack[isp-1] + 4;
 				}
-				goto DO_INDENT;
+				goto MDO_INDENT;
 			}
 		} else if (c == INDENT2) {
 			indent_stack[isp] = indent_stack[isp-1] + 2;
@@ -120,7 +125,7 @@ BEGIN:
 	}
 	return;
 
-DO_MARK:
+MDO_MARK:
 	k = LINE_LENGTH - 1 - file_column(PRINTstream);
 	for (i = 1, j = 0, l = 1;  l > 0 && i < qc && j < k;  i++) {
 		c = queue[mod(qh + i)];
@@ -145,7 +150,7 @@ DO_MARK:
 	indent_stack[isp] = indent_stack[isp-1];
 	goto BEGIN;
 
-DO_INDENT:
+MDO_INDENT:
 	if (iisp > isp)
 		goto PUT_INDENT;
 	k = LINE_LENGTH - 1 - file_column(PRINTstream);
@@ -206,6 +211,7 @@ FLUSH:
 	goto BEGIN;
 }
 
+void
 writec_PRINTstream(c)
 int c;
 {
@@ -215,6 +221,7 @@ int c;
 		writec_stream(c, PRINTstream);
 }
 
+void
 write_str(s)
 char *s;
 {
@@ -222,6 +229,10 @@ char *s;
 		write_ch(*s++);
 }
 
+void
+write_decimal1(int);
+
+void
 write_decimal(i)
 int i;
 {
@@ -232,6 +243,7 @@ int i;
 	write_decimal1(i);
 }
 
+void
 write_decimal1(i)
 int i;
 {
@@ -241,6 +253,7 @@ int i;
 	write_ch(i%10 + '0');
 }
 
+void
 write_addr(x)
 object x;
 {
@@ -257,7 +270,8 @@ object x;
 	}
 }
 
-write_base()
+void
+write_base(void)
 {
 	if (PRINTbase == 2)
 		write_str("#b");
@@ -287,6 +301,7 @@ write_base()
 
 object sSAprint_nansA;
 
+void
 edit_double(n, d, sp, s, ep)
 int n;
 double d;
@@ -358,6 +373,7 @@ int *ep;
 	s[n] = '\0';
 }
 
+void
 write_double(d, e, shortp)
 double d;
 int e;
@@ -435,6 +451,7 @@ bool shortp;
 	write_decimal(exp);
 }
 
+void
 call_structure_print_function(x, level)
 object x;
 int level;
@@ -443,7 +460,7 @@ int level;
 	bool eflag;
 	bds_ptr old_bds_top;
 
-	int (*wf)() = write_ch_fun;
+	void (*wf)(int) = write_ch_fun;
 
 	object *vt = PRINTvs_top;
 	object *vl = PRINTvs_limit;
@@ -520,7 +537,7 @@ ONCE_MORE:
 
 	ifuncall3(S_DATA(x->str.str_def)->print_function,
 		  x, PRINTstream, vs_head);
-	vs_pop;
+	vs_popp;
 	eflag = FALSE;
 
 L:
@@ -565,6 +582,10 @@ L:
 object copy_big();
 object coerce_big_to_string(object,int);
 
+bool
+potential_number_p(object,int);
+
+void
 write_object(x, level)
 object x;
 int level;
@@ -610,7 +631,7 @@ int level;
 				PRINTradix = FALSE;
 				write_object(x, level);
 				PRINTradix = i;
-				vs_pop;
+				vs_popp;
 				if (PRINTradix && PRINTbase == 10)
 					write_ch('.');
 				break;
@@ -745,7 +766,7 @@ int level;
 				j = x->s.s_self[i];
 				if (isUpper(j)) {
                                     if (PRINTcase == sKdowncase ||
-                                        PRINTcase == sKcapitalize && i!=lw)
+                                        (PRINTcase == sKcapitalize && i!=lw))
                                           j += 'a' - 'A';
                                  } else if (!isLower(j))
                                          lw = i + 1;
@@ -799,7 +820,7 @@ int level;
                                  if (k == 0) {
                                          if (isUpper(j)) {
                                                  if (PRINTcase == sKdowncase ||
-                                                     PRINTcase == sKcapitalize && i!=lw)
+                                                     (PRINTcase == sKcapitalize && i!=lw))
                                                  j += 'a' - 'A';
                                          } else if (!isLower(j))
                                                  lw = i + 1;
@@ -840,7 +861,7 @@ int level;
                          if (k == 0) {
                                  if (isUpper(j)) {
                                          if (PRINTcase == sKdowncase ||
-                                             PRINTcase == sKcapitalize && i != lw)
+                                             (PRINTcase == sKcapitalize && i != lw))
                                              j += 'a' - 'A';
                                  } else if (!isLower(j))
                                          lw = i + 1;
@@ -924,7 +945,7 @@ int level;
 			if (n == x->a.a_rank) {
 				vs_push(aref(x, m));
 				write_object(vs_head, level+n);
-				vs_pop;
+				vs_popp;
 			} else
 				write_ch('#');
 			j = n-1;
@@ -986,7 +1007,7 @@ int level;
 			}
 			vs_push(aref(x, 0));
 			write_object(vs_head, level+1);
-			vs_pop;
+			vs_popp;
 			for (i = 1;  i < x->v.v_fillp;  i++) {
 				write_ch(INDENT);
 				if (PRINTlength>=0 && i>=PRINTlength){
@@ -995,7 +1016,7 @@ int level;
 				}
 				vs_push(aref(x, i));
 				write_object(vs_head, level+1);
-				vs_pop;
+				vs_popp;
 			}
 		}
 		write_ch(')');
@@ -1268,7 +1289,7 @@ int level;
 		fix(y) = x->rnd.rnd_value;
 		vs_push(y);
 		write_object(y, level);
-		vs_pop;
+		vs_popp;
 		break;
 
 	case t_structure:
@@ -1302,7 +1323,7 @@ int level;
 			x = structure_to_list(x);
 			vs_push(x);
 			write_object(x, level);
-			vs_pop;
+			vs_popp;
 			break;
 		}
 		call_structure_print_function(x, level);
@@ -1320,7 +1341,7 @@ int level;
 			write_ch('p');
 			vs_push(namestring(x));
 			write_object(vs_head, level);
-			vs_pop;
+			vs_popp;
 		} else {
 			write_str("#<pathname ");
 			write_addr(x);
@@ -1369,6 +1390,7 @@ int level;
 
 char travel_push_type[32]; 
 
+void
 travel_push_object(x)
 object x;
 {
@@ -1408,8 +1430,7 @@ BEGIN:
 	}
 }
 
-
-
+void
 setupPRINTcircle(x,dogensyms)
      object x;
      int dogensyms;
@@ -1427,11 +1448,11 @@ setupPRINTcircle(x,dogensyms)
    PRINTvs_limit = vs_top = vq;
  }
 
+void
 setupPRINTdefault(x)
 object x;
 {
 	object y;
-	object *vp, *vq;
 
 	PRINTvs_top = vs_top;
 	PRINTstream = symbol_value(sLAstandard_outputA);
@@ -1491,13 +1512,15 @@ object x;
 	PRINTstructure = symbol_value(sSAprint_structureA) != Cnil;
 }
 
-cleanupPRINT()
+void
+cleanupPRINT(void)
 {
 	vs_top = PRINTvs_top;
 	if (PRINTpretty)
 		flush_queue(TRUE);
 }
 
+void
 write_object_by_default(x)
 object x;
 {
@@ -1507,6 +1530,7 @@ object x;
 	CLEANUP_PRINT_DEFAULT;
 }
 
+void
 terpri_by_default()
 {
 	PRINTstream = symbol_value(sLAstandard_outputA);
@@ -1563,7 +1587,6 @@ int base;
 		    ((:case cas) `symbol_value(sLAprint_caseA)`)
 		    (gensym `symbol_value(sLAprint_gensymA)`)
 		    (array `symbol_value(sLAprint_arrayA)`))
-	object *vp, *vq;
         struct printStruct printStructBuf; 
         struct printStruct *old_printStructBufp = printStructBufp;  
 @
@@ -1801,6 +1824,7 @@ DEFVAR("*PRINT-PACKAGE*",sSAprint_packageA,SI,Cnil,"");
 DEFVAR("*PRINT-STRUCTURE*",sSAprint_structureA,SI,Cnil,"");
 DEF_ORDINARY("PRETTY-PRINT-FORMAT",sSpretty_print_format,SI,"");
 
+void
 init_print()
 {
 
@@ -1924,6 +1948,7 @@ object strm;
 	return(Cnil);
 }
 
+void
 write_string(strng, strm)
 object strng, strm;
 {
@@ -1943,6 +1968,7 @@ object strng, strm;
 /*
 	THE ULTRA-SPECIAL-DINNER-SERVICE OPTIMIZATION
 */
+void
 princ_str(s, sym)
 char *s;
 object sym;
@@ -1956,6 +1982,7 @@ object sym;
 	writestr_stream(s, sym);
 }
 
+void
 princ_char(c, sym)
 int c;
 object sym;
@@ -1975,6 +2002,7 @@ object sym;
 }
 
 
+void
 pp(x)
 object x;
 {
@@ -1982,14 +2010,16 @@ princ(x,Cnil);
 flush_stream(symbol_value(sLAstandard_outputA));
 }
 
+object
 set_line_length(n)
 int n;
 {
-  return line_length = n;
+  return make_fixnum(line_length = n);
 }
 
 DEFVAR("*PRINT-NANS*",sSAprint_nansA,SI,Cnil,"");
 
+void
 init_print_function()
 {
 	make_function("WRITE", Lwrite);

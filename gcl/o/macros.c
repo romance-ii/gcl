@@ -30,7 +30,8 @@ object sLwarn;
 
 object sSAinhibit_macro_specialA;
 
-siLdefine_macro()
+void
+siLdefine_macro(void)
 {
 	check_arg(2);
 	if (type_of(vs_base[0]) != t_symbol)
@@ -49,7 +50,7 @@ siLdefine_macro()
 		vs_push(make_simple_string(
 			"~S is being redefined."));
 		ifuncall2(sLwarn, vs_head, vs_base[0]);
-		vs_pop;
+		vs_popp;
 	}
 	vs_base[0]->s.s_gfdef = MMcaddr(vs_base[1]);
 	vs_base[0]->s.s_mflag = TRUE;
@@ -68,8 +69,8 @@ siLdefine_macro()
 	vs_top = vs_base+1;
 }
 
-Fdefmacro(form)
-object form;
+void
+Fdefmacro(object form)
 {
 	object endp_temp;
 
@@ -109,7 +110,7 @@ object form;
 		vs_push(make_simple_string(
 			"~S is being redefined."));
 		ifuncall2(sLwarn, vs_head, name);
-		vs_pop;
+		vs_popp;
 	}
 	name->s.s_gfdef = MMcaddr(top[0]);
 	name->s.s_mflag = TRUE;
@@ -135,8 +136,7 @@ object form;
 	in VS_BASE[0].
 */
 object
-Imacro_expand1(exp_fun, form)
-object exp_fun,form;
+Imacro_expand1(object exp_fun, object form)
 {
 	return Ifuncall_n(sLAmacroexpand_hookA->s.s_dbind,
 		   3,exp_fun,form,MACRO_EXPAND_ENV);
@@ -148,8 +148,7 @@ object exp_fun,form;
 	MACRO_DEF returns NIL.
 */
 object
-macro_def(form)
-object form;
+macro_def(object form)
 {
 	object head, fd;
 
@@ -176,7 +175,7 @@ object form ;
 va_dcl
 {	int n=VFUN_NARGS;
 	object envir;
-	object exp_fun, env;
+	object exp_fun;
 	object *lex=lex_env;
 	object buf[3];
 	
@@ -220,7 +219,8 @@ va_dcl
 	  }
 }
 
-Lmacroexpand_1()
+void
+Lmacroexpand_1(void)
 {
 	object exp_fun;
 	object *base=vs_base;
@@ -261,8 +261,7 @@ Lmacroexpand_1()
 	marked.
 */
 object
-macro_expand(form)
-object form;
+macro_expand(object form)
 {
 	object exp_fun, head, fd;
 	object *base = vs_base;
@@ -340,7 +339,8 @@ DEF_ORDINARY("FUNCALL",sLfuncall,LISP,"");
 DEFVAR("*MACROEXPAND-HOOK*",sLAmacroexpand_hookA,LISP,sLfuncall,"");
 DEF_ORDINARY("DEFMACRO*",sSdefmacroA,SI,"");
 DEFVAR("*INHIBIT-MACRO-SPECIAL*",sSAinhibit_macro_specialA,SI,Cnil,"");
-init_macros()
+void
+init_macros(void)
 {
 	make_si_function("DEFINE-MACRO", siLdefine_macro);
 

@@ -437,7 +437,7 @@ EXTER bool PRINTgensym;
 EXTER int PRINTlevel;
 EXTER int PRINTlength;
 EXTER bool PRINTarray;
-EXTER int (*write_ch_fun)();
+EXTER void (*write_ch_fun)(int);
 object princ();
 object prin1();
 object print();

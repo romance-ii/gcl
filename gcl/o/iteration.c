@@ -27,14 +27,13 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 
-Floop(form)
-object form;
+void
+Floop(object form)
 {
 	object endp_temp;
 
 	object x;
 	object *oldlex = lex_env;
-	object id;
 	object *top;
 
 	make_nil_block();
@@ -81,8 +80,8 @@ LOOP:
 					during the main loop.
 */
 
-do_var_list(var_list)
-object var_list;
+void
+do_var_list(object var_list)
 {
 	object endp_temp;
 
@@ -123,8 +122,8 @@ object var_list;
 	}
 }
 
-Fdo(arg)
-object arg;
+void
+Fdo(object arg)
 {
 	object endp_temp;
 
@@ -194,11 +193,12 @@ LOOP:	/* the main loop */
 		}
 	}
 	for (bt = start;  bt<end;  bt++) {
-		if (bt->bt_aux != bt->bt_var)
-			if (bt->bt_spp == Ct)
-				bt->bt_var->s.s_dbind = bt->bt_init;
-			else
-				MMcadr(bt->bt_spp) = bt->bt_init;
+	  if (bt->bt_aux != bt->bt_var) {
+	    if (bt->bt_spp == Ct)
+	      bt->bt_var->s.s_dbind = bt->bt_init;
+	    else
+	      MMcadr(bt->bt_spp) = bt->bt_init;
+	  }
 	}
 	goto LOOP;
 
@@ -208,8 +208,8 @@ END:
 	lex_env = oldlex;
 }
 
-FdoA(arg)
-object arg;
+void
+FdoA(object arg)
 {
 	object endp_temp;
 
@@ -287,8 +287,8 @@ END:
 	lex_env = oldlex;
 }
 
-Fdolist(arg)
-object arg;
+void
+Fdolist(object arg)
 {
 	object endp_temp;
 
@@ -369,8 +369,8 @@ END:
 	lex_env = oldlex;
 }
 
-Fdotimes(arg)
-object arg;
+void
+Fdotimes(object arg)
 {
 	object endp_temp;
 
@@ -453,7 +453,8 @@ END:
 	lex_env = oldlex;
 }
 
-init_iteration()
+void
+init_iteration(void)
 {
 	make_special_form("LOOP", Floop);
 	make_special_form("DO", Fdo);

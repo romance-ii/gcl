@@ -29,6 +29,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	It also contains read_fasl_data.
 */
 
+#include <stdlib.h>
+
 #define IN_FILE
 #include "include.h"
 
@@ -109,7 +111,7 @@ FILE *fp;
 #undef	feof
 #define	feof	feof1
 
-
+void
 end_of_stream(strm)
 object strm;
 {
@@ -168,6 +170,7 @@ BEGIN:
 
 	default:
 		error("illegal stream mode");
+		return(FALSE);
 	}
 }
 
@@ -223,6 +226,7 @@ BEGIN:
 
 	default:
 		error("illegal stream mode");
+		return(FALSE);
 	}
 }
 
@@ -276,10 +280,12 @@ BEGIN:
 
 	default:
 		error("illegal stream mode");
+		return(FALSE);
 	}
 }
 
 #ifndef NO_SETBUF
+void
 setup_stream_buffer(x)
      object x;
 {char *buf=alloc_contblock(BUFSIZ);
@@ -290,6 +296,7 @@ setup_stream_buffer(x)
 	setbuf(x->sm.sm_fp, buf);
 }	
 
+void
 deallocate_stream_buffer(strm)
 object strm;
 {
@@ -297,7 +304,7 @@ object strm;
     {insert_contblock(strm->sm.sm_buffer, BUFSIZ);
      strm->sm.sm_buffer = 0;}
   else
-    printf("no buffer? %x  \n",strm->sm.sm_fp);
+    printf("no buffer? %p  \n",strm->sm.sm_fp);
 
 #ifndef FCLOSE_SETBUF_OK
   strm->sm.sm_fp->_base = NULL;
@@ -308,6 +315,12 @@ object strm;
 
 DEFVAR("*ALLOW-GZIPPED-FILE*",sSAallow_gzipped_fileA,SI,sLnil,"");
 
+void
+too_long_file_name(object);
+void
+cannot_open(object);
+void
+cannot_create(object);
 /*
 	Open_stream(fn, smm, if_exists, if_does_not_exist)
 	opens file fn with mode smm.
@@ -320,7 +333,7 @@ enum smmode smm;
 object if_exists, if_does_not_exist;
 {
 	object x;
-	FILE *fp;
+	FILE *fp=NULL;
 	char fname[BUFSIZ];
 	int i;
 	object unzipped = 0;
@@ -351,7 +364,7 @@ object if_exists, if_does_not_exist;
 			    if (fp)
 			      { char *tmp;
 				char command [500];
-				close(fp);
+				fclose(fp);
 				tmp = tmpnam(0);
 				unzipped = make_simple_string(tmp);
 				sprintf(command,"gzip -dc %s > %s",buf,tmp);
@@ -458,10 +471,13 @@ object if_exists, if_does_not_exist;
 	return(x);
 }
 
+void
+gclFlushSocket(object);
 /*
 	Close_stream(strm) closes stream strm.
 	The abort_flag is not used now.
 */
+void
 close_stream(strm)
 object strm;
 /*bool abort_flag; */	/*  Not used now!  */
@@ -634,6 +650,11 @@ object strm;
 	return(strng);
 }
 
+void
+cannot_read(object);
+
+void
+closed_stream(object);
 int
 readc_stream(strm)
 object strm;
@@ -660,7 +681,7 @@ BEGIN:
 		if (c == EOF) {
         	  if (xkclfeof(c,strm->sm.sm_fp))
 			end_of_stream(strm);
-		  else c = getOneChar(strm);
+		  else c = getOneChar(strm->sm.sm_fp);
 		  if (c == EOF) end_of_stream(strm);
 		}
 		
@@ -727,7 +748,6 @@ BEGIN:
 #define STM_TYPE 6
 #define STM_NAME 8
 {object val;
-	 	object endp_temp;	
 		object *old_vs_base = vs_base;
 		object *old_vs_top = vs_top;
 		vs_base = vs_top;
@@ -746,9 +766,14 @@ BEGIN:
 
 	default:	
 		error("illegal stream mode");
+		return(0);
 	}
 }
 
+int
+rl_ungetc_em(int, FILE *);
+
+void
 unreadc_stream(c, strm)
 int c;
 object strm;
@@ -829,6 +854,14 @@ UNREAD_ERROR:
 	FEerror("Cannot unread the stream ~S.", 1, strm);
 }
 
+void
+putCharGclSocket(object,int);
+int
+rl_putc_em(int, FILE *);
+void
+cannot_write(object);
+
+int
 writec_stream(c, strm)
 int c;
 object strm;
@@ -946,6 +979,7 @@ BEGIN:
 	return(c);
 }
 
+void
 writestr_stream(s, strm)
 char *s;
 object strm;
@@ -954,6 +988,7 @@ object strm;
 		writec_stream(*s++, strm);
 }
 
+void
 flush_stream(strm)
 object strm;
 { 	object endp_temp;
@@ -1024,7 +1059,6 @@ bool
 stream_at_end(strm)
 object strm;
 { 	object endp_temp;
-	object x;
 #define NON_CHAR -1000
 	VOL int c = NON_CHAR;
 
@@ -1109,12 +1143,15 @@ BEGIN:
 #endif
 	default:
 		error("illegal stream mode");
+		return(FALSE);
 	}
 }
+
 
 #ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
 #endif
+
 
 #ifdef LISTEN_USE_FCNTL
 #include <fcntl.h>
@@ -1124,8 +1161,6 @@ bool
 listen_stream(strm)
 object strm;
 { 	object endp_temp;
-	object x;
-	int c;
 
 BEGIN:
 
@@ -1182,7 +1217,6 @@ BEGIN:
 		goto BEGIN;
 
 	case smm_concatenated:
-	CONCATENATED:
 		if (endp(strm->sm.sm_object0))
 			return(FALSE);
 		strm = strm->sm.sm_object0->c.c_car;	/* Incomplete! */
@@ -1204,9 +1238,10 @@ BEGIN:
 	case smm_broadcast:
 	case smm_string_output:
 		FEerror("Can't listen to ~S.", 1, strm);
-
+		return(FALSE);
 	default:
 		error("illegal stream mode");
+		return(FALSE);
 	}
 }
 
@@ -1246,6 +1281,7 @@ BEGIN:
 
 	default:
 		error("illegal stream mode");
+		return(-1);
 	}
 }
 
@@ -1294,6 +1330,7 @@ BEGIN:
 
 	default:
 		error("illegal stream mode");
+		return(-1);
 	}
 }
 
@@ -1331,6 +1368,7 @@ BEGIN:
 
 	default:
 		error("illegal stream mode");
+		return(-1);
 	}
 }
 
@@ -1386,9 +1424,11 @@ BEGIN:
 #endif
 	default:
 		error("illegal stream mode");
+		return(-1);
 	}
 }
 
+void
 load(s)
 char *s;
 {
@@ -1407,13 +1447,15 @@ char *s;
 			break;
 		vs_push(x);
 		ieval(x);
-		vs_pop;
+		vs_popp;
 	}
 	close_stream(strm);
 	vs_reset;
 }
 
-Lmake_synonym_stream()
+
+void
+Lmake_synonym_stream()
 {
 	object x;
 
@@ -1428,6 +1470,7 @@ char *s;
 	vs_base[0] = x;
 }
 
+void
 Lmake_broadcast_stream()
 {
 	object x;
@@ -1450,6 +1493,7 @@ Lmake_broadcast_stream()
 	vs_base[0] = x;
 }
 
+void
 Lmake_concatenated_stream()
 {
 	object x;
@@ -1472,6 +1516,7 @@ Lmake_concatenated_stream()
 	vs_base[0] = x;
 }
 
+void
 Lmake_two_way_stream()
 {
 	check_arg(2);
@@ -1483,9 +1528,10 @@ Lmake_two_way_stream()
 	    !output_stream_p(vs_base[1]))
 		cannot_write(vs_base[1]);
 	vs_base[0] = make_two_way_stream(vs_base[0], vs_base[1]);
-	vs_pop;
+	vs_popp;
 }
 
+void
 Lmake_echo_stream()
 {
 	check_arg(2);
@@ -1497,7 +1543,7 @@ Lmake_echo_stream()
 	    !output_stream_p(vs_base[1]))
 		cannot_write(vs_base[1]);
 	vs_base[0] = make_echo_stream(vs_base[0], vs_base[1]);
-	vs_pop;
+	vs_popp;
 }
 
 @(defun make_string_input_stream (strng &o istart iend)
@@ -1526,12 +1572,14 @@ for the string ~S.",
 		3, istart, iend, strng);
 @)
 
+void
 Lmake_string_output_stream()
 {
 	check_arg(0);
 	vs_push(make_string_output_stream(64));
 }
 
+void
 Lget_output_stream_string()
 {
 	check_arg(1);
@@ -1548,6 +1596,7 @@ Lget_output_stream_string()
 		extracts the string associated with the given
 		string-output-stream.
 */
+void
 siLoutput_stream_string()
 {
 	check_arg(1);
@@ -1557,6 +1606,7 @@ siLoutput_stream_string()
 	vs_base[0] = vs_base[0]->sm.sm_object0;
 }
 
+void
 Lstreamp()
 {
 	check_arg(1);
@@ -1567,6 +1617,7 @@ Lstreamp()
 		vs_base[0] = Cnil;
 }
 
+void
 Linput_stream_p()
 {
 	check_arg(1);
@@ -1578,6 +1629,7 @@ Linput_stream_p()
 		vs_base[0] = Cnil;
 }
 
+void
 Loutput_stream_p()
 {
 	check_arg(1);
@@ -1589,6 +1641,7 @@ Loutput_stream_p()
 		vs_base[0] = Cnil;
 }
 
+void
 Lstream_element_type()
 {
 	check_arg(1);
@@ -1610,7 +1663,7 @@ Lstream_element_type()
 		   (if_exists Cnil iesp)
 		   (if_does_not_exist Cnil idnesp)
 	      &aux strm)
-	enum smmode smm;
+	enum smmode smm=0;
 @
 	check_type_or_pathname_string_symbol_stream(&filename);
 	filename = coerce_to_namestring(filename);
@@ -1652,7 +1705,7 @@ Lstream_element_type()
 @)
 
 @(defun file_position (file_stream &o position)
-	int i;
+	int i=0;
 @
 	check_type_stream(&file_stream);
 	if (position == Cnil) {
@@ -1676,6 +1729,7 @@ for the file-stream ~S.",
 	}	
 @)
 
+void
 Lfile_length()
 {
 	int i;
@@ -1711,9 +1765,9 @@ object sSAload_pathnameA;
 	filename = coerce_to_namestring(pathname);
         old_bds_top=bds_top;
   	if (pntype == Cnil || pntype == sKwild ||
-	    type_of(pntype) == t_string &&
+	    (type_of(pntype) == t_string &&
 #ifdef UNIX
-	    string_eq(pntype, FASL_string)) {
+	    string_eq(pntype, FASL_string))) {
 #endif
 #ifdef AOSVS
 
@@ -1722,9 +1776,9 @@ object sSAload_pathnameA;
 		fasl_filename = coerce_to_namestring(pathname);
 	}
 	if (pntype == Cnil || pntype == sKwild ||
-	    type_of(pntype) == t_string &&
+	    (type_of(pntype) == t_string &&
 #ifdef UNIX
-	    string_eq(pntype, LSP_string)) {
+	    string_eq(pntype, LSP_string))) {
 #endif
 #ifdef AOSVS
 
@@ -1847,6 +1901,7 @@ object sSAload_pathnameA;
 	@(return Ct)
 @)
 
+void
 siLget_string_input_stream_index()
 {
 	check_arg(1);
@@ -1856,6 +1911,7 @@ siLget_string_input_stream_index()
 	vs_base[0] = make_fixnum(STRING_INPUT_STREAM_NEXT(vs_base[0]));
 }
 
+void
 siLmake_string_output_stream_from_string()
 {
 	object strng, strm;
@@ -1874,6 +1930,7 @@ siLmake_string_output_stream_from_string()
 	vs_base[0] = strm;
 }
 
+void
 siLcopy_stream()
 {
 	object in, out;
@@ -1887,37 +1944,41 @@ siLcopy_stream()
 		writec_stream(readc_stream(in), out);
 	flush_stream(out);
 	vs_base[0] = Ct;
-	vs_pop;
+	vs_popp;
 #ifdef AOSVS
 
 #endif
 }
 
-
+void
 too_long_file_name(fn)
 object fn;
 {
 	FEerror("~S is a too long file name.", 1, fn);
 }
 
+void
 cannot_open(fn)
 object fn;
 {
 	FEerror("Cannot open the file ~A.", 1, fn);
 }
 
+void
 cannot_create(fn)
 object fn;
 {
 	FEerror("Cannot create the file ~A.", 1, fn);
 }
 
+void
 cannot_read(strm)
 object strm;
 {
 	FEerror("Cannot read the stream ~S.", 1, strm);
 }
 
+void
 cannot_write(strm)
 object strm;
 {
@@ -1926,6 +1987,7 @@ object strm;
 
 #ifdef USER_DEFINED_STREAMS
 /* more support for user defined streams */
+void
 siLuser_stream_state()
 {     
   check_arg(1);
@@ -1937,6 +1999,7 @@ siLuser_stream_state()
 }
 #endif
 
+void
 closed_stream(strm)
 object strm;
 {
@@ -1998,11 +2061,13 @@ int out;
  return(strm);
 }
 
+void
 siLfp_output_stream()
 {check_arg(1);
  vs_base[0]=coerce_stream(vs_base[0],1);
 }
 
+void
 siLfp_input_stream()
 {check_arg(1);
  vs_base[0]=coerce_stream(vs_base[0],0);
@@ -2031,7 +2096,7 @@ siLfp_input_stream()
   p = vector->ust.ust_self;
   beg = ((type_of(start)==t_fixnum) ? fix(start) : 0);
   n = ((type_of(count)==t_fixnum) ? fix(count) : (vector->st.st_fillp - beg));
-  if (n=fread(p+beg,1,n,stream->sm.sm_fp))
+  if ((n=fread(p+beg,1,n,stream->sm.sm_fp)))
       @(return `make_fixnum(n)`);
   @(return Cnil);
 @)
@@ -2056,6 +2121,7 @@ siLfp_input_stream()
   Side Effects:  The buffer may be filled, and the fill pointer
   of the buffer may be changed.
  */
+void
 putCharGclSocket(strm,ch)
   object strm;
   int ch;
@@ -2066,15 +2132,15 @@ putCharGclSocket(strm,ch)
   if (bufp->ust.ust_fillp < bufp->ust.ust_dim) {
     dprintf("getchar returns (%c)\n",bufp->ust.ust_self[-1+(bufp->ust.ust_fillp)]);
     bufp->ust.ust_self[(bufp->ust.ust_fillp)++]=ch;
-    return ch;
+    return;
   }
   else {
-    gclFlushSocket(strm,Ct);
+    gclFlushSocket(strm);
     goto AGAIN;
   }
 }
 
-
+void
 gclFlushSocket(strm)
      object strm;
 
@@ -2091,8 +2157,7 @@ gclFlushSocket(strm)
     while(i< bufp->ust.ust_fillp) {
       wrote =TcpOutputProc(fd,&(bufp->ust.ust_self[i]),
 		  bufp->ust.ust_fillp-i > AMT_TO_WRITE ? AMT_TO_WRITE :
-		  bufp->ust.ust_fillp-i,&err,
-			 AMT_TO_WRITE);
+		  bufp->ust.ust_fillp-i,&err);
       if (wrote < 0) {
 	SET_STREAM_FLAG(strm,gcl_sm_had_error,1);
 	close_stream(strm);
@@ -2115,7 +2180,6 @@ object port;
 object async;
 {
   object x;
-  FILE *fp = NULL;
   if (fd < 0 )
    {
      FEerror("Could not connect",0);
@@ -2164,7 +2228,6 @@ object async;
 int fd;
 int isServer = 0;
 int inPort;
-FILE *fp;
 char buf1[500];
 char buf2[500];
 char *myaddrPtr=buf1,*hostPtr=buf2;
@@ -2223,7 +2286,8 @@ DEFVAR("*DEBUG-IO*",sLAdebug_ioA,LISP,standard_io,"");
 DEFVAR("*TRACE-OUTPUT*",sLAtrace_outputA,LISP,standard_io,"");
 
 
-init_file()
+void
+init_file(void)
 {
 	object standard_input;
 	object standard_output;
@@ -2295,6 +2359,7 @@ DEF_ORDINARY("VERBOSE",sKverbose,KEYWORD,"");
 
 
 
+void
 init_file_function()
 {
 
@@ -2371,9 +2436,6 @@ char *str;
 {
 	object faslfile, data;
 #ifdef UNIX
-	FILE *fp;
-
-
 #ifdef BSD
 #ifdef HAVE_AOUT
  	struct exec header;
@@ -2385,7 +2447,6 @@ char *str;
 #ifdef E15
 	struct exec header;
 #endif
-	int i;
 #endif
         vs_mark;
 

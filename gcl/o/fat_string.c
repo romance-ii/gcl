@@ -2,6 +2,8 @@
 (c) Copyright W. Schelter 1988, All rights reserved.
 */
 
+#include <stdlib.h>
+
 #include "include.h"
 #include "page.h"
 #define FAT_STRING
@@ -35,7 +37,7 @@ object start_address,scale;
   if( type_of(start_address)!=t_fixnum ||   type_of(scale)!=t_fixnum)
     FEerror("Needs start address and scale as args",0);
 
-  profil((char *) (ar->ust.ust_self), (ar->ust.ust_dim),
+  profil((void *) (ar->ust.ust_self), (ar->ust.ust_dim),
 	 fix(start_address),fix(scale) << 8);
   RETURN1(start_address);
 }
@@ -148,9 +150,9 @@ object sScdefn;
 
 #define CF_FLAG ((unsigned long)1 << (sizeof(long)*8-1)) 
 
-
-cfuns_to_combined_table(n) /* non zero n will ensure new table length */
-unsigned int n;
+void
+cfuns_to_combined_table(unsigned int n) /* non zero n will ensure new table length */
+               
 {int ii=0;  
  STATIC int i, j;
  STATIC object x;
@@ -197,8 +199,8 @@ unsigned int n;
  }
 }
 
-address_node_compare(node1,node2)
-char *node1, *node2;
+int
+address_node_compare(const void *node1, const void *node2)
 {unsigned int a1,a2;
  a1=((struct node *)node1)->address;
  a2=((struct node *)node2)->address;
@@ -306,17 +308,16 @@ va_dcl
 }
 
 static int  prof_start;
-prof_ind(address,scale)
-     unsigned int address;
+int
+prof_ind(unsigned int address, int scale)
 {address = address - prof_start ;
  if (address > 0) return ((address * scale) >> 8) ;
  return 0;
 }
 
 /* sum entries AAR up to DIM entries */
-string_sum(aar,dim)
-register unsigned char *aar;
-unsigned int dim;
+int
+string_sum(register unsigned char *aar, unsigned int dim)
 {register unsigned char *endar;
  register unsigned int count = 0;
 endar=aar+dim;
@@ -377,9 +378,6 @@ object start_addr,scal;
  RETURN1(start_addr);
 }
 
-#ifdef SFASL
-int build_symbol_table();
-#endif
 
 
 /* end fasl stuff*/
@@ -431,7 +429,8 @@ object x0,x1;
 #endif
 
 DEFVAR("*PROFILE-ARRAY*",sSAprofile_arrayA,SI,Cnil,"");
-init_fat_string()
+void
+init_fat_string(void)
 {
  
  make_si_constant("*ASH->>*",(-1==(((int)-1) >> 20))? Ct :Cnil);

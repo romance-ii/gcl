@@ -1,10 +1,10 @@
 
-static L1();
-static L2();
-static L10();
-static L14();
-static L15();
-static L16();
+static void L1();
+static void L2();
+static void L10();
+static void L14();
+static void L15();
+static void L16();
 #define VC1
 #define VC2
 static object LI3();
@@ -56,9 +56,9 @@ static object LI13();
 #define VC13 object  V106 ,V105;
 #define VC14
 #define VC15 object  V122 ,V115 ,V113 ,V112;
-static LC17();
+static void LC17();
 #define VC16
-static LC17();
+static void LC17();
 #define VM16 2
 #define VM15 14
 #define VM14 4
@@ -94,16 +94,16 @@ static char * VVi[116]={
 (char *)(L16)
 };
 #define VV ((object *)VVi)
-static  LnkT114() ;
-static  (*Lnk114)() = LnkT114;
-static  LnkT113() ;
-static  (*Lnk113)() = LnkT113;
-static  LnkT112() ;
-static  (*Lnk112)() = LnkT112;
+static void LnkT114() ;
+static void (*Lnk114)() = LnkT114;
+static void LnkT113() ;
+static void (*Lnk113)() = LnkT113;
+static void LnkT112() ;
+static void (*Lnk112)() = LnkT112;
 static object  LnkTLI111() ;
 static object  (*LnkLI111)() = LnkTLI111;
-static  LnkT60() ;
-static  (*Lnk60)() = LnkT60;
+static void LnkT60() ;
+static void (*Lnk60)() = LnkT60;
 static object  LnkTLI110() ;
 static object  (*LnkLI110)() = LnkTLI110;
 static object  LnkTLI109() ;

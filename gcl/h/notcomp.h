@@ -69,7 +69,7 @@ EXTER object user_package;
 /* for defining old style */
 #define DEFUNO(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,old,doc) \
   ret fname (); \
-old() \
+void old(void) \
 {   Iinvoke_c_function_from_value_stack(fname,F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
     return;} \
   ret fname

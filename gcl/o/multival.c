@@ -28,12 +28,14 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 
-Lvalues()
+void
+Lvalues(void)
 {
 	if (vs_base == vs_top) vs_base[0] = Cnil;
 }
 
-Lvalues_list()
+void
+Lvalues_list(void)
 {
 	object endp_temp;
 
@@ -49,8 +51,8 @@ Lvalues_list()
 	if (vs_top == vs_base) vs_base[0] = Cnil;
 }
 
-Fmultiple_value_list(form)
-object form;
+void
+Fmultiple_value_list(object form)
 {
 	object endp_temp;
 
@@ -70,8 +72,8 @@ object form;
 	vs_top = top+1;
 }
 
-Fmultiple_value_call(form)
-object form;
+void
+Fmultiple_value_call(object form)
 {
 	object endp_temp;
 
@@ -100,8 +102,8 @@ object form;
 	super_funcall(top[0]);
 }
 
-Fmultiple_value_prog1(forms)
-object forms;
+void
+Fmultiple_value_prog1(object forms)
 {
 	object endp_temp;
 
@@ -130,7 +132,8 @@ object forms;
 }
 
 	
-init_multival()
+void
+init_multival(void)
 {
 	make_constant("MULTIPLE-VALUES-LIMIT",make_fixnum(32));
 	make_function("VALUES",Lvalues);

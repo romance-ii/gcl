@@ -34,8 +34,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 object sLkeyword;
 
 
-check_type_integer(p)
-object *p;
+void
+check_type_integer(object *p)
 {
 	enum type t;
 
@@ -43,8 +43,8 @@ object *p;
 		*p = wrong_type_argument(sLinteger, *p);
 }
 
-check_type_non_negative_integer(p)
-object *p;
+void
+check_type_non_negative_integer(object *p)
 {
 	enum type t;
 
@@ -61,8 +61,8 @@ object *p;
 	}
 }
 
-check_type_rational(p)
-object *p;
+void
+check_type_rational(object *p)
 {
 	enum type t;
 
@@ -71,8 +71,8 @@ object *p;
 		*p = wrong_type_argument(sLrational, *p);
 }
 
-check_type_float(p)
-object *p;
+void
+check_type_float(object *p)
 {
 	enum type t;
 
@@ -80,8 +80,8 @@ object *p;
 		*p = wrong_type_argument(sLfloat, *p);
 }
 
-check_type_or_integer_float(p)
-object *p;
+void
+check_type_or_integer_float(object *p)
 {
 	enum type t;
 
@@ -90,8 +90,8 @@ object *p;
 		*p = wrong_type_argument(TSor_integer_float, *p);
 }
 
-check_type_or_rational_float(p)
-object *p;
+void
+check_type_or_rational_float(object *p)
 {
 	enum type t;
 
@@ -100,8 +100,8 @@ object *p;
 		*p = wrong_type_argument(TSor_rational_float, *p);
 }
 
-check_type_number(p)
-object *p;
+void
+check_type_number(object *p)
 {
 	enum type t;
 
@@ -111,23 +111,23 @@ object *p;
 		*p = wrong_type_argument(sLnumber, *p);
 }
 
-check_type_bit(p)
-object *p;
+void
+check_type_bit(object *p)
 {
 	while (type_of(*p) != t_fixnum ||
-	       fix((*p)) != 0 && fix((*p)) != 1)
+	       (fix((*p)) != 0 && fix((*p)) != 1))
 		*p = wrong_type_argument(sLbit, *p);
 }
 
-check_type_character(p)
-object *p;
+void
+check_type_character(object *p)
 {
 	while (type_of(*p) != t_character)
 		*p = wrong_type_argument(sLcharacter, *p);
 }
 
-check_type_string_char(p)
-object *p;
+void
+check_type_string_char(object *p)
 {
 	while (type_of(*p) != t_character ||
 	       char_font((*p)) != 0 ||
@@ -135,29 +135,29 @@ object *p;
 		*p = wrong_type_argument(sLcharacter, *p);
 }
 
-check_type_symbol(p)
-object *p;
+void
+check_type_symbol(object *p)
 {
 	while (type_of(*p) != t_symbol)
 		*p = wrong_type_argument(sLsymbol, *p);
 }
 
-check_type_or_symbol_string(p)
-object *p;
+void
+check_type_or_symbol_string(object *p)
 {
 	while (type_of(*p) != t_symbol && type_of(*p) != t_string)
 		*p = wrong_type_argument(TSor_symbol_string, *p);
 }
 
-check_type_or_string_symbol(p)
-object *p;
+void
+check_type_or_string_symbol(object *p)
 {
 	while (type_of(*p) != t_symbol && type_of(*p) != t_string)
 		*p = wrong_type_argument(TSor_string_symbol, *p);
 }
 
-check_type_or_symbol_string_package(p)
-object *p;
+void
+check_type_or_symbol_string_package(object *p)
 {
 	while (type_of(*p) != t_symbol &&
 	       type_of(*p) != t_string &&
@@ -166,51 +166,51 @@ object *p;
  					   *p);
 }
 
-check_type_package(p)
-object *p;
+void
+check_type_package(object *p)
 {
 	while (type_of(*p) != t_package)
 		*p = wrong_type_argument(sLpackage, *p);
 }
 
-check_type_string(p)
-object *p;
+void
+check_type_string(object *p)
 {
 	while (type_of(*p) != t_string)
 		*p = wrong_type_argument(sLstring, *p);
 }
 
-check_type_bit_vector(p)
-object *p;
+void
+check_type_bit_vector(object *p)
 {
 	while (type_of(*p) != t_bitvector)
 		*p = wrong_type_argument(sLbit_vector, *p);
 }
 
-check_type_cons(p)
-object *p;
+void
+check_type_cons(object *p)
 {
 	while (type_of(*p) != t_cons)
 		*p = wrong_type_argument(sLcons, *p);
 }
 
-check_type_stream(p)
-object *p;
+void
+check_type_stream(object *p)
 {
 	while (type_of(*p) != t_stream)
 		*p = wrong_type_argument(sLstream, *p);
 }
 
-check_type_readtable(p)
-object *p;
+void
+check_type_readtable(object *p)
 {
 	while (type_of(*p) != t_readtable)
 		*p = wrong_type_argument(sLreadtable, *p);
 }
 
 #ifdef UNIX
-check_type_or_Pathname_string_symbol(p)
-object *p;
+void
+check_type_or_Pathname_string_symbol(object *p)
 {
 	enum type t;
 
@@ -221,8 +221,8 @@ object *p;
 }
 #endif
 
-check_type_or_pathname_string_symbol_stream(p)
-object *p;
+void
+check_type_or_pathname_string_symbol_stream(object *p)
 {
 	enum type t;
 
@@ -232,22 +232,22 @@ object *p;
 			TSor_pathname_string_symbol_stream, *p);
 }
 
-check_type_random_state(p)
-object *p;
+void
+check_type_random_state(object *p)
 {
 	while (type_of(*p) != t_random)
 		*p = wrong_type_argument(sLrandom_state, *p);
 }
 
-check_type_hash_table(p)
-object *p;
+void
+check_type_hash_table(object *p)
 {
 	while (type_of(*p) != t_hashtable)
 		*p = wrong_type_argument(sLhash_table, *p);
 }
 
-check_type_array(p)
-object *p;
+void
+check_type_array(object *p)
 {
 BEGIN:
 	switch (type_of(*p)) {
@@ -263,8 +263,8 @@ BEGIN:
 	}
 }
 
-check_type_vector(p)
-object *p;
+void
+check_type_vector(object *p)
 {
 BEGIN:
 	switch (type_of(*p)) {
@@ -280,17 +280,15 @@ BEGIN:
 }
 
 void
-check_type(x,t)
-     object x;
-     int t;
+check_type(object x, int t)
 {if (type_of(x) !=t)
    FEerror("~s is not a ~a",2,
 	   x,make_simple_string(tm_table[t].tm_name +1));
 }
    
 
-
-Ltype_of()
+void
+Ltype_of(void)
 {
 	int i;
 
@@ -327,7 +325,7 @@ Ltype_of()
 			vs_base[0] = sLcharacter;
 		else {
 			i = char_code(vs_base[0]);
-			if (' ' <= i && i < '\177' || i == '\n')
+			if ((' ' <= i && i < '\177') || i == '\n')
 				vs_base[0] = sLstandard_char;
 			else
 				vs_base[0] = sLstring_char;
@@ -488,12 +486,13 @@ DEF_ORDINARY("PLUSP",sLplusp,LISP,"");
 DEFCONST("CHAR-SIZE",sSchar_size,SI,small_fixnum(CHAR_SIZE),"Size in bits of a character");
 DEFCONST("SHORT-SIZE",sSshort_size,SI,small_fixnum(CHAR_SIZE*sizeof(short)),"Size in bits of a short integer");
 
-     
-init_typespec()
+void     
+init_typespec(void)
 {
 }
 
-init_typespec_function()
+void
+init_typespec_function(void)
 {
 	TSor_symbol_string
 	= make_cons(sLor, make_cons(sLsymbol, make_cons(sLstring, Cnil)));

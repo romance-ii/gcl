@@ -1,6 +1,6 @@
 #include "../h/include.h"
 
-extern void user_init();
+extern object user_init();
 
 void init_or_load1 ();
 #define init_or_load(fn,file) do {extern int fn(); init_or_load1(fn,file);} \

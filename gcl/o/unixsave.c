@@ -169,7 +169,8 @@ Lsave()
 
 #endif /* UNIXSAVE include */
 
-init_unixsave()
+void
+init_unixsave(void)
 {
 	make_function("SAVE", Lsave);
 }

@@ -78,11 +78,9 @@ build_symbol_table_bfd(void) {
 
 #endif /* special_rsym */
 
-int
+void
 build_symbol_table(void) { 
 
-  char tmpfile1[50];
-  char command [250];
 
   printf("Building symbol table for %s ..\n",kcl_self);fflush(stdout);
 

@@ -23,6 +23,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	Random numbers
 */
 
+#include <time.h>
+
 #include "include.h"
 #include "num_include.h"
 
@@ -31,8 +33,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 object
-rando(x, rs)
-object x, rs;
+rando(object x, object rs)
 {
 	enum type tx;
 	object z;
@@ -57,14 +58,15 @@ object x, rs;
 		z = alloc_object(t_longfloat);
 		lf(z) = d;
 		return(z);
-	} else
+	} else {
 		FEerror("~S is not an integer nor a floating-point number.",
 			1, x);
+		return(Cnil);
+	}
 }
 
 object
-make_random_state(rs)
-object rs;
+make_random_state(object rs)
 {
         object z;
 #ifdef AOSVS
@@ -87,17 +89,18 @@ object rs;
 
 #endif
 		return(z);
-	} else if (type_of(rs) != t_random)
+	} else if (type_of(rs) != t_random) {
    		FEwrong_type_argument(sLrandom_state, rs);
-	else {
+		return(Cnil);
+	} else {
 		z =alloc_object(t_random);
 		z->rnd.rnd_value = rs->rnd.rnd_value;
 		return(z);
 	}
 }
 
-advance_random_state(rs)
-object rs;
+void
+advance_random_state(object rs)
 {
 	rs->rnd.rnd_value
 	= rs->rnd.rnd_value
@@ -107,11 +110,11 @@ object rs;
 }
 
 
-Lrandom()
+void
+Lrandom(void)
 {
 	int j;
         object x;
-	object rs;
 	
 	j = vs_top - vs_base;
 	if (j == 1)
@@ -124,7 +127,8 @@ Lrandom()
 	vs_push(x);
 }
 
-Lmake_random_state()
+void
+Lmake_random_state(void)
 {
 	int j;
 	object x;
@@ -138,7 +142,8 @@ Lmake_random_state()
 	vs_push(x);
 }
 
-Lrandom_state_p()
+void
+Lrandom_state_p(void)
 {
 	check_arg(1);
 	if (type_of(vs_pop) == t_random)
@@ -147,7 +152,8 @@ Lrandom_state_p()
 		vs_push(Cnil);
 }
 
-init_num_rand()
+void
+init_num_rand(void)
 {
         Vrandom_state = make_special("*RANDOM-STATE*",
 				     make_random_state(Ct));

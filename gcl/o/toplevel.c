@@ -38,8 +38,8 @@ object sSAinhibit_macro_specialA;
 
 object sLtypep;
 
-Fdefun(args)
-object args;
+void
+Fdefun(object args)
 {
 	object endp_temp;
 
@@ -65,7 +65,7 @@ object args;
 		vs_push(make_simple_string(
 			"~S is being redefined."));
 		ifuncall2(sLwarn, vs_head, name);
-		vs_pop;
+		vs_popp;
 	}
 	vs_base = vs_top;
 	if (lex_env[0] == Cnil && lex_env[1] == Cnil && lex_env[2] == Cnil) {
@@ -90,7 +90,7 @@ object args;
 			putf(name->s.s_plist,
 			     form,
 			     sSfunction_documentation);
-			vs_pop;
+			vs_popp;
 			break;
 		}
 		if (type_of(form) != t_cons || form->c.c_car != sLdeclare)
@@ -98,7 +98,8 @@ object args;
 	}
 }
 	
-siLAmake_special()
+void
+siLAmake_special(void)
 {
 	check_arg(1);
 	check_type_symbol(&vs_base[0]);
@@ -107,7 +108,8 @@ siLAmake_special()
 	vs_base[0]->s.s_stype = (short)stp_special;
 }
 
-siLAmake_constant()
+void
+siLAmake_constant(void)
 {
 	check_arg(2);
 	check_type_symbol(&vs_base[0]);
@@ -117,11 +119,11 @@ siLAmake_constant()
 		 1, vs_base[0]);
 	vs_base[0]->s.s_stype = (short)stp_constant;
 	vs_base[0]->s.s_dbind = vs_base[1];
-	vs_pop;
+	vs_popp;
 }
 
-Feval_when(arg)
-object arg;
+void
+Feval_when(object arg)
 {
 	object endp_temp;
 
@@ -147,17 +149,16 @@ object arg;
 	}
 }
 
-Fdeclare(arg)
-object arg;
+void
+Fdeclare(object arg)
 {
 	FEerror("DECLARE appeared in an invalid position.", 0);
 }
 
-Flocally(body)
-object body;
+void
+Flocally(object body)
 {
 	object *oldlex = lex_env;
-	object x, ds, vs, v;
 
 	lex_copy();
 	body = find_special(body, NULL, NULL);
@@ -166,8 +167,8 @@ object body;
 	lex_env = oldlex;
 }
 
-Fthe(args)
-object args;
+void
+Fthe(object args)
 {
 	object endp_temp;
 
@@ -207,7 +208,8 @@ DEF_ORDINARY("VALUES",sLvalues,LISP,"");
 DEF_ORDINARY("VARIABLE-DOCUMENTATION",sSvariable_documentation,SI,"");
 DEF_ORDINARY("WARN",sLwarn,LISP,"");
 
-init_toplevel()
+void
+init_toplevel(void)
 {
 	make_special_form("DEFUN",Fdefun);
 	make_si_function("*MAKE-SPECIAL", siLAmake_special);

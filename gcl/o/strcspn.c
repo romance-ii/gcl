@@ -1,7 +1,5 @@
-int
-strcspn(s1, s2)
-char *s1;
-char *s2;
+size_t
+strcspn(const char *s1, const char *s2)
 {
 	register char *scan1;
 	register char *scan2;

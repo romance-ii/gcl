@@ -3,6 +3,8 @@
 
 #include <stdlib.h>
 
+#include "include.h"
+
 #ifdef NeXT
 typedef int pid_t;
 #endif
@@ -80,3 +82,13 @@ guiCreateThenBindCallback();
 int guiBindCallback();
 
 #endif
+
+int
+sock_write_str2(struct connection_state *,enum mtype, char *,
+		int,char *,int);
+
+
+object
+fSclear_connection();
+
+

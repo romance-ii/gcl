@@ -28,9 +28,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 
-
-Fblock(args)
-object args;
+void
+Fblock(object args)
 {
  	object endp_temp;
 	object *oldlex = lex_env;
@@ -44,7 +43,7 @@ object args;
 	id = alloc_frame_id();
 	vs_push(id);
 	lex_block_bind(MMcar(args), id);
-	vs_pop;
+	vs_popp;
 	frs_push(FRS_CATCH, id);
 	if (nlj_active)
 		nlj_active = FALSE;
@@ -66,8 +65,8 @@ object args;
 	lex_env = oldlex;
 }
 
-Freturn_from(args)
-object args;
+void
+Freturn_from(object args)
 {
  	object endp_temp;
 	object lex_block;
@@ -93,8 +92,8 @@ object args;
 	/*  never reached  */
 }
 
-Freturn(args)
-object args;
+void
+Freturn(object args)
 {
 	object lex_block;
  	object endp_temp;
@@ -117,7 +116,8 @@ object args;
 	/*  never reached  */
 }
 
-init_block()
+void
+init_block(void)
 {
 	sLblock = make_special_form("BLOCK", Fblock);
 	enter_mark_origin(&sLblock);

@@ -104,7 +104,7 @@ struct connection_state
 extern struct connection_state *dsfd;
 
 #define fScheck_dsfd_for_input(sf,timeout) \
- (sf->valid_data_size > 0 ? 1 : fScheck_fd_for_input(sf->fd,timeout))
+ (sf->valid_data_size > 0 ? make_fixnum(1) : fScheck_fd_for_input(sf->fd,timeout))
 
 #define OBJ_TO_CONNECTION_STATE(x) \
   ((struct connection_state *)(void *)((x)->ust.ust_self))

@@ -45,7 +45,7 @@ extern char etext;
      
 #define ROUND_UP_SBRK(x)  \
        do {long i; \
-	     if (i = ((long)x & (PAGESIZE - 1))) \
+	     if ((i = ((long)x & (PAGESIZE - 1)))) \
 	       x=sbrk(PAGESIZE - i); } while(0);
 
 #define FIX_RANDOM_SBRK \

@@ -6,18 +6,16 @@
    argument.   They may in future allow resetting the argument.
 */
 
-object CEerror();
+object CEerror(char *error_str, char *cont_str, int num, object arg1, object arg2, object arg3, object arg4);
 object
-IisSymbol(f)
-object f;
+IisSymbol(object f)
 { if (type_of(f) != t_symbol)
    { FEerror("Not a symbol ~s",1,f); }
   return f;
 }
 
 object
-IisFboundp(f)
-     object f;
+IisFboundp(object f)
 { 
   IisSymbol(f);
   if (f->s.s_gfdef ==0)
@@ -26,8 +24,7 @@ IisFboundp(f)
 }
 
 object
-IisArray(f)
-object f;
+IisArray(object f)
 { if (TS_MEMBER(type_of(f),
 		TS(t_array)
 		|TS(t_vector)
@@ -40,8 +37,7 @@ object f;
 }
 
 object
-Iis_fixnum(f)
-     object f;
+Iis_fixnum(object f)
 { if (type_of(f)==t_fixnum)
     { return f;}
   else
@@ -55,11 +51,11 @@ void Wrong_type_error(char *str,int n,...) {
 }
 
 object
-Iapply_ap(f,ap)
+Iapply_ap(object (*f) (/* ??? */), va_list ap)
 /* Apply f to the va_list ap, with an implicit number of args
    passed in VFUN_NARGS */
-va_list ap;
-object (*f)();
+           
+              
 { int n = VFUN_NARGS;
   object *new;
   COERCE_VA_LIST(new,ap,n);
@@ -130,39 +126,39 @@ Iapply_fun_n1(object (*fun)(),int n,int m,...) {
 
   va_end(ap);
 
- return IapplyVector(fun,i,b);
+ return IapplyVector(make_sfun(Cnil,fun,i,Cnil),i,b);
 }
  
 /* For applying FUN to args in VA_LIST, where n are supplied directly
    and the last one is itself a va_list */
-object
-Iapply_fun_n2(object fun,int n,int m,...) {
+/*  object */
+/*  Iapply_fun_n2(object fun,int n,int m,...) { */
 
-  va_list ap,*app;
-  object b[F_ARG_LIMIT];
-  int i = 0;
+/*    va_list ap,*app; */
+/*    object b[F_ARG_LIMIT]; */
+/*    int i = 0; */
 
-  va_start(ap,m);
+/*    va_start(ap,m); */
 
-  while (--n >= 0) { 
-    b[i++] = va_arg(ap,object);}
-  if (m > 0) {
-    app = va_arg(ap,va_list *);
-    while (--m >= 0)
-      b[i++] = va_arg(*app,object);
-  }
+/*    while (--n >= 0) {  */
+/*      b[i++] = va_arg(ap,object);} */
+/*    if (m > 0) { */
+/*      app = va_arg(ap,va_list *); */
+/*      while (--m >= 0) */
+/*        b[i++] = va_arg(*app,object); */
+/*    } */
 
-  va_end(ap);
+/*    va_end(ap); */
 
- return IapplyVector(fun,i,b);
-}
+/*   return IapplyVector(fun,i,b); */
+/*  } */
  
 
 object
-ImakeStructure(n,p)
+ImakeStructure(int n, object *p)
 /* p[0]= structure name , p[1] = 1'st elt,.... p[n-1] = last elt. */ 
-int n;
-object *p;
+      
+          
 { object * r = vs_top;
   object res;
   if (p+n != r) { FEerror("bad make struct",0);}
@@ -174,31 +170,27 @@ object *p;
 }
 
 object
-Icheck_one_type(x,t)
-object x;
-enum type t;
+Icheck_one_type(object x, enum type t)
 { if (x->d.t != t)
-    { return CEerror("Expected a ~a ","Supply right type",1,type_name(t));
+    { return CEerror("Expected a ~a ","Supply right type",1,type_name(t),Cnil,Cnil,Cnil);
     }
   return x;
 }
 
 
 object
-fSincorrect_type(val,type)
-     object val,type;
-{ return CEerror("Got ~a,Expected a ~a","Supply a new one",1,val,type);
+fSincorrect_type(object val, object type)
+{ return CEerror("Got ~a,Expected a ~a","Supply a new one",1,val,type,Cnil,Cnil);
 }
 
 void
-Ineed_in_image(foo)
-     object (*foo)();
+Ineed_in_image(object (*foo) (/* ??? */))
 {;}
 
 /* Convert a value stack type return to an fcall multiple vaule return
    and return the actual value (or nil if no values);  */
 object
-Ivs_values()
+Ivs_values(void)
 { int n = fcall.nvalues = vs_top - vs_base;
   object *b = vs_base,*p=&fcall.values[0];
   object res = (n > 0 ? b[0] : sLnil);
@@ -209,10 +201,7 @@ Ivs_values()
   
 			
 void
-fatal(s,i1,i2)
-     char *s;
-     int i1;
-     int i2;
+fatal(char *s, int i1, int i2)
 {
   fprintf(stderr,s,i1,i2);
   exit(1);
@@ -223,10 +212,7 @@ fatal(s,i1,i2)
 /* Copy STRING to  BUF which has N bytes available.
    If there is not enough space, malloc some */
 char *
-lisp_copy_to_null_terminated(string,buf,n)
-     char *buf;
-     int n;
-     object string;
+lisp_copy_to_null_terminated(object string, char *buf, int n)
 { if(type_of(string) != t_string
       && type_of(string) != t_symbol)
     FEerror("Need to give symbol or string",0);

@@ -27,8 +27,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include  "include.h"
 
-bds_unwind(new_bds_top)
-bds_ptr new_bds_top;
+void
+bds_unwind(bds_ptr new_bds_top)
 {
 	for (;  bds_top > new_bds_top;  bds_top--)
 		(bds_top->bds_sym)->s.s_dbind = bds_top->bds_val;
