@@ -8,7 +8,7 @@ gclcvs (2.7.0-13) unstable; urgency=low
     study rational for *info* special variable in certain places as
     opposed to more common copy-info
 
- -- Camm Maguire <camm@intech.m.enhanced.com>  Thu, 30 Oct 2003 20:23:17 -0500
+ -- Camm Maguire <camm@enhanced.com>  Thu, 30 Oct 2003 20:23:17 -0500
 
 gclcvs (2.7.0-12) unstable; urgency=low
 
