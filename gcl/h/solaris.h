@@ -2,7 +2,7 @@
   
 #include "bsd.h"
 #ifdef i386
-/* #define DBEGIN 0x8000000 */
+#define DBEGIN 0x8000000
 #define LITTLE_END 
 #define NULL_OR_ON_C_STACK(x) (((x)==0) || ((unsigned long) x) < 0x8048000)
 #define IS_X86
