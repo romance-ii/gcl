@@ -30,6 +30,7 @@ License for more details.
 /* #include "include.h" */
 #include "ext_sym.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -140,7 +141,23 @@ round_up(address,n)
 
 int use_mmap;
 
+int
+get_section_number(name)
+     char *name;
+     
+{int k ;
+ for (k = 1; k < file_h->e_shnum;
+      k++)
+   {
+     if (!strcmp (section_names + SECTION_H(k).sh_name,
+		  name))
+       return k;
+   }
+/* fprintf(stderr,"could not find section %s\n", name); */
+ return 0;
+}
 
+int
 fasload(faslfile)
      object faslfile;
 {  FILE *fp;
@@ -289,7 +306,7 @@ fasload(faslfile)
      { FEerror(0,"Init address not found ");
      }
 
-   { int rel_stab_index = -1;
+   { 
      int j=0;
      for (j=1 ; j <  file_h->e_shnum ; j++)
        {
@@ -367,83 +384,12 @@ fasload(faslfile)
    vs_top = old_vs_top;
 
    if(symbol_value(sLAload_verboseA)!=Cnil)
-     printf("start address -T %x ",memory->cfd.cfd_start);
+     printf("start address -T %p ",memory->cfd.cfd_start);
    return(memory->cfd.cfd_size);
 
 #endif /* STAND */
 
  }
-
-
-get_section_number(name)
-     char *name;
-     
-{int k ;
- for (k = 1; k < file_h->e_shnum;
-      k++)
-   {
-     if (!strcmp (section_names + SECTION_H(k).sh_name,
-		  name))
-       return k;
-   }
-/* fprintf(stderr,"could not find section %s\n", name); */
- return 0;
-}
-
-static void
-relocate_symbols(sym,nsyms,nscns,init_address_ptr)
- Elf32_Sym *sym;
- int nsyms;
- int nscns;
- int *init_address_ptr; /* offset of init_address */
-{  int siz = symsize;
-  while (--nsyms >= 0)
-    { switch(ELF32_ST_BIND(sym->st_info))
-	{ case STB_LOCAL:
-	    if (sym->st_shndx == SHN_ABS || sym->st_shndx >= nscns) break;
-	
-	    if ((SECTION_H(sym->st_shndx).sh_flags & SHF_ALLOC) == 0)
-	      {
-		switch (SECTION_H(sym->st_shndx).sh_type)
-		  {
-		  case SHT_NULL:
-		  case SHT_PROGBITS:
-		  case SHT_NOTE:
-		  case SHT_STRTAB:
-		    /* These occur in Linux.
-		       Ignore symbols for such sections. */
-		    break;
-		  default:
-		    printf("[unknown rel secn %d type=%d]",
-			   sym->st_shndx,
-			   SECTION_H(sym->st_shndx).sh_type);
-		  }
-	      }
-	    else
-	      sym->st_value += (int) (start_address + section[sym->st_shndx].start); 
-	    break;
-	  case STB_GLOBAL:
-	 if (sym->st_shndx == SHN_UNDEF
-	     || sym->st_shndx == SHN_COMMON
-	     )
-	   {  set_symbol_address(sym,string_table + sym->st_name);
-	    }
-	    else
-	      if (sym->st_shndx == text_index &&
-		  bcmp("init_",string_table + sym->st_name,4) == 0)
-		{
-		  *init_address_ptr = sym->st_value;
-
-		  }
-	    else	
-	      {printf("[unknown global sym %s]",string_table + sym->st_name);}
-	    break;
-	  default:
-	    {printf("[unknown bind type %s]",ELF32_ST_BIND(sym->st_info));}
-	  }
-      sym = (void *)sym + siz;
-    }
-}
 
 
 /*  #ifdef HAVE_LIBBFD */
@@ -567,15 +513,16 @@ Elf32_Word sh_type;
 {
   char *where ;
   {
-    unsigned int new_value;
     unsigned int a,b,p,s,val;
 
     if (sh_type == SHT_RELA)
       a = reloc_info->r_addend;
     else if (sh_type == SHT_REL)
       a = 0;
-    else
+    else {
       FEerror("relocate() error: unknown sh_type in ELF object");
+      a=0;
+    }
     b = (unsigned int) the_start;
     s = symbol_table[ELF32_R_SYM(reloc_info->r_info)].st_value;
 /*      printf("Doing %s\n",string_table + symbol_table[ELF32_R_SYM(reloc_info->r_info)].st_name); */
@@ -689,6 +636,7 @@ Elf32_Word sh_type;
 
 #include "sfasli.c"
 
+void
 set_symbol_address(sym,string)
 Elf32_Sym *sym;
 char *string;
@@ -712,6 +660,61 @@ char *string;
   else{FEerror("symbol table not loaded",0,0);}
 }
 
+static void
+relocate_symbols(sym,nsyms,nscns,init_address_ptr)
+ Elf32_Sym *sym;
+ int nsyms;
+ int nscns;
+ int *init_address_ptr; /* offset of init_address */
+{  int siz = symsize;
+  while (--nsyms >= 0)
+    { switch(ELF32_ST_BIND(sym->st_info))
+	{ case STB_LOCAL:
+	    if (sym->st_shndx == SHN_ABS || sym->st_shndx >= nscns) break;
+	
+	    if ((SECTION_H(sym->st_shndx).sh_flags & SHF_ALLOC) == 0)
+	      {
+		switch (SECTION_H(sym->st_shndx).sh_type)
+		  {
+		  case SHT_NULL:
+		  case SHT_PROGBITS:
+		  case SHT_NOTE:
+		  case SHT_STRTAB:
+		    /* These occur in Linux.
+		       Ignore symbols for such sections. */
+		    break;
+		  default:
+		    printf("[unknown rel secn %d type=%d]",
+			   sym->st_shndx,
+			   SECTION_H(sym->st_shndx).sh_type);
+		  }
+	      }
+	    else
+	      sym->st_value += (int) (start_address + section[sym->st_shndx].start); 
+	    break;
+	  case STB_GLOBAL:
+	 if (sym->st_shndx == SHN_UNDEF
+	     || sym->st_shndx == SHN_COMMON
+	     )
+	   {  set_symbol_address(sym,string_table + sym->st_name);
+	    }
+	    else
+	      if (sym->st_shndx == text_index &&
+		  bcmp("init_",string_table + sym->st_name,4) == 0)
+		{
+		  *init_address_ptr = sym->st_value;
+
+		  }
+	    else	
+	      {printf("[unknown global sym %s]",string_table + sym->st_name);}
+	    break;
+	  default:
+	    {printf("[unknown bind type %d]",ELF32_ST_BIND(sym->st_info));}
+	  }
+      sym = (void *)sym + siz;
+    }
+}
+
 #define STRUCT_SYMENT Elf32_Sym
 
 /* dont try to add extra bss stuff here.   It is not really
@@ -719,6 +722,7 @@ common so other files can't reference it, so we really
 should use static.
 */
 
+int
 get_extra_bss(symbol_table,length,start,ptr,bsssize)
 int length,bsssize,start;
 STRUCT_SYMENT *symbol_table;

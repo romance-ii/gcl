@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "include.h"
 #include "page.h"
@@ -69,7 +70,7 @@ char *data_load_addr =0;
 
 
 #ifdef SPECIAL_RSYM
-
+void
 read_special_symbols(symfile)
 char *symfile;
 {FILE *symin;
@@ -100,7 +101,7 @@ char *symfile;
      (SYM_ADDRESS(c_table,i))=jj;
      SYM_STRING(c_table,i)=symbols;
  
-     while( *(symbols++) =   getc(symin)) 
+     while((*(symbols++) =   getc(symin)))
        {;}
 /*     dprintf( name %s ,  SYM_STRING(c_table,i));
      dprintf( addr %d , jj);
@@ -116,8 +117,8 @@ char *symfile;
  if (symin) fclose(symin);
 }
 
-node_compare(node1,node2)
-char *node1, *node2;
+int
+node_compare(const void *node1,const void *node2)
 { return(strcmp( ((struct node *)node1)->string,
 	         ((struct node *)node2)->string));}
 

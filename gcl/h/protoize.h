@@ -1756,3 +1756,11 @@ Ldigit_char_p(void);
 
 void
 Lwrite_byte(void);
+
+#ifdef SPECIAL_RSYM
+void
+read_special_symbols(char *);
+
+int
+node_compare(const void *,const void *);
+#endif

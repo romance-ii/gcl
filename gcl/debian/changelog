@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-20) unstable; urgency=high
+
+  * Cleanups for --disable-bfd option
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 24 Jul 2002 15:05:28 -0400
+
 gcl (2.5.0.cvs20020625-19) unstable; urgency=high
 
   * 64bit fixes

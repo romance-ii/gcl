@@ -85,28 +85,30 @@ build_symbol_table(void) {
   printf("Building symbol table for %s ..\n",kcl_self);fflush(stdout);
 
 #ifdef SPECIAL_RSYM
+  {
 
-  sprintf(tmpfile1,"rsym%d",getpid());
+    char tmpfile1[80],command[300];
+    snprintf(tmpfile1,sizeof(tmpfile1),"rsym%d",getpid());
 #ifndef STAND
-  coerce_to_filename(symbol_value(sSAsystem_directoryA),
-		     system_directory);
+    coerce_to_filename(symbol_value(sSAsystem_directoryA),
+		       system_directory);
 #endif
 #ifndef RSYM_COMMAND
-  sprintf(command,"%srsym %s %s",system_directory,kcl_self,tmpfile1);
+    snprintf(command,sizeof(command),"%srsym %s %s",system_directory,kcl_self,tmpfile1);
 #else
-  RSYM_COMMAND(command,system_directory,kcl_self,tmpfile1);
+    RSYM_COMMAND(command,system_directory,kcl_self,tmpfile1);
 #endif   
-  if (system(command) != 0)
+    if (system(command) != 0)
 #ifdef STAND
-    FEerror("The rsym command %s failed .",1,command);
+      FEerror("The rsym command %s failed .",1,command);
 #else
     FEerror("The rsym command ~a failed .",1,
 	    make_simple_string(command));
 #endif
-  read_special_symbols(tmpfile1);
-  unlink(tmpfile1);
-  qsort((char*)(c_table.ptable),(int)(c_table.length),sizeof(struct node),node_compare);
-
+    read_special_symbols(tmpfile1);
+    unlink(tmpfile1);
+    qsort((char*)(c_table.ptable),(int)(c_table.length),sizeof(struct node),node_compare);
+  }
 #else /* special_rsym */
 
   build_symbol_table_bfd();
