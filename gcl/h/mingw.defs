@@ -11,8 +11,16 @@ ODIR_DEBUG   = -g
 
 CROSS_PREFIX =
 
-CFLAGS       = -Wall -fwritable-strings -DVOL=volatile -O2 -fsigned-char -I$(GCLDIR)/o 
-FINAL_CFLAGS = -Wall -fwritable-strings -DVOL=volatile -O2 -fsigned-char
+# MPICHDIR     = "c:/Program Files/Argonne National Lab/MPICH.NT.1.2.3/SDK.gcc"
+# MPIDIR       = $(GCLDIR)/gcl-mpi
+# MPILSP       = $(MPIDIR)/mpi_glue.lsp
+# MPIOBJS      = $(MPIDIR)/mpi_glue.o
+# LIBS        += -L$(MPICHDIR)/lib -lmpich
+
+CFLAGS       = -Wall -fwritable-strings -DVOL=volatile -fsigned-char -I$(GCLDIR)/o 
+FINAL_CFLAGS = -Wall -fwritable-strings -DVOL=volatile -fsigned-char
+O3FLAGS      = -O2 -fomit-frame-pointer
+O2FLAGS      = -O
 
 #CC           = ${CROSS_PREFIX}gcc
 
