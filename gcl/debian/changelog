@@ -8,8 +8,12 @@ gclcvs (2.7.0-31) unstable; urgency=low
   * Build support for gmp_wrappers
   * Support for gmp_wrappers in alloc_relblock/alloc_contblock;Support
     for GCL_GPROF_START define in gprof functions
+  * dynsysgmp on by default; configure backs off to local gmp configure
+    and build automatically if needed either because gmp not present or
+    patched symbols are needed; autodetect and set the _start symbol
+    when using gprof
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 12 Aug 2004 16:34:47 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 12 Aug 2004 16:39:32 +0000
 
 gclcvs (2.7.0-30) unstable; urgency=high
 

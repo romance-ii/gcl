@@ -249,3 +249,4 @@ SGC is enabled.  */
 #undef HOST_CPU
 #undef HOST_KERNEL
 #undef HOST_SYSTEM
+#undef GCL_GPROF_START

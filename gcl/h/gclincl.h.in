@@ -126,8 +126,8 @@
 #else
 #include <math.h>
 #define ISNORMAL(a) ((sizeof (a) == sizeof (float)) ? \
-		     gcl_isnormal_float(a) : \
-		     gcl_isnormal_double(a))
+       gcl_isnormal_float(a) : \
+       gcl_isnormal_double(a))
 #endif
 #endif
 #endif
@@ -203,6 +203,7 @@
 #undef HOST_CPU
 #undef HOST_KERNEL
 #undef HOST_SYSTEM
+#undef GCL_GPROF_START
 
 /* The number of bytes in a long.  */
 #undef SIZEOF_LONG

@@ -316,7 +316,7 @@ AC_ARG_ENABLE(pic,
 
 AC_ARG_ENABLE(dynsysgmp,
 	[ --enable-dynsysgmp will link against the system libgmp3 overriding certain functions with patched versions from the local source ]
-	,,enable_dynsysgmp="no")
+	,,enable_dynsysgmp="yes")
 
 load_opt="0"
 if test "$enable_dlopen" = "yes" ; then
@@ -434,11 +434,26 @@ case "$use" in
 	TFPFLAG="-fomit-frame-pointer";;
 esac
 
+AC_CHECK_PROGS(AWK,gawk nawk awk,"")
+
 if test "$enable_gprof" = "yes" ; then
 	TCFLAGS="$TCFLAGS -pg"
 	TLIBS="$TLIBS -pg"
 	TFPFLAG=""
 	AC_DEFINE(GCL_GPROF)
+	AC_MSG_CHECKING(for text start)
+	echo 'int main () {return(0);}' >foo.c
+	$CC foo.c -o foo
+	GCL_GPROF_START=`nm foo | $AWK  '/  *T  *_[_]*start$/ {print $NF}'`
+	rm -f foo.c foo
+	AC_MSG_RESULT($GCL_GPROF_START)
+	AC_DEFINE_UNQUOTED(GCL_GPROF_START,$GCL_GPROF_START)
+	case "$use" in	
+	  arm*)	
+	#FIXME report and remove this when done
+		AC_MSG_RESULT(Reducing optimization on profiling arm build to workaround gcc bug)
+		enable_debug=yes;;
+	esac
 fi
 
 if test "$enable_debug" = "yes" ; then
@@ -456,8 +471,6 @@ else
 #	TO3FLAGS="-O3 $TFPFLAG"
 	TO2FLAGS="-O"
 fi
-
-AC_CHECK_PROGS(AWK,gawk nawk awk,"")
 
 # gcc on ppc cannot compile our new_init.c with full opts --CM
 TONIFLAGS=""
@@ -535,38 +548,10 @@ fi
 
 rm -f makedefsafter
 
-MP_INLCUDE=""
+MP_INCLUDE=""
 if test $use_gmp = yes ; then
 
- AC_MSG_CHECKING([use_gmp=yes, doing configure in gmp directory])
- echo
- echo "#"
- echo "#"
- echo "# -------------------"
- echo "# Subconfigure of GMP"
- echo "#"
- echo "#"
-
- if test "$enable_oldgmp" = "yes" ; then
-	GMPDIR=gmp
- else
-	GMPDIR=gmp3
- fi
-
- if test "$use_common_binary" = "yes"; then
-   cd $GMPDIR && ./configure --host=$host && cd ..
- else
-   cd $GMPDIR && ./configure && cd ..
- fi
-#MY_SUBDIRS="$MY_SUBDIRS $GMPDIR" 
-
- echo "#"
- echo "#"
- echo "#"
- echo "# Subconfigure of GMP done"
- echo "# ------------------------"
- echo "#"
-
+ GMPDIR=gmp3
  PATCHED_SYMBOLS=""
  if test "$enable_dynsysgmp" = "yes" ; then
 	AC_CHECK_HEADER(gmp.h,
@@ -580,8 +565,10 @@ if test $use_gmp = yes ; then
 					return -1;
 				    #endif
 				    }],
-				MPFILES=$GMPDIR/mpn/mul_n.o
-				PATCHED_SYMBOLS=__gmpn_toom3_mul_n
+#				MPFILES=$GMPDIR/mpn/mul_n.o
+#				PATCHED_SYMBOLS=__gmpn_toom3_mul_n
+				MPFILES=
+				PATCHED_SYMBOLS=
 				if test "$use" = "m68k-linux" ; then
 					MPFILES="$MPFILES $GMPDIR/mpn/lshift.o $GMPDIR/mpn/rshift.o"
 					PATCHED_SYMBOLS="$PATCHED_SYMBOLS __gmpn_lshift __gmpn_rshift"
@@ -596,11 +583,44 @@ if test $use_gmp = yes ; then
 		echo "Cannot use dynamic gmp lib" ,)
 fi
 
+NEED_LOCAL_GMP=''
 if test "$MP_INCLUDE" = "" ; then			
+	NEED_LOCAL_GMP=1;
+fi
+if test "$PATCHED_SYMBOLS" != "" ; then			
+	NEED_LOCAL_GMP=1;
+fi
 
-	cp $GMPDIR/gmp.h h/gmp.h
-	MP_INCLUDE=h/gmp.h
-	MPFILES=gmp_all
+if test "$NEED_LOCAL_GMP" != "" ; then			
+
+	 AC_MSG_CHECKING([use_gmp=yes, doing configure in gmp directory])
+	 echo
+	 echo "#"
+	 echo "#"
+	 echo "# -------------------"
+	 echo "# Subconfigure of GMP"
+	 echo "#"
+	 echo "#"
+
+	 if test "$use_common_binary" = "yes"; then
+	   cd $GMPDIR && ./configure --host=$host && cd ..
+	 else
+	   cd $GMPDIR && ./configure && cd ..
+	 fi
+	#MY_SUBDIRS="$MY_SUBDIRS $GMPDIR" 
+
+	 echo "#"
+	 echo "#"
+	 echo "#"
+	 echo "# Subconfigure of GMP done"
+	 echo "# ------------------------"
+	 echo "#"
+
+	if test "$MP_INCLUDE" = "" ; then
+		cp $GMPDIR/gmp.h h/gmp.h
+		MP_INCLUDE=h/gmp.h
+		MPFILES=gmp_all
+	fi
 
 fi
 
@@ -771,13 +791,13 @@ if test "$enable_statsysbfd" = "yes" || test "$enable_dynsysbfd" = "yes" ; then
 		MP=`$CC [ -Wl,-M ] -static -o foo foo.c -lbfd -liberty 2>&1 | grep -v : | tr '()' '\012\012' | $AWK '{print $NF}' | sort | uniq`
 		rm -f foo.c foo
 		if echo $MP | tr ' ' '\012' | grep -q libbfd.a ; then
-		   TLIBS="$TLIBS `echo $MP | tr ' ' '\012' | grep libbfd.a`"
+		   TLIBS="$TLIBS `echo $MP | tr ' ' '\012' | grep libbfd.a | $AWK '{i=split($1,A,"/");for (j=1;j<=i;j++) if (j>1 && A[[j]]=="..") {j--;i-=2;for (k=j;k<=i;k++) A[[k]]=A[[k+2]];j--;}} END {for (j=1;j<=i;j++) printf("%s%s",A[[j]],j!=i ? "/" : "")}'`"
 		else
 		   echo Guessing path to libbfd.a due to gcc bug
 		   TLIBS="$TLIBS /usr/lib/libbfd.a"
 		fi   
 		if echo $MP | tr ' ' '\012' | grep -q libiberty.a ; then
-		   TLIBS="$TLIBS `echo $MP | tr ' ' '\012' | grep libiberty.a`"
+		   TLIBS="$TLIBS `echo $MP | tr ' ' '\012' | grep libiberty.a | $AWK '{i=split($1,A,"/");for (j=1;j<=i;j++) if (j>1 && A[[j]]=="..") {j--;i-=2;for (k=j;k<=i;k++) A[[k]]=A[[k+2]];j--;}} END {for (j=1;j<=i;j++) printf("%s%s",A[[j]],j!=i ? "/" : "")}'`"
 		else
 		   echo Guessing path to libiberty.a due to gcc bug
 		   TLIBS="$TLIBS /usr/lib/libiberty.a"
