@@ -2101,6 +2101,19 @@ LFD(Lfile_length)()
 		vs_base[0] = make_fixnum(i);
 }
 
+LFD(siLfile_column)()
+{
+	int i;
+
+	check_arg(1);
+	check_type_stream(&vs_base[0]);
+	i = file_column(vs_base[0]);
+	if (i < 0)
+		FEwrong_type_argument(sLfile_stream,vs_base[0]);
+	else
+		vs_base[0] = make_fixnum(i);
+}
+
 extern object truename();
 
 DEFVAR("*COLLECT-BINARY-MODULES*",sSAcollect_binary_modulesA,SI,sLnil,"");
@@ -2780,6 +2793,7 @@ gcl_init_file_function()
 
 	make_function("FILE-POSITION", Lfile_position);
 	make_function("FILE-LENGTH", Lfile_length);
+	make_si_function("FILE-COLUMN", siLfile_column);
 	make_function("READ-SEQUENCE", Lread_sequence);
 	make_function("WRITE-SEQUENCE", Lwrite_sequence);
 

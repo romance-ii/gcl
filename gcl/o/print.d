@@ -45,8 +45,17 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 static int
 get_line_length(void);
 
+static void
+per_line_prefix(object strm) {
+  int i;
+  if (type_of(sSAprint_line_prefixA->s.s_dbind)==t_string)
+    for (i=0;i<sSAprint_line_prefixA->s.s_dbind->st.st_fillp;i++)
+      writec_stream(sSAprint_line_prefixA->s.s_dbind->st.st_self[i],strm);
+}
+
+
 #ifndef WRITEC_NEWLINE
-#define  WRITEC_NEWLINE(strm) (writec_stream('\n',strm))
+#define  WRITEC_NEWLINE(strm) (writec_stream('\n',strm),per_line_prefix(strm))
 #endif
 
 #define	to_be_escaped(c) \
@@ -103,10 +112,15 @@ int c;
 	qc++;
 }
 
+DEFVAR("*PRINT-LINE-PREFIX*",sSAprint_line_prefixA,SI,Cnil,"");
+
 static void
 flush_queue(int force)
 {
 	int c, i, j, k, l, i0;
+
+	if (!file_position(PRINTstream))
+	  per_line_prefix(PRINTstream);
 
 BEGIN:
 	while (qc > 0) {
@@ -210,12 +224,6 @@ PUT_INDENT:
 	--qc;
 	
         WRITEC_NEWLINE(PRINTstream);
-	{ extern object per_line_prefix_string;
-	int i;
-	if (per_line_prefix_string)
-	  for (i=0;i<per_line_prefix_string->st.st_fillp;i++)
-	    writec_stream(per_line_prefix_string->st.st_self[i],PRINTstream);
-	}
 	for (i = indent_stack[isp];  i > 0;  --i)
 		writec_stream(' ', PRINTstream);
 	iisp = isp;
@@ -689,6 +697,15 @@ int level;
 
 	cs_check(x);
 
+	if (type_of(sSAprin_levelA->s.s_dbind)==t_fixnum &&
+	    fix(sSAprin_levelA->s.s_dbind)>level)
+	  level=fix(sSAprin_levelA->s.s_dbind);
+
+	if (PRINTlevel >= 0 && level >= PRINTlevel) {
+	  write_ch('#');
+	  return;
+	}
+
 	if (x == OBJNULL) {
 		write_str("#<OBJNULL>");
 		return;
@@ -893,12 +910,12 @@ int level;
 			    if (x == *vp) {
 				if (vp[1] != Cnil) {
 				    write_ch('#');
-				    write_decimal((vp-PRINTvs_top)/2);
+				    write_decimal((vp-PRINTvs_top)/2+1);
 				    write_ch('#');
 				    return;
 				} else {
 				    write_ch('#');
-				    write_decimal((vp-PRINTvs_top)/2);
+				    write_decimal((vp-PRINTvs_top)/2+1);
 				    write_ch('=');
 				    vp[1] = Ct;
 				}
@@ -1000,12 +1017,12 @@ int level;
 			    if (x == *vp) {
 				if (vp[1] != Cnil) {
 				    write_ch('#');
-				    write_decimal((vp-PRINTvs_top)/2);
+				    write_decimal((vp-PRINTvs_top)/2+1);
 				    write_ch('#');
 				    return;
 				} else {
 				    write_ch('#');
-				    write_decimal((vp-PRINTvs_top)/2);
+				    write_decimal((vp-PRINTvs_top)/2+1);
 				    write_ch('=');
 				    vp[1] = Ct;
 				    break;
@@ -1091,12 +1108,12 @@ int level;
 			    if (x == *vp) {
 				if (vp[1] != Cnil) {
 				    write_ch('#');
-				    write_decimal((vp-PRINTvs_top)/2);
+				    write_decimal((vp-PRINTvs_top)/2+1);
 				    write_ch('#');
 				    return;
 				} else {
 				    write_ch('#');
-				    write_decimal((vp-PRINTvs_top)/2);
+				    write_decimal((vp-PRINTvs_top)/2+1);
 				    write_ch('=');
 				    vp[1] = Ct;
 				    break;
@@ -1177,12 +1194,12 @@ int level;
 			    if (x == *vp) {
 				if (vp[1] != Cnil) {
 				    write_ch('#');
-				    write_decimal((vp-PRINTvs_top)/2);
+				    write_decimal((vp-PRINTvs_top)/2+1);
 				    write_ch('#');
 				    return;
 				} else {
 				    write_ch('#');
-				    write_decimal((vp-PRINTvs_top)/2);
+				    write_decimal((vp-PRINTvs_top)/2+1);
 				    write_ch('=');
 				    vp[1] = Ct;
 				    break;
@@ -1239,7 +1256,7 @@ int level;
 			    if (x == *vp) {
 				if (vp[1] != Cnil) {
 				    write_str(" . #");
-				    write_decimal((vp-PRINTvs_top)/2);
+				    write_decimal((vp-PRINTvs_top)/2+1);
 				    write_ch('#');
 				    goto RIGHT_PAREN;
 				} else {
@@ -1410,12 +1427,12 @@ int level;
 			    if (x == *vp) {
 				if (vp[1] != Cnil) {
 				    write_ch('#');
-				    write_decimal((vp-PRINTvs_top)/2);
+				    write_decimal((vp-PRINTvs_top)/2+1);
 				    write_ch('#');
 				    return;
 				} else {
 				    write_ch('#');
-				    write_decimal((vp-PRINTvs_top)/2);
+				    write_decimal((vp-PRINTvs_top)/2+1);
 				    write_ch('=');
 				    vp[1] = Ct;
 				    break;
@@ -1980,6 +1997,7 @@ DEF_ORDINARY("PPRINT-DISPATCH",sKpprint_dispatch,KEYWORD,"");
 DEF_ORDINARY("LINES",sKlines,KEYWORD,"");
 DEF_ORDINARY("RIGHT-MARGIN",sKright_margin,KEYWORD,"");
 DEF_ORDINARY("MISER-WIDTH",sKmiser_width,KEYWORD,"");
+DEFVAR("*PRIN-LEVEL*",sSAprin_levelA,SI,make_fixnum(0),"");
 DEFVAR("*PRINT-ESCAPE*",sLAprint_escapeA,LISP,Ct,"");
 DEFVAR("*PRINT-READABLY*",sLAprint_readablyA,LISP,Ct,"");
 DEFVAR("*PRINT-PRETTY*",sLAprint_prettyA,LISP,Ct,"");

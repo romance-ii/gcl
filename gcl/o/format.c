@@ -132,7 +132,6 @@ fmt_decimal(bool, bool);
 
 
 object sSAindent_formatted_outputA;
-object per_line_prefix_string=OBJNULL;
 
 #define	ctl_string	(fmt_string->st.st_self + ctl_origin)
 
@@ -2138,11 +2137,11 @@ fmt_justification(volatile bool colon, bool atsign)
 			    --j0;
 			if (ctl_string[j0] != '~')
 			    fmt_error("~; expected");
-			per_line_prefix_string=fields[n-1]->sm.sm_object0;
+			sSAprint_line_prefixA->s.s_dbind=fields[n-1]->sm.sm_object0;
 		    }
 		}
 	}
-	per_line_prefix_string=OBJNULL;
+	sSAprint_line_prefixA->s.s_dbind=Cnil;
 	for (i = special, l = 0;  i < n;  i++)
 		l += fields[i]->sm.sm_object0->st.st_fillp;
 	m = n - 1 - special;
