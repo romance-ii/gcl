@@ -194,6 +194,10 @@ fasload(object faslfile) {
   static union lispunion dum;
   static struct bfd_link_callbacks link_callbacks;
   static struct bfd_link_order link_order;
+  char entry_name[7]="_init_",*entry_name_ptr;
+#if defined(DARWIN)
+  asection *bi;
+#endif
   
   if (!nbfd) {
 
@@ -231,6 +235,11 @@ fasload(object faslfile) {
   if ((myerr=bfd_get_error()) && myerr!=3)
     FEerror("Unknown bfd error code on check_format",0);
   bfd_set_error(0);
+
+#if defined(DARWIN)
+  if ((bi = bfd_mach_o_craft_fp_branch_islands (b)) == NULL)
+    FEerror ("Could not craft fp register preservation stubs",0);
+#endif
 
   current=NULL;
   for (s=b->sections;s;s=s->next) {
@@ -281,11 +290,15 @@ fasload(object faslfile) {
   q=(asymbol **)alloca(u);
   if ((v=bfd_canonicalize_symtab(b,q))<0)
     FEerror("cannot canonicalize symtab",0);
+
+  *entry_name=bfd_get_symbol_leading_char(b);
+  entry_name_ptr=*entry_name ? entry_name : entry_name+1;
+
   for (u=0;u<v;u++) {
 
     struct bfd_link_hash_entry *h;
 
-    if (!strncmp("init_",q[u]->name,5)) {
+    if (!strncmp(entry_name_ptr,q[u]->name,5)) {
       init_address=q[u]->value;
       continue;
     }
