@@ -10,7 +10,7 @@ static void L1()
 	vs_reserve(VM1);
 	check_arg(0);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= VV[0];
 	vs_top=(vs_base=base+0)+1;

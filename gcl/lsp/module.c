@@ -8,7 +8,7 @@ static object LI1(V2)
 
 object V2;
 {	 VMB1 VMS1 VMV1
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= coerce_to_string((V2));
 	base[1]= symbol_value(VV[0]);
@@ -103,7 +103,7 @@ static object LI3(V13,V14)
 
 register object V13;object V14;
 {	 VMB3 VMS3 VMV3
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V15= (V14);
 	if((V15!= VV[15]))goto T32;
@@ -167,7 +167,7 @@ static object LI4(V25)
 
 register object V25;
 {	 VMB4 VMS4 VMV4
-goto TTL;
+	goto TTL;
 TTL:;
 	if(endp_prop((V25))){
 	goto T47;}

@@ -76,12 +76,13 @@ DEFUN_NEW("ALLOCATE-BIGGER-FIXNUM-RANGE",object,fSallocate_bigger_fixnum_range,
 
 
 object
-make_fixnum(long i)
+make_fixnum1(long i)
 {
 	object x;
 
-	if (-SMALL_FIXNUM_LIMIT <= i && i < SMALL_FIXNUM_LIMIT)
-		return(small_fixnum(i));
+	/* In a macro now */
+/* 	if (-SMALL_FIXNUM_LIMIT <= i && i < SMALL_FIXNUM_LIMIT) */
+/* 		return(small_fixnum(i)); */
 #ifdef BIGGER_FIXNUM_RANGE
 	if (bigger_fixnum_table)
 	  { if (i >= bigger_fixnums.min

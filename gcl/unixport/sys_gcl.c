@@ -7,16 +7,10 @@
 
 extern object user_init();
 
+
 void init_or_load1 (void (*)(void),char *);
 #define init_or_load(fn,file) do {extern void fn(void); init_or_load1(fn,file);} \
   while(0)
-
-static void
-load1(x)
-     char *x;
-{printf("loading %s\n",x);
- fflush(stdout);
- load(x);}
 
 #define mjoin(a,b) a ## b
 #define Mjoin(a,b) mjoin(a,b)
@@ -35,6 +29,22 @@ load1(x)
   if (unlink(#a ".o"))\
     error("Cannot unlink " #a ".o\n");\
 } while(0)
+
+#define ar_check_init(a,b) do {\
+   object t;\
+   \
+   for (t=b->s.s_dbind;!endp(t) && type_of(t->c.c_car)==t_string && strcmp(#a,t->c.c_car->st.st_self);t=t->c.c_cdr);\
+   if (endp(t))\
+     ar_init(a);\
+} while(0)
+
+
+static void
+load1(x)
+     char *x;
+{printf("loading %s\n",x);
+ fflush(stdout);
+ load(x);}
 
 #define lsp_init(a) do {\
    char b[200];\
@@ -63,15 +73,6 @@ init_init()
   lsp_init("../lsp/autoload.lsp");
 
 }
-
-#define ar_check_init(a,b) do {\
-   object t;\
-   \
-   for (t=b->s.s_dbind;!endp(t) && type_of(t->c.c_car)==t_string && strcmp(#a,t->c.c_car->st.st_self);t=t->c.c_cdr);\
-   if (endp(t))\
-     ar_init(a);\
-} while(0)
-
 
 void
 init_system(object no_init)
@@ -134,9 +135,12 @@ init_system(object no_init)
   ar_check_init(cmpvs,no_init);
   ar_check_init(cmpwt,no_init);
 
-/*    build_symbol_table(); */
-	     
-  /*   sLApackageA->s.s_dbind = user_package; */
-  /*   user_init(); */
   
+}
+
+int
+init_cmp_anon(void) {
+
+  return 1;
+
 }

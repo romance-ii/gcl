@@ -16,7 +16,7 @@ static void L1()
 	V2=(base[1]);
 	V3=(base[2]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V4;
 	V4= (VFUN_NARGS=5,(*(LnkLI88))(small_fixnum(10),VV[0],VV[1],VV[2],small_fixnum(0)));
@@ -194,7 +194,7 @@ static void L3()
 	V14=(base[0]);
 	V15=fix(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register long V16;
 	register long V17;
@@ -253,7 +253,7 @@ static void L4()
 	check_arg(1);
 	V23=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register long V24;
 	object V25;
@@ -358,7 +358,7 @@ static void L5()
 	check_arg(1);
 	V42=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register long V43;
 	long V44;
@@ -445,7 +445,7 @@ static void L6()
 	V50=(base[0]);
 	V51=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[2]= (V50);
 	base[3]= make_fixnum((long)(*(LnkLI95))(fix((V51))));
@@ -468,7 +468,7 @@ static void L7()
 	V52=(base[0]);
 	V53=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register long V54;
 	register object V55;
@@ -538,7 +538,7 @@ static void L8()
 	vs_reserve(VM8);
 	check_arg(0);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;{object V59;
 	V59= caddr(symbol_value(VV[20]));
 	if(V59==Cnil)goto T200;
@@ -598,7 +598,7 @@ static void L9()
 	check_arg(1);
 	V66=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V67;
 	register object V68;
@@ -684,7 +684,7 @@ static void L10()
 	V74=(base[0]);
 	V75=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V76;
 	V76= (V74);
@@ -743,7 +743,7 @@ static void L11()
 	V78=(base[0]);
 	V79=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register long V80;
 	V80= 0;
@@ -834,7 +834,7 @@ static void L13()
 	check_arg(1);
 	V91=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[1]= number_plus(car(cadr(cddddr((V91)))),cadr((V91)));
 	vs_top=(vs_base=base+1)+1;
@@ -852,7 +852,7 @@ static void L14()
 	check_arg(1);
 	V92=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V93;
 	register object V94;
@@ -991,7 +991,7 @@ static void L15()
 	V102=(base[0]);
 	V103=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	if(!(eql((V103),VV[42]))){
 	goto T353;}
@@ -1020,7 +1020,7 @@ static void L16()
 	V104=(base[0]);
 	V105=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V106;
 	V106= (V104);
@@ -1099,7 +1099,7 @@ static void L18()
 	check_arg(1);
 	V112=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[1]= (V112);
 	base[2]= car(symbol_value(VV[20]));
@@ -1137,7 +1137,7 @@ static void L19()
 	check_arg(1);
 	V115=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	if(symbol_value(VV[43])==Cnil){
 	base[1]= Cnil;
@@ -1186,7 +1186,7 @@ static void L20()
 	check_arg(1);
 	V116=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[1]= (V116);
 	vs_top=(vs_base=base+1)+1;
@@ -1217,7 +1217,7 @@ static void L21()
 	check_arg(1);
 	V117=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V118;
 	register object V119;
@@ -1276,7 +1276,7 @@ static void L22()
 	check_arg(1);
 	V123=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V124;
 	V124= small_fixnum(0);
@@ -1613,7 +1613,7 @@ static void L24()
 	V162=(base[0]);
 	V163=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V164;
 	register object V165;
@@ -1871,7 +1871,7 @@ static void L26()
 	check_arg(1);
 	V188=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V189;
 	base[2]= (V188);
@@ -2286,7 +2286,7 @@ static void L28()
 	vs_reserve(VM28);
 	check_arg(0);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[1]= VV[79];
 	vs_base=vs_top;
@@ -2309,7 +2309,7 @@ static void L29()
 	vs_reserve(VM29);
 	check_arg(1);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	if(!(type_of(base[0])==t_symbol)){
 	goto T877;}

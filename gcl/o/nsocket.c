@@ -341,7 +341,7 @@ DEFUN_NEW("GETPEERNAME",object,fSgetpeername,SI,1,1,NONE,OO,OO,OO,OO,(object soc
             if (hostEntPtr != (struct hostent *) NULL) 
                host = make_simple_string(hostEntPtr->h_name);
             else host = address;
-	    return list(3,address,host,make_fixnum(ntohs(peername.sin_port)));
+	    return list(3,address,host,small_fixnum(ntohs(peername.sin_port)));
  } else {
    return Cnil;
  }
@@ -364,7 +364,7 @@ DEFUN_NEW("GETSOCKNAME",object,fSgetsockname,SI,1,1,NONE,OO,OO,OO,OO,(object soc
   if (hostEntPtr != (struct hostent *) NULL)
    host = make_simple_string(hostEntPtr->h_name);
   else host=address;
-  return list(3,address,host,make_fixnum(ntohs(sockname.sin_port)));
+  return list(3,address,host,small_fixnum(ntohs(sockname.sin_port)));
  } else {
    return Cnil;
  }
@@ -412,7 +412,7 @@ DEFUN_NEW("SET-BLOCKING",object,fSset_blocking,SI,2,2,NONE,OO,OO,OO,OO,(object s
 	     Zero result means both ok.  (ie succeed)
 	     */       
 	  
-	  return make_fixnum(x1 < 0 || x2 < 0 ? -2 : x1 > 0  ? x1 : x2);
+	  return make_fixnum((x1 < 0 || x2 < 0 ? -2 : x1 > 0  ? x1 : x2));
 	}
       }
 	

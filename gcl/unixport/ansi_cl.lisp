@@ -135,7 +135,7 @@ unbound-slot-instance
 upgraded-complex-part-type wild-pathname-p with-compilation-unit
 with-condition-restarts with-package-iterator with-standard-io-syntax
 write-sequence ))
-	(import (list s) "COMMON-LISP"))
+	(shadowing-import (list s) "COMMON-LISP"))
 
 (use-package "ANSI-LOOP" "COMMON-LISP")
 (use-package "ANSI-LOOP" "USER")
@@ -156,6 +156,4 @@ write-sequence ))
 
 (rename-package 'common-lisp 'common-lisp '(cl))
 (rename-package 'user 'common-lisp-user '(cl-user user))
-
-(si::save-system "saved_ansi_gcl")
 

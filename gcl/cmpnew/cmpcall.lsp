@@ -412,7 +412,7 @@
 	       ))
       ((eql type 'proclaimed-closure)
        (wt-nl1 "static void LnkT" num
-	       "(ptr) object *ptr;{ call_or_link_closure(VV[" num "],(void **)&Lnk" num",&Lclptr" num");}"))
+	       "(ptr) object *ptr;{ call_or_link_closure(VV[" num "],(void **)&Lnk" num",(void **)&Lclptr" num");}"))
       (t
        ;;change later to include above.
        ;;(setq type (cdr (assoc type '((t . "object")(:btpr . "bptr")))))

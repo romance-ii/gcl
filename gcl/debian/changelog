@@ -16,8 +16,26 @@ gcl (2.5.0.cvs20020625-76) unstable; urgency=low
   * Invalid variable is a program error, not a symbol is a type error
   * Attempt at uninterned symbol support as slot names
   * defstruct changes for ANSI conc-name handling
+  * Rework ansi build to follow existing pattern for traditional image,
+    enabling preliminary ansi support on dlopen systems
+  * Fix broken mingw probe in main makefile
+  * Rename pcl and clcs files to avoid init name conflict on dlopen
+    systems
+  * sys-proclaim for clcs
+  * Compiler goto indentation
+  * Compiler pointer cast in call_or_link_closure
+  * *keep-gaz* compiler variable to save anonymously generated lisp
+  * si::init-cmp-anon function to initialize anonymously generated and
+    compiled lisp from .text section of running executable
+  * Debian/rules builds and ships both images
+  * Check for small fixnum in make_fixnum macro
+  * Pass real integers to array functions to minimize fixnum garbage
+  * Larger SHARP_EQ_CONTEXT_SIZE in read.d
+  * Shadowing-import instead of import dummy symbols into common-lisp in
+    ansi_cl.lisp
+  * Rework object definition in makefiles
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 17 Feb 2003 23:06:24 -0500
+ -- Camm Maguire <camm@enhanced.com>  Wed, 26 Feb 2003 16:59:08 -0500
 
 gcl (2.5.0.cvs20020625-75) unstable; urgency=low
 

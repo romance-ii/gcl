@@ -2030,7 +2030,8 @@ static object
 set_line_length(n)
 int n;
 {
-  return make_fixnum(line_length = n);
+  line_length=n;
+  return make_fixnum(line_length);
 }
 
 DEFVAR("*PRINT-NANS*",sSAprint_nansA,SI,Cnil,"");

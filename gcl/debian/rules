@@ -23,9 +23,6 @@ endif
 ifeq ($(ARCHT),ia64)
 MCC:=gcc-3.2
 endif
-#ifeq ($(ARCHT),m68k)
-#MCC:=gcc-2.95
-#endif
 
 #RELOC=locbfd
 RELOC=statsysbfd
@@ -46,17 +43,16 @@ RELOC=dlopen
 endif
 
 GMP=--enable-dynsysgmp
-#ifeq ($(ARCHT),m68k)
-#GMP=
-#endif
 
 DEBUG=
 ifeq ($(ARCHT),hppa)
 DEBUG=--enable-debug
 endif
 
-configure: configure-stamp
-configure-stamp:
+configure:
+
+configure-%-stamp:
+
 	dh_testdir
 
 	if [ /usr/share/misc/config.guess -nt config.guess ] ; then \
@@ -72,25 +68,40 @@ configure-stamp:
 		cp /usr/share/misc/config.sub gmp3/configfsf.sub;\
 	fi
 	if [ configure.in -nt configure ]; then autoconf; fi
-	chmod -R +x gmp3/*
-	[ "$(ARCHT)" != "i386" ] || ( cd gmp3 && CC=$(MCC) ./configure --build=i486-unknown-linux-gnu )
-	CC=$(MCC) ./configure --disable-statsysbfd --enable-$(RELOC) $(GMP) $(DEBUG) --prefix=/usr --mandir=\$${prefix}/share/man --enable-infodir=\$${prefix}/share/info
-	[ "$(ARCHT)" != "ia64" ] || ( cd o && $(MCC) -c -Wall -DVOL=volatile -I. -fsigned-char -fwritable-strings -pipe -O -fomit-frame-pointer -I../h -I../gcl-tk num_log.c  )
-	touch configure-stamp
 
-build: build-stamp
-build-stamp: configure-stamp
+	chmod -R +x gmp3/*
+
+	[ "$(ARCHT)" != "i386" ] || ( cd gmp3 && CC=$(MCC) ./configure --build=i486-unknown-linux-gnu )
+
+	[ "$*" != "ansi" ] || ANSI="--enable-ansi" ; \
+	CC=$(MCC) ./configure \
+		--disable-statsysbfd \
+		--enable-$(RELOC) \
+		$(GMP) \
+		$(DEBUG) \
+		$$ANSI \
+		--prefix=/usr \
+		--mandir=\$${prefix}/share/man \
+		--enable-infodir=\$${prefix}/share/info
+
+	[ "$(ARCHT)" != "ia64" ] || ( cd o && $(MCC) -c -Wall -DVOL=volatile -I. -fsigned-char -fwritable-strings -pipe -O -fomit-frame-pointer -I../h -I../gcl-tk num_log.c  )
+
+	touch $@
+
+
+build: 
+
+build-%-stamp: configure-%-stamp
 	dh_testdir
 
-	# Add here commands to compile the package.
 	$(MAKE)
 
-	touch build-stamp
+	touch $@
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp 
+	rm -f *stamp
 
 	-$(MAKE) clean
 
@@ -100,16 +111,11 @@ BVER:=$(shell dpkg -s binutils |grep ^Version: | cut -f2 -d\  | cut -f1 -d\-)
 debian/substvars:
 	grep -q ^binutils: $@ 2>/dev/null || echo "binutils:Version=$(BVER)" >> $@
 
-install: DH_OPTIONS=
-install: build 
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_installdirs
+install-%-stamp: DH_OPTIONS=
+install-%-stamp: build-%-stamp
 
 	$(MAKE) install DESTDIR=$$(pwd)/debian/tmp
 
-#	rm -rf debian/tmp/usr/share
 	mkdir -p debian/tmp/usr/share/emacs/site-lisp
 	cp -a $$(find debian/tmp/usr/local -name site-lisp -type d) debian/tmp/usr/share/emacs/site-lisp/gcl
 	rm -rf debian/tmp/usr/local
@@ -118,12 +124,7 @@ install: build
 		sed "s,$$(pwd)/debian/tmp,,1" >debian/foo
 	mv debian/foo debian/tmp/usr/lib/gcl-2.5.0/gcl-tk/demos/index.lsp
 
-#	mkdir -p debian/tmp/usr/share/doc/gcl-doc/gcl-si.html
-#	cp info/gcl-si*html debian/tmp/usr/share/doc/gcl-doc/gcl-si.html/
-#	mkdir -p debian/tmp/usr/share/doc/gcl-doc/gcl-tk.html
-#	cp info/gcl-tk*html debian/tmp/usr/share/doc/gcl-doc/gcl-tk.html/
-
-	rm -f debian/tmp/usr/bin/gcl.exe debian/tmp/usr/bin/gclm.bat
+	rm -f debian/tmp/usr/bin/*.exe debian/tmp/usr/bin/*.bat
 
 	mkdir -p debian/tmp/usr/include && \
 		cd debian/tmp/usr/include && \
@@ -136,6 +137,22 @@ install: build
 
 	dh_movefiles
 
+	touch $@
+
+install-pre:
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+gclean:
+	$(MAKE) clean
+	rm *stamp
+
+install: install-pre install-trad-stamp gclean install-ansi-stamp
+	cp debian/gcl.sh debian/gcl/usr/bin/
+	chmod 0755 debian/gcl/usr/bin/gcl
+
 # Build architecture-independent files here.
 # Pass -i to all debhelper commands in this target to reduce clutter.
 binary-indep: build install
@@ -143,11 +160,6 @@ binary-indep: build install
 	dh_testroot -i
 	dh_installdocs -i
 	dh_installinfo -i
-#	cat debian/gcl-doc.postinst.debhelper | \
-#		sed -e 's/\(--quiet .*gcl-si\)/--section "GNU Common Lisp" "GNU Common Lisp" --description="GNU Common Lisp System Internals." \1/1' \
-#		    -e 's/\(--quiet .*gcl-tk\)/--section "GNU Common Lisp" "GNU Common Lisp" --description="GNU Common Lisp Tk Manual." \1/1' >debian/foo && \
-#		mv debian/foo debian/gcl-doc.postinst.debhelper
-#	perl -pi -e 's/--quiet .*gcl-si/--section "GNU Common Lisp" "GNU Common Lisp" --description="GNU Common Lisp System Internals." $$&/; s/--quiet .*gcl-tk/--section "GNU Common Lisp" "GNU Common Lisp" --description="GNU Common Lisp Tk Manual." $$&/'  
 	dh_installchangelogs ChangeLog -i
 	dh_link -i
 	dh_compress -i
@@ -157,7 +169,6 @@ binary-indep: build install
 	dh_md5sums -i
 	dh_builddeb -i
 
-# Build architecture-dependent files here.
 binary-arch: build install debian/substvars
 	dh_testdir -a
 	dh_testroot -a
@@ -177,5 +188,3 @@ binary-arch: build install debian/substvars
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure
-
-# vim:noet:nosta:nolist:

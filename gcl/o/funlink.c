@@ -57,7 +57,7 @@ call_or_link(object sym, void **link )
    else funcall(fun);}
 
 void
-call_or_link_closure(object sym, void **link, object *ptr)
+call_or_link_closure(object sym, void **link, void **ptr)
 {object fun;
  fun = sym->s.s_gfdef;
  if (fun == OBJNULL) {FEinvalid_function(sym); return;}
@@ -807,11 +807,21 @@ call_proc_new(object sym, void **link, int argd, object first, va_list ll)
 	    {vs_push(i ? va_arg(ll,object) : first);
 	     i++;}}
       else
-	{while(i < nargs)
-	    {enum ftype typ=SFUN_NEXT_TYPE(argd);
-	      vs_push((typ==f_object? (i ? va_arg(ll,object) : first):
-		       make_fixnum(i ? va_arg(ll,long) : (long)first)));
-	     i++;}}
+	{
+	  while(i < nargs) {
+	    enum ftype typ=SFUN_NEXT_TYPE(argd);
+	    object _xx;
+	    if (typ==f_object)
+	      _xx=i ? va_arg(ll,object) : first;
+	    else {
+	      long _yy;
+	      _yy=i ? va_arg(ll,long) : (long)first;
+	      _xx=make_fixnum(_yy);
+	    }
+	    vs_push(_xx);
+	    i++;
+	  }
+	}
     }
 
      vs_check;

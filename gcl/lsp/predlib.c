@@ -110,7 +110,7 @@ static void L2()
 	vs_reserve(VM2);
 	check_arg(0);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= list(3,VV[13],VV[14],VV[15]);
 	vs_top=(vs_base=base+0)+1;
@@ -124,7 +124,7 @@ static void L3()
 	vs_reserve(VM3);
 	check_arg(0);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= VV[16];
 	vs_top=(vs_base=base+0)+1;
@@ -140,7 +140,7 @@ static void L4()
 	check_arg(1);
 	V15=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[1]= list(3,VV[13],small_fixnum(0),one_minus((V15)));
 	vs_top=(vs_base=base+1)+1;
@@ -219,7 +219,7 @@ static void L7()
 	vs_reserve(VM7);
 	check_arg(0);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= list(2,VV[20],small_fixnum(8));
 	vs_top=(vs_base=base+0)+1;
@@ -233,7 +233,7 @@ static void L8()
 	vs_reserve(VM8);
 	check_arg(0);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= list(2,VV[21],small_fixnum(8));
 	vs_top=(vs_base=base+0)+1;
@@ -247,7 +247,7 @@ static void L9()
 	vs_reserve(VM9);
 	check_arg(0);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= list(2,VV[20],small_fixnum(16));
 	vs_top=(vs_base=base+0)+1;
@@ -261,7 +261,7 @@ static void L10()
 	vs_reserve(VM10);
 	check_arg(0);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= list(2,VV[21],small_fixnum(16));
 	vs_top=(vs_base=base+0)+1;
@@ -456,7 +456,7 @@ static object LI19(V34)
 
 object V34;
 {	 VMB19 VMS19 VMV19
-goto TTL;
+	goto TTL;
 TTL:;
 	if(type_of((V34))==t_array||
 type_of((V34))==t_vector||
@@ -498,7 +498,7 @@ static void L20()
 	check_arg(1);
 	V40=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[1]= Cnil;
 	vs_top=(vs_base=base+1)+1;
@@ -515,7 +515,7 @@ static void L21()
 	check_arg(1);
 	V41=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[1]= Cnil;
 	vs_top=(vs_base=base+1)+1;
@@ -532,7 +532,7 @@ static void L22()
 	check_arg(1);
 	V42=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[1]= Cnil;
 	vs_top=(vs_base=base+1)+1;
@@ -549,7 +549,7 @@ static void L23()
 	check_arg(1);
 	V43=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[1]= Cnil;
 	vs_top=(vs_base=base+1)+1;
@@ -568,7 +568,7 @@ static void L24()
 	V44=(base[0]);
 	V45=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V46;
 	register object V47;
@@ -1371,7 +1371,7 @@ static object LI25(V86)
 
 register object V86;
 {	 VMB25 VMS25 VMV25
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V87;
 	register object V88;
@@ -1425,7 +1425,7 @@ static object LI26(V93)
 
 register object V93;
 {	 VMB26 VMS26 VMV26
-goto TTL;
+	goto TTL;
 TTL:;
 	if(!(type_of((V93))==t_cons)){
 	goto T366;}
@@ -1464,7 +1464,7 @@ static void L27()
 	V98=(base[0]);
 	V99=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V100;
 	object V101;
@@ -3064,7 +3064,7 @@ static object LI28(V168,V169)
 
 register object V168;register object V169;
 {	 VMB28 VMS28 VMV28
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V170;
 	register object V171;
@@ -3234,7 +3234,7 @@ static object LI29(V191,V192)
 
 register object V191;register object V192;
 {	 VMB29 VMS29 VMV29
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V193;
 	register object V194;
@@ -3322,7 +3322,7 @@ static object LI30(V206,V207)
 
 object V206;register object V207;
 {	 VMB30 VMS30 VMV30
-goto TTL;
+	goto TTL;
 TTL:;
 	if(((V206))!=Cnil){
 	goto T1392;}
@@ -3352,7 +3352,7 @@ static object LI31(V212,V213)
 
 register object V212;object V213;
 {	 VMB31 VMS31 VMV31
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= (V212);
 	base[1]= (V213);

@@ -48,7 +48,7 @@ object dispatch_reader;
 		 .rte_chattrib)
 
 #ifndef SHARP_EQ_CONTEXT_SIZE
-#define	SHARP_EQ_CONTEXT_SIZE	250
+#define	SHARP_EQ_CONTEXT_SIZE	500
 #endif
 
 static void

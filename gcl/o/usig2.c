@@ -162,7 +162,7 @@ only in very SAFE places.")
 { if (signo > sizeof(safety_required))
     {FEerror("Illegal signo:~a.",1,make_fixnum(signo));}
   if (safety >=0) safety_required[signo] = safety;
-  return make_fixnum(safety_required[signo]) ;
+  return small_fixnum(safety_required[signo]) ;
 }
      
 

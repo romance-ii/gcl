@@ -8,7 +8,7 @@ static object LI1()
 
 {	 VMB1 VMS1 VMV1
 	bds_check;
-goto TTL;
+	goto TTL;
 TTL:;
 	bds_bind(VV[0],Cnil);
 	bds_bind(VV[1],Cnil);
@@ -197,7 +197,7 @@ static void L2()
 	{register object V8;
 	V8=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 goto T96;
 T96:;
@@ -1022,7 +1022,7 @@ static object LI8(V64)
 object V64;
 {	 VMB8 VMS8 VMV8
 	bds_check;
-goto TTL;
+	goto TTL;
 TTL:;
 	bds_bind(VV[43],Ct);
 	if(((V64))==Cnil){
@@ -1214,7 +1214,7 @@ T481:;
 static object LI12()
 
 {	 VMB12 VMS12 VMV12
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V78;
 	V78= (VV[39]->s.s_dbind);
@@ -1299,7 +1299,7 @@ static void L14()
 	{object V82;
 	V82=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V83= (number_compare((V82),(VV[37]->s.s_dbind))>=0?((V82)):(VV[37]->s.s_dbind));
 	(VV[39]->s.s_dbind)= (number_compare(V83,(VV[38]->s.s_dbind))<=0?(V83):(VV[38]->s.s_dbind));}
@@ -1323,7 +1323,7 @@ static void L15()
 	register object *sup=base+VM15; VC15
 	vs_check;
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	(void)(princ((VV[34]->s.s_dbind),(VV[48]->s.s_dbind)));
 	princ_char(10,VV[48]);
@@ -1734,7 +1734,7 @@ static void L20()
 	register object *sup=base+VM20; VC20
 	vs_check;
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	princ_str("Backtrace: ",VV[48]);
 	{register object V121;
@@ -1874,7 +1874,7 @@ static object LI22(V130)
 register object V130;
 {	 VMB22 VMS22 VMV22
 	bds_check;
-goto TTL;
+	goto TTL;
 TTL:;
 	bds_bind(VV[56],small_fixnum(2));
 	bds_bind(VV[57],small_fixnum(4));
@@ -1975,7 +1975,7 @@ static object LI23(V135)
 
 register object V135;
 {	 VMB23 VMS23 VMV23
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= (VV[48]->s.s_dbind);
 	base[1]= VV[103];
@@ -2010,7 +2010,7 @@ static object LI24(V138)
 
 register object V138;
 {	 VMB24 VMS24 VMV24
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V139;
 	V139= Cnil;
@@ -2140,7 +2140,7 @@ static void L25()
 	register object *sup=base+VM25; VC25
 	vs_check;
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	if(((VV[36]->s.s_dbind))==Cnil){
 	goto T852;}
@@ -2174,7 +2174,7 @@ static object LI26(V162)
 
 object V162;
 {	 VMB26 VMS26 VMV26
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V163;
 	base[1]= (V162);
@@ -2208,7 +2208,7 @@ static void L27()
 	{object V168;
 	V168=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V169;
 	base[1]= (V168);
@@ -2303,7 +2303,7 @@ static void L28()
 	{object V171;
 	V171=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V172;
 	base[1]= (V171);
@@ -2330,7 +2330,7 @@ T892:;
 static object LI29()
 
 {	 VMB29 VMS29 VMV29
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= (VV[39]->s.s_dbind);
 	vs_top=(vs_base=base+0)+1;
@@ -2377,7 +2377,7 @@ static object LI30(V180,V181)
 
 object V180;register object V181;
 {	 VMB30 VMS30 VMV30
-goto TTL;
+	goto TTL;
 TTL:;
 	if(((V181))!=Cnil){
 	goto T910;}
@@ -2403,7 +2403,7 @@ static object LI31(V188,V189)
 
 register object V188;register object V189;
 {	 VMB31 VMS31 VMV31
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V190;
 	V190= Cnil;
@@ -2523,7 +2523,7 @@ static object LI32(V202)
 
 object V202;
 {	 VMB32 VMS32 VMV32
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V203;
 	V203= Cnil;
@@ -2580,7 +2580,7 @@ static object LI33(V211)
 
 object V211;
 {	 VMB33 VMS33 VMV33
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V212;
 	V212= Cnil;
@@ -2636,7 +2636,7 @@ T1006:;
 static object LI34()
 
 {	 VMB34 VMS34 VMV34
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V219;
 	object V220;
@@ -2857,7 +2857,7 @@ static void L35()
 	{register object V240;
 	V240=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	if(!(type_of((V240))==t_string)){
 	goto T1123;}
@@ -2902,7 +2902,7 @@ static void L36()
 	{object V242;
 	V242=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	if(equal((V242),(VV[129]->s.s_dbind))){
 	goto T1137;}
@@ -3084,7 +3084,7 @@ static void L38()
 	{object V259;
 	V259=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[2]= (V259);
 	base[3]= (VV[130]->s.s_dbind);
@@ -3242,7 +3242,7 @@ static void L42()
 	V267=(base[0]);
 	V268=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V269;{object V270;
 	base[2]= (V268);
@@ -3294,7 +3294,7 @@ static void L43()
 	vs_check;
 	bds_check;
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register long V271;
 	register object V272;
@@ -3438,7 +3438,7 @@ static void L44()
 	{VOL object V278;
 	V278=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[1]= VV[148];
 	base[2]= Cnil;

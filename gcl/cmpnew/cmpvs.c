@@ -7,7 +7,7 @@ void init_cmpvs(){do_init(VV);}
 static object LI1()
 
 {	 VMB1 VMS1 VMV1
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V1;
 	V1= make_cons(symbol_value(VV[0]),symbol_value(VV[1]));
@@ -23,7 +23,7 @@ static object LI2(V5,V6)
 
 register object V5;object V6;
 {	 VMB2 VMS2 VMV2
-goto TTL;
+	goto TTL;
 TTL:;
 	if(!(type_of((V5))==t_cons)){
 	goto T6;}
@@ -31,7 +31,7 @@ TTL:;
 	goto T6;}
 	if(equal(cadr((V5)),(V6))){
 	goto T7;}
-goto T6;
+	goto T6;
 T6:;
 	princ_str("\n	",VV[4]);
 	(void)((*(LnkLI11))((V6)));
@@ -40,7 +40,7 @@ T6:;
 	princ_char(59,VV[4]);
 	{object V7 = Cnil;
 	VMR2(V7)}
-goto T7;
+	goto T7;
 T7:;
 	{object V8 = Cnil;
 	VMR2(V8)}
@@ -52,7 +52,7 @@ static object LI3(V10)
 
 register object V10;
 {	 VMB3 VMS3 VMV3
-goto TTL;
+	goto TTL;
 TTL:;
 	if(!((car((V10)))==(VV[5]))){
 	goto T19;}
@@ -60,7 +60,7 @@ TTL:;
 	(void)((*(LnkLI12))(cadr((V10))));
 	{object V11 = Cnil;
 	VMR3(V11)}
-goto T19;
+	goto T19;
 T19:;
 	if(!((car((V10)))==(VV[6]))){
 	goto T24;}
@@ -69,7 +69,7 @@ T19:;
 	princ_char(93,VV[4]);
 	{object V12 = Cnil;
 	VMR3(V12)}
-goto T24;
+	goto T24;
 T24:;
 	if(!(number_compare(car((V10)),symbol_value(VV[0]))==0)){
 	goto T30;}
@@ -78,7 +78,7 @@ T24:;
 	princ_char(93,VV[4]);
 	{object V13 = Cnil;
 	VMR3(V13)}
-goto T30;
+	goto T30;
 T30:;
 	princ_str("base",VV[4]);
 	(void)((*(LnkLI12))(car((V10))));
@@ -95,7 +95,7 @@ static object LI4(V16)
 
 object V16;
 {	 VMB4 VMS4 VMV4
-goto TTL;
+	goto TTL;
 TTL:;
 	princ_char(40,VV[4]);
 	(void)((*(LnkLI11))((V16)));
@@ -110,7 +110,7 @@ static object LI5(V19)
 
 object V19;
 {	 VMB5 VMS5 VMV5
-goto TTL;
+	goto TTL;
 TTL:;
 	princ_str("(base0[",VV[4]);
 	V20= number_minus(symbol_value(VV[7]),(V19));
@@ -126,7 +126,7 @@ static object LI6(V23)
 
 object V23;
 {	 VMB6 VMS6 VMV6
-goto TTL;
+	goto TTL;
 TTL:;
 	setq(VV[8],(V23));
 	{object V24 = symbol_value(VV[8]);
@@ -147,17 +147,17 @@ static object LI7(object first,...)
 	else {
 	V25= first;}
 	--narg; goto T49;
-goto T48;
+	goto T48;
 T48:;
 	V25= symbol_value(VV[8]);
-goto T49;
+	goto T49;
 T49:;
 	if(((V25))!=Cnil){
 	goto T52;}
 	princ_str("Cnil",VV[4]);
 	{object V26 = Cnil;
 	VMR7(V26)}
-goto T52;
+	goto T52;
 T52:;
 	{object V27 = (*(LnkLI11))((V25));
 	VMR7(V27)}
@@ -169,7 +169,7 @@ T52:;
 static object LI8()
 
 {	 VMB8 VMS8 VMV8
-goto TTL;
+	goto TTL;
 TTL:;
 	setq(VV[9],number_plus(symbol_value(VV[9]),small_fixnum(1)));
 	{object V28 = symbol_value(VV[9]);
@@ -181,7 +181,7 @@ TTL:;
 static object LI9()
 
 {	 VMB9 VMS9 VMV9
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V29;
 	V29= make_cons(VV[6],symbol_value(VV[10]));
@@ -196,26 +196,26 @@ static object LI10(V32)
 
 object V32;
 {	 VMB10 VMS10 VMV10
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V33;
 	V33= (V32);
-goto T60;
+	goto T60;
 T60:;
 	if(((V33))!=Cnil){
 	goto T61;}
 	{object V34 = Cnil;
 	VMR10(V34)}
-goto T61;
+	goto T61;
 T61:;
 	(void)((*(LnkLI12))(car((V33))));
 	if(!((cdr((V33)))==Cnil)){
 	goto T68;}
 	goto T67;
-goto T68;
+	goto T68;
 T68:;
 	princ_char(44,VV[4]);
-goto T67;
+	goto T67;
 T67:;
 	V33= cdr((V33));
 	goto T60;}

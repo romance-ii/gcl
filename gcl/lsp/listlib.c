@@ -15,7 +15,7 @@ static void L1()
 	V2=(base[1]);
 	V3=(base[2]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V4;
 	V4= Cnil;

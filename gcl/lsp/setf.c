@@ -591,7 +591,7 @@ static void L7()
 	V76=(base[1]);
 	V77=(base[2]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V78;
 	object V79;
@@ -826,7 +826,7 @@ static void L9()
 	V109=(base[1]);
 	V110=(base[2]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V111;
 	object V112;
@@ -906,7 +906,7 @@ static void L10()
 	V121=(base[1]);
 	V122=(base[2]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V123;
 	object V124;
@@ -986,7 +986,7 @@ static void L11()
 	V133=(base[1]);
 	V134=(base[2]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V135;
 	object V136;
@@ -1058,7 +1058,7 @@ static object LI12(V147,V148,V149)
 
 object V147;object V148;object V149;
 {	 VMB12 VMS12 VMV12
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V150;
 	V150= Cnil;
@@ -1246,7 +1246,7 @@ static object LI13(V187,V188,V189,V190)
 
 object V187;object V188;object V189;object V190;
 {	 VMB13 VMS13 VMV13
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V191= (V188);
 	if((V191!= VV[43]))goto T379;
@@ -1269,7 +1269,7 @@ static object LI14(V197,V198)
 
 register object V197;object V198;
 {	 VMB14 VMS14 VMV14
-goto TTL;
+	goto TTL;
 TTL:;
 	if(!(endp_prop((V197)))){
 	goto T382;}
@@ -1301,7 +1301,7 @@ static object LI15(V206,V207)
 
 register object V206;object V207;
 {	 VMB15 VMS15 VMV15
-goto TTL;
+	goto TTL;
 TTL:;
 	V206= cdr((V206));
 	if(!(endp_prop((V206)))){

@@ -76,7 +76,7 @@ Lsystem(void)
 	 res = system(command) ;
 	 signals_allowed = old;
 	 vs_base[0] = make_fixnum(res >> 8);
-	 vs_base[1] = make_fixnum(res & 0xff);
+	 vs_base[1] = make_fixnum((res & 0xff));
 	 vs_top++;
        }
 }

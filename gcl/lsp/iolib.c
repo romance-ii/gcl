@@ -307,7 +307,7 @@ static void L6()
 	check_arg(1);
 	V51=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V52;
 	vs_base=vs_top;
@@ -331,7 +331,7 @@ static void L7()
 	check_arg(1);
 	V53=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V54;
 	vs_base=vs_top;
@@ -535,7 +535,7 @@ static object LI11(V79,V80,V81)
 
 object V79;object V80;register object V81;
 {	 VMB11 VMS11 VMV11
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V82;
 	base[0]= (V79);

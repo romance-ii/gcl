@@ -8,7 +8,7 @@ static object LI1(V2)
 
 register object V2;
 {	 VMB1 VMS1 VMV1
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V3;
 	object V4;
@@ -18,7 +18,7 @@ TTL:;
 	if(!(endp_prop((V2)))){
 	goto T5;}
 	(void)((*(LnkLI24))(VV[2],small_fixnum(1),small_fixnum(0)));
-goto T5;
+	goto T5;
 T5:;
 	V4= (*(LnkLI25))(car((V2)));
 	(void)((*(LnkLI26))((V3),cadr((V4))));
@@ -36,7 +36,7 @@ static object LI2(V8,V9)
 object V8;object V9;
 {	 VMB2 VMS2 VMV2
 	bds_check;
-goto TTL;
+	goto TTL;
 TTL:;
 	bds_bind(VV[3],symbol_value(VV[3]));
 	bds_bind(VV[4],VV[5]);
@@ -67,7 +67,7 @@ static object LI3(V13)
 
 object V13;
 {	 VMB3 VMS3 VMV3
-goto TTL;
+	goto TTL;
 TTL:;
 	princ_str("\n	frs_push(FRS_CATCH,",VV[6]);
 	(void)((*(LnkLI31))((V13)));
@@ -83,7 +83,7 @@ static object LI4(V16)
 register object V16;
 {	 VMB4 VMS4 VMV4
 	bds_check;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V17;
 	object V18;
@@ -93,7 +93,7 @@ TTL:;
 	if(!(endp_prop((V16)))){
 	goto T35;}
 	(void)((*(LnkLI24))(VV[11],small_fixnum(1),small_fixnum(0)));
-goto T35;
+	goto T35;
 T35:;
 	base[1]= make_cons(VV[13],symbol_value(VV[12]));
 	base[2]= make_cons(VV[13],symbol_value(VV[14]));
@@ -121,7 +121,7 @@ static object LI5(V23,V24)
 object V23;object V24;
 {	 VMB5 VMS5 VMV5
 	bds_check;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V25;
 	object V26;
@@ -166,10 +166,10 @@ TTL:;
 	goto T94;}
 	V28= car((V26));
 	goto T92;
-goto T94;
+	goto T94;
 T94:;
 	V28= Cnil;
-goto T92;
+	goto T92;
 T92:;
 	(void)((VFUN_NARGS=3,(*(LnkLI29))(VV[7],Cnil,V28)));
 	princ_str("}}",VV[6]);
@@ -185,7 +185,7 @@ static object LI6(V31)
 
 register object V31;
 {	 VMB6 VMS6 VMV6
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V32;
 	object V33;
@@ -195,17 +195,17 @@ TTL:;
 	goto T100;}
 	if(!(endp_prop(cdr((V31))))){
 	goto T99;}
-goto T100;
+	goto T100;
 T100:;
 	V34 = make_fixnum((long)length((V31)));
 	(void)((*(LnkLI24))(VV[21],small_fixnum(2),V34));
-goto T99;
+	goto T99;
 T99:;
 	if(endp_prop(cddr((V31)))){
 	goto T104;}
 	V35 = make_fixnum((long)length((V31)));
 	(void)((*(LnkLI34))(VV[21],small_fixnum(2),V35));
-goto T104;
+	goto T104;
 T104:;
 	V33= (*(LnkLI25))(car((V31)));
 	(void)((*(LnkLI26))((V32),cadr((V33))));
@@ -223,7 +223,7 @@ static object LI7(V39,V40)
 register object V39;object V40;
 {	 VMB7 VMS7 VMV7
 	bds_check;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V41;
 	bds_bind(VV[3],symbol_value(VV[3]));
@@ -233,18 +233,18 @@ TTL:;
 	if((V42!= VV[35]))goto T117;
 	V41= caddr((V39));
 	goto T116;
-goto T117;
+	goto T117;
 T117:;
 	if((V42!= VV[22]))goto T119;
 	V41= make_cons(VV[22],caddr((V39)));
 	goto T116;
-goto T119;
+	goto T119;
 T119:;
 	V41= list(2,VV[16],(*(LnkLI32))());
 	bds_bind(VV[4],(V41));
 	V43= (*(LnkLI28))((V39));
 	bds_unwind1;}
-goto T116;
+	goto T116;
 T116:;
 	princ_str("\n	fr=frs_sch_catch(",VV[6]);
 	(void)((*(LnkLI31))((V41)));

@@ -21,7 +21,7 @@
 /* array.c:57:OF */ extern void Laref (void); /* () */
 /* array.c:126:OF */ extern object fLsvref (object x, unsigned int i); /* (x, i) object x; unsigned int i; */
 /* array.c:142:OF */ extern object fLrow_major_aref (object x, int i); /* (x, i) object x; int i; */
-/* array.c:190:OF */ extern object fSaset1 (object x, object i, object val); /* (x, i, val) object x; int i; object val; */
+/* array.c:190:OF */ extern object fSaset1 (object x, int i, object val); /* (x, i, val) object x; int i; object val; */
 /* array.c:262:OF */ extern void siLaset (void); /* () */
 /* array.c:321:OF */ extern void siLsvset (void); /* () */
 /* array.c:324:OF */ extern object fSsvset (object x, int i, object val); /* (x, i, val) object x; int i; object val; */
@@ -225,7 +225,7 @@ typedef void (*funcvoid)(void);
 /* frame.c:58:OF */ extern frame_ptr frs_sch (object frame_id); /* (frame_id) object frame_id; */
 /* frame.c:69:OF */ extern frame_ptr frs_sch_catch (object frame_id); /* (frame_id) object frame_id; */
 /* funlink.c:19:OF */ extern void call_or_link (object sym, void **link); /* (sym, link) object sym; void **link; */
-/* funlink.c:41:OF */ extern void call_or_link_closure (object sym, void **link, object *ptr); /* (sym, link, ptr) object sym; void **link; object *ptr; */
+/* funlink.c:41:OF */ extern void call_or_link_closure (object sym, void **link, void **ptr); /* (sym, link, ptr) object sym; void **link; object *ptr; */
 /* funlink.c:230:OF */ extern object c_apply_n (object (*fn)(), int n, object *x); /* (fn, n, x) long int (*fn)(); int n; object *x; */
 /* funlink.c:696:OF */ extern object call_proc0 (object sym, void *link); /* (sym, link) object sym; void *link; */
 /* funlink.c:784:OF */ extern int clear_stack (object *beg, object *limit); /* (beg, limit) object *beg; object *limit; */
@@ -390,7 +390,7 @@ typedef void (*funcvoid)(void);
 /* number.c:35:OF */ extern long int fixint (object x); /* (x) object x; */
 /* number.c:44:OF */ extern int fixnnint (object x); /* (x) object x; */
 /* number.c:59:OF */ extern object fSallocate_bigger_fixnum_range (int min, int max); /* (min, max) int min; int max; */
-/* number.c:81:OF */ extern object make_fixnum (long i); /* (i) int i; */
+/* number.c:81:OF */ extern object make_fixnum1 (long i); /* (i) int i; */
 /* number.c:102:OF */ extern object make_ratio (object num, object den); /* (num, den) object num; object den; */
 /* number.c:144:OF */ extern object make_shortfloat (double f); /* (f) double f; */
 /* number.c:157:OF */ extern object make_longfloat (longfloat f); /* (f) longfloat f; */

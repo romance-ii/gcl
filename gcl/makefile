@@ -48,9 +48,6 @@ h/bfd.h: binutils/bfd/libbfd.a binutils/libiberty/libiberty.a
 h/bfdlink.h h/ansidecl.h h/symcat.h: binutils/bfd/libbfd.a binutils/libiberty/libiberty.a
 	cp $(<D)/../include/$(@F) $@
 
-#$(PORTDIR)/saved_gcl: $(PORTDIR)/$(FLISP)
-#	cp $< $@
-
 $(PORTDIR)/saved_gcl: $(HDIR)cmpinclude.h
 	(cd $(BINDIR); $(MAKE) all)
 	$(MAKE) mpfiles
@@ -59,36 +56,24 @@ $(PORTDIR)/saved_gcl: $(HDIR)cmpinclude.h
 	(cd $(LSPDIR); $(MAKE) all)
 	(cd $(CMPDIR); $(MAKE) all)
 	cd $(@D) && $(MAKE) $(@F)
-#	(cd $(PORTDIR); make saved_gcl)
-#	(cd $(PCLDIR); make compile; make saved_gcl_pcl)
-#	(cd $(CLCSDIR); make compile; make saved_full_gcl)
-#	(cd $(PORTDIR); make saved_ansi_gcl)
-#	make command
 
-# 	After making successfully send in a notification to
-#	gcl@nicolas.ma.utexas.edu.   This is extremely helpful in
-#	tracking on which machines and OS versions there are problems.
-#	This will be done automatically by the  xbin/notify line.
-#	(cd  cmpnew ; make collectfn.o)
-#	(cd lsp ; make info.o)
-#	@- if  [ -f cmpnew/collectfn.o ]  ; \
-#	then echo "Make of GCL `cat majvers`.`cat minvers` completed." ; \
-#        if [ "$(NOTIFY)" = "yes" ] ; then \
-#	./xbin/notify "CC=$(CC)" ;  fi ;\
-#	else echo "The new image failed to compile collectfn.lsp" ;fi ; \
-#	if [ -d "$(TK_CONFIG_PREFIX)" ] ; \
-#	then (cd gcl-tk ; make) ; \
-#	else echo "gcl-tk not made..missing include or lib" ; fi 
-#	(cd info ; make)
+$(PORTDIR)/saved_ansi_gcl: $(PORTDIR)/saved_gcl
+	(cd $(PCLDIR); $(MAKE) all)
+	(cd $(CLCSDIR); $(MAKE) all)
+	cd $(@D) && $(MAKE) $(@F)
 
-$(PCLDIR)/saved_gcl_pcl: $(PORTDIR)/saved_gcl
-	cd $(@D) &&  $(MAKE) compile LISP="../$<" &&  $(MAKE) $(@F) LISP="../$<"
+ansi-tests/test_results: $(PORTDIR)/saved_ansi_gcl
+	cd $(@D) && rm -f *.o rt/*.o && echo '(load "gclload.lsp")' | ../$< >$(@F) 2>&1 & j=$$! ; \
+		tail -f --pid=$$j --retry $@ & wait $$j
 
-$(CLCSDIR)/saved_full_gcl: $(PCLDIR)/saved_gcl_pcl
-	cd $(@D) &&  $(MAKE) compile LISP="../$<" &&  $(MAKE) $(@F) LISP="../$<"
+#$(PCLDIR)/saved_gcl_pcl: $(PORTDIR)/saved_gcl
+#	cd $(@D) &&  $(MAKE) compile LISP="../$<" &&  $(MAKE) $(@F) LISP="../$<"
 
-$(PORTDIR)/saved_ansi_gcl: $(CLCSDIR)/saved_full_gcl
-	cd $(@D) &&  $(MAKE) $(@F)
+#$(CLCSDIR)/saved_full_gcl: $(PCLDIR)/saved_gcl_pcl
+#	cd $(@D) &&  $(MAKE) compile LISP="../$<" &&  $(MAKE) $(@F) LISP="../$<"
+
+#$(PORTDIR)/saved_ansi_gcl: $(CLCSDIR)/saved_full_gcl
+#	cd $(@D) &&  $(MAKE) $(@F)
 
 cmpnew/collectfn.o lsp/info.o:
 	cd $(@D) && $(MAKE) $(@F)
@@ -130,12 +115,12 @@ command:
 merge:
 	$(CC) -o merge merge.c
 
-LISP_LIB=cmpnew/collectfn.o lsp/gprof.lsp lsp/info.o lsp/profile.lsp lsp/export.lsp lsp/autoload.lsp cmpnew/cmpmain.lsp cmpnew/cmpopt.lsp cmpnew/lfun_list.lsp lsp/auto_new.lsp h/cmpinclude.h unixport/init_gcl.lsp unixport/libgcl.a unixport/libgclp.a gcl-tk/tk-package.lsp $(TK_LISP_LIB) $(RL_LIB)
+LISP_LIB=cmpnew/collectfn.o lsp/gprof.lsp lsp/info.o lsp/profile.lsp lsp/export.lsp lsp/autoload.lsp cmpnew/cmpmain.lsp cmpnew/cmpopt.lsp cmpnew/lfun_list.lsp lsp/auto_new.lsp h/cmpinclude.h unixport/init_$(SYSTEM).lsp unixport/lib$(SYSTEM).a unixport/libgclp.a gcl-tk/tk-package.lsp $(TK_LISP_LIB) $(RL_LIB)
 
 install-command:
 	rm -f $(DESTDIR)$(prefix)/bin/gcl
 	(echo '#!/bin/sh' ; \
-	if [ "gcc --version | grep mingw" ] ; then echo "export C_INCLUDE_PATH=`echo $$INSTALL_LIB_DIR`/h"; else echo "export C_INCLUDE_PATH=$(INSTALL_LIB_DIR)/h:\$$C_INCLUDE_PATH"; fi ;\
+	if gcc --version | grep -q mingw ; then echo "export C_INCLUDE_PATH=`echo $$INSTALL_LIB_DIR`/h"; else echo "export C_INCLUDE_PATH=$(INSTALL_LIB_DIR)/h:\$$C_INCLUDE_PATH"; fi ;\
 	echo exec $(BINDIR)/$(FLISP)$(EXE) \\ ; \
 	echo '   -dir' $(INSTALL_LIB_DIR)/unixport/ \\ ; \
 	echo '   -libdir' $(INSTALL_LIB_DIR)/ \\ ; \
@@ -146,7 +131,7 @@ install-command:
 	echo '#' other options: -load "/tmp/foo.o" -load "jo.lsp" -eval '"(joe 3)"' >> $(DESTDIR)$(prefix)/bin/gcl
 	chmod a+x $(DESTDIR)$(prefix)/bin/gcl
 	rm -f $(DESTDIR)$(prefix)/bin/gclm.bat
-	(echo '@SET cd='; \
+	if gcc --version | grep -q mingw ; then (echo '@SET cd='; \
 	 echo '@SET promp$=%prompt%'; \
 	 echo '@PROMPT SET cd$Q$P'; \
 	 echo '@CALL>%temp%.\setdir.bat'; \
@@ -159,7 +144,10 @@ install-command:
 	 echo 'set libdir=%cd%\..\lib\gcl-2.5.0'; \
 	 echo 'set unixportdir=%libdir%\unixport'; \
 	 echo 'path %cd%\..\mingw\bin;%PATH%'; \
-	 echo "start %unixportdir%\saved_gcl.exe -dir %unixportdir% -libdir %libdir% -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9" ) > $(DESTDIR)$(prefix)/bin/gclm.bat
+	 echo "start %unixportdir%\saved_gcl.exe -dir %unixportdir% -libdir %libdir% -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9" ) > $(DESTDIR)$(prefix)/bin/gclm.bat ; fi
+	rm -f $(DESTDIR)$(prefix)/bin/gclfinal.bat
+	if gcc --version | grep -q mingw ; then (echo 'ECHO path %1\mingw\bin;%PATH% > gcli.bat'; \
+	 echo "ECHO start %1\lib\gcl-2.5.0\unixport\saved_gcl.exe -dir %1\lib\gcl-2.5.0\unixport -libdir %1\lib\gcl-2.5.0 -eval \"(setq si::*allow-gzipped-file* t)\" %1 %2 %3 %4 %5 %6 %7 %8 %9 >> gcli.bat" ) > $(DESTDIR)$(prefix)/bin/gclfinal.bat ; fi
 
 install: 
 	$(MAKE) install1 "INSTALL_LIB_DIR=$(prefix)/lib/gcl-`cat majvers`.`cat minvers`" "prefix=$(prefix)" "DESTDIR=$(DESTDIR)"
@@ -187,10 +175,10 @@ install1:
 #	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../$(PORTDIR)/$(FLISP)$(EXE)) ; fi
 	if test "$(EMACS_SITE_LISP)" != "" ; then (cd elisp ; $(MAKE) install DESTDIR=$(DESTDIR)) ; fi
 	if test "$(INFO_DIR)" != "unknown"; then (cd info ; $(MAKE) ; $(MAKE) install DESTDIR=$(DESTDIR)) ; fi
-	if [ "gcc --version | grep mingw" ] ; then cp COPYING.LIB-2.0 readme-bin.mingw $(prefix) ; fi
-	if [ "gcc --version | grep mingw" ] ; then cp gcl.ico $(prefix)/bin ; fi
-	if [ "gcc --version | grep mingw" ] ; then rm -rf $(prefix)/install; mkdir $(prefix)/install ; cp windows/install.lsp $(prefix)/install ;fi
-	if [ "gcc --version | grep mingw" ] ; then mkdir $(prefix)/doc; cp info/*.html $(prefix)/doc ; fi
+	if gcc --version | grep mingw ; then cp COPYING.LIB-2.0 readme-bin.mingw $(prefix) ; fi
+	if gcc --version | grep mingw ; then cp gcl.ico $(prefix)/bin ; fi
+	if gcc --version | grep mingw ; then rm -rf $(prefix)/install; mkdir $(prefix)/install ; cp windows/install.lsp $(prefix)/install ;fi
+	if gcc --version | grep mingw ; then mkdir $(prefix)/doc; cp info/*.html $(prefix)/doc ; fi
 
 clean:
 	(cd $(BINDIR); $(MAKE) clean)

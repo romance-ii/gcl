@@ -25,7 +25,7 @@ static object LI2(V3)
 
 object V3;
 {	 VMB2 VMS2 VMV2
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= (V3);
 	base[1]= small_fixnum(4);
@@ -68,7 +68,7 @@ static object LI3(V11)
 
 object V11;
 {	 VMB3 VMS3 VMV3
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V12;
 	V12= one_minus((V11));
@@ -468,7 +468,7 @@ static void L7()
 	check_arg(1);
 	V62=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[1]= VV[14];
 	base[2]= (V62);

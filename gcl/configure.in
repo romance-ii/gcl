@@ -755,13 +755,15 @@ AC_ARG_ENABLE(ansi,[--enable-ansi builds a large gcl aiming for ansi compliance,
 		    --disable-ansi builds the smaller traditional CLtL1 image],,enable_ansi="no")
 
 if test "$enable_ansi" = "yes" ; then
-	FLISP=saved_ansi_gcl;
+	SYSTEM=ansi_gcl
 	AC_DEFINE(ANSI_COMMON_LISP)
 else
-	FLISP=saved_gcl
+	SYSTEM=gcl
 fi
 
+FLISP="saved_$SYSTEM"
 AC_SUBST(FLISP)
+AC_SUBST(SYSTEM)
 
 # pagewidth
 AC_MSG_CHECKING(for pagewidth)
@@ -817,10 +819,6 @@ AC_EGREP_HEADER([gettimeofday],
 
 AC_CHECK_LIB(m,sin,LIBS="${LIBS} -lm",true)
 AC_CHECK_LIB(mingwex,main,LIBS="${LIBS} -lmingwex",true)
-# AC_CHECK_LIB(japi,j_start,LIBS="${LIBS} -ljapi -lwsock32",true)
-AC_CHECK_HEADERS(japi.h,[AC_DEFINE(HAVE_JAPI_H)
-			 EXTRA_LOBJS="${EXTRA_LOBJS} japi.o"
-			 LIBS="${LIBS} -ljapi -lwsock32"] )
 
 # Should really find a way to check for prototypes, but this 
 # basically works for now.  CM
@@ -1397,11 +1395,10 @@ AC_SUBST(O3FLAGS)
 O2FLAGS=$TO2FLAGS
 AC_SUBST(O2FLAGS)
 
-AC_SUBST(EXTRA_LOBJS)
 if test -f h/$use.defs  ; then
 
   AC_SUBST(use)
-  AC_OUTPUT(makedefc windows/gcl.iss)
+  AC_OUTPUT(makedefc windows/gcl.iss bin/gcl.bat)
   echo makedefc
   cat makedefc
 

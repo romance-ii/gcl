@@ -67,7 +67,7 @@ static object LI2(V5)
 
 object V5;
 {	 VMB2 VMS2 VMV2
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V6;
 	base[1]= (V5);
@@ -129,7 +129,7 @@ static void L3()
 	check_arg(1);
 	V12=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V13;
 	V13= Cnil;
@@ -677,7 +677,7 @@ static void L8()
 	vs_reserve(VM8);
 	check_arg(0);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= Cnil;
 	base[1]= Cnil;
@@ -719,7 +719,7 @@ static void L10()
 	vs_reserve(VM10);
 	check_arg(0);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V67;
 	register object V68;
@@ -757,7 +757,7 @@ static void L11()
 	check_arg(1);
 	V69=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;{object V70;
 	{register object V71;
 	register object V72;
@@ -831,7 +831,7 @@ static void L12()
 	V75=(base[0]);
 	V76=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V77;
 	base[2]= (V75);
@@ -875,7 +875,7 @@ static void L13()
 	V81=(base[0]);
 	V82=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V83;
 	object V84;
@@ -910,7 +910,7 @@ static void L14()
 	V89=(base[0]);
 	V90=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V91;
 	object V92;
@@ -1001,7 +1001,7 @@ static void L15()
 	vs_reserve(VM15);
 	check_arg(0);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= VV[33];
 	base[1]= symbol_function(VV[130]);
@@ -1090,7 +1090,7 @@ static void L17()
 	V101=(base[0]);
 	V102=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V103;
 	register object V104;
@@ -1149,7 +1149,7 @@ static void L18()
 	check_arg(1);
 	V110=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V111;
 	V111= Cnil;
@@ -1218,7 +1218,7 @@ static void L19()
 	V116=(base[0]);
 	V117=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V118;
 	register long V119;
@@ -1381,7 +1381,7 @@ static void L20()
 	check_arg(1);
 	V150=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;{object V151;
 	V151= structure_ref((V150),VV[25],2);
 	if(V151==Cnil)goto T553;
@@ -1440,7 +1440,7 @@ static void L23()
 	V154=(base[2]);
 	V155=(base[3]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V156;
 	V156= Cnil;
@@ -1569,7 +1569,7 @@ static void L25()
 	vs_reserve(VM23);
 	check_arg(0);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= symbol_value(VV[57]);
 	base[1]= small_fixnum(0);
@@ -1663,7 +1663,7 @@ static void L28()
 	V171=(base[2]);
 	V172=(base[3]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V173;
 	V173= Cnil;
@@ -1712,7 +1712,7 @@ static void L29()
 	V174=(base[0]);
 	V175=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V176;
 	vs_base=vs_top;
@@ -1742,7 +1742,7 @@ static void L30()
 	V178=(base[0]);
 	V179=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V180;
 	vs_base=vs_top;
@@ -1779,7 +1779,7 @@ static void L31()
 	V182=(base[0]);
 	V183=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V184;
 	V184= (VFUN_NARGS=4,(*(LnkLI144))((V182),symbol_value(VV[53]),VV[63],VV[64]));
@@ -1806,7 +1806,7 @@ static void L32()
 	check_arg(1);
 	V185=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V186;
 	register object V187;
@@ -2047,7 +2047,7 @@ static void L34()
 	check_arg(1);
 	V203=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V204;
 	V204= Cnil;
@@ -2095,7 +2095,7 @@ static void L35()
 	check_arg(1);
 	V214=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V215;
 	V215= (VFUN_NARGS=4,(*(LnkLI144))(VV[71],(V214),VV[72],Ct));
@@ -2123,7 +2123,7 @@ static void L36()
 	check_arg(1);
 	V216=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V217;
 	V217= Cnil;
@@ -2183,7 +2183,7 @@ static void L37()
 	V220=(base[0]);
 	V221=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V222;
 	register object V223;
@@ -2557,7 +2557,7 @@ static void L39()
 	V262=(base[0]);
 	V263=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V264;
 	V264= reverse((V263));
@@ -2625,7 +2625,7 @@ static void L40()
 	V269=(base[1]);
 	V270=(base[2]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	bds_bind(VV[13],symbol_value(VV[10]));
 	bds_bind(VV[11],symbol_value(VV[10]));
@@ -2691,7 +2691,7 @@ static void L41()
 	V272=(base[0]);
 	V273=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V274;
 	V274= (VFUN_NARGS=2,(*(LnkLI144))((V272),(V273)));
@@ -2718,7 +2718,7 @@ static void L42()
 	check_arg(1);
 	V276=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V277;
 	V277= (V276);
@@ -2786,7 +2786,7 @@ static void L43()
 	check_arg(1);
 	V283=fix(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register long V284;
 	register long V285;
@@ -2828,7 +2828,7 @@ static void L44()
 	V288=(base[0]);
 	V289=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V290;
 	object V291;
@@ -2896,7 +2896,7 @@ static void L45()
 	check_arg(1);
 	V296=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V297;
 	register object V298;
@@ -3269,7 +3269,7 @@ static void L48()
 	V340=(base[0]);
 	V341=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V342;
 	register object V343;
@@ -3364,7 +3364,7 @@ static void L49()
 	check_arg(1);
 	V351=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[1]= (V351);
 	vs_top=(vs_base=base+1)+1;
@@ -3544,7 +3544,7 @@ static void L51()
 	V366=(base[1]);
 	V367=(base[2]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	V368= aref1((V366),fixint((V367)));
 	V369= aref1((V366),0);
@@ -3568,7 +3568,7 @@ static void L52()
 	V373=(base[0]);
 	V374=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V375;
 	V375= get((V373),VV[49],Cnil);
@@ -3598,7 +3598,7 @@ static void L53()
 	V377=(base[0]);
 	V378=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	bds_bind(VV[100],Cnil);
 	bds_bind(VV[101],symbol_value(VV[102]));
@@ -3675,7 +3675,7 @@ static void L54()
 	V383=(base[0]);
 	V384=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V385;
 	V385= symbol_value(VV[9]);

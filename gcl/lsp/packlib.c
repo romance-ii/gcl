@@ -39,7 +39,7 @@ static object LI2(V7)
 
 register object V7;
 {	 VMB2 VMS2 VMV2
-goto TTL;
+	goto TTL;
 TTL:;
 	if(!(type_of((V7))==t_symbol)){
 	goto T5;}
@@ -325,7 +325,7 @@ static object LI6(V73,V74)
 
 register object V73;register object V74;
 {	 VMB6 VMS6 VMV6
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V75;
 	register object V76;
@@ -369,7 +369,7 @@ static object LI7(V83)
 
 register object V83;
 {	 VMB7 VMS7 VMV7
-goto TTL;
+	goto TTL;
 TTL:;
 	(void)(prin1((V83),Cnil));
 	base[0]= (V83);

@@ -465,7 +465,7 @@ Lsxhash()
 {
 	check_arg(1);
 
-	vs_base[0] = make_fixnum(ihash_equal(vs_base[0],0) & 0x7fffffff);
+	vs_base[0] = make_fixnum((ihash_equal(vs_base[0],0) & 0x7fffffff));
 }
 
 void

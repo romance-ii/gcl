@@ -517,7 +517,7 @@
          (reset-top)))
 
   (when *tail-recursion-info*
-        (push 'tail-recursion-mark *unwind-exit*) (wt-nl1 "goto TTL;")(wt-nl1 "TTL:;"))
+        (push 'tail-recursion-mark *unwind-exit*) (wt-nl "goto TTL;")(wt-nl1 "TTL:;"))
 
   ;;; Now the parameters are ready!
   (c2expr body)

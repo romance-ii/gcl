@@ -355,19 +355,19 @@ BEGIN:
 @(defun char_code (c)
 @
 	check_type_character(&c);
-	@(return `make_fixnum(char_code(c))`)
+	@(return `small_fixnum(char_code(c))`)
 @)
 
 @(defun char_bits (c)
 @
 	check_type_character(&c);
-	@(return `make_fixnum(char_bits(c))`)
+	@(return `small_fixnum(char_bits(c))`)
 @)
 
 @(defun char_font (c)
 @
 	check_type_character(&c);
-	@(return `make_fixnum(char_font(c))`)
+	@(return `small_fixnum(char_font(c))`)
 @)
 
 @(defun code_char (c &o (b `make_fixnum(0)`) (f `make_fixnum(0)`))

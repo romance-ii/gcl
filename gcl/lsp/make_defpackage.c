@@ -12,7 +12,7 @@ static void L1()
 	check_arg(1);
 	V1=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V2;
 	base[1]= (V1);

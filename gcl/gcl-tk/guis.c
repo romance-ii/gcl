@@ -497,9 +497,9 @@ connection_failure(s)
 }
 
 object
-make_fixnum(long i) {
+make_fixnum1(long i) {
 
-  static union lispunion lu;
+  static union lispunion lu; 
 
   lu.FIX.FIXVAL=i;
   return &lu;

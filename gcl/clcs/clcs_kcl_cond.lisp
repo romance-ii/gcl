@@ -63,6 +63,7 @@
 
 (defun set-internal-error (error-keyword error-format condition-name
 					 &rest keyword-list)
+  (declare (ignore error-format))
 ;  (setf (find-internal-error-data error-keyword error-format)
   (setf (find-internal-error-data error-keyword)
 	(cons condition-name keyword-list)))

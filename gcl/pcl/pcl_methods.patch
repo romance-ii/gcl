@@ -1,0 +1,11 @@
+--- pcl_methods.c	Tue Feb 25 12:06:29 2003
++++ pcl_methods.c.new	Wed Feb 26 13:07:22 2003
+@@ -8110,7 +8110,7 @@
+ {	register object *base=vs_base;
+ 	register object *sup=base+VM122; VC122
+ 	vs_check;
+-	{register object V1409;
++	{VOL object V1409;
+ 	object V1410;
+ 	check_arg(2);
+ 	V1409=(base[0]);

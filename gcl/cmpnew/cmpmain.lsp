@@ -86,6 +86,7 @@
 (defvar *default-c-file* nil)
 (defvar *default-h-file* nil)
 (defvar *default-data-file* nil)
+(defvar *keep-gaz* nil)
 
 ;;  (list section-length split-file-names next-section-start-file-position)
 ;;  Many c compilers cannot handle the large C files resulting from large lisp files.
@@ -138,7 +139,7 @@
 		(setq args (append args (list :output-file (car args)))))
 	    (return 
 	     (prog1 (apply 'compile-file gaz (cdr args))
-	       (delete-file gaz)))
+	       (unless *keep-gaz* (delete-file gaz))))
 	    ))
 	 (t nil))
    (if (consp *split-files*)
@@ -395,6 +396,7 @@ Cannot compile ~a.~%"
 
 
 (defun compile (name &optional def &aux tem gaz (*default-pathname-defaults* #"."))
+
   (cond ((not(symbolp name)) (error "Must be a name"))
 	((and (consp def)
 	      (member (car def) '(lambda )))
@@ -403,7 +405,7 @@ Cannot compile ~a.~%"
 	       def)
 	 (compile name))
 	(def (error "def not a lambda expression"))
-	((setq tem(macro-function name))
+	((setq tem (macro-function name))
 	 (setf (symbol-function 'cmp-anon) tem)
 	 (compile 'cmp-anon)
 	 (setf (macro-function name) (macro-function name))
@@ -411,19 +413,20 @@ Cannot compile ~a.~%"
 	((and (setq tem (symbol-function name))
 	      (consp tem))
 	 (let ((na (if (symbol-package name) name 'cmp-anon)))
-	   (with-open-file
-	       (st (setq gaz (gazonk-name)) :direction :output)
-	     (prin1-cmp `(defun ,na ,@ (ecase (car tem)
-					 (lambda (cdr tem))
-					 (lambda-block (cddr tem))
-					 ))       st))
-	   (let ((fi (compile-file gaz)))
-	     (load fi)
-	     (delete-file fi)
-	     (delete-file gaz)
-	     (or (eq na name) (setf (symbol-function name) (symbol-function na)))
-	     (symbol-function name)
-	     )))
+	   (unless (and (fboundp 'si::init-cmp-anon) (or (si::init-cmp-anon) (fmakunbound 'si::init-cmp-anon)))
+	     (with-open-file
+	      (st (setq gaz (gazonk-name)) :direction :output)
+	      (prin1-cmp `(defun ,na ,@ (ecase (car tem)
+					       (lambda (cdr tem))
+					       (lambda-block (cddr tem))
+					       ))       st))
+	     (let ((fi (compile-file gaz)))
+	       (load fi)
+	       (delete-file fi))
+	     (unless *keep-gaz* (delete-file gaz)))
+	   (or (eq na name) (setf (symbol-function name) (symbol-function na)))
+	   (symbol-function name)
+	   ))
 	(t (error "can't compile ~a" name))))
 
 (defun disassemble (name &aux tem)
@@ -467,7 +470,7 @@ Cannot compile ~a.~%"
 	   (delete-file dn)
 	   (delete-file hn)
 	   (delete-file on)
-	   (delete-file gaz))))
+	   (unless *keep-gaz* (delete-file gaz)))))
 	(t (error "can't disassemble ~a" name))))
 	 
 

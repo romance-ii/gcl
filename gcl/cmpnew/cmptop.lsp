@@ -732,7 +732,7 @@
               (when *compiler-push-events* (wt-nl "ihs_check;"))
               (when *tail-recursion-info*
                     (push 'tail-recursion-mark *unwind-exit*)
-                    (wt-nl1 "goto TTL;") (wt-nl1 "TTL:;"))
+                    (wt-nl "goto TTL;") (wt-nl1 "TTL:;"))
               (dolist
                 (v specials)
 	          (wt-nl "bds_bind(VV[" (cdr v)"],V" (var-loc (car v))");")
@@ -1045,7 +1045,7 @@
 
     (when *tail-recursion-info*
       (push 'tail-recursion-mark *unwind-exit*)
-      (wt-nl1 "goto TTL;") (wt-nl1 "TTL:;"))
+      (wt-nl "goto TTL;") (wt-nl1 "TTL:;"))
     (c2expr (caddr (cddr lambda-expr)))
     
     ;;; End va_list at function end

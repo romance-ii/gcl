@@ -8,7 +8,7 @@ static object LI1(V2)
 
 register object V2;
 {	 VMB1 VMS1 VMV1
-goto TTL;
+	goto TTL;
 TTL:;
 	if(!(type_of((V2))==t_fixnum||type_of((V2))==t_bignum)){
 	goto T2;}
@@ -79,7 +79,7 @@ static object LI2(V9)
 
 register object V9;
 {	 VMB2 VMS2 VMV2
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= (V9);
 	vs_top=(vs_base=base+0)+1;
@@ -151,7 +151,7 @@ static object LI3(V24)
 
 object V24;
 {	 VMB3 VMS3 VMV3
-goto TTL;
+	goto TTL;
 TTL:;
 	base[1]= (V24);
 	vs_top=(vs_base=base+1)+1;
@@ -177,7 +177,7 @@ static object LI4(V27)
 
 register object V27;
 {	 VMB4 VMS4 VMV4
-goto TTL;
+	goto TTL;
 TTL:;
 	if(!(number_compare(small_fixnum(0),(V27))==0)){
 	goto T70;}
@@ -201,7 +201,7 @@ static object LI5(V31)
 
 object V31;
 {	 VMB5 VMS5 VMV5
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= number_times(VV[1],(V31));
 	vs_top=(vs_base=base+0)+1;
@@ -218,7 +218,7 @@ static object LI6(V34)
 
 register object V34;
 {	 VMB6 VMS6 VMV6
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V35;
 	V37= number_times(VV[1],(V34));
@@ -275,7 +275,7 @@ static object LI7(V45)
 
 register object V45;
 {	 VMB7 VMS7 VMV7
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V46;
 	V49= number_times((V45),(V45));
@@ -332,7 +332,7 @@ static object LI8(V56)
 
 register object V56;
 {	 VMB8 VMS8 VMV8
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= (V56);
 	vs_top=(vs_base=base+0)+1;
@@ -425,7 +425,7 @@ static object LI9(V78)
 
 register object V78;
 {	 VMB9 VMS9 VMV9
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= (V78);
 	vs_top=(vs_base=base+0)+1;
@@ -489,7 +489,7 @@ static object LI10(V91)
 
 object V91;
 {	 VMB10 VMS10 VMV10
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= (*(LnkLI14))((V91));
 	base[1]= (*(LnkLI15))((V91));
@@ -507,7 +507,7 @@ static object LI11(V94)
 
 object V94;
 {	 VMB11 VMS11 VMV11
-goto TTL;
+	goto TTL;
 TTL:;
 	V96= number_times((V94),(V94));
 	base[1]= number_plus(VV[2],/* INLINE-ARGS */V96);
@@ -530,7 +530,7 @@ static object LI12(V99)
 
 object V99;
 {	 VMB12 VMS12 VMV12
-goto TTL;
+	goto TTL;
 TTL:;
 	base[2]= one_plus((V99));
 	base[3]= small_fixnum(2);
@@ -568,7 +568,7 @@ static object LI13(V105)
 
 register object V105;
 {	 VMB13 VMS13 VMV13
-goto TTL;
+	goto TTL;
 TTL:;
 	if(number_compare((V105),VV[2])==0){
 	goto T173;}
@@ -608,7 +608,7 @@ static object LI14(V109)
 
 register object V109;
 {	 VMB14 VMS14 VMV14
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V110;
 	V110= (V109);
@@ -933,7 +933,7 @@ static object LI19(V141,V142)
 
 object V141;object V142;
 {	 VMB19 VMS19 VMV19
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= small_fixnum(14);
 	base[1]= (V141);
@@ -952,7 +952,7 @@ static object LI20(V146,V147)
 
 object V146;object V147;
 {	 VMB20 VMS20 VMV20
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= small_fixnum(8);
 	base[1]= (V146);
@@ -971,7 +971,7 @@ static object LI21(V151,V152)
 
 object V151;object V152;
 {	 VMB21 VMS21 VMV21
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= small_fixnum(4);
 	base[1]= (V151);
@@ -990,7 +990,7 @@ static object LI22(V156,V157)
 
 object V156;object V157;
 {	 VMB22 VMS22 VMV22
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= small_fixnum(2);
 	base[1]= (V156);
@@ -1009,7 +1009,7 @@ static object LI23(V161,V162)
 
 object V161;object V162;
 {	 VMB23 VMS23 VMV23
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= small_fixnum(13);
 	base[1]= (V161);
@@ -1028,7 +1028,7 @@ static object LI24(V166,V167)
 
 object V166;object V167;
 {	 VMB24 VMS24 VMV24
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= small_fixnum(11);
 	base[1]= (V166);
@@ -1047,7 +1047,7 @@ static object LI25(V170)
 
 object V170;
 {	 VMB25 VMS25 VMV25
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= small_fixnum(-1);
 	base[1]= (V170);
@@ -1065,7 +1065,7 @@ static object LI26(V174,V175)
 
 object V174;object V175;
 {	 VMB26 VMS26 VMV26
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= (V174);
 	base[1]= (V175);
@@ -1084,7 +1084,7 @@ static object LI27(V180,V181)
 
 object V180;object V181;
 {	 VMB27 VMS27 VMV27
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V182 = make_cons((V180),(V181));
 	VMR27(V182)}
@@ -1096,7 +1096,7 @@ static object LI28(V184)
 
 object V184;
 {	 VMB28 VMS28 VMV28
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V185 = car((V184));
 	VMR28(V185)}
@@ -1108,7 +1108,7 @@ static object LI29(V187)
 
 object V187;
 {	 VMB29 VMS29 VMV29
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V188 = cdr((V187));
 	VMR29(V188)}
@@ -1120,7 +1120,7 @@ static object LI30(V191,V192)
 
 object V191;object V192;
 {	 VMB30 VMS30 VMV30
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= (V192);
 	V194= (*(LnkLI19))((V191));
@@ -1147,7 +1147,7 @@ static object LI31(V200,V201)
 
 object V200;object V201;
 {	 VMB31 VMS31 VMV31
-goto TTL;
+	goto TTL;
 TTL:;
 	V202= (*(LnkLI21))((V200),(V201));
 	{object V203 = (((number_compare(small_fixnum(0),/* INLINE-ARGS */V202)==0?Ct:Cnil))==Cnil?Ct:Cnil);
@@ -1160,7 +1160,7 @@ static object LI32(V206,V207)
 
 object V206;object V207;
 {	 VMB32 VMS32 VMV32
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= (*(LnkLI21))((V206),(V207));
 	base[1]= (*(LnkLI19))((V206));
@@ -1178,7 +1178,7 @@ static object LI33(V212,V213,V214)
 
 object V212;object V213;object V214;
 {	 VMB33 VMS33 VMV33
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= (V214);
 	base[1]= (*(LnkLI22))((V213),(V214));
@@ -1209,7 +1209,7 @@ static object LI34(V221,V222,V223)
 
 object V221;object V222;object V223;
 {	 VMB34 VMS34 VMV34
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= (V221);
 	V225= (*(LnkLI19))((V222));

@@ -8,7 +8,7 @@ static object LI1(V2)
 
 register object V2;
 {	 VMB1 VMS1 VMV1
-goto TTL;
+	goto TTL;
 TTL:;
 	V4= structure_ref((V2),VV[0],1);
 	{object V3= /* INLINE-ARGS */V4;
@@ -29,11 +29,11 @@ TTL:;
 	V8= (*(LnkLI15))();
 	{object V9 = structure_set((V2),VV[0],3,/* INLINE-ARGS */V8);
 	VMR1(V9)}
-goto T3;
+	goto T3;
 T3:;
 	{object V10 = Cnil;
 	VMR1(V10)}
-goto T1;
+	goto T1;
 T1:;
 	if((V3!= VV[16]))goto T16;
 	princ_str("\n	bds_bind(VV[",VV[1]);
@@ -46,7 +46,7 @@ T1:;
 	setq(VV[3],make_cons(VV[2],symbol_value(VV[3])));
 	{object V14 = symbol_value(VV[3]);
 	VMR1(V14)}
-goto T16;
+	goto T16;
 T16:;
 	if((V3!= VV[10]))goto T25;
 	V15= structure_ref((V2),VV[0],4);
@@ -61,11 +61,11 @@ T16:;
 	princ_char(59,VV[1]);
 	{object V18 = Cnil;
 	VMR1(V18)}
-goto T27;
+	goto T27;
 T27:;
 	{object V19 = (*(LnkLI18))();
 	VMR1(V19)}
-goto T25;
+	goto T25;
 T25:;
 	if((V3!= VV[19]))goto T35;
 	princ_str("\n	SETQ_IO(V",VV[1]);
@@ -82,7 +82,7 @@ T25:;
 	princ_str("));",VV[1]);
 	{object V23 = Cnil;
 	VMR1(V23)}
-goto T35;
+	goto T35;
 T35:;
 	princ_str("\n	V",VV[1]);
 	V24= structure_ref((V2),VV[0],4);
@@ -92,30 +92,30 @@ T35:;
 	{object V25= /* INLINE-ARGS */V26;
 	if((V25!= VV[20]))goto T52;
 	goto T51;
-goto T52;
+	goto T52;
 T52:;
 	if((V25!= VV[21]))goto T53;
 	princ_str("fix",VV[1]);
 	goto T51;
-goto T53;
+	goto T53;
 T53:;
 	if((V25!= VV[22]))goto T55;
 	princ_str("char_code",VV[1]);
 	goto T51;
-goto T55;
+	goto T55;
 T55:;
 	if((V25!= VV[23]))goto T57;
 	princ_str("lf",VV[1]);
 	goto T51;
-goto T57;
+	goto T57;
 T57:;
 	if((V25!= VV[24]))goto T59;
 	princ_str("sf",VV[1]);
 	goto T51;
-goto T59;
+	goto T59;
 T59:;
 	(void)((*(LnkLI25))());}
-goto T51;
+	goto T51;
 T51:;
 	princ_char(40,VV[1]);
 	V27= structure_ref((V2),VV[0],2);
@@ -132,7 +132,7 @@ static object LI2(V31,V32)
 register object V31;register object V32;
 {	 VMB2 VMS2 VMV2
 	bds_check;
-goto TTL;
+	goto TTL;
 TTL:;
 	V34= structure_ref((V31),VV[0],1);
 	{object V33= /* INLINE-ARGS */V34;
@@ -152,7 +152,7 @@ TTL:;
 	V37= (*(LnkLI15))();
 	{object V38 = structure_set((V31),VV[0],3,/* INLINE-ARGS */V37);
 	VMR2(V38)}
-goto T67;
+	goto T67;
 T67:;
 	princ_str("\n	",VV[1]);
 	V39= structure_ref((V31),VV[0],2);
@@ -162,7 +162,7 @@ T67:;
 	princ_char(59,VV[1]);
 	{object V40 = Cnil;
 	VMR2(V40)}
-goto T65;
+	goto T65;
 T65:;
 	if((V33!= VV[16]))goto T84;
 	princ_str("\n	bds_bind(VV[",VV[1]);
@@ -174,7 +174,7 @@ T65:;
 	setq(VV[3],make_cons(VV[2],symbol_value(VV[3])));
 	{object V43 = symbol_value(VV[3]);
 	VMR2(V43)}
-goto T84;
+	goto T84;
 T84:;
 	if((V33!= VV[10]))goto T92;
 	princ_str("\n	base0[",VV[1]);
@@ -185,7 +185,7 @@ T84:;
 	princ_char(59,VV[1]);
 	{object V45 = Cnil;
 	VMR2(V45)}
-goto T92;
+	goto T92;
 T92:;
 	if((V33!= VV[19]))goto T98;
 	bds_bind(VV[4],small_fixnum(0));
@@ -208,7 +208,7 @@ T92:;
 	bds_unwind1;
 	bds_unwind1;
 	VMR2(V47)}
-goto T98;
+	goto T98;
 T98:;
 	princ_str("\n	V",VV[1]);
 	V48= structure_ref((V31),VV[0],4);
@@ -222,7 +222,7 @@ T98:;
 	(void) (*Lnk29)();
 	vs_top=sup;
 	goto T114;
-goto T115;
+	goto T115;
 T115:;
 	if((V49!= VV[21]))goto T117;
 	base[0]= (V32);
@@ -230,7 +230,7 @@ T115:;
 	(void) (*Lnk30)();
 	vs_top=sup;
 	goto T114;
-goto T117;
+	goto T117;
 T117:;
 	if((V49!= VV[22]))goto T119;
 	base[0]= (V32);
@@ -238,7 +238,7 @@ T117:;
 	(void) (*Lnk31)();
 	vs_top=sup;
 	goto T114;
-goto T119;
+	goto T119;
 T119:;
 	if((V49!= VV[23]))goto T121;
 	base[0]= (V32);
@@ -246,7 +246,7 @@ T119:;
 	(void) (*Lnk32)();
 	vs_top=sup;
 	goto T114;
-goto T121;
+	goto T121;
 T121:;
 	if((V49!= VV[24]))goto T123;
 	base[0]= (V32);
@@ -254,10 +254,10 @@ T121:;
 	(void) (*Lnk33)();
 	vs_top=sup;
 	goto T114;
-goto T123;
+	goto T123;
 T123:;
 	(void)((*(LnkLI25))());}
-goto T114;
+	goto T114;
 T114:;
 	princ_char(59,VV[1]);
 	{object V51 = Cnil;
@@ -272,7 +272,7 @@ static object LI3(V54,V55)
 register object V54;register object V55;
 {	 VMB3 VMS3 VMV3
 	bds_check;
-goto TTL;
+	goto TTL;
 TTL:;
 	V57= structure_ref((V54),VV[0],1);
 	{object V56= /* INLINE-ARGS */V57;
@@ -296,14 +296,14 @@ TTL:;
 	V61= (*(LnkLI15))();
 	{object V62 = structure_set((V54),VV[0],3,/* INLINE-ARGS */V61);
 	VMR3(V62)}
-goto T128;
+	goto T128;
 T128:;
 	base[0]= list(2,VV[7],structure_ref((V54),VV[0],2));
 	bds_bind(VV[8],base[0]);
 	{object V63 = (*(LnkLI34))((V55));
 	bds_unwind1;
 	VMR3(V63)}
-goto T126;
+	goto T126;
 T126:;
 	if((V56!= VV[16]))goto T143;
 	base[0]= list(2,VV[2],structure_ref((V54),VV[0],4));
@@ -313,7 +313,7 @@ T126:;
 	setq(VV[3],make_cons(VV[2],symbol_value(VV[3])));
 	{object V66 = symbol_value(VV[3]);
 	VMR3(V66)}
-goto T143;
+	goto T143;
 T143:;
 	if((V56!= VV[10]))goto T147;
 	base[0]= list(2,VV[10],structure_ref((V54),VV[0],4));
@@ -321,7 +321,7 @@ T143:;
 	{object V67 = (*(LnkLI34))((V55));
 	bds_unwind1;
 	VMR3(V67)}
-goto T147;
+	goto T147;
 T147:;
 	if((V56== VV[20])
 	|| (V56== VV[21])
@@ -329,14 +329,14 @@ T147:;
 	|| (V56== VV[23])
 	|| (V56== VV[24]))goto T150;
 	if((V56!= VV[19]))goto T149;
-goto T150;
+	goto T150;
 T150:;
 	base[0]= list(3,VV[0],(V54),Cnil);
 	bds_bind(VV[8],base[0]);
 	{object V68 = (*(LnkLI34))((V55));
 	bds_unwind1;
 	VMR3(V68)}
-goto T149;
+	goto T149;
 T149:;
 	{object V69 = (*(LnkLI25))();
 	VMR3(V69)}}
@@ -349,7 +349,7 @@ static object LI4(V72,V73)
 
 object V72;object V73;
 {	 VMB4 VMS4 VMV4
-goto TTL;
+	goto TTL;
 TTL:;
 	princ_str("\n	bds_bind(VV[",VV[1]);
 	(void)((*(LnkLI17))((V73)));

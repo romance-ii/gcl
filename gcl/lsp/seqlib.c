@@ -8,7 +8,7 @@ static object LI1(V2)
 
 register object V2;
 {	 VMB1 VMS1 VMV1
-goto TTL;
+	goto TTL;
 TTL:;
 	if(!(type_of((V2))==t_cons||((V2))==Cnil)){
 	goto T2;}
@@ -57,7 +57,7 @@ static object LI2(V13,V14,V15,V16)
 
 object V13;object V14;object V15;object V16;
 {	 VMB2 VMS2 VMV2
-goto TTL;
+	goto TTL;
 TTL:;
 	if(((V13))==Cnil){
 	goto T18;}
@@ -93,7 +93,7 @@ static object LI3(V23,V24)
 
 object V23;object V24;
 {	 VMB3 VMS3 VMV3
-goto TTL;
+	goto TTL;
 TTL:;
 	if(!(type_of((V23))==t_fixnum)){
 	goto T29;}
@@ -127,7 +127,7 @@ T35:;
 static object LI4()
 
 {	 VMB4 VMS4 VMV4
-goto TTL;
+	goto TTL;
 TTL:;
 	base[0]= VV[7];
 	vs_top=(vs_base=base+0)+1;
@@ -186,7 +186,7 @@ static object LI6(V34,V35)
 
 register object V34;object V35;
 {	 VMB6 VMS6 VMV6
-goto TTL;
+	goto TTL;
 TTL:;
 	if(!(type_of((V34))==t_fixnum)){
 	goto T49;}
@@ -217,7 +217,7 @@ static object LI7(V40)
 
 register object V40;
 {	 VMB7 VMS7 VMV7
-goto TTL;
+	goto TTL;
 TTL:;
 	if(!(type_of((V40))==t_fixnum)){
 	goto T58;}
@@ -3225,7 +3225,7 @@ static void L40()
 	check_arg(3);
 	V678=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[3]= (V678);
 	vs_top=(vs_base=base+3)+1;
@@ -3239,7 +3239,7 @@ static object LI42(V684,V685,V686,V687,V688)
 
 register object V684;long V685;long V686;register object V687;register object V688;
 {	 VMB41 VMS41 VMV41
-goto TTL;
+	goto TTL;
 TTL:;
 	if(!((V686)<=((long)(1)+(V685)))){
 	goto T1187;}
@@ -3698,7 +3698,7 @@ register object *base0;
 	check_arg(1);
 	V747=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{long V748;
 	register object V749;

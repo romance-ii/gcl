@@ -50,7 +50,7 @@ static object LI3(V4)
 
 object V4;
 {	 VMB3 VMS3 VMV3
-goto TTL;
+	goto TTL;
 TTL:;
 	if(!(type_of((V4))==t_symbol)){
 	goto T8;}
@@ -190,7 +190,7 @@ static object LI4(V28)
 
 register object V28;
 {	 VMB4 VMS4 VMV4
-goto TTL;
+	goto TTL;
 TTL:;
 	if(!(type_of((V28))==t_symbol)){
 	goto T73;}
@@ -227,7 +227,7 @@ static object LI5(V34)
 
 register object V34;
 {	 VMB5 VMS5 VMV5
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V35;
 	V35= Cnil;
@@ -294,7 +294,7 @@ static object LI6(V45,V46,V47)
 
 register object V45;register object V46;register object V47;
 {	 VMB6 VMS6 VMV6
-goto TTL;
+	goto TTL;
 TTL:;
 	if(((V46))==Cnil){
 	goto T109;}
@@ -388,7 +388,7 @@ static object LI7(V57)
 
 register object V57;
 {	 VMB7 VMS7 VMV7
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V58;
 	register object V59;
@@ -488,7 +488,7 @@ static object LI8(V66)
 
 register object V66;
 {	 VMB8 VMS8 VMV8
-goto TTL;
+	goto TTL;
 TTL:;
 	if(((V66))==Cnil){
 	goto T194;}
@@ -511,7 +511,7 @@ T194:;
 static object LI9()
 
 {	 VMB9 VMS9 VMV9
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V68;
 	V68= Cnil;
@@ -560,7 +560,7 @@ static void L10()
 	V77=(base[5]);
 	V78=(base[6]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V79;
 	object V80;
@@ -690,7 +690,7 @@ static object LI12(V91)
 
 object V91;
 {	 VMB11 VMS11 VMV11
-goto TTL;
+	goto TTL;
 TTL:;
 	{object V92;
 	base[0]=MMcons((V91),Cnil);
@@ -778,7 +778,7 @@ T277:;
 static object LI13()
 
 {	 VMB12 VMS12 VMV12
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V99;
 	base[0]= symbol_value(VV[50]);

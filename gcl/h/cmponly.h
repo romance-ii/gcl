@@ -1,8 +1,6 @@
 #define EQ(x,y) ((x)==(y))
 
-#define	CMPmake_fixnum(x) \
-((((FIXtemp=(x))+SMALL_FIXNUM_LIMIT)&(-2*SMALL_FIXNUM_LIMIT))==0?small_fixnum(FIXtemp):make_fixnum(FIXtemp))
-
+#define	CMPmake_fixnum(x) make_fixnum(x)
 
 object make_integer();
   /* copy x to y, increasing space by factor of 2  */

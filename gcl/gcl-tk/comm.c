@@ -36,11 +36,11 @@ available on FD, 0 if timeout reached and -1 if failed.")
   FD_SET(fd, &inp);
   n = select(fd + 1, &inp, NULL, NULL, &t);
   if (n < 0)
-    return make_fixnum(-1);
+    return make_fixnum1(-1);
   else if (FD_ISSET(fd, &inp))
-    return make_fixnum(1);
+    return make_fixnum1(1);
   else
-    return make_fixnum(0);
+    return make_fixnum1(0);
 }
 
 
@@ -265,7 +265,7 @@ DEFUN_NEW("CLEAR-CONNECTION",object,fSclear_connection,SI,1,1,NONE,OI,OO,OO,OO,(
    { n+=read(fd,buffer,sizeof(buffer));
    }
  
- return make_fixnum(n);
+ return make_fixnum1(n);
 }
 
 

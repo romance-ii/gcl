@@ -1381,8 +1381,8 @@ dbg:
 #+turbo-closure (clines "#define TURBO_CLOSURE")
 
 (clines "
-static make_trampoline_internal();
-static make_turbo_trampoline_internal();
+static void make_trampoline_internal();
+static void make_turbo_trampoline_internal();
 
 static object
 make_trampoline(function)
@@ -1399,12 +1399,12 @@ make_trampoline(function)
   return vs_pop;
 }
 
-static
+static void
 make_trampoline_internal(base0)
      object *base0;
 {super_funcall_no_event(base0[0]->c.c_car);}
 
-static
+static void
 make_turbo_trampoline_internal(base0)
      object *base0;
 { object function=base0[0]->c.c_car;

@@ -22,7 +22,7 @@ static void L1()
 	V5=(base[4]);
 	V6=(base[5]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[6]= VV[0];
 	base[7]= (V1);
@@ -192,7 +192,7 @@ static void L3()
 	check_arg(1);
 	V28=(base[0]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[1]= symbol_name((V28));
 	base[3]= VV[11];
@@ -219,7 +219,7 @@ static void L4()
 	V30=(base[1]);
 	V31=(base[2]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	base[3]= VV[12];
 	base[4]= VV[13];
@@ -244,7 +244,7 @@ static void L5()
 	V33=(base[1]);
 	V34=(base[2]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V35;
 	register object V36;
@@ -337,7 +337,7 @@ static void L6()
 	V41=(base[0]);
 	V42=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V43;
 	V43= (V42);
@@ -373,7 +373,7 @@ static void L7()
 	V44=(base[0]);
 	V45=(base[1]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V46;
 	V46= (V45);
@@ -1043,7 +1043,7 @@ static void L9()
 	V111=(base[4]);
 	V112=(base[5]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	{register object V113;
 	base[6]= VV[72];
@@ -1153,7 +1153,7 @@ static void L11()
 	V135=(base[6]);
 	V136=(base[7]);
 	vs_top=sup;
-goto TTL;
+	goto TTL;
 TTL:;
 	if(((V131))!=Cnil){
 	goto T479;}
