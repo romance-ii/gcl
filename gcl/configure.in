@@ -1,7 +1,7 @@
 AC_INIT()
 AC_CONFIG_HEADER(h/gclincl.h)
 
-VERSION=5.9.0
+VERSION=2.5.0
 AC_SUBST(VERSION)
 
 # some parts of this configure script are taken from the tcl configure.in
