@@ -5,8 +5,10 @@ gclcvs (2.7.0-25) unstable; urgency=low
   * gclclean makefile target and other small makefile changes
   * Proper check for C stack array body address in gbc.c and sgbc.c
   * acconfig.h update for isnormal default
+  * Fix bug in setting elements (si::aset) of 0 rank arrays uncovered by
+    the random tester
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 27 May 2004 20:40:48 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 31 May 2004 18:35:01 -0400
 
 gclcvs (2.7.0-24) unstable; urgency=low
 
