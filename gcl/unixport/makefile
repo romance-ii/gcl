@@ -119,7 +119,7 @@ libgcl.a: $(FIRST_FILE) $(OBJS) $(LSPOBJS) $(CMPOBJS) sys_gcl.o $(LAST_FILE) gmp
 	ar rs $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
 raw_$(SYSTEM): libgcl.a libgclp.a $(SYSTEM_OBJS) $(EXTRAS)
-	$(CC) -Wl,--allow-multiple-definition  -Wl,-Map=map.txt -o raw_$(SYSTEM)$(EXE) $(filter %.o,$^) -L. $(EXTRA_LD_LIBS) $(LD_LIBS)
+	$(CC) -Wl,-Map=map.txt -o raw_$(SYSTEM)$(EXE) $(filter %.o,$^) -L. $(EXTRA_LD_LIBS) $(LD_LIBS)
 
 sys_gcl.o: sys_gcl.c $(HDIR)/object.h $(HDIR)/config.h
 	$(CC) $(CFLAGS) -c -I$(HDIR) sys_gcl.c
