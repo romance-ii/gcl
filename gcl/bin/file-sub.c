@@ -5,6 +5,8 @@
  */
 
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 void scanCopyToLine(FILE *fp, char *line,FILE *outstream);
 

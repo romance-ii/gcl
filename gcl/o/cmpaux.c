@@ -23,6 +23,9 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 	cmpaux.c
 */
+
+#include <string.h>
+
 #define NEED_MP_H
 #include "include.h"
 #define dcheck_type(a,b) check_type(a,b)

@@ -20,6 +20,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 
+#include <string.h>
 #include <dlfcn.h>
 #ifdef HAVE_AOUT
 #include HAVE_AOUT

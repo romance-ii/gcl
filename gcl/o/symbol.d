@@ -22,6 +22,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	symbol.d
 */
 
+#include <string.h>
 #include "include.h"
 
 object siSpname;

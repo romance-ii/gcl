@@ -19,6 +19,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+#include <string.h>
+
 #define IN_UNIXFSYS
 #include "include.h"
 #include <sys/types.h>

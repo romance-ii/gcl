@@ -24,6 +24,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	IMPLEMENTATION-DEPENDENT
 */
 
+#include <string.h>
+
 #define IN_MAIN
 
 #ifdef KCLOVM
