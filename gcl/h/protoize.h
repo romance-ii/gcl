@@ -108,8 +108,8 @@
 /* backq.c:326:OF */ extern object fLcomma_reader (object x0, object x1); /* (x0, x1) object x0; object x1; */
 /* backq.c:351:OF */ extern object fLbackquote_reader (object x0, object x1); /* (x0, x1) object x0; object x1; */
 /* backq.c:381:OF */ extern void init_backq (void); /* () */
-/* bcmp.c:2:OF */ extern int bcmp (const void *s1, const void *s2, size_t n); /* (s1, s2, n) char *s1; char *s2; int n; */
-/* bcopy.c:3:OF */ extern void bcopy (const void *s1, void *s2, size_t n); /* (s1, s2, n) char *s1; char *s2; int n; */
+/* bcmp.c:2:OF */ extern int bcmp (const char *s1, const char *s2, size_t n); /* (s1, s2, n) char *s1; char *s2; int n; */
+/* bcopy.c:3:OF */ extern void bcopy (const char *s1, char *s2, size_t n); /* (s1, s2, n) char *s1; char *s2; int n; */
 /* bds.c:31:OF */ extern void bds_unwind (bds_ptr new_bds_top); /* (new_bds_top) bds_ptr new_bds_top; */
 /* big.c:53:OF */ extern object fSset_gmp_allocate_relocatable (object flag); /* (flag) object flag; */
 /* gmp_big.c:96:OF */ extern void init_big1 (void); /* () */
@@ -165,7 +165,7 @@ struct key {short n,allow_other_keys;
 /* block.c:97:OF */ extern void Freturn (object args); /* (args) object args; */
 /* block.c:121:OF */ extern void init_block (void); /* () */
 /* bsearch.c:5:OF */ extern void *bsearch (const void *key, const void *base, size_t nel, size_t keysize, int (*compar) (const void *,const void *)); /* (key, base, nel, keysize, compar) char *key; char *base; unsigned int nel; unsigned int keysize; int (*compar)(); */
-/* bzero.c:3:OF */ extern void bzero (void *b, size_t length); /* (b, length) char *b; int length; */
+/* bzero.c:3:OF */ extern void bzero (char *b, size_t length); /* (b, length) char *b; int length; */
 /* catch.c:32:OF */ extern void Fcatch (object args); /* (args) object args; */
 /* catch.c:52:OF */ extern void siLerror_set (void); /* () */
 /* catch.c:61:OF */ extern object fSerror_set (object x0); /* (x0) object x0; */
@@ -486,8 +486,10 @@ typedef void (*funcvoid)(void);
 /* sgbc.c:938:OF */ extern int sgc_start (void); /* () */
 /* sgbc.c:1068:OF */ extern int sgc_quit (void); /* () */
 /* sgbc.c:1131:OF */ extern void make_writable (int beg, int i); /* (beg, i) int beg; int i; */
+#ifndef __MINGW32__
 #include <signal.h>
 /* sgbc.c:1149:OF */ extern void memprotect_handler (int sig, long code, struct sigcontext *scp, char *addr); /* (sig, code, scp, addr) int sig; int code; struct sigcontext *scp; char *addr; */
+#endif
 /* sgbc.c:1202:OF */ extern void sgc_mprotect (int pbeg, int n, int writable); /* (pbeg, n, writable) int pbeg; int n; int writable; */
 /* sgbc.c:1220:OF */ extern void fix_for_page_multiple (int beg, int end); /* (beg, end) int beg; int end; */
 /* sgbc.c:1246:OF */ extern void memory_protect (int on); /* (on) int on; */
@@ -618,8 +620,10 @@ typedef void (*funcvoid)(void);
 /* nsocket.c:385:OF */ extern object fSset_blocking (object sock, object setBlocking); /* (sock, setBlocking) object sock; object setBlocking; */
 /* nsocket.c:484:OF */ extern int getOneChar (FILE *fp); /* (fp) FILE *fp; */
 /* nsocket.c:539:OF */ extern void ungetCharGclSocket (int c, object strm); /* (c, strm) int c; object strm; */
+#ifndef __MINGW32__
 /* nsocket.c:575:OF */ extern int TcpOutputProc (int fd, char *buf, int toWrite, int *errorCodePtr); /* (fd, buf, toWrite, errorCodePtr) int fd; char *buf; int toWrite; int *errorCodePtr; */
 /* nsocket.c:592:OF */ extern void tcpCloseSocket (int fd); /* (fd) int fd; */
+#endif
 /* nsocket.c:598:OF */ extern void doReverse (char *s, int n); /* (s, n) char *s; int n; */
 /* nsocket.c:619:OF */ extern int getCharGclSocket (object strm, object block); /* (strm, block) object strm; object block; */
 /* num_arith.c:31:OF */ extern object fixnum_add (int i, int j); /* (i, j) int i; int j; */
@@ -950,7 +954,16 @@ typedef void (*funcvoid)(void);
 /* unexec-19.29.c:1016:OF */ extern int write_segment (int new, register char *ptr, register char *end); /* (new, ptr, end) int new; register char *ptr; register char *end; */
 /* unexec.c:373:OF */ /*  extern int unexec (char *new_name, char *a_name, unsigned int data_start, unsigned int bss_start, unsigned int entry_address); */ /* (new_name, a_name, data_start, bss_start, entry_address) char *new_name; char *a_name; unsigned int data_start; unsigned int bss_start; unsigned int entry_address; */
 /* unexec.c:1016:OF */ extern int write_segment (int new, register char *ptr, register char *end); /* (new, ptr, end) int new; register char *ptr; register char *end; */
+#ifdef _WIN32
+extern void unexec (
+    char *new_name,
+    char *old_name,
+    void *start_data,
+    void *start_bss,
+    void *entry_address );
+#else
 /* unexelf.c:626:OF */ extern void unexec (char *new_name, char *old_name, unsigned int data_start, unsigned int bss_start, unsigned int entry_address); /* (new_name, old_name, data_start, bss_start, entry_address) char *new_name; char *old_name; unsigned int data_start; unsigned int bss_start; unsigned int entry_address; */
+#endif
 /* unexlin.c:317:OF */ /*  extern int unexec (char *new_name, char *a_name, unsigned int data_start, unsigned int bss_start, unsigned int entry_address); */ /* (new_name, a_name, data_start, bss_start, entry_address) char *new_name; char *a_name; unsigned int data_start; unsigned int bss_start; unsigned int entry_address; */
 /* unexlin.c:808:OF */ extern int write_segment (int new, register char *ptr, register char *end); /* (new, ptr, end) int new; register char *ptr; register char *end; */
 /* unixfasl.c:283:OF */ extern int faslink (object faslfile, object ldargstring); /* (faslfile, ldargstring) object faslfile; object ldargstring; */
