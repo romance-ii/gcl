@@ -1443,12 +1443,12 @@ int *eep;
 @)
 
 @(defun make_pathname (&key
-        (host `Cnil`)
-	(device `Cnil`)
-	(directory `Cnil`)
-	(name `Cnil`)
-	(type `Cnil`)
-	(version `Cnil`)
+        (host `Cnil` host_supplied_p)
+	(device `Cnil` device_supplied_p)
+	(directory `Cnil` directory_supplied_p)
+	(name `Cnil` name_supplied_p)
+	(type `Cnil` type_supplied_p)
+	(version `Cnil` version_supplied_p)
 	(case `Cnil`)
 	(defaults `Ct`)
 	&aux x)
@@ -1467,6 +1467,18 @@ int *eep;
 		defaults = coerce_to_pathname(defaults);
 		x = merge_pathnames(x, defaults, Cnil);
 		wrap_pathname(x);
+	}
+#ifdef ANSI_COMMON_LISP
+	if ((defaults != Cnil) && !pathname_resolve(pathKansi)) {
+#else
+	if (defaults != Cnil) {
+#endif
+	    if ((host == Cnil) && (host_supplied_p)) x->pn.pn_host = host;
+	    if ((device == Cnil) && (device_supplied_p)) x->pn.pn_device = device;
+	    if ((directory == Cnil) && (directory_supplied_p)) x->pn.pn_directory = directory;
+	    if ((name == Cnil) && (name_supplied_p)) x->pn.pn_name = name;
+	    if ((type == Cnil) && (type_supplied_p)) x->pn.pn_type = type;
+	    if ((version == Cnil) && (version_supplied_p)) x->pn.pn_version = version;
 	}
 
 	@(return x)
