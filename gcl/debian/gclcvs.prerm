@@ -1,0 +1,18 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = "remove" ] || [ "$1" = "purge" ] ; then
+	unregister-common-lisp-implementation gclcvs
+# FIXME this should go elsewhere
+	echo '(mapcar (function delete-file) 
+		(directory 
+			(merge-pathnames 
+				(pathname *system-directory*) 
+				(make-pathname :name "*clc*"))))' | gclcvs
+
+fi
+
+#DEBHELPER#
+
+exit 0

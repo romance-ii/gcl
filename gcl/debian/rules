@@ -183,7 +183,7 @@ install-stamp: build-stamp debian/control $(INS)
 	[ "$(EXT)" = "" ] || rm debian/tmp/usr/share/emacs/site-lisp/gcl$(EXT)/dbl.el
 
 	[ "$(EXT)" = "" ] || \
-		for i in debian/tmp/usr/share/info/*.info*; do \
+		for i in debian/tmp/usr/share/info/gcl-*.info*; do \
 			mv $$i $$(echo $$i | sed "s,gcl,gcl$(EXT),g"); done
 
 	mv debian/tmp/usr/share/doc debian/tmp/usr/share/foo

@@ -89,6 +89,15 @@ install-clc)
 	cat > $gcl_bin << !BIN_GCL!
 #!/bin/sh
 
+if [ "\$GCL_ANSI" = "" ] ; then
+exec $gcl_sys_dir/saved_gcl \\
+   -dir $gcl_sys_dir/ \\
+   -libdir $gcl_lib_dir/ \\
+   -eval '(setq si::*allow-gzipped-file* t)' \\
+   -eval '(setq si::*tk-library* "/usr/lib/tk8.4/../tk8.4")' \\
+     "\$@"
+else
+
 [ -f  $image ] &&
 exec $image \\
    -dir $gcl_sys_dir/ \\
@@ -106,6 +115,8 @@ exec $ansi_image \\
      "\$@"
 
 echo "Cannot find GCL ansi_image or clc_image." 2>&1
+
+fi
 
 # other options: -load /tmp/foo.o -load jo.lsp -eval "(joe 3)"
 !BIN_GCL!
