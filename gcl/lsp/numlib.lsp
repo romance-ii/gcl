@@ -155,12 +155,14 @@
 
 (defun asinh (x) (log (+ x (sqrt (+ 1.0d0 (* x x))))))
 ;(defun acosh (x)
+;  (log (+ x
+;	  (* (1+ x)
+;	     (sqrt (/ (1- x) (1+ x)))))))
+;(defun acosh (x)
 ;       (log (+ x
-;               (* (1+ x)
-;                    (sqrt (/ (1- x) (1+ x)))))))
+;	       (sqrt (* (1- x) (1+ x))))))
 (defun acosh (x)
-       (log (+ x
-	       (sqrt (* (1- x) (1+ x))))))
+  (* 2 (log (+ (sqrt (/ (1+ x) 2)) (sqrt (/ (1- x) 2))))))
 (defun atanh (x)
        (when (or (= x 1.0d0) (= x -1.0d0))
              (error "The argument, ~s, is a logarithmic singularity.~

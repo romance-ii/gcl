@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-60) unstable; urgency=low
+
+  * Still better acosh, courtesy of Barton Willis
+
+ -- Camm Maguire <camm@m.enhanced.com>  Thu, 17 Oct 2002 04:52:03 -0400
+
 gcl (2.5.0.cvs20020625-59) unstable; urgency=low
 
   * wrong number of arguments, keyword errors in lambda list bindings,

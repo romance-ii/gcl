@@ -532,18 +532,32 @@ object V99;
 {	 VMB12 VMS12 VMV12
 goto TTL;
 TTL:;
-	V101= one_minus((V99));
-	V102= one_plus((V99));
-	base[1]= number_times(/* INLINE-ARGS */V101,/* INLINE-ARGS */V102);
+	base[2]= one_plus((V99));
+	base[3]= small_fixnum(2);
+	vs_top=(vs_base=base+2)+2;
+	Ldivide();
+	vs_top=sup;
+	base[1]= vs_base[0];
 	vs_top=(vs_base=base+1)+1;
 	Lsqrt();
 	vs_top=sup;
-	V100= vs_base[0];
-	base[0]= number_plus((V99),V100);
+	V101= vs_base[0];
+	base[2]= one_minus((V99));
+	base[3]= small_fixnum(2);
+	vs_top=(vs_base=base+2)+2;
+	Ldivide();
+	vs_top=sup;
+	base[1]= vs_base[0];
+	vs_top=(vs_base=base+1)+1;
+	Lsqrt();
+	vs_top=sup;
+	V102= vs_base[0];
+	base[0]= number_plus(V101,V102);
 	vs_top=(vs_base=base+0)+1;
 	Llog();
 	vs_top=sup;
-	{object V103 = vs_base[0];
+	V100= vs_base[0];
+	{object V103 = number_times(small_fixnum(2),V100);
 	VMR12(V103)}
 	base[0]=base[0];
 	return Cnil;
@@ -557,18 +571,18 @@ register object V105;
 goto TTL;
 TTL:;
 	if(number_compare((V105),VV[2])==0){
-	goto T166;}
+	goto T173;}
 	if(!(number_compare((V105),VV[3])==0)){
-	goto T165;}
-goto T166;
-T166:;
+	goto T172;}
+goto T173;
+T173:;
 	base[0]= VV[9];
 	base[1]= (V105);
 	vs_top=(vs_base=base+0)+2;
 	Lerror();
 	vs_top=sup;
-goto T165;
-T165:;
+goto T172;
+T172:;
 	base[1]= one_plus((V105));
 	V106= number_times((V105),(V105));
 	base[3]= number_minus(VV[2],/* INLINE-ARGS */V106);
@@ -599,36 +613,36 @@ TTL:;
 	{register object V110;
 	V110= (V109);
 	if(!(type_of((V110))==t_shortfloat||type_of((V110))==t_longfloat)){
-	goto T177;}
+	goto T184;}
 	{object V111;
 	object V112;
 	object V113;
 	base[0]= (V109);
 	vs_top=(vs_base=base+0)+1;
 	Linteger_decode_float();
-	if(vs_base>=vs_top){vs_top=sup;goto T181;}
+	if(vs_base>=vs_top){vs_top=sup;goto T188;}
 	V111= vs_base[0];
 	vs_base++;
-	if(vs_base>=vs_top){vs_top=sup;goto T182;}
+	if(vs_base>=vs_top){vs_top=sup;goto T189;}
 	V112= vs_base[0];
 	vs_base++;
-	if(vs_base>=vs_top){vs_top=sup;goto T183;}
+	if(vs_base>=vs_top){vs_top=sup;goto T190;}
 	V113= vs_base[0];
 	vs_top=sup;
-	goto T184;
-goto T181;
-T181:;
+	goto T191;
+goto T188;
+T188:;
 	V111= Cnil;
-goto T182;
-T182:;
+goto T189;
+T189:;
 	V112= Cnil;
-goto T183;
-T183:;
+goto T190;
+T190:;
 	V113= Cnil;
-goto T184;
-T184:;
+goto T191;
+T191:;
 	if(!(number_compare((V113),small_fixnum(0))>=0)){
-	goto T186;}
+	goto T193;}
 	base[0]= (V109);
 	vs_top=(vs_base=base+0)+1;
 	Lfloat_radix();
@@ -637,8 +651,8 @@ T184:;
 	V115= number_expt(V114,(V112));
 	{object V116 = number_times((V111),/* INLINE-ARGS */V115);
 	VMR14(V116)}
-goto T186;
-T186:;
+goto T193;
+T193:;
 	base[0]= (V109);
 	vs_top=(vs_base=base+0)+1;
 	Lfloat_radix();
@@ -648,18 +662,18 @@ T186:;
 	V119= number_times((V111),/* INLINE-ARGS */V118);
 	{object V120 = number_negate(/* INLINE-ARGS */V119);
 	VMR14(V120)}}
-goto T177;
-T177:;
+goto T184;
+T184:;
 	base[0]= (V110);
 	vs_top=(vs_base=base+0)+1;
 	(void) (*Lnk16)();
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
-	goto T193;}
+	goto T200;}
 	{object V121 = (V109);
 	VMR14(V121)}
-goto T193;
-T193:;
+goto T200;
+T200:;
 	base[0]= (*(LnkLI17))(VV[10],(V110),VV[11]);
 	vs_top=(vs_base=base+0)+1;
 	Lerror();
@@ -681,15 +695,15 @@ static void L15()
 	if(vs_top-vs_base>2) too_many_arguments();
 	V123=(base[0]);
 	vs_base=vs_base+1;
-	if(vs_base>=vs_top){vs_top=sup;goto T197;}
+	if(vs_base>=vs_top){vs_top=sup;goto T204;}
 	V124=(base[1]);
 	vs_top=sup;
-	goto T198;
-goto T197;
-T197:;
+	goto T205;
+goto T204;
+T204:;
 	V124= VV[12];
-goto T198;
-T198:;
+goto T205;
+T205:;
 	{object V125;
 	object V126;
 	base[3]= (V123);
@@ -704,21 +718,21 @@ T198:;
 	base[3]= vs_base[0];
 	vs_top=(vs_base=base+2)+2;
 	Lfloor();
-	if(vs_base>=vs_top){vs_top=sup;goto T205;}
+	if(vs_base>=vs_top){vs_top=sup;goto T212;}
 	V125= vs_base[0];
 	vs_base++;
-	if(vs_base>=vs_top){vs_top=sup;goto T206;}
+	if(vs_base>=vs_top){vs_top=sup;goto T213;}
 	V126= vs_base[0];
 	vs_top=sup;
-	goto T207;
-goto T205;
-T205:;
+	goto T214;
+goto T212;
+T212:;
 	V125= Cnil;
-goto T206;
-T206:;
+goto T213;
+T213:;
 	V126= Cnil;
-goto T207;
-T207:;
+goto T214;
+T214:;
 	base[3]= (V125);
 	base[4]= (V126);
 	vs_top=(vs_base=base+3)+2;
@@ -742,15 +756,15 @@ static void L16()
 	if(vs_top-vs_base>2) too_many_arguments();
 	V127=(base[0]);
 	vs_base=vs_base+1;
-	if(vs_base>=vs_top){vs_top=sup;goto T212;}
+	if(vs_base>=vs_top){vs_top=sup;goto T219;}
 	V128=(base[1]);
 	vs_top=sup;
-	goto T213;
-goto T212;
-T212:;
+	goto T220;
+goto T219;
+T219:;
 	V128= VV[12];
-goto T213;
-T213:;
+goto T220;
+T220:;
 	{object V129;
 	object V130;
 	base[3]= (V127);
@@ -765,21 +779,21 @@ T213:;
 	base[3]= vs_base[0];
 	vs_top=(vs_base=base+2)+2;
 	Lceiling();
-	if(vs_base>=vs_top){vs_top=sup;goto T220;}
+	if(vs_base>=vs_top){vs_top=sup;goto T227;}
 	V129= vs_base[0];
 	vs_base++;
-	if(vs_base>=vs_top){vs_top=sup;goto T221;}
+	if(vs_base>=vs_top){vs_top=sup;goto T228;}
 	V130= vs_base[0];
 	vs_top=sup;
-	goto T222;
-goto T220;
-T220:;
+	goto T229;
+goto T227;
+T227:;
 	V129= Cnil;
-goto T221;
-T221:;
+goto T228;
+T228:;
 	V130= Cnil;
-goto T222;
-T222:;
+goto T229;
+T229:;
 	base[3]= (V129);
 	base[4]= (V130);
 	vs_top=(vs_base=base+3)+2;
@@ -803,15 +817,15 @@ static void L17()
 	if(vs_top-vs_base>2) too_many_arguments();
 	V131=(base[0]);
 	vs_base=vs_base+1;
-	if(vs_base>=vs_top){vs_top=sup;goto T227;}
+	if(vs_base>=vs_top){vs_top=sup;goto T234;}
 	V132=(base[1]);
 	vs_top=sup;
-	goto T228;
-goto T227;
-T227:;
+	goto T235;
+goto T234;
+T234:;
 	V132= VV[12];
-goto T228;
-T228:;
+goto T235;
+T235:;
 	{object V133;
 	object V134;
 	base[3]= (V131);
@@ -826,21 +840,21 @@ T228:;
 	base[3]= vs_base[0];
 	vs_top=(vs_base=base+2)+2;
 	Ltruncate();
-	if(vs_base>=vs_top){vs_top=sup;goto T235;}
+	if(vs_base>=vs_top){vs_top=sup;goto T242;}
 	V133= vs_base[0];
 	vs_base++;
-	if(vs_base>=vs_top){vs_top=sup;goto T236;}
+	if(vs_base>=vs_top){vs_top=sup;goto T243;}
 	V134= vs_base[0];
 	vs_top=sup;
-	goto T237;
-goto T235;
-T235:;
+	goto T244;
+goto T242;
+T242:;
 	V133= Cnil;
-goto T236;
-T236:;
+goto T243;
+T243:;
 	V134= Cnil;
-goto T237;
-T237:;
+goto T244;
+T244:;
 	base[3]= (V133);
 	base[4]= (V134);
 	vs_top=(vs_base=base+3)+2;
@@ -864,15 +878,15 @@ static void L18()
 	if(vs_top-vs_base>2) too_many_arguments();
 	V135=(base[0]);
 	vs_base=vs_base+1;
-	if(vs_base>=vs_top){vs_top=sup;goto T242;}
+	if(vs_base>=vs_top){vs_top=sup;goto T249;}
 	V136=(base[1]);
 	vs_top=sup;
-	goto T243;
-goto T242;
-T242:;
+	goto T250;
+goto T249;
+T249:;
 	V136= VV[12];
-goto T243;
-T243:;
+goto T250;
+T250:;
 	{object V137;
 	object V138;
 	base[3]= (V135);
@@ -887,21 +901,21 @@ T243:;
 	base[3]= vs_base[0];
 	vs_top=(vs_base=base+2)+2;
 	Lround();
-	if(vs_base>=vs_top){vs_top=sup;goto T250;}
+	if(vs_base>=vs_top){vs_top=sup;goto T257;}
 	V137= vs_base[0];
 	vs_base++;
-	if(vs_base>=vs_top){vs_top=sup;goto T251;}
+	if(vs_base>=vs_top){vs_top=sup;goto T258;}
 	V138= vs_base[0];
 	vs_top=sup;
-	goto T252;
-goto T250;
-T250:;
+	goto T259;
+goto T257;
+T257:;
 	V137= Cnil;
-goto T251;
-T251:;
+goto T258;
+T258:;
 	V138= Cnil;
-goto T252;
-T252:;
+goto T259;
+T259:;
 	base[3]= (V137);
 	base[4]= (V138);
 	vs_top=(vs_base=base+3)+2;
