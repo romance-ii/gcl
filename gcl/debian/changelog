@@ -1,3 +1,11 @@
+gcl (2.5.0.cvs20020625-39) unstable; urgency=high
+
+  * gcc-3.1 for ia64 fixes a compilation bug in num_co.c for -O3 and
+    higher -- code takes address of a variable kept in a register
+  * compile num_log.c with -O only on ia64 to work around compiler bug
+
+ -- Camm Maguire <camm@enhanced.com>  Sun, 11 Aug 2002 08:53:03 -0400
+
 gcl (2.5.0.cvs20020625-38) unstable; urgency=high
 
   * check for long c statck addresses, fixing NULL_OR_ON_C_STACK macro
