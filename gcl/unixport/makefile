@@ -38,24 +38,24 @@ prefix=/usr/local
 INFO_DIR=/usr/info/
 
 # where to put emacs lisp files.
-EMACS_SITE_LISP=/usr/share/emacs/20.7/site-lisp
+EMACS_SITE_LISP=/usr/local/share/emacs/20.7/site-lisp
 
 # the default.el file
-EMACS_DEFAULT_EL=/usr/share/emacs/20.7/site-lisp/default.el
+EMACS_DEFAULT_EL=/usr/local/share/emacs/20.7/site-lisp/default.el
 
 # numerous TCL/TK variables culled from the tkConfig.sh and tclConfig.sh
 # if these are found.
 TK_CONFIG_PREFIX=/usr/lib
-TK_LIBRARY=/usr/lib/tk8.3
-TCL_LIBRARY=/usr/lib/tcl8.3
+TK_LIBRARY=/usr/lib/tk8.2
+TCL_LIBRARY=/usr/lib/tcl8.2
 TK_XINCLUDES=-I/usr/X11R6/include
 TK_INCLUDE=-I/usr/lib/../include
 TCL_INCLUDE=-I/usr/lib/../include
-TK_LIB_SPEC=-L/usr/lib -ltk8.3
-TK_BUILD_LIB_SPEC=-L/tmp/tk8.3.2/unix -ltk8.3
+TK_LIB_SPEC=-L/usr/lib -ltk8.2
+TK_BUILD_LIB_SPEC=-L/usr/lib -ltk8.2
 TK_XLIBSW=-L/usr/X11R6/lib -lX11
 TK_XINCLUDES=-I/usr/X11R6/include
-TCL_LIB_SPEC=-L/usr/lib -ltcl8.3
+TCL_LIB_SPEC=-L/usr/lib -ltcl8.2${TCL_DBGX}
 TCL_DL_LIBS=-ldl
 TCL_LIBS=-ldl  -lm
 
@@ -66,7 +66,7 @@ GCC=gcc
 
 
 
-GCLDIR=/home/wfs/cvs/gcl
+GCLDIR=/fix/f/debian/mm/gcl/gcl
 SHELL=/bin/sh
 MACHINE=386-linux
 
@@ -247,4 +247,4 @@ hpbsd-crt0-mod.o:
 
 
 clean:
-	rm -f saved_$(GCL) raw_$(GCL) *.o core a.out rsym
+	rm -f saved_$(GCL) raw_$(GCL) *.o core a.out rsym foo *maxima*
