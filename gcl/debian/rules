@@ -11,7 +11,7 @@
 
 # This is the debhelper compatability version to use.
 export DH_COMPAT=4
-ARCHT:=$(shell dpkg --print-architecture)
+ARCHT:=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 
 MCC:=gcc
 #ifeq ($(ARCHT),arm)
@@ -76,17 +76,22 @@ configure-%-stamp: $(CFGS)
 
 	dh_testdir
 
+	! [ -e unixport/saved_pre_gcl ] || $(MAKE) clean
+
 	chmod -R +x gmp3/*
 
-	[ "$(ARCHT)" != "i386" ] || ( cd gmp3 && CC=$(MCC) ./configure --build=i486-unknown-linux-gnu )
+#	[ "$(ARCHT)" != "i386" ] || ( cd gmp3 && CC=$(MCC) ./configure --build=i486-unknown-linux-gnu )
 
-	[ "$*" != "ansi" ] || ANSI="--enable-ansi" ; \
+	[ "$*" != "ansi" ] || FLAGS="--enable-ansi" ; \
+	[ "$*" != "gprof" ] || FLAGS="--enable-gprof" ; \
+	[ "$*" != "ansi-gprof" ] || FLAGS="--enable-ansi --enable-gprof" ; \
 	CC=$(MCC) ./configure \
+		--host=$$(dpkg-architecture -qDEB_HOST_GNU_TYPE) \
 		--disable-statsysbfd \
 		--enable-$(RELOC) \
 		$(GMP) \
 		$(DEBUG) \
-		$$ANSI \
+		$$FLAGS \
 		--prefix=/usr \
 		--mandir=\$${prefix}/share/man \
 		--enable-infodir=\$${prefix}/share/info \
@@ -103,6 +108,12 @@ build-%-stamp: configure-%-stamp
 	rm -rf debian/$*
 	mkdir -p debian/$*
 	$(MAKE) install DESTDIR=$$(pwd)/debian/$*
+	[ "$(findstring gprof,$*)" = "" ] || (\
+		tmp=debian/$*; old=/usr/lib/gcl-$(VERS); new=$$old-prof;\
+		if [ "$(findstring ansi,$*)" = "" ] ; then i=saved_gcl ; else i=saved_ansi_gcl ; fi;\
+		mv $$tmp/$$old $$tmp/$$new ;\
+		echo "(reset-sys-paths \"$$new/\")(si::save-system \"debian/tmp-image\")" | $$tmp/$$new/unixport/$$i &&\
+		mv debian/tmp-image $$tmp/$$new/unixport/$$i;)
 
 	touch $@
 
@@ -114,7 +125,7 @@ ansi-tests/test_results: build-ansi-stamp
 	$(MAKE) $@
 
 build: build-stamp
-build-stamp: build-trad-stamp bclean-stamp build-ansi-stamp ansi-tests/test_results
+build-stamp: build-gprof-stamp build-ansi-gprof-stamp build-trad-stamp build-ansi-stamp ansi-tests/test_results
 	touch $@
 
 debian/control.rm:
@@ -131,7 +142,7 @@ clean: debian/control
 	-$(MAKE) clean
 
 	dh_clean
-	rm -rf debian/trad debian/ansi $(INS) debian/substvars
+	rm -rf debian/gprof debian/ansi-gprof debian/trad debian/ansi $(INS) debian/substvars
 	rm -rf *stamp
 	for i in $(CFGS) ; do ! [ -e $$i ] || mv $$i $${i%.ori} ; done
 
@@ -155,6 +166,8 @@ install-stamp: build-stamp debian/control $(INS)
 	mkdir -p debian/tmp
 	cp -a debian/ansi/* debian/tmp/
 	cp -a debian/trad/* debian/tmp/
+	cp -a debian/gprof/* debian/tmp/
+	cp -a debian/ansi-gprof/* debian/tmp/
 
 	mv debian/tmp/usr/share/emacs/site-lisp debian/tmp/usr/share/emacs/foo
 	mkdir -p debian/tmp/usr/share/emacs/site-lisp
@@ -200,16 +213,22 @@ install-stamp: build-stamp debian/control $(INS)
 
 	rm -f debian/tmp/usr/bin/*.exe debian/tmp/usr/bin/*.bat
 
-	find debian/tmp -type f -name "*.lsp" -exec chmod -x {} \;
-	find debian/tmp -type f -name "*.lisp" -exec chmod -x {} \;
-	find debian/tmp -type f -name "*.el" -exec chmod -x {} \;
-	find debian/tmp -type f -name "*.tcl" -exec chmod -x {} \;
+	find debian/tmp -type f -name "*.lsp" -exec chmod ugo-x {} \;
+	find debian/tmp -type f -name "*.lisp" -exec chmod ugo-x {} \;
+	find debian/tmp -type f -name "*.el" -exec chmod ugo-x {} \;
+	find debian/tmp -type f -name "*.tcl" -exec chmod ugo-x {} \;
 
 	rm -f debian/tmp/usr/bin/gcl
-	cat debian/gcl.sh | sed "s,gcl/,/usr/lib/gcl-$(VERS)/,g" >debian/tmp/usr/bin/gcl$(EXT)
+	TKVERS=$$(cat bin/gcl | grep /tk | head -1l | sed "s,.*/tk\([0-9.]*\)\").*,\1,1"); \
+		cat debian/gcl.sh | sed -e "s,@EXT@,$(EXT),g" \
+					-e "s,@VERS@,$(VERS),g" \
+					-e "s,@TKVERS@,$$TKVERS,g" >debian/tmp/usr/bin/gcl$(EXT)
 	chmod 0755 debian/tmp/usr/bin/gcl$(EXT)
 
 	rm -rf debian/tmp/usr/lib/gcl-$(VERS)/info
+	mkdir -p debian/tmp/etc/default
+	echo DEFAULT_GCL_ANSI= >debian/tmp/etc/default/gcl$(EXT)
+	echo DEFAULT_GCL_PROF= >>debian/tmp/etc/default/gcl$(EXT)
 
 	mkdir -p debian/tmp/usr/lib/common-lisp/bin
 	chmod +x debian/gclcvs.sh
@@ -242,8 +261,10 @@ binary-arch: build install debian/substvars
 	dh_installemacsen -a
 #	dh_installmanpages -a gcl/gmp3/ansi2knr.1
 	dh_installman -a
+	dh_installdebconf -a
 	dh_installchangelogs ChangeLog -a
-	dh_strip -a -Xlibgcl -Xlibansi_gcl
+	dh_strip -a -Xlibgcl -Xlibansi_gcl \
+		-Xgcl-$(VERS)-prof/unixport/saved_gcl -Xgcl-$(VERS)-prof/unixport/saved_ansi_gcl
 	dh_link -a
 	dh_compress -a
 	dh_fixperms -a
@@ -255,4 +276,4 @@ binary-arch: build install debian/substvars
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure
-.PRECIOUS: configure-trad-stamp configure-ansi-stamp
+.PRECIOUS: configure-trad-stamp configure-ansi-stamp configure-gprof-stamp configure-ansi-gprof-stamp
