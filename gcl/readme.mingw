@@ -14,9 +14,12 @@ BUILD TOOLS
 - Source code for GCL.
     http://savannah.gnu.org/projects/gcl/
 
-As a general rule it is a good idea to keep up to date with Mingw32 and Cygwin.
-At the moment, Mingw32 gcc is version 2.95 and I don't know whether the imminent 
-move to version 3.1 will affect GCL.
+As a general rule it is a good idea to keep up to date with Mingw32 and Cygwin.  
+Most importantly, get the latest runtime (30 April 2002).  Having said that, 
+I have not yet tried the recently released version 3.1 of Mingw32 gcc.
+
+Only version 2.95 is known to work (3.1 may well work, it just hasn't been tried yet).
+
 
 
 SETUP
