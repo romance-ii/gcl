@@ -4,8 +4,9 @@ gcl (2.5.0.cvs20020625-43) unstable; urgency=high
     fillp;allow #P
   * don't make common_lisp package when not configuring with --enable-
     ansi
+  * Patch gmp3/mpn/m68k/{l,r}shift.asm, restore gmp3 to m68k build
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 14 Aug 2002 18:01:52 -0400
+ -- Camm Maguire <camm@enhanced.com>  Fri, 16 Aug 2002 10:25:08 -0400
 
 gcl (2.5.0.cvs20020625-42) unstable; urgency=high
 
