@@ -1288,13 +1288,13 @@ static bool true_or_false;
 	object x;
 @
 	while (!endp(a_list)) {
-		if (a_list->c.c_car==Cnil)
-			continue;
-		x=(*car_or_cdr)(a_list->c.c_car);
-		if (key!=Cnil)
-			x=ifuncall1(key,x);
-		if ((ifuncall1(predicate,x) != Cnil) == true_or_false) 
-			@(return `a_list->c.c_car`)
+		if (a_list->c.c_car!=Cnil) {
+			x=(*car_or_cdr)(a_list->c.c_car);
+			if (key!=Cnil)
+				x=ifuncall1(key,x);
+			if ((ifuncall1(predicate,x) != Cnil) == true_or_false) 
+				@(return `a_list->c.c_car`)
+		}
 		a_list = a_list->c.c_cdr;
 	}
 	@(return a_list)
