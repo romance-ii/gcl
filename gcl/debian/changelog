@@ -11,8 +11,9 @@ gclcvs (2.7.0-4) unstable; urgency=low
   * Allow for non-keyword type keywords, and fix some allow-other-keys
     processing
   * Fix typo in fasldlsym.c, Closes: #212239
+  * Package rebuild and rerelease
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 22 Sep 2003 22:02:57 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 22 Sep 2003 22:04:42 +0000
 
 gclcvs (2.7.0-3) unstable; urgency=low
 
