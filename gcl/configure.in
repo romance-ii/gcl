@@ -122,6 +122,9 @@ case $canonical in
      powerpc*linux*)
      	use=powerpc-linux;;
 
+     powerpc-*-darwin*)
+     	use=powerpc-macosx;;
+     
      alpha-dec-osf)
      use=alpha-osf1;;
 
@@ -246,6 +249,7 @@ fi
 def_dlopen="no"
 def_statsysbfd="yes"
 def_custreloc="no"
+def_locbfd="no"
 def_pic="no";
 def_static="no";
 def_static="debug";
@@ -266,6 +270,8 @@ case $use in
 	esac;;
     *mingw*)
 	def_statsysbfd="no" ; def_custreloc="yes" ;;
+    powerpc-macosx)
+	def_statsysbfd="no" ; def_locbfd="yes" ;;
 esac
 
 AC_ARG_ENABLE(dlopen,
@@ -279,7 +285,7 @@ AC_ARG_ENABLE(dynsysbfd,
 	,,enable_dynsysbfd="no")
 AC_ARG_ENABLE(locbfd,
 	[ --enable-locbfd uses a static bfd library built from this source tree for loading and relocationing object files ]
-	,,enable_locbfd="no")
+	,,enable_locbfd="$def_locbfd")
 AC_ARG_ENABLE(custreloc,
 	[ --enable-custreloc uses custom gcl code if available for loading  and relocationing object files ]
 	,,enable_custreloc="$def_custreloc")
@@ -812,7 +818,11 @@ main()
 #ifdef _WIN32
   fprintf(fp,"_dbegin");
 #else
+#if defined (__APPLE__) && defined (__MACH__)
+  fprintf(fp,"get_dbegin()");
+#else
   fprintf(fp,"0x%lx",((unsigned long) b) & ~(unsigned long)0xffffff);
+#endif
 #endif
   fclose(fp);
   return 0;

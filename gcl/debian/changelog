@@ -15,8 +15,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Add missing m4 and automake files in binutils directory to enable
     automake and autoconf here
   * Add bfd/po makefiles
+  * Macosx defaults in configure.in
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 25 Feb 2004 22:33:55 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 25 Feb 2004 22:38:13 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
