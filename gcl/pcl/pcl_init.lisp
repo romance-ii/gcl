@@ -46,7 +46,7 @@
   (let* ((info (initialize-info class initargs))
 	 (valid-p (initialize-info-valid-p info)))
     (when (and (consp valid-p) (eq (car valid-p) :invalid))
-      (error "Invalid initialization argument ~S for class ~S"
+      (specific-error :invalid-form "Invalid initialization argument ~S for class ~S"
 	     (cdr valid-p) (class-name class))))
   (let ((instance (apply #'allocate-instance class initargs)))
     (apply #'initialize-instance instance initargs)
@@ -95,7 +95,7 @@
 	 (info (initialize-info class initargs))
 	 (valid-p (initialize-info-ri-valid-p info)))
     (when (and (consp valid-p) (eq (car valid-p) :invalid))
-      (error "Invalid initialization argument ~S for class ~S"
+      (specific-error :invalid-form "Invalid initialization argument ~S for class ~S"
 	     (cdr valid-p) (class-name class))))
   (apply #'shared-initialize instance nil initargs)
   instance)
@@ -134,18 +134,29 @@
 
 (defmethod shared-initialize
     ((instance slot-object) slot-names &rest initargs)
+
   (when (eq slot-names 't)
+    ;; FIXME this should be in the -t- and -nil- functions eventually
+    ;; loop through initargs looking for errors
+    (doplist (initarg val) initargs)
     (return-from shared-initialize
-      (call-initialize-function
-       (initialize-info-shared-initialize-t-function
-	(initialize-info (class-of instance) initargs))
-       instance initargs)))
+		 (progn 
+		   (call-initialize-function
+		    (initialize-info-shared-initialize-t-function
+		     (initialize-info (class-of instance) initargs))
+		    instance initargs)
+		   instance)))
   (when (eq slot-names 'nil)
+    ;; FIXME this should be in the -t- and -nil- functions eventually
+    ;; loop through initargs looking for errors
+    (doplist (initarg val) initargs)
     (return-from shared-initialize
-      (call-initialize-function
-       (initialize-info-shared-initialize-nil-function
-	(initialize-info (class-of instance) initargs))
-       instance initargs)))
+		 (progn
+		   (call-initialize-function
+		    (initialize-info-shared-initialize-nil-function
+		     (initialize-info (class-of instance) initargs))
+		    instance initargs)
+		   instance)))
   ;;
   ;; initialize the instance's slots in a two step process
   ;;   (1) A slot for which one of the initargs in initargs can set
@@ -240,7 +251,7 @@
     (doplist (key val) initargs
        (unless (memq key legal)
 	 (if error-p
-	     (error "Invalid initialization argument ~S for class ~S"
+	     (specific-error :invalid-form "Invalid initialization argument ~S for class ~S"
 		    key
 		    (class-name class))
 	     (return-from check-initargs-2-plist nil)))))
@@ -253,7 +264,7 @@
     (dolist (key initkeys)
       (unless (memq key legal)
 	(if error-p
-	    (error "Invalid initialization argument ~S for class ~S"
+	    (specific-error :invalid-form "Invalid initialization argument ~S for class ~S"
 		   key
 		   (class-name class))
 	    (return-from check-initargs-2-list nil)))))

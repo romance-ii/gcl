@@ -405,53 +405,111 @@
 	      "methods matching the pattern: ~S"
 	      (car patterns))))
 
-
+;;;
+;;; Return a form that deals with the :ARGUMENTS lambda-list of a long
+;;; method combination.  WRAPPED-BODY is the body of the method
+;;; combination so far, and ARGUMENTS-LAMBDA-LIST is the arguments
+;;; lambda-list of the method combination.
+;;;
+(defun deal-with-arguments-option (wrapped-body arguments-lambda-list)
+  (let ((intercept-rebindings
+	 (loop for arg in arguments-lambda-list
+	       unless (memq arg lambda-list-keywords)
+	       collect `(,arg ',arg)))
+        (nreq 0)
+        (nopt 0)
+	whole)
+    ;;
+    ;; Count the number of required and optional parameters in
+    ;; ARGUMENTS-LAMBDA-LIST into NREQ and NOPT, and set WHOLE to the
+    ;; name of a &WHOLE parameter, if any.
+    (loop with state = 'required
+          for arg in arguments-lambda-list do
+            (if (memq arg lambda-list-keywords)
+                (setq state arg)
+                (case state
+                  (required (incf nreq))
+                  (&optional (incf nopt))
+                  (&whole (setq whole arg
+				state 'required)))))
+    ;;
+    ;; This assumes that the WRAPPED-BODY is a let/let* form, and it
+    ;; injects let-bindings of the form (ARG 'SYM) for all variables
+    ;; of the argument-lambda-list; SYM is a gensym.
+    (assert (memq (first wrapped-body) '(let let*)))
+    (setf (second wrapped-body)
+          (append intercept-rebindings (second wrapped-body)))
+    ;;
+    ;; Be sure to fill out the args lambda list so that it can be too
+    ;; short if it wants to.
+    (unless (or (memq '&rest arguments-lambda-list)
+                (memq '&allow-other-keys arguments-lambda-list))
+      (let ((aux (memq '&aux arguments-lambda-list)))
+        (setq arguments-lambda-list
+              (append (ldiff arguments-lambda-list aux)
+                      (if (memq '&key arguments-lambda-list)
+                          '(&allow-other-keys)
+                          '(&rest .ignore.))
+                      aux))))
+    ;;
+    ;; .GENERIC-FUNCTION. is bound to the generic function in the
+    ;; method combination function, and .GF-ARGS* is bound to the
+    ;; generic function arguments in effective method functions
+    ;; created for generic functions having a method combination that
+    ;; uses :ARGUMENTS.
+    ;;
+    ;; The DESTRUCTURING-BIND binds the parameters of the
+    ;; ARGUMENTS-LAMBDA-LIST to actual generic function arguments.
+    ;; Because ARGUMENTS-LAMBDA-LIST may be shorter or longer than the
+    ;; generic function's lambda list, which is only known at run time,
+    ;; this destructuring has to be done on a slighly modified list of
+    ;; actual arguments, from which values might be stripped or added.
+    ;;
+    ;; Using one of the variable names in the body inserts a symbol
+    ;; into the effective method, and running the effective method
+    ;; produces the value of actual argument that is bound to the
+    ;; symbol.
+    `(let ((inner-result. ,wrapped-body)
+           (gf-lambda-list (generic-function-lambda-list .generic-function.)))
+       `(destructuring-bind ,',arguments-lambda-list
+	    (frob-combined-method-args
+             .gf-args. ',gf-lambda-list
+             ,',nreq ,',nopt)
+	  ,,(when (memq '.ignore. arguments-lambda-list)
+	      ''(declare (ignore .ignore.)))
+	  ;; If there is a &WHOLE in the arguments-lambda-list, let
+	  ;; it result in the actual arguments of the generic-function
+	  ;; not the frobbed list.
+	  ,,(when whole
+	      ``(setq ,',whole .gf-args.))
+	  ,inner-result.))))
 
 ;;;
-;;; This baby is a complete mess.  I can't believe we put it in this
-;;; way.  No doubt this is a large part of what drives MLY crazy.
+;;; Partition VALUES into three sections required, optional, and the
+;;; rest, according to required, optional, and other parameters in
+;;; LAMBDA-LIST.  Make the required and optional sections NREQ and
+;;; NOPT elements long by discarding values or adding NILs.  Value is
+;;; the concatenated list of required and optional sections, and what
+;;; is left as rest from VALUES.
 ;;;
-;;; At runtime (when the effective-method is run), we bind an intercept
-;;; lambda-list to the arguments to the generic function.
-;;; 
-;;; At compute-effective-method time, the symbols in the :arguments
-;;; option are bound to the symbols in the intercept lambda list.
-;;;
-(defun deal-with-arguments-option (wrapped-body arguments-option)
-  (let* ((intercept-lambda-list
-	   (gathering1 (collecting)
-	     (dolist (arg arguments-option)
-	       (if (memq arg lambda-list-keywords)
-		   (gather1 arg)
-		   (gather1 (gensym))))))
-	 (intercept-rebindings
-	   (gathering1 (collecting)
-	     (iterate ((arg (list-elements arguments-option))
-		       (int (list-elements intercept-lambda-list)))
-	       (unless (memq arg lambda-list-keywords)
-		 (gather1 `(,arg ',int)))))))
-    ;;
-    ;;
-    (setf (cadr wrapped-body)
-	  (append intercept-rebindings (cadr wrapped-body)))
-    ;;
-    ;; Be sure to fill out the intercept lambda list so that it can
-    ;; be too short if it wants to.
-    ;; 
-    (cond ((memq '&rest intercept-lambda-list))
-	  ((memq '&allow-other-keys intercept-lambda-list))
-	  ((memq '&key intercept-lambda-list)
-	   (setq intercept-lambda-list
-		 (append intercept-lambda-list '(&allow-other-keys))))
-	  (t
-	   (setq intercept-lambda-list
-		 (append intercept-lambda-list '(&rest .ignore.)))))
-
-    `(let ((inner-result. ,wrapped-body))
-       `(apply #'(lambda ,',intercept-lambda-list
-		   ,,(when (memq '.ignore. intercept-lambda-list)
-		       ''(declare (ignore .ignore.)))
-		   ,inner-result.)
-	       .combined-method-args.))))
-
-
+(defun frob-combined-method-args (values lambda-list nreq nopt)
+  (loop with section = 'required
+        for arg in lambda-list
+        if (memq arg lambda-list-keywords) do
+	  (setq section arg)
+          (unless (eq section '&optional)
+            (loop-finish))
+	else if (eq section 'required)
+	  count t into nr
+          and collect (pop values) into required
+	else if (eq section '&optional)
+	  count t into no
+          and collect (pop values) into optional
+	finally
+	  (flet ((frob (list n m)
+                   (cond ((> n m) (butlast list (- n m)))
+                         ((< n m) (nconc list (make-list (- m n))))
+                         (t list))))
+            (return (nconc (frob required nr nreq)
+                           (frob optional no nopt)
+                           values)))))

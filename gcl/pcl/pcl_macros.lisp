@@ -315,7 +315,11 @@
        (loop (when (null .plist-tail.) (return nil))
 	     (setq ,key (pop .plist-tail.))
 	     (when (null .plist-tail.)
-	       (error "Malformed plist in doplist, odd number of elements."))
+	       (specific-error :invalid-form 
+			       "Malformed plist in doplist, odd number of elements."))
+	     (when (not (symbolp ,key))
+	       (specific-error :invalid-form 
+			       "Supplied key is not a symbol."))
 	     (setq ,val (pop .plist-tail.))
 	     (progn ,@bod)))))
 

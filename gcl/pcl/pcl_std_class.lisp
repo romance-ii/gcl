@@ -362,32 +362,63 @@
 	 (supplied-supers (getf initargs :direct-superclasses unsupplied))
 	 (supplied-slots  (getf initargs :direct-slots unsupplied))
 	 (meta
-	   (cond ((neq supplied-meta unsupplied)
-		  (find-class supplied-meta))
-		 ((or (null class)
-		      (forward-referenced-class-p class))
-		  *the-class-standard-class*)
-		 (t
-		  (class-of class)))))  
+	  (cond ((neq supplied-meta unsupplied)
+		 (find-class supplied-meta))
+		((or (null class)
+		     (forward-referenced-class-p class))
+		 *the-class-standard-class*)
+		(t
+		 (class-of class)))))  
     (flet ((fix-super (s)
-	     (cond ((classp s) s)
-		   ((not (legal-class-name-p s))
-		    (error "~S is not a class or a legal class name." s))
-		   (t
-		    (or (find-class s nil)
-			(setf (find-class s)
-			      (make-instance 'forward-referenced-class
-					     :name s)))))))      
-      (loop (unless (remf initargs :metaclass) (return)))
-      (loop (unless (remf initargs :direct-superclasses) (return)))
-      (loop (unless (remf initargs :direct-slots) (return)))
-      (values meta
-	      (list* :direct-superclasses
-		     (and (neq supplied-supers unsupplied)
-			  (mapcar #'fix-super supplied-supers))
-		     :direct-slots
-		     (and (neq supplied-slots unsupplied) supplied-slots)
-		     initargs)))))
+		      (cond ((classp s) s)
+			    ((not (legal-class-name-p s))
+			     (error "~S is not a class or a legal class name." s))
+			    (t
+			     (or (find-class s nil)
+				 (setf (find-class s)
+				       (make-instance 'forward-referenced-class
+						      :name s)))))))      
+	  ;;
+	  ;; CLHS: signal PROGRAM-ERROR, if
+	  ;; (a) there are any duplicate slot names
+	  ;; (b) any of the slot options :ALLOCATION, :INITFORM, :TYPE, or
+	  ;; :DOCUMENTATION appears more than one in a single slot description.
+	  (loop for (slot . more) on (getf initargs :direct-slots)
+		for slot-name = (getf slot :name)
+		if (some (lambda (s) (eq slot-name (getf s :name))) more) do
+		(specific-error :invalid-form
+				"More than one direct slot with name ~S."
+				slot-name)
+		else do
+		(loop for (option value . more) on slot by #'cddr
+		      when (and (member option '(:allocation :type :initform
+							     :documentation))
+				(not (eq unsupplied
+					 (getf more option unsupplied)))) do
+					 (specific-error :invalid-form
+							 "Duplicate slot option ~S for slot ~S."
+							 option slot-name)))
+	  ;;
+	  ;; CLHS: signal PROGRAM-ERROR, if an initialization argument name
+	  ;; appears more than once in :DEFAULT-INITARGS class option.
+	  (loop for (initarg . more) on (getf initargs :direct-default-initargs)
+		for name = (car initarg) 
+		when (some (lambda (a) (eq (car a) name)) more) do
+		(specific-error :invalid-form
+				"Duplicate initialization argument ~
+                name ~S in :default-initargs of class ~A."
+				name class))
+	  ;;
+	  (loop (unless (remf initargs :metaclass) (return)))
+	  (loop (unless (remf initargs :direct-superclasses) (return)))
+	  (loop (unless (remf initargs :direct-slots) (return)))
+	  (values meta
+		  (list* :direct-superclasses
+			 (and (neq supplied-supers unsupplied)
+			      (mapcar #'fix-super supplied-supers))
+			 :direct-slots
+			 (and (neq supplied-slots unsupplied) supplied-slots)
+			 initargs)))))
 
 
 ;;;
@@ -1204,7 +1235,7 @@
       #+new-kcl-wrapper
       (copy-structure-header ,instance)))
 
-(defun change-class-internal (instance new-class)
+(defun change-class-internal (instance new-class initargs)
   (let* ((old-class (class-of instance))
 	 (copy (allocate-instance new-class))
 	 (new-wrapper (get-wrapper copy))
@@ -1220,53 +1251,58 @@
     ;; Cfrom are retained.  If such a local slot was unbound, it remains
     ;; unbound."
     ;;     
-    (iterate ((new-slot (list-elements new-layout))
-	      (new-position (interval :from 0)))
-      (let* ((new-position new-position)
-	     (old-position (posq new-slot old-layout)))
-	(declare (fixnum new-position))
-	(when old-position
-	  (setf (instance-ref new-slots new-position)
-		(instance-ref old-slots old-position)))))
+    (loop for new-slot in new-layout and new-position from 0
+	  for old-position = (posq new-slot old-layout)
+	  when old-position do
+	    (setf (instance-ref new-slots new-position)
+		  (instance-ref old-slots old-position)))
 
     ;;
     ;; "The values of slots specified as shared in the class Cfrom and
     ;; as local in the class Cto are retained."
     ;;
-    (iterate ((slot-and-val (list-elements old-class-slots)))
-      (let ((position (posq (car slot-and-val) new-layout)))
-	(when position
-	  (setf (instance-ref new-slots position) (cdr slot-and-val)))))
+    (loop for (name . val) in old-class-slots
+	  for new-position = (posq name new-layout)
+	  when new-position do
+	    (setf (instance-ref new-slots new-position) val))
 
     ;; Make the copy point to the old instance's storage, and make the
     ;; old instance point to the new storage.
     (swap-wrappers-and-slots instance copy)
 
-    (update-instance-for-different-class copy instance)
+    (apply #'update-instance-for-different-class copy instance initargs)
     instance))
 
 (defmethod change-class ((instance standard-object)
-			 (new-class standard-class))
-  (unless (std-instance-p instance)
-    (error "Can't change the class of ~S to ~S~@
-            because it isn't already an instance with metaclass~%~S."
-	   instance
-	   new-class
-	   'standard-class))
-  (change-class-internal instance new-class))
+			 (new-class standard-class)
+			 &rest initargs)
+  (change-class-internal instance new-class initargs))
+
+;; FIXME add class funcallable-standard-object ??
+;(defmethod change-class ((instance funcallable-standard-object)
+;			 (new-class funcallable-standard-class)
+;			 &rest initargs)
+;  (change-class-internal instance new-class initargs))
 
 (defmethod change-class ((instance standard-object)
-			 (new-class funcallable-standard-class))
-  (unless (fsc-instance-p instance)
-    (error "Can't change the class of ~S to ~S~@
-            because it isn't already an instance with metaclass~%~S."
-	   instance
-	   new-class
-	   'funcallable-standard-class))
-  (change-class-internal instance new-class))
+			 (new-class funcallable-standard-class)
+			 &rest initargs)
+  (declare (ignore initargs))
+  (error "Can't change the class of ~S to ~S~@
+          because it isn't already an instance with metaclass ~S."
+	 instance new-class 'standard-class))
 
-(defmethod change-class ((instance t) (new-class-name symbol))
-  (change-class instance (find-class new-class-name)))
+;(defmethod change-class ((instance funcallable-standard-object)
+;			 (new-class standard-class)
+;			 &rest initargs)
+;  (declare (ignore initargs))
+;  (error "Can't change the class of ~S to ~S~@
+;          because it isn't already an instance with metaclass ~S."
+;	 instance new-class 'funcallable-standard-class))
+
+(defmethod change-class ((instance t) (new-class-name symbol) &rest initargs)
+  (apply #'change-class instance (find-class new-class-name) initargs))
+
 
 
 

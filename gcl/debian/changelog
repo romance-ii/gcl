@@ -12,8 +12,10 @@ gclcvs (2.7.0-9) unstable; urgency=low
   * eliminate duplicate predicate calls in list-merge-srot in
     gcl_seqlib.lsp
   * declare ignorable support
+  * begin sync of our pcl tree with cmucl's, and fix a few bugs not in
+    cmucl's tree.  Brings ansi test failures down by about one hundred
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 10 Oct 2003 02:55:41 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 10 Oct 2003 03:37:09 +0000
 
 gclcvs (2.7.0-8) unstable; urgency=low
 

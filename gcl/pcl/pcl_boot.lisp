@@ -157,10 +157,68 @@ work during bootstrapping.
       ))
 
 
+
+;;;  FIXME need GCL support for these kernel:* functions
+
 ;;;
 ;;;
 ;;;
+;;;
+;;; ANSI 3.4.2, Generic Function Lambda Lists
+;;;
+
+;(defun parse-generic-function-lambda-list (lambda-list)
+  ;; This is like kernel:parse-lambda-list, but returns an additional
+  ;; value AUXP which is true if LAMBDA-LIST contains any &aux keyword.
+;  (multiple-value-bind (required optional restp rest keyp keys
+;				 allow-other-keys-p aux morep
+;				 more-context more-count)
+;      (kernel:parse-lambda-list lambda-list)
+;    (values required optional restp rest keyp keys allow-other-keys-p
+;	    (or aux (member '&aux lambda-list :test #'eq)) aux
+;	    morep more-context more-count)))
+
+;(defun check-generic-function-lambda-list (function-specifier lambda-list)
+;  (multiple-value-bind (required optional restp rest keyp keys
+;				 allow-other-keys-p auxp aux morep
+;				 more-context more-count)
+;      (parse-generic-function-lambda-list lambda-list)
+;    (declare (ignore restp rest keyp aux allow-other-keys-p more-context
+;		     more-count))
+;    (labels ((lambda-list-error (format-control &rest format-arguments)
+;	       (simple-program-error "Generic function ~A:~%~?"
+;				     function-specifier
+;				     format-control format-arguments))
+;	     (check-required-parameter (parameter)
+;	       (unless (symbolp parameter)
+;		 (lambda-list-error
+;		  "Invalid generic function parameter name ~A"
+;		  parameter)))
+;	     (check-key-or-optional-parameter (parameter)
+;	       (unless (or (symbolp parameter)
+;			   (and (consp parameter)
+;				(symbolp (car parameter))))
+;		 (lambda-list-error
+;		  "Invalid generic function parameter name: ~A"
+;		  parameter))
+;	       (when (and (consp parameter)
+;			  (not (null (cdr parameter))))
+;		 (lambda-list-error
+;		  "Optional and key parameters of generic functions~%~
+;                   may not have default values or supplied-p ~
+;                   parameters: ~A" parameter))))
+;      (when morep
+;	(lambda-list-error
+;	 "&MORE not allowed in generic function lambda lists"))
+;      (when auxp
+;	(lambda-list-error
+;	 "&AUX not allowed in generic function lambda lists"))
+;      (mapc #'check-required-parameter required)
+;      (mapc #'check-key-or-optional-parameter optional)
+;      (mapc #'check-key-or-optional-parameter keys))))
+
 (defmacro defgeneric (function-specifier lambda-list &body options)
+;  (check-generic-function-lambda-list function-specifier lambda-list)
   (expand-defgeneric function-specifier lambda-list options))
 
 (defun expand-defgeneric (function-specifier lambda-list options)
@@ -454,14 +512,12 @@ work during bootstrapping.
 		(mapcar #'(lambda (r s) (declare (ignore s)) r)
 			parameters
 			specializers))
+	       (specialized-parameters
+	        (loop for s in specialized-lambda-list
+		      for p in required-parameters
+		      when (listp s) collect p))
 	       (slots (mapcar #'list required-parameters))
 	       (calls (list nil))
-	       (parameters-to-reference
-		(make-parameter-references specialized-lambda-list
-					   required-parameters
-					   declarations
-					   method-name
-					   specializers))
 	       (class-declarations
 		`(declare
 		  ,@(remove nil
@@ -479,9 +535,9 @@ work during bootstrapping.
 		  ;; are inserted to communicate the class of the method's
 		  ;; arguments to the code walk.
 		  `(lambda ,lambda-list
+		     (declare (ignorable ,@specialized-parameters))
 		     ,class-declarations
 		     ,@declarations
-		     (progn ,@parameters-to-reference)
 		     (block ,(if (listp generic-function-name)
 				 (cadr generic-function-name)
 				 generic-function-name)
@@ -496,20 +552,12 @@ work during bootstrapping.
 					(symbol-package constant-value))))
 			  (list :constant-value constant-value)
 			  ()))
-	       (applyp (dolist (p lambda-list nil)
-			 (cond ((memq p '(&optional &rest &key))
-				(return t))
-			       ((eq p '&aux)
-				(return nil))))))
-	    (multiple-value-bind (walked-lambda call-next-method-p closurep
-						next-method-p-p)
-		(walk-method-lambda method-lambda required-parameters env 
-				    slots calls)
+	       (walked-lambda (walk-method-lambda method-lambda
+						  required-parameters env 
+						  slots calls)))
 	      (multiple-value-bind (ignore walked-declarations walked-lambda-body)
 		  (extract-declarations (cddr walked-lambda))
 		(declare (ignore ignore))
-		(when (or next-method-p-p call-next-method-p)
-		  (setq plist (list* :needs-next-methods-p 't plist)))
 		(when (some #'cdr slots)
 		  (multiple-value-bind (slot-name-lists call-list)
 		      (slot-name-lists-from-slots slots calls)
@@ -534,10 +582,7 @@ work during bootstrapping.
 		(values `(lambda (.method-args. .next-methods.)
 			   (simple-lexical-method-functions
 			       (,lambda-list .method-args. .next-methods.
-				:call-next-method-p ,call-next-method-p 
-				:next-method-p-p ,next-method-p-p
-				:closurep ,closurep
-				:applyp ,applyp)
+                                :method-name-declaration ,name-decl)
 			     ,@walked-declarations
 			     ,@walked-lambda-body))
 			`(,@(when plist 
@@ -567,13 +612,19 @@ work during bootstrapping.
       (bind-args (,(nthcdr (length args) lambda-list) ,rest-arg)
         ,@body))))
 
+(defun call-no-next-method (method-name-declaration &rest args)
+  (destructuring-bind (name qualifiers specializers)
+      (car method-name-declaration)
+    (let ((method (find-method (gdefinition name) qualifiers specializers)))
+      (apply #'no-next-method (method-generic-function method) method args))))
+
 (defmacro bind-simple-lexical-method-macros ((method-args next-methods) &body body)
   `(macrolet ((call-next-method-bind (&body body)
 		`(let ((.next-method. (car ,',next-methods))
 		       (,',next-methods (cdr ,',next-methods)))
 		   .next-method. ,',next-methods
 		   ,@body))
-	      (call-next-method-body (cnm-args)
+	      (call-next-method-body (method-name-declaration cnm-args)
 		`(if .next-method.
 		     (funcall (the function 
 				   (if (std-instance-p .next-method.)
@@ -581,7 +632,8 @@ work during bootstrapping.
 				       .next-method.)) ; for early methods
 			      (or ,cnm-args ,',method-args)
 		              ,',next-methods)
-		     (error "No next method.")))
+		     (apply #'call-no-next-method ',method-name-declaration
+                            (or ,cnm-args ,',method-args))))
 	      (next-method-p-body ()
 	        `(not (null .next-method.))))
      ,@body))
@@ -804,7 +856,7 @@ work during bootstrapping.
 					   &body body)
   `(macrolet ((call-next-method-bind (&body body)
 		`(let () ,@body))
-	      (call-next-method-body (cnm-args)
+	      (call-next-method-body (method-name-declaration cnm-args)
 		`(if ,',next-method-call
 		     ,(if (and (null ',rest-arg)
 			       (consp cnm-args)
@@ -823,40 +875,28 @@ work during bootstrapping.
 					     ,cnm-args)
 					    ,call)
 				 ,call)))
-		     (error "No next method.")))
+                     ,(if (and (null ',rest-arg)
+                               (consp cnm-args)
+                               (eq (car cnm-args) 'list))
+                          `(call-no-next-method ',method-name-declaration
+                                                ,@(cdr cnm-args))
+                          `(call-no-next-method ',method-name-declaration
+                                                ,@',args
+                                                ,@',(when rest-arg
+                                                      `(,rest-arg))))))
 	      (next-method-p-body ()
 	        `(not (null ,',next-method-call))))
      ,@body))
 
 (defmacro bind-lexical-method-functions 
-    ((&key call-next-method-p next-method-p-p closurep applyp)
+    ((&key method-name-declaration) ;call-next-method-p next-method-p-p closurep applyp)
      &body body)
-  (cond ((and (null call-next-method-p) (null next-method-p-p)
-	      (null closurep)
-	      (null applyp))
-	 `(let () ,@body))
-	 ((and (null closurep)
-	       (null applyp))
-	 ;; OK to use MACROLET, and all args are mandatory 
-	 ;; (else APPLYP would be true).
-	 `(call-next-method-bind
-	    (macrolet ((call-next-method (&rest cnm-args)
-			 `(call-next-method-body ,(when cnm-args `(list ,@cnm-args))))
-		       (next-method-p ()
-			 `(next-method-p-body)))
-	       ,@body)))
-	(t
-	 `(call-next-method-bind
-	    (flet (,@(and call-next-method-p
-		       '((call-next-method (&rest cnm-args)
-			  #+Genera
-			  (declare (dbg:invisible-frame :clos-internal))
-			  #+copy-&rest-arg (setq args (copy-list args))
-			  (call-next-method-body cnm-args))))
-		     ,@(and next-method-p-p
-			 '((next-method-p ()
-			    (next-method-p-body)))))
-	      ,@body)))))
+    `(call-next-method-bind
+      (flet ((call-next-method (&rest cnm-args)
+			       (call-next-method-body ,method-name-declaration cnm-args))
+	     (next-method-p ()
+			    (next-method-p-body)))
+	    ,@body)))
 
 (defmacro bind-args ((lambda-list args) &body body)
   #|| ; Lucid and Allegro don't compile the function inline
@@ -1008,29 +1048,6 @@ work during bootstrapping.
 	   (standard-generic-function-p (gdefinition name))
 	   (funcallable-instance-p (gdefinition name)))))
 
-(defun make-parameter-references (specialized-lambda-list
-				  required-parameters
-				  declarations
-				  method-name
-				  specializers)
-  (flet ((ignoredp (symbol)
-	   (dolist (decl (cdar declarations))
-	     (when (and (eq (car decl) 'ignore)
-			(memq symbol (cdr decl)))
-	       (return t)))))	   
-    (gathering ((references (collecting)))
-      (iterate ((s (list-elements specialized-lambda-list))
-		(p (list-elements required-parameters)))
-	(progn p)
-	(cond ((not (listp s)))
-	      ((ignoredp (car s))
-	       (warn "In defmethod ~S, there is a~%~
-                      redundant ignore declaration for the parameter ~S."
-		     method-name
-		     specializers
-		     (car s)))
-	      (t
-	       (gather (car s) references)))))))
 
 
 (defvar *method-function-plist* (make-hash-table :test #'eq))
@@ -1453,7 +1470,7 @@ work during bootstrapping.
 	  (lose "the method has ~S optional arguments than the generic function."
 		(compare nopt gf-nopt)))
 	(unless (eq (or keysp restp) gf-key/rest-p)
-	  (error "the method and generic function differ in whether they accept~%~
+	  (lose "the method and generic function differ in whether they accept~%~
                   rest or keyword arguments."))
 	(when (consp gf-keywords)
 	  (unless (or (and restp (not keysp))
