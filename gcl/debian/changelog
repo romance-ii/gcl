@@ -1,3 +1,9 @@
+gclcvs (2.7.0-25) unstable; urgency=low
+
+  * gcc-3.4 support
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 11 May 2004 18:37:56 +0000
+
 gclcvs (2.7.0-24) unstable; urgency=low
 
   * Fix segfault in referencing (sgc_)type_map out of bounds which can

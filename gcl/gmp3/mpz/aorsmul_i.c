@@ -57,7 +57,7 @@ MA 02111-1307, USA. */
    twos-complement negative y doesn't work, because it effectively adds an
    extra x * 2^BITS_PER_MP_LIMB.  */
 
-void
+REGPARM_ATTR (1) void
 mpz_aorsmul_1 (mpz_ptr w, mpz_srcptr x, mp_limb_t y, mp_size_t sub)
 {
   mp_size_t  xsize, wsize, wsize_signed, new_wsize, min_size, dsize;

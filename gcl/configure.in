@@ -406,7 +406,7 @@ AC_SUBST(CC)
 
 TCFLAGS="-Wall -DVOL=volatile -fsigned-char"
 if test "$GCC" = "yes" ; then
-	TCFLAGS="$TCFLAGS -fwritable-strings -pipe"
+	TCFLAGS="$TCFLAGS -pipe"
 	case $use in
 	     *mingw*)
 	        echo "WARNING: Remove -fno-zero-initialized-in-bss from makedefs if gcc less than 3.3.1."
