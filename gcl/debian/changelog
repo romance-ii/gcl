@@ -6,8 +6,9 @@ gcl (2.5.0.cvs20020625-71) unstable; urgency=high
   * Significant fixes to gmp_num_log.c affecting bitwise ops on bignums
   * Fix test segfault arising from faulty structure-type-included-type-
     name in gcl-low.lisp ; Thanks Peter
+  * aref1 -> row-major-aref
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  3 Jan 2003 14:16:15 -0500
+ -- Camm Maguire <camm@enhanced.com>  Fri,  3 Jan 2003 16:25:17 -0500
 
 gcl (2.5.0.cvs20020625-70) unstable; urgency=high
 

@@ -37,7 +37,7 @@
 /* array.c:57:OF */ extern void Laref (void); /* () */
 /* array.c:107:OF */ extern void fScheck_bounds_bounds (object x, int i); /* (x, i) object x; int i; */
 /* array.c:126:OF */ extern object fLsvref (object x, unsigned int i); /* (x, i) object x; unsigned int i; */
-/* array.c:142:OF */ extern object fSaref1 (object x, int i); /* (x, i) object x; int i; */
+/* array.c:142:OF */ extern object fLrow_major_aref (object x, int i); /* (x, i) object x; int i; */
 /* array.c:190:OF */ extern object fSaset1 (object x, object i, object val); /* (x, i, val) object x; int i; object val; */
 /* array.c:262:OF */ extern void siLaset (void); /* () */
 /* array.c:321:OF */ extern void siLsvset (void); /* () */

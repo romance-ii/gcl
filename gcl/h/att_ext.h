@@ -35,7 +35,7 @@ object fSallocate_relocatable_pages();
 
 /*  array.c  */
 enum aelttype Iarray_element_type();
-object fSaref1();
+object fLrow_major_aref();
 object fSaset1();
 EXTER object sLarray_dimension_limit;
 EXTER object sLarray_total_size_limit;
@@ -639,7 +639,7 @@ extern  object Cstd_key_defaults[];
 extern object call_proc0();
 extern object call_proc();
 extern object call_vproc();
-object fSaref1();
+object fLrow_major_aref();
 object Icheck_one_type();
 
 /* utils.c */

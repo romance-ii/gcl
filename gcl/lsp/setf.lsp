@@ -205,6 +205,7 @@
 (defsetf fill-pointer si:fill-pointer-set)
 (defsetf symbol-plist si:set-symbol-plist)
 (defsetf gethash (k h &optional d) (v) `(si:hash-set ,k ,h ,v))
+(defsetf row-major-aref si:aset1)
 (defsetf documentation (s d) (v)
   `(case ,d
      (variable (si:putprop ,s ,v 'variable-documentation))

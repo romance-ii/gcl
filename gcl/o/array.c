@@ -71,8 +71,8 @@ DEFUNO("AREF", object, fLaref, LISP, 1, ARRAY_RANK_LIMIT,
      int rank = n - 1; 
      if (x->a.a_rank != rank)
        FEerror(" ~a has wrong rank",1,x);
-     if (rank == 1) return fSaref1(x,i);
-     if (rank == 0) return fSaref1(x,0);
+     if (rank == 1) return fLrow_major_aref(x,i);
+     if (rank == 0) return fLrow_major_aref(x,0);
      va_start(ap);
      m = 0;
      k = i;
@@ -96,11 +96,11 @@ DEFUNO("AREF", object, fLaref, LISP, 1, ARRAY_RANK_LIMIT,
 	   }
 	 else break;}
      va_end(ap);
-     return fSaref1(x,i1);
+     return fLrow_major_aref(x,i1);
    }
   if (n > 2)
     { FEerror("Too many args (~a) to aref",1,make_fixnum(n));}
-  return fSaref1(x,i);
+  return fLrow_major_aref(x,i);
 
 }
 
@@ -135,8 +135,8 @@ DEFUN("SVREF", object, fLsvref, LISP, 2, 2,
  return(Cnil);
 }
     
-DEFUN("AREF1", object, fSaref1, SI, 2, 2,
-      NONE, OO, IO, OO,OO,
+DEFUNO("ROW-MAJOR-AREF", object, fLrow_major_aref, LISP, 2, 2,
+       NONE, OO, IO, OO,OO,Lrow_major_aref,
       "For array X and index I it returns (aref x i) as if x were \
 1 dimensional, even though its rank may be bigger than 1")
 (x, i)
@@ -842,7 +842,7 @@ implementation dependent results.")
 	 {if (typ2!=aet_bit)
 	    goto badcopy;
 	    {while(rest> 0)
-	       { fSaset1(y,make_fixnum(i2+n1-rest),(fSaref1(x,i1+n1-rest)));
+	       { fSaset1(y,make_fixnum(i2+n1-rest),(fLrow_major_aref(x,i1+n1-rest)));
 		 rest--;}
 	     }}
        i1=i1/CHAR_SIZE ;
