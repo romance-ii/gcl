@@ -238,7 +238,7 @@ is supplied and FLAG is nil, then this function is deleted from the fast links")
   link_ar = sLAlink_arrayA->s.s_dbind;
   if (link_ar==Cnil && flag==Cnil) RETURN1(Cnil);
   check_type_array(&link_ar);
-  if (link_ar->v.v_elttype != aet_ch)
+  if (type_of(link_ar) != t_string)
   { FEerror("*LINK-ARRAY* must be a string",0);}
   ar = link_ar->v.v_self;
   ar_end = (object *)&(link_ar->ust.ust_self[link_ar->v.v_fillp]);
