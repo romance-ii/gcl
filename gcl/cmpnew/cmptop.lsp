@@ -1196,7 +1196,7 @@
 
 (defun rep-type (type)
        (case type
-             (fixnum "int ")
+             (fixnum "long ")
 	     (integer "GEN ")
              (character "unsigned char ")
              (short-float "float ")

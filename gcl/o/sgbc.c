@@ -566,11 +566,11 @@ BEGIN:
 
 
 sgc_mark_stack_carefully(top,bottom,offset)
-int *bottom,*top;
+long *bottom,*top;
 {int p,m,pageoffset;
  object x;
  struct typemanager *tm;
- register int *j;
+ register long *j;
 
  /* if either of these happens we are marking the C stack
     and need to use a local */

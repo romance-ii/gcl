@@ -1637,7 +1637,7 @@ static object  LnkTLI146(va_alist)va_dcl{va_list ap;va_start(ap);return(object )
 static LnkT144(){ call_or_link(VV[144],&Lnk144);} /* WT-LOC */
 static object  LnkTLI143(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[143],&LnkLI143,ap);} /* REMOVE */
 static object  LnkTLI142(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[142],&LnkLI142,ap);} /* FIND */
-static int  LnkTLI141(va_alist)va_dcl{va_list ap;va_start(ap);return(int )call_proc(VV[141],&LnkLI141,258,ap);} /* PROCLAIMED-ARGD */
+static long  LnkTLI141(va_alist)va_dcl{va_list ap;va_start(ap);return(long )call_proc(VV[141],&LnkLI141,258,ap);} /* PROCLAIMED-ARGD */
 static object  LnkTLI140(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[140],&LnkLI140,1,ap);} /* ADD-OBJECT */
 static object  LnkTLI139(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[139],&LnkLI139,1,ap);} /* REP-TYPE */
 static LnkT138(){ call_or_link(VV[138],&Lnk138);} /* GET-OUTPUT-STREAM-STRING */
@@ -1683,3 +1683,8 @@ static object  LnkTLI99(va_alist)va_dcl{va_list ap;va_start(ap);return(object )c
 static object  LnkTLI98(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[98],&LnkLI98,1,ap);} /* CMP-MACROEXPAND */
 static object  LnkTLI97(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[97],&LnkLI97,1,ap);} /* CMP-MACRO-FUNCTION */
 static object  LnkTLI96(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[96],&LnkLI96,1,ap);} /* C1LOCAL-FUN */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

@@ -30,7 +30,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "num_include.h"
 
 
-int
+long
 fixint(x)
 object x;
 {

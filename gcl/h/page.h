@@ -10,7 +10,7 @@
   (MAYBE_DATA_P(pp) &&  ((char *)(pp) < heap_end))
 
 #ifndef page
-#define page(p)	(((int)(((char *)(p))-DBEGIN)>>PAGEWIDTH))
+#define page(p)	(((long)(((char *)(p))-DBEGIN)>>PAGEWIDTH))
 #define	pagetochar(x)	((char *)(((x) << PAGEWIDTH) + DBEGIN))
 #endif
   
@@ -23,7 +23,7 @@
 
 /* alignment required for pointers */
 #ifndef PTR_ALIGN
-#define PTR_ALIGN (sizeof(int *))
+#define PTR_ALIGN (sizeof(long *))
 #endif
 
 #define ROUND_UP_PTR(n)	(((long)(n) + (PTR_ALIGN-1)) & ~(PTR_ALIGN-1))

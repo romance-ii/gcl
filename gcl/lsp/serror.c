@@ -190,8 +190,8 @@ T51:;
 	{object V27;
 	{register object V28;
 	V28= Cnil;
-	{register int V29;
-	register int V30;
+	{register long V29;
+	register long V30;
 	V29= 0;
 	base[0]= symbol_value(VV[14]);
 	vs_top=(vs_base=base+0)+1;
@@ -317,7 +317,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for FINISH1061	*/
+/*	function definition for G1031	*/
 
 static L8()
 {register object *base=vs_base;
@@ -347,7 +347,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for FINISH1062	*/
+/*	function definition for G1032	*/
 
 static L10()
 {register object *base=vs_base;
@@ -377,7 +377,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for FINISH1063	*/
+/*	function definition for G1033	*/
 
 static L12()
 {register object *base=vs_base;
@@ -407,7 +407,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for FINISH1064	*/
+/*	function definition for G1034	*/
 
 static L14()
 {register object *base=vs_base;
@@ -437,7 +437,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for FINISH1065	*/
+/*	function definition for G1035	*/
 
 static L16()
 {register object *base=vs_base;
@@ -467,7 +467,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for FINISH1066	*/
+/*	function definition for G1036	*/
 
 static L18()
 {register object *base=vs_base;
@@ -497,7 +497,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for FINISH1067	*/
+/*	function definition for G1037	*/
 
 static L20()
 {register object *base=vs_base;
@@ -527,7 +527,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for FINISH1068	*/
+/*	function definition for G1038	*/
 
 static L22()
 {register object *base=vs_base;
@@ -557,7 +557,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for FINISH1069	*/
+/*	function definition for G1039	*/
 
 static L24()
 {register object *base=vs_base;
@@ -587,7 +587,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for FINISH1070	*/
+/*	function definition for G1040	*/
 
 static L26()
 {register object *base=vs_base;
@@ -617,7 +617,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for FINISH1071	*/
+/*	function definition for G1041	*/
 
 static L28()
 {register object *base=vs_base;
@@ -647,7 +647,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for FINISH1072	*/
+/*	function definition for G1042	*/
 
 static L30()
 {register object *base=vs_base;

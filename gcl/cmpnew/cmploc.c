@@ -914,3 +914,8 @@ static object  LnkTLI37(va_alist)va_dcl{va_list ap;va_start(ap);return(object )c
 static object  LnkTLI36(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[36],&LnkLI36,1,ap);} /* WT1 */
 static LnkT35(){ call_or_link(VV[35],&Lnk35);} /* WT-INLINE */
 static object  LnkTLI34(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[34],&LnkLI34,1,ap);} /* SET-RETURN */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

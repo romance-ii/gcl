@@ -30,18 +30,34 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define NEED_MP_H
 #include "include.h"
 
-
 /* the following in line definitions seem to be twice as fast (at
 least on mc68020) as going to the assembly function calls in bitop.c so
 since this is more portable and faster lets use them --W. Schelter
 These assume that DBEGIN is divisible by 32, or else we should have
 #define Shamt(x) (((((int) x -DBEGIN) >> 2) & ~(~0 << 5)))
 */ 
+#define BBITS_CHAR 3
 
-#define Shamt(x) (((((int) x) >> 2) & ~(~0 << 5)))
-#define Madr(x) (mark_table+((((int) x) - ((int)DBEGIN)) >> (7)))
+#if SIZEOF_LONG_P == 4
+#define BBYTES_LONG 2
+#elif SIZEOF_LONG_P == 8
+#define BBYTES_LONG 3
+#else
+#error Do not recognize PTR_ALIGN
+#endif
+
+#define BBITS_LONG (BBYTES_LONG+BBITS_CHAR)
+#define BCHARS_TABLE (BBITS_LONG+BBYTES_LONG)
+
+#define Shamt(x) (((((unsigned long) x) >> BBYTES_LONG) & ~(~0 << BBITS_LONG)))
+#define Madr(x) (mark_table+((((unsigned long) x) - ((unsigned long)DBEGIN)) >> (BCHARS_TABLE)))
 #define get_mark_bit(x) (*(Madr(x)) >> Shamt(x) & 1)
-#define set_mark_bit(x) ((*(Madr(x))) |= (1 << Shamt(x)))
+#define set_mark_bit(x) ((*(Madr(x))) |= ((unsigned long)1 << Shamt(x)))
+
+/*  #define Shamt(x) (((((long) x) >> 3) & ~(~0 << 6))) */
+/*  #define Madr(x) (mark_table+((((long) x) - ((long)DBEGIN)) >> (9))) */
+/*  #define get_mark_bit(x) (*(Madr(x)) >> Shamt(x) & 1) */
+/*  #define set_mark_bit(x) ((*(Madr(x))) |= ((unsigned long)1 << Shamt(x))) */
 
 #ifdef KCLOVM
 void mark_all_stacks();
@@ -69,8 +85,8 @@ char *copy_relblock();
 #endif
 
 
-int real_maxpage;
-int new_holepage;
+long real_maxpage;
+long new_holepage;
 
 #define	available_pages	\
 	(real_maxpage-page(heap_end)-new_holepage-2*nrbpage-real_maxpage/32)
@@ -124,7 +140,7 @@ struct {
 } mark_origin_block[MARK_ORIGIN_BLOCK_MAX];
 int mark_origin_block_max;
 
-int *mark_table;
+long *mark_table;
 
 enum type what_to_collect;
 
@@ -192,7 +208,8 @@ MARK_CDR:
 mark_object(x)
 object x;
 {
-	int i, j;
+	long i;
+	int j;
 	object *p;
 	char *cp;
 	object y;
@@ -372,8 +389,8 @@ BEGIN:
 #endif			  
 				x->a.a_self = (object *)copy_relblock(cp, j);}
 			else if (x->a.a_displaced->c.c_car == Cnil) {
-				i = (int)(object *)copy_relblock(cp, j)
-				  - (int)(x->a.a_self);
+				i = (long)(object *)copy_relblock(cp, j)
+				  - (long)(x->a.a_self);
 				adjust_displaced(x, i);
 			}
 		}
@@ -589,7 +606,7 @@ BEGIN:
 			break;
 		if (what_to_collect == t_contiguous) {
 			if (!MAYBE_DATA_P((x->cfd.cfd_start)) ||
-			    get_mark_bit((int *)(x->cfd.cfd_start)))
+			    get_mark_bit((long *)(x->cfd.cfd_start)))
 				break;
 			mark_contblock(x->cfd.cfd_start, x->cfd.cfd_size);}
 		break;
@@ -615,14 +632,14 @@ BEGIN:
 	}
 }
 
-static int *c_stack_where;
+static long *c_stack_where;
 
 mark_stack_carefully(top,bottom,offset)
-int *bottom,*top;
+long *bottom,*top;
 {int p,m,pageoffset;
  object x;
  struct typemanager *tm;
- register int *j;
+ register long *j;
 
  /* if either of these happens we are marking the C stack
     and need to use a local */
@@ -750,7 +767,7 @@ mark_c_stack(env1,n,fn)
 {jmp_buf env;
  int where;
  if (n== N_RECURSION_REQD)
-   { c_stack_where = (int *) (void *) &env;}
+   { c_stack_where = (long *) (void *) &env;}
  if (n > 0 )
    {  setjmp(env);
       mark_c_stack(env,n - 1,fn);}
@@ -1010,7 +1027,7 @@ enum type t;
 
 		if (rb_start < rb_pointer)
 			rb_start1 = (char *)
-			((int)(rb_pointer + PAGESIZE-1) & -PAGESIZE);
+			((long)(rb_pointer + PAGESIZE-1) & -(unsigned long)PAGESIZE);
 		else
 			rb_start1 = rb_start;
 
@@ -1025,7 +1042,7 @@ enum type t;
 		rb_pointer = rb_start;  /* where the new relblock will start */
 		rb_pointer1 = rb_start1;/* where we will copy it to during gc*/
 
-		mark_table = (int *)(rb_start1 + i);
+		mark_table = (long *)(rb_start1 + i);
 
 		if (rb_end < (char *)&mark_table[j])
 			i = (char *)&mark_table[j] - heap_end;

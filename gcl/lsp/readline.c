@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "readline.h"
 init_readline(){do_init(VV);}
 /*	function definition for INIT-READLINE	*/
@@ -45,8 +45,8 @@ T11:;
 T7:;
 	V3= Cnil;
 	V4= Cnil;
-	{int V6;
-	int V7;
+	{long V6;
+	long V7;
 	base[0]= (V2);
 	vs_top=(vs_base=base+0)+1;
 	(void) (*Lnk5)();
@@ -151,8 +151,8 @@ T66:;
 T62:;
 	V16= Cnil;
 	V17= Cnil;
-	{int V19;
-	int V20;
+	{long V19;
+	long V20;
 	base[0]= (V15);
 	vs_top=(vs_base=base+0)+1;
 	(void) (*Lnk5)();

@@ -107,7 +107,7 @@ TTL:;
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
 	goto T34;}
-	{int V23= fix(structure_ref((V22),VV[2],6));
+	{long V23= fix(structure_ref((V22),VV[2],6));
 	V24 = make_fixnum((/* INLINE-ARGS */V23)+(fix(symbol_value(VV[3]))));
 	{object V25 = structure_set((V22),VV[2],6,V24);
 	VMR3(V25)}}
@@ -1114,3 +1114,8 @@ static object  LnkTLI48(va_alist)va_dcl{va_list ap;va_start(ap);return(object )c
 static object  LnkTLI47(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[47],&LnkLI47,1,ap);} /* ADD-REG1 */
 static object  LnkTLI46(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[46],&LnkLI46,2,ap);} /* JUMPS-TO-P */
 static LnkT45(){ call_or_link(VV[45],&Lnk45);} /* STRUCTURE-SUBTYPE-P */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

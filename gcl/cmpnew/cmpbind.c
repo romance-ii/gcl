@@ -337,3 +337,8 @@ static object  LnkTLI15(){return call_proc0(VV[15],&LnkLI15);} /* CCB-VS-PUSH */
 static object  LnkTLI14(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[14],&LnkLI14,1,ap);} /* CLINK */
 static object  LnkTLI13(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[13],&LnkLI13,ap);} /* WT-CLINK */
 static object  LnkTLI12(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[12],&LnkLI12,1,ap);} /* WT-VS */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

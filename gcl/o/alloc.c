@@ -53,8 +53,8 @@ sbrk1(n)
 #define sbrk sbrk1
 #endif /* DEBUG_SBRK */
 
-int real_maxpage = MAXPAGE;
-int new_holepage;
+long real_maxpage = MAXPAGE;
+long new_holepage;
 
 #define	available_pages	\
 	(real_maxpage-page(heap_end)-new_holepage-2*nrbpage-real_maxpage/32)
@@ -409,10 +409,8 @@ DEFUN("RESET-NUMBER-USED",object,fSreset_number_used,SI,0,1,NONE,OO,OO,OO,OO,"")
 }
 
 
-char *
-alloc_contblock(n)
-int n;
-{
+void *
+alloc_contblock(size_t n) {
 	 char *p;
 	 struct contblock **cbpp;
 	 int i;
@@ -499,10 +497,9 @@ int s;
 	*cbpp = cbp;
 }
 
-char *
-alloc_relblock(n)
-int n;
-{
+void *
+alloc_relblock(size_t n) {
+
 	 char *p;
 	 bool g;
 
@@ -575,6 +572,7 @@ int elsize, nelts;
 {
 	int i, j;
 	int maxpage;
+	/*elsize=elsize<sizeof(struct freelist) ? sizeof(struct freelist) : elsize;*/
 	/* round up to next number of pages */
 	maxpage = (((nelts * elsize) + PAGESIZE -1)/PAGESIZE);
 	tm_table[(int)t].tm_name = name;
@@ -666,9 +664,9 @@ init_alloc()
 	   For these, the first call to sbrk() fails, but
 	   subsequent calls are o.k.
 	   */
-	if ( (int)sbrk(0) == -1 )
+	if ( (long)sbrk(0) == -1 )
 	  {
-	    if ( (int)sbrk(0) == -1 )
+	    if ( (long)sbrk(0) == -1 )
 	      {
 		fputs("FATAL Linux sbrk() error\n", stderr);
 		exit(1);
@@ -1084,10 +1082,8 @@ static char *baby_malloc(n)
 /*  } */
 /*  #endif */
 
-char *
-malloc(size)
-int size;
-{
+void *
+malloc(size_t size) {
         object x;
 	
 /*  #ifdef HAVE_LIBBFD */
@@ -1157,11 +1153,8 @@ char *
 #endif	
 }
 
-char *
-realloc(ptr, size)
-char *ptr;
-int size;
-{
+void *
+realloc(void *ptr, size_t size) {
 	object x;
 	int i, j;
  	object endp_temp;
@@ -1194,7 +1187,7 @@ int size;
 				x->st.st_self = alloc_contblock(size);
 				x->st.st_fillp = x->st.st_dim = size;
 				for (i = 0;  i < size;  i++)
-					x->st.st_self[i] = ptr[i];
+					x->st.st_self[i] = ((char *)ptr)[i];
 				insert_contblock(ptr, j);
 				return(x->st.st_self);
 			}
@@ -1230,10 +1223,9 @@ char *ptr;
 
 
 #ifndef GNUMALLOC
-char *
-memalign(align,size)
-     int align,size;
-{ object x = alloc_simple_string(size);
+void *
+memalign(long align,size_t size) { 
+  object x = alloc_simple_string(size);
   x->st.st_self = ALLOC_ALIGNED(alloc_contblock,size,align);
   malloc_list = make_cons(x, malloc_list);
   return x->st.st_self;

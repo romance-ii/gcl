@@ -1,5 +1,5 @@
 
-#include <cmpinclude.h>
+#include "cmpinclude.h"
 #include "loop.h"
 init_loop(){do_init(VV);}
 /*	macro definition for LOOP-COPYLIST*	*/
@@ -1155,7 +1155,7 @@ T332:;
 	L35(base);
 	return;
 T331:;
-	{register int V134;
+	{register long V134;
 	base[10]= base[1];
 	vs_top=(vs_base=base+10)+1;
 	(void) (*Lnk337)();
@@ -1311,7 +1311,7 @@ TTL:;
 	vs_top=(vs_base=base+2)+1;
 	return;
 T450:;
-	{int V159;
+	{long V159;
 	base[2]= (V157);
 	base[3]= (V158);
 	vs_top=(vs_base=base+2)+2;
@@ -1450,7 +1450,7 @@ T494:;
 	goto T497;}
 	{object V171;
 	object V172;
-	register int V173;
+	register long V173;
 	V171= car((V168));
 	V173= 0;
 	V172= Cnil;
@@ -1484,7 +1484,7 @@ T502:;
 T515:;
 	if(((V172))==Cnil){
 	goto T513;}
-	{int V177= fix(cadr((V172)));
+	{long V177= fix(cadr((V172)));
 	base[2]= cdr((V168));
 	vs_top=(vs_base=base+2)+1;
 	L40(base);
@@ -1608,7 +1608,7 @@ T588:;
 T585:;
 	if(!(((V171))==(VV[85]))){
 	goto T596;}
-	{int V186= length(cadr((V168)));
+	{long V186= length(cadr((V168)));
 	base[2]= cddr((V168));
 	vs_top=(vs_base=base+2)+1;
 	L40(base);
@@ -4089,7 +4089,7 @@ T1519:;
 	vs_top=(vs_base=base+3)+3;
 	(void) (*Lnk355)();
 	vs_top=sup;
-	{int V406;
+	{long V406;
 	object V407;
 	register object V408;
 	object V409;
@@ -6462,7 +6462,7 @@ register object *base0;
 	V645=(base[0]);
 	vs_top=sup;
 TTL:;
-	{int V646;
+	{long V646;
 	V646= 0;
 	{register object V647;
 	object V648;
@@ -6880,7 +6880,7 @@ register object *base0;
 	register object *sup=base+VM105; VC105
 	vs_reserve(VM105);
 	{register object V702;
-	register int V703;
+	register long V703;
 	check_arg(2);
 	V702=(base[0]);
 	V703=fix(base[1]);

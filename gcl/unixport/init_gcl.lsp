@@ -18,7 +18,7 @@
   (setq lisp::*link-array*
      (make-array (ash 1 11)  :element-type 'string-char :fill-pointer 0)))
  (si::use-fast-links t)
-(setq compiler::*cmpinclude* "<cmpinclude.h>") (load #"../cmpnew/cmpmain.lsp") (gbc t)
+(setq compiler::*cmpinclude* "\"cmpinclude.h\"") (load #"../cmpnew/cmpmain.lsp") (gbc t)
  (load #"../cmpnew/lfun_list.lsp")
  (gbc t) (load #"../cmpnew/cmpopt.lsp") (gbc t)
 (load #"../lsp/auto_new.lsp") (gbc t)

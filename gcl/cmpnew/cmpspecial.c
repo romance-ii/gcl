@@ -405,3 +405,8 @@ static object  LnkTLI48(){return call_proc0(VV[48],&LnkLI48);} /* C1NIL */
 static object  LnkTLI47(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[47],&LnkLI47,2,ap);} /* C1CONSTANT-VALUE */
 static object  LnkTLI46(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[46],&LnkLI46,3,ap);} /* TOO-MANY-ARGS */
 static object  LnkTLI45(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[45],&LnkLI45,3,ap);} /* TOO-FEW-ARGS */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

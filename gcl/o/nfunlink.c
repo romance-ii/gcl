@@ -27,10 +27,10 @@ int Rset;
   (in_type == out_type \
 	 ? val \
 	 :in_type == F_int \
-	 ?(out_type == F_object ? make_fixnum((int)val) :\
+	 ?(out_type == F_object ? make_fixnum((long)val) :\
 	   out_type == F_double_ptr \
-	   ?(object) (void *)  & lf(make_longfloat((double)(int) val)) \
-	   :out_type == F_shortfloat? COSF((float)(int)val) \
+	   ?(object) (void *)  & lf(make_longfloat((double)(long) val)) \
+	   :out_type == F_shortfloat? COSF((float)(long)val) \
 	   :(object) 0 ) \
 	 :in_type == F_object \
 	 ?(out_type == F_int ? (object)(void *) Mfix(val) \
@@ -38,12 +38,12 @@ int Rset;
 	   :out_type == F_shortfloat? COSF(Msf(val)) \
 	   :(object) 0)\
 	 :in_type == F_double_ptr \
-    	 ?(out_type == F_int ? (object)(void *)(int)*(double *)(void *)val \
+    	 ?(out_type == F_int ? (object)(void *)(long)*(double *)(void *)val \
 	   :out_type == F_object ? make_longfloat(*(double *)(void *)val) \
 	   :out_type == F_shortfloat? COSF(*(double *)(void *)val) \
 	   :(object) 0) \
          :in_type == F_shortfloat \
-    	 ?(out_type == F_int ? (object)(bill.p = val, (int) bill.f) \
+    	 ?(out_type == F_int ? (object)(bill.p = val, (long) bill.f) \
 	   :out_type == F_object ? make_shortfloat((bill.p=val,(double)(bill.f))) \
 	   :out_type == F_double_ptr ? (object)(void *) \
 	         &lf(make_longfloat((bill.p = val,bill.f))) \
@@ -98,8 +98,8 @@ Icall_proc(fun_name,link_desk,link_loc,ap)
       && F_MAX_ARGS(fargd) >= F_MIN_ARGS(link_desk)
       && F_TYPES(fargd) == F_TYPES(link_desk))
     {				/* do the link */
-      (void) vpush_extend((int) link_loc,sLAlink_arrayA->s.s_dbind); 
-      (void) vpush_extend((int) *link_loc,sLAlink_arrayA->s.s_dbind);
+      (void) vpush_extend((long) link_loc,sLAlink_arrayA->s.s_dbind); 
+      (void) vpush_extend((long) *link_loc,sLAlink_arrayA->s.s_dbind);
       *link_loc = fn;}
   /* make this call */
 

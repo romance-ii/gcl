@@ -211,3 +211,5 @@ SGC is enabled.  */
 /*  #undef PAGESIZE */
 /*  #define PAGESIZE (1<<PAGEWIDTH) */
 /*  #endif */
+
+#undef SIZEOF_LONG_P

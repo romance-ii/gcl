@@ -642,7 +642,7 @@ TTL:;
 	vs_top=sup;
 	if((vs_base[0])==Cnil){
 	goto T292;}
-	{register int V135;
+	{register long V135;
 	object V136;
 	V135= 1;
 	V136= Cnil;
@@ -666,7 +666,7 @@ T304:;
 	goto T303;}
 T300:;
 	{object V139;
-	int V140;
+	long V140;
 	register object V141;
 	V140= 0;
 	V139= (V134);
@@ -1217,8 +1217,8 @@ TTL:;
 T629:;
 	V229= car((V229));
 T626:;
-	{register int V230;
-	register int V231;
+	{register long V230;
+	register long V231;
 	V230= fix((V229));
 	V231= 0;
 T637:;
@@ -1244,8 +1244,8 @@ static L15()
 	V234=(base[1]);
 	vs_top=sup;
 TTL:;
-	{register int V235;
-	int V236;
+	{register long V235;
+	long V236;
 	V235= 0;
 	V236= -1;
 	if(!(type_of((V233))==t_string)){
@@ -1272,7 +1272,7 @@ T661:;
 	V235= (V235)+(1);
 	goto T660;
 T652:;
-	{int V237;
+	{long V237;
 	V237= length((V233));
 T674:;
 	if(!((V235)>=(V237))){
@@ -1846,3 +1846,8 @@ static object  LnkTLI77(va_alist)va_dcl{va_list ap;va_start(ap);return(object )c
 static object  LnkTLI76(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[76],&LnkLI76,1,ap);} /* WT1 */
 static object  LnkTLI75(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[75],&LnkLI75,2,ap);} /* ARGS-INFO-CHANGED-VARS */
 static object  LnkTLI74(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[74],&LnkLI74,2,ap);} /* COERCE-LOC */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

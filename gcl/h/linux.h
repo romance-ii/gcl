@@ -9,16 +9,17 @@
 #define HAVE_ELF
 
 /* Seeking to the end of ELF data is a little messy... */
+#include <link.h>
 #define SEEK_TO_END_OFILE(fp)\
   do { \
 	long offset = 0, endofelf; int j; \
-	Elf32_Ehdr eheader; Elf32_Shdr shdr; \
+	ElfW(Ehdr) eheader; ElfW(Shdr) shdr; \
         fseek(fp, 0, SEEK_SET); \
         fread(&eheader, sizeof(eheader), 1, fp); \
   /* in case the headers themselves come AFTER the actual sections */ \
 	endofelf=offset = eheader.e_shoff+ eheader.e_shentsize *eheader.e_shnum;\
         fseek(fp, eheader.e_shoff, SEEK_SET); \
-	if ( eheader.e_shentsize != sizeof(Elf32_Shdr) ) \
+	if ( eheader.e_shentsize != sizeof(ElfW(Shdr)) ) \
 	  { FEerror("Bad ELF section header size",0); } \
         for ( j = 0; j < eheader.e_shnum; j++ ) \
 	  { fread(&shdr,eheader.e_shentsize,1,fp); \

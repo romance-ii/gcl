@@ -51,7 +51,7 @@ object funobj;
     && type_of(funobj)!=t_afun
     && type_of(funobj)!=t_gfun)
     FEerror("not compiled function",0);
- funobj=make_fixnum((int) (funobj->cf.cf_self));
+ funobj=make_fixnum((long) (funobj->cf.cf_self));
  RETURN1(funobj);
 }
 
@@ -146,7 +146,7 @@ object x0;
 int maxpage;
 object sScdefn;
 
-#define CF_FLAG (1 << 31) 
+#define CF_FLAG ((unsigned long)1 << (sizeof(long)*8-1)) 
 
 
 cfuns_to_combined_table(n) /* non zero n will ensure new table length */
@@ -184,10 +184,10 @@ unsigned int n;
      if ((x->d.m == FREE) || x->cf.cf_self == NULL)
        continue;
 	/* the cdefn things are the proclaimed call types. */
-     cf_addr=(char * ) ((unsigned int)(x->cf.cf_self));
+     cf_addr=(char * ) ((unsigned long)(x->cf.cf_self));
 	
-     SYM_ADDRESS(combined_table,ii)=(unsigned int)cf_addr;
-     SYM_STRING(combined_table,ii)= (char *)(CF_FLAG | (unsigned int)x) ;
+     SYM_ADDRESS(combined_table,ii)=(unsigned long)cf_addr;
+     SYM_STRING(combined_table,ii)= (char *)(CF_FLAG | (unsigned long)x) ;
 /*       (x->cf.cf_name ? x->cf.cf_name->s.st_self : NULL) ; */
      combined_table.length = ++ii;
      if (ii >= combined_table.alloc_length)
@@ -356,13 +356,13 @@ object start_addr,scal;
 	 if ( prev < prof_start) continue;
 	 upto=prof_ind(next,scale);
 	 if (upto >= dim) upto=dim;
-	 {char *name; unsigned int uname;
+	 {char *name; unsigned long uname;
 	  count=0;
 	  for( ; j<upto;j++)
 	    count += ar[j];
 	  if (count > 0) {
 	    name=SYM_STRING(combined_table,i-1);
-	    uname = (unsigned int) name;
+	    uname = (unsigned long) name;
 	    printf("\n%6.2f%% (%5d): ",(100.0*count)/total, count);
 	    fflush(stdout);
 	    if (CF_FLAG & uname)
@@ -393,7 +393,7 @@ DEFUNO("ARRAY-ADRESS",object,fSarray_adress,SI
    ,1,1,NONE,OO,OO,OO,OO,siLarray_adress,"")(array)
 object array;
 {/* 1 args */
- array=make_fixnum((int) (&(array->st.st_self[0])));
+ array=make_fixnum((long) (&(array->st.st_self[0])));
  RETURN1(array);
 }
 

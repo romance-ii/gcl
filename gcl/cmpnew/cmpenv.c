@@ -254,7 +254,7 @@ TTL:;
 	V39= Cnil;
 	V40= Cnil;
 	{register object V41;
-	register int V42;
+	register long V42;
 	V42= 0;
 	V41= (V37);
 T105:;
@@ -1571,7 +1571,7 @@ T868:;
 T869:;
 	{object V217= car((V216));
 	if((V217!= VV[85]))goto T874;
-	{register int V218;
+	{register long V218;
 	V218= fix(cadr((V216)));
 	(VV[53]->s.s_dbind)= ((V218)>=(1)?Ct:Cnil);
 	(VV[54]->s.s_dbind)= ((V218)>=(2)?Ct:Cnil);
@@ -2121,3 +2121,8 @@ static LnkT116(){ call_or_link(VV[116],&Lnk116);} /* GET-OUTPUT-STREAM-STRING */
 static object  LnkTLI115(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[115],&LnkLI115,1,ap);} /* WT-DATA1 */
 static LnkT114(){ call_or_link(VV[114],&Lnk114);} /* MAKE-STRING-OUTPUT-STREAM */
 static object  LnkTLI113(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[113],&LnkLI113,1,ap);} /* PUSH-DATA-INCF */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

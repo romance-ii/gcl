@@ -65,7 +65,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 typedef int bool;
-typedef int fixnum;
+typedef long fixnum;
 typedef float shortfloat;
 typedef double longfloat;
 typedef unsigned short fatchar;
@@ -705,7 +705,7 @@ union lispunion {
 	struct lfarray	lfa;	/*  plong-float array  */
 };
 
-#define address_int unsigned int
+#define address_int unsigned long
 
 /*
 	The struct of free lists.
@@ -822,7 +822,7 @@ char *tmp_alloc;
 #define ALLOC_ALIGNED(f, size,align) \
   (align <= sizeof(plong) ? (char *)((f)(size)) : \
    (tmp_alloc = (char *)((f)(size+(size ?(align)-1 : 0)))+(align)-1 , \
-   (char *)(align * (((unsigned int)tmp_alloc)/align))))
+   (char *)(align * (((unsigned long)tmp_alloc)/align))))
 #define AR_ALLOC(f,n,type) (type *) \
   (ALLOC_ALIGNED(f,(n)*sizeof(type),sizeof(type)))
 

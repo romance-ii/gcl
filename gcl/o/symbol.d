@@ -259,7 +259,7 @@ object place, indicator, deflt;
 
 object
 get(s, p, d)
-object s, p;
+object s, p, d;
 {
 	if (type_of(s) != t_symbol)
 		not_a_symbol(s);

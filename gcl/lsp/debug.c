@@ -125,8 +125,8 @@ TTL:;
 T62:;
 	V13= (V12);
 T60:;
-	{register int V14;
-	register int V15;
+	{register long V14;
+	register long V15;
 	{object V16;
 	vs_base=vs_top;
 	(void) (*Lnk113)();
@@ -260,8 +260,8 @@ T112:;
 	V29= Cnil;
 	if(!((fix((V23)))>(1))){
 	goto T123;}
-	{register int V30;
-	int V31;
+	{register long V30;
+	long V31;
 	V30= 0;{object V32;
 	V32= (type_of((V23))==t_fixnum?Ct:Cnil);
 	if(V32==Cnil)goto T128;
@@ -270,8 +270,8 @@ T128:;}
 	(void)((*(LnkLI114))());
 T127:;
 	V31= fix((V23));
-	{register int V33;
-	int V34;{object V35;
+	{register long V33;
+	long V34;{object V35;
 	V35= (type_of((V26))==t_fixnum?Ct:Cnil);
 	if(V35==Cnil)goto T132;
 	goto T131;
@@ -352,8 +352,8 @@ T160:;
 	vs_top=sup;
 	if(!(type_of((V28))==t_symbol)){
 	goto T174;}
-	{register int V37;
-	int V38;{object V39;
+	{register long V37;
+	long V38;{object V39;
 	V39= (type_of((V25))==t_fixnum?Ct:Cnil);
 	if(V39==Cnil)goto T178;
 	goto T177;
@@ -368,7 +368,7 @@ T182:;}
 	(void)((*(LnkLI114))());
 T181:;
 	V38= fix((V36));
-	{register int V41;
+	{register long V41;
 	V41= 0;
 	{register object V42;
 	V42= Cnil;
@@ -750,7 +750,7 @@ TTL:;
 	(void) (*Lnk126)();
 	vs_top=sup;
 	V77= vs_base[0];
-	{int V78= fix(structure_ref((V77),VV[25],1));
+	{long V78= fix(structure_ref((V77),VV[25],1));
 	V79 = make_fixnum((1)+(/* INLINE-ARGS */V78));
 	(void)(structure_set((V77),VV[25],1,V79));}}
 	base[2]= Cnil;
@@ -834,7 +834,7 @@ TTL:;
 	Lpeek_char();
 	vs_top=sup;
 	V92= vs_base[0];
-	{int V93= fix(structure_ref((V91),VV[25],1));
+	{long V93= fix(structure_ref((V91),VV[25],1));
 	V94 = make_fixnum((1)+(/* INLINE-ARGS */V93));
 	(void)(structure_set((V91),VV[25],1,V94));}
 	if(!(eql((V92),VV[34]))){
@@ -1113,8 +1113,8 @@ static L19()
 	vs_top=sup;
 TTL:;
 	{object V118;
-	register int V119;
-	int V120;
+	register long V119;
+	long V120;
 	V118= symbol_value(VV[47]);
 	V119= 2147483647;
 	V120= -1;
@@ -1136,7 +1136,7 @@ T467:;
 	(void) (*Lnk136)();
 	vs_top=sup;
 	{object V121;
-	register int V122;
+	register long V122;
 	V121= make_fixnum(length((V118)));
 	V122= 0;
 T481:;
@@ -1145,7 +1145,7 @@ T481:;
 	goto T482;}
 	goto T477;
 T482:;
-	{register int V124;
+	{register long V124;
 	V125= aref1((V118),V122);
 	V124= fix(cdar(/* INLINE-ARGS */V125));
 	if(!((V124)>(V120))){
@@ -2152,8 +2152,8 @@ T877:;
 T873:;
 	V243= Cnil;
 	V244= Cnil;
-	{int V246;
-	int V247;
+	{long V246;
+	long V247;
 	base[4]= (V242);
 	vs_top=(vs_base=base+4)+1;
 	(void) (*Lnk154)();
@@ -2496,13 +2496,13 @@ static L43()
 {register object *base=vs_base;
 	register object *sup=base+VM41; VC41
 	vs_reserve(VM41);
-	{register int V278;
+	{register long V278;
 	check_arg(1);
 	V278=fix(base[0]);
 	vs_top=sup;
 TTL:;
-	{register int V279;
-	register int V280;
+	{register long V279;
+	register long V280;
 	register object V281;
 	V279= fix(symbol_value(VV[87]));
 	V280= 0;

@@ -25,8 +25,11 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 /*  alloc.c  */
 char *alloc_page();
 object alloc_object();
-char *alloc_contblock();
-char *alloc_relblock();
+void *malloc(size_t);
+void *realloc(void *,size_t);
+void * memalign(long,size_t);
+void *alloc_contblock(size_t);
+void *alloc_relblock(size_t);
 object fSallocate_contiguous_pages();
 object fSallocate_relocatable_pages();
 
@@ -274,7 +277,7 @@ void error();
 #ifdef UNIX
 EXTER char **ENVP;
 #endif
-
+object vs_overflow(void);
 
 EXTER object sSAsystem_directoryA;
 #ifdef UNIX
@@ -313,7 +316,7 @@ object make_shortfloat();
 object make_longfloat();
 object make_complex();
 double number_to_double();
-
+long fixint(object);
 /*  num_pred.c  */
 
 /*  num_comp.c  */
@@ -620,6 +623,8 @@ object sLfset();
 object MakeAfun();
 extern  object Cstd_key_defaults[];   
 extern object call_proc0();
+extern object call_proc();
+extern object call_vproc();
 object fSaref1();
 object Icheck_one_type();
 

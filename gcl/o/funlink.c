@@ -229,7 +229,7 @@ object
 c_apply_n(fn,n,x)
      object *x;
      int n;
-     int (*fn)();
+     long (*fn)();
 {object res;
  switch(n){
     case 0:  res=(object)(*fn)();break;
@@ -573,8 +573,8 @@ va_list ll;
 	     || type_of(fun)==t_gfun
 	     || type_of(fun)== t_vfun)
 	     && Rset) /* the && Rset is to allow tracing */
-   {int (*fn)();
-    fn =  (int (*)()) fun->sfn.sfn_self;
+   {long (*fn)();
+    fn =  (long (*)()) fun->sfn.sfn_self;
     if (type_of(fun)==t_vfun)
       { /* argd=VFUN_NARGS; */ /*remove this! */
 	nargs=SFUN_NARGS(argd);

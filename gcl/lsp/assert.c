@@ -636,3 +636,8 @@ static object  LnkTLI58(va_alist)va_dcl{va_list ap;va_start(ap);return(object )c
 static object  LnkTLI57(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[57],&LnkLI57,ap);} /* REMOVE */
 static object  LnkTLI56(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[56],&LnkLI56,1,ap);} /* TYPECASE-ERROR-STRINGS */
 static object  LnkTLI53(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[53],&LnkLI53,1,ap);} /* ASK-FOR-FORM */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

@@ -447,7 +447,7 @@ static L5()
 	vs_top=(vs_base=base+5)+1;
 	return;
 }
-/*	function definition for G1078	*/
+/*	function definition for G1027	*/
 
 static L6()
 {register object *base=vs_base;
@@ -529,7 +529,7 @@ T168:;
 	return;}}
 	}
 }
-/*	function definition for G1080	*/
+/*	function definition for G1029	*/
 
 static L7()
 {register object *base=vs_base;
@@ -596,7 +596,7 @@ T184:;
 	return;}}
 	}
 }
-/*	function definition for G1082	*/
+/*	function definition for G1031	*/
 
 static L8()
 {register object *base=vs_base;
@@ -746,7 +746,7 @@ T226:;
 	return;}
 	}
 }
-/*	function definition for G1083	*/
+/*	function definition for G1032	*/
 
 static L9()
 {register object *base=vs_base;
@@ -819,7 +819,7 @@ T256:;
 	return;}}
 	}
 }
-/*	function definition for G1085	*/
+/*	function definition for G1034	*/
 
 static L10()
 {register object *base=vs_base;
@@ -892,7 +892,7 @@ T273:;
 	return;}}
 	}
 }
-/*	function definition for G1087	*/
+/*	function definition for G1036	*/
 
 static L11()
 {register object *base=vs_base;
@@ -2079,3 +2079,8 @@ static object  LnkTLI96(va_alist)va_dcl{va_list ap;va_start(ap);return(object )c
 static LnkT95(){ call_or_link(VV[95],&Lnk95);} /* GET-SETF-METHOD-MULTIPLE-VALUE */
 static LnkT94(){ call_or_link(VV[94],&Lnk94);} /* GET-&ENVIRONMENT */
 static object  LnkTLI93(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[93],&LnkLI93,1,ap);} /* FIND-DOCUMENTATION */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

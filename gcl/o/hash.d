@@ -81,7 +81,7 @@ object x;
 		return(char_code(x));
 
 	default:
-		return((unsigned int)x / 4);
+		return((unsigned long)x / 4);
 	}
 }
 
@@ -193,7 +193,7 @@ object hashtable;
 	htest = (enum httest)hashtable->ht.ht_test;
 	hsize = hashtable->ht.ht_size;
 	if (htest == htt_eq)
-		i = (int)key / 4;
+		i = (long)key / 4;
 	else if (htest == htt_eql)
 		i = hash_eql(key);
 	else if (htest == htt_equal)

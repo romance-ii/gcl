@@ -443,3 +443,8 @@ static object  LnkTLI29(va_alist)va_dcl{va_list ap;va_start(ap);return(object )c
 static object  LnkTLI28(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[28],&LnkLI28,ap);} /* MAKE-BLK */
 static object  LnkTLI27(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[27],&LnkLI27,ap);} /* CMPERR */
 static object  LnkTLI26(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[26],&LnkLI26,3,ap);} /* TOO-FEW-ARGS */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

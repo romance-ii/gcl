@@ -191,3 +191,8 @@ T67:;
 }
 static object  LnkTLI12(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[12],&LnkLI12,1,ap);} /* WT1 */
 static object  LnkTLI11(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[11],&LnkLI11,1,ap);} /* WT-VS */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

@@ -76,7 +76,7 @@ char stdout_buf[BUFSIZ + EXTRA_BUFSIZE];
 int debug;			/* debug switch */
 int initflag = FALSE;		/* initialized flag */
 
-int real_maxpage;
+long real_maxpage;
 object sSAlisp_maxpagesA;
 
 object siClisp_pagesize;
@@ -514,13 +514,13 @@ initlisp()
 #endif	
 
 }
-
+object
 vs_overflow()
 {
 	if (vs_limit > vs_org + stack_multiple *  VSSIZE)
 		error("value stack overflow");
 	vs_limit += STACK_OVER*VSGETA;
-	FEerror("Value stack overflow.", 0);
+	FEerror("Value stack overflow.", 0);return Cnil;
 }
 
 
@@ -778,7 +778,7 @@ siLinit_system()
 siLaddress()
 {
 	check_arg(1);
-	vs_base[0] = make_fixnum((int)vs_base[0]);
+	vs_base[0] = make_fixnum((long)vs_base[0]);
 }
 
 siLnani()

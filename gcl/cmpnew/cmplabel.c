@@ -84,7 +84,7 @@ T1:;
 	princ_str(");",VV[14]);
 T5:;
 	{register object V11;
-	register int V12;
+	register long V12;
 	V11= (V10);
 	V12= 0;
 T14:;
@@ -127,7 +127,7 @@ T25:;
 	V18= Cnil;
 T26:;
 	{register object V19;
-	register int V20;
+	register long V20;
 	object V21;
 	bds_bind(VV[15],symbol_value(VV[15]));
 	V19= Cnil;
@@ -418,7 +418,7 @@ register object V48;
 {	 VMB7 VMS7 VMV7
 TTL:;
 	{register object V49;
-	register int V50;
+	register long V50;
 	V49= Cnil;
 	V50= 0;
 	{register object V51;
@@ -568,3 +568,8 @@ static object  LnkTLI43(va_alist)va_dcl{va_list ap;va_start(ap);return(object )c
 static object  LnkTLI42(){return call_proc0(VV[42],&LnkLI42);} /* RESET-TOP */
 static object  LnkTLI41(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[41],&LnkLI41,2,ap);} /* RECORD-CALL-INFO */
 static object  LnkTLI40(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[40],&LnkLI40,1,ap);} /* WT1 */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

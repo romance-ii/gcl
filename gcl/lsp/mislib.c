@@ -403,3 +403,8 @@ T144:;
 static LnkT15(){ call_or_link(VV[15],&Lnk15);} /* GET-DECODED-TIME */
 static object  LnkTLI14(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[14],&LnkLI14,1,ap);} /* LEAP-YEAR-P */
 static object  LnkTLI13(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[13],&LnkLI13,1,ap);} /* NUMBER-OF-DAYS-FROM-1900 */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

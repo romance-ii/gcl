@@ -739,7 +739,7 @@ object x;
 int diff;
 {
 	if (x->ust.ust_self != NULL)
-		x->ust.ust_self = (char *)((int)(x->a.a_self) + diff);
+		x->ust.ust_self = (char *)((long)(x->a.a_self) + diff);
 	for (x = Mcdr(x->ust.ust_displaced);  x != Cnil;  x = Mcdr(x))
 		adjust_displaced(Mcar(x), diff);
 }
@@ -880,7 +880,7 @@ object x,dflt;
 int staticp;
 {
 	int i, d,n;
-	char *(*fun)(),*tmp_alloc;
+	void *(*fun)(size_t),*tmp_alloc;
 	enum aelttype typ;
 	fun = (staticp ? alloc_contblock : alloc_relblock);
 	{  /* this must be called from within no interrupt code */

@@ -41,7 +41,7 @@
 
 (defvar *compile-print* nil)
 (defvar *compile-verbose* t)
-(defvar *cmpinclude* "<cmpinclude.h>")
+(defvar *cmpinclude* "\"cmpinclude.h\"")
 ;;If the following is a string, then it is inserted instead of
 ;; the include file cmpinclude.h, EXCEPT for system-p calls.
 (defvar *cmpinclude-string* t)

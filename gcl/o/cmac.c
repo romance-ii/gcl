@@ -62,7 +62,7 @@ int a,b,mod;
  { mp_limb_t ar[2],q[2],aa;
  aa = a;
   ar[1]=mpn_mul_1(ar,&aa,1,b);
-  h = mpn_divrem_1(&q,0,ar,2,mod);
+  h = mpn_divrem_1(q,0,ar,2,mod);
  return ((sign<0) ? -h :h);
  }
 }

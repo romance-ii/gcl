@@ -52,6 +52,8 @@ fi
 # subst GCC not only under 386-linux, but where available -- CM
 AC_SUBST(GCC)
 
+AC_CHECK_SIZEOF(long *,0)
+
 AC_CHECK_HEADERS(endian.h,
 	AC_MSG_CHECKING("endianness")
 	AC_TRY_RUN([#define __ARMEB__
@@ -436,7 +438,7 @@ canonical=$host
 AC_MSG_RESULT(host=$host)
 
 use=unknown
-
+EXTRA_CFLAGS=""
 case $canonical in
      older)
      use=386-bsd;;
@@ -448,7 +450,7 @@ case $canonical in
      use=m68k-linux; ln -snf linux.defs h/$use.defs;;
 
      alpha*-*-linux*)
-     use=alpha-linux; ln -snf linux.defs h/$use.defs;;
+     use=alpha-linux; EXTRA_CFLAGS=-mieee; ln -snf linux.defs h/$use.defs;;
 
      mips-*-linux*)
      use=mips-linux; ln -snf linux.defs h/$use.defs;;
@@ -468,7 +470,7 @@ case $canonical in
      ia64-*-linux*)
      use=ia64-linux; ln -snf linux.defs h/$use.defs;;
 
-     hppa-*-linux*)
+     hppa*-*-linux*)
      use=hppa-linux; ln -snf linux.defs h/$use.defs;;
 
      powerpc-*-linux*)
@@ -592,7 +594,7 @@ int joe=SV_ONSTACK;
  AC_SUBST(HAVE_SV_ONSTACK)
  AC_MSG_RESULT(yes)],
 AC_MSG_RESULT(no))
-
+AC_SUBST(EXTRA_CFLAGS)
 
 AC_MSG_CHECKING(check for SIGSYS)
 AC_TRY_COMPILE([#include <signal.h>

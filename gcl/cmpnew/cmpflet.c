@@ -932,8 +932,8 @@ T521:;
 	V167= structure_ref(car((V159)),VV[0],3);
 	(void)((*(LnkLI54))(/* INLINE-ARGS */V167));
 	princ_char(40,VV[20]);
-	{register int V168;
-	register int V169;
+	{register long V168;
+	register long V169;
 	V168= fix(structure_ref(car((V159)),VV[0],4));
 	V169= 0;
 T560:;
@@ -988,3 +988,8 @@ static LnkT45(){ call_or_link(VV[45],&Lnk45);} /* C1BODY */
 static object  LnkTLI44(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[44],&LnkLI44,ap);} /* MAKE-FUN */
 static object  LnkTLI43(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[43],&LnkLI43,ap);} /* CMPERR */
 static object  LnkTLI42(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[42],&LnkLI42,3,ap);} /* TOO-FEW-ARGS */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

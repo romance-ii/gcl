@@ -598,7 +598,7 @@ static L19()
 	{register object V86;
 	register object V87;
 	register object V88;
-	register int V89;
+	register long V89;
 	vs_base=vs_top;
 	Lgensym();
 	vs_top=sup;
@@ -641,7 +641,7 @@ static L20()
 	{register object V95;
 	register object V96;
 	register object V97;
-	register int V98;
+	register long V98;
 	vs_base=vs_top;
 	Lgensym();
 	vs_top=sup;

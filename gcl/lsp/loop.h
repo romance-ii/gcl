@@ -121,7 +121,7 @@ static L104();
 #define VC29
 #define VC30 object  V165 ,V163;
 #define VC31
-#define VC32 int  V192; object  V188; int  V187; object  V182 ,V181; int  V178 ,V175;
+#define VC32 long  V192; object  V188; long  V187; object  V182 ,V181; long  V178 ,V175;
 #define VC33
 #define VC34
 #define VC35 object  V200;

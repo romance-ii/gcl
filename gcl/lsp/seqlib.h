@@ -62,12 +62,12 @@ static object LI5();
 #define VMS5  register object *sup=vs_top+2;vs_top=sup;
 #define VMV5 vs_reserve(2);
 #define VMR5(VMT5) vs_top=base ; return(VMT5);
-static int LI6();
+static long LI6();
 #define VMB6
 #define VMS6
 #define VMV6
 #define VMR6(VMT6) return(VMT6);
-static int LI7();
+static long LI7();
 #define VMB7
 #define VMS7
 #define VMV7
@@ -495,9 +495,9 @@ static object  LnkTLI41() ;
 static object  (*LnkLI41)() = LnkTLI41;
 static object  LnkTLI40() ;
 static object  (*LnkLI40)() = LnkTLI40;
-static int  LnkTLI35() ;
-static int  (*LnkLI35)() = LnkTLI35;
-static int  LnkTLI34() ;
-static int  (*LnkLI34)() = LnkTLI34;
+static long  LnkTLI35() ;
+static long  (*LnkLI35)() = LnkTLI35;
+static long  LnkTLI34() ;
+static long  (*LnkLI34)() = LnkTLI34;
 static object  LnkTLI31() ;
 static object  (*LnkLI31)() = LnkTLI31;

@@ -74,7 +74,7 @@ static object LI2();
 #define VC16
 #define VC17 object  V109;
 #define VC18 object  V115;
-#define VC19 object  V148; int  V145; object  V138 ,V132 ,V131 ,V130 ,V129 ,V128 ,V125 ,V123;
+#define VC19 object  V148; long  V145; object  V138 ,V132 ,V131 ,V130 ,V129 ,V128 ,V125 ,V123;
 #define VC20
 #define VC21 object  V160;
 #define VC22

@@ -1,5 +1,4 @@
 
-
 #include "cmpinclude.h"
 #include "defpackage.h"
 init_defpackage(){do_init(VV);}
@@ -820,7 +819,7 @@ register object *base0;
 	V142= (V139);
 	{object V143;
 	V143= cdr((V139));
-	{register int V144;
+	{register long V144;
 	V144= 1;
 T370:;
 	if(((V143))==Cnil){
@@ -869,7 +868,7 @@ T385:;
 	register object V156;
 	V155= Cnil;
 	V156= (V143);
-	{register int V157;
+	{register long V157;
 	{object V158;
 	V159 = make_fixnum(V144);
 	V158= one_plus(V159);{object V160;
@@ -1152,3 +1151,8 @@ static object  LnkTLI67(){return call_proc0(VV[67],&LnkLI67);} /* TYPE-ERROR */
 static object  LnkTLI65(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[65],&LnkLI65,ap);} /* FIND */
 static object  LnkTLI64(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[64],&LnkLI64,ap);} /* WARN */
 static object  LnkTLI62(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[62],&LnkLI62,ap);} /* COUNT */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

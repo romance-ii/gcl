@@ -154,7 +154,7 @@ T43:;
 	}
 /*	local entry for function THE-END	*/
 
-static int LI6(V34,V35)
+static long LI6(V34,V35)
 
 register object V34;object V35;
 {	 VMB6 VMS6 VMV6
@@ -167,20 +167,20 @@ TTL:;
 T51:;
 	(void)((VFUN_NARGS=1,(*(LnkLI31))((V34))));
 T50:;
-	{int V36 = fix((V34));
+	{long V36 = fix((V34));
 	VMR6(V36)}
 T48:;
 	if(((V34))!=Cnil){
 	goto T54;}
-	{int V37 = length((V35));
+	{long V37 = length((V35));
 	VMR6(V37)}
 T54:;
-	{int V38 = fix((VFUN_NARGS=1,(*(LnkLI31))((V34))));
+	{long V38 = fix((VFUN_NARGS=1,(*(LnkLI31))((V34))));
 	VMR6(V38)}
 }
 /*	local entry for function THE-START	*/
 
-static int LI7(V40)
+static long LI7(V40)
 
 register object V40;
 {	 VMB7 VMS7 VMV7
@@ -193,15 +193,15 @@ TTL:;
 T60:;
 	(void)((VFUN_NARGS=1,(*(LnkLI31))((V40))));
 T59:;
-	{int V41 = fix((V40));
+	{long V41 = fix((V40));
 	VMR7(V41)}
 T57:;
 	if(((V40))!=Cnil){
 	goto T63;}
-	{int V42 = 0;
+	{long V42 = 0;
 	VMR7(V42)}
 T63:;
-	{int V43 = fix((VFUN_NARGS=1,(*(LnkLI31))((V40))));
+	{long V43 = fix((VFUN_NARGS=1,(*(LnkLI31))((V40))));
 	VMR7(V43)}
 }
 /*	function definition for REDUCE	*/
@@ -232,7 +232,7 @@ static L8()
 	V51= symbol_function(VV[33]);
 	}else{
 	V51=(base[6]);}
-	{register int V52;
+	{register long V52;
 	if(((V47))==Cnil){
 	goto T68;}
 	V52= (*(LnkLI34))((V47));
@@ -240,7 +240,7 @@ static L8()
 T68:;
 	V52= 0;
 T66:;
-	{register int V53;
+	{register long V53;
 	V53= (*(LnkLI35))((V48),(V45));
 	if(!((V52)<=(V53))){
 	goto T72;}
@@ -344,7 +344,7 @@ static object LI9(V64,V63,va_alist)
 	parse_key_new(narg,Vcs +2,&LI9key,ap);
 	V67=(Vcs[2]);
 	V68=(Vcs[3]);
-	{int V69;
+	{long V69;
 	if(((V67))==Cnil){
 	goto T124;}
 	V69= (*(LnkLI34))((V67));
@@ -352,7 +352,7 @@ static object LI9(V64,V63,va_alist)
 T124:;
 	V69= 0;
 T122:;
-	{register int V70;
+	{register long V70;
 	V70= (*(LnkLI35))((V68),(V65));
 	if(!((V69)<=(V70))){
 	goto T128;}
@@ -362,7 +362,7 @@ T128:;
 	V72 = make_fixnum(V70);
 	(void)((VFUN_NARGS=2,(*(LnkLI31))(V71,V72)));
 T127:;
-	{register int V73;
+	{register long V73;
 	V73= V69;
 T132:;
 	if(!((V73)>=(V70))){
@@ -399,7 +399,7 @@ static object LI10(V76,V75,va_alist)
 	V80=(Vcs[3]);
 	V81=(Vcs[4]);
 	V82=(Vcs[5]);
-	{int V83;
+	{long V83;
 	if(((V79))==Cnil){
 	goto T143;}
 	V83= (*(LnkLI34))((V79));
@@ -407,7 +407,7 @@ static object LI10(V76,V75,va_alist)
 T143:;
 	V83= 0;
 T141:;
-	{int V84;
+	{long V84;
 	V84= (*(LnkLI35))((V80),(V77));
 	if(!((V83)<=(V84))){
 	goto T147;}
@@ -417,7 +417,7 @@ T147:;
 	V86 = make_fixnum(V84);
 	(void)((VFUN_NARGS=2,(*(LnkLI31))(V85,V86)));
 T146:;
-	{int V87;
+	{long V87;
 	if(((V81))==Cnil){
 	goto T151;}
 	V87= (*(LnkLI34))((V81));
@@ -425,7 +425,7 @@ T146:;
 T151:;
 	V87= 0;
 T149:;
-	{int V88;
+	{long V88;
 	V88= (*(LnkLI35))((V82),(V78));
 	if(!((V87)<=(V88))){
 	goto T155;}
@@ -439,10 +439,10 @@ T154:;
 	goto T158;}
 	if(!((V83)>(V87))){
 	goto T158;}
-	{register int V91;
-	int V92;
-	register int V93;
-	register int V94;
+	{register long V91;
+	long V92;
+	register long V93;
+	register long V94;
 	V91= 0;
 	if(!(((V84)-(V83))<((V88)-(V87)))){
 	goto T165;}
@@ -466,10 +466,10 @@ T171:;
 	V94= (-1)+(V94);
 	goto T170;}
 T158:;
-	{register int V97;
-	int V98;
-	register int V99;
-	register int V100;
+	{register long V97;
+	long V98;
+	register long V99;
+	register long V100;
 	V97= 0;
 	if(!(((V84)-(V83))<((V88)-(V87)))){
 	goto T186;}
@@ -527,7 +527,7 @@ static object LI11(V104,V103,va_alist)
 	V113= symbol_function(VV[33]);
 	}else{
 	V113=(Vcs[8]);}
-	{int V114;
+	{long V114;
 	if(((V110))==Cnil){
 	goto T205;}
 	V114= (*(LnkLI34))((V110));
@@ -535,7 +535,7 @@ static object LI11(V104,V103,va_alist)
 T205:;
 	V114= 0;
 T203:;
-	{int V115;
+	{long V115;
 	V115= (*(LnkLI35))((V111),(V106));
 	if(!((V114)<=(V115))){
 	goto T209;}
@@ -545,7 +545,7 @@ T209:;
 	V117 = make_fixnum(V115);
 	(void)((VFUN_NARGS=2,(*(LnkLI31))(V116,V117)));
 T208:;
-	{int V118;
+	{long V118;
 	if(((V112))!=Cnil){
 	goto T213;}
 	V118= 2147483647;
@@ -567,7 +567,7 @@ T216:;
 	register object V120;
 	V119= (V106);
 	V120= Cnil;
-	{register int V121;
+	{register long V121;
 	V121= 0;
 T226:;
 	if(!((V121)>=(V114))){
@@ -581,8 +581,8 @@ T227:;
 	V121= (1)+(V121);
 	goto T226;}
 T223:;
-	{register int V123;
-	register int V124;
+	{register long V123;
+	register long V124;
 	V123= V114;
 	V124= 0;
 T243:;
@@ -736,9 +736,9 @@ static object LI14(V160,V159,va_alist)
 	V169= symbol_function(VV[33]);
 	}else{
 	V169=(Vcs[8]);}
-	{int V170;
+	{long V170;
 	V170= length((V162));
-	{register int V171;
+	{register long V171;
 	if(((V166))==Cnil){
 	goto T281;}
 	V171= (*(LnkLI34))((V166));
@@ -746,7 +746,7 @@ static object LI14(V160,V159,va_alist)
 T281:;
 	V171= 0;
 T279:;
-	{register int V172;
+	{register long V172;
 	V172= (*(LnkLI35))((V167),(V162));
 	if(!((V171)<=(V172))){
 	goto T285;}
@@ -756,7 +756,7 @@ T285:;
 	V174 = make_fixnum(V172);
 	(void)((VFUN_NARGS=2,(*(LnkLI31))(V173,V174)));
 T284:;
-	{register int V175;
+	{register long V175;
 	if(((V168))!=Cnil){
 	goto T289;}
 	V175= 2147483647;
@@ -778,7 +778,7 @@ T292:;
 	register object V177;
 	V176= make_cons(Cnil,(V162));
 	V177= (V176);
-	{int V178;
+	{long V178;
 	V178= 0;
 T304:;
 	if(!((V178)>=(V171))){
@@ -791,8 +791,8 @@ T305:;
 	V178= (1)+(V178);
 	goto T304;}
 T301:;
-	{int V180;
-	int V181;
+	{long V180;
+	long V181;
 	V180= V171;
 	V181= 0;
 T319:;
@@ -823,7 +823,7 @@ T328:;
 	V180= (1)+(V180);
 	goto T319;}}
 T297:;
-	{int V184;
+	{long V184;
 	V185 = make_fixnum(V171);
 	V186 = make_fixnum(V172);
 	V187 = make_fixnum(V175);
@@ -833,9 +833,9 @@ T297:;
 	V175= V184;
 T341:;
 	{object V188;
-	register int V189;
-	int V190;
-	int V191;
+	register long V189;
+	long V190;
+	long V191;
 	V192= (*(LnkLI47))((V162));
 	V193 = make_fixnum((V170)-(V175));
 	V188= (VFUN_NARGS=2,(*(LnkLI46))(/* INLINE-ARGS */V192,V193));
@@ -871,7 +871,7 @@ T355:;
 	V189= (1)+(V189);
 	goto T350;}}
 T294:;
-	{int V197;
+	{long V197;
 	V198 = make_fixnum(V171);
 	V199 = make_fixnum(V172);
 	V200 = make_fixnum(V175);
@@ -881,9 +881,9 @@ T294:;
 	V175= V197;
 T374:;
 	{object V201;
-	register int V202;
-	int V203;
-	int V204;
+	register long V202;
+	long V203;
+	long V204;
 	V205= (*(LnkLI47))((V162));
 	V206 = make_fixnum((V170)-(V175));
 	V201= (VFUN_NARGS=2,(*(LnkLI46))(/* INLINE-ARGS */V205,V206));
@@ -1019,7 +1019,7 @@ static object LI17(V233,V232,va_alist)
 	V241= symbol_function(VV[33]);
 	}else{
 	V241=(Vcs[7]);}
-	{int V242;
+	{long V242;
 	if(((V239))==Cnil){
 	goto T413;}
 	V242= (*(LnkLI34))((V239));
@@ -1027,7 +1027,7 @@ static object LI17(V233,V232,va_alist)
 T413:;
 	V242= 0;
 T411:;
-	{int V243;
+	{long V243;
 	V243= (*(LnkLI35))((V240),(V235));
 	if(!((V242)<=(V243))){
 	goto T417;}
@@ -1045,8 +1045,8 @@ T416:;
 T419:;
 	if(((V236))!=Cnil){
 	goto T421;}
-	{register int V246;
-	register int V247;
+	{register long V246;
+	register long V247;
 	V246= V242;
 	V247= 0;
 T426:;
@@ -1067,8 +1067,8 @@ T431:;
 	V246= (1)+(V246);
 	goto T426;}
 T421:;
-	{register int V250;
-	register int V251;
+	{register long V250;
+	register long V251;
 	V250= (-1)+(V243);
 	V251= 0;
 T443:;
@@ -1187,7 +1187,7 @@ static object LI20(V275,V274,va_alist)
 	V284= symbol_function(VV[33]);
 	}else{
 	V284=(Vcs[8]);}
-	{int V285;
+	{long V285;
 	if(((V281))==Cnil){
 	goto T464;}
 	V285= (*(LnkLI34))((V281));
@@ -1195,7 +1195,7 @@ static object LI20(V275,V274,va_alist)
 T464:;
 	V285= 0;
 T462:;
-	{int V286;
+	{long V286;
 	V286= (*(LnkLI35))((V282),(V277));
 	if(!((V285)<=(V286))){
 	goto T468;}
@@ -1205,7 +1205,7 @@ T468:;
 	V288 = make_fixnum(V286);
 	(void)((VFUN_NARGS=2,(*(LnkLI31))(V287,V288)));
 T467:;
-	{int V289;
+	{long V289;
 	if(((V283))!=Cnil){
 	goto T472;}
 	V289= 2147483647;
@@ -1221,8 +1221,8 @@ T470:;
 T475:;
 	if(((V278))!=Cnil){
 	goto T477;}
-	{register int V290;
-	register int V291;
+	{register long V290;
+	register long V291;
 	V290= V285;
 	V291= 0;
 T482:;
@@ -1245,8 +1245,8 @@ T487:;
 	V290= (1)+(V290);
 	goto T482;}
 T477:;
-	{register int V294;
-	register int V295;
+	{register long V294;
+	register long V295;
 	V294= (-1)+(V286);
 	V295= 0;
 T501:;
@@ -1373,9 +1373,9 @@ static object LI23(V322,V321,V320,va_alist)
 	V332= symbol_function(VV[33]);
 	}else{
 	V332=(Vcs[9]);}
-	{int V333;
+	{long V333;
 	V333= length((V325));
-	{int V334;
+	{long V334;
 	if(((V329))==Cnil){
 	goto T525;}
 	V334= (*(LnkLI34))((V329));
@@ -1383,7 +1383,7 @@ static object LI23(V322,V321,V320,va_alist)
 T525:;
 	V334= 0;
 T523:;
-	{int V335;
+	{long V335;
 	V335= (*(LnkLI35))((V330),(V325));
 	if(!((V334)<=(V335))){
 	goto T529;}
@@ -1393,7 +1393,7 @@ T529:;
 	V337 = make_fixnum(V335);
 	(void)((VFUN_NARGS=2,(*(LnkLI31))(V336,V337)));
 T528:;
-	{int V338;
+	{long V338;
 	if(((V331))!=Cnil){
 	goto T533;}
 	V338= 2147483647;
@@ -1410,8 +1410,8 @@ T536:;
 	if(((V326))!=Cnil){
 	goto T538;}
 	{register object V339;
-	register int V340;
-	register int V341;
+	register long V340;
+	register long V341;
 	V342= (*(LnkLI47))((V325));
 	V343 = make_fixnum(V333);
 	V339= (VFUN_NARGS=2,(*(LnkLI46))(/* INLINE-ARGS */V342,V343));
@@ -1447,8 +1447,8 @@ T549:;
 	goto T544;}
 T538:;
 	{register object V347;
-	register int V348;
-	register int V349;
+	register long V348;
+	register long V349;
 	V350= (*(LnkLI47))((V325));
 	V351 = make_fixnum(V333);
 	V347= (VFUN_NARGS=2,(*(LnkLI46))(/* INLINE-ARGS */V350,V351));
@@ -1591,7 +1591,7 @@ static object LI26(V383,V382,V381,va_alist)
 	V393= symbol_function(VV[33]);
 	}else{
 	V393=(Vcs[9]);}
-	{int V394;
+	{long V394;
 	if(((V390))==Cnil){
 	goto T599;}
 	V394= (*(LnkLI34))((V390));
@@ -1599,7 +1599,7 @@ static object LI26(V383,V382,V381,va_alist)
 T599:;
 	V394= 0;
 T597:;
-	{int V395;
+	{long V395;
 	V395= (*(LnkLI35))((V391),(V386));
 	if(!((V394)<=(V395))){
 	goto T603;}
@@ -1609,7 +1609,7 @@ T603:;
 	V397 = make_fixnum(V395);
 	(void)((VFUN_NARGS=2,(*(LnkLI31))(V396,V397)));
 T602:;
-	{int V398;
+	{long V398;
 	if(((V392))!=Cnil){
 	goto T607;}
 	V398= 2147483647;
@@ -1625,8 +1625,8 @@ T605:;
 T610:;
 	if(((V387))!=Cnil){
 	goto T612;}
-	{register int V399;
-	register int V400;
+	{register long V399;
+	register long V400;
 	V399= V394;
 	V400= 0;
 T617:;
@@ -1650,8 +1650,8 @@ T622:;
 	V399= (1)+(V399);
 	goto T617;}
 T612:;
-	{register int V403;
-	register int V404;
+	{register long V403;
+	register long V404;
 	V403= (-1)+(V395);
 	V404= 0;
 T637:;
@@ -1779,7 +1779,7 @@ static object LI29(V434,V433,va_alist)
 	V442= symbol_function(VV[33]);
 	}else{
 	V442=(Vcs[7]);}
-	{int V443;
+	{long V443;
 	if(((V440))==Cnil){
 	goto T661;}
 	V443= (*(LnkLI34))((V440));
@@ -1787,7 +1787,7 @@ static object LI29(V434,V433,va_alist)
 T661:;
 	V443= 0;
 T659:;
-	{int V444;
+	{long V444;
 	V444= (*(LnkLI35))((V441),(V436));
 	if(!((V443)<=(V444))){
 	goto T665;}
@@ -1805,7 +1805,7 @@ T664:;
 T667:;
 	if(((V437))!=Cnil){
 	goto T669;}
-	{register int V447;
+	{register long V447;
 	V447= V443;
 T673:;
 	if(!((V447)>=(V444))){
@@ -1826,7 +1826,7 @@ T678:;
 	V447= (1)+(V447);
 	goto T673;}
 T669:;
-	{register int V451;
+	{register long V451;
 	V451= (-1)+(V444);
 T688:;
 	if(!((V451)<(V443))){
@@ -1943,7 +1943,7 @@ static object LI32(V476,V475,va_alist)
 	V484= symbol_function(VV[33]);
 	}else{
 	V484=(Vcs[7]);}
-	{int V485;
+	{long V485;
 	if(((V482))==Cnil){
 	goto T708;}
 	V485= (*(LnkLI34))((V482));
@@ -1951,7 +1951,7 @@ static object LI32(V476,V475,va_alist)
 T708:;
 	V485= 0;
 T706:;
-	{int V486;
+	{long V486;
 	V486= (*(LnkLI35))((V483),(V478));
 	if(!((V485)<=(V486))){
 	goto T712;}
@@ -1969,7 +1969,7 @@ T711:;
 T714:;
 	if(((V479))!=Cnil){
 	goto T716;}
-	{register int V489;
+	{register long V489;
 	V489= V485;
 T720:;
 	if(!((V489)>=(V486))){
@@ -1990,7 +1990,7 @@ T725:;
 	V489= (1)+(V489);
 	goto T720;}
 T716:;
-	{register int V493;
+	{register long V493;
 	V493= (-1)+(V486);
 T735:;
 	if(!((V493)<(V485))){
@@ -2190,7 +2190,7 @@ static object LI36(V530,va_alist)
 	V537= symbol_function(VV[33]);
 	}else{
 	V537=(Vcs[6]);}
-	{int V538;
+	{long V538;
 	V538= length((V531));
 	if((V533)==Cnil){
 	goto T791;}
@@ -2242,7 +2242,7 @@ T812:;
 T810:;
 	goto T805;}
 T792:;
-	{register int V542;
+	{register long V542;
 	if(((V535))==Cnil){
 	goto T828;}
 	V542= (*(LnkLI34))((V535));
@@ -2250,7 +2250,7 @@ T792:;
 T828:;
 	V542= 0;
 T826:;
-	{register int V543;
+	{register long V543;
 	V543= (*(LnkLI35))((V536),(V531));
 	if(!((V542)<=(V543))){
 	goto T832;}
@@ -2262,16 +2262,16 @@ T832:;
 T831:;
 	if(((V532))!=Cnil){
 	goto T835;}
-	{int V546;
-	int V547;
+	{long V546;
+	long V547;
 	V546= 0;
 	V547= V542;
 T840:;
 	if(!((V547)>=(V543))){
 	goto T841;}
 	{object V548;
-	register int V549;
-	int V550;
+	register long V549;
+	long V550;
 	V551= (*(LnkLI47))((V531));
 	V552 = make_fixnum((V538)-(V546));
 	V548= (VFUN_NARGS=2,(*(LnkLI46))(/* INLINE-ARGS */V551,V552));
@@ -2328,16 +2328,16 @@ T870:;
 	V547= (1)+(V547);
 	goto T840;}
 T835:;
-	{int V562;
-	int V563;
+	{long V562;
+	long V563;
 	V562= 0;
 	V563= (-1)+(V543);
 T882:;
 	if(!((V563)<(V542))){
 	goto T883;}
 	{object V564;
-	register int V565;
-	int V566;
+	register long V565;
+	long V566;
 	V567= (*(LnkLI47))((V531));
 	V568 = make_fixnum((V538)-(V562));
 	V564= (VFUN_NARGS=2,(*(LnkLI46))(/* INLINE-ARGS */V567,V568));
@@ -2436,7 +2436,7 @@ static object LI37(V579,V578,va_alist)
 	goto T922;}
 	(void)((*(LnkLI40))());
 T922:;
-	{register int V590;
+	{register long V590;
 	if(((V586))==Cnil){
 	goto T925;}
 	V590= (*(LnkLI34))((V586));
@@ -2444,7 +2444,7 @@ T922:;
 T925:;
 	V590= 0;
 T923:;
-	{register int V591;
+	{register long V591;
 	V591= (*(LnkLI35))((V588),(V580));
 	if(!((V590)<=(V591))){
 	goto T929;}
@@ -2454,7 +2454,7 @@ T929:;
 	V593 = make_fixnum(V591);
 	(void)((VFUN_NARGS=2,(*(LnkLI31))(V592,V593)));
 T928:;
-	{register int V594;
+	{register long V594;
 	if(((V587))==Cnil){
 	goto T933;}
 	V594= (*(LnkLI34))((V587));
@@ -2462,7 +2462,7 @@ T928:;
 T933:;
 	V594= 0;
 T931:;
-	{register int V595;
+	{register long V595;
 	V595= (*(LnkLI35))((V589),(V581));
 	if(!((V594)<=(V595))){
 	goto T937;}
@@ -2474,8 +2474,8 @@ T937:;
 T936:;
 	if(((V582))!=Cnil){
 	goto T940;}
-	{register int V598;
-	register int V599;
+	{register long V598;
+	register long V599;
 	V598= V590;
 	V599= V594;
 T945:;
@@ -2513,8 +2513,8 @@ T957:;
 	V599= (1)+(V599);
 	goto T945;}
 T940:;
-	{register int V605;
-	register int V606;
+	{register long V605;
+	register long V606;
 	V605= (-1)+(V591);
 	V606= (-1)+(V595);
 T971:;
@@ -2594,7 +2594,7 @@ static object LI38(V613,V612,va_alist)
 	goto T995;}
 	(void)((*(LnkLI40))());
 T995:;
-	{int V624;
+	{long V624;
 	if(((V620))==Cnil){
 	goto T998;}
 	V624= (*(LnkLI34))((V620));
@@ -2602,7 +2602,7 @@ T995:;
 T998:;
 	V624= 0;
 T996:;
-	{int V625;
+	{long V625;
 	V625= (*(LnkLI35))((V622),(V614));
 	if(!((V624)<=(V625))){
 	goto T1002;}
@@ -2612,7 +2612,7 @@ T1002:;
 	V627 = make_fixnum(V625);
 	(void)((VFUN_NARGS=2,(*(LnkLI31))(V626,V627)));
 T1001:;
-	{register int V628;
+	{register long V628;
 	if(((V621))==Cnil){
 	goto T1006;}
 	V628= (*(LnkLI34))((V621));
@@ -2620,7 +2620,7 @@ T1001:;
 T1006:;
 	V628= 0;
 T1004:;
-	{int V629;
+	{long V629;
 	V629= (*(LnkLI35))((V623),(V615));
 	if(!((V628)<=(V629))){
 	goto T1010;}
@@ -2633,8 +2633,8 @@ T1009:;
 	if(((V616))!=Cnil){
 	goto T1013;}
 T1016:;
-	{register int V632;
-	register int V633;
+	{register long V632;
+	register long V633;
 	V632= V624;
 	V633= V628;
 T1022:;
@@ -2670,8 +2670,8 @@ T1018:;
 	goto T1016;
 T1013:;
 T1044:;
-	{register int V638;
-	register int V639;
+	{register long V638;
+	register long V639;
 	V638= (-1)+(V625);
 	V639= (-1)+(V629);
 T1050:;
@@ -2759,7 +2759,7 @@ TTL:;
 
 static object LI42(V653,V654,V655,V656,V657)
 
-register object V653;int V654;int V655;register object V656;register object V657;
+register object V653;long V654;long V655;register object V656;register object V657;
 {	 VMB41 VMS41 VMV41
 TTL:;
 	if(!((V655)<=((1)+(V654)))){
@@ -2767,8 +2767,8 @@ TTL:;
 	{object V658 = (V653);
 	VMR41(V658)}
 T1080:;
-	{register int V659;
-	register int V660;
+	{register long V659;
+	register long V660;
 	object V661;
 	register object V662;
 	V659= V654;
@@ -2913,14 +2913,14 @@ static object LI44(V674,V673,V672,V671,va_alist)
 	V679= symbol_function(VV[33]);
 	}else{
 	V679=(Vcs[4]);}
-	{int V680;
-	int V681;
+	{long V680;
+	long V681;
 	V680= length((V676));
 	V681= length((V677));
 	{register object V682;
-	register int V683;
-	register int V684;
-	register int V685;
+	register long V683;
+	register long V684;
+	register long V685;
 	V686 = make_fixnum((V680)+(V681));
 	V682= (VFUN_NARGS=2,(*(LnkLI46))((V675),V686));
 	V683= 0;
@@ -3171,7 +3171,7 @@ register object *base0;
 	V718=(base[0]);
 	vs_top=sup;
 TTL:;
-	{int V719;
+	{long V719;
 	register object V720;
 	register object V721;
 	object V722;
@@ -3227,7 +3227,7 @@ T1269:;
 	return;
 T1253:;
 	V719= (V719>=0&&(2)>0?(V719)/(2):ifloor(V719,2));
-	{int V726;
+	{long V726;
 	register object V727;
 	V726= 1;
 	V727= (V718);
@@ -3349,8 +3349,8 @@ static object  LnkTLI43(va_alist)va_dcl{va_list ap;va_start(ap);return(object )c
 static object  LnkTLI42(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[42],&LnkLI42,ap);} /* DELETE */
 static object  LnkTLI41(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[41],&LnkLI41,4,ap);} /* CALL-TEST */
 static object  LnkTLI40(){return call_proc0(VV[40],&LnkLI40);} /* TEST-ERROR */
-static int  LnkTLI35(va_alist)va_dcl{va_list ap;va_start(ap);return(int )call_proc(VV[35],&LnkLI35,258,ap);} /* THE-END */
-static int  LnkTLI34(va_alist)va_dcl{va_list ap;va_start(ap);return(int )call_proc(VV[34],&LnkLI34,257,ap);} /* THE-START */
+static long  LnkTLI35(va_alist)va_dcl{va_list ap;va_start(ap);return(long )call_proc(VV[35],&LnkLI35,258,ap);} /* THE-END */
+static long  LnkTLI34(va_alist)va_dcl{va_list ap;va_start(ap);return(long )call_proc(VV[34],&LnkLI34,257,ap);} /* THE-START */
 static object  LnkTLI31(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[31],&LnkLI31,ap);} /* BAD-SEQ-LIMIT */
 
 #ifdef SYSTEM_SPECIAL_INIT

@@ -758,3 +758,8 @@ static LnkT41(){ call_or_link(VV[41],&Lnk41);} /* COPY-INFO */
 static object  LnkTLI40(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[40],&LnkLI40,1,ap);} /* C1FUNOB */
 static object  LnkTLI39(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[39],&LnkLI39,1,ap);} /* C1FUNCALL */
 static object  LnkTLI38(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[38],&LnkLI38,3,ap);} /* TOO-FEW-ARGS */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

@@ -896,3 +896,8 @@ static object  LnkTLI56(va_alist)va_dcl{va_list ap;va_start(ap);return(object )c
 static object  LnkTLI55(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[55],&LnkLI55,3,ap);} /* DM-VL */
 static LnkT54(){ call_or_link(VV[54],&Lnk54);} /* GET-&ENVIRONMENT */
 static LnkT53(){ call_or_link(VV[53],&Lnk53);} /* FIND-DOC */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

@@ -56,4 +56,3 @@ struct string_address_table combined_table;
 
 #define PTABLE_EXTRA 20
 
-char *malloc();

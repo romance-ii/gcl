@@ -2257,8 +2257,8 @@ T953:;
 T951:;
 	V155= Cnil;
 	V156= Cnil;
-	{int V158;
-	int V159;
+	{long V158;
+	long V159;
 	base[2]= (V154);
 	vs_top=(vs_base=base+2)+1;
 	(void) (*Lnk193)();
@@ -2366,8 +2366,8 @@ T1012:;
 T1010:;
 	V171= Cnil;
 	V172= Cnil;
-	{int V174;
-	int V175;
+	{long V174;
+	long V175;
 	base[4]= (V170);
 	vs_top=(vs_base=base+4)+1;
 	(void) (*Lnk193)();
@@ -2573,3 +2573,8 @@ static object  LnkTLI161(){return call_proc0(VV[161],&LnkLI161);} /* INSPECT-REA
 static object  LnkTLI160(){return call_proc0(VV[160],&LnkLI160);} /* INSPECT-INDENT */
 static LnkT159(){ call_or_link(VV[159],&Lnk159);} /* INSPECT-OBJECT */
 static object  LnkTLI158(){return call_proc0(VV[158],&LnkLI158);} /* INSPECT-INDENT-1 */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

@@ -54,17 +54,17 @@ object sSAbreak_stepA;
 
 #define SET_TO_APPLY(res,f,n,x) \
  switch(n) {\
- case 0:   res=(object)((int (*)())(f))(); break;\
-  case 1:  res=(object)((int (*)())(f))(x[0]); break; \
-  case 2:  res=(object)((int (*)())(f))(x[0],x[1]);break; \
-  case 3:  res=(object)((int (*)())(f))(x[0],x[1],x[2]);break; \
-  case 4:  res=(object)((int (*)())(f))(x[0],x[1],x[2],x[3]);break; \
-  case 5:  res=(object)((int (*)())(f))(x[0],x[1],x[2],x[3],x[4]);break; \
-  case 6:  res=(object)((int (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5]);  break;\
-  case 7:  res=(object)((int (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5], x[6]); break;\
-  case 8:  res=(object)((int (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5], x[6],x[7]); break;\
-  case 9:  res=(object)((int (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8]);break;\
-  case 10: res=(object)((int (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8],x[9]);break;\
+ case 0:   res=(object)((long (*)())(f))(); break;\
+  case 1:  res=(object)((long (*)())(f))(x[0]); break; \
+  case 2:  res=(object)((long (*)())(f))(x[0],x[1]);break; \
+  case 3:  res=(object)((long (*)())(f))(x[0],x[1],x[2]);break; \
+  case 4:  res=(object)((long (*)())(f))(x[0],x[1],x[2],x[3]);break; \
+  case 5:  res=(object)((long (*)())(f))(x[0],x[1],x[2],x[3],x[4]);break; \
+  case 6:  res=(object)((long (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5]);  break;\
+  case 7:  res=(object)((long (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5], x[6]); break;\
+  case 8:  res=(object)((long (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5], x[6],x[7]); break;\
+  case 9:  res=(object)((long (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8]);break;\
+  case 10: res=(object)((long (*)())(f))(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8],x[9]);break;\
    default: res=c_apply_n(f,n,x); break;}
 
 /*
@@ -101,8 +101,8 @@ quick_call_sfun(fun)
   SET_TO_APPLY(res,(object (*)())fun->sfn.sfn_self,n,x);
   base[0]=
     (restype==f_object ?  res :
-     restype==f_fixnum ? make_fixnum((int)res)
-     :(object) FEerror("Bad result type",0));
+     restype==f_fixnum ? make_fixnum((long)res)
+     :(object) (FEerror("Bad result type",0),Cnil));
   vs_base = base;
   vs_top=base+1;
   CHECK_AVMA;
@@ -1444,7 +1444,7 @@ va_list ap;
 	x =
 	  (typ==f_object ?	va_arg(ap,object):
 	   typ==f_fixnum ? make_fixnum(va_arg(ap,fixnum)):
-	   (object) FEerror("bad type",0));
+	   (object) (FEerror("bad type",0),Cnil));
 	*(vs_top++) = x;}
   else
     {object *base=vs_top;
@@ -1457,7 +1457,7 @@ va_list ap;
   /* vs_base=old_vs_base; */
   return (restype== f_object ? x :
 	  restype== f_fixnum ? (object) (fix(x)):
-	  (object) FEerror("bad type",0));
+	  (object) (FEerror("bad type",0),Cnil));
 }}
 object
 fcalln_vfun(vl)

@@ -141,5 +141,4 @@ struct syment {
 #endif /* COFF */
 
 
-char *malloc();
 

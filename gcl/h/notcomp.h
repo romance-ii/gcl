@@ -24,7 +24,7 @@ EXTER object lisp_package,user_package;
 EXTER object common_lisp_package;
 EXTER char *core_end;
 EXTER int catch_fatal;
-EXTER int real_maxpage;
+EXTER long real_maxpage;
 char *getenv();
 EXTER char *this_lisp;
 

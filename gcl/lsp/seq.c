@@ -127,8 +127,8 @@ T5:;
 	V8= vs_base[0];
 	if(((V6))==Cnil){
 	goto T63;}
-	{register int V14;
-	register int V15;
+	{register long V14;
+	register long V15;
 	V14= 0;
 	V15= fix((V4));
 T69:;
@@ -161,7 +161,7 @@ static object LI2(V17,va_alist)
 	V19= V20;
 	{register object V21;
 	register object V22;
-	register int V23;
+	register long V23;
 	{object V25;
 	{object V26;
 	object V27= (V19);
@@ -197,8 +197,8 @@ T86:;
 	{object V28 = (V21);
 	VMR2(V28)}
 T87:;
-	{register int V29;
-	register int V30;
+	{register long V29;
+	register long V30;
 	V29= 0;
 	V30= length(car((V22)));
 T95:;
@@ -265,8 +265,8 @@ T112:;
 	V40= vs_base[0];
 	if(((V35))!=Cnil){
 	goto T117;}
-	{register int V44;
-	int V45;
+	{register long V44;
+	long V45;
 	V44= 0;
 	V45= fix((V40));
 T122:;
@@ -304,8 +304,8 @@ T129:;
 T117:;
 	{register object V51;
 	V51= (VFUN_NARGS=2,(*(LnkLI15))((V35),(V40)));
-	{register int V52;
-	int V53;
+	{register long V52;
+	long V53;
 	V52= 0;
 	V53= fix((V40));
 T139:;
@@ -362,8 +362,8 @@ static object LI4(V61,V60,va_alist)
 	V65 = list_vector(narg,ap);
 	V64= V65;
 	V64= make_cons((V63),(V64));
-	{register int V66;
-	register int V67;
+	{register long V66;
+	register long V67;
 	V66= 0;
 	{object V68;
 	{object V69;
@@ -450,8 +450,8 @@ static object LI5(V79,V78,va_alist)
 	V83 = list_vector(narg,ap);
 	V82= V83;
 	V82= make_cons((V81),(V82));
-	{register int V84;
-	register int V85;
+	{register long V84;
+	register long V85;
 	V84= 0;
 	{object V86;
 	{object V87;
@@ -586,3 +586,8 @@ static LnkT16(){ call_or_link(VV[16],&Lnk16);} /* SOME */
 static object  LnkTLI15(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[15],&LnkLI15,ap);} /* MAKE-SEQUENCE */
 static object  LnkTLI14(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[14],&LnkLI14,1,ap);} /* BEST-ARRAY-ELEMENT-TYPE */
 static object  LnkTLI13(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[13],&LnkLI13,1,ap);} /* NORMALIZE-TYPE */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

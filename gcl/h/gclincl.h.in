@@ -162,6 +162,9 @@
 /*  #define PAGESIZE (1<<PAGEWIDTH) */
 /*  #endif */
 
+/* The number of bytes in a long *.  */
+#undef SIZEOF_LONG_P
+
 /* Define if you have the getcwd function.  */
 #undef HAVE_GETCWD
 

@@ -29,8 +29,8 @@ T2:;
 	goto T6;}
 	{register object V4;
 	V4= symbol_name((V3));
-	{register int V5;
-	register int V6;
+	{register long V5;
+	register long V6;
 	V5= length((V4));
 	V6= 0;
 T13:;
@@ -684,3 +684,8 @@ static LnkT46(){ call_or_link(VV[46],&Lnk46);} /* HASH-EQUAL */
 static object  LnkTLI45(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[45],&LnkLI45,ap);} /* VECTOR-PUSH-EXTEND */
 static LnkT44(){ call_or_link(VV[44],&Lnk44);} /* CMPILER-ERROR */
 static LnkT43(){ call_or_link(VV[43],&Lnk43);} /* WT-LOC */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

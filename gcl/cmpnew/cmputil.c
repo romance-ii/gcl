@@ -749,3 +749,8 @@ static object  LnkTLI61(va_alist)va_dcl{va_list ap;va_start(ap);return(object )c
 static LnkT60(){ call_or_link(VV[60],&Lnk60);} /* CMP-TOPLEVEL-EVAL */
 static object  LnkTLI59(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[59],&LnkLI59,ap);} /* BREAK */
 static object  LnkTLI58(){return call_proc0(VV[58],&LnkLI58);} /* PRINT-CURRENT-FORM */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

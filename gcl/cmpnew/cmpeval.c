@@ -193,7 +193,7 @@ static L7()
 	V36=(base[0]);
 	vs_top=sup;
 TTL:;
-	{register int V37;
+	{register long V37;
 	V37= 0;
 	{register object V38;
 	register object V39;
@@ -1895,3 +1895,8 @@ static object  LnkTLI126(){return call_proc0(VV[126],&LnkLI126);} /* C1T */
 static object  LnkTLI125(){return call_proc0(VV[125],&LnkLI125);} /* C1NIL */
 static object  LnkTLI124(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[124],&LnkLI124,2,ap);} /* ADD-INFO */
 static object  LnkTLI123(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[123],&LnkLI123,1,ap);} /* C1EXPR */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

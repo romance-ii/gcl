@@ -424,10 +424,10 @@ siLalignment()
  joe.z=3.0;
  
  if (vs_base[0]==sLlong_float)
-   {vs_base[0]=make_fixnum((int)&joe.z- (int)&joe.y); return;}
+   {vs_base[0]=make_fixnum((long)&joe.z- (long)&joe.y); return;}
  else
    if (vs_base[0]==sLshort_float)
-     {vs_base[0]=make_fixnum((int)&(joe.z1)-(int)&(joe.y1)); return;}
+     {vs_base[0]=make_fixnum((long)&(joe.z1)-(long)&(joe.y1)); return;}
    else
      {siLsize_of();}
 }

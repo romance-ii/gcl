@@ -159,3 +159,8 @@ T50:;
 	VMR4(V27)}}
 }
 static LnkT12(){ call_or_link(VV[12],&Lnk12);} /* LOAD */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

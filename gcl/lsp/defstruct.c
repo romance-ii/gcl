@@ -930,7 +930,7 @@ T472:;
 	goto T473;}
 	goto T469;
 T473:;
-	{int V174= fix(aref1((V159),fixint((V173))));
+	{long V174= fix(aref1((V159),fixint((V173))));
 	if((/* INLINE-ARGS */V174)==(0)){
 	goto T477;}}
 	{object V175 = (V159);
@@ -947,9 +947,9 @@ T467:;
 }
 /*	local entry for function ROUND-UP	*/
 
-static int LI8(V180,V181)
+static long LI8(V180,V181)
 
-int V180;int V181;
+long V180;long V181;
 {	 VMB8 VMS8 VMV8
 TTL:;
 	base[0]= make_fixnum(V180);
@@ -958,7 +958,7 @@ TTL:;
 	Lceiling();
 	vs_top=sup;
 	V180= fix(vs_base[0]);
-	{int V182 = (V180)*(V181);
+	{long V182 = (V180)*(V181);
 	VMR8(V182)}
 }
 /*	local entry for function GET-SLOT-POS	*/
@@ -1067,11 +1067,11 @@ T536:;
 	VMR9(V204)}
 T544:;
 	{object V205;
-	register int V206;
-	int V207;
-	int V208;
+	register long V206;
+	long V207;
+	long V208;
 	object V209;
-	int V210;
+	long V210;
 	V205= (VFUN_NARGS=5,(*(LnkLI120))((V186),VV[52],VV[61],VV[54],Ct));
 	V206= 0;
 	V207= 0;
@@ -2180,7 +2180,7 @@ static object  LnkTLI133(va_alist)va_dcl{va_list ap;va_start(ap);return(object )
 static LnkT132(){ call_or_link(VV[132],&Lnk132);} /* MAKE-S-DATA-STRUCTURE */
 static object  LnkTLI131(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[131],&LnkLI131,3,ap);} /* MAKE-T-TYPE */
 static LnkT127(){ call_or_link(VV[127],&Lnk127);} /* MAKE-ACCESS-FUNCTION */
-static int  LnkTLI126(va_alist)va_dcl{va_list ap;va_start(ap);return(int )call_proc(VV[126],&LnkLI126,20738,ap);} /* ROUND-UP */
+static long  LnkTLI126(va_alist)va_dcl{va_list ap;va_start(ap);return(long )call_proc(VV[126],&LnkLI126,20738,ap);} /* ROUND-UP */
 static LnkT125(){ call_or_link(VV[125],&Lnk125);} /* SIZE-OF */
 static object  LnkTLI124(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[124],&LnkLI124,2,ap);} /* COERCE */
 static LnkT123(){ call_or_link(VV[123],&Lnk123);} /* TYPEP */
@@ -2196,3 +2196,8 @@ static LnkT112(){ call_or_link(VV[112],&Lnk112);} /* SUBTYPEP */
 static LnkT111(){ call_or_link(VV[111],&Lnk111);} /* RECORD-FN */
 static object  LnkTLI110(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[110],&LnkLI110,ap);} /* ADJUST-ARRAY */
 static LnkT109(){ call_or_link(VV[109],&Lnk109);} /* STRING-CONCATENATE */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

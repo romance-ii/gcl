@@ -258,8 +258,6 @@ object x;
    by providing a string will fillpointer < length and
    have a null character in the fillpointer position. */
 
-char *malloc();
-
 char *
 object_to_string(x)
      object x;

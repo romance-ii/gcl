@@ -288,7 +288,7 @@ T125:;
 	goto T118;
 T123:;
 	(void)(structure_set((V52),VV[0],2,Ct));
-	{int V61= fix(structure_ref((V52),VV[0],6));
+	{long V61= fix(structure_ref((V52),VV[0],6));
 	V62 = make_fixnum((1)+(/* INLINE-ARGS */V61));
 	(void)(structure_set((V52),VV[0],6,V62));}
 T118:;
@@ -1438,3 +1438,8 @@ static object  LnkTLI70(va_alist)va_dcl{va_list ap;va_start(ap);return(object )c
 static object  LnkTLI68(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[68],&LnkLI68,1,ap);} /* ADD-SYMBOL */
 static object  LnkTLI67(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[67],&LnkLI67,ap);} /* CMPERR */
 static object  LnkTLI66(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[66],&LnkLI66,ap);} /* MAKE-VAR */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

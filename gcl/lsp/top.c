@@ -2435,8 +2435,8 @@ T1045:;
 T1041:;
 	V227= Cnil;
 	V228= Cnil;
-	{int V230;
-	register int V231;
+	{long V230;
+	register long V231;
 	base[0]= (V226);
 	vs_top=(vs_base=base+0)+1;
 	(void) (*Lnk204)();
@@ -2549,7 +2549,7 @@ T1093:;
 	Lerror();
 	vs_top=sup;
 T1092:;
-	{int V242;
+	{long V242;
 	V242= ((V241))->v.v_fillp;
 	if(!((V242)>(0))){
 	goto T1099;}
@@ -2933,7 +2933,7 @@ static L43()
 	bds_check;
 	vs_top=sup;
 TTL:;
-	{register int V272;
+	{register long V272;
 	register object V273;
 	vs_base=vs_top;
 	(void) (*Lnk209)();

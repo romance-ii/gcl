@@ -89,7 +89,7 @@ T1:;
 	vs_top=(vs_base=base+5)+1;
 	return;
 }
-/*	function definition for G1073	*/
+/*	function definition for G1024	*/
 
 static L2()
 {register object *base=vs_base;
@@ -102,7 +102,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1074	*/
+/*	function definition for G1025	*/
 
 static L3()
 {register object *base=vs_base;
@@ -115,7 +115,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1075	*/
+/*	function definition for G1026	*/
 
 static L4()
 {register object *base=vs_base;
@@ -131,7 +131,7 @@ TTL:;
 	return;
 	}
 }
-/*	function definition for G1076	*/
+/*	function definition for G1027	*/
 
 static L5()
 {register object *base=vs_base;
@@ -162,7 +162,7 @@ T49:;
 	return;
 	}
 }
-/*	function definition for G1077	*/
+/*	function definition for G1028	*/
 
 static L6()
 {register object *base=vs_base;
@@ -189,7 +189,7 @@ T55:;
 	return;
 	}
 }
-/*	function definition for G1078	*/
+/*	function definition for G1029	*/
 
 static L7()
 {register object *base=vs_base;
@@ -202,7 +202,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1079	*/
+/*	function definition for G1030	*/
 
 static L8()
 {register object *base=vs_base;
@@ -215,7 +215,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1080	*/
+/*	function definition for G1031	*/
 
 static L9()
 {register object *base=vs_base;
@@ -228,7 +228,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1081	*/
+/*	function definition for G1032	*/
 
 static L10()
 {register object *base=vs_base;
@@ -241,7 +241,7 @@ TTL:;
 	vs_top=(vs_base=base+0)+1;
 	return;
 }
-/*	function definition for G1082	*/
+/*	function definition for G1033	*/
 
 static L11()
 {register object *base=vs_base;
@@ -267,7 +267,7 @@ T59:;
 	return;
 	}
 }
-/*	function definition for G1083	*/
+/*	function definition for G1034	*/
 
 static L12()
 {register object *base=vs_base;
@@ -287,7 +287,7 @@ T63:;
 	return;
 	}
 }
-/*	function definition for G1084	*/
+/*	function definition for G1035	*/
 
 static L13()
 {register object *base=vs_base;
@@ -307,7 +307,7 @@ T66:;
 	return;
 	}
 }
-/*	function definition for G1085	*/
+/*	function definition for G1036	*/
 
 static L14()
 {register object *base=vs_base;
@@ -327,7 +327,7 @@ T69:;
 	return;
 	}
 }
-/*	function definition for G1086	*/
+/*	function definition for G1037	*/
 
 static L15()
 {register object *base=vs_base;
@@ -347,7 +347,7 @@ T72:;
 	return;
 	}
 }
-/*	function definition for G1087	*/
+/*	function definition for G1038	*/
 
 static L16()
 {register object *base=vs_base;

@@ -789,7 +789,7 @@ T407:;
 	goto T409;}
 	goto T406;
 T409:;
-	{int V161= fix(structure_ref((V157),VV[3],6));
+	{long V161= fix(structure_ref((V157),VV[3],6));
 	if((/* INLINE-ARGS */V161)<(fix(symbol_value(VV[29])))){
 	goto T405;}}
 T406:;
@@ -1059,3 +1059,8 @@ static object  LnkTLI42(va_alist)va_dcl{va_list ap;va_start(ap);return(object )c
 static LnkT41(){ call_or_link(VV[41],&Lnk41);} /* C1BODY */
 static object  LnkTLI40(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[40],&LnkLI40,3,ap);} /* TOO-FEW-ARGS */
 static object  LnkTLI39(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_vproc(VV[39],&LnkLI39,ap);} /* MAKE-INFO */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+

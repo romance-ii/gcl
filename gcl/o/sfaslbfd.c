@@ -29,14 +29,14 @@ License for more details.
 
 #include "ext_sym.h"
 #include "gclincl.h"
-#include <bfd.h>
-#include <bfdlink.h>
+#include <string.h>
+
 
 
 /* align for power of two n */
 static void *
 round_up(address,n)
-     unsigned int address,n;
+     unsigned long address,n;
 {
  return  (void *)((address + n -1) & ~(n-1)) ;
 }
@@ -171,7 +171,7 @@ fasload(object faslfile) {
   char filename[256];
   int init_address=-1;
   object memory;
-  int current = 0,max_align = 0;
+  long current = 0,max_align = 0;
   object *old_vs_base=vs_base;
   object *old_vs_top=vs_top;
   static int nbfd;
@@ -229,7 +229,7 @@ fasload(object faslfile) {
     if (max_align<s->alignment_power)
       max_align=s->alignment_power;
 
-    current=(int)round_up(current,1<<s->alignment_power);
+    current=(long)round_up(current,1<<s->alignment_power);
 
     current+=s->_raw_size;
 

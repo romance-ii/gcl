@@ -436,8 +436,8 @@ T102:;
 T100:;
 	V82= Cnil;
 	V83= Cnil;
-	{int V85;
-	int V86;
+	{long V85;
+	long V86;
 	base[2]= (V81);
 	vs_top=(vs_base=base+2)+1;
 	(void) (*Lnk10)();
@@ -610,8 +610,8 @@ T205:;
 T203:;
 	V105= Cnil;
 	V106= Cnil;
-	{int V108;
-	int V109;
+	{long V108;
+	long V109;
 	base[4]= (V104);
 	vs_top=(vs_base=base+4)+1;
 	(void) (*Lnk10)();
@@ -733,8 +733,8 @@ T268:;
 T266:;
 	V122= Cnil;
 	V123= Cnil;
-	{int V125;
-	int V126;
+	{long V125;
+	long V126;
 	base[0]= (V121);
 	vs_top=(vs_base=base+0)+1;
 	(void) (*Lnk10)();
@@ -833,8 +833,8 @@ T324:;
 T321:;
 	V136= Cnil;
 	V137= Cnil;
-	{int V139;
-	int V140;
+	{long V139;
+	long V140;
 	base[0]= (V135);
 	vs_top=(vs_base=base+0)+1;
 	(void) (*Lnk10)();
@@ -935,8 +935,8 @@ T382:;
 T380:;
 	V151= Cnil;
 	V152= Cnil;
-	{int V154;
-	int V155;
+	{long V154;
+	long V155;
 	base[2]= (V150);
 	vs_top=(vs_base=base+2)+1;
 	(void) (*Lnk10)();
@@ -1013,3 +1013,8 @@ static object  LnkTLI34(va_alist)va_dcl{va_list ap;va_start(ap);return(object )c
 static object  LnkTLI33(va_alist)va_dcl{va_list ap;va_start(ap);return(object )call_proc(VV[33],&LnkLI33,2,ap);} /* SUBSTRINGP */
 static LnkT10(){ call_or_link(VV[10],&Lnk10);} /* PACKAGE-SIZE */
 static LnkT32(){ call_or_link(VV[32],&Lnk32);} /* FIND-DECLARATIONS */
+
+#ifdef SYSTEM_SPECIAL_INIT
+SYSTEM_SPECIAL_INIT
+#endif
+
