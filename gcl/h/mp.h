@@ -61,8 +61,10 @@ typedef struct
    action \
    ((((CMPt1=(x))+1024)&-2048)==0?small_fixnum(CMPt1):make_fixnum1(CMPt1));}while(0)
      
+#define ineg(a_) (sizeof(a_)==sizeof(unsigned) ? (unsigned)-(a_) : (unsigned long)-(a_))
+
 #define addii mpz_add
-#define addsi(u,a,b) (a >= 0 ?  mpz_add_ui(u,b,a) : mpz_sub_ui(u,b,-a))
+#define addsi(u,a,b) (a >= 0 ?  mpz_add_ui(u,b,a) : mpz_sub_ui(u,b,ineg(a)))
 #define addss(u,a,b) addsi(u,a,SI_TO_MP(b,big_fixnum1))
 	    
 #define mulii mpz_mul
@@ -71,9 +73,9 @@ typedef struct
 	    
 #define subii mpz_sub
 #define subsi(u,a,b) mpz_sub(u,SI_TO_MP(a,big_fixnum1),b)
-#define subis(u,a,b) (b >= 0 ?  mpz_sub_ui(u,a,b) : mpz_add_ui(u,a,-b))
+#define subis(u,a,b) (b >= 0 ?  mpz_sub_ui(u,a,b) : mpz_add_ui(u,a,ineg(b)))
 #define subss(u,a,b) subis(u,SI_TO_MP(a,big_fixnum1),b)
-#define shifti(u,a,w) (w>=0 ? mpz_mul_2exp(u,a,w) : mpz_fdiv_q_2exp(u,MP(x),-w))
+#define shifti(u,a,w) (w>=0 ? mpz_mul_2exp(u,a,w) : mpz_fdiv_q_2exp(u,MP(x),ineg(w)))
 
 
 
