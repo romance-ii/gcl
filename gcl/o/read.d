@@ -2634,6 +2634,7 @@ init_read()
 	dtab['|'] = make_cf(Lsharp_vertical_bar_reader);
 	dtab['"'] = make_cf(Lsharp_double_quote_reader);
 	dtab['p'] = make_cf(Lsharp_p_reader);
+	dtab['P'] = make_cf(Lsharp_p_reader);
 	/*  This is specific to this implimentation  */
 	dtab['$'] = make_cf(Lsharp_dollar_reader);
 	/*  This is specific to this implimentation  */

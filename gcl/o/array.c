@@ -24,7 +24,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "include.h"
 
 
-#define ARRAY_DIMENSION_LIMIT MOST_POSITIVE_FIXNUM
+/*  #define ARRAY_DIMENSION_LIMIT MOST_POSITIVE_FIXNUM */
 
 DEFCONST("ARRAY-RANK-LIMIT", sLarray_rank_limit, LISP,
 	 make_fixnum(ARRAY_RANK_LIMIT),"");
@@ -32,7 +32,7 @@ DEFCONST("ARRAY-RANK-LIMIT", sLarray_rank_limit, LISP,
 DEFCONST("ARRAY-DIMENSION-LIMIT", sLarray_dimension_limit,
 	 LISP, make_fixnum(MOST_POSITIVE_FIX),"");
 DEFCONST("ARRAY-TOTAL-SIZE-LIMIT", sLarray_total_size_limit,
-	 LISP, sLarray_dimension_limit,"");
+	 LISP, make_fixnum(MOST_POSITIVE_FIX),"");
 
 DEF_ORDINARY("BIT",sLbit,LISP,"");
 
@@ -391,7 +391,7 @@ int n;int elt_type;object staticp;va_dcl
 	  if(type_of(fillp) == t_fixnum)
 	  {	
 	    x->v.v_fillp = Mfix(fillp);
-	    if (x->v.v_fillp > n) FEerror("bad fillp",0);
+	    if (x->v.v_fillp > n || x->v.v_fillp < 0) FEerror("bad fillp",0);
 	    x->v.v_hasfillp = 1;
 	  }
 	else

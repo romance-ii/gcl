@@ -13,8 +13,10 @@ EXTER object value_stack[VSSIZE + (STACK_OVER +1) *VSGETA];
 EXTER struct bds_bd bind_stack[BDSSIZE + (STACK_OVER +1)* BDSGETA];
 
      
-#define	IHSSIZE		1024
-#define	IHSGETA		32
+/*  #define	IHSSIZE		1024 */
+/*  #define	IHSGETA		32 */
+#define	IHSSIZE		4096
+#define	IHSGETA		64
 EXTER struct invocation_history ihs_stack[IHSSIZE + (STACK_OVER +1) * IHSGETA];     
 
 
