@@ -243,4 +243,17 @@ do { int c = 0; \
  */
 
 /* End for cmpinclude */
+/* define if there is no _cleanup,   do here what needs
+   to be done before calling unexec
+   */   
+#define CLEANUP_CODE \
+  setbuf(stdin,0); \
+   setbuf(stdout,0);
+
+/* the following will try to make sure that the stdin and stdout are
+set correctly on startup after a save */
+
+
+#define INIT_CORE_END terminal_io->sm.sm_object0->sm.sm_fp = stdin;terminal_io->sm.sm_object1->sm.sm_fp = stdout;
+
 
