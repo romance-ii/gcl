@@ -1,5 +1,0 @@
-       
-#(
-#(:inherited defpackage::defpackage :nicknames :use :export :shadow :shadowing-import-from :import-from lisp::package-shadowing-symbols system::package-size lisp::find lisp::intersection lisp::set-difference (system::%init . #((system::putprop (lisp::quote user::make-defpackage-form) "Given a package, returns a defpackage form that could recreate the 
-   current state of the package, more or less." (lisp::quote system::function-documentation)) (system::mf (lisp::quote user::make-defpackage-form) 0))))
-)
