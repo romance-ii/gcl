@@ -194,7 +194,7 @@
              (not (eq tem '*)))
 ;	     (not (consp tem))) ;; propagate multiple-value types, CM 20041221
     (let* ((be (and (not (cddr args)) (get f 'result-type-from-bounded-args)))
-	   (ba (and be (funcall be f (car args) (cadr args)))))
+	   (ba (and be (apply be f (mapcar #'coerce-to-one-value args)))))
       (when ba
 	(return-from result-type-from-args ba)))
     (dolist (v '(inline-always inline-unsafe))
@@ -205,8 +205,9 @@
 	       (= (length args) (length (car w)))
 	       (do ((a args (cdr a)) (b (car w) (cdr b)))
 		   ((null a) t)
-		 (unless (or  (eq (car a) (car b))
-			      (type>= (car b) (car a)))
+		 (unless (and (car a) (car b)
+			      (or  (eq (car a) (car b))
+				   (type>= (car b) (car a))))
 		   (return nil))))
 	  (return-from result-type-from-args (second w)))))))
 	

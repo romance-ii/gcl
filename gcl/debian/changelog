@@ -16,8 +16,10 @@ gclcvs (2.7.0-37) unstable; urgency=low
   * enhanced support for multiple value inlining
   * Better packlib number bounds
   * boolean and dynamic-extent declaration type support
+  * Support type propagation in case of coerced multiple values, protect
+    against nil type propagation
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 27 Dec 2004 22:06:49 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 27 Dec 2004 22:08:11 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 
