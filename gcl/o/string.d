@@ -199,7 +199,9 @@ object x;
 	default:
 		break;
 	}
-	FEerror("~S cannot be coerced to a string.", 1, x);
+	vs_push(x);
+	x=wrong_type_argument(sLstring,x);
+	vs_popp;
 	return(Cnil);
 }
 
@@ -223,7 +225,7 @@ siLchar_set()
 	check_type_string(&vs_base[0]);
 	if (type_of(vs_base[1]) != t_fixnum)
 		illegal_index(vs_base[0], vs_base[1]);
-	if ((j = fix(vs_base[1])) < 0 || j >= vs_base[0]->st.st_fillp)
+	if ((j = fix(vs_base[1])) < 0 /* || j >= vs_base[0]->st.st_fillp */)
 		illegal_index(vs_base[0], vs_base[1]);
 	check_type_character(&vs_base[2]);
 	vs_base[0]->st.st_self[j] = char_code(vs_base[2]);
@@ -515,6 +517,8 @@ int c, *bp;
 		*bp = FALSE;
 	} else if (!isDigit(c))
 		*bp = TRUE;
+	else
+		*bp = FALSE;
 	return(c);
 }
 

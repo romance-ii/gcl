@@ -241,7 +241,7 @@
                     number integer bignum rational ratio float
                     short-float single-float double-float long-float complex
                     character standard-char string-char
-		    real
+		    real 
                     package stream pathname readtable hash-table random-state
                     structure array simple-array function compiled-function
 		    arithmetic-error base-char base-string broadcast-stream 
@@ -313,8 +313,8 @@
        	 (cond ((member t1 '(null cons list)) (values t t))
        	       (t (values nil ntp1))))
        	((eq t2 'sequence)
-       	 (cond ((member t1 '(null cons list sequence)) (values t t))
-       	       ((eq t1 'array)
+       	 (cond ((member t1 '(null cons list sequence base-string simple-base-string)) (values t t))
+       	       ((or (eq t1 'simple-array) (eq t1 'array))
        	        (if (and (cdr i1) (consp (cadr i1)) (null (cdadr i1)))
        	            (values t t)
        	            (values nil t)))
@@ -389,6 +389,19 @@
        	      (t (values nil ntp2))))
        	   (standard-char
 	    (if (member t2 '(standard-char string-char character))
+	        (values t t)
+	        (values nil ntp2)))
+       	   (base-string
+	    (if (member t2 '(string vector array sequence))
+	        (values t t)
+	        (values nil ntp2)))
+       	   (base-char
+	    (if (member t2 '(character string-char))
+	        (values t t)
+	        (values nil ntp2)))
+       	   (simple-base-string
+	    (if (member t2 '(string simple-string base-string vector
+				    simple-vector simple-array array sequence))
 	        (values t t)
 	        (values nil ntp2)))
 	   (string-char

@@ -700,14 +700,14 @@ SYSTEM_SPECIAL_INIT
 
 )
 
-(defun link (files image &optional post &aux raw init) 
+(defun link (files image &optional post extra-libs &aux raw init) 
 
   (make-user-init files "user-init")
   (setq raw (format nil "raw_~a" (pathname-name image)))
   (setq init (format nil "init_~a.lsp" (pathname-name image)))
 
   (system 
-   (format nil "~a ~a user-init.o ~a -L ~a ~a"
+   (format nil "~a ~a user-init.o ~a -L ~a ~a ~a"
 	   *ld* 
 	   raw
 	   (let ((sfiles ""))
@@ -716,7 +716,8 @@ SYSTEM_SPECIAL_INIT
 				  (setq sfiles (concatenate 'string sfiles " " tem))))
 			  sfiles) 
 	   si::*system-directory*
-	   *ld-libs*))
+	   *ld-libs*
+	   (if (stringp extra-libs) extra-libs "")))
 
   (delete-file "user-init.o")
 

@@ -19,7 +19,7 @@ NIL, these files are automatically deleted after compilation.
 
 @end defun
 
-@defun LINK (files image &optional post &aux raw init) 
+@defun LINK (files image &optional post extra-libs &aux raw init) 
 Package:LISP
 
 On systems where dlopen is used for relocations, one cannot make custom
@@ -30,11 +30,12 @@ After compiling source files into objects, LINK can be called with a
 list of binary and source FILES which would otherwise normally be loaded
 in sequence before saving the image to IMAGE.  LINK will use the system
 C linker to link the binary files thus supplied with GCL's objects,
-producing a raw_IMAGE executable. This executable is then run to
-initialize first GCL's objects, and then the supplied files, in order.
-Source files are loaded at their position in the sequence.  Any optional
-code which should be run after file initialization can be supplied in
-the POST variable.  The image is then saved using save-system to IMAGE.
+using EXTRA-LIBS as well if provided, and producing a raw_IMAGE
+executable. This executable is then run to initialize first GCL's
+objects, and then the supplied files, in order.  Source files are loaded
+at their position in the sequence.  Any optional code which should be
+run after file initialization can be supplied in the POST variable.  The
+image is then saved using save-system to IMAGE.
 
 This method of creating lisp images may also have the advantage that all
 new object files are kept out of the lisp core and placed instead in the

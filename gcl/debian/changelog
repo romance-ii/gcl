@@ -1,3 +1,10 @@
+gcl (2.5.0.cvs20020625-56) unstable; urgency=high
+
+  * ansi-test corrections; extra-libs option to LINK function; LINK doc
+    change; subtypep and string changes to pass more tests
+
+ -- Camm Maguire <camm@enhanced.com>  Thu,  3 Oct 2002 23:28:46 -0400
+
 gcl (2.5.0.cvs20020625-55) unstable; urgency=high
 
   * Add LINK documentation to info pages
