@@ -10,7 +10,7 @@
 #export DH_VERBOSE=1
 
 # This is the debhelper compatability version to use.
-export DH_COMPAT=2
+export DH_COMPAT=3
 ARCHT:=$(shell dpkg --print-architecture)
 
 MCC:=gcc
@@ -49,9 +49,7 @@ ifeq ($(ARCHT),hppa)
 DEBUG=--enable-debug
 endif
 
-VERS=2.5.1
-
-configure:
+VERS=$(shell echo $$(cat majvers).$$(cat minvers))
 
 configure-%-stamp:
 
@@ -91,13 +89,46 @@ configure-%-stamp:
 	touch $@
 
 
-build: 
-
 build-%-stamp: configure-%-stamp
 	dh_testdir
 
 	$(MAKE)
 
+	rm -rf debian/$*
+	mkdir -p debian/$*
+	$(MAKE) install DESTDIR=$$(pwd)/debian/$*
+
+	mkdir -p debian/$*/usr/share/emacs/site-lisp
+	cp -a $$(find debian/$*/usr/local -name site-lisp -type d) \
+		debian/$*/usr/share/emacs/site-lisp/gcl
+	rm -rf debian/$*/usr/local
+
+	cat debian/$*/usr/lib/gcl-$(VERS)/gcl-tk/demos/index.lsp | \
+		sed "s,$$(pwd)/debian/$*,,1" >debian/foo
+	mv debian/foo debian/$*/usr/lib/gcl-$(VERS)/gcl-tk/demos/index.lsp
+
+	rm -f debian/$*/usr/bin/*.exe debian/$*/usr/bin/*.bat
+
+	mkdir -p debian/$*/usr/include && \
+		cd debian/$*/usr/include && \
+		ln -snf $$(find ../lib -name "cmpinclude.h" ) .
+
+	find debian/$* -type f -name "*.lsp" -exec chmod -x {} \;
+	find debian/$* -type f -name "*.lisp" -exec chmod -x {} \;
+	find debian/$* -type f -name "*.el" -exec chmod -x {} \;
+	find debian/$* -type f -name "*.tcl" -exec chmod -x {} \;
+
+	touch $@
+
+bclean-stamp:
+	-$(MAKE) clean
+	touch $@
+
+ansi-test/test_results: build-ansi-stamp
+	$(MAKE) $@
+
+build: build-stamp
+build-stamp: build-trad-stamp bclean-stamp build-ansi-stamp ansi-test/test_results
 	touch $@
 
 clean:
@@ -108,52 +139,29 @@ clean:
 	-$(MAKE) clean
 
 	dh_clean
+	rm -rf debian/trad debian/ansi
+
 
 BVER:=$(shell dpkg -s binutils |grep ^Version: | cut -f2 -d\  | cut -f1 -d\-)
 debian/substvars:
 	grep -q ^binutils: $@ 2>/dev/null || echo "binutils:Version=$(BVER)" >> $@
 
-install-%-stamp: DH_OPTIONS=
-install-%-stamp: build-%-stamp
-
-	$(MAKE) install DESTDIR=$$(pwd)/debian/tmp
-
-	mkdir -p debian/tmp/usr/share/emacs/site-lisp
-	cp -a $$(find debian/tmp/usr/local -name site-lisp -type d) debian/tmp/usr/share/emacs/site-lisp/gcl
-	rm -rf debian/tmp/usr/local
-
-	cat debian/tmp/usr/lib/gcl-$(VERS)/gcl-tk/demos/index.lsp | \
-		sed "s,$$(pwd)/debian/tmp,,1" >debian/foo
-	mv debian/foo debian/tmp/usr/lib/gcl-$(VERS)/gcl-tk/demos/index.lsp
-
-	rm -f debian/tmp/usr/bin/*.exe debian/tmp/usr/bin/*.bat
-
-	mkdir -p debian/tmp/usr/include && \
-		cd debian/tmp/usr/include && \
-		ln -snf $$(find ../lib -name "cmpinclude.h" ) .
-
-	find debian/tmp -type f -name "*.lsp" -exec chmod -x {} \;
-	find debian/tmp -type f -name "*.lisp" -exec chmod -x {} \;
-	find debian/tmp -type f -name "*.el" -exec chmod -x {} \;
-	find debian/tmp -type f -name "*.tcl" -exec chmod -x {} \;
-
-	dh_movefiles
-
-	touch $@
-
-install-pre:
+install: install-stamp
+install-stamp: build-stamp
 	dh_testdir
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
 
-gclean:
-	$(MAKE) clean
-	rm *stamp
+	cp -a debian/trad/* debian/tmp/
+	cp -a debian/ansi/* debian/tmp/
 
-install: install-pre install-trad-stamp gclean install-ansi-stamp
 	cat debian/gcl.sh | sed "s,gcl/,/usr/lib/gcl-$(VERS)/,g" >debian/gcl/usr/bin/gcl
 	chmod 0755 debian/gcl/usr/bin/gcl
+
+	dh_movefiles
+
+	touch $@
 
 # Build architecture-independent files here.
 # Pass -i to all debhelper commands in this target to reduce clutter.
