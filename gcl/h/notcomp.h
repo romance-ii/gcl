@@ -220,7 +220,7 @@ EXTER  bool left_trim;
 EXTER bool right_trim;
 int  (*casefun)();
 
-#define	Q_SIZE		128
+#define	Q_SIZE		256
 #define IS_SIZE		256
 
 struct printStruct {

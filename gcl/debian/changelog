@@ -20,8 +20,9 @@ gclcvs (2.7.0-31) unstable; urgency=low
   * Fix error in clcs_conditions.lisp in define-condition to handle
     cases where slot-specs are symbols rather than lists -- allows ansi
     tests to run
+  * Large pretty print queue size for ansi tests
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 12 Aug 2004 19:59:10 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 12 Aug 2004 21:01:02 +0000
 
 gclcvs (2.7.0-30) unstable; urgency=high
 
