@@ -8,7 +8,7 @@ if [ "$1" = "remove" ] || [ "$1" = "purge" ] ; then
 	echo '(mapcar (function delete-file) 
 		(directory 
 			(merge-pathnames 
-				(pathname *system-directory*) 
+				(pathname (concatenate (quote string) *system-directory* "../*/"))
 				(make-pathname :name "*clc*"))))' | gclcvs
 
 fi
