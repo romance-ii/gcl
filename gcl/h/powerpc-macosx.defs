@@ -11,11 +11,16 @@ LIBS := `echo $(LIBS) | sed -e 's/-lncurses/ /'`
 # Set this for the linker to operate correctly.
 MACOSX_DEPLOYMENT_TARGET = 10.2
 
-# Defines this to build an executable rsym.
+# Define this to build an executable rsym.
 RSYM = rsym
 
-# Defines this in order to compile sfasl.c.
+# Define this in order to compile sfasl.c.
 SFASL = $(ODIR)/sfasl.o
 
 # When using SFASL it is good to have (si::build-symbol-table).
+# (However, I'm not sure this init form will ever get called.)
 INITFORM = (si::build-symbol-table)
+
+# This is Apple's libtool, completely unrelated to GNU libtool.
+# Other plateforms define this to be `ar rs`.
+ARRS = libtool -static -o
