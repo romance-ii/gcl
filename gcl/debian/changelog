@@ -7,8 +7,11 @@ gcl (2.5.0.cvs20020625-55) unstable; urgency=high
   * Reworked dotnil definitions and support macros
   * add compile-file-pathname
   * setup C_INCLUDE_PATH env variable in gcl shell wrapper
+  * POSITIVE-FIXNUM variable type,simple-error->type error where
+    indicated by various ansi tests, eq->eql in ldiff and tailp;proper
+    lists only in member et. al.
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 29 Sep 2002 23:36:55 -0400
+ -- Camm Maguire <camm@enhanced.com>  Mon, 30 Sep 2002 01:06:08 -0400
 
 gcl (2.5.0.cvs20020625-54) unstable; urgency=high
 

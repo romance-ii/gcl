@@ -566,7 +566,7 @@ sLcompiled_function,
 				sLpathname,	sLcharacter,
 sLnumber,	sLrational,	sLfloat,		sLstring_char,
 sLinteger,	sLratio,		sLshort_float,	sLstandard_char,
-sLfixnum,	sLcomplex,	sLsingle_float,	sLpackage,
+sLfixnum,	sLpositive_fixnum, sLcomplex,	sLsingle_float,	sLpackage,
 sLbignum,	sLrandom_state,	sLdouble_float,	sLstream,
 sLbit,		sLreadtable,	sLlong_float,	sLhash_table;
 EXTER object sLstructure;

@@ -34,7 +34,7 @@ long
 fixint(object x)
 {
 	if (type_of(x) != t_fixnum)
-		FEerror("~S is not a fixnum.", 1, x);
+		FEwrong_type_argument(sLfixnum, x);
 	return(fix(x));
 }
 

@@ -765,10 +765,10 @@ nthcdr(int n, object x) {
 
 	if (n < 0) {
 		vs_push(make_fixnum(n));
-		FEerror("Negative index: ~D.", 1, vs_head);
+		FEwrong_type_argument(sLpositive_fixnum, vs_head);
 	}
 	while (n-- > 0)
-		if (endp(x)) {
+		if (endp_prop(x)) {
 			return(Cnil);
 		} else
 			x = x->c.c_cdr;
@@ -787,8 +787,7 @@ Llast() {
 		return;
 	if (n==2) {
 		if (type_of(vs_base[1])!=t_fixnum || (n=fix(vs_base[1]))<0)
-			FEerror("Expected non-negative fixed integer in second argument: ~S",
-				1,vs_base[1]);
+			FEwrong_type_argument(sLpositive_fixnum,vs_base[1]);
 		vs_popp;
 	}	
 
@@ -1033,7 +1032,7 @@ Lldiff() {
 	check_arg(2);
 	for (i = 0, x = vs_base[0];  !endp(x);  i++, x = x->c.c_cdr)
 /*		if (dot_list_eq(x,vs_base[1]))*/
-		if (fix_dot(x)==vs_base[1])
+		if (eql(fix_dot(x),vs_base[1]))
 			break;
 		else
 			vs_check_push(x->c.c_car);
@@ -1154,13 +1153,12 @@ check_alist(alist)
 @
 	protectTEST;
 	setupTEST(item, test, test_not, key);
-	while (!endp(list)) {
+	while (!endp_prop(list)) {
 		if (TEST(list->c.c_car))
 			goto L;
 		list = list->c.c_cdr;
 	}
 	restoreTEST;
-	list=fix_dot(list);
 	@(return list)
 @)
 
@@ -1189,7 +1187,7 @@ Ltailp() {
 	check_arg(2);
 	for (x = vs_base[1];  !endp(x);  x = x->c.c_cdr)
 /*		if (dot_list_eq(x,vs_base[0])) {*/
-		if (fix_dot(x)==vs_base[0]) {
+		if (eql(fix_dot(x),vs_base[0])) {
 			vs_base[0] = Ct;
 			vs_popp;
 			return;

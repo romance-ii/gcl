@@ -54,6 +54,7 @@ EXTER object  sLratio ;
 EXTER object  sLshort_float ; 
 EXTER object  sLstandard_char ; 
 EXTER object  sLfixnum ; 
+EXTER object  sLpositive_fixnum ; 
 EXTER object  sLcomplex ; 
 EXTER object  sLsingle_float ; 
 EXTER object  sLpackage ; 
