@@ -78,7 +78,8 @@ read_special_symbols(symfile)
 char *symfile;
 {FILE *symin;
  char *symbols;
- int i,jj;
+ int i
+ unsigned long jj;
  struct lsymbol_table tab;
  if (!(symin=fopen(symfile,"r")))
    {perror(symfile);exit(1);};
@@ -90,7 +91,7 @@ char *symfile;
  if (!(c_table.ptable)) {perror("could not allocate"); exit(1);};
  i=0; c_table.length=tab.n_symbols;
  while(i < tab.n_symbols)
-   { fread((char *)&jj,sizeof(int),1,symin);
+   { fread((char *)&jj,sizeof(jj),1,symin);
      (SYM_ADDRESS(c_table,i))=jj;
      SYM_STRING(c_table,i)=symbols;
  

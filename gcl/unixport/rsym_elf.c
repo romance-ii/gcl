@@ -246,7 +246,7 @@ char *out;
 
        { dprintf(tab.n_symbols %d , tab.n_symbols);
 	 tab.n_symbols++;
-	 {int i = (p->n_value);
+	 {unsigned long i = (p->n_value);
 #ifdef AIX3
 	  if (p->n_scnum == TEXT_NSCN)
 	    i = i + 0x10000e00;
@@ -256,7 +256,7 @@ char *out;
 	  /* leave space for the toc entry. */
 
 #endif	  
-	  fwrite((char *)&i,sizeof(int),1,symout);}
+	  fwrite((char *)&i,sizeof(i),1,symout);}
 #ifdef AIX3	 
 	  {short j=0;   fwrite((char *)&j,sizeof(short),1,symout);}
 #endif	   

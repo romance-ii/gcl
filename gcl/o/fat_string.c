@@ -84,7 +84,8 @@ read_special_symbols(symfile)
 char *symfile;
 {FILE *symin;
  char *symbols;
- int i,jj;
+ int i;
+ unsigned long  jj;
  struct lsymbol_table tab;
 #ifdef AIX3
  {char buf[500];
@@ -103,7 +104,7 @@ char *symfile;
  if (!(c_table.ptable)) {perror("could not allocate"); exit(1);};
  i=0; c_table.length=tab.n_symbols;
  while(i < tab.n_symbols)
-   { fread((char *)&jj,sizeof(int),1,symin);
+   { fread((char *)&jj,sizeof(jj),1,symin);
 #ifdef FIX_ADDRESS
      FIX_ADDRESS(jj);
 #endif       

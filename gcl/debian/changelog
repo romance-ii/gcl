@@ -48,8 +48,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Rework internal plt symbol address capture
   * Cleanup sfaslelf compiler warning
   * Remove implicit dependency on gawk, optimize plt.c a little
+  * Fix rsym generated symbol tables for 64 bit platforms
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  3 Mar 2004 15:38:02 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  4 Mar 2004 19:37:04 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
