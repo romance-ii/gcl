@@ -115,8 +115,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Probe for sbrk before probing for randomized sbrk
   * Openbsd changes -- maximize data seg resource if possible, avoid
     mallocing error message when allocation routines fails
+  * Fix sigcontext configure tests
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 30 Mar 2004 20:47:01 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 30 Mar 2004 21:02:04 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
