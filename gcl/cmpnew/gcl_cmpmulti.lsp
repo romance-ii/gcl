@@ -206,7 +206,7 @@
 (defun c1multiple-value-bind (args &aux (info (make-info))
                                    (vars nil) (vnames nil) init-form
                                    ss is ts body other-decls
-                                   (*vars* *vars*))
+                                   (*vars* *vars*) (*decls* *decls*))
   (when (or (endp args) (endp (cdr args)))
     (too-few-args 'multiple-value-bind 2 (length args)))
 

@@ -28,11 +28,137 @@
 (si:putprop 'let* 'c1let* 'c1special)
 (si:putprop 'let* 'c2let* 'c2)
 
+(defvar *decls* nil)
+
+;;FIXME centralize this
+(defun push-macrolets (form)
+  (dolist** (def form)
+	    (push (list (car def)
+			(caddr (si:defmacro* (car def) (cadr def) (cddr def))))
+		  *funs*)))
+
+(defun recursively-cmp-macroexpand (form &optional bf &aux (*funs* *funs*))
+  (if (atom form)
+      form
+    (let ((cf (car form)))
+      (let ((new-cdr-bf (or (and (consp bf) (if (atom (car bf)) bf
+					      (and (member (caar bf) '(flet labels macrolet) :test #'eq) 'lambda)))
+			    (car (member cf '(let let* lambda flet labels macrolet quote)))))
+	    (new-car-bf (and (consp cf) bf (list bf)))
+	    (new-cf (if (or bf (atom cf) (eq (car cf) 'lambda))
+			cf (cmp-macroexpand cf))))
+	(cons (recursively-cmp-macroexpand new-cf new-car-bf)
+	      (progn
+		(when (eq bf 'macrolet)
+		  (push-macrolets cf))
+		(recursively-cmp-macroexpand (cdr form) new-cdr-bf)))))))
+
+(defun var-is-changed (var form)
+  (cond ((atom form) nil)
+	((and (eq (car form) 'setq)
+	      (let ((tmp (member var (cdr form) :test #'eq))) (and tmp (evenp (length tmp)))))
+	 t)
+	(t (or (if (atom (car form)) nil (var-is-changed var (car form)))
+	       (var-is-changed var (cdr form))))))
+
+(defun var-type-position (var form procl)
+  (let ((pos (and (consp form) (position var form))))
+    (if (not pos) t
+      (type-and (or (nth pos procl) t)
+		(let ((pos (1+ pos)))
+		  (var-type-position var (nthcdr pos form) (nthcdr pos procl)))))))
+
+(defun var-is-inferred (var form)
+  (if (atom form) t
+    (let ((procl (and (consp (car form)) (symbolp (caar form)) (get (caar form) 'compiler::proclaimed-arg-types))))
+      (type-and (if procl (var-type-position var (cdar form) procl) t)
+		(type-and (var-is-inferred var (car form)) (var-is-inferred var (cdr form)))))))
+
+(defun var-in-decl (var form)
+  (and form (or (member var (cdar form) :test #'eq) (var-in-decl var (cdr form)))))
+
+(defun var-is-declared (var form)
+  (cond ((atom form) nil)
+	((stringp (car form)) (var-is-declared var (cdr form)))
+	((and (consp (car form)) (eq 'declare (caar form)))
+	 (or (var-in-decl var (cdar form))
+	     (var-is-declared var (cdr form))))
+	(t nil)))
+
+(defun t-to-nil (x)
+  (if (eq x t) nil x))
+
+(defun binding-decls (bindings body star)
+  (cond ((atom bindings) nil)
+	((atom (car bindings)) (binding-decls (cdr bindings) body star))
+	(t 
+	 (let* ((bf (car bindings))
+		(var (car bf)))
+	   (let ((outer (and (symbolp (cadr bf)) (cdr (assoc (cadr bf) *decls*))))
+		 (inf (t-to-nil (var-is-inferred var body)))
+		 (exp (and (consp (cadr bf)) (eq (caadr bf) 'the) (cadadr bf)))
+		 (proc (and (consp (cadr bf))
+			    (symbolp (caadr bf))
+			    (t-to-nil (get (caadr bf) 'compiler::proclaimed-return-type))))
+		 (dec (var-is-declared var body))
+		 (chb (var-is-changed var body))
+		 (chc (and star (var-is-changed var (cdr bindings)))))
+	     (let ((type (or exp (and (symbolp proc) proc) inf outer))
+		   (ublk (not (or dec chb chc))))
+	       (if type
+		   (progn
+		     (cmpnote "var ~S is type ~S from ~a, ~a~%"
+			      var type (cond (exp "explicit declaration")
+					     ((and (symbolp proc) proc) "proclamation")
+					     (inf "argument inference")
+					     (outer "outer scope"))
+			      (cond (dec "but is already declared")
+				    (chb "but is changed in body")
+				    (chc "but is changed in other bindings")
+				    (t "declaring")))
+		     (if ublk
+			 (cons (list type var) (binding-decls (cdr bindings) body star))
+		       (binding-decls (cdr bindings) body star)))
+		 (binding-decls (cdr bindings) body star))))))))
+
+;(type (or (and (symbolp (cadr bf)) (cdr (assoc (cadr bf) *decls*)))
+;			  (t-to-nil (var-is-inferred var body))
+;			  (and (consp (cadr bf))
+;			       (if (eq (caadr bf) 'the) (cadadr bf)
+;				 (and (symbolp (caadr bf))
+;				      (t-to-nil (get (caadr bf) 'compiler::proclaimed-return-type))))))))
+;	   (if (and type
+;		    (symbolp type)
+;		    (not (var-is-declared var body))
+;		    (not (var-is-changed var body))
+;		    (or (not star) (not (var-is-changed var (cdr bindings)))))
+;	       (cons (list type var) (binding-decls (cdr bindings) body star))
+;	     (binding-decls (cdr bindings) body star))))))
+  
+(defun declare-let-bindings (args)
+  (let ((decls (binding-decls (car args) (recursively-cmp-macroexpand (cdr args)) nil)))
+    (if decls
+	(progn (cmpnote "Let bindings ~S declared ~S~%" (car args) decls)
+	       (cons (car args) (cons (cons 'declare decls) (cdr args))))
+      args)))
+
+(defun declare-let*-bindings (args)
+  (let ((decls (binding-decls
+		(recursively-cmp-macroexpand (car args) (list 'let*))
+		(recursively-cmp-macroexpand (cdr args))
+		t)))
+    (if decls
+	(progn (cmpnote "Let* bindings ~S declared ~S~%" (car args) decls)
+	       (cons (car args) (cons (cons 'declare decls) (cdr args))))
+      args)))
+
 (defun c1let (args &aux (info (make-info))(setjmps *setjmps*)
                         (forms nil) (vars nil) (vnames nil)
                         ss is ts body other-decls
-                        (*vars* *vars*))
+                        (*vars* *vars*) (*decls* *decls*))
   (when (endp args) (too-few-args 'let 1 0))
+
+  (setq args (declare-let-bindings args))
 
   (multiple-value-setq (body ss ts is other-decls) (c1body (cdr args) nil))
 
@@ -160,8 +286,10 @@
 (defun c1let* (args &aux (forms nil) (vars nil) (vnames nil)
 		(setjmps *setjmps*)
                     ss is ts body other-decls
-                    (info (make-info)) (*vars* *vars*))
+                    (info (make-info)) (*vars* *vars*) (*decls* *decls*))
   (when (endp args) (too-few-args 'let* 1 0))
+
+  (setq args (declare-let*-bindings args))
 
   (multiple-value-setq (body ss ts is other-decls) (c1body (cdr args) nil))
   (c1add-globals ss)

@@ -492,6 +492,7 @@
      (t (return)))
     (pop body)
     )
+  (dolist (l ts) (push l *decls*))
   (values body ss ts is others doc)
   )
 

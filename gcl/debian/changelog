@@ -13,8 +13,9 @@ gclcvs (2.7.0-36) unstable; urgency=low
   * Use side-effect flag in optimizer to prevent exponential growth in C
     expressions on nesting certain optimized forms
   * Old pathname-name case behavior in CLtL1
+  * Preliminary type inferencing
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  1 Dec 2004 17:41:23 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 11 Dec 2004 00:33:56 +0000
 
 gclcvs (2.7.0-35) unstable; urgency=high
 

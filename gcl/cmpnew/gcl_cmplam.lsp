@@ -127,7 +127,15 @@
               (unwind-exit (list 'make-dclosure (fun-cfun fun) *clink*))))
 
 
-
+(defun decls-from-procls (ll procls body)
+  (cond ((or (null procls) (eq (car procls) '*)
+	     (null ll) (member (car ll) '(&whole &optional &rest &key &environment) :test #'eq)) nil)
+	((or (var-is-declared (car ll) body) (eq (car procls) t))
+	 (decls-from-procls (cdr ll) (cdr procls) body))
+	(t
+	 (cons (list (car procls) (or (if (atom (car ll)) (car ll) (caar ll))))
+	       (decls-from-procls (cdr ll) (cdr procls) body)))))
+	 
 (defun c1lambda-expr (lambda-expr
                       &optional (block-name nil block-it)
                       &aux (requireds nil) (optionals nil) (rest nil)
@@ -137,13 +145,23 @@
                            (aux-inits nil) doc vl spec body ss is ts
                            other-decls vnames
                            (*vars* *vars*)
+			   (*decls* *decls*)
                            (info (make-info))
                            (aux-info nil)
 			   (setjmps *setjmps*)
                       )
+
   (cmpck (endp lambda-expr)
          "The lambda expression ~s is illegal." (cons 'lambda lambda-expr))
 
+  (let ((decls (decls-from-procls
+		(car lambda-expr)
+		(and block-it (get block-name 'compiler::proclaimed-arg-types))
+		(cdr lambda-expr))))
+    (when decls
+      (cmpnote "~S function args declared: ~S~%" block-name decls)
+      (setq lambda-expr (cons (car lambda-expr) (cons (cons 'declare decls) (cdr lambda-expr))))))
+    
   (multiple-value-setq (body ss ts is other-decls doc)
                        (c1body (cdr lambda-expr) t))
   
@@ -704,7 +722,7 @@
 
 
 (defun c1dm (macro-name vl body
-                        &aux (*vs* *vs*) (whole nil) (env nil)
+                        &aux (*vs* *vs*) (whole nil) (env nil)  (*decls* *decls*)
 	(setjmps *setjmps*)
                         (*vnames* nil) (*dm-info* (make-info)) (*dm-vars* nil)
                         doc ss is ts other-decls ppn)

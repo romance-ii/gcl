@@ -264,10 +264,35 @@
        (1- len))
     form))
 
+;(defun find-var (var decls)
+;  (if decls
+;      (or (and (eq (caar decls) var) (car decls))
+;	  (find-var var (cdr decls)))
+;    nil))
+
+;(defun decls-from-lets (lets decls)
+;  (if lets
+;      (let ((decl (find-var (cadar lets) *decls*)))
+;	(when decl
+;	  (push (list (cdr decl) (caar lets)) decls))
+;	(decls-from-lets (cdr lets) decls))
+;    (and decls (cons 'declare (nreverse decls)))))
+	  
+
+;(defmacro let-wrap (lets form)
+;  (let ((decls (gensym)))
+;    `(if lets
+;	 (let ((,decls (decls-from-lets ,lets nil)))
+;	   (if ,decls
+;	       (list 'let* ,lets ,decls ,form)
+;	     (list 'let* ,lets ,form)))
+;     ,form)))
+
 (defmacro let-wrap (lets form)
-  `(if lets
-       (list 'let* ,lets ,form)
-     ,form))
+  (let ((decls (gensym)))
+    `(if lets
+	 (list 'let* ,lets ,form)
+     ,form)))
 
 (defun binary-nest (form env)
   (declare (ignore env))
