@@ -529,11 +529,11 @@ fi
 if test -f ${TCL_CONFIG_PREFIX}/../include/tcl.h ; then
   TCL_INCLUDE=-I${TCL_CONFIG_PREFIX}/../include
 fi
-AC_CHECK_LIB(lieee,have_ieee=1,have_ieee=0)
+AC_CHECK_LIB(lieee,main,have_ieee=1,have_ieee=0)
 if test "$have_ieee" = "0" ; then
  TCL_LIBS=`echo ${TCL_LIBS} | sed -e "s:-lieee::g" `
 fi
-AC_CHECK_LIB(dl,have_dl=1,have_dl=0)
+AC_CHECK_LIB(dl,dlopen,have_dl=1,have_dl=0)
 if test "$have_dl" = "0" ; then
  TCL_LIBS=`echo ${TCL_LIBS} | sed -e "s:-ldl::g"`
 fi
@@ -595,7 +595,7 @@ AC_MSG_RESULT(use=$use)
 # the time handling for unixtime, add timezone
 
 AC_MSG_CHECKING([alloca])
-AC_TRY_RUN([int main() { exit(alloca(500) != NULL ? 0 : 1)}],
+AC_TRY_RUN([int main() { exit(alloca(500) != NULL ? 0 : 1);}],
   ,gcl_ok=yes, gcl_ok=no,gcl_ok=no)
 if test $gcl_ok = yes ; then
     AC_MSG_RESULT(yes)
