@@ -64,6 +64,10 @@ int end;
 	vs_push(copy_simple_string(token));
 }
 
+/* The function below does not attempt to handle DOS pathnames 
+   which use backslashes as directory separators.  It needs 
+   TLC from someone who feels pedantic. MJT */
+
 /* !!!!! Bug Fix. NLG */
 static object
 parse_namestring(s, start, end, ep)
@@ -76,18 +80,16 @@ int start, end, *ep;
 	object x;
 	vs_mark;
 
-	vsp = vs_top + 1;
-	for (;--end >= start && isspace((int)s->st.st_self[end]););
-	for (i = j = start;  i <= end;  ) {
-/* 		if (isspace((int)s->st.st_self[i])) */
-/* 			break; */
 #ifndef IS_DIR_SEPARATOR
 #define IS_DIR_SEPARATOR(x) (x == '/')
 #endif
+	vsp = vs_top + 1;
+	for (;--end >= start && isspace((int)s->st.st_self[end]););
+       /* fprintf ( stderr, "1 %s \n", s->st.st_self );*/
+	for (i = j = start;  i <= end;  ) {
 #ifdef UNIX
 		if (IS_DIR_SEPARATOR(s->st.st_self[i])) {
 #endif
-
 			if (j == 0 && i == 0) {
 				i++;
 				vs_push(sKroot);
@@ -102,37 +104,42 @@ int start, end, *ep;
 				continue;
 			}
 			/* END OF BUG FIX */
-#endif
-#ifdef UNIX
 			if (i-j == 1 && s->st.st_self[j] == '.') {
+				/*fprintf ( stderr, "1 pushing sKcurrent\n" );*/
 				vs_push(sKcurrent);
 			} else if (i-j==2 && s->st.st_self[j]=='.' && s->st.st_self[j+1]=='.') {
+				/*fprintf ( stderr, "2 pushing sKparent\n" );*/
 				vs_push(sKparent);
-			} else
+			} else {
+				/*fprintf ( stderr, "3 pushing %d %d, %c\n", j, i-j, s->st.st_self[j] );*/
 				make_one(&s->st.st_self[j], i-j);
+                        }
 #endif
 			i++;
 			j = i;
-		} else
+		} else {
+		    /* DOS drive character ':' after one drive letter */
+		    if ( (s->st.st_self[i] == ':') && (i == start+1) ) {
+			/*fprintf ( stderr, "4 pushing %d %d, %c\n", j, 2, s->st.st_self[j] );*/
+			make_one(&s->st.st_self[j], 2);
 			i++;
+			/* Skip any succeeding path separators */
+			if ( ( i+1 <= end ) && ( s->st.st_self[i+1] == '/' ) ) {
+			    i++;
+			} 
+			j = i;
+		    } else {
+			i++;
+		    }
+		}
 	}
-#ifdef UNIX
-/*
-	if (i-j == 1 && s->st.st_self[j] == '.') {
-		vs_push(sKcurrent);
-		j = i;
-	} else if (i-j == 2 && s->st.st_self[j] == '.' && s->st.st_self[j+1] == '.') {
-		vs_push(sKparent);
-		j = i;
-	}
-*/
-#endif
 	*ep = i;
 	vs_push(Cnil);
 	while (vs_top > vsp)
 		stack_cons();
 	if (i == j) {
 		/*  no file and no type  */
+		/*fprintf ( stderr, "a2 pushing 2 Cnils\n" );*/
 		vs_push(Cnil);
 		vs_push(Cnil);
 		goto L;
@@ -140,6 +147,7 @@ int start, end, *ep;
 	for (k = j, d = -1;  k < i;  k++)
 		if (s->st.st_self[k] == '.')
 			d = k;
+	/*fprintf ( stderr, "9 d %d i %d j %d start %d end %d %c %c \n", d, i, j, start, end, s->st.st_self[i], s->st.st_self[j]  );*/
 	if (d == -1) {
 		/*  no file type  */
 #ifdef UNIX
@@ -148,7 +156,9 @@ int start, end, *ep;
 			vs_push(sKwild);
 		else
 			make_one(&s->st.st_self[j], i-j);
+	        
 		vs_push(Cnil);
+		/*fprintf ( stderr, "10 i %d j %d start %d end %d %c %c \n", i, j, start, end, s->st.st_self[i], s->st.st_self[j]  );*/
 	} else if (d == j) {
 		/*  no file name  */
 		vs_push(Cnil);
@@ -158,31 +168,36 @@ int start, end, *ep;
 			vs_push(sKwild);
 		else
 			make_one(&s->st.st_self[d+1], i-d-1);
+		/*fprintf ( stderr, "11 i %d j %d start %d end %d %c %c \n", i, j, start, end, s->st.st_self[i], s->st.st_self[j]  );*/
 	} else {
 		/*  file name and file type  */
 #ifdef UNIX
 		if (d-j == 1 && s->st.st_self[j] == '*')
 #endif
 			vs_push(sKwild);
-		else
+		else {
+			/*fprintf ( stderr, "a1 pushing %d %d, %c\n", j, d-j, s->st.st_self[j] );*/
 			make_one(&s->st.st_self[j], d-j);
+	             }
 #ifdef UNIX
 		if (i-d-1 == 1 && s->st.st_self[d+1] == '*')
 #endif
 			vs_push(sKwild);
 		else
+#ifdef __MINGW32__
+			/* I don't understand this */
 			make_one(&s->st.st_self[d+1], i-d-1);
+			/*vs_push(Cnil);*/
+#else
+			make_one(&s->st.st_self[d+1], i-d-1);
+#endif
+		/*fprintf ( stderr, "12 i %d j %d start %d end %d %c %c \n", i, j, start, end, s->st.st_self[j], s->st.st_self[d]  );*/
 	}
 L:
-	x
-	= make_pathname(Cnil, Cnil,
-			vs_top[-3], vs_top[-2], vs_top[-1], Cnil);
+	/*fprintf ( stderr, "13 i %d j %d start %d end %d %c %c \n", i, j, start, end, s->st.st_self[i], s->st.st_self[j]  );*/
+	x = make_pathname ( Cnil, Cnil, vs_top[-3], vs_top[-2], vs_top[-1], Cnil );
 	vs_reset;
 	return(x);
-
-	*ep = i;
-	vs_reset;
-	return(OBJNULL);
 }
 
 object
@@ -567,15 +582,14 @@ from ~S to ~S.",
 	defaults
 		       &aux x)
 @
-	if (defaults == Cnil) {
-		defaults
-		= symbol_value(Vdefault_pathname_defaults);
+	if ( defaults == Cnil ) {
+		defaults = symbol_value ( Vdefault_pathname_defaults );
+		defaults = coerce_to_pathname ( defaults );
+		defaults = make_pathname ( defaults->pn.pn_host,
+				 Cnil, Cnil, Cnil, Cnil, Cnil);
+	} else {
 		defaults = coerce_to_pathname(defaults);
-		defaults
-		= make_pathname(defaults->pn.pn_host,
-			        Cnil, Cnil, Cnil, Cnil, Cnil);
-	} else
-		defaults = coerce_to_pathname(defaults);
+        }
 	x = make_pathname(host, device, directory, name, type, version);
 	x = merge_pathnames(x, defaults, Cnil);
         if ( host_supplied_p) x->pn.pn_host = host;
