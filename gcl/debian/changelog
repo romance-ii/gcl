@@ -1,3 +1,13 @@
+gclcvs (2.7.0-29) unstable; urgency=low
+
+  * Remove references to external functions by static names in file.d
+    (row_major_aref)
+  * Fix bug in gcl_cmptop.lsp in which &optional + &rest lambda lists were
+    not being compiled correctly.
+  * Cleanup after clc on purge, Closes: #261796.
+
+ -- Camm Maguire <camm@enhanced.com>  Sun,  1 Aug 2004 23:06:21 +0000
+
 gclcvs (2.7.0-28) unstable; urgency=high
 
   * Michael Koehne's ANSI patches  (Thanks!)

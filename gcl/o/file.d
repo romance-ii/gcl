@@ -1259,7 +1259,7 @@ int start,end;
 	    if (i<end) {
 		j=i;
 		if (type_of(a) != t_cons)
-		    val = FFN(fLrow_major_aref)(a,i);
+		    val = fLrow_major_aref(a,i);
 		else {
 		    val = a->c.c_car;
 		    a = a->c.c_cdr;
