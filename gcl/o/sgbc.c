@@ -21,6 +21,27 @@
 int mprotect();
 #endif
 
+#ifdef __MINGW32__
+#include <windows.h>
+#define PROT_READ_WRITE PAGE_EXECUTE_READWRITE
+#define PROT_READ PAGE_READONLY
+
+int gclmprotect ( void *addr, size_t len, int prot ) {
+    int old, rv;
+    rv = VirtualProtect ( (LPVOID) addr, len, prot, &old );
+    if ( 0 == rv ) {
+        fprintf ( stderr, "mprotect: VirtualProtect %x %d %d failed\n", addr, len, prot );
+        rv = -1;
+    } else {
+        rv =0;
+    }    
+    return (rv);
+}
+/* Avoid clash with libgcc's mprotect */
+#define mprotect gclmprotect
+
+#endif
+
 #include <signal.h>
 
 /*  void segmentation_catcher(void); */

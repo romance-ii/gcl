@@ -13,6 +13,9 @@
       sprintf(command,"rsym %s %s",kcl_self,tmpfile1);
 #endif
 
+/* Stratified garbage collection - need mprotect() (at least) */
+/*#define SGC*/
+
 #define MP386
 #define GCL
 
@@ -77,6 +80,9 @@ extern DBEGIN_TY _stacktop, _stackbottom, _dbegin;
 #define SIGUSR2		12
 #define SIGPIPE		13
 #define SIGALRM		14
+#if 0
+#define SIGIO		23
+#endif
 #define SIGIO		29
 
 #define OTHER_SIGNALS_HANDLED SIGTERM,SIGKILL,SIGABRT,
@@ -88,8 +94,7 @@ extern DBEGIN_TY _stacktop, _stackbottom, _dbegin;
 #define HAVE_SIGPROCMASK
 #define NEED_TO_REINSTALL_SIGNALS
 
-/* #define HAVE_SIGACTION */
-/* a noop */
+/*#define HAVE_SIGACTION*/
 #define SETUP_SIG_STACK
 #define SV_ONSTACK 0
 #define SA_RESTART 0

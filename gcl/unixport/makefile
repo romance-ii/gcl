@@ -98,6 +98,16 @@ saved_$(SYSTEM):raw_$(SYSTEM) $(RSYM) init_$(SYSTEM).lsp \
 	echo " (in-package \"USER\")(system:save-system \"saved_$(SYSTEM)\")" >>foo
 	$(PORTDIR)/raw_$(SYSTEM)$(EXE) $(PORTDIR)/ -libdir $(GCLDIR)/ < foo
 
+saved_$(SYSTEM)_sgc:raw_$(SYSTEM) $(RSYM) init_$(SYSTEM).lsp \
+		$(CMPDIR)/cmpmain.lsp \
+		$(CMPDIR)/lfun_list.lsp \
+		$(CMPDIR)/cmpopt.lsp $(HDIR)/cmpinclude.h \
+		$(LSPDIR)/auto_new.lsp
+
+	cp init_$(SYSTEM).lsp foo
+	echo " (in-package \"USER\")(si::set-hole-size 500)(gbc nil) (si::sgc-on t)(system:save-system \"saved_$(SYSTEM)_sgc\")" >>foo
+	$(PORTDIR)/raw_$(SYSTEM)$(EXE) $(PORTDIR)/ -libdir $(GCLDIR)/ < foo
+
 $(RSYM): $(SPECIAL_RSYM) $(HDIR)/mdefs.h
 	$(CC) $(CFLAGS) -I$(HDIR) -I$(ODIR) -o $(RSYM) $(SPECIAL_RSYM)
 
