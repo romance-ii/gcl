@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-7) unstable; urgency=high
+
+  * arm is bigendian
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 10 Jul 2002 18:04:22 -0400
+
 gcl (2.5.0.cvs20020625-6) unstable; urgency=high
 
   * cvs updates for arm build
