@@ -19,7 +19,7 @@ SETUP='(load "../clcs/package.lisp")(load "../clcs/myload1.lisp")(load "sys-pack
 	'(setq compiler::*default-c-file* t)'\
 	'(setq compiler::*default-data-file* t)'\
 	'(setq compiler::*default-system-p* t)' \
-	'\#+winnt (si::use-fast-links nil) (setq compiler::*keep-gaz* t)'
+	'(setq compiler::*keep-gaz* t)'
 
 all: $(addsuffix .c,$(AFILES)) $(addsuffix .o,$(AFILES)) 
 
