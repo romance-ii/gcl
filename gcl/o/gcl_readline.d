@@ -201,6 +201,16 @@ static char *rl_completion_words_new(char *text, int state) {
   
 }
 
+#ifndef HAVE_DECL_RL_COMPLETION_MATCHES
+/* readline 4.3 has it, readline 4.1 has completion_matches instead */
+#define rl_completion_matches completion_matches
+#endif
+
+#ifndef HAVE_RL_COMPENTRY_FUNC_T
+/* same here */
+typedef char *rl_compentry_func_t(const char *, int);
+#endif
+
 /* Attempt to complete on the contents of TEXT.  START and END bound the
    region of rl_line_buffer that contains the word to complete.  TEXT is
    the word to complete.  We can use the entire contents of rl_line_buffer

@@ -1070,6 +1070,11 @@ if test "$enable_readline" = "yes" ; then
 # object no longer needed, 20040102 CM
 #			RL_LIB=mod/gcl_readline.o
 			,,-lncurses))
+
+# These tests discover differences between readline 4.1 and 4.3
+	AC_CHECK_LIB(readline,rl_completion_matches,
+			AC_DEFINE(HAVE_DECL_RL_COMPLETION_MATCHES)
+			AC_DEFINE(HAVE_RL_COMPENTRY_FUNC_T),,)
 fi
 
 AC_SUBST(RL_OBJS)

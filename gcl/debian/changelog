@@ -71,8 +71,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Minor ifdefs needed for FreeBSD
   * Refer to exported non-static C stub of fSmake_vector1 in plt.c
     (needed on ia64)
+  * Readline 4.1/4.3 configure magic
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  8 Mar 2004 22:41:08 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue,  9 Mar 2004 02:17:01 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
