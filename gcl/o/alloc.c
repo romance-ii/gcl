@@ -1390,7 +1390,6 @@ static char *baby_malloc(n)
 
 void *
 malloc(size_t size) {
-        object x;
 	static int in_malloc;
 
 	if (in_malloc)
@@ -1421,16 +1420,17 @@ malloc(size_t size) {
 
 #endif	
       
-	x = alloc_simple_string(size);
+	malloc_list = make_cons(Cnil, malloc_list);
 
-	x->st.st_self = alloc_contblock(size);
+	malloc_list->c.c_car = alloc_simple_string(size);
+
+	malloc_list->c.c_car->st.st_self = alloc_contblock(size);
 #ifdef SGC
-	perm_writable(x->st.st_self,size);
+	perm_writable(malloc_list->c.c_car->st.st_self,size);
 #endif
-	malloc_list = make_cons(x, malloc_list);
 
 	in_malloc=0;
-	return(x->st.st_self);
+	return(malloc_list->c.c_car->st.st_self);
 }
 
 

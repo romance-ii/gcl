@@ -43,8 +43,10 @@ gclcvs (2.7.0-25) unstable; urgency=low
   * Remove generated pcl/pcl_gaz*lsp files from repository
   * gcl -> gclcvs in gcl.el and dbl.el when compiling gclcvs package,
     Closes: #255019
+  * Close possibility of malloc failure due to intervening gbc arising
+    from the misordering of allocation calls
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 23 Jun 2004 18:34:47 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 23 Jun 2004 19:22:08 +0000
 
 gclcvs (2.7.0-24) unstable; urgency=low
 
