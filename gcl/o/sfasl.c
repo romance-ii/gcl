@@ -20,7 +20,10 @@
    will write a /tmp/sfasltest file
    which you can use comp to compare with one produced by ld.
    */
-/*#define DEBUG*/
+#if 0
+#define DEBUG
+#endif
+
 #define IN_SFASL
 
 /*  #ifdef STAND */
@@ -316,7 +319,7 @@ int fasload ( object faslfile )
                                     bsssize );
 	
         /* allocate some memory */
-#ifndef STAND	
+#ifndef STAND  
 	{
             BEGIN_NO_INTERRUPT;
             memory = alloc_object ( t_cfdata );

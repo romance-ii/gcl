@@ -10,7 +10,9 @@ Fast linking method for kcl by W. Schelter University of Texas
 #include "sfun_argd.h"
 #include "page.h"
 
-#undef DO_FUNLINK_DEBUG
+#if 0
+#define DO_FUNLINK_DEBUG
+#endif
 
 static int
 clean_link_array(object *,object *);
@@ -58,7 +60,7 @@ call_or_link(object sym, void **link )
             (void) vpush_extend ( link,sLAlink_arrayA->s.s_dbind );
             (void) vpush_extend ( *link,sLAlink_arrayA->s.s_dbind );	 
             *link = (void *) (fun->cf.cf_self);
-#if 0
+#if 1
             fprintf ( stderr, "call_or_link: cf %x\n", fun->cf );
             fprintf ( stderr, "call_or_link: cf_name %x\n", fun->cf.cf_name );
             fprintf ( stderr, "call_or_link: cf_data %x\n", fun->cf.cf_data );
@@ -83,12 +85,12 @@ call_or_link_closure ( object sym, void **link, void **ptr )
 {
     object fun;
 #ifdef DO_FUNLINK_DEBUG
-    fprintf ( stderr, "call_or_link_closure: fun %x START\n", fun );
+    fprintf ( stderr, "call_or_link_closure: START sym %x, link %x, *link %x, ptr %x, *ptr %x, sym->s.s_gfdef (fun) %x\n", sym, link, *link, ptr, *ptr, sym->s.s_gfdef );
 #endif 
     fun = sym->s.s_gfdef;
     if (fun == OBJNULL) {
 #ifdef DO_FUNLINK_DEBUG
-        fprintf ( stderr, "call_or_link: fun %x ERROR END\n", fun );
+        fprintf ( stderr, "call_or_link_closure: fun %x ERROR END\n", fun );
 #endif 
         FEinvalid_function(sym);
         return;
@@ -97,6 +99,9 @@ call_or_link_closure ( object sym, void **link, void **ptr )
         if ( Rset ) {
             (void) vpush_extend ( link, sLAlink_arrayA->s.s_dbind );
             (void) vpush_extend ( *link, sLAlink_arrayA->s.s_dbind );
+#ifdef DO_FUNLINK_DEBUG
+	    fprintf ( stderr, "call_or_link_closure: About to set *ptr %x to %x (after vpush_extend 1), sym->s.s_self %s (%d chars long)\n", *ptr, fun->cc.cc_turbo, sym->s.s_self, sym->s.s_fillp );
+#endif 
             *ptr = (void *) ( fun->cc.cc_turbo );
             *link = (void *) ( fun->cf.cf_self );
             MMccall (fun, fun->cc.cc_turbo);
@@ -104,7 +109,7 @@ call_or_link_closure ( object sym, void **link, void **ptr )
             MMccall ( fun, fun->cc.cc_turbo );
         }
 #ifdef DO_FUNLINK_DEBUG
-        fprintf ( stderr, "call_or_link: fun %x END 1\n", fun );
+        fprintf ( stderr, "call_or_link_closure: fun %x END 1\n", fun );
 #endif 
         return;
     }
@@ -117,6 +122,9 @@ call_or_link_closure ( object sym, void **link, void **ptr )
         if ( type_of ( fun ) == t_cfun ) {
             (void) vpush_extend ( link, sLAlink_arrayA->s.s_dbind );
             (void) vpush_extend ( *link, sLAlink_arrayA->s.s_dbind );	 
+#ifdef DO_FUNLINK_DEBUG
+	    fprintf ( stderr, "call_or_link_closure: About to set *link %x to %x and execute it (after vpush_extend 2), sym->s %x, sym->s.s_self %s (%d chars long)\n", *link, fun->cf.cf_self, sym->s, sym->s.s_self, sym->s.s_fillp );
+#endif 
             *link = (void *) (fun->cf.cf_self);
             ( *(void (*)()) (fun->cf.cf_self) ) ();
         } else {
@@ -124,7 +132,7 @@ call_or_link_closure ( object sym, void **link, void **ptr )
         }
     }
 #ifdef DO_FUNLINK_DEBUG
-    fprintf ( stderr, "call_or_link: fun %x END 2\n", fun );
+    fprintf ( stderr, "call_or_link_closure: fun %x END 2\n", fun );
 #endif 
 }
 
@@ -154,7 +162,7 @@ vpush_extend(void *item, object ar)
       ar->ust.ust_self=newself;
       goto AGAIN;
     }
-#ifdef DO_FUNLINK_DEBUG
+#ifdef DO_FUNLINK_DEBUG_1
  fprintf ( stderr, "vpush_extend: item %x, ar %x END\n", item, ar );
 #endif 
 }
@@ -329,7 +337,7 @@ clean_link_array(object *ar, object *ar_end)
 object
 c_apply_n(object (*fn)(), int n, object *x)
 {object res=Cnil;
-#ifdef DO_FUNLINK_DEBUG
+#ifdef DO_FUNLINK_DEBUG_1
     fprintf ( stderr, "c_apply_n: n %d, x %x START\n", n, x );
 #endif 
  switch(n){
@@ -653,7 +661,7 @@ c_apply_n(object (*fn)(), int n, object *x)
   default: FEerror("Exceeded call-arguments-limit ",0);
   } 
 
-#ifdef DO_FUNLINK_DEBUG
+#ifdef DO_FUNLINK_DEBUG_1
     fprintf ( stderr, "c_apply_n: res %x END\n", n, res );
 #endif 
  return res;
@@ -667,7 +675,7 @@ static object
 call_proc(object sym, void **link, int argd, va_list ll)
 {object fun;
  int nargs;
-#ifdef DO_FUNLINK_DEBUG
+#ifdef DO_FUNLINK_DEBUG_1
     fprintf ( stderr, "call_proc: sym %x START\n", sym );
 #endif 
  check_type_symbol(&sym);
@@ -797,7 +805,7 @@ object
 call_proc_new(object sym, void **link, int argd, object first, va_list ll)
 {object fun;
  int nargs;
-#ifdef DO_FUNLINK_DEBUG
+#ifdef DO_FUNLINK_DEBUG_1
     fprintf ( stderr, "call_proc_new: sym %x START\n", sym );
 #endif 
  check_type_symbol(&sym);
