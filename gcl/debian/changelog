@@ -21,8 +21,10 @@ gclcvs (2.7.0-18) unstable; urgency=low
   * Always check args in compiled macro functions to ensure safe calls
     for now.  FIXME compile these in the future as sfn instead of cf
     types so that arg checking is only done when called from safe code
+  * Avoid ~P escape with no arguments in ansi-tests/rt.lsp -- FIXME --
+    this should be made to work
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 30 Jan 2004 00:12:19 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 30 Jan 2004 04:48:44 +0000
 
 gclcvs (2.7.0-17) unstable; urgency=low
 
