@@ -1,3 +1,12 @@
+gcl (2.5.0.cvs-4) unstable; urgency=medium
+
+  * Updated package descriptions, Closes: #134402
+  * Static linking of libbfd, Closes: #134647
+  * Gcl currently only available on i386, arm and m68k as specified in
+    the Architecture control field, Closes: #133912
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 19 Feb 2002 12:04:29 -0500
+
 gcl (2.5.0.cvs-3) unstable; urgency=medium
 
   * Build-depend on texi2html, Closes: #133699
