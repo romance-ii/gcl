@@ -18,8 +18,9 @@ gclcvs (2.7.0-37) unstable; urgency=low
   * boolean and dynamic-extent declaration type support
   * Support type propagation in case of coerced multiple values, protect
     against nil type propagation
+  * Limit length to less than most-positive-fixnum
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 27 Dec 2004 22:08:11 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 27 Dec 2004 22:09:30 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 
