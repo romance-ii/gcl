@@ -117,7 +117,7 @@ parse_plt() {
   }
   fclose(f);
   unlink(b1);
-  ar=fSmake_vector1(j,aet_object,Cnil);
+  ar=fSmake_vector1_1(j,aet_object,Cnil);
   for (;j && !endp(li);li=li->c.c_cdr) 
     ar->v.v_self[--j]=li->c.c_car;
 

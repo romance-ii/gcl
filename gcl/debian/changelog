@@ -69,8 +69,10 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Autodetection of machine on FreeBSD
   * Updated defs and h files for FreeBSD courtesy of Mark Murray
   * Minor ifdefs needed for FreeBSD
+  * Refer to exported non-static C stub of fSmake_vector1 in plt.c
+    (needed on ia64)
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  8 Mar 2004 22:03:25 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  8 Mar 2004 22:41:08 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
