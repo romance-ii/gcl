@@ -914,12 +914,13 @@ EXTER object MVloc[10];
 /* Number of args supplied to a variable arg t_vfun
  Used by the C function to set optionals */
 
-struct call_data { object fun;
-		     int argd;
-		     int nvalues;
-		   object    values[20];
-		   double double_return;
-		 };
+struct call_data { 
+  object fun;
+  int argd;
+  int nvalues;
+  object values[50];
+  double double_return;
+};
 EXTER struct call_data fcall;
 
 #define  VFUN_NARGS fcall.argd

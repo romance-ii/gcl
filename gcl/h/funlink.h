@@ -71,7 +71,9 @@ A link arg descriptor:
 
 
 #define PUSH_FIRST_VAL(x) int nvals = 1 ; object result = (x)
-#define PUSH_VAL(x) fcall.values[nvals++] = (x)
+#define PUSH_VAL(x) if (nvals>=sizeof(fcall.values)/sizeof(*fcall.values) \
+                       FEerror("Too many function call values"); \
+                     else fcall.values[nvals++] = (x)
 #define RETURN_VALS   fcall.nvalues= nvals; return result;} 0
 
 #define FUNCALL(n,form) (VFUN_NARGS=n,form)

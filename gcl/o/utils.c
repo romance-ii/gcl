@@ -196,6 +196,8 @@ Ivs_values(void)
 { int n = fcall.nvalues = vs_top - vs_base;
   object *b = vs_base,*p=&fcall.values[0];
   object res = (n > 0 ? b[0] : sLnil);
+  if (n>=sizeof(fcall.values)/sizeof(*fcall.values))
+    FEerror("Too many function call values");
   while (--n > 0)
     { *++p= *++b;}
   return res;

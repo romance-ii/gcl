@@ -7,8 +7,12 @@ gcl (2.5.0.cvs20020625-61) unstable; urgency=low
   * Destructuring-bind fixes
   * delete-package error fix
   * pcl functions use pcl-destructuring-bind for now -- fix later
+  * Trigger error if function calls use too many 'values'
+  * Maximum values increased to 50
+  * Enable previously failing tests in multiple-value-{setq,prog1}.lsp
+  * prototype for system_time_zone_helper
 
- -- Camm Maguire <camm@m.enhanced.com>  Fri, 25 Oct 2002 06:40:39 -0400
+ -- Camm Maguire <camm@m.enhanced.com>  Sat, 26 Oct 2002 20:14:55 -0400
 
 gcl (2.5.0.cvs20020625-60) unstable; urgency=low
 
