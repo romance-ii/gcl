@@ -520,13 +520,11 @@ unsigned int length;
    case DATA_NSCN:
      sym->n_value = (int)sfaslp->s_start_data;
      break;
-   case BSS_NSCN: 
-    if (strcmp(".bss",SYM_NAME(sym))!= 0)
-      printf("dont do bss %s",SYM_NAME(sym));
-#else
+   case BSS_NSCN:
+#else  /* _WIN32 */
    case TEXT_NSCN : case DATA_NSCN: case BSS_NSCN :
-#endif     
-#endif
+#endif /* _WIN32 */
+#endif /* COFF */
      str=SYM_NAME(sym);
      dprintf( for sym %s ,str)
      dprintf( new value will be start %x, start_address);
