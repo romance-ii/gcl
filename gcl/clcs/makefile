@@ -33,5 +33,5 @@ saved_full_gcl: ${LISP}
 	echo '(load "package.lisp")(load "loading.lisp")(jamie-load-clcs :compiled)(system::save-system "saved_full_gcl")' | ${LISP}
 
 clean:
-	rm -f *.o *.fn saved_full_gcl$(EXE) saved_full_gcl cmpinclude.h *.c *.h *.data
-.INTERMEDIATE: saved_clcs_gcl
+	rm -f *.o *.fn saved_full_gcl$(EXE) saved_full_gcl cmpinclude.h *.c *.h *.data saved_clcs_gcl
+#.INTERMEDIATE: saved_clcs_gcl

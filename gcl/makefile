@@ -199,7 +199,8 @@ install1:
 	if gcc --version | grep -i mingw >/dev/null 2>&1 ; then rm -rf $(prefix)/install; mkdir $(prefix)/install ; cp windows/install.lsp $(prefix)/install ; cp windows/sysdir.bat $(prefix)/bin ; fi
 	-if gcc --version | grep -i mingw >/dev/null 2>&1 ; then rm -rf $(prefix)/doc; mkdir $(prefix)/doc; cp info/*.html $(prefix)/doc ; fi
 
-clean:
+gclclean:
+
 	(cd $(BINDIR); $(MAKE) clean)
 	(cd mp ; $(MAKE) clean)
 	(cd $(ODIR); $(MAKE) clean)
@@ -208,7 +209,6 @@ clean:
 	(cd $(CMPDIR); $(MAKE) clean)
 	(cd $(PORTDIR); $(MAKE) clean)
 	(cd gcl-tk ; $(MAKE) clean)
-	-(cd $(GMPDIR) ; $(MAKE) distclean)
 	cd $(CLCSDIR) && $(MAKE) clean
 	cd $(PCLDIR) && $(MAKE) clean
 	cd xgcl-2 && $(MAKE) clean
@@ -216,7 +216,6 @@ clean:
 	(cd info ; $(MAKE) clean)
 	rm -f foo.tcl config.log makedefs makedefsafter config.cache config.status makedefc
 	rm -f h/config.h h/gclincl.h h/cmpinclude.h h/gmp.h
-	rm -rf $(GMPDIR)/.deps $(GMPDIR)/libgmp.a
 	rm -f xbin/gcl foo foo.c bin/gclm.bat gmp_all
 	rm -f h/*-linux.defs h/bfd.h h/bfdlink.h h/ansidecl.h h/symcat.h
 	rm -f windows/gcl.iss bin/gcl.bat windows/gcl.ansi.iss windows/install.ansi.lsp \
@@ -225,6 +224,11 @@ clean:
 	rm -f ansi-tests/test_results ansi-tests/gazonk* \
 		ansi-tests/generated-eval-when-test-file.lisp
 	rm -f config.log config.cache config.status
+
+
+clean: gclclean
+	-(cd $(GMPDIR) ; $(MAKE) distclean)
+	rm -rf $(GMPDIR)/.deps $(GMPDIR)/libgmp.a
 	-cd binutils/bfd && $(MAKE) distclean
 	-cd binutils/libiberty && $(MAKE) distclean
 
@@ -264,4 +268,4 @@ kcp:
 	(cd go ; $(MAKE)  "CFLAGS = -I../h -pg  -c -g ")
 	(cd unixport ; $(MAKE) gcp)
 
-.INTERMEDIATE: unixport/saved_pcl_gcl
+#.INTERMEDIATE: unixport/saved_pcl_gcl
