@@ -341,6 +341,18 @@ getd(str)
 
 #define READ_BYTE1() getc(fas_stream)
 
+#define GET8(varx ) \
+ do{unsigned long var=(unsigned long)READ_BYTE1();  \
+   var |=  ((unsigned long)READ_BYTE1() << SIZE_BYTE); \
+   var |=  ((unsigned long)READ_BYTE1() << (2*SIZE_BYTE)); \
+   var |=  ((unsigned long)READ_BYTE1() << (3*SIZE_BYTE)); \
+   var |=  ((unsigned long)READ_BYTE1() << (4*SIZE_BYTE)); \
+   var |=  ((unsigned long)READ_BYTE1() << (5*SIZE_BYTE)); \
+   var |=  ((unsigned long)READ_BYTE1() << (6*SIZE_BYTE)); \
+   var |=  ((unsigned long)READ_BYTE1() << (7*SIZE_BYTE)); \
+   DPRINTF("{8byte:varx= %ld}", var); \
+     varx=var;} while (0)
+
 #define GET4(varx ) \
  do{int  var=READ_BYTE1();  \
    var |=  (READ_BYTE1() << SIZE_BYTE); \
@@ -366,6 +378,18 @@ getd(str)
 
 #define MASK ~(~0 << 8)
 #define WRITE_BYTEI(x,i)  putc((((x) >> (i*SIZE_BYTE)) & MASK),fas_stream)
+
+#define PUT8(varx ) \
+ do{unsigned long var= varx ; \
+     DPRINTF("{8byte:varx= %ld}", var); \
+       WRITE_BYTEI(var,0); \
+     WRITE_BYTEI(var,1); \
+     WRITE_BYTEI(var,2); \
+     WRITE_BYTEI(var,3); \
+     WRITE_BYTEI(var,4); \
+     WRITE_BYTEI(var,5); \
+     WRITE_BYTEI(var,6); \
+     WRITE_BYTEI(var,7);} while(0)
 
 #define PUT4(varx ) \
  do{int var= varx ; \
@@ -772,11 +796,19 @@ write_fasd(object obj)
      {int l = MP(obj)->_mp_size;
      int m = (l >= 0 ? l : -l);
       
-     plong *u = (plong *) MP(obj)->_mp_d;
-     if (sizeof(mp_limb_t) != 4) { FEerror(0,"fix for gmp");}
+     unsigned long *u = (unsigned long *) MP(obj)->_mp_d;
+     /* fix this */
+     /* if (sizeof(mp_limb_t) != 4) { FEerror("fix for gmp",0);} */
      PUT4(l);
-     while (-- m >=0)
-       {PUT4(*u) ; u++;}
+     while (-- m >=0) {
+       if (sizeof(unsigned long)==8)
+	 PUT8(*u);
+       else if (sizeof(unsigned long)==4)
+	 PUT4(*u); 
+       else
+	 FEerror("Fix for gmp",0);
+       u++;
+     }
      break;}
 #else     
        {int l = obj->big.big_length;
@@ -1233,7 +1265,7 @@ read_fasd1(int i, object *loc)
       case DP( d_bignum:)
 	{int j,m;
 	 object tem;
-	 plong *u;
+	 unsigned long *u;
 	 GET4(j);
 #ifdef GMP
 	 tem = new_bignum();
@@ -1241,7 +1273,7 @@ read_fasd1(int i, object *loc)
 	 _mpz_realloc(MP(tem),m);
 	 MP(tem)->_mp_size = j;
 	 j = m;
-	 u = (plong *) MP(tem)->_mp_d;
+	 u = (unsigned long *) MP(tem)->_mp_d;
 #else	 
         { BEGIN_NO_INTERRUPT;
 	 tem = alloc_object(t_bignum);
@@ -1252,11 +1284,17 @@ read_fasd1(int i, object *loc)
 	 }
 	
 #endif	 
-	 while ( --j >=0)
-	   { GET4(*u);
-	     u++;}
-	 *loc=tem; return;}
-      case DP(d_objnull:)
+	while ( --j >=0) {
+	  if (sizeof(unsigned long)==8)
+	    GET8(*u);
+	  else if (sizeof(unsigned long)==4)
+	    GET4(*u);
+	  else
+	    FEerror("Bad sizeof(unsigned long)",0);
+	  u++;
+	}
+	*loc=tem; return;}
+     case DP(d_objnull:)
 
 	*loc=0; return;
 

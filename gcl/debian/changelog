@@ -1,8 +1,9 @@
 gcl (2.5.0.cvs20020625-22) unstable; urgency=high
 
   * ElfW macros in rsym*.c for 64bit
+  * Allow for 8 byte gmp mp_limbs
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 25 Jul 2002 17:49:32 -0400
+ -- Camm Maguire <camm@enhanced.com>  Thu, 25 Jul 2002 18:52:37 -0400
 
 gcl (2.5.0.cvs20020625-21) unstable; urgency=high
 
