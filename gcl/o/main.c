@@ -58,10 +58,8 @@ bool saving_system ;
 
 #endif
 
-#if 0
 #ifdef _WIN32
 #include <fcntl.h>
-#endif
 #endif
 
 #define LISP_IMPLEMENTATION_VERSION "April 1994"
@@ -132,10 +130,8 @@ main(int argc, char **argv, char **envp) {
 #endif
         setbuf(stdin, stdin_buf); 
 	setbuf(stdout, stdout_buf);
-#if 0        
 #ifdef _WIN32
 	_fmode = _O_BINARY;
-#endif
 #endif
 	ARGC = argc;
 	ARGV = argv;
