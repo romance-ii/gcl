@@ -26,8 +26,9 @@ gclcvs (2.7.0-25) unstable; urgency=low
     explicitly to (long) to ensure they can be extracted via
     va_arg(,fixnum)
   * reenable SA_SIGINFO on amd64 to restore SGC there
+  * Include elf.h in FreeBSD.h
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 11 Jun 2004 03:43:01 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 12 Jun 2004 05:23:52 +0000
 
 gclcvs (2.7.0-24) unstable; urgency=low
 

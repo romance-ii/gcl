@@ -25,6 +25,7 @@
 /* OpenBSD needs sys/types.h included before link.h, which is included
    in linux.h */
 #include <sys/types.h>
+#include <elf.h>
 #include "linux.h"
 
 #if defined(__i386__)
