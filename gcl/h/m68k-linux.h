@@ -27,7 +27,7 @@
 	(char *)ea; })
 #endif
 
-/*#define NULL_OR_ON_C_STACK(x) ((x)==0 || ((unsigned int)x) > (unsigned int)(pagetochar(MAXPAGE+1)))*/
+#define NULL_OR_ON_C_STACK(x) ( x == 0 || (((unsigned int) x) >= 0xe0000000 )) 
 
 #define ADDITIONAL_FEATURES \
 		     ADD_FEATURE("BSD386"); \

@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-8) unstable; urgency=high
+
+  * NULL_OR_ON_C_STACK macro correction for m68k
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 12 Jul 2002 14:37:48 -0400
+
 gcl (2.5.0.cvs20020625-7) unstable; urgency=high
 
   * arm is bigendian
