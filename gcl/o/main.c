@@ -105,10 +105,25 @@ static object stack_space;
 #  endif
 #endif
 
+#ifdef NEED_NONRANDOM_SBRK
+#include <syscall.h>
+#include <linux/personality.h>
+#include <unistd.h>
+#endif
+
 int
 main(int argc, char **argv, char **envp) {
 #if defined ( BSD ) && defined ( RLIMIT_STACK )
     struct rlimit rl;
+#endif
+
+#ifdef NEED_NONRANDOM_SBRK
+#if SIZEOF_LONG == 4
+	if (!syscall(SYS_personality,PER_LINUX32))
+#else
+        if (!syscall(SYS_personality,PER_LINUX))
+#endif
+	  execvp(argv[0],argv);
 #endif
 
 #if defined(DARWIN)

@@ -392,13 +392,13 @@ TCFLAGS="-Wall -DVOL=volatile -fsigned-char"
 if test "$GCC" = "yes" ; then
 	TCFLAGS="$TCFLAGS -fwritable-strings -pipe"
 fi
-if test -f /proc/sys/kernel/exec-shield ; then
-	exec_stat=`cat /proc/sys/kernel/exec-shield`
-	if test "$exec_stat" != "0" ; then
-		# CFLAGS here to hopefully cover the DBEGIN routine below
-		CFLAGS="$CFLAGS -Wa,--execstack"
-	fi
-fi
+#if test -f /proc/sys/kernel/exec-shield ; then
+#	exec_stat=`cat /proc/sys/kernel/exec-shield`
+#	if test "$exec_stat" != "0" ; then
+#		# CFLAGS here to hopefully cover the DBEGIN routine below
+#		CFLAGS="$CFLAGS -Wa,--execstack"
+#	fi
+#fi
 
 TO3FLAGS=""
 TO2FLAGS=""
@@ -841,13 +841,126 @@ AC_CHECK_HEADERS(endian.h,
 	AC_MSG_RESULT(big),AC_MSG_RESULT(big)))
 AC_SUBST(LITTLE_END)
 
+
+# On systems with execshield, brk is randomized.  We need to catch
+# this and restore the traditional behavior here
+
+AC_MSG_CHECKING([for randomized brk])
+AC_TRY_RUN([#include <unistd.h>
+	    #include <stdio.h>
+	    int main() {
+		FILE *f;
+		if (!(f=fopen("conftest1","w")))
+			return -1;
+		fprintf(f,"%u",sbrk(0));
+		return 0;
+		}],
+		SBRK=`cat conftest1`,SBRK=0,SBRK=0)
+if test "$SBRK" = "0" ; then
+	AC_MSG_RESULT(cannot trap sbrk)
+	exit 1
+fi
+AC_TRY_RUN([#include <unistd.h>
+	    #include <stdio.h>
+	    int main() {
+		FILE *f;
+		if (!(f=fopen("conftest1","w")))
+			return -1;
+		fprintf(f,"%u",sbrk(0));
+		return 0;
+		}],
+		SBRK1=`cat conftest1`,SBRK1=0,SBRK1=0)
+if test "$SBRK1" = "0" ; then
+	AC_MSG_RESULT(cannot trap sbrk)
+	exit 1
+fi
+
+if test "$SBRK" != "$SBRK1" ; then
+	AC_MSG_RESULT(yes)
+	AC_MSG_CHECKING([for randomized brk remedy])
+	AC_TRY_RUN([#include <syscall.h>
+		    #include <linux/personality.h>
+         	    #include <stdio.h>
+		    #include <unistd.h>
+		    int main(int argc,char * argv[]) {
+			FILE *f;
+			#if SIZEOF_LONG == 4
+			if (!syscall(SYS_personality,PER_LINUX32))
+			#else
+			if (!syscall(SYS_personality,PER_LINUX))
+			#endif
+				execvp(argv[0],argv);
+			if (!(f=fopen("conftest1","w")))
+				return -1;
+			fprintf(f,"%u",sbrk(0));
+			return 0;
+			}],
+			SBRK=`cat conftest1`,SBRK=0,SBRK=0)
+	if test "$SBRK" = "0" ; then
+		AC_MSG_RESULT(cannot trap sbrk)
+		exit 1
+	fi
+	AC_TRY_RUN([#include <syscall.h>
+		    #include <linux/personality.h>
+		    #include <stdio.h>
+		    #include <unistd.h>
+		    int main(int argc,char * argv[]) {
+			FILE *f;
+			#if SIZEOF_LONG == 4
+			if (!syscall(SYS_personality,PER_LINUX32))
+			#else
+			if (!syscall(SYS_personality,PER_LINUX))
+			#endif
+				execvp(argv[0],argv);
+			if (!(f=fopen("conftest1","w")))
+				return -1;
+			fprintf(f,"%u",sbrk(0));
+			return 0;
+			}],
+			SBRK1=`cat conftest1`,SBRK1=0,SBRK1=0)
+	if test "$SBRK1" = "0" ; then
+		AC_MSG_RESULT(cannot trap sbrk)
+		exit 1
+	fi
+	if test "$SBRK" = "$SBRK1" ; then
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(NEED_NONRANDOM_SBRK)
+	else
+		AC_MSG_RESULT(no)
+		echo "Cannot build with randomized sbrk"
+		exit 1
+	fi 
+else
+	AC_MSG_RESULT(no)
+fi
+
+
+
 AC_MSG_CHECKING("finding DBEGIN")
 AC_TRY_RUN([#include <stdio.h>
             #include <stdlib.h>
-main()
+	    #ifdef NEED_NONRANDOM_SBRK
+		   #include <syscall.h>
+		   #include <linux/personality.h>
+		   #include <unistd.h>
+	   #endif
+int
+main(int argc,char * argv[])
 {
-  char *b = (void *) malloc(1000);
-  FILE *fp = fopen("conftest1","w");
+  char *b;
+  FILE *fp;
+
+#ifdef NEED_NONRANDOM_SBRK
+#if SIZEOF_LONG == 4
+if (!syscall(SYS_personality,PER_LINUX32))
+#else
+if (!syscall(SYS_personality,PER_LINUX))
+#endif
+     execvp(argv[0],argv);
+#endif  
+  b = (void *) malloc(1000);
+  fp = fopen("conftest1","w");
+
 #ifdef _WIN32
   fprintf(fp,"_dbegin");
 #else

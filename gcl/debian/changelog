@@ -111,8 +111,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Add old test failures to misc.lsp
   * Properly gensymmed time macro
   * Allow for white space chars in compiled filenames
+  * Autodetect and work around sbrk randomization, e.g. on Fedora 1
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 22 Mar 2004 02:43:22 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 24 Mar 2004 20:53:24 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
