@@ -3,8 +3,9 @@ gclcvs (2.7.0-27) unstable; urgency=low
   * Fixup bad extern declaration of signals_handled in usig.c
   * Minor extern declaration fixup for signals_handled in usig.c
   * Correctly parse gcc version strings in gmp3 subconfigure on arm
+  * Remove unnecessary arguments from FEerror calls in pathname.d
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 29 Jun 2004 15:17:14 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 29 Jun 2004 15:18:07 +0000
 
 gclcvs (2.7.0-26) unstable; urgency=low
 

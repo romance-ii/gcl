@@ -85,7 +85,7 @@ int start, end, *ep;
 #endif
 
 	if ( s == Cnil ) {
-      	    FEerror ( "NIL argument in parse_namestring.", 1, x );
+      	    FEerror ( "NIL argument in parse_namestring.", 0 );
   	}	
 	*ep=oldend;
 	vsp = vs_top + 1;
@@ -206,7 +206,7 @@ object x;
 	int e;
 
         if ( x == Cnil ) {
-            FEerror ( "NIL argument in coerce_to_pathname.", 1, x );
+            FEerror ( "NIL argument in coerce_to_pathname.", 0 );
         }
 L:
 	switch (type_of(x)) {
@@ -313,7 +313,7 @@ object x;
 	object l, y;
 
 	if ( x == Cnil ) {
-      	    FEerror ( "NIL argument in namestring.", 1, x );
+      	    FEerror ( "NIL argument in namestring.", 0 );
   	}	
 	i = 0;
 
@@ -418,7 +418,7 @@ object x;
 {
 
 	if ( x == Cnil ) {
-      	    FEerror ( "NIL argument in coerce_to_namestring.", 1, x );
+      	    FEerror ( "NIL argument in coerce_to_namestring.", 0 );
   	}	
 L:
 	switch (type_of(x)) {
