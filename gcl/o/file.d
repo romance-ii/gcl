@@ -102,6 +102,10 @@ static bool
 feof1(fp)
 FILE *fp;
 {
+
+  if (readline_on && fp==rl_instream && rl_line_buffer && *rl_line_buffer==EOF)
+    return TRUE;
+
 	if (!feof(fp))
 		return(FALSE);
 	if (fp == terminal_io->sm.sm_object0->sm.sm_fp) {
