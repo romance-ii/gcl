@@ -50,7 +50,7 @@ DEBUG=
 #endif
 
 VERS=$(shell echo $$(cat majvers).$$(cat minvers))
-EXT:=cvs
+#EXT:=cvs
 
 CFG:=$(addsuffix /config.,. binutils) gmp3/configfsf.
 # Bug in autocont dependency on emacsen-common workaround
@@ -89,7 +89,8 @@ configure-%-stamp: $(CFGS)
 		$$ANSI \
 		--prefix=/usr \
 		--mandir=\$${prefix}/share/man \
-		--enable-infodir=\$${prefix}/share/info
+		--enable-infodir=\$${prefix}/share/info \
+		--enable-emacsdir=\$${prefix}/share/emacs/site-lisp
 
 	touch $@
 
@@ -155,10 +156,13 @@ install-stamp: build-stamp debian/control $(INS)
 	cp -a debian/ansi/* debian/tmp/
 	cp -a debian/trad/* debian/tmp/
 
+	mv debian/tmp/usr/share/emacs/site-lisp debian/tmp/usr/share/emacs/foo
 	mkdir -p debian/tmp/usr/share/emacs/site-lisp
-	cp -a $$(find debian/tmp/usr/local -name site-lisp -type d) \
-		debian/tmp/usr/share/emacs/site-lisp/gcl$(EXT)
-	rm -rf debian/tmp/usr/local
+	mv debian/tmp/usr/share/emacs/foo debian/tmp/usr/share/emacs/site-lisp/gcl$(EXT)
+
+#	cp -a $$(find debian/tmp/usr/local -name site-lisp -type d) \
+#		debian/tmp/usr/share/emacs/site-lisp/gcl$(EXT)
+#	rm -rf debian/tmp/usr/local
 
 	cat debian/tmp/usr/share/emacs/site-lisp/gcl$(EXT)/gcl.el |\
 		sed "s,(provide 'gcl),(provide 'gcl$(EXT)),1" >tmp &&\
