@@ -33,10 +33,21 @@
 ;	    (error 'internal-simple-error :function-name function-name
 ;		   :format-string error-format-string :format-arguments args)))))
 
+(defvar *internal-error-parms* nil)
+
 (defun clcs-universal-error-handler (error-name correctable function-name
 			             continue-format-string error-format-string
-			             &rest args)
-  (let ((e-d (find-internal-error-data error-name)))
+			             &rest args
+				     &aux (internal-error-parms
+					   (list error-name correctable function-name
+						 continue-format-string error-format-string)))
+  (when (equal internal-error-parms *internal-error-parms*)
+    (format t "Universal error handler called recursively ~S~%"
+	    internal-error-parms)
+	    (return-from clcs-universal-error-handler))
+  (let* ((*internal-error-parms* (list error-name correctable function-name
+				       continue-format-string error-format-string))
+	 (e-d (find-internal-error-data error-name)))
     (if e-d
 	(let ((condition-name (car e-d)))
 	  (if correctable

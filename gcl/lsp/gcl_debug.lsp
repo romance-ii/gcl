@@ -798,7 +798,7 @@
   (cond (env   (setq *break-env* env))
 	(t (list   (vs (ihs-vs i)))))
   
-  (when at
+  (when (consp at)
     (format *debug-io* "~a:~a:0:beg~%" (second at) (third at))
     (format *debug-io* "(~a line ~a) "
 	    (second at)  (third at))

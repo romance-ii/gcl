@@ -144,10 +144,16 @@ signaled at this point in the stack.  For the moment the rest of the VARIABLES a
 	  (t (setf bod (cons 'progn bod))))
     `(block cond-error-continue ,bod)))
 
+(defvar *error-handler-args* nil)
 
-
-(defun #. (if (boundp '*error-handler-function*)*error-handler-function* 'joe)
+(defun #. (if (boundp '*error-handler-function*) *error-handler-function* 'joe)
   (&rest error-handler-args)
+  (when (equal error-handler-args *error-handler-args*)
+    (format t "Error handler called recursively ~S~%"
+	    error-handler-args)
+    ;; FIXME
+    (return-from si::universal-error-handler nil))
+  (let ((*error-handler-args* error-handler-args))
   (when *show-all-debug-info*
        (si::simple-backtrace)(si::backtrace) (si::break-vs))
   (let ((err (make-error-condition
@@ -169,7 +175,7 @@ signaled at this point in the stack.  For the moment the rest of the VARIABLES a
 						      err))
 				  (throw flag err))))))
 	  (t    (apply (get *error-handler-function* :old-definition)
-		       error-handler-args)))))
+			 error-handler-args))))))
 
 (defun inf-signal (&rest error-handler-args)
  (apply *error-handler-function*
