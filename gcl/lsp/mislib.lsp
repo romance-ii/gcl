@@ -24,6 +24,7 @@
 
 
 (export 'time)
+(export 'nth-value)
 (export '(decode-universal-time encode-universal-time))
 
 
@@ -101,3 +102,6 @@
         seconds-per-day)
      (* h 3600) (* min 60) sec))
 
+; Courtesy Paul Dietz
+(defmacro nth-value (n expr)
+  `(nth ,n (multiple-value-list ,expr)))
