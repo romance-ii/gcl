@@ -12,8 +12,10 @@ gclcvs (2.7.0-20) unstable; urgency=low
     lastfile
   * Default to debug mode on hppa to work around gcc compiler
     optimization bugs
+  * Add missing m4 and automake files in binutils directory to enable
+    automake and autoconf here
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 20 Feb 2004 16:25:42 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 25 Feb 2004 22:29:42 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
