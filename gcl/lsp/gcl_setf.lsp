@@ -472,12 +472,20 @@
       (setq access-forms (cons access-form access-forms)))))
 
 
+(defun make-update-form (function access-form others lets)
+  (if others
+      (make-update-form function access-form (cdr others)
+			(cons (list 'list (list 'quote (gensym)) (car others)) lets))
+    `(list 'let* (list ,@lets)
+	   (list ',function access-form ,@(mapcar (lambda (x) (list 'quote (cadadr x))) lets)))))
+
 ;;; DEFINE-MODIFY-MACRO macro.
+;;FIXME -- this is really upgly and error prone.  CM 20041214
 (defmacro define-modify-macro (name lambda-list function &optional doc-string)
   (let ((update-form
 	 (do ((l lambda-list (cdr l))
 	      (vs nil))
-	     ((null l) `(list ',function access-form ,@(nreverse vs)))
+	     ((null l) (make-update-form function 'access-form (nreverse vs) nil))
 	   (unless (eq (car l) '&optional)
 		   (if (eq (car l) '&rest)
 		       (return `(list* ',function

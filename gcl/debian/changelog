@@ -12,8 +12,9 @@ gclcvs (2.7.0-37) unstable; urgency=low
     is more general and pertains to the function alone
   * expand type propation facility
   * Fix bug in fixnum_add on most-negative-fixnum arg
+  * Fix incf/decf bug
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 17 Dec 2004 21:30:55 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 17 Dec 2004 21:31:34 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 
