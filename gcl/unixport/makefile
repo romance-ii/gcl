@@ -75,7 +75,7 @@ CMPOBJS	= $(CMPDIR)/cmpinline.o $(CMPDIR)/cmputil.o $(CMPDIR)/cmptype.o \
 	$(CMPDIR)/cmpspecial.o $(CMPDIR)/cmptag.o $(CMPDIR)/cmptop.o \
 	$(CMPDIR)/cmpvar.o $(CMPDIR)/cmpvs.o $(CMPDIR)/cmpwt.o
 
-SYSTEM=trad_gcl
+SYSTEM=gcl
 
 saved_ansi_gcl: ansi_cl.lisp
 	$(CLCSDIR)/saved_full_gcl < ansi_cl.lisp
@@ -119,8 +119,8 @@ raw_$(SYSTEM):  $(FOR_RAW)
 sys_gcl.o:	sys_gcl.c ${HDIR}/object.h ${HDIR}/config.h
 	$(CC) $(CFLAGS) sys_gcl.c
 
-init_trad_gcl.lsp: init_gcl.lsp
-	ln -s $< $@
+#init_trad_gcl.lsp: init_gcl.lsp
+#	ln -s $< $@
 
 init_gcp.lsp:
 	ln init_gcl.lsp init_gcp.lsp

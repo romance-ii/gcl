@@ -63,7 +63,7 @@ remake:
 	ln -s  $(MAINDIR)/cmpnew/$$v.c . ; ln -s $(MAINDIR)/cmpnew/$$v.h . ; \
 	ln -s $(MAINDIR)/cmpnew/$$v.data . ; \
 	done
-	rm -f ../unixport/saved_gcl 
+	rm -f ../unixport/$(FLISP) 
 	(cd .. ; make sources)
 	(cd .. ; make)
 	(cd .. ; make)

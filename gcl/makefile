@@ -25,12 +25,12 @@ PCLDIR = pcl
 MPDIR	= mp
 GMP_DIR = gmp/
 
-all: $(PORTDIR)/saved_gcl command cmpnew/collectfn.o lsp/info.o do-gcl-tk do-info
+all: $(PORTDIR)/$(FLISP) command cmpnew/collectfn.o lsp/info.o do-gcl-tk do-info
 
-$(PORTDIR)/saved_gcl: $(PORTDIR)/$(FLISP)
-	cp $< $@
+#$(PORTDIR)/saved_gcl: $(PORTDIR)/$(FLISP)
+#	cp $< $@
 
-$(PORTDIR)/saved_trad_gcl: ${HDIR}cmpinclude.h
+$(PORTDIR)/saved_gcl: ${HDIR}cmpinclude.h
 	(cd $(BINDIR); make all)
 	make mpfiles
 	rm -f o/cmpinclude.h ; ln h/cmpinclude.h o
@@ -60,7 +60,7 @@ $(PORTDIR)/saved_trad_gcl: ${HDIR}cmpinclude.h
 #	else echo "gcl-tk not made..missing include or lib" ; fi 
 #	(cd info ; make)
 
-$(PCLDIR)/saved_gcl_pcl: $(PORTDIR)/saved_trad_gcl
+$(PCLDIR)/saved_gcl_pcl: $(PORTDIR)/saved_gcl
 	cd $(@D) &&  make compile LISP="../$<" &&  make $(@F) LISP="../$<"
 
 $(CLCSDIR)/saved_full_gcl: $(PCLDIR)/saved_gcl_pcl
@@ -109,7 +109,7 @@ LISP_LIB=cmpnew/collectfn.o lsp/gprof.lsp lsp/info.o lsp/profile.lsp gcl-tk/tkl.
 install-command:
 	rm -f $(DESTDIR)${prefix}/bin/gcl
 	(echo '#!/bin/sh' ; \
-	echo exec ${INSTALL_LIB_DIR}/unixport/saved_gcl$(EXE) \\ ; \
+	echo exec ${INSTALL_LIB_DIR}/$(PORTDIR)/$(FLISP)$(EXE) \\ ; \
 	echo '   -dir' ${INSTALL_LIB_DIR}/unixport/ \\ ; \
 	echo '   -libdir' ${INSTALL_LIB_DIR}/ \\ ; \
 	echo '   -eval '\''(setq si::*allow-gzipped-file* t)'\' \\ ;\
@@ -128,9 +128,9 @@ install1:
 	mkdir -p $(DESTDIR)${INSTALL_LIB_DIR}
 	make install-command "INSTALL_LIB_DIR=${INSTALL_LIB_DIR}" "prefix=${prefix}" DESTDIR=$(DESTDIR)
 	rm -f $(DESTDIR)${prefix}/bin/gcl.exe
-	tar cf - unixport/saved_gcl$(EXE) info/*.info* ${LISP_LIB} \
+	tar cf - $(PORTDIR)/$(FLISP)$(EXE) info/*.info* ${LISP_LIB} \
 	gcl-tk/gcl.tcl gcl-tk/gcltkaux$(EXE)  |  (cd $(DESTDIR)${INSTALL_LIB_DIR} ;tar xf -)
-	ln ${SYMB} ${INSTALL_LIB_DIR}/unixport/saved_gcl$(EXE) \
+	ln ${SYMB} ${INSTALL_LIB_DIR}/$(PORTDIR)/$(FLISP)$(EXE) \
 	 $(DESTDIR)${prefix}/bin/gcl.exe
 	if [ -d "${TK_CONFIG_PREFIX}" ] ; then  \
 	cat gcl-tk/gcltksrv$(BAT) | \
@@ -140,7 +140,7 @@ install1:
 	chmod a+x $(DESTDIR)${INSTALL_LIB_DIR}/gcl-tk/gcltksrv$(BAT) ; fi
 	if [ -d "${TK_CONFIG_PREFIX}" ] ; then  \
 	(cd $(DESTDIR)${INSTALL_LIB_DIR}/gcl-tk/demos ; \
-	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../unixport/saved_gcl$(EXE)) ; fi
+	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../$(PORTDIR)/$(FLISP)$(EXE)) ; fi
 	(cd elisp ; make install DESTDIR=$(DESTDIR))
 	(cd info ; make ; make install DESTDIR=$(DESTDIR))
 

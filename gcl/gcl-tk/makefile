@@ -22,13 +22,13 @@ CFLAGS1=$(CFLAGS) -I../o -I../h ${TK_INCLUDE} ${TCL_INCLUDE} ${TK_XINCLUDES}
 
 all: gcltksrv   tkl.o tinfo.o  demos/gc-monitor.o gcltkaux
 	(cd demos ; \
-	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../unixport/saved_gcl) 
+	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../unixport/$(FLISP)) 
 
 .lisp.o:
-	echo "(compile-file \"$*.lisp\" :c-file nil :c-debug nil)" | ../unixport/saved_gcl
+	echo "(compile-file \"$*.lisp\" :c-file nil :c-debug nil)" | ../unixport/$(FLISP)
 
 .lsp.o:
-	echo "(compile-file \"$*.lsp\" :c-file nil :c-debug nil)" | ../unixport/saved_gcl
+	echo "(compile-file \"$*.lsp\" :c-file nil :c-debug nil)" | ../unixport/$(FLISP)
 
 
 
