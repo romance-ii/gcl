@@ -25,7 +25,7 @@
 
 (export 'time)
 (export 'nth-value)
-(export '(decode-universal-time encode-universal-time))
+(export '(decode-universal-time encode-universal-time compile-file-pathname))
 
 
 (in-package 'system)
@@ -105,3 +105,5 @@
 ; Courtesy Paul Dietz
 (defmacro nth-value (n expr)
   `(nth ,n (multiple-value-list ,expr)))
+(defun compile-file-pathname (pathname)
+(make-pathname :defaults pathname :type "o"))

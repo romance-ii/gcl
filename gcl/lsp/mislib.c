@@ -198,9 +198,9 @@ T28:;
 	V27= Cnil;
 goto T55;
 T55:;
-	V28= (*(LnkLI14))((V23));
+	V28= (*(LnkLI17))((V23));
 	V27= number_minus((V21),/* INLINE-ARGS */V28);
-	if(((*(LnkLI15))((V23)))==Cnil){
+	if(((*(LnkLI18))((V23)))==Cnil){
 	goto T62;}
 	V29= small_fixnum(366);
 	goto T60;
@@ -219,7 +219,7 @@ T56:;
 	goto T55;}
 goto T53;
 T53:;
-	if(((*(LnkLI15))((V23)))==Cnil){
+	if(((*(LnkLI18))((V23)))==Cnil){
 	goto T70;}
 	if(!(number_compare((V21),small_fixnum(60))==0)){
 	goto T73;}
@@ -323,7 +323,7 @@ T111:;
 	object V52;
 	object V53;
 	vs_base=vs_top;
-	(void) (*Lnk16)();
+	(void) (*Lnk19)();
 	if(vs_base>=vs_top){vs_top=sup;goto T122;}
 	V45= vs_base[0];
 	vs_base++;
@@ -402,7 +402,7 @@ T138:;
 	V43= number_minus((V43),small_fixnum(100));}
 goto T115;
 T115:;
-	if(((*(LnkLI15))((V43)))==Cnil){
+	if(((*(LnkLI18))((V43)))==Cnil){
 	goto T145;}
 	if(number_compare((V42),small_fixnum(2))>0){
 	goto T144;}
@@ -412,7 +412,7 @@ T145:;
 goto T144;
 T144:;
 	base[1]= (V41);
-	base[2]= (*(LnkLI14))((V43));
+	base[2]= (*(LnkLI17))((V43));
 	{object V59;
 	base[3]= VV[12];
 	base[4]= number_minus(small_fixnum(13),(V42));
@@ -460,9 +460,30 @@ static void L6()
 	vs_top=(vs_base=base+4)+1;
 	return;
 }
-static void LnkT16(){ call_or_link(VV[16],(void **)&Lnk16);} /* GET-DECODED-TIME */
-static object  LnkTLI15(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[15],(void **)&LnkLI15,1,ap);va_end(ap);return V1;} /* LEAP-YEAR-P */
-static object  LnkTLI14(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[14],(void **)&LnkLI14,1,ap);va_end(ap);return V1;} /* NUMBER-OF-DAYS-FROM-1900 */
+/*	function definition for COMPILE-FILE-PATHNAME	*/
+
+static void L7()
+{register object *base=vs_base;
+	register object *sup=base+VM7; VC7
+	vs_reserve(VM7);
+	{object V62;
+	check_arg(1);
+	V62=(base[0]);
+	vs_top=sup;
+goto TTL;
+TTL:;
+	base[1]= VV[14];
+	base[2]= (V62);
+	base[3]= VV[15];
+	base[4]= VV[16];
+	vs_top=(vs_base=base+1)+4;
+	Lmake_pathname();
+	return;
+	}
+}
+static void LnkT19(){ call_or_link(VV[19],(void **)&Lnk19);} /* GET-DECODED-TIME */
+static object  LnkTLI18(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[18],(void **)&LnkLI18,1,ap);va_end(ap);return V1;} /* LEAP-YEAR-P */
+static object  LnkTLI17(va_alist)va_dcl{object V1;va_list ap;va_start(ap);V1=call_proc(VV[17],(void **)&LnkLI17,1,ap);va_end(ap);return V1;} /* NUMBER-OF-DAYS-FROM-1900 */
 
 #ifdef SYSTEM_SPECIAL_INIT
 SYSTEM_SPECIAL_INIT

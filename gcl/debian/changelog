@@ -5,8 +5,9 @@ gcl (2.5.0.cvs20020625-55) unstable; urgency=high
   * make-sequence error check for 'null type and non-zero size
   * Dotted-list support in member
   * Reworked dotnil definitions and support macros
+  * add compile-file-pathname
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 27 Sep 2002 17:13:10 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sat, 28 Sep 2002 09:42:06 -0400
 
 gcl (2.5.0.cvs20020625-54) unstable; urgency=high
 

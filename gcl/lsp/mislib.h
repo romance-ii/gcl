@@ -3,6 +3,7 @@ static void L1();
 static void L4();
 static object LI5();
 static void L6();
+static void L7();
 #define VC1
 static object LI2();
 #define VMB2 register object *base=vs_top; object  V8 ,V6 ,V4;
@@ -21,25 +22,28 @@ static object LI5();
 #define VMV5 vs_reserve(5);
 #define VMR5(VMT5) vs_top=base ; return(VMT5);
 #define VC6
+#define VC7
+#define VM7 5
 #define VM6 5
 #define VM5 5
 #define VM4 11
 #define VM3 6
 #define VM2 2
 #define VM1 4
-static char * VVi[18]={
-#define Cdata VV[17]
+static char * VVi[21]={
+#define Cdata VV[20]
 (char *)(L1),
 (char *)(LI2),
 (char *)(LI3),
 (char *)(L4),
 (char *)(LI5),
-(char *)(L6)
+(char *)(L6),
+(char *)(L7)
 };
 #define VV ((object *)VVi)
-static void LnkT16() ;
-static void (*Lnk16)() = LnkT16;
-static object  LnkTLI15() ;
-static object  (*LnkLI15)() = LnkTLI15;
-static object  LnkTLI14() ;
-static object  (*LnkLI14)() = LnkTLI14;
+static void LnkT19() ;
+static void (*Lnk19)() = LnkT19;
+static object  LnkTLI18() ;
+static object  (*LnkLI18)() = LnkTLI18;
+static object  LnkTLI17() ;
+static object  (*LnkLI17)() = LnkTLI17;
