@@ -4,7 +4,10 @@ set -e
 
 if [ "$1" = "remove" ] || [ "$1" = "purge" ] ; then
 	! [ -e /usr/lib/common-lisp/bin/gcl@EXT@.sh ] || 
-		unregister-common-lisp-implementation gcl@EXT@
+		(
+		    /usr/lib/common-lisp/bin/gcl@EXT@.sh remove-clc &&
+		    unregister-common-lisp-implementation gcl@EXT@
+		)
 fi
 
 #DEBHELPER#
