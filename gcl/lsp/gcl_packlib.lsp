@@ -40,9 +40,11 @@
       p
       (let ((g (gensym)))
         `(let ((,g ,p))
-           (if (packagep ,g)
-               ,g
-               (find-package (string ,g)))))))
+           (unless (or
+                    (packagep ,g)
+                    (setq ,g (find-package (string ,g))))
+            (specific-error :package-error "Cannot coerce ~S to a package~%" ,p))
+          ,g))))
 
 (defun find-all-symbols (string-or-symbol)
   (when (symbolp string-or-symbol)
