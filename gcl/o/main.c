@@ -301,9 +301,11 @@ main(int argc, char **argv, char **envp) {
 #endif
 	      again:
 		super_funcall(sStop_level);
-		if (type_of(sSAmultiply_stacksA->s.s_dbind)==t_fixnum)
-		  {multiply_stacks(fix(sSAmultiply_stacksA->s.s_dbind));
-		   goto  again;}
+		if (type_of(sSAmultiply_stacksA->s.s_dbind)==t_fixnum) {
+                    multiply_stacks(fix(sSAmultiply_stacksA->s.s_dbind));
+                    goto  again;
+                }
+                    
 #ifdef USE_DLOPEN
  	unlink_loaded_files();
 #endif			
@@ -529,8 +531,9 @@ vs_overflow(void)
 void
 bds_overflow(void) {
 	--bds_top;
-	if (bds_limit > bds_org + stack_multiple *  BDSSIZE)
-		error("bind stack overflow");
+	if (bds_limit > bds_org + stack_multiple *  BDSSIZE) {
+            error("bind stack overflow");
+        }
 	bds_limit += STACK_OVER  *BDSGETA;
 	FEerror("Bind stack overflow.", 0);
 }
