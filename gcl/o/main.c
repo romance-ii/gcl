@@ -833,15 +833,6 @@ FFN(siLsave_system)(void) {
   
 /*  #ifdef AOSVS */
   
-  
-#ifdef HAVE_READLINE
-  ADD_FEATURE("READLINE");
-#endif
-#if defined(HAVE_LIBBFD) && !defined(USE_DLOPEN)
-  ADD_FEATURE("BFD");
-#endif
-  ADD_FEATURE("UNEXEC");
-  
 /*  #endif */
   cbgbccount = 0;
   rbgbccount = 0;
@@ -943,6 +934,14 @@ init_main(void) {
       { ADD_FEATURE("TRUNCATE_USE_C");
       }  }
 #endif /* PECULIAR_MACHINE */
+  
+#ifdef HAVE_READLINE
+  ADD_FEATURE("READLINE");
+#endif
+#if defined(HAVE_LIBBFD) && !defined(USE_DLOPEN)
+  ADD_FEATURE("BFD");
+#endif
+  ADD_FEATURE("UNEXEC");
   
   make_special("*FEATURES*",features);}
   
