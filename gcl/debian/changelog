@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-62) unstable; urgency=low
+
+  * with-package-iterator modifications
+
+ -- Camm Maguire <camm@m.enhanced.com>  Mon, 28 Oct 2002 11:53:53 -0500
+
 gcl (2.5.0.cvs20020625-61) unstable; urgency=low
 
   * Placeholder support for optional condition in find-restart
