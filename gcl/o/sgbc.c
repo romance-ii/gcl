@@ -1165,9 +1165,8 @@ make_writable(int beg, int i) {
 long debug_fault =0;
 int fault_count =0;
 extern char etext;
-/*  void memprotect_handler(int sig, int code, struct sigcontext *scp, char *addr); */
 void
-memprotect_handler(int sig, long code, struct sigcontext *scp, char *addr) {
+memprotect_handler(int sig, long code, void *scp, char *addr) {
   
   int p;
   int j=page_multiple;

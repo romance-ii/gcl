@@ -487,8 +487,8 @@ typedef void (*funcvoid)(void);
 /* sgbc.c:1068:OF */ extern int sgc_quit (void); /* () */
 /* sgbc.c:1131:OF */ extern void make_writable (int beg, int i); /* (beg, i) int beg; int i; */
 #ifndef __MINGW32__
-#include <signal.h>
-/* sgbc.c:1149:OF */ extern void memprotect_handler (int sig, long code, struct sigcontext *scp, char *addr); /* (sig, code, scp, addr) int sig; int code; struct sigcontext *scp; char *addr; */
+/* #include <signal.h> */
+/* sgbc.c:1149:OF */ extern void memprotect_handler (int sig, long code, void *scp, char *addr); /* (sig, code, scp, addr) int sig; int code; struct sigcontext *scp; char *addr; */
 #endif
 /* sgbc.c:1202:OF */ extern void sgc_mprotect (int pbeg, int n, int writable); /* (pbeg, n, writable) int pbeg; int n; int writable; */
 /* sgbc.c:1220:OF */ extern void fix_for_page_multiple (int beg, int end); /* (beg, end) int beg; int end; */

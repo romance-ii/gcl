@@ -1,6 +1,6 @@
 #include "bsd.h"
 
-#if !defined __ELF__ && !defined SPARC_ELF
+#ifndef __ELF__
 #error Linux systems use ELF
 #endif
 

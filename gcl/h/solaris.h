@@ -1,11 +1,7 @@
 #define __ELF__
+#define ElfW(a) Elf32_ ## a
 
 #include "linux.h"
-
-struct sigcontext {
-  unsigned u;
-}
-#define ElfW(a) Elf32_ ## a
 
 #ifdef IN_GBC
 #undef MPROTECT_ACTION_FLAGS
