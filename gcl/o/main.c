@@ -996,8 +996,11 @@ init_main(void) {
 #ifdef HAVE_READLINE
   ADD_FEATURE("READLINE");
 #endif
-#if defined(HAVE_LIBBFD) && !defined(USE_DLOPEN)
+#if !defined(USE_DLOPEN)
+  ADD_FEATURE("NATIVE-RELOC");
+#if defined(HAVE_LIBBFD) 
   ADD_FEATURE("BFD");
+#endif
 #endif
   ADD_FEATURE("UNEXEC");
 
