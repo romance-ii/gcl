@@ -1,8 +1,14 @@
-gcl (2.5.0.cvs20020625-2) unstable; urgency=high
+gcl (2.5.0.cvs20020625-3) unstable; urgency=high
 
   * Better libbfd detection for arm/alpha
 
  -- Camm Maguire <camm@enhanced.com>  Wed, 26 Jun 2002 17:27:21 -0400
+
+gcl (2.5.0.cvs20020625-2) unstable; urgency=high
+
+  * s390 support
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 25 Jun 2002 21:25:35 -0400
 
 gcl (2.5.0.cvs20020625-1) unstable; urgency=high
 
