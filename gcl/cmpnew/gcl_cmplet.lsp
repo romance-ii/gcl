@@ -106,6 +106,7 @@
 	((integerp form) (list 'integer form form))
 	((atom form) (type-of form))
 	((eq (car form) 'quote) (type-of (cadr form)))
+	((atom (cdr form)) (error "Dotted list in fun-ret-type~"))
 	((symbolp (car form))
 	 (nil-to-t (or (result-type-from-args (car form) (mapcar #'fun-ret-type (cdr form)))
 		       (let ((proc (get (car form) 'proclaimed-return-type)))
@@ -160,7 +161,8 @@
 ;	     (binding-decls (cdr bindings) body star))))))
   
 (defun declare-let-bindings (args)
-  (let ((decls (binding-decls (car args) (recursively-cmp-macroexpand (cdr args)) nil)))
+  (let ((decls (binding-decls (recursively-cmp-macroexpand (car args) (list 'let))
+			      (recursively-cmp-macroexpand (cdr args)) nil)))
     (if decls
 	(progn (cmpnote "Let bindings ~S declared ~S~%" (car args) decls)
 	       (cons (car args) (cons (cons 'declare decls) (cdr args))))
