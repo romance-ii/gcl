@@ -78,7 +78,7 @@
 	 (if (eq (car form) 'quote )
 	     `(load-time-value (si::nani ,(si::address (cadr form))))
 	   (cons (wrap-literals (car form)) (wrap-literals (cdr form)))))
-	((symbolp form)
+	((or (symbolp form) (integerp form))
 	 form)
 	(t
 	 `(load-time-value (si::nani ,(si::address form))))))
