@@ -66,7 +66,7 @@
 
 
 
-(defun lisp-implementation-type () "GNU Common Lisp")
+(defun lisp-implementation-type () "GNU Common Lisp (GCL)")
 
 (defun machine-type () #+sun "SUN"
   #+hp-ux "HP-UX"

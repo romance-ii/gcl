@@ -31,8 +31,10 @@ gclcvs (2.7.0-37) unstable; urgency=low
   * Fix dynamic extent declarations, ammend existing declarations with
     auto-determined ones where possible
   * Compiler type propagation enhancements
+  * Whitespace in compile-file pathnames, lisp-implementation-version
+    sync with 2.6.6
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  7 Jan 2005 17:58:11 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 14 Jan 2005 01:53:53 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 
