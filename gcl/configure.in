@@ -525,7 +525,7 @@ cat >> conftest.el <<EOF
 EOF
 
 AC_MSG_CHECKING([emacs default.el])
-EMACS_DEFAULT_EL=`emacs -q -batch -l conftest.el 2>&1 | sed -e /Loading/d `
+EMACS_DEFAULT_EL=`emacs -q -batch -l conftest.el 2>&1 | sed -e /Loading/d | sed -e /load/d `
 if  test -f "${EMACS_DEFAULT_EL}"  ; then true;else
   EMACS_DEFAULT_EL=${EMACS_SITE_LISP}/default.el
 fi
@@ -547,7 +547,7 @@ cat >> conftest.el <<EOF
 EOF
 
 AC_MSG_CHECKING([emacs info/dir])
-INFO_DIR=`emacs -q -batch -l conftest.el 2>&1 | sed -e /Loading/d `
+INFO_DIR=`emacs -q -batch -l conftest.el 2>&1 | sed -e /Loading/d | sed -e /load/d `
 if  test -f "${INFO_DIR}dir"  ; then true;else
 if test -f /usr/info/dir ; then
   INFO_DIR=/usr/info/
