@@ -98,6 +98,8 @@ Boston, MA 02111-1307, USA.  */
 #include <mach-o/loader.h>
 #include <objc/malloc.h>
 
+#include <sys/mman.h>
+
 #define VERBOSE 1
 
 /* Size of buffer used to copy data from the input file to the output
@@ -475,7 +477,7 @@ static void
 print_load_command (struct load_command *lc)
 {
   print_load_command_name (lc->cmd);
-  printf ("%10lx", lc->cmdsize);
+  printf ("%#10lx", lc->cmdsize);
 
   if (lc->cmd == LC_SEGMENT)
     {
@@ -484,13 +486,13 @@ print_load_command (struct load_command *lc)
       int j;
 
       scp = (struct segment_command *) lc;
-      printf (" %-16.16s %#10lx %#8lx\n",
+      printf (" %-16.16s %#10lx %#10lx\n",
 	      scp->segname, scp->vmaddr, scp->vmsize);
 
       sectp = (struct section *) (scp + 1);
       for (j = 0; j < scp->nsects; j++)
 	{
-	  printf ("                           %-16.16s %#10lx %#8lx\n",
+	  printf ("                               %-16.16s %#10lx %#10lx\n",
 		  sectp->sectname, sectp->addr, sectp->size);
 	  sectp++;
 	}
@@ -567,11 +569,11 @@ read_load_commands ()
 	  text_seg_lowest_offset);
 
   printf ("--- List of Load Commands in Input File ---\n");
-  printf ("# cmd              cmdsize name                address     size\n");
+  printf ("no cmd                 cmdsize name                address       size\n");
 
   for (i = 0; i < nlc; i++)
     {
-      printf ("%1d ", i);
+      printf ("%#2d ", i);
       print_load_command (lca[i]);
     }
 }
@@ -992,32 +994,45 @@ unexec_init_emacs_zone ()
   }
 }
 
-static size_t stub_size (malloc_zone_t *zone, const void *ptr) {
-    extern size_t my_size (const void *);
-    return my_size (ptr);
+static size_t stub_size (malloc_zone_t *zone, const void *ptr)
+{
+    object *p;
+    extern object malloc_list;
+    
+    for (p = &malloc_list ; *p && !endp(*p) ; p = &((*p)->c.c_cdr)) {
+        if ((*p)->c.c_car->st.st_self == ptr) {
+            return ((*p)->c.c_car->st.st_dim);
+        }
+    }
+    return (0);
 }
 
-static void *stub_malloc (malloc_zone_t *zone, size_t size) {
+static void *stub_malloc (malloc_zone_t *zone, size_t size)
+{
     extern void *my_malloc (size_t);
     return my_malloc (size);
 }
 
-static void *stub_calloc (malloc_zone_t *zone, size_t num_items, size_t size) {
+static void *stub_calloc (malloc_zone_t *zone, size_t num_items, size_t size)
+{
     extern void *my_calloc (size_t, size_t);
     return my_calloc (num_items, size);
 }
 
-static void *stub_valloc (malloc_zone_t *zone, size_t size) {
+static void *stub_valloc (malloc_zone_t *zone, size_t size)
+{
     extern void *my_valloc (size_t);
     return my_valloc (size);
 }
 
-static void *stub_realloc (malloc_zone_t *zone, void *ptr, size_t size) {
+static void *stub_realloc (malloc_zone_t *zone, void *ptr, size_t size)
+{
     extern void *my_realloc (void *, size_t);
     return my_realloc (ptr, size);
 }
 
-static void stub_free (malloc_zone_t *zone, void *ptr) {
+static void stub_free (malloc_zone_t *zone, void *ptr)
+{
     extern void my_free (void *ptr);
     my_free (ptr);
 }
@@ -1074,8 +1089,8 @@ char *my_sbrk (int incr)
         }
         mark_region ((unsigned long) mach_brkpt, (unsigned long) big_heap);
         
-        mach_mapstart = mach_brkpt; 
-	mach_maplimit = mach_brkpt + big_heap;
+        mach_mapstart = mach_brkpt;
+        mach_maplimit = mach_brkpt + big_heap;
     }
     if (incr == 0) {
 	return (mach_brkpt);

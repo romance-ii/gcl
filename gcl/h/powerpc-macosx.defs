@@ -1,15 +1,21 @@
-#
-# For MacOS X
-#
+# powerpc-macosx.defs
 
 # Disable Apple's custom C preprocessor which gets confused when
 # preprocessing some of the *.d files in the o/ subdirectory.
-CC = gcc -no-cpp-precomp
+CC = gcc $(CPPFLAGS)
 
 # Set this to avoid warnings when linking against libncurses.
-LIBS = -lSystem -lreadline -ldl
+# This is due to the requirements of the two level namespace.
+LIBS := `echo $(LIBS) | sed -e 's/-lncurses/ /'`
 
 # Set this for the linker to operate correctly.
 MACOSX_DEPLOYMENT_TARGET = 10.2
 
-LDCC = ld -X -seglinkedit -segprot __TEXT rwx rwx /lib/crt0.o 
+# Defines this to build an executable rsym.
+RSYM = rsym
+
+# Defines this in order to compile sfasl.c.
+SFASL = $(ODIR)/sfasl.o
+
+# When using SFASL it is good to have (si::build-symbol-table).
+INITFORM = (si::build-symbol-table)

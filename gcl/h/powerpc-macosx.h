@@ -1,62 +1,85 @@
-/* GCL config file for MacOS X v10.2 (aurelien.chanudetATm4xDOTorg) */
+/* GCL config file for Mac OS X v10.2 (aurelienDOTchanudetATm4xDOTorg) */
+
+/* ./configure --enable-debug --enable-machine=powerpc-macosx --enable-dlopen=no
+	--enable-statsysbfd=no --enable-dynsysbfd=no --enable-custreloc=yes */
 
 #include "bsd.h"
 
 #define DARWIN
 
-/* MacOS X has its own executable file format (Mach-O). */
+/* Mac OS X has its own executable file format (Mach-O). */
 #undef HAVE_AOUT
 #undef HAVE_ELF
 
-#undef WANT_VALLOC
-#define DONT_NEED_MALLOC
+/* #undef WANT_VALLOC */
+/* #define DONT_NEED_MALLOC */
+/* #define GNU_MALLOC */
 
 /* move this to configure */
 #define HAVE_UNISTD_H
 
-/* FIX-ME : check value is correct (differs for ppc and i386) */
+/* correct value for ppc (we should detect this automatically) */
+/* alternatively, we could use the global variable vm_page_size */
 #define PAGEWIDTH 12
+/* correct value for i386 */
+/* #define PAGEWIDTH 13 */
 
 /* The following value determines the running process size. */
-/* I've no idea whatsoever if this value is appropriate.    */
-#define BIG_HEAP_SIZE   0x1000000
+#define BIG_HEAP_SIZE   0x50000000
 
 /* based on NeXT32-m68k.h */
 #undef SET_REAL_MAXPAGE
 #define SET_REAL_MAXPAGE \
-  { extern int mach_maplimit; sbrk(0); real_maxpage = mach_maplimit/PAGESIZE; }
+  { extern int mach_maplimit; my_sbrk(0); real_maxpage = mach_maplimit/PAGESIZE; }
 
 #define sbrk my_sbrk
-extern char * my_sbrk(int incr);
+extern char *my_sbrk(int incr);
 
-/* The code for unexec is based on Christian Swinehart's work for Emacs,
-   which in turn is based on Apple's patches to work with the Mach-O format. */
-#define UNIXSAVE	"unexdyld.c"
+/* The implementation of unexec for GCL is based on Andrew Choi's work
+   for Emacs. Previous pioneering implementation of unexec for Mac OS X
+   by Steve Nygard. */
+#define UNIXSAVE		"unexmacosx.c"
 
-#undef SFASL
-
-#ifdef USE_DLOPEN
-/* #define SPECIAL_RSYM	 rsym_dyld.c  */
-/* #define UNIXFASL 	"fasldlsym.c" */
-#define SPECIAL_RSYM
-#define UNIXFASL	"fasldyld.c"
+/* sfaslbfd.c is included from sfasl.c */
+#ifdef HAVE_LIBBFD
+#define SEPARATE_SFASL_FILE 	"sfaslbfd.c"
 #else
-#define UNIXFASL	"fasldyld.c"
+/* #ifdef USE_DLOPEN */
+#define SPECIAL_RSYM		"rsym_macosx.c"
+/* #define SEPARATE_SFASL_FILE 	"fasldlsym.c" */
+#define SEPARATE_SFASL_FILE	"sfaslmacosx.c"
 #endif
 
-/* MacOS X has sigaction (this is needed in o/usig.c),  */
+/* Mac OS X has sigaction (this is needed in o/usig.c),  */
 #define HAVE_SIGACTION
 /* and we have sigvec too but this is defined in bsd.h. */
 
 /* make this a noop */
-#define SETUP_SIG_STACK
-/* FIX-ME : configure doesnt detect SV_ONSTACK */
+/* #define SETUP_SIG_STACK */
+
+/* copied from {Net,Free,Open}BSD.h */
+#define HAVE_SIGPROCMASK
+#define SIG_STACK_SIZE (SIGSTKSZ/sizeof(double))
+#define SETUP_SIG_STACK \
+{ \
+	static struct sigaltstack estack; \
+	if ((estack.ss_sp = malloc(SIGSTKSZ)) == NULL) \
+	  perror("malloc"); \
+	estack.ss_size = SIGSTKSZ; \
+	estack.ss_flags = 0; \
+	if (sigaltstack(&estack, 0) < 0) \
+	  perror("sigaltstack"); \
+}
+
+#define INSTALL_SEGMENTATION_CATCHER \
+(void) gcl_signal(SIGSEGV, segmentation_catcher); \
+(void) gcl_signal(SIGBUS, segmentation_catcher)
 
 #define	IEEEFLOAT
        
 /* how to check for input */
-/* MacOS X does not have _fileno as in linux.h. Nor does it have _cnt as in bsd.h. */
-/* Let us see what we can do with this declaration found in {Net,Open,Free}BSD.h.  */
+/* Mac OS X does not have _fileno as in linux.h. Nor does it have _cnt as in bsd.h. */
+/* Let us see what we can do with this declaration found in {Net,Free,Open}BSD.h.  */
 #undef LISTEN_FOR_INPUT
 #define LISTEN_FOR_INPUT(fp) \
 do {int c=0;\
@@ -67,11 +90,17 @@ do {int c=0;\
 /* (I hope) we dont need to worry about zeroing fp->_base */
 #define FCLOSE_SETBUF_OK 
 
-/* #define or #undef this to your taste */
-/* #define SGC */
-#undef SGC
 
-/* This is based on powerpc-linux.h. */
+/**** enable stratified garbage collection */
+
+#define SGC
+#define SIGPROTV SIGBUS
+
+
+/**** cache synchronization code */
+
+/* This is based on powerpc-linux.h.  See equivalent code in dyld. */
+
 #define CLEAR_CACHE_LINE_SIZE 32
 #define CLEAR_CACHE \
 do {\
@@ -84,3 +113,19 @@ do {\
 
 #define SEEK_TO_END_OFILE(fp) seek_to_end_ofile(fp)
 /* extern int seek_to_end_ofile(FILE *fp); */
+
+#undef malloc
+#define malloc my_malloc
+
+#undef free
+#define free my_free
+
+#undef realloc
+#define realloc my_realloc
+
+#undef valloc
+#define valloc my_valloc
+
+#undef calloc
+#define calloc my_calloc
+
