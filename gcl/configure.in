@@ -615,8 +615,18 @@ if test "$enable_statsysbfd" = "yes" || test "$enable_dynsysbfd" = "yes" ; then
 		echo 'int main() {bfd_init();bfd_openr("/dev/null",0);return 0;}' >foo.c
 		MP=`$CC [ -Wl,-M ] -static -o foo foo.c -lbfd -liberty 2>&1 | tr '()' '\012\012' | $AWK '{print $NF}' | sort | uniq`
 		rm -f foo.c foo
-		TLIBS="$TLIBS `echo $MP | tr ' ' '\012' | grep libbfd.a`"
-		TLIBS="$TLIBS `echo $MP | tr ' ' '\012' | grep libiberty.a`"
+		if echo $MP | tr ' ' '\012' | grep -q libbfd.a ; then
+		   TLIBS="$TLIBS `echo $MP | tr ' ' '\012' | grep libbfd.a`"
+		else
+		   echo Guessing path to libbfd.a due to gcc bug
+		   TLIBS="$TLIBS /usr/lib/libbfd.a"
+		fi   
+		if echo $MP | tr ' ' '\012' | grep -q libiberty.a ; then
+		   TLIBS="$TLIBS `echo $MP | tr ' ' '\012' | grep libiberty.a`"
+		else
+		   echo Guessing path to libiberty.a due to gcc bug
+		   TLIBS="$TLIBS /usr/lib/libiberty.a"
+		fi   
 	else
 		TLIBS="$TLIBS -lbfd -liberty"
 	fi
