@@ -136,7 +136,6 @@ char *filename;
 	unsigned int i;
 	FILE *fp;
 	int symsize;
-	extern char *malloc();
 	
         
 	fp = fopen(filename, RDONLY);

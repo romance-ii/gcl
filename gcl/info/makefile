@@ -1,7 +1,7 @@
 .SUFFIXES:
 .SUFFIXES: .info .dvi  .texi
 
-INFO_DIR=/usr/local/lib/info
+INFO_DIR=${prefix}/lib/info
 
 GCL_DVI=gcl-tk.dvi gcl-si.dvi gcl.dvi
 GCL_HTML=gcl-si_toc.html gcl-tk_toc.html gcl_toc.html

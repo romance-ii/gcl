@@ -71,8 +71,9 @@ gclcvs (2.7.0-16) unstable; urgency=low
   * Remove generated files from working part of repository, .c, .h, and
     .data source for the mod, pcl, and clcs subsystems are now found in
     the c subdir of the respective dir
+  * Some FreeBSD cleanups
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  3 Dec 2003 14:56:04 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  3 Dec 2003 16:02:36 +0000
 
 gclcvs (2.7.0-15) unstable; urgency=low
 

@@ -1,4 +1,6 @@
+#ifndef BSD
 #define BSD 1
+#endif
 #define UNIX
 #define AV
 #define SFASL
