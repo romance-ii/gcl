@@ -94,8 +94,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * plttest.c cannot depend on include.h
   * Address longstanding FIXmE in gensym, so that two strings are not
     allocated for each gensym
+  * Fix rare infinite loop bug in array.c
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 02:12:34 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 02:15:43 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

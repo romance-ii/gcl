@@ -1069,6 +1069,7 @@ Icheck_displaced(object displaced_list, object ar, int dim)
 { 
   while (displaced_list!=Cnil)
     { object u = Mcar(displaced_list);
+      displaced_list = Mcdr(displaced_list);
       if (u->a.a_self == NULL) continue;
       if ((Iarray_element_type(u) == aet_bit &&
 	   (u->bv.bv_self - ar->bv.bv_self)*BV_BITS +u->bv.bv_dim -dim
@@ -1076,7 +1077,6 @@ Icheck_displaced(object displaced_list, object ar, int dim)
 	  || (ARRAY_BODY_PTR(u,u->a.a_dim) > ARRAY_BODY_PTR(ar,dim)))
 	FEerror("Bad displacement",0);
       Icheck_displaced(DISPLACED_FROM(u),ar,dim);
-      displaced_list = Mcdr(displaced_list);
     }
 }
 
