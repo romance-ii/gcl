@@ -108,8 +108,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * rebuild pcl_gaz* files
   * cleanup room report and give more space to modern large heaps
   * room report formatting
+  * Add old test failures to misc.lsp
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 21 Mar 2004 16:06:43 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 21 Mar 2004 16:06:56 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
