@@ -129,9 +129,11 @@
 
 	 :SIZE is used only in Genera and Allegro.]"
 
-  (sloop for option in options
-	unless (member option '(:documentation :size :nicknames :shadow :shadowing-import-from :use :import-from :intern :export :export-from))
-	  do (cerror "Proceed, ignoring this option." "~s is not a valid DEFPACKAGE option." option))
+  (sloop for option in options 
+	 unless (member 
+		 (first option) 
+		 '(:documentation :size :nicknames :shadow :shadowing-import-from :use :import-from :intern :export :export-from))
+	 do (cerror "Proceed, ignoring this option." "~s is not a valid option." option))
   (labels ((option-test (arg1 arg2) (when (consp arg2) (equal (car arg2) arg1)))
 	   (option-values-list (option options)
 	     (sloop for result = (member option options ':test #'option-test)
