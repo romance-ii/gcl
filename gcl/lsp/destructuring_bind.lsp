@@ -10,6 +10,8 @@
 
 (in-package 'lisp)
 
+(export '(destructuring-bind))
+
 (defvar *arg-tests* ()
   "A list of tests that do argument counting at expansion time.")
 
