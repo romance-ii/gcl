@@ -258,7 +258,7 @@ case $use in
 # def_static -- Function descriptors are currently realized at runtime in a non-reproducible fashion
 # on these architectures -- CM			
 		ia64*)
-			def_dlopen="yes" ; def_statsysbfd="no" ; def_static = "yes" ;;
+			def_dlopen="yes" ; def_statsysbfd="no" ; def_static="yes" ;;
 		hppa*)
 			def_dlopen="yes" ; def_statsysbfd="no" def_pic="yes" ;;
 #		m68k*)
@@ -730,8 +730,8 @@ AC_MSG_CHECKING(sizeof struct contblock)
 AC_TRY_RUN([#include <stdio.h>
 	#define EXTER
 	#include "$MP_INCLUDE"
-	#include "h/enum.h"
-	#include "h/object.h"
+	#include "`pwd`/h/enum.h"
+	#include "`pwd`/h/object.h"
 	int main(int argc,char **argv,char **envp) {
 	FILE *f=fopen("conftest1","w");
 	fprintf(f,"%u",sizeof(struct contblock));
