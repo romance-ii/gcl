@@ -38,8 +38,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
     marked ccb, mark all the clb tags therein ccb too, as the tagbody
     environment will be consed in c2tagbody-ccb.  FIXME -- review this
     logic carefully
+  * fix typoe in o/sfaslbfd.c
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 28 Feb 2004 19:39:28 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 28 Feb 2004 20:16:49 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

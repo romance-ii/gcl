@@ -205,7 +205,7 @@ fasload(object faslfile) {
 
     dum.sm.t=t_stream;
     dum.sm.sm_mode=smm_input;
-    dum.sm.sm_object0=sLsting_char;
+    dum.sm.sm_object0=sLstring_char;
 
     link_callbacks.add_archive_element=madd_archive_element;
     link_callbacks.multiple_definition=mmultiple_definition;
