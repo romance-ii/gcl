@@ -10,8 +10,9 @@ gclcvs (2.7.0-37) unstable; urgency=low
   * track bounded-type propataion via the function symbol plist keyed to
     result-type-from-bounded-args rather in the per inline record, as it
     is more general and pertains to the function alone
+  * expand type propation facility
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 17 Dec 2004 21:27:54 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 17 Dec 2004 21:30:16 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 

@@ -130,20 +130,31 @@
 	    (t  (error "Cannot promote type ~S to C type~%" type)))
     type)))
 
-(defun super-range (f t1 t2)
-  (and
-   (bounded-type t1)
-   (bounded-type t2)
-   (eq (car t1) (car t2))
-   (let ((a (funcall (symbol-function f) (cadr t1) (cadr t2)))
-	 (b (funcall (symbol-function f) (cadr t1) (caddr t2)))
-	 (c (funcall (symbol-function f) (caddr t1) (cadr t2)))
-	 (d (funcall (symbol-function f) (caddr t1) (caddr t2))))
-     (list (car t1) (min a b c d) (max a b c d)))))
-	 
+(defun coerce-to-bounded-type (t1)
+  (if (bounded-type t1) t1
+    (let ((t1 (si::normalize-type t1)))
+      (if (bounded-type t1) t1))))
+
+(defun super-range (f ot1 ot2)
+  (let ((t1 (coerce-to-bounded-type ot1))
+	(t2 (coerce-to-bounded-type ot2)))
+    (and t1
+	 (if ot2
+	     (and 
+	      t2
+	      (eq (car t1) (car t2))
+	      (let ((a (funcall (symbol-function f) (cadr t1) (cadr t2)))
+		    (b (funcall (symbol-function f) (cadr t1) (caddr t2)))
+		    (c (funcall (symbol-function f) (caddr t1) (cadr t2)))
+		    (d (funcall (symbol-function f) (caddr t1) (caddr t2))))
+		(list (car t1) (min a b c d) (max a b c d))))
+	     (let ((a (funcall (symbol-function f) (cadr t1)))
+		   (b (funcall (symbol-function f) (caddr t1))))
+	       (list (car t1) (min a b) (max a b)))))))
+
 (defun bounded-type (type)
   (and (consp type)
-       (eql (length type) 3)
+       (= (length type) 3)
        (member (car type) '(integer signed-byte unsigned-byte) :test #'eq)
        (integerp (cadr type))
        (integerp (caddr type))))
@@ -168,9 +179,15 @@
         ((eq type2 t) type1)
 	((eq type2 '*) type1)
 	((or (bounded-type type1) (bounded-type type2))
-	 (cond ((subtypep type1 type2) type1)
-	       ((subtypep type2 type1) type2)
-	       (t nil)))
+	 (let ((t12 (and (subtypep type1 type2) type1))
+	       (t21 (and (subtypep type2 type1) type2)))
+	   (or (and t12 t21)
+	       t12 t21
+	       (let ((ct1 (coerce-to-bounded-type type1))
+		     (ct2 (coerce-to-bounded-type type2)))
+		 (and ct1 ct2
+		      (eq (car ct1) (car ct2))
+		      (list (car ct1) (max (cadr ct1) (cadr ct2)) (min (caddr ct1) (caddr ct2))))))))
         ((consp type1)
          (case (car type1)
                (array
