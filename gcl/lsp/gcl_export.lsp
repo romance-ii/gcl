@@ -149,6 +149,7 @@ get-setf-method-multiple-value
 get-universal-time
 getf
 ignore
+ignorable
 incf
 inspect
 intersection

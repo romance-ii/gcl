@@ -105,7 +105,9 @@
 		       (eq t (var-type var)))
 		   (setf (var-loc var) 'object))
               (setf (var-kind var) 'LEXICAL)))
-       (when (member name ignores) (setf (var-ref var) 'IGNORE))
+       (let ((ign (member name ignores)))
+        (when ign
+         (setf (var-ref var) (if (eq (cadr ign) 'ignorable) 'IGNORABLE 'IGNORE))))
        var)
   )
 

@@ -11,8 +11,9 @@ gclcvs (2.7.0-9) unstable; urgency=low
     proper fixnum/integer determination from declarations later
   * eliminate duplicate predicate calls in list-merge-srot in
     gcl_seqlib.lsp
+  * declare ignorable support
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 10 Oct 2003 02:54:28 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 10 Oct 2003 02:55:41 +0000
 
 gclcvs (2.7.0-8) unstable; urgency=low
 

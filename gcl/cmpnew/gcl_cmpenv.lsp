@@ -340,7 +340,7 @@
                (if (symbolp fun)
                    (si:putprop fun t 'cmp-notinline)
                    (warn "The function name ~s is not a symbol." fun))))
-    ((object ignore)
+    ((object ignore ignorable)
      (dolist** (var (cdr decl))
        (unless (symbolp var)
                (warn "The variable name ~s is not a symbol." var))))
@@ -404,11 +404,13 @@
                     "The special declaration ~s contains a non-symbol ~s."
                     decl var)
              (push var ss)))
-          (ignore
+          ((ignore ignorable)
            (dolist** (var (cdr decl))
              (cmpck (not (symbolp var))
                     "The ignore declaration ~s contains a non-symbol ~s."
                     decl var)
+             (when (eq (car decl) 'ignorable)
+               (push 'ignorable is))
              (push var is)))
           (type
            (cmpck (endp (cdr decl))
@@ -561,8 +563,8 @@
       (cmpwarn "Type declaration was found for not bound variable ~s."
                (car x))))
   (dolist** (x is)
-    (unless (member x vnames)
-      (cmpwarn "Ignore declaration was found for not bound variable ~s." x)))
+    (unless (or (eq x 'ignorable) (member x vnames))
+      (cmpwarn "Ignore/ignorable declaration was found for not bound variable ~s." x)))
   )
 
 (defun proclamation (decl)
@@ -642,7 +644,7 @@
                  (if (symbolp fun)
                      (unless (get fun 'cmp-notinline) (return nil))
                      (warn "The function name ~s is not a symbol." fun))))
-    ((object ignore)
+    ((object ignore ignorable)
      (dolist** (var (cdr decl) t)
                (unless (symbolp var)
                        (warn "The variable name ~s is not a symbol." var))))
