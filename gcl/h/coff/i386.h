@@ -150,7 +150,7 @@ struct external_syment
   char e_numaux[1];
 };
 
-#ifndef MINGW
+#if !defined(MINGW) && !defined(__CYGWIN__)
 
 #define N_BTMASK	(0xf)
 #define N_TMASK		(0x30)
