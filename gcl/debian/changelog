@@ -11,8 +11,9 @@ gcl (2.5.0.cvs20020625-61) unstable; urgency=low
   * Maximum values increased to 50
   * Enable previously failing tests in multiple-value-{setq,prog1}.lsp
   * prototype for system_time_zone_helper
+  * Initial changes for solaris support
 
- -- Camm Maguire <camm@m.enhanced.com>  Sat, 26 Oct 2002 20:14:55 -0400
+ -- Camm Maguire <camm@m.enhanced.com>  Sun, 27 Oct 2002 18:33:40 -0500
 
 gcl (2.5.0.cvs20020625-60) unstable; urgency=low
 

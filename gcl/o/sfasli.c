@@ -55,7 +55,7 @@ build_symbol_table_bfd(void) {
     FEerror("Cannot canonicalize self's symtab");
   for (u=0;u<v;u++) {
     char *c;
-    if ((c=(char *)strstr(q[u]->name,"@@GLIBC"))) {
+    if ((c=(char *)strstr(q[u]->name,"@@"))) {
       struct bfd_link_hash_entry *h;
       *c=0;
       if (!(h=bfd_link_hash_lookup(link_info.hash,q[u]->name,true,true,true)))

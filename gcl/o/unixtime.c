@@ -47,13 +47,13 @@ which is usually 60 maybe 100 or something else. */
 #undef BSD
 #define ATT
 #endif
-#if defined __MINGW32__ || defined __GNUC__
+#if defined __MINGW32__ || !defined NO_SYSTEM_TIME_ZONE
 #ifdef __MINGW32__
 #include <sys/timeb.h>
 int usleep ( unsigned int microseconds );
 #endif
 void siLget_system_time_zone(void);
-#endif /* __MINGW32__ and __GNUC__ */
+#endif /* __MINGW32__ or  !defined NO_SYSTEM_TIME_ZONE */
 
 #ifdef BSD
 #include <time.h>
@@ -177,7 +177,7 @@ DEFUN("GET-INTERNAL-REAL-TIME",object,fLget_internal_real_time,LISP,0,0,NONE,OO,
 #endif
 }
 
-#if defined __MINGW32__ || defined __GNUC__
+#if defined __MINGW32__ || !defined NO_SYSTEM_TIME_ZONE
 DEFVAR("*DEFAULT-TIME-ZONE*",sSAdefault_time_zoneA,SI,make_fixnum ( system_time_zone_helper() ),"");
 #else
 DEFVAR("*DEFAULT-TIME-ZONE*",sSAdefault_time_zoneA,SI,make_fixnum(TIME_ZONE),"");
@@ -197,7 +197,7 @@ init_unixtime(void)
 
 	make_function("SLEEP", Lsleep);
 	make_function("GET-INTERNAL-RUN-TIME", Lget_internal_run_time);
-#if defined __MINGW32__   || defined __GNUC__
+#if defined __MINGW32__   || !defined NO_SYSTEM_TIME_ZONE
 	make_si_function("GET-SYSTEM-TIME-ZONE", siLget_system_time_zone);
 #endif        
 }
@@ -226,7 +226,7 @@ int system_time_zone_helper(void)
 #endif
 
 /* At GCC 3.2, Mingw struct tm does not include tm_gmtoff so avoid this version */
-#if defined ( __GNUC__ ) && !defined ( __MINGW32__ )
+#if !defined NO_SYSTEM_TIME_ZONE && !defined ( __MINGW32__ )
 int system_time_zone_helper(void){
   
   struct tm *local;
@@ -241,9 +241,9 @@ int system_time_zone_helper(void){
   else
     return(- (nsecs / 60 / 60));
 }
-#endif /*__GNUC__*/
+#endif /* !defined NO_SYSTEM_TIME_ZONE */
 
-#if defined __MINGW32__ || defined __GNUC__
+#if defined __MINGW32__ || !defined NO_SYSTEM_TIME_ZONE 
 void
 siLget_system_time_zone(void)
 {
@@ -251,4 +251,4 @@ siLget_system_time_zone(void)
   vs_push ( make_fixnum ( system_time_zone_helper() ) );
 }
 
-#endif /*__MINGW32__ and __GNUC__ */
+#endif /*__MINGW32__ or !defined NO_SYSTEM_TIME_ZONE */

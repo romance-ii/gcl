@@ -1235,7 +1235,7 @@ cfree(void *ptr) {
 
 #ifndef GNUMALLOC
 void *
-memalign(long align,size_t size) { 
+memalign(size_t align,size_t size) { 
   object x = alloc_simple_string(size);
   x->st.st_self = ALLOC_ALIGNED(alloc_contblock,size,align);
   malloc_list = make_cons(x, malloc_list);

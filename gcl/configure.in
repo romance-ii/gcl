@@ -252,19 +252,37 @@ AC_ARG_ENABLE(dynsysgmp,
 
 load_opt="0"
 if test "$enable_dlopen" = "yes" ; then
-	load_opt=$(($load_opt+1))
+   load_opt=1
 fi
 if test "$enable_statsysbfd" = "yes" ; then
-	load_opt=$(($load_opt+1))
+   case $load_opt in
+   0) load_opt=1;;
+   1) load_opt=2;;
+   esac
 fi
 if test "$enable_dynsysbfd" = "yes" ; then
-	load_opt=$(($load_opt+1))
+   case $load_opt in
+   0) load_opt=1;;
+   1) load_opt=2;;
+   2) load_opt=3;;
+   esac
 fi
 if test "$enable_locbfd" = "yes" ; then
-	load_opt=$(($load_opt+1))
+   case $load_opt in
+   0) load_opt=1;;
+   1) load_opt=2;;
+   2) load_opt=3;;
+   3) load_opt=4;;
+   esac
 fi
 if test "$enable_custreloc" = "yes" ; then
-	load_opt=$(($load_opt+1))
+   case $load_opt in
+   0) load_opt=1;;
+   1) load_opt=2;;
+   2) load_opt=3;;
+   3) load_opt=4;;
+   4) load_opt=5;;
+   esac
 fi
 
 if test "$load_opt" != "1" ; then
