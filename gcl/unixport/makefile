@@ -48,7 +48,7 @@ OOBJS= 	main.o alloc.o gbc.o bitop.o typespec.o eval.o macros.o lex.o bds.o \
 	nfunlink.o usig.o usig2.o utils.o makefun.o sockets.o  clxsocket.o init_pari.o \
 	nsocket.o $(RL_OBJS) new_init.o
 
-OBJS=  $(addprefix $(ODIR)/,$(OOBJS)) $(SFASL) $(EXTRAS) 
+OBJS=  $(addprefix $(ODIR)/,$(OOBJS)) $(SFASL) #$(EXTRAS) 
 
 LLSPOBJS=defmacro.o evalmacros.o top.o module.o predlib.o setf.o \
 	 arraylib.o assert.o defstruct.o describe.o iolib.o listlib.o \
@@ -108,8 +108,8 @@ libgcl.a: $(FIRST_FILE) $(OBJS) $(LSPOBJS) $(CMPOBJS) sys_gcl.o $(LAST_FILE) gmp
 	rm -rf $@
 	ar rs $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
-raw_$(SYSTEM): libgcl.a libgclp.a $(SYSTEM_OBJS)
-	$(CC) -o raw_$(SYSTEM)$(EXE) $(filter %.o,$^) -L. $(LD_LIBS)
+raw_$(SYSTEM): libgcl.a libgclp.a $(SYSTEM_OBJS) $(EXTRAS)
+	$(CC) -o raw_$(SYSTEM)$(EXE) $(filter %.o,$^) -L. $(EXTRA_LD_LIBS) $(LD_LIBS)
 
 sys_gcl.o: sys_gcl.c $(HDIR)/object.h $(HDIR)/config.h
 	$(CC) $(CFLAGS) -c -I$(HDIR) sys_gcl.c

@@ -18,8 +18,9 @@ gcl (2.5.0.cvs20020625-58) unstable; urgency=low
   * Fix number of argument errors in debug.lsp;documentation support for
     packages in defpackage.lsp and module.lsp;do-symbols loops over
     inherited symbols too in packlib.lsp
+  * Reworked EXTRAS variable handling in unixport/makefile
 
- -- Camm Maguire <camm@m.enhanced.com>  Tue, 15 Oct 2002 10:51:04 -0400
+ -- Camm Maguire <camm@m.enhanced.com>  Tue, 15 Oct 2002 14:38:22 -0400
 
 gcl (2.5.0.cvs20020625-57) unstable; urgency=low
 
