@@ -12,6 +12,13 @@
 This is a Texinfo GCL TK Manual
 
 Copyright 1994 William F. Schelter
+
+@format
+INFO-DIR-SECTION GNU Common Lisp
+START-INFO-DIR-ENTRY
+* gcl-tk: (gcl-tk.info). GNU Common Lisp Tk Manual
+END-INFO-DIR-ENTRY
+@end format
 @end ifinfo
 
 @titlepage

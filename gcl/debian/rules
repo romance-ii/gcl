@@ -82,10 +82,10 @@ binary-indep: build install
 	dh_testroot -i
 	dh_installdocs -i
 	dh_installinfo -i
-	cat debian/gcl-doc.postinst.debhelper | \
-		sed -e 's/\(--quiet .*gcl-si\)/--section "GNU Common Lisp" "GNU Common Lisp" --description="GNU Common Lisp System Internals." \1/1' \
-		    -e 's/\(--quiet .*gcl-tk\)/--section "GNU Common Lisp" "GNU Common Lisp" --description="GNU Common Lisp Tk Manual." \1/1' >debian/foo && \
-		mv debian/foo debian/gcl-doc.postinst.debhelper
+#	cat debian/gcl-doc.postinst.debhelper | \
+#		sed -e 's/\(--quiet .*gcl-si\)/--section "GNU Common Lisp" "GNU Common Lisp" --description="GNU Common Lisp System Internals." \1/1' \
+#		    -e 's/\(--quiet .*gcl-tk\)/--section "GNU Common Lisp" "GNU Common Lisp" --description="GNU Common Lisp Tk Manual." \1/1' >debian/foo && \
+#		mv debian/foo debian/gcl-doc.postinst.debhelper
 #	perl -pi -e 's/--quiet .*gcl-si/--section "GNU Common Lisp" "GNU Common Lisp" --description="GNU Common Lisp System Internals." $$&/; s/--quiet .*gcl-tk/--section "GNU Common Lisp" "GNU Common Lisp" --description="GNU Common Lisp Tk Manual." $$&/'  
 	dh_installchangelogs ChangeLog -i
 	dh_link -i
