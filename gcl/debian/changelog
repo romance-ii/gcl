@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-37) unstable; urgency=high
+
+  * Replace tmpnam and mktemp with less dangerous mkstemp
+
+ -- Camm Maguire <camm@enhanced.com>  Fri,  9 Aug 2002 19:45:52 -0400
+
 gcl (2.5.0.cvs20020625-36) unstable; urgency=high
 
   * Fix rsym compilation when not using bfd

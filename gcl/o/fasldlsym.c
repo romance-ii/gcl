@@ -72,10 +72,10 @@ fasload(faslfile)
   coerce_to_filename(truename(faslfile), filename);
   if (count == 0)
     count = time(0);
-  sprintf(buf,"/tmp/ufas%dxXXXXXX",count++);
+  snprintf(buf,sizeof(buf),"/tmp/ufas%dxXXXXXX",count++);
   /* this is just to allow reloading in the same file twice.
    */
-  mktemp(buf);
+  mkstemp(buf);
   symlink(filename,buf);
   { struct name_list *nl=
       (void *) malloc(strlen(buf)+sizeof(struct name_list));

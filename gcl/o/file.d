@@ -363,10 +363,12 @@ object if_exists, if_does_not_exist;
 			    sprintf(buf,"%s.gz",fname);
 			    fp = fopen(buf,"r");
 			    if (fp)
-			      { char *tmp;
+			      { char tmp[200];
 				char command [500];
 				fclose(fp);
-				tmp = tmpnam(0);
+				/*tmp = tmpnam(0);*/
+				snprintf(tmp,sizeof(tmp),"uzipXXXXXX");
+				mkstemp(tmp); /* fixme: catch errors */
 				unzipped = make_simple_string(tmp);
 				sprintf(command,"gzip -dc %s > %s",buf,tmp);
 				fp = 0;
