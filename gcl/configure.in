@@ -304,9 +304,10 @@ if test "$enable_bfd" = "yes" ; then
 	AC_CHECK_HEADER(bfd.h,
 		AC_CHECK_LIB(bfd,bfd_init,
 			echo 'int main() {bfd_init();bfd_openr("/dev/null",0);return 0;}' >foo.c
-			MP=`$GCC -t -static -o foo foo.c -lbfd -liberty 2>&1 `
-			BFDLIB=`echo $MP | tr '()' '\012\012' | sort | uniq | grep libbfd.a`
-			IBRLIB=`echo $MP | tr '()' '\012\012' | sort | uniq | grep libiberty.a`
+			MP=`$GCC [[ -Wl,-M ]] -static -o foo foo.c -lbfd -liberty 2>&1 | tr '()' '\012\012' | $AWK '{print $NF}' | sort | uniq`
+			rm -f foo.c foo
+			BFDLIB=`echo $MP | tr ' ' '\012' | grep libbfd.a`
+			IBRLIB=`echo $MP | tr ' ' '\012' | grep libiberty.a`
 #
 # Old binutils appear to need CONST defined to const
 #
@@ -768,7 +769,7 @@ if { [file exists [file join [set dir] tclConfig.sh]] } {
   }
 ]
 EOF
-cp conftest.tcl foo.tcl
+#cp conftest.tcl foo.tcl
 
 AC_CHECK_PROG(TCLSH,tclsh,tclsh,${TCLSH})
 #AC_CHECK_PROG(TCLSH,tclsh8.0,tclsh8.0,${TCLSH})

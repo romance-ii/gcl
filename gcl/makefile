@@ -130,8 +130,8 @@ install1:
 	rm -f $(DESTDIR)${prefix}/bin/gcl.exe
 	tar cf - $(PORTDIR)/$(FLISP)$(EXE) info/*.info* ${LISP_LIB} \
 	gcl-tk/gcl.tcl gcl-tk/gcltkaux$(EXE)  |  (cd $(DESTDIR)${INSTALL_LIB_DIR} ;tar xf -)
-	ln ${SYMB} ${INSTALL_LIB_DIR}/$(PORTDIR)/$(FLISP)$(EXE) \
-	 $(DESTDIR)${prefix}/bin/gcl.exe
+#	ln ${SYMB} ${INSTALL_LIB_DIR}/$(PORTDIR)/$(FLISP)$(EXE) \
+#	 $(DESTDIR)${prefix}/bin/gcl.exe
 	if [ -d "${TK_CONFIG_PREFIX}" ] ; then  \
 	cat gcl-tk/gcltksrv$(BAT) | \
 	sed -e "s!GCL_TK_DIR=.*!GCL_TK_DIR=${INSTALL_LIB_DIR}/gcl-tk!g"  \
