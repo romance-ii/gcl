@@ -1414,6 +1414,24 @@ init_num_co()
 	make_constant("LONG-FLOAT-NEGATIVE-EPSILON",
 		      make_longfloat(double_negative_epsilon));
 
+	/* Normalized constants added, CM */
+	make_constant("LEAST-POSITIVE-NORMALIZED-SHORT-FLOAT",
+		      make_shortfloat(smallest_float));
+	make_constant("LEAST-NEGATIVE-NORMALIZED-SHORT-FLOAT",
+		      make_shortfloat(-smallest_float));
+	make_constant("LEAST-POSITIVE-NORMALIZED-SINGLE-FLOAT",
+		      make_longfloat(smallest_double));
+	make_constant("LEAST-NEGATIVE-NORMALIZED-SINGLE-FLOAT",
+		      make_longfloat(-smallest_double));
+	make_constant("LEAST-POSITIVE-NORMALIZED-DOUBLE-FLOAT",
+		      make_longfloat(smallest_double));
+	make_constant("LEAST-NEGATIVE-NORMALIZED-DOUBLE-FLOAT",
+		      make_longfloat(-smallest_double));
+	make_constant("LEAST-POSITIVE-NORMALIZED-LONG-FLOAT",
+		      make_longfloat(smallest_double));
+	make_constant("LEAST-NEGATIVE-NORMALIZED-LONG-FLOAT",
+		      make_longfloat(-smallest_double));
+
 	plus_half = make_ratio(small_fixnum(1), small_fixnum(2));
 	enter_mark_origin(&plus_half);
 
