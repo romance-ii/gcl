@@ -10,6 +10,8 @@
     Aurelien Chanudet <aurelien.chanudet(at)m4x.org>
 */
 
+/* For those who are using ACL2, please remember to enlarge your shell stack (ulimit -s 8192).  */
+
 #include "bsd.h"
 
 #define DARWIN
@@ -32,10 +34,6 @@ extern char *mach_maplimit;
 extern char *mach_brkpt;
 
 extern char *get_dbegin ();
-
-/* Where data begin.  */
-#undef DBEGIN
-#define DBEGIN mach_mapstart
 
 #undef SET_REAL_MAXPAGE
 #define SET_REAL_MAXPAGE { my_sbrk(0); real_maxpage = (int) mach_maplimit/PAGESIZE; }
@@ -72,10 +70,9 @@ extern char *my_sbrk(int incr);
 #ifdef HAVE_LIBBFD
 #define SEPARATE_SFASL_FILE "sfaslbfd.c"
 #else
+#define SPECIAL_RSYM "rsym_macosx.c"
 #define SEPARATE_SFASL_FILE "sfaslmacosx.c"
 #endif
-
-#define SPECIAL_RSYM "rsym_macosx.c"
 
 /* The file has non Mach-O stuff appended.  We need to know where the Mach-O stuff ends.  */
 #define SEEK_TO_END_OFILE(fp) seek_to_end_ofile(fp)
@@ -93,7 +90,7 @@ do {                                                                            
 } while(0)
 
 
-/** Stratified garbage collection implementation  */
+/** Stratified garbage collection implementation [ (si::sgc-on t) ]  */
 
 /* Mac OS X has sigaction (this is needed in o/usig.c)  */
 #define HAVE_SIGACTION
@@ -115,18 +112,53 @@ if (sigaltstack(&estack, 0) < 0)                    \
     perror("sigaltstack");                          \
 }
 
-#define INSTALL_SEGMENTATION_CATCHER                \
-(void) gcl_signal(SIGSEGV, segmentation_catcher);   \
-(void) gcl_signal(SIGBUS, segmentation_catcher)
-
 #define SGC
-#define SIGPROTV SIGBUS
+
+#define MPROTECT_ACTION_FLAGS (SA_SIGINFO | SA_RESTART)
+
+#define INSTALL_MPROTECT_HANDLER                        \
+do {                                                    \
+  static struct sigaction sact;                         \
+  sigfillset (&(sact.sa_mask));                         \
+  sact.sa_flags = MPROTECT_ACTION_FLAGS;                \
+  sact.sa_sigaction = (void (*) ()) memprotect_handler; \
+  sigaction (SIGBUS, &sact, 0);                         \
+  sigaction (SIGSEGV, &sact, 0);                        \
+} while (0);
+
+#define INSTALL_SEGMENTATION_CATCHER                \
+  (void) signal (SIGSEGV, segmentation_catcher);    \
+  (void) signal (SIGBUS, segmentation_catcher)
 
 /* si_addr not containing the faulting address is a bug in Darwin.
    Work around this by looking at the dar field of the exception state.  */
 #define GET_FAULT_ADDR(sig,code,scp,addr) ((char *) (((ucontext_t *) scp)->uc_mcontext->es.dar))
 
-#define MPROTECT_ACTION_FLAGS (SA_SIGINFO | SA_RESTART)
+/*
+#include <signal.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <sys/ucontext.h>
+
+void handler (int sig, siginfo_t *info, void *scp)
+{
+     ucontext_t *uc = (ucontext_t *)scp;
+     fprintf(stderr, "addr = 0x%08lx\n", uc->uc_mcontext->es.dar);
+     _exit(99);
+}
+
+int main(void)
+{
+     struct sigaction sact;
+     int ret;
+
+     sigfillset(&(sact.sa_mask));
+     sact.sa_flags = SA_SIGINFO;
+     sact.sa_sigaction = (void (*)())handler;
+     ret = sigaction (SIGBUS, &sact, 0);
+     return *(int *)0x43;
+}
+*/
 
 
 /** Misc stuff  */
@@ -145,17 +177,17 @@ do {int c=0;                                                            \
 /* We (hopefully) dont need to worry about zeroing fp->_base.  */
 #define FCLOSE_SETBUF_OK 
 
-#define GET_FULL_PATH_SELF(a_)                                  \
-do {                                                            \
-extern int _NSGetExecutablePath (char *, unsigned long *);      \
-unsigned long bufsize = 1024;                                   \
-static char buf [1024];                                         \
-static char fub [1024];                                         \
-if (_NSGetExecutablePath (buf, &bufsize) != 0) {                \
-    error ("_NSGetExecutablePath failed");                      \
-}                                                               \
-if (realpath (buf, fub) == 0) {                                 \
-    error ("realpath failed");                                  \
-}                                                               \
-(a_) = fub;                                                     \
+#define GET_FULL_PATH_SELF(a_)                              \
+do {                                                        \
+extern int _NSGetExecutablePath (char *, unsigned long *);  \
+unsigned long bufsize = 1024;                               \
+static char buf [1024];                                     \
+static char fub [1024];                                     \
+if (_NSGetExecutablePath (buf, &bufsize) != 0) {            \
+    error ("_NSGetExecutablePath failed");                  \
+}                                                           \
+if (realpath (buf, fub) == 0) {                             \
+    error ("realpath failed");                              \
+}                                                           \
+(a_) = fub;                                                 \
 } while (0)
