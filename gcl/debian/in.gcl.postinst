@@ -1,0 +1,54 @@
+#!/bin/sh
+CONFIGFILE=/etc/default/gcl@EXT@
+set -e
+. /usr/share/debconf/confmodule
+
+if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ] ; then
+
+# Generate config file, if it doesn't exist.
+# An alternative is to copy in a template
+# file from elsewhere.
+if [ ! -e $CONFIGFILE ]; then
+    echo "# Config file for my package" > $CONFIGFILE
+    echo "DEFAULT_GCL_ANSI=" >> $CONFIGFILE
+a   echo "DEFAULT_GCL_PROF=" >> $CONFIGFILE
+fi
+
+# Substitute in the values from the debconf db.
+# There are obvious optimizations possible here.
+# The cp before the sed ensures we do not mess up
+# the config file's ownership and permissions.
+
+db_get gcl@EXT@/default_gcl_ansi
+
+if [ "$RET" = "true" ] ; then 
+DEFAULT_GCL_ANSI=t
+else
+DEFAULT_GCL_ANSI=
+fi
+
+db_get gcl@EXT@/default_gcl_prof
+
+if [ "$RET" = "true" ] ; then 
+DEFAULT_GCL_PROF=y
+else
+DEFAULT_GCL_PROF=
+fi
+
+cp -a -f $CONFIGFILE $CONFIGFILE.tmp
+
+# If the admin deleted or commented some variables but then set
+# them via debconf, (re-)add them to the conffile.
+test -z "$DEFAULT_GCL_ANSI" || grep -Eq '^ *DEFAULT_GCL_ANSI=' $CONFIGFILE.tmp || echo "DEFAULT_GCL_ANSI=" >> $CONFIGFILE
+test -z "$DEFAULT_GCL_PROF" || grep -Eq '^ *DEFAULT_GCL_PROF=' $CONFIGFILE.tmp || echo "DEFAULT_GCL_PROF=" >> $CONFIGFILE
+
+sed -e "s/^ *DEFAULT_GCL_ANSI=.*/DEFAULT_GCL_ANSI=\"$DEFAULT_GCL_ANSI\"/" \
+    -e "s/^ *DEFAULT_GCL_PROF=.*/DEFAULT_GCL_PROF=\"$DEFAULT_GCL_PROF\"/" \
+    < $CONFIGFILE > $CONFIGFILE.tmp
+mv -f $CONFIGFILE.tmp $CONFIGFILE
+
+fi
+
+#DEBHELPER#
+
+exit 0
