@@ -82,6 +82,9 @@
         (import (list s) "COMMON-LISP")
         (import (list s) "USER"))))
 
+(use-package "ANSI-LOOP" "COMMON-LISP")
+(use-package "ANSI-LOOP" "USER")
+
 (do-symbols (s "COMMON-LISP")
   (export (list s) "COMMON-LISP"))
   
@@ -91,8 +94,10 @@
 (unintern 'lisp_unexport)
 (unintern 'int)
 
+(push ':ansi-cl *features*)
 
-(rename-package 'common-lisp 'common-lisp '(cl))
+(rename-package 'common-lisp 'common-lisp '(cl))
 (rename-package 'user 'common-lisp-user '(cl-user user))
 
 (si::save-system "saved_ansi_gcl")
+
