@@ -57,5 +57,24 @@ EXTRAS       = ${ODIR}/mingwin.o ${ODIR}/mingfile.o
 
 # Work around install problem caused by non-support of GCL TK
 # on Windows platforms.
-TK_LISP_LIB  =
-TCL_EXES     =
+
+TK_CONFIG_PREFIX=
+TK_LIBRARY=
+TCL_LIBRARY=
+TK_XINCLUDES=
+TK_INCLUDE=
+TCL_INCLUDE=
+TK_LIB_SPEC=
+TK_BUILD_LIB_SPEC=
+TK_XLIBSW=
+TK_XINCLUDES=
+TCL_LIB_SPEC=
+TCL_DL_LIBS=
+TCL_LIBS=
+TK_LISP_LIB=
+TCL_EXES=
+
+# Don't do dvi and html
+
+GCL_DVI=
+GCL_HTML=

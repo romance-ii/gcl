@@ -5,7 +5,7 @@ INFO_DIR=/usr/local/lib/info
 
 -include ../makedefs
 
-all: gcl-tk.info gcl-si.info gcl.info gcl-tk.dvi gcl-si.dvi gcl.dvi gcl-si_toc.html gcl-tk_toc.html gcl_toc.html
+all: gcl-tk.info gcl-si.info gcl.info $(GCL_DVI) $(GCL_HTML)
 
 .texi.info:
 	rm -f $*.*gz

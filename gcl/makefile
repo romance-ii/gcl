@@ -13,6 +13,9 @@ prefix=/usr/local
 TK_LISP_LIB=gcl-tk/tkl.o gcl-tk/tinfo.o gcl-tk/decode.tcl gcl-tk/demos/*.lsp gcl-tk/demos/*.lisp gcl-tk/demos/*.o
 TCL_EXES=gcl-tk/gcl.tcl gcl-tk/gcltkaux$(EXE)
 
+GCL_DVI=gcl-tk.dvi gcl-si.dvi gcl.dvi
+GCL_HTML=gcl-si_toc.html gcl-tk_toc.html gcl_toc.html
+
 -include makedefs
 
 
