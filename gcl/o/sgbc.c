@@ -887,19 +887,24 @@ sgc_contblock_sweep_phase(void) {
     e = pagetochar(j);
     for (p = s;  p < e;) {
       if (get_mark_bit((int *)p)) {
-	p += PTR_ALIGN;
+	/* SGC cont pages: cont blocks must be no smaller than
+	   sizeof(struct contblock), and must not have a sweep
+	   granularity greater than this amount (e.g. CPTR_ALIGN) if
+	   contblock leaks are to be avoided.  Used to be aligned at
+	   PTR_ALIGN. CM 20030827 */
+	p += CPTR_ALIGN;
 	continue;
       }
-      q = p + PTR_ALIGN;
+      q = p + CPTR_ALIGN;
       while (q < e) {
 	if (!get_mark_bit((int *)q)) {
-	  q += PTR_ALIGN;
+	  q += CPTR_ALIGN;
 	  continue;
 	}
 	break;
       }
       insert_contblock(p, q - p);
-      p = q + PTR_ALIGN;
+      p = q + CPTR_ALIGN;
     }
     i = j + 1;
   }
@@ -961,6 +966,71 @@ sgc_count_type(int t) {
   return count;
 }
 
+#ifdef SGC_CONT_DEBUG
+void
+overlap_check(struct contblock *t1,struct contblock *t2) {
+
+  struct contblock *p;
+
+  for (;t1;t1=t1->cb_link) {
+
+    if (!inheap(t1)) {
+      fprintf(stderr,"%p not in heap\n",t1);
+      exit(1);
+    }
+
+    for (p=t2;p;p=p->cb_link) {
+
+      if (!inheap(p)) {
+	fprintf(stderr,"%p not in heap\n",t1);
+	exit(1);
+      }
+
+      if ((p<=t1 && (void *)p+p->cb_size>(void *)t1) ||
+	  (t1<=p && (void *)t1+t1->cb_size>(void *)p)) {
+	fprintf(stderr,"Overlap %u %p  %u %p\n",t1->cb_size,t1,p->cb_size,p);
+	exit(1);
+      }
+      
+      if (p==p->cb_link) {
+	fprintf(stderr,"circle detected at %p\n",p);
+	exit(1);
+      }
+
+    }
+	
+    if (t1==t1->cb_link) {
+      fprintf(stderr,"circle detected at %p\n",t1);
+      exit(1);
+    }
+
+  }
+
+}
+
+void
+tcc(struct contblock *t) {
+
+  for (;t;t=t->cb_link) {
+
+    if (!inheap(t)) {
+      fprintf(stderr,"%p not in heap\n",t);
+      break;
+    }
+
+    fprintf(stderr,"%u at %p\n",t->cb_size,t);
+
+    if (t==t->cb_link) {
+      fprintf(stderr,"circle detected at %p\n",t);
+      break;
+    }
+
+  }
+
+}
+
+#endif	  
+
 int
 sgc_start(void) {
 
@@ -985,7 +1055,11 @@ sgc_start(void) {
     {
       int maxp=0;
       int j;
-      int minfree = tm->tm_sgc_minfree;
+      /* SGC cont pages: This used to be simply set to tm_sgc_minfree,
+	 which is a definite bug, as minfree could then be zero,
+	 leading this type to claim SGC pages not of its type as
+	 specified in type_map.  CM 20030827*/
+      int minfree = tm->tm_sgc_minfree > 0 ? tm->tm_sgc_minfree : 1 ;
       int count;
       bzero(free_map,npages*sizeof(short));
       f = tm->tm_free;
@@ -1031,6 +1105,113 @@ sgc_start(void) {
 	  goto FIND_FREE_PAGES;	 
       }
     }
+
+/* SGC cont pages: Here we implement the contblock page division into
+   SGC and non-SGC types.  Unlike the other types, we need *whole*
+   free pages for contblock SGC, as there is no psersistent data
+   element (e.g. .m) on an allocated block itself which can indicate
+   its live status.  If anything on a page which is to be marked
+   read-only points to a live object on an SGC cont page, it will
+   never be marked and will be erroneously swept.  It is also possible
+   for dead objects to unnecessarily mark dead regions on SGC pages
+   and delay sweeping until the pointing type is GC'ed if SGC is
+   turned off for the pointing type, e.g. tm_sgc=0. (This was so by
+   default for a number of types, including bignums, and has now been
+   corrected in init_alloc in alloc.c.) We can't get around this
+   AFAICT, as old data on (writable) SGC pages must be marked lest it
+   is lost, and (old) data on now writable non-SGC pages might point
+   to live regions on SGC pages, yet might not themselves be reachable
+   from the mark origin through an unbroken chain of writable pages.
+   In any case, the possibility of a lot of garbage marks on contblock
+   pages, especially when the blocks are small as in bignums, makes
+   necessary the sweeping of minimal contblocks to prevent leaks. CM
+   20030827 */
+  {
+
+    void *p=NULL;
+    unsigned i,j,k,count;
+    struct contblock *new_cb_pointer=NULL,*tmp_cb_pointer=NULL,**cbpp;
+    
+    tm=tm_of(t_contiguous);
+    
+    /* SGC cont pages:  First count whole free pages available.  CM 20030827 */
+    for (cbpp=&cb_pointer,count=0;*cbpp;cbpp=&(*cbpp)->cb_link) {
+      p=PAGE_ROUND_UP((void *)(*cbpp));
+      k=p-((void *)(*cbpp));
+      if ((*cbpp)->cb_size<k || (*cbpp)->cb_size-k<PAGESIZE) 
+	continue;
+      i=((*cbpp)->cb_size-k)/PAGESIZE;
+      count+=i;
+    }
+    count=tm->tm_sgc>count ? tm->tm_sgc - count : 0;
+    
+    if (count>0) {
+      /* SGC cont pages: allocate more if necessary, dumping possible
+	 GBC freed pages onto the old contblock list.  CM 20030827*/
+      int z=count+1;
+      void *p1=alloc_contblock(z*PAGESIZE);
+      p=PAGE_ROUND_UP(p1);
+      if (p>p1) {
+	z--;
+	insert_contblock(p1,p-p1);
+	insert_contblock(p+z*PAGESIZE,PAGESIZE-(p-p1));
+      }
+      tmp_cb_pointer=cb_pointer;
+      cb_pointer=new_cb_pointer;
+      /* SGC cont pages: add new pages to new contblock list. p is not
+	 already on any list as ensured by alloc_contblock.  CM
+	 20030827 */
+      insert_contblock(p,PAGESIZE*z);
+      new_cb_pointer=cb_pointer;
+      cb_pointer=tmp_cb_pointer;
+      for (i=0;i<z;i++) 
+	sgc_type_map[page(p)+i]|= SGC_PAGE_FLAG;
+    }
+
+    for (cbpp=&cb_pointer;*cbpp;) {
+      p=PAGE_ROUND_UP((void *)(*cbpp));
+      k=p-((void *)(*cbpp));
+      if ((*cbpp)->cb_size<k || (*cbpp)->cb_size-k<PAGESIZE) {
+	cbpp=&(*cbpp)->cb_link;
+	continue;
+      }
+      i=((*cbpp)->cb_size-k)/PAGESIZE;
+      i*=PAGESIZE;
+      j=(*cbpp)->cb_size-i-k;
+      /* SGC contblock pages:  remove this block from old list CM 20030827 */
+      *cbpp=(*cbpp)->cb_link;
+      /* SGC contblock pages:  add fragments old list CM 20030827 */
+      if (k) {
+	ncb--;
+	insert_contblock(p-k,k);
+      }
+      if (j) {
+	ncb--;
+	insert_contblock(p+i,j);
+      }
+      tmp_cb_pointer=cb_pointer;
+      cb_pointer=new_cb_pointer;
+      /* SGC contblock pages: add whole pages to new list, p p-k, and
+	 p+i are guaranteed to be distinct when used. CM 20030827 */
+      insert_contblock(p,i);
+      new_cb_pointer=cb_pointer;
+      cb_pointer=tmp_cb_pointer;
+      i/=PAGESIZE;
+      for (j=0;j<i;j++)
+	sgc_type_map[page(p)+j]|= SGC_PAGE_FLAG;
+    }
+
+    /* SGC contblock pages: switch to new free SGC contblock list. CM
+       20030827 */
+    old_cb_pointer=cb_pointer;
+    cb_pointer=new_cb_pointer;
+
+#ifdef SGC_CONT_DEBUG
+    overlap_check(old_cb_pointer,cb_pointer);
+#endif
+
+  }
+
   /* Now  allocate the sgc relblock.   We do this as the tail
      end of the ordinary rb.     */  
   {
@@ -1117,6 +1298,26 @@ sgc_quit(void) {
     return 0;
   sgc_enabled=0;
   rb_start = old_rb_start;
+
+  /* SGC cont pages: restore contblocks, each tmp_cb_pointer coming
+     from the new list is guaranteed not to be on the old. Need to
+     grab 'next' before insert_contblock writes is.  CM 20030827 */
+  {
+
+    struct contblock *tmp_cb_pointer,*next;
+    if (old_cb_pointer) {
+#ifdef SGC_CONT_DEBUG
+      overlap_check(old_cb_pointer,cb_pointer);
+#endif
+      tmp_cb_pointer=cb_pointer;
+      cb_pointer=old_cb_pointer;
+      for (;tmp_cb_pointer;  tmp_cb_pointer=next) {
+	next=tmp_cb_pointer->cb_link;
+	insert_contblock((void *)tmp_cb_pointer,tmp_cb_pointer->cb_size);
+      }
+    }
+  }
+
   for (i= t_start; i < t_contiguous ; i++)
     if (TM_BASE_TYPE_P(i)) {
       tm=tm_of(i);

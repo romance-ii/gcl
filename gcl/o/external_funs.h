@@ -17,6 +17,7 @@ extern void call_after_gbc_hook GPR((int t));;
 extern object fSallocated GPR((object typ));;  
 extern char *alloc_contblock GPR((int n));;  
 extern int insert_contblock GPR((char *p, int s));;  
+extern int insert_maybe_sgc_contblock GPR((char *p, int s));;  
 extern char *alloc_relblock GPR((int n));;  
 extern int init_tm GPR((enum type t, char *name, int elsize, int nelts, int sgc));;  
 extern int set_maxpage GPR((void));;  

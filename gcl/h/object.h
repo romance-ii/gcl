@@ -759,6 +759,7 @@ struct typemanager {
 	short   tm_max_grow;    /* max amount to grow when growing */
 	short   tm_growth_percent;  /* percent to increase maxpages */
 	short   tm_percent_free;  /* percent which must be free after a gc for this type */
+        short   tm_distinct;       /* pages of this type are distinct */
 
 };
 
@@ -783,6 +784,20 @@ struct contblock {		/*  contiguous block header  */
 	The pointer to the contiguous blocks.
 */
 EXTER struct contblock *cb_pointer;	/*  contblock pointer  */
+
+/* SGC cont pages: After SGC_start, old_cb_pointer will be a linked
+   list of free blocks on non-SGC pages, and cb_pointer will be
+   likewise for SGC pages.  CM 20030827*/
+EXTER struct contblock *old_cb_pointer;	/*  old contblock pointer when in SGC  */
+
+/* SGC cont pages: FIXME -- at some point, enable runtime disabling of
+   SGC cont pages.  Right now, the tm_sgc variable for type contiguous
+   will govern only the possible attempt to get new pages for SGC.
+   Contiguous pages normally allocated when SGC is on will always be
+   marked with SGC_PAGE_FLAG, as the current GBC algorithm always uses
+   sgc_contblock_sweep_phase in this case. */
+/* #define SGC_CONT_ENABLED (sgc_enabled && tm_table[t_contiguous].tm_sgc) */
+#define SGC_CONT_ENABLED (sgc_enabled)
 
 /*
 	Variables for memory management.

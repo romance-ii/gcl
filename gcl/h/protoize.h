@@ -7,6 +7,7 @@
 /* alloc.c:376:OF */ extern object fSallocated (object typ); /* (typ) object typ; */
 /* alloc.c:401:OF */ extern object fSreset_number_used (object typ); /* (typ) object typ; */
 /* alloc.c:480:OF */ extern void insert_contblock (char *p, int s); /* (p, s) char *p; int s; */
+/* alloc.c:480:OF */ extern void insert_maybe_sgc_contblock (char *p, int s); /* (p, s) char *p; int s; */
 /* alloc.c:611:OF */ extern void set_maxpage (void); /* () */
 /* alloc.c:635:OF */ extern void init_alloc (void); /* () */
 /* alloc.c:737:OF */ extern object fSstaticp (object x); /* (x) object x; */

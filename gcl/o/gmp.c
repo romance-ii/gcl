@@ -15,7 +15,9 @@ static void *gcl_gmp_realloc(void *oldmem, size_t oldsize, size_t newsize)
   old = oldmem;
   bcopy(MP_SELF(big_gcprotect),new,oldsize);
   MP_SELF(big_gcprotect)=0;
-  if (inheap(oldmem)) insert_contblock(oldmem,oldsize);
+/* SGC contblock pages: Its possible this is on an old page CM 20030827 */
+  if (inheap(oldmem)) insert_maybe_sgc_contblock(oldmem,oldsize);
+
   return new;
 }
 

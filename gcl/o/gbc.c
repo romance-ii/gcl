@@ -1005,19 +1005,24 @@ contblock_sweep_phase(void) {
     e = pagetochar(j);
     for (p = s;  p < e;) {
       if (get_mark_bit((int *)p)) {
-	p += PTR_ALIGN;
+	/* SGC cont pages: cont blocks must be no smaller than
+	   sizeof(struct contblock), and must not have a sweep
+	   granularity greater than this amount (e.g. CPTR_ALIGN) if
+	   contblock leaks are to be avoided.  Used to be aligned at
+	   PTR_ALIGN. CM 20030827 */
+	p += CPTR_ALIGN;
 	continue;
       }
-      q = p + PTR_ALIGN;
+      q = p + CPTR_ALIGN;
       while (q < e) {
 	if (!get_mark_bit((int *)q)) {
-	  q += PTR_ALIGN;
+	  q += CPTR_ALIGN;
 	  continue;
 	}
 	break;
       }
       insert_contblock(p, q - p);
-      p = q + PTR_ALIGN;
+      p = q + CPTR_ALIGN;
     }
     i = j + 1;
   }
@@ -1060,8 +1065,8 @@ GBC(enum type t) {
     if(sgc_enabled) sgc_quit();
     
     }
-  
-  
+
+
 #ifdef DEBUG
   debug = symbol_value(sSAgbc_messageA) != Cnil;
 #endif
@@ -1271,6 +1276,9 @@ GBC(enum type t) {
   
   interrupt_enable = TRUE;
   
+  if (in_sgc && sgc_enabled==0)
+    sgc_start();
+  
   if (saving_system) {
     j = (rb_pointer-rb_start+PAGESIZE-1) / PAGESIZE;
     
@@ -1315,10 +1323,6 @@ GBC(enum type t) {
   
   if (GBC_exit_hook != NULL)
     (*GBC_exit_hook)();
-  
-  
-  if (in_sgc && sgc_enabled==0)
-    sgc_start();
   
   if(gc_time>=0 && !--gc_recursive) {gc_time=gc_time+(gc_start=(runtime()-gc_start));}
   
@@ -1416,8 +1420,10 @@ mark_contblock(void *p, int s) {
   if (!MAYBE_DATA_P(p) || (enum type)type_map[page(p)] != t_contiguous)
     return;
   q = p + s;
-  x = (int *)ROUND_DOWN_PTR(p);
-  y = (int *)ROUND_UP_PTR(q);
+  /* SGC cont pages: contblock pages must be no smaller than
+     sizeof(struct contblock).  CM 20030827 */
+  x = (int *)ROUND_DOWN_PTR_CONT(p);
+  y = (int *)ROUND_UP_PTR_CONT(q);
   for (;  x < y;  x++)
     set_mark_bit(x);
 }

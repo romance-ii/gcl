@@ -425,9 +425,19 @@ alloc_contblock(size_t n) {
 /*
 	printf("allocating %d-byte contiguous block...\n", n);
 */
+	 /* SGC cont pages: contiguous pointers must be aligned at
+	    CPTR_ALIGN, no smaller than sizeof (struct contblock).
+	    Here we allocate a bigger block, and rely on the fact that
+	    allocate_page returns pointers appropriately aligned,
+	    being also aligned on page boundaries.  Protection against
+	    a too small contblock was aforded before by a minimum
+	    contblock size enforced by CBMINSIZE in insert_contblock.
+	    However, this leads to a leak when many small cont blocks
+	    are allocated, e.g. with bignums, so is now removed.  CM
+	    20030827 */
 
 	g = FALSE;
-	n = ROUND_UP_PTR(n);
+	n = ROUND_UP_PTR_CONT(n);
 
 ONCE_MORE:
 	 CHECK_INTERRUPT;
@@ -472,31 +482,87 @@ Use ALLOCATE-CONTIGUOUS-PAGES to expand the space.",
       }
 	p = alloc_page(m);
 
-	for (i = 0;  i < m;  i++)
+	for (i = 0;  i < m;  i++) {
 		type_map[page(p) + i] = (char)t_contiguous;
+
+		/* SGC cont pages: Before this point, GCL never marked contiguous
+		   pages for SGC, causing no contiguous pages to be
+		   swept when SGC was on.  Here we follow the behavior
+		   for other pages in add_to_freelist. CM 20030827  */
+		if (SGC_CONT_ENABLED)
+		  sgc_type_map[page(p)+i]|= SGC_PAGE_FLAG;
+	}
 	ncbpage += m;
 	insert_contblock(p+n, PAGESIZE*m - n);
 	return(p);
 }
+
+/* SGC cont pages: explicit free calls can come at any time, and we
+   must make sure to add the newly deallocated block to the right
+   list.  CM 20030827*/
+void
+insert_maybe_sgc_contblock(char *p,int s) {
+
+  struct contblock *tmp_cb_pointer;
+
+  if (SGC_CONT_ENABLED && ! SGC_PAGE_P(page(p))) {
+    tmp_cb_pointer=cb_pointer;
+    cb_pointer=old_cb_pointer;
+    sgc_enabled=0;
+    insert_contblock(p,s);
+    sgc_enabled=1;
+    old_cb_pointer=cb_pointer;
+    cb_pointer=tmp_cb_pointer;
+  } else
+    insert_contblock(p,s);
+
+}
+
+#ifdef SGC_CONT_DEBUG
+extern void overlap_check(struct contblock *,struct contblock *);
+#endif
 
 void
 insert_contblock(char *p, int s) {
 
   struct contblock **cbpp, *cbp;
   
-  if (s < CBMINSIZE)
+  /* SGC cont pages: This used to return when s<CBMINSIZE, but we need
+     to be able to sweep small (e.g. bignum) contblocks.  FIXME:
+     should never be called with s<=0 to begin with.  CM 20030827*/
+  if (s<=0)
     return;
   ncb++;
   cbp = (struct contblock *)p;
-  cbp->cb_size = s;
+  /* SGC cont pages: allocated sizes may not be zero mod CPTR_SIZE,
+     e.g. string fillp, but alloc_contblock rounded up the allocation
+     like this, which we follow here.  CM 20030827 */
+  cbp->cb_size = ROUND_UP_PTR_CONT(s);
   for (cbpp = &cb_pointer;  *cbpp;  cbpp = &((*cbpp)->cb_link))
     if ((*cbpp)->cb_size >= s) {
+#ifdef SGC_CONT_DEBUG
+      if (*cbpp==cbp) {
+	fprintf(stderr,"Trying to install a circle at %p\n",cbp);
+	exit(1);
+      }
+      if (sgc_enabled) 
+	overlap_check(old_cb_pointer,cb_pointer);
+      
+#endif
       cbp->cb_link = *cbpp;
       *cbpp = cbp;
+#ifdef SGC_CONT_DEBUG
+      if (sgc_enabled) 
+	overlap_check(old_cb_pointer,cb_pointer);
+#endif
       return;
     }
   cbp->cb_link = NULL;
   *cbpp = cbp;
+#ifdef SGC_CONT_DEBUG
+  if (sgc_enabled) 
+    overlap_check(old_cb_pointer,cb_pointer);
+#endif
 
 }
 
@@ -568,19 +634,30 @@ Use ALLOCATE-RELOCATABLE-PAGES to expand the space.",
 	return(p);
 }
 
+/* Add a tm_distinct field to prevent page type sharing if desired.
+   Not used now, as its never desirable from an efficiency point of
+   view, and as the only known place one must separate is cons and
+   fixnum, which are of different sizes unless PTR_ALIGN is set too
+   high (e.g. 16 on a 32bit machine).  See the ordering of init_tm
+   calls for these types below -- reversing would wind up merging the
+   types with the current algorithm.  CM 20030827 */
+
 static void
-init_tm(enum type t, char *name, int elsize, int nelts, int sgc) {
+init_tm(enum type t, char *name, int elsize, int nelts, int sgc,int distinct) {
 
   int i, j;
   int maxpage;
   /* round up to next number of pages */
   maxpage = (((nelts * elsize) + PAGESIZE -1)/PAGESIZE);
   tm_table[(int)t].tm_name = name;
-  for (j = -1, i = 0;  i < (int)t_end;  i++)
-    if (tm_table[i].tm_size != 0 &&
-	tm_table[i].tm_size >= elsize &&
-	(j < 0 || tm_table[j].tm_size > tm_table[i].tm_size))
-      j = i;
+  j=-1;
+  if (!distinct)
+    for (i = 0;  i < (int)t_end;  i++)
+      if (tm_table[i].tm_size != 0 &&
+	  tm_table[i].tm_size >= elsize &&
+	  !tm_table[i].tm_distinct &&
+	  (j < 0 || tm_table[j].tm_size > tm_table[i].tm_size))
+	j = i;
   if (j >= 0) {
     tm_table[(int)t].tm_type = (enum type)j;
     tm_table[j].tm_maxpage += maxpage;
@@ -598,6 +675,7 @@ init_tm(enum type t, char *name, int elsize, int nelts, int sgc) {
   /*tm_table[(int)t].tm_npage = 0; */  /* dont zero nrbpage.. */
   tm_table[(int)t].tm_maxpage = maxpage;
   tm_table[(int)t].tm_gbccount = 0;
+  tm_table[(int)t].tm_distinct=distinct;
 #ifdef SGC	
   tm_table[(int)t].tm_sgc = sgc;
   tm_table[(int)t].tm_sgc_max = 3000;
@@ -688,40 +766,46 @@ init_alloc(void) {
   for (i = 0;  i < MAXPAGE;  i++)
     type_map[i] = (char)t_other;
   
+  /* Unused (at present) tm_distinct flag added.  Note that if cons
+     and fixnum share page types, errors will be introduced.
+
+     Gave each page type at least some sgc pages by default.  Of
+     course changeable by allocate-sgc.  CM 20030827 */
+
   init_tm(t_fixnum, "NFIXNUM",
-	  sizeof(struct fixnum_struct), 8192,20);
-  init_tm(t_cons, ".CONS", sizeof(struct cons), 65536 ,50 );
-  init_tm(t_structure, "SSTRUCTURE", sizeof(struct structure), 5461,0 );
-  init_tm(t_cfun, "fCFUN", sizeof(struct cfun), 4096,0  );
-  init_tm(t_sfun, "gSFUN", sizeof(struct sfun),409,0 );
-  init_tm(t_string, "\"STRING", sizeof(struct string), 5461,1  );
-  init_tm(t_array, "aARRAY", sizeof(struct array), 4681,1 );
-  init_tm(t_symbol, "|SYMBOL", sizeof(struct symbol), 3640,1 );
-  init_tm(t_bignum, "BBIGNUM", sizeof(struct bignum), 2730,0 );
-  init_tm(t_ratio, "RRATIONAL", sizeof(struct ratio), 170,0 );
+	  sizeof(struct fixnum_struct), 8192,20,0);
+  init_tm(t_cons, ".CONS", sizeof(struct cons), 65536 ,50,0 );
+  init_tm(t_structure, "SSTRUCTURE", sizeof(struct structure), 5461,1,0 );
+  init_tm(t_cfun, "fCFUN", sizeof(struct cfun), 4096,1,0  );
+  init_tm(t_sfun, "gSFUN", sizeof(struct sfun),409,1,0 );
+  init_tm(t_string, "\"STRING", sizeof(struct string), 5461,1,0  );
+  init_tm(t_array, "aARRAY", sizeof(struct array), 4681,1,0 );
+  init_tm(t_symbol, "|SYMBOL", sizeof(struct symbol), 3640,1,0 );
+  init_tm(t_bignum, "BBIGNUM", sizeof(struct bignum), 2730,1,0 );
+  init_tm(t_ratio, "RRATIONAL", sizeof(struct ratio), 170,1,0 );
   init_tm(t_shortfloat, "FSHORT-FLOAT",
-	  sizeof(struct shortfloat_struct), 256 ,1);
+	  sizeof(struct shortfloat_struct), 256 ,1,0);
   init_tm(t_longfloat, "LLONG-FLOAT",
-	  sizeof(struct longfloat_struct), 170 ,0);
-  init_tm(t_complex, "CCOMPLEX", sizeof(struct complex), 170 ,0);
-  init_tm(t_character,"#CHARACTER",sizeof(struct character), 256 ,0);
-  init_tm(t_package, ":PACKAGE", sizeof(struct package), 2*PAGESIZE / sizeof(struct package),0);
-  init_tm(t_hashtable, "hHASH-TABLE", sizeof(struct hashtable), 78,0 );
-  init_tm(t_vector, "vVECTOR", sizeof(struct vector), 146 ,0);
-  init_tm(t_bitvector, "bBIT-VECTOR", sizeof(struct bitvector), 73 ,0);
-  init_tm(t_stream, "sSTREAM", sizeof(struct stream), 78 ,0);
-  init_tm(t_random, "$RANDOM-STATE", sizeof(struct random), 256 ,0);
-  init_tm(t_readtable, "rREADTABLE", sizeof(struct readtable), 256 ,0);
-  init_tm(t_pathname, "pPATHNAME", sizeof(struct pathname), 73 ,0);
-  init_tm(t_cclosure, "cCCLOSURE", sizeof(struct cclosure), 85 ,0);
-  init_tm(t_closure, "cCLOSURE", sizeof(struct cclosure), 85 ,0);
-  init_tm(t_vfun, "VVFUN", sizeof(struct vfun), 102 ,0);
-  init_tm(t_gfun, "gGFUN", sizeof(struct sfun), 0 ,0);
-  init_tm(t_afun, "AAFUN", sizeof(struct sfun), 0 ,0);
-  init_tm(t_cfdata, "cCFDATA", sizeof(struct cfdata), 102 ,0);
-  init_tm(t_spice, "!SPICE", sizeof(struct spice), 4096 ,0);
-  init_tm(t_relocatable, "%RELOCATABLE-BLOCKS", 1000,0,20);
-  init_tm(t_contiguous, "_CONTIGUOUS-BLOCKS", 1001,0,20);
+	  sizeof(struct longfloat_struct), 170 ,1,0);
+  init_tm(t_complex, "CCOMPLEX", sizeof(struct complex), 170 ,1,0);
+  init_tm(t_character,"#CHARACTER",sizeof(struct character), 256 ,1,0);
+  init_tm(t_package, ":PACKAGE", sizeof(struct package), 2*PAGESIZE / sizeof(struct package),1,0);
+  init_tm(t_hashtable, "hHASH-TABLE", sizeof(struct hashtable), 78,1,0 );
+  init_tm(t_vector, "vVECTOR", sizeof(struct vector), 146 ,1,0);
+  init_tm(t_bitvector, "bBIT-VECTOR", sizeof(struct bitvector), 73 ,1,0);
+  init_tm(t_stream, "sSTREAM", sizeof(struct stream), 78 ,1,0);
+  init_tm(t_random, "$RANDOM-STATE", sizeof(struct random), 256 ,1,0);
+  init_tm(t_readtable, "rREADTABLE", sizeof(struct readtable), 256 ,1,0);
+  init_tm(t_pathname, "pPATHNAME", sizeof(struct pathname), 73 ,1,0);
+  init_tm(t_cclosure, "cCCLOSURE", sizeof(struct cclosure), 85 ,1,0);
+  init_tm(t_closure, "cCLOSURE", sizeof(struct cclosure), 85 ,1,0);
+  init_tm(t_vfun, "VVFUN", sizeof(struct vfun), 102 ,1,0);
+  init_tm(t_gfun, "gGFUN", sizeof(struct sfun), 0 ,1,0);
+  init_tm(t_afun, "AAFUN", sizeof(struct sfun), 0 ,1,0);
+  init_tm(t_cfdata, "cCFDATA", sizeof(struct cfdata), 102 ,1,0);
+  init_tm(t_spice, "!SPICE", sizeof(struct spice), 4096 ,1,0);
+  init_tm(t_relocatable, "%RELOCATABLE-BLOCKS", 1000,0,20,0);
+  init_tm(t_contiguous, "_CONTIGUOUS-BLOCKS", 1001,0,20,0);
   tm_table[t_relocatable].tm_nppage = PAGESIZE;
   tm_table[t_contiguous].tm_nppage = PAGESIZE;
   
@@ -895,8 +979,15 @@ DEFUN_NEW("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
     FEerror("Can't allocate ~D pages for contiguous blocks.",
 	    1, make_fixnum(npages));
 
-  for (i = 0;  i < m;  i++)
+  for (i = 0;  i < m;  i++) {
     type_map[page(p + PAGESIZE*i)] = (char)t_contiguous;
+    /* SGC cont pages: Before this point, GCL never marked contiguous
+       pages for SGC, causing no contiguous pages to be
+       swept when SGC was on.  Here we follow the behavior
+       for other pages in add_to_freelist. CM 20030827  */
+    if (SGC_CONT_ENABLED)
+      sgc_type_map[page(p)+i]|= SGC_PAGE_FLAG;
+  }
 
   ncbpage += m;
   insert_contblock(p, PAGESIZE*m);
@@ -1140,8 +1231,9 @@ free(void *ptr)
 #endif	
 	for (p = &malloc_list; *p && !endp(*p);  p = &((*p)->c.c_cdr))
 		if ((*p)->c.c_car->st.st_self == ptr) {
-			insert_contblock((*p)->c.c_car->st.st_self,
-					 (*p)->c.c_car->st.st_dim);
+/* SGC contblock pages: Its possible this is on an old page CM 20030827 */
+ 			insert_maybe_sgc_contblock((*p)->c.c_car->st.st_self,
+						   (*p)->c.c_car->st.st_dim);
 			(*p)->c.c_car->st.st_self = NULL;
 			*p = (*p)->c.c_cdr;
 			return ;
@@ -1189,7 +1281,8 @@ realloc(void *ptr, size_t size) {
 	x->st.st_fillp = x->st.st_dim = size;
 	for (i = 0;  i < size;  i++)
 	  x->st.st_self[i] = ((char *)ptr)[i];
-	insert_contblock(ptr, j);
+/* SGC contblock pages: Its possible this is on an old page CM 20030827 */
+ 	insert_maybe_sgc_contblock(ptr, j);
 	return(x->st.st_self);
       }
     }

@@ -29,6 +29,12 @@
 #define ROUND_UP_PTR(n)	(((long)(n) + (PTR_ALIGN-1)) & ~(PTR_ALIGN-1))
 #define ROUND_DOWN_PTR(n) (((long)(n)  & ~(PTR_ALIGN-1)))
 
+/* alignment required for contiguous pointers */
+#define CPTR_ALIGN (PTR_ALIGN < sizeof(struct contblock) ? sizeof(struct contblock) : PTR_ALIGN)
+
+#define ROUND_UP_PTR_CONT(n)	(((long)(n) + (CPTR_ALIGN-1)) & ~(CPTR_ALIGN-1))
+#define ROUND_DOWN_PTR_CONT(n) (((long)(n)  & ~(CPTR_ALIGN-1)))
+
 
 #ifdef SGC
 

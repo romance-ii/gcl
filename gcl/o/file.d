@@ -303,11 +303,13 @@ static void
 deallocate_stream_buffer(strm)
 object strm;
 {
-  if (strm->sm.sm_buffer)
-    {insert_contblock(strm->sm.sm_buffer, BUFSIZ);
-     strm->sm.sm_buffer = 0;}
- else
-    printf("no buffer? %p  \n",strm->sm.sm_fp);
+
+/* SGC contblock pages: Its possible this is on an old page CM 20030827 */
+  if (strm->sm.sm_buffer) 
+    {insert_maybe_sgc_contblock(strm->sm.sm_buffer, BUFSIZ); 
+    strm->sm.sm_buffer = 0;} 
+  else 
+    printf("no buffer? %p  \n",strm->sm.sm_fp); 
 
 #ifndef FCLOSE_SETBUF_OK
   strm->sm.sm_fp->_base = NULL;
