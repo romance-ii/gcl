@@ -6,8 +6,9 @@ gclcvs (2.7.0-23) unstable; urgency=low
   * Fix merge-pathanames bug in concatenating default and supplied
     directory lists
   * Minor pathname and *features* fixes
+  * Fix recently introduced configure.in syntax bug
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 23 Apr 2004 19:36:04 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 23 Apr 2004 20:21:32 +0000
 
 gclcvs (2.7.0-22) unstable; urgency=low
 

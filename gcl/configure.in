@@ -416,7 +416,7 @@ fi
 TO3FLAGS=""
 TO2FLAGS=""
 
-TFPFLAG="-fomit-frame-pointer";;
+TFPFLAG="-fomit-frame-pointer"
 #case "$use" in
 #  *mingw*)
 #	TFPFLAG="-fomit-frame-pointer";;
@@ -442,7 +442,7 @@ else
 #	  *)
 #		TO3FLAGS="-O3 $TFPFLAG";;
 #	esac
-	TO3FLAGS="-O3 $TFPFLAG";;
+	TO3FLAGS="-O3 $TFPFLAG"
 	TO2FLAGS="-O"
 fi
 
