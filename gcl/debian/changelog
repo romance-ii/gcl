@@ -7,8 +7,11 @@ gclcvs (2.7.0-37) unstable; urgency=low
     type deduction, error in latter when dotted list is encountered
   * Move set_maxpage() past init_darwin_zone for mac
   * expand 'satisfies declarations in c1body where possible
+  * track bounded-type propataion via the function symbol plist keyed to
+    result-type-from-bounded-args rather in the per inline record, as it
+    is more general and pertains to the function alone
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 17 Dec 2004 21:25:59 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 17 Dec 2004 21:27:54 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 

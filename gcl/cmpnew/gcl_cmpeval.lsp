@@ -119,8 +119,7 @@
 	                                        ;; double eval ok.
 	 (result-type-from-args rfa)            ;; if passed args of matching
 					        ;; type result is of result type
-         (is)                                   ;; extends the `integer stack'.
-	 (result-type-from-bounded-args rfba))) ;; result bounds inferred from arg bounds
+         (is)))                                 ;; extends the `integer stack'.
     (cond ((member flag v :test 'eq)
 	   (return-from flags-pos i)))
     (setq i (+ i 1)))
@@ -190,30 +189,31 @@
 )				      
 				
 
-(defun result-type-from-args(f args &aux tem)
+(defun result-type-from-args (f args &aux tem)
   (when (and (setq tem (get f 'return-type))
              (not (eq tem '*))
 	     (not (consp tem)))
+    (let* ((be (and (not (cddr args)) (get f 'result-type-from-bounded-args)))
+	   (ba (and be
+		    (or (atom be)
+			(and (type>= (nil-to-t (car be)) (car args))
+			     (type>= (nil-to-t (cadr be)) (cadr args))))
+		    (super-range f (car args) (cadr args)))))
+      (when ba
+	(return-from result-type-from-args ba)))
     (dolist (v '(inline-always inline-unsafe))
       (dolist (w (get f v))
 	(fix-opt w)
 	(when (and
 	       (flag-p (third w) result-type-from-args)
-	       (eql (length args) (length (car w)))
-	       (do ((a args (cdr a))
-		    (b (car w) (cdr b)))
+	       (= (length args) (length (car w)))
+	       (do ((a args (cdr a)) (b (car w) (cdr b)))
 		   ((null a) t)
 		 (unless (or  (eq (car a) (car b))
 			      (type>= (car b) (car a)))
-			 (return nil))))
-	  (return-from result-type-from-args (second w)))
-	(when (and
-	       (flag-p (third w) result-type-from-bounded-args)
-	       (= 2 (length args) (length (car w)))
-	       (type>= (caar w) (car args))
-	       (type>= (cadar w) (cadr args)))
-	  (return-from result-type-from-args (super-range f (car args) (cadr args))))))))
-
+		   (return nil))))
+	  (return-from result-type-from-args (second w)))))))
+	
 
 ;; omitting a flag means it is set to nil.
 (defmacro flags (&rest lis &aux (i 0))
@@ -305,7 +305,7 @@
   (let ((len (length form)))
     (declare (fixnum len))
     (if (> len 3)
-	(multiple-value-bind (form lets) (pull-evals form)
+	(multiple-value-bind (form lets) (values form nil);(pull-evals form)
 	  (let-wrap lets (binary-nest-int form len)))
       form)))
 
@@ -382,6 +382,35 @@
 
 (si::putprop '1+ (function incr-to-plus) 'compiler-macro)
 (si::putprop '1- (function decr-to-minus) 'compiler-macro)
+
+(defun bind-all-vars-int (form nf bindings)
+  (cond ((null form)
+	 (list bindings (nreverse nf)))
+	((consp (car form))
+	 (let ((lwf (bind-all-vars-int (cdar form) (list (caar form)) bindings)))
+	   (bind-all-vars-int (cdr form) (cons (cadr lwf) nf) (car lwf))))
+	(t
+	 (let* ((sym (if (symbolp (car form)) (cdr (assoc (car form) bindings)) (car form)))
+		(bindings (if sym bindings (cons (cons (car form) (gensym)) bindings)))
+		(sym (or sym (cdar bindings))))
+	   (bind-all-vars-int (cdr form) (cons sym nf) bindings)))))
+
+(defun bind-all-vars (form)
+  (if (atom form) form
+    (let ((res (bind-all-vars-int (cdr form) (list (car form)) nil)))
+      (if (car res)
+	  (list 'let* (mapcar (lambda (x) (list (cdr x) (car x))) (nreverse (car res)))
+		(cadr res))
+	(cadr res)))))
+
+
+(defun if-protect-fun-inf (form env)
+  (declare (ignore env))
+  (cons (car form)
+	(cons (cadr form)
+	      (cons (bind-all-vars (caddr form))
+		    (if (cadddr form) (list (bind-all-vars (cadddr form))))))))
+		
 
 (defun c1symbol-fun (fname args &aux fd)
   (cond ((setq fd (get fname 'c1special)) (funcall fd args))
@@ -495,7 +524,7 @@
                                   (setq etype
                                         (type-and (info-type info) etype))
                                   (when (null etype)
-                                        (cmpwarn
+				    (cmpwarn
                                          "Type mismatch was found in ~s."
                                          (cons fname args)))
                                   (setf (info-type info) etype))))

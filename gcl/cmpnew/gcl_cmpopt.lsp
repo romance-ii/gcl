@@ -13,7 +13,6 @@
 ;;	 (result-type-from-args rfa)            ;; if passed args of matching
 ;;					        ;; type result is of result type
 ;;       (is)                                   ;; extends the `integer stack'.
-;;	 (result-type-from-bounded-args rfba))) ;; result bounds inferred from arg bounds
 ;    (cond ((member flag v :test 'eq)
 ;
 ;;;   valid properties are 'inline-always 'inline-safe 'inline-unsafe
@@ -238,6 +237,7 @@
    (get 'system:svset 'inline-unsafe))
 
 ;;*
+(si::putprop '* t 'result-type-from-bounded-args)
 (push '((t t) t #.(flags ans)"number_times(#0,#1)")
    (get '* 'inline-always))
 (push '((fixnum-float fixnum-float) short-float #.(flags)"(double)(#0)*(double)(#1)")
@@ -249,14 +249,24 @@
 (push '((short-float short-float) short-float #.(flags rfa)"(#0)*(#1)")
    (get '* 'inline-always))
 
-
 (push '((fixnum fixnum) fixnum #.(flags)"(#0)*(#1)")
    (get '* 'inline-always))
 
-(push '((fixnum fixnum) fixnum #.(flags rfba)"(#0)*(#1)")
-   (get '* 'inline-always))
+;;ASH
+(si::putprop 'ash '(fixnum (integer #.most-negative-fixnum #.(integer-length most-positive-fixnum))) 'result-type-from-bounded-args)
+(push '(((integer 0 0) t) fixnum #.(flags rfa)"0")
+   (get 'ash 'inline-always))
+(push '((fixnum (integer 0 #.(integer-length most-positive-fixnum))) fixnum #.(flags)"((#0)<<(#1))")
+   (get 'ash 'inline-always))
+(push '((fixnum (integer #.most-negative-fixnum -1)) fixnum #.(flags set)
+	#.(concatenate 'string "@1;(-(#1)&"
+		       (write-to-string (lognot (integer-length most-positive-fixnum)))
+		       "? ((#0)>=0 ? 0 : -1) : (#0)>>-(#1))"))
+   (get 'ash 'inline-always))
+
 
 ;;+
+(si::putprop '+ t 'result-type-from-bounded-args)
 (push '((t t) t #.(flags ans)"number_plus(#0,#1)")
    (get '+ 'inline-always))
 (push '((fixnum-float fixnum-float) short-float #.(flags)"(double)(#0)+(double)(#1)")
@@ -271,12 +281,13 @@
 (push '((fixnum fixnum) fixnum #.(flags)"(#0)+(#1)")
    (get '+ 'inline-always))
 
-(push '((fixnum fixnum) fixnum #.(flags rfba)"(#0)+(#1)")
-   (get '+ 'inline-always))
-
 ;;-
- (push '((t) t #.(flags ans)"number_negate(#0)")
+(si::putprop '- t 'result-type-from-bounded-args)
+(push '((t) t #.(flags ans)"number_negate(#0)")
    (get '- 'inline-always))
+(push '(((integer #.(1+ most-negative-fixnum) #.most-positive-fixnum)) fixnum #.(flags)"-(#0)")
+   (get '- 'inline-always))
+
 (push '((t t) t #.(flags ans)"number_minus(#0,#1)")
    (get '- 'inline-always))
 (push '((fixnum-float fixnum-float) short-float #.(flags)"(double)(#0)-(double)(#1)")
@@ -297,10 +308,6 @@
    (get '- 'inline-always))
 (push '((fixnum) fixnum #.(flags)"-(#0)")
    (get '- 'inline-always))
-
-(push '((fixnum fixnum) fixnum #.(flags rfba)"(#0)-(#1)")
-   (get '- 'inline-always))
-
 
 ;;/
 (push '((fixnum fixnum) fixnum #.(flags)"(#0)/(#1)")
@@ -912,13 +919,15 @@ type_of(#0)==t_bitvector")
    (get 'make-list 'inline-always))
 
 ;;MAX
- (push '((t t) t #.(flags set)"@01;(number_compare(#0,#1)>=0?(#0):#1)")
+(si::putprop 'max t 'result-type-from-bounded-args)
+(push '((t t) t #.(flags set)"@01;(number_compare(#0,#1)>=0?(#0):#1)")
    (get 'max 'inline-always))
-(push '((fixnum fixnum) fixnum #.(flags rfa set)"@01;((#0)>=(#1)?(#0):#1)")
+ (push '((fixnum fixnum) fixnum #.(flags rfa set)"@01;((#0)>=(#1)?(#0):#1)")
    (get 'max 'inline-always))
 
 ;;MIN
- (push '((t t) t #.(flags set)"@01;(number_compare(#0,#1)<=0?(#0):#1)")
+(si::putprop 'min t 'result-type-from-bounded-args)
+(push '((t t) t #.(flags set)"@01;(number_compare(#0,#1)<=0?(#0):#1)")
    (get 'min 'inline-always))
 (push '((fixnum fixnum) fixnum #.(flags rfa set)"@01;((#0)<=(#1)?(#0):#1)")
    (get 'min 'inline-always))
@@ -926,7 +935,7 @@ type_of(#0)==t_bitvector")
 ;;MINUSP
  (push '((t) boolean #.(flags)"number_compare(small_fixnum(0),#0)>0")
    (get 'minusp 'inline-always))
-(push '((fixnum-float) boolean #.(flags)"(#0)<0")
+ (push '((fixnum-float) boolean #.(flags)"(#0)<0")
    (get 'minusp 'inline-always))
 
 ;;MOD
