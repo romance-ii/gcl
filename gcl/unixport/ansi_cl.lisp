@@ -69,6 +69,16 @@
 ;*print-pprint-dispatch* *print-right-margin* *read-eval*))
 ;	(import (list s) "COMMON-LISP"))
 
+;anything in "SYSTEM" which should go in "COMMON-LISP"
+;can be added to shadow-system
+(setf shadow-system '(system::copy-structure))
+
+(do-external-symbols (s "SYSTEM")
+		     (when (member s shadow-system)
+		       (shadowing-import (list s) "COMMON-LISP")
+		       (shadowing-import (list s) "USER")))
+			 
+
 (do-external-symbols (s "LISP")
   (if (not(member s lisp_unexport))
       (progn 
@@ -127,9 +137,11 @@ write-sequence ))
   
 (makunbound 'clcs_shadow)
 (makunbound 'lisp_unexport)
+(makunbound 'shadow-system)
 (unintern 'clcs_shadow)
 (unintern 'lisp_unexport)
 (unintern 'int)
+(unintern 'shadow-system)
 
 (push ':ansi-cl *features*)
 
