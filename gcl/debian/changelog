@@ -47,8 +47,10 @@ gcl (2.5.4-1) unstable; urgency=low
   * static linking on ia64 to work around current mechanism for runtime
     generated function descriptors
   * enable-static configure option
+  * Fix debian/gcl-doc.docs for latest texinfo file splitting policy,
+    Closes: #206017
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 21 Aug 2003 04:37:48 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 21 Aug 2003 15:54:11 +0000
 
 gcl (2.5.3-2) unstable; urgency=low
 
