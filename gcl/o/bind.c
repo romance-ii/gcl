@@ -1117,7 +1117,7 @@ gcl_init_bind(void)
 	make_cons(make_ordinary("&BODY"), Cnil)))))))));
 
 	make_constant("LAMBDA-PARAMETERS-LIMIT",
-		      make_fixnum(64));
+		      make_fixnum(MAX_ARGS));
 
 
 

@@ -1528,7 +1528,7 @@ gcl_init_eval(void)
 
 
 
-        make_constant("CALL-ARGUMENTS-LIMIT", make_fixnum(64));
+        make_constant("CALL-ARGUMENTS-LIMIT", make_fixnum(MAX_ARGS));
 
 
 	Vevalhook = make_special("*EVALHOOK*", Cnil);
