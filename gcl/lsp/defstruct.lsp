@@ -44,15 +44,17 @@
 (or (fboundp 'record-fn) (setf (symbol-function 'record-fn)
 			       #'(lambda (&rest l) l nil)))
 
-(defun make-access-function (name conc-name type named include no-fun
+(defun make-access-function (name conc-name no-conc type named include no-fun
 				  ;; from apply
 				  slot-name default-init slot-type read-only
 				  offset &optional predicate ) 
   (declare (ignore named default-init predicate ))
   
   (let ((access-function
-	  (intern (si:string-concatenate (string conc-name)
-					 (string slot-name))))
+	 (if no-conc
+	     slot-name
+	   (intern (si:string-concatenate (string conc-name)
+					  (string slot-name)))))
 	accsrs dont-overwrite)
     (ecase type
       ((nil)
@@ -478,7 +480,7 @@
 	       
 	 
 
-(defun define-structure (name conc-name type named slot-descriptions copier
+(defun define-structure (name conc-name no-conc type named slot-descriptions copier
 			      static include print-function constructors
 			      offset predicate &optional documentation no-funs
 			      &aux def leng)
@@ -487,7 +489,7 @@
   (dolist (x slot-descriptions)
 	   (and x (car x)
 		(apply #'make-access-function
-                                     name conc-name type named include no-funs
+                                     name conc-name no-conc type named include no-funs
                                      x )))
   (when (and copier (not no-funs))
 	(setf (symbol-function copier)
@@ -585,7 +587,8 @@
         print-function type named initial-offset
         offset name-offset
         documentation
-	static)
+	static
+	(no-conc nil))
 
     (when (consp name)
 	  ;; The defstruct options are supplied.
@@ -612,8 +615,10 @@
 	       (setq o (caar os) v (cadar os))
 	       (case o
 		 (:conc-name
-		   (if (null v)
-		       (setq conc-name "")
+		   (if (null v) 
+		       (progn
+			 (setq conc-name "")
+			 (setq no-conc t))
 		     (setq conc-name v)))
 		 (:constructor
 		   (if (null v)
@@ -645,7 +650,11 @@
 		  (:constructor
 		    (setq constructors
 			  (cons default-constructor constructors)))
-		  ((:conc-name :copier :predicate :print-function))
+		  ((:copier :predicate :print-function))
+		  (:conc-name
+		   (progn
+		     (setq conc-name "")
+		     (setq no-conc t)))
 		  (:named (setq named t))
 		  (t (error "~S is an illegal defstruct option." o))))))
 
@@ -747,7 +756,7 @@
           (error "A print function is supplied to a typed structure."))
     
     `(progn
-       (define-structure ',name  ',conc-name ',type
+       (define-structure ',name  ',conc-name ',no-conc ',type
 	 ',named ',slot-descriptions ',copier ',static ',include ',print-function ',constructors 
 	 ',offset ',predicate ',documentation 
 	 )

@@ -2035,9 +2035,7 @@ T759:;
 	goto T765;
 goto T766;
 T766:;
-	vs_base=vs_top;
-	(void) (*Lnk122)();
-	vs_top=sup;
+	(void)((*(LnkLI122))());
 goto T765;
 T765:;
 	V199= (long)(V199)+(1);
@@ -2174,9 +2172,7 @@ T822:;
 	goto T827;
 goto T828;
 T828:;}
-	vs_base=vs_top;
-	(void) (*Lnk122)();
-	vs_top=sup;
+	(void)((*(LnkLI122))());
 goto T827;
 T827:;
 	V210= fix((V211));}
@@ -2492,7 +2488,7 @@ static void LnkT126(){ call_or_link(VV[126],(void **)&Lnk126);} /* DEFAULT-INFO-
 static void LnkT125(){ call_or_link(VV[125],(void **)&Lnk125);} /* USER-HOMEDIR-PATHNAME */
 static object  LnkTLI124(object first,...){object V1;va_list ap;va_start(ap,first);V1=call_vproc_new(VV[124],(void **)&LnkLI124,first,ap);va_end(ap);return V1;} /* REMOVE-IF */
 static void LnkT123(){ call_or_link(VV[123],(void **)&Lnk123);} /* READ-FROM-STRING */
-static void LnkT122(){ call_or_link(VV[122],(void **)&Lnk122);} /* TYPE-ERROR */
+static object  LnkTLI122(){return call_proc0(VV[122],(void **)&LnkLI122);} /* TYPE-ERROR */
 static void LnkT121(){ call_or_link(VV[121],(void **)&Lnk121);} /* OFFER-CHOICES */
 static void LnkT120(){ call_or_link(VV[120],(void **)&Lnk120);} /* INFO-AUX */
 static void LnkT119(){ call_or_link(VV[119],(void **)&Lnk119);} /* ADD-FILE */
