@@ -174,7 +174,7 @@
 
   (cond (*compiler-in-use*
          (format t "~&The compiler was called recursively.~%~
-Cannot compile ~a."
+Cannot compile ~a.~%"
                  (namestring (merge-pathnames input-pathname #".lsp")))
          (setq *error-p* t)
          (return-from compile-file1 (values)))
@@ -188,7 +188,7 @@ Cannot compile ~a."
     (return-from compile-file1 (values)))
 
   (when *compile-verbose*
-    (format t "~&Compiling ~a."
+    (format t "~&Compiling ~a.~%"
             (namestring (merge-pathnames input-pathname #".lsp"))))
 
   (and *record-call-info* (clear-call-table))
@@ -303,7 +303,7 @@ Cannot compile ~a."
 			      "code")))
 
       (when (zerop *error-count*)
-        (when *compile-verbose* (format t "~&End of Pass 1.  "))
+        (when *compile-verbose* (format t "~&End of Pass 1.  ~%"))
         (compiler-pass2 c-pathname h-pathname system-p ))
 	
 
@@ -317,7 +317,7 @@ Cannot compile ~a."
 
         #+aosvs
         (progn
-          (when *compile-verbose* (format t "~&End of Pass 2.  "))
+          (when *compile-verbose* (format t "~&End of Pass 2.  ~%"))
           (when data-file
             (with-open-file (in fasl-pathname)
               (with-open-file (out data-pathname :direction :output)
@@ -331,13 +331,13 @@ Cannot compile ~a."
                         (unless ob-file (delete-file ob-pathname))
                         (when *compile-verbose*
                               (print-compiler-info)
-                              (format t "~&Finished compiling ~a." (namestring output-file))
+                              (format t "~&Finished compiling ~a.~%" (namestring output-file))
 			      ))
                        (t (format t "~&Your C compiler failed to compile the intermediate file.~%")
                           (setq *error-p* t))))
                 (*compile-verbose*
                  (print-compiler-info)
-                 (format t "~&Finished compiling ~a." (namestring output-file)
+                 (format t "~&Finished compiling ~a.~%" (namestring output-file)
 			 )))
           (unless c-file (delete-file c-pathname))
           (unless h-file (delete-file h-pathname))
@@ -345,7 +345,7 @@ Cannot compile ~a."
 
         #+unix
         (progn
-          (when *compile-verbose* (format t "~&End of Pass 2.  "))
+          (when *compile-verbose* (format t "~&End of Pass 2.  ~%"))
 	  (cond (*record-call-info*
 		 (dump-fn-data (get-output-pathname output-file "fn" name dir))))
           (cond (o-file
@@ -355,14 +355,14 @@ Cannot compile ~a."
                         (when load (load o-pathname))
                        (when *compile-verbose*
                               (print-compiler-info)
-                              (format t "~&Finished compiling ~a." (namestring output-file)
+                              (format t "~&Finished compiling ~a.~%" (namestring output-file)
 				      )))
                        (t 
                           (format t "~&Your C compiler failed to compile the intermediate file.~%")
                           (setq *error-p* t))))
                  (*compile-verbose*
                   (print-compiler-info)
-                  (format t "~&Finished compiling ~a." (namestring output-file)
+                  (format t "~&Finished compiling ~a.~%" (namestring output-file)
 			  )))
           (unless c-file (delete-file c-pathname))
           (unless h-file (delete-file h-pathname))
