@@ -90,8 +90,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
   * Proper contblock/relblock determination when expanding string
     streams
   * Proper string type determination for *link-array*
+  * .ini files depend on plt.h
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 02:02:46 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 20 Mar 2004 02:05:06 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 

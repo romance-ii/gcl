@@ -30,7 +30,7 @@ DECL := $(HDIR)new_decl.h
 	rm $*.c
 
 CPP=
-%.ini: %.c grab_defs
+%.ini: %.c grab_defs plt.h
 	[ -e $(DECL) ] || touch $(DECL)
 	$(CC) -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c | sed -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
 
@@ -145,6 +145,9 @@ grab_defs: grab_defs.c
 #void.h: undef def
 #	join -v1 $^ | \
 #	awk '/my_plt/ {next} {printf("extern void *%s;\n",$$1);}'>$@
+
+plttest.o: plttest.c 
+	$(CC) -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO) 
 
 plt.h: plttest.o
 	nm $< | awk '/ U / {a=$$2;if (k) sub("^_","",a);\
