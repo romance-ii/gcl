@@ -23,7 +23,9 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #define NEED_ISFINITE
+
 #include "include.h"
+#include <unistd.h>
 
 #define LINE_LENGTH line_length
 int  line_length = 72;

@@ -22,6 +22,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #ifndef IN_UNIXINT
 #define NEED_MP_H
+#include <unistd.h>
 #include "include.h"
 
 #ifndef USIG2

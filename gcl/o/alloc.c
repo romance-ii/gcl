@@ -26,6 +26,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 /*  #define _GNU_SOURCE */
 #include <string.h>
+#include <unistd.h>
 
 #include "include.h"
 #include "page.h"

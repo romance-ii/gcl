@@ -25,6 +25,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #define IN_UNIXTIME
 
+#include <unistd.h>
+
 #include "include.h"
 #include <sys/types.h>
 #ifdef UNIX

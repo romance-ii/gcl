@@ -5,7 +5,7 @@ static caddr_t curbrk = &end;
 caddr_t sbrk(int n);
 
 void *
-sbrk(ptrdiff_t n) { 
+sbrk(int n) { 
   int res;
   if (n==0) return curbrk;
   { 

@@ -916,8 +916,8 @@ typedef void (*funcvoid)(void);
 /* run_process.c:344:OF */ extern void init_socket_function (void); /* () */
 /* save.c:6:OF */ extern void memory_save (char *original_file, char *save_file); /* (original_file, save_file) char *original_file; char *save_file; */
 /* save.c:17:OF */ extern void Lsave (void); /* () */
-#include <unistd.h>
-/* sbrk.c:9:OF */ extern void * sbrk (ptrdiff_t n); /* (n) int n; */
+/*  #include <unistd.h> */
+/* sbrk.c:9:OF */ extern void * sbrk (int n); /* (n) int n; */
 /* strcspn.c:3:OF */ /*  extern size_t strcspn (const char *s1, const char *s2); */ /* (s1, s2) char *s1; char *s2; */
 /* structure.c:41:OF */ extern bool structure_subtypep (object x, object y); /* (x, y) object x; object y; */
 /* structure.c:59:OF */ extern object structure_ref (object x, object name, int i); /* (x, name, i) object x; object name; int i; */
