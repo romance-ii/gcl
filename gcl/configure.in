@@ -213,8 +213,8 @@ case $use in
 			def_dlopen="yes" ; def_statsysbfd="no" ;;
 		hppa*)
 			def_dlopen="yes" ; def_statsysbfd="no" def_pic="yes" ;;
-		m68k*)
-			def_oldgmp="yes" ;;
+#		m68k*)
+#			def_oldgmp="yes" ;;
 	esac;;
     *mingw*)
 	def_statsysbfd="no" ; def_custreloc="yes" ;;
@@ -322,8 +322,8 @@ case $use in
 	case $use in
 		alpha*)
 			TCFLAGS="$TCFLAGS -mieee";;
-		m68k*)
-			TCFLAGS="$TCFLAGS -ffloat-store";;
+#		m68k*)
+#			TCFLAGS="$TCFLAGS -ffloat-store";;
 #		hppa*)
 #			TCFLAGS="$TCFLAGS -fPIC";;
 	esac;;
@@ -405,12 +405,15 @@ if test $use_gmp = yes ; then
  echo "# ------------------------"
  echo "#"
 
+ PATCHED_SYMBOLS=""
  if test "$enable_dynsysgmp" = "yes" ; then
 	AC_CHECK_HEADER(gmp.h,
 		AC_CHECK_LIB(gmp,__gmpz_init,
 			MPFILES=$GMPDIR/mpn/mul_n.o
+			PATCHED_SYMBOLS=__gmpn_toom3_mul_n
 			if test "$use" = "m68k-linux" ; then
 				MPFILES="$MPFILES $GMPDIR/mpn/lshift.o $GMPDIR/mpn/rshift.o"
+				PATCHED_SYMBOLS="$PATCHED_SYMBOLS __gmpn_lshift __gmpn_rshift"
 			fi
 			TLIBS="$TLIBS -lgmp"
 			echo "#include \"gmp.h\"" >foo.c
@@ -471,6 +474,7 @@ fi
  AC_SUBST(GMPDIR)
  echo > makedefsafter
  echo "MPFILES=$MPFILES" >> makedefsafter
+ echo "PATCHED_SYMBOLS=$PATCHED_SYMBOLS" >> makedefsafter
  echo >> makedefsafter
 fi
 

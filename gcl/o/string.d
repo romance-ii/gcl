@@ -31,6 +31,7 @@ object sKend1;
 object sKstart2;
 object sKend2;
 object sKinitial_element;
+object sKelement_type;
 
 object
 alloc_simple_string(l)
@@ -208,7 +209,7 @@ object x;
 	check_type_string(&s);
 	if (type_of(i) != t_fixnum)
 		illegal_index(s, i);
-	if ((j = fix(i)) < 0 || j >= s->st.st_fillp)
+	if ((j = fix(i)) < 0 /*|| j >= s->st.st_fillp*/)
 		illegal_index(s, i);
 	@(return `code_char(s->ust.ust_self[j])`)
 @)
@@ -387,9 +388,9 @@ void Lstring_not_greaterp(){ string_sign =  1; string_boundary = 0;  Lstring_com
 void Lstring_not_lessp()   { string_sign = -1; string_boundary = 0;  Lstring_compare(); }
 void Lstring_not_equal()   { string_sign =  0; string_boundary = 1;  Lstring_compare(); }
 
-
+/* element_type is currently ignored -- character == base-char == standard-char */
 @(defun make_string (size
-		     &key (initial_element `code_char(' ')`)
+		     &key (initial_element `code_char(' ')` ) element_type 
 		     &aux x)
 	int i;
 @
@@ -591,6 +592,7 @@ init_string_function()
 	sKstart2 = make_keyword("START2");
 	sKend2 = make_keyword("END2");
 	sKinitial_element = make_keyword("INITIAL-ELEMENT");
+	sKelement_type = make_keyword("ELEMENT-TYPE");
 	sKstart = make_keyword("START");
 	sKend = make_keyword("END");
 

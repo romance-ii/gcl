@@ -152,6 +152,7 @@
     (satisfies (funcall (car i) object))
     ((t) t)
     ((nil) nil)
+    (boolean (or (eq object 't) (eq object 'nil)))
     (fixnum (eq (type-of object) 'fixnum))
     (bignum (eq (type-of object) 'bignum))
     (ratio (eq (type-of object) 'ratio))
@@ -235,14 +236,26 @@
 (defun known-type-p (type)
   (when (consp type) (setq type (car type)))
   (if (or (member type
-                  '(t nil null symbol keyword atom cons list sequence
+                  '(t nil boolean null symbol keyword atom cons list sequence
 		      signed-char unsigned-char signed-short unsigned-short
                     number integer bignum rational ratio float
                     short-float single-float double-float long-float complex
                     character standard-char string-char
 		    real
                     package stream pathname readtable hash-table random-state
-                    structure array simple-array function compiled-function))
+                    structure array simple-array function compiled-function
+		    arithmetic-error base-char base-string broadcast-stream 
+		    built-in-class cell-error class concatenated-stream condition 
+		    control-error division-by-zero echo-stream end-of-file error 
+		    extended-char file-error file-stream floating-point-inexact 
+		    floating-point-invalid-operation floating-point-overflow 
+		    floating-point-underflow generic-function logical-pathname method 
+		    package-error parse-error print-not-readable program-error 
+		    reader-error serious-condition simple-base-string simple-condition 
+		    simple-type-error simple-warning standard-class standard-generic-function 
+		    standard-method standard-object storage-condition stream-error 
+		    string-stream structure-class style-warning synonym-stream two-way-stream 
+		    type-error unbound-slot unbound-variable undefined-function warning ))
           (get type 's-data))
       t
       nil))
@@ -314,7 +327,15 @@
        	       (t (values nil nil))))
        	((eq t1 'atom) (values nil ntp2))
        	((eq t2 'symbol)
-       	 (if (member t1 '(symbol keyword null))
+       	 (if (member t1 '(symbol keyword boolean null))
+       	     (values t t)
+       	     (values nil ntp1)))
+       	((eq t2 'function)
+       	 (if (member t1 '(compiled-function generic-function standard-generic-function))
+       	     (values t t)
+       	     (values nil ntp1)))
+       	((eq t2 'generic-function)
+       	 (if (eq t1 'standard-generic-function)
        	     (values t t)
        	     (values nil ntp1)))
        	((eq t2 'keyword)

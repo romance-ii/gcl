@@ -15,8 +15,24 @@ gcl (2.5.0.cvs20020625-55) unstable; urgency=high
   * set-exclusive-or preserves order of test arguments
   * type-errors where appropriate in make-sequence
   * nil keys accepted in remove/delete et.al.
+  * Reworked linking command line to ensure that certain symbols are
+    resolved in libgcl.a as opposed to certain system libraries, e.g.
+    gmp
+  * new gmp for m68k;no -ffloat-store for m68k a requested by user due
+    to performance impact (will alter test results in maxima
+    accordingly)
+  * libgclp.a for objects to be overriden by the C library if necessary
+  * readably support
+  * boolean type
+  * Missing ansi type support
+  * subtype code for boolean
+  * add missing ansi types as known types
+  * other preliminary subtype code for missing ansi types
+  * rework result-type check in make-sequence
+  * :element-type support in make-string (preliminary)
+  * (char ignores fill-pointer
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  1 Oct 2002 00:35:54 -0400
+ -- Camm Maguire <camm@enhanced.com>  Thu,  3 Oct 2002 01:30:10 -0400
 
 gcl (2.5.0.cvs20020625-54) unstable; urgency=high
 

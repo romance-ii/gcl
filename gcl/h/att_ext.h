@@ -407,6 +407,7 @@ EXTER object sKupcase;
 EXTER object sKdowncase;
 EXTER object sKcapitalize;
 EXTER object sKstream;
+EXTER object sKreadably;
 EXTER object sKescape;
 EXTER object sKpretty;
 EXTER object sKcircle;
@@ -417,6 +418,7 @@ EXTER object sKgensym;
 EXTER object sKlevel;
 EXTER object sKlength;
 EXTER object sKarray;
+EXTER object sLAprint_readablyA;
 EXTER object sLAprint_escapeA;
 EXTER object sLAprint_prettyA;
 EXTER object sLAprint_circleA;
@@ -430,6 +432,7 @@ EXTER object sLAprint_arrayA;
 EXTER object *PRINTvs_top;
 EXTER object *PRINTvs_limit;
 EXTER object PRINTstream;
+EXTER bool PRINTreadably;
 EXTER bool PRINTescape;
 EXTER bool PRINTpretty;
 EXTER bool PRINTcircle;
@@ -555,22 +558,27 @@ EXTER object sSvariable_documentation;
 EXTER object sSfunction_documentation;
 
 /*  typespec.c  */
-EXTER object
-/*sLt,		sLnil, */
-sLcommon,
-sLnull,		sLcons,		sLlist,		sLsymbol,
-sLarray,		sLvector,	sLbit_vector,	sLstring,
-sLsequence,
-sLsimple_array,	sLsimple_vector,	sLsimple_bit_vector,
-						sLsimple_string,
-sLcompiled_function,
-				sLpathname,	sLcharacter,
-sLnumber,	sLrational,	sLfloat,		sLstring_char,
-sLinteger,	sLratio,		sLshort_float,	sLstandard_char,
-sLfixnum,	sLpositive_fixnum, sLcomplex,	sLsingle_float,	sLpackage,
-sLbignum,	sLrandom_state,	sLdouble_float,	sLstream,
-sLbit,		sLreadtable,	sLlong_float,	sLhash_table;
-EXTER object sLstructure;
+EXTER object sLcommon,sLnull,sLcons,sLlist,sLsymbol,sLarray,sLvector,sLbit_vector,sLstring;
+EXTER object sLsequence,sLsimple_array,sLsimple_vector,sLsimple_bit_vector,sLsimple_string;
+EXTER object sLcompiled_function,sLpathname,sLcharacter,sLnumber,sLrational,sLfloat,sLstring_char;
+EXTER object sLinteger,sLratio,sLshort_float,sLstandard_char,sLfixnum,sLpositive_fixnum, sLcomplex;
+EXTER object sLsingle_float,sLpackage,sLbignum,sLrandom_state,sLdouble_float,sLstream,sLbit,sLreadtable;
+EXTER object sLlong_float,sLhash_table,sLstructure,sLboolean;
+
+#ifdef ANSI_COMMON_LISP
+/* new ansi types */
+EXTER object sLarithmetic_error,sLbase_char,sLbase_string,sLbroadcast_stream,sLbuilt_in_class;
+EXTER object sLcell_error,sLclass,sLconcatenated_stream,sLcondition,sLcontrol_error,sLdivision_by_zero;
+EXTER object sLecho_stream,sLend_of_file,sLerror,sLextended_char,sLfile_error,sLfile_stream;
+EXTER object sLfloating_point_inexact,sLfloating_point_invalid_operation,sLfloating_point_overflow;
+EXTER object sLfloating_point_underflow,sLgeneric_function,sLlogical_pathname,sLmethod,sLpackage_error;
+EXTER object sLparse_error,sLprint_not_readable,sLprogram_error,sLreader_error,sLserious_condition;
+EXTER object sLsimple_base_string,sLsimple_condition,sLsimple_type_error,sLsimple_warning,sLstandard_class;
+EXTER object sLstandard_generic_function,sLstandard_method,sLstandard_object,sLstorage_condition;
+EXTER object sLstream_error,sLstring_stream,sLstructure_class,sLstyle_warning,sLsynonym_stream;
+EXTER object sLtwo_way_stream,sLtype_error,sLunbound_slot,sLunbound_variable,sLundefined_function,sLwarning;
+#endif
+
 EXTER object sLsatisfies;
 EXTER object sLmember;
 EXTER object sLnot;

@@ -467,6 +467,7 @@ int level;
 	object *vt = PRINTvs_top;
 	object *vl = PRINTvs_limit;
 	bool e = PRINTescape;
+	bool ra = PRINTreadably;
 	bool r = PRINTradix;
 	int b = PRINTbase;
 	bool c = PRINTcircle;
@@ -521,6 +522,7 @@ ONCE_MORE:
 
 	old_bds_top = bds_top;
 	bds_bind(sLAprint_escapeA, PRINTescape?Ct:Cnil);
+	bds_bind(sLAprint_readablyA, PRINTreadably?Ct:Cnil);
 	bds_bind(sLAprint_radixA, PRINTradix?Ct:Cnil);
 	bds_bind(sLAprint_baseA, make_fixnum(PRINTbase));
 	bds_bind(sLAprint_circleA, PRINTcircle?Ct:Cnil);
@@ -571,6 +573,7 @@ L:
 	PRINTbase = b;
 	PRINTradix = r;
 	PRINTescape = e;
+	PRINTreadably = ra;
 	PRINTvs_limit = vl;
 	PRINTvs_top = vt;
 
@@ -1465,6 +1468,7 @@ object x;
 		FEwrong_type_argument(sLstream, PRINTstream);
 	}
 	PRINTescape = symbol_value(sLAprint_escapeA) != Cnil;
+	PRINTreadably = symbol_value(sLAprint_readablyA) != Cnil;
 	PRINTpretty = symbol_value(sLAprint_prettyA) != Cnil;
 	PRINTcircle = symbol_value(sLAprint_circleA) != Cnil;
 	y = symbol_value(sLAprint_baseA);
@@ -1580,6 +1584,7 @@ int base;
 @(defun write (x
 	       &key ((:stream strm) Cnil)
 		    (escape `symbol_value(sLAprint_escapeA)`)
+		    (readably `symbol_value(sLAprint_readablyA)`)
 		    (radix `symbol_value(sLAprint_radixA)`)
 		    (base `symbol_value(sLAprint_baseA)`)
 		    (circle `symbol_value(sLAprint_circleA)`)
@@ -1602,7 +1607,8 @@ int base;
 		FEerror("~S is not a stream.", 1, strm);
 	PRINTvs_top = vs_top;
 	PRINTstream = strm;
-	PRINTescape = escape != Cnil;
+	PRINTreadably = readably != Cnil;
+	PRINTescape = PRINTreadably || escape != Cnil;
 	PRINTpretty = pretty != Cnil;
 	PRINTcircle = circle != Cnil;
 	if (type_of(base)!=t_fixnum || fix((base))<2 || fix((base))>36)
@@ -1614,20 +1620,20 @@ int base;
 	if (PRINTcase != sKupcase && PRINTcase != sKdowncase &&
 	    PRINTcase != sKcapitalize)
 		FEerror("~S is an illegal PRINT-CASE.", 1, cas);
-	PRINTgensym = gensym != Cnil;
-	if (level == Cnil)
+	PRINTgensym = PRINTreadably || gensym != Cnil;
+	if (PRINTreadably || level == Cnil)
 		PRINTlevel = -1;
 	else if (type_of(level) != t_fixnum || fix((level)) < 0)
 		FEerror("~S is an illegal PRINT-LEVEL.", 1, level);
 	else
 		PRINTlevel = fix((level));
-	if (length == Cnil)
+	if (PRINTreadably || length == Cnil)
 		PRINTlength = -1;
 	else if (type_of(length) != t_fixnum || fix((length)) < 0)
 		FEerror("~S is an illegal PRINT-LENGTH.", 1, length);
 	else
 		PRINTlength = fix((length));
-	PRINTarray = array != Cnil;
+	PRINTarray = PRINTreadably || array != Cnil;
 	if (PRINTcircle) setupPRINTcircle(x,1);
 	if (PRINTpretty) {
 		qh = qt = qc = 0;
@@ -1666,6 +1672,7 @@ int base;
         WRITEC_NEWLINE(strm);
 	{SETUP_PRINT_DEFAULT(obj);
 	PRINTstream = strm;
+	PRINTreadably = FALSE;
 	PRINTescape = TRUE;
 	PRINTpretty = TRUE;
 	qh = qt = qc = 0;
@@ -1803,6 +1810,7 @@ DEF_ORDINARY("DOWNCASE",sKdowncase,KEYWORD,"");
 DEF_ORDINARY("CAPITALIZE",sKcapitalize,KEYWORD,"");
 DEF_ORDINARY("STREAM",sKstream,KEYWORD,"");
 DEF_ORDINARY("ESCAPE",sKescape,KEYWORD,"");
+DEF_ORDINARY("READABLY",sKreadably,KEYWORD,"");
 DEF_ORDINARY("PRETTY",sKpretty,KEYWORD,"");
 DEF_ORDINARY("CIRCLE",sKcircle,KEYWORD,"");
 DEF_ORDINARY("BASE",sKbase,KEYWORD,"");
@@ -1813,6 +1821,7 @@ DEF_ORDINARY("LEVEL",sKlevel,KEYWORD,"");
 DEF_ORDINARY("LENGTH",sKlength,KEYWORD,"");
 DEF_ORDINARY("ARRAY",sKarray,KEYWORD,"");
 DEFVAR("*PRINT-ESCAPE*",sLAprint_escapeA,LISP,Ct,"");
+DEFVAR("*PRINT-READABLY*",sLAprint_readablyA,LISP,Ct,"");
 DEFVAR("*PRINT-PRETTY*",sLAprint_prettyA,LISP,Ct,"");
 DEFVAR("*PRINT-CIRCLE*",sLAprint_circleA,LISP,Cnil,"");
 DEFVAR("*PRINT-BASE*",sLAprint_baseA,LISP,make_fixnum(10),"");
@@ -1839,6 +1848,7 @@ init_print()
 
 	PRINTstream = Cnil;
 	enter_mark_origin(&PRINTstream);
+	PRINTreadably = FALSE;
 	PRINTescape = TRUE;
 	PRINTpretty = FALSE;
 	PRINTcircle = FALSE;
@@ -1875,6 +1885,7 @@ object obj, strm;
 	case t_string:
 	case t_character:
 		PRINTstream = strm;
+		PRINTreadably = FALSE;
 		PRINTescape = FALSE;
 		write_ch_fun = writec_PRINTstream;
 		write_object(obj, 0);
@@ -1883,6 +1894,7 @@ object obj, strm;
 	default:
 		{SETUP_PRINT_DEFAULT(obj);
 		PRINTstream = strm;
+		PRINTreadably = FALSE;
 		PRINTescape = FALSE;
 		write_object(obj, 0);
 		CLEANUP_PRINT_DEFAULT;}
@@ -1908,6 +1920,7 @@ object obj, strm;
 	case t_string:
 	case t_character:
 		PRINTstream = strm;
+		PRINTreadably = FALSE;
 		PRINTescape = TRUE;
 		write_ch_fun = writec_PRINTstream;
 		write_object(obj, 0);
@@ -1916,6 +1929,7 @@ object obj, strm;
 	default:
 		{SETUP_PRINT_DEFAULT(obj);
 		PRINTstream = strm;
+		PRINTreadably = FALSE;
 		PRINTescape = TRUE;
 		write_object(obj, 0);
 		CLEANUP_PRINT_DEFAULT;}

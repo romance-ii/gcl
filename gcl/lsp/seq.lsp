@@ -57,11 +57,13 @@
                (unless (or (eq (car type) 'array)
 			   (eq (car type) 'simple-array))
 		 (specific-error :wrong-type-argument "~S is not of type ~S." 
-				 type "sequence"))
-               (unless (or (not (si::fixnump (car (caddr type))))
-			   (equal (car (caddr type)) size))
+				 type 'sequence))
+	       (let ((ssize (caddr type)))
+		 (if (listp ssize) (setq ssize (car ssize)))
+		 (if (not (si::fixnump ssize)) (setq ssize size))
+		 (unless (equal ssize size)
 		 (specific-error :wrong-type-argument "~S is not of type ~S." 
-				 type (format nil "~S (size ~S)" type size)))
+				 type (format nil "~S (size ~S)" type size))))
                (or (cadr type) t))))
   (setq element-type (si::best-array-element-type element-type))
   (setq sequence (si:make-vector element-type size nil nil nil nil nil))

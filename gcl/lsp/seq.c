@@ -152,9 +152,19 @@ T33:;
 	vs_top=sup;
 goto T61;
 T61:;
-	if(!(type_of(car(caddr((V3))))==t_fixnum)){
-	goto T70;}
-	if(equal(car(caddr((V3))),(V4))){
+	{object V13;
+	V13= caddr((V3));
+	if(!(type_of((V13))==t_cons||((V13))==Cnil)){
+	goto T72;}
+	V13= car((V13));
+goto T72;
+T72:;
+	if(type_of((V13))==t_fixnum){
+	goto T76;}
+	V13= (V4);
+goto T76;
+T76:;
+	if(equal((V13),(V4))){
 	goto T70;}
 	base[0]= VV[12];
 	base[1]= VV[19];
@@ -169,15 +179,15 @@ T61:;
 	base[3]= vs_base[0];
 	vs_top=(vs_base=base+0)+4;
 	(void) (*Lnk23)();
-	vs_top=sup;
+	vs_top=sup;}
 goto T70;
-T70:;{object V13;
-	V13= cadr((V3));
-	if(V13==Cnil)goto T83;
-	V7= V13;
+T70:;{object V14;
+	V14= cadr((V3));
+	if(V14==Cnil)goto T90;
+	V7= V14;
 	goto T5;
-goto T83;
-T83:;}
+goto T90;
+T90:;}
 	V7= Ct;
 goto T5;
 T5:;
@@ -194,527 +204,527 @@ T5:;
 	vs_top=sup;
 	V8= vs_base[0];
 	if(((V6))==Cnil){
-	goto T96;}
-	{register long V14;
-	register long V15;
-	V14= 0;
-	V15= fix((V4));
-goto T102;
-T102:;
-	if(!((V14)>=(V15))){
 	goto T103;}
-	goto T96;
+	{register long V15;
+	register long V16;
+	V15= 0;
+	V16= fix((V4));
+goto T109;
+T109:;
+	if(!((V15)>=(V16))){
+	goto T110;}
+	goto T103;
+goto T110;
+T110:;
+	(void)(elt_set((V8),V15,(V5)));
+	V15= (long)(V15)+1;
+	goto T109;}
 goto T103;
 T103:;
-	(void)(elt_set((V8),V14,(V5)));
-	V14= (long)(V14)+1;
-	goto T102;}
-goto T96;
-T96:;
-	{object V16 = (V8);
-	VMR1(V16)}}
+	{object V17 = (V8);
+	VMR1(V17)}}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}}
 /*	local entry for function CONCATENATE	*/
 
-static object LI2(V17,va_alist)
-	object V17;
+static object LI2(V18,va_alist)
+	object V18;
 	va_dcl 
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB2 VMS2 VMV2
-	{object V18;
-	object V19;
+	{object V19;
+	object V20;
 	Vcs[0]=Vcs[0];
 	va_start(ap);
 	if(narg <1) too_few_arguments();
-	V18= V17;
+	V19= V18;
 	narg= narg - 1;
-	V20 = list_vector(narg,ap);
-	V19= V20;
-	{register object V21;
-	register object V22;
-	register long V23;
-	{object V25;
+	V21 = list_vector(narg,ap);
+	V20= V21;
+	{register object V22;
+	register object V23;
+	register long V24;
 	{object V26;
-	object V27= (V19);
-	if(endp(V27)){
-	V25= Cnil;
-	goto T113;}
-	base[0]=V26=MMcons(Cnil,Cnil);
-goto T114;
-T114:;
-	base[1]= (V27->c.c_car);
+	{object V27;
+	object V28= (V20);
+	if(endp(V28)){
+	V26= Cnil;
+	goto T120;}
+	base[0]=V27=MMcons(Cnil,Cnil);
+goto T121;
+T121:;
+	base[1]= (V28->c.c_car);
 	vs_top=(vs_base=base+1)+1;
 	Llength();
 	vs_top=sup;
-	(V26->c.c_car)= vs_base[0];
-	V27=MMcdr(V27);
-	if(endp(V27)){
-	V25= base[0];
-	goto T113;}
-	V26=MMcdr(V26)=MMcons(Cnil,Cnil);
-	goto T114;}
-goto T113;
-T113:;
+	(V27->c.c_car)= vs_base[0];
+	V28=MMcdr(V28);
+	if(endp(V28)){
+	V26= base[0];
+	goto T120;}
+	V27=MMcdr(V27)=MMcons(Cnil,Cnil);
+	goto T121;}
+goto T120;
+T120:;
 	 vs_top=base+0;
-	 while(!endp(V25))
-	 {vs_push(car(V25));V25=cdr(V25);}
+	 while(!endp(V26))
+	 {vs_push(car(V26));V26=cdr(V26);}
 	vs_base=base+0;}
 	Lplus();
 	vs_top=sup;
-	V24= vs_base[0];
-	V21= (VFUN_NARGS=2,(*(LnkLI25))((V18),V24));
-	V23= 0;
-	V22= (V19);
-goto T119;
-T119:;
-	if(((V22))!=Cnil){
-	goto T120;}
-	{object V28 = (V21);
-	VMR2(V28)}
-goto T120;
-T120:;
-	{register long V29;
-	register long V30;
-	V29= 0;
-	V30= (long)length(car((V22)));
-goto T128;
-T128:;
-	if(!((V29)>=(V30))){
-	goto T129;}
-	goto T124;
-goto T129;
-T129:;
-	V31= elt(car((V22)),V29);
-	(void)(elt_set((V21),V23,/* INLINE-ARGS */V31));
-	V23= (long)(V23)+(1);
-	V29= (long)(V29)+1;
-	goto T128;}
-goto T124;
-T124:;
-	V22= cdr((V22));
-	goto T119;}
+	V25= vs_base[0];
+	V22= (VFUN_NARGS=2,(*(LnkLI25))((V19),V25));
+	V24= 0;
+	V23= (V20);
+goto T126;
+T126:;
+	if(((V23))!=Cnil){
+	goto T127;}
+	{object V29 = (V22);
+	VMR2(V29)}
+goto T127;
+T127:;
+	{register long V30;
+	register long V31;
+	V30= 0;
+	V31= (long)length(car((V23)));
+goto T135;
+T135:;
+	if(!((V30)>=(V31))){
+	goto T136;}
+	goto T131;
+goto T136;
+T136:;
+	V32= elt(car((V23)),V30);
+	(void)(elt_set((V22),V24,/* INLINE-ARGS */V32));
+	V24= (long)(V24)+(1);
+	V30= (long)(V30)+1;
+	goto T135;}
+goto T131;
+T131:;
+	V23= cdr((V23));
+	goto T126;}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function MAP	*/
 
-static object LI3(V34,V33,V32,va_alist)
-	object V34,V33,V32;
+static object LI3(V35,V34,V33,va_alist)
+	object V35,V34,V33;
 	va_dcl 
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB3 VMS3 VMV3
-	{object V35;
-	register object V36;
-	object V37;
-	register object V38;
+	{object V36;
+	register object V37;
+	object V38;
+	register object V39;
 	Vcs[0]=Vcs[0];
 	va_start(ap);
 	if(narg <3) too_few_arguments();
-	V35= V34;
-	V36= V33;
-	V37= V32;
+	V36= V35;
+	V37= V34;
+	V38= V33;
 	narg= narg - 3;
-	V39 = list_vector(narg,ap);
-	V38= V39;
-	V38= make_cons((V37),(V38));
-	{object V40;
+	V40 = list_vector(narg,ap);
+	V39= V40;
+	V39= make_cons((V38),(V39));
 	{object V41;
 	{object V42;
-	object V43= (V38);
-	if(endp(V43)){
-	V41= Cnil;
-	goto T145;}
-	base[0]=V42=MMcons(Cnil,Cnil);
-goto T146;
-T146:;
-	base[1]= (V43->c.c_car);
+	{object V43;
+	object V44= (V39);
+	if(endp(V44)){
+	V42= Cnil;
+	goto T152;}
+	base[0]=V43=MMcons(Cnil,Cnil);
+goto T153;
+T153:;
+	base[1]= (V44->c.c_car);
 	vs_top=(vs_base=base+1)+1;
 	Llength();
 	vs_top=sup;
-	(V42->c.c_car)= vs_base[0];
-	V43=MMcdr(V43);
-	if(endp(V43)){
-	V41= base[0];
-	goto T145;}
-	V42=MMcdr(V42)=MMcons(Cnil,Cnil);
-	goto T146;}
-goto T145;
-T145:;
+	(V43->c.c_car)= vs_base[0];
+	V44=MMcdr(V44);
+	if(endp(V44)){
+	V42= base[0];
+	goto T152;}
+	V43=MMcdr(V43)=MMcons(Cnil,Cnil);
+	goto T153;}
+goto T152;
+T152:;
 	 vs_top=base+0;
-	 while(!endp(V41))
-	 {vs_push(car(V41));V41=cdr(V41);}
+	 while(!endp(V42))
+	 {vs_push(car(V42));V42=cdr(V42);}
 	vs_base=base+0;}
 	Lmin();
 	vs_top=sup;
-	V40= vs_base[0];
-	if(((V35))!=Cnil){
-	goto T150;}
-	{register long V44;
-	long V45;
-	V44= 0;
-	V45= fix((V40));
-goto T155;
-T155:;
-	if(!((V44)>=(V45))){
-	goto T156;}
-	{object V46 = Cnil;
-	VMR3(V46)}
-goto T156;
-T156:;
-	base[0]= (V36);
-	{object V47;
-	{object V48;
-	object V49= (V38);
-	if(endp(V49)){
-	V47= Cnil;
-	goto T162;}
-	base[1]=V48=MMcons(Cnil,Cnil);
-goto T163;
-T163:;
-	{register object V50;
-	V50= (V49->c.c_car);
-	(V48->c.c_car)= elt((V50),V44);}
-	V49=MMcdr(V49);
-	if(endp(V49)){
-	V47= base[1];
-	goto T162;}
-	V48=MMcdr(V48)=MMcons(Cnil,Cnil);
-	goto T163;}
+	V41= vs_base[0];
+	if(((V36))!=Cnil){
+	goto T157;}
+	{register long V45;
+	long V46;
+	V45= 0;
+	V46= fix((V41));
 goto T162;
 T162:;
+	if(!((V45)>=(V46))){
+	goto T163;}
+	{object V47 = Cnil;
+	VMR3(V47)}
+goto T163;
+T163:;
+	base[0]= (V37);
+	{object V48;
+	{object V49;
+	object V50= (V39);
+	if(endp(V50)){
+	V48= Cnil;
+	goto T169;}
+	base[1]=V49=MMcons(Cnil,Cnil);
+goto T170;
+T170:;
+	{register object V51;
+	V51= (V50->c.c_car);
+	(V49->c.c_car)= elt((V51),V45);}
+	V50=MMcdr(V50);
+	if(endp(V50)){
+	V48= base[1];
+	goto T169;}
+	V49=MMcdr(V49)=MMcons(Cnil,Cnil);
+	goto T170;}
+goto T169;
+T169:;
 	 vs_top=base+1;
-	 while(!endp(V47))
-	 {vs_push(car(V47));V47=cdr(V47);}
+	 while(!endp(V48))
+	 {vs_push(car(V48));V48=cdr(V48);}
 	vs_base=base+1;}
 	super_funcall_no_event(base[0]);
 	vs_top=sup;
-	V44= (long)(V44)+1;
-	goto T155;}
-goto T150;
-T150:;
-	{register object V51;
-	V51= (VFUN_NARGS=2,(*(LnkLI25))((V35),(V40)));
-	{register long V52;
-	long V53;
-	V52= 0;
-	V53= fix((V40));
-goto T172;
-T172:;
-	if(!((V52)>=(V53))){
-	goto T173;}
-	{object V54 = (V51);
-	VMR3(V54)}
-goto T173;
-T173:;
-	base[0]= (V36);
-	{object V56;
-	{object V57;
-	object V58= (V38);
-	if(endp(V58)){
-	V56= Cnil;
+	V45= (long)(V45)+1;
+	goto T162;}
+goto T157;
+T157:;
+	{register object V52;
+	V52= (VFUN_NARGS=2,(*(LnkLI25))((V36),(V41)));
+	{register long V53;
+	long V54;
+	V53= 0;
+	V54= fix((V41));
+goto T179;
+T179:;
+	if(!((V53)>=(V54))){
 	goto T180;}
-	base[1]=V57=MMcons(Cnil,Cnil);
-goto T181;
-T181:;
-	{register object V59;
-	V59= (V58->c.c_car);
-	(V57->c.c_car)= elt((V59),V52);}
-	V58=MMcdr(V58);
-	if(endp(V58)){
-	V56= base[1];
-	goto T180;}
-	V57=MMcdr(V57)=MMcons(Cnil,Cnil);
-	goto T181;}
+	{object V55 = (V52);
+	VMR3(V55)}
 goto T180;
 T180:;
+	base[0]= (V37);
+	{object V57;
+	{object V58;
+	object V59= (V39);
+	if(endp(V59)){
+	V57= Cnil;
+	goto T187;}
+	base[1]=V58=MMcons(Cnil,Cnil);
+goto T188;
+T188:;
+	{register object V60;
+	V60= (V59->c.c_car);
+	(V58->c.c_car)= elt((V60),V53);}
+	V59=MMcdr(V59);
+	if(endp(V59)){
+	V57= base[1];
+	goto T187;}
+	V58=MMcdr(V58)=MMcons(Cnil,Cnil);
+	goto T188;}
+goto T187;
+T187:;
 	 vs_top=base+1;
-	 while(!endp(V56))
-	 {vs_push(car(V56));V56=cdr(V56);}
+	 while(!endp(V57))
+	 {vs_push(car(V57));V57=cdr(V57);}
 	vs_base=base+1;}
 	super_funcall_no_event(base[0]);
 	vs_top=sup;
-	V55= vs_base[0];
-	(void)(elt_set((V51),V52,V55));
-	V52= (long)(V52)+1;
-	goto T172;}}}
+	V56= vs_base[0];
+	(void)(elt_set((V52),V53,V56));
+	V53= (long)(V53)+1;
+	goto T179;}}}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function SOME	*/
 
-static object LI4(V61,V60,va_alist)
-	object V61,V60;
+static object LI4(V62,V61,va_alist)
+	object V62,V61;
 	va_dcl 
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB4 VMS4 VMV4
-	{register object V62;
-	object V63;
-	register object V64;
+	{register object V63;
+	object V64;
+	register object V65;
 	Vcs[0]=Vcs[0];
 	va_start(ap);
 	if(narg <2) too_few_arguments();
-	V62= V61;
-	V63= V60;
+	V63= V62;
+	V64= V61;
 	narg= narg - 2;
-	V65 = list_vector(narg,ap);
-	V64= V65;
-	V64= make_cons((V63),(V64));
-	{register long V66;
-	register long V67;
-	V66= 0;
-	{object V68;
+	V66 = list_vector(narg,ap);
+	V65= V66;
+	V65= make_cons((V64),(V65));
+	{register long V67;
+	register long V68;
+	V67= 0;
 	{object V69;
-	object V70= (V64);
-	if(endp(V70)){
-	V68= Cnil;
-	goto T190;}
-	base[0]=V69=MMcons(Cnil,Cnil);
-goto T191;
-T191:;
-	base[1]= (V70->c.c_car);
+	{object V70;
+	object V71= (V65);
+	if(endp(V71)){
+	V69= Cnil;
+	goto T197;}
+	base[0]=V70=MMcons(Cnil,Cnil);
+goto T198;
+T198:;
+	base[1]= (V71->c.c_car);
 	vs_top=(vs_base=base+1)+1;
 	Llength();
 	vs_top=sup;
-	(V69->c.c_car)= vs_base[0];
-	V70=MMcdr(V70);
-	if(endp(V70)){
-	V68= base[0];
-	goto T190;}
-	V69=MMcdr(V69)=MMcons(Cnil,Cnil);
-	goto T191;}
-goto T190;
-T190:;
+	(V70->c.c_car)= vs_base[0];
+	V71=MMcdr(V71);
+	if(endp(V71)){
+	V69= base[0];
+	goto T197;}
+	V70=MMcdr(V70)=MMcons(Cnil,Cnil);
+	goto T198;}
+goto T197;
+T197:;
 	 vs_top=base+0;
-	 while(!endp(V68))
-	 {vs_push(car(V68));V68=cdr(V68);}
+	 while(!endp(V69))
+	 {vs_push(car(V69));V69=cdr(V69);}
 	vs_base=base+0;}
 	Lmin();
 	vs_top=sup;
-	V67= fix(vs_base[0]);
-goto T195;
-T195:;
-	if(!((V66)>=(V67))){
-	goto T196;}
-	{object V71 = Cnil;
-	VMR4(V71)}
-goto T196;
-T196:;
-	{register object V72;
-	base[0]= (V62);
-	{object V73;
-	{object V74;
-	object V75= (V64);
-	if(endp(V75)){
-	V73= Cnil;
+	V68= fix(vs_base[0]);
+goto T202;
+T202:;
+	if(!((V67)>=(V68))){
 	goto T203;}
-	base[1]=V74=MMcons(Cnil,Cnil);
-goto T204;
-T204:;
-	{register object V76;
-	V76= (V75->c.c_car);
-	(V74->c.c_car)= elt((V76),V66);}
-	V75=MMcdr(V75);
-	if(endp(V75)){
-	V73= base[1];
-	goto T203;}
-	V74=MMcdr(V74)=MMcons(Cnil,Cnil);
-	goto T204;}
+	{object V72 = Cnil;
+	VMR4(V72)}
 goto T203;
 T203:;
+	{register object V73;
+	base[0]= (V63);
+	{object V74;
+	{object V75;
+	object V76= (V65);
+	if(endp(V76)){
+	V74= Cnil;
+	goto T210;}
+	base[1]=V75=MMcons(Cnil,Cnil);
+goto T211;
+T211:;
+	{register object V77;
+	V77= (V76->c.c_car);
+	(V75->c.c_car)= elt((V77),V67);}
+	V76=MMcdr(V76);
+	if(endp(V76)){
+	V74= base[1];
+	goto T210;}
+	V75=MMcdr(V75)=MMcons(Cnil,Cnil);
+	goto T211;}
+goto T210;
+T210:;
 	 vs_top=base+1;
-	 while(!endp(V73))
-	 {vs_push(car(V73));V73=cdr(V73);}
+	 while(!endp(V74))
+	 {vs_push(car(V74));V74=cdr(V74);}
 	vs_base=base+1;}
 	super_funcall_no_event(base[0]);
 	vs_top=sup;
-	V72= vs_base[0];
-	if(((V72))==Cnil){
-	goto T200;}
-	{object V77 = (V72);
-	VMR4(V77)}}
-goto T200;
-T200:;
-	V66= (long)(V66)+1;
-	goto T195;}
+	V73= vs_base[0];
+	if(((V73))==Cnil){
+	goto T207;}
+	{object V78 = (V73);
+	VMR4(V78)}}
+goto T207;
+T207:;
+	V67= (long)(V67)+1;
+	goto T202;}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function EVERY	*/
 
-static object LI5(V79,V78,va_alist)
-	object V79,V78;
+static object LI5(V80,V79,va_alist)
+	object V80,V79;
 	va_dcl 
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB5 VMS5 VMV5
-	{register object V80;
-	object V81;
-	register object V82;
+	{register object V81;
+	object V82;
+	register object V83;
 	Vcs[0]=Vcs[0];
 	va_start(ap);
 	if(narg <2) too_few_arguments();
-	V80= V79;
-	V81= V78;
+	V81= V80;
+	V82= V79;
 	narg= narg - 2;
-	V83 = list_vector(narg,ap);
-	V82= V83;
-	V82= make_cons((V81),(V82));
-	{register long V84;
-	register long V85;
-	V84= 0;
-	{object V86;
+	V84 = list_vector(narg,ap);
+	V83= V84;
+	V83= make_cons((V82),(V83));
+	{register long V85;
+	register long V86;
+	V85= 0;
 	{object V87;
-	object V88= (V82);
-	if(endp(V88)){
-	V86= Cnil;
-	goto T215;}
-	base[0]=V87=MMcons(Cnil,Cnil);
-goto T216;
-T216:;
-	base[1]= (V88->c.c_car);
+	{object V88;
+	object V89= (V83);
+	if(endp(V89)){
+	V87= Cnil;
+	goto T222;}
+	base[0]=V88=MMcons(Cnil,Cnil);
+goto T223;
+T223:;
+	base[1]= (V89->c.c_car);
 	vs_top=(vs_base=base+1)+1;
 	Llength();
 	vs_top=sup;
-	(V87->c.c_car)= vs_base[0];
-	V88=MMcdr(V88);
-	if(endp(V88)){
-	V86= base[0];
-	goto T215;}
-	V87=MMcdr(V87)=MMcons(Cnil,Cnil);
-	goto T216;}
-goto T215;
-T215:;
+	(V88->c.c_car)= vs_base[0];
+	V89=MMcdr(V89);
+	if(endp(V89)){
+	V87= base[0];
+	goto T222;}
+	V88=MMcdr(V88)=MMcons(Cnil,Cnil);
+	goto T223;}
+goto T222;
+T222:;
 	 vs_top=base+0;
-	 while(!endp(V86))
-	 {vs_push(car(V86));V86=cdr(V86);}
+	 while(!endp(V87))
+	 {vs_push(car(V87));V87=cdr(V87);}
 	vs_base=base+0;}
 	Lmin();
 	vs_top=sup;
-	V85= fix(vs_base[0]);
-goto T220;
-T220:;
-	if(!((V84)>=(V85))){
-	goto T221;}
-	{object V89 = Ct;
-	VMR5(V89)}
-goto T221;
-T221:;
-	base[0]= (V80);
-	{object V90;
+	V86= fix(vs_base[0]);
+goto T227;
+T227:;
+	if(!((V85)>=(V86))){
+	goto T228;}
+	{object V90 = Ct;
+	VMR5(V90)}
+goto T228;
+T228:;
+	base[0]= (V81);
 	{object V91;
-	object V92= (V82);
-	if(endp(V92)){
-	V90= Cnil;
-	goto T229;}
-	base[1]=V91=MMcons(Cnil,Cnil);
-goto T230;
-T230:;
-	{register object V93;
-	V93= (V92->c.c_car);
-	(V91->c.c_car)= elt((V93),V84);}
-	V92=MMcdr(V92);
-	if(endp(V92)){
-	V90= base[1];
-	goto T229;}
-	V91=MMcdr(V91)=MMcons(Cnil,Cnil);
-	goto T230;}
-goto T229;
-T229:;
+	{object V92;
+	object V93= (V83);
+	if(endp(V93)){
+	V91= Cnil;
+	goto T236;}
+	base[1]=V92=MMcons(Cnil,Cnil);
+goto T237;
+T237:;
+	{register object V94;
+	V94= (V93->c.c_car);
+	(V92->c.c_car)= elt((V94),V85);}
+	V93=MMcdr(V93);
+	if(endp(V93)){
+	V91= base[1];
+	goto T236;}
+	V92=MMcdr(V92)=MMcons(Cnil,Cnil);
+	goto T237;}
+goto T236;
+T236:;
 	 vs_top=base+1;
-	 while(!endp(V90))
-	 {vs_push(car(V90));V90=cdr(V90);}
+	 while(!endp(V91))
+	 {vs_push(car(V91));V91=cdr(V91);}
 	vs_base=base+1;}
 	super_funcall_no_event(base[0]);
 	vs_top=sup;
 	if((vs_base[0])!=Cnil){
-	goto T225;}
-	{object V94 = Cnil;
-	VMR5(V94)}
-goto T225;
-T225:;
-	V84= (long)(V84)+1;
-	goto T220;}
+	goto T232;}
+	{object V95 = Cnil;
+	VMR5(V95)}
+goto T232;
+T232:;
+	V85= (long)(V85)+1;
+	goto T227;}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function NOTANY	*/
 
-static object LI6(V96,V95,va_alist)
-	object V96,V95;
+static object LI6(V97,V96,va_alist)
+	object V97,V96;
 	va_dcl 
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB6 VMS6 VMV6
-	{object V97;
-	object V98;
+	{object V98;
 	object V99;
+	object V100;
 	Vcs[0]=Vcs[0];
 	va_start(ap);
 	if(narg <2) too_few_arguments();
-	V97= V96;
-	V98= V95;
+	V98= V97;
+	V99= V96;
 	narg= narg - 2;
-	V100 = list_vector(narg,ap);
-	V99= V100;
-	base[0]= (V97);
-	base[1]= (V98);
-	{object V102;
-	V102= (V99);
+	V101 = list_vector(narg,ap);
+	V100= V101;
+	base[0]= (V98);
+	base[1]= (V99);
+	{object V103;
+	V103= (V100);
 	 vs_top=base+2;
-	 while(!endp(V102))
-	 {vs_push(car(V102));V102=cdr(V102);}
+	 while(!endp(V103))
+	 {vs_push(car(V103));V103=cdr(V103);}
 	vs_base=base+0;}
 	(void) (*Lnk26)();
 	vs_top=sup;
-	V101= vs_base[0];
-	{object V103 = ((V101)==Cnil?Ct:Cnil);
-	VMR6(V103)}
+	V102= vs_base[0];
+	{object V104 = ((V102)==Cnil?Ct:Cnil);
+	VMR6(V104)}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}
 	}
 /*	local entry for function NOTEVERY	*/
 
-static object LI7(V105,V104,va_alist)
-	object V105,V104;
+static object LI7(V106,V105,va_alist)
+	object V106,V105;
 	va_dcl 
 {	
 	va_list ap;
 	int narg = VFUN_NARGS; VMB7 VMS7 VMV7
-	{object V106;
-	object V107;
+	{object V107;
 	object V108;
+	object V109;
 	Vcs[0]=Vcs[0];
 	va_start(ap);
 	if(narg <2) too_few_arguments();
-	V106= V105;
-	V107= V104;
+	V107= V106;
+	V108= V105;
 	narg= narg - 2;
-	V109 = list_vector(narg,ap);
-	V108= V109;
-	base[0]= (V106);
-	base[1]= (V107);
-	{object V111;
-	V111= (V108);
+	V110 = list_vector(narg,ap);
+	V109= V110;
+	base[0]= (V107);
+	base[1]= (V108);
+	{object V112;
+	V112= (V109);
 	 vs_top=base+2;
-	 while(!endp(V111))
-	 {vs_push(car(V111));V111=cdr(V111);}
+	 while(!endp(V112))
+	 {vs_push(car(V112));V112=cdr(V112);}
 	vs_base=base+0;}
 	(void) (*Lnk27)();
 	vs_top=sup;
-	V110= vs_base[0];
-	{object V112 = ((V110)==Cnil?Ct:Cnil);
-	VMR7(V112)}
+	V111= vs_base[0];
+	{object V113 = ((V111)==Cnil?Ct:Cnil);
+	VMR7(V113)}
 	va_end(ap);
 	base[0]=base[0];
 	return Cnil;}

@@ -130,6 +130,6 @@ init_system(object no_init)
 /*    build_symbol_table(); */
 	     
   sLApackageA->s.s_dbind = user_package;
-    user_init();
+  user_init();
   
 }
