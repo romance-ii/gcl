@@ -124,7 +124,9 @@ x))
 	    (if (member :ansi-cl *features*) "ANSI" "CLtL1")
 	    (si::gcl-compile-time)
 	    "Source License: LGPL(gcl,gmp), GPL(unexec,bfd)"
-	    "Binary License: GPL due to GPL'ed components:" gpled-modules
+	    "Binary License: "
+	    (if gpled-modules (format nil "GPL due to GPL'ed components: ~a" gpled-modules)
+	      "LGPL")
 	    "Modifications of this banner must retain notice of a compatible license"
 	    "Dedicated to the memory of W. Schelter"
 	    "Use (help) to get some basic information on how to use GCL.")))

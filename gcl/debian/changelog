@@ -23,8 +23,9 @@ gclcvs (2.7.0-20) unstable; urgency=low
     files
   * mach-o compatible changes in sfaslbfd.c
   * Support for new debugging section names in sfaslelf.c
+  * Modify default banner slightly
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 25 Feb 2004 23:04:46 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 26 Feb 2004 15:32:34 +0000
 
 gclcvs (2.7.0-19) unstable; urgency=low
 
