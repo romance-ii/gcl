@@ -35,5 +35,5 @@ Name: "{userdesktop}\GNU Common Lisp"; Filename: "{app}\bin\gcl.bat"; MinVersion
 
 [Run]
 Filename: "{app}\bin\gclfinal.bat"; Parameters: {app}
+Filename: "{app}\lib\gcl-@VERSION@\unixport\saved_gcl.exe"; Parameters: -load {app}/install/install.lsp
 Filename: "{app}\bin\gcl.bat"; Description: "Launch GNU Common Lisp"; Flags: postinstall skipifsilent
-
