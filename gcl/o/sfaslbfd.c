@@ -220,10 +220,10 @@ fasload(object faslfile) {
   for (s=b->sections;s;s=s->next) {
 
     s->owner=b;
-    s->output_section=s;
+    s->output_section=(s->flags & SEC_ALLOC) ? s : b->sections;
     s->output_offset=0;
 
-    if (!(s->flags & SEC_ALLOC) || !(s->flags & SEC_LOAD))
+    if (!(s->flags & SEC_ALLOC))
       continue;
 
     if (max_align<s->alignment_power)
@@ -256,7 +256,7 @@ fasload(object faslfile) {
       continue;
 
     m=round_up(m,1<<s->alignment_power);
-    s->vma=(bfd_vma)m;
+    s->output_section->vma=(bfd_vma)m;
     m+=s->_raw_size;
 	     
   }
@@ -290,7 +290,8 @@ fasload(object faslfile) {
   }
 
   for (s=b->sections;s;s=s->next) {
-    if (!(s->flags & SEC_ALLOC) || !(s->flags & SEC_LOAD))
+
+    if (!(s->flags & SEC_LOAD))
       continue;
 
     link_order.u.indirect.section=s;
@@ -298,7 +299,7 @@ fasload(object faslfile) {
 /*      s->orelocation=alloca(2*bfd_get_reloc_upper_bound (b, s)); */
 
     if (!bfd_get_relocated_section_contents(b,&link_info,&link_order,
-					    (void *)s->vma,0,q)) 
+					    (void *)s->output_section->vma,0,q)) 
       FEerror("Cannot get relocated section contents\n");
       
   }
