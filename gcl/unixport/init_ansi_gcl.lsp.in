@@ -23,6 +23,32 @@
  (system:init-system) 
  (gbc t)
 
+(progn
+  (in-package "lisp")
+;; FIXME integrate this into the stream objects et.al. and/or
+;; just use defclass
+  (defstruct (UNBOUND-SLOT (:constructor %make-UNBOUND-SLOT)))
+  (defstruct ( TWO-WAY-STREAM (:constructor %make-TWO-WAY-STREAM)))
+  (defstruct ( SYNONYM-STREAM (:constructor %make-SYNONYM-STREAM)))
+  (defstruct ( STYLE-WARNING (:constructor %make-STYLE-WARNING)))
+  (defstruct ( STRING-STREAM (:constructor %make-STRING-STREAM)))
+  (defstruct ( STREAM (:constructor %make-STREAM)))
+  (defstruct ( READTABLE (:constructor %make-READTABLE) (:copier %copy-readtable)))
+  (defstruct ( READER-ERROR (:constructor %make-READER-ERROR)))
+  (defstruct ( RANDOM-STATE (:constructor %make-RANDOM-STATE) (:predicate %random-state-p)))
+  (defstruct ( PRINT-NOT-READABLE (:constructor %make-PRINT-NOT-READABLE)))
+  (defstruct (PATHNAME (:constructor %make-PATHNAME)))
+  (defstruct ( PACKAGE (:constructor %make-PACKAGE)))
+  (defstruct ( LOGICAL-PATHNAME (:constructor %make-LOGICAL-PATHNAME)))
+  (defstruct ( HASH-TABLE (:constructor %make-HASH-TABLE) (:predicate %hash-table-p)))
+  (defstruct ( FUNCTION (:constructor %make-FUNCTION)))
+  (defstruct (FLOATING-POINT-INVALID-OPERATION (:constructor %make-FLOATING-POINT-INVALID-OPERATION)))
+  (defstruct ( FLOATING-POINT-INEXACT (:constructor %make-FLOATING-POINT-INEXACT)))
+  (defstruct ( FILE-STREAM (:constructor %make-FILE-STREAM)))
+  (defstruct (ECHO-STREAM (:constructor %make-ECHO-STREAM)))
+  (defstruct ( CONCATENATED-STREAM (:constructor %make-CONCATENATED-STREAM)))
+  (defstruct ( BROADCAST-STREAM (:constructor %make-BROADCAST-STREAM))))
+
  (in-package "USER")
 
  (load (concatenate 'string si::*system-directory* "../gcl-tk/tk-package.lsp"))
@@ -205,8 +231,8 @@
        (symbol-function 'pcl::class-precedence-list))
  (setf (symbol-function 'si::find-class) 
        (symbol-function 'pcl::find-class))
- (setf (symbol-function 'si::find-class-no-error) 
-	(symbol-function 'conditions::find-class-no-error))
+; (setf (symbol-function 'si::find-class-no-error) 
+;	(symbol-function 'conditions::find-class-no-error))
 
  (do-external-symbols (s "CONDITIONS")
 		      (if (member s clcs_shadow)
@@ -234,7 +260,7 @@
 				       echo-stream-input-stream echo-stream-output-stream
 				       ensure-directories-exist fdefinition file-string-length formatter
 				       function-lambda-expression get-setf-expansion hash-table-rehash-size
-				       hash-table-rehash-threshold ignorable interactive-stream-p
+				       hash-table-rehash-threshold interactive-stream-p
 				       load-logical-pathname-translations load-time-value
 				       logical-pathname-translations make-load-form
 				       make-load-form-saving-slots make-method open-stream-p pathname-match-p

@@ -23,8 +23,12 @@ gclcvs (2.7.0-12) unstable; urgency=low
   * Many CLOS ansi fixes, particularly in methods and method-
     combinations, via a (still partial) synchronization of the pcl
     source tree with that of CMUCL
+  * Add functionless structures for missing lisp types that should be
+    classes, TODO, integrate this with GCL's native object support for
+    these types, and/or possibly use defclass directly instead of
+    defstruct
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 23 Oct 2003 15:18:14 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 23 Oct 2003 15:22:39 +0000
 
 gclcvs (2.7.0-11) unstable; urgency=low
 
