@@ -440,7 +440,7 @@ Cannot compile ~a.~%"
 	     (st (setq gaz (gazonk-name)) :direction :output)
 	   (prin1-cmp `(defun ,name ,@ (cddr tem))       st))
 	 (let ((fi (compile-file gaz 
-				 :c-debug t 
+;				 :c-debug t 
 				 :h-file t 
 				 :c-file t
 				 :system-p 't
