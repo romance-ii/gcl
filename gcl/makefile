@@ -118,7 +118,7 @@ command:
 	rm -f bin/gcl xbin/gcl
 	MGCLDIR=`echo $(GCLDIR) | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
 	GCLDIR=`echo $(GCLDIR)` ; \
-	make install-command "INSTALL_LIB_DIR=$(GCLDIR)" "prefix=$(GCLDIR)" "BINDIR=$(MGCLDIR)/$(PORTDIR)"
+	make install-command "INSTALL_LIB_DIR=$$GCLDIR" "prefix=$$GCLDIR" "BINDIR=$$MGCLDIR/$(PORTDIR)"
 	(cd xbin ; cp ../bin/gcl .)
 
 #	GCLDIR=`echo $(GCLDIR) | sed -e 'sX^/cygdrive/\([a-z]\)X\1!Xg' -e 'sX^//\([a-z]\)X\1!Xg'` ; \
