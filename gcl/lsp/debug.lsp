@@ -201,7 +201,10 @@
 	(cond ((eq str (instream-stream v))
 	       (return v))))
       (car (setq *stream-alist*
-		 (cons  (make-instream :stream str) *stream-alist*)))))
+		 (cons  (make-instream :stream str
+                                     :name (if (streamp str)
+                                               (stream-name str))
+   ) *stream-alist*)))))
 
 (defun newline (str ch) ch
   (let ((in (get-instream str)))

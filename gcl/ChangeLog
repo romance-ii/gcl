@@ -1,3 +1,9 @@
+2001-04-15  Bill Schelter  <wfs@linux163.ma.utexas.edu>
+
+	*  Added changes to allow the loading .o files compiled
+	on -O4 under linux, and also added this to be the default
+	optimize level if speed = 3.   speed = 2 gives -O still
+
 2001-04-13  Bill Schelter  <wfs@sonia.ma.utexas.edu>
 
 	* fix the NULL_OR_ON_C_STACK macro for x86 linux in notcomp.h

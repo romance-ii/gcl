@@ -132,7 +132,7 @@ all: gcltksrv   tkl.o tinfo.o  demos/gc-monitor.o gcltkaux
 	echo "(compile-file \"$*.lisp\" :c-file nil :c-debug nil)" | ../unixport/saved_gcl
 
 .lsp.o:
-	echo "(compile-file \"$*.lsp\" :c-file t :c-debug t)" | ../unixport/saved_gcl
+	echo "(compile-file \"$*.lsp\" :c-file nil :c-debug nil)" | ../unixport/saved_gcl
 
 
 

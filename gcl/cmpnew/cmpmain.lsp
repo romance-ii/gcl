@@ -49,7 +49,7 @@
 
 ;; Let the user write dump c-file etc to  /dev/null.
 (defun get-output-pathname (file ext name &optional (dir (pathname-directory *default-pathname-defaults*)))
-  (cond #+unix
+  (cond 
 	((equal file "/dev/null") (pathname file))
 	#+aix3
 	((and (equal name "float")
@@ -66,7 +66,7 @@
 				   name)
 			 :type ext))))
 
-#+unix
+
 (defun safe-system (string)
  (multiple-value-bind
   (code result) (system string)
@@ -144,8 +144,7 @@
 
 (defun compile-file1 (input-pathname
                       &key (output-file input-pathname)
-                           #+aosvs (fasl-file t)
-                           #+unix (o-file t)
+                           (o-file t)
                            (c-file nil)
                            (h-file nil)
                            (data-file nil)
@@ -226,8 +225,8 @@ Cannot compile ~a.~%"
          (name (or (and (not (null output-file))
                         (pathname-name output-file))
                    (pathname-name input-pathname)))
-         #+aosvs (fasl-pathname (get-output-pathname fasl-file "fasl" name dir))
-         #+unix (o-pathname (get-output-pathname o-file "o" name dir))
+
+         (o-pathname (get-output-pathname o-file "o" name dir))
          (c-pathname (get-output-pathname c-file "c" name dir))
          (h-pathname (get-output-pathname h-file "h" name dir))
          (data-pathname (get-output-pathname data-file "data" name dir))
@@ -242,12 +241,12 @@ Cannot compile ~a.~%"
 	 (not system-p)
 	 (add-init `(si::warn-version ,si::*gcl-version* ,si::*gcl-major-version*)))
 
-    (when (probe-file #+unix "./cmpinit.lsp" #+aosvs "=cmpinit.lsp")
-      (load #+unix "./cmpinit.lsp" #+aosvs "=cmpinit.lsp"
+    (when (probe-file "./cmpinit.lsp")
+      (load  "./cmpinit.lsp"
             :verbose *compile-verbose*))
 
     (with-open-file (*compiler-output-data*
-                     #+unix data-pathname #+aosvs fasl-pathname
+                      data-pathname
                      :direction :output)
     (progn 
       (setq *fasd-data*      		      
@@ -343,7 +342,7 @@ Cannot compile ~a.~%"
           (unless h-file (delete-file h-pathname))
           (unless fasl-file (delete-file fasl-pathname)))
 
-        #+unix
+
         (progn
           (when *compile-verbose* (format t "~&End of Pass 2.  ~%"))
 	  (cond (*record-call-info*
@@ -372,9 +371,6 @@ Cannot compile ~a.~%"
         (progn
           (when (probe-file c-pathname) (delete-file c-pathname))
           (when (probe-file h-pathname) (delete-file h-pathname))
-          #+aosvs
-          (when (probe-file fasl-pathname) (delete-file fasl-pathname))
-          #+unix
           (when (probe-file data-pathname) (delete-file data-pathname))
           (format t "~&No FASL generated.~%")
           (setq *error-p* t)
@@ -491,13 +487,6 @@ SYSTEM_SPECIAL_INIT
       #+dos (write-char (code-char 26) *compiler-output1*)
       (terpri *compiler-output2*)))))
 
-#+aosvs
-(defun compiler-cc (c-pathname ob-pathname)
-  (process "cc.pr" ; or ":usr:dgc:cc.pr"
-           (format nil "cc/opt=~d/noextl/e=@null/o=~a,~a"
-                   *speed* (namestring ob-pathname) (namestring c-pathname))
-           :block t :ioc t)
-  (when (string/= (princ (last-termination-message)) "") (terpri)))
 
 (defvar *cc* "cc")
 
@@ -505,63 +494,58 @@ SYSTEM_SPECIAL_INIT
 
 (defun  compiler-command (&rest args &aux na )
   (declare (special *c-debug*))
-  (setq na  (namestring
-	      (make-pathname :name
-			     (pathname-name (first args))
-			     :type (pathname-type(first args)))))
-  (format nil #-(or dos winnt) "(cd ~a ;~a ~a ~@[~*-O ~]-c -I. ~a ~a)"
-		 #+(or dos winnt)  "~a ~a ~@[~*-O ~]-c -I. ~a ~a"
-	          
-		#-(or dos winnt) (let ((dir 	 (pathname-directory (first args))))
-		   (cond (dir (namestring (make-pathname :directory dir)))
-			 (t ".")))
-		*cc*
-                 (if (and (boundp '*c-debug*) *c-debug*) " -g " "")
-		 (if (or (= *speed* 2) (= *speed* 3)) t nil)
-		  na
-		  (prog1
-		      #+aix3
-		    (format nil " -w ;ar x /lib/libc.a fsavres.o  ; ar qc XXXfsave fsavres.o ; echo init_~a > XXexp ; mv  ~a  XXX~a ; ld -r -D-1 -bexport:XXexp -bgc XXX~a -o ~a XXXfsave ; rm -f XXX~a XXexp XXXfsave fsavres.o"
-		      			*init-name*
-					(setq na (namestring (get-output-pathname na "o" nil)))
-					na na na na na)
-		    #+(or dlopen irix5)
-		    (if (not system-p)
-   		       (format nil
-    " -w ; mv ~a XX~a ; ld  ~a -shared XX~a  -o ~a -lc ; rm -f XX~a"  
-    (setq na (namestring (get-output-pathname na "o" nil)))			    na
-    #+ignore-unresolved "-ignore_unresolved"
-    #+expect-unresolved "-expect_unresolved '*'"
-     na na na))	
+  (let ((dirlist (pathname-directory (first args)))
+	(name (pathname-name (first args)))
+	dir
+	)
+    (cond (dirlist (setq dir (namestring (make-pathname :directory dirlist))))
+	  (t (setq dir ".")))
+     (setq na  (namestring
+		(make-pathname :name name :type (pathname-type(first args)))))
+
+   #+(or dos winnt)
+      (format nil "~a ~a ~a -c -I~a -w ~a -o ~a"
+	      *cc*
+	      (if (and (boundp '*c-debug*) *c-debug*) " -g " "")
+              (case *speed* (3 "-O4") (2 "-O") (t ""))
+	      dir
+	      (namestring (make-pathname  :type "c" :defaults (first args)))
+	      (namestring (make-pathname  :type "o" :defaults (first args)))
+	      )
+
+
+	       
+   #-(or dos winnt)
+   (format nil  "(cd ~a ;~a ~a ~a -c -I. ~a ~a)"
+	   dir *cc*
+	   (if (and (boundp '*c-debug*) *c-debug*) " -g " "")
+           (case *speed* (3 "-O4") (2 "-O") (t ""))	
+	   na
+	   (prog1
+	       #+aix3
+	     (format nil " -w ;ar x /lib/libc.a fsavres.o  ; ar qc XXXfsave fsavres.o ; echo init_~a > XXexp ; mv  ~a  XXX~a ; ld -r -D-1 -bexport:XXexp -bgc XXX~a -o ~a XXXfsave ; rm -f XXX~a XXexp XXXfsave fsavres.o"
+		     *init-name*
+		     (setq na (namestring (get-output-pathname na "o" nil)))
+		     na na na na na)
+	     #+(or dlopen irix5)
+	     (if (not system-p)
+		 (format nil
+			 " -w ; mv ~a XX~a ; ld  ~a -shared XX~a  -o ~a -lc ; rm -f XX~a"  
+			 (setq na (namestring (get-output-pathname na "o" nil)))			    na
+			 #+ignore-unresolved "-ignore_unresolved"
+			 #+expect-unresolved "-expect_unresolved '*'"
+			 na na na))	
 			    
-		    #+bsd "-w"
-		    #-(or aix3 bsd irix3) " 2> /dev/null ")
+	     #+bsd "-w"
+	     #-(or aix3 bsd irix3) " 2> /dev/null ")
 		  
 		 
-		 ))
+	   )
+   )
+  )
         
-#+unix
-(defun compiler-cc (c-pathname o-pathname  )
-  #+e15
-  (let ((C (namestring
-            (make-pathname
-             :directory (pathname-directory c-pathname)
-             :name (pathname-name c-pathname)
-             :type "C")))
-        (H (namestring
-            (make-pathname
-             :directory (pathname-directory h-pathname)
-             :name (pathname-name h-pathname)
-             :type "H"))))
-    (system (format nil "mv ~A ~A" (namestring c-pathname) C))
-    (system (format nil "mv ~A ~A" (namestring h-pathname) H))
-    (system (format nil "~Atrans < ~A > ~A"
-              (namestring si:*system-directory*) C (namestring c-pathname)))
-    (system (format nil "~Atrans < ~A > ~A"
-              (namestring si:*system-directory*) H (namestring h-pathname)))
-    (delete-file C)
-    (delete-file H))
 
+(defun compiler-cc (c-pathname o-pathname  )
   (safe-system
     (format
      nil
@@ -584,10 +568,11 @@ SYSTEM_SPECIAL_INIT
     (unless (and (equalp (truename "./")
                          (truename (make-pathname :directory odir)))
                  (equal cname oname))
-            (safe-system
-             (format nil "mv ~A.o ~A" cname (namestring o-pathname))))))
+	(rename-file (make-pathname :name cname :type "o")
+        	                  o-pathname)
+)))
 
-#+unix
+
 (defun compiler-build (o-pathname data-pathname)
   #+(and system-v (not e15))
   (safe-system (format nil "echo \"\\000\\000\\000\\000\" >> ~A"

@@ -122,56 +122,19 @@
 
 ;;; Editor.
 
-#+unix
+;
 (defun get-decoded-time ()
   (decode-universal-time (get-universal-time)))
 
-#-unix
+#+never
 (defun get-universal-time ()
   (multiple-value-bind (sec min h d m y dow dstp tz)
       (get-decoded-time)
     (encode-universal-time sec min h d m y tz)))
 
-#+unix
+
 (defun ed (&optional filename)
   (system (format nil "vi ~A" filename)))
-
-#+aosvs
-(progn
-(defvar *ed-filename* "GAZONK.LSP")
-(defvar *ed-position* "0")
-
-(defun ed (&optional filename)
-  (let (str str-len load-file lstart plen (delete-p nil))
-    (when filename
-          (setq filename
-                (namestring (merge-pathnames filename #".LSP"))))
-    (when (and filename (not (string-equal *ed-filename* filename)))
-          (setq *ed-position* "0")
-          (setq *ed-filename* filename))
-    (process (format nil "~A"
-                     (namestring (merge-pathnames "FECL2.PR"
-                                                  si::*system-directory*)))
-             (format nil "FECL2/LISP,~A,~D" *ed-filename* *ed-position*)
-             :block t :ioc t)
-    (setq str (last-termination-message))
-    (when (or (not (stringp str)) (< (setq str-len (length str)) 21))
-          (return-from ed str))
-    (when (string/= (subseq str 0 5) "LISP ")
-          (return-from ed str))
-    (setq *ed-position* (string-left-trim '(#\Space) (subseq str 5 15)))
-    (setq plen (parse-integer (subseq str 16 19)))
-    (setq *ed-filename* (subseq str 20 (+ 20 plen)))
-    (setq lstart (+ 21 plen))
-    (when (> str-len lstart)
-          (setq str (subseq str lstart str-len))
-          (unwind-protect
-           (progn (setq delete-p (if (char= (char str 1) #\T) t nil))
-                  (load (setq load-file (subseq str 2 (length str)))))
-           (when delete-p (delete-file (truename load-file)))))
-    t))
-)
-
 
 ;;; Allocator.
 

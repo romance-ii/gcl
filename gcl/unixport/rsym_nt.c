@@ -1,8 +1,11 @@
 /* defining IN_SFASL gets us fopen_binary  */
-#define IN_SFASL
-#include "config.h"
+
+/* #include "config.h" */
 #include <stdio.h>
+
 #include "ext_sym.h"
+
+
 
 
 struct lsymbol_table tab;

@@ -38,7 +38,8 @@ LDCC=${CC}
 # Enable the fastloading mechanism which does not use ld -A
 # requires c/rel_.. machine dependent code.
 
-RSYM	= rsym
+RSYM	= rsym.exe
+SPECIAL_RSYM = rsym_nt.c
 SFASL	= $(ODIR)/sfasl.o
 
 
@@ -59,7 +60,7 @@ APPEND=../bin/append
 # suffix for executables
 EXE=.exe
 LIBFILES=bsearch.o bcmp.o bzero.o bcopy.o
-EXTRAS=${OD}mingwin.o
+EXTRAS=${OD}mingwin.o ${OD}mingfile.o
 
 # the  make to use for saved_kcp the profiler.
 KCP=kcp-bsd

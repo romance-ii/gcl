@@ -1,10 +1,16 @@
 #define MP386
 #define WINDOWSNT
 #define MINGW
+#define GCL
 /* #define filehdr _IMAGE_FILE_HEADER */
 #define f_symptr PointerToSymbolTable
 #define f_nsyms NumberOfSymbols
 #define NO_PWD_H
+
+/* page width, (1 <<PAGEWIDTH) should be a multiple of 2 of
+   the native system page width  */
+
+#define PAGEWIDTH 12 
 
 #define MAXPATHLEN 512
 
@@ -46,8 +52,8 @@
 /* size to use for mallocs done  */
 /* #define BABY_MALLOC_SIZE 0x5000 */
 
-/* #define RECREATE_HEAP if (initflag) recreate_heap(argv[0]); */
-#define RECREATE_HEAP if (initflag) recreate_heap1();
+
+
 
 #define NO_SYS_PARAM_H
 #define NO_SYS_TIMES_H
@@ -65,8 +71,12 @@
 
 #ifdef IN_UNIXFSYS
 #undef ATT
-#define BSD
+#define HAVE_RENAME
+
 #endif
+/* the result of 'getenv' is malloc'd */
+#define FREE_GETENV_RESULT
+
 
 #define OUR_NSOCKET "winnsocket.c"
 
@@ -127,7 +137,23 @@ typedef int sigset_t ;
 #include <varargs.h>     
 #include <stdio.h>
 FILE *fopen_binary(char *name,char *mode);
-#define UNIXSAVE "unexnt.c"
+
+
+#define USE_NT_UNEXEC
+#ifdef USE_NT_UNEXEC
+/* use the slightly older unexec */
+#define UNIXSAVE "unexnt.c" 
+#define RECREATE_HEAP if (initflag) { recreate_heap1(); \
+   terminal_io->sm.sm_object1->sm.sm_fp=stdout; \
+   terminal_io->sm.sm_object0->sm.sm_fp=stdin; }
+
+ 
+
+#else
+#define UNIXSAVE "unexw32.c"
+#define RECREATE_HEAP  init_heap();
+#endif
+
 
 #define SPECIAL_RSYM "rsym_nt.c"
 
@@ -197,8 +223,6 @@ FILE *fopen_binary(char *name,char *mode)
 #undef  LISTEN_FOR_INPUT
 
 
-/* dont have profil */
-#define NO_PROFILE
 
 /* adjust the start to the offset */
 #define ADJUST_RELOC_START(j) \

@@ -29,7 +29,7 @@ License for more details.
 
 #include <elf.h>
 
-static void relocate_symbols(Elf32_Sym *sym,int nsyms,int nscns);
+static void relocate_symbols(Elf32_Sym *sym,int nsyms,int nscns, int *init_address_ptr);
 static void relocate(Elf32_Sym *symbol_table,Elf32_Rela
 *reloc_info,Elf32_Word sh_type);
 
@@ -75,6 +75,7 @@ round_up(address,n)
 
 int use_mmap;
 
+
 fasload(faslfile)
      object faslfile;
 {  FILE *fp;
@@ -87,7 +88,7 @@ fasload(faslfile)
    object     * old_vs_top =   vs_top ;
    int symtab_index,j;
    int nsyms;
-   int init_address=0;
+   int init_address=-1;
    int extra_bss=0;
    object memory;
    caddr_t base;
@@ -177,10 +178,6 @@ fasload(faslfile)
      build_symbol_table();
 
    extra_bss = 0;
-   /*
-   extra_bss=get_extra_bss(symbol_table,nsyms,current,
-			   &init_address,bss_size);
-			   */
 
 
    memory = alloc_object(t_cfdata);
@@ -209,7 +206,10 @@ fasload(faslfile)
 	  }
       }
    
-   relocate_symbols(symbol_table,nsyms,file_h->e_shnum);
+   relocate_symbols(symbol_table,nsyms,file_h->e_shnum,&init_address);
+   if (init_address < 0)
+     { FEerror(0,"Init address not found ");
+     }
 
    { int rel_stab_index = -1;
      int j=0;
@@ -251,7 +251,7 @@ fasload(faslfile)
 
    SEEK_TO_END_OFILE(fp);
 
-   init_address = section[text_index].start;
+   /*   init_address += section[text_index].start ; */
    
    if (feof(fp))
      data=0;
@@ -299,10 +299,11 @@ get_section_number(name)
 }
 
 static void
-relocate_symbols(sym,nsyms,nscns)
+relocate_symbols(sym,nsyms,nscns,init_address_ptr)
  Elf32_Sym *sym;
  int nsyms;
  int nscns;
+ int *init_address_ptr; /* offset of init_address */
 {  int siz = symsize;
   while (--nsyms >= 0)
     { switch(ELF32_ST_BIND(sym->st_info))
@@ -316,6 +317,7 @@ relocate_symbols(sym,nsyms,nscns)
 		  case SHT_NULL:
 		  case SHT_PROGBITS:
 		  case SHT_NOTE:
+		  case SHT_STRTAB:
 		    /* These occur in Linux.
 		       Ignore symbols for such sections. */
 		    break;
@@ -336,7 +338,11 @@ relocate_symbols(sym,nsyms,nscns)
 	    }
 	    else
 	      if (sym->st_shndx == text_index &&
-		  bcmp("init_",string_table + sym->st_name,4) == 0) ;
+		  bcmp("init_",string_table + sym->st_name,4) == 0)
+		{
+		  *init_address_ptr = sym->st_value;
+
+		  }
 	    else	
 	      {printf("[unknown global sym %s]",string_table + sym->st_name);}
 	    break;
