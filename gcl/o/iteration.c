@@ -448,7 +448,7 @@ END:
 }
 
 void
-init_iteration(void)
+gcl_init_iteration(void)
 {
 	make_special_form("LOOP", Floop);
 	make_special_form("DO", Fdo);

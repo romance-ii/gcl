@@ -1,0 +1,5 @@
+       
+#(#! 
+(lisp::in-package "SI")
+#(system::readline-init system::lisp :inherited lisp::keyword ":~A" "Gcl" system::package-size (system::%init . #((system::mf (lisp::quote system::init-readline) 0) (system::debug (lisp::quote system::init-readline) (lisp::quote (#:g1391 #:g1383 #:g1394))))))
+)

@@ -284,7 +284,7 @@ number_to_double(object x)
 }
 
 void
-init_number(void)
+gcl_init_number(void)
 {
 	int i;
 
@@ -306,12 +306,12 @@ init_number(void)
 	make_constant("MOST-NEGATIVE-FIXNUM",
 		      make_fixnum(MOST_NEGATIVE_FIX));
 
-	init_big();
-	init_num_pred();
-	init_num_comp();
-	init_num_arith();
-	init_num_co();
-	init_num_log();
-	init_num_sfun();
-	init_num_rand();
+	gcl_init_big();
+	gcl_init_num_pred();
+	gcl_init_num_comp();
+	gcl_init_num_arith();
+	gcl_init_num_co();
+	gcl_init_num_log();
+	gcl_init_num_sfun();
+	gcl_init_num_rand();
 }

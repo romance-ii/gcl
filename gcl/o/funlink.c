@@ -1037,12 +1037,12 @@ DEF_ORDINARY("CDEFN",sScdefn,SI,"");
 DEFVAR("*LINK-ARRAY*",sLAlink_arrayA,LISP,Cnil,"");
 
 void
-init_links(void)
+gcl_init_links(void)
 {	
 
 	make_si_sfun("SET-MV",set_mv, ARGTYPE2(f_fixnum,f_object) |
 		     RESTYPE(f_object));
 	make_si_sfun("MV-REF",mv_ref, ARGTYPE1(f_fixnum) | RESTYPE(f_object));
-	init_xdrfuns();
+	gcl_init_xdrfuns();
 	      }
 

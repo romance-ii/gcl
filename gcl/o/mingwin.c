@@ -851,10 +851,10 @@ void close_shared_memory()
   sharedMemory.handle = NULL;
   if (sharedMemory.address)  UnmapViewOfFile(sharedMemory.address);
   sharedMemory.address = NULL;
-  init_signals_pendingPtr();
+  gcl_init_signals_pendingPtr();
 }
 
-void init_shared_memory (void)
+void gcl_init_shared_memory (void)
 { 
   sprintf(sharedMemory.name,"gcl-%d",getpid());
   sharedMemory.handle =
@@ -869,7 +869,7 @@ void init_shared_memory (void)
 		   0);                                /* Map entire file.  */
    if (sharedMemory.address == NULL)
      { error("MapViewOfFile failed");}
-   init_signals_pendingPtr();
+   gcl_init_signals_pendingPtr();
    atexit(close_shared_memory);
 }
 

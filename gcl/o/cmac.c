@@ -182,7 +182,7 @@ DEFUNO_NEW("CDIFFERENCE",object,fScdifference,SI
 
 
 void     
-init_cmac(void)
+gcl_init_cmac(void)
 {
 /* add_symbol("ctimes",&ctimes,"cplus",&cplus,"cdifference",&cdifference,"cmod",
  &cmod, 0); */

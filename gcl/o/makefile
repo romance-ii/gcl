@@ -98,6 +98,11 @@ new_init.c: ${INI_FILES}
 	cat ${INI_FILES} >> new_init.c
 	echo '}' >> new_init.c
 
+ifneq ($(NIFLAGS),)
+new_init.o: new_init.c
+	$(CC) -c $(NIFLAGS) $(DEFS) $< -o $@
+endif
+
 decls1:
 	echo '#include "make-decl.h"' > foo.c
 	cat ${INI_FILES} >> foo.c

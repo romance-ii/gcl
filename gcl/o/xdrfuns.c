@@ -150,7 +150,7 @@ siGxdr_read(object str,object elt) {
   return elt;
 }
 static void
-init_xdrfuns()
+gcl_init_xdrfuns()
 { make_si_sfun("XDR-WRITE",siGxdr_write,
 	       ARGTYPE2(f_object,f_object)|RESTYPE(f_object));
 
@@ -161,5 +161,5 @@ init_xdrfuns()
   
 }
 #else
-static void init_xdrfuns(void) {;}
+static void gcl_init_xdrfuns(void) {;}
 #endif     

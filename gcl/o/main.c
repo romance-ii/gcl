@@ -251,7 +251,7 @@ main(int argc, char **argv, char **envp) {
             saving_system = FALSE;
             terminal_io->sm.sm_object0->sm.sm_fp = stdin;
             terminal_io->sm.sm_object1->sm.sm_fp = stdout;
-            init_big1();
+            gcl_init_big1();
 #ifdef INIT_CORE_END
             INIT_CORE_END
 #endif			  
@@ -278,7 +278,7 @@ main(int argc, char **argv, char **envp) {
         ovm_process_created = 1;
 #endif
 #ifdef HAVE_READLINE
-        init_readline_function();
+        gcl_init_readline_function();
 #endif
     again:
         super_funcall(sStop_level);
@@ -309,7 +309,7 @@ main(int argc, char **argv, char **envp) {
 
     CMPtemp = CMPtemp1 = CMPtemp2 = CMPtemp3 = OBJNULL;
 
-    init_init();
+    gcl_init_init();
 
     sLApackageA->s.s_dbind = user_package;
 
@@ -368,7 +368,7 @@ initlisp(void) {
 	    error("NULL_OR_ON_C_STACK macro invalid");
 	  }
 
-        init_alloc();
+        gcl_init_alloc();
 
 	Dotnil_body.t = (short)t_symbol;
 	Dotnil_body.s_dbind = Dotnil;
@@ -403,9 +403,9 @@ initlisp(void) {
 	Ct_body.s_stype = (short)stp_constant;
 	Ct_body.s_mflag = FALSE;
 	
-	init_symbol();
+	gcl_init_symbol();
 
-	init_package();
+	gcl_init_package();
 
 	Cnil->s.s_hpack = lisp_package;
 	import(Cnil, lisp_package);
@@ -435,21 +435,21 @@ initlisp(void) {
 
 	
 	NewInit();
-	init_typespec();
-	init_number();
-	init_character();
+	gcl_init_typespec();
+	gcl_init_number();
+	gcl_init_character();
 
-	init_read();
-	init_bind();
-	init_pathname();
-	init_print();
-	init_GBC();
+	gcl_init_read();
+	gcl_init_bind();
+	gcl_init_pathname();
+	gcl_init_print();
+	gcl_init_GBC();
 
 #if defined ( UNIX ) || defined ( __MINGW32__ )
 #  ifndef DGUX
-	init_unixfasl();
-	init_unixsys();
-	init_unixsave();
+	gcl_init_unixfasl();
+	gcl_init_unixsys();
+	gcl_init_unixsave();
 #  else
 
 
@@ -457,57 +457,57 @@ initlisp(void) {
 #  endif
 #endif /* defined ( UNIX ) || defined ( __MINGW32__ ) */
 
-	init_alloc_function();
-	init_array_function();
-	init_character_function();
-	init_file_function();
-	init_list_function();
-	init_package_function();
-	init_pathname_function();
-	init_predicate_function();
-	init_print_function();
-	init_read_function();
-	init_sequence_function();
+	gcl_init_alloc_function();
+	gcl_init_array_function();
+	gcl_init_character_function();
+	gcl_init_file_function();
+	gcl_init_list_function();
+	gcl_init_package_function();
+	gcl_init_pathname_function();
+	gcl_init_predicate_function();
+	gcl_init_print_function();
+	gcl_init_read_function();
+	gcl_init_sequence_function();
 #if  defined(KCLOVM) || defined(RUN_PROCESS)
-	init_socket_function();
+	gcl_init_socket_function();
 #endif	
-	init_structure_function();
-	init_string_function();
-	init_symbol_function();
-	init_typespec_function();
-	init_hash();
-	init_cfun();
+	gcl_init_structure_function();
+	gcl_init_string_function();
+	gcl_init_symbol_function();
+	gcl_init_typespec_function();
+	gcl_init_hash();
+	gcl_init_cfun();
 
 #ifdef UNIX
-	init_unixfsys();
-	init_unixtime();
+	gcl_init_unixfsys();
+	gcl_init_unixtime();
 #endif
-	init_eval();
-	init_lex();
-	init_prog();
-	init_catch();
-	init_block();
-        init_macros();
-	init_conditional();
-	init_reference();
-	init_assignment();
-	init_multival();
-	init_error();
-	init_let();
-	init_mapfun();
-	init_iteration();
-	init_toplevel();
+	gcl_init_eval();
+	gcl_init_lex();
+	gcl_init_prog();
+	gcl_init_catch();
+	gcl_init_block();
+        gcl_init_macros();
+	gcl_init_conditional();
+	gcl_init_reference();
+	gcl_init_assignment();
+	gcl_init_multival();
+	gcl_init_error();
+	gcl_init_let();
+	gcl_init_mapfun();
+	gcl_init_iteration();
+	gcl_init_toplevel();
 
-	init_cmpaux();
+	gcl_init_cmpaux();
 
 	init_main();
 
-	init_format();
-	init_links();
+	gcl_init_format();
+	gcl_init_links();
 
-	init_fat_string();
+	gcl_init_fat_string();
 #ifdef CMAC
-	init_cmac();
+	gcl_init_cmac();
 #endif	
 
 }
@@ -734,7 +734,7 @@ DEFVAR("*NO-INIT*",sSAno_initA,SI,Cnil,"");
 void
 siLinit_system(void) {
   check_arg(0);
-  init_system(sSAno_initA);
+  gcl_init_system(sSAno_initA);
   vs_base[0] = Cnil;
 }
 

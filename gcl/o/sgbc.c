@@ -1117,7 +1117,7 @@ sgc_start(void) {
    and delay sweeping until the pointing type is GC'ed if SGC is
    turned off for the pointing type, e.g. tm_sgc=0. (This was so by
    default for a number of types, including bignums, and has now been
-   corrected in init_alloc in alloc.c.) We can't get around this
+   corrected in gcl_init_alloc in alloc.c.) We can't get around this
    AFAICT, as old data on (writable) SGC pages must be marked lest it
    is lost, and (old) data on now writable non-SGC pages might point
    to live regions on SGC pages, yet might not themselves be reachable

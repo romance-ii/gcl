@@ -114,7 +114,7 @@ Freturn(object args)
 }
 
 void
-init_block(void)
+gcl_init_block(void)
 {
 	sLblock = make_special_form("BLOCK", Fblock);
 	enter_mark_origin(&sLblock);

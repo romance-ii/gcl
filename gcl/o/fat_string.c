@@ -438,7 +438,7 @@ object x0,x1;
 
 DEFVAR("*PROFILE-ARRAY*",sSAprofile_arrayA,SI,Cnil,"");
 void
-init_fat_string(void)
+gcl_init_fat_string(void)
 {
  
  make_si_constant("*ASH->>*",(-1==(((int)-1) >> 20))? Ct :Cnil);

@@ -9,10 +9,13 @@ PORTDIR	= ../unixport
 CAT=cat
 APPEND=../xbin/append
 
-OBJS	= arraylib.o assert.o defmacro.o defstruct.o describe.o evalmacros.o \
-	iolib.o listlib.o mislib.o module.o numlib.o packlib.o predlib.o \
-	seq.o seqlib.o setf.o top.o trace.o sloop.o debug.o info.o serror.o \
-	destructuring_bind.o defpackage.o make_defpackage.o loop.o $(EXTRA_LOBJS)
+OBJS	= gcl_arraylib.o gcl_assert.o gcl_defmacro.o gcl_defstruct.o \
+	  gcl_describe.o gcl_evalmacros.o \
+	  gcl_iolib.o gcl_listlib.o gcl_mislib.o gcl_module.o gcl_numlib.o \
+	  gcl_packlib.o gcl_predlib.o \
+	  gcl_seq.o gcl_seqlib.o gcl_setf.o gcl_top.o gcl_trace.o gcl_sloop.o \
+          gcl_debug.o gcl_info.o gcl_serror.o \
+	  gcl_destructuring_bind.o gcl_defpackage.o gcl_make_defpackage.o gcl_loop.o $(EXTRA_LOBJS)
 # export.o autoload.o auto_new.o
 
 

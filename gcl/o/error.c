@@ -813,7 +813,7 @@ DEF_ORDINARY("CATCHALL",sKcatchall,KEYWORD,"");
 
 
 void
-init_error(void)
+gcl_init_error(void)
 {
 	make_function("ERROR", Lerror);
 	make_function("CERROR", Lcerror);

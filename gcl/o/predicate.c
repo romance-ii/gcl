@@ -835,7 +835,7 @@ DEFUN_NEW("FIXNUMP",object,fSfixnump,SI
 }
 
 void
-init_predicate_function(void)
+gcl_init_predicate_function(void)
 {
 
 	make_special_form("AND",Fand);

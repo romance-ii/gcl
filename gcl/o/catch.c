@@ -157,7 +157,7 @@ Fthrow(object args)
 }
 
 void
-init_catch(void)
+gcl_init_catch(void)
 {
 	make_special_form("CATCH", Fcatch);
 	make_special_form("UNWIND-PROTECT", Funwind_protect);

@@ -32,7 +32,7 @@ MPDIR	= mp
 TESTDIR = ansi-tests
 #GMP_DIR = gmp3/
 
-all: $(BUILD_BFD) $(PORTDIR)/$(FLISP) command cmpnew/collectfn.o lsp/info.o do-gcl-tk do-info
+all: $(BUILD_BFD) $(PORTDIR)/$(FLISP) command cmpnew/gcl_collectfn.o lsp/gcl_info.o do-gcl-tk do-info
 
 xgcl: $(PORTDIR)/saved_xgcl
 
@@ -81,7 +81,7 @@ ansi-tests/test_results: $(PORTDIR)/saved_ansi_gcl
 #$(PORTDIR)/saved_ansi_gcl: $(CLCSDIR)/saved_full_gcl
 #	cd $(@D) &&  $(MAKE) $(@F)
 
-cmpnew/collectfn.o lsp/info.o:
+cmpnew/gcl_collectfn.o lsp/gcl_info.o:
 	cd $(@D) && $(MAKE) $(@F)
 
 do-gcl-tk:
@@ -121,7 +121,7 @@ command:
 merge:
 	$(CC) -o merge merge.c
 
-LISP_LIB=cmpnew/collectfn.o lsp/gprof.lsp lsp/info.o lsp/profile.lsp lsp/export.lsp lsp/autoload.lsp cmpnew/cmpmain.lsp cmpnew/cmpopt.lsp cmpnew/lfun_list.lsp lsp/auto_new.lsp h/cmpinclude.h unixport/init_$(SYSTEM).lsp unixport/lib$(SYSTEM).a unixport/libgclp.a gcl-tk/tk-package.lsp $(TK_LISP_LIB) $(RL_LIB)
+LISP_LIB=cmpnew/gcl_collectfn.o cmpnew/gcl_collectfn.lsp lsp/gcl_gprof.lsp lsp/gcl_info.o lsp/gcl_profile.lsp lsp/gcl_export.lsp lsp/gcl_autoload.lsp cmpnew/gcl_cmpmain.lsp cmpnew/gcl_cmpopt.lsp cmpnew/gcl_lfun_list.lsp lsp/gcl_auto_new.lsp h/cmpinclude.h unixport/init_$(SYSTEM).lsp unixport/lib$(SYSTEM).a unixport/libgclp.a gcl-tk/tk-package.lsp $(TK_LISP_LIB) $(RL_LIB)
 
 install-command:
 	rm -f $(DESTDIR)$(prefix)/bin/gcl

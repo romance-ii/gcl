@@ -576,7 +576,7 @@ int w, r;
 @)
 
 void
-init_character()
+gcl_init_character()
 {
 	int i;
 
@@ -624,7 +624,7 @@ init_character()
 }
 
 void
-init_character_function()
+gcl_init_character_function()
 {
 	make_function("STANDARD-CHAR-P", Lstandard_char_p);
 	make_function("GRAPHIC-CHAR-P", Lgraphic_char_p);

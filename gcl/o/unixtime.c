@@ -210,7 +210,7 @@ DEFVAR("*DEFAULT-TIME-ZONE*",sSAdefault_time_zoneA,SI,make_fixnum(TIME_ZONE),"")
 #endif
 
 void
-init_unixtime(void)
+gcl_init_unixtime(void)
 {
 /* #ifdef BSD */
 /* 	ftime(&beginning); */

@@ -640,7 +640,7 @@ object place;
 
 
 void
-init_symbol()
+gcl_init_symbol()
 {
 	string_register = alloc_simple_string(0);
 	gensym_prefix = make_simple_string("G");
@@ -660,7 +660,7 @@ init_symbol()
 }
 
 void
-init_symbol_function()
+gcl_init_symbol_function()
 {
 	make_function("GET", Lget);
 	make_function("REMPROP", Lremprop);

@@ -1164,7 +1164,7 @@ DEFVAR("*PACKAGE*",sLApackageA,LISP,lisp_package,"");
 
 
 void
-init_package()
+gcl_init_package()
 {
 
 	lisp_package
@@ -1196,7 +1196,7 @@ init_package()
 }
 
 void
-init_package_function()
+gcl_init_package_function()
 {
 	make_function("MAKE-PACKAGE", Lmake_package);
 	make_function("DELETE-PACKAGE", Ldelete_package);

@@ -209,7 +209,7 @@ DEF_ORDINARY("VARIABLE-DOCUMENTATION",sSvariable_documentation,SI,"");
 DEF_ORDINARY("WARN",sLwarn,LISP,"");
 
 void
-init_toplevel(void)
+gcl_init_toplevel(void)
 {
 	make_special_form("DEFUN",Fdefun);
 	make_si_function("*MAKE-SPECIAL", siLAmake_special);

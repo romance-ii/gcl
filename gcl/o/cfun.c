@@ -357,7 +357,7 @@ DEFUN_NEW("TURBO-CLOSURE",object,fSturbo_closure,SI
 
 
 void
-init_cfun(void)
+gcl_init_cfun(void)
 {
 	
 }

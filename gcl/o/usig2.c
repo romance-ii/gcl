@@ -145,12 +145,12 @@ char safety_required[]={XX,XX,XX,XX,XX,XX,XX,XX,
 			XX,XX,XX,XX,XX,XX,XX,XX};
 
 void
-init_safety(void)
+gcl_init_safety(void)
 { safety_required[SIGINT]=sig_try_to_delay;
   safety_required[SIGALRM]=sig_normal;
 }
   
-DO_INIT(init_safety();)
+DO_INIT(gcl_init_safety();)
 DEFUN_NEW("SIGNAL-SAFETY-REQUIRED",object,sSsignal_safety_required,SI,2,2,
 	  NONE,OI,IO,OO,OO,(fixnum signo,fixnum safety),
       "Set the safety level required for handling SIGNO to SAFETY, or if \

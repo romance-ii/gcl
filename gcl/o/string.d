@@ -589,7 +589,7 @@ siLstring_concatenate()
 }
 
 void
-init_string_function()
+gcl_init_string_function()
 {
 	sKstart1 = make_keyword("START1");
 	sKend1 = make_keyword("END1");

@@ -191,7 +191,7 @@ Lspecial_form_p(void)
 }
 
 void
-init_reference(void)
+gcl_init_reference(void)
 {
 	make_function("SYMBOL-FUNCTION", Lsymbol_function);
 	make_function("FBOUNDP", Lfboundp);

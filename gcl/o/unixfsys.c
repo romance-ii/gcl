@@ -771,7 +771,7 @@ siLchdir(void)
 }
 
 void
-init_unixfsys(void)
+gcl_init_unixfsys(void)
 {
 	make_function("TRUENAME", Ltruename);
 	make_function("RENAME-FILE", Lrename_file);

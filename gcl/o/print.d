@@ -1836,7 +1836,7 @@ DEFVAR("*PRINT-STRUCTURE*",sSAprint_structureA,SI,Cnil,"");
 DEF_ORDINARY("PRETTY-PRINT-FORMAT",sSpretty_print_format,SI,"");
 
 void
-init_print()
+gcl_init_print()
 {
 
         travel_push_type[(int)t_array]=1;
@@ -2037,7 +2037,7 @@ int n;
 DEFVAR("*PRINT-NANS*",sSAprint_nansA,SI,Cnil,"");
 
 void
-init_print_function()
+gcl_init_print_function()
 {
 	make_function("WRITE", Lwrite);
 	make_function("PRIN1", Lprin1);

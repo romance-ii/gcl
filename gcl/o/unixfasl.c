@@ -408,7 +408,7 @@ siLfaslink(void)
 #endif /* UNIXFASL */
 
 void
-init_unixfasl(void)
+gcl_init_unixfasl(void)
 {
 #ifdef FASLINK
 	make_si_function("FASLINK", siLfaslink);

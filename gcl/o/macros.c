@@ -336,7 +336,7 @@ DEFVAR("*MACROEXPAND-HOOK*",sLAmacroexpand_hookA,LISP,sLfuncall,"");
 DEF_ORDINARY("DEFMACRO*",sSdefmacroA,SI,"");
 DEFVAR("*INHIBIT-MACRO-SPECIAL*",sSAinhibit_macro_specialA,SI,Cnil,"");
 void
-init_macros(void)
+gcl_init_macros(void)
 {
 	make_si_function("DEFINE-MACRO", siLdefine_macro);
 

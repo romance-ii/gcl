@@ -610,7 +610,7 @@ siLmodf(void)
 }
 
 void
-init_num_sfun(void)
+gcl_init_num_sfun(void)
 {
 	imag_unit
 	= make_complex(make_longfloat((longfloat)0.0),

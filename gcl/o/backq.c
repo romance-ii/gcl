@@ -368,7 +368,7 @@ DEF_ORDINARY("VECTOR",sLvector,LISP,"");
 
 
 void
-init_backq(void)
+gcl_init_backq(void)
 {
 	object r;
 

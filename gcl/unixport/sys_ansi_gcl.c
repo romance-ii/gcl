@@ -5,8 +5,8 @@
 extern object user_init();
 
 
-void init_or_load1 (void (*)(void),char *);
-#define init_or_load(fn,file) do {extern void fn(void); init_or_load1(fn,file);} \
+void gcl_init_or_load1 (void (*)(void),char *);
+#define init_or_load(fn,file) do {extern void fn(void); gcl_init_or_load1(fn,file);} \
   while(0)
 
 #define mjoin(a,b) a ## b
@@ -55,79 +55,79 @@ load1(x)
 } while(0)
 
 void
-init_init()
+gcl_init_init()
 {
 
   build_symbol_table();
 
-  lsp_init("../lsp/export.lsp");
+  lsp_init("../lsp/gcl_export.lsp");
 
-  ar_init(defmacro);
-  ar_init(evalmacros);
-  ar_init(top);
-  ar_init(module);
+  ar_init(gcl_defmacro);
+  ar_init(gcl_evalmacros);
+  ar_init(gcl_top);
+  ar_init(gcl_module);
 
-  lsp_init("../lsp/autoload.lsp");
+  lsp_init("../lsp/gcl_autoload.lsp");
 
 }
 
 void
-init_system(object no_init)
+gcl_init_system(object no_init)
 {
 
   if (type_of(no_init)!=t_symbol)
     error("Supplied no_init is not of type symbol\n");
 
-  ar_check_init(predlib,no_init);
-  ar_check_init(setf,no_init);
-  ar_check_init(arraylib,no_init);
-  ar_check_init(assert,no_init);
-  ar_check_init(defstruct,no_init);
-  ar_check_init(describe,no_init);
-  ar_check_init(iolib,no_init);
-  ar_check_init(listlib,no_init);
-  ar_check_init(mislib,no_init);
-  ar_check_init(numlib,no_init);
-  ar_check_init(packlib,no_init);
-  ar_check_init(seq,no_init);
-  ar_check_init(seqlib,no_init);
-  ar_check_init(trace,no_init);
-  ar_check_init(sloop,no_init);
-  ar_check_init(serror,no_init);
-  ar_check_init(destructuring_bind,no_init);
-  ar_check_init(loop,no_init);
-  ar_check_init(defpackage,no_init);
-  ar_check_init(make_defpackage,no_init);
+  ar_check_init(gcl_predlib,no_init);
+  ar_check_init(gcl_setf,no_init);
+  ar_check_init(gcl_arraylib,no_init);
+  ar_check_init(gcl_assert,no_init);
+  ar_check_init(gcl_defstruct,no_init);
+  ar_check_init(gcl_describe,no_init);
+  ar_check_init(gcl_iolib,no_init);
+  ar_check_init(gcl_listlib,no_init);
+  ar_check_init(gcl_mislib,no_init);
+  ar_check_init(gcl_numlib,no_init);
+  ar_check_init(gcl_packlib,no_init);
+  ar_check_init(gcl_seq,no_init);
+  ar_check_init(gcl_seqlib,no_init);
+  ar_check_init(gcl_trace,no_init);
+  ar_check_init(gcl_sloop,no_init);
+  ar_check_init(gcl_serror,no_init);
+  ar_check_init(gcl_destructuring_bind,no_init);
+  ar_check_init(gcl_loop,no_init);
+  ar_check_init(gcl_defpackage,no_init);
+  ar_check_init(gcl_make_defpackage,no_init);
 
 	
-  ar_check_init(cmpinline,no_init);
-  ar_check_init(cmputil,no_init);
+  ar_check_init(gcl_cmpinline,no_init);
+  ar_check_init(gcl_cmputil,no_init);
 
-  ar_check_init(debug,no_init);
-  ar_check_init(info,no_init);
+  ar_check_init(gcl_debug,no_init);
+  ar_check_init(gcl_info,no_init);
 
-  ar_check_init(cmptype,no_init);
-  ar_check_init(cmpbind,no_init);
-  ar_check_init(cmpblock,no_init);
-  ar_check_init(cmpcall,no_init);
-  ar_check_init(cmpcatch,no_init);
-  ar_check_init(cmpenv,no_init);
-  ar_check_init(cmpeval,no_init);
-  ar_check_init(cmpflet,no_init);
-  ar_check_init(cmpfun,no_init);
-  ar_check_init(cmpif,no_init);
-  ar_check_init(cmplabel,no_init);
-  ar_check_init(cmplam,no_init);
-  ar_check_init(cmplet,no_init);
-  ar_check_init(cmploc,no_init);
-  ar_check_init(cmpmap,no_init);
-  ar_check_init(cmpmulti,no_init);
-  ar_check_init(cmpspecial,no_init);
-  ar_check_init(cmptag,no_init);
-  ar_check_init(cmptop,no_init);
-  ar_check_init(cmpvar,no_init);
-  ar_check_init(cmpvs,no_init);
-  ar_check_init(cmpwt,no_init);
+  ar_check_init(gcl_cmptype,no_init);
+  ar_check_init(gcl_cmpbind,no_init);
+  ar_check_init(gcl_cmpblock,no_init);
+  ar_check_init(gcl_cmpcall,no_init);
+  ar_check_init(gcl_cmpcatch,no_init);
+  ar_check_init(gcl_cmpenv,no_init);
+  ar_check_init(gcl_cmpeval,no_init);
+  ar_check_init(gcl_cmpflet,no_init);
+  ar_check_init(gcl_cmpfun,no_init);
+  ar_check_init(gcl_cmpif,no_init);
+  ar_check_init(gcl_cmplabel,no_init);
+  ar_check_init(gcl_cmplam,no_init);
+  ar_check_init(gcl_cmplet,no_init);
+  ar_check_init(gcl_cmploc,no_init);
+  ar_check_init(gcl_cmpmap,no_init);
+  ar_check_init(gcl_cmpmulti,no_init);
+  ar_check_init(gcl_cmpspecial,no_init);
+  ar_check_init(gcl_cmptag,no_init);
+  ar_check_init(gcl_cmptop,no_init);
+  ar_check_init(gcl_cmpvar,no_init);
+  ar_check_init(gcl_cmpvs,no_init);
+  ar_check_init(gcl_cmpwt,no_init);
 
   ar_check_init(pcl_pkg,no_init);
   ar_check_init(pcl_walk,no_init);
@@ -180,7 +180,7 @@ init_system(object no_init)
 static int ngazonk;
 
 int
-init_cmp_anon(void) {
+gcl_init_cmp_anon(void) {
 
   int i=0;
 

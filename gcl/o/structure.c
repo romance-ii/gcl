@@ -431,7 +431,7 @@ siLalignment(void)
 DEF_ORDINARY("S-DATA",sSs_data,SI,"");
 
 void
-init_structure_function(void)
+gcl_init_structure_function(void)
 {
 
 

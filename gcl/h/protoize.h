@@ -9,7 +9,7 @@
 /* alloc.c:480:OF */ extern void insert_contblock (char *p, int s); /* (p, s) char *p; int s; */
 /* alloc.c:480:OF */ extern void insert_maybe_sgc_contblock (char *p, int s); /* (p, s) char *p; int s; */
 /* alloc.c:611:OF */ extern void set_maxpage (void); /* () */
-/* alloc.c:635:OF */ extern void init_alloc (void); /* () */
+/* alloc.c:635:OF */ extern void gcl_init_alloc (void); /* () */
 /* alloc.c:737:OF */ extern object fSstaticp (object x); /* (x) object x; */
 /* alloc.c:822:OF */ extern object fSallocate_sgc (object type,fixnum min,fixnum max,fixnum free_percent); /* (type, min, max, free_percent) object type; int min; int max; int free_percent; */
 /* alloc.c:846:OF */ extern object fSallocate_growth (object type,fixnum min,fixnum max,fixnum percent,fixnum percent_free); /* (type, min, max, percent, percent_free) object type; int min; int max; int percent; int percent_free; */
@@ -17,7 +17,7 @@
 /* alloc.c:918:OF */ extern object fSmaximum_contiguous_pages (void); /* () */
 /* alloc.c:958:OF */ extern object fSallocated_relocatable_pages (void); /* () */
 /* alloc.c:965:OF */ extern object fSget_hole_size (void); /* () */
-/* alloc.c:1000:OF */ extern void init_alloc_function (void); /* () */
+/* alloc.c:1000:OF */ extern void gcl_init_alloc_function (void); /* () */
 /* alloc.c:1126:OF */ extern void free (void *ptr); /* (ptr) void *ptr; */
 /* array.c:57:OF */ extern void Laref (void); /* () */
 /* array.c:126:OF */ extern object fLsvref (object x, ufixnum i); /* (x, i) object x; unsigned int i; */
@@ -52,7 +52,7 @@
 /* array.c:1093:OF */ extern object fSreplace_array (object old, object new); /* (old, new) object old; object new; */
 /* array.c:1132:OF */ extern object fLarray_total_size (object x); /* (x) object x; */
 /* array.c:1140:OF */ extern object fSaset_by_cursor (object array, object val, object cursor); /* (array, val, cursor) object array; object val; object cursor; */
-/* array.c:1160:OF */ extern void init_array_function (void); /* () */
+/* array.c:1160:OF */ extern void gcl_init_array_function (void); /* () */
 /* assignment.c:62:OF */ extern void setq (object sym, object val); /* (sym, val) object sym; object val; */
 /* assignment.c:128:OF */ extern void Lset (void); /* () */
 /* assignment.c:130:OF */ extern object fLset (object symbol, object value); /* (symbol, value) object symbol; object value; */
@@ -63,12 +63,12 @@
 /* assignment.c:230:OF */ extern object fLfmakunbound (object sym); /* (sym) object sym; */
 /* assignment.c:547:OF */ extern object clear_compiler_properties (object sym, object code); /* (sym, code) object sym; object code; */
 /* assignment.c:563:OF */ extern object fSclear_compiler_properties (object x0, object x1); /* (x0, x1) object x0; object x1; */
-/* assignment.c:591:OF */ extern void init_assignment (void); /* () */
+/* assignment.c:591:OF */ extern void gcl_init_assignment (void); /* () */
 /* backq.c:259:OF */ extern int backq_car (object x); /* (x) object x; */
-/* backq.c:381:OF */ extern void init_backq (void); /* () */
+/* backq.c:381:OF */ extern void gcl_init_backq (void); /* () */
 /* bds.c:31:OF */ extern void bds_unwind (bds_ptr new_bds_top); /* (new_bds_top) bds_ptr new_bds_top; */
 /* big.c:53:OF */ extern object fSset_gmp_allocate_relocatable (object flag); /* (flag) object flag; */
-/* gmp_big.c:96:OF */ extern void init_big1 (void); /* () */
+/* gmp_big.c:96:OF */ extern void gcl_init_big1 (void); /* () */
 /* gmp_big.c:108:OF */ extern object new_bignum (void); /* () */
 /* gmp_big.c:161:OF */ extern object make_integer (__mpz_struct *u); /* (u) __mpz_struct *u; */
 /* gmp_big.c:207:OF */ extern int big_compare (object x, object y); /* (x, y) object x; object y; */
@@ -82,7 +82,7 @@
 /* gmp_big.c:472:OF */ extern object bignum2 (unsigned int h, unsigned int l); /* (h, l) unsigned int h; unsigned int l; */
 /* gmp_big.c:482:OF */ extern void integer_quotient_remainder_1 (object x, object y, object *qp, object *rp); /* (x, y, qp, rp) object x; object y; object *qp; object *rp; */
 /* gmp_big.c:502:OF */ extern object coerce_big_to_string (object x, int printbase); /* (x, printbase) object x; int printbase; */
-/* gmp_big.c:521:OF */ extern void init_big (void); /* () */
+/* gmp_big.c:521:OF */ extern void gcl_init_big (void); /* () */
 /* big.c:72:OF */ extern int big_sign (object x); /* (x) object x; */
 /* big.c:78:OF */ extern void set_big_sign (object x, int sign); /* (x, sign) object x; int sign; */
 /* big.c:85:OF */ extern void zero_big (object x); /* (x) object x; */
@@ -101,14 +101,14 @@ struct key {short n,allow_other_keys;
 /* bind.c:866:OF */ extern int parse_key_new_new (int n, object *base, struct key *keys, object first, va_list ap); /* (n, base, keys, ap) int n; object *base; struct key *keys; va_list ap; */
 /* bind.c:916:OF */ extern int parse_key_rest_new (object rest, int n, object *base, struct key *keys, object first, va_list ap); /* (rest, n, base, keys, ap) object rest; int n; object *base; struct key *keys; va_list ap; */
 /* bind.c:975:OF */ extern void set_key_struct (struct key *ks, object data); /* (ks, data) struct key *ks; object data; */
-/* bind.c:995:OF */ extern void init_bind (void); /* () */
-/* block.c:121:OF */ extern void init_block (void); /* () */
+/* bind.c:995:OF */ extern void gcl_init_bind (void); /* () */
+/* block.c:121:OF */ extern void gcl_init_block (void); /* () */
 /* bsearch.c:5:OF */ extern void *bsearch (const void *key, const void *base, size_t nel, size_t keysize, int (*compar) (const void *,const void *)); /* (key, base, nel, keysize, compar) char *key; char *base; unsigned int nel; unsigned int keysize; int (*compar)(); */
 #if defined (__MINGW32__)
 /* bzero.c:3:OF */ /*  extern void bzero (char *b, size_t length); */ /* (b, length) char *b; int length; */
 #endif
 /* catch.c:61:OF */ extern object fSerror_set (object x0); /* (x0) object x0; */
-/* catch.c:166:OF */ extern void init_catch (void); /* () */
+/* catch.c:166:OF */ extern void gcl_init_catch (void); /* () */
 /* cfun.c:37:OF */ extern object make_cfun (void (*self)(), object name, object data, char *start, int size); /* (self, name, data, start, size) int (*self)(); object name; object data; char *start; int size; */
 /* cfun.c:56:OF */ extern object make_sfun (object name, object (*self)(), int argd, object data); /* (name, self, argd, data) object name; int (*self)(); int argd; object data; */
 /* cfun.c:91:OF */ extern object make_cclosure_new (void (*self)(), object name, object env, object data); /* (self, name, env, data) int (*self)(); object name; object env; object data; */
@@ -126,17 +126,17 @@ struct key {short n,allow_other_keys;
 /* cfun.c:352:OF */ extern object fScompiled_function_name (object fun); /* (fun) object fun; */
 /* cfun.c:371:OF */ extern void turbo_closure (object fun); /* (fun) object fun; */
 /* cfun.c:392:OF */ extern object fSturbo_closure (object funobj); /* (funobj) object funobj; */
-/* cfun.c:403:OF */ extern void init_cfun (void); /* () */
+/* cfun.c:403:OF */ extern void gcl_init_cfun (void); /* () */
 /* cmac.c:147:OF */ extern object fScmod (object num); /* (num) object num; */
 /* cmac.c:156:OF */ extern object fScplus (object x0, object x1); /* (x0, x1) object x0; object x1; */
 /* cmac.c:165:OF */ extern object fSctimes (object x0, object x1); /* (x0, x1) object x0; object x1; */
 /* cmac.c:175:OF */ extern object fScdifference (object x0, object x1); /* (x0, x1) object x0; object x1; */
-/* cmac.c:191:OF */ extern void init_cmac (void); /* () */
+/* cmac.c:191:OF */ extern void gcl_init_cmac (void); /* () */
 /* cmpaux.c:33:OF */ extern void siLspecialp (void); /* () */
 /* cmpaux.c:35:OF */ extern object fSspecialp (object sym); /* (sym) object sym; */
 /* cmpaux.c:73:OF */ extern object fSdebug (object sym, object val); /* (sym, val) object sym; object val; */
 /* cmpaux.c:82:OF */ extern object fSsetvv (object index, object val); /* (index, val) object index; object val; */
-/* cmpaux.c:95:OF */ extern void init_cmpaux (void); /* () */
+/* cmpaux.c:95:OF */ extern void gcl_init_cmpaux (void); /* () */
 /* cmpaux.c:106:OF */ extern int ifloor (int x, int y); /* (x, y) int x; int y; */
 /* cmpaux.c:124:OF */ extern int imod (int x, int y); /* (x, y) int x; int y; */
 /* cmpaux.c:185:OF */ extern int object_to_int (object x); /* (x) object x; */
@@ -144,8 +144,8 @@ struct key {short n,allow_other_keys;
 typedef int (*FUNC)();
 /* cmpaux.c:294:OF */ extern void call_init (int init_address, object memory, object fasl_vec, FUNC fptr); /* (init_address, memory, fasl_vec, fptr) int init_address; object memory; object fasl_vec; FUNC fptr; */
 /* cmpaux.c:339:OF */ extern void do_init (object *statVV); /* (statVV) object *statVV; */
-/* cmpaux.c:416:OF */ extern void init_or_load1 (void (*fn) (void), char *file); /* (fn, file) int (*fn)(); char *file; */
-/* conditional.c:200:OF */ extern void init_conditional (void); /* () */
+/* cmpaux.c:416:OF */ extern void gcl_init_or_load1 (void (*fn) (void), char *file); /* (fn, file) int (*fn)(); char *file; */
+/* conditional.c:200:OF */ extern void gcl_init_conditional (void); /* () */
 /* error.c:38:OF */ extern void terminal_interrupt (int correctable); /* (correctable) int correctable; */
 /* error.c:147:OF */ extern void Lerror (void); /* () */
 /* error.c:164:OF */ extern void Lcerror (void); /* () */
@@ -193,7 +193,7 @@ typedef int (*FUNC)();
 /* error.c:660:OF */ extern void check_socket (object x); /* (x) object x; */
 /* error.c:670:OF */ extern void check_stream (object strm); /* (strm) object strm; */
 /* error.c:697:OF */ extern void check_arg_range (int n, int m); /* (n, m) int n; int m; */
-/* error.c:727:OF */ extern void init_error (void); /* () */
+/* error.c:727:OF */ extern void gcl_init_error (void); /* () */
 /* eval.c:143:OF */ extern void funcall (object fun); /* (fun) object fun; */
 /* eval.c:375:OF */ extern void lispcall (object *funp, int narg); /* (funp, narg) object *funp; int narg; */
 /* eval.c:461:OF */ extern void symlispcall (object sym, object *base, int narg); /* (sym, base, narg) object sym; object *base; int narg; */
@@ -213,15 +213,15 @@ typedef int (*FUNC)();
 /* eval.c:1328:OF */ extern object ifuncall2 (object fun, object arg1, object arg2); /* (fun, arg1, arg2) object fun; object arg1; object arg2; */
 /* eval.c:1348:OF */ extern object ifuncall3 (object fun, object arg1, object arg2, object arg3); /* (fun, arg1, arg2, arg3) object fun; object arg1; object arg2; object arg3; */
 typedef void (*funcvoid)(void);
-/* eval.c:1545:OF */ extern void init_eval (void); /* () */
+/* eval.c:1545:OF */ extern void gcl_init_eval (void); /* () */
 /* fasdump.c:1465:OF */ extern object read_fasl_vector (object in); /* (in) object in; */
 /* fat_string.c:29:OF */ extern object fSprofile (object start_address, object scale); /* (start_address, scale) object start_address; object scale; */
 /* fat_string.c:46:OF */ extern object fSfunction_start (object funobj); /* (funobj) object funobj; */
 /* fat_string.c:331:OF */ extern object fSdisplay_profile (object start_addr, object scal); /* (start_addr, scal) object start_addr; object scal; */
 /* fat_string.c:394:OF */ extern object fSarray_adress (object array); /* (array) object array; */
-/* fat_string.c:435:OF */ extern void init_fat_string (void); /* () */
+/* fat_string.c:435:OF */ extern void gcl_init_fat_string (void); /* () */
 /* format.c:2084:OF */ extern void Lformat (void); /* () */
-/* format.c:2171:OF */ extern void init_format (void); /* () */
+/* format.c:2171:OF */ extern void gcl_init_format (void); /* () */
 /* frame.c:32:OF */ extern void unwind (frame_ptr fr, object tag); /* (fr, tag) frame_ptr fr; object tag; */
 /* frame.c:58:OF */ extern frame_ptr frs_sch (object frame_id); /* (frame_id) object frame_id; */
 /* frame.c:69:OF */ extern frame_ptr frs_sch_catch (object frame_id); /* (frame_id) object frame_id; */
@@ -230,7 +230,7 @@ typedef void (*funcvoid)(void);
 /* funlink.c:230:OF */ extern object c_apply_n (object (*fn)(), int n, object *x); /* (fn, n, x) long int (*fn)(); int n; object *x; */
 /* funlink.c:696:OF */ extern object call_proc0 (object sym, void *link); /* (sym, link) object sym; void *link; */
 /* funlink.c:784:OF */ extern int clear_stack (object *beg, object *limit); /* (beg, limit) object *beg; object *limit; */
-/* funlink.c:821:OF */ extern void init_links (void); /* () */
+/* funlink.c:821:OF */ extern void gcl_init_links (void); /* () */
 /* gbc.c:151:OF */ extern void enter_mark_origin (object *p); /* (p) object *p; */
 /* gbc.c:938:OF */ extern void GBC (enum type t); /* (t) enum type t; */
 /* gbc.c:1326:OF */ extern object fLgbc (object x0); /* (x0) object x0; */
@@ -244,7 +244,7 @@ typedef void (*funcvoid)(void);
 /* sgbc.c:1246:OF */ extern void memory_protect (int on); /* (on) int on; */
 /* sgbc.c:1306:OF */ extern void perm_writable (char *p, int n); /* (p, n) char *p; int n; */
 /* sgbc.c:1321:OF */ extern void system_error (void); /* () */
-/* gbc.c:1357:OF */ extern void init_GBC (void); /* () */
+/* gbc.c:1357:OF */ extern void gcl_init_GBC (void); /* () */
 /* gnumalloc.c:286:OF */ extern void malloc_init (char *start, void (*warnfun) (/* ??? */)); /* (start, warnfun) char *start; void (*warnfun)(); */
 /* gnumalloc.c:301:OF */ extern int malloc_usable_size (char *mem); /* (mem) char *mem; */
 /* gnumalloc.c:461:OF */ /*  extern void *malloc (size_t n); */ /* (n) unsigned int n; */
@@ -254,9 +254,9 @@ typedef void (*funcvoid)(void);
 /* gnumalloc.c:737:OF */ extern int get_lim_data (void); /* () */
 /* grab_defs.c:35:OF */ extern int read_some (char *buf, int n, int start_ch, int copy); /* (buf, n, start_ch, copy) char *buf; int n; int start_ch; int copy; */
 /* grab_defs.c:71:OF */ /*  extern int main (void); */ /* () */
-/* iteration.c:457:OF */ extern void init_iteration (void); /* () */
+/* iteration.c:457:OF */ extern void gcl_init_iteration (void); /* () */
 /* let.c:29:OF */ extern void let_var_list (object var_list); /* (var_list) object var_list; */
-/* let.c:321:OF */ extern void init_let (void); /* () */
+/* let.c:321:OF */ extern void gcl_init_let (void); /* () */
 /* lex.c:34:OF */ extern object assoc_eq (object key, object alist); /* (key, alist) object key; object alist; */
 /* lex.c:47:OF */ extern void lex_fun_bind (object name, object fun); /* (name, fun) object name; object fun; */
 /* lex.c:59:OF */ extern void lex_macro_bind (object name, object exp_fun); /* (name, exp_fun) object name; object exp_fun; */
@@ -264,7 +264,7 @@ typedef void (*funcvoid)(void);
 /* lex.c:82:OF */ extern void lex_block_bind (object name, object id); /* (name, id) object name; object id; */
 /* lex.c:95:OF */ extern object lex_tag_sch (object tag); /* (tag) object tag; */
 /* lex.c:110:OF */ extern object lex_block_sch (object name); /* (name) object name; */
-/* lex.c:125:OF */ extern void init_lex (void); /* () */
+/* lex.c:125:OF */ extern void gcl_init_lex (void); /* () */
 /* littleXwin.c:32:OF */ /*  extern Window open_window (void); */ /* () */
 /* littleXwin.c:102:OF */ /*  extern int close_window (Window the_window); */ /* (the_window) Window the_window; */
 /* littleXwin.c:110:OF */ /*  extern int draw_line (Window the_window, int x1, int y1, int x2, int y2); */ /* (the_window, x1, y1, x2, y2) Window the_window; int x1; int y1; int x2; int y2; */
@@ -285,7 +285,7 @@ typedef void (*funcvoid)(void);
 /* macros.c:173:OF */ extern void Lmacroexpand (void); /* () */
 /* macros.c:224:OF */ extern void Lmacroexpand_1 (void); /* () */
 /* macros.c:265:OF */ extern object macro_expand (object form); /* (form) object form; */
-/* macros.c:344:OF */ extern void init_macros (void); /* () */
+/* macros.c:344:OF */ extern void gcl_init_macros (void); /* () */
 /* main.c:111:OF */ extern int main (int argc, char **argv, char **envp); /* (argc, argv, envp) int argc; char **argv; char **envp; */
 /* main.c:346:OF */ extern void install_segmentation_catcher (void); /* () */
 /* main.c:359:OF */ extern void error (char *s); /* (s) char *s; */
@@ -308,10 +308,10 @@ typedef void (*funcvoid)(void);
 /* makefun.c:122:OF */ extern void SI_makefun (char *strg, object (*fn) (/* ??? */), unsigned int argd); /* (strg, fn, argd) char *strg; object (*fn)(); unsigned int argd; */
 /* makefun.c:131:OF */ extern void LISP_makefun (char *strg, object (*fn) (/* ??? */), unsigned int argd); /* (strg, fn, argd) char *strg; object (*fn)(); unsigned int argd; */
 /* makefun.c:167:OF */ extern object fSinvoke (object x); /* (x) object x; */
-/* mapfun.c:324:OF */ extern void init_mapfun (void); /* () */
+/* mapfun.c:324:OF */ extern void gcl_init_mapfun (void); /* () */
 /* multival.c:32:OF */ extern void Lvalues (void); /* () */
 /* multival.c:37:OF */ extern void Lvalues_list (void); /* () */
-/* multival.c:134:OF */ extern void init_multival (void); /* () */
+/* multival.c:134:OF */ extern void gcl_init_multival (void); /* () */
 /* nfunlink.c:190:OF */ extern object IapplyVector (object fun, int nargs, object *base); /* (fun, nargs, base) object fun; int nargs; object *base; */
 /* nfunlink.c:269:OF */ extern void Iinvoke_c_function_from_value_stack (object (*f)(), int fargd); /* (f, fargd) object (*f)(); int fargd; */
 /* nsocket.c:190:OF */ extern int CreateSocket (int port, char *host, int server, char *myaddr, int myport, int async); /* (port, host, server, myaddr, myport, async) int port; char *host; int server; char *myaddr; int myport; int async; */
@@ -340,7 +340,7 @@ typedef void (*funcvoid)(void);
 /* num_arith.c:889:OF */ extern void Lminus (void); /* () */
 /* num_arith.c:907:OF */ extern void Ltimes (void); /* () */
 /* num_arith.c:923:OF */ extern void Ldivide (void); /* () */
-/* num_arith.c:1029:OF */ extern void init_num_arith (void); /* () */
+/* num_arith.c:1029:OF */ extern void gcl_init_num_arith (void); /* () */
 /* num_co.c:292:OF */ extern object double_to_integer (double d); /* (d) double d; */
 /* num_co.c:372:OF */ extern void Lfloat (void); /* () */
 /* num_co.c:424:OF */ extern void Lnumerator (void); /* () */
@@ -355,13 +355,13 @@ typedef void (*funcvoid)(void);
 /* num_co.c:1114:OF */ extern void Lcomplex (void); /* () */
 /* num_co.c:1136:OF */ extern void Lrealpart (void); /* () */
 /* num_co.c:1147:OF */ extern void Limagpart (void); /* () */
-/* num_co.c:1185:OF */ extern void init_num_co (void); /* () */
+/* num_co.c:1185:OF */ extern void gcl_init_num_co (void); /* () */
 /* num_comp.c:40:OF */ extern int number_compare (object x, object y); /* (x, y) object x; object y; */
 /* num_comp.c:269:OF */ extern void Lmonotonically_increasing (void); /* () */
 /* num_comp.c:271:OF */ extern void Lmonotonically_nondecreasing (void); /* () */
 /* num_comp.c:272:OF */ extern void Lmonotonically_nonincreasing (void); /* () */
 /* num_comp.c:292:OF */ extern void Lmin (void); /* () */
-/* num_comp.c:309:OF */ extern void init_num_comp (void); /* () */
+/* num_comp.c:309:OF */ extern void gcl_init_num_comp (void); /* () */
 /* num_log.c:224:OF */ extern object shift_integer (object x, int w); /* (x, w) object x; int w; */
 /* num_log.c:258:OF */ extern void Llogior (void); /* () */
 /* num_log.c:279:OF */ extern void Llogxor (void); /* () */
@@ -370,16 +370,16 @@ typedef void (*funcvoid)(void);
 /* num_log.c:380:OF */ extern void Llogbitp (void); /* () */
 /* num_log.c:420:OF */ extern void Lash (void); /* () */
 /* num_log.c:482:OF */ extern void Linteger_length (void); /* () */
-/* num_log.c:549:OF */ extern void init_num_log (void); /* () */
+/* num_log.c:549:OF */ extern void gcl_init_num_log (void); /* () */
 /* num_log.c:585:OF */ extern void siLbit_array_op (void); /* () */
 /* num_pred.c:31:OF */ extern int number_zerop (object x); /* (x) object x; */
 /* num_pred.c:67:OF */ extern int number_plusp (object x); /* (x) object x; */
 /* num_pred.c:107:OF */ extern int number_minusp (object x); /* (x) object x; */
 /* num_pred.c:147:OF */ extern int number_oddp (object x); /* (x) object x; */
 /* num_pred.c:161:OF */ extern int number_evenp (object x); /* (x) object x; */
-/* num_pred.c:240:OF */ extern void init_num_pred (void); /* () */
+/* num_pred.c:240:OF */ extern void gcl_init_num_pred (void); /* () */
 /* num_rand.c:111:OF */ extern void Lrandom (void); /* () */
-/* num_rand.c:151:OF */ extern void init_num_rand (void); /* () */
+/* num_rand.c:151:OF */ extern void gcl_init_num_rand (void); /* () */
 /* num_sfun.c:91:OF */ extern object number_expt (object x, object y); /* (x, y) object x; object y; */
 /* num_sfun.c:453:OF */ extern void Lexp (void); /* () */
 /* num_sfun.c:469:OF */ extern void Llog (void); /* () */
@@ -387,7 +387,7 @@ typedef void (*funcvoid)(void);
 /* num_sfun.c:495:OF */ extern void Lsin (void); /* () */
 /* num_sfun.c:502:OF */ extern void Lcos (void); /* () */
 /* num_sfun.c:516:OF */ extern void Latan (void); /* () */
-/* num_sfun.c:535:OF */ extern void init_num_sfun (void); /* () */
+/* num_sfun.c:535:OF */ extern void gcl_init_num_sfun (void); /* () */
 /* number.c:35:OF */ extern long int fixint (object x); /* (x) object x; */
 /* number.c:44:OF */ extern int fixnnint (object x); /* (x) object x; */
 /* number.c:59:OF */ extern object fSallocate_bigger_fixnum_range (fixnum min,fixnum max); /* (min, max) int min; int max; */
@@ -397,7 +397,7 @@ typedef void (*funcvoid)(void);
 /* number.c:157:OF */ extern object make_longfloat (longfloat f); /* (f) longfloat f; */
 /* number.c:170:OF */ extern object make_complex (object r, object i); /* (r, i) object r; object i; */
 /* number.c:229:OF */ extern double number_to_double (object x); /* (x) object x; */
-/* number.c:254:OF */ extern void init_number (void); /* () */
+/* number.c:254:OF */ extern void gcl_init_number (void); /* () */
 /* peculiar.c:14:OF */ /*  extern int main (void); */ /* () */
 /* predicate.c:35:OF */ extern object fLnot (object x0); /* (x0) object x0; */
 /* predicate.c:46:OF */ extern void Lsymbolp (void); /* () */
@@ -441,10 +441,10 @@ typedef void (*funcvoid)(void);
 /* predicate.c:797:OF */ extern object fScontains_sharp_comma (object x0); /* (x0) object x0; */
 /* predicate.c:810:OF */ extern object fSspicep (object x0); /* (x0) object x0; */
 /* predicate.c:822:OF */ extern object fSfixnump (object x0); /* (x0) object x0; */
-/* predicate.c:833:OF */ extern void init_predicate_function (void); /* () */
+/* predicate.c:833:OF */ extern void gcl_init_predicate_function (void); /* () */
 /* prog.c:48:OF */ extern void Ftagbody (object body); /* (body) object body; */
 /* prog.c:246:OF */ extern void Fprogn (object body); /* (body) object body; */
-/* prog.c:303:OF */ extern void init_prog (void); /* () */
+/* prog.c:303:OF */ extern void gcl_init_prog (void); /* () */
 /* reference.c:32:OF */ extern void Lfboundp (void); /* () */
 /* reference.c:49:OF */ extern object symbol_function (object sym); /* (sym) object sym; */
 /* reference.c:69:OF */ extern void Lsymbol_function (void); /* () */
@@ -452,7 +452,7 @@ typedef void (*funcvoid)(void);
 /* reference.c:156:OF */ extern void Lboundp (void); /* () */
 /* reference.c:169:OF */ extern void Lmacro_function (void); /* () */
 /* reference.c:180:OF */ extern void Lspecial_form_p (void); /* () */
-/* reference.c:191:OF */ extern void init_reference (void); /* () */
+/* reference.c:191:OF */ extern void gcl_init_reference (void); /* () */
 /*  #include "regexp.h" */
 /* regexp.c:1588:OF */ extern void regerror (char *s); /* (s) char *s; */
 /* regexpr.c:48:OF */ extern object fSmatch_beginning (fixnum i); /* (i) int i; */
@@ -467,8 +467,8 @@ typedef void (*funcvoid)(void);
 /* structure.c:188:OF */ extern void siLmake_structure (void); /* () */
 /* structure.c:281:OF */ extern void siLstructure_set (void); /* () */
 /* structure.c:326:OF */ extern void siLlist_nth (void); /* () */
-/* structure.c:439:OF */ extern void init_structure_function (void); /* () */
-/* toplevel.c:211:OF */ extern void init_toplevel (void); /* () */
+/* structure.c:439:OF */ extern void gcl_init_structure_function (void); /* () */
+/* toplevel.c:211:OF */ extern void gcl_init_toplevel (void); /* () */
 /* typespec.c:38:OF */ extern void check_type_integer (object *p); /* (p) object *p; */
 /* typespec.c:47:OF */ extern void check_type_non_negative_integer (object *p); /* (p) object *p; */
 /* typespec.c:65:OF */ extern void check_type_rational (object *p); /* (p) object *p; */
@@ -491,12 +491,12 @@ typedef void (*funcvoid)(void);
 /* typespec.c:250:OF */ extern void check_type_array (object *p); /* (p) object *p; */
 /* typespec.c:284:OF */ extern void check_type (object x, int t); /* (x, t) object x; int t; */
 /* typespec.c:294:OF */ extern void Ltype_of (void); /* () */
-/* typespec.c:493:OF */ extern void init_typespec (void); /* () */
-/* typespec.c:497:OF */ extern void init_typespec_function (void); /* () */
+/* typespec.c:493:OF */ extern void gcl_init_typespec (void); /* () */
+/* typespec.c:497:OF */ extern void gcl_init_typespec_function (void); /* () */
 /* unexec-19.29.c:1016:OF */ extern int write_segment (int new, register char *ptr, register char *end); /* (new, ptr, end) int new; register char *ptr; register char *end; */
 /* unexec.c:1016:OF */ extern int write_segment (int new, register char *ptr, register char *end); /* (new, ptr, end) int new; register char *ptr; register char *end; */
 /* unexlin.c:808:OF */ extern int write_segment (int new, register char *ptr, register char *end); /* (new, ptr, end) int new; register char *ptr; register char *end; */
-/* unixfasl.c:409:OF */ extern void init_unixfasl (void); /* () */
+/* unixfasl.c:409:OF */ extern void gcl_init_unixfasl (void); /* () */
 /* unixfsys.c:145:OF */ extern char *getwd (char *buffer); /* (buffer) char *buffer; */
 /* unixfsys.c:209:OF */ extern void coerce_to_filename (object pathname, char *p); /* (pathname, p) object pathname; char *p; */
 /* unixfsys.c:329:OF */ extern bool file_exists (object file); /* (file) object file; */
@@ -508,22 +508,22 @@ typedef void (*funcvoid)(void);
 /* unixfsys.c:442:OF */ extern object fLdelete_file (object path); /* (path) object path; */
 /* unixfsys.c:456:OF */ extern void Lprobe_file (void); /* () */
 /* unixfsys.c:533:OF */ extern void Ldirectory (void); /* () */
-/* unixfsys.c:777:OF */ extern void init_unixfsys (void); /* () */
-/* unixsave.c:173:OF */ extern void init_unixsave (void); /* () */
+/* unixfsys.c:777:OF */ extern void gcl_init_unixfsys (void); /* () */
+/* unixsave.c:173:OF */ extern void gcl_init_unixsave (void); /* () */
 /* unixsys.c:83:OF */ extern object fSgetpid (void); /* () */
-/* unixsys.c:87:OF */ extern void init_unixsys (void); /* () */
+/* unixsys.c:87:OF */ extern void gcl_init_unixsys (void); /* () */
 /* unixtime.c:67:OF */ extern int runtime (void); /* () */
 /* unixtime.c:82:OF */ extern object unix_time_to_universal_time (int i); /* (i) int i; */
 /* unixtime.c:99:OF */ extern object fLget_universal_time (void); /* () */
 /* unixtime.c:144:OF */ extern object fLget_internal_real_time (void); /* () */
-/* unixtime.c:173:OF */ extern void init_unixtime (void); /* () */
+/* unixtime.c:173:OF */ extern void gcl_init_unixtime (void); /* () */
 /* user_init.c:2:OF */ extern object user_init (void); /* () */
 /* user_init.c:2:OF */ extern int user_match (const char *,int n); /* () */
 /* usig.c:49:OF */ extern void gcl_signal (int signo, void (*handler) (/* ??? */)); /* (signo, handler) int signo; void (*handler)(); */
 /* usig.c:92:OF */ extern int unblock_signals (int n, int m); /* (n, m) int n; int m; */
 /* usig.c:119:OF */ extern void unblock_sigusr_sigio (void); /* () */
 /* usig.c:182:OF */ extern void install_default_signals (void); /* () */
-/* usig2.c:142:OF */ extern void init_safety (void); /* () */
+/* usig2.c:142:OF */ extern void gcl_init_safety (void); /* () */
 /* usig2.c:158:OF */ extern object sSsignal_safety_required (fixnum signo,fixnum safety); /* (signo, safety) int signo; int safety; */
 #ifdef __MINGW32__
 /* usig2.c:167:OF */ extern void main_signal_handler (int signo); /* (signo) int signo */
@@ -545,63 +545,63 @@ typedef void (*funcvoid)(void);
 
 /*  readline.d */
 void
-init_readline_function(void);
+gcl_init_readline_function(void);
 
 /*  sys_gcl.c */
 void
-init_init(void);
+gcl_init_init(void);
 
 /* misc */
 void
-init_symbol(void);
+gcl_init_symbol(void);
 
 void
-init_package(void);
+gcl_init_package(void);
 
 void
-init_character(void);
+gcl_init_character(void);
 
 void
-init_read(void);
+gcl_init_read(void);
 
 void
-init_pathname(void);
+gcl_init_pathname(void);
 
 void
-init_print(void);
+gcl_init_print(void);
 
 void
-init_character_function(void);
+gcl_init_character_function(void);
 
 void
-init_file_function(void);
+gcl_init_file_function(void);
 
 void
-init_list_function(void);
+gcl_init_list_function(void);
 
 void
-init_package_function(void);
+gcl_init_package_function(void);
 
 void
-init_pathname_function(void);
+gcl_init_pathname_function(void);
 
 void
-init_print_function(void);
+gcl_init_print_function(void);
 
 void
-init_read_function(void);
+gcl_init_read_function(void);
 
 void
-init_sequence_function(void);
+gcl_init_sequence_function(void);
 
 void
-init_string_function(void);
+gcl_init_string_function(void);
 
 void
-init_symbol_function(void);
+gcl_init_symbol_function(void);
 
 void
-init_hash(void);
+gcl_init_hash(void);
 
 void
 import(object,object);
@@ -613,7 +613,7 @@ void
 NewInit(void);
 
 void
-init_system(object);
+gcl_init_system(object);
 
 void
 set_up_string_register(char *);
@@ -736,7 +736,7 @@ void
 build_symbol_table(void);
 
 void
-init_file(void);
+gcl_init_file(void);
 
 object
 aset1(object,fixnum,object);
@@ -1747,7 +1747,7 @@ void bcopy ( const void *s1, void *s2, size_t n );
 void bzero(void *b, size_t length);
 int TcpOutputProc ( int fd, char *buf, int toWrite, int *errorCodePtr, int block );
 void recreate_heap1 ( void );
-void init_shared_memory ( void );
+void gcl_init_shared_memory ( void );
 void fix_filename ( object pathname, char *filename1 );
 void alarm ( int n );
 void *sbrk ( unsigned long increment );

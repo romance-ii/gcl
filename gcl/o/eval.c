@@ -1524,7 +1524,7 @@ DEFVAR("*BREAK-POINTS*",sSAbreak_pointsA,SI,Cnil,"");
 DEFVAR("*BREAK-STEP*",sSAbreak_stepA,SI,Cnil,"");
 
 void
-init_eval(void)
+gcl_init_eval(void)
 {
 
 

@@ -1361,7 +1361,7 @@ object x, *lp;
 }
 
 void
-init_list_function()
+gcl_init_list_function()
 {
 
 	sKtest = make_keyword("TEST");

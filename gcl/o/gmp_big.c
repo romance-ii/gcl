@@ -91,12 +91,12 @@ object big_fixnum1;
 
 #include "gmp.c"
 void
-init_big1(void) {
+gcl_init_big1(void) {
     mp_set_memory_functions( gcl_gmp_alloc,gcl_gmp_realloc,gcl_gmp_free);
 }
 
 #else
-init_big1()
+gcl_init_big1()
 {
 }
 #endif  
@@ -492,7 +492,7 @@ coerce_big_to_string(object x, int printbase)
 
 
 void
-init_big(void)
+gcl_init_big(void)
 {
   big_gcprotect=alloc_object(t_bignum);
   MP_SELF(big_gcprotect)=0;
@@ -502,7 +502,7 @@ init_big(void)
   enter_mark_origin(&big_fixnum1);
   enter_mark_origin(&big_gcprotect);
   enter_mark_origin(&big_fixnum2);
-  init_big1();
+  gcl_init_big1();
 
 
 }

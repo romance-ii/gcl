@@ -321,7 +321,7 @@ LOOP:
 }
 
 void
-init_mapfun(void)
+gcl_init_mapfun(void)
 {
 	make_function("MAPCAR", Lmapcar);
 	make_function("MAPLIST", Lmaplist);

@@ -583,7 +583,7 @@ DEF_ORDINARY("TRACED",sStraced,SI,"");
 DEF_ORDINARY("VECTOR",sLvector,LISP,"");
 
 void
-init_assignment(void)
+gcl_init_assignment(void)
 {
 	make_special_form("SETQ", Fsetq);
 	make_special_form("PSETQ", Fpsetq);

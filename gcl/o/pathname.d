@@ -737,7 +737,7 @@ Lhost_namestring(void)
 @)
 
 void
-init_pathname(void)
+gcl_init_pathname(void)
 {
 	Vdefault_pathname_defaults =
 	make_special("*DEFAULT-PATHNAME-DEFAULTS*",
@@ -765,7 +765,7 @@ init_pathname(void)
 }
 
 void
-init_pathname_function()
+gcl_init_pathname_function()
 {
 	make_function("PATHNAME", Lpathname);
 	make_function("PARSE-NAMESTRING", Lparse_namestring);

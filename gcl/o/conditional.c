@@ -192,7 +192,7 @@ Funless(object form)
 }
 
 void
-init_conditional(void)
+gcl_init_conditional(void)
 {
 	make_special_form("IF",Fif);
 	make_special_form("COND",Fcond);

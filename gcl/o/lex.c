@@ -116,7 +116,7 @@ object lex_block_sch(object name)
 }
 
 void
-init_lex(void)
+gcl_init_lex(void)
 {
 	sLfunction = make_ordinary("FUNCTION");
 	enter_mark_origin(&sLfunction);

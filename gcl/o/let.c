@@ -310,7 +310,7 @@ is an illegal macro definition in MACROFLET.",
 }
 
 void
-init_let(void)
+gcl_init_let(void)
 {
 	make_special_form("LET", Flet);
 	make_special_form("LET*", FletA);

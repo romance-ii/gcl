@@ -2273,7 +2273,7 @@ fmt_error(char *s)
 
 DEFVAR("*INDENT-FORMATTED-OUTPUT*",sSAindent_formatted_outputA,SI,Cnil,"");
 void
-init_format(void)
+gcl_init_format(void)
 {
 	fmt_temporary_stream = make_string_output_stream(64);
 	enter_mark_origin(&fmt_temporary_stream);

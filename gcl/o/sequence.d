@@ -569,7 +569,7 @@ object seq;
 
 
 void
-init_sequence_function()
+gcl_init_sequence_function()
 {
 	make_function("ELT", Lelt);
 	make_si_function("ELT-SET", siLelt_set);

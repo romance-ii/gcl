@@ -131,6 +131,7 @@ clean: debian/control
 
 	dh_clean
 	rm -rf debian/trad debian/ansi $(INS) debian/substvars
+	rm -rf *stamp
 	for i in $(CFGS) ; do ! [ -e $$i ] || mv $$i $${i%.ori} ; done
 
 
@@ -191,6 +192,8 @@ install-stamp: build-stamp debian/control $(INS)
 	cat debian/gcl.sh | sed "s,gcl/,/usr/lib/gcl-$(VERS)/,g" >debian/tmp/usr/bin/gcl$(EXT)
 	chmod 0755 debian/tmp/usr/bin/gcl$(EXT)
 
+	rm -rf debian/tmp/usr/lib/gcl-$(VERS)/info
+
 	dh_install
 
 	touch $@
@@ -231,3 +234,4 @@ binary-arch: build install debian/substvars
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure
+.PRECIOUS: configure-trad-stamp configure-ansi-stamp

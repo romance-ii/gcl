@@ -1026,7 +1026,7 @@ zero_divisor(void)
 }
 
 void
-init_num_arith(void)
+gcl_init_num_arith(void)
 {
 	make_function("+", Lplus);
 	make_function("-", Lminus);

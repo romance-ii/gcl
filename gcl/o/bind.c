@@ -1086,7 +1086,7 @@ DEF_ORDINARY("ALLOW-OTHER-KEYS",sKallow_other_keys,KEYWORD,"");
 
 
 void
-init_bind(void)
+gcl_init_bind(void)
 {
 	ANDoptional = make_ordinary("&OPTIONAL");
 	enter_mark_origin(&ANDoptional);

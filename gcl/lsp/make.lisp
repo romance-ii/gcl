@@ -392,8 +392,8 @@ source path for joe and compile him into the object path for :uinfor"
 					  "foo.o")))
   (declare (special object-path))
     `(progn
-       (clines "void init_or_load1 ();
-#define init_or_load(fn,file) do {extern int fn(); init_or_load1(fn,file);}  while(0)
+       (clines "void gcl_init_or_load1 ();
+#define init_or_load(fn,file) do {extern int fn(); gcl_init_or_load1(fn,file);}  while(0)
 
 user_init{") ,@
      (sloop::sloop for x  in files

@@ -23,13 +23,13 @@
  
  (setq compiler::*cmpinclude* "\"cmpinclude.h\"") 
  
- (load (concatenate 'string si::*system-directory* "../cmpnew/cmpmain.lsp")) 
+ (load (concatenate 'string si::*system-directory* "../cmpnew/gcl_cmpmain.lsp")) 
  (gbc t)
- (load (concatenate 'string si::*system-directory* "../cmpnew/lfun_list.lsp"))
+ (load (concatenate 'string si::*system-directory* "../cmpnew/gcl_lfun_list.lsp"))
  (gbc t) 
- (load (concatenate 'string si::*system-directory* "../cmpnew/cmpopt.lsp"))
+ (load (concatenate 'string si::*system-directory* "../cmpnew/gcl_cmpopt.lsp"))
  (gbc t)
- (load (concatenate 'string si::*system-directory* "../lsp/auto_new.lsp")) 
+ (load (concatenate 'string si::*system-directory* "../lsp/gcl_auto_new.lsp")) 
  (gbc t)
  
  (when compiler::*cmpinclude-string*

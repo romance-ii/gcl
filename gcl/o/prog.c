@@ -291,7 +291,7 @@ Fprog2(object arg)
 }
 
 void
-init_prog(void)
+gcl_init_prog(void)
 {
 	make_special_form("TAGBODY", Ftagbody);
 	make_special_form("PROG", Fprog);

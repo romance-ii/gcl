@@ -297,6 +297,8 @@ EXTER object sLvalues;
 EXTER object sSvariable_documentation;
 EXTER object sLwarn;
 EXTER object sSAallow_gzipped_fileA;
+EXTER object sSAcollect_binary_modulesA;
+EXTER object sSAbinary_modulesA;
 EXTER object sKmyaddr;
 EXTER object sKmyport;
 EXTER object sKasync;

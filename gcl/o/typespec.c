@@ -547,12 +547,12 @@ DEFCONST("CHAR-SIZE",sSchar_size,SI,small_fixnum(CHAR_SIZE),"Size in bits of a c
 DEFCONST("SHORT-SIZE",sSshort_size,SI,small_fixnum(CHAR_SIZE*sizeof(short)),"Size in bits of a short integer");
 
 void     
-init_typespec(void)
+gcl_init_typespec(void)
 {
 }
 
 void
-init_typespec_function(void)
+gcl_init_typespec_function(void)
 {
 	TSor_symbol_string
 	= make_cons(sLor, make_cons(sLsymbol, make_cons(sLstring, Cnil)));

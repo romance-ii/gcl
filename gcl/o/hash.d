@@ -521,7 +521,7 @@ DEFUN_NEW("HASH-TABLE-SIZE",object,fLhash_table_size,LISP,1,1,NONE,OO,OO,OO,OO,(
 
 
 void
-init_hash()
+gcl_init_hash()
 {
 	sLeq = make_ordinary("EQ");
 	sLeql = make_ordinary("EQL");

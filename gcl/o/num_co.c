@@ -1221,7 +1221,7 @@ Limagpart(void)
 }
 
 void
-init_num_co(void)
+gcl_init_num_co(void)
 {
 	float smallest_float, smallest_norm_float, biggest_float;
 	double smallest_double, smallest_norm_double, biggest_double;

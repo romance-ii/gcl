@@ -313,7 +313,7 @@ Lmin(void)
 }
 
 void
-init_num_comp(void)
+gcl_init_num_comp(void)
 {
 	make_function("=", Lall_the_same);
 	make_function("/=", Lall_different);

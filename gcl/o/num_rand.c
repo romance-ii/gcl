@@ -153,7 +153,7 @@ Lrandom_state_p(void)
 }
 
 void
-init_num_rand(void)
+gcl_init_num_rand(void)
 {
         Vrandom_state = make_special("*RANDOM-STATE*",
 				     make_random_state(Ct));

@@ -3,8 +3,18 @@ gclcvs (2.7.0-2) unstable; urgency=low
   * Add processor flag variable to flags in configure.in
   * Autoadd full path to kcl_self to enable save-system when user moves
     executable and calls without script wrapper
+  * Add special variables si::*collect-binary-modules* and si::*binary-
+    modules* as a facility for discovering the list of fasloaded objects
+    preceding a save-system is required for a subsequent compiler::link
+  * Add collectfn.lsp to distro
+  * Rename some files and init_ functions to eliminate namespace
+    conflicts when building images with compiler::link
+  * Enable compressed info reading
+  * Make sure no opt flags are set when enable debug is specified
+  * Use NIFlAGS to compile new_init with lower opts on ppc to work
+    around gcc bug, restore full opts to other files
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 10 Sep 2003 19:56:55 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 14 Sep 2003 02:43:36 +0000
 
 gclcvs (2.7.0-1) unstable; urgency=low
 

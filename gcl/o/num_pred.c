@@ -243,7 +243,7 @@ Levenp(void)
 
 
 void
-init_num_pred(void)
+gcl_init_num_pred(void)
 {
 #ifndef GMP
         big_register_1 = new_bignum();

@@ -722,7 +722,7 @@ set_maxpage(void) {
 
 
 void
-init_alloc(void) {
+gcl_init_alloc(void) {
 
   int i;
   static int initialized;
@@ -1104,7 +1104,7 @@ DEFUN_NEW("SET-HOLE-SIZE",object,fSset_hole_size,SI
 
 
 void
-init_alloc_function(void) {
+gcl_init_alloc_function(void) {
 }
 
 object malloc_list;
@@ -1203,7 +1203,7 @@ malloc(size_t size) {
 #else	
 	if (GBC_enable==0) {
 	   if ( initflag ==0)
-	     init_alloc();
+	     gcl_init_alloc();
 	   else {
 #ifdef	     RECREATE_HEAP
 	     	RECREATE_HEAP

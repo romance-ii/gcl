@@ -1472,7 +1472,7 @@ DEFUN_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
 }
 
 void
-init_array_function(void) {
+gcl_init_array_function(void) {
   make_function("ARRAY-DISPLACEMENT", Larray_displacement);
 }
      

@@ -375,7 +375,7 @@ object if_exists, if_does_not_exist;
 			    char buf[256];
 			    if (snprintf(buf,sizeof(buf),"%s.gz",fname)<=0)
 			      FEerror("Cannot write .gz filename",0);
-			    if (!stat(fname,&ss)) {
+			    if (!stat(buf,&ss)) {
 			      FILE *pp;
 			      int n;
 			      if (!(fp=tmpfile()))
@@ -389,6 +389,8 @@ object if_exists, if_does_not_exist;
 				  FEerror("Cannot write pipe output to temporary file",0);
 			      if (pclose(pp)<0)
 				FEerror("Cannot close zcat pipe",0);
+			      if (fseek(fp,0,SEEK_SET))
+				FEerror("Cannot rewind temporary file\n",0); 
 			      goto AGAIN;
 			    }
 			  }
@@ -1773,6 +1775,8 @@ Lfile_length()
 }
 
 object sSAload_pathnameA;
+DEFVAR("*COLLECT-BINARY-MODULES*",sSAcollect_binary_modulesA,SI,sLnil,"");
+DEFVAR("*BINARY-MODULES*",sSAbinary_modulesA,SI,Cnil,"");
 
 @(static defun load (pathname
 	      &key (verbose `symbol_value(sLAload_verboseA)`)
@@ -1832,6 +1836,18 @@ object sSAload_pathnameA;
 		package = symbol_value(sLApackageA);
 		bds_bind(sLApackageA, package);
 		bds_bind(sSAload_pathnameA,fasl_filename);
+		if (sSAcollect_binary_modulesA->s.s_dbind==Ct) {
+		  object _x=sSAbinary_modulesA->s.s_dbind;
+		  object _y=Cnil;
+		  while (_x!=Cnil) {
+		    _y=_x;
+		    _x=_x->c.c_cdr;
+		  }
+		  if (_y==Cnil)
+		    sSAbinary_modulesA->s.s_dbind=make_cons(fasl_filename,Cnil);
+		  else 
+		    _y->c.c_cdr=make_cons(fasl_filename,Cnil);
+		}
 		i = fasload(fasl_filename);
 		if (print != Cnil) {
 			SETUP_PRINT_DEFAULT(Cnil);
@@ -2311,7 +2327,7 @@ DEF_ORDINARY("SOCKET",sSsocket,SI,"");
 #endif /* HAVE_NSOCKET */
 
 object standard_io;
-DEFVAR("*STANDARD-INPUT*",sLAstandard_inputA,LISP,(init_file(),standard_io),""); 
+DEFVAR("*STANDARD-INPUT*",sLAstandard_inputA,LISP,(gcl_init_file(),standard_io),""); 
 DEFVAR("*STANDARD-OUTPUT*",sLAstandard_outputA,LISP,standard_io,"");
 DEFVAR("*ERROR-OUTPUT*",sLAerror_outputA,LISP,standard_io,"");
 DEFVAR("*TERMINAL-IO*",sLAterminal_ioA,LISP,terminal_io,"");
@@ -2323,7 +2339,7 @@ DEFVAR("*TRACE-OUTPUT*",sLAtrace_outputA,LISP,standard_io,"");
 
 
 void
-init_file(void)
+gcl_init_file(void)
 {
 	object standard_input;
 	object standard_output;
@@ -2396,7 +2412,7 @@ DEF_ORDINARY("VERBOSE",sKverbose,KEYWORD,"");
 
 
 void
-init_file_function()
+gcl_init_file_function()
 {
 
 
@@ -2461,7 +2477,7 @@ init_file_function()
 #endif
 
 #ifdef HAVE_READLINE
-	init_readline_function();
+	gcl_init_readline_function();
 #endif
 }
 

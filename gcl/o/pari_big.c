@@ -525,12 +525,12 @@ set_pari_stack(parisize)
 }
 
 /* things to be done every start */
-init_big1()
+gcl_init_big1()
 {
 
 }
 
-init_big()
+gcl_init_big()
 {
   if (avma==0)
     { 

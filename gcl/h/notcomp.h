@@ -222,4 +222,4 @@ EXTER object sSY;
 char *lisp_copy_to_null_terminated();
 
 int
-init_cmp_anon(void);
+gcl_init_cmp_anon(void);

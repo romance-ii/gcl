@@ -1496,7 +1496,7 @@ DEFVAR("*GBC-MESSAGE*",sSAgbc_messageA,SI,Cnil,"");
 #endif
 
 void
-init_GBC(void) {
+gcl_init_GBC(void) {
 
   make_si_function("ROOM-REPORT", siLroom_report);
   make_si_function("RESET-GBC-COUNT", siLreset_gbc_count);

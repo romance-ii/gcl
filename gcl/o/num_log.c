@@ -533,7 +533,7 @@ Linteger_length(void)
   
 
 void
-init_num_log(void)
+gcl_init_num_log(void)
 {
 /*  	int siLbit_array_op(void); */
 

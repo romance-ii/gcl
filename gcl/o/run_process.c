@@ -276,7 +276,7 @@ void siLrun_process()
 }
 
 void
-init_socket_function()
+gcl_init_socket_function()
 {
   make_si_function("RUN-PROCESS", siLrun_process);
 }
@@ -573,7 +573,7 @@ siLmake_socket_pair()
 }
 
 void
-init_socket_function()
+gcl_init_socket_function()
 {
   make_si_function("MAKE-SOCKET-STREAM", siLmake_socket_stream); 
   make_si_function("MAKE-SOCKET-PAIR", siLmake_socket_pair);
