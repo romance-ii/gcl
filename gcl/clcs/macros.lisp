@@ -12,7 +12,7 @@
 	   (COND ((ATOM KEYS)
 		  (COND ((NULL KEYS))
 			((MEMBER KEYS '(OTHERWISE T))
-			 (IF (NOT (MEMBER MACRO-NAME '( ECASE CCASE)))
+			 (IF (NOT (MEMBER MACRO-NAME '( ECASE CCASE ETYPECASE CTYPECASE)))
 			     (ERROR "OTHERWISE is not allowed in ~S expressions." MACRO-NAME))
 			   (PUSH (LIST KEYS) L))
 			(T (PUSH KEYS L))))

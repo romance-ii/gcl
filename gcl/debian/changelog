@@ -8,8 +8,11 @@ gcl (2.5.0.cvs20020625-60) unstable; urgency=low
   * invalid-function errors are type errors
   * ecase and ccase take t and otherwise clauses
   * ECASE/CCASE test fixes
+  * setf values fixes to use setf instead of setq when target value is
+    not a symbol
+  * ETYPECASE/CTYPECASE can take t and otherwise
 
- -- Camm Maguire <camm@m.enhanced.com>  Mon, 21 Oct 2002 04:52:59 -0400
+ -- Camm Maguire <camm@m.enhanced.com>  Tue, 22 Oct 2002 15:39:29 -0400
 
 gcl (2.5.0.cvs20020625-59) unstable; urgency=low
 
