@@ -113,10 +113,12 @@ ifloor(int x, int y)
     if (x >= 0)
       return(x/y);
     else
-      return(-((-x+y-1))/y);
+      /* FIXME, deal with possible overflow here*/
+      return(-((-x-1))/y-1);
   }
   if (x >= 0)
-    return(-((x-y-1)/(-y)));
+      /* FIXME, deal with possible overflow here*/
+    return(-((x-1)/(-y))-1);
   else
     return((-x)/(-y));
 }
