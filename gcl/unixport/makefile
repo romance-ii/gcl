@@ -1,7 +1,9 @@
 SPECIAL_RSYM = rsym.c
 
 LIBC	= -lc
-LIBGCLP = libgclp.a
+GCLP = libgclp.a
+LIBGCLP = -lgclp
+
 -include ../makedefs
 
 HDIR	= ../h
@@ -14,7 +16,7 @@ PORTDIR = .
 
 OLDDATE = "DATE"
 
-LD_LIBS=$(addprefix -u ,$(PATCHED_SYMBOLS)) -lgcl $(LIBS) $(LIBC) -lgclp
+LD_LIBS=$(addprefix -u ,$(PATCHED_SYMBOLS)) -lgcl $(LIBS) $(LIBC) $(LIBGCLP)
 
 libgclp.a: $(ODIR)/gcllib.a
 	cp $< $@
@@ -106,7 +108,7 @@ libgcl.a: $(FIRST_FILE) $(OBJS) $(LSPOBJS) $(CMPOBJS) sys_gcl.o $(LAST_FILE) gmp
 	rm -rf $@
 	ar rs $@ $(filter %.o,$^) $(shell find gmp bfd -name "*.o")
 
-raw_$(SYSTEM): libgcl.a $(LIBGCLP) $(SYSTEM_OBJS)
+raw_$(SYSTEM): libgcl.a $(GCLP) $(SYSTEM_OBJS)
 	$(CC) -o raw_$(SYSTEM)$(EXE) $(filter %.o,$^) -L. $(LD_LIBS)
 
 sys_gcl.o: sys_gcl.c $(HDIR)/object.h $(HDIR)/config.h
@@ -115,5 +117,5 @@ sys_gcl.o: sys_gcl.c $(HDIR)/object.h $(HDIR)/config.h
 clean:
 	rm -rf  saved_$(SYSTEM)$(EXE) raw_$(SYSTEM)$(EXE) saved_gcl$(EXE) \
 		saved_ansi_gcl$(EXE) raw_gcl$(EXE) *.o core a.out $(RSYM) \
-		$(LSPDIR)/auto_new.lsp foo *maxima* init_gcl.lsp libgcl.a libgclp.a \
+		$(LSPDIR)/auto_new.lsp foo *maxima* init_gcl.lsp libgcl.a $(GCLP) \
 		gmp* bfd*
