@@ -1,4 +1,4 @@
-gclcvs (2.7.0-36) unstable; urgency=low
+gclcvs (2.7.0-36) unstable; urgency=high
 
   * Modify pull-evals and add arg-appears in gcl_cmpeval.lsp to more
     correctly choose which arguments need pre-evaluation in binary op
@@ -14,7 +14,8 @@ gclcvs (2.7.0-36) unstable; urgency=low
     expressions on nesting certain optimized forms
   * Old pathname-name case behavior in CLtL1
   * Preliminary type inferencing
-  * reduce print.cons.random.2 iterations for slow autobuilders
+  * reduce print.cons.random.2 iterations for slow autobuilders to migrate
+    latest into sarge, Closes: #282809.
 
  -- Camm Maguire <camm@enhanced.com>  Sat, 11 Dec 2004 01:22:13 +0000
 
