@@ -263,7 +263,7 @@
       (list 'labels info (reverse local-funs) (reverse closures) body)
       body))
 
-(defun c2labels (local-funs closures body &aux (*vs* *vs*) (*clink* *clink*))
+(defun c2labels (local-funs closures body &aux (*vs* *vs*) (*clink* *clink*) (*ccb-vs* *ccb-vs*))
 
   ;;; Prepare for cross-referencing closures.
   (dolist** (def closures)
