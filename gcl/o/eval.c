@@ -367,7 +367,7 @@ funcall_no_event(object fun)
 	}
 
 	case t_sfun:
-		call_sfun_no_check(fun); return;
+/*  		call_sfun_no_check(fun); return; */
         case t_gfun:
 		quick_call_sfun(fun); return;
         case t_vfun:

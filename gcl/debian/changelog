@@ -15,8 +15,18 @@ gcl (2.5.0.cvs20020625-71) unstable; urgency=high
   * Added si::modf
   * Do not trigger error in IapplyVector if max args is zero
   * Fixes to with-package-iterator to cleanup compiler warnings
+  * :invalid-variable is a type error
+  * No max arg checking if &key or &rest present
+  * proper defun declarations in listlib.lsp
+  * class specifiers in typep, subtypep and coerce
+  * Corrections to allow-other-key processing in bind.c
+  * eval sfuns with argument error checking (in one place)
+  * copy-structure takes only one arg
+  * si::classp, si::class-of, and si::class-precedence-list overwritten
+    by pcl analogs when compiling ansi
+  * recompiled core lsp and compiler files
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 21 Jan 2003 11:41:17 -0500
+ -- Camm Maguire <camm@enhanced.com>  Fri, 24 Jan 2003 13:36:57 -0500
 
 gcl (2.5.0.cvs20020625-70) unstable; urgency=high
 

@@ -1830,7 +1830,7 @@ T774:;
 	goto T775;}
 goto T776;
 T776:;
-	V335 = make_longfloat((double)(4.9406564584124650e-324)*(double)(1.0000000e+20));
+	V335 = make_longfloat((double)(4.94065645841246540e-324)*(double)(1.0000000e+20));
 	if(!(number_compare((V329),V335)<0)){
 	goto T770;}
 	base[0]= (V316);

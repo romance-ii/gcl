@@ -588,7 +588,10 @@
 
 
 (defun maxargs (lambda-list)
-  (cond ((or (ll-allow-other-keys lambda-list)(ll-rest lambda-list))
+; any function can take &allow-other-keys in ANSI lisp 
+  (cond (
+;	 (or (ll-allow-other-keys lambda-list)(ll-rest lambda-list))
+	 (or (ll-keywords-p lambda-list) (ll-rest lambda-list))
 	 64)
 	(t (+ (length (car lambda-list)) ;reg
 	      (length (ll-optionals lambda-list))

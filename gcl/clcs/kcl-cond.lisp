@@ -96,6 +96,8 @@
      internal-undefined-function :name)
     ("FEinvalid_function" :invalid-function "~S is invalid as a function."
      internal-type-error) ; |obj|
+    ("FEinvalid_variable" :invalid-variable "~S is an invalid variable."
+     internal-type-error) ; |obj|
     ("check_arg_failed" :too-few-arguments "~S [or a callee] requires ~R argument~:p,~%\
 but only ~R ~:*~[were~;was~:;were~] supplied."
      internal-simple-program-error) ; |<function>| |n| |top - base|
@@ -112,10 +114,10 @@ but only ~R ~:*~[were~;was~:;were~] supplied."
      internal-simple-program-error) ;??
     ("illegal_declare" :invalid-form "~S is an illegal declaration form."
      internal-simple-program-error)
-    ("not_a_symbol" :invalid-variable "~S is not a symbol."
-     internal-simple-error) ;??
-    ("not_a_variable" :invalid-variable "~S is not a variable."
-     internal-simple-program-error)
+;    ("not_a_symbol" :invalid-variable "~S is not a symbol."
+;     internal-simple-error) ;??
+;    ("not_a_variable" :invalid-variable "~S is not a variable."
+;     internal-simple-program-error)
     ("illegal_index" :error "~S is an illegal index to ~S."
      internal-simple-error)
     ("vfun_wrong_number_of_args" :error "Expected ~S args but received ~S args"

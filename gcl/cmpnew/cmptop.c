@@ -1403,7 +1403,7 @@ register object V197;
 {	 VMB17 VMS17 VMV17
 goto TTL;
 TTL:;
-	if((cadr(cddddr((V197))))!=Cnil){
+	if((cadddr((V197)))!=Cnil){
 	goto T652;}
 	if((caddr((V197)))==Cnil){
 	goto T653;}

@@ -711,7 +711,7 @@ parse_key(object *base, bool rest, bool allow_other_keys, register int n, ...)
         object temporary;
 	va_list ap;
 	object other_key = OBJNULL;
-	int narg, error_flag = 0;
+	int narg, error_flag = 0, allow_other_keys_found=0;
 	object *v, k, *top;
 	register int i;
 
@@ -735,13 +735,16 @@ parse_key(object *base, bool rest, bool allow_other_keys, register int n, ...)
 		k = base[0];
 		if (!keywordp(k))
 		  FEunexpected_keyword(k);
-		if (k == sKallow_other_keys && base[1] != Cnil)
-			allow_other_keys = TRUE;
+		if (k == sKallow_other_keys && ! allow_other_keys_found) {
+		  allow_other_keys_found=1;
+		  if (base[1]!=Cnil)
+		    allow_other_keys=TRUE;
+		}
 		temporary = base[1];
 		if (rest)
 			base++;
 		top = base + n;
-		other_key = k;
+		other_key = k == sKallow_other_keys ? OBJNULL : k;
 		va_start(ap,n);
 		for (i = 0;  i < n;  i++) {
 		    
@@ -782,10 +785,13 @@ parse_key(object *base, bool rest, bool allow_other_keys, register int n, ...)
 			k->s.s_stype = FOUND;
 		} else if (k->s.s_stype == FOUND) {
 			;
-		} else if (other_key == OBJNULL)
+		} else if (other_key == OBJNULL && k!=sKallow_other_keys)
 			other_key = k;
-		if (k == sKallow_other_keys && v[1] != Cnil)
-			allow_other_keys = TRUE;
+		if (k == sKallow_other_keys && !allow_other_keys_found) {
+		  allow_other_keys_found=1;
+		  if (v[1] != Cnil)
+		    allow_other_keys = TRUE;
+		}
 	}
 	if (rest) {
 		top = vs_top;
@@ -854,6 +860,7 @@ check_other_key(object l, int n, ...)
 object Cstd_key_defaults[15]={Cnil,Cnil,Cnil,Cnil,Cnil,Cnil,Cnil,
 				Cnil,Cnil,Cnil,Cnil,Cnil,Cnil,Cnil,Cnil};
 
+/* FIXME rewrite this */
 int
 parse_key_new(int n, object *base, struct key *keys, va_list ap)
 {object *new;
@@ -868,6 +875,14 @@ parse_key_new(int n, object *base, struct key *keys, va_list ap)
  {if (n==0){ return 0;}
  {int allow = keys->allow_other_keys;
   object k;
+
+  if (!allow) {
+    int i;
+    for (i=n;i>0 && new[-i]!=sKallow_other_keys;i-=2);
+    if (i>0 && new[-i+1]!=Cnil)
+      allow=1;
+  }
+
  top:
   while (n>=2)
     {int i= keys->n;
@@ -881,19 +896,10 @@ parse_key_new(int n, object *base, struct key *keys, va_list ap)
 	   goto top;
 	 }}
      /* the key is a new one */
-     if (allow  )
-       {
-	 n=n-2;
-      }
+     if (allow || k==sKallow_other_keys) 
+       n=n-2;
      else
-       {int m = n -2;
-	object *p = new;
-	while (m >= 0)
-	  {if (*p == sKallow_other_keys)
-	     { allow = (p[1] !=Cnil) ; break;}
-	   p -= 2;
-	   m -= 2;}
-	if (allow) n = n -2 ; else goto error;}
+       goto error;
    }
   /* FIXME better message */
   if (n!=0) FEunexpected_keyword(Cnil);
@@ -923,6 +929,14 @@ parse_key_rest(object rest, int n, object *base, struct key *keys, va_list ap)
  {if (n==0){ return 0;}
  {int allow = keys->allow_other_keys;
   object k;
+
+  if (!allow) {
+    int i;
+    for (i=n;i>0 && new[-i]!=sKallow_other_keys;i-=2);
+    if (i>0 && new[-i+1]!=Cnil)
+      allow=1;
+  }
+
  top:
   while (n>=2)
     {int i= keys->n;
@@ -936,20 +950,10 @@ parse_key_rest(object rest, int n, object *base, struct key *keys, va_list ap)
 	   goto top;
 	 }}
      /* the key is a new one */
-     if (allow)
-       {
-	 n=n-2;
-      }
+     if (allow || k==sKallow_other_keys) 
+       n=n-2;
      else
-       {int m = n -2;
-	object *p = new;
-	while (m >= 0)
-	  {if (*p == sKallow_other_keys)
-	     { allow = (p[1] !=Cnil) ; break;}
-	   p -= 2;
-	   m -= 2;}
-	if (allow) n = n -2 ; else goto error;}
-
+       goto error;
    }
   /* FIXME better message */
   if (n!=0) FEunexpected_keyword(Cnil);

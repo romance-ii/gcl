@@ -241,7 +241,8 @@ siLcopy_structure(void)
 	object x, y;
 	struct s_data *def;
 
-	if (vs_top-vs_base < 1) too_few_arguments();
+	check_arg(1);
+/*  	if (vs_top-vs_base < 1) too_few_arguments(); */
 	x = vs_base[0];
 	check_type_structure(x);
 	{BEGIN_NO_INTERRUPT;

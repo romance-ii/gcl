@@ -134,9 +134,21 @@
     ((endp l))
   (si:putprop (caar l) (cdar l) 'type-predicate))
 
+(defun class-of (object)
+  (declare (ignore object))
+  nil)
+(defun classp (object)
+  (declare (ignore object))
+  nil)
+(defun class-precedence-list (object)
+  (declare (ignore object))
+  nil)
 
 ;;; TYPEP predicate.
+;;; FIXME --optimize with most likely cases first
 (defun typep (object type &aux tp i tem)
+  (when (classp type)
+    (return-from typep (eq (funcall 'class-of object) type)))
   (if (atom type)
       (setq tp type i nil)
       (setq tp (car type) i (cdr type)))
@@ -270,6 +282,13 @@
 
 ;;; SUBTYPEP predicate.
 (defun subtypep (type1 type2 &aux t1 t2 i1 i2 ntp1 ntp2 tem)
+  (let ((c1 (classp type1)) (c2 (classp type2)))
+    (when (and c1 c2)
+      (return-from subtypep 
+		   (if (member type2 (class-precedence-list type1))
+		       (values t t) (values nil t))))
+    (when (or c1 c2)
+      (return-from subtypep (values nil t))))
   (setq t1 (normalize-type type1))
   (setq type1 (if (eq (car t1) 'satisfies) (list type1) t1))
   (setq t2 (normalize-type type2))
@@ -676,6 +695,8 @@
   (when (typep object type)
         ;; Just return as it is.
         (return-from coerce object))
+  (when (classp type)
+    (specific-error :wrong-type-argument "Cannot coerce ~S to class ~S~%" object type))
   (setq type (normalize-type type))
   (case (car type)
     (list

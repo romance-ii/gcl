@@ -89,6 +89,12 @@
   (import (list s) "COMMON-LISP")
   (import (list s) "USER"))
 
+;(shadowing-import (list 'pcl::classp) "SYSTEM")
+(setf (symbol-function 'si::classp) (symbol-function 'pcl::classp))
+(setf (symbol-function 'si::class-of) (symbol-function 'pcl::class-of))
+(setf (symbol-function 'si::class-precedence-list) 
+	(symbol-function 'pcl::class-precedence-list))
+
 (do-external-symbols (s "CONDITIONS")
   (if (member s clcs_shadow)
       (progn 
