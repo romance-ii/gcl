@@ -34,7 +34,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 static int
 t_from_type(object);
 
-
 DEFVAR("*AFTER-GBC-HOOK*",sSAafter_gbc_hookA,SI,sLnil,"");
 DEFVAR("*IGNORE-MAXIMUM-PAGES*",sSAignore_maximum_pagesA,SI,sLt,"");
 #define IGNORE_MAX_PAGES (sSAignore_maximum_pagesA ==0 || sSAignore_maximum_pagesA->s.s_dbind !=sLnil) 
@@ -846,7 +845,6 @@ set_maxpage(void) {
 #endif
   
   SET_REAL_MAXPAGE;
-
 }
 
 
@@ -1498,6 +1496,16 @@ malloc(size_t size) {
 	     	RECREATE_HEAP
 #endif
 		;
+#ifdef       __MINGW32__
+                /* If malloc() gets called by the C runtime before
+                 * main starts and the shared memory is not yet
+                 * initialised causing boofo. 
+                 * SET_REAL_MAXPAGE calls init_shared_memory().
+                 * This problem arose with gcc 3.4.2 and new libs.
+                 */
+                SET_REAL_MAXPAGE
+                ;
+#endif
 	   }
 	}
 
