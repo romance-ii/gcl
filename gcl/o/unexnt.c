@@ -959,8 +959,9 @@ allocate_heap (void)
   unsigned long end  = 1 << VALBITS; /* 256MB */
   void *ptr = NULL;
 
-#define NTHEAP_PROBE_BASE 1
+#define NTHEAP_PROBE_BASE 0
 #if NTHEAP_PROBE_BASE /* This is never normally defined */
+  /* Macros in gbc.c depend on DBEGIN being divisible by 32 */
   /* Try various addresses looking for one the kernel will let us have.  */
   while (!ptr && (base < end))
     {
@@ -970,7 +971,7 @@ allocate_heap (void)
 			  MEM_RESERVE,
 			  PAGE_NOACCESS);
       base += 0x00100000;  /* 1MB increment */
-      DBEGIN = ptr;
+      DBEGIN = (DBEGIN_TY) ptr;
     }
 #else
   reserved_heap_size = end - base;
@@ -978,7 +979,7 @@ allocate_heap (void)
 		      get_reserved_heap_size (),
 		      MEM_RESERVE,
 		      PAGE_NOACCESS);
-  DBEGIN = ptr;
+  DBEGIN = (DBEGIN_TY) ptr;
 #endif
 
   return ptr;
