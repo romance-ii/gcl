@@ -41,7 +41,7 @@ void Ldirectory();
 #include <sys/dir.h>
 
 
-#ifndef GETCWD
+#ifndef HAVE_GETCWD
 char dotdot[3*16+2] = "../../../../../../../../../../../../../../../../.";
 #include <mnttab.h>
 static char *getwd_buf;
@@ -131,7 +131,7 @@ DEV_FOUND:
 	/* END OF BUG FIX */
 	getwd_bufp = i;
 }
-#endif   /* not GETCWD */
+#endif   /* not HAVE_GETCWD */
 #endif
 
 #ifndef MAXPATHLEN
@@ -139,7 +139,7 @@ DEV_FOUND:
 #endif
 
 
-#ifdef GETCWD
+#ifdef HAVE_GETCWD
 char *
 getwd(buffer)
 char *buffer;
