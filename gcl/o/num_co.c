@@ -29,6 +29,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define IN_NUM_CO
 
 #define NEED_MP_H
+#define NEED_ISFINITE
 
 #include "include.h"
 #include "num_include.h"
@@ -38,6 +39,44 @@ extern void zero_divisor(void);
 #ifdef CONVEX
 #define VAX
 #endif
+
+/*   A number is normal when:
+   * it is finite,
+   * it is not zero, and
+   * its exponent is non-zero.
+*/
+int 
+gcl_isnormal_double(double d) {
+
+  union {double d;int i[2];} u;
+  
+  if (!ISFINITE(d) || !d)
+    return 0;
+
+#ifdef IEEEFLOAT
+  u.d = d;
+  return (u.i[HIND] & 0x7ff00000) != 0;
+#else
+#error gcl_isnormal_double only implemented for IEEE
+#endif
+
+}
+
+int gcl_isnormal_float(float f)
+{
+  union {float f;int i;} u;
+
+  if (!ISFINITE(f) || !f)
+    return 0;
+
+#ifdef IEEEFLOAT
+  u.f = f;
+  return (u.i & 0x7f800000) != 0;
+#else
+#error gcl_isnormal_float only implemented for IEEE
+#endif
+
+}
 
 #ifdef VAX
 /*

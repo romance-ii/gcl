@@ -1756,6 +1756,12 @@ parse_plt(void);
 int
 sgc_count_read_only_type(int);
 
+int 
+gcl_isnormal_double(double);
+
+int 
+gcl_isnormal_float(float);
+
 #ifdef SGC
 void
 memprotect_test_reset(void);

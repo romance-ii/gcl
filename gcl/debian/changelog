@@ -1,8 +1,9 @@
 gclcvs (2.7.0-25) unstable; urgency=low
 
   * gcc-3.4 support
+  * Proper isnormal default courtesy of Magnus Henoch
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 11 May 2004 18:37:56 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 26 May 2004 02:03:29 +0000
 
 gclcvs (2.7.0-24) unstable; urgency=low
 
