@@ -79,12 +79,19 @@ parse_plt() {
   char b[1024],b1[1024];
   unsigned i,n,j;
   unsigned long u;
+#ifdef _WIN32
+  char *exe_start = NULL;           /* point to start of .exe */
+#endif  
   char *c,*d;
   object st,fi,li,ar,*op;
   Plt *p=mplt,*pe=p+sizeof(mplt)/sizeof(*mplt);
 
   if (snprintf(b,sizeof(b),"%s",kcl_self)<=0)
     FEerror("Cannot write map filename",0);
+#ifdef _WIN32
+  exe_start = strstr ( b, ".exe" );
+  if ( NULL != exe_start ) *exe_start = '\0';
+#endif  
   c=b+strlen(b);
   if (sizeof(b)-(c-b)<5)
     FEerror("Cannot write map filename",0);
