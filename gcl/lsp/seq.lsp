@@ -46,6 +46,8 @@
               (t
                (setq type (normalize-type type))
                (when (subtypep (car type) 'list)
+		 (if (and (eq 'null (car type)) (not (equal size 0)))
+		     (error "Cannot make 'null sequence of size ~S." size))
                      (return-from make-sequence
                       (if iesp
                           (make-list size :initial-element initial-element)
