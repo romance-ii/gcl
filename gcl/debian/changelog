@@ -1,3 +1,11 @@
+gcl (2.5.0.cvs20020625-38) unstable; urgency=high
+
+  * check for long c statck addresses, fixing NULL_OR_ON_C_STACK macro
+    for ia64
+  * Remove error in clean target
+
+ -- Camm Maguire <camm@enhanced.com>  Sat, 10 Aug 2002 13:20:08 -0400
+
 gcl (2.5.0.cvs20020625-37) unstable; urgency=high
 
   * Replace tmpnam and mktemp with less dangerous mkstemp

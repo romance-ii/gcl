@@ -1897,7 +1897,7 @@ main()
 {
   char *b ;
   FILE *fp = fopen("conftest1","w");
-  fprintf(fp,"%d",((int) &b));
+  fprintf(fp,"%ld",((long) &b));
   fclose(fp);
   return 0;
 }

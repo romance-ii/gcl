@@ -175,8 +175,8 @@ clean:
 	rm -rf gmp3/.deps gmp3/libgmp.a
 	rm -f xbin/gcl foo foo.c bin/gclm.bat
 	rm -f h/*-linux.defs h/bfd.h h/bfdlink.h
-	cd binutils/bfd && make distclean
-	cd binutils/libiberty && make distclean
+	-cd binutils/bfd && make distclean
+	-cd binutils/libiberty && make distclean
 
 CMPINCLUDE_FILES=${HDIR}cmpincl1.h ${HDIR}gclincl.h ${HDIR}compbas.h ${HDIR}enum.h $(MP_INCLUDE) ${HDIR}object.h ${HDIR}vs.h \
 	${HDIR}bds.h ${HDIR}frame.h \
