@@ -954,7 +954,9 @@
 		    (c2bind-loc (car opt) (if first (list 'first-var-arg) (list 'next-var-arg)))
 		    (setq first nil)
 		    (wt "}")
-		    (when (caddr opt) (c2bind-loc (caddr opt) t)))))
+		    (when (caddr opt) (c2bind-loc (caddr opt) t)))
+	  (unless (or first (not (ll-rest ll)))
+	    (wt-nl "first=va_arg(ap,object);"))))
       (setq labels (nreverse labels))
       
       (let ((label (next-label)))
