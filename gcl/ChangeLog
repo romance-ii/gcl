@@ -1,3 +1,8 @@
+2002-01-25  Camm Maguire  <camm@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/ChangeLog, /cvsroot/gcl/gcl/ChangeLog.orig:
+	New ChangeLog via rcs2log
+
 2002-01-23  Camm Maguire  <camm@intech19.enhanced.com>
 
 	* /cvsroot/gcl/gcl/o/mingfile.c, /cvsroot/gcl/gcl/configure, /cvsroot/gcl/gcl/configure.in, /cvsroot/gcl/gcl/h/minglacks.h, /cvsroot/gcl/gcl/h/mingw.h:
