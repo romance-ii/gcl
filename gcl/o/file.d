@@ -488,11 +488,14 @@ BEGIN:
 	    fflush(stderr);
 	  }
 	  else {
+#ifdef HAVE_NSOCKET
           if (GET_STREAM_FLAG(strm,gcl_sm_output))
-              {	 gclFlushSocket(strm);
+              {	 
+		gclFlushSocket(strm);
                  /* there are two for one fd so close only one */
             	  tcpCloseSocket(SOCKET_STREAM_FD(strm));
                } 
+#endif
 	  SOCKET_STREAM_FD(strm)=-1;
 	  }
 
@@ -848,9 +851,11 @@ BEGIN:
 			STREAM_FILE_COLUMN(strm)++;
 		if (strm->sm.sm_fp == NULL)
 		  {
+#ifdef HAVE_NSOCKET
 		    if (strm->sm.sm_mode == smm_socket && strm->sm.sm_fd>=0)
 		      putCharGclSocket(strm,c);
 		    else
+#endif
 		      if (!GET_STREAM_FLAG(strm,gcl_sm_had_error))
 			closed_stream(strm);
 		  } else {
@@ -963,9 +968,11 @@ BEGIN:
 	  fflush(strm->sm.sm_fp);
 	  break;
 	case smm_socket:
+#ifdef HAVE_NSOCKET
 		if (SOCKET_STREAM_FD(strm) >0)
 		  gclFlushSocket(strm);
 		else
+#endif
 		  closed_stream(strm);
 		break;
 	case smm_synonym:

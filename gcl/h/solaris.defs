@@ -1,6 +1,6 @@
 
 OFLAG	=  -O
-LIBS	= -lm -lsocket -lnsl
+#LIBS	= -lm -lsocket -lnsl
 
 # tell linker to remember where it got the shared object...
 # should have the same for TCL/TK if you used shared libs..
