@@ -120,7 +120,7 @@ integer_exact_quotient(object x,object y,int in_place) {
 static object
 ratio_op_with_cancellation(object a,object b,object c,object d,object (*op)(object,object)) {
 
-  object b0,d0g,t,g1,r;
+  object b0,d0,g,t,g1,r;
   
   b0=b;
   d0=d;
