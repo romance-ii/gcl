@@ -229,7 +229,6 @@ int fasload ( object faslfile )
     char filename[MAXPATHLEN];
     int i;
     int init_address=0;
-    int aux_to_go = 0;
     size_t sections_read = 0;
     object *old_vs_base = vs_base;
     object *old_vs_top = vs_top;
@@ -526,11 +525,13 @@ void relocate_symbols ( unsigned int length )
                 str = SYM_NAME ( sym );
                 set_symbol_address ( sym, str );
             } else {
+                /*
                 fprintf ( stderr,
                           "relocate_symbols: am ignoring section number %d (%s)\n",
                           sym->SectionNumber,
                           SYM_NAME ( sym ) );
                 fflush ( stderr );
+                */
             }
         }
         sym += sym->NumberOfAuxSymbols;
