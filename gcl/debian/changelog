@@ -1,3 +1,9 @@
+gcl (2.5.0.cvs20020625-9) unstable; urgency=high
+
+  * cvs commits for 64bit support
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 12 Jul 2002 18:01:21 -0400
+
 gcl (2.5.0.cvs20020625-8) unstable; urgency=high
 
   * NULL_OR_ON_C_STACK macro correction for m68k
