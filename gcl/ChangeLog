@@ -1,3 +1,12 @@
+2002-02-01  Camm Maguire  <camm@intech19.enhanced.com>
+
+	* /cvsroot/gcl/gcl/h/solaris.h: Uncommented define of DBEGIN in h/solaris.h
+
+	* /cvsroot/gcl/gcl/unixport/rsym_elf.c: Handle solaris setjmp symbols
+
+	* /cvsroot/gcl/gcl/configure, /cvsroot/gcl/gcl/configure.in:
+	test -e -> test -f for solaris in configure.in
+
 2002-01-31  Camm Maguire  <camm@wisdom.m.enhanced.com>
 
 	* /cvsroot/gcl/gcl/cmpnew/cmploc.c, /cvsroot/gcl/gcl/cmpnew/cmpmap.c, /cvsroot/gcl/gcl/cmpnew/cmpmulti.c, /cvsroot/gcl/gcl/cmpnew/cmpspecial.c, /cvsroot/gcl/gcl/cmpnew/cmptag.c, /cvsroot/gcl/gcl/cmpnew/cmptop.c, /cvsroot/gcl/gcl/cmpnew/cmptype.c, /cvsroot/gcl/gcl/cmpnew/cmputil.c, /cvsroot/gcl/gcl/cmpnew/cmpvar.c, /cvsroot/gcl/gcl/cmpnew/cmpvs.c, /cvsroot/gcl/gcl/cmpnew/cmpwt.c, /cvsroot/gcl/gcl/gmp/ansi2knr.c, /cvsroot/gcl/gcl/lsp/arraylib.c, /cvsroot/gcl/gcl/lsp/assert.c, /cvsroot/gcl/gcl/lsp/debug.c, /cvsroot/gcl/gcl/lsp/defmacro.c, /cvsroot/gcl/gcl/lsp/defstruct.c, /cvsroot/gcl/gcl/lsp/describe.c, /cvsroot/gcl/gcl/lsp/evalmacros.c, /cvsroot/gcl/gcl/lsp/info.c, /cvsroot/gcl/gcl/lsp/iolib.c, /cvsroot/gcl/gcl/lsp/listlib.c, /cvsroot/gcl/gcl/lsp/mislib.c, /cvsroot/gcl/gcl/lsp/module.c, /cvsroot/gcl/gcl/lsp/numlib.c, /cvsroot/gcl/gcl/lsp/packlib.c, /cvsroot/gcl/gcl/lsp/predlib.c, /cvsroot/gcl/gcl/lsp/seq.c, /cvsroot/gcl/gcl/lsp/seqlib.c, /cvsroot/gcl/gcl/lsp/serror.c, /cvsroot/gcl/gcl/lsp/setf.c, /cvsroot/gcl/gcl/lsp/sloop.c, /cvsroot/gcl/gcl/lsp/top.c, /cvsroot/gcl/gcl/lsp/trace.c, /cvsroot/gcl/gcl/o/firstfile.c, /cvsroot/gcl/gcl/o/lastfile.c, /cvsroot/gcl/gcl/o/try.c, /cvsroot/gcl/gcl/o/unexaix.c, /cvsroot/gcl/gcl/o/unexec-19.29.c, /cvsroot/gcl/gcl/o/unexec.c, /cvsroot/gcl/gcl/o/unexelf.c, /cvsroot/gcl/gcl/o/unexmips.c, /cvsroot/gcl/gcl/cmpnew/cmpbind.c, /cvsroot/gcl/gcl/cmpnew/cmpblock.c, /cvsroot/gcl/gcl/cmpnew/cmpcall.c, /cvsroot/gcl/gcl/cmpnew/cmpcatch.c, /cvsroot/gcl/gcl/cmpnew/cmpenv.c, /cvsroot/gcl/gcl/cmpnew/cmpeval.c, /cvsroot/gcl/gcl/cmpnew/cmpflet.c, /cvsroot/gcl/gcl/cmpnew/cmpfun.c, /cvsroot/gcl/gcl/cmpnew/cmpif.c, /cvsroot/gcl/gcl/cmpnew/cmpinline.c, /cvsroot/gcl/gcl/cmpnew/cmplabel.c, /cvsroot/gcl/gcl/cmpnew/cmplam.c, /cvsroot/gcl/gcl/cmpnew/cmplet.c:
