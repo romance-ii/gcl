@@ -608,7 +608,8 @@
                  ((endp opts))
                  (declare (object opts))
                  (push (next-label) labels)
-                 (wt-nl "if(vs_base>=vs_top){vs_top=sup;")
+                 (wt-nl "if(vs_base>=vs_top){")
+		 (reset-top)
                  (wt-go (car labels)) (wt "}")
                  (c2bind (caar opts))
                  (when (caddar opts) (c2bind-loc (caddar opts) t))
@@ -617,8 +618,8 @@
         (setq labels (reverse labels))
         )
 
-  (wt-nl "vs_top=sup;")
-
+  (reset-top)
+  
   (when optionals
         (let ((label (next-label)))
              (wt-go label)
@@ -864,7 +865,7 @@
   (cond (env (setf (var-ref env) (vs-push)))
         (t (vs-push)))
   (c2dm-reserve-vl vl)
-  (wt-nl "vs_top=sup;")
+  (reset-top)
   (when whole (c2bind whole))
   (when env (c2bind env))
   (maybe-wt-c2dm-bind-vl vl cvar (wt-nl "{object V" cvar "=base[0]->c.c_cdr;") (wt "}"))
