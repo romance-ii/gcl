@@ -2,20 +2,14 @@
 BUILDING A NATIVE WIN32 GNU COMMON LISP FROM CVS (DRAFT ONLY)
 =============================================================
 
-I have recently changed the preferred build host system
-for the Mingw32 compiler to MSYS, rather than Cygwin.
+The preferred build host system for the Mingw32 compiler is 
+MSYS, rather than Cygwin.  I prefer to  use gcc 3.2, but 
+gcc 2.95 certainly works.
 
 The older Cygwin hosted method is set out further into this file
 below the MSYS method described here.  It is not recommended, not
 supported and the instructions are not up to date.
 
-I have also built a debug GCL with the new Mingw 2 executable install 
-package (uses GCC 3.2).  
-
-This does not work with the default optimisation settings - 
-instead 
-	-O2
-	do not use -fomit-frame-pointers.
 
 ===============================================
 BUILDING GCL USING MSYS AS THE HOST
@@ -23,7 +17,7 @@ BUILDING GCL USING MSYS AS THE HOST
 
 BUILD TOOLS
 
-- Mingw32 1.1 Windows native gcc from Source Forge:
+- Mingw32 2 Windows native gcc from Source Forge:
     http://sourceforge.net/projects/mingw/
 
 - MSYS Mingw build environment, including the MSYS DTK
@@ -35,15 +29,8 @@ BUILD TOOLS
 - Source code for GCL.
     http://savannah.gnu.org/projects/gcl/
 
-It is a good idea to keep up to date with Mingw32 and MSYS, especially 
-the latest Mingw32 runtime (30 April 2002).
-
-Having said that, I have not yet tried the recently released versions 3.1 
-and 3.2 of Mingw32 gcc as they are still experimental.  Furthermore, do not
-install Mingw 2 as that contains gcc 3.2.
-
-Only gcc 2.95 is known to work (The newer versions may well work, they just 
-haven't been tried yet).
+It is a good idea to keep up to date with Mingw32 and MSYS.  GCL is 
+known to build with both gcc 3.2 and gcc 2.95.
 
 
 SHORT SETUP NOTES
@@ -53,18 +40,11 @@ SHORT SETUP NOTES
 
 DETAILED SETUP NOTES
 
-- Start with MinGW-1.1.tar.gz.  DO NOT USE THE NEW MINGW 2 PACKAGE.
+- Start by installing the latest version of MinGW2.exe.
 
 - By looking at the dates and version numbers appended to the other
-  packages on the download page, get the latest versions of gcc, binutils,
-  mingw-runtime, and w32api.   (Stick with gcc 2.95 rather than gcc 3.1/3.2).
-  I have the following packages:
-
-  gcc-2.95.3-20011106.tar.gz
-  binutils-2.13-20020808-1.tar.gz
-  mingwDTK-1.0.0-alpha-1.tar.gz
-  mingw-runtime-2.1.tar.gz
-  w32api-1.5.tar.gz
+  packages on the download page, get any versions of gcc 3.2, binutils,
+  mingw-runtime, and w32api that are later than the Mingw2 package. 
 
 - Go to the top level Mingw32 installation directory - the one in which you
   can see "bin", "lib" etc
@@ -74,7 +54,8 @@ DETAILED SETUP NOTES
   tar xzf rumpty-dumpty.tar.gz
 
 - Remove the Mingw version of "make" from the bin directory - it has serious
-  bugs and will not work properly for most tasks including building GCL and Maxima.
+  bugs and will not work properly for most tasks including building GCL and 
+  Maxima.
 
 - Get MSYS and install it - follow the instructions - subscribe to the
   mailing list and read the archives.
@@ -131,7 +112,10 @@ BUILDING
 
 - BFD fasloading and Stratified Garbage Collection (SGC) do not work under
   Windows.  The configuration options above provide a "traditional" GCL 
-  executable which will build the current CVS version of Maxima.  
+  executable which will build the current CVS version of Maxima.  The BFD
+  option will depend on someone with knowledge of BFD and PE-COFF linking
+  fixing some problems with the BFD library - I am slowly absorbing the info
+  needed, but we really need input from an expert.
 
 - A PCL/ANSI build ("configure --enable-ansi --enable-custreloc") can be 
   obtained by adding "(si::use-fast-links nil)" to the end of the list of
@@ -140,13 +124,13 @@ BUILDING
   experimental and will not compile Maxima at present.
 
 
-Mike Thomas, 23 September 2002
+Mike Thomas, 15 October 2002
 
 
 
-===============================================
-BUILDING GCL USING CYGWIN AS THE HOST
-===============================================
+===================================================
+BUILDING GCL USING CYGWIN AS THE HOST - UNSUPPORTED
+===================================================
 
 BUILD TOOLS
 
