@@ -29,6 +29,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define IN_NUM_CO
 
 #define NEED_MP_H
+#define _GNU_SOURCE
 #include "include.h"
 #include "num_include.h"
 
@@ -120,8 +121,13 @@ int *hp, *lp, *ep, *sp;
 	h = h >> 1;
 #endif
 #ifdef IEEEFLOAT
-	*ep = ((h & 0x7ff00000) >> 20) - 1022 - 53;
-	h = (h & 0x000fffff | 0x00100000);
+	if (isnormal(d)) {
+	  *ep = ((h & 0x7ff00000) >> 20) - 1022 - 53;
+	  h = (h & 0x000fffff | 0x00100000);
+	} else {
+	  *ep = ((h & 0x7fe00000) >> 20) - 1022 - 53 + 1;
+	  h = (h & 0x001fffff);
+	}
 #endif
 #ifdef S3000
 	*ep = ((h & 0x7f000000) >> 24) - 64 - 14;
@@ -201,8 +207,13 @@ int *mp, *ep, *sp;
 
 #endif
 #ifdef IEEEFLOAT
-	*ep = ((m & 0x7f800000) >> 23) - 126 - 24;
-	*mp = m & 0x007fffff | 0x00800000;
+	if (isnormal(f)) {
+	  *ep = ((m & 0x7f800000) >> 23) - 126 - 24;
+	  *mp = m & 0x007fffff | 0x00800000;
+	} else {
+	  *ep = ((m & 0x7f000000) >> 23) - 126 - 24 + 1;
+	  *mp = m & 0x00ffffff;
+	}
 #endif
 #ifdef MV
 
@@ -1173,8 +1184,8 @@ void  _assure_in_memory ();
 init_num_co()
 {
 	int l[2];
-	float smallest_float, biggest_float;
-	double smallest_double, biggest_double;
+	float smallest_float, smallest_norm_float, biggest_float;
+	double smallest_double, smallest_norm_double, biggest_double;
 	float float_epsilon, float_negative_epsilon;
 	double double_epsilon, double_negative_epsilon;
 	double lf1,lf2;
@@ -1310,11 +1321,11 @@ init_num_co()
 	biggest_double = *(double *)l;
 #endif
 
-	
+
 #ifdef DBL_MAX_10_EXP
 	biggest_double = DBL_MAX;
-	smallest_double = DBL_MIN;
-	smallest_float = FLT_MIN;
+	smallest_norm_double = DBL_MIN;
+	smallest_norm_float = FLT_MIN;
 	biggest_float = FLT_MAX;
 #endif
 	
@@ -1416,21 +1427,21 @@ init_num_co()
 
 	/* Normalized constants added, CM */
 	make_constant("LEAST-POSITIVE-NORMALIZED-SHORT-FLOAT",
-		      make_shortfloat(smallest_float));
+		      make_shortfloat(smallest_norm_float));
 	make_constant("LEAST-NEGATIVE-NORMALIZED-SHORT-FLOAT",
-		      make_shortfloat(-smallest_float));
+		      make_shortfloat(-smallest_norm_float));
 	make_constant("LEAST-POSITIVE-NORMALIZED-SINGLE-FLOAT",
-		      make_longfloat(smallest_double));
+		      make_longfloat(smallest_norm_double));
 	make_constant("LEAST-NEGATIVE-NORMALIZED-SINGLE-FLOAT",
-		      make_longfloat(-smallest_double));
+		      make_longfloat(-smallest_norm_double));
 	make_constant("LEAST-POSITIVE-NORMALIZED-DOUBLE-FLOAT",
-		      make_longfloat(smallest_double));
+		      make_longfloat(smallest_norm_double));
 	make_constant("LEAST-NEGATIVE-NORMALIZED-DOUBLE-FLOAT",
-		      make_longfloat(-smallest_double));
+		      make_longfloat(-smallest_norm_double));
 	make_constant("LEAST-POSITIVE-NORMALIZED-LONG-FLOAT",
-		      make_longfloat(smallest_double));
+		      make_longfloat(smallest_norm_double));
 	make_constant("LEAST-NEGATIVE-NORMALIZED-LONG-FLOAT",
-		      make_longfloat(-smallest_double));
+		      make_longfloat(-smallest_norm_double));
 
 	plus_half = make_ratio(small_fixnum(1), small_fixnum(2));
 	enter_mark_origin(&plus_half);

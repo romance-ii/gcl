@@ -1,5 +1,7 @@
 
+#ifndef _GNU_SOURCE
 #include <varargs.h>
+#endif
 #include <setjmp.h>
 #include <stdio.h>
 
