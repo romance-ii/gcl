@@ -134,10 +134,6 @@ extern DBEGIN_TY _dbegin;
      terminal_io->sm.sm_object0->sm.sm_fp=stdin; }
 
 #define HAVE_AOUT "wincoff.h"
-/* we dont need to worry about zeroing fp->_base , to prevent  */
- /* must use seek to go to beginning of string table */
-/* #define MUST_SEEK_TO_STROFF */
-/* #define N_STROFF(hdr)   ((&hdr)->f_symptr+((&hdr)->f_nsyms)*SYMESZ) */
 
 #define TO_NUMBER(ptr,type) (*((type *)(void *)(ptr)))
 
@@ -167,7 +163,7 @@ extern DBEGIN_TY _dbegin;
 /* include some low level routines for maxima */
 #define CMAC
 
-#define RELOC_FILE "rel_coff.c"
+#define RELOC_FILE "rel_pecoff.c"
 
 /*  FIONREAD not supported */
 #undef  LISTEN_FOR_INPUT
@@ -211,9 +207,8 @@ extern char *GCLExeName ( void );
 { if (*ptr==0 && (NTYPE(sym) == TEXT_NSCN) && sym->n_value ) \
   { char tem [9]; \
     char *str=SYM_NAME(sym); \
-     dprintf(find init: %s ,str); \
   if (str[1]=='i'    && str[2]=='n'  && str[3]=='i' && str[4]== 't' \
-      && str[5]=='_' && str[0]== '_' &&  str[strlen(str)-1] !='X')  \
+      && str[5]=='_' && str[0]== '_' )  \
 	*ptr=  sym->n_value ; \
    else {/* printf("The first data symbol was not the init");*/}  \
  }}
