@@ -33,6 +33,8 @@
 /* #include "config.h" */
 #include "ext_sym.h"
 
+int verbose = 0;
+
 void rsym_error (char *format, ...)
 {
     va_list ap;
@@ -51,10 +53,17 @@ int rsym_select_symbol(struct nlist *symbol)
     if (symbol->n_type & N_STAB) {
         return (FALSE);
     }
+    if (!(symbol->n_type & N_EXT)) {
+        return (FALSE);
+    }
+ /* if (symbol->n_type == N_UNDF) {
+        return (FALSE);
+    }
     if (symbol->n_sect == NO_SECT) {
         return (FALSE);
     }
-    return (symbol->n_type & N_EXT);
+    */
+    return (TRUE);
 }
 
 void rsym_doit2 (struct nlist *symbols, unsigned long nsyms, char *outfile)
@@ -90,9 +99,9 @@ void rsym_doit2 (struct nlist *symbols, unsigned long nsyms, char *outfile)
         }
     }
     
-  #ifdef DEBUG
-    fprintf (stderr, "%d/%d symbol(s) reviewed\n", tab.n_symbols, nsyms);
-  #endif
+    if (verbose) {
+        fprintf (stdout, "%d/%d symbol(s) reviewed\n", tab.n_symbols, nsyms);
+    }
     
     fseek (symout, 0, 0);
     fwrite (&tab, sizeof(tab), 1, symout);
@@ -170,10 +179,10 @@ void rsym_doit1 (char *infile, char *outfile)
         else
             selected_symbols[i].n_un.n_name = selected_symbols[i].n_un.n_strx + strtab;
         
-      #if DEBUG
-        fprintf (stderr, "debug: %8x %s\n", (unsigned int) selected_symbols[i].n_value,
-            selected_symbols[i].n_un.n_name);
-      #endif
+      	if (verbose) {
+            fprintf (stdout, "%8x %s\n", (unsigned int) selected_symbols[i].n_value,
+                selected_symbols[i].n_un.n_name);
+   	}
     }
     
     rsym_doit2 (selected_symbols, nsyms, outfile);
@@ -191,12 +200,22 @@ void rsym_doit1 (char *infile, char *outfile)
 
 int main (int argc, char **argv, char **envp)
 {
-    if (argc != 3) {
-        fprintf (stderr, "usage: rsym <infile> <outfile>\n");
-        exit (1);
+    int ch;
+        
+    while ((ch = getopt (argc, argv, "-v")) != -1) {
+        if (ch == 'v')
+            verbose = 1;
     }
     
-    rsym_doit1 (argv[1], argv[2]);
+    argc -= optind;
+    argv += optind;
+    
+    if (argc < 2) {
+        fprintf (stderr, "usage: rsym [-v(erbose)] <infile> <outfile>\n");
+        exit (1);
+    }
+
+    rsym_doit1 (argv[0], argv[1]);
     
     return 0;
 }
