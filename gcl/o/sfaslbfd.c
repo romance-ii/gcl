@@ -171,6 +171,9 @@ return MY_BFD_FALSE;
 
 static bfd *bself;
 
+#ifdef __mips__
+#include "sfaslbfd_mips.c"
+#endif
 
 int
 fasload(object faslfile) {
@@ -241,6 +244,47 @@ fasload(object faslfile) {
     FEerror ("Could not craft fp register preservation stubs",0);
 #endif
 
+  if ((u=bfd_get_symtab_upper_bound(b))<0)
+    FEerror("Cannot get symtab uppoer bound",0);
+  q=(asymbol **)alloca(u);
+  if ((v=bfd_canonicalize_symtab(b,q))<0)
+    FEerror("cannot canonicalize symtab",0);
+
+  *entry_name=bfd_get_symbol_leading_char(b);
+  entry_name_ptr=*entry_name ? entry_name : entry_name+1;
+
+  for (u=0;u<v;u++) {
+
+    struct bfd_link_hash_entry *h;
+
+    if (!strncmp(entry_name_ptr,q[u]->name,5)) {
+      init_address=u;
+      continue;
+    }
+
+    if (!(h=bfd_link_hash_lookup(link_info.hash,q[u]->name,MY_BFD_FALSE,MY_BFD_FALSE,MY_BFD_TRUE))) 
+      continue;
+
+    if (h->type!=bfd_link_hash_defined) 
+      FEerror("Undefined symbol ~S",1,make_simple_string(q[u]->name));
+      
+    if (h->u.def.section) {
+      q[u]->value=h->u.def.value+h->u.def.section->vma;
+      q[u]->flags|=BSF_WEAK;
+    } else 
+      FEerror("Symbol without section",0);
+
+  }
+
+
+  /* Perhaps all arch dependent stuff could be placed here, e.g. the
+     darwin code below.  Aurelien?  This snippet should likely be a
+     CPP define in config.h.*/
+
+#ifdef __mips__
+  mipself_special(b,q,v);
+#endif
+
   current=NULL;
   for (s=b->sections;s;s=s->next) {
 
@@ -285,75 +329,54 @@ fasload(object faslfile) {
 	     
   }
 
-  if ((u=bfd_get_symtab_upper_bound(b))<0)
-    FEerror("Cannot get symtab uppoer bound",0);
-  q=(asymbol **)alloca(u);
-  if ((v=bfd_canonicalize_symtab(b,q))<0)
-    FEerror("cannot canonicalize symtab",0);
-
-  *entry_name=bfd_get_symbol_leading_char(b);
-  entry_name_ptr=*entry_name ? entry_name : entry_name+1;
-
-  for (u=0;u<v;u++) {
-
-    struct bfd_link_hash_entry *h;
-
-    if (!strncmp(entry_name_ptr,q[u]->name,5)) {
-      init_address=q[u]->value+(q[u]->section->output_section->vma-(unsigned long)memory->cfd.cfd_start);
-      continue;
-    }
-
-    if (!(h=bfd_link_hash_lookup(link_info.hash,q[u]->name,MY_BFD_FALSE,MY_BFD_FALSE,MY_BFD_TRUE))) 
-      continue;
-
-    if (h->type!=bfd_link_hash_defined) 
-      FEerror("Undefined symbol ~S",1,make_simple_string(q[u]->name));
-      
-    if (h->u.def.section) {
-      q[u]->value=h->u.def.value+h->u.def.section->vma;
-      q[u]->flags|=BSF_WEAK;
-    } else 
-      FEerror("Symbol without section",0);
-
-  }
+  init_address=q[init_address]->value+
+    (q[init_address]->section->output_section->vma-(unsigned long)memory->cfd.cfd_start);
 
 #if defined(DARWIN)
   if (!bfd_mach_o_inject_fp_branch_islands (b, bi, q))
     FEerror ("Could not inject fp register preservation stubs",0);
 #endif
 
-#ifndef HAVE_ALLOCA
-#error Cannot use bfd relocations without alloca at present
-#endif
-  /* We have to do this  to avoid the possibility that 
-     bfd_get_relocated_section_contents will run GBC via its alloc, thereby 
-     write protecting the pages of memory->cfd again and causing bfd reads of 
-     the section contents to return an error code after a 'stratified' segfault */
+  /* MIPS native relocs: As these use GOT and HI/LOW relocs which must
+     reference the final address of the code, we can no longer rely on
+     our previous strategy of bfd_get_relocated_section_contents to
+     alloca'ed memory followed by a memcpy to the real location as a
+     means of avoiding a bfd alloc induced sgc-off/sgc-on which write
+     protects memory->cfd.cfd_start and causes certain system calls
+     (e.g. read) to return error codes.  Here we try to accomplish the
+     same via SGC_PERM_WRITABLE.  We don't want to leave this on
+     forever, as thee is quite a bit of loaded code in a given system
+     which need not be in the small SGC working heap.  20050409 CM*/
+
+#ifdef SGC
  {
-   void *v=alloca(memory->cfd.cfd_size);
-   
-   if (!v)
-     FEerror("Cannot alloca for bfd",0);
+   extern int sgc_enabled;
+   if (sgc_enabled)
+     perm_writable(memory->cfd.cfd_start,memory->cfd.cfd_size);
+ }
+#endif
 
    for (s=b->sections;s;s=s->next) {
      
-     unsigned long ss=bfd_section_size(b,s);
-
      if (!(s->flags & SEC_LOAD))
        continue;
      
      link_order.u.indirect.section=s;
      
      if (!bfd_get_relocated_section_contents(b,&link_info,&link_order,
-					     v,0,q)) 
+					     (void *)(unsigned long)s->output_section->vma,0,q)) 
        FEerror("Cannot get relocated section contents\n",0);
-
-     memcpy((void *)(unsigned long)s->output_section->vma,v,ss);
      
    }
 
+#ifdef SGC
+ {
+   extern int sgc_enabled;
+   if (sgc_enabled)
+     un_perm_writable(memory->cfd.cfd_start,memory->cfd.cfd_size);
  }
-   
+#endif
+
   dum.sm.sm_object1=faslfile;
   dum.sm.sm_fp=b->iostream;
 

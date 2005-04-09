@@ -29,12 +29,16 @@ RELOC=locbfd
 ifeq ($(ARCHT),alpha)
 RELOC=dlopen
 endif
-ifeq ($(ARCHT),mips)
-RELOC=dlopen
-endif
-ifeq ($(ARCHT),mipsel)
-RELOC=dlopen
-endif
+
+# MIPS bfd support added 20050407 CM
+#ifeq ($(ARCHT),mips)
+#RELOC=dlopen
+#endif
+#ifeq ($(ARCHT),mipsel)
+#RELOC=dlopen
+#endif
+
+
 ifeq ($(ARCHT),ia64)
 RELOC=dlopen
 endif

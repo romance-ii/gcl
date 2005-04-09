@@ -286,8 +286,9 @@ case $use in
 	case $use in
 		alpha*)
 			def_dlopen="yes" ; def_statsysbfd="no" ;;
-		mips*)
-			def_dlopen="yes" ; def_statsysbfd="no" ;;
+# MIPS bfd support added 20050407  CM
+#		mips*)
+#			def_dlopen="yes" ; def_statsysbfd="no" ;;
 # def_static -- Function descriptors are currently realized at runtime in a non-reproducible fashion
 # on these architectures -- CM			
 		ia64*)

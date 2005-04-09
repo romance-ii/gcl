@@ -1801,6 +1801,22 @@ perm_writable(char *p, long n) {
 }
 
 void
+un_perm_writable(char *p, long n) {
+
+  unsigned long beg=page(p);
+  unsigned long end=page(PAGE_ROUND_UP(p+n));
+  unsigned long i;
+
+  beg = ROUND_DOWN_PAGE_NO(beg);
+  end = ROUND_UP_PAGE_NO(end);
+  if (beg >= MAXPAGE || end >MAXPAGE)
+    error("Address supplied to un_perm_writable out of range");
+  for (i=beg ; i < end ; i++) {
+    sgc_type_map [i] &= ~SGC_PERM_WRITABLE;
+  }
+}
+
+void
 system_error(void) {
   FEerror("System error",0);
 }
