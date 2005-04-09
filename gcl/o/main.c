@@ -129,6 +129,8 @@ main(int argc, char **argv, char **envp) {
     init_darwin_zone_compat ();
 #endif
 
+    install_segmentation_catcher();
+
     set_maxpage();
 
 #ifdef RECREATE_HEAP
@@ -222,7 +224,6 @@ main(int argc, char **argv, char **envp) {
     cs_org = &argc;
     /* CSSIZE in bytes, cssize for pointer arithmetic. */ 
     cssize = CSSIZE / sizeof ( void * );
-    install_segmentation_catcher();
 
 #ifdef BSD
 #  ifdef RLIMIT_STACK

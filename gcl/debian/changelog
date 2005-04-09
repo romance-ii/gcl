@@ -52,8 +52,10 @@ gclcvs (2.7.0-37) unstable; urgency=low
     regexps
   * Fix a read error condition allowing the ansi test suite to complete
   * Support for MIPS native object relocation, courtesy of lush
+  * Restore proper order of segv sigaction handler setup to reenable
+    saving images with sgc turned on
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  9 Apr 2005 13:58:44 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat,  9 Apr 2005 14:00:14 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 
