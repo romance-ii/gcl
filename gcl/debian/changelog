@@ -54,8 +54,9 @@ gclcvs (2.7.0-37) unstable; urgency=low
   * Support for MIPS native object relocation, courtesy of lush
   * Restore proper order of segv sigaction handler setup to reenable
     saving images with sgc turned on
+  * Fix aref error in top-level parse function
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  9 Apr 2005 14:00:14 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 10 Apr 2005 01:13:05 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 

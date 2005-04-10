@@ -709,13 +709,15 @@ First directory is checked for first name and all extensions etc."
     (or v (return nil))
     (let ((str (car v)))
       (declare (string str))
-      (if (and (eql  (aref str 0) (aref a 0))
-	       (eql  (aref str 1) (aref a 1))
+;;FIXME  equal on strings should compile to something like this by itself
+      (if (and (= (length str) (length a))
+	       (or (= (length str) 0) (eql  (aref str 0) (aref a 0)))
+	       (or (= (length str) 1) (eql  (aref str 1) (aref a 1)))
 	       (equal str a))
 	  (return
-	  (cond (val-if-there)
-		((cadr v)(values (cadr v) (cdr v)))
-		(t t)))))))
+	   (cond (val-if-there)
+		 ((cadr v)(values (cadr v) (cdr v)))
+		 (t t)))))))
 
 ; (let ((tem (member a si::*command-args* :test 'equal)))
 ;    (if tem (or  val-if-there (cadr tem) t))))
