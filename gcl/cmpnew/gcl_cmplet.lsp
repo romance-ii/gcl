@@ -49,11 +49,12 @@
       form
     (let ((cf (car form)))
       (let ((new-cdr-bf (or (and (eq bf 'quote) 'quote)
-			    (car (member cf '(let let* lambda flet labels macrolet quote function)))
+			    (and (eq bf 'declare) 'declare)
+			    (car (member cf '(let let* lambda flet labels macrolet declare quote function)))
 			    (and (consp bf)
 				 (if (atom (car bf)) bf
 				   (and (member (caar bf) '(flet labels macrolet) :test #'eq) 'lambda)))))
-	    (new-car-bf (and (consp cf) bf (if (eq bf 'quote) bf (list bf))))
+	    (new-car-bf (and (consp cf) bf (if (or (eq bf 'quote) (eq bf 'declare)) bf (list bf))))
 	    (new-cf (if (or bf (atom cf) (eq (car cf) 'lambda))
 			cf (cmp-macroexp-with-compiler-macros cf))))
 	(cons (recursively-cmp-macroexpand new-cf new-car-bf)
@@ -110,7 +111,11 @@
   
 (defun binding-decls-new (bindings star body out)
   (cond ((atom bindings) (nreverse out))
-	((atom (car bindings)) (binding-decls-new (cdr bindings) star body out))
+	((atom (car bindings))
+         (let ((var (car bindings)))
+          (let ((*vars* (if (not star) *vars*
+                         (cons (c1make-var var nil nil (list (cons var t))) *vars*))))
+           (binding-decls-new (cdr bindings) star body out))))
 	(t 
 	 (let* ((bf (car bindings))
 		(var (car bf))
