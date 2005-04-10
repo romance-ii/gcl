@@ -246,6 +246,7 @@ typedef void (*funcvoid)(void);
 #endif
 /* sgbc.c:1246:OF */ extern void memory_protect (int on); /* (on) int on; */
 /* sgbc.c:1306:OF */ extern void perm_writable (char *p, long n); /* (p, n) char *p; int n; */
+/* sgbc.c:1306:OF */ extern void un_perm_writable (char *p, long n); /* (p, n) char *p; int n; */
 /* sgbc.c:1321:OF */ extern void system_error (void); /* () */
 /* gbc.c:1357:OF */ extern void gcl_init_GBC (void); /* () */
 /* gnumalloc.c:286:OF */ extern void malloc_init (char *start, void (*warnfun) (/* ??? */)); /* (start, warnfun) char *start; void (*warnfun)(); */

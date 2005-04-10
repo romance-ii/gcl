@@ -60,8 +60,9 @@ gclcvs (2.7.0-37) unstable; urgency=low
     in binding-decls-new
   * libreadline5 for Debian
   * cacheflush for mips; FIXME -- perhaps not necessary
+  * prototype for un_perm_writable
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 10 Apr 2005 03:17:44 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 10 Apr 2005 03:18:16 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 
