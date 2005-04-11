@@ -5,6 +5,7 @@
 /*  We try here to compile in function addresses to which it is known
     that the compiler will make *direct* reference.  20040308 CM */
 
+extern int _mcount();
 
 int
 main(int argc,char * argv[],char *envp[]) {
@@ -16,6 +17,8 @@ main(int argc,char * argv[],char *envp[]) {
 
   getc(f);
   putc(ch,f);
+
+  _mcount();
 
   setjmp(env);
 
