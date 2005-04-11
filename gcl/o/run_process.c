@@ -427,7 +427,8 @@ enum smmode smm;
 	return(stream);
 }
 
-object make_socket_stream(host_l,port)
+object
+FFN(make_socket_stream)(host_l,port)
 object	host_l;
 object	port;
 {
@@ -447,7 +448,7 @@ object	port;
 }
 
 void
-siLmake_socket_stream()
+FFN(siLmake_socket_stream)()
 {
   check_arg(2);
   vs_base[0] = make_socket_stream(vs_base[0], vs_base[1]);
@@ -537,7 +538,7 @@ char **argv;
     
       
 void
-run_process(filename, argv)
+FFN(run_process)(filename, argv)
 char *filename;
 char **argv;
 {

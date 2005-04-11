@@ -62,8 +62,9 @@ gclcvs (2.7.0-37) unstable; urgency=low
   * cacheflush for mips; FIXME -- perhaps not necessary
   * prototype for un_perm_writable
   * Add _mcount symbol to plt table for mips native relocs on ansi gprof
+  * Make static stubs in run_process.c for ia64
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 11 Apr 2005 19:26:02 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 11 Apr 2005 19:31:08 +0000
 
 gclcvs (2.7.0-36) unstable; urgency=high
 
