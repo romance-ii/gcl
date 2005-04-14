@@ -1,3 +1,9 @@
+gclcvs (2.7.0-39) unstable; urgency=low
+
+  * Alpha native relocs
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 14 Apr 2005 21:29:42 +0000
+
 gclcvs (2.7.0-38) unstable; urgency=low
 
   * Add _mcount symbol to plt table for mips native relocs on ansi gprof

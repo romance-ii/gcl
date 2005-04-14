@@ -32,4 +32,4 @@ int cacheflush(void *,int,int);
                         v=(void *)((unsigned long)v & ~(CLEAR_CACHE_LINE_SIZE - 1));\
                         cacheflush(v,ve-v,BCACHE);\
                     } while(0)
-
+#define SPECIAL_BFD_INCLUDE "sfaslbfd_mips.c"

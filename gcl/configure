@@ -1034,8 +1034,8 @@ case $use in
      *linux)
 	ln -snf linux.defs h/$use.defs;
 	case $use in
-		alpha*)
-			def_dlopen="yes" ; def_statsysbfd="no" ;;
+#		alpha*)
+#			def_dlopen="yes" ; def_statsysbfd="no" ;;
 # MIPS bfd support added 20050407  CM
 #		mips*)
 #			def_dlopen="yes" ; def_statsysbfd="no" ;;

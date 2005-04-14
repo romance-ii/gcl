@@ -25,10 +25,11 @@ MCC:=gcc
 #endif
 
 RELOC=locbfd
+
 #RELOC?=statsysbfd
-ifeq ($(ARCHT),alpha)
-RELOC=dlopen
-endif
+#ifeq ($(ARCHT),alpha)
+#RELOC=dlopen
+#endif
 
 # MIPS bfd support added 20050407 CM
 #ifeq ($(ARCHT),mips)

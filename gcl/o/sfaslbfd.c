@@ -171,8 +171,8 @@ return MY_BFD_FALSE;
 
 static bfd *bself;
 
-#ifdef __mips__
-#include "sfaslbfd_mips.c"
+#ifdef SPECIAL_BFD_INCLUDE
+#include SPECIAL_BFD_INCLUDE
 #endif
 
 int
@@ -281,8 +281,8 @@ fasload(object faslfile) {
      darwin code below.  Aurelien?  This snippet should likely be a
      CPP define in config.h.*/
 
-#ifdef __mips__
-  mipself_special(b,q,v);
+#ifdef SPECIAL_BFD
+  SPECIAL_BFD(b,q,v);
 #endif
 
   current=NULL;

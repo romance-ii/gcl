@@ -28,3 +28,6 @@
   (char *)((struct ucontext *)scp )->uc_mcontext.sc_traparg_a0
 #endif
 #define SGC
+#include <asm/system.h>
+#define CLEAR_CACHE imb()
+#define SPECIAL_BFD_INCLUDE "sfaslbfd_alpha.c"
