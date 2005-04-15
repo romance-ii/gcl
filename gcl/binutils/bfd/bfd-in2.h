@@ -279,7 +279,7 @@ bfd_format;
 typedef unsigned long symindex;
 
 /* How to perform a relocation.  */
-typedef const struct reloc_howto_struct reloc_howto_type;
+typedef struct reloc_howto_struct reloc_howto_type;
 
 #define BFD_NO_MORE_SYMBOLS ((symindex) ~0)
 
