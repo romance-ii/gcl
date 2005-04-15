@@ -471,7 +471,7 @@ mipself_fix_relocs(bfd *b,asymbol ** symbols,int symbol_count,
       gpdisp = symbols[i];
       gpdisp->value = 0;
       gpdisp->flags = BSF_LOCAL|BSF_SECTION_SYM;
-      gpdisp->section = info->sgot ? info->sgot : info->sgot : bfd_abs_section_ptr;
+      gpdisp->section = info->sgot ? info->sgot : bfd_abs_section_ptr;
       gpdisp->udata.p = NULL;
       break;
     }
