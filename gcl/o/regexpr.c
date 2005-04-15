@@ -152,7 +152,7 @@ be over written.   \
 
      else if (case_fold != case_fold_search || len != strlen(buf) || memcmp(pattern->ust.ust_self,buf,len)) 
 
-       compiled_regexp=saved_compiled_regexp=(regexp *)fScompile_regexp(pattern)->v.v_self;
+       compiled_regexp=saved_compiled_regexp=(regexp *)FFN(fScompile_regexp)(pattern)->v.v_self;
 
 
      str=string->st.st_self;
