@@ -1,3 +1,9 @@
+gclcvs (2.7.0-40) unstable; urgency=low
+
+  * Fix ia64 function stubs in run_process.c
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 15 Apr 2005 00:06:24 +0000
+
 gclcvs (2.7.0-39) unstable; urgency=low
 
   * Alpha native relocs

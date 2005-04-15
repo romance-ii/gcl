@@ -428,7 +428,7 @@ enum smmode smm;
 }
 
 object
-FFN(make_socket_stream)(host_l,port)
+make_socket_stream(host_l,port)
 object	host_l;
 object	port;
 {
@@ -538,7 +538,7 @@ char **argv;
     
       
 void
-FFN(run_process)(filename, argv)
+run_process(filename, argv)
 char *filename;
 char **argv;
 {
@@ -552,7 +552,7 @@ char **argv;
 }
     
 void
-siLrun_process()
+FFN(siLrun_process)()
 {
   int i;
   object arglist;
@@ -569,7 +569,7 @@ siLrun_process()
 }
 
 void
-siLmake_socket_pair()
+FFN(siLmake_socket_pair)()
 {
   make_socket_pair();
 }
