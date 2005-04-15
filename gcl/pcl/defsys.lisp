@@ -600,9 +600,11 @@ and load your system with:
 				(:source (car *system-directory*))
 				(:binary (cdr *system-directory*)))))))
 	 (dir (pathname-directory directory))
-	 (ldir (if (consp dir)
-		   dir
-		   (pathname-directory (truename directory))))
+	 (ldir nil)
+
+;	 (if (consp dir)
+;		   dir
+;		   (pathname-directory (truename directory))))
 
 	 (port-dname (when (and port 
 				(or *put-impl-binaries-in-impl-directory-p*
@@ -611,6 +613,12 @@ and load your system with:
 	 (port-directory (if port-dname
 			     (append ldir (list "impl" port-dname))
 			     ldir))
+			     
+;	 (port-directory (if port-dname
+;			     (append ldir (list "impl" port-dname))
+;			     ldir))
+			     
+	 (port-directory ldir)
 			     
          (pathname
            (make-pathname

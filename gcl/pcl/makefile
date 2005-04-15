@@ -2,7 +2,7 @@
 
 -include ../makedefs
 
-FILES:=$(shell ls -1 pcl_*.lisp | sed 's,\.lisp,,1') pcl_gcl_low
+FILES:=$(shell ls -1 pcl_*.lisp | sed 's,\.lisp,,1')
 
 GFILES1:= 0 1 2 3 4 5 6 7 8
 GFILES:=$(addprefix pcl_gazonk,$(GFILES1))
@@ -30,7 +30,7 @@ saved_gcl_pcl: ../unixport/saved_mod_gcl
 
 $(addsuffix .c,$(AFILES)) $(addsuffix .data,$(AFILES))\
 	$(addsuffix .h,$(AFILES)) $(addsuffix .lsp,$(GFILES)): \
-	$(addsuffix .lisp,$(subst pcl_gcl_low,impl/gcl/pcl_gcl_low,$(FILES)))
+	$(addsuffix .lisp,$(FILES))
 	rm -f *.o *gazonk*
 	cp ../h/cmpinclude.h .
 	echo ${SETUP} '(pcl::compile-pcl)' | ../unixport/saved_mod_gcl ../unixport/
