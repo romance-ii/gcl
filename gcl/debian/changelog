@@ -4,8 +4,9 @@ gclcvs (2.7.0-41) unstable; urgency=low
   * Fix typo in sfaslbfd_mips.c
   * Move impl/gcl/pcl_gcl_low.lisp into pcl/ directory in prep for
     unique gprof init name patch
+  * fix symbol name hashing in new alpha relocation code
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 15 Apr 2005 21:31:31 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 17 Apr 2005 19:43:37 +0000
 
 gclcvs (2.7.0-40) unstable; urgency=low
 

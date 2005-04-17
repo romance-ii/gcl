@@ -266,7 +266,9 @@ msymbol_name(bfd *b,const asymbol *s,unsigned long a) {
   char *n;
   unsigned l;
 
-  if (!(s->flags & BSF_SECTION_SYM))
+  /* FIXME -- first condition likely unnecessary.  small_fixnum_table
+     not a section sym, but has addends CM 20050417*/
+  if (!(s->flags & BSF_SECTION_SYM) && !a)
     return s->name;
   l=strlen(s->name)+17;
   n=xballoc(b,l+1);
