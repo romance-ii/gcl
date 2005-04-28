@@ -248,33 +248,38 @@ void DisplayError(char *pszAPI)
     FEerror ( "RUN-PROCESS encountered problems.", 0 );
 }
 
-void siLrun_process()
+void
+FFN(siLrun_process)()
 {
+    int i;
+    object arglist;
     char cmdline[20480];
-    int i, nargs;
-    int old = signals_allowed;
-    int argc = 0;
 
-    nargs = vs_top - vs_base;
-    for ( i = 0; i < nargs; i++ ) {
-      check_type_string ( &vs_base[i] );
+    *cmdline = '\0';
+    strcat ( cmdline, object_to_string ( vs_base[0] ) );
+    arglist = vs_base[1];
+    
+    for ( i = 1; arglist != Cnil; i++ ) {
+        /* The first of any argument list. */
+        char *argument = object_to_string ( arglist->c.c_car );
+        
+        /* Check for buffer overruns in the command string. */
+        if ( strlen ( cmdline ) + strlen ( argument ) + 2 > 20480 ) {
+            FEerror ( "RUN-PROCESS command more than 20480 characters long.", 0 );
+        }
+
+        /* Put spaces between the arguments. */
+        strcat ( cmdline, " " );
+
+        /* Add the new argument. */
+        strcat ( cmdline, argument );
+
+        /* Find the next Lisp item to append. */
+        arglist = arglist->c.c_cdr;
     }
 
-    cmdline[0]='\0';
-    for ( i = 0; i < nargs; i++ ) {
-      if ( strlen ( cmdline ) + vs_base[i]->st.st_fillp + 2 > 20480 ) {
-	FEerror ( "RUN-PROCESS command more than 20480 characters long.", 0 );
-      }
-      if ( i != 0 ) {
-        strcat ( cmdline, " ");
-      }
-      strcat ( cmdline,  vs_base[i]->st.st_self );
-      fprintf ( stderr, "siLrun_process: cmdline=%s\n", cmdline );
-      argc++;
-    }
-    signals_allowed = sig_at_read;
+    /* Do the job. */
     run_process ( cmdline );
-    signals_allowed = old;
 }
 
 void
