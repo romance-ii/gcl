@@ -1,3 +1,9 @@
+gclcvs (2.7.0-42) unstable; urgency=low
+
+  * libreadline5 support for Debian
+
+ -- Camm Maguire <camm@enhanced.com>  Sat, 30 Apr 2005 22:40:47 +0000
+
 gclcvs (2.7.0-41) unstable; urgency=low
 
   * static ia64 stubs in regexpr.c: fScompile_regexp in fSstring_match
