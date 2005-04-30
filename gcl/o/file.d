@@ -85,6 +85,16 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <elf_abi.h>
 #endif
 
+#ifndef __MINGW32__
+#  include <sys/socket.h>
+#  include <netinet/in.h>
+#  include <arpa/inet.h>
+#else
+#  include <windows.h>
+#  include <winsock2.h>
+#endif
+#include <errno.h>
+
 extern void tcpCloseSocket (int fd);
 
 object terminal_io;
@@ -1519,11 +1529,19 @@ BEGIN:
 	switch (strm->sm.sm_mode) {
 #ifdef HAVE_NSOCKET
 	case smm_socket:
-	  { int ch  = getCharGclSocket(strm,Cnil);
-	   if (ch == EOF) return FALSE;
-	   else unreadc_stream(ch,strm);
-	   return TRUE;
-	  }
+	  {
+	    fd_set fds;
+	    struct timeval tv;
+	    FD_ZERO(&fds);
+	    FD_SET(SOCKET_STREAM_FD(strm),&fds);
+	    memset(&tv,0,sizeof(tv));
+	    return select(SOCKET_STREAM_FD(strm)+1,&fds,NULL,NULL,&tv)>0 ? TRUE : FALSE;
+ 	  }
+/* 	  { int ch  = getCharGclSocket(strm,Cnil); */
+/* 	   if (ch == EOF) return FALSE; */
+/* 	   else unreadc_stream(ch,strm); */
+/* 	   return TRUE; */
+/* 	  } */
 #endif	   
 
 	case smm_input:
@@ -2684,9 +2702,32 @@ DEF_ORDINARY("SERVER",sKserver,KEYWORD,"");
 DEF_ORDINARY("SOCKET",sSsocket,SI,"");
 
 
+@(static defun accept (x)
+int fd,n;
+struct sockaddr_in addr;
+object server,host,port;
+@
+  if (type_of(x) != t_stream)
+    FEerror("~S is not a steam~%",1,x);
+  if (x->sm.sm_mode!=smm_two_way)
+    FEerror("~S is not a two-way steam~%",1,x);
+  fd=accept(SOCKET_STREAM_FD(STREAM_INPUT_STREAM(x)),(struct sockaddr *)&addr, &n);
+  if (fd <0) {
+    FEerror("Error ~S on accepting connection to ~S~%",1,make_simple_string(strerror(errno)),x);
+    x=Cnil;
+  } else {
+    server=STREAM_INPUT_STREAM(x)->sm.sm_object0->c.c_car;
+    host=STREAM_INPUT_STREAM(x)->sm.sm_object0->c.c_cdr->c.c_car;
+    port=STREAM_INPUT_STREAM(x)->sm.sm_object0->c.c_cdr->c.c_cdr->c.c_car;
+    x = make_two_way_stream
+      (make_socket_stream(fd,gcl_sm_input,server,host,port,Cnil),
+       make_socket_stream(fd,gcl_sm_output,server,host,port,Cnil));
+  }
+  @(return `x`);
 
+   
+@)
 
-     
 #endif /* HAVE_NSOCKET */
 
 object standard_io;
@@ -2804,6 +2845,7 @@ gcl_init_file_function()
 	make_si_function("FREAD",Lfread);
 #ifdef HAVE_NSOCKET
 	make_si_function("SOCKET",Lsocket);
+	make_si_function("ACCEPT",Laccept);
 #endif
 	make_function("STREAMP", Lstreamp);
 	make_function("INPUT-STREAM-P", Linput_stream_p);
