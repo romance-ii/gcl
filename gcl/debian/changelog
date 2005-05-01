@@ -5,8 +5,9 @@ gclcvs (2.7.0-42) unstable; urgency=low
     streams
   * Add daemon capabilities to server sockets, document socket and
     accept
+  * Some gcl-tk fixes
 
- -- Camm Maguire <camm@enhanced.com>  Sun,  1 May 2005 04:12:45 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun,  1 May 2005 05:09:20 +0000
 
 gclcvs (2.7.0-41) unstable; urgency=low
 

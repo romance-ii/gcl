@@ -15,9 +15,9 @@
     (wm :iconname w "Text Styles")
 
     (button (conc w '.ok) :text "OK" :command (tk-conc "destroy " w))
+    (scrollbar (conc w '.s) :relief "flat" :command (tk-conc w ".t yview"))
     (text textwin :relief "raised" :bd 2 :yscrollcommand (tk-conc w ".s set") :setgrid "true" 
 	    :width 70 :height 28)
-    (scrollbar (conc w '.s) :relief "flat" :command (tk-conc w ".t yview"))
     (pack (conc w '.ok) :side "bottom" :fill "x")
     (pack (conc w '.s) :side "right" :fill "y")
     (pack textwin :expand "yes" :fill "both")

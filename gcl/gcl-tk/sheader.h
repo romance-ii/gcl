@@ -98,8 +98,8 @@ struct connection_state
   int write_timeout;
 };
 
-#define MAX_ALLOWED_IN_PIPE 2200
-#define READ_BUFF_SIZE 4096
+#define MAX_ALLOWED_IN_PIPE PAGESIZE
+#define READ_BUFF_SIZE (PAGESIZE<<1)
 
 extern struct connection_state *dsfd;
 

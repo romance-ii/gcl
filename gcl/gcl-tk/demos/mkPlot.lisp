@@ -17,7 +17,7 @@
     (message (conc w '.msg) :font :Adobe-Times-Medium-R-Normal-*-180-* :width 400 
 	    :bd 2 :relief "raised" :text "This window displays a canvas widget containing a simple 2-dimensional plot.  You can doctor the data by dragging any of the points with mouse button 1.")
     (canvas c :relief "raised" :width 450 :height 300)
-    (button (conc w '.ok) :text "OK" :command  "destroy " : w)
+    (button (conc w '.ok) :text "OK" :command  (tk-conc "destroy " w))
     (pack (conc w '.msg) (conc w '.c) :side "top" :fill "x")
     (pack (conc w '.ok) :side "bottom" :pady 5)
 
