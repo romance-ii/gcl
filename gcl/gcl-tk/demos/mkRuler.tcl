@@ -32,7 +32,7 @@ proc mkRuler {{w .ruler}} {
     set v(bottom) [winfo fpixels $c 1.5c]
     set v(size) [winfo fpixels $c .2c]
     set v(normalStyle) "-fill black"
-    if {[tk colormodel $c] == "color"} {
+    if {[winfo depth $c] > 1} {
 	set v(activeStyle) "-fill red -stipple {}"
 	set v(deleteStyle) "-stipple @$tk_library/demos/bitmaps/grey.25 \
 		-fill red"

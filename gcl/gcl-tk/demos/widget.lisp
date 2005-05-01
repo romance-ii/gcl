@@ -34,7 +34,7 @@
 
 (frame '.menu :relief "raised" :borderwidth 1)
 (message '.msg :font :Adobe-times-medium-r-normal--*-180* :relief "raised" :width 500 
-:borderwidth 1 :text "This application demonstrates the widgets provided by theGCL Tk toolkit.  The menus above are organized by widget type:  each menu contains one or more demonstrations of a particular type of widget.  To invoke a demonstration, press mouse button 1 over one of the menu buttons above, drag the mouse to the desired entry in the menu, then release the mouse button.)
+:borderwidth 1 :text "This application demonstrates the widgets provided by the GCL Tk toolkit.  The menus above are organized by widget type:  each menu contains one or more demonstrations of a particular type of widget.  To invoke a demonstration, press mouse button 1 over one of the menu buttons above, drag the mouse to the desired entry in the menu, then release the mouse button.)
 (To exit this demonstration, invoke the \"Quit\" entry in the \"Misc\" menu.")
 
 (pack '.menu :side "top" :fill "x")
@@ -115,10 +115,10 @@
 (menu '.menu.menu.m)
 (.menu.menu.m :add 'command :label "Print hello" :command '(print "Hello")
     :accelerator "Control+a" :underline 6)
-(bind '.menu "<Control-a>" '(print "Hello"))
+(bind '|.| "<Control-a>" '(print "Hello"))
 (.menu.menu.m :add 'command :label "Print goodbye" :command 
    '(print "Goodbye") :accelerator "Control+b" :underline 6)
-(bind '.menu "<Control-b>" '(format t "Goodbye"))
+(bind '|.| "<Control-b>" '(format t "Goodbye"))
 (.menu.menu.m :add 'command :label "Light blue background" 
     :command '(.msg :configure :bg "LightBlue1") :underline 0)
 (.menu.menu.m :add 'command :label "Info on tear-off menus" :command "mkTear" 

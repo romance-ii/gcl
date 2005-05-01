@@ -27,7 +27,7 @@
     (funcall textwin :tag :configure 'bold :font :Adobe-Courier-Bold-O-Normal-*-120-*)
     (funcall textwin :tag :configure 'big :font :Adobe-Courier-Bold-R-Normal-*-140-*)
     (funcall textwin :tag :configure 'verybig :font :Adobe-Helvetica-Bold-R-Normal-*-240-*)
-    (if (equal (tk :colormodel w)  "color")
+    (if (> (read-from-string (winfo :depth w)) 1)
 	(progn 
 	  (funcall textwin :tag :configure 'color1 :background "#eed5b7")
 	  (funcall textwin :tag :configure 'color2 :foreground "red")

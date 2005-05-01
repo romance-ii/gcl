@@ -41,7 +41,7 @@ proc mkArrow {{w .arrow}} {
     set v(y) 150
     set v(smallTips) {5 5 2}
     set v(count) 0
-    if {[tk colormodel $c] == "color"} {
+    if {[winfo depth $c] > 1} {
 	set v(bigLineStyle) "-fill SkyBlue1"
 	set v(boxStyle) "-fill {} -outline black -width 1"
 	set v(activeStyle) "-fill red -outline black -width 1"

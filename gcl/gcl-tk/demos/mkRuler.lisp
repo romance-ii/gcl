@@ -32,7 +32,7 @@
     (setf (get *v* 'bottom) (winfo :fpixels c "1.5c" :return t))
     (setf (get *v* 'size) (winfo :fpixels c '.2c :return t))
     (setf (get *v* 'normalStyle) '(:fill "black"))
-    (if (equal (tk :colormodel c) "color")
+    (if (> (read-from-string (winfo :depth c)) 1)
 	(progn 
 	  (setf (get *v* 'activeStyle) '(:fill "red" :stipple ""))
 	  (setf (get *v* 'deleteStyle)

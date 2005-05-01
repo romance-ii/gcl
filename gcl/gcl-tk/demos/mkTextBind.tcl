@@ -23,7 +23,7 @@ proc mkTextBind {{w .bindings}} {
 
     # Set up display styles
 
-    if {[tk colormodel $w] == "color"} {
+    if {[winfo depth $w] > 1} {
 	set bold "-foreground red"
 	set normal "-foreground {}"
     } else {

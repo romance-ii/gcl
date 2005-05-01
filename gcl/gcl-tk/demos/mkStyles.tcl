@@ -26,7 +26,7 @@ proc mkStyles {{w .styles}} {
     $w.t tag configure bold -font -Adobe-Courier-Bold-O-Normal-*-120-*
     $w.t tag configure big -font -Adobe-Courier-Bold-R-Normal-*-140-*
     $w.t tag configure verybig -font -Adobe-Helvetica-Bold-R-Normal-*-240-*
-    if {[tk colormodel $w] == "color"} {
+    if {[winfo depth $w] > 1} {
 	$w.t tag configure color1 -background #eed5b7
 	$w.t tag configure color2 -foreground red
 	$w.t tag configure raised -background #eed5b7 -relief raised \

@@ -44,7 +44,7 @@ proc mkItems {{w .citems}} {
 
     set font1 -Adobe-Helvetica-Medium-R-Normal--*-120-*
     set font2 -Adobe-Helvetica-Bold-R-Normal--*-240-*
-    if {[tk colormodel $c] == "color"} {
+    if {[winfo depth $c] > 1} {
 	set blue DeepSkyBlue3
 	set red red
 	set bisque bisque3
@@ -165,7 +165,7 @@ proc mkItems {{w .citems}} {
 proc itemEnter {c} {
     global restoreCmd
 
-    if {[tk colormodel $c] != "color"} {
+    if {[winfo depth $c] <= 1} {
 	set restoreCmd {}
 	return
     }

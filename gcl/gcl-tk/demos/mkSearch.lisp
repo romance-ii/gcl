@@ -38,7 +38,7 @@
     (bind (conc w '.string.entry) "<Return>" `(TextSearch
 					       ',textwin searchString "search"))
 
-    (button (conc w '.ok) :text "OK" :command "destroy " : w)
+    (button (conc w '.ok) :text "OK" :command (tk-conc "destroy " w))
     (text textwin :relief "raised" :bd 2 :yscrollcommand  (tk-conc w ".s set")
 	  :setgrid "true")
     (scrollbar (conc w '.s) :relief "flat" :command (tk-conc w  ".t yview"))
@@ -49,7 +49,7 @@
 
     ;; Set up display styles for text highlighting.
     (let* (com
-	   (bg (if (equal (tk :colormodel w)"color")
+	   (bg (if (> (read-from-string (winfo :depth w)) 1)
 		   "SeaGreen4" "black"))
 	   on
 	       

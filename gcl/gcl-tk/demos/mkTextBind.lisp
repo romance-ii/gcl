@@ -27,7 +27,7 @@
 
     ;; Set up display styles
 
-    (if (equal (tk :colormodel w) "color")
+    (if (> (read-from-string (winfo :depth w)) 1)
 	(progn 
 	  (setq bold '(:foreground "red"))
 	  (setq normal '(:foreground ""))

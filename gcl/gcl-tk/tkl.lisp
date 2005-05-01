@@ -632,6 +632,8 @@
 (def-widget message)
 (def-widget frame)
 (def-widget label)
+(def-widget |image create photo|)
+(def-widget |image create bitmap|)
 (def-widget radiobutton)
 (def-widget toplevel)
 

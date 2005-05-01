@@ -29,11 +29,11 @@
     (pack (conc w '.frame2) :side "top" :fill "both" :expand "yes")
     (pack (conc w '.ok) :side "bottom" :pady 5 :anchor "center")
 
+    (scrollbar (conc w '.frame2.vscroll)  :relief "sunken" :command (tk-conc c " yview"))
+    (scrollbar (conc w '.frame2.hscroll) :orient "horiz" :relief "sunken" :command (tk-conc c " xview"))
     (canvas c :scrollregion "0c 0c 30c 24c" :width "15c" :height "10c"
 	    :relief "sunken" :borderwidth 2
 	    :xscrollcommand (tk-conc w ".frame2.hscroll set") :yscrollcommand (tk-conc w ".frame2.vscroll set"))
-    (scrollbar (conc w '.frame2.vscroll)  :relief "sunken" :command (tk-conc c " yview"))
-    (scrollbar (conc w '.frame2.hscroll) :orient "horiz" :relief "sunken" :command (tk-conc c " xview"))
     (pack (conc w '.frame2.hscroll) :side "bottom" :fill "x")
     (pack (conc w '.frame2.vscroll) :side "right" :fill "y")
     (pack c :in (conc w '.frame2) :expand "yes" :fill "both")
@@ -280,31 +280,35 @@
 
 ;; Utility procedures to support dragging of items.
 
+(defvar *lastX* 0)
+(defvar *lastY* 0)
+
+
 (defun itemStartDrag (c x y) 
-;    (global :lastX lastY)
-    (setq lastX (funcall c :canvasx x :return 'number))
-    (setq lastY (funcall c :canvasy y :return 'number))
+;    (global :*lastX* *lastY*)
+    (setq *lastX* (funcall c :canvasx x :return 'number))
+    (setq *lastY* (funcall c :canvasy y :return 'number))
 )
 
 (defun itemDrag (c x y) 
-;    (global :lastX lastY)
+;    (global :*lastX* *lastY*)
     (setq x (funcall c :canvasx x :return 'number))
     (setq y (funcall c :canvasy y :return 'number))
-    (funcall c :move "current" (- x lastX) (- y lastY))
-    (setq lastX x)
-    (setq lastY y)
+    (funcall c :move "current" (- x *lastX*) (- y *lastY*))
+    (setq *lastX* x)
+    (setq *lastY* y)
 )
 
 (defvar *recursive* nil)
 (defun itemDrag (c x y) 
-;    (global :lastX lastY)
+;    (global :*lastX* *lastY*)
   (cond (*recursive* )
         (t (let ((*recursive* t))
     (setq x (funcall c :canvasx x :return 'number))
     (setq y (funcall c :canvasy y :return 'number))
-    (funcall c :move "current" (- x lastX) (- y lastY))
-    (setq lastX x)
-    (setq lastY y)))))
+    (funcall c :move "current" (- x *lastX*) (- y *lastY*))
+    (setq *lastX* x)
+    (setq *lastY* y)))))
 
 ;; Procedure that's invoked when the button embedded in the "canvas"
 ;; is invoked.

@@ -24,7 +24,7 @@ proc mkScroll {{w .cscroll}} {
     pack $w.frame -side top -expand yes -fill both
 
     canvas $c -scrollregion {-10c -10c 50c 20c} \
-	    -xscroll "$w.frame.hscroll set" -yscroll "$w.frame.vscroll set"
+	    -xscrollcommand "$w.frame.hscroll set" -yscrollcommand "$w.frame.vscroll set"
     scrollbar $w.frame.vscroll  -relief sunken -command "$c yview"
     scrollbar $w.frame.hscroll -orient horiz -relief sunken -command "$c xview"
     pack $w.frame.vscroll -side right -fill y
@@ -56,7 +56,7 @@ proc scrollEnter canvas {
 	set id [expr $id-1]
     }
     set oldFill [lindex [$canvas itemconfig $id -fill] 4]
-    if {[tk colormodel $canvas] == "color"} {
+    if {[winfo depth $canvas] > 1} {
 	$canvas itemconfigure $id -fill SeaGreen1
     } else {
 	$canvas itemconfigure $id -fill black

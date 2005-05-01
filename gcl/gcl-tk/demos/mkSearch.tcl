@@ -45,7 +45,7 @@ proc mkTextSearch {{w .search}} {
 
     # Set up display styles for text highlighting.
 
-    if {[tk colormodel $w] == "color"} {
+    if {[winfo depth $w] > 1} {
 	TextToggle "$w.t tag configure search -background \
 		SeaGreen4 -foreground white" 800 "$w.t tag configure \
 		search -background {} -foreground {}" 200

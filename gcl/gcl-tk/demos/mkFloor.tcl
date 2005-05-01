@@ -26,8 +26,8 @@ proc mkFloor {{w .cfloor}} {
 
     scrollbar $w.frame2.vscroll  -relief sunken -command "$c yview"
     scrollbar $w.frame2.hscroll -orient horiz -relief sunken -command "$c xview"
-    canvas $c -width 900 -height 500 -xscroll "$w.frame2.hscroll set" \
-	    -yscroll "$w.frame2.vscroll set"
+    canvas $c -width 900 -height 500 -xscrollcommand "$w.frame2.hscroll set" \
+	    -yscrollcommand "$w.frame2.vscroll set"
     pack $w.frame2.hscroll -side bottom -fill x
     pack $w.frame2.vscroll -side right -fill y
     pack $c -in $w.frame2 -expand yes -fill both
@@ -38,7 +38,7 @@ proc mkFloor {{w .cfloor}} {
 
     # Choose colors, then fill in the floorplan.
 
-    if {[tk colormodel $c] == "color"} {
+    if {[winfo depth $c] > 1} {
 	set colors(bg1) #c0a3db55dc28
 	set colors(outline1) #70207f868000
 	set colors(bg2) #aeb8c6eec7ad

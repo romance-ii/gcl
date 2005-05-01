@@ -112,7 +112,7 @@
     (toplevel '.gc)
     (wm :title '.gc "GC Monitor")
     (wm :title '.gc "GC")
-    (or (equal (tk :colormodel '.gc) "color")
+    (or (> (read-from-string (winfo :depth '.gc)) 1)
 	(setq *special-type-background* "white"))
     (message '.gc.msg :font :Adobe-times-medium-r-normal--*-180* :aspect 400
 	     :text
