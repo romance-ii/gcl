@@ -966,6 +966,46 @@ vector is not a fixnum array.
    Returns the end of the I'th match from the previous STRING-MATCH
 @end defun
 
+@defun SOCKET (port &key host server async myaddr myport daemon)
+
+Establishes a socket connection to the specified PORT under a variety
+of circumstances.  
+
+If HOST is specified, then it is a string designating the IP address
+of the server to which we are the client.  ASYNC specifies that the
+connection should be made asynchronously, and the call return
+immediately.  MYADDR and MYPORT can specify the IP address and port
+respectively of a client connection, for example when the running
+machine has several network interfaces.
+
+If SERVER is specified, then it is a function which will handle
+incoming connections to this PORT.  DAEMON specifies that the running
+process should be forked to handle incoming connections in the
+background.  If DAEMON is set to the keyword PERSISTENT, then the
+backgrounded process will survive when the parent process exits, and
+the SOCKET call returns NIL.  Any other non-NIL setting of DAEMON
+causes the socket call to return the process id of the backgrounded
+process.  DAEMON currently only works on BSD and Linux based systems.
+
+If DAEMON is not set or nil, or if the socket is not a SERVER socket,
+then the SOCKET call returns a two way stream.  In this case, the
+running process is responsible for all I/O operations on the stream.
+Specifically, if a SERVER socket is created as a non-DAEMON, then the
+running process must LISTEN for connections, ACCEPT them when present,
+and call the SERVER function on the stream returned by ACCEPT.
+
+@end defun
+
+@defun ACCEPT (stream)
+
+Creates a new two-way stream to handle an individual incoming
+connection to STREAM, which must have been created with the SOCKET
+function with the SERVER keyword set.  ACCEPT should only be invoked
+when LISTEN on STREAM returns T.  If the STREAM was created with the
+DAEMON keyword set in the call to SOCKET, ACCEPT is unnecessary and
+will be called automatically as needed.
+
+@end defun
 
 @menu
 * Regular Expressions::		

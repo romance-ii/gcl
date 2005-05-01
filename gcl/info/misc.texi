@@ -45,6 +45,3 @@ This program is also a good tutorial on invoking C from lisp.
 
 See also defentry and faslink.
 
-
-
-
