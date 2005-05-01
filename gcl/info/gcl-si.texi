@@ -132,8 +132,6 @@ Miscellaneous
 
 @include misc.texi
 
-
-
 @include compiler-defs.texi
 
 @include gcl-si-index.texi

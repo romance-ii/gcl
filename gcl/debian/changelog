@@ -3,8 +3,10 @@ gclcvs (2.7.0-42) unstable; urgency=low
   * libreadline5 support for Debian
   * Push function 'accept  into lisp, use select for 'listen on socket
     streams
+  * Add daemon capabilities to server sockets, document socket and
+    accept
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 30 Apr 2005 22:55:40 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun,  1 May 2005 04:12:45 +0000
 
 gclcvs (2.7.0-41) unstable; urgency=low
 

@@ -2646,7 +2646,47 @@ object async;
   return x;
 }
      
-@(static defun socket (port &key host server async myaddr myport)
+static object
+maccept(object x) {
+
+  int fd,n;
+  struct sockaddr_in addr;
+  object server,host,port;
+  
+  if (type_of(x) != t_stream)
+    FEerror("~S is not a steam~%",1,x);
+  if (x->sm.sm_mode!=smm_two_way)
+    FEerror("~S is not a two-way steam~%",1,x);
+  fd=accept(SOCKET_STREAM_FD(STREAM_INPUT_STREAM(x)),(struct sockaddr *)&addr, &n);
+  if (fd <0) {
+    FEerror("Error ~S on accepting connection to ~S~%",2,make_simple_string(strerror(errno)),x);
+    x=Cnil;
+  } else {
+    server=STREAM_INPUT_STREAM(x)->sm.sm_object0->c.c_car;
+    host=STREAM_INPUT_STREAM(x)->sm.sm_object0->c.c_cdr->c.c_car;
+    port=STREAM_INPUT_STREAM(x)->sm.sm_object0->c.c_cdr->c.c_cdr->c.c_car;
+    x = make_two_way_stream
+      (make_socket_stream(fd,gcl_sm_input,server,host,port,Cnil),
+       make_socket_stream(fd,gcl_sm_output,server,host,port,Cnil));
+  }
+  return x;
+
+}
+
+#ifdef BSD
+#include <sys/types.h>
+#include <sys/resource.h>
+#include <signal.h>
+
+static void
+rmc(int e,void *pid) {
+
+  kill((int)pid,SIGTERM);
+
+}
+#endif
+
+@(static defun socket (port &key host server async myaddr myport daemon)
              /*
 	     HOST is a string then connection is made to that
                           ip or domain address.
@@ -2664,6 +2704,7 @@ int inPort;
 char buf1[500];
 char buf2[500];
 char *myaddrPtr=buf1,*hostPtr=buf2;
+object x;
 @
   if (type_of(host) == t_string) {
     hostPtr=lisp_copy_to_null_terminated(host,hostPtr,sizeof(buf1));
@@ -2682,15 +2723,120 @@ char *myaddrPtr=buf1,*hostPtr=buf2;
    Iis_fixnum(port);
    inPort = (myport == Cnil ? 0 : fix(Iis_fixnum(myport)));
    
-   fd = CreateSocket(fix(port),hostPtr,isServer,myaddrPtr,inPort,(async!=Cnil));
-   
-   
-   { object x;
-     x = make_two_way_stream
-       (make_socket_stream(fd,gcl_sm_input,server,host,port,async),
-	make_socket_stream(fd,gcl_sm_output,server,host,port,async));
-	@(return `x`);
-   }
+#ifdef BSD
+  if (isServer && daemon != Cnil) {
+
+    int pid,i;
+    struct rlimit r;
+    struct sigaction sa;
+
+    sa.sa_handler=SIG_IGN;
+    sa.sa_flags=SA_NOCLDWAIT;
+    sigemptyset(&sa.sa_mask);
+
+    sigaction(SIGCHLD,&sa,NULL);
+
+    switch((pid=fork())) {
+    case -1:
+      FEerror("Cannot fork", 0);
+      break;
+    case 0:
+
+      if (setsid()<0)
+	FEerror("setsid error", 0);
+
+      if (daemon == sKpersistent)
+	switch(fork()) {
+	case -1:
+	  FEerror("daemon fork error", 0);
+	  break;
+	case 0:
+	  break;
+	default:
+	  exit(0);
+	  break;
+	}
+      
+      memset(&r,0,sizeof(r));
+      if (getrlimit(RLIMIT_NOFILE,&r))
+	FEerror("Cannot get resourse usage",0);
+      
+      for (i=0;i<r.rlim_cur;i++)
+	close(i);
+      errno=0;
+      
+      if ((i=open("/dev/null",O_RDWR))==-1)
+	FEerror("Can't open /dev/null for stdin",0);
+      if ((i=dup(i))==-1)
+	FEerror("Can't dup",0);
+      if ((i=dup(i))==-1)
+	FEerror("Can't dup twice",0);
+      
+      if (chdir("/"))
+	FEerror("Cannot chdir to /",0);
+      
+      umask(0);
+      
+      fd = CreateSocket(fix(port),hostPtr,isServer,myaddrPtr,inPort,(async!=Cnil));
+      
+      x = make_two_way_stream
+	(make_socket_stream(fd,gcl_sm_input,server,host,port,async),
+	 make_socket_stream(fd,gcl_sm_output,server,host,port,async));
+    
+      for (;;) {
+	
+	fd_set fds;
+	object y;
+	
+	FD_ZERO(&fds);
+	FD_SET(fd,&fds);
+	i=select(fd+1,&fds,NULL,NULL,NULL);
+	
+	if (i>0) {
+	  
+	  y=maccept(x);
+	  
+	  sigaction(SIGCHLD,&sa,NULL);
+	  
+	  switch((pid=fork())) {
+	  case 0:
+	    ifuncall1(server,y);
+	    exit(0);
+	    break;
+	  case -1:
+	    abort();
+	    break;
+	  default:
+	    close_stream(y);
+	    break;
+	  }
+	  
+	}
+      }
+      break;
+    default:
+      if (daemon != sKpersistent) {
+	on_exit(rmc,(void *)pid);
+	x=make_fixnum(pid);
+      } else
+	x=Cnil;
+      break;
+    }
+
+  } else 
+
+#endif
+
+  {
+    fd = CreateSocket(fix(port),hostPtr,isServer,myaddrPtr,inPort,(async!=Cnil));
+	
+    x = make_two_way_stream
+      (make_socket_stream(fd,gcl_sm_input,server,host,port,async),
+       make_socket_stream(fd,gcl_sm_output,server,host,port,async));
+
+  }
+    
+  @(return `x`);
    
 @)
 
@@ -2699,33 +2845,15 @@ DEF_ORDINARY("MYPORT",sKmyport,KEYWORD,"");
 DEF_ORDINARY("ASYNC",sKasync,KEYWORD,"");
 DEF_ORDINARY("HOST",sKhost,KEYWORD,"");
 DEF_ORDINARY("SERVER",sKserver,KEYWORD,"");
+DEF_ORDINARY("DAEMON",sKdaemon,KEYWORD,"");
+DEF_ORDINARY("PERSISTENT",sKpersistent,KEYWORD,"");
 DEF_ORDINARY("SOCKET",sSsocket,SI,"");
 
 
 @(static defun accept (x)
-int fd,n;
-struct sockaddr_in addr;
-object server,host,port;
 @
-  if (type_of(x) != t_stream)
-    FEerror("~S is not a steam~%",1,x);
-  if (x->sm.sm_mode!=smm_two_way)
-    FEerror("~S is not a two-way steam~%",1,x);
-  fd=accept(SOCKET_STREAM_FD(STREAM_INPUT_STREAM(x)),(struct sockaddr *)&addr, &n);
-  if (fd <0) {
-    FEerror("Error ~S on accepting connection to ~S~%",1,make_simple_string(strerror(errno)),x);
-    x=Cnil;
-  } else {
-    server=STREAM_INPUT_STREAM(x)->sm.sm_object0->c.c_car;
-    host=STREAM_INPUT_STREAM(x)->sm.sm_object0->c.c_cdr->c.c_car;
-    port=STREAM_INPUT_STREAM(x)->sm.sm_object0->c.c_cdr->c.c_cdr->c.c_car;
-    x = make_two_way_stream
-      (make_socket_stream(fd,gcl_sm_input,server,host,port,Cnil),
-       make_socket_stream(fd,gcl_sm_output,server,host,port,Cnil));
-  }
+  x=maccept(x);
   @(return `x`);
-
-   
 @)
 
 #endif /* HAVE_NSOCKET */
