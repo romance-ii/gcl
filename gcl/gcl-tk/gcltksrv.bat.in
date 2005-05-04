@@ -1,0 +1,6 @@
+set GCL_TK_DIR=c:/cvs/head/gcl/gcl-tk
+set TCL_LIBRARY=c:/lang/Tcl-8.4.1.0/lib/tcl8.4
+set TK_LIBRARY=c:/lang/Tcl-8.4.1.0/lib/tcl8.4
+echo %1 %2 %3
+start %GCL_TK_DIR%/gcltkaux %1 %2 %3
+

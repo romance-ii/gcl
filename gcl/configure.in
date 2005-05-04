@@ -1694,14 +1694,18 @@ if test -f ${TCL_CONFIG_PREFIX}/../include/tcl.h ; then
     TCL_INCLUDE=-I/usr/include/tcl${TCL_VERSION}
   fi
 fi
-AC_CHECK_LIB(lieee,main,have_ieee=1,have_ieee=0)
-if test "$have_ieee" = "0" ; then
- TCL_LIBS=`echo ${TCL_LIBS} | sed -e "s:-lieee::g" `
+TCL_VERSION_DOT_FREE=`echo ${TCL_VERSION} | tr -d .`
+if test -f ${TK_CONFIG_PREFIX}/../bin/tcl${TCL_VERSION_DOT_FREE}.dll  ; then
+   TCL_LIBS="-L${TK_CONFIG_PREFIX}/../bin -ltk${TCL_VERSION_DOT_FREE} -ltcl${TCL_VERSION_DOT_FREE}"
+else
+  AC_CHECK_LIB(lieee,main,have_ieee=1,have_ieee=0)
+  if test "$have_ieee" = "0" ; then
+    TCL_LIBS=`echo ${TCL_LIBS} | sed -e "s:-lieee::g" `
+  fi
+  if test "$have_dl" = "0" ; then
+    TCL_LIBS=`echo ${TCL_LIBS} | sed -e "s:-ldl::g"`
+  fi
 fi
-if test "$have_dl" = "0" ; then
- TCL_LIBS=`echo ${TCL_LIBS} | sed -e "s:-ldl::g"`
-fi
-
 
 AC_SUBST(TK_CONFIG_PREFIX)
 AC_SUBST(TK_LIBRARY)
