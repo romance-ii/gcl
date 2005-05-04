@@ -504,6 +504,7 @@ typedef void (*funcvoid)(void);
 /* unixfsys.c:145:OF */ extern char *getwd (char *buffer); /* (buffer) char *buffer; */
 /* unixfsys.c:209:OF */ extern void coerce_to_filename (object pathname, char *p); /* (pathname, p) object pathname; char *p; */
 /* unixfsys.c:329:OF */ extern bool file_exists (object file); /* (file) object file; */
+/* unixfsys.c:359:OF */ extern FILE *fopen_not_dir (char *filename, char *option); /* (filename, option) char *filename; char *option; */
 /* unixfsys.c:359:OF */ extern FILE *backup_fopen (char *filename, char *option); /* (filename, option) char *filename; char *option; */
 /* unixfsys.c:372:OF */ extern int file_len (FILE *fp); /* (fp) FILE *fp; */
 /* unixfsys.c:382:OF */ extern object truename (object); /* () */

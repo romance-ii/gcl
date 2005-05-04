@@ -372,7 +372,7 @@ file_exists(object file)
         }
 #endif        
 
-	if (stat(filename, &filestatus) >= 0) {
+	if (stat(filename, &filestatus) >= 0  && !S_ISDIR(filestatus.st_mode)) {
 #ifdef AIX
 	    /* if /tmp/foo is not a directory /tmp/foo/ should not exist */
 	    if (filename[strlen(filename)-1] == '/' &&
@@ -383,10 +383,22 @@ file_exists(object file)
 	} else
 	if (sSAallow_gzipped_fileA->s.s_dbind != sLnil
 	      && (strcat(filename,".gz"),
-		  stat(filename, &filestatus) >= 0))
+		  stat(filename, &filestatus) >= 0 && !S_ISDIR(filestatus.st_mode)))
 	    return TRUE;
 	else
 	    return(FALSE);
+}
+
+FILE *
+fopen_not_dir(char *filename,char * option) {
+
+  struct stat ss;
+
+  if (!stat(filename,&ss) && S_ISDIR(ss.st_mode))
+    return NULL;
+  else
+    return fopen(filename,option);
+
 }
 
 FILE *
@@ -562,7 +574,8 @@ LFD(Lfile_write_date)(void)
 
 
 	coerce_to_local_filename(vs_base[0], filename);
-	if (stat(filename, &filestatus) < 0) { vs_base[0] = Cnil; return;}
+	if (stat(filename, &filestatus) < 0 || S_ISDIR(filestatus.st_mode)) 
+	  { vs_base[0] = Cnil; return;}
 	vs_base[0] = unix_time_to_universal_time(filestatus.st_mtime);
 }
 
@@ -586,7 +599,8 @@ LFD(Lfile_author)(void)
 	}
 
 	coerce_to_local_filename(vs_base[0], filename);
-	if (stat(filename, &filestatus) < 0) { vs_base[0] = Cnil; return;}
+	if (stat(filename, &filestatus) < 0 || S_ISDIR(filestatus.st_mode)) 
+	  { vs_base[0] = Cnil; return;}
 	pwent = getpwuid(filestatus.st_uid);
 	vs_base[0] = pwent ? make_simple_string(pwent->pw_name) : Cnil;
 #else
