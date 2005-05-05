@@ -247,7 +247,7 @@ truename(object pathname)
 		return(file_error("Symlink broken at ~S.",pathname));
 	    for (p = filename, q = 0;  *p != '\0';  p++)
 		    if (*p == '/') q = p;
-	    if (q == 0)
+	    if (q == 0 || *newname == '/')
 		q = filename;
 	    else
 		q++;

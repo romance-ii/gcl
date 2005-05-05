@@ -8,8 +8,9 @@ gclcvs (2.7.0-42) unstable; urgency=low
   * Some gcl-tk fixes
   * gcltk demo cleanups
   * Probe-file, open_stream, and the like fail on directories
+  * Fix symlink resolution to absolute paths, Thanks Magnus Henoch
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  4 May 2005 17:38:00 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  5 May 2005 13:38:14 +0000
 
 gclcvs (2.7.0-41) unstable; urgency=low
 
