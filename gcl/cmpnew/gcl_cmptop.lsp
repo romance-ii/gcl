@@ -1540,6 +1540,7 @@
 (defun t3defcfun (header vs-size body &aux fd)
   (wt-comment "C function defined by " 'defcfun)
   (wt-nl1 header)
+  (wt-h header ";")
   (wt-nl1 "{")
   (wt-nl1 "object *vs=vs_top;")
   (wt-nl1 "object *old_top=vs_top+" vs-size ";")
