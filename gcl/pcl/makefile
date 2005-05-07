@@ -2,10 +2,10 @@
 
 -include ../makedefs
 
-FILES:=$(shell ls -1 pcl_*.lisp | sed 's,\.lisp,,1')
+FILES:=$(shell ls -1 gcl_*.lisp | sed 's,\.lisp,,1')
 
 GFILES1:= 0 1 2 3 4 5 6 7 8
-GFILES:=$(addprefix pcl_gazonk,$(GFILES1))
+GFILES:=$(addprefix gcl_pcl_gazonk,$(GFILES1))
 
 AFILES:=$(FILES) $(GFILES)
 
@@ -39,7 +39,8 @@ $(addsuffix .c,$(AFILES)) $(addsuffix .data,$(AFILES))\
 #	patch -p0 <pcl_methods.patch
 #	rm -f pcl_methods.o
 	for i in gazonk* ; do j=$$(echo $$i | sed 's,\..*$$,,1');\
-		cat $$i | sed "s,$$j,pcl_$$j,g" >pcl_$$i && rm $$i; done
+		cat $$i | sed   -e "s,$$j\.h,gcl_pcl_$$j.h,1" \
+				-e  "s,init_.*$$j[^_]*,init_gcl_pcl_$$j,g" >gcl_pcl_$$i && rm $$i; done
 
 %.o: %.c %.h %.data
 	$(CC) $(CFLAGS) -c $< -o $@

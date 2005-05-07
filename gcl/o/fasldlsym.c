@@ -45,19 +45,67 @@ struct name_list
 } ;
 static struct name_list *loaded_files;
 
-void  
-get_init_name(faslfile,init_fun)
-     object faslfile;
-     char *init_fun;
-{
-  object path = coerce_to_pathname(faslfile);
-  char *p;
-  strcpy(init_fun,"init_");
-  coerce_to_filename(path->pn.pn_name,init_fun+5);
-  p = init_fun +5;
-  while(*p)
-    {if (*p == '-') *p = '_';
-     p++;}
+/* void   */
+/* get_init_name(faslfile,init_fun) */
+/*      object faslfile; */
+/*      char *init_fun; */
+/* { */
+/*   object path = coerce_to_pathname(faslfile); */
+/*   char *p; */
+/*   strcpy(init_fun,"init_"); */
+/*   coerce_to_filename(path->pn.pn_name,init_fun+5); */
+/*   p = init_fun +5; */
+/*   while(*p) */
+/*     {if (*p == '-') *p = '_'; */
+/*      p++;} */
+/* } */
+
+static void *
+get_init_fptr(void *dlp,char *fn) {
+
+  static object inf;
+  struct string st;
+  object x;
+  char ib[MAXPATHLEN+1];
+  void *v;
+
+  if (!inf) {
+
+    object x;
+    struct string st;
+    st.t=t_string;
+    st.st_self="COMPILER";
+    st.st_dim=st.st_fillp=strlen(st.st_self);
+    if ((x=find_package((object)&st))==Cnil)
+      FEerror("Cannot find compiler package", 0);
+    st.st_self="INIT-NAME";
+    st.st_dim=st.st_fillp=strlen(st.st_self);
+    if ((inf=find_symbol((object)&st,x))==Cnil) {
+      inf=NULL;
+      FEerror("Cannot find function COMPILER::INIT-NAME", 0);
+    }
+    
+  }
+
+  st.t=t_string;
+  st.st_self=fn;
+  st.st_dim=st.st_fillp=strlen(st.st_self);
+  x=ifuncall1(inf,(object)&st);
+  if (x->d.t!=t_string)
+    FEerror("INIT-NAME error", 0);
+  assert(snprintf(ib,sizeof(ib),"init_%-.*s",x->st.st_dim,x->st.st_self)>0);
+
+  if (!(v=dlsym(dlp, ib))) {
+    x=ifuncall2(inf,(object)&st,Ct);
+    if (x->d.t!=t_string)
+      FEerror("INIT-NAME error", 0);
+    assert(snprintf(ib,sizeof(ib),"init_%-.*s",x->st.st_dim,x->st.st_self)>0);
+    if (!(v=dlsym(dlp, ib)))
+      FEerror("Cannot lookup init-name ~a",1,make_simple_string(ib));
+  }
+
+  return v;
+
 }
 
 int
@@ -112,14 +160,15 @@ fasload(faslfile)
     FEerror("Cant open for dynamic link ~a",1,make_simple_string(faslfile));
   }
   
-  fptr = (int (*)())dlsym(dlp, "init_code");
-  if (fptr == 0)
-    { /* maybe system-p compiled so init_filename */
-      char init_fun[200];
-      get_init_name(faslfile,init_fun);
-      fptr = (int (*)())dlsym(dlp, init_fun);
-      if (fptr == 0)
-      FEerror("Cant find init_code in ~a",1,make_simple_string(faslfile));}
+  fptr=get_init_fptr(dlp,filename);
+/*   fptr = (int (*)())dlsym(dlp, "init_code"); */
+/*   if (fptr == 0) */
+/*     { /\* maybe system-p compiled so init_filename *\/ */
+/*       char init_fun[200]; */
+/*       get_init_name(faslfile,init_fun); */
+/*       fptr = (int (*)())dlsym(dlp, init_fun); */
+/*       if (fptr == 0) */
+/*       FEerror("Cant find init_code in ~a",1,make_simple_string(faslfile));} */
   
   SEEK_TO_END_OFILE(faslstream->sm.sm_fp);
   data = read_fasl_vector(faslstream);

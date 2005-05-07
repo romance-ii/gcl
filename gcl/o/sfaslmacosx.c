@@ -49,16 +49,64 @@ static void sfasl_error (char *format, ...)
     exit (1);
 }
 
-static void get_init_name (object faslfile, char *init_fun)
-{
-    object path = coerce_to_pathname (faslfile);
-    char *p;
+/* static void get_init_name (object faslfile, char *init_fun) */
+/* { */
+/*     object path = coerce_to_pathname (faslfile); */
+/*     char *p; */
   
-    strcpy (init_fun, "_init_");
-    coerce_to_filename (path->pn.pn_name, init_fun + 6);
+/*     strcpy (init_fun, "_init_"); */
+/*     coerce_to_filename (path->pn.pn_name, init_fun + 6); */
   
-    for (p = init_fun + 6 ; *p ; p++)
-      if (*p == '-') *p = '_';
+/*     for (p = init_fun + 6 ; *p ; p++) */
+/*       if (*p == '-') *p = '_'; */
+/* } */
+
+static NSSymbol
+get_init_sym(NSModule module,object ff) {
+
+  static object inf;
+  struct string st;
+  object x;
+  char ib[MAXPATHLEN+1];
+  NSSymbol v;
+
+  if (!inf) {
+
+    object x;
+    struct string st;
+    st.t=t_string;
+    st.st_self="COMPILER";
+    st.st_dim=st.st_fillp=strlen(st.st_self);
+    if ((x=find_package((object)&st))==Cnil)
+      sfasl_error("Cannot find compiler package\n");
+    st.st_self="INIT-NAME";
+    st.st_dim=st.st_fillp=strlen(st.st_self);
+    if ((inf=find_symbol((object)&st,x))==Cnil) {
+      inf=NULL;
+      sfasl_error("Cannot find function COMPILER::INIT-NAME\n");
+    }
+    
+  }
+
+  st.t=t_string;
+  st.st_self=ff->st.st_self;
+  st.st_dim=st.st_fillp=ff->st.st_dim;
+  x=ifuncall1(inf,(object)&st);
+  if (x->d.t!=t_string)
+    sfasl_error("INIT-NAME error\n");
+  assert(snprintf(ib,sizeof(ib),"_init_%-.*s",x->st.st_dim,x->st.st_self)>0);
+
+  if (!(v=NSLookupSymbolInModule(module, ib))) {
+    x=ifuncall2(inf,(object)&st,Ct);
+    if (x->d.t!=t_string)
+      sfasl_error("INIT-NAME error\n");
+    assert(snprintf(ib,sizeof(ib),"_init_%-.*s",x->st.st_dim,x->st.st_self)>0);
+    if (!(v=NSLookupSymbolInModule(module, ib)))
+      sfasl_error("Cannot lookup init-name\n");
+  }
+
+  return v;
+
 }
 
 static func prepare_bundle (object faslfile, char *filename)
@@ -84,16 +132,17 @@ static func prepare_bundle (object faslfile, char *filename)
         sfasl_error ("cannot link bundle\n");
     }
     
-    if (!(nssym = NSLookupSymbolInModule (module, "_init_code")))
-    {
-        char init_fun [256];
+    nssym=get_init_sym(module,faslfile);
+/*     if (!(nssym = NSLookupSymbolInModule (module, "_init_code"))) */
+/*     { */
+/*         char init_fun [256]; */
         
-        get_init_name (faslfile, init_fun);
+/*         get_init_name (faslfile, init_fun); */
         
-        if (!(nssym = NSLookupSymbolInModule (module, init_fun))) {
-            sfasl_error ("cannot retrieve entry point symbol in bundle\n");
-        }
-    }
+/*         if (!(nssym = NSLookupSymbolInModule (module, init_fun))) { */
+/*             sfasl_error ("cannot retrieve entry point symbol in bundle\n"); */
+/*         } */
+/*     } */
     
     if (!(fptr = (int (*) ()) NSAddressOfSymbol (nssym))) {
         sfasl_error ("cannot retrieve entry point address\n");

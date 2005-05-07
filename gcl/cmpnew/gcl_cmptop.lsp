@@ -210,6 +210,23 @@
   (let ((new (copy-seq str)))
     (dash-to-underscore-int new 0 (length new))))
 
+(defun init-name (p &optional sp (gp t) (dc t) (nt t)) 
+
+  (cond ((not sp) "code")
+	((not (pathnamep p)) (init-name (pathname p) sp gp dc nt))
+	((not (string= (pathname-type p) "o")) 
+	 (init-name (merge-pathnames (make-pathname :type "o") p) sp gp dc nt))
+	#-aosvs(dc (string-downcase (init-name p sp gp nil nt)))
+	(gp (let ((s (open p :if-does-not-exist :create))) (close s)) (init-name (truename p) sp nil dc nt))
+	((and nt
+	      (let* ((pn (pathname-name p))
+		     (pp (make-pathname :name pn)))
+		(and (not (equal pp p)) 
+		     (eql 4 (string<= "gcl_" pn))
+		     (init-name pp sp gp dc nil)))))
+	((dash-to-underscore (namestring p)))))
+
+
 ;; FIXME consider making this a macro
 (defun c-function-name (prefix num fname)
   #-gprof (declare (ignore fname))
@@ -221,8 +238,8 @@
 	       "__"
 	       (dash-to-underscore fname)
 	       "__"
-	       (if *compiler-input*
-		   (dash-to-underscore (namestring *compiler-input*))
+	       (if (boundp '*compiler-input*)
+		   (subseq (init-name *compiler-input* t) 4)
 		 "")))))
 
 (defun t1expr (form &aux (*current-form* form) (*first-error* t))

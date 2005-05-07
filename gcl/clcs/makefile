@@ -3,7 +3,7 @@
 COMPILE_FILE=./saved_clcs_gcl ./ -system-p -c-file -data-file \
 	-o-file nil -h-file -compile
 
-FILES:=$(shell ls -1 clcs_*.lisp | sed 's,\.lisp,,1')
+FILES:=$(shell ls -1 gcl_clcs_*.lisp | sed 's,\.lisp,,1')
 
 all: $(addsuffix .c,$(FILES)) $(addsuffix .o,$(FILES))
 
@@ -13,6 +13,7 @@ saved_clcs_gcl: ../unixport/saved_pcl_gcl
 %.h %.data %.c : %.lisp saved_clcs_gcl
 	cp ../h/cmpinclude.h .
 	$(COMPILE_FILE) $<
+	rm -f $*.o
 
 %.o: %.c %.h %.data
 	$(CC) $(CFLAGS) -c $< -o $@

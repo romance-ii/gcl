@@ -337,13 +337,7 @@ Cannot compile ~a.~%"
 
             (when prev (set-dispatch-macro-character #\# #\, prev rtb)))))
 
-     	(setq *init-name*
-	      (substitute #\_ #\-
-			  (if system-p	
-			      #-aosvs (pathname-name input-pathname)
-			      #+aosvs (string-downcase
-				       (pathname-name input-pathname))
-			      "code")))
+     (setq *init-name* (init-name input-pathname system-p))
 
       (when (zerop *error-count*)
         (when *compile-verbose* (format t "~&End of Pass 1.  ~%"))
@@ -771,7 +765,7 @@ SYSTEM_SPECIAL_INIT
 		    (dolist (tem files)
 		      (when (equal (pathname-type tem) "o")
 			  (push (list
-				 (substitute #\_ #\- (pathname-name tem))
+                                 (init-name tem t)
 				 (namestring tem))
 				p)))
 

@@ -22,7 +22,7 @@ void gcl_init_or_load1 (void (*)(void),char *);
     error("Cannot unpack module " #a "o\n");\
   if (system(b)) \
     error("Cannot run ar command to unpack module " #a ".o\n");\
-  init_or_load(Mjoin(init_,a),#a ".o");\
+  init_or_load(Mjoin(init_,Mjoin(a,_o)),#a ".o");\
   if (unlink(#a ".o"))\
     error("Cannot unlink " #a ".o\n");\
 } while(0)
@@ -136,40 +136,40 @@ gcl_init_system(object no_init)
   lsp_init("../clcs/package.lisp");
   lsp_init("../clcs/myload1.lisp");
 
-  ar_check_init(pcl_pkg,no_init);
-  ar_check_init(pcl_walk,no_init);
-  ar_check_init(pcl_iterate,no_init);
-  ar_check_init(pcl_macros,no_init);
-  ar_check_init(pcl_low,no_init);
-  ar_check_init(pcl_gcl_low,no_init);
-  ar_check_init(pcl_fin,no_init);
-  ar_check_init(pcl_defclass,no_init);
-  ar_check_init(pcl_defs,no_init);
-  ar_check_init(pcl_fngen,no_init);
-  ar_check_init(pcl_cache,no_init);
-  ar_check_init(pcl_dlisp,no_init);
-  ar_check_init(pcl_dlisp2,no_init);
-  ar_check_init(pcl_boot,no_init);
-  ar_check_init(pcl_vector,no_init);
-  ar_check_init(pcl_slots_boot,no_init);
-  ar_check_init(pcl_combin,no_init);
-  ar_check_init(pcl_dfun,no_init);
-  ar_check_init(pcl_fast_init,no_init);
-  ar_check_init(pcl_braid,no_init);
-  ar_check_init(pcl_generic_functions,no_init);
-  ar_check_init(pcl_slots,no_init);
-  ar_check_init(pcl_init,no_init);
-  ar_check_init(pcl_std_class,no_init);
-  ar_check_init(pcl_cpl,no_init);
-  ar_check_init(pcl_fsc,no_init);
-  ar_check_init(pcl_methods,no_init);
-  ar_check_init(pcl_fixup,no_init);
-  ar_check_init(pcl_defcombin,no_init);
-  ar_check_init(pcl_ctypes,no_init);
-  ar_check_init(pcl_env,no_init);
-  ar_check_init(pcl_compat,no_init);
-  ar_check_init(pcl_precom1,no_init);
-  ar_check_init(pcl_precom2,no_init);
+  ar_check_init(gcl_pcl_pkg,no_init);
+  ar_check_init(gcl_pcl_walk,no_init);
+  ar_check_init(gcl_pcl_iterate,no_init);
+  ar_check_init(gcl_pcl_macros,no_init);
+  ar_check_init(gcl_pcl_low,no_init);
+  ar_check_init(gcl_pcl_impl_low,no_init);
+  ar_check_init(gcl_pcl_fin,no_init);
+  ar_check_init(gcl_pcl_defclass,no_init);
+  ar_check_init(gcl_pcl_defs,no_init);
+  ar_check_init(gcl_pcl_fngen,no_init);
+  ar_check_init(gcl_pcl_cache,no_init);
+  ar_check_init(gcl_pcl_dlisp,no_init);
+  ar_check_init(gcl_pcl_dlisp2,no_init);
+  ar_check_init(gcl_pcl_boot,no_init);
+  ar_check_init(gcl_pcl_vector,no_init);
+  ar_check_init(gcl_pcl_slots_boot,no_init);
+  ar_check_init(gcl_pcl_combin,no_init);
+  ar_check_init(gcl_pcl_dfun,no_init);
+  ar_check_init(gcl_pcl_fast_init,no_init);
+  ar_check_init(gcl_pcl_braid,no_init);
+  ar_check_init(gcl_pcl_generic_functions,no_init);
+  ar_check_init(gcl_pcl_slots,no_init);
+  ar_check_init(gcl_pcl_init,no_init);
+  ar_check_init(gcl_pcl_std_class,no_init);
+  ar_check_init(gcl_pcl_cpl,no_init);
+  ar_check_init(gcl_pcl_fsc,no_init);
+  ar_check_init(gcl_pcl_methods,no_init);
+  ar_check_init(gcl_pcl_fixup,no_init);
+  ar_check_init(gcl_pcl_defcombin,no_init);
+  ar_check_init(gcl_pcl_ctypes,no_init);
+  ar_check_init(gcl_pcl_env,no_init);
+  ar_check_init(gcl_pcl_compat,no_init);
+  ar_check_init(gcl_pcl_precom1,no_init);
+  ar_check_init(gcl_pcl_precom2,no_init);
 
 }
 
@@ -182,31 +182,31 @@ gcl_init_cmp_anon(void) {
 
   switch(ngazonk++) {
   case 0:
-    ar_check_init(pcl_gazonk0,Cnil);
+    ar_check_init(gcl_pcl_gazonk0,Cnil);
     break;
   case 1:
-    ar_check_init(pcl_gazonk1,Cnil);
+    ar_check_init(gcl_pcl_gazonk1,Cnil);
     break;
   case 2:
-    ar_check_init(pcl_gazonk2,Cnil);
+    ar_check_init(gcl_pcl_gazonk2,Cnil);
     break;
   case 3:
-    ar_check_init(pcl_gazonk3,Cnil);
+    ar_check_init(gcl_pcl_gazonk3,Cnil);
     break;
   case 4:
-    ar_check_init(pcl_gazonk4,Cnil);
+    ar_check_init(gcl_pcl_gazonk4,Cnil);
     break;
   case 5:
-    ar_check_init(pcl_gazonk5,Cnil);
+    ar_check_init(gcl_pcl_gazonk5,Cnil);
     break;
   case 6:
-    ar_check_init(pcl_gazonk6,Cnil);
+    ar_check_init(gcl_pcl_gazonk6,Cnil);
     break;
   case 7:
-    ar_check_init(pcl_gazonk7,Cnil);
+    ar_check_init(gcl_pcl_gazonk7,Cnil);
     break;
   case 8:
-    ar_check_init(pcl_gazonk8,Cnil);
+    ar_check_init(gcl_pcl_gazonk8,Cnil);
     i=1;
     break;
   default:
