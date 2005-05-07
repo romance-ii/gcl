@@ -40,7 +40,7 @@ $(addsuffix .c,$(AFILES)) $(addsuffix .data,$(AFILES))\
 #	rm -f pcl_methods.o
 	for i in gazonk* ; do j=$$(echo $$i | sed 's,\..*$$,,1');\
 		cat $$i | sed   -e "s,$$j\.h,gcl_pcl_$$j.h,1" \
-				-e  "s,init_.*$$j[^_]*,init_gcl_pcl_$$j,g" >gcl_pcl_$$i && rm $$i; done
+				-e  "s,init_.*$$j,init_gcl_pcl_$$j,g" >gcl_pcl_$$i && rm $$i; done
 
 %.o: %.c %.h %.data
 	$(CC) $(CFLAGS) -c $< -o $@

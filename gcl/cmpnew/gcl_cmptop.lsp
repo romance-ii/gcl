@@ -214,10 +214,15 @@
 
   (cond ((not sp) "code")
 	((not (pathnamep p)) (init-name (pathname p) sp gp dc nt))
-	((not (string= (pathname-type p) "o")) 
-	 (init-name (merge-pathnames (make-pathname :type "o") p) sp gp dc nt))
+	(gp (init-name (truename (merge-pathnames p #".lsp")) sp nil dc nt))
+	((pathname-type p)
+	 (init-name (make-pathname
+                     :host (pathname-host p)
+                     :device (pathname-device p)
+                     :directory (pathname-directory p)
+                     :name (pathname-name p)
+                     :version (pathname-version p)) sp gp dc nt))
 	#-aosvs(dc (string-downcase (init-name p sp gp nil nt)))
-	(gp (let ((s (open p :if-does-not-exist :create))) (close s)) (init-name (truename p) sp nil dc nt))
 	((and nt
 	      (let* ((pn (pathname-name p))
 		     (pp (make-pathname :name pn)))

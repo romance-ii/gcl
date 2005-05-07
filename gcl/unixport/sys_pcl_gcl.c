@@ -22,7 +22,7 @@ void gcl_init_or_load1 (void (*)(void),char *);
     error("Cannot unpack module " #a "o\n");\
   if (system(b)) \
     error("Cannot run ar command to unpack module " #a ".o\n");\
-  init_or_load(Mjoin(init_,Mjoin(a,_o)),#a ".o");\
+  init_or_load(Mjoin(init_,a),#a ".o");\
   if (unlink(#a ".o"))\
     error("Cannot unlink " #a ".o\n");\
 } while(0)
