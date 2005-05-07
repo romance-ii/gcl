@@ -10,8 +10,9 @@ gclcvs (2.7.0-42) unstable; urgency=low
   * Probe-file, open_stream, and the like fail on directories
   * Fix symlink resolution to absolute paths, Thanks Magnus Henoch
   * Place prototypes for defcfun in header files
+  * libreadline5 for Debian
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  6 May 2005 17:13:20 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat,  7 May 2005 02:42:28 +0000
 
 gclcvs (2.7.0-41) unstable; urgency=low
 
