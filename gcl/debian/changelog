@@ -11,8 +11,9 @@ gclcvs (2.7.0-42) unstable; urgency=low
   * Fix symlink resolution to absolute paths, Thanks Magnus Henoch
   * Place prototypes for defcfun in header files
   * libreadline5 for Debian
+  * Darwin cleanups
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  7 May 2005 02:42:28 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat,  7 May 2005 02:43:06 +0000
 
 gclcvs (2.7.0-41) unstable; urgency=low
 

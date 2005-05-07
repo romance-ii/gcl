@@ -75,6 +75,8 @@ extern char *my_sbrk(int incr);
 #endif
 
 /* The file has non Mach-O stuff appended.  We need to know where the Mach-O stuff ends.  */
+#include <stdio.h>
+extern int seek_to_end_ofile (FILE *);
 #define SEEK_TO_END_OFILE(fp) seek_to_end_ofile(fp)
 
 /* Processor cache synchronization code.  This is based on powerpc-linux.h (Debian ppc).

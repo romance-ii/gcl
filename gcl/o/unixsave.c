@@ -138,6 +138,8 @@ char *original_file, *save_file;
 	fclose(save);
 }
 
+extern void _cleanup();
+
 LFD(Lsave)()
 {
 	char filename[256];

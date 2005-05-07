@@ -2681,12 +2681,16 @@ maccept(object x) {
 #include <sys/resource.h>
 #include <signal.h>
 
+#if defined(DARWIN)
+#define on_exit(a,b)
+#else
 static void
 rmc(int e,void *pid) {
 
   kill((int)pid,SIGTERM);
 
 }
+#endif
 #endif
 
 @(static defun socket (port &key host server async myaddr myport daemon)
@@ -2707,7 +2711,7 @@ int inPort;
 char buf1[500];
 char buf2[500];
 char *myaddrPtr=buf1,*hostPtr=buf2;
-object x;
+object x=Cnil;
 @
   if (type_of(host) == t_string) {
     hostPtr=lisp_copy_to_null_terminated(host,hostPtr,sizeof(buf1));

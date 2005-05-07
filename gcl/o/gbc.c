@@ -180,14 +180,16 @@ enum type what_to_collect;
 void
 enter_mark_origin(object *p)
 {
-  unsigned long np=page(p);
 /*   if (np>=MAXPAGE) */
 /*     error("Address supplied to enter_mar_origin out of range"); */
   if (mark_origin_max >= MARK_ORIGIN_MAX)
     error("too many mark origins");
 #ifdef SGC
-  if (np<MAXPAGE)
-    sgc_type_map[np] |= SGC_PERM_WRITABLE ;
+ {
+   unsigned long np=page(p);
+   if (np<MAXPAGE)
+     sgc_type_map[np] |= SGC_PERM_WRITABLE ;
+ }
 #endif	
   mark_origin[mark_origin_max++] = p;
 }
@@ -1103,7 +1105,7 @@ GBC(enum type t) {
 	   (sgc_enabled ? sgc_count_type(t) : tm_of(t)->tm_npage),
 	   (tm_table[(int)t].tm_name)+1);
 #else
-    printf("[%s for %d %s pages..",
+    printf("[%s for %ld %s pages..",
 	   ("GC"),
 	   (tm_of(t)->tm_npage),
 	   (tm_table[(int)t].tm_name)+1);
