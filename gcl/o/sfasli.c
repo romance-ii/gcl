@@ -25,6 +25,18 @@ find_sym_ptable(name)
 
 #else
 
+static MY_BFD_BOOLEAN
+bfd_hash_transfer(struct bfd_link_hash_entry *h,void *v) {
+  
+  if (h->type==bfd_link_hash_defined)
+    sethash(make_simple_string(h->root.string),
+	    sSAlink_hash_tableA->s.s_dbind,
+	    make_fixnum(h->u.def.value+h->u.def.section->vma));
+
+  return MY_BFD_TRUE;
+  
+}  
+
 /* Replace this with gcl's own hash structure at some point */
 static int
 build_symbol_table_bfd(void) {
@@ -97,6 +109,31 @@ build_symbol_table_bfd(void) {
       c=NULL;
     }
   }
+
+  {
+    
+    extern object sLequal;
+    object *ovsb=vs_base,*ovst=vs_top;
+    
+    vs_base=vs_top;
+    vs_push(sKtest);
+    vs_push(sLequal);
+    Lmake_hash_table();
+    sSAlink_hash_tableA->s.s_dbind=vs_base[0];
+    vs_top=ovst;
+    vs_base=ovsb;
+
+    bfd_link_hash_traverse(link_info.hash,bfd_hash_transfer,NULL);
+
+    bfd_close(bself);
+    bself=NULL;
+    link_info.hash=NULL;
+
+  }
+
+
+
+
 
 #ifndef HAVE_ALLOCA
   free(q);

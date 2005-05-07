@@ -175,6 +175,9 @@ static bfd *bself;
 #include SPECIAL_BFD_INCLUDE
 #endif
 
+object sSAlinker_symbol_packageA;
+DEFVAR("*LINK-HASH-TABLE*",sSAlink_hash_tableA,SI,((object)&Cnil_body),"");
+
 int
 fasload(object faslfile) {
 
@@ -253,26 +256,49 @@ fasload(object faslfile) {
   *entry_name=bfd_get_symbol_leading_char(b);
   entry_name_ptr=*entry_name ? entry_name : entry_name+1;
 
-  for (u=0;u<v;u++) {
+  {
+    struct string st;
+    memset(&st,0,sizeof(st));
+    st.t=t_string;
 
-    struct bfd_link_hash_entry *h;
-
-    if (!strncmp(entry_name_ptr,q[u]->name,5)) {
-      init_address=u;
-      continue;
-    }
-
-    if (!(h=bfd_link_hash_lookup(link_info.hash,q[u]->name,MY_BFD_FALSE,MY_BFD_FALSE,MY_BFD_TRUE))) 
-      continue;
-
-    if (h->type!=bfd_link_hash_defined) 
-      FEerror("Undefined symbol ~S",1,make_simple_string(q[u]->name));
+    for (u=0;u<v;u++) {
       
-    if (h->u.def.section) {
-      q[u]->value=h->u.def.value+h->u.def.section->vma;
-      q[u]->flags|=BSF_WEAK;
-    } else 
-      FEerror("Symbol without section",0);
+      struct bfd_link_hash_entry *h;
+      
+      if (!strncmp(entry_name_ptr,q[u]->name,5)) {
+	init_address=u;
+	continue;
+      }
+      
+      if (link_info.hash) {
+
+	if (!(h=bfd_link_hash_lookup(link_info.hash,q[u]->name,MY_BFD_FALSE,MY_BFD_FALSE,MY_BFD_TRUE))) 
+	  continue;
+
+	if (h->type!=bfd_link_hash_defined) 
+	  FEerror("Undefined symbol ~S",1,make_simple_string(q[u]->name));
+      
+	if (h->u.def.section) {
+	  q[u]->value=h->u.def.value+h->u.def.section->vma;
+	  q[u]->flags|=BSF_WEAK;
+	} else 
+	  FEerror("Symbol without section",0);
+
+      } else {
+
+	struct htent *x;
+
+	st.st_self=(char *)q[u]->name;
+	st.st_fillp=st.st_dim=strlen(st.st_self);
+	if ((x=gethash((object)&st,sSAlink_hash_tableA->s.s_dbind))->hte_key==OBJNULL)
+	  continue;
+
+	q[u]->value=fix(x->hte_value);
+	q[u]->flags|=BSF_WEAK;
+
+      }
+
+    }
 
   }
 

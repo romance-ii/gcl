@@ -13,8 +13,10 @@ gclcvs (2.7.0-42) unstable; urgency=low
   * libreadline5 for Debian
   * Darwin cleanups
   * static function pointer for array-dimension for ia64
+  * si::*link-hash-table* to replace stored bfd hash tables (using
+    malloced memory)
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  7 May 2005 02:45:08 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat,  7 May 2005 02:46:24 +0000
 
 gclcvs (2.7.0-41) unstable; urgency=low
 
