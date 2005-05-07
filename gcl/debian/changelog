@@ -12,8 +12,9 @@ gclcvs (2.7.0-42) unstable; urgency=low
   * Place prototypes for defcfun in header files
   * libreadline5 for Debian
   * Darwin cleanups
+  * static function pointer for array-dimension for ia64
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  7 May 2005 02:43:06 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat,  7 May 2005 02:45:08 +0000
 
 gclcvs (2.7.0-41) unstable; urgency=low
 

@@ -1066,6 +1066,12 @@ DEFUNO_NEW("ARRAY-DIMENSION",object,fLarray_dimension,LISP,2,2,
    IisArray(x);
    return make_fixnum(x->v.v_dim);
 }
+#ifdef STATIC_FUNCTION_POINTERS
+object
+fLarray_dimension(object x,fixnum i) {
+  return FFN(fLarray_dimension)(x,i);
+}
+#endif
 
 static void
 Icheck_displaced(object displaced_list, object ar, int dim)
