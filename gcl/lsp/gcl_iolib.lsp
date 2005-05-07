@@ -272,24 +272,33 @@
 ;;; ensure-directories-exist 
 
 (defun ensure-directories-exist (pathspec &key verbose)
-  (let* ((path (pathname pathspec))
-	 (dir (make-pathname :host (pathname-host path)
-			     :device (pathname-device path)
-			     :directory (pathname-directory path)))
-	 (created nil)
-	  trans walk newdir)
-    (when (and (pathname-directory path)
-	       (not (probe-file dir)))
-      (setq trans (pathname-directory (translate-logical-pathname dir)))
-      (setq walk (list (car trans)))
-      (dolist (step (cdr trans))
-	(nconc walk (list step))
-	(setq newdir (make-pathname :directory walk))
-	(when (not (probe-file newdir))
-	  (si:mkdir newdir)
-	  (when verbose (format t "~&Directory ~A created.~%" newdir))))
-      (setq created t))
-    (values pathspec created)))
+  (flet ((pop-path 
+	  (p) 
+	  (if (pathname-name p) p
+	    (let* ((pd (pathname-directory p))
+		   (kl (if (keywordp (car (last pd))) 0 1)))
+	      (merge-pathnames 
+	       (make-pathname :directory (butlast pd kl)
+			      :name (last pd kl)) 
+	       p)))))
+	(let* ((path (pathname pathspec))
+	       (dir (make-pathname :host (pathname-host path)
+				   :device (pathname-device path)
+				   :directory (pathname-directory path)))
+	       (created nil)
+	       trans walk newdir)
+	  (when (and (pathname-directory path)
+		     (not (directory (pop-path dir))))
+	    (setq trans (pathname-directory (translate-logical-pathname dir)))
+	    (setq walk (list (car trans)))
+	    (dolist (step (cdr trans))
+	      (nconc walk (list step))
+	      (setq newdir (make-pathname :directory walk))
+	      (when (not (directory (pop-path newdir)))
+		(si:mkdir newdir)
+		(when verbose (format t "~&Directory ~A created.~%" newdir))))
+	    (setq created t))
+	  (values pathspec created))))
 
 ;;; new logical pathname translation
 ;
@@ -504,5 +513,5 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
 
 ; i know this should be in cmpnew - but its easier here.
 
-(defmacro with-compilation-unit (opt &rest body) `(progn ,@body))
+(defmacro with-compilation-unit (opt &rest body) (declare (ignore opt)) `(progn ,@body))
 
