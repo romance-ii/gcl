@@ -1,3 +1,9 @@
+gclcvs (2.7.0-43) unstable; urgency=low
+
+  * Add sqrt, newly written by the compiler, to the local plt table
+
+ -- Camm Maguire <camm@enhanced.com>  Mon,  9 May 2005 19:10:20 +0000
+
 gclcvs (2.7.0-42) unstable; urgency=low
 
   * libreadline5 support for Debian
