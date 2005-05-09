@@ -741,7 +741,7 @@
 ;;         20050106 CM.
 (defun c-cast (aet)
   (case aet
-    ((string-char unsigned-char non-negative-char) "unsigned char")
+    ((string-char character unsigned-char non-negative-char) "unsigned char")
     (signed-char "char")
     (signed-short "short")
     ((non-negative-short unsigned-short) "unsigned short")
@@ -783,7 +783,9 @@
        (let ((uaet (upgraded-array-element-type (nil-to-t (cadr x)))))
 	 ;; FIXME -- inline bit-vectors too.
 	 (unless (eq uaet 'bit)
-	   uaet))))
+	   ;;FIXME string-char -> character for ansi throughout, this is just a bridge for now.
+	   ;;20050509 CM
+	   (if (eq uaet 'string-char) 'character uaet)))))
 
 (setf (symbol-function 'cmp-aref) (symbol-function 'row-major-aref))
 
@@ -806,7 +808,7 @@
 
 (defun cmp-aset-inline-types (&rest r)
   (let ((art (car r)))
-    (let ((aet (aref-propagator 'cmp-asef art)))
+    (let ((aet (aref-propagator 'cmp-aset art)))
       (if aet
 	  `((,art seqind ,aet) ,aet)
 	`((t seqind t) t)))))

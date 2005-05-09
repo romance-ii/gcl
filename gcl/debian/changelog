@@ -3,8 +3,10 @@ gclcvs (2.7.0-43) unstable; urgency=low
   * Add sqrt, newly written by the compiler, to the local plt table
   * Remove rfa flag from sqrt optimizer -- FIXME, handle libm imports as
     a group
+  * Fix remaining misc test failure by bridging the old string-char into
+    character -- FIXME, this needs to be done throughout
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  9 May 2005 19:11:51 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  9 May 2005 19:59:26 +0000
 
 gclcvs (2.7.0-42) unstable; urgency=low
 
