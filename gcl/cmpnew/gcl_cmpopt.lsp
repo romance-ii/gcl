@@ -1137,7 +1137,7 @@ TRUNCATE_USE_C
    (get 'tan 'inline-always))
 
 ;;SQRT
- (push '((long-float) long-float #.(flags rfa)"sqrt((double)#0)")
+ (push '((long-float) long-float #.(flags)"sqrt((double)#0)")
    (get 'sqrt 'inline-always))
 
 ;;TERPRI
