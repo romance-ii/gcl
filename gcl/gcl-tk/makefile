@@ -18,6 +18,7 @@ GCLIB  = ../o/gcllib.a
 
 
 CFLAGS1=$(CFLAGS) -I../o -I../h ${TK_INCLUDE} ${TCL_INCLUDE} ${TK_XINCLUDES}
+WGCLDIR=`echo $(GCLDIR) | sed -e 'sX^/\([a-z]\)X\1:Xg'`
 
 
 all: gcltksrv   tkl.o tinfo.o  demos/gc-monitor.o gcltkaux
@@ -55,7 +56,7 @@ gcltksrv: makefile
 	cat gcltksrv.bat.in | sed -e "s!TK_LIBRARY=.*!TK_LIBRARY=${TK_LIBRARY}!g" \
 	-e "s!TCL_LIBRARY=.*!TCL_LIBRARY=${TCL_LIBRARY}!g" \
 	-e "s!TK_XLIB_DIR=.*!TK_XLIB_DIR=${TK_XLIB_DIR}!g" \
-	-e "s!GCL_TK_DIR=.*!GCL_TK_DIR=${GCLDIR}/gcl-tk!g" > gcltksrv.bat
+	-e "s!GCL_TK_DIR=.*!GCL_TK_DIR=${WGCLDIR}/gcl-tk!g" > gcltksrv.bat
 
 gcltksrv.interp: makefile
 	cat gcltksrv.in.interp | sed -e "s!TK_LIBRARY=.*!TK_LIBRARY=${TK_LIBRARY}!g" \
