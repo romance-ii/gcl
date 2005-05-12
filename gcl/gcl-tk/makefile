@@ -21,7 +21,8 @@ CFLAGS1=$(CFLAGS) -I../o -I../h ${TK_INCLUDE} ${TCL_INCLUDE} ${TK_XINCLUDES}
 WGCLDIR=`echo $(GCLDIR) | sed -e 'sX^/\([a-z]\)X\1:Xg'`
 
 
-all: gcltksrv   tkl.o tinfo.o  demos/gc-monitor.o gcltkaux
+all: gcltksrv   tkl.o tinfo.o  demos/gc-monitor.o gcltkaux \
+     winkill.exe tclwinkill.dll
 	(cd demos ; \
 	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../unixport/$(FLISP)$(EXE)) 
 
@@ -64,6 +65,12 @@ gcltksrv.interp: makefile
 	-e "s!TCL_LIBRARY=.*!TCL_LIBRARY=${TCL_LIBRARY}!g" \
 	-e "s!GCL_TK_DIR=.*!GCL_TK_DIR=${GCLDIR}/gcl-tk!g" > gcltksrv.interp
 	chmod a+x gcltksrv.interp
+
+winkill.exe: winkill.c
+	gcc -Wall -o winkill.exe winkill.c 
+
+tclwinkill.dll: tclwinkill.c
+	gcc -Wall -shared $(TCL_INCLUDE) tclwinkill.c $(TCL_STUB_LIBS) -o tclwinkill.dll
 
 INTERESTING=*.lsp *.lisp tk*.c guis.c sockets.c  comm.c Makefile  demos/*.lisp  *.h
 
