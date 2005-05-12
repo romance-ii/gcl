@@ -536,7 +536,6 @@ and load your system with:
 
 #+cmu17
 (defparameter *byte-files* '(defclass defcombin iterate env))
-
 (defun operate-on-system (name mode &optional arg print-only)
   (let ((system (get-system name)))
     (unless system (error "Can't find system with name ~S." name))
@@ -619,11 +618,15 @@ and load your system with:
 ;			     ldir))
 			     
 	 (port-directory ldir)
+	 (port-device (if (null port-directory)
+			  nil
+			(pathname-device port-directory)))
 			     
          (pathname
            (make-pathname
              :name (string-downcase (string name))
              :type extension
+	     :device port-device
 	     :directory port-directory
              :defaults directory)))
 
