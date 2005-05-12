@@ -37,7 +37,7 @@ all: gcltksrv   tkl.o tinfo.o  demos/gc-monitor.o gcltkaux \
 GUIOS = guis.o tkAppInit.o tkMain.o
 
 clean::
-	rm -f ${GUIOS} $(OFILES) gcltkaux gcltksrv *.o */*.o demos/index.lsp *.fn demos/*.fn
+	rm -f ${GUIOS} $(OFILES) gcltkaux gcltksrv gcltksrv.bat *.o */*.o demos/index.lsp *.fn demos/*.fn
 
 .c.o:
 	$(GCLTKCC) -c $(CFLAGS1) ${ODIR_DEBUG}  $*.c
@@ -48,7 +48,7 @@ clean::
 gcltkaux:  $(GUIOS)
 	$(LD_ORDINARY_CC) $(GUIOS) -o gcltkaux  ${TK_LIB_SPEC} ${TK_BUILD_LIB_SPEC} ${TK_XLIBSW} ${TK_XINCLUDES} ${TCL_LIB_SPEC} ${TCL_LIBS}  ${LIBS} ${GCLIB}
 
-gcltksrv: makefile
+gcltksrv: makefile gcltksrv.in gcltksrv.bat.in
 	cat gcltksrv.in | sed -e "s!TK_LIBRARY=.*!TK_LIBRARY=${TK_LIBRARY}!g" \
 	-e "s!TCL_LIBRARY=.*!TCL_LIBRARY=${TCL_LIBRARY}!g" \
 	-e "s!TK_XLIB_DIR=.*!TK_XLIB_DIR=${TK_XLIB_DIR}!g" \

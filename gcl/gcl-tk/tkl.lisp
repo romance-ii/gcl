@@ -1399,11 +1399,13 @@
 
 
 (defvar *tk-library* nil)
-(defun tkconnect (&key host can-rsh gcltksrv (display (si::getenv "DISPLAY"))
+(defun tkconnect (&key host can-rsh gcltksrv (display 
+					      #+winnt "DUMMYDISPLAYNAME"
+					      #-winnt(si::getenv "DISPLAY"))
 		       (args  "")
 			    &aux hostid  (loopback "127.0.0.1"))
   (if *tk-connection*  (tkdisconnect))
-  (or display (error "DISPLAY not set"))
+  #-winnt (or display (error "DISPLAY not set"))
   (or *tk-library* (setq *tk-library* (si::getenv "TK_LIBRARY")))
   (or gcltksrv
       (setq 	gcltksrv
