@@ -292,7 +292,7 @@ TkX_Wish (argc, argv)
 	    name = p;
 	}
     }
-
+#ifndef __MINGW32__
     /*
      * If a display was specified, put it into the DISPLAY
      * environment variable so that it will be available for
@@ -302,7 +302,7 @@ TkX_Wish (argc, argv)
     if (display != NULL) {
 	Tcl_SetVar2(interp, "env", "DISPLAY", display, TCL_GLOBAL_ONLY);
     }
-
+#endif
     /*
      * Initialize the Tk application.
      */
@@ -358,11 +358,13 @@ TkX_Wish (argc, argv)
     /*
      * Invoke application-specific initialization.
      */
-
+#ifdef _WIN32
+    Tcl_FindExecutable ( argv[0] ); 
+#else
     if (Tcl_AppInit(interp) != TCL_OK) {
 	fprintf(stderr, "Tcl_AppInit failed: %s\n", interp->result);
     }
-
+#endif
     /*
      * Set the geometry of the main window, if requested.
      */
