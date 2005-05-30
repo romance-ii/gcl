@@ -21,8 +21,7 @@ CFLAGS1=$(CFLAGS) -I../o -I../h ${TK_INCLUDE} ${TCL_INCLUDE} ${TK_XINCLUDES}
 WGCLDIR=`echo $(GCLDIR) | sed -e 'sX^/\([a-z]\)X\1:Xg'`
 
 
-all: gcltksrv   tkl.o tinfo.o  demos/gc-monitor.o gcltkaux \
-     winkill.exe tclwinkill.dll
+all: gcltksrv   tkl.o tinfo.o  demos/gc-monitor.o gcltkaux
 	(cd demos ; \
 	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../unixport/$(FLISP)$(EXE)) 
 
