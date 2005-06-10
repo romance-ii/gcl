@@ -114,7 +114,7 @@ structure_set(object x, object name, int i, object v)
 
 #ifdef SGC
  /* make sure the structure header is on a writable page */
- if (x->d.m) FEerror("bad gc field",0); else  x->d.m = 0;
+ if (is_marked(x)) FEerror("bad gc field",0); else  unmark(x);
 #endif   
  
  s_pos= & SLOT_POS(x->str.str_def,0);

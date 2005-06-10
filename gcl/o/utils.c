@@ -67,7 +67,7 @@ object Ifuncall_n(object fun, int n, ...)
 /* TODO: check array.c and nfunlink.c */
 object Icheck_one_type(object x, enum type t)
 {
-    if (x->d.t != t) {
+    if (type_of(x) != t) {
 	return CEerror("Expected a ~a ", "Supply right type", 1,
 		       type_name(t), Cnil, Cnil, Cnil);
     }

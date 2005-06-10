@@ -28,7 +28,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #undef endp
 
-#define	endp(obje)	((enum type)((endp_temp = (obje))->d.t) == t_cons ? \
+#define	endp(obje)	((enum type)(type_of(endp_temp = (obje))) == t_cons ? \
 			 FALSE : endp_temp == Cnil ? TRUE : \
 			 (FEwrong_type_argument(sLlist, endp_temp),FALSE))
 

@@ -481,7 +481,7 @@ LFD(Linteger_length)(void)
 	vs_push(make_fixnum(count));
 }
 
-#define W_SIZE (8*sizeof(int))
+/* #define W_SIZE (8*sizeof(int)) */
 /* static object */
 /* bitand(object a, object b, object c) */
 /* { int d= a->bv.bv_fillp; */
@@ -559,14 +559,14 @@ LFD(siLbit_array_op)(void)
 				goto ERROR;
 			if (r->bv.bv_dim != d)
 				goto ERROR;
-			i = (r->bv.bv_self - xp)*8 + (BV_OFFSET(r) - xo);
+			i = (r->bv.bv_self - xp)*CHAR_SIZE + (BV_OFFSET(r) - xo);
 			if ((i > 0 && i < d) || (i < 0 && -i < d)) {
 				r0 = r;
 				r = Cnil;
 				replace = TRUE;
 				goto L1;
 			}
-			i = (r->bv.bv_self - yp)*8 + (BV_OFFSET(r) - yo);
+			i = (r->bv.bv_self - yp)*CHAR_SIZE + (BV_OFFSET(r) - yo);
 			if ((i > 0 && i < d) || (i < 0 && -i < d)) {
 				r0 = r;
 				r = Cnil;
@@ -617,14 +617,14 @@ LFD(siLbit_array_op)(void)
 			for (i = 0;  i < x->a.a_rank;  i++)
 				if (r->a.a_dims[i] != x->a.a_dims[i])
 					goto ERROR;
-			i = (r->bv.bv_self - xp)*8 + (BV_OFFSET(r) - xo);
+			i = (r->bv.bv_self - xp)*CHAR_SIZE + (BV_OFFSET(r) - xo);
 			if ((i > 0 && i < d) || (i < 0 && -i < d)) {
 				r0 = r;
 				r = Cnil;
 				replace = TRUE;
 				goto L2;
 			} 
-			i = (r->bv.bv_self - yp)*8 + (BV_OFFSET(r) - yo);
+			i = (r->bv.bv_self - yp)*CHAR_SIZE + (BV_OFFSET(r) - yo);
 			if ((i > 0 && i < d) || (i < 0 && -i < d)) {
 				r0 = r;
 				r = Cnil;
@@ -634,14 +634,15 @@ LFD(siLbit_array_op)(void)
 	L2:
 		if (r == Cnil) {
 		  object b;
-		  struct cons *p=alloca(x->a.a_rank*sizeof(struct cons));
+		  struct cons *p=ZALLOCA((x->a.a_rank+1)*sizeof(struct cons));
+		  p=(void *)(((unsigned long)((void *)p+sizeof(struct cons)-1))&~(sizeof(struct cons)-1));
 		  if (x->a.a_rank) {
 		    object b1;
 
 		    b=(object)p;
 		    for (b1=b,i=0;i<x->a.a_rank;i++,b1=b1->c.c_cdr) {
-		      b1->d.t=(int)t_cons;
-		      b1->d.m=FALSE;
+		      set_type_of(b1,t_cons); 
+		      make_unfree(b1);
 		      b1->c.c_car=/* x->a.a_dims[i]<SMALL_FIXNUM_LIMIT ?  */
 			/* small_fixnum(x->a.a_dims[i]) :  */ 
 			/* now done in a macro */

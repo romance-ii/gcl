@@ -581,17 +581,19 @@ gcl_init_character()
 	int i;
 
 	for (i = 0;  i < CHCODELIM;  i++) {
-		character_table[i].t = (short)t_character;
-		character_table[i].ch_code = i;
-		character_table[i].ch_font = 0;
-		character_table[i].ch_bits = 0;
+	  object x=(object)(character_table+i);
+	  set_type_of(x,t_character);
+	  x->ch.ch_code = i;
+	  x->ch.ch_font = 0;
+	  x->ch.ch_bits = 0;
 	}
 #ifdef AV
 	for (i = -128;  i < 0;  i++) {
-		character_table[i].t = (short)t_character;
-		character_table[i].ch_code = i+CHCODELIM;
-		character_table[i].ch_font = 0;
-		character_table[i].ch_bits = 0;
+	  object x=(object)(character_table+i);
+	  set_type_of(x,t_character);
+	  x->ch.ch_code = i+CHCODELIM;
+	  x->ch.ch_font = 0;
+	  x->ch.ch_bits = 0;
 	}
 #endif
 

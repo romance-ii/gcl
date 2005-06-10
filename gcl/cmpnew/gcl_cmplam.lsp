@@ -97,7 +97,7 @@
 (si:putprop 'make-dclosure 'wt-make-dclosure 'wt-loc)
 
 (defun wt-make-dclosure (cfun clink)clink  ;;Dbase=base0
-  (wt-nl "(DownClose"cfun".t=t_dclosure,DownClose" cfun ".dc_self=LC" cfun","
+  (wt-nl "(set_type_of(&DownClose"cfun",t_dclosure),DownClose" cfun ".dc_self=LC" cfun","
      "DownClose" cfun ".dc_env=base0,(object)&DownClose" cfun ")"))
 
 (defun wfs-error ()

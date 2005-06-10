@@ -263,10 +263,10 @@ object item,a_list,value;
  */
 
 object
-pathname_case_word(word, casekey)
-object word, casekey;
+pathname_case_word(wrd, casekey)
+object wrd, casekey;
 {
-	object x=word;
+	object x=wrd;
 
 #ifdef ANSI_COMMON_LISP
 
@@ -274,28 +274,28 @@ object word, casekey;
 	int seen_upper=0;
 	int i;
 
-	if (type_of(word) == t_string) {
-	    for (i=0; i<word->st.st_fillp; i++) {
-		if (isupper(word->st.st_self[i])) seen_upper=1;
-		if (islower(word->st.st_self[i])) seen_lower=1;
+	if (type_of(wrd) == t_string) {
+	    for (i=0; i<wrd->st.st_fillp; i++) {
+		if (isupper(wrd->st.st_self[i])) seen_upper=1;
+		if (islower(wrd->st.st_self[i])) seen_lower=1;
 	    }
 	    if (casekey == sKcommon) {
 		if (seen_lower != seen_upper) {
-		    x=copy_simple_string(word);
-		    for (i=0; i<word->st.st_fillp; i++) {
-			if (isupper(word->st.st_self[i]))
+		    x=copy_simple_string(wrd);
+		    for (i=0; i<wrd->st.st_fillp; i++) {
+			if (isupper(wrd->st.st_self[i]))
 			    x->st.st_self[i]=tolower(x->st.st_self[i]);
 			else
-			if (islower(word->st.st_self[i]))
+			if (islower(wrd->st.st_self[i]))
 			    x->st.st_self[i]=toupper(x->st.st_self[i]);
 		    }
 		}
 	    } else
 	    if (casekey == sKdowncase) {
 		if ((seen_lower != seen_upper) || pathname_resolve(pathKansi))
-		{   x=copy_simple_string(word);
-		    for (i=0; i<word->st.st_fillp; i++)
-			if (isupper(word->st.st_self[i]))
+		{   x=copy_simple_string(wrd);
+		    for (i=0; i<wrd->st.st_fillp; i++)
+			if (isupper(wrd->st.st_self[i]))
 			    x->st.st_self[i]=tolower(x->st.st_self[i]);
 	    	}
 	    }

@@ -159,7 +159,7 @@ DEFUNO_NEW("READ-EXTERNALS",object,fSread_externals,SI
 int maxpage;
 object sScdefn;
 
-#define CF_FLAG ((unsigned long)1 << (sizeof(long)*8-1)) 
+#define CF_FLAG ((unsigned long)1 << (sizeof(long)*CHAR_SIZE-1)) 
 
 static void
 cfuns_to_combined_table(unsigned int n) /* non zero n will ensure new table length */
@@ -194,7 +194,7 @@ cfuns_to_combined_table(unsigned int n) /* non zero n will ensure new table leng
 	 type_of(x)!=t_vfun &&
 	 type_of(x)!=t_gfun
 	 ) continue;
-     if ((x->d.m == FREE) || x->cf.cf_self == NULL)
+     if (is_free(x) || x->cf.cf_self == NULL)
        continue;
 	/* the cdefn things are the proclaimed call types. */
      cf_addr=(char * ) ((unsigned long)(x->cf.cf_self));

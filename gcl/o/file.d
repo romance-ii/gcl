@@ -391,7 +391,7 @@ object if_exists, if_does_not_exist;
 		    FEerror("Cannot write .gz filename",0);
 		  st.st_self=buf;
 		  st.st_dim=st.st_fillp=strlen(buf);
-		  st.t=t_string;
+		  set_type_of(&st,t_string);
 		  if (file_exists((object)&st)) {
 		    FILE *pp;
 		    int n;
@@ -2687,7 +2687,7 @@ maccept(object x) {
 static void
 rmc(int e,void *pid) {
 
-  kill((int)pid,SIGTERM);
+  kill((int)(unsigned long)pid,SIGTERM);
 
 }
 #endif
@@ -2823,7 +2823,7 @@ object x=Cnil;
       break;
     default:
       if (daemon != sKpersistent) {
-	on_exit(rmc,(void *)pid);
+	on_exit(rmc,(void *)(unsigned long)pid);
 	x=make_fixnum(pid);
       } else
 	x=Cnil;

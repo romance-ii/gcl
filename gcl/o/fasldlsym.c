@@ -73,7 +73,7 @@ get_init_fptr(void *dlp,char *fn) {
 
     object x;
     struct string st;
-    st.t=t_string;
+    set_type_of(&st,t_string);
     st.st_self="COMPILER";
     st.st_dim=st.st_fillp=strlen(st.st_self);
     if ((x=find_package((object)&st))==Cnil)
@@ -87,17 +87,17 @@ get_init_fptr(void *dlp,char *fn) {
     
   }
 
-  st.t=t_string;
+  set_type_of(&st,t_string);
   st.st_self=fn;
   st.st_dim=st.st_fillp=strlen(st.st_self);
   x=ifuncall1(inf,(object)&st);
-  if (x->d.t!=t_string)
+  if (type_of(x)!=t_string)
     FEerror("INIT-NAME error", 0);
   assert(snprintf(ib,sizeof(ib),"init_%-.*s",x->st.st_dim,x->st.st_self)>0);
 
   if (!(v=dlsym(dlp, ib))) {
     x=ifuncall2(inf,(object)&st,Ct);
-    if (x->d.t!=t_string)
+    if (type_of(x)!=t_string)
       FEerror("INIT-NAME error", 0);
     assert(snprintf(ib,sizeof(ib),"init_%-.*s",x->st.st_dim,x->st.st_self)>0);
     if (!(v=dlsym(dlp, ib)))

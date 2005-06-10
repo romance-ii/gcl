@@ -222,26 +222,6 @@ stack_cons(void)
 	*vs_top++ = c;
 }
 
-/*static object on_stack_list_vector(n,ap)
-     int n;
-     va_list ap;
-{object res=(object) alloca_val;
- struct cons *p;
- object x;
- p=(struct cons *) res;
- if (n<=0) return Cnil;
- TOP:
- p->t = (int)t_cons;
- p->m=FALSE;
- p->c_car= va_arg(ap,object);
- if (--n == 0)
-   {p->c_cdr = Cnil;
-    return res;}
- else
-   { x= (object) p;
-     x->c.c_cdr= (object) ( ++p);}
- goto TOP;
-}*/
 
 object on_stack_list_vector_new(fixnum n,object first,va_list ap)
 {object res=(object) alloca_val;
@@ -251,8 +231,6 @@ object on_stack_list_vector_new(fixnum n,object first,va_list ap)
  p=(struct cons *) res;
  if (n<=0) return Cnil;
  TOP:
- p->t = (int)t_cons;
- p->m=FALSE;
  p->c_car= jj ? va_arg(ap,object) : first;
  jj=1;
  if (--n == 0)
@@ -333,15 +311,15 @@ object list(fixnum n,...)
       {if (i < n)
        tail->c.c_cdr=OBJ_LINK(tail);
        else {tm->tm_free=OBJ_LINK(tail);
-	     tail->d.t = (int)t_cons;
-	     tail->d.m = FALSE;
+	     set_type_of(tail,t_cons);
+	     make_unfree(tail);
 	     tail->c.c_car=va_arg(ap,object); 
 	     tail->c.c_cdr=Cnil;
 	     goto END_INTER ;
 	   }
        /* these could be one instruction*/
-       tail->d.t = (int)t_cons;
-       tail->d.m=FALSE;
+       set_type_of(tail,t_cons);
+       make_unfree(tail);
        tail->c.c_car=va_arg(ap,object);
        tail=tail->c.c_cdr;
        i++;}
@@ -865,8 +843,6 @@ fixnum n;
  struct cons *p = (struct cons *)res;
  if (n<=0) return Cnil;
   TOP:
- p->t = (int)t_cons;
- p->m=FALSE;
  p->c_car=Cnil;
  if (--n == 0)
    {p->c_cdr = Cnil;
@@ -885,7 +861,7 @@ fixnum n;
  return x;}
 
 @(defun make_list (size &key initial_element &aux x)
-	fixnum i;
+	fixnum i=0;
 @
 	check_type_non_negative_integer(&size);
 	if (type_of(size) != t_fixnum)

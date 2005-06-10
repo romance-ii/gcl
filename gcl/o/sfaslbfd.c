@@ -176,7 +176,7 @@ static bfd *bself;
 #endif
 
 object sSAlinker_symbol_packageA;
-DEFVAR("*LINK-HASH-TABLE*",sSAlink_hash_tableA,SI,((object)&Cnil_body),"");
+DEFVAR("*LINK-HASH-TABLE*",sSAlink_hash_tableA,SI,Cnil,"");
 
 int
 fasload(object faslfile) {
@@ -209,7 +209,7 @@ fasload(object faslfile) {
 
     nbfd=1;
 
-    dum.sm.t=t_stream;
+    set_type_of(&dum,t_stream);
     dum.sm.sm_mode=smm_input;
     dum.sm.sm_object0=sLstring_char;
 
@@ -249,7 +249,7 @@ fasload(object faslfile) {
 
   if ((u=bfd_get_symtab_upper_bound(b))<0)
     FEerror("Cannot get symtab uppoer bound",0);
-  q=(asymbol **)alloca(u);
+  q=(asymbol **)ZALLOCA(u);
   if ((v=bfd_canonicalize_symtab(b,q))<0)
     FEerror("cannot canonicalize symtab",0);
 
@@ -259,7 +259,7 @@ fasload(object faslfile) {
   {
     struct string st;
     memset(&st,0,sizeof(st));
-    st.t=t_string;
+    set_type_of(&st,t_string);
 
     for (u=0;u<v;u++) {
       
@@ -288,6 +288,7 @@ fasload(object faslfile) {
 
 	struct htent *x;
 
+	set_type_of(&st,t_string);
 	st.st_self=(char *)q[u]->name;
 	st.st_fillp=st.st_dim=strlen(st.st_self);
 	if ((x=gethash((object)&st,sSAlink_hash_tableA->s.s_dbind))->hte_key==OBJNULL)

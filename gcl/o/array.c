@@ -536,7 +536,7 @@ DEFUN_NEW("MAKE-ARRAY1",object,fSmake_array1,SI,6,6,
     x->a.a_self = 0;
     x->a.a_rank = rank;
     x->a.a_displaced = Cnil;
-    x->a.a_dims = AR_ALLOC(alloc_relblock,rank,int);
+    x->a.a_dims = AR_ALLOC(alloc_relblock,rank,fixnum);
     i = 0;
     v = dimensions;
     while (i < rank)
@@ -754,12 +754,13 @@ Iarray_element_type(object x)
 /* add diff to body of x and arrays diisplaced to it */
 
 void
-adjust_displaced(object x, long diff)
-{
-	if (x->ust.ust_self != NULL)
-		x->ust.ust_self = (char *)((long)(x->a.a_self) + diff);
-	for (x = Mcdr(x->ust.ust_displaced);  x != Cnil;  x = Mcdr(x))
-		adjust_displaced(Mcar(x), diff);
+adjust_displaced(object x, long diff) {
+
+  if (x->ust.ust_self != NULL)
+    x->ust.ust_self = (char *)((long)(x->a.a_self) + diff);
+  for (x = Scdr(x->ust.ust_displaced);  x != Cnil;  x = Scdr(x)) 
+    adjust_displaced(Mcar(x), diff);
+  
 }
 
 

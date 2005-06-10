@@ -16,8 +16,8 @@ void gcl_init_or_load1 (void (*)(void),char *);
   char b[200];\
   \
   if (snprintf(b,sizeof(b),"ar x %-*.*slibgcl.a %s.o",\
-		sSAsystem_directoryA->s.s_dbind->st.st_fillp,\
-		sSAsystem_directoryA->s.s_dbind->st.st_fillp,\
+		(int)sSAsystem_directoryA->s.s_dbind->st.st_fillp,\
+		(int)sSAsystem_directoryA->s.s_dbind->st.st_fillp,\
 		sSAsystem_directoryA->s.s_dbind->st.st_self,#a)<=0)\
     error("Cannot unpack module " #a "o\n");\
   if (system(b)) \
@@ -47,8 +47,8 @@ load1(x)
    char b[200];\
    \
    if (snprintf(b,sizeof(b),"%-*.*s%s",\
-		sSAsystem_directoryA->s.s_dbind->st.st_fillp,\
-		sSAsystem_directoryA->s.s_dbind->st.st_fillp,\
+		(int)sSAsystem_directoryA->s.s_dbind->st.st_fillp,\
+		(int)sSAsystem_directoryA->s.s_dbind->st.st_fillp,\
 		sSAsystem_directoryA->s.s_dbind->st.st_self,a)<=0)\
      error("Cannot append system directory\n");\
    load1(b);\

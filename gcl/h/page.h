@@ -69,7 +69,7 @@ char sgc_type_map[MAXPAGE];
 			       (sgc_type_map[xSG] & SGC_WRITABLE)) \
 				 {if_code;}} while(0)
 
-#define sgc_mark_object(x) IF_WRITABLE(x,if((x)->d.m==0) sgc_mark_object1(x))
+#define sgc_mark_object(x) IF_WRITABLE(x,if(!is_marked(x)) sgc_mark_object1(x))
 /*
 #define sgc_mark_object(x) sgc_mark_object1(x)
 */
@@ -81,9 +81,9 @@ int sgc_on;
 
 
 /* for the S field of the FIRSTWORD */
-enum sgc_type { SGC_NORMAL,   /* not allocated since the last sgc */
-                SGC_RECENT    /* allocated since last sgc */
-		};
+enum sgc_type { SGC_NORMAL,    /* not allocated since the last sgc */
+                SGC_RECENT     /* allocated since last sgc */
+ 		};
 
 
 #define TM_BASE_TYPE_P(i) (((int) (tm_table[i].tm_type)) == i)
@@ -99,12 +99,7 @@ enum sgc_type { SGC_NORMAL,   /* not allocated since the last sgc */
 /* check if a relblock address is new relblock */
 #define SGC_RELBLOCK_P(x)  ((char *)(x) >= rb_start)
 
-/* the following assumes that the char s,m fields of first word
-   have same length as a short
-   (x->d.m || x->d.s) would be an equivalent for our purposes */
-struct sgc_firstword {short t; short sm;};
-#define SGC_OR_M(x)  (((struct sgc_firstword *)(x))->sm) 
-
+#define SGC_OR_M(x) (is_marked_or_free((object)x) || (is_cons((object)x) ? ON_SGC_PAGE((object)x) : ((object)x)->d.s))
 #ifndef SIGPROTV
 #define SIGPROTV SIGSEGV
 #endif
@@ -140,3 +135,5 @@ extern int page_multiple;
 */
 char type_map[MAXPAGE];
 
+#define	available_pages	\
+	((long)((real_maxpage-page(heap_end)-new_holepage-nrbpage-real_maxpage/32)))
