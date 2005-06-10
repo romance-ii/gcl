@@ -10,8 +10,9 @@ gclcvs (2.7.0-43) unstable; urgency=low
   * Automatic heap start lowering via linker script gcl.script
     (configure changes too)
   * Close ansi open/load errors failures
+  * Close ansi proclaim et.al. errors failures
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 10 Jun 2005 15:04:01 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 10 Jun 2005 15:04:47 +0000
 
 gclcvs (2.7.0-42) unstable; urgency=low
 

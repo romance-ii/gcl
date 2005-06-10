@@ -83,7 +83,7 @@
   (wt-data1 x)
   (get-output-stream-string *compiler-output-data*))
 
-(defun add-object (object &aux x)
+(defun add-object (object)
   ;;; Used only during Pass 1.
   (let ((object1 (cond ((and 
 			 (consp object)
@@ -201,6 +201,8 @@
 
 (defun add-function-proclamation (fname decl list &aux (procl t)
 					arg-types return-types)
+ (when (not (listp list))
+   (specific-error :wrong-type-argument "~S is not of type ~S." list 'list))
   (cond
    ((and (symbolp fname)
 	 (listp decl) (listp (cdr decl)))
@@ -299,6 +301,10 @@
                 (get fname 'cmp-notinline))))
 
 (defun proclaim (decl)
+ (when (not (listp decl))
+   (specific-error :wrong-type-argument "~S is not of type ~S." decl 'list))
+ (when (not (listp (cdr decl)))
+   (specific-error :wrong-type-argument "~S is not of type ~S." (cdr decl) 'list))
   (case (car decl)
     (special
      (dolist** (var (cdr decl))
@@ -306,7 +312,7 @@
            (si:*make-special var)
            (warn "The variable name ~s is not a symbol." var))))
     (optimize
-     (dolist (x (cdr decl))
+     (dolist** (x (cdr decl))
        (when (symbolp x) (setq x (list x 3)))
        (if (or (not (consp x))
                (not (consp (cdr x)))
@@ -378,6 +384,8 @@
   )
 
 (defun proclaim-var (type vl)
+ (when (not (listp vl))
+   (specific-error :wrong-type-argument "~S is not of type ~S." vl 'list))
   (setq type (type-filter type))
   (dolist** (var vl)
     (cond ((symbolp var)
