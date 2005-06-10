@@ -29,10 +29,16 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef CSSIZE
 #  define	CSSIZE		20000
 #endif
-#ifndef CSGETA
-#  define	CSGETA		4000
+/* #ifndef CSGETA */
+/* #  define	CSGETA		4000 */
+/* #endif */
+
+#ifdef __ia64__
+EXTER int *cs_base2;
+EXTER int *cs_org2;
 #endif
 
+EXTER int *cs_base;
 EXTER int *cs_org;
 EXTER int *cs_limit;
 
@@ -40,9 +46,11 @@ EXTER int *cs_limit;
 /* we catch the segmentation fault and check to warn of c stack overflow */
 #ifdef AV
 #ifndef cs_check
-#define	cs_check(something) \
-	if ((int *)(&something) < cs_limit) \
-		cs_overflow()
+#if CSTACK_DIRECTION == -1
+#define	cs_check(something) if ((long *)(&something) < cs_limit) cs_overflow()
+#else
+#define	cs_check(something) if ((long *)(&something) > cs_limit) cs_overflow()
+#endif
 #endif
 #endif
 #ifdef MV

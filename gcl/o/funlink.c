@@ -352,331 +352,843 @@ clean_link_array(object *ar, object *ar_end)
 #define LCAST(a) (*a)
 /*  #endif */
 
+static object c_apply_n0(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n0(object (*fn)(),object *x,object y,object z) {
+  return fn();
+}
+
+static object c_apply_n1(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n1(object (*fn)(),object *x,object y,object z) {
+  return fn(x[0]);
+}
+
+static object c_apply_n2(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n2(object (*fn)(),object *x,object y,object z) {
+  return fn(x[0],x[1]);
+}
+
+static object c_apply_n3(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n3(object (*fn)(),object *x,object y,object z) {
+  return fn(x[0],x[1],x[2]);
+}
+
+static object c_apply_n4(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n4(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3]);
+
+}
+
+static object c_apply_n5(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n5(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4]);
+
+}
+
+static object c_apply_n6(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n6(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5]);
+
+}
+
+static object c_apply_n7(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n7(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6]);
+
+}
+
+static object c_apply_n8(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n8(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7]);
+
+}
+
+static object c_apply_n9(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n9(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8]);
+
+}
+
+static object c_apply_n10(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n10(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9]);
+
+}
+
+static object c_apply_n11(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n11(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10]);
+
+}
+
+static object c_apply_n12(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n12(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11]);
+
+}
+
+static object c_apply_n13(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n13(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12]);
+
+}
+
+static object c_apply_n14(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n14(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13]);
+
+}
+
+static object c_apply_n15(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n15(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14]);
+
+}
+
+static object c_apply_n16(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n16(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15]);
+
+}
+
+static object c_apply_n17(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n17(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16]);
+
+}
+
+static object c_apply_n18(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n18(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17]);
+
+}
+
+static object c_apply_n19(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n19(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18]);
+
+}
+
+static object c_apply_n20(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n20(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19]);
+
+}
+
+static object c_apply_n21(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n21(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20]);
+
+}
+
+static object c_apply_n22(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n22(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21]);
+
+}
+
+static object c_apply_n23(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n23(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22]);
+
+}
+
+static object c_apply_n24(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n24(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23]);
+
+}
+
+static object c_apply_n25(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n25(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24]);
+
+}
+
+static object c_apply_n26(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n26(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25]);
+
+}
+
+static object c_apply_n27(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n27(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26]);
+
+}
+
+static object c_apply_n28(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n28(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27]);
+
+}
+
+static object c_apply_n29(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n29(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28]);
+
+}
+
+static object c_apply_n30(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n30(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29]);
+
+}
+
+static object c_apply_n31(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n31(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30]);
+
+}
+
+static object c_apply_n32(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n32(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31]);
+
+}
+
+static object c_apply_n33(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n33(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32]);
+
+}
+
+static object c_apply_n34(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n34(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33]);
+
+}
+
+static object c_apply_n35(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n35(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34]);
+
+}
+
+static object c_apply_n36(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n36(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35]);
+
+}
+
+static object c_apply_n37(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n37(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36]);
+
+}
+
+static object c_apply_n38(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n38(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37]);
+
+}
+
+static object c_apply_n39(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n39(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38]);
+
+}
+
+static object c_apply_n40(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n40(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39]);
+
+}
+
+static object c_apply_n41(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n41(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40]);
+
+}
+
+static object c_apply_n42(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n42(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41]);
+
+}
+
+static object c_apply_n43(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n43(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42]);
+
+}
+
+static object c_apply_n44(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n44(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43]);
+
+}
+
+static object c_apply_n45(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n45(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44]);
+
+}
+
+static object c_apply_n46(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n46(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44],x[45]);
+
+}
+
+static object c_apply_n47(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n47(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44],x[45],x[46]);
+
+}
+
+static object c_apply_n48(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n48(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44],x[45],x[46],x[47]);
+
+}
+
+static object c_apply_n49(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n49(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44],x[45],x[46],x[47],x[48]);
+
+}
+
+static object c_apply_n50(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n50(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44],x[45],x[46],x[47],x[48],x[49]);
+
+}
+
+static object c_apply_n51(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n51(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
+         x[50]);
+
+}
+
+static object c_apply_n52(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n52(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
+         x[50],x[51]);
+
+}
+
+static object c_apply_n53(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n53(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
+         x[50],x[51],x[52]);
+
+}
+
+static object c_apply_n54(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n54(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
+         x[50],x[51],x[52],x[53]);
+
+}
+
+static object c_apply_n55(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n55(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
+         x[50],x[51],x[52],x[53],x[54]);
+
+}
+
+static object c_apply_n56(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n56(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
+         x[50],x[51],x[52],x[53],x[54],x[55]);
+
+}
+
+static object c_apply_n57(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n57(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
+         x[50],x[51],x[52],x[53],x[54],x[55],x[56]);
+
+}
+
+static object c_apply_n58(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n58(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
+         x[50],x[51],x[52],x[53],x[54],x[55],x[56],
+         x[57]);
+
+}
+
+static object c_apply_n59(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n59(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
+         x[50],x[51],x[52],x[53],x[54],x[55],x[56],
+         x[57],x[58]);
+
+}
+
+static object c_apply_n60(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n60(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
+         x[50],x[51],x[52],x[53],x[54],x[55],x[56],
+         x[57],x[58],x[59]);
+
+}
+
+static object c_apply_n61(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n61(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
+         x[50],x[51],x[52],x[53],x[54],x[55],x[56],
+         x[57],x[58],x[59],x[60]);
+
+}
+
+static object c_apply_n62(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n62(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
+         x[50],x[51],x[52],x[53],x[54],x[55],x[56],
+         x[57],x[58],x[59],x[60],x[61]);
+
+}
+
+static object c_apply_n63(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n63(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
+         x[50],x[51],x[52],x[53],x[54],x[55],x[56],
+         x[57],x[58],x[59],x[60],x[61],x[62]);
+
+}
+
+static object c_apply_n64(object (*)(),object *,object,object) __attribute__ ((noinline));
+static object
+c_apply_n64(object (*fn)(),object *x,object y,object z) {
+
+  return fn(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
+         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
+         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
+         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
+         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
+         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
+         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
+         x[50],x[51],x[52],x[53],x[54],x[55],x[56],
+         x[57],x[58],x[59],x[60],x[61],x[62],x[63]);
+
+}
+
+#define CASE_N(a,b,c) case c : return Mjoin(c_apply_n,c)(a,b,OBJNULL,OBJNULL);break
+
 object
 c_apply_n(object (*fn)(), int n, object *x)
 {object res=Cnil;
-#ifdef DO_FUNLINK_DEBUG_1
-    fprintf ( stderr, "c_apply_n: n %d, x %x START\n", n, x );
-#endif 
+/*  clear_c_stack(&res-4*(n+16)); */
  switch(n){
-    case 0:  res=LCAST(fn)();break;
-    case 1:  res=LCAST(fn)(x[0]);break;
-    case 2:  res=LCAST(fn)(x[0],x[1]);break;
-    case 3:  res=LCAST(fn)(x[0],x[1],x[2]);break;
-    case 4:  res=LCAST(fn)(x[0],x[1],x[2],x[3]);break;
-    case 5:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4]);break;
-    case 6:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5]);break;
-    case 7:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6]);break;
-    case 8:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7]);break;
-    case 9:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8]);break;
-    case 10:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9]);break;
-    case 11:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10]);break;
-    case 12:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11]);break;
-    case 13:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12]);break;
-    case 14:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13]);break;
-    case 15:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14]);break;
-    case 16:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15]);break;
-    case 17:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16]);break;
-    case 18:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17]);break;
-    case 19:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18]);break;
-    case 20:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19]);break;
-    case 21:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20]);break;
-    case 22:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21]);break;
-    case 23:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22]);break;
-    case 24:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23]);break;
-    case 25:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24]);break;
-    case 26:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25]);break;
-    case 27:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26]);break;
-    case 28:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27]);break;
-    case 29:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28]);break;
-    case 30:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29]);break;
-    case 31:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30]);break;
-    case 32:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31]);break;
-    case 33:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32]);break;
-    case 34:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33]);break;
-    case 35:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34]);break;
-    case 36:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35]);break;
-    case 37:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36]);break;
-    case 38:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37]);break;
-    case 39:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38]);break;
-    case 40:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39]);break;
-    case 41:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40]);break;
-    case 42:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41]);break;
-    case 43:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42]);break;
-    case 44:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43]);break;
-    case 45:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44]);break;
-    case 46:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44],x[45]);break;
-    case 47:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44],x[45],x[46]);break;
-    case 48:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44],x[45],x[46],x[47]);break;
-    case 49:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44],x[45],x[46],x[47],x[48]);break;
-    case 50:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44],x[45],x[46],x[47],x[48],x[49]);break;
-    case 51:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
-         x[50]);break;
-    case 52:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
-         x[50],x[51]);break;
-    case 53:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
-         x[50],x[51],x[52]);break;
-    case 54:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
-         x[50],x[51],x[52],x[53]);break;
-    case 55:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
-         x[50],x[51],x[52],x[53],x[54]);break;
-    case 56:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
-         x[50],x[51],x[52],x[53],x[54],x[55]);break;
-    case 57:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
-         x[50],x[51],x[52],x[53],x[54],x[55],x[56]);break;
-    case 58:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
-         x[50],x[51],x[52],x[53],x[54],x[55],x[56],
-         x[57]);break;
-    case 59:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
-         x[50],x[51],x[52],x[53],x[54],x[55],x[56],
-         x[57],x[58]);break;
-    case 60:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
-         x[50],x[51],x[52],x[53],x[54],x[55],x[56],
-         x[57],x[58],x[59]);break;
-    case 61:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
-         x[50],x[51],x[52],x[53],x[54],x[55],x[56],
-         x[57],x[58],x[59],x[60]);break;
-    case 62:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
-         x[50],x[51],x[52],x[53],x[54],x[55],x[56],
-         x[57],x[58],x[59],x[60],x[61]);break;
-    case 63:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
-         x[50],x[51],x[52],x[53],x[54],x[55],x[56],
-         x[57],x[58],x[59],x[60],x[61],x[62]);break;
-    case 64:  res=LCAST(fn)(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],
-         x[8],x[9],x[10],x[11],x[12],x[13],x[14],
-         x[15],x[16],x[17],x[18],x[19],x[20],x[21],
-         x[22],x[23],x[24],x[25],x[26],x[27],x[28],
-         x[29],x[30],x[31],x[32],x[33],x[34],x[35],
-         x[36],x[37],x[38],x[39],x[40],x[41],x[42],
-         x[43],x[44],x[45],x[46],x[47],x[48],x[49],
-         x[50],x[51],x[52],x[53],x[54],x[55],x[56],
-         x[57],x[58],x[59],x[60],x[61],x[62],x[63]);break;
-  default: FEerror("Exceeded call-arguments-limit ",0);
+    CASE_N(fn,x,0);
+    CASE_N(fn,x,1);
+    CASE_N(fn,x,2);
+    CASE_N(fn,x,3);
+    CASE_N(fn,x,4);
+    CASE_N(fn,x,5);
+    CASE_N(fn,x,6);
+    CASE_N(fn,x,7);
+    CASE_N(fn,x,8);
+    CASE_N(fn,x,9);
+    CASE_N(fn,x,10);
+    CASE_N(fn,x,11);
+    CASE_N(fn,x,12);
+    CASE_N(fn,x,13);
+    CASE_N(fn,x,14);
+    CASE_N(fn,x,15);
+    CASE_N(fn,x,16);
+    CASE_N(fn,x,17);
+    CASE_N(fn,x,18);
+    CASE_N(fn,x,19);
+    CASE_N(fn,x,20);
+    CASE_N(fn,x,21);
+    CASE_N(fn,x,22);
+    CASE_N(fn,x,23);
+    CASE_N(fn,x,24);
+    CASE_N(fn,x,25);
+    CASE_N(fn,x,26);
+    CASE_N(fn,x,27);
+    CASE_N(fn,x,28);
+    CASE_N(fn,x,29);
+    CASE_N(fn,x,30);
+    CASE_N(fn,x,31);
+    CASE_N(fn,x,32);
+    CASE_N(fn,x,33);
+    CASE_N(fn,x,34);
+    CASE_N(fn,x,35);
+    CASE_N(fn,x,36);
+    CASE_N(fn,x,37);
+    CASE_N(fn,x,38);
+    CASE_N(fn,x,39);
+    CASE_N(fn,x,40);
+    CASE_N(fn,x,41);
+    CASE_N(fn,x,42);
+    CASE_N(fn,x,43);
+    CASE_N(fn,x,44);
+    CASE_N(fn,x,45);
+    CASE_N(fn,x,46);
+    CASE_N(fn,x,47);
+    CASE_N(fn,x,48);
+    CASE_N(fn,x,49);
+    CASE_N(fn,x,50);
+    CASE_N(fn,x,51);
+    CASE_N(fn,x,52);
+    CASE_N(fn,x,53);
+    CASE_N(fn,x,54);
+    CASE_N(fn,x,55);
+    CASE_N(fn,x,56);
+    CASE_N(fn,x,57);
+    CASE_N(fn,x,58);
+    CASE_N(fn,x,59);
+    CASE_N(fn,x,60);
+    CASE_N(fn,x,61);
+    CASE_N(fn,x,62);
+    CASE_N(fn,x,63);
+    CASE_N(fn,x,64);
+    default: FEerror("Exceeded call-arguments-limit ",0);
   } 
 
 #ifdef DO_FUNLINK_DEBUG_1

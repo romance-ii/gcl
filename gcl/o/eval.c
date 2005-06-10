@@ -95,8 +95,8 @@ quick_call_sfun(object fun)
 { DEBUG_AVMA
   int i=fun->sfn.sfn_argd,n=SFUN_NARGS(i);
   enum ftype restype;
-  object *x,res,*base;
-  object *temp_ar=alloca(n*sizeof(object));
+  object *x,res=OBJNULL,*base;
+  object *temp_ar=ZALLOCA(n*sizeof(object));
 /*   i=fun->sfn.sfn_argd; */
 /*   n=SFUN_NARGS(i); */
   base = vs_base;
@@ -157,13 +157,16 @@ call_vfun(object fun)
 void
 funcall(object fun)
 { 
-        object temporary;
-	object x;
-	 object * VOL top;
-	object *lex;
-	bds_ptr old_bds_top;
-	VOL bool b;
-	bool c;
+/*         object VOL sfirst=NULL; */
+/*         wipe_stack(&sfirst); */
+	{
+        object temporary=OBJNULL;
+	object x=OBJNULL;
+	object * VOL top=NULL;
+	object *lex=NULL;
+	bds_ptr old_bds_top=NULL;
+	VOL bool b=0;
+	bool c=0;
 	DEBUG_AVMA
       TOP:
 	if (fun == OBJNULL)
@@ -185,7 +188,7 @@ funcall(object fun)
 		return;
          case t_afun:
 	 case t_closure:
-	   { object res,*b = vs_base;
+	   { object res=OBJNULL,*b = vs_base;
 	     int n = vs_top - b;
 	     res = (object)IapplyVector(fun,n,b);
 	     n = fcall.nvalues;
@@ -197,7 +200,7 @@ funcall(object fun)
       case t_cclosure:
 
 	{
-		object *top, *base, l;
+		object *top=NULL, *base=NULL, l=OBJNULL;
 
 		if (fun->cc.cc_turbo != NULL) {
 			MMccall(fun, fun->cc.cc_turbo);
@@ -338,7 +341,7 @@ END:
 	lex_env = lex;
 	if (not_pushed == 0) {ihs_pop();}
 	CHECK_AVMA;
-}}
+}}}
 
 void
 funcall_no_event(object fun)
@@ -353,7 +356,7 @@ funcall_no_event(object fun)
 
 	case t_cclosure:
 	{
-		object *top, *base, l;
+		object *top=NULL, *base=NULL, l=OBJNULL;
 
 		if (fun->cc.cc_turbo != NULL) {
 			(*fun->cc.cc_self)(fun->cc.cc_turbo);
@@ -933,11 +936,11 @@ Ieval(object form)
 void
 eval(object form)
 { 
-        object temporary;
+        object temporary=OBJNULL;
         DEBUG_AVMA
-	object fun, x;
-	object *top;
-	object *base;
+	object fun=OBJNULL, x=OBJNULL;
+	object *top=NULL;
+	object *base=NULL;
 
 	cs_check(form);
 
@@ -1129,17 +1132,21 @@ call_applyhook(object fun)
 	super_funcall(ah);
 }
 
-
 DEFUNO_NEW("FUNCALL",object,fLfuncall,LISP
-       ,1,MAX_ARGS,NONE,OO,OO,OO,OO,void,Lfuncall,(object fun,...),"")
-{ va_list ap;
+       ,1,MAX_ARGS,NONE,OO,OO,OO,OO,void,Lfuncall,(object fun,...),"") { 
+
+  va_list ap;
   object *new;
-  int n = VFUN_NARGS;
+  int i,n = VFUN_NARGS-1;
+
+  if (n>=65) FEerror("arg limit exceeded",0);
+  new=ZALLOCA(n*sizeof(*new));
+/*   wipe_stack(&n); */
   va_start(ap,fun);
-  {COERCE_VA_LIST(new,ap,n);
-  return IapplyVector(fun,n-1,new);
+  for (i=0;i<n;i++)
+    new[i]=va_arg(ap,object);
   va_end(ap);
- }
+  return IapplyVector(fun,n,new);
 }
 
 

@@ -133,7 +133,7 @@ coerce_big_to_string(x,printbase)
  int sign=big_sign(x);
  object b;
  int size = (int)((ceil(MP_SIZE_IN_BASE2(MP(x))* digitsPerBit[printbase]))+.01);
- char *q,*p = alloca(size+5);
+ char *q,*p = ZALLOCA(size+5);
  q=p;
  if(sign<=0) {
    *q++ = '-';

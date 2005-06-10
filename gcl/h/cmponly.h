@@ -18,11 +18,11 @@ void isetq_fix();
 #define SETQ_II(var,alloc,val) \
   do{GEN _xx =(val) ; \
   int _n = replace_copy1(_xx,var); \
-  if(_n) var = replace_copy2(_xx,alloca(_n));}while(0)
+  if(_n) var = replace_copy2(_xx,ZALLOCA(_n));}while(0)
 
 #define SETQ_IO(var,alloc,val) {object _xx =(val) ; \
 			      int _n = obj_replace_copy1(_xx,var); \
-			    if(_n) var = obj_replace_copy2(_xx,alloca(_n));}
+			    if(_n) var = obj_replace_copy2(_xx,ZALLOCA(_n));}
 #define IDECL(a,b,c) our_ulong b[4];a =(b[0]=0x1010000 +4,b) ; object c
 #else
 GEN setq_io(),setq_ii();
@@ -50,7 +50,7 @@ MP_INT * otoi(object x);
 /* inside setjmp frames, and faster alloca allocation otherwise.*/
 /* FIXME, verify that IDECL need not be changed, improve logic behind malloc */
 /* selection, e.g. closure boundaries.  CM 20031201*/
-#define IDECL(a,b,c) mp_limb_t *c=(mp_limb_t *)alloca(1*sizeof(mp_limb_t));MP_INT b={1,1,c}; a = &b 
+#define IDECL(a,b,c) mp_limb_t *c=(mp_limb_t *)ZALLOCA(1*sizeof(mp_limb_t));MP_INT b={1,1,c}; a = &b 
 #define SETQ_IO(var,alloc,val,af) { object _xx = (val); \
                                     int _n; \
                                     if ((_n=obj_to_mpz(_xx,(var)))) {\

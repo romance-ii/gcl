@@ -6,6 +6,12 @@
 
 void enter_mark_origin() ;
 
+#ifdef __ia64__
+EXTER int *cs_base2;
+EXTER int *cs_org2;
+#endif
+
+EXTER int *cs_base;     
 EXTER int *cs_org;     
 EXTER int GBC_enable;
 
@@ -52,12 +58,6 @@ EXTER object user_package;
   while(_i++ <= max) { if (_i > _nargs) *__p++ = Cnil; \
 			 else *__p++ = va_arg(ap,object);} \
   va_end(ap)
-
-/*  #undef endp */
-
-/*  #define	endp(obje)	((enum type)((endp_temp = (obje))->d.t) == t_cons ? \ */
-/*  			 FALSE : endp_temp == Cnil ? TRUE : \ */
-/*  			 endp1(endp_temp)) */
 
 #ifndef NO_DEFUN
 #undef DEFUN
