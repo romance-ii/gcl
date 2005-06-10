@@ -33,81 +33,80 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 static object
-rando(object x, object rs)
-{
-	enum type tx;
-	object z;
-	double d;
-	
-	tx = type_of(x);
-	if (number_compare(x, small_fixnum(0)) != 1)
-		FEwrong_type_argument(TSpositive_number, x);
-	/*FIXME 64*/
-	d = (double)(rs->rnd.rnd_value>>1) / (4294967296.0/2.0);
-	d = number_to_double(x) * d;
-	if (tx == t_fixnum) {
-		z = make_fixnum((fixnum)d);
-		return(z);
-	} else if (tx == t_bignum) {
-		z = double_to_integer(d);
-		return(z);
-	} else if (tx == t_shortfloat) {
-		z = alloc_object(t_shortfloat);
-		sf(z) = (float)d;
-		return(z);
-	} else if (tx == t_longfloat) {
-		z = alloc_object(t_longfloat);
-		lf(z) = d;
-		return(z);
-	} else {
-		FEerror("~S is not an integer nor a floating-point number.",
-			1, x);
-		return(Cnil);
-	}
+rando(object x, object rs) {
+
+  enum type tx;
+  object base,out,z;
+  fixnum fbase;
+  double d;
+  
+  tx = type_of(x);
+  if (number_compare(x, small_fixnum(0)) != 1)
+    FEwrong_type_argument(TSpositive_number, x);
+  
+  if (tx==t_bignum) {
+    out=new_bignum();
+    base=x;
+    fbase=-1;
+  } else {
+    out=big_fixnum1;
+    fbase=tx==t_fixnum ? fix(x) : MOST_POSITIVE_FIX;
+    mpz_set_si(MP(big_fixnum2),fbase);
+    base=big_fixnum2;
+  }
+  
+  mpz_urandomm(MP(out),&rs->rnd.rnd_state,MP(base));
+  
+  switch (tx) {
+    
+  case t_fixnum:
+    return make_fixnum(mpz_get_si(MP(out)));
+  case t_bignum:
+    return normalize_big(out);
+  case t_shortfloat: case t_longfloat:
+    d=mpz_get_d(MP(out));
+    d/=(double)fbase;
+    z=alloc_object(tx);
+    if (tx==t_shortfloat) sf(z)=sf(x)*d; else lf(z)=lf(x)*d;
+    return z;
+  default:
+    FEerror("~S is not an integer nor a floating-point number.", 1, x);
+    return(Cnil);
+  }
 }
+
+
+#ifdef UNIX
+#define RS_DEF_INIT time(0)
+#else
+#define RS_DEF_INIT 0
+#endif
+
 
 static object
-make_random_state(object rs)
-{
-        object z;
-#ifdef AOSVS
+make_random_state(object rs) {
 
-#endif
+  object z;
+  
+  if (rs==Cnil)
+    rs=symbol_value(Vrandom_state);
+  
+  if (rs!=Ct && type_of(rs) != t_random) {
+    FEwrong_type_argument(sLrandom_state, rs);
+    return(Cnil);
+  }
+  
+  z = alloc_object(t_random);
+  bzero(&z->rnd.rnd_state,sizeof(z->rnd.rnd_state));
+  gmp_randinit_default(&z->rnd.rnd_state);
+  
+  if (rs == Ct) 
+    gmp_randseed_ui(&z->rnd.rnd_state,RS_DEF_INIT);
+  else
+    gmp_randseed(&z->rnd.rnd_state,rs->rnd.rnd_state._mp_seed);
+  
+  return(z);
 
-	if (rs == Cnil) {
-		z = alloc_object(t_random);
-		z->rnd.rnd_value = symbol_value(Vrandom_state)->rnd.rnd_value;
-		return(z);
-	} else if (rs == Ct) {
-		z = alloc_object(t_random);
-#ifdef UNIX
-		z->rnd.rnd_value = time(0);
-#endif
-#ifdef AOSVS
-
-
-
-
-#endif
-		return(z);
-	} else if (type_of(rs) != t_random) {
-   		FEwrong_type_argument(sLrandom_state, rs);
-		return(Cnil);
-	} else {
-		z =alloc_object(t_random);
-		z->rnd.rnd_value = rs->rnd.rnd_value;
-		return(z);
-	}
-}
-
-static void
-advance_random_state(object rs)
-{
-	rs->rnd.rnd_value
-	= rs->rnd.rnd_value
-	+ (rs->rnd.rnd_value<<2)
-	+ (rs->rnd.rnd_value<<17)
-	+ (rs->rnd.rnd_value<<27);
 }
 
 
@@ -121,7 +120,6 @@ LFD(Lrandom)(void)
 		vs_push(symbol_value(Vrandom_state));
 	check_arg(2);
 	check_type_random_state(&vs_base[1]);
-	advance_random_state(vs_base[1]);
 	x = rando(vs_base[0], vs_base[1]);
 	vs_top = vs_base;
 	vs_push(x);
