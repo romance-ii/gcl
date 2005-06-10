@@ -61,13 +61,13 @@ gcl_signal(int signo, handler_function_type handler)
     struct sigaction action;
     action.sa_handler = handler;
 /*    action.sa_flags =  SA_RESTART | ((signo == SIGSEGV || signo == SIGBUS) ? SV_ONSTACK : 0) */
-   action.sa_flags = SA_RESTART | ((signo == SIGSEGV || signo == SIGBUS) ? SV_ONSTACK : 0)  
+   action.sa_flags = SA_RESTART | ((signo == SIGSEGV || signo == SIGBUS) ? SA_ONSTACK : 0)  
 #ifdef SA_SIGINFO
     | SA_SIGINFO
 #endif      
       ;
     sigemptyset(&action.sa_mask);
-    sigaddset(&action.sa_mask,signo);
+/*     sigaddset(&action.sa_mask,signo); */
     sigaction(signo,&action,0);
 #else
 #ifdef HAVE_SIGVEC

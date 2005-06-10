@@ -297,7 +297,7 @@ typedef void (*funcvoid)(void);
 /* main.c:528:OF */ extern void bds_overflow (void); /* () */
 /* main.c:537:OF */ extern void frs_overflow (void); /* () */
 /* main.c:546:OF */ extern void ihs_overflow (void); /* () */
-/* main.c:556:OF */ extern void segmentation_catcher (int); /* () */
+/* main.c:556:OF */ extern void segmentation_catcher (int,long,void *,char *); /* () */
 /* main.c:587:OF */ extern void Lby (void); /* () */
 /* main.c:607:OF */ extern void Lquit(void); /* () */
 /* main.c:612:OF */ extern void Lexit(void); /* () */
@@ -1770,6 +1770,12 @@ gcl_isnormal_double(double);
 int 
 gcl_isnormal_float(float);
 
+void wipe_stack   (VOL void *);
+void clear_c_stack(VOL unsigned);
+
+long
+opt_maxpage(struct typemanager *);
+
 #ifdef SGC
 void
 memprotect_test_reset(void);
@@ -1796,3 +1802,7 @@ int sigprocmask ( int how, const sigset_t *set, sigset_t *oldset );
 void
 gprof_cleanup(void);
 #endif
+
+
+unsigned long
+ihash_equal1(object,int);

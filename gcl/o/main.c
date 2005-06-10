@@ -79,7 +79,6 @@ int    initflag          = FALSE;		/* initialized flag */
 int    raw_image         = FALSE;		/* raw or saved image */
 
 int    stack_multiple    = 1;
-unsigned int cssize      = 0;
 
 extern bool saving_system;
 extern long real_maxpage;
@@ -93,21 +92,46 @@ object sSAmultiply_stacksA;
 
 static object stack_space;
 
+/*FIXME: all ports should be able t use the default sigstack now --
+  some h/ implementations are broken.*/
 #ifndef SIG_STACK_SIZE
 #  define SIG_STACK_SIZE 1000
 #endif
 
-#ifndef SETUP_SIG_STACK
-#  if defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC)
-      struct sigstack estack;
-#  endif
-#endif
+/* #ifndef SETUP_SIG_STACK */
+/* #  if defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC) */
+/*       struct sigstack estack; */
+/* #  endif */
+/* #endif */
 
 #ifdef NEED_NONRANDOM_SBRK
 #include <syscall.h>
 #include <linux/personality.h>
 #include <unistd.h>
 #endif
+
+void
+wipe_stack(VOL void *l) {
+
+#if CSTACK_DIRECTION == -1
+   if (l>(void *)&l) bzero((void *)&l,l-(void *)&l);
+#else
+  l+=sizeof(l);
+  if ((void *)&l>l) bzero((void *)l,(void *)&l-l);
+#endif
+
+}
+
+void
+clear_c_stack(VOL unsigned n) {
+
+  void *v=OBJNULL;
+  alloca(n);
+  wipe_stack(&v);
+
+}
+
+unsigned long cssize      = 0;
 
 int
 main(int argc, char **argv, char **envp) {
@@ -221,26 +245,32 @@ main(int argc, char **argv, char **envp) {
     ihs_top = ihs_org-1;
     bds_top = bds_org-1;
     frs_top = frs_org-1;
-    cs_org = &argc;
+    cs_org = cs_base = &argc;
+#ifdef __ia64__
+ {
+   extern void * __libc_ia64_register_backing_store_base;
+   cs_org2=cs_base2=__libc_ia64_register_backing_store_base;
+ }
+#endif
     /* CSSIZE in bytes, cssize for pointer arithmetic. */ 
-    cssize = CSSIZE / sizeof ( void * );
+    cssize = CSSIZE;
 
 #ifdef BSD
 #  ifdef RLIMIT_STACK
     {
-      unsigned long mss;
-      mss=16*sizeof(short)*MAXPAGE; /* i.e. short foo[MAXPAGE] on stack in sgc_start */
+      /* unsigned long mss; */
+/*       mss=16*sizeof(short)*MAXPAGE; */ /* i.e. short foo[MAXPAGE] on stack in sgc_start */
       if (getrlimit(RLIMIT_STACK, &rl))
 	error("Cannot get stack rlimit\n");
-      if (rl.rlim_max != RLIM_INFINITY && rl.rlim_max < mss)
-	mss=rl.rlim_max;
+      if (rl.rlim_max != RLIM_INFINITY && rl.rlim_max < cssize)
+	cssize=rl.rlim_max;
       if (rl.rlim_cur == RLIM_INFINITY || 
-	  rl.rlim_cur != mss) {
-	rl.rlim_cur=mss;
+	  rl.rlim_cur != cssize) {
+	rl.rlim_cur=cssize;
 	if (setrlimit(RLIMIT_STACK,&rl))
 	  error("Cannot set stack rlimit\n");
       }
-      cssize = rl.rlim_cur/sizeof(*cs_org) - sizeof(*cs_org)*CSGETA;
+      cssize = rl.rlim_cur;
     }
 
     /* Maybe the soft limit for data segment size is lower than the
@@ -261,7 +291,7 @@ main(int argc, char **argv, char **envp) {
 
 #ifdef AV
     
-    cs_limit = cs_org - cssize;
+    cs_limit = cs_base + CSTACK_DIRECTION * cssize/sizeof(*cs_base);
 #endif
 
 
@@ -272,15 +302,19 @@ main(int argc, char **argv, char **envp) {
 #  if defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC)
     {
         /* make sure the stack is 8 byte aligned */
-#    ifdef SETJMP_ONE_DIRECTION
-        static
-#    endif /* SETUP_SIG_STACK */
-	    double estack_buf[SIG_STACK_SIZE];
+/* #    ifdef SETJMP_ONE_DIRECTION */
+/*         static */
+/* #    endif */ /* SETUP_SIG_STACK */
+      static double estack_buf[32*SIGSTKSZ];
+      static struct sigaltstack estack;
 	    
-        bzero(estack_buf,sizeof(estack_buf));
-        estack.ss_sp = (char *) &estack_buf[SIG_STACK_SIZE-1];
-        estack.ss_onstack=0;
-        sigstack(&estack,0);
+      bzero(estack_buf,sizeof(estack_buf));
+      estack.ss_sp = estack_buf;
+      estack.ss_flags = 0;                                   
+      estack.ss_size = sizeof(estack_buf);                             
+      if (sigaltstack(&estack, 0) < 0)                       
+	error("sigaltstack");                             
+
     }
 #  endif /* defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC) */
 
@@ -390,21 +424,27 @@ void install_segmentation_catcher(void)
 
 int catch_fatal=1;
 void
-error(char *s)
-{
-        if (catch_fatal>0 && interrupt_enable )
-            {catch_fatal = -1;
+error(char *s) {
+  if (catch_fatal>0 && interrupt_enable ) {
+    catch_fatal = -1;
 #ifdef SGC
-	   if (sgc_enabled)
-	     { sgc_quit();}
-	   if (sgc_enabled==0)
+    if (sgc_enabled)
+      sgc_quit();
+    if (sgc_enabled==0)
 #endif
-	     { install_segmentation_catcher() ;}
-	   FEerror("Caught fatal error [memory may be damaged]",0); }
-	printf("\nUnrecoverable error: %s.\n", s);
-	fflush(stdout);
+      install_segmentation_catcher();
+    {
+      struct string st;
+      set_type_of(&st,t_string);
+      st.st_dim=st.st_fillp=s ? strlen(s) : 0;
+      st.st_self=s;
+      FEerror("Caught fatal error [memory may be damaged]: ~a",1,&st);
+    }
+  }
+  printf("\nUnrecoverable error: %s.\n", s);
+  fflush(stdout);
 #ifdef UNIX
-    abort();
+  abort();
 #endif
 }
 
@@ -421,38 +461,41 @@ initlisp(void) {
 
         gcl_init_alloc();
 
-	Dotnil_body.t = (short)t_symbol;
-	Dotnil_body.s_dbind = Dotnil;
-	Dotnil_body.s_sfdef = NOT_SPECIAL;
-	Dotnil_body.s_fillp = 6;
-	Dotnil_body.s_self = "DOTNIL";
-	Dotnil_body.s_gfdef = OBJNULL;
-	Dotnil_body.s_plist = Cnil;
-	Dotnil_body.s_hpack = Cnil;
-	Dotnil_body.s_stype = (short)stp_constant;
-	Dotnil_body.s_mflag = FALSE;
+ 	Dotnil->c.c_cdr=Dotnil;
+ 	Dotnil->s.s_dbind = Dotnil;
+ 	Dotnil->s.s_sfdef = NOT_SPECIAL;
+ 	Dotnil->s.s_fillp = 6;
+ 	Dotnil->s.s_self = "DOTNIL";
+ 	Dotnil->s.s_gfdef = OBJNULL;
+ 	Dotnil->s.s_plist = Cnil;
+ 	Dotnil->s.s_hpack = Cnil;
+ 	Dotnil->s.s_stype = (short)stp_constant;
+ 	Dotnil->s.s_mflag = FALSE;
+	Dotnil->s.s_hash = ihash_equal1(Dotnil,0);
 	
-	Cnil_body.t = (short)t_symbol;
-	Cnil_body.s_dbind = Cnil;
-	Cnil_body.s_sfdef = NOT_SPECIAL;
-	Cnil_body.s_fillp = 3;
-	Cnil_body.s_self = "NIL";
-	Cnil_body.s_gfdef = OBJNULL;
-	Cnil_body.s_plist = Cnil;
-	Cnil_body.s_hpack = Cnil;
-	Cnil_body.s_stype = (short)stp_constant;
-	Cnil_body.s_mflag = FALSE;
+ 	Cnil->c.c_cdr=Cnil;
+ 	Cnil->s.s_dbind = Cnil;
+ 	Cnil->s.s_sfdef = NOT_SPECIAL;
+ 	Cnil->s.s_fillp = 3;
+ 	Cnil->s.s_self = "NIL";
+ 	Cnil->s.s_gfdef = OBJNULL;
+ 	Cnil->s.s_plist = Cnil;
+ 	Cnil->s.s_hpack = Cnil;
+ 	Cnil->s.s_stype = (short)stp_constant;
+ 	Cnil->s.s_mflag = FALSE;
+	Cnil->s.s_hash = ihash_equal1(Cnil,0);
 	
-	Ct_body.t = (short)t_symbol;
-	Ct_body.s_dbind = Ct;
-	Ct_body.s_sfdef = NOT_SPECIAL;
-	Ct_body.s_fillp = 1;
-	Ct_body.s_self = "T";
-	Ct_body.s_gfdef = OBJNULL;
-	Ct_body.s_plist = Cnil;
-	Ct_body.s_hpack = Cnil;
-	Ct_body.s_stype = (short)stp_constant;
-	Ct_body.s_mflag = FALSE;
+ 	Ct->c.c_cdr=Ct;
+ 	Ct->s.s_dbind = Ct;
+ 	Ct->s.s_sfdef = NOT_SPECIAL;
+ 	Ct->s.s_fillp = 1;
+ 	Ct->s.s_self = "T";
+ 	Ct->s.s_gfdef = OBJNULL;
+ 	Ct->s.s_plist = Cnil;
+ 	Ct->s.s_hpack = Cnil;
+ 	Ct->s.s_stype = (short)stp_constant;
+ 	Ct->s.s_mflag = FALSE;
+	Ct->s.s_hash = ihash_equal1(Ct,0);
 	
 	gcl_init_symbol();
 
@@ -602,15 +645,22 @@ ihs_overflow(void) {
 }
 
 void
-segmentation_catcher(int i) {
-#ifndef SIG_STACK_SIZE 
-  int x;
-  if (&x < cs_limit)
-    cs_overflow();
+segmentation_catcher(int i, long code, void *scp, char *addr) {
+
+  void *faddr;
+  faddr=((siginfo_t *)code)->si_addr;
+
+#if CSTACK_DIRECTION == -1
+  if (faddr < (void *)cs_limit) /*FIXME, perhaps bound by nearest page here.*/
+#else
+  if (faddr > (void *)cs_limit)
+#endif
+    FEerror("Control stack overflow.",0); /*FIXME -- provide getrlimit here.*/
   else 
     printf("Segmentation violation: c stack ok:signalling error");
-#endif
+
   error("Segmentation violation.");
+
 }
 
 DEFUNO_NEW("BYE",object,fLbye,LISP
@@ -708,12 +758,14 @@ FFN(siLcatch_fatal)(int i) {
 
 static void
 reset_cstack_limit(int arg) {
-#ifdef AV
-  if ( &arg > cs_org - cssize + 16 )
-      cs_limit = cs_org - cssize;
+#if CSTACK_DIRECTION==-1
+  if (&arg > cs_base - cssize/sizeof(*cs_base) + 16)
+#else
+  if (&arg < cs_base + cssize/sizeof(*cs_base) - 16)
+#endif
+    cs_limit = cs_base + CSTACK_DIRECTION * cssize/sizeof(*cs_base);
   else
       error ( "can't reset cs_limit" );
-#endif
 }
 
 LFD(siLreset_stack_limits)(void)
@@ -741,6 +793,16 @@ LFD(siLreset_stack_limits)(void)
     ihs_limit = ihs_org + stack_multiple *  IHSSIZE;
   else
     error("can't reset ihs_limit");
+  if (cs_base==cs_org)
+    cs_org=(void *)&i;
+#ifdef __ia64__
+ {
+   extern void * GC_save_regs_in_stack();
+   if (cs_base2==cs_org2)
+     cs_org2=GC_save_regs_in_stack();
+ }
+#endif
+
   reset_cstack_limit(i);
   vs_base[0] = Cnil;
 }
