@@ -148,6 +148,7 @@ signaled at this point in the stack.  For the moment the rest of the VARIABLES a
 
 (defun #. (if (boundp '*error-handler-function*) *error-handler-function* 'joe)
   (&rest error-handler-args)
+  (declare (:dynamic-extent error-handler-args))
   (when (equal error-handler-args *error-handler-args*)
     (format t "Error handler called recursively ~S~%"
 	    error-handler-args)
@@ -161,9 +162,8 @@ signaled at this point in the stack.  For the moment the rest of the VARIABLES a
 			     :string (fifth error-handler-args)
 			     :function (third error-handler-args)
 			     :continue-string (fourth error-handler-args)
-			     :format-args
-			     (copy-list (nthcdr 5 error-handler-args))
-			     :error-handler-args (copy-list error-handler-args))))
+			     :format-args (nthcdr 5 error-handler-args)
+			     :error-handler-args error-handler-args)))
     (cond (*catch-error* (throw :any-error err))
 	  ((let (flag) (do ((i 0 (the fixnum (1+ i)))
 			    (end (the fixnum(fill-pointer (the array

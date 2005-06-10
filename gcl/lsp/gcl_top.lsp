@@ -113,6 +113,7 @@
               (setq - (locally (declare (notinline read))
                                (read *standard-input* nil *top-eof*)))
               (when (eq - *top-eof*) (bye))
+;              (si::clear-c-stack 4096)
               (let ((values (multiple-value-list
                              (locally (declare (notinline eval)) (eval -)))))
                 (setq /// // // / / values *** ** ** * * (car /))
@@ -151,21 +152,26 @@
 	 ((eq ch eof-value) (return-from dbl-read eof-value)))
    (unread-char ch stream))
 
-  (cond ((eql #\: ch)
-	 (setq tem
-	       (string-concatenate
-		"("
-		(read-line stream eof-error-p eof-value)")"))
-	 (read  (make-string-input-stream tem)
-					 eof-error-p eof-value))
+  (cond 
+;   ((eql #\: ch)
+;    (setq tem
+;	  (string-concatenate
+;	   "("
+;	   (read-line stream eof-error-p eof-value)")"))
+;    (read  (make-string-input-stream tem)
+;	   eof-error-p eof-value))
 	(t (read stream eof-error-p eof-value))))
 
 
 (defun break-level (at &optional env)
   (let* ((*break-message* (if (stringp at) at *break-message*))
-	 (*quit-tags* (cons (cons *break-level* *quit-tag*) *quit-tags*))
-         (*quit-tag* (cons nil nil))
-         (*break-level* (if (not at) *break-level* (cons t *break-level*)))
+	 (quit-tags1 (cons *break-level* *quit-tag*))
+	 (quit-tags (cons quit-tags1 *quit-tags*))
+	 (*quit-tags* quit-tags)
+         (quit-tag (cons nil nil))
+         (*quit-tag* quit-tag)
+         (break-level (cons t *break-level*))
+         (*break-level* (if (not at) *break-level* break-level))
          (*ihs-base* (1+ *ihs-top*))
          (*ihs-top* (1- (ihs-top)))
          (*current-ihs* *ihs-top*)
@@ -184,6 +190,7 @@
          (* *) (** **) (*** ***)
          (/ /) (// //) (/// ///)
          )
+    (declare (:dynamic-extent quit-tags quit-tags1 quit-tag break-level))
 					; (terpri *error-output*)
     (unless (or be (not (stringp at)))
       (simple-backtrace)
@@ -210,15 +217,19 @@
           (setq - (locally (declare (notinline read))
 			   (dbl-read *debug-io* nil *top-eof*)))
           (when (eq - *top-eof*) (bye -1))
-          (let* ( break-command
+          (let* (break-command
 		 (values
 		  (multiple-value-list
 		  (LOCALLY (declare (notinline break-call evalhook))
-			   (if (keywordp -)(setq - (cons - nil)))
-			   (cond ((and (consp -) (keywordp (car -)))
-				  (setq break-command t)
-				  (break-call (car -) (cdr -) 'si::break-command))
-				 (t (evalhook - nil nil *break-env*)))))))
+;			   (if (keywordp -)(setq - (cons - nil)))
+			   (cond 
+			    ((keywordp -)
+			     (setq break-command t)
+			     (break-call - nil 'si::break-command))
+			    ((and (consp -) (keywordp (car -)))
+			     (setq break-command t)
+			     (break-call (car -) (cdr -) 'si::break-command))
+			    (t (evalhook - nil nil *break-env*)))))))
 	    (and break-command (eq (car values) :resume )(return))
             (setq /// // // / / values *** ** ** * * (car /))
             (fresh-line *debug-io*)
@@ -246,7 +257,7 @@
   (error-name correctable function-name
    continue-format-string error-format-string
    &rest args &aux message)
-  (declare (ignore error-name))
+  (declare (ignore error-name) (:dynamic-extent args))
   (let ((*print-pretty* nil)
         (*print-level* *debug-print-level*)
         (*print-length* *debug-print-level*)
