@@ -230,7 +230,7 @@ int case_fold_search = 0;
  * of the structure of the compiled regexp.
  */
 static regexp *
-regcomp(char *exp,int *sz)
+regcomp(char *exp,fixnum *sz)
 {
 	register regexp *r;
 	register char *scan;

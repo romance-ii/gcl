@@ -1385,7 +1385,7 @@ read_fasd1(int i, object *loc)
 	 x->a.a_displaced=Cnil;
 	 x->a.a_adjustable=0;
 	 if (x->a.a_rank > 0)
-	   { x->a.a_dims = (int *)alloc_relblock(sizeof(int)*(x->a.a_rank)); }
+	   { x->a.a_dims = (fixnum *)alloc_relblock(sizeof(fixnum)*(x->a.a_rank)); }
 	 for (i=0; i< x->a.a_rank ; i++)
 	   GET4(x->a.a_dims[i]);
 	 array_allocself(x,0,Cnil);
@@ -1525,7 +1525,7 @@ read_fasl_vector(object in)
   { BEGIN_NO_INTERRUPT;
 #ifdef HAVE_ALLOCA
   current_fasd.table->v.v_self
-    = (object *)alloca(n*sizeof(object));
+    = (object *)ZALLOCA(n*sizeof(object));
 #else
   current_fasd.table->v.v_self
     = (object *)alloc_relblock(n*sizeof(object));
