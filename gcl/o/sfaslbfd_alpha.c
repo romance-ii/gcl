@@ -313,7 +313,7 @@ alphaelf_create_got(bfd *b,asymbol **syms,
       
       sz = bfd_get_reloc_upper_bound(b, p);
       assert(sz>0);
-      reloc=alloca(sz);
+      reloc=ZALLOCA(sz);
       
       reloc_count = bfd_canonicalize_reloc(b, p, reloc, syms);
       assert(reloc_count>0);

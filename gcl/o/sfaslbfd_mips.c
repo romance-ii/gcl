@@ -374,7 +374,7 @@ mipself_create_got(bfd *b,asymbol **syms,
       
       storage_needed = bfd_get_reloc_upper_bound(b, p);
       assert(storage_needed>0);
-      reloc=alloca(storage_needed);
+      reloc=ZALLOCA(storage_needed);
 
       reloc_count = bfd_canonicalize_reloc(b, p, reloc, syms);
       assert(reloc_count>0);
