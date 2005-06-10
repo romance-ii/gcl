@@ -11,29 +11,36 @@ AC_SUBST(VERSION)
 #
 
 help="--enable-maxpage=XXXX will compile in a page table of size XXX (default ${default_maxpage})"
-AC_ARG_ENABLE(maxpage,[ --enable-maxpage=XXXX will compile in a page table of size XXX (eg '--enable-maxpage=64*1024' would give 64K pages allowing 256 MB if pages are 4K each)] ,
-[AC_DEFINE_UNQUOTED(MAXPAGE,$enable_maxpage)])
 
-AC_ARG_ENABLE(holepage,[ --enable-holepage=XXXX will compile in a XXX-sized hole between the heap and relocatable memory area (eg '--enable-holepage=64*1024' would give 64K pages allowing 256 MB if pages are 4K each)] ,
-[AC_DEFINE_UNQUOTED(HOLEPAGE,$enable_holepage)])
+AC_ARG_ENABLE(maxpage,[ --enable-maxpage=XXXX will compile in a page table of size XXX (eg '--enable-maxpage=64*1024' would give 64K pages allowing 256 MB if pages are 4K each)],,enable_maxpage=262144)
+#AC_DEFINE_UNQUOTED(MAXPAGE,$enable_maxpage)
 
-AC_ARG_ENABLE(vssize,[ --enable-vssize=XXXX will compile in a value stack of size XXX] ,
-[AC_DEFINE_UNQUOTED(VSSIZE,$enable_vssize)])
 
-AC_ARG_ENABLE(bdssize,[ --enable-bdssize=XXXX will compile in a binding stack of size XXX] ,
-[AC_DEFINE_UNQUOTED(BDSSIZE,$enable_bdssize)])
+AC_ARG_ENABLE(holediv,[ --enable-holediv=XXXX will specify that 1/XXXX of the core should be used as the hole between the heap and relocatable memory area],,enable_holediv=4)
+AC_DEFINE_UNQUOTED(HOLEDIV,$enable_holediv)
 
-AC_ARG_ENABLE(ihssize,[ --enable-ihssize=XXXX will compile in a invocation history stack of size XXX] ,
-[AC_DEFINE_UNQUOTED(IHSSIZE,$enable_ihssize)])
 
-AC_ARG_ENABLE(frssize,[ --enable-frssize=XXXX will compile in a frame stack of size XXX] ,
-[AC_DEFINE_UNQUOTED(FRSSIZE,$enable_frssize)])
+AC_ARG_ENABLE(vssize,[ --enable-vssize=XXXX will compile in a value stack of size XXX],,enable_vssize=131072)
+AC_DEFINE_UNQUOTED(VSSIZE,$enable_vssize)
 
-AC_ARG_ENABLE(cssize,[ --enable-cssize=XXXX produces executables with a C stack of size XXX] ,
-[AC_DEFINE_UNQUOTED(CSSIZE,$enable_cssize)])
 
+AC_ARG_ENABLE(bdssize,[ --enable-bdssize=XXXX will compile in a binding stack of size XXX],,enable_bdssize=2048)
+AC_DEFINE_UNQUOTED(BDSSIZE,$enable_bdssize)
+
+
+AC_ARG_ENABLE(ihssize,[ --enable-ihssize=XXXX will compile in a invocation history stack of size XXX],,enable_ihssize=4096)
+AC_DEFINE_UNQUOTED(IHSSIZE,$enable_ihssize)
+
+AC_ARG_ENABLE(frssize,[ --enable-frssize=XXXX will compile in a frame stack of size XXX],,enable_frssize=4096)
+AC_DEFINE_UNQUOTED(FRSSIZE,$enable_frssize)
+
+AC_ARG_ENABLE(cssize,[ --enable-cssize=XXXX produces executables with a C stack of size XXX],,enable_cssize=1073741824)
+#AC_DEFINE_UNQUOTED(CSSIZE,$enable_cssize)
+  
 AC_ARG_ENABLE(machine,[ --enable-machine=XXXX will force the use of one of the definitions in h/XXXX.defs] ,
 [enable_machine=$enableval],[enable_machine=""])
+
+AC_ARG_ENABLE(immfix,[ --enable-immfix will enable an immediate fixnum table above the C stack],,enable_immfix=yes)
 
 #AC_ARG_ENABLE(gmp,[ --enable-gmp=no will disable use of GMP gnu multiprecision arithmetic, (default is =yes)] ,
 #[use_gmp=$enableval],[use_gmp="yes"])
@@ -494,6 +501,10 @@ case $use in
 	case $use in
 #		amd64*) # stack-boundary option does not work
 #			TCFLAGS="$TCFLAGS -m64 -mpreferred-stack-boundary=8";;  
+#		386*)
+#			TCFLAGS="$TCFLAGS -mpreferred-stack-boundary=2";;  
+#		amd64*)
+#			TCFLAGS="$TCFLAGS -mpreferred-stack-boundary=3";;  
 		alpha*)
 			TCFLAGS="$TCFLAGS -mieee";;
 #		m68k*)
@@ -891,6 +902,35 @@ fi
 # addresses, in calculating a page for an address in the heap.
 
 AC_CHECK_SIZEOF(long,0)
+AC_CHECK_SIZEOF(int,0)
+AC_CHECK_SIZEOF(short,0)
+AC_CHECK_SIZEOF(char,0)
+
+AC_MSG_CHECKING(for number of bits in char)
+AC_TRY_RUN([#include <stdio.h>
+int main() {
+FILE *fp=fopen("conftest1","w");;
+unsigned char c;
+int i;
+for (i=0,c=1;c;c<<=1,i++);
+fprintf(fp,"%d",i);
+return 0;
+}],char_size=`cat conftest1`,
+		 echo Cannot find char_size;exit 1,
+		 echo Cannot find char_size;exit 1)
+AC_MSG_RESULT($char_size)
+AC_DEFINE_UNQUOTED(CHAR_SIZE,$char_size)
+
+AC_CHECK_HEADERS(endian.h,
+	AC_MSG_CHECKING("endianness")
+	AC_TRY_RUN([#define __ARMEB__
+		#include <endian.h> 
+		int main() { return BYTE_ORDER == __LITTLE_ENDIAN ? 0 : 1;}],
+	AC_DEFINE(LITTLE_END) AC_MSG_RESULT(little),
+	AC_MSG_RESULT(big),AC_MSG_RESULT(big)))
+AC_SUBST(LITTLE_END)
+
+
 AC_MSG_CHECKING(sizeof struct contblock)
 
 # work around MSYS pwd result incompatibility
@@ -926,16 +966,6 @@ fi
 AC_MSG_RESULT($sizeof_contblock)
 AC_DEFINE_UNQUOTED(SIZEOF_CONTBLOCK,$sizeof_contblock)
 
-
-
-AC_CHECK_HEADERS(endian.h,
-	AC_MSG_CHECKING("endianness")
-	AC_TRY_RUN([#define __ARMEB__
-		#include <endian.h> 
-		int main() { return BYTE_ORDER == __LITTLE_ENDIAN ? 0 : 1;}],
-	AC_DEFINE(LITTLE_END) AC_MSG_RESULT(little),
-	AC_MSG_RESULT(big),AC_MSG_RESULT(big)))
-AC_SUBST(LITTLE_END)
 
 
 # On systems with execshield, brk is randomized.  We need to catch
@@ -1048,9 +1078,41 @@ if test "$HAVE_SBRK" = "1" ; then
 	fi
 fi
 
+AC_MSG_CHECKING("finding default linker script")
+touch unixport/gcl.script
+echo "int main() {return 0;}" >foo.c
+$CC -Wl,--verbose foo.c -o foo 2>&1 | \
+    awk '/==================================================/ {i=1-i;next} {if (i) print}' >gcl.script
+rm -rf foo.c foo
+if test "`cat gcl.script | wc -l`" != "0" ; then
+  AC_MSG_RESULT(got it)
+  AC_MSG_CHECKING("trying to lower heap start")
+  cp gcl.script gcl.script.def
+  cat gcl.script.def | awk '/SIZEOF_HEADERS/ {gsub("0x...","0x000",$0);} {print}' >gcl.script
+  if diff gcl.script.def gcl.script >/dev/null 2>&1 ; then
+     AC_MSG_RESULT("cannot or not needed")
+     rm -f gcl.script gcl.script.def
+  else
+     AC_MSG_CHECKING("linker script")
+     echo "int main() {return 0;}" >foo.c
+     if $CC -Wl,-T gcl.script foo.c -o foo >/dev/null 2>&1 && ./foo >/dev/null 2>&1 ; then
+          AC_MSG_RESULT("done")
+	  rm -f gcl.script.def
+	  LDFLAGS="$LDFLAGS -Wl,-T gcl.script "
+	  cp gcl.script unixport
+     else
+          AC_MSG_RESULT("failed")
+          rm -f gcl.script gcl.script.def
+     fi	  
+     rm -rf foo.c foo
+  fi
+else
+  AC_MSG_RESULT("none")
+  rm -f gcl.script
+fi
 
 old_LDFLAGS="$LDFLAGS"
-LDFLAGS="$TLDFLAGS"
+LDFLAGS="$LDFLAGS $TLDFLAGS"
 AC_MSG_CHECKING("finding DBEGIN")
 AC_TRY_RUN([#include <stdio.h>
             #include <stdlib.h>
@@ -1094,6 +1156,51 @@ AC_DEFINE_UNQUOTED(DBEGIN,$dbegin \
 AC_MSG_RESULT(got $dbegin)
 LDFLAGS="$old_LDFLAGS"
 
+AC_MSG_CHECKING("for heap shared library heap ceiling")
+echo "int main() {return 0;}" >foo.c
+$CC foo.c -o foo
+heap_ceiling=`ldd foo | tail -n 1 | awk '{print $NF}' | tr -d '()'`
+heap_ceiling=`awk 'END {if (h<d) print 0; else print h}' h=$heap_ceiling d=$dbegin configure.in`
+AC_MSG_RESULT("got $heap_ceiling")
+AC_DEFINE_UNQUOTED(SHARED_LIB_HEAP_CEILING,$heap_ceiling)
+
+# pagewidth
+AC_MSG_CHECKING(for pagewidth)
+AC_TRY_RUN([#include <stdio.h>
+            #include <unistd.h>
+int main() {size_t i=getpagesize(),j; 
+	    FILE *fp=fopen("conftest1","w");
+	    for (j=0;i>>=1;j++);
+	    fprintf(fp,"%u",j);
+	    return 0;}],PAGEWIDTH=`cat conftest1`,PAGEWIDTH=0,PAGEWIDTH=0)
+AC_MSG_RESULT($PAGEWIDTH)
+AC_DEFINE_UNQUOTED(PAGEWIDTH,$PAGEWIDTH)
+AC_SUBST(PAGEWIDTH)
+
+AC_MSG_CHECKING("for maxpage revision")
+AC_TRY_RUN([#include <stdio.h>
+main()
+{
+  char *b;
+  unsigned long i,j;
+  FILE *fp = fopen("conftest1","w");
+  j=((unsigned long)$enable_maxpage <<$PAGEWIDTH) + $dbegin;
+  j=$heap_ceiling && j>$heap_ceiling ? $heap_ceiling : j;
+  j-=$dbegin;
+  for (i=1;i<=j;i<<=1);
+  if (i>j) i>>=1;
+  fprintf(fp,"%ld",i>>$PAGEWIDTH);
+  fclose(fp);
+  return 0;
+}],tmp_maxpage=`cat conftest1`,tmp_maxpage=0,tmp_maxpage=0)
+if test "$tmp_maxpage" != "$enable_maxpage" ; then
+   enable_maxpage=$tmp_maxpage
+   AC_MSG_RESULT("got $enable_maxpage")
+#   AC_DEFINE_UNQUOTED(MAXPAGE,$enable_maxpage)
+else
+   AC_MSG_RESULT("$enable_maxpage is OK")
+fi
+AC_DEFINE_UNQUOTED(MAXPAGE,$enable_maxpage)
 
 AC_MSG_CHECKING("finding CSTACK_ADDRESS")
 AC_TRY_RUN([#include <stdio.h>
@@ -1108,6 +1215,122 @@ main()
 AC_DEFINE_UNQUOTED(CSTACK_ADDRESS,$cstack_address \
 )
 AC_MSG_RESULT(got $cstack_address)
+
+AC_MSG_CHECKING("finding CSTACK_ALIGNMENT")
+AC_TRY_RUN([#include <stdio.h>
+main()
+{
+  void *b,*c;
+  FILE *fp = fopen("conftest1","w");
+  long n;
+  b=alloca(sizeof(b));
+  c=alloca(sizeof(c));
+  n=b>c ? b-c : c-b;
+  n=n>sizeof(c) ? n : 0;
+  fprintf(fp,"%ld",n);
+  fclose(fp);
+  return 0;
+}],cstack_alignment=`cat conftest1`,cstack_alignment=0,cstack_alignment=0)
+AC_DEFINE_UNQUOTED(CSTACK_ALIGNMENT,$cstack_alignment \
+)
+AC_MSG_RESULT(got $cstack_alignment)
+
+AC_MSG_CHECKING("finding CSTACK_DIRECTION")
+AC_TRY_RUN([#include <stdio.h>
+void *
+foo(void) {
+int i;
+return (void *)&i;
+}
+
+int
+main()
+{
+  char *b;
+  FILE *fp = fopen("conftest1","w");
+  fprintf(fp,"%d",((long) &b) > ((long) foo()) ? -1 : 1);
+  fclose(fp);
+  return 0;
+}],cstack_direction=`cat conftest1`,cstack_direction=0,cstack_direction=0)
+AC_DEFINE_UNQUOTED(CSTACK_DIRECTION,$cstack_direction \
+)
+AC_MSG_RESULT(got $cstack_direction)
+
+AC_MSG_CHECKING("for C stack size floor from heap ")
+AC_TRY_RUN([#include <stdio.h>
+int
+main()
+{
+  char *b;
+  FILE *fp = fopen("conftest1","w");
+  unsigned long j,k;
+  
+  j=((unsigned long)&b) + $cstack_direction * $enable_cssize;
+  k=($dbegin + ((unsigned long)$enable_maxpage << $PAGEWIDTH));
+  j=abs(j-((unsigned long)&b))!=$enable_cssize || j<k ? k : j;
+  j-=((unsigned long)&b);
+  j*=$cstack_direction;
+  fprintf(fp,"%lu",j);
+  fclose(fp);
+  return 0;
+}],tmp_cssize=`cat conftest1`,tmp_cssize=0,tmp_cssize=0)
+if test "$tmp_cssize" != "$enable_cssize" ; then
+   enable_cssize=$tmp_cssize;
+   AC_MSG_RESULT("got $enable_cssize")
+#   AC_DEFINE_UNQUOTED(CSSIZE,$enable_cssize)
+else
+   AC_MSG_RESULT("$enable_cssize is OK")
+fi
+AC_DEFINE_UNQUOTED(CSSIZE,$enable_cssize)
+
+cstack_top=0
+cstack_range=0
+AC_MSG_CHECKING("finding cstack top")
+AC_TRY_RUN([#include <stdio.h>
+int
+main()
+{
+  void *v;
+  unsigned long i,j,k;
+  FILE *fp = fopen("conftest1","w");
+
+  for (i=2,k=1;i;k=i,i<<=1);
+  for (i=j=k;j && i<(unsigned long)&v + ($cstack_direction==1 ? $enable_cssize : 0);j>>=1,i|=j);
+  fprintf(fp,"0x%lx",i&-0x1000);
+  fclose(fp);
+  return 0;
+}],cstack_top=`cat conftest1`,cstack_top=0,cstack_top=0)
+AC_MSG_RESULT(got $cstack_top)
+if test "$cstack_top" != "0" ; then
+   AC_MSG_CHECKING("finding over cstack half range")
+   AC_TRY_RUN([#include <stdio.h>
+   int
+   main()
+   {
+     unsigned long j;
+     FILE *fp = fopen("conftest1","w");
+
+     for (j=1;j && !(j& $cstack_top);j<<=1);
+     fprintf(fp,"0x%lx",j>>1);
+     fclose(fp);
+     return 0;
+   }],cstack_range=`cat conftest1`,cstack_range=0,cstack_range=0)
+   AC_MSG_RESULT(got $cstack_range)
+   if test "$cstack_range" != "0" ; then 
+	AC_DEFINE_UNQUOTED(CSTACK_TOP,$cstack_top)
+      AC_DEFINE_UNQUOTED(CSTACK_RANGE,$cstack_range)
+   fi
+fi
+
+if test "$enable_immfix" = "yes" ; then
+  if test "$cstack_top" != "0" ; then
+     if test "$cstack_range" != "0" ; then 
+	AC_DEFINE_UNQUOTED(IM_FIX_BASE,$cstack_top)
+        AC_DEFINE_UNQUOTED(IM_FIX_LIM,$cstack_range)
+     fi
+  fi
+fi
+
 
 AC_MSG_CHECKING("sizeof long long int")
 AC_TRY_RUN([#include <stdio.h>
@@ -1146,23 +1369,6 @@ FLISP="saved_$SYSTEM"
 AC_SUBST(FLISP)
 AC_SUBST(SYSTEM)
 AC_SUBST(CLSTANDARD)
-
-# pagewidth
-AC_MSG_CHECKING(for pagewidth)
-AC_TRY_RUN([#include <stdio.h>
-            #include <unistd.h>
-int main() {size_t i=getpagesize(),j; 
-	    FILE *fp=fopen("conftest1","w");
-	    for (j=0;i>>=1;j++);
-	    fprintf(fp,"%u",j);
-	    return 0;}],PAGEWIDTH=`cat conftest1`,PAGEWIDTH=0,PAGEWIDTH=0)
-AC_MSG_RESULT($PAGEWIDTH)
-AC_DEFINE_UNQUOTED(PAGEWIDTH,$PAGEWIDTH)
-AC_SUBST(PAGEWIDTH)
-
-# Maximum number of pages
-
-
 
 # Check if Posix compliant getcwd exists, if not we'll use getwd.
 AC_CHECK_FUNCS(getcwd)
@@ -1810,7 +2016,7 @@ if  2>&1 $CC -v | fgrep "gcc version 2.96" > /dev/null
 	AC_MSG_RESULT([no])
 fi 
 
-LIBS="$LDFLAGS $TLDFLAGS $LIBS $TLIBS"
+LIBS="`echo $LDFLAGS | sed 's,gcl.script,../unixport/gcl.script,g'` $TLDFLAGS $LIBS $TLIBS"
 AC_SUBST(LIBS)
 FINAL_CFLAGS="$CFLAGS $TCFLAGS $PROCESSOR_FLAGS"
 AC_SUBST(FINAL_CFLAGS)

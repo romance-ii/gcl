@@ -5,8 +5,10 @@ gclcvs (2.7.0-43) unstable; urgency=low
     a group
   * Fix remaining misc test failure by bridging the old string-char into
     character -- FIXME, this needs to be done throughout
+  * All page size defaults in configure.in; memory bounds checking in
+    configure
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  9 May 2005 19:59:26 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 10 Jun 2005 15:00:55 +0000
 
 gclcvs (2.7.0-42) unstable; urgency=low
 
