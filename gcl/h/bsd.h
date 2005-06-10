@@ -65,9 +65,10 @@ do {char *x=sbrk(0); \
      	heap_end = sbrk(0); ROUND_UP_SBRK(heap_end);\
 	heap_end = core_end = sbrk(0);
 
+#define MAXCORE ((char *)((unsigned long)DBEGIN+(unsigned long)(MAXPAGE-1)*PAGESIZE))
 #define IF_ALLOCATE_ERR \
         FIX_RANDOM_SBRK; \
-	if (core_end != sbrk(PAGESIZE*(n - m)))
+	if (core_end+PAGESIZE*(n - m)>MAXCORE || core_end != sbrk(PAGESIZE*(n - m)))
 
 #define SYM_EXTERNAL_P(sym) ((sym)->n_type & N_EXT)
      
