@@ -250,6 +250,29 @@
           cfun cclosure sfun gfun vfun afun closure cfdata spice))
 
 
+(defun heaprep nil
+  
+  (let ((f (list
+	    "word size:            ~a bits~%"
+	    "page size:            ~a bytes~%"
+	    "heap start:           0x~x~%"
+	    "heap max :            0x~x~%"
+	    "shared library start: 0x~x~%"
+	    "cstack start:         0x~x~%"
+	    "cstack mark offset:   ~a bytes~%"
+	    "cstack direction:     ~[downward~;upward~;~]~%"
+	    "cstack alignment:     ~a bytes~%"
+	    "cstack max:           ~a bytes~%"
+	    "immfix start:         0x~x~%"
+	    "immfix size:          ~a fixnums~%"))
+	(v (multiple-value-list (si::heap-report))))
+    
+    (do ((v v (cdr v)) (f f (cdr f))) ((not (car v)))
+	(format t (car f) 
+		(let ((x (car v))) 
+		  (cond ((>= x 0) x) 
+			((+ x (* 2 (1+ most-positive-fixnum))))))))))
+
 (defun room (&optional x)
   (let ((l (multiple-value-list (si:room-report)))
         maxpage leftpage ncbpage maxcbpage ncb cbgbccount npage
@@ -262,7 +285,7 @@
           rbused (nth 7 l) rbfree (nth 8 l) nrbpage (nth 9 l)
           rbgbccount (nth 10 l)
           l (nthcdr 11 l))
-    (do ((l l (nthcdr 5 l))
+    (do ((l l (nthcdr 6 l))
          (tl *type-list* (cdr tl))
          (i 0 (+ i (if (nth 2 l) (nth 2 l) 0))))
         ((null l) (setq npage i))
@@ -271,9 +294,10 @@
             (nfree (nth 1 l))
             (npage (nth 2 l))
             (maxpage (nth 3 l))
-            (gbccount (nth 4 l)))
+            (gbccount (nth 4 l))
+            (ws (nth 5 l)))
         (if nused
-            (push (list typename npage maxpage
+            (push (list typename ws npage maxpage
                         (if (zerop (+ nused nfree))
                             0
                             (/ nused 0.01 (+ nused nfree)))
@@ -285,8 +309,9 @@
                      (push (list (nth nfree *type-list*) typename)
                            link-alist))))))
     (terpri)
+    (format t "~@[~2A~]~8@A/~A~14T~6@A%~@[~8@A~]~30T~{~A~^ ~}~%~%" "WS" "UP" "MP" "FI" "GC" '("TYPES"))
     (dolist (info (reverse info-list))
-      (apply #'format t "~6D/~D~12T~6,1F%~@[~8D~]~28T~{~A~^ ~}"
+      (apply #'format t "~@[~2D~]~8D/~D~14T~6,1F%~@[~8D~]~30T~{~A~^ ~}"
              (append (cdr info)
                      (if  (assoc (car info) link-alist)
                           (list (assoc (car info) link-alist))
@@ -294,10 +319,10 @@
       (terpri)
       )
     (terpri)
-    (format t "~6D/~D~19T~@[~8D~]~28Tcontiguous (~D blocks)~%"
+    (format t "~10D/~D~19T~@[~8D~]~30Tcontiguous (~D blocks)~%"
             ncbpage maxcbpage (if (zerop cbgbccount) nil cbgbccount) ncb)
-    (format t "~7T~D~28Thole~%" holepage)
-    (format t "~7T~D~12T~6,1F%~@[~8D~]~28Trelocatable~%~%"
+    (format t "~11T~D~30Thole~%" holepage)
+    (format t "~11T~D~14T~6,1F%~@[~8D~]~30Trelocatable~%~%"
             nrbpage (/ rbused 0.01 (+ rbused rbfree))
             (if (zerop rbgbccount) nil rbgbccount))
     (format t "~10D pages for cells~%" npage)
@@ -307,8 +332,11 @@
 	    (- maxpage (+ npage ncbpage holepage nrbpage leftpage)))
     (format t "~10D maximum pages~%" maxpage)
     (values)
-    ))
-
+    )
+  (format t "~%~%")
+  (format t "Key:~%~%WS: words per struct~%UP: allocated pages~%MP: maximum pages~%FI: fraction of cells in use on allocated pages~%GC: number of gc triggers allocating this type~%~%")
+  (heaprep)
+  (values))
 
 ;;; C Interface.
 
