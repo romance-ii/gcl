@@ -546,7 +546,7 @@ and load your system with:
 		 (or print-only (load pathname)))	       
 	       (load-module (m)
 		 (let* ((name (module-name m))
-			(*load-verbose* nil)
+			(*load-verbose* t)
 			(binary (make-binary-pathname m)))
 		   (load-binary name binary)))
 	       (compile-module (m)

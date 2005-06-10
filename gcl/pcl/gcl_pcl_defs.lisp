@@ -567,6 +567,7 @@
    
     (symbol     (t)        (null)                   (t)
      symbol)
+    (random-state (t)      (null)                   (t) #$0)
     (null       (symbol 
 		 list)     ()                       (symbol list sequence t)
      nil)))
