@@ -143,7 +143,7 @@ parse_plt() {
 
   for (;p<pe;p++)
     if ((op=bsearch(p->n,ar->v.v_self,ar->v.v_dim,sizeof(*ar->v.v_self),arsearch)) &&
-	(*op)->c.c_cdr->FIX.FIXVAL != p->ad)
+	fix((*op)->c.c_cdr) != p->ad)
       FEerror("plt/ld address mismatch",0);
 
   sSAplt_tableA->s.s_dbind=ar;
@@ -165,7 +165,7 @@ my_plt(const char *s,unsigned long *v) {
 		 sSAplt_tableA->s.s_dbind->v.v_dim,
 		 sizeof(*sSAplt_tableA->s.s_dbind->v.v_self),
 		 arsearch))) {
-    *v=(*op)->c.c_cdr->FIX.FIXVAL;
+    *v=fix((*op)->c.c_cdr);
     return 0;
   }
     
