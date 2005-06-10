@@ -108,6 +108,12 @@ GMP_EXTERN int jmp_gmp;
            return Join(RR_,rt_);\
    }
 
+MEM_GMP_CALL(3,void,mpz_urandomm,1,mpz_t,gmp_randstate_t,mpz_t)
+MEM_GMP_CALL(2,void,gmp_randseed,1,gmp_randstate_t,mpz_t)
+MEM_GMP_CALL(2,void,gmp_randseed_ui,1,gmp_randstate_t,unsigned long int)
+MEM_GMP_CALL(1,void,gmp_randinit_default,0,gmp_randstate_t)
+
+
 MEM_GMP_CALL(3,void,mpz_add,1,mpz_t,mpz_t,mpz_t)
 MEM_GMP_CALL(3,void,mpz_add_ui,1,mpz_t,mpz_t,unsigned long int)
 MEM_GMP_CALL(3,void,mpz_sub,1,mpz_t,mpz_t,mpz_t)
@@ -143,6 +149,11 @@ MEM_GMP_CALL(3,void,mpz_divexact,1,mpz_t,mpz_t,mpz_t)
 MEM_GMP_CALL(3,void,mpz_divexact_ui,1,mpz_t,mpz_t,unsigned long int)
 
      /* FIXME: find a way to have this follow the convention in gmp.h*/
+
+#define __gmpz_urandomm m__gmpz_urandomm
+#define __gmp_randseed m__gmp_randseed 
+#define __gmp_randseed_ui m__gmp_randseed_ui
+#define __gmp_randinit_default m__gmp_randinit_default
 
 #define __gmpz_add m__gmpz_add
 #define __gmpz_add_ui m__gmpz_add_ui

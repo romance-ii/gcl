@@ -293,7 +293,7 @@ object x;
 	int j, k;
 
 	i = (long)x;
-	for (j = 8*sizeof(i)-4;  j >= 0;  j -= 4) {
+	for (j = CHAR_SIZE*sizeof(i)-4;  j >= 0;  j -= 4) {
 		k = (i>>j) & 0xf;
 		if (k < 10)
 			write_ch('0' + k);
@@ -711,7 +711,7 @@ int level;
 		write_str("#<OBJNULL>");
 		return;
 	}
-	if (x->d.m == FREE) {
+	if (is_free(x)) {
 		write_str("#<FREE OBJECT ");
 		write_addr(x);
 		write_str(">");
@@ -1414,10 +1414,16 @@ int level;
 		}
 		break;
 
+#define FRESH_COPY(a_,b_) {(b_)->_mp_alloc=(a_)->_mp_alloc;\
+                           (b_)->_mp_d=gcl_gmp_alloc((b_)->_mp_alloc*sizeof(*(b_)->_mp_d));\
+                           (b_)->_mp_size=(a_)->_mp_size;\
+                           memcpy((b_)->_mp_d,(a_)->_mp_d,(b_)->_mp_alloc*sizeof(*(b_)->_mp_d));}
+
 	case t_random:
 		write_str("#$");
-		y = alloc_object(t_fixnum);
-		fix(y) = x->rnd.rnd_value;
+		y = new_bignum();
+		FRESH_COPY(x->rnd.rnd_state._mp_seed,MP(y));
+		y=normalize_big(y);
 		vs_push(y);
 		write_object(y, level);
 		vs_popp;
@@ -1511,7 +1517,7 @@ int level;
 
 	case t_spice:
 		write_str("#<\100");
-		for (i = 8*sizeof(long)-4;  i >= 0;  i -= 4) {
+		for (i = CHAR_SIZE*sizeof(long)-4;  i >= 0;  i -= 4) {
 			j = ((long)x >> i) & 0xf;
 			if (j < 10)
 				write_ch('0' + j);

@@ -246,6 +246,7 @@ object in;
 	vs_push(old_READtable);
 	for (i = 0;  i < sharp_eq_context_max;  i++)
 		old_sharp_eq_context[i] = sharp_eq_context[i];
+	memset(old_sharp_eq_context+i,0,sizeof(old_sharp_eq_context)-i*sizeof(*old_sharp_eq_context));
 	old_backq_level = backq_level;
 	setup_READ();
 
@@ -1896,20 +1897,26 @@ Lsharp_double_quote_reader()
 static void
 Lsharp_dollar_reader()
 {
-	int i;
+	object x;
+	enum type tx;
 
 	check_arg(3);
 	if (vs_base[2] != Cnil && !READsuppress)
 		extra_argument('$');
 	vs_popp;
 	vs_popp;
-	vs_base[0] = read_object(vs_base[0]);
-	if (type_of(vs_base[0]) != t_fixnum)
-		FEerror("Cannot make a random-state with the value ~S.",
-			1, vs_base[0]);
-	i = fix(vs_base[0]);
+	x = read_object(vs_base[0]);
+	tx=type_of(x);
+	if (tx!=t_fixnum && tx!=t_bignum)
+	  FEerror("Cannot make a random-state with the value ~S.",1, x);
 	vs_base[0] = alloc_object(t_random);
-	vs_base[0]->rnd.rnd_value = i;
+	bzero(&vs_base[0]->rnd.rnd_state,sizeof(vs_base[0]->rnd.rnd_state));
+	gmp_randinit_default(&vs_base[0]->rnd.rnd_state);
+	if (tx==t_fixnum)
+	  gmp_randseed_ui(&vs_base[0]->rnd.rnd_state,fix(x));
+	else
+	  gmp_randseed(&vs_base[0]->rnd.rnd_state,MP(x));
+
 }
 
 /*

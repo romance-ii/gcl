@@ -118,11 +118,11 @@ new_bignum(void)
    it, and then we can copy it back
 */   
 #define GCPROTECT(u) \
- MP_INT * __u = MP(big_gcprotect); \
+ MP_INT * __u = (u==MP(big_fixnum1) || u==MP(big_fixnum2)) ? u : MP(big_gcprotect); \
  (__u)->_mp_d =   (u)->_mp_d; \
  (__u)->_mp_alloc = (u)->_mp_alloc 
 #define GC_PROTECTED_SELF (__u)->_mp_d
-#define END_GCPROTECT (__u)->_mp_d = 0
+#define END_GCPROTECT if (__u==MP(big_gcprotect)) (__u)->_mp_d = 0
  
 
 

@@ -16,8 +16,9 @@ gclcvs (2.7.0-43) unstable; urgency=low
   * Enforce heap max
   * Minimize stack hole garbage; push c stack mark to frame jsut above
     toplevel
+  * gmp random numbers
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 10 Jun 2005 15:21:02 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 10 Jun 2005 15:25:01 +0000
 
 gclcvs (2.7.0-42) unstable; urgency=low
 
