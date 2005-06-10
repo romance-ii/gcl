@@ -62,6 +62,32 @@ object fixnum_sub(fixnum i, fixnum j)
    }
 }
 
+object 
+fixnum_times(fixnum i, fixnum j) {
+
+  if (i>=0) {
+    if (j>=0) {
+      if (!i || j<= (MOST_POSITIVE_FIX/i))
+	goto FIX;
+    } else {
+      if (j==-1 || i<= (MOST_NEGATIVE_FIX/j))
+	goto FIX;
+    }
+  } else {
+    if (j>=0) {
+      if (i==-1 || j<= (MOST_NEGATIVE_FIX/i))
+	goto FIX;
+    } else {
+      if (-i<= (MOST_POSITIVE_FIX/-j))
+	goto FIX;
+    }
+  }
+  MPOP(return,mulss,i,j);
+ FIX:
+  return make_fixnum(i*j);
+}
+
+/* return i - j */
 /* static object */
 /* fixnum_times(int i, int j) */
 /* { */
@@ -589,7 +615,8 @@ number_times(object x, object y)
 	case t_fixnum:
 		switch (type_of(y)) {
 		case t_fixnum:
-		  MPOP(return,mulss,fix(x),fix(y));
+		  return fixnum_times(fix(x),fix(y));
+/* 		  MPOP(return,mulss,fix(x),fix(y)); */
 		case t_bignum:
 		  MPOP(return,mulsi,fix(x),MP(y));
 		case t_ratio:
