@@ -144,6 +144,16 @@ number_expt(object x, object y)
 			vs_reset;
 			return(z);
 		}
+		if (tx==t_fixnum && fix(x)==2 && ty==t_fixnum) {
+		  object z1;
+		  if (fix(y)<CHAR_SIZE*sizeof(fixnum)-1)
+		    return make_fixnum((((fixnum)1)<<fix(y)));
+		  z=new_bignum();
+		  z1=new_bignum();
+		  mpz_set_ui(MP(z),1);
+		  mpz_mul_2exp(MP(z1),MP(z),fix(y));
+		  return normalize_big(z1);
+		}
 		z = small_fixnum(1);
 		vs_push(z);
 		vs_push(Cnil);
