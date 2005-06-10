@@ -20,8 +20,9 @@ gclcvs (2.7.0-43) unstable; urgency=low
   * sigaltstack support for c stack overrun; FIXME -- remove separate
     implementations in h/ where possible, which are lilely broken
   * Better room report
+  * 64bit hashing, cache symbol hash code for sxhash
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 10 Jun 2005 15:31:01 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 10 Jun 2005 15:34:00 +0000
 
 gclcvs (2.7.0-42) unstable; urgency=low
 

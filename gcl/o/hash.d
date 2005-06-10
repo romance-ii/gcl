@@ -31,138 +31,125 @@ object sKsize;
 object sKrehash_size;
 object sKrehash_threshold;
 
+#define MHSH(a_) ((a_) & ~(((unsigned long)1)<<(sizeof(a_)*CHAR_SIZE-1)))
 
-static unsigned int
-hash_eql(x)
-object x;
-{
-	unsigned int h = 0;
+static unsigned long
+hash_eql(object x) {
 
-	switch (type_of(x)) {
-	case t_fixnum:
-		return(fix(x));
+  unsigned long h = 0;
 
-	case t_bignum:
-#ifdef GMP
-	  { MP_INT *mp = MP(x);
-	  int l = mpz_size (mp);
-	  mp_limb_t *u = mp->_mp_d;
-	  if (l > 5) l = 5;
-	  while (-- l >= 0)
-	    { h += *u++;}
-	  return(h);
-	  }
-		
-#else
-	     { GEN u = MP(x);
-		  int l = lg(u) - 2;
-		  u += 2;
-		  h += l;
-		  if (l > 5) l = 5;
-		  while (-- l >= 0)
-		    { h += *u++;}
-		  return(h);
-		}
-#endif
+  switch (type_of(x)) {
+  case t_fixnum:
+    h=fix(x);
+    h ^= (h >> 11);
+    h ^= (h <<  7) & 0x9D2C5680U;
+    h ^= (h << 15) & 0xEFC60000U;
+    h ^= (h >> 18);
+    break;
+  case t_bignum:
+    { 
+      MP_INT *mp = MP(x);
+      int l = mpz_size (mp);
+      mp_limb_t *u = mp->_mp_d;
+      if (l > 5) l = 5;
+      while (-- l >= 0) 
+	h += *u++;
+    }
+    break;
+  case t_ratio:
+    h=hash_eql(x->rat.rat_num) + hash_eql(x->rat.rat_den);
+    break;
+  case t_shortfloat:  /*FIXME, sizeof int = sizeof float*/
+    h=*((int *) &(sf(x)));
+    break;
+  case t_longfloat:
+    {
+      int *y = (int *) &lf(x);
+      h= *y + *(y+1);
+    }
+    break;
+  case t_complex:
+    h=hash_eql(x->cmp.cmp_real) + hash_eql(x->cmp.cmp_imag);
+    break;
+  case t_character:
+    h=char_code(x);
+    break;
+  default:
+    h=((unsigned long)x / sizeof(x));
+    break;
+  }
 
-	case t_ratio:
-   		return(hash_eql(x->rat.rat_num) + hash_eql(x->rat.rat_den));
+  return MHSH(h);
 
-	case t_shortfloat:
-		return(*((int *) &(sf(x))));
-
-	case t_longfloat:
-		{int *y = (int *) &lf(x);
-		return( *y + *(y+1));}
-
-	case t_complex:
-		return(hash_eql(x->cmp.cmp_real) + hash_eql(x->cmp.cmp_imag));
-
-	case t_character:
-		return(char_code(x));
-
-	default:
-		return((unsigned long)x / 4);
-	}
 }
 
-static unsigned int
-ihash_equal(x,depth)
-object x;
-int depth;
-{
-	unsigned int h = 0;
-	int i;
-	char *s;
+#define ihash_equal(a_,b_) ((type_of(a_)==t_symbol && (a_)->s.s_hash) ? (a_)->s.s_hash : ihash_equal1(a_,b_))
+unsigned long
+ihash_equal1(object x,int depth) {
 
-	cs_check(x);
+  enum type tx;
+  unsigned long h = 0;
+  long i;
+  char *s;
+  
+  cs_check(x);
 
 BEGIN:
-	if (depth++ >3) return h;
-	switch (type_of(x)) {
-	case t_cons:
-		h += ihash_equal(x->c.c_car,depth);
-		x = x->c.c_cdr;
-		goto BEGIN;
+  if (depth++ <=3)
+    switch ((tx=type_of(x))) {
+    case t_cons:
+      h += ihash_equal(x->c.c_car,depth);
+      x = x->c.c_cdr;
+      goto BEGIN;
+      break;
+    case t_symbol:
+    case t_string:
+      {
+	long len=x->st.st_fillp;
+	s=x->st.st_self;
+	len=len>sizeof(len) ? sizeof(len) : len;
+	for (s+=len-1;len--;s--)
+	  h+= *s << CHAR_SIZE*len;
+      }
+      break;
 
-	case t_string:
-		for (i = x->st.st_fillp, s = x->st.st_self;  i > 0;  --i, s++)
-			h += (*s & 0377)*12345 + 1;
-		return(h);
-	case t_symbol:
-		/* case t_string could share this code--wfs */
-		{int len=x->st.st_fillp;
-		 s=x->st.st_self;
-		 switch(len) {
-		 case 0: break;
-		 default:
-		 case 4: h+= s[--len] << 24;
-		 case 3: h+= s[--len]<< 16;
-		 case 2: h+= s[1] << 8;
-		 case 1: h+= s[0] ;
-		   
-		   
-		 }
-		 return(h);
-	       }
-		   
-        case t_package:  return h;
-	case t_bitvector:
-        {static char ar[10];
-	 i = x->bv.bv_fillp;
-	 h = h + i;
-	 i = i/8;
-	 if (i > 10) i= 10;
-	 s = x->bv.bv_self;
-	 if (x->bv.bv_offset)
-	   {int k,j;
-	    int e = i;
-	    s = ar;
-	    /* 8 should be CHAR_SIZE but this needs to be changed
-	       everywhere .. */
-	    e = e * 8;
-	    bzero(ar,sizeof(ar));
-	    for (k = x->bv.bv_offset, j = 0;  k < e;  k++, j++)
-	      if (x->bv.bv_self[k/8]&(0200>>k%8))
-		ar[j/8]  |= 0200>>j%8;
-	  }
-	 for (;  i > 0;  --i, s++)
-	   h += (*s & 0377)*12345 + 1;
-
-	 return(h);
-       }
-	case t_pathname:
-		h += ihash_equal(x->pn.pn_host,depth);
-		h += ihash_equal(x->pn.pn_device,depth);
-		h += ihash_equal(x->pn.pn_directory,depth);
-		h += ihash_equal(x->pn.pn_name,depth);
-		h += ihash_equal(x->pn.pn_type,depth);
-		/* version is ignored unless logical host */
-		if ((type_of(x->pn.pn_host) == t_string) &&
-		    (pathname_lookup(x->pn.pn_host,sSApathname_logicalA) != Cnil))
-			h += ihash_equal(x->pn.pn_version,depth);
-		h += ihash_equal(x->pn.pn_version,depth);
-		return(h);
+    case t_package: 
+      break;
+    case t_bitvector:
+      {
+	static char ar[10];
+	i = x->bv.bv_fillp;
+	h += i;
+	i = i/8;
+	if (i > 10) i= 10;
+	s = x->bv.bv_self;
+	if (x->bv.bv_offset) {
+	  long k,j,e=i;
+	  s = ar;
+	  /* 8 should be CHAR_SIZE but this needs to be changed
+	     everywhere .. */
+	  e = e * 8;
+	  bzero(ar,sizeof(ar));
+	  for (k = x->bv.bv_offset, j = 0;  k < e;  k++, j++)
+	    if (x->bv.bv_self[k/8]&(0200>>k%8))
+	      ar[j/8]  |= 0200>>j%8;
+	}
+	for (;  i > 0;  --i, s++)
+	  h += (*s & 0377)*12345 + 1;
+      }
+      break;
+    case t_pathname:
+      h += ihash_equal(x->pn.pn_host,depth);
+      h += ihash_equal(x->pn.pn_device,depth);
+      h += ihash_equal(x->pn.pn_directory,depth);
+      h += ihash_equal(x->pn.pn_name,depth);
+      h += ihash_equal(x->pn.pn_type,depth);
+      /* version is ignored unless logical host */
+      if ((type_of(x->pn.pn_host) == t_string) &&
+	  (pathname_lookup(x->pn.pn_host,sSApathname_logicalA) != Cnil))
+	h += ihash_equal(x->pn.pn_version,depth);
+      h += ihash_equal(x->pn.pn_version,depth);
+      break;
 /*  CLTLII says don't descend into structures
 	case t_structure:
 		{unsigned char *s_type;
@@ -178,72 +165,68 @@ BEGIN:
 		 return(h);}
 */
 
-	default:
-		return(h + hash_eql(x));
-	}
+    default:
+      h +=  hash_eql(x);
+      break;
+    }
+  
+  return MHSH(h);
+
 }
-		
+
+	
 static object
-FFN(hash_equal)(x,depth)
-object x;
-int depth;
-{
-
-	return make_fixnum(ihash_equal(x,depth));
-
+FFN(hash_equal)(object x,int depth) {
+  return make_fixnum(ihash_equal(x,depth));
 }
 
 struct htent *
-gethash(key, hashtable)
-object key;
-object hashtable;
-{
-	enum httest htest;
-	int hsize;
-	struct htent *e;
-	object hkey;
-	int i=0, j = -1, k; /* k added by chou */
-	bool b=FALSE;
+gethash(object key, object hashtable) {
 
-	htest = (enum httest)hashtable->ht.ht_test;
-	hsize = hashtable->ht.ht_size;
-	if (htest == htt_eq)
-		i = (long)key / 4;
-	else if (htest == htt_eql)
-		i = hash_eql(key);
-	else if (htest == htt_equal)
-		i = ihash_equal(key,0);
-	/*FIXME 64*/
-	i &= 0x7fffffff;
-	for (i %= hsize, k = 0; k < hsize;  i = (i + 1) % hsize, k++) { /* k added by chou */
-		e = &hashtable->ht.ht_self[i];
-		hkey = e->hte_key;
-		if (hkey == OBJNULL) {
-			if (e->hte_value == OBJNULL)
-				if (j < 0)
-					return(e);
-				else
-					return(&hashtable->ht.ht_self[j]);
-			else
-				if (j < 0)
-					j = i;
-				else if (j==i)
-				  /* this was never returning --wfs
-				     but looping around with j=0 */
-				  return(e) 
-					;
-			continue;
-		}
-		if (htest == htt_eq)
-		    	b = key == hkey;
-		else if (htest == htt_eql)
-			b = eql(key, hkey);
-		else if (htest == htt_equal)
-			b = equal(key, hkey);
-		if (b)
-			return(&hashtable->ht.ht_self[i]);
-	}
-	return(&hashtable->ht.ht_self[j]);	/* added by chou */
+  enum httest htest;
+  long hsize,j,s,q;
+  struct htent *e,*e1;
+  object hkey;
+  unsigned long i=0;
+  bool (*f)(object,object)=NULL;
+  
+  htest = (enum httest)hashtable->ht.ht_test;
+  hsize = hashtable->ht.ht_size;
+  switch (htest) {
+  case htt_eq:
+    i = (long)key / sizeof(key);
+    break;
+  case htt_eql:
+    i = hash_eql(key);
+    f=eql;
+    break;
+  case htt_equal:
+    i = ihash_equal(key,0);
+    f=equal;
+    break;
+  }
+  
+  i%=hsize;
+  s=i;
+  q=hsize;
+  e=e1=NULL;
+ SEARCH:
+  for (j=s;j<q;j++) {
+    e = &hashtable->ht.ht_self[j];
+    hkey = e->hte_key;
+    if (hkey==OBJNULL) {
+      if (e->hte_value==OBJNULL) return e1 ? e1 : e;
+      if (!e1) e1=e;
+    } else
+      if (f ? f(key,hkey) : key==hkey) return e;
+  }
+  if (s) {
+    q=s;
+    s=0;
+    goto SEARCH;
+  }
+  FEerror("gethash error",0);
+  return NULL;
 }
 
 static void
@@ -464,7 +447,7 @@ LFD(Lsxhash)()
 	check_arg(1);
 
 	/*FIXME 64*/
-	vs_base[0] = make_fixnum((ihash_equal(vs_base[0],0) & 0x7fffffff));
+	vs_base[0] = make_fixnum(ihash_equal(vs_base[0],0)/*  & 0x7fffffff */);
 }
 
 LFD(Lmaphash)()

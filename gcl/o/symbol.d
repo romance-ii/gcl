@@ -63,6 +63,7 @@ object st;
 		for (i = 0;  i < x->s.s_fillp;  i++)
 			x->s.s_self[i] = st->st.st_self[i];
 	}
+	x->s.s_hash = ihash_equal1(x,0);
 	END_NO_INTERRUPT;}	
 	return(vs_pop);
 }
@@ -508,7 +509,7 @@ DEFVAR("*GENSYM-COUNTER*",sLgensym_counter,LISP,make_fixnum(0),"");
 	  big=this_gensym_counter;
 	  sign=BIG_SIGN(big);
 	  size = mpz_sizeinbase(MP(big),10)+2+(sign<0? 1 : 0);
-	  if (!(p=alloca(size)))
+	  if (!(p=ZALLOCA(size)))
 	    FEerror("Cannot alloca gensym name", 0);
 	  mpz_get_str(p,10,MP(big));
 	  j=size-5;
@@ -517,9 +518,9 @@ DEFVAR("*GENSYM-COUNTER*",sLgensym_counter,LISP,make_fixnum(0),"");
 	  q=p+j;
 	  break;
 	case t_fixnum:
-	  for (size=1,f=this_gensym_counter->FIX.FIXVAL;f;f/=10,size++);
-	  q=p=alloca(size+5);
-	  if ((j=snprintf(p,size+5,"%d",(int)this_gensym_counter->FIX.FIXVAL))<=0)
+	  for (size=1,f=fix(this_gensym_counter);f;f/=10,size++);
+	  q=p=ZALLOCA(size+5);
+	  if ((j=snprintf(p,size+5,"%d",(int)fix(this_gensym_counter)))<=0)
 	    FEerror("Cannot write gensym counter",0);
 	  q=p+j;
 	  break;
