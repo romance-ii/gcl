@@ -1,3 +1,4 @@
+#include <string.h>
 #include <setjmp.h>
 #include <stdio.h>
 #include <math.h>
@@ -14,6 +15,8 @@ main(int argc,char * argv[],char *envp[]) {
   char ch=0;
   jmp_buf env;
   double d=0.1;
+
+  bzero(&env,sizeof(env));
 
   getc(f);
   putc(ch,f);
