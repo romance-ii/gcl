@@ -31,9 +31,8 @@
       } while(0)
 
 
-#ifdef IN_GBC
-/* Based upon sun4.h */
-#define MPROTECT_ACTION_FLAGS SA_RESTART
+#define GET_FAULT_ADDR(sig,code,sv,a) ((siginfo_t *)code)->si_addr
+#define MPROTECT_ACTION_FLAGS SA_RESTART | SA_ONSTACK | SA_SIGINFO
 #define INSTALL_MPROTECT_HANDLER \
 do {static struct sigaction action; \
       action.sa_handler = (void *)memprotect_handler; \
@@ -44,8 +43,6 @@ do {static struct sigaction action; \
       sigaddset(&action.sa_mask,SIGALRM); \
       sigaction(SIGSEGV,&action,0); \
       sigaction(SIGBUS,&action,0);} while (0)
-
-#endif
 
 #undef SETUP_SIG_STACK
 

@@ -253,10 +253,10 @@ EXTER struct printStruct *printStructBufp;
 #ifndef NULL_OR_ON_C_STACK
 
 
-#if (CSTACK_ADDRESS > 0)
-#define NULL_OR_ON_C_STACK(x) ((x)==0 || ((unsigned long)x) > (unsigned long)(pagetochar(MAXPAGE+1)))
+#if ((long)CSTACK_ADDRESS > 0)
+#define NULL_OR_ON_C_STACK(x) (((unsigned long)x)<=DBEGIN || ((unsigned long)x) >= (unsigned long)(pagetochar(MAXPAGE)))
 #else
-#define NULL_OR_ON_C_STACK(x) ((long)x <= 0)     
+#define NULL_OR_ON_C_STACK(x) ((long)x <= DBEGIN)     
 #endif
 
 #endif /* NULL_OR_ON_C_STACK */
