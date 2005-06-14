@@ -866,8 +866,7 @@ check_other_key(object l, int n, ...)
 /*  	   }; */
 
 
-object Cstd_key_defaults[15]={Cnil,Cnil,Cnil,Cnil,Cnil,Cnil,Cnil,
-				Cnil,Cnil,Cnil,Cnil,Cnil,Cnil,Cnil,Cnil};
+object Cstd_key_defaults[15]={0};
 
 /* FIXME rewrite this */
 /* static int */
@@ -1131,4 +1130,13 @@ gcl_init_bind(void)
 	six_nils.nil6_self[3] = Cnil;
 	six_nils.nil6_self[4] = Cnil;
 	six_nils.nil6_self[5] = Cnil;
+
+	{
+
+	  int i;
+	  for (i=0;i<sizeof(Cstd_key_defaults)/sizeof(*Cstd_key_defaults);i++)
+	    Cstd_key_defaults[i]=Cnil;
+
+	}
+
 }

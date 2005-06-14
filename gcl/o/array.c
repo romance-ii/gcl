@@ -434,14 +434,14 @@ fSmake_vector1_1(fixnum n,fixnum elt_type,object staticp) {
 }
 
 
-static object DFLT_aet_object = Cnil;	
+static object DFLT_aet_object;	
 static char DFLT_aet_ch = ' ';
 static char DFLT_aet_char = 0; 
 static fixnum DFLT_aet_fix = 0  ;		
 static short DFLT_aet_short = 0;
 static shortfloat DFLT_aet_sf = 0.0;
 static longfloat DFLT_aet_lf = 0.0;	
-static object Iname_t = sLt;
+static object Iname_t;
 static struct { char * dflt; object *namep;} aet_types[] =
 {   {(char *)	&DFLT_aet_object,	&Iname_t,},	/*  t  */
     {(char *)	&DFLT_aet_ch, &sLstring_char,},/*  string-char  */
@@ -1516,6 +1516,9 @@ DEFUN_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
 void
 gcl_init_array_function(void) {
   make_function("ARRAY-DISPLACEMENT", Larray_displacement);
+  DFLT_aet_object=Cnil;
+  Iname_t=sLt;
+
 }
      
 
