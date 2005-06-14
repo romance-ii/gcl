@@ -129,9 +129,10 @@ integer_exact_quotient(object x,object y,int in_place) {
   if (y==small_fixnum(1) || x==small_fixnum(0))
     return x;
 
-  if (type_of(y)==t_fixnum && type_of(x)==t_fixnum) 
-    return make_fixnum(fix(x)/fix(y)); /* no in_place for fixnums as could be small */;
-
+  if (type_of(x)==t_fixnum)  /* no in_place for fixnums as could be small */
+    return make_fixnum((type_of(y)==t_fixnum ? fix(x)/fix(y) : -1)); 
+  /* Only big dividing a fix is most-negative-fix/abs(most-negative-fix)*/
+    
   r=in_place ? x : new_bignum();
 
   if (type_of(y)==t_fixnum) 
