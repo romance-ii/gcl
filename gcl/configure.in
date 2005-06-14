@@ -909,7 +909,7 @@ AC_CHECK_SIZEOF(char,0)
 AC_MSG_CHECKING(for number of bits in char)
 AC_TRY_RUN([#include <stdio.h>
 int main() {
-FILE *fp=fopen("conftest1","w");;
+FILE *fp=fopen("conftest1","w");
 unsigned char c;
 int i;
 for (i=0,c=1;c;c<<=1,i++);
@@ -923,7 +923,7 @@ AC_DEFINE_UNQUOTED(CHAR_SIZE,$char_size)
 
 AC_CHECK_HEADERS(endian.h,
 	AC_MSG_CHECKING("endianness")
-	AC_TRY_RUN([#define __ARMEB__
+	AC_TRY_RUN([/*#define __ARMEB__*/
 		#include <endian.h> 
 		int main() { return BYTE_ORDER == __LITTLE_ENDIAN ? 0 : 1;}],
 	AC_DEFINE(LITTLE_END) AC_MSG_RESULT(little),
@@ -1226,7 +1226,7 @@ main()
   b=alloca(sizeof(b));
   c=alloca(sizeof(c));
   n=b>c ? b-c : c-b;
-  n=n>sizeof(c) ? n : 0;
+  n=n>sizeof(c) ? n : 1;
   fprintf(fp,"%ld",n);
   fclose(fp);
   return 0;

@@ -1,3 +1,10 @@
+gclcvs (2.7.0-45) unstable; urgency=low
+
+  * Portability fixes
+  * Arm is little endian, CSTACK_ALIGNMENT defaults to 1
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 14 Jun 2005 14:28:00 +0000
+
 gclcvs (2.7.0-44) unstable; urgency=low
 
   * All page size defaults in configure.in; memory bounds checking in
