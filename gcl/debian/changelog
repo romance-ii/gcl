@@ -7,8 +7,10 @@ gclcvs (2.7.0-45) unstable; urgency=low
     byte alignment on packed machines like m68k (hash table padding),
     stripped cdr Scdr macro unmarks rather than unfrees as imm fix table
     could be tight.  Revisit this
+  * Computable Cnil address
+  * Fix accelerated allocations in list()
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 14 Jun 2005 14:32:56 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 14 Jun 2005 14:34:18 +0000
 
 gclcvs (2.7.0-44) unstable; urgency=low
 

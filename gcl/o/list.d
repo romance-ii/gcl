@@ -282,50 +282,51 @@ object list_vector_new(fixnum n,object first,va_list ap)
 
    
 
-object list(fixnum n,...)
-{ va_list ap;
-  struct typemanager *tm=(&tm_table[(int)t_cons]);
-  va_start(ap,n);
-  CHECK_INTERRUPT;
-  if (tm->tm_nfree < n )
-     {
-	object *p = vs_top;
+object list(fixnum n,...) { 
 
-	vs_push(Cnil);
-	while(--n>=0)
-	  { *p=make_cons(va_arg(ap,object),Cnil);
-	    p= &((*p)->c.c_cdr);
-	  }
-	return(vs_pop);
-     }
-  else
-    {BEGIN_NO_INTERRUPT;
-    {fixnum i=0;
-    object tail=tm->tm_free;
-    object lis;
+  va_list ap;
+  struct typemanager *tm=(&tm_table[(int)t_cons]);
+
+  if (n<=0) return Cnil;
+  va_start(ap,n);
+
+  CHECK_INTERRUPT;
+  if (tm->tm_nfree < n )  {
+    
+    object *p = vs_top;
+    
+    vs_push(Cnil);
+    while(--n>=0)
+      { *p=make_cons(va_arg(ap,object),Cnil);
+      p= &((*p)->c.c_cdr);
+      }
+    return(vs_pop);
+
+  } else  {
+
+    object tail=tm->tm_free,lis=tail;
+    BEGIN_NO_INTERRUPT;
+
     tm->tm_nfree -= n;
     tm->tm_nused += n;
-    n=n-1;
-    lis=tail;
-    while (1)
-      {if (i < n)
-       tail->c.c_cdr=OBJ_LINK(tail);
-       else {tm->tm_free=OBJ_LINK(tail);
-	     set_type_of(tail,t_cons);
-	     make_unfree(tail);
-	     tail->c.c_car=va_arg(ap,object); 
-	     tail->c.c_cdr=Cnil;
-	     goto END_INTER ;
-	   }
-       /* these could be one instruction*/
-       set_type_of(tail,t_cons);
-       make_unfree(tail);
-       tail->c.c_car=va_arg(ap,object);
-       tail=tail->c.c_cdr;
-       i++;}
-   END_INTER: END_NO_INTERRUPT;
-  va_end(ap);
-  return lis;}}	
+    while (--n) {
+      set_type_of(tail,t_cons);
+      make_unfree(tail);
+      tail->c.c_cdr=OBJ_LINK(tail);
+      tail->c.c_car=va_arg(ap,object); 
+      tail=tail->c.c_cdr;
+    }
+    tm->tm_free=OBJ_LINK(tail);
+    set_type_of(tail,t_cons);
+    make_unfree(tail);
+    tail->c.c_car=va_arg(ap,object); 
+    tail->c.c_cdr=Cnil;
+    
+    END_NO_INTERRUPT;
+    va_end(ap);
+    return lis;
+    
+  }
 
 }
 
