@@ -291,7 +291,7 @@ main(int argc, char **argv, char **envp) {
 
 #ifdef AV
     
-    cs_limit = cs_base + CSTACK_DIRECTION * cssize/sizeof(*cs_base);
+    cs_limit = (void *)CSTACK_ADDRESS + CSTACK_DIRECTION * cssize;
 #endif
 
 
@@ -644,16 +644,17 @@ ihs_overflow(void) {
 	FEerror("Invocation history stack overflow.", 0);
 }
 
+
 void
 segmentation_catcher(int i, long code, void *scp, char *addr) {
 
   void *faddr;
-  faddr=((siginfo_t *)code)->si_addr;
+  faddr=GET_FAULT_ADDR(sig,code,scp,addr); 
 
 #if CSTACK_DIRECTION == -1
-  if (faddr < (void *)cs_limit) /*FIXME, perhaps bound by nearest page here.*/
+  if (faddr < (void *)cs_limit && (void *)cs_limit-faddr <= PAGESIZE) /*FIXME, perhaps bound by nearest page here.*/
 #else
-  if (faddr > (void *)cs_limit)
+  if (faddr > (void *)cs_limit && faddr-(void *)cs_limit <= PAGESIZE)
 #endif
     FEerror("Control stack overflow.",0); /*FIXME -- provide getrlimit here.*/
   else 
@@ -763,7 +764,7 @@ reset_cstack_limit(int arg) {
 #else
   if (&arg < cs_base + cssize/sizeof(*cs_base) - 16)
 #endif
-    cs_limit = cs_base + CSTACK_DIRECTION * cssize/sizeof(*cs_base);
+    cs_limit = (void *)CSTACK_ADDRESS + CSTACK_DIRECTION * cssize;
   else
       error ( "can't reset cs_limit" );
 }
