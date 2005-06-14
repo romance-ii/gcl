@@ -297,11 +297,11 @@ struct symbol {
 
 };
 
-EXTER char CnilCt[3*sizeof(struct symbol)+1];
+EXTER double CnilCt[3*sizeof(struct symbol)/sizeof(double)];
 
 #define Cnil   ((object)(CnilCt))
-#define Ct     ((object)(CnilCt+sizeof(struct symbol)))
-#define Dotnil ((object)(CnilCt+2*sizeof(struct symbol)))
+#define Ct     ((object)((char *)Cnil+sizeof(struct symbol)))
+#define Dotnil ((object)((char *)Ct+sizeof(struct symbol)))
 #define sLnil Cnil
 #define sLt Ct
 
@@ -349,7 +349,7 @@ struct cons {
 
 };
 /*FIXME, review handling of imm fix here*/
-#define Scdr(a_) ({object _t=(a_)->c.c_cdr;make_unfree((object)&_t);_t;})
+#define Scdr(a_) ({object _t=(a_)->c.c_cdr;unmark((object)&_t);_t;})
 
 enum httest {   /*  hash table key test function  */
   htt_eq,       /*  eq  */
@@ -373,6 +373,7 @@ struct hashtable {           /*  hash table header  */
   fixnum        ht_size;    /*  hash table size  */
   hfixnum       ht_test;    /*  key test function  */
                             /*  of enum httest  */
+  hfixnum       ht_pad;
   SPAD;
 
 };
@@ -1178,10 +1179,11 @@ EXTER unsigned plong signals_allowed, signals_pending  ;
 /* #define Dotnil ((object)&Dotnil_body) */
 
 #define endp(x) ({\
-    static struct cons s_my_dot={/* t_cons,0,0,0,0,0, */Dotnil,Dotnil};\
+    static struct cons s_my_dot;\
     object _x=(x);\
     bool _b=FALSE;\
     \
+    if (!s_my_dot.c_car) s_my_dot.c_car=s_my_dot.c_cdr=Dotnil;\
     if (type_of(_x)==t_cons) {\
        if (type_of(_x->c.c_cdr)!=t_cons && _x->c.c_cdr!=Cnil)\
           s_my_dot.c_car=_x->c.c_cdr;\
