@@ -1088,7 +1088,7 @@ if test "`cat gcl.script | wc -l`" != "0" ; then
   AC_MSG_RESULT(got it)
   AC_MSG_CHECKING("trying to lower heap start")
   cp gcl.script gcl.script.def
-  cat gcl.script.def | awk '/SIZEOF_HEADERS/ {gsub("0x...","0x000",$0);} {print}' >gcl.script
+  cat gcl.script.def | awk '/SIZEOF_HEADERS/ {gsub("0x...","0x000",$0);} {print} | sed 's,. = 0x10000000;,/*. = 0x10000000;*/,1'' >gcl.script
   if diff gcl.script.def gcl.script >/dev/null 2>&1 ; then
      AC_MSG_RESULT("cannot or not needed")
      rm -f gcl.script gcl.script.def
@@ -1281,6 +1281,34 @@ if test "$tmp_cssize" != "$enable_cssize" ; then
    enable_cssize=$tmp_cssize;
    AC_MSG_RESULT("got $enable_cssize")
 #   AC_DEFINE_UNQUOTED(CSSIZE,$enable_cssize)
+else
+   AC_MSG_RESULT("$enable_cssize is OK")
+fi
+AC_DEFINE_UNQUOTED(CSSIZE,$enable_cssize)
+
+AC_MSG_CHECKING("for C stack size limit from fixnum table ")
+AC_TRY_RUN([#include <stdio.h>
+int
+main()
+{
+  char *b;
+  FILE *fp = fopen("conftest1","w");
+  unsigned long j,k;
+  
+  j=$cstack_address + $cstack_direction * $enable_cssize;
+  if ($cstack_direction>0) {
+    k=$cstack_address + ((-(unsigned long)$cstack_address)>>1);
+    j=j<$cstack_address || j > k ? k : j;
+  }
+  j-=$cstack_address;
+  j*=$cstack_direction;
+  fprintf(fp,"%lu",j);
+  fclose(fp);
+  return 0;
+}],tmp_cssize=`cat conftest1`,tmp_cssize=0,tmp_cssize=0)
+if test "$tmp_cssize" != "$enable_cssize" ; then
+   enable_cssize=$tmp_cssize;
+   AC_MSG_RESULT("got $enable_cssize")
 else
    AC_MSG_RESULT("$enable_cssize is OK")
 fi

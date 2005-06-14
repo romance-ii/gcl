@@ -17,8 +17,9 @@ gclcvs (2.7.0-45) unstable; urgency=low
   * Better cs_limit calculation
   * Pass faults out of heap to segmentation catcher
   * Centralize GET_FAULT_ADDR and NULL_OR_ON_C_STACK macros
+  * Cap rising C stacks for fixnum table, lower mips heap start
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 14 Jun 2005 17:27:04 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 14 Jun 2005 20:36:54 +0000
 
 gclcvs (2.7.0-44) unstable; urgency=low
 
