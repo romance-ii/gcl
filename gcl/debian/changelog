@@ -15,8 +15,9 @@ gclcvs (2.7.0-45) unstable; urgency=low
     builtin bzero issue
   * Round CSTACK_ADDRESS
   * Better cs_limit calculation
+  * Pass faults out of heap to segmentation catcher
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 14 Jun 2005 17:25:33 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 14 Jun 2005 17:26:07 +0000
 
 gclcvs (2.7.0-44) unstable; urgency=low
 

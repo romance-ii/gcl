@@ -1648,12 +1648,12 @@ memprotect_handler(int sig, long code, void *scp, char *addr) {
 #ifdef DEBUG_MPROTECT
   printf("fault:0x%x [%d] (%d)  ",faddr,page(faddr),faddr >= core_end);
 #endif 
-  if (faddr >= core_end || (unsigned long)faddr < DBEGIN) {
-    if (fault_count > 300) error("fault count too high");
-    fault_count ++;
-    INSTALL_MPROTECT_HANDLER;
-    return;
-  }
+/*   if (faddr >= core_end || (unsigned long)faddr < DBEGIN) { */
+/*     if (fault_count > 300) error("fault count too high"); */
+/*     fault_count ++; */
+/*     INSTALL_MPROTECT_HANDLER; */
+/*     return; */
+/*   } */
 #else
   faddr = addr;
 #endif 
