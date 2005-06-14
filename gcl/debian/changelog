@@ -13,8 +13,9 @@ gclcvs (2.7.0-45) unstable; urgency=low
     integer_exact_quotient
   * Push bzero to plt table as compiler writes it via ZALLOCA -- revisit
     builtin bzero issue
+  * Round CSTACK_ADDRESS
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 14 Jun 2005 14:36:29 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 14 Jun 2005 17:22:31 +0000
 
 gclcvs (2.7.0-44) unstable; urgency=low
 
