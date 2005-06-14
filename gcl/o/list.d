@@ -310,15 +310,13 @@ object list(fixnum n,...) {
     tm->tm_nfree -= n;
     tm->tm_nused += n;
     while (--n) {
-      set_type_of(tail,t_cons);
-      make_unfree(tail);
+      set_type_of(tail,t_cons);/*FIXME try removing this*/
       tail->c.c_cdr=OBJ_LINK(tail);
       tail->c.c_car=va_arg(ap,object); 
       tail=tail->c.c_cdr;
     }
     tm->tm_free=OBJ_LINK(tail);
-    set_type_of(tail,t_cons);
-    make_unfree(tail);
+    set_type_of(tail,t_cons);/*FIXME try removing this*/
     tail->c.c_car=va_arg(ap,object); 
     tail->c.c_cdr=Cnil;
     

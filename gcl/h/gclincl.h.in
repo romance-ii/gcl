@@ -220,6 +220,8 @@
 #undef GCL_GPROF_START
 #undef HZ
 
+#undef TYPE_BITS
+
 /* The number of bytes in a char.  */
 #undef SIZEOF_CHAR
 

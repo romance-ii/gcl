@@ -76,12 +76,14 @@ typedef unsigned char  uqfixnum;
 #define FIRSTWORD fixnum e:1,m:1,f:1,s:1,z:4,t:8,w:FILL_BITS
 #define MARKWORD  fixnum e:1,mf:2,   s:1,z:4,t:8,w:FILL_BITS
 #define SGCMWORD  fixnum e:1,mfs:3,      z:4,t:8,w:FILL_BITS
+#define TYPEWORD  fixnum emf:3,      s:1,z:4,t:8,w:FILL_BITS
 
 #else
 
 #define FIRSTWORD fixnum w:FILL_BITS,t:8,z:4,s:1,f:1,m:1,e:1
 #define MARKWORD  fixnum w:FILL_BITS,t:8,z:4,s:1,mf:2,   e:1
 #define SGCMWORD  fixnum w:FILL_BITS,t:8,z:4,mfs:3,      e:1
+#define TYPEWORD  fixnum w:FILL_BITS,t:8,z:4,s:1,emf:3
 
 #endif
 
@@ -180,13 +182,14 @@ struct fixnum_struct {
 #define set_fix(a_,b_)   ((a_)->FIX.FIXVAL=(b_))
 
 #define Zcdr(a_)                 (*(object *)(a_))/* ((a_)->c.c_cdr) */ /*FIXME*/
+#define fobj(a_)                 ((object)&(a_))
 #define is_marked(a_)            (is_imm_fixnum(Zcdr(a_)) ? is_marked_imm_fixnum(Zcdr(a_)) : (a_)->d.m)
 #define is_marked_or_free(a_)    (is_imm_fixnum(Zcdr(a_)) ? is_marked_imm_fixnum(Zcdr(a_)) : (a_)->md.mf)
 #define mark(a_)                 if (is_imm_fixnum(Zcdr(a_))) mark_imm_fixnum(Zcdr(a_)); else (a_)->d.m=1
 #define unmark(a_)               if (is_imm_fixnum(Zcdr(a_))) unmark_imm_fixnum(Zcdr(a_)); else (a_)->d.m=0
 #define is_free(a_)              (!is_imm_fixnum(a_) && !is_imm_fixnum(Zcdr(a_)) && (a_)->d.f)
-#define make_free(a_)            {un_imm_fixnum(Zcdr(a_));(a_)->d.f=1;(a_)->d.m=0;}
-#define make_unfree(a_)          {un_imm_fixnum(Zcdr(a_));(a_)->d.f=0;(a_)->d.m=0;}
+#define make_free(a_)            {*(fixnum *)(a_)&=TYPE_BITS;(a_)->d.f=1;}
+#define make_unfree(a_)          {(a_)->d.f=0;}
 
 #define is_cons(a_)              (is_imm_fixnum(Zcdr(a_)) || !(a_)->d.e)
 
@@ -349,7 +352,7 @@ struct cons {
 
 };
 /*FIXME, review handling of imm fix here*/
-#define Scdr(a_) ({object _t=(a_)->c.c_cdr;unmark((object)&_t);_t;})
+#define Scdr(a_) ({object _t=(a_)->c.c_cdr;unmark(fobj(_t));_t;})
 
 enum httest {   /*  hash table key test function  */
   htt_eq,       /*  eq  */
@@ -802,6 +805,7 @@ struct spice {
 */
 struct dummy      {FIRSTWORD;};
 struct mark       {MARKWORD;};
+struct typew      {TYPEWORD;};
 struct sgcm       {SGCMWORD;};
 
 /*
@@ -840,6 +844,7 @@ union lispunion {
  struct dummy               d; /*  dummy  */
  struct mark               md; /*  mark dummy  */
  struct sgcm              smd; /*  sgc mark dummy  */
+ struct typew              td; /*  type dummy  */
 
  struct fixarray         fixa; /*  fixnum array  */
  struct sfarray           sfa; /*  short-float array  */
@@ -875,8 +880,8 @@ struct freelist {
                            is_imm_fixnum(_z) ? t_fixnum : \
                            (_z==Cnil || _z==Ct || _z==Dotnil ? t_symbol : \
                            (is_cons(_z) ?  t_cons  : _z->d.t));})
-#define set_type_of(x,y) ({object _x=(object)(x);enum type _y=(y);make_unfree(_x);\
-                           if (_y!=t_cons) {_x->d.e=1;_x->d.t=_y;} else _x->d.e=0;})
+#define set_type_of(x,y) ({object _x=(object)(x);enum type _y=(y);*(fixnum *)(_x)=0;\
+                           if (_y!=t_cons) {_x->d.e=1;_x->d.t=_y;}})
 /*
  Storage manager for each type.
 */

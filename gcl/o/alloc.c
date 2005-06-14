@@ -379,9 +379,7 @@ ONCE_MORE:
 	tm->tm_free = OBJ_LINK(obj);
 	--(tm->tm_nfree);
 	(tm->tm_nused)++;
-	set_type_of(obj,t);
-	make_unfree(obj);
-	if (((unsigned long)obj)&0x7) error("foo\n");
+	set_type_of(obj,t);/*FIXME try removing this*/
 	return(obj);
 #ifdef SGC
 #define TOTAL_THIS_TYPE(tm) \
@@ -456,11 +454,9 @@ ONCE_MORE:
 	tm->tm_free = OBJ_LINK(obj);
 	--(tm->tm_nfree);
 	(tm->tm_nused)++;
-	set_type_of(obj,t_cons);
-	make_unfree(obj);
+	set_type_of(obj,t_cons);/*FIXME try removing this*/
 	obj->c.c_car = a;
 	obj->c.c_cdr = d;
-	if (((unsigned long)obj)&0x7) error("foo\n");
 	return(obj);
 
 CALL_GBC:
@@ -502,10 +498,8 @@ Use ALLOCATE to expand the space.",
 object on_stack_cons(object x, object y)
 {object p = (object) alloca_val;
  set_type_of(p,t_cons);
- make_unfree(p);
  p->c.c_car=x;
  p->c.c_cdr=y;
- if (((unsigned long)p)&0x7) error("foo\n");
  return p;
 }
 
@@ -821,7 +815,7 @@ init_tm(enum type t, char *name, int elsize, int nelts, int sgc,int distinct) {
   /* round up to next number of pages */
 
   lu=elsize;
-  if (((object)&lu)->md.mf || type_of((object)&lu)!=t_cons)
+  if (fobj(lu)->td.emf)
     error("structure size must allow for type, mark, and free bits");
 
   maxpage = (((nelts * elsize) + PAGESIZE -1)/PAGESIZE);

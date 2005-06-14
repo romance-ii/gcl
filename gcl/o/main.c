@@ -450,7 +450,21 @@ error(char *s) {
 
 static void
 initlisp(void) {
-        int j;
+
+	fixnum j,a;
+
+	a=(fixnum)Cnil;
+	if (fobj(a)->td.emf)
+	  error("Cnil address must allow for type, mark, and free bits");
+
+	a=(fixnum)Ct;
+	if (fobj(a)->td.emf)
+	  error("Cnil address must allow for type, mark, and free bits");
+
+	a=(fixnum)Dotnil;
+	if (fobj(a)->td.emf)
+	  error("Cnil address must allow for type, mark, and free bits");
+
 	if (NULL_OR_ON_C_STACK(&j) == 0
 	    || NULL_OR_ON_C_STACK(Cnil) != 0
 	    || (((unsigned long )core_end) !=0

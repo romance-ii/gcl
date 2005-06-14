@@ -930,6 +930,25 @@ AC_CHECK_HEADERS(endian.h,
 	AC_MSG_RESULT(big),AC_MSG_RESULT(big)))
 AC_SUBST(LITTLE_END)
 
+AC_MSG_CHECKING(TYPE_BITS macro)
+AC_TRY_RUN([#include <stdio.h>
+	#define EXTER
+	#include "$MP_INCLUDE"
+	#include "`pwd`/h/enum.h"
+	#include "`pwd`/h/object.h"
+	int main(int argc,char **argv,char **envp) {
+	FILE *f=fopen("conftest1","w");
+	fixnum g=0;
+	fobj(g)->d.e=-1;
+	fobj(g)->d.t=-1;
+	fprintf(f,"0x%x",g);
+	fclose(f);
+	return 0;
+	}],type_bits=`cat conftest1`,
+	   echo Cannot find type_bits;exit 1,
+	   echo Cannot find type_bits;exit 1)
+AC_MSG_RESULT($type_bits)
+AC_DEFINE_UNQUOTED(TYPE_BITS,$type_bits)
 
 AC_MSG_CHECKING(sizeof struct contblock)
 
@@ -1088,7 +1107,7 @@ if test "`cat gcl.script | wc -l`" != "0" ; then
   AC_MSG_RESULT(got it)
   AC_MSG_CHECKING("trying to lower heap start")
   cp gcl.script gcl.script.def
-  cat gcl.script.def | awk '/SIZEOF_HEADERS/ {gsub("0x...","0x000",$0);} {print} | sed 's,. = 0x10000000;,/*. = 0x10000000;*/,1'' >gcl.script
+  cat gcl.script.def | awk '/SIZEOF_HEADERS/ {gsub("0x...","0x000",$0);} {print}' |  sed 's,\. = 0x10000000;,/*. = 0x10000000;*/,1' >gcl.script
   if diff gcl.script.def gcl.script >/dev/null 2>&1 ; then
      AC_MSG_RESULT("cannot or not needed")
      rm -f gcl.script gcl.script.def
