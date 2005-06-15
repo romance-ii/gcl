@@ -7,8 +7,9 @@ gclcvs (2.7.0-46) unstable; urgency=low
   * Make clcs/makefile compatible with new broken make
   * Need SGC mark in TYPE_BITS
   * Handle CSTACK_ADDRESS of MOST_NEGATIVE_FIX
+  * Preserve SGC bit i set_type_of
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 15 Jun 2005 22:02:43 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 15 Jun 2005 22:23:28 +0000
 
 gclcvs (2.7.0-45) unstable; urgency=low
 
