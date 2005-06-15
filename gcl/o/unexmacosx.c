@@ -1274,7 +1274,7 @@ void init_darwin_zone_compat ()
 
 /* Replacement for broken sbrk(2).  */
 
-char *my_sbrk (int incr)
+char *sbrk_macosx (int incr)
 {
   char               *temp, *ptr;
   kern_return_t       rtn;
@@ -1282,13 +1282,13 @@ char *my_sbrk (int incr)
   if (mach_brkpt == 0) {
     if ((rtn = vm_allocate (mach_task_self (), (vm_address_t *) &mach_brkpt,
                             big_heap, 1)) != KERN_SUCCESS) {
-      malloc_printf ("my_sbrk(): vm_allocate() failed\n");
+      malloc_printf ("sbrk_macosx(): vm_allocate() failed\n");
       abort ();
       return ((char *)-1);
     }
     if (!mach_brkpt) {
       /* Call this instead of fprintf() because no allocation is performed.  */
-      malloc_printf ("my_sbrk(): cannot allocate heap\n");
+      malloc_printf ("sbrk_macosx(): cannot allocate heap\n");
       return ((char *)-1);        
     }
     mark_region ((unsigned long) mach_brkpt, (unsigned long) big_heap);
@@ -1305,7 +1305,7 @@ char *my_sbrk (int incr)
       mach_brkpt = ptr;
       return (temp);
     } else {
-      malloc_printf ("my_sbrk(): no more memory\n");
+      malloc_printf ("sbrk_macosx(): no more memory\n");
       return ((char *)-1);
     }
   }
