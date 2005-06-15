@@ -43,6 +43,13 @@ fixnum_expt(int x, int y)
 	return(z);
 }
 
+static object number_sin(object);
+static object number_cos(object);
+static object number_exp(object);
+static object number_nlog(object);
+static object number_atan2(object,object);
+
+
 static object
 number_exp(object x)
 {
@@ -64,7 +71,6 @@ number_exp(object x)
 	case t_complex:
 	{
 		object y, y1;
-		static object number_sin(object x), number_cos(object x);
 	        vs_mark;
 	
 		y = x->cmp.cmp_imag;
@@ -93,7 +99,6 @@ number_expt(object x, object y)
 {
 	enum type tx, ty;
 	object z;
-	static object number_nlog(object x);
 	vs_mark;
 
 	tx = type_of(x);
@@ -187,7 +192,6 @@ number_nlog(object x)
 {
 	double log(double);
 	object r=Cnil, i=Cnil, a, p;
-	static object number_sqrt(object x), number_atan2(object y, object x);
 	vs_mark;
 
 	if (type_of(x) == t_complex) {

@@ -1,3 +1,10 @@
+gclcvs (2.7.0-46) unstable; urgency=low
+
+  * Mac fixes
+  * gcc-4.0 static decl fixes
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 15 Jun 2005 15:37:36 +0000
+
 gclcvs (2.7.0-45) unstable; urgency=low
 
   * Portability fixes
