@@ -528,7 +528,7 @@ static void
 print_load_command (struct load_command *lc)
 {
   print_load_command_name (lc->cmd);
-  printf ("%#10lx", lc->cmdsize);
+  printf ("%#10lx", (unsigned long)lc->cmdsize);
 
   if (lc->cmd == LC_SEGMENT)
     {
@@ -538,13 +538,13 @@ print_load_command (struct load_command *lc)
 
       scp = (struct segment_command *) lc;
       printf (" %-16.16s %#10lx %#10lx\n",
-        scp->segname, scp->vmaddr, scp->vmsize);
+        scp->segname, (unsigned long)scp->vmaddr, (unsigned long)scp->vmsize);
 
       sectp = (struct section *) (scp + 1);
       for (j = 0; j < scp->nsects; j++)
         {
           printf ("                               %-16.16s %#10lx %#10lx\n",
-                  sectp->sectname, sectp->addr, sectp->size);
+                  sectp->sectname, (unsigned long)sectp->addr, (unsigned long)sectp->size);
           sectp++;
         }
     }
@@ -571,13 +571,13 @@ read_load_commands ()
 
 #if VERBOSE
   printf ("--- Header Information ---\n");
-  printf ("Magic      = 0x%08lx\n", mh.magic);
+  printf ("Magic      = 0x%08lx\n", (unsigned long)mh.magic);
   printf ("CPUType    = %d\n",      mh.cputype);
   printf ("CPUSubType = %d\n",      mh.cpusubtype);
-  printf ("FileType   = 0x%lx\n",   mh.filetype);
-  printf ("NCmds      = %ld\n",     mh.ncmds);
-  printf ("SizeOfCmds = %ld\n",     mh.sizeofcmds);
-  printf ("Flags      = 0x%08lx\n", mh.flags);
+  printf ("FileType   = 0x%lx\n",   (unsigned long)mh.filetype);
+  printf ("NCmds      = %ld\n",     (unsigned long)mh.ncmds);
+  printf ("SizeOfCmds = %ld\n",     (unsigned long)mh.sizeofcmds);
+  printf ("Flags      = 0x%08lx\n", (unsigned long)mh.flags);
 #endif
 
   nlc = mh.ncmds;
@@ -656,8 +656,8 @@ copy_segment (struct load_command *lc)
     scp->vmaddr += linkedit_delta;
   
   printf ("Writing segment %-16.16s at %#10lx - %#10lx (sz: %#10lx)\n",
-          scp->segname, scp->fileoff, scp->fileoff + scp->filesize,
-          scp->filesize);
+          scp->segname, (unsigned long)scp->fileoff, (unsigned long)scp->fileoff + scp->filesize,
+          (unsigned long)scp->filesize);
 
   if (!unexec_copy (scp->fileoff, old_fileoff, scp->filesize))
     unexec_error ("cannot copy segment from input to output file");
@@ -694,8 +694,8 @@ copy_data_segment (struct load_command *lc)
   }
 
   printf ("Writing segment %-16.16s at %#10lx - %#10lx (sz: %#10lx)\n",
-          scp->segname, scp->fileoff, scp->fileoff + scp->filesize,
-          scp->filesize);
+          scp->segname, (unsigned long)scp->fileoff, (unsigned long)scp->fileoff + scp->filesize,
+          (unsigned long)scp->filesize);
   
   /* Offsets in the output file for writing the next section structure
      and segment data block, respectively.  */
@@ -742,8 +742,8 @@ copy_data_segment (struct load_command *lc)
         unexec_error ("unrecognized section name in __DATA segment");
 
       printf ("        section %-16.16s at %#10lx - %#10lx (sz: %#10lx)\n",
-              sectp->sectname, sectp->offset, sectp->offset + sectp->size,
-              sectp->size);
+              sectp->sectname, (unsigned long)sectp->offset, (unsigned long)sectp->offset + sectp->size,
+              (unsigned long)sectp->size);
 
       header_offset += sizeof (struct section);
       sectp++;
@@ -831,7 +831,7 @@ copy_data_segment (struct load_command *lc)
       section.reserved2 = 0;
             
       printf ("Writing segment %-16.16s at %#10lx - %#10lx (sz: %#10lx)\n",
-              sc.segname, sc.fileoff, sc.fileoff + sc.filesize, sc.filesize);
+              sc.segname, (unsigned long)sc.fileoff, (unsigned long)sc.fileoff + sc.filesize, (unsigned long)sc.filesize);
 
       if (!unexec_write (sc.fileoff, (void *) sc.vmaddr, sc.filesize))
         unexec_error ("cannot write new __DATA segment");
