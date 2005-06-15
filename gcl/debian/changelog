@@ -4,8 +4,9 @@ gclcvs (2.7.0-46) unstable; urgency=low
   * gcc-4.0 static decl fixes
   * my_sbrk -> sbrk_macosx
   * unsigned long casts to printf in unexmacosx.c
+  * Make clcs/makefile compatible with new broken make
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 15 Jun 2005 15:53:35 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 15 Jun 2005 16:57:35 +0000
 
 gclcvs (2.7.0-45) unstable; urgency=low
 
