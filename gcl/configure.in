@@ -941,6 +941,7 @@ AC_TRY_RUN([#include <stdio.h>
 	fixnum g=0;
 	fobj(g)->d.e=-1;
 	fobj(g)->d.t=-1;
+	fobj(g)->d.s=-1;
 	fprintf(f,"0x%x",g);
 	fclose(f);
 	return 0;
