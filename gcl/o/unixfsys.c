@@ -225,7 +225,7 @@ truename(object pathname)
 	char truefilename[MAXPATHLEN];
 	char current_directory[MAXPATHLEN];
 	char directory[MAXPATHLEN];
-	static char *getwd(char *buffer);
+	char *getwd(char *buffer);
 	int islinkcount=8;
 	struct stat filestatus;
 
