@@ -291,7 +291,7 @@ main(int argc, char **argv, char **envp) {
 
 #ifdef AV
     
-    cs_limit = (void *)CSTACK_ADDRESS + CSTACK_DIRECTION * cssize;
+    cs_limit = (void *)CSTACK_ADDRESS + CSTACK_DIRECTION * cssize + 1;
 #endif
 
 
@@ -778,7 +778,7 @@ reset_cstack_limit(int arg) {
 #else
   if (&arg < cs_base + cssize/sizeof(*cs_base) - 16)
 #endif
-    cs_limit = (void *)CSTACK_ADDRESS + CSTACK_DIRECTION * cssize;
+    cs_limit = (void *)CSTACK_ADDRESS + CSTACK_DIRECTION * cssize + 1;
   else
       error ( "can't reset cs_limit" );
 }

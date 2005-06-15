@@ -6,8 +6,9 @@ gclcvs (2.7.0-46) unstable; urgency=low
   * unsigned long casts to printf in unexmacosx.c
   * Make clcs/makefile compatible with new broken make
   * Need SGC mark in TYPE_BITS
+  * Handle CSTACK_ADDRESS of MOST_NEGATIVE_FIX
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 15 Jun 2005 17:32:39 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 15 Jun 2005 22:02:43 +0000
 
 gclcvs (2.7.0-45) unstable; urgency=low
 

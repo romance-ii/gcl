@@ -1232,7 +1232,8 @@ main()
 
   for (i=2,k=1;i;k=i,i<<=1);
   for (i=j=k;j && i<(unsigned long)&v;j>>=1,i|=j);
-  fprintf(fp,"%ld",i&-0x1000);
+  i&=-0x1000;
+  fprintf(fp,"%ld",i-1);
   fclose(fp);
   return 0;
 }],cstack_address=`cat conftest1`,cstack_address=0,cstack_address=0)
