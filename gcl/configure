@@ -5814,7 +5814,7 @@ else
   cat > conftest.$ac_ext <<EOF
 #line 5816 "configure"
 #include "confdefs.h"
-#define _GNU_SOURCE
+#define _GNU_SOURCE 1
 	    #include <math.h>
 	    int main() {
 		float f;
@@ -5874,7 +5874,7 @@ else
   cat > conftest.$ac_ext <<EOF
 #line 5876 "configure"
 #include "confdefs.h"
-#define _GNU_SOURCE
+#define _GNU_SOURCE 1
 	    #include <math.h>
 	    int main() {
 		float f;

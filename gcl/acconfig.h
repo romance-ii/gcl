@@ -166,7 +166,7 @@ SGC is enabled.  */
 
 #ifdef IN_NUM_CO
 #ifdef HAVE_ISNORMAL
-#define _GNU_SOURCE
+#define __USE_ISOC99 1
 #include <math.h>
 #define ISNORMAL(a) isnormal(a)
 #else
@@ -187,7 +187,7 @@ SGC is enabled.  */
 
 #ifdef NEED_ISFINITE
 #ifdef HAVE_ISFINITE
-#define _GNU_SOURCE
+#define __USE_ISOC99 1
 #include <math.h>
 #define ISFINITE(a) isfinite(a)
 #else
