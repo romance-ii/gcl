@@ -97,8 +97,8 @@ SGC is enabled.  */
 #define CSTACK_ADDRESS 0
 #define CSTACK_DIRECTION 0
 #define CSTACK_ALIGNMENT 0
-#define CSTACK_TOP 0
-#define CSTACK_RANGE 0
+#define MEM_TOP 0
+#define MEM_RANGE 0
 #define SHARED_LIB_HEAP_CEILING 0
 #undef IM_FIX_BASE
 #undef IM_FIX_LIM
@@ -266,3 +266,4 @@ SGC is enabled.  */
 
 #undef TYPE_BITS
 #undef OBJ_ALIGN
+#undef NEG_CSTACK_ADDRESS
