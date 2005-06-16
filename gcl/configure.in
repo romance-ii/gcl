@@ -930,63 +930,6 @@ AC_CHECK_HEADERS(endian.h,
 	AC_MSG_RESULT(big),AC_MSG_RESULT(big)))
 AC_SUBST(LITTLE_END)
 
-AC_MSG_CHECKING(TYPE_BITS macro)
-AC_TRY_RUN([#include <stdio.h>
-	#define EXTER
-	#include "$MP_INCLUDE"
-	#include "`pwd`/h/enum.h"
-	#include "`pwd`/h/object.h"
-	int main(int argc,char **argv,char **envp) {
-	FILE *f=fopen("conftest1","w");
-	fixnum g=0;
-	fobj(g)->d.e=-1;
-	fobj(g)->d.t=-1;
-	fobj(g)->d.s=-1;
-	fprintf(f,"0x%x",g);
-	fclose(f);
-	return 0;
-	}],type_bits=`cat conftest1`,
-	   echo Cannot find type_bits;exit 1,
-	   echo Cannot find type_bits;exit 1)
-AC_MSG_RESULT($type_bits)
-AC_DEFINE_UNQUOTED(TYPE_BITS,$type_bits)
-
-AC_MSG_CHECKING(sizeof struct contblock)
-
-# work around MSYS pwd result incompatibility
-if test "$use" = "mingw" ; then
-AC_TRY_RUN([#include <stdio.h>
-	#define EXTER
-	#include "$MP_INCLUDE"
-	#include "h/enum.h"
-	#include "h/object.h"
-	int main(int argc,char **argv,char **envp) {
-	FILE *f=fopen("conftest1","w");
-	fprintf(f,"%u",sizeof(struct contblock));
-	fclose(f);
-	return 0;
-	}],sizeof_contblock=`cat conftest1`,
-	   echo Cannot find sizeof struct contblock;exit 1,
-	   echo Cannot find sizeof struct contblock;exit 1)
-else
-AC_TRY_RUN([#include <stdio.h>
-	#define EXTER
-	#include "$MP_INCLUDE"
-	#include "`pwd`/h/enum.h"
-	#include "`pwd`/h/object.h"
-	int main(int argc,char **argv,char **envp) {
-	FILE *f=fopen("conftest1","w");
-	fprintf(f,"%u",sizeof(struct contblock));
-	fclose(f);
-	return 0;
-	}],sizeof_contblock=`cat conftest1`,
-	   echo Cannot find sizeof struct contblock;exit 1,
-	   echo Cannot find sizeof struct contblock;exit 1)
-fi
-AC_MSG_RESULT($sizeof_contblock)
-AC_DEFINE_UNQUOTED(SIZEOF_CONTBLOCK,$sizeof_contblock)
-
-
 
 # On systems with execshield, brk is randomized.  We need to catch
 # this and restore the traditional behavior here
@@ -1097,6 +1040,92 @@ if test "$HAVE_SBRK" = "1" ; then
 		AC_MSG_RESULT(no)
 	fi
 fi
+
+####  Memory areas and alignment
+
+AC_MSG_CHECKING("for required object alignment")
+AC_TRY_RUN([#include <stdio.h>
+	#define EXTER
+	#include "$MP_INCLUDE"
+	#include "`pwd`/h/enum.h"
+	#define OBJ_ALIGN
+	#include "`pwd`/h/object.h"
+	int main() {
+	unsigned long i;
+   	FILE *fp=fopen("conftest1","w");
+	for (i=1;i && NOT_OBJECT_ALIGNED(i); i<<=1);
+	if (!i) return -1;
+	fprintf(fp,"%lu\n",i);
+	fclose(fp);
+	return 0;}],obj_align=`cat conftest1`,
+				echo Cannot find object alignent;exit -1,
+				echo Cannot find object alignent;exit -1)
+AC_MSG_RESULT($obj_align)
+
+AC_MSG_CHECKING("for C extension variable alignment")
+AC_TRY_RUN([int main() {
+	    char *v __attribute__ ((aligned ($obj_align)));
+	    return 0;}],obj_align="__attribute__ ((aligned ($obj_align)))",obj_align=,obj_align=)
+AC_MSG_RESULT($obj_align)
+AC_DEFINE_UNQUOTED(OBJ_ALIGN,$obj_align)
+
+
+AC_MSG_CHECKING(TYPE_BITS macro)
+AC_TRY_RUN([#include <stdio.h>
+	#define EXTER
+	#include "$MP_INCLUDE"
+	#include "`pwd`/h/enum.h"
+	#include "`pwd`/h/object.h"
+	int main(int argc,char **argv,char **envp) {
+	FILE *f=fopen("conftest1","w");
+	fixnum g=0;
+	fobj(g)->d.e=-1;
+	fobj(g)->d.t=-1;
+	fobj(g)->d.s=-1;
+	fprintf(f,"0x%x",g);
+	fclose(f);
+	return 0;
+	}],type_bits=`cat conftest1`,
+	   echo Cannot find type_bits;exit 1,
+	   echo Cannot find type_bits;exit 1)
+AC_MSG_RESULT($type_bits)
+AC_DEFINE_UNQUOTED(TYPE_BITS,$type_bits)
+
+AC_MSG_CHECKING(sizeof struct contblock)
+
+# work around MSYS pwd result incompatibility
+if test "$use" = "mingw" ; then
+AC_TRY_RUN([#include <stdio.h>
+	#define EXTER
+	#include "$MP_INCLUDE"
+	#include "h/enum.h"
+	#include "h/object.h"
+	int main(int argc,char **argv,char **envp) {
+	FILE *f=fopen("conftest1","w");
+	fprintf(f,"%u",sizeof(struct contblock));
+	fclose(f);
+	return 0;
+	}],sizeof_contblock=`cat conftest1`,
+	   echo Cannot find sizeof struct contblock;exit 1,
+	   echo Cannot find sizeof struct contblock;exit 1)
+else
+AC_TRY_RUN([#include <stdio.h>
+	#define EXTER
+	#include "$MP_INCLUDE"
+	#include "`pwd`/h/enum.h"
+	#include "`pwd`/h/object.h"
+	int main(int argc,char **argv,char **envp) {
+	FILE *f=fopen("conftest1","w");
+	fprintf(f,"%u",sizeof(struct contblock));
+	fclose(f);
+	return 0;
+	}],sizeof_contblock=`cat conftest1`,
+	   echo Cannot find sizeof struct contblock;exit 1,
+	   echo Cannot find sizeof struct contblock;exit 1)
+fi
+AC_MSG_RESULT($sizeof_contblock)
+AC_DEFINE_UNQUOTED(SIZEOF_CONTBLOCK,$sizeof_contblock)
+
 
 AC_MSG_CHECKING("finding default linker script")
 touch unixport/gcl.script
@@ -1305,7 +1334,7 @@ if test "$tmp_cssize" != "$enable_cssize" ; then
 else
    AC_MSG_RESULT("$enable_cssize is OK")
 fi
-AC_DEFINE_UNQUOTED(CSSIZE,$enable_cssize)
+#AC_DEFINE_UNQUOTED(CSSIZE,$enable_cssize)
 
 AC_MSG_CHECKING("for C stack size limit from fixnum table ")
 AC_TRY_RUN([#include <stdio.h>
@@ -2004,7 +2033,8 @@ AC_SUBST(NOTIFY)
 # the time handling for unixtime, add timezone
 
 AC_MSG_CHECKING([alloca])
-AC_TRY_RUN([int main() { exit(alloca(500) != NULL ? 0 : 1);}],
+AC_TRY_RUN([#include <stdio.h>
+int main() { exit(alloca(500) != NULL ? 0 : 1);}],
   ,gcl_ok=yes, gcl_ok=no,gcl_ok=no)
 if test $gcl_ok = yes ; then
     AC_MSG_RESULT(yes)

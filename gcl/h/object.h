@@ -87,6 +87,8 @@ typedef unsigned char  uqfixnum;
 
 #endif
 
+#define NOT_OBJECT_ALIGNED(a_) fobj(a_)->td.emf
+
 #ifndef PAGEWIDTH
 #define PAGEWIDTH 11
 #endif
@@ -257,7 +259,7 @@ struct character {
 
 };
 
-EXTER struct character character_table1[256+128]; /*FIXME, sync with char code constants above.*/
+EXTER struct character character_table1[256+128] OBJ_ALIGN; /*FIXME, sync with char code constants above.*/
 #define character_table (character_table1+128)
 #define code_char(c)    (object)(character_table+(c))
 #define char_code(obje) (obje)->ch.ch_code
@@ -300,7 +302,7 @@ struct symbol {
 
 };
 
-EXTER double CnilCt[3*sizeof(struct symbol)/sizeof(double)];
+EXTER char CnilCt[3*sizeof(struct symbol)] OBJ_ALIGN;
 
 #define Cnil   ((object)(CnilCt))
 #define Ct     ((object)((char *)Cnil+sizeof(struct symbol)))
@@ -1183,12 +1185,16 @@ EXTER unsigned plong signals_allowed, signals_pending  ;
 /* EXTER struct symbol Dotnil_body; */
 /* #define Dotnil ((object)&Dotnil_body) */
 
+/* FIXME -- go through all the endp calls and handle dots explicitly
+   at some point.  For now, the s_my_dot structs must be explicitly
+   initialized to be placed in .data as opposed to .bss and thereby
+   initialized by the loader.  20050616 CM*/
+
 #define endp(x) ({\
-    static struct cons s_my_dot;\
+    static struct cons s_my_dot={Dotnil,Dotnil};\
     object _x=(x);\
     bool _b=FALSE;\
     \
-    if (!s_my_dot.c_car) s_my_dot.c_car=s_my_dot.c_cdr=Dotnil;\
     if (type_of(_x)==t_cons) {\
        if (type_of(_x->c.c_cdr)!=t_cons && _x->c.c_cdr!=Cnil)\
           s_my_dot.c_car=_x->c.c_cdr;\

@@ -265,3 +265,4 @@ SGC is enabled.  */
 #undef HZ
 
 #undef TYPE_BITS
+#undef OBJ_ALIGN

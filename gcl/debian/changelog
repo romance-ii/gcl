@@ -1,3 +1,11 @@
+gclcvs (2.7.0-47) unstable; urgency=low
+
+  * More portability fixes
+  * Explicitly align CnilCt and character_table1, the only objects in
+    our initial .data segment
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 16 Jun 2005 17:01:02 +0000
+
 gclcvs (2.7.0-46) unstable; urgency=low
 
   * Mac fixes

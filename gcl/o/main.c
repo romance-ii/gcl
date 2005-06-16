@@ -454,16 +454,16 @@ initlisp(void) {
 	fixnum j,a;
 
 	a=(fixnum)Cnil;
-	if (fobj(a)->td.emf)
-	  error("Cnil address must allow for type, mark, and free bits");
+	if (NOT_OBJECT_ALIGNED(a))
+	  error("Cnil is not properly aligned");
 
 	a=(fixnum)Ct;
-	if (fobj(a)->td.emf)
-	  error("Cnil address must allow for type, mark, and free bits");
+	if (NOT_OBJECT_ALIGNED(a))
+	  error("Ct is not properly aligned");
 
 	a=(fixnum)Dotnil;
-	if (fobj(a)->td.emf)
-	  error("Cnil address must allow for type, mark, and free bits");
+	if (NOT_OBJECT_ALIGNED(a))
+	  error("Dotnil is not properly aligned");
 
 	if (NULL_OR_ON_C_STACK(&j) == 0
 	    || NULL_OR_ON_C_STACK(Cnil) != 0

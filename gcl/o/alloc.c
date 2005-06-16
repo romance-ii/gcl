@@ -815,8 +815,8 @@ init_tm(enum type t, char *name, int elsize, int nelts, int sgc,int distinct) {
   /* round up to next number of pages */
 
   lu=elsize;
-  if (fobj(lu)->td.emf)
-    error("structure size must allow for type, mark, and free bits");
+  if (NOT_OBJECT_ALIGNED(lu))
+    error("structure size is not properly aligned");
 
   maxpage = (((nelts * elsize) + PAGESIZE -1)/PAGESIZE);
   tm_table[(int)t].tm_name = name;

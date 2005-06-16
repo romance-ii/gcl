@@ -221,6 +221,7 @@
 #undef HZ
 
 #undef TYPE_BITS
+#undef OBJ_ALIGN
 
 /* The number of bytes in a char.  */
 #undef SIZEOF_CHAR
