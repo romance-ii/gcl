@@ -4551,7 +4551,7 @@ echo "$ac_t""$cstack_direction" 1>&6
 
 ## Don't lower heap start if C stack is below default dbegin, as we're
 # likely to get more heap this way.
-if awk 'END {exit (unsigned long)d<(unsigned long)c ? 0 : 1}'d=$dbegin c=$cstack_address /dev/null ; then
+if awk 'END {exit (unsigned long)d<(unsigned long)c ? 0 : 1}' d=$dbegin c=$cstack_address /dev/null ; then
 
    echo $ac_n "checking "finding default linker script"""... $ac_c" 1>&6
 echo "configure:4558: checking "finding default linker script"" >&5
