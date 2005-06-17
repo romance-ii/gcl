@@ -1,3 +1,10 @@
+gclcvs (2.7.0-48) unstable; urgency=low
+
+  * More ortability fixes
+  * Fix stack/heap configuration issues on alpha
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 17 Jun 2005 17:36:12 +0000
+
 gclcvs (2.7.0-47) unstable; urgency=low
 
   * More portability fixes
