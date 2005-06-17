@@ -134,6 +134,8 @@ do {                                                    \
 
 /* si_addr not containing the faulting address is a bug in Darwin.
    Work around this by looking at the dar field of the exception state.  */
+#include <sys/ucontext.h>
+#include <sys/types.h>
 #define GET_FAULT_ADDR(sig,code,scp,addr) ((char *) (((ucontext_t *) scp)->uc_mcontext->es.dar))
 
 /*

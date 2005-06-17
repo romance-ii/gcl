@@ -6,8 +6,9 @@ gclcvs (2.7.0-47) unstable; urgency=low
   * Modify configure to handle cases where C stack is below dbegin.
     FIXME -- do likewise for shared memory loads below dbegin
   * FIXME _GNU_SOURCE -> __USE_ISOC99 macro for isnormal et. al.
+  * powerpc-macosx.h includes
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 16 Jun 2005 22:35:26 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 17 Jun 2005 01:13:32 +0000
 
 gclcvs (2.7.0-46) unstable; urgency=low
 
