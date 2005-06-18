@@ -17,6 +17,7 @@ main(int argc,char * argv[],char *envp[]) {
   double d=0.1;
 
   bzero(&env,sizeof(env));
+  memset(&env,0,sizeof(env));
 
   getc(f);
   putc(ch,f);
