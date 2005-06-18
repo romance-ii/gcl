@@ -3,8 +3,9 @@ gclcvs (2.7.0-48) unstable; urgency=low
   * More ortability fixes
   * Fix stack/heap configuration issues on alpha
   * mips optimizes bzero to memset
+  * Have to build 2.0 binary on hppa until debian gets >= gcc 3.4
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 18 Jun 2005 22:00:25 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 18 Jun 2005 22:08:17 +0000
 
 gclcvs (2.7.0-47) unstable; urgency=low
 
