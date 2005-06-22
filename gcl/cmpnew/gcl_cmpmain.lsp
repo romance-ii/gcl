@@ -115,7 +115,8 @@
 	 ((> (file-position *compiler-input*)
 	     (car *split-files*))
 	  (setf (third *split-files*)(file-position *compiler-input*)))))
-	  
+
+(defvar *lsp-ext* (make-pathname :type "lsp"))
 
 (defun compile-file  (&rest args
 			    &aux (*print-pretty* nil)
@@ -132,7 +133,7 @@
 			    (*PRINT-ESCAPE* T)
 			    (section-length *split-files*)
 			    tem
-			    (*compile-file-pathname* (merge-pathnames (car args)))
+			    (*compile-file-pathname* (merge-pathnames *lsp-ext* (car args)))
 			    (*compile-file-truename* (truename *compile-file-pathname*)))
   (loop 
    (compiler::init-env)
