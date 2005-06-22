@@ -838,7 +838,9 @@
 	(if *safe-compile*
 	    ;;FIXME -- alter C definition to remove the fixint here.
 	    (wt "fixint(fLarray_dimension(" a "," i "))")
-	  (wt "(type_of(" a ")==t_array ? (" a ")->a.a_dims[(" i ")] : (" a ")->v.v_dim)"))))))
+         (if (eql 0 i)
+	     (wt "(type_of(" a ")==t_array ? (" a ")->a.a_dims[(" i ")] : (" a ")->v.v_dim)")
+	    (wt "(" a ")->a.a_dims[(" i ")]")))))))
   
 (defun list*-inline (&rest x)
   (case (length x)
