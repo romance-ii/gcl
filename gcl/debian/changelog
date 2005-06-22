@@ -7,8 +7,10 @@ gclcvs (2.7.0-49) unstable; urgency=low
     decide if this is preferable to blocking this possibility and saving
     this facility for floats/doubles.  ACL2 declares quite a few
     functions as having unbounded integer arguments.
+  * Allow fmakunbound to proceed on undefined functions in cltl1 for
+    acl2
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 22 Jun 2005 01:35:31 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 22 Jun 2005 01:38:00 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 

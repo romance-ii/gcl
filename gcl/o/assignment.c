@@ -257,8 +257,11 @@ DEFUNO_NEW("FMAKUNBOUND",object,fLfmakunbound,LISP
   /* 1 args */
   if(type_of(sym) != t_symbol)
     not_a_symbol(sym);
+
+#ifdef ANSI_COMMON_LISP
   if (sym->s.s_gfdef==OBJNULL)
     FEundefined_function(sym);
+#endif
 
   if (sym->s.s_sfdef != NOT_SPECIAL) {
     if (sym->s.s_mflag) {
