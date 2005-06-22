@@ -518,7 +518,7 @@
   (when (flag-p (third inline-info) itf)
     (let ((restp (apply (car inline-info) arg-types)))
       (return-from inline-type-matches (when restp `(,(car restp) ,(cadr restp) ,@(cddr inline-info))))))
-  (if (member 'integer (car inline-info))
+  (if (member 'integer (car inline-info) :key (lambda (x) (if (consp x) (car x) x)) :test #'eq)
       (return-from inline-type-matches nil))
   (if (and (let ((types (car inline-info))(last t))
                 (declare (object types))
