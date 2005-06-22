@@ -638,6 +638,8 @@
   (if (var-p x) (setq x (var-type x)))
   (cond ((and x (subtypep x 'fixnum))
 	 1)
+	((and x (subtypep x 'integer))
+	 2)
 	(t 0)))
 
 
@@ -793,6 +795,7 @@
     (t3defun-aux 't3defun-local-entry
 		 (case (promoted-c-type (caddr inline-info))
 		   (fixnum 'return-fixnum)
+		   (integer 'return-integer)
 		   (character 'return-character)
 		   (long-float 'return-long-float)
 		   (short-float 'return-short-float)
@@ -826,6 +829,7 @@
              (setf (var-kind (car vl))
                    (case (promoted-c-type (car types))
                          (fixnum 'FIXNUM)
+                         (integer 'integer)
                          (character 'CHARACTER)
                          (long-float 'LONG-FLOAT)
                          (short-float 'SHORT-FLOAT)
@@ -1821,24 +1825,20 @@
 
 (defun wt-cvars( &aux type )
   (dolist (v *c-vars*)
-     (let ((t1 (if (consp v) (prog1 (car v) (setq v (cdr v))) t)))
-       (cond ((eq type t1)(format *compiler-output2* " ,V~a" v))
-	     (t (or (null type)
-		    (format *compiler-output2* ";"))
-		(setq type t1)
-		(format *compiler-output2* " ~a V~a"
-				       (rep-type type) v)))
-       (cond ((eq type 'integer)
-	      (format *compiler-output2* "= 0,V~aalloc" v)
-	      ))
-       ))
- (and *c-vars* (format *compiler-output2* ";"))
+    (let ((t1 (if (consp v) (prog1 (car v) (setq v (cdr v))) t)))
+      (cond ((eq type t1)(format *compiler-output2* " ,V~a" v))
+	    (t (or (null type)
+		   (format *compiler-output2* ";"))
+	       (setq type t1)
+	       (if (eq (promoted-c-type type) 'integer)
+		   (format *compiler-output2*  "IDECL1(V~a,V~abody,V~aalloc)" v v v)
+		 (format *compiler-output2* " ~a V~a" (rep-type type) v))))))
+  (and *c-vars* (format *compiler-output2* ";"))
  (unless (or (not *vcs-used*) (eql *cs* 0))
 ;	 (format *compiler-output2* " object Vcs[~a]={Cnil" *cs*)
 ;	 (dotimes (temp (- *cs* 1) t) (format *compiler-output2* ",Cnil"))
 ;	 (format *compiler-output2* "};"))
-	 (format *compiler-output2* " object Vcs[~a];" *cs*))
-  )
+	 (format *compiler-output2* " object Vcs[~a];" *cs*)))
 
 
 

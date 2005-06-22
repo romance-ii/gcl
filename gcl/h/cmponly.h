@@ -33,7 +33,7 @@ GEN setq_io(),setq_ii();
 
 #else
 
-typedef MP_INT * GEN;
+/* typedef MP_INT * GEN; */
 
 int obj_to_mpz(object,MP_INT *);
 int obj_to_mpz1(object,MP_INT *,void *);
@@ -51,6 +51,7 @@ MP_INT * otoi(object x);
 /* FIXME, verify that IDECL need not be changed, improve logic behind malloc */
 /* selection, e.g. closure boundaries.  CM 20031201*/
 #define IDECL(a,b,c) mp_limb_t *c=(mp_limb_t *)ZALLOCA(1*sizeof(mp_limb_t));MP_INT b={1,1,c}; a = &b 
+#define IDECL1(a,b,c) mp_limb_t *c=(mp_limb_t *)ZALLOCA(1*sizeof(mp_limb_t));MP_INT b={1,1,c}; GEN a = &b 
 #define SETQ_IO(var,alloc,val,af) { object _xx = (val); \
                                     int _n; \
                                     if ((_n=obj_to_mpz(_xx,(var)))) {\

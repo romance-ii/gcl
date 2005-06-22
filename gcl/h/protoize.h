@@ -1776,6 +1776,11 @@ void clear_c_stack(VOL unsigned);
 long
 opt_maxpage(struct typemanager *);
 
+typedef MP_INT * GEN;
+
+MP_INT *
+otoi(object);
+
 #ifdef SGC
 void
 memprotect_test_reset(void);

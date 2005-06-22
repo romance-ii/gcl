@@ -1022,7 +1022,7 @@ EXTER char *tmp_alloc;
 #define isUpper(xxx) (((xxx)&0200) == 0 && isupper((int)xxx))
 #define isLower(xxx) (((xxx)&0200) == 0 && islower((int)xxx))
 #define isDigit(xxx) (((xxx)&0200) == 0 && isdigit((int)xxx))
-enum ftype {f_object,f_fixnum};
+enum ftype {f_object,f_fixnum,f_integer};
 EXTER char *alloca_val;
 
 /*          ...xx|xx|xxxx|xxxx|   

@@ -105,7 +105,7 @@ quick_call_sfun(object fun)
   restype = SFUN_RETURN_TYPE(i);
   SFUN_START_ARG_TYPES(i);
   /* for moment just support object and int */
-#define COERCE_ARG(a,type)  (type==f_object ? a : (object)(fix(a)))
+#define COERCE_ARG(a,type)  (type==f_object ? a : (type==f_fixnum ? (object)(fix(a)) : (object)otoi(a)))
   if (i==0)
     x=vs_base;
   else
@@ -117,8 +117,9 @@ quick_call_sfun(object fun)
   SET_TO_APPLY(res,fun->sfn.sfn_self,n,x);
   base[0]=
     (restype==f_object ?  res :
-     restype==f_fixnum ? make_fixnum((long)res)
-     :(object) (FEerror("Bad result type",0),Cnil));
+     (restype==f_fixnum ? make_fixnum((long)res) :
+      (restype==f_integer ? make_integer((GEN)res) :
+       (object) (FEerror("Bad result type",0),Cnil))));
   vs_base = base;
   vs_top=base+1;
   CHECK_AVMA;
@@ -1426,9 +1427,10 @@ fcalln_general(object first,va_list ap) {
       while (n-- > 0) {
 	typ= SFUN_NEXT_TYPE(i);
 	x =
-	  (typ==f_object ?	(jj ? va_arg(ap,object) : first):
-	   typ==f_fixnum ? make_fixnum((jj ? va_arg(ap,fixnum) : (fixnum)first)):
-	   (object) (FEerror("bad type",0),Cnil));
+	  (typ==f_object ?	(jj ? va_arg(ap,object) : first) :
+	   (typ==f_fixnum ? make_fixnum((jj ? va_arg(ap,fixnum) : (fixnum)first)) :
+	    (typ==f_integer ? make_integer((jj ? va_arg(ap,GEN) : (GEN)first)) :
+	     (object) (FEerror("bad type",0),Cnil))));
 	*(vs_top++) = x;
 	jj++;
       }
@@ -1445,8 +1447,9 @@ fcalln_general(object first,va_list ap) {
     vs_top=old_vs_top;
     /* vs_base=old_vs_base; */
     return (restype== f_object ? x :
-	    restype== f_fixnum ? (object) (fix(x)):
-	    (object) (FEerror("bad type",0),Cnil));
+	    (restype== f_fixnum ? (object) (fix(x)) :
+	     (restype== f_integer ? (object) (otoi(x)) :
+	      (object) (FEerror("bad type",0),Cnil))));
   }
 }
 

@@ -221,7 +221,7 @@
        (fixnum           (wt "stoi(V" (var-loc (cadr loc))")"))
        (otherwise (wt "otoi(" loc ")"))))
     (otherwise (wt "otoi(" loc ")")))
-  (and avma (not *restore-avma*)(wfs-error))
+;  (and avma (not *restore-avma*)(wfs-error))
   )
      
 

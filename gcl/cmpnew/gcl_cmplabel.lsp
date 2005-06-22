@@ -166,6 +166,7 @@
     ((setq type.wt
 	   (assoc ue
 		  '((return-fixnum fixnum .  wt-fixnum-loc)
+		    (return-integer integer . wt-integer-loc)
 		    (return-character character . wt-character-loc)
 		    (return-short-float short-float . wt-short-float-loc)
 		    (return-long-float long-float . wt-long-float-loc)

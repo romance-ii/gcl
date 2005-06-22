@@ -214,9 +214,17 @@
     (let ((t1 (si::normalize-type t1)))
       (if (integer-typep t1) t1))))
 
+(defvar *two-stars* '(* *))
+
+(defun integer-norm-form (form &optional (st *two-stars* stp))
+  (cond ((and (not stp) (atom form)) (integer-norm-form (list form)))
+	((and form (or (not st) (atom form))) (error "Bad integer type"))
+	(form (cons (car form) (integer-norm-form (cdr form) (if stp (cdr st) st))))
+	(st)))
+
 (defun integer-type-and (type1 type2)
-  (let ((ct1 (coerce-to-integer-type type1))
-	(ct2 (coerce-to-integer-type type2)))
+  (let ((ct1 (integer-norm-form (coerce-to-integer-type type1)))
+	(ct2 (integer-norm-form (coerce-to-integer-type type2))))
     (and ct1 ct2
 	 (eq (car ct1) (car ct2))
 	 (let ((b1 (cadr ct1))

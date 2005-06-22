@@ -1311,7 +1311,8 @@ call_proc(object sym, int setf, void **link, int argd, va_list ll)
 	{while(i < nargs)
 	    {enum ftype typ=SFUN_NEXT_TYPE(argd);
 	      vs_push((typ==f_object? va_arg(ll,object):
-		       make_fixnum(va_arg(ll,fixnum))));
+		       (typ==f_fixnum ? make_fixnum(va_arg(ll,fixnum)) :
+			make_integer(va_arg(ll,GEN)))));
 	     i++;}}
     }
 
@@ -1321,7 +1322,7 @@ call_proc(object sym, int setf, void **link, int argd, va_list ll)
       vs_top=base;
 	/* vs_base=oldbase;
       The caller won't expect us to restore these.  */
-     return((result_type==f_object? vs_base[0] : (object)fix(vs_base[0])));
+     return((result_type==f_object? vs_base[0] : (result_type==f_fixnum ? (object)fix(vs_base[0]) : (object)otoi(vs_base[0]))));
    }
 }
 
@@ -1446,10 +1447,14 @@ call_proc_new(object sym, int setf,void **link, int argd, object first, va_list 
 	    object _xx;
 	    if (typ==f_object)
 	      _xx=i ? va_arg(ll,object) : first;
-	    else {
-	      long _yy;
+	    else if (typ==f_fixnum) {
+	      fixnum _yy;
 	      _yy=i ? va_arg(ll,fixnum) : (fixnum)first;
 	      _xx=make_fixnum(_yy);
+	    } else {
+	      GEN _yy;
+	      _yy=i ? va_arg(ll,GEN) : (GEN)first;
+	      _xx=make_integer(_yy);
 	    }
 	    vs_push(_xx);
 	    i++;
@@ -1463,7 +1468,7 @@ call_proc_new(object sym, int setf,void **link, int argd, object first, va_list 
      vs_top=base;
      /* vs_base=oldbase;
 	The caller won't expect us to restore these.  */
-     return((result_type==f_object? vs_base[0] : (object)fix(vs_base[0])));
+     return((result_type==f_object? vs_base[0] : (result_type==f_fixnum ? (object)fix(vs_base[0]) : (object)otoi(vs_base[0]))));
    }
 }
 
