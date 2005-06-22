@@ -66,28 +66,19 @@
   (compiler-default-type *compiler-normal-type*))
 
 ;; Let the user write dump c-file etc to  /dev/null.
-(defun get-output-pathname (file ext name &optional (dir (pathname-directory *default-pathname-defaults*))
+(defun get-output-pathname (file ext name &optional 
+				 (dir (pathname-directory *default-pathname-defaults*))
 				 (device (pathname-device *default-pathname-defaults*)))
-  (cond 
-	((equal file "/dev/null") (pathname file))
+  (cond ((equal file "/dev/null") (pathname file))
 	#+aix3
 	((and (equal name "float")
 	      (equal ext "h"))
 	 (get-output-pathname file ext "Float" ))
-	(t
-	 (make-pathname :device (or (and (not (null file))
-					 (not (eq file t))
-					 (pathname-device file))
-				       device)
-			:directory (or (and (not (null file))
-					    (not (eq file t))
-					    (pathname-directory file))
-				       dir)
-			:name (or (and (not (null file))
-				       (not (eq file t))
-				       (pathname-name file))
-				  name)
-			:type ext))))
+	((let ((lf (and file (not (eq file t)))))
+	   (let ((device (if lf (pathname-device file) device))
+		 (dir (if lf (pathname-directory file) dir))
+		 (name (if lf (pathname-name file) name)))
+	     (make-pathname :device device :directory dir :name name :type ext))))))
 
 
 (defun safe-system (string)
@@ -140,38 +131,30 @@
 			    (*PRINT-BASE* 10)
 			    (*PRINT-ESCAPE* T)
 			    (section-length *split-files*)
-			    tem)
+			    tem
+			    (*compile-file-pathname* (merge-pathnames (car args)))
+			    (*compile-file-truename* (truename *compile-file-pathname*)))
   (loop 
    (compiler::init-env)
    (setq tem (apply 'compiler::compile-file1 args))
    (cond ((atom *split-files*)(return tem))
-	 ((and (consp *split-files*)
-	       (null (third *split-files*)))
-	  (let ((gaz (let ((*DEFAULT-PATHNAME-DEFAULTS* (car args)))
-			    			    (gazonk-name)))
+	 ((and (consp *split-files*) (null (third *split-files*)))
+	  (let ((gaz (let ((*DEFAULT-PATHNAME-DEFAULTS* (car args))) (gazonk-name)))
 		(*readtable* (si::standard-readtable)))
-	    (setf *compile-file-pathname* (pathname (merge-pathnames gaz)))
-	    (setf *compile-file-truename* (truename *compile-file-pathname*))
-	    (setq gaz (get-output-pathname gaz "lsp" (car args)))
-	    (with-open-file (st gaz :direction :output)
-	      (print
-	       `(eval-when (load eval)
-			   (dolist (v ',(nreverse (second *split-files*)))
-				   (load (merge-pathnames v si::*load-pathname*))))
-	       st))
+	    (with-open-file 
+	     (st gaz :direction :output)
+	     (print `(eval-when (load eval)
+				(dolist (v ',(nreverse (second *split-files*)))
+				  (load (merge-pathnames v si::*load-pathname*))))
+		    st))
 	    (setq *split-files* nil)
 	    (or (member :output-file args)
 		(setq args (append args (list :output-file (car args)))))
 	    (return 
 	     (prog1 (apply 'compile-file gaz (cdr args))
-	       (unless *keep-gaz* (delete-file gaz))))
-	    ))
-	 (t nil))
-   (setf *compile-file-pathname* nil)
-   (setf *compile-file-truename* nil)
+	       (unless *keep-gaz* (delete-file gaz)))))))
    (if (consp *split-files*)
-       (setf (car *split-files*) (+ (third *split-files*) section-length)))
-   ))
+       (setf (car *split-files*) (+ (third *split-files*) section-length)))))
 
 
 (defun compile-file1 (input-pathname
@@ -417,8 +400,9 @@ Cannot compile ~a.~%"
 
 (defun gazonk-name ( &aux tem)
   (dotimes (i 1000)
-	   (unless (probe-file (setq tem (merge-pathnames (format nil "gazonk~d.lsp" i))))
-		  (return-from gazonk-name (pathname tem))))
+    (let ((tem (merge-pathnames (format nil "gazonk~d.lsp" i))))
+      (unless (probe-file tem)
+	(return-from gazonk-name (pathname tem)))))
   (error "1000 gazonk names used already!"))
 
 (defun prin1-cmp (form strm)
