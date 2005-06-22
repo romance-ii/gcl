@@ -9,8 +9,10 @@ gclcvs (2.7.0-49) unstable; urgency=low
     functions as having unbounded integer arguments.
   * Allow fmakunbound to proceed on undefined functions in cltl1 for
     acl2
+  * Move cmp-array-dimension proclamation to sys-proclaim.lisp until can
+    work out top level form ordering in compiled files
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 22 Jun 2005 01:38:00 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 22 Jun 2005 01:42:06 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 

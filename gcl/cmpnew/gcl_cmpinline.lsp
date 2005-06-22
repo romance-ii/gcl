@@ -822,7 +822,7 @@
   
   
 (setf (symbol-function 'cmp-array-dimension) (symbol-function 'array-dimension))
-(proclaim '(ftype (function (t rnkind) seqind) cmp-array-dimension))
+;(proclaim '(ftype (function (t rnkind) seqind) cmp-array-dimension))
 (defun cmp-array-dimension-inline-types (&rest r)
   (if (aref-propagator 'cmp-array-dimension (car r))
       `((,(car r) rnkind) seqind)
