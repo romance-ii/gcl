@@ -13,8 +13,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
     work out top level form ordering in compiled files
   * More efficient inliner for array-dimension
   * Fix compile-file-pathname and compile-file-truename, split-files
+  * Handle file type defaults in compile-file
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 22 Jun 2005 14:41:16 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 22 Jun 2005 18:55:48 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 

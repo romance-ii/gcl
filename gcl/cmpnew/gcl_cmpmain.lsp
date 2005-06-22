@@ -133,7 +133,7 @@
 			    (*PRINT-ESCAPE* T)
 			    (section-length *split-files*)
 			    tem
-			    (*compile-file-pathname* (merge-pathnames *lsp-ext* (car args)))
+			    (*compile-file-pathname* (merge-pathnames (car args) *lsp-ext*))
 			    (*compile-file-truename* (truename *compile-file-pathname*)))
   (loop 
    (compiler::init-env)
