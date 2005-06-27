@@ -779,13 +779,14 @@
 ;;from the function definitions themselves.  CM 20050106.
 (defun aref-propagator (fn x &rest inds)
   (declare (ignore fn inds))
-  (and (consp x) (member (car x) '(array vector string) :test #'eq)
-       (let ((uaet (upgraded-array-element-type (nil-to-t (cadr x)))))
+  (let ((x (si::normalize-type x)))
+    (and (consp x) (member (car x) '(array simple-array))
+       (let ((uaet (and (not (eq (cadr x) '*)) (upgraded-array-element-type (nil-to-t (cadr x))))))
 	 ;; FIXME -- inline bit-vectors too.
 	 (unless (eq uaet 'bit)
 	   ;;FIXME string-char -> character for ansi throughout, this is just a bridge for now.
 	   ;;20050509 CM
-	   (if (eq uaet 'string-char) 'character uaet)))))
+	   (if (eq uaet 'string-char) 'character uaet))))))
 
 (setf (symbol-function 'cmp-aref) (symbol-function 'row-major-aref))
 
