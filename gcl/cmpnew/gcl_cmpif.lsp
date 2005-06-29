@@ -358,7 +358,7 @@
     (list 'case info key-form (reverse clauses) (or default (c1nil)))))
 
 (defun c2case (key-form clauses default
-               &aux (cvar (next-cvar)) (*vs* *vs*) (*inline-blocks* 0))
+               &aux (cvar (cs-push t t)) (*vs* *vs*) (*inline-blocks* 0))
   (setq key-form (car (inline-args (list key-form) '(t))))
   (wt-nl "{object V" cvar "= " key-form ";")
 

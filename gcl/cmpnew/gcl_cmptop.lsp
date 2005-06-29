@@ -637,7 +637,7 @@
  
 
 (defun cs-push (&optional type local)
-  (let ((tem (cs-push t t)))
+  (let ((tem (next-cvar)))
    (let ((type (or type t)))
     (when (or (not local) (not (eq type t)))
 	(push (if local (cons tem type) (cons type tem)) *c-vars*)))

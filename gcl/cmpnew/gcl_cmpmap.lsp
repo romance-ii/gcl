@@ -49,9 +49,9 @@
 (defun c2mapcar (funob car-p args &aux (*vs* *vs*) (*inline-blocks* 0))
   (let ((label (next-label*))
         (value-loc (list 'VS (vs-push)))
-        (handy (list 'CVAR (next-cvar)))
+        (handy (list 'CVAR (cs-push t t)))
         (handies (mapcar #'(lambda (x) (declare (ignore x))
-                                   (list 'CVAR (next-cvar)))
+                                   (list 'CVAR (cs-push t t)))
                          args))
         save
         )
@@ -117,7 +117,7 @@
   (let ((label (next-label*))
         value-loc
         (handies (mapcar #'(lambda (x) (declare (ignore x))
-                                   (list 'CVAR (next-cvar)))
+                                   (list 'CVAR (cs-push t t)))
                          args))
         save
         )
@@ -181,9 +181,9 @@
 (defun c2mapcan (funob car-p args &aux (*vs* *vs*) (*inline-blocks* 0))
   (let ((label (next-label*))
         (value-loc (list 'VS (vs-push)))
-        (handy (list 'CVAR (next-cvar)))
+        (handy (list 'CVAR (cs-push t t)))
         (handies (mapcar #'(lambda (x) (declare (ignore x))
-                                   (list 'CVAR (next-cvar)))
+                                   (list 'CVAR (cs-push t t)))
                          args))
         save
         )

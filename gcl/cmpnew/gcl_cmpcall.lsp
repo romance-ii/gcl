@@ -463,7 +463,7 @@
 	   (wt-nl "(")  
 	   (wt-loc  fun-loc)))
 	  (t
-	   (setq loc (list 'cvar (incf *next-cvar*)))
+	   (setq loc (list 'cvar (cs-push t t))) ;(incf *next-cvar*)
 	   (let ((*value-to-go* loc))
 	     (wt-nl 
 	      "{object V" (second loc) ";")
