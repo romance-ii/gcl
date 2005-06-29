@@ -301,7 +301,7 @@ EXTER object sLlambda_block;
 EXTER object sLlambda_closure;
 EXTER object sLlambda_block_closure;
 
-EXTER object sLfunction;
+EXTER object sLfunction,sLfunction_identifier;
 EXTER object sLmacro;
 EXTER object sLtag;
 EXTER object sLblock;

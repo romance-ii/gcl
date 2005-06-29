@@ -140,7 +140,14 @@
 (deftype simple-bit-vector (&optional size)
   `(simple-array bit (,size)))
 
-
+(deftype function-identifier () `(satisfies si::function-identifierp))
+(defun function-identifierp (tp)
+  (or (symbolp tp)
+      (and (consp tp)
+	   (eq (car tp) 'setf)
+	   (consp (cdr tp))
+	   (symbolp (cadr tp))
+	   (not (cddr tp)))))
 
 (defun simple-array-p (x)
   (and (arrayp x)

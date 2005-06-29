@@ -239,26 +239,25 @@ DEFUNO_NEW("FMAKUNBOUND",object,fLfmakunbound,LISP
 
 {
 
+  if(type_of(sym) != t_symbol && !setf_fn_form(sym)) {
+/*     stack_string(s,"Function Identifier"); */
+/*     TYPE_ERROR(sym,s); */
+    FEwrong_type_argument(sLfunction_identifier,sym);
+  }
+
   /*FIXME -- store a symbol in plist for setf functions as opposed to
     the function itself, and centralize function name resolution.
     Allow for tracing, etc. thereby. 20050307 CM*/
 
-  if (type_of(sym)==t_cons && sym->c.c_car==sLsetf
-      && type_of(sym->c.c_cdr->c.c_car)==t_symbol
-      && sym->c.c_cdr->c.c_cdr==Cnil) {
+  if (setf_fn_form(sym)) {
 
-    if (get(sym->c.c_cdr->c.c_car,sSsetf_function,OBJNULL)==OBJNULL)
-      FEundefined_function(sym);
-    remf(&sym->c.c_cdr->c.c_car->s.s_plist,sSsetf_function);
+    if (get(sym->c.c_cdr->c.c_car,sSsetf_function,OBJNULL)!=OBJNULL)
+/*       FEundefined_function(sym); */
+      remf(&sym->c.c_cdr->c.c_car->s.s_plist,sSsetf_function);
     RETURN1(sym);
-
   }
 
   /* 1 args */
-  if(type_of(sym) != t_symbol && !setf_fn_form(sym)) {
-    stack_string(s,"Function Identifier");
-    TYPE_ERROR(sym,s);
-  }
 
   if (sym->s.s_sfdef != NOT_SPECIAL) {
     if (sym->s.s_mflag) {
