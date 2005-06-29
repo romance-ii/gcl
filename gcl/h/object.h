@@ -448,6 +448,15 @@ struct string {           /*  string header  */
                            /*  string length  */
 };
 
+#define stack_string(a_,b_) struct string _s={0};\
+                            object a_=(object)&_s;\
+                            set_type_of((a_),t_string);\
+                            (a_)->st.st_self=(b_);\
+                            (a_)->st.st_dim=(a_)->st.st_fillp=strlen(b_);
+
+#define TYPE_ERROR(a_,b_) {stack_string(tp_err,"~S is not of type ~S.");\
+                           Icall_error_handler(sKwrong_type_argument,tp_err,2,(a_),(b_));}
+
 struct ustring {
 
   FIRSTWORD;

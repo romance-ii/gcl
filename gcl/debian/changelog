@@ -27,8 +27,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * replace eql with eq in list search functions when possible
   * preliminary support for symbol keyword and cons type optimization in
     compiler
+  * Preparation for error system overhaul work
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:20:46 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:21:58 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
