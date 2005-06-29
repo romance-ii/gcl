@@ -38,8 +38,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * wrap compile-file  in ansi image for warnings and failures
   * Remove unused ansi_cl.lisp
   * Preliminary gabriel benchmark addition
+  * Fix compile to pass warnings and failures from compile-file
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:33:30 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 17:01:10 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
