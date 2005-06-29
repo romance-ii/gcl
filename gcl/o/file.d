@@ -2196,14 +2196,14 @@ DEFVAR("*BINARY-MODULES*",sSAbinary_modulesA,SI,Cnil,"");
         if (fasl_filename == Cnil) {
 	  FILE *f;
 	  char b[32],fn[4096];/*FIXME*/
-	  int i;
+	  int i,n;
 	  coerce_to_local_filename(pathname,fn);
 	  if (!(f=fopen(fn,"rb")))
 	    file_error("Cannot open ~S",pathname);
-	  fread(b,sizeof(b),1,f);
+	  n=fread(b,sizeof(b),1,f);
 	  fclose(f);
-	  for (i=0;i<sizeof(b) && (!iscntrl(b[i]) || isspace(b[i]));i++);
-	  if (i<sizeof(b))
+	  for (i=0;i<n && (!iscntrl(b[i]) || isspace(b[i]));i++);
+	  if (i<n)
 	    fasl_filename = coerce_to_local_namestring(pathname);
 	}
 
