@@ -22,8 +22,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * expand result-type-from-args invocation; run compiler macros before
     c1 funs
   * Better list search function optimizations -- FIXME more here later
+  * Don't  autodeclare apparently constant special variable bindings
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:16:17 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:18:04 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 

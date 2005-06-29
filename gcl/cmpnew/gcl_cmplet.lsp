@@ -109,26 +109,27 @@
 (defun type-of-form (form)
   (t-to-nil (coerce-to-one-value (info-type (cadr (c1expr form))))))
   
-(defun binding-decls-new (bindings star body out)
+(defun binding-decls-new (bindings star body out specials)
   (cond ((atom bindings) (nreverse out))
 	((atom (car bindings))
          (let ((var (car bindings)))
           (let ((*vars* (if (not star) *vars*
                          (cons (c1make-var var nil nil (list (cons var t))) *vars*))))
-           (binding-decls-new (cdr bindings) star body out))))
+           (binding-decls-new (cdr bindings) star body out specials))))
 	(t 
 	 (let* ((bf (car bindings))
 		(var (car bf))
 		(form (cadr bf)))
 	   (let ((type (type-of-form form))
-		 (ch (or (var-is-changed var body) (and star (var-is-changed var (cdr bindings))))))
+		 (ch (or (si::specialp var) (member var specials) 
+			 (var-is-changed var body) (and star (var-is-changed var (cdr bindings))))))
 	     (let ((*vars* (if (not star) *vars*
 			     (cons (c1make-var var nil nil (list (cons var (nil-to-t type)))) *vars*))))
 	       (when type
 		 (cmpnote "var ~S is type ~S from type propagation, ~a~%" var type 
 			  (if ch "but is changed" "declaring")))
 	       (binding-decls-new (cdr bindings) star body
-				  (if (and type (not ch)) (cons (list type var) out) out))))))))
+				  (if (and type (not ch)) (cons (list type var) out) out) specials)))))))
 
 
 ;;FIXME -- We can eliminate the extra recursively-cmp-macroexpand
@@ -139,7 +140,7 @@
 ;;also lets of flet shadow c1setq1 to catch cases where the new form
 ;;is of the same type as the initial type of the binding.  CM
 ;;20050106.
-(defun declare-let-bindings-new (args star)
+(defun declare-let-bindings-new (args star specials)
 ;  (let ((info (make-info))
 ;	(newvars *vars*))
 ;    (dolist (bind (car args))
@@ -152,7 +153,7 @@
 ;	    (c1expr* (cadr bind) info)))))
     (let ((body (recursively-cmp-macroexpand (cdr args) nil))
 	  (bindings (if star (recursively-cmp-macroexpand (car args) (list 'let*)) (car args))))
-      (let ((decls (binding-decls-new bindings star body nil)))
+      (let ((decls (binding-decls-new bindings star body nil specials)))
 	(if decls
 	    (progn (cmpnote "Let bindings ~S declared ~S~%" (car args) decls)
 		   (cons (car args) (cons (cons 'declare decls) (cdr args))))
@@ -165,7 +166,7 @@
                         (*vars* *vars*))
   (when (endp args) (too-few-args 'let 1 0))
 
-  (setq args (declare-let-bindings-new args nil))
+  (setq args (declare-let-bindings-new args nil ss))
 
   (multiple-value-setq (body ss ts is other-decls) (c1body (cdr args) nil))
 
@@ -223,7 +224,7 @@
 			(not (is-changed var (cadr body))))
 	     (push var used-vars))
 	   (cond (kind  (setf (var-kind var) kind)
-		       (setf (var-loc var) (next-cvar)))
+			(setf (var-loc var) (cs-push (var-type var) t)))
 		((eq (var-kind var) 'down)
 		 (or (si::fixnump (var-loc var)) (wfs-error)))
 		(t (setf (var-ref var) (vs-push))))
@@ -300,7 +301,7 @@
                     (info (make-info)) (*vars* *vars*))
   (when (endp args) (too-few-args 'let* 1 0))
 
-  (setq args (declare-let-bindings-new args t))
+  (setq args (declare-let-bindings-new args t ss))
 
   (multiple-value-setq (body ss ts is other-decls) (c1body (cdr args) nil))
   (c1add-globals ss)
@@ -358,7 +359,7 @@
 				     (cdr fl))))
 	     (push var used-vars))	   
 	   (cond (kind  (setf (var-kind var) kind)
-		       (setf (var-loc var) (next-cvar))))
+			(setf (var-loc var) (cs-push (var-type var) t))))
         (if (member (var-kind var)
                     '(FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT INTEGER))
 	    nil
@@ -479,7 +480,7 @@
 				    (null (cddr val))
 				    (setq val `(cons ,(second val) nil))))
 			   (progn
-			     (push (next-cvar) nums)
+			     (push (cs-push t t) nums)
 			     `(,var (stack-cons ,(car nums) ,@ (cdr val)))))))
 		   (t (cmpwarn "Stack let = regular let for ~a ~a"
 			       v (cdr args))
@@ -491,7 +492,7 @@
 (setf (get 'stack-let 'c2) 'c2stack-let)
 
 (defun c2stack-let (nums form)
-  (let ((n (next-cvar)))
+  (let ((n (cs-push t t)))
     (wt-nl "{Cons_Macro" n ";")
     (c2expr form)
     (wt "}")

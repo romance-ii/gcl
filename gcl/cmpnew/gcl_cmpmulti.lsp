@@ -47,8 +47,8 @@
          (let ((*value-to-go* 'top)) (c2expr* (car forms)))
          (c2funcall funob 'args-pushed loc))
         (t
-         (setq top (next-cvar))
-         (setq sup (next-cvar))
+         (setq top (cs-push t t))
+         (setq sup (cs-push t t))
          (setq loc (save-funob funob))
          (base-used)
 	 ;; Add (sup .var) handling in unwind-exit -- in
@@ -81,9 +81,9 @@
 ;; We may record information here when *value-to-go* = 'top
 (defvar *top-data* nil)
 
-(defun c2multiple-value-prog1 (form forms &aux (base (next-cvar))
-				               (top (next-cvar))
-					       (sup (next-cvar))
+(defun c2multiple-value-prog1 (form forms &aux (base (cs-push t t))
+				               (top (cs-push t t))
+					       (sup (cs-push t t))
 					       top-data)
   (let ((*value-to-go* 'top)
 	*top-data* )
@@ -214,7 +214,7 @@
 
 
 ;;FIXME -- this still uses pass1, while let for performance reasons uses custom change-detection code.
-(defun declare-multiple-value-bindings (args)
+(defun declare-multiple-value-bindings (args specials)
   (let ((info (make-info))
 	(newvars *vars*))
     (dolist (var (car args))
@@ -228,10 +228,11 @@
 				    (list (list expt (caar args)))) :key #'car)))
 	(let ((decls (remove-if
 		      (lambda (x)
-			(let ((nv (car (member x newvars :key #'var-name :test #'eq))))
-			  (when (is-changed nv info)
-			    (cmpnote "Multiple-value-binding ~S is changed and cannot be declared~%" x)
-			    t))) decls :key #'cadr)))
+			(or (si::specialp x) (member x specials)
+			    (let ((nv (car (member x newvars :key #'var-name :test #'eq))))
+			      (when (is-changed nv info)
+				(cmpnote "Multiple-value-binding ~S is changed and cannot be declared~%" x)
+				t)))) decls :key #'cadr)))
 	  (if decls
 	      (progn (cmpnote "Multiple-value bindings ~S of type ~S~%" (car args) decls )
 		     (cons (car args) (cons (cadr args) (cons (cons 'declare decls) (cddr args)))))
@@ -297,7 +298,7 @@
   (when (or (endp args) (endp (cdr args)))
     (too-few-args 'multiple-value-bind 2 (length args)))
 
-  (setq args (declare-multiple-value-bindings args))
+  (setq args (declare-multiple-value-bindings args ss))
 
   (multiple-value-setq (body ss ts is other-decls) (c1body (cddr args) nil))
 
@@ -337,7 +338,7 @@
     (let ((kind (c2var-kind var)))
          (declare (object kind))
       (if kind
-          (let ((cvar (next-cvar)))
+          (let ((cvar (cs-push (var-type var) t)))
             (setf (var-kind var) kind)
             (setf (var-loc var) cvar)
             (wt-nl)
