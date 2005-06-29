@@ -142,7 +142,7 @@
   (loop 
    (compiler::init-env)
    (setq tem (apply 'compiler::compile-file1 filename args))
-   (cond ((atom *split-files*)(return (values (truename tem) warnings failures)))
+   (cond ((atom *split-files*)(return (values (when tem (truename tem)) warnings failures)))
 	 ((and (consp *split-files*) (null (third *split-files*)))
 	  (let ((gaz (let ((*DEFAULT-PATHNAME-DEFAULTS* filename)) (gazonk-name)))
 		(*readtable* (si::standard-readtable)))
@@ -156,9 +156,9 @@
 	    (or (member :output-file args)
 		(setq args (append args (list :output-file filename))))
 	    (return 
-	     (let ((tem (truename (apply 'compile-file gaz args))))
+	     (let ((tem (apply 'compile-file gaz args)))
 	       (unless *keep-gaz* (delete-file gaz))
-	       (values tem warnings failures))))))
+	       (values (when tem (truename tem)) warnings failures))))))
    (if (consp *split-files*)
        (setf (car *split-files*) (+ (third *split-files*) section-length)))))))
 
@@ -396,7 +396,7 @@ Cannot compile ~a.~%"
           (unless c-file (delete-file c-pathname))
           (unless h-file (delete-file h-pathname))
           (unless (or data-file #+ld-not-accept-data t system-p) (delete-file data-pathname))
-	  o-pathname)
+	  (when o-file o-pathname))
 
         (progn
           (when (probe-file c-pathname) (delete-file c-pathname))
