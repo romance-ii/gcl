@@ -37,8 +37,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * truename is not destructive
   * wrap compile-file  in ansi image for warnings and failures
   * Remove unused ansi_cl.lisp
+  * Preliminary gabriel benchmark addition
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:30:22 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:33:30 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
