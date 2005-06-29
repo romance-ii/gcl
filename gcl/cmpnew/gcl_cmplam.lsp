@@ -449,7 +449,7 @@
            (let ((kind (c2var-kind var)))
                 (declare (object kind))
                 (when kind
-                      (let ((cvar (next-cvar)))
+                      (let ((cvar (cs-push (var-type var) t)))
                            (setf (var-kind var) kind)
                            (setf (var-loc var) cvar)
                            (wt-nl)
@@ -569,7 +569,7 @@
            (let ((kind (c2var-kind var)))
                 (declare (object kind))
                 (when kind
-                      (let ((cvar (next-cvar)))
+                      (let ((cvar (cs-push (var-type var) t)))
                            (setf (var-kind var) kind)
                            (setf (var-loc var) cvar)
                            (wt-nl)
@@ -879,7 +879,7 @@
       ,end-form))))
 
 (defun c2dm (whole env vl body
-                   &aux (cvar (next-cvar)))
+                   &aux (cvar (cs-push t t)))
 ; FIXME Compile macros as sfn instead of cf -- need this to guarantee safe calls
 ; CM 20040129
 ;  (when (or *safe-compile* *compiler-check-args*)
@@ -955,7 +955,7 @@
       (wt "}"))
   (when rest (c2dm-bind-loc rest `(cvar ,cvar)))
   (dolist** (kwd keywords)
-    (let ((cvar1 (next-cvar)))
+    (let ((cvar1 (cs-push t t)))
          (wt-nl
           "{object V" cvar1 "=getf(V" cvar ",VV[" (add-symbol (car kwd))
           "],OBJNULL);")
@@ -986,14 +986,14 @@
 
 (defun c2dm-bind-loc (v loc)
   (if (consp v)
-      (let ((cvar (next-cvar)))
+      (let ((cvar (cs-push t t)))
            (maybe-wt-c2dm-bind-vl v cvar (wt-nl "{object V" cvar "= " loc ";") (wt "}")))
       (c2bind-loc v loc)))
 
 (defun c2dm-bind-init (v init)
   (if (consp v)
       (let* ((*vs* *vs*) (*inline-blocks* 0)
-             (cvar (next-cvar))
+             (cvar (cs-push t t))
              (loc (car (inline-args (list init) '(t)))))
        (maybe-wt-c2dm-bind-vl v cvar (wt-nl "{object V" cvar "= " loc ";") (wt "}"))
        (close-inline-blocks))

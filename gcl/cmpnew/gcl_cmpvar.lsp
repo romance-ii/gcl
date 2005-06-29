@@ -382,7 +382,7 @@
   )
 
 (defun c2progv (symbols values body
-                &aux (cvar (next-cvar))
+                &aux (cvar (cs-push t t))
                      (*unwind-exit* *unwind-exit*))
 
   (wt-nl "{object symbols,values;")
@@ -449,8 +449,8 @@
             (if (member (var-kind (car vref))
                         '(FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT OBJECT))
                 (let* ((kind (var-kind (car vref)))
-                       (cvar (next-cvar))
-                       (temp (list 'var (make-var :kind kind :loc cvar) nil)))
+                       (cvar (cs-push (var-type (car vref)) t))
+                       (temp (list 'var (make-var :kind kind :type (var-type (car vref)) :loc cvar) nil)))
                   (wt-nl "{" *volatile* (rep-type kind) "V" cvar ";")
                   (incf blocks)
                   (let ((*value-to-go* temp)) (c2expr* (car forms)))

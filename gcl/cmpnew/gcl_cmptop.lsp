@@ -26,7 +26,14 @@
 (defvar *sharp-commas* nil)
 (defvar *function-links* nil)
 (defvar *c-gc* t) ;if we gc the c stack.
+
+;; We are expanding the use of *c-vars* to hold type information for C
+;; stack variables initialized in inline blocks too.  conses of form
+;; type . num get initialized at function top as before.  conses of
+;; this form and the alternate form (num . type) are searched for
+;; inline matching late in pass2, e.g. cmp-aref-inline. 20060627 CM
 (defvar *c-vars*)  ;list of *c-vars* to put at beginning of function.
+
 ;;number of address registers available not counting the
 ;;frame pointer and the stack pointer
 ;;If sup and base are used, then their are even 2 less
@@ -629,9 +636,11 @@
 
  
 
-(defun cs-push (&optional type)
-  (let ((tem (next-cvar)))
-    (push (if type (cons type tem) tem) *c-vars*)
+(defun cs-push (&optional type local)
+  (let ((tem (cs-push t t)))
+   (let ((type (or type t)))
+    (when (or (not local) (not (eq type t)))
+	(push (if local (cons tem type) (cons type tem)) *c-vars*)))
     tem))
 ; For the moment only two types are recognized.
 (defun f-type (x)
@@ -817,64 +826,58 @@
   (let-pass3 ()   (apply f lis)))   
 
 (defun t3defun-local-entry (fname cfun lambda-expr sp inline-info
-				   &aux specials
-				   (requireds   (caaddr lambda-expr)))
+				   &aux specials (requireds (caaddr lambda-expr)))
   (do ((vl requireds (cdr vl))
        (types (cadr inline-info) (cdr types)))
       ((endp vl))
-      (declare (object vl types))
-      (cond ((eq (var-kind (car vl)) 'special)
-              (push (cons (car vl) (var-loc (car vl))) specials))
-            (t 
-             (setf (var-kind (car vl))
-                   (case (promoted-c-type (car types))
-                         (fixnum 'FIXNUM)
-                         (integer 'integer)
-                         (character 'CHARACTER)
-                         (long-float 'LONG-FLOAT)
-                         (short-float 'SHORT-FLOAT)
-                         (otherwise 'OBJECT))))
-                   )
-             (setf (var-loc (car vl)) (next-cvar)))
-         (wt-comment "local entry for function " (function-string fname))
-         (wt-h "static " (declaration-type (rep-type (caddr inline-info))) (c-function-name "LI" cfun fname) "();")
-         (wt-nl1 "static " (declaration-type (rep-type (caddr inline-info))) (c-function-name "LI" cfun fname) "(")
-         (wt-requireds  requireds
-		       (cadr inline-info))
+;      (declare (object vl types))
+      (if (eq (var-kind (car vl)) 'special)
+	  (push (cons (car vl) (var-loc (car vl))) specials)
+	(setf (var-kind (car vl))
+	      (case (promoted-c-type (car types))
+		    (fixnum 'FIXNUM)
+		    (integer 'integer)
+		    (character 'CHARACTER)
+		    (long-float 'LONG-FLOAT)
+		    (short-float 'SHORT-FLOAT)
+		    (otherwise 'OBJECT))))
+      (setf (var-loc (car vl)) (cs-push (var-type (car vl)) t)))
+  (wt-comment "local entry for function " (function-string fname))
+  (wt-h "static " (declaration-type (rep-type (caddr inline-info))) (c-function-name "LI" cfun fname) "();")
+  (wt-nl1 "static " (declaration-type (rep-type (caddr inline-info))) (c-function-name "LI" cfun fname) "(")
+  (wt-requireds  requireds
+		 (cadr inline-info))
          ;;; Now the body.
-         (let ((cm *reservation-cmacro*)
-	       (*tail-recursion-info*
-	        (if *do-tail-recursion* (cons fname requireds) nil))
-	       (*unwind-exit* *unwind-exit*))
-              (wt-nl1 "{	")
-               (assign-down-vars (cadr lambda-expr) cfun
-		  't3defun)
-                (wt " VMB" cm " VMS" cm " VMV" cm)
-
-              (when sp (wt-nl "bds_check;"))
-              (when *compiler-push-events* (wt-nl "ihs_check;"))
-              (when *tail-recursion-info*
-                    (push 'tail-recursion-mark *unwind-exit*)
-                    (wt-nl "goto TTL;") (wt-nl1 "TTL:;"))
-              (dolist
-                (v specials)
-	          (wt-nl "bds_bind(VV[" (cdr v)"],V" (var-loc (car v))");")
-	          (push 'bds-bind *unwind-exit*)
-		  (setf (var-kind (car v)) 'SPECIAL)
-		  (setf (var-loc (car v)) (cdr v)))
-              (c2expr (caddr (cddr lambda-expr)))
-              
+  (let ((cm *reservation-cmacro*)
+	(*tail-recursion-info*
+	 (if *do-tail-recursion* (cons fname requireds) nil))
+	(*unwind-exit* *unwind-exit*))
+    (wt-nl1 "{	")
+    (assign-down-vars (cadr lambda-expr) cfun
+		      't3defun)
+    (wt " VMB" cm " VMS" cm " VMV" cm)
+    
+    (when sp (wt-nl "bds_check;"))
+    (when *compiler-push-events* (wt-nl "ihs_check;"))
+    (when *tail-recursion-info*
+      (push 'tail-recursion-mark *unwind-exit*)
+      (wt-nl "goto TTL;") (wt-nl1 "TTL:;"))
+    (dolist
+	(v specials)
+      (wt-nl "bds_bind(VV[" (cdr v)"],V" (var-loc (car v))");")
+      (push 'bds-bind *unwind-exit*)
+      (setf (var-kind (car v)) 'SPECIAL)
+      (setf (var-loc (car v)) (cdr v)))
+    (c2expr (caddr (cddr lambda-expr)))
+    
 ;;; Use base if defined for lint
-	      (if (and (zerop *max-vs*) (not *sup-used*) (not *base-used*)) t (wt-nl "base[0]=base[0];"))
-
+    (if (and (zerop *max-vs*) (not *sup-used*) (not *base-used*)) t (wt-nl "base[0]=base[0];"))
+    
 ;;; Make sure to return object if necessary
-	      (if (equal "object " (rep-type (caddr inline-info))) (wt-nl "return Cnil;"))
-
-              (wt-nl1 "}")
-	      (wt-V*-macros cm (caddr inline-info))
-         ))
-
-
+    (if (equal "object " (rep-type (caddr inline-info))) (wt-nl "return Cnil;"))
+    
+    (wt-nl1 "}")
+    (wt-V*-macros cm (caddr inline-info))))
 
 (defvar *vararg-use-vs* nil)
 (defun set-up-var-cvs (var)
@@ -891,7 +894,7 @@
 					     (ll-optionals ll)
 					     (ll-keywords-p ll))))
   (dolist (v (car ll))
-	  (push (list 'cvar (next-cvar)) reqs))
+	  (push (list 'cvar (cs-push t t)) reqs))
  
   (wt-comment "local entry for function " (function-string fname))
 
@@ -953,7 +956,7 @@
 		    (let ((kind (c2var-kind var)))
 		      (declare (object kind))
 		      (when kind
-			    (let ((cvar (next-cvar)))
+			    (let ((cvar (cs-push (var-type var) t)))
 			      (setf (var-kind var) kind)
 			      (setf (var-loc var) cvar)
 			      (wt-nl)
@@ -1249,8 +1252,8 @@
 (defun wt-requireds (requireds arg-types)
   (do ((vl requireds (cdr vl)))
       ((endp vl))
-      (declare (object vl))
-      (let ((cvar (next-cvar)))
+;      (declare (object vl))
+      (let ((cvar (cs-push (var-type (car vl)) t)))
 	(setf (var-loc (car vl)) cvar)
 	(wt "V" cvar))
       (unless (endp (cdr vl)) (wt ",")))
@@ -1824,21 +1827,25 @@
   )
 
 (defun wt-cvars( &aux type )
-  (dolist (v *c-vars*)
-    (let ((t1 (if (consp v) (prog1 (car v) (setq v (cdr v))) t)))
-      (cond ((eq type t1)(format *compiler-output2* " ,V~a" v))
-	    (t (or (null type)
-		   (format *compiler-output2* ";"))
-	       (setq type t1)
-	       (if (eq (promoted-c-type type) 'integer)
-		   (format *compiler-output2*  "IDECL1(V~a,V~abody,V~aalloc)" v v v)
-		 (format *compiler-output2* " ~a V~a" (rep-type type) v))))))
-  (and *c-vars* (format *compiler-output2* ";"))
- (unless (or (not *vcs-used*) (eql *cs* 0))
+  (let (vars)
+    (dolist (v *c-vars*)
+      (when (integerp (cdr v))
+	(setq vars t)
+	(let* ((t1 (car v))
+	       (v (cdr v)))
+	  (cond ((eq type t1)(format *compiler-output2* " ,V~a" v))
+		(t (or (null type)
+		       (format *compiler-output2* ";"))
+		   (setq type t1)
+		   (if (eq (promoted-c-type type) 'integer)
+		       (format *compiler-output2*  "IDECL1(V~a,V~abody,V~aalloc)" v v v)
+		     (format *compiler-output2* " ~a V~a" (rep-type type) v)))))))
+    (when vars (format *compiler-output2* ";")))
+  (unless (or (not *vcs-used*) (eql *cs* 0))
 ;	 (format *compiler-output2* " object Vcs[~a]={Cnil" *cs*)
 ;	 (dotimes (temp (- *cs* 1) t) (format *compiler-output2* ",Cnil"))
 ;	 (format *compiler-output2* "};"))
-	 (format *compiler-output2* " object Vcs[~a];" *cs*)))
+    (format *compiler-output2* " object Vcs[~a];" *cs*)))
 
 
 

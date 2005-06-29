@@ -267,13 +267,13 @@
                       (cond ((and (member (var-kind (caaddr form))
                                          *special-types*)
                                   (eq type (var-kind (caaddr form))))
-                             (let ((cvar (next-cvar)))
+                             (let ((cvar (cs-push type t)))
                                (wt-nl "{" (rep-type type) "V" cvar "= V"
                                       (var-loc (caaddr form)) ";")
                                (push (list 'cvar cvar 'inline-args) locs)
                                (inc-inline-blocks)))
                             (t 
-                             (let ((temp (wt-c-push)))
+                             (let ((temp (wt-c-push type)))
                                (wt-nl temp "= ")
                                (wt-var (caaddr form) (cadr (caddr form)))
                                (wt ";")
@@ -326,7 +326,7 @@
 			       (setq cvar (cs-push))
 			       (wt-nl "V" cvar "= ")
 			       (wt-loc loc))
-			      (t (setq cvar (next-cvar))
+			      (t (setq cvar (cs-push type t))
 				 (wt-nl "{" (rep-type type) "V" cvar "= ")
 				 (case (promoted-c-type type)
 				   (fixnum (wt-fixnum-loc loc))
@@ -361,34 +361,26 @@
                           (setq types (list* type  types))))))
               (t (let
 		     ((temp
-		       (cond (*c-gc*
-			      (cond ((eq type t)
-				     (list 'cvar (cs-push)))
-				    (t (push (cons type (next-cvar)) *c-vars*)
-				       (list 'var
-					     (make-var
-					      :type type
-					      :kind
-					      (let ((type (promoted-c-type type)))
-						(if (member type
-							    *special-types*)
-						    type 'object))
-					      :loc (cdar *c-vars*))
-					     nil
-					     ))))
-			     (t  (list 'vs (vs-push))))))
+		       (cond ((not *c-gc*) (list 'vs (vs-push)))
+			     ((eq type t) (list 'cvar (cs-push)))
+			     ((list 'var
+				    (make-var :type type :loc (cs-push type)
+					      :kind (or (car (member (promoted-c-type type) *special-types*)) 'object))
+				    nil)))))
 		   (let ((*value-to-go* temp))
 		     (c2expr* form)
 		     (push (coerce-loc temp type) locs))))))))
 
+;;FIXME mapcar
+(defvar *coersion-alist* '((fixnum . fixnum-loc)
+			   (integer . integer-loc)
+			   (character . character-loc)
+			   (short-float . short-float-loc)
+			   (long-float . long-float-loc)))
+
 (defun coerce-loc (loc type)
-  (case (promoted-c-type type)
-    (fixnum (list 'FIXNUM-LOC loc))
-    (integer (list 'integer-loc loc ))
-    (character (list 'CHARACTER-LOC loc))
-    (long-float (list 'LONG-FLOAT-LOC loc))
-    (short-float (list 'SHORT-FLOAT-LOC loc))
-    (t loc)))
+  (let ((tl (cdr (assoc (promoted-c-type type) *coersion-alist*))))
+    (if tl (list tl loc) loc)))
 
 (defun get-inline-loc (ii args &aux (fun (car (cdddr ii))) locs)
   ;;; Those functions that use GET-INLINE-LOC must rebind the variable *VS*.
@@ -431,14 +423,13 @@
 				     (flag-p (cadr loc) side-effect-p))
 	                            )))
                   (wt-nl "{")
-                  (inc-inline-blocks)
-                  (let ((cvar (next-cvar)))
+                  (inc-inline-blocks) ;;FIXME -- make sure not losing specificity in coersion
+                  (let ((cvar (cs-push (car (rassoc coersion *coersion-alist*)) t))) 
                     (push (list 'CVAR cvar) locs1)
                     (case coersion
                      ((nil) (wt "object V" cvar "= ") (wt-loc loc1))
                      (FIXNUM-LOC (wt "fixnum V" cvar "= ") (wt-fixnum-loc loc))
-		     (integer-loc (wt "GEN V" cvar "= ") (wt-integer-loc loc
-									 'get-inline-locs))
+		     (integer-loc (wt "GEN V" cvar "= ") (wt-integer-loc loc 'get-inline-locs))
                      (CHARACTER-LOC
                       (wt "unsigned char V" cvar "= ") (wt-character-loc loc))
                      (LONG-FLOAT-LOC
@@ -581,9 +572,9 @@
               (t (return t)))))
   )
 
-(defun wt-c-push ()
+(defun wt-c-push (&optional type)
   (cond (*c-gc* (inc-inline-blocks)
-		(let ((tem (next-cvar)))
+		(let ((tem (cs-push type t)))
 		  (wt "{" *volatile* "object V" tem ";")
 		  (list 'cvar tem)))
 	(t (list 'VS (vs-push)))))
@@ -788,6 +779,13 @@
 	   ;;20050509 CM
 	   (if (eq uaet 'string-char) 'character uaet))))))
 
+(defun var-array-type (a)
+  (when (consp a)
+    (cond ((eq (car a) 'var) (var-type (cadr a)))
+	  ((eq (car a)  'cvar)
+	   (or (cdr (assoc (cadr a) *c-vars*))
+	       (car (rassoc (cadr a) *c-vars*)))))))
+
 (setf (symbol-function 'cmp-aref) (symbol-function 'row-major-aref))
 
 (defun cmp-aref-inline-types (&rest r)
@@ -798,7 +796,7 @@
 	`((t seqind) t)))))
 
 (defun cmp-aref-inline (a i)
-  (let ((at (nil-to-t (and (consp a) (eq (car a) 'var) (var-type (cadr a))))))
+  (let ((at (nil-to-t (var-array-type a))))
     (let ((aet (aref-propagator 'cmp-aref at)))
       (if aet
 	  (wt  "((" (c-cast aet) " *)(" a ")->v.v_self)[" i "]")
@@ -814,8 +812,11 @@
 	  `((,art seqind ,aet) ,aet)
 	`((t seqind t) t)))))
 
+
+	       
+
 (defun cmp-aset-inline (a i j)
-  (let ((at (nil-to-t (and (consp a) (eq (car a) 'var)(var-type (cadr a))))))
+  (let ((at (nil-to-t (var-array-type a))))
     (let ((aet (aref-propagator 'cmp-aset at)))
       (if aet
 	  (wt  "((" (c-cast aet) " *)(" a ")->v.v_self)[" i "]=" j)
@@ -829,8 +830,10 @@
       `((,(car r) rnkind) seqind)
     `((t rnkind) seqind)))
 
+
+;;FIXME lose the normalize-type
 (defun cmp-array-dimension-inline (a i)
-  (let ((at (si::normalize-type (and (consp a) (eq (car a) 'var) (var-type (cadr a))))))
+  (let ((at (si::normalize-type (var-array-type a))))
     (let ((aet (aref-propagator 'cmp-aset at)))
       (if aet
 	  (if (and (consp (third at)) (= (length (third at)) 1))

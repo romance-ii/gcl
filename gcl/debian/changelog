@@ -16,8 +16,13 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * Handle file type defaults in compile-file
   * Fix '* array element handling in aref-propagator
   * Style-warning condition
+  * Save variable type information in *c-vars*, using alternate form
+    (cons index type) for stack vars in inline blocks, for use in late
+    inlining
+  * expand result-type-from-args invocation; run compiler macros before
+    c1 funs
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:12:18 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:15:11 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 

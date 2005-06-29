@@ -190,10 +190,8 @@
 )				      
 				
 
-(defun result-type-from-args (f args &aux tem)
-  (when (and (setq tem (get f 'return-type))
-             (not (eq tem '*)))
-;	     (not (consp tem))) ;; propagate multiple-value types, CM 20041221
+(defun result-type-from-args (f args)
+  (when (not (eq '* (get f 'return-type))) ;;FIXME  make sure return-type and proclaimed-return-type are in sync
     (let* ((be (get f 'type-propagator))
 	   (ba (and be (apply be f (mapcar #'coerce-to-one-value args)))))
       (when ba
@@ -448,7 +446,6 @@
 	      (cons (bind-all-vars (caddr form))
 		    (if (cadddr form) (list (bind-all-vars (cadddr form))))))))
 		
-
 (defun c1symbol-fun (fname args &aux fd)
   (cond ((setq fd (get fname 'c1special)) (funcall fd args))
 	((and (setq fd (get fname 'co1special))
@@ -476,6 +473,11 @@
                                   (setq forms (reverse fl)))))
                   (list 'call-local info (cddr fd) forms))
              (c1expr (cmp-expand-macro fd fname args))))
+        ((let ((fn (get fname 'compiler-macro)) (res (cons fname args)))
+	   (and fn
+		(let ((fd (cmp-eval `(funcall ',fn ',res nil))))
+                 (and (not (eq res fd))
+		      (c1expr fd))))))
 	((and (setq fd (get fname 'co1))
 	      (inline-possible fname)
 	      (funcall fd fname args)))
@@ -497,12 +499,6 @@
 	;;continue
         ((setq fd (macro-function fname))
          (c1expr (cmp-expand-macro fd fname args)))
-        ((let ((fn (get fname 'compiler-macro)) res)
-	   (and fn
-		(setq res (cons fname args))
-		(setq fd (cmp-eval `(funcall ',fn ',res nil)))
-		(not (eq res fd))))
-         (c1expr fd))
         ((and (setq fd (get fname 'si::structure-access))
               (inline-possible fname)
               ;;; Structure hack.
