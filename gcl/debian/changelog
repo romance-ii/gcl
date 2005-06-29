@@ -24,8 +24,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * Better list search function optimizations -- FIXME more here later
   * Don't  autodeclare apparently constant special variable bindings
   * compile-file ansi test fixes
+  * replace eql with eq in list search functions when possible
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:18:36 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:19:46 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 

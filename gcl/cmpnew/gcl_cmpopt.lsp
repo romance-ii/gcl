@@ -1017,13 +1017,19 @@ type_of(#0)==t_bitvector")
 
 ;;NUMBERP
  (push '((t) boolean #.(flags)
-  "@0;type_of(#0)==t_fixnum||
-type_of(#0)==t_bignum||
-type_of(#0)==t_ratio||
-type_of(#0)==t_shortfloat||
-type_of(#0)==t_longfloat||
-type_of(#0)==t_complex")
+  "@0;({enum type _numberp=type_of(#0); _numberp>=t_fixnum && _numberp <= t_complex;})")
    (get 'numberp 'inline-always))
+
+;;EQL-IS-EQ
+ (push '((t) boolean #.(flags)
+  "@0;(is_imm_fixnum(#0) || ({enum type _tp=type_of(#0); _tp==t_cons || _tp > t_character;}))")
+   (get 'eql-is-eq 'inline-always))
+ (push '((fixnum) boolean #.(flags)
+  "@0;(is_imm_fix(#0))")
+   (get 'eql-is-eq 'inline-always))
+ (push '((#.+ift+) boolean #.(flags)
+  "@0;Ct")
+   (get 'eql-is-eq 'inline-always))
 
 ;;PLUSP
  (push '((t) boolean #.(flags)"number_compare(small_fixnum(0),#0)<0")
