@@ -1,3 +1,6 @@
+(push :common-lisp *features*)
+(push :ansi-cl *features*)
+  
 (make-package "COMPILER" :use '("LISP"))
 (make-package "SLOOP" :use '("LISP"))
 (make-package "SERROR" :use '("LISP" "SLOOP"))
@@ -245,12 +248,34 @@
 			  (import (list s) "COMMON-LISP")
 			  (import (list s) "USER"))))
  
+ (do-external-symbols (s "COMPILER")
+		      (if (member s clcs_shadow)
+			  (progn 
+			    (shadowing-import (list s) "COMMON-LISP")
+			    (shadowing-import (list s) "USER"))
+			(progn
+			  (import (list s) "COMMON-LISP")
+			  (import (list s) "USER"))))
+
+ (setf (symbol-function 'compiler::compile-file)
+       (let ((old (symbol-function 'compiler::compile-file)))
+	 (lambda (&rest args)
+	   (let (warnings failures)
+	     (conditions::handler-bind
+	      ((warning (lambda (c) 
+			 (setq warnings t) 
+			 (unless (typep c 'style-warning)
+			   (setq failures t))
+			 (when (not compiler::*compile-verbose*) 
+			   (conditions::invoke-restart 
+			    (conditions::find-restart 'conditions::muffle-warning c)))))
+	       (error (lambda (c) (setq failures t))))
+	      (values (apply old args) warnings failures))))))
  t)
 
 (progn
 
-  (dolist (s '(*compile-file-pathname* *compile-file-truename*
-				       *compile-print* *compile-verbose* *load-pathname* *load-print*
+  (dolist (s '(*load-pathname* *load-print*
 				       *load-truename* *print-lines* *print-miser-width*
 				       *print-pprint-dispatch* *print-right-margin* *read-eval*
 				       lisp::arithmetic-error broadcast-stream-streams cell-error
@@ -302,8 +327,8 @@
   (unintern 'int)
   (unintern 'shadow-system)
   
-  (push :common-lisp *features*)
-  (push :ansi-cl *features*)
+;  (push :common-lisp *features*)
+;  (push :ansi-cl *features*)
   
   (eval-when (load)
 	     (if (fboundp 'get-system-time-zone)
