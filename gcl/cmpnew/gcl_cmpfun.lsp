@@ -39,6 +39,7 @@
 (si:putprop 'member 'c1member 'c1)
 (si:putprop 'member!2 'c2member!2 'c2)
 (si:putprop 'assoc 'c1assoc 'c1)
+(si:putprop 'rassoc 'c1rassoc 'c1)
 (si:putprop 'assoc!2 'c2assoc!2 'c2)
 (si:putprop 'get 'c1get 'c1)
 (si:putprop 'get 'c2get 'c2)
@@ -138,7 +139,7 @@
 
 (defun c2apply (funob args &aux (*vs* *vs*) loc)
   (setq loc (save-funob funob))
-  (let ((*vs* *vs*) (base *vs*) (last-arg (list 'CVAR (next-cvar))))
+  (let ((*vs* *vs*) (base *vs*) (last-arg (list 'CVAR (cs-push t t))))
        (do ((l args (cdr l)))
            ((endp (cdr l))
             (wt-nl "{object " last-arg ";")
@@ -271,91 +272,92 @@
   (close-inline-blocks)
   )
 
-(defun c1memq (args &aux (info (make-info)))
-  (when (or (endp args) (endp (cdr args)))
-        (too-few-args 'si::memq 2 (length args)))
-  (unless (endp (cddr args))
-          (too-many-args 'si::memq 2 (length args)))
-  (list 'member!2 info 'eq (c1args (list (car args) (cadr args)) info)))
-        
-(defun c1member (args &aux (info (make-info)))
-  (when (or (endp args) (endp (cdr args)))
-        (too-few-args 'member 2 (length args)))
-  (cond ((endp (cddr args))
-         (list 'member!2 info 'eql (c1args args info)))
-        ((and (eq (caddr args) :test)
-              (eql (length args) 4)	
-       (member  (cadddr args) '('eq #'eq 'equal #'equal
-				'equalp #'equalp 'eql #'eql)
-		:test 'equal))
-         (list 'member!2 info (cadr (cadddr args))
-               (c1args (list (car args) (cadr args)) info)))
-        (t
-         (list 'call-global info 'member (c1args args info)))))
 
-(defun c2member!2 (fun args
-                       &aux (*vs* *vs*) (*inline-blocks* 0) (l (next-cvar)))
-  (setq args (inline-args args '(t t)))
-  (wt-nl "{register object x= " (car args) ",V" l "= " (cadr args) ";")
-  (if *safe-compile*
-      (wt-nl "while(!endp(V" l "))")
-      (wt-nl "while(V" l "!=Cnil)"))
-  (if (eq fun 'eq)
-      (wt-nl "if(x==(V" l "->c.c_car)){")
-      (wt-nl "if(" (string-downcase (symbol-name fun))
-		"(x,V" l "->c.c_car)){"))
-  (if (and (consp *value-to-go*)
-           (or (eq (car *value-to-go*) 'JUMP-TRUE)
-               (eq (car *value-to-go*) 'JUMP-FALSE)))
-      (unwind-exit t 'JUMP)
-      (unwind-exit (list 'CVAR l) 'JUMP))
-  (wt-nl "}else V" l "=V" l "->c.c_cdr;")
-  (unwind-exit nil)
-  (wt "}")
-  (close-inline-blocks)
-  )
+(defconstant +ifb+ (- (car (last (multiple-value-list (si::heap-report))))))
+(defconstant +ifr+ (ash (- +ifb+)  -1))
+(defconstant +ift+ '(integer #.(- +ifr+) #.(1- +ifr+)))
 
-(defun c1assoc (args &aux (info (make-info)))
-  (when (or (endp args) (endp (cdr args)))
-        (too-few-args 'assoc 2 (length args)))
-  (cond ((endp (cddr args))
-         (list 'assoc!2 info 'eql (c1args args info)))
-        ((and (eq (caddr args) ':test)
-              (eql (length args) 4)	
-       (member  (cadddr args) '('eq #'eq 'equal #'equal
-				'equalp #'equalp 'eql #'eql)
-		:test 'equal))
-         (list 'assoc!2 info (cadr (cadddr args)) (c1args (list (car args) (cadr args)) info)))
-        (t
-         (list 'call-global info 'assoc (c1args args info)))))
+(defun eql-is-eq (x)
+  (cond ((typep x '#.+ift+))
+	((or (typep x 'number) (typep x 'character)) nil)
+	(t)))
 
-(defun c2assoc!2 (fun args
-                      &aux (*vs* *vs*) (*inline-blocks* 0) (al (next-cvar))name)
-  (setq args (inline-args args '(t t)))
-  (setq name (symbol-name fun))
-  (or (eq fun 'eq) (setq name (string-downcase name)))
-  (wt-nl "{register object x= " (car args) ",V" al "= " (cadr args) ";")
-  (cond (*safe-compile*
-         (wt-nl "while(!endp(V" al "))")
-             (wt-nl "if(type_of(V"al"->c.c_car)==t_cons &&"
-		    name "(x,V" al "->c.c_car->c.c_car)){"))
-        (t
-         (wt-nl "while(V" al "!=Cnil)")
-             (wt-nl "if(" name "(x,V" al "->c.c_car->c.c_car) &&"
-			"V"al"->c.c_car != Cnil){"))) 
-  (if (and (consp *value-to-go*)
-           (or (eq (car *value-to-go*) 'jump-true)
-               (eq (car *value-to-go*) 'jump-false)))
-      (unwind-exit t 'jump)
-      (unwind-exit (list 'CAR al) 'jump))
-  (wt-nl "}else V" al "=V" al "->c.c_cdr;")
-  (unwind-exit nil)
-  (wt "}")
-  (close-inline-blocks)
-  )
+(defun eql-is-eq-tp (x)
+  (cond ((subtypep x +ift+))
+	((or (subtypep x 'number) (subtypep x 'character)) nil)
+	((or (subtypep 'number x) (subtypep 'character x)) nil)
+	(t)))
 
+(defun implicit-eq-tst (item list)
+  (cond ((and (constantp item) (eql-is-eq item)))
+	((and (constantp list) (consp list) (consp (cadr list))
+	      (reduce (lambda (x y) (and (eql-is-eq x) y)) (cadr list))))
+	((let* ((info (make-info))
+		(nargs (c1args (list item list) info)))
+	   (eql-is-eq-tp (info-type (cadar nargs)))))))
+  
+(defun lit-fun (x &rest r)
+  (cond ((atom x) `(funcall ,x ,@r))
+	((member (car x) '(quote function)) `(,(cadr x) ,@r))
+	((eq (car x) 'lambda) `(,x ,@r))
+	((wfs-error))))
 
+(defun do-list-srch (item list tst key k1 ret)
+  (let* ((key-form `(,k1 ,list))
+	 (key-form (if key (lit-fun key key-form) key-form))
+	 (tst-form (lit-fun tst item key-form))
+	 (tst-form (if ret `(and (,ret ,list) ,tst-form) tst-form))
+	 (exit-form `(or (not ,list) ,tst-form))
+	 (ret-form (if ret `(,ret ,list) list)))
+    `(do ((,list ,list (cdr ,list)))
+	 (,exit-form ,ret-form))))
 
+(defun fun-to-sym (x)
+  (if (and (consp x) (or (eq (car x) 'quote) (eq (car x) 'function)))
+      (cadr x)
+    x))
+
+(defun do-list-srch-eql (item list tst key k1 ret)
+  (let ((ei (gensym)) (el (gensym)))
+    `(let ((,ei ,item) (,el ,list))
+       ,(if (eq (fun-to-sym tst) 'eql)
+	   `(if (eql-is-eq ,ei)
+		,(do-list-srch ei el ''eq key k1 ret)
+	      ,(do-list-srch ei el tst key k1 ret))
+	 (do-list-srch ei el tst key k1 ret)))))
+
+(defun list-expr (item list &key key test test-not k1 ret)
+  (when (and test test-not)
+    (error ":test and :test-not both specified"))
+  (let ((test (or test
+		 (and test-not `(lambda (x y) (not ,(lit-fun test-not 'x 'y))))
+		 (if (implicit-eq-tst item list) ''eq ''eql))))
+    (c1expr (do-list-srch-eql item list test key k1 ret))))
+
+(defmacro with-item-list-keys ((item list keys) args &body body) 
+  `(let ((,item (car ,args)) (,list (cadr ,args)) (,keys (cddr ,args))) 
+     (when (or (endp ,args) (endp (cdr ,args))) 
+       (too-few-args 'list-expr 2 (length ,args)))  
+     ,@body))
+
+(defun c1assoc (args)
+  (with-item-list-keys 
+   (item list keys) args
+   (apply 'list-expr item list :k1 'caar :ret 'car keys)))
+(defun c1rassoc (args)
+  (with-item-list-keys 
+   (item list keys) args
+   (apply 'list-expr item list :k1 'cdar :ret 'car keys)))
+(defun c1member (args)
+  (with-item-list-keys 
+   (item list keys) args
+  (apply 'list-expr item list  :k1 'car keys)))
+(defun c1memq (args)
+  (with-item-list-keys 
+   (item list keys) args
+  (apply 'list-expr item list :k1 'car :test ''eq keys)))
+
+;;FIXME member-if member-if-not et.al by ;test -> :test-not
 
 (defun boole3 (a b c)  (boole a b c))
 (si:putprop 'boole '(c1boole-condition . c1boole3) 'c1conditional)
@@ -463,7 +465,7 @@
 (defun c2get (args)
   (if *safe-compile*
       (c2call-global 'get args nil t)
-      (let ((*vs* *vs*) (*inline-blocks* 0) (pl (next-cvar)))
+      (let ((*vs* *vs*) (*inline-blocks* 0) (pl (cs-push t t)))
            (setq args (inline-args args (if (cddr args) '(t t t) '(t t))))
            (wt-nl "{object V" pl" =(" (car args) ")->s.s_plist;")
            (wt-nl " object ind= " (cadr args) ";")
@@ -931,7 +933,7 @@
             (c1args (list (cadr args)) info))
       (list 'call-global info 'si:list-nth (c1args args info))))
 
-(defun c2list-nth-immediate (index args &aux (l (next-cvar))
+(defun c2list-nth-immediate (index args &aux (l (cs-push t t))
                                              (*vs* *vs*) (*inline-blocks* 0))
   (setq args (inline-args args '(t t)))
   (wt-nl "{object V" l "= ")
