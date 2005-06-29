@@ -51,7 +51,8 @@
   (let ((type (type-of thing)))
     (case type
       ((fixnum bignum) `(integer ,thing ,thing))
-      ((short-float long-float) type)
+      ((short-float long-float symbol cons) type)
+      (keyword 'symbol)
       ((string-char standard-char character) 'character)
       ((string bit-vector) type)
       (vector (list 'vector (array-element-type thing)))
@@ -60,11 +61,12 @@
 
 ;;FIXME -- this function needs a rewrite.  CM 20050106
 (defun type-filter (type)
-  (when (and (symbolp type) (get type 'si::deftype-definition) (not (get type 's-data)))
+  (when (and (symbolp type) (get type 'si::deftype-definition) (not (get type 's-data)) (not (eq type 'string)))
     (return-from type-filter type))
   (case type
-    ((character short-float long-float boolean) type)
+    ((character short-float long-float boolean symbol cons) type)
     ((single-float double-float) 'long-float)
+    (keyword 'symbol)
     ((nil t) t)
     (t (let ((type (si::normalize-type type)) element-type)
 	 (case (car type)
@@ -82,7 +84,7 @@
 			    (and (consp (caddr type))
 				 (= (length (caddr type)) 1))))
 		   (case element-type
-		     (string-char 'string)
+;		     (string-char 'string)
 		     (bit 'bit-vector)
 		     (t (list 'vector element-type))))
 		  (t (list 'array element-type))))
@@ -310,36 +312,38 @@
 	(t (case type1
 	     (string
 	      (if (and (consp type2) (eq (car type2) 'array)
-				   (eq (cadr type2) 'string-char))
-			      type1 nil))
-			 (bit-vector
-			  (if (and (consp type2) (eq (car type2) 'array)
-				   (eq (cadr type2) 'bit))
-			      type1 nil))
-			 (fixnum-float
-			  (if (member type2 '(fixnum float short-float long-float))
+		       (eq (cadr type2) 'string-char))
+		  type1 nil))
+	     (bit-vector
+	      (if (and (consp type2) (eq (car type2) 'array)
+		       (eq (cadr type2) 'bit))
+		  type1 nil))
+	     (fixnum-float
+	      (if (member type2 '(fixnum float short-float long-float))
+		  type2 nil))
+	     (float
+	      (if (member type2 '(short-float long-float))
 			      type2 nil))
-			 (float
-			  (if (member type2 '(short-float long-float))
-			      type2 nil))
-			 ((long-float short-float)
-			  (if (member type2 '(fixnum-float float))
-			      type1 nil))
-			 ((signed-char unsigned-char signed-short)
-			  (if (eq type2 'fixnum) type1 nil))
-			 ((unsigned-short)
-			  (if (subtypep type1 type2) type1 nil))
-			 (integer
-			  (case type2
-			    (fixnum type2)))
-			 (fixnum
-			  (case type2
-			    ((integer fixnum-float) 'fixnum)
-			    ((signed-char unsigned-char signed-short bit)
-			     type2)
-			    ((unsigned-short)
-			     (if (subtypep type2 type1) type2 nil))))
-			 ))))
+	     ((long-float short-float)
+	      (if (member type2 '(fixnum-float float))
+		  type1 nil))
+	     ((signed-char unsigned-char signed-short)
+	      (if (eq type2 'fixnum) type1 nil))
+	     ((unsigned-short)
+	      (if (subtypep type1 type2) type1 nil))
+	     (integer
+	      (case type2
+		    (fixnum type2)))
+	     (fixnum
+	      (case type2
+		    ((integer fixnum-float) 'fixnum)
+		    ((signed-char unsigned-char signed-short bit)
+		     type2)
+		    ((unsigned-short)
+		     (if (subtypep type2 type1) type2 nil))))
+	     (otherwise
+	      (if (subtypep type1 type2) type1 (if (subtypep type2 type1) type2 nil)))
+	     ))))
 		 
 (defun type>= (type1 type2)
   (equal (type-and type1 type2) type2))

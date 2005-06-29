@@ -25,8 +25,10 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * Don't  autodeclare apparently constant special variable bindings
   * compile-file ansi test fixes
   * replace eql with eq in list search functions when possible
+  * preliminary support for symbol keyword and cons type optimization in
+    compiler
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:19:46 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:20:46 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
