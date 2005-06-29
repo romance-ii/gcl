@@ -443,12 +443,8 @@ LFD(Ltruename)(void)
 	    !file_exists(vs_base[0])) {
 	    file_error("File ~S does not exist.",vs_base[0]);
 	    vs_base[0] = Cnil;
-	} else {
-	    if ((vs_base[0]->pn.pn_directory == Cnil) || 
-		    (vs_base[0]->pn.pn_directory == sKunspecific))
-		vs_base[0]->pn.pn_directory=make_cons(sKrelative,Cnil);
+	} else 
 	    vs_base[0] = truename(vs_base[0]);
-	}
 }
 
 LFD(Lrename_file)(void)
