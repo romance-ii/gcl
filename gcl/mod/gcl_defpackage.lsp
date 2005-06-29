@@ -145,36 +145,36 @@
   (labels ((option-test (arg1 arg2) (when (consp arg2) (equal (car arg2) arg1)))
 	   (option-values-list (option options)
 			       (sloop for result = (member option options
-							   ':test #'option-test)
+							   :test #'option-test)
 				      then (member option (rest result)
-						   ':test #'option-test)
+						   :test #'option-test)
 				      until (null result) when result collect
 				      (rest (first result))))
 	   (option-values (option options)
-			  (sloop for result  = (member option options ':test #'option-test)
-				 then (member option (rest result) ':test #'option-test)
+			  (sloop for result  = (member option options :test #'option-test)
+				 then (member option (rest result) :test #'option-test)
 				 until (null result) when result append
 				 (rest (first result)))))
 	  (sloop for option in '(:size :documentation)
-		 when (<= 2 (count option options ':key #'car))
+		 when (<= 2 (count option options :key #'car))
 		 do (specific-error :invalid-form 
 				    "DEFPACKAGE option ~s specified more than once."
 				    option))
 	  (setq name (string name))
-	  (let ((nicknames (mapcar #'string (option-values ':nicknames options)))
-		(documentation (first (option-values ':documentation options)))
-		(size (first (option-values ':size options)))
-		(shadowed-symbol-names (mapcar #'string (option-values ':shadow options)))
-		(interned-symbol-names (mapcar #'string (option-values ':intern options)))
-		(exported-symbol-names (mapcar #'string (option-values ':export options)))
+	  (let ((nicknames (mapcar #'string (option-values :nicknames options)))
+		(documentation (first (option-values :documentation options)))
+		(size (first (option-values :size options)))
+		(shadowed-symbol-names (mapcar #'string (option-values :shadow options)))
+		(interned-symbol-names (mapcar #'string (option-values :intern options)))
+		(exported-symbol-names (mapcar #'string (option-values :export options)))
 		(shadowing-imported-from-symbol-names-list 
-		 (sloop for list in (option-values-list ':shadowing-import-from options)
+		 (sloop for list in (option-values-list :shadowing-import-from options)
 			collect (cons (string (first list)) (mapcar #'string (rest list)))))
 		(imported-from-symbol-names-list 
-		 (sloop for list in (option-values-list ':import-from options)
+		 (sloop for list in (option-values-list :import-from options)
 			collect (cons (string (first list)) (mapcar #'string (rest list)))))
 		(exported-from-package-names 
-		 (mapcar #'string (option-values ':export-from options))))
+		 (mapcar #'string (option-values :export-from options))))
 	    (flet ((find-duplicates 
 		    (&rest lists)
 		    (let (results)
@@ -212,10 +212,10 @@
 			  (sloop for num in (rest duplicate)
 				 collect 
 				 (case num 
-				       (1 ':SHADOW)
-				       (2 ':INTERN)
-				       (3 ':SHADOWING-IMPORT-FROM)
-				       (4 ':IMPORT-FROM)))))
+				       (1 :SHADOW)
+				       (2 :INTERN)
+				       (3 :SHADOWING-IMPORT-FROM)
+				       (4 :IMPORT-FROM)))))
 		  (sloop for duplicate in 
 			 (find-duplicates exported-symbol-names interned-symbol-names)
 			 do
@@ -226,8 +226,8 @@
 			  (sloop for num in 
 				 (rest duplicate) 
 				 collect (case num 
-					       (1 ':EXPORT)
-					       (2 ':INTERN))))))
+					       (1 :EXPORT)
+					       (2 :INTERN))))))
 	    `(eval-when (load eval compile)
 			(if (find-package ,name)
 			    (progn (rename-package ,name ,name)
@@ -244,13 +244,13 @@
 							   (find-package ,name))))
 						  (when (hash-table-p tab)
 						    (setf (excl::ha_rehash-size tab) ,size)))))
-				   ,@(when (not (null (member ':use options ':key #'car)))
+				   ,@(when (not (null (member :use options :key 'car)))
 				       `((unuse-package 
 					  (package-use-list (find-package ,name)) ,name))))
 			  (make-package 
 			   ,name 
-			   ':use 'nil 
-			   ':nicknames 
+			   :use 'nil 
+			   :nicknames 
 			   ',nicknames 
 			   ,@(when size 
 			       #+lispm `(:size ,size) 
@@ -278,8 +278,8 @@
 
 						    ',(rest list))))
 				      SHADOWING-IMPORTed-from-symbol-names-list))
-			  (USE-PACKAGE ',(if (member ':USE options ':test #'option-test)
-					     (mapcar #'string (option-values ':USE options))
+			  (USE-PACKAGE ',(if (member :USE options :test #'option-test)
+					     (mapcar #'string (option-values :USE options))
 					   "LISP"))
 			  ,@(when IMPORTed-from-symbol-names-list
 			      (mapcar #'(lambda (list) 
@@ -312,8 +312,8 @@
 ;(excl::defadvice cl:documentation (look-for-package-type :around)
 ;    (let ((symbol (first excl::arglist))
 ;	   (type (second excl::arglist)))
-;       (if (or (eq ':package (intern (string type) :keyword))
-;	       (eq ':defpackage (intern (string type) :keyword)))
+;       (if (or (eq :package (intern (string type) :keyword))
+;	       (eq :defpackage (intern (string type) :keyword)))
 ;	   (or (get symbol 'excl::%package-documentation)
 ;	       (get (intern (string symbol) :keyword) 'excl::%package-documentation))
 ;	 (values :do-it))))
@@ -322,10 +322,10 @@
 ;(scl::advise cl:documentation :around look-for-package-type nil
 ;   (let ((symbol (first scl::arglist))
 ;	 (type (second scl::arglist)))
-;     (if (or (eq ':package (intern (string type) :keyword))
-;	     (eq ':defpackage (intern (string type) :keyword)))
-;	 (or (get symbol ':package-documentation)
-;	     (get (intern (string symbol) :keyword) ':package-documentation))
+;     (if (or (eq :package (intern (string type) :keyword))
+;	     (eq :defpackage (intern (string type) :keyword)))
+;	 (or (get symbol :package-documentation)
+;	     (get (intern (string symbol) :keyword) :package-documentation))
 ;       (values :do-it))))
 
 ;(pushnew :defpackage *features*)
