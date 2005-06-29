@@ -303,11 +303,12 @@
 	   (not (endp (si:pathname-lookup (pathname-host object)
 				    	  si:*pathname-logical*)))))
     (t 
-     (cond ((setq tem (get tp 'si::s-data))
-	    (structure-subtype-p object tem))
-           ((setq tem (get tp 'deftype-definition))
+     (cond ((setq tem (get tp 'deftype-definition))
 	      (typep object
-		     (apply tem i)))))))
+		     (apply tem i)))
+	   ((setq tem (get tp 'si::s-data))
+	    (structure-subtype-p object tem))
+           ))))
 
 
 ;;; NORMALIZE-TYPE normalizes the type using the DEFTYPE definitions.
@@ -332,8 +333,9 @@
 ;;FIXME -- get rid of this list.  And those in subtypep.  CM 20050106
 (defun known-type-p (type)
   (when (consp type) (setq type (car type)))
-  (if (or (equal (string type) "ERROR")
-	  (member type
+  (if (and (symbolp type) 
+	   (or (equal (string type) "ERROR")) ;FIXME error symbol
+	   (member type
                   '(t nil boolean null symbol keyword atom cons list sequence
 		      non-negative-char negative-char signed-char unsigned-char
 		      non-negative-short negative-short signed-short unsigned-short
@@ -357,7 +359,7 @@
 		      style-warning synonym-stream two-way-stream structure-object
 		      type-error unbound-slot unbound-variable undefined-function
 		      warning ))
-          (get type 's-data))
+	   (get type 's-data))
       t
       nil))
 
@@ -494,8 +496,9 @@
        	     (values t t)
        	     (values nil ntp1)))
        	((eq t2 'condition)
-       	 (if (or (equal (string t1) "ERROR")
-		 (member t1 '(serious-condition error type-error simple-type-error
+       	 (if (and (symbolp t1) 
+		  (or (equal (string t1) "ERROR")
+		      (member t1 '(serious-condition error type-error simple-type-error
 					    parse-error cell-error unbound-slot
 					    warning style-warning storage-condition
 					    simple-warning unbound-variable control-error
@@ -508,12 +511,13 @@
 					    floating-point-underflow 
 					    file-error stream-error end-of-file
 					    print-not-readable
-					    reader-error)))
+					    reader-error))))
        	     (values t t)
        	     (values nil ntp1)))
        	((eq t2 'serious-condition)
-       	 (if (or (equal (string t1) "ERROR")
-		 (member t1 '( error type-error simple-type-error
+       	 (if (and (symbolp t1)
+		  (or (equal (string t1) "ERROR")
+		      (member t1 '( error type-error simple-type-error
 				     parse-error cell-error unbound-slot
 				     storage-condition
 				     unbound-variable control-error
@@ -526,7 +530,7 @@
 				     floating-point-underflow 
 				     file-error stream-error end-of-file 
 				     print-not-readable
-				     reader-error)))
+				     reader-error))))
        	     (values t t)
        	     (values nil ntp1)))
        	((eq t2 'type-error)
@@ -541,7 +545,7 @@
        	 (if (member t1 '(reader-error end-of-file))
        	     (values t t)
        	     (values nil ntp1)))
-       	((or (equal (string t2) "ERROR") (eq t2 'error))
+       	((and (symbolp t2) (or (equal (string t2) "ERROR") (eq t2 'error)))
        	 (if (member t1 '(simple-type-error type-error
 			  parse-error cell-error unbound-slot
 			  unbound-variable control-error
@@ -605,12 +609,12 @@
 	       (t (values nil ntp1))))
        	((eq t1 'number) (values nil ntp2))
        	((or (eq t2 'structure) (eq t2 'structure-object))
-       	 (if (or (eq t1 'structure) (get t1 'si::s-data))
+       	 (if (and (symbolp t1) (or (eq t1 'structure) (get t1 'si::s-data)))
        	     (values t t)
        	     (values nil ntp1)))
        	((eq t1 'structure) (values nil ntp2))
-       	((setq tem (get t1 'si::s-data))
-	 (let ((tem2 (get t2 'si::s-data)))
+       	((and (symbolp t1) (setq tem (get t1 'si::s-data)))
+	 (let ((tem2 (and (symbolp t2) (get t2 'si::s-data))))
 	   (cond (tem2
 		   (do ((tp1 tem (s-data-includes tp1)) (tp2 tem2))
 		       ((null tp1)(values nil t))
@@ -625,7 +629,7 @@
 		 (sub-interval-p i1 i2))
 		(values t t))
 	       (t (values nil ntp1))))
-       	((get t2 'si::s-data) (values nil ntp1))
+       	((and (symbolp t2) (get t2 'si::s-data)) (values nil ntp1))
        	(t
        	 (case t1
        	   (bignum

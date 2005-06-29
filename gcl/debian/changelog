@@ -28,8 +28,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * preliminary support for symbol keyword and cons type optimization in
     compiler
   * Preparation for error system overhaul work
+  * deftype before structure-subtype in typep
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:21:58 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:22:56 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
