@@ -31,8 +31,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * deftype before structure-subtype in typep
   * unused vars
   * remove ':
+  * fmakunbound on undefined fn is not an error
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:23:52 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:24:23 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
