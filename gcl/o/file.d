@@ -2193,6 +2193,20 @@ DEFVAR("*BINARY-MODULES*",sSAbinary_modulesA,SI,Cnil,"");
 		pathname->pn.pn_type = FASL_string;
 		fasl_filename = coerce_to_local_namestring(pathname);
 	}
+        if (fasl_filename == Cnil) {
+	  FILE *f;
+	  char b[32],fn[4096];/*FIXME*/
+	  int i;
+	  coerce_to_local_filename(pathname,fn);
+	  if (!(f=fopen(fn,"rb")))
+	    file_error("Cannot open ~S",pathname);
+	  fread(b,sizeof(b),1,f);
+	  fclose(f);
+	  for (i=0;i<sizeof(b) && (!iscntrl(b[i]) || isspace(b[i]));i++);
+	  if (i<sizeof(b))
+	    fasl_filename = coerce_to_local_namestring(pathname);
+	}
+
 	if (fasl_filename != Cnil && file_exists(fasl_filename)) {
 		if (verbose != Cnil) {
 			SETUP_PRINT_DEFAULT(fasl_filename);

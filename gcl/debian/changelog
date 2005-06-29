@@ -32,8 +32,10 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * unused vars
   * remove ':
   * fmakunbound on undefined fn is not an error
+  * heuristic to detect compiled objects from text files independent of
+    filename extension
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:24:23 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:25:29 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
