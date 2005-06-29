@@ -1,2 +1,0 @@
-
-static object LI1();
