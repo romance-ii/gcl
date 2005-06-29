@@ -55,6 +55,7 @@
 (defvar *compile-file-truename* nil)
 (defvar *compile-file-pathname* nil)
 
+
 (defun compiler-default-type (pname) 
   "Set the default file extension (type) for compilable file names."
   (setf *compiler-default-type* (if (pathnamep pname)
@@ -118,7 +119,9 @@
 
 (defvar *lsp-ext* (make-pathname :type "lsp"))
 
-(defun compile-file  (&rest args
+(defvar *o-ext* (make-pathname  :type "o"))
+
+(defun compile-file  (filename &rest args
 			    &aux (*print-pretty* nil)
 			    (*package* *package*) (*split-files* *split-files*)
 			    (*PRINT-CIRCLE* NIL)
@@ -132,34 +135,36 @@
 			    (*PRINT-BASE* 10)
 			    (*PRINT-ESCAPE* T)
 			    (section-length *split-files*)
-			    tem
-			    (*compile-file-pathname* (merge-pathnames (car args) *lsp-ext*))
+			    tem warnings failures
+			    (*compile-file-pathname* (merge-pathnames filename *lsp-ext*))
 			    (*compile-file-truename* (truename *compile-file-pathname*)))
+
   (loop 
    (compiler::init-env)
-   (setq tem (apply 'compiler::compile-file1 args))
-   (cond ((atom *split-files*)(return tem))
+   (setq tem (apply 'compiler::compile-file1 filename args))
+   (cond ((atom *split-files*)(return (values (truename tem) warnings failures)))
 	 ((and (consp *split-files*) (null (third *split-files*)))
-	  (let ((gaz (let ((*DEFAULT-PATHNAME-DEFAULTS* (car args))) (gazonk-name)))
+	  (let ((gaz (let ((*DEFAULT-PATHNAME-DEFAULTS* filename)) (gazonk-name)))
 		(*readtable* (si::standard-readtable)))
 	    (with-open-file 
 	     (st gaz :direction :output)
 	     (print `(eval-when (load eval)
-				(dolist (v ',(nreverse (second *split-files*)))
+				(dolist (v (nreverse (second *split-files*)))
 				  (load (merge-pathnames v si::*load-pathname*))))
 		    st))
 	    (setq *split-files* nil)
 	    (or (member :output-file args)
-		(setq args (append args (list :output-file (car args)))))
+		(setq args (append args (list :output-file filename))))
 	    (return 
-	     (prog1 (apply 'compile-file gaz (cdr args))
-	       (unless *keep-gaz* (delete-file gaz)))))))
+	     (let ((tem (truename (apply 'compile-file gaz args))))
+	       (unless *keep-gaz* (delete-file gaz))
+	       (values tem warnings failures))))))
    (if (consp *split-files*)
-       (setf (car *split-files*) (+ (third *split-files*) section-length)))))
+       (setf (car *split-files*) (+ (third *split-files*) section-length)))))))
 
 
 (defun compile-file1 (input-pathname
-                      &key (output-file input-pathname)
+                      &key (output-file (merge-pathnames *o-ext* input-pathname))
                            (o-file t)
                            (c-file *default-c-file*)
                            (h-file *default-h-file*)
@@ -209,7 +214,7 @@ Cannot compile ~a.~%"
     (return-from compile-file1 (values)))
 
   (when *compile-verbose*
-    (format t "~&Compiling ~a.~%"
+    (format t "~&;; Compiling ~a.~%"
             (namestring (merge-pathnames input-pathname *compiler-default-type*))))
 
   (and *record-call-info* (clear-call-table))
@@ -247,11 +252,14 @@ Cannot compile ~a.~%"
          (name (or (and (not (null output-file))
                         (pathname-name output-file))
                    (pathname-name input-pathname)))
+	 (tp (or (and (not (null output-file))
+		      (pathname-type output-file))
+                   "o"))
 	 (device (or (and (not (null output-file))
                         (pathname-device output-file))
                    (pathname-device input-pathname)))
 
-         (o-pathname (get-output-pathname o-file "o" name dir device))
+         (o-pathname (get-output-pathname o-file tp name dir device))
          (c-pathname (get-output-pathname c-file "c" name dir device))
          (h-pathname (get-output-pathname h-file "h" name dir device))
          (data-pathname (get-output-pathname data-file "data" name dir device))
@@ -324,7 +332,7 @@ Cannot compile ~a.~%"
      (setq *init-name* (init-name input-pathname system-p))
 
       (when (zerop *error-count*)
-        (when *compile-verbose* (format t "~&End of Pass 1.  ~%"))
+        (when *compile-verbose* (format t "~&;; End of Pass 1.  ~%"))
         (compiler-pass2 c-pathname h-pathname system-p ))
 	
 
@@ -338,7 +346,7 @@ Cannot compile ~a.~%"
 
         #+aosvs
         (progn
-          (when *compile-verbose* (format t "~&End of Pass 2.  ~%"))
+          (when *compile-verbose* (format t "~&;; End of Pass 2.  ~%"))
           (when data-file
             (with-open-file (in fasl-pathname)
               (with-open-file (out data-pathname :direction :output)
@@ -352,13 +360,13 @@ Cannot compile ~a.~%"
                         (unless ob-file (delete-file ob-pathname))
                         (when *compile-verbose*
                               (print-compiler-info)
-                              (format t "~&Finished compiling ~a.~%" (namestring output-file))
+                              (format t "~&;; Finished compiling ~a.~%" (namestring output-file))
 			      ))
                        (t (format t "~&Your C compiler failed to compile the intermediate file.~%")
                           (setq *error-p* t))))
                 (*compile-verbose*
                  (print-compiler-info)
-                 (format t "~&Finished compiling ~a.~%" (namestring output-file)
+                 (format t "~&;; Finished compiling ~a.~%" (namestring output-file)
 			 )))
           (unless c-file (delete-file c-pathname))
           (unless h-file (delete-file h-pathname))
@@ -366,7 +374,7 @@ Cannot compile ~a.~%"
 
 
         (progn
-          (when *compile-verbose* (format t "~&End of Pass 2.  ~%"))
+          (when *compile-verbose* (format t "~&;; End of Pass 2.  ~%"))
 	  (cond (*record-call-info*
 		 (dump-fn-data (get-output-pathname output-file "fn" name dir device))))
           (cond (o-file
@@ -376,14 +384,14 @@ Cannot compile ~a.~%"
                         (when load (load o-pathname))
                        (when *compile-verbose*
                               (print-compiler-info)
-                              (format t "~&Finished compiling ~a.~%" (namestring output-file)
+                              (format t "~&;; Finished compiling ~a.~%" (namestring output-file)
 				      )))
                        (t 
                           (format t "~&Your C compiler failed to compile the intermediate file.~%")
                           (setq *error-p* t))))
                  (*compile-verbose*
                   (print-compiler-info)
-                  (format t "~&Finished compiling ~a.~%" (namestring output-file)
+                  (format t "~&;; Finished compiling ~a.~%" (namestring output-file)
 			  )))
           (unless c-file (delete-file c-pathname))
           (unless h-file (delete-file h-pathname))
@@ -440,14 +448,12 @@ Cannot compile ~a.~%"
 					       (lambda-block (cddr tem))
 					       ))       st))
 	     (let ((fi (let ((*compiler-compile* t))
-			 (compile-file gaz))))
-	       (load fi)
-	       (delete-file fi))
-	     (unless *keep-gaz* (delete-file gaz)))
-	   (or (eq na name) (setf (symbol-function name) (symbol-function na)))
-	 ;; FIXME -- support warnings-p and failures-p.  CM 20041119
-	   (values (symbol-function name) nil nil)
-	   ))
+			 (multiple-value-list (compile-file gaz)))))
+	       (load (car fi))
+	       (delete-file (car fi))
+	       (unless *keep-gaz* (delete-file gaz))
+	       (or (eq na name) (setf (symbol-function name) (symbol-function na)))
+	       (values (symbol-function name) (cadr fi) (caddr fi))))))
 	(t (error "can't compile ~a" name))))
 
 (defun disassemble (name &aux tem)
@@ -670,7 +676,7 @@ SYSTEM_SPECIAL_INIT
 			 (namestring o-pathname)))))
 
 (defun print-compiler-info ()
-  (format t "~&OPTIMIZE levels: Safety=~d~:[ (No runtime error checking)~;~], Space=~d, Speed=~d, (Debug quality ignored)~%"
+  (format t "~&;; OPTIMIZE levels: Safety=~d~:[ (No runtime error checking)~;~], Space=~d, Speed=~d, (Debug quality ignored)~%"
           (cond ((null *compiler-check-args*) 0)
                 ((null *safe-compile*) 1)
                 ((null *compiler-push-events*) 2)
@@ -769,7 +775,11 @@ SYSTEM_SPECIAL_INIT
 		      (format st "{init_~a,\"~a\"}" (car tem) (cadr tem)))
 		    (format st "};~%~%")
 		    
+		    (format st "static int user_init_run;~%")
+		    (format st "#define my_load(a_,b_) {if (!user_init_run && (a_)) gcl_init_or_load1((a_),(b_));(a_)=0;}~%~%")
+                    
 		    (format st "object user_init(void) {~%")
+		    (format st "user_init_run=1;~%")
 		    (dolist (tem files)
 		      (let ((tem (namestring tem)))
 			    (cond ((equal (cadr (car p)) tem)
@@ -781,10 +791,10 @@ SYSTEM_SPECIAL_INIT
 		    (format st "return Cnil;}~%~%")
 
 		    (format st "int user_match(const char *s,int n) {~%")
-		    (format st "  const Fnlst *f;~%")
+		    (format st "  Fnlst *f;~%")
 		    (format st "  for (f=my_fnlst;f<my_fnlst+NF;f++){~%")
 		    (format st "     if (!strncmp(s,f->s,n)) {~%")
-		    (format st "        gcl_init_or_load1(f->fn,f->s);~%")
+		    (format st "        my_load(f->fn,f->s);~%")
 		    (format st "        return 1;~%")
 		    (format st "     }~%")
 		    (format st "  }~%")
@@ -793,6 +803,7 @@ SYSTEM_SPECIAL_INIT
 		    
   (compiler-cc c o)
 ;  (system (format nil "~a ~a" *cc* tem))
+;   (with-open-file (s c) (si::copy-stream s *standard-output*))
   (delete-file c)
 
   o))

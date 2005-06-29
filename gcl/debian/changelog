@@ -23,8 +23,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
     c1 funs
   * Better list search function optimizations -- FIXME more here later
   * Don't  autodeclare apparently constant special variable bindings
+  * compile-file ansi test fixes
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:18:04 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:18:36 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
