@@ -1,0 +1,2 @@
+
+static object LI1();
