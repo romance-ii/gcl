@@ -431,7 +431,7 @@
 	      (let ((vararg (member '* args)))
 		(wt "(object first,...){"
 		    (declaration-type (rep-type type)) "V1;"
-		    "va_list ap;va_start(ap,first);V1=call_"
+		    "va_list ap;va_start(ap,first);V1=(" (declaration-type (rep-type type)) ")call_"
 		    (if vararg "v" "") "proc_new(VV["
 		    (add-object name)"]," (if setf "1" "0") ",(void **)(void *)&Lnk" num )
 		(or vararg (wt "," (proclaimed-argd args type)))

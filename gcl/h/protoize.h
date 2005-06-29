@@ -1781,6 +1781,9 @@ typedef MP_INT * GEN;
 MP_INT *
 otoi(object);
 
+MP_INT *
+stoi(fixnum);
+
 #ifdef SGC
 void
 memprotect_test_reset(void);

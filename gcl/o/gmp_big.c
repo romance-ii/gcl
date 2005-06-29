@@ -419,6 +419,13 @@ otoi(object x) {
   FEwrong_type_argument(sLinteger,x);
   return NULL;
 }
+
+MP_INT *
+stoi(fixnum x) {
+  object y = new_bignum();
+  mpz_set_si(MP(y),x);
+  return MP(y);
+}
 /* end added section for declare integer -- CM */
 
 

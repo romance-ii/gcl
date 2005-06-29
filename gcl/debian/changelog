@@ -43,8 +43,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * Fix command line compile semantics for new compile-file behavior
   * function identifier type -- stack strings don't work for error
     reporting
+  * stoi for unboxed integer arguments
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 21:19:16 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 21:51:38 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
