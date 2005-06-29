@@ -15,8 +15,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * Fix compile-file-pathname and compile-file-truename, split-files
   * Handle file type defaults in compile-file
   * Fix '* array element handling in aref-propagator
+  * Style-warning condition
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 27 Jun 2005 14:55:31 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:12:18 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
