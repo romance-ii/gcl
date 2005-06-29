@@ -74,7 +74,7 @@
 	    (format *debug-io* "~&~A~2%" *break-message*) ;***
 	    (when (> (length *link-array*) 0)
 	      (format *debug-io* 
-		      "Fast links are on: do (use-fast-links nil) for debugging~%"))
+		      "Fast links are on: do (si::use-fast-links nil) for debugging~%"))
 	    (set-current)		;***
 	    (setq *no-prompt* nil)
 	    (show-restarts)))		;***
