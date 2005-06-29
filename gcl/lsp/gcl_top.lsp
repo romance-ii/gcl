@@ -144,7 +144,7 @@
 
 
 (defun dbl-read (&optional (stream *standard-input*) (eof-error-p t)
-			   (eof-value nil)  &aux tem  ch)
+			   (eof-value nil)  &aux ch)
   (tagbody
    top
    (setq ch (read-char stream eof-error-p eof-value))

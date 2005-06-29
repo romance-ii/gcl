@@ -29,8 +29,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
     compiler
   * Preparation for error system overhaul work
   * deftype before structure-subtype in typep
+  * unused vars
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:22:56 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 29 Jun 2005 04:23:21 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
