@@ -9,14 +9,15 @@ PORTDIR	= ../unixport
 CAT=cat
 APPEND=../xbin/append
 
-OBJS	= gcl_arraylib.o gcl_assert.o gcl_defmacro.o gcl_defstruct.o \
-	  gcl_describe.o gcl_evalmacros.o \
-	  gcl_iolib.o gcl_listlib.o gcl_mislib.o gcl_module.o gcl_numlib.o \
-	  gcl_packlib.o gcl_predlib.o \
-	  gcl_seq.o gcl_seqlib.o gcl_setf.o gcl_top.o gcl_trace.o gcl_sloop.o \
-          gcl_debug.o gcl_info.o gcl_serror.o 
-# export.o autoload.o auto_new.o
-
+PREFS:= arraylib assert defmacro defstruct \
+	  describe evalmacros \
+	  iolib listlib mislib module numlib \
+	  packlib predlib \
+	  seq seqlib setf top trace sloop \
+          debug info serror 
+NPREFS:= export autoload auto_new
+SRC:= $(addprefix gcl_,$(addsuffix .lsp,$(PREFS) $(NCPREFS)))
+OBJS:=$(addprefix gcl_,$(addsuffix .o,$(PREFS)))
 
 COMPILE_FILE=$(PORTDIR)/saved_pre_gcl $(PORTDIR) -system-p -c-file -data-file \
 	-o-file nil -h-file -compile
@@ -35,10 +36,10 @@ COMPILE_FILE=$(PORTDIR)/saved_pre_gcl $(PORTDIR) -system-p -c-file -data-file \
 	"${APPEND} ${NULLFILE} $*.data $*.o "
 
 
-all:	$(OBJS)
+all:	$(OBJS) TAGS
 
-
-
+TAGS: $(SRC)
+	etags $^
 .c.o:
 	$(CC) $(OFLAG) $(CFLAGS) -c $*.c
 	${APPEND} ${NULLFILE} $*.data  $*.o

@@ -8,11 +8,15 @@ PORTDIR	= ../unixport
 CAT=cat
 APPEND=../xbin/append
 
-OBJS	= gcl_cmpbind.o gcl_cmpblock.o gcl_cmpcall.o gcl_cmpcatch.o gcl_cmpenv.o gcl_cmpeval.o \
-	gcl_cmpflet.o gcl_cmpfun.o gcl_cmpif.o gcl_cmpinline.o gcl_cmplabel.o gcl_cmplam.o gcl_cmplet.o \
-	gcl_cmploc.o gcl_cmpmap.o gcl_cmpmulti.o gcl_cmpspecial.o gcl_cmptag.o gcl_cmptop.o \
-	gcl_cmptype.o gcl_cmputil.o gcl_cmpvar.o gcl_cmpvs.o gcl_cmpwt.o # gcl_cmpmain.o gcl_cmpopt.o gcl_lfun_list.o
+PREFS:= cmpbind cmpblock cmpcall cmpcatch cmpenv cmpeval \
+	cmpflet cmpfun cmpif cmpinline cmplabel cmplam cmplet \
+	cmploc cmpmap cmpmulti cmpspecial cmptag cmptop \
+	cmptype cmputil cmpvar cmpvs cmpwt 
 
+NCPREFS:= cmpmain cmpopt lfun_list
+
+SRC:= $(addprefix gcl_,$(addsuffix .lsp,$(PREFS) $(NCPREFS)))
+OBJS:=$(addprefix gcl_,$(addsuffix .o,$(PREFS)))
 FNS:= $(OBJS:.o=.fn)
 
 COMPILE_FILE=$(PORTDIR)/saved_pre_gcl $(PORTDIR) -system-p -c-file -data-file \
@@ -31,7 +35,10 @@ COMPILE_FILE=$(PORTDIR)/saved_pre_gcl $(PORTDIR) -system-p -c-file -data-file \
 	"$(CC) $(OFLAG) $(CFLAGS) -c $*.c" \
 	"${APPEND} ${NULLFILE} $*.data $*.o"
 
-all:	$(OBJS)
+all:	$(OBJS) TAGS
+
+TAGS: $(SRC)
+	etags $^
 
 .lsp.fn: ../cmpnew/gcl_collectfn.o
 	../xbin/make-fn $*.lsp
