@@ -50,8 +50,10 @@ gclcvs (2.7.0-49) unstable; urgency=low
     integers across functions, prepare for doing so with short and long
     floats instead.
   * TAGS in lsp and cmpnew
+  * reorder types for quick predicates, define some useful macros to
+    same end
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  8 Jul 2005 06:07:59 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri,  8 Jul 2005 06:08:46 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
