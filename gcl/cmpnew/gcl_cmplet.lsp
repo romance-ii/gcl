@@ -1,3 +1,4 @@
+;;-*-Lisp-*-
 ;;; CMPLET  Let and Let*.
 ;;;
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
@@ -228,16 +229,14 @@
 		((eq (var-kind var) 'down)
 		 (or (si::fixnump (var-loc var)) (wfs-error)))
 		(t (setf (var-ref var) (vs-push))))
-        (case (var-kind var)
-          ((FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT INTEGER)
-	   (push (list 'c2expr* (list 'var var nil) form)  initials))
-          (otherwise
-            (case (car form)
+        (if (member (var-kind var) +c-local-var-types+)
+	    (push (list 'c2expr* (list 'var var nil) form)  initials)
+	(case (car form)
               (LOCATION
                (if (can-be-replaced var body)
                    (progn (setf (var-kind var) 'REPLACED)
                           (setf (var-loc var) (caddr form)))
-                   (push (list var (caddr form)) bindings)))
+		 (push (list var (caddr form)) bindings)))
               (VAR
                (let ((var1 (caaddr form)))
                     (declare (object var1))
@@ -276,10 +275,8 @@
 				    (list 'down (var-loc var)))
 				   (t(push (list var) bindings)
 				    (list 'vs (var-ref var))))
-			     form) initials))
-              )))
-        (when (eq (var-kind var) 'SPECIAL) (push (var-name var) prev-ss))
-        ))
+			     form) initials))))
+        (when (eq (var-kind var) 'SPECIAL) (push (var-name var) prev-ss))))
 
   (setq block-p (write-block-open (nreverse used-vars)))
 
@@ -360,8 +357,7 @@
 	     (push var used-vars))	   
 	   (cond (kind  (setf (var-kind var) kind)
 			(setf (var-loc var) (cs-push (var-type var) t))))
-        (if (member (var-kind var)
-                    '(FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT INTEGER))
+        (if (member (var-kind var) +c-local-var-types+)
 	    nil
             (case (car form)
               (LOCATION
@@ -406,12 +402,11 @@
       ((null vl))
       (setq var (car vl))(setq form (car fl))
 ;      (print (list (var-kind var) (car form)))
-      (case
-       (var-kind var)
-       ((FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT OBJECT  INTEGER)
+      (cond
+       ((eq (var-kind var) 'replaced))
+       ((member (var-kind var) +c-local-var-types+)
 	(let ((*value-to-go* (list 'var var nil)))
-	  (c2expr* form)))
-       (REPLACED )
+	      (c2expr* form)))
        (t
 	(case
     	 (car form)
@@ -446,9 +441,7 @@
     (dolist**
      (var vars)
      (let ((kind (var-kind var)))
-       (declare (object kind))
-       (when (member kind '(FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT OBJECT
-				   INTEGER))
+       (when (or (eq kind 'object) (member kind +c-local-var-types+))
 	     (wt-nl)
 	     (unless block-p (wt "{") (setq block-p t))
 	     (wt-var-decl var)

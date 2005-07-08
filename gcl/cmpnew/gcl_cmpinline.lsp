@@ -1,3 +1,4 @@
+;;-*-Lisp-*-
 ;;; CMPINLINE  Open coding optimizer.
 ;;;
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
@@ -41,6 +42,38 @@
   (volatile nil)	;;; whether there is a possible setjmp
   (changed-array (mia 10 0))     ;;; List of var-objects changed by the form. 
   (referred-array (mia 10 0)))	 ;;; List of var-objects referred in the form.
+
+;; This is the begininng of the long-awaited type-handling
+;; centralization.  +c-global-arg-types+ can be passed unboxed to the
+;; interpreter -- there are at most three (encoded in a two bit field)
+;; of these which must be coordinated with the enum ftype definined in
+;; object.h. +c-local-arg-types+ is a larger set which can be passed
+;; unboxed to and from compiled functions in the same lisp source file
+;; -- these must be passable in total on the C stack by value, i.e. no
+;; pointers.  +c-local-var-types+ is a larger set which can be
+;; manipulated unboxed within compiled functions, presumably to
+;; allocate them on the local stack and save gc, but cannot be passed
+;; as function arguments or returned therefrom.  20050707 CM.
+
+(defconstant +c-global-arg-types+   `(fixnum)) ;FIXME (long-float short-float) later
+(defconstant +c-local-arg-types+    (union +c-global-arg-types+ '(fixnum character long-float short-float)))
+(defconstant +c-local-var-types+    (union +c-local-arg-types+ '(fixnum character long-float short-float integer)))
+
+(defun get-sym (args)
+  (intern (apply 'concatenate 'string (mapcar 'string args))))
+
+(defconstant +set-return-alist+ 
+  (mapcar (lambda (x) (cons (get-sym `("RETURN-" ,x)) (get-sym `("SET-RETURN-" ,x)))) +c-local-arg-types+))
+(defconstant +return-alist+ 
+  (mapcar (lambda (x) (cons x (get-sym `("RETURN-" ,x)))) (cons 'object +c-local-arg-types+)))
+(defconstant +wt-loc-alist+ 
+  `((object . wt-loc)
+    ,@(mapcar (lambda (x) (cons x (get-sym `("WT-" ,x "-LOC")))) +c-local-var-types+)))
+(defconstant +coersion-alist+
+  (mapcar (lambda (x) (cons x (get-sym `(,x "-LOC")))) +c-local-var-types+))
+(defconstant +inline-types-alist+ 
+  `((boolean . inline-cond) (t . inline) 
+    ,@(mapcar (lambda (x) (cons x (get-sym `("INLINE-" ,x)))) +c-local-var-types+)))
 
 (defun copy-array (array)
   (declare ((vector t) array))
@@ -245,8 +278,6 @@
 ;;; This variable is used to close up blocks introduced to declare static
 ;;; c variables.
 
-(defvar *special-types* '(FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT integer))
-
 (defun inc-inline-blocks()
   (cond ((consp *inline-blocks*)
 	 (incf (car *inline-blocks*)))
@@ -264,8 +295,7 @@
               (LOCATION (push (coerce-loc (caddr form) type) locs))
               (VAR
                (cond ((args-info-changed-vars (caaddr form) (cdr forms))
-                      (cond ((and (member (var-kind (caaddr form))
-                                         *special-types*)
+                      (cond ((and (member (var-kind (caaddr form)) +c-local-var-types+)
                                   (eq type (var-kind (caaddr form))))
                              (let ((cvar (cs-push type t)))
                                (wt-nl "{" (rep-type type) "V" cvar "= V"
@@ -278,9 +308,8 @@
                                (wt-var (caaddr form) (cadr (caddr form)))
                                (wt ";")
                                (push (coerce-loc temp type) locs)))))
-                     ((and (member (var-kind (caaddr form))
-				       '(FIXNUM LONG-FLOAT SHORT-FLOAT INTEGER))
-			       (not (eq type (var-kind (caaddr form)))))
+                     ((and (member (var-kind (caaddr form)) +c-local-var-types+)
+			   (not (eq type (var-kind (caaddr form)))))
 		      (let ((temp (cs-push type)))
 			(wt-nl "V" temp " = "
 			       (coerce-loc (cons 'var (caddr form)) type) ";")
@@ -328,13 +357,7 @@
 			       (wt-loc loc))
 			      (t (setq cvar (cs-push type t))
 				 (wt-nl "{" (rep-type type) "V" cvar "= ")
-				 (case (promoted-c-type type)
-				   (fixnum (wt-fixnum-loc loc))
-				   (integer (wt-integer-loc loc 'inline-args))
-				   (character (wt-character-loc loc))
-				   (long-float (wt-long-float-loc loc))
-				   (short-float (wt-short-float-loc loc))
-				   (otherwise (wt-loc loc)))
+				 (funcall (or (cdr (assoc (promoted-c-type type) +wt-loc-alist+)) 'wt-loc) loc)
 				 (inc-inline-blocks)))
 			    (wt ";")
                             (push (list 'cvar cvar 'inline-args) locs)
@@ -365,21 +388,14 @@
 			     ((eq type t) (list 'cvar (cs-push)))
 			     ((list 'var
 				    (make-var :type type :loc (cs-push type)
-					      :kind (or (car (member (promoted-c-type type) *special-types*)) 'object))
+					      :kind (or (car (member (promoted-c-type type) +c-local-var-types+)) 'object))
 				    nil)))))
 		   (let ((*value-to-go* temp))
 		     (c2expr* form)
 		     (push (coerce-loc temp type) locs))))))))
 
-;;FIXME mapcar
-(defvar *coersion-alist* '((fixnum . fixnum-loc)
-			   (integer . integer-loc)
-			   (character . character-loc)
-			   (short-float . short-float-loc)
-			   (long-float . long-float-loc)))
-
 (defun coerce-loc (loc type)
-  (let ((tl (cdr (assoc (promoted-c-type type) *coersion-alist*))))
+  (let ((tl (cdr (assoc (promoted-c-type type) +coersion-alist+))))
     (if tl (list tl loc) loc)))
 
 (defun get-inline-loc (ii args &aux (fun (car (cdddr ii))) locs)
@@ -400,45 +416,24 @@
           ((endp l) (setq locs (reverse locs1)))
           (declare (fixnum n) (object l))
           (if (member n saves)
-              (let* ((loc1 (car l)) (loc loc1) (coersion nil))
-                    (declare (object loc loc1))
-                (when (and (consp loc1)
-                           (member (car loc1)
-                                   '(FIXNUM-LOC integer-loc CHARACTER-LOC
-                                     LONG-FLOAT-LOC SHORT-FLOAT-LOC)))
-                      (setq coersion (car loc1))
-                      (setq loc (cadr loc1))  ; remove coersion
-                      )
+              (let* ((loc (car l)) (loc1 loc) 
+		     (coersion (and (consp loc) (cdr (rassoc (car loc) +coersion-alist+))))
+		     (loc (if coersion (cadr loc) loc))); remove coersion
                 (cond
                  ((and (consp loc)
-		       (or
-			 (member (car loc) 
-                                    '(INLINE INLINE-COND))
-			 (and 	 (member (car loc)
-					 '(
-					   INLINE-FIXNUM inline-integer
-					   INLINE-CHARACTER INLINE-LONG-FLOAT
-					   INLINE-SHORT-FLOAT))
-				 (or (flag-p (cadr loc) allocates-new-storage)
-				     (flag-p (cadr loc) side-effect-p))
-	                            )))
+		       (rassoc (car loc) +inline-types-alist+)
+		       (or (member (car loc) '(inline inline-cond))
+			   (flag-p (cadr loc) allocates-new-storage)
+			   (flag-p (cadr loc) side-effect-p)))
                   (wt-nl "{")
                   (inc-inline-blocks) ;;FIXME -- make sure not losing specificity in coersion
-                  (let ((cvar (cs-push (car (rassoc coersion *coersion-alist*)) t))) 
+		  (let* ((ck (or (car (rassoc coersion +coersion-alist+)) 'object))
+			 (cvar (cs-push ck t)))
                     (push (list 'CVAR cvar) locs1)
-                    (case coersion
-                     ((nil) (wt "object V" cvar "= ") (wt-loc loc1))
-                     (FIXNUM-LOC (wt "fixnum V" cvar "= ") (wt-fixnum-loc loc))
-		     (integer-loc (wt "GEN V" cvar "= ") (wt-integer-loc loc 'get-inline-locs))
-                     (CHARACTER-LOC
-                      (wt "unsigned char V" cvar "= ") (wt-character-loc loc))
-                     (LONG-FLOAT-LOC
-                      (wt "double V" cvar "= ") (wt-long-float-loc loc))
-                     (SHORT-FLOAT-LOC
-                      (wt "float V" cvar "= ") (wt-short-float-loc loc))
-                     (t (baboon))))
-                  (wt ";")
-                  )
+		    (unless ck (baboon))
+		    (wt (rep-type ck) "V" cvar "= ")
+		    (funcall (cdr (assoc ck +wt-loc-alist+)) loc))
+                  (wt ";"))
                  (t (push loc1 locs1))))
               (push (car l) locs1)))))
 
@@ -450,17 +445,9 @@
 	  locs
 	  ))
   )
-(defvar *inline-types*
-  '((boolean . INLINE-COND)
-    (fixnum . INLINE-FIXNUM)
-    (character . INLINE-CHARACTER)
-    (long-float . INLINE-LONG-FLOAT)
-    (short-float . INLINE-SHORT-FLOAT)
-    (integer . INLINE-INTEGER)
-    (t . INLINE)))
 
 (defun inline-type (type)
-  (or (cdr (assoc (promoted-c-type type) *inline-types*)) 'inline))
+  (or (cdr (assoc (promoted-c-type type) +inline-types-alist+)) 'inline))
 
 (defun get-inline-info (fname args return-type &aux x ii)
   (and  (fast-link-proclaimed-type-p fname args)

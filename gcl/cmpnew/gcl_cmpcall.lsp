@@ -1,3 +1,4 @@
+;;-*-Lisp-*-
 ;;; CMPCALL  Function call.
 ;;;
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
@@ -26,9 +27,7 @@
 
 (eval-when (compile eval)
 (defmacro link-arg-p (x)
-  `(let ((.u ,x))
-     (not (member .u '(character boolean long-float short-float)))))
-)
+ `(or (is-global-arg-type ,x) (not (is-local-arg-type ,x)))))
 
 (defun fast-link-proclaimed-type-p (fname &optional args)
   (and 
@@ -262,9 +261,8 @@
            *do-tail-recursion*
            *tail-recursion-info*
            (eq (car *tail-recursion-info*) fname)
-           (member *exit*
-                   '(RETURN RETURN-FIXNUM RETURN-CHARACTER RETURN-SHORT-FLOAT
-                            RETURN-LONG-FLOAT RETURN-OBJECT))
+	   (or (eq *exit* 'return)
+	       (rassoc *exit* +return-alist+))
            (tail-recursion-possible)
            (= (length args) (length (cdr *tail-recursion-info*))))
       (let* ((*value-to-go* 'trash)

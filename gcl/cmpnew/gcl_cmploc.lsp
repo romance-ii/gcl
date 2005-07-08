@@ -1,3 +1,4 @@
+;;-*-Lisp-*-
 ;;; CMPLOC  Set-loc and Wt-loc.
 ;;;
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
@@ -113,10 +114,7 @@
   (cond ((eq *value-to-go* 'return) (set-return loc))
         ((eq *value-to-go* 'trash)
          (cond ((and (consp loc)
-                     (member (car loc)
-                             '(INLINE INLINE-COND INLINE-FIXNUM inline-integer
-                               INLINE-CHARACTER INLINE-LONG-FLOAT
-                               INLINE-SHORT-FLOAT))
+                     (rassoc (car loc) +inline-types-alist+)
                      (cadr loc))
                 (wt-nl "(void)(") (wt-inline t (caddr loc) (cadddr loc))
                 (wt ");"))
@@ -131,10 +129,7 @@
 	       (let ((*value-to-go* (pop *values-to-go*)))
 		 (set-loc loc)))
 	     (wt-nl)(reset-top)(wt-go *multiple-value-exit-label*))))
-        ((eq *value-to-go* 'return-fixnum) (set-return-fixnum loc))
-        ((eq *value-to-go* 'return-character) (set-return-character loc))
-        ((eq *value-to-go* 'return-long-float) (set-return-long-float loc))
-        ((eq *value-to-go* 'return-short-float) (set-return-short-float loc))
+        ((setq fd (cdr (assoc *value-to-go* +set-return-alist+))) (funcall fd loc))
         ((or (not (consp *value-to-go*))
              (not (symbolp (car *value-to-go*))))
          (baboon))
@@ -142,8 +137,7 @@
          (apply fd loc (cdr *value-to-go*)))
         ((setq fd (get (car *value-to-go*) 'wt-loc))
          (wt-nl) (apply fd (cdr *value-to-go*)) (wt "= " loc ";"))
-        (t (baboon)))
-  )
+        (t (baboon))))
 
 (defun wt-loc (loc)
   (cond ((eq loc nil) (wt "Cnil"))
@@ -205,9 +199,7 @@
          (wt "(fixnum)")(wt (caddr loc)))
         (t (wt (if *safe-compile* "fixint(" "fix(") loc ")"))))
 
-(defun wt-integer-loc (loc &optional type
-			   &aux (avma t)(first (and (consp loc) (car loc))))
-  (declare (ignore type))
+(defun wt-integer-loc (loc  &aux (avma t)(first (and (consp loc) (car loc))))
   (case first
     (inline-fixnum
      (wt "stoi(")

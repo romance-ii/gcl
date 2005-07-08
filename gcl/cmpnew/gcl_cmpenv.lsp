@@ -1,3 +1,4 @@
+;;-*-Lisp-*-
 ;;; CMPENV  Environments of the Compiler.
 ;;;
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
@@ -156,7 +157,7 @@
 			       ((< i 9)
 				(let ((tem
 				       (type-filter (car al))))
-				  (if (eq 'integer tem) t tem)))
+				  (if (is-local-arg-type tem) tem t)))
 			      (t (if (eq (car al) '*) '* t)))
 			types)))
   ;;only type t args for var arg so far.
@@ -184,7 +185,7 @@
 				  return-types))
 		(nreverse result))
 	     (let ((tem  (if (eq (car v) '*) '* (type-filter (car v)))))
-	       (if (eq tem 'integer) (setq tem t))
+	       (unless (or (eq tem '*) (is-local-arg-type tem)) (setq tem t))
 	       (push  tem result))))))
 
 (defun put-procls (fname arg-types return-types procl)
@@ -332,8 +333,6 @@
      (if (consp (cdr decl))
          (proclaim-var (cadr decl) (cddr decl))
          (warn "The type declaration ~s is illegal." decl)))
-    ((fixnum character short-float long-float)
-     (proclaim-var (car decl) (cdr decl)))
     (ftype
       (cond ((and (consp (cdr decl))
 		  (consp (cadr decl))
@@ -365,6 +364,7 @@
            (unless (member x *alien-declarations*)
                    (push x *alien-declarations*))
            (warn "The declaration specifier ~s is not a symbol." x))))
+    ;;FIXME
     ((array atom bignum bit bit-vector character common compiled-function
       complex cons double-float fixnum float hash-table integer keyword list
       long-float nil null number package pathname random-state ratio rational
@@ -648,14 +648,6 @@
                             (return nil))
                     (warn "The variable name ~s is not a symbol." var))))
          (warn "The type declaration ~s is illegal." decl)))
-    ((fixnum character short-float long-float)
-     (let ((type (type-filter (car decl)))
-           x)
-          (dolist** (var (cdr decl) t)
-            (if (symbolp var)
-                (unless (and (setq x (get var 'cmp-type)) (equal x type))
-                        (return nil))
-                (warn "The variable name ~s is not a symbol." var)))))
     (ftype
      (if (or (endp (cdr decl))
              (not (consp (cadr decl)))

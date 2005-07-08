@@ -1,3 +1,4 @@
+;;-*-Lisp-*-
 ;;; CMPLABEL  Exit manager.
 ;;;
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
@@ -85,14 +86,8 @@
 				(or (and (eq (car loc) 'var)
 					 (member (var-kind (cadr loc))
 						 '(SPECIAL GLOBAL)))
-				    (member (car loc)
-					    '(SIMPLE-CALL
-					      INLINE
-					      INLINE-COND INLINE-FIXNUM
-					      INLINE-CHARACTER
-					      INLINE-INTEGER
-					      INLINE-LONG-FLOAT
-					      INLINE-SHORT-FLOAT))))
+				    (eq (car loc) 'SIMPLE-CALL)
+				    (rassoc (car loc) +inline-types-alist+)))
 			   (cond ((and (consp *value-to-go*)
 				       (eq (car *value-to-go*) 'vs))
 				  (set-loc loc)
@@ -147,11 +142,7 @@
         ;;; Never reached
      )
     ((eq ue 'frame)
-     (when (and (consp loc)
-		(member (car loc)
-			'(SIMPLE-CALL INLINE INLINE-COND INLINE-FIXNUM inline-integer
-				      INLINE-CHARACTER INLINE-LONG-FLOAT
-				      INLINE-SHORT-FLOAT)))
+     (when (and (consp loc) (eq (car loc) 'simple-call) (rassoc (car loc) +inline-types-alist+))
        (cond ((and (consp *value-to-go*)
 		   (eq (car *value-to-go*) 'vs))
 	      (set-loc loc)
@@ -163,16 +154,8 @@
      (wt-nl "frs_pop();"))
     ((eq ue 'tail-recursion-mark))
     ((eq ue 'jump) (setq jump-p t))
-    ((setq type.wt
-	   (assoc ue
-		  '((return-fixnum fixnum .  wt-fixnum-loc)
-		    (return-integer integer . wt-integer-loc)
-		    (return-character character . wt-character-loc)
-		    (return-short-float short-float . wt-short-float-loc)
-		    (return-long-float long-float . wt-long-float-loc)
-		    (return-object t . wt-loc))))
-     (or (eq *exit* (car type.wt)) (wfs-error))
-     (setq type.wt (cdr type.wt))
+    ((setq type.wt (assoc (car (rassoc ue +return-alist+)) +wt-loc-alist+))
+     (or (eq *exit* ue) (wfs-error))
      (let ((cvar (cs-push (car type.wt) t)))
        (wt-nl "{" (rep-type (car type.wt)) "V" cvar " = ")
        (funcall (cdr type.wt) loc)  (wt ";")
@@ -208,8 +191,7 @@
 	  (reset-top)))
        ((numberp ue) (setq bds-cvar ue bds-bind 0))
        ((eq ue 'bds-bind) (incf bds-bind))
-       ((member ue '(return return-object return-fixnum return-character
-                            return-long-float return-short-float))
+       ((or (eq ue 'return) (rassoc ue +return-alist+))
         (cond ((eq exit ue) (unwind-bds bds-cvar bds-bind)
                             (return))
               (t (baboon)))

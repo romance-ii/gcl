@@ -1,3 +1,4 @@
+;;-*-Lisp-*-
 ;;; CMPTYPE  Type information.
 ;;;
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
@@ -129,11 +130,11 @@
 ;;FIXME -- This function needs expansion on centralization.  CM 20050106
 (defun promoted-c-type (type)
   (let ((type (coerce-to-one-value type)))
-    (let ((ct (car (member type
+    (let ((ct (and type (car (member type
 ;			   '(signed-char signed-short fixnum integer)
 ;			   '(signed-char unsigned-char signed-short unsigned-short fixnum integer)
 			   '(fixnum integer)
-			   :test #'type<=))))
+			   :test #'type<=)))))
       (or ct type))))
 ;      (if (integer-typep type)
 ;	(cond ;((subtypep type 'signed-char) 'signed-char)
@@ -370,12 +371,7 @@
         (cmpwarn "The type of the form ~s is not ~s." original-form type)))
 
 (defun default-init (type)
-  (case (promoted-c-type type)
-        (fixnum (cmpwarn "The default value of NIL is not FIXNUM."))
-        (character (cmpwarn "The default value of NIL is not CHARACTER."))
-        (long-float (cmpwarn "The default value of NIL is not LONG-FLOAT."))
-        (short-float (cmpwarn "The default value of NIL is not SHORT-FLOAT."))
-	(integer (cmpwarn "The default value of NIL is not INTEGER"))
-	
-        )
+  (let ((type (promoted-c-type type)))
+    (when (member type +c-local-var-types+)
+      (cmpwarn "The default value of NIL is not ~S." type)))
   (c1nil))

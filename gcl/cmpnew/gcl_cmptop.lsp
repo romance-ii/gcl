@@ -1,3 +1,4 @@
+;;-*-Lisp-*-
 ;;; CMPTOP  Compiler top-level.
 ;;;
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
@@ -638,19 +639,28 @@
 
 (defun cs-push (&optional type local)
   (let ((tem (next-cvar)))
-   (let ((type (or type t)))
+   (let ((type (if (or (not type) (eq type 'object)) t type)))
     (when (or (not local) (not (eq type t)))
 	(push (if local (cons tem type) (cons type tem)) *c-vars*)))
     tem))
-; For the moment only two types are recognized.
+
+
+;For the moment only two types are recognized.
 (defun f-type (x)
   (if (var-p x) (setq x (var-type x)))
-  (cond ((and x (subtypep x 'fixnum))
-	 1)
-	((and x (subtypep x 'integer))
-	 2)
-	(t 0)))
+  (let ((x (promoted-c-type x)))
+    (let ((x (position x +c-global-arg-types+)))
+      (if x (1+ x) 0))))
 
+(defun is-global-arg-type (x)
+  (let ((x (promoted-c-type x)))
+    (or (eq x t) (member x +c-global-arg-types+))))
+(defun is-local-arg-type (x)
+  (let ((x (promoted-c-type x)))
+    (or (eq x t) (member x +c-local-arg-types+))))
+(defun is-local-var-type (x)
+  (let ((x (promoted-c-type x)))
+    (or (eq x t) (member x +c-local-var-types+))))
 
 (defun proclaimed-argd (args return)
   (let ((ans (length args))
@@ -802,13 +812,7 @@
     ;;; Local entry
     (analyze-regs (cadr lambda-expr) 0)
     (t3defun-aux 't3defun-local-entry
-		 (case (promoted-c-type (caddr inline-info))
-		   (fixnum 'return-fixnum)
-		   (integer 'return-integer)
-		   (character 'return-character)
-		   (long-float 'return-long-float)
-		   (short-float 'return-short-float)
-		   (otherwise 'return-object))
+		 (or (cdr (assoc (promoted-c-type (caddr inline-info)) +return-alist+)) 'return-object)
 		 fname cfun lambda-expr sp inline-info
     ))
    ((vararg-p fname)
@@ -834,13 +838,7 @@
       (if (eq (var-kind (car vl)) 'special)
 	  (push (cons (car vl) (var-loc (car vl))) specials)
 	(setf (var-kind (car vl))
-	      (case (promoted-c-type (car types))
-		    (fixnum 'FIXNUM)
-		    (integer 'integer)
-		    (character 'CHARACTER)
-		    (long-float 'LONG-FLOAT)
-		    (short-float 'SHORT-FLOAT)
-		    (otherwise 'OBJECT))))
+	      (or (car (member (promoted-c-type (car types)) +c-local-arg-types+)) 'object)))
       (setf (var-loc (car vl)) (cs-push (var-type (car vl)) t)))
   (wt-comment "local entry for function " (function-string fname))
   (wt-h "static " (declaration-type (rep-type (caddr inline-info))) (c-function-name "LI" cfun fname) "();")
@@ -1382,7 +1380,7 @@
 
 (defun rep-type (type)
   (case (promoted-c-type type)
-    (fixnum "long ")
+    (fixnum "fixnum ")
     (integer "GEN ")
     (character "unsigned char ")
     (short-float "float ")

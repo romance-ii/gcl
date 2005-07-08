@@ -1,3 +1,4 @@
+;;-*-Lisp-*-
 ;;; CMPVAR  Variables.
 ;;;
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
@@ -164,12 +165,7 @@
       (if (eq (var-loc var) 'OBJECT)
           'OBJECT
           (let ((type (var-type var)))
-               (declare (object type))
-               (cond ((type>= 'fixnum type) 'FIXNUM)
-		     ((type>= 'integer type) 'INTEGER)
-                     ((type>= 'CHARACTER type) 'CHARACTER)
-                     ((type>= 'long-float type) 'LONG-FLOAT)
-                     ((type>= 'short-float type) 'SHORT-FLOAT)
+               (cond ((car (member type +c-local-var-types+ :test 'type<=)))
                      ((and (boundp '*c-gc*) *c-gc* 'OBJECT))
 		     (t nil))))
       nil)
@@ -301,7 +297,7 @@
 		  (let ((*inline-blocks* 0) (*restore-avma* *restore-avma*))
 		    (save-avma '(nil integer))
 		    (wt-nl "SETQ_II(V"n",V" n"alloc,")
-		    (wt-integer-loc loc  (cons 'set-var var))
+		    (wt-integer-loc loc)
 		    (wt "," (bignum-expansion-storage) ");")
 		    (close-inline-blocks))
 		  (return-from set-var nil))
@@ -309,15 +305,8 @@
 	       (wt ");")))
             (t
              (wt-nl "V" (var-loc var) "= ")
-             (case (var-kind var)
-                   (FIXNUM (wt-fixnum-loc loc))
-                   (CHARACTER (wt-character-loc loc))
-                   (LONG-FLOAT (wt-long-float-loc loc))
-                   (SHORT-FLOAT (wt-short-float-loc loc))
-                   (OBJECT (wt-loc loc))
-                   (t (baboon)))
-             (wt ";"))
-            )))
+	     (funcall (or (cdr (assoc (var-kind var) +wt-loc-alist+)) (baboon)) loc)
+             (wt ";")))))
 
 (defun sch-global (name)
   (dolist* (var *undefined-vars* nil)
@@ -446,8 +435,7 @@
         (case (caar forms)
           (LOCATION (push (cons vref (caddar forms)) saves))
           (otherwise
-            (if (member (var-kind (car vref))
-                        '(FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT OBJECT))
+            (if (assoc (var-kind (car vref)) +return-alist+)
                 (let* ((kind (var-kind (car vref)))
                        (cvar (cs-push (var-type (car vref)) t))
                        (temp (list 'var (make-var :kind kind :type (var-type (car vref)) :loc cvar) nil)))
