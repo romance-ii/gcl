@@ -201,11 +201,15 @@ check_type_stream(object *p)
 		*p = wrong_type_argument(sLstream, *p);
 }
 
+/* Thankfully we can do this bit of non-lispy c stuff since we pass by reference. FIXME*/
 void
-check_type_readtable(object *p)
-{
-	while (type_of(*p) != t_readtable)
-		*p = wrong_type_argument(sLreadtable, *p);
+check_type_readtable(object *p) {
+  
+  if (*p==Cnil)
+    *p=standard_readtable;
+  if (type_of(*p) != t_readtable)
+    *p = wrong_type_argument(sLreadtable, *p);
+
 }
 
 #ifdef UNIX
