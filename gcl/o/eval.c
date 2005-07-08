@@ -1077,7 +1077,7 @@ EVAL_ARGS:
 	form = form->c.c_cdr;
 	base = vs_top;
 	top = vs_top;
-	while(!endp(form)) {
+	while(!endp_prop(form)) {
 		eval(MMcar(form));
 		top[0] = vs_base[0];
 		vs_top = ++top;
