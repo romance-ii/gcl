@@ -379,7 +379,7 @@ struct hashtable {           /*  hash table header  */
   hfixnum       ht_test;    /*  key test function  */
                             /*  of enum httest  */
   hfixnum       ht_pad;
-  SPAD;
+  fixnum        ht_max_ent;
 
 };
 
