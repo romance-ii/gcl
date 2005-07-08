@@ -1,3 +1,4 @@
+;;-*-Lisp-*-
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
 
 ;; This file is part of GNU Common Lisp, herein referred to as GCL
@@ -511,7 +512,7 @@
         copier
         predicate predicate-specified
         include
-        print-function type named initial-offset
+        print-function print-object  type named initial-offset
         offset name-offset
         documentation
 	static
@@ -562,6 +563,10 @@
 		   (setq include (cdar os))
 		   (unless (get v 's-data)
 			   (error "~S is an illegal included structure." v)))
+		 (:print-object
+		  (and (consp v) (eq (car v) 'function)
+		       (setq v (second v)))
+		  (setq print-object v))
 		 (:print-function
 		  (and (consp v) (eq (car v) 'function)
 		       (setq v (second v)))
@@ -586,6 +591,11 @@
 		  (t (error "~S is an illegal defstruct option." o))))))
 
     (setq conc-name (intern (string conc-name)))
+
+    (when (and print-function print-object)
+      (error "Cannot specify both :print-function and :print-object."))
+    (when print-object
+      (setq print-function (lambda (x y z) (declare (ignore z)) (funcall print-object x y))))
 
     (and include (not print-function)
 	 (setq print-function (s-data-print-function (get (car include)  's-data))))
