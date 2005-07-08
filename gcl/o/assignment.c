@@ -239,11 +239,8 @@ DEFUNO_NEW("FMAKUNBOUND",object,fLfmakunbound,LISP
 
 {
 
-  if(type_of(sym) != t_symbol && !setf_fn_form(sym)) {
-/*     stack_string(s,"Function Identifier"); */
-/*     TYPE_ERROR(sym,s); */
-    FEwrong_type_argument(sLfunction_identifier,sym);
-  }
+  if(type_of(sym) != t_symbol && !setf_fn_form(sym)) 
+    TYPE_ERROR(sym,sLfunction_identifier);
 
   /*FIXME -- store a symbol in plist for setf functions as opposed to
     the function itself, and centralize function name resolution.

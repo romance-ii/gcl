@@ -1,3 +1,4 @@
+/*-*-C-*-*/
 /*
  Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
 
@@ -1174,11 +1175,15 @@ Lsharp_C_reader()
 	x = read_object(vs_base[0]);
 	if (x == OBJNULL)
 		FEerror("No real part.", 0);
+	if (!realp(x))
+	  TYPE_ERROR(x,TSor_rational_float);
 	vs_push(x);
 	delimiting_char = code_char(')');
 	x = read_object(vs_base[0]);
 	if (x == OBJNULL)
 		FEerror("No imaginary part.", 0);
+	if (!realp(x))
+	  TYPE_ERROR(x,TSor_rational_float);
 	vs_push(x);
 	delimiting_char = code_char(')');
 	x = read_object(vs_base[0]);
