@@ -1784,6 +1784,9 @@ otoi(object);
 MP_INT *
 stoi(fixnum);
 
+object
+read_byte1(object,object);
+
 #ifdef SGC
 void
 memprotect_test_reset(void);

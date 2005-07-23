@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 ;;; CMPWT  Output routines.
 ;;;
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
@@ -141,6 +142,7 @@
 (defun wt-data-end ())
 (defun wt-data-package-operation (x)
   (push x (data-package-ops)))
+;  (push-data-incf x))
 
 (defmacro wt (&rest forms &aux (fl nil))
   (dolist** (form forms (cons 'progn (reverse (cons nil fl))))

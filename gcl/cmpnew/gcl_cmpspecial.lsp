@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 ;;; CMPSPECIAL  Miscellaneous special forms.
 ;;;
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
@@ -103,12 +104,12 @@
              ((and (consp fun) (eq (car fun) 'lambda))
               (cmpck (endp (cdr fun))
                      "The lambda expression ~s is illegal." fun)
-              (let ((*vars* (cons 'cb *vars*))
-                    (*funs* (cons 'cb *funs*))
-                    (*blocks* (cons 'cb *blocks*))
-                    (*tags* (cons 'cb *tags*)))
-                   (setq fun (c1lambda-expr (cdr fun)))
-                   (list 'function (cadr fun) fun)))
+	      (let ((*vars* (cons 'cb *vars*))
+		    (*funs* (cons 'cb *funs*))
+		    (*blocks* (cons 'cb *blocks*))
+		    (*tags* (cons 'cb *tags*)))
+		(setq fun (c1lambda-expr (cdr fun)))
+		(list 'function (cadr fun) fun)))
              (t (cmperr "The function ~s is illegal." fun))))
   )
 

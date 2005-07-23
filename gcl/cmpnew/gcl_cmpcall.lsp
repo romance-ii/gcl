@@ -26,8 +26,8 @@
 
 
 (eval-when (compile eval)
-(defmacro link-arg-p (x)
- `(or (is-global-arg-type ,x) (not (is-local-arg-type ,x)))))
+ (defmacro link-arg-p (x)
+  `(or (is-global-arg-type ,x) (not (is-local-arg-type ,x)))))
 
 (defun fast-link-proclaimed-type-p (fname &optional args)
   (and 

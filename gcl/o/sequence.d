@@ -1,3 +1,4 @@
+/* -*-C-*- */
 /*
  Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
 
@@ -447,9 +448,9 @@ object seq;
 
 	case t_string:
 		x = seq;
-		{BEGIN_NO_INTERRUPT;
 		y = alloc_simple_string(x->st.st_fillp);
 		TYPE_STRING:
+		{BEGIN_NO_INTERRUPT;
 		vs_push(y);
 		y->st.st_self
 		= alloc_relblock(x->st.st_fillp);

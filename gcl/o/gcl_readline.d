@@ -1,3 +1,4 @@
+/* -*-C-*- */
 /*
  Copyright (C) 2000 Tuukka Toivonen <tuukkat AT ee.oulu.fi>
 
@@ -53,7 +54,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 int readline_on = 0;		/* On (1) or off (0) */
 static int rl_ungetc_em_char = -1;
-static unsigned char *rl_putc_em_line = NULL;
+static char *rl_putc_em_line = NULL;
 
 #ifdef RL_COMPLETION
 
@@ -229,7 +230,7 @@ static char **rl_completion(char *text, int start, int end) {
 int rl_putc_em(int c, FILE *f) {
 	static int allocated_length = 0;
 	static int current_length = 0;
-	unsigned char *old_line;
+	char *old_line;
 
 	if (f!=stdout || !isatty(fileno(f)) || !readline_on) goto tail;
 
@@ -259,7 +260,7 @@ int rl_putc_em(int c, FILE *f) {
 }
 
 int rl_getc_em(FILE *f) {
-	static unsigned char *line = NULL;
+	static char *line = NULL;
 	static int linepos = 0;
 	int r;
 	

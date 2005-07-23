@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 (in-package 'compiler)
 (import 'si::switch)
 (import 'sloop::sloop)

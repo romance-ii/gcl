@@ -71,7 +71,7 @@
 (defmacro parse-gspec (spec
 		       (non-setf-var . non-setf-case)
 		       (setf-var . setf-case))
-  (declare (indentation 1 1))
+;  (declare (indentation 1 1))
   #+setf (declare (ignore setf-var setf-case))
   (once-only (spec)
     `(cond (#-setf (symbolp ,spec) #+setf t
@@ -370,7 +370,7 @@
 	   type))))
 
 ;;; not used...
-#+nil
+;#+nil
 (defun *typep (object type)
   (setq type (*normalize-type type))
   (cond ((member (car type) '(eql wrapper-eq class-eq class))
@@ -434,7 +434,8 @@
   ;; better.  Note that for most ports, providing this definition
   ;; should just speed up class definition.  It shouldn't have an
   ;; effect on performance of most user code.
-  (eval `(deftype ,name () '(satisfies ,predicate))))
+  (progn ;(break "foo ~a ~a~%" name predicate)
+  (eval `(deftype ,name () '(satisfies ,predicate)))))
 
 (defun make-type-predicate-name (name &optional kind)
   (if (symbol-package name)
@@ -624,10 +625,22 @@
   (defclass kernel:funcallable-instance (function) ()
     (:metaclass built-in-class)))
 
+;(defclass function (t) ()
+;  (:metaclass built-in-class))
+
+;(defclass stream (si::instance) ()
+;  (:metaclass built-in-class))
+
+
 (defclass slot-object (#-cmu17 t #+cmu17 kernel:instance) ()
   (:metaclass slot-class))
 
-(defclass structure-object (slot-object) ()
+;(defclass si::instance (slot-object) ())
+
+;(defclass si::funcallable-instance (slot-object) ())
+
+(defclass structure-object (slot-object ;si::instance
+			    ) ()
   (:metaclass structure-class))
 
 (defstruct (#-cmu17 structure-object #+cmu17 dead-beef-structure-object
@@ -638,7 +651,12 @@
 
 (defclass metaobject (standard-object) ())
 
-(defclass specializer (metaobject) 
+(defclass funcallable-standard-object (standard-object)
+;				       si::funcallable-instance)
+  ()
+  (:metaclass funcallable-standard-class))
+
+(defclass specializer (metaobject); si::instance) 
      ((type
         :initform nil
         :reader specializer-type)))
@@ -666,7 +684,7 @@
 ;;; have the class CLASS in its class precedence list.
 ;;; 
 (defclass class (documentation-mixin dependent-update-mixin definition-source-mixin
-		 specializer)
+		 specializer );si::instance)
      ((name
 	:initform nil
 	:initarg  :name
@@ -771,7 +789,7 @@
 ;;;
 ;;; Slot definitions.
 ;;;
-(defclass slot-definition (metaobject) 
+(defclass slot-definition (metaobject );si::instance) 
      ((name
 	:initform nil
 	:initarg :name
@@ -859,7 +877,8 @@
 					       effective-slot-definition)
   ())
 
-(defclass method (metaobject) ())
+(defclass method (metaobject );si::instance) 
+  ())
 
 (defclass standard-method (definition-source-mixin plist-mixin method)
      ((generic-function
@@ -908,7 +927,7 @@
 			    definition-source-mixin
 			    documentation-mixin
 			    metaobject
-			    #+cmu17 kernel:funcallable-instance)
+			    funcallable-standard-object)
      ()
   (:metaclass funcallable-standard-class))
     
@@ -940,7 +959,8 @@
   (:default-initargs :method-class *the-class-standard-method*
 		     :method-combination *standard-method-combination*))
 
-(defclass method-combination (metaobject) ())
+(defclass method-combination (metaobject); si::instance)
+  ())
 
 (defclass standard-method-combination
 	  (definition-source-mixin method-combination)
@@ -981,3 +1001,21 @@
     (method-combination method-combination-p)
     (long-method-combination long-method-combination-p)))
 
+
+(defun early-find-class-symbol (x &optional errorp environment)
+  (declare (ignore errorp environment))
+  (when (or (member x *early-class-definitions* :key 'cadr)
+	    (gethash x *find-class*))
+    x))
+
+(defun mk-early-cpl (sym)
+  (let ((l (nth 4 (car (member sym *early-class-definitions* :key 'cadr)))))
+    (append l (reduce (lambda (&rest r) (when r (apply 'union r))) (mapcar 'mk-early-cpl l)))))
+
+(defun early-class-precedence-list-symbol (x &aux tem)
+  (cond ((mk-early-cpl x))
+	((setq tem (gethash x *find-class*))
+	 (early-class-precedence-list (car tem)))))
+
+(setf (symbol-function 'si::find-class) (symbol-function 'early-find-class-symbol))
+(setf (symbol-function 'si::class-precedence-list) (symbol-function 'early-class-precedence-list-symbol))

@@ -265,14 +265,16 @@
              (cond ((eq fun 'si:|#,|)
                     (cmperr "Sharp-comma-macro is in a bad place."))
                    ((get fun 'package-operation)
-                    (when *non-package-operation*
-                      (cmpwarn "The package operation ~s was in a bad place."
-                               form))
+;                    (when *non-package-operation*
+;                      (cmpwarn "The package operation ~s was in a bad place."
+;                               form))
 		    (let ((res (if (setq fd (macro-function fun))
 				   (cmp-expand-macro fd fun (copy-list (cdr form)))
 				 form)))
-		      (maybe-eval t res)
-		      (wt-data-package-operation res)))
+		      (maybe-eval t res) 
+		      (t1ordinary form)
+		      ;(wt-data-package-operation res)
+		      ))
                    ((setq fd (get fun 't1))
                     (when *compile-print* (print-current-form))
                     (funcall fd args))
@@ -694,8 +696,7 @@
 		      (arg-p (length (get fname 'proclaimed-arg-types)))
 		      (va  (member '* (get fname 'proclaimed-arg-types))))
 		  (cond (va
-			 (or (>= arg-c)
-			     (- arg-p (length va))
+			 (or (>= arg-c (- arg-p (length va)))
 			     (cmpwarn "~a needs ~a args. ~a supplied."
 				      fname   (- arg-p (length va))
 				      arg-c)))

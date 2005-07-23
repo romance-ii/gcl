@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
 
 ;; This file is part of GNU Common Lisp, herein referred to as GCL
@@ -42,25 +43,35 @@
 
 (proclaim '(optimize (safety 2) (space 3)))
 
-;;FIXME -- this needs integration with other type functions.  CM 20050106
 (defun best-array-element-type (type)
-  (cond ((null type) nil)
-	((eql t type) t)
-	((memq type '(bit unsigned-char signed-char
-				    unsigned-short
-				    signed-short fixnum))
-	       type)
-	((subtypep type 'fixnum)
-	 (dolist (v '(bit non-negative-char signed-char unsigned-char non-negative-short signed-short unsigned-short)
-		    'fixnum)
-		 (cond ((subtypep type v)
-			(return v)))))
-	((eql type 'character) 'string-char)
-	(t (or (dolist (v '(string-char bit short-float
-				    long-float))
-		   (cond ((subtypep type v)
-			  (return v))))
-	       t))))
+  (cond ((not type) nil)
+	((eq type '*) '*)
+	((member type '(string-char character standard-char base-char extended-char)) 'string-char) ;FIXME
+	((car (member type +array-types+)))
+	((car (member type +array-types+ :test 'subtypep)))
+	((subtypep type 'float) 'long-float)
+	(t)))
+
+;;FIXME -- this needs integration with other type functions.  CM 20050106
+;(defun best-array-element-type (type)
+;  (cond ((null type) nil)
+;	((eql t type) t)
+;	((memq type '(bit unsigned-char signed-char
+;				    unsigned-short
+;				    signed-short fixnum))
+;	       type)
+;	((subtypep type 'fixnum)
+;	 (dolist (v ;'(bit non-negative-char signed-char unsigned-char non-negative-short signed-short unsigned-short)
+;		    '(bit signed-char unsigned-char signed-short unsigned-short)
+;		    'fixnum)
+;		 (cond ((subtypep type v)
+;			(return v)))))
+;	((eql type 'character) 'string-char)
+;	(t (or (dolist (v '(string-char bit short-float
+;				    long-float))
+;		   (cond ((subtypep type v)
+;			  (return v))))
+;	       t))))
 	 
 (defun upgraded-array-element-type (type &optional environment)
   (declare (ignore environment))
@@ -277,11 +288,11 @@
 			  initial-element
 			  (initial-contents nil initial-contents-supplied-p)
 			  (fill-pointer nil fill-pointer-supplied-p)
-			  (displaced-to nil displaced-to-supplied-p)
+			  (displaced-to nil)
 			  (displaced-index-offset 0)
 			  (static nil static-supplied-p))
 
-  (declare (ignore initial-element static)
+  (declare (ignore initial-element static displaced-index-offset) ;FIXME
 	   (:dynamic-extent r new-dimensions))
 
   (when (integerp new-dimensions)

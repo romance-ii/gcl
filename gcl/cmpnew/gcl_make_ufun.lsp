@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 ;;; MAKE_UFUN  Makes Ufun list for user-defined functions.
 ;;;
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa

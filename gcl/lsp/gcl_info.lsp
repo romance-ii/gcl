@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 (in-package "SI"  )
 
 (eval-when (compile)

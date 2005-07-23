@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 
 ;; Modified data base including return values types
 ;; and making the arglists correct if they have optional args.

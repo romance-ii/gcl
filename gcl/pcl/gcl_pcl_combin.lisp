@@ -345,7 +345,12 @@
 	  after   (reverse after)
 	  primary (reverse primary)
 	  around  (reverse around))
+;    (when (eq generic-function (symbol-function 'shared-initialize))
+;      (break "here3 ~a ~a ~a~%" generic-function combin applicable-methods))
+;    (when (eq generic-function (symbol-function 'compute-effective-method))
+;      (break "here2 ~a ~a ~a~%" generic-function combin applicable-methods))
     (cond ((null primary)
+;	   (break "here we are ~a ~a ~a~%" generic-function combin applicable-methods)
 	   `(error "No primary method for the generic function ~S." ',generic-function))
 	  ((and (null before) (null after) (null around))
 	   ;;

@@ -931,16 +931,21 @@
 			      '*variable-declarations-without-argument*)
 			(push declaration-name
 			      *variable-declarations-without-argument*))
-		      (when arg-p
-			(setq dname (append dname (list (pop form)))))
-		      (dolist (var form)
-			(if (member var args)
-			    (push var outers)
-			    (push var inners)))
-		      (when outers
-			(push `(declare (,@dname ,@outers)) outer-decls))
-		      (when inners
-			(push `(declare (,@dname ,@inners)) inner-decls)))))))
+		      (if (eq (car dname) 'class)
+			  (if (member (car form) args)
+			      (push `(declare (,@dname ,@form)) outer-decls)
+			    (push `(declare (,@dname ,@form)) inner-decls))
+			(progn
+			  (when arg-p
+			    (setq dname (append dname (list (pop form)))))
+			  (dolist (var form)
+			    (if (member var args)
+				(push var outers)
+			      (push var inners)))
+			  (when outers
+			    (push `(declare (,@dname ,@outers)) outer-decls))
+			  (when inners
+			    (push `(declare (,@dname ,@inners)) inner-decls)))))))))
 	  (setq body (cdr body)))
     (values outer-decls inner-decls body)))
 

@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 (in-package 'si)
 
 (defvar *old-handler* #'si::universal-error-handler)

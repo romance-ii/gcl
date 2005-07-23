@@ -33,7 +33,7 @@ $(addsuffix .c,$(AFILES)) $(addsuffix .data,$(AFILES))\
 	$(addsuffix .lisp,$(FILES))
 	rm -f *.o *gazonk*
 	cp ../h/cmpinclude.h .
-	echo ${SETUP} '(pcl::compile-pcl)' | ../unixport/saved_mod_gcl ../unixport/
+	echo ${SETUP} '(pcl::compile-pcl)' | ../unixport/saved_mod_gcl #../unixport/
 # FIXME -- small compiler setjmp/volatile detection bug -- CM
 # doesn't seem to be needed now, but investigate more later
 #	patch -p0 <pcl_methods.patch

@@ -601,19 +601,20 @@
     :initfunction ,(eval-form (structure-slotd-init-form slotd))))
 
 (defun find-structure-class (symbol)
-  (if (structure-type-p symbol)
-      (unless (eq find-structure-class symbol)
-	(let ((find-structure-class symbol))
-	  (ensure-class symbol
-			:metaclass 'structure-class
-			:name symbol
-			:direct-superclasses
-			(when (structure-type-included-type-name symbol)
-			  (list (structure-type-included-type-name symbol)))
-			:direct-slots
-			(mapcar #'slot-initargs-from-structure-slotd
-				(structure-type-slot-description-list symbol)))))
-      (error "~S is not a legal structure class name." symbol)))
+  (unless (eq symbol 'std-instance)
+    (if (structure-type-p symbol)
+	(unless (eq find-structure-class symbol)
+	  (let ((find-structure-class symbol))
+	    (ensure-class symbol
+			  :metaclass 'structure-class
+			  :name symbol
+			  :direct-superclasses
+			  (when (structure-type-included-type-name symbol)
+			    (list (structure-type-included-type-name symbol)))
+			  :direct-slots
+			  (mapcar #'slot-initargs-from-structure-slotd
+				  (structure-type-slot-description-list symbol)))))
+      (error "~S is not a legal structure class name." symbol))))
 
 #-cmu17
 (eval-when (compile eval)

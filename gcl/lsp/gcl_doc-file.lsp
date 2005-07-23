@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 (defun doc-file (file packages)
 ;;Write FILE of doc strings for all symbols in PACKAGES
 ;;This file is suitable for use with the find-doc function.

@@ -329,7 +329,7 @@ DEFUN_NEW("GETPEERNAME",object,fSgetpeername,SI,1,1,NONE,OO,OO,OO,OO,(object soc
  "Return a list of three elements: the address, the hostname and the port for the other end of the socket.  If hostname is not available it will be equal to the address.  Invalid on server sockets. Return NIL on failure.")
 {
  struct sockaddr_in peername;
- int size = sizeof(struct sockaddr_in);
+ unsigned size = sizeof(struct sockaddr_in);
  struct hostent *hostEntPtr;
  object address,host;
  check_socket(sock);
@@ -351,7 +351,7 @@ DEFUN_NEW("GETPEERNAME",object,fSgetpeername,SI,1,1,NONE,OO,OO,OO,OO,(object soc
 DEFUN_NEW("GETSOCKNAME",object,fSgetsockname,SI,1,1,NONE,OO,OO,OO,OO,(object sock),
  "Return a list of three elements: the address, the hostname and the port for the socket.  If hostname is not available it will be equal to the address. Return NIL on failure. ")
 { struct sockaddr_in sockname;
- int size = sizeof(struct sockaddr_in);
+ unsigned size = sizeof(struct sockaddr_in);
  struct hostent *hostEntPtr;
  object address,host;
 
@@ -635,8 +635,8 @@ getCharGclSocket(object strm, object block)
       if (high > 0)
 	{ object bufp = SOCKET_STREAM_BUFFER(strm);
 	int n;
-	n = SAFE_READ(fd,bufp->ust.ust_self ,bufp->ust.ust_dim);
-	doReverse(bufp->ust.ust_self,n);
+	n = SAFE_READ(fd,bufp->st.st_self ,bufp->ust.ust_dim);
+	doReverse(bufp->st.st_self,n);
 	bufp->ust.ust_fillp=n;
 	if (n > 0)
 	  {

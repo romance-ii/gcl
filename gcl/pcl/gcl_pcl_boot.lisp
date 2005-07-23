@@ -524,6 +524,7 @@ work during bootstrapping.
 		  ,@(mapcan (lambda (a s)
 			      (when (and (symbolp s) (neq s t))
 				(list `(class ,a ,s))))
+;				(list `(type ,s ,a))))
 			    parameters
 			    specializers)))
 	       (method-lambda

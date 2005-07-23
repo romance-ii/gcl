@@ -835,7 +835,7 @@ regexec(register regexp *prog, register char *string, char *start, int length)
 
 	    
 	    int amt;
-	    unsigned char *s = string+ advance -1;
+	    unsigned char *s = (unsigned char *)string+ advance -1;
 	    min_initial_branch_length(prog, buf,advance);
 	    switch(advance) {
 	    case 1:
@@ -843,7 +843,7 @@ regexec(register regexp *prog, register char *string, char *start, int length)
 	      { if (buf[*s]==0)
 		  { if (*s == 0) RETURN_VAL(0);
 		    else
-		      if (regtry(prog,s-(1-1))) RETURN_VAL(1);}
+		      if (regtry(prog,(char *)s-(1-1))) RETURN_VAL(1);}
 		s++; }
 	    RETURN_VAL(0);
 	      
@@ -855,7 +855,7 @@ regexec(register regexp *prog, register char *string, char *start, int length)
 		  {
 		    amt = buf[s[-1]]-1;
 		    if (amt <=0) {
-		      if (regtry(prog,s-(advance-1))) 
+		      if (regtry(prog,(char *)s-(advance-1))) 
 			RETURN_VAL(1);
 		      else 
 			amt =1;
@@ -872,7 +872,7 @@ regexec(register regexp *prog, register char *string, char *start, int length)
 		   if (amt <=0)
 		     {amt = buf[s[-2]]-2;
 		      if (amt <=0)
-		        {if (regtry(prog,s-(advance-1))) RETURN_VAL(1);
+		        {if (regtry(prog,(char *)s-(advance-1))) RETURN_VAL(1);
 			else amt =1;}}}
 		s += amt; length -= amt;}
 	  case 4:
@@ -885,7 +885,7 @@ regexec(register regexp *prog, register char *string, char *start, int length)
 		      if (amt <=0)
 			{amt = buf[s[-3]]-3;
 			 if (amt <=0)
-			   {if (regtry(prog,s-(advance-1))) RETURN_VAL(1);
+			   {if (regtry(prog,(char *)s-(advance-1))) RETURN_VAL(1);
 			   else amt =1;}}}}
 		s += amt; length -= amt;}
 
@@ -901,7 +901,7 @@ regexec(register regexp *prog, register char *string, char *start, int length)
 			 if (amt <=0)
 			   {amt = buf[s[-4]]-4;
 			    if (amt <=0)
-			   {if (regtry(prog,s-(advance-1))) RETURN_VAL(1);
+			   {if (regtry(prog,(char *)s-(advance-1))) RETURN_VAL(1);
 			   else amt =1;}}}}}
 		s += amt; length -= amt;}
 	  }

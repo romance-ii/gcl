@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 
 (in-package 'si)
 (use-package "SLOOP")

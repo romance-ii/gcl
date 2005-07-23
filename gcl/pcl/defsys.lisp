@@ -743,7 +743,7 @@ and load your system with:
    (sys-proclaim    t            t            ()                kcl)
    (gcl_pcl_walk        (gcl_pcl_pkg)    (gcl_pcl_pkg)    ())
    (gcl_pcl_iterate     t            t            ())
-   (gcl_pcl_macros      t            t            ())
+   (gcl_pcl_macros    t         t        ())
    (gcl_pcl_low         (gcl_pcl_pkg gcl_pcl_macros) t            (gcl_pcl_macros))
    
    

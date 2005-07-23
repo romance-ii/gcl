@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 ;;; CMPIF  Conditionals.
 ;;;
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
@@ -35,6 +36,9 @@
 (si:putprop 'ecase 'c1ecase 'c1)
 (si:putprop 'case 'c2case 'c2)
 
+(defun note-branch-elimination (test-form val elim-form)
+  (cmpnote "Test form ~S is ~S,~%;; eliminating branch ~S~%" test-form val elim-form))
+
 (defun c1if (args &aux info f)
   (when (or (endp args) (endp (cdr args)))
         (too-few-args 'if 2 (length args)))
@@ -43,16 +47,41 @@
   (setq f (c1fmla-constant (car args)))
 
   (case f
-        ((t) (c1expr (cadr args)))
-        ((nil) (if (endp (cddr args)) (c1nil) (c1expr (caddr args))))
+        ((t) 
+	 (when (caddr args) (note-branch-elimination (car args) t (caddr args)))
+	 (c1expr (cadr args)))
+        ((nil) 
+	 (note-branch-elimination (car args) nil (cadr args))
+	(if (endp (cddr args)) (c1nil) (c1expr (caddr args))))
         (otherwise
          (setq info (make-info))
-         (list 'if info
-               (c1fmla f info)
+	 (let* ((*fmla-eval-const* t)
+		(fmla (c1fmla f info))
+		(fmlae (fmla-eval-const fmla)))
+	   (if *fmla-eval-const*
+	       (cond (fmlae 
+		      (when (caddr args) (note-branch-elimination (car args) t (caddr args)))
+		      (c1expr (cadr args)))
+		     (t 
+		       (note-branch-elimination (car args) nil (cadr args)) 
+		      (endp (cddr args)) (c1nil) (c1expr (caddr args))))
+	     (list 'if info
+               fmla
                (c1expr* (cadr args) info)
-               (if (endp (cddr args)) (c1nil) (c1expr* (caddr args) info)))))
-  )
+               (if (endp (cddr args)) (c1nil) (c1expr* (caddr args) info))))))))
 
+(defvar *fmla-eval-const*)
+(defun fmla-eval-const (fmla)
+  (case (car fmla)
+	(fmla-and (and (fmla-eval-const (cdr fmla)) (fmla-eval-const (cddr fmla))))
+	(fmla-or (or (fmla-eval-const (cdr fmla)) (fmla-eval-const (cddr fmla))))
+	(fmla-not (not (fmla-eval-const (cdr fmla))))
+	(location (caddr fmla))
+	((t nil) (car fmla))
+	(otherwise (if (consp (car fmla)) 
+		       (fmla-eval-const (car fmla)) 
+		     (setq *fmla-eval-const* nil)))))
+		  
 (defun c1fmla-constant (fmla &aux f)
   (cond
    ((consp fmla)

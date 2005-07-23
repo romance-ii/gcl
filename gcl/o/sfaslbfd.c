@@ -129,7 +129,7 @@ mundefined_symbol (struct bfd_link_info * link_info,
 }
 
 static MY_BFD_BOOLEAN
-mreloc_overflow (struct bfd_link_info * link_info,
+mreloc_overflow (struct bfd_link_info * link_info,struct bfd_link_hash_entry *entry,
 		 const char *name,
 		 const char *reloc_name, bfd_vma addend,
 		 bfd *abfd, asection *section,

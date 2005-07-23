@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 ;;; CMPFLET  Flet, Labels, and Macrolet.
 ;;;
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa

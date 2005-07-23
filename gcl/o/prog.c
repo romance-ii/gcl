@@ -49,8 +49,8 @@ FFD(Ftagbody)(object body)
 
 	object *old_top = vs_top;
 	object *new_top;
-	object *tinf;
-	object *tinf_base;
+	VOL object *tinf;
+	VOL object *tinf_base;
 	object *env = lex_env;
 	object id = alloc_frame_id();
 	object bodysv = body;

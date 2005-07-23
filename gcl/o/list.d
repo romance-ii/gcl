@@ -1,3 +1,4 @@
+/* -*-C-*- */
 /*
  Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
 
@@ -1257,8 +1258,8 @@ LFD(Lacons)()
 	protectTEST;
 	setupTEST(item, test, test_not, key);
 	while (!endp(a_list)) {
-		if (TEST((*car_or_cdr)(a_list->c.c_car)) &&
-                    a_list->c.c_car != Cnil) {
+		if (a_list->c.c_car != Cnil && 
+		    TEST((*car_or_cdr)(a_list->c.c_car))) {
 			a_list = a_list->c.c_car;
 			goto L;
 		}

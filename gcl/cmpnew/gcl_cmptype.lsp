@@ -52,7 +52,8 @@
   (let ((type (type-of thing)))
     (case type
       ((fixnum bignum) `(integer ,thing ,thing))
-      ((short-float long-float symbol cons) type)
+      ((short-float long-float symbol) type)
+      (cons `(cons ,(object-type (car thing)) ,(and (cdr thing) (object-type (cdr thing)))))
       (keyword 'symbol)
       ((string-char standard-char character) 'character)
       ((string bit-vector) type)
@@ -65,7 +66,7 @@
   (when (and (symbolp type) (get type 'si::deftype-definition) (not (get type 's-data)) (not (eq type 'string)))
     (return-from type-filter type))
   (case type
-    ((character short-float long-float boolean symbol cons) type)
+    ((character short-float long-float boolean symbol cons list sequence) type)
     ((single-float double-float) 'long-float)
     (keyword 'symbol)
     ((nil t) t)
@@ -126,6 +127,9 @@
 	   )))))
 
 (defun type<= (t1 t2) (type>= t2 t1))
+
+(defun literalp (form)
+  (or (constantp form) (and (consp form) (eq (car form) 'load-time-value))))
 
 ;;FIXME -- This function needs expansion on centralization.  CM 20050106
 (defun promoted-c-type (type)
@@ -283,7 +287,8 @@
 	((si::memq type1 '(t object)) type2)
 	((si::memq type2 '(t object)) type1)
 	((or (integer-typep type1) (integer-typep type2))
-	 (integer-type-and type1 type2))
+;	 (integer-type-and type1 type2))FIXME
+	 (si::resolve-type `(and ,type1 ,type2)))
 	((and (array-tp type1) (array-tp type2))
 	 (cond
 	  ((eq (car type1) (car type2))

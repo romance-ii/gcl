@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 ;; By W. Schelter
 ;; Usage: (si::proclaim-file "foo.lsp") (compile-file "foo.lsp")
 

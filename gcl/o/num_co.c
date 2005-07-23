@@ -990,7 +990,7 @@ LFD(Ldecode_float)(void)
 	}
 	e=0;
 	if (!ISNORMAL(d)) {
-	  unsigned hp,lp,sp;
+	  int hp,lp,sp;
 
 	  integer_decode_double(d,&hp,&lp,&e,&sp);
 	  if (hp!=0 || lp<0)

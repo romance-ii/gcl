@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 (in-package 'si)
 
 (require "FASDMACROS" "../cmpnew/fasdmacros.lsp")

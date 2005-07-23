@@ -57,8 +57,15 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * Only eval proper lists
   * read error on non-real complex components
   * nil means standard readtable
+  * gcc-4.0 fixups
+  * gcc 4.0 fixes;new trial subtypep (no member cons or satisfies yet);
+    branch elimination; much type propagation expansion; equality
+    upgrading to eq, list search functions inlined and optimized via
+    compiler macros ; fix subtypep {,-integer,-float,-real,-rational,-
+    complex} ansi tests.  FIXME -- go over these diffs and cleanup in a
+    week's time
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  8 Jul 2005 06:12:39 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 23 Jul 2005 07:50:37 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 

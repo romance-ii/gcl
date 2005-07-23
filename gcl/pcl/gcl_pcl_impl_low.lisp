@@ -280,9 +280,7 @@ object set_cclosure (result_cc,value_cc,available_size)
       (let (#+akcl(s-data nil))
         (and (symbolp type)
               (setq s-data (get type 'si::s-data))
-             
-             (null  (si::s-data-type s-data)
-                   )))))
+	      (null  (si::s-data-type s-data))))))
 
 
 (defun structure-type-included-type-name (type)

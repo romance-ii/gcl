@@ -5,8 +5,8 @@ COMPILE_FILE=./saved_clcs_gcl ./ -system-p -c-file -data-file \
 
 FILES:=$(shell ls -1 gcl_clcs_*.lisp | sed 's,\.lisp,,1')
 
-#all: $(addsuffix .c,$(FILES)) $(addsuffix .o,$(FILES))
-all: $(addsuffix .o,$(FILES))
+all: $(addsuffix .c,$(FILES)) $(addsuffix .o,$(FILES))
+#all: $(addsuffix .o,$(FILES))
 
 saved_clcs_gcl: ../unixport/saved_pcl_gcl
 	echo '(load "myload.lisp")(si::save-system "$@")' | $< $(<D)/
@@ -37,3 +37,4 @@ saved_full_gcl: ${LISP}
 clean:
 	rm -f *.o *.fn saved_full_gcl$(EXE) cmpinclude.h *.c *.h *.data saved_clcs_gcl$(EXE)
 #.INTERMEDIATE: saved_clcs_gcl
+#.PRECIOUS: $(addsuffix .c,$(FILES))

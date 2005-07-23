@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 ;;Copyright William F. Schelter 1990, All Rights Reserved 
 
 

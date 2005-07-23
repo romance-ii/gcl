@@ -130,7 +130,7 @@
   ;;(expt 2 (ceiling (log x 2)))
   (the non-negative-fixnum (ash 1 (integer-length (1- x)))))
 
-(defconstant *nkeys-limit* 256)
+(defconstant *nkeys-limit* 255)
 )
 
 (defstruct (cache
@@ -139,7 +139,7 @@
 	     (:copier copy-cache-internal))
   (owner nil)
   (nkeys 1 :type (integer 1 #.*nkeys-limit*))
-  (valuep nil :type (member nil t))
+  (valuep nil :type boolean)
   (nlines 0 :type non-negative-fixnum)
   (field 0 :type field-type)
   (limit-fn #'default-limit-fn :type function)

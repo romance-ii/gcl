@@ -213,7 +213,8 @@ DEFUN_NEW("ACCEPT-SOCKET-CONNECTION",object,fSaccept_socket_connection,
 and returns (list* named_socket fd name1) when one is established")
 
 {
-  int n, fd;
+  unsigned n;
+  int fd;
   struct sockaddr_in addr;
   object x; 
   n = sizeof addr;
@@ -320,7 +321,7 @@ DEFUN_NEW("CONNECTION-STATE-FD",object,fSconnection_state_fd,SI,1,1,NONE,OO,OO,O
      
 DEFUN_NEW("OUR-WRITE",object,fSour_write,SI,3,3,NONE,OO,OI,OO,OO,(object sfd,object buffer,fixnum nbytes),"")
 
-{ return make_fixnum(write1(OBJ_TO_CONNECTION_STATE(sfd),buffer->ust.ust_self,nbytes));
+{ return make_fixnum(write1(OBJ_TO_CONNECTION_STATE(sfd),buffer->st.st_self,nbytes));
 }
 
 DEFUN_NEW("OUR-READ-WITH-OFFSET",object,fSour_read_with_offset,SI,5,5,NONE,

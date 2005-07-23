@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
 
 ;; This file is part of GNU Common Lisp, herein referred to as GCL
@@ -45,7 +46,7 @@
               ((or (eq type 'simple-vector) (eq type 'vector)) t)
               (t
                (setq type (normalize-type type))
-               (when (subtypep (car type) 'list)
+               (when (member (car type) '(cons nil));(subtypep (car type) 'list)
 		 (if (or (and (eq 'null (car type)) (not (equal size 0)))
 			 (and (eq 'cons (car type)) (equal size 0)))
 		     (specific-error :wrong-type-argument "~S is not of type ~S." 

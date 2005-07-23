@@ -1,3 +1,4 @@
+/* -*-C-*- */
 /*
  Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
 
@@ -29,7 +30,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 @(defun standard_char_p (c)
 	int i;
 @
-	check_type_character(&c);
+        if (type_of(c)!=t_character) @(return Cnil)
+/* 	check_type_character(&c); */
 	if (char_font(c) != 0 || char_bits(c) != 0)
 		@(return Cnil)
 	i = char_code(c);
@@ -52,7 +54,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 @(defun string_char_p (c)
 @
-	check_type_character(&c);
+        if (type_of(c)!=t_character) @(return Cnil)
+  /*	check_type_character(&c);*/
 	if (char_font(c) != 0 || char_bits(c) != 0)
 		@(return Cnil)
 	@(return Ct)

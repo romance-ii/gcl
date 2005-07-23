@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 ;;; CMPCATCH  Catch, Unwind-protect, and Throw.
 ;;;
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa

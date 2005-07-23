@@ -78,9 +78,15 @@ gcl_init_system(object no_init)
   if (type_of(no_init)!=t_symbol)
     error("Supplied no_init is not of type symbol\n");
 
+  lsp_init("../lsp/gcl_mislib.lsp");
   lsp_init("../lsp/gcl_predlib.lsp");
   lsp_init("../lsp/gcl_setf.lsp");
   lsp_init("../lsp/gcl_arraylib.lsp");
+
+  lsp_init("../lsp/gcl_seq.lsp");
+  lsp_init("../lsp/gcl_seqlib.lsp");
+  lsp_init("../lsp/gcl_numlib.lsp");
+
   lsp_init("../lsp/gcl_assert.lsp");
   lsp_init("../lsp/gcl_defstruct.lsp");
   lsp_init("../lsp/gcl_describe.lsp");
@@ -89,11 +95,11 @@ gcl_init_system(object no_init)
 #endif
   lsp_init("../lsp/gcl_iolib.lsp");
   lsp_init("../lsp/gcl_listlib.lsp");
-  lsp_init("../lsp/gcl_mislib.lsp");
-  lsp_init("../lsp/gcl_numlib.lsp");
+/*   lsp_init("../lsp/gcl_mislib.lsp"); */
+/*   lsp_init("../lsp/gcl_numlib.lsp"); */
   lsp_init("../lsp/gcl_packlib.lsp");
-  lsp_init("../lsp/gcl_seq.lsp");
-  lsp_init("../lsp/gcl_seqlib.lsp");
+/*   lsp_init("../lsp/gcl_seq.lsp"); */
+/*   lsp_init("../lsp/gcl_seqlib.lsp"); */
   lsp_init("../lsp/gcl_trace.lsp");
   lsp_init("../lsp/gcl_sloop.lsp");
   lsp_init("../lsp/gcl_serror.lsp");

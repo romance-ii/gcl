@@ -525,3 +525,7 @@
             (return (nconc (frob required nr nreq)
                            (frob optional no nopt)
                            values)))))
+
+
+(dolist (l '(find-class classp class-precedence-list))
+  (setf (symbol-function (find-symbol (symbol-name l) 'si)) (symbol-function l)))

@@ -4710,7 +4710,7 @@ main()
   j=((unsigned long)$enable_maxpage <<$PAGEWIDTH) + $dbegin;
   j=$heap_ceiling && j>$heap_ceiling ? $heap_ceiling : j;
   j-=$dbegin;
-  for (i=1;i<=j;i<<=1);
+  for (i=1;i<<1 && i<=j;i<<=1);
   if (i>j) i>>=1;
   fprintf(fp,"%ld",i>>$PAGEWIDTH);
   fclose(fp);

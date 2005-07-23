@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 ;; CMPFUN  Library functions.
 ;;;
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
@@ -35,12 +36,24 @@
 (si:putprop 'rplacd 'c1rplacd 'c1)
 (si:putprop 'rplacd 'c2rplacd 'c2)
 
-(si:putprop 'si::memq 'c1memq 'c1)
-(si:putprop 'member 'c1member 'c1)
-(si:putprop 'member!2 'c2member!2 'c2)
-(si:putprop 'assoc 'c1assoc 'c1)
-(si:putprop 'rassoc 'c1rassoc 'c1)
-(si:putprop 'assoc!2 'c2assoc!2 'c2)
+;(dolist (l '(si::memq 
+;	     member member-i member-if-not
+;	     assoc assoc-i assoc-if-not
+;	     rassoc rassoc-i rassoc-if-not
+;	     intersection set-difference set-exclusive-or subsetp union))
+;  (si::putprop l (intern (concatenate 'string "C1" (symbol-name l))) 'c1))
+
+;(si:putprop 'si::memq 'c1memq 'c1)
+;(si:putprop 'member 'c1member 'c1)
+;(si:putprop 'member-if 'c1member-if 'c1)
+;(si:putprop 'member-if-not 'c1member-if-not 'c1)
+;(si:putprop 'member!2 'c2member!2 'c2)
+;(si:putprop 'assoc 'c1assoc 'c1)
+;(si:putprop 'rassoc 'c1rassoc 'c1)
+;(si:putprop 'set-difference 'c1set-difference 'c1)
+;(si:putprop 'assoc!2 'c2assoc!2 'c2)
+
+
 (si:putprop 'get 'c1get 'c1)
 (si:putprop 'get 'c2get 'c2)
 
@@ -51,6 +64,28 @@
 (si:putprop 'list-nth-immediate 'c2list-nth-immediate 'c2)
 
 (defvar *princ-string-limit* 80)
+(defvar *type-alist*
+  '((fixnum . si::fixnump)
+    (float . floatp)
+    (short-float . short-float-p)
+    (long-float . long-float-p)
+    (integer . integerp)
+    (character . characterp)
+    (symbol . symbolp)
+    (cons . consp)
+    (null . null)
+    (array . arrayp)
+    (vector . vectorp)
+    (bit-vector . bit-vector-p)
+    (string . stringp)
+    (list . listp)
+    (number . numberp)
+    (rational . rationalp)
+    (complex . complexp)
+    (ratio . ratiop)
+    (sequence . (lambda (y) (or (listp y) (vectorp y))))
+    (function . functionp)
+    ))
 
 (defun c1princ (args &aux stream (info (make-info)))
   (when (endp args) (too-few-args 'princ 1 0))
@@ -230,11 +265,16 @@
 
 (defun c1funcall (args &aux funob (info (make-info)))
   (when (endp args) (too-few-args 'funcall 1 0))
-  (setq funob (c1funob (car args)))
-  (add-info info (cadr funob))
-  (list 'funcall info funob (c1args (cdr args) info))
-  )
-
+  (cond ((and (consp (car args)) (eq (caar args) 'lambda))
+	 (c1lambda-fun (cdar args) (cdr args)))
+	((and (consp (car args)) (eq (caar args) 'function) (symbolp (cadar args)) (not (cddar args)))
+	 (c1expr `(,(cadar args) ,@(cdr args))))
+	((constantp (car args))
+	 (c1expr `(,(cmp-eval (car args)) ,@(cdr args))))
+	((progn
+	   (setq funob (c1funob (car args)))
+	   (add-info info (cadr funob))
+	   (list 'funcall info funob (c1args (cdr args) info))))))
 
 (defun c1rplaca (args &aux (info (make-info)))
   (when (or (endp args) (endp (cdr args)))
@@ -277,87 +317,236 @@
 (defconstant +ifr+ (ash (- +ifb+)  -1))
 (defconstant +ift+ '(integer #.(- +ifr+) #.(1- +ifr+)))
 
+;;FIXME the right way to do these is by defining compound types and
+;;using typep and subtypep -- alas these choke on these types of forms
+;;at the moment. 20050704 CM
+
 (defun eql-is-eq (x)
   (cond ((typep x '#.+ift+))
-	((or (typep x 'number) (typep x 'character)) nil)
+	((member-if (lambda (y) (typep x y)) '(number character)) nil)
 	(t)))
 
 (defun eql-is-eq-tp (x)
-  (cond ((subtypep x +ift+))
-	((or (subtypep x 'number) (subtypep x 'character)) nil)
-	((or (subtypep 'number x) (subtypep 'character x)) nil)
-	(t)))
+  (cond ((subtypep x +ift+) (values t t))
+	((subtypep +ift+ x) (values nil nil))
+	((member-if (lambda (y) (subtypep x y)) '(number character)) (values nil t))
+	(t (values t t))))
 
-(defun implicit-eq-tst (item list)
-  (cond ((and (constantp item) (eql-is-eq item)))
-	((and (constantp list) (consp list) (consp (cadr list))
-	      (reduce (lambda (x y) (and (eql-is-eq x) y)) (cadr list))))
-	((let* ((info (make-info))
-		(nargs (c1args (list item list) info)))
-	   (eql-is-eq-tp (info-type (cadar nargs)))))))
-  
-(defun lit-fun (x &rest r)
-  (cond ((atom x) `(funcall ,x ,@r))
-	((member (car x) '(quote function)) `(,(cadr x) ,@r))
-	((eq (car x) 'lambda) `(,x ,@r))
-	((wfs-error))))
+(defun equal-is-eq (x)
+  (cond ((member-if (lambda (y) (typep x y)) '(cons string bit-vector pathname)) nil)
+	((eql-is-eq x))))
 
-(defun do-list-srch (item list tst key k1 ret)
-  (let* ((key-form `(,k1 ,list))
-	 (key-form (if key (lit-fun key key-form) key-form))
-	 (tst-form (lit-fun tst item key-form))
-	 (tst-form (if ret `(and (,ret ,list) ,tst-form) tst-form))
-	 (exit-form `(or (not ,list) ,tst-form))
-	 (ret-form (if ret `(,ret ,list) list)))
-    `(do ((,list ,list (cdr ,list)))
-	 (,exit-form ,ret-form))))
+(defun equal-is-eq-tp (x)
+  (cond ((member-if (lambda (y) (subtypep x y)) '(cons string bit-vector pathname)) (values nil t))
+	(t (eql-is-eq-tp x))))
 
-(defun fun-to-sym (x)
-  (if (and (consp x) (or (eq (car x) 'quote) (eq (car x) 'function)))
-      (cadr x)
-    x))
+(defun equalp-is-eq (x)
+  (cond ((member-if (lambda (y) (typep x y)) '(array hash-table structure number)) nil)
+	((equal-is-eq x))))
 
-(defun do-list-srch-eql (item list tst key k1 ret)
-  (let ((ei (gensym)) (el (gensym)))
-    `(let ((,ei ,item) (,el ,list))
-       ,(if (eq (fun-to-sym tst) 'eql)
-	   `(if (eql-is-eq ,ei)
-		,(do-list-srch ei el ''eq key k1 ret)
-	      ,(do-list-srch ei el tst key k1 ret))
-	 (do-list-srch ei el tst key k1 ret)))))
+(defun equalp-is-eq-tp (x)
+  (cond ((member-if (lambda (y) (subtypep x y)) '(array hash-table structure number)) (values nil t))
+	(t (equal-is-eq-tp x))))
 
-(defun list-expr (item list &key key test test-not k1 ret)
-  (when (and test test-not)
-    (error ":test and :test-not both specified"))
-  (let ((test (or test
-		 (and test-not `(lambda (x y) (not ,(lit-fun test-not 'x 'y))))
-		 (if (implicit-eq-tst item list) ''eq ''eql))))
-    (c1expr (do-list-srch-eql item list test key k1 ret))))
+(defun do-eq-et-al (fn args)
+  (let* ((tf (cadr (test-to-tf fn)))
+	 (info (make-info))
+	 (nargs (c1args args info)))
+    (cond ((and tf 
+		(or (funcall tf (info-type (cadar nargs)))
+		    (funcall tf (info-type (cadadr nargs)))))
+	   (list 'call-global info 'eq nargs))
+	  ((list 'call-global info fn nargs)))))
+	   
+(dolist (l `(eq eql equal equalp))
+  (si::putprop l 'do-eq-et-al 'c1g))
 
-(defmacro with-item-list-keys ((item list keys) args &body body) 
-  `(let ((,item (car ,args)) (,list (cadr ,args)) (,keys (cddr ,args))) 
-     (when (or (endp ,args) (endp (cdr ,args))) 
-       (too-few-args 'list-expr 2 (length ,args)))  
-     ,@body))
+(defun num-type-bounds (t1)
+  (let ((t1 (si::normalize-type t1))
+	(i 1) j)
+    (mapcar (lambda (x) 
+	      (setq j i i (- i)
+		    x (cond ((atom x) x)
+			    ((and (eq (car t1) 'integer) (integerp (car x))) (+ (car x) j))
+			    ((car x))))) (cdr t1))))
 
-(defun c1assoc (args)
-  (with-item-list-keys 
-   (item list keys) args
-   (apply 'list-expr item list :k1 'caar :ret 'car keys)))
-(defun c1rassoc (args)
-  (with-item-list-keys 
-   (item list keys) args
-   (apply 'list-expr item list :k1 'cdar :ret 'car keys)))
-(defun c1member (args)
-  (with-item-list-keys 
-   (item list keys) args
-  (apply 'list-expr item list  :k1 'car keys)))
-(defun c1memq (args)
-  (with-item-list-keys 
-   (item list keys) args
-  (apply 'list-expr item list :k1 'car :test ''eq keys)))
 
-;;FIXME member-if member-if-not et.al by ;test -> :test-not
+(defun num-type-rel (fn t1 t2 &optional s)
+  (let ((nop (car (rassoc fn '((>= . <) (> . <=) (= . /=)))))
+	(rfn (cdr (assoc fn '((>= . >) (> . >=))))))
+    (cond (nop (let ((q (num-type-rel nop t1 t2))) 
+		 (list (and (not (car q)) (cadr q)) (cadr q))))
+	  ((eq fn '=) (mapcar (lambda (x y) (and x y)) (num-type-rel '>= t1 t2) (num-type-rel '>= t2 t1)))
+	  ((not s) (let ((f (num-type-rel fn t1 t2 t)))
+		     (list f (or f (num-type-rel rfn t2 t1 t)))))
+	  ((let ((t1 (car (num-type-bounds t1)))
+		 (t2 (cadr (num-type-bounds t2))))
+	     (and (numberp t1) (numberp t2) (funcall fn t1 t2)))))))
+
+
+(defun do-num-relations (fn args)
+  (let* ((info (make-info))
+	 (nargs (c1args args info))
+	 (t1 (and (cddr args) (info-type (cadar nargs))))
+	 (t2 (and (cddr args) (info-type (cadadr nargs))))
+	 (r (and t1 t2 (num-type-rel fn t1 t2))))
+    (cond ((cddr args) (list 'call-global info fn nargs))
+	  ((car r) (c1expr t))
+	  ((cadr r) (c1expr nil))
+	  ((list 'call-global info fn nargs)))))
+
+(dolist (l `(>= > < <= = /=))
+  (si::putprop l 'do-num-relations 'c1g))
+
+(dolist (l `(eq eql equal equalp > >= < <= = /= 
+		,@(mapcar (lambda (x) (cdr x)) (remove-if-not (lambda (x) (symbolp (cdr x))) *type-alist*))))
+  (si::putprop l t 'c1no-side-effects))
+
+;;bound type comparisons
+;; only boolean eval const args
+
+
+
+
+(defun list-tp-test (tf lt)
+  (cond ((null lt) (values t t))
+	((atom lt) (values nil nil))
+	((eq (car lt) 'cons)
+	 (multiple-value-bind 
+	  (m1 f1) (funcall tf (cadr lt))
+	  (multiple-value-bind 
+	   (m2 f2) (list-tp-test tf (caddr lt))
+	   (values (and m1 m2) (or f1 f2)))))
+	(t (values nil nil))))
+
+(defun test-to-tf (test)
+  (let ((test (if (constantp test) (cmp-eval test) test)))
+    (cond ((member test `(eql ,#'eql)) '(eql-is-eq eql-is-eq-tp))
+	  ((member test `(equal ,#'equal)) '(equal-is-eq equal-is-eq-tp))
+	  ((member test `(equalp ,#'equalp)) '(equalp-is-eq equalp-is-eq-tp)))))
+
+(defun is-eq-test-item-list (test item list)
+  (declare (ignore list))
+  (let ((tf (car (test-to-tf test))))
+    (and tf (funcall tf item))))
+	
+(defun c1is-eq-test-item-list (args)
+  (let* ((ltf (test-to-tf (car args)))
+	 (tf (cadr ltf))
+	 (info (make-info)))
+    (if (not tf) 
+	(c1expr nil)
+      (let ((nargs (c1args (cdr args) info)))
+	(multiple-value-bind 
+	 (m1 f1) (funcall tf (info-type (cadar nargs)))
+	 (multiple-value-bind 
+	  (m2 f2) (list-tp-test tf (info-type (cadadr nargs)))
+	  (declare (ignore f2))
+	  (cond ((or m1 m2) (c1expr t))
+		(f1 (c1expr nil))
+		((let ((info (make-info))) (list 'call-global info (car ltf) (c1args (list (cadr args)) info)))))))))))
+(si::putprop 'is-eq-test-item-list 'c1is-eq-test-item-list 'c1)
+
+(defun do-predicate (fn args)
+  (let* ((info (make-info))
+	(nargs (c1args args info))
+	(tp (car (rassoc fn *type-alist*))))
+    (let ((at (and (not (cdr args)) (info-type (cadar nargs)))))
+      (cond ((and at (subtypep at tp)) (c1expr t))
+	    ((not (type-and at tp)) (c1expr nil))
+	    ((list 'call-global info fn nargs))))))
+(dolist (l *type-alist*) (when (symbolp (cdr l)) (si::putprop (cdr l) 'do-predicate 'c1g)))
+
+(defun c1or (args)
+  (cond ((null args) (c1expr nil))
+	((constantp (car args)) (let ((na (cmp-eval (car args)))) (if na (c1expr na) (c1or (cdr args)))))
+	((null (cdr args)) (c1expr (car args)))
+	((macro-function 'or) (c1expr (cmp-macroexpand `(or ,@args))))
+	((let ((info (make-info))) (list 'call-global info 'or (c1args args info))))))
+(si::putprop 'or 'c1or 'c1)
+
+(defun cmp-array-element-type (&rest args)
+  (and 
+   args
+   (let ((z (or (not (typep (car args) 'array)) (upgraded-array-element-type (array-element-type (car args)))))
+	 (y (apply 'cmp-array-element-type (cdr args))))
+     ;;need type-or here
+     (cond ((subtypep z y) y)
+	   ((subtypep y z) z)
+	   (t)))))
+
+(defun array-element-subtype (type)
+  (let ((type (si::normalize-type type)))
+    (or 
+     (not (consp type))
+     (not (member (car type) '(array simple-array)))
+     (null (cadr type))
+     (eq (cadr type) '*)
+     (cadr type))))
+
+(defun cmp-array-element-subtype (args)
+  (and 
+   args
+   (let ((z (array-element-subtype (car args)))
+	 (y (cmp-array-element-subtype (cdr args))))
+     ;;need type-or here
+     (cond ((subtypep z y) y)
+	   ((subtypep y z) z)
+	   (t)))))
+
+(defun c1cmp-array-element-type (args)
+  (let* ((info (make-info))
+	 (nargs (c1args args info)))
+    (c1expr `(quote ,(cmp-array-element-subtype (mapcar (lambda (x) (info-type (cadr x))) nargs))))))
+(si::putprop 'cmp-array-element-type 'c1cmp-array-element-type 'c1)
+
+(defun cons-type-length (type)
+  (cond ((null type) 0)
+	((and (consp type) (eq (car type) 'cons)) (+ 1 (cons-type-length (caddr type))))))
+
+(defun c1make-array (args)
+  (let* ((info (make-info))
+	 (nargs (c1args args info)))
+    (let* ((eltp (position :element-type args))
+	   (eltp (and eltp (nth (1+ eltp) nargs)))
+	   (eltp (and eltp (consp eltp) (eq (car eltp) 'location) (caddr eltp)))
+	   (eltp (and (consp eltp) (eq (car eltp) 'VV) (caar (member (cadr eltp) *objects*  :key 'cadr))))
+	   (eltp (if eltp `(,eltp) `(*))))
+      (let ((szf (let ((st (info-type (cadar nargs))))
+		   (cond ((subtypep st 'list) `(,(make-list (cons-type-length st) :initial-element '*)))
+			 ((and st (not (subtypep 'list st))) `((*)))))))
+	(setf (info-type info) `(array ,@eltp ,@szf))
+	(list 'call-global info 'make-array nargs)))))
+(si::putprop 'make-array 'c1make-array 'c1)
+
+;(defun all-type (types type)
+;  (if (null types) 
+;      (values t nil)
+;    (let ((m (subtypep (car types) type))
+;	  (f (subtypep type (car types))))
+;      (multiple-value-bind 
+;       (m1 f1)(all-type (cdr types) type)
+;        (values (and m m1) (or (and (not m) (not f)) f1))))))
+    
+;(defun all-type-check (fn type pred args)
+;  (let* ((info (make-info))
+;	(nargs (c1args args info)))
+;    (multiple-value-bind 
+;     (m f) (all-type (mapcar (lambda (x) (info-type (cadr x))) nargs) type)
+;     (cond (m (c1expr t))
+;	   (f (c1expr nil))
+;	   ((c1expr (reduce (lambda (x y) `(and ,x (,pred ,y))) args :initial-value t)))))))
+
+;(defun all-lists (args)
+;  (every 'listp args))
+;(defun c1all-lists (args)
+;  (all-type-check 'all-lists 'list 'listp args))
+;(si::putprop 'all-lists 'c1all-lists 'c1)
+;(defun all-vectors (args)
+;  (every 'vectorp args))
+;(defun c1all-vectors (args)
+;  (all-type-check 'all-vectors 'vector 'vectorp args))
+;(si::putprop 'all-vectors 'c1all-vectors 'c1)
 
 (defun boole3 (a b c)  (boole a b c))
 (si:putprop 'boole '(c1boole-condition . c1boole3) 'c1conditional)
@@ -517,40 +706,33 @@
 	(t t)))
 
 
-
-(defvar *type-alist*
-  '((fixnum . si::fixnump)
-    (float . floatp)
-    (short-float . short-float-p)
-    (long-float . long-float-p)
-    (integer . integerp)
-    (character . characterp)
-    (symbol . symbolp)
-    (cons . consp)
-    (null . null)
-    (array . arrayp)
-    (vector . vectorp)
-    (bit-vector . bit-vector-p)
-    (string . stringp)
-    (list . (lambda (y) (or (consp y) (null y))))
-    (number . numberp)
-    (rational . rationalp)
-    (complex . complexp)
-    (ratio . ratiop)
-    (sequence . (lambda (y) (or (listp y) (vectorp y))))
-    (function . functionp)
-    ))
-
+;(defvar *std-instance-class-type* nil)
+;(defvar *std-instance-symbol* nil)
 
 (defun co1typep (f args &aux tem) f
-  (let*
-      ((x (car args))  new
-       (type (and (consp (second args))
-		  (eq (car (second args)) 'quote)
-		  (second (second args)))))
-    (cond ((subtypep (result-type (car args)) type)
-	   (setq new t)
-	   (return-from co1typep (c1expr new))))
+  (let* ((x (car args))  new
+	 (type (and (literalp (cadr args)) (cmp-eval (cadr args)))))
+;    (unless *std-instance-symbol*
+;      (setq *std-instance-symbol* (let ((p (find-package 'pcl))) (and p (find-symbol "STD-INSTANCE" p)))))
+;    (when (eq type *std-instance-symbol*)
+;      (unless *std-instance-class-type*
+;	(let* ((p (find-package 'pcl))
+;	       (s (and p (find-symbol "SLOT-OBJECT" p)))
+;	       (si (and s (import s 'compiler)))
+;	       (q (and p (find-symbol "FUNCALLABLE-STANDARD-OBJECT" p)))
+;	       (qi (and q (import q 'compiler))))
+;	  (when (and si qi)
+;	    (setq *std-instance-class-type* `(and ,s (not ,q)))))))
+;    (let ((type (or (and (eq type *std-instance-symbol*) *std-instance-class-type*) type)))
+      (let ((rt (result-type (car args))))
+;	(format t "~a ~a ~a ~a ~a ~a~%" type rt (car args) (subtypep rt type) (multiple-value-list (subtypep type rt)) (type-and type rt))
+	(cond ((subtypep rt type)
+	       (setq new t)
+	       (return-from co1typep (c1expr new)))
+	      ((and type (multiple-value-bind (m v) (subtypep type rt) (and (not m) v)) (not (type-and type rt)))
+	       (setq new nil)
+	       (return-from co1typep (c1expr new)))))
+;)
     (setq new
 	  (cond
 	   ((null type) nil)
@@ -921,6 +1103,13 @@
 
   
 ;; end new		  
+
+(defun c1list (args)
+  (let* ((info (make-info))
+	(nargs (c1args args info)))
+    (setf (info-type info) (nil-to-t (reduce (lambda (x y) (list 'cons (info-type (cadr x)) y)) (append nargs '(nil)) :from-end t)))
+    (list 'call-global info 'list nargs)));
+(si::putprop 'list 'c1list 'c1)
       
 (defun c1list-nth (args &aux (info (make-info)))
   (when (or (endp args) (endp (cdr args)))

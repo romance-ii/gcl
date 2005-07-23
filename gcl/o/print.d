@@ -1,3 +1,4 @@
+/* -*-C-*- */
 /*
  Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
 
@@ -2228,7 +2229,7 @@ get_line_length(void)
     return l;
 }
 
-static void
+void
 pp(x)
 object x;
 {

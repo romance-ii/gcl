@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 (in-package 'compiler)
 
 ;; Author W. Schelter

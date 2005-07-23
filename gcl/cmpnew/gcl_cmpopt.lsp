@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 (in-package 'compiler)
 
 ;; The optimizers have been redone to allow more flags
@@ -175,7 +176,7 @@
    (get 'system:elt-set 'inline-unsafe))
 
 ;;SYSTEM:FILL-POINTER-SET
- (push '((t fixnum) fixnum #.(flags rfa set)"((#0)->st.st_fillp)=(#1)")
+ (push '((t fixnum) fixnum #.(flags rfa set)"(((#0)->st.st_fillp)=(((#0)->st.st_hasfillp) ? (#1) : ((#0)->st.st_fillp)))")
    (get 'system:fill-pointer-set 'inline-unsafe))
 
 ;;SYSTEM:FIXNUMP
@@ -760,31 +761,47 @@ type_of(#0)==t_bitvector")
    (get 'endp 'inline-unsafe))
 
 ;;EQ
+ (push '((t t) t #.(flags)"((#0)==(#1)?Ct:Cnil)")
+   (get 'eq 'inline-always))
  (push '((t t) boolean #.(flags)"(#0)==(#1)")
    (get 'eq 'inline-always))
-(push '((fixnum fixnum) boolean #.(flags)"0")
-   (get 'eq 'inline-always))
+;(push '((fixnum fixnum) boolean #.(flags)"0")
+;   (get 'eq 'inline-always))
 
 ;;EQL
+ (push '((t t) t #.(flags)"(eql(#0,#1)?Ct:Cnil)")
+   (get 'eql 'inline-always))
  (push '((t t) boolean #.(flags)"eql(#0,#1)")
+   (get 'eql 'inline-always))
+ (push '((fixnum fixnum) t #.(flags)"((#0)==(#1)?Ct:Cnil)")
    (get 'eql 'inline-always))
 (push '((fixnum fixnum) boolean #.(flags)"(#0)==(#1)")
    (get 'eql 'inline-always))
+ (push '((character character) t #.(flags)"((#0)==(#1)?Ct:Cnil)")
+   (get 'eql 'inline-always))
 (push '((character character) boolean #.(flags)"(#0)==(#1)")
    (get 'eql 'inline-always))
-
+;;FIXME -- floats?
 
 ;;EQUAL
+ (push '((t t) t #.(flags)"(equal(#0,#1)?Ct:Cnil)")
+   (get 'equal 'inline-always))
  (push '((t t) boolean #.(flags)"equal(#0,#1)")
+   (get 'equal 'inline-always))
+ (push '((fixnum fixnum) t #.(flags)"((#0)==(#1)?Ct:Cnil)")
    (get 'equal 'inline-always))
 (push '((fixnum fixnum) boolean #.(flags)"(#0)==(#1)")
    (get 'equal 'inline-always))
 
 ;;EQUALP
+ (push '((t t) t #.(flags)"(equalp(#0,#1)?Ct:Cnil)")
+      (get 'equalp 'inline-always))
  (push '((t t) boolean #.(flags)"equalp(#0,#1)")
-   (get 'equalp 'inline-always))
-(push '((fixnum fixnum) boolean #.(flags)"(#0)==(#1)")
-   (get 'equalp 'inline-always))
+      (get 'equalp 'inline-always))
+ (push '((fixnum fixnum) t #.(flags)"((#0)==(#1)?Ct:Cnil)")
+      (get 'equalp 'inline-always))
+ (push '((fixnum fixnum) boolean #.(flags)"(#0)==(#1)")
+      (get 'equalp 'inline-always))
 
 ;;EXPT
  (push '((t t) t #.(flags ans)"number_expt(#0,#1)")

@@ -423,7 +423,7 @@
 		  (if (consp dtype)
 		    (let* ((dtype (si::normalize-type dtype))
 			   (stype (car dtype)))
-		      (cmpck (or (not (symbolp stype)) (cdddr dtype)) "The declaration ~s is illegal." decl)
+;		      (cmpck (or (not (symbolp stype)) (cdddr dtype)) "The declaration ~s is illegal." decl) FIXME
 		      (case stype
 			(satisfies
 			 (push decl others))
@@ -460,6 +460,16 @@
 					      "The type declaration ~s contains a non-symbol ~s."
 					      decl var)
 				       (push (cons var type) ts)))))
+			(class
+			 (cmpck (cdddr decl)
+				"The type declaration ~s is illegal." decl)
+			 (let ((type (type-filter (or (caddr decl) (car decl)))))
+			   (when type
+			     (let ((var (cadr decl)))
+			       (cmpck (not (symbolp var))
+				      "The type declaration ~s contains a non-symbol ~s."
+				      decl var)
+			       (push (cons var type) ts)))))
 			(object
 			 (dolist** (var (cdr decl))
 				   (cmpck (not (symbolp var))
@@ -600,8 +610,7 @@
 (defun check-vdecl (vnames ts is)
   (dolist** (x ts)
     (unless (member (car x) vnames)
-      (cmpwarn "Type declaration was found for not bound variable ~s."
-               (car x))))
+      (cmpwarn "Type declaration was found for not bound variable ~s" (car x))))
   (dolist** (x is)
     (unless (or (eq x 'ignorable) (member x vnames))
       (cmpwarn "Ignore/ignorable declaration was found for not bound variable ~s." x)))

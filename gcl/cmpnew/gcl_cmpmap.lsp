@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 ;;; CMPMAP  Map functions.
 ;;;
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
@@ -259,4 +260,36 @@
                    (wt-nl temp "= " loc ";")
                    (push temp locs1))
               (push loc locs1))))
+
+(defun c1map-into (args)
+  (when (or (endp args) (endp (cdr args)))
+    (too-few-args 'map-function 2 (length args)))
+  (let ((info (make-info)))
+    (let ((nargs (c1args args info)))
+      (if (not (member-if-not (lambda (x) (subtypep (info-type (cadr x)) 'vector)) (cddr nargs)))
+	(let ((l (gensym)) (i (gensym)))
+	  (c1expr 
+	   `(let ((,l (min ,@(mapcar (lambda (x) `(length ,x)) (cddr args)))))
+	      (do ((,i 0 (+ ,i 1))) ((= ,i ,l))
+		  (declare (seqind ,i))
+		  (setf (aref ,(car args) ,i) (funcall ,(cadr args) ,@(mapcar (lambda (x) `(aref ,x ,i)) (cddr args))))))))
+	(list 'call-global info 'map-into nargs)))))
+(si::putprop 'map-into 'c1map-into 'c1)
+
+(defun c1map (args)
+  (when (or (endp args) (endp (cdr args)))
+    (too-few-args 'map-function 2 (length args)))
+  (let ((info (make-info)))
+    (let ((nargs (c1args (cddr args) info)))
+      (if (and (not (car args)) (not (member-if-not (lambda (x) (subtypep (info-type (cadr x)) 'vector)) nargs)))
+	  (let ((l (gensym)) (i (gensym)))
+	    (c1expr 
+	     `(let ((,l (min ,@(mapcar (lambda (x) `(length ,x)) (cddr args)))))
+		(do ((,i 0 (+ ,i 1))) ((= ,i ,l))
+		    (declare (seqind ,i))
+		    (funcall ,(cadr args) ,@(mapcar (lambda (x) `(aref ,x ,i)) (cddr args)))))))
+	(let ((info (make-info)))
+	  (list 'call-global info 'map (c1args args info)))))))
+(si::putprop 'map 'c1map 'c1)
+
 

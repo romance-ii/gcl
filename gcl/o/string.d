@@ -1,3 +1,4 @@
+/* -*-C-*- */
 /*
  Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
 
@@ -265,7 +266,7 @@ for the string ~S.", 3, start, end, string);
 
 @(defun string_eq (string1 string2
 		   &key start1 end1 start2 end2)
-	int s1, e1, s2, e2;
+	int s1=0, e1=0, s2=0, e2=0;
 @
 	string1 = coerce_to_string(string1);
 	string2 = coerce_to_string(string2);
@@ -282,7 +283,7 @@ for the string ~S.", 3, start, end, string);
 
 @(defun string_equal (string1 string2
 		      &key start1 end1 start2 end2)
-	int s1, e1, s2, e2;
+	int s1=0, e1=0, s2=0, e2=0;
 	int i1, i2;
 @
 	string1 = coerce_to_string(string1);
@@ -309,7 +310,7 @@ int string_sign, string_boundary;
 
 @(static defun string_cmp (string1 string2
 		    &key start1 end1 start2 end2)
-	int s1, e1, s2, e2;
+	int s1=0, e1=0, s2=0, e2=0;
 	int i1, i2;
 	int s;
 @
@@ -348,7 +349,7 @@ LFD(Lstring_neq)() { string_sign = 0;  string_boundary = 1;  FFN(Lstring_cmp)();
 
 @(static defun string_compare (string1 string2
 			&key start1 end1 start2 end2)
-	int s1, e1, s2, e2;
+	int s1=0, e1=0, s2=0, e2=0;
 	int i1, i2;
 	int s;
 @
@@ -523,7 +524,7 @@ int c, *bp;
 }
 
 @(static defun string_case (strng &key start end &aux conv)
-	int s, e, i;
+	int s=0, e=0, i;
 	bool b;
 @
 	strng = coerce_to_string(strng);
@@ -542,7 +543,7 @@ LFD(Lstring_capitalize)() { casefun = char_capitalize;  FFN(Lstring_case)(); }
 
 
 @(static defun nstring_case (strng &key start end)
-	int s, e, i;
+	int s=0, e=0, i;
 	bool b;
 @
 	check_type_string(&strng);

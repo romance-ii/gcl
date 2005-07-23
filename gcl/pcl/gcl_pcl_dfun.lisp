@@ -1518,7 +1518,7 @@ And so, we are saved.
 
 (defun update-dfun (generic-function &optional dfun cache info)
   (let* ((early-p (early-gf-p generic-function))
-	 (gf-name (if early-p
+	 #+cmu(gf-name (if early-p
 		      (early-gf-name generic-function)
 		      (generic-function-name generic-function)))
 	 (ocache (gf-dfun-cache generic-function)))

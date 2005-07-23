@@ -821,7 +821,7 @@
 ;;FIXME lose the normalize-type
 (defun cmp-array-dimension-inline (a i)
   (let ((at (si::normalize-type (var-array-type a))))
-    (let ((aet (aref-propagator 'cmp-aset at)))
+    (let ((aet (and (consp at) (member (car at) '(array simple-array)))))
       (if aet
 	  (if (and (consp (third at)) (= (length (third at)) 1))
 	      (wt "(" a ")->v.v_dim")
@@ -829,10 +829,10 @@
 	(if *safe-compile*
 	    ;;FIXME -- alter C definition to remove the fixint here.
 	    (wt "fixint(fLarray_dimension(" a "," i "))")
-         (if (eql 0 i)
+         (if (or (not (constantp i)) (eql 0 i))
 	     (wt "(type_of(" a ")==t_array ? (" a ")->a.a_dims[(" i ")] : (" a ")->v.v_dim)")
 	    (wt "(" a ")->a.a_dims[(" i ")]")))))))
-  
+
 (defun list*-inline (&rest x)
   (case (length x)
         (1 (wt (car x)))

@@ -443,6 +443,7 @@
 
 (defvar *create-classes-from-internal-structure-definitions-p* t)
 
+
 (defun find-class-from-cell (symbol cell &optional (errorp t))
   (or (find-class-cell-class cell)
       (and *create-classes-from-internal-structure-definitions-p*
@@ -507,6 +508,7 @@
   `(SETF\ PCL\ FIND-CLASS ,new-value ,symbol))
 
 (defun #-setf SETF\ PCL\ FIND-CLASS #+setf (setf find-class) (new-value symbol  &optional errorp environment)
+  (declare (ignore errorp environment))
   (if (legal-class-name-p symbol)
       (let ((cell (find-class-cell symbol)))
 	(setf (find-class-cell-class cell) new-value)

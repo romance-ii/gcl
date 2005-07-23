@@ -1,4 +1,4 @@
-
+;; -*-Lisp-*-
 ;;;
 ;;; This file contains some macros for user defined streams
 ;;;

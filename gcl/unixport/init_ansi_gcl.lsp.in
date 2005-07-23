@@ -230,12 +230,12 @@
 		      (import (list s) "USER"))
  
 ;(shadowing-import (list 'pcl::classp) "SYSTEM")
- (setf (symbol-function 'si::classp) (symbol-function 'pcl::classp))
- (setf (symbol-function 'si::class-of) (symbol-function 'pcl::class-of))
- (setf (symbol-function 'si::class-precedence-list) 
-       (symbol-function 'pcl::class-precedence-list))
- (setf (symbol-function 'si::find-class) 
-       (symbol-function 'pcl::find-class))
+; (setf (symbol-function 'si::classp) (symbol-function 'pcl::classp))
+; (setf (symbol-function 'si::class-of) (symbol-function 'pcl::class-of))
+; (setf (symbol-function 'si::class-precedence-list) 
+;       (symbol-function 'pcl::class-precedence-list))
+; (setf (symbol-function 'si::find-class) 
+;       (symbol-function 'pcl::find-class))
 ; (setf (symbol-function 'si::find-class-no-error) 
 ;	(symbol-function 'conditions::find-class-no-error))
 

@@ -37,7 +37,7 @@
 		  *funs*)))
 
 (defun cmp-macroexp-with-compiler-macros (form)
-  (let ((form (cmp-macroexpand form)))
+  (let ((form (if (and (consp form) (eq (car form) 'or)) form (cmp-macroexpand form))))
     (if (and (consp form) (symbolp (car form)))
 	(let ((cmf (get (car form) 'compiler-macro)))
 	  (if cmf

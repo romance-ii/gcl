@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 ;;; -*- Mode:LISP; Package:(SLOOP LISP);Syntax:COMMON-LISP;Base:10 -*- ;;;;;
 ;;;                                                                    ;;;;;
 ;;;     Copyright (c) 1985,86 by William Schelter,                     ;;;;;

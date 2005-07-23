@@ -485,13 +485,13 @@ coerce_big_to_string(object x, int printbase)
  int ss = mpz_sizeinbase(MP(x),printbase);
  char *p;
   object ans = alloc_simple_string(ss+2+(sign<0? 1: 0));
-  ans->ust.ust_self=p=alloc_relblock(ans->ust.ust_dim);
+  ans->st.st_self=p=alloc_relblock(ans->st.st_dim);
   /*  if (sign < 0) *p++='-'; */
   mpz_get_str(p, printbase,MP(x));
-  i = ans->ust.ust_dim-5;
+  i = ans->st.st_dim-5;
   if (i <0 ) i=0;
-  while(ans->ust.ust_self[i]) { i++;}
-  ans->ust.ust_fillp=i;
+  while(ans->st.st_self[i]) { i++;}
+  ans->st.st_fillp=i;
   return ans;
 }
 

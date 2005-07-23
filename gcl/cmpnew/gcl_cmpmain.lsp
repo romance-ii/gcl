@@ -1,3 +1,4 @@
+;; -*-Lisp-*-
 ;;; CMPMAIN  Compiler main program.
 ;;;
 ;; Copyright (C) 1994 M. Hagiya, W. Schelter, T. Yuasa
@@ -458,17 +459,22 @@ Cannot compile ~a.~%"
 	   (values (symbol-function name) warnings failures)))
 	(t (error "can't compile ~a" name))))
 
-(defun disassemble (name &aux tem)
+(defun assert-type (obj tp)
+  (unless (typep obj tp)
+    (specific-error :wrong-type-argument "~S is not of type ~S." obj tp)))
+
+(defun disassemble (name &optional (asm t) &aux tem)
+  (assert-type name '(or function function-identifier))
   (cond ((and (consp name)
 	      (eq (car name) 'lambda))
 	 (eval `(defun cmp-anon ,@ (cdr name)))
-	 (disassemble 'cmp-anon))
-	((not(symbolp name)) (error "Not a lambda or a name"))
+	 (disassemble 'cmp-anon asm))
+	((not(symbolp name)) (princ "Not a lambda or a name") nil)
 	((setq tem(macro-function name))
 	 (setf (symbol-function 'cmp-tmp-macro) tem)
-	 (disassemble 'cmp-tmp-macro)
+	 (disassemble 'cmp-tmp-macro asm)
 	 (setf (macro-function name) (macro-function name))
-	 name)
+	 nil)
 	((and (setq tem (symbol-function name))
 	      (consp tem)
 	      (eq (car tem) 'lambda-block))
@@ -496,14 +502,15 @@ Cannot compile ~a.~%"
 			     (si::copy-stream st *standard-output*))
 	     (with-open-file (st hn)
 			     (si::copy-stream st *standard-output*))
-	     (system (si::string-concatenate "objdump -d -l "
-					     (namestring on)))
+	     (when asm (system (si::string-concatenate "objdump -d -l "
+					     (namestring on))))
 	     (delete-file cn)
 	     (delete-file dn)
 	     (delete-file hn)
 	     (delete-file on)
-	     (unless *keep-gaz* (delete-file gaz)))))
-	(t (error "can't disassemble ~a" name))))
+	     (unless *keep-gaz* (delete-file gaz))
+	     nil)))
+	((princ name) nil))) ;(error "can't disassemble ~a" name)
 
 
 (defun compiler-pass2 (c-pathname h-pathname system-p )
