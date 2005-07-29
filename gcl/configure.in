@@ -889,7 +889,7 @@ if test "$enable_locbfd" = "yes" ; then
 	echo "# Subconfigure of BFD done"
 	echo "# ------------------------"
 	echo "#"
-#	TLIBS="$TLIBS `pwd`/binutils/bfd/libbfd.a `pwd`/binutils/libiberty/libiberty.a"
+#	TLIBS="$TLIBS ./binutils/bfd/libbfd.a ./binutils/libiberty/libiberty.a"
 	AC_DEFINE(HAVE_LIBBFD)
 	BUILD_BFD="h/bfd.h h/bfdlink.h h/ansidecl.h h/symcat.h"
 	AC_SUBST(BUILD_BFD)
@@ -1047,9 +1047,9 @@ AC_MSG_CHECKING(for required object alignment)
 AC_TRY_RUN([#include <stdio.h>
 	#define EXTER
 	#include "$MP_INCLUDE"
-	#include "`pwd`/h/enum.h"
+	#include "./h/enum.h"
 	#define OBJ_ALIGN
-	#include "`pwd`/h/object.h"
+	#include "./h/object.h"
 	int main() {
 	unsigned long i;
    	FILE *fp=fopen("conftest1","w");
@@ -1074,8 +1074,8 @@ AC_MSG_CHECKING(TYPE_BITS macro)
 AC_TRY_RUN([#include <stdio.h>
 	#define EXTER
 	#include "$MP_INCLUDE"
-	#include "`pwd`/h/enum.h"
-	#include "`pwd`/h/object.h"
+	#include "./h/enum.h"
+	#include "./h/object.h"
 	int main(int argc,char **argv,char **envp) {
 	FILE *f=fopen("conftest1","w");
 	fixnum g=0;
@@ -1112,8 +1112,8 @@ else
 AC_TRY_RUN([#include <stdio.h>
 	#define EXTER
 	#include "$MP_INCLUDE"
-	#include "`pwd`/h/enum.h"
-	#include "`pwd`/h/object.h"
+	#include "./h/enum.h"
+	#include "./h/object.h"
 	int main(int argc,char **argv,char **envp) {
 	FILE *f=fopen("conftest1","w");
 	fprintf(f,"%u",sizeof(struct contblock));
@@ -1331,6 +1331,9 @@ fi
 AC_DEFINE_UNQUOTED(DBEGIN,$dbegin)
 
 AC_MSG_CHECKING(for shared library/C stack ceiling to heap)
+if test "$use" = "mingw" ; then
+  heap_ceiling=2000000000
+else
 echo "int main() {return 0;}" >foo.c
 $CC foo.c -o foo
 heap_ceiling=`ldd foo | tail -n 1 | awk '{print $NF}' | tr -d '()'`
@@ -1342,6 +1345,7 @@ int main() {
     h=c>d && c<h ? c : h;
     fprintf(fp,"0x%lx",h);
     return 0;}],heap_ceiling=`cat conftest1`,echo failed;exit 1,echo failed;exit 1)
+fi
 AC_MSG_RESULT($heap_ceiling)
 AC_DEFINE_UNQUOTED(SHARED_LIB_HEAP_CEILING,$heap_ceiling)
 
@@ -2101,32 +2105,27 @@ AC_SUBST(NOTIFY)
 
 # the time handling for unixtime, add timezone
 
-AC_MSG_CHECKING([alloca])
-AC_TRY_RUN([#include <stdio.h>
-int main() { exit(alloca(500) != NULL ? 0 : 1);}],
-  ,gcl_ok=yes, gcl_ok=no,gcl_ok=no)
-if test $gcl_ok = yes ; then
+if test "$use" != "mingw" ; then
+  AC_MSG_CHECKING([alloca])
+  AC_TRY_RUN([#include <stdio.h>
+  int main() { exit(alloca(500) != NULL ? 0 : 1);}],
+    ,gcl_ok=yes, gcl_ok=no,gcl_ok=no)
+  if test $gcl_ok = yes ; then
     AC_MSG_RESULT(yes)
     AC_DEFINE(HAVE_ALLOCA)
-else
-  AC_TRY_RUN([#include <alloca.h>
-  int main() { exit(alloca(500) != NULL ? 0 : 1)}],
-  ,gcl_ok=yes, gcl_ok=no,gcl_ok=no)
- if test $gcl_ok = yes ; then
-    AC_MSG_RESULT(yes)
-    AC_DEFINE(HAVE_ALLOCA)
-    AC_DEFINE(NEED_ALLOCA_H)
- fi
+  else
+    AC_TRY_RUN([#include <alloca.h>
+    int main() { exit(alloca(500) != NULL ? 0 : 1)}],
+    ,gcl_ok=yes, gcl_ok=no,gcl_ok=no)
+    if test $gcl_ok = yes ; then
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(HAVE_ALLOCA)
+      AC_DEFINE(NEED_ALLOCA_H)
+    fi
+  fi
+
+  if test $gcl_ok = no ; then     AC_MSG_RESULT(no) ; fi
 fi
-if test $gcl_ok = no ; then     AC_MSG_RESULT(no) ; fi
-
-
-
-
-
-
-
-
 
 
 # alloca
@@ -2154,7 +2153,7 @@ if test $gcl_ok = no ; then     AC_MSG_RESULT(no) ; fi
 
 # redhat/cygnus released for some reason a buggy version of gcc,
 # which no one else released.   Catch that here.
-AC_MSG_CHECKING([Checking for buggy gcc version from redhat])
+AC_MSG_CHECKING([for buggy gcc version from redhat])
 if  2>&1 $CC -v | fgrep "gcc version 2.96" > /dev/null 
    then 
         BROKEN_O4_OPT=1
