@@ -1398,7 +1398,7 @@ if test "${enable_cssize+set}" = set; then
   enableval="$enable_cssize"
 
 else
-  enable_cssize=1073741824
+  enable_cssize=1024*1024*2
 fi;
 #AC_DEFINE_UNQUOTED(CSSIZE,$enable_cssize)
 
