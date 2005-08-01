@@ -1755,16 +1755,7 @@ case $canonical in
        # the linker.  Set a default otherwise of 2 Mbytes (Windows default).
        if test "$enable_cssize" == "" ; then
          enable_cssize=1024*1024*2
-       else
-	 LD_STACK_FLAGS="-Wl,--stack=$CSSIZE"
-         echo "Linker stack size flags added: $LD_STACK_FLAGS"
        fi
-       echo "Executable C stack size will be $CSSIZE"
-       cat >>confdefs.h <<_ACEOF
-#define CSSIZE $enable_cssize
-_ACEOF
-
-
        use=mingw;;
 
      i*cygwin*)
@@ -13872,6 +13863,7 @@ O2FLAGS=$TO2FLAGS
 
 
 
+LD_STACK_FLAGS="-Wl,--stack=$enable_cssize"
 
 
 if test -f h/$use.defs  ; then
