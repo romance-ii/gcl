@@ -73,8 +73,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * revert mistagged change to gcl_cmpeval.lsp
   * fix constant numeric comparison result detection for use in branch
     elimination ; eql-to-eq list type detection
+  * Last arg to and is not a boolean
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  8 Aug 2005 22:57:53 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  8 Aug 2005 22:58:37 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 

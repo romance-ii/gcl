@@ -228,7 +228,10 @@
 (defun c1and (args)
   (cond ((endp args) (c1t))
         ((endp (cdr args)) (c1expr (car args)))
-        (t (let ((info (make-info))) (list 'AND info (c1args args info))))))
+        ((let ((info (make-info))
+	       (nargs (append (mapcar (lambda (x) `(the boolean ,x)) (butlast args))
+			      (last args))))
+	   (list 'AND info (c1args nargs info))))))
 
 (defun c2and (forms)
   (do ((forms forms (cdr forms)))
