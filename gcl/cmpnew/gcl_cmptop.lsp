@@ -294,10 +294,10 @@
            )))
   )
 
-(defun declaration-type (type) 
-  (cond ((equal type "") "void")
-	((equal type "long ") "object ")
-	(t type)))
+;(defun declaration-type (type) 
+;  (cond ((equal type "") "void")
+;	((equal type "long ") "object ")
+;	(t type)))
 
 (defvar *vaddress-list*)   ;; hold addresses of C functions, and other data
 (defvar *vind*)            ;; index in the VV array where the address is.
@@ -796,36 +796,48 @@
 		      (*current-form* (list 'defun fname))
 		      (*volatile* (volatile (second lambda-expr)))
 		      *downward-closures*)
+
   (declare (ignore doc))
-  (cond
-   ((dolist (v *inline-functions*)
-      (or (si::fixnump (nth 3 v))
-	  (error "Old style inline"))
-	   (and (eq (car v) fname)
-                 (not (nth 5 v)) ; ie.not  'link-call or 'ifuncall
-		 (return (setq inline-info v))))
 
+  (let ((*compiler-check-args* *compiler-check-args*)
+        (*safe-compile* *safe-compile*)
+        (*compiler-push-events* *compiler-push-events*)
+        (*notinline* *notinline*)
+        (*space* *space*)
+        (*debug* *debug*))
+    
+    (when (eq (car (caddr (cddr lambda-expr))) 'decl-body)
+      (local-compile-decls (caddr (caddr (cddr lambda-expr)))))
+
+    (cond
+     ((dolist (v *inline-functions*)
+	(or (si::fixnump (nth 3 v))
+	    (error "Old style inline"))
+	(and (eq (car v) fname)
+	     (not (nth 5 v)) ; ie.not  'link-call or 'ifuncall
+	     (return (setq inline-info v))))
+      
     ;;; Add global entry information.
-    (when (not (fast-link-proclaimed-type-p fname))
-	  (push (list fname cfun (cadr inline-info) (caddr inline-info))
-		*global-entries*))
-
+      (when (not (fast-link-proclaimed-type-p fname))
+	(push (list fname cfun (cadr inline-info) (caddr inline-info))
+	      *global-entries*))
+    
     ;;; Local entry
-    (analyze-regs (cadr lambda-expr) 0)
-    (t3defun-aux 't3defun-local-entry
-		 (or (cdr (assoc (promoted-c-type (caddr inline-info)) +return-alist+)) 'return-object)
-		 fname cfun lambda-expr sp inline-info
-    ))
-   ((vararg-p fname)
-    (analyze-regs (cadr lambda-expr) 0)
-    (t3defun-aux 't3defun-vararg 'return-object
-		 fname cfun lambda-expr sp))
-   (t
-    (analyze-regs (cadr lambda-expr) 2)
-    (t3defun-aux 't3defun-normal 'return fname cfun lambda-expr sp)))
-  
-  (wt-downward-closure-macro cfun)
-  (add-debug-info fname lambda-expr))
+      (analyze-regs (cadr lambda-expr) 0)
+      (t3defun-aux 't3defun-local-entry
+		   (or (cdr (assoc (promoted-c-type (caddr inline-info)) +return-alist+)) 'return-object)
+		   fname cfun lambda-expr sp inline-info))
+
+     ((vararg-p fname)
+      (analyze-regs (cadr lambda-expr) 0)
+      (t3defun-aux 't3defun-vararg 'return-object
+		   fname cfun lambda-expr sp))
+
+     (t (analyze-regs (cadr lambda-expr) 2)
+	(t3defun-aux 't3defun-normal 'return fname cfun lambda-expr sp)))
+    
+    (wt-downward-closure-macro cfun)
+    (add-debug-info fname lambda-expr)))
 
 (defun t3defun-aux (f *exit* &rest lis)
   (let-pass3 ()   (apply f lis)))   
@@ -892,11 +904,12 @@
 			     (is-var-arg (or (ll-rest ll)
 					     (ll-optionals ll)
 					     (ll-keywords-p ll))))
-  (dolist (v (car ll))
-	  (push (list 'cvar (cs-push t t)) reqs))
- 
-  (wt-comment "local entry for function " (function-string fname))
 
+  (dolist (v (car ll))
+    (push (list 'cvar (cs-push t t)) reqs))
+  
+  (wt-comment "local entry for function " (function-string fname))
+  
   (let ((tmp ""))
     (wt-nl1 "static object " (c-function-name "LI" cfun fname) "(")
     (when reqs 
@@ -914,13 +927,13 @@
       (setq tmp (concatenate 'string tmp "object,...")))
     (wt ")")
     (wt-h "static object " (c-function-name "LI" cfun fname) "(" tmp ");"))
-
-
-;  (when reqs (wt-nl "object ")
-;	(wt-list reqs)  (wt ";"))
-;  (if is-var-arg (wt-nl "va_dcl "))
+  
+  
+					;  (when reqs (wt-nl "object ")
+					;	(wt-list reqs)  (wt ";"))
+					;  (if is-var-arg (wt-nl "va_dcl "))
          ;;; Now the body.
-   
+  
   (let ((cm *reservation-cmacro*)
 	(*tail-recursion-info*
 	 ;; to do:  When can we do tail recursion?
@@ -939,30 +952,30 @@
     (wt-nl1 "{	")
     (when is-var-arg	  (wt-nl "va_list ap;"))
     (wt-nl "int narg = VFUN_NARGS;")
-
+    
     (assign-down-vars (cadr lambda-expr) cfun
 		      't3defun)
     (wt " VMB" cm " VMS" cm " VMV" cm)
-
+    
     (when sp (wt-nl "bds_check;"))
     (when *compiler-push-events* (wt-nl "ihs_check;"))
     (or is-var-arg (wt-nl "if ( narg!= " (length reqs) ") vfun_wrong_number_of_args(small_fixnum("
 			  (length reqs)
 			  "));"))
-
+    
     (flet ((do-decl (var)
 		    (and (eql (var-loc var) 'clb) (setf *vararg-use-vs* t))
 		    (let ((kind (c2var-kind var)))
 		      (declare (object kind))
 		      (when kind
-			    (let ((cvar (cs-push (var-type var) t)))
-			      (setf (var-kind var) kind)
-			      (setf (var-loc var) cvar)
-			      (wt-nl)
-			      (unless block-p (wt "{") (setq block-p t))
-			      (wt-var-decl var)
-			      )))))
-
+			(let ((cvar (cs-push (var-type var) t)))
+			  (setf (var-kind var) kind)
+			  (setf (var-loc var) cvar)
+			  (wt-nl)
+			  (unless block-p (wt "{") (setq block-p t))
+			  (wt-var-decl var)
+			  )))))
+	  
 	  (dolist** (var (car ll))
 		    (do-decl var))
 	  (dolist** (opt (ll-optionals ll))
@@ -973,32 +986,32 @@
 		    (do-decl (cadr kwd))
 		    (when (cadddr kwd) (do-decl (cadddr kwd))))
 	  )
-
+    
   ;;; Use Vcs for lint
-  ;  (if *vararg-use-vs* t (progn (wt-nl "Vcs[0]=Vcs[0];")))
-
+					;  (if *vararg-use-vs* t (progn (wt-nl "Vcs[0]=Vcs[0];")))
+    
   ;;; start va_list at beginning
     (if (or (ll-optionals ll) (ll-rest ll) (ll-keywords-p ll))
 	(unless va-start (setq va-start t) (wt-nl "va_start(ap,first);")))
-      
+    
   ;;; Check arguments.
     (when (and (or *safe-compile* *compiler-check-args*) (car ll))
-	  (wt-nl "if(narg <" (length (car ll))
-		 ") too_few_arguments();"))
-
+      (wt-nl "if(narg <" (length (car ll))
+	     ") too_few_arguments();"))
+    
   ;;; Allocate the parameters.
     (dolist** (var (car ll))    (set-up-var-cvs var))
     (dolist** (opt (ll-optionals ll))  (set-up-var-cvs (car opt)))
-	      
-
+    
+    
     (when (ll-rest ll) (set-up-var-cvs (ll-rest ll))) 
-
+    
     (setf key-offset (if *vararg-use-vs* *vs* *cs*))
     (dolist** (kwd (ll-keywords ll))
-	       (set-up-var-cvs (cadr kwd)))
+	      (set-up-var-cvs (cadr kwd)))
     (dolist** (kwd (ll-keywords ll))
-	       (set-up-var-cvs (cadddr kwd)))
-
+	      (set-up-var-cvs (cadddr kwd)))
+    
     ;;bind the params:
     (do ((v reqs (cdr v))
 	 (vl (car ll) (cdr vl)))
@@ -1169,22 +1182,22 @@
 	      
 	      
 	      )
-
+    
     (when *tail-recursion-info*
       (push 'tail-recursion-mark *unwind-exit*)
       (wt-nl "goto TTL;") (wt-nl1 "TTL:;"))
     (c2expr (caddr (cddr lambda-expr)))
     
     ;;; End va_list at function end
-
+    
     (when va-start (setq va-start nil) (wt-nl "va_end(ap);"))
-
+    
 ;;; Use base if defined for lint
     (if (and (zerop *max-vs*) (not *sup-used*) (not *base-used*)) t (wt-nl "base[0]=base[0];"))
-
+    
 ;;; Need to ensure return of type object
     (wt-nl "return Cnil;")
-
+    
     (wt "}") 
     (when block-p (wt-nl "}"))
     (close-inline-blocks)
@@ -1415,36 +1428,45 @@
   (when doc (add-init `(si::putprop ',fname ,doc 'si::function-documentation) ))
   (when ppn
 	(add-init `(si::putprop ',fname ',ppn 'si::pretty-print-format) ))
-  (wt-h "static void " (c-function-name "L" cfun fname) "();")
-  (add-init `(si::MM ',fname ,(add-address (c-function-name "L" cfun fname))) )
-  )
+  (let ((nm (c-function-name "L" cfun fname)))
+    (wt-h "static void " nm "();")
+    (add-init `(si::MM ',fname ,(add-address nm)))))
 
 (defun t3defmacro (fname cfun macro-lambda doc ppn sp
                          &aux (*volatile* (if (get fname 'contains-setjmp)
 					      " VOL " "")))
   (declare (ignore doc ppn))
-  (let-pass3
-   ((*exit* 'return))
-   (wt-comment "macro definition for " fname)
-   (wt-nl1 "static void " (c-function-name "L" cfun fname) "()")
-   (wt-nl1 "{register object *" *volatile* "base=vs_base;")
-   (assign-down-vars (nth 4 macro-lambda) cfun ;*dm-info*
-		     't3defun)
-   (wt-nl "register object *"*volatile* "sup=base+VM" *reservation-cmacro* ";")
-   (wt " VC" *reservation-cmacro*)
-   (if *safe-compile*
-       (wt-nl "vs_reserve(VM" *reservation-cmacro* ");")
-     (wt-nl "vs_check;"))
-   (when sp (wt-nl "bds_check;"))
-   (when *compiler-push-events* (wt-nl "ihs_check;"))
-   (c2dm (car macro-lambda) (cadr macro-lambda) (caddr macro-lambda)
-	 (cadddr macro-lambda))
-   (wt-nl1 "}")
-   (push (cons *reservation-cmacro* *max-vs*) *reservations*)
-   (wt-h "#define VC" *reservation-cmacro*)
-   (wt-cvars)
 
-   ))
+  (let ((*compiler-check-args* *compiler-check-args*)
+        (*safe-compile* *safe-compile*)
+        (*compiler-push-events* *compiler-push-events*)
+        (*notinline* *notinline*)
+        (*space* *space*)
+        (*debug* *debug*))
+    
+    (when (eq (car (cadddr macro-lambda)) 'decl-body)
+      (local-compile-decls (caddr (cadddr macro-lambda))))
+    
+    (let-pass3
+     ((*exit* 'return))
+     (wt-comment "macro definition for " fname)
+     (wt-nl1 "static void " (c-function-name "L" cfun fname) "()")
+     (wt-nl1 "{register object *" *volatile* "base=vs_base;")
+     (assign-down-vars (nth 4 macro-lambda) cfun ;*dm-info*
+		       't3defun)
+     (wt-nl "register object *"*volatile* "sup=base+VM" *reservation-cmacro* ";")
+     (wt " VC" *reservation-cmacro*)
+     (if *safe-compile*
+	 (wt-nl "vs_reserve(VM" *reservation-cmacro* ");")
+       (wt-nl "vs_check;"))
+     (when sp (wt-nl "bds_check;"))
+     (when *compiler-push-events* (wt-nl "ihs_check;"))
+     (c2dm (car macro-lambda) (cadr macro-lambda) (caddr macro-lambda)
+	   (cadddr macro-lambda))
+     (wt-nl1 "}")
+     (push (cons *reservation-cmacro* *max-vs*) *reservations*)
+     (wt-h "#define VC" *reservation-cmacro*)
+     (wt-cvars))))
 
 
 

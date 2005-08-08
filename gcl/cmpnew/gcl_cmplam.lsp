@@ -467,15 +467,15 @@
   ;;; check arguments
   (when (or *safe-compile* *compiler-check-args*)
     (cond ((or rest optionals)
-           (when requireds
-             (wt-nl "if(vs_top-vs_base<" (length requireds)
-                    ") too_few_arguments();"))
-           (unless rest
-             (wt-nl "if(vs_top-vs_base>"
-                    (+ (length requireds) (length optionals))
-                    ") too_many_arguments();")))
-          (t (wt-nl "check_arg(" (length requireds) ");"))))
-
+	   (when requireds
+	     (wt-nl "if(vs_top-vs_base<" (length requireds)
+		    ") too_few_arguments();"))
+	   (unless rest
+	     (wt-nl "if(vs_top-vs_base>"
+		    (+ (length requireds) (length optionals))
+		    ") too_many_arguments();")))
+	  (t (wt-nl "check_arg(" (length requireds) ");"))))
+  
   ;;; Allocate the parameters.
   (dolist** (var requireds) (setf (var-ref var) (vs-push)))
   (dolist** (opt optionals) (setf (var-ref (car opt)) (vs-push)))
@@ -589,9 +589,9 @@
         )
   ;;; Check arguments.
   (when (and (or *safe-compile* *compiler-check-args*) requireds)
-        (when requireds
-              (wt-nl "if(vs_top-vs_base<" (length requireds)
-                     ") too_few_arguments();")))
+    (when requireds
+      (wt-nl "if(vs_top-vs_base<" (length requireds)
+	     ") too_few_arguments();")))
 
   ;;; Allocate the parameters.
   (dolist** (var requireds) (setf (var-ref var) (vs-push)))
@@ -881,11 +881,8 @@
 
 (defun c2dm (whole env vl body
                    &aux (cvar (cs-push t t)))
-; FIXME Compile macros as sfn instead of cf -- need this to guarantee safe calls
-; CM 20040129
-;  (when (or *safe-compile* *compiler-check-args*)
-  (wt-nl "check_arg(2);")
-;    )
+  (when (or *safe-compile* *compiler-check-args*)
+    (wt-nl "check_arg(2);"))
   (cond (whole (setf (var-ref whole) (vs-push)))
         (t (vs-push)))
   (cond (env (setf (var-ref env) (vs-push)))
