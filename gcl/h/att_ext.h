@@ -118,6 +118,7 @@ double object_to_double();
 /*  error.c  */
 EXTER object sKerror,sKparse_error;
 EXTER object sKwrong_type_argument;
+EXTER object sKcontrol_error;
 EXTER object sKcatch;
 EXTER object sKprotect;
 EXTER object sKcatchall;
@@ -613,8 +614,8 @@ EXTER object sLlong_float,sLhash_table,sLstructure,sLboolean,sLfile_stream;
 #ifdef ANSI_COMMON_LISP
 /* new ansi types */
 EXTER object sLarithmetic_error,sLbase_char,sLbase_string,sLbroadcast_stream,sLbuilt_in_class;
-EXTER object sLcell_error,sLclass,sLconcatenated_stream,sLcondition,sLcontrol_error,sLdivision_by_zero;
-EXTER object sLecho_stream,sLend_of_file,sLerror,sLextended_char,sLfile_error;
+EXTER object sLcell_error,sLclass,sLconcatenated_stream,sLcondition,sLdivision_by_zero;
+EXTER object sLecho_stream,sLend_of_file,sLerror,sLextended_char,sLfile_error,sLcontrol_error;
 EXTER object sLfloating_point_inexact,sLfloating_point_invalid_operation,sLfloating_point_overflow;
 EXTER object sLfloating_point_underflow,sLgeneric_function,sLlogical_pathname,sLmethod,sLpackage_error;
 EXTER object sLparse_error,sLprint_not_readable,sLprogram_error,sLreader_error,sLserious_condition;

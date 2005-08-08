@@ -457,6 +457,9 @@ struct string {           /*  string header  */
 #define TYPE_ERROR(a_,b_) {stack_string(tp_err,"~S is not of type ~S.");\
                            Icall_error_handler(sKwrong_type_argument,tp_err,2,(a_),(b_));}
 
+#define CONTROL_ERROR(a_) {stack_string(tp_err,#a_);\
+                           Icall_error_handler(sKcontrol_error,tp_err,0);}
+
 struct ustring {
 
   FIRSTWORD;

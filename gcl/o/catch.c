@@ -150,7 +150,8 @@ FFN(Fthrow)(object args)
 	vs_push(tag);
 	fr = frs_sch_catch(tag);
 	if (fr == NULL)
-		FEerror("~S is an undefined tag.", 1, tag);
+/* 		FEerror("~S is an undefined tag.", 1, tag); */
+	  CONTROL_ERROR("Undefined tag.");
 	eval(MMcadr(args));
 	unwind(fr, tag);
 	/* never reached */
