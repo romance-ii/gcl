@@ -71,8 +71,10 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * Allow local function optimization declarations
   * Fix member compiler-macro
   * revert mistagged change to gcl_cmpeval.lsp
+  * fix constant numeric comparison result detection for use in branch
+    elimination ; eql-to-eq list type detection
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  8 Aug 2005 22:55:49 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  8 Aug 2005 22:57:53 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 

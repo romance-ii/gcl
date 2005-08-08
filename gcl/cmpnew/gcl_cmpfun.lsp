@@ -387,8 +387,8 @@
 (defun do-num-relations (fn args)
   (let* ((info (make-info))
 	 (nargs (c1args args info))
-	 (t1 (and (cddr args) (info-type (cadar nargs))))
-	 (t2 (and (cddr args) (info-type (cadadr nargs))))
+	 (t1 (and (car args) (info-type (cadar nargs))))
+	 (t2 (and (cadr args) (info-type (cadadr nargs))))
 	 (r (and t1 t2 (num-type-rel fn t1 t2))))
     (cond ((cddr args) (list 'call-global info fn nargs))
 	  ((car r) (c1expr t))
@@ -409,15 +409,15 @@
 
 
 (defun list-tp-test (tf lt)
-  (cond ((null lt) (values t t))
-	((atom lt) (values nil nil))
+  (cond ((atom lt) (let ((z (funcall tf lt))) (values z z)))
 	((eq (car lt) 'cons)
 	 (multiple-value-bind 
 	  (m1 f1) (funcall tf (cadr lt))
 	  (multiple-value-bind 
 	   (m2 f2) (list-tp-test tf (caddr lt))
 	   (values (and m1 m2) (or f1 f2)))))
-	(t (values nil nil))))
+	((list-tp-test tf (car lt)))))
+;	(t (values nil nil))))
 
 (defun test-to-tf (test)
   (let ((test (if (constantp test) (cmp-eval test) test)))
@@ -457,13 +457,13 @@
 	    ((list 'call-global info fn nargs))))))
 (dolist (l *type-alist*) (when (symbolp (cdr l)) (si::putprop (cdr l) 'do-predicate 'c1g)))
 
-(defun c1or (args)
-  (cond ((null args) (c1expr nil))
-	((constantp (car args)) (let ((na (cmp-eval (car args)))) (if na (c1expr na) (c1or (cdr args)))))
-	((null (cdr args)) (c1expr (car args)))
-	((macro-function 'or) (c1expr (cmp-macroexpand `(or ,@args))))
-	((let ((info (make-info))) (list 'call-global info 'or (c1args args info))))))
-(si::putprop 'or 'c1or 'c1)
+;(defun c1or (args)
+;  (cond ((null args) (c1expr nil))
+;	((constantp (car args)) (let ((na (cmp-eval (car args)))) (if na (c1expr na) (c1or (cdr args)))))
+;	((null (cdr args)) (c1expr (car args)))
+;	((macro-function 'or) (c1expr (cmp-macroexpand `(or ,@args))))
+;	((let ((info (make-info))) (list 'call-global info 'or (c1args args info))))))
+;(si::putprop 'or 'c1or 'c1)
 
 (defun cmp-array-element-type (&rest args)
   (and 
@@ -706,33 +706,18 @@
 	(t t)))
 
 
-;(defvar *std-instance-class-type* nil)
-;(defvar *std-instance-symbol* nil)
-
 (defun co1typep (f args &aux tem) f
   (let* ((x (car args))  new
 	 (type (and (literalp (cadr args)) (cmp-eval (cadr args)))))
-;    (unless *std-instance-symbol*
-;      (setq *std-instance-symbol* (let ((p (find-package 'pcl))) (and p (find-symbol "STD-INSTANCE" p)))))
-;    (when (eq type *std-instance-symbol*)
-;      (unless *std-instance-class-type*
-;	(let* ((p (find-package 'pcl))
-;	       (s (and p (find-symbol "SLOT-OBJECT" p)))
-;	       (si (and s (import s 'compiler)))
-;	       (q (and p (find-symbol "FUNCALLABLE-STANDARD-OBJECT" p)))
-;	       (qi (and q (import q 'compiler))))
-;	  (when (and si qi)
-;	    (setq *std-instance-class-type* `(and ,s (not ,q)))))))
-;    (let ((type (or (and (eq type *std-instance-symbol*) *std-instance-class-type*) type)))
       (let ((rt (result-type (car args))))
 ;	(format t "~a ~a ~a ~a ~a ~a~%" type rt (car args) (subtypep rt type) (multiple-value-list (subtypep type rt)) (type-and type rt))
 	(cond ((subtypep rt type)
 	       (setq new t)
 	       (return-from co1typep (c1expr new)))
+	      ;;FIXME only need type-and here when finalized
 	      ((and type (multiple-value-bind (m v) (subtypep type rt) (and (not m) v)) (not (type-and type rt)))
 	       (setq new nil)
 	       (return-from co1typep (c1expr new)))))
-;)
     (setq new
 	  (cond
 	   ((null type) nil)
@@ -1107,7 +1092,7 @@
 (defun c1list (args)
   (let* ((info (make-info))
 	(nargs (c1args args info)))
-    (setf (info-type info) (nil-to-t (reduce (lambda (x y) (list 'cons (info-type (cadr x)) y)) (append nargs '(nil)) :from-end t)))
+    (setf (info-type info) (nil-to-t (reduce (lambda (x y) (list 'cons (info-type (cadr x)) y)) (append nargs '(null)) :from-end t)))
     (list 'call-global info 'list nargs)));
 (si::putprop 'list 'c1list 'c1)
       
