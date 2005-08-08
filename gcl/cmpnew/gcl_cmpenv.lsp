@@ -582,30 +582,32 @@
 
 (si:putprop 'decl-body 'c2decl-body 'c2)
 
+(defun local-compile-decls (decls)
+  (dolist** 
+   (decl decls)
+   (case (car decl)
+	 (debug (setq *debug* (cadr decl)))
+	 (safety
+	  (let ((level (cadr decl)))
+	    (declare (fixnum level))
+	    (setq *compiler-check-args* (>= level 1)
+		  *safe-compile* (>= level 2)
+		  *compiler-push-events* (>= level 3))))
+	 (space (setq *space* (cadr decl)))
+	 (notinline (push (cadr decl) *notinline*))
+	 (inline
+	   (setq *notinline* (remove (cadr decl) *notinline*)))
+	 (otherwise (baboon)))))
+
 (defun c2decl-body (decls body)
   (let ((*compiler-check-args* *compiler-check-args*)
         (*safe-compile* *safe-compile*)
         (*compiler-push-events* *compiler-push-events*)
         (*notinline* *notinline*)
         (*space* *space*)
-        (*debug* *debug*)
-	)
-       (dolist** (decl decls)
-         (case (car decl)
-               (debug (setq *debug* (cadr decl)))
-               (safety
-                (let ((level (cadr decl)))
-                     (declare (fixnum level))
-                     (setq *compiler-check-args* (>= level 1)
-                           *safe-compile* (>= level 2)
-                           *compiler-push-events* (>= level 3))))
-               (space (setq *space* (cadr decl)))
-               (notinline (push (cadr decl) *notinline*))
-               (inline
-                (setq *notinline* (remove (cadr decl) *notinline*)))
-               (otherwise (baboon))))
-       (c2expr body))
-  )
+        (*debug* *debug*))
+    (local-compile-decls decls)
+    (c2expr body)))
 
 (defun check-vdecl (vnames ts is)
   (dolist** (x ts)
