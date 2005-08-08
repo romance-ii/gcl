@@ -65,8 +65,10 @@ gclcvs (2.7.0-49) unstable; urgency=low
     complex} ansi tests.  FIXME -- go over these diffs and cleanup in a
     week's time
   * no nil vectors in gcl
+  * optimize external macros with safety >=1 for arg checking -- with
+    newer compiler mods enabling this facility
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  8 Aug 2005 22:47:29 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  8 Aug 2005 22:48:34 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
