@@ -70,8 +70,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * agressive C inline function calls for (funcall (quote sym) ...
   * Allow local function optimization declarations
   * Fix member compiler-macro
+  * revert mistagged change to gcl_cmpeval.lsp
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  8 Aug 2005 22:52:11 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  8 Aug 2005 22:55:49 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
