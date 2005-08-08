@@ -368,11 +368,10 @@
    (get '<= 'inline-always))
 
 ;;=
- (push '((t t) boolean #.(flags)"number_compare(#0,#1)==0")
-   (get '= 'inline-always))
-
+(push '((t t) boolean #.(flags)"number_compare(#0,#1)==0")
+      (get '= 'inline-always))
 (push '((fixnum-float fixnum-float) boolean #.(flags)"(#0)==(#1)")
-   (get '= 'inline-always))
+      (get '= 'inline-always))
 
 ;;>
  (push '((t t) boolean #.(flags)"number_compare(#0,#1)>0")
@@ -473,10 +472,7 @@
 
 ;;ARRAYP
  (push '((t) boolean #.(flags)
-  "@0;type_of(#0)==t_array||
-type_of(#0)==t_vector||
-type_of(#0)==t_string||
-type_of(#0)==t_bitvector")
+  "@0;({enum type _tp=type_of(#0);_tp>=t_string && _tp<=t_array;})")
    (get 'arrayp 'inline-always))
 
 ;;ATOM
@@ -761,44 +757,28 @@ type_of(#0)==t_bitvector")
    (get 'endp 'inline-unsafe))
 
 ;;EQ
- (push '((t t) t #.(flags)"((#0)==(#1)?Ct:Cnil)")
-   (get 'eq 'inline-always))
  (push '((t t) boolean #.(flags)"(#0)==(#1)")
    (get 'eq 'inline-always))
 ;(push '((fixnum fixnum) boolean #.(flags)"0")
 ;   (get 'eq 'inline-always))
 
 ;;EQL
- (push '((t t) t #.(flags)"(eql(#0,#1)?Ct:Cnil)")
-   (get 'eql 'inline-always))
  (push '((t t) boolean #.(flags)"eql(#0,#1)")
-   (get 'eql 'inline-always))
- (push '((fixnum fixnum) t #.(flags)"((#0)==(#1)?Ct:Cnil)")
-   (get 'eql 'inline-always))
+       (get 'eql 'inline-always))
 (push '((fixnum fixnum) boolean #.(flags)"(#0)==(#1)")
-   (get 'eql 'inline-always))
- (push '((character character) t #.(flags)"((#0)==(#1)?Ct:Cnil)")
-   (get 'eql 'inline-always))
+      (get 'eql 'inline-always))
 (push '((character character) boolean #.(flags)"(#0)==(#1)")
-   (get 'eql 'inline-always))
+      (get 'eql 'inline-always))
 ;;FIXME -- floats?
 
 ;;EQUAL
- (push '((t t) t #.(flags)"(equal(#0,#1)?Ct:Cnil)")
-   (get 'equal 'inline-always))
  (push '((t t) boolean #.(flags)"equal(#0,#1)")
-   (get 'equal 'inline-always))
- (push '((fixnum fixnum) t #.(flags)"((#0)==(#1)?Ct:Cnil)")
-   (get 'equal 'inline-always))
+       (get 'equal 'inline-always))
 (push '((fixnum fixnum) boolean #.(flags)"(#0)==(#1)")
-   (get 'equal 'inline-always))
+      (get 'equal 'inline-always))
 
 ;;EQUALP
- (push '((t t) t #.(flags)"(equalp(#0,#1)?Ct:Cnil)")
-      (get 'equalp 'inline-always))
  (push '((t t) boolean #.(flags)"equalp(#0,#1)")
-      (get 'equalp 'inline-always))
- (push '((fixnum fixnum) t #.(flags)"((#0)==(#1)?Ct:Cnil)")
       (get 'equalp 'inline-always))
  (push '((fixnum fixnum) boolean #.(flags)"(#0)==(#1)")
       (get 'equalp 'inline-always))
@@ -873,7 +853,7 @@ type_of(#0)==t_bitvector")
 
 ;;INTEGERP
  (push '((t) boolean #.(flags)
-  "@0;type_of(#0)==t_fixnum||type_of(#0)==t_bignum")
+  "@0;({enum type _tp=type_of(#0);_tp==t_fixnum||_tp==t_bignum;})")
    (get 'integerp 'inline-always))
 (push '((fixnum) boolean #.(flags)
   "1")
@@ -1184,12 +1164,10 @@ TRUNCATE_USE_C
    (get 'truncate 'inline-always))
 
 
-
+;;FIXME boolean -> t opts
 ;;VECTORP
  (push '((t) boolean #.(flags)
-  "@0;type_of(#0)==t_vector||
-type_of(#0)==t_string||
-type_of(#0)==t_bitvector")
+  "@0;({enum type _tp=type_of(#0);_tp>=t_string && _tp<=t_vector;})")
    (get 'vectorp 'inline-always))
 
 ;;WRITE-CHAR
@@ -1219,6 +1197,10 @@ type_of(#0)==t_bitvector")
 ;;CDIFFERENCE
  (push '((t t) t #.(flags) "cdifference(#0,#1)")
    (get 'system:cdifference 'inline-always))
+
+;;IDENTITY
+ (push '((t) t #.(flags) "(#0)")
+   (get 'identity 'inline-always))
 
 ;;GETHASH
 (push '((t t *) (values t t) #.(flags)(lambda (key hash &optional default)

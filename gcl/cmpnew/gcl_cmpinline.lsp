@@ -518,7 +518,20 @@
 			   (push (car types) rts))
 			  (t (return nil))))
                   (setq last (pop types))))
-	   (type>= (cadr inline-info) return-type))
+	   (or
+	    (type>= (cadr inline-info) return-type)
+	    (and (eq (cadr inline-info) 'boolean) (eq return-type t)
+		 (stringp (cadddr inline-info))
+		 (let* ((ns (cadddr inline-info)) 
+			(pos (and (eql #\@ (aref ns 0)) (position #\; ns)))
+			(pos (when pos (1+ pos))))
+		   (setq inline-info (list (car inline-info) t (caddr inline-info) ;;FIXME
+					   (si::string-concatenate 
+					    (if pos (subseq ns 0 pos) "")
+					    "(" 
+					    (if pos (subseq ns pos) ns)
+					    ")?Ct:Cnil")))
+		   t))))
       (cons (nreverse rts) (cdr inline-info))))
 
 (defun need-to-protect (forms types &aux ii)

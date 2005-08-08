@@ -74,8 +74,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * fix constant numeric comparison result detection for use in branch
     elimination ; eql-to-eq list type detection
   * Last arg to and is not a boolean
+  * Make t inlines whenever boolean inlines are provided
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  8 Aug 2005 22:58:37 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  8 Aug 2005 22:59:26 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
