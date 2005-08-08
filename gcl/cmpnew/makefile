@@ -41,7 +41,7 @@ TAGS: $(SRC)
 	etags $^
 
 .lsp.fn: ../cmpnew/gcl_collectfn.o
-	../xbin/make-fn $*.lsp
+	../xbin/make-fn $*.lsp ../unixport/saved_pre_gcl
 
 
 .c.o:  
@@ -57,7 +57,7 @@ gcl_collectfn.o:
 sys-proclaim.lisp: $(FNS)
 	echo '(in-package "COMPILER")' \
 	'(load "../cmpnew/gcl_collectfn")(load "../lsp/sys-proclaim.lisp")'\
-	'(compiler::make-all-proclaims "*.fn")' | ../unixport/saved_gcl
+	'(compiler::make-all-proclaims "*.fn")' | ../unixport/saved_pre_gcl
 
 
 newfn:	

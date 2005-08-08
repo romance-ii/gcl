@@ -77,8 +77,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * Make t inlines whenever boolean inlines are provided
   * proper lists in map functions -- FIXME handle properly elsewher too
   * fix terminal element in cons type support
+  * make sys-proclaim.lisp with saved_pre_gcl
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  8 Aug 2005 23:03:05 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  8 Aug 2005 23:03:42 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
