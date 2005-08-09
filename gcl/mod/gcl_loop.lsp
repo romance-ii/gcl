@@ -2217,6 +2217,7 @@ collected result will be returned as the value of the LOOP."
 (defmacro loop (&environment env &rest keywords-and-forms)
   #+Genera (declare (compiler:do-not-record-macroexpansions)
 		    (zwei:indentation . zwei:indent-loop))
+  (declare (optimize (safety 1)))
   (loop-standard-expansion keywords-and-forms env *loop-ansi-universe*))
 
 #+allegro
