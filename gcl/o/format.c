@@ -44,7 +44,7 @@ static void
 fmt_roman(int,int,int,int,int);
 
 static void
-fmt_integer(object,bool,bool,int,int,int,int);
+fmt_integer(object,bool,bool,int,int,int,int,int);
 
 static void
 fmt_semicolon(bool,bool);
@@ -676,59 +676,63 @@ fmt_S_expression(bool colon, bool atsign)
 static void
 fmt_decimal(bool colon, bool atsign)
 {
-	int mincol=0, padchar=0, commachar=0;
+	int mincol=0, padchar=0, commachar=0, commainterval=0;
 
-	fmt_max_param(3);
+	fmt_max_param(4);
 	fmt_set_param(0, &mincol, fmt_int, 0);
 	fmt_set_param(1, &padchar, fmt_char, ' ');
 	fmt_set_param(2, &commachar, fmt_char, ',');
+	fmt_set_param(3, &commainterval, fmt_int, 3);
 	fmt_integer(fmt_advance(), colon, atsign,
-		    10, mincol, padchar, commachar);
+		    10, mincol, padchar, commachar, commainterval);
 }
 
 static void
 fmt_binary(bool colon, bool atsign)
 {
-	int mincol=0, padchar=0, commachar=0;
+	int mincol=0, padchar=0, commachar=0, commainterval=0;
 
-	fmt_max_param(3);
+	fmt_max_param(4);
 	fmt_set_param(0, &mincol, fmt_int, 0);
 	fmt_set_param(1, &padchar, fmt_char, ' ');
 	fmt_set_param(2, &commachar, fmt_char, ',');
+	fmt_set_param(3, &commainterval, fmt_int, 3);
 	fmt_integer(fmt_advance(), colon, atsign,
-		    2, mincol, padchar, commachar);
+		    2, mincol, padchar, commachar, commainterval);
 }
 
 static void
 fmt_octal(bool colon, bool atsign)
 {
-	int mincol=0, padchar=0, commachar=0;
+	int mincol=0, padchar=0, commachar=0, commainterval=0;;
 
-	fmt_max_param(3);
+	fmt_max_param(4);
 	fmt_set_param(0, &mincol, fmt_int, 0);
 	fmt_set_param(1, &padchar, fmt_char, ' ');
 	fmt_set_param(2, &commachar, fmt_char, ',');
+	fmt_set_param(3, &commainterval, fmt_int, 3);
 	fmt_integer(fmt_advance(), colon, atsign,
-		    8, mincol, padchar, commachar);
+		    8, mincol, padchar, commachar, commainterval);
 }
 
 static void
 fmt_hexadecimal(bool colon, bool atsign)
 {
-	int mincol=0, padchar=0, commachar=0;
+	int mincol=0, padchar=0, commachar=0, commainterval=0;;
 
-	fmt_max_param(3);
+	fmt_max_param(4);
 	fmt_set_param(0, &mincol, fmt_int, 0);
 	fmt_set_param(1, &padchar, fmt_char, ' ');
 	fmt_set_param(2, &commachar, fmt_char, ',');
+	fmt_set_param(3, &commainterval, fmt_int, 3);
 	fmt_integer(fmt_advance(), colon, atsign,
-		    16, mincol, padchar, commachar);
+		    16, mincol, padchar, commachar, commainterval);
 }
 
 static void
 fmt_radix(bool colon, bool atsign)
 {
-	int radix=0, mincol=0, padchar=0, commachar=0;
+	int radix=0, mincol=0, padchar=0, commachar=0, commainterval=0;;
 	object x;
 	int i, j, k;
 	int s, t;
@@ -745,7 +749,7 @@ fmt_radix(bool colon, bool atsign)
 				i = -1;
 			if ((!colon && (i <= 0 || i >= 4000)) ||
 			    (colon && (i <= 0 || i >= 5000))) {
-				fmt_integer(x, FALSE, FALSE, 10, 0, ' ', ',');
+				fmt_integer(x, FALSE, FALSE, 10, 0, ' ', ',', 3);
 				return;
 			}
 			fmt_roman(i/1000, 'M', '*', '*', colon);
@@ -792,22 +796,23 @@ fmt_radix(bool colon, bool atsign)
 		}
 		return;
 	}
-	fmt_max_param(4);
+	fmt_max_param(5);
 	fmt_set_param(0, &radix, fmt_int, 10);
 	fmt_set_param(1, &mincol, fmt_int, 0);
 	fmt_set_param(2, &padchar, fmt_char, ' ');
 	fmt_set_param(3, &commachar, fmt_char, ',');
+	fmt_set_param(4, &commainterval, fmt_int, 3);
 	x = fmt_advance();
 	check_type_integer(&x);
 	if (radix < 0 || radix > 36) {
 		vs_push(make_fixnum(radix));
 		FEerror("~D is illegal as a radix.", 1, vs_head);
 	}
-	fmt_integer(x, colon, atsign, radix, mincol, padchar, commachar);
+	fmt_integer(x, colon, atsign, radix, mincol, padchar, commachar, commainterval);
 }	
 
 static void
-fmt_integer(object x, bool colon, bool atsign, int radix, int mincol, int padchar, int commachar)
+fmt_integer(object x, bool colon, bool atsign, int radix, int mincol, int padchar, int commachar, int commainterval)
 {
 	int l, l1;
 	int s;
@@ -858,7 +863,7 @@ fmt_integer(object x, bool colon, bool atsign, int radix, int mincol, int padcha
 		writec_stream('+', fmt_stream);
 	while (l1-- > 0) {
 		writec_stream(fmt_tempstr(s++), fmt_stream);
-		if (colon && l1 > 0 && l1%3 == 0)
+		if (colon && l1 > 0 && l1%(commainterval) == 0)
 			writec_stream(commachar, fmt_stream);
 	}
 }
