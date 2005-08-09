@@ -361,7 +361,7 @@
   (setq tem (get fun 'line-info))
   (if tem
       (let ((ar tem))
-	(declare (type (array (t)) ar))
+	(declare ((array t) ar))
 	(when ar
 	  (dotimes
 	   (i (length ar))

@@ -44,7 +44,7 @@
 (proclaim '(optimize (safety 2) (space 3)))
 
 (defun best-array-element-type (type)
-  (cond ((not type) nil)
+  (cond ((not type))
 	((eq type '*) '*)
 	((member type '(string-char character standard-char base-char extended-char)) 'string-char) ;FIXME
 	((car (member type +array-types+)))
@@ -73,9 +73,9 @@
 ;			  (return v))))
 ;	       t))))
 	 
-(defun upgraded-array-element-type (type &optional environment)
-  (declare (ignore environment))
-  (best-array-element-type type))
+;(defun upgraded-array-element-type (type &optional environment)
+;  (declare (ignore environment))
+;  (best-array-element-type type))
 
 ;(defun array-displacement (array)
 ;  (let ((x (si:array-displacement1 array)))
