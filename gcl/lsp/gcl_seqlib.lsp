@@ -120,7 +120,7 @@
      (cond ((not from-end)
            (when (null ivsp)
                  (when (>= start end)
-                       (return-from reduce (funcall function)))
+                       (return-from reduce (let ((z (funcall function))) z)))
 		 (setq initial-value (funcall key (elt sequence start)))
                  (setf start (f+ 1 start))
 		 )
@@ -132,7 +132,7 @@
           (t
            (when (null ivsp)
                  (when (>= start end)
-                       (return-from reduce (funcall function)))
+                       (return-from reduce (let ((z (funcall function))) z)))
                  (setf end (f+ end -1))
 		  (setq initial-value (funcall key (elt sequence end)))
 		  )
@@ -640,7 +640,8 @@
               (return (cdr l0)))
         (setq key-right (funcall key (car right)))
         (go loop))))
-   (sort l)))
+   (let ((z (sort l)))
+     z)))
 
 
 #|

@@ -412,7 +412,7 @@
   (do ((bi (1+ (frs-bds (1- *frs-base*))) (1+ bi))
        (last (frs-bds (1+ *frs-top*))))
       ((> bi last) (values))
-    (when (or (null vars) (member (bds-var bi) vars))
+    (when (or (null vars) (member (the symbol (bds-var bi)) vars))
       (do ()
           ((or (> fi *frs-top*) (> (frs-bds fi) bi)))
         (print-frs fi)
@@ -471,7 +471,7 @@
   (case (frs-class i)
     (:catch
      (if (spicep (frs-tag i))
-         (or (and (setq x (member (frs-tag i) (vs (+ (frs-vs i) 2))
+         (or (and (setq x (member (the symbol (frs-tag i)) (vs (+ (frs-vs i) 2))
                                   :key #'caddr :test #'eq))
                   (if (eq (cadar x) 'block)
                       `(block ,(caar x) ***)
@@ -496,7 +496,7 @@
 (defvar *break-hidden-packages* nil)
 
 (defun ihs-visible (i &aux (tem (ihs-fname i)))
-  (and tem (not (member tem *break-hidden-packages*))))
+  (and tem (not (member (the symbol tem) *break-hidden-packages*))))
 
 
 (defun ihs-fname (ihs-index)
@@ -540,11 +540,11 @@
 
 (defun super-go (i tag &aux x)
   (when (and (>= i *frs-base*) (<= i *frs-top*) (spicep (frs-tag i)))
-    (if (setq x (member (frs-tag i) (vs (+ (frs-vs i) 2))
+    (if (setq x (member (the symbol (frs-tag i)) (vs (+ (frs-vs i) 2))
                         :key #'caddr :test #'eq))
         ; Interpreted TAGBODY.
         (when (and (eq (cadar x) 'tag)
-                   (member tag (mapcar #'car (remove (frs-tag i) x
+                   (member (the symbol tag) (mapcar #'car (remove (frs-tag i) x
                                                      :test-not #'eq
                                                      :key #'caddr))))
           (internal-super-go (frs-tag i) tag t))

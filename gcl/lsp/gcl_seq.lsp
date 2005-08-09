@@ -46,7 +46,7 @@
               ((or (eq type 'simple-vector) (eq type 'vector)) t)
               (t
                (setq type (normalize-type type))
-               (when (member (car type) '(cons nil));(subtypep (car type) 'list)
+               (when (member (car type) '(cons null));(subtypep (car type) 'list)
 		 (if (or (and (eq 'null (car type)) (not (equal size 0)))
 			 (and (eq 'cons (car type)) (equal size 0)))
 		     (specific-error :wrong-type-argument "~S is not of type ~S." 
