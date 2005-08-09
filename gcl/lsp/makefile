@@ -45,7 +45,7 @@ TAGS: $(SRC)
 	${APPEND} ${NULLFILE} $*.data  $*.o
 
 .lsp.fn: ../cmpnew/gcl_collectfn.o
-	../xbin/make-fn $*.lsp
+	../xbin/make-fn $*.lsp ../unixport/saved_pre_gcl
 
 all:	$(OBJS)
 
@@ -68,7 +68,7 @@ dummy3 $(NEWCFILES): sys-proclaim.lisp
 sys-proclaim.lisp: fns
 	echo '(in-package "SYSTEM")' \
 	'(load "../cmpnew/gcl_collectfn")'\
-	'(compiler::make-all-proclaims "*.fn")' | ../unixport/saved_gcl
+	'(compiler::make-all-proclaims "*.fn")' | ../unixport/saved_pre_gcl
 
 
 newc:	
