@@ -450,7 +450,7 @@
 	canonical-slots   (copy-tree canonical-slots)
 	canonical-options (copy-tree canonical-options))
   (do-standard-defsetfs-for-defclass accessor-names)
-  (when (eq metaclass 'standard-class)
+  (when (or (eq metaclass 'standard-class) (eq metaclass 'funcallable-standard-class))
     (inform-type-system-about-std-class name))
   (let ((ecd
 	  (make-early-class-definition name

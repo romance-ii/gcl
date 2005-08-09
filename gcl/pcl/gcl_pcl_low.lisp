@@ -125,7 +125,7 @@
 (defmacro instance-ref (slots index)
   `(svref ,slots ,index))
 
-(si::putprop 'std-instance '(lambda nil `(and slot-object (not (funcallable-standard-object)))) 'si::deftype-definition)
+(si::putprop 'std-instance '(lambda nil `(or structure (and standard-object (not (funcallable-standard-object))))) 'si::deftype-definition)
 
 ;(defmacro std-instance-p (object)
 ;  `(or (typep ,object 'si::instance) (structurep ,object)))

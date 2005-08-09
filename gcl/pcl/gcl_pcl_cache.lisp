@@ -1397,7 +1397,7 @@
       (declare (type non-negative-fixnum location limit))
       (when (location-reserved-p location)
 	(setq location (next-location location)))
-      (dotimes (i (1+ limit))
+      (dotimes (i (the non-negative-fixnum (1+ limit)))
 	(when (location-matches-wrappers-p location wrappers)
 	  (return-from probe-cache (or (not (valuep))
 				       (location-value location))))

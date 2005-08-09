@@ -527,5 +527,5 @@
                            values)))))
 
 
-(dolist (l '(find-class classp class-precedence-list))
+(dolist (l '(find-class classp class-precedence-list class-name))
   (setf (symbol-function (find-symbol (symbol-name l) 'si)) (symbol-function l)))
