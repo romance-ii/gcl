@@ -2008,7 +2008,7 @@ DEF_ORDINARY("RIGHT-MARGIN",sKright_margin,KEYWORD,"");
 DEF_ORDINARY("MISER-WIDTH",sKmiser_width,KEYWORD,"");
 DEFVAR("*PRIN-LEVEL*",sSAprin_levelA,SI,make_fixnum(0),"");
 DEFVAR("*PRINT-ESCAPE*",sLAprint_escapeA,LISP,Ct,"");
-DEFVAR("*PRINT-READABLY*",sLAprint_readablyA,LISP,Ct,"");
+DEFVAR("*PRINT-READABLY*",sLAprint_readablyA,LISP,Cnil,"");
 DEFVAR("*PRINT-PRETTY*",sLAprint_prettyA,LISP,Ct,"");
 DEFVAR("*PRINT-CIRCLE*",sLAprint_circleA,LISP,Cnil,"");
 DEFVAR("*PRINT-BASE*",sLAprint_baseA,LISP,make_fixnum(10),"");
