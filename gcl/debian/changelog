@@ -80,8 +80,19 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * make sys-proclaim.lisp with saved_pre_gcl
   * control-error support
   * No nil vector types
+  * Major type system overhaul at the base -- all ansi subtypep tests
+    pass with second arg set to t.  Autodetection and branch elimination
+    for pcl::std-instance-p.  Incremental addition of class information
+    during pcl build.  Explicit type orthoganalization and subtypep
+    analysis based on assessment of (and t1 (not t2)) being type nil as
+    in the Baker paper.  Preliminary use in the compiler in type-and.
+    TODO complete replacement type-and and type-or in compiler with
+    these algorithms.  Consider type hash consing  in compiler for
+    compiler performance.  Consider a better deftype structure, as rate
+    limiting step at present lies in normalizing the type via evaluation
+    of interpreted deftype closures. Halv complex workload.
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  9 Aug 2005 00:35:09 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue,  9 Aug 2005 00:44:01 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
