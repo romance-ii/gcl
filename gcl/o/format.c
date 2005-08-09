@@ -370,6 +370,11 @@ DIRECTIVE:
 	if (c == '@') {
 		atsign = TRUE;
 		c = ctl_advance();
+		if (!colon)
+		  if (c == ':') {
+		    colon = TRUE;
+		    c = ctl_advance();
+		  }
 	}
 	fmt_nparam = n;
 	switch (c) {
