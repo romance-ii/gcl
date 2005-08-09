@@ -83,13 +83,11 @@ designate_package(object x,struct package *p) {
 #define check_type_or_symbol_string_package(a) check_package_designator(*a)
 
 static void
-rehash_pack(ptab,n,m)
-     object **ptab;
-     int *n,m;
-{ object *ntab;
+rehash_pack(object **ptab,fixnum *n,fixnum m) { 
+  object *ntab;
   object *tab = *ptab;
   object l,ll;
-  int k,i;
+  fixnum k,i;
   i=0;
   k = *n;
   {BEGIN_NO_INTERRUPT;
