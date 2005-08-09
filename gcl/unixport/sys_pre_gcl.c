@@ -104,10 +104,10 @@ gcl_init_system(object no_init)
   lsp_init("../lsp/gcl_sloop.lsp");
   lsp_init("../lsp/gcl_serror.lsp");
 
-  lsp_init("../mod/gcl_destructuring_bind.lsp");
-  lsp_init("../mod/gcl_loop.lsp");
-  lsp_init("../mod/gcl_defpackage.lsp");
-  lsp_init("../mod/gcl_make_defpackage.lsp");
+/*   lsp_init("../mod/gcl_destructuring_bind.lsp"); */
+/*   lsp_init("../mod/gcl_loop.lsp"); */
+/*   lsp_init("../mod/gcl_defpackage.lsp"); */
+/*   lsp_init("../mod/gcl_make_defpackage.lsp"); */
 
   lsp_init("../cmpnew/gcl_cmpinline.lsp");
   lsp_init("../cmpnew/gcl_cmputil.lsp");
