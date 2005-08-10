@@ -150,7 +150,7 @@
 	    (with-open-file 
 	     (st gaz :direction :output)
 	     (print `(eval-when (load eval)
-				(dolist (v (nreverse (second *split-files*)))
+				(dolist (v ',(nreverse (second *split-files*)))
 				  (load (merge-pathnames v si::*load-pathname*))))
 		    st))
 	    (setq *split-files* nil)
