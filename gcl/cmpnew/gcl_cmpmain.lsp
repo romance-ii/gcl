@@ -154,14 +154,14 @@
 				  (load (merge-pathnames v si::*load-pathname*))))
 		    st))
 	    (setq *split-files* nil)
-	    (or (member :output-file args)
-		(setq args (append args (list :output-file filename))))
+	    (unless (member :output-file args)
+		(setq args (append args (list :output-file (get-output-pathname filename "o" nil nil nil)))))
 	    (return 
 	     (let ((tem (apply 'compile-file gaz args)))
 	       (unless *keep-gaz* (delete-file gaz))
 	       (values (when tem (truename tem)) warnings failures))))))
    (if (consp *split-files*)
-       (setf (car *split-files*) (+ (third *split-files*) section-length)))))))
+       (setf (car *split-files*) (+ (third *split-files*) section-length)))))
 
 
 (defun compile-file1 (input-pathname
