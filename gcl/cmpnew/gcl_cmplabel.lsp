@@ -142,7 +142,7 @@
         ;;; Never reached
      )
     ((eq ue 'frame)
-     (when (and (consp loc) (eq (car loc) 'simple-call) (rassoc (car loc) +inline-types-alist+))
+     (when (and (consp loc) (or (eq (car loc) 'simple-call) (rassoc (car loc) +inline-types-alist+)))
        (cond ((and (consp *value-to-go*)
 		   (eq (car *value-to-go*) 'vs))
 	      (set-loc loc)
@@ -151,6 +151,7 @@
 				       (list 'vs (vs-push)))))
 		  (set-loc loc)
 		  (setq loc *value-to-go*)))))
+     ;;baboon if didn't go through above?
      (wt-nl "frs_pop();"))
     ((eq ue 'tail-recursion-mark))
     ((eq ue 'jump) (setq jump-p t))

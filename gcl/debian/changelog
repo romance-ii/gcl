@@ -107,8 +107,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * package-used-by-list typo fix in gcl_pcl_env.lisp
   * clcs_macros.lisp  to gcl_clcs_macros.lisp in main makefile
   * Fix cons-type-length bug blocking acl2
+  * Fix frame popping bug misc.613
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 10 Aug 2005 13:50:56 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 10 Aug 2005 13:54:00 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
