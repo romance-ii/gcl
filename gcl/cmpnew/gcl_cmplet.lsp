@@ -45,13 +45,14 @@
 	    form))
       form)))
 
+;;FIXME -- this really needs replacing with another c1 pass at this point.
 (defun recursively-cmp-macroexpand (form bf &aux (*funs* *funs*))
   (if (atom form)
       form
     (let ((cf (car form)))
       (let ((new-cdr-bf (or (and (eq bf 'quote) 'quote)
 			    (and (eq bf 'declare) 'declare)
-			    (car (member cf '(let let* lambda flet labels macrolet declare quote function)))
+			    (car (member cf '(let let* lambda the flet labels macrolet declare quote function)))
 			    (and (consp bf)
 				 (if (atom (car bf)) bf
 				   (and (member (caar bf) '(flet labels macrolet) :test #'eq) 'lambda)))))
