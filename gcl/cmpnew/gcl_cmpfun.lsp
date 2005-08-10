@@ -501,8 +501,8 @@
 (si::putprop 'cmp-array-element-type 'c1cmp-array-element-type 'c1)
 
 (defun cons-type-length (type)
-  (cond ((null type) 0)
-	((and (consp type) (eq (car type) 'cons)) (+ 1 (cons-type-length (caddr type))))))
+  (cond ((and (consp type) (eq (car type) 'cons)) (+ 1 (cons-type-length (caddr type))))
+	(0)))
 
 (defun c1make-array (args)
   (let* ((info (make-info))
