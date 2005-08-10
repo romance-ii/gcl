@@ -175,7 +175,7 @@ EXTER char *alloca_val;
 #define ON_STACK_LIST_VECTOR_NEW on_stack_list_vector_new
 #define ON_STACK_MAKE_LIST on_stack_make_list
 object on_stack_cons();
-object on_stack_list(int,...);
+object on_stack_list(fixnum,...);
 /* object on_stack_list_vector(int,va_list); */
 object on_stack_list_vector_new(fixnum,object,va_list);
 object on_stack_make_list();
