@@ -112,8 +112,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
     this needs replacing with another c1 pass soon
   * Fix split-files pathname bug for the nqthms
   * Add back on_stack_list, fix misc 614
+  * accelerated normalize-type without side-effects
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 10 Aug 2005 13:57:05 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 10 Aug 2005 13:58:37 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
