@@ -2,12 +2,12 @@ Source: gclcvs
 Section: interpreters
 Priority: optional
 Maintainer: Camm Maguire <camm@enhanced.com>
-Build-Depends: debhelper, emacs21 | emacsen, libreadline5-dev | libreadline-dev, m4, tk8.4-dev, tetex-bin, texinfo, binutils-dev, libgmp3-dev, autotools-dev
-Standards-Version: 3.6.1
+Build-Depends: debhelper (>= 4.1.16), emacs21 | emacsen, libreadline5-dev | libreadline-dev, m4, tk8.4-dev, tetex-bin, texinfo, binutils-dev, libgmp3-dev, autotools-dev
+Standards-Version: 3.6.2.1
 
 Package: gclcvs
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, ${gcc}, ${binutils}
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${gcc}, ${binutils}, debconf (>= 1.2.0)
 Suggests: gclcvs-doc
 Description: GNU Common Lisp compiler, CVS snapshot
  GNU Common Lisp (GCL) is a Common Lisp compiler and interpreter

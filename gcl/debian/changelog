@@ -115,8 +115,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * accelerated normalize-type without side-effects
   * extra ansi hash functions
   * another split-file fix
+  * Newer standards
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 10 Aug 2005 22:28:01 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 11 Aug 2005 21:22:04 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 

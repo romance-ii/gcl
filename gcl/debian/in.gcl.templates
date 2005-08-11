@@ -1,32 +1,32 @@
 Template: gcl@EXT@/default_gcl_ansi
 Type: boolean
-Description: Use the work-in-progress ansi build by default
- GCL is one of the oldest free common lisp systems still in use.
- Several production systems have used it for over a decade.  The common
- lisp standard in effect when GCL was first released is known as
- "Common Lisp, the Language" (CLtL1) after a book by Steele of the same
- name providing this specification.  Subsequently, a much expanded
- standard was adopted by the American National Standards Institute
- (ANSI), which is still considered the definitive common lisp language
- specification to this day.  GCL is in the process of providing an ANSI
- compliant image in addition to its traditional CLtL1 image still in
- production use.  Setting this variable will determine which image you
- will use by default on executing 'gcl@EXT@'.  You can locally override this
- choice by setting the GCL_ANSI environment variable to any non-empty
- string for the ANSI build, and to the empty string for the CLtL1
- build, e.g. GCL_ANSI=t gcl@EXT@.  You may be interested in reviewing the
- ANSI test results sketching the level of compliance achieved thus far
- in /usr/share/doc/gcl@EXT@/test_results.gz.  The flavor of the build in force
- will be reported in the initial startup banner.
+_Description: Use the work-in-progress ansi build by default
+ GCL is one of the oldest free common lisp systems still in use. Several
+ production systems have used it for over a decade.  The common lisp
+ standard in effect when GCL was first released is known as "Common Lisp,
+ the Language" (CLtL1) after a book by Steele of the same name providing
+ this specification.  Subsequently, a much expanded standard was adopted by
+ the American National Standards Institute (ANSI), which is still
+ considered the definitive common lisp language specification to this day. 
+ GCL is in the process of providing an ANSI compliant image in addition to
+ its traditional CLtL1 image still in production use.  Setting this
+ variable will determine which image you will use by default on executing
+ 'gcl@EXT@'.  You can locally override this choice by setting the GCL_ANSI
+ environment variable to any non-empty string for the ANSI build, and to
+ the empty string for the CLtL1 build, e.g. GCL_ANSI=t gcl@EXT@.  You may
+ be interested in reviewing the ANSI test results sketching the level of
+ compliance achieved thus far in /usr/share/doc/gcl@EXT@/test_results.gz. 
+ The flavor of the build in force will be reported in the initial startup
+ banner.
 
 Template: gcl@EXT@/default_gcl_prof
 Type: boolean
-Description: Use the profiling build by default
- GCL now has support for profiling via gprof.  Please see the
- documentation for si::gprof-start and si::gprof-quit for details.
- This build is slower than builds without gprof support, so this is not
- recommended for final production use. You can locally override this
- choice by setting the GCL_PROF environment variable to any non-empty
- string for profiling support, and to the empty string for the more
- optimized builds, e.g. GCL_PROF=t gcl@EXT@.  If profiling is enabled, this will
- be reported in the initial startup banner.
+_Description: Use the profiling build by default
+ GCL now has support for profiling via gprof.  Please see the documentation
+ for si::gprof-start and si::gprof-quit for details. This build is slower
+ than builds without gprof support, so this is not recommended for final
+ production use. You can locally override this choice by setting the
+ GCL_PROF environment variable to any non-empty string for profiling
+ support, and to the empty string for the more optimized builds, e.g.
+ GCL_PROF=t gcl@EXT@.  If profiling is enabled, this will be reported in
+ the initial startup banner.
