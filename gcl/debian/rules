@@ -139,7 +139,7 @@ debian/control.rm:
 debian/control: debian/control.rm
 	cp debian/control.$(EXT) debian/control
 
-clean: debian/control debian/gcl.templates
+clean: debian/control debian/gcl$(EXT).templates
 	dh_testdir
 	dh_testroot
 	rm -f *stamp

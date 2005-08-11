@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-02-19 01:34-0300\n"
+"POT-Creation-Date: 2005-08-11 23:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,13 +26,13 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../gcl.templates:3
+#: ../gclcvs.templates:3
 msgid "Use the work-in-progress ansi build by default"
 msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../gcl.templates:3
+#: ../gclcvs.templates:3
 msgid ""
 "GCL is one of the oldest free common lisp systems still in use. Several "
 "production systems have used it for over a decade.  The common lisp standard "
@@ -43,30 +43,30 @@ msgid ""
 "definitive common lisp language specification to this day.  GCL is in the "
 "process of providing an ANSI compliant image in addition to its traditional "
 "CLtL1 image still in production use.  Setting this variable will determine "
-"which image you will use by default on executing 'gcl'.  You can locally "
+"which image you will use by default on executing 'gclcvs'.  You can locally "
 "override this choice by setting the GCL_ANSI environment variable to any non-"
 "empty string for the ANSI build, and to the empty string for the CLtL1 "
-"build, e.g. GCL_ANSI=t gcl.  You may be interested in reviewing the ANSI "
+"build, e.g. GCL_ANSI=t gclcvs.  You may be interested in reviewing the ANSI "
 "test results sketching the level of compliance achieved thus far in /usr/"
-"share/doc/gcl/test_results.gz.  The flavor of the build in force will be "
+"share/doc/gclcvs/test_results.gz.  The flavor of the build in force will be "
 "reported in the initial startup banner."
 msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../gcl.templates:24
+#: ../gclcvs.templates:24
 msgid "Use the profiling build by default"
 msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../gcl.templates:24
+#: ../gclcvs.templates:24
 msgid ""
 "GCL now has support for profiling via gprof.  Please see the documentation "
 "for si::gprof-start and si::gprof-quit for details. This build is slower "
 "than builds without gprof support, so this is not recommended for final "
 "production use. You can locally override this choice by setting the GCL_PROF "
 "environment variable to any non-empty string for profiling support, and to "
-"the empty string for the more optimized builds, e.g. GCL_PROF=t gcl.  If "
+"the empty string for the more optimized builds, e.g. GCL_PROF=t gclcvs.  If "
 "profiling is enabled, this will be reported in the initial startup banner."
 msgstr ""
