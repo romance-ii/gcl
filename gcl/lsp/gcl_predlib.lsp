@@ -411,7 +411,7 @@
 
 (deftype complex (&optional (rp 'real)) `(complex ,(if (eq rp '*) 'real rp)))
 (deftype cons (&optional (car t) (cdr t)) `(cons ,(if (eq car '*) t car)  ,(if (eq cdr '*) t cdr)))
-
+(deftype structure-object () `(structure))
 
 (defun non-keyword-symbol-p (x)
   (and (symbolp x) (not (keywordp x))))
@@ -1001,8 +1001,8 @@
   (cond ((not x))
 	((eq x t))
 	((and (consp x) 
-	      (consp (car x)) (= (length (car x)) 3)
-	      (consp (cdr x)) (= (length (cdr x)) 3)))))
+	      (consp (car x)) (listp (caar x)) (= (length (car x)) 3)
+	      (consp (cdr x)) (listp (cadr x)) (= (length (cdr x)) 3)))))
 
 (defun cons^ (x y)
   (cond ((eq x t) y)
@@ -1022,8 +1022,8 @@
 	       (cond ((not (cadr x)))
 		     ((eq (cadr x) t) nil)
 		     ((cons-atm (cadr x))
-		      (let ((car (ntp-to-nil (ntp-not (caadr x))));FIXME
-			    (cdr (ntp-to-nil (ntp-not (cdadr x)))))
+		      (let ((car (ntp-to-nil (ntp-not (copy-tree (caadr x)))));FIXME
+			    (cdr (ntp-to-nil (ntp-not (copy-tree (cdadr x))))))
 			(cond ((and car cdr) 
 			       (cons-to-nil 
 				(sigalg-op 'or `(,car . ,(nprocess-type '(t))) 

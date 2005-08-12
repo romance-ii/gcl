@@ -116,8 +116,11 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * extra ansi hash functions
   * another split-file fix
   * Newer standards
+  * Fix cons type side-effect-induced bug -- FIXME try to remove the
+    side effects and see how bad the performance gets
+  * deftype structure-object to structure
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 11 Aug 2005 21:22:04 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 12 Aug 2005 15:27:19 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
