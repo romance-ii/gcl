@@ -47,7 +47,11 @@
   (let ((f (and (not i) (symbolp tp) (get tp 'type-predicate))))
     (when f (return-from typep-int (let ((z (funcall f object))) z))))
   (case tp
-    (cons (and (consp object) (typep-int (car object) (car i)) (typep-int (cdr object) (cadr i))))
+    (cons (and (consp object)
+	       (or (endp i)
+		   (and (typep-int (car object) (car i))
+			(or (endp (cdr i))
+			    (typep-int (cdr object) (cadr i)))))))
     (member (member object i))
     (not (not (typep-int object (car i))))
     (or
@@ -60,7 +64,7 @@
        (unless (typep-int object (car l)) (return nil))))
     (satisfies (let ((z (funcall (car i) object))) z))
     ((t) t)
-    ((nil) (not object))
+    ((nil) nil)
     (boolean (or (eq object 't) (eq object 'nil)))
     (fixnum (eq (type-of object) 'fixnum))
     (bignum (eq (type-of object) 'bignum))
