@@ -2,7 +2,7 @@ This is a list of bugs that have been found in gcl.  When you fix
 a bug, add the notation (FIXED) after the bug number, but leave the
 number in place so it isn't reused.
 
-1. (subtypep s 'structure-object) isn't working properly when
+1 (FIXED). (subtypep s 'structure-object) isn't working properly when
   s is a structure class name or a structure class object.
   This is causing 95 ansi-test failures.
 

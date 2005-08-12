@@ -1316,26 +1316,26 @@ object x, l;
 	return(FALSE);
 }
 
-static void
-FFN(siLmemq)()
-{
-	object x, l;
+/* static void */
+/* FFN(siLmemq)() */
+/* { */
+/* 	object x, l; */
 
-	check_arg(2);
+/* 	check_arg(2); */
 
-	x = vs_base[0];
-	l = vs_base[1];
+/* 	x = vs_base[0]; */
+/* 	l = vs_base[1]; */
 
-	for (;  type_of(l) == t_cons;  l = l->c.c_cdr)
-		if (x == l->c.c_car) {
-			vs_base[0] = l;
-			vs_popp;
-			return;
-		}
+/* 	for (;  type_of(l) == t_cons;  l = l->c.c_cdr) */
+/* 		if (x == l->c.c_car) { */
+/* 			vs_base[0] = l; */
+/* 			vs_popp; */
+/* 			return; */
+/* 		} */
 	
-	vs_base[0] = Cnil;
-	vs_popp;
-}
+/* 	vs_base[0] = Cnil; */
+/* 	vs_popp; */
+/* } */
 
 void
 delete_eq(x, lp)
@@ -1440,6 +1440,6 @@ gcl_init_list_function()
 	make_function("RASSOC-IF", Lrassoc_if);
 	make_function("RASSOC-IF-NOT", Lrassoc_if_not);
 
-	make_si_function("MEMQ", siLmemq);
+/* 	make_si_function("MEMQ", siLmemq); */
 
 }
