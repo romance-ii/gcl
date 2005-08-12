@@ -782,10 +782,8 @@
 
 (defun maybe-or-push (x res)
   (cond ((not res) (list x))
-	((and (equal (elout (caar res) (car x) '<) (caar res))
-	      (equal (elout (cdr x) (cdar res) '>) (cdar res))) 
-	 res)
-	((cons x res))))
+	((elgt x (car res)) (cons x res))
+	((cons (cons (elout (caar res) (car x) '<) (elout (cdr x) (cdar res) '>)) (cdr res)))))
 
 (defun range-not (x &optional res (last '* lastp))
   (cond ((not x) (nreverse (if (and lastp (eq last '*)) res (cons (cons (elcomp last) '*) res))))
