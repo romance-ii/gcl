@@ -376,7 +376,7 @@
 			      (setf val (symbol-value val)))
 			  (and (constantp val)
 			       (setf (cadr v) (coerce val type)))))
-		(cond ((member type '(signed-char unsigned-char
+		(cond ((memq type '(signed-char unsigned-char
 						short unsigned-short
 					 long-float
 					 bit))
