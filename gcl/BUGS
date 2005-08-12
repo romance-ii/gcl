@@ -1,0 +1,39 @@
+This is a list of bugs that have been found in gcl.  When you fix
+a bug, add the notation (FIXED) after the bug number, but leave the
+number in place so it isn't reused.
+
+1. (subtypep s 'structure-object) isn't working properly when
+  s is a structure class name or a structure class object.
+  This is causing 95 ansi-test failures.
+
+2. (sublis x y :test #'fn) is passing the arguments to fn in the
+  wrong order.  The problem here is that the :key argument is being
+  applied somewhat unusually, making the usual TEST macro not do
+  quite the right thing.  ansi-tests: sublis.9 and sublis.10
+
+3. (nsublis x y :test #'fn) is passing the arguments to fn in the
+  wrong order. Similar to bug #2.  ansi-tests:  nsublis.10 and nsublis.11
+
+4. (last x n) is incorrectly signaling an error when n is a positive
+  bignum.  Instead, it should return x.   ansi-tests: last.11, last.12
+
+5. The map* functions should signal a type error when given an improper
+  list.  They do so, but the slots of the type error object don't
+  satisfy the property that the value in the datum slot is not of
+  the type in the expected-type slot.  ansi-tests: mapc.error.8,
+  mapcar.error.8, mapcan.error.8, mapl.error.8, maplist.error.11,
+  mapcon.error.8
+
+6. Similar to #5, but the error is for GET-PROPERTIES.  ansi-tests:
+   get-properties.error.[456]
+
+7. (SETF (GETF form1 form2 form3) form4) is evaluating the subforms
+  in the wrong order: form3 is being evaluated before (the subforms of)
+  form1 and form2.  ansi-test: setf-getf.order.2
+
+8. Similar to #5, but the error is for GETF.  ansi-tests: getf.error.[45]
+
+9. REMF is violating the requirement that the value of the place be
+  read out after all the other subforms of the REMF form are computed
+  (even the ones to the right of the place form; see section 5.1.3
+  of CLtS).  ansi-test:  remf.order.3
