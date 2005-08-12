@@ -147,10 +147,14 @@
       (and (pathnamep object)
 	   (not (endp (si:pathname-lookup (pathname-host object)
 				    	  si:*pathname-logical*)))))
-    (t (cond ((setq tem (when (symbolp tp) (get tp 'deftype-definition)))
-	      (typep-int object (apply tem i)))
-	     ((if (symbolp tp) (get tp 'si::s-data) (typep-int tp 's-data))
-	      (let ((z (structure-subtype-p object tp))) z))))))
+    (t (cond 
+	 ((setq tem (when (symbolp tp) (get tp 'deftype-definition)))
+	  (typep-int object (apply tem i)))
+	 ((if (symbolp tp) (get tp 'si::s-data) (typep-int tp 's-data))
+	  (let ((z (structure-subtype-p object tp))) z))
+	 ((typep tp 'class)
+	  (values (subtypep (type-of object) tp)))))))
+	 
 
 ;;; TYPEP predicate.
 ;;; FIXME --optimize with most likely cases first
