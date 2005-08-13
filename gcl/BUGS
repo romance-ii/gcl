@@ -29,11 +29,174 @@ number in place so it isn't reused.
 
 7. (SETF (GETF form1 form2 form3) form4) is evaluating the subforms
   in the wrong order: form3 is being evaluated before (the subforms of)
-  form1 and form2.  ansi-test: setf-getf.order.2
+  form1 and form2.  ansi-tests: setf-getf.order.2
 
 8. Similar to #5, but the error is for GETF.  ansi-tests: getf.error.[45]
 
 9. REMF is violating the requirement that the value of the place be
   read out after all the other subforms of the REMF form are computed
   (even the ones to the right of the place form; see section 5.1.3
-  of CLtS).  ansi-test:  remf.order.3
+  of CLtS).  ansi-tests:  remf.order.3
+
+10. Similar to #5, but on ELT when the index is out of range.  Should
+  return a type-error with datum == the index and type ==
+  `(integer 0 (,(length sequence))) (or NIL if the sequence has length 0).
+  ani-tests:  elt.1, elt.1b, elt.2, 
+
+11. There's an internal type error somewhere in the code exercised by
+  elt.10 -- the invalid type (integer 0 . 1) is being passed to TYPEP
+  (and similarly for elt.14, elt-v.1, elt-v.10, elt-adj-array.1,
+   elt-adj-array.10, elt-displaced-array.1, elt-fill-pointer.[3468],
+   and elt,error.[45]).
+
+12. Coerce can't coerce a vector of characters into a base-string.
+  ansi-tests: fill.string.10
+
+13. MAKE-SEQUENCE fails on type argument NULL,. (CLASS-OF NIL), or LIST.
+   ansi-tests: make-sequence,9, make-sequence.49. make-sequence.57
+
+14. The datum and expected type fields of the type errors thrown by
+   MAKE-SEQUENCE, MAP  do not satisfy the constraint that the datum
+   is not of type expected-type.  ansi-tests: make-sequence.error.1,
+   make-sequence.error.2, make-sequence.error.14, make-sequence.error.16,
+   map.error.1, map.error.1a, map.error.11.
+
+15. MAP fails on type argument NULL, (OR (VECTOR 5) (VECTOR 10))
+   ansi-tests: map-null.1, map.48
+
+16. NREVERSE is broken on vectors of element type LISP:SIGNED-SHORT
+
+    (let ((v (make-array '(7) :initial-contents '(1 1 0 1 1 1 0)
+                  :element-type 'lisp:signed-short)))
+      (nreverse v))
+    ==> #(0 1 1 1 1 1 0)
+
+   (ansi-tests: nreverse-vector.7, nreverse-vector.8)
+
+17. The setf expander for SUBSEQ returns the wrong value (the entire
+   vector is returned rather than the aubsequence being assigned.)
+   ansi-tests: subseq.order.[34]
+
+18. CONCATENATE fails on type argument of NULL, as does MERGE.
+   ansi-tests:. concatenate.24, merge-null.1, merge.error.6
+
+19, There are 140 symbols exported from the COMMON-LISP package that
+   should not be external in taht package.
+   ansi-tests: no-extra-symbols-exported-from-common-lisp
+
+20. 19 functions are missing: arithmetic-error-operands
+  broadcast-stream-streams cell-error-name concatenated-stream-streams
+  echo-stream-input-stream echo-stream-output-stream
+  function-lambda-expression get-setf-expansion
+  make-load-form-saving-slots pprint-indent pprint-newline
+  pprint-tab print-not-readable-object simple-condition-format-control
+  synonym-stream-symbol two-way-stream-input-stream
+  two-way-stream-output-stream unbound-slot-instance
+  compiler-macro-function readtable-case.
+
+  ansi-tests: cl-function-symbols.1, dcf-funs and these tests:
+
+   cell-error-name:
+      symbol-value.error.5 symbol-function.error.5 makunbound.2
+
+21. The following macros are missing: define-compiler-macro
+    define-setf-expander define-symbol-macro in-package.
+    ansi-tests: cl-macro-symbols.1, in-package.error.1,
+     dcf-macros, define-setf-expander.error.1,
+     define-setf-expander.[1234567], 
+
+22. GENTEMP should take a package designator as its second argument,
+   not just a package object. ansi-tests: gentemp.[345].
+
+23. (special-operator-p 'symbol-macrolet) should be true.
+   ansi-tests: special-operator-p.1
+
+24. (debatable) special-operator-p should be nil on DECLARE and IN-PACKAGE.
+   ansi-tests: special-operator-p.2
+
+25. (debatable) "USER" should not be a nickname of "COMMON-LISP-USER"
+     (instead, it can name a separate package).
+    ansi-tests: common-lisp-user-package-nicknames
+
+26. FIND-ALL-SYMBOLS should take a string designator, which includes
+    character values.  ansi-tests: find-all-symbols.2
+
+27. Free special declarations do not apply to the final value clauses
+    of iteration forms.  ansi-tests: do-symbols.16 do-external-symbols.16
+
+28. The scope of the bound variable in DO-ALL-SYMBOLS should include
+    the final value form.  ansi-tests: do-all-symbols.4
+
+29. The implicit block in DO-ALL-SYMBOLS should surround the entire
+    loop, including the return value form.  ansi-tests: do-all-symbols.6
+
+30. DO-ALL-SYMBOLS should accept declarations. ansi-tests: do-all-symbols.9
+    do-all-symbols.10 do-all-symbols.11
+
+31. IMPORT should set the home package of any symbol being imported that
+    does not have a home package.  ansi-tests: import.5
+
+32. The setf expander for VALUES evaluates the source form before the subforms
+    of the destination places.  ansi-tests: setf-values.5
+
+33. Order of evaluation problem in expansion of psetq/psetf, possibly involving
+    symbol macros.  ansi-tests: psetq.7 psetf.7
+
+34. Cannot create classes whose names are uninterned symbols.
+    ansi-tests: psetf.35 rotatef.35
+
+35. ROTATEF does not work with no arguments.  snsi-tests: rotatef.3
+
+36. DEFSETF (long form) should produce an implicit block with the name
+    of the accessor-fn.  ansi-tests: defsetf.5a
+
+37. The expansion function produced by DEFSETF (long form) should be defined
+    in the same lexical environment in which the DEFSETF form appears.
+    ansi-tests: defsetf.6a
+
+38. The control error signaled by (throw (gensym) nil) isn't printable
+    when *print-escape* and *print-readably* are nil. ansi-tests: throw-error
+
+39. DOCUMENTATION should be allowed to be called on function objects, not
+    just function names. ansi-tests: define-modify-macro.documentation.1
+    define-modify-macro.documentation.2
+
+40. In DEFUN where the function names is a (SETF <name>) pair, there is an
+    implicit block with name <name>.  ansi-tests: defun.4
+
+41. Free special declarations do not apply to the expressions in &aux,
+    &optional or &key forms of an ordinary lambda list.  See also bug #49.
+    ansi-tests: defun.5 defun.6 defun.7
+
+42. &WHOLE causes an error during macroexpansion in destructuring-bind.
+    ansi-tests: destructuring-bind.20
+    
+43. destructuring-bind fails to destructure in the &rest parameter
+    ansi-tests: destructuring-bind.21
+
+44. The macro function for destructuring-bind (and, I suspect, many
+    other builtin macros) fails to properly signal a program error
+    when called on an invalid number of arguments.  ansi-tests:
+    destructuring-bind.error.[789]
+
+45 .No hash table with :key EQUALP.
+    ansi-tests:  equalp.21
+
+46. EQUALP fails to properly compare hash tables.
+    ansi-tests: equalp.22 to equalp.35
+
+47. The type error signalled by EVERY has the datum and expected-type
+    slots switched.  ansi-tests: every.error.1
+
+48. flet and labels do not accept SETF function names.
+    ansi-tests: flet.17 labels.17 flet.51 labels.26
+
+49. Free special declarations in flet and labels forms do not affect
+    the expressions in the &aux, &optional and &key fields of the
+    ordinary lambda list.  See also bug #41.  ansi-tests: flet.62 flet.63
+    flet.67 labels.41 labels.42 labels.46
+
+50. Funcall should throw an undefined function error when called on a symbol
+    that has a macro function binding but not a function binding.
+    ansi-tests: funcall.error.3
+
