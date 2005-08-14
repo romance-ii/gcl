@@ -98,6 +98,9 @@ number in place so it isn't reused.
 
    cell-error-name:
       symbol-value.error.5 symbol-function.error.5 makunbound.2
+      eval.error.3 eval.error.4 
+   get-setf-expansion
+      get-setf-expansion.error.[12] get-setf-expansion.[123]
 
 21. The following macros are missing: define-compiler-macro
     define-setf-expander define-symbol-macro in-package.
@@ -185,8 +188,9 @@ number in place so it isn't reused.
 46. EQUALP fails to properly compare hash tables.
     ansi-tests: equalp.22 to equalp.35
 
-47. The type error signalled by EVERY has the datum and expected-type
-    slots switched.  ansi-tests: every.error.1
+47. The type error signaled by EVERY and related functions has
+    the datum and expected-type slots switched.  ansi-tests:
+    every.error.1 notany.error.1  notevery.error.1 some.error.1
 
 48. flet and labels do not accept SETF function names.
     ansi-tests: flet.17 labels.17 flet.51 labels.26
@@ -200,3 +204,43 @@ number in place so it isn't reused.
     that has a macro function binding but not a function binding.
     ansi-tests: funcall.error.3
 
+51. function-lambda-expression is not defined.
+    ansi-tests: function-lambda-expression.[123]
+    function-lambda-expression.order.1 function-lambda-expression.error.[12]
+
+52. Lambda forms are no longer of type function.
+    ansi-tests: function.6 function.10 functionp.6 functionp.10
+
+53. Symbols are no longer functions.
+    ansi-tests: functionp.2
+
+54. Free special declarations do not apply to the init forms of a LET or LET*.
+    ansi-tests: let.17 let.17a let*.17 let*.17a let*.18
+
+55. &whole not recognized in macro lambda list
+    anso-tests: macrolet.5 macrolet.36 
+
+56. symbol-macros are not showing up in the macro expansion environment
+    ansi-tests: macrolet.13 macrolet.14 
+
+57. :allow-other-keys not being properly handled in macros with &key in
+    their macro lambda lists.  ansi-tests: macrolet.32 
+
+58. NIL should match anything in a macro lambda lists.
+    ansi-tests: macrlet.39
+
+59, Ordering problem related to presence of symbol macro with side effects
+    in multiple-value-setq.  ansi-tests: multiple-value-setq.[58]
+
+60. Free special declarations should not apply to the initialization
+    forms in PROG, PROG* forms.  ansi-tests: prog.11 prog*.11
+
+61. DEFINE-COMPILER-MACRO is undefined
+
+62. DEFINE-SYMBOL-MACRO is undefined
+
+63. CONSTANTP should take an optional second argument, an environment
+    or nil (and which may be ignored.)  ansi-tests: constantp.6
+    constantp.8 constantp.order.2
+
+64. 
