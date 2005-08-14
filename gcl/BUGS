@@ -243,4 +243,11 @@ number in place so it isn't reused.
     or nil (and which may be ignored.)  ansi-tests: constantp.6
     constantp.8 constantp.order.2
 
-64. 
+64. Free special declarations in a LAMBDA form should not affect
+    the expressions in key, aux, or optional parameters.
+    ansi-tests: lambda.52 lambda.53 lambda.55
+
+65. The second argument to COMPILE is allowed to be a function;
+    not just a lambda expression.  ansi-tests: lambda.55 lambda.56
+
+    
