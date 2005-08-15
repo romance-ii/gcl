@@ -81,7 +81,7 @@ number in place so it isn't reused.
    ansi-tests:. concatenate.24, merge-null.1, merge.error.6
 
 19, There are 140 symbols exported from the COMMON-LISP package that
-   should not be external in taht package.
+   should not be external in that package.
    ansi-tests: no-extra-symbols-exported-from-common-lisp
     all-exported-cl-class-names-are-valid
 
@@ -184,7 +184,7 @@ number in place so it isn't reused.
     when called on an invalid number of arguments.  ansi-tests:
     destructuring-bind.error.[789]
 
-45 .No hash table with :key EQUALP.
+45..No hash table with :key EQUALP.
     ansi-tests:  equalp.21
 
 46. EQUALP fails to properly compare hash tables.
@@ -362,7 +362,7 @@ number in place so it isn't reused.
     the function value #'CONS.
     ansi-tests: standard-generic-function.[12]
 
-88. Numerous problems with TYPE-OF (ansi-tests: type-of.1 type-of.4))
+88. Numerous problems with TYPE-OF (ansi-tests: type-of.1 type-of.4)
 
    a. TYPE-OF of a nonnegative integer must be a subtype of UNSIGNED-BYTE.
    b. #\Rubout, #\Tab, #\Backspace, #\Return, and #\Page are BASE-CHARs,
@@ -398,3 +398,74 @@ number in place so it isn't reused.
 
 91. typep should signal an error if the type is a compound function
     type.  ansi-tests: typep.error.7
+
+92. The CPL (class precedence list) tests are failing due to a bug
+    in PCL that also showed up in SBCL and CMUCL.  The function starts
+    returning NIL after a few calls.  ansi-tests: *-CPL
+
+93. READTABLE-CASE is undefined (and its SETF form)
+    ansi-tests: read-symbol.1[678] read-symbol.25
+     readtable-case.* set-syntax-from-char-trait-*
+
+94. Binding *READ-SUPPRESS* to true doesn't totally suppress reading;
+    reading a list still returns a list, as does reading a vector
+    or pathname.
+    ansi-tests: read-suppress.9 read-suppress.1[01245]
+    read-suppress.sharp-quote.[1235678]
+    read-suppress.sharp-left-paren.[123456789]
+    read-suppress.sharp-left-paren.1[012]
+    read-suppress.sharp-p.[1234567]
+    read-suppress.sharp-equal.4
+    
+
+95. Binding *READ-SUPPRESS* to true causes the reading of complex
+    numbers to abort with a type error.
+    read-suppress.sharp-c.[123456789] read-suppress.sharp-c.1[12345]
+
+96. In read suppressed mode, #r does not read the full token following
+    it, but stops at the # character.  ansi-tests: read-suppress.sharp-r.10
+
+97. In read suppressed mode, ## terms are not read correctly
+    ansi-tests: read-suppress.sharp-sharp.[1234]
+
+98. Reading a token starting with a right paren (an invalid character)
+    should signal a READER-ERROR, but it does not.
+    ansi-tests: read-suppress.error.1
+
+99. Reading #< should signal a reader error.
+    ansi-tests: read-suppress.error.2 set-syntax-from-char.right-paren
+
+100. Setting the syntax of a character to that of #\" doesn't work.
+    ansi-tests: set-syntax-from-char.double-quote
+
+101. Initially, for a new dispatching macro character, every following
+    character should have the dispatching macro character function that
+    signals a read-error.  This is not happening.
+    ansi-tests: make-dispatch-macro-character.3
+
+102. #\Backspace is an invalid character in the standard syntax, and
+    reading it should signal a reader-error.  This is not happening.
+    ansi-tests: syntax.backspace.invalid
+
+103. #\Rubout is an invalid character in the standard syntax, and
+    reading it should signal a reader-error.  This is not happening.
+    ansi-tests: syntax.rubout.invalid
+
+104. The string "#0()" should read as the simple vector of length 0,
+    but it causes an error. ansi-tests: syntax.sharp-left-paren.2
+
+105. Various malformations of #* syntax should lead to reader errors,
+    but do not.  ansi-tests: syntax.sharp-asterisk.error.[123]
+
+106. Binding *read-eval* to nil should cause #. to throw a reader
+    error, but it does not always.  ansi-tests: syntax.sharp-dot.error.3
+
+107. #C should tolerate whitespace before the left paren.
+    ansi-tests: syntax.sharp-c.5
+
+108. #+(:and) #+(:or) #+(:not ...) lead to errors in the reader (which
+    is wrong).  The problem seems to be that the feature expression
+    is being read in the current package, not the keyword package.
+    ansi-tests: syntax.sharp-plus.5 syntax.sharp-plus.7 syntax.sharp-plus.8
+     syntax.sharp-plus.12
+
