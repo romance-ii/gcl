@@ -280,6 +280,7 @@ number in place so it isn't reused.
 73. MACRO-FUNCTION should take an optional second argument (that
     is an environment or NIL), but it does not.
     ansi-tests: macro-function.[2379] macro-function.1[135]
+      loop-finish.error.1
 
 74. SUBTYPEP problems (ansi-tests: types.3)
 
@@ -430,10 +431,11 @@ number in place so it isn't reused.
 
 98. Reading a token starting with a right paren (an invalid character)
     should signal a READER-ERROR, but it does not.
-    ansi-tests: read-suppress.error.1
+    ansi-tests: read-suppress.error.1 syntax.right-paren-error.1
 
 99. Reading #< should signal a reader error.
     ansi-tests: read-suppress.error.2 set-syntax-from-char.right-paren
+     syntax.sharp-less-than.1
 
 100. Setting the syntax of a character to that of #\" doesn't work.
     ansi-tests: set-syntax-from-char.double-quote
@@ -468,4 +470,32 @@ number in place so it isn't reused.
     is being read in the current package, not the keyword package.
     ansi-tests: syntax.sharp-plus.5 syntax.sharp-plus.7 syntax.sharp-plus.8
      syntax.sharp-plus.12
+
+109. Reading # followed by whitespace[1] should signal a reader-error,
+    but it is not (it is signaling a simple-error that is not a reader-error).
+    ansi-tests: syntax.sharp-whitespace.1
+
+110. Reading # followed by a right parenthesis should signal a reader-error,
+    but it is not (it is signaling a simple-error that is not a reader-error).
+    ansi-tests: syntax.sharp-right-paren.1
+
+111. Reading a rational with zero denominator should signal a reader error.
+    ansi-tests: syntax.number-token.error.1
+
+112. Tokens containing only dots and not being a single dot in a position
+    where a consing dot is expected should cause a reader-error.
+    ansi-tests: syntax.dot-error.[1234567]
+
+113. Reading a comma while not in a backquoted form should signal a
+     reader-error.  ansi-tests: syntax.comma-error.[12]
+
+114. Free special declarations in DO, DO* forms should not affect the init
+     forms.  ansi-tests: do.16 do*.16
+
+115. NIL is a destructuring pattern that matches anything (and binds
+     nothing) and should be allowed in for-as-arithmetic clauses.
+     ansi-tests: loop.1.5[013456] 
+
+116. A while or until clause in a LOOP should be executed at its location,
+     not earlier.  ansi-tests: loop.11.29 loop.11.3[01234]
 
