@@ -99,9 +99,15 @@ number in place so it isn't reused.
 
    cell-error-name:
       symbol-value.error.5 symbol-function.error.5 makunbound.2
-      eval.error.3 eval.error.4 
+      eval.error.3 eval.error.4 cell-error-name.[123456]
+      cell-error-name.error.[12]
+
    get-setf-expansion
       get-setf-expansion.error.[12] get-setf-expansion.[123]
+
+   simple-condition-format-control
+      error.1 error.4 cerror.1 cerror.4
+      
 
 21. The following macros are missing: define-compiler-macro
     define-setf-expander define-symbol-macro in-package.
@@ -297,6 +303,9 @@ number in place so it isn't reused.
    g. READER-ERROR PARSE-ERROR ==> NIL T
       (see also reader-error-cpl)
    h. READER-ERROR STREAM-ERROR ==> NIL T
+
+   (see also condition.2 for subtype failures on expected subtype
+    relationships of condition types)
 
 75. More SUBTYPEP problems (ansi-tests: types.9a)
 
@@ -499,3 +508,98 @@ number in place so it isn't reused.
 116. A while or until clause in a LOOP should be executed at its location,
      not earlier.  ansi-tests: loop.11.29 loop.11.3[01234]
 
+117. Creating a structure whose name is an uninterned symbol causes the
+     class that is created to be unfindable with FIND-CLASS.
+     ansi-tests: struct-test-31/1[3457] struct-test-31/15a
+
+118. The -P predicate created for a structure of type (vector t) causes
+     an error on the string (string (code-char 0)).
+     ansi-tests: struct-test-41/3 struct-test-43/3
+
+119. There should be an initialization argument :format-control for
+     simple-errors and simple-warnigns.  ansi-tests: error.[2389]
+     error.1[02] cerror.[23] cerror.2a warn.8 warn.10 warn.19
+
+120. Error should take a formatter (not just a format string) as its first
+     argument. ansi-tests: error.5 error.1 cerror.4a cerror.5
+
+121. The datum slot of the error signaled by a CHECK-TYPE failure
+     is not the value being checked. ansi-tests: check-type.[23567]
+
+122. invoke-debugger is not signaling a program error in safe code
+     when called with an incorrect number of arguments.
+
+123. The (<type> <handler>) pairs of HANDLER-BIND should accept
+     literal function values as handlers, but uncompiled function
+     objects (which are improperly implemented as CONSes) cause
+     an error.  ansi-tests: handler-bind.9
+
+     (This is also a problem with function literals occuring
+      in other expressions, but there isn't a test for that
+      in the eval/compile section of ansi-tests.)
+
+124. HANDLER-BIND is not properly handing off a declined condition
+     to a following handler in some cases.  ansi-tests: handler-bind.11
+
+125. HANDLER-BIND is not accepting condition class objects as type
+     designators.  ansi-tests: handler-bind.17
+
+126. HANDLER-CASE is not accepting condition class objects as type
+     designators.  ansi-tests: handler-case.5
+
+127. HANDLER-CASE did not accept a DECLARE expression (by itself)
+     in the body of a handler clause.  ansi-tests: handler-case.28
+
+128. Free special declarations in the handler clauses of a HANDLER-CASE
+     are improperly affecting the expressions in &aux variables.
+     ansi-tests: handler-case.29
+
+129. (typep <condition object> (find-class 'condition)) ==> NIL
+     (typep <condition object> (find-class '<its condition class name>)) ==> NIL
+     ansi-tests: condition-1/is-a-member-of-class/condition and
+      about 30 similar tests
+
+130. compute-restarts is returning a restarts that are not associated with
+     the condition being tested.  ansi-tests: compute-restarts.9
+
+131. restart-case with macro, symbols forms not not properly handled:
+     ansi-tests: restart-case.29 restart-case.30 restart-case.31
+
+132. Free special declarations in restart definitions in restart-case
+     do not have the correct scope.  ansi-tests: restart-case.36
+
+133. continue, store-value, and use-value functions are invoking restarts
+     that are applicable to other conditions than the argument condition.
+     (Or, with-condition-restarts may not be behaving properly)
+     ansi-tests: continue.2 store-value.2 use-value.2
+
+134. A safe call (make-condition) should signal a program error.
+     ansi-tests: make-condition.error.1
+
+135. Division by zero should be signaling a divide-by-zero condition,
+     not a generic simple error.  ansi-tests /.error.[2345678]
+
+136. (/ -1) is returning three values, not just one.
+     ansi-tests: /.2
+
+137. (expt -1 0.0) should be 1.0 (of the appropriate floating type),
+     but the result being returned is #c(1.0 0.0).
+     ansi-tests: expt.18 expt.19 expt.20 expt.21
+
+138. (lcm) should yield 1, not an error.
+     ansi-tests: lcm.1
+
+139. (typep 1 '(real (0))) ==> error
+     ansi-tests: random.error.3
+
+140. (phase 0) ==> error (logarithmic singularity)
+     ansi-tests: phase.1
+
+141. (float x) should eql x when x is a float, but short-floats
+     are being converted to single-floats
+     (eql (float 1.0s0) 1.0s0) ==> NIL
+     ansi-tests: float.5
+
+142. rational and rationalize should signal type errors on arguments
+     that are not of type real in safe code.
+     ansi-tests: rational.error.4 rationalize.error.4
