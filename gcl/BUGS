@@ -589,7 +589,8 @@ number in place so it isn't reused.
 138. (lcm) should yield 1, not an error.
      ansi-tests: lcm.1
 
-139. (typep 1 '(real (0))) ==> error
+139. (typep 1 '(real (0))) ==> error  (and similarly for
+        (typep 1 '(integer (0))).)
      ansi-tests: random.error.3
 
 140. (phase 0) ==> error (logarithmic singularity)
@@ -603,3 +604,97 @@ number in place so it isn't reused.
 142. rational and rationalize should signal type errors on arguments
      that are not of type real in safe code.
      ansi-tests: rational.error.4 rationalize.error.4
+
+143. Apparent compiler problem in this function:
+
+     (defun digit-char.1.body.old ()
+       (loop for r from 2 to 36 always
+            (loop for i from 0 to 36
+               always (let* ((c (digit-char i r))
+                             (result
+                              (if (>= i r) (null c)
+                                  (eqlt c (char +extended-digit-chars+ i)))))
+                        (unless result
+                          (format t "~A ~A ~A~%" r i c))
+                        result))))
+
+      When called, it prints  2 2 p and returns nil.  However,
+      (digit-char 2 2) ==> nil when called at the REPL.
+
+      (this is from digit-char.1, but that test has been changed.)
+
+144. digit-char should take at most two arguments, but it is failing
+     to signal a program error in safe code when given more.
+     ansi-tests: digit-char.error.2
+
+145. standard-char-p should signal a type error in safe code when
+     called on a non-character.  ansi-tests: standard-char-p.3
+
+146. code-char should signal an error in safe code when called with
+     more than one argument.  ansi-tests: code-char.error.2
+
+147. adjust-array does not have the correct semantics when performed
+     on the middle of a chain of three displaced bit vectors.  The chain
+     appears to have been improperly short-circuited.
+     ansi-tests: adjust-array.bit-vector.adjustable.13
+
+148. fill-pointer should signal a type error when called with vectors
+     that lack fill pointers.  It does, but the expected-type field
+     is wrong.  ansi-tests: fill-pointer.error.[36]
+
+149. The value (upgraded-array-element-type 'base-char) should be
+     type-equivalent to base-char.  However, it is string-char,
+     and (subtypep 'string-char 'base-char) ==> nil t
+     ansi-tests: upgraded-array-element-type.2
+
+150. upgraded-array-element-type violates the 'preserves subtype'
+     properties for numerous types.  For example:
+
+      (upgraded-array-element-type '(eql 2)) ==> lisp:signed-char
+      but
+      (upgraded-array-element-type '(unsigned-byte 16)) ==>
+             lisp:unsigned-short
+
+     ansi-tests: upgraded-array-element-type.8
+
+151. (upgraded-array-element-type nil) ==> t, but it should be nil.
+
+152. vector-pop should signal a type-error when passed a vector
+     that lacks a fill pointer.  It does, but the expected-type
+     slot is wrong.  ansi-tests: vector-pop.error.[15]
+
+153. (make-hash-table :size 0) signals an error, but 0 is a legal
+     value for the size parameter.  ansi-tests: make-hash-table.2
+
+154. equalp hash tables are not supported.
+     ansi-tests: make-hash-table.1[01] hash-table-count.[59]
+     hash-table-rehash-threshold.[23] hash-table-test.[234]
+     gethash.zero.4 remhash.4 clrhash.4 maphash.[36]
+     with-hash-table-iterator.7
+ 
+155. (make-hash-table :rehash-threshold x) errors:
+
+    a. x == 0 (or 0.0s0, or 0.0)  signals an error, but zero
+     is a legal value for this parameter.  ansi-tests:
+     make-hash-table.1[6789] make-hash-table.20
+     
+    b. x == 1/2 signals an error, but this is a legal value for
+     this parameter.  ansi-tests: make-hash-table.21
+
+156. The third argument to GETHASH in the SETF form should be
+    allowed, but instead is causing an error.
+    ansi-tests: gethash.5 gethash.order.4
+
+157. The last invocation of the local macro in WITH-HASH-TABLE-ITERATOR
+    should return just a single value, NIL, but it is returning
+    three values.  ansi-tests: with-hash-table-iterator.4
+
+158. PATHNAME, when called on a stream, should return the pathname
+    that was used to create the stream.  However, for logical pathnames,
+    this is not happening -- the physical pathname corresponding to the
+    logical pathname is returned instead.
+    ansi-tests: logical-pathname.3
+
+159. ensure-directories-exist should signal a file-error if part of
+    the directory is wild, but it does not.
+    ansi-tests: ensure-directories-exist.error.1
