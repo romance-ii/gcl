@@ -107,6 +107,9 @@ number in place so it isn't reused.
 
    simple-condition-format-control
       error.1 error.4 cerror.1 cerror.4
+
+   synonym-stream-symbol:
+      synonym-stream-symbol.1 synonym-stream-symbol.error.[12]
       
 
 21. The following macros are missing: define-compiler-macro
@@ -698,3 +701,50 @@ number in place so it isn't reused.
 159. ensure-directories-exist should signal a file-error if part of
     the directory is wild, but it does not.
     ansi-tests: ensure-directories-exist.error.1
+
+160. stream-element-type is returning :default on a stream opened
+    with OPEN.  This violates the constraint that this type must
+    be a subtype of integer or character.  ansi-tests: stream-element-type.6
+
+161. Cannot write (1- (ash 1 32)) to a stream with :element-type
+    (unsigned-byte 32) using write-byte. ansi-tests: read-byte.3
+     read-byte.4 file-length.[2345]
+
+162. peek-char advances the file position of echo streams.
+     ansi-tests: peek-char.17
+
+163  Passing NIL to the :start argument of read-sequence or write-sequence
+     is treated as if the parameter were not present.  This is incorrect:
+     :start, if provided, must be a nonnegative integer, and should signal
+     a type error in safe calls otherwise..  ansi-tests:
+     read-sequence.error.9 write-sequence.error.15
+
+164. file-string-length is computing the wrong thing.  It should compute
+     the change in file position after an object is printed as a sequence
+     of characters, not as printed in readable representation.  #\a, for
+     example, should occupy one position, not three.
+     ansi-tests: file-string-length.[12]
+
+165. Free declarations in with-open-file forms should not have the return
+     value form in their scope.  ansi-tests: with-open-file.[789]
+
+166. open-stream-p reports that a string-stream (input or output)
+     is still open, even after it has been closed.  ansi-tests:
+     with-open-stream.[6789]
+
+167. Free declarations in a with-open-stream form are incorrectly
+     being applied to the return value form.  ansi-tests: with-open-stream.10
+
+168. (typep (make-broadcast-stream) 'broadcast-stream) ==> nil (and related).
+     ansi-tests: make-broadcast-stream.[123]
+
+169. file-position should return 0 on null broadcast streams.
+     ansi-tests: make-broadcast-stream.6
+
+170. file-string-length should return 1 on null broadcast streams.
+     ansi-tests: make-broadcast-stream.7
+
+171. make-broadcast-stream should signal a type error in safe calls
+     when an argument is not an output stream.
+     ansi-tests: make-broadcast-stream.error.[12]
+
