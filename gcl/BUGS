@@ -110,6 +110,30 @@ number in place so it isn't reused.
 
    synonym-stream-symbol:
       synonym-stream-symbol.1 synonym-stream-symbol.error.[12]
+
+   broadcast-stream-streams:
+      broadcast-stream-streams.[12]
+      broadcast-stream-streams.error.[12]
+
+   two-way-stream-input-stream:
+      two-way-stream-input-stream.1
+      two-way-stream-input-stream.error.[12]
+
+   two-way-stream-output-stream:
+      two-way-stream-output-stream.1
+      two-way-stream-output-stream.error.[12]
+
+   echo-stream-input-stream:
+      echo-stream-input-stream.1
+      echo-stream-input-stream.error.[12]
+
+   echo-stream-output-stream:
+      echo-stream-output-stream.1
+      echo-stream-output-stream.error.[12]
+
+   concatenated-stream-streams:
+      concatenated-stream-streams.[12345]
+      concatenated-stream-streams.error.[12]
       
 
 21. The following macros are missing: define-compiler-macro
@@ -748,3 +772,43 @@ number in place so it isn't reused.
      when an argument is not an output stream.
      ansi-tests: make-broadcast-stream.error.[12]
 
+172. open-stream-p returns T on a two-way-stream, echo-stream,
+     or concatenated-stream that has been closed.
+     ansi-tests: make-two-way-stream.2 make-echo-stream.10
+      make-concatenated-stream.27
+
+173. make-two-way-stream should signal a type error if the output
+     stream argument is not an output stream.  It does so, but
+     the expected-type slot is wrong.
+     ansi-tests: make-two-way-stream.error.[67]
+
+174. (open-stream-p (make-concatenated-stream)) ==> nil
+     ansi-tests: make-concatenated-stream.7
+
+175. READ-CHAR-NO-HANG is encountering a premature EOF in a concatenated
+     stream.  It looks like it is only reading from the first of the input
+     streams.
+     ansi-tests: make-concatenated-stream.16
+
+176. LISTEN fails to look at the second input stream to a concatenated
+     stream.
+     ansi-tests: make-concatenated-stream.30
+
+177. make-string-output-stream should take a keyword argument, :element-type.
+     ansi-tests: make-string-output-stream.[235679]
+      make-string-output-stream.1[01]
+
+178. Free declarations in with-input-from-string should not apply to the return
+     value form, or the start or end arguments.
+      ansi-tests: with-input-from-string.19 with-input-from-string.2[012]
+
+179. The index place argument of with-input-from-string should be updated only
+     if the form terminates normally.
+      ansi-tests: with-input-from-string.22
+
+180. with-output-to-string should take an :element-type argument.
+      ansi-tests: with-output-to-string.[78] with-output-to-string.1[46]
+
+181. Free special declarations in with-output-to-string should not
+     apply to the return value form.
+      ansi-tests: with-output-to-string.15
