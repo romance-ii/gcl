@@ -453,6 +453,8 @@ number in place so it isn't reused.
 93. READTABLE-CASE is undefined (and its SETF form)
     ansi-tests: read-symbol.1[678] read-symbol.25
      readtable-case.* set-syntax-from-char-trait-*
+     print.symbol.[123456789] print-symbol.1[012] prin1.symbol.[123]
+     
 
 94. Binding *READ-SUPPRESS* to true doesn't totally suppress reading;
     reading a list still returns a list, as does reading a vector
@@ -968,3 +970,72 @@ Error in LET [or a callee]: What kind of instance is this?
 212. COMPUTE-APPLICABLE-METHODS should signal a program-error when called
      with too many or too few arguments in safe code.
    ansi-tests: compute-applicable-methods.error.1
+
+213. FIND-METHOD should signal a program-error when called with too few
+     or too many arguments.
+   ansi-tests: find-method.error.[1234]
+
+214. FIND-METHOD should signal an error if the length of the specializers
+    list does not equal the number of required arguments to the generic
+    function
+   ansi-tests: find-method.error.[789] find-method.error.10
+
+215. ADD-METHOD should signal a program-error when called with too few or
+     too many arguments in safe code.
+    ansi-tests: add-method.error.[456]
+
+216. ADD-METHOD should return the generic function.
+    ansi-tests: add-method.[12]
+
+217. Computing SLOT-VALUE on a missing slot should throw an UNBOUND-SLOT error.
+    ansi-tests: unbound-slot.[12]
+
+218. A generic function should throw a program-error if called with too few
+     or too many arguments in safe code.
+    ansi-tests: defmethod.error.1[34]
+
+219. A generic function should throw a program-error when called with invalid
+     keyword arguments in safe code.
+    ansi-tests :defmethod.error.15
+
+220. Double floats are not printed readably correctly.  Round-off error
+     is apparently occuring, causing the re-read value to differ slightly.
+    ansi-tests: print.double-float.random print.long-float.random
+
+221. #\Space should print (under PRIN1) as #\ , not #\Space.
+    ansi-tests: print.char.4 print.char.10
+
+222. Escaped haracter printing violates therules in 2.4.8.1
+    ansi-tests: print.char.7
+
+223. (code-char 28) doesn't print or possibly read correctly
+    ansi-tests: print.char.[89]
+
+224. A symbol whose symbol-package is a deleted package should be printed
+     as if it had no home package.
+    ansi-tests: print.symbol.prefix.8
+
+225. Component printing controlled by *print-level* should not print #
+     for an object unless that object 'has components'.  I interpret
+     this to mean objects that are printed by recursive calls to the
+     object printer, and that can be targets of #n# syntax, so cons cells,
+     T vectors, structures, etc. have components, but not numbers, symbols.
+     strings, or bit vectors.
+    ansi-tests: print.cons.level.[25] print.vector.level.[34]
+
+226. Arrays of dimension > 1 that have total size > 0 and one ore more
+     dimensions of size 0 do not print readably.
+    ansi-tests: print.array.2.2[123]
+
+227. The 'is-similar*' generic function is not dispatching properly.
+     In particular, the correct method is apparently not being invoked
+     on pathnames.
+    ansi-tests: print.pathname.1
+
+228. PPRINT-FILL should signal a program-error when called with the
+     wrong number of arguments in safe code.
+    ansi-tests: pprint-fill.error.[123]
+
+229. PPRINT-LINEAR should signal a program-error when called with the
+     wrong number of arguments in safe code.
+    ansi-tests: ppprint-linear.error.[123]
