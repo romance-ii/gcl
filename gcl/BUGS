@@ -134,6 +134,11 @@ number in place so it isn't reused.
    concatenated-stream-streams:
       concatenated-stream-streams.[12345]
       concatenated-stream-streams.error.[12]
+
+   make-load-form-saving-slots:
+      make-load-form-saving-slots.[123456789]
+      make-load-form-saving-slots.1[012]
+      make-load-form-saving-slots.error.[12]
       
 
 21. The following macros are missing: define-compiler-macro
@@ -181,7 +186,7 @@ number in place so it isn't reused.
     symbol macros.  ansi-tests: psetq.7 psetf.7
 
 34. Cannot create classes whose names are uninterned symbols.
-    ansi-tests: psetf.35 rotatef.35
+    ansi-tests: psetf.35 rotatef.35 defclass.forward-ref.4
 
 35. ROTATEF does not work with no arguments.  snsi-tests: rotatef.3
 
@@ -294,6 +299,7 @@ number in place so it isn't reused.
     ansi-tests: defmacro.3 defmacro.4 defmacro.12 defmacro.13
 
 68. (typep nil (find-class 'null)) ==> nil
+    See also bug #81.
     ansi-tests: the.9 the.10
 
 69. (VALUES &REST ...) not being understood.
@@ -373,7 +379,11 @@ number in place so it isn't reused.
 
 81. (let ((x (make-condition 'arithmetic-error))) (typep x (class-of x)))
       ==> NIL
-    ansi-tests: coerce.3 
+    More generally, typep isn't working on class object type specifiers.
+    ansi-tests: coerce.3 class-28.[123] class-0201.1 class-0202.1
+     class-0301.1 class-0309.1 class-0311.1 allocate-instance.[1234]
+     allocate-instance.order.1 change-class.3.[12]
+     update-instance-for-different-class.4
 
 82. In a DEFTYPE lambda list, the default value for missing key or optional
     parameters should be the symbol *, not NIL.
@@ -812,3 +822,149 @@ number in place so it isn't reused.
 181. Free special declarations in with-output-to-string should not
      apply to the return value form.
       ansi-tests: with-output-to-string.15
+
+182. Calling make-instance with an initialization argument for a shared slot
+     does not properly initialize that shared slot.
+     ansi-tests: class-13.1
+
+183. Violations of the rules for default initargs.
+     ansi-tests: class-20.[123] class-21.[1245]
+
+184. documentation doesn't work on class objects.
+     ansi-tests: class-23.[34]
+
+185. :ALLOW-OTHER-KEYS <true> in the :DEFAULT-INITARGS specifier of
+     a class definition should allow other arguments to be passed in
+     the initializer list to make-instance.  However, this is not happening.
+     ansi-tests: class-24.2
+
+186. slot-makunbound should return the instance. It is instead returning nil.
+     ansi-tests: class-0203.[12] slot-missing.3
+
+187. slot-makunbound throws an error incorrectly:
+
+
+> (defclass example-class () ((a :allocation :instance)
+                              (b :allocation :class)))
+
+#<Standard-Class EXAMPLE-CLASS 72244360>
+
+> (let ((c1 (make-instance 'example-class))) (slot-makunbound c1 'a))
+
+Error in LET [or a callee]: What kind of instance is this?
+
+     ansi-tests: class-0206.1 class-0207.1 class-redefinition.2
+      update-instance-for-different-class.[123] slot-boundp.5
+      slot-makunbound.[12] slot-makunbound.error.[12]
+      
+188. T is an illegal documentation type.
+    ansi-tests: class-0221.[123] defgeneric.2
+
+189. If the name of a class is changed to NIL, and another class of the same
+    original name is then defined, the original class should not be redefined;
+    instead, there should be two classes.  Zee section 4.3.1 for the notion
+    of 'proper name', and see also bug #190 below.
+    ansi-tests: class-0309.1
+
+190. Similar to 189, but if FIND-CLASS for a given name is changed.
+    ansi-tests: class-0310.1
+
+191. defclass should allow forward referencing of superclasses, but
+    doesn't.  Attempting to include the name of a class that hasn't
+    yet been defined in the superclass list causes an error.
+    ansi-tests: defclass.forward-ref.[123]
+
+192. ensure-generic-function should take a method class object as its
+    :method-class argument.
+    ansi-tests: ensure-generic-function.9
+
+193. ensure-generic-function should take the :declare keyword argument,
+    but it does not (this was a source of some confusion in other lisps,
+    and may be a spec bug.)
+    ansi-tests: ensure-generic-function.13
+
+194. allocate-instance should work on structure classes.
+    ansi-tests: allocate-instance.5
+
+195. allocate-instance should signal a program-error when called with
+    too few arguments in safe code.
+    ansi-tests: allocate-instance.error.1
+
+196. change-class isn't allowing the :allow-other-keys keyword argument.
+    ansi-tests: change-class.1.7 change-class.7.5
+
+197. When SLOT-MISSING is called when attempting to write to a missing
+    slot, any of its return values should be ignored.  However, they
+    are being returned by the setf function.
+    ansi-tests: slot-missing.[267]
+
+198. When slot-boundp is invoked on a missing slot, only a value equivalent
+    (in the boolean sense) to the primary value of slot-missing should
+    be returned, not any other values.
+    ansi-tests: slot-missing.8
+
+199. If slot-value is called on an unbound slot, and the applicable
+     slot-unbound method returns no values, then slot-value should return
+     the primary value, which is NIL.  However, it is returning no values
+     at all.  Similarly, if the method returns more than one value, slot-value
+     should return only the first
+    ansi-tests: slot-unbound.[3456]
+
+200. The function method-qualifiers should throw a progra-error when called
+     with other than one argument in safe code.
+    ansi-tests: method-qualifiers.error.[12]
+
+201. remove-method must not signal an error if the method does not belong
+     to the generic function.
+    ansi-tests: remove-method.1
+
+202. MAKE-LOAD-FORM should have default methods (that signal errors) when
+     invoked on standard objects, structure objects, or conditions.
+    ansi-tests: make-load-form.[456789] make-load-form.1[012]
+
+203. MAKE-LOAD-FORM should signal a program error when invoked with too
+     many arguments.
+    ansi-tests: make-load-form.error.2
+
+204. WITH-ACCESSORS forms should allow the presence of DECLARE expressions.
+    ansi-tests: with-accessors.1[01]
+
+205. WITH-SLOTS forms should allow the presence of DECLARE expressions.
+    ansi-tests: with-slots.19 with-slots.20
+
+206. DEFGENERIC should signal a program=error if a required argument occurs
+     more than once in the argument-precedence-order list, or if a
+     required argument is missing in the argument-precedence-order list.
+    ansi-tests: defgeneric.error.[48]
+
+207. If a generic function is passed a keyword argument that is not
+     accepted by any applicable method, an error should be signalled.
+     See CLtS 7.6.5.
+    ansi-tests: defgeneric.error.2[01]
+
+208. When an existing generic function is redefined using DEFMETHOD, any
+     preexisting methods that were defined using the :methods option
+     of DEFGENERIC should be removed.  See also paragraph 4 of the
+     description of ENSURE-GENERIC-FUNCTION.
+
+    ansi-tests: defgeneric.3[12]
+
+209. The method declarations in DEFGENERIC forms should admit DECLARE
+     expressions.
+    ansi-tests: defgeneric.35
+
+210. Neither rebinding nor using SETQ (& related operators) should alter
+     the arguments passed by CALL-NEXT-METHOD.
+    ansi-tests: call-next-method.8
+
+211. "When providing arguments to call-next-method, the following
+      rule must be satisfied or an error of type error should be signaled:
+      the ordered set of applicable methods for a changed set of arguments
+      for call-next-method must be the same as the ordered set of applicable
+      methods for the original arguments to the generic function."
+
+   ansi-tests: call-next-method.error.[12]
+
+212. COMPUTE-APPLICABLE-METHODS should signal a program-error when called
+     with too many or too few arguments in safe code.
+   ansi-tests: compute-applicable-methods.error.1
