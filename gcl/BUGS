@@ -139,6 +139,26 @@ number in place so it isn't reused.
       make-load-form-saving-slots.[123456789]
       make-load-form-saving-slots.1[012]
       make-load-form-saving-slots.error.[12]
+
+   pprint-indent
+      pprint-indent.[123456789] pprint-indent.1[0123456789]
+      pprint-indent.13a pprint-indent.2[0123]
+      pprint-indent.error.[123]
+
+   pprint-newline
+      pprint-newline.[123] pprint-newline.linear.[123456789]
+      pprint-newline.linear.10 pprint-newline.miser.123456789]
+      pprint-newline.miser.1[0123] pprint-newline.fill.[123456789]
+      pprint-newline.fill.10 pprint-newline.mandatory.[123456]
+      pprint-newline.error.123] pprint-newline.error.1-unsafe
+
+   pprint-tab
+      pprint-tab.non-pretty.[12345678] pprint-tab.nil.1
+      pprint-tab.t.1 pprint-tab.line.1 pprint-tab.section.1
+      pprint-tab.line-relative.1 pprint-tab.section-relative.1
+      pprint.tab.error.[1234]
+
+   
       
 
 21. The following macros are missing: define-compiler-macro
@@ -1021,7 +1041,8 @@ Error in LET [or a callee]: What kind of instance is this?
      object printer, and that can be targets of #n# syntax, so cons cells,
      T vectors, structures, etc. have components, but not numbers, symbols.
      strings, or bit vectors.
-    ansi-tests: print.cons.level.[25] print.vector.level.[34]
+    ansi-tests: print.cons.level.[25] print.vector.level.[34] pprint.1
+      print-level.[4589]
 
 226. Arrays of dimension > 1 that have total size > 0 and one ore more
      dimensions of size 0 do not print readably.
@@ -1039,3 +1060,82 @@ Error in LET [or a callee]: What kind of instance is this?
 229. PPRINT-LINEAR should signal a program-error when called with the
      wrong number of arguments in safe code.
     ansi-tests: ppprint-linear.error.[123]
+
+230. PPRINT-TABULAR should use WRITE to print an object when it is a
+     non-list.
+    ansi-tests: pprint-tabular.[12]
+
+231. The default tabsize for PPRINT-TABULAR is 16, but it is instead
+     using ordinary tab characters.
+    ansi-tests: pprint-tabular.[6789] pprint-tabular.1[0123456789]
+      pprint-tabular.2[01234]
+
+232. PPRINT-TABULAR fails to break the list across lines if it would
+     otherwise exceed *PRINT-RIGHT-MARGIN*.
+    ansi-tests: pprint-tabular.2[12]
+
+233. PPRINT-TABULAR should signal a program-error when called with the
+     incorrect number of arguments in safe code.
+    ansi-tests: pprint-tabular.error.[1234]
+
+234. PPRINT-LOGICAL-BLOCK does not always properly print the #n# notation
+     when *print-circle* is true.
+    ansi-tests: pprint-logical-block.17
+
+235. The local macro PPRINT-EXIT-IF-LIST-EXHAUSTED isn't being defined
+     inside PPRINT-LOGICAL-BLOCK forms.
+    ansi-tests: pprint-exit-if-list-exhausted.[1234]
+
+236. The local macro PPRINT-POP isn't being defined inside
+     PPRINT-LOGICAL-BLOCK forms.
+    ansi-tests: pprint-pop.[123456789]
+
+237. PRINT-UNREADABLE-OBJECT, when :TYPE is T, is specified to print a space
+     after the type even if nothing else is printed before the closing >.
+     This is not happening.  (Arguably this is a spec bug.)  Similarly,
+     it is specified to print a space before the 'identity' inforamtion.
+    ansi-tests: print-unreadable-object.[23]
+
+238. PRINT-UNREADABLE-OBJECT should signal an error of type PRINT-NOT-READABLE
+     if *PRINT-READABLY* is true, but it is not doing this.
+    ansi-tests: print-unreadable-object.error.1
+
+239. PRINT appears to ignore the *PRINT-READABLY* control variable,
+    as does PRIN1.  ansi-tests: print.1 prin1.1
+
+240. *PRINT-LEVEL* can be legally bound to any nonnegative integer,
+     but an error occurs when it is bound to a bignum.
+     ansi-tests: print-level.12
+
+241. *PRINT-LENGTH* can be legally bound to any nonnegative integer,
+     but an error occurs when it is bound to a bignum.
+     ansi-tests: print-length.7
+
+242. Structures should be printed with their slot names given as keyword
+     symbols.
+    ansi-tests: print-length.11
+
+243. The format directive ~c should print #\Newline, #\Space, and
+     many other characters as the single characters, not as their names,
+    ansi-tests: format.c.1  format.c.1a format.r.15 format.d.5
+
+244. The ~:c format directive should print the name of simple, non-graphic
+     characters.
+    ansi-tests: format.c.4a 
+
+245. The ~@c format directive should print characters in a readable format,
+     but this fails on the character with code 28.
+    ansi-tests: format.c.5a
+
+246. The function produced by the FORMATTER macro should return the list
+     of unconsumed arguments.
+    ansi-tests: many formatter tests
+
+247. When the v format parameter of the R format directive gets 'nil',
+     it is to be treated as if it were not there, which means ~r should
+     print an english number.  It isn't doing this.
+    ansi-tests: format.r.8
+
+248. Specifying a very large format parameter for ~r causes the error
+    'Can't extend the string.'.  ansi-tests: format.r.38
+
