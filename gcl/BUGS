@@ -1118,6 +1118,8 @@ Error in LET [or a callee]: What kind of instance is this?
 243. The format directive ~c should print #\Newline, #\Space, and
      many other characters as the single characters, not as their names,
     ansi-tests: format.c.1  format.c.1a format.r.15 format.d.5
+     format.d.11 format.b.5 format.b.11 format.o.5 format.o.11
+     format.x.5 format.x.11 format.justify.10
 
 244. The ~:c format directive should print the name of simple, non-graphic
      characters.
@@ -1136,6 +1138,101 @@ Error in LET [or a callee]: What kind of instance is this?
      print an english number.  It isn't doing this.
     ansi-tests: format.r.8
 
-248. Specifying a very large format parameter for ~r causes the error
-    'Can't extend the string.'.  ansi-tests: format.r.38
+248. Specifying a very large negative format parameter for ~r (and others)
+    causes the error 'Can't extend the string.'.  ansi-tests: format.r.38
+    format.d.28 format.b.28 format.o.28 format.x.28
 
+249. ~d is supposed to do the same thing as ~a when called on a non-integer,
+     but for several kinds of values it doesn't.
+    ansi-tests: format.d.1[89] format.d.2[01]
+
+250. The format directive "~vd" fails when the v parameter is a negative
+    bignum, and similarly for other numeric directives (b, etc.)
+    ansi-tests: format.d.29 format.b.29 format.o.29 format.x.29
+
+251. The ~_ format directive is not implemented.
+    ansi-tests: All format.*_* tests  format.logical-block.1[789]
+      format.logical-block.2[14
+
+252. In the ~<...~:> format directive (logical block), 'An error is
+     signaled if either the prefix or suffix fails to be a constant
+     string or if the enclosed portion is divided into more than three
+     segments.'
+    ansi-tests: format.logical-block.error.[123456789]
+     format.logical-block.error.1[0123456789]
+     format.logical-block.error.2[01234]
+
+253. 'An error is signaled if any of these directives[~< ... ~:>]
+      is nested within ~<...~>."
+    ansi-tests: format.logical-block.error.25
+
+254. 'An error is also signaled if the ~<...~:;...~> form of ~<...~>
+      is used in the same format string with [...]  ~<...~:> [...].'
+    ansi-tests: format.logical-block.error.2[67]
+
+255. ~< ,,, ~:> should consume the next argument and use it (as a list)
+     to supply the arguments used by the directives inside the form.
+    ansi-tests: format.logical-block.[1679]
+      format.logical-block.1[0345]
+
+256. The : modified to ~<...~:> should cause the prefix and suffix
+     strings, if missing, to be "(" and ")", respectively.
+    ansi-tests: format.logical-block.[45] format.logical-block.2[0236]
+     format.logical-block.escape.[12]
+
+257. If ~:@> terminates a ~< construct, then it should be the case that
+     'a fill-style conditional newline is automatically inserted after
+      each group of blanks immediately contained in the body (except
+      for blanks after a <Newline> directive).'  This is not happening.
+    ansi-tests: format.logical-block.2[25]
+
+258. ~@; in ~<...~:> construct isn't setting the per-line-prefix properly.
+    ansi-tests: format.logical-block.2[789]
+
+
+259. The ~i directive hasn't been implemented.
+    ansi-tests: format.i.[123456789] format.i.1[0123456]
+
+260. The ~/.../ directive hasn't been implemented.
+    ansi-tests: format./.[123456789] format./.1[123456789]
+
+261. Various ~T failures, all similar
+    ansi-tests: format.t.[348]
+
+262. ~:T and ~:@T  aren't implemented.
+    ansi-tests: format.:t,[123456789] format.:t1[012]
+     format.:@t.[12345] format.:@t1[abcd]
+
+263. Two ~<...~> failures (undiagnosed)
+    ansi-tests: format.justify.8 format.justify.29
+
+264. Condition (~{ ~}) format directive isn't accepting bignums.
+    ansi-tests: format.cond.[46] format.cond:.[46]
+
+265. Conditional format directive with a prefix argument selects
+     the wrong clause if the prefix is a bignum.
+    ansi-tests: format.cond.12
+
+266. A NIL ~v prefix to [ does not work correctly.
+    ansi-tests: format.cond.14 format.cond:.7
+
+267. The format directive ~{~} should take the next argument as a format
+     control to be used in the iteration.  This is not happening.
+   ansi-tests: format.{.1a format.{.1b format.{.1[569] format.{.2[0123]
+     format.:{.[3456]  format.@{.1[23] format.:@{.[45]
+
+268. The ~{ ... ~} directive should be prepared to signal an error of
+     type type-error if the argument is not a list.
+   ansi-tests: format.{.error.5 format.:@{.error.5
+
+269. ~^ should take format parameters that are bignums, and other
+      format parameter problems with that format directive.
+   ansi-tests: format.^.(.1[89] format.^.{.2[056789]
+    format.^.{.3[0123] format.^.:{.[67] format.^.:{.1[013456]
+    format.^.:{.3[89] format.^.@{.19 format.^.@{.2056789]
+    format.^.@{.3[0123] format.^.:@{.[67] format.^.:@{.1[01456]
+    format.^.:@{.3[89]
+
+270. Large numbers of undiagnosed failures in ~:^ in various forms of
+     the iteration directives.
+    ansi-tests: format.:^.*
