@@ -1302,4 +1302,3 @@ Error in LET [or a callee]: What kind of instance is this?
 285. DRIBBLE should signal a program-error if called with more than one
      argument in safe code.
     ansi-tests: dribble.error.1
-y
