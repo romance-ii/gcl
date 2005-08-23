@@ -158,15 +158,13 @@ number in place so it isn't reused.
       pprint-tab.line-relative.1 pprint-tab.section-relative.1
       pprint.tab.error.[1234]
 
-   
-      
-
 21. The following macros are missing: define-compiler-macro
     define-setf-expander define-symbol-macro in-package.
     ansi-tests: cl-macro-symbols.1 in-package.error.1
     dcf-macros define-setf-expander.error.1
     define-setf-expander.[1234567] define-compiler-macro.error.[123]
     define-compiler-macro.[12345678] define-symbol-macro.error.[123]
+    documentation.symbol.setf.[12]
 
 22. GENTEMP should take a package designator as its second argument,
    not just a package object. ansi-tests: gentemp.[345].
@@ -223,6 +221,7 @@ number in place so it isn't reused.
 39. DOCUMENTATION should be allowed to be called on function objects, not
     just function names. ansi-tests: define-modify-macro.documentation.1
     define-modify-macro.documentation.2
+    documentation.function.function.[1235]
 
 40. In DEFUN where the function names is a (SETF <name>) pair, there is an
     implicit block with name <name>.  ansi-tests: defun.4
@@ -296,6 +295,8 @@ number in place so it isn't reused.
     forms in PROG, PROG* forms.  ansi-tests: prog.11 prog*.11
 
 61. DEFINE-COMPILER-MACRO is undefined
+   ansi-tests: documentation.list.compiler-macro.[12]
+     documentation.symbol.compiler-macro.[12]
 
 62. DEFINE-SYMBOL-MACRO is undefined
 
@@ -853,7 +854,8 @@ number in place so it isn't reused.
      ansi-tests: class-20.[123] class-21.[1245]
 
 184. documentation doesn't work on class objects.
-     ansi-tests: class-23.[34]
+     ansi-tests: class-23.[34] documentation.standard-class.t.1
+      documenation.struct-class.t.1
 
 185. :ALLOW-OTHER-KEYS <true> in the :DEFAULT-INITARGS specifier of
      a class definition should allow other arguments to be passed in
@@ -881,6 +883,11 @@ Error in LET [or a callee]: What kind of instance is this?
       
 188. T is an illegal documentation type.
     ansi-tests: class-0221.[123] defgeneric.2
+     documentation.function.t.[123456789]
+     documentation.function.t.[56]a documentation.function.t.1[012]
+     documentation.function.function.[48]
+     documentation.standard-method.t.1
+     documentation.package.t.1 documentation.new-method.1
 
 189. If the name of a class is changed to NIL, and another class of the same
     original name is then defined, the original class should not be redefined;
@@ -1236,3 +1243,63 @@ Error in LET [or a callee]: What kind of instance is this?
 270. Large numbers of undiagnosed failures in ~:^ in various forms of
      the iteration directives.
     ansi-tests: format.:^.*
+
+271. LOAD should be able to load directly from a stream.
+    ansi-tests: load.[38] load.1[356] load.1[56]a
+
+272. The information printed by LOAD when verbose is true should
+     be on lines starting with semicolons.
+    ansi-tests: load.[56]
+
+273. LOAD should simply return nil if an attempt to load a nonexistent
+     file is made when the :if-does-not-exist keyword argument is nil.
+    ansi-tests: load.14
+
+274. LOAD should bind *LOAD-PATHNAME* to be the pathname of the file
+     being loaded, merged against the defaults.  However, this variable
+     is being bound to the pathname's name (a string), not a pathname.
+    ansi-tests: load.18
+
+275. LOAD should signal a FILE-ERROR when trying to load a nonexistent
+     file (unless the if-does-not-exist parameter is false).  It is throwing
+     a simple-error instead.
+    ansi-tests: load.error.1
+
+276. The describe tests crash gcl when run with rt::*catch-errors* bound
+     to nil.
+    ansi-tests: describe.[12345]
+
+277. DISASSEMBLE should signal a program-error on safe calls with more than
+     one argument.
+   ansi-tests: disassemble.error.2
+
+278. TRACE ism't working on extended function names like (SETF ...).
+   ansi-tests: trace.[68
+
+279. TRACE isn't working properly on generic functions.  An error is being
+     signaled if a method is added to a generic function that is being traced.
+   ansi-tests: trace.1[34]
+
+280. GET-UNIVERSAL-TIME should signal a program-error in safe calls with more
+     than zero arguments.
+    ansi-tests: get-universal-time.error.[12]
+
+281. GET-INTERNAL-REAL-TIME should signal a program-error in safe calls with
+     more than zero arguments.
+    ansi-tests: get-interal-real-time.error.[12]
+
+282. GET-INTERNAL-RUN-TIME should return a single integer, but it is returning
+     two values.
+    ansi-tests: get-internal-run-time.1
+
+283. DOCUMENTATION fails on (SETF ...) function names with documentation type
+     FUNCTION.
+    ansi-tests: documentation.list.function.[12]
+
+284. DOCUMENTATION fails on symbol, 'type arguments.
+    ansi-tests: documentation.symnol.type.1
+
+285. DRIBBLE should signal a program-error if called with more than one
+     argument in safe code.
+    ansi-tests: dribble.error.1
+y
