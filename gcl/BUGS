@@ -649,9 +649,9 @@ number in place so it isn't reused.
 138. (lcm) should yield 1, not an error.
      ansi-tests: lcm.1
 
-139. (typep 1 '(real (0))) ==> error  (and similarly for
+139. (FIXED) (typep 1 '(real (0))) ==> error  (and similarly for
         (typep 1 '(integer (0))).)
-     ansi-tests: random.error.3
+     ansi-tests: random.error.3 (and others)
 
 140. (phase 0) ==> error (logarithmic singularity)
      ansi-tests: phase.1
