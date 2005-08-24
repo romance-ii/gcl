@@ -33,7 +33,7 @@ number in place so it isn't reused.
 
 8. Similar to #5, but the error is for GETF.  ansi-tests: getf.error.[45]
 
-9. REMF is violating the requirement that the value of the place be
+9. (FIXED) REMF is violating the requirement that the value of the place be
   read out after all the other subforms of the REMF form are computed
   (even the ones to the right of the place form; see section 5.1.3
   of CLtS).  ansi-tests:  remf.order.3

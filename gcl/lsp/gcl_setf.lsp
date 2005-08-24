@@ -513,14 +513,43 @@
 
 ;;; Some macro definitions.
 
+;;; (defmacro remf (&environment env place indicator)
+;;;  (multiple-value-bind (vars vals stores store-form access-form)
+;;;      (get-setf-method place env)
+;;;    `(let* ,(mapcar #'list vars vals)
+;;;       (multiple-value-bind (,(car stores) flag)
+;;;           (si:rem-f ,access-form ,indicator)
+;;;         ,store-form
+;;;         flag))))
+
+;;; This definition was obtained from SBCL
 (defmacro remf (&environment env place indicator)
-  (multiple-value-bind (vars vals stores store-form access-form)
+  (multiple-value-bind (dummies vals newval setter getter)
       (get-setf-method place env)
-    `(let* ,(mapcar #'list vars vals)
-       (multiple-value-bind (,(car stores) flag)
-           (si:rem-f ,access-form ,indicator)
-         ,store-form
-         flag))))
+    (do* ((d dummies (cdr d))
+          (v vals (cdr v))
+          (let-list nil)
+          (ind-temp (gensym))
+          (local1 (gensym))
+          (local2 (gensym)))
+         ((null d)
+          ;; See ANSI 5.1.3 for why we do out-of-order evaluation
+          (push (list ind-temp indicator) let-list)
+          (push (list (car newval) getter) let-list)
+          `(let* ,(nreverse let-list)
+             (do ((,local1 ,(car newval) (cddr ,local1))
+                  (,local2 nil ,local1))
+                 ((atom ,local1) nil)
+               (cond ((atom (cdr ,local1))
+                      (error "Odd-length property list in REMF."))
+                     ((eq (car ,local1) ,ind-temp)
+                      (cond (,local2
+                             (rplacd (cdr ,local2) (cddr ,local1))
+                             (return t))
+                            (t (setq ,(car newval) (cddr ,(car newval)))
+                               ,setter
+                               (return t))))))))
+      (push (list (car d) (car v)) let-list))))
 
 (define-modify-macro incf (&optional (delta 1)) +)
 (define-modify-macro decf (&optional (delta 1)) -)
