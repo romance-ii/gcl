@@ -160,7 +160,7 @@ number in place so it isn't reused.
 
 21. The following macros are missing: define-compiler-macro
     define-setf-expander define-symbol-macro in-package.
-    ansi-tests: cl-macro-symbols.1 in-package.error.1
+   ansi-tests: cl-macro-symbols.1 in-package.error.1
     dcf-macros define-setf-expander.error.1
     define-setf-expander.[1234567] define-compiler-macro.error.[123]
     define-compiler-macro.[12345678] define-symbol-macro.error.[123]
@@ -241,7 +241,7 @@ number in place so it isn't reused.
     when called on an invalid number of arguments.  ansi-tests:
     destructuring-bind.error.[789]
 
-45..No hash table with :key EQUALP.
+45. No hash table with :key EQUALP.
     ansi-tests:  equalp.21
 
 46. EQUALP fails to properly compare hash tables.
@@ -1302,3 +1302,14 @@ Error in LET [or a callee]: What kind of instance is this?
 285. DRIBBLE should signal a program-error if called with more than one
      argument in safe code.
     ansi-tests: dribble.error.1
+
+286. Compiling a call to a function whose name is an uninterned symbol
+    doesn't work.
+
+     (let* ((sym (gensym))
+            (fun-def `(defun ,sym () nil)))
+        (eval fun-def)
+        (funcall (compile nil `(lambda () (,sym)))))
+
+  Error in COMPILER::CMP-ANON [or a callee]: FUNCTION is not of type #:G1832.
+
