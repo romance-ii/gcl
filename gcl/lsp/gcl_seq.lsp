@@ -113,25 +113,37 @@
 
 
 (defun some (predicate sequence &rest more-sequences)
-  (setq more-sequences (cons sequence more-sequences))
-  (do ((i 0 (1+ i))
-       (l (apply #'min (mapcar #'length more-sequences))))
-      ((>= i l) nil)
-    (declare (fixnum i l))
-    (let ((that-value
-           (apply predicate
-                  (mapcar #'(lambda (z) (elt z i)) more-sequences))))
-      (when that-value (return that-value)))))
-
+  (cond
+    ((and (listp sequence) (null more-sequences))
+     ;; special case -- only one sequence, and it's a list
+     (dolist (e sequence nil)
+       (let ((that-value (funcall predicate e)))
+	 (when that-value (return that-value)))))
+    (t
+     (setq more-sequences (cons sequence more-sequences))
+     (do ((i 0 (1+ i))
+          (l (apply #'min (mapcar #'length more-sequences))))
+         ((>= i l) nil)
+       (declare (fixnum i l))
+       (let ((that-value
+              (apply predicate
+                     (mapcar #'(lambda (z) (elt z i)) more-sequences))))
+         (when that-value (return that-value)))))))
 
 (defun every (predicate sequence &rest more-sequences)
-  (setq more-sequences (cons sequence more-sequences))
-  (do ((i 0 (1+ i))
-       (l (apply #'min (mapcar #'length more-sequences))))
-      ((>= i l) t)
-    (declare (fixnum i l))
-    (unless (apply predicate (mapcar #'(lambda (z) (elt z i)) more-sequences))
-            (return nil))))
+  (cond
+    ((and (listp sequence) (null more-sequences))
+     ;; special case -- only one sequence, and it's a list
+     (dolist (e sequence t)
+       (unless (funcall predicate e) (return nil))))
+    (t
+     (setq more-sequences (cons sequence more-sequences))
+     (do ((i 0 (1+ i))
+          (l (apply #'min (mapcar #'length more-sequences))))
+         ((>= i l) t)
+       (declare (fixnum i l))
+       (unless (apply predicate (mapcar #'(lambda (z) (elt z i)) more-sequences))
+         (return nil))))))
 
 
 (defun notany (predicate sequence &rest more-sequences)
