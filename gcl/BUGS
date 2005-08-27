@@ -88,12 +88,12 @@ number in place so it isn't reused.
 20. 19 functions are missing: arithmetic-error-operands
   broadcast-stream-streams cell-error-name concatenated-stream-streams
   echo-stream-input-stream echo-stream-output-stream
-  function-lambda-expression get-setf-expansion
+  function-lambda-expression  (FIXED)get-setf-expansion
   make-load-form-saving-slots pprint-indent pprint-newline
   pprint-tab print-not-readable-object simple-condition-format-control
   synonym-stream-symbol two-way-stream-input-stream
   two-way-stream-output-stream unbound-slot-instance
-  compiler-macro-function readtable-case.
+  (FIXED)compiler-macro-function readtable-case.
 
   ansi-tests: cl-function-symbols.1, dcf-funs and these tests:
 
@@ -102,7 +102,7 @@ number in place so it isn't reused.
       eval.error.3 eval.error.4 cell-error-name.[123456]
       cell-error-name.error.[12]
 
-   get-setf-expansion
+   get-setf-expansion (FIXED)
       get-setf-expansion.error.[12] get-setf-expansion.[123]
 
    simple-condition-format-control
@@ -158,8 +158,8 @@ number in place so it isn't reused.
       pprint-tab.line-relative.1 pprint-tab.section-relative.1
       pprint.tab.error.[1234]
 
-21. The following macros are missing: define-compiler-macro
-    define-setf-expander define-symbol-macro in-package.
+21. The following macros are missing: (FIXED)define-compiler-macro
+    (FIXED)define-setf-expander define-symbol-macro in-package.
    ansi-tests: cl-macro-symbols.1 in-package.error.1
     dcf-macros define-setf-expander.error.1
     define-setf-expander.[1234567] define-compiler-macro.error.[123]
@@ -294,7 +294,7 @@ number in place so it isn't reused.
 60. Free special declarations should not apply to the initialization
     forms in PROG, PROG* forms.  ansi-tests: prog.11 prog*.11
 
-61. DEFINE-COMPILER-MACRO is undefined
+61. (FIXED, partially) DEFINE-COMPILER-MACRO is undefined
    ansi-tests: documentation.list.compiler-macro.[12]
      documentation.symbol.compiler-macro.[12]
 
@@ -881,7 +881,7 @@ Error in LET [or a callee]: What kind of instance is this?
       update-instance-for-different-class.[123] slot-boundp.5
       slot-makunbound.[12] slot-makunbound.error.[12]
       
-188. T is an illegal documentation type.
+188. (FIXED) T is an illegal documentation type.
     ansi-tests: class-0221.[123] defgeneric.2
      documentation.function.t.[123456789]
      documentation.function.t.[56]a documentation.function.t.1[012]
