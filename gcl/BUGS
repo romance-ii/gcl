@@ -52,8 +52,9 @@ number in place so it isn't reused.
 12. Coerce can't coerce a vector of characters into a base-string.
   ansi-tests: fill.string.10
 
-13. MAKE-SEQUENCE fails on type argument NULL,. (CLASS-OF NIL), or LIST.
-   ansi-tests: make-sequence,9, make-sequence.49. make-sequence.57
+13. (partially FIXED) MAKE-SEQUENCE fails on type argument NULL,
+   (CLASS-OF NIL), or (FIND-CLASS LIST).
+   ansi-tests: make-sequence.57
 
 14. The datum and expected type fields of the type errors thrown by
    MAKE-SEQUENCE, MAP  do not satisfy the constraint that the datum
