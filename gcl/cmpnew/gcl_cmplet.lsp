@@ -39,7 +39,7 @@
 (defun cmp-macroexp-with-compiler-macros (form)
   (let ((form (if (and (consp form) (eq (car form) 'or)) form (cmp-macroexpand form))))
     (if (and (consp form) (symbolp (car form)))
-	(let ((cmf (get (car form) 'compiler-macro)))
+	(let ((cmf (get (car form) 'si::compiler-macro-prop)))
 	  (if cmf
 	      (cmp-eval `(funcall ',cmf ',form nil))
 	    form))

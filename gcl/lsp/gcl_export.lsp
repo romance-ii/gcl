@@ -100,6 +100,7 @@ declaim
 decode-universal-time
 defconstant
 define-modify-macro
+define-setf-expander
 define-setf-method
 defparameter
 defsetf
@@ -145,6 +146,7 @@ fourth
 fround
 ftruncate
 get-decoded-time
+get-setf-expansion
 get-setf-method
 get-setf-method-multiple-value
 get-universal-time

@@ -27,7 +27,7 @@
 
 (export '(*modules* provide require))
 (export 'documentation)
-(export '(variable function structure type setf))
+(export '(variable function structure type setf compiler-macro))
 
 (in-package 'system)
 
@@ -67,10 +67,12 @@
     (setf (get symbol 'setf-documentation))
     (compiler-macro (get symbol 'compiler-macro-documentation))
     (method-combination (get symbol 'method-combination-documentation))
-    (t
-     (if (packagep symbol) 
-	 (get (find-symbol (package-name symbol) :keyword) 'package-documentation)
-       (error "~S is an illegal documentation type." doc-type)))))
+    (otherwise
+     (cond
+       ((packagep symbol) 
+	(get (find-symbol (package-name symbol) :keyword) 'package-documentation))
+       ((eql doc-type t) nil)
+       (t (error "~S is an illegal documentation type." doc-type))))))
 
 
 (defun find-documentation (body)
@@ -83,5 +85,3 @@
                      (eq (car form) 'declare))
                 (find-documentation (cdr body))
                 nil)))))
-
-

@@ -29,7 +29,11 @@
 (export '(setf psetf shiftf rotatef
           define-modify-macro defsetf
           getf remf incf decf push pushnew pop
-          define-setf-method get-setf-method get-setf-method-multiple-value))
+          define-setf-method
+	  define-setf-expander
+	  get-setf-method
+	  get-setf-expansion
+	  get-setf-method-multiple-value))
 
 
 (in-package 'system)
@@ -78,7 +82,9 @@
 	(t (setq args (cons (gensym) args))
 	   (push `(declare (ignore ,(car args))) body)))
   `(eval-when (compile eval load)
-          (si:putprop ',access-fn #'(lambda ,args ,@ body) 'setf-method)
+          (si:putprop ',access-fn
+		      #'(lambda ,args (block ,access-fn ,@ body))
+		      'setf-method)
           (remprop ',access-fn 'setf-lambda)
           (remprop ',access-fn 'setf-update-fn)
           (si:putprop ',access-fn
@@ -86,6 +92,8 @@
                       'setf-documentation)
           ',access-fn))
 
+(defmacro define-setf-expander (access-fn &rest rest)
+  `(define-setf-method ,access-fn ,@rest))
 
 ;;; GET-SETF-METHOD.
 ;;; It just calls GET-SETF-METHOD-MULTIPLE-VALUE
@@ -97,6 +105,8 @@
 	    (error "Multiple store-variables are not allowed."))
     (values vars vals stores store-form access-form)))
 
+(defun get-setf-expansion (form &optional env)
+  (get-setf-method form env))
 
 ;;;; GET-SETF-METHOD-MULTIPLE-VALUE.
 

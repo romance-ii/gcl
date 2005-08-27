@@ -23,6 +23,7 @@
 
 
 (export '(si::define-compiler-macro
+          si::compiler-macro-function
 	  si::undef-compiler-macro
           si::define-inline-function) 'system)
 
@@ -285,15 +286,15 @@
 	  (let-wrap lets (binary-nest-int form len)))
       form)))
 
-(si::putprop '* (function binary-nest) 'compiler-macro)
-(si::putprop '+ (function binary-nest) 'compiler-macro)
+(si::putprop '* (function binary-nest) 'si::compiler-macro-prop)
+(si::putprop '+ (function binary-nest) 'si::compiler-macro-prop)
 
-(si::putprop 'logand (function binary-nest) 'compiler-macro)
-(si::putprop 'logior (function binary-nest) 'compiler-macro)
-(si::putprop 'logxor (function binary-nest) 'compiler-macro)
+(si::putprop 'logand (function binary-nest) 'si::compiler-macro-prop)
+(si::putprop 'logior (function binary-nest) 'si::compiler-macro-prop)
+(si::putprop 'logxor (function binary-nest) 'si::compiler-macro-prop)
 
-(si::putprop 'max (function binary-nest) 'compiler-macro)
-(si::putprop 'min (function binary-nest) 'compiler-macro)
+(si::putprop 'max (function binary-nest) 'si::compiler-macro-prop)
+(si::putprop 'min (function binary-nest) 'si::compiler-macro-prop)
 
 (defun invert-binary-nest (form env)
   (declare (ignore env))
@@ -306,8 +307,8 @@
 	(list op (cadr form) (cons recip (cddr form))))
     form))
 
-(si::putprop '- (function invert-binary-nest) 'compiler-macro)
-(si::putprop '/ (function invert-binary-nest) 'compiler-macro)
+(si::putprop '- (function invert-binary-nest) 'si::compiler-macro-prop)
+(si::putprop '/ (function invert-binary-nest) 'si::compiler-macro-prop)
 
 (defun logical-binary-nest (form env)
   (declare (ignore env))
@@ -320,17 +321,17 @@
 	    (push (list (car form) (car f) (cadr f)) r))))
 	form))
 
-(si::putprop '> (function logical-binary-nest) 'compiler-macro)
-(si::putprop '>= (function logical-binary-nest) 'compiler-macro)
-(si::putprop '< (function logical-binary-nest) 'compiler-macro)
-(si::putprop '<= (function logical-binary-nest) 'compiler-macro)
-(si::putprop '= (function logical-binary-nest) 'compiler-macro)
+(si::putprop '> (function logical-binary-nest) 'si::compiler-macro-prop)
+(si::putprop '>= (function logical-binary-nest) 'si::compiler-macro-prop)
+(si::putprop '< (function logical-binary-nest) 'si::compiler-macro-prop)
+(si::putprop '<= (function logical-binary-nest) 'si::compiler-macro-prop)
+(si::putprop '= (function logical-binary-nest) 'si::compiler-macro-prop)
 
-(si::putprop 'char> (function logical-binary-nest) 'compiler-macro)
-(si::putprop 'char>= (function logical-binary-nest) 'compiler-macro)
-(si::putprop 'char< (function logical-binary-nest) 'compiler-macro)
-(si::putprop 'char<= (function logical-binary-nest) 'compiler-macro)
-(si::putprop 'char= (function logical-binary-nest) 'compiler-macro)
+(si::putprop 'char> (function logical-binary-nest) 'si::compiler-macro-prop)
+(si::putprop 'char>= (function logical-binary-nest) 'si::compiler-macro-prop)
+(si::putprop 'char< (function logical-binary-nest) 'si::compiler-macro-prop)
+(si::putprop 'char<= (function logical-binary-nest) 'si::compiler-macro-prop)
+(si::putprop 'char= (function logical-binary-nest) 'si::compiler-macro-prop)
 
 (defun logical-outer-nest (form env)
   (declare (ignore env))
@@ -344,8 +345,8 @@
 	    (push (list (car form) (car f) (car g)) r)))))
     form))
 
-(si::putprop '/= (function logical-outer-nest) 'compiler-macro)
-(si::putprop 'char/= (function logical-outer-nest) 'compiler-macro)
+(si::putprop '/= (function logical-outer-nest) 'si::compiler-macro-prop)
+(si::putprop 'char/= (function logical-outer-nest) 'si::compiler-macro-prop)
 
 
 (defun incr-to-plus (form env)
@@ -356,8 +357,8 @@
   (declare (ignore env))
   `(- ,(cadr form) 1))
 
-(si::putprop '1+ (function incr-to-plus) 'compiler-macro)
-(si::putprop '1- (function decr-to-minus) 'compiler-macro)
+(si::putprop '1+ (function incr-to-plus) 'si::compiler-macro-prop)
+(si::putprop '1- (function decr-to-minus) 'si::compiler-macro-prop)
 
 (defun seqind-wrap (form)
   (if *safe-compile*
@@ -382,7 +383,7 @@
 				`(* ,first (array-dimension ,ar ,it))) ,second)) ,@rest)
 		nil it))))))
 
-(si::putprop 'array-row-major-index (function array-row-major-index-expander) 'compiler-macro)
+(si::putprop 'array-row-major-index (function array-row-major-index-expander) 'si::compiler-macro-prop)
 
 (defmacro with-pulled-array (bindings form &body body)
   `(let ((,(car bindings) (cadr ,form)))
@@ -399,8 +400,8 @@
      (let ((lets (append lets `((,isym (array-row-major-index ,sym ,@(cddr form)))))))
        (let-wrap lets `(compiler::cmp-aref ,sym ,isym))))))
 
-(si::putprop 'aref (function aref-expander) 'compiler-macro)
-(si::putprop 'row-major-aref (function aref-expander) 'compiler-macro)
+(si::putprop 'aref (function aref-expander) 'si::compiler-macro-prop)
+(si::putprop 'row-major-aref (function aref-expander) 'si::compiler-macro-prop)
 
 (defun aset-expander (form env)
   (declare (ignore env))
@@ -410,9 +411,9 @@
      (let ((lets (append lets `((,isym (array-row-major-index ,sym ,@(butlast (cddr form))))))))
        (let-wrap lets `(compiler::cmp-aset ,sym ,isym ,(car (last form))))))))
 
-(si::putprop 'si::aset (function aset-expander) 'compiler-macro)
+(si::putprop 'si::aset (function aset-expander) 'si::compiler-macro-prop)
 ;FIXME -- test and install this and svref, CM 20050106
-;(si::putprop 'svset (function aset-expander) 'compiler-macro)
+;(si::putprop 'svset (function aset-expander) 'si::compiler-macro-prop)
 
 (defun array-dimension-expander (form env)
   (declare (ignore env))
@@ -420,7 +421,7 @@
    (ar lets sym) form
    (let-wrap lets `(compiler::cmp-array-dimension ,sym ,(caddr form)))))
 
-(si::putprop 'array-dimension (function array-dimension-expander) 'compiler-macro)
+(si::putprop 'array-dimension (function array-dimension-expander) 'si::compiler-macro-prop)
 
 (defun do-list-search (test list &key (k1 nil k1p) (key nil keyp) (item nil itemp) rev (ret nil retp) test-not ((:test foo)))
   (declare (ignore foo))
@@ -470,15 +471,15 @@
       `(let (,@syms)
 	 ,(apply 'possible-eq-list-search (car r) (cadr r) specials `(,@overrides ,@(cddr r)))))))
 
-(si::putprop 'member (macro-function 'member-compiler-macro) 'compiler-macro)
-(si::putprop 'member-if (macro-function 'member-compiler-macro) 'compiler-macro)
-(si::putprop 'member-if-not (macro-function 'member-compiler-macro) 'compiler-macro)
-(si::putprop 'assoc (macro-function 'member-compiler-macro) 'compiler-macro)
-(si::putprop 'assoc-if (macro-function 'member-compiler-macro) 'compiler-macro)
-(si::putprop 'assoc-if-not (macro-function 'member-compiler-macro) 'compiler-macro)
-(si::putprop 'rassoc (macro-function 'member-compiler-macro) 'compiler-macro)
-(si::putprop 'rassoc-if (macro-function 'member-compiler-macro) 'compiler-macro)
-(si::putprop 'rassoc-if-not (macro-function 'member-compiler-macro) 'compiler-macro)
+(si::putprop 'member (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'member-if (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'member-if-not (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'assoc (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'assoc-if (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'assoc-if-not (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'rassoc (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'rassoc-if (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'rassoc-if-not (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
 
 ;;start end count position
 (defun do-sequence-search (fn vars &key dest newseq (sum nil sump) pos start end count (item nil itemp) ret k1 (key nil keyp) (test ''eql) rev not)
@@ -565,7 +566,7 @@
 ;	 ((all-vectors ,@(cdr args))
 ;	  ,(do-vector-search (car args) (cdr args) :not t))
 ;	 ((funcall (function every) ,@args))))
-;(si::putprop 'every (macro-function 'every-compiler-macro) 'compiler-macro)
+;(si::putprop 'every (macro-function 'every-compiler-macro) 'si::compiler-macro-prop)
 	    
 
 
@@ -624,7 +625,7 @@
                                   (setq forms (reverse fl)))))
                   (list 'call-local info (cddr fd) forms))
              (c1expr (cmp-expand-macro fd fname args))))
-        ((let ((fn (get fname 'compiler-macro)) (res (cons fname args)))
+        ((let ((fn (get fname 'si::compiler-macro-prop)) (res (cons fname args)))
 	   (and fn
 		(let ((fd (cmp-eval `(funcall ',fn ',res nil))))
                  (and (not (eq res fd))
@@ -1036,11 +1037,14 @@
 (defmacro si::define-compiler-macro (name vl &rest body)
   `(progn (si:putprop ',name
                       (caddr (si:defmacro* ',name ',vl ',body))
-                      'compiler-macro)
+                      'si::compiler-macro-prop)
           ',name))  
 
+(defun si::compiler-macro-function (name)
+  (get name 'si::compiler-macro-prop))  
+
 (defun si::undef-compiler-macro (name)
-  (remprop name 'compiler-macro))
+  (remprop name 'si::compiler-macro-prop))
 
 (defvar *compiler-temps*
         '(tmp0 tmp1 tmp2 tmp3 tmp4 tmp5 tmp6 tmp7 tmp8 tmp9))
