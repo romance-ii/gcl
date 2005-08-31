@@ -91,6 +91,7 @@
                 (declare (type fixnum len))
                 (do ((i 0 (1+ i)))
                     ((>= i len))
+		  (declare (type fixnum i))
                   (setf tail (setf (cdr tail) (cons (elt s i) nil))))))))
       (do ((x (make-sequence result-type
                              (apply #'+ (mapcar #'length sequences))))
