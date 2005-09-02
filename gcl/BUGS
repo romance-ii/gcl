@@ -1314,3 +1314,7 @@ Error in LET [or a callee]: What kind of instance is this?
 
   Error in COMPILER::CMP-ANON [or a callee]: FUNCTION is not of type #:G1832.
 
+287. DO-ALL-SYMBOLS should return when a RETURN is executed in its body.
+     However, it is just skipping the package currently being traversed,
+     since the macro is implemented as two nested loops and each has
+     its own implicit NIL block.  ansi-tests: do-all-symbols.12
