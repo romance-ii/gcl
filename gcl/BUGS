@@ -74,8 +74,8 @@ number in place so it isn't reused.
 
    (ansi-tests: nreverse-vector.7, nreverse-vector.8)
 
-17. The setf expander for SUBSEQ returns the wrong value (the entire
-   vector is returned rather than the aubsequence being assigned.)
+17. (FIXED) The setf expander for SUBSEQ returns the wrong value (the
+   entire vector is returned rather than the aubsequence being assigned.)
    ansi-tests: subseq.order.[34]
 
 18. CONCATENATE fails on type argument of NULL, as does MERGE.

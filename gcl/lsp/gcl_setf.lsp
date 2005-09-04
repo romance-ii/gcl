@@ -254,8 +254,9 @@
               `(getf ,access-form ,itemp ,default)))))
 
 (defsetf subseq (sequence1 start1 &optional end1)
-		(sequence2)
-  `(replace ,sequence1 ,sequence2 :start1 ,start1 :end1 ,end1))
+                (sequence2)
+  `(progn (replace ,sequence1 ,sequence2 :start1 ,start1 :end1 ,end1)
+	  ,sequence2))
 
 (define-setf-method the (&environment env type form)
   (multiple-value-bind (vars vals stores store-form access-form)
