@@ -23,7 +23,7 @@
 
 (in-package "LISP")
 
-(export '(defvar defparameter defconstant))
+(export '(defvar defparameter defconstant memq))
 
 (in-package "SYSTEM")
 
@@ -343,3 +343,4 @@
 	     ,@(mapcar #'(lambda (x) `(proclaim ',x)) l)))
 
 (defmacro lambda ( &rest l) `(function (lambda ,@l)))
+(defmacro memq (a b) `(member ,a ,b :test 'eq))
