@@ -709,13 +709,13 @@
 (defun co1typep (f args &aux tem) f
   (let* ((x (car args))  new
 	 (type (and (literalp (cadr args)) (cmp-eval (cadr args)))))
-      (let ((rt (result-type (car args))))
-;	(format t "~a ~a ~a ~a ~a ~a~%" type rt (car args) (subtypep rt type) (multiple-value-list (subtypep type rt)) (type-and type rt))
-	(cond ((subtypep rt type)
+      (let* ((rt (result-type (car args)))
+	     (ta (type-and rt type)))
+;	(format t "~a ~a ~a ~a~%" type rt ta (eq ta rt))
+	(cond ((eq ta rt)
 	       (setq new t)
 	       (return-from co1typep (c1expr new)))
-	      ;;FIXME only need type-and here when finalized
-	      ((and type (multiple-value-bind (m v) (subtypep type rt) (and (not m) v)) (not (type-and type rt)))
+	      ((and type (not ta))
 	       (setq new nil)
 	       (return-from co1typep (c1expr new)))))
     (setq new
@@ -969,19 +969,19 @@
 
 
 
-(defvar *aet-types*
-  #(T STRING-CHAR SIGNED-CHAR FIXNUM SHORT-FLOAT LONG-FLOAT
-			SIGNED-CHAR
-			UNSIGNED-CHAR SIGNED-SHORT UNSIGNED-SHORT))
+(defvar *aet-types* ;FIXME generate and centralize
+  #(T STRING-CHAR SIGNED-CHAR FIXNUM NON-NEGATIVE-FIXNUM SHORT-FLOAT LONG-FLOAT
+			SIGNED-CHAR NON-NEGATIVE-CHAR
+			UNSIGNED-CHAR SIGNED-SHORT NON-NEGATIVE-SHORT UNSIGNED-SHORT))
 
 
 (defun aet-c-type (type)
   (ecase type
     ((t) "object")
-    ((string-char signed-char) "char")
-    (fixnum "fixnum")
+    ((string-char signed-char non-negative-char) "char")
+    ((non-negative-fixnum fixnum) "fixnum")
     (unsigned-char "unsigned char")
-    (signed-short "short")
+    ((signed-short non-negative-short) "short")
     (unsigned-short "unsigned short")
     (long-float "longfloat")
     (short-float "shortfloat")))
