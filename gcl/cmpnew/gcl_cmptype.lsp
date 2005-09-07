@@ -263,7 +263,7 @@
 
 ;;FIXME -- centralize subtypep, normalzie-type, type>=, type-and.
 ;;Consider traversing a static tree.  CM 20050106
-(defun type-and (type1 type2)
+(defun type-and (type1 type2 &aux tem)
 
   (let ((nt1 (si::normalize-type type1)))
     (unless (and (not (array-wd type1)) (equal nt1 (if (symbolp type1) (list type1) type1)))
@@ -289,9 +289,13 @@
 	((eq type2 '*) type1)
 	((si::memq type1 '(t object)) type2)
 	((si::memq type2 '(t object)) type1)
+	((setq tem (car (si::resolve-type `(and ,type1 ,type2))));FIXME
+	 (let ((ntem (si::normalize-type tem)))
+	   (cond ((equal ntem type1) type1)
+		 ((equal ntem type2) type2)
+		 (tem))))
 	((or (integer-typep type1) (integer-typep type2))
-;	 (integer-type-and type1 type2))FIXME
-	 (si::resolve-type `(and ,type1 ,type2)))
+	 (integer-type-and type1 type2));FIXME
 	((and (array-tp type1) (array-tp type2))
 	 (cond
 	  ((eq (car type1) (car type2))
@@ -355,7 +359,7 @@
 	     ))))
 		 
 (defun type>= (type1 type2)
-  (equal (type-and type1 type2) type2))
+  (eq (type-and type1 type2) type2))
 
 (defun reset-info-type (info)
   (if (info-type info)
