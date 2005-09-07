@@ -61,7 +61,8 @@
 ;;;
 (eval-when (compile load eval)
 
-(defmacro memq (item list) `(member ,item ,list :test #'eq))
+(import '(si::memq) 'pcl)
+;(defmacro memq (item list) `(member ,item ,list :test #'eq))
 (defmacro assq (item list) `(assoc ,item ,list :test #'eq))
 (defmacro rassq (item list) `(rassoc ,item ,list :test #'eq))
 (defmacro delq (item list) `(delete ,item ,list :test #'eq))
