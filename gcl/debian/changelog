@@ -144,8 +144,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * interpreted-function support
   * more TAGS makefile support -- todo merge all dirs
   * logical-pathname-p
+  * type-of support for classes
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 02:56:23 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 02:59:22 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 

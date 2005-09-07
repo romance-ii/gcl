@@ -291,7 +291,7 @@ check_type(object x, int t)
 }
    
 
-LFD(Ltype_of)(void)
+LFD(siLtype_of_c)(void)
 {
 	int i;
 
@@ -299,12 +299,15 @@ LFD(Ltype_of)(void)
 
 	switch (type_of(vs_base[0])) {
 	case t_fixnum:
-		vs_base[0] = sLfixnum;
-		break;
+	  {
+	    fixnum i=fix(vs_base[0]);
+	    vs_base[0] = !i || i==1 ? sLbit : (i>0 ? sLnon_negative_fixnum : sLfixnum);
+	  }
+	  break;
 
 	case t_bignum:
-		vs_base[0] = sLbignum;
-		break;
+	  vs_base[0] = big_sign(vs_base[0])<0 ? sLbignum : sLnon_negative_bignum;
+	  break;
 
 	case t_ratio:
 		vs_base[0] = sLratio;
@@ -331,15 +334,19 @@ LFD(Ltype_of)(void)
 			if ((' ' <= i && i < '\177') || i == '\n')
 				vs_base[0] = sLstandard_char;
 			else
-				vs_base[0] = sLstring_char;
+				vs_base[0] = sLbase_char;
 		}
 		break;
 
 	case t_symbol:
-		if (vs_base[0]->s.s_hpack == keyword_package)
-			vs_base[0] = sLkeyword;
+		if (vs_base[0]==Cnil)
+		  vs_base[0] = sLnull;
+		else if (vs_base[0]==Ct)
+		  vs_base[0]=sLboolean;
+		else if (vs_base[0]->s.s_hpack == keyword_package)
+		  vs_base[0] = sLkeyword;
 		else
-			vs_base[0] = sLsymbol;
+		  vs_base[0] = sLsymbol;
 		break;
 
 	case t_package:
@@ -355,40 +362,40 @@ LFD(Ltype_of)(void)
 		break;
 
 	case t_array:
-		if (vs_base[0]->a.a_adjustable ||
-		    vs_base[0]->a.a_displaced->c.c_car == Cnil)
-			vs_base[0] = sLarray;
-		else
-			vs_base[0] = sLsimple_array;
-		break;
+/* 		if (vs_base[0]->a.a_adjustable || */
+/* 		    vs_base[0]->a.a_displaced->c.c_car == Cnil) */
+/* 			vs_base[0] = sLarray; */
+/* 		else */
+	  vs_base[0] = sLarray;
+	  break;
 
 	case t_vector:
-		if (vs_base[0]->v.v_adjustable ||
-		    vs_base[0]->v.v_hasfillp ||
-		    vs_base[0]->v.v_displaced->c.c_car == Cnil ||
-		    (enum aelttype)vs_base[0]->v.v_elttype != aet_object)
-			vs_base[0] = sLvector;
-		else
-			vs_base[0] = sLsimple_vector;
-		break;
+/* 		if (vs_base[0]->v.v_adjustable || */
+/* 		    vs_base[0]->v.v_hasfillp || */
+/* 		    vs_base[0]->v.v_displaced->c.c_car == Cnil || */
+/* 		    (enum aelttype)vs_base[0]->v.v_elttype != aet_object) */
+/* 			vs_base[0] = sLvector; */
+/* 		else */
+	  vs_base[0] = sLvector;
+	  break;
 
 	case t_string:
-		if (vs_base[0]->st.st_adjustable ||
-		    vs_base[0]->st.st_hasfillp ||
-		    vs_base[0]->st.st_displaced->c.c_car == Cnil)
-			vs_base[0] = sLstring;
-		else
-			vs_base[0] = sLsimple_string;
-		break;
+/* 		if (vs_base[0]->st.st_adjustable || */
+/* 		    vs_base[0]->st.st_hasfillp || */
+/* 		    vs_base[0]->st.st_displaced->c.c_car == Cnil) */
+/* 			vs_base[0] = sLstring; */
+/* 		else */
+	  vs_base[0] = sLstring;
+	  break;
 
 	case t_bitvector:
-		if (vs_base[0]->bv.bv_adjustable ||
-		    vs_base[0]->bv.bv_hasfillp ||
-		    vs_base[0]->bv.bv_displaced->c.c_car == Cnil)
-			vs_base[0] = sLbit_vector;
-		else
-			vs_base[0] = sLsimple_bit_vector;
-		break;
+/* 		if (vs_base[0]->bv.bv_adjustable || */
+/* 		    vs_base[0]->bv.bv_hasfillp || */
+/* 		    vs_base[0]->bv.bv_displaced->c.c_car == Cnil) */
+/* 			vs_base[0] = sLbit_vector; */
+/* 		else */
+	  vs_base[0] = sLbit_vector;
+	  break;
 
 	case t_structure:
 		
@@ -436,8 +443,11 @@ LFD(Ltype_of)(void)
 		break;
 
 	case t_pathname:
-		vs_base[0] = sLpathname;
-		break;
+	  if (pathname_lookup(vs_base[0]->pn.pn_host,sSApathname_logicalA->s.s_dbind)!=Cnil)
+	    vs_base[0] = sLlogical_pathname;
+	  else
+	    vs_base[0] = sLpathname;
+	  break;
 
 	case t_random:
 		vs_base[0] = sLrandom_state;
@@ -452,6 +462,10 @@ LFD(Ltype_of)(void)
         case t_closure:
 		vs_base[0] = sLcompiled_function;
 		break;
+
+	case t_ifun:
+	  vs_base[0]=sLinterpreted_function;
+	  break;
 
 	default:
 		error("not a lisp data object");
@@ -475,6 +489,7 @@ DEF_ORDINARY("SIMPLE-STRING",sLsimple_string,LISP,"");
 DEF_ORDINARY("FUNCTION",sLfunction,LISP,"");
 DEF_ORDINARY("FUNCTION-IDENTIFIER",sLfunction_identifier,LISP,"");
 DEF_ORDINARY("COMPILED-FUNCTION",sLcompiled_function,LISP,"");
+DEF_ORDINARY("INTERPRETED-FUNCTION",sLinterpreted_function,LISP,"");
 DEF_ORDINARY("PATHNAME",sLpathname,LISP,"");
 DEF_ORDINARY("CHARACTER",sLcharacter,LISP,"");
 DEF_ORDINARY("NUMBER",sLnumber,LISP,"");
@@ -505,6 +520,8 @@ DEF_ORDINARY("UNSIGNED-SHORT",sLunsigned_short,LISP,"");
 DEF_ORDINARY("FIXNUM",sLfixnum,LISP,"");
 DEF_ORDINARY("NON-NEGATIVE-FIXNUM",sLnon_negative_fixnum,LISP,"");
 DEF_ORDINARY("NEGATIVE-FIXNUM",sLnegative_fixnum,LISP,"");
+DEF_ORDINARY("NON-NEGATIVE-BIGNUM",sLnon_negative_bignum,LISP,"");
+DEF_ORDINARY("NEGATIVE-BIGNUM",sLnegative_bignum,LISP,"");
 DEF_ORDINARY("SIGNED-FIXNUM",sLsigned_fixnum,LISP,"");
 DEF_ORDINARY("UNSIGNED-FIXNUM",sLunsigned_fixnum,LISP,"");
 
@@ -657,5 +674,5 @@ gcl_init_typespec_function(void)
 							    Cnil)))));
 	enter_mark_origin(&TSor_pathname_string_symbol_stream);
 
-	make_function("TYPE-OF", Ltype_of);
+	make_si_function("TYPE-OF-C", siLtype_of_c);
 }				
