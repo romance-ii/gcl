@@ -90,7 +90,7 @@ number in place so it isn't reused.
   broadcast-stream-streams cell-error-name concatenated-stream-streams
   echo-stream-input-stream echo-stream-output-stream
   function-lambda-expression  (FIXED)get-setf-expansion
-  make-load-form-saving-slots pprint-indent pprint-newline
+ (FIXED) make-load-form-saving-slots pprint-indent pprint-newline
   pprint-tab print-not-readable-object simple-condition-format-control
   synonym-stream-symbol two-way-stream-input-stream
   two-way-stream-output-stream unbound-slot-instance
@@ -136,7 +136,7 @@ number in place so it isn't reused.
       concatenated-stream-streams.[12345]
       concatenated-stream-streams.error.[12]
 
-   make-load-form-saving-slots:
+   (FIXED) make-load-form-saving-slots:
       make-load-form-saving-slots.[123456789]
       make-load-form-saving-slots.1[012]
       make-load-form-saving-slots.error.[12]
@@ -345,45 +345,45 @@ number in place so it isn't reused.
 
 74. SUBTYPEP problems (ansi-tests: types.3)
 
-   a. GENERIC-FUNCTION FUNCTION ==> NIL T
-   b. UNBOUND-SLOT CELL-ERROR ==> NIL T
+   a. (FIXED) GENERIC-FUNCTION FUNCTION ==> NIL T
+   b. (FIXED) UNBOUND-SLOT CELL-ERROR ==> NIL T
       (see also unbound-slot-cpl)
-   c. FLOATING-POINT-INVALID-OPERATION ARITHMETIC-ERROR ==> NIL T
+   c. (FIXED) FLOATING-POINT-INVALID-OPERATION ARITHMETIC-ERROR ==> NIL T
       (see also floating-point-invalid-operation-cpl type-of.5)
-   d. FLOATING-POINT-INEXACT ARITHMETIC-ERROR ==> NIL T
+   d. (FIXED) FLOATING-POINT-INEXACT ARITHMETIC-ERROR ==> NIL T
       (see also floating-point-inexact-cpl type-of.5)
-   e. LOGICAL-PATHNAME PATHNAME ==> NIL T
-   f. PRINT-NOT-READABLE ERROR ==> NIL T
+   e. (FIXED) LOGICAL-PATHNAME PATHNAME ==> NIL T
+   f. (FIXED) PRINT-NOT-READABLE ERROR ==> NIL T
       (see also print-not-readable-cpl)
-   g. READER-ERROR PARSE-ERROR ==> NIL T
+   g. (FIXED) READER-ERROR PARSE-ERROR ==> NIL T
       (see also reader-error-cpl)
-   h. READER-ERROR STREAM-ERROR ==> NIL T
+   h. (FIXED) READER-ERROR STREAM-ERROR ==> NIL T
 
    (see also condition.2 for subtype failures on expected subtype
     relationships of condition types)
 
 75. More SUBTYPEP problems (ansi-tests: types.9a)
 
-   a. VECTOR SIMPLE-ARRAY ==> T T
-   b. ARRAY SIMPLE-ARRAY ==> T T
-   c. BIT-VECTOR SIMPLE-ARRAY ==> T T
-   d. BIT-VECTOR SIMPLE-BIT-VECTOR ==> T T
+   a. (FIXED) VECTOR SIMPLE-ARRAY ==> T T
+   b. (FIXED) ARRAY SIMPLE-ARRAY ==> T T
+   c. (FIXED) BIT-VECTOR SIMPLE-ARRAY ==> T T
+   d. (FIXED) BIT-VECTOR SIMPLE-BIT-VECTOR ==> T T
 
    (counterexample elements were found for all these supposed subtype
     relationship.)
 
-76. (subtypep 'function 'atom) ==> T T (which is correct), but there
+76. (FIXED) (subtypep 'function 'atom) ==> T T (which is correct), but there
     are function objects that are not of type atom.  The problem is that
     cons cells are used to represent functions.  The problem is tbat
     lambda expressions are no longer of type FUNCTION in CLtS.
     (also from ansi-test types.9a, see also
      universe-elements-in-at-most-one-disjoint-type)
 
-77. Yet more SUBTYPEP problems:
+77. (FIXED) Yet more SUBTYPEP problems:
      (subtypep 'standard-object (find-class 'standard-object)) ==> nil t
     ansi-tests: all-classes-are-type-equivalent-to-their-names
 
-78. A number of standardized classes are implemented as structure
+78. (FIXED) A number of standardized classes are implemented as structure
     classes (which is allowed) but subtypep is not recognizing them
     as subtypes of structure-object:  synonym-stream, hash-table,
     broadcast-stream,  echo-stream, pathname, concatenated-stream,
@@ -394,7 +394,7 @@ number in place so it isn't reused.
 79. The standardized generic function DOCUMENTATION should be a member
     of the class GENERIC-FUNCTION.
 
-80. SUBTYPEP is not correctly determining that if a class X is a subclass
+80. (FIXED, please check) SUBTYPEP is not correctly determining that if a class X is a subclass
     of classes Y and Z, then X is a subtype of (AND Y Z) (it is allowed
     to fail to determine the subtype relationship, but if it does it must
     determine it correctly).  ansi-tests: tac-3.16
@@ -407,46 +407,46 @@ number in place so it isn't reused.
      allocate-instance.order.1 change-class.3.[12]
      update-instance-for-different-class.4
 
-82. In a DEFTYPE lambda list, the default value for missing key or optional
+82. (FIXED) In a DEFTYPE lambda list, the default value for missing key or optional
     parameters should be the symbol *, not NIL.
     ansi-tests: deftype.11 deftype.12 deftype.18
 
-83. SUBTYPEP is not correctly handling a DEFTYPE that yields the NIL type:
+83. (FIXED) SUBTYPEP is not correctly handling a DEFTYPE that yields the NIL type:
      (deftype foo () nil)
      (subtypep '(foo) nil) ==> nil t
     ansi-tests: deftype.13
 
-84. The body of a DEFTYPE form should be in an implicit block whose name
+84. (FIXED) The body of a DEFTYPE form should be in an implicit block whose name
     is the name of the type being defined.
     ansi-tests: deftype.16
 
-85. DEFTYPE forms are not allowing all DECLARE expressions.
+85. (FIXED) DEFTYPE forms are not allowing all DECLARE expressions.
     ansi-tests: deftype.19
 
-86. Free special declarations in a DEFTYPE should not apply to the
+86. (partially FIXED) Free special declarations in a DEFTYPE should not apply to the
     forms in optional or key arguments in the deftype lambda list.
     ansi-tests: deftype.15
 
-87. The method parameter specifier (X FUNCTION) is not matching
+87. (FIXED) The method parameter specifier (X FUNCTION) is not matching
     the function value #'CONS.
     ansi-tests: standard-generic-function.[12]
 
 88. Numerous problems with TYPE-OF (ansi-tests: type-of.1 type-of.4)
 
-   a. TYPE-OF of a nonnegative integer must be a subtype of UNSIGNED-BYTE.
-   b. #\Rubout, #\Tab, #\Backspace, #\Return, and #\Page are BASE-CHARs,
+   a. (FIXED) TYPE-OF of a nonnegative integer must be a subtype of UNSIGNED-BYTE.
+   b. (FIXED) #\Rubout, #\Tab, #\Backspace, #\Return, and #\Page are BASE-CHARs,
       and have TYPE-OF ==> STRING-CHAR,  but
        (SUBTYPEP 'STRING-CHAR 'BASE-CHAR) ==> nil t
-   c. TYPE-OF on condition objects returns PCL::STD-INSTANCE, which is
+   c. (FIXED) TYPE-OF on condition objects returns PCL::STD-INSTANCE, which is
       not a subtypep of the condition types to which the objects belong.
       It also isn't a subtype of the class returned by CLASS-OF.
-   d, TYPE-OF on #(nil nil) is VECTOR, but #(nil nil) is a SIMPLE-VECTOR.
-   e. TYPE-OF on a logical pathname returns PATHNAME, which is not a subtype
+   d, (FIXED) TYPE-OF on #(nil nil) is VECTOR, but #(nil nil) is a SIMPLE-VECTOR.
+   e. (FIXED) TYPE-OF on a logical pathname returns PATHNAME, which is not a subtype
       of LOGICAL-PATHNAME.
-   f. TYPE-OF on standard methods returns PCL::STD-INSTANCE, which is not
+   f. (FIXED) TYPE-OF on standard methods returns PCL::STD-INSTANCE, which is not
       a subtype of METHOD, STANDARD-METHOD, OR STANDARD-OBJECT.
       It is also not a subtype of (CLASS-OF <method>).
-   g. TYPE-OF on a compiled closure for a generic function yields
+   g. (FIXED) TYPE-OF on a compiled closure for a generic function yields
       COMPILED-FUNCTION, which is not a subtype of GENERIC-FUNCTION,
       STANDARD-GENERIC-FUNCTION, or STANDARD-OBJECT.  It is also not
       a subtype of (CLASS-OF <fun>).
@@ -456,19 +456,19 @@ number in place so it isn't reused.
    the standard.  Given that they are elements, the subtype relationship
    is required by the standard.)
 
-89. TYPE-OF on an instance of a user-defined standard class is
+89. (FIXED) TYPE-OF on an instance of a user-defined standard class is
     PCL::STD-INSTANCE, but it should be the name of the class
     (or the class itself if it has no name).
     ansi-tests: type-of.7 type-of.8 type-of.9 (and type-of.10,
     indirectly)
 
-90. typep should signal an error if the type is a VALUES type.
+90. (FIXED) typep should signal an error if the type is a VALUES type.
     ansi-tests: typep.error.4 typep.error.5 typep.error.6
 
-91. typep should signal an error if the type is a compound function
+91. (FIXED) typep should signal an error if the type is a compound function
     type.  ansi-tests: typep.error.7
 
-92. The CPL (class precedence list) tests are failing due to a bug
+92. (FIXED) The CPL (class precedence list) tests are failing due to a bug
     in PCL that also showed up in SBCL and CMUCL.  The function starts
     returning NIL after a few calls.  ansi-tests: *-CPL
 
@@ -703,12 +703,12 @@ number in place so it isn't reused.
      that lack fill pointers.  It does, but the expected-type field
      is wrong.  ansi-tests: fill-pointer.error.[36]
 
-149. The value (upgraded-array-element-type 'base-char) should be
+149. (FIXED) The value (upgraded-array-element-type 'base-char) should be
      type-equivalent to base-char.  However, it is string-char,
      and (subtypep 'string-char 'base-char) ==> nil t
      ansi-tests: upgraded-array-element-type.2
 
-150. upgraded-array-element-type violates the 'preserves subtype'
+150. (FIXED) upgraded-array-element-type violates the 'preserves subtype'
      properties for numerous types.  For example:
 
       (upgraded-array-element-type '(eql 2)) ==> lisp:signed-char
@@ -718,7 +718,7 @@ number in place so it isn't reused.
 
      ansi-tests: upgraded-array-element-type.8
 
-151. (upgraded-array-element-type nil) ==> t, but it should be nil.
+151. (FIXED) (upgraded-array-element-type nil) ==> t, but it should be nil.
 
 152. vector-pop should signal a type-error when passed a vector
      that lacks a fill pointer.  It does, but the expected-type
@@ -948,7 +948,7 @@ Error in LET [or a callee]: What kind of instance is this?
      to the generic function.
     ansi-tests: remove-method.1
 
-202. MAKE-LOAD-FORM should have default methods (that signal errors) when
+202. (FIXED) MAKE-LOAD-FORM should have default methods (that signal errors) when
      invoked on standard objects, structure objects, or conditions.
     ansi-tests: make-load-form.[456789] make-load-form.1[012]
 
