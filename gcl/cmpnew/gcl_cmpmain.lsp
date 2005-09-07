@@ -438,7 +438,7 @@ Cannot compile ~a.~%"
 	 ;; FIXME -- support warnings-p and failures-p.  CM 20041119
 	 (values name nil nil))
 	((and (setq tem (symbol-function name))
-	      (consp tem))
+	      (or (consp tem) (when (typep tem 'interpreted-function) (setq tem (si::interpreted-function-lambda tem)))))
 	 (let ((na (if (symbol-package name) name 'cmp-anon))
 	       (tem (if *keep-gaz* tem (wrap-literals tem))) warnings failures)
 	   (unless (and (fboundp 'si::init-cmp-anon) (or (si::init-cmp-anon) (fmakunbound 'si::init-cmp-anon)))
@@ -476,7 +476,7 @@ Cannot compile ~a.~%"
 	 (setf (macro-function name) (macro-function name))
 	 nil)
 	((and (setq tem (symbol-function name))
-	      (consp tem)
+	      (or (consp tem) (when (typep tem 'interpreted-function) (setq tem (si::interpreted-function-lambda tem))))
 	      (eq (car tem) 'lambda-block))
 	 (let ((gaz (gazonk-name)))
 	   (with-open-file
@@ -823,7 +823,7 @@ SYSTEM_SPECIAL_INIT
       (return-from mysub str))
     (let ((y (+ (length it) (the fixnum x))))
       (declare (fixnum y))
-      (concatenate (type-of str)
+      (concatenate (lisp::type-of str)
 		   (subseq str 0 x)
 		   new
 		   (mysub (subseq str y) it new)))))

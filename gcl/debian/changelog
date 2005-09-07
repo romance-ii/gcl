@@ -127,8 +127,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * Use new enhanced type-and in typep compiler optimizations -- patter
     should be used elsewhere
   * non-negative-{char,short-fixnum} array types
+  * compiler support for new interpreted function type
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 02:39:58 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 02:40:33 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
