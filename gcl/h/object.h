@@ -388,11 +388,14 @@ enum aelttype {   /*  array element type  */
  aet_ch,          /*  string-char  */
  aet_bit,         /*  bit  */
  aet_fix,         /*  fixnum  */
+ aet_nnfix,       /*  non-neg fixnum  */
  aet_sf,          /*  short-float  */
  aet_lf,          /*  plong-float  */
  aet_char,        /* signed char */
+ aet_nnchar,      /* non-neg char */
  aet_uchar,       /* unsigned char */
  aet_short,       /* signed short */
+ aet_nnshort,     /*  non-neg short   */
  aet_ushort,      /*  unsigned short   */
  aet_last
 };
@@ -782,6 +785,14 @@ struct sfun {
 
 };
 
+struct ifun {
+
+  FIRSTWORD; 
+
+  object   ifn_self;       /* list def */
+
+};
+
 struct vfun {
 
   FIRSTWORD; 
@@ -851,6 +862,7 @@ union lispunion {
  struct cclosure           cc; /*  compiled closure  uses value stack */
  struct closure            cl; /*  compiled closure  uses c stack */
  struct sfun              sfn; /*  simple function */
+ struct ifun              ifn; /*  interpreted function */
  struct vfun              vfn; /*  function with variable number of args */
  struct cfdata            cfd; /* compiled fun data */
  struct spice             spc; /*  spice  */
@@ -931,7 +943,7 @@ struct typemanager {
 /*
  The table of type managers.
 */
-EXTER struct typemanager tm_table[ 32  /* (int) t_relocatable */];
+EXTER struct typemanager tm_table[ (int)t_other ];
 
 #define tm_of(t) (&(tm_table[(int)tm_table[(int)(t)].tm_type]))
 

@@ -27,6 +27,7 @@ enum type {
   t_cfun,
   t_cclosure,
   t_sfun,
+  t_ifun,
   t_gfun,
   t_vfun,
   t_afun,
