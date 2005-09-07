@@ -44,7 +44,7 @@
 (proclaim '(optimize (safety 2) (space 3)))
 
 (defun best-array-element-type (type)
-  (cond ((not type))
+  (cond ((not type) nil)
 	((eq type '*) '*)
 	((member type '(string-char character standard-char base-char extended-char)) 'string-char) ;FIXME
 	((car (member type +array-types+)))
