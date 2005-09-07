@@ -159,8 +159,10 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * depend on common-lisp-controller, Closes: #308365
   * base-char lisp symbol
   * move base-char init into trad image
+  * fix clc script to avoid hanging on stdin -- TODO FIX, this should
+    happen with -batch in any case
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 16:22:08 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 17:43:55 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 

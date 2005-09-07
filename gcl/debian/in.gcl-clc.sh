@@ -48,8 +48,8 @@ for PROF in n y; do
     fi
 
     if [ -f $gcl_bin ] ; then
-	image=$($gcl_bin -batch -eval '(princ (namestring (merge-pathnames (make-pathname :name "saved_clc_gcl") (pathname si:*system-directory*))))')
-	gcl_clc=$($gcl_bin -batch -eval '(princ (namestring (make-pathname :directory (append (pathname-directory (pathname "/usr/lib/common-lisp/")) (last (pathname-directory (pathname si::*lib-directory*)))))))')
+	image=$($gcl_bin -batch -eval '(princ (namestring (merge-pathnames (make-pathname :name "saved_clc_gcl") (pathname si:*system-directory*))))'</dev/null)
+	gcl_clc=$($gcl_bin -batch -eval '(princ (namestring (make-pathname :directory (append (pathname-directory (pathname "/usr/lib/common-lisp/")) (last (pathname-directory (pathname si::*lib-directory*)))))))'</dev/null)
     else
 	echo "Cannot find gcl." 1>&2
 	exit 1
