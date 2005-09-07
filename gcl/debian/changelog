@@ -149,8 +149,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * export class-direct-subclasses to type system
   * fix class-precedence-list-foo pcl bug a la cmucl
   * make-load-form support a la cmucl
+  * fix structure-type-slot-description-list
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 03:05:49 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 03:07:00 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 

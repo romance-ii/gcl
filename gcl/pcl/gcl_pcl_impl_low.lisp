@@ -7,7 +7,8 @@
 (setq  *EVAL-WHEN-COMPILE* t)
 )
 
-(defmacro memq (item list) `(member ,item ,list :test #'eq))
+(import '(si::memq) 'pcl)
+;(defmacro memq (item list) `(member ,item ,list :test #'eq))
 (defmacro assq (item list) `(assoc ,item ,list :test #'eq))
 (defmacro posq (item list) `(position ,item ,list :test #'eq))
 
@@ -290,33 +291,35 @@ object set_cclosure (result_cc,value_cc,available_size)
 	  (si::s-data-name includes)))))
 
 (defun structure-type-internal-slotds (type)
-   (si::s-data-slot-descriptions (get type 'si::s-data))
-  )
+   (si::s-data-slot-descriptions (get type 'si::s-data)))
 
 (defun structure-type-slot-description-list (type)
   (or (cdr (gethash type *structure-table*))
       (mapcan #'(lambda (slotd)
                   (when (and slotd (car slotd))
-                    (let ((offset (fifth slotd)))
-                      (let ((reader #'(lambda (x)
-                                         (si:structure-ref1 x offset)
-                                         ))
-                            (writer #'(lambda (v x)
-                                        (si:structure-set x type offset v))))
+                    (let ((read-only-p (fourth slotd))
+			  (offset (fifth slotd)))
+                      (let ((reader (lambda (x) (si:structure-ref1 x offset)))
+                            (writer ;(if read-only-p
+					;(lambda (v x) (si:structure-ref1 x offset))
+				      (lambda (v x) (si:structure-set x type offset v))))
                         #+turbo-closure (si:turbo-closure reader)
                         #+turbo-closure (si:turbo-closure writer)
                         (let* ((reader-sym 
 				(let ((*package* *the-pcl-package*))
 				  (intern (format nil "~s SLOT~D" type offset))))
 			       (writer-sym (get-setf-function-name reader-sym))
-			       (slot-name (first slotd))
-			       (read-only-p (fourth slotd)))
+			       (slot-name (first slotd)))
                           (setf (symbol-function reader-sym) reader)
                           (setf (symbol-function writer-sym) writer)
                           (do-standard-defsetf-1 reader-sym)
                           (list (list slot-name
+				      (find-symbol (concatenate 'string (symbol-name type) "-" (symbol-name slot-name))
+						   (symbol-package type))
                                       reader-sym
-                                      (and (not read-only-p) writer))))))))
+				      writer
+				      (third slotd)
+				      (second slotd))))))))
               (let ((slotds (structure-type-internal-slotds type))
                     (inc (structure-type-included-type-name type)))
                 (if inc
@@ -330,14 +333,17 @@ object set_cclosure (result_cc,value_cc,available_size)
 (defun structure-slotd-accessor-symbol (slotd)
   (second slotd))
 
-;(defun structure-slotd-writer-function (slotd)
-;  (third slotd))
-
 (defun structure-slotd-reader-function (slotd)
   (third slotd))
 
 (defun structure-slotd-writer-function (slotd)
   (fourth slotd))
+
+(defun structure-slotd-type (slotd)
+  (fifth slotd))
+
+(defun structure-slotd-init-form (slotd)
+  (sixth slotd))
 
 (defun renew-sys-files()
   ;; packages:
