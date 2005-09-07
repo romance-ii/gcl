@@ -146,8 +146,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * logical-pathname-p
   * type-of support for classes
   * function class and structure class constructor support
+  * export class-direct-subclasses to type system
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 03:02:25 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 03:03:20 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 

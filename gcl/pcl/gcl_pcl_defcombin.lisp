@@ -527,5 +527,5 @@
                            values)))))
 
 
-(dolist (l '(find-class classp class-precedence-list class-name))
+(dolist (l '(find-class classp class-precedence-list class-name class-of class-direct-subclasses))
   (setf (symbol-function (find-symbol (symbol-name l) 'si)) (symbol-function l)))
