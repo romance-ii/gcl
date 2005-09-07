@@ -198,6 +198,11 @@
 (define-condition condition ()
   ())
 
+(defmethod pcl::make-load-form ((object condition) &optional env)
+  (declare (ignore env))
+  (error "~@<Default ~s method for ~s called.~@>"
+	 'pcl::make-load-form object))
+
 #+pcl
 (when (fboundp 'pcl::proclaim-incompatible-superclasses)
   (mapc
