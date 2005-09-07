@@ -123,8 +123,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * class-precedence-list tests should work now
   * define several standard conditions
   * make-load-form support for conditions
+  * check-type test fixes
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 02:36:35 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 02:37:19 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 

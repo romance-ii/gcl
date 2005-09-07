@@ -170,10 +170,10 @@
 	 (RESTART-CASE ,(IF TYPE-STRING
 	   `(specific-error :wrong-type-argument
 			    "The value of ~S is not ~S."
-			    ',PLACE ,TYPE-STRING)
+			    ,PLACE ,TYPE-STRING)
 	   `(specific-error :wrong-type-argument
 			    "The value of ~S is not of type ~S."
-			    ',PLACE ',TYPE))
+			    ,PLACE ',TYPE))
 	   (STORE-VALUE (VALUE)
 	       :REPORT (LAMBDA (STREAM)
 			 (FORMAT STREAM "Supply a new value of ~S."
