@@ -68,15 +68,15 @@ structure_ref(object x, object name, int i)
  switch((SLOT_TYPE(x->str.str_def,i)))
    {
    case aet_object: return(STREF(object,x,s_pos[i]));
-   case aet_fix:  return(make_fixnum((STREF(fixnum,x,s_pos[i]))));
+   case aet_fix:case aet_nnfix:  return(make_fixnum((STREF(fixnum,x,s_pos[i]))));
    case aet_ch:  return(code_char(STREF(char,x,s_pos[i])));
    case aet_bit:
-   case aet_char: return(small_fixnum(STREF(char,x,s_pos[i])));
+   case aet_char:case aet_nnchar: return(small_fixnum(STREF(char,x,s_pos[i])));
    case aet_sf: return(make_shortfloat(STREF(shortfloat,x,s_pos[i])));
    case aet_lf: return(make_longfloat(STREF(longfloat,x,s_pos[i])));
    case aet_uchar: return(small_fixnum(STREF(unsigned char,x,s_pos[i])));
    case aet_ushort: return(make_fixnum(STREF(unsigned short,x,s_pos[i])));
-   case aet_short: return(make_fixnum(STREF(short,x,s_pos[i])));
+   case aet_short:case aet_nnshort: return(make_fixnum(STREF(short,x,s_pos[i])));
    default:
      bad_raw_type();
      return 0;
@@ -121,15 +121,15 @@ structure_set(object x, object name, int i, object v)
  switch(SLOT_TYPE(x->str.str_def,i)){
    
    case aet_object: STREF(object,x,s_pos[i])=v; break;
-   case aet_fix:  (STREF(fixnum,x,s_pos[i]))=fix(v); break;
+   case aet_fix:case aet_nnfix:  (STREF(fixnum,x,s_pos[i]))=fix(v); break;
    case aet_ch:  STREF(char,x,s_pos[i])=char_code(v); break;
    case aet_bit:
-   case aet_char: STREF(char,x,s_pos[i])=fix(v); break;
+   case aet_char:case aet_nnchar: STREF(char,x,s_pos[i])=fix(v); break;
    case aet_sf: STREF(shortfloat,x,s_pos[i])=sf(v); break;
    case aet_lf: STREF(longfloat,x,s_pos[i])=lf(v); break;
    case aet_uchar: STREF(unsigned char,x,s_pos[i])=fix(v); break;
    case aet_ushort: STREF(unsigned short,x,s_pos[i])=fix(v); break;
-   case aet_short: STREF(short,x,s_pos[i])=fix(v); break;
+   case aet_short:case aet_nnshort: STREF(short,x,s_pos[i])=fix(v); break;
  default:
    bad_raw_type();
 
@@ -215,15 +215,15 @@ LFD(siLmake_structure)(void)
       switch(s_type[i]){
 	     
       case aet_object: STREF(object,x,s_pos[i])=v; break;
-      case aet_fix:  (STREF(fixnum,x,s_pos[i]))=fix(v); break;
+      case aet_fix:case aet_nnfix:  (STREF(fixnum,x,s_pos[i]))=fix(v); break;
       case aet_ch:  STREF(char,x,s_pos[i])=char_code(v); break;
       case aet_bit:
-      case aet_char: STREF(char,x,s_pos[i])=fix(v); break;
+      case aet_char:case aet_nnchar: STREF(char,x,s_pos[i])=fix(v); break;
       case aet_sf: STREF(shortfloat,x,s_pos[i])=sf(v); break;
       case aet_lf: STREF(longfloat,x,s_pos[i])=lf(v); break;
       case aet_uchar: STREF(unsigned char,x,s_pos[i])=fix(v); break;
       case aet_ushort: STREF(unsigned short,x,s_pos[i])=fix(v); break;
-      case aet_short: STREF(short,x,s_pos[i])=fix(v); break;
+      case aet_short:case aet_nnshort: STREF(short,x,s_pos[i])=fix(v); break;
       default:
 	bad_raw_type();
 
@@ -375,11 +375,14 @@ sizeof(object),  /* aet_object  t  */
 sizeof(char),  /* aet_ch  string-char  */
 sizeof(char),  /* aet_bit  bit  */
 sizeof(fixnum),  /* aet_fix  fixnum  */
+sizeof(fixnum),  /* aet_nnfix  non-neg fixnum  */
 sizeof(float),  /* aet_sf  short-float  */
 sizeof(double),  /* aet_lf  long-float  */
 sizeof(char),  /* aet_char  signed char */
+sizeof(char),  /* aet_nnchar  non-neg char */
 sizeof(char),  /* aet_uchar  unsigned char */
 sizeof(short),  /* aet_short  signed short */
+sizeof(short),  /* aet_nnshort  non-neg short */
 sizeof(short)  /* aet_ushort  unsigned short   */
 };
 

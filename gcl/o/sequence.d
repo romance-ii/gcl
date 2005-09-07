@@ -269,8 +269,6 @@ E:
 		array_allocself(x, FALSE,0);
 		switch (sequence->v.v_elttype) {
 		case aet_object:
-		case aet_fix:
-		case aet_sf:
 			for (i = s, j = 0;  i < e;  i++, j++)
 				x->v.v_self[j] = sequence->v.v_self[i];
 			break;
@@ -281,12 +279,27 @@ E:
 				sequence->lfa.lfa_self[i];
 			break;
 
+		case aet_sf:
+			for (i = s, j = 0;  i < e;  i++, j++)
+				x->sfa.sfa_self[j] =
+				sequence->sfa.sfa_self[i];
+			break;
+
+		case aet_nnfix:
+		case aet_fix:
+			for (i = s, j = 0;  i < e;  i++, j++)
+				x->fixa.fixa_self[j] =
+				sequence->fixa.fixa_self[i];
+			break;
+
 		case aet_short:
+		case aet_nnshort:
 		case aet_ushort:
 			for (i = s, j = 0;  i < e;  i++, j++)
 				USHORT_GCL(x, j) = USHORT_GCL(sequence, i);
 			break;
 		case aet_char:
+		case aet_nnchar:
 		case aet_uchar:
 			for (i = s, j = 0;  i < e;  i++, j++)	
 			  x->st.st_self[j] = sequence->st.st_self[i];
@@ -424,8 +437,6 @@ object seq;
 		array_allocself(y, FALSE,0);
 		switch (x->v.v_elttype) {
 		case aet_object:
-		case aet_fix:
-		case aet_sf:
 			for (j = k - 1, i = 0;  j >=0;  --j, i++)
 				y->v.v_self[j] = x->v.v_self[i];
 			break;
@@ -435,12 +446,25 @@ object seq;
 				y->lfa.lfa_self[j] = x->lfa.lfa_self[i];
 			break;
 
+		case aet_sf:
+			for (j = k - 1, i = 0;  j >=0;  --j, i++)
+				y->sfa.sfa_self[j] = x->sfa.sfa_self[i];
+			break;
+
+		case aet_fix:
+		case aet_nnfix:
+			for (j = k - 1, i = 0;  j >=0;  --j, i++)
+				y->fixa.fixa_self[j] = x->fixa.fixa_self[i];
+			break;
+
 		case aet_short:
+		case aet_nnshort:
 		case aet_ushort:
 			for (j = k - 1, i = 0;  j >=0;  --j, i++)
 				USHORT_GCL(y, j) = USHORT_GCL(x, i);
 			break;
 		case aet_char:
+		case aet_nnchar:
 		case aet_uchar:
 		    goto TYPE_STRING;
 		}
@@ -518,8 +542,6 @@ object seq;
 		k = x->v.v_fillp;
 		switch (x->v.v_elttype) {
 		case aet_object:
-		case aet_fix:
-		case aet_sf:
 			for (i = 0, j = k - 1;  i < j;  i++, --j) {
 				y = x->v.v_self[i];
 				x->v.v_self[i] = x->v.v_self[j];
@@ -536,7 +558,27 @@ object seq;
 			}
 			return(seq);
 
+		case aet_sf:
+			for (i = 0, j = k - 1;  i < j;  i++, --j) {
+				shortfloat y;
+				y = x->sfa.sfa_self[i];
+				x->sfa.sfa_self[i] = x->sfa.sfa_self[j];
+				x->sfa.sfa_self[j] = y;
+			}
+			return(seq);
+
+		case aet_fix:
+		case aet_nnfix:
+			for (i = 0, j = k - 1;  i < j;  i++, --j) {
+				fixnum y;
+				y = x->fixa.fixa_self[i];
+				x->fixa.fixa_self[i] = x->fixa.fixa_self[j];
+				x->fixa.fixa_self[j] = y;
+			}
+			return(seq);
+
 		case aet_short:
+		case aet_nnshort:
 		case aet_ushort:
 			for (i = 0, j = k - 1;  i < j;  i++, --j) {
 				unsigned short y;
@@ -546,6 +588,7 @@ object seq;
 			}
 			return(seq);
 		case aet_char:
+		case aet_nnchar:
 		case aet_uchar:
 		    goto TYPE_STRING;
 		}
