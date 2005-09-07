@@ -346,8 +346,8 @@ setf(object place, object form)
 	  val = Ieval(form);
 	  return putprop(sym,val,key); 
 	}
-	if (fun == sLgetf) 
-	  Ieval(Mcaddr(args));
+/* 	if (fun == sLgetf)  */
+/* 	  Ieval(Mcaddr(args)); */
 	if (fun == sLaref) { f = siLaset; goto EVAL; }
 	if (fun == sLsvref) { f = siLsvset; goto EVAL; }
 	if (fun == sLelt) { f = siLelt_set; goto EVAL; }

@@ -153,8 +153,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * export make-load-form, make-load-form-saving-slots, and describe-
     object
   * don't implement any standard classes as structue classes
+  * remove extra eval of getf default
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 03:09:31 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 03:44:05 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
