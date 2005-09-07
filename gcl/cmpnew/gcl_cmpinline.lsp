@@ -732,11 +732,12 @@
 ;;         20050106 CM.
 (defun c-cast (aet)
   (case aet
-    ((string-char character unsigned-char non-negative-char) "unsigned char")
     (signed-char "char")
+    ((string-char character unsigned-char non-negative-char) "unsigned char")
     (signed-short "short")
     ((non-negative-short unsigned-short) "unsigned short")
-    (fixnum "fixnum")
+    ((signed-fixnum fixnum non-negative-fixnum) "fixnum")
+    ((unsigned-fixnum ) "object") ;FIXME
     (short-float "float")
     (long-float "double")
     ((t object) "object")

@@ -126,8 +126,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * check-type test fixes
   * Use new enhanced type-and in typep compiler optimizations -- patter
     should be used elsewhere
+  * non-negative-{char,short-fixnum} array types
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 02:39:08 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 02:39:58 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
