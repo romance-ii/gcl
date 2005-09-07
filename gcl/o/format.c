@@ -2229,7 +2229,7 @@ fmt_semicolon(bool colon, bool atsign)
 	fmt_set_param(1, &fmt_line_length, fmt_int, 72);
 }
 
-DEFVAR("*FORMAT-UNUSED-ARGS*",sSAformat_unused_argsA,SI,Cnil,"");
+DEFVAR("*FORMAT-UNUSED-ARGS*",sSAformat_unused_argsA,SI,OBJNULL,"");
 
 DEFUNO_NEW("FORMAT",object,fLformat,LISP
        ,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,void,Lformat,(object strm, object control,...),"")
