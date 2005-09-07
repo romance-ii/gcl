@@ -243,9 +243,10 @@
 		   fname))
 
 	  ;;(LAMBDA-BLOCK block-name lambda-list (TRACE-CALL ... ))
-	  ((and (consp (symbol-function fname))
-		(consp (nth 3 (symbol-function fname)))
-		(eq (car (nth 3 (symbol-function fname))) 'trace-call))
+	  ((let ((fn (and (interpreted-function-p (symbol-function fname))
+			  (interpreted-function-lambda (symbol-function fname)))))
+	     (and (consp (nth 3 fn))
+		  (eq (car (nth 3 fn)) 'trace-call)))
 	   (si:fset fname (symbol-function sym)))
 	  (t
 	   (format *trace-output*
