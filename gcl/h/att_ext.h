@@ -603,7 +603,7 @@ EXTER object sLchar,sLnon_negative_char,sLnegative_char,sLsigned_char,sLunsigned
 EXTER object sLshort,sLnon_negative_short,sLnegative_short,sLsigned_short,sLunsigned_short;
 EXTER object sLfixnum,sLnon_negative_fixnum,sLnegative_fixnum,sLsigned_fixnum,sLunsigned_fixnum;
 EXTER object sLlfixnum,sLnon_negative_lfixnum,sLnegative_lfixnum;
-EXTER object sLsigned_lfixnum,sLunsigned_lfixnum,sLnegative_bignum,sLnon_negative_bignum;
+EXTER object sLsigned_lfixnum,sLunsigned_lfixnum,sLnegative_bignum,sLnon_negative_bignum,sLbase_char;
 
 EXTER object sLseqind,sLrnkind;
 

@@ -157,8 +157,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * dpp makefile bug fix
   * gcc-4.0 fixes, Closes: #323523
   * depend on common-lisp-controller, Closes: #308365
+  * base-char lisp symbol
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 13:38:59 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 13:58:50 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
