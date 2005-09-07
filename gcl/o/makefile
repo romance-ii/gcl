@@ -25,7 +25,7 @@ DECL := $(HDIR)/new_decl.h
 %.o: %.c $(DECL)
 	$(CC) -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO) 
 
-%.c: %.d
+%.c: %.d $(DPP)
 	$(DPP) $*
 
 %.o: %.d $(DECL)
