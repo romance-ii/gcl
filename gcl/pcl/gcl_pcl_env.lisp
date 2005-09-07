@@ -368,6 +368,40 @@
 	    object))
     :just-dump-it-normally))
 
+(defgeneric make-load-form (object &optional environment))
+
+(macrolet ((define-default-method (class)
+	     `(defmethod make-load-form ((object ,class) &optional env)
+		(declare (ignore env))
+		(error "~@<Default ~s method for ~s called.~@>"
+		       'make-load-form object))))
+;  (define-default-method condition)
+  (define-default-method standard-object)
+  (define-default-method structure-object))
+
+(defmethod make-load-form ((class class) &optional env)
+  (declare (ignore env))
+  (let ((name (class-name class)))
+    (unless (and name (eq (find-class name nil) class))
+      (error "~@<Can't use anonymous or undefined class as constant: ~S~:@>"
+	     class))
+    `(find-class ',name)))
+
+(defun make-load-form-saving-slots (object &key slot-names environment)
+  (declare (ignore environment))
+  (let (inits (class (class-of object)))
+    (dolist (slot (class-slots class))
+      (let ((slot-name (slot-definition-name slot)))
+	(when (or (memq slot-name slot-names)
+		  (and (null slot-names)
+		       (eq :instance (slot-definition-allocation slot))))
+	  (if (slot-boundp-using-class class object slot)
+	      (let ((value (slot-value-using-class class object slot)))
+		(push `(setf (slot-value ,object ',slot-name) ',value) inits))
+	    (push `(slot-makunbound ,object ',slot-name) inits)))))
+    (values `(allocate-instance (find-class ',(class-name class)))
+	    `(progn .,(nreverse inits)))))
+
 
 ;;; The following are hacks to deal with CMU CL having two different CLASS
 ;;; classes.
