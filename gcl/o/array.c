@@ -146,16 +146,19 @@ DEFUNO_NEW("ROW-MAJOR-AREF", object, fLrow_major_aref, LISP, 2, 2,
       i += BV_OFFSET(x);
       return make_fixnum(BITREF(x, i));
     case aet_fix:
+    case aet_nnfix:
       return make_fixnum(x->fixa.fixa_self[i]);
     case aet_sf:
       return make_shortfloat(x->sfa.sfa_self[i]);
     case aet_lf:
       return make_longfloat(x->lfa.lfa_self[i]);
     case aet_char:
+    case aet_nnchar:
       return small_fixnum(x->st.st_self[i]);
     case aet_uchar:
       return small_fixnum(x->ust.ust_self[i]);
     case aet_short:
+    case aet_nnshort:
       return make_fixnum(SHORT_GCL(x, i));
     case aet_ushort:
       return make_fixnum(USHORT_GCL(x, i));
@@ -209,6 +212,7 @@ DEFUN_NEW("ASET1", object, fSaset1, SI, 3, 3, NONE, OO, IO, OO,OO,(object x, fix
 	     goto AGAIN_BIT;}
        break;}
     case aet_fix:
+    case aet_nnfix:
       ASSURE_TYPE(val,t_fixnum);
       (x->fixa.fixa_self[i]) = Mfix(val);
       break;
@@ -221,6 +225,7 @@ DEFUN_NEW("ASET1", object, fSaset1, SI, 3, 3, NONE, OO, IO, OO,OO,(object x, fix
       (x->lfa.lfa_self[i]) = Mlf(val);
       break;
     case aet_char:
+    case aet_nnchar:
       ASSURE_TYPE(val,t_fixnum);
       x->st.st_self[i] = Mfix(val);
       break;
@@ -229,6 +234,7 @@ DEFUN_NEW("ASET1", object, fSaset1, SI, 3, 3, NONE, OO, IO, OO,OO,(object x, fix
       (x->ust.ust_self[i])= Mfix(val);
       break;
     case aet_short:
+    case aet_nnshort:
       ASSURE_TYPE(val,t_fixnum);
       SHORT_GCL(x, i) = Mfix(val);
       break;
@@ -447,11 +453,14 @@ static struct { char * dflt; object *namep;} aet_types[] =
     {(char *)	&DFLT_aet_ch, &sLstring_char,},/*  string-char  */
     {(char *)	&DFLT_aet_fix, &sLbit,},		/*  bit  */
     {(char *)	&DFLT_aet_fix,	&sLfixnum,}, 	/*  fixnum  */
+    {(char *)	&DFLT_aet_fix,	&sLnon_negative_fixnum,}, 	/*  non-neg fixnum  */
     {(char *)	&DFLT_aet_sf, &sLshort_float,},			/*  short-float  */
     {(char *)	&DFLT_aet_lf, &sLlong_float,},	/*  long-float  */
     {(char *)	&DFLT_aet_char,&sLsigned_char,},               /* signed char */
-    {(char *)    &DFLT_aet_char,&sLunsigned_char,},               /* unsigned char */
+    {(char *)	&DFLT_aet_char,&sLnon_negative_char,},               /* non-neg char */
+    {(char *)   &DFLT_aet_char,&sLunsigned_char,},               /* unsigned char */
     {(char *)	&DFLT_aet_short,&sLsigned_short,},              /* signed short */
+    {(char *)	&DFLT_aet_short,&sLnon_negative_short,},              /* non-neg short */
     {(char *)	&DFLT_aet_short, &sLunsigned_short},    /*  unsigned short   */
 	};
 
@@ -460,13 +469,13 @@ DEFUN_NEW("GET-AELTTYPE",object,fSget_aelttype,SI,1,1,NONE,OO,OO,OO,OO,(object x
   for (i=0 ; i <   aet_last ; i++)
     if (x == * aet_types[i].namep)
       return make_fixnum((enum aelttype) i);
-  if (x == sLlong_float || x == sLsingle_float || x == sLdouble_float)
+  if (x == sLsingle_float || x == sLdouble_float)
     return make_fixnum(aet_lf);
-  if (x==sLnon_negative_char)
+  if (x==sLnegative_char)
     return make_fixnum(aet_char);
-  if (x==sLnon_negative_short)
+  if (x==sLnegative_short)
     return make_fixnum(aet_short);
-  if (x==sLnon_negative_fixnum)
+  if (x==sLnegative_fixnum || x==sLsigned_fixnum)
     return make_fixnum(aet_fix);
   return make_fixnum(aet_object);
 }
@@ -798,6 +807,7 @@ raw_aet_ptr(object x, short int typ)
     u.i=-Mfix(x);
     break;
   case aet_fix:    
+  case aet_nnfix:    
     /* STORE_TYPED(&u,fixnum, Mfix(x)); */
     u.i=Mfix(x);
     break;
@@ -810,6 +820,7 @@ raw_aet_ptr(object x, short int typ)
     u.d=Mlf(x);
     break;
   case aet_char:   
+  case aet_nnchar:   
     /* STORE_TYPED(&u, char, Mfix(x)); */
     u.c=(char)Mfix(x);
     break;
@@ -818,6 +829,7 @@ raw_aet_ptr(object x, short int typ)
     u.uc=(unsigned char)Mfix(x);
     break;
   case aet_short:  
+  case aet_nnshort:  
     /* STORE_TYPED(&u, short, Mfix(x)); */
     u.s=(short)Mfix(x);
     break;
@@ -857,12 +869,12 @@ gset(void *p1, void *val, int n, int typ)
     case aet_ch:     GSET(p1,n,char,val);
       /* Note n is number of fixnum WORDS for bit */
     case aet_bit:    GSET(p1,n,fixnum,val);
-    case aet_fix:    GSET(p1,n,fixnum,val);
+    case aet_fix:case aet_nnfix:    GSET(p1,n,fixnum,val);
     case aet_sf:     GSET(p1,n,shortfloat,val);
     case aet_lf:     GSET(p1,n,longfloat,val);
-    case aet_char:   GSET(p1,n,char,val);
+    case aet_char:case aet_nnchar:   GSET(p1,n,char,val);
     case aet_uchar:  GSET(p1,n,unsigned char,val);
-    case aet_short:  GSET(p1,n,short,val);
+    case aet_short:case aet_nnshort:  GSET(p1,n,short,val);
     case aet_ushort: GSET(p1,n,unsigned short,val);
     default:         FEerror("bad elttype",0);
     }
@@ -942,10 +954,12 @@ array_allocself(object x, int staticp, object dflt)
 		break;
 	case aet_ch:
 	case aet_char:
+	case aet_nnchar:
         case aet_uchar:
 		x->st.st_self = AR_ALLOC(*fun,n,char);
 		break;
         case aet_short:
+        case aet_nnshort:
         case aet_ushort:
 		x->ust.ust_self = (unsigned char *) AR_ALLOC(*fun,n,short);
 		break;
@@ -953,6 +967,7 @@ array_allocself(object x, int staticp, object dflt)
 		n = (n+W_SIZE-1)/W_SIZE;
 		SET_BV_OFFSET(x,0);
 	case aet_fix:
+	case aet_nnfix:
 		x->fixa.fixa_self = AR_ALLOC(*fun,n,fixnum);
 		break;
 	case aet_sf:
@@ -1039,7 +1054,24 @@ DEFUNO_NEW("ADJUSTABLE-ARRAY-P",object,fLadjustable_array_p,
        LISP,1,1,NONE,OO,OO,OO,OO,void,Ladjustable_array_p,(object x),"")
 { 
   IisArray(x);
-  return sLt;
+  switch (type_of(x)) {
+  case t_array:
+    x=x->a.a_adjustable ? Ct : Cnil; 
+    break;
+  case t_string:
+    x=x->st.st_adjustable ? Ct : Cnil; 
+    break;
+  case t_vector:
+    x=x->v.v_adjustable ? Ct : Cnil; 
+    break;
+  case t_bitvector:
+    x=x->bv.bv_adjustable ? Ct : Cnil; 
+    break;
+  default:
+    FEerror("Bad array type",0);
+    break;
+  }
+  return x;
 }
 
 DEFUNO_NEW("DISPLACED-ARRAY-P",object,fSdisplaced_array_p,SI,1,
