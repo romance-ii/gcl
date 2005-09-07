@@ -522,20 +522,21 @@ And so, we are saved.
 	   (default '(unknown)))
       (and (null applyp)
 	   (or (not (eq *boot-state* 'complete))
-	       (compute-applicable-methods-emf-std-p gf))
+	       (and (compute-applicable-methods-emf-std-p gf)
+		    (eq (generic-function-method-combination gf)
+			*standard-method-combination*)))
 	   (notany #'(lambda (method)
 		       (or (and (eq *boot-state* 'complete)
-				(some #'eql-specializer-p
-				      (method-specializers method)))
+				(or (some #'eql-specializer-p (method-specializers method))
+				    (method-qualifiers method)))
 			   (let ((value (method-function-get 
 					 (if early-p
 					     (or (third method) (second method))
 					     (or (method-fast-function method)
 						 (method-function method)))
 					 :constant-value default)))
-			     (if boolean-values-p
-				 (not (or (eq value 't) (eq value nil)))
-				 (eq value default)))))
+			     (or (eq value default)
+				 (when boolean-values-p (not (member value '(t nil))))))))
 		   methods)))))
 
 (defun make-constant-value-dfun (generic-function &optional cache)
