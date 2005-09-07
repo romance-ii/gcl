@@ -229,6 +229,9 @@
 		    initialize-instance
 		    invalid-method-error
 		    make-instance
+		    make-load-form
+		    make-load-form-saving-slots
+		    describe-object
 		    make-instances-obsolete
 		    method-combination-error
 		    method-qualifiers

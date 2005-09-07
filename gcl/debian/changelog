@@ -150,8 +150,10 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * fix class-precedence-list-foo pcl bug a la cmucl
   * make-load-form support a la cmucl
   * fix structure-type-slot-description-list
+  * export make-load-form, make-load-form-saving-slots, and describe-
+    object
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 03:07:00 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 03:08:23 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
