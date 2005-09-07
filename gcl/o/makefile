@@ -24,6 +24,10 @@ DECL := $(HDIR)/new_decl.h
 # AUX_INFO=-aux-info $*.X
 %.o: %.c $(DECL)
 	$(CC) -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO) 
+
+%.c: %.d
+	$(DPP) $*
+
 %.o: %.d $(DECL)
 	$(DPP) $*
 	$(CC) -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO)
@@ -88,7 +92,10 @@ INI_FILES=$(patsubst %.o,%.ini,${OBJS})
 
 OBJECTS:=$(OBJS) $(LIBFILES) new_init.o  $(GCLIB) $(LAST_FILE)  $(FIRST_FILE) 
 
-all:  $(OBJECTS) #plt.o
+all:  $(OBJECTS) TAGS #plt.o
+
+TAGS: $(HFILES) $(patsubst %.o,%.c,$(OBJECTS))
+	etags $^
 
 go:
 	$(MAKE) "CFLAGS=${CFLAGS} -pg"
@@ -122,7 +129,7 @@ $(DECL): $(HDIR)/make-decl.h $(INI_FILES)
 	cat ${INI_FILES} >> foo.c
 	${CC} -E -I${HDIR} foo.c | sed -n -e '/#/d' -e '/DO_/d' -e '/[a-zA-Z;]/p' > tmpini
 	../xbin/move-if-changed mv tmpini $@
-	-rm foo.c tmpini
+	rm -f foo.c tmpini
 
 grab_defs: grab_defs.c
 	${CC} $(OFLAGS) -o grab_defs  grab_defs.c
@@ -172,7 +179,7 @@ $(GCLIB): ${ALIB}
 	$(AR) gcllib.a ${ALIB}
 	${RANLIB} gcllib.a
 clean:
-	rm -f $(OBJS) ${ALIB} new_init.o  $(LAST_FILE) $(FIRST_FILE) *.a grab_defs$(EXE) *.ini tmpx foo.c cmpinclude.h new_init.c $(DECL) def undef udef.h void.h plt.h plttest.o
+	rm -f $(OBJS) ${ALIB} new_init.o  $(LAST_FILE) $(FIRST_FILE) *.a grab_defs$(EXE) *.ini tmpx foo.c cmpinclude.h new_init.c $(DECL) def undef udef.h void.h plt.h plttest.o TAGS
 
 fsavres.o: /lib/libc.a
 	ar xv /lib/libc.a fsavres.o
@@ -255,4 +262,4 @@ sockets.o:$(HFILES) ../gcl-tk/comm.c ../gcl-tk/sheader.h
 nsocket.ini:nsocket.c $(HFILES)
 mingwin.o:mingwin.c $(HFILES)
 
-
+.INTERMEDIATE: $(patsubst %.d,%.c,$(shell ls -1 *.d))
