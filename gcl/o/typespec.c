@@ -562,11 +562,12 @@ DEF_ORDINARY("FILE-STREAM",sLfile_stream,LISP,"");
 /* logical pathnames exist even in non ansi gcl */
 DEF_ORDINARY("LOGICAL-PATHNAME",sLlogical_pathname,LISP,"");
 
+DEF_ORDINARY("BASE-CHAR",sLbase_char,LISP,"");
+
 #ifdef ANSI_COMMON_LISP
 /* New ansi types */
 DEF_ORDINARY("METHOD-COMBINATION",sLmethod_combination,LISP,"");
 DEF_ORDINARY("ARITHMETIC-ERROR",sLarithmetic_error,LISP,"");
-DEF_ORDINARY("BASE-CHAR",sLbase_char,LISP,"");
 DEF_ORDINARY("BASE-STRING",sLbase_string,LISP,"");
 DEF_ORDINARY("BROADCAST-STREAM",sLbroadcast_stream,LISP,"");
 DEF_ORDINARY("BUILT-IN-CLASS",sLbuilt_in_class,LISP,"");
