@@ -137,8 +137,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * all arrays are simple
   * memq is a sys macro
   * return unused format args in formatter
+  * extensive type system fixes
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 02:48:39 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 02:49:42 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 

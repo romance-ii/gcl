@@ -25,7 +25,7 @@
 
 (in-package 'system)
 
-(export '(lisp::upgraded-complex-part-type 
+(export '(lisp::upgraded-complex-part-type lisp::type-of
 	  lisp::deftype lisp::typep lisp::subtypep 
 	  lisp::coerce lisp::upgraded-array-element-type) 'lisp)
 
@@ -37,18 +37,30 @@
 (eval-when (compile)
 	   (proclaim '(optimize (safety 0) (space 3) (speed 3))))
 
+(defun type-of (object)
+  (or (and (typep object 'standard-object) 
+	   (let* ((c (class-of object))
+		  (n (class-name c)))
+	     (if (and n (eq c (find-class n nil))) n c)))
+      (let ((tp (type-of-c object)))
+	(if (member tp '(vector array));FIXME
+	    `(,tp ,(upgraded-array-element-type (array-element-type object)))
+	  tp))))
+
 (defun typep-int (object type &aux tp i tem)
   (if (atom type)
       (setq tp type i nil)
       (setq tp (car type) i (cdr type)))
+  (when (or (eq tp 'values) (and (eq tp 'function) i))
+    (error "Bad type to typep: ~S" type))
   (if (eq tp 'structure-object) (setq tp 'structure))
-  (when (and (eq tp 'structure) (typep-int object 'standard-object))
+  (when (and (member tp '(structure compiled-function)) (typep-int object 'standard-object))
     (return-from typep-int nil))
   (let ((f (and (not i) (symbolp tp) (get tp 'type-predicate))))
     (when f (return-from typep-int (let ((z (funcall f object))) z))))
   (case tp
     (cons (and (consp object)
-	       (or (endp i)
+	       (or (not i)
 		   (and (typep-int (car object) (car i))
 			(or (endp (cdr i))
 			    (typep-int (cdr object) (cadr i)))))))
@@ -66,11 +78,8 @@
     ((t) t)
     ((nil) nil)
     (boolean (or (eq object 't) (eq object 'nil)))
-    (fixnum (eq (type-of object) 'fixnum))
-    (bignum (eq (type-of object) 'bignum))
-    (ratio (eq (type-of object) 'ratio))
-    (standard-char
-     (and (characterp object) (standard-char-p object)))
+    (bignum (member (type-of-c object) '(bignum non-negative-bignum negative-bignum)))
+    (ratio (eq (type-of-c object) 'ratio))
     ((base-char string-char)
      (and (characterp object) (string-char-p object)))
     (integer
@@ -82,78 +91,45 @@
     (float
      (and (floatp object) (in-interval-p object i)))
     ((short-float)
-     (and (eq (type-of object) 'short-float) (in-interval-p object i)))
+     (and (eq (type-of-c object) 'short-float) (in-interval-p object i)))
     ((single-float double-float long-float)
-     (and (eq (type-of object) 'long-float) (in-interval-p object i)))
+     (and (eq (type-of-c object) 'long-float) (in-interval-p object i)))
     (complex
      (and (complexp object)
-    	  
-    (or (null i)
-       (and   (typep-int (realpart object) (car i))
-            ;;wfs--should only have to check one.
-            ;;Illegal to mix real and imaginary types!
-              (typep-int (imagpart object) (car i))))
-     ))
+	  (or (null i)
+	      (and   (typep-int (realpart object) (car i))
+		     ;;wfs--should only have to check one.
+		     ;;Illegal to mix real and imaginary types!
+		     (typep-int (imagpart object) (car i))))))
     (sequence (or (listp object) (vectorp object)))
-    ((base-string string) ;FIXME
+    ((base-string string simple-base-string simple-string) ;FIXME
      (and (stringp object)
           (or (endp i) (match-dimensions (array-dimensions object) i))))
-    (bit-vector
+    ((bit-vector simple-bit-vector)
      (and (bit-vector-p object)
           (or (endp i) (match-dimensions (array-dimensions object) i))))
-    ((simple-base-string simple-string) ;FIXME
-     (and (simple-string-p object)
-          (or (endp i) (match-dimensions (array-dimensions object) i))))
-    (simple-bit-vector
-     (and (simple-bit-vector-p object)
-          (or (endp i) (match-dimensions (array-dimensions object) i))))
-    (simple-vector
-     (and (simple-vector-p object)
-	  (or (endp i) (eq (car i) '*) 
-	      (and (eq (car i) t) (not (stringp object)) (not (bit-vector-p object)))
-	      (equal (array-element-type object) (best-array-element-type (car i))))
-          (or (endp (cdr i)) (match-dimensions (array-dimensions object) (cdr i)))))
-    (vector
+    ((vector simple-vector)
      (and (vectorp object)
-	  (or (endp i) (eq (car i) '*) 
-	      (and (eq (car i) t) (not (stringp object)) (not (bit-vector-p object)))
-	      (equal (array-element-type object) (best-array-element-type (car i))))
-          (or (endp (cdr i)) (match-dimensions (array-dimensions object) (cdr i)))))
-    (simple-array
-     (and (simple-array-p object)
-          (or (endp i) (eq (car i) '*)
-              (equal (array-element-type object)(best-array-element-type (car i))))
-          (or (endp (cdr i)) (eq (cadr i) '*)
-	      (if (listp (cadr i))
-		  (match-dimensions (array-dimensions object) (cadr i))
-		(eql (array-rank object) (cadr i))))))
-    (array
+	  (let ((at (upgraded-array-element-type (or (car i) (if (eq tp 'vector) '* t)))))
+	    (or (eq at '*) (eq at (upgraded-array-element-type (array-element-type object)))))
+          (or (not (cdr i)) (match-dimensions (array-dimensions object) (cdr i)))))
+    ((array simple-array)
      (and (arrayp object)
-          (or (endp i) (eq (car i) '*)
-              ;; Or the element type of object should be EQUAL to (car i).
-              ;; Is this too strict?
-              (equal (array-element-type object) (best-array-element-type (car i))))
-          (or (endp (cdr i)) (eq (cadr i) '*)
+	  (let ((at (upgraded-array-element-type (or (car i) '*))))
+	    (or (eq at '*) (eq at (upgraded-array-element-type (array-element-type object)))))
+          (or (not (cdr i)) (eq (cadr i) '*)
 	      (if (listp (cadr i))
 		  (match-dimensions (array-dimensions object) (cadr i))
 		(eql (array-rank object) (cadr i))))))
-    (file-stream (eq (type-of object) 'file-stream))
-    (string-stream (eq (type-of object) 'string-stream))
-    (synonym-stream (eq (type-of object) 'synonym-stream))
-    (concatenated-stream (eq (type-of object) 'concatenated-stream))
-    (two-way-stream (eq (type-of object) 'two-way-stream))
-    (echo-stream (eq (type-of object) 'echo-stream))
-    (logical-pathname
-      (and (pathnamep object)
-	   (not (endp (si:pathname-lookup (pathname-host object)
-				    	  si:*pathname-logical*)))))
+    ((file-stream string-stream synonym-stream concatenated-stream
+		  broadcast-stream two-way-stream echo-stream) (eq (type-of-c object) tp))
     (t (cond 
 	 ((setq tem (when (symbolp tp) (get tp 'deftype-definition)))
 	  (typep-int object (apply tem i)))
-	 ((if (symbolp tp) (get tp 'si::s-data) (typep-int tp 's-data))
+	 ((if (symbolp tp) (get tp 's-data) (typep-int tp 's-data))
 	  (let ((z (structure-subtype-p object tp))) z))
-	 ((typep tp 'class)
-	  (values (subtypep (type-of object) tp)))))))
+	 ((classp tp)
+	  (values (subtypep (class-of object) tp)))))))
 	 
 
 ;;; TYPEP predicate.
@@ -216,7 +192,8 @@
   (declare (ignore env) (optimize (safety 1)))
   (if (or (not t1) (eq t2 t))
       (values t t)
-    (values (not (resolve-type `(and ,t1 ,(negate t2)))) t)))
+    (let ((rt (resolve-type `(and ,t1 ,(negate t2)))))
+      (values (not (car rt)) (not (cadr rt))))))
 
 (defun upgraded-complex-part-type (type &optional environment) 
   (declare (ignore environment) (optimize (safety 1)) )
@@ -239,13 +216,14 @@
   (if (atom type) (setq type (list type)))
   (case (car type)
 	(function
-	 (assert-type object 'symbol)
-	 (symbol-function object))
+	 (cond ((symbolp object) (symbol-function object))
+	       ((and (consp object) (eq (car object) 'lambda)) (eval `(function ,object)))
+	       ((function-identifierp object) (get (cadr object) 'setf-function))));FIXME
 	(list
 	 (do ((l nil (cons (elt object i) l))
 	      (i (1- (length object)) (1- i)))
 	     ((< i 0) l)))
-	((array simple-array vector simple-vector bit-vector string simple-string)
+	((array simple-array vector simple-vector bit-vector simple-bit-vector string simple-string)
 	 (when (cdr type) ;;FIXME
 	   (assert-type (cdr type) 'cons)
 	   (when (cddr type)
@@ -269,15 +247,19 @@
 	(t (specific-error :wrong-type-argument "Cannot coerce ~S to class ~S." object type))))
 
 ;;; DEFTYPE macro.
-(defmacro deftype (name lambda-list &rest body)
+(defmacro deftype (name lambda-list &rest body &aux decls)
   ;; Replace undefaultized optional parameter X by (X '*).
   (declare (optimize (safety 1)))
+  (do ((b body body)) ((or (not b) (not (consp (car b))) (not (eq 'declare (caar b)))) (nreverse decls))
+      (let ((d (pop body)))
+	(unless (member-if (lambda (x) (and (consp x) (eq (car x) 'special))) (cdr d)) ;FIXME
+	  (push d decls))))
   (do ((l lambda-list (cdr l))
        (m nil (cons (car l) m)))
       ((null l))
     (when (member (car l) lambda-list-keywords)
-	  (unless (eq (car l) '&optional) (return nil))
-	  (setq m (cons '&optional m))
+	  (unless (member (car l) '(&optional &key)) (return nil))
+	  (setq m (cons (car l) m))
 	  (setq l (cdr l))
 	  (do ()
 	      ((or (null l) (member (car l) lambda-list-keywords)))
@@ -288,16 +270,15 @@
 	  (setq lambda-list (nreconc m l))
 	  (return nil)))
   `(eval-when (compile eval load)
-	      (si:putprop ',name
+	      (putprop ',name
 			  '(deftype ,name ,lambda-list ,@body)
 			  'deftype-form)
-	      (si:putprop ',name
-			  (if (null ',lambda-list)
-			      (let ((tem (progn ,@body)))
-				(lambda ,lambda-list tem))
-			    (lambda ,lambda-list ,@body))
+	      (putprop ',name
+		       (if (null ',lambda-list)
+			   (lambda nil ,@decls (block ,name ,`(progn ,@body)))
+			 (lambda ,lambda-list ,@decls (block ,name ,@body)))
 			  'deftype-definition)
-	      (si:putprop ',name
+	      (putprop ',name
 			  ,(find-documentation body)
 			  'type-documentation)
 	      ',name))
@@ -312,11 +293,11 @@
   `(integer 0 ,(1- n)))
 (deftype non-negative-byte (&optional s)
   (if (eq s '*)
-      `(integer * *)
+      `(integer 0 *)
       `(integer 0 ,(1- (expt 2 (1- s))))))
 (deftype negative-byte (&optional s)
   (if (eq s '*)
-      `(integer * *)
+      `(integer * -1)
       `(integer ,(- (expt 2 (1- s))) -1)))
 (deftype signed-byte (&optional s)
   (if (eq s '*)
@@ -355,32 +336,41 @@
 (deftype vector (&optional element-type size)
   `(array ,element-type (,size)))
 (deftype string (&optional size)
-  `(vector string-char ,size))
+  `(array string-char (,size)))
 (deftype base-string (&optional size)
-  `(vector base-char ,size))
+  `(array base-char (,size)))
 (deftype bit-vector (&optional size)
-  `(vector bit ,size))
+  `(array bit (,size)))
 
 (deftype simple-vector (&optional size)
-  `(simple-array t (,size)))
+  `(array t (,size)))
 (deftype simple-string (&optional size)
-  `(simple-array string-char (,size)))
+  `(array string-char (,size)))
 (deftype simple-base-string (&optional size)
-  `(simple-array base-char (,size)))
+  `(array base-char (,size)))
 (deftype simple-bit-vector (&optional size)
-  `(simple-array bit (,size)))
+  `(array bit (,size)))
 
-(deftype function-identifier () `(satisfies si::function-identifierp))
+(deftype function-identifier () `(satisfies function-identifierp))
 
 
 (deftype list () `(or cons null))
 (deftype sequence () `(or list vector))
+
+(defun non-standard-base-char-p (x)
+  (and (characterp x) (not (standard-char-p x))))
+
+(deftype extended-char () nil)
+(deftype base-char () `(or standard-char non-standard-base-char))
 (deftype character () `(or base-char extended-char))
-(deftype string-char () `(or base-char extended-char))
+(deftype string-char () `character)
+
 (deftype stream () `(or broadcast-stream concatenated-stream echo-stream
 			file-stream string-stream synonym-stream two-way-stream))
 
 (deftype bignum () `(and integer (not fixnum)))
+(deftype non-negative-bignum () `(and non-negative-byte (not non-negative-fixnum)))
+(deftype negative-bignum () `(and negative-byte (not negative-fixnum)))
 ;;FIXME adjust integer bounds here?
 (deftype rational (&optional (low '*) (high '*)) `(or (integer ,low ,high) (ratio ,low ,high)))
 (deftype float (&optional (low '*) (high '*)) `(or (short-float ,low ,high) (long-float ,low ,high)))
@@ -389,8 +379,7 @@
 (deftype real (&optional (low '*) (high '*)) `(or (rational ,low ,high) (float ,low ,high)))
 (deftype number () `(or real complex))
 (deftype atom () `(not cons))
-(deftype function (&optional as vs) `(or interpreted-function compiled-function))
-(deftype base-char () `(or standard-char non-standard-base-char))
+(deftype function (&optional as vs) `(or interpreted-function compiled-function generic-function))
 
 (deftype integer (&optional (low '*) (high '*)) `(integer ,low ,high))
 (deftype ratio (&optional (low '*) (high '*)) `(ratio ,low ,high))
@@ -400,7 +389,7 @@
 (deftype array (&optional (et '*) (dims '*)) 
   `(array ,et ,(if (not dims) 0 dims)))
 (deftype simple-array (&optional (et '*) (dims '*)) 
-  `(simple-array ,et ,(if (not dims) 0 dims)))
+  `(array ,et ,(if (not dims) 0 dims)))
 
 (deftype eql (&optional (x nil xp)) (when xp `(member ,x)))
 
@@ -414,46 +403,48 @@
 (deftype complex (&optional (rp 'real)) `(complex ,(if (eq rp '*) 'real rp)))
 (deftype cons (&optional (car t) (cdr t)) `(cons ,(if (eq car '*) t car)  ,(if (eq cdr '*) t cdr)))
 (deftype structure-object () `(structure))
+(deftype pathname () `(or non-logical-pathname logical-pathname))
+
+(defun non-logical-pathname-p (x)
+  (and (pathnamep x) (not (logical-pathname-p x))))
 
 (defun non-keyword-symbol-p (x)
   (and (symbolp x) (not (keywordp x))))
 
 (defun function-identifierp (tp)
   (or (symbolp tp)
+      (and (consp tp) (eq (car tp) 'lambda))
       (and (consp tp)
 	   (eq (car tp) 'setf)
 	   (consp (cdr tp))
 	   (symbolp (cadr tp))
 	   (not (cddr tp)))))
 
-(defun simple-array-p (x)
-  (and (arrayp x)
+;(defun simple-array-p (x)
+;  (and (arrayp x)
        ;; should be (not (expressly-adjustable-p x))
        ;; since the following will always return T
        ;; (not (adjustable-array-p x))
-       (not (array-has-fill-pointer-p x))
-       (not (si:displaced-array-p x))))
+;       (not (array-has-fill-pointer-p x))
+;       (not (displaced-array-p x))))
 
 
-(defun non-standard-base-char-p (x)
-  (and (characterp x) (not (standard-char-p x))))
+;(defun extended-char-p (x) (declare (ignore x)) nil)
 
-(defun extended-char-p (x) (declare (ignore x)) nil)
+;(defun interpreted-function-p (x) 
+;  (and (function-p x) (not (compiled-function-p x))))
 
-(defun interpreted-function-p (x) 
-  (and (function-p x) (not (compiled-function-p x))))
-
-(defun function-p (x)
-  (and (not (symbolp x)) (functionp x)))
+;(defun function-p (x)
+;  (and (not (symbolp x)) (functionp x)))
 
 (do ((l '((null . null)
           (symbol . symbolp)
           (keyword . keywordp)
-          (is-t . is-t-p)
+	  (non-logical-pathname . non-logical-pathname-p)
+	  (logical-pathname . logical-pathname-p)
 	  (non-keyword-symbol . non-keyword-symbol-p)
 	  (standard-char . standard-char-p)
 	  (non-standard-base-char . non-standard-base-char-p)
-	  (extended-char . extended-char-p)
 	  (string-char . string-char-p);;FIXME
 	  (interpreted-function . interpreted-function-p)
           (atom . atom)
@@ -470,41 +461,45 @@
           (readtable . readtablep)
           (hash-table . hash-table-p)
           (random-state . random-state-p)
-          (structure . si:structurep)
-          (function . function-p)
+          (structure . structurep)
+          (function . functionp)
           (compiled-function . compiled-function-p)
           (common . commonp)
           )
         (cdr l)))
     ((endp l))
-  (si:putprop (caar l) (cdar l) 'type-predicate)
+  (putprop (caar l) (cdar l) 'type-predicate)
   (when (symbolp (cdar l)) 
-    (si:putprop (cdar l) (caar l) 'predicate-type)
+    (putprop (cdar l) (caar l) 'predicate-type)
     (proclaim `(ftype (function (t) t) ,(cdar l)))))
 
 
 (defconstant +singleton-types+ '(non-keyword-symbol keyword standard-char
-				      non-standard-base-char extended-char 
+				      non-standard-base-char 
 				      package cons-member
 				      broadcast-stream concatenated-stream echo-stream file-stream string-stream
 				      synonym-stream two-way-stream 
-				      pathname readtable hash-table random-state standard-object structure 
+				      non-logical-pathname logical-pathname
+				      readtable hash-table random-state standard-object structure 
 				      interpreted-function
 				      compiled-function))
 
 
 (defconstant +range-types+ `(integer ratio short-float long-float))
-(defconstant +array-types+ '(character bit signed-char unsigned-char signed-short unsigned-short 
-				       fixnum short-float long-float t))
+(defconstant +array-types+ '(nil character bit ;FIXME try to live with unsigned alone if can work out the C casting
+				       non-negative-char signed-char unsigned-char
+				       non-negative-short signed-short unsigned-short 
+				       non-negative-fixnum fixnum
+				       short-float long-float t))
 
 (defconstant +known-types+ (append +range-types+ 
 				   (mapcar (lambda (x) `(complex ,x)) +range-types+)
 				   +singleton-types+
 				   (mapcar (lambda (x) `(array ,x)) +array-types+)))
 
-(defconstant +array-type-alist+ (mapcar (lambda (x) (cons x (intern (si::string-concatenate "ARRAY-" (string x)))))
+(defconstant +array-type-alist+ (mapcar (lambda (x) (cons x (intern (string-concatenate "ARRAY-" (string x)))))
 					+array-types+))
-(defconstant +complex-type-alist+ (mapcar (lambda (x) (cons x (intern (si::string-concatenate "COMPLEX-" (string x)))))
+(defconstant +complex-type-alist+ (mapcar (lambda (x) (cons x (intern (string-concatenate "COMPLEX-" (string x)))))
 					+range-types+))
 
 (defconstant +kindom-logic-ops-alist+ `(,@(mapcar (lambda (x) `(,x . range-op)) +range-types+)
@@ -529,7 +524,7 @@
 					 (standard-object . standard-load)
 					 (structure . structure-load)
 					 (array . array-load)
-					 (simple-array . array-load)
+;					 (simple-array . array-load)
 					 ,@(mapcar (lambda (x) `(,x . single-load)) +singleton-types+)))
 
 
@@ -612,7 +607,7 @@
 	   (cond ((member (car zn) '(and or not)) (distribute-complex zn))
 		 ((and (not (cddr type)) (eq z zn)) type)
 		 (`(,(car type) ,zn)))))
-	((member (car type) '(array simple-array))
+	((eq (car type) 'array)
 	 (let* ((tp (cadr type))
 		(tpn (if (cdr type) (maybe-eval tp) '*))
 		(tpn (if ar (upgraded-array-element-type tpn) tpn))
@@ -621,7 +616,6 @@
 		(dmn (or dmn 0)))
 	   (if (and (not (cdddr type)) (eq tp tpn) (eq dm dmn)) type `(,(car type) ,tpn ,dmn))))
 	((eq (car type) 'member) type)
-	((and (not (cdr type)) (member (car type) +singleton-types+)) type)
 	((eq (car type) 'cons)
 	 (let* ((def '(t))
 		(car (cadr type))
@@ -635,6 +629,7 @@
 	   (if (and (not (cdddr type)) (eq car carn) (eq cdr cdrn)) type `(,(car type) ,carn ,cdrn))))
 	((setq tem (coerce-to-standard-class (car type))) (if (eq (car type) tem) type `(,tem ,@(cdr type))))
 	((classp (car type)) (normalize-type-int `(,(class-name (car type)) ,@(cdr type)) ar))
+	((and (not (cdr type)) (member (car type) +singleton-types+)) type)
         ((and (eq (car type) 'satisfies) 
 	      (setq tem (get (cadr type) 'predicate-type)))
 	 (normalize-type-int tem ar))
@@ -644,7 +639,7 @@
 			(mapcar (lambda (x) (if (and (consp x) (eq (car x) 'load-time-value)) (eval (cadr x)) x))
 				(cdr type))
 		      (cdr type)))
-		(nt (and dt (apply dt rr))))
+		(nt (and dt (or (apply dt rr) '(nil)))))
 	   (when (and nt (not (equal type nt)))
 	     (normalize-type-int nt ar))))
 	((member (car type) '(and or not))
@@ -719,7 +714,7 @@
 	   (funcall tem ntp type))
 	  ((setq tem (coerce-to-standard-class (car type)))
 	   (ntp-ld ntp `(standard-object ,tem)))
-	  ((and (symbolp (car type)) (setq tem (get (car type) 'si::s-data)))
+	  ((and (symbolp (car type)) (setq tem (get (car type) 's-data)))
 	   (ntp-ld ntp `(structure ,tem)))
 	  ((eq (car type) 'member)
 	   (let ((els (cdr type)))
@@ -897,16 +892,16 @@
 (defun array-load (ntp type)
   (let* ((z (if (eq (cadr type) 'string-char) 'character (cadr type)));FIXME
 	 (z (if (eq z '*) z (car (member z +array-types+)))))
-    (unless z (error "Bad array type ~a~%" (cadr type)))
+    (unless (or z (not (cadr type))) (error "Bad array type ~a~%" (cadr type)))
     (let* ((dim (caddr type))
 	   (dim (cond ((eq dim '*) t)
 		      ((integerp dim) (if (= 0 dim) dim (make-list dim :initial-element t)))
 		      ((listp dim) (substitute t '* dim))))) ;FIXME consing
       (if (eq z '*)
 	  (dolist (l +array-type-alist+)
-	    (ntp-ld ntp `(,(cdr l) ,dim)))
+	    (ntp-ld ntp `(,(cdr l) ,(when z dim))))
 	(ntp-ld ntp `(,(cdr (assoc z +array-type-alist+)) ,dim))))))
-
+  
 (defun array-atm (x)
   (cond ((atom x))
 	((eq (car x) 'not) (array-atm (cadr x)))
@@ -964,7 +959,7 @@
 	      ((and or) (sigalg-op op (cadr x) (cadr y) 'structure^ 'structure-atm))
 	      (not (negate (cadr x))))))
 
-(defun structure-recon (x) (single-recon x))
+(defun structure-recon (x) (cadr x))
 
 ;; STANDARD-OBJECTS
 
@@ -984,7 +979,12 @@
 	   (when q `(member ,@q))))
 	((and (consp y) (eq (car y) 'member)) (standard^ y x))
 	((member y (class-precedence-list x)) x)
-	((member x (class-precedence-list y)) y)))
+	((member x (class-precedence-list y)) y)
+	((reduce (lambda (&rest xy) (when xy (standard^ (car xy) (cadr xy))))
+		 (intersection (class-direct-subclasses x) (class-direct-subclasses y) :test 'eq)))))
+;	((reduce (lambda (&rest xy) (when xy (standard^ (car xy) (cadr xy))))
+;		 (intersection (class-direct-subclasses x) (class-direct-subclasses y)
+;				 :test 'standard^)))))
 
 (defun standard-op (op x y)
   (setf (cadr x)
@@ -992,7 +992,7 @@
 	      ((and or) (sigalg-op op (cadr x) (cadr y) 'standard^ 'standard-atm))
 	      (not (negate (cadr x))))))
 
-(defun standard-recon (x) (single-recon x))
+(defun standard-recon (x) (cadr x))
 
 ;; CONS
 
@@ -1053,8 +1053,8 @@
   (cond ((eq t (cadr x)) `(cons t t))
 	((atom (cadr x)) nil)
 	((cons-atm (cadr x))
-	 (let ((car (nreconstruct-type (caadr x)))
-	       (cdr (nreconstruct-type (cdadr x))))
+	 (let ((car (nreconstruct-type-int (caadr x)))
+	       (cdr (nreconstruct-type-int (cdadr x))))
 	   (and car cdr `(cons ,car ,cdr))))
 	((eq (caadr x) 'or)
 	 (let ((z (lremove-if 'not (mapcar (lambda (x) (cons-recon `(cons ,x))) (cdadr x)))))
@@ -1178,10 +1178,10 @@
   
 
 
-(defun nreconstruct-type (x)
+(defun nreconstruct-type-int (x)
   (if (ntp-ukn x) t
     (if (ntp-def x)
-	(let ((z (nreconstruct-type (ntp-not x))))
+	(let ((z (nreconstruct-type-int (ntp-not x))))
 	  (or (not z) `(not ,z)))
       (let ((z (lremove-if 
 		'not 
@@ -1190,6 +1190,8 @@
 			    (funcall op x))) (ntp-tps x)))))
 	(if (cdr z) `(or ,@z) (car z))))))
 
+(defun nreconstruct-type (x)
+  (list (nreconstruct-type-int x) (ntp-ukn x)))
 
 
 ;; CLASS HACKS
@@ -1200,6 +1202,8 @@
 (defun class-precedence-list (object) (declare (ignore object)) nil)
 (defun find-class (object &optional errorp environment) (declare (ignore object errorp environment))nil)
 (defun class-name (class) (declare (ignore class)) nil)
+(defun class-of (object) (declare (ignore object)) nil)
+(defun class-direct-subclasses (object) (declare (ignore object)) nil)
 
 (defun is-standard-class-symbol (sym) 
   (let* ((z (get sym 'deftype-definition))
