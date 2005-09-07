@@ -535,43 +535,68 @@
   ;;
   ;; name       supers     subs                     cdr of cpl
   ;; prototype
-  '(;(t         ()         (number sequence array character symbol) ())
+  `(;(t         ()         (number sequence array character symbol) ())
     (number     (t)        (complex float rational) (t))
-    (complex    (number)   ()                       (number t)
-     #c(1 1))
-    (float      (real)     ()                       (real number t)
-     1.0)
+    (complex    (number)   ()                       (number t)                   #c(1 1))
+    (float      (real)     ()                       (real number t)              1.0)
     (real       (number)   (rational float)         (number t))
     (rational   (real)     (integer ratio)          (real number t))
-    (integer    (rational) ()                       (rational real number t)
-     1)
-    (ratio      (rational) ()                       (rational real number t)
-     1/2)
+    (integer    (rational) ()                       (rational real number t)     1)
+    (ratio      (rational) ()                       (rational real number t)     1/2)
 
     (sequence   (t)        (list vector)            (t))
     (list       (sequence) (cons null)              (sequence t))
-    (cons       (list)     ()                       (list sequence t)
-     (nil))
+    (cons       (list)     ()                       (list sequence t)            (nil))
+
+    (pathname   (t)        (logical-pathname)       (t)                          #p"foo")
+    (logical-pathname   
+                (pathname t)        ()              (pathname t)                 )
+    (readtable  (t)        ()                       (t)                          ,*readtable*)
+    (package    (t)        ()                       (t)                          ,*package*)
+    (hash-table (t)        ()                       (t)                          )
+    (function   (t)        ()                       (t)                          ,#'cons)
+;    (function   (t)        (interpreted-function
+;			    compiled-function)      (t)                          )
+;    (interpreted-function   
+;                (function t)
+;		           ()                       (function t)                 ,(eval `(function (lambda nil nil))))
+;    (compiled-function   
+;                (function t)
+;		           ()                       (function t)                 ,#'cons)
+    (synonym-stream  
+                (stream t) ()                       (stream t)                   ,*standard-output*)
+    (echo-stream  
+                (stream t) ()                       (stream t)                   )
+    (two-way-stream  
+                (stream t) ()                       (stream t)                   )
+    (string-stream  
+                (stream t) ()                       (stream t)                   )
+    (concatenated-stream  
+                (stream t) ()                       (stream t)                   )
+    (broadcast-stream  
+                (stream t) ()                       (stream t)                   )
+    (file-stream  
+                (stream t) ()                       (stream t)                   )
+    (stream     (t)        (synonym-stream 
+			    string-stream
+			    two-way-stream
+			    echo-stream
+			    file-stream
+			    concatenated-stream
+			    broadcast-stream)       (t))
     
 
-    (array      (t)        (vector)                 (t)
-     #2A((NIL)))
+    (array      (t)        (vector)                 (t)                          #2A((NIL)))
     (vector     (array
-		 sequence) (string bit-vector)      (array sequence t)
-     #())
-    (string     (vector)   ()                       (vector array sequence t)
-     "")
-    (bit-vector (vector)   ()                       (vector array sequence t)
-     #*1)
-    (character  (t)        ()                       (t)
-     #\c)
+		 sequence) (string bit-vector)      (array sequence t)           #())
+    (string     (vector)   ()                       (vector array sequence t)    "")
+    (bit-vector (vector)   ()                       (vector array sequence t)    #*1)
+    (character  (t)        ()                       (t)                          #\c)
    
-    (symbol     (t)        (null)                   (t)
-     symbol)
-    (random-state (t)      (null)                   (t) #$0)
+    (symbol     (t)        (null)                   (t)                          symbol)
+    (random-state (t)      (null)                   (t)                          #$0)
     (null       (symbol 
-		 list)     ()                       (symbol list sequence t)
-     nil)))
+		 list)     ()                       (symbol list sequence t)     nil)))
 
 #+cmu17
 (labels ((direct-supers (class)
@@ -625,22 +650,12 @@
   (defclass kernel:funcallable-instance (function) ()
     (:metaclass built-in-class)))
 
-;(defclass function (t) ()
-;  (:metaclass built-in-class))
-
-;(defclass stream (si::instance) ()
-;  (:metaclass built-in-class))
-
+(push (make-early-class-definition 'function nil 'built-in-class '(t) nil nil) *early-class-definitions*)
 
 (defclass slot-object (#-cmu17 t #+cmu17 kernel:instance) ()
   (:metaclass slot-class))
 
-;(defclass si::instance (slot-object) ())
-
-;(defclass si::funcallable-instance (slot-object) ())
-
-(defclass structure-object (slot-object ;si::instance
-			    ) ()
+(defclass structure-object (slot-object) ()
   (:metaclass structure-class))
 
 (defstruct (#-cmu17 structure-object #+cmu17 dead-beef-structure-object
@@ -651,12 +666,11 @@
 
 (defclass metaobject (standard-object) ())
 
-(defclass funcallable-standard-object (standard-object)
-;				       si::funcallable-instance)
+(defclass funcallable-standard-object (standard-object function)
   ()
   (:metaclass funcallable-standard-class))
 
-(defclass specializer (metaobject); si::instance) 
+(defclass specializer (metaobject)
      ((type
         :initform nil
         :reader specializer-type)))
@@ -684,7 +698,7 @@
 ;;; have the class CLASS in its class precedence list.
 ;;; 
 (defclass class (documentation-mixin dependent-update-mixin definition-source-mixin
-		 specializer );si::instance)
+		 specializer )
      ((name
 	:initform nil
 	:initarg  :name
@@ -789,7 +803,7 @@
 ;;;
 ;;; Slot definitions.
 ;;;
-(defclass slot-definition (metaobject );si::instance) 
+(defclass slot-definition (metaobject )
      ((name
 	:initform nil
 	:initarg :name
@@ -877,7 +891,7 @@
 					       effective-slot-definition)
   ())
 
-(defclass method (metaobject );si::instance) 
+(defclass method (metaobject )
   ())
 
 (defclass standard-method (definition-source-mixin plist-mixin method)
@@ -959,7 +973,7 @@
   (:default-initargs :method-class *the-class-standard-method*
 		     :method-combination *standard-method-combination*))
 
-(defclass method-combination (metaobject); si::instance)
+(defclass method-combination (metaobject)
   ())
 
 (defclass standard-method-combination
@@ -1019,3 +1033,5 @@
 
 (setf (symbol-function 'si::find-class) (symbol-function 'early-find-class-symbol))
 (setf (symbol-function 'si::class-precedence-list) (symbol-function 'early-class-precedence-list-symbol))
+(setf (symbol-function 'si::class-of) (symbol-function 'early-class-name-of))
+;(setf (symbol-function 'si::class-direct-subclasses) (symbol-function 'early-class-direct-subclasses)) ;FIXME need class-name here

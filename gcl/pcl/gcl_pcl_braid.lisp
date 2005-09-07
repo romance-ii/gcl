@@ -224,9 +224,10 @@
 		(setf (wrapper-class-slots wrapper)
 		      ()))
 	      
-	      (setq proto (if (eq meta 'funcallable-standard-class)
+	      (setq proto (if (eq name 'function) #'cons ;;FIXME -- not necessary
+			    (if (eq meta 'funcallable-standard-class)
 			      (allocate-funcallable-instance wrapper)
-			      (allocate-standard-instance wrapper)))
+			      (allocate-standard-instance wrapper))))
 	    
 	      (setq direct-slots
 		    (bootstrap-make-slot-definitions 
@@ -462,8 +463,9 @@
   (let* ((built-in-class (find-class 'built-in-class))
 	 (built-in-class-wrapper (class-wrapper built-in-class)))
     (dolist (e *built-in-classes*)
-      (let ((class (allocate-standard-instance built-in-class-wrapper)))
-	(setf (find-class (car e)) class))))
+      (unless (find-class (car e) nil)
+	(let ((class (allocate-standard-instance built-in-class-wrapper)))
+	  (setf (find-class (car e)) class)))))
 
   ;;
   ;; In the second pass, we initialize the class objects.
@@ -605,15 +607,17 @@
     (if (structure-type-p symbol)
 	(unless (eq find-structure-class symbol)
 	  (let ((find-structure-class symbol))
-	    (ensure-class symbol
-			  :metaclass 'structure-class
-			  :name symbol
-			  :direct-superclasses
-			  (when (structure-type-included-type-name symbol)
-			    (list (structure-type-included-type-name symbol)))
-			  :direct-slots
-			  (mapcar #'slot-initargs-from-structure-slotd
-				  (structure-type-slot-description-list symbol)))))
+	    (let ((res (ensure-class symbol
+				     :metaclass 'structure-class
+				     :name symbol
+				     :direct-superclasses
+				     (when (structure-type-included-type-name symbol)
+				       (list (structure-type-included-type-name symbol)))
+				     :direct-slots
+				     (mapcar #'slot-initargs-from-structure-slotd
+					     (structure-type-slot-description-list symbol)))))
+	      (setf (class-defstruct-constructor res) (car (si::s-data-constructors (get symbol 'si::s-data))))
+	      res)))
       (error "~S is not a legal structure class name." symbol))))
 
 #-cmu17
