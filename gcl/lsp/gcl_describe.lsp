@@ -244,7 +244,7 @@
                                (car l) (nth i cons)))))
 
 (defun inspect-string (string)
-  (format t (if (simple-string-p string) "~S - simple string" "~S - string")
+  (format t "~S - string";(if (simple-string-p string) "~S - simple string" "~S - string")
           string)
   (inspect-print  "dimension:  ~D"(array-dimension string 0))
   (when (array-has-fill-pointer-p string)
@@ -258,7 +258,7 @@
                                       (char string i)))))
 
 (defun inspect-vector (vector)
-  (format t (if (simple-vector-p vector) "~S - simple vector" "~S - vector")
+  (format t "~S - vector";(if (simple-vector-p vector) "~S - simple vector" "~S - vector")
           vector)
   (inspect-print  "dimension:  ~D" (array-dimension vector 0))
   (when (array-has-fill-pointer-p vector)
