@@ -2433,31 +2433,47 @@ object path;
 	@(return s)
 @)
 
-@(defun logical_pathname (pathname)
-        object s;
-	vs_mark;
+
+@(defun logical_pathname (s)
+  enum type tp;
 @
-	s = pathname;
-	check_type_or_pathname_string_symbol_stream(&s);
-	s = coerce_to_pathname(s); vs_push(s);
 
-	if ((s->pn.pn_host == Cnil) || (s->pn.pn_host == sKunspecific)) {
-	    file_type_error("Pathname ~S is not a ~S.",s, sLlogical_pathname);
-	    s=Cnil;
-	} else
-	if ((s->pn.pn_device != Cnil) && (s->pn.pn_device != sKunspecific)) {
-	    file_type_error("Pathname ~S is not a ~S.",s, sLlogical_pathname);
-	    s=Cnil;
-	} else
+  vs_mark;
+  vs_push(s);
+
+  tp=type_of(s);
+  if (tp!=t_pathname &&
+      tp!=t_string &&
+      tp!=t_symbol &&
+      tp!=t_stream) {
+    wrong_type_argument(TSor_pathname_string_symbol_stream, s);
+    s=Cnil;
+
+  } else {
+
+    s = coerce_to_pathname(s); 
+    vs_push(s);
+    
+    if ((s->pn.pn_host == Cnil) || (s->pn.pn_host == sKunspecific)) {
+      file_type_error("Pathname ~S is not a ~S.",s, sLlogical_pathname);
+      s=Cnil;
+    } else
+      if ((s->pn.pn_device != Cnil) && (s->pn.pn_device != sKunspecific)) {
+	file_type_error("Pathname ~S is not a ~S.",s, sLlogical_pathname);
+	s=Cnil;
+      } else
 	if (pathname_lookup(s->pn.pn_host,sSApathname_logicalA) == Cnil) {
-	    file_type_error("Pathname ~S is not a ~S.",s, sLlogical_pathname);
-	    s=Cnil;
-	}
-	s->pn.pn_device = sKunspecific;
+	  file_type_error("Pathname ~S is not a ~S.",s, sLlogical_pathname);
+	  s=Cnil;
+	} else
+	  s->pn.pn_device = sKunspecific; /*FIXME side effect*/
+  }
 
-	vs_reset;
-	@(return s)
+  vs_reset;
+  @(return s)
+
 @)
+
 
 void
 gcl_init_pathname(void)
@@ -2523,6 +2539,7 @@ gcl_init_pathname_function()
 	make_function("TRANSLATE-PATHNAME", Ltranslate_pathname);
 	make_function("TRANSLATE-LOGICAL-PATHNAME", Ltranslate_logical_pathname);
 	make_function("LOGICAL-PATHNAME", Llogical_pathname);
+/* 	make_function("LOGICAL-PATHNAME-P", Llogical_pathname_p); */
 
 	make_si_function("WRAP-PATHNAME", Lwrap_pathname);
 	make_si_function("SEARCH-LOCAL-PATHNAME", Lsearch_local_pathname);
