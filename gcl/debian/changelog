@@ -121,8 +121,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * deftype structure-object to structure
   * Various type system fixes
   * class-precedence-list tests should work now
+  * define several standard conditions
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 02:33:26 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 02:35:37 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
