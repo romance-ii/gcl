@@ -225,6 +225,13 @@ funcall(object fun)
 		FEundefined_function(fun);
 	      }
 
+	case t_ifun:
+	  {object x = fun->ifn.ifn_self;
+	  if (x) { fun = x; goto TOP;}
+	  else
+	    FEundefined_function(fun);
+	  }
+	  
 	case t_cons:
 		break;
 
@@ -898,7 +905,7 @@ EVAL_ARGS:
 	  top[0] = ans;
 	  vs_top = ++top;
 	  form = MMcdr(form);}
-	  n =top - base; /* number of args */
+	n =top - base; /* number of args */
 	if (Vapplyhook->s.s_dbind != Cnil) {
 	  base[0]= (object)n;
 	  base[0] = c_apply_n(list,n+1,base);

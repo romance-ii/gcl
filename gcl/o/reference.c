@@ -156,6 +156,11 @@ FFN(Ffunction)(object form)
 		vs_base[0] = MMcons(lex_env[1], vs_base[0]);
 		vs_base[0] = MMcons(lex_env[0], vs_base[0]);
 		vs_base[0] = MMcons(sLlambda_closure, vs_base[0]);
+		{
+		  object x=alloc_object(t_ifun);
+		  x->ifn.ifn_self=vs_base[0];
+		  vs_base[0]=x;
+		}
 	} else if (setf_fn_form(fun)) {
 	        object setf_fn_def=get(MMcadr(fun),sSsetf_function,Cnil);
 		if (setf_fn_def==Cnil)
@@ -215,6 +220,18 @@ LFD(Lspecial_form_p)(void)
 	else
 		vs_base[0] = Cnil;
 }
+
+DEFUNO_NEW("INTERPRETED-FUNCTION-LAMBDA",object,fSinterpreted_function_lambda,SI
+   ,1,1,NONE,OO,OO,OO,OO,void,siLinterpreted_function_lambda,(object x),"")
+
+{
+
+  if (type_of(x)!=t_ifun)
+    TYPE_ERROR(x,sLinterpreted_function);
+  return x->ifn.ifn_self;
+
+}
+
 
 void
 gcl_init_reference(void)

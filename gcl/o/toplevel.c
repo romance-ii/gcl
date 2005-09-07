@@ -52,8 +52,11 @@ FFN(Fdefun)(object args)
 	name = MMcar(args);
 	if (type_of(name) != t_symbol) {
 	  if (setf_fn_form(name)) {
+	    object x;
 	    vs_base = vs_top;
-	    vs_push(MMcons(sLlambda, MMcdr(args)));
+	    x=alloc_object(t_ifun);
+	    x->ifn.ifn_self=MMcons(sLlambda, MMcdr(args));
+	    vs_push(x);
 	    putprop(MMcadr(name),vs_base[0],sSsetf_function);
 	    vs_base[0]=name;
 	    return;
@@ -84,6 +87,9 @@ FFN(Fdefun)(object args)
 	  vs_base[0] = MMcons(sLlambda_block_closure, vs_base[0]);
 	}
 	{object fname =  clear_compiler_properties(name,vs_base[0]);
+	object x=alloc_object(t_ifun);
+	x->ifn.ifn_self=vs_base[0];
+	vs_base[0]=x;
 	fname->s.s_gfdef = vs_base[0];
 	fname->s.s_mflag = FALSE;}
 	vs_base[0] = name;

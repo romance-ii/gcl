@@ -169,6 +169,7 @@ DEFUNO_NEW("FSET",object,fSfset,SI
 	    type_of(function) == t_sfun ||
 	    type_of(function) == t_vfun ||
 	    type_of(function) == t_gfun ||
+	    type_of(function) == t_ifun ||
 	    type_of(function) == t_cclosure||
 	    type_of(function) == t_closure ||
 	    type_of(function) == t_afun 

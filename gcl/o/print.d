@@ -725,6 +725,7 @@ int level;
 		switch (type_of(ppfun)) {
 		    case t_cfun:
 		    case t_gfun:
+		    case t_ifun:
 		    case t_sfun:
 		    case t_vfun:
 		    case t_afun:
@@ -1506,6 +1507,15 @@ int level;
 		write_str(">");
 		break;
 
+	case t_ifun:
+		write_str("#<interpreted-function ");
+		if (x->ifn.ifn_self != Cnil)
+			write_object(x->ifn.ifn_self, level);
+		else
+			write_addr(x);
+		write_str(">");
+		break;
+
 	case t_closure:
 	case t_cclosure:
 		write_str("#<compiled-closure ");
@@ -1533,7 +1543,7 @@ int level;
 	}
 }
 
-char travel_push_type[32]; 
+char travel_push_type[(int)t_other]; 
 
 static void
 travel_push_object(x)

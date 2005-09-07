@@ -141,8 +141,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * make-sequence handles classes
   * interpreted-function support for trace
   * non-negative-* array types
+  * interpreted-function support
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 02:52:27 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 02:53:03 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 

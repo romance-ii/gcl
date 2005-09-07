@@ -400,10 +400,12 @@ mark_object(object x) {
       break;
     case aet_char:
     case aet_uchar:
+    case aet_nnchar:
       j=sizeof(char)*x->a.a_dim;
       break;
     case aet_short:
     case aet_ushort:
+    case aet_nnshort:
       j=sizeof(short)*x->a.a_dim;
       break;
     default:
@@ -656,6 +658,10 @@ mark_object(object x) {
   case t_gfun:	
     mark_object(x->cf.cf_name);
     mark_object(x->cf.cf_data);
+    break;
+
+  case t_ifun:
+    mark_object(x->ifn.ifn_self);
     break;
     
   case t_cfdata:

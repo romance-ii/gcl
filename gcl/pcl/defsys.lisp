@@ -467,7 +467,7 @@ and load your system with:
 (defun operation-transformations (name mode &optional arg)
   (let ((system (get-system name)))
     (unless system (error "Can't find system with name ~S." name))
-    (let ((*system-directory* (funcall (the function (car system))))
+    (let ((*system-directory* (funcall (car system))) ;(the function (car system))
 	  (modules (cadr system)))
       (ecase mode
 	(:compile
@@ -539,7 +539,7 @@ and load your system with:
 (defun operate-on-system (name mode &optional arg print-only)
   (let ((system (get-system name)))
     (unless system (error "Can't find system with name ~S." name))
-    (let* ((*system-directory* (funcall (the function (car system))))
+    (let* ((*system-directory* (funcall (car system))) ; (the function (car system))
 	   (transformations (operation-transformations name mode arg)))
       (labels ((load-binary (name pathname)
 		 (format t "~&Loading binary of ~A...~%" name)
@@ -639,14 +639,14 @@ and load your system with:
 (defun system-source-files (name)
   (let ((system (get-system name)))
     (unless system (error "Can't find system with name ~S." name))
-    (let ((*system-directory* (funcall (the function (car system))))
+    (let ((*system-directory* (funcall (car system))) ;(the function (car system))
 	  (modules (cadr system)))
       (mapcar #'make-source-pathname modules))))
 
 (defun system-binary-files (name)
   (let ((system (get-system name)))
     (unless system (error "Can't find system with name ~S." name))
-    (let ((*system-directory* (funcall (the function (car system))))
+    (let ((*system-directory* (funcall (car system))) ;(the function (car system))
 	  (modules (cadr system)))
       (mapcar #'make-binary-pathname modules))))
 

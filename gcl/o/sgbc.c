@@ -588,6 +588,10 @@ sgc_mark_object1(object x) {
     sgc_mark_object(x->cf.cf_data);
     break;
     
+  case t_ifun:
+    sgc_mark_object(x->ifn.ifn_self);
+    break;
+
   case t_cfdata:
     
     if (x->cfd.cfd_self != NULL) {

@@ -50,6 +50,9 @@ ihs_function_name(object x)
 	case t_symbol:
 		return(x);
 
+	case t_ifun:
+	  x=x->ifn.ifn_self;
+	  /*pass through*/
 	case t_cons:
 		y = x->c.c_car;
 		if (y == sLlambda)
