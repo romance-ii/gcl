@@ -166,7 +166,7 @@
 (DEFSYSFUN 'STRING-UPCASE "Lstring_upcase" '(T *) 'STRING NIL NIL) 
 (DEFSYSFUN 'CEILING "Lceiling" '(T *) '(VALUES T T) NIL NIL) 
 (DEFSYSFUN 'GETHASH "Lgethash" '(T T *) '(VALUES T T) NIL NIL) 
-(DEFSYSFUN 'TYPE-OF "Ltype_of" '(T) 'T NIL NIL) 
+;(DEFSYSFUN 'TYPE-OF "Ltype_of" '(T) 'T NIL NIL) 
 (DEFSYSFUN 'BUTLAST "Lbutlast" '(T *) 'T NIL NIL) 
 (DEFSYSFUN '1- "Lone_minus" '(T) 'T NIL NIL) 
 (DEFSYSFUN 'MAKE-HASH-TABLE "Lmake_hash_table" '(*) 'T NIL NIL) 

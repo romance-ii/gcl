@@ -130,8 +130,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * compiler support for new interpreted function type
   * use new subtypep/resolve-type system for enhanced compiler type-and
     -- TODO cleanup dead code
+  * type-of now an sfun
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 02:41:45 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 02:42:17 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 
