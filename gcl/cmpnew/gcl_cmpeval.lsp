@@ -1054,7 +1054,7 @@
         (*compiler-temps* *compiler-temps*))
     (dolist (var vars)
       (if (and (symbolp var)
-               (not (si:memq var '(&optional &rest &key &aux))))
+               (not (member var '(&optional &rest &key &aux))))
           (push (or (pop *compiler-temps*)
                     (gentemp "TMP" (find-package 'compiler)))
                 temps)
