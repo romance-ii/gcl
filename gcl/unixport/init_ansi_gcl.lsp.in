@@ -34,27 +34,28 @@
   (in-package "lisp")
 ;; FIXME integrate this into the stream objects et.al. and/or
 ;; just use defclass
-  (defstruct (UNBOUND-SLOT (:constructor %make-UNBOUND-SLOT)))
-  (defstruct ( TWO-WAY-STREAM (:constructor %make-TWO-WAY-STREAM)))
-  (defstruct ( SYNONYM-STREAM (:constructor %make-SYNONYM-STREAM)))
-  (defstruct ( STYLE-WARNING (:constructor %make-STYLE-WARNING)))
-  (defstruct ( STRING-STREAM (:constructor %make-STRING-STREAM)))
-  (defstruct ( STREAM (:constructor %make-STREAM)))
-  (defstruct ( READTABLE (:constructor %make-READTABLE) (:copier %copy-readtable)))
-  (defstruct ( READER-ERROR (:constructor %make-READER-ERROR)))
-  (defstruct ( RANDOM-STATE (:constructor %make-RANDOM-STATE) (:predicate %random-state-p)))
-  (defstruct ( PRINT-NOT-READABLE (:constructor %make-PRINT-NOT-READABLE)))
-  (defstruct (PATHNAME (:constructor %make-PATHNAME)))
-  (defstruct ( PACKAGE (:constructor %make-PACKAGE)))
-  (defstruct ( LOGICAL-PATHNAME (:constructor %make-LOGICAL-PATHNAME)))
-  (defstruct ( HASH-TABLE (:constructor %make-HASH-TABLE) (:predicate %hash-table-p)))
-  (defstruct ( FUNCTION (:constructor %make-FUNCTION)))
-  (defstruct (FLOATING-POINT-INVALID-OPERATION (:constructor %make-FLOATING-POINT-INVALID-OPERATION)))
-  (defstruct ( FLOATING-POINT-INEXACT (:constructor %make-FLOATING-POINT-INEXACT)))
-  (defstruct ( FILE-STREAM (:constructor %make-FILE-STREAM)))
-  (defstruct (ECHO-STREAM (:constructor %make-ECHO-STREAM)))
-  (defstruct ( CONCATENATED-STREAM (:constructor %make-CONCATENATED-STREAM)))
-  (defstruct ( BROADCAST-STREAM (:constructor %make-BROADCAST-STREAM))))
+;  (defstruct (UNBOUND-SLOT (:constructor %make-UNBOUND-SLOT)))
+;  (defstruct ( TWO-WAY-STREAM (:constructor %make-TWO-WAY-STREAM)))
+;  (defstruct ( SYNONYM-STREAM (:constructor %make-SYNONYM-STREAM)))
+;  (defstruct ( STYLE-WARNING (:constructor %make-STYLE-WARNING)))
+;  (defstruct ( STRING-STREAM (:constructor %make-STRING-STREAM)))
+;  (defstruct ( STREAM (:constructor %make-STREAM)))
+;  (defstruct ( READTABLE (:constructor %make-READTABLE) (:copier %copy-readtable)))
+;  (defstruct ( READER-ERROR (:constructor %make-READER-ERROR)))
+;  (defstruct ( RANDOM-STATE (:constructor %make-RANDOM-STATE) (:predicate %random-state-p)))
+;  (defstruct ( PRINT-NOT-READABLE (:constructor %make-PRINT-NOT-READABLE)))
+;  (defstruct (PATHNAME (:constructor %make-PATHNAME)))
+;  (defstruct ( PACKAGE (:constructor %make-PACKAGE)))
+;  (defstruct ( LOGICAL-PATHNAME (:constructor %make-LOGICAL-PATHNAME)))
+;  (defstruct ( HASH-TABLE (:constructor %make-HASH-TABLE) (:predicate %hash-table-p)))
+;  (defstruct ( FUNCTION (:constructor %make-FUNCTION)))
+;  (defstruct (FLOATING-POINT-INVALID-OPERATION (:constructor %make-FLOATING-POINT-INVALID-OPERATION)))
+;  (defstruct ( FLOATING-POINT-INEXACT (:constructor %make-FLOATING-POINT-INEXACT)))
+;  (defstruct ( FILE-STREAM (:constructor %make-FILE-STREAM)))
+;  (defstruct (ECHO-STREAM (:constructor %make-ECHO-STREAM)))
+;  (defstruct ( CONCATENATED-STREAM (:constructor %make-CONCATENATED-STREAM)))
+;  (defstruct ( BROADCAST-STREAM (:constructor %make-BROADCAST-STREAM))))
+)
 
  (in-package "USER")
 
@@ -209,6 +210,8 @@
 	 LISP::KYOTO
 	 LISP::CCLOSURE))
  
+
+
 ;anything in "SYSTEM" which should go in "COMMON-LISP"
 ;can be added to shadow-system
  (setf shadow-system '(system::copy-structure
@@ -227,9 +230,24 @@
 			    (import (list s) "COMMON-LISP")
 			    (import (list s) "USER")) ))
  
- (do-external-symbols (s "PCL")
-		      (import (list s) "COMMON-LISP")
-		      (import (list s) "USER"))
+ (do-external-symbols 
+  (s "PCL")
+  (unless (member s '(pcl::STANDARD-SLOT-DEFINITION  
+		      pcl::SLOT-DEFINITION pcl::SPECIALIZER 
+		      pcl::EFFECTIVE-SLOT-DEFINITION pcl::STANDARD-WRITER-METHOD
+		      pcl::STANDARD-READER-METHOD pcl::EQL-SPECIALIZER
+		      pcl::DIRECT-SLOT-DEFINITION pcl::INTERPRETED-FUNCTION
+		      pcl::FORWARD-REFERENCED-CLASS
+		      pcl::STANDARD-EFFECTIVE-SLOT-DEFINITION
+		      pcl::STANDARD-ACCESSOR-METHOD
+		      pcl::STANDARD-DIRECT-SLOT-DEFINITION
+		      pcl::FUNCALLABLE-STANDARD-CLASS))
+    (import (list s) "COMMON-LISP")
+    (import (list s) "USER")))
+
+(shadowing-import (find-symbol "DOCUMENTATION" 'pcl) 'common-lisp)
+(shadowing-import (find-symbol "DOCUMENTATION" 'pcl) 'user)
+ 
  
 ;(shadowing-import (list 'pcl::classp) "SYSTEM")
 ; (setf (symbol-function 'si::classp) (symbol-function 'pcl::classp))
@@ -241,14 +259,16 @@
 ; (setf (symbol-function 'si::find-class-no-error) 
 ;	(symbol-function 'conditions::find-class-no-error))
 
- (do-external-symbols (s "CONDITIONS")
-		      (if (member s clcs_shadow)
-			  (progn 
-			    (shadowing-import (list s) "COMMON-LISP")
-			    (shadowing-import (list s) "USER"))
-			(progn
-			  (import (list s) "COMMON-LISP")
-			  (import (list s) "USER"))))
+ (do-external-symbols 
+  (s "CONDITIONS")
+  (unless (member s '(conditions::STACK-OVERFLOW conditions::STORAGE-EXHAUSTED))
+    (if (member s clcs_shadow)
+	(progn 
+	  (shadowing-import (list s) "COMMON-LISP")
+	  (shadowing-import (list s) "USER"))
+      (progn
+	(import (list s) "COMMON-LISP")
+	(import (list s) "USER")))))
  
  (do-external-symbols (s "COMPILER")
 		      (if (member s clcs_shadow)
