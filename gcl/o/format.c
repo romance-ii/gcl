@@ -2229,6 +2229,8 @@ fmt_semicolon(bool colon, bool atsign)
 	fmt_set_param(1, &fmt_line_length, fmt_int, 72);
 }
 
+DEFVAR("*FORMAT-UNUSED-ARGS*",sSAformat_unused_argsA,SI,Cnil,"");
+
 DEFUNO_NEW("FORMAT",object,fLformat,LISP
        ,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,void,Lformat,(object strm, object control,...),"")
 {       va_list ap; 
@@ -2288,6 +2290,12 @@ DEFUNO_NEW("FORMAT",object,fLformat,LISP
 		    goto L;
 	    }
 	    format(strm, 0, control->st.st_fillp);
+	    if (sSAformat_unused_argsA->s.s_dbind) {
+	      int i;
+	      for (i=fmt_end-1;i>=fmt_index;i--)
+		sSAformat_unused_argsA->s.s_dbind=MMcons(fmt_base[i],sSAformat_unused_argsA->s.s_dbind);
+	    }
+
 	    flush_stream(strm);
 	}
 	    e = FALSE;

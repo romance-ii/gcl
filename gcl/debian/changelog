@@ -136,8 +136,9 @@ gclcvs (2.7.0-49) unstable; urgency=low
   * upgraded-array-element type of nil is nil
   * all arrays are simple
   * memq is a sys macro
+  * return unused format args in formatter
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 02:46:35 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  7 Sep 2005 02:48:39 +0000
 
 gclcvs (2.7.0-48) unstable; urgency=low
 

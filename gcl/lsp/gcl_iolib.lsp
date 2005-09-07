@@ -457,8 +457,10 @@
 
 (defmacro formatter ( control-string )
   `(progn
-  #'(lambda (*standard-output* &rest arguments)                                
-            (apply #'format t ,control-string arguments) )))
+     (lambda (*standard-output* &rest arguments)                                
+       (let ((*format-unused-args* nil))
+	 (apply 'format t ,control-string arguments)
+	 *format-unused-args*))))
 
 ;;; copied from ECL under LGPL by Michael Koehne
 ;;;    with-standard-io-syntax
