@@ -1,6 +1,6 @@
 /* BFD back-end for s-record objects.
    Copyright 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-   2000, 2001, 2002
+   2000, 2001, 2002, 2003, 2004, 2005
    Free Software Foundation, Inc.
    Written by Steve Chamberlain of Cygnus Support <sac@cygnus.com>.
 
@@ -114,32 +114,31 @@ static void srec_get_symbol_info PARAMS ((bfd *, asymbol *, symbol_info *));
 static void srec_print_symbol
  PARAMS ((bfd *, PTR, asymbol *, bfd_print_symbol_type));
 static void srec_init PARAMS ((void));
-static boolean srec_mkobject PARAMS ((bfd *));
-static int srec_get_byte PARAMS ((bfd *, boolean *));
-static void srec_bad_byte PARAMS ((bfd *, unsigned int, int, boolean));
-static boolean srec_scan PARAMS ((bfd *));
+static bfd_boolean srec_mkobject PARAMS ((bfd *));
+static int srec_get_byte PARAMS ((bfd *, bfd_boolean *));
+static void srec_bad_byte PARAMS ((bfd *, unsigned int, int, bfd_boolean));
+static bfd_boolean srec_scan PARAMS ((bfd *));
 static const bfd_target *srec_object_p PARAMS ((bfd *));
 static const bfd_target *symbolsrec_object_p PARAMS ((bfd *));
-static boolean srec_read_section PARAMS ((bfd *, asection *, bfd_byte *));
+static bfd_boolean srec_read_section PARAMS ((bfd *, asection *, bfd_byte *));
 
-static boolean srec_write_record PARAMS ((bfd *, unsigned int, bfd_vma,
-					  const bfd_byte *,
-					  const bfd_byte *));
-static boolean srec_write_header PARAMS ((bfd *));
-static boolean srec_write_symbols PARAMS ((bfd *));
-static boolean srec_new_symbol PARAMS ((bfd *, const char *, bfd_vma));
-static boolean srec_get_section_contents
+static bfd_boolean srec_write_record
+  PARAMS ((bfd *, unsigned int, bfd_vma, const bfd_byte *, const bfd_byte *));
+static bfd_boolean srec_write_header PARAMS ((bfd *));
+static bfd_boolean srec_write_symbols PARAMS ((bfd *));
+static bfd_boolean srec_new_symbol PARAMS ((bfd *, const char *, bfd_vma));
+static bfd_boolean srec_get_section_contents
   PARAMS ((bfd *, asection *, PTR, file_ptr, bfd_size_type));
-static boolean srec_set_arch_mach
+static bfd_boolean srec_set_arch_mach
   PARAMS ((bfd *, enum bfd_architecture, unsigned long));
-static boolean srec_set_section_contents
-  PARAMS ((bfd *, sec_ptr, PTR, file_ptr, bfd_size_type));
-static boolean internal_srec_write_object_contents PARAMS ((bfd *, int));
-static boolean srec_write_object_contents PARAMS ((bfd *));
-static boolean symbolsrec_write_object_contents PARAMS ((bfd *));
-static int srec_sizeof_headers PARAMS ((bfd *, boolean));
+static bfd_boolean srec_set_section_contents
+  PARAMS ((bfd *, sec_ptr, const PTR, file_ptr, bfd_size_type));
+static bfd_boolean internal_srec_write_object_contents PARAMS ((bfd *, int));
+static bfd_boolean srec_write_object_contents PARAMS ((bfd *));
+static bfd_boolean symbolsrec_write_object_contents PARAMS ((bfd *));
+static int srec_sizeof_headers PARAMS ((bfd *, bfd_boolean));
 static long srec_get_symtab_upper_bound PARAMS ((bfd *));
-static long srec_get_symtab PARAMS ((bfd *, asymbol **));
+static long srec_canonicalize_symtab PARAMS ((bfd *, asymbol **));
 
 /* Macros for converting between hex and binary.  */
 
@@ -158,11 +157,11 @@ static const char digs[] = "0123456789ABCDEF";
 static void
 srec_init ()
 {
-  static boolean inited = false;
+  static bfd_boolean inited = FALSE;
 
   if (! inited)
     {
-      inited = true;
+      inited = TRUE;
       hex_init ();
     }
 }
@@ -181,7 +180,7 @@ unsigned int Chunk = DEFAULT_CHUNK;
 /* The type of srec output (free or forced to S3).
    This variable can be modified by objcopy's --srec-forceS3
    parameter.  */
-boolean S3Forced = 0;
+bfd_boolean S3Forced = FALSE;
 
 /* When writing an S-record file, the S-records can not be output as
    they are seen.  This structure is used to hold them in memory.  */
@@ -220,34 +219,36 @@ typedef struct srec_data_struct
   }
 tdata_type;
 
-static boolean srec_write_section PARAMS ((bfd *, tdata_type *,
-					   srec_data_list_type *));
-static boolean srec_write_terminator PARAMS ((bfd *, tdata_type *));
+static bfd_boolean srec_write_section
+  PARAMS ((bfd *, tdata_type *, srec_data_list_type *));
+static bfd_boolean srec_write_terminator
+  PARAMS ((bfd *, tdata_type *));
 
 /* Set up the S-record tdata information.  */
 
-static boolean
+static bfd_boolean
 srec_mkobject (abfd)
      bfd *abfd;
 {
+  bfd_size_type amt;
+  tdata_type *tdata;
+
   srec_init ();
 
-  if (abfd->tdata.srec_data == NULL)
-    {
-      bfd_size_type amt = sizeof (tdata_type);
-      tdata_type *tdata = (tdata_type *) bfd_alloc (abfd, amt);
-      if (tdata == NULL)
-	return false;
-      abfd->tdata.srec_data = tdata;
-      tdata->type = 1;
-      tdata->head = NULL;
-      tdata->tail = NULL;
-      tdata->symbols = NULL;
-      tdata->symtail = NULL;
-      tdata->csymbols = NULL;
-    }
+  amt = sizeof (tdata_type);
+  tdata = (tdata_type *) bfd_alloc (abfd, amt);
+  if (tdata == NULL)
+    return FALSE;
 
-  return true;
+  abfd->tdata.srec_data = tdata;
+  tdata->type = 1;
+  tdata->head = NULL;
+  tdata->tail = NULL;
+  tdata->symbols = NULL;
+  tdata->symtail = NULL;
+  tdata->csymbols = NULL;
+
+  return TRUE;
 }
 
 /* Read a byte from an S record file.  Set *ERRORPTR if an error
@@ -256,14 +257,14 @@ srec_mkobject (abfd)
 static int
 srec_get_byte (abfd, errorptr)
      bfd *abfd;
-     boolean *errorptr;
+     bfd_boolean *errorptr;
 {
   bfd_byte c;
 
   if (bfd_bread (&c, (bfd_size_type) 1, abfd) != 1)
     {
       if (bfd_get_error () != bfd_error_file_truncated)
-	*errorptr = true;
+	*errorptr = TRUE;
       return EOF;
     }
 
@@ -279,7 +280,7 @@ srec_bad_byte (abfd, lineno, c, error)
      bfd *abfd;
      unsigned int lineno;
      int c;
-     boolean error;
+     bfd_boolean error;
 {
   if (c == EOF)
     {
@@ -298,15 +299,15 @@ srec_bad_byte (abfd, lineno, c, error)
 	  buf[1] = '\0';
 	}
       (*_bfd_error_handler)
-	(_("%s:%d: Unexpected character `%s' in S-record file\n"),
-	 bfd_archive_filename (abfd), lineno, buf);
+	(_("%B:%d: Unexpected character `%s' in S-record file\n"),
+	 abfd, lineno, buf);
       bfd_set_error (bfd_error_bad_value);
     }
 }
 
 /* Add a new symbol found in an S-record file.  */
 
-static boolean
+static bfd_boolean
 srec_new_symbol (abfd, name, val)
      bfd *abfd;
      const char *name;
@@ -317,7 +318,7 @@ srec_new_symbol (abfd, name, val)
 
   n = (struct srec_symbol *) bfd_alloc (abfd, amt);
   if (n == NULL)
-    return false;
+    return FALSE;
 
   n->name = name;
   n->val = val;
@@ -331,19 +332,19 @@ srec_new_symbol (abfd, name, val)
 
   ++abfd->symcount;
 
-  return true;
+  return TRUE;
 }
 
 /* Read the S record file and turn it into sections.  We create a new
    section for each contiguous set of bytes.  */
 
-static boolean
+static bfd_boolean
 srec_scan (abfd)
      bfd *abfd;
 {
   int c;
   unsigned int lineno = 1;
-  boolean error = false;
+  bfd_boolean error = FALSE;
   bfd_byte *buf = NULL;
   size_t bufsize = 0;
   asection *sec = NULL;
@@ -355,7 +356,7 @@ srec_scan (abfd)
   while ((c = srec_get_byte (abfd, &error)) != EOF)
     {
       /* We only build sections from contiguous S-records, so if this
-         is not an S-record, then stop building a section.  */
+	 is not an S-record, then stop building a section.  */
       if (c != 'S' && c != '\r' && c != '\n')
 	sec = NULL;
 
@@ -541,7 +542,7 @@ srec_scan (abfd)
 	      case '0':
 	      case '5':
 		/* Prologue--ignore the file name, but stop building a
-                   section at this point.  */
+		   section at this point.  */
 		sec = NULL;
 		break;
 
@@ -563,11 +564,11 @@ srec_scan (abfd)
 		bytes -= 2;
 
 		if (sec != NULL
-		    && sec->vma + sec->_raw_size == address)
+		    && sec->vma + sec->size == address)
 		  {
 		    /* This data goes at the end of the section we are
-                       currently building.  */
-		    sec->_raw_size += bytes;
+		       currently building.  */
+		    sec->size += bytes;
 		  }
 		else
 		  {
@@ -585,7 +586,7 @@ srec_scan (abfd)
 		    sec->flags = SEC_HAS_CONTENTS | SEC_LOAD | SEC_ALLOC;
 		    sec->vma = address;
 		    sec->lma = address;
-		    sec->_raw_size = bytes;
+		    sec->size = bytes;
 		    sec->filepos = pos;
 		  }
 
@@ -611,7 +612,7 @@ srec_scan (abfd)
 		if (buf != NULL)
 		  free (buf);
 
-		return true;
+		return TRUE;
 	      }
 	  }
 	  break;
@@ -624,14 +625,14 @@ srec_scan (abfd)
   if (buf != NULL)
     free (buf);
 
-  return true;
+  return TRUE;
 
  error_return:
   if (symbuf != NULL)
     free (symbuf);
   if (buf != NULL)
     free (buf);
-  return false;
+  return FALSE;
 }
 
 /* Check whether an existing file is an S-record file.  */
@@ -640,6 +641,7 @@ static const bfd_target *
 srec_object_p (abfd)
      bfd *abfd;
 {
+  PTR tdata_save;
   bfd_byte b[4];
 
   srec_init ();
@@ -654,9 +656,14 @@ srec_object_p (abfd)
       return NULL;
     }
 
-  if (! srec_mkobject (abfd)
-      || ! srec_scan (abfd))
-    return NULL;
+  tdata_save = abfd->tdata.any;
+  if (! srec_mkobject (abfd) || ! srec_scan (abfd))
+    {
+      if (abfd->tdata.any != tdata_save && abfd->tdata.any != NULL)
+	bfd_release (abfd, abfd->tdata.any);
+      abfd->tdata.any = tdata_save;
+      return NULL;
+    }
 
   if (abfd->symcount > 0)
     abfd->flags |= HAS_SYMS;
@@ -670,6 +677,7 @@ static const bfd_target *
 symbolsrec_object_p (abfd)
      bfd *abfd;
 {
+  PTR tdata_save;
   char b[2];
 
   srec_init ();
@@ -684,9 +692,14 @@ symbolsrec_object_p (abfd)
       return NULL;
     }
 
-  if (! srec_mkobject (abfd)
-      || ! srec_scan (abfd))
-    return NULL;
+  tdata_save = abfd->tdata.any;
+  if (! srec_mkobject (abfd) || ! srec_scan (abfd))
+    {
+      if (abfd->tdata.any != tdata_save && abfd->tdata.any != NULL)
+	bfd_release (abfd, abfd->tdata.any);
+      abfd->tdata.any = tdata_save;
+      return NULL;
+    }
 
   if (abfd->symcount > 0)
     abfd->flags |= HAS_SYMS;
@@ -696,7 +709,7 @@ symbolsrec_object_p (abfd)
 
 /* Read in the contents of a section in an S-record file.  */
 
-static boolean
+static bfd_boolean
 srec_read_section (abfd, section, contents)
      bfd *abfd;
      asection *section;
@@ -704,7 +717,7 @@ srec_read_section (abfd, section, contents)
 {
   int c;
   bfd_size_type sofar = 0;
-  boolean error = false;
+  bfd_boolean error = FALSE;
   bfd_byte *buf = NULL;
   size_t bufsize = 0;
 
@@ -722,7 +735,7 @@ srec_read_section (abfd, section, contents)
 	continue;
 
       /* This is called after srec_scan has already been called, so we
-         ought to know the exact format.  */
+	 ought to know the exact format.  */
       BFD_ASSERT (c == 'S');
 
       if (bfd_bread (hdr, (bfd_size_type) 3, abfd) != 3)
@@ -750,10 +763,10 @@ srec_read_section (abfd, section, contents)
       switch (hdr[0])
 	{
 	default:
-	  BFD_ASSERT (sofar == section->_raw_size);
+	  BFD_ASSERT (sofar == section->size);
 	  if (buf != NULL)
 	    free (buf);
-	  return true;
+	  return TRUE;
 
 	case '3':
 	  address = HEX (data);
@@ -775,10 +788,10 @@ srec_read_section (abfd, section, contents)
 	  if (address != section->vma + sofar)
 	    {
 	      /* We've come to the end of this section.  */
-	      BFD_ASSERT (sofar == section->_raw_size);
+	      BFD_ASSERT (sofar == section->size);
 	      if (buf != NULL)
 		free (buf);
-	      return true;
+	      return TRUE;
 	    }
 
 	  /* Don't consider checksum.  */
@@ -798,22 +811,22 @@ srec_read_section (abfd, section, contents)
   if (error)
     goto error_return;
 
-  BFD_ASSERT (sofar == section->_raw_size);
+  BFD_ASSERT (sofar == section->size);
 
   if (buf != NULL)
     free (buf);
 
-  return true;
+  return TRUE;
 
  error_return:
   if (buf != NULL)
     free (buf);
-  return false;
+  return FALSE;
 }
 
 /* Get the contents of a section in an S-record file.  */
 
-static boolean
+static bfd_boolean
 srec_get_section_contents (abfd, section, location, offset, count)
      bfd *abfd;
      asection *section;
@@ -823,23 +836,23 @@ srec_get_section_contents (abfd, section, location, offset, count)
 {
   if (section->used_by_bfd == NULL)
     {
-      section->used_by_bfd = bfd_alloc (abfd, section->_raw_size);
-      if (section->used_by_bfd == NULL && section->_raw_size != 0)
-	return false;
+      section->used_by_bfd = bfd_alloc (abfd, section->size);
+      if (section->used_by_bfd == NULL && section->size != 0)
+	return FALSE;
 
       if (! srec_read_section (abfd, section, section->used_by_bfd))
-	return false;
+	return FALSE;
     }
 
   memcpy (location, (bfd_byte *) section->used_by_bfd + offset,
 	  (size_t) count);
 
-  return true;
+  return TRUE;
 }
 
 /* Set the architecture.  We accept an unknown architecture here.  */
 
-static boolean
+static bfd_boolean
 srec_set_arch_mach (abfd, arch, mach)
      bfd *abfd;
      enum bfd_architecture arch;
@@ -848,18 +861,18 @@ srec_set_arch_mach (abfd, arch, mach)
   if (arch == bfd_arch_unknown)
     {
       abfd->arch_info = &bfd_default_arch_struct;
-      return true;
+      return TRUE;
     }
   return bfd_default_set_arch_mach (abfd, arch, mach);
 }
 
 /* We have to save up all the Srecords for a splurge before output.  */
 
-static boolean
+static bfd_boolean
 srec_set_section_contents (abfd, section, location, offset, bytes_to_do)
      bfd *abfd;
      sec_ptr section;
-     PTR location;
+     const PTR location;
      file_ptr offset;
      bfd_size_type bytes_to_do;
 {
@@ -869,7 +882,7 @@ srec_set_section_contents (abfd, section, location, offset, bytes_to_do)
   entry = ((srec_data_list_type *)
 	   bfd_alloc (abfd, (bfd_size_type) sizeof (srec_data_list_type)));
   if (entry == NULL)
-    return false;
+    return FALSE;
 
   if (bytes_to_do
       && (section->flags & SEC_ALLOC)
@@ -879,10 +892,10 @@ srec_set_section_contents (abfd, section, location, offset, bytes_to_do)
 
       data = (bfd_byte *) bfd_alloc (abfd, bytes_to_do);
       if (data == NULL)
-	return false;
+	return FALSE;
       memcpy ((PTR) data, location, (size_t) bytes_to_do);
 
-      /* Ff S3Forced is true then always select S3 records,
+      /* Ff S3Forced is TRUE then always select S3 records,
 	 regardless of the siez of the addresses.  */
       if (S3Forced)
 	tdata->type = 3;
@@ -899,7 +912,7 @@ srec_set_section_contents (abfd, section, location, offset, bytes_to_do)
       entry->size = bytes_to_do;
 
       /* Sort the records by address.  Optimize for the common case of
-         adding a record to the end of the list.  */
+	 adding a record to the end of the list.  */
       if (tdata->tail != NULL
 	  && entry->where >= tdata->tail->where)
 	{
@@ -921,14 +934,14 @@ srec_set_section_contents (abfd, section, location, offset, bytes_to_do)
 	    tdata->tail = entry;
 	}
     }
-  return true;
+  return TRUE;
 }
 
 /* Write a record of type, of the supplied number of bytes. The
    supplied bytes and length don't have a checksum. That's worked out
    here.  */
 
-static boolean
+static bfd_boolean
 srec_write_record (abfd, type, address, data, end)
      bfd *abfd;
      unsigned int type;
@@ -986,25 +999,26 @@ srec_write_record (abfd, type, address, data, end)
   *dst++ = '\n';
   wrlen = dst - buffer;
   if (bfd_bwrite ((PTR) buffer, wrlen, abfd) != wrlen)
-    return false;
-  return true;
+    return FALSE;
+  return TRUE;
 }
 
-static boolean
+static bfd_boolean
 srec_write_header (abfd)
      bfd *abfd;
 {
   unsigned int len = strlen (abfd->filename);
 
-  /* I'll put an arbitary 40 char limit on header size.  */
+  /* I'll put an arbitrary 40 char limit on header size.  */
   if (len > 40)
     len = 40;
 
   return srec_write_record (abfd, 0, (bfd_vma) 0,
-			    abfd->filename, abfd->filename + len);
+			    (bfd_byte *) abfd->filename,
+			    (bfd_byte *) abfd->filename + len);
 }
 
-static boolean
+static bfd_boolean
 srec_write_section (abfd, tdata, list)
      bfd *abfd;
      tdata_type *tdata;
@@ -1039,16 +1053,16 @@ srec_write_section (abfd, tdata, list)
 			       address,
 			       location,
 			       location + octets_this_chunk))
-	return false;
+	return FALSE;
 
       octets_written += octets_this_chunk;
       location += octets_this_chunk;
     }
 
-  return true;
+  return TRUE;
 }
 
-static boolean
+static bfd_boolean
 srec_write_terminator (abfd, tdata)
      bfd *abfd;
      tdata_type *tdata;
@@ -1057,7 +1071,7 @@ srec_write_terminator (abfd, tdata)
 			    abfd->start_address, NULL, NULL);
 }
 
-static boolean
+static bfd_boolean
 srec_write_symbols (abfd)
      bfd *abfd;
 {
@@ -1073,7 +1087,7 @@ srec_write_symbols (abfd)
       if (bfd_bwrite ("$$ ", (bfd_size_type) 3, abfd) != 3
 	  || bfd_bwrite (abfd->filename, len, abfd) != len
 	  || bfd_bwrite ("\r\n", (bfd_size_type) 2, abfd) != 2)
-	return false;
+	return FALSE;
 
       for (i = 0; i < count; i++)
 	{
@@ -1082,36 +1096,37 @@ srec_write_symbols (abfd)
 	      && (s->flags & BSF_DEBUGGING) == 0)
 	    {
 	      /* Just dump out non debug symbols.  */
-	      char buf[42], *p;
+	      char buf[43], *p;
 
 	      len = strlen (s->name);
 	      if (bfd_bwrite ("  ", (bfd_size_type) 2, abfd) != 2
 		  || bfd_bwrite (s->name, len, abfd) != len)
-		return false;
+		return FALSE;
 
-	      sprintf_vma (buf + 1, (s->value
+	      sprintf_vma (buf + 2, (s->value
 				     + s->section->output_section->lma
 				     + s->section->output_offset));
-	      p = buf + 1;
+	      p = buf + 2;
 	      while (p[0] == '0' && p[1] != 0)
 		p++;
 	      len = strlen (p);
 	      p[len] = '\r';
 	      p[len + 1] = '\n';
+	      *--p = '$';
 	      *--p = ' ';
-	      len += 3;
+	      len += 4;
 	      if (bfd_bwrite (p, len, abfd) != len)
-		return false;
+		return FALSE;
 	    }
 	}
       if (bfd_bwrite ("$$ \r\n", (bfd_size_type) 5, abfd) != 5)
-	return false;
+	return FALSE;
     }
 
-  return true;
+  return TRUE;
 }
 
-static boolean
+static bfd_boolean
 internal_srec_write_object_contents (abfd, symbols)
      bfd *abfd;
      int symbols;
@@ -1122,11 +1137,11 @@ internal_srec_write_object_contents (abfd, symbols)
   if (symbols)
     {
       if (! srec_write_symbols (abfd))
-	return false;
+	return FALSE;
     }
 
   if (! srec_write_header (abfd))
-    return false;
+    return FALSE;
 
   /* Now wander though all the sections provided and output them.  */
   list = tdata->head;
@@ -1134,20 +1149,20 @@ internal_srec_write_object_contents (abfd, symbols)
   while (list != (srec_data_list_type *) NULL)
     {
       if (! srec_write_section (abfd, tdata, list))
-	return false;
+	return FALSE;
       list = list->next;
     }
   return srec_write_terminator (abfd, tdata);
 }
 
-static boolean
+static bfd_boolean
 srec_write_object_contents (abfd)
      bfd *abfd;
 {
   return internal_srec_write_object_contents (abfd, 0);
 }
 
-static boolean
+static bfd_boolean
 symbolsrec_write_object_contents (abfd)
      bfd *abfd;
 {
@@ -1157,7 +1172,7 @@ symbolsrec_write_object_contents (abfd)
 static int
 srec_sizeof_headers (abfd, exec)
      bfd *abfd ATTRIBUTE_UNUSED;
-     boolean exec ATTRIBUTE_UNUSED;
+     bfd_boolean exec ATTRIBUTE_UNUSED;
 {
   return 0;
 }
@@ -1174,7 +1189,7 @@ srec_get_symtab_upper_bound (abfd)
 /* Return the symbol table.  */
 
 static long
-srec_get_symtab (abfd, alocation)
+srec_canonicalize_symtab (abfd, alocation)
      bfd *abfd;
      asymbol **alocation;
 {
@@ -1190,7 +1205,7 @@ srec_get_symtab (abfd, alocation)
 
       csymbols = (asymbol *) bfd_alloc (abfd, symcount * sizeof (asymbol));
       if (csymbols == NULL && symcount != 0)
-	return false;
+	return 0;
       abfd->tdata.srec_data->csymbols = csymbols;
 
       for (s = abfd->tdata.srec_data->symbols, c = csymbols;
@@ -1248,6 +1263,7 @@ srec_print_symbol (abfd, afile, symbol, how)
 #define srec_bfd_free_cached_info _bfd_generic_bfd_free_cached_info
 #define srec_new_section_hook _bfd_generic_new_section_hook
 
+#define srec_bfd_is_target_special_symbol ((bfd_boolean (*) (bfd *, asymbol *)) bfd_false)
 #define srec_bfd_is_local_label_name bfd_generic_is_local_label_name
 #define srec_get_lineno _bfd_nosymbols_get_lineno
 #define srec_find_nearest_line _bfd_nosymbols_find_nearest_line
@@ -1270,7 +1286,10 @@ srec_print_symbol (abfd, afile, symbol, how)
 #define srec_bfd_relax_section bfd_generic_relax_section
 #define srec_bfd_gc_sections bfd_generic_gc_sections
 #define srec_bfd_merge_sections bfd_generic_merge_sections
+#define srec_bfd_is_group_section bfd_generic_is_group_section
 #define srec_bfd_discard_group bfd_generic_discard_group
+#define srec_section_already_linked \
+  _bfd_generic_section_already_linked
 #define srec_bfd_link_hash_table_create _bfd_generic_link_hash_table_create
 #define srec_bfd_link_hash_table_free _bfd_generic_link_hash_table_free
 #define srec_bfd_link_add_symbols _bfd_generic_link_add_symbols

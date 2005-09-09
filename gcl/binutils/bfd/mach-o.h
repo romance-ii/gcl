@@ -1,5 +1,5 @@
 /* Mach-O support for BFD.
-   Copyright 1999, 2000, 2001, 2002
+   Copyright 1999, 2000, 2001, 2002, 2003
    Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -74,11 +74,11 @@ typedef enum bfd_mach_o_load_command_type
     BFD_MACH_O_LC_FVMFILE = 0x9,	/* Fixed VM file inclusion.  */
     BFD_MACH_O_LC_PREPAGE = 0xa,	/* Prepage command (internal use).  */
     BFD_MACH_O_LC_DYSYMTAB = 0xb,	/* Dynamic link-edit symbol table info.  */
-    BFD_MACH_O_LC_LOAD_DYLIB = 0xc,	/* Load a dynamicly linked shared library.  */
-    BFD_MACH_O_LC_ID_DYLIB = 0xd,	/* Dynamicly linked shared lib identification.  */
+    BFD_MACH_O_LC_LOAD_DYLIB = 0xc,	/* Load a dynamically linked shared library.  */
+    BFD_MACH_O_LC_ID_DYLIB = 0xd,	/* Dynamically linked shared lib identification.  */
     BFD_MACH_O_LC_LOAD_DYLINKER = 0xe,	/* Load a dynamic linker.  */
     BFD_MACH_O_LC_ID_DYLINKER = 0xf,	/* Dynamic linker identification.  */
-    BFD_MACH_O_LC_PREBOUND_DYLIB = 0x10,/* Modules prebound for a dynamicly.  */
+    BFD_MACH_O_LC_PREBOUND_DYLIB = 0x10,/* Modules prebound for a dynamically.  */
     BFD_MACH_O_LC_ROUTINES = 0x11,	/* Image routines.  */
     BFD_MACH_O_LC_SUB_FRAMEWORK = 0x12,	/* Sub framework.  */
     BFD_MACH_O_LC_SUB_UMBRELLA = 0x13,	/* Sub umbrella.  */
@@ -86,7 +86,7 @@ typedef enum bfd_mach_o_load_command_type
     BFD_MACH_O_LC_SUB_LIBRARY = 0x15,   /* Sub library.  */
     BFD_MACH_O_LC_TWOLEVEL_HINTS = 0x16,/* Two-level namespace lookup hints.  */
     BFD_MACH_O_LC_PREBIND_CKSUM = 0x17, /* Prebind checksum.  */
-    /* Load a dynamicly linked shared library that is allowed to be
+    /* Load a dynamically linked shared library that is allowed to be
        missing (weak).  */
     BFD_MACH_O_LC_LOAD_WEAK_DYLIB = 0x18
   }
@@ -118,8 +118,7 @@ typedef enum bfd_mach_o_filetype
     BFD_MACH_O_MH_PRELOAD = 5,
     BFD_MACH_O_MH_DYLIB = 6,
     BFD_MACH_O_MH_DYLINKER = 7,
-    BFD_MACH_O_MH_BUNDLE = 8,
-    BFD_MACH_O_MH_DYLIB_STUB = 9
+    BFD_MACH_O_MH_BUNDLE = 8
   }
 bfd_mach_o_filetype;
 
@@ -160,12 +159,10 @@ typedef enum bfd_mach_o_section_type
 
     /* Section with only non-lazy symbol pointers.  */
     BFD_MACH_O_S_NON_LAZY_SYMBOL_POINTERS = 0x6,
-    BFD_MACH_O_S_NL_SYMBOL_POINTERS = 0x6,
-    
+
     /* Section with only lazy symbol pointers.  */
     BFD_MACH_O_S_LAZY_SYMBOL_POINTERS = 0x7,
-    BFD_MACH_O_S_LA_SYMBOL_POINTERS = 0x7,
-    
+
     /* Section with only symbol stubs, byte size of stub in the reserved2 field.  */
     BFD_MACH_O_S_SYMBOL_STUBS = 0x8,
 
@@ -173,24 +170,6 @@ typedef enum bfd_mach_o_section_type
     BFD_MACH_O_S_MOD_INIT_FUNC_POINTERS = 0x9
   }
 bfd_mach_o_section_type;
-
-/* mask */
-#define BFD_MACH_O_REFERENCE_TYPE 0xf
-
-typedef enum bfd_mach_o_n_desc
-  {
-
-    /* This symbol is a reference to an external non-lazy symbol (data).  */
-    BFD_MACH_O_REFERENCE_FLAG_UNDEFINED_NON_LAZY = 0x0,
-    
-    /* This symbol is a reference to an external lazy symbol pointer (function call).  */
-    BFD_MACH_O_REFERENCE_FLAG_UNDEFINED_LAZY = 0x1,
-
-    /* This symbol is defined in this module.  */
-    BFD_MACH_O_REFERENCE_FLAG_DEFINED = 0x2
-
-  }
-bfd_mach_o_n_desc;
 
 typedef unsigned long bfd_mach_o_cpu_subtype;
 
@@ -238,39 +217,13 @@ typedef struct bfd_mach_o_segment_command
 }
 bfd_mach_o_segment_command;
 
-typedef struct bfd_mach_o_nlist
-{
-  /* BFD internal representation.  */
-  asymbol root;
-  
-  /* Mach-O representation.  */
-  struct {
-    union {
-      char *n_name;
-      long  n_strx;
-    } n_un;
-    unsigned char n_type;
-    unsigned char n_sect;
-    short n_desc;
-    unsigned long n_value;
-  } nlist;
-
-  /* Index in input symbol table.  */
-  unsigned long input_index;
-  
-  /* Index in output symbol table.  */
-  unsigned long output_index;
-}
-bfd_mach_o_nlist;
-
 typedef struct bfd_mach_o_symtab_command
 {
   unsigned long symoff;
   unsigned long nsyms;
   unsigned long stroff;
   unsigned long strsize;
-  /*asymbol *symbols;*/
-  bfd_mach_o_nlist *nlists;
+  asymbol *symbols;
   char *strtab;
   asection *stabs_segment;
   asection *stabstr_segment;
@@ -278,7 +231,7 @@ typedef struct bfd_mach_o_symtab_command
 bfd_mach_o_symtab_command;
 
 /* This is the second set of the symbolic information which is used to support
-   the data structures for the dynamicly link editor.
+   the data structures for the dynamically link editor.
 
    The original set of symbolic information in the symtab_command which contains
    the symbol and string tables must also be present when this load command is
@@ -297,7 +250,7 @@ bfd_mach_o_symtab_command;
        reference symbol table
        indirect symbol table
    The first three tables above (the table of contents, module table and
-   reference symbol table) are only present if the file is a dynamicly linked
+   reference symbol table) are only present if the file is a dynamically linked
    shared library.  For executable and object modules, which are files
    containing only one module, the information that would be in these three
    tables is determined as follows:
@@ -306,7 +259,7 @@ bfd_mach_o_symtab_command;
                       file is part of the module.
        reference symbol table - is the defined and undefined external symbols
 
-   For dynamicly linked shared library files this load command also contains
+   For dynamically linked shared library files this load command also contains
    offsets and sizes to the pool of relocation entries for all sections
    separated into two groups:
        external relocation entries
@@ -328,7 +281,7 @@ typedef struct bfd_mach_o_dysymtab_command
 
      The last two groups are used by the dynamic binding process to do the
      binding (indirectly through the module table and the reference symbol
-     table when this is a dynamicly linked shared library file).  */
+     table when this is a dynamically linked shared library file).  */
 
   unsigned long ilocalsym;    /* Index to local symbols.  */
   unsigned long nlocalsym;    /* Number of local symbols.  */
@@ -340,7 +293,7 @@ typedef struct bfd_mach_o_dysymtab_command
   /* For the for the dynamic binding process to find which module a symbol
      is defined in the table of contents is used (analogous to the ranlib
      structure in an archive) which maps defined external symbols to modules
-     they are defined in.  This exists only in a dynamicly linked shared
+     they are defined in.  This exists only in a dynamically linked shared
      library file.  For executable and object modules the defined external
      symbols are sorted by name and is use as the table of contents.  */
 
@@ -351,7 +304,7 @@ typedef struct bfd_mach_o_dysymtab_command
      table must reflect the modules that the file was created from.  This is
      done by having a module table that has indexes and counts into the merged
      tables for each module.  The module structure that these two entries
-     refer to is described below.  This exists only in a dynamicly linked
+     refer to is described below.  This exists only in a dynamically linked
      shared library file.  For executable and object modules the file only
      contains one module so everything in the file belongs to the module.  */
 
@@ -362,7 +315,7 @@ typedef struct bfd_mach_o_dysymtab_command
      indicates the external references (defined and undefined) each module
      makes.  For each module there is an offset and a count into the
      reference symbol table for the symbols that the module references.
-     This exists only in a dynamicly linked shared library file.  For
+     This exists only in a dynamically linked shared library file.  For
      executable and object modules the defined external symbols and the
      undefined external symbols indicates the external references.  */
 
@@ -410,7 +363,7 @@ typedef struct bfd_mach_o_dysymtab_command
 
   /* All the local relocation entries are grouped together (they are not
      grouped by their module since they are only used if the object is moved
-     from it staticly link edited address).  */
+     from it statically link edited address).  */
 
   unsigned long locreloff;    /* Offset to local relocation entries.  */
   unsigned long nlocrel;      /* Number of local relocation entries.  */
@@ -496,96 +449,10 @@ typedef struct bfd_mach_o_load_command
 }
 bfd_mach_o_load_command;
 
-/* Map an indirect symbol table entry to a symbol table entry and vice-versa.  */
-typedef struct {
-
-  /* Reference to the indirect symbol table entry.  */
-  unsigned long ist_idx;
-
-  /* Reference to the symbol table entry.  */
-  unsigned long st_idx;
-}
-bfd_mach_o_ist_entry;
-
-/* Describe the indirect symbol table.  */
-typedef struct {
-
-  /* Associated LC_DYSYMTAB load command.  */
-  bfd_mach_o_dysymtab_command *command;
-
-  /* Number of entries in this indirect symbol table.  */
-  unsigned long nmemb;
-
-  /* Number of BFD_MACH_O_S_SYMBOL_STUB sections in the following array.  */
-  unsigned long nstubs;
-  
-  /* Array of stub sections.  */
-  bfd_mach_o_section **stubs;
-  
-  /* Number of BFD_MACH_O_S_NL_SYMBOL_POINTERS sections in the following array.  */
-  unsigned long nnlptrs;
-
-  /* Array of non-lazy symbol pointer sections.  */
-  bfd_mach_o_section **nlptrs;
-
-  /* Number of BFD_MACH_O_S_LA_SYMBOL_POINTERS sections in the following array.  */
-  unsigned long nlaptrs;
-
-  /* Array of lazy symbol pointer sections.  */
-  bfd_mach_o_section **laptrs;
-
-  /* Raw indirect symbol table entry, as slurped from the input file.  */
-  bfd_mach_o_ist_entry *raw_ist;
-
-  /* Indirect symbol table that was sorted by chunks, depending on st_idx.  */
-  bfd_mach_o_ist_entry *sorted_ist;  
-}
-bfd_mach_o_ist;
-
-typedef struct
-{
-  /* General link information.  */
-  struct bfd_link_info *info;
-
-  /* Output BFD.  */
-  bfd *output_bfd;
-
-  /* Buffer large enough to hold contents of any section.  */
-  bfd_byte *contents;
-}
-bfd_mach_o_final_link_info;
-
-/* This struct is used to pass information to and from bfd_mach_o_link_output_extsym.  */
-typedef struct
-{
-  boolean failed;
-  bfd_mach_o_final_link_info *finfo;
-}
-bfd_mach_o_outext_info;
-
-/* Mach-O back-end global hash table entries.  */
-// typedef struct {
-//
-//   struct bfd_link_hash_entry root;
-//  
-// }
-// bfd_mach_o_link_hash_entry;
-
-#define mach_o_tdata(abfd)    ((abfd)->tdata.mach_o_data)
-#define mach_o_symtab(abfd)   (mach_o_tdata(abfd)->st)
-#define mach_o_dysymtab(abfd) (mach_o_tdata(abfd)->dyst)
-
-#define mach_o_n_type(udata)  (((udata) >> 24) & 0xff)
-#define mach_o_n_sect(udata)  (((udata) >> 16) & 0xff)
-#define mach_o_n_desc(udata)  ((udata) & 0xffff)
-
 typedef struct mach_o_data_struct
 {
   bfd_mach_o_header header;
   bfd_mach_o_load_command *commands;
-  bfd_mach_o_ist *ist;
-  bfd_mach_o_symtab_command *st;
-  bfd_mach_o_dysymtab_command *dyst;
   unsigned long nsymbols;
   asymbol *symbols;
   unsigned long nsects;
@@ -596,24 +463,22 @@ mach_o_data_struct;
 
 typedef struct mach_o_data_struct bfd_mach_o_data_struct;
 
-boolean bfd_mach_o_valid
+bfd_boolean bfd_mach_o_valid
   PARAMS ((bfd *));
 int bfd_mach_o_scan_read_symtab_symbol
-/*PARAMS ((bfd *, bfd_mach_o_symtab_command *, asymbol *, unsigned long));*/
-  PARAMS ((bfd *, bfd_mach_o_symtab_command *,
-	   bfd_mach_o_nlist *, unsigned long));
+  PARAMS ((bfd *, bfd_mach_o_symtab_command *, asymbol *, unsigned long));
 int bfd_mach_o_scan_read_symtab_strtab
   PARAMS ((bfd *, bfd_mach_o_symtab_command *));
 int bfd_mach_o_scan_read_symtab_symbols
   PARAMS ((bfd *, bfd_mach_o_symtab_command *));
 int bfd_mach_o_scan_read_dysymtab_symbol
   PARAMS ((bfd *, bfd_mach_o_dysymtab_command *, bfd_mach_o_symtab_command *,
-	   bfd_mach_o_nlist */*asymbol **/, unsigned long));
+	   asymbol *, unsigned long));
 int bfd_mach_o_scan_start_address
   PARAMS ((bfd *));
 int bfd_mach_o_scan
   PARAMS ((bfd *, bfd_mach_o_header *, bfd_mach_o_data_struct *));
-boolean bfd_mach_o_mkobject
+bfd_boolean bfd_mach_o_mkobject
   PARAMS ((bfd *));
 const bfd_target * bfd_mach_o_object_p
   PARAMS ((bfd *));
@@ -636,32 +501,11 @@ char * bfd_mach_o_core_file_failing_command
   PARAMS ((bfd *));
 int bfd_mach_o_core_file_failing_signal
   PARAMS ((bfd *));
-boolean bfd_mach_o_core_file_matches_executable_p
+bfd_boolean bfd_mach_o_core_file_matches_executable_p
   PARAMS ((bfd *, bfd *));
 
 extern const bfd_target mach_o_be_vec;
 extern const bfd_target mach_o_le_vec;
 extern const bfd_target mach_o_fat_vec;
-
-struct bfd_preserve
-{
-  PTR marker;
-  PTR tdata;
-  flagword flags;
-  const struct bfd_arch_info *arch_info;
-  struct sec *sections;
-  struct sec **section_tail;
-  unsigned int section_count;
-  struct bfd_hash_table section_htab;
-};
-
-boolean
-bfd_preserve_save PARAMS ((bfd *, struct bfd_preserve *));
-
-void
-bfd_preserve_restore PARAMS ((bfd *, struct bfd_preserve *));
-
-void
-bfd_preserve_finish PARAMS ((bfd *, struct bfd_preserve *));
 
 #endif /* _BFD_MACH_O_H_ */

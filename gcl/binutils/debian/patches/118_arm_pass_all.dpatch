@@ -1,0 +1,135 @@
+#! /bin/sh -e
+## 118_arm_pass_all.dpatch
+##
+## DP: Description: fix broken libtool pass_all handling for arm and other arches
+## DP: Author: James Troup <james@nocrew.org>
+## DP: Upstream status: Not submitted
+## DP: Date: 2004-09-09
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+diff -urNad binutils-2.16/bfd/configure /tmp/dpep.uWtDw8/binutils-2.16/bfd/configure
+--- binutils-2.16/bfd/configure	2005-05-06 19:01:17.471585202 +0200
++++ /tmp/dpep.uWtDw8/binutils-2.16/bfd/configure	2005-05-06 19:33:02.830018225 +0200
+@@ -3573,13 +3573,7 @@
+ 
+ # This must be Linux ELF.
+ linux-gnu*)
+-  case $host_cpu in
+-  alpha* | mips* | hppa* | i*86 | powerpc* | sparc* | ia64* )
+-    lt_cv_deplibs_check_method=pass_all ;;
+-  *)
+-    # glibc up to 2.1.1 does not perform some relocations on ARM
+-    lt_cv_deplibs_check_method='file_magic ELF [0-9][0-9]*-bit [LM]SB (shared object|dynamic lib )' ;;
+-  esac
++  lt_cv_deplibs_check_method=pass_all
+   lt_cv_file_magic_test_file=`echo /lib/libc.so* /lib/libc-*.so`
+   ;;
+ 
+diff -urNad binutils-2.16/binutils/configure /tmp/dpep.uWtDw8/binutils-2.16/binutils/configure
+--- binutils-2.16/binutils/configure	2005-03-22 16:31:04.000000000 +0100
++++ /tmp/dpep.uWtDw8/binutils-2.16/binutils/configure	2005-05-06 19:33:02.832017625 +0200
+@@ -1565,13 +1565,7 @@
+ 
+ # This must be Linux ELF.
+ linux-gnu*)
+-  case $host_cpu in
+-  alpha* | mips* | hppa* | i*86 | powerpc* | sparc* | ia64* )
+-    lt_cv_deplibs_check_method=pass_all ;;
+-  *)
+-    # glibc up to 2.1.1 does not perform some relocations on ARM
+-    lt_cv_deplibs_check_method='file_magic ELF [0-9][0-9]*-bit [LM]SB (shared object|dynamic lib )' ;;
+-  esac
++  lt_cv_deplibs_check_method=pass_all
+   lt_cv_file_magic_test_file=`echo /lib/libc.so* /lib/libc-*.so`
+   ;;
+ 
+diff -urNad binutils-2.16/gas/configure /tmp/dpep.uWtDw8/binutils-2.16/gas/configure
+--- binutils-2.16/gas/configure	2005-03-01 01:43:51.000000000 +0100
++++ /tmp/dpep.uWtDw8/binutils-2.16/gas/configure	2005-05-06 19:33:02.836016424 +0200
+@@ -3410,13 +3410,7 @@
+ 
+ # This must be Linux ELF.
+ linux-gnu*)
+-  case $host_cpu in
+-  alpha* | mips* | hppa* | i*86 | powerpc* | sparc* | ia64* )
+-    lt_cv_deplibs_check_method=pass_all ;;
+-  *)
+-    # glibc up to 2.1.1 does not perform some relocations on ARM
+-    lt_cv_deplibs_check_method='file_magic ELF [0-9][0-9]*-bit [LM]SB (shared object|dynamic lib )' ;;
+-  esac
++  lt_cv_deplibs_check_method=pass_all
+   lt_cv_file_magic_test_file=`echo /lib/libc.so* /lib/libc-*.so`
+   ;;
+ 
+diff -urNad binutils-2.16/gprof/configure /tmp/dpep.uWtDw8/binutils-2.16/gprof/configure
+--- binutils-2.16/gprof/configure	2005-01-31 21:32:41.000000000 +0100
++++ /tmp/dpep.uWtDw8/binutils-2.16/gprof/configure	2005-05-06 19:33:02.840015222 +0200
+@@ -3408,13 +3408,7 @@
+ 
+ # This must be Linux ELF.
+ linux-gnu*)
+-  case $host_cpu in
+-  alpha* | mips* | hppa* | i*86 | powerpc* | sparc* | ia64* )
+-    lt_cv_deplibs_check_method=pass_all ;;
+-  *)
+-    # glibc up to 2.1.1 does not perform some relocations on ARM
+-    lt_cv_deplibs_check_method='file_magic ELF [0-9][0-9]*-bit [LM]SB (shared object|dynamic lib )' ;;
+-  esac
++  lt_cv_deplibs_check_method=pass_all
+   lt_cv_file_magic_test_file=`echo /lib/libc.so* /lib/libc-*.so`
+   ;;
+ 
+diff -urNad binutils-2.16/ld/configure /tmp/dpep.uWtDw8/binutils-2.16/ld/configure
+--- binutils-2.16/ld/configure	2005-02-21 12:49:47.000000000 +0100
++++ /tmp/dpep.uWtDw8/binutils-2.16/ld/configure	2005-05-06 19:33:02.841014922 +0200
+@@ -1569,13 +1569,7 @@
+ 
+ # This must be Linux ELF.
+ linux-gnu*)
+-  case $host_cpu in
+-  alpha* | mips* | hppa* | i*86 | powerpc* | sparc* | ia64* )
+-    lt_cv_deplibs_check_method=pass_all ;;
+-  *)
+-    # glibc up to 2.1.1 does not perform some relocations on ARM
+-    lt_cv_deplibs_check_method='file_magic ELF [0-9][0-9]*-bit [LM]SB (shared object|dynamic lib )' ;;
+-  esac
++  lt_cv_deplibs_check_method=pass_all
+   lt_cv_file_magic_test_file=`echo /lib/libc.so* /lib/libc-*.so`
+   ;;
+ 
+diff -urNad binutils-2.16/opcodes/configure /tmp/dpep.uWtDw8/binutils-2.16/opcodes/configure
+--- binutils-2.16/opcodes/configure	2005-01-31 21:30:37.000000000 +0100
++++ /tmp/dpep.uWtDw8/binutils-2.16/opcodes/configure	2005-05-06 19:33:02.845013721 +0200
+@@ -3577,13 +3577,7 @@
+ 
+ # This must be Linux ELF.
+ linux-gnu*)
+-  case $host_cpu in
+-  alpha* | mips* | hppa* | i*86 | powerpc* | sparc* | ia64* )
+-    lt_cv_deplibs_check_method=pass_all ;;
+-  *)
+-    # glibc up to 2.1.1 does not perform some relocations on ARM
+-    lt_cv_deplibs_check_method='file_magic ELF [0-9][0-9]*-bit [LM]SB (shared object|dynamic lib )' ;;
+-  esac
++  lt_cv_deplibs_check_method=pass_all
+   lt_cv_file_magic_test_file=`echo /lib/libc.so* /lib/libc-*.so`
+   ;;
+ 

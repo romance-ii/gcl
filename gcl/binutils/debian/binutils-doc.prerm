@@ -1,0 +1,9 @@
+#! /bin/sh
+
+set -e
+
+for pkg in as bfd binutils gasp gprof ld; do
+  if [ -e /usr/share/info/$i.info.gz ]; then
+    install-info --quiet --remove $i
+  fi
+done

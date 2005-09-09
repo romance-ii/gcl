@@ -1,5 +1,5 @@
 /* Mach-O support for BFD.
-   Copyright 1999, 2000, 2001, 2002
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005
    Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -20,7 +20,6 @@
 
 #include "mach-o.h"
 #include "bfd.h"
-#include "bfdlink.h"
 #include "sysdep.h"
 #include "libbfd.h"
 #include "libiberty.h"
@@ -45,19 +44,21 @@
 #define bfd_mach_o_new_section_hook _bfd_generic_new_section_hook
 #define bfd_mach_o_get_section_contents_in_window _bfd_generic_get_section_contents_in_window
 #define bfd_mach_o_bfd_is_local_label_name _bfd_nosymbols_bfd_is_local_label_name
+#define bfd_mach_o_bfd_is_target_special_symbol ((bfd_boolean (*) (bfd *, asymbol *)) bfd_false)
+#define bfd_mach_o_bfd_is_local_label_name _bfd_nosymbols_bfd_is_local_label_name
 #define bfd_mach_o_get_lineno _bfd_nosymbols_get_lineno
 #define bfd_mach_o_find_nearest_line _bfd_nosymbols_find_nearest_line
 #define bfd_mach_o_bfd_make_debug_symbol _bfd_nosymbols_bfd_make_debug_symbol
 #define bfd_mach_o_read_minisymbols _bfd_generic_read_minisymbols
 #define bfd_mach_o_minisymbol_to_symbol _bfd_generic_minisymbol_to_symbol
-/*#define bfd_mach_o_get_reloc_upper_bound _bfd_norelocs_get_reloc_upper_bound*/
-/*#define bfd_mach_o_canonicalize_reloc _bfd_norelocs_canonicalize_reloc*/
-/*#define bfd_mach_o_bfd_reloc_type_lookup _bfd_norelocs_bfd_reloc_type_lookup*/
-/*#define bfd_mach_o_bfd_get_relocated_section_contents bfd_generic_get_relocated_section_contents*/
+#define bfd_mach_o_get_reloc_upper_bound _bfd_norelocs_get_reloc_upper_bound
+#define bfd_mach_o_canonicalize_reloc _bfd_norelocs_canonicalize_reloc
+#define bfd_mach_o_bfd_reloc_type_lookup _bfd_norelocs_bfd_reloc_type_lookup
+#define bfd_mach_o_bfd_get_relocated_section_contents bfd_generic_get_relocated_section_contents
 #define bfd_mach_o_bfd_relax_section bfd_generic_relax_section
 #define bfd_mach_o_bfd_link_hash_table_create _bfd_generic_link_hash_table_create
 #define bfd_mach_o_bfd_link_hash_table_free _bfd_generic_link_hash_table_free
-/*#define bfd_mach_o_bfd_link_add_symbols _bfd_generic_link_add_symbols*/
+#define bfd_mach_o_bfd_link_add_symbols _bfd_generic_link_add_symbols
 #define bfd_mach_o_bfd_link_just_syms _bfd_generic_link_just_syms
 #define bfd_mach_o_bfd_final_link _bfd_generic_final_link
 #define bfd_mach_o_bfd_link_split_section _bfd_generic_link_split_section
@@ -69,19 +70,23 @@
 #define bfd_mach_o_set_section_contents _bfd_generic_set_section_contents
 #define bfd_mach_o_bfd_gc_sections bfd_generic_gc_sections
 #define bfd_mach_o_bfd_merge_sections bfd_generic_merge_sections
+#define bfd_mach_o_bfd_is_group_section bfd_generic_is_group_section
 #define bfd_mach_o_bfd_discard_group bfd_generic_discard_group
+#define bfd_mach_o_section_already_linked \
+  _bfd_generic_section_already_linked
+#define bfd_mach_o_bfd_copy_private_header_data _bfd_generic_bfd_copy_private_header_data
 
-static boolean bfd_mach_o_bfd_copy_private_symbol_data
+static bfd_boolean bfd_mach_o_bfd_copy_private_symbol_data
   PARAMS ((bfd *, asymbol *, bfd *, asymbol *));
-static boolean bfd_mach_o_bfd_copy_private_section_data
+static bfd_boolean bfd_mach_o_bfd_copy_private_section_data
   PARAMS ((bfd *, asection *, bfd *, asection *));
-static boolean bfd_mach_o_bfd_copy_private_bfd_data
+static bfd_boolean bfd_mach_o_bfd_copy_private_bfd_data
   PARAMS ((bfd *, bfd *));
 static long bfd_mach_o_count_symbols
   PARAMS ((bfd *));
 static long bfd_mach_o_get_symtab_upper_bound
   PARAMS ((bfd *));
-static long bfd_mach_o_get_symtab
+static long bfd_mach_o_canonicalize_symtab
   PARAMS ((bfd *, asymbol **));
 static void bfd_mach_o_get_symbol_info
   PARAMS ((bfd *, asymbol *, symbol_info *));
@@ -90,10 +95,10 @@ static void bfd_mach_o_print_symbol
 static void bfd_mach_o_convert_architecture
   PARAMS ((bfd_mach_o_cpu_type, bfd_mach_o_cpu_subtype,
 	   enum bfd_architecture *, unsigned long *));
-static boolean bfd_mach_o_write_contents
+static bfd_boolean bfd_mach_o_write_contents
   PARAMS ((bfd *));
 static int bfd_mach_o_sizeof_headers
-  PARAMS ((bfd *, boolean));
+  PARAMS ((bfd *, bfd_boolean));
 static asymbol * bfd_mach_o_make_empty_symbol
   PARAMS ((bfd *));
 static int bfd_mach_o_write_header
@@ -137,23 +142,6 @@ static const char * bfd_mach_o_i386_flavour_string
 static const char * bfd_mach_o_ppc_flavour_string
   PARAMS ((unsigned int));
 
-static int bfd_mach_o_compar_st_idx
-  PARAMS ((const void *, const void *));
-static void bfd_mach_o_dump_ist_aux
-  PARAMS ((bfd *, bfd_mach_o_symtab_command *, bfd_mach_o_section **, unsigned long, unsigned long));
-static void bfd_mach_o_dump_ist 
-  PARAMS ((bfd *, bfd_mach_o_symtab_command *));
-static boolean bfd_mach_o_check_ist
-  PARAMS ((bfd_mach_o_ist *));
-static bfd_mach_o_ist * bfd_mach_o_slurp_ist
-  PARAMS ((bfd *));
-static bfd_vma bfd_mach_o_get_lazy_symbol_stub
-  PARAMS ((bfd_mach_o_ist *, unsigned long, asection **));
-static bfd_vma bfd_mach_o_get_non_lazy_symbol_ptr
-  PARAMS ((bfd_mach_o_ist *, unsigned long, asection **));
-static boolean bfd_mach_o_bfd_link_add_symbols
-  PARAMS ((bfd *, struct bfd_link_info *));
-
 /* The flags field of a section structure is separated into two parts a section
    type and section attributes.  The section types are mutually exclusive (it
    can only have one type) but the section attributes are not (it may have more
@@ -165,23 +153,12 @@ static boolean bfd_mach_o_bfd_link_add_symbols
 /* Constants for the section attributes part of the flags field of a section
    structure.  */
 
-/* User-settable attributes.  */
-#define SECTION_ATTRIBUTES_USR   0xff000000
-
-/* Section contains only true machine instructions.  */
-#define S_ATTR_PURE_INSTRUCTIONS 0x80000000
-
-/* System setable attributes.  */
-#define SECTION_ATTRIBUTES_SYS   0x00ffff00
-
-/* Section contains some machine instructions.  */
-#define S_ATTR_SOME_INSTRUCTIONS 0x00000400
-
-/* Section has external relocation entries.  */
-#define S_ATTR_EXT_RELOC         0x00000200
-
-/* Section has local relocation entries.  */
-#define S_ATTR_LOC_RELOC         0x00000100
+#define SECTION_ATTRIBUTES_USR   0xff000000     /* User-settable attributes.  */
+#define S_ATTR_PURE_INSTRUCTIONS 0x80000000     /* Section contains only true machine instructions.  */
+#define SECTION_ATTRIBUTES_SYS   0x00ffff00     /* System setable attributes.  */
+#define S_ATTR_SOME_INSTRUCTIONS 0x00000400     /* Section contains some machine instructions.  */
+#define S_ATTR_EXT_RELOC         0x00000200     /* Section has external relocation entries.  */
+#define S_ATTR_LOC_RELOC         0x00000100     /* Section has local relocation entries.  */
 
 #define N_STAB 0xe0
 #define N_TYPE 0x1e
@@ -191,7 +168,7 @@ static boolean bfd_mach_o_bfd_link_add_symbols
 #define N_SECT 0xe
 #define N_INDR 0xa
 
-boolean
+bfd_boolean
 bfd_mach_o_valid (abfd)
      bfd *abfd;
 {
@@ -211,33 +188,33 @@ bfd_mach_o_valid (abfd)
 /* Copy any private info we understand from the input symbol
    to the output symbol.  */
 
-static boolean
+static bfd_boolean
 bfd_mach_o_bfd_copy_private_symbol_data (ibfd, isymbol, obfd, osymbol)
      bfd *ibfd ATTRIBUTE_UNUSED;
      asymbol *isymbol ATTRIBUTE_UNUSED;
      bfd *obfd ATTRIBUTE_UNUSED;
      asymbol *osymbol ATTRIBUTE_UNUSED;
 {
-  return true;
+  return TRUE;
 }
 
 /* Copy any private info we understand from the input section
    to the output section.  */
 
-static boolean
+static bfd_boolean
 bfd_mach_o_bfd_copy_private_section_data (ibfd, isection, obfd, osection)
      bfd *ibfd ATTRIBUTE_UNUSED;
      asection *isection ATTRIBUTE_UNUSED;
      bfd *obfd ATTRIBUTE_UNUSED;
      asection *osection ATTRIBUTE_UNUSED;
 {
-  return true;
+  return TRUE;
 }
 
 /* Copy any private info we understand from the input bfd
    to the output bfd.  */
 
-static boolean
+static bfd_boolean
 bfd_mach_o_bfd_copy_private_bfd_data (ibfd, obfd)
      bfd *ibfd;
      bfd *obfd;
@@ -247,7 +224,7 @@ bfd_mach_o_bfd_copy_private_bfd_data (ibfd, obfd)
 
   obfd->tdata.mach_o_data = ibfd->tdata.mach_o_data;
   obfd->tdata.mach_o_data->ibfd = ibfd;
-  return true;
+  return TRUE;
 }
 
 static long
@@ -284,7 +261,7 @@ bfd_mach_o_get_symtab_upper_bound (abfd)
 }
 
 static long
-bfd_mach_o_get_symtab (abfd, alocation)
+bfd_mach_o_canonicalize_symtab (abfd, alocation)
      bfd *abfd;
      asymbol **alocation;
 {
@@ -302,28 +279,24 @@ bfd_mach_o_get_symtab (abfd, alocation)
 	{
 	  bfd_mach_o_symtab_command *sym = &mdata->commands[i].command.symtab;
 
-	  if (bfd_mach_o_scan_read_symtab_symbols (abfd, sym) != 0)
+	  if (bfd_mach_o_scan_read_symtab_symbols (abfd, &mdata->commands[i].command.symtab) != 0)
 	    {
-	      fprintf (stderr, "bfd_mach_o_get_symtab: "
-		       "unable to load symbols for section %lu\n", i);
+	      fprintf (stderr, "bfd_mach_o_canonicalize_symtab: unable to load symbols for section %lu\n", i);
 	      return 0;
 	    }
 
-	  BFD_ASSERT (sym->nlists != NULL);
+	  BFD_ASSERT (sym->symbols != NULL);
 
 	  for (j = 0; j < sym->nsyms; j++)
 	    {
 	      BFD_ASSERT (csym < (alocation + nsyms));
-	      *csym++ = &(sym->nlists[j].root);
+	      *csym++ = &sym->symbols[j];
 	    }
 	}
     }
 
   *csym++ = NULL;
-  
-  bfd_get_symcount (abfd) = nsyms;
-  mdata->nsymbols = nsyms;
-  
+
   return nsyms;
 }
 
@@ -371,8 +344,7 @@ bfd_mach_o_convert_architecture (mtype, msubtype, type, subtype)
     case BFD_MACH_O_CPU_TYPE_MC680x0: *type = bfd_arch_m68k; break;
     case BFD_MACH_O_CPU_TYPE_I386: *type = bfd_arch_i386; break;
     case BFD_MACH_O_CPU_TYPE_MIPS: *type = bfd_arch_mips; break;
- /* I'm in a hurry : comment this out for now (Aurelien, 14-II-04). */
- /* case BFD_MACH_O_CPU_TYPE_MC98000: *type = bfd_arch_m98k; break; */
+    case BFD_MACH_O_CPU_TYPE_MC98000: *type = bfd_arch_m98k; break;
     case BFD_MACH_O_CPU_TYPE_HPPA: *type = bfd_arch_hppa; break;
     case BFD_MACH_O_CPU_TYPE_ARM: *type = bfd_arch_arm; break;
     case BFD_MACH_O_CPU_TYPE_MC88000: *type = bfd_arch_m88k; break;
@@ -392,156 +364,7 @@ bfd_mach_o_convert_architecture (mtype, msubtype, type, subtype)
     }
 }
 
-/*
-We don't need these for GCL (Aurelien, 14-II-04).
-
-int
-bfd_mach_o_compar_symbols (void *a, void *b)
-{
-  static char *empty_symbol_name = "";
-  asymbol *s = (asymbol *) a;
-  asymbol *t = (asymbol *) b;
-  
-  if (s->name == NULL)
-    s->name = empty_symbol_name;
-  if (t->name == NULL)
-    t->name = empty_symbol_name;
-  
-  if (s->flags & BSF_DEBUGGING)
-    {
-      if (t->flags & BSF_DEBUGGING)
-	return strcmp (s->name, t->name);
-      else
-	return -1;
-    }
-  else if (s->flags & BSF_LOCAL)
-    {
-      if (t->flags & BSF_DEBUGGING)
-	return +1;
-      else if (t->flags & BSF_LOCAL)
-	return strcmp (s->name, t->name);
-      else
-	return -1;
-    }
-  else
-    {
-      asection *ssect = s->section;
-      asection *tsect = t->section;
-      
-      if (!(bfd_is_und_section (ssect) || bfd_is_com_section (ssect)))
-	{
-	  if (t->flags & BSF_LOCAL)
-	    return +1;
-	  else if (!(bfd_is_und_section (tsect) || bfd_is_com_section (tsect)))
-	    return strcmp (s->name, t->name);
-	  else
-	    return -1;
-	}
-      else
-	{
-	  if (t->flags & BSF_LOCAL)
-	    return +1;
-	  else if (!(bfd_is_und_section (tsect) || bfd_is_com_section (tsect)))
-	    return +1;
-	  else
-	    return strcmp (s->name, t->name);
-	}
-    }
-}
-
-boolean
-bfd_mach_o_sort_symtab (abfd, link_info)
-     bfd *abfd;
-     struct bfd_link_info *link_info;
-{
-  bfd_mach_o_symtab_command *st = mach_o_symtab (abfd);
-  int i, symcount = bfd_get_symcount (abfd);
-  bfd_mach_o_nlist *nlists;
-  bfd_size_type strtab_size;
-  char *strtab;
-  asymbol *sym_ptr;
-  int num_loc_syms, num_ext_syms, num_und_syms;
-  bfd_mach_o_nlist *loc_sym_ptr, *ext_sym_ptr, *und_sym_ptr;
-  
-  if (st == NULL)
-    {
-      st = (bfd_mach_o_symtab_command *)
-	bfd_zalloc (abfd, sizeof (bfd_mach_o_symtab_command));
-      mach_o_symtab (abfd) = st;
-    }
-
-  if (st == NULL)
-    return false;
-
-  if (symcount == 0)
-    return true;
-  
-  nlists = st->nlists;
-  
-  if (nlists == NULL)
-    {
-      nlists = (bfd_mach_o_nlist *)
-	bfd_zalloc (abfd, sizeof (bfd_mach_o_nlist) * symcount);
-      st->nlists = nlists;
-    }
-
-  if (nlists == NULL)
-    return false;
-  
-  strtab_size = 0;
-  sym_ptr = mach_o_tdata (abfd)->symbols;
-  
-  num_loc_syms = 0;
-  num_ext_syms = 0;
-  num_und_syms = 0;
-  
-  for (i=0 ; i < symcount ; i++, sym_ptr++)
-    {
-      if (sym_ptr->name != NULL)
-	strtab_size += strlen (sym_ptr->name);
-      
-      if (sym_ptr->flags & BSF_GLOBAL)
-	{
-	  asection *asect = sym_ptr->section;
-	  
-	  if (bfd_is_und_section (asect) || bfd_is_com_section (asect))
-	    num_und_syms++;
-	  else
-	    num_ext_syms++;
-        }
-      else
-	num_loc_syms++;
-    }
-
-  strtab = (char *) bfd_zalloc (abfd, strtab_size);
- 
-  if (strtab == NULL)
-    return false;
-  
-  sym_ptr = mach_o_tdata (abfd)->symbols;
-  
-  loc_sym_ptr = nlists;
-  ext_sym_ptr = loc_sym_ptr + num_loc_syms;
-  und_sym_ptr = ext_sym_ptr + num_ext_syms;
-  
-  for (i=0 ; i < symcount ; i++, sym_ptr++)
-    {
-      if (sym_ptr->flags & BSF_GLOBAL)
-	{
-	  if (bfd_is_und_section (sym_ptr->section) ||
-	      bfd_is_com_section (sym_ptr->section))
-	    (*und_sym_ptr++).root = *sym;
-	  else
-	    (*ext_sym_ptr++).root = *sym;
-	}
-      else
-	(*loc_sym_ptr++).root = *sym;
-    }
-    
-}
-*/
-
-static boolean
+static bfd_boolean
 bfd_mach_o_write_contents (abfd)
      bfd *abfd;
 {
@@ -556,44 +379,9 @@ bfd_mach_o_write_contents (abfd)
   for (s = abfd->sections; s != (asection *) NULL; s = s->next)
     ;
 
-#if 0
-  for (i = 0; i < mdata->header.ncmds; i++)
-    {
-      bfd_mach_o_load_command *cur = &mdata->commands[i];
-      if (cur->type != BFD_MACH_O_LC_SEGMENT)
-	break;
-
-      {
-	bfd_mach_o_segment_command *seg = &cur->command.segment;
-	char buf[1024];
-	bfd_vma nbytes = seg->filesize;
-	bfd_vma curoff = seg->fileoff;
-
-	while (nbytes > 0)
-	  {
-	    bfd_vma thisread = nbytes;
-
-	    if (thisread > 1024)
-	      thisread = 1024;
-
-	    bfd_seek (abfd, curoff, SEEK_SET);
-	    if (bfd_bread ((PTR) buf, thisread, abfd) != thisread)
-	      return false;
-
-	    bfd_seek (abfd, curoff, SEEK_SET);
-	    if (bfd_bwrite ((PTR) buf, thisread, abfd) != thisread)
-	      return false;
-
-	    nbytes -= thisread;
-	    curoff += thisread;
-	  }
-      }
-  }
-#endif
-
   /* Now write header information.  */
   if (bfd_mach_o_write_header (abfd, &mdata->header) != 0)
-    return false;
+    return FALSE;
 
   for (i = 0; i < mdata->header.ncmds; i++)
     {
@@ -601,32 +389,31 @@ bfd_mach_o_write_contents (abfd)
       bfd_mach_o_load_command *cur = &mdata->commands[i];
       unsigned long typeflag;
 
-      typeflag = cur->type_required
-	? cur->type & BFD_MACH_O_LC_REQ_DYLD : cur->type;
+      typeflag = cur->type_required ? cur->type & BFD_MACH_O_LC_REQ_DYLD : cur->type;
 
       bfd_h_put_32 (abfd, typeflag, buf);
       bfd_h_put_32 (abfd, cur->len, buf + 4);
 
       bfd_seek (abfd, cur->offset, SEEK_SET);
       if (bfd_bwrite ((PTR) buf, 8, abfd) != 8)
-	return false;
+	return FALSE;
 
       switch (cur->type)
 	{
 	case BFD_MACH_O_LC_SEGMENT:
 	  if (bfd_mach_o_scan_write_segment (abfd, cur) != 0)
-	    return false;
+	    return FALSE;
 	  break;
 	case BFD_MACH_O_LC_SYMTAB:
 	  if (bfd_mach_o_scan_write_symtab (abfd, cur) != 0)
-	    return false;
+	    return FALSE;
 	  break;
 	case BFD_MACH_O_LC_SYMSEG:
 	  break;
 	case BFD_MACH_O_LC_THREAD:
 	case BFD_MACH_O_LC_UNIXTHREAD:
 	  if (bfd_mach_o_scan_write_thread (abfd, cur) != 0)
-	    return false;
+	    return FALSE;
 	  break;
 	case BFD_MACH_O_LC_LOADFVMLIB:
 	case BFD_MACH_O_LC_IDFVMLIB:
@@ -647,17 +434,17 @@ bfd_mach_o_write_contents (abfd)
 	  fprintf (stderr,
 		   "unable to write unknown load command 0x%lx\n",
 		   (long) cur->type);
-	  return false;
+	  return FALSE;
 	}
     }
 
-  return true;
+  return TRUE;
 }
 
 static int
 bfd_mach_o_sizeof_headers (a, b)
      bfd *a ATTRIBUTE_UNUSED;
-     boolean b ATTRIBUTE_UNUSED;
+     bfd_boolean b ATTRIBUTE_UNUSED;
 {
   return 0;
 }
@@ -706,7 +493,7 @@ bfd_mach_o_read_header (abfd, header)
      bfd_mach_o_header *header;
 {
   unsigned char buf[28];
-  bfd_vma (*get32) PARAMS ((const bfd_byte *)) = NULL;
+  bfd_vma (*get32) (const void *) = NULL;
 
   bfd_seek (abfd, 0, SEEK_SET);
 
@@ -766,34 +553,14 @@ bfd_mach_o_make_bfd_section (abfd, section)
 
   bfdsec->vma = section->addr;
   bfdsec->lma = section->addr;
-  bfdsec->_raw_size = section->size;
+  bfdsec->size = section->size;
   bfdsec->filepos = section->offset;
   bfdsec->alignment_power = section->align;
-  bfdsec->rel_filepos = section->reloff;
-  bfdsec->reloc_count = section->nreloc;
 
-  /* I suspect that bfdsec->userdata is, at most, volatile.  When we really
-     need the value of section->flags, we will have to do something else to
-     store it for good.  */
-  bfdsec->userdata = (PTR) section->flags;
-  
   if (section->flags & BFD_MACH_O_S_ZEROFILL)
     bfdsec->flags = SEC_ALLOC;
   else
     bfdsec->flags = SEC_HAS_CONTENTS | SEC_LOAD | SEC_ALLOC | SEC_CODE;
-
-  if (section->flags & BFD_MACH_O_S_LAZY_SYMBOL_POINTERS ||
-      section->flags & BFD_MACH_O_S_NON_LAZY_SYMBOL_POINTERS) {
-    /* We want to do this because client program might rely on SEC_LOAD to
-       decide whether to call bfd_get_relocated_section_contents or not.
-       Altough a (non-)lazy symbol pointer section does not, stricly speaking,
-       have associated relocation entries, it contains symbol pointers to be
-       updated based on the global linker hash table.  */
-    bfdsec->flags |= SEC_LOAD;
-  }
-
-  if (bfdsec->reloc_count > 0)
-    bfdsec->flags |= SEC_RELOC;
 
   return bfdsec;
 }
@@ -875,23 +642,7 @@ bfd_mach_o_scan_write_symtab_symbols (abfd, command)
       unsigned char nsect = 0;
       short ndesc = 0;
 
-      /*s = &sym->symbols[i];*/
-      s = &(sym->nlists[i].root);
-
-      /* Don't set this from the symbol information; use stored values.  */
-#if 0
-      if (s->flags & BSF_GLOBAL)
-	ntype |= N_EXT;
-      if (s->flags & BSF_DEBUGGING)
-	ntype |= N_STAB;
-
-      if (s->section == bfd_und_section_ptr)
-	ntype |= N_UNDF;
-      else if (s->section == bfd_abs_section_ptr)
-	ntype |= N_ABS;
-      else
-	ntype |= N_SECT;
-#endif
+      s = &sym->symbols[i];
 
       /* Instead just set from the stored values.  */
       ntype = (s->udata.i >> 24) & 0xff;
@@ -907,8 +658,7 @@ bfd_mach_o_scan_write_symtab_symbols (abfd, command)
       bfd_seek (abfd, symoff, SEEK_SET);
       if (bfd_bwrite ((PTR) buf, 12, abfd) != 12)
 	{
-	  fprintf (stderr, "bfd_mach_o_scan_write_symtab_symbols: "
-		   "unable to write %d bytes at %lu\n",
+	  fprintf (stderr, "bfd_mach_o_scan_write_symtab_symbols: unable to write %d bytes at %lu\n",
 		   12, (unsigned long) symoff);
 	  return -1;
 	}
@@ -918,11 +668,10 @@ bfd_mach_o_scan_write_symtab_symbols (abfd, command)
 }
 
 int
-bfd_mach_o_scan_read_symtab_symbol (abfd, sym, nlist, i)
+bfd_mach_o_scan_read_symtab_symbol (abfd, sym, s, i)
      bfd *abfd;
      bfd_mach_o_symtab_command *sym;
-     /*asymbol *s;*/
-     bfd_mach_o_nlist *nlist;
+     asymbol *s;
      unsigned long i;
 {
   bfd_mach_o_data_struct *mdata = abfd->tdata.mach_o_data;
@@ -934,15 +683,13 @@ bfd_mach_o_scan_read_symtab_symbol (abfd, sym, nlist, i)
   unsigned long value = -1;
   unsigned long stroff = -1;
   unsigned int symtype = -1;
-  bfd_mach_o_ist *ist = mdata->ist;
-   
+
   BFD_ASSERT (sym->strtab != NULL);
 
   bfd_seek (abfd, symoff, SEEK_SET);
   if (bfd_bread ((PTR) buf, 12, abfd) != 12)
     {
-      fprintf (stderr, "bfd_mach_o_scan_read_symtab_symbol: "
-	       "unable to read %d bytes at %lu\n",
+      fprintf (stderr, "bfd_mach_o_scan_read_symtab_symbol: unable to read %d bytes at %lu\n",
 	       12, (unsigned long) symoff);
       return -1;
     }
@@ -950,141 +697,84 @@ bfd_mach_o_scan_read_symtab_symbol (abfd, sym, nlist, i)
   stroff = bfd_h_get_32 (abfd, buf);
   type = bfd_h_get_8 (abfd, buf + 4);
   symtype = (type & 0x0e);
-  /* We dont want to substract -1 twice.  */
-  section = bfd_h_get_8 (abfd, buf + 5) /* - 1 */;
+  section = bfd_h_get_8 (abfd, buf + 5) - 1;
   desc = bfd_h_get_16 (abfd, buf + 6);
   value = bfd_h_get_32 (abfd, buf + 8);
 
-  nlist->nlist.n_type = type;
-  nlist->nlist.n_sect = section;
-  nlist->nlist.n_desc = desc;
-  nlist->nlist.n_value = value;
-  
-  nlist->input_index = i;
-  nlist->output_index = (unsigned long) -1;
-  
   if (stroff >= sym->strsize)
     {
-      fprintf (stderr, "bfd_mach_o_scan_read_symtab_symbol: "
-	       "symbol name out of range (%lu >= %lu)\n",
+      fprintf (stderr, "bfd_mach_o_scan_read_symtab_symbol: symbol name out of range (%lu >= %lu)\n",
 	       (unsigned long) stroff, (unsigned long) sym->strsize);
       return -1;
     }
 
-  nlist->root.the_bfd = abfd;
-  nlist->root.name = sym->strtab + stroff;
-  nlist->root.value = value;
-  /* Unfortunately, this cannot be relied on.  This field is volatile.  */
-  nlist->root.udata.i = (type << 24) | (section << 16) | desc;
-  nlist->root.flags = 0x0;
+  s->the_bfd = abfd;
+  s->name = sym->strtab + stroff;
+  s->value = value;
+  s->udata.i = (type << 24) | (section << 16) | desc;
+  s->flags = 0x0;
 
   if (type & BFD_MACH_O_N_STAB)
     {
-      nlist->root.flags |= BSF_DEBUGGING;
-      nlist->root.section = bfd_und_section_ptr;
+      s->flags |= BSF_DEBUGGING;
+      s->section = bfd_und_section_ptr;
     }
   else
     {
       if (type & BFD_MACH_O_N_PEXT)
 	{
-	  /* Why this for ? */
-	  /* type &= ~BFD_MACH_O_N_PEXT; */
-	  nlist->root.flags |= BSF_GLOBAL;
+	  type &= ~BFD_MACH_O_N_PEXT;
+	  s->flags |= BSF_GLOBAL;
 	}
 
       if (type & BFD_MACH_O_N_EXT)
 	{
-	  /* Why this for ? */
-	  /* type &= ~BFD_MACH_O_N_EXT; */
-	  nlist->root.flags |= BSF_GLOBAL;
+	  type &= ~BFD_MACH_O_N_EXT;
+	  s->flags |= BSF_GLOBAL;
 	}
 
       switch (symtype)
 	{
 	case BFD_MACH_O_N_UNDF:
-	  nlist->root.section = bfd_und_section_ptr;
-	  if (type & (BFD_MACH_O_N_EXT | BFD_MACH_O_N_PEXT)) {
-	    if (value != 0)
-	      {
-		/* This is a common symbol, actually.  */
-		nlist->root.section = bfd_com_section_ptr;
-	      }
-	    else
-	      {
-		/* There's not much we can do with an undefined symbol whose
-		   value is zero.  Here, we try to find a stub or non-lazy
-		   symbol pointer corresponding to this symbol.  ELF happens
-		   to do the same thing	with its undefined symbols, setting
-		   them to point to PLT or GOT entries.  The code below is
-		   rather heuristic but I can't find of	any thing better for
-		   now.  */
-
-		if (ist != NULL)
-		  {
-		    asection *indirect_section = NULL;
-
-		    /* See if we can find a stub for this symbol.  */
-		    if (ist->nstubs > 0)
-		      nlist->root.value =
-			bfd_mach_o_get_lazy_symbol_stub (ist, i,
-							 &indirect_section);
-
-		    /* If no stub was found, look for a non-lazy ptr.  */
-		    if (indirect_section == NULL && ist->nnlptrs > 0)
-		      nlist->root.value =
-			bfd_mach_o_get_non_lazy_symbol_ptr (ist, i,
-							    &indirect_section);
-		    
-		    /* If something was found, adjust the symbol value.  */
-		    if (indirect_section != NULL)
-		      nlist->root.value +=
-			indirect_section->vma - bfd_und_section_ptr->vma;
-		  }
-	      }
-	  }
+	  s->section = bfd_und_section_ptr;
 	  break;
 	case BFD_MACH_O_N_PBUD:
-	  nlist->root.section = bfd_und_section_ptr;
+	  s->section = bfd_und_section_ptr;
 	  break;
 	case BFD_MACH_O_N_ABS:
-	  nlist->root.section = bfd_abs_section_ptr;
+	  s->section = bfd_abs_section_ptr;
 	  break;
 	case BFD_MACH_O_N_SECT:
 	  if ((section > 0) && (section <= mdata->nsects))
 	    {
-	      nlist->root.section = mdata->sections[section - 1]->bfdsection;
-	      nlist->root.value =
-		nlist->root.value - mdata->sections[section - 1]->addr;
+	      s->section = mdata->sections[section - 1]->bfdsection;
+	      s->value = s->value - mdata->sections[section - 1]->addr;
 	    }
 	  else
 	    {
 	      /* Mach-O uses 0 to mean "no section"; not an error.  */
 	      if (section != 0)
-		fprintf (stderr, "bfd_mach_o_scan_read_symtab_symbol: "
-		         "symbol \"%s\" specified invalid section %d (max %lu): "
-		         "setting to undefined\n",
-		         nlist->root.name, section, mdata->nsects);
-	      nlist->root.section = bfd_und_section_ptr;
+		{
+		  fprintf (stderr, "bfd_mach_o_scan_read_symtab_symbol: "
+			   "symbol \"%s\" specified invalid section %d (max %lu): setting to undefined\n",
+			   s->name, section, mdata->nsects);
+		}
+	      s->section = bfd_und_section_ptr;
 	    }
 	  break;
 	case BFD_MACH_O_N_INDR:
 	  fprintf (stderr, "bfd_mach_o_scan_read_symtab_symbol: "
-		   "symbol \"%s\" is unsupported 'indirect' reference: "
-		   "setting to undefined\n",
-		   nlist->root.name);
-	  nlist->root.section = bfd_und_section_ptr;
+		   "symbol \"%s\" is unsupported 'indirect' reference: setting to undefined\n",
+		   s->name);
+	  s->section = bfd_und_section_ptr;
 	  break;
 	default:
 	  fprintf (stderr, "bfd_mach_o_scan_read_symtab_symbol: "
-		   "symbol \"%s\" specified invalid type field 0x%x: "
-		   "setting to undefined\n",
-		   nlist->root.name, symtype);
-	  nlist->root.section = bfd_und_section_ptr;
+		   "symbol \"%s\" specified invalid type field 0x%x: setting to undefined\n",
+		   s->name, symtype);
+	  s->section = bfd_und_section_ptr;
 	  break;
 	}
-      
-      if ((nlist->root.flags & BSF_GLOBAL) == 0)
-	nlist->root.flags |= BSF_LOCAL;
     }
 
   return 0;
@@ -1095,8 +785,7 @@ bfd_mach_o_scan_read_symtab_strtab (abfd, sym)
      bfd *abfd;
      bfd_mach_o_symtab_command *sym;
 {
-  if (sym->strtab != NULL)
-    return 0; /* If there's not work to be done, don't do any.  */
+  BFD_ASSERT (sym->strtab == NULL);
 
   if (abfd->flags & BFD_IN_MEMORY)
     {
@@ -1109,19 +798,18 @@ bfd_mach_o_scan_read_symtab_strtab (abfd, sym)
 	  bfd_set_error (bfd_error_file_truncated);
 	  return -1;
 	}
-      sym->strtab = b->buffer + sym->stroff;
+      sym->strtab = (char *) b->buffer + sym->stroff;
       return 0;
     }
 
   sym->strtab = bfd_alloc (abfd, sym->strsize);
-  if (sym->strtab == NULL && sym->strsize != 0)
+  if (sym->strtab == NULL)
     return -1;
 
   bfd_seek (abfd, sym->stroff, SEEK_SET);
   if (bfd_bread ((PTR) sym->strtab, sym->strsize, abfd) != sym->strsize)
     {
-      fprintf (stderr, "bfd_mach_o_scan_read_symtab_strtab: "
-	       "unable to read %lu bytes at %lu\n",
+      fprintf (stderr, "bfd_mach_o_scan_read_symtab_strtab: unable to read %lu bytes at %lu\n",
 	       sym->strsize, sym->stroff);
       return -1;
     }
@@ -1136,19 +824,13 @@ bfd_mach_o_scan_read_symtab_symbols (abfd, sym)
 {
   unsigned long i;
   int ret;
-  bfd_mach_o_ist *ist;
-  bfd_mach_o_nlist *nlist;
-  
-  if (sym->nlists != NULL)
-    return true; /* If there's not work to be done, don't do any.  */
 
-  sym->nlists = (bfd_mach_o_nlist *)
-    bfd_alloc (abfd, sym->nsyms * sizeof (bfd_mach_o_nlist));
+  BFD_ASSERT (sym->symbols == NULL);
+  sym->symbols = bfd_alloc (abfd, sym->nsyms * sizeof (asymbol));
 
-  if (sym->nlists == NULL && sym->nsyms != 0)
+  if (sym->symbols == NULL)
     {
-      fprintf (stderr, "bfd_mach_o_scan_read_symtab_symbols: "
-	       "unable to allocate memory for symbols\n");
+      fprintf (stderr, "bfd_mach_o_scan_read_symtab_symbols: unable to allocate memory for symbols\n");
       return -1;
     }
 
@@ -1156,11 +838,9 @@ bfd_mach_o_scan_read_symtab_symbols (abfd, sym)
   if (ret != 0)
     return ret;
 
-  ist = bfd_mach_o_slurp_ist (abfd);
-  
-  for (nlist = sym->nlists, i = 0; i < sym->nsyms; nlist++, i++)
+  for (i = 0; i < sym->nsyms; i++)
     {
-      ret = bfd_mach_o_scan_read_symtab_symbol (abfd, sym, nlist, i);
+      ret = bfd_mach_o_scan_read_symtab_symbol (abfd, sym, &sym->symbols[i], i);
       if (ret != 0)
 	return ret;
     }
@@ -1169,11 +849,11 @@ bfd_mach_o_scan_read_symtab_symbols (abfd, sym)
 }
 
 int
-bfd_mach_o_scan_read_dysymtab_symbol (abfd, dysym, sym, nlist, i)
+bfd_mach_o_scan_read_dysymtab_symbol (abfd, dysym, sym, s, i)
      bfd *abfd;
      bfd_mach_o_dysymtab_command *dysym;
      bfd_mach_o_symtab_command *sym;
-     bfd_mach_o_nlist *nlist;
+     asymbol *s;
      unsigned long i;
 {
   unsigned long isymoff = dysym->indirectsymoff + (i * 4);
@@ -1185,14 +865,13 @@ bfd_mach_o_scan_read_dysymtab_symbol (abfd, dysym, sym, nlist, i)
   bfd_seek (abfd, isymoff, SEEK_SET);
   if (bfd_bread ((PTR) buf, 4, abfd) != 4)
     {
-      fprintf (stderr, "bfd_mach_o_scan_read_dysymtab_symbol: "
-	       "unable to read %lu bytes at %lu\n",
+      fprintf (stderr, "bfd_mach_o_scan_read_dysymtab_symbol: unable to read %lu bytes at %lu\n",
 	       (unsigned long) 4, isymoff);
       return -1;
     }
   symindex = bfd_h_get_32 (abfd, buf);
 
-  return bfd_mach_o_scan_read_symtab_symbol (abfd, sym, nlist, symindex);
+  return bfd_mach_o_scan_read_symtab_symbol (abfd, sym, s, symindex);
 }
 
 static const char *
@@ -1201,32 +880,19 @@ bfd_mach_o_i386_flavour_string (flavour)
 {
   switch ((int) flavour)
     {
-    case BFD_MACH_O_i386_NEW_THREAD_STATE:
-      return "i386_NEW_THREAD_STATE";
-    case BFD_MACH_O_i386_FLOAT_STATE:
-      return "i386_FLOAT_STATE";
-    case BFD_MACH_O_i386_ISA_PORT_MAP_STATE:
-      return "i386_ISA_PORT_MAP_STATE";
-    case BFD_MACH_O_i386_V86_ASSIST_STATE:
-      return "i386_V86_ASSIST_STATE";
-    case BFD_MACH_O_i386_REGS_SEGS_STATE:
-      return "i386_REGS_SEGS_STATE";
-    case BFD_MACH_O_i386_THREAD_SYSCALL_STATE:
-      return "i386_THREAD_SYSCALL_STATE";
-    case BFD_MACH_O_i386_THREAD_STATE_NONE:
-      return "i386_THREAD_STATE_NONE";
-    case BFD_MACH_O_i386_SAVED_STATE:
-      return "i386_SAVED_STATE";
-    case BFD_MACH_O_i386_THREAD_STATE:
-      return "i386_THREAD_STATE";
-    case BFD_MACH_O_i386_THREAD_FPSTATE:
-      return "i386_THREAD_FPSTATE";
-    case BFD_MACH_O_i386_THREAD_EXCEPTSTATE:
-      return "i386_THREAD_EXCEPTSTATE";
-    case BFD_MACH_O_i386_THREAD_CTHREADSTATE:
-      return "i386_THREAD_CTHREADSTATE";
-    default:
-      return "UNKNOWN";
+    case BFD_MACH_O_i386_NEW_THREAD_STATE: return "i386_NEW_THREAD_STATE";
+    case BFD_MACH_O_i386_FLOAT_STATE: return "i386_FLOAT_STATE";
+    case BFD_MACH_O_i386_ISA_PORT_MAP_STATE: return "i386_ISA_PORT_MAP_STATE";
+    case BFD_MACH_O_i386_V86_ASSIST_STATE: return "i386_V86_ASSIST_STATE";
+    case BFD_MACH_O_i386_REGS_SEGS_STATE: return "i386_REGS_SEGS_STATE";
+    case BFD_MACH_O_i386_THREAD_SYSCALL_STATE: return "i386_THREAD_SYSCALL_STATE";
+    case BFD_MACH_O_i386_THREAD_STATE_NONE: return "i386_THREAD_STATE_NONE";
+    case BFD_MACH_O_i386_SAVED_STATE: return "i386_SAVED_STATE";
+    case BFD_MACH_O_i386_THREAD_STATE: return "i386_THREAD_STATE";
+    case BFD_MACH_O_i386_THREAD_FPSTATE: return "i386_THREAD_FPSTATE";
+    case BFD_MACH_O_i386_THREAD_EXCEPTSTATE: return "i386_THREAD_EXCEPTSTATE";
+    case BFD_MACH_O_i386_THREAD_CTHREADSTATE: return "i386_THREAD_CTHREADSTATE";
+    default: return "UNKNOWN";
     }
 }
 
@@ -1320,7 +986,7 @@ bfd_mach_o_scan_read_dylinker (abfd, command)
 
   bfdsec->vma = 0;
   bfdsec->lma = 0;
-  bfdsec->_raw_size = command->len - 8;
+  bfdsec->size = command->len - 8;
   bfdsec->filepos = command->offset + 8;
   bfdsec->alignment_power = 0;
   bfdsec->flags = SEC_HAS_CONTENTS;
@@ -1378,7 +1044,7 @@ bfd_mach_o_scan_read_dylib (abfd, command)
 
   bfdsec->vma = 0;
   bfdsec->lma = 0;
-  bfdsec->_raw_size = command->len - 8;
+  bfdsec->size = command->len - 8;
   bfdsec->filepos = command->offset + 8;
   bfdsec->alignment_power = 0;
   bfdsec->flags = SEC_HAS_CONTENTS;
@@ -1501,10 +1167,10 @@ bfd_mach_o_scan_read_thread (abfd, command)
 
       bfdsec->vma = 0;
       bfdsec->lma = 0;
-      bfdsec->_raw_size = cmd->flavours[i].size;
+      bfdsec->size = cmd->flavours[i].size;
       bfdsec->filepos = cmd->flavours[i].offset;
       bfdsec->alignment_power = 0x0;
-      bfdsec->flags = SEC_HAS_CONTENTS /*| SEC_THREAD_LOCAL*/;
+      bfdsec->flags = SEC_HAS_CONTENTS;
 
       cmd->section = bfdsec;
     }
@@ -1594,8 +1260,7 @@ bfd_mach_o_scan_read_symtab (abfd, command)
   seg->nsyms = bfd_h_get_32 (abfd, buf + 4);
   seg->stroff = bfd_h_get_32 (abfd, buf + 8);
   seg->strsize = bfd_h_get_32 (abfd, buf + 12);
-  /*seg->symbols = NULL;*/
-  seg->nlists = NULL;
+  seg->symbols = NULL;
   seg->strtab = NULL;
 
   sname = (char *) bfd_alloc (abfd, strlen (prefix) + 1);
@@ -1609,11 +1274,10 @@ bfd_mach_o_scan_read_symtab (abfd, command)
 
   bfdsec->vma = 0;
   bfdsec->lma = 0;
-  bfdsec->_raw_size = seg->nsyms * 12;
+  bfdsec->size = seg->nsyms * 12;
   bfdsec->filepos = seg->symoff;
   bfdsec->alignment_power = 0;
   bfdsec->flags = SEC_HAS_CONTENTS;
-  bfdsec->reloc_count = 0;
 
   seg->stabs_segment = bfdsec;
 
@@ -1629,12 +1293,11 @@ bfd_mach_o_scan_read_symtab (abfd, command)
 
   bfdsec->vma = 0;
   bfdsec->lma = 0;
-  bfdsec->_raw_size = seg->strsize;
+  bfdsec->size = seg->strsize;
   bfdsec->filepos = seg->stroff;
   bfdsec->alignment_power = 0;
   bfdsec->flags = SEC_HAS_CONTENTS;
-  bfdsec->reloc_count = 0;
-  
+
   seg->stabstr_segment = bfdsec;
 
   return 0;
@@ -1675,20 +1338,16 @@ bfd_mach_o_scan_read_segment (abfd, command)
     return -1;
   sprintf (sname, "%s.%s", prefix, seg->segname);
 
-#if 0
   bfdsec = bfd_make_section_anyway (abfd, sname);
   if (bfdsec == NULL)
     return -1;
 
   bfdsec->vma = seg->vmaddr;
   bfdsec->lma = seg->vmaddr;
-  bfdsec->_raw_size = seg->filesize;
+  bfdsec->size = seg->filesize;
   bfdsec->filepos = seg->fileoff;
   bfdsec->alignment_power = 0x0;
   bfdsec->flags = SEC_HAS_CONTENTS | SEC_LOAD | SEC_ALLOC | SEC_CODE;
-#else
-  bfdsec = NULL;
-#endif
 
   seg->segment = bfdsec;
 
@@ -1956,7 +1615,7 @@ bfd_mach_o_scan (abfd, header, mdata)
 
   mdata->header = *header;
   mdata->symbols = NULL;
- 
+
   abfd->flags = (abfd->xvec->object_flags
 		 | (abfd->flags & (BFD_IN_MEMORY | BFD_IO_FUNCS)));
   abfd->tdata.mach_o_data = mdata;
@@ -1976,7 +1635,7 @@ bfd_mach_o_scan (abfd, header, mdata)
     {
       mdata->commands =
 	((bfd_mach_o_load_command *)
-	 bfd_zalloc (abfd, header->ncmds * sizeof (bfd_mach_o_load_command)));
+	 bfd_alloc (abfd, header->ncmds * sizeof (bfd_mach_o_load_command)));
       if (mdata->commands == NULL)
 	return -1;
 
@@ -1998,30 +1657,22 @@ bfd_mach_o_scan (abfd, header, mdata)
     }
 
   if (bfd_mach_o_scan_start_address (abfd) < 0)
-    {
-#if 0
-      fprintf (stderr, "bfd_mach_o_scan: unable to scan start address: %s\n",
-	       bfd_errmsg (bfd_get_error ()));
-      abfd->tdata.mach_o_data = NULL;
-      return -1;
-#endif
-    }
+    return -1;
 
   bfd_mach_o_flatten_sections (abfd);
-
   return 0;
 }
 
-boolean
+bfd_boolean
 bfd_mach_o_mkobject (abfd)
      bfd *abfd;
 {
   bfd_mach_o_data_struct *mdata = NULL;
 
   mdata = ((bfd_mach_o_data_struct *)
-	   bfd_zalloc (abfd, sizeof (bfd_mach_o_data_struct)));
+	   bfd_alloc (abfd, sizeof (bfd_mach_o_data_struct)));
   if (mdata == NULL)
-    return false;
+    return FALSE;
   abfd->tdata.mach_o_data = mdata;
 
   mdata->header.magic = 0;
@@ -2037,10 +1688,9 @@ bfd_mach_o_mkobject (abfd)
   mdata->symbols = NULL;
   mdata->nsects = 0;
   mdata->sections = NULL;
-  mdata->ist = NULL;
   mdata->ibfd = NULL;
 
-  return true;
+  return TRUE;
 }
 
 const bfd_target *
@@ -2470,7 +2120,7 @@ bfd_mach_o_core_file_failing_command (abfd)
   if (ret < 0)
     return NULL;
 
-  return buf;
+  return (char *) buf;
 }
 
 int
@@ -2480,655 +2130,13 @@ bfd_mach_o_core_file_failing_signal (abfd)
   return 0;
 }
 
-boolean
+bfd_boolean
 bfd_mach_o_core_file_matches_executable_p (core_bfd, exec_bfd)
      bfd *core_bfd ATTRIBUTE_UNUSED;
      bfd *exec_bfd ATTRIBUTE_UNUSED;
 {
-  return true;
+  return TRUE;
 }
-
-static int
-bfd_mach_o_compar_st_idx (const void *a, const void *b)
-{
-    unsigned long  x = ((bfd_mach_o_ist_entry *) a)->st_idx;
-    unsigned long  y = ((bfd_mach_o_ist_entry *) b)->st_idx;
-
-    return (int) x - (int) y;
-}
-
-static void
-bfd_mach_o_dump_ist_aux (abfd, sym, sect_array, array_length, tot)
-     bfd *abfd;
-     bfd_mach_o_symtab_command *sym;
-     bfd_mach_o_section **sect_array;
-     unsigned long array_length;
-     unsigned long tot;
-{
-  bfd_mach_o_data_struct *mdata = abfd->tdata.mach_o_data;
-  bfd_mach_o_ist *ist = mdata->ist;
-  unsigned long i;
-  
-  BFD_ASSERT (sym->symoff != NULL);
-  BFD_ASSERT (sym->strtab != NULL);
-  
-  for (i=0 ; i < array_length ; sect_array++, i++)
-    {
-      bfd_mach_o_ist_entry *e;
-      unsigned long start;
-      unsigned long nmemb;
-      unsigned long j;
-      unsigned long atomic_size;
-      
-      if ((*sect_array)->reserved2)
-	atomic_size = ((*sect_array)->reserved2);
-      else
-	atomic_size = 4;
-      
-      start = (*sect_array)->reserved1;
-      nmemb = (*sect_array)->size / atomic_size;
-
-      if (nmemb + start > ist->nmemb || start >= ist->nmemb) {
-	printf ("%s: contains garbage\n\n", (*sect_array)->sectname);
-	continue;
-      }
-
-      printf ("%s (contains %ld out of %ld indirect symbols)\n",
-	      (*sect_array)->sectname, nmemb, tot);
-
-      e = ist->raw_ist + start;
-      
-      for (j=0 ; j < nmemb ; e++, j++)
-	{
-	  file_ptr symdelta, strdelta;
-	  char buf [12];
-	  
-	  symdelta = (e->st_idx) * 12;
-	  
-	  if (bfd_seek (abfd, sym->symoff + symdelta, SEEK_SET) != 0 ||
-	      bfd_bread ((PTR) buf, 12, abfd) != 12)
-	    continue;
-	  
-	  strdelta = bfd_h_get_32 (abfd, buf);
-	  
-	  printf ("  %5ld - %5ld %s\n",
-		  e->ist_idx, e->st_idx, sym->strtab + strdelta);
-	}
-
-      printf ("\n");
-      fflush (stdout);
-    }
-}
-
-static void
-bfd_mach_o_dump_ist (abfd, sym)
-     bfd *abfd;
-     bfd_mach_o_symtab_command *sym;
-{
-  bfd_mach_o_data_struct *mdata = abfd->tdata.mach_o_data;
-  bfd_mach_o_ist *ist = mdata->ist;
-  
-  if (ist != NULL)
-    {
-      printf ("\nDumping indirect symbol table for file %s:\n\n",
-	      abfd->filename);
-
-      bfd_mach_o_dump_ist_aux (abfd, sym, ist->stubs,  ist->nstubs,  ist->nmemb);
-  
-      bfd_mach_o_dump_ist_aux (abfd, sym, ist->nlptrs, ist->nnlptrs, ist->nmemb);
-
-      bfd_mach_o_dump_ist_aux (abfd, sym, ist->laptrs, ist->nlaptrs, ist->nmemb);
-    }
-}
-
-static boolean
-bfd_mach_o_check_ist (ist)
-     bfd_mach_o_ist *ist;
-{
-  if (ist != NULL)
-    {
-      boolean retval = true;
-      
-      if (ist->nmemb > 0)
-	{     
-	  bfd_mach_o_section **stub_sections;
-	  boolean *marks;
-	  unsigned long i;
-	  
-	  stub_sections = ist->stubs;
-
-	  marks = (boolean *) bfd_malloc (ist->nmemb * sizeof (boolean));
-	  if (marks == NULL)
-	    return false;
-	  
-	  memset (marks, 0, ist->nmemb * sizeof (boolean));
-	  
-	  for (i=0 ; i < ist->nstubs ; stub_sections++, i++)
-	    {
-	      unsigned long j, start,  nmemb;
-	      bfd_mach_o_ist_entry *e;
-	 
-	      if ((*stub_sections)->reserved2 == 0)
-		{
-		  fprintf (stderr, "check_ist: invalid stub size in section "
-			   "%s\n", (*stub_sections)->sectname);
-		  retval = false;
-		  break;
-		}
-	      
-	      start = (*stub_sections)->reserved1;
-	      nmemb = (*stub_sections)->size / (*stub_sections)->reserved2;
-	      
-	      if (nmemb + start > ist->nmemb || start >= ist->nmemb)
-		{
-		  fprintf (stderr, "check_ist: malformed indirect section %s\n",
-			   (*stub_sections)->sectname);
-		  retval = false;
-		  break;
-		}
-
-	      e = ist->raw_ist + start;
-	      
-	      for (j=0 ; j < nmemb ; j++, e++)
-		{
-		  boolean already_there = marks[e->ist_idx];
-		  
-		  if (!already_there) {
-		    marks[e->ist_idx] = true;
-		  } else {
-		    fprintf (stderr, "check_ist: multiple stubs for "
-			     "indirect symbol %ld/%ld\n",
-			     e->ist_idx, e->st_idx );
-		 /* retval = false;  This is legal, actually.  */
-		  }
-		}
-	    }
-	  
-	  free (marks);
-	  
-	  fflush (stderr);
-	}
-
-      return retval;
-    }
-
-  return false;
-}
-
-static bfd_mach_o_ist *
-bfd_mach_o_slurp_ist (abfd)
-     bfd *abfd;
-{
-  bfd_mach_o_data_struct *mdata = abfd->tdata.mach_o_data;
-  bfd_mach_o_dysymtab_command *dyst = NULL;
-  bfd_mach_o_ist *ist = NULL;
-  unsigned long nnlptrs = 0;
-  unsigned long nlaptrs = 0;
-  unsigned long nstubs = 0;
-  unsigned long i;
-    
-  if (mdata->ist != NULL) {
-    /* Nothing to do.  */
-    return (mdata->ist);
-  }
-    
-  for (i=0 ; i < mdata->header.ncmds ; i++) {
-    if (mdata->commands[i].type == BFD_MACH_O_LC_DYSYMTAB)
-      {
-	if (dyst != NULL) {
-	  fprintf (stderr, "bfd_mach_o_slurp_ist: "
-		   "input file contains more than one LC_DYSYMTAB load cmd\n");
-	  abort ();
-	}
-	dyst = &mdata->commands[i].command.dysymtab;
-      }
-  }
-  
-  ist = (bfd_mach_o_ist *) bfd_zalloc (abfd, sizeof (bfd_mach_o_ist));
-  if (ist == NULL)
-    return (NULL);
-    
-  /* Make sure we did find a LC_DYSYMTAB load command.  */
-
-  if (dyst != NULL)
-    {
-      bfd_size_type ist_size;
-        
-      ist->command = dyst;
-      ist->nmemb = dyst->nindirectsyms;
-        
-      if (ist->nmemb == 0) {
-     /* Empty indirect symbol table.  */
-	return (mdata->ist = ist);
-      }
-      
-      ist_size = ist->nmemb * sizeof (bfd_mach_o_ist_entry);
-
-      ist->raw_ist = (bfd_mach_o_ist_entry *) bfd_alloc (abfd, ist_size);
-      ist->sorted_ist = (bfd_mach_o_ist_entry *) bfd_alloc (abfd, ist_size);
-
-      if (ist->raw_ist == NULL || ist->sorted_ist == NULL)
-	return (NULL);
-      
-      if ((bfd_seek (abfd, dyst->indirectsymoff, SEEK_SET) != 0 ||
-	   bfd_bread (ist->raw_ist, ist_size, abfd) != ist_size))
-	return (NULL);
-        
-      for (i=ist->nmemb ; --i != (unsigned long) -1 ; )
-	{
-	  (ist->raw_ist)[i].st_idx = ((unsigned long *) ist->raw_ist)[i];
-	  (ist->raw_ist)[i].ist_idx = i;
-
-	  (ist->sorted_ist)[i].ist_idx = i;
-	  (ist->sorted_ist)[i].st_idx = (ist->raw_ist)[i].st_idx;
-	}
-        
-      /* Loop through all sections, looking for ist related sections.  */
-
-      for (i=0 ; i < mdata->nsects ; i++)
-	{
-	  bfd_mach_o_section *sectp = mdata->sections[i];
-	  bfd_size_type array_size;
-	  unsigned long start;
-	  unsigned long nmemb;
-            
-	  if ((sectp->flags & SECTION_TYPE)
-	      == BFD_MACH_O_S_SYMBOL_STUBS)
-	    {
-	      array_size = (++nstubs) * sizeof (bfd_mach_o_section *);
-                 
-	      ist->stubs =
-		(bfd_mach_o_section **) bfd_realloc (ist->stubs, array_size);
-
-	      if (ist->stubs == NULL)
-		return NULL;
-                
-	      ist->stubs[ist->nstubs++] = sectp;
- 	    }
-	  else if ((sectp->flags & SECTION_TYPE)
-		   == BFD_MACH_O_S_NL_SYMBOL_POINTERS)
-	    {
-	      array_size = (++nnlptrs) * sizeof (bfd_mach_o_section *);
-                
-	      ist->nlptrs =
-		(bfd_mach_o_section **) bfd_realloc (ist->nlptrs, array_size);
-
-	      if (ist->nlptrs == NULL)
-		return (NULL);
-                
-	      ist->nlptrs[ist->nnlptrs++] = sectp;
-	    }
-	  else if ((sectp->flags & SECTION_TYPE)
-		   == BFD_MACH_O_S_LA_SYMBOL_POINTERS)
-	    {
-	      array_size = (++nlaptrs) * sizeof (bfd_mach_o_section *);
-
-	      ist->laptrs =
-		(bfd_mach_o_section **) bfd_realloc (ist->laptrs, array_size);
-
-	      if (ist->laptrs == NULL)
-		return (NULL);
-
-	      ist->laptrs[ist->nlaptrs++] = sectp;
-	    }
-	  else
-	    {
-	      continue;
-	    }
-
-	  start = sectp->reserved1;
-	  nmemb = sectp->size / (sectp->reserved2 != 0 ? sectp->reserved2 : 4);
-
-	  qsort (ist->sorted_ist + start, nmemb,
-		 sizeof (bfd_mach_o_ist_entry), bfd_mach_o_compar_st_idx);
-	}
-
-       BFD_ASSERT (bfd_mach_o_check_ist (ist));
-    }
-     
-  return (mdata->ist = ist);
-}
-
-static bfd_vma
-bfd_mach_o_get_lazy_symbol_stub (ist, sym_idx, asect_ptr)
-  bfd_mach_o_ist *ist;
-  unsigned long sym_idx;
-  asection **asect_ptr;
-{
-  bfd_vma addr = 0;
-    
-  if (ist != NULL)
-    {
-      bfd_mach_o_section **stub_sections;
-      unsigned long i;
-      
-      stub_sections = ist->stubs;
-      
-      for (i=0 ; i < ist->nstubs ; stub_sections++, i++)
-        {
-	  unsigned long start, stub_size, nmemb;
-	  bfd_mach_o_ist_entry *match, key;
-            
-	  start = (*stub_sections)->reserved1;
-	  stub_size = (*stub_sections)->reserved2;
-	  nmemb = (*stub_sections)->size / stub_size;
-	  
-	  key.st_idx = sym_idx;
-            
-	  match = (bfd_mach_o_ist_entry *)
-	    bsearch (&key, ist->sorted_ist + start, nmemb,
-		     sizeof (bfd_mach_o_ist_entry), bfd_mach_o_compar_st_idx);
-            
-	  if (match != NULL) {
-	    if ((start <= match->ist_idx) && (match->ist_idx < (start + nmemb)))
-	      {
-	        if (asect_ptr != NULL)
-		  *asect_ptr = (*stub_sections)->bfdsection;
-              
-	        /* Obey the general contract about symbol addresses,
-	           i.e. return a section relative address.  */
-	        return (addr = ((match->ist_idx - start) * stub_size));
-	      }
-          }
-        }
-    }
-    
-  return (addr);
-}
-
-static bfd_vma
-bfd_mach_o_get_non_lazy_symbol_ptr (ist, sym_idx, asect_ptr)
-  bfd_mach_o_ist *ist;
-  unsigned long sym_idx;
-  asection **asect_ptr;
-{
-  bfd_vma addr = 0;
-  
-  if (ist != NULL)
-    {
-      bfd_mach_o_section **nlptr_sections;
-      unsigned long i;
-      
-      nlptr_sections = ist->nlptrs;
-      
-      for (i=0 ; i < ist->nnlptrs ; nlptr_sections++, i++)
-        {
-	  unsigned long start, nmemb;
-	  bfd_mach_o_ist_entry *match, key;
-            
-	  start = (*nlptr_sections)->reserved1;
-	  nmemb = (*nlptr_sections)->size / 4;
-	  
-	  key.st_idx = sym_idx;
-            
-	  match = (bfd_mach_o_ist_entry *)
-	    bsearch (&key, ist->sorted_ist + start, nmemb,
-		     sizeof (bfd_mach_o_ist_entry), bfd_mach_o_compar_st_idx);
-            
-	  if (match != NULL) {
-	    if ((start <= match->ist_idx) && (match->ist_idx < (start + nmemb)))
-	      {
-	        if (asect_ptr != NULL)
-		  *asect_ptr = (*nlptr_sections)->bfdsection;
-              
-	        /* Obey the general contract about symbol addresses,
-		   i.e. return a section relative address.  */
-	        return (addr = ((match->ist_idx - start) * 4));
-              }
-	  }
-        }
-    }
-    
-  return (addr);
-}
-
-static boolean
-bfd_mach_o_bfd_link_add_symbols (abfd,info)
-     bfd *abfd;
-     struct bfd_link_info *info;
-{
-  bfd_mach_o_data_struct *mdata;
-  unsigned long i;
-    
-  BFD_ASSERT (bfd_mach_o_valid (abfd));
-  mdata = abfd->tdata.mach_o_data;
-    
-  for (i = 0; i < mdata->header.ncmds; i++)
-    {
-      if (mdata->commands[i].type == BFD_MACH_O_LC_SYMTAB)
-        {
-	  bfd_mach_o_symtab_command *sym = &mdata->commands[i].command.symtab;
-	  unsigned long j;
-            
-	  if (bfd_mach_o_scan_read_symtab_strtab (abfd, sym) < 0) {
-	    fprintf (stderr, "bfd_mach_o_link_add_symbols: "
-		     "error reading strtab\n");
-	    return false;
-	  }
-            
-	  BFD_ASSERT (sym->strtab != NULL);
-            
-	  for (j=0 ; j < sym->nsyms ; j++)
-            {
-	      bfd_vma symoff = sym->symoff + (j * 12);
-                
-	      unsigned char buf[12];
-	      unsigned char type;
-	      unsigned char sect;
-	      short desc;
-	      bfd_vma value;
-	      unsigned long stroff;
-                
-	      boolean copy = true; /* (info->keep_memory) ? false : TRUE; */
-	      const char *name;
-	      flagword flags;
-	      asection *section;
-                
-	      bfd_seek (abfd, symoff, SEEK_SET);
-	      if (bfd_bread ((PTR) buf, 12, abfd) != 12) {
-		return false; 
-	      }
-                
-	      type = bfd_h_get_8 (abfd, buf + 4);
-                
-	      if (type & BFD_MACH_O_N_STAB)
-		continue;
-
-	      stroff = bfd_h_get_32 (abfd, buf);
-	      sect = bfd_h_get_8 (abfd, buf + 5);
-	      desc = bfd_h_get_16 (abfd, buf + 6);
-	      value = bfd_h_get_32 (abfd, buf + 8);
-
-	      if (stroff >= sym->strsize) {
-		bfd_set_error (bfd_error_file_truncated);
-		return false;
-	      }
-                
-	      name = sym->strtab + stroff;
-	      flags = BSF_GLOBAL;
-                
-	      if (type & (BFD_MACH_O_N_EXT | BFD_MACH_O_N_PEXT))
-                {
-		  struct bfd_link_hash_entry *hashp = NULL;
-                    
-		  /* In the case of an N_INDR symbol, `string' is
-		     the name of the symbol that is referred to.  */
-		  const char *string = NULL;
-                    
-		  switch (type & BFD_MACH_O_N_TYPE) {
-		  case BFD_MACH_O_N_UNDF:
-		    if (value == 0) {
-		      section = bfd_und_section_ptr;
-		      /* flags = 0; */
-		    }
-		    else
-		      section = bfd_com_section_ptr;
-		    break;
-		  case BFD_MACH_O_N_PBUD:
-		    section = bfd_und_section_ptr;
-		    break;
-		  case BFD_MACH_O_N_ABS:
-		    section = bfd_abs_section_ptr;
-		    break;
-		  case BFD_MACH_O_N_INDR:
-		    flags |= BSF_INDIRECT;
-		    section = bfd_ind_section_ptr;
-		    fprintf (stderr,
-			     "BFD_MACH_O_N_INDR symbols not yet supported\n");
-		    abort ();
-		    break;
-		  case BFD_MACH_O_N_SECT:
-		    /* section numbering starts at 1, zero means no section */
-		    if (sect > 0 && sect <= mdata->nsects) {
-		      section = mdata->sections[sect-1]->bfdsection;
-		      value -= mdata->sections[sect-1]->addr;
-		    } else {
-		      if (sect != 0) {
-			fprintf (stderr,
-				 "bfd_mach_o_link_add_symbols: symbol \"%s\" "
-				 "specified invalid section %d (max %lu), "
-				 "setting to undefined\n", 
-				 name, sect, mdata->nsects);
-		      }
-		      section = bfd_und_section_ptr;
-		      fprintf (stderr, "sect: %d %s\n", sect, name);
-		    }
-		    break;
-		  default:
-		    fprintf (stderr, "unknown N_TYPE value");
-		    abort();
-		    break;
-		  }
-                  
-		  if ((flags & BSF_GLOBAL) == 0)
-		    flags |= BSF_LOCAL;
-		  
-		  /* FIX-ME: Set the alignment for common symbols here.  */
-                    
-		  if (!_bfd_generic_link_add_one_symbol (info, abfd, name, flags,
-							 section, value, string,
-							 copy, false, &hashp)) {
-		    return false;
-		  }
-                }
-            }
-        }
-    }
-    
-  return true;
-}
-
-/*
-FUNCTION
-	bfd_preserve_save
-
-SYNOPSIS
-	boolean bfd_preserve_save (bfd *, struct bfd_preserve *);
-
-DESCRIPTION
-	When testing an object for compatibility with a particular
-	target back-end, the back-end object_p function needs to set
-	up certain fields in the bfd on successfully recognizing the
-	object.  This typically happens in a piecemeal fashion, with
-	failures possible at many points.  On failure, the bfd is
-	supposed to be restored to its initial state, which is
-	virtually impossible.  However, restoring a subset of the bfd
-	state works in practice.  This function stores the subset and
-	reinitializes the bfd.
-
-*/
-
-boolean
-bfd_preserve_save (abfd, preserve)
-     bfd *abfd;
-     struct bfd_preserve *preserve;
-{
-  preserve->tdata = abfd->tdata.any;
-  preserve->arch_info = abfd->arch_info;
-  preserve->flags = abfd->flags;
-  preserve->sections = abfd->sections;
-  preserve->section_tail = abfd->section_tail;
-  preserve->section_count = abfd->section_count;
-  preserve->section_htab = abfd->section_htab;
-
-  if (! bfd_hash_table_init (&abfd->section_htab, bfd_section_hash_newfunc))
-    return false;
-
-  abfd->tdata.any = NULL;
-  abfd->arch_info = &bfd_default_arch_struct;
-  abfd->flags &= BFD_IN_MEMORY;
-  abfd->sections = NULL;
-  abfd->section_tail = &abfd->sections;
-  abfd->section_count = 0;
-
-  return true;
-}
-
-/*
-FUNCTION
-	bfd_preserve_restore
-
-SYNOPSIS
-	void bfd_preserve_restore (bfd *, struct bfd_preserve *);
-
-DESCRIPTION
-	This function restores bfd state saved by bfd_preserve_save.
-	If MARKER is non-NULL in struct bfd_preserve then that block
-	and all subsequently bfd_alloc'd memory is freed.
-
-*/
-
-void
-bfd_preserve_restore (abfd, preserve)
-     bfd *abfd;
-     struct bfd_preserve *preserve;
-{
-  bfd_hash_table_free (&abfd->section_htab);
-
-  abfd->tdata.any = preserve->tdata;
-  abfd->arch_info = preserve->arch_info;
-  abfd->flags = preserve->flags;
-  abfd->section_htab = preserve->section_htab;
-  abfd->sections = preserve->sections;
-  abfd->section_tail = preserve->section_tail;
-  abfd->section_count = preserve->section_count;
-
-  /* bfd_release frees all memory more recently bfd_alloc'd than
-     its arg, as well as its arg.  */
-  if (preserve->marker != NULL)
-    {
-      bfd_release (abfd, preserve->marker);
-      preserve->marker = NULL;
-    }
-}
-
-/*
-FUNCTION
-	bfd_preserve_finish
-
-SYNOPSIS
-	void bfd_preserve_finish (bfd *, struct bfd_preserve *);
-
-DESCRIPTION
-	This function should be called when the bfd state saved by
-	bfd_preserve_save is no longer needed.  ie. when the back-end
-	object_p function returns with success.
-
-*/
-
-void
-bfd_preserve_finish (abfd, preserve)
-     bfd *abfd ATTRIBUTE_UNUSED;
-     struct bfd_preserve *preserve;
-{
-  /* It would be nice to be able to free more memory here, eg. old
-     tdata, but that's not possible since these blocks are sitting
-     inside bfd_alloc'd memory.  The section hash is on a separate
-     objalloc.  */
-  bfd_hash_table_free (&preserve->section_htab);
-}
-
-#include "mach-o-reloc.c"
 
 #define TARGET_NAME mach_o_be_vec
 #define TARGET_STRING "mach-o-be"

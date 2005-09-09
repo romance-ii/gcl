@@ -1,5 +1,5 @@
 /* Motorola MCore specific support for 32-bit ELF
-   Copyright 1994, 1995, 1999, 2000, 2001, 2002
+   Copyright 1994, 1995, 1999, 2000, 2001, 2002, 2003, 2004
    Free Software Foundation, Inc.
 
 This file is part of BFD, the Binary File Descriptor library.
@@ -29,31 +29,30 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #include "elf/mcore.h"
 #include <assert.h>
 
-#define	USE_RELA	/* Only USE_REL is actually significant, but this is
-			   here are a reminder...  */
+/* RELA relocs are used here...  */
 
 static void mcore_elf_howto_init
   PARAMS ((void));
 static reloc_howto_type * mcore_elf_reloc_type_lookup
   PARAMS ((bfd *, bfd_reloc_code_real_type));
 static void mcore_elf_info_to_howto
-  PARAMS ((bfd *, arelent *, Elf32_Internal_Rela *));
-static boolean mcore_elf_set_private_flags
+  PARAMS ((bfd *, arelent *, Elf_Internal_Rela *));
+static bfd_boolean mcore_elf_set_private_flags
   PARAMS ((bfd *, flagword));
-static boolean mcore_elf_merge_private_bfd_data
+static bfd_boolean mcore_elf_merge_private_bfd_data
   PARAMS ((bfd *, bfd *));
 static bfd_reloc_status_type mcore_elf_unsupported_reloc
   PARAMS ((bfd *, arelent *, asymbol *, PTR, asection *, bfd *, char **));
-static boolean mcore_elf_relocate_section
+static bfd_boolean mcore_elf_relocate_section
   PARAMS ((bfd *, struct bfd_link_info *, bfd *, asection *, bfd_byte *,
 	   Elf_Internal_Rela *, Elf_Internal_Sym *, asection **));
 static asection * mcore_elf_gc_mark_hook
   PARAMS ((asection *, struct bfd_link_info *, Elf_Internal_Rela *,
 	   struct elf_link_hash_entry *, Elf_Internal_Sym *));
-static boolean mcore_elf_gc_sweep_hook
+static bfd_boolean mcore_elf_gc_sweep_hook
   PARAMS ((bfd *, struct bfd_link_info *, asection *,
 	   const Elf_Internal_Rela *));
-static boolean mcore_elf_check_relocs
+static bfd_boolean mcore_elf_check_relocs
   PARAMS ((bfd *, struct bfd_link_info *, asection *,
 	   const Elf_Internal_Rela *));
 
@@ -66,30 +65,30 @@ static reloc_howto_type mcore_elf_howto_raw[] =
 	 0,			/* rightshift */
 	 2,			/* size (0 = byte, 1 = short, 2 = long) */
 	 32,			/* bitsize */
-	 false,			/* pc_relative */
+	 FALSE,			/* pc_relative */
 	 0,			/* bitpos */
 	 complain_overflow_bitfield,  /* complain_on_overflow */
 	 NULL,                  /* special_function */
 	 "R_MCORE_NONE",	/* name */
-	 false,			/* partial_inplace */
+	 FALSE,			/* partial_inplace */
 	 0,			/* src_mask */
 	 0,			/* dst_mask */
-	 false),		/* pcrel_offset */
+	 FALSE),		/* pcrel_offset */
 
   /* A standard 32 bit relocation.  */
   HOWTO (R_MCORE_ADDR32,	/* type */
 	 0,			/* rightshift */
 	 2,			/* size (0 = byte, 1 = short, 2 = long) */
 	 32,			/* bitsize */
-	 false,			/* pc_relative */
+	 FALSE,			/* pc_relative */
 	 0,			/* bitpos */
 	 complain_overflow_bitfield, /* complain_on_overflow */
 	 bfd_elf_generic_reloc,	/* special_function */
-	 "ADDR32",		/* name *//* For compatability with coff/pe port.  */
-	 false,			/* partial_inplace */
+	 "ADDR32",		/* name *//* For compatibility with coff/pe port.  */
+	 FALSE,			/* partial_inplace */
 	 0x0,			/* src_mask */
 	 0xffffffff,		/* dst_mask */
-	 false),		/* pcrel_offset */
+	 FALSE),		/* pcrel_offset */
 
   /* 8 bits + 2 zero bits; jmpi/jsri/lrw instructions.
      Should not appear in object files.  */
@@ -97,15 +96,15 @@ static reloc_howto_type mcore_elf_howto_raw[] =
 	 2,			/* rightshift */
 	 1,			/* size (0 = byte, 1 = short, 2 = long) */
 	 8,			/* bitsize */
-	 true,			/* pc_relative */
+	 TRUE,			/* pc_relative */
 	 0,			/* bitpos */
 	 complain_overflow_bitfield, /* complain_on_overflow */
 	 mcore_elf_unsupported_reloc,	/* special_function */
 	 "R_MCORE_PCRELIMM8BY4",/* name */
-	 false,			/* partial_inplace */
+	 FALSE,			/* partial_inplace */
 	 0,			/* src_mask */
 	 0,			/* dst_mask */
-	 true),			/* pcrel_offset */
+	 TRUE),			/* pcrel_offset */
 
   /* bsr/bt/bf/br instructions; 11 bits + 1 zero bit
      Span 2k instructions == 4k bytes.
@@ -114,45 +113,45 @@ static reloc_howto_type mcore_elf_howto_raw[] =
 	 1,			/* rightshift */
 	 1,			/* size (0 = byte, 1 = short, 2 = long) */
 	 11,			/* bitsize */
-	 true,			/* pc_relative */
+	 TRUE,			/* pc_relative */
 	 0,			/* bitpos */
 	 complain_overflow_signed, /* complain_on_overflow */
 	 bfd_elf_generic_reloc,	/* special_function */
 	 "R_MCORE_PCRELIMM11BY2",/* name */
-	 false,			/* partial_inplace */
+	 FALSE,			/* partial_inplace */
 	 0x0,			/* src_mask */
 	 0x7ff,			/* dst_mask */
-	 true),			/* pcrel_offset */
+	 TRUE),			/* pcrel_offset */
 
   /* 4 bits + 1 zero bit; 'loopt' instruction only; unsupported.  */
   HOWTO (R_MCORE_PCRELIMM4BY2,	/* type */
 	 1,			/* rightshift */
 	 1,			/* size (0 = byte, 1 = short, 2 = long) */
 	 4,			/* bitsize */
-	 true,			/* pc_relative */
+	 TRUE,			/* pc_relative */
 	 0,			/* bitpos */
 	 complain_overflow_bitfield, /* complain_on_overflow */
 	 mcore_elf_unsupported_reloc,/* special_function */
 	 "R_MCORE_PCRELIMM4BY2",/* name */
-	 false,			/* partial_inplace */
+	 FALSE,			/* partial_inplace */
 	 0,			/* src_mask */
 	 0,			/* dst_mask */
-	 true),			/* pcrel_offset */
+	 TRUE),			/* pcrel_offset */
 
   /* 32-bit pc-relative. Eventually this will help support PIC code.  */
   HOWTO (R_MCORE_PCREL32,	/* type */
 	 0,			/* rightshift */
 	 2,			/* size (0 = byte, 1 = short, 2 = long) */
 	 32,			/* bitsize */
-	 true,			/* pc_relative */
+	 TRUE,			/* pc_relative */
 	 0,			/* bitpos */
 	 complain_overflow_bitfield, /* complain_on_overflow */
 	 bfd_elf_generic_reloc,	/* special_function */
 	 "R_MCORE_PCREL32",	/* name */
-	 false,			/* partial_inplace */
+	 FALSE,			/* partial_inplace */
 	 0x0,			/* src_mask */
 	 0xffffffff,		/* dst_mask */
-	 true),			/* pcrel_offset */
+	 TRUE),			/* pcrel_offset */
 
   /* Like PCRELIMM11BY2, this relocation indicates that there is a
      'jsri' at the specified address. There is a separate relocation
@@ -165,59 +164,59 @@ static reloc_howto_type mcore_elf_howto_raw[] =
 	 1,			/* rightshift */
 	 1,			/* size (0 = byte, 1 = short, 2 = long) */
 	 11,			/* bitsize */
-	 true,			/* pc_relative */
+	 TRUE,			/* pc_relative */
 	 0,			/* bitpos */
 	 complain_overflow_signed, /* complain_on_overflow */
 	 bfd_elf_generic_reloc,	/* special_function */
 	 "R_MCORE_PCRELJSR_IMM11BY2", /* name */
-	 false,			/* partial_inplace */
+	 FALSE,			/* partial_inplace */
 	 0x0,			/* src_mask */
 	 0x7ff,			/* dst_mask */
-	 true),			/* pcrel_offset */
+	 TRUE),			/* pcrel_offset */
 
   /* GNU extension to record C++ vtable hierarchy */
   HOWTO (R_MCORE_GNU_VTINHERIT, /* type */
          0,                     /* rightshift */
          2,                     /* size (0 = byte, 1 = short, 2 = long) */
          0,                     /* bitsize */
-         false,                 /* pc_relative */
+         FALSE,                 /* pc_relative */
          0,                     /* bitpos */
          complain_overflow_dont, /* complain_on_overflow */
          NULL,                  /* special_function */
          "R_MCORE_GNU_VTINHERIT", /* name */
-         false,                 /* partial_inplace */
+         FALSE,                 /* partial_inplace */
          0,                     /* src_mask */
          0,                     /* dst_mask */
-         false),                /* pcrel_offset */
+         FALSE),                /* pcrel_offset */
 
   /* GNU extension to record C++ vtable member usage */
   HOWTO (R_MCORE_GNU_VTENTRY,   /* type */
          0,                     /* rightshift */
          2,                     /* size (0 = byte, 1 = short, 2 = long) */
          0,                     /* bitsize */
-         false,                 /* pc_relative */
+         FALSE,                 /* pc_relative */
          0,                     /* bitpos */
          complain_overflow_dont,/* complain_on_overflow */
          _bfd_elf_rel_vtable_reloc_fn,  /* special_function */
          "R_MCORE_GNU_VTENTRY", /* name */
-         false,                 /* partial_inplace */
+         FALSE,                 /* partial_inplace */
          0,                     /* src_mask */
          0,                     /* dst_mask */
-         false),                /* pcrel_offset */
+         FALSE),                /* pcrel_offset */
 
   HOWTO (R_MCORE_RELATIVE,      /* type */
 	 0,			/* rightshift */
 	 2,			/* size (0 = byte, 1 = short, 2 = long) */
 	 32,			/* bitsize */
-	 false,			/* pc_relative */
+	 FALSE,			/* pc_relative */
 	 0,			/* bitpos */
 	 complain_overflow_signed, /* complain_on_overflow */
 	 NULL,                  /* special_function */
 	 "R_MCORE_RELATIVE",    /* name */
-	 true,			/* partial_inplace */
+	 TRUE,			/* partial_inplace */
 	 0xffffffff,		/* src_mask */
 	 0xffffffff,		/* dst_mask */
-	 false)			/* pcrel_offset */
+	 FALSE)			/* pcrel_offset */
 };
 
 #ifndef NUM_ELEM
@@ -276,7 +275,7 @@ static void
 mcore_elf_info_to_howto (abfd, cache_ptr, dst)
      bfd * abfd ATTRIBUTE_UNUSED;
      arelent * cache_ptr;
-     Elf32_Internal_Rela * dst;
+     Elf_Internal_Rela * dst;
 {
   if (! mcore_elf_howto_table [R_MCORE_PCRELIMM8BY4])	/* Initialize howto table if needed */
     mcore_elf_howto_init ();
@@ -287,7 +286,7 @@ mcore_elf_info_to_howto (abfd, cache_ptr, dst)
 }
 
 /* Function to set whether a module needs the -mrelocatable bit set.  */
-static boolean
+static bfd_boolean
 mcore_elf_set_private_flags (abfd, flags)
      bfd * abfd;
      flagword flags;
@@ -296,13 +295,13 @@ mcore_elf_set_private_flags (abfd, flags)
 	      || elf_elfheader (abfd)->e_flags == flags);
 
   elf_elfheader (abfd)->e_flags = flags;
-  elf_flags_init (abfd) = true;
-  return true;
+  elf_flags_init (abfd) = TRUE;
+  return TRUE;
 }
 
 /* Merge backend specific data from an object file to the output
    object file when linking.  */
-static boolean
+static bfd_boolean
 mcore_elf_merge_private_bfd_data (ibfd, obfd)
      bfd * ibfd;
      bfd * obfd;
@@ -312,18 +311,18 @@ mcore_elf_merge_private_bfd_data (ibfd, obfd)
 
   /* Check if we have the same endianess */
   if (! _bfd_generic_verify_endian_match (ibfd, obfd))
-    return false;
+    return FALSE;
 
   if (   bfd_get_flavour (ibfd) != bfd_target_elf_flavour
       || bfd_get_flavour (obfd) != bfd_target_elf_flavour)
-    return true;
+    return TRUE;
 
   new_flags = elf_elfheader (ibfd)->e_flags;
   old_flags = elf_elfheader (obfd)->e_flags;
 
   if (! elf_flags_init (obfd))	/* First call, no flags set */
     {
-      elf_flags_init (obfd) = true;
+      elf_flags_init (obfd) = TRUE;
       elf_elfheader (obfd)->e_flags = new_flags;
     }
   else if (new_flags == old_flags)	/* Compatible flags are ok */
@@ -333,7 +332,7 @@ mcore_elf_merge_private_bfd_data (ibfd, obfd)
       /* FIXME */
     }
 
-  return true;
+  return TRUE;
 }
 
 /* Don't pretend we can deal with unsupported relocs.  */
@@ -351,8 +350,8 @@ mcore_elf_unsupported_reloc (abfd, reloc_entry, symbol, data, input_section,
 {
   BFD_ASSERT (reloc_entry->howto != (reloc_howto_type *)0);
 
-  _bfd_error_handler (_("%s: Relocation %s (%d) is not currently supported.\n"),
-		      bfd_archive_filename (abfd),
+  _bfd_error_handler (_("%B: Relocation %s (%d) is not currently supported.\n"),
+		      abfd,
 		      reloc_entry->howto->name,
 		      reloc_entry->howto->type);
 
@@ -368,7 +367,7 @@ mcore_elf_unsupported_reloc (abfd, reloc_entry, symbol, data, input_section,
 
    This function is responsible for adjust the section contents as
    necessary, and (if using Rela relocs and generating a
-   relocateable output file) adjusting the reloc addend as
+   relocatable output file) adjusting the reloc addend as
    necessary.
 
    This function does not have to worry about setting the reloc
@@ -382,15 +381,15 @@ mcore_elf_unsupported_reloc (abfd, reloc_entry, symbol, data, input_section,
    The global hash table entry for the global symbols can be found
    via elf_sym_hashes (input_bfd).
 
-   When generating relocateable output, this function must handle
+   When generating relocatable output, this function must handle
    STB_LOCAL/STT_SECTION symbols specially.  The output symbol is
    going to be the section symbol corresponding to the output
    section, which means that the addend must be adjusted
    accordingly.  */
 
-static boolean
+static bfd_boolean
 mcore_elf_relocate_section (output_bfd, info, input_bfd, input_section,
-			  contents, relocs, local_syms, local_sections)
+			    contents, relocs, local_syms, local_sections)
      bfd * output_bfd;
      struct bfd_link_info * info;
      bfd * input_bfd;
@@ -400,23 +399,23 @@ mcore_elf_relocate_section (output_bfd, info, input_bfd, input_section,
      Elf_Internal_Sym * local_syms;
      asection ** local_sections;
 {
-  Elf_Internal_Shdr *           symtab_hdr = & elf_tdata (input_bfd)->symtab_hdr;
+  Elf_Internal_Shdr * symtab_hdr = & elf_tdata (input_bfd)->symtab_hdr;
   struct elf_link_hash_entry ** sym_hashes = elf_sym_hashes (input_bfd);
-  Elf_Internal_Rela *           rel = relocs;
-  Elf_Internal_Rela *           relend = relocs + input_section->reloc_count;
-  boolean ret = true;
+  Elf_Internal_Rela * rel = relocs;
+  Elf_Internal_Rela * relend = relocs + input_section->reloc_count;
+  bfd_boolean ret = TRUE;
 
 #ifdef DEBUG
-  fprintf (stderr,
-	   "mcore_elf_relocate_section called for %s section %s, %ld relocations%s\n",
-	   bfd_archive_filename (input_bfd),
-	   bfd_section_name(input_bfd, input_section),
-	   (long) input_section->reloc_count,
-	   (info->relocateable) ? " (relocatable)" : "");
+  _bfd_error_handler
+    ("mcore_elf_relocate_section called for %B section %A, %ld relocations%s",
+     input_bfd,
+     input_section,
+     (long) input_section->reloc_count,
+     (info->relocatable) ? " (relocatable)" : "");
 #endif
 
-  if (info->relocateable)
-    return true;
+  if (info->relocatable)
+    return TRUE;
 
   if (! mcore_elf_howto_table [R_MCORE_PCRELIMM8BY4])	/* Initialize howto table if needed */
     mcore_elf_howto_init ();
@@ -439,12 +438,11 @@ mcore_elf_relocate_section (output_bfd, info, input_bfd, input_section,
       if ((unsigned) r_type >= (unsigned) R_MCORE_max
 	  || ! mcore_elf_howto_table [(int)r_type])
 	{
-	  _bfd_error_handler (_("%s: Unknown relocation type %d\n"),
-			      bfd_archive_filename (input_bfd),
-			      (int) r_type);
+	  _bfd_error_handler (_("%B: Unknown relocation type %d\n"),
+			      input_bfd, (int) r_type);
 
 	  bfd_set_error (bfd_error_bad_value);
-	  ret = false;
+	  ret = FALSE;
 	  continue;
 	}
 
@@ -454,13 +452,13 @@ mcore_elf_relocate_section (output_bfd, info, input_bfd, input_section,
       /* Complain about known relocation that are not yet supported.  */
       if (howto->special_function == mcore_elf_unsupported_reloc)
 	{
-	  _bfd_error_handler (_("%s: Relocation %s (%d) is not currently supported.\n"),
-			      bfd_archive_filename (input_bfd),
+	  _bfd_error_handler (_("%B: Relocation %s (%d) is not currently supported.\n"),
+			      input_bfd,
 			      howto->name,
 			      (int)r_type);
 
 	  bfd_set_error (bfd_error_bad_value);
-	  ret = false;
+	  ret = FALSE;
 	  continue;
 	}
 
@@ -468,35 +466,17 @@ mcore_elf_relocate_section (output_bfd, info, input_bfd, input_section,
 	{
 	  sym = local_syms + r_symndx;
 	  sec = local_sections [r_symndx];
-	  relocation = _bfd_elf_rela_local_sym (output_bfd, sym, sec, rel);
+	  relocation = _bfd_elf_rela_local_sym (output_bfd, sym, &sec, rel);
 	  addend = rel->r_addend;
 	}
       else
 	{
-	  h = sym_hashes [r_symndx - symtab_hdr->sh_info];
-	  if (   h->root.type == bfd_link_hash_defined
-	      || h->root.type == bfd_link_hash_defweak)
-	    {
-	      sec = h->root.u.def.section;
-	      relocation = (h->root.u.def.value
-			    + sec->output_section->vma
-			    + sec->output_offset);
-	    }
-	  else if (h->root.type == bfd_link_hash_undefweak)
-	    relocation = 0;
-	  else if (info->shared
-		   && ELF_ST_VISIBILITY (h->other) == STV_DEFAULT)
-	    relocation = 0;
-	  else
-	    {
-	      if (! ((*info->callbacks->undefined_symbol)
-			(info, h->root.root.string, input_bfd,
-		 	 input_section, rel->r_offset, true)))
-		return false;
+	  bfd_boolean unresolved_reloc, warned;
 
-	      ret = false;
-	      continue;
-	    }
+	  RELOC_FOR_GLOBAL_SYMBOL (info, input_bfd, input_section, rel,
+				   r_symndx, symtab_hdr, sym_hashes,
+				   h, sec, relocation,
+				   unresolved_reloc, warned);
 	}
 
       switch (r_type)
@@ -528,7 +508,7 @@ mcore_elf_relocate_section (output_bfd, info, input_bfd, input_section,
 
       if (r != bfd_reloc_ok)
 	{
-	  ret = false;
+	  ret = FALSE;
 
 	  switch (r)
 	    {
@@ -540,7 +520,7 @@ mcore_elf_relocate_section (output_bfd, info, input_bfd, input_section,
 		const char * name;
 
 		if (h != NULL)
-		  name = h->root.root.string;
+		  name = NULL;
 		else
 		  {
 		    name = bfd_elf_string_from_elf_section
@@ -554,8 +534,8 @@ mcore_elf_relocate_section (output_bfd, info, input_bfd, input_section,
 		  }
 
 		(*info->callbacks->reloc_overflow)
-		  (info, name, howto->name, (bfd_vma) 0, input_bfd, input_section,
-		   offset);
+		  (info, (h ? &h->root : NULL), name, howto->name,
+		   (bfd_vma) 0, input_bfd, input_section, offset);
 	      }
 	      break;
 	    }
@@ -611,35 +591,35 @@ mcore_elf_gc_mark_hook (sec, info, rel, h, sym)
 
 /* Update the got entry reference counts for the section being removed.  */
 
-static boolean
+static bfd_boolean
 mcore_elf_gc_sweep_hook (abfd, info, sec, relocs)
-     bfd *                     abfd ATTRIBUTE_UNUSED;
-     struct bfd_link_info *    info ATTRIBUTE_UNUSED;
-     asection *                sec ATTRIBUTE_UNUSED;
+     bfd * abfd ATTRIBUTE_UNUSED;
+     struct bfd_link_info * info ATTRIBUTE_UNUSED;
+     asection * sec ATTRIBUTE_UNUSED;
      const Elf_Internal_Rela * relocs ATTRIBUTE_UNUSED;
 {
-  return true;
+  return TRUE;
 }
 
 /* Look through the relocs for a section during the first phase.
    Since we don't do .gots or .plts, we just need to consider the
    virtual table relocs for gc.  */
 
-static boolean
+static bfd_boolean
 mcore_elf_check_relocs (abfd, info, sec, relocs)
      bfd * abfd;
      struct bfd_link_info * info;
      asection * sec;
      const Elf_Internal_Rela * relocs;
 {
-  Elf_Internal_Shdr *           symtab_hdr;
+  Elf_Internal_Shdr * symtab_hdr;
   struct elf_link_hash_entry ** sym_hashes;
   struct elf_link_hash_entry ** sym_hashes_end;
-  const Elf_Internal_Rela *     rel;
-  const Elf_Internal_Rela *     rel_end;
+  const Elf_Internal_Rela * rel;
+  const Elf_Internal_Rela * rel_end;
 
-  if (info->relocateable)
-    return true;
+  if (info->relocatable)
+    return TRUE;
 
   symtab_hdr = & elf_tdata (abfd)->symtab_hdr;
   sym_hashes = elf_sym_hashes (abfd);
@@ -666,21 +646,28 @@ mcore_elf_check_relocs (abfd, info, sec, relocs)
         /* This relocation describes the C++ object vtable hierarchy.
            Reconstruct it for later use during GC.  */
         case R_MCORE_GNU_VTINHERIT:
-          if (!_bfd_elf32_gc_record_vtinherit (abfd, sec, h, rel->r_offset))
-            return false;
+          if (!bfd_elf_gc_record_vtinherit (abfd, sec, h, rel->r_offset))
+            return FALSE;
           break;
 
         /* This relocation describes which C++ vtable entries are actually
            used.  Record for later use during GC.  */
         case R_MCORE_GNU_VTENTRY:
-          if (!_bfd_elf32_gc_record_vtentry (abfd, sec, h, rel->r_addend))
-            return false;
+          if (!bfd_elf_gc_record_vtentry (abfd, sec, h, rel->r_addend))
+            return FALSE;
           break;
         }
     }
 
-  return true;
+  return TRUE;
 }
+
+static struct bfd_elf_special_section const mcore_elf_special_sections[]=
+{
+  { ".ctors",   6, -2, SHT_PROGBITS, SHF_ALLOC + SHF_WRITE },
+  { ".dtors",   6, -2, SHT_PROGBITS, SHF_ALLOC + SHF_WRITE },
+  { NULL,       0,  0, 0,            0 }
+};
 
 #define TARGET_BIG_SYM		bfd_elf32_mcore_big_vec
 #define TARGET_BIG_NAME		"elf32-mcore-big"
@@ -700,6 +687,7 @@ mcore_elf_check_relocs (abfd, info, sec, relocs)
 #define elf_backend_gc_mark_hook		mcore_elf_gc_mark_hook
 #define elf_backend_gc_sweep_hook		mcore_elf_gc_sweep_hook
 #define elf_backend_check_relocs                mcore_elf_check_relocs
+#define elf_backend_special_sections		mcore_elf_special_sections
 
 #define elf_backend_can_gc_sections		1
 #define elf_backend_rela_normal			1

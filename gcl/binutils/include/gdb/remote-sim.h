@@ -1,6 +1,7 @@
 /* This file defines the interface between the simulator and gdb.
-   Copyright 1993, 1994, 1996, 1997, 1998, 2000
-   Free Software Foundation, Inc.
+
+   Copyright 1993, 1994, 1996, 1997, 1998, 2000, 2002 Free Software
+   Foundation, Inc.
 
 This file is part of GDB.
 
@@ -57,16 +58,13 @@ typedef enum {
 
 typedef enum {
   SIM_RC_FAIL = 0,
-  SIM_RC_OK = 1,
-  SIM_RC_UNKNOWN_BREAKPOINT = 2,
-  SIM_RC_INSUFFICIENT_RESOURCES = 3,
-  SIM_RC_DUPLICATE_BREAKPOINT = 4
+  SIM_RC_OK = 1
 } SIM_RC;
 
 
 /* The bfd struct, as an opaque type.  */
 
-struct _bfd;
+struct bfd;
 
 
 /* Main simulator entry points.  */
@@ -107,7 +105,7 @@ struct _bfd;
    sim_create_inferior.  FIXME: What should the state of the simulator
    be? */
 
-SIM_DESC sim_open PARAMS ((SIM_OPEN_KIND kind, struct host_callback_struct *callback, struct _bfd *abfd, char **argv));
+SIM_DESC sim_open PARAMS ((SIM_OPEN_KIND kind, struct host_callback_struct *callback, struct bfd *abfd, char **argv));
 
 
 /* Destory a simulator instance.
@@ -144,7 +142,7 @@ void sim_close PARAMS ((SIM_DESC sd, int quitting));
    Such manipulation should probably (?) occure in
    sim_create_inferior. */
 
-SIM_RC sim_load PARAMS ((SIM_DESC sd, char *prog, struct _bfd *abfd, int from_tty));
+SIM_RC sim_load PARAMS ((SIM_DESC sd, char *prog, struct bfd *abfd, int from_tty));
 
 
 /* Prepare to run the simulated program.
@@ -164,7 +162,7 @@ SIM_RC sim_load PARAMS ((SIM_DESC sd, char *prog, struct _bfd *abfd, int from_tt
    address space (according to the applicable ABI) and the program
    counter and stack pointer set accordingly. */
 
-SIM_RC sim_create_inferior PARAMS ((SIM_DESC sd, struct _bfd *abfd, char **argv, char **env));
+SIM_RC sim_create_inferior PARAMS ((SIM_DESC sd, struct bfd *abfd, char **argv, char **env));
 
 
 /* Fetch LENGTH bytes of the simulated program's memory.  Start fetch
@@ -276,76 +274,6 @@ void sim_stop_reason PARAMS ((SIM_DESC sd, enum sim_stop *reason, int *sigrc));
    or empty CMD. */
 
 void sim_do_command PARAMS ((SIM_DESC sd, char *cmd));
-
-/* Call these functions to set and clear breakpoints at ADDR. */
-
-SIM_RC sim_set_breakpoint PARAMS ((SIM_DESC sd, SIM_ADDR addr));
-SIM_RC sim_clear_breakpoint PARAMS ((SIM_DESC sd, SIM_ADDR addr));
-SIM_RC sim_clear_all_breakpoints PARAMS ((SIM_DESC sd));
-
-/* These functions are used to enable and disable breakpoints. */
-
-SIM_RC sim_enable_breakpoint PARAMS ((SIM_DESC sd, SIM_ADDR addr));
-SIM_RC sim_disable_breakpoint PARAMS ((SIM_DESC sd, SIM_ADDR addr));
-SIM_RC sim_enable_all_breakpoints PARAMS ((SIM_DESC sd));
-SIM_RC sim_disable_all_breakpoints PARAMS ((SIM_DESC sd));
-
-
-/* Provide simulator with a default (global) host_callback_struct.
-   THIS PROCEDURE IS DEPRECIATED.
-   GDB and NRUN do not use this interface.
-   This procedure does not take a SIM_DESC argument as it is
-   used before sim_open. */
-
-void sim_set_callbacks PARAMS ((struct host_callback_struct *));
-
-
-/* Set the size of the simulator memory array.
-   THIS PROCEDURE IS DEPRECIATED.
-   GDB and NRUN do not use this interface.
-   This procedure does not take a SIM_DESC argument as it is
-   used before sim_open. */
-
-void sim_size PARAMS ((int i));
-
-
-/* Single-step simulator with tracing enabled.
-   THIS PROCEDURE IS DEPRECIATED.
-   THIS PROCEDURE IS EVEN MORE DEPRECATED THAN SIM_SET_TRACE
-   GDB and NRUN do not use this interface.
-   This procedure returns: ``0'' indicating that the simulator should
-   be continued using sim_trace() calls; ``1'' indicating that the
-   simulation has finished. */
-
-int sim_trace PARAMS ((SIM_DESC sd));
-
-
-/* Enable tracing.
-   THIS PROCEDURE IS DEPRECIATED.
-   GDB and NRUN do not use this interface.
-   This procedure returns: ``0'' indicating that the simulator should
-   be continued using sim_trace() calls; ``1'' indicating that the
-   simulation has finished. */
-
-void sim_set_trace PARAMS ((void));
-
-
-/* Configure the size of the profile buffer.
-   THIS PROCEDURE IS DEPRECIATED.
-   GDB and NRUN do not use this interface.
-   This procedure does not take a SIM_DESC argument as it is
-   used before sim_open. */
-
-void sim_set_profile_size PARAMS ((int n));
-
-
-/* Kill the running program.
-   THIS PROCEDURE IS DEPRECIATED.
-   GDB and NRUN do not use this interface.
-   This procedure will be replaced as part of the introduction of
-   multi-cpu simulators. */
-
-void sim_kill PARAMS ((SIM_DESC sd));
 
 #ifdef __cplusplus
 }

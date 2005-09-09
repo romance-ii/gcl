@@ -1,5 +1,5 @@
 /* ix86 ELF support for BFD.
-   Copyright 1998, 1999, 2000 Free Software Foundation, Inc.
+   Copyright 1998, 1999, 2000, 2002, 2004 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -36,7 +36,10 @@ START_RELOC_NUMBERS (elf_i386_reloc_type)
      RELOC_NUMBER (R_386_GOTPC,    10)	/* 32 bit PC relative offset to GOT */
      RELOC_NUMBER (R_386_32PLT,    11)	/* Used by Sun */
      FAKE_RELOC   (FIRST_INVALID_RELOC, 12)
-     FAKE_RELOC   (LAST_INVALID_RELOC,  16)
+     FAKE_RELOC   (LAST_INVALID_RELOC,  13)
+     RELOC_NUMBER (R_386_TLS_TPOFF,14)
+     RELOC_NUMBER (R_386_TLS_IE,   15)
+     RELOC_NUMBER (R_386_TLS_GOTIE,16)
      RELOC_NUMBER (R_386_TLS_LE,   17)
      RELOC_NUMBER (R_386_TLS_GD,   18)
      RELOC_NUMBER (R_386_TLS_LDM,  19)
@@ -58,6 +61,9 @@ START_RELOC_NUMBERS (elf_i386_reloc_type)
      RELOC_NUMBER (R_386_TLS_DTPMOD32, 35)
      RELOC_NUMBER (R_386_TLS_DTPOFF32, 36)
      RELOC_NUMBER (R_386_TLS_TPOFF32,  37)
+
+     /* Used by Intel.  */
+     RELOC_NUMBER (R_386_USED_BY_INTEL_200, 200)
 
      /* These are GNU extensions to enable C++ vtable garbage collection.  */
      RELOC_NUMBER (R_386_GNU_VTINHERIT, 250)

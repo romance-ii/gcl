@@ -1,0 +1,41 @@
+#! /bin/sh -e
+## 120_mips_xgot_multigot_workaround.dpatch
+##
+## DP: Description: Make multigot/xgot handling mutually exclusive.
+## DP: Author: Thiemo Seufer <seufer@csv.ica.uni-stuttgart.de>
+## DP: Upstream status: Not submitted
+## DP: Date: 2004-09-17
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+diff -urNad binutils-2.16/bfd/elfxx-mips.c /tmp/dpep.y4Hdz5/binutils-2.16/bfd/elfxx-mips.c
+--- binutils-2.16/bfd/elfxx-mips.c	2005-05-09 15:31:30.272554473 +0200
++++ /tmp/dpep.y4Hdz5/binutils-2.16/bfd/elfxx-mips.c	2005-05-09 15:31:30.871374791 +0200
+@@ -6595,7 +6595,9 @@
+ 
+   if (s->size > MIPS_ELF_GOT_MAX_SIZE (output_bfd))
+     {
+-      if (! mips_elf_multi_got (output_bfd, info, g, s, local_gotno))
++      if (! mips_elf_multi_got (output_bfd, info, g, s, local_gotno)
++	  && g->global_gotno <= (MIPS_ELF_GOT_MAX_SIZE (output_bfd)
++				 / MIPS_ELF_GOT_SIZE (output_bfd)))
+ 	return FALSE;
+     }
+   else

@@ -1,5 +1,5 @@
 /* SH ELF support for BFD.
-   Copyright 1998, 2000, 2001, 2002 Free Software Foundation, Inc.
+   Copyright 1998, 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -27,28 +27,63 @@
 #define EF_SH1		   1
 #define EF_SH2		   2
 #define EF_SH3		   3
-#define EF_SH_HAS_DSP(flags) ((flags) & 4)
 #define EF_SH_DSP	   4
 #define EF_SH3_DSP	   5
-#define EF_SH_HAS_FP(flags) ((flags) & 8)
+#define EF_SH4AL_DSP	   6
 #define EF_SH3E		   8
 #define EF_SH4		   9
+#define EF_SH2E            11
+#define EF_SH4A		   12
+#define EF_SH2A            13
+
+#define EF_SH4_NOFPU	   16
+#define EF_SH4A_NOFPU	   17
+#define EF_SH4_NOMMU_NOFPU 18
+#define EF_SH2A_NOFPU      19
+#define EF_SH3_NOMMU       20
+
+#define EF_SH2A_SH4_NOFPU  21
+#define EF_SH2A_SH3_NOFPU  22
+#define EF_SH2A_SH4        23
+#define EF_SH2A_SH3E       24
 
 /* This one can only mix in objects from other EF_SH5 objects.  */
 #define EF_SH5		  10
 
-#define EF_SH_MERGE_MACH(mach1, mach2) \
-  (((((mach1) == EF_SH3 || (mach1) == EF_SH_UNKNOWN) && (mach2) == EF_SH_DSP) \
-    || ((mach1) == EF_SH_DSP \
-	&& ((mach2) == EF_SH3 || (mach2) == EF_SH_UNKNOWN))) \
-   ? EF_SH3_DSP \
-   : (((mach1) < EF_SH3 && (mach2) == EF_SH_UNKNOWN) \
-      || ((mach2) < EF_SH3 && (mach1) == EF_SH_UNKNOWN)) \
-   ? EF_SH3 \
-   : (((mach1) == EF_SH3E && (mach2) == EF_SH_UNKNOWN) \
-      || ((mach2) == EF_SH3E && (mach1) == EF_SH_UNKNOWN)) \
-   ? EF_SH4 \
-   : ((mach1) > (mach2) ? (mach1) : (mach2)))
+/* Define the mapping from ELF to bfd mach numbers.
+   bfd_mach_* are defined in bfd_in2.h (generated from
+   archures.c).  */
+#define EF_SH_BFD_TABLE \
+/* EF_SH_UNKNOWN	*/ bfd_mach_sh3		, \
+/* EF_SH1		*/ bfd_mach_sh		, \
+/* EF_SH2		*/ bfd_mach_sh2		, \
+/* EF_SH3		*/ bfd_mach_sh3		, \
+/* EF_SH_DSP		*/ bfd_mach_sh_dsp	, \
+/* EF_SH3_DSP		*/ bfd_mach_sh3_dsp	, \
+/* EF_SHAL_DSP		*/ bfd_mach_sh4al_dsp	, \
+/* 7			*/ 0, \
+/* EF_SH3E		*/ bfd_mach_sh3e	, \
+/* EF_SH4		*/ bfd_mach_sh4		, \
+/* EF_SH5		*/ 0, \
+/* EF_SH2E		*/ bfd_mach_sh2e	, \
+/* EF_SH4A		*/ bfd_mach_sh4a	, \
+/* EF_SH2A		*/ bfd_mach_sh2a        , \
+/* 14, 15		*/ 0, 0, \
+/* EF_SH4_NOFPU		*/ bfd_mach_sh4_nofpu	, \
+/* EF_SH4A_NOFPU	*/ bfd_mach_sh4a_nofpu	, \
+/* EF_SH4_NOMMU_NOFPU	*/ bfd_mach_sh4_nommu_nofpu, \
+/* EF_SH2A_NOFPU	*/ bfd_mach_sh2a_nofpu  , \
+/* EF_SH3_NOMMU		*/ bfd_mach_sh3_nommu   , \
+/* EF_SH2A_SH4_NOFPU    */ bfd_mach_sh2a_nofpu_or_sh4_nommu_nofpu, \
+/* EF_SH2A_SH3_NOFPU    */ bfd_mach_sh2a_nofpu_or_sh3_nommu, \
+/* EF_SH2A_SH4          */ bfd_mach_sh2a_or_sh4 , \
+/* EF_SH2A_SH3E         */ bfd_mach_sh2a_or_sh3e
+
+/* Convert arch_sh* into EF_SH*.  */
+int sh_find_elf_flags (unsigned int arch_set);
+
+/* Convert bfd_mach_* into EF_SH*.  */
+int sh_elf_get_flags_from_mach (unsigned long mach);
 
 /* Flags for the st_other symbol field.
    Keep away from the STV_ visibility flags (bit 0..1).  */
@@ -71,66 +106,11 @@
    symbols).  */
 #define STT_DATALABEL STT_LOPROC
 
-#define SH64_CRANGES_SECTION_NAME ".cranges"
-enum sh64_elf_cr_type {
-  CRT_NONE = 0,
-  CRT_DATA = 1,
-  CRT_SH5_ISA16 = 2,
-  CRT_SH5_ISA32 = 3
-};
-
-/* The official definition is this:
-
-    typedef struct {
-      Elf32_Addr cr_addr;
-      Elf32_Word cr_size;
-      Elf32_Half cr_type;
-    } Elf32_CRange;
-
-   but we have no use for that exact type.  Instead we use this struct for
-   the internal representation.  */
-typedef struct {
-  bfd_vma cr_addr;
-  bfd_size_type cr_size;
-  enum sh64_elf_cr_type cr_type;
-} sh64_elf_crange;
-
-#define SH64_CRANGE_SIZE (4 + 4 + 2)
-#define SH64_CRANGE_CR_ADDR_OFFSET 0
-#define SH64_CRANGE_CR_SIZE_OFFSET 4
-#define SH64_CRANGE_CR_TYPE_OFFSET (4 + 4)
-
-/* Get the contents type of an arbitrary address, or return CRT_NONE.  */
-extern enum sh64_elf_cr_type sh64_get_contents_type
-  PARAMS ((asection *, bfd_vma, sh64_elf_crange *));
-
-/* Simpler interface.
-   FIXME: This seems redundant now that we export the interface above.  */
-extern boolean sh64_address_is_shmedia PARAMS ((asection *, bfd_vma));
-
-extern int _bfd_sh64_crange_qsort_cmpb PARAMS ((const void *, const void *));
-extern int _bfd_sh64_crange_qsort_cmpl PARAMS ((const void *, const void *));
-extern int _bfd_sh64_crange_bsearch_cmpb PARAMS ((const void *, const void *));
-extern int _bfd_sh64_crange_bsearch_cmpl PARAMS ((const void *, const void *));
-
-/* We put this in elf_section_data (section)->tdata.  */
-struct sh64_section_data
-{
-  flagword contents_flags;
-
-  /* Only used in the cranges section, but we don't have an official
-     backend-specific bfd field.  */
-  bfd_size_type cranges_growth;
-};
-
-#define sh64_elf_section_data(sec) \
-  ((struct sh64_section_data *) ((elf_section_data (sec))->tdata))
-
 #include "elf/reloc-macros.h"
 
 /* Relocations.  */
-/* Relocations 25ff are GNU extensions.
-   25..33 are used for relaxation and use the same constants as COFF uses.  */
+/* Relocations 10-32 and 128-255 are GNU extensions.
+   25..32 and 10 are used for relaxation.  */
 START_RELOC_NUMBERS (elf_sh_reloc_type)
   RELOC_NUMBER (R_SH_NONE, 0)
   RELOC_NUMBER (R_SH_DIR32, 1)
@@ -142,8 +122,16 @@ START_RELOC_NUMBERS (elf_sh_reloc_type)
   RELOC_NUMBER (R_SH_DIR8BP, 7)
   RELOC_NUMBER (R_SH_DIR8W, 8)
   RELOC_NUMBER (R_SH_DIR8L, 9)
-  FAKE_RELOC (R_SH_FIRST_INVALID_RELOC, 10)
-  FAKE_RELOC (R_SH_LAST_INVALID_RELOC, 24)
+
+  RELOC_NUMBER (R_SH_LOOP_START, 10)
+  RELOC_NUMBER (R_SH_LOOP_END, 11)
+
+  FAKE_RELOC (R_SH_FIRST_INVALID_RELOC, 12)
+  FAKE_RELOC (R_SH_LAST_INVALID_RELOC, 21)
+
+  RELOC_NUMBER (R_SH_GNU_VTINHERIT, 22)
+  RELOC_NUMBER (R_SH_GNU_VTENTRY, 23)
+  RELOC_NUMBER (R_SH_SWITCH8, 24)
   RELOC_NUMBER (R_SH_SWITCH16, 25)
   RELOC_NUMBER (R_SH_SWITCH32, 26)
   RELOC_NUMBER (R_SH_USES, 27)
@@ -152,13 +140,19 @@ START_RELOC_NUMBERS (elf_sh_reloc_type)
   RELOC_NUMBER (R_SH_CODE, 30)
   RELOC_NUMBER (R_SH_DATA, 31)
   RELOC_NUMBER (R_SH_LABEL, 32)
-  RELOC_NUMBER (R_SH_SWITCH8, 33)
-  RELOC_NUMBER (R_SH_GNU_VTINHERIT, 34)
-  RELOC_NUMBER (R_SH_GNU_VTENTRY, 35)
-  RELOC_NUMBER (R_SH_LOOP_START, 36)
-  RELOC_NUMBER (R_SH_LOOP_END, 37)
-  FAKE_RELOC (R_SH_FIRST_INVALID_RELOC_2, 38)
-  FAKE_RELOC (R_SH_LAST_INVALID_RELOC_2, 44)
+
+  RELOC_NUMBER (R_SH_DIR16, 33)
+  RELOC_NUMBER (R_SH_DIR8, 34)
+  RELOC_NUMBER (R_SH_DIR8UL, 35)
+  RELOC_NUMBER (R_SH_DIR8UW, 36)
+  RELOC_NUMBER (R_SH_DIR8U, 37)
+  RELOC_NUMBER (R_SH_DIR8SW, 38)
+  RELOC_NUMBER (R_SH_DIR8S, 39)
+  RELOC_NUMBER (R_SH_DIR4UL, 40)
+  RELOC_NUMBER (R_SH_DIR4UW, 41)
+  RELOC_NUMBER (R_SH_DIR4U, 42)
+  RELOC_NUMBER (R_SH_PSHA, 43)
+  RELOC_NUMBER (R_SH_PSHL, 44)
   RELOC_NUMBER (R_SH_DIR5U, 45)
   RELOC_NUMBER (R_SH_DIR6U, 46)
   RELOC_NUMBER (R_SH_DIR6S, 47)
@@ -166,8 +160,21 @@ START_RELOC_NUMBERS (elf_sh_reloc_type)
   RELOC_NUMBER (R_SH_DIR10SW, 49)
   RELOC_NUMBER (R_SH_DIR10SL, 50)
   RELOC_NUMBER (R_SH_DIR10SQ, 51)
-  FAKE_RELOC (R_SH_FIRST_INVALID_RELOC_3, 52)
-  FAKE_RELOC (R_SH_LAST_INVALID_RELOC_3, 159)
+  FAKE_RELOC (R_SH_FIRST_INVALID_RELOC_2, 52)
+  FAKE_RELOC (R_SH_LAST_INVALID_RELOC_2, 52)
+  RELOC_NUMBER (R_SH_DIR16S, 53)
+  FAKE_RELOC (R_SH_FIRST_INVALID_RELOC_3, 54)
+  FAKE_RELOC (R_SH_LAST_INVALID_RELOC_3, 143)
+  RELOC_NUMBER (R_SH_TLS_GD_32, 144)
+  RELOC_NUMBER (R_SH_TLS_LD_32, 145)
+  RELOC_NUMBER (R_SH_TLS_LDO_32, 146)
+  RELOC_NUMBER (R_SH_TLS_IE_32, 147)
+  RELOC_NUMBER (R_SH_TLS_LE_32, 148)
+  RELOC_NUMBER (R_SH_TLS_DTPMOD32, 149)
+  RELOC_NUMBER (R_SH_TLS_DTPOFF32, 150)
+  RELOC_NUMBER (R_SH_TLS_TPOFF32, 151)
+  FAKE_RELOC (R_SH_FIRST_INVALID_RELOC_4, 152)
+  FAKE_RELOC (R_SH_LAST_INVALID_RELOC_4, 159)
   RELOC_NUMBER (R_SH_GOT32, 160)
   RELOC_NUMBER (R_SH_PLT32, 161)
   RELOC_NUMBER (R_SH_COPY, 162)
@@ -205,8 +212,8 @@ START_RELOC_NUMBERS (elf_sh_reloc_type)
   RELOC_NUMBER (R_SH_GLOB_DAT64, 194)
   RELOC_NUMBER (R_SH_JMP_SLOT64, 195)
   RELOC_NUMBER (R_SH_RELATIVE64, 196)
-  FAKE_RELOC (R_SH_FIRST_INVALID_RELOC_4, 197)
-  FAKE_RELOC (R_SH_LAST_INVALID_RELOC_4, 241)
+  FAKE_RELOC (R_SH_FIRST_INVALID_RELOC_5, 197)
+  FAKE_RELOC (R_SH_LAST_INVALID_RELOC_5, 241)
   RELOC_NUMBER (R_SH_SHMEDIA_CODE, 242)
   RELOC_NUMBER (R_SH_PT_16, 243)
   RELOC_NUMBER (R_SH_IMMS16, 244)

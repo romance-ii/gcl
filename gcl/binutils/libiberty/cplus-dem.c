@@ -1,6 +1,6 @@
 /* Demangler for GNU C++
    Copyright 1989, 1991, 1994, 1995, 1996, 1997, 1998, 1999,
-   2000, 2001 Free Software Foundation, Inc.
+   2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
    Written by James Clark (jjc@jclark.uucp)
    Rewritten by Fred Fish (fnf@cygnus.com) for ARM and Lucid demangling
    Modified by Satish Pai (pai@apollo.hp.com) for HP demangling
@@ -10,6 +10,15 @@ Libiberty is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
 License as published by the Free Software Foundation; either
 version 2 of the License, or (at your option) any later version.
+
+In addition to the permissions in the GNU Library General Public
+License, the Free Software Foundation gives you unlimited permission
+to link the compiled version of this file into combinations with other
+programs, and to distribute those combinations without any restriction
+coming from the use of this file.  (The Library Public License
+restrictions do apply in other respects; for example, they cover
+modification of the file, and distribution when not linked into a
+combined executable.)
 
 Libiberty is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -40,14 +49,6 @@ Boston, MA 02111-1307, USA.  */
 #include <string.h>
 #include <stdio.h>
 
-#if defined(HAVE_DLOPEN) && defined(HAVE_WEAK_SYMBOL) && defined(HAVE_DLFCN_H)
-#include <dlfcn.h>
-
-#pragma weak dlopen
-#pragma weak dlsym
-#pragma weak dlerror
-#endif
-
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #else
@@ -61,9 +62,7 @@ char * realloc ();
 
 #include "libiberty.h"
 
-static char *ada_demangle PARAMS ((const char *, int));
-static int cplus_demangle_name_to_mnemonic
-  PARAMS ((const char *mnemonic));
+static char *ada_demangle  PARAMS ((const char *, int));
 
 #define min(X,Y) (((X) < (Y)) ? (X) : (Y))
 
@@ -247,100 +246,74 @@ typedef enum type_kind_t
   tk_real
 } type_kind_t;
 
-struct demangler_engine libiberty_demanglers[] =
+const struct demangler_engine libiberty_demanglers[] =
 {
   {
     NO_DEMANGLING_STYLE_STRING,
-    DMGL_NO_OPTS,
-    DMGL_NO_OPTS,
-    "Demangling disabled",
-    cplus_demangle_with_style
+    no_demangling,
+    "Demangling disabled"
   }
   ,
   {
     AUTO_DEMANGLING_STYLE_STRING,
-    DMGL_AUTO,
-    DMGL_PARAMS | DMGL_ANSI | DMGL_VERBOSE,
-    "Automatic selection based on executable",
-    cplus_demangle_with_style
+      auto_demangling,
+      "Automatic selection based on executable"
   }
   ,
   {
     GNU_DEMANGLING_STYLE_STRING,
-    DMGL_GNU,
-    DMGL_PARAMS | DMGL_ANSI | DMGL_VERBOSE,
-    "GNU (g++) style demangling",
-    cplus_demangle_with_style
+      gnu_demangling,
+      "GNU (g++) style demangling"
   }
   ,
   {
     LUCID_DEMANGLING_STYLE_STRING,
-    DMGL_LUCID,
-    DMGL_PARAMS | DMGL_ANSI | DMGL_VERBOSE,
-    "Lucid (lcc) style demangling",
-    cplus_demangle_with_style
+      lucid_demangling,
+      "Lucid (lcc) style demangling"
   }
   ,
   {
     ARM_DEMANGLING_STYLE_STRING,
-    DMGL_ARM,
-    DMGL_PARAMS | DMGL_ANSI | DMGL_VERBOSE,
-    "ANSI style demangling",
-    cplus_demangle_with_style
+      arm_demangling,
+      "ARM style demangling"
   }
   ,
   {
     HP_DEMANGLING_STYLE_STRING,
-    DMGL_HP,
-    DMGL_PARAMS | DMGL_ANSI | DMGL_VERBOSE,
-    "HP (aCC) style demangling",
-    cplus_demangle_with_style
+      hp_demangling,
+      "HP (aCC) style demangling"
   }
   ,
   {
     EDG_DEMANGLING_STYLE_STRING,
-    DMGL_EDG,
-    DMGL_PARAMS | DMGL_ANSI | DMGL_VERBOSE,
-    "EDG style demangling",
-    cplus_demangle_with_style
+      edg_demangling,
+      "EDG style demangling"
   }
   ,
   {
     GNU_V3_DEMANGLING_STYLE_STRING,
-    DMGL_GNU_V3,
-    DMGL_PARAMS | DMGL_ANSI | DMGL_VERBOSE,
-    "GNU (g++) V3 ABI-style demangling",
-    cplus_demangle_with_style
+    gnu_v3_demangling,
+    "GNU (g++) V3 ABI-style demangling"
   }
   ,
   {
     JAVA_DEMANGLING_STYLE_STRING,
-    DMGL_JAVA,
-    DMGL_PARAMS | DMGL_ANSI | DMGL_VERBOSE,
-    "Java style demangling",
-    cplus_demangle_with_style
+    java_demangling,
+    "Java style demangling"
   }
   ,
   {
     GNAT_DEMANGLING_STYLE_STRING,
-    DMGL_GNAT,
-    DMGL_PARAMS | DMGL_ANSI | DMGL_VERBOSE,
-    "GNAT (ada) style demangling",
-    cplus_demangle_with_style,
+    gnat_demangling,
+    "GNAT style demangling"
   }
   ,
   {
-    COMPAQ_DEMANGLING_STYLE_STRING,
-    DMGL_COMPAQ,
-    DMGL_PARAMS | DMGL_ANSI | DMGL_VERBOSE,
-    "Compaq (cxx) style demangling",
-    NULL 
+    NULL, unknown_demangling, NULL
   }
 };
 
 #define STRING_EMPTY(str)	((str) -> b == (str) -> p)
-#define PREPEND_BLANK(str)	{if (!STRING_EMPTY(str)) \
-    string_prepend(str, " ");}
 #define APPEND_BLANK(str)	{if (!STRING_EMPTY(str)) \
     string_append(str, " ");}
 #define LEN_STRING(str)         ( (STRING_EMPTY(str))?0:((str)->p - (str)->b))
@@ -550,7 +523,7 @@ recursively_demangle PARAMS ((struct work_stuff *, const char **, string *,
 			      int));
 
 static void
-grow_vect PARAMS ((void **, size_t *, size_t, int));
+grow_vect PARAMS ((char **, size_t *, size_t, int));
 
 /* Translate count to integer, consuming tokens in the process.
    Conversion terminates on the first non-digit character.
@@ -871,11 +844,14 @@ enum demangling_styles
 cplus_demangle_set_style (style)
      enum demangling_styles style;
 {
-  if (first_demangling <= style && style < unknown_demangling)
-    {
-      current_demangling_style = style;
-      return current_demangling_style;
-    }
+  const struct demangler_engine *demangler = libiberty_demanglers; 
+
+  for (; demangler->demangling_style != unknown_demangling; ++demangler)
+    if (style == demangler->demangling_style)
+      {
+	current_demangling_style = style;
+	return current_demangling_style;
+      }
 
   return unknown_demangling;
 }
@@ -886,14 +862,13 @@ enum demangling_styles
 cplus_demangle_name_to_style (name)
      const char *name;
 {
-  enum demangling_styles i;
+  const struct demangler_engine *demangler = libiberty_demanglers; 
 
-  for (i = 0; i < unknown_demangling; i++)
-    if (strcasecmp (libiberty_demanglers [i].demangling_style_name,
-		    name) == 0)
-      break;
+  for (; demangler->demangling_style != unknown_demangling; ++demangler)
+    if (strcmp (name, demangler->demangling_style_name) == 0)
+      return demangler->demangling_style;
 
-  return i;
+  return unknown_demangling;
 }
 
 /* char *cplus_demangle (const char *mangled, int options)
@@ -925,47 +900,44 @@ cplus_demangle_name_to_style (name)
    MANGLED.  */
 
 char *
-cplus_demangle_with_style (mangled, style, options)
+cplus_demangle (mangled, options)
      const char *mangled;
-     enum demangling_styles style;
      int options;
 {
   char *ret;
   struct work_stuff work[1];
 
-  if (style == no_demangling)
+  if (current_demangling_style == no_demangling)
     return xstrdup (mangled);
 
   memset ((char *) work, 0, sizeof (work));
   work->options = options;
   if ((work->options & DMGL_STYLE_MASK) == 0)
-    work->options |= libiberty_demanglers [style].demangling_style
-		     & DMGL_STYLE_MASK;
+    work->options |= (int) current_demangling_style & DMGL_STYLE_MASK;
 
   /* The V3 ABI demangling is implemented elsewhere.  */
-  if (libiberty_demanglers [style].demangling_style
-      & (DMGL_GNU_V3 | DMGL_AUTO))
+  if (GNU_V3_DEMANGLING || AUTO_DEMANGLING)
     {
       ret = cplus_demangle_v3 (mangled, work->options);
-      if (ret || (libiberty_demanglers [style].demangling_style
-		  & DMGL_GNU_V3))
+      if (ret || GNU_V3_DEMANGLING)
 	return ret;
     }
 
-  if (libiberty_demanglers [style].demangling_style & DMGL_JAVA)
+  if (JAVA_DEMANGLING)
     {
       ret = java_demangle_v3 (mangled);
       if (ret)
-	return ret;
+        return ret;
     }
 
-  if (libiberty_demanglers [style].demangling_style & DMGL_GNAT)
-    return ada_demangle (mangled, options);
+  if (GNAT_DEMANGLING)
+    return ada_demangle(mangled,options);
 
   ret = internal_cplus_demangle (work, mangled);
   squangle_mop_up (work);
   return (ret);
 }
+
 
 /* Assuming *OLD_VECT points to an array of *SIZE objects of size
    ELEMENT_SIZE, grow it to contain at least MIN_SIZE objects,
@@ -973,7 +945,7 @@ cplus_demangle_with_style (mangled, style, options)
 
 static void
 grow_vect (old_vect, size, min_size, element_size)
-     void **old_vect;
+     char **old_vect;
      size_t *size;
      size_t min_size;
      int element_size;
@@ -983,7 +955,7 @@ grow_vect (old_vect, size, min_size, element_size)
       *size *= 2;
       if (*size < min_size)
 	*size = min_size;
-      *old_vect = xrealloc (*old_vect, *size * element_size);
+      *old_vect = (void *) xrealloc (*old_vect, *size * element_size);
     }
 }
 
@@ -1004,10 +976,8 @@ ada_demangle (mangled, option)
   int len0;
   const char* p;
   char *demangled = NULL;
-  int at_start_name;
   int changed;
-  char *demangling_buffer = NULL;
-  size_t demangling_buffer_size = 0;
+  size_t demangled_size = 0;
   
   changed = 0;
 
@@ -1035,10 +1005,9 @@ ada_demangle (mangled, option)
     }
   
   /* Make demangled big enough for possible expansion by operator name.  */
-  grow_vect ((void **) &(demangling_buffer),
-	     &demangling_buffer_size,  2 * len0 + 1,
+  grow_vect (&demangled,
+	     &demangled_size,  2 * len0 + 1,
 	     sizeof (char));
-  demangled = demangling_buffer;
   
   if (ISDIGIT ((unsigned char) mangled[len0 - 1])) {
     for (i = len0 - 2; i >= 0 && ISDIGIT ((unsigned char) mangled[i]); i -= 1)
@@ -1059,15 +1028,12 @@ ada_demangle (mangled, option)
        i += 1, j += 1)
     demangled[j] = mangled[i];
   
-  at_start_name = 1;
   while (i < len0)
     {
-      at_start_name = 0;
-      
       if (i < len0 - 2 && mangled[i] == '_' && mangled[i + 1] == '_')
 	{
 	  demangled[j] = '.';
-	  changed = at_start_name = 1;
+	  changed = 1;
 	  i += 2; j += 1;
 	}
       else
@@ -1088,10 +1054,10 @@ ada_demangle (mangled, option)
     return demangled;
   
  Suppress:
-  grow_vect ((void **) &(demangling_buffer),
-	     &demangling_buffer_size,  strlen (mangled) + 3,
+  grow_vect (&demangled,
+	     &demangled_size,  strlen (mangled) + 3,
 	     sizeof (char));
-  demangled = demangling_buffer;
+
   if (mangled[0] == '<')
      strcpy (demangled, mangled);
   else
@@ -1100,195 +1066,10 @@ ada_demangle (mangled, option)
   return demangled;
 }
 
-char *
-cplus_demangle (mangled, options)
-     const char *mangled;
-     int options;
-{
-  return cplus_demangle_with_style (mangled, current_demangling_style,
-  				    options);
-}
-
-static int
-cplus_demangle_name_to_mnemonic (mnemonic)
-     const char *mnemonic;
-{
-  enum demangling_styles i;
-
-  for (i = 0; i < unknown_demangling; i++)
-    if (strcasecmp (libiberty_demanglers [i].demangling_style_name,
-		    mnemonic) == 0)
-      break;
-
-  if (i != unknown_demangling)
-    return libiberty_demanglers [i].demangling_style;
-  else
-    {
-      if (strncasecmp (mnemonic, "PARAMS", sizeof ("PARAMS") - 1) == 0)
-	return DMGL_PARAMS;
-      else 
-	return DMGL_NO_OPTS;
-    }
-}
-
-int
-init_demangler (style, options, demangler)
-     const char *style;
-     const char *options;
-     const char *demangler;
-{
-#if defined(HAVE_DLOPEN) && defined(HAVE_WEAK_SYMBOL) && defined(HAVE_DLFCN_H)
-  char *dso = NULL;
-  char *function = NULL;
-  demangle_function df;
-#endif
-
-  /* Initialize demangler_list_buffer. */
-  (void) get_demangler_list ();
-
-  if (style != NULL)
-    {
-      current_demangling_style = cplus_demangle_name_to_style (style);
-      if (current_demangling_style == unknown_demangling)
-	{
-	  fprintf (stderr, "init_demangler: unknown demangling style `%s'\n",
-		   style);
-	  exit (1);
-	}
-    }
-
-  if (options != NULL)
-    {
-      const char *cp;
-      int demangler_options = 0;
-
-      for (cp = options; *cp; )
-	{
-	  if (*cp == ';')
-	    cp++;
-	  demangler_options |= cplus_demangle_name_to_mnemonic (cp);
-	  while (*cp && *cp != ':')
-	    cp++;
-	}
-
-      libiberty_demanglers [current_demangling_style].demangling_options
-	= demangler_options;
-    }
-
-#if defined(HAVE_DLOPEN) && defined(HAVE_WEAK_SYMBOL) && defined(HAVE_DLFCN_H)
-  if (demangler)
-    {
-      dso = alloca (strlen (demangler) + 1);
-      strcpy (dso, demangler);
-      function = strchr (dso, ':');
-      if (!function)
-	{
-	  fprintf (stderr, "init_demangler: invalid `dso:function': `%s'\n",
-		   demangler);
-	  exit (1);
-	}
-      *function = '\0';
-      function++;
-    }
-
-  if (current_demangling_style == compaq_demangling)
-    {
-      if (dso == NULL || *dso == '\0')
-        dso = "libcompaq_demangle.so";
-      if (function == NULL)
-        function = "libiberty_demangle_string";
-    }
-
-  if (dso && function)
-    {
-      void *handle;
-
-#ifndef __linux__
-      if (&dlopen == NULL || &dlsym == NULL || &dlerror == NULL)
-	{
-	  fprintf (stderr, "init_demangler: dynamic linking is unsupported\n");
-	  exit (1);
-	}
-#endif
-
-      handle = dlopen (dso, RTLD_LAZY);
-      if (handle == NULL)
-	{
-	  fprintf(stderr, "init_demangler: %s\n", dlerror ());
-	  exit (1);
-	}
-
-      df = (demangle_function) dlsym (handle, function);
-      if (df == NULL)
-	{
-	  fprintf(stderr, "init_demangler: %s\n", dlerror ());
-	  exit (1);
-	}
-
-      libiberty_demanglers [current_demangling_style].df = df;
-    }
-#endif
-
-  return 0;
-}
-
-char *
-demangle_symbol (mangled)
-     const char *mangled;
-{
-  return demangle_symbol_with_style (mangled,
-  				     current_demangling_style);
-}
-
-char *
-demangle_symbol_with_style (mangled, style)
-     const char *mangled;
-     enum demangling_styles style;
-{
-  return demangle_symbol_with_style_options
-	  (mangled, style,
-	   libiberty_demanglers [style].demangling_options);
-}
-
-char *
-demangle_symbol_with_options (mangled, options)
-     const char *mangled;
-     int options;
-{
-  return demangle_symbol_with_style_options
-	  (mangled, current_demangling_style, options);
-}
-
-char *
-demangle_symbol_with_style_options (mangled, style, options)
-     const char *mangled;
-     enum demangling_styles style;
-     int options;
-{
-  switch (style)
-    {
-    case compaq_demangling:
-      if (libiberty_demanglers [style].df == NULL)
-	{
-#if defined(HAVE_DLOPEN) && defined(HAVE_WEAK_SYMBOL) && defined(HAVE_DLFCN_H)
-	  init_demangler ("compaq", NULL, NULL);
-#else
-	  fprintf (stderr, "demangle_symbol_with_style_options: compaq_demangling is unsupported\n");
-	  exit (1);
-#endif
-	}
-      break;
-    default:
-      break;
-    }
-
-  return (*libiberty_demanglers [style].df) (mangled, style, options);
-}
-
 /* This function performs most of what cplus_demangle use to do, but
    to be able to demangle a name with a B, K or n code, we need to
    have a longer term memory of what types have been seen. The original
-   now intializes and cleans up the squangle code info, while internal
+   now initializes and cleans up the squangle code info, while internal
    calls go directly to this routine to avoid resetting that info. */
 
 static char *
@@ -1428,7 +1209,7 @@ work_stuff_copy_to_from (to, from)
 
   if (from->ntmpl_args)
     to->tmpl_argvec
-      = xmalloc (from->ntmpl_args * sizeof (to->tmpl_argvec[0]));
+      = (char **) xmalloc (from->ntmpl_args * sizeof (to->tmpl_argvec[0]));
 
   for (i = 0; i < from->ntmpl_args; i++)
     {
@@ -1653,6 +1434,7 @@ demangle_signature (work, mangled, declp)
 	      {
 		string_append (&s, SCOPE_STRING (work));
 		string_prepends (declp, &s);
+		string_delete (&s);
 	      }
 	    oldmangled = NULL;
 	    expect_func = 1;
@@ -1732,7 +1514,6 @@ demangle_signature (work, mangled, declp)
 	    {
 	      /* Read the return type. */
 	      string return_type;
-	      string_init (&return_type);
 
 	      (*mangled)++;
 	      success = do_type (work, mangled, &return_type);
@@ -2012,31 +1793,34 @@ demangle_integral_value (work, mangled, s)
 
       success = 0;
 
-      /* Negative numbers are indicated with a leading `m'.  */
-      if (**mangled == 'm')
-	{
-	  string_appendn (s, "-", 1);
-	  (*mangled)++;
-	}
-      else if (mangled[0][0] == '_' && mangled[0][1] == 'm')
-	{
-	  /* Since consume_count_with_underscores does not handle the
-	     `m'-prefix we must do it here, using consume_count and
-	     adjusting underscores: we have to consume the underscore
-	     matching the prepended one.  */
-	  multidigit_without_leading_underscore = 1;
-	  string_appendn (s, "-", 1);
-	  (*mangled) += 2;
-	}
-      else if (**mangled == '_')
-	{
-	  /* Do not consume a following underscore;
-	     multidigit_without_leading_underscore will consume what should be
-	     consumed.  */
-	  leave_following_underscore = 1;
+      if (**mangled == '_')
+        {
+	  if (mangled[0][1] == 'm')
+	    {
+	      /* Since consume_count_with_underscores does not handle the
+		 `m'-prefix we must do it here, using consume_count and
+		 adjusting underscores: we have to consume the underscore
+		 matching the prepended one.  */
+	      multidigit_without_leading_underscore = 1;
+	      string_appendn (s, "-", 1);
+	      (*mangled) += 2;
+	    }
+	  else
+	    {
+	      /* Do not consume a following underscore;
+	         consume_count_with_underscores will consume what
+	         should be consumed.  */
+	      leave_following_underscore = 1;
+	    }
 	}
       else
 	{
+	  /* Negative numbers are indicated with a leading `m'.  */
+	  if (**mangled == 'm')
+	  {
+	    string_appendn (s, "-", 1);
+	    (*mangled)++;
+	  }
 	  /* Since consume_count_with_underscores does not handle
 	     multi-digit numbers that do not start with an underscore,
 	     and this number can be an integer template parameter,
@@ -2077,7 +1861,7 @@ demangle_integral_value (work, mangled, s)
 	  /* All is well.  */
 	  success = 1;
 	}
-    }
+      }
 
   return success;
 }
@@ -2252,17 +2036,12 @@ demangle_template (work, mangled, tname, trawname, is_type, remember)
   int r;
   int need_comma = 0;
   int success = 0;
-  const char *start;
   int is_java_array = 0;
   string temp;
-  int bindex = 0;
 
   (*mangled)++;
   if (is_type)
     {
-      if (remember)
-	bindex = register_Btype (work);
-      start = *mangled;
       /* get template name */
       if (**mangled == 'z')
 	{
@@ -2438,7 +2217,10 @@ demangle_template (work, mangled, tname, trawname, is_type, remember)
     }
 
   if (is_type && remember)
-    remember_Btype (work, tname->b, LEN_STRING (tname), bindex);
+    {
+      const int bindex = register_Btype (work);
+      remember_Btype (work, tname->b, LEN_STRING (tname), bindex);
+    }
 
   /*
     if (work -> static_type)
@@ -2530,6 +2312,7 @@ demangle_arm_hp_template (work, mangled, n, declp)
   if (HP_DEMANGLING && ((*mangled)[n] == 'X'))
     {
       char *start_spec_args = NULL;
+      int hold_options;
 
       /* First check for and omit template specialization pseudo-arguments,
          such as in "Spec<#1,#1.*>" */
@@ -2542,10 +2325,16 @@ demangle_arm_hp_template (work, mangled, n, declp)
       string_init (&arg);
       if (work->temp_start == -1) /* non-recursive call */
         work->temp_start = declp->p - declp->b;
+
+      /* We want to unconditionally demangle parameter types in
+	 template parameters.  */
+      hold_options = work->options;
+      work->options |= DMGL_PARAMS;
+
       string_append (declp, "<");
       while (1)
         {
-          string_clear (&arg);
+          string_delete (&arg);
           switch (**mangled)
             {
               case 'T':
@@ -2588,21 +2377,29 @@ demangle_arm_hp_template (work, mangled, n, declp)
       string_delete (&arg);
       if (**mangled == '_')
         (*mangled)++;
+      work->options = hold_options;
       return;
     }
   /* ARM template? (Also handles HP cfront extensions) */
   else if (arm_pt (work, *mangled, n, &p, &args))
     {
+      int hold_options;
       string type_str;
 
       string_init (&arg);
       string_appendn (declp, *mangled, p - *mangled);
       if (work->temp_start == -1)  /* non-recursive call */
 	work->temp_start = declp->p - declp->b;
+
+      /* We want to unconditionally demangle parameter types in
+	 template parameters.  */
+      hold_options = work->options;
+      work->options |= DMGL_PARAMS;
+
       string_append (declp, "<");
       /* should do error checking here */
       while (args < e) {
-	string_clear (&arg);
+	string_delete (&arg);
 
 	/* Check for type or literal here */
 	switch (*args)
@@ -2617,6 +2414,7 @@ demangle_arm_hp_template (work, mangled, n, declp)
 	      goto cfront_template_args_done;
             string_append (&arg, "(");
             string_appends (&arg, &type_str);
+            string_delete (&type_str);
             string_append (&arg, ")");
             if (*args != 'L')
               goto cfront_template_args_done;
@@ -2641,7 +2439,10 @@ demangle_arm_hp_template (work, mangled, n, declp)
 
               /* Fail if we didn't make any progress: prevent infinite loop. */
               if (args == old_args)
-                return;
+		{
+		  work->options = hold_options;
+		  return;
+		}
             }
 	  }
 	string_appends (declp, &arg);
@@ -2652,6 +2453,7 @@ demangle_arm_hp_template (work, mangled, n, declp)
       if (args >= e)
 	--declp->p; /* remove extra comma */
       string_append (declp, ">");
+      work->options = hold_options;
     }
   else if (n>10 && strncmp (*mangled, "_GLOBAL_", 8) == 0
 	   && (*mangled)[9] == 'N'
@@ -3574,6 +3376,7 @@ demangle_qualified (work, mangled, result, isfuncname, append)
             }
           else
             {
+              string_delete (&last_name);
               success = do_type (work, mangled, &last_name);
               if (!success)
                 break;
@@ -3716,10 +3519,8 @@ do_type (work, mangled, result)
   string decl;
   const char *remembered_type;
   int type_quals;
-  string btype;
   type_kind_t tk = tk_none;
 
-  string_init (&btype);
   string_init (&decl);
   string_init (result);
 
@@ -3837,6 +3638,7 @@ do_type (work, mangled, result)
 		string temp;
 		do_type (work, mangled, &temp);
 		string_prepends (&decl, &temp);
+		string_delete (&temp);
 	      }
 	    else if (**mangled == 't')
 	      {
@@ -3847,7 +3649,7 @@ do_type (work, mangled, result)
 		if (success)
 		  {
 		    string_prependn (&decl, temp.b, temp.p - temp.b);
-		    string_clear (&temp);
+		    string_delete (&temp);
 		  }
 		else
 		  break;
@@ -4027,10 +3829,7 @@ demangle_fund_type (work, mangled, result)
   int success = 1;
   char buf[10];
   unsigned int dec = 0;
-  string btype;
   type_kind_t tk = tk_integral;
-
-  string_init (&btype);
 
   /* First pick off any type qualifiers.  There can be more than one.  */
 
@@ -4203,8 +4002,11 @@ demangle_fund_type (work, mangled, result)
       }
     case 't':
       {
+        string btype;
+        string_init (&btype);
         success = demangle_template (work, mangled, &btype, 0, 1, 1);
         string_appends (result, &btype);
+        string_delete (&btype);
         break;
       }
     default:
@@ -4406,12 +4208,9 @@ do_arg (work, mangled, result)
      do not want to add additional types to the back-referenceable
      type vector when processing a repeated type.  */
   if (work->previous_argument)
-    string_clear (work->previous_argument);
+    string_delete (work->previous_argument);
   else
-    {
-      work->previous_argument = (string*) xmalloc (sizeof (string));
-      string_init (work->previous_argument);
-    }
+    work->previous_argument = (string*) xmalloc (sizeof (string));
 
   if (!do_type (work, mangled, work->previous_argument))
     return 0;
@@ -4775,7 +4574,10 @@ demangle_nested_args (work, mangled, declp)
 
   /* Restore the previous_argument field.  */
   if (work->previous_argument)
-    string_delete (work->previous_argument);
+    {
+      string_delete (work->previous_argument);
+      free ((char *) work->previous_argument);
+    }
   work->previous_argument = saved_previous_argument;
   --work->forgetting_types;
   work->nrepeats = saved_nrepeats;
@@ -5100,363 +4902,3 @@ string_append_template_idx (s, idx)
   sprintf(buf, "T%d", idx);
   string_append (s, buf);
 }
-
-static const char * demangler_list = NULL;
-
-/* The buffer should be big enough to hold the list. */
-static char demangler_list_buffer [128];
-
-const char *
-get_demangler_list ()
-{
-  enum demangling_styles i;
-  int start, len, left;
-
-  if (!demangler_list)
-    {
-      demangler_list = demangler_list_buffer;
-      demangler_list_buffer [0] = '{';
-
-      start = 1;
-      left = sizeof (demangler_list_buffer) - start;
-  
-      for (i = 0; i < unknown_demangling && left > 0; i++)
-	{
-	  strncpy (&demangler_list_buffer [start],
-		   libiberty_demanglers [i].demangling_style_name, left);
-	  len = strlen (libiberty_demanglers [i].demangling_style_name);
-	  start += len;
-    	  if (left > 0)
-	    {
-	      demangler_list_buffer [start] = ',';
-	      start++;
-	      left -= len + 1;
-	    }
-	}
-
-      if (left >= 0)
-	{
-	  demangler_list_buffer [--start] = '}';  
-	}
-    }
-
-  return demangler_list;
-}
-
-/* To generate a standalone demangler program for testing purposes,
-   just compile and link this file with -DMAIN and libiberty.a.  When
-   run, it demangles each command line arg, or each stdin string, and
-   prints the result on stdout.  */
-
-#ifdef MAIN
-
-#include "getopt.h"
-
-static const char *program_name;
-static const char *program_version = VERSION;
-
-static void demangle_it PARAMS ((char *));
-static void usage PARAMS ((FILE *, int)) ATTRIBUTE_NORETURN;
-static void fatal PARAMS ((const char *)) ATTRIBUTE_NORETURN;
-
-static void
-demangle_it (mangled_name)
-     char *mangled_name;
-{
-  char *result;
-
-  /* For command line args, also try to demangle type encodings.  */
-  libiberty_demanglers [current_demangling_style].demangling_options
-    |= DMGL_TYPES;
-  result = demangle_symbol (mangled_name);
-  if (result == NULL)
-    {
-      printf ("%s\n", mangled_name);
-    }
-  else
-    {
-      printf ("%s\n", result);
-      free (result);
-    }
-}
-
-static void
-usage (stream, status)
-     FILE *stream;
-     int status;
-{
-  fprintf (stream, "\
-Usage: %s [-_] [-n] [--strip-underscores] [--no-strip-underscores] \n",
-	   program_name);
-
-  fprintf (stream, "\
-       [-s %s]\n", get_demangler_list ());
-
-  fprintf (stream, "\
-       [--format %s]\n", get_demangler_list ());
-
-  fprintf (stream, "\
-       [--help] [--version] [arg...]\n");
-  exit (status);
-}
-
-#define MBUF_SIZE 32767
-char mbuffer[MBUF_SIZE];
-
-/* Defined in the automatically-generated underscore.c.  */
-extern int prepends_underscore;
-
-int strip_underscore = 0;
-
-static const struct option long_options[] = {
-  {"strip-underscores", no_argument, 0, '_'},
-  {"format", required_argument, 0, 's'},
-  {"demangler", required_argument, 0, 'd'},
-  {"help", no_argument, 0, 'h'},
-  {"no-strip-underscores", no_argument, 0, 'n'},
-  {"version", no_argument, 0, 'v'},
-  {0, no_argument, 0, 0}
-};
-
-/* More 'friendly' abort that prints the line and file.
-   config.h can #define abort fancy_abort if you like that sort of thing.  */
-
-void
-fancy_abort ()
-{
-  fatal ("Internal gcc abort.");
-}
-
-
-static const char *
-standard_symbol_characters PARAMS ((void));
-
-static const char *
-hp_symbol_characters PARAMS ((void));
-
-static const char *
-gnu_v3_symbol_characters PARAMS ((void));
-
-/* Return the string of non-alnum characters that may occur 
-   as a valid symbol component, in the standard assembler symbol
-   syntax.  */
-
-static const char *
-standard_symbol_characters ()
-{
-  return "_$.";
-}
-
-
-/* Return the string of non-alnum characters that may occur
-   as a valid symbol name component in an HP object file.
-
-   Note that, since HP's compiler generates object code straight from
-   C++ source, without going through an assembler, its mangled
-   identifiers can use all sorts of characters that no assembler would
-   tolerate, so the alphabet this function creates is a little odd.
-   Here are some sample mangled identifiers offered by HP:
-
-	typeid*__XT24AddressIndExpClassMember_
-	[Vftptr]key:__dt__32OrdinaryCompareIndExpClassMemberFv
-	__ct__Q2_9Elf64_Dyn18{unnamed.union.#1}Fv
-
-   This still seems really weird to me, since nowhere else in this
-   file is there anything to recognize curly brackets, parens, etc.
-   I've talked with Srikanth <srikanth@cup.hp.com>, and he assures me
-   this is right, but I still strongly suspect that there's a
-   misunderstanding here.
-
-   If we decide it's better for c++filt to use HP's assembler syntax
-   to scrape identifiers out of its input, here's the definition of
-   the symbol name syntax from the HP assembler manual:
-
-       Symbols are composed of uppercase and lowercase letters, decimal
-       digits, dollar symbol, period (.), ampersand (&), pound sign(#) and
-       underscore (_). A symbol can begin with a letter, digit underscore or
-       dollar sign. If a symbol begins with a digit, it must contain a
-       non-digit character.
-
-   So have fun.  */
-static const char *
-hp_symbol_characters ()
-{
-  return "_$.<>#,*&[]:(){}";
-}
-
-
-/* Return the string of non-alnum characters that may occur 
-   as a valid symbol component in the GNU C++ V3 ABI mangling
-   scheme.  */
-
-static const char *
-gnu_v3_symbol_characters ()
-{
-  return "_$.";
-}
-
-
-extern int main PARAMS ((int, char **));
-
-int
-main (argc, argv)
-     int argc;
-     char **argv;
-{
-  char *result;
-  int c;
-  const char *valid_symbols;
-  const char *demangler = NULL;
-  const char *options = NULL;
-
-  program_name = argv[0];
-
-  strip_underscore = prepends_underscore;
-
-  while ((c = getopt_long (argc, argv, "_ns:d:", long_options, (int *) 0)) != EOF)
-    {
-      switch (c)
-	{
-	case '?':
-	  usage (stderr, 1);
-	  break;
-	case 'h':
-	  usage (stdout, 0);
-	case 'n':
-	  strip_underscore = 0;
-	  break;
-	case 'v':
-	  printf ("GNU %s (C++ demangler), version %s\n", program_name, program_version);
-	  return (0);
-	case '_':
-	  strip_underscore = 1;
-	  break;
-	case 'd':
-  	  demangler = optarg;
-	  break;
-	case 's':
-	  current_demangling_style
-	    = cplus_demangle_name_to_style (optarg);
-	  if (current_demangling_style == unknown_demangling)
-	    {
-	      fprintf (stderr, "%s: unknown demangling style `%s'\n",
-		       program_name, optarg);
-	      return (1);
-	    }
-	  break;
-	}
-    }
-
-  init_demangler (NULL, options, demangler);
-
-  if (optind < argc)
-    {
-      for ( ; optind < argc; optind++)
-	{
-	  demangle_it (argv[optind]);
-	}
-    }
-  else
-    {
-      switch (current_demangling_style)
-	{
-	case gnu_demangling:
-	case lucid_demangling:
-	case arm_demangling:
-	case java_demangling:
-	case edg_demangling:
-	case gnat_demangling:
-	case auto_demangling:
-	case compaq_demangling:
-	  valid_symbols = standard_symbol_characters ();
-	  break;
-	case hp_demangling:
-	  valid_symbols = hp_symbol_characters ();
-	  break;
-	case gnu_v3_demangling:
-	  valid_symbols = gnu_v3_symbol_characters ();
-	  break;
-	default:
-	  /* Folks should explicitly indicate the appropriate alphabet for
-	     each demangling.  Providing a default would allow the
-	     question to go unconsidered.  */
-	  abort ();
-	}
-
-      for (;;)
-	{
-	  int i = 0;
-	  c = getchar ();
-	  /* Try to read a label.  */
-	  while (c != EOF && (ISALNUM (c) || strchr (valid_symbols, c)))
-	    {
-	      if (i >= MBUF_SIZE-1)
-		break;
-	      mbuffer[i++] = c;
-	      c = getchar ();
-	    }
-	  if (i > 0)
-	    {
-	      int skip_first = 0;
-
-	      if (mbuffer[0] == '.' || mbuffer[0] == '$')
-		++skip_first;
-	      if (strip_underscore && mbuffer[skip_first] == '_')
-		++skip_first;
-
-	      if (skip_first > i)
-		skip_first = i;
-
-	      mbuffer[i] = 0;
-	      result = demangle_symbol (mbuffer + skip_first);
-	      if (result)
-		{
-		  if (mbuffer[0] == '.')
-		    putc ('.', stdout);
-		  fputs (result, stdout);
-		  free (result);
-		}
-	      else
-		fputs (mbuffer, stdout);
-
-	      fflush (stdout);
-	    }
-	  if (c == EOF)
-	    break;
-	  putchar (c);
-	  fflush (stdout);
-	}
-    }
-
-  return (0);
-}
-
-static void
-fatal (str)
-     const char *str;
-{
-  fprintf (stderr, "%s: %s\n", program_name, str);
-  exit (1);
-}
-
-PTR
-xmalloc (size)
-  size_t size;
-{
-  register PTR value = (PTR) malloc (size);
-  if (value == 0)
-    fatal ("virtual memory exhausted");
-  return value;
-}
-
-PTR
-xrealloc (ptr, size)
-  PTR ptr;
-  size_t size;
-{
-  register PTR value = (PTR) realloc (ptr, size);
-  if (value == 0)
-    fatal ("virtual memory exhausted");
-  return value;
-}
-#endif	/* main */

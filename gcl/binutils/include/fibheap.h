@@ -59,8 +59,13 @@ typedef struct fibnode
   struct fibnode *right;
   fibheapkey_t key;
   void *data;
+#if defined (__GNUC__) && (!defined (SIZEOF_INT) || SIZEOF_INT < 4)
+  __extension__ unsigned long int degree : 31;
+  __extension__ unsigned long int mark : 1;
+#else
   unsigned int degree : 31;
   unsigned int mark : 1;
+#endif
 } *fibnode_t;
 
 extern fibheap_t fibheap_new PARAMS ((void));

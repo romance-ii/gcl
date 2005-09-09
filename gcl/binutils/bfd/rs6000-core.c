@@ -1,6 +1,6 @@
 /* IBM RS/6000 "XCOFF" back-end for BFD.
    Copyright 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 2000,
-   2001, 2002
+   2001, 2002, 2004
    Free Software Foundation, Inc.
    FIXME: Can someone provide a transliteration of this name into ASCII?
    Using the following chars caused a compiler warning on HIUX (so I replaced
@@ -253,19 +253,19 @@ typedef union {
 /* Try to read into CORE the header from the core file associated with ABFD.
    Return success.  */
 
-static boolean
+static bfd_boolean
 read_hdr (bfd *abfd, CoreHdr *core)
 {
   bfd_size_type size;
 
   if (bfd_seek (abfd, (file_ptr) 0, SEEK_SET) != 0)
-    return false;
+    return FALSE;
 
   /* Read the leading portion that old and new core dump structures have in
      common.  */
   size = CORE_COMMONSZ;
   if (bfd_bread (core, size, abfd) != size)
-    return false;
+    return FALSE;
 
   /* Read the trailing portion of the structure.  */
   if (CORE_NEW (*core))
@@ -277,11 +277,11 @@ read_hdr (bfd *abfd, CoreHdr *core)
 }
 
 static asection *
-make_bfd_asection (abfd, name, flags, _raw_size, vma, filepos)
+make_bfd_asection (abfd, name, flags, size, vma, filepos)
      bfd *abfd;
      const char *name;
      flagword flags;
-     bfd_size_type _raw_size;
+     bfd_size_type size;
      bfd_vma vma;
      file_ptr filepos;
 {
@@ -292,7 +292,7 @@ make_bfd_asection (abfd, name, flags, _raw_size, vma, filepos)
     return NULL;
 
   asect->flags = flags;
-  asect->_raw_size = _raw_size;
+  asect->size = size;
   asect->vma = vma;
   asect->filepos = filepos;
   asect->alignment_power = 8;
@@ -630,9 +630,9 @@ rs6000coff_core_p (abfd)
   return NULL;
 }
 
-/* Return `true' if given core is from the given executable.  */
+/* Return `TRUE' if given core is from the given executable.  */
 
-boolean
+bfd_boolean
 rs6000coff_core_file_matches_executable_p (core_bfd, exec_bfd)
      bfd *core_bfd;
      bfd *exec_bfd;
@@ -642,11 +642,11 @@ rs6000coff_core_file_matches_executable_p (core_bfd, exec_bfd)
   char *path, *s;
   size_t alloc;
   const char *str1, *str2;
-  boolean ret;
+  bfd_boolean ret;
   file_ptr c_loader;
 
   if (!read_hdr (core_bfd, &core))
-    return false;
+    return FALSE;
 
   if (CORE_NEW (core))
     c_loader = CNEW_LOADER (core.new);
@@ -659,12 +659,12 @@ rs6000coff_core_file_matches_executable_p (core_bfd, exec_bfd)
     size = (int) ((LdInfo *) 0)->l32.ldinfo_filename;
 
   if (bfd_seek (core_bfd, c_loader + size, SEEK_SET) != 0)
-    return false;
+    return FALSE;
 
   alloc = 100;
   path = bfd_malloc ((bfd_size_type) alloc);
   if (path == NULL)
-    return false;
+    return FALSE;
   s = path;
 
   while (1)
@@ -672,7 +672,7 @@ rs6000coff_core_file_matches_executable_p (core_bfd, exec_bfd)
       if (bfd_bread (s, (bfd_size_type) 1, core_bfd) != 1)
 	{
 	  free (path);
-	  return false;
+	  return FALSE;
 	}
       if (*s == '\0')
 	break;
@@ -686,7 +686,7 @@ rs6000coff_core_file_matches_executable_p (core_bfd, exec_bfd)
 	  if (n == NULL)
 	    {
 	      free (path);
-	      return false;
+	      return FALSE;
 	    }
 	  s = n + (path - s);
 	  path = n;
@@ -701,9 +701,9 @@ rs6000coff_core_file_matches_executable_p (core_bfd, exec_bfd)
   str2 = str2 != NULL ? str2 + 1 : exec_bfd->filename;
 
   if (strcmp (str1, str2) == 0)
-    ret = true;
+    ret = TRUE;
   else
-    ret = false;
+    ret = FALSE;
 
   free (path);
 

@@ -1,5 +1,5 @@
 /* ELF support for BFD.
-   Copyright 1991, 1992, 1993, 1995, 1997, 1998, 1999, 2001
+   Copyright 1991, 1992, 1993, 1995, 1997, 1998, 1999, 2001, 2003
    Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
@@ -257,5 +257,20 @@ typedef struct
   unsigned char		si_boundto[2];
   unsigned char		si_flags[2];
 } Elf_External_Syminfo;
+
+
+/* This structure appears on the stack and in NT_AUXV core file notes.  */
+typedef struct
+{
+  unsigned char		a_type[4];
+  unsigned char		a_val[4];
+} Elf32_External_Auxv;
+
+typedef struct
+{
+  unsigned char		a_type[8];
+  unsigned char		a_val[8];
+} Elf64_External_Auxv;
+
 
 #endif /* _ELF_EXTERNAL_H */

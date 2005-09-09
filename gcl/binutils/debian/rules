@@ -1,0 +1,468 @@
+#!/usr/bin/make -f
+# debian/rules file - for binutils (2.15)
+# Based on sample debian/rules file - for GNU Hello (1.3).
+# Copyright 1994,1995 by Ian Jackson.
+# Copyright 1998-2004 James Troup
+# I hereby give you perpetual unlimited permission to copy,
+# modify and relicense this file, provided that you do not remove
+# my name from the file itself.  (I assert my moral right of
+# paternity under the Copyright, Designs and Patents Act 1988.)
+# This file may have to be extensively modified
+
+################################################################################
+
+include /usr/share/dpatch/dpatch.make
+
+################################################################################
+
+p_bin = binutils
+p_dev = $(p_bin)-dev
+p_mul = $(p_bin)-multiarch
+p_doc = $(p_bin)-doc
+p_hppa64 = $(p_bin)-hppa64
+
+pwd   := $(shell pwd)
+d     = debian/tmp
+d_bin = $(d)
+d_dev = debian/$(p_dev)
+d_mul = debian/$(p_mul)
+d_doc = debian/$(p_doc)
+d_hppa64 = debian/$(p_hppa64)
+
+install_dir    = install -d -m 755
+install_file   = install -m 644
+install_script = install -m 755
+install_binary = install -m 755 -s
+
+DEB_BUILD_GNU_TYPE := $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+DEB_HOST_ARCH 	   := $(shell dpkg-architecture -qDEB_HOST_ARCH)
+DEB_HOST_GNU_TYPE  := $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+
+CC     = gcc
+CFLAGS = -g -O2
+ifeq ($(DEB_HOST_ARCH),powerpc)
+  CFLAGS += -I$(shell pwd)/debian/include
+endif
+STRIP  = strip --remove-section=.comment --remove-section=.note
+
+VERSION       = $(shell sed -n 's/^ *VERSION=\(.*\)/\1/p' bfd/configure)
+MULTI_VERSION = $(VERSION)-multiarch
+MULTI_ARGS    = MAKEOVERRIDES="VERSION=$(MULTI_VERSION)"
+
+HPPA64_VERSION= $(VERSION)-hppa64
+HPPA64_ARGS   = MAKEOVERRIDES="VERSION=$(HPPA64_VERSION)"
+
+########################################
+
+CONFARGS = --enable-shared --prefix=/usr --build=$(DEB_BUILD_GNU_TYPE) \
+	   --host=$(DEB_HOST_GNU_TYPE)
+CONFLICTS = -VmainConflicts="gas, elf-binutils, modutils (<< 2.4.19-1)"
+
+ifeq ($(DEB_HOST_ARCH),sparc)
+	CONFARGS += --enable-targets=sparc64-linux-gnu
+	CONFLICTS = -VmainConflicts="gas, elf-binutils, modutils (<< 2.4.19-1), libc6-dev-sparc64 (<< 2.2.5-7)"
+endif
+ifeq ($(DEB_HOST_ARCH),sparc64)
+	CONFARGS += --enable-targets=sparc-linux-gnu
+	CONFLICTS = -VmainConflicts="gas, elf-binutils, libc6-dev-sparc64 (<< 2.2.5-7)"
+endif
+ifeq ($(DEB_HOST_ARCH),powerpc)
+	CONFARGS += --enable-targets=powerpc64-linux-gnu
+endif
+ifeq ($(DEB_HOST_ARCH),s390)
+	CONFARGS += --enable-targets=s390x-linux-gnu
+endif
+ifeq ($(DEB_HOST_ARCH),i386)
+	CONFARGS += --enable-targets=x86_64-linux-gnu
+endif
+ifeq ($(DEB_HOST_ARCH),mips)
+       CONFARGS += --enable-targets=mips64-linux-gnu
+endif
+ifeq ($(DEB_HOST_ARCH),mipsel)
+       CONFARGS += --enable-targets=mips64el-linux-gnu
+endif
+
+################################################################################
+
+################
+# clean target #
+################
+
+clean: unpatch
+	$(checkdir)
+	-rm -fr builddir-multi builddir-single builddir-hppa64
+	-find . -name \*.gmo -o -name \*~ | xargs rm -f
+	-rm -f $(pwd)/test-summary
+	-rm -fr $(d_bin) $(d_dev) $(d_mul) $(d_doc) $(d_hppa64)
+	-rm -rf debian/patched debian/tmp debian/files debian/substvars
+	for i in $$(find -name debian -prune -o -name '*.info*.saved' -print); \
+	do \
+	    echo restore $$i; \
+	    mv $$i $${i%*.saved}; \
+	done
+
+################################################################################
+
+#######################
+# single-arch targets #
+#######################
+
+configure-single-stamp: patch-stamp
+	$(checkdir)
+	rm -rf configure-single-stamp \
+		builddir-single
+	mkdir builddir-single
+	cd builddir-single && env CC="$(CC)" \
+		../configure $(CONFARGS)
+	$(MAKE) -C builddir-single configure-host
+	touch configure-single-stamp
+
+build-single-stamp: configure-single-stamp
+	$(checkdir)
+	$(MAKE) -C builddir-single/bfd headers
+	$(MAKE) -C builddir-single \
+		CFLAGS="$(CFLAGS)"
+	-$(MAKE) -C builddir-single -k \
+		CFLAGS="$(CFLAGS)" check
+	cat builddir-single/binutils/binutils.sum \
+	    builddir-single/gas/testsuite/gas.sum \
+	    builddir-single/ld/ld.sum >> $(pwd)/test-summary
+	touch build-single-stamp
+
+################################################################################
+
+#####################
+# multiarch targets #
+#####################
+
+configure-multi-stamp: patch-stamp
+	$(checkdir)
+	rm -rf configure-multi-stamp \
+		builddir-multi
+	mkdir builddir-multi
+	cd builddir-multi \
+	    && env CC="$(CC)" ../configure $(CONFARGS) \
+		--enable-targets=alpha-linux-gnu,arm-linux-gnu,hppa-linux-gnu,i486-gnu,i486-linux-gnu,ia64-linux-gnu,m68k-linux-gnu,m68k-rtems,mips-linux-gnu,mipsel-linux-gnu,mips64-linux-gnu,mips64el-linux-gnu,powerpc-linux-gnu,powerpc64-linux-gnu,s390-linux-gnu,s390x-linux-gnu,sh-linux-gnu,sparc-linux-gnu,sparc64-linux-gnu,x86_64-linux-gnu
+	$(MAKE) -C builddir-multi configure-host
+	touch configure-multi-stamp
+
+build-multi-stamp: configure-multi-stamp
+	$(checkdir)
+	$(MAKE) -C builddir-multi/bfd headers
+	$(MAKE) -C builddir-multi \
+		CFLAGS="$(CFLAGS)" $(MULTI_ARGS)
+	touch build-multi-stamp
+
+################################################################################
+
+#################
+# hppa64 target #
+#################
+
+configure-hppa64-stamp: patch-stamp
+	$(checkdir)
+	rm -rf configure-hppa64-stamp \
+		builddir-hppa64
+	mkdir builddir-hppa64
+	cd builddir-hppa64 \
+	    && env CC="$(CC)" ../configure \
+		--enable-shared \
+		--prefix=/usr \
+		--build=$(DEB_BUILD_GNU_TYPE) \
+		--host=$(DEB_BUILD_GNU_TYPE) \
+		--target=hppa64-linux-gnu
+	$(MAKE) -C builddir-hppa64 configure-host
+	touch configure-hppa64-stamp
+
+build-hppa64-stamp: configure-hppa64-stamp
+	$(checkdir)
+	$(MAKE) -C builddir-hppa64/bfd headers
+	$(MAKE) -C builddir-hppa64 \
+		CFLAGS="$(CFLAGS)" $(HPPA64_ARGS)
+	touch build-hppa64-stamp
+
+build_stamps = pre-build build-single-stamp build-multi-stamp
+ifeq ($(DEB_HOST_ARCH),hppa)
+       build_stamps += build-hppa64-stamp
+endif
+build: build-stamp
+build-stamp: $(build_stamps)
+	touch build-stamp
+
+pre-build:
+	for i in $$(find -name debian -prune -o ! -name '*.saved' -name '*.info*' -print); do \
+	  if [ ! -f $$i.saved ]; then \
+	    echo "save $$i"; \
+	    cp -p $$i $$i.saved; \
+	  fi; \
+	done
+
+################################################################################
+
+##################
+# install target #
+##################
+
+install_stamps = install-stamp
+ifeq ($(DEB_HOST_ARCH),hppa)
+       install_stamps += install-hppa64-stamp
+endif
+install: $(install_stamps)
+install-stamp: checkroot build-stamp
+	$(checkdir)
+
+	rm -fr $(d_bin) $(d_dev) $(d_mul) $(d_doc)
+	$(install_dir) $(d_bin) $(d_dev) $(d_mul) $(d_doc)
+
+	: # install binutils and -dev stuff
+	$(MAKE) -C builddir-single \
+		CFLAGS="$(CFLAGS)" prefix=$(pwd)/$(d_bin)/usr \
+		mandir=$(pwd)/$(d_bin)/usr/share/man \
+		infodir=$(pwd)/$(d_doc)/usr/share/info install
+
+	: # now install binutils-multiarch stuff
+	$(MAKE) -C builddir-multi \
+		CFLAGS="$(CFLAGS)" $(MULTI_ARGS) \
+		prefix=$(pwd)/$(d_mul)/usr \
+		mandir=$(pwd)/$(d_mul)/usr/share/man \
+		infodir=$(pwd)/$(d_doc)/usr/share/info install
+
+	: # copy libiberty.h ... not too keen on this, but it was requested
+	cp -f include/libiberty.h $(d_bin)/usr/include
+
+	: # We don't need to distribute everything in binutils and -dev
+	rm -rf $(d_bin)/usr/include/obstack.h
+	rm -f $(d_bin)/usr/man/man1/configure.1
+	rm -f $(d_doc)/usr/share/info/configure.* $(d_doc)/usr/share/info/standards.*
+	: # *sigh*, bugs.debian.org/213524
+	rm -f $(d_doc)/usr/share/info/dir*
+
+	: # Now get rid of just about everything in binutils-multiarch
+	rm -rf $(d_mul)/usr/man $(d_mul)/usr/info $(d_mul)/usr/include
+	rm -rf $(d_mul)/usr/share/man $(d_mul)/usr/share/info $(d_mul)/usr/share/locale
+
+	: # Get rid of ld for the time being since it's suddenly unhappy when
+	: # linking kernels.  Also get rid of the ldscripts for good measure.
+	rm -f $(d_mul)/usr/bin/as $(d_mul)/usr/bin/gasp $(d_mul)/usr/bin/c++filt \
+	       $(d_mul)/usr/bin/ld
+	rm -rf $(d_mul)/usr/lib/ldscripts
+
+	$(install_dir) $(d_dev)/usr/include/ $(d_dev)/usr/lib/
+	mv $(d_bin)/usr/include/* $(d_dev)/usr/include/
+	mv $(d_bin)/usr/lib/*.a $(d_bin)/usr/lib/libbfd.so $(d_bin)/usr/lib/libopcodes.so \
+	   $(d_dev)/usr/lib/
+
+	rm -f $(d_mul)/usr/lib/libbfd.so $(d_mul)/usr/lib/libopcodes.so
+	rm -f $(d_mul)/usr/lib/*.la
+	rm -f $(d_mul)/usr/lib/libiberty*
+
+	: # Get rid of .la files since libtool obviously has no idea about transient paths
+	rm -f $(d_bin)/usr/lib/*.la
+
+	: # Strip shared libraries
+	$(STRIP) --strip-unneeded $(d_bin)/usr/lib/libbfd-*so
+	$(STRIP) --strip-unneeded $(d_bin)/usr/lib/libopcodes-*so
+	$(STRIP) --strip-unneeded $(d_mul)/usr/lib/libbfd-*so
+	$(STRIP) --strip-unneeded $(d_mul)/usr/lib/libopcodes-*so
+
+	chmod ugo-x $(d_bin)/usr/lib/*.so $(d_mul)/usr/lib/*.so
+	$(STRIP) $(d_bin)/usr/bin/* $(d_mul)/usr/bin/*
+
+	: # Don't want /usr/<arch>-linux to exist in any package
+	rm -rf $(d_bin)/usr/$(DEB_HOST_GNU_TYPE)
+	rm -rf $(d_mul)/usr/$(DEB_HOST_GNU_TYPE)
+
+	: # Remove windres manpages
+	rm -f $(d_bin)/usr/share/man/man1/windres.1
+	rm -f $(d_mul)/usr/share/man/man1/windres.1
+
+	: # Remove empty directory
+	rmdir $(d_bin)/usr/include/
+
+	touch install-stamp
+
+install-hppa64-stamp: checkroot build-hppa64-stamp
+	$(checkdir)
+
+	rm -fr $(d_hppa64)
+	$(install_dir) $(d_hppa64)
+	$(install_dir) $(d_hppa64)/usr/lib
+
+	: # install binutils-hppa64 stuff
+	$(MAKE) -C builddir-hppa64 \
+		CFLAGS="$(CFLAGS)" $(HPPA64_ARGS) \
+		prefix=$(pwd)/$(d_hppa64)/usr/ \
+		mandir=$(pwd)/$(d_hppa64)/usr/share/man \
+		infodir=$(pwd)/$(d_hppa64)/usr/share/info install
+
+	: # move shared libs to the standard path
+	mv $(d_hppa64)/usr/hppa-linux-gnu/hppa64-linux-gnu/lib/lib*-*.so \
+		$(d_hppa64)/usr/lib/.
+
+	: # Now get rid of just about everything in binutils-hppa64
+	rm -rf $(d_hppa64)/usr/man
+	rm -rf $(d_hppa64)/usr/info
+	rm -rf $(d_hppa64)/usr/include
+	rm -rf $(d_hppa64)/usr/share
+	rm -rf $(d_hppa64)/usr/hppa-linux-gnu
+	rm -rf $(d_hppa64)/usr/lib/libiberty.a
+
+	: # Strip shared libraries
+	$(STRIP) --strip-unneeded $(d_hppa64)/usr/lib/libbfd-*so
+	$(STRIP) --strip-unneeded $(d_hppa64)/usr/lib/libopcodes-*so
+
+	chmod ugo-x $(d_hppa64)/usr/lib/*.so
+	$(STRIP) $(d_hppa64)/usr/bin/*
+
+	: # Don't want /usr/<arch>-linux to exist in any package
+	rm -rf $(d_hppa64)/usr/hppa64-linux-gnu
+
+	touch install-hppa64-stamp
+
+################################################################################
+
+#######################
+# binary-indep target #
+#######################
+
+binary-indep: checkroot build install
+	$(checkdir)
+
+	rm -f debian/files debian/substvars
+
+	$(install_dir) $(d_doc)/DEBIAN
+	$(install_script) debian/binutils-doc.postinst $(d_doc)/DEBIAN/postinst
+	$(install_script) debian/binutils-doc.prerm $(d_doc)/DEBIAN/prerm
+
+	$(install_dir) $(d_doc)/usr/share/doc/$(p_doc)/
+	$(install_file)	debian/changelog $(d_doc)/usr/share/doc/$(p_doc)/changelog.Debian
+	$(install_file)	debian/copyright $(d_doc)/usr/share/doc/$(p_doc)/
+	for i in bfd gas gprof ld; do \
+	  ln -sf ../$(p_bin)/$$i $(d_doc)/usr/share/doc/$(p_doc)/$$i; \
+	done
+	find $(d_doc)/usr/share/doc/$(p_doc) -type f -maxdepth 1 ! -name copyright | xargs gzip -9
+	gzip -9 $(d_doc)/usr/share/info/*
+
+	dpkg-gencontrol -isp -P$(d_doc) -p$(p_doc)
+	chown -R root:root $(d_doc)
+	chmod -R go=rX  $(d_doc)
+	[ -x /usr/bin/pkgstriptranslations ] && /usr/bin/pkgstriptranslations || true
+	dpkg --build $(d_doc) ..
+
+################################################################################
+
+#######################
+# binary-arch target  #
+#######################
+
+binary-arch: checkroot build install
+	$(checkdir)
+
+	: # install maintainer scrtips
+	$(install_dir) $(d_bin)/DEBIAN
+	$(install_script) debian/binutils.postinst $(d_bin)/DEBIAN/postinst
+	$(install_script) debian/binutils.postrm $(d_bin)/DEBIAN/postrm
+	$(install_file) debian/binutils.shlibs $(d_bin)/DEBIAN/shlibs
+
+	$(install_dir) $(d_dev)/DEBIAN
+
+	$(install_dir) $(d_mul)/DEBIAN
+	$(install_script) debian/binutils-multiarch.postinst $(d_mul)/DEBIAN/postinst
+	$(install_script) debian/binutils-multiarch.postrm $(d_mul)/DEBIAN/postrm
+	$(install_script) debian/binutils-multiarch.preinst $(d_mul)/DEBIAN/preinst
+	$(install_file) debian/binutils-multiarch.shlibs $(d_mul)/DEBIAN/shlibs
+
+ifeq ($(DEB_HOST_ARCH),hppa)
+	$(install_dir) $(d_hppa64)/DEBIAN
+	$(install_script) debian/binutils-hppa64.postinst $(d_hppa64)/DEBIAN/postinst
+	$(install_script) debian/binutils-hppa64.postrm $(d_hppa64)/DEBIAN/postrm
+	$(install_file) debian/binutils-hppa64.shlibs $(d_hppa64)/DEBIAN/shlibs
+endif
+
+	: # install docs
+	$(install_dir) $(d_bin)/usr/share/doc/$(p_bin)/
+	$(install_file)	debian/changelog $(d_bin)/usr/share/doc/$(p_bin)/changelog.Debian
+	$(install_file)	debian/copyright $(d_bin)/usr/share/doc/$(p_bin)/
+
+	$(install_dir) $(d_dev)/usr/share/doc/ $(d_mul)/usr/share/doc/
+	ln -sf $(p_bin) $(d_dev)/usr/share/doc/$(p_dev)
+	ln -sf $(p_bin) $(d_mul)/usr/share/doc/$(p_mul)
+ifeq ($(DEB_HOST_ARCH),hppa)
+	$(install_dir) $(d_hppa64)/usr/share/doc/
+	ln -sf $(p_bin) $(d_hppa64)/usr/share/doc/$(p_hppa64)
+endif
+
+	$(install_file) $(pwd)/test-summary binutils/NEWS  \
+	                debian/README.Debian $(d_bin)/usr/share/doc/$(p_bin)/
+
+	$(install_file) binutils/ChangeLog $(d_bin)/usr/share/doc/$(p_bin)/changelog
+
+	for pkg in bfd gas gprof ld; do \
+	  $(install_dir) $(d_bin)/usr/share/doc/$(p_bin)/$$pkg; \
+	done
+	$(install_file) bfd/ChangeLog bfd/PORTING bfd/TODO \
+			$(d_bin)/usr/share/doc/$(p_bin)/bfd/
+	$(install_file) gas/ChangeLog gas/NEWS $(d_bin)/usr/share/doc/$(p_bin)/gas/
+	$(install_file) gprof/ChangeLog gprof/TODO gprof/TEST \
+			$(d_bin)/usr/share/doc/$(p_bin)/gprof/
+	$(install_file) ld/ChangeLog ld/TODO ld/NEWS \
+			$(d_bin)/usr/share/doc/$(p_bin)/ld/
+
+	: # These only exist in H. J. Lu releases not GNU ones.
+	for dir in binutils bfd gas gprof ld; do \
+	  if [ -f $$dir/ChangeLog.linux ]; then \
+	    $(install_file) $(d_bin)/usr/share/doc/$(p_bin)/$$dir/; \
+	  fi; \
+	done
+
+	: # Copy bbconv.pl to the doc dir for use by interested people
+	$(install_file) gprof/bbconv.pl $(d_bin)/usr/share/doc/$(p_bin)/gprof/.
+
+	: # Compress stuff that needs it
+	gzip -9 $(d_bin)/usr/share/man/man1/*
+	find $(d_bin)/usr/share/doc/$(p_bin)/ -type f ! -name copyright -a ! -name bbconv.pl | xargs gzip -9
+
+	: # Finish it all up
+	find $(d_bin) -type f | xargs file | grep ELF | cut -d: -f 1 | xargs dpkg-shlibdeps
+	dpkg-gencontrol -isp -P$(d_bin) -p$(p_bin) $(CONFLICTS)
+
+	rm -f debian/substvars
+	dpkg-gencontrol -isp -P$(d_dev) -p$(p_dev)
+
+	rm -f debian/substvars
+	find $(d_mul) -type f | xargs file | grep ELF | cut -d: -f 1 | xargs dpkg-shlibdeps
+	dpkg-gencontrol -isp -P$(d_mul) -p$(p_mul)
+
+ifeq ($(DEB_HOST_ARCH),hppa)
+	rm -f debian/substvars
+	find $(d_hppa64) -type f | xargs file | grep ELF | cut -d: -f 1 | xargs dpkg-shlibdeps
+	dpkg-gencontrol -isp -P$(d_hppa64) -p$(p_hppa64)
+endif
+
+	chown -R root:root $(d_bin) $(d_dev) $(d_mul)
+	chmod -R go=rX  $(d_bin) $(d_dev) $(d_mul)
+	[ -x /usr/bin/pkgstriptranslations ] && /usr/bin/pkgstriptranslations || true
+	dpkg --build $(d_bin) ..
+	dpkg --build $(d_dev) ..
+	dpkg --build $(d_mul) ..
+ifeq ($(DEB_HOST_ARCH),hppa)
+	chown -R root:root $(d_hppa64)
+	chmod -R go=rX  $(d_hppa64)
+	dpkg --build $(d_hppa64) ..
+endif
+
+################################################################################
+
+define checkdir
+        test -f bfd/elf32.c -a -f debian/rules
+endef
+
+# Below here is fairly generic really
+
+binary:         binary-indep binary-arch
+
+checkroot:
+	$(checkdir)
+        test root = "`whoami`"
+
+.PHONY: binary binary-arch binary-indep clean checkroot

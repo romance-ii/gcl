@@ -1,0 +1,43 @@
+#! /bin/sh -e
+## 117_mips_symbolic_link.dpatch
+##
+## DP: Description: Handle symbolic multigot links. (#270619)
+## DP: Author: Thiemo Seufer <ths@debian.org>
+## DP: Upstream status: Not submitted
+## DP: Date: 2005-07-09
+
+if [ $# -lt 1 ]; then
+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+    exit 1
+fi
+
+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
+
+case "$1" in
+    -patch) patch -p1 ${patch_opts} < $0;;
+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
+    *)
+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
+        exit 1;;
+esac
+
+exit 0
+
+@DPATCH@
+diff -urNad binutils-2.16/bfd/elfxx-mips.c /tmp/dpep.hHHLUZ/binutils-2.16/bfd/elfxx-mips.c
+--- binutils-2.16/bfd/elfxx-mips.c	2005-05-09 15:37:08.670800004 +0200
++++ /tmp/dpep.hHHLUZ/binutils-2.16/bfd/elfxx-mips.c	2005-05-09 15:37:17.487138297 +0200
+@@ -4486,10 +4486,8 @@
+   /* We must now calculate the dynamic symbol table index to use
+      in the relocation.  */
+   if (h != NULL
+-      && (! info->symbolic || !h->root.def_regular)
+-      /* h->root.dynindx may be -1 if this symbol was marked to
+-	 become local.  */
+-      && h->root.dynindx != -1)
++      && (!h->root.def_regular
++	  || (info->shared && !info->symbolic && !h->root.forced_local)))
+     {
+       indx = h->root.dynindx;
+       if (SGI_COMPAT (output_bfd))

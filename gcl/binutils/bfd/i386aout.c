@@ -1,5 +1,5 @@
 /* BFD back-end for i386 a.out binaries.
-   Copyright 1990, 1991, 1992, 1994, 1996, 1997, 2001
+   Copyright 1990, 1991, 1992, 1994, 1996, 1997, 2001, 2002, 2003, 2005
    Free Software Foundation, Inc.
 
 This file is part of BFD, the Binary File Descriptor library.
@@ -26,17 +26,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    system, and I'll stick it in for the next release.  */
 
 #define N_HEADER_IN_TEXT(x) 0
-#define BYTES_IN_WORD 4
 
 #define N_TXTOFF(x) 0x20
 #define N_TXTADDR(x) (N_MAGIC(x)==ZMAGIC ? 0x1020 : 0)
 
 #define N_TXTSIZE(x) ((x).a_text)
-#if 0
-#define N_DATADDR(x) (N_MAGIC(x)==OMAGIC? (N_TXTADDR(x)+(x).a_text) : (SEGMENT_SIZE + ((0x1020+(x).a_text-1) & ~(SEGMENT_SIZE-1))))
-#define NOSUBEXECB
-
-#endif
 #define TARGET_PAGE_SIZE 4096
 #define SEGMENT_SIZE 0x400000
 #define DEFAULT_ARCH bfd_arch_i386
@@ -54,12 +48,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #include "aout/aout64.h"
 #include "libaout.h"
 
-static boolean i386aout_write_object_contents PARAMS ((bfd *));
-static boolean MY (set_sizes) PARAMS ((bfd *));
+static bfd_boolean i386aout_write_object_contents PARAMS ((bfd *));
+static bfd_boolean MY (set_sizes) PARAMS ((bfd *));
 
 /* Set the machine type correctly.  */
 
-static boolean
+static bfd_boolean
 i386aout_write_object_contents (abfd)
      bfd *abfd;
 {
@@ -72,7 +66,7 @@ i386aout_write_object_contents (abfd)
 
   WRITE_HEADERS (abfd, execp);
 
-  return true;
+  return TRUE;
 }
 
 #define MY_write_object_contents i386aout_write_object_contents

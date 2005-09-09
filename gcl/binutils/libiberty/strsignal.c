@@ -2,10 +2,9 @@
    Written by Fred Fish.  fnf@cygnus.com
    This file is in the public domain.  */
 
+#include "config.h"
 #include "ansidecl.h"
 #include "libiberty.h"
-
-#include "config.h"
 
 /* We need to declare sys_siglist, because even if the system provides
    it we can't assume that it is declared in <signal.h> (for example,
@@ -42,7 +41,7 @@ extern PTR memset ();
 #undef sys_nsig
 
 #ifndef NULL
-#  ifdef __STDC__
+#  ifdef ANSI_PROTOTYPES
 #    define NULL (void *) 0
 #  else
 #    define NULL 0

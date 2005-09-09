@@ -1,5 +1,6 @@
-/* Scenix IP2xxx specific support for 32-bit ELF
-   Copyright 2000, 2001, 2002 Free Software Foundation, Inc.
+/* Ubicom IP2xxx specific support for 32-bit ELF
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005
+   Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -30,126 +31,145 @@ struct misc
   Elf_Internal_Shdr *  symtab_hdr;
   Elf_Internal_Rela *  irelbase;
   bfd_byte *           contents;
-  bfd_byte *           free_contents;
-  Elf32_External_Sym * extsyms;
-  Elf32_External_Sym * free_extsyms;
-  Elf_Internal_Rela *  free_relocs;
+  Elf_Internal_Sym *   isymbuf;
 };
 
+struct ip2k_opcode
+{
+  unsigned short opcode;
+  unsigned short mask;
+};
+  
 /* Prototypes.  */
-static reloc_howto_type *    ip2k_reloc_type_lookup               PARAMS ((bfd *, bfd_reloc_code_real_type));
-static void                  ip2k_info_to_howto_rela              PARAMS ((bfd *, arelent *, Elf32_Internal_Rela *));
-static asection *            ip2k_elf_gc_mark_hook                PARAMS ((asection *, struct bfd_link_info *, Elf_Internal_Rela *, struct elf_link_hash_entry *, Elf_Internal_Sym *));
-static boolean               ip2k_elf_gc_sweep_hook               PARAMS ((bfd *, struct bfd_link_info *, asection *, const Elf_Internal_Rela *));
-static bfd_vma               symbol_value                         PARAMS ((bfd *, Elf_Internal_Shdr *, Elf32_External_Sym *, Elf_Internal_Rela *));
-static void                  adjust_all_relocations               PARAMS ((bfd *, asection *, bfd_vma, bfd_vma, int, int));
-static boolean               ip2k_elf_relax_delete_bytes          PARAMS ((bfd *, asection *, bfd_vma, int));
-static boolean               ip2k_elf_relax_add_bytes             PARAMS ((bfd *, asection *, bfd_vma, const bfd_byte *, int, int));
-static boolean               add_page_insn                        PARAMS ((bfd *, asection *, Elf_Internal_Rela *, struct misc *));
-static boolean               ip2k_elf_relax_section               PARAMS ((bfd *, asection *, struct bfd_link_info *, boolean *));
-static boolean               relax_switch_dispatch_tables_pass1   PARAMS ((bfd *, asection *, bfd_vma, struct misc *));
-static boolean               unrelax_dispatch_table_entries       PARAMS ((bfd *, asection *, bfd_vma, bfd_vma, boolean *, struct misc *));
-static boolean               unrelax_switch_dispatch_tables_passN PARAMS ((bfd *, asection *, bfd_vma, boolean *, struct misc *));
-static boolean               is_switch_128_dispatch_table_p       PARAMS ((bfd *, bfd_vma, boolean, struct misc *));
-static boolean               is_switch_256_dispatch_table_p       PARAMS ((bfd *, bfd_vma, boolean, struct misc *));
-static void                  tidyup_after_error                   PARAMS ((struct misc *));
-static boolean               ip2k_elf_relax_section_pass1         PARAMS ((bfd *, asection *, boolean *, struct misc *));
-static boolean               ip2k_elf_relax_section_passN         PARAMS ((bfd *, asection *, boolean *, boolean *, struct misc *));
-static bfd_reloc_status_type ip2k_final_link_relocate             PARAMS ((reloc_howto_type *, bfd *, asection *, bfd_byte *, Elf_Internal_Rela *, bfd_vma));
-static boolean               ip2k_elf_relocate_section            PARAMS ((bfd *, struct bfd_link_info *, bfd *, asection *, bfd_byte *, Elf_Internal_Rela *, Elf_Internal_Sym *, asection **));
+static reloc_howto_type *ip2k_reloc_type_lookup
+  PARAMS ((bfd *, bfd_reloc_code_real_type));
+static int ip2k_is_opcode
+  PARAMS ((bfd_byte *, const struct ip2k_opcode *));
+static bfd_vma symbol_value
+  PARAMS ((bfd *, Elf_Internal_Shdr *, Elf_Internal_Sym *,
+	   Elf_Internal_Rela *));
+static void ip2k_get_mem
+  PARAMS ((bfd *, bfd_byte *, int, bfd_byte *));
+static bfd_vma ip2k_nominal_page_bits
+  PARAMS ((bfd *, asection *, bfd_vma, bfd_byte *));
+static bfd_boolean ip2k_test_page_insn
+  PARAMS ((bfd *, asection *, Elf_Internal_Rela *, struct misc *));
+static bfd_boolean ip2k_delete_page_insn
+  PARAMS ((bfd *, asection *, Elf_Internal_Rela *, bfd_boolean *, struct misc *));
+static int ip2k_is_switch_table_128
+  PARAMS ((bfd *, asection *, bfd_vma, bfd_byte *));
+static bfd_boolean ip2k_relax_switch_table_128
+  PARAMS ((bfd *, asection *, Elf_Internal_Rela *, bfd_boolean *, struct misc *));
+static int ip2k_is_switch_table_256
+  PARAMS ((bfd *, asection *, bfd_vma, bfd_byte *));
+static bfd_boolean ip2k_relax_switch_table_256
+  PARAMS ((bfd *, asection *, Elf_Internal_Rela *, bfd_boolean *, struct misc *));
+static bfd_boolean ip2k_elf_relax_section
+  PARAMS ((bfd *, asection *, struct bfd_link_info *, bfd_boolean *));
+static bfd_boolean ip2k_elf_relax_section_page
+  PARAMS ((bfd *, asection *, bfd_boolean *, struct misc *, unsigned long, unsigned long));
+static void adjust_all_relocations
+  PARAMS ((bfd *, asection *, bfd_vma, bfd_vma, int, int));
+static bfd_boolean ip2k_elf_relax_delete_bytes
+  PARAMS ((bfd *, asection *, bfd_vma, int));
+static void ip2k_info_to_howto_rela
+  PARAMS ((bfd *, arelent *, Elf_Internal_Rela *));
+static bfd_reloc_status_type ip2k_final_link_relocate
+  PARAMS ((reloc_howto_type *, bfd *, asection *, bfd_byte *,
+	   Elf_Internal_Rela *, bfd_vma));
+static bfd_boolean ip2k_elf_relocate_section
+  PARAMS ((bfd *, struct bfd_link_info *, bfd *, asection *, bfd_byte *,
+	   Elf_Internal_Rela *, Elf_Internal_Sym *, asection **));
+static asection *ip2k_elf_gc_mark_hook
+  PARAMS ((asection *, struct bfd_link_info *, Elf_Internal_Rela *,
+	   struct elf_link_hash_entry *, Elf_Internal_Sym *));
+static bfd_boolean ip2k_elf_gc_sweep_hook
+  PARAMS ((bfd *, struct bfd_link_info *, asection *,
+	   const Elf_Internal_Rela *));
 
-#define IS_OPCODE(CODE0,CODE1,OPCODE) \
-  ((CODE0) == (OPCODE)[0] && (CODE1) == (OPCODE)[1])
+static bfd_boolean ip2k_relaxed = FALSE;
 
-#define PAGE_INSN_0		0x00
-#define PAGE_INSN_1		0x10
-
-static const bfd_byte page_opcode[] =
+static const struct ip2k_opcode ip2k_page_opcode[] =
 {
-   PAGE_INSN_0, PAGE_INSN_1
+  {0x0010, 0xFFF8},	/* page */
+  {0x0000, 0x0000},
 };
 
-#define IS_PAGE_OPCODE(CODE0,CODE1) \
-  IS_OPCODE (CODE0, CODE1, page_opcode)
+#define IS_PAGE_OPCODE(code) \
+  ip2k_is_opcode (code, ip2k_page_opcode)
 
-#define JMP_INSN_0		0xE0
-#define JMP_INSN_1		0x00
-
-static const bfd_byte jmp_opcode[] =
+static const struct ip2k_opcode ip2k_jmp_opcode[] =
 {
-   JMP_INSN_0, JMP_INSN_1
+  {0xE000, 0xE000},	/* jmp */
+  {0x0000, 0x0000},
 };
 
-#define IS_JMP_OPCODE(CODE0,CODE1) \
-  IS_OPCODE (CODE0, CODE1, jmp_opcode)
+#define IS_JMP_OPCODE(code) \
+  ip2k_is_opcode (code, ip2k_jmp_opcode)
 
-#define CALL_INSN_0		0xC0
-#define CALL_INSN_1		0x00
-
-static const bfd_byte call_opcode[] =
+static const struct ip2k_opcode ip2k_snc_opcode[] =
 {
-  CALL_INSN_0, CALL_INSN_1
+  {0xA00B, 0xFFFF},	/* snc */
+  {0x0000, 0x0000},
 };
 
-#define IS_CALL_OPCODE(CODE0,CODE1) \
-  IS_OPCODE (CODE0, CODE1, call_opcode)
+#define IS_SNC_OPCODE(code) \
+  ip2k_is_opcode (code, ip2k_snc_opcode)
 
-#define ADD_PCL_W_INSN_0	0x1E
-#define ADD_PCL_W_INSN_1	0x09
-
-static const bfd_byte add_pcl_w_opcode[] =
+static const struct ip2k_opcode ip2k_inc_1sp_opcode[] =
 {
-  ADD_PCL_W_INSN_0, ADD_PCL_W_INSN_1
+  {0x2B81, 0xFFFF},	/* inc 1(SP) */
+  {0x0000, 0x0000},
 };
 
-#define IS_ADD_PCL_W_OPCODE(CODE0,CODE1) \
-  IS_OPCODE (CODE0, CODE1, add_pcl_w_opcode)
+#define IS_INC_1SP_OPCODE(code) \
+  ip2k_is_opcode (code, ip2k_inc_1sp_opcode)
 
-#define ADD_W_WREG_INSN_0	0x1C
-#define ADD_W_WREG_INSN_1	0x0A
-
-static const bfd_byte add_w_wreg_opcode[] =
+static const struct ip2k_opcode ip2k_add_2sp_w_opcode[] =
 {
-  ADD_W_WREG_INSN_0, ADD_W_WREG_INSN_1
+  {0x1F82, 0xFFFF},	/* add 2(SP),w */
+  {0x0000, 0x0000},
 };
 
-#define IS_ADD_W_WREG_OPCODE(CODE0,CODE1) \
-  IS_OPCODE (CODE0, CODE1, add_w_wreg_opcode)
+#define IS_ADD_2SP_W_OPCODE(code) \
+  ip2k_is_opcode (code, ip2k_add_2sp_w_opcode)
 
-#define SNC_INSN_0		0xA0
-#define SNC_INSN_1		0x0B
-
-static const bfd_byte snc_opcode[] =
+static const struct ip2k_opcode ip2k_add_w_wreg_opcode[] =
 {
-   SNC_INSN_0, SNC_INSN_1
+  {0x1C0A, 0xFFFF},	/* add w,wreg */
+  {0x1E0A, 0xFFFF},	/* add wreg,w */
+  {0x0000, 0x0000},
 };
 
-#define IS_SNC_OPCODE(CODE0,CODE1) \
-  IS_OPCODE (CODE0, CODE1, snc_opcode)
+#define IS_ADD_W_WREG_OPCODE(code) \
+  ip2k_is_opcode (code, ip2k_add_w_wreg_opcode)
 
-#define INC_1_SP_INSN_0		0x2B
-#define INC_1_SP_INSN_1		0x81
-
-static const bfd_byte inc_1_sp_opcode[] =
+static const struct ip2k_opcode ip2k_add_pcl_w_opcode[] =
 {
-   INC_1_SP_INSN_0, INC_1_SP_INSN_1
+  {0x1E09, 0xFFFF},	/* add pcl,w */
+  {0x0000, 0x0000},
 };
 
-#define IS_INC_1_SP_OPCODE(CODE0,CODE1) \
-  IS_OPCODE (CODE0, CODE1, inc_1_sp_opcode)
+#define IS_ADD_PCL_W_OPCODE(code) \
+  ip2k_is_opcode (code, ip2k_add_pcl_w_opcode)
 
-#define ADD_2_SP_W_INSN_0	0x1F
-#define ADD_2_SP_W_INSN_1	0x82
-
-static const bfd_byte add_2_sp_w_opcode[] =
+static const struct ip2k_opcode ip2k_skip_opcodes[] =
 {
-   ADD_2_SP_W_INSN_0, ADD_2_SP_W_INSN_1
+  {0xB000, 0xF000},	/* sb */
+  {0xA000, 0xF000},	/* snb */
+  {0x7600, 0xFE00},	/* cse/csne #lit */
+  {0x5800, 0xFC00},	/* incsnz */
+  {0x4C00, 0xFC00},	/* decsnz */
+  {0x4000, 0xFC00},	/* cse/csne */
+  {0x3C00, 0xFC00},	/* incsz */
+  {0x2C00, 0xFC00},	/* decsz */
+  {0x0000, 0x0000},
 };
 
-#define IS_ADD_2_SP_W_OPCODE(CODE0,CODE1) \
-  IS_OPCODE (CODE0, CODE1, add_2_sp_w_opcode)
+#define IS_SKIP_OPCODE(code) \
+  ip2k_is_opcode (code, ip2k_skip_opcodes)
 
-/* Relocation tables. */
+/* Relocation tables.  */
 static reloc_howto_type ip2k_elf_howto_table [] =
 {
 #define IP2K_HOWTO(t,rs,s,bs,pr,bp,name,sm,dm) \
@@ -162,44 +182,44 @@ static reloc_howto_type ip2k_elf_howto_table [] =
           complain_overflow_dont,/* complain_on_overflow */ \
           bfd_elf_generic_reloc,/* special_function */ \
           name,                 /* name */ \
-          false,                /* partial_inplace */ \
+          FALSE,                /* partial_inplace */ \
           sm,                   /* src_mask */ \
           dm,                   /* dst_mask */ \
           pr)                   /* pcrel_offset */
 
-  /* This reloc does nothing. */
-  IP2K_HOWTO (R_IP2K_NONE, 0,2,32, false, 0, "R_IP2K_NONE", 0, 0), 
+  /* This reloc does nothing.  */
+  IP2K_HOWTO (R_IP2K_NONE, 0,2,32, FALSE, 0, "R_IP2K_NONE", 0, 0),
   /* A 16 bit absolute relocation.  */
-  IP2K_HOWTO (R_IP2K_16, 0,1,16, false, 0, "R_IP2K_16", 0, 0xffff),
+  IP2K_HOWTO (R_IP2K_16, 0,1,16, FALSE, 0, "R_IP2K_16", 0, 0xffff),
   /* A 32 bit absolute relocation.  */
-  IP2K_HOWTO (R_IP2K_32, 0,2,32, false, 0, "R_IP2K_32", 0, 0xffffffff),
+  IP2K_HOWTO (R_IP2K_32, 0,2,32, FALSE, 0, "R_IP2K_32", 0, 0xffffffff),
   /* A 8-bit data relocation for the FR9 field.  Ninth bit is computed specially.  */
-  IP2K_HOWTO (R_IP2K_FR9, 0,1,9, false, 0, "R_IP2K_FR9", 0, 0x00ff),
+  IP2K_HOWTO (R_IP2K_FR9, 0,1,9, FALSE, 0, "R_IP2K_FR9", 0, 0x00ff),
   /* A 4-bit data relocation.  */
-  IP2K_HOWTO (R_IP2K_BANK, 8,1,4, false, 0, "R_IP2K_BANK", 0, 0x000f),
+  IP2K_HOWTO (R_IP2K_BANK, 8,1,4, FALSE, 0, "R_IP2K_BANK", 0, 0x000f),
   /* A 13-bit insn relocation - word address => right-shift 1 bit extra.  */
-  IP2K_HOWTO (R_IP2K_ADDR16CJP, 1,1,13, false, 0, "R_IP2K_ADDR16CJP", 0, 0x1fff),
+  IP2K_HOWTO (R_IP2K_ADDR16CJP, 1,1,13, FALSE, 0, "R_IP2K_ADDR16CJP", 0, 0x1fff),
   /* A 3-bit insn relocation - word address => right-shift 1 bit extra.  */
-  IP2K_HOWTO (R_IP2K_PAGE3, 14,1,3, false, 0, "R_IP2K_PAGE3", 0, 0x0007),
+  IP2K_HOWTO (R_IP2K_PAGE3, 14,1,3, FALSE, 0, "R_IP2K_PAGE3", 0, 0x0007),
   /* Two 8-bit data relocations.  */
-  IP2K_HOWTO (R_IP2K_LO8DATA, 0,1,8, false, 0, "R_IP2K_LO8DATA", 0, 0x00ff),
-  IP2K_HOWTO (R_IP2K_HI8DATA, 8,1,8, false, 0, "R_IP2K_HI8DATA", 0, 0x00ff),
+  IP2K_HOWTO (R_IP2K_LO8DATA, 0,1,8, FALSE, 0, "R_IP2K_LO8DATA", 0, 0x00ff),
+  IP2K_HOWTO (R_IP2K_HI8DATA, 8,1,8, FALSE, 0, "R_IP2K_HI8DATA", 0, 0x00ff),
   /* Two 8-bit insn relocations.  word address => right-shift 1 bit extra.  */
-  IP2K_HOWTO (R_IP2K_LO8INSN, 1,1,8, false, 0, "R_IP2K_LO8INSN", 0, 0x00ff),
-  IP2K_HOWTO (R_IP2K_HI8INSN, 9,1,8, false, 0, "R_IP2K_HI8INSN", 0, 0x00ff),
+  IP2K_HOWTO (R_IP2K_LO8INSN, 1,1,8, FALSE, 0, "R_IP2K_LO8INSN", 0, 0x00ff),
+  IP2K_HOWTO (R_IP2K_HI8INSN, 9,1,8, FALSE, 0, "R_IP2K_HI8INSN", 0, 0x00ff),
 
   /* Special 1 bit relocation for SKIP instructions.  */
-  IP2K_HOWTO (R_IP2K_PC_SKIP, 1,1,1, false, 12, "R_IP2K_PC_SKIP", 0xfffe, 0x1000),
+  IP2K_HOWTO (R_IP2K_PC_SKIP, 1,1,1, FALSE, 12, "R_IP2K_PC_SKIP", 0xfffe, 0x1000),
   /* 16 bit word address.  */
-  IP2K_HOWTO (R_IP2K_TEXT, 1,1,16, false, 0, "R_IP2K_TEXT", 0, 0xffff),
+  IP2K_HOWTO (R_IP2K_TEXT, 1,1,16, FALSE, 0, "R_IP2K_TEXT", 0, 0xffff),
   /* A 7-bit offset relocation for the FR9 field.  Eigth and ninth bit comes from insn.  */
-  IP2K_HOWTO (R_IP2K_FR_OFFSET, 0,1,9, false, 0, "R_IP2K_FR_OFFSET", 0x180, 0x007f),
+  IP2K_HOWTO (R_IP2K_FR_OFFSET, 0,1,9, FALSE, 0, "R_IP2K_FR_OFFSET", 0x180, 0x007f),
   /* Bits 23:16 of an address.  */
-  IP2K_HOWTO (R_IP2K_EX8DATA, 16,1,8, false, 0, "R_IP2K_EX8DATA", 0, 0x00ff),
+  IP2K_HOWTO (R_IP2K_EX8DATA, 16,1,8, FALSE, 0, "R_IP2K_EX8DATA", 0, 0x00ff),
 };
 
 
-/* Map BFD reloc types to IP2K ELF reloc types. */
+/* Map BFD reloc types to IP2K ELF reloc types.  */
 static reloc_howto_type *
 ip2k_reloc_type_lookup (abfd, code)
      bfd * abfd ATTRIBUTE_UNUSED;
@@ -208,7 +228,7 @@ ip2k_reloc_type_lookup (abfd, code)
   /* Note that the ip2k_elf_howto_table is indxed by the R_
      constants.  Thus, the order that the howto records appear in the
      table *must* match the order of the relocation types defined in
-     include/elf/ip2k.h. */
+     include/elf/ip2k.h.  */
 
   switch (code)
     {
@@ -243,13 +263,42 @@ ip2k_reloc_type_lookup (abfd, code)
     case BFD_RELOC_IP2K_EX8DATA:
       return &ip2k_elf_howto_table[ (int) R_IP2K_EX8DATA];
     default:
-      /* Pacify gcc -Wall. */
+      /* Pacify gcc -Wall.  */
       return NULL;
     }
   return NULL;
 }
 
-#define PAGENO(ABSADDR) ((ABSADDR) & 0x1C000)
+static void
+ip2k_get_mem (abfd, addr, length, ptr)
+     bfd *abfd ATTRIBUTE_UNUSED;
+     bfd_byte *addr;
+     int length;
+     bfd_byte *ptr;
+{
+  while (length --)
+    * ptr ++ = bfd_get_8 (abfd, addr ++);
+}
+
+static bfd_boolean
+ip2k_is_opcode (code, opcodes)
+     bfd_byte *code;
+     const struct ip2k_opcode *opcodes;
+{
+  unsigned short insn = (code[0] << 8) | code[1];
+
+  while (opcodes->mask != 0)
+    {
+      if ((insn & opcodes->mask) == opcodes->opcode)
+	return TRUE;
+
+      opcodes ++;
+    }
+
+  return FALSE;
+}
+
+#define PAGENO(ABSADDR) ((ABSADDR) & 0xFFFFC000)
 #define BASEADDR(SEC)	((SEC)->output_section->vma + (SEC)->output_offset)
 
 #define UNDEFINED_SYMBOL (~(bfd_vma)0)
@@ -257,34 +306,28 @@ ip2k_reloc_type_lookup (abfd, code)
 /* Return the value of the symbol associated with the relocation IREL.  */
 
 static bfd_vma
-symbol_value (abfd, symtab_hdr, extsyms, irel)
+symbol_value (abfd, symtab_hdr, isymbuf, irel)
      bfd *abfd;
      Elf_Internal_Shdr *symtab_hdr;
-     Elf32_External_Sym *extsyms;
-     Elf_Internal_Rela *irel;   
+     Elf_Internal_Sym *isymbuf;
+     Elf_Internal_Rela *irel;
 {
   if (ELF32_R_SYM (irel->r_info) < symtab_hdr->sh_info)
     {
-      Elf_External_Sym_Shndx *sym_shndx;
-      Elf_Internal_Shdr *shndx_hdr;
-      Elf_Internal_Sym isym;
+      Elf_Internal_Sym *isym;
       asection *sym_sec;
 
-      shndx_hdr = &elf_tdata (abfd)->symtab_shndx_hdr;
-      sym_shndx = (Elf_External_Sym_Shndx *) shndx_hdr->contents;
-      sym_shndx = sym_shndx ? sym_shndx + ELF32_R_SYM (irel->r_info) : NULL;
-      bfd_elf32_swap_symbol_in (abfd, extsyms + ELF32_R_SYM (irel->r_info),
-				sym_shndx, &isym);
-      if (isym.st_shndx == SHN_UNDEF)
+      isym = isymbuf + ELF32_R_SYM (irel->r_info);
+      if (isym->st_shndx == SHN_UNDEF)
 	sym_sec = bfd_und_section_ptr;
-      else if (isym.st_shndx == SHN_ABS)
+      else if (isym->st_shndx == SHN_ABS)
 	sym_sec = bfd_abs_section_ptr;
-      else if (isym.st_shndx == SHN_COMMON)
+      else if (isym->st_shndx == SHN_COMMON)
 	sym_sec = bfd_com_section_ptr;
       else
-	sym_sec = bfd_section_from_elf_index (abfd, isym.st_shndx);
+	sym_sec = bfd_section_from_elf_index (abfd, isym->st_shndx);
 
-      return isym.st_value + BASEADDR (sym_sec);
+      return isym->st_value + BASEADDR (sym_sec);
     }
   else
     {
@@ -303,10 +346,119 @@ symbol_value (abfd, symtab_hdr, extsyms, irel)
     }
 }
 
+/* Returns the expected page state for the given instruction not including
+   the effect of page instructions.  */
+
+static bfd_vma
+ip2k_nominal_page_bits (abfd, sec, addr, contents)
+     bfd *abfd ATTRIBUTE_UNUSED;
+     asection *sec;
+     bfd_vma addr;
+     bfd_byte *contents;
+{
+  bfd_vma page = PAGENO (BASEADDR (sec) + addr);
+
+  /* Check if section flows into this page. If not then the page
+     bits are assumed to match the PC. This will be true unless
+     the user has a page instruction without a call/jump, in which
+     case they are on their own.  */
+  if (PAGENO (BASEADDR (sec)) == page)
+    return page;
+
+  /* Section flows across page boundary. The page bits should match
+     the PC unless there is a possible flow from the previous page,
+     in which case it is not possible to determine the value of the
+     page bits.  */
+  while (PAGENO (BASEADDR (sec) + addr - 2) == page)
+    {
+      bfd_byte code[2];
+
+      addr -= 2;
+      ip2k_get_mem (abfd, contents + addr, 2, code);
+      if (!IS_PAGE_OPCODE (code))
+	continue;
+
+      /* Found a page instruction, check if jump table.  */
+      if (ip2k_is_switch_table_128 (abfd, sec, addr, contents) != -1)
+	/* Jump table => page is conditional.  */
+	continue;
+
+      if (ip2k_is_switch_table_256 (abfd, sec, addr, contents) != -1)
+	/* Jump table => page is conditional.  */
+	continue;
+
+      /* Found a page instruction, check if conditional.  */
+      if (addr >= 2)
+        {
+	  ip2k_get_mem (abfd, contents + addr - 2, 2, code);
+          if (IS_SKIP_OPCODE (code))
+	    /* Page is conditional.  */
+	    continue;
+        }
+
+      /* Unconditional page instruction => page bits should be correct.  */
+      return page;
+    }
+
+  /* Flow from previous page => page bits are impossible to determine.  */
+  return 0;
+}
+
+static bfd_boolean
+ip2k_test_page_insn (abfd, sec, irel, misc)
+     bfd *abfd ATTRIBUTE_UNUSED;
+     asection *sec;
+     Elf_Internal_Rela *irel;
+     struct misc *misc;
+{
+  bfd_vma symval;
+
+  /* Get the value of the symbol referred to by the reloc.  */
+  symval = symbol_value (abfd, misc->symtab_hdr, misc->isymbuf, irel);
+  if (symval == UNDEFINED_SYMBOL)
+    /* This appears to be a reference to an undefined
+       symbol.  Just ignore it--it will be caught by the
+       regular reloc processing.  */
+    return FALSE;
+
+  /* Test if we can delete this page instruction.  */
+  if (PAGENO (symval + irel->r_addend) !=
+      ip2k_nominal_page_bits (abfd, sec, irel->r_offset, misc->contents))
+    return FALSE;
+
+  return TRUE;
+}
+
+static bfd_boolean
+ip2k_delete_page_insn (abfd, sec, irel, again, misc)
+     bfd *abfd ATTRIBUTE_UNUSED;
+     asection *sec;
+     Elf_Internal_Rela *irel;
+     bfd_boolean *again;
+     struct misc *misc;
+{
+  /* Note that we've changed the relocs, section contents, etc.  */
+  elf_section_data (sec)->relocs = misc->irelbase;
+  elf_section_data (sec)->this_hdr.contents = misc->contents;
+  misc->symtab_hdr->contents = (bfd_byte *) misc->isymbuf;
+
+  /* Fix the relocation's type.  */
+  irel->r_info = ELF32_R_INFO (ELF32_R_SYM (irel->r_info), R_IP2K_NONE);
+
+  /* Delete the PAGE insn.  */
+  if (!ip2k_elf_relax_delete_bytes (abfd, sec, irel->r_offset, 2))
+    return FALSE;
+	
+  /* Modified => will need to iterate relaxation again.  */
+  *again = TRUE;
+  
+  return TRUE;
+}
+
 /* Determine if the instruction sequence matches that for
    the prologue of a switch dispatch table with fewer than
    128 entries.
- 
+
           sc
           page    $nnn0
           jmp     $nnn0
@@ -320,7 +472,7 @@ symbol_value (abfd, symtab_hdr, extsyms, irel)
  	   ...
  	   page    $nnnN
  	   jmp     $nnnN
- 
+
   After relaxation.
   	   sc
  	   page    $nnn0
@@ -332,55 +484,123 @@ symbol_value (abfd, symtab_hdr, extsyms, irel)
  	   ...
           jmp     $nnnN  */
 
-static boolean 
-is_switch_128_dispatch_table_p (abfd, addr, relaxed, misc)
-     bfd *abfd ATTRIBUTE_UNUSED;                
+static int
+ip2k_is_switch_table_128 (abfd, sec, addr, contents)
+     bfd *abfd ATTRIBUTE_UNUSED;
+     asection *sec;
      bfd_vma addr;
-     boolean relaxed;
+     bfd_byte *contents;
+{
+  bfd_byte code[4];
+  int index = 0;
+  
+  /* Check current page-jmp.  */
+  if (addr + 4 > sec->size)
+    return -1;
+
+  ip2k_get_mem (abfd, contents + addr, 4, code);
+
+  if ((! IS_PAGE_OPCODE (code + 0))
+      || (! IS_JMP_OPCODE (code + 2)))
+    return -1;
+  
+  /* Search back.  */
+  while (1)
+    {
+      if (addr < 4)
+	return -1;
+
+      /* Check previous 2 instructions.  */
+      ip2k_get_mem (abfd, contents + addr - 4, 4, code);
+      if ((IS_ADD_W_WREG_OPCODE (code + 0))
+	  && (IS_ADD_PCL_W_OPCODE (code + 2)))
+	return index;
+
+      if ((! IS_PAGE_OPCODE (code + 0))
+	  || (! IS_JMP_OPCODE (code + 2)))
+	return -1;
+
+      index++;
+      addr -= 4;
+    }
+}
+
+static bfd_boolean
+ip2k_relax_switch_table_128 (abfd, sec, irel, again, misc)
+     bfd *abfd ATTRIBUTE_UNUSED;
+     asection *sec;
+     Elf_Internal_Rela *irel;
+     bfd_boolean *again;
      struct misc *misc;
 {
-  bfd_byte code0, code1;
-
-  if (addr < (3 * 2))
-    return false;
-
-  code0 = bfd_get_8 (abfd, misc->contents + addr - 2);
-  code1 = bfd_get_8 (abfd, misc->contents + addr - 1);
-
-  /* Is it ADD PCL,W */
-  if (! IS_ADD_PCL_W_OPCODE (code0, code1))
-    return false;
-
-  code0 = bfd_get_8 (abfd, misc->contents + addr - 4);
-  code1 = bfd_get_8 (abfd, misc->contents + addr - 3);
-
-  if (relaxed)
-    /* Is it ADD W,WREG  */
-    return ! IS_ADD_W_WREG_OPCODE (code0, code1);
-
-  else
+  Elf_Internal_Rela *irelend = misc->irelbase + sec->reloc_count;
+  Elf_Internal_Rela *ireltest = irel;
+  bfd_byte code[4];
+  bfd_vma addr;
+  
+  /* Test all page instructions.  */
+  addr = irel->r_offset;
+  while (1)
     {
-      /* Is it ADD W,WREG  */
-      if (! IS_ADD_W_WREG_OPCODE (code0, code1))
-	return false;
+      if (addr + 4 > sec->size)
+	break;
 
-      code0 = bfd_get_8 (abfd, misc->contents + addr - 6);
-      code1 = bfd_get_8 (abfd, misc->contents + addr - 5);
+      ip2k_get_mem (abfd, misc->contents + addr, 4, code);
+      if ((! IS_PAGE_OPCODE (code + 0))
+	  || (! IS_JMP_OPCODE (code + 2)))
+	break;
 
-      /* Is it JMP $nnnn  */
-      if (! IS_JMP_OPCODE (code0, code1))
-        return false;
+      /* Validate relocation entry (every entry should have a matching
+          relocation entry).  */
+      if (ireltest >= irelend)
+        {
+	  _bfd_error_handler (_("ip2k relaxer: switch table without complete matching relocation information."));
+          return FALSE;
+        }
+
+      if (ireltest->r_offset != addr)
+        {
+	  _bfd_error_handler (_("ip2k relaxer: switch table without complete matching relocation information."));
+          return FALSE;
+        }
+
+      if (! ip2k_test_page_insn (abfd, sec, ireltest, misc))
+	/* Un-removable page insn => nothing can be done.  */
+	return TRUE;
+
+      addr += 4;
+      ireltest += 2;
     }
 
-  /* It looks like we've found the prologue for
-     a 1-127 entry switch dispatch table.  */
-  return true;
+  /* Relaxable. Adjust table header.  */
+  ip2k_get_mem (abfd, misc->contents + irel->r_offset - 4, 4, code);
+  if ((! IS_ADD_W_WREG_OPCODE (code + 0))
+      || (! IS_ADD_PCL_W_OPCODE (code + 2)))
+    {
+      _bfd_error_handler (_("ip2k relaxer: switch table header corrupt."));
+      return FALSE;
+    }
+
+  if (!ip2k_elf_relax_delete_bytes (abfd, sec, irel->r_offset - 4, 2))
+    return FALSE;
+
+  *again = TRUE;
+
+  /* Delete all page instructions in table.  */
+  while (irel < ireltest)
+    {
+      if (!ip2k_delete_page_insn (abfd, sec, irel, again, misc))
+	return FALSE;
+      irel += 2;
+    }
+
+  return TRUE;
 }
 
 /* Determine if the instruction sequence matches that for
    the prologue switch dispatch table with fewer than
    256 entries but more than 127.
- 
+
    Before relaxation.
           push    %lo8insn(label) ; Push address of table
           push    %hi8insn(label)
@@ -401,7 +621,7 @@ is_switch_128_dispatch_table_p (abfd, addr, relaxed, misc)
  	   ...
  	   page    $nnnN
  	   jmp	   $nnnN
- 
+
   After relaxation.
           push    %lo8insn(label) ; Push address of table
           push    %hi8insn(label)
@@ -417,429 +637,208 @@ is_switch_128_dispatch_table_p (abfd, addr, relaxed, misc)
           ...
           jmp     $nnnN  */
 
-static boolean 
-is_switch_256_dispatch_table_p (abfd, addr, relaxed,  misc)
+static int
+ip2k_is_switch_table_256 (abfd, sec, addr, contents)
      bfd *abfd ATTRIBUTE_UNUSED;
+     asection *sec;
      bfd_vma addr;
-     boolean relaxed;
+     bfd_byte *contents;
+{
+  bfd_byte code[16];
+  int index = 0;
+  
+  /* Check current page-jmp.  */
+  if (addr + 4 > sec->size)
+    return -1;
+
+  ip2k_get_mem (abfd, contents + addr, 4, code);
+  if ((! IS_PAGE_OPCODE (code + 0))
+      || (! IS_JMP_OPCODE (code + 2)))
+    return -1;
+  
+  /* Search back.  */
+  while (1)
+    {
+      if (addr < 16)
+	return -1;
+
+      /* Check previous 8 instructions.  */
+      ip2k_get_mem (abfd, contents + addr - 16, 16, code);
+      if ((IS_ADD_W_WREG_OPCODE (code + 0))
+	  && (IS_SNC_OPCODE (code + 2))
+	  && (IS_INC_1SP_OPCODE (code + 4))
+	  && (IS_ADD_2SP_W_OPCODE (code + 6))
+	  && (IS_SNC_OPCODE (code + 8))
+	  && (IS_INC_1SP_OPCODE (code + 10))
+	  && (IS_PAGE_OPCODE (code + 12))
+	  && (IS_JMP_OPCODE (code + 14)))
+	return index;
+
+      if ((IS_ADD_W_WREG_OPCODE (code + 2))
+	  && (IS_SNC_OPCODE (code + 4))
+	  && (IS_INC_1SP_OPCODE (code + 6))
+	  && (IS_ADD_2SP_W_OPCODE (code + 8))
+	  && (IS_SNC_OPCODE (code + 10))
+	  && (IS_INC_1SP_OPCODE (code + 12))
+	  && (IS_JMP_OPCODE (code + 14)))
+	return index;
+      
+      if ((! IS_PAGE_OPCODE (code + 0))
+	  || (! IS_JMP_OPCODE (code + 2)))
+	return -1;
+
+      index++;
+      addr -= 4;
+    }
+}
+
+static bfd_boolean
+ip2k_relax_switch_table_256 (abfd, sec, irel, again, misc)
+     bfd *abfd ATTRIBUTE_UNUSED;
+     asection *sec;
+     Elf_Internal_Rela *irel;
+     bfd_boolean *again;
      struct misc *misc;
 {
-  bfd_byte code0, code1;
+  Elf_Internal_Rela *irelend = misc->irelbase + sec->reloc_count;
+  Elf_Internal_Rela *ireltest = irel;
+  bfd_byte code[12];
+  bfd_vma addr;
+  
+  /* Test all page instructions.  */
+  addr = irel->r_offset;
 
-  if (addr < (8 * 2))
-    return false;
+  while (1)
+    {
+      if (addr + 4 > sec->size)
+	break;
 
-  code0 = bfd_get_8 (abfd, misc->contents + addr - 2);
-  code1 = bfd_get_8 (abfd, misc->contents + addr - 1);
+      ip2k_get_mem (abfd, misc->contents + addr, 4, code);
 
-  /* Is it INC 1(SP).  */
-  if (! IS_INC_1_SP_OPCODE (code0, code1))
-    return false;
+      if ((! IS_PAGE_OPCODE (code + 0))
+	  || (! IS_JMP_OPCODE (code + 2)))
+	break;
 
-  code0 = bfd_get_8 (abfd, misc->contents + addr - 4);
-  code1 = bfd_get_8 (abfd, misc->contents + addr - 3);
+      /* Validate relocation entry (every entry should have a matching
+          relocation entry).  */
+      if (ireltest >= irelend)
+        {
+          _bfd_error_handler (_("ip2k relaxer: switch table without complete matching relocation information."));
+          return FALSE;
+        }
 
-  /* Is it SNC.  */
-  if (! IS_SNC_OPCODE (code0, code1))
-    return false;
+      if (ireltest->r_offset != addr)
+        {
+          _bfd_error_handler (_("ip2k relaxer: switch table without complete matching relocation information."));
+          return FALSE;
+        }
 
-  code0 = bfd_get_8 (abfd, misc->contents + addr - 6);
-  code1 = bfd_get_8 (abfd, misc->contents + addr - 5);
+      if (!ip2k_test_page_insn (abfd, sec, ireltest, misc))
+	/* Un-removable page insn => nothing can be done.  */
+	return TRUE;
 
-  /* Is it ADD 2(SP),W.  */
-  if (! IS_ADD_2_SP_W_OPCODE (code0, code1))
-    return false;
+      addr += 4;
+      ireltest += 2;
+    }
 
-  code0 = bfd_get_8 (abfd, misc->contents + addr - 8);
-  code1 = bfd_get_8 (abfd, misc->contents + addr - 7);
-
-  if (relaxed)
-    /* Is it INC 1(SP).  */
-    return ! IS_INC_1_SP_OPCODE (code0, code1);
-
+  /* Relaxable. Adjust table header.  */
+  ip2k_get_mem (abfd, misc->contents + irel->r_offset - 4, 2, code);
+  if (IS_PAGE_OPCODE (code))
+    addr = irel->r_offset - 16;
   else
+    addr = irel->r_offset - 14;
+
+  ip2k_get_mem (abfd, misc->contents + addr, 12, code);
+  if ((!IS_ADD_W_WREG_OPCODE (code + 0))
+      || (!IS_SNC_OPCODE (code + 2))
+      || (!IS_INC_1SP_OPCODE (code + 4))
+      || (!IS_ADD_2SP_W_OPCODE (code + 6))
+      || (!IS_SNC_OPCODE (code + 8))
+      || (!IS_INC_1SP_OPCODE (code + 10)))
     {
-      /* Is it INC 1(SP).  */
-      if (! IS_INC_1_SP_OPCODE (code0, code1))
-	return false;
-
-      code0 = bfd_get_8 (abfd, misc->contents + addr - 10);
-      code1 = bfd_get_8 (abfd, misc->contents + addr - 9);
- 
-      /* Is it SNC.  */
-      if (! IS_SNC_OPCODE (code0, code1))
-        return false;
-
-      code0 = bfd_get_8 (abfd, misc->contents + addr - 12);
-      code1 = bfd_get_8 (abfd, misc->contents + addr - 11);
-
-      /* Is it ADD W,WREG.  */
-      if (! IS_ADD_W_WREG_OPCODE (code0, code1))
-	return false;
+      _bfd_error_handler (_("ip2k relaxer: switch table header corrupt."));
+      return FALSE;
     }
 
-  /* It looks like we've found the prologue for
-     a 128-255 entry switch dispatch table.  */
-  return true;
-}
+  /* Delete first 3 opcodes.  */
+  if (!ip2k_elf_relax_delete_bytes (abfd, sec, addr + 0, 6))
+    return FALSE;
 
-static boolean
-relax_switch_dispatch_tables_pass1 (abfd, sec, addr, misc)
-     bfd *abfd;
-     asection *sec;
-     bfd_vma addr;
-     struct misc *misc;
-{
-  if (addr + 3 < sec->_cooked_size)
+  *again = TRUE;
+
+  /* Delete all page instructions in table.  */
+  while (irel < ireltest)
     {
-      bfd_byte code0 = bfd_get_8 (abfd, misc->contents + addr + 2);
-      bfd_byte code1 = bfd_get_8 (abfd, misc->contents + addr + 3);
-
-      if (IS_JMP_OPCODE (code0, code1)
-	  && is_switch_128_dispatch_table_p (abfd, addr, false, misc))
-	{
-	  /* Delete ADD W,WREG from prologue.  */
-	  ip2k_elf_relax_delete_bytes (abfd, sec, addr - (2 * 2), (1 * 2));
-	  return true;
-	}
-
-      if (IS_JMP_OPCODE (code0, code1)
-	  && is_switch_256_dispatch_table_p (abfd, addr, false, misc))
-	{
-	  /* Delete ADD W,WREG; SNC ; INC 1(SP) from prologue.  */
-	  ip2k_elf_relax_delete_bytes (abfd, sec, addr - 6 * 2, 3 * 2);
-	  return true;
-	}
-    }
- 
-  return true;
-}
-
-static boolean
-unrelax_dispatch_table_entries (abfd, sec, first, last, changed, misc)
-     bfd *abfd;
-     asection *sec;
-     bfd_vma first;
-     bfd_vma last;
-     boolean *changed;
-     struct misc *misc;
-{
-  bfd_vma addr = first;
-
-  while (addr < last)
-    {
-      bfd_byte code0 = bfd_get_8 (abfd, misc->contents + addr);
-      bfd_byte code1 = bfd_get_8 (abfd, misc->contents + addr + 1);
-
-      /* We are only expecting to find PAGE or JMP insns
-         in the dispatch table. If we find anything else
-         something has gone wrong failed the relaxation
-         which will cause the link to be aborted.  */
-
-      if (IS_PAGE_OPCODE (code0, code1))
-	/* Skip the PAGE and JMP insns.  */
-        addr += 4;
-      else if (IS_JMP_OPCODE (code0, code1))
-         {
-            Elf_Internal_Rela * irelend = misc->irelbase
-					  + sec->reloc_count;
-            Elf_Internal_Rela * irel;
-
-            /* Find the relocation entry.  */
-            for (irel = misc->irelbase; irel < irelend; irel++)
-               {
-                  if (irel->r_offset == addr
-                      && ELF32_R_TYPE (irel->r_info) == R_IP2K_ADDR16CJP)
-                    {
-                      if (! add_page_insn (abfd, sec, irel, misc))
-			/* Something has gone wrong.  */
-                        return false;
-
-		      *changed = true;
-		      break;
-                    }
-               }
-
-	    /* If we fell off the end something has gone wrong.  */
-	    if (irel >= irelend)
-	      /* Something has gone wrong.  */
-	      return false;
-
-	    /* Skip the PAGE and JMP isns.  */
-	    addr += 4;
-	    /* Acount for the new PAGE insn.  */
-            last += 2;
-          }
-       else
-	 /* Something has gone wrong.  */
-	 return false;
+      if (!ip2k_delete_page_insn (abfd, sec, irel, again, misc))
+	return FALSE;
+      irel += 2;
     }
 
-  return true;
+  return TRUE;
 }
 
-static boolean 
-unrelax_switch_dispatch_tables_passN (abfd, sec, addr, changed, misc)
-     bfd *abfd;
-     asection *sec;
-     bfd_vma addr;
-     boolean *changed;
-     struct misc *misc;
-{
-  if (2 <= addr && (addr + 3) < sec->_cooked_size)
-    {
-      bfd_byte code0 = bfd_get_8 (abfd, misc->contents + addr - 2);
-      bfd_byte code1 = bfd_get_8 (abfd, misc->contents + addr - 1);
+/* This function handles relaxing for the ip2k.
 
-      if (IS_PAGE_OPCODE (code0, code1))
-	{
-	  addr -= 2;
-	  code0 = bfd_get_8 (abfd, misc->contents + addr + 2);
-          code1 = bfd_get_8 (abfd, misc->contents + addr + 3);
-	}
-      else
-	{
-	  code0 = bfd_get_8 (abfd, misc->contents + addr);
-	  code1 = bfd_get_8 (abfd, misc->contents + addr + 1);
-	}
+   Principle: Start with the first page and remove page instructions that
+   are not require on this first page. By removing page instructions more
+   code will fit into this page - repeat until nothing more can be achieved
+   for this page. Move on to the next page.
 
-      if (IS_JMP_OPCODE (code0, code1)
-          && is_switch_128_dispatch_table_p (abfd, addr, true, misc))
-        {
-	  bfd_vma first = addr;
-	  bfd_vma last  = first;
-	  boolean relaxed = true;
+   Processing the pages one at a time from the lowest page allows a removal
+   only policy to be used - pages can be removed but are never reinserted.  */
 
-	  /* On the final pass we must check if *all* entries in the
-	     dispatch table are relaxed. If *any* are not relaxed
-	     then we must unrelax *all* the entries in the dispach
-	     table and also unrelax the dispatch table prologue.  */
-
-	  /* Find the last entry in the dispach table.  */
-	  while (last < sec->_cooked_size)
-	     {
-	        code0 = bfd_get_8 (abfd, misc->contents + last);
-	        code1 = bfd_get_8 (abfd, misc->contents + last + 1);
-
-		if (IS_PAGE_OPCODE (code0, code1))
-		  relaxed = false;
-		else if (! IS_JMP_OPCODE (code0, code1))
-		    break;
-
-	        last += 2;
-	     }
-
-	  /* We should have found the end of the dispatch table
-	     before reaching the end of the section. If we've have
-	     reached the end then fail the relaxation which will
-	     cause the link to be aborted.  */
-	  if (last >= sec->_cooked_size)
-	    /* Something has gone wrong.  */
-	    return false;
-
-	  /* If we found an unrelaxed entry then
-	     unlrelax all the switch table entries.  */
-	  if (! relaxed )
-	    {
-	      if (! unrelax_dispatch_table_entries (abfd, sec, first,
-						    last, changed, misc))
-		/* Something has gone wrong.  */
-	        return false;
-
-	      if (! is_switch_128_dispatch_table_p (abfd, addr, true, misc))
-		/* Something has gone wrong.  */
-		return false;
-		
-              /* Unrelax the prologue.  */
-
-              /* Insert an ADD W,WREG insnstruction.  */
-              if (! ip2k_elf_relax_add_bytes (abfd, sec,
-					      addr - 2,
-					      add_w_wreg_opcode,
-					      sizeof (add_w_wreg_opcode),
-					      0))
-		/* Something has gone wrong.  */
-                return false;
-	    }
-
-          return true;
-        }
-
-      if (IS_JMP_OPCODE (code0, code1)
-          && is_switch_256_dispatch_table_p (abfd, addr, true, misc))
-        {
-          bfd_vma first = addr;
-          bfd_vma last;
-          boolean relaxed = true;
-
-          /* On the final pass we must check if *all* entries in the
-             dispatch table are relaxed. If *any* are not relaxed
-             then we must unrelax *all* the entries in the dispach
-             table and also unrelax the dispatch table prologue.  */
-
-	  /* Note the 1st PAGE/JMP instructions are part of the
-	     prologue and can safely be relaxed.  */
-
-          code0 = bfd_get_8 (abfd, misc->contents + first);
-          code1 = bfd_get_8 (abfd, misc->contents + first + 1);
-
-	  if (IS_PAGE_OPCODE (code0, code1))
-	    {
-	      first += 2;
-              code0 = bfd_get_8 (abfd, misc->contents + first);
-              code1 = bfd_get_8 (abfd, misc->contents + first + 1);
-	    }
-
-          if (! IS_JMP_OPCODE (code0, code1))
-	    /* Something has gone wrong.  */
-	    return false;
-
-          first += 2;
-	  last = first; 
-
-          /* Find the last entry in the dispach table.  */
-          while (last < sec->_cooked_size)
-             {
-                code0 = bfd_get_8 (abfd, misc->contents + last);
-                code1 = bfd_get_8 (abfd, misc->contents + last + 1);
-
-                if (IS_PAGE_OPCODE (code0, code1))
-                  relaxed = false;
-                else if (! IS_JMP_OPCODE (code0, code1))
-                    break;
-
-                last += 2;
-             }
-
-          /* We should have found the end of the dispatch table
-             before reaching the end of the section. If we have
-             reached the end of the section then fail the
-	     relaxation.  */
-          if (last >= sec->_cooked_size)
-            return false;
-
-          /* If we found an unrelaxed entry then
-              unrelax all the switch table entries.  */
-          if (! relaxed)
-	    {
-	      if (! unrelax_dispatch_table_entries (abfd, sec, first,
-						    last, changed, misc))
-		return false;
-
-              if (! is_switch_256_dispatch_table_p (abfd, addr, true, misc))
-		return false;
-
-              /* Unrelax the prologue.  */
-
-              /* Insert an INC 1(SP) insnstruction.  */
-              if (! ip2k_elf_relax_add_bytes (abfd, sec,
-                                              addr - 6,
-                                              inc_1_sp_opcode,
-                                              sizeof (inc_1_sp_opcode),
-					      0))
-		return false;
-
-              /* Insert an SNC insnstruction.  */
-              if (! ip2k_elf_relax_add_bytes (abfd, sec,
-					      addr - 6,
-					      snc_opcode,
-					      sizeof (snc_opcode),
-					      0))
-		return false;
-
-	      /* Insert an ADD W,WREG insnstruction.  */
-              if (! ip2k_elf_relax_add_bytes (abfd, sec,
-					     addr - 6,
-				 	     add_w_wreg_opcode,
-					     sizeof (add_w_wreg_opcode),
-					     0))
-		return false;
-	    }
-
-          return true;
-        }
-    }
-
-  return true;
-}
-
-/* This function handles relaxing for the ip2k.  */
-
-static boolean
+static bfd_boolean
 ip2k_elf_relax_section (abfd, sec, link_info, again)
      bfd *abfd;
      asection *sec;
      struct bfd_link_info *link_info;
-     boolean *again;
+     bfd_boolean *again;
 {
-  Elf_External_Sym_Shndx *shndx_buf;
-  Elf_Internal_Shdr *shndx_hdr;
+  Elf_Internal_Shdr *symtab_hdr;
+  Elf_Internal_Rela *internal_relocs;
+  bfd_byte *contents = NULL;
+  Elf_Internal_Sym *isymbuf = NULL;
   static asection * first_section = NULL;
-  static asection * last_section = NULL;
-  static boolean changed = false;
-  static boolean final_pass = false;
+  static unsigned long search_addr;
+  static unsigned long page_start = 0;
+  static unsigned long page_end = 0;
   static unsigned int pass = 0;
+  static bfd_boolean new_pass = FALSE;
+  static bfd_boolean changed = FALSE;
   struct misc misc;
   asection *stab;
 
   /* Assume nothing changes.  */
-  *again = false;
+  *again = FALSE;
 
   if (first_section == NULL)
-    first_section = sec;
+    {
+      ip2k_relaxed = TRUE;
+      first_section = sec;
+    }
 
   if (first_section == sec)
     {
-      changed = false;
       pass++;
+      new_pass = TRUE;
     }
-
-  /* If we make too many passes then it's a sign that
-     something is wrong and we fail the relaxation.
-     Note if everything is working correctly then the
-     relaxation should converge reasonably quickly.  */
-  if (pass == 4096)
-    return false;
 
   /* We don't have to do anything for a relocatable link,
      if this section does not have relocs, or if this is
      not a code section.  */
-  if (link_info->relocateable
+  if (link_info->relocatable
       || (sec->flags & SEC_RELOC) == 0
       || sec->reloc_count == 0
       || (sec->flags & SEC_CODE) == 0)
-    return true;
+    return TRUE;
 
-  if (pass == 1)
-    last_section = sec;
+  symtab_hdr = &elf_tdata (abfd)->symtab_hdr;
 
-  misc.symtab_hdr = NULL;
-  misc.irelbase = NULL;
-  misc.contents = NULL;
-  misc.free_contents = NULL;
-  misc.extsyms = NULL;
-  misc.free_extsyms = NULL;
-  misc.free_relocs = NULL;
-
-  /* If this is the first time we have been called
-      for this section, initialise the cooked size.  */
-  if (sec->_cooked_size == 0)
-    sec->_cooked_size = sec->_raw_size;
-
-  misc.symtab_hdr = &elf_tdata (abfd)->symtab_hdr;
-  shndx_hdr = &elf_tdata (abfd)->symtab_shndx_hdr;
-
-  misc.irelbase = _bfd_elf32_link_read_relocs (abfd, sec, NULL,
-					     (Elf_Internal_Rela *)NULL,
-					     link_info->keep_memory);
-  if (misc.irelbase == NULL)
-    {
-      tidyup_after_error (&misc);
-      return false;
-    }
-
-  if (! link_info->keep_memory)
-    misc.free_relocs = misc.irelbase;
+  internal_relocs = _bfd_elf_link_read_relocs (abfd, sec, NULL,
+					       (Elf_Internal_Rela *)NULL,
+					       link_info->keep_memory);
+  if (internal_relocs == NULL)
+    goto error_return;
 
   /* Make sure the stac.rela stuff gets read in.  */
   stab = bfd_get_section_by_name (abfd, ".stab");
@@ -849,373 +848,199 @@ ip2k_elf_relax_section (abfd, sec, link_info, again)
       /* So stab does exits.  */
       Elf_Internal_Rela * irelbase;
 
-      irelbase = _bfd_elf32_link_read_relocs (abfd, stab, NULL,
-					      (Elf_Internal_Rela *)NULL,
-					      link_info->keep_memory);
+      irelbase = _bfd_elf_link_read_relocs (abfd, stab, NULL,
+					    (Elf_Internal_Rela *)NULL,
+					    link_info->keep_memory);
     }
 
   /* Get section contents cached copy if it exists.  */
-  if (elf_section_data (sec)->this_hdr.contents != NULL)
-    misc.contents = elf_section_data (sec)->this_hdr.contents;
-  else
+  if (contents == NULL)
     {
-      /* Go get them of disk.  */
-      misc.contents = (bfd_byte *) bfd_malloc (sec->_raw_size);
-      if (misc.contents == NULL)
+      /* Get cached copy if it exists.  */
+      if (elf_section_data (sec)->this_hdr.contents != NULL)
+	contents = elf_section_data (sec)->this_hdr.contents;
+      else
 	{
-	  tidyup_after_error (&misc);
-	  return false;
-	}
-
-      misc.free_contents = misc.contents;
-      if (! bfd_get_section_contents (abfd, sec, misc.contents,
-				      (file_ptr)0,
-				      sec->_raw_size))
-	{
-	  tidyup_after_error (&misc);
-	  return false;
+	  /* Go get them off disk.  */
+	  if (!bfd_malloc_and_get_section (abfd, sec, &contents))
+	    goto error_return;
 	}
     }
-  
+
   /* Read this BFD's symbols cached copy if it exists.  */
-  if (misc.symtab_hdr->contents != NULL)
-    misc.extsyms = (Elf32_External_Sym *) misc.symtab_hdr->contents;
-  else
+  if (isymbuf == NULL && symtab_hdr->sh_info != 0)
     {
-      /* Go get them off disk.  */
-      misc.extsyms = ((Elf32_External_Sym *)bfd_malloc (misc.symtab_hdr->sh_size));
-      if (misc.extsyms == NULL)
-	{
-	  tidyup_after_error (&misc);
-	  return false;
-	}
-
-      misc.free_extsyms = misc.extsyms;
-      if (bfd_seek (abfd, misc.symtab_hdr->sh_offset, SEEK_SET) != 0
-          || (bfd_read (misc.extsyms, 1, misc.symtab_hdr->sh_size, abfd)
-          != misc.symtab_hdr->sh_size))
-	{
-	  tidyup_after_error (&misc);
-	  return false;
-	}
+      isymbuf = (Elf_Internal_Sym *) symtab_hdr->contents;
+      if (isymbuf == NULL)
+	isymbuf = bfd_elf_get_elf_syms (abfd, symtab_hdr,
+					symtab_hdr->sh_info, 0,
+					NULL, NULL, NULL);
+      if (isymbuf == NULL)
+	goto error_return;
     }
 
-  if (shndx_hdr->sh_size != 0)
-    {
-      bfd_size_type amt;
-
-      amt = misc.symtab_hdr->sh_info * sizeof (Elf_External_Sym_Shndx);
-      shndx_buf = (Elf_External_Sym_Shndx *) bfd_malloc (amt);
-      if (shndx_buf == NULL)
-	{
-	  tidyup_after_error (&misc);
-	  return false;
-	}
-      if (bfd_seek (abfd, shndx_hdr->sh_offset, SEEK_SET) != 0
-	  || bfd_bread ((PTR) shndx_buf, amt, abfd) != amt)
-	{
-	  tidyup_after_error (&misc);
-	  return false;
-	}
-      shndx_hdr->contents = (PTR) shndx_buf;
-    }
+  misc.symtab_hdr = symtab_hdr;
+  misc.isymbuf = isymbuf;
+  misc.irelbase = internal_relocs;
+  misc.contents = contents;
 
   /* This is where all the relaxation actually get done.  */
-
-  if (pass == 1)
+  if ((pass == 1) || (new_pass && !changed))
     {
-      /* On the first pass we remove *all* page instructions and
-         relax the prolog for switch dispatch tables. This gets
-	 us to the starting point for subsequent passes where
-	 we add page instructions back in as needed.  */
+      /* On the first pass we simply search for the lowest page that
+         we havn't relaxed yet. Note that the pass count is reset
+         each time a page is complete in order to move on to the next page.
+         If we can't find any more pages then we are finished.  */
+      if (new_pass)
+	{
+	  pass = 1;
+	  new_pass = FALSE;
+	  changed = TRUE; /* Pre-initialize to break out of pass 1.  */
+	  search_addr = 0xFFFFFFFF;
+	}
 
-      if (! ip2k_elf_relax_section_pass1 (abfd, sec, again, &misc))
-        {
-	  tidyup_after_error (&misc);
-	  return false;
-        }
+      if ((BASEADDR (sec) + sec->size < search_addr)
+	  && (BASEADDR (sec) + sec->size > page_end))
+	{
+	  if (BASEADDR (sec) <= page_end)
+	    search_addr = page_end + 1;
+	  else
+	    search_addr = BASEADDR (sec);
 
-      changed |= *again;
+	  /* Found a page => more work to do.  */
+	  *again = TRUE;
+	}
     }
   else
     {
-      /* Add page instructions back in as needed but we ignore 
-	 the issue with sections (functions) crossing a page
-	 boundary until we have converged to an approximate
-	 solution (i.e. nothing has changed on this relaxation
-	 pass) and we then know roughly where the page boundaries
-	 will end up.
-
-	 After we have have converged to an approximate solution
-	 we set the final pass flag and continue relaxing. On these
-	 final passes if a section (function) cross page boundary
-	 we will add *all* the page instructions back into such
-	 sections.
-
-	 After adding *all* page instructions back into a section
-	 which crosses a page bounbdary we reset the final pass flag
-	 so the we will again interate until we find a new approximate
-	 solution which is closer to the final solution.  */
-
-      if (! ip2k_elf_relax_section_passN (abfd, sec, again,
-					 &final_pass,  &misc))
+      if (new_pass)
 	{
-	  tidyup_after_error (&misc);
-	  return false;
+	  new_pass = FALSE;
+	  changed = FALSE;
+	  page_start = PAGENO (search_addr);
+	  page_end = page_start | 0x00003FFF;
 	}
 
-      changed |= *again;
-
-      /* If nothing has changed on this relaxation
-	  pass restart the final relaxaton pass.  */
-      if (! changed && last_section == sec)
+      /* Only process sections in range.  */
+      if ((BASEADDR (sec) + sec->size >= page_start)
+	  && (BASEADDR (sec) <= page_end))
 	{
-	  /* If this was the final pass and we didn't reset 
-	     the final pass flag then we are done, otherwise
-	     do another final pass.  */
-	  if (! final_pass)
-	    {
-	      final_pass = true;
-	      *again = true;
-	    }
+          if (!ip2k_elf_relax_section_page (abfd, sec, &changed, &misc, page_start, page_end))
+	    return FALSE;
 	}
+      *again = TRUE;
     }
 
-  /* Perform some house keeping after relaxing the section.  */  
+  /* Perform some house keeping after relaxing the section.  */
 
-  if (misc.free_relocs != NULL)
-    {
-      free (misc.free_relocs);
-      misc.free_relocs = NULL;
-    }
-
-  if (misc.free_contents != NULL)
+  if (isymbuf != NULL
+      && symtab_hdr->contents != (unsigned char *) isymbuf)
     {
       if (! link_info->keep_memory)
-	free (misc.free_contents);
+	free (isymbuf);
+      else
+	symtab_hdr->contents = (unsigned char *) isymbuf;
+    }
+
+  if (contents != NULL
+      && elf_section_data (sec)->this_hdr.contents != contents)
+    {
+      if (! link_info->keep_memory)
+	free (contents);
       else
 	{
 	  /* Cache the section contents for elf_link_input_bfd.  */
-	  elf_section_data (sec)->this_hdr.contents = misc.contents;
+	  elf_section_data (sec)->this_hdr.contents = contents;
 	}
-
-      misc.free_contents = NULL;
     }
 
-  if (misc.free_extsyms != NULL)
-    {
-      if (! link_info->keep_memory)
-	free (misc.free_extsyms);
-      else
-	{
-	  /* Cache the symbols for elf_link_input_bfd.  */
-	  misc.symtab_hdr->contents = misc.extsyms;
-	}
+  if (internal_relocs != NULL
+      && elf_section_data (sec)->relocs != internal_relocs)
+    free (internal_relocs);
 
-      misc.free_extsyms = NULL;
-    }
+  return TRUE;
 
-  return true;
+ error_return:
+  if (isymbuf != NULL
+      && symtab_hdr->contents != (unsigned char *) isymbuf)
+    free (isymbuf);
+  if (contents != NULL
+      && elf_section_data (sec)->this_hdr.contents != contents)
+    free (contents);
+  if (internal_relocs != NULL
+      && elf_section_data (sec)->relocs != internal_relocs)
+    free (internal_relocs);
+  return FALSE;
 }
 
-static void
-tidyup_after_error (misc)
+/* This function handles relaxation of a section in a specific page.  */
+
+static bfd_boolean
+ip2k_elf_relax_section_page (abfd, sec, again, misc, page_start, page_end)
+     bfd *abfd;
+     asection *sec;
+     bfd_boolean *again;
      struct misc *misc;
-{
-  if (misc->free_relocs != NULL)
-    {
-      free (misc->free_relocs);
-      misc->free_relocs = NULL;
-    }
-
-  if (misc->free_contents != NULL)
-    {
-      free (misc->free_contents);
-      misc->free_contents = NULL;
-    }
-
-  if (misc->free_extsyms != NULL)
-    {
-      free (misc->free_extsyms);
-      misc->free_extsyms = NULL;
-    }
-
-  return;
-}
-
-/* This function handles relaxation during the first pass.  */
-
-static boolean
-ip2k_elf_relax_section_pass1 (abfd, sec, again, misc)
-     bfd *abfd;
-     asection *sec;
-     boolean *again;
-     struct misc * misc;
+     unsigned long page_start;
+     unsigned long page_end;
 {
   Elf_Internal_Rela *irelend = misc->irelbase + sec->reloc_count;
   Elf_Internal_Rela *irel;
-
-  /* Walk thru the section looking for relaxation opertunities.  */
+  int switch_table_128;
+  int switch_table_256;
+  
+  /* Walk thru the section looking for relaxation opportunities.  */
   for (irel = misc->irelbase; irel < irelend; irel++)
     {
-      if (ELF32_R_TYPE (irel->r_info) == (int) R_IP2K_PAGE3)
-      {
-	bfd_byte code0 = bfd_get_8 (abfd,
-				    misc->contents + irel->r_offset);
-	bfd_byte code1 = bfd_get_8 (abfd,
-				    misc->contents + irel->r_offset + 1);
+      if (ELF32_R_TYPE (irel->r_info) != (int) R_IP2K_PAGE3)
+	/* Ignore non page instructions.  */
+	continue;
 
-        /* Verify that this is the PAGE opcode.  */
-        if (IS_PAGE_OPCODE (code0, code1))
-	  {
-	    /* Note that we've changed the relocs, section contents, etc.  */
-	    elf_section_data (sec)->relocs = misc->irelbase;
-	    misc->free_relocs = NULL;
+      if (BASEADDR (sec) + irel->r_offset < page_start)
+	/* Ignore page instructions on earlier page - they have
+	   already been processed. Remember that there is code flow
+	   that crosses a page boundary.  */
+	continue;
 
-	    elf_section_data (sec)->this_hdr.contents = misc->contents;
-	    misc->free_contents = NULL;
+      if (BASEADDR (sec) + irel->r_offset > page_end)
+	/* Flow beyond end of page => nothing more to do for this page.  */
+	return TRUE;
 
-	    misc->symtab_hdr->contents = (bfd_byte *) misc->extsyms;
-	    misc->free_extsyms = NULL;
+      /* Detect switch tables.  */
+      switch_table_128 = ip2k_is_switch_table_128 (abfd, sec, irel->r_offset, misc->contents);
+      switch_table_256 = ip2k_is_switch_table_256 (abfd, sec, irel->r_offset, misc->contents);
 
-	    /* Handle switch dispatch tables/prologues.  */
-	    if (!  relax_switch_dispatch_tables_pass1 (abfd, sec,
-						       irel->r_offset, misc))
-	      return false;
-	    
-	    /* Fix the relocation's type.  */
-	    irel->r_info = ELF32_R_INFO (ELF32_R_SYM (irel->r_info),
-				         R_IP2K_NONE);
+      if ((switch_table_128 > 0) || (switch_table_256 > 0))
+	/* If the index is greater than 0 then it has already been processed.  */
+	continue;
 
-	    /* Delete the PAGE insn.  */
-	    if (! ip2k_elf_relax_delete_bytes (abfd, sec,
-					       irel->r_offset,
-					       sizeof (page_opcode)))
-	      return false;
-
-	    /* That will change things, so, we should relax again.
-	       Note that this is not required, and it may be slow.  */
-	    *again = true;
-	  }
-      }
-    }
-
-  return true;
-}
-
-/* This function handles relaxation for 2nd and subsequent passes.  */
-
-static boolean
-ip2k_elf_relax_section_passN (abfd, sec, again, final_pass, misc)
-     bfd *abfd;
-     asection *sec;
-     boolean *again;
-     boolean *final_pass;
-     struct misc * misc;
-{
-  Elf_Internal_Rela *irelend = misc->irelbase + sec->reloc_count;
-  Elf_Internal_Rela *irel;
-  boolean add_all;
-
-  /* If we are on the final relaxation pass and the section crosses
-     then set a flag to indicate that *all* page instructions need
-     to be added back into this section.  */
-  if (*final_pass)
-    {
-      add_all = (PAGENO (BASEADDR (sec))
-	         != PAGENO (BASEADDR (sec) + sec->_cooked_size));
-
-      /* If this section crosses a page boundary set the crossed
-	 page boundary flag.  */
-      if (add_all)
-	sec->userdata = sec;
-      else
+      if (switch_table_128 == 0)
 	{
-	  /* If the section had previously crossed a page boundary
-	     but on this pass does not then reset crossed page
-	     boundary flag and rerun the 1st relaxation pass on
-	     this section.  */
-	  if (sec->userdata)
-	    {
-	      sec->userdata = NULL;
-	      if (! ip2k_elf_relax_section_pass1 (abfd, sec, again, misc))
-		return false;
-	    }
+	  if (!ip2k_relax_switch_table_128 (abfd, sec, irel, again, misc))
+	    return FALSE;
+
+	  continue;
+	}
+
+      if (switch_table_256 == 0)
+	{
+	  if (!ip2k_relax_switch_table_256 (abfd, sec, irel, again, misc))
+	    return FALSE;
+
+	  continue;
+	}
+
+      /* Simple relax.  */
+      if (ip2k_test_page_insn (abfd, sec, irel, misc))
+	{
+	  if (!ip2k_delete_page_insn (abfd, sec, irel, again, misc))
+	    return FALSE;
+
+	  continue;
 	}
     }
-  else
-    add_all = false;
 
-  /* Walk thru the section looking for call/jmp
-      instructions which need a page instruction.  */
-  for (irel = misc->irelbase; irel < irelend; irel++)
-    {
-      if (ELF32_R_TYPE (irel->r_info) == (int) R_IP2K_ADDR16CJP)
-      {
-        /* Get the value of the symbol referred to by the reloc.  */
-        bfd_vma symval = symbol_value (abfd, misc->symtab_hdr, misc->extsyms,
-				       irel);
-	bfd_byte code0, code1;
-
-        if (symval == UNDEFINED_SYMBOL)
-	  {
-	    /* This appears to be a reference to an undefined
-	       symbol.  Just ignore it--it will be caught by the
-	       regular reloc processing.  */
-	    continue;
-	  }
-
-        /* For simplicity of coding, we are going to modify the section
-	   contents, the section relocs, and the BFD symbol table.  We
-	   must tell the rest of the code not to free up this
-	   information.  It would be possible to instead create a table
-	   of changes which have to be made, as is done in coff-mips.c;
-	   that would be more work, but would require less memory when
-	   the linker is run.  */
-
-	/* Get the opcode.  */
-	code0 = bfd_get_8 (abfd, misc->contents + irel->r_offset);
-	code1 = bfd_get_8 (abfd, misc->contents + irel->r_offset + 1);
-
-	if (IS_JMP_OPCODE (code0, code1) || IS_CALL_OPCODE (code0, code1))
-	  {
-	    if (*final_pass)
-	      {
-		if (! unrelax_switch_dispatch_tables_passN (abfd, sec,
-						            irel->r_offset,
-                                                            again, misc))
-		  return false;
-
-                if (*again)
-		  add_all = false;
-	      }
-
-	    code0 = bfd_get_8 (abfd, misc->contents + irel->r_offset - 2);
-	    code1 = bfd_get_8 (abfd, misc->contents + irel->r_offset - 1);
-
-	    if (! IS_PAGE_OPCODE (code0, code1))
-	      {
-		bfd_vma value = symval + irel->r_addend;
-		bfd_vma addr  = BASEADDR (sec) + irel->r_offset;
-
-		if (add_all || PAGENO (addr) != PAGENO (value))
-		  {
-		    if (! add_page_insn (abfd, sec, irel, misc))
-		      return false;
-
-		    /* That will have changed things, so,  we must relax again.  */
-		    *again = true;
-		  }
-	       }
-	   }
-        }
-    }
-      
-  /* If anything changed reset the final pass flag.  */
-  if (*again)
-    *final_pass = false;
-
-  return true;
+  return TRUE;
 }
 
 /* Parts of a Stabs entry.  */
@@ -1239,18 +1064,17 @@ adjust_all_relocations (abfd, sec, addr, endaddr, count, noadj)
      int noadj;
 {
   Elf_Internal_Shdr *symtab_hdr;
-  Elf32_External_Sym *extsyms;
-  int shndx, index;
+  Elf_Internal_Sym *isymbuf, *isym, *isymend;
+  unsigned int shndx;
   bfd_byte *contents;
   Elf_Internal_Rela *irel, *irelend, *irelbase;
-  Elf32_External_Sym *esym, *esymend;
+  struct elf_link_hash_entry **sym_hashes;
+  struct elf_link_hash_entry **end_hashes;
+  unsigned int symcount;
   asection *stab;
-  bfd_byte *stabp, *stabend, *stabcontents;
-  Elf_Internal_Shdr *shndx_hdr;
-  Elf_External_Sym_Shndx *sym_shndx;
-    
+
   symtab_hdr = &elf_tdata (abfd)->symtab_hdr;
-  extsyms = (Elf32_External_Sym *) symtab_hdr->contents;
+  isymbuf = (Elf_Internal_Sym *) symtab_hdr->contents;
 
   shndx = _bfd_elf_section_from_bfd_section (abfd, sec);
 
@@ -1266,34 +1090,16 @@ adjust_all_relocations (abfd, sec, addr, endaddr, count, noadj)
           /* Get the value of the symbol referred to by the reloc.  */
           if (ELF32_R_SYM (irel->r_info) < symtab_hdr->sh_info)
             {
-              Elf_Internal_Sym isym;
               asection *sym_sec;
-	      Elf_External_Sym_Shndx *sym_shndx;
-	      Elf_Internal_Shdr *shndx_hdr;
 
               /* A local symbol.  */
-	      
-	      shndx_hdr = &elf_tdata (abfd)->symtab_shndx_hdr;
-	      sym_shndx = (Elf_External_Sym_Shndx *) shndx_hdr->contents;
-	      sym_shndx = (sym_shndx
-			   ? sym_shndx + ELF32_R_SYM (irel->r_info) : NULL);
-              bfd_elf32_swap_symbol_in (abfd,
-					extsyms + ELF32_R_SYM (irel->r_info),
-					sym_shndx, &isym);
+	      isym = isymbuf + ELF32_R_SYM (irel->r_info);
+              sym_sec = bfd_section_from_elf_index (abfd, isym->st_shndx);
 
-	      if (isym.st_shndx == SHN_UNDEF)
-		sym_sec = bfd_und_section_ptr;
-	      else if (isym.st_shndx == SHN_ABS)
-		sym_sec = bfd_abs_section_ptr;
-	      else if (isym.st_shndx == SHN_COMMON)
-		sym_sec = bfd_com_section_ptr;
-	      else
-		sym_sec = bfd_section_from_elf_index (abfd, isym.st_shndx);
-
-              if (sym_sec == sec)
+              if (isym->st_shndx == shndx)
                 {
                   bfd_vma baseaddr = BASEADDR (sec);
-                  bfd_vma symval = BASEADDR (sym_sec) + isym.st_value
+                  bfd_vma symval = BASEADDR (sym_sec) + isym->st_value
                                    + irel->r_addend;
 
                   if ((baseaddr + addr + noadj) <= symval
@@ -1312,6 +1118,9 @@ adjust_all_relocations (abfd, sec, addr, endaddr, count, noadj)
   stab = bfd_get_section_by_name (abfd, ".stab");
   if (stab)
     {
+      bfd_byte *stabcontents, *stabend, *stabp;
+      bfd_size_type stab_size = stab->rawsize ? stab->rawsize : stab->size;
+
       irelbase = elf_section_data (stab)->relocs;
       irelend = irelbase + stab->reloc_count;
 
@@ -1320,18 +1129,18 @@ adjust_all_relocations (abfd, sec, addr, endaddr, count, noadj)
 	stabcontents = elf_section_data (stab)->this_hdr.contents;
       else
 	{
-	  stabcontents = (bfd_byte *) bfd_alloc (abfd, stab->_raw_size);
-	  if (stabcontents == NULL)
-	    return;
-	  if (! bfd_get_section_contents (abfd, stab, stabcontents,
-					  (file_ptr) 0, stab->_raw_size))
-	    return;
+	  if (!bfd_malloc_and_get_section (abfd, stab, &stabcontents))
+	    {
+	      if (stabcontents != NULL)
+		free (stabcontents);
+	      return;
+	    }
 
 	  /* We need to remember this.  */
 	  elf_section_data (stab)->this_hdr.contents = stabcontents;
 	}
 
-      stabend = stabcontents + stab->_raw_size;
+      stabend = stabcontents + stab_size;
 
       for (irel = irelbase; irel < irelend; irel++)
 	{
@@ -1340,31 +1149,11 @@ adjust_all_relocations (abfd, sec, addr, endaddr, count, noadj)
 	      /* Get the value of the symbol referred to by the reloc.  */
 	      if (ELF32_R_SYM (irel->r_info) < symtab_hdr->sh_info)
 		{
-		  Elf_Internal_Sym isym;
 		  asection *sym_sec;
-		  Elf_External_Sym_Shndx *sym_shndx;
-		  Elf_Internal_Shdr *shndx_hdr;
 		  
 		  /* A local symbol.  */
-		  shndx_hdr = &elf_tdata (abfd)->symtab_shndx_hdr;
-		  sym_shndx = (Elf_External_Sym_Shndx *) shndx_hdr->contents;
-		  sym_shndx = (sym_shndx
-			       ? sym_shndx + ELF32_R_SYM (irel->r_info)
-			       : NULL);
-		  
-		  bfd_elf32_swap_symbol_in (abfd,
-					    (extsyms
-					     + ELF32_R_SYM (irel->r_info)),
-					    sym_shndx, &isym);
-		  
-		  if (isym.st_shndx == SHN_UNDEF)
-		    sym_sec = bfd_und_section_ptr;
-		  else if (isym.st_shndx == SHN_ABS)
-		    sym_sec = bfd_abs_section_ptr;
-		  else if (isym.st_shndx == SHN_COMMON)
-		    sym_sec = bfd_com_section_ptr;
-		  else
-		    sym_sec = bfd_section_from_elf_index (abfd, isym.st_shndx);
+		  isym = isymbuf + ELF32_R_SYM (irel->r_info);
+		  sym_sec = bfd_section_from_elf_index (abfd, isym->st_shndx);
 		  
 		  if (sym_sec == sec)
 		    {
@@ -1374,7 +1163,7 @@ adjust_all_relocations (abfd, sec, addr, endaddr, count, noadj)
 		      unsigned short desc;
 		      bfd_vma value;
 		      bfd_vma baseaddr = BASEADDR (sec);
-		      bfd_vma symval = BASEADDR (sym_sec) + isym.st_value
+		      bfd_vma symval = BASEADDR (sym_sec) + isym->st_value
 			+ irel->r_addend;
 		      
 		      if ((baseaddr + addr) <= symval
@@ -1385,10 +1174,10 @@ adjust_all_relocations (abfd, sec, addr, endaddr, count, noadj)
 		      stabp = stabcontents + irel->r_offset - 8; 
 
 		      /* Go pullout the stab entry.  */
-		      strx = bfd_h_get_32 (abfd, stabp + STRDXOFF);
-		      type = bfd_h_get_8 (abfd, stabp + TYPEOFF);
+		      strx  = bfd_h_get_32 (abfd, stabp + STRDXOFF);
+		      type  = bfd_h_get_8 (abfd, stabp + TYPEOFF);
 		      other = bfd_h_get_8 (abfd, stabp + OTHEROFF);
-		      desc = bfd_h_get_16 (abfd, stabp + DESCOFF);
+		      desc  = bfd_h_get_16 (abfd, stabp + DESCOFF);
 		      value = bfd_h_get_32 (abfd, stabp + VALOFF);
 		      
 		      name = bfd_get_stab_name (type);
@@ -1406,11 +1195,12 @@ adjust_all_relocations (abfd, sec, addr, endaddr, count, noadj)
 			  for (;stabp < stabend; stabp += STABSIZE)
 			    {
 			      /* Go pullout the stab entry.  */
-			      strx = bfd_h_get_32 (abfd, stabp + STRDXOFF);
-			      type = bfd_h_get_8 (abfd, stabp + TYPEOFF);
+			      strx  = bfd_h_get_32 (abfd, stabp + STRDXOFF);
+			      type  = bfd_h_get_8 (abfd, stabp + TYPEOFF);
 			      other = bfd_h_get_8 (abfd, stabp + OTHEROFF);
-			      desc = bfd_h_get_16 (abfd, stabp + DESCOFF);
+			      desc  = bfd_h_get_16 (abfd, stabp + DESCOFF);
 			      value = bfd_h_get_32 (abfd, stabp + VALOFF);
+
 			      name = bfd_get_stab_name (type);
 
 			      if (strcmp (name, "FUN") == 0)
@@ -1459,150 +1249,40 @@ adjust_all_relocations (abfd, sec, addr, endaddr, count, noadj)
   addr += noadj;
 
   /* Adjust the local symbols defined in this section.  */
-  shndx_hdr = &elf_tdata (abfd)->symtab_shndx_hdr;
-  sym_shndx = (Elf_External_Sym_Shndx *) shndx_hdr->contents;
-  esym = extsyms;
-  esymend = esym + symtab_hdr->sh_info;
-  for (; esym < esymend; esym++, sym_shndx = (sym_shndx ? sym_shndx + 1: NULL))
+  isymend = isymbuf + symtab_hdr->sh_info;
+  for (isym = isymbuf; isym < isymend; isym++)
     {
-      Elf_Internal_Sym isym;
-      Elf_External_Sym_Shndx dummy;
-
-      bfd_elf32_swap_symbol_in (abfd, esym, sym_shndx, &isym);
-
-      if (isym.st_shndx == shndx)
-        {
-          if (addr <= isym.st_value && isym.st_value < endaddr)
-            {
-              isym.st_value += count;
-              bfd_elf32_swap_symbol_out (abfd, &isym, esym, &dummy);
-            }
-        }
+      if (isym->st_shndx == shndx
+	  && addr <= isym->st_value
+	  && isym->st_value < endaddr)
+	isym->st_value += count;
     }
 
-  /* Now adjust the global symbols defined in this section.  */
-  shndx_hdr = &elf_tdata (abfd)->symtab_shndx_hdr;
-  sym_shndx = (Elf_External_Sym_Shndx *) shndx_hdr->contents;
-  esym = extsyms + symtab_hdr->sh_info;
-  esymend = extsyms + (symtab_hdr->sh_size / sizeof (Elf32_External_Sym));
-  for (index = 0; esym < esymend;
-       esym++, index++, sym_shndx = (sym_shndx ? sym_shndx + 1: NULL))
+    /* Now adjust the global symbols defined in this section.  */
+  symcount = (symtab_hdr->sh_size / sizeof (Elf32_External_Sym)
+	      - symtab_hdr->sh_info);
+  sym_hashes = elf_sym_hashes (abfd);
+  end_hashes = sym_hashes + symcount;
+  for (; sym_hashes < end_hashes; sym_hashes++)
     {
-      Elf_Internal_Sym isym;
-      struct elf_link_hash_entry *sym_hash;
+      struct elf_link_hash_entry *sym_hash = *sym_hashes;
 
-      bfd_elf32_swap_symbol_in (abfd, esym, sym_shndx, &isym);
-      sym_hash = elf_sym_hashes (abfd)[index];
-
-      if (isym.st_shndx == shndx
-          && (sym_hash->root.type == bfd_link_hash_defined
-              || sym_hash->root.type == bfd_link_hash_defweak)
-          && sym_hash->root.u.def.section == sec)
-        {
+      if ((sym_hash->root.type == bfd_link_hash_defined
+	   || sym_hash->root.type == bfd_link_hash_defweak)
+	  && sym_hash->root.u.def.section == sec)
+	{
           if (addr <= sym_hash->root.u.def.value
               && sym_hash->root.u.def.value < endaddr)
-            {
-	      Elf_External_Sym_Shndx dummy;
-
-	      sym_hash->root.u.def.value += count;
-              bfd_elf32_swap_symbol_out (abfd, &isym, esym, &dummy);
-            }
-        }
+	    sym_hash->root.u.def.value += count;
+	}
     }
 
   return;
 }
 
-static boolean
-add_page_insn (abfd, sec, irel, misc)
-      bfd *abfd;
-      asection *sec;
-      Elf_Internal_Rela *irel;
-      struct misc *misc;
-{
-  /* Note that we've changed the relocs, section contents, etc.  */
-  elf_section_data (sec)->relocs = misc->irelbase;
-  misc->free_relocs = NULL;
-
-  elf_section_data (sec)->this_hdr.contents = misc->contents;
-  misc->free_contents = NULL;
-
-  misc->symtab_hdr->contents = (bfd_byte *) misc->extsyms;
-  misc->free_extsyms = NULL;
-
-  /* Add the PAGE insn.  */
-  if (! ip2k_elf_relax_add_bytes (abfd, sec, irel->r_offset,
-                                  page_opcode,
-                                  sizeof (page_opcode),
-				  sizeof (page_opcode)))
-    return false;
-  else
-    {
-       Elf32_Internal_Rela * jrel = irel - 1;
-
-       /* Add relocation for PAGE insn added.  */
-       if (ELF32_R_TYPE (jrel->r_info) != R_IP2K_NONE)
-	 {
-	   bfd_byte code0, code1;
-	   char *msg = NULL;
-	   
-	   /* Get the opcode.  */
-	   code0 = bfd_get_8 (abfd, misc->contents + irel->r_offset);
-	   code1 = bfd_get_8 (abfd, misc->contents + irel->r_offset + 1);
-
-	   if (IS_JMP_OPCODE (code0, code1))
-	     msg = "\tJMP instruction missing a preceeding PAGE instruction in %s\n\n";
-
-	   else if (IS_CALL_OPCODE (code0, code1))
-	     msg = "\tCALL instruction missing a preceeding PAGE instruction in %s\n\n";
-
-	   if (msg)
-	     {
-	       fprintf (stderr, "\n\t *** LINKER RELAXATION failure ***\n");
-	       fprintf (stderr, msg, sec->owner->filename);
-	     }
-
-	   return false;
-	 }
-
-       jrel->r_addend = irel->r_addend;
-       jrel->r_offset = irel->r_offset - sizeof (page_opcode);
-       jrel->r_info = ELF32_R_INFO (ELF32_R_SYM (irel->r_info),
-                                    R_IP2K_PAGE3);
-     }
-
-   return true;
-}
-
-/* Insert bytes into a section while relaxing.  */
-
-static boolean
-ip2k_elf_relax_add_bytes (abfd, sec, addr, bytes, count, noadj)
-     bfd *abfd;
-     asection *sec;
-     bfd_vma addr;
-     const bfd_byte *bytes;
-     int count;
-     int noadj;
-{
-  bfd_byte *contents = elf_section_data (sec)->this_hdr.contents;
-  bfd_vma endaddr = sec->_cooked_size;
-
-  /* Make room to insert the bytes.  */
-  memmove (contents + addr + count, contents + addr, endaddr - addr);
-
-  /* Insert the bytes into the section.  */
-  memcpy  (contents + addr, bytes, count);
-  
-  sec->_cooked_size += count;
-
-  adjust_all_relocations (abfd, sec, addr, endaddr, count, noadj);
-  return true;
-}
-
 /* Delete some bytes from a section while relaxing.  */
 
-static boolean
+static bfd_boolean
 ip2k_elf_relax_delete_bytes (abfd, sec, addr, count)
      bfd *abfd;
      asection *sec;
@@ -1610,16 +1290,16 @@ ip2k_elf_relax_delete_bytes (abfd, sec, addr, count)
      int count;
 {
   bfd_byte *contents = elf_section_data (sec)->this_hdr.contents;
-  bfd_vma endaddr = sec->_cooked_size;
+  bfd_vma endaddr = sec->size;
 
   /* Actually delete the bytes.  */
   memmove (contents + addr, contents + addr + count,
 	   endaddr - addr - count);
 
-  sec->_cooked_size -= count;
+  sec->size -= count;
 
   adjust_all_relocations (abfd, sec, addr + count, endaddr, -count, 0);
-  return true;
+  return TRUE;
 }
 
 /* -------------------------------------------------------------------- */
@@ -1633,7 +1313,7 @@ static void
 ip2k_info_to_howto_rela (abfd, cache_ptr, dst)
      bfd * abfd ATTRIBUTE_UNUSED;
      arelent * cache_ptr;
-     Elf32_Internal_Rela * dst;
+     Elf_Internal_Rela * dst;
 {
   unsigned int r_type;
 
@@ -1659,8 +1339,9 @@ ip2k_final_link_relocate (howto, input_bfd, input_section, contents, rel,
      Elf_Internal_Rela * rel;
      bfd_vma             relocation;
 {
-  bfd_reloc_status_type r = bfd_reloc_ok;
+  static bfd_vma page_addr = 0;
 
+  bfd_reloc_status_type r = bfd_reloc_ok;
   switch (howto->type)
     {
       /* Handle data space relocations.  */
@@ -1678,8 +1359,45 @@ ip2k_final_link_relocate (howto, input_bfd, input_section, contents, rel,
       break;
 
       /* Handle insn space relocations.  */
-    case R_IP2K_ADDR16CJP:
     case R_IP2K_PAGE3:
+      page_addr = BASEADDR (input_section) + rel->r_offset;
+      if ((relocation & IP2K_INSN_MASK) == IP2K_INSN_VALUE)
+	relocation &= ~IP2K_INSN_MASK;
+      else
+	r = bfd_reloc_notsupported;
+      break;
+
+    case R_IP2K_ADDR16CJP:
+      if (BASEADDR (input_section) + rel->r_offset != page_addr + 2)
+	{
+	  /* No preceding page instruction, verify that it isn't needed.  */
+	  if (PAGENO (relocation + rel->r_addend) !=
+	      ip2k_nominal_page_bits (input_bfd, input_section,
+	      			      rel->r_offset, contents))
+	    _bfd_error_handler (_("ip2k linker: missing page instruction at 0x%08lx (dest = 0x%08lx)."),
+				BASEADDR (input_section) + rel->r_offset,
+				relocation + rel->r_addend);
+        }
+      else if (ip2k_relaxed)
+        {
+          /* Preceding page instruction. Verify that the page instruction is
+             really needed. One reason for the relaxation to miss a page is if
+             the section is not marked as executable.  */
+	  if (!ip2k_is_switch_table_128 (input_bfd, input_section, rel->r_offset - 2, contents) &&
+	      !ip2k_is_switch_table_256 (input_bfd, input_section, rel->r_offset - 2, contents) &&
+	      (PAGENO (relocation + rel->r_addend) ==
+	       ip2k_nominal_page_bits (input_bfd, input_section,
+	      			      rel->r_offset - 2, contents)))
+	    _bfd_error_handler (_("ip2k linker: redundant page instruction at 0x%08lx (dest = 0x%08lx)."),
+				page_addr,
+				relocation + rel->r_addend);
+        }
+      if ((relocation & IP2K_INSN_MASK) == IP2K_INSN_VALUE)
+	relocation &= ~IP2K_INSN_MASK;
+      else
+	r = bfd_reloc_notsupported;
+      break;
+
     case R_IP2K_LO8INSN:
     case R_IP2K_HI8INSN:
     case R_IP2K_PC_SKIP:
@@ -1711,9 +1429,6 @@ ip2k_final_link_relocate (howto, input_bfd, input_section, contents, rel,
 }
 
 /* Relocate a IP2K ELF section.
-   There is some attempt to make this function usable for many architectures,
-   both USE_REL and USE_RELA ['twould be nice if such a critter existed],
-   if only to serve as a learning tool.
 
    The RELOCATE_SECTION function is called by the new ELF backend linker
    to handle the relocations for a section.
@@ -1723,7 +1438,7 @@ ip2k_final_link_relocate (howto, input_bfd, input_section, contents, rel,
    zero.
 
    This function is responsible for adjusting the section contents as
-   necessary, and (if using Rela relocs and generating a relocateable
+   necessary, and (if using Rela relocs and generating a relocatable
    output file) adjusting the reloc addend as necessary.
 
    This function does not have to worry about setting the reloc
@@ -1737,28 +1452,31 @@ ip2k_final_link_relocate (howto, input_bfd, input_section, contents, rel,
    The global hash table entry for the global symbols can be found
    via elf_sym_hashes (input_bfd).
 
-   When generating relocateable output, this function must handle
+   When generating relocatable output, this function must handle
    STB_LOCAL/STT_SECTION symbols specially.  The output symbol is
    going to be the section symbol corresponding to the output
    section, which means that the addend must be adjusted
    accordingly.  */
 
-static boolean
+static bfd_boolean
 ip2k_elf_relocate_section (output_bfd, info, input_bfd, input_section,
 			   contents, relocs, local_syms, local_sections)
-     bfd *                   output_bfd ATTRIBUTE_UNUSED;
-     struct bfd_link_info *  info;
-     bfd *                   input_bfd;
-     asection *              input_section;
-     bfd_byte *              contents;
-     Elf_Internal_Rela *     relocs;
-     Elf_Internal_Sym *      local_syms;
-     asection **             local_sections;
+     bfd *output_bfd ATTRIBUTE_UNUSED;
+     struct bfd_link_info *info;
+     bfd *input_bfd;
+     asection *input_section;
+     bfd_byte *contents;
+     Elf_Internal_Rela *relocs;
+     Elf_Internal_Sym *local_syms;
+     asection **local_sections;
 {
-  Elf_Internal_Shdr *           symtab_hdr;
-  struct elf_link_hash_entry ** sym_hashes;
-  Elf_Internal_Rela *           rel;
-  Elf_Internal_Rela *           relend;
+  Elf_Internal_Shdr *symtab_hdr;
+  struct elf_link_hash_entry **sym_hashes;
+  Elf_Internal_Rela *rel;
+  Elf_Internal_Rela *relend;
+
+  if (info->relocatable)
+    return TRUE;
 
   symtab_hdr = & elf_tdata (input_bfd)->symtab_hdr;
   sym_hashes = elf_sym_hashes (input_bfd);
@@ -1775,76 +1493,36 @@ ip2k_elf_relocate_section (output_bfd, info, input_bfd, input_section,
       bfd_reloc_status_type        r;
       const char *                 name = NULL;
       int                          r_type;
-      
-      r_type = ELF32_R_TYPE (rel->r_info);
-
-      r_symndx = ELF32_R_SYM (rel->r_info);
-
-      if (info->relocateable)
-	{
-	  /* This is a relocateable link.  We don't have to change
-             anything, unless the reloc is against a section symbol,
-             in which case we have to adjust according to where the
-             section symbol winds up in the output section.  */
-	  if (r_symndx < symtab_hdr->sh_info)
-	    {
-	      sym = local_syms + r_symndx;
-	      
-	      if (ELF_ST_TYPE (sym->st_info) == STT_SECTION)
-		{
-		  sec = local_sections [r_symndx];
-		  rel->r_addend += sec->output_offset + sym->st_value;
-		}
-	    }
-
-	  continue;
-	}
 
       /* This is a final link.  */
+      r_type = ELF32_R_TYPE (rel->r_info);
+      r_symndx = ELF32_R_SYM (rel->r_info);
       howto  = ip2k_elf_howto_table + ELF32_R_TYPE (rel->r_info);
       h      = NULL;
       sym    = NULL;
       sec    = NULL;
-      
+
       if (r_symndx < symtab_hdr->sh_info)
 	{
 	  sym = local_syms + r_symndx;
 	  sec = local_sections [r_symndx];
 	  relocation = BASEADDR (sec) + sym->st_value;
-	  
+
 	  name = bfd_elf_string_from_elf_section
 	    (input_bfd, symtab_hdr->sh_link, sym->st_name);
 	  name = (name == NULL) ? bfd_section_name (input_bfd, sec) : name;
 	}
       else
 	{
-	  h = sym_hashes [r_symndx - symtab_hdr->sh_info];
-	  
-	  while (h->root.type == bfd_link_hash_indirect
-		 || h->root.type == bfd_link_hash_warning)
-	    h = (struct elf_link_hash_entry *) h->root.u.i.link;
+	  bfd_boolean warned;
+	  bfd_boolean unresolved_reloc;
+
+	  RELOC_FOR_GLOBAL_SYMBOL (info, input_bfd, input_section, rel,
+				   r_symndx, symtab_hdr, sym_hashes,
+				   h, sec, relocation,
+				   unresolved_reloc, warned);
 
 	  name = h->root.root.string;
-	  
-	  if (h->root.type == bfd_link_hash_defined
-	      || h->root.type == bfd_link_hash_defweak)
-	    {
-	      sec = h->root.u.def.section;
-	      relocation = h->root.u.def.value + BASEADDR (sec);
-	    }
-	  else if (h->root.type == bfd_link_hash_undefweak)
-	    {
-	      relocation = 0;
-	    }
-	  else
-	    {
-	      if (! ((*info->callbacks->undefined_symbol)
-		     (info, h->root.root.string, input_bfd,
-		      input_section, rel->r_offset,
-		     (! info->shared || info->no_undefined))))
-		return false;
-	      relocation = 0;
-	    }
 	}
 
       /* Finally, the sole IP2K-specific part.  */
@@ -1859,15 +1537,15 @@ ip2k_elf_relocate_section (output_bfd, info, input_bfd, input_section,
 	    {
 	    case bfd_reloc_overflow:
 	      r = info->callbacks->reloc_overflow
-		(info, name, howto->name, (bfd_vma) 0,
-		 input_bfd, input_section, rel->r_offset);
+		(info, (h ? &h->root : NULL), name, howto->name,
+		 (bfd_vma) 0, input_bfd, input_section, rel->r_offset);
 	      break;
-	      
+
 	    case bfd_reloc_undefined:
 	      r = info->callbacks->undefined_symbol
-		(info, name, input_bfd, input_section, rel->r_offset, true);
+		(info, name, input_bfd, input_section, rel->r_offset, TRUE);
 	      break;
-	      
+
 	    case bfd_reloc_outofrange:
 	      msg = _("internal error: out of range error");
 	      break;
@@ -1893,11 +1571,11 @@ ip2k_elf_relocate_section (output_bfd, info, input_bfd, input_section,
 	      (info, msg, name, input_bfd, input_section, rel->r_offset);
 
 	  if (! r)
-	    return false;
+	    return FALSE;
 	}
     }
 
-  return true;
+  return TRUE;
 }
 
 static asection *
@@ -1912,12 +1590,6 @@ ip2k_elf_gc_mark_hook (sec, info, rel, h, sym)
     {
       switch (ELF32_R_TYPE (rel->r_info))
       {
-#if 0 
-      case R_IP2K_GNU_VTINHERIT:
-      case R_IP2K_GNU_VTENTRY:
-        break;
-#endif
-
       default:
         switch (h->root.type)
           {
@@ -1939,51 +1611,41 @@ ip2k_elf_gc_mark_hook (sec, info, rel, h, sym)
 	     && ELF_ST_BIND (sym->st_info) != STB_LOCAL)
 	   && ! ((sym->st_shndx <= 0 || sym->st_shndx >= SHN_LORESERVE)
 		 && sym->st_shndx != SHN_COMMON))
-          {
-            return bfd_section_from_elf_index (sec->owner, sym->st_shndx);
-          }
+	 return bfd_section_from_elf_index (sec->owner, sym->st_shndx);
       }
   return NULL;
 }
 
-static boolean
+static bfd_boolean
 ip2k_elf_gc_sweep_hook (abfd, info, sec, relocs)
      bfd *abfd ATTRIBUTE_UNUSED;
      struct bfd_link_info *info ATTRIBUTE_UNUSED;
      asection *sec ATTRIBUTE_UNUSED;
      const Elf_Internal_Rela *relocs ATTRIBUTE_UNUSED;
 {
-  /* we don't use got and plt entries for ip2k */
-  return true;
+  /* We don't use got and plt entries for ip2k.  */
+  return TRUE;
 }
-
-
-/* -------------------------------------------------------------------- */
-
 
 #define TARGET_BIG_SYM	 bfd_elf32_ip2k_vec
 #define TARGET_BIG_NAME  "elf32-ip2k"
 
 #define ELF_ARCH	 bfd_arch_ip2k
 #define ELF_MACHINE_CODE EM_IP2K
-#define ELF_MAXPAGESIZE  1 /* No pages on the IP2K */
-
-#undef USE_REL
-#define USE_RELA
+#define ELF_MACHINE_ALT1 EM_IP2K_OLD
+#define ELF_MAXPAGESIZE  1 /* No pages on the IP2K.  */
 
 #define elf_info_to_howto_rel			NULL
 #define elf_info_to_howto			ip2k_info_to_howto_rela
 
 #define elf_backend_can_gc_sections     	1
+#define elf_backend_rela_normal			1
 #define elf_backend_gc_mark_hook                ip2k_elf_gc_mark_hook
 #define elf_backend_gc_sweep_hook               ip2k_elf_gc_sweep_hook
-
 #define elf_backend_relocate_section		ip2k_elf_relocate_section
 
 #define elf_symbol_leading_char			'_'
 #define bfd_elf32_bfd_reloc_type_lookup		ip2k_reloc_type_lookup
 #define bfd_elf32_bfd_relax_section		ip2k_elf_relax_section
 
-
 #include "elf32-target.h"
-

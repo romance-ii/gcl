@@ -1,5 +1,6 @@
 /* MIPS ELF support for BFD.
-   Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
+   Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
+   2003, 2004, 2005
    Free Software Foundation, Inc.
 
    By Ian Lance Taylor, Cygnus Support, <ian@cygnus.com>, from
@@ -72,16 +73,37 @@ START_RELOC_NUMBERS (elf_mips_reloc_type)
   RELOC_NUMBER (R_MIPS_PJUMP, 35)
   RELOC_NUMBER (R_MIPS_RELGOT, 36)
   RELOC_NUMBER (R_MIPS_JALR, 37)
-  RELOC_NUMBER (R_MIPS_max, 38)
+  /* TLS relocations.  */
+  RELOC_NUMBER (R_MIPS_TLS_DTPMOD32, 38)
+  RELOC_NUMBER (R_MIPS_TLS_DTPREL32, 39)
+  RELOC_NUMBER (R_MIPS_TLS_DTPMOD64, 40)
+  RELOC_NUMBER (R_MIPS_TLS_DTPREL64, 41)
+  RELOC_NUMBER (R_MIPS_TLS_GD, 42)
+  RELOC_NUMBER (R_MIPS_TLS_LDM, 43)
+  RELOC_NUMBER (R_MIPS_TLS_DTPREL_HI16, 44)
+  RELOC_NUMBER (R_MIPS_TLS_DTPREL_LO16, 45)
+  RELOC_NUMBER (R_MIPS_TLS_GOTTPREL, 46)
+  RELOC_NUMBER (R_MIPS_TLS_TPREL32, 47)
+  RELOC_NUMBER (R_MIPS_TLS_TPREL64, 48)
+  RELOC_NUMBER (R_MIPS_TLS_TPREL_HI16, 49)
+  RELOC_NUMBER (R_MIPS_TLS_TPREL_LO16, 50)
+  FAKE_RELOC (R_MIPS_max, 51)
   /* These relocs are used for the mips16.  */
+  FAKE_RELOC (R_MIPS16_min, 100)
   RELOC_NUMBER (R_MIPS16_26, 100)
   RELOC_NUMBER (R_MIPS16_GPREL, 101)
-  /* These are GNU extensions to handle embedded-pic.  */
+  RELOC_NUMBER (R_MIPS16_GOT16, 102)
+  RELOC_NUMBER (R_MIPS16_CALL16, 103)
+  RELOC_NUMBER (R_MIPS16_HI16, 104)
+  RELOC_NUMBER (R_MIPS16_LO16, 105)
+  FAKE_RELOC (R_MIPS16_max, 106)
+  /* This was a GNU extension used by embedded-PIC.  It was co-opted by
+     mips-linux for exception-handling data.  It is no longer used, but
+     should continue to be supported by the linker for backward
+     compatibility.  (GCC stopped using it in May, 2004.)  */
   RELOC_NUMBER (R_MIPS_PC32, 248)
-  RELOC_NUMBER (R_MIPS_PC64, 249)
+  /* FIXME: this relocation is used internally by gas.  */
   RELOC_NUMBER (R_MIPS_GNU_REL16_S2, 250)
-  RELOC_NUMBER (R_MIPS_GNU_REL_LO16, 251)
-  RELOC_NUMBER (R_MIPS_GNU_REL_HI16, 252)
   /* These are GNU extensions to enable C++ vtable garbage collection.  */
   RELOC_NUMBER (R_MIPS_GNU_VTINHERIT, 253)
   RELOC_NUMBER (R_MIPS_GNU_VTENTRY, 254)
@@ -98,6 +120,9 @@ END_RELOC_NUMBERS (R_MIPS_maxext)
 /* Code in file uses the standard calling sequence for calling
    position independent code.  */
 #define EF_MIPS_CPIC		0x00000004
+
+/* ???  Unknown flag, set in IRIX 6's BSDdup2.o in libbsd.a.  */
+#define EF_MIPS_XGOT		0x00000008
 
 /* Code in file uses UCODE (obsolete) */
 #define EF_MIPS_UCODE		0x00000010
@@ -145,6 +170,12 @@ END_RELOC_NUMBERS (R_MIPS_maxext)
 /* -mips64 code.  */
 #define E_MIPS_ARCH_64          0x60000000
 
+/* -mips32r2 code.  */
+#define E_MIPS_ARCH_32R2        0x70000000
+
+/* -mips64r2 code.  */
+#define E_MIPS_ARCH_64R2        0x80000000
+
 /* The ABI of the file.  Also see EF_MIPS_ABI2 above. */
 #define EF_MIPS_ABI		0x0000F000
 
@@ -175,8 +206,12 @@ END_RELOC_NUMBERS (R_MIPS_maxext)
 #define E_MIPS_MACH_4010	0x00820000
 #define E_MIPS_MACH_4100	0x00830000
 #define E_MIPS_MACH_4650	0x00850000
+#define E_MIPS_MACH_4120	0x00870000
 #define E_MIPS_MACH_4111	0x00880000
 #define E_MIPS_MACH_SB1         0x008a0000
+#define E_MIPS_MACH_5400	0x00910000
+#define E_MIPS_MACH_5500	0x00980000
+#define E_MIPS_MACH_9000	0x00990000
 
 /* Processor specific section indices.  These sections do not actually
    exist.  Symbols with a st_shndx field corresponding to one of these
@@ -447,9 +482,9 @@ typedef struct
 
 /* MIPS ELF .reginfo swapping routines.  */
 extern void bfd_mips_elf32_swap_reginfo_in
-  PARAMS ((bfd *, const Elf32_External_RegInfo *, Elf32_RegInfo *));
+  (bfd *, const Elf32_External_RegInfo *, Elf32_RegInfo *);
 extern void bfd_mips_elf32_swap_reginfo_out
-  PARAMS ((bfd *, const Elf32_RegInfo *, Elf32_External_RegInfo *));
+  (bfd *, const Elf32_RegInfo *, Elf32_External_RegInfo *);
 
 /* Processor specific section flags.  */
 
@@ -813,9 +848,9 @@ typedef struct
 
 /* MIPS ELF option header swapping routines.  */
 extern void bfd_mips_elf_swap_options_in
-  PARAMS ((bfd *, const Elf_External_Options *, Elf_Internal_Options *));
+  (bfd *, const Elf_External_Options *, Elf_Internal_Options *);
 extern void bfd_mips_elf_swap_options_out
-  PARAMS ((bfd *, const Elf_Internal_Options *, Elf_External_Options *));
+  (bfd *, const Elf_Internal_Options *, Elf_External_Options *);
 
 /* Values which may appear in the kind field of an Elf_Options
    structure.  */
@@ -917,9 +952,9 @@ typedef struct
 
 /* MIPS ELF reginfo swapping routines.  */
 extern void bfd_mips_elf64_swap_reginfo_in
-  PARAMS ((bfd *, const Elf64_External_RegInfo *, Elf64_Internal_RegInfo *));
+  (bfd *, const Elf64_External_RegInfo *, Elf64_Internal_RegInfo *);
 extern void bfd_mips_elf64_swap_reginfo_out
-  PARAMS ((bfd *, const Elf64_Internal_RegInfo *, Elf64_External_RegInfo *));
+  (bfd *, const Elf64_Internal_RegInfo *, Elf64_External_RegInfo *);
 
 /* Masks for the info work of an ODK_EXCEPTIONS descriptor.  */
 #define OEX_FPU_MIN	0x1f	/* FPEs which must be enabled.  */

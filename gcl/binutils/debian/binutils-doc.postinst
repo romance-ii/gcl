@@ -1,0 +1,13 @@
+#! /bin/sh
+
+set -e
+
+for pkg in as binutils bfd gasp gprof ld; do
+  if [ -e /usr/share/info/$pkg.info.gz ]; then
+    install-info --quiet --section "Development" "Development" \
+                  /usr/share/info/$pkg.info.gz
+  fi
+done
+
+
+

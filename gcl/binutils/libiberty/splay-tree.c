@@ -59,18 +59,59 @@ splay_tree_delete_helper (sp, node)
      splay_tree sp;
      splay_tree_node node;
 {
+  splay_tree_node pending = 0;
+  splay_tree_node active = 0;
+
   if (!node)
     return;
 
-  splay_tree_delete_helper (sp, node->left);
-  splay_tree_delete_helper (sp, node->right);
+#define KDEL(x)  if (sp->delete_key) (*sp->delete_key)(x);
+#define VDEL(x)  if (sp->delete_value) (*sp->delete_value)(x);
 
-  if (sp->delete_key)
-    (*sp->delete_key)(node->key);
-  if (sp->delete_value)
-    (*sp->delete_value)(node->value);
+  KDEL (node->key);
+  VDEL (node->value);
 
-  (*sp->deallocate) ((char*) node, sp->allocate_data);
+  /* We use the "key" field to hold the "next" pointer.  */
+  node->key = (splay_tree_key)pending;
+  pending = (splay_tree_node)node;
+
+  /* Now, keep processing the pending list until there aren't any
+     more.  This is a little more complicated than just recursing, but
+     it doesn't toast the stack for large trees.  */
+
+  while (pending)
+    {
+      active = pending;
+      pending = 0;
+      while (active)
+	{
+	  splay_tree_node temp;
+
+	  /* active points to a node which has its key and value
+	     deallocated, we just need to process left and right.  */
+
+	  if (active->left)
+	    {
+	      KDEL (active->left->key);
+	      VDEL (active->left->value);
+	      active->left->key = (splay_tree_key)pending;
+	      pending = (splay_tree_node)(active->left);
+	    }
+	  if (active->right)
+	    {
+	      KDEL (active->right->key);
+	      VDEL (active->right->value);
+	      active->right->key = (splay_tree_key)pending;
+	      pending = (splay_tree_node)(active->right);
+	    }
+
+	  temp = active;
+	  active = (splay_tree_node)(temp->key);
+	  (*sp->deallocate) ((char*) temp, sp->allocate_data);
+	}
+    }
+#undef KDEL
+#undef VDEL
 }
 
 /* Help splay SP around KEY.  PARENT and GRANDPARENT are the parent
@@ -234,7 +275,7 @@ splay_tree_xmalloc_allocate (size, data)
      int size;
      void *data ATTRIBUTE_UNUSED;
 {
-  return xmalloc (size);
+  return (void *) xmalloc (size);
 }
 
 static void
@@ -472,7 +513,7 @@ splay_tree_predecessor (sp, key)
   if (comparison < 0)
     return sp->root;
 
-  /* Otherwise, find the leftmost element of the right subtree.  */
+  /* Otherwise, find the rightmost element of the left subtree.  */
   node = sp->root->left;
   if (node)
     while (node->right)
@@ -482,7 +523,7 @@ splay_tree_predecessor (sp, key)
 }
 
 /* Return the immediate successor KEY, or NULL if there is no
-   predecessor.  KEY need not be present in the tree.  */
+   successor.  KEY need not be present in the tree.  */
 
 splay_tree_node
 splay_tree_successor (sp, key)
@@ -492,7 +533,7 @@ splay_tree_successor (sp, key)
   int comparison;
   splay_tree_node node;
 
-  /* If the tree is empty, there is certainly no predecessor.  */
+  /* If the tree is empty, there is certainly no successor.  */
   if (!sp->root)
     return NULL;
 
@@ -505,7 +546,7 @@ splay_tree_successor (sp, key)
   if (comparison > 0)
     return sp->root;
 
-  /* Otherwise, find the rightmost element of the left subtree.  */
+  /* Otherwise, find the leftmost element of the right subtree.  */
   node = sp->root->right;
   if (node)
     while (node->left)

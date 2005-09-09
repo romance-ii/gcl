@@ -1,7 +1,8 @@
 /* Internal format of COFF object file data structures, for GNU BFD.
    This file is part of BFD, the Binary File Descriptor library.
    
-   Copyright 2001 Free Software Foundation, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004
+   Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -235,7 +236,11 @@ struct internal_aouthdr
 #define C_ALIAS	 	105	/* duplicate tag		*/
 #define C_HIDDEN	106	/* ext symbol in dmert public lib */
 
-#define C_WEAKEXT	127	/* weak symbol -- GNU extension */
+#if defined _AIX52 || defined AIX_WEAK_SUPPORT
+#define C_WEAKEXT	111	/* weak symbol -- AIX standard.  */
+#else
+#define C_WEAKEXT	127	/* weak symbol -- GNU extension.  */
+#endif
 
 /* New storage classes for TI COFF */
 #define C_UEXT		19	/* Tentative external definition */
@@ -600,20 +605,25 @@ struct internal_reloc
 };
 
 #define R_DIR16 	 1
+#define R_REL24          5
 #define R_DIR32 	 6
 #define R_IMAGEBASE	 7
+#define R_SECREL32	11
 #define R_RELBYTE	15
 #define R_RELWORD	16
 #define R_RELLONG	17
 #define R_PCRBYTE	18
 #define R_PCRWORD	19
 #define R_PCRLONG	20
+#define R_PCR24         21
 #define R_IPRSHORT	24
 #define R_IPRLONG	26
 #define R_GETSEG	29
 #define R_GETPA 	30
 #define R_TAGWORD	31
 #define R_JUMPTARG	32	/* strange 29k 00xx00xx reloc */
+#define R_PARTLS16      32
+#define R_PARTMS8       33
 
 #define R_PCR16L       128
 #define R_PCR26L       129

@@ -1,6 +1,6 @@
 /* chew
    Copyright 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1998, 2000, 2001,
-   2002
+   2002, 2003, 2005
    Free Software Foundation, Inc.
    Contributed by steve chamberlain @cygnus
 
@@ -485,7 +485,7 @@ print_stack_level ()
  */
 
 static void
-paramstuff (void)
+paramstuff ()
 {
   unsigned int openp;
   unsigned int fname;
@@ -494,8 +494,11 @@ paramstuff (void)
   string_type out;
   init_string (&out);
 
+#define NO_PARAMS 1
+
   /* Make sure that it's not already param'd or proto'd.  */
-  if (find (tos, "PARAMS") || find (tos, "PROTO") || !find (tos, "("))
+  if (NO_PARAMS
+      || find (tos, "PARAMS") || find (tos, "PROTO") || !find (tos, "("))
     {
       catstr (&out, tos);
     }
@@ -585,48 +588,9 @@ translatecomments ()
   pc++;
 }
 
-#if 0
-
-/* This is not currently used.  */
-
-/* turn everything not starting with a . into a comment */
-
-static void
-manglecomments ()
-{
-  unsigned int idx = 0;
-  string_type out;
-  init_string (&out);
-
-  while (at (tos, idx))
-    {
-      if (at (tos, idx) == '\n' && at (tos, idx + 1) == '*')
-	{
-	  cattext (&out, "	/*");
-	  idx += 2;
-	}
-      else if (at (tos, idx) == '*' && at (tos, idx + 1) == '}')
-	{
-	  cattext (&out, "*/");
-	  idx += 2;
-	}
-      else
-	{
-	  catchar (&out, at (tos, idx));
-	  idx++;
-	}
-    }
-
-  overwrite_string (tos, &out);
-
-  pc++;
-}
-
-#endif
-
 /* Mod tos so that only lines with leading dots remain */
 static void
-outputdots (void)
+outputdots ()
 {
   unsigned int idx = 0;
   string_type out;
@@ -1261,7 +1225,7 @@ lookup_word (word)
 }
 
 static void
-perform (void)
+perform ()
 {
   tos = stack;
 
@@ -1412,7 +1376,7 @@ compile (string)
 }
 
 static void
-bang (void)
+bang ()
 {
   *(long *) ((isp[0])) = isp[-1];
   isp -= 2;
@@ -1487,7 +1451,7 @@ read_in (str, file)
 }
 
 static void
-usage (void)
+usage ()
 {
   fprintf (stderr, "usage: -[d|i|g] <file >file\n");
   exit (33);

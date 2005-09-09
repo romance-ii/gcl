@@ -1,0 +1,26 @@
+Kernel link failure info
+------------------------
+
+You may experience problems linking older (and some newer) kernels
+with this version of binutils.  This is not because of a bug in the
+linker, but rather a bug in the kernel source.  This is being worked
+out and fixed by the upstream kernel group in newer kernels, but not
+all of the problems may have been fixed at this time.  Older kernel
+versions will almost always exhibit the problem, however, and no
+attempts are being made to fix those that we know of.
+
+There are a few work-arounds, but the most reliable is to edit the
+linker script for your architecture (e.g. arch/i386/vmlinux.lds) and
+remove the '*(.text.exit)' entry from the 'DISCARD' line.  It will
+bloat the kernel somewhat, but it should link properly.
+
+The ld -oformat option has been replaced
+----------------------------------------
+
+The ld command-line option '-oformat' has been completely replaced by
+'--oformat' in newer binutils.  This may cause problems when linking
+older kernel versions on i386 which still use the '-oformat' syntax in
+arch/boot/Makefile.
+
+If you encounter problems, edit arch/boot/Makefile in your kernel
+source and change '-oformat' to '--oformat'.
