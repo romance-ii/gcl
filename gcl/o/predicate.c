@@ -247,7 +247,7 @@ RETURN1(x0);}
 DEFUNO_NEW("SIMPLE-STRING-P",object,fLsimple_string_p,LISP
    ,1,1,NONE,OO,OO,OO,OO,void,Lsimple_string_p,(object x0),"") {
 
-  RETURN1(fLstringp(x0));
+  RETURN1(FFN(fLstringp)(x0));
 
 }
 
@@ -268,7 +268,7 @@ DEFUNO_NEW("SIMPLE-STRING-P",object,fLsimple_string_p,LISP
 DEFUNO_NEW("SIMPLE-BIT-VECTOR-P",object,fLsimple_bit_vector_p ,LISP
    ,1,1,NONE,OO,OO,OO,OO,void,Lsimple_bit_vector_p ,(object x0),"") {
   
-  RETURN1(fLbit_vector_p(x0));
+  RETURN1(FFN(fLbit_vector_p)(x0));
 
 }
 
@@ -291,7 +291,7 @@ DEFUNO_NEW("SIMPLE-BIT-VECTOR-P",object,fLsimple_bit_vector_p ,LISP
 DEFUNO_NEW("SIMPLE-VECTOR-P",object,fLsimple_vector_p ,LISP
    ,1,1,NONE,OO,OO,OO,OO,void,Lsimple_vector_p ,(object x0),"") {
 
-  RETURN1(fLvectorp(x0));
+  RETURN1(FFN(fLvectorp)(x0));
 
 }
 
