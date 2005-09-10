@@ -148,7 +148,7 @@ SGC is enabled.  */
 /* bfd support */
 #undef HAVE_LIBBFD
 #undef NEED_CONST
-#undef HAVE_BFD_BOOLEAN
+#define HAVE_BFD_BOOLEAN
 
 #ifdef HAVE_BFD_BOOLEAN
 #define MY_BFD_BOOLEAN bfd_boolean
