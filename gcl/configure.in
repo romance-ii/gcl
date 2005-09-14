@@ -1244,9 +1244,28 @@ AC_DEFINE_UNQUOTED(CSTACK_DIRECTION,$cstack_direction)
 AC_MSG_RESULT($cstack_direction)
 
 
+AC_MSG_CHECKING(for shared library/C stack ceiling to heap)
+if test "$use" = "mingw" ; then
+  heap_ceiling=2000000000
+else
+echo "int main() {return 0;}" >foo.c
+$CC foo.c -o foo
+heap_ceiling=`ldd foo | tail -n 1 | awk '{print $NF}' | tr -d '()'`
+AC_TRY_RUN([#include <stdio.h>
+int main() {
+    FILE *fp=fopen("conftest1","w");
+    unsigned long h=$heap_ceiling,d=$dbegin,c=$cstack_address;
+    h=h<d ? 0 : h;
+    h=c>d && c<h ? c : h;
+    fprintf(fp,"0x%lx",h);
+    return 0;}],heap_ceiling=`cat conftest1`,echo failed;exit 1,echo failed;exit 1)
+fi
+AC_MSG_RESULT($heap_ceiling)
+AC_DEFINE_UNQUOTED(SHARED_LIB_HEAP_CEILING,$heap_ceiling)
+
 ## Don't lower heap start if C stack is below default dbegin, as we're
 # likely to get more heap this way.
-if awk 'END {exit (unsigned long)d<(unsigned long)c ? 0 : 1}' d=$dbegin c=$cstack_address /dev/null ; then
+if awk 'END {exit h && (unsigned long)d<(unsigned long)c ? 0 : 1}' h=$heap_ceiling d=$dbegin c=$cstack_address /dev/null ; then
 
    AC_MSG_CHECKING("finding default linker script")
    touch unixport/gcl.script
@@ -1323,25 +1342,6 @@ if awk 'END {exit (unsigned long)d<(unsigned long)c ? 0 : 1}' d=$dbegin c=$cstac
    LDFLAGS="$old_LDFLAGS"
 fi
 AC_DEFINE_UNQUOTED(DBEGIN,$dbegin)
-
-AC_MSG_CHECKING(for shared library/C stack ceiling to heap)
-if test "$use" = "mingw" ; then
-  heap_ceiling=2000000000
-else
-echo "int main() {return 0;}" >foo.c
-$CC foo.c -o foo
-heap_ceiling=`ldd foo | tail -n 1 | awk '{print $NF}' | tr -d '()'`
-AC_TRY_RUN([#include <stdio.h>
-int main() {
-    FILE *fp=fopen("conftest1","w");
-    unsigned long h=$heap_ceiling,d=$dbegin,c=$cstack_address;
-    h=h<d ? 0 : h;
-    h=c>d && c<h ? c : h;
-    fprintf(fp,"0x%lx",h);
-    return 0;}],heap_ceiling=`cat conftest1`,echo failed;exit 1,echo failed;exit 1)
-fi
-AC_MSG_RESULT($heap_ceiling)
-AC_DEFINE_UNQUOTED(SHARED_LIB_HEAP_CEILING,$heap_ceiling)
 
 AC_MSG_CHECKING(for maxpage revision)
 AC_TRY_RUN([#include <stdio.h>

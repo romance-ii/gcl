@@ -1,3 +1,9 @@
+gclcvs (2.7.0-51) unstable; urgency=low
+
+  * Don't lower DBEGIN if shared mem start is beneath default
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 14 Sep 2005 19:08:18 +0000
+
 gclcvs (2.7.0-50) unstable; urgency=low
 
   * debian binutils 2-16.1

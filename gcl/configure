@@ -4540,12 +4540,54 @@ EOF
 echo "$ac_t""$cstack_direction" 1>&6
 
 
+echo $ac_n "checking for shared library/C stack ceiling to heap""... $ac_c" 1>&6
+echo "configure:4545: checking for shared library/C stack ceiling to heap" >&5
+if test "$use" = "mingw" ; then
+  heap_ceiling=2000000000
+else
+echo "int main() {return 0;}" >foo.c
+$CC foo.c -o foo
+heap_ceiling=`ldd foo | tail -n 1 | awk '{print $NF}' | tr -d '()'`
+if test "$cross_compiling" = yes; then
+  echo failed;exit 1
+else
+  cat > conftest.$ac_ext <<EOF
+#line 4556 "configure"
+#include "confdefs.h"
+#include <stdio.h>
+int main() {
+    FILE *fp=fopen("conftest1","w");
+    unsigned long h=$heap_ceiling,d=$dbegin,c=$cstack_address;
+    h=h<d ? 0 : h;
+    h=c>d && c<h ? c : h;
+    fprintf(fp,"0x%lx",h);
+    return 0;}
+EOF
+if { (eval echo configure:4567: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+then
+  heap_ceiling=`cat conftest1`
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  rm -fr conftest*
+  echo failed;exit 1
+fi
+rm -fr conftest*
+fi
+
+fi
+echo "$ac_t""$heap_ceiling" 1>&6
+cat >> confdefs.h <<EOF
+#define SHARED_LIB_HEAP_CEILING $heap_ceiling
+EOF
+
+
 ## Don't lower heap start if C stack is below default dbegin, as we're
 # likely to get more heap this way.
-if awk 'END {exit (unsigned long)d<(unsigned long)c ? 0 : 1}' d=$dbegin c=$cstack_address /dev/null ; then
+if awk 'END {exit h && (unsigned long)d<(unsigned long)c ? 0 : 1}' h=$heap_ceiling d=$dbegin c=$cstack_address /dev/null ; then
 
    echo $ac_n "checking "finding default linker script"""... $ac_c" 1>&6
-echo "configure:4549: checking "finding default linker script"" >&5
+echo "configure:4591: checking "finding default linker script"" >&5
    touch unixport/gcl.script
    echo "int main() {return 0;}" >foo.c
    $CC -Wl,--verbose foo.c -o foo 2>&1 | \
@@ -4554,7 +4596,7 @@ echo "configure:4549: checking "finding default linker script"" >&5
    if test "`cat gcl.script | wc -l`" != "0" ; then
       echo "$ac_t""got it" 1>&6
       echo $ac_n "checking "trying to lower heap start"""... $ac_c" 1>&6
-echo "configure:4558: checking "trying to lower heap start"" >&5
+echo "configure:4600: checking "trying to lower heap start"" >&5
       cp gcl.script gcl.script.def
       cat gcl.script.def | awk '/SIZEOF_HEADERS/ {gsub("0x...","0x000",$0);} {print}' |  sed 's,\. = 0x10000000;,/*. = 0x10000000;*/,1' >gcl.script
       if diff gcl.script.def gcl.script >/dev/null 2>&1 ; then
@@ -4562,7 +4604,7 @@ echo "configure:4558: checking "trying to lower heap start"" >&5
 	 rm -f gcl.script gcl.script.def
       else
 	 echo $ac_n "checking "linker script"""... $ac_c" 1>&6
-echo "configure:4566: checking "linker script"" >&5
+echo "configure:4608: checking "linker script"" >&5
 	 echo "int main() {return 0;}" >foo.c
 	 if $CC -Wl,-T gcl.script foo.c -o foo >/dev/null 2>&1 && ./foo >/dev/null 2>&1 ; then
 	    echo "$ac_t"""done"" 1>&6
@@ -4583,12 +4625,12 @@ echo "configure:4566: checking "linker script"" >&5
    old_LDFLAGS="$LDFLAGS"
    LDFLAGS="$LDFLAGS $TLDFLAGS"
    echo $ac_n "checking "revised DBEGIN"""... $ac_c" 1>&6
-echo "configure:4587: checking "revised DBEGIN"" >&5
+echo "configure:4629: checking "revised DBEGIN"" >&5
    if test "$cross_compiling" = yes; then
   dbegin=0
 else
   cat > conftest.$ac_ext <<EOF
-#line 4592 "configure"
+#line 4634 "configure"
 #include "confdefs.h"
 #include <stdio.h>
                #include <stdlib.h>
@@ -4626,7 +4668,7 @@ else
 		   fclose(fp);
 		   return 0;}
 EOF
-if { (eval echo configure:4630: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:4672: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   dbegin=`cat conftest1`
 else
@@ -4643,48 +4685,6 @@ fi
 fi
 cat >> confdefs.h <<EOF
 #define DBEGIN $dbegin
-EOF
-
-
-echo $ac_n "checking for shared library/C stack ceiling to heap""... $ac_c" 1>&6
-echo "configure:4651: checking for shared library/C stack ceiling to heap" >&5
-if test "$use" = "mingw" ; then
-  heap_ceiling=2000000000
-else
-echo "int main() {return 0;}" >foo.c
-$CC foo.c -o foo
-heap_ceiling=`ldd foo | tail -n 1 | awk '{print $NF}' | tr -d '()'`
-if test "$cross_compiling" = yes; then
-  echo failed;exit 1
-else
-  cat > conftest.$ac_ext <<EOF
-#line 4662 "configure"
-#include "confdefs.h"
-#include <stdio.h>
-int main() {
-    FILE *fp=fopen("conftest1","w");
-    unsigned long h=$heap_ceiling,d=$dbegin,c=$cstack_address;
-    h=h<d ? 0 : h;
-    h=c>d && c<h ? c : h;
-    fprintf(fp,"0x%lx",h);
-    return 0;}
-EOF
-if { (eval echo configure:4673: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
-then
-  heap_ceiling=`cat conftest1`
-else
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-  rm -fr conftest*
-  echo failed;exit 1
-fi
-rm -fr conftest*
-fi
-
-fi
-echo "$ac_t""$heap_ceiling" 1>&6
-cat >> confdefs.h <<EOF
-#define SHARED_LIB_HEAP_CEILING $heap_ceiling
 EOF
 
 
