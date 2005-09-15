@@ -1265,7 +1265,9 @@ AC_DEFINE_UNQUOTED(SHARED_LIB_HEAP_CEILING,$heap_ceiling)
 
 ## Don't lower heap start if C stack is below default dbegin, as we're
 # likely to get more heap this way.
-if awk 'END {exit h && (unsigned long)d<(unsigned long)c ? 0 : 1}' h=$heap_ceiling d=$dbegin c=$cstack_address /dev/null ; then
+echo "int main() {return !($heap_ceiling && (unsigned long)$dbegin < (unsigned long)$cstack_address);}" >foo.c
+$CC foo.c -o foo
+if foo ; then
 
    AC_MSG_CHECKING("finding default linker script")
    touch unixport/gcl.script
@@ -1342,6 +1344,7 @@ if awk 'END {exit h && (unsigned long)d<(unsigned long)c ? 0 : 1}' h=$heap_ceili
    LDFLAGS="$old_LDFLAGS"
 fi
 AC_DEFINE_UNQUOTED(DBEGIN,$dbegin)
+rm -rf foo*
 
 AC_MSG_CHECKING(for maxpage revision)
 AC_TRY_RUN([#include <stdio.h>
