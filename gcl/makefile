@@ -37,6 +37,10 @@ VERSION=`cat majvers`.`cat minvers`
 
 all: $(BUILD_BFD) $(PORTDIR)/$(FLISP) command cmpnew/gcl_collectfn.o lsp/gcl_info.o do-gcl-tk do-info
 
+ASRC:=$(shell ls -1 o/*.c o/*.d o/*.h h/*.h lsp/*.lsp cmpnew/*.lsp mod/*.lsp pcl/*sp clcs/*sp)
+TAGS: $(ASRC)
+	etags $^
+
 xgcl: $(PORTDIR)/saved_xgcl
 
 $(PORTDIR)/saved_xgcl: $(PORTDIR)/saved_gcl

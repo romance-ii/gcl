@@ -2,8 +2,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
 
   * Don't lower DBEGIN if shared mem start is beneath default
   * Better conditionalizing of dbegin lowering script
+  * Make only one big TAGS table in source top
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 15 Sep 2005 13:35:13 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:36:20 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
