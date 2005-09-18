@@ -5,8 +5,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * Make only one big TAGS table in source top
   * No nil arrays in GCL
   * check-type type error format string recognition
+  * check-type type error format string recognition
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:41:49 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:42:37 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
