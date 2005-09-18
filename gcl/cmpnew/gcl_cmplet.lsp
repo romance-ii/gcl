@@ -134,6 +134,24 @@
 				  (if (and type (not ch)) (cons (list type var) out) out) specials)))))))
 
 
+
+(defun binding-decls-new1 (star out specials body-info nvars ninfos)
+  (cond ((atom nvars) (nreverse out))
+	((let* ((var (car nvars))
+		(type (t-to-nil (coerce-to-one-value (info-type (car ninfos)))))
+		(n (var-name var))
+		(ch (or (si::specialp n) (member n specials) 
+			(is-changed var body-info)
+			(member-if (lambda (x) (is-changed var x)) (cdr ninfos)))))
+	   (when type
+	     (cmpnote "var ~S is type ~S from type propagation, ~a~%" n type 
+		      (if ch "but is changed" "declaring")))
+	   (binding-decls-new1 star 
+			       (if (and type (not ch)) (cons (list type n) out) out)
+			       specials
+			       body-info (cdr nvars) (cdr ninfos))))))
+
+
 ;;FIXME -- We can eliminate the extra recursively-cmp-macroexpand
 ;;code, the logic of which as already provided in a somewhat differing
 ;;form by pass1, and extract the changed variable information from the
@@ -162,13 +180,48 @@
 	  args))))
 
 
+(defun make-bindings-var-info (bindings star vars infos)
+  (cond ((atom bindings) (list (nreverse vars) (nreverse infos)))
+	((let* ((cb (consp (car bindings)))
+		(n (if cb (caar bindings) (car bindings)))
+		(info (if cb (cadr (c1expr (cadar bindings))) (make-info)))
+		(var (c1make-var n nil nil (list (cons n (info-type info))))))
+	   (let ((*vars* (if star (cons var *vars*) *vars*)))
+	     (make-bindings-var-info (cdr bindings) star (cons var vars) (cons info infos)))))))
+
+
+(defvar *dlbs* 0)
+(defvar *dlbsrl* 2)
+
+(defun declare-let-bindings-new1 (args star specials)
+  (if (>= *dlbs* *dlbsrl*) args
+    (let ((*dlbs* (1+ *dlbs*)))
+      (let ((res 
+	     (let ((*suppress-compiler-warnings* t)
+		   (*suppress-compiler-notes* t)) 
+	       (let* ((body-info (make-info))
+		      (bvi (make-bindings-var-info (car args) star nil nil))
+		      (nv (car bvi))
+		      (ni (cadr bvi)))
+		 (let ((*vars* *vars*))
+		   (dolist (v nv) (push v *vars*))
+		   (c1args (c1body (cdr args) nil) body-info)
+		   (list body-info nv ni))))))
+	(let ((decls (binding-decls-new1 star nil specials (car res) (cadr res)(caddr res))))
+	  (if decls
+	      (progn (cmpnote "Let bindings ~S declared ~S~%" (car args) decls)
+		     (cons (car args) (cons (cons 'declare decls) (cdr args))))
+	    args))))))
+
+
 (defun c1let (args &aux (info (make-info))(setjmps *setjmps*)
                         (forms nil) (vars nil) (vnames nil)
                         ss is ts body other-decls
                         (*vars* *vars*))
   (when (endp args) (too-few-args 'let 1 0))
 
-  (setq args (declare-let-bindings-new args nil ss))
+;  (setq args (declare-let-bindings-new args nil ss))
+  (setq args (declare-let-bindings-new1 args nil ss))
 
   (multiple-value-setq (body ss ts is other-decls) (c1body (cdr args) nil))
 
@@ -299,7 +352,7 @@
                     (info (make-info)) (*vars* *vars*))
   (when (endp args) (too-few-args 'let* 1 0))
 
-  (setq args (declare-let-bindings-new args t ss))
+  (setq args (declare-let-bindings-new1 args t ss))
 
   (multiple-value-setq (body ss ts is other-decls) (c1body (cdr args) nil))
   (c1add-globals ss)
