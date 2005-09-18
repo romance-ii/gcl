@@ -227,13 +227,19 @@ funcall(object fun)
 
 	case t_ifun:
 	  {object x = fun->ifn.ifn_self;
-	  if (x) { fun = x; goto TOP;}
+	  if (x) { fun = x; break;}
 	  else
 	    FEundefined_function(fun);
 	  }
 	  
-	case t_cons:
-		break;
+ 	case t_cons:
+	  if (fun->c.c_car!=sLlambda &&
+	      fun->c.c_car!=sLlambda_closure &&
+	      fun->c.c_car!=sLlambda_block &&
+	      fun->c.c_car!=sSlambda_block_expanded &&
+	      fun->c.c_car!=sLlambda_block_closure)
+		FEinvalid_function(fun);
+	  break;
 
 	default:
 		FEinvalid_function(fun);

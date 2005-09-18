@@ -23,6 +23,35 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <string.h>
 #include "include.h"
 
+static object Iname_t=Ct;
+static char zero[4*SIZEOF_LONG];/*FIXME*/
+
+aet_type_struct aet_types[] = {
+  {" ",&sLcharacter,sizeof(char)},
+  {zero,&sLbit,sizeof(char)},
+  {zero,&sLnon_negative_char,sizeof(char)},
+  {zero,&sLsigned_char,sizeof(char)},
+  {zero,&sLunsigned_char,sizeof(char)},
+  {zero,&sLnon_negative_short,sizeof(short)},
+  {zero,&sLsigned_short,sizeof(short)},
+  {zero,&sLunsigned_short,sizeof(short)},
+#if SIZEOF_LONG != SIZEOF_INT
+  {zero,&sLnon_negative_int,sizeof(int)},
+  {zero,&sLsigned_int,sizeof(int)},
+  {zero,&sLunsigned_int,sizeof(int)},
+#endif
+  {zero,&sLnon_negative_fixnum,sizeof(fixnum)},
+  {zero,&sLfixnum,sizeof(fixnum)},
+  {zero,&sLshort_float,sizeof(float)},
+  {zero,&sLlong_float,sizeof(double)},
+  {Cnil,&Iname_t,sizeof(object)}
+#if SIZEOF_LONG == SIZEOF_INT
+  ,{zero,&sLnon_negative_int,sizeof(int)},
+  {zero,&sLsigned_int,sizeof(int)},
+  {zero,&sLunsigned_int,sizeof(int)}
+#endif
+};
+
 static void
 displace(object, object, int);
 
@@ -55,10 +84,8 @@ DEF_ORDINARY("BIT",sLbit,LISP,"");
 #define CLEAR_BITREF(x,i) \
   (x->bv.bv_self[i/BV_BITS]) &= ~(((1 << (BV_BITS -1)) >> (i % BV_BITS)))
 
-extern short aet_sizes[];
-
 #define ARRAY_BODY_PTR(ar,n) \
-  (void *)(ar->ust.ust_self + aet_sizes[Iarray_element_type(ar)]*n)
+  (void *)(ar->ust.ust_self + aet_types[Iarray_element_type(ar)].size*n)
 
 #define N_FIXNUM_ARGS 6
 
@@ -162,7 +189,11 @@ DEFUNO_NEW("ROW-MAJOR-AREF", object, fLrow_major_aref, LISP, 2, 2,
       return make_fixnum(SHORT_GCL(x, i));
     case aet_ushort:
       return make_fixnum(USHORT_GCL(x, i));
-
+    case aet_int:
+    case aet_nnint:
+      return make_fixnum(INT_GCL(x, i));
+    case aet_uint:
+      return make_fixnum(UINT_GCL(x, i));
     default:
       FEerror("unknown array type",0);
     }
@@ -241,6 +272,15 @@ DEFUN_NEW("ASET1", object, fSaset1, SI, 3, 3, NONE, OO, IO, OO,OO,(object x, fix
     case aet_ushort:
       ASSURE_TYPE(val,t_fixnum);
       USHORT_GCL(x, i) = Mfix(val);
+      break;
+    case aet_int:
+    case aet_nnint:
+      ASSURE_TYPE(val,t_fixnum);
+      INT_GCL(x, i) = Mfix(val);
+      break;
+    case aet_uint:
+      ASSURE_TYPE(val,t_fixnum);
+      UINT_GCL(x, i) = Mfix(val);
       break;
     default:
       FEerror("unknown array type",0);
@@ -439,30 +479,20 @@ fSmake_vector1_1(fixnum n,fixnum elt_type,object staticp) {
   return FFN(fSmake_vector1)(n,elt_type,staticp);
 }
 
+DEFUN_NEW("AELTTYPE-LIST",object,fSaelttype_list,SI,0,0,NONE,OO,OO,OO,OO,(),"") {
 
-static object DFLT_aet_object;	
-static char DFLT_aet_ch = ' ';
-static char DFLT_aet_char = 0; 
-static fixnum DFLT_aet_fix = 0  ;		
-static short DFLT_aet_short = 0;
-static shortfloat DFLT_aet_sf = 0.0;
-static longfloat DFLT_aet_lf = 0.0;	
-static object Iname_t;
-static struct { char * dflt; object *namep;} aet_types[] =
-{   {(char *)	&DFLT_aet_object,	&Iname_t,},	/*  t  */
-    {(char *)	&DFLT_aet_ch, &sLstring_char,},/*  string-char  */
-    {(char *)	&DFLT_aet_fix, &sLbit,},		/*  bit  */
-    {(char *)	&DFLT_aet_fix,	&sLfixnum,}, 	/*  fixnum  */
-    {(char *)	&DFLT_aet_fix,	&sLnon_negative_fixnum,}, 	/*  non-neg fixnum  */
-    {(char *)	&DFLT_aet_sf, &sLshort_float,},			/*  short-float  */
-    {(char *)	&DFLT_aet_lf, &sLlong_float,},	/*  long-float  */
-    {(char *)	&DFLT_aet_char,&sLsigned_char,},               /* signed char */
-    {(char *)	&DFLT_aet_char,&sLnon_negative_char,},               /* non-neg char */
-    {(char *)   &DFLT_aet_char,&sLunsigned_char,},               /* unsigned char */
-    {(char *)	&DFLT_aet_short,&sLsigned_short,},              /* signed short */
-    {(char *)	&DFLT_aet_short,&sLnon_negative_short,},              /* non-neg short */
-    {(char *)	&DFLT_aet_short, &sLunsigned_short},    /*  unsigned short   */
-	};
+  aet_type_struct *p,*pe;
+  object f,x,y=OBJNULL;
+
+  for (p=aet_types,pe=p+aet_object;p<=pe;p++) {
+    x=MMcons(*p->namep,Cnil);
+    y=y ? (y->c.c_cdr=x) : (f=x);
+  }
+  
+  return f;
+
+}
+  
 
 DEFUN_NEW("GET-AELTTYPE",object,fSget_aelttype,SI,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { int i;
@@ -475,6 +505,14 @@ DEFUN_NEW("GET-AELTTYPE",object,fSget_aelttype,SI,1,1,NONE,OO,OO,OO,OO,(object x
     return make_fixnum(aet_char);
   if (x==sLnegative_short)
     return make_fixnum(aet_short);
+  if (x==sLnegative_int)
+    return make_fixnum(
+#if SIZEOF_LONG != SIZEOF_INT
+		       aet_int
+#else
+		       aet_fix
+#endif
+		       );
   if (x==sLnegative_fixnum || x==sLsigned_fixnum)
     return make_fixnum(aet_fix);
   return make_fixnum(aet_object);
@@ -634,7 +672,7 @@ FFN(Larray_displacement)(void) {
 
   }
 
-  s=aet_sizes[Iarray_element_type(a)];
+  s=aet_types[Iarray_element_type(a)].size;
   n=(void *)array->a.a_self-(void *)a->a.a_self;
   if (Iarray_element_type(a)==aet_bit)
     n=n*BV_BITS+BV_OFFSET(array);
@@ -786,7 +824,8 @@ raw_aet_ptr(object x, short int typ)
 {  /* doubles are the largest raw type */
 
   static union{
-    object o;char c;fixnum i;shortfloat f;longfloat d;
+    object o;char c;int i;unsigned int ui;
+    fixnum f;shortfloat sf;longfloat d;
     unsigned char uc;short s;unsigned short us;} u;
 
   if (x==Cnil) 
@@ -809,11 +848,11 @@ raw_aet_ptr(object x, short int typ)
   case aet_fix:    
   case aet_nnfix:    
     /* STORE_TYPED(&u,fixnum, Mfix(x)); */
-    u.i=Mfix(x);
+    u.f=Mfix(x);
     break;
   case aet_sf:     
     /* STORE_TYPED(&u,shortfloat, Msf(x)); */
-    u.f=Msf(x);
+    u.sf=Msf(x);
     break;
   case aet_lf:     
     /* STORE_TYPED(&u,longfloat, Mlf(x)); */
@@ -836,6 +875,15 @@ raw_aet_ptr(object x, short int typ)
   case aet_ushort: 
     /* STORE_TYPED(&u,unsigned short,Mfix(x)); */
     u.us=(unsigned short)Mfix(x);
+    break;
+  case aet_int:  
+  case aet_nnint:  
+    /* STORE_TYPED(&u, int, Mfix(x)); */
+    u.i=(int)Mfix(x);
+    break;
+  case aet_uint: 
+    /* STORE_TYPED(&u,unsigned int,Mfix(x)); */
+    u.ui=(unsigned int)Mfix(x);
     break;
   default: 
     FEerror("bad elttype",0);
@@ -876,6 +924,8 @@ gset(void *p1, void *val, int n, int typ)
     case aet_uchar:  GSET(p1,n,unsigned char,val);
     case aet_short:case aet_nnshort:  GSET(p1,n,short,val);
     case aet_ushort: GSET(p1,n,unsigned short,val);
+    case aet_int:case aet_nnint:  GSET(p1,n,int,val);
+    case aet_uint: GSET(p1,n,unsigned int,val);
     default:         FEerror("bad elttype",0);
     }
   }
@@ -921,12 +971,12 @@ implementation dependent results.")
   if ((typ1 ==aet_object ||
        typ2  ==aet_object) && typ1 != typ2)
     FEerror("Can't copy between different array types",0);
-  nc=n1 * aet_sizes[(int)typ1];
+  nc=n1 * aet_types[(int)typ1].size;
   if (i1+n1 > x->a.a_dim
-      || ((y->a.a_dim - i2) *aet_sizes[(int)typ2]) < nc)
+      || ((y->a.a_dim - i2) *aet_types[(int)typ2].size) < nc)
     FEerror("Copy  out of bounds",0);
-  bcopy(x->ust.ust_self + (i1*aet_sizes[(int)typ1]),
-	y->ust.ust_self + (i2*aet_sizes[(int)typ2]),
+  bcopy(x->ust.ust_self + (i1*aet_types[(int)typ1].size),
+	y->ust.ust_self + (i2*aet_types[(int)typ2].size),
 	nc);
   return x;
 }
@@ -962,6 +1012,11 @@ array_allocself(object x, int staticp, object dflt)
         case aet_nnshort:
         case aet_ushort:
 		x->ust.ust_self = (unsigned char *) AR_ALLOC(*fun,n,short);
+		break;
+        case aet_int:
+        case aet_nnint:
+        case aet_uint:
+		x->ust.ust_self = (unsigned char *) AR_ALLOC(*fun,n,int);
 		break;
 	case aet_bit:
 		n = (n+W_SIZE-1)/W_SIZE;
@@ -1548,8 +1603,8 @@ DEFUN_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
 void
 gcl_init_array_function(void) {
   make_function("ARRAY-DISPLACEMENT", Larray_displacement);
-  DFLT_aet_object=Cnil;
-  Iname_t=sLt;
+/*   DFLT_aet_object=Cnil; */
+/*   Iname_t=sLt; */
 
 }
      

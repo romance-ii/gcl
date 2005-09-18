@@ -404,7 +404,7 @@ LFD(Lstring_not_equal)()   { string_sign =  0; string_boundary = 1;  FFN(Lstring
 	       char_bits(initial_element) != 0 ||
 	       char_font(initial_element) != 0)
 		initial_element
-		= wrong_type_argument(sLstring_char, initial_element);
+		= wrong_type_argument(sLcharacter, initial_element);
 	{BEGIN_NO_INTERRUPT;	
 	x = alloc_simple_string(fix(size));
 	x->st.st_self = alloc_relblock(fix(size));

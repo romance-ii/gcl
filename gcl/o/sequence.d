@@ -292,6 +292,13 @@ E:
 				sequence->fixa.fixa_self[i];
 			break;
 
+		case aet_int:
+		case aet_nnint:
+		case aet_uint:
+			for (i = s, j = 0;  i < e;  i++, j++)
+				UINT_GCL(x, j) = UINT_GCL(sequence, i);
+			break;
+
 		case aet_short:
 		case aet_nnshort:
 		case aet_ushort:
@@ -457,6 +464,13 @@ object seq;
 				y->fixa.fixa_self[j] = x->fixa.fixa_self[i];
 			break;
 
+		case aet_int:
+		case aet_nnint:
+		case aet_uint:
+			for (j = k - 1, i = 0;  j >=0;  --j, i++)
+				UINT_GCL(y, j) = UINT_GCL(x, i);
+			break;
+
 		case aet_short:
 		case aet_nnshort:
 		case aet_ushort:
@@ -574,6 +588,17 @@ object seq;
 				y = x->fixa.fixa_self[i];
 				x->fixa.fixa_self[i] = x->fixa.fixa_self[j];
 				x->fixa.fixa_self[j] = y;
+			}
+			return(seq);
+
+		case aet_int:
+		case aet_nnint:
+		case aet_uint:
+			for (i = 0, j = k - 1;  i < j;  i++, --j) {
+				unsigned int y;
+				y = UINT_GCL(x, i);
+				UINT_GCL(x, i) = UINT_GCL(x, j);
+				UINT_GCL(x, y) = y;
 			}
 			return(seq);
 

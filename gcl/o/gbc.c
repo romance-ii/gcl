@@ -408,6 +408,11 @@ mark_object(object x) {
     case aet_nnshort:
       j=sizeof(short)*x->a.a_dim;
       break;
+    case aet_int:
+    case aet_uint:
+    case aet_nnint:
+      j=sizeof(int)*x->a.a_dim;
+      break;
     default:
       j=sizeof(fixnum)*x->fixa.fixa_dim;}
     
@@ -531,7 +536,7 @@ mark_object(object x) {
     unsigned char * s_type = &SLOT_TYPE(def,0);
     unsigned short *s_pos= & SLOT_POS(def,0);
     for (i = 0, j = S_DATA(def)->length;  i < j;  i++)
-      if (s_type[i]==0) mark_object(STREF(object,x,s_pos[i]));
+      if (s_type[i]==aet_object) mark_object(STREF(object,x,s_pos[i]));
     if ((int)what_to_collect >= (int)t_contiguous) {
       if (inheap(x->str.str_self)) {
 	if (what_to_collect == t_contiguous)

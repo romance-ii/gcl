@@ -22,7 +22,7 @@ License for more details.
 #endif
 #include <rpc/rpc.h>
 
-extern short aet_sizes[];
+extern aet_type_struct aet_types[];
 static object
 FFN(siGxdr_open)(f)
      object f;
@@ -83,7 +83,7 @@ FFN(siGxdr_write)(object str,object elt) {
       if(!xdr_array(xdrp,(char **)&elt->v.v_self,
 		    &tmp,
 		    elt->v.v_dim,
-		    aet_sizes[elt->v.v_elttype],
+		    aet_types[elt->v.v_elttype].size,
 		    e))
 	goto error;
     }
@@ -145,7 +145,7 @@ FFN(siGxdr_read)(object str,object elt) {
       if(!xdr_array(xdrp,(char **)&elt->v.v_self,
 		    &tmp,
 		    elt->v.v_dim,
-		    aet_sizes[elt->v.v_elttype],
+		    aet_types[elt->v.v_elttype].size,
 		    e))
 	goto error;
     }

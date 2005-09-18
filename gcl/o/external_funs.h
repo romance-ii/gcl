@@ -232,7 +232,6 @@ extern int init_cfun GPR((void));;
 
 extern int Lstandard_char_p GPR((void));;  
 extern int Lgraphic_char_p GPR((void));;  
-extern int Lstring_char_p GPR((void));;  
 extern int Lalpha_char_p GPR((void));;  
 extern int Lupper_case_p GPR((void));;  
 extern int Llower_case_p GPR((void));;  

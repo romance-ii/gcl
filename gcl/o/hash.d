@@ -669,6 +669,49 @@ DEFUN_NEW("NEXT-HASH-TABLE-ENTRY",object,fSnext_hash_table_entry,SI,2,2,NONE,OO,
    RETURN(3,object,small_fixnum(-1),(RV(sLnil),RV(sLnil)));
 }
 
+DEFUN_NEW("NEXT-HASH-TABLE-INDEX",object,fSnext_hash_table_index,SI,2,2,NONE,OO,OO,OO,OO,(object table,object ind),"For HASH-TABLE and for index I return the index of the next valid entry, or -1.") { 
+
+  fixnum i = fix(ind);
+
+  check_type_hash_table(&table);
+  if ( i < 0) 
+    FEerror("needs non negative index",0);
+
+  while ( i <  table->ht.ht_size) {
+    if (table->ht.ht_self[i].hte_key != OBJNULL)
+      return make_fixnum(i);
+    i++;}
+
+  return small_fixnum(-1);
+
+}
+
+DEFUN_NEW("HASH-ENTRY-BY-INDEX",object,fShash_entry_by_index,SI,2,2,NONE,OO,OO,OO,OO,(object table,object ind),"For HASH-TABLE and for index I return the index of the next valid entry, or -1.") { 
+
+  fixnum i = fix(ind);
+
+  check_type_hash_table(&table);
+  if ( i < 0) 
+    FEerror("needs non negative index",0);
+  if (table->ht.ht_self[i].hte_key == OBJNULL)
+    FEerror("invalid index",0);
+  return table->ht.ht_self[i].hte_value;
+
+}
+
+DEFUN_NEW("HASH-KEY-BY-INDEX",object,fShash_key_by_index,SI,2,2,NONE,OO,OO,OO,OO,(object table,object ind),"For HASH-TABLE and for index I return the index of the next valid key, or -1.") { 
+
+  fixnum i = fix(ind);
+
+  check_type_hash_table(&table);
+  if ( i < 0) 
+    FEerror("needs non negative index",0);
+  if (table->ht.ht_self[i].hte_key == OBJNULL)
+    FEerror("invalid index",0);
+  return table->ht.ht_self[i].hte_key;
+
+}
+
 DEFUN_NEW("HASH-TABLE-TEST",object,fLhash_table_test,LISP,1,1,NONE,OO,OO,OO,OO,(object table),
  "Given a HASH-TABLE return a symbol which specifies the function used in its test") 
 { 

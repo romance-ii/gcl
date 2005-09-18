@@ -211,7 +211,7 @@ fasload(object faslfile) {
 
     set_type_of(&dum,t_stream);
     dum.sm.sm_mode=smm_input;
-    dum.sm.sm_object0=sLstring_char;
+    dum.sm.sm_object0=sLcharacter;
 
     link_callbacks.add_archive_element=madd_archive_element;
     link_callbacks.multiple_definition=mmultiple_definition;

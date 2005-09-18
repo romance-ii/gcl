@@ -291,13 +291,20 @@ sgc_mark_object1(object x) {
 	  !(inheap(cp)) && SGC_RELBLOCK_P(x->a.a_self))
 	ROUND_RB_POINTERS_DOUBLE;
       break;
+    case aet_nnchar:
     case aet_char:
     case aet_uchar:
       j=sizeof(char)*x->a.a_dim;
       break;
+    case aet_nnshort:
     case aet_short:
     case aet_ushort:
       j=sizeof(short)*x->a.a_dim;
+      break;
+    case aet_nnint:
+    case aet_int:
+    case aet_uint:
+      j=sizeof(int)*x->a.a_dim;
       break;
     default:
       j=sizeof(fixnum)*x->fixa.fixa_dim;}
@@ -453,7 +460,7 @@ sgc_mark_object1(object x) {
       unsigned char * s_type = &SLOT_TYPE(def,0);
       unsigned short *s_pos= & SLOT_POS(def,0);
       for (i = 0, j = S_DATA(def)->length;  i < j;  i++)
-	if (s_type[i]==0 &&
+	if (s_type[i]==aet_object &&
 	    ON_WRITABLE_PAGE(& STREF(object,x,s_pos[i]))
 	    )
 	  sgc_mark_object(STREF(object,x,s_pos[i]));

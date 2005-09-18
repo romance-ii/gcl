@@ -697,7 +697,7 @@ BEGIN:
 		 unsigned char *s_type= & SLOT_TYPE(x->str.str_def,0);
 		 unsigned short *s_pos= & SLOT_POS(x->str.str_def,0);
 		for (i = 0;  i < leng;  i++,s_pos++)
-		 {if (s_type[i]==0)
+		 {if (s_type[i]==aet_object)
 		   {if (!equalp(STREF(object,x,*s_pos),STREF(object,y,*s_pos)))
 		       return FALSE;}
 		  else

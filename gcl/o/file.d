@@ -268,7 +268,7 @@ BEGIN:
 		return(strm->sm.sm_object0);
 
 	case smm_socket:
-	    return (sLstring_char);
+	    return (sLcharacter);
 	    
 	case smm_synonym:
 		strm = symbol_value(strm->sm.sm_object0);
@@ -295,10 +295,10 @@ BEGIN:
 		return(stream_element_type(STREAM_INPUT_STREAM(strm)));
 
 	case smm_string_input:
-		return(sLstring_char);
+		return(sLcharacter);
 
 	case smm_string_output:
-		return(sLstring_char);
+		return(sLcharacter);
 
 	default:
 		FEerror("Illegal stream mode for ~S.",1,strm);
@@ -496,7 +496,7 @@ object if_exists, if_does_not_exist;
 	x->sm.sm_mode = (short)smm;
 	x->sm.sm_fp = fp;
 	x->sm.sm_buffer = 0;
-	x->sm.sm_object0 = sLstring_char;
+	x->sm.sm_object0 = sLcharacter;
 	x->sm.sm_object1 = vs_head;
 	x->sm.sm_int0 = x->sm.sm_int1 = 0;
 	vs_push(x);
@@ -1123,8 +1123,7 @@ int start,end;
 
 	val=stream_element_type(s);
 	charstream = (val == sLcharacter) ||
-		     (val == sLstandard_char) ||
-		     (val == sLstring_char);
+		     (val == sLstandard_char);
 
 	switch (s->sm.sm_mode) {
 	case smm_input:
@@ -2051,7 +2050,7 @@ LFD(Lstream_element_type)()
 
 @(static defun open (filename
 	      &key (direction sKinput)
-		   (element_type sLstring_char)
+		   (element_type sLcharacter)
 		   (if_exists Cnil iesp)
 		   (if_does_not_exist Cnil idnesp)
                    (external_format sKdefault iefp)  
@@ -2903,7 +2902,7 @@ gcl_init_file(void)
 	standard_input = alloc_object(t_stream);
 	standard_input->sm.sm_mode = (short)smm_input;
 	standard_input->sm.sm_fp = stdin;
-	standard_input->sm.sm_object0 = sLstring_char;
+	standard_input->sm.sm_object0 = sLcharacter;
 	standard_input->sm.sm_object1 = make_simple_string("stdin");
 	standard_input->sm.sm_int0 = 0; /* unused */
 	standard_input->sm.sm_int1 = 0; /* unused */
@@ -2911,7 +2910,7 @@ gcl_init_file(void)
 	standard_output = alloc_object(t_stream);
 	standard_output->sm.sm_mode = (short)smm_output;
 	standard_output->sm.sm_fp = stdout;
-	standard_output->sm.sm_object0 = sLstring_char;
+	standard_output->sm.sm_object0 = sLcharacter;
 	standard_output->sm.sm_object1 = make_simple_string("stdout");
 	standard_output->sm.sm_int0 = 0; /* unused */
 	STREAM_FILE_COLUMN(standard_output) = 0;

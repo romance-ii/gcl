@@ -92,10 +92,7 @@ INI_FILES=$(patsubst %.o,%.ini,${OBJS})
 
 OBJECTS:=$(OBJS) $(LIBFILES) new_init.o  $(GCLIB) $(LAST_FILE)  $(FIRST_FILE) 
 
-all:  $(OBJECTS) TAGS #plt.o
-
-TAGS: $(HFILES) $(patsubst %.o,%.c,$(OBJECTS))
-	etags $^
+all:  $(OBJECTS) #plt.o
 
 go:
 	$(MAKE) "CFLAGS=${CFLAGS} -pg"
@@ -155,18 +152,29 @@ grab_defs: grab_defs.c
 #	awk '/my_plt/ {next} {printf("extern void *%s;\n",$$1);}'>$@
 
 plttest.o: plttest.c 
-	$(CC) -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO) 
+	$(CC) -c $(CFLAGS) $(DEFS) -fno-builtin $*.c $(AUX_INFO) 
 
-plt.h: plttest.o
+pltd.h: plttest.o
 	nm $< | awk '/ U / {a=$$2;if (k) sub("^_","",a);\
                             b=a;gsub("_","",b);\
-                            if (match(j,b)) printf("MY_PLT(%s)\n",a)}' \
+                            if (!match(j,b) && !match(b,"IO")) printf("extern int %s();\n",a)}' \
 			j="$$(awk '/main/ {i=1;next} {if (!i) next} \
-				/^ *[a-zA-Z_]*\(/ {sub("\\(.*$$","",$$1);print $$1}' plttest.c)" \
+				/^ *[a-zA-Z_=]*\(/ {sub("\\(.*$$","",$$1);sub("^.*=","",$$1);print $$1}' plttest.c)" \
+			k=$(LEADING_UNDERSCORE) |\
+			sort | \
+			awk '{A[++k]=$$0} END {for (i=1;i<=k;i++) \
+				printf("%s\n",A[i]);}' >$@
+
+plt.h: plttest.o pltd.h 
+	nm $< | awk '/ U / {a=$$2;if (k) sub("^_","",a);\
+                            b=a;gsub("_","",b);\
+                            printf("MY_PLT(%s)\n",a)}' \
 			k=$(LEADING_UNDERSCORE) |\
 			sort | \
 			awk '{A[++k]=$$0} END {for (i=1;i<=k;i++) \
 				printf("%s%s\n",A[i],i==k ? "" : ",");}' >$@
+	echo Plt table:
+	cat $@
 
 plt.o: plt.c plt.h
 	$(CC) -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO) 
@@ -179,7 +187,7 @@ $(GCLIB): ${ALIB}
 	$(AR) gcllib.a ${ALIB}
 	${RANLIB} gcllib.a
 clean:
-	rm -f $(OBJS) ${ALIB} new_init.o  $(LAST_FILE) $(FIRST_FILE) *.a grab_defs$(EXE) *.ini tmpx foo.c cmpinclude.h new_init.c $(DECL) def undef udef.h void.h plt.h plttest.o TAGS
+	rm -f $(OBJS) ${ALIB} new_init.o  $(LAST_FILE) $(FIRST_FILE) *.a grab_defs$(EXE) *.ini tmpx foo.c cmpinclude.h new_init.c $(DECL) def undef udef.h void.h plt.h pltd.h plttest.o TAGS
 
 fsavres.o: /lib/libc.a
 	ar xv /lib/libc.a fsavres.o

@@ -36,8 +36,10 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * string-char to character ; localize safety proclamations
   * dolist checks for improper list
   * string-char to character ; localize saety proclamations
+  * string-char to character ; int array element types ; more robust plt
+    table handling
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 02:46:23 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 02:48:52 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

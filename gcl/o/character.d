@@ -52,15 +52,6 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	@(return Cnil)
 @)
 
-@(defun string_char_p (c)
-@
-        if (type_of(c)!=t_character) @(return Cnil)
-  /*	check_type_character(&c);*/
-	if (char_font(c) != 0 || char_bits(c) != 0)
-		@(return Cnil)
-	@(return Ct)
-@)
-
 @(defun alpha_char_p (c)
 	int i;
 @
@@ -633,7 +624,6 @@ gcl_init_character_function()
 {
 	make_function("STANDARD-CHAR-P", Lstandard_char_p);
 	make_function("GRAPHIC-CHAR-P", Lgraphic_char_p);
-	make_function("STRING-CHAR-P", Lstring_char_p);
 	make_function("ALPHA-CHAR-P", Lalpha_char_p);
 	make_function("UPPER-CASE-P", Lupper_case_p);
 	make_function("LOWER-CASE-P", Llower_case_p);

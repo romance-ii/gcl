@@ -385,7 +385,7 @@ void
 FEinvalid_function(object obj)
 {
 #ifdef ANSI_COMMON_LISP
-    FEwrong_type_argument(obj,sLfunction);
+    TYPE_ERROR(obj,sLfunction);
 #else
     Icall_error_handler(sKinvalid_function,
 		     make_simple_string("~S is invalid as a function."),

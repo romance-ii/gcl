@@ -126,15 +126,6 @@ check_type_character(object *p)
 		*p = wrong_type_argument(sLcharacter, *p);
 }
 
-/* static void */
-/* check_type_string_char(object *p) */
-/* { */
-/* 	while (type_of(*p) != t_character || */
-/* 	       char_font((*p)) != 0 || */
-/* 	       char_bits((*p)) != 0) */
-/* 		*p = wrong_type_argument(sLcharacter, *p); */
-/* } */
-
 void
 check_type_symbol(object *p)
 {
@@ -495,7 +486,6 @@ DEF_ORDINARY("CHARACTER",sLcharacter,LISP,"");
 DEF_ORDINARY("NUMBER",sLnumber,LISP,"");
 DEF_ORDINARY("RATIONAL",sLrational,LISP,"");
 DEF_ORDINARY("FLOAT",sLfloat,LISP,"");
-DEF_ORDINARY("STRING-CHAR",sLstring_char,LISP,"");
 DEF_ORDINARY("INTEGER",sLinteger,LISP,"");
 DEF_ORDINARY("RATIO",sLratio,LISP,"");
 DEF_ORDINARY("SHORT-FLOAT",sLshort_float,LISP,"");
@@ -516,6 +506,11 @@ DEF_ORDINARY("NON-NEGATIVE-SHORT",sLnon_negative_short,LISP,"");
 DEF_ORDINARY("NEGATIVE-SHORT",sLnegative_short,LISP,"");
 DEF_ORDINARY("SIGNED-SHORT",sLsigned_short,LISP,"");
 DEF_ORDINARY("UNSIGNED-SHORT",sLunsigned_short,LISP,"");
+
+DEF_ORDINARY("NON-NEGATIVE-INT",sLnon_negative_int,LISP,"");
+DEF_ORDINARY("NEGATIVE-INT",sLnegative_int,LISP,"");
+DEF_ORDINARY("SIGNED-INT",sLsigned_int,LISP,"");
+DEF_ORDINARY("UNSIGNED-INT",sLunsigned_int,LISP,"");
 
 DEF_ORDINARY("FIXNUM",sLfixnum,LISP,"");
 DEF_ORDINARY("NON-NEGATIVE-FIXNUM",sLnon_negative_fixnum,LISP,"");
@@ -619,10 +614,16 @@ DEF_ORDINARY("WARNING",sLwarning,LISP,"");
 DEF_ORDINARY("DYNAMIC-EXTENT",sLdynamic_extent,LISP,"");
 #endif
 
-DEFCONST("CHAR-LENGTH",sSchar_length,SI,small_fixnum(CHAR_SIZE),"Size in bits of a character");
-DEFCONST("SHORT-LENGTH",sSshort_length,SI,small_fixnum(CHAR_SIZE*sizeof(short)),"Size in bits of a short integer");
-DEFCONST("FIXNUM-LENGTH",sSfixnum_length,SI,small_fixnum(CHAR_SIZE*sizeof(fixnum)),"Size in bits of a short integer");
-DEFCONST("LFIXNUM-LENGTH",sSlfixnum_length,SI,small_fixnum(CHAR_SIZE*sizeof(lfixnum)),"Size in bits of a short integer");
+DEFCONST("CHAR-LENGTH",   sSchar_length,   SI,small_fixnum(CHAR_SIZE),
+	 "Size in bits of a character");
+DEFCONST("SHORT-LENGTH",  sSshort_length,  SI,small_fixnum(CHAR_SIZE*sizeof(short)),
+	 "Size in bits of a short integer");
+DEFCONST("INT-LENGTH", sSint_length, SI,small_fixnum(CHAR_SIZE*sizeof(int)),
+	 "Size in bits of an int");
+DEFCONST("FIXNUM-LENGTH", sSfixnum_length, SI,small_fixnum(CHAR_SIZE*sizeof(fixnum)),
+	 "Size in bits of a fixnum");
+DEFCONST("LFIXNUM-LENGTH",sSlfixnum_length,SI,small_fixnum(CHAR_SIZE*sizeof(lfixnum)),
+	 "Size in bits of a long fixnum");
 
 void     
 gcl_init_typespec(void)
