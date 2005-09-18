@@ -29,6 +29,9 @@
 
 (in-package 'compiler)
 
+(import 'si::+array-types+ 'compiler)
+(import 'si::+aet-type-object+ 'compiler)
+
 (si:putprop 'progn 'c1progn 'c1special)
 (si:putprop 'progn 'c2progn 'c2)
 
@@ -41,6 +44,11 @@
 (defun c1expr* (form info)
   (setq form (c1expr form))
   (add-info info (cadr form))
+  form)
+
+(defun c1expr** (form info)
+  (setq form (c1expr form))
+  (add-info (cadr form) info)
   form)
 
 (defun c1expr (form)
@@ -365,6 +373,25 @@
       form
     `(the seqind ,form)))
 
+(defconstant +hash-index-type+ (car (si::resolve-type `(or (integer -1 -1) seqind))))
+
+(defun maphash-expander (form env)
+  (declare (ignore env))
+  (let ((block (gensym))(tag (gensym)) (ind (gensym)) (key (gensym)) (val (gensym)))
+    `(block 
+      ,block
+      (let ((,ind -1))
+	(declare (,+hash-index-type+ ,ind))
+	(tagbody 
+	 ,tag
+	 (when (< (setq ,ind (si::next-hash-table-index ,(caddr form) (1+ ,ind))) 0)
+	   (return-from ,block))
+	 (let ((,key (si::hash-key-by-index ,(caddr form) ,ind))
+	       (,val (si::hash-entry-by-index ,(caddr form) ,ind)))
+	   (funcall ,(cadr form) ,key ,val))
+	 (go ,tag))))))
+(si::putprop 'maphash (function maphash-expander) 'si::compiler-macro-prop)
+	
 (defun array-row-major-index-expander (form env &optional (it 0))
   (declare (ignore env) (fixnum it))
   (let ((l (length form)))
@@ -884,7 +911,6 @@
 
 (defun c1structure-ref1 (form name index &aux (info (make-info)))
   ;;; Explicitly called from c1expr and c1structure-ref.
-  (declare (special  *aet-types*))
   (cond (*safe-compile* (c1expr `(si::structure-ref ,form ',name ,index)))
 	(t
   (let* ((sd (get name 'si::s-data))
@@ -893,7 +919,7 @@
     (setf (info-type info) (if (and (eq name 'si::s-data) (= index 2))
 			       ;;FIXME -- this belongs somewhere else.  CM 20050106
 			       '(vector unsigned-char)
-			     (type-filter (aref *aet-types* aet-type))))
+			     (type-filter (nth aet-type +array-types+))))
     (list 'structure-ref info
 	  (c1expr* form info)
 	  (add-symbol name)
@@ -906,9 +932,9 @@
 	 (index (caddr form)))
     (cond (sd
 	    (let* ((aet-type (aref (si::s-data-raw sd) index))
-		   (type (aref *aet-types* aet-type)))
+		   (type (nth aet-type +array-types+)))
 	      (cond ((eq (inline-type (type-filter type)) 'inline)
-		     (or (eql aet-type 0) (error "bad type ~a" type))))
+		     (or (= aet-type +aet-type-object+) (error "bad type ~a" type))))
 	      (setf (info-type (car arg)) (type-filter type))
 	      (coerce-loc
 		      (list (inline-type
@@ -928,7 +954,7 @@
 (defun c2structure-ref (form name-vv index sd
                              &aux (*vs* *vs*) (*inline-blocks* 0))
   (let ((loc (car (inline-args (list form) '(t))))
-	(type (aref *aet-types* (aref (si::s-data-raw sd) index))))
+	(type (nth (aref (si::s-data-raw sd) index) +array-types+)))
        (unwind-exit
 	 (list (inline-type (type-filter type))
 			  (flags) 'my-call
@@ -942,7 +968,7 @@
   (let* ((raw (si::s-data-raw sd))
 	 (spos (si::s-data-slot-position sd)))
     (if *safe-compile* (wfs-error)
-      (wt "STREF("  (aet-c-type (aref *aet-types* (aref raw ind)) )
+      (wt "STREF("  (aet-c-type (nth (aref raw ind) +array-types+) )
 	  "," loc "," (aref spos ind) ")"))))
 
 
@@ -980,7 +1006,7 @@
                           &aux locs (*vs* *vs*) (*inline-blocks* 0))
   name-vv
   (let* ((raw (si::s-data-raw sd))
-  (type (aref *aet-types* (aref raw ind)))
+  (type (nth (aref raw ind) +array-types+))
   (spos (si::s-data-slot-position sd))
   (tftype (type-filter type))
   ix iy)

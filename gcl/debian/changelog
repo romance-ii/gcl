@@ -7,8 +7,10 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * check-type type error format string recognition
   * check-type type error format string recognition
   * Avoid duplicate data entries
+  * maphash inlining;array type centralization ; c1expr** for use in
+    branch elmination
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:43:13 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:45:02 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
