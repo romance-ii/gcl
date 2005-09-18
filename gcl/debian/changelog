@@ -24,8 +24,10 @@ gclcvs (2.7.0-51) unstable; urgency=low
     modifications from disabling inlining in parts of the self-compile;
     fill-pointer inlining; functionp and compile-function-p inlining;
     maphash inlining
+  * string-char to character; allow local safety declarations in
+    compiled lambda closures
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:56:05 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:56:54 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

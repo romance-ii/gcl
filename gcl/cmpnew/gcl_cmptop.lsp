@@ -626,7 +626,7 @@
 (defun make-inline-string (cfun args fname)
   (if (null args)
       (format nil "~d()" (c-function-name "LI" cfun fname))
-      (let ((o (make-array 100 :element-type 'string-char :fill-pointer 0
+      (let ((o (make-array 100 :element-type 'character :fill-pointer 0
 			   :adjustable t )))
            (format o "~d(" (c-function-name "LI" cfun fname))
            (do ((l args (cdr l))
@@ -1825,7 +1825,15 @@
                          ;; *initial-ccb-vs* for correct use in
                          ;; wt-ccb-vs. CM 20031130
     (*level* (1+ level)) (*initial-ccb-vs* initial-ccb-vs)
-    (*exit* 'return))
+    (*exit* 'return)
+    (*compiler-check-args* *compiler-check-args*)
+    (*safe-compile* *safe-compile*)
+    (*compiler-push-events* *compiler-push-events*)
+    (*notinline* *notinline*)
+    (*space* *space*)
+    (*debug* *debug*))
+   (when (eq (car (caddr (cddr lambda-expr))) 'decl-body)
+     (local-compile-decls (caddr (caddr (cddr lambda-expr)))))
    (wt-nl1 "{	register object *"*volatile*"base=vs_base;")
    (wt-nl  "register object *" *volatile* "sup=base+VM" *reservation-cmacro* ";")
    (assign-down-vars (cadr lambda-expr) (fun-cfun fun)
