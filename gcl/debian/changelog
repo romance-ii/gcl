@@ -3,8 +3,10 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * Don't lower DBEGIN if shared mem start is beneath default
   * Better conditionalizing of dbegin lowering script
   * Make only one big TAGS table in source top
+  * No nil arrays in GCL
+  * No nil arrays in GCL
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:36:20 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:40:41 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
