@@ -27,7 +27,7 @@
 
  (or lisp::*link-array*
      (setq lisp::*link-array*
-	   (make-array (ash 1 11)  :element-type 'string-char :fill-pointer 0)))
+	   (make-array (ash 1 11)  :element-type 'character :fill-pointer 0)))
  (si::use-fast-links t)
 
  (let* ((x (append (pathname-directory si::*system-directory*) (list :parent)))

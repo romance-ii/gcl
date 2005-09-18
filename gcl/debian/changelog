@@ -38,8 +38,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * string-char to character ; localize saety proclamations
   * string-char to character ; int array element types ; more robust plt
     table handling
+  * string-char to character
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 02:48:52 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 02:49:27 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
