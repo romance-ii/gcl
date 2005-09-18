@@ -27,7 +27,7 @@
 (defvar eof (cons nil nil))
 (defvar *Ufun-out*)
 
-(defvar *str* (make-array 128 :element-type 'string-char :fill-pointer 0))
+(defvar *str* (make-array 128 :element-type 'character :fill-pointer 0))
 
 (defun make-Ufun (in-files &key (out-file "Ufun_list.lsp"))
   (with-open-file (*Ufun-out* out-file :direction :output)

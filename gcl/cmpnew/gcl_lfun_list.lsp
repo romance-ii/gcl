@@ -94,7 +94,6 @@
 (DEFSYSFUN 'NTHCDR "Lnthcdr" '(T T) 'T NIL NIL) 
 (DEFSYSFUN 'LOGIOR "Llogior" '(*) 'T NIL NIL) 
 (DEFSYSFUN 'CHAR-DOWNCASE "Lchar_downcase" '(T) 'CHARACTER NIL NIL) 
-(DEFSYSFUN 'STRING-CHAR-P "Lstring_char_p" '(T) 'T NIL T) 
 (DEFSYSFUN 'STREAM-ELEMENT-TYPE "Lstream_element_type" '(T) 'T NIL NIL) 
 (DEFSYSFUN 'PACKAGE-USED-BY-LIST "Lpackage_used_by_list" '(T) 'T NIL
     NIL) 
