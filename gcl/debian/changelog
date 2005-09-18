@@ -9,8 +9,10 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * Avoid duplicate data entries
   * maphash inlining;array type centralization ; c1expr** for use in
     branch elmination
+  * array type centralization ; propagate info in cases of branch
+    elimination
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:45:02 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:46:21 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

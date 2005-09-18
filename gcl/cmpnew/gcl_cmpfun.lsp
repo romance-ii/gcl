@@ -391,8 +391,8 @@
 	 (t2 (and (cadr args) (info-type (cadadr nargs))))
 	 (r (and t1 t2 (num-type-rel fn t1 t2))))
     (cond ((cddr args) (list 'call-global info fn nargs))
-	  ((car r) (c1expr t))
-	  ((cadr r) (c1expr nil))
+	  ((car r) (c1expr** t info))
+	  ((cadr r) (c1expr** nil info))
 	  ((list 'call-global info fn nargs)))))
 
 (dolist (l `(>= > < <= = /=))
@@ -435,25 +435,26 @@
 	 (tf (cadr ltf))
 	 (info (make-info)))
     (if (not tf) 
-	(c1expr nil)
+	(c1expr** nil info)
       (let ((nargs (c1args (cdr args) info)))
 	(multiple-value-bind 
 	 (m1 f1) (funcall tf (info-type (cadar nargs)))
 	 (multiple-value-bind 
 	  (m2 f2) (list-tp-test tf (info-type (cadadr nargs)))
 	  (declare (ignore f2))
-	  (cond ((or m1 m2) (c1expr t))
-		(f1 (c1expr nil))
-		((let ((info (make-info))) (list 'call-global info (car ltf) (c1args (list (cadr args)) info)))))))))))
+	  (cond ((or m1 m2) (c1expr** t info))
+		(f1 (c1expr** nil info))
+		((let ((info (make-info))) 
+		   (list 'call-global info (car ltf) (c1args (list (cadr args)) info)))))))))))
 (si::putprop 'is-eq-test-item-list 'c1is-eq-test-item-list 'c1)
 
 (defun do-predicate (fn args)
   (let* ((info (make-info))
-	(nargs (c1args args info))
-	(tp (car (rassoc fn *type-alist*))))
+	 (nargs (c1args args info))
+	 (tp (car (rassoc fn *type-alist*))))
     (let ((at (and (not (cdr args)) (info-type (cadar nargs)))))
-      (cond ((and at (subtypep at tp)) (c1expr t))
-	    ((not (type-and at tp)) (c1expr nil))
+      (cond ((and at (subtypep at tp)) (c1expr** t info))
+	    ((not (type-and at tp)) (c1expr** nil info))
 	    ((list 'call-global info fn nargs))))))
 (dolist (l *type-alist*) (when (symbolp (cdr l)) (si::putprop (cdr l) 'do-predicate 'c1g)))
 
@@ -732,9 +733,9 @@
 		      (equal (third type) '(*)))))
 	    (setq tem (si::best-array-element-type
 		       (second type)))
-	    (cond ((eq tem 'string-char) `(stringp ,x))
+	    (cond ((eq tem 'character) `(stringp ,x))
 		  ((eq tem 'bit) `(bit-vector-p ,x))
-		  ((setq tem (position tem *aet-types*))
+		  ((setq tem (position tem +array-types+))
 		   `(the boolean (vector-type ,x ,tem)))))
 	   ((and (consp type)
 		 (eq (car type) 'satisfies)
@@ -969,20 +970,17 @@
 
 
 
-(defvar *aet-types* ;FIXME generate and centralize
-  #(T STRING-CHAR SIGNED-CHAR FIXNUM NON-NEGATIVE-FIXNUM SHORT-FLOAT LONG-FLOAT
-			SIGNED-CHAR NON-NEGATIVE-CHAR
-			UNSIGNED-CHAR SIGNED-SHORT NON-NEGATIVE-SHORT UNSIGNED-SHORT))
-
 
 (defun aet-c-type (type)
   (ecase type
     ((t) "object")
-    ((string-char signed-char non-negative-char) "char")
+    ((character signed-char non-negative-char) "char")
     ((non-negative-fixnum fixnum) "fixnum")
     (unsigned-char "unsigned char")
     ((signed-short non-negative-short) "short")
     (unsigned-short "unsigned short")
+    ((signed-int non-negative-int) "int")
+    (unsigned-int "unsigned int")
     (long-float "longfloat")
     (short-float "shortfloat")))
 
