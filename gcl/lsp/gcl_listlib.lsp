@@ -34,9 +34,9 @@
 
 (in-package 'system)
 
-(eval-when (compile)
-  (proclaim '(optimize (safety 0) (space 3)))
-  )
+;(eval-when (compile)
+;  (proclaim '(optimize (safety 0) (space 3)))
+;  )
 
 (defun key-list (key test test-not &aux (tem nil))
   (when key (push :key tem) (push key tem))

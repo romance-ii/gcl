@@ -43,7 +43,7 @@
 (in-package 'system)
 
 
-(proclaim '(optimize (safety 2) (space 3)))
+;(proclaim '(optimize (safety 2) (space 3)))
 
 
 (proclaim '(function seqtype (t) t))

@@ -46,10 +46,11 @@
 (in-package 'system)
 
 
-(proclaim '(optimize (safety 2) (space 3)))
+;(proclaim '(optimize (safety 2) (space 3)))
 
 
 (defmacro with-open-stream ((var stream) . body)
+  (declare (optimize (safety 1)))
   (multiple-value-bind (ds b)
       (find-declarations body)
     `(let ((,var ,stream))
@@ -60,6 +61,7 @@
 
 
 (defmacro with-input-from-string ((var string &key index start end) . body)
+  (declare (optimize (safety 1)))
   (if index
       (multiple-value-bind (ds b)
           (find-declarations body)
@@ -73,6 +75,7 @@
 
 
 (defmacro with-output-to-string ((var &optional string) . body)
+  (declare (optimize (safety 1)))
   (if string
       `(let ((,var (make-string-output-stream-from-string ,string)))
          ,@body)
@@ -85,6 +88,7 @@
                          &optional (eof-error-p t) eof-value
                          &key (start 0) (end (length string))
                               preserve-whitespace)
+  (declare (optimize (safety 1)))
   (let ((stream (make-string-input-stream string start end)))
     (if preserve-whitespace
         (values (read-preserving-whitespace stream eof-error-p eof-value)
@@ -110,6 +114,7 @@
 			    ( readably nil readably-supplied-p )
 			    ( right-margin nil right-margin-supplied-p )
                         &aux (stream (make-string-output-stream)))
+  (declare (optimize (safety 1)))
   (let*((*print-array*
 	  (if array-supplied-p array *print-array*))
 	(*print-base*
@@ -145,16 +150,19 @@
 
 (defun prin1-to-string (object
                         &aux (stream (make-string-output-stream)))
-   (prin1 object stream)
-   (get-output-stream-string stream))
+  (declare (optimize (safety 1)))
+  (prin1 object stream)
+  (get-output-stream-string stream))
 
 
 (defun princ-to-string (object
                         &aux (stream (make-string-output-stream)))
+  (declare (optimize (safety 1)))
   (princ object stream)
   (get-output-stream-string stream))
 
 (defun file-string-length (ostream object)
+  (declare (optimize (safety 1)))
   (if (subtypep (stream-element-type ostream) 'character)
     (let ((sstream (make-string-output-stream)))
       (write object :stream sstream)
@@ -162,6 +170,7 @@
     nil))
 
 (defmacro with-open-file ((stream . filespec) . body)
+  (declare (optimize (safety 1)))
   (multiple-value-bind (ds b)
       (find-declarations body)
     `(let ((,stream (open ,@filespec)))
@@ -171,6 +180,7 @@
          (if ,stream (close ,stream))))))
 
 (defun pprint-dispatch (obj &optional (table *print-pprint-dispatch*))
+  (declare (optimize (safety 1)))
   (let ((fun (si:get-pprint-dispatch obj table)))
     (if fun (values fun t) (values 'si:default-pprint-object nil))))
 
@@ -179,6 +189,7 @@
 (defun set-pprint-dispatch (type-spec function &optional
 			    (priority 0)
 			    (table *print-pprint-dispatch*))
+  (declare (optimize (safety 1)))
   (unless (typep priority 'real)
     (specific-error :wrong-type-argument "~S is not of type ~S." priority 'real))
   (let ((a (assoc type-spec (cdr table) :test 'equal)))
@@ -187,6 +198,7 @@
   nil)
 
 (defun copy-pprint-dispatch (&optional table)
+  (declare (optimize (safety 1)))
   (unless table
     (setq table *print-pprint-dispatch*))
   (unless (and (eq (type-of table) 'cons)
@@ -242,6 +254,7 @@
 (defvar *dribble-saved-terminal-io* nil)
 
 (defun dribble (&optional (pathname "DRIBBLE.LOG" psp) (f :supersede))
+  (declare (optimize (safety 1)))
   (cond ((not psp)
          (when (null *dribble-stream*) (error "Not in dribble."))
          (if (eq *dribble-io* *terminal-io*)
@@ -273,6 +286,7 @@
 ;;; ensure-directories-exist 
 
 (defun ensure-directories-exist (pathspec &key verbose)
+  (declare (optimize (safety 1)))
   (flet ((pop-path 
 	  (p) 
 	  (if (pathname-name p) p
@@ -364,6 +378,7 @@
       value))
 
 (defun logical-pathname-translations (key)
+  (declare (optimize (safety 1)))
   (let ((k (if (stringp key) (string-right-trim ":" (string-downcase key)) key)))
       (cdr (si:pathname-lookup k si:*pathname-logical*))))
 
@@ -456,6 +471,7 @@
 ; simple formatter macro
 
 (defmacro formatter ( control-string )
+  (declare (optimize (safety 1)))
   `(progn
      (lambda (*standard-output* &rest arguments)                                
        (let ((*format-unused-args* nil))
@@ -470,6 +486,7 @@
 The forms of the body are executed in a print environment that corresponds to
 the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
 *package* is \"CL-USER\", etc."
+  (declare (optimize (safety 1)))
   `(let*((*package* (find-package :cl-user))
 	 (*print-array* t) ;; print-array -> core dampft
 	 (*print-base* 10)
@@ -508,6 +525,7 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
   
 (defmacro print-unreadable-object
 	  ((object stream &key type identity) &body body)
+  (declare (optimize (safety 1)))
   (if body
       `(flet ((.print-unreadable-object-body. () ,@body))
 	 (si::print-unreadable-object-function
@@ -516,5 +534,8 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
 
 ; i know this should be in cmpnew - but its easier here.
 
-(defmacro with-compilation-unit (opt &rest body) (declare (ignore opt)) `(progn ,@body))
+(defmacro with-compilation-unit (opt &rest body)   
+  (declare (optimize (safety 1)))
+  (declare (ignore opt)) 
+  `(progn ,@body))
 

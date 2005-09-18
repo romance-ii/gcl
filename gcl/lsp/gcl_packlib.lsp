@@ -33,7 +33,7 @@
 (in-package 'system)
 
 
-(proclaim '(optimize (safety 2) (space 3)))
+;(proclaim '(optimize (safety 2) (space 3)))
 
 
 (defmacro coerce-to-package (p)
@@ -48,6 +48,7 @@
           ,g))))
 
 (defun find-all-symbols (string-or-symbol)
+  (declare (optimize (safety 1)))
   (when (symbolp string-or-symbol)
         (setq string-or-symbol (symbol-name string-or-symbol)))
   (mapcan #'(lambda (p)
@@ -61,6 +62,7 @@
 
 (defmacro do-symbols ((var &optional (package '*package*) (result-form nil))
                       . body)
+  (declare (optimize (safety 1)))
   (let ((p (gensym)) (i (gensym)) (l (gensym)) (q (gensym))
         (loop (gensym)) (x (gensym))(y (gensym)) (break (gensym)) declaration)
     (multiple-value-setq (declaration body) (find-declarations body))
@@ -89,6 +91,7 @@
 
 (defmacro do-external-symbols
           ((var &optional (package '*package*) (result-form nil)) . body)
+  (declare (optimize (safety 1)))
   (let ((p (gensym)) (i (gensym)) (l (gensym))
         (loop (gensym)) (break (gensym)) declaration)
     (multiple-value-setq (declaration body)
@@ -107,6 +110,7 @@
        ,break))))
 
 (defmacro do-all-symbols((var &optional (result-form nil)) . body)
+  (declare (optimize (safety 1)))
   `(dolist (.v (list-all-packages) ,result-form)
 	   (do-symbols (,var .v)
 		       (tagbody ,@ body))))
@@ -156,6 +160,7 @@
 
 
 (defun apropos-list (string &optional package &aux list)
+  (declare (optimize (safety 1)))
   (setq list nil)
   (setq string (string string))
   (cond (package
@@ -175,11 +180,13 @@
 	       #'string< :key #'symbol-name))
 
 (defun apropos (string &optional package)
+  (declare (optimize (safety 1)))
   (dolist (symbol (apropos-list string package))
     (print-symbol-apropos symbol))
   (values))
 
 (defmacro with-package-iterator ((name plist &rest symbol-types) . body)
+  (declare (optimize (safety 1)))
   (let ((p (gensym)) (i (gensym)) (l (gensym)) (q (gensym)) (dum (gensym))
         (x (gensym))(y (gensym)) (access (gensym)) declaration)
     (multiple-value-setq (declaration body) (si::find-declarations body))

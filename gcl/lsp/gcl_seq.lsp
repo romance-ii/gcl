@@ -30,18 +30,18 @@
 (in-package 'system)
 
 
-(proclaim '(optimize (safety 2) (space 3)))
+(eval-when (compile) (proclaim '(optimize (safety 1) (space 3))))
 
 
 (defun make-sequence (type size &key (initial-element nil iesp)
-                                &aux element-type sequence)
+                                &aux element-type sequence)  
   (setq element-type
         (cond ((eq type 'list)
                (return-from make-sequence
                 (if iesp
                     (make-list size :initial-element initial-element)
                     (make-list size))))
-              ((or (eq type 'simple-string) (eq type 'string)) 'string-char)
+              ((or (eq type 'simple-string) (eq type 'string)) 'character)
               ((or (eq type 'simple-bit-vector) (eq type 'bit-vector)) 'bit)
               ((or (eq type 'simple-vector) (eq type 'vector)) t)
               (t
@@ -192,8 +192,8 @@
            (return nil)))))))
 
 (defun notany (predicate sequence &rest more-sequences)
-  (not (apply #'some predicate sequence more-sequences)))
+  (not (apply 'some predicate sequence more-sequences)))
 
 
 (defun notevery (predicate sequence &rest more-sequences)
-  (not (apply #'every predicate sequence more-sequences)))
+  (not (apply 'every predicate sequence more-sequences)))

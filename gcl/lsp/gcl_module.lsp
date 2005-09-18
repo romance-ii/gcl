@@ -32,7 +32,7 @@
 (in-package 'system)
 
 
-(eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))
+;(eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))
 
 
 (defvar *modules* nil)

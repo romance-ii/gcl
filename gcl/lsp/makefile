@@ -36,10 +36,8 @@ COMPILE_FILE=$(PORTDIR)/saved_pre_gcl $(PORTDIR) -system-p -c-file -data-file \
 	"${APPEND} ${NULLFILE} $*.data $*.o "
 
 
-all:	$(OBJS) TAGS
+all:	$(OBJS)
 
-TAGS: $(SRC)
-	etags $^
 .c.o:
 	$(CC) $(OFLAG) $(CFLAGS) -c $*.c
 	${APPEND} ${NULLFILE} $*.data  $*.o

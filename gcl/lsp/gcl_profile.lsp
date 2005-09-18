@@ -29,14 +29,14 @@
 ;				       (< (the fixnum (car x))
 ;					  (the fixnum (car y))))))))
 (defvar si::*profile-array*
-		      (make-array 20000 :element-type 'string-char
+		      (make-array 20000 :element-type 'character
 				  :static t
 				  :initial-element
 				  (code-char 0)))
 
 (defun create-profile-array (&optional (n 100000))
   (if *profile-array* (profile 0 0))
-  (setq *profile-array*	      (make-array n :element-type 'string-char
+  (setq *profile-array*	      (make-array n :element-type 'character
 				  :static t
 				  :initial-element
 				  (code-char 0)))
@@ -98,7 +98,7 @@
 	       (>= (array-total-size *profile-array*) array-size))
 	  (print "making new array")
 	  (setq *profile-array*  (make-array array-size
-					     :element-type 'string-char
+					     :element-type 'character
 					     :static t
 					     :initial-element
 					     (code-char 0))))

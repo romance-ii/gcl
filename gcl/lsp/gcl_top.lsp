@@ -39,8 +39,8 @@
 
 (export '(vs ihs-vs ihs-fun frs-vs frs-bds frs-ihs bds-var bds-val super-go))
 
-(eval-when (compile) (proclaim '(optimize (safety 2) (space 3))
-			       )
+(eval-when (compile) ;(proclaim '(optimize (safety 2) (space 3))
+		;	       )
 	   (defvar *command-args* nil)
 	   )
 

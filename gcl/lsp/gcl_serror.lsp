@@ -16,8 +16,8 @@
 	   error-name error-string error-continue-string error-format-args
 	   ) "SERROR")
 
-(eval-when (compile)
-	   (proclaim '(optimize (safety 2) (speed 2) (space 2))))
+;(eval-when (compile)
+;	   (proclaim '(optimize (safety 2) (speed 2) (space 2))))
 
 ;;do (require "SERROR")
 ;;(use-package "SERROR")
