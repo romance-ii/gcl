@@ -99,7 +99,7 @@
 		       (t object))))
 
     (or 
-     (cadr (assoc object1 *objects*))
+     (cadr (assoc object1 *objects* :test 'equal))
      (caar (member object1 *sharp-commas* :key #'cadr :test #'equal))
      (progn
        (push-data-incf (if (eq object1 object) object1))

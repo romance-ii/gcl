@@ -6,8 +6,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * No nil arrays in GCL
   * check-type type error format string recognition
   * check-type type error format string recognition
+  * Avoid duplicate data entries
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:42:37 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:43:13 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
