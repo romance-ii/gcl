@@ -20,8 +20,12 @@ gclcvs (2.7.0-51) unstable; urgency=low
     detect constant let bindings for autodeclaration purposes.  FIXME --
     comment, autodeclare modified bindings if appropriate, and
     comment/document
+  * string-char to character; prevent cmp-aref et.al. symbol-function
+    modifications from disabling inlining in parts of the self-compile;
+    fill-pointer inlining; functionp and compile-function-p inlining;
+    maphash inlining
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:53:35 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:56:05 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

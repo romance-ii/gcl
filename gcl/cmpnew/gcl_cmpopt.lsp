@@ -119,7 +119,7 @@
    (get 'system:aset 'inline-unsafe))
 (push '(((array t) fixnum t) t #.(flags set)"(#0)->v.v_self[#1]= (#2)")
    (get 'system:aset 'inline-unsafe))
-(push '(((array string-char) fixnum character) character #.(flags rfa set)"(#0)->ust.ust_self[#1]= (#2)")
+(push '(((array character) fixnum character) character #.(flags rfa set)"(#0)->ust.ust_self[#1]= (#2)")
    (get 'system:aset 'inline-unsafe))
 (push '(((array fixnum) fixnum fixnum) fixnum #.(flags set rfa)"(#0)->fixa.fixa_self[#1]= (#2)")
    (get 'system:aset 'inline-unsafe))
@@ -142,7 +142,7 @@
 (push '(((array t) fixnum fixnum t) t #.(flags set)
   "@0;(#0)->a.a_self[(#1)*(#0)->a.a_dims[1]+#2]= (#3)")
    (get 'system:aset 'inline-unsafe))
-(push '(((array string-char) fixnum fixnum character) character
+(push '(((array character) fixnum fixnum character) character
 	#.(flags rfa set)
   "@0;(#0)->ust.ust_self[(#1)*(#0)->a.a_dims[1]+#2]= (#3)")
    (get 'system:aset 'inline-unsafe))
@@ -399,7 +399,7 @@
 ;   (get 'aref 'inline-unsafe))
 ;(push '(((array t) fixnum) t #.(flags)"(#0)->v.v_self[#1]")
 ;   (get 'aref 'inline-unsafe))
-;(push '(((array string-char) fixnum) character #.(flags rfa)"(#0)->ust.ust_self[#1]")
+;(push '(((array character) fixnum) character #.(flags rfa)"(#0)->ust.ust_self[#1]")
 ;   (get 'aref 'inline-unsafe))
 ;(push '(((array fixnum) fixnum) fixnum #.(flags rfa)"(#0)->fixa.fixa_self[#1]")
 ;   (get 'aref 'inline-unsafe))
@@ -422,7 +422,7 @@
 ;(push '(((array t) fixnum fixnum) t #.(flags )
 ;  "@0;(#0)->a.a_self[(#1)*(#0)->a.a_dims[1]+#2]")
 ;   (get 'aref 'inline-unsafe))
-;(push '(((array string-char) fixnum fixnum) character #.(flags rfa)
+;(push '(((array character) fixnum fixnum) character #.(flags rfa)
 ;  "@0;(#0)->ust.ust_self[(#1)*(#0)->a.a_dims[1]+#2]")
 ;   (get 'aref 'inline-unsafe))
 ;(push '(((array fixnum) fixnum fixnum) fixnum #.(flags rfa)
@@ -448,11 +448,13 @@
 ;   (get 'row-major-aref 'inline-unsafe))
 
 ;;CMP-AREF
+(setf (symbol-function 'cmp-aref) (symbol-function 'row-major-aref))
 (si::putprop 'cmp-aref 'aref-propagator 'type-propagator)
 (push '(cmp-aref-inline-types nil #.(flags itf) cmp-aref-inline)
    (get 'cmp-aref 'inline-always))
 
 ;;CMP-ASET
+(setf (symbol-function 'cmp-aset) (symbol-function 'si::aset1))
 (si::putprop 'cmp-aset 'aref-propagator 'type-propagator)
 (push '(cmp-aset-inline-types nil #.(flags itf) cmp-aset-inline)
    (get 'cmp-aset 'inline-always))
@@ -463,6 +465,7 @@
 ;   (get 'array-dimension 'inline-unsafe))
 
 ;;CMP-ARRAY-DIMENSION
+(setf (symbol-function 'cmp-array-dimension) (symbol-function 'array-dimension))
 (push '(cmp-array-dimension-inline-types nil #.(flags itf) cmp-array-dimension-inline)
    (get 'cmp-array-dimension 'inline-always))
 
@@ -803,8 +806,16 @@
 
 
 ;;FILL-POINTER
- (push '((t) fixnum #.(flags rfa)"((#0)->st.st_fillp)")
+ (push '((t) seqind #.(flags rfa)"((#0)->v.v_fillp)")
    (get 'fill-pointer 'inline-unsafe))
+ (push '((vector) seqind #.(flags rfa)"((#0)->v.v_fillp)")
+   (get 'fill-pointer 'inline-always))
+
+;;ARRAY-HAS-FILL-POINTER-P
+ (push '((t) boolean #.(flags rfa)"((#0)->v.v_hasfillp)")
+   (get 'array-has-fill-pointer-p 'inline-unsafe))
+ (push '((vector) boolean #.(flags rfa)"((#0)->v.v_hasfillp)")
+   (get 'array-has-fill-pointer-p 'inline-always))
 
 ;;FIRST
  (push '((t) t #.(flags)"car(#0)")
@@ -877,12 +888,14 @@
 ;;LENGTH
  (push '((t) seqind #.(flags rfa set)"length(#0)")
    (get 'length 'inline-always))
-(push '(((array t)) seqind #.(flags rfa)"(#0)->v.v_fillp")
+(push '((vector) seqind #.(flags rfa)"(#0)->v.v_fillp")
    (get 'length 'inline-unsafe))
-(push '(((array fixnum)) seqind #.(flags rfa)"(#0)->v.v_fillp")
-   (get 'length 'inline-unsafe))
-(push '((string) seqind #.(flags rfa)"(#0)->v.v_fillp")
-   (get 'length 'inline-unsafe))
+;(push '(((array t)) seqind #.(flags rfa)"(#0)->v.v_fillp")
+;   (get 'length 'inline-unsafe))
+;(push '(((array fixnum)) seqind #.(flags rfa)"(#0)->v.v_fillp")
+;   (get 'length 'inline-unsafe))
+;(push '((string) seqind #.(flags rfa)"(#0)->v.v_fillp")
+;   (get 'length 'inline-unsafe))
 
 ;;LIST
  (push '(nil t #.(flags)"Cnil")
@@ -1170,6 +1183,16 @@ TRUNCATE_USE_C
   "@0;({enum type _tp=type_of(#0);_tp>=t_string && _tp<=t_vector;})")
    (get 'vectorp 'inline-always))
 
+;;FUNCTIONP
+ (push '((t) boolean #.(flags)
+  "@0;({enum type _tp=type_of(#0);_tp>=t_ifun && _tp<=t_closure;})")
+   (get 'functionp 'inline-always))
+
+;;FUNCTIONP
+ (push '((t) boolean #.(flags)
+  "@0;({enum type _tp=type_of(#0);_tp>=t_cfun && _tp<=t_closure;})")
+   (get 'compiled-function-p 'inline-always))
+
 ;;WRITE-CHAR
  (push '((t) t #.(flags set)
   "@0;(writec_stream(char_code(#0),Vstandard_output->s.s_dbind),(#0))")
@@ -1201,6 +1224,26 @@ TRUNCATE_USE_C
 ;;IDENTITY
  (push '((t) t #.(flags) "(#0)")
    (get 'identity 'inline-always))
+
+;;SI::NEXT-HASH-TABLE-INDEX
+ (push '((t t) fixnum #.(flags rfa) 
+	 "({fixnum _i;for (_i=fix(#1);_i<(#0)->ht.ht_size && (#0)->ht.ht_self[_i].hte_key==OBJNULL;_i++);_i==(#0)->ht.ht_size ? -1 : _i;})")
+   (get 'si::next-hash-table-index 'inline-unsafe))
+ (push '((t fixnum) fixnum #.(flags rfa) 
+	 "({fixnum _i;for (_i=(#1);_i<(#0)->ht.ht_size && (#0)->ht.ht_self[_i].hte_key==OBJNULL;_i++);_i==(#0)->ht.ht_size ? -1 : _i;})")
+   (get 'si::next-hash-table-index 'inline-unsafe))
+
+;;SI::HASH-ENTRY-BY-INDEX
+ (push '((t t) t #.(flags) "(#0)->ht.ht_self[fix(#1)].hte_value")
+   (get 'si::hash-entry-by-index 'inline-unsafe))
+ (push '((t fixnum) t #.(flags) "(#0)->ht.ht_self[(#1)].hte_value")
+   (get 'si::hash-entry-by-index 'inline-unsafe))
+
+;;SI::HASH-KEY-BY-INDEX
+ (push '((t t) t #.(flags) "(#0)->ht.ht_self[fix(#1)].hte_key")
+   (get 'si::hash-key-by-index 'inline-unsafe))
+ (push '((t fixnum) t #.(flags) "(#0)->ht.ht_self[(#1)].hte_key")
+   (get 'si::hash-key-by-index 'inline-unsafe))
 
 ;;GETHASH
 (push '((t t *) (values t t) #.(flags)(lambda (key hash &optional default)
