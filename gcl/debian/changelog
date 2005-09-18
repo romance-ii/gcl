@@ -34,8 +34,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * localize safety proclamations; string-char to character ; simgle-
     valued subtypep1 to accelerate best-array-element-type
   * string-char to character ; localize safety proclamations
+  * dolist checks for improper list
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 02:08:45 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 02:09:17 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

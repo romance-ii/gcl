@@ -28,7 +28,7 @@
 (in-package "SYSTEM")
 
 
-(eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))
+(eval-when (compile) (proclaim '(optimize (safety 1) (space 3))))
 (eval-when (eval compile) (defun si:clear-compiler-properties (symbol)))
 (eval-when (eval compile) (setq si:*inhibit-macro-special* nil))
 
@@ -274,9 +274,10 @@
 
 (defmacro dolist ((var form &optional (val nil)) &rest body
                                                  &aux (temp (gensym)))
-  `(do* ((,temp ,form (cdr ,temp)) (,var (car ,temp) (car ,temp)))
-	((endp ,temp) ,val)
-	,@body))
+  `(do* ((,temp ,form (cdr ,temp)))
+	((not (consp ,temp)) (check-type ,temp null) ,val)
+	(let ((,var (car ,temp)))
+	  ,@body)))
 
 ;; In principle, a more complete job could be done here by trying to
 ;; capture fixnum type declarations from the surrounding context or
@@ -343,4 +344,5 @@
 	     ,@(mapcar #'(lambda (x) `(proclaim ',x)) l)))
 
 (defmacro lambda ( &rest l) `(function (lambda ,@l)))
+
 (defmacro memq (a b) `(member ,a ,b :test 'eq))
