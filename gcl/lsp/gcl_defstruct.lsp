@@ -30,7 +30,7 @@
 (in-package 'system)
 
 
-(proclaim '(optimize (safety 2) (space 3)))
+;(proclaim '(optimize (safety 2) (space 3)))
 
 
 
@@ -43,7 +43,7 @@
 (defvar *vector-accessors* (make-array 2 :adjustable t))
 
 (or (fboundp 'record-fn) (setf (symbol-function 'record-fn)
-			       #'(lambda (&rest l) l nil)))
+			       (lambda (&rest l) l nil)))
 
 (defun make-access-function (name conc-name no-conc type named include no-fun
 				  ;; from apply
@@ -75,16 +75,19 @@
 	   (or (aref accsrs offset)
 	       (setf (aref accsrs offset)
 		     (cond  ((eq accsrs *accessors*)
-				#'(lambda (x)
-				    (or (structurep x)
-					(error "~a is not a structure" x))
+				(lambda (x)
+				  (declare (optimize (safety 1)))
+				  (or (structurep x)
+				      (error "~a is not a structure" x))
 				    (structure-ref1 x offset)))
 			       ((eq accsrs *list-accessors*)
-				#'(lambda(x)
+				(lambda(x)
+				    (declare (optimize (safety 1)))
 				    (si:list-nth offset x)))
 			       ((eq accsrs *vector-accessors*)
-				#'(lambda(x)
-				    (aref x offset)))))))))
+				(lambda(x)
+				  (declare (optimize (safety 1)))
+				  (aref x offset)))))))))
     (cond (read-only
 	    (remprop access-function 'structure-access)
 	    (setf (get access-function 'struct-read-only) t))
@@ -122,7 +125,9 @@
 (defmacro maybe-add-keydef (key keydefs prior-keyword)
   `(let ((def (cadar 
 	       (member (key-name ,key ,prior-keyword) ,keydefs
-		       :key #'(lambda (k) (when (consp k) (car k)))))))
+		       :key (lambda (k)
+			      (declare (optimize (safety 1)))
+			      (when (consp k) (car k)))))))
      (if def
 	 (cond ((not (consp ,key))
 		(list ,key def))
@@ -187,7 +192,7 @@
   (declare (ignore named))
   (let ((slot-names
          ;; Collect the slot-names.
-         (mapcar #'(lambda (x)
+         (mapcar (lambda (x)
                      (cond ((null x)
                             ;; If the slot-description is NIL,
                             ;;  it is in the padding of initial-offset.
@@ -201,7 +206,7 @@
                  slot-descriptions))
         (keys
          ;; Make the keyword parameters.
-         (mapcan #'(lambda (x)
+         (mapcan (lambda (x)
                      (cond ((null x) nil)
                            ((null (car x)) nil)
                            ((null (cadr x)) (list (maybe-cons-keyname x)))
@@ -320,8 +325,10 @@
                (cons (car olds)
                      (overwrite-slot-descriptions news (cdr olds))))))))
 
-(defvar *all-t-s-type* (make-array 50 :element-type 'unsigned-char :static t))
-(defvar *alignment-t* (alignment t))
+(defconstant +aet-type-object+ (aet-type nil))
+(defconstant +all-t-s-type+ 
+  (make-array 50 :element-type 'unsigned-char :static t :initial-element +aet-type-object+))
+(defconstant +alignment-t+ (alignment t))
 
 (defun make-t-type (n include slot-descriptions &aux i)
   (let ((res  (make-array n :element-type 'unsigned-char :static t)))
@@ -334,13 +341,14 @@
     (dolist (v slot-descriptions)
 	    (setq i (nth 4 v))
 	    (let ((type (third v)))
-	      (cond ((<= (the fixnum (alignment type)) *alignment-t*)
+	      (cond ((<= (the fixnum (alignment type)) +alignment-t+)
 		     (setf (aref res i) (aet-type type))))))
-    (cond ((< n (length *all-t-s-type*))
-	   (dotimes (i n)
-		  (cond ((not (eql (the fixnum (aref res i)) 0))
-			 (return-from make-t-type res))))
-	   *all-t-s-type*)
+    (cond ((< n (length +all-t-s-type+))
+	   (let ((def +aet-type-object+))
+	     (dotimes (i n)
+	       (cond ((not (= (the fixnum (aref res i)) def))
+		      (return-from make-t-type res)))))
+	   +all-t-s-type+)
 	  (t res))))
 
 (defvar *standard-slot-positions*
@@ -351,9 +359,9 @@
 	     (setf (aref ar i)(*  (size-of t) i)))
     ar))
 
-(eval-when (compile )
-(proclaim '(function round-up (fixnum fixnum ) fixnum))
-)
+;(eval-when (compile )
+;(proclaim '(function round-up (fixnum fixnum ) fixnum))
+;)
 
 (defun round-up (a b)
   (declare (fixnum a b))
@@ -394,10 +402,10 @@
 	       (v slot-descriptions)
 	       (setq type (caddr v))
 	       (setq align (alignment type))
-	       (unless (<= align *alignment-t*)
+	       (unless (<= align +alignment-t+)
 		       (setq type t)
 		       (setf (caddr v) t)
-		       (setq align *alignment-t*)
+		       (setq align +alignment-t+)
 		       (setq v (nconc v '(t))))
 	       (setq next-pos (round-up pos align))	
 	       (or (eql pos next-pos) (setq has-holes t))
@@ -432,7 +440,7 @@
 	 ;bootstrapping code!
 	 (setq def (make-s-data-structure
 		     (make-array (* leng (size-of t))
-				 :element-type 'string-char :static t)
+				 :element-type 'unsigned-char :static t :initial-element +aet-type-object+)
 		     (make-t-type leng nil slot-descriptions)
 		     *standard-slot-positions*
 		     slot-descriptions
@@ -495,8 +503,9 @@
 	  (record-fn predicate 'defun '(t) t)
 	  (or no-funs
 	      (setf (symbol-function predicate)
-		    #'(lambda (x)
-			(si::structure-subtype-p x name))))
+		    (lambda (x)
+		      (declare (optimize (safety 1)))
+		      (si::structure-subtype-p x name))))
 	  (setf (get predicate 'compiler::co1)
 		'compiler::co1structure-predicate)
 	  (setf (get predicate 'struct-predicate) name)
@@ -505,6 +514,7 @@
 
 		  
 (defmacro defstruct (name &rest slots)
+  (declare (optimize (safety 1)))
   (let ((slot-descriptions slots)
         options
         conc-name
@@ -595,7 +605,9 @@
     (when (and print-function print-object)
       (error "Cannot specify both :print-function and :print-object."))
     (when print-object
-      (setq print-function (lambda (x y z) (declare (ignore z)) (funcall print-object x y))))
+      (setq print-function (lambda (x y z) 
+			     (declare (optimize (safety 1)))
+			     (declare (ignore z)) (funcall print-object x y))))
 
     (and include (not print-function)
 	 (setq print-function (s-data-print-function (get (car include)  's-data))))
@@ -656,7 +668,7 @@
           (t
 	    (setq slot-descriptions
 		  (append (overwrite-slot-descriptions
-			    (mapcar #'(lambda (sd)
+			    (mapcar (lambda (sd)
 					(parse-slot-description sd 0))
 				    (cdr include))
 			    (s-data-slot-descriptions
@@ -713,7 +725,7 @@
 	   ',offset ',predicate ',documentation 
 	   )
 	 
-	 ,@(mapcar #'(lambda (constructor)
+	 ,@(mapcar (lambda (constructor)
 		       (make-constructor name constructor type named new-slot-descriptions))
 		   constructors)
 	 ,@(if (and type predicate)

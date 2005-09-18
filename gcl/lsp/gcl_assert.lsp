@@ -31,22 +31,23 @@
 (in-package 'system)
 
 
-(proclaim '(optimize (safety 2) (space 3)))
+;(proclaim '(optimize (safety 2) (space 3)))
 
 
 (defmacro check-type (place typespec &optional (string nil s))
+  (declare (optimize (safety 1)))
   `(do ((*print-level* 4)
         (*print-length* 4))
        ((typep ,place ',typespec) nil)
-       (cerror ""
-               "The value of ~:@(~S~), ~:@(~S~), is not ~A."
-               ',place ,place
-               ,(if s string `',typespec))
+       (specific-error :wrong-type-argument
+               "The value ~:@(~S~) is not ~A. (bound to variable ~:@(~S~))"
+               ,place ,(if s string `',typespec) ',place )
        ,(ask-for-form place)
        (format *error-output* "Now continuing ...~%")))
 
 
 (defmacro assert (test-form &optional places string &rest args)
+  (declare (optimize (safety 1)))
   `(do ((*print-level* 4)
         (*print-length* 4))
        (,test-form nil)
@@ -66,6 +67,7 @@
 
 
 (defmacro ecase (keyform &rest clauses &aux (key (gensym)))
+  (declare (optimize (safety 1)))
    (do ((l (reverse clauses) (cdr l))
         (form `(let ((*print-level* 4)
                      (*print-length* 4))
@@ -90,6 +92,7 @@
 )
 
 (defmacro ccase (keyplace &rest clauses &aux (key (gensym)))
+  (declare (optimize (safety 1)))
    `(loop (let ((,key ,keyplace))
                ,@(mapcar #'(lambda (l)
                                   `(when ,(if (listp (car l))
@@ -118,6 +121,7 @@
    )
 
 (defmacro typecase (keyform &rest clauses)
+  (declare (optimize (safety 1)))
   (do ((l (reverse clauses) (cdr l))
        (form nil) (key (gensym)))
       ((endp l) `(let ((,key ,keyform)) ,form))
@@ -130,6 +134,7 @@
   )
 
 (defmacro etypecase (keyform &rest clauses &aux (key (gensym)))
+  (declare (optimize (safety 1)))
    (do ((l (reverse clauses) (cdr l))
         (form `(error (typecase-error-string
                        ',keyform ,key
@@ -142,6 +147,7 @@
    )
 
 (defmacro ctypecase (keyplace &rest clauses &aux (key (gensym)))
+  (declare (optimize (safety 1)))
   `(loop (let ((,key ,keyplace))
               ,@(mapcar #'(lambda (l)
                                  `(when (typep ,key ',(car l))

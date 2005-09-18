@@ -5,8 +5,8 @@
 (In-package "SYSTEM")
 (import 'sloop::sloop)
 
-(eval-when (compile eval)
-  (proclaim '(optimize (safety 2) (space 3)))
+;(eval-when (compile eval)
+;  (proclaim '(optimize (safety 2) (space 3)))
 
 (defmacro f (op &rest args)
     `(the fixnum (,op ,@ (mapcar #'(lambda (x) `(the fixnum ,x)) args) )))
@@ -585,7 +585,7 @@
 ;; in other common lisps this should be a string output stream.
 
 (defvar *display-string*
-  (make-array 100 :element-type 'string-char :fill-pointer 0 :adjustable t))
+  (make-array 100 :element-type 'character :fill-pointer 0 :adjustable t))
 
 (defun display-env (n env)
   (do ((v (reverse env) (cdr v)))

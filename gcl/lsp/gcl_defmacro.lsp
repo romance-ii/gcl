@@ -30,7 +30,7 @@
 (in-package 'system)
 
 
-(eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))
+;(eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))
 
 
 ;;; valid lambda-list to DEFMACRO is:

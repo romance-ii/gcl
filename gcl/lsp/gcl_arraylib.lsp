@@ -41,46 +41,15 @@
 (in-package 'system)
 
 
-(proclaim '(optimize (safety 2) (space 3)))
+;(proclaim '(optimize (safety 2) (space 3)))
 
 (defun best-array-element-type (type)
   (cond ((not type) nil)
 	((eq type '*) '*)
-	((member type '(string-char character standard-char base-char extended-char)) 'string-char) ;FIXME
 	((car (member type +array-types+)))
-	((car (member type +array-types+ :test 'subtypep)))
-	((subtypep type 'float) 'long-float)
+	((car (member type +array-types+ :test 'subtypep1)))
+	((subtypep1 type 'float) 'long-float)
 	(t)))
-
-;;FIXME -- this needs integration with other type functions.  CM 20050106
-;(defun best-array-element-type (type)
-;  (cond ((null type) nil)
-;	((eql t type) t)
-;	((memq type '(bit unsigned-char signed-char
-;				    unsigned-short
-;				    signed-short fixnum))
-;	       type)
-;	((subtypep type 'fixnum)
-;	 (dolist (v ;'(bit non-negative-char signed-char unsigned-char non-negative-short signed-short unsigned-short)
-;		    '(bit signed-char unsigned-char signed-short unsigned-short)
-;		    'fixnum)
-;		 (cond ((subtypep type v)
-;			(return v)))))
-;	((eql type 'character) 'string-char)
-;	(t (or (dolist (v '(string-char bit short-float
-;				    long-float))
-;		   (cond ((subtypep type v)
-;			  (return v))))
-;	       t))))
-	 
-;(defun upgraded-array-element-type (type &optional environment)
-;  (declare (ignore environment))
-;  (best-array-element-type type))
-
-;(defun array-displacement (array)
-;  (let ((x (si:array-displacement1 array)))
-;  (values (car x) (cdr x)))
-;  )
 
 (defun make-array (dimensions
 		   &key (element-type t)
@@ -90,7 +59,7 @@
 			displaced-to (displaced-index-offset 0)
 			static)
   (when (integerp dimensions) (setq dimensions (list dimensions)))
-  (setq element-type (or (best-array-element-type element-type) 'string-char))
+  (setq element-type (or (best-array-element-type element-type) 'character))
   (cond ((= (length dimensions) 1)
 	 (let ((x (si:make-vector element-type (car dimensions)
 	                          adjustable fill-pointer
@@ -243,11 +212,12 @@
 
 
 (defun vector-push (new-element vector)
+  (declare (optimize (safety 1)))
+  (assert (array-has-fill-pointer-p vector))
   (let ((fp (fill-pointer vector)))
-    (declare (fixnum fp))
-    (cond ((< fp (the fixnum (array-dimension vector 0)))
+    (cond ((< fp (array-dimension vector 0))
            (si:aset vector fp new-element)
-           (si:fill-pointer-set vector (the fixnum (1+ fp)))
+           (si:fill-pointer-set vector (1+ fp))
 	   fp)
 	  (t nil))))
 

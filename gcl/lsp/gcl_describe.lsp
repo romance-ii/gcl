@@ -31,7 +31,7 @@
 (in-package 'system)
 
 
-(proclaim '(optimize (safety 2) (space 3)))
+;(proclaim '(optimize (safety 2) (space 3)))
 
 
 (defvar *inspect-level* 0)
@@ -192,7 +192,7 @@
 (defun inspect-character (character)
   (format t
           (cond ((standard-char-p character) "~S - standard character")
-                ((string-char-p character) "~S - string character")
+                ((characterp character) "~S - character")
                 (t "~S - character"))
           character)
   (inspect-print "code:  #x~X" (char-code character))
@@ -322,6 +322,7 @@
                              (*print-level* nil)
                              (*print-length* nil))
 ;  "The lisp function DESCRIBE."
+  (declare (optimize (safety 1)))
   (terpri)
   (catch 'quit-inspect (inspect-object object))
   (terpri)
@@ -335,6 +336,7 @@
                             (*print-level* 3)
                             (*print-length* 3))
 ;  "The lisp function INSPECT."
+  (declare (optimize (safety 1)))
   (read-line)
   (princ "Type ? and a newline for help.")
   (terpri)
