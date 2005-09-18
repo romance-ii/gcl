@@ -167,13 +167,10 @@
     `(BLOCK ,TAG1
        (TAGBODY ,TAG2
 	 (IF (TYPEP ,PLACE ',TYPE) (RETURN-FROM ,TAG1 NIL))
-	 (RESTART-CASE ,(IF TYPE-STRING
-	   `(specific-error :wrong-type-argument
-			    "The value of ~S is not ~S."
-			    ,PLACE ,TYPE-STRING)
-	   `(specific-error :wrong-type-argument
-			    "The value of ~S is not of type ~S."
-			    ,PLACE ',TYPE))
+	 (RESTART-CASE 
+	  (specific-error :wrong-type-argument
+			  "The value ~:@(~S~) is not ~A. (bound to variable ~:@(~S~))"
+			  ,place ,(or type-string `',type) ',place)
 	   (STORE-VALUE (VALUE)
 	       :REPORT (LAMBDA (STREAM)
 			 (FORMAT STREAM "Supply a new value of ~S."

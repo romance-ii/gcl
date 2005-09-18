@@ -99,6 +99,7 @@
     (:wrong-type-argument "The value of ~S is not of type ~S." internal-type-error :datum :expected-type)
     (:wrong-type-argument "The value of ~S is not ~S, but ~S." internal-type-error :datum :expected-type)
     (:wrong-type-argument "The value of ~S is not of type ~S, but ~S." internal-type-error :datum :expected-type)
+    (:wrong-type-argument "The value ~:@(~S~) is not ~A. (bound to variable ~:@(~S~))" internal-type-error :datum :expected-type)
 
 ; those had been commented out before - have to check them
 ;   (:too-few-arguments "~S [or a callee] requires ~R argument~:p,~% but only ~R ~:*~[were~;was~:;were~] supplied." internal-simple-program-error) ; |<function>| |n| |top - base|
