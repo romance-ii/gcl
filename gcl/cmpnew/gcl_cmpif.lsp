@@ -61,10 +61,9 @@
 	   (if *fmla-eval-const*
 	       (cond (fmlae 
 		      (when (caddr args) (note-branch-elimination (car args) t (caddr args)))
-		      (c1expr (cadr args)))
-		     (t 
-		       (note-branch-elimination (car args) nil (cadr args)) 
-		      (endp (cddr args)) (c1nil) (c1expr (caddr args))))
+		      (c1expr** (cadr args) info))
+		     (t (note-branch-elimination (car args) nil (cadr args)) 
+		      (if (endp (cddr args)) (c1nil) (c1expr** (caddr args) info))))
 	     (list 'if info
                fmla
                (c1expr* (cadr args) info)
