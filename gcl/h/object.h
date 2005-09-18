@@ -383,22 +383,12 @@ struct hashtable {           /*  hash table header  */
 
 };
 
-enum aelttype {   /*  array element type  */
- aet_object,      /*  t  */
- aet_ch,          /*  string-char  */
- aet_bit,         /*  bit  */
- aet_fix,         /*  fixnum  */
- aet_nnfix,       /*  non-neg fixnum  */
- aet_sf,          /*  short-float  */
- aet_lf,          /*  plong-float  */
- aet_char,        /* signed char */
- aet_nnchar,      /* non-neg char */
- aet_uchar,       /* unsigned char */
- aet_short,       /* signed short */
- aet_nnshort,     /*  non-neg short   */
- aet_ushort,      /*  unsigned short   */
- aet_last
-};
+typedef struct {
+  void *dflt;
+  object *namep;
+  unsigned char size;
+} aet_type_struct;
+
 
 struct array {           /*  array header  */
 
@@ -479,6 +469,9 @@ struct ustring {
 
 #define USHORT_GCL(x,i)  (((unsigned short *)(x)->ust.ust_self)[i])
 #define  SHORT_GCL(x,i)  ((( short *)(x)->ust.ust_self)[i])
+
+#define UINT_GCL(x,i)  (((unsigned int *)(x)->ust.ust_self)[i])
+#define  INT_GCL(x,i)  ((( int *)(x)->ust.ust_self)[i])
 
 #define BV_OFFSET(x) ((type_of(x)==t_bitvector ? x->bv.bv_offset : \
                        type_of(x)== t_array ? x->a.a_offset : (abort(),0)))

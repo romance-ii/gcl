@@ -596,7 +596,7 @@ EXTER object sSsetf_function;
 /*  typespec.c  */
 EXTER object sLcommon,sLnull,sLcons,sLlist,sLsymbol,sLarray,sLvector,sLbit_vector,sLstring;
 EXTER object sLsequence,sLsimple_array,sLsimple_vector,sLsimple_bit_vector,sLsimple_string;
-EXTER object sLcompiled_function,sLpathname,sLcharacter,sLnumber,sLrational,sLfloat,sLstring_char;
+EXTER object sLcompiled_function,sLpathname,sLcharacter,sLnumber,sLrational,sLfloat;
 EXTER object sLinteger,sLratio,sLshort_float,sLstandard_char,sLinterpreted_function;
 
 EXTER object sLchar,sLnon_negative_char,sLnegative_char,sLsigned_char,sLunsigned_char;
@@ -604,6 +604,8 @@ EXTER object sLshort,sLnon_negative_short,sLnegative_short,sLsigned_short,sLunsi
 EXTER object sLfixnum,sLnon_negative_fixnum,sLnegative_fixnum,sLsigned_fixnum,sLunsigned_fixnum;
 EXTER object sLlfixnum,sLnon_negative_lfixnum,sLnegative_lfixnum;
 EXTER object sLsigned_lfixnum,sLunsigned_lfixnum,sLnegative_bignum,sLnon_negative_bignum,sLbase_char;
+
+EXTER object sLsigned_int,sLnon_negative_int,sLnegative_int,sLunsigned_int;
 
 EXTER object sLseqind,sLrnkind;
 
@@ -696,3 +698,5 @@ object Ifuncall_n(object,int,...);
 object Ivs_values();
 object Icheck_one_type();
 object fSincorrect_type();
+
+

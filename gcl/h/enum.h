@@ -24,10 +24,10 @@ enum type {
   t_stream,
   t_random,
   t_readtable,
+  t_ifun,
   t_cfun,
   t_cclosure,
   t_sfun,
-  t_ifun,
   t_gfun,
   t_vfun,
   t_afun,
@@ -57,3 +57,30 @@ enum signals_allowed_values {
 };
 
   
+enum aelttype {   /*  array element type  */
+ aet_ch,          /*  character  */
+ aet_bit,         /*  bit  */
+ aet_nnchar,      /*  non-neg char */
+ aet_char,        /*  signed char */
+ aet_uchar,       /*  unsigned char */
+ aet_nnshort,     /*  non-neg short   */
+ aet_short,       /*  signed short */
+ aet_ushort,      /*  unsigned short   */
+#if SIZEOF_LONG != SIZEOF_INT
+ aet_nnint,       /*  non-neg int   */
+ aet_int,         /*  signed int */
+ aet_uint,        /*  unsigned int   */
+#endif
+ aet_nnfix,       /*  non-neg fixnum  */
+ aet_fix,         /*  fixnum  */
+ aet_sf,          /*  short-float  */
+ aet_lf,          /*  plong-float  */
+ aet_object,      /*  t  */
+#if SIZEOF_LONG == SIZEOF_INT
+ aet_nnint,       /*  non-neg int   */
+ aet_int,         /*  signed int */
+ aet_uint,        /*  unsigned int   */
+#endif
+ aet_last
+};
+

@@ -29,8 +29,10 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * string-char to character; consolidate type-and around resolve-type;
   * string-char to character
   * one big TAGS table
+  * string-char to character ; int array element types
+  * string-char to character ; int array element types
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:59:51 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 02:01:54 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
