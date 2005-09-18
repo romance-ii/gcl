@@ -31,8 +31,10 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * one big TAGS table
   * string-char to character ; int array element types
   * string-char to character ; int array element types
+  * localize safety proclamations; string-char to character ; simgle-
+    valued subtypep1 to accelerate best-array-element-type
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 02:01:54 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 02:04:12 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

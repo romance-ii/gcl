@@ -80,8 +80,7 @@
     (boolean (or (eq object 't) (eq object 'nil)))
     (bignum (member (type-of-c object) '(bignum non-negative-bignum negative-bignum)))
     (ratio (eq (type-of-c object) 'ratio))
-    ((base-char string-char)
-     (and (characterp object) (string-char-p object)))
+    ((base-char) (characterp object))
     (integer
      (and (integerp object) (in-interval-p object i)))
     (rational
@@ -185,8 +184,9 @@
 	      (match-dimensions (cdr dim) (cdr pat))))))
 
 
-
-
+(defun subtypep1 (t1 t2)
+  (or (not t1) (eq t2 t)
+      (not (car (resolve-type `(and ,t1 ,(negate t2)))))))
 
 (defun subtypep (t1 t2 &optional env)
   (declare (ignore env) (optimize (safety 1)))
@@ -320,6 +320,12 @@
 (deftype unsigned-short ()`(unsigned-byte ,short-length))
 (deftype short ()`(signed-short))
 
+(deftype non-negative-int () `(non-negative-byte ,int-length))
+(deftype negative-int () `(negative-byte ,int-length))
+(deftype signed-int ()`(signed-byte ,int-length))
+(deftype unsigned-int ()`(unsigned-byte ,int-length))
+(deftype int ()`(signed-int))
+
 (deftype non-negative-fixnum () `(non-negative-byte ,fixnum-length))
 (deftype negative-fixnum () `(negative-byte ,fixnum-length))
 (deftype signed-fixnum ()`(signed-byte ,fixnum-length))
@@ -336,7 +342,7 @@
 (deftype vector (&optional element-type size)
   `(array ,element-type (,size)))
 (deftype string (&optional size)
-  `(array string-char (,size)))
+  `(array character (,size)))
 (deftype base-string (&optional size)
   `(array base-char (,size)))
 (deftype bit-vector (&optional size)
@@ -345,7 +351,7 @@
 (deftype simple-vector (&optional size)
   `(array t (,size)))
 (deftype simple-string (&optional size)
-  `(array string-char (,size)))
+  `(array character (,size)))
 (deftype simple-base-string (&optional size)
   `(array base-char (,size)))
 (deftype simple-bit-vector (&optional size)
@@ -363,7 +369,6 @@
 (deftype extended-char () nil)
 (deftype base-char () `(or standard-char non-standard-base-char))
 (deftype character () `(or base-char extended-char))
-(deftype string-char () `character)
 
 (deftype stream () `(or broadcast-stream concatenated-stream echo-stream
 			file-stream string-stream synonym-stream two-way-stream))
@@ -445,7 +450,6 @@
 	  (non-keyword-symbol . non-keyword-symbol-p)
 	  (standard-char . standard-char-p)
 	  (non-standard-base-char . non-standard-base-char-p)
-	  (string-char . string-char-p);;FIXME
 	  (interpreted-function . interpreted-function-p)
           (atom . atom)
           (cons . consp)
@@ -486,19 +490,17 @@
 
 
 (defconstant +range-types+ `(integer ratio short-float long-float))
-(defconstant +array-types+ '(nil character bit ;FIXME try to live with unsigned alone if can work out the C casting
-				       non-negative-char signed-char unsigned-char
-				       non-negative-short signed-short unsigned-short 
-				       non-negative-fixnum fixnum
-				       short-float long-float t))
+
+(defconstant +array-types+ (si::aelttype-list))
+(defconstant +array-types-with-nil-for-ansi+ (append '(nil) +array-types+))
 
 (defconstant +known-types+ (append +range-types+ 
 				   (mapcar (lambda (x) `(complex ,x)) +range-types+)
 				   +singleton-types+
-				   (mapcar (lambda (x) `(array ,x)) +array-types+)))
+				   (mapcar (lambda (x) `(array ,x)) +array-types-with-nil-for-ansi+)))
 
 (defconstant +array-type-alist+ (mapcar (lambda (x) (cons x (intern (string-concatenate "ARRAY-" (string x)))))
-					+array-types+))
+					+array-types-with-nil-for-ansi+))
 (defconstant +complex-type-alist+ (mapcar (lambda (x) (cons x (intern (string-concatenate "COMPLEX-" (string x)))))
 					+range-types+))
 
@@ -792,6 +794,9 @@
 
 (defun elgt (x y)
   (cond ((or (eq (car x) '*) (eq (cdr y) '*)) nil)
+	((and (integerp (car x)) (integerp (cdr y))) (> (car x) (1+ (cdr y))))
+	((and (integerp (range-num (car x))) 
+	      (integerp (range-num (cdr y)))) (>= (range-num (car x)) (1+ (range-num (cdr y)))))
 	((and (numberp (car x)) (numberp (cdr y))) (> (car x) (cdr y)))
 	((>= (range-num (car x)) (range-num (cdr y))))))
 
@@ -890,8 +895,8 @@
 ;; ARRAY TYPES
 
 (defun array-load (ntp type)
-  (let* ((z (if (eq (cadr type) 'string-char) 'character (cadr type)));FIXME
-	 (z (if (eq z '*) z (car (member z +array-types+)))))
+  (let* ((z (cadr type))
+	 (z (if (eq z '*) z (car (member z +array-types-with-nil-for-ansi+)))))
     (unless (or z (not (cadr type))) (error "Bad array type ~a~%" (cadr type)))
     (let* ((dim (caddr type))
 	   (dim (cond ((eq dim '*) t)
@@ -934,7 +939,7 @@
 	      (not (negate (cadr x))))))
 
 (defun array-recon (x) 
-  `(array ,(car (rassoc (car x) +array-type-alist+)) ,(cadr x)))
+  `(array ,(car (rassoc (car x) +array-type-alist+)) ,(cond ((eq (cadr x) t) '*) ((atom (cadr x)) (cadr x)) ((mapcar (lambda (x) (if (eq x t) '* x)) (cadr x))))))
 
 ;; STRUCTURES
 
