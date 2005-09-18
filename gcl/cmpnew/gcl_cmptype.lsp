@@ -31,7 +31,7 @@
 ;;;	FIXNUM  CHARACTER  SHORT-FLOAT  LONG-FLOAT
 ;;;	(VECTOR T)  STRING  BIT-VECTOR  (VECTOR FIXNUM)
 ;;;	(VECTOR SHORT-FLOAT)  (VECTOR LONG-FLOAT)
-;;;	(ARRAY T)  (ARRAY STRING-CHAR)  (ARRAY BIT)
+;;;	(ARRAY T)  (ARRAY CHARACTER)  (ARRAY BIT)
 ;;;	(ARRAY FIXNUM)
 ;;;	(ARRAY SHORT-FLOAT)  (ARRAY LONG-FLOAT)
 ;;;	UNKNOWN
@@ -52,10 +52,10 @@
   (let ((type (type-of thing)))
     (case type
       ((fixnum bignum) `(integer ,thing ,thing))
-      ((short-float long-float symbol) type)
+      ((short-float long-float symbol null boolean) type)
       (cons `(cons ,(object-type (car thing)) ,(if (cdr thing) (object-type (cdr thing)) 'null)))
       (keyword 'symbol)
-      ((string-char standard-char character) 'character)
+      ((standard-char character) 'character)
       ((string bit-vector) type)
       (vector (list 'vector (array-element-type thing)))
       (array (list 'array (array-element-type thing)))
@@ -86,7 +86,6 @@
 			    (and (consp (caddr type))
 				 (= (length (caddr type)) 1))))
 		   (case element-type
-;		     (string-char 'string)
 		     (bit 'bit-vector)
 		     (t (list 'vector element-type))))
 		  (t (list 'array element-type))))
@@ -108,8 +107,6 @@
 		    ((subtypep type '(vector long-float))
 		     '(vector long-float))
 		    ((subtypep type '(array t)) '(array t))
-		    ((subtypep type '(array string-char))
-		     '(array string-char))
 		    ((subtypep type '(array bit)) '(array bit))
 		    ((subtypep type '(array fixnum)) '(array fixnum))
 		    ((subtypep type '(array short-float))
@@ -263,18 +260,18 @@
 
 ;;FIXME -- centralize subtypep, normalzie-type, type>=, type-and.
 ;;Consider traversing a static tree.  CM 20050106
-(defun type-and (type1 type2 &aux tem)
+(defun type-and (type1 type2)
 
-  (let ((nt1 (si::normalize-type type1)))
-    (unless (and (not (array-wd type1)) (equal nt1 (if (symbolp type1) (list type1) type1)))
-      (let ((tem (type-and nt1 type2)))
-	(return-from type-and (or (and (equal tem type2) type2) (and (equal tem nt1) type1) tem)))))
-  (let ((nt2 (si::normalize-type type2)))
-    (unless (and (not (array-wd type2)) (equal nt2 (if (symbolp type2) (list type2) type2)))
-      (let ((tem (type-and type1 nt2)))
-	(return-from type-and (if (equal tem nt2) type2 tem)))))
+;  (let ((nt1 (si::normalize-type type1)))
+;    (unless (and (not (array-wd type1)) (equal nt1 (if (symbolp type1) (list type1) type1)))
+;      (let ((tem (type-and nt1 type2)))
+;	(return-from type-and (or (and (equal tem type2) type2) (and (equal tem nt1) type1) tem)))))
+;  (let ((nt2 (si::normalize-type type2)))
+;    (unless (and (not (array-wd type2)) (equal nt2 (if (symbolp type2) (list type2) type2)))
+;      (let ((tem (type-and type1 nt2)))
+;	(return-from type-and (if (equal tem nt2) type2 tem)))))
 
-  (cond ((equal type1 type2) type2)
+  (cond ;((equal type1 type2) type2)
 	((and (consp type2) (eq (car type2) 'values))
 	 (if (and (consp type1) (eq (car type1) 'values))
 	     (let ((r (list 'values)))
@@ -285,78 +282,13 @@
 	   (type-and type1 (second type2))))
 	((and (consp type1) (eq (car type1) 'values))
 	 (type-and (second type1) type2))
-	((eq type1 '*) type2)
-	((eq type2 '*) type1)
-	((si::memq type1 '(t object)) type2)
-	((si::memq type2 '(t object)) type1)
-	((setq tem (car (si::resolve-type `(and ,type1 ,type2))));FIXME
-	 (let ((ntem (si::normalize-type tem)))
-	   (cond ((equal ntem type1) type1)
-		 ((equal ntem type2) type2)
-		 (tem))))
-	((or (integer-typep type1) (integer-typep type2))
-	 (integer-type-and type1 type2));FIXME
-	((and (array-tp type1) (array-tp type2))
-	 (cond
-	  ((eq (car type1) (car type2))
-	   (cond
-	    ((null (cdr type1)) type2)
-	    ((null (cdr type2)) type1)
-	    ((null (cddr type1))
-	     (cond
-	      ((eq (cadr type1) '*) type2)
-	      ((eq (cadr type1) (cadr type2)) type2)
-	      ((eq (cadr type2) '*) `(,(car type2) ,(cadr type1) ,@(cddr type2)))))
-	    ((null (cddr type2))
-	     (cond
-	      ((eq (cadr type2) '*) type1)
-	      ((eq (cadr type2) (cadr type1)) type1)
-	      ((eq (cadr type1) '*) `(,(car type1) ,(cadr type2) ,@(cddr type1)))))
-	    (t
-	     (cond
-	      ((not (equal (caddr type1) (caddr type2))) nil)
-	      ((eq (cadr type1) '*) type2)
-	      ((eq (cadr type1) (cadr type2)) type2)
-	      ((eq (cadr type2) '*) type1)))))
-	  ((eq (car type1) 'simple-array)
-	   (type-and type1 `(simple-array ,@(cdr type2))))
-	  ((eq (car type2) 'simple-array)
-	   (type-and `(simple-array ,@(cdr type1)) type2))))
-	(t (case type1
-	     (string
-	      (if (and (consp type2) (eq (car type2) 'array)
-		       (eq (cadr type2) 'string-char))
-		  type1 nil))
-	     (bit-vector
-	      (if (and (consp type2) (eq (car type2) 'array)
-		       (eq (cadr type2) 'bit))
-		  type1 nil))
-	     (fixnum-float
-	      (if (member type2 '(fixnum float short-float long-float))
-		  type2 nil))
-	     (float
-	      (if (member type2 '(short-float long-float))
-			      type2 nil))
-	     ((long-float short-float)
-	      (if (member type2 '(fixnum-float float))
-		  type1 nil))
-	     ((signed-char unsigned-char signed-short)
-	      (if (eq type2 'fixnum) type1 nil))
-	     ((unsigned-short)
-	      (if (subtypep type1 type2) type1 nil))
-	     (integer
-	      (case type2
-		    (fixnum type2)))
-	     (fixnum
-	      (case type2
-		    ((integer fixnum-float) 'fixnum)
-		    ((signed-char unsigned-char signed-short bit)
-		     type2)
-		    ((unsigned-short)
-		     (if (subtypep type2 type1) type2 nil))))
-	     (otherwise
-	      (if (subtypep type1 type2) type1 (if (subtypep type2 type1) type2 nil)))
-	     ))))
+	((member type1 '(t object *)) type2)
+	((member type2 '(t object *)) type1)
+	((let* ((n (si::normalize-type-int `(and ,type1 ,type2) t))
+		(tem (si::normalize-type-int (car (si::nreconstruct-type (si::nprocess-type n))) t)))
+	   (cond ((equal tem (caddr n)) type2)
+		 ((equal tem (cadr n)) type1)
+		 (tem))))))
 		 
 (defun type>= (type1 type2)
   (eq (type-and type1 type2) type2))
