@@ -1267,7 +1267,7 @@ AC_DEFINE_UNQUOTED(SHARED_LIB_HEAP_CEILING,$heap_ceiling)
 # likely to get more heap this way.
 echo "int main() {return !($heap_ceiling && (unsigned long)$dbegin < (unsigned long)$cstack_address);}" >foo.c
 $CC foo.c -o foo
-if foo ; then
+if ./foo ; then
 
    AC_MSG_CHECKING("finding default linker script")
    touch unixport/gcl.script

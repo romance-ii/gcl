@@ -4586,7 +4586,7 @@ EOF
 # likely to get more heap this way.
 echo "int main() {return !($heap_ceiling && (unsigned long)$dbegin < (unsigned long)$cstack_address);}" >foo.c
 $CC foo.c -o foo
-if foo ; then
+if ./foo ; then
 
    echo $ac_n "checking "finding default linker script"""... $ac_c" 1>&6
 echo "configure:4593: checking "finding default linker script"" >&5
