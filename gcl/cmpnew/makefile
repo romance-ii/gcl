@@ -35,10 +35,7 @@ COMPILE_FILE=$(PORTDIR)/saved_pre_gcl $(PORTDIR) -system-p -c-file -data-file \
 	"$(CC) $(OFLAG) $(CFLAGS) -c $*.c" \
 	"${APPEND} ${NULLFILE} $*.data $*.o"
 
-all:	$(OBJS) TAGS
-
-TAGS: $(SRC)
-	etags $^
+all:	$(OBJS)
 
 .lsp.fn: ../cmpnew/gcl_collectfn.o
 	../xbin/make-fn $*.lsp ../unixport/saved_pre_gcl

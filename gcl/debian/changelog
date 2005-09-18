@@ -28,8 +28,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
     compiled lambda closures
   * string-char to character; consolidate type-and around resolve-type;
   * string-char to character
+  * one big TAGS table
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:59:10 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:59:51 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
