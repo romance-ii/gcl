@@ -104,24 +104,19 @@
 	  (t (bsearchleq x a (1+ k) j le)))))
 
 (defun push-array (x ar s lin)
-  (declare  (object x lin) ((vector t) ar) (fixnum s) (ignore lin))
-;	 (j (if lin
-;		 (do ((k s (1+ k))) ((or (eql k (length ar)) (si::objlt x (aref ar k)) (eq x (aref ar k))) k)
-;		   (declare (fixnum k)))
-;		 (bsearchleq x ar s (length ar)))))
+  (declare  ((vector t) ar) (seqind s) (ignore lin))
   (let ((j (bsearchleq x ar s (length ar) t)))
-    (declare (fixnum j))
     (when (and (< j (length ar)) (eq (aref ar j) x))
 	(return-from push-array -1))
-    (let ((ar (if (eql (length ar) (the fixnum (array-total-size ar)))
-		  (adjust-array ar (the fixnum (* 2 (length ar))))
+    (let ((ar (if (= (length ar) (array-total-size ar))
+		  (adjust-array ar (* 2 (length ar)))
 		ar)))
       (declare ((vector t) ar))
       (do ((i (length ar) (1- i))) ((<= i j))
-	(declare (fixnum i))
-	(setf (aref ar i) (aref ar (the fixnum (1- i)))))
+	  (declare (seqind i))
+	  (setf (aref ar i) (aref ar  (1- i))))
       (setf (aref ar j) x)
-      (setf (fill-pointer ar) (the fixnum (1+ (length ar))))
+      (setf (fill-pointer ar)  (1+ (length ar)))
       j)))
 
 
@@ -733,9 +728,11 @@
 (defun c-cast (aet)
   (case aet
     (signed-char "char")
-    ((string-char character unsigned-char non-negative-char) "unsigned char")
+    ((bit character unsigned-char non-negative-char) "unsigned char")
     (signed-short "short")
     ((non-negative-short unsigned-short) "unsigned short")
+    (signed-int "int")
+    ((non-negative-int unsigned-int) "unsigned int")
     ((signed-fixnum fixnum non-negative-fixnum) "fixnum")
     ((unsigned-fixnum ) "object") ;FIXME
     (short-float "float")
@@ -775,10 +772,8 @@
     (and (consp x) (member (car x) '(array simple-array))
        (let ((uaet (and (not (eq (cadr x) '*)) (upgraded-array-element-type (nil-to-t (cadr x))))))
 	 ;; FIXME -- inline bit-vectors too.
-	 (unless (eq uaet 'bit)
-	   ;;FIXME string-char -> character for ansi throughout, this is just a bridge for now.
-	   ;;20050509 CM
-	   (if (eq uaet 'string-char) 'character uaet))))))
+	 (unless nil;(eq uaet 'bit)
+	   uaet)))))
 
 (defun var-array-type (a)
   (when (consp a)
@@ -787,7 +782,10 @@
 	   (or (cdr (assoc (cadr a) *c-vars*))
 	       (car (rassoc (cadr a) *c-vars*)))))))
 
-(setf (symbol-function 'cmp-aref) (symbol-function 'row-major-aref))
+;(setf (symbol-function 'cmp-aref) (symbol-function 'row-major-aref))
+
+(defmacro wt-bit-index (i)
+  `(wt #+clx-little-endian "(7-" "(" ,i "&0x7)" #+clx-little-endian ")"))
 
 (defun cmp-aref-inline-types (&rest r)
   (let ((art (car r)))
@@ -800,11 +798,16 @@
   (let ((at (nil-to-t (var-array-type a))))
     (let ((aet (aref-propagator 'cmp-aref at)))
       (if aet
-	  (wt  "((" (c-cast aet) " *)(" a ")->v.v_self)[" i "]")
+	  (if (eq aet 'bit) 
+	      (progn
+		(wt  "(((" (c-cast aet) " *)(" a ")->v.v_self)[" i ">>3]>>")
+		(wt-bit-index i) 
+		(wt "&0x1)"))
+	    (wt  "((" (c-cast aet) " *)(" a ")->v.v_self)[" i "]"))
 	(wt "fLrow_major_aref(" a "," i ")")))))
   
   
-(setf (symbol-function 'cmp-aset) (symbol-function 'si::aset1))
+;(setf (symbol-function 'cmp-aset) (symbol-function 'si::aset1))
 
 (defun cmp-aset-inline-types (&rest r)
   (let ((art (car r)))
@@ -820,7 +823,14 @@
   (let ((at (nil-to-t (var-array-type a))))
     (let ((aet (aref-propagator 'cmp-aset at)))
       (if aet
-	  (wt  "((" (c-cast aet) " *)(" a ")->v.v_self)[" i "]=" j)
+	  (if (eq aet 'bit) 
+	      (progn 
+		(wt  "(" j " ? (((" (c-cast aet) " *)(" a ")->v.v_self)[" i ">>3]|=(1<<")
+		(wt-bit-index i)
+		(wt ")) : (((" (c-cast aet) " *)(" a ")->v.v_self)[" i ">>3]&=~(1<<")
+		(wt-bit-index i) 
+		(wt ")))"))
+	    (wt  "((" (c-cast aet) " *)(" a ")->v.v_self)[" i "]=" j))
 	(wt "fSaset1(" a "," i "," j ")")))))
   
   

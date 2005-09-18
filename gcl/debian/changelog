@@ -12,8 +12,12 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * array type centralization ; propagate info in cases of branch
     elimination
   * propagate info in cases of branch elimination
+  * Bit vector inlining; signed-int and unsigned-int array element types
+    for use on 64bit where fixnum is 64bit and int is 32bit; prevent
+    cmp-aref et.al. symbol-function modifications from disabling
+    inlining in parts of the self-compile
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:46:45 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 18 Sep 2005 01:51:27 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
