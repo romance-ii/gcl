@@ -352,8 +352,7 @@
          (setf (info-type info1) type)
          (setq form1 (list* (car form1) info1 (cddr form1)))))
   (setf (info-type info) type)
-  (list 'setq info name1 form1)
-  )
+  (list 'setq info name1 form1))
 
 (defun c2setq (vref form)
   (let ((*value-to-go* (cons 'var vref))) (c2expr* form))
