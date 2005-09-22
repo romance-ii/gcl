@@ -895,9 +895,9 @@ struct freelist {
 /*
  Type_of.
 */
-#define type_of(x)       ({object _z=(object)(x);\
+#define type_of(x)       ({register object _z=(object)(x);\
                            is_imm_fixnum(_z) ? t_fixnum : \
-                           (_z==Cnil || _z==Ct || _z==Dotnil ? t_symbol : \
+                           (_z==Cnil || _z==Dotnil ? t_symbol : \
                            (is_cons(_z) ?  t_cons  : _z->d.t));})
 #define set_type_of(x,y) ({object _x=(object)(x);enum type _y=(y);*(fixnum *)(_x)&=TYPE_BITS;\
                            if (_y!=t_cons) {_x->d.e=1;_x->d.t=_y;}})

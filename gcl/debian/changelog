@@ -42,8 +42,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * custreloc is default on macosx
   * Accelerate equal, eql and equalp
   * preliminary static linking option
+  * T is an ordinary symbol
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 22 Sep 2005 21:06:30 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 22 Sep 2005 21:07:24 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
