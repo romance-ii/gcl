@@ -66,6 +66,8 @@ DEFUN_NEW("COMPILE-REGEXP",object,fScompile_regexp,SI,1,1,NONE,OO,OO,OO,OO,(obje
 
   char *tmp;
   object res;
+  void *v;
+  fixnum sz;
 
   if (type_of(p)!= t_string && type_of(p)!=t_symbol)
     not_a_string_or_symbol(p);
@@ -75,15 +77,17 @@ DEFUN_NEW("COMPILE-REGEXP",object,fScompile_regexp,SI,1,1,NONE,OO,OO,OO,OO,(obje
   memcpy(tmp,p->st.st_self,p->st.st_fillp);
   tmp[p->st.st_fillp]=0;
 
+  if (!(v=(void *)regcomp(tmp,&sz)))
+    FEerror("regcomp failure",0);
+
   res=alloc_object(t_vector);
   res->v.v_displaced=Cnil;
   res->v.v_hasfillp=1;
   res->v.v_elttype=aet_uchar;
   res->v.v_adjustable=0;
   res->v.v_offset=0;
-  if (!(res->v.v_self=(void *)regcomp(tmp,&res->v.v_dim)))
-    FEerror("regcomp failure",0);
-  res->v.v_fillp=res->v.v_dim;
+  res->v.v_self=v;
+  res->v.v_fillp=res->v.v_dim=sz;
 
   RETURN1(res);
 
