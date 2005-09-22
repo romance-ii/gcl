@@ -279,11 +279,11 @@ gethash(object key, object hashtable) {
     break;
   case htt_eql:
     i = hash_eql(key);
-    f=eql;
+    f=eql1;
     break;
   case htt_equal:
     i = ihash_equal(key,0);
-    f=equal;
+    f=equal1;
     break;
   default:
     FEerror( "gethash:  Hash table not of type EQ, EQL, or EQUAL." ,0);
@@ -302,7 +302,7 @@ gethash(object key, object hashtable) {
       if (e->hte_value==OBJNULL) return first_objnull ? first_objnull : e;
       if (!first_objnull) first_objnull=e;
     } else
-      if (f ? f(key,hkey) : key==hkey) return e;
+      if (key == hkey || (f && f(key,hkey))) return e;
   }
   if (s) {
     q=s;

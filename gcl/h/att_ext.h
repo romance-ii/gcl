@@ -423,7 +423,7 @@ extern object expand_pathname();
 
 /*  prediate.c  */
 
-int eql(),equal(),eq();
+int eql1(),equal1(),eq();
 
 /*  print.d  */
 EXTER object sKupcase;

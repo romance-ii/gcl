@@ -482,7 +482,7 @@ fSmake_vector1_1(fixnum n,fixnum elt_type,object staticp) {
 DEFUN_NEW("AELTTYPE-LIST",object,fSaelttype_list,SI,0,0,NONE,OO,OO,OO,OO,(),"") {
 
   aet_type_struct *p,*pe;
-  object f,x,y=OBJNULL;
+  object f=Cnil,x,y=OBJNULL;
 
   for (p=aet_types,pe=p+aet_object;p<=pe;p++) {
     x=MMcons(*p->namep,Cnil);

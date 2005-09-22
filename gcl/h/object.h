@@ -1235,3 +1235,7 @@ EXTER unsigned plong signals_allowed, signals_pending  ;
     
 #define proper_list(a) (type_of(a)==t_cons || (a)==Cnil)
 #define fix_dot(a) ((a) == Dotnil ? Cnil : (type_of(a)==t_cons && (a)->c.c_cdr==Dotnil ? (a)->c.c_car : (a))) 
+
+#define eql(a_,b_)    ({register object _a=(a_);register object _b=(b_);_a==_b || eql1(_a,_b);})
+#define equal(a_,b_)  ({register object _a=(a_);register object _b=(b_);_a==_b || equal1(_a,_b);})
+#define equalp(a_,b_) ({register object _a=(a_);register object _b=(b_);_a==_b || equalp1(_a,_b);})

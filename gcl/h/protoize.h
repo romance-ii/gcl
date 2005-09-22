@@ -435,11 +435,11 @@ typedef void (*funcvoid)(void);
 /* predicate.c:346:OF */ extern object fLcompiled_function_p (object x0); /* (x0) object x0; */
 /* predicate.c:367:OF */ extern object fLcommonp (object x0); /* (x0) object x0; */
 /* predicate.c:379:OF */ extern object fLeq (object x0, object x1); /* (x0, x1) object x0; object x1; */
-/* predicate.c:393:OF */ extern int eql (object x, object y); /* (x, y) object x; object y; */
+/* predicate.c:393:OF */ extern int eql1 (object x, object y); /* (x, y) object x; object y; */
 /* predicate.c:455:OF */ extern object fLeql (object x0, object x1); /* (x0, x1) object x0; object x1; */
-/* predicate.c:469:OF */ extern int equal (register object x, register object y); /* (x, y) register object x; register object y; */
+/* predicate.c:469:OF */ extern int equal1 (register object x, register object y); /* (x, y) register object x; register object y; */
 /* predicate.c:543:OF */ extern object fLequal (object x0, object x1); /* (x0, x1) object x0; object x1; */
-/* predicate.c:557:OF */ extern bool equalp (object x, object y); /* (x, y) object x; object y; */
+/* predicate.c:557:OF */ extern bool equalp1 (object x, object y); /* (x, y) object x; object y; */
 /* predicate.c:681:OF */ extern object fLequalp (object x0, object x1); /* (x0, x1) object x0; object x1; */
 /* predicate.c:750:OF */ extern bool contains_sharp_comma (object x); /* (x) object x; */
 /* predicate.c:797:OF */ extern object fScontains_sharp_comma (object x0); /* (x0) object x0; */

@@ -446,65 +446,67 @@ DEFUNO_NEW("EQ",object,fLeq,LISP
     ;}
 
 bool
-eql(object x, object y)
-{
-	enum type t;
+eql1(register object x, register object y) {
 
-	if (x == y)
-		return(TRUE);
-	if ((t = type_of(x)) != type_of(y))
-		return(FALSE);
-	switch (t) {
+  register enum type t;
 
-	case t_fixnum:
-		if (fix(x) == fix(y))
-			return(TRUE);
-		else
-			return(FALSE);
+/* 	if (x == y) */
+/* 		return(TRUE); */
 
-	case t_bignum:
-		if (big_compare(x,y) == 0)
-			return(TRUE);
-		else
-			return(FALSE);
+  if ((t = type_of(x)) != type_of(y))
+    return(FALSE);
 
-	case t_ratio:
-		if (eql(x->rat.rat_num, y->rat.rat_num) &&
-		    eql(x->rat.rat_den, y->rat.rat_den))
-			return(TRUE);
-		else
-			return(FALSE);
+  switch (t) {
 
-	case t_shortfloat:
-		if (sf(x) == sf(y))
-			return(TRUE);
-		else
-			return(FALSE);
+  case t_fixnum:
+    if (fix(x) == fix(y))
+      return(TRUE);
+    else
+      return(FALSE);
+    
+  case t_bignum:
+    if (big_compare(x,y) == 0)
+      return(TRUE);
+    else
+      return(FALSE);
+    
+  case t_ratio:
+    if (eql(x->rat.rat_num, y->rat.rat_num) &&
+	eql(x->rat.rat_den, y->rat.rat_den))
+      return(TRUE);
+    else
+      return(FALSE);
 
-	case t_longfloat:
-		if (lf(x) == lf(y))
-			return(TRUE);
-		else
-			return(FALSE);
-
-	case t_complex:
-		if (eql(x->cmp.cmp_real, y->cmp.cmp_real) &&
-		    eql(x->cmp.cmp_imag, y->cmp.cmp_imag))
-			return(TRUE);
-		else
-			return(FALSE);
-
-	case t_character:
-		if (char_code(x) == char_code(y) &&
-		    char_bits(x) == char_bits(y) &&
-		    char_font(x) == char_font(y))
-			return(TRUE);
-		else
-			return(FALSE);
-	default:
-	  break;
-	}
-	return(FALSE);
+  case t_shortfloat:
+    if (sf(x) == sf(y))
+      return(TRUE);
+    else
+      return(FALSE);
+    
+  case t_longfloat:
+    if (lf(x) == lf(y))
+      return(TRUE);
+    else
+      return(FALSE);
+    
+  case t_complex:
+    if (eql(x->cmp.cmp_real, y->cmp.cmp_real) &&
+	eql(x->cmp.cmp_imag, y->cmp.cmp_imag))
+      return(TRUE);
+    else
+      return(FALSE);
+    
+  case t_character:
+    if (char_code(x) == char_code(y) &&
+	char_bits(x) == char_bits(y) &&
+	char_font(x) == char_font(y))
+      return(TRUE);
+    else
+      return(FALSE);
+  default:
+    break;
+  }
+  return(FALSE);
 }
 
 DEFUNO_NEW("EQL",object,fLeql,LISP
@@ -520,90 +522,87 @@ DEFUNO_NEW("EQL",object,fLeql,LISP
 	
 RETURN1(x0);}
 
+
+
 bool
+equal1(register object x, register object y) {
 
-equal(register object x, register object y)
-                  
-#ifdef UNIX   /* in non unix case cs_check want's an address */
-        
-#endif
-         
-{
-register enum type t;
+  register enum type t;
+  
+ BEGIN:
+  /*         if ( NULL == x ) { */
+  /*             FEerror ( "equal: x is a NULL pointer", 0 ); */
+  /*         } */
+  /*         if ( NULL == y ) { */
+  /*             FEerror ( "equal: y is a NULL pointer", 0 ); */
+  /*         } */
 
-	cs_check(y);
-	cs_check(x);
+/*   if (x==y) */
+/*     return(TRUE); */
 
-BEGIN:
-        if ( NULL == x ) {
-            FEerror ( "equal: x is a NULL pointer", 0 );
-        }
-        if ( NULL == y ) {
-            FEerror ( "equal: y is a NULL pointer", 0 );
-        }
-	if ((t = type_of(x)) != type_of(y))
-		return(FALSE);
-	if (x==y)
-		return(TRUE);
-	switch (t) {
+  if ((t = type_of(x)) != type_of(y))
+    return(FALSE);
 
-	case t_cons:
-		if (!equal(x->c.c_car, y->c.c_car))
-			return(FALSE);
-		x = x->c.c_cdr;
-		y = y->c.c_cdr;
-		goto BEGIN;
-
-        case t_structure:
-	case t_symbol: 
-	case t_vector:
-        case t_array:
-		return FALSE;
-
-	case t_fixnum :
-	return(fix(x)==fix(y));
-	case t_shortfloat:
-	return(x->SF.SFVAL==y->SF.SFVAL);
-	case t_longfloat:
-	return(x->LF.LFVAL==y->LF.LFVAL);
-
- 	case t_string:
-	  return(string_eq(x, y));
-
-	case t_bitvector:
-	{
-		int i, ox, oy;
-
-		if (x->bv.bv_fillp != y->bv.bv_fillp)
-			return(FALSE);
-		ox = BV_OFFSET(x);
-		oy = BV_OFFSET(y);
-		for (i = 0;  i < x->bv.bv_fillp;  i++)
-			if((x->bv.bv_self[(i+ox)/8] & (0200>>(i+ox)%8))
-			 !=(y->bv.bv_self[(i+oy)/8] & (0200>>(i+oy)%8)))
-				return(FALSE);
-		return(TRUE);
-	}
-
-	case t_pathname:
-		if (equal(x->pn.pn_host, y->pn.pn_host) &&
-		    equal(x->pn.pn_device, y->pn.pn_device) &&
-		    equal(x->pn.pn_directory, y->pn.pn_directory) &&
-		    equal(x->pn.pn_name, y->pn.pn_name) &&
-		    equal(x->pn.pn_type, y->pn.pn_type)) {
-		    /* version is ignored unless logical host */
-		    if ((type_of(x->pn.pn_host) == t_string) &&
-			(pathname_lookup(x->pn.pn_host,sSApathname_logicalA) != Cnil))
-			return(equal(x->pn.pn_version, y->pn.pn_version) ?
-				TRUE : FALSE);
-		    else
-			return(TRUE);
-		} else
-			return(FALSE);
-	default:
-		break;
-	}
-	return(eql(x,y));
+  switch (t) {
+    
+  case t_cons:
+    if (!equal(x->c.c_car, y->c.c_car))
+      return(FALSE);
+    x = x->c.c_cdr;
+    y = y->c.c_cdr;
+    if (x==y) return (TRUE);
+    goto BEGIN;
+    
+  case t_structure:
+  case t_symbol: 
+  case t_vector:
+  case t_array:
+    return FALSE;
+    
+  case t_fixnum :
+    return(fix(x)==fix(y));
+  case t_shortfloat:
+    return(x->SF.SFVAL==y->SF.SFVAL);
+  case t_longfloat:
+    return(x->LF.LFVAL==y->LF.LFVAL);
+    
+  case t_string:
+    return(string_eq(x, y));
+    
+  case t_bitvector:
+    {
+      fixnum i, ox, oy;
+      
+      if (x->bv.bv_fillp != y->bv.bv_fillp)
+	return(FALSE);
+      ox = BV_OFFSET(x);
+      oy = BV_OFFSET(y);
+      for (i = 0;  i < x->bv.bv_fillp;  i++)
+	if((x->bv.bv_self[(i+ox)/8] & (0200>>(i+ox)%8))
+	   !=(y->bv.bv_self[(i+oy)/8] & (0200>>(i+oy)%8)))
+	  return(FALSE);
+      return(TRUE);
+    }
+    
+  case t_pathname:
+    if (equal(x->pn.pn_host, y->pn.pn_host) &&
+	equal(x->pn.pn_device, y->pn.pn_device) &&
+	equal(x->pn.pn_directory, y->pn.pn_directory) &&
+	equal(x->pn.pn_name, y->pn.pn_name) &&
+	equal(x->pn.pn_type, y->pn.pn_type)) {
+      /* version is ignored unless logical host */
+      if ((type_of(x->pn.pn_host) == t_string) &&
+	  (pathname_lookup(x->pn.pn_host,sSApathname_logicalA) != Cnil))
+	return(equal(x->pn.pn_version, y->pn.pn_version) ?
+	       TRUE : FALSE);
+      else
+	return(TRUE);
+    } else
+      return(FALSE);
+  default:
+    break;
+  }
+  return(eql(x,y));
 }
 
 DEFUNO_NEW("EQUAL",object,fLequal,LISP
@@ -621,133 +620,145 @@ DEFUNO_NEW("EQUAL",object,fLequal,LISP
 }
 
 bool
-equalp(object x, object y)
-{
-	enum type tx, ty;
-	int j;
+equalp1(register object x, register object y) {
 
-	cs_check(x);
+  register enum type tx, ty;
+  fixnum j;
+  
+ BEGIN:
+  if (eql1(x, y))
+    return(TRUE);
 
-BEGIN:
-	if (eql(x, y))
-		return(TRUE);
-	tx = type_of(x);
-	ty = type_of(y);
-
-	switch (tx) {
-	case t_fixnum:
-	case t_bignum:
-	case t_ratio:
-	case t_shortfloat:
-	case t_longfloat:
-	case t_complex:
-		if (ty == t_fixnum || ty == t_bignum || ty == t_ratio ||
-		    ty == t_shortfloat || ty == t_longfloat ||
-		    ty == t_complex)
-			return(!number_compare(x, y));
-		else
-			return(FALSE);
-
-	case t_vector:
-	case t_string:
-	case t_bitvector:
-		if (ty == t_vector || ty == t_string || ty == t_bitvector)
-			{ j = x->v.v_fillp;
-			  if (j != y->v.v_fillp)
-			    return FALSE;
-			  goto ARRAY;}
-		else
-			return(FALSE);
-
-	case t_array:
-		if (ty == t_array && x->a.a_rank == y->a.a_rank)
-		  { if (x->a.a_rank > 1)
-		     {int i=0;
-		      for (i=0; i< x->a.a_rank; i++)
-			{if (x->a.a_dims[i]!=y->a.a_dims[i])
-			   return(FALSE);}}
-		    if (x->a.a_dim != y->a.a_dim)
-		      return(FALSE);
-		    j=x->a.a_dim;
-		    goto ARRAY;}
-		else
-			return(FALSE);
-	default:
-	  break;
+  tx = type_of(x);
+  ty = type_of(y);
+  
+  switch (tx) {
+  case t_fixnum:
+  case t_bignum:
+  case t_ratio:
+  case t_shortfloat:
+  case t_longfloat:
+  case t_complex:
+    if (ty == t_fixnum || ty == t_bignum || ty == t_ratio ||
+	ty == t_shortfloat || ty == t_longfloat ||
+	ty == t_complex)
+      return(!number_compare(x, y));
+    else
+      return(FALSE);
+    
+  case t_vector:
+  case t_string:
+  case t_bitvector:
+    if (ty == t_vector || ty == t_string || ty == t_bitvector) {
+      j = x->v.v_fillp;
+      if (j != y->v.v_fillp)
+	return FALSE;
+      goto ARRAY;
+    }
+    else
+      return(FALSE);
+    
+  case t_array:
+    if (ty == t_array && x->a.a_rank == y->a.a_rank) { 
+      if (x->a.a_rank > 1) {
+	fixnum i;
+	for (i=0; i< x->a.a_rank; i++) {
+	  if (x->a.a_dims[i]!=y->a.a_dims[i])
+	    return(FALSE);
 	}
-	if (tx != ty)
-		return(FALSE);
-	switch (tx) {
-	case t_character:
-		return(char_equal(x, y));
-
-	case t_cons:
-		if (!equalp(x->c.c_car, y->c.c_car))
-			return(FALSE);
-		x = x->c.c_cdr;
-		y = y->c.c_cdr;
-		goto BEGIN;
-
-	case t_structure:
-		{
-		int i;
-		if (x->str.str_def != y->str.str_def)
-			return(FALSE);
-		{int leng= S_DATA(x->str.str_def)->length;
-		 unsigned char *s_type= & SLOT_TYPE(x->str.str_def,0);
-		 unsigned short *s_pos= & SLOT_POS(x->str.str_def,0);
-		for (i = 0;  i < leng;  i++,s_pos++)
-		 {if (s_type[i]==aet_object)
-		   {if (!equalp(STREF(object,x,*s_pos),STREF(object,y,*s_pos)))
-		       return FALSE;}
-		  else
-/* 		   if (! (*s_pos & (sizeof(object)-1))) */
-		    switch(s_type[i]){
-		    case aet_lf:
-		     if((! (*s_pos & (sizeof(longfloat)-1))) &&
-			STREF(longfloat,x,*s_pos) != STREF(longfloat,y,*s_pos))
-			return(FALSE);
-		      break;
-		    case aet_sf:
-		     if((! (*s_pos & (sizeof(shortfloat)-1))) &&
-			STREF(shortfloat,x,*s_pos)!=STREF(shortfloat,y,*s_pos))
-			return(FALSE);
-		      break;
-		    default:
-		      if((! (*s_pos & (sizeof(fixnum)-1))) &&
-			 STREF(fixnum,x,*s_pos)!=STREF(fixnum,y,*s_pos))
-			return(FALSE);
-		      break;}}
-		return(TRUE);
-	}}
-
-	case t_pathname:
-		return(equal(x, y));
-	default:
-	  break;
-	}
+      }
+      if (x->a.a_dim != y->a.a_dim)
 	return(FALSE);
+      j=x->a.a_dim;
+      goto ARRAY;
+    }
+    else
+      return(FALSE);
+  default:
+    break;
+  }
+  
+  if (tx != ty)
+    return(FALSE);
+  
+  switch (tx) {
 
-ARRAY:
-
-	{
-		int i;
-
-		vs_push(Cnil);
-		vs_push(Cnil);
-		for (i = 0;  i < j;  i++) {
-			vs_top[-2] = aref(x, i);
-			vs_top[-1] = aref(y, i);
-			if (!equalp(vs_top[-2], vs_top[-1])) {
-				vs_popp;
-				vs_popp;
-				return(FALSE);
-			}
-		}
-		vs_popp;
-		vs_popp;
-		return(TRUE);
+  case t_character:
+    return(char_equal(x, y));
+    
+  case t_cons:
+    if (!equalp(x->c.c_car, y->c.c_car))
+      return(FALSE);
+    x = x->c.c_cdr;
+    y = y->c.c_cdr;
+    if (x==y) return (TRUE);
+    goto BEGIN;
+    
+  case t_structure:
+    {
+      fixnum i;
+      if (x->str.str_def != y->str.str_def)
+	return(FALSE);
+      {
+	fixnum leng= S_DATA(x->str.str_def)->length;
+	unsigned char *s_type= & SLOT_TYPE(x->str.str_def,0);
+	unsigned short *s_pos= & SLOT_POS(x->str.str_def,0);
+	for (i = 0;  i < leng;  i++,s_pos++) {
+	  if (s_type[i]==aet_object) {
+	    if (!equalp(STREF(object,x,*s_pos),STREF(object,y,*s_pos)))
+	      return FALSE;
+	  }
+	  else
+	    /* 		   if (! (*s_pos & (sizeof(object)-1))) */
+	    switch(s_type[i]) {
+	    case aet_lf:
+	      if((! (*s_pos & (sizeof(longfloat)-1))) &&
+		 STREF(longfloat,x,*s_pos) != STREF(longfloat,y,*s_pos))
+		return(FALSE);
+	      break;
+	    case aet_sf:
+	      if((! (*s_pos & (sizeof(shortfloat)-1))) &&
+		 STREF(shortfloat,x,*s_pos)!=STREF(shortfloat,y,*s_pos))
+		return(FALSE);
+	      break;
+	    default:
+	      if((! (*s_pos & (sizeof(fixnum)-1))) &&
+		 STREF(fixnum,x,*s_pos)!=STREF(fixnum,y,*s_pos))
+		return(FALSE);
+	    break;
+	    }
 	}
+	return(TRUE);
+      }
+    }
+    
+  case t_pathname:
+    return(equal(x, y));
+  default:
+    break;
+  }
+  return(FALSE);
+  
+ ARRAY:
+  
+  {
+    fixnum i;
+    
+    vs_push(Cnil);
+    vs_push(Cnil);
+    for (i = 0;  i < j;  i++) {
+      vs_top[-2] = aref(x, i);
+      vs_top[-1] = aref(y, i);
+      if (!equalp(vs_top[-2], vs_top[-1])) {
+	vs_popp;
+	vs_popp;
+	return(FALSE);
+      }
+    }
+    vs_popp;
+    vs_popp;
+    return(TRUE);
+  }
 }
 
 DEFUNO_NEW("EQUALP",object,fLequalp,LISP

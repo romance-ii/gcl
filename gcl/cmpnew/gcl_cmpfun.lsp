@@ -1066,10 +1066,10 @@
 (si::putprop 'sublis 'co1sublis 'co1)
 (defun co1sublis (f args &aux test) f
  (and (case (length args)
-	(2 (setq test 'eql))
+	(2 (setq test 'eql1))
 	(4 (and (eq (third args) :test)
-		(cond ((member (fourth args) '(equal (function equal))) (setq test 'equal))
-		      ((member (fourth args) '(eql (function eql))) (setq test 'eql))
+		(cond ((member (fourth args) '(equal (function equal))) (setq test 'equal1))
+		      ((member (fourth args) '(eql (function eql))) (setq test 'eql1))
      		      ((member (fourth args) '(eq (function eq))) (setq test 'eq))
 		      ))))
       (let ((s (gensym)))
@@ -1079,7 +1079,7 @@
 
 (defun sublis1-inline (a b c)
   (let ((tst (car (find (cadr c) *objects* :key 'cadr))))
-    (or (member tst '(eq equal eql)) (error "bad test"))
+    (or (member tst '(eq equal1 eql1)) (error "bad test"))
   (wt "(check_alist("
       a
      "),sublis1("a "," b "," (format nil "~(&~a~)))" tst))))
