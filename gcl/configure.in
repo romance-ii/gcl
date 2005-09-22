@@ -280,7 +280,6 @@ def_custreloc="no"
 def_locbfd="no"
 def_pic="no";
 def_static="no";
-def_static="debug";
 case $use in 
      *linux)
 	ln -snf linux.defs h/$use.defs;
@@ -293,7 +292,7 @@ case $use in
 # def_static -- Function descriptors are currently realized at runtime in a non-reproducible fashion
 # on these architectures -- CM			
 		ia64*)
-			def_dlopen="yes" ; def_statsysbfd="no" ; def_static="no" ;;
+			def_dlopen="yes" ; def_statsysbfd="no" ;;
 		hppa*)
 			def_dlopen="yes" ; def_statsysbfd="no" ; def_pic="yes" ; def_debug="yes" ;;
 	esac;;
@@ -376,7 +375,8 @@ fi
 
 TLIBS=""
 if test "$enable_static" = "yes" ; then
-   TLIBS="-static $TLIBS";
+   TLIBS="-static -Wl,-zmuldefs $TLIBS";
+   AC_DEFINE(STATIC_LINKING)
 fi
 
 ## finally warn if we did not find a recognized machine.s
@@ -1248,6 +1248,9 @@ AC_MSG_CHECKING(for shared library/C stack ceiling to heap)
 if test "$use" = "mingw" ; then
   heap_ceiling=2000000000
 else
+if test "$enable_static" = "yes" ; then
+  heap_ceiling=0x0
+else
 echo "int main() {return 0;}" >foo.c
 $CC foo.c -o foo
 heap_ceiling=`ldd foo | tail -n 1 | awk '{print $NF}' | tr -d '()'`
@@ -1259,6 +1262,7 @@ int main() {
     h=c>d && c<h ? c : h;
     fprintf(fp,"0x%lx",h);
     return 0;}],heap_ceiling=`cat conftest1`,echo failed;exit 1,echo failed;exit 1)
+fi
 fi
 AC_MSG_RESULT($heap_ceiling)
 AC_DEFINE_UNQUOTED(SHARED_LIB_HEAP_CEILING,$heap_ceiling)

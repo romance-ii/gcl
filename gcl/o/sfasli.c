@@ -92,9 +92,11 @@ build_symbol_table_bfd(void) {
 	FEerror("Symbol ~S is missing section",1,make_simple_string(q[u]->name));
       if (!my_plt(q[u]->name,&pa)) {
 /* 	printf("my_plt %s %p\n",q[u]->name,(void *)pa); */
-	if (q[u]->value && q[u]->value!=pa)
+#ifndef STATIC_LINKING	
+	if (q[u]->value && q[u]->value!=pa/
 	  FEerror("plt address mismatch", 0);
 	else
+#endif
 	  q[u]->value=pa;
       }
       if (q[u]->value) {

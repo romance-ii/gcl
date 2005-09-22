@@ -223,6 +223,7 @@
 #undef TYPE_BITS
 #undef OBJ_ALIGN
 #undef NEG_CSTACK_ADDRESS
+#undef STATIC_LINKING
 
 /* The number of bytes in a char.  */
 #undef SIZEOF_CHAR
