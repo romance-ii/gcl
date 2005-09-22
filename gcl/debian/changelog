@@ -44,8 +44,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * preliminary static linking option
   * T is an ordinary symbol
   * Fix regexp GC race
+  * Accelerate is_cons
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 22 Sep 2005 21:31:20 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 22 Sep 2005 21:32:00 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

@@ -193,7 +193,7 @@ struct fixnum_struct {
 #define make_free(a_)            {*(fixnum *)(a_)&=TYPE_BITS;(a_)->d.f=1;}
 #define make_unfree(a_)          {(a_)->d.f=0;}
 
-#define is_cons(a_)              (is_imm_fixnum(Zcdr(a_)) || !(a_)->d.e)
+#define is_cons(a_)              (!(a_)->d.e || is_imm_fixnum(Zcdr(a_)))
 
 struct shortfloat_struct {
 
