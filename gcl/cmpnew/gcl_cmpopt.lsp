@@ -768,7 +768,7 @@
 ;;EQL
  (push '((t t) boolean #.(flags)"eql(#0,#1)")
        (get 'eql 'inline-always))
-(push '((fixnum fixnum) boolean #.(flags)"(#0)==(#1)")
+(push '((fixnum-float fixnum-float) boolean #.(flags)"(#0)==(#1)")
       (get 'eql 'inline-always))
 (push '((character character) boolean #.(flags)"(#0)==(#1)")
       (get 'eql 'inline-always))
@@ -777,13 +777,21 @@
 ;;EQUAL
  (push '((t t) boolean #.(flags)"equal(#0,#1)")
        (get 'equal 'inline-always))
-(push '((fixnum fixnum) boolean #.(flags)"(#0)==(#1)")
+(push '((fixnum-float fixnum-float) boolean #.(flags)"(#0)==(#1)")
+      (get 'equal 'inline-always))
+(push '((character character) boolean #.(flags)"(#0)==(#1)")
       (get 'equal 'inline-always))
 
 ;;EQUALP
  (push '((t t) boolean #.(flags)"equalp(#0,#1)")
       (get 'equalp 'inline-always))
  (push '((fixnum fixnum) boolean #.(flags)"(#0)==(#1)")
+      (get 'equalp 'inline-always))
+ (push '((short-float short-float) boolean #.(flags)"(#0)==(#1)")
+      (get 'equalp 'inline-always))
+ (push '((long-float long-float) boolean #.(flags)"(#0)==(#1)")
+      (get 'equalp 'inline-always))
+ (push '((character character) boolean #.(flags)"(#0)==(#1)")
       (get 'equalp 'inline-always))
 
 ;;EXPT
@@ -1035,9 +1043,17 @@
  (push '((fixnum) boolean #.(flags)
   "@0;(is_imm_fix(#0))")
    (get 'eql-is-eq 'inline-always))
- (push '((#.+ift+) boolean #.(flags)
-  "@0;Ct")
-   (get 'eql-is-eq 'inline-always))
+
+;;EQUAL-IS-EQ
+ (push '((t) boolean #.(flags)"@0;equal_is_eq(#0)")
+   (get 'equal-is-eq 'inline-always))
+ (push '((fixnum) boolean #.(flags)
+  "@0;(is_imm_fix(#0))")
+   (get 'equal-is-eq 'inline-always))
+
+;;EQUALP-IS-EQ
+ (push '((t) boolean #.(flags)"@0;equalp_is_eq(#0)")
+   (get 'equalp-is-eq 'inline-always))
 
 ;;PLUSP
  (push '((t) boolean #.(flags)"number_compare(small_fixnum(0),#0)<0")
