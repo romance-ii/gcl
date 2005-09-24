@@ -358,7 +358,7 @@ Cannot compile ~a.~%"
                         (when fasl-file
                               (compiler-build ob-pathname fasl-pathname)
                               (when load (load fasl-pathname)))
-                        (unless ob-file (delete-file ob-pathname))
+                        (unless (or *keep-gaz* ob-file) (delete-file ob-pathname))
                         (when *compile-verbose*
                               (print-compiler-info)
                               (format t "~&;; Finished compiling ~a.~%" (namestring output-file))

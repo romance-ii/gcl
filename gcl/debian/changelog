@@ -48,8 +48,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * don't wrap quoted symbols external in lisp/common-lisp
   * do eq promotions with real type handlers as subtypep et. al. are now
     up to the task
+  * keep gazonk objects when *keep-gaz* is set
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 24 Sep 2005 19:25:19 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 24 Sep 2005 19:25:59 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
