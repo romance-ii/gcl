@@ -50,8 +50,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
     up to the task
   * keep gazonk objects when *keep-gaz* is set
   * complete eq promotion optimizers
+  * Check for nil first in type_of
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 24 Sep 2005 19:26:36 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 24 Sep 2005 19:27:07 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
