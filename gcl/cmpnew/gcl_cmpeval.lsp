@@ -85,13 +85,14 @@
 
 (defun wrap-literals (form)
   (cond ((consp form)
-	 (if (eq (car form) 'quote )
-	     `(load-time-value (si::nani ,(si::address (cadr form))))
-	   (cons (wrap-literals (car form)) (wrap-literals (cdr form)))))
-	((or (symbolp form) (integerp form))
-	 form)
-	(t
-	 `(load-time-value (si::nani ,(si::address form))))))
+	 (cond ((and (member (car form) '(quote function))
+		     (or (not (symbolp (cadr form)))
+			 (not (eq :external (cadr (multiple-value-list (find-symbol (symbol-name (cadr form)) 'lisp)))))))
+		`(load-time-value (si::nani ,(si::address (cadr form)))))
+	       ((cons (wrap-literals (car form)) (wrap-literals (cdr form))))))
+	((and (not (symbolp form)) (eql-is-eq form))
+	 `(load-time-value (si::nani ,(si::address form))))
+	(form)))
 
 (defun c1load-time-value (arg)
   (c1constant-value

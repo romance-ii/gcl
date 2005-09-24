@@ -45,8 +45,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * T is an ordinary symbol
   * Fix regexp GC race
   * Accelerate is_cons
+  * don't wrap quoted symbols external in lisp/common-lisp
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 22 Sep 2005 21:32:00 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 24 Sep 2005 19:24:11 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
