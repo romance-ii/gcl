@@ -317,36 +317,34 @@
 (defconstant +ifr+ (ash (- +ifb+)  -1))
 (defconstant +ift+ '(integer #.(- +ifr+) #.(1- +ifr+)))
 
-;;FIXME the right way to do these is by defining compound types and
-;;using typep and subtypep -- alas these choke on these types of forms
-;;at the moment. 20050704 CM
+;FIXME compiler-macrexpand source to (if (typep ....) ...) when needed (member-compiler-macro et al)?
+
+(defconstant +eql-is-eq-tp+ `(or #.+ift+ (not (or number character))))
+(defconstant +equal-is-eq-tp+ `(or #.+ift+ (not (or cons string bit-vector pathname number character))))
+(defconstant +equalp-is-eq-tp+ `(not (or array hash-table structure cons string bit-vector pathname number character)))
+
+(defmacro eq-subtp (x y)  ;FIXME axe mult values
+  (let ((s (gensym)))
+    `(let ((,s (si::subtypep1 ,x ,y)))
+       (values ,s (or ,s (si::subtypep1 x `(not ,,y)))))))
 
 (defun eql-is-eq (x)
-  (cond ((typep x '#.+ift+))
-	((member-if (lambda (y) (typep x y)) '(number character)) nil)
-	(t)))
+  (typep x +eql-is-eq-tp+))
 
 (defun eql-is-eq-tp (x)
-  (cond ((subtypep x +ift+) (values t t))
-	((subtypep +ift+ x) (values nil nil))
-	((member-if (lambda (y) (subtypep x y)) '(number character)) (values nil t))
-	(t (values t t))))
+  (eq-subtp x +eql-is-eq-tp+))
 
 (defun equal-is-eq (x)
-  (cond ((member-if (lambda (y) (typep x y)) '(cons string bit-vector pathname)) nil)
-	((eql-is-eq x))))
+  (typep x +equal-is-eq-tp+))
 
 (defun equal-is-eq-tp (x)
-  (cond ((member-if (lambda (y) (subtypep x y)) '(cons string bit-vector pathname)) (values nil t))
-	(t (eql-is-eq-tp x))))
+  (eq-subtp x +equal-is-eq-tp+))
 
 (defun equalp-is-eq (x)
-  (cond ((member-if (lambda (y) (typep x y)) '(array hash-table structure number)) nil)
-	((equal-is-eq x))))
+  (typep x +equalp-is-eq-tp+))
 
 (defun equalp-is-eq-tp (x)
-  (cond ((member-if (lambda (y) (subtypep x y)) '(array hash-table structure number)) (values nil t))
-	(t (equal-is-eq-tp x))))
+  (eq-subtp x +equalp-is-eq-tp+))
 
 (defun do-eq-et-al (fn args)
   (let* ((tf (cadr (test-to-tf fn)))
