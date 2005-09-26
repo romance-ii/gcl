@@ -304,7 +304,7 @@
 	 (body (cdr form))
 	 (switch-op-1 (c1expr switch-op)))
     (cond ((and (typep (second switch-op-1 ) 'info)
-		(subtypep (info-type (second switch-op-1)) 'fixnum))
+		(type>= 'fixnum (info-type (second switch-op-1))))
 	   ;;optimize into a C switch:
 	   ;;If we ever get GCC to do switch's with an enum arg,
 	   ;;which don't do bounds checking, then we will

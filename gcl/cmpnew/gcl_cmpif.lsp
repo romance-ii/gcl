@@ -362,7 +362,7 @@
   (let* ((info (make-info))
          (key-form (c1expr* (car args) info))
          (clauses nil))
-    (cond ((subtypep (info-type (second key-form)) 'fixnum)
+    (cond ((type>= 'fixnum (info-type (second key-form)))
 	   (return-from c1case  (c1expr (convert-case-to-switch
 				 args default )))))
     (dolist (clause (cdr args))

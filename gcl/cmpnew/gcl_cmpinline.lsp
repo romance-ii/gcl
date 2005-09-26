@@ -768,7 +768,7 @@
 ;;from the function definitions themselves.  CM 20050106.
 (defun aref-propagator (fn x &rest inds)
   (declare (ignore fn inds))
-  (let ((x (si::normalize-type x)))
+  (let ((x (cmp-norm-tp x)))
     (and (consp x) (member (car x) '(array simple-array))
        (let ((uaet (and (not (eq (cadr x) '*)) (upgraded-array-element-type (nil-to-t (cadr x))))))
 	 ;; FIXME -- inline bit-vectors too.
@@ -844,7 +844,7 @@
 
 ;;FIXME lose the normalize-type
 (defun cmp-array-dimension-inline (a i)
-  (let ((at (si::normalize-type (var-array-type a))))
+  (let ((at (cmp-norm-tp (var-array-type a))))
     (let ((aet (and (consp at) (member (car at) '(array simple-array)))))
       (if aet
 	  (if (and (consp (third at)) (= (length (third at)) 1))

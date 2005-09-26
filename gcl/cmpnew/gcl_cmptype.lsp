@@ -61,6 +61,24 @@
       (array (list 'array (array-element-type thing)))
       (t t))))   ;   'unknown ;; I can't see any use of this
 
+(defvar *norm-tp-hash* (make-hash-table :test 'equal))
+(defvar *and-tp-hash* (make-hash-table :test 'equal))
+
+(defun cmp-norm-tp (tp)
+  (multiple-value-bind 
+   (r f) 
+   (gethash tp *norm-tp-hash*)
+   (cond (f r)
+	 ((setf (gethash tp *norm-tp-hash*) (si::normalize-type-int tp t))))))
+
+(defun type-and (t1 t2)
+  (let ((x (cons t1 t2)))
+    (multiple-value-bind 
+     (r f) 
+     (gethash x *norm-tp-hash*)
+     (cond (f r)
+	   ((setf (gethash x *and-tp-hash*) (type-and-int t1 t2)))))))
+
 ;;FIXME -- this function needs a rewrite.  CM 20050106
 (defun type-filter (type)
   (when (and (symbolp type) (get type 'si::deftype-definition) (not (get type 's-data)) (not (eq type 'string)))
@@ -70,7 +88,7 @@
     ((single-float double-float) 'long-float)
     (keyword 'symbol)
     ((nil t) t)
-    (t (let ((type (si::normalize-type type)) element-type)
+    (t (let ((type (cmp-norm-tp type)) element-type)
 	 (case (car type)
 	   ((simple-array array)
 	    (cond ((or (endp (cdr type))
@@ -93,26 +111,13 @@
 	   ((short-float) 'short-float)
 	   ((long-float double-float single-float) 'long-float)
 	   ((stream) 'stream)
-	   (t (cond ((subtypep type 'fixnum) 'fixnum)
-		    ((subtypep type 'integer) 'integer)
-		    ((subtypep type 'character) 'character)
-		    ((subtypep type 'short-float) 'short-float)
-		    ((subtypep type 'long-float) 'long-float)
-		    ((subtypep type '(vector t)) '(vector t))
-		    ((subtypep type 'string) 'string)
-		    ((subtypep type 'bit-vector) 'bit-vector)
-		    ((subtypep type '(vector fixnum)) '(vector fixnum))
-		    ((subtypep type '(vector short-float))
-		     '(vector short-float))
-		    ((subtypep type '(vector long-float))
-		     '(vector long-float))
-		    ((subtypep type '(array t)) '(array t))
-		    ((subtypep type '(array bit)) '(array bit))
-		    ((subtypep type '(array fixnum)) '(array fixnum))
-		    ((subtypep type '(array short-float))
-		     '(array short-float))
-		    ((subtypep type '(array long-float))
-		     '(array long-float))
+	   (t (cond ((car (member type 
+				  '(fixnum integer character short-float long-float
+					   (vector t) string bit-vector
+					   (vector fixnum) (vector short-float) (vector long-float)
+					   (array t) (array bit) (array fixnum)
+					   (array short-float) (array long-float))
+				  :test 'type<=)))
 		    ((eq (car type) 'values)
 		     (if  (null (cddr type))
 			 (list 'values (type-filter (second type)))
@@ -122,8 +127,6 @@
 			  (get (second type) 'type-filter)))
 		    (t t)))
 	   )))))
-
-(defun type<= (t1 t2) (type>= t2 t1))
 
 (defun literalp (form)
   (or (constantp form) (and (consp form) (eq (car form) 'load-time-value))))
@@ -135,7 +138,7 @@
 ;			   '(signed-char signed-short fixnum integer)
 ;			   '(signed-char unsigned-char signed-short unsigned-short fixnum integer)
 			   '(fixnum integer)
-			   :test #'type<=)))))
+			   :test 'type<=)))))
       (cond (ct)
 ;	    ((eq type 'boolean))
 	    (type)))))
@@ -148,7 +151,7 @@
 ;      type)))
 
 (defun random-propagator (&rest r)
-  (let ((tp (si::normalize-type (cadr r))))
+  (let ((tp (cmp-norm-tp (cadr r))))
     (if (integer-typep tp)
 	`(integer 0 ,(if (integerp (caddr tp)) (caddr tp) '*))
       tp)))
@@ -218,7 +221,7 @@
 
 (defun coerce-to-integer-type (t1)
   (if (integer-typep t1) t1
-    (let ((t1 (si::normalize-type t1)))
+    (let ((t1 (cmp-norm-tp t1)))
       (if (integer-typep t1) t1))))
 
 (defvar *two-stars* '(* *))
@@ -251,27 +254,11 @@
 			 (and (or (eq br '*) (eq er '*) (<= br er))
 			      (list (car ct1) br er))))))))))
 
-;;FIXME -- this is awful.  array and simple-array cannot be deftyped,
-;;-- the code for their processing needs to be centralized. CM 20050106
-(defmacro array-wd (form)
-  `(member ,form '(array simple-array) :test #'eq))
-(defmacro array-tp (form)
-  `(and (consp ,form) (array-wd (car ,form))))
-
 ;;FIXME -- centralize subtypep, normalzie-type, type>=, type-and.
 ;;Consider traversing a static tree.  CM 20050106
-(defun type-and (type1 type2)
+(defun type-and-int (type1 type2)
 
-;  (let ((nt1 (si::normalize-type type1)))
-;    (unless (and (not (array-wd type1)) (equal nt1 (if (symbolp type1) (list type1) type1)))
-;      (let ((tem (type-and nt1 type2)))
-;	(return-from type-and (or (and (equal tem type2) type2) (and (equal tem nt1) type1) tem)))))
-;  (let ((nt2 (si::normalize-type type2)))
-;    (unless (and (not (array-wd type2)) (equal nt2 (if (symbolp type2) (list type2) type2)))
-;      (let ((tem (type-and type1 nt2)))
-;	(return-from type-and (if (equal tem nt2) type2 tem)))))
-
-  (cond ;((equal type1 type2) type2)
+  (cond ((equal type1 type2) type2)
 	((and (consp type2) (eq (car type2) 'values))
 	 (if (and (consp type1) (eq (car type1) 'values))
 	     (let ((r (list 'values)))
@@ -284,14 +271,18 @@
 	 (type-and (second type1) type2))
 	((member type1 '(t object *)) type2)
 	((member type2 '(t object *)) type1)
-	((let* ((n (si::normalize-type-int `(and ,type1 ,type2) t))
-		(tem (si::normalize-type-int (car (si::nreconstruct-type (si::nprocess-type n))) t)))
-	   (cond ((equal tem (caddr n)) type2)
+	((let* ((n (cmp-norm-tp `(and ,type1 ,type2)))
+		(tem (cmp-norm-tp (car (si::nreconstruct-type (si::nprocess-type n))))))
+	   (cond ((equal tem (caddr n)) type2) ;;FIXME centralize normalization
 		 ((equal tem (cadr n)) type1)
+		 ((not (car tem)) nil)
 		 (tem))))))
 		 
 (defun type>= (type1 type2)
-  (eq (type-and type1 type2) type2))
+  (equal (type-and type1 type2) type2))
+(defun type<= (type1 type2)
+  (equal (type-and type1 type2) type1))
+
 
 (defun reset-info-type (info)
   (if (info-type info)
@@ -303,7 +294,7 @@
 (defun and-form-type (type form original-form &aux type1)
   (setq type1 (type-and type (info-type (cadr form))))
   (when (null type1)
-        (cmpwarn "The type of the form ~s is not ~s." original-form type))
+        (cmpwarn "The type of the form ~s is not ~s, but ~s." original-form type (info-type (cadr form))))
   (if (eq type1 (info-type (cadr form)))
       form
       (let ((info (copy-info (cadr form))))
@@ -312,7 +303,7 @@
 
 (defun check-form-type (type form original-form)
   (when (null (type-and type (info-type (cadr form))))
-        (cmpwarn "The type of the form ~s is not ~s." original-form type)))
+        (cmpwarn "The type of the form ~s is not ~s, but ~s." original-form type (info-type (cadr form)))))
 
 (defun default-init (type)
   (let ((type (promoted-c-type type)))

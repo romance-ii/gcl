@@ -325,8 +325,8 @@
 
 (defmacro eq-subtp (x y)  ;FIXME axe mult values
   (let ((s (gensym)))
-    `(let ((,s (si::subtypep1 ,x ,y)))
-       (values ,s (or ,s (si::subtypep1 x `(not ,,y)))))))
+    `(let ((,s (type>= ,y ,x)))
+       (values ,s (or ,s (type>= `(not ,,y) x))))))
 
 (defun eql-is-eq (x)
   (typep x +eql-is-eq-tp+))
@@ -360,7 +360,7 @@
   (si::putprop l 'do-eq-et-al 'c1g))
 
 (defun num-type-bounds (t1)
-  (let ((t1 (si::normalize-type t1))
+  (let ((t1 (cmp-norm-tp t1))
 	(i 1) j)
     (mapcar (lambda (x) 
 	      (setq j i i (- i)
@@ -451,7 +451,7 @@
 	 (nargs (c1args args info))
 	 (tp (car (rassoc fn *type-alist*))))
     (let ((at (and (not (cdr args)) (info-type (cadar nargs)))))
-      (cond ((and at (subtypep at tp)) (c1expr** t info))
+      (cond ((and at (type>= tp at)) (c1expr** t info))
 	    ((not (type-and at tp)) (c1expr** nil info))
 	    ((list 'call-global info fn nargs))))))
 (dolist (l *type-alist*) (when (symbolp (cdr l)) (si::putprop (cdr l) 'do-predicate 'c1g)))
@@ -470,12 +470,12 @@
    (let ((z (or (not (typep (car args) 'array)) (upgraded-array-element-type (array-element-type (car args)))))
 	 (y (apply 'cmp-array-element-type (cdr args))))
      ;;need type-or here
-     (cond ((subtypep z y) y)
-	   ((subtypep y z) z)
+     (cond ((type>= y z) y)
+	   ((type>= z y) z)
 	   (t)))))
 
 (defun array-element-subtype (type)
-  (let ((type (si::normalize-type type)))
+  (let ((type (cmp-norm-tp type)))
     (or 
      (not (consp type))
      (not (member (car type) '(array simple-array)))
@@ -489,8 +489,8 @@
    (let ((z (array-element-subtype (car args)))
 	 (y (cmp-array-element-subtype (cdr args))))
      ;;need type-or here
-     (cond ((subtypep z y) y)
-	   ((subtypep y z) z)
+     (cond ((type>= y z) y)
+	   ((type>= z y) z)
 	   (t)))))
 
 (defun c1cmp-array-element-type (args)
@@ -512,8 +512,8 @@
 	   (eltp (and (consp eltp) (eq (car eltp) 'VV) (caar (member (cadr eltp) *objects*  :key 'cadr))))
 	   (eltp (if eltp `(,eltp) `(*))))
       (let ((szf (let ((st (info-type (cadar nargs))))
-		   (cond ((subtypep st 'list) `(,(make-list (cons-type-length st) :initial-element '*)))
-			 ((and st (not (subtypep 'list st))) `((*)))))))
+		   (cond ((type>= 'list st) `(,(make-list (cons-type-length st) :initial-element '*)))
+			 ((and st (not (type>= st 'list))) `((*)))))))
 	(setf (info-type info) `(array ,@eltp ,@szf))
 	(list 'call-global info 'make-array nargs)))))
 (si::putprop 'make-array 'c1make-array 'c1)
@@ -590,7 +590,7 @@
 	(and (consp shamt)
 	     (eq (car  shamt) 'the)
 	     (let ((type (cadr  shamt)))
-	        (subtypep type `(integer ,ibot ,itop)))))))
+	        (type>= `(integer ,ibot ,itop) type))))))
 
 (defun c1ash (args)
   (let  ((shamt (second args))fun)
@@ -600,9 +600,9 @@
 		 ((>= shamt 0) (setq fun 'shift<<))))
 	  (t (let ((type (second shamt)))
 	       ;;it had to be a (the type..)
-	       (cond ((subtypep type `(integer 0 ,itop))
+	       (cond ((type>= `(integer 0 ,itop) type)
 		      (setq fun 'shift<< ))
-		     ((subtypep type `(integer ,ibot 0))
+		     ((type>= `(integer ,ibot 0) type)
 		      (setq fun 'shift>> ))
 		     (t (error "should not get here")))
 	       )))
@@ -624,7 +624,7 @@
 		(integerp (car specs))
 		(< (+ (car specs)(cdr specs))
 		   len)
-		(subtypep (result-type (second args)) 'fixnum))
+		(type>= 'fixnum (result-type (second args))))
 	   (c1expr `(the fixnum (si::ldb1 ,(car specs) ,(cdr specs) ,(second args))))))))
 
 	  
@@ -743,8 +743,8 @@
 		 (symbol-package (cadr type))
 		 (null (cddr type))
 		 `(,(cadr type) ,x)))
-	   ((subtypep type 'fixnum)
-	    (setq tem (si::normalize-type type))
+	   ((type>= 'fixnum  type)
+	    (setq tem (cmp-norm-tp type))
 	    (and (consp tem)
 		 (si::fixnump (second tem))
 		 (si::fixnump (third  tem))

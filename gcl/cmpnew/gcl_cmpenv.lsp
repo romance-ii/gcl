@@ -56,7 +56,8 @@
   (setq *inline-functions* nil)
   (setq *inline-blocks* 0)
   (setq *notinline* nil)
-  )
+  (clrhash *norm-tp-hash*)
+  (clrhash *and-tp-hash*))
 
 (defvar *next-cvar* 0)
 (defvar *next-cmacro* 0)
@@ -421,7 +422,7 @@
 ;;		       (dft (and (symbolp dtype) (get dtype 'si::deftype-definition)))
 ;;		       (dtype (or (and dft (funcall dft)) dtype)))
 		  (if (consp dtype)
-		    (let* ((dtype (si::normalize-type dtype))
+		    (let* ((dtype (cmp-norm-tp dtype))
 			   (stype (car dtype)))
 ;		      (cmpck (or (not (symbolp stype)) (cdddr dtype)) "The declaration ~s is illegal." decl) FIXME
 		      (case stype
