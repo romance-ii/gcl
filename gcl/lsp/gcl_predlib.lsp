@@ -592,6 +592,7 @@
 
 (defmacro maybe-eval (x) `(if (and (consp ,x) (eq (car ,x) 'load-time-value)) (eval (cadr ,x)) ,x))
 
+;;FIXME loose the ar and default to t
 (defun normalize-type-int (type ar &aux tem)
   (cond ((atom type) (normalize-type-int (list type) ar))
 	;;These are deftype accelerators
