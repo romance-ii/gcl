@@ -84,15 +84,18 @@
   (c1constant-value (cons 'si:|#,| arg) t))
 
 (defun wrap-literals (form)
-  (cond ((consp form)
-	 (cond ((and (member (car form) '(quote function))
-		     (or (not (symbolp (cadr form)))
-			 (not (eq :external (cadr (multiple-value-list (find-symbol (symbol-name (cadr form)) 'lisp)))))))
-		`(load-time-value (si::nani ,(si::address (cadr form)))))
-	       ((cons (wrap-literals (car form)) (wrap-literals (cdr form))))))
-	((and (not (symbolp form)) (eql-is-eq form))
-	 `(load-time-value (si::nani ,(si::address form))))
-	(form)))
+  (cond ((and (consp form) (eq (car form) 'quote))
+	 (let ((x (cadr form)))
+	   (if (and (symbolp x)
+		    (eq :external (cadr (multiple-value-list (find-symbol (symbol-name x) 'lisp)))))
+	       form
+	     `(load-time-value (si::nani ,(si::address x))))))
+	((consp form)
+	 (cons (wrap-literals (car form)) (wrap-literals (cdr form))))
+	((or (symbolp form) (numberp form) (characterp form))
+	 form)
+	(`(load-time-value (si::nani ,(si::address form))))))
+
 
 (defun c1load-time-value (arg)
   (c1constant-value
