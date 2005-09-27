@@ -511,7 +511,6 @@ DEFUN_NEW("GET-AELTTYPE",object,fSget_aelttype,SI,1,1,NONE,OO,OO,OO,OO,(object x
 #else
     return make_fixnum(aet_fix);
 #endif
-		       );
   if (x==sLnegative_fixnum || x==sLsigned_fixnum)
     return make_fixnum(aet_fix);
   return make_fixnum(aet_object);
