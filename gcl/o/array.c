@@ -506,11 +506,10 @@ DEFUN_NEW("GET-AELTTYPE",object,fSget_aelttype,SI,1,1,NONE,OO,OO,OO,OO,(object x
   if (x==sLnegative_short)
     return make_fixnum(aet_short);
   if (x==sLnegative_int)
-    return make_fixnum(
 #if SIZEOF_LONG != SIZEOF_INT
-		       aet_int
+    return make_fixnum(aet_int);
 #else
-		       aet_fix
+    return make_fixnum(aet_fix);
 #endif
 		       );
   if (x==sLnegative_fixnum || x==sLsigned_fixnum)
