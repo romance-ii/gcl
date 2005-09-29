@@ -1763,6 +1763,9 @@ gcl_isnormal_double(double);
 int 
 gcl_isnormal_float(float);
 
+object
+find_init_name1(char *,unsigned);
+
 void wipe_stack   (VOL void *);
 void clear_c_stack(VOL unsigned);
 

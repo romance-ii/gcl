@@ -480,3 +480,41 @@ function.")
   return i ? Cnil : Ct;
 
 }
+
+object
+find_init_name1(char *s,unsigned len) {
+
+  struct stat ss;
+  char *tmp,*q;
+  FILE *f;
+
+  if (len) {
+    tmp=alloca(len+1);
+    memcpy(tmp,s,len);
+    tmp[len]=0;
+  } else
+    tmp=s;
+  if (stat(tmp,&ss))
+    FEerror("File ~a does not exist",1,make_simple_string(tmp));
+  if (!(f=fopen(tmp,"rb")))
+    FEerror("Cannot open ~a for binary reading",1,make_simple_string(tmp));
+  tmp=alloca(ss.st_size+1);
+  if (fread(tmp,1,ss.st_size,f)!=ss.st_size)
+    FEerror("Error reading binary file",0);
+  fclose(f);
+  for (s=tmp;s<tmp+ss.st_size && strncmp(s,"init_",5);q=strstr(s+1,"init_"),s=q ? q : s+strlen(s)+1);
+  if (strncmp(s,"init_",5))
+    FEerror("Init name not found",0);
+  return make_simple_string(s);
+
+}
+ 
+
+DEFUN_NEW("FIND-INIT-NAME", object, fSfind_init_name, SI, 1, 1,
+	  NONE, OO, OO, OO,OO,(object namestring),"") 
+{
+
+  check_type_string(&namestring);
+  return find_init_name1(namestring->st.st_self,namestring->st.st_dim);
+
+}

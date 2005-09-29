@@ -57,8 +57,11 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * Fix eql_is_eq macro
   * Fix C macro parsing problem in array.c
   * ADDR_NO_RANDOMIZE fix
+  * Fix dlopen based fasloading and compiler::link via a new routine
+    si::find-init-name which determines the unique init-function name
+    before loading
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 29 Sep 2005 17:53:28 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 29 Sep 2005 17:56:23 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

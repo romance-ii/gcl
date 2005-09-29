@@ -444,14 +444,29 @@ struct string {           /*  string header  */
 #define stack_string(a_,b_) struct string _s={0};\
                             object a_=(object)&_s;\
                             set_type_of((a_),t_string);\
-                            (a_)->st.st_self=(b_);\
-                            (a_)->st.st_dim=(a_)->st.st_fillp=strlen(b_);
+                            (a_)->st.st_self=(void *)(b_);\
+                            (a_)->st.st_dim=(a_)->st.st_fillp=strlen(b_)
+
+#define stack_fixnum(a_,b_) struct fixnum_struct _s={0};\
+                            object a_;\
+                            if (is_imm_fix(b_)) (a_)=make_fixnum(b_); else {\
+                            (a_)=(object)&_s;\
+                            set_type_of((a_),t_fixnum);\
+                            (a_)->FIX.FIXVAL=(b_);}
 
 #define TYPE_ERROR(a_,b_) {stack_string(tp_err,"~S is not of type ~S.");\
                            Icall_error_handler(sKwrong_type_argument,tp_err,2,(a_),(b_));}
 
-#define CONTROL_ERROR(a_) {stack_string(tp_err,#a_);\
+#define CONTROL_ERROR(a_) {stack_string(tp_err,a_);\
                            Icall_error_handler(sKcontrol_error,tp_err,0);}
+
+#define NERROR(a_)  {stack_string(fmt,a_ ": line ~a, file ~a, function ~a");\
+                    {stack_fixnum(line,__LINE__);\
+                    {stack_string(file,__FILE__);\
+                    {stack_string(function,__FUNCTION__);\
+                     Icall_error_handler(sKerror,fmt,3,line,file,function);}}}}
+
+#define ASSERT(a_) if (!(a_)) NERROR("The assertion " #a_ " failed")
 
 struct ustring {
 
