@@ -268,3 +268,4 @@ SGC is enabled.  */
 #undef OBJ_ALIGN
 #undef NEG_CSTACK_ADDRESS
 #undef STATIC_LINKING
+#undef ADDR_NO_RANDOMIZE

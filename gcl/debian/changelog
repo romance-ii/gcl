@@ -56,8 +56,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * Better wrap-literal strategy
   * Fix eql_is_eq macro
   * Fix C macro parsing problem in array.c
+  * ADDR_NO_RANDOMIZE fix
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 27 Sep 2005 16:50:05 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 29 Sep 2005 17:53:28 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

@@ -977,19 +977,46 @@ if test "$HAVE_SBRK" = "1" ; then
 	
 	if test "$SBRK" != "$SBRK1" ; then
 		AC_MSG_RESULT(yes)
-		AC_MSG_CHECKING([for randomized brk remedy])
+#		AC_CHECK_HEADER(linux/personality.h, true,
+#			   AC_MSG_ERROR(linux/personality.h not found))
+#		AC_TRY_RUN([#include <syscall.h>
+#			    #include <linux/personality.h>
+#	         	    #include <stdio.h>
+#			    #include <unistd.h>
+#			    int main(int argc,char *argv[],char *envp[]) {
+#				FILE *f;
+#				if (!(f=fopen("conftest1","w")))
+#					return -1;
+#				fprintf(f,"%x",ADDR_NO_RANDOMIZE);
+#				return 0;
+#				}],
+#				ADDR_NO_RANDOMIZE=`cat conftest1`,ADDR_NO_RANDOMIZE=0,ADDR_NO_RANDOMIZE=0)
+#		if test "$ADDR_NO_RANDOMIZE" = "0" ; then
+#			AC_MSG_RESULT(cannot get ADDR_NO_RANDOMIZE constant)
+#			exit 1
+#		fi
+#		AC_DEFINE_UNQUOTED(ADDR_NO_RANDOMIZE,$ADDR_NO_RANGOMIZE)
+#
+# Many boxes do not have the definition yet
+#
+		ADDR_NO_RANDOMIZE=0x40000
+		AC_DEFINE_UNQUOTED(ADDR_NO_RANDOMIZE,$ADDR_NO_RANDOMIZE)
+		AC_MSG_CHECKING([for ADDR_NO_RANOMIZE constant])
+		AC_MSG_RESULT($ADDR_NO_RANDOMIZE)
+		AC_CHECK_HEADER(sys/personality.h, true,
+			   AC_MSG_ERROR(sys/personality.h not found))
 		AC_TRY_RUN([#include <syscall.h>
-			    #include <linux/personality.h>
+			    #include <sys/personality.h>
 	         	    #include <stdio.h>
 			    #include <unistd.h>
-			    int main(int argc,char * argv[]) {
+			    int main(int argc,char *argv[],char *envp[]) {
 				FILE *f;
-				#if SIZEOF_LONG == 4
-				if (!syscall(SYS_personality,PER_LINUX32))
-				#else
-				if (!syscall(SYS_personality,PER_LINUX))
-				#endif
-					execvp(argv[0],argv);
+				long pers;
+				pers=personality(-1);
+				if (!(pers & ADDR_NO_RANDOMIZE)) {
+				   personality(pers | ADDR_NO_RANDOMIZE);
+				   execve(*argv,argv,envp);
+                                }
 				if (!(f=fopen("conftest1","w")))
 					return -1;
 				fprintf(f,"%u",sbrk(0));
@@ -1001,17 +1028,17 @@ if test "$HAVE_SBRK" = "1" ; then
 			exit 1
 		fi
 		AC_TRY_RUN([#include <syscall.h>
-			    #include <linux/personality.h>
+			    #include <sys/personality.h>
 			    #include <stdio.h>
 			    #include <unistd.h>
-			    int main(int argc,char * argv[]) {
+			    int main(int argc,char * argv[],char *envp[]) {
 				FILE *f;
-				#if SIZEOF_LONG == 4
-				if (!syscall(SYS_personality,PER_LINUX32))
-				#else
-				if (!syscall(SYS_personality,PER_LINUX))
-				#endif
-					execvp(argv[0],argv);
+				long pers;
+				pers=personality(-1);
+				if (!(pers & ADDR_NO_RANDOMIZE)) {
+				   personality(pers | ADDR_NO_RANDOMIZE);
+				   execve(*argv,argv,envp);
+                                }
 				if (!(f=fopen("conftest1","w")))
 					return -1;
 				fprintf(f,"%u",sbrk(0));
@@ -1022,6 +1049,7 @@ if test "$HAVE_SBRK" = "1" ; then
 			AC_MSG_RESULT(cannot trap sbrk)
 			exit 1
 		fi
+		AC_MSG_CHECKING([for randomized brk remedy])
 		if test "$SBRK" = "$SBRK1" ; then
 			AC_MSG_RESULT(yes)
 			AC_DEFINE(NEED_NONRANDOM_SBRK)
@@ -1126,7 +1154,7 @@ AC_TRY_RUN([#include <stdio.h>
             #include <stdlib.h>
 	    #ifdef NEED_NONRANDOM_SBRK
 		   #include <syscall.h>
-		   #include <linux/personality.h>
+		   #include <sys/personality.h>
 		   #include <unistd.h>
 	   #endif
 int
@@ -1136,13 +1164,12 @@ main(int argc,char * argv[])
   FILE *fp;
 
 #ifdef NEED_NONRANDOM_SBRK
-#if SIZEOF_LONG == 4
-if (!syscall(SYS_personality,PER_LINUX32))
-#else
-if (!syscall(SYS_personality,PER_LINUX))
+  pers=personality(-1);
+  if (!(pers & ADDR_NO_RANDOMIZE)) {
+   personality(pers | ADDR_NO_RANDOMIZE);
+   execve(*argv,argv,envp);
+  }
 #endif
-     execvp(argv[0],argv);
-#endif  
   b = (void *) malloc(1000);
   fp = fopen("conftest1","w");
 
