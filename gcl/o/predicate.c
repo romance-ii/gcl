@@ -732,6 +732,26 @@ equalp1(register object x, register object y) {
       }
     }
     
+  case t_hashtable:
+    {
+      unsigned i;
+      struct htent *e;
+
+      if (x->ht.ht_nent!=y->ht.ht_nent)
+	return(FALSE);
+      if (x->ht.ht_test!=y->ht.ht_test)
+	return(FALSE);
+      for (i=0;i<x->ht.ht_size;i++) {
+	if (x->ht.ht_self[i].hte_key==OBJNULL)
+	  continue;
+	if (!(e=gethash(x->ht.ht_self[i].hte_key,y))
+	    || !equalp(x->ht.ht_self[i].hte_value,e->hte_value))
+	  return(FALSE);
+      }
+      return(TRUE);
+      break;
+    }
+
   case t_pathname:
     return(equal(x, y));
   default:

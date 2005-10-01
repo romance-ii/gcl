@@ -359,7 +359,8 @@ struct cons {
 enum httest {   /*  hash table key test function  */
   htt_eq,       /*  eq  */
   htt_eql,      /*  eql  */
-  htt_equal     /*  equal  */
+  htt_equal,    /*  equal  */
+  htt_equalp    /*  equalp  */
 };
 
 struct htent {      /*  hash table entry  */

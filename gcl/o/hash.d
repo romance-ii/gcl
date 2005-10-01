@@ -53,6 +53,7 @@ required additional changes to be made in "make_hash_table" and
 object sLeq;
 object sLeql;
 object sLequal;
+object sLequalp;
 
 object sKsize;
 object sKrehash_size;
@@ -227,6 +228,150 @@ FFN(hash_equal)(object x,int depth) {
   return make_fixnum(ihash_equal(x,depth));
 }
 
+#define ihash_equalp(a_,b_) ((type_of(a_)==t_symbol && (a_)->s.s_hash) ? (a_)->s.s_hash : ihash_equalp1(a_,b_))
+unsigned long
+ihash_equalp1(object x,int depth) {
+
+  enum type tx;
+  unsigned long h = 0,j;
+  long i;
+  char *s;
+  
+  cs_check(x);
+
+BEGIN:
+  if (depth++ <=3)
+    switch ((tx=type_of(x))) {
+    case t_cons:
+      h += ihash_equalp(x->c.c_car,depth);
+      x = x->c.c_cdr;
+      goto BEGIN;
+      break;
+    case t_symbol:
+    case t_string:
+      {
+	long len=x->st.st_fillp;
+	s=x->st.st_self;
+	len=len>sizeof(len) ? sizeof(len) : len;
+	for (s+=len-1;len--;s--)
+	  h+= *s << CHAR_SIZE*len;
+      }
+      break;
+
+    case t_package: 
+      break;
+    case t_bitvector:
+      {
+	static char ar[10];
+	i = x->bv.bv_fillp;
+	h += i;
+	i = i/8;
+	if (i > 10) i= 10;
+	s = x->bv.bv_self;
+	if (x->bv.bv_offset) {
+	  long k,j,e=i;
+	  s = ar;
+	  /* 8 should be CHAR_SIZE but this needs to be changed
+	     everywhere .. */
+	  e = e * 8;
+	  bzero(ar,sizeof(ar)); /*FIXME is this not a generic copy? */
+	  for (k = x->bv.bv_offset, j = 0;  k < e;  k++, j++)
+	    if (x->bv.bv_self[k/8]&(0200>>k%8))
+	      ar[j/8]  |= 0200>>j%8;
+	}
+	for (;  i > 0;  --i, s++)
+	  h += (*s & 0377)*12345 + 1;
+      }
+      break;
+
+    case t_vector:
+      j=x->v.v_fillp;
+      h+=j*12345;
+      j=j>10 ? 10 : j;
+      for (i=0;i<j;i++)
+	h+=ihash_equalp(x->v.v_self[i],depth);
+      break;
+			
+    case t_array:
+      j=x->a.a_rank;
+      h+=j*12345;
+      for (i=0;i<j-1;i++)
+	h+=x->a.a_dims[i]*54321;
+      j=x->a.a_dim;
+      j=j>10 ? 10 : j;
+      for (i=0;i<j;i++)
+	h+=ihash_equalp(x->a.a_self[i],depth);
+      break;
+			
+    case t_hashtable:
+      j=x->ht.ht_nent;
+      h+=j*12345+x->ht.ht_test*54321;
+      j=j>10 ? 10 : j;
+      for (i=0;i<j;i++)
+	if (x->ht.ht_self[i].hte_key!=OBJNULL)
+	  switch (x->ht.ht_test) {
+	  case htt_eq:
+	    h+=(((unsigned long)x->ht.ht_self[i].hte_key)>>3) +
+	      ihash_equalp(x->ht.ht_self[i].hte_value,depth);
+	    break;
+	  case htt_eql:
+	    h+=hash_eql(x->ht.ht_self[i].hte_key) +
+	      ihash_equalp(x->ht.ht_self[i].hte_value,depth);
+	    break;
+	  case htt_equal:
+	    h+=ihash_equal(x->ht.ht_self[i].hte_key,depth) +
+	      ihash_equalp(x->ht.ht_self[i].hte_value,depth);
+	    break;
+	  case htt_equalp:
+	    h+=ihash_equalp(x->ht.ht_self[i].hte_key,depth) +
+	      ihash_equalp(x->ht.ht_self[i].hte_value,depth);
+	    break;
+	  }
+      break;
+
+    case t_pathname:
+      h += ihash_equalp(x->pn.pn_host,depth);
+      h += ihash_equalp(x->pn.pn_device,depth);
+      h += ihash_equalp(x->pn.pn_directory,depth);
+      h += ihash_equalp(x->pn.pn_name,depth);
+      h += ihash_equalp(x->pn.pn_type,depth);
+      /* version is ignored unless logical host */
+      if ((type_of(x->pn.pn_host) == t_string) &&
+	  (pathname_lookup(x->pn.pn_host,sSApathname_logicalA) != Cnil))
+	h += ihash_equalp(x->pn.pn_version,depth);
+      h += ihash_equalp(x->pn.pn_version,depth);
+      break;
+
+    case t_structure:
+      {
+	unsigned char *s_type;
+	struct s_data *def;
+	def=S_DATA(x->str.str_def);
+	s_type= & SLOT_TYPE(x->str.str_def,0);
+	h += ihash_equalp(def->name,depth);
+	for (i = 0;  i < def->length;  i++)
+	  if (s_type[i]==aet_object)
+	    h += ihash_equalp(x->str.str_self[i],depth);
+	  else
+	    h += ((int)x->str.str_self[i]) + depth++;
+	break;
+      }
+
+    default:
+      h +=  hash_eql(x);
+      break;
+    }
+  
+  return MHSH(h);
+
+}
+
+	
+static object
+FFN(hash_equalp)(object x,int depth) {
+  return make_fixnum(ihash_equalp(x,depth));
+}
+
 /* 
 
 gethash
@@ -284,6 +429,10 @@ gethash(object key, object hashtable) {
   case htt_equal:
     i = ihash_equal(key,0);
     f=equal1;
+    break;
+  case htt_equalp:
+    i = ihash_equalp(key,0);
+    f=equalp1;
     break;
   default:
     FEerror( "gethash:  Hash table not of type EQ, EQL, or EQUAL." ,0);
@@ -481,6 +630,8 @@ print_hash_table (object ht,char *procedure_name) {
      htt = htt_eql;
   else if (test == sLequal || test == sLequal->s.s_gfdef)
      htt = htt_equal;
+  else if (test == sLequalp || test == sLequalp->s.s_gfdef)
+     htt = htt_equalp;
   else
      FEerror("~S is an illegal hash-table test function.",1, test);
 
@@ -717,6 +868,7 @@ DEFUN_NEW("HASH-TABLE-TEST",object,fLhash_table_test,LISP,1,1,NONE,OO,OO,OO,OO,(
 { 
   check_type_hash_table(&table);
   switch(table->ht.ht_test) {
+     case htt_equalp: RETURN1(sLequalp);
      case htt_equal: RETURN1(sLequal);
      case htt_eq: RETURN1(sLeq);
      case htt_eql: RETURN1(sLeql);
@@ -751,6 +903,7 @@ gcl_init_hash()
 	sLeq = make_ordinary("EQ");
 	sLeql = make_ordinary("EQL");
 	sLequal = make_ordinary("EQUAL");
+	sLequalp = make_ordinary("EQUALP");
 	sKsize = make_keyword("SIZE");
 	sKtest = make_keyword("TEST");
 	sKrehash_size = make_keyword("REHASH-SIZE");
@@ -765,6 +918,8 @@ gcl_init_hash()
 	make_function("HASH-TABLE-COUNT", Lhash_table_count);
    	make_function("SXHASH", Lsxhash);
 	make_si_sfun("HASH-EQUAL",hash_equal,ARGTYPE2(f_object,f_fixnum)
+						| RESTYPE(f_object));
+	make_si_sfun("HASH-EQUALP",hash_equalp,ARGTYPE2(f_object,f_fixnum)
 						| RESTYPE(f_object));
 	make_si_function("HASH-SET", siLhash_set);
 }
