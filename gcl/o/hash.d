@@ -357,6 +357,29 @@ BEGIN:
 	break;
       }
 
+    case t_character:
+      {
+	vs_mark; /*FIXME*/
+	object *base=vs_base;
+	vs_base=vs_top;
+	vs_push(x);
+	Lchar_upcase();
+	x=vs_base[0];
+	vs_base=base;
+	vs_reset;
+	h +=  hash_eql(x);
+	break;
+      }
+      
+    case t_fixnum:
+    case t_bignum:
+    case t_ratio:
+    case t_shortfloat:
+    case t_longfloat:
+
+      h+=hash_eql(make_longfloat(number_to_double(x)));
+      break;
+
     default:
       h +=  hash_eql(x);
       break;

@@ -61,8 +61,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
     si::find-init-name which determines the unique init-function name
     before loading
   * First try at euqalp hashing
+  * fix character and number equalp hash codes
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  1 Oct 2005 15:41:17 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  3 Oct 2005 14:56:17 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
