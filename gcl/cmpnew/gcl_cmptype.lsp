@@ -63,6 +63,7 @@
 
 (defvar *norm-tp-hash* (make-hash-table :test 'equal))
 (defvar *and-tp-hash* (make-hash-table :test 'equal))
+(defvar *or-tp-hash* (make-hash-table :test 'equal))
 
 (defun cmp-norm-tp (tp)
   (multiple-value-bind 
@@ -78,6 +79,14 @@
      (gethash x *norm-tp-hash*)
      (cond (f r)
 	   ((setf (gethash x *and-tp-hash*) (type-and-int t1 t2)))))))
+
+(defun type-or1 (t1 t2)
+  (let ((x (cons t1 t2)))
+    (multiple-value-bind 
+     (r f) 
+     (gethash x *norm-tp-hash*)
+     (cond (f r)
+	   ((setf (gethash x *or-tp-hash*) (type-or1-int t1 t2)))))))
 
 ;;FIXME -- this function needs a rewrite.  CM 20050106
 (defun type-filter (type)
@@ -284,12 +293,36 @@
   (equal (type-and type1 type2) type1))
 
 
+(defun type-or1-int (type1 type2)
+  (cond ((equal type1 type2) type2)
+	((and (consp type2) (eq (car type2) 'values))
+	 (if (and (consp type1) (eq (car type1) 'values))
+	     (let ((r (list 'values)))
+	       (do ((t1 (cdr type1) (cdr t1))
+		    (t2 (cdr type2) (cdr t2)))
+		   ((not (and (consp t1) (consp t2))) (nreverse r))
+		 (push (type-or1 (car t1) (car t2)) r)))
+	   (type-or1 type1 (second type2))))
+	((and (consp type1) (eq (car type1) 'values))
+	 (type-or1 (second type1) type2))
+	((member type1 '(t object *)) type1)
+	((member type2 '(t object *)) type2)
+	((let* ((n (cmp-norm-tp `(or ,type1 ,type2)))
+		(tem (cmp-norm-tp (car (si::nreconstruct-type (si::nprocess-type n))))))
+	   (cond ((equal tem (caddr n)) type2) ;;FIXME centralize normalization
+		 ((equal tem (cadr n)) type1)
+		 ((not (car tem)) nil)
+		 ((eq (car tem) t))
+		 (tem))))))
+
 (defun reset-info-type (info)
   (if (info-type info)
       (let ((info1 (copy-info info)))
            (setf (info-type info1) t)
            info1)
       info))
+
+;(defun reset-info-type (x) x)
 
 (defun and-form-type (type form original-form &aux type1)
   (setq type1 (type-and type (info-type (cadr form))))

@@ -69,8 +69,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * propagate the type-or of the branches in c1if
   * remove anti-integer prejudice in inline-type-matches
   * length inlining support function cmp-vec-length
+  * type-or1 support
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  5 Oct 2005 15:23:07 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  5 Oct 2005 15:23:37 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
