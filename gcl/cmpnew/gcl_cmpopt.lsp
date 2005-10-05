@@ -898,6 +898,10 @@
    (get 'length 'inline-always))
 (push '((vector) seqind #.(flags rfa)"(#0)->v.v_fillp")
    (get 'length 'inline-unsafe))
+
+;;CMP-VEC-LENGTH
+(push '((t) seqind #.(flags rfa)"(#0)->v.v_fillp")
+   (get 'cmp-vec-length 'inline-always))
 ;(push '(((array t)) seqind #.(flags rfa)"(#0)->v.v_fillp")
 ;   (get 'length 'inline-unsafe))
 ;(push '(((array fixnum)) seqind #.(flags rfa)"(#0)->v.v_fillp")
