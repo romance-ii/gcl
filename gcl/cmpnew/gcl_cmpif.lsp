@@ -64,10 +64,12 @@
 		      (c1expr** (cadr args) info))
 		     (t (note-branch-elimination (car args) nil (cadr args)) 
 		      (if (endp (cddr args)) (c1nil) (c1expr** (caddr args) info))))
-	     (list 'if info
-               fmla
-               (c1expr* (cadr args) info)
-               (if (endp (cddr args)) (c1nil) (c1expr* (caddr args) info))))))))
+	     (let ((tb (c1expr* (cadr args) info))
+		   (fb (if (endp (cddr args)) (c1nil) (c1expr* (caddr args) info))))
+	       (setf (info-type info) (if (endp (cddr args)) (info-type (cadr tb))
+					(type-or1 (info-type (cadr tb)) (info-type (cadr fb)))))
+	       (list 'if info
+		     fmla tb fb)))))))
 
 (defvar *fmla-eval-const*)
 (defun fmla-eval-const (fmla)

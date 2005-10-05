@@ -66,8 +66,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
     type-or hash table
   * inline expanders for length, reverse, endp, identity, and sort
   * disable older ash-conditional in favor of newer ash-propagator
+  * propagate the type-or of the branches in c1if
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  5 Oct 2005 15:20:22 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  5 Oct 2005 15:21:05 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
