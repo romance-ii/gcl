@@ -275,7 +275,7 @@
 (defmacro dolist ((var form &optional (val nil)) &rest body
                                                  &aux (temp (gensym)))
   `(do* ((,temp ,form (cdr ,temp)))
-	((not (consp ,temp)) (check-type ,temp null) ,val)
+	((endp ,temp) ,val)
 	(let ((,var (car ,temp)))
 	  ,@body)))
 

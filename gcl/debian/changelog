@@ -70,8 +70,10 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * remove anti-integer prejudice in inline-type-matches
   * length inlining support function cmp-vec-length
   * type-or1 support
+  * Use new endp expansion to optimize dolist depending on safety
+    settings
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  5 Oct 2005 15:23:37 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  5 Oct 2005 15:24:17 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
