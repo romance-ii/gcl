@@ -64,8 +64,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * fix character and number equalp hash codes
   * set compiler-check-args in pass1 for use in expanders e.g. endp,
     type-or hash table
+  * inline expanders for length, reverse, endp, identity, and sort
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  5 Oct 2005 15:17:19 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  5 Oct 2005 15:18:28 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
