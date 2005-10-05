@@ -57,7 +57,8 @@
   (setq *inline-blocks* 0)
   (setq *notinline* nil)
   (clrhash *norm-tp-hash*)
-  (clrhash *and-tp-hash*))
+  (clrhash *and-tp-hash*)
+  (clrhash *or-tp-hash*))
 
 (defvar *next-cvar* 0)
 (defvar *next-cmacro* 0)
@@ -512,6 +513,7 @@
             (*alien-declarations* *alien-declarations*)
             (*notinline* *notinline*)
             (*space* *space*)
+	    (*compiler-check-args* *compiler-check-args*)
 	    (*safe-compile* *safe-compile*))
            (dolist** (decl decls dl)
              (case (car decl)
@@ -529,6 +531,8 @@
                            (safety
 			     (setq *safe-compile*
 				   (>= (the fixnum (cadr x)) 2))
+			     (setq *compiler-check-args*
+				   (>= (the fixnum (cadr x)) 1))
 			     (push (list 'safety (cadr x)) dl))
                            (space (setq *space* (cadr x))
                                   (push (list 'space (cadr x)) dl))
