@@ -73,8 +73,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * Use new endp expansion to optimize dolist depending on safety
     settings
   * external functions compiled with safety = 1 for argument checking
+  * equalp hash bug fix
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  5 Oct 2005 15:25:14 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  5 Oct 2005 15:26:03 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

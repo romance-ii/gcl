@@ -744,7 +744,7 @@ equalp1(register object x, register object y) {
       for (i=0;i<x->ht.ht_size;i++) {
 	if (x->ht.ht_self[i].hte_key==OBJNULL)
 	  continue;
-	if (!(e=gethash(x->ht.ht_self[i].hte_key,y))
+	if ((e=gethash(x->ht.ht_self[i].hte_key,y))->hte_key==OBJNULL
 	    || !equalp(x->ht.ht_self[i].hte_value,e->hte_value))
 	  return(FALSE);
       }
