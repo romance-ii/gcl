@@ -47,6 +47,7 @@ required additional changes to be made in "make_hash_table" and
 
 #define NEED_MP_H
 #include <string.h>
+#include <ctype.h>
 #include "include.h"
 
 
@@ -254,7 +255,7 @@ BEGIN:
 	s=x->st.st_self;
 	len=len>sizeof(len) ? sizeof(len) : len;
 	for (s+=len-1;len--;s--)
-	  h+= *s << CHAR_SIZE*len;
+	  h+= toupper(*s) << CHAR_SIZE*len;
       }
       break;
 
@@ -289,7 +290,7 @@ BEGIN:
       h+=j*12345;
       j=j>10 ? 10 : j;
       for (i=0;i<j;i++)
-	h+=ihash_equalp(x->v.v_self[i],depth);
+	h+=ihash_equalp(aref(x,i),depth);
       break;
 			
     case t_array:
@@ -300,7 +301,7 @@ BEGIN:
       j=x->a.a_dim;
       j=j>10 ? 10 : j;
       for (i=0;i<j;i++)
-	h+=ihash_equalp(x->a.a_self[i],depth);
+	h+=ihash_equalp(aref(x,i),depth);
       break;
 			
     case t_hashtable:
