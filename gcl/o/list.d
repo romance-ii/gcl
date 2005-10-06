@@ -159,7 +159,7 @@ endp1(x)
 object x;
 {
 
-	if (type_of(x) == t_cons)
+	if (consp(x))
 		return(FALSE);
 	else * if (x == Cnil) *
 		return(TRUE);
@@ -174,7 +174,7 @@ object x;
 {
 	if (x == Cnil)
 		return(x);
-	if (type_of(x) == t_cons)
+	if (consp(x))
 		return(x->c.c_car);
 	FEwrong_type_argument(sLlist, x);
 	return(Cnil);
@@ -186,7 +186,7 @@ object x;
 {
 	if (x == Cnil)
 		return(x);
-	if (type_of(x) == t_cons)
+	if (consp(x))
 		return(x->c.c_cdr);
 	FEwrong_type_argument(sLlist, x);
 	return(Cnil);
@@ -196,7 +196,7 @@ object
 kar(x)
 object x;
 {
-	if (type_of(x) == t_cons)
+	if (consp(x))
 		return(x->c.c_car);
 	FEwrong_type_argument(sLcons, x);
 	return(Cnil);
@@ -206,7 +206,7 @@ object x;
 kdr(x)
 object x;
 {
-	if (type_of(x) == t_cons)
+	if (consp(x))
 		return(x->c.c_cdr);
 	FEwrong_type_argument(sLcons, x);
 	return(Cnil);
@@ -360,8 +360,8 @@ object x, y;
 	cs_check(x);
 
 BEGIN:
-	if (type_of(x) == t_cons)
-		if (type_of(y) == t_cons)
+	if (consp(x))
+		if (consp(y))
 			if (tree_equal(x->c.c_car, y->c.c_car)) {
 				x = x->c.c_cdr;
 				y = y->c.c_cdr;
@@ -410,11 +410,11 @@ object x;
 {
 	object y;
 
-	if (type_of(x) != t_cons)
+	if (!consp(x))
 		return(x);
 	y = make_cons(x->c.c_car, Cnil);
 	vs_push(y);
-	for (x = x->c.c_cdr; type_of(x) == t_cons; x = x->c.c_cdr) {
+	for (x = x->c.c_cdr; consp(x); x = x->c.c_cdr) {
 		y->c.c_cdr = make_cons(x->c.c_car, Cnil);
 		y = y->c.c_cdr;
 	}
@@ -456,7 +456,7 @@ object x;
 {
 	cs_check(x);
 
-	if (type_of(x) == t_cons) {
+	if (consp(x)) {
 		copy_tree(x->c.c_car);
 		copy_tree(x->c.c_cdr);
 		stack_cons();
@@ -477,7 +477,7 @@ object new, tree;
 
 	if (TEST(tree))
 		vs_check_push(new);
-	else if (type_of(tree) == t_cons) {
+	else if (consp(tree)) {
 		subst(new, tree->c.c_car);
 		subst(new, tree->c.c_cdr);
 		stack_cons();
@@ -498,7 +498,7 @@ object new, *treep;
 
 	if (TEST(*treep))
 		*treep = new;
-	else if (type_of(*treep) == t_cons) {
+	else if (consp(*treep)) {
 		nsubst(new, &(*treep)->c.c_car);
 		nsubst(new, &(*treep)->c.c_cdr);
 	}
@@ -524,7 +524,7 @@ object alist, tree;
 			return;
 		}
 	}
-	if (type_of(tree) == t_cons) {
+	if (consp(tree)) {
 		sublis(alist, tree->c.c_car);
 		sublis(alist, tree->c.c_cdr);
 		stack_cons();
@@ -553,7 +553,7 @@ object alist, *treep;
 			return;
 		}
 	}
-	if (type_of(*treep) == t_cons) {
+	if (consp(*treep)) {
 		nsublis(alist, &(*treep)->c.c_car);
 		nsublis(alist, &(*treep)->c.c_cdr);
 	}
@@ -563,7 +563,7 @@ LFD(Lcar)()
 {
 	check_arg(1);
 
-	if (type_of(vs_base[0]) == t_cons || vs_base[0] == Cnil)
+	if (listp(vs_base[0]))
 		vs_base[0] = vs_base[0]->c.c_car;
 	else
 		FEwrong_type_argument(sLlist, vs_base[0]);
@@ -573,7 +573,7 @@ LFD(Lcdr)()
 {
 	check_arg(1);
 
-	if (type_of(vs_base[0]) == t_cons || vs_base[0] == Cnil)
+	if (listp(vs_base[0]))
 		vs_base[0] = vs_base[0]->c.c_cdr;
 	else
 		FEwrong_type_argument(sLlist, vs_base[0]);
@@ -642,7 +642,7 @@ DEFUNO_NEW("NTH",object,fLnth,LISP,2,2,NONE,OI,OO,OO,OO,void,Lnth,(fixnum index,
   if (index < 0)
     FEerror("Negative index: ~D.", 1, make_fixnum(index));
   while (1)
-    {if (type_of(x)==t_cons)
+    {if (consp(x))
        { if (index == 0)
 	   RETURN1(Mcar(x));
 	 else {x = Mcdr(x); index--;}}
@@ -709,7 +709,7 @@ LFD(Lendp)()
 		vs_base[0] = Ct;
 		return;
 	}
-	if (type_of(vs_base[0]) == t_cons) {
+	if (consp(vs_base[0])) {
 		vs_base[0] = Cnil;
 		return;
 	}
@@ -776,7 +776,7 @@ nthcdr(fixnum n, object x) {
 		FEwrong_type_argument(sLnon_negative_fixnum, vs_head);
 	}
 	while (n-- > 0)
-		if (endp_prop(x)) {
+		if (endp(x)) {
 			return(Cnil);
 		} else
 			x = x->c.c_cdr;
@@ -801,13 +801,13 @@ LFD(Llast)() {
 	}	
 
 	if (!n)
-		while (type_of(vs_base[0]) == t_cons)
+		while (consp(vs_base[0]))
 			vs_base[0]=vs_base[0]->c.c_cdr;
 	else {
 		t=vs_base[0];
-		while (type_of(vs_base[0]->c.c_cdr) == t_cons && --n)
+		while (consp(vs_base[0]->c.c_cdr) && --n)
 			vs_base[0] = vs_base[0]->c.c_cdr;
-		while (type_of(vs_base[0]->c.c_cdr) == t_cons) {
+		while (consp(vs_base[0]->c.c_cdr)) {
 			t=t->c.c_cdr;
 			vs_base[0] = vs_base[0]->c.c_cdr;
 		}
@@ -835,7 +835,7 @@ object x;
 {object *p;
  p = &x;
  TOP:
- if (type_of(*p) ==t_cons)
+ if (consp(*p))
    { if(!inheap(*p))
        *p=make_cons(copy_off_stack_tree((*p)->c.c_car),(*p)->c.c_cdr);
    else
@@ -920,10 +920,8 @@ LFD(Lrevappend)() {
 	object x, y;
 
 	check_arg(2);
-	/* check_proper_list(vs_base[0]); */
-	/* endp_prop does check */
 	y = vs_pop;
-	for (x = vs_base[0];  !endp_prop(x);  x = x->c.c_cdr) {
+	for (x = vs_base[0];  !endp(x);  x = x->c.c_cdr) {
 		vs_push(x->c.c_car);
 		vs_push(y);
 		stack_cons();
@@ -961,7 +959,7 @@ LFD(Lnconc)() {
 			m->c.c_cdr = l;
 			m = l;
 		}
-		for (;  type_of(m->c.c_cdr)==t_cons;  m = m->c.c_cdr);
+		for (;  consp(m->c.c_cdr);  m = m->c.c_cdr);
 	}
 	if (x == Cnil) vs_base[0] = vs_top[-1];
 	else {
@@ -976,7 +974,7 @@ LFD(Lreconc)() {
 
 	check_arg(2);
 	y = vs_pop;
-	for (x = vs_base[0];  !endp_prop(x);) {
+	for (x = vs_base[0];  !endp(x);) {
 		z = x;
 		x = x->c.c_cdr;
 		z->c.c_cdr = y;
@@ -989,9 +987,11 @@ LFD(Lreconc)() {
 	fixnum i;
 @
 	check_type_non_negative_integer(&nn);
+        if (!listp(lis))
+           TYPE_ERROR(lis,sLlist);
 	if (type_of(nn) != t_fixnum)
 		@(return Cnil)
-	for (i = 0;  !endp(lis) && fix_dot(lis)==lis;  i++, lis = lis->c.c_cdr)
+	for (i = 0;  consp(lis);  i++, lis = lis->c.c_cdr)
 		vs_check_push(lis->c.c_car);
 	if (i <= fix((nn))) {
 		vs_top -= i;
@@ -1011,14 +1011,14 @@ LFD(Lreconc)() {
 	object x;
 @
 	check_type_non_negative_integer(&nn);
+        if (!listp(lis))
+           TYPE_ERROR(lis,sLlist);
 	if (type_of(nn) != t_fixnum)
 		@(return Cnil)
-	for (i = 0, x = lis;  !endp(x) && fix_dot(x)==x;  i++, x = x->c.c_cdr)
-		;
+        for (i = 0, x = lis;  consp(x);  i++, x = x->c.c_cdr);
 	if (i <= fix((nn)))
 		@(return Cnil)
-	for (i -= fix((nn)), x = lis;  --i > 0;  x = x->c.c_cdr)
-		;
+        for (i -= fix((nn)), x = lis;  --i > 0;  x = x->c.c_cdr);
 	x->c.c_cdr = Cnil;
 	@(return lis)
 @)
@@ -1028,18 +1028,15 @@ LFD(Lldiff)() {
 	object x;
 
 	check_arg(2);
-	for (i = 0, x = vs_base[0];  !endp(x);  i++, x = x->c.c_cdr)
-/*		if (dot_list_eq(x,vs_base[1]))*/
-		if (eql(fix_dot(x),vs_base[1]))
-			break;
-		else
-			vs_check_push(x->c.c_car);
-        if (proper_list(x))
-		vs_push(Cnil);
-	else
-		i--;
+	x = vs_base[0];
+	if (!listp(x))/*FIXME checktype*/
+	  TYPE_ERROR(x,sLlist);
+	for (i = 0; consp(x) && x!=vs_base[1] ;  i++, x = x->c.c_cdr)
+	  vs_check_push(x->c.c_car); /*FIXME but a segfault breaker at vs_limit*/
+	x=eql(x,vs_base[1]) ? Cnil : x;
+	vs_check_push(x);
 	while (i-- > 0)
-		stack_cons();
+	  stack_cons();
 	vs_base[0] = vs_pop;
 	vs_popp;
 }
@@ -1095,7 +1092,7 @@ sublis1(alist,tree,tst)
  for (v=alist ; v!=Cnil; v=v->c.c_cdr)
    { if (v->c.c_car->c.c_car == tree || (*tst)(v->c.c_car->c.c_car ,tree))
        return(v->c.c_car->c.c_cdr);}
- if (type_of(tree)==t_cons)
+ if (consp(tree))
    {object ntree=make_cons(sublis1(alist,tree->c.c_car,tst),
 			   tree->c.c_cdr);
     ntree->c.c_cdr=sublis1(alist,ntree->c.c_cdr,tst);
@@ -1115,7 +1112,7 @@ object alist;
 {
     object v;
     for (v=alist ; !endp(v) ; v=v->c.c_cdr)
-        if (type_of(v->c.c_car) != t_cons && v->c.c_car != Cnil)
+        if (!consp(v->c.c_car) && v->c.c_car != Cnil)
 	     FEwrong_type_argument(sLlist, v);
 }
  
@@ -1128,7 +1125,7 @@ object alist;
     if (alist == Cnil)
 	 FEwrong_type_argument(sLlist, alist);
     */
-    for (v=alist ; type_of(v) == t_cons ; v=v->c.c_cdr);
+    for (v=alist ; consp(v) ; v=v->c.c_cdr);
     if (v != Cnil)
 	 FEwrong_type_argument(sLlist, alist);
 }
@@ -1162,7 +1159,7 @@ object alist;
 @
 	protectTEST;
 	setupTEST(item, test, test_not, key);
-	while (!endp_prop(list)) {
+	while (!endp(list)) {
 		if (TEST(list->c.c_car))
 			goto L;
 		list = list->c.c_cdr;
@@ -1182,7 +1179,7 @@ PREDICATE(Lmember,Lmember_if,Lmember_if_not, 2)
 	if (rev != Cnil)
 		reverse_comparison=1;
 	setupTEST(item, test, test_not, key);
-	while (!endp_prop(list)) {
+	while (!endp(list)) {
 		if (TEST(list->c.c_car))
 			goto L;
 		list = list->c.c_cdr;
@@ -1196,16 +1193,13 @@ LFD(Ltailp)() {
 	object x;
 
 	check_arg(2);
-	for (x = vs_base[1];  !endp(x);  x = x->c.c_cdr)
-		if (eql(fix_dot(x),vs_base[0])) {
-			vs_base[0] = Ct;
-			vs_popp;
-			return;
-		}
-	if (eql(x,vs_base[0])) 
-		vs_base[0] = Ct;
-	else
-		vs_base[0] = Cnil;
+	for (x = vs_base[1];  consp(x);  x = x->c.c_cdr)
+	  if (x==vs_base[0]) {
+	    vs_base[0] = Ct;
+	    vs_popp;
+	    return;
+	  }
+	vs_base[0]=eql(x,vs_base[0]) ? Ct : Cnil;
 	vs_popp;
 	return;
 }
@@ -1242,10 +1236,8 @@ LFD(Lacons)()
 	vp = vs_top + 1;
 	k = keys;
 	d = data;
-	/* check_proper_list(k);
-	check_proper_list(d); */
-	while (!endp_prop(k)) {
-		if (endp_prop(d))
+	while (!endp(k)) {
+		if (endp(d))
 		 FEerror(
 		  "The keys ~S and the data ~S are not of the same length",
 		  2, keys, data);
@@ -1253,7 +1245,7 @@ LFD(Lacons)()
 		k = k->c.c_cdr;
 		d = d->c.c_cdr;
 	}
-	if (!endp_prop(d))
+	if (!endp(d))
 	    FEerror("The keys ~S and the data ~S are not of the same length",
 		    2, keys, data);
 	vs_push(a_list);
@@ -1310,7 +1302,7 @@ member_eq(x, l)
 object x, l;
 {
 
-	for (;  type_of(l) == t_cons;  l = l->c.c_cdr)
+	for (;  consp(l);  l = l->c.c_cdr)
 		if (x == l->c.c_car)
 			return(TRUE);
 	return(FALSE);
@@ -1326,7 +1318,7 @@ object x, l;
 /* 	x = vs_base[0]; */
 /* 	l = vs_base[1]; */
 
-/* 	for (;  type_of(l) == t_cons;  l = l->c.c_cdr) */
+/* 	for (;  consp(l);  l = l->c.c_cdr) */
 /* 		if (x == l->c.c_car) { */
 /* 			vs_base[0] = l; */
 /* 			vs_popp; */
@@ -1341,7 +1333,7 @@ void
 delete_eq(x, lp)
 object x, *lp;
 {
-	for (;  type_of(*lp) == t_cons;  lp = &(*lp)->c.c_cdr)
+	for (;  consp(*lp);  lp = &(*lp)->c.c_cdr)
 		if ((*lp)->c.c_car == x) {
 			*lp = (*lp)->c.c_cdr;
 			return;

@@ -61,22 +61,22 @@ ihs_function_name(object x)
 			return(sLlambda_closure);
 		if (y == sLlambda_block || y == sSlambda_block_expanded) {
 			x = x->c.c_cdr;
-			if (type_of(x) != t_cons)
+			if (!consp(x))
 				return(sLlambda_block);
 			return(x->c.c_car);
 		}
 		if (y == sLlambda_block_closure) {
 			x = x->c.c_cdr;
-			if (type_of(x) != t_cons)
+			if (!consp(x))
 				return(sLlambda_block_closure);
 			x = x->c.c_cdr;
-			if (type_of(x) != t_cons)
+			if (!consp(x))
 				return(sLlambda_block_closure);
 			x = x->c.c_cdr;
-			if (type_of(x) != t_cons)
+			if (!consp(x))
 				return(sLlambda_block_closure);
 			x = x->c.c_cdr;
-			if (type_of(x) != t_cons)
+			if (!consp(x))
 				return(sLlambda_block_closure);
 			return(x->c.c_car);
 		}

@@ -72,7 +72,7 @@ DEFUNO_NEW("ATOM",object,fLatom  ,LISP
 {
 	/* 1 args */
 
-	if (type_of(x0) != t_cons)
+	if (!consp(x0))
 		x0 = Ct;
 	else
 		x0 = Cnil;
@@ -85,7 +85,7 @@ DEFUNO_NEW("CONSP",object,fLconsp,LISP
 {
 	/* 1 args */
 
-	if (type_of(x0) == t_cons)
+	if (consp(x0))
 		x0 = Ct;
 	else
 		x0 = Cnil;
@@ -98,7 +98,7 @@ DEFUNO_NEW("LISTP",object,fLlistp,LISP
 {
 	/* 1 args */
 
-	if (x0 == Cnil || type_of(x0) == t_cons)
+	if (listp(x0))
 		x0 = Ct;
 	else
 		x0 = Cnil;

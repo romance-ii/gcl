@@ -465,9 +465,9 @@ initlisp(void) {
 	if (NOT_OBJECT_ALIGNED(a))
 	  error("Ct is not properly aligned");
 
-	a=(fixnum)Dotnil;
-	if (NOT_OBJECT_ALIGNED(a))
-	  error("Dotnil is not properly aligned");
+/* 	a=(fixnum)Dotnil; */
+/* 	if (NOT_OBJECT_ALIGNED(a)) */
+/* 	  error("Dotnil is not properly aligned"); */
 
 	if (NULL_OR_ON_C_STACK(&j) == 0
 	    || NULL_OR_ON_C_STACK(Cnil) != 0
@@ -479,17 +479,17 @@ initlisp(void) {
 
         gcl_init_alloc();
 
- 	Dotnil->c.c_cdr=Dotnil;
- 	Dotnil->s.s_dbind = Dotnil;
- 	Dotnil->s.s_sfdef = NOT_SPECIAL;
- 	Dotnil->s.s_fillp = 6;
- 	Dotnil->s.s_self = "DOTNIL";
- 	Dotnil->s.s_gfdef = OBJNULL;
- 	Dotnil->s.s_plist = Cnil;
- 	Dotnil->s.s_hpack = Cnil;
- 	Dotnil->s.s_stype = (short)stp_constant;
- 	Dotnil->s.s_mflag = FALSE;
-	Dotnil->s.s_hash = ihash_equal1(Dotnil,0);
+/*  	Dotnil->c.c_cdr=Dotnil; */
+/*  	Dotnil->s.s_dbind = Dotnil; */
+/*  	Dotnil->s.s_sfdef = NOT_SPECIAL; */
+/*  	Dotnil->s.s_fillp = 6; */
+/*  	Dotnil->s.s_self = "DOTNIL"; */
+/*  	Dotnil->s.s_gfdef = OBJNULL; */
+/*  	Dotnil->s.s_plist = Cnil; */
+/*  	Dotnil->s.s_hpack = Cnil; */
+/*  	Dotnil->s.s_stype = (short)stp_constant; */
+/*  	Dotnil->s.s_mflag = FALSE; */
+/* 	Dotnil->s.s_hash = ihash_equal1(Dotnil,0); */
 	
  	Cnil->c.c_cdr=Cnil;
  	Cnil->s.s_dbind = Cnil;

@@ -75,8 +75,10 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * external functions compiled with safety = 1 for argument checking
   * equalp hash bug fix
   * equalp hashing fix
+  * consp, listp, and atom macros, remove DOTNIL, fix relevant functions
+    in list.d
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  6 Oct 2005 01:54:16 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  6 Oct 2005 20:29:23 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

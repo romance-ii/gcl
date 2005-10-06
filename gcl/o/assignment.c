@@ -326,7 +326,7 @@ setf(object place, object form)
 /*  	extern void siLfill_pointer_set(void); */
 	extern void siLhash_set();
 
-	if (type_of(place) != t_cons) {
+	if (!consp(place)) {
 	  setq(place, result=Ieval(form));
 	  vs_top=vs_base+1;
 	  return result;
@@ -340,7 +340,7 @@ setf(object place, object form)
 	  sym = Ieval(car(args));
 	  key = Ieval(car(Mcdr(args)));
           deflt1 = Mcddr(args);
-          if ( type_of(deflt1) == t_cons ) {
+          if ( consp(deflt1) ) {
               deflt = Ieval(car(deflt1));
           }
 	  val = Ieval(form);
@@ -358,7 +358,7 @@ setf(object place, object form)
 	if (fun == sLcar) {
 		x = Ieval(Mcar(args));
 		result = Ieval(form);
-		if (type_of(x) != t_cons)
+		if (!consp(x))
 			FEerror("~S is not a cons.", 1, x);
 		Mcar(x) = result;
 		return result;
@@ -366,7 +366,7 @@ setf(object place, object form)
 	if (fun == sLcdr) {
 		x = Ieval(Mcar(args));
 		result = Ieval(form);
-		if (type_of(x) != t_cons)
+		if (!consp(x))
 			FEerror("~S is not a cons.", 1, x);
 		Mcdr(x) = result;
 		return result;
@@ -384,7 +384,7 @@ setf(object place, object form)
 	}
 
 	x = getf(fun->s.s_plist, sSstructure_access, Cnil);
-	if (x == Cnil || type_of(x) != t_cons)
+	if (x == Cnil || !consp(x))
 		goto OTHERWISE;
 	if (getf(fun->s.s_plist, sSsetf_lambda, Cnil) == Cnil)
 		goto OTHERWISE;
@@ -405,7 +405,7 @@ setf(object place, object form)
 	} else if (x == sLlist) {
 		for (x = y;  i > 0;  --i)
 			x = cdr(x);
-		if (type_of(x) != t_cons)
+		if (!consp(x))
 			goto OTHERWISE;
 		x->c.c_car = result;
 	} else {
@@ -455,7 +455,7 @@ FFN(Fpush)(object form)
 	if (!endp(MMcddr(form)))
 		FEtoo_many_argumentsF(form);
 	var = MMcadr(form);
-	if (type_of(var) != t_cons) {
+	if (!consp(var)) {
 		eval(MMcar(form));
 		form = vs_base[0];
 		eval(var);
@@ -486,7 +486,7 @@ FFN(Fpop)(object form)
 	if (!endp(MMcdr(form)))
 		FEtoo_many_argumentsF(form);
 	var = MMcar(form);
-	if (type_of(var) != t_cons) {
+	if (!consp(var)) {
 		eval(var);
 		setq(var, cdr(vs_base[0]));
 		vs_base[0] = car(vs_base[0]);
@@ -516,7 +516,7 @@ FFN(Fincf)(object form)
 	if (!endp(MMcdr(form)) && !endp(MMcddr(form)))
 		FEtoo_many_argumentsF(form);
 	var = MMcar(form);
-	if (type_of(var) != t_cons) {
+	if (!consp(var)) {
 		if (endp(MMcdr(form))) {
 			eval(var);
 			vs_base[0] = one_plus(vs_base[0]);
@@ -554,7 +554,7 @@ FFN(Fdecf)(object form)
 	if (!endp(MMcdr(form)) && !endp(MMcddr(form)))
 		FEtoo_many_argumentsF(form);
 	var = MMcar(form);
-	if (type_of(var) != t_cons) {
+	if (!consp(var)) {
 		if (endp(MMcdr(form))) {
 			eval(var);
 			vs_base[0] = one_minus(vs_base[0]);

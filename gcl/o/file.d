@@ -632,7 +632,7 @@ object strm;
 
 	case smm_broadcast:
 	case smm_concatenated:
-		if (( type_of(strm->sm.sm_object0) == t_cons ) && 
+		if (( consp(strm->sm.sm_object0) ) && 
 		    ( type_of(strm->sm.sm_object0->c.c_car) == t_stream ))
 		    strm=strm->sm.sm_object0->c.c_car;
 		else
@@ -681,7 +681,7 @@ interactive_stream_p(object strm)
 
 	case smm_broadcast:
 	case smm_concatenated:
-		if (( type_of(strm->sm.sm_object0) == t_cons ) && 
+		if (( consp(strm->sm.sm_object0) ) && 
 		    ( type_of(strm->sm.sm_object0->c.c_car) == t_stream ))
 		    strm=strm->sm.sm_object0->c.c_car;
 		else
@@ -1136,7 +1136,7 @@ int start,end;
 	}
 
 	i=0;
-        while ((type_of(a) == t_cons) && (i<start)) {
+        while ((consp(a)) && (i<start)) {
 	    a=a->c.c_cdr;
 	    i++;
 	}
@@ -1201,12 +1201,12 @@ int start,end;
 		default:
 		    FEwrong_type_argument(sLsequence,a);
 		}
-		if (type_of(a) != t_cons)
+		if (!consp(a))
 		    aset1(a,i,val);
 		else {
 		    a->c.c_car = val;
 		    a=a->c.c_cdr;
-		    if (type_of(a) != t_cons)
+		    if (!consp(a))
 		        i=end+1;
 		}
 	    }
@@ -1231,7 +1231,7 @@ int start,end;
 		    FEwrong_type_argument(sLnon_negative_fixnum,start);
 	
 	    if ((end == Cnil) &&
-	        (type_of(arr) == t_cons))
+	        (consp(arr)))
 		    iend = length(arr);
 	    else
 	    if ((end == Cnil) &&
@@ -1279,7 +1279,7 @@ int start,end;
 	}
 
 	i=0;
-        while ((type_of(a) == t_cons) && (i<start)) {
+        while ((consp(a)) && (i<start)) {
 	    a=a->c.c_cdr;
 	    i++;
 	}
@@ -1288,12 +1288,12 @@ int start,end;
 	for (i=start;i<end;i++) {
 	    if (i<end) {
 		j=i;
-		if (type_of(a) != t_cons)
+		if (!consp(a))
 		    val = fLrow_major_aref(a,i);
 		else {
 		    val = a->c.c_car;
 		    a = a->c.c_cdr;
-		    if (type_of(a) != t_cons)
+		    if (!consp(a))
 		        i=end+1;
 		}
 
@@ -1334,7 +1334,7 @@ int start,end;
 		    FEwrong_type_argument(sLnon_negative_fixnum,start);
 	
 	    if ((end == Cnil) &&
-	        (type_of(arr) == t_cons))
+	        (consp(arr)))
 		    iend = length(arr);
 	    else
 	    if ((end == Cnil) &&

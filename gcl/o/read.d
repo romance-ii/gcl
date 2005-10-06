@@ -1741,7 +1741,7 @@ object x;
 {
 	for (;;) {
 		x->c.c_car = patch_sharp(x->c.c_car);
-		if (type_of(x->c.c_cdr) == t_cons)
+		if (consp(x->c.c_cdr))
 			x = x->c.c_cdr;
 		else {
 			x->c.c_cdr = patch_sharp(x->c.c_cdr);

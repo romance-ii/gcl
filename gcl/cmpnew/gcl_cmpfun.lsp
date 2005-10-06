@@ -287,7 +287,7 @@
 (defun c2rplaca (args &aux (*vs* *vs*) (*inline-blocks* 0))
   (setq args (inline-args args '(t t)))
   (safe-compile
-   (wt-nl "if(type_of(" (car args) ")!=t_cons)"
+   (wt-nl "if(!consp(" (car args) "))"
           "FEwrong_type_argument(Scons," (car args) ");"))
   (wt-nl "(" (car args) ")->c.c_car = " (cadr args) ";")
   (unwind-exit (car args))
@@ -305,7 +305,7 @@
 (defun c2rplacd (args &aux (*vs* *vs*) (*inline-blocks* 0))
   (setq args (inline-args args '(t t)))
   (safe-compile
-   (wt-nl "if(type_of(" (car args) ")!=t_cons)"
+   (wt-nl "if(!consp(" (car args) "))"
           "FEwrong_type_argument(Scons," (car args) ");"))
   (wt-nl "(" (car args) ")->c.c_cdr = " (cadr args) ";")
   (unwind-exit (car args))
@@ -1113,7 +1113,7 @@
        (wt (car args))
        (dotimes** (i index) (wt ")"))
        (wt ";")
-       (wt-nl "if((type_of(V" l ")!=t_cons) && (" (car args) "!= Cnil))")
+       (wt-nl "if((!consp(V" l ")) && (" (car args) "!= Cnil))")
        (wt-nl " FEwrong_type_argument(Scons,V" l ");")
        )
       (progn

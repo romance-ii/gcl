@@ -249,7 +249,6 @@ BEGIN:
       goto BEGIN;
       break;
     case t_symbol:
-    case t_string:
       {
 	long len=x->st.st_fillp;
 	s=x->st.st_self;
@@ -285,6 +284,7 @@ BEGIN:
       }
       break;
 
+    case t_string:
     case t_vector:
       j=x->v.v_fillp;
       h+=j*12345;

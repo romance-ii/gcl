@@ -198,9 +198,9 @@ add_page_to_freelist(char *p, struct typemanager *tm)
  make_free(x);
 #ifdef SGC
  if (sgc_enabled && tm->tm_sgc)
-   {if (type_of(x)!=t_cons) x->d.s=SGC_RECENT; /*FIXME, can sgc mark cons on 64bit*/
+   {if (!consp(x)) x->d.s=SGC_RECENT; /*FIXME, can sgc mark cons on 64bit*/
     sgc_type_map[np] = (SGC_PAGE_FLAG | SGC_TEMP_WRITABLE);}
- else {if (type_of(x)!=t_cons) x->d.s = SGC_NORMAL;}
+ else {if (!consp(x)) x->d.s = SGC_NORMAL;}
  
  /* array headers must be always writable, since a write to the
     body does not touch the header.   It may be desirable if there

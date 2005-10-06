@@ -53,7 +53,7 @@ do {static struct sigaction action; \
                               extern char etext; \
 			       real_maxpage = MAXPAGE ;\
      	getrlimit(RLIMIT_DATA, &data_rlimit); \
-	real_maxpage = ((unsigned int)&etext/PAGESIZE \
+	real_maxpage = ((unsigned long)&etext/PAGESIZE \
 			+ data_rlimit.rlim_cur/PAGESIZE - ELF_TEXT_BASE/PAGESIZE); \
 	if (real_maxpage > MAXPAGE) \
 		real_maxpage = MAXPAGE ; } while(0)

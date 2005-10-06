@@ -323,7 +323,7 @@ call_init(int init_address, object memory, object fasl_vec, FUNC fptr)
  VERIFY_INIT
 #endif
    
- if (type_of(form)==t_cons &&
+ if (consp(form) &&
      form->c.c_car == sSPinit)
    {bds_bind(sSPinit,fasl_vec);
     bds_bind(sSPmemory,memory);

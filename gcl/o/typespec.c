@@ -181,7 +181,7 @@ check_type_string(object *p)
 void
 check_type_cons(object *p)
 {
-	while (type_of(*p) != t_cons)
+	while (!consp(*p))
 		*p = wrong_type_argument(sLcons, *p);
 }
 

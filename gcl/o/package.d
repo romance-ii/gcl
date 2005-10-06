@@ -44,7 +44,7 @@ static bool
 member_string_equal(x, l)
 object x, l;
 {
-	for (;  type_of(l) == t_cons;  l = l->c.c_cdr)
+	for (;  consp(l);  l = l->c.c_cdr)
 		if (string_equal(x, l->c.c_car))
 			return(TRUE);
 	return(FALSE);
@@ -96,7 +96,7 @@ rehash_pack(object **ptab,fixnum *n,fixnum m) {
   *n=m;
   while(i<m) ntab[i++]=Cnil;
    for(i=0 ; i< k; i++)
-   	for (l = tab[i];  type_of(l) == t_cons;)
+   	for (l = tab[i];  consp(l);)
 	  {int j =pack_hash(l->c.c_car)%m;
 	   ll=l->c.c_cdr;
 	   l->c.c_cdr = ntab[j];
@@ -398,20 +398,20 @@ object st, p;
    ((a)->st.st_fillp==(b)->st.st_fillp && \
 	 bcmp((a)->st.st_self,(b)->st.st_self,(a)->st.st_fillp)==0)
 
-	for (l = *ip;  type_of(l) == t_cons;  l = l->c.c_cdr)
+	for (l = *ip;  consp(l);  l = l->c.c_cdr)
 		if (string_eq(l->c.c_car, st)) {
 			intern_flag = INTERNAL;
 			END_NO_INTERRUPT;return(l->c.c_car);
 		}
 	ep = &P_EXTERNAL(p,j);
-	for (l = *ep;  type_of(l) == t_cons;  l = l->c.c_cdr)
+	for (l = *ep;  consp(l);  l = l->c.c_cdr)
 		if (string_eq(l->c.c_car, st)) {
 			intern_flag = EXTERNAL;
 			END_NO_INTERRUPT;return(l->c.c_car);
 		}
-	for (ul=p->p.p_uselist; type_of(ul)==t_cons; ul=ul->c.c_cdr)
+	for (ul=p->p.p_uselist; consp(ul); ul=ul->c.c_cdr)
 		for (l = P_EXTERNAL(ul->c.c_car,j);
-		     type_of(l) == t_cons;
+		     consp(l);
 		     l = l->c.c_cdr)
 			if (string_eq(l->c.c_car, st)) {
 				intern_flag = INHERITED;
@@ -451,20 +451,20 @@ object st, p;
 	if (type_of(st)==t_character) st=coerce_to_string(st);
 	j = pack_hash(st);
 	ip = &P_INTERNAL(p ,j);
-	for (l = *ip;  type_of(l) == t_cons;  l = l->c.c_cdr)
+	for (l = *ip;  consp(l);  l = l->c.c_cdr)
 		if (string_eq(l->c.c_car, st)) {
 			intern_flag = INTERNAL;
 			END_NO_INTERRUPT;return(l->c.c_car);
 		}
 	ep = &P_EXTERNAL(p,j);
-	for (l = *ep;  type_of(l) == t_cons;  l = l->c.c_cdr)
+	for (l = *ep;  consp(l);  l = l->c.c_cdr)
 		if (string_eq(l->c.c_car, st)) {
 			intern_flag = EXTERNAL;
 			END_NO_INTERRUPT;return(l->c.c_car);
 		}
-	for (ul=p->p.p_uselist; type_of(ul)==t_cons; ul=ul->c.c_cdr)
+	for (ul=p->p.p_uselist; consp(ul); ul=ul->c.c_cdr)
 		for (l = P_EXTERNAL(ul->c.c_car,j);
-		     type_of(l) == t_cons;
+		     consp(l);
 		     l = l->c.c_cdr)
 			if (string_eq(l->c.c_car, st)) {
 				intern_flag = INHERITED;
@@ -499,7 +499,7 @@ object s, p;
 
 L:
 	x = OBJNULL;
-	for (l = p->p.p_uselist; type_of(l) == t_cons; l = l->c.c_cdr) {
+	for (l = p->p.p_uselist; consp(l); l = l->c.c_cdr) {
 		y = find_symbol(s, l->c.c_car);
 		if (intern_flag == EXTERNAL) {
 			if (x == OBJNULL)
@@ -544,7 +544,7 @@ BEGIN:
 	} else
 		FEpackage_error(p,"Symbol not accessible.");
 	for (l = p->p.p_usedbylist;
-	     type_of(l) == t_cons;
+	     consp(l);
 	     l = l->c.c_cdr) {
 		x = find_symbol(s, l->c.c_car);
 		if (intern_flag && s != x &&
@@ -679,7 +679,7 @@ object x0, p;
 		return;
 	for (i = 0;  i < x->p.p_external_size;  i++)
 		for (l = P_EXTERNAL(x ,i);
-		     type_of(l) == t_cons;
+		     consp(l);
 		     l = l->c.c_cdr) {
 			y = find_symbol(l->c.c_car, p);
 			if (intern_flag && l->c.c_car != y
@@ -791,9 +791,9 @@ FFN(Fin_package)(object form)
 	vs_push(MMcar(form));
 	mark = vs_top;
  
- 	if ((type_of(vs_head) == t_cons) &&
+ 	if ((consp(vs_head)) &&
 	    (vs_head->c.c_car == sLquote) &&
-	    (type_of(vs_head->c.c_cdr) == t_cons) &&
+	    (consp(vs_head->c.c_cdr)) &&
 	    (vs_head->c.c_cdr->c.c_cdr = Cnil))
 	    vs_head = vs_head->c.c_cdr->c.c_car;
 	if ((type_of(vs_head) == t_character) ||
@@ -812,9 +812,9 @@ FFN(Fin_package)(object form)
 	    object q=Cnil;
 	    object p=form->c.c_cdr;
 
-	    while ((type_of(p) == t_cons) &&
+	    while ((consp(p)) &&
 	    	   ((p->c.c_car == sKuse) || (p->c.c_car == sKnicknames)) &&
-	           (type_of(p->c.c_cdr) == t_cons)) {
+	           (consp(p->c.c_cdr))) {
 		q=p->c.c_cdr->c.c_car;
 		if (q->c.c_car == sLquote)
 		    q = q->c.c_cdr->c.c_car;

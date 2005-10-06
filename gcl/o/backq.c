@@ -48,7 +48,7 @@ kwote_cdr(void)
 		    x->s.s_dbind == x)
 			return;
 		goto KWOTE;
-	} else if (type_of(x) == t_cons || type_of(x) == t_vector)
+	} else if (consp(x) || type_of(x) == t_vector)
 		goto KWOTE;
 	return;
 
@@ -68,7 +68,7 @@ kwote_car(void)
 		    x->s.s_dbind == x)
 			return;
 		goto KWOTE;
-	} else if (type_of(x) == t_cons || type_of(x) == t_vector)
+	} else if (consp(x) || type_of(x) == t_vector)
 		goto KWOTE;
 	return;
 
@@ -94,7 +94,7 @@ backq_cdr(object x)
 
 	cs_check(x);
 
-	if (type_of(x) != t_cons) {
+	if (!consp(x)) {
 		vs_push(x);
 		return(QUOTE);
 	}
@@ -118,7 +118,7 @@ backq_cdr(object x)
 				stack_cons();
 				return(LIST);
 			}
-			if (type_of(vs_head) == t_cons &&
+			if (consp(vs_head) &&
 			    vs_head->c.c_cdr == Cnil) {
 				vs_head = vs_head->c.c_car;
 				kwote_cdr();
@@ -255,7 +255,7 @@ backq_car(object x)
 
 	cs_check(x);
 
-	if (type_of(x) != t_cons) {
+	if (!consp(x)) {
 		vs_push(x);
 		return(QUOTE);
 	}

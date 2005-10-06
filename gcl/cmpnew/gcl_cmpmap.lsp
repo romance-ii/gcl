@@ -68,8 +68,8 @@
          (wt-nl "object " loc "= " (car args) ";")
          (pop args))
        (cond (*safe-compile*
-              (wt-nl "if(endp_prop(" (car handies) ")")
-              (dolist** (loc (cdr handies)) (wt "||endp_prop(" loc ")"))
+              (wt-nl "if(endp(" (car handies) ")")
+              (dolist** (loc (cdr handies)) (wt "||endp(" loc ")"))
               (wt "){"))
              (t
               (wt-nl "if(" (car handies) "==Cnil")
@@ -96,9 +96,9 @@
 	      (wt-nl (car handies) "=MMcdr(" (car handies) ");")
               (dolist** (loc (cdr handies))
 			(wt-nl loc "=MMcdr(" loc ");"))
-              (wt-nl "if(endp_prop(" (car handies)  ")")
+              (wt-nl "if(endp(" (car handies)  ")")
               (dolist** (loc (cdr handies))
-                        (wt "||endp_prop(" loc ")"))
+                        (wt "||endp(" loc ")"))
               (wt "){"))
              (t
               (wt-nl "if((" (car handies) "=MMcdr(" (car handies) "))==Cnil")
@@ -135,8 +135,8 @@
                  (wt-nl "object " loc "= " (car args) ";")
                  (pop args))
        (cond (*safe-compile*
-              (wt-nl "if(endp_prop(" (car handies) ")")
-              (dolist** (loc (cdr handies)) (wt "||endp_prop(" loc ")"))
+              (wt-nl "if(endp(" (car handies) ")")
+              (dolist** (loc (cdr handies)) (wt "||endp(" loc ")"))
               (wt "){"))
              (t
               (wt-nl "if(" (car handies) "==Cnil")

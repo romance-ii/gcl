@@ -99,7 +99,7 @@ lambda_bind(object *arg_top)
 
 	bds_check;
 	lambda = vs_head;
-	if (type_of(lambda) != t_cons)
+	if (!consp(lambda))
 		FEerror("No lambda list.", 0);
 	lambda_list = lambda->c.c_car;
 	body = lambda->c.c_cdr;
@@ -152,7 +152,7 @@ OPTIONAL:
 			goto SEARCH_DECLARE;
 		x = lambda_list->c.c_car;
 		lambda_list = lambda_list->c.c_cdr;
-		if (type_of(x) == t_cons) {
+		if (consp(x)) {
 			check_symbol(x->c.c_car);
 			check_var(x->c.c_car);
 			vs_push(x->c.c_car);
@@ -226,8 +226,8 @@ KEYWORD:
 			goto SEARCH_DECLARE;
 		x = lambda_list->c.c_car;
 		lambda_list = lambda_list->c.c_cdr;
-		if (type_of(x) == t_cons) {
-			if (type_of(x->c.c_car) == t_cons) {
+		if (consp(x)) {
+			if (consp(x->c.c_car)) {
 				if (type_of(x->c.c_car->c.c_car)!=t_symbol)
 				  /* FIXME better message */
 					FEunexpected_keyword(x->c.c_car->c.c_car);
@@ -296,7 +296,7 @@ AUX_L:
 			goto SEARCH_DECLARE;
 		x = lambda_list->c.c_car;
 		lambda_list = lambda_list->c.c_cdr;
-		if (type_of(x) == t_cons) {
+		if (consp(x)) {
 			check_symbol(x->c.c_car);
 			check_var(x->c.c_car);
 			vs_push(x->c.c_car);
@@ -336,10 +336,10 @@ SEARCH_DECLARE:
 				break;
 			continue;
 		}
-		if (type_of(form)!=t_cons || !isdeclare(form->c.c_car))
+		if (!consp(form) || !isdeclare(form->c.c_car))
 			break;
 		for (ds = form->c.c_cdr; !endp(ds); ds = ds->c.c_cdr) {
-			if (type_of(ds->c.c_car) != t_cons)
+			if (!consp(ds->c.c_car))
 				illegal_declare(form);
 			if (ds->c.c_car->c.c_car == sLspecial) {
 				vs = ds->c.c_car->c.c_cdr;
@@ -496,7 +496,7 @@ SEARCH_DECLARE:
 		eval_assign(temporary, aux[i].aux_init);
 		bind_var(aux[i].aux_var, temporary, aux[i].aux_spp);
 	}
-	if (type_of(body) != t_cons || body->c.c_car == form) {
+	if (!consp(body) || body->c.c_car == form) {
 		vs_reset;
 		vs_head = body;
 	} else {
@@ -519,10 +519,10 @@ REQUIRED_ONLY:
 				break;
 			continue;
 		}
-		if (type_of(form)!=t_cons || !isdeclare(form->c.c_car))
+		if (!consp(form) || !isdeclare(form->c.c_car))
 			break;
 		for (ds = form->c.c_cdr; !endp(ds); ds = ds->c.c_cdr) {
-			if (type_of(ds->c.c_car) != t_cons)
+			if (!consp(ds->c.c_car))
 				illegal_declare(form);
 			if (ds->c.c_car->c.c_car == sLspecial) {
 				vs = ds->c.c_car->c.c_cdr;
@@ -559,7 +559,7 @@ REQUIRED_ONLY:
 		bind_var(required[i].req_var,
 			 base[i],
 			 required[i].req_spp);
-	if (type_of(body) != t_cons || body->c.c_car == form) {
+	if (!consp(body) || body->c.c_car == form) {
 		vs_reset;
 		vs_head = body;
 	} else {
@@ -638,10 +638,10 @@ find_special(object body, struct bind_temp *start, struct bind_temp *end)
 				break;
 			continue;
 		}
-		if (type_of(form)!=t_cons || !isdeclare(form->c.c_car))
+		if (!consp(form) || !isdeclare(form->c.c_car))
 			break;
 		for (ds = form->c.c_cdr; !endp(ds); ds = ds->c.c_cdr) {
-			if (type_of(ds->c.c_car) != t_cons)
+			if (!consp(ds->c.c_car))
 				illegal_declare(form);
 			if (ds->c.c_car->c.c_car == sLspecial) {
 				vs = ds->c.c_car->c.c_cdr;

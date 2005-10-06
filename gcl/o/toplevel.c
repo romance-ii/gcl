@@ -47,7 +47,7 @@ FFN(Fdefun)(object args)
 
 	if (endp(args) || endp(MMcdr(args)))
 		FEtoo_few_argumentsF(args);
-	if (MMcadr(args) != Cnil && type_of(MMcadr(args)) != t_cons)
+	if (MMcadr(args) != Cnil && !consp(MMcadr(args)))
 		FEerror("~S is an illegal lambda-list.", 1, MMcadr(args));
 	name = MMcar(args);
 	if (type_of(name) != t_symbol) {
@@ -106,7 +106,7 @@ FFN(Fdefun)(object args)
 	    vs_popp;
 	    break;
 	  }
-	  if (type_of(form) != t_cons || form->c.c_car != sLdeclare)
+	  if (!consp(form) || form->c.c_car != sLdeclare)
 	    break;
 	}
 }
@@ -205,7 +205,7 @@ FFN(Fthe)(object args)
 		FEtoo_many_argumentsF(args);
 	eval(MMcadr(args));
 	args = MMcar(args);
-	if (type_of(args) == t_cons && MMcar(args) == sLvalues) {
+	if (consp(args) && MMcar(args) == sLvalues) {
 	  vs = vs_base;
 	  for (args=MMcdr(args); !endp(args) && vs<vs_top; args=MMcdr(args), vs++)
 	    /*			{ if (vs >= vs_top)

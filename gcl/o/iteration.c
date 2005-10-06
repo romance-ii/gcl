@@ -95,7 +95,7 @@ do_var_list(object var_list)
           
 
 
-		if (type_of(x) != t_cons)
+		if (!consp(x))
 			FEinvalid_form("The index, ~S, is illegal.", x);
 		y = MMcar(x);
 		check_var(y);

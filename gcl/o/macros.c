@@ -150,7 +150,7 @@ macro_def(object form)
 {
 	object head, fd;
 
-	if (type_of(form) != t_cons)
+	if (!consp(form))
 		return(Cnil);
 	head = MMcar(form);
 	if (type_of(head) != t_symbol)
@@ -266,7 +266,7 @@ macro_expand(object form)
 	   immediately.  Macro definitions are superseded by special-
 	   form definitions.
 	*/
-	if (type_of(form) != t_cons)
+	if (!consp(form))
 		return(form);
 	head = MMcar(form);
 	if (type_of(head) != t_symbol)
@@ -303,7 +303,7 @@ LOOP:
 	/* Check if the expanded form is again a macro form.  If not,
 	   reset the stack and return.
 	*/
-	if (type_of(form) != t_cons)
+	if (!consp(form))
 		goto END;
 	head = MMcar(form);
 	if (type_of(head) != t_symbol)

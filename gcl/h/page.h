@@ -99,7 +99,7 @@ enum sgc_type { SGC_NORMAL,    /* not allocated since the last sgc */
 /* check if a relblock address is new relblock */
 #define SGC_RELBLOCK_P(x)  ((char *)(x) >= rb_start)
 
-#define SGC_OR_M(x) (is_marked_or_free((object)x) || (is_cons((object)x) ? ON_SGC_PAGE((object)x) : ((object)x)->d.s))
+#define SGC_OR_M(x) (is_marked_or_free((object)x) || (valid_cdr((object)x) ? ON_SGC_PAGE((object)x) : ((object)x)->d.s))
 #ifndef SIGPROTV
 #define SIGPROTV SIGSEGV
 #endif

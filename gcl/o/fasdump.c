@@ -697,7 +697,7 @@ write_fasd(object obj)
 	  { if(x==Cnil)
 	      {PUT_OP(d_list1+l);
 	       break;}
-	    if(type_of(x)==t_cons)
+	    if(consp(x))
 	      {if ((int) d_list1 + ++l > (int) d_list4)
 	       {PUT_OP(d_list);
 		break;}
@@ -720,7 +720,7 @@ write_fasd(object obj)
        obj=obj->c.c_cdr;
        {int l=0;
 	while(1)
-	  {if (type_of(obj)==t_cons)
+	  {if (consp(obj))
 	     { enum circ_ind is_indexed=LATER_INDEX;
 	       if(HASHP(t_cons)){
 		 is_indexed=do_hash(obj,d_dot);
@@ -891,7 +891,7 @@ fasd_patch_sharp_cons(object x, int depth)
 {
 	for (;;) {
 		x->c.c_car = fasd_patch_sharp(x->c.c_car,depth+1);
-		if (type_of(x->c.c_cdr) == t_cons)
+		if (consp(x->c.c_cdr))
 			x = x->c.c_cdr;
 		else {
 			x->c.c_cdr = fasd_patch_sharp(x->c.c_cdr,depth+1);
@@ -1538,7 +1538,7 @@ read_fasl_vector(object in)
   result=FFN(read_fasd_top)(ar);
   if (type_of(result) !=t_vector) goto ERROR;
   last=result->v.v_self[result->v.v_fillp-1];
-  if(type_of(last)!=t_cons || last->c.c_car !=sSPinit)
+  if(!consp(last) || last->c.c_car !=sSPinit)
     goto ERROR;
   current_fasd.table->v.v_self = 0;
   FFN(close_fasd)(ar);

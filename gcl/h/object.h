@@ -193,7 +193,7 @@ struct fixnum_struct {
 #define make_free(a_)            {*(fixnum *)(a_)&=TYPE_BITS;(a_)->d.f=1;}
 #define make_unfree(a_)          {(a_)->d.f=0;}
 
-#define is_cons(a_)              (!(a_)->d.e || is_imm_fixnum(Zcdr(a_)))
+#define valid_cdr(a_)              (!(a_)->d.e || is_imm_fixnum(Zcdr(a_)))
 
 struct shortfloat_struct {
 
@@ -302,11 +302,17 @@ struct symbol {
 
 };
 
-EXTER char CnilCt[3*sizeof(struct symbol)] OBJ_ALIGN;
+/* EXTER char CnilCt[3*sizeof(struct symbol)] OBJ_ALIGN; */
 
-#define Cnil   ((object)(CnilCt))
-#define Ct     ((object)((char *)Cnil+sizeof(struct symbol)))
-#define Dotnil ((object)((char *)Ct+sizeof(struct symbol)))
+/* #define Cnil   ((object)(CnilCt)) */
+/* #define Ct     ((object)((char *)Cnil+sizeof(struct symbol))) */
+/* #define Dotnil ((object)((char *)Ct+sizeof(struct symbol))) */
+
+EXTER struct symbol Cnil_body OBJ_ALIGN;
+EXTER struct symbol Ct_body OBJ_ALIGN;
+
+#define Cnil ((object)&Cnil_body)
+#define Ct   ((object)&Ct_body)
 #define sLnil Cnil
 #define sLt Ct
 
@@ -912,11 +918,19 @@ struct freelist {
  Type_of.
 */
 #define type_of(x)       ({register object _z=(object)(x);\
-                           _z==Cnil || _z==Dotnil ? t_symbol : \
+                           _z==Cnil ? t_symbol : \
                            (is_imm_fixnum(_z) ? t_fixnum : \
-                           (is_cons(_z) ?  t_cons  : _z->d.t));})
+                           (valid_cdr(_z) ?  t_cons  : _z->d.t));})
 #define set_type_of(x,y) ({object _x=(object)(x);enum type _y=(y);*(fixnum *)(_x)&=TYPE_BITS;\
                            if (_y!=t_cons) {_x->d.e=1;_x->d.t=_y;}})
+
+#define consp(x)         ({register object _z=(object)(x);\
+                           (_z!=Cnil && !is_imm_fixnum(_z) && valid_cdr(_z));})
+#define listp(x)         ({register object _z=(object)(x);\
+                           (!is_imm_fixnum(_z) && valid_cdr(_z));})
+#define atom(x)          ({register object _z=(object)(x);\
+                           (_z==Cnil || is_imm_fixnum(_z) || !valid_cdr(_z));})
+
 /*
  Storage manager for each type.
 */
@@ -1223,34 +1237,37 @@ EXTER unsigned plong signals_allowed, signals_pending  ;
    initialized to be placed in .data as opposed to .bss and thereby
    initialized by the loader.  20050616 CM*/
 
-#define endp(x) ({\
-    static struct cons s_my_dot={Dotnil,Dotnil};\
-    object _x=(x);\
-    bool _b=FALSE;\
-    \
-    if (type_of(_x)==t_cons) {\
-       if (type_of(_x->c.c_cdr)!=t_cons && _x->c.c_cdr!=Cnil)\
-          s_my_dot.c_car=_x->c.c_cdr;\
-       else \
-          s_my_dot.c_car=Dotnil;\
-    } else {\
-       if (_x==s_my_dot.c_car)\
-          x=(object)&s_my_dot;\
-       else {\
-         s_my_dot.c_car=Dotnil;\
-         if (_x==Cnil || _x==Dotnil)\
-             _b=TRUE;\
-         else\
-             FEwrong_type_argument(sLlist, _x);\
-       }\
-    }\
-    _b;\
-    })
+/* #define endp(x) ({\ */
+/*     static struct cons s_my_dot={Dotnil,Dotnil};\ */
+/*     object _x=(x);\ */
+/*     bool _b=FALSE;\ */
+/*     \ */
+/*     if (type_of(_x)==t_cons) {\ */
+/*        if (type_of(_x->c.c_cdr)!=t_cons && _x->c.c_cdr!=Cnil)\ */
+/*           s_my_dot.c_car=_x->c.c_cdr;\ */
+/*        else \ */
+/*           s_my_dot.c_car=Dotnil;\ */
+/*     } else {\ */
+/*        if (_x==s_my_dot.c_car)\ */
+/*           x=(object)&s_my_dot;\ */
+/*        else {\ */
+/*          s_my_dot.c_car=Dotnil;\ */
+/*          if (_x==Cnil || _x==Dotnil)\ */
+/*              _b=TRUE;\ */
+/*          else\ */
+/*              FEwrong_type_argument(sLlist, _x);\ */
+/*        }\ */
+/*     }\ */
+/*     _b;\ */
+/*     }) */
 
-#define endp_prop(a) (type_of(a)==t_cons ? FALSE : ((a)==Cnil ? TRUE : (FEwrong_type_argument(sLlist, (a)),FALSE)))
+/* #define endp_prop(a) (type_of(a)==t_cons ? FALSE : ((a)==Cnil ? TRUE : (FEwrong_type_argument(sLlist, (a)),FALSE))) */
     
-#define proper_list(a) (type_of(a)==t_cons || (a)==Cnil)
-#define fix_dot(a) ((a) == Dotnil ? Cnil : (type_of(a)==t_cons && (a)->c.c_cdr==Dotnil ? (a)->c.c_car : (a))) 
+/* #define proper_list(a) (type_of(a)==t_cons || (a)==Cnil) */
+/* #define fix_dot(a) ((a) == Dotnil ? Cnil : (type_of(a)==t_cons && (a)->c.c_cdr==Dotnil ? (a)->c.c_car : (a)))  */
+
+#define endp(a) (type_of(a)==t_cons ? FALSE : ((a)==Cnil ? TRUE : ({TYPE_ERROR((a),sLlist);FALSE;})))
+
 
 #define eql(a_,b_)    ({register object _a=(a_);register object _b=(b_);_a==_b || eql1(_a,_b);})
 #define equal(a_,b_)  ({register object _a=(a_);register object _b=(b_);_a==_b || equal1(_a,_b);})

@@ -42,7 +42,7 @@ extern char etext;
 				extern char etext; \
 			     real_maxpage = MAXPAGE ; \
      	getrlimit(RLIMIT_DATA, &data_rlimit); \
-	real_maxpage = ((unsigned int)&etext/PAGESIZE + data_rlimit.rlim_cur/PAGESIZE); \
+	real_maxpage = ((unsigned long)&etext/PAGESIZE + data_rlimit.rlim_cur/PAGESIZE); \
 	if (real_maxpage > MAXPAGE) \
 		real_maxpage = MAXPAGE ; } while(0)
      

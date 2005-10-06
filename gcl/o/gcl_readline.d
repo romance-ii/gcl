@@ -168,7 +168,7 @@ static char *rl_completion_words_new(char *text, int state) {
   while (tp && tp != Cnil) {
 
     while (1) {
-      while (type_of(l)==t_cons) {
+      while (consp(l)) {
 	struct symbol sym=l->c.c_car->s;
 	l=l->c.c_cdr;
 	if (pref) {
@@ -389,7 +389,7 @@ FFN(siLreadline_init)() {
 			FEerror("~S is not a fixnum.", 1, case_type);
 		}
 
-		if (type_of(word_list)==t_cons || word_list==Cnil) {
+		if (listp(word_list)) {
 #ifdef RL_COMPLETION
 			/* First count the number of completion words and check their type */
 			words = 0;

@@ -647,28 +647,28 @@ object obj,a_list;
 	    return Cnil;
 	if (type_of(a_list) == t_symbol)
 	    a_list = symbol_value(a_list);
-	if (type_of(a_list) == t_cons)
+	if (consp(a_list))
 	    a_list = a_list->c.c_cdr;
 
 	while ((a_list != Cnil) &&
-	       (type_of(a_list) == t_cons) &&
+	       (consp(a_list)) &&
 	        !endp(a_list)) {
 	    if ((a_list->c.c_car != Cnil) &&
-		(type_of(a_list->c.c_car) == t_cons) &&
+		(consp(a_list->c.c_car)) &&
 		(a_list->c.c_car->c.c_car != Cnil) &&
 		(a_list->c.c_car->c.c_cdr != Cnil) &&
 		(ifuncall2(sLtypep,obj,a_list->c.c_car->c.c_car) != Cnil)) {
 		    if (pri == Cnil) {
 			    ret =a_list->c.c_car->c.c_cdr;
-			    if ((type_of(a_list->c.c_car->c.c_cdr) == t_cons) &&
-				(type_of(a_list->c.c_car->c.c_cdr->c.c_cdr) == t_cons) &&
+			    if ((consp(a_list->c.c_car->c.c_cdr)) &&
+				(consp(a_list->c.c_car->c.c_cdr->c.c_cdr)) &&
 		      (ifuncall2(sLtypep,a_list->c.c_car->c.c_cdr->c.c_cdr->c.c_car,sLnumber) != Cnil))
 				    pri =a_list->c.c_car->c.c_cdr->c.c_cdr->c.c_car;
 			    else
 				    pri =make_fixnum(0);
 		    } else
-		    if ((type_of(a_list->c.c_car->c.c_cdr) == t_cons) &&
-		        (type_of(a_list->c.c_car->c.c_cdr->c.c_cdr) == t_cons) &&
+		    if ((consp(a_list->c.c_car->c.c_cdr)) &&
+		        (consp(a_list->c.c_car->c.c_cdr->c.c_cdr)) &&
 	      (ifuncall2(sLtypep,a_list->c.c_car->c.c_cdr->c.c_cdr->c.c_car,sLnumber) != Cnil) &&
 		 (number_compare(a_list->c.c_car->c.c_cdr->c.c_cdr->c.c_car,pri)>0)) {
 			    ret =a_list->c.c_car->c.c_cdr;
@@ -677,7 +677,7 @@ object obj,a_list;
 	    }
 	    a_list = a_list->c.c_cdr;
 	}
-	if (type_of(ret) == t_cons)
+	if (consp(ret))
 	    ret = ret->c.c_car;
 	return ret;
 }
@@ -1212,14 +1212,14 @@ int level;
 		}
                 if (PRINTpretty) {
 		if (x->c.c_car == sLquote &&
-		    type_of(x->c.c_cdr) == t_cons &&
+		    consp(x->c.c_cdr) &&
 		    x->c.c_cdr->c.c_cdr == Cnil) {
 			write_ch('\'');
 			write_object(x->c.c_cdr->c.c_car, level);
 			break;
 		}
 		if (x->c.c_car == sLfunction &&
-		    type_of(x->c.c_cdr) == t_cons &&
+		    consp(x->c.c_cdr) &&
 		    x->c.c_cdr->c.c_cdr == Cnil) {
 			write_ch('#');
 			write_ch('\'');
@@ -1247,7 +1247,7 @@ int level;
 			y = x->c.c_car;
 			x = x->c.c_cdr;
 			write_object(y, level+1);
-			if (type_of(x) != t_cons) {
+			if (!consp(x)) {
 				if (x != Cnil) {
 					write_ch(INDENT);
 					write_str(". ");
@@ -1295,7 +1295,7 @@ int level;
 				write_str("()");
 			else
 				write_object(y, level+1);
-			if (type_of(x) != t_cons) {
+			if (!consp(x)) {
 				if (x != Cnil) {
 					write_ch(INDENT);
 					write_str(". ");

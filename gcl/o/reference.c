@@ -149,7 +149,7 @@ FFN(Ffunction)(object form)
 			vs_base = vs_top;
 			vs_push(MMcaddr(fd));
 		}
-	} else if (type_of(fun) == t_cons && MMcar(fun) == sLlambda) {
+	} else if (consp(fun) && MMcar(fun) == sLlambda) {
 		vs_base = vs_top;
 		vs_push(MMcdr(fun));
 		vs_base[0] = MMcons(lex_env[2], vs_base[0]);

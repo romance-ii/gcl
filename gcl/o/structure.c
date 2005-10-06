@@ -304,7 +304,7 @@ LFD(siLrplaca_nthcdr)(void)
 	check_arg(3);
 	if (type_of(vs_base[1]) != t_fixnum || fix(vs_base[1]) < 0)
 		FEerror("~S is not a non-negative fixnum.", 1, vs_base[1]);
-	if (type_of(vs_base[0]) != t_cons)
+	if (!consp(vs_base[0]))
 		FEerror("~S is not a cons.", 1, vs_base[0]);
 
 	for (i = fix(vs_base[1]), l = vs_base[0];  i > 0; --i) {
@@ -331,7 +331,7 @@ LFD(siLlist_nth)(void)
 	check_arg(2);
 	if (type_of(vs_base[0]) != t_fixnum || fix(vs_base[0]) < 0)
 		FEerror("~S is not a non-negative fixnum.", 1, vs_base[0]);
-	if (type_of(vs_base[1]) != t_cons)
+	if (!consp(vs_base[1]))
 		FEerror("~S is not a cons.", 1, vs_base[1]);
 
 	for (i = fix(vs_base[0]), l = vs_base[1];  i > 0; --i) {

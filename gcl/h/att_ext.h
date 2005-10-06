@@ -589,8 +589,8 @@ EXTER object sLspecial,sLdeclare;
 EXTER object sSvariable_documentation;
 EXTER object sSfunction_documentation;
 EXTER object sSsetf_function;
-#define setf_fn_form(a_) (type_of(a_)==t_cons && MMcar(a_)==sLsetf &&\
-                          type_of(MMcdr(a_))==t_cons && type_of(MMcadr(a_))==t_symbol &&\
+#define setf_fn_form(a_) (consp(a_) && MMcar(a_)==sLsetf &&\
+                          consp(MMcdr(a_)) && type_of(MMcadr(a_))==t_symbol &&\
                           MMcddr(a_)==Cnil)
 
 /*  typespec.c  */

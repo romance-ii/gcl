@@ -88,7 +88,7 @@ char *s;
 	set_up_string_register(s);
 	j = pack_hash(string_register);
 	ep = &P_EXTERNAL(lisp_package,j);
-	for (l = *ep;  type_of(l) == t_cons;  l = l->c.c_cdr)
+	for (l = *ep;  consp(l);  l = l->c.c_cdr)
 		if (string_eq(l->c.c_car, string_register))
 			return(l->c.c_car);
 	x = make_symbol(string_register);
@@ -153,11 +153,11 @@ char *s;
 	set_up_string_register(s);
 	j = pack_hash(string_register);
 	ep = & P_EXTERNAL(system_package,j);
-	for (l = *ep;  type_of(l) == t_cons;  l = l->c.c_cdr)
+	for (l = *ep;  consp(l);  l = l->c.c_cdr)
 		if (string_eq(l->c.c_car, string_register))
 			return(l->c.c_car);
 	for (l =  P_EXTERNAL(lisp_package,j);
-	     type_of(l) == t_cons;
+	     consp(l);
 	     l = l->c.c_cdr)
 		if (string_eq(l->c.c_car, string_register))
 		    error("name conflict --- can't make_si_ordinary");
@@ -218,7 +218,7 @@ char *s;
 	set_up_string_register(s);
 	j = pack_hash(string_register);
 	ep = &P_EXTERNAL(keyword_package,j);
-	for (l = *ep;  type_of(l) == t_cons;  l = l->c.c_cdr)
+	for (l = *ep;  consp(l);  l = l->c.c_cdr)
 		if (string_eq(l->c.c_car, string_register))
 			return(l->c.c_car);
 	x = make_symbol(string_register);
@@ -251,7 +251,7 @@ object place, indicator, deflt;
 {
 
 	object l;
-#define cendp(obj) ((type_of(obj)!=t_cons))
+#define cendp(obj) ((!consp(obj)))
 	for (l = place;  !cendp(l);  l = l->c.c_cdr->c.c_cdr) {
 		if (cendp(l->c.c_cdr))
 			break;
@@ -439,7 +439,7 @@ object x;
 {
 object y;
  if (type_of(x)!=t_symbol) FEwrong_type_argument(sLsymbol,x);
-  for (y=x->s.s_plist; type_of(y)==t_cons ; y=y->c.c_cdr->c.c_cdr)
+  for (y=x->s.s_plist; consp(y) ; y=y->c.c_cdr->c.c_cdr)
    {if(y->c.c_car==siSpname) return(y->c.c_cdr->c.c_car);}
    {BEGIN_NO_INTERRUPT;		
     y = alloc_simple_string(x->s.s_fillp);

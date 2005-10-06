@@ -814,7 +814,7 @@ EVAL:
 	} else
 		eval1 = 0;
 
-	if (type_of(form) == t_cons)
+	if (consp(form))
 		goto APPLICATION;
 
 	if (type_of(form) != t_symbol)  RETURN1(form);
@@ -830,7 +830,7 @@ EVAL:
 
 	default:
 		/*  x = lex_var_sch(form);  */
-		for (x = lex_env[0];  type_of(x) == t_cons;  x = x->c.c_cdr)
+		for (x = lex_env[0];  consp(x);  x = x->c.c_cdr)
 			if (x->c.c_car->c.c_car == form) {
 				x = x->c.c_car->c.c_cdr;
 				if (endp(x))
@@ -875,7 +875,7 @@ APPLICATION:
 		return Ivs_values();
 	}
 	/*  x = lex_fd_sch(fun);  */
-	for (x = lex_env[1];  type_of(x) == t_cons;  x = x->c.c_cdr)
+	for (x = lex_env[1];  consp(x);  x = x->c.c_cdr)
 		if (x->c.c_car->c.c_car == fun) {
 			x = x->c.c_car;
 			if (MMcadr(x) == sLmacro) {
@@ -931,7 +931,7 @@ EVAL_ARGS:
 		 }
 
 LAMBDA:
-	if (type_of(fun) == t_cons && MMcar(fun) == sLlambda) {
+	if (consp(fun) && MMcar(fun) == sLlambda) {
 	  x = listA(4,sLlambda_closure,lex_env[0],lex_env[1],lex_env[2],Mcdr(fun));
 	  goto EVAL_ARGS;
 	}
@@ -984,7 +984,7 @@ EVAL:
 	} else
 		eval1 = 0;
 
-	if (type_of(form) == t_cons)
+	if (consp(form))
 		goto APPLICATION;
 
 	if (type_of(form) != t_symbol) {
@@ -1008,7 +1008,7 @@ EVAL:
 
 	default:
 		/*  x = lex_var_sch(form);  */
-		for (x = lex_env[0];  type_of(x) == t_cons;  x = x->c.c_cdr)
+		for (x = lex_env[0];  consp(x);  x = x->c.c_cdr)
 			if (x->c.c_car->c.c_car == form) {
 				x = x->c.c_car->c.c_cdr;
 				if (endp(x))
@@ -1057,7 +1057,7 @@ APPLICATION:
 		return;
 	}
 	/*  x = lex_fd_sch(fun);  */
-	for (x = lex_env[1];  type_of(x) == t_cons;  x = x->c.c_cdr)
+	for (x = lex_env[1];  consp(x);  x = x->c.c_cdr)
 		if (x->c.c_car->c.c_car == fun) {
 			x = x->c.c_car;
 			if (MMcadr(x) == sLmacro) {
@@ -1090,7 +1090,7 @@ EVAL_ARGS:
 	form = form->c.c_cdr;
 	base = vs_top;
 	top = vs_top;
-	while(!endp_prop(form)) {
+	while(!endp(form)) {
 		eval(MMcar(form));
 		top[0] = vs_base[0];
 		vs_top = ++top;
@@ -1112,7 +1112,7 @@ EVAL_ARGS:
 	return;
 
 LAMBDA:
-	if (type_of(fun) == t_cons && MMcar(fun) == sLlambda) {
+	if (consp(fun) && MMcar(fun) == sLlambda) {
 		temporary = make_cons(lex_env[2], fun->c.c_cdr);
 		temporary = make_cons(lex_env[1], temporary);
 		temporary = make_cons(lex_env[0], temporary);

@@ -27,13 +27,13 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 
-#undef endp
+/* #undef endp */
 
-#define	endp(obje)	((enum type)(type_of(endp_temp = (obje))) == t_cons ? \
-			 FALSE : endp_temp == Cnil ? TRUE : \
-			 (FEwrong_type_argument(sLlist, endp_temp),FALSE))
+/* #define	endp(obje)	((enum type)(type_of(endp_temp = (obje))) == t_cons ? \ */
+/* 			 FALSE : endp_temp == Cnil ? TRUE : \ */
+/* 			 (FEwrong_type_argument(sLlist, endp_temp),FALSE)) */
 
-object endp_temp;
+/* object endp_temp; */
 
 /*
 	I know the following name is not good.
@@ -84,7 +84,7 @@ elt(seq, index)
 object seq;
 int index;
 {
-	object endp_temp;
+/* 	object endp_temp; */
 
 	int i,max;
 	object l;
@@ -156,7 +156,7 @@ object seq;
 int index;
 object val;
 {
-	object endp_temp;
+/* 	object endp_temp; */
 
 	int i,max;
 	object l;
@@ -240,14 +240,14 @@ E:
 			if ((e -= s) < 0)
 				goto ILLEGAL_START_END;
 		while (s-- > 0) {
-			if (type_of(sequence) != t_cons)
+			if (!consp(sequence))
 				goto ILLEGAL_START_END;
 			sequence = sequence->c.c_cdr;
 		}
 		if (e < 0)
 			@(return `copy_list(sequence)`)
 		for (i = 0;  i < e;  i++) {
-			if (type_of(sequence) != t_cons)
+			if (!consp(sequence))
 				goto ILLEGAL_START_END;
 			vs_check_push(sequence->c.c_car);
 			sequence = sequence->c.c_cdr;
@@ -383,7 +383,7 @@ object x;
 		return(0);
 	case t_cons:
 
-#define cendp(obj) ((type_of(obj)!=t_cons))
+#define cendp(obj) ((!consp(obj)))
 		for (i = 0;  !cendp(x);  i++, x = x->c.c_cdr)
 			;
 		if (x==Cnil) return(i);
@@ -418,7 +418,7 @@ object
 reverse(seq)
 object seq;
 {
-	object endp_temp;
+/* 	object endp_temp; */
 
 	object x, y, *v;
 	int i, j, k;
@@ -530,7 +530,7 @@ object
 nreverse(seq)
 object seq;
 {
-	object endp_temp;
+/* 	object endp_temp; */
 
 	object x, y, z;
 	int i, j, k;

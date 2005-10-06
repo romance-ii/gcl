@@ -547,10 +547,11 @@
      "#define Cons_Macro" n (format nil " struct cons ~{STcons~a ~^,~};" nums)
      )))
 
-(push '((fixnum t t) t #.(flags) 
-	"(STcons#0.t=t_cons,STcons#0.m=0,STcons#0.c_car=(#1),
-              STcons#0.c_cdr=(#2),(object)&STcons#0)")
-        (get 'stack-cons 'inline-always))    
+;;FIXME update this
+;(push '((fixnum t t) t #.(flags) 
+;	"(STcons#0.t=t_cons,STcons#0.m=0,STcons#0.c_car=(#1),
+;              STcons#0.c_cdr=(#2),(object)&STcons#0)")
+;        (get 'stack-cons 'inline-always))    
 
 ;; ---------- end stack-let for consing on stack ---------
 

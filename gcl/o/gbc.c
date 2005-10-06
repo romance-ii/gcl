@@ -218,7 +218,7 @@ mark_cons(object x) {
   
  BEGIN:  
   if (NULL_OR_ON_C_STACK(x->c.c_car)) goto MARK_CDR;
-  if (type_of(x->c.c_car) == t_cons) {
+  if (consp(x->c.c_car)) {
     if (is_marked_or_free(x->c.c_car))
       ;
     else {
@@ -231,7 +231,7 @@ mark_cons(object x) {
   if (NULL_OR_ON_C_STACK(x->c.c_cdr))
     return;
   x = Scdr(x);
-  if (type_of(x) == t_cons) {
+  if (consp(x)) {
     if (is_marked_or_free(x))
       return;
     mark(x);

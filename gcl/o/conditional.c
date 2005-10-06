@@ -65,7 +65,7 @@ FFN(Fcond)(object args)
 
 	while (!endp(args)) {
 		clause = MMcar(args);
-		if (type_of(clause) != t_cons)
+		if (!consp(clause))
 			FEerror("~S is an illegal COND clause.",1,clause);
 		eval(MMcar(clause));
 		if (vs_base[0] != Cnil) {
@@ -105,11 +105,11 @@ FFN(Fcase)(object arg)
 	arg = MMcdr(arg);
 	while (!endp(arg)) {
 		clause = MMcar(arg);
-		if (type_of(clause) != t_cons)
+		if (!consp(clause))
 			FEerror("~S is an illegal CASE clause.",1,clause);
 		key = MMcar(clause);
 		conseq = MMcdr(clause);
-		if (type_of(key) == t_cons)
+		if (consp(key))
 			do {
 				if (eql(MMcar(key),top[0]))
 					goto FOUND;

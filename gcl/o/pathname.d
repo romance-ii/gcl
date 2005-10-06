@@ -160,7 +160,7 @@ object key;
 {
 	object o=symbol_value(sSApathname_resolveA);
 	if (o == key) return 1;
-	while (type_of(o) == t_cons) {
+	while (consp(o)) {
 	    if (o->c.c_car==key) return 1;
 	    o=o->c.c_cdr;
 	}
@@ -185,17 +185,17 @@ object item,a_list;
 	    a_list = symbol_value(a_list);
 
 	while ((a_list != Cnil) &&
-	       (type_of(a_list) == t_cons) &&
+	       (consp(a_list)) &&
 	        !endp(a_list))
 	    if ((type_of(item) == t_string) &&
 	    	(a_list->c.c_car != Cnil) &&
-		(type_of(a_list->c.c_car) == t_cons) &&
+		(consp(a_list->c.c_car)) &&
 		(type_of(a_list->c.c_car->c.c_car) == t_string) &&
 		(string_equal(item, a_list->c.c_car->c.c_car) == TRUE))
 		    return(a_list->c.c_car);
 	    else
 	    if ((a_list->c.c_car != Cnil) &&
-		(type_of(a_list->c.c_car) == t_cons) &&
+		(consp(a_list->c.c_car)) &&
 		(type_of(a_list->c.c_car->c.c_car) == type_of(item)) &&
 		equal(item,a_list->c.c_car->c.c_car))
 		    return(a_list->c.c_car);
@@ -211,7 +211,7 @@ object item,a_list;
 {
      object r;
      r=get_pathname_lookup(item,a_list);
-     if (type_of(r)==t_cons) return r->c.c_cdr;
+     if (consp(r)) return r->c.c_cdr;
      return Cnil;
 }
 
@@ -237,9 +237,9 @@ object item,a_list,value;
 	if (item == Cnil) 
 	    return Cnil;
 
-	if (type_of(a_list) == t_cons) {
+	if (consp(a_list)) {
 	    l=get_pathname_lookup(item,a_list);
-	    if (type_of(l)==t_cons) {
+	    if (consp(l)) {
 		l->c.c_cdr = value;
 		return(a_list);
 	    }
@@ -360,23 +360,23 @@ object x;
 	} else 
 	if ((x->pn.pn_directory != Cnil) &&
 	    (x->pn.pn_directory != sKunspecific) &&
-	    (type_of(x->pn.pn_directory) != t_cons)) {
+	    (!consp(x->pn.pn_directory))) {
 	    file_error("Invalid directory in pathname ~S.",x);
 	    return;
 	}
-	if ((type_of(x->pn.pn_host) == t_cons) &&
+	if ((consp(x->pn.pn_host)) &&
 	    (x->pn.pn_host->c.c_cdr == Cnil))
 	    x->pn.pn_host=x->pn.pn_host->c.c_car;
-	if ((type_of(x->pn.pn_device) == t_cons) &&
+	if ((consp(x->pn.pn_device)) &&
 	    (x->pn.pn_device->c.c_cdr == Cnil))
 	    x->pn.pn_device=x->pn.pn_device->c.c_car;
-	if ((type_of(x->pn.pn_name) == t_cons) &&
+	if ((consp(x->pn.pn_name)) &&
 	    (x->pn.pn_name->c.c_cdr == Cnil))
 	    x->pn.pn_name=x->pn.pn_name->c.c_car;
-	if ((type_of(x->pn.pn_type) == t_cons) &&
+	if ((consp(x->pn.pn_type)) &&
 	    (x->pn.pn_type->c.c_cdr == Cnil))
 	    x->pn.pn_type=x->pn.pn_type->c.c_car;
-	if ((type_of(x->pn.pn_version) == t_cons) &&
+	if ((consp(x->pn.pn_version)) &&
 	    (x->pn.pn_version->c.c_cdr == Cnil))
 	    x->pn.pn_version=x->pn.pn_version->c.c_car;
 
@@ -419,7 +419,7 @@ object x;
 	}
 	d=x->pn.pn_directory;
 	start=1; count=-1; l=Cnil;
-	while (type_of(d) == t_cons) {
+	while (consp(d)) {
 	    t=d->c.c_car;
 
 	    if (start && (t==sKrelative))
@@ -463,7 +463,7 @@ object x;
 	constrain_pathname(x);
 
 	f=1; d=x->pn.pn_directory; l=Cnil;
-	while (type_of(d) == t_cons) {
+	while (consp(d)) {
 	    if ((l != Cnil) &&
 		(d->c.c_car == sKcurrent)) {
 		    l->c.c_cdr = d->c.c_cdr;
@@ -476,9 +476,9 @@ object x;
 
 	while (f) {
 	    f=0; d=x->pn.pn_directory; l=Cnil;
-	    while (type_of(d) == t_cons) {
+	    while (consp(d)) {
 		if ((l ==Cnil) &&
-		    (type_of(d->c.c_cdr) == t_cons) &&
+		    (consp(d->c.c_cdr)) &&
 		    (d->c.c_cdr->c.c_car == sKback) &&
 		    (d->c.c_car != sKback) &&
 		    (d->c.c_car != sKup) &&
@@ -489,7 +489,7 @@ object x;
 			f=1; /* do it again */
 		} else
 		if ((l != Cnil) &&
-		    (type_of(d->c.c_cdr) == t_cons) &&
+		    (consp(d->c.c_cdr)) &&
 		    (d->c.c_cdr->c.c_car == sKback) &&
 		    (d->c.c_car != sKback) &&
 		    (d->c.c_car != sKup) &&
@@ -506,7 +506,7 @@ object x;
 	}
 
 	d=x->pn.pn_directory; 
-	while (type_of(d) == t_cons) {
+	while (consp(d)) {
 	    if ((d->c.c_car == sKback) || (d->c.c_car == sKparent))
 	        d->c.c_car = sKup;
 	    d=d->c.c_cdr;
@@ -537,12 +537,12 @@ object host, device, directory, name, type, version, casekey;
 	    x->pn.pn_host = pathname_case_word(host,sKcommon);
 	    x->pn.pn_device = pathname_case_word(device,sKcommon);
 
-	    if (type_of(x->pn.pn_directory) == t_cons) {
+	    if (consp(x->pn.pn_directory)) {
 		z = x->pn.pn_directory;
 		vs_push(z);
 		y = make_cons( pathname_case_word(z->c.c_car,sKcommon), Cnil);
 		x->pn.pn_directory=y;
-		for (z = z->c.c_cdr; type_of(z) == t_cons; z = z->c.c_cdr) {
+		for (z = z->c.c_cdr; consp(z); z = z->c.c_cdr) {
 		    y->c.c_cdr = make_cons(
 			pathname_case_word(z->c.c_car,sKcommon), Cnil);
 		    y = y->c.c_cdr;
@@ -997,7 +997,7 @@ object path, defaults, default_version;
 		type = path->pn.pn_type;
 
 	if (defaults->pn.pn_directory==Cnil ||
-	   ((type_of(path->pn.pn_directory)==t_cons) &&
+	   ((consp(path->pn.pn_directory)) &&
 	    ((path->pn.pn_directory->c.c_car==sKroot) ||
 	     (path->pn.pn_directory->c.c_car==sKabsolute) ||
 	     (path->pn.pn_directory->c.c_car==sKhome) ||
@@ -1007,15 +1007,15 @@ object path, defaults, default_version;
 		directory=path->pn.pn_directory;
 	else
 	if ((path->pn.pn_directory==Cnil) ||
-	   ((type_of(path->pn.pn_directory)==t_cons) &&
+	   ((consp(path->pn.pn_directory)) &&
 	    (path->pn.pn_directory->c.c_car==sKrelative) &&
 	    (path->pn.pn_directory->c.c_cdr==Cnil)))
 		directory=defaults->pn.pn_directory;
 	else /* barf before merging junk */
-	if (type_of(path->pn.pn_directory)!=t_cons)
+	if (!consp(path->pn.pn_directory))
 		file_error("Invalid pathname component ~S.", path->pn.pn_directory);
 	else /* barf before merging junk */
-	if (type_of(defaults->pn.pn_directory)!=t_cons)
+	if (!consp(defaults->pn.pn_directory))
 		file_error("Invalid pathname component ~S.", defaults->pn.pn_directory);
 	else /* read: Roger Kehr vs. Bruno Haible
 	    (or a b b) is the same as (or a b), so
@@ -1158,7 +1158,7 @@ object x;
 	}
 
   	l = x->pn.pn_directory;
-	if (type_of(l) == t_cons) {
+	if (consp(l)) {
 	    y = l->c.c_car;
 	    if ((y == sKroot) || (y == sKabsolute)) {
 		    if (!flag_host)
@@ -1306,7 +1306,7 @@ object pathname;
     }
     if (pathname_resolve(sKdevice) &&
 	(type_of(pathname->pn.pn_device) == t_string) &&
-	(type_of(pathname_lookup(pathname->pn.pn_device,sSApathname_deviceA)) == t_cons)) {
+	(consp(pathname_lookup(pathname->pn.pn_device,sSApathname_deviceA)))) {
 	    pathname = search_local_pathname(pathname,32);
 	    vs_push(pathname);
     }
@@ -1536,12 +1536,12 @@ LFD(Lpathnamep)(void)
 	    if (type_of(x) == t_string)
 		x=pathname_case_word(x,sKcommon);
 	    else
-	    if (type_of(x) == t_cons) {
+	    if (consp(x)) {
 		z = x;
 		y = make_cons( pathname_case_word(z->c.c_car,sKcommon), Cnil);
 		x = y;
 		vs_push(y);
-		for (z = z->c.c_cdr; type_of(z) == t_cons; z = z->c.c_cdr) {
+		for (z = z->c.c_cdr; consp(z); z = z->c.c_cdr) {
 		    y->c.c_cdr = make_cons(
 			pathname_case_word(z->c.c_car,sKcommon), Cnil);
 		    y = y->c.c_cdr;
@@ -1657,8 +1657,8 @@ LFD(Lhost_namestring)(void)
 	if (defaults->pn.pn_type == sKunspecific) defaults->pn.pn_type = Cnil;
 	if (defaults->pn.pn_version == sKunspecific) defaults->pn.pn_version = Cnil;
 
-	if ((type_of(path->pn.pn_directory)==t_cons) &&
-	    (type_of(defaults->pn.pn_directory)==t_cons) &&
+	if ((consp(path->pn.pn_directory)) &&
+	    (consp(defaults->pn.pn_directory)) &&
 	    ((path->pn.pn_directory->c.c_car==sKroot) ||
 	     (path->pn.pn_directory->c.c_car==sKabsolute) ||
 	     (path->pn.pn_directory->c.c_car==sKhome) ||
@@ -1667,7 +1667,7 @@ LFD(Lhost_namestring)(void)
 	      (path->pn.pn_directory->c.c_car->st.st_self[0] == '~')))) {
 	    object dir=path->pn.pn_directory;
 	    object def=defaults->pn.pn_directory;
-	    while ((type_of(dir)==t_cons) && (type_of(def)==t_cons) &&
+	    while ((consp(dir)) && (consp(def)) &&
 		     equalp(dir->c.c_car,def->c.c_car)) {
 		     	dir=dir->c.c_cdr;
 		     	def=def->c.c_cdr;
@@ -1718,7 +1718,7 @@ object o;
 
 	if (o == Cnil)
 	    return 0;
-        while (type_of(o) == t_cons) {
+        while (consp(o)) {
 	    if (wild_component_p(o->c.c_car))
 	        return 1;
 	    o=o->c.c_cdr;
@@ -1840,7 +1840,7 @@ object build;
 	    if ((*p == '*') || ((*p == '?') && (*s != '*'))) {
 	        if ((pl == 1) && ((*p == '*') ||
 			((*p == '?') && (*s != '*') && (sl == 1)))) {
-		    if (type_of(build)==t_cons) {
+		    if (consp(build)) {
 		        char *t;
 			t=token->st.st_self;
 			while ((sl > 0) && *s) {
@@ -1857,7 +1857,7 @@ object build;
 		    if (((*try == *next) || (*next == '?') || (*next == '*')) &&
 			((r=pathstring_match_range(
 				try,s+sl-try, next,pl-1, build))!=Cnil)) {
-			    if (type_of(r)==t_cons) {
+			    if (consp(r)) {
 				char *t;
 				t=token->st.st_self;
 				while ((sl > 0) && (s<try) && *s) {
@@ -1882,7 +1882,7 @@ object build;
 		return Cnil;
 	}
 	if ((*p == '*') && (pl == 1)) {
-	    if (type_of(build)==t_cons) {
+	    if (consp(build)) {
 		token->st.st_fillp=0;
 		build=pathstring_match_add(build,token);
 	    }
@@ -1904,7 +1904,7 @@ object s,m,b;
 	object r;
 
 	if ((m == sKwild) || (m == sKwildinf))
-	    r = type_of(b) == t_cons ? pathstring_match_add(b,s) : b;
+	    r = consp(b) ? pathstring_match_add(b,s) : b;
 	else
 	if ((s == m) || (m == sKunspecific) || (m == Cnil) ||
 	   ((m == sKnewest) && ((s == Cnil) ||
@@ -1925,7 +1925,7 @@ static object
 pathlist_match_p(s,m,b)
 object s,m,b;
 {
-	while ((type_of(s) == t_cons) && (type_of(m) == t_cons)) {
+	while ((consp(s)) && (consp(m))) {
 	    if (pathobject_match_p(s->c.c_car,m->c.c_car,Ct) == Cnil)
 		return Cnil;
 	    if (m->c.c_car == sKwildinf) {
@@ -1934,11 +1934,11 @@ object s,m,b;
 		next = m->c.c_cdr;
 		if (next == Cnil) {
 		    r = b;
-		    if (type_of(b) == t_cons) {
+		    if (consp(b)) {
 			t = make_cons(Cnil,Cnil);
 			vs_push(t);
 			r = pathstring_match_add(r,t);
-			while (type_of(s) == t_cons) {
+			while (consp(s)) {
 			    if (t->c.c_car == Cnil)
 			        t->c.c_car = s->c.c_car;
 		            else {
@@ -1950,14 +1950,14 @@ object s,m,b;
 		    }
 		    return r;
 		}
-	        while (type_of(try) == t_cons) {
+	        while (consp(try)) {
 		    if ((pathobject_match_p(try->c.c_car,next->c.c_car,Ct) != Cnil) &&
 			((r=pathlist_match_p(try,next,b))!= Cnil)) {
-			    if (type_of(r) == t_cons) {
+			    if (consp(r)) {
 				t = make_cons(Cnil,Cnil);
 				vs_push(t);
 				r = pathstring_match_add(r,t);
-				while ((type_of(s) == t_cons) && (s != try)) {
+				while ((consp(s)) && (s != try)) {
 				    if (t->c.c_car == Cnil)
 					t->c.c_car = s->c.c_car;
 				    else {
@@ -1999,11 +1999,11 @@ object s,m,b;
 #ifdef ANSI_COMMON_LISP
 	    (!pathname_resolve(pathKansi)) &&
 #endif
-	    (type_of(m) == t_cons)) {
+	    (consp(m))) {
 	    if ((m->c.c_car == sKabsolute) ||
 		 (m->c.c_car == sKrelative))
 		    m=m->c.c_cdr;
-	    if ((type_of(m) == t_cons) &&
+	    if ((consp(m)) &&
 	        (m->c.c_car == sKwildinf) &&
 		(m->c.c_cdr == Cnil)) {
 		    vs_push(make_cons(Cnil,Cnil));
@@ -2011,7 +2011,7 @@ object s,m,b;
 		    return b;
 	    }
 	}
-	if ((type_of(s) == t_cons) && (type_of(m) == t_cons)) {
+	if ((consp(s)) && (consp(m))) {
 	    /* skip relative/absolute */
 #ifdef ANSI_COMMON_LISP
 	    if (!pathname_resolve(pathKansi)) {
@@ -2047,7 +2047,7 @@ object s,m,b;
 	x=make_cons(sKstart,Cnil);
 	vs_push(x);
 	x=pathobject_match_p(s,m,x);
-	if ((type_of(x) == t_cons) && (x->c.c_car == sKstart))
+	if ((consp(x)) && (x->c.c_car == sKstart))
 	    x=Ct;
 	vs_reset;
 
@@ -2100,7 +2100,7 @@ object s,m,b;
 	x=make_cons(sKstart,Cnil);
 	vs_push(x);
 	x=pathname_match_p(s,m,x);
-	if ((type_of(x) == t_cons) && (x->c.c_car == sKstart))
+	if ((consp(x)) && (x->c.c_car == sKstart))
 	    x=Ct;
 	vs_reset;
 
@@ -2117,7 +2117,7 @@ object s,*xa;
 
 
 	if (s == sKwild) {
-	    if ((type_of(*xa) == t_cons) &&
+	    if ((consp(*xa)) &&
 		(type_of((*xa)->c.c_car)==t_string)) {
 		p=(*xa)->c.c_car;
 		for (j=0;j<p->st.st_fillp; j++)
@@ -2125,7 +2125,7 @@ object s,*xa;
 		p=(*xa)->c.c_cdr;
 		*xa=p;
 	    } else
-	    if ((type_of(*xa) == t_cons) &&
+	    if ((consp(*xa)) &&
 		(type_of((*xa)->c.c_car)==t_symbol)) {
 		p=*xa;
 		(*xa)=(*xa)->c.c_cdr;
@@ -2141,7 +2141,7 @@ object s,*xa;
 	    	if ((s->st.st_self[i]!='*') && (s->st.st_self[i]!='?'))
 		    *t++=s->st.st_self[i];
 		else
-		if ((type_of(*xa) == t_cons) &&
+		if ((consp(*xa)) &&
 		    (type_of((*xa)->c.c_car)==t_string)) {
 		    p=(*xa)->c.c_car;
 		    for (j=0;j<p->st.st_fillp; j++)
@@ -2178,11 +2178,11 @@ object s,m,p;
 	x=make_cons(sKstart,Cnil);
 	vs_push(x);
 	x=pathname_match_p(s,m,x);
-	if ((type_of(x) == t_cons) && (x->c.c_car == sKstart))
+	if ((consp(x)) && (x->c.c_car == sKstart))
 	    x=Ct;
 	vs_push(x);
 
-	if (type_of(x) == t_cons) {
+	if (consp(x)) {
 	    r = make_pathname(Cnil,Cnil,Cnil,Cnil,Cnil,Cnil,Cnil);
 	    vs_push(r);
 
@@ -2208,14 +2208,14 @@ object s,m,p;
 	    if (wild_component_p(m->pn.pn_directory)) {
 		y=p->pn.pn_directory;
 		z=Cnil;
-		while (type_of(y) == t_cons) {
+		while (consp(y)) {
 		    if (y->c.c_car == sKwildinf) {
-			if (type_of(x)==t_cons) {
+			if (consp(x)) {
 			    t = x->c.c_car;
-			    if ((type_of(t)!=t_cons) && (t!=Cnil) && (t!=sKunspecific))
+			    if ((!consp(t)) && (t!=Cnil) && (t!=sKunspecific))
 				FEerror("Invalid wild pathobject_patch ~S for sKwildinf",1,t);
 			    if ((t->c.c_car != Cnil) && (t!=sKunspecific))
-			    while (type_of(t)==t_cons) {
+			    while (consp(t)) {
 				if (z == Cnil) {
 				    z = make_cons(t->c.c_car,Cnil);
 				    r->pn.pn_directory=z;
@@ -2320,9 +2320,9 @@ object path;
 	if ((l = pathname_lookup(s->pn.pn_host,sSApathname_logicalA)) == Cnil)
 	    return(file_error("Invalid host in logical pathname ~S.",s));
 
-	while (type_of(l) == t_cons) {
-	    if ((type_of(l->c.c_car) == t_cons) &&
-	    	(type_of(l->c.c_car->c.c_cdr) == t_cons) &&
+	while (consp(l)) {
+	    if ((consp(l->c.c_car)) &&
+	    	(consp(l->c.c_car->c.c_cdr)) &&
 	        ((r=translate_pathname(s,l->c.c_car->c.c_car,
 		    l->c.c_car->c.c_cdr->c.c_car)) != Cnil)) {
 		vs_push(r);
@@ -2363,18 +2363,18 @@ object path;
 	}
 	/* a device lookup of true or nil means a real device - only cons are translated */
 	if ((s->pn.pn_device != Cnil) && (s->pn.pn_device != sKunspecific)) {
-	    if (type_of(l=pathname_lookup(s->pn.pn_device,sSApathname_deviceA)) != t_cons) {
+	    if (!consp(l=pathname_lookup(s->pn.pn_device,sSApathname_deviceA))) {
 		vs_reset;
 		return path;
 	    } 
 	} else {
-	    if (type_of(pathname_lookup(s->pn.pn_host,sSApathname_logicalA)) == t_cons) {
+	    if (consp(pathname_lookup(s->pn.pn_host,sSApathname_logicalA))) {
 	        vs_push(r=translate_logical_pathname(path,c));
 		r=search_local_pathname(r,c);
 		vs_reset;
 		return r;
 	    } else
-	    if (type_of(l=pathname_lookup(s->pn.pn_host,sSApathname_virtualA)) != t_cons) {
+	    if (!consp(l=pathname_lookup(s->pn.pn_host,sSApathname_virtualA))) {
 		if (l == Ct) {
 		    r=make_pathname(Cnil,Cnil,
 			s->pn.pn_directory,
@@ -2388,17 +2388,17 @@ object path;
 	    }
 	}
 
-	while (type_of(l) == t_cons) {
-	    if ((type_of(l->c.c_car) == t_cons) &&
-	    	(type_of(l->c.c_car->c.c_cdr) == t_cons) &&
+	while (consp(l)) {
+	    if ((consp(l->c.c_car)) &&
+	    	(consp(l->c.c_car->c.c_cdr)) &&
 	        ((r=translate_pathname(s,l->c.c_car->c.c_car,
 		    l->c.c_car->c.c_cdr->c.c_car)) != Cnil)) {
 		w=l->c.c_car->c.c_cdr->c.c_cdr;
-		if ((type_of(w) == t_cons) &&
+		if ((consp(w)) &&
 		    ((s->pn.pn_name != Cnil) || (s->pn.pn_type != Cnil))) {
 		    vs_push(r);
 		    if (!file_exists(r)) {
-			while (type_of(w) == t_cons) {
+			while (consp(w)) {
 			    p=translate_pathname(s,l->c.c_car->c.c_car,w->c.c_car);
 			    if (type_of(p) == t_pathname) {
 				vs_push(p);

@@ -85,11 +85,11 @@
  (push '(nil t #.(flags ans set)"Ct")
    (get 'side-effects 'inline-always))
 
-;;STACK-CONS
- (push '((fixnum t t) t #.(flags)
-  "(STcons#0.t=t_cons,STcons#0.m=0,STcons#0.c_car=(#1),
-              STcons#0.c_cdr=(#2),(object)&STcons#0)")
-   (get 'stack-cons 'inline-always))
+;;STACK-CONS  ;;FIXME update this
+; (push '((fixnum t t) t #.(flags)
+;  "(STcons#0.t=t_cons,STcons#0.m=0,STcons#0.c_car=(#1),
+;              STcons#0.c_cdr=(#2),(object)&STcons#0)")
+;   (get 'stack-cons 'inline-always))
 
 ;;SUBLIS1
  (push '((t t t) t #.(flags ans set)SUBLIS1-INLINE)
@@ -479,7 +479,7 @@
    (get 'arrayp 'inline-always))
 
 ;;ATOM
- (push '((t) boolean #.(flags)"type_of(#0)!=t_cons")
+ (push '((t) boolean #.(flags)"atom(#0)")
    (get 'atom 'inline-always))
 
 ;;BIT-VECTOR-P
@@ -731,7 +731,7 @@
 ;   (get 'cons 'inline-always))
 
 ;;CONSP
- (push '((t) boolean #.(flags)"type_of(#0)==t_cons")
+ (push '((t) boolean #.(flags)"consp(#0)")
    (get 'consp 'inline-always))
 
 ;;COS
@@ -751,10 +751,7 @@
    (get 'elt 'inline-unsafe))
 
 ;;ENDP
-;;Must use endp_prop here as generic lisp code containing (endp 
-;;can be compiled to take function output as its argument, which
-;;cannot be redirected via a macro, e.g. endp(cdr(V20)).  CM
- (push '((t) boolean #.(flags)"endp_prop(#0)")
+ (push '((t) boolean #.(flags)"endp(#0)")
    (get 'endp 'inline-safe))
 (push '((t) boolean #.(flags)"(#0)==Cnil")
    (get 'endp 'inline-unsafe))
@@ -956,7 +953,7 @@
    (get 'list* 'inline-always))
 
 ;;LISTP
- (push '((t) boolean #.(flags)"@0;type_of(#0)==t_cons||(#0)==Cnil")
+ (push '((t) boolean #.(flags)"listp(#0)")
    (get 'listp 'inline-always))
 
 ;;LOGAND

@@ -99,7 +99,7 @@ sgc_mark_cons(object x) {
   
  MARK_CAR:
   if (!is_marked_or_free(x->c.c_car)) {
-    if (type_of(x->c.c_car) == t_cons) {
+    if (consp(x->c.c_car)) {
       mark(x->c.c_car);
       sgc_mark_cons(x->c.c_car);
     } else
@@ -112,7 +112,7 @@ sgc_mark_cons(object x) {
   return;
  WRITABLE_CDR:
   if (is_marked_or_free(x)) return;
-  if (type_of(x) == t_cons) {
+  if (consp(x)) {
     mark(x);
     goto BEGIN;
   }
@@ -710,7 +710,7 @@ sgc_mark_phase(void) {
 	  object x = (object) p; 
 	  if (SGC_OR_M(x)) 
 	    continue;
-	  if (type_of(x)==t_cons) {
+	  if (consp(x)) {
 	    mark(x); 
 	    sgc_mark_cons(x);
 	  } else
@@ -851,7 +851,7 @@ sgc_sweep_phase(void) {
 	  unmark(x);
 	  continue;
 	}
-	if(!is_cons(x) && x->d.s == SGC_NORMAL)
+	if(!valid_cdr(x) && x->d.s == SGC_NORMAL)
 	  continue;
 	
 	/* it is ok to free x */
@@ -884,7 +884,7 @@ sgc_sweep_phase(void) {
 	
 	SET_LINK(x,f);
 	make_free(x);
-	if (!is_cons(x)) x->d.s = (int)SGC_RECENT;
+	if (!valid_cdr(x)) x->d.s = (int)SGC_RECENT;
 	f = x;
 	k++;
       }
@@ -1505,12 +1505,12 @@ sgc_start(void) {
 #endif
 	if (ON_SGC_PAGE(f)) {
 	  SET_LINK(f,x);
- 	  if (!is_cons(f)) f->d.s = SGC_RECENT;
+ 	  if (!valid_cdr(f)) f->d.s = SGC_RECENT;
 	  x=f;
 	  count++;
 	} else {
 	  SET_LINK(f,y);
- 	  if (!is_cons(f)) f->d.s = SGC_NORMAL; 
+ 	  if (!valid_cdr(f)) f->d.s = SGC_NORMAL; 
 	  y=f;
 	}
 	f=next;
@@ -1617,7 +1617,7 @@ sgc_quit(void) {
 	    if (type_map[i]==t && (sgc_type_map[i] & SGC_PAGE_FLAG))
 	      for (p= pagetochar(i),j = tm->tm_nppage;
 		   j > 0; --j, p += tm->tm_size)
-		if (!is_cons((object)p))  ((object) p)->d.s = SGC_NORMAL;
+		if (!valid_cdr((object)p))  ((object) p)->d.s = SGC_NORMAL;
 	}
       }
     }
