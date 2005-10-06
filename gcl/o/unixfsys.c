@@ -165,7 +165,7 @@ coerce_to_filename(object pathname, char *p)
     namestring = coerce_to_namestring(pathname);
     vs_push(namestring);
 
-#ifndef NO_PWD_H  
+#if !defined(NO_PWD_H) && !defined(STATIC_LINKING)
     if(namestring->st.st_self[0]=='~') {
 	char name[20];
 	int n;
@@ -577,7 +577,7 @@ LFD(Lfile_write_date)(void)
 
 LFD(Lfile_author)(void)
 {
-#ifndef NO_PWD_H
+#if !defined(NO_PWD_H) && !defined(STATIC_LINKING)
 	char filename[MAXPATHLEN];
 	struct stat filestatus;
 	struct passwd *pwent;
@@ -608,7 +608,7 @@ LFD(Lfile_author)(void)
 static void
 FFN(Luser_homedir_pathname)(void)
 {
-#ifndef NO_PWD_H  
+#if !defined(NO_PWD_H) && !defined(STATIC_LINKING)
 	struct passwd *pwent;
 	char filename[MAXPATHLEN];
 	register int i;

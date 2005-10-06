@@ -78,8 +78,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * consp, listp, and atom macros, remove DOTNIL, fix relevant functions
     in list.d
   * Clear the cache with mprotect on 386-linux
+  * disable dynamic functions when enabling static linking
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  6 Oct 2005 20:42:12 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  6 Oct 2005 22:43:26 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

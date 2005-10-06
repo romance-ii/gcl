@@ -154,7 +154,12 @@ CreateSocketAddress(struct sockaddr_in *sockaddrPtr, char *host, int port)
     } else {
         addr.s_addr = inet_addr(host);
         if (addr.s_addr == -1) {
-            hostent = gethostbyname(host);
+            hostent = 
+#ifdef STATIC_LINKING
+	      NULL;
+#else
+	    gethostbyname(host);
+#endif
             if (hostent != NULL) {
                 memcpy((VOID *) &addr,
                         (VOID *) hostent->h_addr_list[0],
@@ -336,8 +341,13 @@ DEFUN_NEW("GETPEERNAME",object,fSgetpeername,SI,1,1,NONE,OO,OO,OO,OO,(object soc
  if (getpeername(SOCKET_FD(sock), (struct sockaddr *) &peername, &size)
 		>= 0) {
            address=make_simple_string(inet_ntoa(peername.sin_addr));
-           hostEntPtr = gethostbyaddr((char *) &(peername.sin_addr),
-                    sizeof(peername.sin_addr), AF_INET);
+           hostEntPtr = 
+#ifdef STATIC_LINKING
+	     NULL;
+#else
+	   gethostbyaddr((char *) &(peername.sin_addr),
+			 sizeof(peername.sin_addr), AF_INET);
+#endif
             if (hostEntPtr != (struct hostent *) NULL) 
                host = make_simple_string(hostEntPtr->h_name);
             else host = address;
@@ -359,8 +369,13 @@ DEFUN_NEW("GETSOCKNAME",object,fSgetsockname,SI,1,1,NONE,OO,OO,OO,OO,(object soc
  if (getsockname(SOCKET_FD(sock), (struct sockaddr *) &sockname, &size)
 		>= 0) {
   address= make_simple_string(inet_ntoa(sockname.sin_addr));
-  hostEntPtr = gethostbyaddr((char *) &(sockname.sin_addr),
-			     sizeof(sockname.sin_addr), AF_INET);
+  hostEntPtr = 
+#ifdef STATIC_LINKING
+    NULL;
+#else
+  gethostbyaddr((char *) &(sockname.sin_addr),
+		sizeof(sockname.sin_addr), AF_INET);
+#endif
   if (hostEntPtr != (struct hostent *) NULL)
    host = make_simple_string(hostEntPtr->h_name);
   else host=address;

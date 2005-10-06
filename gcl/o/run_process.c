@@ -358,7 +358,9 @@ int	server;
 	struct	hostent	*hp;
 	struct	sockaddr_in	sock_add;	/* Address of socket          */
 
+#ifndef STATIC_LINKING
 	if((hp = gethostbyname(host)) == NULL)
+#endif
 	{
 		FEerror("No such host.",0);
 	}

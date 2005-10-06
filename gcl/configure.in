@@ -1534,6 +1534,11 @@ AC_ARG_ENABLE(readline,
 	[--enable-readine    enables command line completion via the readline library ],,
 	enable_readline="yes")
 
+if test "$enable_static" = "yes" ; then
+   echo disabling readline when linking statically
+   enable_readline="no"
+fi
+
 # ansi lisp
 AC_ARG_ENABLE(ansi,[--enable-ansi builds a large gcl aiming for ansi compliance, 
 		    --disable-ansi builds the smaller traditional CLtL1 image],,enable_ansi="no")
