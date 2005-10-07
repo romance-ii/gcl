@@ -260,31 +260,32 @@ BEGIN:
 
     case t_package: 
       break;
-    case t_bitvector:
-      {
-	static char ar[10];
-	i = x->bv.bv_fillp;
-	h += i;
-	i = i/8;
-	if (i > 10) i= 10;
-	s = x->bv.bv_self;
-	if (x->bv.bv_offset) {
-	  long k,j,e=i;
-	  s = ar;
+/*     case t_bitvector: */
+/*       { */
+/* 	static char ar[10]; */
+/* 	i = x->bv.bv_fillp; */
+/* 	h += i; */
+/* 	i = i/8; */
+/* 	if (i > 10) i= 10; */
+/* 	s = x->bv.bv_self; */
+/* 	if (x->bv.bv_offset) { */
+/* 	  long k,j,e=i; */
+/* 	  s = ar; */
 	  /* 8 should be CHAR_SIZE but this needs to be changed
 	     everywhere .. */
-	  e = e * 8;
-	  bzero(ar,sizeof(ar)); /*FIXME is this not a generic copy? */
-	  for (k = x->bv.bv_offset, j = 0;  k < e;  k++, j++)
-	    if (x->bv.bv_self[k/8]&(0200>>k%8))
-	      ar[j/8]  |= 0200>>j%8;
-	}
-	for (;  i > 0;  --i, s++)
-	  h += (*s & 0377)*12345 + 1;
-      }
-      break;
+/* 	  e = e * 8; */
+/* 	  bzero(ar,sizeof(ar)); /\*FIXME is this not a generic copy? *\/ */
+/* 	  for (k = x->bv.bv_offset, j = 0;  k < e;  k++, j++) */
+/* 	    if (x->bv.bv_self[k/8]&(0200>>k%8)) */
+/* 	      ar[j/8]  |= 0200>>j%8; */
+/* 	} */
+/* 	for (;  i > 0;  --i, s++) */
+/* 	  h += (*s & 0377)*12345 + 1; */
+/*       } */
+/*       break; */
 
     case t_string:
+    case t_bitvector:
     case t_vector:
       j=x->v.v_fillp;
       h+=j*12345;

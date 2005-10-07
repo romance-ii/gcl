@@ -79,8 +79,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
     in list.d
   * Clear the cache with mprotect on 386-linux
   * disable dynamic functions when enabling static linking
+  * Fix equalp bitvector hashing bug
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  6 Oct 2005 22:43:26 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri,  7 Oct 2005 16:11:22 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
