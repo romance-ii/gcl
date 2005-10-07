@@ -1266,7 +1266,7 @@ EXTER unsigned plong signals_allowed, signals_pending  ;
 /* #define proper_list(a) (type_of(a)==t_cons || (a)==Cnil) */
 /* #define fix_dot(a) ((a) == Dotnil ? Cnil : (type_of(a)==t_cons && (a)->c.c_cdr==Dotnil ? (a)->c.c_car : (a)))  */
 
-#define endp(a) (type_of(a)==t_cons ? FALSE : ((a)==Cnil ? TRUE : ({TYPE_ERROR((a),sLlist);FALSE;})))
+#define endp(a) (consp(a) ? FALSE : ((a)==Cnil ? TRUE : ({TYPE_ERROR((a),sLlist);FALSE;})))
 
 
 #define eql(a_,b_)    ({register object _a=(a_);register object _b=(b_);_a==_b || eql1(_a,_b);})
