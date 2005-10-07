@@ -107,6 +107,8 @@
             FTRUNCATE PPRINT-DISPATCH SHOW-INFO NLOAD APROPOS-DOC)) 
 (PROCLAIM
     '(FTYPE (FUNCTION (T) T) TYPE-OF CLASS-OF NON-LOGICAL-PATHNAME-P DO-F SLOOP::POINTER-FOR-COLLECT
+	    sequence-type-element-type  sequence-type-element-type-int
+	    sequence-type-length-type sequence-type-length-type-int
             SLOOP::LOOP-LET-BINDINGS SLOOP::LOOP-COLLECT-KEYWORD-P
             SERROR::|TOO-MANY-ARGUMENTS-tester|
             SERROR::|TOO-FEW-ARGUMENTS-tester| COERCE-TO-STANDARD-CLASS

@@ -204,47 +204,79 @@
   (best-array-element-type type))
 
 
-;;FIXME -- needs a rewrite
+(defun sequence-type-length-type-int (type)
+    (case (car type)
+	  (cons (do ((i 0 (1+ i)) (x type (caddr type))) 
+		    ((not (eq 'cons (car x))) 
+		     (cond ((equal x '(member nil)) `(eql ,i))
+			   ((not (equal x '(t))) `(eql ,(1+ i)))
+			   ('(integer 1)))) (declare (seqind i))))
+	  (member (unless (cadr type) `(eql 0)))
+	  (array (and (cddr type) (consp (caddr type)) (= (length (caddr type)) 1) (integerp (caaddr type))
+		    `(eql ,(caaddr type))))
+	  ((or and) (reduce (lambda (&rest xy) (when xy 
+						 (and (integerp (car xy)) 
+						      (integerp (cadr xy)) 
+						      (equal (car xy) (cadr xy)) (car xy))))
+			    (mapcar 'sequence-type-length-type-int (cdr type)))))))
+	  
+(defun sequence-type-length-type (type)
+  (sequence-type-length-type-int (normalize-type-int type nil)))
+
+(defun sequence-type-element-type-int (type)
+    (case (car type)
+	  (cons t)
+	  (array (or (not (cdr type)) (upgraded-array-element-type (cadr type))))
+	  ((or and) (reduce 
+		     (lambda (&rest xy) 
+		       (when xy 
+			 (cond ((eq (car xy) '*) (cadr xy))
+			       ((eq (cadr xy) '*) (car xy))
+			       ((eq (car xy) (cadr xy)) (car xy)))))
+		     (mapcar 'sequence-type-element-type-int (cdr type))))))
+	  
+(defun sequence-type-element-type (type)
+  (let ((x (sequence-type-element-type-int (normalize-type-int type nil))))
+    (or (eq x '*) x)))
+
+
+
 ;;; COERCE function.
 (defun coerce (object type)
   (declare (optimize (safety 1)))
-  (when (classp type)
-    (setq type (or (class-name type)
-		   (specific-error :wrong-type-argument "Cannot coerce ~S to class ~S." object type))))
-  (when (typep-int object (normalize-type-int type nil))
+  (when (typep-int object type)
     (return-from coerce object))
-  (if (atom type) (setq type (list type)))
-  (case (car type)
-	(function
-	 (cond ((symbolp object) (symbol-function object))
-	       ((and (consp object) (eq (car object) 'lambda)) (eval `(function ,object)))
-	       ((function-identifierp object) (get (cadr object) 'setf-function))));FIXME
-	(list
-	 (do ((l nil (cons (elt object i) l))
-	      (i (1- (length object)) (1- i)))
-	     ((< i 0) l)))
-	((array simple-array vector simple-vector bit-vector simple-bit-vector string simple-string)
-	 (when (cdr type) ;;FIXME
-	   (assert-type (cdr type) 'cons)
-	   (when (cddr type)
-	     (assert-type (cddr type) 'cons)
-	     (or (eq (caddr type) '*) (integerp (caddr type))
-		 (and (assert-type (caddr type) 'cons) (assert-type (cdr (caddr type)) 'null)))))
-	 (do ((seq (make-sequence type (length object)))
-	      (i 0 (1+ i))
-	      (l (length object)))
-	     ((>= i l) seq)
-	     (setf (elt seq i) (elt object i))))
-	(character (character object))
-	(float (float object))
-	((short-float) (float object 0.0S0))
-	((single-float double-float long-float) (float object 0.0L0))
-	(complex
-	 (if (or (null (cdr type)) (null (cadr type)) (eq (cadr type) '*))
-	     (complex (realpart object) (imagpart object))
-	   (complex (coerce (realpart object) (cadr type))
-		    (coerce (imagpart object) (cadr type)))))
-	(t (specific-error :wrong-type-argument "Cannot coerce ~S to class ~S." object type))))
+  (cond
+   ((subtypep1 type 'function)
+    (cond ((symbolp object) (symbol-function object))
+	  ((and (consp object) (eq (car object) 'lambda)) (eval `(function ,object)))
+	  ((function-identifierp object) (get (cadr object) 'setf-function))));FIXME
+   ((subtypep1 type 'list)
+    (let* ((l (length object))
+	   (x (sequence-type-length-type type)))
+      (when x (assert-type l x))
+      (do ((l nil (cons (elt object i) l))
+	   (i (1- l) (1- i)))
+	  ((< i 0) l))))
+   ((subtypep1 type 'array)
+    (let* ((l (length object))
+	   (x (sequence-type-length-type type)))
+      (when x (assert-type l x))
+      (do ((seq (make-sequence type l))
+	   (i 0 (1+ i))
+	   (l l))
+	  ((>= i l) seq)
+	  (setf (elt seq i) (elt object i)))))
+   ((subtypep1 type 'character) (character object))
+   ((subtypep1 type 'short-float) (float object 0.0S0))
+   ((subtypep1 type 'long-float) (float object 0.0L0))
+   ((subtypep1 type 'float) (float object))
+   ((subtypep1 type 'complex)
+    (if (or (atom type) (null (cdr type)) (null (cadr type)) (eq (cadr type) '*))
+	(complex (realpart object) (imagpart object))
+      (complex (coerce (realpart object) (cadr type))
+	       (coerce (imagpart object) (cadr type)))))
+   ((assert-type object type))))
 
 ;;; DEFTYPE macro.
 (defmacro deftype (name lambda-list &rest body &aux decls)

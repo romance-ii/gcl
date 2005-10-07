@@ -33,59 +33,26 @@
 (eval-when (compile) (proclaim '(optimize (safety 1) (space 3))))
 
 
-(defun make-sequence (type size &key (initial-element nil iesp)
-                                &aux element-type sequence)  
-  (setq element-type
-        (cond ((eq type 'list)
-               (return-from make-sequence
-                (if iesp
-                    (make-list size :initial-element initial-element)
-                    (make-list size))))
-              ((or (eq type 'simple-string) (eq type 'string)) 'character)
-              ((or (eq type 'simple-bit-vector) (eq type 'bit-vector)) 'bit)
-              ((or (eq type 'simple-vector) (eq type 'vector)) t)
-              (t
-	       (when (subtypep type 'list)
-		 (let ((nn (subtypep type 'null)))
-                   (when (if nn (/= size 0) (= size 0))
-		     (specific-error :wrong-type-argument "~S is not of type ~S." 
-				     type (format nil "list (size ~S)" size)))
-                   (return-from make-sequence
-                     (if iesp
-                         (make-list size :initial-element initial-element)
-                         (make-list size)))))
-               (let ((normalized-type (normalize-type type)))
-;                 (when (member (car normalized-type) '(cons null))  ;(subtypep (car normalized-type) 'list)
-;                   (if (or (and (eq 'null (car normalized-type)) (not (equal size 0)))
-;                           (and (eq 'cons (car normalized-type)) (equal size 0)))
-;                       (specific-error :wrong-type-argument "~S is not of type ~S." 
-;                                       type (format nil "list (size ~S)" size)))
-;                   (return-from make-sequence
-;                     (if iesp
-;                         (make-list size :initial-element initial-element)
-;                         (make-list size))))
-;                 (when (and (equal normalized-type '(member nil)) (equal size 0))
-;                   (return-from make-sequence nil))
-                 (unless (or (eq (car normalized-type) 'array)
-                             (eq (car normalized-type) 'simple-array))
-                   (specific-error :wrong-type-argument "~S is not of type ~S." 
-                                   type 'sequence))
-                 (let ((ssize (caddr normalized-type)))
-                   (if (listp ssize) (setq ssize (car ssize)))
-                   (if (not (si::fixnump ssize)) (setq ssize size))
-                   (unless (equal ssize size)
-                     (specific-error :wrong-type-argument "~S is not of type ~S." 
-                                     type (format nil "~S (size ~S)" type size))))
-                 (or (cadr normalized-type) t)))))
-  (setq element-type (si::best-array-element-type element-type))
-  (setq sequence (si:make-vector element-type size nil nil nil nil nil))
-  (when iesp
-        (do ((i 0 (1+ i))
-             (size size))
-            ((>= i size))
-          (declare (fixnum i size))
-          (setf (elt sequence i) initial-element)))
-  sequence)
+(defun make-sequence (type size &key (initial-element nil iesp))
+
+  (let ((x (sequence-type-length-type type)))
+    (when x (assert-type size x)))
+  (cond 
+   ((subtypep1 type 'list)
+    (make-list size :initial-element (and iesp initial-element)))
+   ((subtypep1 type 'array)
+    (let ((element-type (sequence-type-element-type type)))
+      (unless element-type
+	(assert-type type '(member list array)))
+      (let ((sequence (si:make-vector element-type size nil nil nil nil nil)))
+	(when iesp
+	  (do ((i 0 (1+ i))
+	       (size size))
+	      ((>= i size))
+	      (declare (fixnum i size))
+	      (setf (elt sequence i) initial-element)))
+	sequence)))
+   ((assert-type type '(member list array)))))
 
 
 (defun concatenate (result-type &rest sequences)
