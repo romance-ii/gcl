@@ -39,7 +39,6 @@
 (eval-when (compile load eval)
 (pushnew :turbo-closure *features*)
 (pushnew :turbo-closure-env-size *features*))
-)
 
 (defmacro %svref (vector index)
   `(svref (the simple-vector ,vector) (the fixnum ,index)))
