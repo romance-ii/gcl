@@ -1675,14 +1675,14 @@ case $use in
 			if test "$enable_debug" != "yes" ; then TO2FLAGS="-O" ; fi
 			;;
 		arm*)
-			TCFLAGS="$TCFLAGS -mlong-calls";;	
+			TCFLAGS="$TCFLAGS -mlong-calls -fdollars-in-identifiers ";;	
 		powerpc*) 
 			if $CC -v 2>&1 | grep -q "gcc version 3.2" ; then
 			   echo Reducing optimization for buggy gcc-3.2
 			   if test "$enable_debug" != "yes" ; then TONIFLAGS="-O $TFPFLAG" ; fi
 			fi;
 			echo Probing for longcall
-			if ! $CC -v 2>&1 | $AWK '/^gcc version / {split($3,A,".");if (A[1]+0>=3 && A[2]+0>=3) exit 1;}'; then
+			if ! $CC -v 2>&1 | $AWK '/^gcc version / {split($3,A,".");if (A[1]+0>3 || (A[1]+0>=3 && A[2]+0>=3)) exit 1;}'; then
 			   echo Enabling longcall on gcc 3.3 or later
 			   TCFLAGS="$TCFLAGS -mlongcall"
 			   echo Reducing optimization for buggy gcc 3.3 or later

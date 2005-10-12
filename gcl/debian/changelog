@@ -91,8 +91,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
     syntax-from-char fixes, rework loose package syntax, prohibit loose
     right paren in reader
   * Fix gethash size 0 bug
+  * fix long-call probe on gcc, fdollars in identifiers on arm
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 12 Oct 2005 15:32:14 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 12 Oct 2005 16:26:55 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
