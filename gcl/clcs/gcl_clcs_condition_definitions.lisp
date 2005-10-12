@@ -316,6 +316,15 @@
   #-(or clos pcl)(:conc-name %%internal-simple-parse-error-)
   #-(or clos pcl)(:report internal-simple-error-printer))
 
+(define-condition internal-simple-reader-error 
+    (#+(or clos pcl) internal-simple-error reader-error)
+  #-(or clos pcl)
+  ((function-name nil) format-string (format-arguments '()))
+  #+(or clos pcl)
+  ()
+  #-(or clos pcl)(:conc-name %%internal-simple-reader-error-)
+  #-(or clos pcl)(:report internal-simple-error-printer))
+
 (define-condition internal-simple-control-error 
     (#+(or clos pcl) internal-simple-error control-error)
   #-(or clos pcl)

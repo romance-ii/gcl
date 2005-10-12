@@ -83,8 +83,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * consp in endp
   * Better coerce and  make-sequence
   * fix type<= definition
+  * enhanced reader-error support
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 12 Oct 2005 01:47:37 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 12 Oct 2005 03:06:04 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
