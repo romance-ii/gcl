@@ -440,7 +440,10 @@ gethash(object key, object hashtable) {
   object hkey;
   unsigned long i=0;
   bool (*f)(object,object)=NULL;
+  static struct htent dummy={OBJNULL,OBJNULL};
   
+  if (!hashtable->ht.ht_size)
+    return &dummy;
   htest = (enum httest)hashtable->ht.ht_test;
   hsize = hashtable->ht.ht_size;
   switch (htest) {

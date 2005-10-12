@@ -90,8 +90,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
     table ansi fixes, simple-vector-p ansi fix, print-symbol fixes, set-
     syntax-from-char fixes, rework loose package syntax, prohibit loose
     right paren in reader
+  * Fix gethash size 0 bug
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 12 Oct 2005 03:12:29 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 12 Oct 2005 15:32:14 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
