@@ -221,7 +221,9 @@
 			    (mapcar 'sequence-type-length-type-int (cdr type))))))
 	  
 (defun sequence-type-length-type (type)
-  (when (consp type) (sequence-type-length-type-int (normalize-type-int type nil))))
+  (cond ((eq type 'null) `(eql 0));;FIXME accelerators
+	((eq type 'cons) `(integer 1))
+	((consp type) (sequence-type-length-type-int (normalize-type-int type nil)))))
 
 (defun sequence-type-element-type-int (type)
     (case (car type)
