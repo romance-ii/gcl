@@ -759,6 +759,7 @@ print_symbol_name_body(object x,int pp) {
   cc=constant_case(x);
   k=needs_escape(x);
   pp=pp && (potential_number_p(x, PRINTbase)||all_dots(x)) ? 0 : 1;
+  pp=k ? 0 : pp;
 
   if (k)
     write_ch('|');
