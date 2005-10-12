@@ -954,7 +954,7 @@
     (let* ((dim (caddr type))
 	   (dim (cond ((eq dim '*) t)
 		      ((integerp dim) (if (= 0 dim) dim (make-list dim :initial-element t)))
-		      ((listp dim) (let (r) (dolist (d dim (nreverse r)) (push (if (eq d '*) t d) r)) r)))))
+		      ((listp dim) (let (r) (dolist (d dim (nreverse r)) (push (if (eq d '*) t d) r)))))))
       (if (eq z '*)
 	  (dolist (l +array-type-alist+)
 	    (ntp-ld ntp `(,(cdr l) ,(when z dim))))

@@ -58,7 +58,7 @@
    ((subtypep1 type 'list)
     (make-list size :initial-element (and iesp initial-element)))
    ((subtypep1 type 'array)
-    (make-sequence-vector (sequence-type-element-type type)size iesp initial-element))
+    (make-sequence-vector (sequence-type-element-type type) size iesp initial-element))
    ((assert-type type '(member list array)))))
 
 
