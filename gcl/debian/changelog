@@ -92,8 +92,11 @@ gclcvs (2.7.0-51) unstable; urgency=low
     right paren in reader
   * Fix gethash size 0 bug
   * fix long-call probe on gcc, fdollars in identifiers on arm
+  * accelerate make-sequence, which was making several subtypep1 and
+    normalize-type calls on simple argument input, and even calling
+    itself thereby -- FIXME, get concise logic with performance
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 12 Oct 2005 16:26:55 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 12 Oct 2005 19:13:41 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

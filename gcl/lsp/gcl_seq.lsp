@@ -32,26 +32,33 @@
 
 (eval-when (compile) (proclaim '(optimize (safety 1) (space 3))))
 
+(defun make-sequence-vector (element-type size iesp initial-element)
+  (unless element-type
+    (assert-type type '(member list array)))
+  (let ((sequence (si:make-vector element-type size nil nil nil nil nil)))
+    (when iesp
+      (do ((i 0 (1+ i))
+	   (size size))
+	  ((>= i size))
+	  (declare (fixnum i size))
+	  (setf (elt sequence i) initial-element)))
+    sequence))
 
 (defun make-sequence (type size &key (initial-element nil iesp))
 
   (let ((x (sequence-type-length-type type)))
     (when x (assert-type size x)))
   (cond 
+   ((member type '(list cons null));;FIXME these are accelerators
+    (make-list size :initial-element (and iesp initial-element)))
+   ((eq type 'string)
+    (make-sequence-vector 'character size iesp initial-element))
+   ((eq type 'vector)
+    (make-sequence-vector t size iesp initial-element))
    ((subtypep1 type 'list)
     (make-list size :initial-element (and iesp initial-element)))
    ((subtypep1 type 'array)
-    (let ((element-type (sequence-type-element-type type)))
-      (unless element-type
-	(assert-type type '(member list array)))
-      (let ((sequence (si:make-vector element-type size nil nil nil nil nil)))
-	(when iesp
-	  (do ((i 0 (1+ i))
-	       (size size))
-	      ((>= i size))
-	      (declare (fixnum i size))
-	      (setf (elt sequence i) initial-element)))
-	sequence)))
+    (make-sequence-vector (sequence-type-element-type type)size iesp initial-element))
    ((assert-type type '(member list array)))))
 
 
