@@ -82,8 +82,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * Fix equalp bitvector hashing bug
   * consp in endp
   * Better coerce and  make-sequence
+  * fix type<= definition
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  7 Oct 2005 21:59:55 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 12 Oct 2005 01:47:37 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

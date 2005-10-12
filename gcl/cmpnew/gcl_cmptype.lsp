@@ -290,7 +290,7 @@
 (defun type>= (type1 type2)
   (equal (type-and type1 type2) type2))
 (defun type<= (type1 type2)
-  (equal (type-and type1 type2) type1))
+  (equal (type-and type2 type1) type1))
 
 
 (defun type-or1-int (type1 type2)
