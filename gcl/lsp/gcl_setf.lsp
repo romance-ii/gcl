@@ -232,6 +232,7 @@
 (defsetf symbol-plist si:set-symbol-plist)
 (defsetf gethash (k h &optional d) (v) `(si:hash-set ,k ,h ,v))
 (defsetf row-major-aref si:aset1)
+(defsetf readtable-case si::set-readtable-case)
 (defsetf documentation (s d) (v)
   `(case ,d
      (variable (si:putprop ,s ,v 'variable-documentation))
@@ -528,7 +529,7 @@
 	       (mapcar #'list
 		       (append vars stores)
 		       (append vals (list ,update-form)))
-	       store-form))))))))))))))))))))
+	       store-form)))))
 
 
 ;;; Some macro definitions.

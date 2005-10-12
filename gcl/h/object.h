@@ -397,12 +397,21 @@ typedef struct {
 } aet_type_struct;
 
 
+#if SIZEOF_LONG == 4
+#define HFILL_BITS 15
+#elif SIZEOF_LONG == 8
+#define HFILL_BITS 31
+#else
+#error Cannot calculate HFILL_BITS
+#endif
+
 struct array {           /*  array header  */
 
   FIRSTWORD;
 
   object  a_displaced;   /*  displaced  */
-  hfixnum a_rank;        /*  array rank  */
+  hfixnum a_hasfillp:1;  /*  fillp compatability */
+  hfixnum a_rank:HFILL_BITS;        /*  array rank  */
   hfixnum a_elttype;     /*  element type  */
   object *a_self;        /*  pointer to the array  */
   hfixnum a_adjustable;  /*  adjustable flag  */
@@ -420,7 +429,8 @@ struct vector {           /*  vector header  */
   FIRSTWORD;
 
   object  v_displaced;    /*  displaced  */
-  hfixnum v_hasfillp;     /*  has-fill-pointer flag  */
+  hfixnum v_hasfillp:1;   /*  has-fill-pointer flag  */
+  hfixnum v_unused:HFILL_BITS;   /*  rank compatibility  */
   hfixnum v_elttype;      /*  element type  */
   object *v_self;         /*  pointer to the vector  */
   fixnum  v_fillp;        /*  fill pointer  */
@@ -438,7 +448,8 @@ struct string {           /*  string header  */
   FIRSTWORD;
 
   object  st_displaced;    /*  displaced  */
-  hfixnum st_hasfillp;     /*  has-fill-pointer flag  */
+  hfixnum st_hasfillp:1;     /*  has-fill-pointer flag  */
+  hfixnum st_unused:HFILL_BITS;   /*  rank compatibility  */
   hfixnum st_adjustable;   /*  adjustable flag  */
   char    *st_self;        /*  pointer to the string  */
   fixnum   st_fillp;       /*  fill pointer  */
@@ -467,6 +478,9 @@ struct string {           /*  string header  */
 #define CONTROL_ERROR(a_) {stack_string(tp_err,a_);\
                            Icall_error_handler(sKcontrol_error,tp_err,0);}
 
+#define READER_ERROR(a_)  {stack_string(tp_err,a_);\
+                           Icall_error_handler(sKreader_error,tp_err,0);}
+
 #define NERROR(a_)  {stack_string(fmt,a_ ": line ~a, file ~a, function ~a");\
                     {stack_fixnum(line,__LINE__);\
                     {stack_string(file,__FILE__);\
@@ -480,7 +494,8 @@ struct ustring {
   FIRSTWORD;
 
   object         ust_displaced;
-  hfixnum        ust_hasfillp;
+  hfixnum        ust_hasfillp:1;
+  hfixnum        ust_unused:HFILL_BITS;   /*  rank compatibility  */
   hfixnum        ust_adjustable;  
   unsigned char *ust_self;
   fixnum         ust_fillp;
@@ -506,7 +521,8 @@ struct bitvector {         /*  bitvector header  */
   FIRSTWORD;
 
   object   bv_displaced;   /*  displaced  */
-  hfixnum  bv_hasfillp;    /*  has-fill-pointer flag  */
+  hfixnum  bv_hasfillp:1;  /*  has-fill-pointer flag  */
+  hfixnum  bv_unused:HFILL_BITS;   /*  rank compatibility  */
   hfixnum  bv_elttype;     /*  not used  */
   char    *bv_self;        /*  pointer to the bitvector  */
   fixnum   bv_fillp;       /*  fill pointer  */
@@ -717,8 +733,21 @@ enum chattrib {       /*  character attribute  */
  cat_constituent      /*  constituent  */
 };
 
+enum chatrait {       /*  character attribute  */
+ trait_alpha,         /*  alphabetic  */
+ trait_digit,         /*  digits      */
+ trait_alphadigit,    /*  alpha/digit */
+ trait_package,       /*  package mrk */
+ trait_plus,          /*  plus sign   */
+ trait_minus,         /*  minus sign  */
+ trait_ratio,         /*  ratio mrk   */
+ trait_exp,           /*  expon mrk   */
+ trait_invalid        /*  unreadable  */
+};
+
 struct rtent {               /*  read table entry  */
  enum chattrib rte_chattrib; /*  character attribute  */
+ enum chatrait rte_chatrait; /*  constituent trait */
  object        rte_macro;    /*  macro function  */
  object        *rte_dtab;    /*  pointer to the  */
                              /*  dispatch table  */
@@ -733,6 +762,8 @@ struct readtable {       /*  read table  */
   FIRSTWORD;
 
   struct rtent *rt_self; /*  read table itself  */
+  object rt_case;
+  SPAD;
 
 };
 

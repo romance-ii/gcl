@@ -194,12 +194,19 @@ check_type_stream(object *p)
 
 /* Thankfully we can do this bit of non-lispy c stuff since we pass by reference. FIXME*/
 void
+check_type_readtable_no_default(object *p) {
+  
+  if (type_of(*p) != t_readtable)
+    *p = wrong_type_argument(sLreadtable, *p);
+
+}
+
+void
 check_type_readtable(object *p) {
   
   if (*p==Cnil)
     *p=standard_readtable;
-  if (type_of(*p) != t_readtable)
-    *p = wrong_type_argument(sLreadtable, *p);
+  check_type_readtable_no_default(p);
 
 }
 
@@ -467,6 +474,7 @@ DEF_ORDINARY("COMMON",sLcommon,LISP,"");
 DEF_ORDINARY("NULL",sLnull,LISP,"");
 DEF_ORDINARY("CONS",sLcons,LISP,"");
 DEF_ORDINARY("LIST",sLlist,LISP,"");
+DEF_ORDINARY("PROPER-LIST",siLproper_list,SI,"");
 DEF_ORDINARY("SYMBOL",sLsymbol,LISP,"");
 DEF_ORDINARY("ARRAY",sLarray,LISP,"");
 DEF_ORDINARY("VECTOR",sLvector,LISP,"");

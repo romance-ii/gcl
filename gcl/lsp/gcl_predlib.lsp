@@ -218,7 +218,7 @@
 						 (and (integerp (car xy)) 
 						      (integerp (cadr xy)) 
 						      (equal (car xy) (cadr xy)) (car xy))))
-			    (mapcar 'sequence-type-length-type-int (cdr type)))))))
+			    (mapcar 'sequence-type-length-type-int (cdr type))))))
 	  
 (defun sequence-type-length-type (type)
   (sequence-type-length-type-int (normalize-type-int type nil)))
@@ -397,6 +397,12 @@
 
 (defun non-standard-base-char-p (x)
   (and (characterp x) (not (standard-char-p x))))
+
+(defun proper-listp (x)
+  (and (listp x)
+       (do ((x x (cdr x))) ((not (consp x)) (not x)))))
+
+(deftype proper-list () `(satisfies proper-listp))
 
 (deftype extended-char () nil)
 (deftype base-char () `(or standard-char non-standard-base-char))

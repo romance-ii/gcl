@@ -239,7 +239,7 @@
 		    (terpri *debug-io*)))
           nil))
         (terpri *debug-io*)
-        (break-current))))))
+        (break-current)))))
 
 (defvar *debug-print-level* 3)
 

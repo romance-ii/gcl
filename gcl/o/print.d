@@ -60,11 +60,7 @@ per_line_prefix(object strm) {
 #define  WRITEC_NEWLINE(strm) (writec_stream('\n',strm),per_line_prefix(strm))
 #endif
 
-#define	to_be_escaped(c) \
-	(standard_readtable->rt.rt_self[(c)&0377].rte_chattrib \
-	 != cat_constituent || \
-	 isLower((c)&0377) || (c) == ':')
-
+#define READ_TABLE_CASE (Vreadtable->s.s_dbind->rt.rt_case)
 
 #define	mod(x)		((x)%Q_SIZE)
 
@@ -687,13 +683,116 @@ object obj,a_list;
 	@(return `pprint_dispatch(obj,table)`)
 @)
 
+
+static int
+constant_case(object x) {
+
+  fixnum i,j=0,jj;
+  for (i=0;i<x->s.s_fillp;i++,j=jj ? jj : j) {
+    jj=isUpper(x->s.s_self[i]) ? 1 : (isLower(x->s.s_self[i]) ? -1 : 0);
+    if (j*jj==-1)
+      return 0;
+  }
+  return j;
+
+}
+    
+static int
+needs_escape (object x) {
+
+  fixnum i;
+
+  if (x->s.s_fillp && *x->s.s_self==' ')
+    return 1;
+
+  for (i=0;i<x->s.s_fillp;i++) 
+    switch(x->s.s_self[i]) {
+    case '(':
+    case ')':
+    case ':':
+    case '`':
+    case '\'':
+    case '"':
+    case ';':
+    case ',':
+    case '\n':
+      return 1;
+    default:
+      break;
+    }
+
+  if (!PRINTescape)
+    return 0;
+  if (READ_TABLE_CASE==sKupcase) {
+    for (i=0;i<x->s.s_fillp;i++) 
+      if (isLower(x->s.s_self[i]))
+	return 1;
+  } else if (READ_TABLE_CASE==sKdowncase) {
+    for (i=0;i<x->s.s_fillp;i++) 
+      if (isUpper(x->s.s_self[i]))
+	return 1;
+  }
+
+  return !x->s.s_fillp;
+
+}
+
+static int
+all_dots(object x) {
+  
+  fixnum i;
+
+  for (i=0;i<x->s.s_fillp && x->s.s_self[i]=='.';i++);
+  
+  return i==x->s.s_fillp;
+
+}
+
+#define convertible_upper(c) ((READ_TABLE_CASE==sKupcase||READ_TABLE_CASE==sKinvert)&& isUpper(c))
+#define convertible_lower(c) ((READ_TABLE_CASE==sKdowncase||READ_TABLE_CASE==sKinvert)&& isLower(c))
+
+static void
+print_symbol_name_body(object x,int pp) {
+
+  int i,j,fc,tc,lw,k,cc;
+
+  cc=constant_case(x);
+  k=needs_escape(x);
+  pp=pp && (potential_number_p(x, PRINTbase)||all_dots(x)) ? 0 : 1;
+
+  if (k)
+    write_ch('|');
+
+  for (lw=i=0;i<x->s.s_fillp;i++) {
+    j = x->s.s_self[i];
+    if (PRINTescape && (j == '|' || j == '\\'))
+      write_ch('\\');
+    fc=convertible_upper(j) ? 1 : 
+        (convertible_lower(j) ? -1 : 0);
+    tc=(READ_TABLE_CASE==sKinvert ? -cc :
+	 (PRINTcase == sKupcase ? 1 : 
+	  (PRINTcase == sKdowncase ? -1 : 
+	   (PRINTcase == sKcapitalize ? (i==lw ? 1 : -1) : 0))));
+    if (ispunct(j)||isspace(j)) lw=i+1;
+    tc*=pp*fc*fc;
+    fc=tc*tc*(tc-fc)>>1;
+    j+=fc*('A'-'a');
+    write_ch(j);
+    
+  }
+
+  if (k)
+    write_ch('|');
+
+}
+
 void
 write_object(x, level)
 object x;
 int level;
 {
 	object r, y;
-	int i, j, k,lw;
+	int i, j, k;
 	object *vp;
 	object ppfun;
 
@@ -894,117 +993,49 @@ int level;
 		break;
 
 	case t_symbol:
-		if (!PRINTescape) {
-			for (lw = 0,i = 0;  i < x->s.s_fillp;  i++) {
-				j = x->s.s_self[i];
-				if (isUpper(j)) {
-                                    if (PRINTcase == sKdowncase ||
-                                        (PRINTcase == sKcapitalize && i!=lw))
-                                          j += 'a' - 'A';
-                                 } else if (!isLower(j))
-                                         lw = i + 1;
-                                  write_ch(j);
+	  {
 
-			}
-			break;
-		}
-		if (x->s.s_hpack == Cnil) {
-		    if (PRINTcircle) {
-			for (vp = PRINTvs_top;  vp < PRINTvs_limit;  vp += 2)
-			    if (x == *vp) {
-				if (vp[1] != Cnil) {
-				    write_ch('#');
-				    write_decimal((vp-PRINTvs_top)/2+1);
-				    write_ch('#');
-				    return;
-				} else {
-				    write_ch('#');
-				    write_decimal((vp-PRINTvs_top)/2+1);
-				    write_ch('=');
-				    vp[1] = Ct;
-				}
-			    }
+	    if (PRINTescape) {
+	      if (x->s.s_hpack == Cnil) {
+		if (PRINTcircle) {
+		  for (vp = PRINTvs_top;  vp < PRINTvs_limit;  vp += 2)
+		    if (x == *vp) {
+		      if (vp[1] != Cnil) {
+			write_ch('#');
+			write_decimal((vp-PRINTvs_top)/2+1);
+			write_ch('#');
+			return;
+		      } else {
+			write_ch('#');
+			write_decimal((vp-PRINTvs_top)/2+1);
+			write_ch('=');
+			vp[1] = Ct;
+		      }
 		    }
-		    if (PRINTgensym)
-			write_str("#:");
-		} else if (x->s.s_hpack == keyword_package)
-			write_ch(':');
-		else if (PRINTpackage||find_symbol(x,current_package())!=x
-			 || intern_flag == 0)
-		  {
-			k = 0;
-			for (i = 0;
-			     i < x->s.s_hpack->p.p_name->st.st_fillp;
-			     i++) {
-				j = x->s.s_hpack->p.p_name
-				    ->st.st_self[i];
-				if (to_be_escaped(j))
-					k++;
-			}
-			if (k > 0)
-				write_ch('|');
-		     for (lw = 0, i = 0;	
-			     i < x->s.s_hpack->p.p_name->st.st_fillp;
-			     i++) {
-				j = x->s.s_hpack->p.p_name
-				    ->st.st_self[i];
- 				if (j == '|' || j == '\\')
-					write_ch('\\');
-                                 if (k == 0) {
-                                         if (isUpper(j)) {
-                                                 if (PRINTcase == sKdowncase ||
-                                                     (PRINTcase == sKcapitalize && i!=lw))
-                                                 j += 'a' - 'A';
-                                         } else if (!isLower(j))
-                                                 lw = i + 1;
-                                 }
-				write_ch(j);
-			}
-			if (k > 0)
-				write_ch('|');
-			if (find_symbol(x, x->s.s_hpack) != x)
-				error("can't print symbol");
-			if (PRINTpackage || intern_flag == INTERNAL)
-				write_str("::");
-			else if (intern_flag == EXTERNAL)
-				write_ch(':');
-			else
-			FEerror("Pathological symbol --- cannot print.", 0);
 		}
-		k = 0;
-		if (potential_number_p(x, PRINTbase))
-			k++;
-		for (i = 0;  i < x->s.s_fillp;  i++) {
-			j = x->s.s_self[i];
-			if (to_be_escaped(j))
-				k++;
-		}
-		for (i = 0;  i < x->s.s_fillp;  i++)
-			if (x->s.s_self[i] != '.')
-				goto NOT_DOT;
-		k++;
+		if (PRINTgensym)
+		  write_str("#:");
+	      } else if (x->s.s_hpack == keyword_package) {
+		write_ch(':');
+	      } else if (PRINTpackage||find_symbol(x,current_package())!=x || !intern_flag) {
+		
+		print_symbol_name_body(x->s.s_hpack->p.p_name,0);
+		
+		if (find_symbol(x, x->s.s_hpack) != x)
+		  error("can't print symbol");
+		if (PRINTpackage || intern_flag == INTERNAL)
+		  write_str("::");
+		else if (intern_flag == EXTERNAL)
+		  write_ch(':');
+		else
+		  FEerror("Pathological symbol --- cannot print.", 0);
+		
+	      }
 
-	NOT_DOT:			
-		if (k > 0)
-			write_ch('|');
-                 for (lw = 0, i = 0;  i < x->s.s_fillp;  i++) {
-			j = x->s.s_self[i];
- 			if (j == '|' || j == '\\')
-				write_ch('\\');
-                         if (k == 0) {
-                                 if (isUpper(j)) {
-                                         if (PRINTcase == sKdowncase ||
-                                             (PRINTcase == sKcapitalize && i != lw))
-                                             j += 'a' - 'A';
-                                 } else if (!isLower(j))
-                                         lw = i + 1;
-                         }
-			write_ch(j);
-		}
-		if (k > 0)
-			write_ch('|');
-		break;
-
+	    }
+	    print_symbol_name_body(x,1);
+	    break;
+	  }
 	case t_array:
 	{
 		int subscripts[ARANKLIM];

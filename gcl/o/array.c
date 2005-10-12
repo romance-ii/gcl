@@ -579,6 +579,7 @@ DEFUN_NEW("MAKE-ARRAY1",object,fSmake_array1,SI,6,6,
     x = alloc_object(t_array);
     x->a.a_elttype = elt_type;
     x->a.a_self = 0;
+    x->a.a_hasfillp = 0;
     x->a.a_rank = rank;
     x->a.a_displaced = Cnil;
     x->a.a_dims = AR_ALLOC(alloc_relblock,rank,fixnum);

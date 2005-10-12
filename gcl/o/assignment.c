@@ -318,7 +318,7 @@ setf(object place, object form)
 	void (*f)();
 	object args;
 	object x,result,y;
-	int i;
+	int i,nka=0;
 /*  	extern void siLaset(void); */
 /*  	extern void siLsvset(void); */
 	extern void siLelt_set();
@@ -354,7 +354,7 @@ setf(object place, object form)
 	if (fun == sLchar) { f = siLchar_set; goto EVAL; }
 	if (fun == sLschar) { f = siLchar_set; goto EVAL; }
 	if (fun == sLfill_pointer) { f = siLfill_pointer_set; goto EVAL; }
-	if (fun == sLgethash) { f = siLhash_set; goto EVAL; }
+	if (fun == sLgethash) { f = siLhash_set; nka=2; goto EVAL; }
 	if (fun == sLcar) {
 		x = Ieval(Mcar(args));
 		result = Ieval(form);
@@ -418,6 +418,11 @@ EVAL:
 		eval_push(args->c.c_car);
 	}
 	eval_push(form);
+	if (nka && vs_top-vs>nka) {
+	  vs[nka]=vs_base[0];
+	  vs_top=vs+nka+1;
+	}
+	nka=0;
 	vs_base = vs;
 	(*f)();
 	return vs_base[0];

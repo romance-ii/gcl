@@ -418,7 +418,6 @@
 		(wt-h "static " (declaration-type newtype) " LnkT" num "();")
 		#-sgi3d (wt-h "static "  (declaration-type newtype) " (*Lnk" num ")() = LnkT" num ";")
 		#+sgi3d (wt-h "static "  (declaration-type newtype) " (*Lnk" num ")();"))))))
-)
 
 
 ;; this default will be as close to the the decision of the x3j13 committee
@@ -507,7 +506,7 @@
    ((is-setf-function name)
     (make-setf-function-proxy-symbol (cadr name)))
    (t
-    nil))))
+    nil)))
 
 (defun function-string (name)
   (unless (symbolp name)
@@ -1513,9 +1512,7 @@
 (defun t2ordinary (form)
   (cond ((atom form))
 	((constantp form) )
-	(t (add-init form ))))
-  
-  )
+	(t (add-init form))))
 
 (defun add-load-time-sharp-comma ()
   (dolist* (vv (reverse *sharp-commas*))

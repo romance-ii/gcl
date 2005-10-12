@@ -1380,6 +1380,7 @@ read_fasd1(int i, object *loc)
 
 	 x->a.a_elttype = GETD("a_elttype=%d");
 	 x->a.a_dim=leng;
+	 x->a.a_hasfillp=0;
 	 x->a.a_rank= GETD("a_rank=%d");
 	 x->a.a_self=0;
 	 x->a.a_displaced=Cnil;

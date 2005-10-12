@@ -208,7 +208,7 @@ EXTER int eval1 ;
 /* list.d */
 EXTER bool in_list_flag;
 EXTER object test_function;
-EXTER object item_compared;
+EXTER object item_compared,reverse_comparison;
 bool (*tf)();
 EXTER object key_function;
 object (*kf)();

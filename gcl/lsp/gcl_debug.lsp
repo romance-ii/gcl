@@ -14,7 +14,6 @@
 (defmacro fb (op &rest args)
     `(,op ,@ (mapcar #'(lambda (x) `(the fixnum ,x)) args) ))
 
-  )
 
 ;;; Some debugging features:
 ;;; Search-stack :

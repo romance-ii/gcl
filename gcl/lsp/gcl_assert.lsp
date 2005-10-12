@@ -159,7 +159,6 @@
                        ',(mapcar #'(lambda (l) (car l)) clauses))))
          ,(ask-for-form keyplace)
          (format *error-output* "Now continuing ...~%")))
-  )
 
 (defun typecase-error-string
        (keyform keyvalue negs

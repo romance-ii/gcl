@@ -291,7 +291,7 @@ DEFUNO_NEW("SIMPLE-BIT-VECTOR-P",object,fLsimple_bit_vector_p ,LISP
 DEFUNO_NEW("SIMPLE-VECTOR-P",object,fLsimple_vector_p ,LISP
    ,1,1,NONE,OO,OO,OO,OO,void,Lsimple_vector_p ,(object x0),"") {
 
-  RETURN1(FFN(fLvectorp)(x0));
+  RETURN1(FFN(fLvectorp)(x0)==Ct && (enum aelttype)x0->v.v_elttype == aet_object ? Ct : Cnil);
 
 }
 

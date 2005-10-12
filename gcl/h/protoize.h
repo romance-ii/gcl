@@ -488,6 +488,7 @@ typedef void (*funcvoid)(void);
 /* typespec.c:191:OF */ extern void check_type_cons (object *p); /* (p) object *p; */
 /* typespec.c:198:OF */ extern void check_type_stream (object *p); /* (p) object *p; */
 /* typespec.c:205:OF */ extern void check_type_readtable (object *p); /* (p) object *p; */
+/* typespec.c:205:OF */ extern void check_type_readtable_no_default (object *p); /* (p) object *p; */
 /* typespec.c:213:OF */ extern void check_type_or_Pathname_string_symbol (object *p); /* (p) object *p; */
 /* typespec.c:225:OF */ extern void check_type_or_pathname_string_symbol_stream (object *p); /* (p) object *p; */
 /* typespec.c:236:OF */ extern void check_type_random_state (object *p); /* (p) object *p; */

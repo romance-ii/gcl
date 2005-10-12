@@ -65,7 +65,7 @@
     (cond ((and (>= ch 0) (< ch 10))
 	   (setq ans (+ ch (* 10 ans))))
 	  (t (return nil))))
-  ans))
+  ans)
   
 (defun info-get-tags (file &aux (lim 0) *match-data* tags files
 			   (*case-fold-search* t))
@@ -238,7 +238,7 @@
 (defun get-info-choices (pat type)
       (if (eql type 'index)
 	  (nodes-from-index pat )
-	(get-nodes pat (car (nth 1 *current-info-data*))))))
+	(get-nodes pat (car (nth 1 *current-info-data*)))))
 
 (defun add-file (v file &aux (lis v))
   (while lis

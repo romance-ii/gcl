@@ -84,8 +84,14 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * Better coerce and  make-sequence
   * fix type<= definition
   * enhanced reader-error support
+  * enhanced reader-error support, readtable-case support, proper-list
+    type support, list function ansi fixes, hasfillp slot for arrays and
+    vectors, character traits, setf gethash interpreter fix, make-hash-
+    table ansi fixes, simple-vector-p ansi fix, print-symbol fixes, set-
+    syntax-from-char fixes, rework loose package syntax, prohibit loose
+    right paren in reader
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 12 Oct 2005 03:06:04 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 12 Oct 2005 03:12:29 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

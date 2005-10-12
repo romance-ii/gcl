@@ -389,7 +389,7 @@
      (cond ((and ,i-in-range ,within-count ,satisfies-the-test)
             (setf (elt newseq i) newitem)
             ,kount-up)
-           (t (setf (elt newseq i) ,x))))))
+           (t (setf (elt newseq i) ,x)))))
 
 
 (defseq nsubstitute (newitem) t nil

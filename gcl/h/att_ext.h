@@ -116,7 +116,7 @@ float object_to_float();
 double object_to_double();
 
 /*  error.c  */
-EXTER object sKerror,sKparse_error;
+EXTER object sKerror,sKparse_error,sKreader_error;;
 EXTER object sKwrong_type_argument;
 EXTER object sKcontrol_error;
 EXTER object sKcatch;
@@ -428,6 +428,8 @@ int eql1(),equal1(),eq();
 /*  print.d  */
 EXTER object sKupcase;
 EXTER object sKdowncase;
+EXTER object sKpreserve;
+EXTER object sKinvert;
 EXTER object sKcapitalize;
 EXTER object sKstream;
 EXTER object sKreadably;
@@ -594,7 +596,7 @@ EXTER object sSsetf_function;
                           MMcddr(a_)==Cnil)
 
 /*  typespec.c  */
-EXTER object sLcommon,sLnull,sLcons,sLlist,sLsymbol,sLarray,sLvector,sLbit_vector,sLstring;
+EXTER object sLcommon,sLnull,sLcons,sLlist,siLproper_list,sLsymbol,sLarray,sLvector,sLbit_vector,sLstring;
 EXTER object sLsequence,sLsimple_array,sLsimple_vector,sLsimple_bit_vector,sLsimple_string;
 EXTER object sLcompiled_function,sLpathname,sLcharacter,sLnumber,sLrational,sLfloat;
 EXTER object sLinteger,sLratio,sLshort_float,sLstandard_char,sLinterpreted_function;

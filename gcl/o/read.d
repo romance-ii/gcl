@@ -48,6 +48,8 @@ object dispatch_reader;
 
 #define	cat(c)	(READtable->rt.rt_self[char_code((c))] \
 		 .rte_chattrib)
+#define	trt(c)	(READtable->rt.rt_self[char_code((c))] \
+		 .rte_chatrait)
 
 #ifndef SHARP_EQ_CONTEXT_SIZE
 #define	SHARP_EQ_CONTEXT_SIZE	500
@@ -72,6 +74,10 @@ struct sharp_eq_context_struct {
 		sharp_eq_context to mark_origin.
 */
 
+
+/* FIXME What should this be? Apparently no reliable way to use value stack */ 
+#define MAX_PACKAGE_STACK 1024
+static object P0[MAX_PACKAGE_STACK],*PP0=P0,LP;
 
 static void
 setup_READ()
@@ -101,6 +107,10 @@ setup_READ()
 	sharp_eq_context_max = 0;
 
 	backq_level = 0;
+
+	PP0=P0;
+	LP=NULL;
+
 }
 
 static void
@@ -396,10 +406,6 @@ too_long_token(void);
 	This routine corresponds to COMMON Lisp function READ.
 */
 
-/* FIXME What should this be? Apparently no reliable way to use value stack */ 
-#define MAX_PACKAGE_STACK 1024
-static object P0[MAX_PACKAGE_STACK],*PP0=P0,LP;
-
 object
 read_object(in)
 object in;
@@ -431,28 +437,17 @@ BEGIN:
 	  if (df) {
 	    vs_reset;
 	    return(OBJNULL);
-	  } else
+	  } else 
 	    end_of_stream(in);
 	});
 		a = cat(c);
 	} while (a == cat_whitespace);
-	if (c->ch.ch_code == '(') { /* Loose package extension */
-	  LP=LP || PP0==P0 ? LP : PP0[-1]; /* push loose packages into nested lists */
-	  if (LP) {
-	    if (PP0-P0>=MAX_PACKAGE_STACK)
-	      FEerror("Too many nested package specifiers",0);
-	    *PP0++=LP;
-	    LP=NULL;
-	  }
-	} else if (LP)
-	    FEerror("Loose package prefix must be followed by a list",0);
-	if (c->ch.ch_code==')' && PP0>P0) PP0--; /* regardless of error behavior, 
-						    will pop stack to beginning as parens
-						    must match before the reader starts */
+
 	delimiting_char = vs_head;
 	if (delimiting_char != OBJNULL && c == delimiting_char) {
 		delimiting_char = OBJNULL;
 		vs_reset;
+		LP=NULL;
 		return(OBJNULL);
 	}
 	delimiting_char = OBJNULL;
@@ -471,6 +466,7 @@ BEGIN:
 		fun_box[0] = x;
 		super_funcall(x);
 
+		LP=NULL;
 		i = vs_top - vs_base;
 		if (i == 0) {
 			vs_base = old_vs_base;
@@ -528,18 +524,28 @@ BEGIN:
 		    goto K;
 		  else
 		    break;
-		}
-		else if ('a' <= char_code(c) && char_code(c) <= 'z')
-			c = code_char(char_code(c) - ('a' - 'A'));
-		else if (char_code(c) == ':') {
-			if (colon_type == 0) {
-				colon_type = 1;
-				colon = length;
-			} else if (colon_type == 1 && colon == length-1)
-				colon_type = 2;
-			else
-				colon_type = -1;
-				/*  Colon has appeared twice.  */
+		} else {
+
+		  if (trt(c)==trait_invalid)
+		    READER_ERROR("Cannot read character");
+
+		  if ('A' <= char_code(c) && char_code(c) <= 'z') {
+		    if ('a' <= char_code(c) && char_code(c) <= 'z' && 
+			(READtable->rt.rt_case==sKupcase || READtable->rt.rt_case==sKinvert))
+		      c = code_char(char_code(c) - ('a' - 'A'));
+		    else if ('A' <= char_code(c) && char_code(c) <= 'Z' && 
+			     (READtable->rt.rt_case==sKdowncase || READtable->rt.rt_case==sKinvert))
+		      c = code_char(char_code(c) + ('a' - 'A'));
+		  } else if (char_code(c) == ':') {
+		    if (colon_type == 0) {
+		      colon_type = 1;
+		      colon = length;
+		    } else if (colon_type == 1 && colon == length-1)
+		      colon_type = 2;
+		    else
+		      colon_type = -1;
+		    /*  Colon has appeared twice.  */
+		  }
 		}
         }
 	if (preserving_whitespace_flag || cat(c) != cat_whitespace)
@@ -638,6 +644,8 @@ SYMBOL:
 	return(x);
 }
 
+static int inlp;
+
 static void
 Lleft_parenthesis_reader()
 {
@@ -648,6 +656,14 @@ Lleft_parenthesis_reader()
 	in = vs_base[0];
 	vs_head = Cnil;
 	p = &vs_head;
+	inlp=1;
+	LP=LP || PP0==P0 ? LP : PP0[-1]; /* push loose packages into nested lists */
+	if (LP) {
+	  if (PP0-P0>=MAX_PACKAGE_STACK)
+	    FEerror("Too many nested package specifiers",0);
+	  *PP0++=LP;
+	  LP=NULL;
+	}
 	for (;;) {
 		delimiting_char = code_char(')');
 		in_list_flag = TRUE;
@@ -666,9 +682,6 @@ Lleft_parenthesis_reader()
 				c = read_char(in);
 			if (char_code(c) != ')')
 	FEerror("A dot appeared before a right parenthesis.", 0);
-			else if (PP0>P0) PP0--; /* should be the only other place
- 						   outside of read_object where
-					           closing parens are read */
 			goto ENDUP;
 		}
 		vs_push(x);
@@ -678,7 +691,9 @@ Lleft_parenthesis_reader()
 	}
 
 ENDUP:
+	if (PP0>P0) PP0--;
 	vs_base[0] = vs_pop;
+	inlp=0;
 	return;
 }
 
@@ -1060,10 +1075,13 @@ object in;
 static void
 Ldouble_quote_reader()
 {
-	check_arg(2);
-	vs_popp;
-	read_string('"', vs_base[0]);
-	vs_base[0] = copy_simple_string(token);
+  object c;
+  check_arg(2);
+  c=vs_base[1];
+  vs_popp;
+  read_string(char_code(c), vs_base[0]);
+  vs_base[0] = copy_simple_string(token);
+
 }
 
 static void
@@ -1123,6 +1141,8 @@ static void
 Lright_parenthesis_reader()
 {
 	check_arg(2);
+	if (!inlp)
+	  READER_ERROR("Right paren found with no left.");
 	vs_popp;
 	vs_popp;
 		/*  no result  */
@@ -1860,7 +1880,7 @@ Lsharp_vertical_bar_reader()
 static void
 Ldefault_dispatch_macro()
 {
-	FEerror("The default dispatch macro signalled an error.", 0);
+	READER_ERROR("The default dispatch macro signalled an error.");
 }
 
 /*
@@ -1960,6 +1980,7 @@ object from, to;
 				rtab[i].rte_dtab[j]
 				= from->rt.rt_self[i].rte_dtab[j];
 		}
+	to->rt.rt_case=from->rt.rt_case;
 	vs_reset;
 	END_NO_INTERRUPT;}
 	return(to);
@@ -2409,8 +2430,8 @@ LFD(Lreadtablep)()
 		fromrdtbl = standard_readtable;
 	else
 		check_type_readtable(&fromrdtbl);
-	tordtbl->rt.rt_self[char_code(tochr)].rte_chattrib
-	= fromrdtbl->rt.rt_self[char_code(fromchr)].rte_chattrib;
+	tordtbl->rt.rt_self[char_code(tochr)].rte_chattrib 
+	  = fromrdtbl->rt.rt_self[char_code(fromchr)].rte_chattrib;
 	tordtbl->rt.rt_self[char_code(tochr)].rte_macro
 	= fromrdtbl->rt.rt_self[char_code(fromchr)].rte_macro;
 	if ((tordtbl->rt.rt_self[char_code(tochr)].rte_dtab
@@ -2503,6 +2524,21 @@ LFD(Lreadtablep)()
 
 	@(return Ct)
 @)
+
+DEFUNO_NEW("READTABLE-CASE",object,fLreadtable_case,LISP,1,1,NONE,OO,OO,OO,OO,void,Lreadtable_case,(object rt),"") {
+  check_type_readtable_no_default(&rt);
+  RETURN1(rt->rt.rt_case);
+}
+
+DEFUNO_NEW("SET-READTABLE-CASE",object,fSset_readtable_case,SI,2,2,NONE,
+	   OO,OO,OO,OO,void,siLset_readtable_case,(object rt,object cas),"") {
+  check_type_readtable_no_default(&rt);
+  if (cas!=sKupcase && cas!=sKdowncase && cas!=sKpreserve && cas!=sKinvert)
+    TYPE_ERROR(cas,list(5,sLmember,sKupcase,sKdowncase,sKpreserve,sKinvert));
+  RETURN1(rt->rt.rt_case=cas);
+}
+
+
 
 @(static defun get_dispatch_macro_character (dspchr subchr
 	&optional (rdtbl `current_readtable()`))
@@ -2628,10 +2664,20 @@ gcl_init_read()
 	dispatch_reader = make_cf(Ldispatch_reader);
 	enter_mark_origin(&dispatch_reader);
 
+
+	rtab['\b'].rte_chatrait = trait_invalid;
+	rtab['\t'].rte_chatrait = trait_invalid;
+	rtab['\n'].rte_chatrait = trait_invalid;
+	rtab['\r'].rte_chatrait = trait_invalid;
+	rtab['\f'].rte_chatrait = trait_invalid;
+	rtab[' '].rte_chatrait = trait_invalid;
+	rtab['\177'].rte_chatrait = trait_invalid;
+
+
 	rtab['\t'].rte_chattrib = cat_whitespace;
+	rtab['\r'].rte_chattrib = cat_whitespace;
 	rtab['\n'].rte_chattrib = cat_whitespace;
 	rtab['\f'].rte_chattrib = cat_whitespace;
-	rtab['\r'].rte_chattrib = cat_whitespace;
 	rtab[' '].rte_chattrib = cat_whitespace;
 	rtab['"'].rte_chattrib = cat_terminating;
 	rtab['"'].rte_macro = make_cf(Ldouble_quote_reader);
@@ -2708,6 +2754,13 @@ gcl_init_read()
 */
 
 	gcl_init_backq();
+
+	sKupcase = make_keyword("UPCASE");
+	sKdowncase = make_keyword("DOWNCASE");
+	sKpreserve = make_keyword("PRESERVE");
+	sKinvert = make_keyword("INVERT");
+
+	standard_readtable->rt.rt_case=sKupcase;
 
 	Vreadtable
  	= make_special("*READTABLE*",

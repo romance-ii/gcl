@@ -26,11 +26,10 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "include.h"
+#include "num_include.h"
 
-static int reverse_comparison;
-
-#define TARG1(a,b) (reverse_comparison ? (b) : (a))
-#define TARG2(a,b) (reverse_comparison ? (a) : (b))
+#define TARG1(a,b) (reverse_comparison!=Cnil ? (b) : (a))
+#define TARG2(a,b) (reverse_comparison!=Cnil ? (a) : (b))
 
 object sKinitial_element;
 
@@ -39,6 +38,7 @@ object sKinitial_element;
 #define	saveTEST  \
 	object old_test_function = test_function;  \
 	object old_item_compared = item_compared;  \
+	object old_reverse_comparison = reverse_comparison;  \
 	bool (*old_tf)() = tf;  \
 	object old_key_function = key_function;  \
 	object (*old_kf)() = kf;  \
@@ -56,6 +56,7 @@ L:  \
 	frs_pop();  \
 	test_function = old_test_function;  \
 	item_compared = old_item_compared;  \
+	reverse_comparison = old_reverse_comparison;  \
 	tf = old_tf;  \
 	key_function = old_key_function;  \
 	kf = old_kf;  \
@@ -114,8 +115,8 @@ object x;
 }
 
 static void
-setupTEST(item, test, test_not, key)
-object item, test, test_not, key;
+setupTEST(item, test, test_not, key, rev)
+object item, test, test_not, key, rev;
 {
 	item_compared = item;
 	if (test != Cnil) {
@@ -133,6 +134,7 @@ object item, test, test_not, key;
 		kf = apply_key_function;
 	} else
 		kf = identity;
+	reverse_comparison=rev;
 }
 
 #define	PREDICATE(f, f_if, f_if_not, n)  \
@@ -516,7 +518,6 @@ object alist, tree;
 	object x;
 	cs_check(alist);
 
-
 	for (x = alist;  !endp(x);  x = x->c.c_cdr) {
 		item_compared = car(x->c.c_car);
 		if (TEST(tree)) {
@@ -694,7 +695,7 @@ LFD(Lcons)()
         saveTEST;
 @
 	protectTEST;	
-	setupTEST(Cnil, test, test_not, Cnil);
+	setupTEST(Cnil, test, test_not, Cnil, Cnil);
         x=(tree_equal(x, y) ? Ct : Cnil);
         restoreTEST;
         @(return x) 
@@ -795,9 +796,11 @@ LFD(Llast)() {
 	if (endp(vs_base[0]))
 		return;
 	if (n==2) {
-		if (type_of(vs_base[1])!=t_fixnum || (n=fix(vs_base[1]))<0)
-			FEwrong_type_argument(sLnon_negative_fixnum,vs_base[1]);
-		vs_popp;
+	  enum type tp=type_of(vs_base[1]);
+	  if ((tp!=t_fixnum && tp!=t_bignum)|| number_minusp(vs_base[1]))
+	    TYPE_ERROR(vs_base[1],list(2,sLinteger,make_fixnum(0)));
+	  n=tp==t_fixnum ? fix(vs_base[1]) : MOST_POSITIVE_FIX;
+	  vs_popp;
 	}	
 
 	if (!n)
@@ -1062,7 +1065,7 @@ LFD(Lrplacd)()
 	saveTEST;
 @
 	protectTEST;
-	setupTEST(old, test, test_not, key);
+	setupTEST(old, test, test_not, key, Cnil);
 	subst(new, tree);
 	tree = vs_pop;
 	restoreTEST;
@@ -1076,7 +1079,7 @@ PREDICATE(Lsubst,Lsubst_if,Lsubst_if_not, 3)
 	saveTEST;
 @
 	protectTEST;
-	setupTEST(old, test, test_not, key);
+	setupTEST(old, test, test_not, key, Cnil);
 	nsubst(new, &tree);
 	restoreTEST;
 	@(return tree)
@@ -1127,7 +1130,7 @@ object alist;
     */
     for (v=alist ; consp(v) ; v=v->c.c_cdr);
     if (v != Cnil)
-	 FEwrong_type_argument(sLlist, alist);
+      TYPE_ERROR(alist,siLproper_list);
 }
  
 
@@ -1136,7 +1139,7 @@ object alist;
         saveTEST;
 @  
 	protectTEST;
-	setupTEST(Cnil, test, test_not, key);
+	setupTEST(Cnil, test, test_not, key, Ct);
 	sublis(alist, tree);
 	tree = vs_pop;
 	restoreTEST;
@@ -1147,7 +1150,7 @@ object alist;
 	saveTEST;
 @
 	protectTEST;
-	setupTEST(Cnil, test, test_not, key);
+	setupTEST(Cnil, test, test_not, key, Ct);
 	nsublis(alist, &tree);
 	restoreTEST;
 	@(return tree)
@@ -1158,7 +1161,7 @@ object alist;
 
 @
 	protectTEST;
-	setupTEST(item, test, test_not, key);
+	setupTEST(item, test, test_not, key, Cnil);
 	while (!endp(list)) {
 		if (TEST(list->c.c_car))
 			goto L;
@@ -1176,16 +1179,13 @@ PREDICATE(Lmember,Lmember_if,Lmember_if_not, 2)
 	protectTEST;
 	if (key != Cnil)
 		item = ifuncall1(key, item);
-	if (rev != Cnil)
-		reverse_comparison=1;
-	setupTEST(item, test, test_not, key);
+	setupTEST(item, test, test_not, key, rev);
 	while (!endp(list)) {
 		if (TEST(list->c.c_car))
 			goto L;
 		list = list->c.c_cdr;
 	}
 	restoreTEST;
-	reverse_comparison=0;
 	@(return list)
 @)
 
@@ -1258,7 +1258,7 @@ LFD(Lacons)()
 	saveTEST;
 @
 	protectTEST;
-	setupTEST(item, test, test_not, key);
+	setupTEST(item, test, test_not, key, Cnil);
 	while (!endp(a_list)) {
 		if (a_list->c.c_car != Cnil && 
 		    TEST((*car_or_cdr)(a_list->c.c_car))) {

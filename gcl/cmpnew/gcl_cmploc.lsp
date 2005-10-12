@@ -170,7 +170,7 @@
   (let ((vs-mark *vs*) (*vs* *vs*))
     (wt-nl) (wt-vs (vs-push)) (wt "= " loc ";")
     (wt-nl "vs_top=(vs_base=base+" vs-mark ")+" (- *vs* vs-mark) ";")
-    (base-used)))))
+    (base-used)))
 
 (defun wt-vs-base (offset) (wt "vs_base[" offset "]"))
 

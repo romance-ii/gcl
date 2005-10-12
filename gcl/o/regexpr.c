@@ -67,7 +67,7 @@ DEFUN_NEW("COMPILE-REGEXP",object,fScompile_regexp,SI,1,1,NONE,OO,OO,OO,OO,(obje
   char *tmp;
   object res;
   void *v;
-  fixnum sz;
+  fixnum sz=0;
 
   if (type_of(p)!= t_string && type_of(p)!=t_symbol)
     not_a_string_or_symbol(p);

@@ -660,7 +660,7 @@ print_hash_table (object ht,char *procedure_name) {
   else
      FEerror("~S is an illegal hash-table test function.",1, test);
 
-  if (type_of(size)!=t_fixnum || fix(size)<=0)
+  if (type_of(size)!=t_fixnum || fix(size)<0)
      FEerror("~S is an illegal hash-table size.", 1, size);
 
   err=0;
@@ -684,16 +684,24 @@ print_hash_table (object ht,char *procedure_name) {
   switch(type_of(rehash_threshold)) {
   case t_fixnum:
     max_ent=fix(rehash_threshold);
-    if (max_ent<=0 || max_ent>=fix(size)) err=1;
+    if (max_ent<0 || max_ent>fix(size)) err=1;
     break;
   case t_shortfloat:
     max_ent=(fixnum)(sf(rehash_threshold)*fix(size)+0.5);
-    if (sf(rehash_threshold)<=0.0 || sf(rehash_threshold)>=1.0) err=1;
+    if (sf(rehash_threshold)<0.0 || sf(rehash_threshold)>1.0) err=1;
     break;
   case t_longfloat:
     max_ent=(fixnum)(lf(rehash_threshold)*fix(size)+0.5);
-    if (lf(rehash_threshold)<=0.0 || lf(rehash_threshold)>=1.0) err=1;
+    if (lf(rehash_threshold)<0.0 || lf(rehash_threshold)>1.0) err=1;
     break;
+  case t_ratio:
+    {
+      double d=number_to_double(rehash_threshold);
+      max_ent=(fixnum)(d*fix(size)+0.5);
+      if (d<0.0 || d>1.0) err=1;
+      break;
+    }
+      
   default:
     max_ent = (7 * fix(size)) / 10;  /* Default to 70% */    
     err=1;
