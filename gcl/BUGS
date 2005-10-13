@@ -6,32 +6,33 @@ number in place so it isn't reused.
   s is a structure class name or a structure class object.
   This is causing 95 ansi-test failures.
 
-2. (sublis x y :test #'fn) is passing the arguments to fn in the
+2. (FIXED) (sublis x y :test #'fn) is passing the arguments to fn in the
   wrong order.  The problem here is that the :key argument is being
   applied somewhat unusually, making the usual TEST macro not do
   quite the right thing.  ansi-tests: sublis.9 and sublis.10
 
-3. (nsublis x y :test #'fn) is passing the arguments to fn in the
+3. (FIXED) (nsublis x y :test #'fn) is passing the arguments to fn in the
   wrong order. Similar to bug #2.  ansi-tests:  nsublis.10 and nsublis.11
 
-4. (last x n) is incorrectly signaling an error when n is a positive
+4. (FIXED) (last x n) is incorrectly signaling an error when n is a positive
   bignum.  Instead, it should return x.   ansi-tests: last.11, last.12
 
-5. The map* functions should signal a type error when given an improper
+5. (FIXED) The map* functions should signal a type error when given an improper
   list.  They do so, but the slots of the type error object don't
   satisfy the property that the value in the datum slot is not of
   the type in the expected-type slot.  ansi-tests: mapc.error.8,
   mapcar.error.8, mapcan.error.8, mapl.error.8, maplist.error.11,
   mapcon.error.8
 
-6. Similar to #5, but the error is for GET-PROPERTIES.  ansi-tests:
+6. (FIXED)  Similar to #5, but the error is for GET-PROPERTIES.  ansi-tests:
    get-properties.error.[456]
 
-7. (SETF (GETF form1 form2 form3) form4) is evaluating the subforms
+7. (FIXED) (SETF (GETF form1 form2 form3) form4) is evaluating the subforms
   in the wrong order: form3 is being evaluated before (the subforms of)
   form1 and form2.  ansi-tests: setf-getf.order.2
 
-8. Similar to #5, but the error is for GETF.  ansi-tests: getf.error.[45]
+8. (FIXED) Similar to #5, but the error is for GETF.  ansi-tests:
+   getf.error.[45]
 
 9. (FIXED) REMF is violating the requirement that the value of the place be
   read out after all the other subforms of the REMF form are computed
@@ -49,20 +50,21 @@ number in place so it isn't reused.
    elt-adj-array.10, elt-displaced-array.1, elt-fill-pointer.[3468],
    and elt,error.[45]).
 
-12. Coerce can't coerce a vector of characters into a base-string.
+12. (FIXED)  Coerce can't coerce a vector of characters into a base-string.
   ansi-tests: fill.string.10
 
-13. (partially FIXED) MAKE-SEQUENCE fails on type argument NULL,
+13. (FIXED) MAKE-SEQUENCE fails on type argument NULL,
    (CLASS-OF NIL), or (FIND-CLASS LIST).
    ansi-tests: make-sequence.57
 
-14. The datum and expected type fields of the type errors thrown by
+14. (partially FIXED; map.error.11 still fails)
+   The datum and expected type fields of the type errors thrown by
    MAKE-SEQUENCE, MAP  do not satisfy the constraint that the datum
    is not of type expected-type.  ansi-tests: make-sequence.error.1,
    make-sequence.error.2, make-sequence.error.14, make-sequence.error.16,
    map.error.1, map.error.1a, map.error.11.
 
-15. MAP fails on type argument NULL, (OR (VECTOR 5) (VECTOR 10))
+15. (FIXED) MAP fails on type argument NULL, (OR (VECTOR 5) (VECTOR 10))
    ansi-tests: map-null.1, map.48
 
 16. NREVERSE is broken on vectors of element type LISP:SIGNED-SHORT
@@ -78,10 +80,11 @@ number in place so it isn't reused.
    entire vector is returned rather than the aubsequence being assigned.)
    ansi-tests: subseq.order.[34]
 
-18. CONCATENATE fails on type argument of NULL, as does MERGE.
+18. (FIXED) CONCATENATE fails on type argument of NULL, as does MERGE.
    ansi-tests:. concatenate.24, merge-null.1, merge.error.6
 
-19, There are 140 symbols exported from the COMMON-LISP package that
+19, (partially FIXED; no-extra-symbols-exported-from-common-lisp still fails)
+   There are 140 symbols exported from the COMMON-LISP package that
    should not be external in that package.
    ansi-tests: no-extra-symbols-exported-from-common-lisp
     all-exported-cl-class-names-are-valid
@@ -162,8 +165,10 @@ number in place so it isn't reused.
 21. The following macros are missing: (FIXED)define-compiler-macro
     (FIXED)define-setf-expander define-symbol-macro in-package.
    ansi-tests: cl-macro-symbols.1 in-package.error.1
-    dcf-macros define-setf-expander.error.1
-    define-setf-expander.[1234567] define-compiler-macro.error.[123]
+    dcf-macros define-setf-expander.error.1 (FIXED)
+    define-setf-expander.[1234567] (partially FIXED; define-setf-expander.7
+      still fails)
+    define-compiler-macro.error.[123]
     define-compiler-macro.[12345678] define-symbol-macro.error.[123]
     documentation.symbol.setf.[12]
 
@@ -242,13 +247,14 @@ number in place so it isn't reused.
     when called on an invalid number of arguments.  ansi-tests:
     destructuring-bind.error.[789]
 
-45. No hash table with :key EQUALP.
+45. (FIXED) No hash table with :key EQUALP.
     ansi-tests:  equalp.21
 
-46. EQUALP fails to properly compare hash tables.
+46. (partially FIXED; equalp.35 still fails)
+    EQUALP fails to properly compare hash tables.
     ansi-tests: equalp.22 to equalp.35
 
-47. The type error signaled by EVERY and related functions has
+47. (FIXED) The type error signaled by EVERY and related functions has
     the datum and expected-type slots switched.  ansi-tests:
     every.error.1 notany.error.1  notevery.error.1 some.error.1
 
@@ -268,10 +274,10 @@ number in place so it isn't reused.
     ansi-tests: function-lambda-expression.[123]
     function-lambda-expression.order.1 function-lambda-expression.error.[12]
 
-52. Lambda forms are no longer of type function.
+52. (FIXED) Lambda forms are no longer of type function.
     ansi-tests: function.6 function.10 functionp.6 functionp.10
 
-53. Symbols are no longer functions.
+53. (FIXED) Symbols are no longer functions.
     ansi-tests: functionp.2
 
 54. Free special declarations do not apply to the init forms of a LET or LET*.
@@ -307,10 +313,10 @@ number in place so it isn't reused.
 
 64. Free special declarations in a LAMBDA form should not affect
     the expressions in key, aux, or optional parameters.
-    ansi-tests: lambda.52 lambda.53 lambda.55
+    ansi-tests: lambda.5[234]
 
 65. The second argument to COMPILE is allowed to be a function;
-    not just a lambda expression.  ansi-tests: lambda.55 lambda.56
+    not just a lambda expression.  ansi-tests: lambda.5[56]
 
 66. COMPILE-FILE is incorrectly executing the code twice i
      an EVAL-WHEN form with both the :COMPILE-TOPLEVEL and
@@ -320,7 +326,7 @@ number in place so it isn't reused.
     environment in which the DEFMACRO form appears.
     ansi-tests: defmacro.3 defmacro.4 defmacro.12 defmacro.13
 
-68. (typep nil (find-class 'null)) ==> nil
+68. (FIXED) (typep nil (find-class 'null)) ==> nil
     See also bug #81.
     ansi-tests: the.9 the.10
 
@@ -391,7 +397,7 @@ number in place so it isn't reused.
     two-way-stream.
     ansi-tests: all-structure-classes-are-subtypes-of-structure-object
 
-79. The standardized generic function DOCUMENTATION should be a member
+79. (FIXED) The standardized generic function DOCUMENTATION should be a member
     of the class GENERIC-FUNCTION.
 
 80. (FIXED, please check) SUBTYPEP is not correctly determining that if a class X is a subclass
@@ -472,10 +478,14 @@ number in place so it isn't reused.
     in PCL that also showed up in SBCL and CMUCL.  The function starts
     returning NIL after a few calls.  ansi-tests: *-CPL
 
-93. READTABLE-CASE is undefined (and its SETF form)
+93. (partially FIXED; prin1.symbol.3 is still failing, but is a different
+     bug)  READTABLE-CASE is undefined (and its SETF form)
     ansi-tests: read-symbol.1[678] read-symbol.25
      readtable-case.* set-syntax-from-char-trait-*
-     print.symbol.[123456789] print-symbol.1[012] prin1.symbol.[123]
+     print.symbol.[123456789] print.symbol.1[012] prin1.symbol.[123]
+
+93a. PRIN1 is not escape the symbol |1| properly when readtabkle-case
+    is set to :UPCASE.  ansi-tests: prin1.symbol.3
      
 
 94. Binding *READ-SUPPRESS* to true doesn't totally suppress reading;
