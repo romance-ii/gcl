@@ -100,8 +100,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * accelerate deftype expansions
   * compile gcl_cmpmain.lsp
   * remove string-char from sys-proclaim.lisp
+  * print symbol fixes
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 13 Oct 2005 21:25:23 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 13 Oct 2005 21:26:27 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

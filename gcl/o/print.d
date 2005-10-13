@@ -698,15 +698,27 @@ constant_case(object x) {
 }
     
 static int
+all_dots(object x) {
+  
+  fixnum i;
+
+  for (i=0;i<x->s.s_fillp && x->s.s_self[i]=='.';i++);
+  
+  return i==x->s.s_fillp;
+
+}
+
+static int
 needs_escape (object x) {
 
   fixnum i;
 
-  if (x->s.s_fillp && *x->s.s_self==' ')
-    return 1;
+/*   if (x->s.s_fillp && *x->s.s_self==' ') */
+/*     return 1; */
 
   for (i=0;i<x->s.s_fillp;i++) 
     switch(x->s.s_self[i]) {
+    case ' ':
     case '(':
     case ')':
     case ':':
@@ -721,30 +733,20 @@ needs_escape (object x) {
       break;
     }
 
-  if (!PRINTescape)
-    return 0;
-  if (READ_TABLE_CASE==sKupcase) {
+  if (READ_TABLE_CASE==sKupcase || PRINTreadably) {
     for (i=0;i<x->s.s_fillp;i++) 
       if (isLower(x->s.s_self[i]))
 	return 1;
   } else if (READ_TABLE_CASE==sKdowncase) {
-    for (i=0;i<x->s.s_fillp;i++) 
+    for (i=0;i<x->s.s_fillp;i++)
       if (isUpper(x->s.s_self[i]))
 	return 1;
   }
 
+  if (potential_number_p(x, PRINTbase)||all_dots(x))
+    return 1;
+
   return !x->s.s_fillp;
-
-}
-
-static int
-all_dots(object x) {
-  
-  fixnum i;
-
-  for (i=0;i<x->s.s_fillp && x->s.s_self[i]=='.';i++);
-  
-  return i==x->s.s_fillp;
 
 }
 
@@ -758,8 +760,9 @@ print_symbol_name_body(object x,int pp) {
 
   cc=constant_case(x);
   k=needs_escape(x);
-  pp=pp && (potential_number_p(x, PRINTbase)||all_dots(x)) ? 0 : 1;
-  pp=k ? 0 : pp;
+  k=PRINTescape ? k : 0;
+  pp=k*pp ? 0 : 1;
+
 
   if (k)
     write_ch('|');
@@ -997,7 +1000,7 @@ int level;
 	  {
 
 	    if (PRINTescape) {
-	      if (x->s.s_hpack == Cnil) {
+	      if (x->s.s_hpack == Cnil || x->s.s_hpack->p.p_name == Cnil) { /*FIXME???*/
 		if (PRINTcircle) {
 		  for (vp = PRINTvs_top;  vp < PRINTvs_limit;  vp += 2)
 		    if (x == *vp) {
