@@ -96,8 +96,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
     normalize-type calls on simple argument input, and even calling
     itself thereby -- FIXME, get concise logic with performance
   * enable setf readtable-case in printer-aux.lsp
+  * Prepare gcl_cmpmain.lsp for compilation
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 13 Oct 2005 21:17:43 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 13 Oct 2005 21:19:06 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

@@ -163,6 +163,7 @@
    (if (consp *split-files*)
        (setf (car *split-files*) (+ (third *split-files*) section-length)))))
 
+(defvar *init-name*)
 
 (defun compile-file1 (input-pathname
                       &key (output-file (merge-pathnames *o-ext* input-pathname))
@@ -190,10 +191,9 @@
 					 nil ;inits
 					 nil
 					 ))
-			   *init-name* 	
 			   (*fasd-data* *fasd-data*)
                            (*error-count* 0))
-  (declare (special *c-debug* *init-name* system-p))
+  (declare (special *c-debug* system-p))
   (when input-pathname
     (setq input-pathname (si:search-local-pathname input-pathname)))
   (when output-file
@@ -408,7 +408,7 @@ Cannot compile ~a.~%"
 	  (values)
 	  )))))
 
-(defun gazonk-name ( &aux tem)
+(defun gazonk-name ()
   (dotimes (i 1000)
     (let ((tem (merge-pathnames (format nil "gazonk~d.lsp" i))))
       (unless (probe-file tem)
@@ -476,7 +476,8 @@ Cannot compile ~a.~%"
 	 (setf (macro-function name) (macro-function name))
 	 nil)
 	((and (setq tem (symbol-function name))
-	      (or (consp tem) (when (typep tem 'interpreted-function) (setq tem (si::interpreted-function-lambda tem))))
+	      (or (consp tem) (when (typep tem 'interpreted-function) 
+				(setq tem (si::interpreted-function-lambda tem))))
 	      (eq (car tem) 'lambda-block))
 	 (let ((gaz (gazonk-name)))
 	   (with-open-file
@@ -494,7 +495,10 @@ Cannot compile ~a.~%"
 		 (on (get-output-pathname gaz "o" gaz )))
 	     (with-open-file (st cn)
 			     (do () ((let ((a (read-line st)))
-				       (when (>= (si::string-match "gazonk[0-9]*.h" a) 0)
+				       (when (>= (si::string-match 
+						  (load-time-value
+						   (si::compile-regexp 
+						    #u"gazonk[0-9]*.h")) a) 0)
 					 (format t "~%~d~%" a)
 					 a))))
 			     (si::copy-stream st *standard-output*))
@@ -745,7 +749,7 @@ SYSTEM_SPECIAL_INIT
 ;  the loading of binary objects on systems relocating with dlopen.
 ;
 
-(defun make-user-init (files outn &aux tem)
+(defun make-user-init (files outn)
 
   (let* ((c (pathname outn))
 	 (c (merge-pathnames c (make-pathname :directory '(:current))))
@@ -826,7 +830,7 @@ SYSTEM_SPECIAL_INIT
 		   new
 		   (mysub (subseq str y) it new)))))
 
-(defun link (files image &optional post extra-libs (run-user-init t) &aux raw init) 
+(defun link (files image &optional post extra-libs (run-user-init t)) 
 
   (let* ((ui (make-user-init files "user-init"))
 	 (raw (pathname image))
