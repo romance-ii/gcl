@@ -95,8 +95,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * accelerate make-sequence, which was making several subtypep1 and
     normalize-type calls on simple argument input, and even calling
     itself thereby -- FIXME, get concise logic with performance
+  * enable setf readtable-case in printer-aux.lsp
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 12 Oct 2005 19:13:41 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 13 Oct 2005 21:17:43 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
