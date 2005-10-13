@@ -47,6 +47,15 @@
 	    `(,tp ,(upgraded-array-element-type (array-element-type object)))
 	  tp))))
 
+(defmacro dt-apply (x y) 
+  (let ((l (gensym))) 
+    `(let ((,l (length ,y))) 
+       (case ,l 
+	     (0 (funcall ,x)) 
+	     (1 (funcall ,x (car ,y))) 
+	     (2 (funcall ,x (car ,y) (cadr ,y))) 
+	     (otherwise (apply ,x ,y))))))
+
 (defun typep-int (object type &aux tp i tem)
   (if (atom type)
       (setq tp type i nil)
@@ -124,7 +133,7 @@
 		  broadcast-stream two-way-stream echo-stream) (eq (type-of-c object) tp))
     (t (cond 
 	 ((setq tem (when (symbolp tp) (get tp 'deftype-definition)))
-	  (typep-int object (apply tem i)))
+	  (typep-int object (dt-apply tem i)))
 	 ((if (symbolp tp) (get tp 's-data) (typep-int tp 's-data))
 	  (let ((z (structure-subtype-p object tp))) z))
 	 ((classp tp)
@@ -281,7 +290,7 @@
    ((assert-type object type))))
 
 ;;; DEFTYPE macro.
-(defmacro deftype (name lambda-list &rest body &aux decls)
+(defmacro deftype (name lambda-list &rest body &aux decls prot)
   ;; Replace undefaultized optional parameter X by (X '*).
   (declare (optimize (safety 1)))
   (do ((b body body)) ((or (not b) (not (consp (car b))) (not (eq 'declare (caar b)))) (nreverse decls))
@@ -291,31 +300,32 @@
   (do ((l lambda-list (cdr l))
        (m nil (cons (car l) m)))
       ((null l))
-    (when (member (car l) lambda-list-keywords)
-	  (unless (member (car l) '(&optional &key)) (return nil))
-	  (setq m (cons (car l) m))
-	  (setq l (cdr l))
-	  (do ()
-	      ((or (null l) (member (car l) lambda-list-keywords)))
-	    (if (symbolp (car l))
-		(setq m (cons (list (car l) ''*) m))
-		(setq m (cons (car l) m)))
-	    (setq l (cdr l)))
-	  (setq lambda-list (nreconc m l))
-	  (return nil)))
-  `(eval-when (compile eval load)
-	      (putprop ',name
-			  '(deftype ,name ,lambda-list ,@body)
-			  'deftype-form)
-	      (putprop ',name
-		       (if (null ',lambda-list)
-			   (lambda nil ,@decls (block ,name ,`(progn ,@body)))
-			 (lambda ,lambda-list ,@decls (block ,name ,@body)))
-			  'deftype-definition)
-	      (putprop ',name
-			  ,(find-documentation body)
-			  'type-documentation)
-	      ',name))
+      (cond ((member (car l) lambda-list-keywords)
+	     (unless (eq (car prot) '*) (push '* prot))
+	     (unless (member (car l) '(&optional &key)) (return nil))
+	     (setq m (cons (car l) m))
+	     (setq l (cdr l))
+	     (do ()
+		 ((or (null l) (member (car l) lambda-list-keywords)))
+		 (if (symbolp (car l))
+		     (setq m (cons (list (car l) ''*) m))
+		   (setq m (cons (car l) m)))
+		 (setq l (cdr l)))
+	     (setq lambda-list (nreconc m l))
+	     (return nil))
+	    ((push t prot))))
+  (let ((fun-name (gensym (string name))) (prot (nreverse prot)))
+    `(eval-when (compile eval load)
+		(putprop ',name
+			 '(deftype ,name ,lambda-list ,@body)
+			 'deftype-form)
+		(proclaim '(ftype (function ,prot t) ,fun-name))
+		(defun ,fun-name ,lambda-list ,@decls (block ,name ,@body))
+		(putprop ',name ',fun-name 'deftype-definition)
+		(putprop ',name
+			 ,(find-documentation body)
+			 'type-documentation)
+		',name)))
 
 ;;; Some DEFTYPE definitions.
 (deftype seqind ()
@@ -424,7 +434,9 @@
 (deftype real (&optional (low '*) (high '*)) `(or (rational ,low ,high) (float ,low ,high)))
 (deftype number () `(or real complex))
 (deftype atom () `(not cons))
-(deftype function (&optional as vs) `(or interpreted-function compiled-function generic-function))
+(deftype function (&optional as vs) 
+  (declare (ignore as vs)) 
+  `(or interpreted-function compiled-function generic-function))
 
 (deftype integer (&optional (low '*) (high '*)) `(integer ,low ,high))
 (deftype ratio (&optional (low '*) (high '*)) `(ratio ,low ,high))
@@ -635,7 +647,7 @@
 ;;FIXME loose the ar and default to t
 (defun normalize-type-int (type ar &aux tem)
   (cond ((atom type) (normalize-type-int (list type) ar))
-	;;These are deftype accelerators
+	;;These are deftype accelerators  FIXME may no longer be necessary with faster deftype
 	((member (car type) +range-types+)
 	 (let* ((l (cadr type))
 		(ln (if (cdr type) (maybe-eval l) '*))
@@ -682,7 +694,7 @@
 			(mapcar (lambda (x) (if (and (consp x) (eq (car x) 'load-time-value)) (eval (cadr x)) x))
 				(cdr type))
 		      (cdr type)))
-		(nt (and dt (or (apply dt rr) '(nil)))))
+		(nt (and dt (or (dt-apply dt rr) '(nil)))))
 	   (when (and nt (not (equal type nt)))
 	     (normalize-type-int nt ar))))
 	((member (car type) '(and or not))
