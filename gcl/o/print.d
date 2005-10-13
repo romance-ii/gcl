@@ -698,23 +698,9 @@ constant_case(object x) {
 }
     
 static int
-all_dots(object x) {
-  
-  fixnum i;
-
-  for (i=0;i<x->s.s_fillp && x->s.s_self[i]=='.';i++);
-  
-  return i==x->s.s_fillp;
-
-}
-
-static int
 needs_escape (object x) {
 
   fixnum i;
-
-/*   if (x->s.s_fillp && *x->s.s_self==' ') */
-/*     return 1; */
 
   for (i=0;i<x->s.s_fillp;i++) 
     switch(x->s.s_self[i]) {
@@ -743,7 +729,7 @@ needs_escape (object x) {
 	return 1;
   }
 
-  if (potential_number_p(x, PRINTbase)||all_dots(x))
+  if (potential_number_p(x, PRINTbase))
     return 1;
 
   return !x->s.s_fillp;
