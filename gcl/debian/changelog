@@ -101,8 +101,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * compile gcl_cmpmain.lsp
   * remove string-char from sys-proclaim.lisp
   * print symbol fixes
+  * Fix subtypep cons test  FIXME handle side effects better
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 13 Oct 2005 21:26:27 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 13 Oct 2005 22:01:03 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

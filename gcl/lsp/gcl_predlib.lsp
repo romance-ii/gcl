@@ -1125,8 +1125,8 @@
   (cond ((eq t (cadr x)) `(cons t t))
 	((atom (cadr x)) nil)
 	((cons-atm (cadr x))
-	 (let ((car (nreconstruct-type-int (caadr x)))
-	       (cdr (nreconstruct-type-int (cdadr x))))
+	 (let ((car (nreconstruct-type-int (copy-tree (caadr x))));FIXME
+	       (cdr (nreconstruct-type-int (copy-tree (cdadr x)))))
 	   (and car cdr `(cons ,car ,cdr))))
 	((eq (caadr x) 'or)
 	 (let ((z (lremove-if 'not (mapcar (lambda (x) (cons-recon `(cons ,x))) (cdadr x)))))
