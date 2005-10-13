@@ -11,7 +11,7 @@ APPEND=../xbin/append
 PREFS:= cmpbind cmpblock cmpcall cmpcatch cmpenv cmpeval \
 	cmpflet cmpfun cmpif cmpinline cmplabel cmplam cmplet \
 	cmploc cmpmap cmpmulti cmpspecial cmptag cmptop \
-	cmptype cmputil cmpvar cmpvs cmpwt 
+	cmptype cmputil cmpvar cmpvs cmpwt cmpmain
 
 NCPREFS:= cmpmain cmpopt lfun_list
 

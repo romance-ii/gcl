@@ -70,21 +70,21 @@ init_mod_gcl.lsp.tmp: init_mod_gcl.lsp.in
 init_xgcl.lsp.tmp: init_gcl.lsp.tmp
 	ln -snf $< $@
 
-init_pcl_gcl.lsp.tmp: init_pcl_gcl.lsp.in ../cmpnew/gcl_cmpmain.lsp \
+init_pcl_gcl.lsp.tmp: init_pcl_gcl.lsp.in \
 		../pcl/sys-package.lisp ../clcs/package.lisp \
 		$(shell ls -1 ../clcs/clcs_*.lisp)
 
 	awk '/^ *@LI-PCL-PACKAGE@/{i=1;next} {if (i==0) print}' $< >$@
-	cat ../cmpnew/gcl_cmpmain.lsp >>$@
+#	cat ../cmpnew/gcl_cmpmain.lsp >>$@
 	cat ../pcl/sys-package.lisp >>$@
 	awk '/^ *@LI-PCL-PACKAGE@/{i=1;next} {if (i==1) print}' $< >>$@
 
-init_ansi_gcl.lsp.tmp: init_ansi_gcl.lsp.in ../cmpnew/gcl_cmpmain.lsp \
+init_ansi_gcl.lsp.tmp: init_ansi_gcl.lsp.in \
 		../pcl/sys-package.lisp ../clcs/package.lisp
 
 	awk '/^ *@LI-PCL-PACKAGE@/{i=1;next} \
 		/^ *@LI-CLCS-PACKAGE@/{i=2;next} {if (i==0) print}' $< >$@
-	cat ../cmpnew/gcl_cmpmain.lsp >>$@
+#	cat ../cmpnew/gcl_cmpmain.lsp >>$@
 	cat ../pcl/sys-package.lisp >>$@
 	awk '/^ *@LI-PCL-PACKAGE@/{i=1;next} \
 		/^ *@LI-CLCS-PACKAGE@/{i=2;next} {if (i==1) print}' $< >>$@
@@ -108,7 +108,6 @@ init_%.lsp: init_%.lsp.tmp
 		-e "s#@LI-INIT-LSP@#\"$@\"#1" >$@
 
 saved_%:raw_% $(RSYM) init_%.lsp raw_%_map \
-		$(CMPDIR)/gcl_cmpmain.lsp \
 		$(CMPDIR)/gcl_lfun_list.lsp \
 		$(CMPDIR)/gcl_cmpopt.lsp $(HDIR)/cmpinclude.h \
 		$(LSPDIR)/gcl_auto_new.lsp

@@ -98,8 +98,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * enable setf readtable-case in printer-aux.lsp
   * Prepare gcl_cmpmain.lsp for compilation
   * accelerate deftype expansions
+  * compile gcl_cmpmain.lsp
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 13 Oct 2005 21:20:59 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 13 Oct 2005 21:24:14 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

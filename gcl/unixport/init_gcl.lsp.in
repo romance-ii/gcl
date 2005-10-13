@@ -31,7 +31,7 @@
    (dolist (d (list lsp cmpnew))
        (load (make-pathname :name "sys-proclaim" :type "lisp" :directory d)))
    (load (make-pathname :name "tk-package" :type "lsp" :directory gtk))
-   (load (make-pathname :name "gcl_cmpmain" :type "lsp" :directory cmpnew))
+;   (load (make-pathname :name "gcl_cmpmain" :type "lsp" :directory cmpnew))
    (load (make-pathname :name "gcl_lfun_list" :type "lsp" :directory cmpnew))
    (load (make-pathname :name "gcl_cmpopt" :type "lsp" :directory cmpnew))
    (load (make-pathname :name "gcl_auto_new" :type "lsp" :directory lsp))
