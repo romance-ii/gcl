@@ -165,7 +165,7 @@
     (:control-error 	  t internal-simple-control-error)
     (:unexpected-keyword  t internal-simple-control-error)
     (:parse-error         t internal-simple-parse-error)
-    (:reader-error        t internal-simple-reader-error)
+    (:reader-error        t internal-reader-error :stream :issue)
     (:invalid-form        t internal-simple-program-error)
     (:invalid-variable    t internal-simple-program-error )
 

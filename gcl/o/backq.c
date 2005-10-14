@@ -322,7 +322,7 @@ static object fLcomma_reader(object x0, object x1)
 
 	in = x0;
 	if (backq_level <= 0)
-		READER_ERROR("A comma has appeared out of a backquote.");
+		READER_ERROR(in,"A comma has appeared out of a backquote.");
 	c = peek_char(FALSE, in);
 	if (c == code_char('@')) {
 		w = siScomma_at;

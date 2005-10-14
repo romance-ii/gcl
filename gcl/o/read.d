@@ -79,6 +79,8 @@ struct sharp_eq_context_struct {
 #define MAX_PACKAGE_STACK 1024
 static object P0[MAX_PACKAGE_STACK],*PP0=P0,LP;
 
+static int inlp;
+
 static void
 setup_READ()
 {
@@ -110,6 +112,7 @@ setup_READ()
 
 	PP0=P0;
 	LP=NULL;
+	inlp=0;
 
 }
 
@@ -478,7 +481,8 @@ BEGIN:
 			FEerror("The readmacro ~S returned ~D values.",
 				 2, fun_box[0], vs_top[-1]);
 		}
-		result = vs_base[0];
+		result = READsuppress ? Cnil : vs_base[0]; /*FIXME, centralize here rather than in
+							     reader macros ??*/
 		vs_base = old_vs_base;
 		vs_reset;
 		return(result);
@@ -527,7 +531,7 @@ BEGIN:
 		} else {
 
 		  if (trt(c)==trait_invalid)
-		    READER_ERROR("Cannot read character");
+		    READER_ERROR(in,"Cannot read character");
 
 		  if ('A' <= char_code(c) && char_code(c) <= 'z') {
 		    if ('a' <= char_code(c) && char_code(c) <= 'z' && 
@@ -643,8 +647,6 @@ SYMBOL:
 	vs_reset;
 	return(x);
 }
-
-static int inlp;
 
 static void
 Lleft_parenthesis_reader()
@@ -1142,7 +1144,7 @@ Lright_parenthesis_reader()
 {
 	check_arg(2);
 	if (!inlp)
-	  READER_ERROR("Right paren found with no left.");
+	  READER_ERROR(vs_base[0],"Right paren found with no left.");
 	vs_popp;
 	vs_popp;
 		/*  no result  */
@@ -1181,45 +1183,45 @@ extra_argument(int);
 static void
 Lsharp_C_reader()
 {
-	object x, c;
+	object x;
 
 	check_arg(3);
 	if (vs_base[2] != Cnil && !READsuppress)
 		extra_argument('C');
 	vs_popp;
 	vs_popp;
-	c = read_char(vs_base[0]);
-	if (char_code(c) != '(')
-		FEerror("A left parenthesis is expected.", 0);
-	delimiting_char = code_char(')');
-	x = read_object(vs_base[0]);
-	if (x == OBJNULL)
-		FEerror("No real part.", 0);
-	if (!realp(x))
-	  TYPE_ERROR(x,TSor_rational_float);
-	vs_push(x);
-	delimiting_char = code_char(')');
-	x = read_object(vs_base[0]);
-	if (x == OBJNULL)
-		FEerror("No imaginary part.", 0);
-	if (!realp(x))
-	  TYPE_ERROR(x,TSor_rational_float);
-	vs_push(x);
-	delimiting_char = code_char(')');
-	x = read_object(vs_base[0]);
-	if (x != OBJNULL)
-		FEerror("A right parenthesis is expected.", 0);
-	if (READsuppress) vs_base[0]= Cnil ;
-         else
-	if (contains_sharp_comma(vs_base[1]) ||
-	    contains_sharp_comma(vs_base[2])) {
-		vs_base[0] = alloc_object(t_complex);
-		vs_base[0]->cmp.cmp_real = vs_base[1];
-		vs_base[0]->cmp.cmp_imag = vs_base[2];
+
+	if (READsuppress) {
+	  read_object(vs_base[0]);
+	  vs_base[0]= Cnil;
 	} else {
-		check_type_number(&vs_base[1]);
-		check_type_number(&vs_base[2]);
-		vs_base[0] = make_complex(vs_base[1], vs_base[2]);
+	  x = read_char(vs_base[0]);
+	  if (char_code(x) != '(')
+	    READER_ERROR(vs_base[0],"A left parenthesis is expected.");
+	  delimiting_char = code_char(')');
+	  x = read_object(vs_base[0]);
+	  if (x==OBJNULL || !realp(x))
+	    TYPE_ERROR(x,TSor_rational_float);
+	  vs_push(x);
+	  delimiting_char = code_char(')');
+	  x = read_object(vs_base[0]);
+	  if (x==OBJNULL || !realp(x))
+	    TYPE_ERROR(x,TSor_rational_float);
+	  vs_push(x);
+	  delimiting_char = code_char(')');
+	  x = read_object(vs_base[0]);
+	  if (x != OBJNULL)
+	    READER_ERROR(vs_base[0],"A right parenthesis is expected.");
+	  if (contains_sharp_comma(vs_base[1]) ||
+	      contains_sharp_comma(vs_base[2])) {
+	    vs_base[0] = alloc_object(t_complex);
+	    vs_base[0]->cmp.cmp_real = vs_base[1];
+	    vs_base[0]->cmp.cmp_imag = vs_base[2];
+	  } else {
+	    check_type_number(&vs_base[1]);
+	    check_type_number(&vs_base[2]);
+	    vs_base[0] = make_complex(vs_base[1], vs_base[2]);
+	  }
 	}
 	vs_top = vs_base + 1;
 }
@@ -1679,12 +1681,12 @@ Lsharp_R_reader()
 	vs_popp;
 	vs_popp;
 	read_constituent(vs_base[0]);
+	vs_base[0]
+	= parse_number(token_buffer, token->st.st_fillp, &i, radix);
 	if (READsuppress) {
 		vs_base[0] = Cnil;
 		return;
 	}
-	vs_base[0]
-	= parse_number(token_buffer, token->st.st_fillp, &i, radix);
 	if (vs_base[0] == OBJNULL || i != token->st.st_fillp)
 		FEerror("Cannot parse the #R readmacro.", 0);
 	if (type_of(vs_base[0]) == t_shortfloat ||
@@ -1738,6 +1740,7 @@ Lsharp_sharp_reader()
 		vs_popp;
 		vs_popp;
 		vs_base[0] = Cnil;
+		return;
 	}
 	if (vs_base[2] == Cnil)
 		FEerror("The ## readmacro requires an argument.", 0);
@@ -1880,7 +1883,7 @@ Lsharp_vertical_bar_reader()
 static void
 Ldefault_dispatch_macro()
 {
-	READER_ERROR("The default dispatch macro signalled an error.");
+	READER_ERROR(vs_base[0],"The default dispatch macro signalled an error.");
 }
 
 /*
@@ -1895,7 +1898,7 @@ Lsharp_p_reader()
 	vs_popp;
 	vs_popp;
 	vs_base[0] = read_object(vs_base[0]);
-	vs_base[0] = coerce_to_pathname(vs_base[0]);
+	vs_base[0] = READsuppress ? Cnil : coerce_to_pathname(vs_base[0]);
 }
 
 /*

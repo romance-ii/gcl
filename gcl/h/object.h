@@ -478,8 +478,9 @@ struct string {           /*  string header  */
 #define CONTROL_ERROR(a_) {stack_string(tp_err,a_);\
                            Icall_error_handler(sKcontrol_error,tp_err,0);}
 
-#define READER_ERROR(a_)  {stack_string(tp_err,a_);\
-                           Icall_error_handler(sKreader_error,tp_err,0);}
+#define READER_ERROR(a_,b_)  {stack_string(tp_err,b_);\
+                             {stack_string(rd_err,"Read error on stream ~S: ~S.");\
+                              Icall_error_handler(sKreader_error,rd_err,2,(a_),(b_));}}
 
 #define NERROR(a_)  {stack_string(fmt,a_ ": line ~a, file ~a, function ~a");\
                     {stack_fixnum(line,__LINE__);\

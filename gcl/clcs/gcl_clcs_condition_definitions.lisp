@@ -128,7 +128,8 @@
 	   :reader STREAM-ERROR-STREAM)))
 
 (DEFINE-CONDITION READER-ERROR (PARSE-ERROR STREAM-ERROR)
-  ())
+  ((ISSUE :initarg :ISSUE
+	  :reader READER-ERROR-ISSUE)))
 
 (DEFINE-CONDITION END-OF-FILE (STREAM-ERROR)
   ()
@@ -283,6 +284,21 @@
 				    (type-error-datum condition)
 				    (type-error-expected-type condition)))))
 
+(define-condition internal-reader-error 
+    (#+(or clos pcl) internal-error reader-error)
+  #-(or clos pcl)
+  ((function-name nil))
+  #+(or clos pcl)
+  ()
+  #-(or clos pcl)(:conc-name %%internal-reader-error-)
+  #-(or clos pcl)(:report (lambda (condition stream)
+			    (when (internal-error-function-name condition)
+			      (format stream "Error in ~S [or a callee]: "
+				      (internal-error-function-name condition)))
+			    (format stream "Read error on stream ~S: ~S."
+				    (reader-error-stream condition)
+				    (reader-error-issue condition)))))
+
 (define-condition internal-package-error 
    (#+(or clos pcl) internal-error package-error)
  #-(or clos pcl)
@@ -314,15 +330,6 @@
   #+(or clos pcl)
   ()
   #-(or clos pcl)(:conc-name %%internal-simple-parse-error-)
-  #-(or clos pcl)(:report internal-simple-error-printer))
-
-(define-condition internal-simple-reader-error 
-    (#+(or clos pcl) internal-simple-error reader-error)
-  #-(or clos pcl)
-  ((function-name nil) format-string (format-arguments '()))
-  #+(or clos pcl)
-  ()
-  #-(or clos pcl)(:conc-name %%internal-simple-reader-error-)
   #-(or clos pcl)(:report internal-simple-error-printer))
 
 (define-condition internal-simple-control-error 
