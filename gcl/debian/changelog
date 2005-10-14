@@ -103,8 +103,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * print symbol fixes
   * Fix subtypep cons test  FIXME handle side effects better
   * make-package case fix
+  * #+ #- readaer macro fixes
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 14 Oct 2005 00:19:41 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 14 Oct 2005 00:32:41 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
