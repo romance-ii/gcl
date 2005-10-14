@@ -1236,7 +1236,6 @@
 	 (funcall (car funs) string)))))
 
 ;;convert "2c" into screen units or points or something...
-    ))
 
 ;; If loc is suitable for handing to setf,  then
 ;; (setf loc (coerce-result val type)
