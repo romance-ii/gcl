@@ -31,7 +31,7 @@
  (gbc t)
 
 (progn
-  (in-package "lisp")
+  (in-package 'lisp)
 ;; FIXME integrate this into the stream objects et.al. and/or
 ;; just use defclass
 ;  (defstruct (UNBOUND-SLOT (:constructor %make-UNBOUND-SLOT)))

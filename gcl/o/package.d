@@ -41,11 +41,11 @@ void check_type_or_symbol_string_package(object *);
 
 
 static bool
-member_string_equal(x, l)
+member_string_eq(x, l)
 object x, l;
 {
 	for (;  consp(l);  l = l->c.c_cdr)
-		if (string_equal(x, l->c.c_car))
+		if (string_eq(x, l->c.c_car))
 			return(TRUE);
 	return(FALSE);
 }
@@ -55,7 +55,7 @@ designate_package(object x,struct package *p) {
 
   switch(type_of(x)) {
   case t_string: case t_symbol:
-    return string_equal(x,p->p_name) || member_string_equal(x, p->p_nicknames);
+    return string_eq(x,p->p_name) || member_string_eq(x, p->p_nicknames);
     break;
   case t_character:
     return designate_package(coerce_to_string(x),p);
