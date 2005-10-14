@@ -26,7 +26,9 @@
 
 (export 'time)
 (export 'nth-value)
-(export '(reset-sys-paths decode-universal-time encode-universal-time compile-file-pathname complement constantly))
+(export '(function-lambda-expression 
+	  reset-sys-paths decode-universal-time
+	  encode-universal-time compile-file-pathname complement constantly))
 
 
 (in-package 'system)
@@ -174,3 +176,14 @@
       (push (si::string-concatenate s l) nl))
     (setq si::*load-path* nl))
   nil)
+
+(defun function-lambda-expression (x) 
+  (if (typep x 'interpreted-function) 
+      (let* ((x (si::interpreted-function-lambda x)))
+	(case (car x)
+	      (lambda (values x nil nil))
+	      (lambda-block (values (cons 'lambda (cddr x))  nil (cadr x)))
+	      (lambda-closure (values (cons 'lambda (cddr (cddr x)))  (not (not (cadr x)))  nil))
+	      (lambda-block-closure (values (cons 'lambda (cdr (cddr (cddr x))))  (not (not (cadr x))) (fifth x)))
+	      (otherwise (values nil t nil))))
+    (values nil t nil)))

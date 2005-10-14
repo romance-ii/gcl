@@ -104,8 +104,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * Fix subtypep cons test  FIXME handle side effects better
   * make-package case fix
   * #+ #- readaer macro fixes
+  * function-lambda-expression -- FIXME closure variables elided
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 14 Oct 2005 00:32:41 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 14 Oct 2005 01:07:23 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
