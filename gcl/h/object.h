@@ -472,20 +472,25 @@ struct string {           /*  string header  */
                             set_type_of((a_),t_fixnum);\
                             (a_)->FIX.FIXVAL=(b_);}
 
-#define TYPE_ERROR(a_,b_) {stack_string(tp_err,"~S is not of type ~S.");\
+/*FIXME the stack stuff is dangerous It works for error handling, but
+  simple errors may evan pass the format tring up the stack as a slot
+  in ansi*/
+/* #define TYPE_ERROR(a_,b_) {stack_string(tp_err,"~S is not of type ~S.");\ */
+/*                            Icall_error_handler(sKwrong_type_argument,tp_err,2,(a_),(b_));} */
+
+#define TYPE_ERROR(a_,b_) {object tp_err=make_simple_string("~S is not of type ~S.");\
                            Icall_error_handler(sKwrong_type_argument,tp_err,2,(a_),(b_));}
 
-#define CONTROL_ERROR(a_) {stack_string(tp_err,a_);\
+#define CONTROL_ERROR(a_) {object tp_err=make_simple_string(a_);\
                            Icall_error_handler(sKcontrol_error,tp_err,0);}
 
-#define READER_ERROR(a_,b_)  {stack_string(tp_err,b_);\
-                             {stack_string(rd_err,"Read error on stream ~S: ~S.");\
-                              Icall_error_handler(sKreader_error,rd_err,2,(a_),(b_));}}
+#define READER_ERROR(a_,b_)  {object rd_err=make_simple_string("Read error on stream ~S: " b_);\
+                              Icall_error_handler(sKreader_error,rd_err,1,(a_));}
 
-#define NERROR(a_)  {stack_string(fmt,a_ ": line ~a, file ~a, function ~a");\
-                    {stack_fixnum(line,__LINE__);\
-                    {stack_string(file,__FILE__);\
-                    {stack_string(function,__FUNCTION__);\
+#define NERROR(a_)  {object fmt=make_simple_string(a_ ": line ~a, file ~a, function ~a");\
+                    {object line=make_fixnum(__LINE__);\
+                    {object file=make_simple_string(__FILE__);\
+                    {object function=make_simple_string(__FUNCTION__);\
                      Icall_error_handler(sKerror,fmt,3,line,file,function);}}}}
 
 #define ASSERT(a_) if (!(a_)) NERROR("The assertion " #a_ " failed")

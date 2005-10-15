@@ -493,6 +493,7 @@ EXTER object READtable;
 EXTER int READdefault_float_format;
 EXTER int READbase;
 EXTER bool READsuppress;
+EXTER bool READeval;
 EXTER object siSsharp_comma;
 EXTER bool escape_flag;
 EXTER object delimiting_char;

@@ -106,6 +106,7 @@ setup_READ()
 	}
 	READbase = fix(x);
 	READsuppress = symbol_value(sLAread_suppressA) != Cnil;
+	READeval = symbol_value(sLAread_evalA) != Cnil;
 	sharp_eq_context_max = 0;
 
 	backq_level = 0;
@@ -123,6 +124,7 @@ setup_standard_READ()
 	READdefault_float_format = 'F';
 	READbase = 10;
 	READsuppress = FALSE;
+	READeval = TRUE;
 	sharp_eq_context_max = 0;
 	backq_level = 0;
 }
@@ -181,6 +183,7 @@ object in;
 	int old_READdefault_float_format = READdefault_float_format;
 	int old_READbase = READbase;
 	bool old_READsuppress = READsuppress;
+	bool old_READeval = READeval;
 
 	/* BUG FIX by Toshiba */
 	vs_push(old_READtable);
@@ -211,6 +214,7 @@ object in;
 	}
 	READbase = fix(x);
 	READsuppress = symbol_value(sLAread_suppressA) != Cnil;
+	READeval = symbol_value(sLAread_evalA) != Cnil;
 
 	x = read_object(in);
 	e = FALSE;
@@ -222,6 +226,7 @@ L:
 	READdefault_float_format = old_READdefault_float_format;
 	READbase = old_READbase;
 	READsuppress = old_READsuppress;
+	READeval = old_READeval;
 
 	/* BUG FIX by Toshiba */
 	vs_popp;
@@ -246,6 +251,7 @@ object in;
 	int old_READdefault_float_format;
 	int old_READbase;
 	int old_READsuppress;
+	int old_READeval;
 	int old_sharp_eq_context_max;
 	struct sharp_eq_context_struct
 		old_sharp_eq_context[SHARP_EQ_CONTEXT_SIZE];
@@ -255,6 +261,7 @@ object in;
 	old_READdefault_float_format = READdefault_float_format;
 	old_READbase = READbase;
 	old_READsuppress = READsuppress;
+	old_READeval = READeval;
 	old_sharp_eq_context_max = sharp_eq_context_max;
 	/* BUG FIX by Toshiba */
 	vs_push(old_READtable);
@@ -285,6 +292,7 @@ L:
 	READdefault_float_format = old_READdefault_float_format;
 	READbase = old_READbase;
 	READsuppress = old_READsuppress;
+	READeval = old_READeval;
 	sharp_eq_context_max = old_sharp_eq_context_max;
 	for (i = 0;  i < sharp_eq_context_max;  i++)
 		sharp_eq_context[i] = old_sharp_eq_context[i];
@@ -310,6 +318,7 @@ object in;
 	int old_READdefault_float_format;
 	int old_READbase;
 	int old_READsuppress;
+	int old_READeval;
 	int old_sharp_eq_context_max;
 	struct sharp_eq_context_struct
 		old_sharp_eq_context[SHARP_EQ_CONTEXT_SIZE];
@@ -319,6 +328,7 @@ object in;
 	old_READdefault_float_format = READdefault_float_format;
 	old_READbase = READbase;
 	old_READsuppress = READsuppress;
+	old_READeval = READeval;
 	old_sharp_eq_context_max = sharp_eq_context_max;
 	BUG FIX by Toshiba
 	vs_push(old_READtable);
@@ -349,6 +359,7 @@ L:
 	READdefault_float_format = old_READdefault_float_format;
 	READbase = old_READbase;
 	READsuppress = old_READsuppress;
+	READeval = old_READeval;
 	sharp_eq_context_max = old_sharp_eq_context_max;
 	for (i = 0;  i < sharp_eq_context_max;  i++)
 		sharp_eq_context[i] = old_sharp_eq_context[i];
@@ -1195,7 +1206,10 @@ Lsharp_C_reader()
 	  read_object(vs_base[0]);
 	  vs_base[0]= Cnil;
 	} else {
-	  x = read_char(vs_base[0]);
+	  do {read_char_to(x,vs_base[0], {
+	    READER_ERROR(vs_base[0],"A left parenthesis is expected.");
+	  });
+	  } while (cat(x) == cat_whitespace);
 	  if (char_code(x) != '(')
 	    READER_ERROR(vs_base[0],"A left parenthesis is expected.");
 	  delimiting_char = code_char(')');
@@ -1371,8 +1385,8 @@ L:
 		if (dimcount > dim)
 			FEerror("Too many elements in #(...).", 0);
 		else {
-			if (dimcount == 0)
-				FEerror("Cannot fill the vector #().", 0);
+/* 			if (dimcount == 0) */
+/* 				FEerror("Cannot fill the vector #().", 0); */
 			x = vs_head;
 			for (;  dimcount < dim;  dimcount++)
 				vs_push(x);
@@ -1421,18 +1435,20 @@ Lsharp_asterisk_reader()
 			break;
 		x = read_char(in);
 		if (char_code(x) != '0' && char_code(x) != '1') {
-			unread_char(x, in);
-			break;
+		  if (cat(x)==cat_constituent)
+		    READER_ERROR(in,"Invalid bit vector element");
+		  unreadc_stream(char_code(x),in);
+		  break;
 		}
 		vs_check_push(x);
 		dimcount++;
 	}	
 	if (dim >= 0) {
-		if (dimcount > dim)
-			FEerror("Too many elements in #*....", 0);
-		else {
-			if (dimcount == 0)
-				FEerror("Cannot fill the bit-vector #*.",0);
+	  if (dimcount > dim) {
+	    READER_ERROR(in,"Too many elements in #*....");
+	  } else {
+/* 			if (dimcount == 0) */
+/* 				FEerror("Cannot fill the bit-vector #*.",0); */
 			x = vs_head;
 			for (;  dimcount < dim;  dimcount++)
 				vs_push(x);
@@ -1444,10 +1460,17 @@ Lsharp_asterisk_reader()
 	x->bv.bv_self = alloc_relblock((dimcount + 7)/8);
 	vs_popp;
 	for (dim = 0; dim < dimcount; dim++)
-		if (char_code(vsp[dim]) == '0')
-			x->bv.bv_self[dim/8] &= ~(0200 >> dim%8);
-		else
-			x->bv.bv_self[dim/8] |= 0200 >> dim%8;
+	  switch(char_code(vsp[dim])) {
+	  case '0':
+	    x->bv.bv_self[dim/8] &= ~(0200 >> dim%8);
+	    break;
+	  case '1':
+	    x->bv.bv_self[dim/8] |= 0200 >> dim%8;
+	    break;
+	  default:
+	    READER_ERROR(in,"Invalid bit vector entry");
+	    break;
+	  }
 	END_NO_INTERRUPT;}
 	vs_top = vs_base;
 	vs_push(x);
@@ -1533,8 +1556,12 @@ Lsharp_dot_reader()
 		vs_base[0] = Cnil;
 		return;
 	}
-	vs_base[0] = read_object(vs_base[0]);
-	vs_base[0] = ieval(vs_base[0]);
+	if (READeval) {
+	  vs_base[0] = read_object(vs_base[0]);
+	  vs_base[0] = ieval(vs_base[0]);
+	} else {
+	  READER_ERROR(vs_base[0],"Sharp dot found with *read-eval* set to nil");
+	}
 }
 
 static void
@@ -2783,6 +2810,7 @@ gcl_init_read()
 	READdefault_float_format = 'F';
 	READbase = 10;
 	READsuppress = FALSE;
+	READeval = TRUE;
 
 	sharp_eq_context_max = 0;
 
@@ -2863,6 +2891,7 @@ object in;
 	int old_READdefault_float_format;
 	int old_READbase;
 	int old_READsuppress;
+	int old_READeval;
 	int old_sharp_eq_context_max;
 	struct sharp_eq_context_struct
 		old_sharp_eq_context[SHARP_EQ_CONTEXT_SIZE];
@@ -2875,6 +2904,7 @@ object in;
 	old_READdefault_float_format = READdefault_float_format;
 	old_READbase = READbase;
 	old_READsuppress = READsuppress;
+	old_READeval = READeval;
 	old_sharp_eq_context_max = sharp_eq_context_max;
 	/* BUG FIX by Toshiba */
 	vs_push(old_READtable);
@@ -2936,6 +2966,7 @@ L:
 	READdefault_float_format = old_READdefault_float_format;
 	READbase = old_READbase;
 	READsuppress = old_READsuppress;
+	READeval = old_READeval;
 	sharp_eq_context_max = old_sharp_eq_context_max;
 	for (i = 0;  i < sharp_eq_context_max;  i++)
 		sharp_eq_context[i] = old_sharp_eq_context[i];

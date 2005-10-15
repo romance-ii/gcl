@@ -106,8 +106,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * #+ #- readaer macro fixes
   * function-lambda-expression -- FIXME closure variables elided
   * read-suppress fixes, reader-error fixes
+  * reader error fixes
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 14 Oct 2005 22:41:12 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 15 Oct 2005 02:39:17 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

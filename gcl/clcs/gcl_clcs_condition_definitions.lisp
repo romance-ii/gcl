@@ -128,8 +128,11 @@
 	   :reader STREAM-ERROR-STREAM)))
 
 (DEFINE-CONDITION READER-ERROR (PARSE-ERROR STREAM-ERROR)
-  ((ISSUE :initarg :ISSUE
-	  :reader READER-ERROR-ISSUE)))
+  ()
+  (:report
+    (lambda (condition stream)
+      (format stream "Read error on stream ~S:."
+	      (STREAM-ERROR-STREAM CONDITION)))))
 
 (DEFINE-CONDITION END-OF-FILE (STREAM-ERROR)
   ()
@@ -284,21 +287,6 @@
 				    (type-error-datum condition)
 				    (type-error-expected-type condition)))))
 
-(define-condition internal-reader-error 
-    (#+(or clos pcl) internal-error reader-error)
-  #-(or clos pcl)
-  ((function-name nil))
-  #+(or clos pcl)
-  ()
-  #-(or clos pcl)(:conc-name %%internal-reader-error-)
-  #-(or clos pcl)(:report (lambda (condition stream)
-			    (when (internal-error-function-name condition)
-			      (format stream "Error in ~S [or a callee]: "
-				      (internal-error-function-name condition)))
-			    (format stream "Read error on stream ~S: ~S."
-				    (reader-error-stream condition)
-				    (reader-error-issue condition)))))
-
 (define-condition internal-package-error 
    (#+(or clos pcl) internal-error package-error)
  #-(or clos pcl)
@@ -321,6 +309,15 @@
   #+(or clos pcl)
   ()
   #-(or clos pcl)(:conc-name %%internal-simple-program-error-)
+  #-(or clos pcl)(:report internal-simple-error-printer))
+
+(define-condition internal-simple-reader-error 
+    (#+(or clos pcl) internal-simple-error reader-error)
+  #-(or clos pcl)
+  ((function-name nil) format-string (format-arguments '()))
+  #+(or clos pcl)
+  ()
+  #-(or clos pcl)(:conc-name %%internal-simple-reader-error-)
   #-(or clos pcl)(:report internal-simple-error-printer))
 
 (define-condition internal-simple-parse-error 
@@ -441,6 +438,8 @@
 	  (%%internal-simple-error-format-string condition))
     #+kcl(internal-simple-program-error
 	  (%%internal-simple-program-error-format-string condition))
+    #+kcl(internal-simple-reader-error
+	  (%%internal-simple-reader-error-format-string condition))
     #+kcl(internal-simple-parse-error
 	  (%%internal-simple-parse-error-format-string condition))
     #+kcl(internal-simple-control-error
@@ -460,6 +459,8 @@
 	  (%%internal-simple-error-format-arguments condition))
     #+kcl(internal-simple-program-error
 	  (%%internal-simple-program-error-format-arguments condition))
+    #+kcl(internal-simple-reader-error
+	  (%%internal-simple-reader-error-format-arguments condition))
     #+kcl(internal-simple-parse-error
 	  (%%internal-simple-parse-error-format-arguments condition))
     #+kcl(internal-simple-control-error
@@ -473,6 +474,7 @@
   (member type '(SIMPLE-CONDITION SIMPLE-WARNING SIMPLE-TYPE-ERROR SIMPLE-ERROR
 		 #+kcl internal-simple-error
 		 #+kcl internal-simple-program-error
+		 #+kcl internal-simple-reader-error
 		 #+kcl internal-simple-parse-error
 		 #+kcl internal-simple-control-error
 		 #+kcl internal-simple-file-error
