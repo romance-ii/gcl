@@ -561,6 +561,8 @@ DEF_ORDINARY("UNSIGNED-SHORT",sLunsigned_short,LISP,"");
 DEF_ORDINARY("*",sLA,LISP,"");
 DEF_ORDINARY("PLUSP",sLplusp,LISP,"");
 DEF_ORDINARY("FILE-STREAM",sLfile_stream,LISP,"");
+DEF_ORDINARY("INPUT-STREAM",sLinput_stream,SI,"");
+DEF_ORDINARY("OUTPUT-STREAM",sLoutput_stream,SI,"");
 
 /* logical pathnames exist even in non ansi gcl */
 DEF_ORDINARY("LOGICAL-PATHNAME",sLlogical_pathname,LISP,"");

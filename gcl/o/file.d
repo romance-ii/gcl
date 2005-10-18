@@ -521,9 +521,9 @@ close_stream(strm)
 object strm;
 /*bool abort_flag; */	/*  Not used now!  */
 {
-	object x;
+/* 	object x; */
 
-BEGIN:
+/* BEGIN: */
 	switch (strm->sm.sm_mode) {
 	case smm_output:
 		if (strm->sm.sm_fp == stdout)
@@ -571,32 +571,38 @@ BEGIN:
 		break;
 
 	case smm_synonym:
-		strm = symbol_value(strm->sm.sm_object0);
-		if (type_of(strm) != t_stream)
-			FEwrong_type_argument(sLstream, strm);
-		goto BEGIN;
+/* 		strm = symbol_value(strm->sm.sm_object0); */
+/* 		if (type_of(strm) != t_stream) { */
+/* 			TYPE_ERROR(strm,sLstream); */
+/* 		} */
+		strm->sm.sm_object0=OBJNULL;
+/* 		goto BEGIN; */
+		break;
 
 	case smm_broadcast:
-		for (x = strm->sm.sm_object0; !endp(x); x = x->c.c_cdr)
-			close_stream(x->c.c_car);
+/* 		for (x = strm->sm.sm_object0; !endp(x); x = x->c.c_cdr) */
+/* 			close_stream(x->c.c_car); */
+		strm->sm.sm_object0=OBJNULL;
 		break;
 
 	case smm_concatenated:
-		for (x = strm->sm.sm_object0; !endp(x); x = x->c.c_cdr)
-			close_stream(x->c.c_car);
+/* 		for (x = strm->sm.sm_object0; !endp(x); x = x->c.c_cdr) */
+/* 			close_stream(x->c.c_car); */
+		strm->sm.sm_object0=OBJNULL;
 		break;
 
 	case smm_two_way:
 	case smm_echo:
-		close_stream(STREAM_INPUT_STREAM(strm));
-		close_stream(STREAM_OUTPUT_STREAM(strm));
+		STREAM_INPUT_STREAM(strm)=OBJNULL;
+		STREAM_OUTPUT_STREAM(strm)=OBJNULL;
+/* 		close_stream(STREAM_INPUT_STREAM(strm)); */
+/* 		close_stream(STREAM_OUTPUT_STREAM(strm)); */
 		break;
 
 	case smm_string_input:
-		break;		/*  There is nothing to do.  */
-
 	case smm_string_output:
-		break;		/*  There is nothing to do.  */
+	  STRING_STREAM_STRING(strm)=OBJNULL;
+	  break;		
 
 	default:
 		FEerror("Illegal stream mode for ~S.",1,strm);
@@ -625,32 +631,29 @@ object strm;
 		break;
 
 	case smm_synonym:
-		strm = symbol_value(strm->sm.sm_object0);
-		if (type_of(strm) != t_stream)
-			FEwrong_type_argument(sLstream, strm);
-		break;
-
 	case smm_broadcast:
 	case smm_concatenated:
-		if (( consp(strm->sm.sm_object0) ) && 
-		    ( type_of(strm->sm.sm_object0->c.c_car) == t_stream ))
-		    strm=strm->sm.sm_object0->c.c_car;
-		else
-		    return Cnil;
-		break;
+	  return strm->sm.sm_object0!=OBJNULL ? Ct : Cnil;
+	  break;
+
+/* 	case smm_broadcast: */
+/* 	case smm_concatenated: */
+/* 		if (( consp(strm->sm.sm_object0) ) &&  */
+/* 		    ( type_of(strm->sm.sm_object0->c.c_car) == t_stream )) */
+/* 		    strm=strm->sm.sm_object0->c.c_car; */
+/* 		else */
+/* 		    return Cnil; */
+/* 		break; */
 
 	case smm_two_way:
 	case smm_echo:
-		strm=STREAM_INPUT_STREAM(strm);
-		break;
+	  return STREAM_INPUT_STREAM(strm)==OBJNULL && STREAM_OUTPUT_STREAM(strm)==OBJNULL ? Cnil : Ct;
+	  break;
 
 	case smm_string_input:
-		return Ct;
-		break;		/*  There is nothing to do.  */
-
 	case smm_string_output:
-		return Ct;
-		break;		/*  There is nothing to do.  */
+	  return STRING_STREAM_STRING(strm)!=OBJNULL ? Ct : Cnil;
+	  break;
 
 	default:
 		FEerror("Illegal stream mode for ~S.",1,strm);
@@ -1107,260 +1110,260 @@ object strm;
 		writec_stream(*s++, strm);
 }
 
-int
-read_sequence_stream(a,s,start,end)
-object a,s;
-int start,end;
-{	
-	int i,j;
-	int ch=EOF;
-	object val=Cnil;
-	FILE *fp;
-	int charstream;
+/* int */
+/* read_sequence_stream(a,s,start,end) */
+/* object a,s; */
+/* int start,end; */
+/* {	 */
+/* 	int i,j; */
+/* 	int ch=EOF; */
+/* 	object val=Cnil; */
+/* 	FILE *fp; */
+/* 	int charstream; */
 
-	if (type_of(s) != t_stream)
-	    FEwrong_type_argument(sLstream,a);
+/* 	if (type_of(s) != t_stream) */
+/* 	    FEwrong_type_argument(sLstream,a); */
 
-	val=stream_element_type(s);
-	charstream = (val == sLcharacter) ||
-		     (val == sLstandard_char);
+/* 	val=stream_element_type(s); */
+/* 	charstream = (val == sLcharacter) || */
+/* 		     (val == sLstandard_char); */
 
-	switch (s->sm.sm_mode) {
-	case smm_input:
-	case smm_io:
-	case smm_socket:
-	    fp=s->sm.sm_fp;
-	    break;
-	default:
-	    fp=0;
-	}
+/* 	switch (s->sm.sm_mode) { */
+/* 	case smm_input: */
+/* 	case smm_io: */
+/* 	case smm_socket: */
+/* 	    fp=s->sm.sm_fp; */
+/* 	    break; */
+/* 	default: */
+/* 	    fp=0; */
+/* 	} */
 
-	i=0;
-        while ((consp(a)) && (i<start)) {
-	    a=a->c.c_cdr;
-	    i++;
-	}
-	j=start-1;
-	if (a != Cnil)
-	for (i=start;i<end;i++) {
-	    if (fp) {
-	        ch = kclgetc(fp);
-		if (ch==EOF && xkclfeof(c,fp))
-		    i=end+1;
-	    } else
-	    if(stream_at_end(s))
-		i=end+1;
-	    else {
-		ch = readc_stream(s);
-		if (ch == EOF)
-		    i=end+1;
-	    }
-	    if (i<end) {
-		j=i;
-	        switch (type_of(a)) {
-		case t_array:
-		case t_vector:
-		case t_bitvector:
-		    switch (a->v.v_elttype) {
-		    case aet_object:
-			if (!charstream) {
-			    val=make_fixnum(ch);
-			    break;
-			} /* fall through */
-		    case aet_ch:
-			val = alloc_object(t_character);
-			char_code(val) = ch;
-			char_bits(val) = 0;
-			char_font(val) = 0;
-			break;
-		    case aet_bit:
-		    	val=make_fixnum(ch ? 1 : 0);
-		        break;
-		    case aet_fix:
-		    case aet_char:
-		    case aet_uchar:
-		    case aet_short:
-		    case aet_ushort: 
-		    	val=make_fixnum(ch);
-		        break;
-		    default:
-		        FEwrong_type_argument(sLarray,a);
-		    }
-		    break;
-		case t_cons:
-		    if (!charstream) {
-			val=make_fixnum(ch);
-			break;
-		    } /* fall through */
-		case t_string:
-		    val = alloc_object(t_character);
-		    char_code(val) = ch;
-		    char_bits(val) = 0;
-		    char_font(val) = 0;
-		    break;
-		default:
-		    FEwrong_type_argument(sLsequence,a);
-		}
-		if (!consp(a))
-		    aset1(a,i,val);
-		else {
-		    a->c.c_car = val;
-		    a=a->c.c_cdr;
-		    if (!consp(a))
-		        i=end+1;
-		}
-	    }
-	}
-	return j+1;
-}
+/* 	i=0; */
+/*         while ((consp(a)) && (i<start)) { */
+/* 	    a=a->c.c_cdr; */
+/* 	    i++; */
+/* 	} */
+/* 	j=start-1; */
+/* 	if (a != Cnil) */
+/* 	for (i=start;i<end;i++) { */
+/* 	    if (fp) { */
+/* 	        ch = kclgetc(fp); */
+/* 		if (ch==EOF && xkclfeof(c,fp)) */
+/* 		    i=end+1; */
+/* 	    } else */
+/* 	    if(stream_at_end(s)) */
+/* 		i=end+1; */
+/* 	    else { */
+/* 		ch = readc_stream(s); */
+/* 		if (ch == EOF) */
+/* 		    i=end+1; */
+/* 	    } */
+/* 	    if (i<end) { */
+/* 		j=i; */
+/* 	        switch (type_of(a)) { */
+/* 		case t_array: */
+/* 		case t_vector: */
+/* 		case t_bitvector: */
+/* 		    switch (a->v.v_elttype) { */
+/* 		    case aet_object: */
+/* 			if (!charstream) { */
+/* 			    val=make_fixnum(ch); */
+/* 			    break; */
+/* 			}  */
+/* 		    case aet_ch: */
+/* 			val = alloc_object(t_character); */
+/* 			char_code(val) = ch; */
+/* 			char_bits(val) = 0; */
+/* 			char_font(val) = 0; */
+/* 			break; */
+/* 		    case aet_bit: */
+/* 		    	val=make_fixnum(ch ? 1 : 0); */
+/* 		        break; */
+/* 		    case aet_fix: */
+/* 		    case aet_char: */
+/* 		    case aet_uchar: */
+/* 		    case aet_short: */
+/* 		    case aet_ushort:  */
+/* 		    	val=make_fixnum(ch); */
+/* 		        break; */
+/* 		    default: */
+/* 		        FEwrong_type_argument(sLarray,a); */
+/* 		    } */
+/* 		    break; */
+/* 		case t_cons: */
+/* 		    if (!charstream) { */
+/* 			val=make_fixnum(ch); */
+/* 			break; */
+/* 		    }  */
+/* 		case t_string: */
+/* 		    val = alloc_object(t_character); */
+/* 		    char_code(val) = ch; */
+/* 		    char_bits(val) = 0; */
+/* 		    char_font(val) = 0; */
+/* 		    break; */
+/* 		default: */
+/* 		    FEwrong_type_argument(sLsequence,a); */
+/* 		} */
+/* 		if (!consp(a)) */
+/* 		    aset1(a,i,val); */
+/* 		else { */
+/* 		    a->c.c_car = val; */
+/* 		    a=a->c.c_cdr; */
+/* 		    if (!consp(a)) */
+/* 		        i=end+1; */
+/* 		} */
+/* 	    } */
+/* 	} */
+/* 	return j+1; */
+/* } */
 
-@(defun read_sequence (arr str &k (start `Cnil`) (end `Cnil`))
-	int istart,iend,ipos;
-@
-	switch (type_of(arr)) {
-	case t_array:
-	case t_vector:
-	case t_bitvector:
-	case t_string:
-	case t_cons:
-	    if (start == Cnil)
-		    istart = 0;
-	    else
-		    istart = FIX_CHECK(start);
-	    if (istart < 0)
-		    FEwrong_type_argument(sLnon_negative_fixnum,start);
+/* @(defun read_sequence (arr str &k (start `Cnil` start_p) (end `Cnil`)) */
+/* 	int istart,iend,ipos; */
+/* @ */
+/* 	switch (type_of(arr)) { */
+/* 	case t_array: */
+/* 	case t_vector: */
+/* 	case t_bitvector: */
+/* 	case t_string: */
+/* 	case t_cons: */
+/* 	    if (!start_p) */
+/* 		    istart = 0; */
+/* 	    else */
+/* 		    istart = FIX_CHECK(start); */
+/* 	    if (istart < 0) */
+/* 		    FEwrong_type_argument(sLnon_negative_fixnum,start); */
 	
-	    if ((end == Cnil) &&
-	        (consp(arr)))
-		    iend = length(arr);
-	    else
-	    if ((end == Cnil) &&
-		(type_of(arr) != t_array) &&
-		(arr->v.v_hasfillp != 0))
-		    iend = arr->v.v_fillp;
-	    else
-	    if (end == Cnil)
-		    iend = arr->a.a_dim;
-	    else
-		    iend = FIX_CHECK(end);
-	    if (iend < 0)
-		    FEwrong_type_argument(sLnon_negative_fixnum,end);
+/* 	    if ((end==Cnil) && */
+/* 	        (consp(arr))) */
+/* 		    iend = length(arr); */
+/* 	    else */
+/* 	    if ((end==Cnil) && */
+/* 		(type_of(arr) != t_array) && */
+/* 		(arr->v.v_hasfillp != 0)) */
+/* 		    iend = arr->v.v_fillp; */
+/* 	    else */
+/* 	    if (end==Cnil) */
+/* 		    iend = arr->a.a_dim; */
+/* 	    else */
+/* 		    iend = FIX_CHECK(end); */
+/* 	    if (iend < 0) */
+/* 		    FEwrong_type_argument(sLnon_negative_fixnum,end); */
 
-	    ipos=read_sequence_stream(arr,str,istart,iend);
-	    start = make_fixnum(ipos);
-	    @(return start)
-	default:
-	    FEwrong_type_argument(sLsequence,arr);
-	}
-	@(return Cnil)
-@)
+/* 	    ipos=read_sequence_stream(arr,str,istart,iend); */
+/* 	    start = make_fixnum(ipos); */
+/* 	    @(return start) */
+/* 	default: */
+/* 	    FEwrong_type_argument(sLsequence,arr); */
+/* 	} */
+/* 	@(return Cnil) */
+/* @) */
 
-int
-write_sequence_stream(a,s,start,end)
-object a,s;
-int start,end;
-{	
-	int i,j;
-	int ch=EOF;
-	object val=Cnil;
-	FILE *fp;
+/* int */
+/* write_sequence_stream(a,s,start,end) */
+/* object a,s; */
+/* int start,end; */
+/* {	 */
+/* 	int i,j; */
+/* 	int ch=EOF; */
+/* 	object val=Cnil; */
+/* 	FILE *fp; */
 
-	if (type_of(s) != t_stream)
-	    FEwrong_type_argument(sLstream,a);
+/* 	if (type_of(s) != t_stream) */
+/* 	    FEwrong_type_argument(sLstream,a); */
 
-	switch (s->sm.sm_mode) {
-	case smm_socket:
-	case smm_output:
-	case smm_io:
-	    fp=s->sm.sm_fp;
-	    break;
-	default:
-	    fp=0;
-	}
+/* 	switch (s->sm.sm_mode) { */
+/* 	case smm_socket: */
+/* 	case smm_output: */
+/* 	case smm_io: */
+/* 	    fp=s->sm.sm_fp; */
+/* 	    break; */
+/* 	default: */
+/* 	    fp=0; */
+/* 	} */
 
-	i=0;
-        while ((consp(a)) && (i<start)) {
-	    a=a->c.c_cdr;
-	    i++;
-	}
-	j=start-1;
-	if (a != Cnil)
-	for (i=start;i<end;i++) {
-	    if (i<end) {
-		j=i;
-		if (!consp(a))
-		    val = fLrow_major_aref(a,i);
-		else {
-		    val = a->c.c_car;
-		    a = a->c.c_cdr;
-		    if (!consp(a))
-		        i=end+1;
-		}
+/* 	i=0; */
+/*         while ((consp(a)) && (i<start)) { */
+/* 	    a=a->c.c_cdr; */
+/* 	    i++; */
+/* 	} */
+/* 	j=start-1; */
+/* 	if (a != Cnil) */
+/* 	for (i=start;i<end;i++) { */
+/* 	    if (i<end) { */
+/* 		j=i; */
+/* 		if (!consp(a)) */
+/* 		    val = fLrow_major_aref(a,i); */
+/* 		else { */
+/* 		    val = a->c.c_car; */
+/* 		    a = a->c.c_cdr; */
+/* 		    if (!consp(a)) */
+/* 		        i=end+1; */
+/* 		} */
 
-	        switch (type_of(val)) {
-		case t_character:
-		    ch = char_code(val);
-		    break;
-		case t_fixnum:
-		    ch = Mfix(val);
-		    break;
-		default:
-		    FEwrong_type_argument(sLcharacter,val);
-		}
-		if (fp)
-		    kclputc(ch, fp);
-		else
-		    writec_stream(ch, s);
-	    }
-	}
-	return j+1;
-}
+/* 	        switch (type_of(val)) { */
+/* 		case t_character: */
+/* 		    ch = char_code(val); */
+/* 		    break; */
+/* 		case t_fixnum: */
+/* 		    ch = Mfix(val); */
+/* 		    break; */
+/* 		default: */
+/* 		    FEwrong_type_argument(sLcharacter,val); */
+/* 		} */
+/* 		if (fp) */
+/* 		    kclputc(ch, fp); */
+/* 		else */
+/* 		    writec_stream(ch, s); */
+/* 	    } */
+/* 	} */
+/* 	return j+1; */
+/* } */
 
-@(defun write_sequence (arr str &k (start `Cnil`) (end `Cnil`) &a ret)
-	int istart,iend,ipos;
-@
-	if (arr != Cnil)
-	switch (type_of(arr)) {
-	case t_array:
-	case t_vector:
-	case t_bitvector:
-	case t_string:
-	case t_cons:
-	    if (start == Cnil)
-		    istart = 0;
-	    else
-		    istart = FIX_CHECK(start);
-	    if (istart < 0)
-		    FEwrong_type_argument(sLnon_negative_fixnum,start);
+/* @(defun write_sequence (arr str &k (start `Cnil` start_p) (end `Cnil`) &a ret) */
+/* 	int istart,iend,ipos; */
+/* @ */
+/* 	if (arr != Cnil) */
+/* 	switch (type_of(arr)) { */
+/* 	case t_array: */
+/* 	case t_vector: */
+/* 	case t_bitvector: */
+/* 	case t_string: */
+/* 	case t_cons: */
+/* 	    if (!start_p) */
+/* 		    istart = 0; */
+/* 	    else */
+/* 		    istart = FIX_CHECK(start); */
+/* 	    if (istart < 0) */
+/* 		    FEwrong_type_argument(sLnon_negative_fixnum,start); */
 	
-	    if ((end == Cnil) &&
-	        (consp(arr)))
-		    iend = length(arr);
-	    else
-	    if ((end == Cnil) &&
-		(type_of(arr) != t_array) &&
-		(arr->v.v_hasfillp != 0))
-		    iend = arr->v.v_fillp;
-	    else
-	    if (end == Cnil)
-		    iend = arr->a.a_dim;
-	    else
-		    iend = FIX_CHECK(end);
-	    if (iend < 0)
-		    FEwrong_type_argument(sLnon_negative_fixnum,end);
+/* 	    if ((end==Cnil) && */
+/* 	        (consp(arr))) */
+/* 		    iend = length(arr); */
+/* 	    else */
+/* 	    if ((end==Cnil) && */
+/* 		(type_of(arr) != t_array) && */
+/* 		(arr->v.v_hasfillp != 0)) */
+/* 		    iend = arr->v.v_fillp; */
+/* 	    else */
+/* 	    if (end==Cnil) */
+/* 		    iend = arr->a.a_dim; */
+/* 	    else */
+/* 		    iend = FIX_CHECK(end); */
+/* 	    if (iend < 0) */
+/* 		    FEwrong_type_argument(sLnon_negative_fixnum,end); */
 
-	    ipos=write_sequence_stream(arr,str,istart,iend);
-	    if (ipos == iend)
-	        ret = arr;
-	    else
-		ret = make_fixnum(ipos);
-	    @(return ret)
-	    break;
-	default:
-	    FEwrong_type_argument(sLsequence,arr);
-	}
-	@(return Cnil)
-@)
+/* 	    ipos=write_sequence_stream(arr,str,istart,iend); */
+/* 	    if (ipos == iend) */
+/* 	        ret = arr; */
+/* 	    else */
+/* 		ret = make_fixnum(ipos); */
+/* 	    @(return ret) */
+/* 	    break; */
+/* 	default: */
+/* 	    FEwrong_type_argument(sLsequence,arr); */
+/* 	} */
+/* 	@(return Cnil) */
+/* @) */
 
 void
 flush_stream(object strm) {
@@ -1594,10 +1597,14 @@ BEGIN:
 		goto BEGIN;
 
 	case smm_concatenated:
-		if (endp(strm->sm.sm_object0))
-			return(FALSE);
-		strm = strm->sm.sm_object0->c.c_car;	/* Incomplete! */
-		goto BEGIN;
+	  {
+	    object x;
+	    for (x=strm->sm.sm_object0;!endp(x);x=x->c.c_cdr)
+	      if (listen_stream(x->c.c_car))
+		return TRUE;
+	    return FALSE;
+	  }
+	  break;
 
 	case smm_two_way:
 	case smm_echo:
@@ -1635,6 +1642,15 @@ BEGIN:
 		if (strm->sm.sm_fp == NULL)
 			closed_stream(strm);
 		return(ftell(strm->sm.sm_fp));
+	case smm_broadcast:
+	  for (strm=strm->sm.sm_object0;!endp(strm->c.c_cdr);strm=strm->c.c_cdr);
+	  if (strm==Cnil)
+	    return 0;
+	  else {
+	    strm=strm->c.c_car;
+	    goto BEGIN;
+	  }
+
 	case smm_socket:
 	   return -1;
 	  
@@ -1649,7 +1665,6 @@ BEGIN:
 		goto BEGIN;
 
 	case smm_probe:
-	case smm_broadcast:
 	case smm_concatenated:
 	case smm_two_way:
 	case smm_echo:
@@ -1715,27 +1730,34 @@ static int
 file_length(strm)
 object strm;
 {
-	while (type_of(strm) == t_stream)
+ BEGIN:
 	switch (strm->sm.sm_mode) {
 	case smm_input:
 	case smm_output:
 	case smm_io:
 	case smm_probe:
-
-		if (strm->sm.sm_fp == NULL)
-			closed_stream(strm);
-		return(file_len(strm->sm.sm_fp));
+	  if (strm->sm.sm_fp == NULL)
+	    closed_stream(strm);
+	  return(file_len(strm->sm.sm_fp));
 	  
+	case smm_broadcast:
+	  for (strm=strm->sm.sm_object0;!endp(strm->c.c_cdr);strm=strm->c.c_cdr);
+	  if (strm==Cnil)
+	    return 0;
+	  else {
+	    strm=strm->c.c_car;
+	    goto BEGIN;
+	  }
+
 	case smm_synonym:
 
 		strm = symbol_value(strm->sm.sm_object0);
 		if (type_of(strm) != t_stream)
 			FEwrong_type_argument(sLstream, strm);
-		break;
+		goto BEGIN;
 
 	case smm_string_input:
 	case smm_string_output:
-	case smm_broadcast:
 	case smm_concatenated:
 	case smm_two_way:
 	case smm_echo:
@@ -1856,7 +1878,7 @@ LFD(Lmake_broadcast_stream)()
 	for (i = 0;  i < narg;  i++)
 		if (type_of(vs_base[i]) != t_stream ||
 		    !output_stream_p(vs_base[i]))
-			cannot_write(vs_base[i]);
+		  TYPE_ERROR(vs_base[i],sLoutput_stream);
 	vs_push(Cnil);
 	for (i = narg;  i > 0;  --i)
 		stack_cons();
@@ -1878,7 +1900,7 @@ LFD(Lmake_concatenated_stream)()
 	for (i = 0;  i < narg;  i++)
 		if (type_of(vs_base[i]) != t_stream ||
 		    !input_stream_p(vs_base[i]))
-			cannot_read(vs_base[i]);
+		  TYPE_ERROR(vs_base[i],sLinput_stream);
 	vs_push(Cnil);
 	for (i = narg;  i > 0;  --i)
 		stack_cons();
@@ -1896,11 +1918,11 @@ LFD(Lmake_two_way_stream)()
 	check_arg(2);
 
 	if (type_of(vs_base[0]) != t_stream ||
-	    !input_stream_p(vs_base[0]))
-	        FEwrong_type_argument(sLstream, vs_base[0]);
+	    !input_stream_p(vs_base[0])) 
+	  TYPE_ERROR(vs_base[0],sLinput_stream);
 	if (type_of(vs_base[1]) != t_stream ||
 	    !output_stream_p(vs_base[1]))
-	        FEwrong_type_argument(sLstream, vs_base[1]);
+	  TYPE_ERROR(vs_base[1],sLoutput_stream);
 	vs_base[0] = make_two_way_stream(vs_base[0], vs_base[1]);
 	vs_popp;
 }
@@ -1911,10 +1933,10 @@ LFD(Lmake_echo_stream)()
 
 	if (type_of(vs_base[0]) != t_stream ||
 	    !input_stream_p(vs_base[0]))
-	        FEwrong_type_argument(sLstream, vs_base[1]);
+	  TYPE_ERROR(vs_base[0],sLinput_stream);
 	if (type_of(vs_base[1]) != t_stream ||
 	    !output_stream_p(vs_base[1]))
-	        FEwrong_type_argument(sLstream, vs_base[1]);
+	  TYPE_ERROR(vs_base[1],sLoutput_stream);
 	vs_base[0] = make_echo_stream(vs_base[0], vs_base[1]);
 	vs_popp;
 }
@@ -1945,12 +1967,11 @@ for the string ~S.",
 		3, istart, iend, strng);
 @)
 
-static void
-FFN(Lmake_string_output_stream)()
-{
-	check_arg(0);
-	vs_push(make_string_output_stream(64));
-}
+@(static defun make_string_output_stream (&k element_type)
+@
+  element_type=element_type;/*FIXME lintian*/
+  @(return `make_string_output_stream(64)`)
+@)
 
 LFD(Lget_output_stream_string)()
 {
@@ -1991,7 +2012,7 @@ LFD(Linput_stream_p)()
 {
 	check_arg(1);
 
-	check_type_stream(&vs_base[0]);
+ 	check_type_stream(&vs_base[0]);
 	if (input_stream_p(vs_base[0]))
 		vs_base[0] = Ct;
 	else
@@ -2048,7 +2069,7 @@ LFD(Lstream_element_type)()
 	@(return Ct)
 @)
 
-@(static defun open (filename
+@(static defun open1 (filename
 	      &key (direction sKinput)
 		   (element_type sLcharacter)
 		   (if_exists Cnil iesp)
@@ -2107,14 +2128,30 @@ LFD(Lstream_element_type)()
 	@(return strm)
 @)
 
+static fixnum /*FIXME, this duplicates code in gcl_iolib.lsp somwhat */
+chars_per_write(object s) {/*s already a file-stream*/
+
+  fixnum i;
+  
+  s=s->sm.sm_object0;
+  if (consp(s)) {
+    s=s->c.c_cdr->c.c_car;
+    i=fix(s);
+    return ((i/CHAR_SIZE) + (i%CHAR_SIZE ? 1 : 0));
+  } else
+    return 1;
+
+}
+
 @(defun file_position (file_stream &o position)
-	int i=0;
+  fixnum i=0;
 @
 	check_type_stream(&file_stream);
 	if (position == Cnil) {
 		i = file_position(file_stream);
 		if (i < 0)
 			@(return Cnil)
+	        i/=chars_per_write(file_stream);
 		@(return `make_fixnum(i)`)
 	} else {
 		if (position == sKstart)
@@ -2141,8 +2178,10 @@ LFD(Lfile_length)()
 	i = file_length(vs_base[0]);
 	if (i < 0)
 		FEwrong_type_argument(sLfile_stream,vs_base[0]);
-	else
-		vs_base[0] = make_fixnum(i);
+	else {
+	  i/=chars_per_write(vs_base[0]);
+	  vs_base[0] = make_fixnum(i);
+	}
 }
 
 LFD(siLfile_column)()
@@ -2960,7 +2999,29 @@ DEF_ORDINARY("SUPERSEDE",sKsupersede,KEYWORD,"");
 DEF_ORDINARY("VERBOSE",sKverbose,KEYWORD,"");
 
 
+DEFUNO_NEW("STREAM-OBJECT0",object,fSstream_object0,SI,1,1,NONE,OO,OO,OO,OO,void,siLstream_object0,(object strm),"") { 
+  
+  object x;
 
+  if (type_of(strm)!=t_stream)
+    TYPE_ERROR(strm,sLstream);
+  x=strm->sm.sm_object0;
+  x=x==OBJNULL ? Cnil : x;
+  RETURN1(x);
+
+}
+
+DEFUNO_NEW("STREAM-OBJECT1",object,fSstream_object1,SI,1,1,NONE,OO,OO,OO,OO,void,siLstream_object1,(object strm),"") { 
+
+  object x;
+
+  if (type_of(strm)!=t_stream)
+    TYPE_ERROR(strm,sLstream);
+  x=strm->sm.sm_object1;
+  x=x==OBJNULL ? Cnil : x;
+  RETURN1(x);
+
+}
 
 void
 gcl_init_file_function()
@@ -3006,13 +3067,13 @@ gcl_init_file_function()
 	make_function("STREAM-ELEMENT-TYPE", Lstream_element_type);
 	make_function("CLOSE", Lclose);
 
-	make_function("OPEN", Lopen);
+	make_si_function("OPEN1", Lopen1);
 
 	make_function("FILE-POSITION", Lfile_position);
 	make_function("FILE-LENGTH", Lfile_length);
 	make_si_function("FILE-COLUMN", siLfile_column);
-	make_function("READ-SEQUENCE", Lread_sequence);
-	make_function("WRITE-SEQUENCE", Lwrite_sequence);
+/* 	make_function("READ-SEQUENCE", Lread_sequence); */
+/* 	make_function("WRITE-SEQUENCE", Lwrite_sequence); */
 
 	make_function("LOAD", Lload);
 

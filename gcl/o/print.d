@@ -700,7 +700,7 @@ constant_case(object x) {
 static int
 needs_escape (object x) {
 
-  fixnum i;
+  fixnum i,all_dots=1;
 
   for (i=0;i<x->s.s_fillp;i++) 
     switch(x->s.s_self[i]) {
@@ -715,9 +715,15 @@ needs_escape (object x) {
     case ',':
     case '\n':
       return 1;
+    case '.':
+      break;
     default:
+      all_dots=0;
       break;
     }
+
+  if (all_dots)
+    return 1;
 
   if (READ_TABLE_CASE==sKupcase || PRINTreadably) {
     for (i=0;i<x->s.s_fillp;i++) 
@@ -1409,13 +1415,17 @@ int level;
 			break;
 
 		case smm_string_input:
-			write_str("#<string-input stream from \"");
+			write_str("#<string-input stream ");
 			y = x->sm.sm_object0;
-			j = y->st.st_fillp;
-			for (i = 0;  i < j && i < 16;  i++)
-				write_ch(y->st.st_self[i]);
-			if (j > 16)
-				write_str("...");
+			if (y) {
+			  write_str(" from \"");
+			  j = y->st.st_fillp;
+			  for (i = 0;  i < j && i < 16;  i++)
+			    write_ch(y->st.st_self[i]);
+			  if (j > 16)
+			    write_str("...");
+			} else
+			  write_str("(closed)");
 			write_str("\">");
 			break;
 #ifdef USER_DEFINED_STREAMS
@@ -1972,6 +1982,8 @@ int base;
          }
 	if (file_column(strm) == 0)
 		@(return Cnil)
+        if (strm->sm.sm_mode==smm_broadcast && strm->sm.sm_object0==Cnil)
+           @(return Cnil)
         WRITEC_NEWLINE(strm);
 	flush_stream(strm);
 	@(return Ct)
@@ -2009,14 +2021,14 @@ int base;
 	@(return Cnil)
 @)
 
-@(defun write_byte (integer binary_output_stream)
-@
-	if (type_of(integer) != t_fixnum)
-		FEerror("~S is not a byte.", 1, integer);
-	check_type_stream(&binary_output_stream);
-	writec_stream(fix(integer), binary_output_stream);
-	@(return integer)
-@)
+/* @(defun write_byte (integer binary_output_stream) */
+/* @ */
+/* 	if (type_of(integer) != t_fixnum) */
+/* 		FEerror("~S is not a byte.", 1, integer); */
+/* 	check_type_stream(&binary_output_stream); */
+/* 	writec_stream(fix(integer), binary_output_stream); */
+/* 	@(return integer) */
+/* @) */
 
 DEF_ORDINARY("UPCASE",sKupcase,KEYWORD,"");
 DEF_ORDINARY("DOWNCASE",sKdowncase,KEYWORD,"");
@@ -2293,7 +2305,7 @@ gcl_init_print_function()
 	make_function("FINISH-OUTPUT", Lfinish_output);
 	make_function("FORCE-OUTPUT", Lforce_output);
 	make_function("CLEAR-OUTPUT", Lclear_output);
-	make_function("WRITE-BYTE", Lwrite_byte);
+/* 	make_function("WRITE-BYTE", Lwrite_byte); */
 	make_si_function("DEFAULT-PPRINT-OBJECT", Ldefault_pprint_object);
 	make_si_function("GET-PPRINT-DISPATCH", Lget_pprint_dispatch);
 

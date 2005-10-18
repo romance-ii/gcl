@@ -423,6 +423,9 @@
 (deftype stream () `(or broadcast-stream concatenated-stream echo-stream
 			file-stream string-stream synonym-stream two-way-stream))
 
+(deftype input-stream ()  `(and stream (satisfies  input-stream-p)))
+(deftype output-stream () `(and stream (satisfies  output-stream-p)))
+
 (deftype bignum () `(and integer (not fixnum)))
 (deftype non-negative-bignum () `(and non-negative-byte (not non-negative-fixnum)))
 (deftype negative-bignum () `(and negative-byte (not negative-fixnum)))

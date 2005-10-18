@@ -614,7 +614,7 @@ EXTER object sLseqind,sLrnkind;
 
 EXTER object sLcomplex;
 EXTER object sLsingle_float,sLpackage,sLbignum,sLrandom_state,sLdouble_float,sLstream,sLbit,sLreadtable;
-EXTER object sLlong_float,sLhash_table,sLstructure,sLboolean,sLfile_stream;
+EXTER object sLlong_float,sLhash_table,sLstructure,sLboolean,sLfile_stream,sLinput_stream,sLoutput_stream;
 
 #ifdef ANSI_COMMON_LISP
 /* new ansi types */

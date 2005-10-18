@@ -136,6 +136,22 @@ object in;
 	return(code_char(readc_stream(in)));
 }
 
+
+static object
+read_char_no_echo(object in) {
+
+  int c;
+
+  if (type_of(in)==t_stream && in->sm.sm_mode==smm_echo) {
+    c = readc_stream(STREAM_INPUT_STREAM(in));
+    if (ECHO_STREAM_N_UNREAD(in) != 0)
+      --(ECHO_STREAM_N_UNREAD(in));
+    return(code_char(c));
+  } else
+    return(code_char(readc_stream(in)));
+
+}
+
 #define	read_char(in)	code_char(readc_stream(in))
 
 static void
@@ -684,18 +700,23 @@ Lleft_parenthesis_reader()
 		if (x == OBJNULL)
 			goto ENDUP;
 		if (dot_flag) {
-			if (p == &vs_head)
-	FEerror("A dot appeared after a left parenthesis.", 0);
-			in_list_flag = TRUE;
-			*p = read_object(in);
-			if (dot_flag)
-	FEerror("Two dots appeared consecutively.", 0);
-			c = read_char(in);
-			while (cat(c) == cat_whitespace)
-				c = read_char(in);
-			if (char_code(c) != ')')
-	FEerror("A dot appeared before a right parenthesis.", 0);
-			goto ENDUP;
+		  if (p == &vs_head) 
+		    READER_ERROR(in,"A dot appeared after a left parenthesis.");
+		  delimiting_char = code_char(')');
+		  in_list_flag = TRUE;
+		  *p = read_object(in);
+		  if (dot_flag)
+		    READER_ERROR(in,"Two dots appeared consecutively.");
+		  if (*p==OBJNULL) 
+		    READER_ERROR(in,"Object missing after dot.");
+		  else {
+		    c = read_char(in);
+		    while (cat(c) == cat_whitespace)
+		      c = read_char(in);
+		    if (char_code(c) != ')')
+		      READER_ERROR(in,"Expecting right parenthesis after dot and object.");
+		  }
+		  goto ENDUP;
 		}
 		vs_push(x);
 		*p = make_cons(x, Cnil);
@@ -2252,7 +2273,7 @@ READ:
 			else
 				end_of_stream(strm);
 		}
-		c = read_char(strm);
+		c = read_char_no_echo(strm);
 		unread_char(c, strm);
 		@(return c)
 	}
@@ -2378,20 +2399,20 @@ CANNOT_PARSE:
 			    1, strng);
 @)
 
-@(defun read_byte (binary_input_stream
-		   &optional (eof_errorp Ct) eof_value)
-	int c;
-@
-	check_type_stream(&binary_input_stream);
-	if (stream_at_end(binary_input_stream)) {
-		if (eof_errorp == Cnil)
-			@(return eof_value)
-		else
-			end_of_stream(binary_input_stream);
-	}
-	c = readc_stream(binary_input_stream);
-	@(return `make_fixnum(c)`)
-@)
+/* @(defun read_byte (binary_input_stream */
+/* 		   &optional (eof_errorp Ct) eof_value) */
+/* 	int c; */
+/* @ */
+/* 	check_type_stream(&binary_input_stream); */
+/* 	if (stream_at_end(binary_input_stream)) { */
+/* 		if (eof_errorp == Cnil) */
+/* 			@(return eof_value) */
+/* 		else */
+/* 			end_of_stream(binary_input_stream); */
+/* 	} */
+/* 	c = readc_stream(binary_input_stream); */
+/* 	@(return `make_fixnum(c)`) */
+/* @) */
 
 object
 read_byte1(strm,eof)
@@ -2853,7 +2874,7 @@ gcl_init_read_function()
 
 	make_function("PARSE-INTEGER", Lparse_integer);
 
-	make_function("READ-BYTE", Lread_byte);
+/* 	make_function("READ-BYTE", Lread_byte); */
 
 	make_function("COPY-READTABLE", Lcopy_readtable);
 	make_function("READTABLEP", Lreadtablep);

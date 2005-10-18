@@ -66,8 +66,9 @@
 		      (if (endp (cddr args)) (c1nil) (c1expr** (caddr args) info))))
 	     (let ((tb (c1expr* (cadr args) info))
 		   (fb (if (endp (cddr args)) (c1nil) (c1expr* (caddr args) info))))
-	       (setf (info-type info) (if (endp (cddr args)) (info-type (cadr tb))
-					(type-or1 (info-type (cadr tb)) (info-type (cadr fb)))))
+	       (setf (info-type info) (type-or1 (info-type (cadr tb)) 
+						(if (endp (cddr args)) 'null
+						  (info-type (cadr fb)))))
 	       (list 'if info
 		     fmla tb fb)))))))
 

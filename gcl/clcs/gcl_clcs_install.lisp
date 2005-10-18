@@ -74,7 +74,7 @@
 
 (defun clcs-open (&rest args)
   (loop (with-simple-restart (retry "Retry opening file ~S." (car args))
-          (return-from clcs-open
+			       (return-from clcs-open
                        (apply (or (get 'open 'definition-before-clcs) #'open) args)))))
 
 #+(or kcl lucid cmu)
