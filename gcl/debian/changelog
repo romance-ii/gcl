@@ -109,8 +109,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * reader error fixes
   * fix if type-propagation bug, fix stream ansi failures, fix slash-dot
     printing and corresponding read-errors
+  * scale default maxpage with SIZEOF_LONG and PAGEWIDTH
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 18 Oct 2005 02:11:44 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 20 Oct 2005 00:22:02 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

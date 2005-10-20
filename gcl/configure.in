@@ -10,12 +10,6 @@ AC_SUBST(VERSION)
 # Arguments
 #
 
-help="--enable-maxpage=XXXX will compile in a page table of size XXX (default ${default_maxpage})"
-
-AC_ARG_ENABLE(maxpage,[ --enable-maxpage=XXXX will compile in a page table of size XXX (eg '--enable-maxpage=64*1024' would give 64K pages allowing 256 MB if pages are 4K each)],,enable_maxpage=262144)
-#AC_DEFINE_UNQUOTED(MAXPAGE,$enable_maxpage)
-
-
 AC_ARG_ENABLE(holediv,[ --enable-holediv=XXXX will specify that 1/XXXX of the core should be used as the hole between the heap and relocatable memory area],,enable_holediv=4)
 AC_DEFINE_UNQUOTED(HOLEDIV,$enable_holediv)
 
@@ -1195,11 +1189,22 @@ AC_TRY_RUN([#include <stdio.h>
 int main() {size_t i=getpagesize(),j; 
 	    FILE *fp=fopen("conftest1","w");
 	    for (j=0;i>>=1;j++);
+	    if (j<12) {printf("pagewidth %u is too small\n",j);return -1;}
 	    fprintf(fp,"%u",j);
 	    return 0;}],PAGEWIDTH=`cat conftest1`,PAGEWIDTH=0,PAGEWIDTH=0)
 AC_MSG_RESULT($PAGEWIDTH)
 AC_DEFINE_UNQUOTED(PAGEWIDTH,$PAGEWIDTH)
 AC_SUBST(PAGEWIDTH)
+
+AC_TRY_RUN([#include <stdio.h>
+            #include <unistd.h>
+int main() {FILE *fp=fopen("conftest1","w");
+	    fprintf(fp,"%u",262144*($SIZEOF_LONG>>2)/(1<<($PAGEWIDTH-12)));
+	    return 0;}],def_maxpage=`cat conftest1`,def_maxpage=262144,def_maxpage=262144)
+
+help="--enable-maxpage=XXXX will compile in a page table of size XXX (default ${default_maxpage})"
+AC_ARG_ENABLE(maxpage,[ --enable-maxpage=XXXX will compile in a page table of size XXX (eg '--enable-maxpage=64*1024' would give 64K pages allowing 256 MB if pages are 4K each)],,enable_maxpage=$def_maxpage)
+#AC_DEFINE_UNQUOTED(MAXPAGE,$enable_maxpage)
 
 
 AC_MSG_CHECKING(CSTACK_ADDRESS)
