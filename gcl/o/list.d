@@ -225,17 +225,6 @@ stack_cons(void)
 	*vs_top++ = c;
 }
 
-object on_stack_list(fixnum n,...) {
-  object x,first;
-  va_list ap;
-  va_start(ap,n);
-  first=va_arg(ap,object);
-  x=on_stack_list_vector_new(n,first,ap);
-  va_end(ap);
-  return x;
-}
-
-
 object on_stack_list_vector_new(fixnum n,object first,va_list ap)
 {object res=(object) alloca_val;
  struct cons *p;
@@ -253,6 +242,16 @@ object on_stack_list_vector_new(fixnum n,object first,va_list ap)
    { x= (object) p;
      x->c.c_cdr= (object) ( ++p);}
  goto TOP;
+}
+
+object on_stack_list(fixnum n,...) {
+  object x,first;
+  va_list ap;
+  va_start(ap,n);
+  first=va_arg(ap,object);
+  x=on_stack_list_vector_new(n,first,ap);
+  va_end(ap);
+  return x;
 }
 
 /* static object list_vector(n,ap)
