@@ -200,9 +200,12 @@ extern char *GCLExeName ( void );
    (a_)=GCLExeName();\
 } while(0)
 
-#define INSTALL_SEGMENTATION_CATCHER \
-  	 (void) signal(SIGSEGV,segmentation_catcher)
+/* #define INSTALL_SEGMENTATION_CATCHER \
+   (void) signal(SIGSEGV,segmentation_catcher) */
 
+#define MAXCORE ((char *)((unsigned long)DBEGIN+(unsigned long)(MAXPAGE-1)*PAGESIZE))
+
+#define malloc gcl_malloc
 /* Begin for cmpinclude */
 
 
