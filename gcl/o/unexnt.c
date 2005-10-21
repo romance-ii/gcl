@@ -108,6 +108,30 @@ DWORD  data_size = UNINIT_LONG;
 PUCHAR bss_start = UNINIT_PTR;
 DWORD  bss_size = UNINIT_LONG;
 
+void ErrorExit(LPTSTR lpszFunction) 
+{ 
+    TCHAR szBuf[80]; 
+    LPVOID lpMsgBuf;
+    DWORD dw = GetLastError(); 
+
+    FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+        FORMAT_MESSAGE_FROM_SYSTEM,
+        NULL,
+        dw,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR) &lpMsgBuf,
+        0, NULL );
+
+    wsprintf(szBuf, 
+        "%s failed with error %d: %s", 
+        lpszFunction, dw, lpMsgBuf); 
+ 
+    MessageBox(NULL, szBuf, "Error", MB_OK); 
+
+    LocalFree(lpMsgBuf);
+    ExitProcess(dw); 
+}
 void recreate_heap1()
 {
   char executable_path[MAX_PATH];
@@ -987,19 +1011,43 @@ allocate_heap (void)
      the region below the 256MB line for our malloc arena - 229MB is
      still a pretty decent arena to play in!  */
 
-  unsigned long base = DBEGIN /*0x01B00000*/;  /*  27MB */
-  unsigned long end  = 2*PAGESIZE*MAXPAGE;
-  void *ptr = NULL;
+    unsigned long base = DBEGIN;
+    unsigned long end  = PAGESIZE*MAXPAGE - DBEGIN;
+    void *ptr = NULL;
 
-  reserved_heap_size = end - base;
-  ptr = VirtualAlloc ((void *) base,
-		      get_reserved_heap_size (),
-		      MEM_RESERVE,
-		      PAGE_NOACCESS);
-  if ( 0 == ptr ) {
-    FEerror ( "Can't allocate storage.", 1, "");
-  }
-  return ptr;
+    reserved_heap_size = end - base;
+    ptr = VirtualAlloc ((void *) base,
+                         get_reserved_heap_size (),
+                         MEM_RESERVE,
+                         PAGE_NOACCESS );
+#if 1    
+    fprintf ( stderr,
+              "allocate_heap:"
+              " base %lx, end %lx, reserved_heap_size %lx, PAGESIZE %lx, MAXPAGE %lx,"
+              " MAXCORE %lx, CORE_PAGES %lx, INIT_NRBDIV %lx, INIT_HOLEDIV %lx, HOLEDIV %lx"
+              " INIT_NRBDIV %lx\n",
+              (void *) base,
+              (void *) end,
+              get_reserved_heap_size (),
+              PAGESIZE,
+              MAXPAGE,
+              MAXCORE,
+              CORE_PAGES,
+              INIT_NRBDIV,
+              INIT_HOLEDIV,
+              HOLEDIV );
+#endif  
+    if ( 0 == ptr ) {
+        ErrorExit ( "allocate_heap" );
+        fprintf ( stderr,
+                  "ERROR: allocate_heap couldn't allocate storage with VirtualAlloc\n"
+                  " base %d, reserved_heap_size %d, MEM_RESERVE %d, PAGE_NOACCESS %d\n",
+                  (void *) base,
+                  get_reserved_heap_size (),
+                  MEM_RESERVE,
+                  PAGE_NOACCESS );
+    }
+    return ptr;
 }
 
 
