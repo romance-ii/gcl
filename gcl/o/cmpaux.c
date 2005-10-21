@@ -483,7 +483,9 @@ function.")
 
 object
 find_init_name1(char *s,unsigned len) {
-
+#ifdef _WIN32
+  FEerror("Not supported on Windows",0);
+#else    
   struct stat ss;
   char *tmp,*q;
   FILE *f;
@@ -506,6 +508,7 @@ find_init_name1(char *s,unsigned len) {
   if (strncmp(s,"init_",5))
     FEerror("Init name not found",0);
   return make_simple_string(s);
+#endif  
 
 }
  

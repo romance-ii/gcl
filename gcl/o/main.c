@@ -665,7 +665,7 @@ ihs_overflow(void) {
 
 void
 segmentation_catcher(int i, long code, void *scp, char *addr) {
-
+#ifndef _WIN32
   void *faddr;
   faddr=GET_FAULT_ADDR(sig,code,scp,addr); 
 
@@ -677,7 +677,7 @@ segmentation_catcher(int i, long code, void *scp, char *addr) {
     FEerror("Control stack overflow.",0); /*FIXME -- provide getrlimit here.*/
   else 
     printf("Segmentation violation: c stack ok:signalling error");
-
+#endif
   error("Segmentation violation.");
 
 }

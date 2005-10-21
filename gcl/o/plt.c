@@ -26,9 +26,12 @@ pltcomp(const void *v1,const void *v2) {
 /* extern int _mcount(); */
 /* extern int mcount(); */
 
-#include "pltd.h"
+#ifndef _WIN32
+#  include "pltd.h"
+#endif
 
 #define MY_PLT(a_) {#a_,(unsigned long)(void *)a_}
+
 static Plt mplt[]={
 	/* This is an attempt to at least capture the addresses to
 	   which the compiler directly refers in C code. (Some symbols
@@ -43,7 +46,9 @@ static Plt mplt[]={
 	   in sfasli.c.  FIXME -- this should be made synchronous with
 	   compiler changes; sort the list automatically.  SORT THIS
 	   LIST BY HAND FOR THE TIME BEING. */
-#include "plt.h"
+#ifndef _WIN32
+#  include "plt.h"
+#endif    
 };
 
 object sSAplt_tableA;
