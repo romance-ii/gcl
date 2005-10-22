@@ -97,10 +97,10 @@
   (setq *dl* `(&aux ,env ,whole))
   (setq ppn (dm-vl vl whole t))
   (dolist (kc *key-check*)
-          (push `(unless (getf ,(car kc) :allow-other-keys)
+          (push `(unless (getf ,(car kc) :allow-other-keys);FIXME order?
                          (do ((vl ,(car kc) (cddr vl)))
                              ((endp vl))
-                             (unless (member (car vl) ',(cdr kc))
+                             (unless (member (car vl) ',(cons :allow-other-keys (cdr kc)))
                                      (dm-key-not-allowed (car vl))
                                      )))
                 body))
@@ -201,7 +201,9 @@
 (defun dm-v (v init)
        (if (symbolp v)
            (push (if init (list v init) v) *dl*)
-           (let ((temp (gensym)))
+           (let* ((w (eq (car v) '&whole))
+		  (temp (if w (cadr v) (gensym)))
+		  (v (if w (cddr v) v)))
                 (push (if init (list temp init) temp) *dl*)
                 (dm-vl v temp nil))))
 

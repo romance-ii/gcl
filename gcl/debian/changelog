@@ -110,8 +110,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * fix if type-propagation bug, fix stream ansi failures, fix slash-dot
     printing and corresponding read-errors
   * scale default maxpage with SIZEOF_LONG and PAGEWIDTH
+  * fix &whole in defmacro subterms, some :allow-other-keys tests
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 20 Oct 2005 00:22:02 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 22 Oct 2005 02:57:55 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
