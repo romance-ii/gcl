@@ -2533,7 +2533,7 @@ int out;
     if (out) cannot_write(strm);
   break;
  case smm_io:
-   /* case smm_socket: */
+/*  case smm_socket: */
  break;
  
  default:
@@ -2706,14 +2706,15 @@ static object
 maccept(object x) {
 
   int fd;
-  unsigned n;
   struct sockaddr_in addr;
+  unsigned n=sizeof(addr);
   object server,host,port;
   
   if (type_of(x) != t_stream)
     FEerror("~S is not a steam~%",1,x);
   if (x->sm.sm_mode!=smm_two_way)
     FEerror("~S is not a two-way steam~%",1,x);
+  memset(&addr,0,sizeof(addr));
   fd=accept(SOCKET_STREAM_FD(STREAM_INPUT_STREAM(x)),(struct sockaddr *)&addr, &n);
   if (fd <0) {
     FEerror("Error ~S on accepting connection to ~S~%",2,make_simple_string(strerror(errno)),x);
