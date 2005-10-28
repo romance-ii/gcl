@@ -1934,7 +1934,7 @@ EOF
 AC_MSG_CHECKING([emacs site lisp directory])
 if [[ "$EMACS_SITE_LISP" = "unknown" ]] ; then
 	if [[ "$EMACS" != "" ]] ; then
-		EMACS_SITE_LISP=`$EMACS -q -batch --no-site-file -l conftest.el 2>&1 | sed -e /Loading/d | sed -e /load/d `
+		EMACS_SITE_LISP=`$EMACS -q -batch --no-site-file -l conftest.el 2>&1 | sed -e /Loading/d | sed -e /load/d | sed -e /^Warn/d`
 	else
 		EMACS_SITE_LISP=""
 	fi
