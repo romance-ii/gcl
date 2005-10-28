@@ -830,7 +830,8 @@ SYSTEM_SPECIAL_INIT
 		   new
 		   (mysub (subseq str y) it new)))))
 
-(defun link (files image &optional post extra-libs (run-user-init t)) 
+(defun link (files image &optional post extra-libs (run-user-init t)
+		   &aux (system-fail nil))
 
   (let* ((ui (make-user-init files "user-init"))
 	 (raw (pathname image))
@@ -847,7 +848,8 @@ SYSTEM_SPECIAL_INIT
 	 )
 
     (with-open-file (st (namestring map) :direction :output))
-    (system 
+    (if (/= 0 (system
+     ;; <<<<<<<<<<
      (format nil "~a ~a ~a ~a -L~a ~a ~a ~a"
 	     *ld* 
 	     (namestring raw)
@@ -864,6 +866,9 @@ SYSTEM_SPECIAL_INIT
 		    (j (concatenate 'string " " si::*system-directory* par)))
 	       (mysub *ld-libs* i j))
 	     (if (stringp extra-libs) extra-libs "")))
+     ;; >>>>>>>>>>
+	)
+	(setq system-fail t))
     
     (delete-file ui)
     
@@ -880,12 +885,13 @@ SYSTEM_SPECIAL_INIT
 		    (if (stringp post) (format st "~a~%" post))
 		    (format st "(si::save-system \"~a\")~%" (namestring image)))
     
-    (system (format nil "~a ~a < ~a" 
-		    (namestring raw)
-		    si::*system-directory*
-		    (namestring init)))
+    (if (/= 0 (system (format nil "~a ~a < ~a" 
+			      (namestring raw)
+			      si::*system-directory*
+			      (namestring init))))
+	(setq system-fail t))
     
     (delete-file raw)
     (delete-file init))
 
-  image)
+  (if system-fail nil image))
