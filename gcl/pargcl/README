@@ -1,0 +1,163 @@
+To build ParGCL, do:
+ ./configure
+ make
+
+You will still need the GCL source distribution available with the libraries
+and binaries built by that distribution.  If ./configure cannot find
+the path to a corresponding gcl script, use:
+  ./configure --with-gcl=PATH-TO-SCRIPT
+If you prefer to use your own GCL instead of the built-in GCL, do:
+  ./configure --with-mpicc=PATH-TO-MPICC
+where mpicc is an MPI compiler script.  See below for more information.
+
+For more information, see the doc subdirectory.
+
+The files provided include:
+README (this file)
+doc/MANUAL (a very brief manual)
+doc/INTERNALS (helpful information for porting and debugging)
+doc/abstract.tex (abstract of talk about this facility)
+examples/*.lsp (example programs demonstrating MPI, slave-listener
+			and master-slave parallel interfaces)
+src/mpi_glue.lsp (low level mpi library)
+src/mpi_defglue.lsp (utility for mpi_glue.lsp)
+src/slave-listener.lsp (sets up slave-listener layer)
+src/master-slave.lsp (sets up master-slave layer)
+src/pargcl.sed (additional lines for bin/pargcl)
+src/aix_mpi_exports (needed only for IBM RS/6000, see instructions below)
+src/mpicc.lsp (used if --with-mpicc= option of ./configure was specified)
+doc/procgroup.txt (describes format of procgroup file)
+src/master-slave-seq.lsp (emulates master-slave in one process, easier debugging)
+src/myfactor.lsp (example parallel program:  factorization)
+
+After the build, the files needed for running are:
+bin/pargcl (script for running ParGCL, analogous to gcl command)
+bin/procgroup (specifies remote hosts on which to run ParGCL)
+bin/mpinucc (not needed; provides an MPI C compiler for using built-in MPINU)
+src/saved_pargcl (binary for ParGCL, analogous to unixport/saved_gcl binary of GCL)
+
+[ This builds a new `saved_pargcl', by using the original
+  GCL build directory.  This assumes you own the GCL files.
+  It uses mpinu (an MPI subset sufficient for ParGCL).
+  Alternatively, `./configure --with-mpicc=' allows you to specify
+  an alternate MPI by specifying, for example, the mpicc command of MPICH.
+  See the file, doc/INTERNALS for more information.
+
+  In order to run it, call `pargcl' (if using default mpinu),
+  or `mpirun pargcl' if using MPICH or a similar MPI.
+]
+
+The `bin/procgroup' file specifies two slave processes on the localhost.
+If you want to try it out, try something like:
+  cd bin
+  ./pargcl
+  (par-load "../src/myfactor.lsp")
+  (par-myfactor 987654321)
+  (quit)
+
+Some other things to try:
+  (send-message '(print (+ 3 4)))
+  (send-message "(+ 3 4)" 2)
+  (receive-message 2)
+  (flush-all-messages)
+  (par-reset)
+  (send-receive-message '(progn (setq a 45) (+ 3 4)) 1)
+  (send-message 'a 2)
+  (receive-message 2)
+  (send-message 'a 1)
+  (receive-message 1)
+Also, look at:
+  examples/example-mpi.lsp
+  examples/example-slave-listener.lsp
+  examples/example-master-slave.lsp
+
+We recommend using the higher level interfaces:  master-slave or slave-listener
+If you insist on using MPI, see src/examples/example-mpi.lsp as a quick
+way to get started.  doc/MANUAL has additional information on all three
+parallel interfaces (including MPI).
+
+When starting pargcl, it looks in the local directory for a `procgroup'
+file, or else pargcl looks at its command line:  pargcl -p4pg PROCGROUP_FILE
+You will next want to try it with slave processes on a different host.
+Read `bin/procgroup' for the format in which remote processes are specified.
+
+If you use ParGCL in a publication, please reference it as follows:
+  Gene Cooperman, ``STAR/MPI:  Binding a Parallel Library to Interactive
+       Symbolic Algebra Systems'',
+       {\sl Proc. of Int. Symposium on Symbolic and Algebraic
+       Computation (ISSAC '95)}, ACM Press, 1995, pp.~126--132
+       SOFTWARE:  http://www.ccs.neu.edu/home/gene/pargcl.html
+
+You might want to next read the manual, doc/MANUAL .
+Note that (help ...) works on all parallel commands.  So, you
+can also try:
+MASTER_SLAVE ABSTRACTION (highest level):
+  (help 'master-slave)
+SLAVE LISTENER LAYER:
+  (apropos "send-")
+  (help 'send-message)
+MPI LAYER (lowest level):
+  (apopros "MPI-")
+  (help 'mpi-send)
+
+ParGCL uses its own built-in subset of MPI, MPINU.  When MPI_Init()
+is called by the master process, it looks in the local directory
+for a file, procgroup .  Try modifying the procgroup in the bin directory
+to use some remote processors.
+
+You can substitute your favorite MPI implementation for MPINU.  See the
+end for more information on this.
+
+If you use MPINU and ParGCL does not start up correctly,
+test your environment by typing:
+  rsh REMOTE_HOST
+where REMOTE_HOST is the host being used in the procgroup file.
+MPINU requires that the remote host start up _without_ asking
+for a password.  If this does not work, try:
+  setenv RSH ssh
+and then try again (using ssh instead of rsh).  Also, test:
+  ssh REMOTE_HOST
+If you still get a request for a password, try creating or modifying
+~/.rhosts, ~/.shosts, /etc/hosts.equiv, /etc/shosts.equiv,
+or ~/.ssh/authorized_keys, as described in `man ssh'.
+
+
+For IBM rios architectures, read the makefile statement:
+This was last tested with an earlier GCL (GCL-2.x), and probably does
+not currently work.  It will be removed in a future version.
+# if you add to EXTRAS:
+# Remember you must add the names of any C functions you want to reference
+# in lisp code, to unixport/aix_exports or add your own exports file to
+# LIBS above
+(The distribution provides a file aix_mpi_exports for this purpose.  We
+ suggest modifying LIBS in gcl/unixport/makefile, so that it reads:
+LIBS	= -lm -bexport:${GCLDIR}/unixport/aix_exports \
+          -bexport:${GCLMPI}/aix_mpi_exports
+)
+
+The make process builds a new GCL binary, src/saved_pargcl .
+In fact, it is possible to keep only one copy as unixport/saved_gcl .
+Then link bin/saved_pargcl to unixport/saved_gcl.  When the `gcl' script
+calls unixport/saved_gcl, nothing will be altered from the user point of view.
+The MPI commands are all in the `MPI' package.
+It is the `pargcl' script that enables the MPI features of src/saved_pargcl.
+
+If you want to use your own MPI instead of the built-in MPINU, you can
+do so with  `./configure --with-mpicc=MPICC', where MPICC is the compiler
+script from your MPI distribution.  If your distribution provides
+only a set of MPI libraries and an `mpi.h' include file, then see
+bin/mpinucc for an example compiler script written based on the above
+information.
+
+Note that this implementation supports only the subset of MPI functions
+implemented by MPINU (primarily the point-to-point functions).  It is easy
+to extend `src/mpi_glue.lsp' to define other MPI functions, if you have a
+fuller MPI distribution.  If you need only a few additional MPI functions,
+please write to the author, Gene Cooperman, who will be happy to add them
+to ParGCL.
+
+If you just want a small subset of MPI with a small footprint,
+the bin/mpinucc provides that.  It works to change gcc to g++ in that
+script if you prefer to use C++.
+							Gene Cooperman
+							gene@ccs.neu.edu

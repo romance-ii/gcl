@@ -1,0 +1,12 @@
+If we're calling (receive-message), and no message available,
+we can't interrupt with ^C
+
+slave should be in SLAVE-LISTENER package.
+  or at least, not exported from MPIpackage
+
+Note also (getcwd):
+(getcwd) => reports too many allocated blocks ??
+NOTE that the following workaround does work, however:
+  (getcwd
+      (make-array 256 :element-type 'string-char :fill-pointer t :static t))
+

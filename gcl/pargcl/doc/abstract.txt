@@ -1,0 +1,45 @@
+Many LISP programmers have felt the need for greater CPU power.  Yet not so
+many have ventured into parallel programming due to the steep learning curve
+and the unfamiliar programming environment entailed by such an effort.  In an
+attempt to remedy that situation, the parallel library MPI has been integrated
+into GCL (GNU Common LISP).  This implementation is an example that extends
+bindings of MPI to interactive languages.  (MPI already has bindings to the
+compiled languages C and FORTRAN.)  Further, this binding to an interactive
+language retains the interactive environment during execution.
+
+In addition to MPI, this distribution implements a higher level library
+based on the TOP-C (Task Oriented Parallel C/C++) model.
+
+This distribution has been variously called STAR/MPI, GCL/MPI and now ParGCL.
+ParGCL represents a blueprint for binding MPI to other interactive languages
+besides GCL.
+
+For further reading on this and a family of related systems employing the same
+abstraction, see:
+
+G.~Cooperman, ``STAR/MPI:  Binding a Parallel Library to
+	Interactive Symbolic Algebra Systems'',
+	{\sl Proc. of International Symposium on Symbolic and Algebraic
+	Computation (ISSAC '95)}, ACM Press, pp.~126--132.
+
+G.~Cooperman, ``GAP/MPI: Facilitating Parallelism'',
+	{\sl Proceedings of DIMACS Workshop on Groups
+	and Computation}, 1995, to appear in {\sl DIMACS Series in
+	Discrete Mathematics and Theoretical Computer Science}, 1996.
+
+G.~Cooperman, ``TOP-C:  A Task-Oriented Parallel C Interface'',
+	{\sl $5^{\hbox{th}}$ International Symposium on High Performance
+	Distributed Computing} (HPDC-5), IEEE Press, 1996, pp.~141--150.
+
+An example of using the TOP-C model to parallelize Geant4,
+a 1,000,000 line C++ program, is provided below.  Geant4 was developed
+jointly by CERN and many national laboratories for high energy physics,
+with over 100 contributors.
+
+G.~Cooperman, H.~Casanova, J.~Hayes and T.~Witzel,
+	``Using {TOP-C} and {AMPIC} to Port Large Parallel Applications
+                 to the Computational Grid'',
+        {\sl Proc. of 2$^{nd}$ IEEE/ACM International Symposium
+                on Cluster Computing and the Grid (CCGrid~2002)},
+	H.~Bal, A.~Reinefeld, and P.~Lohr (eds.), IEEE Press,
+	2002, to appear.

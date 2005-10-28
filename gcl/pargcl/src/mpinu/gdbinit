@@ -1,0 +1,35 @@
+#!gdb --args ./hello_mpi
+
+# Note:  If this is executable, can just run it as a script.
+#   Otherwise, can call:  gdb -x gdbinit --args foo arg1 arg2 ...
+#    To start running with args.
+
+define ps
+  shell ps -elfww | grep -- -p4 | grep -v grep | grep -v gdb
+end
+
+define pkill
+  detach
+  shell pkill hello_mpi
+end
+
+echo "NOTE:  user-defined gdb commands `ps' and `pkill' exist."
+echo "       ps shows slave processes, pkill kills all hello_mpi processes"
+echo "NOTE:  breakpoint set after slaves created, allowing one to `attach'"
+
+define hookpost-attach
+  printf "RANK:  %d\n", MPINU_myrank
+end
+
+# Slaves are available here, and they know their rank.
+# Print process IDs of slaves for attach.
+break master.c:137
+commands
+  echo "\nSLAVES AVAILABLE FOR USE OF attach COMMAND IN ANOTHER GDB:  gdb -n\n"
+  ps
+end
+
+# Note $bpnum is breakpoint number of most recent breakpoint.
+#  This is useful for:  condition $bpnum ...
+
+run

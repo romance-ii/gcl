@@ -1,0 +1,112 @@
+In its original form, MPINU did not have any data structures to
+hold messages.  MPI_Send is blocking.  So, MPI_Send and MPI_Receive
+act as wrappers for the send and recv system calls.  They copy
+directly from the application buffer directly to the network and then back
+to an application buffer.  There was only one communicator, MPI_COMM_WORLD.
+Each pair of MPI nodes has a socket between them.
+
+Furthermore, select() is called to determine which socket has a message
+waiting, and recv() is then called twice (for the header and the body)
+and it blocks each time.
+
+Since messages may be arbitrarily split, send and recv are replaced
+by wrappers utils.c:MPINU_sendall and utils.c:MPINU_recvall.  The wrappers
+restart send and recv upon seeing errno set to EINTR or EAGAIN.  Otherwise,
+they return -1 for failure.   The macro mpiimpl.h:CALL_CHECK was the
+old way to check for EINTR and EAGAIN.  Those calls can probably
+be removed, but before doing that we want a stable version with extensive
+testing.
+
+tivlog.h:init_log and tivlog.h:log_string and tivlog.h:finalize_log
+are convenient for logging at different log levels.
+
+The original implementation had several defects:
+1.  MPI_Send was blocking.  It used the network as a buffer, and it
+	did not return until the call to send returned.
+2.  MPI_Recv could only receive messages in order.  If MPI_Recv
+        is called with tag B, and if a message with tag B arrives after
+        a message with tag A, and if the message with tag A has not yet
+        been read by MPI_Recv, then MPI_Recv will permanently block.
+3.  MPI_Send cannot send to itself.
+4.  MPINU is not thread safe.  In particular, MPINU sends a message header
+	in one call to send, and a message body in the next call.
+	Similarly, it receives a message header in one call to recv,
+	and a message body in the next call.  So, if two threads compete,
+	we may send two message headers in a row, or a thread may read
+	a message body believing that it is a message header.
+
+=======================================================================
+The latest implementation employs the following solutions:
+1.  To ensure that MPI_Send does not block, Instead of calling send,
+        we call MPINU_send_nonblock, defined in send_nonblock.c.
+	A send thread is created by MPINU_send_nonblock.  A shared buffer
+	is created, and the original thread acts as a producer (copying
+	to the shared buffer), while the send thread acts as a consumer
+	(copying from the shared buffer to the network).
+2.  To ensure that MPI_Recv can receive messages out of order, as required
+	if a different tag is specified.  The logic for this is in recv_cache.c.
+	The API is:
+		buf_init()
+		buf_reset(int rank)
+		buf_finalize ()
+		buf_enqueue(int rank, void *buf, int len, int peek_msg) 
+		buf_dequeue(int rank, void *buf, int len, int peek_msg)
+		buf_peek(int rank, void *buf, int len)
+		buf_skip(int rank, int len)
+    recv_cache.c:MPINU_recv_msg_hdr_with_cache calls buf_reset early.
+    buf_reset resets the pointer to the receive buffer to the beginning
+    of the queue.
+3.  When MPI_Send detects a message being sent to oneself, it can copy
+	it directly to the receive buffer above.  MPI_Recv has the
+	potential to receive a message from self, and so we
+	have to worry about thread synchronization.  We need a mutex
+	so that MPINU_send_to_self_with_cache and MPI_Recv (receiving
+	from self) don't both access data structures of recv_cache.c
+	at same time.  MPI_Recv would lock mutex only if receiving from self.
+	Similar logic applies to MPI_Probe and MPI_Iprobe.
+	hOW DO WE DETECT AND WARN THE USER IF HE/SHE ENDS UP CALLING
+	MPINU_recv_msg_hdr_with_cache(), AND THERE IS NO MESSAGE IN CACHE?
+	iF THIS HAPPENS THROUGH MPI_Recv/MPI_Probe, THEN IT WILL TRY
+	TO PASS A SOCKET TO MPINU_recv_msg_hdr_with_cache.  bUT THERE
+	IS NO SOCKET TO SELF.
+	(not implemented yet?)
+4.  THREAD_SAFE:  For MPI_Send, it is easy to use a mutex to make
+	MPI_Send thread-safe.  For MPI_Recv, it is more subtle.
+	When a thread reads a message header, it must first lock
+	the mutex for that socket.  If the tag does not match, then
+	the lock must be released.  If a second thread specifies
+	MPI_ANY_SOURCE, then it may wait on the lock in case the
+	message header will be refused by the first thread.
+	    To solve this, each source has an associated variable of type
+	pthread_t and a mutex around it.  A thread must lock the mutex to read
+	the variable.  The variable will be (pthread_t)-1 if no one is reading
+	the message header or body.  The thread that is reading the message
+	header and body will set the variable to pthread_self() prior
+	to reading, and set it back to (pthread_t)-1 upon stopping reading.
+	However, the thread will hold the mutex lock only while reading
+	the message header, or at the end of reading the message body
+	in order to set the associated variable back to (pthread_t)-1.
+	    The above idea also solves the problem that one thread could
+	be calling recv_cache.c:buf_enqueue while another thread is calling
+	recv_cache.c:buf_dequeue, and there is no synchronization scheme
+	for the queue data structures.
+	    Finally, two threads may execute select() and discover that
+        they both are trying to read a single message from a single source.
+	Just in case the first thread will be reading for a while, it is
+	important for the second thread to go on, and come back to try
+	later.  Since it might happen that there are no new messages,
+	it is important for the second thread to go back and call select()
+	before trying again.  In particular, MPINU_recv_msg_hdr_with_cache
+	will block if there is no message to receive.  So, the first thread
+	through should, after reading, set the associated variable to
+	(pthread_t)-2 (meaning that there are no more pending message)
+	if it has consumed the message.  Another thread should note the
+	value of -2 before calling select, and if select says there is
+	a pending message, then after locking the associated variable and
+	checking that it is _still_ -2, it can be set to pthread_self().
+	If it is released, then it can be set back to -1.  To summarize,
+	the variable has one value from:
+	  -2:  no pending message verified by select  (initial value of var)
+	  -1:  pending message and it has not been read
+	  pthread_self():  pending message is being examined by indicated thread
+	(not implemented yet?)

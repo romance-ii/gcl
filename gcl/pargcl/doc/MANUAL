@@ -1,0 +1,217 @@
+			        ParGCL/MPI
+	       Comments to:  Gene Cooperman (gene@ccs.neu.edu)
+
+ParGCL provides three parallel programming interfaces, each described
+individually, below.  The three interfaces are:
+  master-slave - simple, easy-to-use master-worker model of parallelism
+  		 based on TOP-C (http://www.ccs.neu.edu/home/gene/topc.html)
+		 It also supports non-trivial parallelism, in which any
+		 slave process can cause the "shared data" to be updated,
+		 and so made visible to other slaves.
+  slave-listener - master sends LISP commands to a slave, and then receives
+  		 replies.
+  MPI -          Simplified LISP interface to MPI.  At this time, it
+  		 primarily implements the point-to-point layer of MPI.
+		 See the MPI standard on the web for a full manual of the
+		 MPI functions.
+
+ParGCL/MPI is intended as an easy-to-use master-slave distributed architecture.
+It combines the feedback of an interactive language (the GCL or AKCL dialect
+of LISP) with the the use of MPI to take advantage of networks of
+workstations.  As such, it is hoped that it will make available an SPMD
+architecture that helps people overcome the initial learning barrier in
+writing parallel programs.  Ease-of-use is emphasized while hoping to maintain
+reasonable efficiency and a reasonable feature set.  This distribution,
+along with a paper describing it, is available by anonymous ftp in
+the directory /pub/people/gene/starmpi at ftp.ccs.neu.edu .
+If you use this software, please send e-mail to gene@ccs.neu.edu to notify me.
+
+This is admittedly a very simplistic manual for now.  As the system develops,
+this manual will expand further.  The main idea is that gcl/mpi is built in
+three layers.  Most people will prefer to use almost entirely the master slave
+layer, while taking advantage of the lower layers only as needed.  By default,
+commands are executed on the master only.  The implicit "PRINT" of the
+top-level read-eval-print loop operates only on the master.  However, explicit
+print commands executed by user programs on master AND slaves will display on
+the user console.
+
+The routines par-eval and par-funcall cause execution on all processors
+(master and slaves).  A user can restrict execution to a particular processor
+by use of the functions master-p and mpi-comm-rank.  However, as a matter of
+style, it is recommended to use these only as a last resort, since programming
+is conceptually easier when the same data structures are present on all
+processors.
+
+The current implementation is based on MPI and GCL or AKCL, but it should
+be easily portable to other message passing libraries (such as PVM)
+and other dialects of Common LISP with a foreign function interface
+capable of loading object (.o) files and library archive (.a) files.
+
+Note that messages are converted to (vector fixnum), (vector float),
+or in general, strings (general print representations) before being sent.
+This implies significant overhead for very large messages that have to be
+sent as their print representation.  Also, a timer will kill any process
+that has not received a message for some time (60 minutes by default).
+
+This version is still experimental, and commands can change.  More examples
+are planned for the future to make the learning curve less steep.
+Comments will be gratefully accepted.
+
+=========================================================================
+
+MASTER SLAVE LAYER 
+
+(master-slave             - see related article for full details.
+			    The user is responsible for writing the FNC's:
+  :generate-task-input FNC - (generate-task-input) returns TASK, arb. user
+			     data structure
+  :do-task FNC		 - (do-task TASK) returns RESULT, arb. user data struct
+  :check-task-result FNC    - (check-task-result RESULT)
+				 must return T, NIL, ?, or (CONTINUATION . *)
+			   Equivalently, can return symbols:
+				UPDATE, NO-ACTION, REDO, (CONTINUATION . *)
+			   T means call (update-shared-data TASK RESULT)
+			   NIL means do nothing more with this task
+			   ? means re-send TASK for additional comp. by do-task
+			   CONTINUATION is like ?, but it allows a user
+                              parameter for *.  (CONTINUATION . *) becomes
+                              the next TASK for the slave.
+  :update-shared-data FNC - (update-shared-data TASK RESULT) executed on
+			     master and slaves, used to modify global var's
+  :trace T-OR-NIL)	  - obvious
+*master-slave-trace*	  - global variable, default value for :trace keyword
+        EXAMPLE:  see file, myfactor.lsp
+
+*master-slave-time* - variable set after each call to master-slave;
+        see (documentation-string master-slave-time);
+        On each processor shows time spent.
+
+(up-to-date-p)		  - utility to test if update-shared-data was called
+			    between time when most recent result was
+			    generated, using generate-task-input, and
+			    when the correspond.
+			    result was obtained, using check-task-result
+	EXAMPLE: (defun check-task-result-fnc (result)
+		   (if (up-to-date-p)
+		       t    ;data is consistent, update all processors
+		       'REDO)) ;data structures changed, re-do computation
+
+(result-task)             - Utility returning task corresponding to most recent
+			    result returned; Used only in check-task-result
+        EXAMPLE: (defun check-task-result-fnc (result)
+	           (case (first (result-task))
+		       (TASK-A ...)
+                       (TASK-B ...)
+                       ...))
+
+(par-eval 'EXP)	          - EXP evaluated on all processors
+         EXAMPLE: (par-eval '(defun foo (x) (1+ x)))
+(par-funcall FNC ARG1 ...) - like (funcall FNC ARG1 ...) with value of ARG's
+			    taken from lexical environment on master
+         EXAMPLE: (par-funcall #'load "file.lsp")
+(par-load FILE)		  - like (load FILE), loads FILE on all processors
+(par-reset)		  - resets slave processors if wedged (deadlocked)
+	 EXAMPLE: (par-reset)
+
+(master-p) - returns t when executed on master, and nil when on slave.
+        EXAMPLE:  (par-eval '(if (master-p)
+	            (set-up-large-master-data-structure)
+		    (set-up-special-slave-stuff))
+
+=========================================================================
+
+SLAVE LISTENER LAYER - master distributes commands to slaves;  These
+     commands should be executed on the master ONLY.  The slave-listener
+     layer sets the initial slave directory to the same as the master.
+     The master can arbitrarily	intermix sending commands and getting results
+
+(send-message LISP-EXPR OPT-MPI-DEST-ID OPT-TAG)  - send arb. expression for
+				 evaluation; send to OPT-MPI-DEST-ID with TAG,
+				 default is OPT-MPI-DEST-ID = 1, TAG = 0
+	EXAMPLE: (send-message '(+ 3 4))
+	NOTE: if LISP-EXPR is a string, it assumes this is a print
+	   representation of a LISP object, and not a raw LISP string
+
+(receive-message OPTIONAL-MPI-ID OPT-TAG)  - return result from next msg from MPI-ID
+					that was sent with TAG, default is next
+				        available slave, any tag
+        EXAMPLE:  (receive-message)  -> returns 7 for above case
+
+(broadcast-message LISP-EXPR) - send arb. expression to all slaves.  No result
+                                is returned.
+
+(free-msg-buffer BUF) - optimization for greater efficiency;  Allows
+                        end-user to free message buffer for re-use by
+                        slave-listener, saving the slave-listener from
+		        generating a new buffer.
+
+(mpi-comm-rank)		  - returns MPI process ID, 0 = master, > 0 for slaves
+        EXAMPLE: (par-eval '(if (= (mpi-comm-rank) 2) (print x)))
+
+(get-last-source), (get-last-tag), (get-last-count), (get-last-datatype)
+  all exist.
+These last should be avoided, but get-last-source can be useful for matching
+initial response of slave with later continuation by same slave.
+
+=========================================================================
+
+MPI LAYER - not all commands are implemented.  The MPI manual is also
+  a good source for what the commands do.  The calling sequences can
+  be found via (help 'mpi-command) or (describe 'mpi-command)
+
+(mpi-iprobe) - non-blocking probe for remaining messages. Returns t or nil.
+        EXAMPLE: (if (null (mpi-iprobe)) (print "READY"))
+
+(mpi-probe) - blocking probe for remaining msg's. Always returns t, eventually.
+        EXAMPLE: (progn (mpi-probe) (print "READY"))
+
+(autologout X) - if no msg rec'd in X minutes, process aborted.  Returns old
+	value of X.  Can be called with 0 arg's, leaving old value unchanged.
+
+(nice X) - nice val between -19 and 20 (higher is lower prio.); returns old val
+
+(limit-rss X) - limit Resident Set Size, when others also want RAM;
+	returns old val
+
+(chdir "string") - change current directory
+
+(getcwd) - get current working directory as string
+
+Many other MPI commands.  Not recommended, except for special cases.
+One could load the MPI layer alone, for special requirements.
+
+DEBUGGING -  It is recommended, when debugging, to first run on the master and
+all slaves on a single processor.  (The procgroup file can easily be set up
+this way.)  The :trace keyword in the function, master-slave, is also useful.
+
+In more difficult debugging situations, one may run the user code
+with master-slave-seq.lsp in a single process (e.g.: in gcl, not gcl-mpi).
+In this case, one can use (step ...) to debug routines that would reside
+on the slave.  However, the user code should first be modified to
+removed any uses of "(master-p)" or other constructs explicitly referring
+to a distinct master and slave.
+
+(par-eval '(si::use-fast-links nil)) is a good precaution during development,
+to find at what function any crashes occur.
+
+If communication time is too much, then you should break up any very large
+messages into elementary MPI datatypes.  So, consider breaking up messages of
+over several thousand bytes into several messages, where each large messages
+is of LISP type: (vector fixnum) or (vector float).
+
+The variable master-slave-time may also be useful for seeing where
+all the time is going.
+
+PERFORMANCE - Try:
+1.  Bundling several tasks into one to reduce communication overhead
+2.  Setting up multiple slave processes on the same processor to gain
+    greater CPU utilization on the processor
+3.  Using free-msg-buffer in check-task-result to save on garbage collections:
+    Important if do-task is returning long vectors of fixnum or of float.
+4.  The file, master-slave.lsp, currently has a throttling mechanism in case
+    a slave is very slow, perhaps due to paging against other users.
+    Any slave running CYCLES-BEFORE-DEAD times slower (default = 20)
+    will stop being used.  After CYCLES-BEFORE-UNDEAD (default = 200)
+    task times, they will be resuscitated and tried again.  These
+    constants in master-slave.lsp can be changed, after which STAR/MPI
+    should be re-made.

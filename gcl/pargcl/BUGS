@@ -1,0 +1,4 @@
+(getcwd) => reports too many allocated blocks ??
+NOTE that the following workaround does work, however:
+  (getcwd
+    (make-array 256 :element-type 'string-char :fill-pointer t :static t))

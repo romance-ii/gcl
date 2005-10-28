@@ -1,0 +1,11 @@
+example-mpi.lsp - example code using MPI
+example-slave-listener.lsp - example code using slave-listener API
+example-master-slave.lsp - example code using master-slave API
+myfactor.lsp - longer example code using master-slave parallel interface
+
+To call, do:
+  (par-load "FULL-PATH-TO-FILE")
+Some examples have built-in par-FUNCTION that can be called directly.
+In other cases, do one of:
+  (par-funcall #'FUNCTION ARG1 ...)
+  (par-eval #'FUNCTION ARG1 ...)

@@ -1,0 +1,18 @@
+# This is a comment.
+# @configure_input@
+
+local 0
+localhost 1 @PWD@/bin/pargcl
+localhost 1 @PWD@/bin/pargcl
+# localhost 1 pargapmpi
+
+# The general format is that "local 0" implies creation of a master.
+# Otherwise there is one line per slave.  The "1" is obligatory.
+# The first field is the hostname or localhost (in a form valid for "rsh")
+# The second field, 1, is obligatory.
+# The third field is the full path on the remote host where pargcl can be found.
+#   That path can also be specified relative to the home directory.
+# The format is inherited from MPICH, which grew from P4.
+
+#Example:
+# procyon.ccs.neu.edu 1 /usr/local/source/pargcl-0.93/bin/pargcl

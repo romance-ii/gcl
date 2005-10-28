@@ -1,0 +1,131 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+@SET_MAKE@
+
+DEBUG=0
+# DEBUG=1
+
+GCL = @GCL@
+GCL_ROOT=@GCL_SRC@
+
+CC=@CC@
+# MPICC=@MPICC@
+CFLAGS=@CFLAGS@ -I@PWD@/include
+
+SRCDIR=@PWD@/src
+LIBDIR=@PWD@/lib
+INCLUDEDIR=@PWD@/include
+
+# You may need to edit the macros below.
+LIBMPI = @PWD@/src/mpinu/libmpi.a
+# LIBMPI = -L@PWD@/src/mpinu @LIBSFORMPI@
+INCLUDEMPI = @PWD@/src/mpinu/mpi.h 
+
+LSP_FILES = ${SRCDIR}/mpi_glue.lsp ${SRCDIR}/mpi_defglue.lsp \
+	${SRCDIR}/slave-listener.lsp ${SRCDIR}/master-slave.lsp
+
+
+../bin/pargcl: saved_pargcl pargcl.sed
+# Bug: If line ends in {non-whitespace}\^J  (no space at end), "\" is absorbed
+#      IBM Rios didn't seem to recognize [^ \]
+#   `which ${GCL}` adds extra characters if "source .cshrc" prints to stdout
+#   This make process runs sh, and "which" will source .cshrc in new csh
+#   Maybe should run which script inside csh to get around this, or test.
+#	if [ X`echo echo "" | csh -t -` = X ]; then echo hi; fi
+#	echo "echo This does not work if .cshrc prints to stdout" > par${GCL}
+#	echo "Check this by doing:   source ~/.cshrc | cat -v" >> par${GCL}
+#	echo "If it prints, modify ~/.cshrc and re-make script" >> par${GCL}
+	if [ -r ${PWD}/mpi_glue.o ] ; then tmp=${PWD}; else tmp=`pwd`; fi; \
+	  cat `which ${GCL}` | \
+	  sed -e "s%[^ ]*saved_[^ ]*%$$tmp/saved_pargcl%g" | \
+	  sed -f pargcl.sed \
+	  > ../bin/par`basename ${GCL}`
+#	if [ ! -s par`basename ${GCL}` ]
+#	then
+#	echo "echo This does not work if .cshrc prints to stdout" > par${GCL}
+#	echo "Check this by doing:   source ~/.cshrc | cat -v" >> par${GCL}
+#	echo "If it prints, modify ~/.cshrc and re-make script" >> par${GCL}
+#	fi
+	@ chmod a+x ../bin/par`basename ${GCL}`
+	@ echo @PWD@/bin/par`basename ${GCL}` is ready to execute.
+	@ echo Be sure to put a procgroup file in the current directory.
+	@ echo   and to modify its contents to point to \
+	                              ../bin/par`basename ${GCL}`.
+
+@PWD@/src/mpinu/libmpi.a:
+	cd mpinu; make libmpi.a
+${LIBDIR}/libmpi.a: ${LIBMPI}
+	ln -fs ${LIBMPI} ${LIBDIR}/libmpi.a
+
+${INCLUDEDIR}/mpi.h: ${INCLUDEMPI}
+	ln -fs ${INCLUDEMPI} ${INCLUDEDIR}/mpi.h
+
+mpi_glue.o: mpi_glue.lsp ${INCLUDEDIR}/mpi.h
+	if [ ${DEBUG} = 1 ]; then \
+	  cd ${SRCDIR}; \
+	  echo \
+	    '(setq si::pargcl-src "@PWD@/src/")' \
+	    '(setq si::pargcl-include "@PWD@/include/")' \
+	    '(if (string= "@MPICC@" "@CC@")' \
+	    '  (setq compiler::*cc*' \
+	    '    (concatenate (quote string) compiler::*cc* ' \
+	    '      " -g -I@PWD@/include"))' \
+	    '  (progn (setq compiler::*mpicc* "@MPICC@")' \
+	    '    (load "mpicc.lsp")))' \
+	    '(setq compiler::*cc*' \
+	    '  (concatenate (quote string) compiler::*cc* ' \
+	    '    " -g -I${GCL_ROOT}/h"))' \
+	    '(compile-file "mpi_glue.lsp" :c-file t :h-file t :system-p t)' \
+	    | ${GCL} ; \
+	else \
+	  if [ x'@MPICC@' = x ]; then \
+	    mpicc=nil; \
+	  else \
+	    mpicc='@MPICC@'; \
+	  fi; \
+	  cd ${SRCDIR}; \
+	    echo \
+	    '(setq si::pargcl-src "@PWD@/src/")' \
+	    '(setq si::pargcl-include "@PWD@/include/")' \
+	    '(if (string= "@MPICC@" "@CC@")' \
+	    '  (setq compiler::*cc* ' \
+	    '    (concatenate (quote string) compiler::*cc* ' \
+	    '      "-I@PWD@/include/"))' \
+	    '  (progn (setq compiler::*mpicc* "@MPICC@")' \
+	    '    (load "mpicc.lsp")))' \
+	    '(setq compiler::*cc*' \
+	    '  (concatenate (quote string) compiler::*cc* ' \
+	    '    " -g -I${GCL_ROOT}/h"))' \
+	    '(compile-file "mpi_glue.lsp" :system-p t)' | ${GCL} ; \
+	fi
+
+saved_pargcl: mpi_glue.o ${LIBDIR}/libmpi.a \
+		${SRCDIR}/slave-listener.lsp ${SRCDIR}/master-slave.lsp
+	rm -f saved_prepargcl
+	echo \
+	  '(if (not (string= "@MPICC@" "@CC@"))' \
+	  '  (progn (setq compiler::*mpicc* "@MPICC@")' \
+	  '    (load "mpicc.lsp") (setq *libmpi* ""))' \
+	  '  (setq *libmpi* ' \
+	  '    "${LIBDIR}/libmpi.a @LIBSFORSOCKETS@ @LIBSFORPTHREAD@"))' \
+	  '(format t "Linking MPI to GCL ...~%")' \
+	  '(compiler::link (list "mpi_glue.o") "saved_prepargcl"' \
+	     ' nil' \
+	     ' *libmpi* t)' | ${GCL} \
+	  || ( echo "CHECK IF FULL GCL SOURCE DISTRIBUTION AVAILABLE" ; false )
+	rm -f saved_pargcl
+	echo \
+	  '(setq si::pargcl-src "@PWD@/src/")' \
+	  '(setq si::pargcl-include "@PWD@/include/")' \
+	  '(setq si::pargcl-version-string' \
+	     '"version @PARGCL_VERSION@, updated @PARGCL_UPDATED@")' \
+	  '(unless (find-package "MPI") (load "mpi_glue.o"))' \
+	  '(load "slave-listener.lsp")' \
+	  '(load "master-slave.lsp")' \
+	  '(setq *top-level-hook* (quote mpi::init-slave-listener))' \
+	  '(setq si::*system-banner* "")' \
+	  '(si::save-system "saved_pargcl")' | ./saved_prepargcl
+	rm saved_prepargcl
+
+clean:
+	rm -f mpi_glue.c mpi_glue.data mpi_glue.h *.o *~ raw_saved_*

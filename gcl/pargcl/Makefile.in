@@ -1,0 +1,48 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+@SET_MAKE@
+
+VERSION=@PARGCL_VERSION@
+UPDATED=@PARGCL_UPDATED@
+
+SRCDIR=@PWD@/src
+BINDIR=@PWD@/bin
+LIBDIR=@PWD@/lib
+INCLUDEDIR=@PWD@/include
+
+bin/pargcl:
+	cd src; make
+	@ echo ""
+	@ echo This is ParGCL version ${VERSION}, built ${UPDATED}.
+
+clean:
+	rm -f *~
+	rm -f doc/*~
+	rm -rf autom4te.cache
+	cd ${SRCDIR}; make clean
+	cd ${SRCDIR}/mpinu; make clean
+
+distclean: clean
+	rm -f ${LIBDIR}/libmpi.a ${INCLUDEDIR}/mpi.h ${BINDIR}/pargcl
+	rm -f ${BINDIR}/mpinucc
+	rm config.*
+	rm -f src/Makefile src/saved_pargcl \
+	      src/mpinu/Makefile src/mpinu/procgroup \
+	      bin/Makefile bin/procgroup Makefile
+
+dist: distclean
+	( name=`basename $$PWD`; \
+	  cd @PWD@/..; \
+	  if [ "$$name" != "pargcl" ] ; then \
+	    if [ -d pargcl ] ; then \
+	      echo "Can't make dist.  The ../pargcl directory is in the way.";\
+	      exit 1; \
+	    fi; \
+	    mv $$name pargcl; \
+	  fi; \
+	  tar cvf pargcl-${VERSION}.tar ./pargcl; \
+	  if [ "$$name" != "pargcl" ] ; then \
+	    mv pargcl $$name; \
+	  fi; \
+	  gzip pargcl-${VERSION}.tar; )
+	ls -l ../pargcl-${VERSION}.tar.gz

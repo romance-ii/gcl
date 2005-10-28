@@ -1,0 +1,29 @@
+list_connect_new_socket
+list_accept_new_socket
+  could have race w/ multiple threads;
+  protect them.
+
+Suppose two processes on different nodes begin connect
+  to each other at same time.  Only one should succeed -- not both.
+  Fix it.
+Can send message once connect made if we're lower rank, and have 
+  higher rank confirm that he's not trying to also connect.
+
+====
+Add code for multiple pending send messages (more than one).
+Add code for MPINU_recvall_with_pending_msgs to get buffer
+  and could call MPINU_recvall_with_pending_msgs at beginning of
+    any receive instead of MPINU_recvall: MPI_Recv, MPI_Irecv, etc.
+  and MPINU_Recv should call MPINU_recvall_skip_msg
+    to save non-matching msgs in buffer.
+If MPINU_recvall_with_pending_msgs called twice in a row, then
+  reset it to beginning.
+---
+PLACE IN:  recvall.c
+SO:  calling MPINU_buffered_recvall_peek with PEEK_MSG
+    Check for small receive (less than or equal to 16 bytes?)
+THEN:  if desired, call MPINU_buffered_recvall PEEK_MSG
+    After call to MPINU_buffered_recvall_with_pending_msgs
+     (successful msg return), MPINU_buffered_recvall_reset
+     or call it at beginning of MPI_Recv??
+OR:  if not desired, call it again w/ MPINU_buffered_recvall_skip

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+cc=@CC@
+includeDir=@PWD@
+libDir=@PWD@
+
+if ( uname -sr | grep "SunOS 5" > /dev/null ); then
+  libs="-lsocket -lnsl -lrt -lpthread" hello_mpi
+else
+  libs="-lpthread"
+fi
+$cc -o hello_mpi -g -I@includeDir@ hello_mpi.c @libDir@/libmpi.a $libs

@@ -1,0 +1,162 @@
+
+   
+     _________________________________________________________________
+   
+                 SPECIFYING PROCESSES IN THE PROCGROUP FILE
+                                       
+   [1] [IMAGE] [2][IMAGE] [3][IMAGE] 
+   Up: [4]Contents Next: [5]Developing a Simple p4 Program Previous:
+   [6]Analysis of the Program
+   
+   
+   
+   The procgroup file is the only portion of the interface that is very
+   likely to change through multiple versions of p4. As new architectures
+   are supported, it is hoped that we can merely alter the procgroup file
+   format to reflect any new features. (Of course new procedure calls may
+   also be required, but existing procedure calls will remain unchanged
+   when possible). See See section [7]Running p4 on Specific Machines for
+   a discussion of machine dependencies in starting p4 programs.
+   
+   The current format of a procgroup file is as follows:
+
+
+local_machine  n [full_path_name] [loginname]
+remote_machine n full_path_name [loginname]
+  .
+  .
+  .
+
+   
+   
+   In some situations, the program is started via some special command
+   executed from the host machine. In such cases, the procgroup file name
+   can be specified to the special command line along with the program
+   name (see for example the runcube and rundelta shell scripts in the
+   p4/messages subdirectory). In those cases where no special command
+   is required, no special handling is required for the procgroup
+   filename.
+   
+   The first line of a procgroup file may be ``local n'' where n is the
+   number of slave processes that share memory with the master. The full
+   path name on the ``local'' line is ignored on machines other than cube
+   and mesh machines, and the IBM SP-1. The word ``local'' may be
+   replaced by an alias for the local machine if needed, to specify an
+   alternative transport layer. The subsequent lines contain either three
+   or four fields:
+   
+       1. the name of a remote machine on which slave processes are to be
+       created.
+       2. the number of slaves that are to be created on that machine,
+       i.e. be in the same cluster (note that on machines that support
+       it, the processes in a cluster will share memory)
+       3. the full path name of the executable slave program
+       4. optionally, the user login name on the remote machine, if
+       different from that on the host machine.
+       
+   
+   As an example, let's assume that you have a network of three Sun
+   workstations named sun1, sun2, and sun3. We will also assume that you
+   are working on sun1 and plan to run a master process there. If you
+   would like to run one process on each of the other Suns, then you
+   might code a procgroup file that looks like:
+   
+   
+
+
+    # start one slave on each of sun2 and sun3
+    local 0
+    sun2  1  /home/mylogin/p4pgms/sr_test
+    sun3  1  /home/mylogin/p4pgms/sr_test
+
+   Lines beginning with # are comments.
+   
+   It is also possible to have different executables on different
+   machines. This is required, of course, when the machines don't share
+   files or are of different architectures. An example of such a
+   procgroup file would be:
+   
+   
+
+
+    local   0
+    sun2    1  /home/user/p4pgms/sun/prog1
+    sun3    1  /home/user/p4pgms/sun/prog2
+    rs6000  1  /home/user/p4pgms/rs6000/prog1
+
+   On a shared memory machine such as a KSR, in which you want all the
+   processes to communicate through shared memory using monitors, the
+   procgroup file can be as simple as:
+   
+   
+
+
+    local 50
+
+   On the CM-5, your procgroup file would look like:
+   
+   
+
+
+    local 32 /home/joe/p4progs/cm5/multiply
+
+   Next, let's assume that you have a Sequent Symmetry (named symm) and
+   an Encore Multimax (named mmax). We will also assume that you are
+   working on symm, and plan to run the master there. If you would like
+   to run two processes on symm (in addition to the master) and two on
+   mmax, then you might code a procgroup file that looks like:
+   
+   
+
+
+    local 2
+    mmax  2  /mmaxfs/mylogin/p4pgms/sr_test
+
+   P4 also permits you to treat the symmetry as a remote machine even
+   when you are running the master there. Thus, you might code a
+   procgroup file as follows:
+   
+   
+
+
+    local 2
+    symm  2  /symmfs/mylogin/p4pgms/sr_test
+    mmax  2  /mmaxfs/mylogin/p4pgms/sr_test
+
+   In this example, there are seven processes running. Five of the
+   processes are on symm, including the master. Two of the processes on
+   symm are in the master's procgroup and two are running in a separate
+   procgroup as if they were on a separate machine. Of course, the last
+   two are running on mmax.
+   
+   Finally, suppose that you have a fiber-channel network that parallels
+   your Ethernet, connecting the same machines, and that connections fro
+   running TCP/IP over the fiber-channel network are obtained by
+   connecting to sun1-fc, sun2-fc, etc. Then even if sun1 is the local
+   machine that you are logged into, you will want your procgroup file to
+   look like:
+   
+   
+
+
+    sun1-fc    0
+    sun2-fc    1  /home/user/p4pgms/sun/prog1
+    sun3-fc    1  /home/user/p4pgms/sun/prog2
+
+   Some notes about the contents of the procgroup file should be made at
+   this point. First, the value of n on the local line can be zero, i.e.
+   the master may have no local slaves. Second, the local machine may be
+   treated as if it is a remote machine by merely entering it in some
+   line as a remote machine. Third, a single machine may be treated as
+   multiple remote machines by having the same remote machine name
+   entered on multiple lines in the procgroup file. Fourth, if a single
+   machine is listed multiple times, those processes specified on each
+   line form a single cluster (share memory). Fifth, the cluster size
+   specified for a uniprocessor should be 1, because all slaves in a
+   cluster are assumed to run in parallel and to share memory.
+   
+   We refer to the original (master) process as the ``big master''. The
+   first process created in each cluster is the ``remote master'' or the
+   ``cluster master'' for that cluster. All p4-managed processes (see the
+   procedure p4_create_procgroup) have unique integer id's beginning with
+   0. The processes within a cluster are numbered consecutively.

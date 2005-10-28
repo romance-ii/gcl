@@ -1,0 +1,99 @@
+This has information in two parts:
+I. Building pargcl (overview)
+II.  Building pargcl (details)
+III. Invoking pargcl
+
+==================================================================
+I. Building pargcl (overview)
+
+GCL has hooks for faslink.  That technology allowed one to load C code
+into a running GCL and then call it from GCL.  That works under Solaris,
+but not under Linux as of 2002.  Since Linux may currently be the
+dominant application for GCL, pargcl has been customized for the
+"lowest common denominator".  i.e. it does not use faslink on any
+platform.
+
+A simplified form of the src/Makefile dependencies is
+  (assuming one is in ../pargcl/src/ :
+
+../bin/pargcl: saved_pargcl pargcl.sed
+saved_pargcl: mpi_glue.o libmpi.a
+mpi_glue.o:  mpi_glue.lsp
+
+1.  mpi_glue.o is made using GCL (compile-file ...) with :system-p t
+2.  saved_prepargcl is created, which links the GCL binary with mpi_glue.o
+      and any needed MPI functions.  It is created using `compiler::link'.
+      Then additional functions and symbols are loaded into saved_prepargcl
+      by (load "slave-listener.lsp") and (load "master-slave.lsp").
+      This is saved as saved_pargcl, using `si::save-system'.
+3.  A script pargcl, derived from the gcl script is deposited
+      in ../bin/pargcl.  Just as gcl calls saved_gcl,
+      pargcl calls saved_pargcl.
+
+When pargcl is called:
+1.  The -eval flags in the script call:
+    (MPI::MPI-Init) and (MPI::init-slave-listener)
+2.  MPI::init-slave-listener prints the banner and if it is the slave,
+      it sets the directory to the same directory as on the master,
+      and then starts a read-message/eval/send-message loop in which it
+      receives commands from the master.
+
+==================================================================
+II.  Building pargcl (details):
+A. The default target, ../bin/par${GCL}, makes the target saved_pargcl.
+B. Makefile then creates a modified script ../bin/pargcl based
+  on the original gcl script.  The modified script invokes saved_pargcl, along
+  with some initial evaluations specified by -eval in the ../bin/pargcl script.
+  The standard gcl script does not call those parallel initializations.
+  1. calls (MPI::init-slave-listener)
+  3. MPI::init-slave-listener checks command line args to see if
+      this is slave or master, and initializes appropriately
+
+==================================================================
+III. Invoking pargcl
+
+1.  ParGCL is built in layers:               ParGCL
+					----------------
+                                          master-slave
+					----------------
+                                         slave-listener
+					------------------
+                                   MPI glue (invoke MPI from LISP) 
+					------------------
+					      GCL
+
+ParGCL also provides a buitin MPI subset (MPINU).  In MPINU,
+MPI_Init looks for a local file, procgroup, to specify what
+slave processes should be started and where.  If one links
+instead to a different MPI implementation, that implementation
+of MPI_Init() will determine what slave processes to start where.
+
+a.  MPI glue uses the GCL  C foreign function interface
+      to create a LISP wrapper around C.  mpi_glue.lsp implements
+      this layer, and also uses defglue.lsp for some utility macros.
+b.  slave-listener starts up ParGCL slaves according to the number
+      of slave processes specified in the procgroup file (assuming MPINU).
+     The procgroup file is invoked from MPI_Init()
+    Each slave executes a top level receive-eval-send loop
+      in place of the standard read-eval-print loop.
+    The receive-eval-send loop is in slave-listener.lsp, which
+      is loaded up by init-pargcl.lsp, just before saved_pargcl is dumped.
+c.  master-slave then bootstraps off of the slave-listener layer.
+    It causes slaves to execute tasks specified by the master.
+    This provides a simple, easy way of quickly writing parallel programs.
+    It is based on the TOP-C architecture (Task Oriented Parallel C/C++),
+      which can be found at http://www.ccs.neu.edu/home/gene/topc.html
+    master-slave.lsp is loaded by init-pargcl.lsp, just before
+      saved_pargcl is dumped.
+
+==================================================================
+IV. Starting up slave listener
+
+1.  In building pargcl, the pargcl script invokes:
+ (mpi::init-slave-listener)
+
+2.  When pargcl starts, it calls
+  > (mpi::init-slave-listener), which calls
+  > > (if (= (MPI-Comm-rank) 0) (si:chdir MPI::curr-dir))
+  > > (if (<> (MPI-Comm-rank) 0)  (slave)), which calls
+  > > > SLAVE:  Carry out slave side of initializations done by master above.
