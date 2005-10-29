@@ -128,4 +128,5 @@ saved_pargcl: mpi_glue.o ${LIBDIR}/libmpi.a \
 	rm saved_prepargcl
 
 clean:
-	rm -f mpi_glue.c mpi_glue.data mpi_glue.h *.o *~ raw_saved_*
+	rm -f mpi_glue.c mpi_glue.data mpi_glue.h *.o *~ raw_saved_* \
+	  saved_prepargcl

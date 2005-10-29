@@ -87,8 +87,9 @@ $   value.it_value.tv_sec = logout_time * 60;
 $   setitimer(ITIMER_REAL, &value, NULL);
 $ }
 $ 
+$ static char hostname_string[75];
 $ static char *hostname_id()
-$ { char host[75], out[75];
+$ { char host[75];
 $   int res, rank;
 $    res = gethostname(host, sizeof(host)/sizeof(char));
 $    MPI_Initialized(&rank);
@@ -96,10 +97,10 @@ $    if ( rank == 1)
 $      MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 $    else rank = -1;
 $    if (res == -1) {
-$      perror(res);
+$      perror("ParGCL: gethostname");
 $      sprintf(host, "<unknown name>"); }
-$    sprintf(out, "Processor %s (MPI rank/ID: %d)", host, rank);
-$    return out;
+$    sprintf(hostname_string, "Processor %s (MPI rank/ID: %d)", host, rank);
+$    return hostname_string;
 $ }
 $
 $ /* CCS modems dysfunctional again; check later if these have
@@ -115,9 +116,9 @@ $ static object staticp(array)
 $   object array;
 ${  /* if ((enum type)type_map[page(array->st.st_self)] == t_contiguous) */
 $   if (inheap(array->st.st_self))
-$ /* wfs recommends:      if inheap(x->st.st_dim)
-$ /*"since it might be that the string is in a saved image [where contig
-$ /* and relblock get converted to t_other and not gc'd], and so to be safe
+$ /* wfs recommends:      if inheap(x->st.st_dim) */
+$ /*"since it might be that the string is in a saved image [where contig */
+$ /* and relblock get converted to t_other and not gc'd], and so to be safe */
 $ /* in those cases make this be contiguous.." */
 $     return Ct;
 $   else return Cnil;
@@ -235,7 +236,7 @@ $ static int MPI_Any_Tag () { return MPI_ANY_TAG; }
   ("int i"
    "char **argv"
    "MPI_Initialized(&i)"
-   "if (i) {printf(\"MPI already initialized\\n\"); return;}"
+   "if (i) {printf(\"MPI already initialized\\n\"); return -1;}"
    "argv = (char **)argv_obj->v.v_self"
    "for (i=0; i<argc; i++) argv[i] = (char *)((object)argv[i])->ust.ust_self"
    "/* master will remove p4 flags from argv & decrement argc */"
@@ -253,7 +254,8 @@ $ static int MPI_Any_Tag () { return MPI_ANY_TAG; }
    "else signal(SIGINT, SIG_IGN) /* else slave */"
    "signal( SIGALRM, &timeout ) /* assumes SIGALRM not used by GCL/GAP */"
    "signal( SIGBUS, &debug_test ); signal( SIGSEGV, &debug_test )"
-   "settimer()")
+   "settimer()"
+   "return 0")
   "int returned;  Single arg is a list of p4-style flags:
    ex.: '(\"-p4pg\" \"procgroup\" \"-p4dbg\" 99 \"-p4rdbg\" 99))"
   )
@@ -321,7 +323,7 @@ $ static int MPI_Any_Tag () { return MPI_ANY_TAG; }
   (MPI-Get-processor-name-glue string)
   ((object "MPI_Get_processor_name_glue") (object string))
   ("int resultlen"
-   "MPI_Get_processor_name((unsigned char *)string->st.st_self, &resultlen)"
+   "MPI_Get_processor_name((char *)string->st.st_self, &resultlen)"
    "if (string->v.v_hasfillp) (string->st.st_fillp)=resultlen"
    "return(string)")
   "args:  string; returns name in string.
@@ -341,7 +343,7 @@ $ static int MPI_Any_Tag () { return MPI_ANY_TAG; }
 
 (defglue (MPI-Abort errorcode)
   ((int "MPI_Abort_glue") (int errorcode))
-  ("MPI_Abort(MPI_COMM_WORLD, errorcode)")
+  ("return MPI_Abort(MPI_COMM_WORLD, errorcode)")
   "errorcode arg;  causes all processes to abort and return errorcode")
 
 (defglue
@@ -427,7 +429,8 @@ $ static int MPI_Any_Tag () { return MPI_ANY_TAG; }
   (getcwd (&optional (string (make-fill-string 256))))
   (getcwd-glue string)
   ((object "mygetcwd") (object string))
-  ("char *cwd, *getcwd(), *buf"
+  ("char *cwd, *getcwd()"
+;;char *buf;
 ;;if (type_of(vs_base[0]) == t_array) {
 ;;  vs_base[0]->a.a_dims[0]
 ;; } else {
@@ -447,7 +450,7 @@ $ static int MPI_Any_Tag () { return MPI_ANY_TAG; }
 (defglue
   (chdir (object path))
   ((object "mychdir") (object path))
-  ("if (chdir((unsigned char *)path->st.st_self) == -1) {perror (\"chdir\"); return Cnil;}"
+  ("if (chdir((char *)path->st.st_self) == -1) {perror (\"chdir\"); return Cnil;}"
    "return Ct")
   "returns t if chdir was successful, else nil")
 
@@ -456,7 +459,7 @@ $ static int MPI_Any_Tag () { return MPI_ANY_TAG; }
 
 (defglue
   (nice (int prio))
-  ((int "nice") (int prio))
+  ((int "nice_internal") (int prio))
   ("int oldprio, success"
    "oldprio = getpriority(PRIO_PROCESS,getpid())"
    "success = setpriority(PRIO_PROCESS,getpid(),prio)"

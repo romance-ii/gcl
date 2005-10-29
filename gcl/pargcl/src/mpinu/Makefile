@@ -6,16 +6,16 @@ CC=gcc
 CFLAGS=-g -O2
 # LIBS= -lsocket -lnsl -lrt   needed for Solaris
 # SHOULD USE CONFIGURE VARIABLE FOR -lpthread
+LIBS=  @LIBSFORSLEEP@ -lpthread
 
 RANLIB=ranlib
 
 LIBOBJS=mpi.o master.o parse.o cmd.o slave.o utils.o sendrecv.o spawn2.o
 LIBOBJS=mpi.o master.o parse.o cmd.o slave.o utils.o sendrecv.o \
-	send_nonblock.o recv_cache.o
+	send-nonblock.o recv-cache.o
 
-execute: hello_mpi hello_mpi2
+execute: hello_mpi
 	./hello_mpi
-	./hello_mpi2 -p4pg procgroup2
 
 # Under solaris, end-user application will need:  libmpi.a -lsocket -lnsl -lrt
 libmpi.a: ${LIBOBJS}
@@ -31,7 +31,7 @@ hello_mpi: hello_mpi.o libmpi.a
 	    [ "x${LIBS}" = "x" ] ; then \
 	      make LIBS="-lpthread" hello_mpi; \
 	else \
-	  ${CC} -o hello_mpi -O0 -g hello_mpi.o libmpi.a ${LIBS}; \
+	  ${CC} -o hello_mpi -g hello_mpi.o libmpi.a ${LIBS}; \
 	fi
 
 hello_mpi2: hello_mpi2.o libmpi.a
@@ -51,7 +51,7 @@ check: hello_mpi hello_mpi2
 	./hello_mpi2 -p4pg procgroup2
 
 dist: clean
-	dir=`basename $$PWD`; cd ..; tar cvf mpinu.tar ./$$dir
+	dir=./`basename $$PWD`; cd ..; tar cvf mpinu.tar ./$$dir
 	gzip ../mpinu.tar
 	ls -l ../mpinu.tar.gz
 

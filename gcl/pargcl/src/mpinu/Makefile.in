@@ -12,7 +12,7 @@ RANLIB=@RANLIB@
 
 LIBOBJS=mpi.o master.o parse.o cmd.o slave.o utils.o sendrecv.o spawn2.o
 LIBOBJS=mpi.o master.o parse.o cmd.o slave.o utils.o sendrecv.o \
-	send_nonblock.o recv_cache.o
+	send-nonblock.o recv-cache.o
 
 execute: hello_mpi
 	./hello_mpi

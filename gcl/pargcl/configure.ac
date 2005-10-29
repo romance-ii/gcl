@@ -4,8 +4,8 @@ dnl Process this file with autoconf to produce a configure script.
 AC_INIT(src/mpi_defglue.lsp)
 
 dnl Set version number
-PARGCL_VERSION=0.9.3-beta1
-PARGCL_UPDATED="June, 2005"
+PARGCL_VERSION=0.9.5
+PARGCL_UPDATED="October, 2005"
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -122,9 +122,9 @@ if test ! -x "$with_gcl"; then
   AC_MSG_ERROR(Couldn't find gcl command
     Use ./configure --with-gcl= to specify location of gcl command );
 fi
-libdir=`$with_gcl -batch -eval '(format t *lib-directory*)'`
+libdir=`$with_gcl -batch -eval '(progn (format t *lib-directory*) (quit))'`
 if test ! -d $libdir/h; then
-  AC_MSG_ERROR(Didn't find include directory at $libdir/gmp3
+  AC_MSG_ERROR(Didn't find include directory at $libdir/h
     Bad parameter given to ./configure --with-gcl= );
 fi
 if test ! -d $libdir/gmp3; then
@@ -133,7 +133,7 @@ if test ! -d $libdir/gmp3; then
 fi
 
 GCL=$with_gcl
-GCL_SRC=`$with_gcl -batch -eval '(write *lib-directory* :escape nil)'`
+GCL_SRC=`$with_gcl -batch -eval '(progn (write *lib-directory* :escape nil) (quit))'`
 GCL_SRC=`echo $GCL_SRC | sed -e s'#"##g'`
 
 dnl Substitute shell variables
