@@ -1,3 +1,0 @@
-b MPINU_send_nonblock
-b enqueue
-b dequeue
