@@ -5055,7 +5055,7 @@ GCL_SRC=`echo $GCL_SRC | sed -e s'#"##g'`
 
 
 
-                                                                      ac_config_files="$ac_config_files src/Makefile src/mpinu/Makefile src/mpinu/procgroup bin/Makefile bin/procgroup bin/mpinucc Makefile"
+                                                            ac_config_files="$ac_config_files src/Makefile src/mpinu/Makefile src/mpinu/procgroup bin/procgroup bin/mpinucc Makefile"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -5609,7 +5609,6 @@ do
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
   "src/mpinu/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/mpinu/Makefile" ;;
   "src/mpinu/procgroup" ) CONFIG_FILES="$CONFIG_FILES src/mpinu/procgroup" ;;
-  "bin/Makefile" ) CONFIG_FILES="$CONFIG_FILES bin/Makefile" ;;
   "bin/procgroup" ) CONFIG_FILES="$CONFIG_FILES bin/procgroup" ;;
   "bin/mpinucc" ) CONFIG_FILES="$CONFIG_FILES bin/mpinucc" ;;
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;

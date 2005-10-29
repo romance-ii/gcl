@@ -156,7 +156,7 @@ AC_SUBST(MPICXX)
 
 AC_OUTPUT(src/Makefile
 	  src/mpinu/Makefile src/mpinu/procgroup
-          bin/Makefile bin/procgroup bin/mpinucc Makefile
+          bin/procgroup bin/mpinucc Makefile
          )
 chmod a+x bin/mpinucc
 
