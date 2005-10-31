@@ -144,7 +144,7 @@
 	    (if (member :ansi-cl *features*) "ANSI" "CLtL1")
 	    (if (member :gprof *features*) "profiling" "")
 	    (si::gcl-compile-time)
-	    "Source License: LGPL(gcl,gmp), GPL(unexec,bfd)"
+	    "Source License: LGPL(gcl,gmp,pargcl), GPL(unexec,bfd)"
 	    "Binary License: "
 	    (if gpled-modules (format nil "GPL due to GPL'ed components: ~a" gpled-modules)
 	      "LGPL")

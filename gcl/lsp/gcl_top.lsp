@@ -641,8 +641,8 @@ Low level commands:
 :bds ['v1 'v2 ..]Show previous special bindings of v1, v2,.. or all if no v1
 
 ")) (format  *debug-io* v))
-  (format *debug-io* "~%Here is a COMPLETE list of bindings.   Too
-add a new one, add a 'si::break-command property:")
+  (format *debug-io* "~%Here is a COMPLETE list of bindings.   To
+add a new one, add an 'si::break-command property:")
   (do-symbols (v (find-package "KEYWORD"))
 	      (cond ((get v 'si::break-command)
 		     (format  *debug-io*
