@@ -1,7 +1,20 @@
-;;;; Copyright (c) Gene Cooperman, 1994-2002
-;;;;  Rights to use this code for any purpose are freely granted,
-;;;;  so long as this notice remains.  No warranty is given for the
-;;;;  correctness or suitability of this code.
+;;;; Copyright (c) Gene Cooperman, 1994-2005
+
+;; This file is part of ParGCL.
+;;
+;; ParGCL is free software; you can redistribute it and/or modify it under
+;;  the terms of the GNU LIBRARY GENERAL PUBLIC LICENSE as published by
+;; the Free Software Foundation; either version 2, or (at your option)
+;; any later version.
+;;
+;; ParGCL is distributed in the hope that it will be useful, but WITHOUT
+;; ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+;; FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
+;; License for more details.
+;;
+;; You should have received a copy of the GNU Library General Public License
+;; along with ParGCL; see the file COPYING.  If not, write to the Free Software
+;; Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 (in-package "MPI")
 
@@ -28,6 +41,7 @@
 ;;;This file MUST be compiled, and loaded compiled, or C fnc's not found
 ;;;Unfortunately, AKCL already has integrated another MPI package:
 ;;;  Multiple Precision Integers, while here, MPI = Message Passing Interface
+;;;  In GCL 2.7.0, this seems to be replaced by gmp (GNU Multiple Prec), anyway.
 ;;;  Hopefully this presents no conflict or confusion, since at the
 ;;;  the user level, MPI is always Message Passing Interface
 ;;;BUG:  MPI and LISP compete for same signals (interrupt, etc.)
@@ -52,7 +66,7 @@
       (return (- i 2)))))
 (eval-when (compile)
 (defmacro make-fill-string (len)
-  `(make-array ,len :element-type 'string-char :fill-pointer t :static t))
+  `(make-array ,len :element-type 'character :fill-pointer t :static t))
 )
 
 ;;;character macro:  $ ...  ==>  "..."
@@ -183,16 +197,18 @@ $ static int MPI_Status_Tag () { return last_status.MPI_TAG; }
 $ static MPI_Datatype MPI_type[3];
 $ static void MPI_Init_Datatype()
 $ { /* must be set only after running MPI_Init; MPI_CHAR is var, not const */
-$  MPI_type[0] = MPI_CHAR /* STRING-CHAR */;
+$  MPI_type[0] = MPI_CHAR /* CHARACTER */;
 $  MPI_type[1] = MPI_INT /* FIXNUM */;
 $/* printf("debugging: %d %d %d\n", MPI_type[0], MPI_CHAR, MPI_INT); */
 $  MPI_type[2] = MPI_FLOAT /*  */;}
 )
-(defconstant STRING-CHAR 0)
+(defconstant CHARACTER 0)
 (defconstant FIXNUM 1)
 (defconstant FLOAT 2)
+;;; Was called string-char in GCL 2.6.0, but character in GCL 2.7.0
 (defconstant *type-lisp-to-mpi*
-	   `((string-char . ,STRING-CHAR) (fixnum . ,FIXNUM) (float . ,FLOAT)))
+	   `((character . ,CHARACTER) (string-char . ,CHARACTER)
+	     (fixnum . ,FIXNUM) (float . ,FLOAT)))
 (Clines
 $ static int MPI_Any_Source () { return MPI_ANY_SOURCE; }
 $ static int MPI_Any_Tag () { return MPI_ANY_TAG; }
@@ -265,7 +281,7 @@ $ static int MPI_Any_Tag () { return MPI_ANY_TAG; }
     (if (symbolp datatype)
       (setq datatype
 	    (case datatype
-	      (string-char 0)
+	      (character 0)
 	      (fixnum 1)
 	      (float 2)
 	      (otherwise (error "unsupported datatype for MPI-Get-count"))))))
@@ -351,6 +367,10 @@ $ static int MPI_Any_Tag () { return MPI_ANY_TAG; }
 		 &aux (datatype (array-element-type msg)) (len (length msg)))
       (setq datatype (or (cdr (assoc datatype *type-lisp-to-mpi*))
 			(error "msg is array of bad elt. type: ~a" datatype)))
+      (if (>= dest (MPI-World-size))
+	(error "destination ~a is larger than maximum rank of processes" dest))
+      (if (< dest 0)
+	(error "destination ~a is negative" dest))
       (if (not (staticp msg))
 	  (error "MPI-Send:  msg buffer not static array")))
   (MPI-Send-glue msg len datatype dest tag)
@@ -358,9 +378,9 @@ $ static int MPI_Any_Tag () { return MPI_ANY_TAG; }
        (object buf) (int count) (int datatype) (int dest) (int tag))
   ("/* printf(\"debugging:  datatype:  %x %x\\n\", MPI_CHAR, MPI_type[0]) */"
    "return MPI_Send(buf->st.st_self, count, MPI_type[datatype], dest, tag, MPI_COMM_WORLD)")
-  "args: msg (string or (array fixnum)), dest (fixnum rank), tag (fixnum);
-       tag argument is optional;
-       msg MUST be static array.  See (make-array ... static t);
+  "args: msg (string or (array fixnum) or (array float)), dest (fixnum rank), 
+       tag (fixnum);  [ tag argument is optional ]
+       msg MUST be static array.  See (make-array ... :static t);
        side-effects status variable; (apropos \"MPI-Status\") for more info;
        data in all of array is sent to receiver, but if it has
        a fill-pointer, only the data up to the fill-pointer is sent.")
@@ -379,6 +399,11 @@ $ static int MPI_Any_Tag () { return MPI_ANY_TAG; }
                         See examples/example-mpi.lsp"))
  	    (setq datatype (array-element-type buf))
  	    (setq count (array-dimension buf 0))
+            (if (>= source (MPI-World-size))
+	      (error "source ~a is larger than maximum rank of processes"
+		     source))
+            (if (< source 0)
+	      (error "source ~a is negative" source))
 	    (setq datatype (or (cdr (assoc datatype *type-lisp-to-mpi*))
 			(error "buf is array of bad elt. type: ~a~%  ~
               See *type-lisp-to-mpi* for list of acceptable types" datatype))))
@@ -395,7 +420,7 @@ $ static int MPI_Any_Tag () { return MPI_ANY_TAG; }
    "                        (buf->v.v_fillp)=count;}"
    "settimer()"
    "return(buf)")
-  "args: buf (array string-char/fixnum), source (fixnum rank),
+  "args: buf (array character/fixnum/float), source (fixnum rank),
          <opt: tag(fixnum)>;
    all arguments optional;
    side-effects status variable; (apropos \"MPI-Status\") for more info;
@@ -485,7 +510,7 @@ $ static int MPI_Any_Tag () { return MPI_ANY_TAG; }
 
 ;;;;; THIS MUST BE LAST
 (do-symbols (var "MPI") (if (fboundp var) (export var "MPI")))
-;;These shouldn't be in LISP package.  But make_special was putting them there.
 (dolist (x '(LISP::mpi-tag-ub LISP::mpi-host LISP::mpi-io)) (export x "LISP"))
-(pushnew 'MPI *features*)
+(pushnew :MPI *features*)
+;;These shouldn't be in LISP package.  But make_special was putting them there.
 (eval-when (compile eval) (setq *readtable* %old-readtable%))

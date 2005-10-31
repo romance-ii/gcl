@@ -3,61 +3,88 @@
 
 ParGCL provides three parallel programming interfaces, each described
 individually, below.  The three interfaces are:
-  master-slave - simple, easy-to-use master-worker model of parallelism
-  		 based on TOP-C (http://www.ccs.neu.edu/home/gene/topc.html)
-		 It also supports non-trivial parallelism, in which any
-		 slave process can cause the "shared data" to be updated,
-		 and so made visible to other slaves.
+
   slave-listener - master sends LISP commands to a slave, and then receives
   		 replies.
   MPI -          Simplified LISP interface to MPI.  At this time, it
   		 primarily implements the point-to-point layer of MPI.
 		 See the MPI standard on the web for a full manual of the
 		 MPI functions.
+  master-slave - simple, easy-to-use master-worker model of parallelism
+  		 based on TOP-C (http://www.ccs.neu.edu/home/gene/topc.html)
+		 It also supports non-trivial parallelism, in which any
+		 slave process can cause the "shared data" to be updated,
+		 and so made visible to other slaves.
 
-ParGCL/MPI is intended as an easy-to-use master-slave distributed architecture.
-It combines the feedback of an interactive language (the GCL or AKCL dialect
-of LISP) with the the use of MPI to take advantage of networks of
-workstations.  As such, it is hoped that it will make available an SPMD
-architecture that helps people overcome the initial learning barrier in
-writing parallel programs.  Ease-of-use is emphasized while hoping to maintain
-reasonable efficiency and a reasonable feature set.  This distribution,
-along with a paper describing it, is available by anonymous ftp in
-the directory /pub/people/gene/starmpi at ftp.ccs.neu.edu .
-If you use this software, please send e-mail to gene@ccs.neu.edu to notify me.
+To begin, make sure that there is a procgroup file in the directory where
+you start pargcl, or else call:  pargcl -p4pg FULL_PATH_OF_PROCGROUP_FILE
+The procgroup file specifies the remote "slave" machines and the path
+to pargcl on those machines.  pargcl/bin/procgroup is a sample file.
 
-This is admittedly a very simplistic manual for now.  As the system develops,
-this manual will expand further.  The main idea is that gcl/mpi is built in
-three layers.  Most people will prefer to use almost entirely the master slave
-layer, while taking advantage of the lower layers only as needed.  By default,
-commands are executed on the master only.  The implicit "PRINT" of the
-top-level read-eval-print loop operates only on the master.  However, explicit
-print commands executed by user programs on master AND slaves will display on
-the user console.
+Most people will want to begin with the slave-listener interface.
+Note that (help 'COMMAND) works for most commands.
+There are example parallel programs in pargcl/examples/.
+Here is a sample usage of some simple commands:
+  (send-message '(+ 3 4) 2)  ; send to slave 2 for evaluation
+  (send-message "(+ 5 6)" 1) ; send to slave 1 for evaluation
+  (send-message "(+ 7 8)" 1) ; send to slave 1 for evaluation
+  (receive-message 2)
+  (receive-message 1)
+  (probe-message 1) ; Slave 1 has message pending
+  (flush-all-messages)
+  (probe-message 1) ; Slave 1 now has no messages
+  (broadcast-message '(setq myrank (MPI-Comm-rank))) ; rank (id) of slave
+  (par-eval '(defun myfnc (x) (sqrt x)))
+  (send-message '(dotimes (i 1000000000) (myfnc i)) 1)
+  (par-reset) ; useful if slave not responding.
+  (par-load "/home/joe/myfile.lsp") ; Load file on all processors
 
-The routines par-eval and par-funcall cause execution on all processors
-(master and slaves).  A user can restrict execution to a particular processor
-by use of the functions master-p and mpi-comm-rank.  However, as a matter of
-style, it is recommended to use these only as a last resort, since programming
-is conceptually easier when the same data structures are present on all
-processors.
+;;;; A remote process is set up for each one specified in your procgroup file.
+;;;; Available commands:
+;;;; (send-message <lisp-expr> <optional dest = 1>)
+;;;; (broadcast-message <lisp-expr>) ; no reply message
+;;;; (receive-message <optional source = (MPI-Any-source)>)
+;;;; (free-msg-buffer <buf>) ; optimization for greater efficiency, only
+;;;;                         ; frees message buffer for re-use in next MPI-recv
+;;;; (probe-message <optional source = (MPI-Any-source)>)
+;;;; (flush-all-messages)  ; flush all commands pending by slaves
+;;;; (bye) modified to also delete remote processes
+;;;; (quit) synonym for (bye)
+;;;; (get-last-source) ; not recommended, but can be useful in cases
+;;;;                   ; of a continuation between master and slave,
+;;;;                   ; if master wants to match initial info and later
+;;;;                   ; info after continuation
+;;;; ---
+;;;; It works to call (send-message ... 1) n times, and then call
+;;;;   (receive-message 1) n times, although this may be less efficient.
+;;;; Commands sent to the same processor, are evaluated in sequence.
+;;;; ---
+;;;; CAUTION:  If you add the optional tag parameter to send-message,
+;;;; note that the slave-listener does not reply if tag = broadcast-tag
+;;;; Also, tags larger than broadcast-tag are interpreted as (vector fixnum)
+;;;; or (vector float), and use the corresponding MPI data types.
 
-The current implementation is based on MPI and GCL or AKCL, but it should
-be easily portable to other message passing libraries (such as PVM)
-and other dialects of Common LISP with a foreign function interface
-capable of loading object (.o) files and library archive (.a) files.
+====================
+
+The current implementation has a built-in MPI subset (MPINU).  Note,
+however, that one can invoke:  ./configure --with-mpicc=XXX
+where XXX is an mpicc script that compiles an application to use MPI.
+This allows you to use other dialects of MPI.
 
 Note that messages are converted to (vector fixnum), (vector float),
-or in general, strings (general print representations) before being sent.
-This implies significant overhead for very large messages that have to be
-sent as their print representation.  Also, a timer will kill any process
+or (by default) strings (general print representations) before being sent.
+Conversion from a general object to its print representation as a string
+implies significant overhead for very large messages
+
+Also, a timer will kill any process
 that has not received a message for some time (60 minutes by default).
 
-This version is still experimental, and commands can change.  More examples
-are planned for the future to make the learning curve less steep.
-Comments will be gratefully accepted.
+Following is a summary of the master-slave layer, slave-listener layer,
+and MPI layer.
 
 =========================================================================
+[ The master-slave layer uses the TOP-C model.  For a detailed description
+  of the TOP-C model, see http://www.ccs.neu.edu/home/gene/topc.html ]
 
 MASTER SLAVE LAYER 
 

@@ -99,8 +99,7 @@ mpi_glue.o: mpi_glue.lsp ${INCLUDEDIR}/mpi.h
 	    '(compile-file "mpi_glue.lsp" :system-p t)' | ${GCL} ; \
 	fi
 
-saved_pargcl: mpi_glue.o ${LIBDIR}/libmpi.a \
-		${SRCDIR}/slave-listener.lsp ${SRCDIR}/master-slave.lsp
+saved_prepargcl: mpi_glue.o ${LIBDIR}/libmpi.a
 	rm -f saved_prepargcl
 	echo \
 	  '(if (not (string= "@MPICC@" "@CC@"))' \
@@ -113,12 +112,14 @@ saved_pargcl: mpi_glue.o ${LIBDIR}/libmpi.a \
 	     ' nil' \
 	     ' *libmpi* t)' | ${GCL} \
 	  || ( echo "CHECK IF FULL GCL SOURCE DISTRIBUTION AVAILABLE" ; false )
+saved_pargcl: saved_prepargcl mpi_glue.o \
+		${SRCDIR}/slave-listener.lsp ${SRCDIR}/master-slave.lsp
 	rm -f saved_pargcl
 	echo \
 	  '(setq si::pargcl-src "@PWD@/src/")' \
 	  '(setq si::pargcl-include "@PWD@/include/")' \
 	  '(setq si::pargcl-version-string' \
-	     '"version @PARGCL_VERSION@, updated @PARGCL_UPDATED@")' \
+	     ' "version @PARGCL_VERSION@, updated @PARGCL_UPDATED@")' \
 	  '(unless (find-package "MPI") (load "mpi_glue.o"))' \
 	  '(load "slave-listener.lsp")' \
 	  '(load "master-slave.lsp")' \

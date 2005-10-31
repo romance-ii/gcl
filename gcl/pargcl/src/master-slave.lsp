@@ -1,7 +1,20 @@
-;;;; Copyright (c) Gene Cooperman, 1994-2002
-;;;;  Rights to use this code for any purpose are freely granted,
-;;;;  so long as this notice remains.  No warranty is given for the
-;;;;  correctness or suitability of this code.
+;;;; Copyright (c) Gene Cooperman, 1994-2005
+
+;; This file is part of ParGCL.
+;;
+;; ParGCL is free software; you can redistribute it and/or modify it under
+;;  the terms of the GNU LIBRARY GENERAL PUBLIC LICENSE as published by
+;; the Free Software Foundation; either version 2, or (at your option)
+;; any later version.
+;;
+;; ParGCL is distributed in the hope that it will be useful, but WITHOUT
+;; ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+;; FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
+;; License for more details.
+;;
+;; You should have received a copy of the GNU Library General Public License
+;; along with ParGCL; see the file COPYING.  If not, write to the Free Software
+;; Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 ;;Main function:  master-slave
 ;;  parametrized functions:  generate-task-input, do-task, check-task-result,
@@ -157,9 +170,9 @@
    This is based on the TOP-C model for C/C++.
    See http://www.ccs.neu.edu/home/gene/topc.html"
   (declare (special *msg-buf*)) ; defined in slave-listener.lsp
-  (let ((old-buffer-size (array-dimension (get '*msg-buf* 'string-char) 0)))
+  (let ((old-buffer-size (array-dimension (get '*msg-buf* 'character) 0)))
      (if trace (format t "~%In master-slave~%"))
-     (when buffer-size (adjust-array (get '*msg-buf* 'string-char) buffer-size
+     (when buffer-size (adjust-array (get '*msg-buf* 'character) buffer-size
 				     :static t))
      (setq *master-slave-time*
 	   (list (get-internal-run-time) (get-internal-real-time) 0))
@@ -302,7 +315,7 @@
 		(when update-shared-data ; broadcast doesn't require reply
 		    (funcall update-shared-data result))))))))
      (when buffer-size
-       (adjust-array (get '*msg-buf* 'string-char) old-buffer-size :static t))
+       (adjust-array (get '*msg-buf* 'character) old-buffer-size :static t))
      (setf (first *master-slave-time*)
 	   (- (get-internal-run-time) (first *master-slave-time*)))
      (setf (second *master-slave-time*)

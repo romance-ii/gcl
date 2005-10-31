@@ -10,10 +10,12 @@ BINDIR=@PWD@/bin
 LIBDIR=@PWD@/lib
 INCLUDEDIR=@PWD@/include
 
-bin/pargcl:
+bin/pargcl: src/saved_pargcl src/pargcl.sed
+
+src/saved_pargcl src/pargcl.sed:
 	cd src; make
 	@ echo ""
-	@ echo This is ParGCL version ${VERSION}, built ${UPDATED}.
+	@ echo This is ParGCL version ${VERSION}, ${UPDATED}.
 
 clean:
 	rm -f *~

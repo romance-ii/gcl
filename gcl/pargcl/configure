@@ -1291,7 +1291,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-PARGCL_VERSION=0.9.5
+PARGCL_VERSION=0.9.6
 PARGCL_UPDATED="October, 2005"
 
 ac_ext=c

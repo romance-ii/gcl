@@ -1,7 +1,20 @@
-;;;; Copyright (c) Gene Cooperman, 1994-2002
-;;;;  Rights to use this code for any purpose are freely granted,
-;;;;  so long as this notice remains.  No warranty is given for the
-;;;;  correctness or suitability of this code.
+;;;; Copyright (c) Gene Cooperman, 1994-2005
+
+;; This file is part of ParGCL.
+;;
+;; ParGCL is free software; you can redistribute it and/or modify it under
+;;  the terms of the GNU LIBRARY GENERAL PUBLIC LICENSE as published by
+;; the Free Software Foundation; either version 2, or (at your option)
+;; any later version.
+;;
+;; ParGCL is distributed in the hope that it will be useful, but WITHOUT
+;; ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+;; FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
+;; License for more details.
+;;
+;; You should have received a copy of the GNU Library General Public License
+;; along with ParGCL; see the file COPYING.  If not, write to the Free Software
+;; Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 ;;;; A remote process is set up for each one specified in your procgroup file.
 ;;;; Available commands:
@@ -39,7 +52,7 @@
   `(the fixnum (rem (MPI-status-tag) next-datatype-tag)))
 (defmacro get-last-datatype ()
   "interprets tag to indicate type of message;
-   0 = string-char; 1 = fixnum; 2 = float; (corresponds to MPI_type[] in C)"
+   0 = character; 1 = fixnum; 2 = float; (corresponds to MPI_type[] in C)"
   `(values (the fixnum (truncate (MPI-status-tag) next-datatype-tag))))
 (defmacro get-last-count ()
   "count of message last received or last probed"
@@ -51,14 +64,14 @@
   (MPI-status-source))
 
 ;;This buffer is lengthened if longer messages are encountered.
-(defvar *msg-buf* nil)
+(defvar *msg-buf* nil
   "Symbol has property list with element-type of vector as property,
    and vector as value.  :fill-pointer, :adjustable, and :static all set to T.
    :static t is essential.  A pointer to its body gets passed to MPI,
    which can call malloc, calling GCL's GBC.  So, the pointer must not move.
    (adjust-array ... :static t) must repeat :static t; bug in GCL-2.1 & lower")
-(setf (get '*msg-buf* 'string-char)
-      (make-array 256 :element-type 'string-char :fill-pointer t :adjustable t
+(setf (get '*msg-buf* 'character)
+      (make-array 256 :element-type 'character :fill-pointer t :adjustable t
 		  :static t))
 (defun free-msg-buffer (buf)
   "end-user-callable: frees message buffer for reuse by slave-listener
@@ -75,14 +88,14 @@
 		      :adjustable t :static t))
        (setf (get '*msg-buf* 'float) buf))
       (#.(array-element-type
-	  (make-array 2 :element-type 'string-char :fill-pointer t
+	  (make-array 2 :element-type 'character :fill-pointer t
 		      :adjustable t :static t))
-       (setf (get '*msg-buf* 'string-char) buf))
+       (setf (get '*msg-buf* 'character) buf))
       (otherwise (error "buffer with elements of unknown type")))
     (error "buffer is not of type vector")))
 (defun send-message (message &optional (dest (if (= (mpi-comm-rank) 0) 1 0))
 			     (tag 0)
-			     &aux (string-buf (get '*msg-buf* 'string-char)))
+			     &aux (string-buf (get '*msg-buf* 'character)))
   "Master side:  Each send-message must have a later receive-message
    Slave side:  Each send-message must have a previous receive-message
    If message is already a string, we assume this is a print representation
@@ -95,7 +108,7 @@
   ;;NIL ==> THIS CODE NOT YET STABLE.
   (if (and t (vectorp message))   ; (vector fixnum/float) to be sent directly
     (let ((x (array-element-type message)))
-      (cond ((eq x 'string-char) nil); skip subtypep computation (freq. case)
+      (cond ((eq x 'character) nil); skip subtypep computation (freq. case)
 	    ((subtypep x 'fixnum) (incf tag next-datatype-tag))
 	    ((subtypep x 'float) (incf tag #.(* 2 next-datatype-tag))))))
   (unless (or (stringp message)		; string assumed to be print rep.
@@ -103,7 +116,7 @@
 		   ;;NIL ==> THIS CODE NOT YET STABLE.
 		   t
 		   (let ((x (array-element-type message)))
-		     (and (not (eq x 'string-char)) ; skip subtypep computation
+		     (and (not (eq x 'character)) ; skip subtypep computation
 			  (or (subtypep x 'fixnum)
 			      (subtypep x 'float))))))
     (setf (fill-pointer string-buf) 0)
@@ -128,7 +141,7 @@
     (let ((msg-len (* (length message)
 		     (rest (assoc (array-element-type message)
 			   ;; Most common sizeof, but could break on some CPU''
-			     '((string-char . 1) (fixnum . 4) (float . 4)))))))
+			     '((character . 1) (fixnum . 4) (float . 4)))))))
       (declare (fixnum msg-len))
       (if (> msg-len (length string-buf))
 	(adjust-array string-buf msg-len :static t))
@@ -167,8 +180,8 @@
   (unless (and (= type-enum (get-last-datatype)) (= count (get-last-count)))
     (error "receive-message:  MPI-Recv didn't agree with MPI-Probe"))
   ;; (format t "remote ~d:  ~a~%" (MPI-Status-Source) buf)
-  (if (eq type 'string-char)
-    ;; slave-listener keeps (get '*msg-buf* 'string-char)
+  (if (eq type 'character)
+    ;; slave-listener keeps (get '*msg-buf* 'character)
     (values (read-from-string buf))
     (progn (setf (get '*msg-buf* type) nil) ; user keeps (get '*msg-buf* type)
 	   buf)))
@@ -225,7 +238,7 @@
   (unless (= (MPI-Comm-rank) 0) (error "Only master can flush messages."))
   (loop
     (if (not (MPI-Iprobe)) (return count))
-    (MPI-Recv (get '*msg-buf* 'string-char) (MPI-Any-source))
+    (MPI-Recv (get '*msg-buf* 'character) (MPI-Any-source))
     (incf count)))
 
 ;;shadow bye with version to kill slaves
@@ -261,7 +274,9 @@
 (setq si::*system-banner* (si::default-system-banner))
 (if (= (MPI-comm-rank) 0)
     (progn (format t si::*system-banner*)
-	   (format t "This is ParGCL, ~s.~%~%" si::pargcl-version-string)))
+	   (format t "~%This is ParGCL, ~a.~%" si::pargcl-version-string)
+	   (format t "See pargcl/doc/MANUAL and pargcl/examples ~
+		      for usage tips.~%~%")))
 
 ;;;For debugging:
 ;;; (let ((args nil))
