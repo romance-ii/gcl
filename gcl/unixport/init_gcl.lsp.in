@@ -4,6 +4,7 @@
 (make-package "ANSI-LOOP" :use '("LISP"))
 (make-package "DEFPACKAGE" :use '("LISP"))
 (make-package "TK" :use '("LISP" "SLOOP"))
+(make-package "MPI" :use '("LISP" "SLOOP"))
 
 (in-package "SYSTEM")
 
