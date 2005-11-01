@@ -348,9 +348,9 @@
 (defmacro memq (a b) `(member ,a ,b :test 'eq))
 
 ;;FIXME should come from DEFUNO_NEW
-(proclaim '(ftype (function (t fixnum) fixnum) si::select-read))
-(proclaim '(ftype (function () t) si::fork))
-(proclaim '(ftype (function (t) t) fib si::kill))
+;(proclaim '(ftype (function (t fixnum) fixnum) si::select-read))
+;(proclaim '(ftype (function () t) si::fork))
+;(proclaim '(ftype (function (t) t) fib si::kill))
 
 (defmacro background (form) 
   (let ((x (gensym))) 
