@@ -960,6 +960,14 @@
  (push '((fixnum fixnum) fixnum #.(flags rfa)"((#0) & (#1))")
    (get 'logand 'inline-always))
 
+;;LOGANDC1
+ (push '((fixnum fixnum) fixnum #.(flags rfa)"(~(#0) & (#1))")
+   (get 'logandc1 'inline-always))
+
+;;LOGANDC2
+ (push '((fixnum fixnum) fixnum #.(flags rfa)"((#0) & ~(#1))")
+   (get 'logandc2 'inline-always))
+
 ;;LOGIOR
  (push '((fixnum fixnum) fixnum #.(flags rfa)"((#0) | (#1))")
    (get 'logior 'inline-always))

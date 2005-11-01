@@ -120,8 +120,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * Misc sequence ansi fixes
   * ansi fix to phase
   * sharp-v-reader for pre-compiled regexps
+  * logandc1 and logandc2 optimizers
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  1 Nov 2005 12:15:53 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue,  1 Nov 2005 12:16:40 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
