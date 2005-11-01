@@ -52,6 +52,10 @@ AC_ARG_WITH(gcl,
 , with_gcl=no)
 with_gcl=`echo $with_gcl | sed -e "s#^../#$PWD/../#"`
 
+AC_ARG_WITH(gcl-dir,
+[  --with-gcl-dir=PATH     usually defaults correctly, specifies GCL source dir],
+, with_gcl_dir=no)
+
 AC_ARG_WITH(mpicc,
 [  --with-mpicc=PATH       if don't want built-in MPI, define path to mpicc],
 , with_mpicc=no)
@@ -122,19 +126,22 @@ if test ! -x "$with_gcl"; then
   AC_MSG_ERROR(Couldn't find gcl command
     Use ./configure --with-gcl= to specify location of gcl command );
 fi
-libdir=`$with_gcl -batch -eval '(progn (format t *lib-directory*) (quit))'`
-if test ! -d $libdir/h; then
-  AC_MSG_ERROR(Didn't find include directory at $libdir/h
-    Bad parameter given to ./configure --with-gcl= );
-fi
-if test ! -d $libdir/gmp3; then
-  AC_MSG_ERROR(Didn't find libgmp in gmp3 directory at $libdir/gmp3
-    Bad parameter given to ./configure --with-gcl= );
-fi
+
+dnl libdir=`$with_gcl -batch -eval '(progn (format t *lib-directory*) (quit))'`
+dnl # Check if we have correct lib directory
+dnl if test ! -d $libdir/h; then
+dnl   AC_MSG_ERROR(Didn't find include directory at $libdir/h
+dnl     Bad parameter given to ./configure --with-gcl= );
+dnl fi
 
 GCL=$with_gcl
-GCL_SRC=`$with_gcl -batch -eval '(progn (write *lib-directory* :escape nil) (quit))'`
-GCL_SRC=`echo $GCL_SRC | sed -e s'#"##g'`
+if test "$with_gcl_dir" = "no"; then
+  GCL_SRC=`$with_gcl -batch \
+                     -eval '(progn (write *lib-directory* :escape nil) (quit))'`
+  GCL_SRC=`echo $GCL_SRC | sed -e s'#"##g'`
+else
+  GCL_SRC=$with_gcl_dir
+fi
 
 dnl Substitute shell variables
 AC_SUBST(PARGCL_VERSION)

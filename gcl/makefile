@@ -123,6 +123,11 @@ gmp_all: $(GMPDIR)/Makefile
 $(GMPDIR)/mpn/mul_n.o $(GMPDIR)/mpn/lshift.o $(GMPDIR)/mpn/rshift.o: $(GMPDIR)/Makefile
 	cd $(@D) && $(MAKE) $(@F)
 
+pargcl_all:
+	if test "$(PARGCLDIR)" != ""; then \
+	  cd $(PARGCLDIR) && $(MAKE); \
+	fi
+
 command:
 	rm -f bin/gcl xbin/gcl
 	MGCLDIR=`echo $(GCLDIR) | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
