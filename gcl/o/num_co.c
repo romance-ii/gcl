@@ -448,8 +448,7 @@ LFD(Lfloat)(void)
 		break;
 
 	case t_shortfloat:
-		if (narg > 1 && t == t_shortfloat);
-		  else
+		if (narg > 1 && t == t_longfloat)
 		    x = make_longfloat((double)(sf(x)));
 		break;
 

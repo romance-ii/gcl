@@ -1092,8 +1092,10 @@ LFD(Llcm)(void)
 	int i, narg;
 
 	narg = vs_top - vs_base;
-	if (narg == 0)
-		too_few_arguments();
+	if (narg == 0) {
+	  vs_push(make_fixnum(1));
+	  return;
+	}
 	for (i = 0;  i < narg;  i++)
 		check_type_integer(&vs_base[i]);
 	if (narg == 1) {

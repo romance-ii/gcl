@@ -178,9 +178,12 @@ number_expt(object x, object y)
 		vs_reset;
 		return(z);
 	}
-	z = number_nlog(x);
-	vs_push(z);
-	z = number_times(z, y);
+	if (!number_zerop(y)) {
+	  z = number_nlog(x);
+	  vs_push(z);
+	  z = number_times(z, y);
+	} else
+	  z=(type_of(x)==t_longfloat) ? make_longfloat(0.0) : y;/*FIXME*/
 	vs_push(z);
 	z = number_exp(z);
 	vs_reset;
