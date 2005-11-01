@@ -1,5 +1,10 @@
 (in-package 'lisp)
-(export '(pprint-linear pprint-fill pprint-tabular pprint-logical-block))
+(export '(pprint-linear
+	  pprint-fill
+	  pprint-tabular
+	  pprint-logical-block
+	  pprint-pop pprint-indent pprint-newline pprint-tab 
+	  pprint-exit-if-list-exhausted))
 (in-package 'si)
 
 
@@ -31,14 +36,14 @@
     (write-string z s)
     nil))
 
-(defun circlep-int (x y z)
-  (let ((dz (cdr z)))
-    (cond ((null dz) nil)
-	  ((eq y dz) t)
-	  ((eq y z) (circlep-int x x dz))
-	  (t (circlep-int x (cdr y) z)))))
+(defun circlep-int (x y)
+  (cond ((or (atom x) (atom y)) nil)
+	((eq x y) t)
+	((eq x (cdr y)) t)
+	((atom (cdr y)) nil)
+	((circlep-int (cdr x) (cddr y)))))
 
-(defmacro circlep (x) `(and (consp ,x) (circlep-int ,x ,x ,x)))
+(defmacro circlep (x) `(and (consp ,x) (circlep-int ,x (cdr ,x))))
 
 (defmacro pprint-logical-block ((s x &key (prefix "") (per-line-prefix "") (suffix "")) &body body)
   (let ((nx (gensym)) (xx (gensym)) (count (gensym)) (end (gensym)) (eprefix (gensym))

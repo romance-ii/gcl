@@ -121,8 +121,10 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * ansi fix to phase
   * sharp-v-reader for pre-compiled regexps
   * logandc1 and logandc2 optimizers
+  * update init_ansi_gcl.lsp.in for new functions, export rudimentary
+    fns from mod/gcl_ansi_io.lsp
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  1 Nov 2005 12:16:40 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue,  1 Nov 2005 12:25:56 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
