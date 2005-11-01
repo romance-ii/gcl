@@ -80,7 +80,8 @@
 
 
 (defun phase (x)
-       (atan (imagpart x) (realpart x)))
+  (if (= 0 x) 0.0
+       (atan (imagpart x) (realpart x))))
 
 (defun signum (x) (if (zerop x) x (/ x (abs x))))
 
