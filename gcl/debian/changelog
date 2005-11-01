@@ -115,8 +115,10 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * set file descriptor to -1 on close in streams with file pointers --
     TODO examine use of explicit file buffers
   * Fix ansi bugs in lcm, float, expt
+  * New parallel processing functions si::fork, si::select-read,
+    si::kill, si::p-let si::p-and and si::p-or
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  1 Nov 2005 12:10:47 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue,  1 Nov 2005 12:13:42 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

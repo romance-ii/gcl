@@ -581,6 +581,103 @@ FFN(siLmake_socket_pair)()
   make_socket_pair();
 }
 
+DEFUNO_NEW("KILL",object,fSkill,SI,1,1,NONE,OO,OO,OO,OO,void,siLkill,(object x),"") {
+  if (!consp(x))
+    TYPE_ERROR(x,sLcons);
+  if (type_of(x->c.c_car)!=t_fixnum)
+    TYPE_ERROR(x->c.c_car,t_fixnum);
+  if (type_of(x->c.c_cdr) != t_stream ||
+      x->c.c_cdr->sm.sm_mode!=smm_input)
+    TYPE_ERROR(x->c.c_cdr,sLinput_stream);
+  kill(fix(x->c.c_car),SIGTERM);
+  close_stream(x->c.c_cdr);
+  return Cnil;
+}
+  
+DEFUNO_NEW("SELECT-READ",object,fSselect_read,SI,2,2,NONE,IO,IO,OO,OO,void,siLselect_read,
+	   (object x,fixnum usec),"") {
+  fd_set fds;
+  fixnum max=-1,k,mask,i;
+  object y=x;
+  struct timeval tv={usec/1000000,usec%1000000};
+
+  FD_ZERO(&fds);
+  if (x!=Cnil && !consp(x))
+    TYPE_ERROR(x,sLlist);
+  for (;!endp(x);x=x->c.c_cdr) {
+    if (!consp(x->c.c_car))
+      TYPE_ERROR(x->c.c_car,sLcons);
+    if (type_of(x->c.c_car->c.c_cdr) != t_stream ||
+	x->c.c_car->c.c_cdr->sm.sm_mode!=smm_input)
+      TYPE_ERROR(x->c.c_car->c.c_cdr,sLinput_stream);
+    k=x->c.c_car->c.c_cdr->sm.sm_fd;
+    if (k<0) continue;/*closed stream*/
+    max=max<k ? k : max;
+    FD_SET(k,&fds);
+  }
+  select(max+1,&fds,NULL,NULL,usec < 0 ? NULL : &tv);
+  for (x=y,i=mask=0;!endp(x);x=x->c.c_cdr,i++) {
+    k=x->c.c_car->c.c_cdr->sm.sm_fd;
+    if (k<0) continue;
+    if (FD_ISSET(k,&fds))
+      mask|=(1<<i);
+  }
+  return (object)mask;
+}
+  
+
+DEFUNO_NEW("FORK",object,fSfork,SI,0,0,NONE,OO,OO,OO,OO,void,siLfork,(void),"") {
+  int p[2],j;
+  pid_t pid;
+  struct sigaction sa;
+  object x;
+
+  ASSERT(!pipe(p));
+
+  sa.sa_handler=SIG_IGN;
+  sa.sa_flags=SA_NOCLDWAIT;
+  sigemptyset(&sa.sa_mask);
+  
+  sigaction(SIGCHLD,&sa,NULL);
+  
+  ASSERT((pid=fork())>=0);
+  
+  if (!pid) {
+    fd_set fds;
+
+    FD_ZERO(&fds);
+    FD_SET(p[1],&fds);
+    select(p[1]+1,NULL,&fds,NULL,NULL);
+
+    close(STDIN_FILENO);
+    /*       dup2(p[0],STDIN_FILENO); */
+    /*       close(p[0]); */
+    close(STDOUT_FILENO);
+    /*       dup2(p[1],STDOUT_FILENO); */
+    /*       close(p[1]); */
+    close(STDERR_FILENO);
+      
+  }
+
+  j=pid ? 0 : 1;
+  close(p[1-j]);
+
+  x = alloc_object(t_stream);
+  x->sm.sm_mode = j ? smm_output : smm_input;
+  x->sm.sm_fp = fdopen(p[j],j ? "w" : "r");
+  x->sm.sm_buffer = 0;
+  x->sm.sm_object0 = sLcharacter;
+  x->sm.sm_object1 = Cnil;
+  x->sm.sm_fd=p[j];
+/*   x->sm.sm_int0 = p[0]; */
+/*   x->sm.sm_int1 = p[1]; */
+  
+  return MMcons(make_fixnum(pid),x);
+
+}
+
+
+
 void
 gcl_init_socket_function()
 {

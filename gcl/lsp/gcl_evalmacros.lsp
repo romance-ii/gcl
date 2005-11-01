@@ -346,3 +346,67 @@
 (defmacro lambda ( &rest l) `(function (lambda ,@l)))
 
 (defmacro memq (a b) `(member ,a ,b :test 'eq))
+
+;;FIXME should come from DEFUNO_NEW
+(proclaim '(ftype (function (t fixnum) fixnum) si::select-read))
+(proclaim '(ftype (function () t) si::fork))
+(proclaim '(ftype (function (t) t) fib si::kill))
+
+(defmacro background (form) 
+  (let ((x (gensym))) 
+    `(let ((,x (si::fork))) 
+       (if (eql 0 (car ,x)) 
+	   (progn (prin1 ,form (cdr ,x))(bye)) 
+	 ,x))))
+
+(defmacro with-read-values ((i r b) (forms timeout) &body body)
+  (let* ((m (gensym))
+	 (j (gensym))
+	 (k (gensym))
+	 (p (gensym))
+	 (pbl (length forms))
+	 (pbm (1- (ash 1 pbl))))
+  `(let* ((,m ,pbm)
+	  (,b (list ,@(mapcar (lambda (x) `(background ,x)) forms))))
+     (declare ((integer 0 ,pbm) ,m))
+     (do nil ((= ,m 0))
+	 (let ((,p (si::select-read ,b ,timeout)));;FAILURE code here on 0 return
+	   (declare ((integer 0 ,pbm) ,p))
+	   (do ((,i 0 (1+ ,i))(,j 1 (ash ,j 1)) (,k ,b (cdr ,k))) 
+	       ((= ,i ,pbl) (setq ,m (logandc2 ,m ,p)))
+	       (declare ((integer 0 ,pbl) ,i) ((integer 1 ,(1+ pbm)) ,j))
+	       (when (/= 0 (logand ,j ,p))
+		 (let ((,r (read (cdar ,k))))
+		   (close (cdar ,k))
+		   ,@body))))))))
+  
+(defmacro p-let (bindings &body body) 
+  (let* ((i (gensym)) (r (gensym)) (c (gensym))
+	 (pb (remove-if 'atom bindings)))
+  `(let* (,@(mapcar 'car pb) ,@(remove-if 'consp bindings))
+     (with-read-values 
+      (,i ,r ,c) (,(mapcar 'cadr pb) -1)
+      (case ,i
+	    ,@(let ((g -1)) 
+		(mapcar (lambda (x) `(,(incf g) (setq ,(car x) ,r))) pb))))
+     ,@body)))
+
+(defmacro p-and (&rest forms) 
+  (let* ((i (gensym)) (r (gensym)) (c (gensym)) (top (gensym)))
+    `(block ,top
+       (with-read-values 
+	(,i ,r ,c) (,forms -1)
+	(unless ,r
+	  (dolist (,c ,c) (si::kill ,c))
+	  (return-from ,top nil)))
+       t)))
+
+(defmacro p-or (&rest forms) 
+  (let* ((i (gensym)) (r (gensym)) (c (gensym)) (top (gensym)))
+    `(block ,top
+       (with-read-values 
+	(,i ,r ,c) (,forms -1)
+	(when ,r
+	  (dolist (,c ,c) (si::kill ,c))
+	  (return-from ,top t)))
+       nil)))
