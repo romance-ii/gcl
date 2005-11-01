@@ -12,12 +12,12 @@
   `(slooP::sloop while ,test do ,@ body))
  (defmacro f (op x y)
    `(the ,(if  (get op 'compiler::predicate)  't 'fixnum)
-	 (,op (the fixnum ,x) (the fixnum ,y))))
-(defmacro fcr (x) `(load-time-value (compile-regexp ,x))))
+	 (,op (the fixnum ,x) (the fixnum ,y)))))
 
 (eval-when (compile eval load)
-(defun sharp-u-reader (stream subchar arg)
-  subchar arg
+
+(defun regexp-conv (stream)
+
   (let ((tem (make-array 10 :element-type 'character :fill-pointer 0)))
     (or (eql (read-char stream) #\")
 	(error "sharp-u-reader reader needs a \" right after it"))
@@ -32,13 +32,23 @@
 			   ch))))
        (vector-push-extend ch tem)))
     tem))
+  
+
+(defun sharp-u-reader (stream subchar arg)
+  (declare (ignore subchar arg))
+  (regexp-conv stream))
+
+(defun sharp-v-reader (stream subchar arg)
+  (declare (ignore subchar arg))
+  `(load-time-value (compile-regexp ,(regexp-conv stream))))
 
 (set-dispatch-macro-character #\# #\u 'sharp-u-reader)
+(set-dispatch-macro-character #\# #\v 'sharp-v-reader)
 
 )
 
-(defconstant +crlu+ (compile-regexp #u""))
-(defconstant +crnp+ (compile-regexp #u"[]"))
+(defconstant +crlu+ #v"")
+(defconstant +crnp+ #v"[]")
 
 (defvar *info-data* nil)
 (defvar *current-info-data* nil)
@@ -72,11 +82,11 @@
   (declare (fixnum lim))
   (let ((s (file-to-string file)) (i 0))
     (declare (fixnum i) (string s))
-    (cond ((f >= (string-match (fcr #u"[\n]+Indirect:") s 0) 0)
+    (cond ((f >= (string-match #v"[\n]+Indirect:" s 0) 0)
 	   (setq i (match-end 0))
 	   (setq lim (string-match +crlu+ s i))
 	   (while
-	       (f >= (string-match (fcr #u"\n([^\n]+): ([0-9]+)") s i lim) 0)
+	       (f >= (string-match #v"\n([^\n]+): ([0-9]+)" s i lim) 0)
 	     (setq i (match-end 0))
 	     (setq files
 		   (cons(cons
@@ -84,7 +94,7 @@
 			 (get-match s 1)
 			 )
 			files)))))
-    (cond ((f >=  (si::string-match (fcr #u"[\n]+Tag Table:") s i) 0)
+    (cond ((f >=  (si::string-match #v"[\n]+Tag Table:" s i) 0)
 	   (setq i (si::match-end 0))
 	   (cond ((f >= (si::string-match +crlu+ s i) 0)
 		  (setq tags (subseq s i (si::match-end 0)))))))
@@ -299,7 +309,7 @@
       (setq i (match-end 0)))
     (setq i (- i 1))
     (if (f >= (string-match
-	       (fcr #u"[\n][^\n]*Node:[ \t]+([^\n\t,]+)[\n\t,][^\n]*\n")  s i) 0)
+	       #v"[\n][^\n]*Node:[ \t]+([^\n\t,]+)[\n\t,][^\n]*\n"  s i) 0)
 	(let* ((i (match-beginning 0))
 	       (beg (match-end 0))
 	       (name (get-match s 1))
@@ -329,7 +339,7 @@
 	   (setq position-pattern (car name) name (cdr name)))))
   (or (stringp name) (info-error "bad arg"))
   (waiting *info-window*)  
-  (cond ((f >= (string-match (fcr "^\\(([^(]+)\\)([^)]*)") name) 0)
+  (cond ((f >= (string-match #v"^\\(([^(]+)\\)([^)]*)" name) 0)
 	 ;; (file)node
 	 (setq file (get-match name 1))
 	 (setq name (get-match name 2))
@@ -385,10 +395,10 @@
 			     (if (and (>= subnode 0)
 				      (f >=
 					 (string-match 
-					  (fcr #u"\n -+ [a-zA-Z]")
+					  #v"\n -+ [a-zA-Z]"
 					  s 
 					  (let* ((bg (+ beg 1 initial-offset))
-						 (sd (string-match (fcr #u"\n   ") s bg end))
+						 (sd (string-match #v"\n   " s bg end))
 						 (nb (if (minusp sd) bg sd)))
 					    nb) 
 						       end)

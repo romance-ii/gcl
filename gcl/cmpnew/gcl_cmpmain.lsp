@@ -496,9 +496,7 @@ Cannot compile ~a.~%"
 	     (with-open-file (st cn)
 			     (do () ((let ((a (read-line st)))
 				       (when (>= (si::string-match 
-						  (load-time-value
-						   (si::compile-regexp 
-						    #u"gazonk[0-9]*.h")) a) 0)
+						  #v"gazonk[0-9]*.h" a) 0)
 					 (format t "~%~d~%" a)
 					 a))))
 			     (si::copy-stream st *standard-output*))
