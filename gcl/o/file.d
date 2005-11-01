@@ -318,6 +318,7 @@ setup_stream_buffer(x)
 	setbuf(x->sm.sm_fp, buf);
 }	
 
+/*FIXME  these buffers appear to be unused, or seldomly used*/
 static void
 deallocate_stream_buffer(strm)
 object strm;
@@ -332,8 +333,8 @@ object strm;
       insert_contblock(strm->sm.sm_buffer, BUFSIZ); 
 #endif
     strm->sm.sm_buffer = 0;} 
-  else 
-    printf("no buffer? %p  \n",strm->sm.sm_fp); 
+/*   else  */
+/*     printf("no buffer? %p  \n",strm->sm.sm_fp);  */
 
 #ifndef FCLOSE_SETBUF_OK
   strm->sm.sm_fp->_base = NULL;
@@ -533,6 +534,7 @@ object strm;
 		deallocate_stream_buffer(strm);
 		fclose(strm->sm.sm_fp);
 		strm->sm.sm_fp = NULL;
+		strm->sm.sm_fd = -1;
 		break;
 
 
@@ -568,6 +570,7 @@ object strm;
 		else 
 		  fclose(strm->sm.sm_fp);
 		strm->sm.sm_fp = NULL;
+		strm->sm.sm_fd = -1;
 		break;
 
 	case smm_synonym:
@@ -1533,6 +1536,7 @@ listen_stream(object strm) {
 BEGIN:
 
 	switch (strm->sm.sm_mode) {
+
 #ifdef HAVE_NSOCKET
 	case smm_socket:
 	  {
