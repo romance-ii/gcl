@@ -126,6 +126,11 @@ $(GMPDIR)/mpn/mul_n.o $(GMPDIR)/mpn/lshift.o $(GMPDIR)/mpn/rshift.o: $(GMPDIR)/M
 pargcl_all:
 	if test "$(PARGCLDIR)" != ""; then \
 	  cd $(PARGCLDIR) && $(MAKE); \
+	  echo '#';
+	  echo '#';
+	  echo '# ParGCL built.  To test it:  cd pargcl/bin; ./pargcl ';
+	  echo '#';
+	  echo '#';
 	fi
 
 command:
