@@ -89,10 +89,8 @@ int index;
 	int i,max;
 	object l;
 
-	if (index < 0) {
-		vs_push(make_fixnum(index));
-		FEwrong_type_argument(sLnon_negative_fixnum, vs_head);
-	}
+	if (index < 0) 
+	  TYPE_ERROR(make_fixnum(index),sLnon_negative_fixnum);
 	switch (type_of(seq)) {
 	case t_cons:
 		for (i = index, l = seq;  i > 0;  --i)
@@ -122,23 +120,20 @@ int index;
 		}
 		return(code_char(seq->ust.ust_self[index]));
 
+	case t_symbol:
+	  if (seq == Cnil) {
+	    max=0;
+	    goto E;
+	  }
 	default:
-		/* if (seq == Cnil) goto E; */
-		FEwrong_type_argument(sLsequence, seq);
-		return(Cnil);
+	  TYPE_ERROR(seq,sLsequence);
+	  return(Cnil);
 	}
 
 E:
-	l = vs_push( make_fixnum(max) );
-	vs_push( make_fixnum(0) );
-	l = vs_head = make_cons(vs_head, l);
-	l = vs_head = make_cons(sLinteger, l);
-	vs_push(make_fixnum(index));
-	/* FIXME message should indicate out of range
-	Icall_error_handler(sKwrong_type_argument,
-		     make_simple_string("The index, ~S, is too large."),
-		     1,vs_head); */
-	FEwrong_type_argument(l,vs_head);
+	TYPE_ERROR(make_fixnum(index),MMcons(sLinteger,
+					     MMcons(make_fixnum(0),
+						    MMcons(MMcons(make_fixnum(max),Cnil),Cnil))));
 	return(Cnil);
 }
 
@@ -161,10 +156,8 @@ object val;
 	int i,max;
 	object l;
 
-	if (index < 0) {
-		vs_push(make_fixnum(index));
-		FEwrong_type_argument(sLnon_negative_fixnum, vs_head);
-	}
+	if (index < 0) 
+	  TYPE_ERROR(make_fixnum(index),sLnon_negative_fixnum);
 	switch (type_of(seq)) {
 	case t_cons:
 		for (i = index, l = seq;  i > 0;  --i)
@@ -193,25 +186,19 @@ object val;
 			goto E;
 		}
 		if (type_of(val) != t_character)
-			FEwrong_type_argument(sLcharacter, val);
+		  TYPE_ERROR(val,sLcharacter);
 		seq->st.st_self[index] = val->ch.ch_code;
 		return(val);
 
 	default:
 		max=0;
-		FEwrong_type_argument(sLsequence, seq);
+		TYPE_ERROR(seq,sLsequence);
 	}
 
 E:
-	l = vs_push( make_fixnum(max) );
-	vs_push( make_fixnum(0) );
-	l = vs_head = make_cons(vs_head, l);
-	l = vs_head = make_cons(sLinteger, l);
-	vs_push(make_fixnum(index));
-
-	/* FIXME error message should indicate value out of range -
-	   fixed kraehe */
-	FEwrong_type_argument(l, vs_head);
+	TYPE_ERROR(make_fixnum(index),MMcons(sLinteger,
+					     MMcons(make_fixnum(0),
+						    MMcons(MMcons(make_fixnum(max),Cnil),Cnil))));
 	return(Cnil);	
 }
 
@@ -598,7 +585,7 @@ object seq;
 				unsigned int y;
 				y = UINT_GCL(x, i);
 				UINT_GCL(x, i) = UINT_GCL(x, j);
-				UINT_GCL(x, y) = y;
+				UINT_GCL(x, j) = y;
 			}
 			return(seq);
 
@@ -609,7 +596,7 @@ object seq;
 				unsigned short y;
 				y = USHORT_GCL(x, i);
 				USHORT_GCL(x, i) = USHORT_GCL(x, j);
-				USHORT_GCL(x, y) = y;
+				USHORT_GCL(x, j) = y;
 			}
 			return(seq);
 		case aet_char:

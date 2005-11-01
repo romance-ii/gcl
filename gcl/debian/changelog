@@ -117,8 +117,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * Fix ansi bugs in lcm, float, expt
   * New parallel processing functions si::fork, si::select-read,
     si::kill, si::p-let si::p-and and si::p-or
+  * Misc sequence ansi fixes
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  1 Nov 2005 12:13:42 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue,  1 Nov 2005 12:14:16 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
