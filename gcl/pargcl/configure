@@ -841,6 +841,7 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-gcl=PATH         defines location of gcl
+  --with-gcl-dir=PATH     usually defaults correctly, specifies GCL source dir
   --with-mpicc=PATH       if don't want built-in MPI, define path to mpicc
 
 Some influential environment variables:
@@ -3008,6 +3009,15 @@ fi;
 with_gcl=`echo $with_gcl | sed -e "s#^../#$PWD/../#"`
 
 
+# Check whether --with-gcl-dir or --without-gcl-dir was given.
+if test "${with_gcl_dir+set}" = set; then
+  withval="$with_gcl_dir"
+
+else
+  with_gcl_dir=no
+fi;
+
+
 # Check whether --with-mpicc or --without-mpicc was given.
 if test "${with_mpicc+set}" = set; then
   withval="$with_mpicc"
@@ -5018,19 +5028,16 @@ echo "$as_me: error: Couldn't find gcl command
     Use ./configure --with-gcl= to specify location of gcl command " >&2;}
    { (exit 1); exit 1; }; };
 fi
-libdir=`$with_gcl -batch -eval '(progn (format t *lib-directory*) (quit))'`
-# Check if we have correct lib directory
-if test ! -d $libdir/h; then
-  { { echo "$as_me:$LINENO: error: Didn't find include directory at $libdir/h
-    Bad parameter given to ./configure --with-gcl= " >&5
-echo "$as_me: error: Didn't find include directory at $libdir/h
-    Bad parameter given to ./configure --with-gcl= " >&2;}
-   { (exit 1); exit 1; }; };
-fi
+
 
 GCL=$with_gcl
-GCL_SRC=`$with_gcl -batch -eval '(progn (write *lib-directory* :escape nil) (quit))'`
-GCL_SRC=`echo $GCL_SRC | sed -e s'#"##g'`
+if test "$with_gcl_dir" = "no"; then
+  GCL_SRC=`$with_gcl -batch \
+                     -eval '(progn (write *lib-directory* :escape nil) (quit))'`
+  GCL_SRC=`echo $GCL_SRC | sed -e s'#"##g'`
+else
+  GCL_SRC=$with_gcl_dir
+fi
 
 
 

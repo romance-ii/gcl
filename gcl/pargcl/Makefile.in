@@ -10,9 +10,15 @@ BINDIR=@PWD@/bin
 LIBDIR=@PWD@/lib
 INCLUDEDIR=@PWD@/include
 
-bin/pargcl: src/saved_pargcl src/pargcl.sed
+SRC_FILES=src/saved_pargcl src/pargcl.sed src/mpi_glue.lsp \
+	  src/slave-listener.lsp src/master-slave.lsp
 
-src/saved_pargcl src/pargcl.sed:
+bin/pargcl: ${SRC_FILES}
+	cd src; make
+	@ echo ""
+	@ echo This is ParGCL version ${VERSION}, ${UPDATED}.
+
+${SRC_FILES}:
 	cd src; make
 	@ echo ""
 	@ echo This is ParGCL version ${VERSION}, ${UPDATED}.

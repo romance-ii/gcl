@@ -402,7 +402,7 @@ $ static int MPI_Any_Tag () { return MPI_ANY_TAG; }
             (if (>= source (MPI-World-size))
 	      (error "source ~a is larger than maximum rank of processes"
 		     source))
-            (if (< source 0)
+            (if (and (< source 0) (/= source (MPI-Any-source)))
 	      (error "source ~a is negative" source))
 	    (setq datatype (or (cdr (assoc datatype *type-lisp-to-mpi*))
 			(error "buf is array of bad elt. type: ~a~%  ~
@@ -427,6 +427,7 @@ $ static int MPI_Any_Tag () { return MPI_ANY_TAG; }
    msg is placed in array up to length of msg;  if array has
    a fill-pointer, the fill-pointer is set to actual msg length.")
 
+;; Can't check source since used in startup before (MPI-World-size) defined
 (defglue
   (MPI-Probe (&optional (source (MPI-Any-source)) (tag (MPI-Any-tag))))
   (MPI-Probe-glue source tag)
@@ -438,7 +439,11 @@ $ static int MPI_Any_Tag () { return MPI_ANY_TAG; }
    side-effects status variable; (apropos \"MPI-Status\") for more info.")
 
 (defglue
-  (MPI-Iprobe (&optional (source (MPI-Any-source)) (tag (MPI-Any-tag))))
+  (MPI-Iprobe (&optional (source (MPI-Any-source)) (tag (MPI-Any-tag)))
+      (if (>= source (MPI-World-size))
+	(error "source ~a is larger than maximum rank of processes" source))
+      (if (and (< source 0) (/= source (MPI-Any-source)))
+	(error "source ~a is negative" source)))
   (MPI-Iprobe-glue source tag)
   ((object "MPI_Iprobe_glue") (int source) (int tag))
   ("int flag"
