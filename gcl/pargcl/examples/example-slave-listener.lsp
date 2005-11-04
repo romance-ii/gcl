@@ -13,9 +13,9 @@
 
 (defun par-find-one-factor-sl (x &optional (incr 10000))
     "Produces one factor of argument"
-      (par-funcall #'find-one-factor-sl x incr))
+      (par-funcall #'par-find-one-factor-sl-helper x incr))
 
-(defun find-one-factor-sl (num incr)
+(defun par-find-one-factor-sl-helper (num incr)
   (if (= 0 (MPI-Comm-rank))
     (master-sl num incr)
     (worker-sl num incr)))

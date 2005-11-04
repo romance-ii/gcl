@@ -21,20 +21,21 @@
 ;;;; (send-message <lisp-expr> <optional dest = 1>)
 ;;;; (broadcast-message <lisp-expr>) ; no reply message
 ;;;; (receive-message <optional source = (MPI-Any-source)>)
+;;;; (defun send-receive-message <lisp-expr> <optional dest = 1>)
+;;;; (send-receive-message <lisp-expr> <optional dest = 1>)
 ;;;; (free-msg-buffer <buf>) ; optimization for greater efficiency, only
 ;;;;                         ; frees message buffer for re-use in next MPI-recv
 ;;;; (probe-message <optional source = (MPI-Any-source)>)
 ;;;; (flush-all-messages)  ; flush all commands pending by slaves
 ;;;; (bye) modified to also delete remote processes
-;;;; (get-last-source) ; not recommended, but can be useful in cases
-;;;;                   ; of a continuation between master and slave,
-;;;;                   ; if master wants to match initial info and later
-;;;;                   ; info after continuation
+;;;; (get-last-source) ; not needed, but can be useful in special cases
+;;;; (get-last-tag)    ; not needed, but can be useful in special cases
 ;;;; ---
 ;;;; It works to call (send-message ... 1) n times, and then call
 ;;;;   (receive-message 1) n times, although this may be less efficient.
 ;;;; Commands sent to the same processor, are evaluated in sequence.
 ;;;; ---
+;;;; Send/receive/probe commands also accept optional tag with obvious default
 ;;;; CAUTION:  If you add the optional tag parameter to send-message,
 ;;;; note that the slave-listener does not reply if tag = broadcast-tag
 ;;;; Also, tags larger than broadcast-tag are interpreted as (vector fixnum)
@@ -113,7 +114,7 @@
 	    ((subtypep x 'float) (incf tag #.(* 2 next-datatype-tag))))))
   (unless (or (stringp message)		; string assumed to be print rep.
 	      (and (vectorp message)	; (vector fixnum) to be sent directly?
-		   ;;NIL ==> THIS CODE NOT YET STABLE.
+		   ;;THIS PART NOT YET STABLE.  SET TO nil WHEN STABLE.
 		   t
 		   (let ((x (array-element-type message)))
 		     (and (not (eq x 'character)) ; skip subtypep computation
@@ -123,19 +124,19 @@
     ;; (write 3) CAUSES BUG IN gcl-2
     ;; At this time, bug seems to go away if there was previously an error,
     ;;  or if init.lsp (any or no contents) was in the startup directory
-    (with-output-to-string (var string-buf)
+    (with-output-to-string (stream string-buf)
       (if (or (string-equal (lisp-implementation-version) "GCL-2-0")
       	      (string-equal (lisp-implementation-version) "GCL-2-1"))
 	;;bug patch for gcl-2.0 and gcl-2.1
 	(let ((*print-circle* nil) (*print-array* t) (*print-escape* t)
 	      (*print-level* nil) (*print-length* nil))
-	  (format var "~s" message))
-	(write message :stream var :escape t :level nil :length nil
+	  (format stream "~s" message))
+	(write message :stream stream :escape t :level nil :length nil
 	       :array t
 	       ;;Would like to make this t, but stack can then blow up
 	       ;; for large lists, at least in akcl
 	       :circle nil)))
-    (setq message string-buf))
+    (setq message (fix-read-write-transparency string-buf)))
   ;;IF MESSAGE NOT STATIC, need to copy to static *msg-buf* of right length
   (unless (staticp message)
     (let ((msg-len (* (length message)
@@ -151,13 +152,37 @@
   (MPI-Send message dest tag)
   nil)
 
-(defun receive-message (&optional (source (MPI-Any-source))
+;;; Still writing this.
+;;; must handle #'foo => (lambda-block ...)
+;;;   and #'(lambda ...) => (lambda-closure () () () ...)
+#- not-a-feature
+(defun fix-read-write-transparency (str) str)
+#+ not-a-feature
+(defun fix-read-write-transparency (str)
+  "Change #<compiled-function ...> and #<interpreted-function ...> to #'..."
+  ;; This doesn't work if ">" (greater than) is used as a function.
+  ;; Really have to use "read-from-string" and be prepared to catch error.
+      (setq a (si:string-match "#<[a-z]*-function "))
+      (setq b (si:match-end 0))
+      (setq c (length (format nil "~a" (read-from-string
+	(make-array :element-type 'character
+		    :displaced-to str
+		    :displaced-index-offset (si:match-end 0))))))
+      (setf (aref str a) #\' ) ; #< ==> #'
+      (fill str #\space :start (+ a 1) :end b) ; ...-function ==> _spaces_
+      (if lambda-block rewrite it or macroexpand it)
+      (setf (aref str (+ b c)) #\) ) ; > ==> right_paren
+  si:match-end
+  si:match-beginning
+)
+
+(defun receive-message (&optional (source (MPI-Any-source)) (tag (MPI-Any-tag))
 			     &aux (datatype -10) (type-enum -1) (type NIL)
 			     (count 0) (buf NIL))
   "Master side:  Each send-message must have a previous receive-message
    Slave side:  Each send-message must have a later receive-message"
   (declare (fixnum datatype count type-enum))
-  (MPI-Probe source)
+  (MPI-Probe source tag)
   (setq type-enum (get-last-datatype))
   (setq count (get-last-count))
   (setq type (car (rassoc type-enum MPI::*type-lisp-to-mpi*)))
@@ -172,11 +197,12 @@
 	   (setf (fill-pointer buf) count))
     (setq buf (make-array count :element-type type :fill-pointer t
 			  :adjustable t :static t)))
-  ;;Set source in case it used to be MPI-ANY-SOURCE
+  ;;Set source and in case they used to be MPI-ANY-SOURCE or MPI-ANY-TAG
   ;;Then rely on non-overtaking messages to insure that MPI-Recv
   ;;   sees the same message as MPI-Probe
   (setq source (MPI-Status-source))
-  (MPI-Recv buf source)
+  (setq tag (MPI-Status-tag))
+  (MPI-Recv buf source tag)
   (unless (and (= type-enum (get-last-datatype)) (= count (get-last-count)))
     (error "receive-message:  MPI-Recv didn't agree with MPI-Probe"))
   ;; (format t "remote ~d:  ~a~%" (MPI-Status-Source) buf)
@@ -286,6 +312,7 @@
       ;;  invoking from command line
       #-aix (or (si:getenv "PWD") (truename *default-pathname-defaults*))
       #+aix (truename *default-pathname-defaults*))
+
 (format t "Process of rank ~d initialized on processor ~a.~%" (MPI-Comm-rank)
 	(or (si:gethostname)
 	    #+kcl(si:getenv "HOST") #+kcl(si:getenv "HOSTNAME")

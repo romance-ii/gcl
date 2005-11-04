@@ -1,5 +1,15 @@
+configure of gcl should also call --prefix according to GCL caller's configure.
+  Geant4 does something like that.
+
+Finish fix-read-write-transparency to allow #'(lambda (...) ...)
+to be passed across the network.
+
 If we're calling (receive-message), and no message available,
 we can't interrupt with ^C
+Should catch interrupts with signal so that (receive-message ...)
+won't block indefinitely when there's no message to receive.
+
+Check if par-reset is stable, or can it corrupt the session?
 
 slave should be in SLAVE-LISTENER package.
   or at least, not exported from MPIpackage

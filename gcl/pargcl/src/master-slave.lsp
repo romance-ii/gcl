@@ -127,8 +127,8 @@
    broadcast;  If tag of most recent message is at least that large,
    this is up-to-date."
   (>= (get-last-tag) (aref *up-to-date-tag* 0)))
-(defmacro result-task ()
-  "Returns task corresponding to most recent result (most recent message)
+(defmacro result-task-input ()
+  "Returns task-input corresponding to most recent result (most recent message)
    returned."
   `(aref pending (get-last-tag)))
 
@@ -149,7 +149,7 @@
 	      (aref pending curr-tag)))
      (setf (aref pending curr-tag) task)
      (setf (aref slave-tags dest) curr-tag)
-     ,@(if trace `((if ,trace (format t "TRACE: -> ~d: ~s~%" dest task))))
+     ,@(if trace `((if ,trace (format t "TRACE: -> ~d : ~s~%" dest task))))
      (decf num-free-processors)
      (send-message task dest curr-tag)))
 
@@ -214,54 +214,60 @@
 					(funcall generate-task-input))))))
 	    (send-task task (pop free-processors) trace))
 	  (when (= num-free-processors num-slaves) (return)) ; no task, no pending
-	  (let ((result (receive-message))) ; Get a result
+	  (let ((task-out (receive-message))) ; Get a task-out
 	    (if trace
-	      (format t "TRACE: ~d ->: ~s~%" (MPI-Status-source) result))
-	    (if (eq (result-task) DEAD-SLAVE)
+	      (format t "TRACE:  <= ~d: ~s~%" (MPI-Status-source) task-out))
+	    (if (eq (result-task-input) DEAD-SLAVE)
 	      (progn
-		(setq result nil)
+		(setq task-out nil)
 		(if trace
-		  (format t "DEAD SLAVE tried to return result.  Killed.~%")))
+		  (format t
+			 "DEAD SLAVE tried to return task output.  Killed.~%")))
 	      (progn ; BETTER TO DELAY THIS AND DO ONLY IF NEEDED (a la TOP-C)
 		(setq free-processors           ; free-processors is FIFO queue
 		      (nconc free-processors (list (MPI-status-source))))
 		(incf num-free-processors)))
 	    (setf (aref slave-tags (MPI-status-source)) NO-TAG)
-	    (when result
+	    (when task-out
 	      (block try-result
-		(let ((task-result
+		(let ((task-action
 		       (if check-task-result
-			 (funcall check-task-result result) t)))
-		  (if (and (consp task-result)
-			   (eq (first task-result) 'continuation))
+			 (funcall check-task-result
+				  (result-task-input) task-out)
+			 t))) ; default is t = UPDATE
+		  (if (and (consp task-action)
+			   (eq (first task-action) 'continuation))
 		    ;;ask same processor to extend computation
-		    (progn (setf (aref pending (get-last-tag)) nil)
-			   (send-task task-result
+		    (progn (setf (result-task-input) nil)
+			   (send-task task-action
 				      (first (last free-processors)) trace)
 			   (setf free-processors (nbutlast free-processors))
 			   (return-from try-result)) ; skip update
-		    (case task-result
-		      ;;REDO:  resend to same processor that did result.
+		    (case task-action
+		      ;;REDO:  resend to same processor that did task-out.
 		      ;;IF RESENDING TO SAME PROC., CAN JUST RETURN ?
 		      ;; AND LET do-task REMEMBER ORIGINAL TASK
-		      ((? REDO) (send-task (aref pending (get-last-tag))
+		      ((? REDO) (send-task (result-task-input)
 				    (first (last free-processors)) trace)
 			 (setf free-processors (nbutlast free-processors))
 			 ;;(get-last-tag) is set for last REC'D msg, only
-			 (setf (aref pending (get-last-tag)) nil)
+			 (setf (result-task-input) nil)
 			 (return-from try-result)) ; skip update
 		      ((nil NO-ACTION)		; NO-ACTION
-		       (setf (aref pending (get-last-tag)) nil)
+		       (setf (result-task-input) nil)
 		       (return-from try-result)) ; skip update
 		      ((t UPDATE)		; UPDATE
-		       ;; else assume result is up-to-date
-		       (setf (aref pending (get-last-tag)) nil)
+		       ;; else assume task-out is up-to-date
 		       (when update-shared-data
 			 ;;broadcast-tag will cause slave in master-slave
 			 ;; mode to recognize update-shared-data request
-			 (progn (broadcast-message result)
-				(funcall update-shared-data result)))
-		       (when set-task (funcall set-task result))
+			 (progn (broadcast-message (result-task-input))
+			 	(broadcast-message task-out)
+				(funcall update-shared-data
+					 (result-task-input)
+					 task-out)))
+		       (setf (result-task-input) nil)
+		       (when set-task (funcall set-task task-out))
 		       (setf (aref *up-to-date-tag* 0) curr-tag))
 		      (otherwise (error ":check-task-result must return one ~
                                           of '(REDO NO-ACTION UPDATE)."))))))))
@@ -303,17 +309,20 @@
 	 ;;THIS ASSUMES SLAVE IS ALSO RUNNING (master-slave ...)
 	 ;; mpi::... required, since reader would otherwise put in curr package
 	 (broadcast-message "#.(throw 'mpi::done 'done)"))
-       (let ((result))			; else this is a slave
+       (let ((task-in))			; else this is a slave
 	 (catch 'mpi::done
 	   (loop
-	    (setq result (receive-message 0))
-	    (if (equal result '(quote %%mpi-internal-slave-escape%%)) (return))
-	    (if (equal result '(quote %%mpi-internal-slave-confirm%%))
+	    (setq task-in (receive-message 0))
+	    (if (equal task-in '(quote %%mpi-internal-slave-escape%%))
+		(return))
+	    (if (equal task-in '(quote %%mpi-internal-slave-confirm%%))
 	      (send-message 'mpi-slave-confirmed 0 (get-last-tag))
 	      (if (/= (get-last-tag) (the fixnum broadcast-tag))
-		(send-message (funcall do-task result) 0 (get-last-tag)) ;reply
-		(when update-shared-data ; broadcast doesn't require reply
-		    (funcall update-shared-data result))))))))
+		(send-message (funcall do-task task-in) 0 (get-last-tag));reply
+		(progn
+		  (let* ((task-out (receive-message 0)))
+		    (when update-shared-data ; broadcast doesn't require reply
+		      (funcall update-shared-data task-in task-out))))))))))
      (when buffer-size
        (adjust-array (get '*msg-buf* 'character) old-buffer-size :static t))
      (setf (first *master-slave-time*)

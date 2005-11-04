@@ -69,25 +69,28 @@
   (setq *master-slave-time*
 	(list (get-internal-run-time) (get-internal-real-time) 0))
 
-  (do ((result) (task t) (action)) ((null task))
-    (when (setq task
-		(if (and (consp action) (eq (first action) 'continuation))
-		    action (funcall generate-task-input)))
-      (case (setq action (funcall check-task-result
-				  (setq result (funcall do-task task))))
-      ;;resend to same processor that did result.
+  (do ((task-out) (task-in t) (task-action)) ((null task))
+    (when (setq task-in
+		(if (and (consp task-action)
+			 (eq (first task-action) 'continuation))
+		    task-action (funcall generate-task-input)))
+      (case (setq task-action (funcall check-task-result
+				       task-in
+				       (setq task-out
+					     (funcall do-task task-in))))
+      ;;resend to same processor that did task-out.
       ;;IF RESENDING TO SAME PROC., CAN JUST RETURN ?
-      ;; AND LET do-task REMEMBER ORIGINAL TASK
+      ;; AND LET do-task REMEMBER ORIGINAL TASK-IN
       ((? REDO) (error "BUG:  asking for resend in sequential mode"))
       ((nil NO-ACTION) )		; skip update
       ((t UPDATE)			; do update
-       ;; else assume result is up-to-date
+       ;; else assume task-out is up-to-date
        (when update-shared-data
 	 ;;broadcast-tag will cause slave in master-slave
 	 ;; mode to recognize update-shared-data request
-	 (funcall update-shared-data result)))
+	 (funcall update-shared-data task-in task-out)))
       (otherwise
-       (unless (and (consp action) (eq (first action) 'continuation))
+       (unless (and (consp task-action) (eq (first task-action) 'continuation))
 	       (error ":check-task-result must return one ~
                                           of '(REDO NO-ACTION UPDATE)."))))))
 

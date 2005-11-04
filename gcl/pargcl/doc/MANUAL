@@ -38,27 +38,46 @@ Here is a sample usage of some simple commands:
   (send-message '(dotimes (i 1000000000) (myfnc i)) 1)
   (par-reset) ; useful if slave not responding.
   (par-load "/home/joe/myfile.lsp") ; Load file on all processors
+  (defun par-mapcar (fnc list &aux (i -1) result)
+    (par-funcall #'par-mapcar-helper fnc list))
+  (defun par-mapcar-helper (fnc list &aux (i -1) result)
+    (if (master-p)
+        (setq result (make-array (length list))))
+    (master-slave
+      :generate-task-input #'(lambda () (incf i) (if (< i (length list)) i nil))
+      :do-task             #'(lambda (j) (funcall fnc (nth j list)))
+      :check-task-result   #'(lambda (task-in task-out)
+                               (setf (aref result task-in) task-out)
+                               'NO-ACTION)
+      :trace t)
+    (if (master-p) result nil)
+  )
+  ;; Note 'sqrt below.  #'sqrt couldn't be passed across network.
+  (par-mapcar 'sqrt '(1 2 3 4 5 6 7 8 9 10))
+  (help '*master-slave-time*)
+  *master-slave-time*
+  (send-receive-message '*master-slave-time*) ; time spent on slave 1
 
 ;;;; A remote process is set up for each one specified in your procgroup file.
 ;;;; Available commands:
 ;;;; (send-message <lisp-expr> <optional dest = 1>)
 ;;;; (broadcast-message <lisp-expr>) ; no reply message
 ;;;; (receive-message <optional source = (MPI-Any-source)>)
+;;;; (defun send-receive-message <lisp-expr> <optional dest = 1>)
+;;;; (send-receive-message <lisp-expr> <optional dest = 1>)
 ;;;; (free-msg-buffer <buf>) ; optimization for greater efficiency, only
 ;;;;                         ; frees message buffer for re-use in next MPI-recv
 ;;;; (probe-message <optional source = (MPI-Any-source)>)
 ;;;; (flush-all-messages)  ; flush all commands pending by slaves
 ;;;; (bye) modified to also delete remote processes
-;;;; (quit) synonym for (bye)
-;;;; (get-last-source) ; not recommended, but can be useful in cases
-;;;;                   ; of a continuation between master and slave,
-;;;;                   ; if master wants to match initial info and later
-;;;;                   ; info after continuation
+;;;; (get-last-source) ; not needed, but can be useful in special cases
+;;;; (get-last-tag)    ; not needed, but can be useful in special cases
 ;;;; ---
 ;;;; It works to call (send-message ... 1) n times, and then call
 ;;;;   (receive-message 1) n times, although this may be less efficient.
 ;;;; Commands sent to the same processor, are evaluated in sequence.
 ;;;; ---
+;;;; Send/receive/probe commands also accept optional tag with obvious default
 ;;;; CAUTION:  If you add the optional tag parameter to send-message,
 ;;;; note that the slave-listener does not reply if tag = broadcast-tag
 ;;;; Also, tags larger than broadcast-tag are interpreted as (vector fixnum)
@@ -90,27 +109,28 @@ MASTER SLAVE LAYER
 
 (master-slave             - see related article for full details.
 			    The user is responsible for writing the FNC's:
-  :generate-task-input FNC - (generate-task-input) returns TASK, arb. user
+  :generate-task-input FNC - (generate-task-input) returns TASK-IN, arb. user
 			     data structure
-  :do-task FNC		 - (do-task TASK) returns RESULT, arb. user data struct
-  :check-task-result FNC    - (check-task-result RESULT)
+  :do-task FNC		 - (do-task TASK-IN) returns TASK-OUT, arb. user
+                             data struct
+  :check-task-result FNC    - (check-task-result TASK-IN TASK-OUT)
 				 must return T, NIL, ?, or (CONTINUATION . *)
 			   Equivalently, can return symbols:
 				UPDATE, NO-ACTION, REDO, (CONTINUATION . *)
-			   T means call (update-shared-data TASK RESULT)
+			   T means call (update-shared-data TASK-IN TASK-OUT)
 			   NIL means do nothing more with this task
 			   ? means re-send TASK for additional comp. by do-task
 			   CONTINUATION is like ?, but it allows a user
                               parameter for *.  (CONTINUATION . *) becomes
                               the next TASK for the slave.
-  :update-shared-data FNC - (update-shared-data TASK RESULT) executed on
+  :update-shared-data FNC - (update-shared-data TASK-IN TASK-OUT) executed on
 			     master and slaves, used to modify global var's
   :trace T-OR-NIL)	  - obvious
 *master-slave-trace*	  - global variable, default value for :trace keyword
         EXAMPLE:  see file, myfactor.lsp
 
 *master-slave-time* - variable set after each call to master-slave;
-        see (documentation-string master-slave-time);
+        see (help '*master-slave-time*);
         On each processor shows time spent.
 
 (up-to-date-p)		  - utility to test if update-shared-data was called

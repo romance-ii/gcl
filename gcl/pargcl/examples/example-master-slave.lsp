@@ -12,9 +12,9 @@
 
 (defun par-find-one-factor-ms (x &optional (incr 10000))
     "Produces one factor of argument"
-      (par-funcall #'find-one-factor-ms x incr))
+      (par-funcall #'par-find-one-factor-ms-helper x incr))
 
-(defun find-one-factor-ms (num INCR)
+(defun par-find-one-factor-ms-helper (num INCR)
   (let ((sqrt (ceiling (sqrt num)))
         (curr 1) (answer nil))
     (master-slave :generate-task-input
@@ -27,12 +27,11 @@
 			(if (= (mod num (incf curr)) 0)
 			    (return curr))))
                   :check-task-result
-		  #'(lambda (result)
-		      (when result
+		  #'(lambda (curr task-output)
+		      (when task-output
 			;;(min .. ..) in case 2 slaves find diff. factors
-			(setq answer (if answer (min answer result)
-				       result)))
+			(setq answer (if answer (min answer task-output)
+				       task-output)))
 		      'NO-ACTION)
                   :trace t) ; optionally trace messages
     (or answer 'prime)))
-)

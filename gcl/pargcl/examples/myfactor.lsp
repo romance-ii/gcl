@@ -25,8 +25,8 @@
 ;; factors, those will have been registered first.
 (defun par-myfactor (x &optional (incr 1000))
   "Produces all factors of argument"
-  (par-funcall #'par-myfactor-aux x incr))
-(defun par-myfactor-aux (x incr)
+  (par-funcall #'par-myfactor-helper x incr))
+(defun par-myfactor-helper (x incr)
   (let ((sqrt (ceiling (sqrt x)))
         (curr 1) (answer nil))
     (master-slave :generate-task-input  ; executed on master => curr
@@ -40,8 +40,8 @@
 			    (return curr))))
 		  ;; curr from slave sent to master as result 
                   :check-task-result ; executed on master
-		  #'(lambda (result)
-		      (if result
+		  #'(lambda (curr task-output)
+		      (if task-output
 			  (if (up-to-date-p)
 			      ;; more factors in [curr+1..curr+incr]?
 			      (progn (decf curr incr) 'UPDATE)
@@ -49,10 +49,10 @@
 			'NO-ACTION))
 		  ;; update answer on all processors if UPDATE action above
 		  :update-shared-data ; executed on master and all slaves
-		  #'(lambda (result)
-		      (setq x (/ x result))
+		  #'(lambda (curr task-output)
+		      (setq x (/ x task-output))
 		      (setq sqrt (ceiling (sqrt x)))
-		      (push result answer))
+		      (push task-output answer))
                   :trace t) ; optionally trace messages
     (if (> x 1) (push x answer))
     (or answer 'prime)))

@@ -1,7 +1,17 @@
+;;; All three of the following find one factor of an integer.
+;;; They illustrate how the same functionality is acchieved with fewer
+;;;   lines of code using a progressively higher level interface:
+;;;     i) MPI
+;;;    ii) slave-listener (sendToSlave-eval-ReceiveFromSlave)
+;;;   iii) master-slave (master-worker parallelism)
 example-mpi.lsp - example code using MPI
 example-slave-listener.lsp - example code using slave-listener API
 example-master-slave.lsp - example code using master-slave API
+
 myfactor.lsp - longer example code using master-slave parallel interface
+myfactor-simple.lsp - a simple version with just one trial factor per task
+
+par-mapcar.lsp - implements obvious parallel generalization of mapcar
 
 To call, do:
   (par-load "FULL-PATH-TO-FILE")
