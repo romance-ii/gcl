@@ -50,7 +50,7 @@ Here is a sample usage of some simple commands:
                                (setf (aref result task-in) task-out)
                                'NO-ACTION)
       :trace t)
-    (if (master-p) result nil)
+    (if (master-p) (coerce result 'list) nil)
   )
   ;; Note 'sqrt below.  #'sqrt couldn't be passed across network.
   (par-mapcar 'sqrt '(1 2 3 4 5 6 7 8 9 10))

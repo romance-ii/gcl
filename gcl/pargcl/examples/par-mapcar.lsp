@@ -22,5 +22,5 @@
 			     (setf (aref result task-in) task-out)
 			     'NO-ACTION)
     :trace t)
-  (if (master-p) result nil)
+  (if (master-p) (coerce result 'list) nil)
 )
