@@ -1619,7 +1619,7 @@ if test "$enable_pargcl" != "no" ; then
 	 echo "#"
 	 echo "#"
 
-	 PARGCL_GCLDIR=$PWD
+	 PARGCL_GCLDIR=${prefix}
 	 ( cd $PARGCLDIR && ./configure --with-gcl=$PARGCL_GCLDIR/bin/gcl \
 	               --with-gcl-dir=$PARGCL_GCLDIR --with-mpicc=$with_mpicc )
 	#MY_SUBDIRS="$MY_SUBDIRS $PARGCLDIR" 

@@ -136,7 +136,7 @@
 	       ;;Would like to make this t, but stack can then blow up
 	       ;; for large lists, at least in akcl
 	       :circle nil)))
-    (setq message (fix-read-write-transparency string-buf)))
+    (setq message (fix-read-write-consistency string-buf)))
   ;;IF MESSAGE NOT STATIC, need to copy to static *msg-buf* of right length
   (unless (staticp message)
     (let ((msg-len (* (length message)
@@ -156,9 +156,9 @@
 ;;; must handle #'foo => (lambda-block ...)
 ;;;   and #'(lambda ...) => (lambda-closure () () () ...)
 #- not-a-feature
-(defun fix-read-write-transparency (str) str)
+(defun fix-read-write-consistency (str) str)
 #+ not-a-feature
-(defun fix-read-write-transparency (str)
+(defun fix-read-write-consistency (str)
   "Change #<compiled-function ...> and #<interpreted-function ...> to #'..."
   ;; This doesn't work if ">" (greater than) is used as a function.
   ;; Really have to use "read-from-string" and be prepared to catch error.

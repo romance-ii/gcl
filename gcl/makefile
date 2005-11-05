@@ -123,9 +123,28 @@ gmp_all: $(GMPDIR)/Makefile
 $(GMPDIR)/mpn/mul_n.o $(GMPDIR)/mpn/lshift.o $(GMPDIR)/mpn/rshift.o: $(GMPDIR)/Makefile
 	cd $(@D) && $(MAKE) $(@F)
 
+# This target can only be made once gcl is _installed_ in ${prefix}.
 pargcl_all:
 	if test "$(PARGCLDIR)" != ""; then \
-	  cd $(PARGCLDIR) && $(MAKE); \
+	  cd $(PARGCLDIR) && $(MAKE) "INSTALL_GCL_DIR=$(DESTDIR)$(INSTALL_LIB_DIR)"; \
+	# gene - $(INSTALL_GLC_DIR) not yet used by ParGCL.  Also, ParGCL currently
+	#   calls bin/gcl in make of ParGCL, and finds it with --with-gcl=
+	#   ParGCL should create bin/pargcl that differs from bin/gcl only in
+	#     saved_gcl -> saved_pargcl and pargcl.sed is used.
+	#  But do that only if this is GCL install;  Else keep original bin/pargcl
+	#  Can even produce both pargcl/bin/pargcl and $(INSTALL_GCL_DIR)/bin/pargcl
+	# We imitate the install logic of install_unix target of this makefile
+	if test "$(PARGCLDIR)" != ""; then \
+		&& mv $(PARGCLDIR)/src/saved_pargcl \
+		      $(DESTDIR)$(INSTALL_LIB_DIR)/$(PORTDIR)/saved_pargcl \
+		&& cp $(PARGCLDIR)/bin/pargcl \
+		      $(DESTDIR)$(INSTALL_LIB_DIR)/bin/pargcl; \
+		cd $(DESTDIR)$(INSTALL_LIB_DIR)/$(PORTDIR) \
+		&& mv saved_pargcl temp$(EXE) \
+		&& echo '(reset-sys-paths "$(INSTALL_LIB_DIR)/")' \
+			' (si::save-system "saved_pargcl")' | ./temp$(EXE) \
+		&& rm -f temp$(EXE); \
+	fi
 	  echo '#';
 	  echo '#';
 	  echo '# ParGCL built.  To test it:  cd pargcl/bin; ./pargcl ';
@@ -208,6 +227,7 @@ install_unix:
 		echo '(reset-sys-paths "$(INSTALL_LIB_DIR)/")\
 		      (si::save-system "$(FLISP)$(EXE)")' | ./temp$(EXE) && \
 		rm -f temp$(EXE)
+	false && echo "NOT READY TO TEST IT YET" && $(MAKE) pargcl_all
 	if [ -e "unixport/rsym$(EXE)" ] ; then cp unixport/rsym$(EXE) $(DESTDIR)$(INSTALL_LIB_DIR)/unixport/ ; fi
 #	ln $(SYMB) $(INSTALL_LIB_DIR)/$(PORTDIR)/$(FLISP)$(EXE) \
 #	 $(DESTDIR)$(prefix)/bin/gcl.exe
