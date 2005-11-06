@@ -126,7 +126,8 @@ $(GMPDIR)/mpn/mul_n.o $(GMPDIR)/mpn/lshift.o $(GMPDIR)/mpn/rshift.o: $(GMPDIR)/M
 # This target can only be made once gcl is _installed_ in ${prefix}.
 pargcl_all:
 	if test "$(PARGCLDIR)" != ""; then \
-	  cd $(PARGCLDIR) && $(MAKE) "INSTALL_GCL_DIR=$(DESTDIR)$(INSTALL_LIB_DIR)"; \
+	  cd $(PARGCLDIR) \
+	    && $(MAKE) "INSTALL_GCL_DIR=$(DESTDIR)$(INSTALL_LIB_DIR)"; \
 	# gene - $(INSTALL_GLC_DIR) not yet used by ParGCL.  Also, ParGCL currently
 	#   calls bin/gcl in make of ParGCL, and finds it with --with-gcl=
 	#   ParGCL should create bin/pargcl that differs from bin/gcl only in
@@ -157,6 +158,7 @@ command:
 	MGCLDIR=`echo $(GCLDIR) | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
 	GCLDIR=`echo $(GCLDIR)` ; \
 	$(MAKE) install_command "INSTALL_LIB_DIR=$$GCLDIR" "prefix=$$GCLDIR" "BINDIR=$$MGCLDIR/$(PORTDIR)"
+	false && echo "NOT READY TO TEST IT YET" && $(MAKE) pargcl_all
 	(cd xbin ; cp ../bin/gcl .)
 
 #	GCLDIR=`echo $(GCLDIR) | sed -e 'sX^/cygdrive/\([a-z]\)X\1!Xg' -e 'sX^//\([a-z]\)X\1!Xg'` ; \
