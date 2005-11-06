@@ -23,16 +23,18 @@ ${SRC_FILES}:
 	@ echo ""
 	@ echo This is ParGCL version ${VERSION}, ${UPDATED}.
 
-check:
+check: bin/pargcl
 	cd bin; echo '(progn ' \
 		       '(par-load "../examples/example-mpi.lsp") ' \
-		       '(par-find-one-factor-mpi 987654321) ' \
+		       '(print (par-find-one-factor-mpi 987654321)) ' \
 		       '(par-load "../examples/example-slave-listener.lsp") ' \
-		       '(par-find-one-factor-sl 987654321) ' \
+		       '(print (par-find-one-factor-sl 987654321)) ' \
 		       '(par-load "../examples/example-master-slave.lsp") ' \
-		       '(par-find-one-factor-ms 987654321) ' \
+		       '(print (par-find-one-factor-ms 987654321)) ' \
 		       '(par-load "../examples/myfactor.lsp") ' \
-		       '(par-myfactor 987654321) ' \
+		       '(print (par-myfactor 987654321)) ' \
+		       '(par-load "../examples/par-mapcar.lsp") ' \
+		       "(print (par-mapcar #'sqrt '(1 2 3 4 5 6 7 8 9 10))) " \
 		       '(quit))' \
 		       | ./pargcl
 

@@ -1,6 +1,6 @@
 ;;; To load and run this example:
 ;;;          (par-load "par-mapcar.lsp")
-;;;          (par-mapcar 'sqrt '(1 2 3 4 5 6 7 8 9 10))
+;;;          (par-mapcar #'sqrt '(1 2 3 4 5 6 7 8 9 10))
 
 ;;;This example generalizes mapcar to the obvious parallel version.
 ;;;  It computes on each element of the list using the next processor,
@@ -21,6 +21,6 @@
     :check-task-result   #'(lambda (task-in task-out)
 			     (setf (aref result task-in) task-out)
 			     'NO-ACTION)
-    :trace t)
+    :trace nil)
   (if (master-p) (coerce result 'list) nil)
 )

@@ -1,8 +1,9 @@
-configure of gcl should also call --prefix according to GCL caller's configure.
-  Geant4 does something like that.
+(help 'xxx) not working in ParGCL.  Why?
 
-Finish fix-read-write-transparency to allow #'(lambda (...) ...)
-to be passed across the network.
+slave-listener not in MPI package.  Why?
+
+slave should be in SLAVE-LISTENER package.
+  or at least, not exported from MPIpackage
 
 If we're calling (receive-message), and no message available,
 we can't interrupt with ^C
@@ -11,10 +12,7 @@ won't block indefinitely when there's no message to receive.
 
 Check if par-reset is stable, or can it corrupt the session?
 
-slave should be in SLAVE-LISTENER package.
-  or at least, not exported from MPIpackage
-
-Note also (getcwd):
+Note also (getcwd) [STILL TRUE?]:
 (getcwd) => reports too many allocated blocks ??
 NOTE that the following workaround does work, however:
   (getcwd

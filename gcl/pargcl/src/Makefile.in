@@ -40,7 +40,7 @@ LSP_FILES = ${SRCDIR}/mpi_glue.lsp ${SRCDIR}/mpi_defglue.lsp \
 	  sed -e "s%[^ ]*saved_[^ ]*%$$tmp/saved_pargcl%g" | \
 	  sed -f pargcl.sed \
 	  > ../bin/par`basename ${GCL}`
-	if "${INSTALL_GCL_DIR}" != ""; then
+	if [ "${INSTALL_GCL_DIR}" != "" ]; then \
 	  cat ${GCL} | \
 	  sed -e "s%saved_[^ ]*%saved_pargcl%g" | \
 	  sed -f pargcl.sed \

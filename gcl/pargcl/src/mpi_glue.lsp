@@ -41,7 +41,6 @@
 ;;;This file MUST be compiled, and loaded compiled, or C fnc's not found
 ;;;Unfortunately, AKCL already has integrated another MPI package:
 ;;;  Multiple Precision Integers, while here, MPI = Message Passing Interface
-;;;  In GCL 2.7.0, this seems to be replaced by gmp (GNU Multiple Prec), anyway.
 ;;;  Hopefully this presents no conflict or confusion, since at the
 ;;;  the user level, MPI is always Message Passing Interface
 ;;;BUG:  MPI and LISP compete for same signals (interrupt, etc.)

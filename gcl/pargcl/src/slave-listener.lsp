@@ -21,7 +21,6 @@
 ;;;; (send-message <lisp-expr> <optional dest = 1>)
 ;;;; (broadcast-message <lisp-expr>) ; no reply message
 ;;;; (receive-message <optional source = (MPI-Any-source)>)
-;;;; (defun send-receive-message <lisp-expr> <optional dest = 1>)
 ;;;; (send-receive-message <lisp-expr> <optional dest = 1>)
 ;;;; (free-msg-buffer <buf>) ; optimization for greater efficiency, only
 ;;;;                         ; frees message buffer for re-use in next MPI-recv
@@ -152,29 +151,52 @@
   (MPI-Send message dest tag)
   nil)
 
-;;; Still writing this.
-;;; must handle #'foo => (lambda-block ...)
-;;;   and #'(lambda ...) => (lambda-closure () () () ...)
-#- not-a-feature
-(defun fix-read-write-consistency (str) str)
-#+ not-a-feature
-(defun fix-read-write-consistency (str)
-  "Change #<compiled-function ...> and #<interpreted-function ...> to #'..."
-  ;; This doesn't work if ">" (greater than) is used as a function.
-  ;; Really have to use "read-from-string" and be prepared to catch error.
-      (setq a (si:string-match "#<[a-z]*-function "))
-      (setq b (si:match-end 0))
-      (setq c (length (format nil "~a" (read-from-string
-	(make-array :element-type 'character
-		    :displaced-to str
-		    :displaced-index-offset (si:match-end 0))))))
-      (setf (aref str a) #\' ) ; #< ==> #'
-      (fill str #\space :start (+ a 1) :end b) ; ...-function ==> _spaces_
-      (if lambda-block rewrite it or macroexpand it)
-      (setf (aref str (+ b c)) #\) ) ; > ==> right_paren
-  si:match-end
-  si:match-beginning
-)
+(defun fix-read-write-consistency (str &aux preamble-begin preamble-end end)
+  "Change #<compiled-function ...> and #<interpreted-function ...> to #'...
+   Works solely by modifying str argument"
+  (setq preamble-begin (si:string-match "#<[a-z]*-function " str))
+  (if (= preamble-begin -1) (return-from fix-read-write-consistency str))
+  ;; CHANGE:  '#<...>   ==>   #<...>
+  ;;   since later,  #<...> become #'(lambda (...) ...)
+  ;; Presumably, other special functions, besides "quote" could also be a problem.
+  (if (and (> preamble-begin 0) (eq (aref str (- preamble-begin 1)) #\'))
+      (setf (aref str (- preamble-begin 1)) #\space))
+  (setq preamble-end (si:match-end 0))
+  (fix-read-write-consistency
+    (make-array (- (length str) preamble-end)
+		:element-type (array-element-type str)
+		:displaced-to str
+		:displaced-index-offset preamble-end))
+  (multiple-value-bind (expr expr-end)
+                       (read-from-string str t nil :start preamble-end)
+    (loop (if (memq (aref str (- expr-end 1)) '(#\tab #\newline #\space))
+	    (decf expr-end)
+	    (return)))
+    (when (eq #\> (aref str (1- expr-end))) ; when: #<compiled-function mapcar>
+      (decf expr-end)
+      (setq expr (read-from-string str t nil :start preamble-end :end expr-end)))
+    (setq end (1+ (si:string-match ">" str expr-end))) ; start at expr-end
+    ;; fill with spaces following '#' of '#<...>'
+    (fill str #\space :start (+ preamble-begin 1) :end end)
+    (setf (aref str (+ preamble-begin 1)) #\' ) ; #<   ==>   #'
+    (with-output-to-string (stream
+			     (make-array (- (length str) preamble-begin 2)
+					 :fill-pointer 0
+					 :element-type (array-element-type str)
+					 :displaced-to str
+				 :displaced-index-offset (+ preamble-begin 2)))
+      (write (cond ((not (listp expr)) expr)
+		   ;; (lambda-block (x) (+ x 1)) =>
+		   ((eq (first expr) 'lambda-block)
+		    (list 'lambda (third expr)
+			  (list* 'block (second expr) (cdddr expr))))
+		   ;; (lambda-closure () () () (x) (+ x 1)) =>
+		   ((eq (first expr) 'lambda-closure)
+		    (cons 'lambda (cddddr expr))))
+	     ;; :circle t okay; body of fnc shouldn't be so large to blow stack
+	     :stream stream :escape t :level nil :length nil :array t :circle t
+	     )))
+  str)
 
 (defun receive-message (&optional (source (MPI-Any-source)) (tag (MPI-Any-tag))
 			     &aux (datatype -10) (type-enum -1) (type NIL)
