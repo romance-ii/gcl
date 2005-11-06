@@ -318,7 +318,6 @@ setup_stream_buffer(x)
 	setbuf(x->sm.sm_fp, buf);
 }	
 
-/*FIXME  these buffers appear to be unused, or seldomly used*/
 static void
 deallocate_stream_buffer(strm)
 object strm;
@@ -2698,7 +2697,7 @@ object async;
      {
          object buffer;
          x->sm.sm_fp = NULL;
-	  buffer=alloc_simple_string((BUFSIZ < 4096 ? 4096 : BUFSIZ));
+	 buffer=alloc_simple_string((BUFSIZ < 4096 ? 4096 : BUFSIZ));
 	 SOCKET_STREAM_BUFFER(x) =buffer;
 	 buffer->ust.ust_self = alloc_contblock(buffer->st.st_dim);
 	 buffer->ust.ust_fillp = 0;

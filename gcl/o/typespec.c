@@ -563,6 +563,10 @@ DEF_ORDINARY("PLUSP",sLplusp,LISP,"");
 DEF_ORDINARY("FILE-STREAM",sLfile_stream,LISP,"");
 DEF_ORDINARY("INPUT-STREAM",sLinput_stream,SI,"");
 DEF_ORDINARY("OUTPUT-STREAM",sLoutput_stream,SI,"");
+DEF_ORDINARY("PROCLAIMED-ARG-TYPES",sSproclaimed_arg_types,SI,"");
+DEF_ORDINARY("PROCLAIMED-RETURN-TYPE",sSproclaimed_return_type,SI,"");
+DEF_ORDINARY("PROCLAIMED-FUNCTION",sSproclaimed_function,SI,"");
+
 
 /* logical pathnames exist even in non ansi gcl */
 DEF_ORDINARY("LOGICAL-PATHNAME",sLlogical_pathname,LISP,"");

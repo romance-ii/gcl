@@ -17,6 +17,8 @@ License for more details.
 */
 
 #include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #define IN_RUN_PROCESS
 #include "include.h"
@@ -581,16 +583,46 @@ FFN(siLmake_socket_pair)()
   make_socket_pair();
 }
 
-DEFUNO_NEW("KILL",object,fSkill,SI,1,1,NONE,OO,OO,OO,OO,void,siLkill,(object x),"") {
-  if (!consp(x))
-    TYPE_ERROR(x,sLcons);
-  if (type_of(x->c.c_car)!=t_fixnum)
-    TYPE_ERROR(x->c.c_car,t_fixnum);
-  if (type_of(x->c.c_cdr) != t_stream ||
-      x->c.c_cdr->sm.sm_mode!=smm_input)
-    TYPE_ERROR(x->c.c_cdr,sLinput_stream);
-  kill(fix(x->c.c_car),SIGTERM);
-  close_stream(x->c.c_cdr);
+#define unpack_handle(a_,b_,c_) ({if (!consp(a_))\
+                                    TYPE_ERROR(a_,sLcons);\
+                                  if (type_of(a_->c.c_car)!=t_fixnum)\
+                                    TYPE_ERROR(a_->c.c_car,sLfixnum);\
+                                  b_=fix(a_->c.c_car);\
+                                  if (type_of(a_->c.c_cdr) != t_fixnum)\
+                                    TYPE_ERROR(a_->c.c_cdr,sLfixnum);\
+                                  c_=fix(a_->c.c_cdr);})
+
+
+DEFUNO_NEW("KILL",object,fSkill,SI,2,2,NONE,OO,IO,OO,OO,void,siLkill,(object x,fixnum err),"") {
+
+  fixnum k,l;
+  int e,status;
+
+  unpack_handle(x,k,l);
+
+  if (l>=0) {
+    ASSERT((e=waitpid(k,&status,WNOHANG))>=0);
+    if (e) {
+      if (!WIFEXITED(status)) {
+	ASSERT(WIFSIGNALED(status));
+	FEerror("Child %u died with signal %u\n",k,WTERMSIG(status));
+      } else if ((e=WEXITSTATUS(status)))
+	  FEerror("Child %u exited with error status %d\n",k,e);
+    } else {
+      ASSERT(!kill(k,SIGTERM));
+      ASSERT(waitpid(k,&status,0)==k);
+      if (WIFSIGNALED(status)) {
+	ASSERT(WTERMSIG(status)==SIGTERM);
+      } else {
+	ASSERT(WIFEXITED(status));
+	if ((e=WEXITSTATUS(status)))
+	  FEerror("Child %u exited with error status %d\n",k,e);
+      }
+    }
+/*     ASSERT(!close(l)); */
+    close(l);/*FIXME*/
+    x->c.c_cdr=make_fixnum(-1);
+  }
   return Cnil;
 }
   
@@ -605,19 +637,14 @@ DEFUNO_NEW("SELECT-READ",object,fSselect_read,SI,2,2,NONE,IO,IO,OO,OO,void,siLse
   if (x!=Cnil && !consp(x))
     TYPE_ERROR(x,sLlist);
   for (;!endp(x);x=x->c.c_cdr) {
-    if (!consp(x->c.c_car))
-      TYPE_ERROR(x->c.c_car,sLcons);
-    if (type_of(x->c.c_car->c.c_cdr) != t_stream ||
-	x->c.c_car->c.c_cdr->sm.sm_mode!=smm_input)
-      TYPE_ERROR(x->c.c_car->c.c_cdr,sLinput_stream);
-    k=x->c.c_car->c.c_cdr->sm.sm_fd;
+    unpack_handle(x->c.c_car,i,k);
     if (k<0) continue;/*closed stream*/
     max=max<k ? k : max;
     FD_SET(k,&fds);
   }
   select(max+1,&fds,NULL,NULL,usec < 0 ? NULL : &tv);
   for (x=y,i=mask=0;!endp(x);x=x->c.c_cdr,i++) {
-    k=x->c.c_car->c.c_cdr->sm.sm_fd;
+    k=fix(x->c.c_car->c.c_cdr);
     if (k<0) continue;
     if (FD_ISSET(k,&fds))
       mask|=(1<<i);
@@ -625,54 +652,73 @@ DEFUNO_NEW("SELECT-READ",object,fSselect_read,SI,2,2,NONE,IO,IO,OO,OO,void,siLse
   return (object)mask;
 }
   
+DEFUNO_NEW("WRITE-POINTER-OBJECT",object,fSwrite_pointer_object,SI,2,2,NONE,OO,IO,OO,OO,
+	   void,siLwrite_pointer_object,(object x,object z),"") {
+
+  object y;
+  fixnum pid,s;
+
+  unpack_handle(z,pid,s);
+
+  y=x;
+  if (stack_alloc_end<=stack_alloc_start || !writable_ptr(x)) 
+    y=OBJNULL;
+  ASSERT(write(s,&y,sizeof(y))==sizeof(y)); 
+  if (y==OBJNULL) {
+    char b[BUFSIZ];
+    stack_alloc_off();
+    y=make_fd_stream(s,smm_output,"w",b);
+    prin1(x,y);
+    fclose(y->sm.sm_fp);
+  }
+  return Cnil;
+}
+
+DEFUNO_NEW("READ-POINTER-OBJECT",object,fSread_pointer_object,SI,1,1,NONE,OO,OO,OO,OO,
+	   void,siLread_pointer_object,(object z),"") {
+
+  object x;
+  fixnum pid,s;
+
+  unpack_handle(z,pid,s);
+
+  ASSERT(read(s,&x,sizeof(x))==sizeof(x));
+  if (x==OBJNULL) {
+    object y;
+    char b[BUFSIZ];
+    /*FIXME this could be somewhat faster if the malloc induced by
+      fdopen could be avoided.*/
+    y=make_fd_stream(s,smm_input,"r",b);
+    x=read_object(y);
+    fclose(y->sm.sm_fp);
+  }
+  fSkill(z,1);
+  return x;
+
+}
+
+DEFVAR("*CHILD-STACK-ALLOC*",sSAchild_stack_allocA,SI,make_shortfloat(0.8),"");
 
 DEFUNO_NEW("FORK",object,fSfork,SI,0,0,NONE,OO,OO,OO,OO,void,siLfork,(void),"") {
-  int p[2],j;
+  int p[2],j=0;
   pid_t pid;
-  struct sigaction sa;
-  object x;
 
   ASSERT(!pipe(p));
 
-  sa.sa_handler=SIG_IGN;
-  sa.sa_flags=SA_NOCLDWAIT;
-  sigemptyset(&sa.sa_mask);
-  
-  sigaction(SIGCHLD,&sa,NULL);
-  
   ASSERT((pid=fork())>=0);
   
   if (!pid) {
-    fd_set fds;
 
-    FD_ZERO(&fds);
-    FD_SET(p[1],&fds);
-    select(p[1]+1,NULL,&fds,NULL,NULL);
-
+    j=1;
     close(STDIN_FILENO);
-    /*       dup2(p[0],STDIN_FILENO); */
-    /*       close(p[0]); */
     close(STDOUT_FILENO);
-    /*       dup2(p[1],STDOUT_FILENO); */
-    /*       close(p[1]); */
     close(STDERR_FILENO);
       
   }
 
-  j=pid ? 0 : 1;
   close(p[1-j]);
 
-  x = alloc_object(t_stream);
-  x->sm.sm_mode = j ? smm_output : smm_input;
-  x->sm.sm_fp = fdopen(p[j],j ? "w" : "r");
-  x->sm.sm_buffer = 0;
-  x->sm.sm_object0 = sLcharacter;
-  x->sm.sm_object1 = Cnil;
-  x->sm.sm_fd=p[j];
-/*   x->sm.sm_int0 = p[0]; */
-/*   x->sm.sm_int1 = p[1]; */
-  
-  return MMcons(make_fixnum(pid),x);
+  return MMcons(make_fixnum(pid),make_fixnum(p[j]));
 
 }
 
@@ -680,7 +726,15 @@ DEFUNO_NEW("FORK",object,fSfork,SI,0,0,NONE,OO,OO,OO,OO,void,siLfork,(void),"") 
 
 void
 gcl_init_socket_function()
-{
+{ 
+ 
+/*   struct sigaction sa; */
+/*   sa.sa_handler=SIG_IGN; */
+/*   sa.sa_flags=SA_NOCLDWAIT; */
+/*   sigemptyset(&sa.sa_mask); */
+  
+/*   sigaction(SIGCHLD,&sa,NULL); */
+  
   make_si_function("MAKE-SOCKET-STREAM", siLmake_socket_stream); 
   make_si_function("MAKE-SOCKET-PAIR", siLmake_socket_pair);
   make_si_function("RUN-PROCESS", siLrun_process);

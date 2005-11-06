@@ -614,7 +614,7 @@ DEFUN_NEW("SCH-FRS-BASE",object,fSsch_frs_base,SI
 	RETURN1(x0);
 }
 
-DEFUN_NEW("INTERNAL-SUPER-GO",object,fSinternal_super_go,SI
+DEFUNM_NEW("INTERNAL-SUPER-GO",object,fSinternal_super_go,SI
        ,3,3,NONE,OO,OO,OO,OO,(object tag,object x1,object x2),"")
 {
 	frame_ptr fr;

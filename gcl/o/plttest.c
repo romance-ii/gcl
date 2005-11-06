@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <string.h>
 #include <setjmp.h>
 #include <stdio.h>
@@ -29,6 +30,10 @@ main(int argc,char * argv[],char *envp[]) {
 
   ch=getc(f);
   ch&=putc(ch,f);
+
+  f=fdopen(l,"r");
+  l=read(l,&l,sizeof(l));
+  l=write(l,&l,sizeof(l));
 
   ch&=mmcount();
 

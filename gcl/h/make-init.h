@@ -40,6 +40,14 @@
 #define DEFUNO_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,oldret,old,args,doc) \
   {extern void Mjoin(fname,_init)();Mjoin(fname,_init)();}
 
+#undef DEFUNM_NEW
+#define DEFUNM_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) \
+  {extern void Mjoin(fname,_init)(); Mjoin(fname,_init)();}
+
+#undef DEFUNOM_NEW
+#define DEFUNOM_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,oldret,old,args,doc) \
+  {extern void Mjoin(fname,_init)();Mjoin(fname,_init)();}
+
 #undef DEFCOMP
 #define DEFCOMP(type, fun,doc) Ineed_in_image(fun);
 

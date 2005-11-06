@@ -82,6 +82,11 @@ void old(void) \
    pack == LISP ? LISP_makefun(string,fname,argd) : \
    error("Bad pack variable in MAKEFUN\n"))
 
+#define MAKEFUNM(pack,string,fname,argd) \
+  (pack == SI ? SI_makefunm(string,fname,argd) : \
+   pack == LISP ? LISP_makefunm(string,fname,argd) : \
+   error("Bad pack variable in MAKEFUN\n"))
+
 #define mjoin(a_,b_) a_ ## b_
 #define Mjoin(a_,b_) mjoin(a_,b_)
 
@@ -122,6 +127,12 @@ void Mjoin(fname,_init) () {\
 }\
 STATD ret FFN(fname) args
 
+#define DEFUNM_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,args,doc) STATD ret FFN(fname) args;\
+void Mjoin(fname,_init) () {\
+   MAKEFUNM(pack,string,(ret (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));\
+}\
+STATD ret FFN(fname) args
+
 /* eg.
    A function taking from 2 to 8 args
    returning object the first args is object, the next 6 int, and last defaults to object.
@@ -134,6 +145,16 @@ STATD ret FFN(fname) args
 STATD  ret FFN(fname) args; \
 void Mjoin(fname,_init) () {\
    MAKEFUN(pack,string,(ret (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));\
+}\
+LFD(old)(void) \
+{   Iinvoke_c_function_from_value_stack((object (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \
+    return;} \
+STATD  ret FFN(fname) args
+
+#define DEFUNOM_NEW(string,ret,fname,pack,min,max, flags, ret0a0,a12,a34,a56,oldret,old,args,doc) \
+STATD  ret FFN(fname) args; \
+void Mjoin(fname,_init) () {\
+   MAKEFUNM(pack,string,(ret (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56)));\
 }\
 LFD(old)(void) \
 {   Iinvoke_c_function_from_value_stack((object (*)())FFN(fname),F_ARGD(min,max,flags,ARGTYPES(ret0a0,a12,a34,a56))); \

@@ -123,8 +123,18 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * logandc1 and logandc2 optimizers
   * update init_ansi_gcl.lsp.in for new functions, export rudimentary
     fns from mod/gcl_ansi_io.lsp
+  * rework parent/child communication across fork(), stack allocation in
+    children by default to return object pointers in the parent when
+    possible, use maximal cssize in configure by default
+  * Remove unnecessary stubs in compiled code
+  * push proclamation information into lisp for C functions defined with
+    DEFUN...
+  * FIXME --centralize DEFUN macros and push mutiple value returns to C
+    stack using a generic value holding structure
+  * FIXME write unreadable objects from children using an extended
+    fasdump format
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  1 Nov 2005 12:25:56 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun,  6 Nov 2005 17:49:19 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

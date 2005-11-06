@@ -303,7 +303,7 @@ object list(fixnum n,...) {
   va_start(ap,n);
 
   CHECK_INTERRUPT;
-  if (tm->tm_nfree < n )  {
+  if (stack_alloc_start || tm->tm_nfree < n )  {
     
     object *p = vs_top;
     

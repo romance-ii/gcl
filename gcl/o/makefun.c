@@ -101,17 +101,96 @@ DEFUN_NEW("SET-KEY-STRUCT",object,fSset_key_struct,SI,1,1,NONE,OO,OO,OO,OO,(obje
   return Cnil;
 }
      
+#define collect(top_,next_,val_) ({object _x=MMcons(val_,Cnil);\
+                                   if (top_==Cnil) top_=next_=_x; \
+                                   else next_=next_->c.c_cdr=_x;})
+
+
+static void
+put_fn_procls(object sym,int argd,int oneval) {
+
+  unsigned int atypes=F_TYPES(argd) >> F_TYPE_WIDTH;
+  unsigned int minargs=F_MIN_ARGS(argd);
+  unsigned int maxargs=F_MAX_ARGS(argd);
+  unsigned int rettype=F_RESULT_TYPE(argd);
+  unsigned int i;
+  object ta=Cnil,na=Cnil;
+
+  for (i=0;i<minargs;i++,atypes >>=F_TYPE_WIDTH) 
+    switch(maxargs!=minargs ? F_object : atypes & MASK_RANGE(0,F_TYPE_WIDTH)) {
+    case F_object:
+      collect(ta,na,Ct);
+      break;
+    case F_int:
+      collect(ta,na,sLfixnum);
+      break;
+    case F_shortfloat:
+      collect(ta,na,sLshort_float);
+      break;
+    case F_double_ptr:
+      collect(ta,na,sLlong_float);
+      break;
+    default:
+      FEerror("Bad sfn declaration",0);
+      break;
+    }
+  if (maxargs!=minargs)
+    collect(ta,na,sLA);
+  putprop(sym,ta,sSproclaimed_arg_types);
+  ta=na=Cnil;
+  if (oneval) 
+    switch(rettype) {
+    case F_object:
+      ta=Ct;
+      break;
+    case F_int:
+      ta=sLfixnum;
+      break;
+    case F_shortfloat:
+      ta=sLshort_float;
+      break;
+    case F_double_ptr:
+      ta=sLlong_float;
+      break;
+    default:
+      FEerror("Bad sfn declaration",0);
+      break;
+    }
+  else
+    ta=MMcons(sLA,Cnil);
+  putprop(sym,ta,sSproclaimed_return_type);
+  if (oneval)
+    putprop(sym,Ct,sSproclaimed_function);
+
+}  
+
 
 void
 SI_makefun(char *strg, object (*fn) (/* ??? */), unsigned int argd)
 { object sym = make_si_ordinary(strg);
  fSfset(sym, fSmakefun(sym,fn,argd));
+ put_fn_procls(sym,argd,1);
 }
 
 void
 LISP_makefun(char *strg, object (*fn) (/* ??? */), unsigned int argd)
 { object sym = make_ordinary(strg);
  fSfset(sym, fSmakefun(sym,fn,argd));
+ put_fn_procls(sym,argd,1);
+}
+
+void
+SI_makefunm(char *strg, object (*fn) (/* ??? */), unsigned int argd)
+{ object sym = make_si_ordinary(strg);
+ fSfset(sym, fSmakefun(sym,fn,argd));
+ put_fn_procls(sym,argd,0);
+}
+
+void
+LISP_makefunm(char *strg, object (*fn) (/* ??? */), unsigned int argd)
+{ object sym = make_ordinary(strg);
+ fSfset(sym, fSmakefun(sym,fn,argd));
+ put_fn_procls(sym,argd,0);
 }
 
 

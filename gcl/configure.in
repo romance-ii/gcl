@@ -40,10 +40,7 @@ AC_ARG_ENABLE(frssize,
 ,enable_frssize=4096)
 AC_DEFINE_UNQUOTED(FRSSIZE,$enable_frssize)
 
-AC_ARG_ENABLE(cssize,
-[ --enable-cssize=XXXX   produces executables with a C stack of size XXX],
-,enable_cssize=1024*1024*2)
-#AC_DEFINE_UNQUOTED(CSSIZE,$enable_cssize)
+AC_ARG_ENABLE(cssize,[ --enable-cssize=XXXX produces executables with a C stack of size XXX],,enable_cssize=-1)#AC_DEFINE_UNQUOTED(CSSIZE,$enable_cssize)
   
 AC_ARG_ENABLE(machine,
 [ --enable-machine=XXXX  will force the use of one of the definitions
@@ -571,11 +568,11 @@ fi
 # for the system.  This can usually be done via the "uname" command, but
 # there are a few systems, like Next, where this doesn't work.
 
-AC_MSG_CHECKING([system version (for dynamic loading)])
-if machine=`uname -m` ; then true; else machine=unknown ; fi
-
 AC_CHECK_PROGS(MAKEINFO,makeinfo,"false")
 AC_SUBST(MAKEINFO)
+
+AC_MSG_CHECKING([system version (for dynamic loading)])
+if machine=`uname -m` ; then true; else machine=unknown ; fi
 
 if test -f /usr/lib/NextStep/software_version; then
     system=NEXTSTEP-`${AWK} '/3/,/3/' /usr/lib/NextStep/software_version`
@@ -643,6 +640,7 @@ if test $use_gmp = yes ; then
 					return -1;
 				    #endif
 				    }],
+				AC_MSG_RESULT(ok);
 #				MPFILES=$GMPDIR/mpn/mul_n.o
 #				PATCHED_SYMBOLS=__gmpn_toom3_mul_n
 				MPFILES=
@@ -705,6 +703,7 @@ fi
 AC_MSG_CHECKING("for leading underscore in object symbols")
 cat>foo.c <<EOFF
 #include <math.h>
+#include <stdio.h>
 int main() {double d=0.0;cos(d);printf("%g",cos(d));return 0;}
 EOFF
 $CC -c foo.c -o foo.o
@@ -781,10 +780,10 @@ fi
 # 
 
 AC_PATH_XTRA
-echo $X_CFLAGS
-echo $X_LIBS
-echo $X_EXTRA_LIBS
-echo $X_PRE_LIBS
+#echo $X_CFLAGS
+#echo $X_LIBS
+#echo $X_EXTRA_LIBS
+#echo $X_PRE_LIBS
 
 miss=0
 AC_CHECK_LIB(Xmu,main,X_LIBS="$X_LIBS -lXmu",miss=1,$X_LIBS)
@@ -793,10 +792,13 @@ AC_CHECK_LIB(Xext,main,X_LIBS="$X_LIBS -lXext",miss=1,$X_LIBS)
 AC_CHECK_LIB(Xaw,main,X_LIBS="$X_LIBS -lXaw",miss=1,$X_LIBS)
 AC_CHECK_LIB(X11,main,X_LIBS="$X_LIBS -lX11",miss=1,$X_LIBS)
  
+AC_MSG_CHECKING(can compile xgcl)
 if test "$miss" = "1" ; then
 	X_CFLAGS=
 	X_LIBS=
-	echo missing x libraries -- cannot compile xgcl
+	AC_MSG_RESULT(no)
+else
+	AC_MSG_RESULT(yes)
 fi
 
 
@@ -1121,6 +1123,7 @@ AC_TRY_RUN([#include <stdio.h>
 				echo Cannot find object alignent;exit -1,
 				echo Cannot find object alignent;exit -1)
 AC_MSG_RESULT($obj_align)
+AC_DEFINE_UNQUOTED(OBJ_ALIGNMENT,$obj_align)
 
 AC_MSG_CHECKING(for C extension variable alignment)
 AC_TRY_RUN([int main() {

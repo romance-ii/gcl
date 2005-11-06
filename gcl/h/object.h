@@ -88,6 +88,8 @@ typedef unsigned char  uqfixnum;
 #endif
 
 #define NOT_OBJECT_ALIGNED(a_) fobj(a_)->td.emf
+#define ROUNDUP(x_,y_) (((unsigned long)(x_)+(y_ -1)) & ~(y_ -1))
+#define ROUNDDN(x_,y_) (((unsigned long)(x_)) & ~(y_ -1))
 
 #ifndef PAGEWIDTH
 #define PAGEWIDTH 11
@@ -1309,3 +1311,67 @@ EXTER unsigned plong signals_allowed, signals_pending  ;
 #define eql(a_,b_)    ({register object _a=(a_);register object _b=(b_);_a==_b || eql1(_a,_b);})
 #define equal(a_,b_)  ({register object _a=(a_);register object _b=(b_);_a==_b || equal1(_a,_b);})
 #define equalp(a_,b_) ({register object _a=(a_);register object _b=(b_);_a==_b || equalp1(_a,_b);})
+
+extern void *stack_alloc_start,*stack_alloc_end;
+
+
+
+#define stack_alloc_on(n_) ({void *_v=alloca(n_*PAGESIZE+OBJ_ALIGNMENT-1);\
+                             if (_v) {\
+                                stack_alloc_start=(void *)ROUNDUP(_v,OBJ_ALIGNMENT);\
+                                memset(_v,0,stack_alloc_start-_v);\
+                                _v+=n_*PAGESIZE+OBJ_ALIGNMENT-1;\
+                                stack_alloc_end=(void *)ROUNDDN(_v,OBJ_ALIGNMENT);\
+                                memset(stack_alloc_end,0,_v-stack_alloc_end);\
+                             };\
+                           })
+     
+#define stack_alloc_off() ({stack_alloc_start=stack_alloc_end=NULL;})
+            
+#define maybe_alloc_on_stack(n_,t_) ({void *_v=OBJNULL;\
+                                      if (stack_alloc_start) {\
+                                         unsigned _n=ROUNDUP(n_,OBJ_ALIGNMENT);\
+                                         if (stack_alloc_end-stack_alloc_start>_n) {\
+                                           _v=stack_alloc_start;\
+                                           stack_alloc_start+=_n;\
+                                           if (t_>=0) set_type_of(_v,t_);\
+                                         } else stack_alloc_off();\
+                                      }\
+                                      _v;})
+
+
+#define stack_pages_left ({fixnum _val;int _w;\
+                           _val=cs_limit-&_w;\
+                           _val=_val<0 ? -_val : _val;\
+                           _val=(_val>>PAGEWIDTH);})
+
+#define myfork() ({int _p[2],_j=0;pid_t _pid;\
+                   pipe(_p);\
+                   _pid=fork();\
+                   if (!_pid) { \
+                      object _x=sSAchild_stack_allocA->s.s_dbind;\
+                      enum type _tp=type_of(_x);\
+                      float _fac= _tp==t_shortfloat ? sf(_x) : (_tp==t_longfloat ? lf(_x) : 0.8);\
+                      fixnum _n=_fac*stack_pages_left;\
+                      if (_n>0) stack_alloc_on(_n);\
+                      close(0);close(1);close(2);\
+                      _j=1;\
+                   } \
+                   close(_p[1-_j]);\
+		   make_cons(make_fixnum(_pid),make_fixnum(_p[_j]));})
+
+#define make_fd_stream(fd_,mode_,st_,buf_) ({object _x=alloc_object(t_stream);\
+                                            _x->sm.sm_mode=mode_;\
+                                            _x->sm.sm_fp=fdopen(fd_,st_);\
+                                            _x->sm.sm_buffer=buf_;\
+                                            setbuf(_x->sm.sm_fp,_x->sm.sm_buffer);\
+                                            _x->sm.sm_object0=sLcharacter;\
+                                            _x->sm.sm_object1=Cnil;\
+                                            _x->sm.sm_fd=fd_;\
+                                            _x;})
+
+#define writable_ptr(a_) (((void *)(a_)>=DBEGIN && (void *)(a_)<(void *)heap_end) || is_imm_fixnum(a_))
+
+#define write_pointer_object(a_,b_) fSwrite_pointer_object(a_,b_)
+
+#define read_pointer_object(a_) fSread_pointer_object(a_)

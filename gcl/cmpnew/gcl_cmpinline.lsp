@@ -22,6 +22,11 @@
 
 (in-package 'compiler)
 
+(import 'si::proclaimed-arg-types 'compiler)
+(import 'si::proclaimed-return-type 'compiler)
+(import 'si::proclaimed-function 'compiler)
+
+
 ;;; Pass 1 generates the internal form
 ;;;	( id  info-object . rest )
 ;;; for each form encountered.
@@ -445,8 +450,8 @@
   (or (cdr (assoc (promoted-c-type type) +inline-types-alist+)) 'inline))
 
 (defun get-inline-info (fname args return-type &aux x ii)
-  (and  (fast-link-proclaimed-type-p fname args)
-        (add-fast-link fname return-type args))
+;  (and  (fast-link-proclaimed-type-p fname args)
+;        (add-fast-link fname return-type args))
   (setq args (mapcar #'(lambda (form) (info-type (cadr form))) args))
   (when (if *safe-compile*
             (setq x (get fname 'inline-safe))
@@ -458,6 +463,10 @@
         (dolist** (y x)
           (when (setq ii (inline-type-matches fname y args return-type))
                 (return-from get-inline-info ii))))
+
+  (when  (fast-link-proclaimed-type-p fname args)
+    (add-fast-link fname return-type args))
+
   (dolist* (x *inline-functions*)
 	(when (and (eq (car x) fname)
 		   (setq ii (inline-type-matches fname (cdr x) args return-type)))
@@ -475,8 +484,7 @@
 			       (wt "(VFUN_NARGS="(length l) ",")
 			       (wt-inline-loc x l)
 			       (wt ")")))))
-  nil
-  )
+  nil)
 
 (defun inline-type-matches (fname inline-info arg-types return-type
                                         &aux (rts nil))

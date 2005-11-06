@@ -61,6 +61,18 @@
 (push '((character object) fixnum #.(flags set rfa)"(putc(#0,(#1)->sm.sm_fp))")
    (get 'sputc 'inline-unsafe))
 
+;;FORK
+ (push '(() t #.(flags)"myfork()")
+   (get 'si::fork 'inline-unsafe))
+
+;;READ-POINTER-OBJECT
+ (push '((t) t #.(flags ans set)"read_pointer_object(#0)")
+   (get 'si::read-pointer-object 'inline-unsafe))
+
+;;WRITE-POINTER-OBJECT
+ (push '((t t) t #.(flags ans set)"write_pointer_object(#0,#1)")
+   (get 'si::write-pointer-object 'inline-unsafe))
+
 ;;READ-BYTE1
  (push '((t t) t #.(flags ans set)"read_byte1(#0,#1)")
    (get 'read-byte1 'inline-unsafe))

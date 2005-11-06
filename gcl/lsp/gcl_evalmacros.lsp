@@ -356,7 +356,7 @@
   (let ((x (gensym))) 
     `(let ((,x (si::fork))) 
        (if (eql 0 (car ,x)) 
-	   (progn (prin1 ,form (cdr ,x))(bye)) 
+	   (progn (si::write-pointer-object ,form ,x)(bye)) 
 	 ,x))))
 
 (defmacro with-read-values ((i r b) (forms timeout) &body body)
@@ -369,16 +369,17 @@
   `(let* ((,m ,pbm)
 	  (,b (list ,@(mapcar (lambda (x) `(background ,x)) forms))))
      (declare ((integer 0 ,pbm) ,m))
-     (do nil ((= ,m 0))
-	 (let ((,p (si::select-read ,b ,timeout)));;FAILURE code here on 0 return
-	   (declare ((integer 0 ,pbm) ,p))
-	   (do ((,i 0 (1+ ,i))(,j 1 (ash ,j 1)) (,k ,b (cdr ,k))) 
-	       ((= ,i ,pbl) (setq ,m (logandc2 ,m ,p)))
-	       (declare ((integer 0 ,pbl) ,i) ((integer 1 ,(1+ pbm)) ,j))
-	       (when (/= 0 (logand ,j ,p))
-		 (let ((,r (read (cdar ,k))))
-		   (close (cdar ,k))
-		   ,@body))))))))
+     (unwind-protect
+	 (do nil ((= ,m 0))
+	     (let ((,p (si::select-read ,b ,timeout)));;FAILURE code here on 0 return
+	       (declare ((integer 0 ,pbm) ,p))
+	       (do ((,i 0 (1+ ,i))(,j 1 (ash ,j 1)) (,k ,b (cdr ,k))) 
+		   ((= ,i ,pbl) (setq ,m (logandc2 ,m ,p)))
+		   (declare ((integer 0 ,pbl) ,i) ((integer 1 ,(1+ pbm)) ,j))
+		   (when (/= 0 (logand ,j ,p))
+		     (let ((,r (si::read-pointer-object (car ,k))))
+		       ,@body)))))
+       (dolist (,b ,b (cdr ,b)) (si::kill ,b 0))))))
   
 (defmacro p-let (bindings &body body) 
   (let* ((i (gensym)) (r (gensym)) (c (gensym))
@@ -397,7 +398,7 @@
        (with-read-values 
 	(,i ,r ,c) (,forms -1)
 	(unless ,r
-	  (dolist (,c ,c) (si::kill ,c))
+	  (dolist (,c ,c) (si::kill ,c 0))
 	  (return-from ,top nil)))
        t)))
 
@@ -407,6 +408,6 @@
        (with-read-values 
 	(,i ,r ,c) (,forms -1)
 	(when ,r
-	  (dolist (,c ,c) (si::kill ,c))
+	  (dolist (,c ,c) (si::kill ,c 0))
 	  (return-from ,top t)))
        nil)))

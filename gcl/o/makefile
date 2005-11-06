@@ -62,8 +62,8 @@ HFILES	= $(HDIR)/include.h $(CMPINCLUDE_FILES) $(OTHERS)
 # these are made elsewhere...
 MPFILES= 
 
-OBJS	= $(OD)main.o $(OD)alloc.o $(OD)gbc.o \
-	$(OD)bitop.o $(OD)typespec.o $(OD)eval.o \
+OBJS	= $(OD)typespec.o $(OD)alloc.o $(OD)gbc.o \
+	$(OD)bitop.o $(OD)main.o $(OD)eval.o \
 	$(OD)macros.o $(OD)lex.o $(OD)bds.o \
 	$(OD)frame.o $(OD)predicate.o $(OD)reference.o \
 	$(OD)assignment.o $(OD)bind.o $(OD)let.o \

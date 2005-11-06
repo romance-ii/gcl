@@ -266,6 +266,7 @@ SGC is enabled.  */
 
 #undef TYPE_BITS
 #undef OBJ_ALIGN
+#undef OBJ_ALIGNMENT
 #undef NEG_CSTACK_ADDRESS
 #undef STATIC_LINKING
 #undef ADDR_NO_RANDOMIZE

@@ -85,6 +85,7 @@ struct rlimit data_rlimit;
 int reserve_pages_for_signal_handler =30;
 int hole_overrun=0;
 
+void *stack_alloc_start=NULL,*stack_alloc_end=NULL;
 
 /* If  (n >= 0 ) return pointer to n pages starting at heap end,
    These must come from the hole, so if that is exhausted you have
@@ -100,6 +101,7 @@ alloc_page(long n)
 {
 	char *e;
 	long m;
+
 	e = heap_end;
 	if (n >= 0) {
 		if (n >=
@@ -355,9 +357,14 @@ alloc_object(enum type t)
 	 int must_have_more_pages;
 	 unsigned long i;
 
-ONCE_MORE:
 	tm = tm_of(t);
 
+	if ((obj=maybe_alloc_on_stack(tm->tm_size,t))) {
+/* 	  printf("alloc_object %u %u %u %p\n",getpid(),t,tm->tm_size,obj); */
+	  return obj;
+	}
+
+ONCE_MORE:
         CHECK_INTERRUPT;	 
 
 	obj = tm->tm_free;
@@ -433,8 +440,17 @@ make_cons(object a, object d)
 	 int must_have_more_pages;
 	 unsigned long i;
 
+	if ((obj=maybe_alloc_on_stack(tm->tm_size,t_cons))) {
+/* 	  printf("make_cons %u %u %u %p %p %p\n",getpid(),t_cons,tm->tm_size,obj,a,d); */
+	  obj->c.c_car=a;
+	  obj->c.c_cdr=d;
+	  return obj;
+	}
+
+
 ONCE_MORE:
         CHECK_INTERRUPT;
+
 	obj = tm->tm_free;
 	if (obj == OBJNULL) {
 		if (tm->tm_npage >= tm->tm_maxpage)
@@ -504,7 +520,7 @@ object on_stack_cons(object x, object y)
 }
 
 
-DEFUN_NEW("ALLOCATED",object,fSallocated,SI,1,1,NONE,OO,OO,OO,OO,(object typ),"")
+DEFUNM_NEW("ALLOCATED",object,fSallocated,SI,1,1,NONE,OO,OO,OO,OO,(object typ),"")
 { struct typemanager *tm=(&tm_table[t_from_type(typ)]);
   tm = & tm_table[tm->tm_type];
   if (tm->tm_type == t_relocatable)
@@ -563,6 +579,11 @@ alloc_contblock(size_t n) {
 
 	g = FALSE;
 	n = ROUND_UP_PTR_CONT(n);
+
+	if ((p=maybe_alloc_on_stack(n,-1))) {
+/* 	  printf("alloc_contblock %u %d %u %p\n",getpid(),-1,n,p); */
+	  return p;
+	}
 
 ONCE_MORE:
 	CHECK_INTERRUPT;
@@ -726,6 +747,12 @@ alloc_relblock(size_t n) {
 
 	g = FALSE;
 	n = ROUND_UP_PTR(n);
+
+	if ((p=maybe_alloc_on_stack(n,-1))) {
+/* 	  printf("alloc_relblock %u %d %u %p\n",getpid(),-1,n,p); */
+	  return p;
+	}
+
 
 ONCE_MORE:
         CHECK_INTERRUPT;
@@ -1393,7 +1420,7 @@ DEFUN_NEW("GPROF-QUIT",object,fSgprof_quit,SI
 
 #endif
 
-DEFUN_NEW("SET-HOLE-SIZE",object,fSset_hole_size,SI
+DEFUNM_NEW("SET-HOLE-SIZE",object,fSset_hole_size,SI
        ,1,2,NONE,OI,IO,OO,OO,(fixnum npages,...),"")
 {
 

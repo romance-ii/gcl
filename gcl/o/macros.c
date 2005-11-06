@@ -167,7 +167,7 @@ macro_def(object form)
 		return(Cnil);
 }
 
-DEFUNO_NEW("MACROEXPAND",object,fLmacroexpand,LISP
+DEFUNOM_NEW("MACROEXPAND",object,fLmacroexpand,LISP
        ,1,2,NONE,OO,OO,OO,OO,void,Lmacroexpand,(object form,...),"")
 {	int n=VFUN_NARGS;
 	object envir;
