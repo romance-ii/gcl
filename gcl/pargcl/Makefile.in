@@ -14,12 +14,12 @@ SRC_FILES=src/saved_pargcl src/pargcl.sed src/mpi_glue.lsp \
 	  src/slave-listener.lsp src/master-slave.lsp
 
 bin/pargcl: ${SRC_FILES}
-	cd src; make "INSTALL_GCL_DIR=$(DESTDIR)$(INSTALL_LIB_DIR)"
+	cd src; make
 	@ echo ""
 	@ echo This is ParGCL version ${VERSION}, ${UPDATED}.
 
 ${SRC_FILES}:
-	cd src; make "INSTALL_GCL_DIR=$(DESTDIR)$(INSTALL_LIB_DIR)"
+	cd src; make
 	@ echo ""
 	@ echo This is ParGCL version ${VERSION}, ${UPDATED}.
 
