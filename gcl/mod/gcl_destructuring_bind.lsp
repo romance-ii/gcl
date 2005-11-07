@@ -402,6 +402,7 @@
 
 (defmacro destructuring-bind (lambda-list arg-list &rest body)
   "Bind the variables in LAMBDA-LIST to the contents of ARG-LIST."
+  (declare (optimize (safety 1)))
   (let* ((arg-list-name (gensym "ARG-LIST-")))
     (multiple-value-bind
 	(body local-decls)
