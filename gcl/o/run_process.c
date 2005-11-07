@@ -652,7 +652,7 @@ DEFUNO_NEW("SELECT-READ",object,fSselect_read,SI,2,2,NONE,IO,IO,OO,OO,void,siLse
   return (object)mask;
 }
   
-DEFUNO_NEW("WRITE-POINTER-OBJECT",object,fSwrite_pointer_object,SI,2,2,NONE,OO,IO,OO,OO,
+DEFUNO_NEW("WRITE-POINTER-OBJECT",object,fSwrite_pointer_object,SI,2,2,NONE,OO,OO,OO,OO,
 	   void,siLwrite_pointer_object,(object x,object z),"") {
 
   object y;
