@@ -15,6 +15,7 @@ TCL_EXES=gcl-tk/gcl.tcl gcl-tk/gcltkaux$(EXE)
 
 GCL_DVI=gcl-tk.dvi gcl-si.dvi gcl.dvi
 GCL_HTML=gcl-si_toc.html gcl-tk_toc.html gcl_toc.html
+BINSCPT:=gcl
 
 -include makedefs
 
@@ -133,7 +134,7 @@ pargcl_all: $(BUILD_BFD) $(PORTDIR)/$(FLISP) command cmpnew/gcl_collectfn.o \
 	if test "$(PARGCLDIR)" != ""; then \
 	  MGCLDIR=`echo $(GCLDIR) | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
 	  GCLDIR=`echo $(GCLDIR)` ; \
-	  $(MAKE) install_command FLISP=saved_pargcl SYSTEM=pargcl \
+	  $(MAKE) install_command FLISP=saved_pargcl BINSCPT=pargcl \
 	    "INSTALL_LIB_DIR=$$GCLDIR" "prefix=$$GCLDIR" \
 	    "BINDIR=$$MGCLDIR/$(PORTDIR)"; \
 	  (cd $(PARGCLDIR) && $(MAKE)) \
@@ -165,16 +166,16 @@ merge:
 LISP_LIB=clcs/myload1.lisp clcs/gcl_clcs_macros.lisp cmpnew/gcl_collectfn.o cmpnew/gcl_collectfn.lsp lsp/gcl_gprof.lsp lsp/gcl_info.o lsp/gcl_profile.lsp lsp/gcl_export.lsp lsp/gcl_autoload.lsp cmpnew/gcl_cmpmain.lsp cmpnew/gcl_cmpopt.lsp cmpnew/gcl_lfun_list.lsp lsp/gcl_auto_new.lsp h/cmpinclude.h unixport/init_$(SYSTEM).lsp unixport/lib$(SYSTEM).a unixport/libgclp.a gcl-tk/tk-package.lsp $(TK_LISP_LIB) $(RL_LIB) $(FIRST_FILE) $(LAST_FILE) $(addsuffix /sys-proclaim.lisp,lsp cmpnew pcl clcs) unixport/gcl.script
 
 install_command:
-	rm -f bin/$(SYSTEM)
+	rm -f bin/$(BINSCPT)
 	(echo '#!/bin/sh' ; \
 	echo exec $(BINDIR)/$(FLISP)$(EXE) \\ ; \
 	echo '   -dir' $(INSTALL_LIB_DIR)/unixport/ \\ ; \
 	echo '   -libdir' $(INSTALL_LIB_DIR)/ \\ ; \
 	echo '   -eval '\''(setq si::*allow-gzipped-file* t)'\' \\ ;\
 	! [ -d "$(TK_CONFIG_PREFIX)" ] || echo '   -eval '\''(setq si::*tk-library* '\"$(TK_LIBRARY)\"')'\' \\;\
-	echo '     '\"\$$@\" ) > bin/$(SYSTEM);
-	echo '#' other options: -load "/tmp/foo.o" -load "jo.lsp" -eval '"(joe 3)"' >> bin/$(SYSTEM)
-	chmod a+x bin/$(SYSTEM)
+	echo '     '\"\$$@\" ) > bin/$(BINSCPT);
+	echo '#' other options: -load "/tmp/foo.o" -load "jo.lsp" -eval '"(joe 3)"' >> bin/$(BINSCPT)
+	chmod a+x bin/$(BINSCPT)
 
 install_windows_command:
 	rm -f $(prefix)/bin/gcl
@@ -209,12 +210,12 @@ INSTALL_LIB_DIR=
 install1:
 # When the make variables for `${MAKE} install_unix', below, are added
 #  in, please also add them for`${MAKE} pargcl_all
-# Only the FLISP and SYSTEM variables need to be added, to convert to pargcl
+# Only the FLISP and BINSCPT variables need to be added, to convert to pargcl
 	if gcc --version | grep -i mingw >/dev/null 2>&1 ; then \
 		${MAKE} install_windows; \
 	else \
 		${MAKE} install_unix; \
-		${MAKE} pargcl_all FLISP=saved_pargcl SYSTEM=pargcl \
+		${MAKE} pargcl_all FLISP=saved_pargcl BINSCPT=pargcl \
 			 INSTALL_LIB_DIR=$(INSTALL_LIB_DIR) prefix=$(prefix) \
 			 DESTDIR=$(DESTDIR) GCLDIR=$(INSTALL_LIB_DIR); \
 	fi
