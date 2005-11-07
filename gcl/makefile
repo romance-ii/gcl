@@ -18,7 +18,6 @@ GCL_HTML=gcl-si_toc.html gcl-tk_toc.html gcl_toc.html
 
 -include makedefs
 
-
 BINDIR	= bin
 HDIR	= h/
 CDIR	= c
@@ -35,7 +34,7 @@ TESTDIR = ansi-tests
 
 VERSION=`cat majvers`.`cat minvers`
 
-all: $(BUILD_BFD) $(PORTDIR)/$(FLISP) command cmpnew/gcl_collectfn.o lsp/gcl_info.o do-gcl-tk do-info
+all: $(BUILD_BFD) $(PORTDIR)/$(FLISP) command cmpnew/gcl_collectfn.o lsp/gcl_info.o do-gcl-tk do-info pargcl_all
 
 ASRC:=$(shell ls -1 o/*.c o/*.d o/*.h h/*.h lsp/*.lsp cmpnew/*.lsp mod/*.lsp pcl/*sp clcs/*sp)
 TAGS: $(ASRC)
@@ -123,34 +122,32 @@ gmp_all: $(GMPDIR)/Makefile
 $(GMPDIR)/mpn/mul_n.o $(GMPDIR)/mpn/lshift.o $(GMPDIR)/mpn/rshift.o: $(GMPDIR)/Makefile
 	cd $(@D) && $(MAKE) $(@F)
 
-# This target can only be made once gcl is _installed_ in ${prefix}.
-pargcl_all:
+# This target can only be made once gcl exists.
+# So, the dependencies here should match those of "all", except for pargcl_all.
+# By setting make variables, pargcl_all should work for build, and for install
+pargcl_all: $(BUILD_BFD) $(PORTDIR)/$(FLISP) command cmpnew/gcl_collectfn.o \
+		lsp/gcl_info.o do-gcl-tk do-info
+	# MINSTALL_LIB_DIR=`echo $(INSTALL_LIB_DIR) | sed -e 'sX^\([a-z]\):X/\1Xg'`
+	# $(MAKE) install_command "INSTALL_LIB_DIR=$(INSTALL_LIB_DIR)" "prefix=$(prefix)" "DESTDIR=$(DESTDIR)" "BINDIR=$$MINSTALL_LIB_DIR/unixport"
+	# Logic copied from `command' target, but with FLISP modified:
 	if test "$(PARGCLDIR)" != ""; then \
-	  cd $(PARGCLDIR) \
-	    && $(MAKE) "INSTALL_GCL_DIR=$(DESTDIR)$(INSTALL_LIB_DIR)"; \
-	# gene - $(INSTALL_GLC_DIR) not yet used by ParGCL.  Also, ParGCL currently
-	#   calls bin/gcl in make of ParGCL, and finds it with --with-gcl=
-	#   ParGCL should create bin/pargcl that differs from bin/gcl only in
-	#     saved_gcl -> saved_pargcl and pargcl.sed is used.
-	#  But do that only if this is GCL install;  Else keep original bin/pargcl
-	#  Can even produce both pargcl/bin/pargcl and $(INSTALL_GCL_DIR)/bin/pargcl
-	# We imitate the install logic of install_unix target of this makefile
-	if test "$(PARGCLDIR)" != ""; then \
-		&& mv $(PARGCLDIR)/src/saved_pargcl \
-		      $(DESTDIR)$(INSTALL_LIB_DIR)/$(PORTDIR)/saved_pargcl \
-		&& cp $(PARGCLDIR)/bin/pargcl \
-		      $(DESTDIR)$(INSTALL_LIB_DIR)/bin/pargcl; \
-		cd $(DESTDIR)$(INSTALL_LIB_DIR)/$(PORTDIR) \
-		&& mv saved_pargcl temp$(EXE) \
-		&& echo '(reset-sys-paths "$(INSTALL_LIB_DIR)/")' \
-			' (si::save-system "saved_pargcl")' | ./temp$(EXE) \
-		&& rm -f temp$(EXE); \
-	fi
-	  echo '#';
-	  echo '#';
-	  echo '# ParGCL built.  To test it:  cd pargcl/bin; ./pargcl ';
-	  echo '#';
-	  echo '#';
+	  MGCLDIR=`echo $(GCLDIR) | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
+	  GCLDIR=`echo $(GCLDIR)` ; \
+	  $(MAKE) install_command FLISP=saved_pargcl SYSTEM=pargcl \
+	    "INSTALL_LIB_DIR=$$GCLDIR" "prefix=$$GCLDIR" \
+	    "BINDIR=$$MGCLDIR/$(PORTDIR)"; \
+	  (cd $(PARGCLDIR) && $(MAKE)) \
+	  && cp ${PARGCLDIR}/src/saved_pargcl unixport/ \
+	  && cd unixport \
+	  && mv saved_pargcl temp$(EXE) \
+	  && echo '(reset-sys-paths "$(GCLDIR)/")' \
+		  ' (si::save-system "saved_pargcl")' | ./temp$(EXE) \
+	  && echo '#' \
+	  && echo '#' \
+	  && echo '# ParGCL built.  To test it:  cd bin; ./pargcl ' \
+	  && echo '#' \
+	  && echo '#' ; \
+	  rm -f temp$(EXE); \
 	fi
 
 command:
@@ -158,7 +155,6 @@ command:
 	MGCLDIR=`echo $(GCLDIR) | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
 	GCLDIR=`echo $(GCLDIR)` ; \
 	$(MAKE) install_command "INSTALL_LIB_DIR=$$GCLDIR" "prefix=$$GCLDIR" "BINDIR=$$MGCLDIR/$(PORTDIR)"
-	false && echo "NOT READY TO TEST IT YET" && $(MAKE) pargcl_all
 	(cd xbin ; cp ../bin/gcl .)
 
 #	GCLDIR=`echo $(GCLDIR) | sed -e 'sX^/cygdrive/\([a-z]\)X\1!Xg' -e 'sX^//\([a-z]\)X\1!Xg'` ; \
@@ -169,16 +165,16 @@ merge:
 LISP_LIB=clcs/myload1.lisp clcs/gcl_clcs_macros.lisp cmpnew/gcl_collectfn.o cmpnew/gcl_collectfn.lsp lsp/gcl_gprof.lsp lsp/gcl_info.o lsp/gcl_profile.lsp lsp/gcl_export.lsp lsp/gcl_autoload.lsp cmpnew/gcl_cmpmain.lsp cmpnew/gcl_cmpopt.lsp cmpnew/gcl_lfun_list.lsp lsp/gcl_auto_new.lsp h/cmpinclude.h unixport/init_$(SYSTEM).lsp unixport/lib$(SYSTEM).a unixport/libgclp.a gcl-tk/tk-package.lsp $(TK_LISP_LIB) $(RL_LIB) $(FIRST_FILE) $(LAST_FILE) $(addsuffix /sys-proclaim.lisp,lsp cmpnew pcl clcs) unixport/gcl.script
 
 install_command:
-	rm -f bin/gcl
+	rm -f bin/$(SYSTEM)
 	(echo '#!/bin/sh' ; \
 	echo exec $(BINDIR)/$(FLISP)$(EXE) \\ ; \
 	echo '   -dir' $(INSTALL_LIB_DIR)/unixport/ \\ ; \
 	echo '   -libdir' $(INSTALL_LIB_DIR)/ \\ ; \
 	echo '   -eval '\''(setq si::*allow-gzipped-file* t)'\' \\ ;\
 	! [ -d "$(TK_CONFIG_PREFIX)" ] || echo '   -eval '\''(setq si::*tk-library* '\"$(TK_LIBRARY)\"')'\' \\;\
-	echo '     '\"\$$@\" ) > bin/gcl;
-	echo '#' other options: -load "/tmp/foo.o" -load "jo.lsp" -eval '"(joe 3)"' >> bin/gcl
-	chmod a+x bin/gcl
+	echo '     '\"\$$@\" ) > bin/$(SYSTEM);
+	echo '#' other options: -load "/tmp/foo.o" -load "jo.lsp" -eval '"(joe 3)"' >> bin/$(SYSTEM)
+	chmod a+x bin/$(SYSTEM)
 
 install_windows_command:
 	rm -f $(prefix)/bin/gcl
@@ -208,12 +204,20 @@ install_windows_command:
 
 install: all
 	$(MAKE) install1 "INSTALL_LIB_DIR=$(prefix)/lib/gcl-`cat majvers`.`cat minvers`" "prefix=$(prefix)" "DESTDIR=$(DESTDIR)"
+
 INSTALL_LIB_DIR=
 install1:
+# When the make variables for `${MAKE} install_unix', below, are added
+#  in, please also add them for`${MAKE} pargcl_all
+# Only the FLISP and SYSTEM variables need to be added, to convert to pargcl
 	if gcc --version | grep -i mingw >/dev/null 2>&1 ; then \
-		make install_windows; \
+		${MAKE} install_windows; \
 	else \
-		make install_unix ; fi
+		${MAKE} install_unix; \
+		${MAKE} pargcl_all FLISP=saved_pargcl SYSTEM=pargcl \
+			 INSTALL_LIB_DIR=$(INSTALL_LIB_DIR) prefix=$(prefix) \
+			 DESTDIR=$(DESTDIR) GCLDIR=$(INSTALL_LIB_DIR); \
+	fi
 
 install_unix:
 	mkdir -p $(DESTDIR)$(prefix)/lib 
@@ -229,7 +233,6 @@ install_unix:
 		echo '(reset-sys-paths "$(INSTALL_LIB_DIR)/")\
 		      (si::save-system "$(FLISP)$(EXE)")' | ./temp$(EXE) && \
 		rm -f temp$(EXE)
-	false && echo "NOT READY TO TEST IT YET" && $(MAKE) pargcl_all
 	if [ -e "unixport/rsym$(EXE)" ] ; then cp unixport/rsym$(EXE) $(DESTDIR)$(INSTALL_LIB_DIR)/unixport/ ; fi
 #	ln $(SYMB) $(INSTALL_LIB_DIR)/$(PORTDIR)/$(FLISP)$(EXE) \
 #	 $(DESTDIR)$(prefix)/bin/gcl.exe
@@ -302,8 +305,10 @@ gclclean:
 
 
 clean: gclclean
-	-(cd $(GMPDIR) ; $(MAKE) distclean)
+	-cd $(GMPDIR) && $(MAKE) distclean
 	rm -rf $(GMPDIR)/.deps $(GMPDIR)/libgmp.a
+	-cd $(PARGCLDIR) && $(MAKE) distclean
+	rm -f unixport/saved_pargcl bin/pargcl
 	-cd binutils/bfd && $(MAKE) distclean
 	-cd binutils/libiberty && $(MAKE) distclean
 
