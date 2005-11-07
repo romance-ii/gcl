@@ -1188,7 +1188,7 @@ DEFUNO_NEW("APPLY",object,fLapply,LISP
       }
 	
 
-DEFUNO_NEW("EVAL",object,fLeval,LISP
+DEFUNOM_NEW("EVAL",object,fLeval,LISP
        ,1,1,NONE,OO,OO,OO,OO,void,Leval,(object x0),"")
 {
 	object *lex = lex_env;
