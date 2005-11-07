@@ -99,7 +99,8 @@
 (defmacro DEFPACKAGE (name &rest options)
   (declare (type (or symbol string) name)
 	   (arglist defined-package-name &rest options)
-	   (values package))
+	   (values package)
+	   (optimize (safety 1)))
   "DEFPACKAGE - DEFINED-PACKAGE-NAME {OPTION}*			[Macro]
 
    This creates a new package, or modifies an existing one, whose name is
