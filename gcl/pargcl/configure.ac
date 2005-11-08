@@ -7,7 +7,7 @@ dnl Set version number
 PARGCL_VERSION=0.9.7
 PARGCL_UPDATED="November, 2005"
 
-dnl Checks for programs.
+# Checks for programs.
 AC_PROG_CC
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
@@ -23,9 +23,15 @@ LIBSFORSOCKETS="$LIBS"
 dnl AC_CHECK_LIB(efence, malloc, LIBEFENCE=-lefence, LIBEFENCE= )
 LIBS=
 
-AC_CHECK_LIB(pthread, pthread_create)
+AC_CHECK_FUNC([nanosleep], , AC_CHECK_LIB([rt], [nanosleep]))
+LIBSFORSLEEP="$LIBS"
+LIBS=
+
+AC_CHECK_LIB([pthread], [pthread_create])
 LIBSFORPTHREAD="$LIBS"
-AC_CHECK_LIB(posix4, sem_init)
+LIBS=
+
+AC_CHECK_LIB([posix4], [sem_init])
 LIBSFORPTHREAD="$LIBSFORPTHREAD $LIBS"
 
 dnl LIBS="$LIBSFORSOCKETS $LIBSFORPTHREAD"
@@ -52,9 +58,9 @@ AC_ARG_WITH(gcl,
 , with_gcl=no)
 with_gcl=`echo $with_gcl | sed -e "s#^../#$PWD/../#"`
 
-AC_ARG_WITH(gcl-dir,
-[  --with-gcl-dir=PATH     usually defaults correctly, specifies GCL source dir],
-, with_gcl_dir=no)
+AC_ARG_WITH(gcl-build-dir,
+[  --with-gcl-build-dir=PATH not needed unless GCL not yet built],
+, with_gcl_build_dir=no)
 
 AC_ARG_WITH(mpicc,
 [  --with-mpicc=PATH       if don't want built-in MPI, define path to mpicc],
@@ -82,20 +88,24 @@ dnl # Do all of this for MPICXX also
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS(fcntl.h limits.h sys/time.h unistd.h)
-AC_CHECK_HEADERS(pthread.h semaphore.h)
+AC_CHECK_HEADERS([fcntl.h netdb.h netinet/in.h stdlib.h string.h sys/socket.h sys/time.h unistd.h])
+AC_CHECK_HEADERS([pthread.h semaphore.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
 AC_HEADER_TIME
+AC_C_VOLATILE
 
 dnl Checks for library functions.
-AC_FUNC_MMAP
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
+AC_FUNC_SELECT_ARGTYPES
 AC_TYPE_SIGNAL
+AC_FUNC_STAT
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS(getcwd gethostname select socket strcspn strdup strerror strtol)
+AC_CHECK_FUNCS([alarm getcwd gethostbyname gethostname gettimeofday memset select socket strchr strerror])
 
 dnl Erase old @DEFS@ and add to it
 rm -rf conftest* confdefs.h
@@ -122,10 +132,6 @@ dnl   '(write (concatenate (quote string) (car *load-path*) "..") :escape nil)'`
 if test "x$with_gcl" = "xno"; then
   with_gcl=`which gcl`
 fi
-if test ! -x "$with_gcl"; then
-  AC_MSG_ERROR(Couldn't find gcl command
-    Use ./configure --with-gcl= to specify location of gcl command );
-fi
 
 dnl libdir=`$with_gcl -batch -eval '(progn (format t *lib-directory*) (quit))'`
 dnl # Check if we have correct lib directory
@@ -135,12 +141,18 @@ dnl     Bad parameter given to ./configure --with-gcl= );
 dnl fi
 
 GCL=$with_gcl
-if test "$with_gcl_dir" = "no"; then
+if test "$with_gcl_build_dir" = "no"; then
   GCL_SRC=`$with_gcl -batch \
                      -eval '(progn (write *lib-directory* :escape nil) (quit))'`
   GCL_SRC=`echo $GCL_SRC | sed -e s'#"##g'`
 else
-  GCL_SRC=$with_gcl_dir
+  GCL_SRC=$with_gcl_build_dir
+fi
+
+# If user specifies with_gcl__build_dir, then with_gcl does not yet exist.
+if test ! -x "$with_gcl" -a "x$with_gcl_build_dir" = "xno"; then
+  AC_MSG_ERROR(Couldn't find gcl command
+    Use ./configure --with-gcl= to specify location of gcl command );
 fi
 
 dnl Substitute shell variables
@@ -151,6 +163,7 @@ AC_SUBST(GCL_SRC)
 AC_SUBST(PWD)
 AC_SUBST(HOSTNAME)
 AC_SUBST(LIBSFORSOCKETS)
+AC_SUBST(LIBSFORSLEEP)
 AC_SUBST(LIBSFORPTHREAD)
 AC_SUBST(LIBSFORMPI)
 AC_SUBST(CFLAGS_FOR_POSIX_1C)
@@ -161,10 +174,10 @@ AC_SUBST(STRIP)
 AC_SUBST(MPICC)
 AC_SUBST(MPICXX)
 
-AC_OUTPUT(src/Makefile
-	  src/mpinu/Makefile src/mpinu/procgroup
-          bin/procgroup bin/mpinucc Makefile
-         )
+AC_CONFIG_FILES([src/Makefile
+		 src/mpinu/Makefile src/mpinu/procgroup
+		 bin/procgroup bin/mpinucc Makefile])
+AC_OUTPUT
 chmod a+x bin/mpinucc
 
 dnl --enable-batch not currently among our configure options

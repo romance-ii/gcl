@@ -1586,7 +1586,7 @@ AC_SUBST(HAVE_LONG_LONG)
 
 # readline
 AC_ARG_ENABLE(readline,
-[  --enable-readline     enables command line completion via the
+[ --enable-readline      enables command line completion via the
                          readline library ],
 ,enable_readline="yes")
 
@@ -1601,8 +1601,8 @@ fi
 
 # ParGCL (includes MPINU)
 AC_ARG_ENABLE(pargcl,
-[  --enable-pargcl       enables ParGCL, including MPI subset
-                         (see pargcl/doc/)],
+[ --enable-pargcl        enables ParGCL (for parallel computing),
+			 including subset of MPI (see pargcl/doc/)],
 ,enable_pargcl="no")
 AC_ARG_WITH(mpicc,
 [  --with-mpicc=PATH       define path to mpicc (default is built-in MPI subset)],
@@ -1622,9 +1622,9 @@ if test "$enable_pargcl" != "no" ; then
 	 echo "#"
 	 echo "#"
 
-	 PARGCL_GCLDIR=${prefix}
+	 PARGCL_GCLDIR=`pwd`
 	 ( cd $PARGCLDIR && ./configure --with-gcl=$PARGCL_GCLDIR/bin/gcl \
-	               --with-gcl-dir=$PARGCL_GCLDIR --with-mpicc=$with_mpicc )
+	        --with-gcl-build-dir=$PARGCL_GCLDIR --with-mpicc=$with_mpicc )
 	#MY_SUBDIRS="$MY_SUBDIRS $PARGCLDIR" 
 
 	 echo "#"
@@ -1639,7 +1639,7 @@ fi
 
 # ansi lisp
 AC_ARG_ENABLE(ansi,
-[  --enable-ansi         builds a large gcl aiming for ansi compliance, 
+[ --enable-ansi          builds a large gcl aiming for ansi compliance, 
 		         --disable-ansi builds the smaller
 			 traditional CLtL1 image],
 ,enable_ansi="no")
