@@ -1,4 +1,8 @@
 (help 'xxx) not working in ParGCL.  Why?
+(It does seem to work in ParGCL, but (help 'mapcar) doesn't seem
+  to work at the moment -- even in gcl.  However, (help 'dolist) works.)
+
+Check --enable-ansi, and port to that if needed.
 
 slave-listener not in MPI package.  Why?
 
@@ -11,6 +15,8 @@ Should catch interrupts with signal so that (receive-message ...)
 won't block indefinitely when there's no message to receive.
 
 Check if par-reset is stable, or can it corrupt the session?
+
+Test --with-mpicc using other MPI dialects
 
 Note also (getcwd) [STILL TRUE?]:
 (getcwd) => reports too many allocated blocks ??

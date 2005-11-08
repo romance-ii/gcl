@@ -136,7 +136,11 @@ pargcl_all: $(BUILD_BFD) $(PORTDIR)/$(FLISP) command cmpnew/gcl_collectfn.o \
 	  GCLDIR=`echo $(GCLDIR)` ; \
 	  $(MAKE) install_command FLISP=saved_pargcl BINSCPT=pargcl \
 	    "INSTALL_LIB_DIR=$$GCLDIR" "prefix=$$GCLDIR" \
-	    "BINDIR=$$MGCLDIR/$(PORTDIR)"; \
+	    "BINDIR=$$MGCLDIR/$(PORTDIR)" \
+	  && cat bin/pargcl \
+	  	| sed -f $(PARGCLDIR)/src/pargcl.sed > bin/pargcl_temp \
+	  && mv -f bin/pargcl_temp bin/pargcl \
+	  && chmod a+x bin/pargcl ; \
 	  (cd $(PARGCLDIR) && $(MAKE)) \
 	  && cp ${PARGCLDIR}/src/saved_pargcl unixport/ \
 	  && cd unixport \
