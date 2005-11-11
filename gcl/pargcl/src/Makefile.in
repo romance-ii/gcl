@@ -39,11 +39,7 @@ LSP_FILES = ${SRCDIR}/mpi_glue.lsp ${SRCDIR}/mpi_defglue.lsp \
 	  cat `which ${GCL}` | \
 	  sed -e "s%[^ ]*saved_[^ ]*%$$tmp/saved_pargcl%g" | \
 	  sed -f pargcl.sed \
-<<<<<<< Makefile.in
 	  > ../bin/par@GCL_SCRIPT@
-=======
-	  > ../bin/par`basename ${GCL}`
->>>>>>> 1.6
 #	if [ ! -s par`basename ${GCL}` ]
 #	then
 #	echo "echo This does not work if .cshrc prints to stdout" > par${GCL}
