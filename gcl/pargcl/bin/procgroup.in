@@ -2,8 +2,8 @@
 # @configure_input@
 
 local 0
-localhost 1 @PWD@/bin/pargcl
-localhost 1 @PWD@/bin/pargcl
+localhost 1 @PWD@/bin/par@GCL_SCRIPT@
+localhost 1 @PWD@/bin/par@GCL_SCRIPT@
 # localhost 1 pargapmpi
 
 # The general format is that "local 0" implies creation of a master.

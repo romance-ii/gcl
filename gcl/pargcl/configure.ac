@@ -4,7 +4,7 @@ dnl Process this file with autoconf to produce a configure script.
 AC_INIT(src/mpi_defglue.lsp)
 
 dnl Set version number
-PARGCL_VERSION=0.9.7
+PARGCL_VERSION=0.9.8
 PARGCL_UPDATED="November, 2005"
 
 # Checks for programs.
@@ -141,6 +141,7 @@ dnl     Bad parameter given to ./configure --with-gcl= );
 dnl fi
 
 GCL=$with_gcl
+GCL_SCRIPT=`basename $with_gcl`
 if test "$with_gcl_build_dir" = "no"; then
   GCL_SRC=`$with_gcl -batch \
                      -eval '(progn (write *lib-directory* :escape nil) (quit))'`
@@ -160,6 +161,7 @@ AC_SUBST(PARGCL_VERSION)
 AC_SUBST(PARGCL_UPDATED)
 AC_SUBST(GCL)
 AC_SUBST(GCL_SRC)
+AC_SUBST(GCL_SCRIPT)
 AC_SUBST(PWD)
 AC_SUBST(HOSTNAME)
 AC_SUBST(LIBSFORSOCKETS)

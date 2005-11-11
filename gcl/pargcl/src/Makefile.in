@@ -25,7 +25,7 @@ LSP_FILES = ${SRCDIR}/mpi_glue.lsp ${SRCDIR}/mpi_defglue.lsp \
 	${SRCDIR}/slave-listener.lsp ${SRCDIR}/master-slave.lsp
 
 
-../bin/pargcl: saved_pargcl pargcl.sed
+../bin/par@GCL_SCRIPT@: saved_pargcl pargcl.sed
 # Bug: If line ends in {non-whitespace}\^J  (no space at end), "\" is absorbed
 #      IBM Rios didn't seem to recognize [^ \]
 #   `which ${GCL}` adds extra characters if "source .cshrc" prints to stdout
@@ -39,7 +39,11 @@ LSP_FILES = ${SRCDIR}/mpi_glue.lsp ${SRCDIR}/mpi_defglue.lsp \
 	  cat `which ${GCL}` | \
 	  sed -e "s%[^ ]*saved_[^ ]*%$$tmp/saved_pargcl%g" | \
 	  sed -f pargcl.sed \
+<<<<<<< Makefile.in
+	  > ../bin/par@GCL_SCRIPT@
+=======
 	  > ../bin/par`basename ${GCL}`
+>>>>>>> 1.6
 #	if [ ! -s par`basename ${GCL}` ]
 #	then
 #	echo "echo This does not work if .cshrc prints to stdout" > par${GCL}
@@ -108,9 +112,10 @@ saved_prepargcl: mpi_glue.o ${LIBDIR}/libmpi.a
 	  '  (setq *libmpi* ' \
 	  '    "${LIBDIR}/libmpi.a @LIBSFORSOCKETS@ @LIBSFORPTHREAD@"))' \
 	  '(format t "Linking MPI to GCL ...~%")' \
-	  '(compiler::link (list "mpi_glue.o") "saved_prepargcl"' \
-	     ' nil' \
-	     ' *libmpi* t)' | ${GCL} \
+	  '(if (not (compiler::link (list "mpi_glue.o") "saved_prepargcl"' \
+	  '         nil *libmpi* t))' \
+	  '     (progn (delete-file "saved_prepargcl") "LINK FAILED"))' \
+	  | ${GCL} \
 	  || ( echo "CHECK IF FULL GCL SOURCE DISTRIBUTION AVAILABLE" ; false )
 saved_pargcl: saved_prepargcl mpi_glue.o \
 		${SRCDIR}/slave-listener.lsp ${SRCDIR}/master-slave.lsp

@@ -13,7 +13,7 @@ INCLUDEDIR=@PWD@/include
 SRC_FILES=src/saved_pargcl src/pargcl.sed src/mpi_glue.lsp \
 	  src/slave-listener.lsp src/master-slave.lsp
 
-bin/pargcl: ${SRC_FILES}
+bin/par@GCL_SCRIPT@: ${SRC_FILES}
 	cd src; make
 	@ echo ""
 	@ echo This is ParGCL version ${VERSION}, ${UPDATED}.
@@ -23,7 +23,7 @@ ${SRC_FILES}:
 	@ echo ""
 	@ echo This is ParGCL version ${VERSION}, ${UPDATED}.
 
-check: bin/pargcl
+check: bin/par@GCL_SCRIPT@
 	cd bin; echo '(progn ' \
 		       '(par-load "../examples/example-mpi.lsp") ' \
 		       '(print (par-find-one-factor-mpi 987654321)) ' \
@@ -36,7 +36,7 @@ check: bin/pargcl
 		       '(par-load "../examples/par-mapcar.lsp") ' \
 		       "(print (par-mapcar #'sqrt '(1 2 3 4 5 6 7 8 9 10))) " \
 		       '(quit))' \
-		       | ./pargcl
+		       | ./par@GCL_SCRIPT@
 
 clean:
 	rm -f *~
@@ -46,7 +46,7 @@ clean:
 	cd ${SRCDIR}/mpinu; make clean
 
 distclean: clean
-	rm -f ${LIBDIR}/libmpi.a ${INCLUDEDIR}/mpi.h ${BINDIR}/pargcl
+	rm -f ${LIBDIR}/libmpi.a ${INCLUDEDIR}/mpi.h ${BINDIR}/par@GCL_SCRIPT@
 	rm -f ${BINDIR}/mpinucc
 	rm config.*
 	rm -f src/Makefile src/saved_pargcl \

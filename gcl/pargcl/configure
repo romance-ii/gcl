@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT LN_S SET_MAKE RANLIB ac_ct_RANLIB CPP EGREP LIBOBJS PARGCL_VERSION PARGCL_UPDATED GCL GCL_SRC PWD HOSTNAME LIBSFORSOCKETS LIBSFORSLEEP LIBSFORPTHREAD LIBSFORMPI CFLAGS_FOR_POSIX_1C HAVE_PTHREAD LIBEFENCE STRIP_LIBS STRIP MPICC MPICXX LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT LN_S SET_MAKE RANLIB ac_ct_RANLIB CPP EGREP LIBOBJS PARGCL_VERSION PARGCL_UPDATED GCL GCL_SRC GCL_SCRIPT PWD HOSTNAME LIBSFORSOCKETS LIBSFORSLEEP LIBSFORPTHREAD LIBSFORMPI CFLAGS_FOR_POSIX_1C HAVE_PTHREAD LIBEFENCE STRIP_LIBS STRIP MPICC MPICXX LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1292,7 +1292,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-PARGCL_VERSION=0.9.7
+PARGCL_VERSION=0.9.8
 PARGCL_UPDATED="November, 2005"
 
 # Checks for programs.
@@ -5685,6 +5685,7 @@ fi
 
 
 GCL=$with_gcl
+GCL_SCRIPT=`basename $with_gcl`
 if test "$with_gcl_build_dir" = "no"; then
   GCL_SRC=`$with_gcl -batch \
                      -eval '(progn (write *lib-directory* :escape nil) (quit))'`
@@ -5701,6 +5702,7 @@ echo "$as_me: error: Couldn't find gcl command
     Use ./configure --with-gcl= to specify location of gcl command " >&2;}
    { (exit 1); exit 1; }; };
 fi
+
 
 
 
@@ -6379,6 +6381,7 @@ s,@PARGCL_VERSION@,$PARGCL_VERSION,;t t
 s,@PARGCL_UPDATED@,$PARGCL_UPDATED,;t t
 s,@GCL@,$GCL,;t t
 s,@GCL_SRC@,$GCL_SRC,;t t
+s,@GCL_SCRIPT@,$GCL_SCRIPT,;t t
 s,@PWD@,$PWD,;t t
 s,@HOSTNAME@,$HOSTNAME,;t t
 s,@LIBSFORSOCKETS@,$LIBSFORSOCKETS,;t t
