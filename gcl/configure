@@ -10515,36 +10515,6 @@ else
   with_mpicc=no
 fi;
 
-if test "$enable_pargcl" != "no" ; then
-
-	 echo "$as_me:$LINENO: checking enable_pargcl=yes, doing configure in pargcl directory" >&5
-echo $ECHO_N "checking enable_pargcl=yes, doing configure in pargcl directory... $ECHO_C" >&6
-	 if test -d pargcl; then
-	   PARGCLDIR=pargcl
-	 fi
-	 echo
-	 echo "#"
-	 echo "#"
-	 echo "# -------------------"
-	 echo "# Subconfigure of ParGCL"
-	 echo "#"
-	 echo "#"
-
-	 PARGCL_GCLDIR=`pwd`
-	 ( cd $PARGCLDIR && ./configure --with-gcl=$PARGCL_GCLDIR/bin/gcl \
-	        --with-gcl-build-dir=$PARGCL_GCLDIR --with-mpicc=$with_mpicc )
-	#MY_SUBDIRS="$MY_SUBDIRS $PARGCLDIR"
-
-	 echo "#"
-	 echo "#"
-	 echo "#"
-	 echo "# Subconfigure of ParGCL done"
-	 echo "# ------------------------"
-	 echo "#"
-
-
-fi
-
 # ansi lisp
 # Check whether --enable-ansi or --disable-ansi was given.
 if test "${enable_ansi+set}" = set; then
@@ -10564,6 +10534,37 @@ _ACEOF
 else
 	SYSTEM=gcl
 	CLSTANDARD=CLtL1
+fi
+
+if test "$enable_pargcl" != "no" ; then
+
+	 echo "$as_me:$LINENO: checking enable_pargcl=yes, doing configure in pargcl directory" >&5
+echo $ECHO_N "checking enable_pargcl=yes, doing configure in pargcl directory... $ECHO_C" >&6
+	 if test -d pargcl; then
+	   PARGCLDIR=pargcl
+	 fi
+	 echo
+	 echo "#"
+	 echo "#"
+	 echo "# -------------------"
+	 echo "# Subconfigure of ParGCL"
+	 echo "#"
+	 echo "#"
+
+	 #SYSTEM is either gcl or ansi_gcl.  This must come after def of SYSTEM
+	 PARGCL_GCLDIR=`pwd`
+	 ( cd $PARGCLDIR && ./configure --with-gcl=$PARGCL_GCLDIR/bin/$SYSTEM \
+	        --with-gcl-build-dir=$PARGCL_GCLDIR --with-mpicc=$with_mpicc )
+	#MY_SUBDIRS="$MY_SUBDIRS $PARGCLDIR"
+
+	 echo "#"
+	 echo "#"
+	 echo "#"
+	 echo "# Subconfigure of ParGCL done"
+	 echo "# ------------------------"
+	 echo "#"
+
+
 fi
 
 FLISP="saved_$SYSTEM"

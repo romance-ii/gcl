@@ -140,7 +140,10 @@ pargcl_all: $(BUILD_BFD) $(PORTDIR)/$(FLISP) command cmpnew/gcl_collectfn.o \
 	  && cat bin/pargcl \
 	  	| sed -f $(PARGCLDIR)/src/pargcl.sed > bin/pargcl_temp \
 	  && mv -f bin/pargcl_temp bin/pargcl \
-	  && chmod a+x bin/pargcl ; \
+	  && chmod a+x bin/pargcl \
+	  && cat $(PARGCLDIR)/bin/procgroup \
+	  	| sed -e s^pargcl/bin/par^bin/par^ \
+		| sed -e s^bin/par${SYSTEM}^bin/pargcl^ > bin/procgroup ; \
 	  (cd $(PARGCLDIR) && $(MAKE)) \
 	  && cp ${PARGCLDIR}/src/saved_pargcl unixport/ \
 	  && cd unixport \
@@ -313,7 +316,7 @@ clean: gclclean
 	-cd $(GMPDIR) && $(MAKE) distclean
 	rm -rf $(GMPDIR)/.deps $(GMPDIR)/libgmp.a
 	-cd $(PARGCLDIR) && $(MAKE) distclean
-	rm -f unixport/saved_pargcl bin/pargcl
+	rm -f unixport/saved_pargcl bin/pargcl bin/procgroup
 	-cd binutils/bfd && $(MAKE) distclean
 	-cd binutils/libiberty && $(MAKE) distclean
 
