@@ -1481,6 +1481,7 @@ FFN(siLroom_report)(void) {
   vs_push(make_fixnum(nrbpage));
   vs_push(make_fixnum(rbgbccount));
   for (i = 0;  i < (int)t_end;  i++) {
+    vs_check_push(make_simple_string(tm_table[i].tm_name+1));
     if (tm_table[i].tm_type == (enum type)i) {
       vs_check_push(make_fixnum(TM_NUSED(tm_table[i])));
       vs_push(make_fixnum(tm_table[i].tm_nfree+tm_table[i].tm_alt_nfree));
@@ -1490,7 +1491,7 @@ FFN(siLroom_report)(void) {
       vs_push(make_fixnum(tm_table[i].tm_size/sizeof(fixnum)));
     } else {
       vs_check_push(Cnil);
-      vs_push(make_fixnum(tm_table[i].tm_type));
+      vs_push(make_simple_string(tm_of(i)->tm_name+1));
       vs_push(Cnil);
       vs_push(Cnil);
       vs_push(Cnil);

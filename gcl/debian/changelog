@@ -133,8 +133,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
     stack using a generic value holding structure
   * FIXME write unreadable objects from children using an extended
     fasdump format
+  * fix room report gc type anomaly
 
- -- Camm Maguire <camm@enhanced.com>  Sun,  6 Nov 2005 17:49:19 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 12 Nov 2005 18:33:26 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

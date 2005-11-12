@@ -240,16 +240,6 @@
 ;(defun allocated-relocatable-pages ()
 ;  (si::nrbpage))
 
-;; FIXME  This has to come straight from enum.h. CM 20050114
-(defvar *type-list*
-        '(cons
-          fixnum bignum ratio short-float long-float complex
-          character symbol package hash-table
-          array vector string bit-vector
-          structure stream random-state readtable pathname
-          cfun cclosure sfun gfun vfun afun closure cfdata spice))
-
-
 (defun heaprep nil
   
   (let ((f (list
@@ -285,17 +275,16 @@
           rbused (nth 7 l) rbfree (nth 8 l) nrbpage (nth 9 l)
           rbgbccount (nth 10 l)
           l (nthcdr 11 l))
-    (do ((l l (nthcdr 6 l))
-         (tl *type-list* (cdr tl))
-         (i 0 (+ i (if (nth 2 l) (nth 2 l) 0))))
+    (do ((l l (nthcdr 7 l))
+         (i 0 (+ i (if (nth 3 l) (nth 3 l) 0))))
         ((null l) (setq npage i))
-      (let ((typename (car tl))
-            (nused (nth 0 l))
-            (nfree (nth 1 l))
-            (npage (nth 2 l))
-            (maxpage (nth 3 l))
-            (gbccount (nth 4 l))
-            (ws (nth 5 l)))
+      (let ((typename (intern (nth 0 l)))
+            (nused (nth 1 l))
+            (nfree (nth 2 l))
+            (npage (nth 3 l))
+            (maxpage (nth 4 l))
+            (gbccount (nth 5 l))
+            (ws (nth 6 l)))
         (if nused
             (push (list typename ws npage maxpage
                         (if (zerop (+ nused nfree))
@@ -303,10 +292,11 @@
                             (/ nused 0.01 (+ nused nfree)))
                         (if (zerop gbccount) nil gbccount))
                   info-list)
-            (let ((a (assoc (nth nfree *type-list*) link-alist)))
+            (let* ((nfree (intern nfree))
+		   (a (assoc nfree link-alist)))
                  (if a
                      (nconc a (list typename))
-                     (push (list (nth nfree *type-list*) typename)
+                     (push (list nfree typename)
                            link-alist))))))
     (terpri)
     (format t "~@[~2A~]~8@A/~A~14T~6@A%~@[~8@A~]~30T~{~A~^ ~}~%~%" "WS" "UP" "MP" "FI" "GC" '("TYPES"))

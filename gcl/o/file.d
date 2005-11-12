@@ -1068,9 +1068,9 @@ BEGIN:
 			for (i = 0;  i < x->st.st_dim;  i++)
 				p[i] = x->st.st_self[i];
 			i = x->st.st_dim * 2 + 16;
-#define	ADIMLIM		16*1024*1024
-			if (i >= ADIMLIM)
-				FEerror("Can't extend the string.", 0);
+/* #define	ADIMLIM		16*1024*1024 */
+/* 			if (i >= ADIMLIM) */
+/* 				FEerror("Can't extend the string.", 0); */
 			x->st.st_dim = i;
 			adjust_displaced(x, p - x->st.st_self);
 		}

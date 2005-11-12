@@ -1010,6 +1010,7 @@ gcl_init_alloc(void) {
   init_tm(t_fixnum, "NFIXNUM",
 	  sizeof(struct fixnum_struct), 8192,20,0);
   init_tm(t_structure, "SSTRUCTURE", sizeof(struct structure), 5461,1,0 );
+  init_tm(t_ifun, "iIFUN", sizeof(struct ifun), 4096,1,0  );
   init_tm(t_cfun, "fCFUN", sizeof(struct cfun), 4096,1,0  );
   init_tm(t_sfun, "gSFUN", sizeof(struct sfun),409,1,0 );
   init_tm(t_string, "\"STRING", sizeof(struct string), 5461,1,0  );
