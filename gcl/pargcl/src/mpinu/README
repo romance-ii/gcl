@@ -15,10 +15,14 @@ the ports used by this implementation.  For additional restrictions on the
 functionality, see below.
 
 In addition, note that MPI does not guarantee that a computation can
-continue past an error.  In part, this is because if we use MPI_Bsend
-or MPI_Isend (a nonblocking send), then a different thread may send
-asynchronously.  If that thread fails, it is too late to recover if we
-were using MPI_Bsend.
+continue past an error.  For the reasons why, let us consider the issues:
+    If we use MPI_Bsend or MPI_Isend (a nonblocking send), then a different
+"send thread" must send asynchronously.  (Otherwise the current thread
+may block if the kernel's network buffer is full.  An alternative is to
+ask for a larger network buffer from the kernel, and this is being considered
+for a future version --- but the kernel is not required to use the larger
+network buffer.)  If the second "send thread" fails,
+it is too late to have MPI_Bsend or MPI_Isend return MPI_FAIL and then recover.
   In MPI_Bsend, MPI is entitled to use the user buffer
 declared by the user, and it is then up to the user to make sure that
 the buffer has been used before again calling MPI_Bsend.
@@ -26,10 +30,13 @@ the buffer has been used before again calling MPI_Bsend.
 is not guaranteed to complete until something such as MPI_Test guarantees
 completion.  However, MPI_Isend should be asynchronous, typically with a
 separate thread completing on its own.
-  MPINU will use MPI_Send for potentially blocking sends (although short
+  MPINU currently provides only MPI_Send, and creates a separate "send
+thread" to always avoid blocking.  Hence, if the send thread incurs an
+error, it is too late to return an error from MPI_Send.  In the future,
+we may provide MPI_Send for potentially blocking sends (although short
 sends will typically be buffered by the network), and MPI_Bsend for
-nonblocking sends that copy to an MPINU buffer, regardless of what
-user buffers are provided by MPI_Attach.
+nonblocking sends that use the "send thread".  MPI_Bsend would copy to an
+MPINU buffer, regardless of what user buffers are provided by MPI_Attach.
 
 To use it, call:
 make libmpi.a

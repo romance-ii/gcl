@@ -112,6 +112,15 @@ implies significant overhead for very large messages
 Also, a timer will kill any process
 that has not received a message for some time (60 minutes by default).
 
+Finally, there is an obscure interaction of MPINU and ANSI GCL and
+the GNU libpthread library.  (Interestingly, the debugging-enabled version,
+/usr/lib/debug/libpthread.so.0, seems to work fine under Debian.)  For this
+reason, if you configure GCL with --enable-ansi or ParGCL
+with --with-mpi="...ansi_gcl", then MPINU is built with "-DHAVE_PTHREAD=0".
+The result is that under ANSI GCL, if two processes simultaneously
+end very large messages to each other, they can deadlock.  This should not
+affect typical programs.
+
 Following is a summary of the master-slave layer, slave-listener layer,
 and MPI layer.
 

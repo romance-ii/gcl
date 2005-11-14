@@ -371,7 +371,8 @@ $ static int MPI_Any_Tag () { return MPI_ANY_TAG; }
       (if (< dest 0)
 	(error "destination ~a is negative" dest))
       (if (not (staticp msg))
-	  (error "MPI-Send:  msg buffer not static array")))
+	  (error "MPI-Send:  msg buffer not static array;~%           ~
+		             use (make-array ... :static t)")))
   (MPI-Send-glue msg len datatype dest tag)
   ((int "MPI_Send_glue")
        (object buf) (int count) (int datatype) (int dest) (int tag))
