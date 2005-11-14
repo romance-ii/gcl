@@ -383,8 +383,13 @@
 (deftype lfixnum ()`(signed-lfixnum))
 
 
-(deftype vector (&optional element-type size)
-  `(array ,element-type (,size)))
+;;FIXME this is really ugly, but we need nreconstruct-type to return
+;;values that are equal to normalize type in the compiler (type-and,
+;;etc.)
+;(deftype vector (&optional element-type size)
+;  `(array ,element-type (,size)))
+;see below
+
 (deftype string (&optional size)
   `(array character (,size)))
 (deftype base-string (&optional size)
@@ -548,6 +553,11 @@
 
 (defconstant +array-types+ (si::aelttype-list))
 (defconstant +array-types-with-nil-for-ansi+ (append '(nil) +array-types+))
+
+(deftype vector (&optional (element-type '* ep) size)
+  (if ep 
+      `(array ,element-type (,size))
+    `(or ,@(mapcar (lambda (x) `(array ,x (,size))) +array-types-with-nil-for-ansi+))))
 
 (defconstant +known-types+ (append +range-types+ 
 				   (mapcar (lambda (x) `(complex ,x)) +range-types+)
