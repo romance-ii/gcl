@@ -527,7 +527,7 @@
 			     (*structure-type* type)
 			     #+lucid
 			     (*structure-length* (structure-length x type)))
-			(find-class-from-cell type cell))))
+			(find-class-from-cell type cell nil))))
 	   (wrapper (if class (class-wrapper class) *the-wrapper-of-t*)))
       (when (symbolp type)
 	(setq wft-type1 type  wft-wrapper1 wrapper))
@@ -607,17 +607,18 @@
     (if (structure-type-p symbol)
 	(unless (eq find-structure-class symbol)
 	  (let ((find-structure-class symbol))
-	    (let ((res (ensure-class symbol
-				     :metaclass 'structure-class
-				     :name symbol
-				     :direct-superclasses
-				     (when (structure-type-included-type-name symbol)
-				       (list (structure-type-included-type-name symbol)))
-				     :direct-slots
-				     (mapcar #'slot-initargs-from-structure-slotd
-					     (structure-type-slot-description-list symbol)))))
-	      (setf (class-defstruct-constructor res) (car (si::s-data-constructors (get symbol 'si::s-data))))
-	      res)))
+	    (when (fboundp 'ensure-class)
+	      (let ((res (ensure-class symbol
+				       :metaclass 'structure-class
+				       :name symbol
+				       :direct-superclasses
+				       (when (structure-type-included-type-name symbol)
+					 (list (structure-type-included-type-name symbol)))
+				       :direct-slots
+				       (mapcar #'slot-initargs-from-structure-slotd
+					       (structure-type-slot-description-list symbol)))))
+		(setf (class-defstruct-constructor res) (car (si::s-data-constructors (get symbol 'si::s-data))))
+		res))))
       (error "~S is not a legal structure class name." symbol))))
 
 #-cmu17

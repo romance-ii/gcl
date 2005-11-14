@@ -140,8 +140,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * full vector deftype expansion for consistent use in compiler
   * accelerate relocatable string string-match
   * work around for large directory listings for directory -- FIXME
+  * update pcl bootstrapping for new object type code in compiler
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 14 Nov 2005 04:48:34 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 14 Nov 2005 04:50:59 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
