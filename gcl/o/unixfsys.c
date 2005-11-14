@@ -668,8 +668,11 @@ LFD(Ldirectory)(void)
 	} else
 		coerce_to_local_filename(vs_base[0], filename);
 
-	sprintf(command, "ls -d %s 2> /dev/null", filename);
-
+	sprintf(command, "j=%s ; "
+		         "while [ \"$j\" != \"\" ] ; do "
+                            "ls -d $(echo $j | cut -f-256 -d\\ ); "
+                            "j=$(echo $j | cut -s -f257- -d\\ ); "
+                            "done 2> /dev/null", filename);
 	fp = popen(command, "r");
 	setbuf(fp, iobuffer);
 	for (;;) {
