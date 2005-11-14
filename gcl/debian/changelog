@@ -135,8 +135,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
     fasdump format
   * fix room report gc type anomaly
   * compiler macros for position*, count*, map-into, and reduce
+  * update  list component type handling for sequences
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 14 Nov 2005 04:43:07 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 14 Nov 2005 04:45:00 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

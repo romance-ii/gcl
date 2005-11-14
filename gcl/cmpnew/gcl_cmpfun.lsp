@@ -405,17 +405,22 @@
 
 
 
-
-(defun list-tp-test (tf lt)
-  (cond ((atom lt) (let ((z (funcall tf lt))) (values z z)))
-	((eq (car lt) 'cons)
-	 (multiple-value-bind 
-	  (m1 f1) (funcall tf (cadr lt))
-	  (multiple-value-bind 
-	   (m2 f2) (list-tp-test tf (caddr lt))
-	   (values (and m1 m2) (or f1 f2)))))
-	((list-tp-test tf (car lt)))))
-;	(t (values nil nil))))
+;;FIXME rewrite elim mv
+(defun list-tp-test (tf lt &optional ic &aux aet)
+  (cond 
+   ((setq aet (aref-propagator 'list-tp-test lt))
+     (let ((z (funcall tf aet))) (values z z)));;FIXME second value meaning
+   ((or (atom lt) (not (eq (car lt) 'cons)))
+    (let ((z (and ic (funcall tf lt)))) (values z z)))
+   (t 
+    (unless (caddr lt) (return-from list-tp-test (values nil t)))
+    (multiple-value-bind 
+     (m1 f1) (funcall tf (cadr lt))
+     (multiple-value-bind 
+      (m2 f2) (list-tp-test tf (caddr lt) t)
+      (values (and m1 m2) (or f1 f2)))))))
+					;	((and ic (list-tp-test tf (car lt))))))
+					;	(t (values nil nil))))
 
 (defun test-to-tf (test)
   (let ((test (if (constantp test) (cmp-eval test) test)))
@@ -1088,7 +1093,10 @@
 (defun c1list (args)
   (let* ((info (make-info))
 	(nargs (c1args args info)))
-    (setf (info-type info) (nil-to-t (reduce (lambda (x y) (list 'cons (info-type (cadr x)) y)) (append nargs '(null)) :from-end t)))
+    (setf (info-type info) 
+	  (cmp-norm-tp 
+	   (nil-to-t 
+	    (reduce (lambda (x y) (list 'cons (info-type (cadr x)) y)) (append nargs '(null)) :from-end t))))
     (list 'call-global info 'list nargs)));
 (si::putprop 'list 'c1list 'c1)
       
