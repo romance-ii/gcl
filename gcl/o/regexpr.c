@@ -161,7 +161,7 @@ be over written.   \
 
      str=string->st.st_self;
      np=page(str);
-     if (np>=MAXPAGE || (type_map[np] != t_contiguous && type_map[np] != t_relocatable) ||
+     if (np>=MAXPAGE || (type_map[np] != t_contiguous && str < heap_end) ||
 	 str+end==(void *)core_end || str+end==(void *)compiled_regexp) {
 
        if (!(str=ZALLOCA(string->st.st_fillp+1)))

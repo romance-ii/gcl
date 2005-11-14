@@ -138,8 +138,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * update  list component type handling for sequences
   * fix bit vector inlining (offsets)
   * full vector deftype expansion for consistent use in compiler
+  * accelerate relocatable string string-match
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 14 Nov 2005 04:46:39 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 14 Nov 2005 04:47:27 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
