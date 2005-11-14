@@ -786,14 +786,21 @@
 (defun var-array-type (a)
   (when (consp a)
     (cond ((eq (car a) 'var) (var-type (cadr a)))
+	  ((eq (car a) 'VV) (object-type (cdr (aref (car *data*) (cadr a)))))
 	  ((eq (car a)  'cvar)
 	   (or (cdr (assoc (cadr a) *c-vars*))
 	       (car (rassoc (cadr a) *c-vars*)))))))
 
 ;(setf (symbol-function 'cmp-aref) (symbol-function 'row-major-aref))
 
-(defmacro wt-bit-index (i)
-  `(wt #+clx-little-endian "(7-" "(" ,i "&0x7)" #+clx-little-endian ")"))
+(defmacro wt-bv-index (a i)
+ `(wt "(((" ,a ")->bv.bv_offset) + " ,i ")"))
+
+(defmacro wt-bv-shift (a i)
+  `(progn
+     (wt #+clx-little-endian "(7-" "(")
+     (wt-bv-index ,a ,i)
+     (wt "&0x7)" #+clx-little-endian ")")))
 
 (defun cmp-aref-inline-types (&rest r)
   (let ((art (car r)))
@@ -808,8 +815,10 @@
       (if aet
 	  (if (eq aet 'bit) 
 	      (progn
-		(wt  "(((" (c-cast aet) " *)(" a ")->v.v_self)[" i ">>3]>>")
-		(wt-bit-index i) 
+		(wt  "(((" (c-cast aet) " *)(" a ")->bv.bv_self)[")
+		(wt-bv-index a i)
+		(wt ">>3]>>")
+		(wt-bv-shift a i) 
 		(wt "&0x1)"))
 	    (wt  "((" (c-cast aet) " *)(" a ")->v.v_self)[" i "]"))
 	(wt "fLrow_major_aref(" a "," i ")")))))
@@ -833,10 +842,14 @@
       (if aet
 	  (if (eq aet 'bit) 
 	      (progn 
-		(wt  "(" j " ? (((" (c-cast aet) " *)(" a ")->v.v_self)[" i ">>3]|=(1<<")
-		(wt-bit-index i)
-		(wt ")) : (((" (c-cast aet) " *)(" a ")->v.v_self)[" i ">>3]&=~(1<<")
-		(wt-bit-index i) 
+		(wt  "(" j " ? (((" (c-cast aet) " *)(" a ")->bv.bv_self)[")
+		(wt-bv-index a i)
+		(wt ">>3]|=(1<<")
+		(wt-bv-shift a i)
+		(wt ")) : (((" (c-cast aet) " *)(" a ")->bv.bv_self)[")
+		(wt-bv-index a i)
+		(wt ">>3]&=~(1<<")
+		(wt-bv-shift a i) 
 		(wt ")))"))
 	    (wt  "((" (c-cast aet) " *)(" a ")->v.v_self)[" i "]=" j))
 	(wt "fSaset1(" a "," i "," j ")")))))
@@ -854,16 +867,13 @@
 (defun cmp-array-dimension-inline (a i)
   (let ((at (cmp-norm-tp (var-array-type a))))
     (let ((aet (and (consp at) (member (car at) '(array simple-array)))))
-      (if aet
-	  (if (and (consp (third at)) (= (length (third at)) 1))
-	      (wt "(" a ")->v.v_dim")
-	    (wt "(" a ")->a.a_dims[(" i ")]"))
-	(if *safe-compile*
-	    ;;FIXME -- alter C definition to remove the fixint here.
-	    (wt "fixint(fLarray_dimension(" a "," i "))")
-         (if (or (not (constantp i)) (eql 0 i))
-	     (wt "(type_of(" a ")==t_array ? (" a ")->a.a_dims[(" i ")] : (" a ")->v.v_dim)")
-	    (wt "(" a ")->a.a_dims[(" i ")]")))))))
+      (cond ((and (not *safe-compile*) (not aet))
+	     (wt "fixint(fLarray_dimension(" a "," i "))"))
+	    ((and aet (consp (third at)) (= (length (third at)) 1))
+	     (wt "(" a ")->v.v_dim"))
+	    ((and (constantp i) (> i 0))
+	     (wt "(" a ")->a.a_dims[(" i ")]"))
+	    ((wt "(type_of(" a ")==t_array ? (" a ")->a.a_dims[(" i ")] : (" a ")->v.v_dim)"))))))
 
 (defun list*-inline (&rest x)
   (case (length x)
