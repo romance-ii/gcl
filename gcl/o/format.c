@@ -24,6 +24,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "include.h"
+#include "num_include.h"
 
 static int
 fmt_thousand(int,int,bool,bool,int);
@@ -178,9 +179,12 @@ object sSAindent_formatted_outputA;
 			fmt_string = old_fmt_string ; \
                         fmt_paramp = old_fmt_paramp 
 
+#define MAX_MINCOL 1024
+#define BOUND_MINCOL(a_) ({fixnum _t=a_; _t=_t<0 ? 0 : _t;if (_t>MAX_MINCOL) _t=MAX_MINCOL;_t;})
+
 typedef struct {
-	  int fmt_param_type;
-	  int fmt_param_value;
+	  fixnum fmt_param_type;
+	  fixnum fmt_param_value;
 	} format_parameter;
 
 format_parameter fmt_param[100];
@@ -257,11 +261,29 @@ fmt_advance(void)
 	return(fmt_base[fmt_index++]);
 }
 
+static int
+rd_ex_ch(int f,int *s) {
+  char *p1[]={"Return","Space","Rubout","Page","Tab","Backspace","Linefeed","Newline",0},**p,*ch;
+  int c1[]={'\r',' ','\177','\f','\t','\b','\n','\n',0},*c,i;
+  for (p=p1,c=c1,i=ctl_index;*p && *c;p++,c++) {
+    if (f==(*p)[0] && *s==(*p)[1]) {
+      for (ch=*p+2,ctl_index=i;*ch && *ch==ctl_advance();ch++);
+      if (!*ch) {
+	*s=ctl_advance();
+	return *c;
+      }
+    }
+  }
+  ctl_index=i;
+  return f;
+}
+  
 
 static void
 format(object fmt_stream0, int ctl_origin0, int ctl_end0)
 {
-	int c, i, n;
+	int c, n;
+	fixnum i,j,sn;
 	bool colon, atsign;
 	object x;
 	fmt_paramp = fmt_param;
@@ -291,39 +313,32 @@ LOOP:
 
 		case '0':  case '1':  case '2':  case '3':  case '4':
 		case '5':  case '6':  case '7':  case '8':  case '9':
+   		        sn=1;
 		DIGIT:
 			i = 0;
 			do {
-				i = i*10 + (c - '0');
+				j = i*10 + (c - '0');
+				i=j>=i ? j : MOST_POSITIVE_FIX;
 				c = ctl_advance();
 			} while (isDigit(c));
 			fmt_param[n].fmt_param_type = fmt_int;
-			fmt_param[n].fmt_param_value = i;
+			fmt_param[n].fmt_param_value = sn*i;
 			break;
 
 		case '+':
+		case '-':
+   		        sn=c=='+' ? 1 : -1;
 			c = ctl_advance();
 			if (!isDigit(c))
 				fmt_error("digit expected");
 			goto DIGIT;
 
-		case '-':
-			c = ctl_advance();
-			if (!isDigit(c))
-				fmt_error("digit expected");
-			i = 0;
-			do {
-				i = i*10 + (c - '0');
-				c = ctl_advance();
-			} while (isDigit(c));
-			fmt_param[n].fmt_param_type = fmt_int;
-			fmt_param[n].fmt_param_value = -i;
-			break;
-
 		case '\'':
 			fmt_param[n].fmt_param_type = fmt_char;
 			fmt_param[n].fmt_param_value = ctl_advance();
 			c = ctl_advance();
+			if (c != ',')
+			  fmt_param[n].fmt_param_value=rd_ex_ch(fmt_param[n].fmt_param_value,&c);
 			break;
 
 		case 'v':  case 'V':
@@ -334,6 +349,9 @@ LOOP:
 			} else if (type_of(x) == t_character) {
 				fmt_param[n].fmt_param_type = fmt_char;
 				fmt_param[n].fmt_param_value = x->ch.ch_code;
+			} else if (type_of(x) == t_bignum) {
+				fmt_param[n].fmt_param_type = fmt_int;
+				fmt_param[n].fmt_param_value = big_sign(x)<0 ? -MOST_POSITIVE_FIX : MOST_POSITIVE_FIX;
                         } else if (x == Cnil) {
                                  fmt_param[n].fmt_param_type = fmt_null;				
 			} else
@@ -606,6 +624,7 @@ fmt_ascii(bool colon, bool atsign)
 
 	fmt_max_param(4);
 	fmt_set_param(0, &mincol, fmt_int, 0);
+	mincol=BOUND_MINCOL(mincol);
 	fmt_set_param(1, &colinc, fmt_int, 1);
 	fmt_set_param(2, &minpad, fmt_int, 0);
 	fmt_set_param(3, &padchar, fmt_char, ' ');
@@ -644,6 +663,7 @@ fmt_S_expression(bool colon, bool atsign)
 
 	fmt_max_param(4);
 	fmt_set_param(0, &mincol, fmt_int, 0);
+	mincol=BOUND_MINCOL(mincol);
 	fmt_set_param(1, &colinc, fmt_int, 1);
 	fmt_set_param(2, &minpad, fmt_int, 0);
 	fmt_set_param(3, &padchar, fmt_char, ' ');
@@ -818,6 +838,7 @@ fmt_integer(object x, bool colon, bool atsign, int radix, int mincol, int padcha
 	int s;
 	extern void (*write_ch_fun)(int), writec_PRINTstream(int);
 
+	mincol=BOUND_MINCOL(mincol);
 	if (type_of(x) != t_fixnum && type_of(x) != t_bignum) {
 		fmt_temporary_string->st.st_fillp = 0;
 		/* fmt_temporary_stream->sm.sm_int0 = file_column(fmt_stream); */
@@ -2081,6 +2102,7 @@ fmt_justification(volatile bool colon, bool atsign)
 	up_colon=(long)&old_fmt_paramp;
 	fmt_max_param(4);
 	fmt_set_param(0, &mincol, fmt_int, 0);
+	mincol=BOUND_MINCOL(mincol);
 	fmt_set_param(1, &colinc, fmt_int, 1);
 	fmt_set_param(2, &minpad, fmt_int, 0);
 	fmt_set_param(3, &padchar, fmt_char, ' ');
@@ -2169,8 +2191,7 @@ fmt_justification(volatile bool colon, bool atsign)
 		m++;
 	l0 = l;
 	l += minpad * m;
-	for (k = 0;  mincol + k * colinc < l;  k++)
-		;
+	for (k = 0;  mincol + k * colinc < l;  k++);
 	l = mincol + k * colinc;
 	if (special != 0 &&
 	    file_column(fmt_stream) + l + spare_spaces >= line_length)
