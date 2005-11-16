@@ -844,9 +844,7 @@
 			 args :initial-value nil))
 	   (r (mapcar (lambda (x) (cond ((inlinable-fn x) x)
 					((car (rassoc x syms :key 'car :test 'equal))) (x))) args))
-	   (form (apply 'do-sequence-search (car r) (list (cadr r)) :sum t 
-			(let ((z (member :initial-value (cddr args))))
-			  (when z `(:iv ,(cadr z)))))))
+	   (form (apply 'do-sequence-search (car r) (list (cadr r)) `( :sum t ,@(substitute :iv :initial-value (cddr args))))))
       `(let ,syms
 	 ,@(if (constantp (cadr r)) (list form)
 	     `((if (typep ,(cadr r) 'vector)
