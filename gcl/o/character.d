@@ -534,6 +534,11 @@ int w, r;
 	case '\n':
 		@(return STnewline)
 	}
+        if (char_code(c)<' ' || char_code(c) >='\177') {
+          object x=make_simple_string(" ");
+          x->st.st_self[0]=char_code(c);
+          @(return x)
+        }
 	@(return Cnil)
 @)
 

@@ -759,7 +759,9 @@ fmt_radix(bool colon, bool atsign)
 	bool b;
 	extern void (*write_ch_fun)(int), writec_PRINTstream(int);
 
-	if (fmt_nparam == 0) {
+	fmt_max_param(5);
+	fmt_set_param(0, &radix, fmt_int, -1);
+	if (radix==-1) {
 		x = fmt_advance();
 		check_type_integer(&x);
 		if (atsign) {
@@ -816,8 +818,7 @@ fmt_radix(bool colon, bool atsign)
 		}
 		return;
 	}
-	fmt_max_param(5);
-	fmt_set_param(0, &radix, fmt_int, 10);
+	fmt_set_param(0, &radix, fmt_int, -1);
 	fmt_set_param(1, &mincol, fmt_int, 0);
 	fmt_set_param(2, &padchar, fmt_char, ' ');
 	fmt_set_param(3, &commachar, fmt_char, ',');
@@ -840,22 +841,27 @@ fmt_integer(object x, bool colon, bool atsign, int radix, int mincol, int padcha
 
 	mincol=BOUND_MINCOL(mincol);
 	if (type_of(x) != t_fixnum && type_of(x) != t_bignum) {
-		fmt_temporary_string->st.st_fillp = 0;
-		/* fmt_temporary_stream->sm.sm_int0 = file_column(fmt_stream); */
-		STREAM_FILE_COLUMN(fmt_temporary_stream) = file_column(fmt_stream);
+	        object fts,ftm;/*FIXME more comprehensive solution
+				 here, but this avoids some recursive
+				 use of the temporaries*/
+	        ftm=make_string_output_stream(64);
+	        fts=ftm->sm.sm_object0;
+	        fts->st.st_fillp = 0;
+		/* ftm->sm.sm_int0 = file_column(fmt_stream); */
+		STREAM_FILE_COLUMN(ftm) = file_column(fmt_stream);
 		{SETUP_PRINT_DEFAULT(x);
-		PRINTstream = fmt_temporary_stream;
+		PRINTstream = ftm;
 		PRINTescape = FALSE;
 		PRINTbase = radix;
 		write_ch_fun = writec_PRINTstream;
 		write_object(x, 0);
 		CLEANUP_PRINT_DEFAULT;}
-		l = fmt_temporary_string->st.st_fillp;
+		l = fts->st.st_fillp;
 		mincol -= l;
 		while (mincol-- > 0)
 			writec_stream(padchar, fmt_stream);
 		for (s = 0;  l > 0;  --l, s++)
-			writec_stream(fmt_tempstr(s), fmt_stream);
+			writec_stream(fts->st.st_self[s], fmt_stream);
 		return;
 	}
 	fmt_temporary_string->st.st_fillp = 0;
@@ -1028,20 +1034,28 @@ fmt_character(bool colon, bool atsign)
 {
 	object x;
 	int i;
+	int c1[]={'\r',' ','\177','\f','\t','\b','\n',0},*c;
 
 	fmt_max_param(0);
-	fmt_temporary_string->st.st_fillp = 0;
-	/* fmt_temporary_stream->sm.sm_int0 = 0;*/
-	STREAM_FILE_COLUMN(fmt_temporary_stream) = 0;
 	x = fmt_advance();
 	check_type_character(&x);
-	prin1(x, fmt_temporary_stream);
-	if (!colon && atsign)
-		i = 0;
-	else
-		i = 2;
-	for (;  i < fmt_temporary_string->st.st_fillp;  i++)
-		writec_stream(fmt_tempstr(i), fmt_stream);
+	
+	for (c=c1;*c && *c!=x->ch.ch_code;c++);
+	if (colon ? *c : atsign) {
+
+	  i=(!colon && atsign) ? 0 : 2;
+
+	  fmt_temporary_string->st.st_fillp = 0;
+	  /* fmt_temporary_stream->sm.sm_int0 = 0;*/
+	  STREAM_FILE_COLUMN(fmt_temporary_stream) = 0;
+	  prin1(x, fmt_temporary_stream);
+
+	  for (;  i < fmt_temporary_string->st.st_fillp;  i++)
+	    writec_stream(fmt_tempstr(i), fmt_stream);
+
+	} else
+	  writec_stream(x->ch.ch_code, fmt_stream);
+
 }
 
 static void
@@ -2331,6 +2345,7 @@ L:
 	} else
 	switch (type_of(control)) {
 	    case t_cfun:
+	    case t_ifun:
 	    case t_gfun:
 	    case t_sfun:
 	    case t_vfun:
