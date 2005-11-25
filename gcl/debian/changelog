@@ -143,8 +143,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * update pcl bootstrapping for new object type code in compiler
   * format directive fixes
   * fixes to format and char-name
+  * Prevent *c1nil*/*c1t* garbage accumulation
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 16 Nov 2005 01:03:34 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 25 Nov 2005 06:06:33 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

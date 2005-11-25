@@ -48,7 +48,7 @@
 
 (defun c1expr** (form info)
   (setq form (c1expr form))
-  (add-info (cadr form) info)
+  (add-info (copy-info (cadr form)) info)
   form)
 
 (defun c1expr (form)
