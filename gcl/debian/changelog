@@ -144,8 +144,11 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * format directive fixes
   * fixes to format and char-name
   * Prevent *c1nil*/*c1t* garbage accumulation
+  * Don't do branch elimination when autodetecting let bindings for now.
+    Can do better later by searching for tags separating binding and
+    point of evaluation
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 25 Nov 2005 06:06:33 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 25 Nov 2005 16:52:04 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

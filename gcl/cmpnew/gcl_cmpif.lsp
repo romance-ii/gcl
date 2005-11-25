@@ -55,7 +55,7 @@
 	(if (endp (cddr args)) (c1nil) (c1expr (caddr args))))
         (otherwise
          (setq info (make-info))
-	 (let* ((*fmla-eval-const* t)
+	 (let* ((*fmla-eval-const* (= *dlbs* 0)) ;;FIXME expand this to detect tags and setq cases
 		(fmla (c1fmla f info))
 		(fmlae (fmla-eval-const fmla)))
 	   (if *fmla-eval-const*
