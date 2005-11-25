@@ -47,8 +47,9 @@
   form)
 
 (defun c1expr** (form info)
-  (setq form (c1expr form))
-  (add-info (copy-info (cadr form)) info)
+  (setq form (copy-list (c1expr form)))
+  (setf (cadr form) (copy-info (cadr form)))
+  (add-info (cadr form) info)
   form)
 
 (defun c1expr (form)
