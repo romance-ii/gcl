@@ -149,8 +149,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
     point of evaluation
   * Try harder to call after-gbc-hook after every gc
   * throw an error on bogus macrolet definitions
+  * Strip emacs warnings when finding site-lisp directory
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 27 Nov 2005 18:08:09 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 27 Nov 2005 21:50:28 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
