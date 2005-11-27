@@ -147,8 +147,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * Don't do branch elimination when autodetecting let bindings for now.
     Can do better later by searching for tags separating binding and
     point of evaluation
+  * Try harder to call after-gbc-hook after every gc
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 25 Nov 2005 16:52:04 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 27 Nov 2005 17:55:34 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

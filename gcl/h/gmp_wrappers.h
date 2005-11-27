@@ -100,10 +100,10 @@ GMP_EXTERN int jmp_gmp;
            Join(RD_,rt_);\
 	   jmp_gmp=0;\
            if ((j=setjmp(gmp_jmp)))\
-              GBC(j);\
+              {GBC(j);call_after_gbc_hook(j);}\
            if (Join(Join(E,n_),s_)) jmp_gmp=-1 ; else jmp_gmp++;\
            Join(RA_,rt_) a_(Join(A,n_));\
-           if (jmp_gmp<-1) GBC(-jmp_gmp);\
+           if (jmp_gmp<-1) {GBC(-jmp_gmp);call_after_gbc_hook(-jmp_gmp);}\
            jmp_gmp=0;\
            return Join(RR_,rt_);\
    }
