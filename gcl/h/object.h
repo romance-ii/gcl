@@ -416,10 +416,10 @@ struct array {           /*  array header  */
   hfixnum a_rank:HFILL_BITS;        /*  array rank  */
   hfixnum a_elttype;     /*  element type  */
   object *a_self;        /*  pointer to the array  */
+  fixnum *a_dims;        /*  table of dimensions  */
+  fixnum  a_dim;         /*  dimension  */
   hfixnum a_adjustable;  /*  adjustable flag  */
   hfixnum a_offset;      /*  bitvector offset  */
-  fixnum  a_dim;         /*  dimension  */
-  fixnum *a_dims;        /*  table of dimensions  */
   SPAD;
 
 };
@@ -554,10 +554,10 @@ struct fixarray {            /*  fixnum array header  */
   hfixnum   fixa_rank;       /*  array rank  */
   hfixnum   fixa_elttype;    /*  element type  */
   fixnum   *fixa_self;       /*  pointer to the array  */
+  fixnum   *fixa_dims;       /*  table of dimensions  */
+  fixnum    fixa_dim;        /*  dimension  */
   hfixnum   fixa_adjustable; /*  adjustable flag  */
   hfixnum   fixa_offset;     /*  not used  */
-  fixnum    fixa_dim;        /*  dimension  */
-  fixnum   *fixa_dims;       /*  table of dimensions  */
   SPAD;
   
 };
@@ -570,10 +570,10 @@ struct sfarray {                  /*  short-float array header  */
   hfixnum      sfa_rank;          /*  array rank  */
   hfixnum      sfa_elttype;       /*  element type  */
   shortfloat  *sfa_self;          /*  pointer to the array  */
+  fixnum      *sfa_dims;          /*  table of dimensions  */
+  fixnum       sfa_dim;           /*  dimension  */
   hfixnum      sfa_adjustable;    /*  adjustable flag  */
   hfixnum      sfa_offset;        /*  not used  */
-  fixnum       sfa_dim;           /*  dimension  */
-  fixnum      *sfa_dims;          /*  table of dimensions  */
   SPAD;
 
 
@@ -588,10 +588,10 @@ struct lfarray {             /*  plong-float array header  */
   hfixnum     lfa_rank;      /*  array rank  */
   hfixnum     lfa_elttype;   /*  element type  */
   longfloat  *lfa_self;      /*  pointer to the array  */
+  fixnum     *lfa_dims;      /*  table of dimensions  */
+  fixnum      lfa_dim;       /*  dimension  */
   hfixnum     lfa_adjustable;/*  adjustable flag  */
   hfixnum     lfa_offset;    /*  not used  */
-  fixnum      lfa_dim;       /*  dimension  */
-  fixnum     *lfa_dims;      /*  table of dimensions  */
   SPAD;
 
 };
