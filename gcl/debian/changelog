@@ -152,8 +152,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * Strip emacs warnings when finding site-lisp directory
   * clear sole remaining misc compiler test failure by realigning offset
     position in 0 rank bit arrays (and others)
+  * Check array rank on setf aref
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 28 Nov 2005 03:52:03 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 29 Nov 2005 01:11:49 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

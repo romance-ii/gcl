@@ -357,6 +357,8 @@ DEFUNO_NEW("ASET", object, fSaset, SI, 1, ARG_LIMIT, NONE, OO,
   else 
     { 
      ASSURE_TYPE(ii,t_fixnum);
+     if (n!=3)
+       TYPE_ERROR(x,list(3,sLarray,sLA,list(1,sLA)));
      i = fix(ii);
       return fSaset1(x,i,y);
     }
