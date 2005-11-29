@@ -34,7 +34,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 static int
 t_from_type(object);
 
-DEFVAR("*AFTER-GBC-HOOK*",sSAafter_gbc_hookA,SI,sLnil,"");
+/* DEFVAR("*AFTER-GBC-HOOK*",sSAafter_gbc_hookA,SI,sLnil,""); */
 DEFVAR("*IGNORE-MAXIMUM-PAGES*",sSAignore_maximum_pagesA,SI,sLt,"");
 #define IGNORE_MAX_PAGES (sSAignore_maximum_pagesA ==0 || sSAignore_maximum_pagesA->s.s_dbind !=sLnil) 
 
@@ -95,7 +95,7 @@ void *stack_alloc_start=NULL,*stack_alloc_end=NULL;
    If not in_signal_handler then try to keep a minimum of
    reserve_pages_for_signal_handler pages on hand in the hole
  */
-static int pending_agbch_call;
+/* static int pending_agbch_call; */
 char *
 alloc_page(long n)
 {
@@ -125,7 +125,7 @@ eg to add 20 more do (si::set-hole-size %ld %d)\n...start over ", new_holepage, 
 			hole_overrun=1;
 			GBC(t_relocatable);
 			hole_overrun=0;
-			pending_agbch_call=1;
+/* 			pending_agbch_call=1; */
 #ifdef SGC
 			if (in_sgc)
 			  {hole_overrun=1;sgc_start();hole_overrun=0;
@@ -231,14 +231,14 @@ type_name(int t)
 { return make_simple_string(tm_table[(int)t].tm_name+1);}
 
 
-void
-call_after_gbc_hook(t)
-{ pending_agbch_call=0;
-  if (sSAafter_gbc_hookA && sSAafter_gbc_hookA->s.s_dbind!= Cnil)
-    { set_up_string_register(tm_table[(int)t].tm_name+1);
-      ifuncall1(sSAafter_gbc_hookA->s.s_dbind,intern(string_register,system_package));
-    }
-}
+/* void */
+/* call_after_gbc_hook(t) */
+/* { pending_agbch_call=0; */
+/*   if (sSAafter_gbc_hookA && sSAafter_gbc_hookA->s.s_dbind!= Cnil) */
+/*     { set_up_string_register(tm_table[(int)t].tm_name+1); */
+/*       ifuncall1(sSAafter_gbc_hookA->s.s_dbind,intern(string_register,system_package)); */
+/*     } */
+/* } */
 
 /* #define PERCENT_FREE(tm)  ((tm->tm_percent_free ? tm->tm_percent_free : 10)/100.0) */
 #define PERCENT_FREE(tm)  ((tm->tm_percent_free ? tm->tm_percent_free : 30)/100.0)
@@ -381,7 +381,7 @@ ONCE_MORE:
 		}
 		p = alloc_page(1);
 		add_page_to_freelist(p,tm);
-		if (pending_agbch_call) call_after_gbc_hook(t);
+/* 		if (pending_agbch_call) call_after_gbc_hook(t); */
 		obj = tm->tm_free;
 		if (tm->tm_npage >= tm->tm_maxpage)
 			goto CALL_GBC;
@@ -415,7 +415,7 @@ CALL_GBC:
 	     tm->tm_adjgbccnt*=(double)j/tm->tm_maxpage;
 	   } 
 	}
-	call_after_gbc_hook(t);
+/* 	call_after_gbc_hook(t); */
 	goto ONCE_MORE;
 
 EXHAUSTED:
@@ -430,7 +430,7 @@ Use ALLOCATE to expand the space.",
 		2, vs_top[-2], vs_top[-1], Cnil, Cnil);
 	vs_popp;
 	vs_popp;
-	call_after_gbc_hook(t);
+/* 	call_after_gbc_hook(t); */
 	goto ONCE_MORE;
 }
 
@@ -466,7 +466,7 @@ ONCE_MORE:
 		}
 		p = alloc_page(1);
 		add_page_to_freelist(p,tm);
-		if (pending_agbch_call) call_after_gbc_hook(t_cons);
+/* 		if (pending_agbch_call) call_after_gbc_hook(t_cons); */
 		obj = tm->tm_free ;
 		if (tm->tm_npage >= tm->tm_maxpage)
 			goto CALL_GBC;
@@ -496,7 +496,7 @@ CALL_GBC:
 	     tm->tm_adjgbccnt*=(double)j/tm->tm_maxpage;
 	   } 
 	}
-	call_after_gbc_hook(t_cons);
+/* 	call_after_gbc_hook(t_cons); */
 	goto ONCE_MORE;
 
 EXHAUSTED:
@@ -509,7 +509,7 @@ Use ALLOCATE to expand the space.",
 		"Continues execution.",
 		1, vs_top[-1],Cnil,Cnil,Cnil);
 	vs_popp;
-	call_after_gbc_hook(t_cons);
+/* 	call_after_gbc_hook(t_cons); */
 	goto ONCE_MORE;
 #undef	tm
 }
@@ -633,7 +633,7 @@ ONCE_MORE:
 		  }
 		} 
 		g=j==maxcbpage ? TRUE : FALSE;
-		call_after_gbc_hook(t_contiguous);
+/* 		call_after_gbc_hook(t_contiguous); */
 		goto ONCE_MORE;
 EXHAUSTED:
 		vs_push(make_fixnum(ncbpage));
@@ -643,7 +643,7 @@ Use ALLOCATE-CONTIGUOUS-PAGES to expand the space.",
 			"Continues execution.", 1, vs_head,Cnil,Cnil,Cnil);
 		vs_popp;
 		g = FALSE;
-		call_after_gbc_hook(t_contiguous);
+/* 		call_after_gbc_hook(t_contiguous); */
 		goto ONCE_MORE;
 	}
       }
@@ -664,7 +664,7 @@ Use ALLOCATE-CONTIGUOUS-PAGES to expand the space.",
 	}
 	ncbpage += m;
 	insert_contblock(p+n, PAGESIZE*m - n);
-	if (pending_agbch_call) call_after_gbc_hook(t_contiguous);
+/* 	if (pending_agbch_call) call_after_gbc_hook(t_contiguous); */
 	return(p);
 }
 
@@ -809,7 +809,7 @@ ONCE_MORE:
 	    }
 	  } 
 	  g=i==nrbpage ? TRUE : FALSE;
-	  call_after_gbc_hook(t_relocatable);
+/* 	  call_after_gbc_hook(t_relocatable); */
 	  goto ONCE_MORE;
 EXHAUSTED:		
 	  if (rb_limit > rb_end - 2*RB_GETA)
@@ -822,7 +822,7 @@ Use ALLOCATE-RELOCATABLE-PAGES to expand the space.",
 		  "Continues execution.", 1, vs_head,Cnil,Cnil,Cnil);
 	  vs_popp;
 	  g = FALSE;
-	  call_after_gbc_hook(t_relocatable);
+/* 	  call_after_gbc_hook(t_relocatable); */
 	  goto ONCE_MORE;
 	}
 	p = rb_pointer;
@@ -1187,7 +1187,7 @@ DEFUN_NEW("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
 
   ncbpage += m;
   insert_contblock(p, PAGESIZE*m);
-  if (pending_agbch_call) call_after_gbc_hook(t_contiguous);
+/*   if (pending_agbch_call) call_after_gbc_hook(t_contiguous); */
   RETURN1(Ct);
 
 }
@@ -1234,7 +1234,7 @@ DEFUN_NEW("ALLOCATE-RELOCATABLE-PAGES",object,fSallocate_relocatable_pages,SI
   nrbpage = npages;
   rb_limit = rb_end - 2*RB_GETA;
   alloc_page(-(holepage + nrbpage));
-  if (pending_agbch_call) call_after_gbc_hook(t_relocatable);
+/*   if (pending_agbch_call) call_after_gbc_hook(t_relocatable); */
   vs_top = vs_base;
   vs_push(Ct);
   RETURN1(make_fixnum(npages));
@@ -1290,7 +1290,7 @@ DEFUN_NEW("ALLOCATE",object,fSallocate,SI
       for (;  tm->tm_npage < tm->tm_maxpage;  pp += PAGESIZE)
 	add_page_to_freelist(pp,tm);}
   
-  if (pending_agbch_call) call_after_gbc_hook(t);
+/*   if (pending_agbch_call) call_after_gbc_hook(t); */
   RETURN1(Ct);
 
 }

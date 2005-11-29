@@ -153,8 +153,10 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * clear sole remaining misc compiler test failure by realigning offset
     position in 0 rank bit arrays (and others)
   * Check array rank on setf aref
+  * Sanitize calls to after-gbc-hook, even if possibly more dangerous --
+    TODO test thoroughly
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 29 Nov 2005 01:11:49 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 29 Nov 2005 23:19:27 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

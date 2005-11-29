@@ -1817,4 +1817,4 @@ gprof_cleanup(void);
 unsigned long
 ihash_equal1(object,int);
 
-void call_after_gbc_hook(int);
+/* void call_after_gbc_hook(int); */

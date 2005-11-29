@@ -1080,6 +1080,16 @@ char *old_rb_start;
 #define OPTIMIZE_MAX_PAGES (sSAoptimize_maximum_pagesA ==0 || sSAoptimize_maximum_pagesA->s.s_dbind !=sLnil) 
 #define IGNORE_MAX_PAGES (sSAignore_maximum_pagesA ==0 || sSAignore_maximum_pagesA->s.s_dbind !=sLnil) 
 
+DEFVAR("*AFTER-GBC-HOOK*",sSAafter_gbc_hookA,SI,sLnil,"");
+
+static void
+call_after_gbc_hook(t)
+{ if (sSAafter_gbc_hookA && sSAafter_gbc_hookA->s.s_dbind!= Cnil)
+    { set_up_string_register(tm_table[(int)t].tm_name+1);
+      ifuncall1(sSAafter_gbc_hookA->s.s_dbind,intern(string_register,system_package));
+    }
+}
+
 void
 GBC(enum type t) {
 
@@ -1425,6 +1435,7 @@ GBC(enum type t) {
   
   CHECK_INTERRUPT;
 
+  call_after_gbc_hook(t);
 
 }
 
