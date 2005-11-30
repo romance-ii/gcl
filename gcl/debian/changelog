@@ -155,8 +155,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * Check array rank on setf aref
   * Sanitize calls to after-gbc-hook, even if possibly more dangerous --
     TODO test thoroughly
+  * plttest.c mod to get __div inlines on alpha
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 29 Nov 2005 23:19:27 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 30 Nov 2005 15:36:02 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

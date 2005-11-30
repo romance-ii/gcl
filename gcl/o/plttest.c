@@ -27,6 +27,8 @@ main(int argc,char * argv[],char *envp[]) {
   ul=ul%(ul>>(ul & 0x3));
   l=*(long *)argv;
   l=l%(l<<(l & 0x7));
+  l/=ul/l;
+  l/=((long)ul)/l;
 
   ch=getc(f);
   ch&=putc(ch,f);
