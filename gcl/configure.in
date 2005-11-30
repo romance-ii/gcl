@@ -1510,6 +1510,28 @@ if test "$tmp_cssize" != "$enable_cssize" ; then
 else
    AC_MSG_RESULT($enable_cssize is OK)
 fi
+
+AC_MSG_CHECKING(for C stack size limit from address wrap)
+AC_TRY_RUN([#include <stdio.h>
+int
+main()
+{
+  char *b;
+  FILE *fp = fopen("conftest1","w");
+  unsigned long j,k;
+  
+  j=-$cstack_address * $cstack_direction;
+  j=j>$enable_cssize ? $enable_cssize : j;
+  fprintf(fp,"%lu",j);
+  fclose(fp);
+  return 0;
+}],tmp_cssize=`cat conftest1`,tmp_cssize=0,tmp_cssize=0)
+if test "$tmp_cssize" != "$enable_cssize" ; then
+   enable_cssize=$tmp_cssize;
+   AC_MSG_RESULT($enable_cssize)
+else
+   AC_MSG_RESULT($enable_cssize is OK)
+fi
 AC_DEFINE_UNQUOTED(CSSIZE,$enable_cssize)
 
 mem_top=0
