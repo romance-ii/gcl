@@ -775,17 +775,17 @@ FFN(siLcatch_fatal)(int i) {
   return Cnil;
 }
 
-static void
-reset_cstack_limit(int arg) {
-#if CSTACK_DIRECTION==-1
-  if (&arg > cs_base - cssize/sizeof(*cs_base) + 16)
-#else
-  if (&arg < cs_base + cssize/sizeof(*cs_base) - 16)
-#endif
-    cs_limit = (void *)CSTACK_ADDRESS + CSTACK_DIRECTION * cssize + 1;
-  else
-      error ( "can't reset cs_limit" );
-}
+/* static void */
+/* reset_cstack_limit(int arg) { */
+/* #if CSTACK_DIRECTION==-1 */
+/*   if (&arg > cs_base - cssize/sizeof(*cs_base) + 16) */
+/* #else */
+/*   if (&arg < cs_base + cssize/sizeof(*cs_base) - 16) */
+/* #endif */
+/*     cs_limit = (void *)CSTACK_ADDRESS + CSTACK_DIRECTION * cssize + 1; */
+/*   else */
+/*       error ( "can't reset cs_limit" ); */
+/* } */
 
 LFD(siLreset_stack_limits)(void)
 {
@@ -822,7 +822,7 @@ LFD(siLreset_stack_limits)(void)
  }
 #endif
 
-  reset_cstack_limit(i);
+/*   reset_cstack_limit(i); */
   vs_base[0] = Cnil;
 }
 

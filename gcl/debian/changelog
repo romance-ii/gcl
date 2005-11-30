@@ -157,8 +157,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
     TODO test thoroughly
   * plttest.c mod to get __div inlines on alpha
   * Limit cssize by address wrap boundary for alpha and possibly others
+  * remove useless reset_cstack_limit
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 30 Nov 2005 15:36:45 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 30 Nov 2005 16:22:12 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
