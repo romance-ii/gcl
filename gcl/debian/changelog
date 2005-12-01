@@ -159,8 +159,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * Limit cssize by address wrap boundary for alpha and possibly others
   * remove useless reset_cstack_limit
   * reduce inlining fixes
+  * macosx fixes from 2.6.8pre courtesy Aurelien
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 30 Nov 2005 19:08:53 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  1 Dec 2005 23:12:13 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

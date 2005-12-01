@@ -1076,7 +1076,7 @@ case $use in
     *mingw*)
 	def_statsysbfd="no" ; def_custreloc="yes" ;;
     powerpc-macosx)
-	def_statsysbfd="no" ; def_custreloc="yes" ;;
+	def_statsysbfd="no" ; def_locbfd="yes" ;;
 esac
 
 # Check whether --enable-dlopen or --disable-dlopen was given.

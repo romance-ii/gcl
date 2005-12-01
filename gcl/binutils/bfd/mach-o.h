@@ -118,7 +118,8 @@ typedef enum bfd_mach_o_filetype
     BFD_MACH_O_MH_PRELOAD = 5,
     BFD_MACH_O_MH_DYLIB = 6,
     BFD_MACH_O_MH_DYLINKER = 7,
-    BFD_MACH_O_MH_BUNDLE = 8
+    BFD_MACH_O_MH_BUNDLE = 8,
+    BFD_MACH_O_MH_DYLIB_STUB = 9
   }
 bfd_mach_o_filetype;
 
@@ -159,9 +160,11 @@ typedef enum bfd_mach_o_section_type
 
     /* Section with only non-lazy symbol pointers.  */
     BFD_MACH_O_S_NON_LAZY_SYMBOL_POINTERS = 0x6,
+    BFD_MACH_O_S_NL_SYMBOL_POINTERS = 0x6,
 
     /* Section with only lazy symbol pointers.  */
     BFD_MACH_O_S_LAZY_SYMBOL_POINTERS = 0x7,
+    BFD_MACH_O_S_LA_SYMBOL_POINTERS = 0x7,
 
     /* Section with only symbol stubs, byte size of stub in the reserved2 field.  */
     BFD_MACH_O_S_SYMBOL_STUBS = 0x8,
@@ -170,6 +173,24 @@ typedef enum bfd_mach_o_section_type
     BFD_MACH_O_S_MOD_INIT_FUNC_POINTERS = 0x9
   }
 bfd_mach_o_section_type;
+
+/* mask */
+#define BFD_MACH_O_REFERENCE_TYPE 0xf
+
+typedef enum bfd_mach_o_n_desc
+  {
+
+    /* This symbol is a reference to an external non-lazy symbol (data).  */
+    BFD_MACH_O_REFERENCE_FLAG_UNDEFINED_NON_LAZY = 0x0,
+    
+    /* This symbol is a reference to an external lazy symbol pointer (function call).  */
+    BFD_MACH_O_REFERENCE_FLAG_UNDEFINED_LAZY = 0x1,
+
+    /* This symbol is defined in this module.  */
+    BFD_MACH_O_REFERENCE_FLAG_DEFINED = 0x2
+
+  }
+bfd_mach_o_n_desc;
 
 typedef unsigned long bfd_mach_o_cpu_subtype;
 
@@ -203,6 +224,31 @@ typedef struct bfd_mach_o_section
 }
 bfd_mach_o_section;
 
+typedef struct bfd_mach_o_nlist
+{
+  /* BFD internal representation.  */
+  asymbol root;
+  
+  /* Mach-O representation.  */
+  struct {
+    union {
+      char *n_name;
+      long  n_strx;
+    } n_un;
+    unsigned char n_type;
+    unsigned char n_sect;
+    short n_desc;
+    unsigned long n_value;
+  } nlist;
+
+  /* Index in input symbol table.  */
+  unsigned long input_index;
+  
+  /* Index in output symbol table.  */
+  unsigned long output_index;
+}
+bfd_mach_o_nlist;
+
 typedef struct bfd_mach_o_segment_command
 {
   char segname[16];
@@ -223,7 +269,8 @@ typedef struct bfd_mach_o_symtab_command
   unsigned long nsyms;
   unsigned long stroff;
   unsigned long strsize;
-  asymbol *symbols;
+  /* asymbol *symbols; */
+  bfd_mach_o_nlist *nlists;
   char *strtab;
   asection *stabs_segment;
   asection *stabstr_segment;
@@ -448,11 +495,96 @@ typedef struct bfd_mach_o_load_command
   command;
 }
 bfd_mach_o_load_command;
+/* Map an indirect symbol table entry to a symbol table entry and vice-versa.  */
+typedef struct {
+
+  /* Reference to the indirect symbol table entry.  */
+  unsigned long ist_idx;
+
+  /* Reference to the symbol table entry.  */
+  unsigned long st_idx;
+}
+bfd_mach_o_ist_entry;
+
+/* Describe the indirect symbol table.  */
+typedef struct {
+
+  /* Associated LC_DYSYMTAB load command.  */
+  bfd_mach_o_dysymtab_command *command;
+
+  /* Number of entries in this indirect symbol table.  */
+  unsigned long nmemb;
+
+  /* Number of BFD_MACH_O_S_SYMBOL_STUB sections in the following array.  */
+  unsigned long nstubs;
+  
+  /* Array of stub sections.  */
+  bfd_mach_o_section **stubs;
+  
+  /* Number of BFD_MACH_O_S_NL_SYMBOL_POINTERS sections in the following array.  */
+  unsigned long nnlptrs;
+
+  /* Array of non-lazy symbol pointer sections.  */
+  bfd_mach_o_section **nlptrs;
+
+  /* Number of BFD_MACH_O_S_LA_SYMBOL_POINTERS sections in the following array.  */
+  unsigned long nlaptrs;
+
+  /* Array of lazy symbol pointer sections.  */
+  bfd_mach_o_section **laptrs;
+
+  /* Raw indirect symbol table entry, as slurped from the input file.  */
+  bfd_mach_o_ist_entry *raw_ist;
+
+  /* Indirect symbol table that was sorted by chunks, depending on st_idx.  */
+  bfd_mach_o_ist_entry *sorted_ist;  
+}
+bfd_mach_o_ist;
+
+typedef struct
+{
+  /* General link information.  */
+  struct bfd_link_info *info;
+
+  /* Output BFD.  */
+  bfd *output_bfd;
+
+  /* Buffer large enough to hold contents of any section.  */
+  bfd_byte *contents;
+}
+bfd_mach_o_final_link_info;
+
+/* This struct is used to pass information to and from bfd_mach_o_link_output_extsym.  */
+typedef struct
+{
+  bfd_boolean failed;
+  bfd_mach_o_final_link_info *finfo;
+}
+bfd_mach_o_outext_info;
+
+/* Mach-O back-end global hash table entries.  */
+// typedef struct {
+//
+//   struct bfd_link_hash_entry root;
+//  
+// }
+// bfd_mach_o_link_hash_entry;
+
+#define mach_o_tdata(abfd)    ((abfd)->tdata.mach_o_data)
+#define mach_o_symtab(abfd)   (mach_o_tdata(abfd)->st)
+#define mach_o_dysymtab(abfd) (mach_o_tdata(abfd)->dyst)
+
+#define mach_o_n_type(udata)  (((udata) >> 24) & 0xff)
+#define mach_o_n_sect(udata)  (((udata) >> 16) & 0xff)
+#define mach_o_n_desc(udata)  ((udata) & 0xffff)
 
 typedef struct mach_o_data_struct
 {
   bfd_mach_o_header header;
   bfd_mach_o_load_command *commands;
+  bfd_mach_o_ist *ist;
+  bfd_mach_o_symtab_command *st;
+  bfd_mach_o_dysymtab_command *dyst;
   unsigned long nsymbols;
   asymbol *symbols;
   unsigned long nsects;
@@ -466,14 +598,16 @@ typedef struct mach_o_data_struct bfd_mach_o_data_struct;
 bfd_boolean bfd_mach_o_valid
   PARAMS ((bfd *));
 int bfd_mach_o_scan_read_symtab_symbol
-  PARAMS ((bfd *, bfd_mach_o_symtab_command *, asymbol *, unsigned long));
+/*PARAMS ((bfd *, bfd_mach_o_symtab_command *, asymbol *, unsigned long));*/
+  PARAMS ((bfd *, bfd_mach_o_symtab_command *,
+	   bfd_mach_o_nlist *, unsigned long));
 int bfd_mach_o_scan_read_symtab_strtab
   PARAMS ((bfd *, bfd_mach_o_symtab_command *));
 int bfd_mach_o_scan_read_symtab_symbols
   PARAMS ((bfd *, bfd_mach_o_symtab_command *));
 int bfd_mach_o_scan_read_dysymtab_symbol
   PARAMS ((bfd *, bfd_mach_o_dysymtab_command *, bfd_mach_o_symtab_command *,
-	   asymbol *, unsigned long));
+	   bfd_mach_o_nlist */*asymbol **/, unsigned long));
 int bfd_mach_o_scan_start_address
   PARAMS ((bfd *));
 int bfd_mach_o_scan
@@ -507,5 +641,30 @@ bfd_boolean bfd_mach_o_core_file_matches_executable_p
 extern const bfd_target mach_o_be_vec;
 extern const bfd_target mach_o_le_vec;
 extern const bfd_target mach_o_fat_vec;
+
+/*
+These do not appear to be necessary any longer (Aurelien, 1-XII-05).
+
+struct bfd_preserve
+{
+  PTR marker;
+  PTR tdata;
+  flagword flags;
+  const struct bfd_arch_info *arch_info;
+  struct sec *sections;
+  struct sec **section_tail;
+  unsigned int section_count;
+  struct bfd_hash_table section_htab;
+};
+
+boolean
+bfd_preserve_save PARAMS ((bfd *, struct bfd_preserve *));
+
+void
+bfd_preserve_restore PARAMS ((bfd *, struct bfd_preserve *));
+
+void
+bfd_preserve_finish PARAMS ((bfd *, struct bfd_preserve *));
+*/
 
 #endif /* _BFD_MACH_O_H_ */

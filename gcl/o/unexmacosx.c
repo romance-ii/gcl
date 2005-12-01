@@ -124,7 +124,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 #include <mach-o/nlist.h>
 #include <mach-o/getsect.h>
-#include <objc/malloc.h>
+#include <malloc/malloc.h>
 
 #include <sys/mman.h>
 

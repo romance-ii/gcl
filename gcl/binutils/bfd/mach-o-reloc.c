@@ -18,10 +18,13 @@ enum bfd_mach_o_rtype {
   PPC_RELOC_HA16_SECTDIFF            = 12, /* expects a pair */
   PPC_RELOC_JBSR                     = 13, /* expects a pair */
   PPC_RELOC_LO14_SECTDIFF            = 14, /* expects a pair */
+  PPC_RELOC_LOCAL_SECTDIFF           = 15, /* expects a pair */
 
   PPC_RELOC_NONE                     = 255
 
 };
+#define PPC_RELOC_SENTINEL (PPC_RELOC_LOCAL_SECTDIFF+1)
+
 
 /* Entries not suffixed by "PCREL" are expected to be absolute.  Note, however,
    that the canonicalization routine does not require this.  This means that adding
@@ -49,10 +52,12 @@ enum bfd_reloc_code_real_type {
   BFD_MACH_O_PPC_RELOC_HI16_SECTDIFF   = 14,
   BFD_MACH_O_PPC_RELOC_LO16_SECTDIFF   = 15,
   BFD_MACH_O_PPC_RELOC_HA16_SECTDIFF   = 16,
-  BFD_MACH_O_PPC_RELOC_LO14_SECTDIFF   = 17,
-  BFD_MACH_O_PPC_RELOC_JBSR            = 18
+  BFD_MACH_O_PPC_RELOC_JBSR            = 17,
+  BFD_MACH_O_PPC_RELOC_LO14_SECTDIFF   = 18,
+  BFD_MACH_O_PPC_RELOC_LOCAL_SECTDIFF  = 19
 
 };
+#define BFD_MACH_O_PPC_RELOC_SENTINEL (BFD_MACH_O_PPC_RELOC_LOCAL_SECTDIFF+1)
 
 #define BFD_MACH_O_R_ABS        0
 #define BFD_MACH_O_R_SCATTERED  0x80000000
@@ -113,12 +118,12 @@ bfd_mach_o_get_reloc_upper_bound PARAMS ((bfd *, asection *));
 reloc_howto_type *
 bfd_mach_o_bfd_reloc_type_lookup PARAMS ((bfd *abfd, bfd_reloc_code_real_type));
 
-static boolean
+static bfd_boolean
 bfd_mach_o_slurp_relocation_entries PARAMS ((bfd *, asection *, bfd_size_type,
 arelent *, asymbol **, unsigned *, PTR, struct relocation_info *));
 
-static boolean
-bfd_mach_o_slurp_reloc_table PARAMS ((bfd *, asection *, asymbol **, boolean));
+static bfd_boolean
+bfd_mach_o_slurp_reloc_table PARAMS ((bfd *, asection *, asymbol **, bfd_boolean));
 
 long
 bfd_mach_o_canonicalize_reloc PARAMS ((bfd *, asection *, arelent **, asymbol **));
@@ -127,20 +132,20 @@ static bfd_reloc_status_type
 bfd_mach_o_sectdiff_reloc PARAMS ((bfd *, arelent *, asymbol *, PTR, asection *,
 bfd *, char **));
 
-boolean
+bfd_boolean
 bfd_mach_o_get_indirect_section_contents PARAMS ((bfd *, struct bfd_link_info *,
 sec_ptr, bfd_byte *, asymbol **));
 
 asection *
 bfd_mach_o_craft_fp_branch_islands PARAMS ((bfd *));
 
-boolean
+bfd_boolean
 bfd_mach_o_inject_fp_branch_islands PARAMS ((bfd *, asection *, asymbol **));
 
 bfd_byte *
 bfd_mach_o_bfd_get_relocated_section_contents PARAMS ((bfd *,
 struct bfd_link_info *, struct bfd_link_order *, bfd_byte *data,
-boolean relocateable, asymbol **symbols));
+bfd_boolean relocateable, asymbol **symbols));
 
 reloc_howto_type reloc_howto_table [] = {
     
@@ -152,15 +157,15 @@ reloc_howto_type reloc_howto_table [] = {
         0,                                      /* right_shift */
         2,                                      /* size */
         32,                                     /* bitsize */
-        false,                                  /* pc_relative */
+        FALSE,                                  /* pc_relative */
         0,                                      /* bitpos */
         complain_overflow_dont,                 /* complain_overflow */
         NULL,                                   /* special_function */
         "(this reloc does nothing)",            /* name */
-        false,                                  /* partial_inplace */
+        FALSE,                                  /* partial_inplace */
         0,                                      /* src_mask */
         0,                                      /* dst_mask */
-        false                                   /* pcrel_offset */
+        FALSE                                   /* pcrel_offset */
         ),
     
   /* 1 */
@@ -169,15 +174,15 @@ reloc_howto_type reloc_howto_table [] = {
         0,                                      /* right_shift */
         0,                                      /* size, 0=byte */
         8,                                      /* bitsize */
-        false,                                  /* pc_relative */
+        FALSE,                                  /* pc_relative */
         0,                                      /* bitpos */
         complain_overflow_bitfield,             /* complain_overflow */
         NULL,                                   /* special_function */
         "BFD_MACH_O_PPC_RELOC_VANILLA_0",       /* name */
-        false,                                  /* partial_inplace */
+        FALSE,                                  /* partial_inplace */
         0,                                      /* src_mask */
         0xffffffff,                             /* dst_mask */
-        false                                   /* pcrel_offset */
+        FALSE                                   /* pcrel_offset */
         ),
 
   /* 2 */
@@ -186,15 +191,15 @@ reloc_howto_type reloc_howto_table [] = {
         0,                                      /* right_shift */
         1,                                      /* size, 1=word */
         16,                                     /* bitsize */
-        false,                                  /* pc_relative */
+        FALSE,                                  /* pc_relative */
         0,                                      /* bitpos */
         complain_overflow_bitfield,             /* complain_overflow */
         NULL,                                   /* special_function */
         "BFD_MACH_O_PPC_RELOC_VANILLA_1",       /* name */
-        false,                                  /* partial_inplace */
+        FALSE,                                  /* partial_inplace */
         0,                                      /* src_mask */
         0xffffffff,                             /* dst_mask */
-        false                                   /* pcrel_offset */
+        FALSE                                   /* pcrel_offset */
         ),
 
   /* 3 */
@@ -203,15 +208,15 @@ reloc_howto_type reloc_howto_table [] = {
         0,                                      /* right_shift */
         2,                                      /* size, 2=long */
         32,                                     /* bitsize */
-        false,                                  /* pc_relative */
+        FALSE,                                  /* pc_relative */
         0,                                      /* bitpos */
         complain_overflow_dont,                 /* complain_overflow */
         NULL,                                   /* special_function */
         "BFD_MACH_O_PPC_RELOC_VANILLA_2",       /* name */
-        false,                                  /* partial_inplace */
+        FALSE,                                  /* partial_inplace */
         0,                                      /* src_mask */
         0xffffffff,                             /* dst_mask */
-        false                                   /* pcrel_offset */
+        FALSE                                   /* pcrel_offset */
         ),
    
   /* bnel and other such instructions can accommodate up to 16 bits.
@@ -223,15 +228,15 @@ reloc_howto_type reloc_howto_table [] = {
         0,                                      /* right_shift */
         2,                                      /* size */
         16,                                     /* bitsize */
-        false,                                  /* pc_relative */
+        FALSE,                                  /* pc_relative */
         0,                                      /* bitpos */
         complain_overflow_unsigned,             /* complain_overflow */
         NULL,                                   /* special_function */
         "BFD_MACH_O_PPC_RELOC_BR14",            /* name */
-        false,                                  /* partial_inplace */
+        FALSE,                                  /* partial_inplace */
         0,                                      /* src_mask */
         0xfffc,                                 /* dst_mask */
-        false                                   /* pcrel_offset */
+        FALSE                                   /* pcrel_offset */
         ),
     
   /* 5 */
@@ -240,15 +245,15 @@ reloc_howto_type reloc_howto_table [] = {
         0,                                      /* right_shift */
         2,                                      /* size */
         16,                                     /* bitsize */
-        true,                                   /* pc_relative */
+        TRUE,                                   /* pc_relative */
         0,                                      /* bitpos */
         complain_overflow_signed,               /* complain_overflow */
         NULL,                                   /* special_function */
         "BFD_MACH_O_PPC_RELOC_BR14_PCREL",      /* name */
-        false,                                  /* partial_inplace */
+        FALSE,                                  /* partial_inplace */
         0,                                      /* src_mask */
         0xfffc,                                 /* dst_mask */
-        true                                    /* pcrel_offset */
+        TRUE                                    /* pcrel_offset */
         ),
   
   /* bl and other such instructions can accommodate up to 26 bits.
@@ -261,15 +266,15 @@ reloc_howto_type reloc_howto_table [] = {
         0,                                      /* right_shift */
         2,                                      /* size */
         26,                                     /* bitsize */
-        false,                                  /* pc_relative */
+        FALSE,                                  /* pc_relative */
         0,                                      /* bitpos */
         complain_overflow_unsigned,             /* complain_overflow */
         NULL,                                   /* special_function */
         "BFD_MACH_O_PPC_RELOC_BR24",            /* name */
-        false,                                  /* partial_inplace */
+        FALSE,                                  /* partial_inplace */
         0,                                      /* src_mask */
         0x03fffffc,                             /* dst_mask */
-        false                                   /* pcrel_offset */
+        FALSE                                   /* pcrel_offset */
         ),
     
   /* 7 */
@@ -278,15 +283,15 @@ reloc_howto_type reloc_howto_table [] = {
         0,                                      /* right_shift */
         2,                                      /* size */
         26,                                     /* bitsize */
-        true,                                   /* pc_relative */
+        TRUE,                                   /* pc_relative */
         0,                                      /* bitpos */
         complain_overflow_signed,               /* complain_overflow */
         NULL,                                   /* special_function */
         "BFD_MACH_O_PPC_RELOC_BR24_PCREL",      /* name */
-        false,                                  /* partial_inplace */
+        FALSE,                                  /* partial_inplace */
         0,                                      /* src_mask */
         0x03fffffc,                             /* dst_mask */
-        true                                    /* pcrel_offset */
+        TRUE                                    /* pcrel_offset */
         ),
 
   /* The instruction contains the high 16 bits of a relocatable expression.
@@ -299,15 +304,15 @@ reloc_howto_type reloc_howto_table [] = {
         16,                                     /* right_shift */
         2,                                      /* size */
         16,                                     /* bitsize */
-        false,                                  /* pc_relative */
+        FALSE,                                  /* pc_relative */
         0,                                      /* bitpos */
         complain_overflow_dont,                 /* complain_overflow */
         NULL,                                   /* special_function */
         "BFD_MACH_O_PPC_RELOC_HI16",            /* name */
-        false,                                  /* partial_inplace */
+        FALSE,                                  /* partial_inplace */
         0,                                      /* src_mask */
         0xffff,                                 /* dst_mask */
-        false                                   /* pcrel_offset */
+        FALSE                                   /* pcrel_offset */
         ),
     
   /* The instruction contains the low 16 bits of an address.  The next entry
@@ -320,15 +325,15 @@ reloc_howto_type reloc_howto_table [] = {
         0,                                      /* right_shift */
         2,                                      /* size */
         16,                                     /* bitsize */
-        false,                                  /* pc_relative */
+        FALSE,                                  /* pc_relative */
         0,                                      /* bitpos */
         complain_overflow_dont,                 /* complain_overflow */
         NULL,                                   /* special_function */
         "BFD_MACH_O_PPC_RELOC_LO16",            /* name */
-        false,                                  /* partial_inplace */
+        FALSE,                                  /* partial_inplace */
         0,                                      /* src_mask */
         0xffff,                                 /* dst_mask */
-        false                                   /* pcrel_offset */
+        FALSE                                   /* pcrel_offset */
         ),
     
   /* 10 */
@@ -337,15 +342,15 @@ reloc_howto_type reloc_howto_table [] = {
         16,                                     /* right_shift */
         2,                                      /* size */
         16,                                     /* bitsize */
-        false,                                  /* pc_relative */
+        FALSE,                                  /* pc_relative */
         0,                                      /* bitpos */
         complain_overflow_dont,                 /* complain_overflow */
         NULL,                                   /* special_function */
         "BFD_MACH_O_PPC_RELOC_HA16",            /* name */
-        false,                                  /* partial_inplace */
+        FALSE,                                  /* partial_inplace */
         0,                                      /* src_mask */
         0xffff,                                 /* dst_mask */
-        false                                   /* pcrel_offset */
+        FALSE                                   /* pcrel_offset */
         ),
 
   /* The lower two bits must be zero.  We don't check that, we just clear them.
@@ -357,15 +362,15 @@ reloc_howto_type reloc_howto_table [] = {
         0,                                      /* right_shift */
         2,                                      /* size */
         16,                                     /* bitsize */
-        false,                                  /* pc_relative */
+        FALSE,                                  /* pc_relative */
         0,                                      /* bitpos */
         complain_overflow_dont,                 /* complain_overflow */
         NULL,                                   /* special_function */
         "BFD_MACH_O_PPC_RELOC_LO14",            /* name */
-        false,                                  /* partial_inplace */
+        FALSE,                                  /* partial_inplace */
         0,                                      /* src_mask */
         0xfffc,                                 /* dst_mask */
-        false                                   /* pcrel_offset */
+        FALSE                                   /* pcrel_offset */
         ),
 
   /* 12 */
@@ -374,15 +379,15 @@ reloc_howto_type reloc_howto_table [] = {
         0,                                      /* right_shift */
         2,                                      /* size */
         32,                                     /* bitsize */
-        false,                                  /* pc_relative */
+        FALSE,                                  /* pc_relative */
         0,                                      /* bitpos */
         complain_overflow_dont,                 /* complain_overflow */
         bfd_mach_o_sectdiff_reloc,              /* special_function */
         "BFD_MACH_O_PPC_RELOC_SECTDIFF",        /* name */
-        false,                                  /* partial_inplace */
+        FALSE,                                  /* partial_inplace */
         0,                                      /* src_mask */
         0xffffffff,                             /* dst_mask */
-        false                                   /* pcrel_offset */
+        FALSE                                   /* pcrel_offset */
         ),
 
   /* This is always a scattered relocation entry. The r_value field contains the
@@ -395,15 +400,15 @@ reloc_howto_type reloc_howto_table [] = {
         0,                                      /* right_shift */
         2,                                      /* size */
         32,                                     /* bitsize */
-        false,                                  /* pc_relative */
+        FALSE,                                  /* pc_relative */
         0,                                      /* bitpos */
         complain_overflow_dont,                 /* complain_overflow */
         NULL,                                   /* special_function */
         "BFD_MACH_O_PPC_RELOC_PB_LA_PTR",       /* name */
-        false,                                  /* partial_inplace */
+        FALSE,                                  /* partial_inplace */
         0,                                      /* src_mask */
         0,                                      /* dst_mask */
-        false                                   /* pcrel_offset */
+        FALSE                                   /* pcrel_offset */
         ),
     
   /* 14 */
@@ -412,15 +417,15 @@ reloc_howto_type reloc_howto_table [] = {
         16,                                     /* right_shift */
         2,                                      /* size */
         16,                                     /* bitsize */
-        false,                                  /* pc_relative */
+        FALSE,                                  /* pc_relative */
         0,                                      /* bitpos */
         complain_overflow_dont,                 /* complain_overflow */
         bfd_mach_o_sectdiff_reloc,              /* special_function */
         "BFD_MACH_O_PPC_RELOC_HI16_SECTDIFF",   /* name */
-        false,                                  /* partial_inplace */
+        FALSE,                                  /* partial_inplace */
         0,                                      /* src_mask */
         0xffff,                                 /* dst_mask */
-        false                                   /* pcrel_offset */
+        FALSE                                   /* pcrel_offset */
         ),
     
   /* 15 */
@@ -429,15 +434,15 @@ reloc_howto_type reloc_howto_table [] = {
         0,                                      /* right_shift */
         2,                                      /* size */
         16,                                     /* bitsize */
-        false,                                  /* pc_relative */
+        FALSE,                                  /* pc_relative */
         0,                                      /* bitpos */
         complain_overflow_dont,                 /* complain_overflow */
         bfd_mach_o_sectdiff_reloc,              /* special_function */
         "BFD_MACH_O_PPC_RELOC_LO16_SECTDIFF",   /* name */
-        false,                                  /* partial_inplace */
+        FALSE,                                  /* partial_inplace */
         0,                                      /* src_mask */
         0xffff,                                 /* dst_mask */
-        false                                   /* pcrel_offset */
+        FALSE                                   /* pcrel_offset */
         ),
 
   /* 16 */
@@ -446,52 +451,71 @@ reloc_howto_type reloc_howto_table [] = {
         16,                                     /* right_shift */
         2,                                      /* size */
         16,                                     /* bitsize */
-        false,                                  /* pc_relative */
+        FALSE,                                  /* pc_relative */
         0,                                      /* bitpos */
         complain_overflow_dont,                 /* complain_overflow */
         bfd_mach_o_sectdiff_reloc,              /* special_function */
         "BFD_MACH_O_PPC_RELOC_HA16_SECTDIFF",   /* name */
-        false,                                  /* partial_inplace */
+        FALSE,                                  /* partial_inplace */
         0,                                      /* src_mask */
         0xffff,                                 /* dst_mask */
-        false                                   /* pcrel_offset */
-        ),
-
-  /* 17 */
-  HOWTO(
-        BFD_MACH_O_PPC_RELOC_LO14_SECTDIFF,     /* type */
-        0,                                      /* right_shift */
-        2,                                      /* size */
-        16,                                     /* bitsize */
-        false,                                  /* pc_relative */
-        0,                                      /* bitpos */
-        complain_overflow_dont,                 /* complain_overflow */
-        bfd_mach_o_sectdiff_reloc,              /* special_function */
-        "BFD_MACH_O_PPC_RELOC_LO14_SECTDIFF",   /* name */
-        false,                                  /* partial_inplace */
-        0,                                      /* src_mask */
-        0xfffc,                                 /* dst_mask */
-        false                                   /* pcrel_offset */
+        FALSE                                   /* pcrel_offset */
         ),
 
   /* The jbsr instruction is assembled to the branch island. For
      now, don't bother testing if the target can be reached directly.  */
-  
-  /* 18 */
+
+  /* 17 */
   HOWTO(
         BFD_MACH_O_PPC_RELOC_JBSR,              /* type */
         0,                                      /* right_shift */
         2,                                      /* size */
         26,                                     /* bitsize */
-        false,                                  /* pc_relative */
+        FALSE,                                  /* pc_relative */
         0,                                      /* bitpos */
-        complain_overflow_dont,                 /* complain_overflow */
-        NULL,                                   /* special_function */
+        complain_overflow_dont,                 /*
+omplain_overflow */
+        NULL,                                   /*
+pecial_function */
         "BFD_MACH_O_PPC_RELOC_JBSR",            /* name */
-        false,                                  /* partial_inplace */
+        FALSE,                                  /* partial_inplace */
         0,                                      /* src_mask */
         0,                                      /* dst_mask */
-        false                                   /* pcrel_offset */
+        FALSE                                   /* pcrel_offset */
+        ),
+
+  /* 18 */
+  HOWTO(
+        BFD_MACH_O_PPC_RELOC_LO14_SECTDIFF,     /* type */
+        0,                                      /* right_shift */
+        2,                                      /* size */
+        16,                                     /* bitsize */
+        FALSE,                                  /* pc_relative */
+        0,                                      /* bitpos */
+        complain_overflow_dont,                 /* complain_overflow */
+        bfd_mach_o_sectdiff_reloc,              /* special_function */
+        "BFD_MACH_O_PPC_RELOC_LO14_SECTDIFF",   /* name */
+        FALSE,                                  /* partial_inplace */
+        0,                                      /* src_mask */
+        0xfffc,                                 /* dst_mask */
+        FALSE                                   /* pcrel_offset */
+        ),
+
+  /* 19 */
+  HOWTO(
+        BFD_MACH_O_PPC_RELOC_LOCAL_SECTDIFF,    /* type */
+        0,                                      /* right_shift */
+        2,                                      /* size */
+        32,                                     /* bitsize */
+        FALSE,                                  /* pc_relative */
+        0,                                      /* bitpos */
+        complain_overflow_dont,                 /* complain_overflow */
+        bfd_mach_o_sectdiff_reloc,              /* special_function */
+        "BFD_MACH_O_PPC_RELOC_LOCAL_SECTDIFF",  /* name */
+        FALSE,                                  /* partial_inplace */
+        0,                                      /* src_mask */
+        0xffffffff,                             /* dst_mask */
+        FALSE                                   /* pcrel_offset */
         )
 
 };
@@ -513,11 +537,12 @@ static reloc_howto_type *to_howto [] = {
   & reloc_howto_table [BFD_MACH_O_PPC_RELOC_HA16_SECTDIFF],
   & reloc_howto_table [BFD_MACH_O_PPC_RELOC_JBSR],
   & reloc_howto_table [BFD_MACH_O_PPC_RELOC_LO14_SECTDIFF],
-
+  & reloc_howto_table [BFD_MACH_O_PPC_RELOC_LOCAL_SECTDIFF],
   NULL,
   NULL,
   & reloc_howto_table [BFD_MACH_O_PPC_RELOC_BR14_PCREL],
   & reloc_howto_table [BFD_MACH_O_PPC_RELOC_BR24_PCREL],
+  NULL,
   NULL,
   NULL,
   NULL,
@@ -601,7 +626,7 @@ bfd_mach_o_bfd_reloc_type_lookup (abfd, code)
      bfd *abfd ATTRIBUTE_UNUSED;
      bfd_reloc_code_real_type code;
 {
-  if (code <= BFD_MACH_O_PPC_RELOC_JBSR) {
+  if (code < BFD_MACH_O_PPC_RELOC_SENTINEL) {
     return reloc_howto_table + code;
   } else {
     return NULL;
@@ -639,7 +664,7 @@ bfd_mach_o_compar_ist_idx (const void *a, const void *b)
     return (int) x - (int) y;
 }
 
-boolean
+bfd_boolean
 bfd_mach_o_la_sym_idx (bfd *abfd, asection *asect, bfd_vma offset, unsigned long *idx)
 {
     bfd_mach_o_section *sectp;
@@ -649,10 +674,10 @@ bfd_mach_o_la_sym_idx (bfd *abfd, asection *asect, bfd_vma offset, unsigned long
     bfd_mach_o_ist_helper_struct *match, key;
     
     if (!ist || (sectp = bfd_mach_o_native_section_for_asection (mdata, asect)) == NULL)
-        return false;
+        return FALSE;
     
     if ((sectp->flags & SECTION_TYPE) != BFD_MACH_O_S_LAZY_SYMBOL_POINTERS)
-        return false;
+        return FALSE;
     
     start = sectp->reserved1;
     nmemb = sectp->size / sizeof (unsigned long);
@@ -664,16 +689,16 @@ bfd_mach_o_la_sym_idx (bfd *abfd, asection *asect, bfd_vma offset, unsigned long
     if (match && (start <= match->x) && (match->x < (start + nmemb)))
     {
         if (idx) *idx = match->y;
-        return true;
+        return TRUE;
     }
     
-    return false;
+    return FALSE;
 }
 */
 
 /* This function does the actual job of converting Mach-O relocs to BFD internal relocs.  */
 
-static boolean
+static bfd_boolean
 bfd_mach_o_slurp_relocation_entries (abfd, asect, reloc_count, relent, symbols,
                                      num_pairs, sectbase, native_reloc)
      bfd *abfd;
@@ -767,7 +792,7 @@ bfd_mach_o_slurp_relocation_entries (abfd, asect, reloc_count, relent, symbols,
                 {
                   fprintf (stderr,
                            "error: scattered relocation entry missing section\n");
-                  return false;
+                  return FALSE;
                 }
               else
                 {
@@ -819,7 +844,7 @@ bfd_mach_o_slurp_relocation_entries (abfd, asect, reloc_count, relent, symbols,
                 {
                   fprintf (stderr, "error: "
                            "symbol index out of bounds in external reloc\n");
-                  return false;
+                  return FALSE;
                 }
             }
           else if (r_symbolnum == 0 /* = BFD_MACH_O_R_ABS */)
@@ -835,7 +860,7 @@ bfd_mach_o_slurp_relocation_entries (abfd, asect, reloc_count, relent, symbols,
           else
             {
               fprintf (stderr, "error: bad section ordinal in local reloc\n");
-              return false;
+              return FALSE;
             }
         }
 
@@ -849,7 +874,7 @@ bfd_mach_o_slurp_relocation_entries (abfd, asect, reloc_count, relent, symbols,
       if (r_address >= bfd_mach_o_nsection_for_asection (abfd, asect)->size)
         {
           fprintf (stderr, "error: bad relocation offset\n");
-          return false;
+          return FALSE;
         }
 
       relent->addend = 0;
@@ -900,7 +925,7 @@ bfd_mach_o_slurp_relocation_entries (abfd, asect, reloc_count, relent, symbols,
             {
               fprintf (stderr, "error: "
                        "reloc entry missing following associated pair entry\n");
-              return false;
+              return FALSE;
             } 
 
           (*num_pairs) += 1;
@@ -909,7 +934,8 @@ bfd_mach_o_slurp_relocation_entries (abfd, asect, reloc_count, relent, symbols,
                r_type == PPC_RELOC_HI16_SECTDIFF ||
                r_type == PPC_RELOC_LO16_SECTDIFF ||
                r_type == PPC_RELOC_HA16_SECTDIFF ||
-               r_type == PPC_RELOC_LO14_SECTDIFF)
+               r_type == PPC_RELOC_LO14_SECTDIFF ||
+	       r_type == PPC_RELOC_LOCAL_SECTDIFF)
         {
           struct scattered_relocation_info *srip = NULL;
           enum bfd_mach_o_rtype pair_r_type = PPC_RELOC_NONE;
@@ -917,7 +943,7 @@ bfd_mach_o_slurp_relocation_entries (abfd, asect, reloc_count, relent, symbols,
           if (r_scattered != 1)
             {
               fprintf (stderr, "error: SECTDIFF type reloc not scattered\n");
-              return false;
+              return FALSE;
             }
 
           if (++native_reloc < stop)
@@ -940,7 +966,7 @@ bfd_mach_o_slurp_relocation_entries (abfd, asect, reloc_count, relent, symbols,
             {
               fprintf (stderr, "error: "
                        "reloc entry missing following associated pair entry\n");
-              return false;
+              return FALSE;
             }
 
           (*num_pairs) += 1;
@@ -948,7 +974,7 @@ bfd_mach_o_slurp_relocation_entries (abfd, asect, reloc_count, relent, symbols,
 
       octets = relent->address * bfd_octets_per_byte (abfd);
         
-      if (r_type == PPC_RELOC_VANILLA || r_type == PPC_RELOC_SECTDIFF)
+      if (r_type == PPC_RELOC_VANILLA || r_type == PPC_RELOC_SECTDIFF || r_type == PPC_RELOC_LOCAL_SECTDIFF)
         {             
           switch (r_length)
             {
@@ -1015,8 +1041,8 @@ bfd_mach_o_slurp_relocation_entries (abfd, asect, reloc_count, relent, symbols,
               break;
                 
             default:
-              fprintf (stderr, "error: unknown relocation entry\n");
-              return false;
+              fprintf (stderr, "error: unknown relocation entry, r_type=0x%x\n",r_type);
+              return FALSE;
             }
         }
 
@@ -1070,7 +1096,8 @@ bfd_mach_o_slurp_relocation_entries (abfd, asect, reloc_count, relent, symbols,
           r_type == PPC_RELOC_HI16_SECTDIFF ||
           r_type == PPC_RELOC_LO16_SECTDIFF ||
           r_type == PPC_RELOC_HA16_SECTDIFF ||
-          r_type == PPC_RELOC_LO14_SECTDIFF)
+          r_type == PPC_RELOC_LO14_SECTDIFF ||
+	  r_type == PPC_RELOC_LOCAL_SECTDIFF)
         {
           bfd_mach_o_sectdiff *sectdiff = (bfd_mach_o_sectdiff *)
             bfd_alloc (abfd, sizeof (bfd_mach_o_sectdiff));
@@ -1099,10 +1126,10 @@ bfd_mach_o_slurp_relocation_entries (abfd, asect, reloc_count, relent, symbols,
 
       relent->howto = NULL;
       
-      if ((r_type + (PPC_RELOC_LO14_SECTDIFF+1) * r_pcrel) < sizeof (to_howto))
+      if ((r_type + PPC_RELOC_SENTINEL * r_pcrel) < sizeof (to_howto))
         {
           relent->howto =
-            to_howto [r_type + (PPC_RELOC_LO14_SECTDIFF+1) * r_pcrel];
+            to_howto [r_type + PPC_RELOC_SENTINEL * r_pcrel];
         
           if (relent->howto ==
               & reloc_howto_table [BFD_MACH_O_PPC_RELOC_VANILLA_2])
@@ -1123,19 +1150,19 @@ bfd_mach_o_slurp_relocation_entries (abfd, asect, reloc_count, relent, symbols,
       if (relent->howto == NULL)
         {
           fprintf (stderr, "warning: unsupported relocation entry\n");
-          return false;
+          return FALSE;
         }   
     }
  
-  return true;
+  return TRUE;
 }
 
-static boolean
+static bfd_boolean
 bfd_mach_o_slurp_reloc_table (abfd, asect, symbols, dynamic)
      bfd *abfd;
      asection *asect;
      asymbol **symbols;
-     boolean dynamic ATTRIBUTE_UNUSED;
+     bfd_boolean dynamic ATTRIBUTE_UNUSED;
 {
   PTR relbuf = NULL;
   PTR secbuf = NULL;
@@ -1146,21 +1173,21 @@ bfd_mach_o_slurp_reloc_table (abfd, asect, symbols, dynamic)
   bfd_size_type amt;
   arelent *relents;
   unsigned num_pairs = 0;
-  boolean rtn;
+  bfd_boolean rtn;
   
   if (asect->relocation != NULL)
-    return true;
+    return TRUE;
 
   reloc_count = asect->reloc_count;
   
-  if (reloc_count == 0 || asect->_raw_size == 0)
-    return true;
+  if (reloc_count == 0 || /*asect->_raw_size == 0*/ asect->size == 0)
+    return TRUE;
   
   amt = reloc_count * sizeof (arelent);
   relents = (arelent *) bfd_alloc (abfd, amt);
 
   if (relents == NULL)
-    return false;
+    return FALSE;
   
   reloc_size = reloc_count * sizeof (struct relocation_info);
   
@@ -1169,13 +1196,13 @@ bfd_mach_o_slurp_reloc_table (abfd, asect, symbols, dynamic)
       relbuf = (PTR) bfd_malloc (reloc_size);
         
       if (relbuf == NULL)
-        return false;
+        return FALSE;
       
       if (bfd_seek (abfd, asect->rel_filepos, SEEK_SET) != 0 ||
           bfd_bread (relbuf, reloc_size, abfd) != reloc_size)
         {
           free (relbuf);
-          return false;
+          return FALSE;
         }
       
       relbase = (struct relocation_info *) relbuf;
@@ -1187,20 +1214,20 @@ bfd_mach_o_slurp_reloc_table (abfd, asect, symbols, dynamic)
         }
       else
         {
-          secbuf = (PTR) bfd_malloc (asect->_raw_size);
+          secbuf = (PTR) bfd_malloc (/*asect->_raw_size*/ asect->size);
           
           if (secbuf == NULL)
             {
               free (relbuf);
-              return false;
+              return FALSE;
             }
             
           if (bfd_seek (abfd, asect->filepos, SEEK_SET) != 0 ||
-              bfd_bread (secbuf, asect->_raw_size, abfd) != asect->_raw_size)
+              bfd_bread (secbuf, asect->/*_raw_size*/size, abfd) != asect->/*_raw_size*/size)
             {
               free (relbuf);
               free (secbuf);
-              return false;
+              return FALSE;
             }
             
           sectbase = secbuf;
@@ -1213,13 +1240,13 @@ bfd_mach_o_slurp_reloc_table (abfd, asect, symbols, dynamic)
       if (asect->rel_filepos + reloc_size > b->size)
         {
           bfd_set_error (bfd_error_file_truncated);
-          return false;
+          return FALSE;
         }
         
-      if (asect->filepos + asect->_raw_size > b->size)
+      if (asect->filepos + /*asect->_raw_size*/ asect->size > b->size)
         {
           bfd_set_error (bfd_error_file_truncated);
-          return false;
+          return FALSE;
         }
       
       relbase = (struct relocation_info *) (b->buffer + asect->rel_filepos);
@@ -1298,8 +1325,9 @@ bfd_mach_o_craft_fp_branch_islands (bfd *abfd)
   asect->flags = SEC_ALLOC | SEC_LOAD | SEC_RELOC | SEC_CODE
     | SEC_HAS_CONTENTS | SEC_IN_MEMORY | SEC_LINKER_CREATED;
 
-  asect->_cooked_size = 32;
-  asect->_raw_size = 32;
+  /*asect->_cooked_size = 32;*/
+  /*asect->_raw_size = 32;*/
+  asect->size = 32;
 
   asect->alignment_power = 2;
 
@@ -1311,7 +1339,7 @@ bfd_mach_o_craft_fp_branch_islands (bfd *abfd)
   return asect;
 }
 
-boolean
+bfd_boolean
 bfd_mach_o_inject_fp_branch_islands (abfd, branch_islands, symbols)
      bfd *abfd;
      asection *branch_islands;
@@ -1321,7 +1349,7 @@ bfd_mach_o_inject_fp_branch_islands (abfd, branch_islands, symbols)
   unsigned int i;
 
   if (branch_islands == NULL)
-    return false;
+    return FALSE;
   
   symbol_hdl = symbols + abfd->symcount;
   saveFP_hdl = restFP_hdl = NULL;
@@ -1344,7 +1372,7 @@ bfd_mach_o_inject_fp_branch_islands (abfd, branch_islands, symbols)
           restFP_new = bfd_make_empty_symbol (abfd);
 
           if (saveFP_new == NULL || restFP_new == NULL)
-            return false;
+            return FALSE;
           
           saveFP_new->section = restFP_new->section = branch_islands;
 
@@ -1358,7 +1386,7 @@ bfd_mach_o_inject_fp_branch_islands (abfd, branch_islands, symbols)
 
           sym_ptr_ptr = (asymbol **) bfd_alloc (abfd, sizeof (asymbol *) * 2);
           if (sym_ptr_ptr == NULL)
-            return false;
+            return FALSE;
           
           sym_ptr_ptr[0] = *saveFP_hdl;
           sym_ptr_ptr[1] = *restFP_hdl;
@@ -1380,7 +1408,7 @@ bfd_mach_o_inject_fp_branch_islands (abfd, branch_islands, symbols)
       branch_islands->reloc_count = 0; /* Just cancel relocation.  */
     }
 
-  return true;
+  return TRUE;
 }
 
 long
@@ -1393,7 +1421,7 @@ bfd_mach_o_canonicalize_reloc (abfd, asect, relptr, symbols)
     arelent *tblptr;
     unsigned i;
     
-    if (!bfd_mach_o_slurp_reloc_table (abfd, asect, symbols, false))
+    if (!bfd_mach_o_slurp_reloc_table (abfd, asect, symbols, FALSE))
         return -1;
     
     tblptr = asect->relocation;
@@ -1405,7 +1433,7 @@ bfd_mach_o_canonicalize_reloc (abfd, asect, relptr, symbols)
     return asect->reloc_count;
 }
 
-boolean
+bfd_boolean
 bfd_mach_o_get_indirect_section_contents (abfd, link_info, section, data, symbols)
      bfd *abfd;
      struct bfd_link_info *link_info;
@@ -1427,7 +1455,7 @@ bfd_mach_o_get_indirect_section_contents (abfd, link_info, section, data, symbol
       (sectp->flags & BFD_MACH_O_S_NON_LAZY_SYMBOL_POINTERS) == 0)
     {
       bfd_set_error (bfd_error_invalid_operation);
-      return (false);
+      return (FALSE);
     }
 
   e = ist->raw_ist + sectp->reserved1;
@@ -1441,7 +1469,7 @@ bfd_mach_o_get_indirect_section_contents (abfd, link_info, section, data, symbol
           asymbol *asym = *(symbols + e->st_idx);
           struct bfd_link_hash_entry *hashp;
           
-          hashp = bfd_link_hash_lookup (link_info->hash, asym->name, false, false, true);
+          hashp = bfd_link_hash_lookup (link_info->hash, asym->name, FALSE, FALSE, TRUE);
       
           if (hashp != NULL && hashp->type == bfd_link_hash_defined)
             {
@@ -1467,20 +1495,20 @@ bfd_mach_o_get_indirect_section_contents (abfd, link_info, section, data, symbol
             {
               fprintf (stderr, "Error binding section %s: "
                        "symbol %s is undefined\n", section->name, asym->name);
-              return (false);
+              return (FALSE);
             }
         }
       else
         {
           fprintf (stderr, "Error binding section %s: "
                    "symbol out of bounds\n", section->name);
-          return (false);
+          return (FALSE);
         }
 
       offset += 4;
     }
 
-  return (true);
+  return (TRUE);
 }
 
 bfd_byte *
@@ -1489,7 +1517,7 @@ bfd_mach_o_bfd_get_relocated_section_contents (
     struct bfd_link_info *link_info,
     struct bfd_link_order *link_order,
     bfd_byte *data,
-    boolean relocateable,
+    bfd_boolean relocateable,
     asymbol **symbols
 ) {
   bfd_mach_o_data_struct *mdata = abfd->tdata.mach_o_data;
