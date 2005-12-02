@@ -66,7 +66,7 @@ static int IS_SOCKET_CONNECTED(int socket) {
   socklen_t mpi_tmp_namelen = 0;
   struct sockaddr mpi_tmp_name;
 int retval = getpeername( socket, &mpi_tmp_name, &mpi_tmp_namelen ); 
-if (retval == -1) {printf("errno: %d: \n", errno); perror("getpeername");}
+if (retval == -1) {fprintf(stderr, "errno: %d: \n", errno); perror("getpeername");}
   return 1 + getpeername( socket, &mpi_tmp_name, &mpi_tmp_namelen );
 }
 
@@ -76,8 +76,7 @@ if (retval == -1) {printf("errno: %d: \n", errno); perror("getpeername");}
 //  to set up the initial connection, or to create a new one if the
 //  old one dies.
 
-static void list_accept_new_socket(list_sd)
-int list_sd;
+static void list_accept_new_socket(int list_sd)
 { struct sockaddr_in new_sin;
   int ns, source;
   socklen_t fromlen = sizeof(new_sin);
@@ -107,8 +106,7 @@ int list_sd;
   }
 }
 
-static int list_connect_new_socket( myrank, dest_rank )
-int myrank, dest_rank;
+static int list_connect_new_socket( int myrank, int dest_rank )
 { int sd;
   char buf[sizeof(long)];
 
@@ -186,12 +184,8 @@ static void *curr_signal()
 /* Under POSIX, the system calls used here that are interruptible (EINTR)
    are:  connect(), recv(), select()
    */
-static int select_block_sigs( n, readfds, writefds, exceptfds, timeout )
-    int n;
-    fd_set *readfds;
-    fd_set *writefds;
-    fd_set *exceptfds;
-    struct timeval *timeout;
+static int select_block_sigs( int n, fd_set *readfds, fd_set *writefds,
+			      fd_set *exceptfds, struct timeval *timeout )
 { sigset_t sigset, oldsigset;
   sighandler_t real_handler;
   int answer;
@@ -401,19 +395,21 @@ if ( count * datatype_size[(int)datatype] < 0 ) {
 #define DONT_EAT_HDR 0
 #define BLOCKING 0
 #define NOT_BLOCKING 1
+// These next two are the values of flag in MPI_Iprobe, and must be 1 and 0
 #define MSG_WAITING 1
 #define NO_MSG_WAITING 0
 MPI_Status dummy_status;
 
-static struct timeval * read_msg_hdr_setup( int *source, int tag, int *flag ) {
+static struct timeval * read_msg_hdr_setup( int source, int tag,
+					    int blocking ) {
   static struct timeval zerotime;
   /* MUST ALSO HANDLE MPI_ANY_TAG and MPI_COLL_COMM_TAG */
-  if ( *source > MPINU_num_slaves || *source < MPI_ANY_SOURCE ||
+  if ( source > MPINU_num_slaves || source < MPI_ANY_SOURCE ||
        tag < MPI_COLL_COMM_TAG ) {
     printf("read_msg_hdr: invalid argument\n");
     exit(1);
   }
-  if ( *flag == BLOCKING )
+  if ( blocking == BLOCKING )
     return NULL; /* NULL timeout means in select means wait forever (block) */
   else { /* poll and return */
     zerotime.tv_sec = 0;
@@ -422,32 +418,33 @@ static struct timeval * read_msg_hdr_setup( int *source, int tag, int *flag ) {
   }
 }
 
-static int read_msg_hdr_select(int *source, fd_set *fd_readset_ptr, int *flag,
-			       struct timeval *timeout) {
+static int read_msg_hdr_select(int source, int tag, fd_set *fd_readset_ptr,
+		       int *blocking, struct timeval *timeout, int *rank) {
   int tmp, fd, num_sd;
-  tmp = MPINU_rank_of_msg_avail_in_cache(*source);
+  tmp = MPINU_rank_of_msg_avail_in_cache(source, tag);
   if (tmp != -1) {
-    *source = tmp; /* in case *source was MPI_ANY_SOURCE */
-    *flag = MSG_WAITING;
+    *rank = tmp; /* in case source was MPI_ANY_SOURCE */
+    *blocking = MSG_WAITING;
     return MPINU_pg_array[tmp].sd;
-  }
-  if (*source == MPINU_myrank) { /* If want msg from self and not in cache ... */
-    if ( *flag == BLOCKING ) {
+  } else
+    *rank = source;
+  if (source == MPINU_myrank) { /* If want msg from self and not in cache ... */
+    if ( *blocking == BLOCKING ) {
       printf("read_msg_hdr:  rank %d BLOCKING waiting for msg from self.\n",
 	     MPINU_myrank);
       exit(1);
     } else {
-      *flag = NO_MSG_WAITING;  /* no messages, return */
+      *blocking = NO_MSG_WAITING;  /* no messages, return */
       return -1;
     }
   }
 
-  if ( *source == MPI_ANY_SOURCE ) {
+  if ( source == MPI_ANY_SOURCE ) {
     /* Copy global MPINU_fdset (with everything set) to local fd_readset */
     memcpy( (char *)fd_readset_ptr, (char *)&MPINU_fdset,
 	    sizeof(MPINU_fdset) );
   } else {
-    fd = MPINU_pg_array[*source].sd;
+    fd = MPINU_pg_array[source].sd;
     FD_ZERO( fd_readset_ptr );
     if ( fd != PG_NOSOCKET )
       FD_SET( fd, fd_readset_ptr );
@@ -467,43 +464,43 @@ static int read_msg_hdr_select(int *source, fd_set *fd_readset_ptr, int *flag,
   CALL_CHK( num_sd = select_block_sigs, (MPINU_max_sd+1, fd_readset_ptr,
 					 NULL, NULL, timeout) );
   if ( FD_ISSET( MPINU_my_list_sd, fd_readset_ptr ) ) {
-    assert( *source != MPI_ANY_SOURCE );
+    assert( source != MPI_ANY_SOURCE );
     /* A msg on this socket is a request to open a new socket. */
     list_accept_new_socket(MPINU_my_list_sd);
-    // If after list_accept_..., there's now a socket for *source, register it;
-    // Else it was a new socket, but not one for *source, and do nothing
-    if (MPINU_pg_array[*source].sd != PG_NOSOCKET)
-      FD_SET( MPINU_pg_array[*source].sd, fd_readset_ptr );
+    // If after list_accept_..., there's now a socket for source, register it;
+    // Else it was a new socket, but not one for source, and do nothing
+    if (MPINU_pg_array[source].sd != PG_NOSOCKET)
+      FD_SET( MPINU_pg_array[source].sd, fd_readset_ptr );
     errno = EAGAIN;
     return -1;
   }
 
-  /* Given *flag with value of BLOCKING or NOT_BLOCKING,
+  /* Given *blocking with value of BLOCKING or NOT_BLOCKING,
      change to MSG_WAITING or NO_MSG_WAITING */
   if ( num_sd == 0 ) {
-    if ( *flag == BLOCKING ) {
+    if ( *blocking == BLOCKING ) {
       printf("read_msg_hdr:  rank %d BLOCKING exiting without recv'd msg.\n",
 	     MPINU_myrank);
       exit(1);
     } else {
-      *flag = NO_MSG_WAITING;  /* no messages, return */
+      *blocking = NO_MSG_WAITING;  /* no messages, return */
       return -1;
     }
   } else if ( num_sd > 0 )
-    *flag = MSG_WAITING;
+    *blocking = MSG_WAITING;
 
   return num_sd;
 }
 
-static struct msg_hdr * read_msg_hdr_get_buf(int *source, int tag,
+static struct msg_hdr * read_msg_hdr_get_buf(int source, int tag,
 				        fd_set *fd_readset_ptr, int eat_hdr) {
-  int fd, recv_flags, num_bytes, tmp;
+  int fd, recv_flags, num_bytes, dest;
   static struct msg_hdr buf_hdr; // static since we return this to caller
 
   if ( eat_hdr == DONT_EAT_HDR ) recv_flags = MSG_PEEK;
   else recv_flags = 0;
 
-  if ( *source == MPI_ANY_SOURCE ) { /* Determine source, fd */
+  if ( source == MPI_ANY_SOURCE ) { /* Determine source, fd */
     FD_CLR( MPINU_my_list_sd, fd_readset_ptr ); /* listener not legit source */
     for ( fd = 0; fd <= MPINU_max_sd+1; fd++)
       if ( FD_ISSET( fd, fd_readset_ptr ) ) break;
@@ -512,7 +509,7 @@ static struct msg_hdr * read_msg_hdr_get_buf(int *source, int tag,
       exit(1);
     }
   } else
-    fd = MPINU_pg_array[*source].sd;
+    fd = MPINU_pg_array[source].sd;
 #ifdef DEBUG
   printf("receiving on socket %d out of MPINU_max_sd %d\n", fd, MPINU_max_sd);
 #endif
@@ -533,15 +530,15 @@ static struct msg_hdr * read_msg_hdr_get_buf(int *source, int tag,
     return NULL; /* failed to receive; return NULL and try again upstairs */
   }
   // Confirm that the source for that socket is the same as source in buf_hdr
-  for ( tmp = 0; tmp <= MPINU_num_slaves; tmp++ )
-    if ( MPINU_pg_array[tmp].sd == fd )
-      assert( tmp == ntohl(buf_hdr.rank) );
+  for ( dest = 0; dest <= MPINU_num_slaves; dest++ )
+    if ( MPINU_pg_array[dest].sd == fd )
+      assert( dest == ntohl(buf_hdr.rank) );
   return &buf_hdr;
 }
 
-void read_msg_hdr_post_check( int eat_hdr, int *source, int tag, int size,
-			      MPI_Datatype datatype, int count,
-			      MPI_Status  *status ) {
+static void read_msg_hdr_post_check( int eat_hdr, int source, int tag,
+				     int size, MPI_Datatype datatype,
+				     int count, MPI_Status  *status ) {
   assert( size != -1 );
   if ( (tag != MPI_ANY_TAG) && (tag != status->MPI_TAG) ) {
     printf("MPINU(rank %d): Msg received with tag (%d) from source (%d)\n"
@@ -563,10 +560,10 @@ void read_msg_hdr_post_check( int eat_hdr, int *source, int tag, int size,
       exit(1);
     }
   }
-  if ( ( *source != status->MPI_SOURCE ) && ( *source != MPI_ANY_SOURCE ) ) {
+  if ( ( source != status->MPI_SOURCE ) && ( source != MPI_ANY_SOURCE ) ) {
     printf("read_msg_hdr:  inconsistent source,\n");
     printf("  expecting source(%d) and received from source(%d) on proc. %d\n",
-	    *source, status->MPI_SOURCE, MPINU_myrank);
+	    source, status->MPI_SOURCE, MPINU_myrank);
     exit(1);
   }
 }
@@ -580,9 +577,9 @@ void read_msg_hdr_post_check( int eat_hdr, int *source, int tag, int size,
  *   eat_hdr:  eat_hdr == DONT_EAT_HDR means don't consume msg header
  */
 static int read_msg_hdr ( int count, MPI_Datatype datatype,
-			  int *source, int tag, MPI_Comm comm, int *flag,
+			  int *source, int tag, MPI_Comm comm, int *blocking,
 			  MPI_Status *status, int eat_hdr ) {
-  int size, fd, num_bytes, num_sd;
+  int size, fd, num_bytes, num_sd, rank;
   fd_set fd_readset;
   struct timeval *timeout;
   struct msg_hdr * buf_hdr = NULL;
@@ -596,7 +593,7 @@ static int read_msg_hdr ( int count, MPI_Datatype datatype,
   exit(1);
 #endif
 
-  timeout = read_msg_hdr_setup( source, tag, flag );
+  timeout = read_msg_hdr_setup( *source, tag, *blocking );
 
   while ( buf_hdr == NULL ) {
     /* Use select to find active port; if BLOCKING && not MPI_ANY_SOURCE,
@@ -604,25 +601,26 @@ static int read_msg_hdr ( int count, MPI_Datatype datatype,
        that we also need to check the listener port */
     /* num_sd is number of socket descriptors with available messages;
      * num_sd is used only for debugging */
-    while ( -1 == (num_sd =
-	           read_msg_hdr_select(source, &fd_readset, flag, timeout))
-	    && errno == EAGAIN );
+    do {
+      num_sd = read_msg_hdr_select(*source, tag,
+				   &fd_readset, blocking, timeout, &rank);
+    } while ( ( -1 == num_sd ) && ( errno == EAGAIN ) );
 #ifdef DEBUG
     printf("exiting select(%d)\n",MPINU_myrank);fflush(stdout);
-    printf("timeout == NULL: %d; num_sd: %d; *flag: %d\n",
-	   timeout == NULL, num_sd, *flag);
+    printf("timeout == NULL: %d; num_sd: %d; *blocking: %d\n",
+	   timeout == NULL, num_sd, *blocking);
 #endif
 
-    if (*flag == NO_MSG_WAITING)
+    if (*blocking == NO_MSG_WAITING)
       return 0; /* This was MPI_Iprobe;  It doesn't expect a buffer or status*/
-    buf_hdr = read_msg_hdr_get_buf(source, tag, &fd_readset, eat_hdr);
+    buf_hdr = read_msg_hdr_get_buf(rank, tag, &fd_readset, eat_hdr);
   }
   status->MPI_TAG = ntohl(buf_hdr->tag);
   size = ntohl(buf_hdr->size);
   status->mpi_size = size;
   status->MPI_SOURCE = ntohl(buf_hdr->rank);
 
-  read_msg_hdr_post_check( eat_hdr, source, tag, size, datatype, count,
+  read_msg_hdr_post_check( eat_hdr, *source, tag, size, datatype, count,
 			   status );
 
 #ifdef DEBUG

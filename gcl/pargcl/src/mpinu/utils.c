@@ -120,6 +120,7 @@ else
   log_string(4, "MPINU_recvall(rank %d): msg body(coming): size: %d\n",
 		                MPINU_myrank, len);
 
+    assert(s >= 0);
     assert(len >= 0);
     while (received < len && timeout > 0) {
       result = recv(s, (char *)buf + received, len - received, flags);

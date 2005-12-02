@@ -37,38 +37,59 @@
 #include "mpi.h"
 #include "mpiimpl.h"
 
+typedef enum { BUF_TAG_EQUAL, BUF_TAG_NOT_EQUAL } buf_tag_equality_t;
+
 static void buf_init ();
-static void buf_reset(int rank);
-static int buf_avail (int rank, int len);
+static buf_tag_equality_t buf_tag_compare(int rank, int tag);
+static void buf_reset(int source, int tag);
+static int buf_avail (int source, int len);
+static int buf_avail_tag(int source, int len, int tag);
 static void buf_enqueue(int rank, void *buf, int len);
 static void buf_dequeue(int rank, void *buf, int len, int peek_msg);
-static void buf_peek(int rank, void *buf, int len);
+static void *buf_peek(int rank, int len);
 static void buf_skip(int rank, int len);
 
-/* non-blocking, returns socket descriptor or -1 if none available */
-int MPINU_rank_of_msg_avail_in_cache(int source) {
+/* non-blocking, returns socket descriptor or -1 if none available
+ * NOTE:  This function assumes that the cursor of all buf's is zero,
+ *        and it can call buf_reset(source, tag).
+ */
+int MPINU_rank_of_msg_avail_in_cache(int source, int tag) {
     if (source != MPI_ANY_SOURCE) {
-      if (buf_avail(source, sizeof(struct msg_hdr)))
-	return source;
+      if (tag == MPI_ANY_TAG) {
+	if (buf_avail(source, sizeof(struct msg_hdr)))
+          return source;
+      }
+      else
+	while (buf_avail(source, sizeof(struct msg_hdr))) {
+	  struct msg_hdr *hdr = buf_peek(source, sizeof(struct msg_hdr));
+	  if ( ntohl( hdr->tag ) == tag ) {
+	    buf_reset(source, tag); /* clean up for next caller */
+	    return source;
+	  } else { /* Else skip header and body */
+	    buf_skip( source, sizeof(struct msg_hdr) + ntohl(hdr->size) );
+	  }
+	}
+      buf_reset(source, tag); /* clean up for next caller */
     }
     else /* else source == MPI_ANY_SOURCE */
-      for (source = 0; source < MPINU_num_slaves; source++)
-        if (buf_avail(source, sizeof(struct msg_hdr)))
-          return source;
+      for (source = 0; source < MPINU_num_slaves; source++) {
+	int rank = MPINU_rank_of_msg_avail_in_cache(source, tag);
+	if (rank != -1)
+	  return rank;
+      }
     /* if no source had buf_avail, then no msg avail */
     return -1;
 }
 
-/* On receiving a msg_hdr, we first do buf_reset(source),
+/* On receiving a msg_hdr, we first do buf_reset(source, tag),
  * but _not_ on receiving a msg_body */
 ssize_t MPINU_recv_msg_hdr_with_cache(int s, int tag,
 				      void *buf, size_t len, int flags) {
     int msg_found = 0;
     int source = MPINU_rank_from_socket(s);
-    buf_reset(source);
+    buf_reset(source, tag);
     while ( !msg_found && buf_avail(source, len) ) {
-      buf_peek(source, buf, len);
-      if ( ntohl( ((struct msg_hdr *)buf)->tag ) == tag
+      if ( ntohl( ((struct msg_hdr *)buf_peek(source, len))->tag ) == tag
 	   || tag == MPI_ANY_TAG ) {
 	buf_dequeue(source, buf, len, flags & MSG_PEEK);
 	msg_found = 1;
@@ -140,6 +161,7 @@ static struct buf_queue {
     void * buf;
     int end;
     int curs;
+    int tag;
 } * recv_buf;
 
 static void buf_init () {
@@ -155,15 +177,50 @@ static void buf_init () {
       recv_buf[i].curs = 0;
     }
 }
-static void buf_reset(int rank) {
+/* Reset to search beginning of buffer, looking for tag */
+static void buf_reset(int source, int tag) {
+    assert( source != MPI_ANY_SOURCE );
     if ( recv_buf == NULL )
       buf_init();
-    recv_buf[rank].curs = 0;
+    recv_buf[source].curs = 0;
+    recv_buf[source].tag = tag;
 }
-static int buf_avail (int rank, int len) {
+static int buf_avail (int source, int len) {
     if ( recv_buf == NULL ) /* if recv_buf never init'ed, then nothing avail */
       return 0;
-    return recv_buf[rank].curs + len <= recv_buf[rank].end;
+    return recv_buf[source].curs + len <= recv_buf[source].end;
+}
+/*
+ * If the tags are not equal, then check the entire buffer.
+ * If the tags are equal, buf_reset() was called for this tag.  Continue
+ *    searching starting at cursor.
+ */
+static int buf_avail_tag(int source, int len, int tag) {
+    if ( recv_buf == NULL ) /* if recv_buf never init'ed, then nothing avail */
+      return 0;
+    assert( source != MPI_ANY_SOURCE );
+    assert( recv_buf[source].curs == 0 || recv_buf[source].tag != MPI_ANY_TAG);
+    /* I DON'T UNDERSTAND THIS FIRST CASE.  IF curs == 0, THEN BOTH
+       CASES DO THE SAME THING.  IF curs > 0, THEN THE TAGS DON'T MATCH,
+       AND SO THEN SHOULDN'T WE RETURN FALSE AND THEN FORCE A SEARCH FURTHER
+       INTO buf BY OUR CALLING FUNCTION?  - Gene */
+    if (buf_tag_compare(source, tag) == BUF_TAG_NOT_EQUAL)
+      return len <= recv_buf[source].end;
+    else
+      return recv_buf[source].curs + len <= recv_buf[source].end;
+}
+/*
+ * Compare the given tag with the tag of the cursor for the specified rank. If
+ * the cursor is at the beginning then declare
+ * that the tag does not match. Otherwise, if an actual tag comparison doesn't
+ * match, return that fact, else the tags do match.
+ */
+static buf_tag_equality_t buf_tag_compare(int rank, int tag) {
+    assert( rank != MPI_ANY_SOURCE );
+    if ( recv_buf[rank].curs == 0 || recv_buf[rank].tag != tag )
+	return BUF_TAG_NOT_EQUAL;
+    else
+	return BUF_TAG_EQUAL;
 }
 static void buf_finalize () {
     free( recv_buf );
@@ -198,9 +255,10 @@ static void buf_dequeue(int rank, void *buf, int len, int peek_msg) {
         free( recv_buf[rank].buf );
     }
 }
-static void buf_peek(int rank, void *buf, int len) {
+static void *buf_peek(int rank, int len) {
     assert( recv_buf[rank].curs + len <= recv_buf[rank].end );
-    memcpy( buf, recv_buf[rank].buf + recv_buf[rank].curs, len );
+    assert( recv_buf[rank].curs == 0 || recv_buf[rank].tag != MPI_ANY_TAG );
+    return (char *)recv_buf[rank].buf + recv_buf[rank].curs;
 }
 static void buf_skip(int rank, int len) {
     recv_buf[rank].curs += len;

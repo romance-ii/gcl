@@ -175,7 +175,7 @@ int MPINU_set_and_exec_cmds();
 void MPINU_send_thread_exit(void);
 
 	/* from utils.c : */
-int MPINU_rank_of_msg_avail_in_cache(int source);
+int MPINU_rank_of_msg_avail_in_cache(int source, int tag);
 ssize_t MPINU_recv_msg_hdr_with_cache(int s, int tag,
 				      void *buf, size_t len, int flags);
 ssize_t MPINU_recv_msg_body_with_cache(int source, void *buf, size_t len,
