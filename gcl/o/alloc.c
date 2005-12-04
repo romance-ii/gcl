@@ -800,11 +800,12 @@ ONCE_MORE:
 		goto EXHAUSTED;
 	      }
 	    } else if (nrbpage != i) {
-	      rb_end +=  (PAGESIZE* (nrbpage -i));
+/* 	      rb_end +=  (PAGESIZE* (nrbpage -i)); */
+	      rb_end =  heap_end+(holepage+nrbpage)*PAGESIZE;
 	      rb_limit = rb_end - 2*RB_GETA;
-	      if (page(rb_end) - page(heap_end) !=
-		  holepage + nrbpage)
-		FEerror("bad rb_end",0);
+/* 	      if (page(rb_end) - page(heap_end) != */
+/* 		  holepage + nrbpage) */
+/* 		FEerror("bad rb_end",0); */
 	      alloc_page(-( nrbpage + holepage));
 	    }
 	  } 

@@ -1082,12 +1082,17 @@ char *old_rb_start;
 
 DEFVAR("*AFTER-GBC-HOOK*",sSAafter_gbc_hookA,SI,sLnil,"");
 
+static int in_agbch;
 static void
-call_after_gbc_hook(t)
-{ if (sSAafter_gbc_hookA && sSAafter_gbc_hookA->s.s_dbind!= Cnil)
-    { set_up_string_register(tm_table[(int)t].tm_name+1);
-      ifuncall1(sSAafter_gbc_hookA->s.s_dbind,intern(string_register,system_package));
-    }
+call_after_gbc_hook(t) { 
+
+  if (sSAafter_gbc_hookA && sSAafter_gbc_hookA->s.s_dbind!= Cnil) { 
+    in_agbch=1;
+    set_up_string_register(tm_table[(int)t].tm_name+1);
+    ifuncall1(sSAafter_gbc_hookA->s.s_dbind,intern(string_register,system_package));
+    in_agbch=0;
+  }
+  
 }
 
 void
@@ -1101,6 +1106,9 @@ GBC(enum type t) {
 #ifdef DEBUG
   int tm=0;
 #endif
+
+  if (in_agbch)
+    return;
   
   mcsl=mcsh=&tm;
 
