@@ -512,7 +512,7 @@ DEFVAR("*GENSYM-COUNTER*",sLgensym_counter,LISP,make_fixnum(0),"");
 	  size = mpz_sizeinbase(MP(big),10)+2+(sign<0? 1 : 0);
 	  if (!(p=ZALLOCA(size)))
 	    FEerror("Cannot alloca gensym name", 0);
-	  mpz_get_str(p,10,MP(big));
+	  mpz_get_strp(&p,10,MP(big));
 	  j=size-5;
 	  j=j<0 ? 0 : j;
 	  while (p[j]) j++;

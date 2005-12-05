@@ -72,6 +72,12 @@ GMP_EXTERN int jmp_gmp;
 #define RA_void
 #define RR_void
 
+#undef mpz_get_strp
+#define mpz_get_strp __gmpz_get_strp
+
+static char *
+__gmpz_get_strp(char **a,int b,mpz_t c) {return __gmpz_get_str(*a,b,c);}
+
 /* GMP_WRAPPERS: the gmp library uses heap allocation in places for
    temporary storage.  This greatly complicates relocatable bignum
    allocation in GCL, which is a big winner in terms of performance.
@@ -136,7 +142,7 @@ MEM_GMP_CALL(2,void,mpz_set_ui,1,mpz_t,unsigned long int)
 MEM_GMP_CALL(2,void,mpz_set_si,1,mpz_t,long int)
 MEM_GMP_CALL(1,double,mpz_get_d,0,mpz_t)
 MEM_GMP_CALL(1,gmp_lint,mpz_get_si,0,mpz_t)
-MEM_GMP_CALL(3,gmp_char_star,mpz_get_str,0,char *,int,mpz_t)
+MEM_GMP_CALL(3,gmp_char_star,__gmpz_get_strp,0,char **,int,mpz_t)
 MEM_GMP_CALL(1,int,mpz_fits_sint_p,0,mpz_t)
 MEM_GMP_CALL(1,int,mpz_fits_slong_p,0,mpz_t)
 MEM_GMP_CALL(1,gmp_ulint,mpz_popcount,0,mpz_t)
@@ -147,6 +153,7 @@ MEM_GMP_CALL(3,void,mpz_gcd,1,mpz_t,mpz_t,mpz_t)
 MEM_GMP_CALL(3,gmp_ulint,mpz_gcd_ui,1,mpz_t,mpz_t,unsigned long int)
 MEM_GMP_CALL(3,void,mpz_divexact,1,mpz_t,mpz_t,mpz_t)
 MEM_GMP_CALL(3,void,mpz_divexact_ui,1,mpz_t,mpz_t,unsigned long int)
+
 
      /* FIXME: find a way to have this follow the convention in gmp.h*/
 
@@ -177,7 +184,8 @@ MEM_GMP_CALL(3,void,mpz_divexact_ui,1,mpz_t,mpz_t,unsigned long int)
 #define __gmpz_set_si m__gmpz_set_si
 #define __gmpz_get_d m__gmpz_get_d
 #define __gmpz_get_si m__gmpz_get_si
-#define __gmpz_get_str m__gmpz_get_str
+/* #define __gmpz_get_str m__gmpz_get_str */
+#define __gmpz_get_strp m__gmpz_get_strp
 #define __gmpz_fits_sint_p m__gmpz_fits_sint_p
 #define __gmpz_fits_slong_p m__gmpz_fits_slong_p
 #define __gmpz_popcount m__gmpz_popcount

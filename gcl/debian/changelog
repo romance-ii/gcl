@@ -163,8 +163,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * try to prevent some gc recusion when using *after-gbc-hook*
   * Handle after-gbc-hook escape in manner that is robust against error
     breaks
+  * FIx bignum gc print bug
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  5 Dec 2005 15:02:18 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  5 Dec 2005 21:41:18 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
