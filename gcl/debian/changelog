@@ -161,8 +161,10 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * reduce inlining fixes
   * macosx fixes from 2.6.8pre courtesy Aurelien
   * try to prevent some gc recusion when using *after-gbc-hook*
+  * Handle after-gbc-hook escape in manner that is robust against error
+    breaks
 
- -- Camm Maguire <camm@enhanced.com>  Sun,  4 Dec 2005 23:00:39 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  5 Dec 2005 15:02:18 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

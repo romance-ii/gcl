@@ -1082,15 +1082,17 @@ char *old_rb_start;
 
 DEFVAR("*AFTER-GBC-HOOK*",sSAafter_gbc_hookA,SI,sLnil,"");
 
-static int in_agbch;
+static struct symbol in_agbchs;
+static object in_agbch=(object)&in_agbchs;
 static void
 call_after_gbc_hook(t) { 
 
   if (sSAafter_gbc_hookA && sSAafter_gbc_hookA->s.s_dbind!= Cnil) { 
-    in_agbch=1;
+    bds_ptr old_bds_top = bds_top;
+    bds_bind(in_agbch,Ct);
     set_up_string_register(tm_table[(int)t].tm_name+1);
     ifuncall1(sSAafter_gbc_hookA->s.s_dbind,intern(string_register,system_package));
-    in_agbch=0;
+    bds_unwind(old_bds_top);
   }
   
 }
@@ -1107,7 +1109,7 @@ GBC(enum type t) {
   int tm=0;
 #endif
 
-  if (in_agbch)
+  if (in_agbch->s.s_dbind==Ct)
     return;
   
   mcsl=mcsh=&tm;
