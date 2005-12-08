@@ -164,8 +164,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * Handle after-gbc-hook escape in manner that is robust against error
     breaks
   * FIx bignum gc print bug
+  * fix :dynamic-extent list inintialization
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  5 Dec 2005 21:41:18 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  8 Dec 2005 01:22:39 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

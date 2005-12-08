@@ -721,7 +721,7 @@
 (defun make-list-inline (n)
   (let ((tem (can-allocate-on-stack)))
     (if tem
-	(wt "({fixnum _t=" n ";(ALLOCA_CONS(_t),ON_STACK_LIST(_t));})")
+	(wt "(ALLOCA_CONS(" n "),ON_STACK_MAKE_LIST(" n "))")
       (wt "make_list(" n ")"))))
 
 
