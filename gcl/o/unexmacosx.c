@@ -1274,7 +1274,7 @@ void init_darwin_zone_compat ()
 
 /* Replacement for broken sbrk(2).  */
 
-char *sbrk_macosx (int incr)
+void *my_sbrk (int incr)
 {
   char               *temp, *ptr;
   kern_return_t       rtn;

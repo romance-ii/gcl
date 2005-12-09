@@ -39,7 +39,7 @@ extern char *get_dbegin ();
 #define SET_REAL_MAXPAGE { sbrk_macosx(0); real_maxpage = (int) mach_maplimit/PAGESIZE; }
 
 #define sbrk sbrk_macosx
-extern char *sbrk_macosx(int incr);
+extern void *my_sbrk(int incr);
 
 
 /** (si::save-system "...") a.k.a. unexec implementation  */

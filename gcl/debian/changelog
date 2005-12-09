@@ -169,8 +169,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * Better object-type; write non-static array objects to .data
   * Omit heap ceiling check for now when ldd does not exist (e.g.
     macosx)
+  * sbrk_macosx -> my_sbrk for (possible) overriding purposes
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  9 Dec 2005 01:05:19 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri,  9 Dec 2005 01:33:40 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
