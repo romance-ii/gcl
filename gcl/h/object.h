@@ -1081,7 +1081,7 @@ EXTER char *tmp_alloc;
 #define INIT_NRBDIV (INIT_HOLEDIV*3)
 #define RB_GETDIV 100
 
-#define CORE_PAGES (((ufixnum)core_end-DBEGIN)>>PAGEWIDTH)
+#define CORE_PAGES (((ufixnum)core_end-(ufixnum)DBEGIN)>>PAGEWIDTH)
 #define RB_GETA    (CORE_PAGES/RB_GETDIV)
 
 
