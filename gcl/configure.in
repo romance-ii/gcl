@@ -1333,6 +1333,9 @@ else
 if test "$enable_static" = "yes" ; then
   heap_ceiling=0x0
 else
+if ! test -x ldd ; then
+  heap_ceiling=0x0
+else
 echo "int main() {return 0;}" >foo.c
 $CC foo.c -o foo
 heap_ceiling=`ldd foo | tail -n 1 | awk '{print $NF}' | tr -d '()'`
@@ -1344,6 +1347,7 @@ int main() {
     h=c>d && c<h ? c : h;
     fprintf(fp,"0x%lx",h);
     return 0;}],heap_ceiling=`cat conftest1`,echo failed;exit 1,echo failed;exit 1)
+fi
 fi
 fi
 AC_MSG_RESULT($heap_ceiling)

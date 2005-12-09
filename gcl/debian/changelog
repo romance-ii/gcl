@@ -167,8 +167,10 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * fix :dynamic-extent list inintialization
   * Catch array object types from *constants* stack
   * Better object-type; write non-static array objects to .data
+  * Omit heap ceiling check for now when ldd does not exist (e.g.
+    macosx)
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  9 Dec 2005 00:59:56 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri,  9 Dec 2005 01:05:19 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
