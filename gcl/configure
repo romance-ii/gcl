@@ -2059,7 +2059,7 @@ cat>foo.c <<EOFF
 int main() {FILE *f;double d=0.0;getc(f);cos(d);printf("%g",cos(d));return 0;}
 EOFF
 $CC -c foo.c -o foo.o
-if nm foo.o |grep " U " | grep "_cos" >/dev/null || nm foo.o |grep " U " | grep "_getc" >/dev/null  ; then
+if nm foo.o |grep " U " | grep "_cos" >/dev/null || nm foo.o |grep " U " | grep " _getc" >/dev/null  ; then
 	LEADING_UNDERSCORE=1
 	echo "$ac_t"""yes"" 1>&6
 else

@@ -170,8 +170,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * Omit heap ceiling check for now when ldd does not exist (e.g.
     macosx)
   * sbrk_macosx -> my_sbrk for (possible) overriding purposes
+  * macosx name mangling fixes
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  9 Dec 2005 01:33:40 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri,  9 Dec 2005 02:07:57 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

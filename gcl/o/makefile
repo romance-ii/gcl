@@ -159,7 +159,7 @@ pltd.h: plttest.o
                             b=a;gsub("_","",b);\
                             if (!match(j,b) && !match(b,"IO")) printf("extern int %s();\n",a)}' \
 			j="$$(awk '/main/ {i=1;next} {if (!i) next} \
-				/^ *[a-zA-Z_=]*\(/ {sub("\\(.*$$","",$$1);sub("^.*=","",$$1);print $$1}' plttest.c)" \
+				/^ *[a-zA-Z_=]*\(/ {sub("\\(.*$$","",$$1);sub("^.*=","",$$1);print $$1}' plttest.c | tr -d '\012')" \
 			k=$(LEADING_UNDERSCORE) |\
 			sort | \
 			awk '{A[++k]=$$0} END {for (i=1;i<=k;i++) \
