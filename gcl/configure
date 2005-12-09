@@ -2056,10 +2056,10 @@ echo "configure:2056: checking "for leading underscore in object symbols"" >&5
 cat>foo.c <<EOFF
 #include <math.h>
 #include <stdio.h>
-int main() {double d=0.0;cos(d);printf("%g",cos(d));return 0;}
+int main() {FILE *f;double d=0.0;getc(f);cos(d);printf("%g",cos(d));return 0;}
 EOFF
 $CC -c foo.c -o foo.o
-if nm foo.o |grep " U " | grep "_cos" >/dev/null ; then
+if nm foo.o |grep " U " | grep "_cos" >/dev/null || nm foo.o |grep " U " | grep "_getc" >/dev/null  ; then
 	LEADING_UNDERSCORE=1
 	echo "$ac_t"""yes"" 1>&6
 else
