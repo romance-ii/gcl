@@ -4400,7 +4400,7 @@ main(int argc,char * argv[])
   fprintf ( fp,"0x%lx", 0x3000000 );  /* Windows custom allocation from this point up */
 #else
 #if defined (__APPLE__) && defined (__MACH__)
-  fprintf(fp,"get_dbegin()");
+  fprintf(fp,"((unsigned long)get_dbegin())");
 #else
   fprintf(fp,"0x%lx",((unsigned long) b) & ~(unsigned long)0xffffff);
 #endif
