@@ -49,17 +49,12 @@
 ;;; Check if THING is an object of the type TYPE.
 ;;; Depends on the implementation of TYPE-OF.
 (defun object-type (thing)
-  (let ((type (type-of thing)))
-    (case type
-      ((fixnum bignum) `(integer ,thing ,thing))
-      ((short-float long-float symbol null boolean) type)
-      (cons `(cons ,(object-type (car thing)) ,(if (cdr thing) (object-type (cdr thing)) 'null)))
-      (keyword 'symbol)
-      ((standard-char character) 'character)
-      ((string bit-vector) type)
-      (vector (list 'vector (array-element-type thing)))
-      (array (list 'array (array-element-type thing)))
-      (t t))))   ;   'unknown ;; I can't see any use of this
+  (let* ((type (type-of thing)))
+    (cond ((type>= 'integer type) `(integer ,thing ,thing))
+	  ((eq type 'cons) `(cons ,(object-type (car thing)) ,(if (cdr thing) (object-type (cdr thing)) 'null)))
+	  ((eq type 'keyword) 'symbol)
+	  ((type>= 'character type) 'character)
+	  (type))))
 
 (defvar *norm-tp-hash* (make-hash-table :test 'equal))
 (defvar *and-tp-hash* (make-hash-table :test 'equal))
