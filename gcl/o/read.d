@@ -1215,7 +1215,7 @@ extra_argument(int);
 static void
 Lsharp_C_reader()
 {
-	object x;
+	object x=OBJNULL;
 
 	check_arg(3);
 	if (vs_base[2] != Cnil && !READsuppress)
