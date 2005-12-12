@@ -4,8 +4,8 @@ dnl Process this file with autoconf to produce a configure script.
 AC_INIT(src/mpi_defglue.lsp)
 
 dnl Set version number
-PARGCL_VERSION=0.9.8
-PARGCL_UPDATED="November, 2005"
+PARGCL_VERSION=0.9.9.1
+PARGCL_UPDATED="December, 2005"
 
 # Checks for programs.
 AC_PROG_CC
