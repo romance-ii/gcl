@@ -98,8 +98,6 @@ char *p4pg_file, *argv[];
         break;
       }
     }
-// Give slaves time to get ready to receive on socket???
-sleep(2);
 
     fromlen = sizeof(new_sin);
     CALL_CHK( ns = accept, (sd, (struct sockaddr *)&new_sin, &fromlen) );

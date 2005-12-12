@@ -410,7 +410,7 @@ static struct timeval * read_msg_hdr_setup( int source, int tag,
     exit(1);
   }
   if ( blocking == BLOCKING )
-    return NULL; /* NULL timeout means in select means wait forever (block) */
+    return NULL; /* NULL timeout means wait forever in select (block) */
   else { /* poll and return */
     zerotime.tv_sec = 0;
     zerotime.tv_usec = 0;
@@ -671,7 +671,7 @@ printf("fd: %d, *flag: %d\n", fd, is_blocking);fflush(stdout);
   }
 #ifdef NEW
   assert( source != MPI_ANY_SOURCE );
-  CALL_CHK(i = MPINU_recv_msg_body_with_cache, (source, (char *)buf, size, 0));
+  CALL_CHK(i = MPINU_recv_msg_body_with_cache, (source, (char *)buf, size));
 #else
   CALL_CHK( i = MPINU_recvall, ( fd, (char *)buf, size, 0 ) );
 #endif

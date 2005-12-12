@@ -131,16 +131,16 @@ ssize_t MPINU_recv_msg_hdr_with_cache(int s, int tag,
     return len;
 }
 
-ssize_t MPINU_recv_msg_body_with_cache(int source, void *buf, size_t len,
-				       int flags) {
+ssize_t MPINU_recv_msg_body_with_cache(int source, void *buf, size_t len) {
     if ( buf_avail(source, len) ) {
-      buf_dequeue(source, buf, len, flags & MSG_PEEK);
+      buf_dequeue(source, buf, len, 0); /* flags = 0: Never peek for body */
       return len;
     } else {
       /* Body cannot be split between buf and network;
        * If len bytes weren't available in buf, then expect 0 bytes in buf */
       assert( !buf_avail(source, 1) );
-      len = MPINU_recvall(MPINU_pg_array[source].sd, buf, len, flags);
+      /* flags = 0: Never peek for body */
+      len = MPINU_recvall(MPINU_pg_array[source].sd, buf, len, 0);
       return len;
     }
 }

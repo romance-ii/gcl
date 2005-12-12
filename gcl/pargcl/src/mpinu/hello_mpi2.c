@@ -77,6 +77,39 @@ char			*argv[];
 	}
 	barrier();
 
+	/* Test nonblocking sends of very large messages.
+	 *   This forces a deadly embrace unless one of the two processes
+	 *   can send two large messages, and begin a receive, while the
+	 *   other process has not yet begun any receive.
+	 * However, it appears that some O/S (e.g. Linux 2.6.12 ??) have
+	 *   a trick by which even if the master blocks on MPI_Send, when the
+	 *   slave enters MPI_Send, this somehow blocks the master.
+	 */
+	if ( myrank == 0 ) {
+	  printf("Sending two large messages before a receive at other end.\n");
+	  fflush(stdout);
+	}
+	if (myrank == 0) {
+		MPI_Send(workarray, WORKLEN, MPI_INT, 1, WORKTAG1,
+			 MPI_COMM_WORLD);
+		MPI_Send(workarray, WORKLEN, MPI_INT, 1, WORKTAG1,
+			 MPI_COMM_WORLD);
+		MPI_Recv(workarray, WORKLEN, MPI_INT, 1, WORKTAG1,
+			 MPI_COMM_WORLD, &status);
+		MPI_Recv(workarray, WORKLEN, MPI_INT, 1, WORKTAG1,
+			 MPI_COMM_WORLD, &status);
+	} else if (myrank == 1) {
+		MPI_Send(workarray, WORKLEN, MPI_INT, 0, WORKTAG1,
+			 MPI_COMM_WORLD);
+		MPI_Send(workarray, WORKLEN, MPI_INT, 0, WORKTAG1,
+			 MPI_COMM_WORLD);
+		MPI_Recv(workarray, WORKLEN, MPI_INT, 0, WORKTAG1,
+			 MPI_COMM_WORLD, &status);
+		MPI_Recv(workarray, WORKLEN, MPI_INT, 0, WORKTAG1,
+			 MPI_COMM_WORLD, &status);
+	}
+
+
 	MPI_Finalize();			/* cleanup MPI */
 	return 0;
 }

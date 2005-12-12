@@ -1,3 +1,7 @@
+// TODO:  define MAX_QUEUE_LENGTH 10000, currently
+//        Set it back to 100 (small footprint), and dynamically grow it
+//          when assert would normally violate MAX_QUEUE_LENGTH.
+
  /**********************************************************************
   * MPINU				                               *
   * Copyright (c) 2004-2005 Gene Cooperman <gene@ccs.neu.edu>          *
@@ -43,7 +47,7 @@
 /* When the NEW version has been run a lot, we will delete the
  * else branch (OLD). */
 #define NEW /* Use send queue of length longer than 1 */
-#define MAX_QUEUE_LENGTH 100
+#define MAX_QUEUE_LENGTH 10000
 
 #define true 1
 #define false 0
@@ -82,7 +86,10 @@ static sem_t send_consumer_semaphore;
 static sem_t *send_producer_sem = &send_producer_semaphore;
 static sem_t *send_consumer_sem = &send_consumer_semaphore;
 #endif
+/* for MPINU_sendall */
 static pthread_mutex_t send_mutex = PTHREAD_MUTEX_INITIALIZER;
+/* for enqueue, dequeue, pthread_create/sem_init */
+static pthread_mutex_t send_queue_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 // Primary declaration and initialization in section:  enqueue and dequeue
 static int head; // value is next empty slot in send_args
@@ -121,7 +128,7 @@ ssize_t MPINU_send_nonblock(int s, const void *buf, size_t len, int flags) {
     if (len == 0)
 	return len;
     // Initialize thread and semaphores if not done yet.
-    assert( pthread_mutex_lock( &send_mutex ) == 0 );
+    assert( pthread_mutex_lock( &send_queue_mutex ) == 0 );
     if (! send_thread_init) {
 #ifdef LOG_STRING
         { char filename[100];
@@ -167,11 +174,11 @@ ssize_t MPINU_send_nonblock(int s, const void *buf, size_t len, int flags) {
         send_thread_create();
 	send_thread_init = 1;
     }
-    assert( pthread_mutex_unlock( &send_mutex ) == 0 );
+    assert( pthread_mutex_unlock( &send_queue_mutex ) == 0 );
 
     // We are the producer; We wait until our semaphore gives us permission.
     assert( nu_sem_wait( send_producer_sem ) == 0  );
-    assert( pthread_mutex_lock( &send_mutex ) == 0 );
+    assert( pthread_mutex_lock( &send_queue_mutex ) == 0 );
 #ifdef NEW
     enqueue(s, buf, len, flags, "send");
     assert(DBG_COUNT>=0);
@@ -197,7 +204,7 @@ ssize_t MPINU_send_nonblock(int s, const void *buf, size_t len, int flags) {
 # endif
 #endif
     DBG_COUNT += len;
-    assert( pthread_mutex_unlock( &send_mutex ) == 0 );
+    assert( pthread_mutex_unlock( &send_queue_mutex ) == 0 );
     assert( sem_post( send_consumer_sem ) == 0 );
 
     return len;
@@ -211,7 +218,7 @@ static void * send_thread_body(void *dummy) {
 #endif
         //We are the consumer; We wait until our semaphore gives us permission.
         assert( nu_sem_wait( send_consumer_sem ) == 0 );
-        assert( pthread_mutex_lock( &send_mutex ) == 0 );
+        assert( pthread_mutex_lock( &send_queue_mutex ) == 0 );
 #ifdef NEW
 	if ( queue_length() == MAX_QUEUE_LENGTH-1 ) {
 	    sleep(60);  // If queue full, hope it will go away in 1 minute
@@ -261,20 +268,32 @@ static void * send_thread_body(void *dummy) {
 			  " msg body: size: %d\n",
 		      MPINU_myrank, MPINU_rank_from_socket(send_sd), send_len);
 #endif
+        assert( pthread_mutex_unlock( &send_queue_mutex ) == 0 );
+
 #ifdef NEW
 //printf( "queue_length(): %d\n", queue_length() );
 //printf( "args->sd: %d; rank: %d\n", args->sd, MPINU_myrank );
+        assert( pthread_mutex_lock( &send_mutex ) == 0 );
         CALL_CHK( num_bytes = MPINU_sendall,
 		  (args->sd, args->buf, args->len, args->flags) );
+        assert( pthread_mutex_unlock( &send_mutex ) == 0 );
+
+        assert( pthread_mutex_lock( &send_queue_mutex ) == 0 );
 	DBG_COUNT -= args->len;
 	assert(DBG_COUNT>=0);
 	tmplen = args->len;
 	dequeue("body");
+        assert( pthread_mutex_unlock( &send_queue_mutex ) == 0 );
 #else
+        assert( pthread_mutex_lock( &send_mutex ) == 0 );
         CALL_CHK( num_bytes = MPINU_sendall,
 		  (send_sd, (void *)send_tmp_buf, send_len, send_flags) );
+        assert( pthread_mutex_unlock( &send_mutex ) == 0 );
+
+        assert( pthread_mutex_lock( &send_queue_mutex ) == 0 );
 	DBG_COUNT -= send_len;
 	assert(DBG_COUNT==0);
+        assert( pthread_mutex_unlock( &send_queue_mutex ) == 0 );
 #endif
         // Original thread no longer available to handle error conditions:
         if ( num_bytes == -1 ) {
@@ -293,7 +312,6 @@ static void * send_thread_body(void *dummy) {
 		   num_bytes, send_len);
 	assert( num_bytes == send_len );
 #endif
-        assert( pthread_mutex_unlock( &send_mutex ) == 0 );
         assert( sem_post( send_producer_sem ) == 0 );
     }
 }
@@ -316,9 +334,9 @@ void MPINU_send_thread_exit() {
 #endif
     assert( nu_sem_wait( send_producer_sem ) == 0);
 #ifdef NEW
-    assert( pthread_mutex_lock( &send_mutex ) == 0 );
+    assert( pthread_mutex_lock( &send_queue_mutex ) == 0 );
     enqueue( SEND_DONE, "send is done", strlen("send is done")+1, -1, "exit" );
-    assert( pthread_mutex_unlock( &send_mutex ) == 0 );
+    assert( pthread_mutex_unlock( &send_queue_mutex ) == 0 );
 #else
     free( (void *)send_tmp_buf );
     send_tmp_buf = send_done;
