@@ -171,8 +171,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
     macosx)
   * sbrk_macosx -> my_sbrk for (possible) overriding purposes
   * macosx name mangling fixes
+  * clear-input for saner error processing
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  9 Dec 2005 02:07:57 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 13 Dec 2005 02:10:29 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 

@@ -145,38 +145,44 @@ signaled at this point in the stack.  For the moment the rest of the VARIABLES a
 	  (t (setf bod (cons 'progn bod))))
     `(block cond-error-continue ,bod)))
 
-(defvar *error-handler-args* nil)
+(defvar *internal-error-parms* nil)
 
 (defun #. (if (boundp '*error-handler-function*) *error-handler-function* 'joe)
-  (&rest error-handler-args)
+  (error-name correctable function-name
+	      continue-format-string error-format-string
+	      &rest error-handler-args
+	      &aux (internal-error-parms
+		    `(,error-name ,correctable ,function-name ,continue-format-string 
+				 ,error-format-string ,@error-handler-args)))
   (declare (:dynamic-extent error-handler-args))
-  (when (equal error-handler-args *error-handler-args*)
+  (clear-input nil)
+  (when (equal internal-error-parms *internal-error-parms*)
     (format t "Error handler called recursively ~S~%"
-	    error-handler-args)
+	    internal-error-parms)
     ;; FIXME
     (return-from si::universal-error-handler nil))
-  (let ((*error-handler-args* error-handler-args))
+  (let ((*internal-error-parms* internal-error-parms))
   (when *show-all-debug-info*
-       (si::simple-backtrace)(si::backtrace) (si::break-vs))
+    (si::simple-backtrace)
+    (si::backtrace)
+    (si::break-vs))
   (let ((err (make-error-condition
-			     :name (car error-handler-args)
-			     :string (fifth error-handler-args)
-			     :function (third error-handler-args)
-			     :continue-string (fourth error-handler-args)
-			     :format-args (nthcdr 5 error-handler-args)
-			     :error-handler-args error-handler-args)))
+	      :name error-name
+	      :string error-format-string
+	      :function function-name
+	      :continue-string continue-format-string
+	      :format-args error-handler-args
+	      :error-handler-args internal-error-parms)))
     (cond (*catch-error* (throw :any-error err))
 	  ((let (flag) (do ((i 0 (the fixnum (1+ i)))
-			    (end (the fixnum(fill-pointer (the array
-						    *catch-error-stack*)))))
+			    (end (the fixnum
+				      (fill-pointer (the array *catch-error-stack*)))))
 			   ((>= i end))
 			   (declare (fixnum i end))
 			   (cond ((setq flag
-					(funcall (aref *catch-error-stack* i)
-						      err))
+					(funcall (aref *catch-error-stack* i) err))
 				  (throw flag err))))))
-	  (t    (apply (get *error-handler-function* :old-definition)
-			 error-handler-args))))))
+	  ((apply (get *error-handler-function* :old-definition) internal-error-parms))))))
 
 (defun inf-signal (&rest error-handler-args)
  (apply *error-handler-function*
