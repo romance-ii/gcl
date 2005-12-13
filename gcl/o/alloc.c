@@ -994,6 +994,20 @@ gcl_init_alloc(void) {
   new_holepage = CORE_PAGES/HOLEDIV;
   nrbpage = CORE_PAGES/INIT_NRBDIV;
   
+#if 0    
+    fprintf ( stderr,
+              "gcl_init_alloc:"
+              " PAGESIZE %lx, MAXPAGE %lx,"
+              " MAXCORE %lx, CORE_PAGES %lx, INIT_NRBDIV %lx, INIT_HOLEDIV %lx, HOLEDIV %lx",
+              PAGESIZE,
+              MAXPAGE,
+              MAXCORE,
+              CORE_PAGES,
+              INIT_NRBDIV,
+              INIT_HOLEDIV,
+              HOLEDIV );
+#endif  
+
   alloc_page(-(holepage + nrbpage));
   
   rb_start = rb_pointer = heap_end + PAGESIZE*holepage;

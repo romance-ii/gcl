@@ -1024,15 +1024,13 @@ allocate_heap (void)
     fprintf ( stderr,
               "allocate_heap:"
               " base %lx, end %lx, reserved_heap_size %lx, PAGESIZE %lx, MAXPAGE %lx,"
-              " MAXCORE %lx, CORE_PAGES %lx, INIT_NRBDIV %lx, INIT_HOLEDIV %lx, HOLEDIV %lx"
-              " INIT_NRBDIV %lx\n",
+              " MAXCORE %lx, INIT_NRBDIV %lx, INIT_HOLEDIV %lx, HOLEDIV %lx",
               (void *) base,
               (void *) end,
               get_reserved_heap_size (),
               PAGESIZE,
               MAXPAGE,
               MAXCORE,
-              CORE_PAGES,
               INIT_NRBDIV,
               INIT_HOLEDIV,
               HOLEDIV );
