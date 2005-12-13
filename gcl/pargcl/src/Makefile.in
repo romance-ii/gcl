@@ -134,5 +134,5 @@ saved_pargcl: saved_prepargcl mpi_glue.o \
 	rm saved_prepargcl
 
 clean:
-	rm -f mpi_glue.c mpi_glue.data mpi_glue.h *.o *~ raw_saved_* \
+	rm -f mpi_glue.c mpi_glue.data mpi_glue.h *.o *~ raw_saved_* *_map \
 	  saved_prepargcl
