@@ -40,6 +40,7 @@ main(int argc,char * argv[],char *envp[]) {
   ch&=mmcount();
 
   setjmp(env);
+  _setjmp(env);
 
   d=cos(d);
   d=sin(d);

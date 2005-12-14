@@ -173,8 +173,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * macosx name mangling fixes
   * clear-input for saner error processing
   * multi-process safe gazonk names in compiler::*tmp-dir*
+  * Add underscore-mangled setjmp calls to plttest.c for macosx
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 14 Dec 2005 14:35:12 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 14 Dec 2005 14:36:52 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
