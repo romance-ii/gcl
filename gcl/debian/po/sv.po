@@ -1,0 +1,90 @@
+# Translators, if you are not familiar with the PO format, gettext
+# documentation is worth reading, especially sections dedicated to
+# this format, e.g. by running:
+# info -n '(gettext)PO Files'
+# info -n '(gettext)Header Entry'
+# Some information specific to po-debconf are available at
+# /usr/share/doc/po-debconf/README-trans
+# or http://www.debian.org/intl/l10n/po-debconf/README-trans
+# Developers do not need to manually edit POT or PO files.
+# , fuzzy
+# 
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: gcl 2.6.7-9\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-02-19 01:34-0300\n"
+"PO-Revision-Date: 2005-10-14 08:18+0200\n"
+"Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
+"Language-Team: Swedish <sv@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit"
+
+#. Type: boolean
+#. Description
+#: ../gcl.templates:3
+msgid "Use the work-in-progress ansi build by default"
+msgstr "Använd work-in-progress ANSI-bygget som standard"
+
+#. Type: boolean
+#. Description
+#: ../gcl.templates:3
+msgid ""
+"GCL is one of the oldest free common lisp systems still in use. Several "
+"production systems have used it for over a decade.  The common lisp standard "
+"in effect when GCL was first released is known as \"Common Lisp, the Language"
+"\" (CLtL1) after a book by Steele of the same name providing this "
+"specification.  Subsequently, a much expanded standard was adopted by the "
+"American National Standards Institute (ANSI), which is still considered the "
+"definitive common lisp language specification to this day.  GCL is in the "
+"process of providing an ANSI compliant image in addition to its traditional "
+"CLtL1 image still in production use.  Setting this variable will determine "
+"which image you will use by default on executing 'gcl'.  You can locally "
+"override this choice by setting the GCL_ANSI environment variable to any non-"
+"empty string for the ANSI build, and to the empty string for the CLtL1 "
+"build, e.g. GCL_ANSI=t gcl.  You may be interested in reviewing the ANSI "
+"test results sketching the level of compliance achieved thus far in /usr/"
+"share/doc/gcl/test_results.gz.  The flavor of the build in force will be "
+"reported in the initial startup banner."
+msgstr ""
+"GCL är en av de äldsta fria common lisp-system som fortfarande används. Ett flertal "
+"produktionssystem har använt den i över ett decennium.  Common lisp-standarden "
+"som användes när GCL först gavs ut kallas för \"Common Lisp, språket\" (CLtL1) efter "
+"en bok av Steele med samma namn som ger denna specifikation.  Därefter blev en mycket "
+"mer expanderad standard fråntagen av American National Standards Institute (ANSI) "
+"som fortfarande är den definitiva common lisp-språket än idag.  GCL är i processen att "
+"ge en avbild som följer ANSI men också till den traditionella CLtL1 som fortfarande används "
+"i produktion.  Ställa in denna variabel bestämmer vilken avbild du vill använda som standard "
+"när 'gcl' startas.  Du kan lokalt köra över detta val genom att sätta miljövariabeln GCL_ANSI "
+"till en icke-blank sträng för ANSI-bygget och en blank sträng för CLtL1-bygget, till exempel "
+"GCL_ANSI=t gcl.  Du kanske är intresserad av att granska ANSI-testresultaten som ger "
+"en nivån av medgörlighet som klaras av än så länge, i /usr/share/doc/gcl/test_results.gz.  "
+"Valet av bygget som används kommer att rapporteras i den initiella uppstarten."
+
+#. Type: boolean
+#. Description
+#: ../gcl.templates:24
+msgid "Use the profiling build by default"
+msgstr "Använd profilbygget som standard"
+
+#. Type: boolean
+#. Description
+#: ../gcl.templates:24
+msgid ""
+"GCL now has support for profiling via gprof.  Please see the documentation "
+"for si::gprof-start and si::gprof-quit for details. This build is slower "
+"than builds without gprof support, so this is not recommended for final "
+"production use. You can locally override this choice by setting the GCL_PROF "
+"environment variable to any non-empty string for profiling support, and to "
+"the empty string for the more optimized builds, e.g. GCL_PROF=t gcl.  If "
+"profiling is enabled, this will be reported in the initial startup banner."
+msgstr ""
+"GCL har nu stöd för profiler via gprof.  Vänligen se dokumentationen för si::gprof-start "
+"och si::gprof-quit för detaljer. Detta bygge är långsammar än byggen utan gprof-stöd "
+"så det är inte rekommenderat för användning i produktion. Du kan lokalt köra över "
+"detta val genom att sätta miljövariabeln GCL_PROF till en icke-blank sträng för "
+"profilstöd och till en blank sträng för mer optimerade byggen, exempel GCL_PROF=t gcl.  "
+"Om profilstöd är aktiverat kommer detta att rapporteras vid den initiella uppstarten."
+
