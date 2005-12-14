@@ -12,6 +12,14 @@ exit status and any possible terminating signal respectively.
 
 @end defun
 
+@defvar *TMP-DIR* 
+Package:COMPILER
+GCL specific: Directory in which temporary ``gazonk'' files used by the
+compiler are to be created.
+
+
+@end defvar
+
 @defvar *IGNORE-MAXIMUM-PAGES* 
 Package:SI
 GCL specific: Tells the GCL memory manager whether (non-NIL) or not (NIL) it
