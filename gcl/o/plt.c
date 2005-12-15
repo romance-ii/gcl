@@ -15,11 +15,17 @@ typedef struct {
   unsigned long ad;
 } Plt;
 
+#ifdef LEADING_UNDERSCORE
+#define stn(a_) (*(a_)=='_' ? (a_)+1 : (a_))
+#else
+#define stn(a_) a_
+#endif
+
 static int
 pltcomp(const void *v1,const void *v2) {
   const Plt *p1=v1,*p2=v2;
 
-  return strcmp(p1->n,p2->n);
+  return strcmp(stn(p1->n),stn(p2->n));
 
 }
 

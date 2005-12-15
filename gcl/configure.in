@@ -709,6 +709,7 @@ EOFF
 $CC -c foo.c -o foo.o
 if nm foo.o |grep " U " | grep "_cos" >/dev/null || nm foo.o |grep " U " | grep " _getc" >/dev/null  ; then
 	LEADING_UNDERSCORE=1
+	AC_DEFINE(LEADING_UNDERSCORE)
 	AC_MSG_RESULT("yes")
 else
 	LEADING_UNDERSCORE=""

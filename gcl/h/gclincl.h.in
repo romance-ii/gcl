@@ -226,6 +226,7 @@
 #undef NEG_CSTACK_ADDRESS
 #undef STATIC_LINKING
 #undef ADDR_NO_RANDOMIZE
+#undef LEADING_UNDERSCORE
 
 /* The number of bytes in a char.  */
 #undef SIZEOF_CHAR

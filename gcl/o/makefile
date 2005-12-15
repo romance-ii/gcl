@@ -168,11 +168,12 @@ pltd.h: plttest.o
 
 plt.h: plttest.o pltd.h 
 	nm $< | awk '/ U / {a=$$2;if (k) sub("^_","",a);\
-                            printf("MY_PLT(%s)\n",a)}' \
+                            print a}' \
 			k=$(LEADING_UNDERSCORE) |\
 			sort | \
+			grep -v '[^ \t_]_' |\
 			awk '{A[++k]=$$0} END {for (i=1;i<=k;i++) \
-				printf("%s%s\n",A[i],i==k ? "" : ",");}' >$@
+				printf("MY_PLT(%s)%s\n",A[i],i==k ? "" : ",");}' >$@
 	echo Plt table:
 	cat $@
 
