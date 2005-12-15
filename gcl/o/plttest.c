@@ -31,7 +31,7 @@ main(int argc,char * argv[],char *envp[]) {
   l/=((long)ul)/l;
 
   ch=getc(f);
-  ch&=putc(ch,f);
+  ch&=feof(f) ? putc(ch,f) : getc(f);
 
   f=fdopen(l,"r");
   l=read(l,&l,sizeof(l));
