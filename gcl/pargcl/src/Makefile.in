@@ -53,11 +53,7 @@ LSP_FILES = ${SRCDIR}/mpi_glue.lsp ${SRCDIR}/mpi_defglue.lsp \
 	                              ../bin/par`basename ${GCL}`.
 
 @PWD@/src/mpinu/libmpi.a:
-	if [ "`basename @GCL@`" = ansi_gcl ]; then \
-	  cd mpinu; make CFLAGS="-DHAVE_PTHREAD=0 -g -O0" libmpi.a; \
-	else \
-	  cd mpinu; make libmpi.a; \
-	fi
+	cd mpinu; make libmpi.a
 ${LIBDIR}/libmpi.a: ${LIBMPI}
 	ln -fs ${LIBMPI} ${LIBDIR}/libmpi.a
 

@@ -43,6 +43,16 @@ char ***argv_ptr;
 { char *p4pg_file = "procgroup";
   int i, p4pg_flag = 0;
 
+  /* This is to fix a bug in the CVS version of GCL (as of Dec. 16, 2005)
+   * It sets rl.rlim_cur very high, and this seems to trigger a bug
+   *   in Linux 2.6.12/gcc-4.0.2/glibc-2.3.5 (/lib/tls/libc-2.3.5.so)
+   */
+  struct rlimit rl;
+  assert(0 == getrlimit(RLIMIT_STACK, &rl));
+  if(rl.rlim_cur >=  0x40000000)
+    rl.rlim_cur = 0x40000000;
+  assert(0 == setrlimit(RLIMIT_STACK, &rl));
+
 #ifdef DEBUG
   system("hostname");
   printf("entering MPI_Init\n");

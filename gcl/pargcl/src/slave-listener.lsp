@@ -101,7 +101,8 @@
    If message is already a string, we assume this is a print representation
     of the lisp expression (i.e.: the lisp expression is what's
     contained in the string)"
-  (if (= dest (MPI-Comm-Rank)) (error "Can't send command to myself."))
+  ;;Sending to self is allowed unless we don't have pthreads.
+  ;;(if (= dest (MPI-Comm-Rank)) (error "Can't send command to myself."))
   (if (>= tag next-datatype-tag)
     (error "On processor ~d: tag (~d) >= next-datatype-tag (~d)"
 	   (MPI-comm-rank) tag next-datatype-tag))
@@ -120,6 +121,8 @@
 			  (or (subtypep x 'fixnum)
 			      (subtypep x 'float))))))
     (setf (fill-pointer string-buf) 0)
+    ;; SHOULD ALSO HANDLE CASE WHEN message IS STRING:
+    (if (= 0 dest) (setq message (eval message))); No slave to eval this.
     ;; (write 3) CAUSES BUG IN gcl-2
     ;; At this time, bug seems to go away if there was previously an error,
     ;;  or if init.lsp (any or no contents) was in the startup directory
