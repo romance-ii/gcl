@@ -222,7 +222,7 @@ install1:
 		${MAKE} install_windows; \
 	else \
 		${MAKE} install_unix; \
-		${MAKE} pargcl_all FLISP=saved_pargcl BINSCPT=pargcl \
+		[ "$(PARGCLDIR)" = "" ] || ${MAKE} pargcl_all FLISP=saved_pargcl BINSCPT=pargcl \
 			 INSTALL_LIB_DIR=$(INSTALL_LIB_DIR) prefix=$(prefix) \
 			 DESTDIR=$(DESTDIR) GCLDIR=$(INSTALL_LIB_DIR); \
 	fi

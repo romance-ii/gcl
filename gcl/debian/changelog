@@ -180,8 +180,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * Add feof to plttest.c for macosx
   * rationalize some of the plt table stuff
   * pass devices if present in compiler::get-temp-dir
+  * Fix install target
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 16 Dec 2005 20:52:15 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 16 Dec 2005 22:13:42 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
