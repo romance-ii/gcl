@@ -422,6 +422,7 @@ Cannot compile ~a.~%"
 	   get-temp-dir 
 	   (namestring 
 	    (make-pathname 
+	     :device (pathname-device x)
 	     :directory (when (or (pathname-directory x) (pathname-name x))
 			  (append (pathname-directory x) (list (pathname-name x))))))))))))
 

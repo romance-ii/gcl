@@ -179,8 +179,9 @@ gclcvs (2.7.0-51) unstable; urgency=low
   * New French and Swedish translations, Closes: #333654, Closes: #336757.
   * Add feof to plttest.c for macosx
   * rationalize some of the plt table stuff
+  * pass devices if present in compiler::get-temp-dir
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 15 Dec 2005 15:14:51 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 16 Dec 2005 20:52:15 +0000
 
 gclcvs (2.7.0-50) unstable; urgency=low
 
