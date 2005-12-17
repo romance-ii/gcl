@@ -1,3 +1,9 @@
+gclcvs (2.7.0-52) unstable; urgency=low
+
+  * fix configure
+
+ -- Camm Maguire <camm@enhanced.com>  Sat, 17 Dec 2005 15:04:56 +0000
+
 gclcvs (2.7.0-51) unstable; urgency=low
 
   * Don't lower DBEGIN if shared mem start is beneath default

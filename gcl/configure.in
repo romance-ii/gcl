@@ -578,7 +578,7 @@ if test -f /usr/lib/NextStep/software_version; then
     system=NEXTSTEP-`${AWK} '/3/,/3/' /usr/lib/NextStep/software_version`
 else
     system=`uname -s`-`uname -r`
-    if test "$?" -ne 0 ; then
+    if test "$?" -ne "0" ; then
 	AC_MSG_RESULT([unknown (can't find uname command)])
 	system=unknown
     else
@@ -586,7 +586,7 @@ else
 	# results, and the version is kept in special file).
     
 	if test -r /etc/.relid -a "X`uname -n`" = "X`uname -s`" ; then
-	    system=MP-RAS-`${AWK} '{print $3}' /etc/.relid'`
+	    system="MP-RAS-`${AWK} '{print $3}' /etc/.relid'`"
 	fi
 	if test "`uname -s`" = "AIX" ; then
 	    system=AIX-`uname -v`.`uname -r`
