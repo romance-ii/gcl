@@ -1,3 +1,10 @@
+gclcvs (2.7.0-53) unstable; urgency=low
+
+  * No logl on non-i386 ?? (a c99 requirement),wrap fSkill call in
+    run_process.c for ia64
+
+ -- Camm Maguire <camm@enhanced.com>  Sun, 18 Dec 2005 18:38:36 +0000
+
 gclcvs (2.7.0-52) unstable; urgency=low
 
   * fix configure

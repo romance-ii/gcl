@@ -62,7 +62,9 @@ main(int argc,char * argv[],char *envp[]) {
 
   d=exp(d);
   d=log(d);
+#ifdef __i386__/*FIXME*/
   d=logl(d);
+#endif
 
   d=sqrt(d);
   

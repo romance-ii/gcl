@@ -694,7 +694,7 @@ DEFUNO_NEW("READ-POINTER-OBJECT",object,fSread_pointer_object,SI,1,1,NONE,OO,OO,
     x=read_object(y);
     fclose(y->sm.sm_fp);
   }
-  fSkill(z,1);
+  FFN(fSkill)(z,1);
   return x;
 
 }
