@@ -283,7 +283,6 @@ install_windows:
 	rm -rf $(prefix)/install; mkdir $(prefix)/install ; cp windows/install.lsp $(prefix)/install ; cp windows/sysdir.bat $(prefix)/bin
 
 gclclean:
-
 	(cd $(BINDIR); $(MAKE) clean)
 	(cd mp ; $(MAKE) clean)
 	(cd $(ODIR); $(MAKE) clean)
@@ -313,7 +312,8 @@ clean: gclclean
 	-cd $(GMPDIR) && $(MAKE) distclean
 	rm -rf $(GMPDIR)/.deps $(GMPDIR)/libgmp.a
 	-cd $(PARGCLDIR) && $(MAKE) distclean
-	rm -f unixport/saved_pargcl bin/pargcl bin/procgroup
+	rm -f unixport/saved_pargcl unixport/saved_prepargcl \
+		bin/pargcl bin/procgroup
 	-cd binutils/bfd && $(MAKE) distclean
 	-cd binutils/libiberty && $(MAKE) distclean
 
