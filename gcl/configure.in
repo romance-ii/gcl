@@ -956,14 +956,18 @@ return 0;
 AC_MSG_RESULT($char_size)
 AC_DEFINE_UNQUOTED(CHAR_SIZE,$char_size)
 
-AC_CHECK_HEADERS(endian.h,
-	AC_MSG_CHECKING(endianness)
-	AC_TRY_RUN([/*#define __ARMEB__*/
-		#include <endian.h> 
-		int main() { return BYTE_ORDER == __LITTLE_ENDIAN ? 0 : 1;}],
-	AC_DEFINE(LITTLE_END) AC_MSG_RESULT(little),
-	AC_MSG_RESULT(big),AC_MSG_RESULT(big)))
-AC_SUBST(LITTLE_END)
+AC_C_BIGENDIAN()
+AC_SUBST(WORDS_BIGENDIAN)
+
+
+#AC_CHECK_HEADERS(endian.h,
+#	AC_MSG_CHECKING(endianness)
+#	AC_TRY_RUN([/*#define __ARMEB__*/
+#		#include <endian.h> 
+#		int main() { return BYTE_ORDER == __LITTLE_ENDIAN ? 0 : 1;}],
+#	AC_DEFINE(LITTLE_END) AC_MSG_RESULT(little),
+#	AC_MSG_RESULT(big),AC_MSG_RESULT(big)))
+#AC_SUBST(LITTLE_END)
 
 
 # On systems with execshield, brk is randomized.  We need to catch
@@ -1914,12 +1918,12 @@ AC_CHECK_FUNC(_cleanup, [AC_DEFINE(USE_CLEANUP)],)
 AC_SUBST(USE_CLEANUP)
 gcl_ok=no
 
-AC_HEADER_EGREP(LITTLE_ENDIAN, ctype.h, gcl_ok=yes, gcl_ok=noo)
-if test $gcl_ok = yes ; then
-AC_DEFINE(ENDIAN_ALREADY_DEFINED)
-fi
+#AC_HEADER_EGREP(LITTLE_ENDIAN, ctype.h, gcl_ok=yes, gcl_ok=noo)
+#if test $gcl_ok = yes ; then
+#AC_DEFINE(ENDIAN_ALREADY_DEFINED)
+#fi
 
-AC_SUBST(ENDIAN_ALREADY_DEFINED)
+#AC_SUBST(ENDIAN_ALREADY_DEFINED)
 
 
 

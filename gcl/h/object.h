@@ -71,7 +71,7 @@ typedef unsigned char  uqfixnum;
 #error Cannot calculate FILL_BITS
 #endif
 
-#ifdef LITTLE_END
+#ifndef WORDS_BIGENDIAN
 
 #define FIRSTWORD fixnum e:1,m:1,f:1,s:1,z:4,t:8,w:FILL_BITS
 #define MARKWORD  fixnum e:1,mf:2,   s:1,z:4,t:8,w:FILL_BITS
@@ -1093,7 +1093,7 @@ EXTER char *tmp_alloc;
 /*  For IEEEFLOAT, the double may have exponent in the second word
 (little endian) or first word.*/
 
-#if defined(I386) || defined(LITTLE_END)
+#if !defined(WORDS_BIGENDIAN)
 #define HIND 1  /* (int) of double where the exponent and most signif is */
 #define LIND 0  /* low part of a double */
 #else /* big endian */

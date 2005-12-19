@@ -58,7 +58,7 @@
 
 #define RELOC_FILE "rel_sun3.c"	/* for SFASL - enabled in bsd.h */
 
-#define LITTLE_END		/* also in <machine/endian.h> */
+/* #define LITTLE_END */		/* also in <machine/endian.h> */
 #if 0				/* are these relics? */
 #define USE_DIRENT
 #define GETPATHNAME

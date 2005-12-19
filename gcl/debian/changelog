@@ -1,3 +1,9 @@
+gclcvs (2.7.0-54) unstable; urgency=low
+
+  * LITTLE_END -> WORDS_BIGENDIAN
+
+ -- Camm Maguire <camm@enhanced.com>  Mon, 19 Dec 2005 16:06:02 +0000
+
 gclcvs (2.7.0-53) unstable; urgency=low
 
   * No logl on non-i386 ?? (a c99 requirement),wrap fSkill call in

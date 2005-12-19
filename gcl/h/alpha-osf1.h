@@ -33,7 +33,7 @@
 #define IEEEFLOAT
 
 /* The exponent and most signif are in the second word for doubles */
-#define LITTLE_END
+/* #define LITTLE_END */
 
 #undef   FILECPY_HEADER
 #define FILECPY_HEADER \

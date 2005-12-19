@@ -45,7 +45,7 @@
 #include <sys/stat.h>
 #endif
 
-#define LITTLE_END
+/* #define LITTLE_END */
 
 /* Begin for cmpinclude */
 

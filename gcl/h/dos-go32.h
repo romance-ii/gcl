@@ -3,7 +3,7 @@
 #define MSDOS
 #endif
 #define I386
-#define LITTLE_END
+/* #define LITTLE_END */
 #include "bsd.h"
 #include "386.h"
 

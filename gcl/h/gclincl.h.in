@@ -6,6 +6,10 @@
 /* Define if you have <alloca.h> and it should be used (not on Ultrix).  */
 #undef HAVE_ALLOCA_H
 
+/* Define if your processor stores words with the most significant
+   byte first (like Motorola and SPARC, unlike Intel and VAX).  */
+#undef WORDS_BIGENDIAN
+
 /* Define if the X Window System is missing or not being used.  */
 #undef X_DISPLAY_MISSING
 
@@ -52,10 +56,6 @@
 /* define if the _cleanup() function exists and should be called
    before saving */
 /* #define USE_CLEANUP  */
-
-/* define if BIG_ENDIAN or LITTLE_ENDIAN is defined by including
-   the standard includes */
-/* #define ENDIAN_ALREADY_DEFINED */
 
 /* define if SV_ONSTACK is defined in signal.h */
 #undef HAVE_SV_ONSTACK 
@@ -178,7 +178,7 @@
 #include <math.h>
 #endif
 
-#undef LITTLE_END
+#undef WORDS_BIGENDIAN
 
 #undef PAGEWIDTH
 
@@ -257,9 +257,6 @@
 
 /* Define if you have the <elf_abi.h> header file.  */
 #undef HAVE_ELF_ABI_H
-
-/* Define if you have the <endian.h> header file.  */
-#undef HAVE_ENDIAN_H
 
 /* Define if you have the <float.h> header file.  */
 #undef HAVE_FLOAT_H

@@ -26,7 +26,7 @@
 
 
 #include <machine/machparam.h>
-#undef LITTLE_END
+/* #undef LITTLE_END */
 
 #define	PAGSIZ		(NBPG)
 #define	SEGSIZ		(NBPG * CLSIZE)

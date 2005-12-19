@@ -1070,7 +1070,7 @@ init_main(void) {
   ADD_FEATURE("BSD");
 #endif
   
-#ifdef LITTLE_END	 
+#ifndef WORDS_BIGENDIAN	 
   ADD_FEATURE("CLX-LITTLE-ENDIAN");
 #endif
   
