@@ -1,8 +1,10 @@
 gclcvs (2.7.0-54) unstable; urgency=low
 
   * LITTLE_END -> WORDS_BIGENDIAN
+  * NULL_OR_ON_C_STACK macro check fix, exclude sparc symbols beginning
+    with . from plt table
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 19 Dec 2005 16:06:02 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 21 Dec 2005 21:25:56 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

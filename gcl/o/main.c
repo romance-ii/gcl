@@ -98,12 +98,6 @@ static object stack_space;
 #  define SIG_STACK_SIZE 1000
 #endif
 
-/* #ifndef SETUP_SIG_STACK */
-/* #  if defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC) */
-/*       struct sigstack estack; */
-/* #  endif */
-/* #endif */
-
 #ifdef NEED_NONRANDOM_SBRK
 #include <syscall.h>
 #include <sys/personality.h>
@@ -305,10 +299,6 @@ main(int argc, char **argv, char **envp) {
 
 #  if defined(HAVE_SIGACTION) || defined(HAVE_SIGVEC)
     {
-        /* make sure the stack is 8 byte aligned */
-/* #    ifdef SETJMP_ONE_DIRECTION */
-/*         static */
-/* #    endif */ /* SETUP_SIG_STACK */
       static double estack_buf[32*SIGSTKSZ];
       static struct sigaltstack estack;
 	    
@@ -465,33 +455,8 @@ initlisp(void) {
 	if (NOT_OBJECT_ALIGNED(a))
 	  error("Ct is not properly aligned");
 
-/* 	a=(fixnum)Dotnil; */
-/* 	if (NOT_OBJECT_ALIGNED(a)) */
-/* 	  error("Dotnil is not properly aligned"); */
-
-        if ( NULL_OR_ON_C_STACK(&j) == 0
-             || NULL_OR_ON_C_STACK(IM_FIX_LIM) == 0
-             || NULL_OR_ON_C_STACK(Cnil) != 0
-             || (((unsigned long )core_end) !=0
-                  && NULL_OR_ON_C_STACK(core_end) != 0))
-	  { /* check person has correct definition of above */
-	    error("NULL_OR_ON_C_STACK macro invalid");
-	  }
-
         gcl_init_alloc();
 
-/*  	Dotnil->c.c_cdr=Dotnil; */
-/*  	Dotnil->s.s_dbind = Dotnil; */
-/*  	Dotnil->s.s_sfdef = NOT_SPECIAL; */
-/*  	Dotnil->s.s_fillp = 6; */
-/*  	Dotnil->s.s_self = "DOTNIL"; */
-/*  	Dotnil->s.s_gfdef = OBJNULL; */
-/*  	Dotnil->s.s_plist = Cnil; */
-/*  	Dotnil->s.s_hpack = Cnil; */
-/*  	Dotnil->s.s_stype = (short)stp_constant; */
-/*  	Dotnil->s.s_mflag = FALSE; */
-/* 	Dotnil->s.s_hash = ihash_equal1(Dotnil,0); */
-	
  	Cnil->c.c_cdr=Cnil;
  	Cnil->s.s_dbind = Cnil;
  	Cnil->s.s_sfdef = NOT_SPECIAL;
@@ -529,17 +494,13 @@ initlisp(void) {
 	export(Ct, lisp_package);
 
 #ifdef ANSI_COMMON_LISP
-/*  	Cnil->s.s_hpack = common_lisp_package; */
 	import(Cnil, common_lisp_package);
 	export(Cnil, common_lisp_package);
 
-/*  	Ct->s.s_hpack = common_lisp_package; */
 	import(Ct, common_lisp_package);
 	export(Ct, common_lisp_package);
 #endif
 
-/* 	sLquote = make_ordinary("QUOTE"); */
-/* 	sLfunction = make_ordinary("FUNCTION"); */
 	sLlambda = make_ordinary("LAMBDA");
 	sLlambda_block = make_ordinary("LAMBDA-BLOCK");
 	sLlambda_closure = make_ordinary("LAMBDA-CLOSURE");
@@ -548,6 +509,17 @@ initlisp(void) {
 
 	
 	NewInit();
+
+        if ( NULL_OR_ON_C_STACK(&j) == 0
+             || NULL_OR_ON_C_STACK(IM_FIX_BASE) == 0
+             || NULL_OR_ON_C_STACK(IM_FIX_BASE|IM_FIX_LIM) == 0
+             || NULL_OR_ON_C_STACK(Cnil) != 0
+             || (((unsigned long )core_end) !=0
+                  && NULL_OR_ON_C_STACK(core_end) != 0))
+	  { /* check person has correct definition of above */
+	    error("NULL_OR_ON_C_STACK macro invalid");
+	  }
+
 	gcl_init_typespec();
 	gcl_init_number();
 	gcl_init_character();
@@ -563,10 +535,6 @@ initlisp(void) {
 	gcl_init_unixfasl();
 	gcl_init_unixsys();
 	gcl_init_unixsave();
-#  else
-
-
-
 #  endif
 #endif /* defined ( UNIX ) || defined ( __MINGW32__ ) */
 
@@ -701,10 +669,6 @@ DEFUN_NEW("QUIT",object,fLquit,LISP
        ,0,1,NONE,OI,OO,OO,OO,(fixnum exitc),"")
 {	return FFN(fLbye)(exitc); }
  
-/* DEFUN_NEW("EXIT",object,fLexit,LISP */
-/*        ,0,1,NONE,OI,OO,OO,OO,(fixnum exitc),"") */
-/* {	return fLbye(exitc); } */
- 
 
 static void
 FFN(siLargc)(void) {
@@ -776,18 +740,6 @@ FFN(siLcatch_fatal)(int i) {
   return Cnil;
 }
 
-/* static void */
-/* reset_cstack_limit(int arg) { */
-/* #if CSTACK_DIRECTION==-1 */
-/*   if (&arg > cs_base - cssize/sizeof(*cs_base) + 16) */
-/* #else */
-/*   if (&arg < cs_base + cssize/sizeof(*cs_base) - 16) */
-/* #endif */
-/*     cs_limit = (void *)CSTACK_ADDRESS + CSTACK_DIRECTION * cssize + 1; */
-/*   else */
-/*       error ( "can't reset cs_limit" ); */
-/* } */
-
 LFD(siLreset_stack_limits)(void)
 {
   int i=0;
@@ -838,9 +790,6 @@ LFD(siLreset_stack_limits)(void)
 
 static int
 multiply_stacks(int m) {  
-/*    int n; */
-/*    object x; */
-/*    object gc_pro=stack_space; */
   char *p;
   int vs,bd,frs,ihs;
   stack_multiple=stack_multiple*m;
@@ -967,16 +916,8 @@ FFN(siLsave_system)(void) {
     
 #if defined(BSD) || defined(ATT)  
   brk(core_end);
-  /* printf( "(breaking at core_end = %x in main ,)",core_end); */
 #endif
   
-/*  #ifdef DGUX */
-  
-/*  #endif */
-  
-/*  #ifdef AOSVS */
-  
-/*  #endif */
   cbgbccount = tm_table[t_contiguous].tm_adjgbccnt = tm_table[t_contiguous].tm_opt_maxpage = 0;
   rbgbccount = tm_table[t_relocatable].tm_adjgbccnt = tm_table[t_relocatable].tm_opt_maxpage = 0;
   for (i = 0;  i < (int)t_end;  i++)
@@ -1057,10 +998,6 @@ init_main(void) {
   ADD_FEATURE("SGC");
 #endif	 
 
-/* #ifdef  ADDITIONAL_FEATURES */
-/*   ADDITIONAL_FEATURES; */
-/* #endif */
-  
   ADD_FEATURE(HOST_CPU);
   ADD_FEATURE(HOST_KERNEL);
 #ifdef HOST_SYSTEM

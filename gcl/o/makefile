@@ -157,7 +157,7 @@ plttest.o: plttest.c
 pltd.h: plttest.o
 	nm $< | awk '/ U / {a=$$2;if (k) sub("^_","",a);\
                             b=a;gsub("_"," ",b);\
-                            if (!match(j,b) && !match(b,"IO")) printf("extern int %s();\n",a)}' \
+                            if (!match(j,b) && !match(b,"IO") && !match(b,"^\\.")) printf("extern int %s();\n",a)}' \
                         j="$$(cpp plttest.c | sed 's,^ .*[^a-zA-Z_,]\([a-zA-Z_]*\)(.*,\1,g' |\
 			      awk '/main *\(/ {i=1;next;} /^}/ {i=0;} \
                                    {if (i && substr($$0,1,1)!=" ") print}' | tr '\012' ' ' | tr -s ' ')" \
@@ -168,7 +168,7 @@ pltd.h: plttest.o
 
 plt.h: plttest.o pltd.h 
 	nm $< | awk '/ U / {a=$$2;if (k) sub("^_","",a);\
-                            print a}' \
+                            if (!match(a,"^\\.")) print a;}' \
 			k=$(LEADING_UNDERSCORE) |\
 			sort | \
 			grep -v '[^ \t_]_' |\
