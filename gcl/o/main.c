@@ -469,10 +469,11 @@ initlisp(void) {
 /* 	if (NOT_OBJECT_ALIGNED(a)) */
 /* 	  error("Dotnil is not properly aligned"); */
 
-	if (NULL_OR_ON_C_STACK(&j) == 0
-	    || NULL_OR_ON_C_STACK(Cnil) != 0
-	    || (((unsigned long )core_end) !=0
-	        && NULL_OR_ON_C_STACK(core_end) != 0))
+        if ( NULL_OR_ON_C_STACK(&j) == 0
+             || NULL_OR_ON_C_STACK(IM_FIX_LIM) == 0
+             || NULL_OR_ON_C_STACK(Cnil) != 0
+             || (((unsigned long )core_end) !=0
+                  && NULL_OR_ON_C_STACK(core_end) != 0))
 	  { /* check person has correct definition of above */
 	    error("NULL_OR_ON_C_STACK macro invalid");
 	  }

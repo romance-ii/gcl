@@ -1011,7 +1011,7 @@ allocate_heap (void)
      the region below the 256MB line for our malloc arena - 229MB is
      still a pretty decent arena to play in!  */
 
-    unsigned long base = DBEGIN;
+    unsigned long base = DBEGIN+PAGESIZE*500;
     unsigned long end  = PAGESIZE*MAXPAGE - DBEGIN;
     void *ptr = NULL;
 
@@ -1020,11 +1020,11 @@ allocate_heap (void)
                          get_reserved_heap_size (),
                          MEM_RESERVE,
                          PAGE_NOACCESS );
-#if 1    
+#if 0
     fprintf ( stderr,
               "allocate_heap:"
               " base %lx, end %lx, reserved_heap_size %lx, PAGESIZE %lx, MAXPAGE %lx,"
-              " MAXCORE %lx, INIT_NRBDIV %lx, INIT_HOLEDIV %lx, HOLEDIV %lx",
+              " MAXCORE %lx, INIT_NRBDIV %lx, INIT_HOLEDIV %lx, HOLEDIV %lx, DBEGIN %lx, PAGEWIDTH %lx\n",
               (void *) base,
               (void *) end,
               get_reserved_heap_size (),
@@ -1033,7 +1033,9 @@ allocate_heap (void)
               MAXCORE,
               INIT_NRBDIV,
               INIT_HOLEDIV,
-              HOLEDIV );
+              HOLEDIV,
+              DBEGIN,
+              PAGEWIDTH );
 #endif  
     if ( 0 == ptr ) {
         ErrorExit ( "allocate_heap" );
