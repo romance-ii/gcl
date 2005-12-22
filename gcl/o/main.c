@@ -158,10 +158,6 @@ main(int argc, char **argv, char **envp) {
 #ifdef RECREATE_HEAP
     RECREATE_HEAP
 #endif
-#if defined ( _WIN32 ) && !defined ( AV )
-#  error BLAH
-#endif        
-	
     setbuf(stdin, stdin_buf); 
     setbuf(stdout, stdout_buf);
 #ifdef _WIN32
