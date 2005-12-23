@@ -139,8 +139,7 @@
          ADD_FEATURE("MINGW32");
 
 #undef SET_REAL_MAXPAGE  
-#define SET_REAL_MAXPAGE \
-	 init_shared_memory(); real_maxpage=MAXPAGE;
+#define SET_REAL_MAXPAGE real_maxpage=MAXPAGE;
 
 /* include some low level routines for maxima */
 #define CMAC

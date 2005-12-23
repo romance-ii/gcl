@@ -152,20 +152,27 @@ main(int argc, char **argv, char **envp) {
 #endif
 
     install_segmentation_catcher();
-
     set_maxpage();
 
 #ifdef RECREATE_HEAP
     RECREATE_HEAP
 #endif
+
     setbuf(stdin, stdin_buf); 
     setbuf(stdout, stdout_buf);
+
 #ifdef _WIN32
+
     _fmode = _O_BINARY;
-    _setmode( _fileno( stdin ),  _O_BINARY );
-    _setmode( _fileno( stdout ), _O_BINARY );
-    _setmode( _fileno( stderr ), _O_BINARY );
+    _setmode ( _fileno ( stdin ),  _O_BINARY );
+    _setmode ( _fileno ( stdout ), _O_BINARY );
+    _setmode ( _fileno ( stderr ), _O_BINARY );
+    
+    /* Don't initialise shared memory until after the Heap is recreated.*/
+    init_shared_memory();
+
 #endif
+
     ARGC = argc;
     ARGV = argv;
 #ifdef UNIX
