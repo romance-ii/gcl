@@ -313,7 +313,7 @@ clean: gclclean
 	rm -rf $(GMPDIR)/.deps $(GMPDIR)/libgmp.a
 	-cd $(PARGCLDIR) && $(MAKE) distclean
 	rm -f unixport/saved_pargcl unixport/saved_prepargcl \
-		bin/pargcl bin/procgroup
+		bin/pargcl bin/procgroup unixport/_rsym1
 	-cd binutils/bfd && $(MAKE) distclean
 	-cd binutils/libiberty && $(MAKE) distclean
 
