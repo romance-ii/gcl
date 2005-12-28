@@ -409,7 +409,7 @@ Cannot compile ~a.~%"
 	  )))))
 
 (defun get-temp-dir ()
-  (dolist (x `(,@(mapcar 'si::getenv #-winnt '("TMPDIR" "TMP") #+winnt '("%TEMP%" "%TMP%")) #-winnt "/tmp" ""))
+  (dolist (x `(,@(mapcar 'si::getenv #-winnt '("TMPDIR" "TMP") #+winnt '("TEMP" "TMP")) #-winnt "/tmp" ""))
     (when x
       (let* ((x (pathname x))
 	     (x (if (pathname-name x) x 
