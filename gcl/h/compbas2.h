@@ -155,7 +155,7 @@ EXTER object MVloc[10];
 #define TYPEP(x,t) (type_of(x) == (t))
 
 
-#ifdef HAVE_ALLOCA
+#if defined(HAVE_ALLOCA)/* || defined(_WIN32)*/
 /* #ifndef alloca */
 /* char *alloca(); */
 /* #endif */
@@ -185,6 +185,7 @@ object on_stack_make_list();
 #define ALLOCA_CONS(n) 0
 #define ON_STACK_CONS(x,y) MMcons(x,y)
 #define ON_STACK_LIST list
+#define ON_STACK_LIST_VECTOR_NEW list_vector_new
 #define ON_STACK_LIST_VECTOR list_vector
 #define ON_STACK_MAKE_LIST make_list
 #endif

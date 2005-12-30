@@ -763,7 +763,9 @@ read_in_bss (char *filename)
   DWORD index, n_read;
   int    i;
 
+#if 0
   printf ( "Reading BSS into .bss area of address space from %s...\n", filename );
+#endif
   file = CreateFile (filename, GENERIC_READ, FILE_SHARE_READ, NULL,
 		     OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
   if (file == INVALID_HANDLE_VALUE) 
@@ -788,7 +790,7 @@ read_in_bss (char *filename)
       i = GetLastError ();
       exit (1);
     }
-#if 1
+#if 0
     printf ("\t0x%p BSS start in memory.\n", bss_start);
     printf ("\t0x%08lx BSS offset in saved executable.\n", index);
     printf ("\t0x%08lx BSS size in bytes.\n", bss_size);
@@ -807,7 +809,9 @@ map_in_heap (char *filename)
   DWORD size, upper_size, n_read;
   int    i;
 
+#if 0
   printf ("Mapping heap into address space...\n");
+#endif
   file = CreateFile (filename, GENERIC_READ, FILE_SHARE_READ, NULL,
 		     OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
   if (file == INVALID_HANDLE_VALUE) 
@@ -829,7 +833,7 @@ map_in_heap (char *filename)
   file_base = MapViewOfFileEx (file_mapping, FILE_MAP_COPY, 0, 
 			       heap_index_in_executable, size,
 			       get_heap_start ());
-#if 1
+#if 0
     printf ("\t0x%p Heap start in memory.\n", get_heap_start() );
     printf ("\t0x%08lx Heap offset in executable.\n", heap_index_in_executable);
     printf ("\t0x%08lx Heap size in bytes.\n", size);

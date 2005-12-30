@@ -202,6 +202,9 @@ extern char *GCLExeName ( void );
 extern int is_shared_memory_initialised;
 #define CHECK_INTERRUPT if ( is_shared_memory_initialised && signals_pending ) raise_pending_signals(sig_safe)
 
+#undef alloca
+/*#define alloca(x) __builtin_alloca((x))*/
+
 /* Begin for cmpinclude */
 
 
