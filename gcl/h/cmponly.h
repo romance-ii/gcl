@@ -42,7 +42,7 @@ int mpz_to_mpz1(MP_INT *,MP_INT *,void *);
 void isetq_fix(MP_INT *,int);
 MP_INT * otoi(object x);
 
-#ifndef HAVE_ALLOCA
+#if !defined(HAVE_ALLOCA) && !defined(_WIN32)
 #error Need alloca for GMP
 #endif
 

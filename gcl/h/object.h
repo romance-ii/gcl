@@ -1245,8 +1245,10 @@ EXTER object sSlambda_block_expanded;
 #ifndef FIX_PATH_STRING
 #define FIX_PATH_STRING(file) file
 #endif
- 
-#define CHECK_INTERRUPT   if (signals_pending) raise_pending_signals(sig_safe)
+
+#ifndef CHECK_INTERRUPT
+#  define CHECK_INTERRUPT   if (signals_pending) raise_pending_signals(sig_safe)
+#endif
 
 #define BEGIN_NO_INTERRUPT \
  plong old_signals_allowed = signals_allowed; \

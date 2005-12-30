@@ -146,7 +146,8 @@ void recreate_heap1()
     recreate_heap (executable_path);
   }
   heap_state = HEAP_LOADED;
-
+  is_shared_memory_initialised = FALSE;
+  signalsPendingPtr = NULL;
 }
 
 
@@ -685,7 +686,7 @@ copy_executable_and_dump_data_section (file_data *p_infile,
   data_va = data_start_va;
     
   size = (DWORD) data_file - (DWORD) p_outfile->file_base;
-#if 0  
+#if 1  
   printf ("Copying executable up to data section...\n");
   printf ("\t0x%08x Offset in input file.\n", 0);
   printf ("\t0x%08x Offset in output file.\n", 0);
@@ -694,7 +695,7 @@ copy_executable_and_dump_data_section (file_data *p_infile,
   memcpy (p_outfile->file_base, p_infile->file_base, size);
   
   size = data_size;
-#if 0  
+#if 1  
   printf ("Dumping .data section...\n");
   printf ("\t0x%p Address in process.\n", data_va);
   printf ("\t0x%08x Offset in output file.\n", 
@@ -705,7 +706,7 @@ copy_executable_and_dump_data_section (file_data *p_infile,
   
   index = (DWORD) data_file + size - (DWORD) p_outfile->file_base;
   size = p_infile->size - index;
-#if 0  
+#if 1  
   printf ("Copying rest of executable...\n");
   printf ("\t0x%08lx Offset in input file.\n", index);
   printf ("\t0x%08lx Offset in output file.\n", index);
@@ -727,7 +728,7 @@ dump_bss_and_heap (file_data *p_infile, file_data *p_outfile)
     size = get_committed_heap_size ();
     heap_data = get_heap_start ();
 
-#if 0    
+#if 1    
     printf ("\t0x%p Heap start in process.\n", heap_data);
     printf ("\t0x%08lx Heap offset in executable.\n", index);
     printf ("\t0x%08lx Heap size in bytes.\n", size);
@@ -740,7 +741,7 @@ dump_bss_and_heap (file_data *p_infile, file_data *p_outfile)
     index += size;
     size = bss_size;
     bss_data = bss_start;
-#if 0    
+#if 1    
     printf ("\t0x%p BSS start in process.\n", bss_data);
     printf ("\t0x%08lx BSS offset in executable.\n", index);
     printf ("\t0x%08lx BSS size in bytes.\n", size);
@@ -787,7 +788,7 @@ read_in_bss (char *filename)
       i = GetLastError ();
       exit (1);
     }
-#if 0
+#if 1
     printf ("\t0x%p BSS start in memory.\n", bss_start);
     printf ("\t0x%08lx BSS offset in saved executable.\n", index);
     printf ("\t0x%08lx BSS size in bytes.\n", bss_size);
@@ -828,7 +829,7 @@ map_in_heap (char *filename)
   file_base = MapViewOfFileEx (file_mapping, FILE_MAP_COPY, 0, 
 			       heap_index_in_executable, size,
 			       get_heap_start ());
-#if 0
+#if 1
     printf ("\t0x%p Heap start in memory.\n", get_heap_start() );
     printf ("\t0x%08lx Heap offset in executable.\n", heap_index_in_executable);
     printf ("\t0x%08lx Heap size in bytes.\n", size);
@@ -845,9 +846,13 @@ map_in_heap (char *filename)
 
   CloseHandle (file_mapping);
 
+#if 0
+  fprintf ( stdout, "map_in_heap: VirtualAlloc from %x, %x bytes, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE\n", get_heap_start (), get_committed_heap_size () );
+#endif
   if (VirtualAlloc (get_heap_start (), get_committed_heap_size (),
 		    MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE) == NULL)
     {
+        ErrorExit ( "map_in_heap" );
       i = GetLastError ();
       exit (1);
     }
@@ -1013,15 +1018,21 @@ allocate_heap (void)
      the region below the 256MB line for our malloc arena - 229MB is
      still a pretty decent arena to play in!  */
 
-    unsigned long base = DBEGIN+PAGESIZE*500;
+    unsigned long base = DBEGIN+PAGESIZE*512;
     unsigned long end  = PAGESIZE*MAXPAGE - DBEGIN;
     void *ptr = NULL;
 
     reserved_heap_size = end - base;
+#if 0
+    fprintf ( stdout, "allocate_heap: VirtualAlloc from %x, %x bytes, MEM_RESERVE, PAGE_NOACCESS\n", base, get_reserved_heap_size () );
+#endif
     ptr = VirtualAlloc ((void *) base,
                          get_reserved_heap_size (),
                          MEM_RESERVE,
                          PAGE_NOACCESS );
+#if 0
+    fprintf ( stdout, "allocate_heap: VirtualAlloc tried %x, returned %x\n", base, ptr);
+#endif
 #if 0
     fprintf ( stderr,
               "allocate_heap:"
@@ -1104,7 +1115,10 @@ sbrk (unsigned long increment)
       if (new_size > 0) 
 	{
 	  /* Decommit size bytes from the end of the heap.  */
-	  if (!VirtualFree (real_data_region_end, new_size, MEM_DECOMMIT))
+#if 0
+            fprintf ( stdout, "sbrk: VirtualFree from %x, new size %x bytes, MEM_DECOMMIT\n", real_data_region_end, new_size );
+#endif
+            if (!VirtualFree (real_data_region_end, new_size, MEM_DECOMMIT))
 	    return NULL;
  	}
 
@@ -1119,6 +1133,9 @@ sbrk (unsigned long increment)
 	return NULL;
 
       /* Commit more of our heap. */
+#if 0
+      fprintf ( stdout, "sbrk: VirtualAlloc from %x, %x bytes, MEM_COMMIT, PAGE_READWRITE\n", data_region_end, size);
+#endif
       if (VirtualAlloc (data_region_end, size, MEM_COMMIT,
 			PAGE_READWRITE) == NULL)
 	return NULL;
@@ -1143,10 +1160,18 @@ recreate_heap (char *executable_path)
   /* First reserve the upper part of our heap.  (We reserve first
      because there have been problems in the past where doing the
      mapping first has loaded DLLs into the VA space of our heap.)  */
+#if 0
+  fprintf ( stdout, "recreate_heap: VirtualAlloc from %x, %x bytes MEM_RESERVE, PAGE_NOACCESS\n",
+            get_heap_end (), get_reserved_heap_size () - get_committed_heap_size () );
+#endif
   tmp = VirtualAlloc ((void *) get_heap_end (),
+  /*tmp = VirtualAlloc ((void *) DBEGIN+PAGESIZE*512,*/
 		      get_reserved_heap_size () - get_committed_heap_size (),
 		      MEM_RESERVE,
 		      PAGE_NOACCESS);
+#if 0
+  fprintf ( stdout, "recreate_heap: VirtualAlloc tried %x, returned %x\n", get_heap_end (), tmp);
+#endif  
   if (!tmp)
     exit (1);
 

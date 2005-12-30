@@ -197,9 +197,12 @@ extern char *GCLExeName ( void );
 
 #define MAXCORE ((char *)((unsigned long)DBEGIN+(unsigned long)(MAXPAGE-1)*PAGESIZE))
 
-#define malloc gcl_malloc
+/* This must be done to ensure that nothing is done until virtual memory is initialised for the
+ * windows signals hack. */
+extern int is_shared_memory_initialised;
+#define CHECK_INTERRUPT if ( is_shared_memory_initialised && signals_pending ) raise_pending_signals(sig_safe)
+
 /* Begin for cmpinclude */
 
 
 /* End for cmpinclude */
-

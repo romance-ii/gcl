@@ -60,6 +60,7 @@ void initialize_process();
 #ifdef _WIN32
 
 extern void init_shared_memory (void);
+int is_shared_memory_initialised = FALSE;
 
 #  include <fcntl.h>
 
@@ -182,6 +183,7 @@ main(int argc, char **argv, char **envp) {
 #else
 	kcl_self = argv[0];
 #endif
+
 #ifdef FIX_FILENAME
     {
         int n = strlen ( kcl_self );
@@ -360,6 +362,7 @@ main(int argc, char **argv, char **envp) {
         gcl_init_readline_function();
 #endif
     again:
+
         super_funcall(sStop_level);
         if (type_of(sSAmultiply_stacksA->s.s_dbind)==t_fixnum) {
             multiply_stacks(fix(sSAmultiply_stacksA->s.s_dbind));
@@ -689,7 +692,6 @@ FFN(siLargv)(void) {
       i >= ARGC)
     FEerror("Illegal argument index: ~S.", 1, vs_base[0]);
   vs_base[0] = make_simple_string(ARGV[i]);
-
 }
 
 #ifdef UNIX
