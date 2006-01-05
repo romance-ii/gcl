@@ -84,7 +84,7 @@
 		    :system-p (si::get-command-arg "-system-p" t)))))
 	 (bye (if (or compiler::*error-p* (equal result '(nil))) 1 0))))
    (cond ((si::get-command-arg "-batch")
-	  (setq si::*top-level-hook* 'bye))
+	  (setf si::*top-level-hook* #'si::bye))
 	 ((si::get-command-arg "-f"))
 	 (t (format t si::*system-banner*)))
    (setq si::*ihs-top* 1)
