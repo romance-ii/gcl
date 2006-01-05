@@ -89,9 +89,13 @@
   (let ((+ nil) (++ nil) (+++ nil)
         (- nil) 
         (* nil) (** nil) (*** nil)
-        (/ nil) (// nil) (/// nil)
-	)
+        (/ nil) (// nil) (/// nil))
     (setq *lisp-initialized* t)
+    (let* ((c (find-package "COMPILER"))
+	   (tmp (and c (find-symbol "*TMP-DIR*" c))))
+      (when tmp
+	(setf (symbol-value tmp) (funcall (find-symbol "GET-TEMP-DIR" c)))
+	(format t "Temporary directory for compiler files set to ~a~%" (symbol-value tmp))))
     (catch *quit-tag*
       (progn 
 	(cond
