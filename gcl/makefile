@@ -308,7 +308,7 @@ gclclean:
 	rm -rf windows/Output
 	rm -f ansi-tests/test_results ansi-tests/gazonk* \
 		ansi-tests/generated-eval-when-test-file.lisp
-	rm -f config.log config.cache config.status $(PORTDIR)/gmon.out gcl.script
+	rm -f config.log config.cache config.status $(PORTDIR)/gmon.out gcl.script machine
 
 
 clean: gclclean
