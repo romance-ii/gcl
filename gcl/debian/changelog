@@ -4,8 +4,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * NULL_OR_ON_C_STACK macro check fix, exclude sparc symbols beginning
     with . from plt table
   * clear only terminal input on error
+  * Use internal gettext for bfd
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  5 Jan 2006 03:19:16 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  5 Jan 2006 16:40:57 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

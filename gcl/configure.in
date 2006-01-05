@@ -679,7 +679,7 @@ if test "$NEED_LOCAL_GMP" != "" ; then
 	 echo "#"
 
 	 if test "$use_common_binary" = "yes"; then
-	   cd $GMPDIR && ./configure --host=$host && cd ..
+	   cd $GMPDIR && ./configure --build=$host && cd ..
 	 else
 	   cd $GMPDIR && ./configure && cd ..
 	 fi
@@ -892,10 +892,23 @@ if test "$enable_locbfd" = "yes" ; then
 
 	# check for gettext.  It is part of glibc, but others
 	# need GNU gettext separately.
-	AC_CHECK_HEADER(libintl.h, true,
-			   AC_MSG_ERROR(libintl.h (gettext) not found))
-	AC_SEARCH_LIBS(dgettext, intl, true, AC_MSG_ERROR(gettext library not found))
+#	AC_CHECK_HEADER(libintl.h, true,
+#			   AC_MSG_ERROR(libintl.h (gettext) not found))
+#	AC_SEARCH_LIBS(dgettext, intl, true, AC_MSG_ERROR(gettext library not found))
  
+	echo "#"
+	echo "#"
+	echo "# -------------------------"
+	echo "# Subconfigure of LIBINTL"
+	echo "#"
+	echo "#"
+	cd binutils/intl && chmod +x configure && ./configure && cd ../..
+	echo "#"
+	echo "#"
+	echo "#"
+	echo "# Subconfigure of LIBINTL done"
+	echo "# ------------------------------"
+	echo "#"
 	echo "#"
 	echo "#"
 	echo "# -------------------------"
@@ -916,7 +929,7 @@ if test "$enable_locbfd" = "yes" ; then
 	echo "# Subconfigure of BFD"
 	echo "#"
 	echo "#"
-	cd binutils/bfd && chmod +x configure && ./configure && cd ../..
+	cd binutils/bfd && chmod +x configure && ./configure --with-included-gettext && cd ../..
 #       MY_SUBDIRS="$MY_SUBDIRS binutils/bfd " 
 	echo "#"
 	echo "#"

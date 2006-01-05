@@ -46,7 +46,10 @@ xgcl: $(PORTDIR)/saved_xgcl
 $(PORTDIR)/saved_xgcl: $(PORTDIR)/saved_gcl
 	cd xgcl-2 && $(MAKE)
 
-binutils/bfd/libbfd.a binutils/libiberty/libiberty.a:
+binutils/intl/libintl.a:
+	cd $(@D) && $(MAKE)
+
+binutils/bfd/libbfd.a binutils/libiberty/libiberty.a: binutils/intl/libintl.a
 	cd $(@D) && $(MAKE)
 
 h/bfd.h: binutils/bfd/libbfd.a binutils/libiberty/libiberty.a
@@ -314,6 +317,7 @@ clean: gclclean
 	-cd $(PARGCLDIR) && $(MAKE) distclean
 	rm -f unixport/saved_pargcl unixport/saved_prepargcl \
 		bin/pargcl bin/procgroup unixport/_rsym1
+	-cd binutils/intl && $(MAKE) distclean
 	-cd binutils/bfd && $(MAKE) distclean
 	-cd binutils/libiberty && $(MAKE) distclean
 
