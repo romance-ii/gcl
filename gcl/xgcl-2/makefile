@@ -38,7 +38,7 @@ maxobjs: $(shell echo *.lsp) $(PORTDIR)/saved_gcl
 	'(xlib::compile-xgcl)' | $(LISP)
 
 $(PORTDIR)/saved_$(SYSTEM): $(C_OBJS) maxobjs
-	(cd $(PORTDIR) ; $(MAKE) saved_xgcl "INIT_SYSTEM_LSP=init_gcl.lsp" "SYSTEM=$(SYSTEM)" "SYSTEM_OBJS=`cat $(SYSDIR)/maxobjs` $(C_OBJS) " "EXTRA_LD_LIBS= $(X_LIBS) " "PORTDIR=$(PORTDIR)")
+	(cd $(PORTDIR) ; $(MAKE) saved_xgcl INIT_SYSTEM_LSP="init_gcl.lsp" SYSTEM="$(SYSTEM)" SYSTEM_OBJS="`cat $(SYSDIR)/maxobjs` $(C_OBJS) " "EXTRA_LD_LIBS= $(X_LIBS)" PORTDIR="$(PORTDIR)")
 	rm -f $(PORTDIR)/raw_$(SYSTEM)
 
 Xgcl:

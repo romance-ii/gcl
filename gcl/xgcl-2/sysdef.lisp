@@ -23,19 +23,19 @@
 (in-package :XLIB)
 (sys::use-package '(:lisp :system :sys))
 
-(defvar *files* '( "Xlib"
-      "Xutil"
-      "X"
-      "XAtom"
-      "defentry-events"
-      "Xstruct"
-      "XStruct-l-3"
-      "general"
-      "keysymdef"
-      "X10"
-      "Xinit"
-      "dwtrans"
-      "sysinit"
+(defvar *files* '( "gcl_Xlib"
+      "gcl_Xutil"
+      "gcl_X"
+      "gcl_XAtom"
+      "gcl_defentry-events"
+      "gcl_Xstruct"
+      "gcl_XStruct-l-3"
+      "gcl_general"
+      "gcl_keysymdef"
+      "gcl_X10"
+      "gcl_Xinit"
+      "gcl_dwtrans"
+      "gcl_sysinit"
       ))
 
 

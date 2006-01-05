@@ -48,11 +48,10 @@
        (clines "load1(\"../xgcl-2/sysdef.lisp\");")
      ,@(sloop::sloop for x  in files
 	for f  = (substitute #\_ #\-  x)
-;	for ff =  (namestring (truename (format nil "~a.o" x)))
-	for ff =  (namestring (format nil "~a.o" x))
+	for ff =  (namestring (truename (format nil "~a.o" x)))
 	do (princ ff st) (princ " " st)
 	collect
-	`(clines ,(Format nil "init_or_load(init_~a,\"~a\");" f ff))
+	`(clines ,(Format nil "init_or_load(init_~a,\"~a\");" (string-downcase f) ff))
 	finally (terpri st)
 	))
     

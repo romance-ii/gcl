@@ -5,8 +5,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     with . from plt table
   * clear only terminal input on error
   * Use internal gettext for bfd
+  * Restore xgcl
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  5 Jan 2006 16:40:57 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  5 Jan 2006 19:00:14 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

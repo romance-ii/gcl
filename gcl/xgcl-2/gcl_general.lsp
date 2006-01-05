@@ -33,7 +33,7 @@
 
 ;;from mark ring's function
 ;; General routines.
-(defCfun "object  get_c_string(s) object s;" 0
+(defCfun "object  get_c_string(object s)" 0
   " return( s->st.st_self);"
   )
 (defentry get_c_string_2 (object) (object get_c_string))
@@ -44,7 +44,7 @@
 
 
 ;; General routines.
-(defCfun "object lisp_string(a_string, c_string ) object a_string; int  c_string; " 0
+(defCfun "object lisp_string(object a_string, int c_string )" 0
   "int len = strlen(c_string);"
   "a_string->st.st_dim = len;"
   "a_string->st.st_fillp = len;"
@@ -58,7 +58,7 @@
 
 ;;modified from mark ring's function
 ;; General routines.
-(defCfun "int   get_st_point(s) object s;" 0
+(defCfun "int get_st_point(object s)" 0
   " return((int) s->st.st_self);"
   )
 (defentry get-st-point2 (object) (int get_c_string))
