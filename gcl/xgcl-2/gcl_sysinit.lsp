@@ -48,7 +48,7 @@
        (clines "load1(\"../xgcl-2/sysdef.lisp\");")
      ,@(sloop::sloop for x  in files
 	for f  = (substitute #\_ #\-  x)
-	for ff =  (namestring (truename (format nil "~a.o" x)))
+	for ff = (or (probe-file (format nil "~a.o" x)) (probe-file (format nil "~a.lsp" x)))
 	do (princ ff st) (princ " " st)
 	collect
 	`(clines ,(Format nil "init_or_load(init_~a,\"~a\");" (string-downcase f) ff))
