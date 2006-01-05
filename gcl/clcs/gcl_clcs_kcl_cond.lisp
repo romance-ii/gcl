@@ -15,7 +15,7 @@
 				     &aux (internal-error-parms
 					   (list error-name correctable function-name
 						 continue-format-string error-format-string)))
-  (clear-input nil)
+  (clear-input t)
   (when (equal internal-error-parms *internal-error-parms*)
     (format t "Universal error handler called recursively ~S~%"
 	    internal-error-parms)
