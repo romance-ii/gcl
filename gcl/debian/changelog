@@ -10,8 +10,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * report tmp-dir setting with system-banner to enable clean -eval -
     batch operation; fix listen on socket streams; use (abs (getpid)) in
     tmp names for Windows
+  * fix configure unbalanced quotes
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  9 Jan 2006 17:26:15 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  9 Jan 2006 19:54:27 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
