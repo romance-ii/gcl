@@ -431,7 +431,7 @@ Cannot compile ~a.~%"
 (defun gazonk-name ()
   (dotimes (i 1000)
     (let ((tem (merge-pathnames 
-		(format nil "~agazonk_~d_~d.lsp" (if (boundp '*tmp-dir*) *tmp-dir* "") (si::getpid) i))))
+		(format nil "~agazonk_~d_~d.lsp" (if (boundp '*tmp-dir*) *tmp-dir* "") (abs (si::getpid)) i))))
       (unless (probe-file tem)
 	(return-from gazonk-name (pathname tem)))))
   (error "1000 gazonk names used already!"))
@@ -537,6 +537,7 @@ Cannot compile ~a.~%"
 
 
 (defun compiler-pass2 (c-pathname h-pathname system-p )
+  (declare (special *init-name*))
   (with-open-file (st c-pathname :direction :output)
     (let ((*compiler-output1* (if (eq system-p 'disassemble) *standard-output*
 				st)))

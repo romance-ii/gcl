@@ -7,8 +7,11 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * Use internal gettext for bfd
   * Restore xgcl
   * Set compiler::*tmp-dir* at runtime
+  * report tmp-dir setting with system-banner to enable clean -eval -
+    batch operation; fix listen on socket streams; use (abs (getpid)) in
+    tmp names for Windows
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  5 Jan 2006 21:21:52 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  9 Jan 2006 17:26:15 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
