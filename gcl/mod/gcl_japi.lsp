@@ -1,8 +1,10 @@
 ;;; Binding to the cross platform Japi GUI library from http://www.japi.de/
 
-(eval-when (load eval)
-	   (make-package :japi-primitives :nicknames '(jpr) :use '(lisp)))
-(in-package :japi-primitives)
+;(eval-when (load eval)
+;  (make-package "japi-primitives" :nicknames '(jpr) :use '(lisp)))
+;(eval-when (compile)
+;(in-package "JAPI-PRIMITIVES")
+;)
 
 (clines "#include <japi.h>")
 

@@ -93,6 +93,9 @@ gcl_init_system(object no_init)
 #ifdef HAVE_JAPI_H
   lsp_init("../mod/gcl_japi.lsp");
 #endif
+#ifdef HAVE_TK
+  lsp_init("../mod/gcl_tk.lsp"); /* Needed for package declaration when compiling later. */
+#endif
   lsp_init("../lsp/gcl_iolib.lsp");
   lsp_init("../lsp/gcl_listlib.lsp");
 /*   lsp_init("../lsp/gcl_mislib.lsp"); */

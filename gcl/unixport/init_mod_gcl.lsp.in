@@ -4,6 +4,8 @@
 (make-package "ANSI-LOOP" :use '("LISP"))
 (make-package "DEFPACKAGE" :use '("LISP"))
 (make-package "TK" :use '("LISP" "SLOOP"))
+(make-package "JAPI-PRIMITIVES" :use '("LISP"))
+(make-package "TK-PRIMITIVES" :use '("LISP"))
 
 (in-package "SYSTEM")
 (defvar *command-args* nil)

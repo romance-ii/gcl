@@ -66,6 +66,14 @@ int is_shared_memory_initialised = FALSE;
 
 #endif
 
+#ifdef HAVE_TK
+
+#  include <tcl.h>
+#  include <tk.h>
+Tcl_Interp *tcl_interpreter;
+
+#endif
+
 #define LISP_IMPLEMENTATION_VERSION "April 1994"
 
 #define EXTRA_BUFSIZE 8
@@ -361,7 +369,26 @@ main(int argc, char **argv, char **envp) {
 #ifdef HAVE_READLINE
         gcl_init_readline_function();
 #endif
+
+#ifdef HAVE_TK
+#  ifdef _WIN32
+	Tcl_FindExecutable ( argv[0] );
+	tcl_interpreter = Tcl_CreateInterp();
+#  else
+	tcl_interpreter = Tcl_CreateInterp();
+	if ( Tcl_AppInit ( tcl_interpreter ) != TCL_OK ) {
+	  fprintf(stderr, "Tcl_AppInit failed: %s\n", interp->result);
+	}
+#  endif
+#endif
+
     again:
+
+#ifdef HAVE_TK
+        if ( Tk_GetNumMainWindows() > 0 ) {
+            Tcl_DoOneEvent(0);
+        }
+#endif
 
         super_funcall(sStop_level);
         if (type_of(sSAmultiply_stacksA->s.s_dbind)==t_fixnum) {
@@ -1050,6 +1077,14 @@ init_main(void) {
   ADD_FEATURE("GNU-LD");
 #endif
   
+#ifdef HAVE_JAPI_H
+  ADD_FEATURE("JAPI-PRIMITIVES");
+#endif	 
+
+#ifdef HAVE_TK
+  ADD_FEATURE("TK-PRIMITIVES");
+#endif	 
+
   make_special("*FEATURES*",features);}
   
   make_si_function("SAVE-SYSTEM", siLsave_system);

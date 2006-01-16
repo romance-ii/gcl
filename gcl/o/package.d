@@ -1235,6 +1235,22 @@ gcl_init_package()
 			         make_cons(make_simple_string("SYS"),
 					   Cnil)),
 		       make_cons(lisp_package, Cnil),251,157);
+#if 0
+#if HAVE_JAPI_H
+	japi_package
+	= make_package(make_simple_string("JAPI-PRIMITIVES"),
+		       make_cons(make_simple_string("JPR"),
+					   Cnil),
+		       make_cons(lisp_package, Cnil),100,100);
+#endif
+#if HAVE_TK
+	tk_package
+	= make_package(make_simple_string("TK-PRIMITIVES"),
+		       make_cons(make_simple_string("TKPR"),
+					   Cnil),
+		       make_cons(lisp_package, Cnil),100,100);
+#endif
+#endif
 
 	/*  There is no need to enter a package as a mark origin.  */
 
