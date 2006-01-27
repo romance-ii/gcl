@@ -113,6 +113,7 @@ object LISP_string;
 object sSAignore_eof_on_terminal_ioA;
 
 extern void coerce_to_local_filename(object p,char *f);
+extern char *lisp_to_string(object string);
 
 static bool
 feof1(fp)
@@ -2014,7 +2015,8 @@ object make_stream_from_fd ( object command, int fd, enum smmode smm )
     int child_pid;
     object stream_write;
     object stream_read;
-    int i, vargcount;
+    int i;
+    char *c_command;
 @
     command = coerce_to_string(command);
 #if defined ( _WIN32 )
@@ -2026,7 +2028,7 @@ object make_stream_from_fd ( object command, int fd, enum smmode smm )
         HANDLE child_stdout, child_stdin, child_stderr;
         HANDLE current = GetCurrentProcess();
         SECURITY_ATTRIBUTES attr;
-        char *c_command;
+        int vargcount;
         
         /* Coerce command and args to a single string with quotes around
          * program name to help with spaces in paths. */
@@ -2167,8 +2169,10 @@ object make_stream_from_fd ( object command, int fd, enum smmode smm )
 #define OUR_MAX_ARGS 100
 	int child_stdin, child_stdout, child_stderr;
         char *argv_ptr[OUR_MAX_ARGS];
-        object arglist;
-        arglist = vs_base[1];
+        object arglist = vs_base[1];
+        
+        c_command  = lisp_to_string ( command );
+
         argv_ptr[0] = "";
         for ( i = 1; ( arglist != Cnil ) && ( i < OUR_MAX_ARGS - 1 ); i++ ) {
             argv_ptr[i] = lisp_to_string ( arglist->c.c_car );
@@ -2206,7 +2210,7 @@ object make_stream_from_fd ( object command, int fd, enum smmode smm )
 	if (error == sKoutput) {
             child_stderr = child_stdout;
 	} else if (error == Ct) {
-            child_stderr = stream_to_handle(sLAstandard_errorA, 1);
+            child_stderr = stream_to_handle(sLAerror_outputA, 1);
 	} else {
             child_stderr = -1;
 	}
@@ -2226,7 +2230,7 @@ object make_stream_from_fd ( object command, int fd, enum smmode smm )
             if (parent_read) close(parent_read);
             close(2);
             dup(child_stderr);
-            execvp(command->string.self, argv_ptr);
+            execvp(c_command, argv_ptr);
             /* at this point exec has failed */
             perror("exec");
             abort();
@@ -2235,7 +2239,6 @@ object make_stream_from_fd ( object command, int fd, enum smmode smm )
 	close(child_stdout);
 	close(child_stderr);
     }
-}
 #endif  /* _WIN32 */    
     if (child_pid < 0) {
         if (parent_write) close(parent_write);
