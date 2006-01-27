@@ -2015,7 +2015,6 @@ object make_stream_from_fd ( object command, int fd, enum smmode smm )
     int child_pid;
     object stream_write;
     object stream_read;
-    int i;
     char *c_command;
 @
     command = coerce_to_string(command);
@@ -2170,6 +2169,7 @@ object make_stream_from_fd ( object command, int fd, enum smmode smm )
 	int child_stdin, child_stdout, child_stderr;
         char *argv_ptr[OUR_MAX_ARGS];
         object arglist = vs_base[1];
+        int i;
         
         c_command  = lisp_to_string ( command );
 
