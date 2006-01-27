@@ -29,6 +29,33 @@ License for more details.
 void setup_stream_buffer(object);
 object make_two_way_stream(object, object);
 
+/* LISP - Lisp Wrapper for the "c" code.
+ *
+ * The lisp OBJECT is passed to the code and a string must be extracted
+ * and null terminated to make it work with the "C" code.
+ *
+ * Lisp Interface code.
+ */
+
+char *lisp_to_string(string)
+object string;
+{
+	int	i, len;
+	char	*sself;
+	char	*cstr;
+
+	len = string->st.st_fillp;
+
+	cstr = (char *) malloc (len+1);
+	sself = &(string->st.st_self[0]);
+	for (i=0; i<len; i++)
+	{
+		cstr[i] = sself[i];
+	}
+	cstr[i] = 0;
+	return (cstr);
+}
+
 #ifdef __MINGW32__
 
 #include<windows.h>
@@ -317,33 +344,6 @@ gcl_init_socket_function()
 #include <stdio.h>
 
 
-
-/* LISP - Lisp Wrapper for the "c" code.
- *
- * The lisp OBJECT is passed to the code and a string must be extracted
- * and null terminated to make it work with the "C" code.
- *
- * Lisp Interface code.
- */
-
-static char *lisp_to_string(string)
-object string;
-{
-	int	i, len;
-	char	*sself;
-	char	*cstr;
-
-	len = string->st.st_fillp;
-
-	cstr = (char *) malloc (len+1);
-	sself = &(string->st.st_self[0]);
-	for (i=0; i<len; i++)
-	{
-		cstr[i] = sself[i];
-	}
-	cstr[i] = 0;
-	return (cstr);
-}
 
 /* open_connection - Open_Connection a socket to a server that you know by port number.
  *
