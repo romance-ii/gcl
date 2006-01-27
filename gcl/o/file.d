@@ -39,6 +39,11 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #define IN_FILE
 #include "include.h"
 
+#ifdef _WIN32
+#  include<windows.h>
+#  include <fcntl.h>
+#endif
+
 #ifdef HAVE_READLINE
 #include <readline/readline.h>
 #define kclgetc(FP)		rl_getc_em(FP)
@@ -1947,6 +1952,316 @@ LFD(Lmake_echo_stream)()
 	vs_popp;
 }
 
+static int
+stream_to_handle(object s, int output)
+{
+	FILE *f;
+ BEGIN:
+	if (type_of(s) != t_stream)
+		return -1;
+	switch ((enum smmode)s->sm.sm_mode) {
+	case smm_input:
+		if (output) return -1;
+		f = s->sm.sm_fp;
+		break;
+	case smm_output:
+		if (!output) return -1;
+		f = s->sm.sm_fp;
+		break;
+	case smm_io:
+		f = s->sm.sm_fp;
+		break;
+	case smm_synonym:
+		s = symbol_value(s->sm.sm_object0);
+		goto BEGIN;
+	case smm_two_way:
+		s = output? s->sm.sm_object1 : s->sm.sm_object0;
+		goto BEGIN;
+	default:
+		error("illegal stream mode");
+	}
+	return fileno(f);
+}
+
+object make_stream_from_fd ( object command, int fd, enum smmode smm )
+{
+	object stream = (object) alloc_object(t_stream);
+        char *mode;
+	switch(smm)
+	{
+	case smm_input:
+		mode = "r";
+		break;
+	case smm_output:
+		mode = "w";
+		break;
+	default:
+		FEerror("make_stream_from_fd : wrong mode",0);
+	}
+        
+	stream->sm.sm_mode    = (short) smm;
+	stream->sm.sm_fp      = fdopen ( fd, mode );
+
+	stream->sm.sm_object0 = sLcharacter;
+	stream->sm.sm_object1 = Cnil;
+	stream->sm.sm_int0    = stream->sm.sm_int1 = 0;
+	return ( stream );
+}
+
+/* Borrowed from ECL */
+@(defun run_program (command argv &key (input sKstream) (output sKstream) (error Ct))
+    int parent_write = 0, parent_read = 0;
+    int child_pid;
+    object stream_write;
+    object stream_read;
+    int i, vargcount;
+@
+    command = coerce_to_string(command);
+#if defined ( _WIN32 )
+    {
+        object x;
+        BOOL ok;
+        STARTUPINFO st_info;
+        PROCESS_INFORMATION pr_info;
+        HANDLE child_stdout, child_stdin, child_stderr;
+        HANDLE current = GetCurrentProcess();
+        SECURITY_ATTRIBUTES attr;
+        char *c_command;
+        
+        /* Coerce command and args to a single string with quotes around
+         * program name to help with spaces in paths. */
+        for ( x = argv; x != Cnil; x = MMcdr ( x ) ) {
+            MMcar ( x ) = coerce_to_string ( MMcar(x) );
+        }
+        x = make_simple_string ( "~S~{ ~S~}" );
+        vargcount  = VFUN_NARGS;
+        VFUN_NARGS = 4;
+        command    = FFN(fLformat) ( Cnil, x, command, argv );
+        VFUN_NARGS = vargcount;
+
+        c_command  = lisp_to_string ( command );
+        
+        attr.nLength = sizeof(SECURITY_ATTRIBUTES);
+        attr.lpSecurityDescriptor = NULL;
+        attr.bInheritHandle = TRUE;
+        if (input == sKstream) {
+            /* Creates a pipe that we can read from what the child
+               writes to it. We duplicate one extreme of the pipe
+               so that the child does not inherit it. */
+            HANDLE tmp;
+            ok = CreatePipe(&child_stdin, &tmp, &attr, 0);
+            if (ok) {
+                ok = DuplicateHandle(current, tmp, current,
+                                      &tmp, 0, FALSE,
+                                      DUPLICATE_CLOSE_SOURCE |
+                                      DUPLICATE_SAME_ACCESS);
+                if (ok) {
+                    parent_write = _open_osfhandle(tmp, _O_WRONLY /*| _O_TEXT*/);
+                    if (parent_write < 0)
+                        printf("open_osfhandle failed\n");
+                }
+            }
+        } else if (input == Ct) {
+            /* The child inherits a duplicate of our input
+               handle. Creating a duplicate avoids problems when
+               the child closes it */
+            int stream_handle = stream_to_handle(sLAstandard_inputA, 0);
+            if (stream_handle >= 0)
+                DuplicateHandle(current, _get_osfhandle(stream_handle) /*GetStdHandle(STD_INPUT_HANDLE)*/,
+                                 current, &child_stdin, 0, TRUE,
+                                 DUPLICATE_SAME_ACCESS);
+            else
+                child_stdin = NULL;
+        } else {
+            child_stdin = NULL;
+        }
+        if (output == sKstream) {
+            /* Creates a pipe that we can write to and the
+               child reads from. We duplicate one extreme of the
+               pipe so that the child does not inherit it. */
+            HANDLE tmp;
+            ok = CreatePipe(&tmp, &child_stdout, &attr, 0);
+            if (ok) {
+                ok = DuplicateHandle(current, tmp, current,
+                                      &tmp, 0, FALSE,
+                                      DUPLICATE_CLOSE_SOURCE |
+                                      DUPLICATE_SAME_ACCESS);
+                if (ok) {
+                    parent_read = _open_osfhandle(tmp, _O_RDONLY /*| _O_TEXT*/);
+                    if (parent_read < 0)
+                        printf("open_osfhandle failed\n");
+                }
+            }
+        } else if (output == Ct) {
+            /* The child inherits a duplicate of our output
+               handle. Creating a duplicate avoids problems when
+               the child closes it */
+            int stream_handle = stream_to_handle(sLAstandard_outputA, 1);
+            if (stream_handle >= 0)
+                DuplicateHandle(current, _get_osfhandle(stream_handle) /*GetStdHandle(STD_OUTPUT_HANDLE)*/,
+                                 current, &child_stdout, 0, TRUE,
+                                 DUPLICATE_SAME_ACCESS);
+            else
+                child_stdout = NULL;
+        } else {
+            child_stdout = NULL;
+        }
+        if (error == sKoutput) {
+            /* The child inherits a duplicate of its own output
+               handle.*/
+            DuplicateHandle(current, child_stdout, current,
+                             &child_stderr, 0, TRUE,
+                             DUPLICATE_SAME_ACCESS);
+        } else if (error == Ct) {
+            /* The child inherits a duplicate of our output
+               handle. Creating a duplicate avoids problems when
+               the child closes it */
+            int stream_handle = stream_to_handle(sLAerror_outputA, 1);
+            if (stream_handle >= 0)
+                DuplicateHandle(current, _get_osfhandle(stream_handle) /*GetStdHandle(STD_ERROR_HANDLE)*/,
+                                 current, &child_stderr, 0, TRUE,
+                                 DUPLICATE_SAME_ACCESS);
+            else
+                child_stderr = NULL;
+        } else {
+            child_stderr = NULL;
+        }
+        ZeroMemory(&st_info, sizeof(STARTUPINFO));
+        st_info.cb = sizeof(STARTUPINFO);
+        st_info.lpTitle = NULL; /* No window title, just exec name */
+        st_info.dwFlags = STARTF_USESTDHANDLES; /* Specify std{in,out,err} */
+        st_info.hStdInput = child_stdin;
+        st_info.hStdOutput = child_stdout;
+        st_info.hStdError = child_stderr;
+        ZeroMemory(&pr_info, sizeof(PROCESS_INFORMATION));
+        ok = CreateProcess ( NULL, c_command,
+                             NULL, NULL, /* lpProcess/ThreadAttributes */
+                             TRUE, /* Inherit handles (for files) */
+                             /*CREATE_NEW_CONSOLE |*/
+                             0 /*(input == Ct || output == Ct || error == Ct ? 0 : CREATE_NO_WINDOW)*/,
+                             NULL, /* Inherit environment */
+                             NULL, /* Current directory */
+                             &st_info, /* Startup info */
+                             &pr_info ); /* Process info */
+        if (ok) {
+            CloseHandle(pr_info.hProcess);
+            CloseHandle(pr_info.hThread);
+            child_pid = pr_info.dwProcessId;
+            /* Child handles must be closed in the parent process */
+            /* otherwise the created pipes are never closed       */
+            if (child_stdin)  CloseHandle(child_stdin);
+            if (child_stdout) CloseHandle(child_stdout);
+            if (child_stderr) CloseHandle(child_stderr);
+        } else {
+            const char *message;
+            FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+                           FORMAT_MESSAGE_ALLOCATE_BUFFER,
+                           0, GetLastError(), 0, (void*)&message, 0, NULL);
+            printf("%s\n", message);
+            LocalFree(message);
+            child_pid = -1;
+        }
+    }
+#else
+    {
+#define OUR_MAX_ARGS 100
+	int child_stdin, child_stdout, child_stderr;
+        char *argv_ptr[OUR_MAX_ARGS];
+        object arglist;
+        arglist = vs_base[1];
+        argv_ptr[0] = "";
+        for ( i = 1; ( arglist != Cnil ) && ( i < OUR_MAX_ARGS - 1 ); i++ ) {
+            argv_ptr[i] = lisp_to_string ( arglist->c.c_car );
+            arglist = arglist->c.c_cdr;
+        }
+        argv_ptr[i] = (char *)0;
+	if (input == sKstream) {
+            int fd[2];
+            pipe(fd);
+            parent_write = fd[1];
+            child_stdin = fd[0];
+	} else {
+            child_stdin = -1;
+            if (input == Ct)
+                child_stdin = stream_to_handle(sLAstandard_inputA, 0);
+            if (child_stdin >= 0)
+                child_stdin = dup(child_stdin);
+            else
+                child_stdin = open("/dev/null", O_RDONLY);
+	}
+	if (output == sKstream) {
+            int fd[2];
+            pipe(fd);
+            parent_read = fd[0];
+            child_stdout = fd[1];
+	} else {
+            child_stdout = -1;
+            if (output == Ct)
+                child_stdout = stream_to_handle(sLAstandard_outputA, 1);
+            if (child_stdout >= 0)
+                child_stdout = dup(child_stdout);
+            else
+                child_stdout = open("/dev/null", O_WRONLY);
+	}
+	if (error == sKoutput) {
+            child_stderr = child_stdout;
+	} else if (error == Ct) {
+            child_stderr = stream_to_handle(sLAstandard_errorA, 1);
+	} else {
+            child_stderr = -1;
+	}
+	if (child_stderr < 0) {
+            child_stderr = open("/dev/null", O_WRONLY);
+	} else {
+            child_stderr = dup(child_stderr);
+	}
+	child_pid = fork();
+	if (child_pid == 0) {
+            /* Child */
+            close(0);
+            dup(child_stdin);
+            if (parent_write) close(parent_write);
+            close(1);
+            dup(child_stdout);
+            if (parent_read) close(parent_read);
+            close(2);
+            dup(child_stderr);
+            execvp(command->string.self, argv_ptr);
+            /* at this point exec has failed */
+            perror("exec");
+            abort();
+	}
+	close(child_stdin);
+	close(child_stdout);
+	close(child_stderr);
+    }
+}
+#endif  /* _WIN32 */    
+    if (child_pid < 0) {
+        if (parent_write) close(parent_write);
+        if (parent_read) close(parent_read);
+        parent_write = 0;
+        parent_read = 0;
+        FEerror("Could not spawn subprocess to run ~S.", 1, command);
+    }
+    if (parent_write > 0) {
+        stream_write = make_stream_from_fd(command, parent_write,
+                                                smm_output);
+    } else {
+        parent_write = 0;
+        stream_write = NULL;
+    }
+    if (parent_read > 0) {
+        stream_read = make_stream_from_fd(command, parent_read,
+                                               smm_input);
+    } else {
+        parent_read = 0;
+        stream_read = NULL;
+    }
+    @(return `( parent_read || parent_write ) ? make_two_way_stream(stream_read, stream_write) : Cnil` )
+@)
+
+
 @(static defun make_string_input_stream (strng &o istart iend)
 	int s, e;
 @
@@ -3089,6 +3404,7 @@ gcl_init_file_function()
 	make_si_function("MAKE-STRING-OUTPUT-STREAM-FROM-STRING",
 			 siLmake_string_output_stream_from_string);
 	make_si_function("COPY-STREAM", siLcopy_stream);
+	make_si_function("RUN-PROGRAM", Lrun_program);
 
 #ifdef USER_DEFINED_STREAMS
 	make_si_function("USER-STREAM-STATE", siLuser_stream_state);
