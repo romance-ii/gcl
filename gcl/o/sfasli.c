@@ -163,15 +163,15 @@ LFD(build_symbol_table)(void) {
 		       system_directory);
 #endif
 #ifndef RSYM_COMMAND
-    snprintf(command,sizeof(command),"%srsym %s %s",system_directory,kcl_self,tmpfile1);
+    snprintf(command,sizeof(command),"%s/rsym %s %s",system_directory,kcl_self,tmpfile1);
 #else
     RSYM_COMMAND(command,system_directory,kcl_self,tmpfile1);
-#endif   
+#endif
     if (system(command) != 0)
 #ifdef STAND
-      FEerror("The rsym command %s failed .",1,command);
+      FEerror("The rsym command %s failed.",1,command);
 #else
-    FEerror("The rsym command ~a failed .",1,
+    FEerror("The rsym command ~a failed.",1,
 	    make_simple_string(command));
 #endif
     read_special_symbols(tmpfile1);
