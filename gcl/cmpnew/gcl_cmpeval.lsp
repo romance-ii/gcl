@@ -1339,7 +1339,7 @@
    ((and (consp val) (eq (car val) 'si::|#,|))
     (list 'LOCATION (make-info :type (object-type (cmp-eval (cdr val))))
           (list 'VV (add-object val))))
-   ((and (arrayp val) (not (si::staticp val)))
+   ((and (arrayp val) (not (si::staticp val)) (eq (array-element-type val) t)) ;; This must be readable
     (list 'LOCATION (make-info :type (object-type val))
           (list 'VV (add-object val))))
    (always-p

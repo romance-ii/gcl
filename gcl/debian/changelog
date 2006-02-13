@@ -12,8 +12,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
     tmp names for Windows
   * fix configure unbalanced quotes
   * Fix no arg type numerical propagation
+  * Do not dump arrays with array-element-types other than t to data
+    file
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 11 Jan 2006 15:35:53 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 13 Feb 2006 20:10:09 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
