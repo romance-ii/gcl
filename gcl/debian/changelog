@@ -18,8 +18,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     let
   * limit cons type calculations
   * Better cond evalmacro
+  * improper-consp, and better si::proper-list deftype
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 14 Feb 2006 18:06:21 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 14 Feb 2006 18:07:07 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

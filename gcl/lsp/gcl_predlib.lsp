@@ -415,11 +415,18 @@
 (defun non-standard-base-char-p (x)
   (and (characterp x) (not (standard-char-p x))))
 
-(defun proper-listp (x)
-  (and (listp x)
-       (do ((x x (cdr x))) ((not (consp x)) (not x)))))
+(defun improper-consp-int (s f)
+  (cond ((atom f) f)
+	((atom (cdr f)) (cdr f))
+	((eq s f))
+	((improper-consp-int (cdr s) (cddr f)))))
 
-(deftype proper-list () `(satisfies proper-listp))
+(defun improper-consp (x)
+  (and (consp x)
+       (or (and (atom (cdr x)) (cdr x))
+	   (improper-consp-int (cdr x) (cddr x)))))
+
+(deftype proper-list () `(or null (and cons (not (satisfies improper-consp)))))
 
 (deftype extended-char () nil)
 (deftype base-char () `(or standard-char non-standard-base-char))
