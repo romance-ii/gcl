@@ -16,8 +16,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     file
   * limit multiple-value-binding autodeclaration nesting depth following
     let
+  * limit cons type calculations
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 14 Feb 2006 18:00:36 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 14 Feb 2006 18:05:45 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

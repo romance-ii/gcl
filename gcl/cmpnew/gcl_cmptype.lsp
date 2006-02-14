@@ -48,10 +48,24 @@
 
 ;;; Check if THING is an object of the type TYPE.
 ;;; Depends on the implementation of TYPE-OF.
-(defun object-type (thing)
+
+(defvar *car-limit* 5)
+(defvar *cdr-limit* 5)
+(defun cons-tp-limit (x i j)
+  (declare (seqind i j))
+  (cond ((> i *car-limit*) nil)
+	((> j *cdr-limit*) nil)
+	((atom x) t)
+	((and (cons-tp-limit (car x) (1+ i) 0) (cons-tp-limit (cdr x) i (1+ j))))))
+
+
+(defun object-type (thing &optional lim)
   (let* ((type (type-of thing)))
     (cond ((type>= 'integer type) `(integer ,thing ,thing))
-	  ((eq type 'cons) `(cons ,(object-type (car thing)) ,(if (cdr thing) (object-type (cdr thing)) 'null)))
+	  ((eq type 'cons) (cond ((or lim (cons-tp-limit thing 0 0)) 
+				  `(cons ,(object-type (car thing) t) ,(if (cdr thing) (object-type (cdr thing) t) 'null)))
+				 ((si::improper-consp thing) `(list))
+				 (`(si::proper-list))))
 	  ((eq type 'keyword) 'symbol)
 	  ((type>= 'character type) 'character)
 	  (type))))
@@ -71,7 +85,7 @@
   (let ((x (cons t1 t2)))
     (multiple-value-bind 
      (r f) 
-     (gethash x *norm-tp-hash*)
+     (gethash x *and-tp-hash*)
      (cond (f r)
 	   ((setf (gethash x *and-tp-hash*) (type-and-int t1 t2)))))))
 
@@ -79,7 +93,7 @@
   (let ((x (cons t1 t2)))
     (multiple-value-bind 
      (r f) 
-     (gethash x *norm-tp-hash*)
+     (gethash x *or-tp-hash*)
      (cond (f r)
 	   ((setf (gethash x *or-tp-hash*) (type-or1-int t1 t2)))))))
 
