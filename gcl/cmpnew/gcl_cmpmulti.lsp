@@ -214,26 +214,34 @@
 ;	(list 'values frt)))))
 
 
-;;FIXME -- this still uses pass1, while let for performance reasons uses custom change-detection code.
+(defvar *dmbs* 0)
+(defvar *dmbsrl* 2)
+
+;;FIXME -- rewrite this more in line with let case, to catch certain changed bindings too.
 (defun declare-multiple-value-bindings (args specials)
-  (let ((info (make-info))
-	(newvars *vars*))
-    (dolist (var (car args))
-      (push (c1make-var var nil nil nil) newvars))
-    (let ((*vars* newvars))
-      (c1args (c1body (cddr args) nil) info))
-    (let ((expt (info-type (cadr (c1expr (cadr args))))))
-      (let ((decls (remove-if-not #'t-to-nil
-				  (if (and (consp expt) (eq (car expt) 'values))
-				      (mapcar #'list (cdr expt) (car args))
-				    (list (list expt (caar args)))) :key #'car)))
-	(let ((decls (remove-if
-		      (lambda (x)
-			(or (si::specialp x) (member x specials)
-			    (let ((nv (car (member x newvars :key #'var-name :test #'eq))))
-			      (when (is-changed nv info)
-				(cmpnote "Multiple-value-binding ~S is changed and cannot be declared~%" x)
-				t)))) decls :key #'cadr)))
+  (if (>= *dmbs* *dmbsrl*) args
+    (let ((*dmbs* (1+ *dmbs*))
+	  (info (make-info))
+	  (newvars *vars*))
+      (dolist (var (car args))
+	(push (c1make-var var nil nil nil) newvars))
+      (let ((expt (let ((*suppress-compiler-warnings* t)
+			(*suppress-compiler-notes* t)
+			(*vars* newvars))
+		    (c1args (c1body (cddr args) nil) info)
+		    (info-type (cadr (c1expr (cadr args)))))))
+	(let* ((decls (remove-if-not 
+		       't-to-nil
+		       (if (and (consp expt) (eq (car expt) 'values))
+			   (mapcar 'list (cdr expt) (car args))
+			 (list (list expt (caar args)))) :key 'car))
+	       (decls (remove-if
+		       (lambda (x)
+			 (or (si::specialp x) (member x specials)
+			     (let ((nv (car (member x newvars :key 'var-name :test 'eq))))
+			       (when (is-changed nv info)
+				 (cmpnote "Multiple-value-binding ~S is changed and cannot be declared~%" x)
+				 t)))) decls :key 'cadr)))
 	  (if decls
 	      (progn (cmpnote "Multiple-value bindings ~S of type ~S~%" (car args) decls )
 		     (cons (car args) (cons (cadr args) (cons (cons 'declare decls) (cddr args)))))

@@ -14,8 +14,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * Fix no arg type numerical propagation
   * Do not dump arrays with array-element-types other than t to data
     file
+  * limit multiple-value-binding autodeclaration nesting depth following
+    let
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 13 Feb 2006 20:10:09 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 14 Feb 2006 18:00:36 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
