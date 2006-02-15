@@ -25,7 +25,7 @@
 (defmacro with-server ((app-name debug-level) . body)
   (multiple-value-bind (ds b)
 		       (si::find-declarations body)
-		       `(if (= 0 (jpr::j_start))
+		       `(if (= 0 (j_start))
 			    (format t (format nil "~S can't connect to the Japi GUI server." ,app-name))
 			  (progn
 			    (j_setdebug ,debug-level)

@@ -1,10 +1,9 @@
 ;;; Binding to the cross platform Japi GUI library from http://www.japi.de/
 
-;(eval-when (load eval)
-;  (make-package "tk-primitives" :nicknames '(tkpr) :use '(lisp)))
-;(eval-when (compile)
-;(in-package "TK-PRIMITIVES")
-;)
+(eval-when (load eval)
+	   (make-package "tk-primitives" :nicknames '(tkpr) :use '(lisp)))
+(eval-when (compile)
+	   (in-package "tk-primitives"))
 
 (clines "#include <tcl.h>")
 (clines "#include <tk.h>")
