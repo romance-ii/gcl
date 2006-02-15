@@ -934,15 +934,9 @@ sigprocmask (int how , const sigset_t *set,sigset_t *oldset)
 }
   
 void
-fix_filename(object pathname, char *filename1)
+fix_filename ( object pathname, char *filename )
 {
-    char current_directory[MAXPATHLEN];
-    char directory[MAXPATHLEN];
-    char *filename = filename1;
-    char *p;
-    extern char *getwd();
-    /*    fprintf ( stderr, "fix_filename: At start %s\n", filename1 );*/
-    p = filename;
+    char *p = filename;
     while ( *p ) {
         if (*p=='\\') *p='/';
         p++;
