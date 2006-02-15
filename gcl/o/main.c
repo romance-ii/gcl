@@ -737,8 +737,11 @@ FFN(siLgetenv)(void) {
   for (i = 0;  i < vs_base[0]->st.st_fillp;  i++)
     name[i] = vs_base[0]->st.st_self[i];
   name[i] = '\0';
-  if ((value = getenv(name)) != NULL)
-    {vs_base[0] = make_simple_string(value);
+  if ((value = getenv(name)) != NULL) {
+#ifdef _WIN32
+    fix_filename(NULL, value);
+#endif    
+    vs_base[0] = make_simple_string(value);
 #ifdef FREE_GETENV_RESULT
     free(value);
 #endif		
