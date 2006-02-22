@@ -27,7 +27,7 @@ Name: "desktopicon"; Description: "Create a &desktop icon"; GroupDescription: "A
 
 [Files]
 Source: "@prefix@\*.*"; DestDir: "{app}\";  Flags: recursesubdirs
-Source: "c:\lang\MinGW32-gcl\*.*"; DestDir: "{app}\mingw";  Flags: recursesubdirs
+Source: "c:\lang\MinGW32-3.4.5-gcl\*.*"; DestDir: "{app}\mingw";  Flags: recursesubdirs
 
 [Icons]
 Name: "{group}\GNU Common Lisp @VERSION@ @CLSTANDARD@"; Filename: "{app}\bin\gcl.bat"; IconFilename: "{app}\bin\gcl.ico"
