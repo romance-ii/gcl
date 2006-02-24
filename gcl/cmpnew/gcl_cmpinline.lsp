@@ -25,7 +25,13 @@
 (import 'si::proclaimed-arg-types 'compiler)
 (import 'si::proclaimed-return-type 'compiler)
 (import 'si::proclaimed-function 'compiler)
-
+(import 'si::proper-list 'compiler)
+(import 'si::subtypep1 'compiler)
+(import 'si::resolve-type 'compiler)
+(import 'si::+inf 'compiler)
+(import 'si::-inf 'compiler)
+(import 'si::nan 'compiler)
+(import 'si::isfinite 'compiler)
 
 ;;; Pass 1 generates the internal form
 ;;;	( id  info-object . rest )
