@@ -334,7 +334,7 @@
 (defun break-quit (&optional (level 0)
                    &aux (current-level (length *break-level*)))
   (when (and (>= level 0) (< level current-level))
-    (let ((x (nth (- current-level level 1) *quit-tags*)))
+    (let ((x (do ((v *quit-tags* (cdr v)) (i 0 (1+ i))) ((= i (- current-level level 1)) (car v)) (declare (fixnum i)))))
       (throw (cdr x) (cdr x))))
   (break-current))
 
@@ -505,7 +505,7 @@
            (case (car fun)
              (lambda 'lambda)
              ((lambda-block lambda-block-expanded) (cadr fun))
-             (lambda-block-closure (nth 4 fun))
+             (lambda-block-closure (cadr (cdddr fun)))
              (lambda-closure 'lambda-closure)
              (t (if (and (symbolp (car fun))
 			 (or (special-form-p (car fun))

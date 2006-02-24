@@ -25,8 +25,7 @@
 
 
 (export 'time)
-(export 'nth-value)
-(export '(function-lambda-expression 
+(export '(function-lambda-expression
 	  reset-sys-paths decode-universal-time
 	  encode-universal-time compile-file-pathname complement constantly))
 
@@ -119,9 +118,6 @@
      (* h 3600) (* min 60) sec))
 
 ; Courtesy Paul Dietz
-(defmacro nth-value (n expr)
-  (declare (optimize (safety 1)))
-  `(nth ,n (multiple-value-list ,expr)))
 (defun compile-file-pathname (pathname)
   (declare (optimize (safety 1)))
   (make-pathname :defaults pathname :type "o"))
@@ -187,3 +183,91 @@
 	      (lambda-block-closure (values (cons 'lambda (cdr (cddr (cddr x))))  (not (not (cadr x))) (fifth x)))
 	      (otherwise (values nil t nil))))
     (values nil t nil)))
+
+(defun heaprep nil
+  
+  (let ((f (list
+	    "word size:            ~a bits~%"
+	    "page size:            ~a bytes~%"
+	    "heap start:           0x~x~%"
+	    "heap max :            0x~x~%"
+	    "shared library start: 0x~x~%"
+	    "cstack start:         0x~x~%"
+	    "cstack mark offset:   ~a bytes~%"
+	    "cstack direction:     ~[downward~;upward~;~]~%"
+	    "cstack alignment:     ~a bytes~%"
+	    "cstack max:           ~a bytes~%"
+	    "immfix start:         0x~x~%"
+	    "immfix size:          ~a fixnums~%"))
+	(v (multiple-value-list (si::heap-report))))
+    
+    (do ((v v (cdr v)) (f f (cdr f))) ((not (car v)))
+	(format t (car f) 
+		(let ((x (car v))) 
+		  (cond ((>= x 0) x) 
+			((+ x (* 2 (1+ most-positive-fixnum))))))))))
+
+(defun room (&optional x)
+  (let ((l (multiple-value-list (si:room-report)))
+        maxpage holepage leftpage ncbpage maxcbpage ncb cbgbccount npage
+        rbused rbfree nrbpage rbgbccount
+        info-list link-alist)
+    (setq maxpage (nth 0 l) leftpage (nth 1 l)
+          ncbpage (nth 2 l) maxcbpage (nth 3 l) ncb (nth 4 l)
+          cbgbccount (nth 5 l)
+          holepage (nth 6 l)
+          rbused (nth 7 l) rbfree (nth 8 l) nrbpage (nth 9 l)
+          rbgbccount (nth 10 l)
+          l (nthcdr 11 l))
+    (do ((l l (nthcdr 7 l))
+         (i 0 (+ i (if (nth 3 l) (nth 3 l) 0))))
+        ((null l) (setq npage i))
+      (let ((typename (intern (nth 0 l)))
+            (nused (nth 1 l))
+            (nfree (nth 2 l))
+            (npage (nth 3 l))
+            (maxpage (nth 4 l))
+            (gbccount (nth 5 l))
+            (ws (nth 6 l)))
+        (if nused
+            (push (list typename ws npage maxpage
+                        (if (zerop (+ nused nfree))
+                            0
+                            (/ nused 0.01 (+ nused nfree)))
+                        (if (zerop gbccount) nil gbccount))
+                  info-list)
+            (let* ((nfree (intern nfree))
+		   (a (assoc nfree link-alist)))
+                 (if a
+                     (nconc a (list typename))
+                     (push (list nfree typename)
+                           link-alist))))))
+    (terpri)
+    (format t "~@[~2A~]~8@A/~A~14T~6@A%~@[~8@A~]~30T~{~A~^ ~}~%~%" "WS" "UP" "MP" "FI" "GC" '("TYPES"))
+    (dolist (info (reverse info-list))
+      (apply #'format t "~@[~2D~]~8D/~D~14T~6,1F%~@[~8D~]~30T~{~A~^ ~}"
+             (append (cdr info)
+                     (if  (assoc (car info) link-alist)
+                          (list (assoc (car info) link-alist))
+                          (list (list (car info))))))
+      (terpri)
+      )
+    (terpri)
+    (format t "~10D/~D~19T~@[~8D~]~30Tcontiguous (~D blocks)~%"
+            ncbpage maxcbpage (if (zerop cbgbccount) nil cbgbccount) ncb)
+    (format t "~11T~D~30Thole~%" holepage)
+    (format t "~11T~D~14T~6,1F%~@[~8D~]~30Trelocatable~%~%"
+            nrbpage (/ rbused 0.01 (+ rbused rbfree))
+            (if (zerop rbgbccount) nil rbgbccount))
+    (format t "~10D pages for cells~%" npage)
+    (format t "~10D total pages~%" (+ npage ncbpage holepage nrbpage))
+    (format t "~10D pages available~%" leftpage)
+    (format t "~10D pages in heap but not gc'd + pages needed for gc marking~%"
+	    (- maxpage (+ npage ncbpage holepage nrbpage leftpage)))
+    (format t "~10D maximum pages~%" maxpage)
+    (values)
+    )
+  (format t "~%~%")
+  (format t "Key:~%~%WS: words per struct~%UP: allocated pages~%MP: maximum pages~%FI: fraction of cells in use on allocated pages~%GC: number of gc triggers allocating this type~%~%")
+  (heaprep)
+  (values))

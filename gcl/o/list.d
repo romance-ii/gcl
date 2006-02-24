@@ -637,46 +637,46 @@ LFD(Lcddadr)(){check_arg(1); vs_base[0] = cdr(cdr(car(cdr(vs_base[0]))));}
 LFD(Lcdddar)(){check_arg(1); vs_base[0] = cdr(cdr(cdr(car(vs_base[0]))));}
 LFD(Lcddddr)(){check_arg(1); vs_base[0] = cdr(cdr(cdr(cdr(vs_base[0]))));}
 
-DEFUNO_NEW("NTH",object,fLnth,LISP,2,2,NONE,OI,OO,OO,OO,void,Lnth,(fixnum index,object list),"")
-{ object x = list;
-  if (index < 0)
-    FEerror("Negative index: ~D.", 1, make_fixnum(index));
-  while (1)
-    {if (consp(x))
-       { if (index == 0)
-	   RETURN1(Mcar(x));
-	 else {x = Mcdr(x); index--;}}
-      else if (x == sLnil) RETURN1(sLnil);
-      else FEwrong_type_argument(sLlist, list);}
-}   
-#ifdef STATIC_FUNCTION_POINTERS
-object
-fLnth(fixnum index,object list) {
-	return FFN(fLnth)(index,list);
-}
-#endif
+/* DEFUNO_NEW("NTH",object,fLnth,LISP,2,2,NONE,OI,OO,OO,OO,void,Lnth,(fixnum index,object list),"") */
+/* { object x = list; */
+/*   if (index < 0) */
+/*     FEerror("Negative index: ~D.", 1, make_fixnum(index)); */
+/*   while (1) */
+/*     {if (consp(x)) */
+/*        { if (index == 0) */
+/* 	   RETURN1(Mcar(x)); */
+/* 	 else {x = Mcdr(x); index--;}} */
+/*       else if (x == sLnil) RETURN1(sLnil); */
+/*       else FEwrong_type_argument(sLlist, list);} */
+/* }    */
+/* #ifdef STATIC_FUNCTION_POINTERS */
+/* object */
+/* fLnth(fixnum index,object list) { */
+/* 	return FFN(fLnth)(index,list); */
+/* } */
+/* #endif */
 
-DEFUN_NEW("FIRST",object,fLfirst,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") 
-{ RETURN1(car(x)) ;}
+/* DEFUN_NEW("FIRST",object,fLfirst,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")  */
+/* { RETURN1(car(x)) ;} */
 
-DEFUN_NEW("SECOND",object,fLsecond,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
-{ return fLnth(1,x);}
-DEFUN_NEW("THIRD",object,fLthird,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
-{ return fLnth(2,x);}
-DEFUN_NEW("FOURTH",object,fLfourth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
-{ return fLnth(3,x);}
-DEFUN_NEW("FIFTH",object,fLfifth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
-{ return fLnth(4,x);}
-DEFUN_NEW("SIXTH",object,fLsixth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
-{ return fLnth(5,x);}
-DEFUN_NEW("SEVENTH",object,fLseventh,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
-{ return fLnth(6,x);}
-DEFUN_NEW("EIGHTH",object,fLeighth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
-{ return fLnth(7,x);}
-DEFUN_NEW("NINTH",object,fLninth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
-{ return fLnth(8,x);}
-DEFUN_NEW("TENTH",object,fLtenth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
-{ return fLnth(9,x);}
+/* DEFUN_NEW("SECOND",object,fLsecond,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") */
+/* { return fLnth(1,x);} */
+/* DEFUN_NEW("THIRD",object,fLthird,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") */
+/* { return fLnth(2,x);} */
+/* DEFUN_NEW("FOURTH",object,fLfourth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") */
+/* { return fLnth(3,x);} */
+/* DEFUN_NEW("FIFTH",object,fLfifth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") */
+/* { return fLnth(4,x);} */
+/* DEFUN_NEW("SIXTH",object,fLsixth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") */
+/* { return fLnth(5,x);} */
+/* DEFUN_NEW("SEVENTH",object,fLseventh,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") */
+/* { return fLnth(6,x);} */
+/* DEFUN_NEW("EIGHTH",object,fLeighth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") */
+/* { return fLnth(7,x);} */
+/* DEFUN_NEW("NINTH",object,fLninth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") */
+/* { return fLnth(8,x);} */
+/* DEFUN_NEW("TENTH",object,fLtenth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") */
+/* { return fLnth(9,x);} */
 
 LFD(Lcons)()
 {
@@ -743,45 +743,45 @@ LFD(Llist_length)()
 }
 
 
-object
-nth(fixnum n, object x) {
+/* object */
+/* nth(fixnum n, object x) { */
 
-	if (n < 0) {
-		vs_push(make_fixnum(n));
-		FEerror("Negative index: ~D.", 1, vs_head);
-	}
-	while (n-- > 0)
-		if (endp(x)) {
-			return(Cnil);
-		} else
-			x = x->c.c_cdr;
-	if (endp(x))
-		return(Cnil);
-	else
-		return(x->c.c_car);
-}
+/* 	if (n < 0) { */
+/* 		vs_push(make_fixnum(n)); */
+/* 		FEerror("Negative index: ~D.", 1, vs_head); */
+/* 	} */
+/* 	while (n-- > 0) */
+/* 		if (endp(x)) { */
+/* 			return(Cnil); */
+/* 		} else */
+/* 			x = x->c.c_cdr; */
+/* 	if (endp(x)) */
+/* 		return(Cnil); */
+/* 	else */
+/* 		return(x->c.c_car); */
+/* } */
 
-LFD(Lnthcdr)()
-{
-	check_arg(2);
-	vs_base[0] = nthcdr(fixint(vs_base[0]), vs_base[1]);
-	vs_popp;
-}
+/* LFD(Lnthcdr)() */
+/* { */
+/* 	check_arg(2); */
+/* 	vs_base[0] = nthcdr(fixint(vs_base[0]), vs_base[1]); */
+/* 	vs_popp; */
+/* } */
 
-object
-nthcdr(fixnum n, object x) {
+/* object */
+/* nthcdr(fixnum n, object x) { */
 
-	if (n < 0) {
-		vs_push(make_fixnum(n));
-		FEwrong_type_argument(sLnon_negative_fixnum, vs_head);
-	}
-	while (n-- > 0)
-		if (endp(x)) {
-			return(Cnil);
-		} else
-			x = x->c.c_cdr;
-	return(x);
-}
+/* 	if (n < 0) { */
+/* 		vs_push(make_fixnum(n)); */
+/* 		FEwrong_type_argument(sLnon_negative_fixnum, vs_head); */
+/* 	} */
+/* 	while (n-- > 0) */
+/* 		if (endp(x)) { */
+/* 			return(Cnil); */
+/* 		} else */
+/* 			x = x->c.c_cdr; */
+/* 	return(x); */
+/* } */
 
 LFD(Llast)() {
 	object t;
@@ -1389,7 +1389,7 @@ gcl_init_list_function()
 
 
 	make_function("REST", Lcdr);
-	make_function("NTHCDR", Lnthcdr);
+/* 	make_function("NTHCDR", Lnthcdr); */
 	make_function("LAST", Llast);
 	make_function("LIST", Llist);
 	make_function("LIST*", LlistA);

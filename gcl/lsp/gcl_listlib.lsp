@@ -30,7 +30,7 @@
 
 (export '(union nunion intersection nintersection
           set-difference nset-difference set-exclusive-or nset-exclusive-or
-          subsetp))
+          subsetp nth-value nth nthcdr first second third fourth fifth sixth seventh eighth ninth tenth))
 
 (in-package 'system)
 
@@ -203,3 +203,65 @@
     (if (not (apply #'member1 (car l) list2 (key-list key test test-not))) (return nil))))
 
 
+(defmacro tp-error (x y)
+  `(specific-error :wrong-type-argument "~S is not of type ~S." ,x ',y))
+
+(defun smallnthcdr (n x)
+  (declare (seqind n))
+  (cond ((atom x) (when x (tp-error x proper-list)))
+	((= n 0) x)
+	((smallnthcdr (1- n) (cdr x)))))
+
+(defun bignthcdr (n i s f) 
+  (declare (seqind i))
+  (cond ((atom f) (when f (tp-error f proper-list)))
+	((atom (cdr f)) (when (cdr f) (tp-error (cdr f) proper-list)))
+	((eq s f) (smallnthcdr (mod n i) s))
+	((bignthcdr n (1+ i) (cdr s) (cddr f)))))
+
+(defun nthcdr (n x)
+  (declare (optimize (safety 1)))
+  (cond ((or (not (integerp n)) (minusp n)) (tp-error n (integer 0)))
+	((< n array-dimension-limit) (smallnthcdr n x))
+	((atom x) (when x (tp-error x proper-list)))
+	((atom (cdr x)) (when (cdr x) (tp-error (cdr x) proper-list)))
+	((bignthcdr n 1 (cdr x) (cddr x)))))
+
+(defun nth (n x)
+  (declare (optimize (safety 1)))
+  (car (nthcdr n x)))
+(defun first (x) 
+  (declare (optimize (safety 1)))
+  (car x))
+(defun second (x) 
+  (declare (optimize (safety 1)))
+  (cadr x))
+(defun third (x) 
+  (declare (optimize (safety 1)))
+  (caddr x))
+(defun fourth (x) 
+  (declare (optimize (safety 1)))
+  (cadddr x))
+(defun fifth (x) 
+  (declare (optimize (safety 1)))
+  (car (cddddr x)))
+(defun sixth (x) 
+  (declare (optimize (safety 1)))
+  (cadr (cddddr x)))
+(defun seventh (x) 
+  (declare (optimize (safety 1)))
+  (caddr (cddddr x)))
+(defun eighth (x) 
+  (declare (optimize (safety 1)))
+  (cadddr (cddddr x)))
+(defun ninth (x) 
+  (declare (optimize (safety 1)))
+  (car (cddddr (cddddr x))))
+(defun tenth (x) 
+  (declare (optimize (safety 1)))
+  (cadr (cddddr (cddddr x))))
+
+; Courtesy Paul Dietz
+(defmacro nth-value (n expr)
+  (declare (optimize (safety 1)))
+  `(nth ,n (multiple-value-list ,expr)))

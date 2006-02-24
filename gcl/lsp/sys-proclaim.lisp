@@ -1,6 +1,10 @@
 
 (IN-PACKAGE "SYSTEM") 
 (PROCLAIM
+    '(FTYPE (FUNCTION (SEQIND T) T) SMALLNTHCDR))
+(PROCLAIM
+    '(FTYPE (FUNCTION (T SEQIND T T) T) BIGNTHCDR))
+(PROCLAIM
     '(FTYPE (FUNCTION (T) FIXNUM) INSTREAM-LINE S-DATA-SIZE
             S-DATA-LENGTH THE-START)) 
 (PROCLAIM '(FTYPE (FUNCTION (T FIXNUM FIXNUM T T) T) QUICK-SORT)) 
@@ -106,7 +110,8 @@
             DECODE-UNIVERSAL-TIME READ-FROM-STRING STEPPER APROPOS
             FTRUNCATE PPRINT-DISPATCH SHOW-INFO NLOAD APROPOS-DOC)) 
 (PROCLAIM
-    '(FTYPE (FUNCTION (T) T) improper-consp TYPE-OF CLASS-OF NON-LOGICAL-PATHNAME-P DO-F SLOOP::POINTER-FOR-COLLECT
+    '(FTYPE (FUNCTION (T) T) first second third fourth fifth sixth seventh eighth ninth tenth
+	    improper-consp TYPE-OF CLASS-OF NON-LOGICAL-PATHNAME-P DO-F SLOOP::POINTER-FOR-COLLECT
 	    sequence-type-element-type  sequence-type-element-type-int
 	    sequence-type-length-type sequence-type-length-type-int
             SLOOP::LOOP-LET-BINDINGS SLOOP::LOOP-COLLECT-KEYWORD-P
@@ -181,7 +186,8 @@
 (PROCLAIM
     '(FTYPE (FUNCTION (T T) *) FIND-DOC NEW-SEMI-COLON-READER NEWLINE)) 
 (PROCLAIM
-    '(FTYPE (FUNCTION (T T) T) improper-consp-int ordered-intersection ordered-intersection-eq subtypep1 copy-type SLOOP::LOGXOR-SLOOP-COLLECT
+    '(FTYPE (FUNCTION (T T) T) nthcdr nth tp-mod improper-consp-int ordered-intersection 
+	    ordered-intersection-eq subtypep1 copy-type SLOOP::LOGXOR-SLOOP-COLLECT
             SLOOP::COLLATE-SLOOP-COLLECT SLOOP::COUNT-SLOOP-COLLECT
             NORMALIZE-TYPE-INT CONS^ CONS-LOAD COMPLEX-LOAD COERCE
             LOGTEST LOGORC2 LOGORC1 LOGANDC2 LOGANDC1 LOGNOR LOGNAND
