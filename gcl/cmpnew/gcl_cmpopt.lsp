@@ -112,6 +112,17 @@
 ;;      growth in nested expressions.  set added to flags for now here and in analogous
 ;;      constructs involving ?.  CM 20041129
 
+;;ABS
+; (si::putprop 'abs 'abs-propagator 'type-propagator)
+ (push '(((integer #.(1+ most-negative-fixnum) #.most-positive-fixnum)) (integer 0 #.most-positive-fixnum) #.(flags rfa)"abs(#0)")
+   (get 'abs 'inline-always))
+ (push '((short-float) (short-float 0.0) #.(flags rfa)"fabs(#0)") ;;FIXME ranged floating point types
+   (get 'abs 'inline-always))
+ (push '((long-float) (long-float 0.0) #.(flags rfa)"fabs(#0)")
+   (get 'abs 'inline-always))
+ (push '(((real 0.0)) t #.(flags)"#0")
+   (get 'abs 'inline-always))
+
 ;;SYMBOL-LENGTH
  (push '((t) fixnum #.(flags rfa set)
   "@0;(type_of(#0)==t_symbol ? (#0)->s.st_fillp :not_a_variable((#0)))")
@@ -251,7 +262,7 @@
    (get 'system:svset 'inline-unsafe))
 
 ;;*
-(si::putprop '* 'super-range 'type-propagator)
+;(si::putprop '* 'super-range 'type-propagator)
 (push '((t t) t #.(flags ans)"number_times(#0,#1)")
    (get '* 'inline-always))
 (push '((fixnum-float fixnum-float) short-float #.(flags)"(double)(#0)*(double)(#1)")
@@ -267,7 +278,7 @@
    (get '* 'inline-always))
 
 ;;ASH
-(si::putprop 'ash 'ash-propagator 'type-propagator)
+;(si::putprop 'ash 'ash-propagator 'type-propagator)
 (push '(((integer 0 0) t) fixnum #.(flags rfa)"0")
    (get 'ash 'inline-always))
 (push '((fixnum (integer 0 #.(integer-length most-positive-fixnum))) fixnum #.(flags)"((#0)<<(#1))")
@@ -280,7 +291,7 @@
 
 
 ;;+
-(si::putprop '+ 'super-range 'type-propagator)
+;(si::putprop '+ 'super-range 'type-propagator)
 (push '((t t) t #.(flags ans)"number_plus(#0,#1)")
    (get '+ 'inline-always))
 (push '((fixnum-float fixnum-float) short-float #.(flags)"(double)(#0)+(double)(#1)")
@@ -296,7 +307,7 @@
    (get '+ 'inline-always))
 
 ;;-
-(si::putprop '- 'super-range 'type-propagator)
+;(si::putprop '- 'super-range 'type-propagator)
 (push '((t) t #.(flags ans)"number_negate(#0)")
    (get '- 'inline-always))
 (push '(((integer #.(1+ most-negative-fixnum) #.most-positive-fixnum)) fixnum #.(flags)"-(#0)")
@@ -855,13 +866,13 @@
 ; (push '((fixnum fixnum) fixnum #.(flags rfa)
 ;  "@01;(#0>=0&&(#1)>0?(#0)/(#1):ifloor(#0,#1))")
 ;   (get 'floor 'inline-always))
-(si::putprop 'floor 'floor-propagator 'type-propagator)
+;(si::putprop 'floor 'floor-propagator 'type-propagator)
 (push '((fixnum fixnum) (values fixnum fixnum) #.(flags rfa set)
 	 "@01;({fixnum _t=(#0)/(#1);_t=((#0)<=0 && (#1)<=0) || ((#0)>=0 && (#1)>=0) || ((#1)*_t==(#0)) ? _t : _t-1;$1((#0)-_t*(#1))$ _t;})")
    (get 'floor 'inline-always))
 
 ;;CEILING
-(si::putprop 'ceiling 'floor-propagator 'type-propagator)
+;(si::putprop 'ceiling 'floor-propagator 'type-propagator)
 (push '((fixnum fixnum) (values fixnum fixnum) #.(flags rfa set)
 	 "@01;({fixnum _t=(#0)/(#1);_t=((#0)<=0 && (#1)>=0) || ((#0)>=0 && (#1)<=0) || ((#1)*_t==(#0)) ? _t : _t+1;$1((#0)-_t*(#1))$ _t;})")
    (get 'ceiling 'inline-always))
@@ -997,14 +1008,14 @@
    (get 'make-list 'inline-always))
 
 ;;MAX
-(si::putprop 'max 'super-range 'type-propagator)
+;(si::putprop 'max 'super-range 'type-propagator)
 (push '((t t) t #.(flags set)"@01;(number_compare(#0,#1)>=0?(#0):#1)")
    (get 'max 'inline-always))
  (push '((fixnum fixnum) fixnum #.(flags rfa set)"@01;((#0)>=(#1)?(#0):#1)")
    (get 'max 'inline-always))
 
 ;;MIN
-(si::putprop 'min 'super-range 'type-propagator)
+;(si::putprop 'min 'super-range 'type-propagator)
 (push '((t t) t #.(flags set)"@01;(number_compare(#0,#1)<=0?(#0):#1)")
    (get 'min 'inline-always))
 (push '((fixnum fixnum) fixnum #.(flags rfa set)"@01;((#0)<=(#1)?(#0):#1)")
@@ -1019,7 +1030,7 @@
 ;;MOD
 ; (push '((fixnum fixnum) fixnum #.(flags rfa)"@01;(#0>=0&&(#1)>0?(#0)%(#1):imod(#0,#1))")
 ;   (get 'mod 'inline-always))
- (push '((fixnum fixnum) fixnum #.(flags rfa set)"@01;({fixnum _t=(#0)%(#1);((#1)<0 && _t<=0) || ((#1)>0 && _t>=0) ? _t : _t + (#1);})")
+ (push '((fixnum fixnum) fixnum #.(flags rfa set)"@01;({register fixnum _t=(#0)%(#1);((#1)<0 && _t<=0) || ((#1)>0 && _t>=0) ? _t : _t + (#1);})")
    (get 'mod 'inline-always))
 
 ;;NCONC
@@ -1035,20 +1046,39 @@
    (get 'nreverse 'inline-always))
 
 ;;NTH
- (push '((t t) t #.(flags)"nth(fixint(#0),#1)")
+; (push '((t t) t #.(flags)"nth(fixint(#0),#1)")
+;   (get 'nth 'inline-always))
+;(push '((fixnum t) t #.(flags)"nth(#0,#1)")
+;   (get 'nth 'inline-always))
+;(push '((t t) t #.(flags)"nth(fix(#0),#1)")
+;   (get 'nth 'inline-unsafe))
+
+(push '((seqind proper-list) proper-list #.(flags rfa)"({register fixnum _i=#0;register object _x=#1;for (;_i--;_x=_x->c.c_cdr);_x->c.c_car;})")
    (get 'nth 'inline-always))
-(push '((fixnum t) t #.(flags)"nth(#0,#1)")
+(push '(((and (integer 0) (not seqind)) proper-list) null #.(flags rfa)"Cnil")
    (get 'nth 'inline-always))
-(push '((t t) t #.(flags)"nth(fix(#0),#1)")
+(push '((fixnum t) proper-list #.(flags rfa)"({register fixnum _i=#0;register object _x=#1;for (;_i--;_x=_x->c.c_cdr);_x->c.c_car;})")
+   (get 'nth 'inline-unsafe))
+(push '(((not fixnum) proper-list) null #.(flags rfa)"Cnil")
    (get 'nth 'inline-unsafe))
 
 ;;NTHCDR
- (push '((t t) t #.(flags)"nthcdr(fixint(#0),#1)")
+; (push '((t t) t #.(flags)"nthcdr(fixint(#0),#1)")
+;   (get 'nthcdr 'inline-always))
+;(push '((fixnum t) t #.(flags)"nthcdr(#0,#1)")
+;   (get 'nthcdr 'inline-always))
+;(push '((t t) t #.(flags)"nthcdr(fix(#0),#1)")
+;   (get 'nthcdr 'inline-unsafe))
+
+(push '((seqind proper-list) proper-list #.(flags rfa)"({register fixnum _i=#0;register object _x=#1;for (;_i--;_x=_x->c.c_cdr);_x;})")
    (get 'nthcdr 'inline-always))
-(push '((fixnum t) t #.(flags)"nthcdr(#0,#1)")
+(push '(((and (integer 0) (not seqind)) proper-list) null #.(flags rfa)"Cnil")
    (get 'nthcdr 'inline-always))
-(push '((t t) t #.(flags)"nthcdr(fix(#0),#1)")
+(push '((fixnum t) proper-list #.(flags rfa)"({register fixnum _i=#0;register object _x=#1;for (;_i--;_x=_x->c.c_cdr);_x;})")
    (get 'nthcdr 'inline-unsafe))
+(push '(((not fixnum) proper-list) null #.(flags rfa)"Cnil")
+   (get 'nthcdr 'inline-unsafe))
+
 
 ;;NULL
  (push '((t) boolean #.(flags)"(#0)==Cnil")
@@ -1190,6 +1220,16 @@ TRUNCATE_USE_C
 ;;SQRT
  (push '((long-float) long-float #.(flags)"sqrt((double)#0)")
    (get 'sqrt 'inline-always))
+ (push '((short-float) short-float #.(flags)"sqrt((double)#0)")
+   (get 'sqrt 'inline-always))
+ (push '(((long-float 0.0)) (long-float 0.0) #.(flags rfa)"sqrt((double)#0)")
+   (get 'sqrt 'inline-always))
+ (push '(((short-float 0.0)) (short-float 0.0) #.(flags rfa)"sqrt((double)#0)")
+   (get 'sqrt 'inline-always))
+; (push '(((or (integer 0) (float 0.0))) long-float #.(flags rfa)"sqrt((double)#0)")
+;   (get 'sqrt 'inline-always))
+; (push '(((integer 0 10)) long-float #.(flags rfa)"sqrt((double)#0)")
+;   (get 'sqrt 'inline-always))
 
 ;;TERPRI
  (push '((t) t #.(flags set)"terpri(#0)")
@@ -1207,7 +1247,7 @@ TRUNCATE_USE_C
 
 #+
 TRUNCATE_USE_C
-(si::putprop 'truncate 'floor-propagator 'type-propagator)
+;(si::putprop 'truncate 'floor-propagator 'type-propagator)
 (push '((fixnum fixnum) (values fixnum fixnum) #.(flags rfa)"({fixnum _t=(#0)/(#1);$1(#0)-_t*(#1)$ _t;})")
    (get 'truncate 'inline-always))
 (push '((fixnum-float) fixnum #.(flags)"(fixnum)(#0)")
