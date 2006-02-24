@@ -134,6 +134,30 @@ int gcl_isnormal_float(float f)
 	LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
 */
 #endif
+
+
+DEFUNO_NEW("ISFINITE",object,fSisnormal,SI
+	   ,1,1,NONE,OO,OO,OO,OO,void,siLisnormal,(object x),"") {
+
+  switch (type_of(x)) {
+  case t_longfloat:
+    return lf(x)==0.0 || ISFINITE(lf(x)) ? Ct : Cnil;
+    break;
+  case t_shortfloat:
+    return sf(x)==0.0 || ISFINITE(sf(x)) ? Ct : Cnil;
+    break;
+  default:
+    return Cnil;
+    break;
+  }
+
+  return Cnil;
+
+}
+
+
+
+
 static void
 integer_decode_double(double d, int *hp, int *lp, int *ep, int *sp)
 {
@@ -1418,6 +1442,10 @@ gcl_init_num_co(void)
 #ifdef IEEEFLOAT
 	/* Maybe check for "right" answer here */
 #endif
+
+	make_si_constant("+INF",make_longfloat(INFINITY));
+	make_si_constant("-INF",make_longfloat(-INFINITY));
+	make_si_constant("NAN",make_longfloat(NAN));
 
 	make_constant("MOST-POSITIVE-SHORT-FLOAT",
 		      make_shortfloat(biggest_float));
