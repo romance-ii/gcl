@@ -309,6 +309,9 @@
 (si::putprop 'max (function binary-nest) 'si::compiler-macro-prop)
 (si::putprop 'min (function binary-nest) 'si::compiler-macro-prop)
 
+(si::putprop 'gcd (function binary-nest) 'si::compiler-macro-prop)
+(si::putprop 'lcm (function binary-nest) 'si::compiler-macro-prop)
+
 (defun invert-binary-nest (form env)
   (declare (ignore env))
   (if (> (length form) 3)
@@ -1321,15 +1324,18 @@
     ;; We can't read in long-floats which are too big:
     (let (tem x)
       (unless (setq tem (cadr (assoc val *objects*)))
-         (cond((or
-		 (and
-		   (> (setq x (abs val)) (/ most-positive-long-float 2))
-		   (c1expr `(si::|#,| * ,(/ val most-positive-long-float)
-				 most-positive-long-float)))
-		 (and
-		   (< x (* least-positive-long-float 1.0d20))
-		   (c1expr `(si::|#,| * ,(/ val least-positive-long-float)
-				 least-positive-long-float))))
+	(cond ((or
+		(and (= val +inf) (c1expr `(si::|#,| symbol-value '+inf)))
+		(and (= val -inf) (c1expr `(si::|#,| symbol-value '-inf)))
+		(and (not (isfinite val)) (c1expr `(si::|#,| symbol-value 'nan)))
+		(and
+		 (> (setq x (abs val)) (/ most-positive-long-float 2))
+		 (c1expr `(si::|#,| * ,(/ val most-positive-long-float)
+			       most-positive-long-float)))
+		(and
+		 (< x (* least-positive-long-float 1.0d20))
+		 (c1expr `(si::|#,| * ,(/ val least-positive-long-float)
+			       least-positive-long-float))))
 	       (push (list val (setq tem *next-vv*)) *objects*))))
       (list 'LOCATION (make-info :type 'long-float)
 	    (list 'LONG-FLOAT-VALUE (or tem (add-object val)) val))))

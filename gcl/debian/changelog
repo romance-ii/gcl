@@ -27,8 +27,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * Represent mv types internally as '(values ...) -- FIXME do this more
     carefully
   * Inf and nan constants
+  * binary nexting of gcd and lcm; support for writing inf and nan into
+    .data files
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 24 Feb 2006 21:42:23 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 24 Feb 2006 21:43:10 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
