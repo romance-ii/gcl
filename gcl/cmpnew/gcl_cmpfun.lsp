@@ -1094,10 +1094,11 @@
   (let* ((info (make-info))
 	(nargs (c1args args info)))
     (setf (info-type info) 
-	  (cmp-norm-tp 
-	   (nil-to-t 
-	    (reduce (lambda (x y) (list 'cons (info-type (cadr x)) y)) (append nargs '(null)) :from-end t))))
-    (list 'call-global info 'list nargs)));
+	  (let ((v (reduce (lambda (x y) (list 'cons (info-type (cadr x)) y)) (append nargs '(null)) :from-end t)))
+	    (if (cons-tp-limit v 0 0)
+		(cmp-norm-tp (nil-to-t v))
+	      'si::proper-list)))
+    (list 'call-global info 'list nargs)))
 (si::putprop 'list 'c1list 'c1)
       
 (defun c1list-nth (args &aux (info (make-info)))
