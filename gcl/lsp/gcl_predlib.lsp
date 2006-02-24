@@ -22,7 +22,6 @@
 ;;;;
 ;;;;                              predicate routines
 
-
 (in-package 'system)
 
 (export '(lisp::upgraded-complex-part-type lisp::type-of

@@ -22,8 +22,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * support for bignums in nth et.al.
   * Fix typep on simple-arrays
   * Fix branch cut of atanh
+  * Support for certain subtypep calls on partially unknown satisfies
+    types
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 24 Feb 2006 21:34:50 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 24 Feb 2006 21:38:49 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
