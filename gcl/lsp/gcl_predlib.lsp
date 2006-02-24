@@ -118,12 +118,12 @@
           (or (endp i) (match-dimensions (array-dimensions object) i))))
     ((vector simple-vector)
      (and (vectorp object)
-	  (let ((at (upgraded-array-element-type (or (car i) (if (eq tp 'vector) '* t)))))
+	  (let ((at (upgraded-array-element-type (or (eq tp 'simple-vector) (car i) (if (eq tp 'vector) '* t)))))
 	    (or (eq at '*) (eq at (upgraded-array-element-type (array-element-type object)))))
           (or (not (cdr i)) (match-dimensions (array-dimensions object) (cdr i)))))
     ((array simple-array)
      (and (arrayp object)
-	  (let ((at (upgraded-array-element-type (or (car i) '*))))
+	  (let ((at (upgraded-array-element-type (or (eq tp 'simple-array) (car i) '*))))
 	    (or (eq at '*) (eq at (upgraded-array-element-type (array-element-type object)))))
           (or (not (cdr i)) (eq (cadr i) '*)
 	      (if (listp (cadr i))
@@ -195,14 +195,17 @@
 
 (defun subtypep1 (t1 t2)
   (or (not t1) (eq t2 t)
-      (not (car (resolve-type `(and ,t1 ,(negate t2)))))))
+      (not (car (resolve-type `(and ,t1 ,(negate t2)))))
+      (not (car (resolve-type `(and (type-max ,t1) ,(negate `(type-min ,t2))))))))
 
 (defun subtypep (t1 t2 &optional env)
   (declare (ignore env) (optimize (safety 1)))
   (if (or (not t1) (eq t2 t))
       (values t t)
-    (let ((rt (resolve-type `(and ,t1 ,(negate t2)))))
-      (values (not (car rt)) (not (cadr rt))))))
+    (let* ((rt (resolve-type `(and ,t1 ,(negate t2))))
+	   (mt (when (cadr rt) (resolve-type `(and (type-max ,t1) ,(negate `(type-min ,t2))))))
+	   (rt (if (or (not (cadr rt)) (car mt)) rt `(nil nil))))
+      (values (not (car rt))  (not (cadr rt))))))
 
 (defun upgraded-complex-part-type (type &optional environment) 
   (declare (ignore environment) (optimize (safety 1)) )
@@ -604,6 +607,8 @@
 
 
 (defmacro make-ntp nil `(make-list 3))
+(defconstant +tp-nil+ (make-ntp))
+(defconstant +tp-t+   '(nil t nil));FIXME cannot call ntp-not as depends on setf too early
 (defmacro ntp-tps (ntp) `(first ,ntp))
 (defmacro ntp-def (ntp) `(second ,ntp))
 (defmacro ntp-ukn (ntp) `(third ,ntp))
@@ -722,6 +727,7 @@
 	   (if (cdr type)
 	       type
 	     (case (car type) (and '(t)) (or '(nil)) (not (error "Bad type~%"))))))
+	((member (car type) '(type-min type-max)) `(,(car type) ,(normalize-type-int (cadr type) ar)))
 	(type)))
 
 (defun distribute-complex (type)
@@ -731,16 +737,27 @@
 	(`(complex ,type))))
 
 
+(defvar *tp-mod* 0)
+(eval-when (compile) (proclaim '(type (integer -1 1) *tp-mod*)))
+
+(defun tp-mod (x d)
+  (unless (or (not (ntp-ukn x)) (/= (abs *tp-mod*) 1))
+    (if d (setf (ntp-tps x) nil (ntp-def x) (= *tp-mod* 1) (ntp-ukn x) nil)
+      (setq x (if (= *tp-mod* 1) +tp-t+ +tp-nil+))))
+  x)
 
 (defun nprocess-type (type)
-  (cond	((eq (car type) 'and)  (reduce 'ntp-and (mapcar (lambda (x) (nprocess-type x)) (cdr type))))
-	((eq (car type) 'or)   (reduce 'ntp-or (mapcar (lambda (x) (nprocess-type x)) (cdr type))))
-	((eq (car type) 'not)  (ntp-not (nprocess-type (cadr type))))
-	((ntp-load type))))
+  (cond	
+   ((eq (car type) 'type-min) (let ((*tp-mod* -1)) (nprocess-type (cadr type))))
+   ((eq (car type) 'type-max) (let ((*tp-mod*  1)) (nprocess-type (cadr type))))
+   ((eq (car type) 'and)  (reduce 'ntp-and (mapcar (lambda (x) (nprocess-type x)) (cdr type))))
+   ((eq (car type) 'or)   (reduce 'ntp-or (mapcar (lambda (x) (nprocess-type x)) (cdr type))))
+   ((eq (car type) 'not)  (ntp-not (nprocess-type (cadr type))))
+   ((ntp-load type))))
 
 (defun ntp-and (&rest xy)
   (when xy
-    (let ((x (car xy)) (y (cadr xy)))
+    (let ((x (tp-mod (car xy) t)) (y (tp-mod (cadr xy) nil)))
       (dolist (l (ntp-tps x))
 	(let ((op (cdr (assoc (car l) +kindom-logic-ops-alist+)))
 	      (ny (assoc (car l) (ntp-tps y))))
@@ -750,13 +767,13 @@
 	(when (and (ntp-def x) (not (assoc (car l) (ntp-tps x))))
 	  (ntp-ld x l)))
       (setf (ntp-def x) (and (ntp-def x) (ntp-def y)))
-      (setf (ntp-ukn x) (or (ntp-ukn x) (ntp-ukn y)))
+      (setf (ntp-ukn x) (or  (ntp-ukn x) (ntp-ukn y)))
       (ntp-clean x)
       x)))
 
 (defun ntp-or (&rest xy)
   (when xy
-    (let ((x (car xy)) (y (cadr xy)))
+    (let ((x (tp-mod (car xy) t)) (y (tp-mod (cadr xy) nil)))
       (dolist (l (ntp-tps x))
 	(let* ((op (cdr (assoc (car l) +kindom-logic-ops-alist+)))
 	      (ny (assoc (car l) (ntp-tps y)))

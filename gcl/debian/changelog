@@ -20,8 +20,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * Better cond evalmacro
   * improper-consp, and better si::proper-list deftype
   * support for bignums in nth et.al.
+  * Fix typep on simple-arrays
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 24 Feb 2006 21:15:21 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 24 Feb 2006 21:33:45 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
