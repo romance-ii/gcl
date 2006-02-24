@@ -226,10 +226,11 @@
       (dolist (var (car args))
 	(push (c1make-var var nil nil nil) newvars))
       (let ((expt (let ((*suppress-compiler-warnings* t)
-			(*suppress-compiler-notes* t)
-			(*vars* newvars))
-		    (c1args (c1body (cddr args) nil) info)
-		    (info-type (cadr (c1expr (cadr args)))))))
+			(*suppress-compiler-notes* t))
+		    (prog1 
+			(info-type (cadr (c1expr (cadr args))))
+		      (let ((*vars* newvars))
+			(c1args (c1body (cddr args) nil) info))))))
 	(let* ((decls (remove-if-not 
 		       't-to-nil
 		       (if (and (consp expt) (eq (car expt) 'values))

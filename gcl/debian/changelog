@@ -30,8 +30,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * binary nexting of gcd and lcm; support for writing inf and nan into
     .data files
   * limit list type length in c1list
+  * Fix multiple-value-binding autodeclaration when binding vars have
+    identical names in outer scope
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 24 Feb 2006 21:43:37 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 24 Feb 2006 21:44:30 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
