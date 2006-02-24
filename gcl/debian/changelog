@@ -36,8 +36,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * propagate floating point types, new propagator code for random ash
     floor et. al. + - * / lcm gcd log exp expt atan sqrt max min abs mod
     rem
+  * prevent nested free errors
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 24 Feb 2006 21:48:23 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 24 Feb 2006 21:49:27 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

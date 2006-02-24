@@ -1675,8 +1675,12 @@ free(void *ptr)
 #ifdef NOFREE_ERR
 	return ;
 #else	
-	if (raw_image==FALSE || core_end-heap_end<sizeof(ptr) || ptr!=*(void **)heap_end)
+	if (raw_image==FALSE || core_end-heap_end<sizeof(ptr) || ptr!=*(void **)heap_end) {
+	  static void *old_ptr;
+	  if (old_ptr==ptr) return;
+	  old_ptr=ptr;
 	  FEerror("free(3) error.",0);
+	}
 	return;
 #endif	
 }
