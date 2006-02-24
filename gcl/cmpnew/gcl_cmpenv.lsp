@@ -213,6 +213,8 @@
 	  (t (setq arg-types (function-arg-types (car decl)))
 	     ))
     (setq return-types (function-return-type (cdr decl)))
+    (when (and (consp return-types) (consp (cdr return-types)))
+      (setq return-types (cons 'values return-types)))
     (cond ((and (consp return-types)	; ie not nil
 		(endp (cdr return-types))
 		(not (eq (car return-types) '*)))
