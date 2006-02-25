@@ -229,7 +229,8 @@
 			(*suppress-compiler-notes* t))
 		    (prog1 
 			(info-type (cadr (c1expr (cadr args))))
-		      (let ((*vars* newvars))
+		      (let ((*vars* newvars)
+			    (*undefined-vars* *undefined-vars*))
 			(c1args (c1body (cddr args) nil) info))))))
 	(let* ((decls (remove-if-not 
 		       't-to-nil

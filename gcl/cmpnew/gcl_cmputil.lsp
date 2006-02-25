@@ -87,25 +87,23 @@
 
 (defun print-current-form ()
   (when *first-error*
-        (setq *first-error* nil)
-        (fresh-line)
-        (cond
-         ((and (consp *current-form*)
-               (eq (car *current-form*) 'si:|#,|))
-          (format t "; #,~s is being compiled.~%" (cdr *current-form*)))
-         (t
-          (let ((*print-length* 2)
-                (*print-level* 2))
-               (format t "; ~s is being compiled.~%" *current-form*)))))
+    (setq *first-error* nil)
+    (fresh-line)
+    (cond
+     ((and (consp *current-form*)
+	   (eq (car *current-form*) 'si:|#,|))
+      (format t "; #,~s is being compiled.~%" (cdr *current-form*)))
+     (t
+      (let ((*print-length* 2)
+	    (*print-level* 2))
+	(format t "; ~s is being compiled.~%" *current-form*)))))
   nil)
 
 (defun undefined-variable (sym &aux (*print-case* :upcase))
-  (print-current-form)
-  (format t
-          ";; The variable ~s is undefined.~%~
+  (cmpwarn
+   ";; The variable ~s is undefined.~%~
            ;; The compiler will assume this variable is a global.~%"
-          sym)
-  nil)
+   sym))
 
 (defun baboon (&aux (*print-case* :upcase))
   (print-current-form)

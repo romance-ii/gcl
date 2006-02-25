@@ -37,8 +37,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     floor et. al. + - * / lcm gcd log exp expt atan sqrt max min abs mod
     rem
   * prevent nested free errors
+  * Make undefined-vars assumed global a warning
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 24 Feb 2006 21:49:27 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 25 Feb 2006 19:05:42 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
