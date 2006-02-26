@@ -1747,7 +1747,7 @@ AC_EGREP_HEADER([gettimeofday],
     		 AC_DEFINE(GETTOD_NOT_DECLARED)])
 
 
-AC_CHECK_LIB(m,sin,TLIBS="${TLIBS} -lm",true)
+AC_CHECK_LIB(m,sin,LIBS="${LIBS} -lm",true)
 AC_CHECK_LIB(mingwex,main,LIBS="${LIBS} -lmingwex",true)
 
 EXTRA_LOBJS=
@@ -2364,7 +2364,7 @@ if  2>&1 $CC -v | fgrep "gcc version 2.96" > /dev/null
 	AC_MSG_RESULT([no])
 fi 
 
-LIBS="`echo $LDFLAGS | sed 's,gcl.script,../unixport/gcl.script,g'` $TLDFLAGS $LIBS $TLIBS"
+LIBS="`echo $LDFLAGS | sed 's,gcl.script,../unixport/gcl.script,g'` $TLDFLAGS $TLIBS $LIBS"
 AC_SUBST(LIBS)
 
 FINAL_CFLAGS="$CFLAGS $TCFLAGS $PROCESSOR_FLAGS"

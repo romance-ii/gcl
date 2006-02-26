@@ -5691,7 +5691,7 @@ LIBS="$ac_save_LIBS"
 fi
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   echo "$ac_t""yes" 1>&6
-  TLIBS="${TLIBS} -lm"
+  LIBS="${LIBS} -lm"
 else
   echo "$ac_t""no" 1>&6
 true
@@ -7592,7 +7592,7 @@ EOF
 	echo "$ac_t""no" 1>&6
 fi 
 
-LIBS="`echo $LDFLAGS | sed 's,gcl.script,../unixport/gcl.script,g'` $TLDFLAGS $LIBS $TLIBS"
+LIBS="`echo $LDFLAGS | sed 's,gcl.script,../unixport/gcl.script,g'` $TLDFLAGS $TLIBS $LIBS"
 
 
 FINAL_CFLAGS="$CFLAGS $TCFLAGS $PROCESSOR_FLAGS"
