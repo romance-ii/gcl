@@ -38,8 +38,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
     rem
   * prevent nested free errors
   * Make undefined-vars assumed global a warning
+  * use same nesting level limits for let and mv binding
+    autodeclarations
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 25 Feb 2006 19:05:42 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 26 Feb 2006 15:47:44 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

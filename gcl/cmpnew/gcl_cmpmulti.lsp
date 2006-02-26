@@ -214,13 +214,13 @@
 ;	(list 'values frt)))))
 
 
-(defvar *dmbs* 0)
-(defvar *dmbsrl* 2)
+;(defvar *dmbs* 0)
+;(defvar *dmbsrl* 2)
 
 ;;FIXME -- rewrite this more in line with let case, to catch certain changed bindings too.
 (defun declare-multiple-value-bindings (args specials)
-  (if (>= *dmbs* *dmbsrl*) args
-    (let ((*dmbs* (1+ *dmbs*))
+  (if (>= *dlbs* *dlbsrl*) args
+    (let ((*dlbs* (1+ *dlbs*))
 	  (info (make-info))
 	  (newvars *vars*))
       (dolist (var (car args))
