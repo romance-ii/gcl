@@ -416,7 +416,7 @@ fi
 
 TLIBS=""
 if test "$enable_static" = "yes" ; then
-   TLIBS="-static -Wl,-zmuldefs $TLIBS";
+   TLIBS="-lgclp -static -Wl,-zmuldefs $TLIBS"; #FIXME should be in unixport/makefile
    AC_DEFINE(STATIC_LINKING)
 fi
 
@@ -1747,7 +1747,7 @@ AC_EGREP_HEADER([gettimeofday],
     		 AC_DEFINE(GETTOD_NOT_DECLARED)])
 
 
-AC_CHECK_LIB(m,sin,LIBS="${LIBS} -lm",true)
+AC_CHECK_LIB(m,sin,TLIBS="${TLIBS} -lm",true)
 AC_CHECK_LIB(mingwex,main,LIBS="${LIBS} -lmingwex",true)
 
 EXTRA_LOBJS=

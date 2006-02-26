@@ -41,8 +41,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * use same nesting level limits for let and mv binding
     autodeclarations
   * cmp-nthcdr expander
+  * Push gclp in front of -static for static linking
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 26 Feb 2006 17:40:28 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 26 Feb 2006 18:56:01 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
