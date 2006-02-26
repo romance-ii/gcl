@@ -71,7 +71,7 @@ build_symbol_table_bfd(void) {
     char *c=NULL;
     struct bfd_link_hash_entry *h;
 
-    if (!*q[u]->name)
+    if (!*q[u]->name || !q[u]->section)
       continue;
 
     if (strncmp(q[u]->section->name,"*UND*",5) && !(q[u]->flags & BSF_WEAK))

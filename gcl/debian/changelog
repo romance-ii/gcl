@@ -42,8 +42,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     autodeclarations
   * cmp-nthcdr expander
   * Push gclp in front of -static for static linking
+  * skip over null bfd sections in bfd_build_symbol_tabls
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 26 Feb 2006 18:56:01 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 26 Feb 2006 19:03:44 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
