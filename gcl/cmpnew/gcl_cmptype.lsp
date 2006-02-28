@@ -449,7 +449,7 @@
 
 (dolist (l '(/ floor ceiling truncate round ffloor fceiling ftruncate fround log))
   (si::putprop l t 'zero-pole))
-(dolist (l '(+ - * / log exp expt sqrt atan max min))
+(dolist (l '(+ - * / log exp float sqrt atan max min))
   (si::putprop l 'super-range 'type-propagator))
 
 (defun mod-propagator (f t1 t2)
@@ -500,6 +500,13 @@
    (type>= '(integer #.most-negative-fixnum #.(integer-length most-positive-fixnum)) t2)
    (super-range f t1 t2)))
 (si::putprop 'ash 'ash-propagator 'type-propagator)
+
+(defun expt-propagator (f t1 t2)
+  (cond ((and (type>= 'integer t1) 
+	      (or (not (type>= 'fixnum t1))
+		  (not (type>= '(integer #.most-negative-fixnum #.(integer-length most-positive-fixnum)) t2)))) nil)
+	((super-range f t1 t2))))
+(si::putprop 'expt 'expt-propagator 'type-propagator)
 
 (defun abs-propagator (f t1)
   (type-and (type-or1 t1 (super-range '- t1)) '(real 0)))
