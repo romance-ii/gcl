@@ -45,8 +45,11 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * skip over null bfd sections in bfd_build_symbol_tabls
   * expt-propagator, float propagator using super-range
   * revert atanh branch cut change
+  * revert boolean to t coercion in inline-type-matches, rely on normal
+    coercion and boolean type-propagation to enable optimization of
+    boolean->t functions
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  2 Mar 2006 17:38:59 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri,  3 Mar 2006 02:39:25 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
