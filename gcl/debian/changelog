@@ -48,8 +48,11 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * revert boolean to t coercion in inline-type-matches, rely on normal
     coercion and boolean type-propagation to enable optimization of
     boolean->t functions
+  * More useful do evalmacro;fix nthcdr error order;fix simple-array
+    typep;new predicates in 'si and optimizers in compiler;ynchronize
+    +type-alist+
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  3 Mar 2006 02:39:25 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  6 Mar 2006 03:57:55 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

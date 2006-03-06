@@ -64,28 +64,6 @@
 (si:putprop 'list-nth-immediate 'c2list-nth-immediate 'c2)
 
 (defvar *princ-string-limit* 80)
-(defvar *type-alist*
-  '((fixnum . si::fixnump)
-    (float . floatp)
-    (short-float . short-float-p)
-    (long-float . long-float-p)
-    (integer . integerp)
-    (character . characterp)
-    (symbol . symbolp)
-    (cons . consp)
-    (null . null)
-    (array . arrayp)
-    (vector . vectorp)
-    (bit-vector . bit-vector-p)
-    (string . stringp)
-    (list . listp)
-    (number . numberp)
-    (rational . rationalp)
-    (complex . complexp)
-    (ratio . ratiop)
-    (sequence . (lambda (y) (or (listp y) (vectorp y))))
-    (function . functionp)
-    ))
 
 (defun c1princ (args &aux stream (info (make-info)))
   (when (endp args) (too-few-args 'princ 1 0))
@@ -397,7 +375,7 @@
   (si::putprop l 'do-num-relations 'c1g))
 
 (dolist (l `(eq eql equal equalp > >= < <= = /= 
-		,@(mapcar (lambda (x) (cdr x)) (remove-if-not (lambda (x) (symbolp (cdr x))) *type-alist*))))
+		,@(mapcar (lambda (x) (cdr x)) (remove-if-not (lambda (x) (symbolp (cdr x))) +type-alist+))))
   (si::putprop l t 'c1no-side-effects))
 
 ;;bound type comparisons
@@ -454,12 +432,12 @@
 (defun do-predicate (fn args)
   (let* ((info (make-info :type 'boolean))
 	 (nargs (c1args args info))
-	 (tp (car (rassoc fn *type-alist*))))
+	 (tp (car (rassoc fn +type-alist+))))
     (let ((at (and (not (cdr args)) (info-type (cadar nargs)))))
       (cond ((and at (type>= tp at)) (c1expr** t info))
 	    ((not (type-and at tp)) (c1expr** nil info))
 	    ((list 'call-global info fn nargs))))))
-(dolist (l *type-alist*) (when (symbolp (cdr l)) (si::putprop (cdr l) 'do-predicate 'c1g)))
+(dolist (l +type-alist+) (when (symbolp (cdr l)) (si::putprop (cdr l) 'do-predicate 'c1g)))
 
 ;(defun c1or (args)
 ;  (cond ((null args) (c1expr nil))
@@ -725,7 +703,7 @@
     (setq new
 	  (cond
 	   ((null type) nil)
-	   ((setq f (assoc type *type-alist* :test 'equal))
+	   ((setq f (assoc type +type-alist+ :test 'equal))
 	    (list (cdr f) x))
 	   ((and (consp type)
 		 (or (and (eq (car type) 'vector)

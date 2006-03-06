@@ -122,7 +122,7 @@
           (or (not (cdr i)) (match-dimensions (array-dimensions object) (cdr i)))))
     ((array simple-array)
      (and (arrayp object)
-	  (let ((at (upgraded-array-element-type (or (eq tp 'simple-array) (car i) '*))))
+	  (let ((at (upgraded-array-element-type (or (car i) '*))))
 	    (or (eq at '*) (eq at (upgraded-array-element-type (array-element-type object)))))
           (or (not (cdr i)) (eq (cadr i) '*)
 	      (if (listp (cadr i))
@@ -511,7 +511,19 @@
 ;(defun function-p (x)
 ;  (and (not (symbolp x)) (functionp x)))
 
-(do ((l '((null . null)
+(defun sequencep (x)
+  (or (listp x) (vectorp x)))
+
+(defun ratiop (x)
+  (and (rationalp x) (not (integerp x))))
+
+(defun short-float-p (x)
+  (and (floatp x) (eql x (float x 0.0s0))))
+
+(defun long-float-p (x)
+  (and (floatp x) (eql x (float x 0.0))))
+
+(defconstant +type-alist+ '((null . null)
           (symbol . symbolp)
           (keyword . keywordp)
 	  (non-logical-pathname . non-logical-pathname-p)
@@ -520,6 +532,16 @@
 	  (standard-char . standard-char-p)
 	  (non-standard-base-char . non-standard-base-char-p)
 	  (interpreted-function . interpreted-function-p)
+	  (float . floatp)
+	  (short-float . short-float-p)
+	  (long-float . long-float-p)
+	  (array . arrayp)
+	  (vector . vectorp)
+	  (bit-vector . bit-vector-p)
+	  (string . stringp)
+	  (complex . complexp)
+	  (ratio . ratiop)
+	  (sequence . sequencep)
           (atom . atom)
           (cons . consp)
           (list . listp)
@@ -537,14 +559,13 @@
           (structure . structurep)
           (function . functionp)
           (compiled-function . compiled-function-p)
-          (common . commonp)
-          )
-        (cdr l)))
-    ((endp l))
-  (putprop (caar l) (cdar l) 'type-predicate)
-  (when (symbolp (cdar l)) 
-    (putprop (cdar l) (caar l) 'predicate-type)
-    (proclaim `(ftype (function (t) t) ,(cdar l)))))
+          (common . commonp)))
+
+(dolist (l +type-alist+)
+  (putprop (car l) (cdr l) 'type-predicate)
+  (when (symbolp (cdr l)) 
+    (putprop (cdr l) (car l) 'predicate-type)
+    (proclaim `(ftype (function (t) t) ,(cdr l)))))
 
 
 (defconstant +singleton-types+ '(non-keyword-symbol keyword standard-char

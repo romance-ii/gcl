@@ -215,10 +215,12 @@
           (let ,(reverse vl)
                ,@decl
                (tagbody
-                ,label (if ,test (return (progn ,@result)))
-                       (tagbody ,@body)
-                       (psetq ,@(reverse step))
-                       (go ,label)))))
+                ,label (if ,test 
+			   (return (progn ,@result))
+			 (progn 
+			   (tagbody ,@body)
+			   (psetq ,@(reverse step))
+			   (go ,label)))))))
 
 (defmacro do* (control (test . result) &rest body
                &aux (decl nil) (label (gensym)) (vl nil) (step nil))

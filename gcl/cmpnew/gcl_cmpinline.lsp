@@ -32,6 +32,11 @@
 (import 'si::-inf 'compiler)
 (import 'si::nan 'compiler)
 (import 'si::isfinite 'compiler)
+(import 'si::+type-alist+ 'compiler)
+(import 'si::sequencep 'compiler)
+(import 'si::ratiop 'compiler)
+(import 'si::short-float-p 'compiler)
+(import 'si::long-float-p 'compiler)
 
 ;;; Pass 1 generates the internal form
 ;;;	( id  info-object . rest )

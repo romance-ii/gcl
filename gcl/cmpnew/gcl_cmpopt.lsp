@@ -1274,6 +1274,11 @@ TRUNCATE_USE_C
   "@0;({enum type _tp=type_of(#0);_tp>=t_string && _tp<=t_vector;})")
    (get 'vectorp 'inline-always))
 
+;;SEQUENCEP
+ (push '((t) boolean #.(flags rfa)
+  "@0;(listp(#0) || ({enum type _tp=type_of(#0);_tp>=t_string && _tp<=t_vector;}))")
+   (get 'sequencep 'inline-always))
+
 ;;FUNCTIONP
  (push '((t) boolean #.(flags rfa)
   "@0;({enum type _tp=type_of(#0);_tp>=t_ifun && _tp<=t_closure;})")

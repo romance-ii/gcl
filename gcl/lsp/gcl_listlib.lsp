@@ -208,15 +208,15 @@
 
 (defun smallnthcdr (n x)
   (declare (seqind n))
-  (cond ((atom x) (when x (tp-error x proper-list)))
-	((= n 0) x)
+  (cond ((= n 0) x)
+	((atom x) (when x (tp-error x proper-list)))
 	((smallnthcdr (1- n) (cdr x)))))
 
 (defun bignthcdr (n i s f) 
   (declare (seqind i))
-  (cond ((atom f) (when f (tp-error f proper-list)))
+  (cond ((eq s f) (smallnthcdr (mod n i) s))
+	((atom f) (when f (tp-error f proper-list)))
 	((atom (cdr f)) (when (cdr f) (tp-error (cdr f) proper-list)))
-	((eq s f) (smallnthcdr (mod n i) s))
 	((bignthcdr n (1+ i) (cdr s) (cddr f)))))
 
 (defun nthcdr (n x)
