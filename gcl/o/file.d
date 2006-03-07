@@ -147,6 +147,15 @@ object strm;
 	FEerror("Unexpected end of ~S.", 1, strm);
 }
 
+DEFUNO_NEW("TERMINAL-INPUT-STREAM-P",object,fSterminal_input_stream_p,SI
+	  ,1,1,NONE,OO,OO,OO,OO,void,siLterminal_input_stream_p,(object x),"")
+{
+
+  RETURN1(type_of(x)==t_stream && x->sm.sm_mode==smm_input && x->sm.sm_fp && isatty(fileno(x->sm.sm_fp)) ? Ct : Cnil);
+
+}
+
+
 /*
 	Input_stream_p(strm) answers
 	if stream strm is an input stream or not.

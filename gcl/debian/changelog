@@ -51,8 +51,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * More useful do evalmacro;fix nthcdr error order;fix simple-array
     typep;new predicates in 'si and optimizers in compiler;ynchronize
     +type-alist+
+  * Only clear real terminal input on error
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  6 Mar 2006 03:57:55 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue,  7 Mar 2006 17:27:00 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

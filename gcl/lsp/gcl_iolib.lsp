@@ -87,6 +87,12 @@
   (stream-object0 stream))
 ;(proclaim '(optimize (safety 2) (space 3)))
 
+(defun maybe-clear-input (&optional (x *standard-input*))
+  (cond ((not (typep x 'stream)) nil)
+	((typep x 'synonym-stream) (maybe-clear-input (symbol-value (synonym-stream-symbol x))))
+	((typep x 'two-way-stream) (maybe-clear-input (two-way-stream-input-stream x)))
+	((terminal-input-stream-p x) (clear-input t))))
+
 (defun decl-vars (decls);FIXME complete and centralize
   (remove-duplicates
    (mapcan (lambda (x) 
