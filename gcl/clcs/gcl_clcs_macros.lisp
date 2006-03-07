@@ -171,10 +171,10 @@
 	  (specific-error :wrong-type-argument
 			  "The value ~:@(~S~) is not ~A. (bound to variable ~:@(~S~))"
 			  ,place ,(or type-string `',type) ',place)
-	   (STORE-VALUE (VALUE)
-	       :REPORT (LAMBDA (STREAM)
-			 (FORMAT STREAM "Supply a new value of ~S."
-				 ',PLACE))
-	       :INTERACTIVE READ-EVALUATED-FORM
-	     (SETF ,PLACE VALUE)
-	     (GO ,TAG2)))))))
+	   ,@(unless (constantp place) 
+	       `((STORE-VALUE (VALUE)
+			     :REPORT (LAMBDA (STREAM)
+					     (FORMAT STREAM "Supply a new value of ~S." ',PLACE))
+			     :INTERACTIVE READ-EVALUATED-FORM
+			     (SETF ,PLACE VALUE)
+			     (GO ,TAG2)))))))))

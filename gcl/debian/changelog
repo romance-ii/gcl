@@ -52,8 +52,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     typep;new predicates in 'si and optimizers in compiler;ynchronize
     +type-alist+
   * Only clear real terminal input on error
+  * Fix check-type restarts for constant places
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  7 Mar 2006 17:27:00 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue,  7 Mar 2006 21:12:34 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
