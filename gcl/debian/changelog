@@ -53,8 +53,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     +type-alist+
   * Only clear real terminal input on error
   * Fix check-type restarts for constant places
+  * Fix multiple-value-setq evalmacro bug recently introduced
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  7 Mar 2006 21:12:34 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  9 Mar 2006 11:38:21 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

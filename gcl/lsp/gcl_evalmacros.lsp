@@ -185,7 +185,7 @@
        (sym (gensym))
        (forms nil))
       ((endp vl) `(let ((,sym (multiple-value-list ,form))) ,@(nreverse forms)))
-      (push `(setq ,(car vl) (car ,sym) ,sym (cdr ,sym)) forms)))
+      (push `(setq ,@(when forms `(,sym (cdr ,sym))) ,(car vl) (car ,sym)) forms)))
 
 (defmacro multiple-value-bind (vars form &rest body)
   (do ((vl vars (cdr vl))
