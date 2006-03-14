@@ -296,7 +296,7 @@ object set_cclosure (result_cc,value_cc,available_size)
   (or (cdr (gethash type *structure-table*))
       (mapcan #'(lambda (slotd)
                   (when (and slotd (car slotd))
-                    (let ((read-only-p (fourth slotd))
+                    (let (;(read-only-p (fourth slotd))
 			  (offset (fifth slotd)))
                       (let ((reader (lambda (x) (si:structure-ref1 x offset)))
                             (writer ;(if read-only-p

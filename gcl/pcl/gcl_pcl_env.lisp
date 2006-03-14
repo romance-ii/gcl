@@ -189,10 +189,10 @@
 				  (lisp::package-hashtable-free external))
 			 #-cmu 0))
     #-cmu (do-external-symbols (sym object)
-	    (declare (ignore sym))
+;	    (declare (ignore sym))
 	    (incf external-count))
     #-cmu (do-symbols (sym object)
-	    (declare (ignore sym))
+;	    (declare (ignore sym))
 	    (incf internal-count))
     #-cmu (decf internal-count external-count)
     (format stream "It has ~D internal and ~D external symbols (~D total).~%"

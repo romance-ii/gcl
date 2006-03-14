@@ -55,6 +55,8 @@
 (defun slot-boundp-symbol (slot-name)
   (slot-symbol slot-name boundp))
 
+;(defun conditions::error (&rest r) nil)
+
 (defmacro asv-funcall (sym slot-name type &rest args)
   (declare (ignore type))
   `(if (#-akcl fboundp #+akcl %fboundp ',sym)
@@ -98,6 +100,7 @@
 	   'accessor-slot-boundp))
   (let* ((slot-name (eval slot-name))
 	 (sym (slot-boundp-symbol slot-name)))
+    (declare (ignorable sym)) ;FIXME
     (if (not *optimize-slot-boundp*)
 	`(slot-boundp-normal ,object ',slot-name)
 	`(asv-funcall ,sym ,slot-name boundp ,object))))

@@ -307,7 +307,7 @@ NIL => never; :USER => those resulting from user code; T => always, even if it's
                         let-body)
                  update-forms)
            (dolist (v vars)
-;               (declare (ignore v))
+               (declare (ignore v))
                                                ; Pop off the vars we have now
                                                ; bound from the list of vars
                                                ; to watch out for--we'll bind

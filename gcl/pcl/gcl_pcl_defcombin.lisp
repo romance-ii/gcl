@@ -49,7 +49,7 @@
     ((generic-function generic-function)
      (method-combination method-combination)
      applicable-methods)
-  (declare (ignore applicable-methods))
+  (declare (ignorable applicable-methods))
   (flet ((real-invalid-method-error (method format-string &rest args)
 	   (declare (ignore method))
 	   (apply #'error format-string args))

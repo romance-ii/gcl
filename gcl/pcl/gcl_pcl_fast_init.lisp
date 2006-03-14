@@ -1008,7 +1008,7 @@
     (values
      `(lambda (pv-cell cvector)
         (declare (type ,cvector-type cvector))
-	#+cmu
+;	#+cmu
 	(declare (ignorable pv-cell cvector))
         #'(lambda (instance initargs)
 	    (declare #.*optimize-speed*)
