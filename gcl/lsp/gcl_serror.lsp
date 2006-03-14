@@ -155,7 +155,7 @@ signaled at this point in the stack.  For the moment the rest of the VARIABLES a
 		    `(,error-name ,correctable ,function-name ,continue-format-string 
 				 ,error-format-string ,@error-handler-args)))
   (declare (:dynamic-extent error-handler-args))
-  (maybe-clear-input)
+  (si::maybe-clear-input)
   (when (equal internal-error-parms *internal-error-parms*)
     (format t "Error handler called recursively ~S~%"
 	    internal-error-parms)
