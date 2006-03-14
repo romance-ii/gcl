@@ -322,7 +322,14 @@
 
   (setq init-form (c1expr* (cadr args) info))
 
-  (dolist* (v (reverse vars)) (push v *vars*))
+  (setq vars (nreverse vars))
+  (let ((tp (info-type (second init-form))))
+    (when (and (consp tp) (eq (car tp) 'values))
+      (do ((v vars (cdr v)) (t1 (cdr tp) (cdr t1)))
+	  ((or (not v) (not t1)))
+	  (set-var-init-type (car v) (car t1)))))
+
+  (dolist* (v vars) (push v *vars*))
 
   (check-vdecl vnames ts is)
 
@@ -333,8 +340,7 @@
 
   (dolist** (var vars) (check-vref var))
 
-  (list 'multiple-value-bind info (reverse vars) init-form body)
-  )
+  (list 'multiple-value-bind info vars init-form body))
 
 
 (defun c2multiple-value-bind (vars init-form body

@@ -191,7 +191,7 @@
 
 
 (defvar *dlbs* 0)
-(defvar *dlbsrl* 2)
+(defvar *dlbsrl* -1);2)
 
 (defun declare-let-bindings-new1 (args star specials)
   (if (>= *dlbs* *dlbsrl*) args
@@ -215,6 +215,13 @@
 	    args))))))
 
 
+(defun set-var-init-type (v t1);;FIXME should be in c1make-var
+  (when (eq (var-kind v) 'lexical)
+    (setf (var-dt v) (var-type v)
+	  (var-type v) t1
+	  (var-mt v) (var-type v)
+	  (var-loc v) (unless (and (eq (var-loc v) 'object)
+				   (t-to-nil (var-type v))) (var-loc v)))))
 (defun c1let (args &aux (info (make-info))(setjmps *setjmps*)
                         (forms nil) (vars nil) (vnames nil)
                         ss is ts body other-decls
@@ -237,14 +244,15 @@
           (t (cmpck (not (and (consp x) (or (endp (cdr x)) (endp (cddr x)))))
                     "The variable binding ~s is illegal." x)
              (let ((v (c1make-var (car x) ss is ts)))
-                  (push (car x) vnames)
-                  (push v vars)
-                  (push (if (endp (cdr x))
-                            (default-init (var-type v))
-                            (and-form-type (var-type v)
-                                           (c1expr* (cadr x) info)
-                                           (cadr x)))
-                        forms)))))
+	       (push (car x) vnames)
+	       (push v vars)
+	       (push (if (endp (cdr x))
+			 (default-init (var-type v))
+		       (and-form-type (var-type v)
+				      (c1expr* (cadr x) info)
+				      (cadr x)))
+		     forms)
+	       (set-var-init-type (car vars) (info-type (second (car forms))))))))
 
   (dolist* (v (reverse vars)) (push v *vars*))
 
@@ -258,9 +266,11 @@
   (dolist** (var vars) (check-vref var))
 
 
-    (or (eql setjmps *setjmps*) (setf (info-volatile info) t))
-	(list 'let info (reverse vars) (reverse forms) body)
-  )
+  (or (eql setjmps *setjmps*) (setf (info-volatile info) t))
+
+  (dolist (var vars) (setf (var-type var) (var-mt var)))
+
+  (list 'let info (reverse vars) (reverse forms) body))
 
 (defun c2let (vars forms body
                    &aux (block-p nil) (bindings nil) initials used-vars
@@ -376,6 +386,7 @@
                                            (cadr x)))
                         forms)
                   (push v vars)
+		  (set-var-init-type (car vars) (info-type (second  (car forms))))
                   (push v *vars*)))))
 
   (check-vdecl vnames ts is)
@@ -383,9 +394,9 @@
   (add-info info (cadr body))
   (setf (info-type info) (info-type (cadr body)))
   (dolist** (var vars) (check-vref var))
-(or (eql setjmps *setjmps*) (setf (info-volatile info) t))
-  (list 'let*  info (reverse vars) (reverse forms) body)
-  )
+  (or (eql setjmps *setjmps*) (setf (info-volatile info) t))
+  (dolist (var vars) (setf (var-type var) (var-mt var)))
+  (list 'let*  info (reverse vars) (reverse forms) body))
 
 (defun c2let* (vars forms body
                     &aux (block-p nil) used-vars

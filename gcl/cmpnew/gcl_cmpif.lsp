@@ -39,6 +39,74 @@
 (defun note-branch-elimination (test-form val elim-form)
   (cmpnote "Test form ~S is ~S,~%;; eliminating branch ~S~%" test-form val elim-form))
 
+;; (defun min-real-bound (x)
+;;   (if (and (consp x) (member (car x) '(integer short-float long-float)))
+;;       (or (not (member x '(integer short-float long-float) :test 'type<=))
+;; 	  (nil-to-t (cadr x)))))
+
+;; (defun max-real-bound (x)
+;;   (if (and (consp x) (member (car x) '(integer short-float long-float)))
+;;       (or (not (member x '(integer short-float long-float) :test 'type<=))
+;; 	  (nil-to-t (caddr x)))))
+
+(defun negate (tp)
+  (or (not tp) (unless (eq tp t) `(not ,tp))))
+
+(defun tp-reduce (f1 f2 l1 l2 r)
+  (cond (l1 (tp-reduce f1 f2 (cdr l1) l2 
+		       (cons (cons (caar l1) 
+				   (cons 
+				    (funcall f1 (nil-to-t (cadr (assoc (caar l1) l2))) (cadar l1))
+				    (funcall f2 (nil-to-t (cddr (assoc (caar l1) l2))) (cddar l1)))) r)))
+	((assoc (caar l2) r) (tp-reduce f1 f2 l1 (cdr l2) r))
+	(l2 (tp-reduce f1 f2 l1 (cdr l2) (cons (cons (caar l2) 
+						  (cons 
+						   (funcall f1 t (cadar l2))
+						   (funcall f2 t (cddar l2)))) r)))
+	(r)))
+
+(defconstant +bool-inf-op-list+ '((> . <=) (>= . <) (< . >=) (<= . >)))
+
+(defun two-tp-inf (fn t2)
+  (case fn
+	((> >=) (if (and (consp t2) (member (car t2) '(integer short-float long-float)))
+		    `(real ,(or (cadr t2) '*)) t))
+	((< <=) (if (and (consp t2) (member (car t2) '(integer short-float long-float)))
+		    `(real * ,(or (caddr t2) '*)) t))))
+
+(defmacro vl-name (x) `(var-name (car (third ,x))))
+(defmacro itp (x) `(info-type (second ,x)))
+(defmacro vlp (x) `(eq 'var (car ,x)))
+(defmacro tppr (f r x) (let ((s (gensym))) `(let ((,s (cmp-norm-tp ,x))) (cons (two-tp-inf ,f ,s) (two-tp-inf ,r ,s)))))
+(defmacro reduce-lambda ((x y) &rest forms)
+  (let ((xy (gensym)))
+    `(lambda (&rest ,xy)
+       (when ,xy
+	 (let ((,x (car ,xy)) (,y (cadr ,xy)))
+	   ,@forms)))))
+
+(defun fmla-infer-tp (fmla)
+  (case (car fmla)
+	(fmla-and (reduce (reduce-lambda (x y) (tp-reduce 'type-and 'type-or1 x y nil)) (maplist 'fmla-infer-tp (cdr fmla))))
+	(fmla-or  (reduce (reduce-lambda (x y) (tp-reduce 'type-or1 'type-and x y nil)) (maplist 'fmla-infer-tp (cdr fmla))))
+	(fmla-not (mapcar (lambda (x) (cons (car x) (cons (cddr x) (cadr x)))) (fmla-infer-tp (cdr fmla))))
+	(call-global
+	 (let* ((fn (third fmla)) (rfn (cdr (assoc fn +bool-inf-op-list+)))
+		(args (fourth fmla)) (l (length args)) (pt (get fn 'si::predicate-type)))
+	   (cond ((and (= l 1) (eq (car (first args)) 'var) pt) (list (cons (vl-name (first args)) (cons pt `(not ,pt)))))
+		 ((and (= l 2) rfn)
+		  (let (r)
+		    (when (vlp (first args))
+		      (push (cons (vl-name (first args)) (tppr fn rfn (itp (second args)))) r))
+		    (when (vlp (second args))
+		      (push (cons (vl-name (second args)) (tppr rfn fn (itp (first args)))) r))
+		    r))
+		 ((map 'list (lambda (x) (cons (var-name x) (cons t t))) (info-referred-array (second fmla)))))))
+	(otherwise (when (consp (car fmla))
+		     (fmla-infer-tp (car fmla))))))
+
+
+
 (defun c1if (args &aux info f)
   (when (or (endp args) (endp (cdr args)))
         (too-few-args 'if 2 (length args)))
@@ -55,7 +123,7 @@
 	(if (endp (cddr args)) (c1nil) (c1expr (caddr args))))
         (otherwise
          (setq info (make-info))
-	 (let* ((*fmla-eval-const* (= *dlbs* 0)) ;;FIXME expand this to detect tags and setq cases
+	 (let* ((*fmla-eval-const* t)
 		(fmla (c1fmla f info))
 		(fmlae (fmla-eval-const fmla)))
 	   (if *fmla-eval-const*
@@ -63,14 +131,28 @@
 		      (when (caddr args) (note-branch-elimination (car args) t (caddr args)))
 		      (c1expr** (cadr args) info))
 		     (t (note-branch-elimination (car args) nil (cadr args)) 
-		      (if (endp (cddr args)) (c1nil) (c1expr** (caddr args) info))))
-	     (let ((tb (c1expr* (cadr args) info))
-		   (fb (if (endp (cddr args)) (c1nil) (c1expr* (caddr args) info))))
-	       (setf (info-type info) (type-or1 (info-type (cadr tb)) 
-						(if (endp (cddr args)) 'null
-						  (info-type (cadr fb)))))
-	       (list 'if info
-		     fmla tb fb)))))))
+			(if (endp (cddr args)) (c1nil) (c1expr** (caddr args) info))))
+	     (let ((inf (fmla-infer-tp fmla)) r)
+	       (dolist (l inf)
+		 (let ((v (car (member (car l) *vars* :key (lambda (x) (when (var-p x) (var-name x)))))))
+		   (when v
+		     (push (list v (var-type v) (var-brt v) (cdr l)) r))))
+	       (unwind-protect
+		   (let ((tb (progn (dolist (l r) 
+				      (setf (var-brt (car l)) (car (cadddr l)))
+				      (setf (var-type (car l)) (type-and (cadr l) (var-brt (car l)))))
+				    (c1expr* (cadr args) info)))
+			 (fb (if (endp (cddr args)) (c1nil)
+			       (progn (dolist (l r) 
+					(setf (var-brt (car l)) (cdr (cadddr l)))
+					(setf (var-type (car l)) (type-and (cadr l) (var-brt (car l)))))
+				      (c1expr* (caddr args) info)))))
+		     (setf (info-type info) (type-or1 (info-type (cadr tb)) 
+						      (if (endp (cddr args)) 'null
+							(info-type (cadr fb)))))
+		     (list 'if info fmla tb fb))
+		 (dolist (l r)
+		   (setf (var-type (car l)) (cadr l) (var-brt (car l)) (caddr l))))))))))
 
 (defvar *fmla-eval-const*)
 (defun fmla-eval-const (fmla)
@@ -121,8 +203,7 @@
    ((symbolp fmla) (if (constantp fmla)
                        (if (symbol-value fmla) t nil)
                        fmla))
-   (t t))
-  )
+   (t t)))
 
 (defun c1fmla (fmla info)
   (if (consp fmla)
@@ -144,9 +225,13 @@
                   (unless (endp (cddr fmla))
                           (too-many-args 'not 1 (length (cdr fmla))))
                   (list 'FMLA-NOT (c1fmla (cadr fmla) info)))
-            (t (c1expr* `(the boolean ,fmla) info)))
-      (c1expr* fmla info))
-  )
+	    ;;FIXME collapse and an or to if with compiler-macros/normal macros, and ensure order makes sense with that in c1symbol-fun
+            (t (let* ((cm (and (symbolp (car fmla)) (get (car fmla) 'si::compiler-macro-prop)))
+		      (cm (and cm (funcall cm fmla nil))))
+		 (if (and cm (not (eq cm fmla)))
+		     (c1fmla cm info)
+		   (c1expr* `(the boolean ,fmla) info)))))
+      (c1expr* fmla info)))
 
 (defun c2if (fmla form1 form2
                   &aux (Tlabel (next-label)) Flabel)

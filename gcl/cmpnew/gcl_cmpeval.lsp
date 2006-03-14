@@ -429,13 +429,13 @@
   (declare (ignore env))
   (let ((i (gensym)) (s (gensym)))
     `(let ((,s ,(cadr form)))
+       (declare (sequence ,s))
        (the seqind ;FIXME
-	    (if (typep ,s 'vector)	
-		(let ((,s ,s)) ;;FIXME should be automatic co1typep
-		  (declare (vector ,s))
-		  (cmp-vec-length ,s))
-	      (do ((,i 0 (1+ ,i)) (,s ,s (cdr ,s))) ((endp ,s) ,i)
-		  (declare (seqind ,i))))))))
+	    (if (listp ,s)	
+		(do ((,i 0 (1+ ,i)) (,s ,s (cdr ,s))) ((endp ,s) ,i)
+		    (declare (seqind ,i)))
+	      (let ((,s ,s)) ;;FIXME should be automatic co1typep
+		(cmp-vec-length ,s)))))))
 (si::putprop 'length (function length-expander) 'si::compiler-macro-prop)
 
 
@@ -891,6 +891,21 @@
 		   (declare (list ,(cadr r)))
 		   ,form))))))))
 (si::putprop 'reduce (macro-function 'compiler::reduce-compiler-macro) 'si::compiler-macro-prop)
+
+
+(defun and-compiler-macro (form env)
+  (declare (ignore env))
+  (cond ((endp (cdr form)))
+	((endp (cddr form)) (cadr form))
+	(`(if ,(cadr form) ,(and-compiler-macro `(and ,@(cddr form)) nil)))))
+(si::putprop 'and 'and-compiler-macro 'si::compiler-macro-prop)
+	   
+(defun or-compiler-macro (form env)
+  (declare (ignore env))
+  (cond ((endp (cdr form)) nil)
+	((endp (cddr form)) (cadr form))
+	((let ((s (gensym))) `(let ((,s ,(cadr form))) (if ,s ,s ,(or-compiler-macro `(or ,@(cddr form)) nil)))))))
+(si::putprop 'or 'or-compiler-macro 'si::compiler-macro-prop)
 
 ;(defun do-vector-map (fn vars &key (not nil notp))
 ;  (let ((i (gensym)) (l (gensym)))
@@ -1356,8 +1371,8 @@
     (let (tem x)
       (unless (setq tem (cadr (assoc val *objects*)))
 	(cond ((or
-		(and (= val +inf) (c1expr `(si::|#,| symbol-value '+inf)))
-		(and (= val -inf) (c1expr `(si::|#,| symbol-value '-inf)))
+		(and (= val (symbol-value '+inf)) (c1expr `(si::|#,| symbol-value '+inf)))
+		(and (= val (symbol-value '-inf)) (c1expr `(si::|#,| symbol-value '-inf)))
 		(and (not (isfinite val)) (c1expr `(si::|#,| symbol-value 'nan)))
 		(and
 		 (> (setq x (abs val)) (/ most-positive-long-float 2))

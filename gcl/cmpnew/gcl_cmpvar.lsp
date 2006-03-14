@@ -57,7 +57,11 @@
   		;;; For FIXNUM, CHARACTER, LONG-FLOAT, SHORT-FLOAT, and
   		;;; OBJECT, the cvar for the C variable that holds the value.
   		;;; Not used for LEXICAL.
-  (type t)	;;; Type of the variable.
+  (dt t)	;;; Declared Type of the variable.
+  (type t)	;;; Current Type of the variable.
+  (brt t)	;;; Restriction super-type in this if branch FIXME probably unnecessary as a slot
+  (mt t)	;;; Maximum type of the life of this binding
+  tag           ;;; Inner tag (to binding) being analyzed if any
   (register 0 :type unsigned-short)  ;;; If greater than specified am't this goes into register.
   (dynamic 0 :type unsigned-short)   ;;; If variable is declared dynamic-extent
   )
@@ -81,35 +85,40 @@
 ;;; undefined variables are detected.
 
 (defun c1make-var (name specials ignores types &aux x)
+
   (let ((var (make-var :name name)))
+
     (cmpck (not (symbolp name)) "The variable ~s is not a symbol." name)
     (cmpck (constantp name)     "The constant ~s is being bound." name)
-
-    (dolist**
+    
+    (dolist** 
      (v types)
      (when (eq (car v) name)
        (case (cdr v)
-	 (object (setf (var-loc var) 'object))
-	 (register (setf (var-register var) (+ (var-register var) 100)))
-	 (dynamic-extent  (setf (var-dynamic var) 1))
-	 (t (setf (var-type var) (nil-to-t (type-and (var-type var) (cdr v))))))))
+	     (object (setf (var-loc var) 'object))
+	     (register (setf (var-register var) (+ (var-register var) 100)))
+	     (dynamic-extent  (setf (var-dynamic var) 1))
+	     (t (setf (var-type var) (nil-to-t (type-and (var-type var) (cdr v))))))))
     
-       (cond ((or (member name specials) (si:specialp name))
-              (setf (var-kind var) 'SPECIAL)
-              (setf (var-loc var) (add-symbol name))
-	      (when (and (not (assoc name types)) (setq x (get name 'cmp-type)))
-                     (setf (var-type var) x))
+    (cond ((or (member name specials) (si:specialp name))
+	   (setf (var-kind var) 'SPECIAL)
+	   (setf (var-loc var) (add-symbol name))
+	   (when (and (not (assoc name types)) (setq x (get name 'cmp-type)))
+	     (setf (var-type var) x))
               (setq *special-binding* t))
-             (t
-	      (and (boundp '*c-gc*) *c-gc*
-		   (or (null (var-type var))
-		       (eq t (var-type var)))
-		   (setf (var-loc var) 'object))
-              (setf (var-kind var) 'LEXICAL)))
-       (let ((ign (member name ignores)))
-        (when ign
-         (setf (var-ref var) (if (eq (cadr ign) 'ignorable) 'IGNORABLE 'IGNORE))))
-       var))
+	  (t
+	   (and (boundp '*c-gc*) *c-gc*
+		(or (null (var-type var))
+		    (eq t (var-type var)))
+		(setf (var-loc var) 'object))
+	   (setf (var-kind var) 'LEXICAL)))
+    (let ((ign (member name ignores)))
+      (when ign
+	(setf (var-ref var) (if (eq (cadr ign) 'ignorable) 'IGNORABLE 'IGNORE))))
+    
+    (setf (var-mt var) (var-type var))
+    (setf (var-dt var) (var-type var))
+    var))
 
 (defun check-vref (var)
   (when (and (eq (var-kind var) 'LEXICAL)
@@ -337,6 +346,30 @@
              )))
   )
 
+;(defconstant +useful-c-types+ '(fixnum short-float long-float proper-list t)) ;FIXME
+(defconstant +useful-c-types+ '(fixnum short-float long-float t)) ;FIXME
+
+(defun do-setq-tp (v form t1)
+  (when (eq (var-kind v) 'lexical)
+    (let* ((tp (type-and (var-dt v) t1)))
+      (unless tp
+	(cmpwarn "Type mismatches between ~s/~s and ~s/~s." (var-name v) (var-dt v) form t1))
+      (setf (var-type v) tp)
+      (unless (type>= (var-mt v) tp)
+	(setf (var-mt v) (type-or1 (var-mt v) tp))
+	(when (t-to-nil (var-tag v))
+	  (let* ((ff (c1expr form))
+		 (t1 (info-type (second ff)))
+		 (tp (type-and (var-dt v) t1)))
+	    (unless (and (type>= (var-mt v) tp)
+			 (every (lambda (x) (eq t (var-tag x))) (info-referred-array (second ff))))
+	      (let* ((nmt (car (member (var-mt v) +useful-c-types+ :test (lambda (x y) (and (type>= y x) (or (eq y t) (not (type>= x y))))))))
+		     (nmt (type-and nmt (var-dt v))))
+		(setf (var-mt v) nmt)))
+	    (setf (var-type v) (var-mt v))
+	    (throw (var-tag v) v)))))))
+	
+
 (defun c1setq1 (name form &aux (info (make-info)) type form1 name1)
   (cmpck (not (symbolp name)) "The variable ~s is not a symbol." name)
   (cmpck (constantp name) "The constant ~s is being assigned a value." name)
@@ -344,9 +377,10 @@
   (push-changed (car name1) info)
   (setq form1 (c1expr form))
   (add-info info (cadr form1))
-  (setq type (type-and (var-type (car name1)) (info-type (cadr form1))))
-  (when (null type)
-    (cmpwarn "Type mismatches between ~s and ~s." name form))
+  
+  (do-setq-tp (car name1) form (info-type (cadr form1)))
+  (setq type (var-type (car name1)))
+
   (unless (eq type (info-type (cadr form1)))
     (let ((info1 (copy-info (cadr form1))))
          (setf (info-type info1) type)
@@ -358,8 +392,7 @@
   (let ((*value-to-go* (cons 'var vref))) (c2expr* form))
   (case (car form)
         (LOCATION (c2location (caddr form)))
-        (otherwise (unwind-exit (cons 'var vref))))
-  )
+        (otherwise (unwind-exit (cons 'var vref)))))
 
 (defun c1progv (args &aux symbols values (info (make-info)))
   (when (or (endp args) (endp (cdr args)))
@@ -413,19 +446,20 @@
              "No form was given for the value of ~s." (car l))
       (let* ((vref (c1vref (car l)))
              (form (c1expr (cadr l)))
-             (type (type-and (var-type (car vref))
-                             (info-type (cadr form)))))
-            (unless (equal type (info-type (cadr form)))
-              (let ((info1 (copy-info (cadr form))))
-                   (setf (info-type info1) type)
-                   (setq form (list* (car form) info1 (cddr form)))))
-            (push vref vrefs)
-            (push form forms)
-            (push-changed (car vref) info)
-            (add-info info (cadar forms)))
-      )
-  (list 'psetq info (reverse vrefs) (reverse forms))
-  )
+             (type (type-and (var-dt (car vref)) (info-type (cadr form)))))
+
+	(do-setq-tp (car vref) (cadr l) (info-type (cadr form)))
+	(setq type (var-type (car vref)))
+
+	(unless (equal type (info-type (cadr form)))
+	  (let ((info1 (copy-info (cadr form))))
+	    (setf (info-type info1) type)
+	    (setq form (list* (car form) info1 (cddr form)))))
+	(push vref vrefs)
+	(push form forms)
+	(push-changed (car vref) info)
+	(add-info info (cadar forms))))
+  (list 'psetq info (reverse vrefs) (reverse forms)))
 
 (defun c2psetq (vrefs forms &aux (*vs* *vs*) (saves nil) (blocks 0))
   (dolist** (vref vrefs)

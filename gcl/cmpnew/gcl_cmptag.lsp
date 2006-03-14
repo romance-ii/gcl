@@ -103,7 +103,7 @@
   ;;; Establish tags.
   (setq body
         (mapcar
-         #'(lambda (x)
+         (lambda (x)
              (cond ((or (symbolp x) (integerp x))
                     (let ((tag (make-tag :name x :ref nil
                                          :ref-ccb nil :ref-clb nil)))
@@ -112,9 +112,33 @@
                    (t x)))
          body))
 
+  (setq body 
+	(nreverse 
+	 (let* (nb 
+		(ob body)
+		(ft (do ((l (pop ob) (pop ob))) ((or (not l) (typep l 'tag)) l)
+			(push (c1expr* l info) nb))))
+	   (cond ((not ft) nb)
+		 ((every (lambda (x) (if (var-p x) (var-tag x) t)) *vars*)
+		  (let ((nb (cons ft nb)))
+		    (do ((tob (pop ob) (pop ob))) ((not tob)nb) (push (if (typep tob 'tag) tob (c1expr* tob info)) nb))))
+		 ((let ((nt (gensym)) (nb (cons ft nb)) vl)
+		    (dolist (v *vars*) (when (var-p v) (unless (var-tag v) (setf (var-tag v) nt) (push v vl))))
+		    (do ((tob ob ob) (tnb nb nb) dne)
+			((not 
+			  (let ((nv (catch nt (do ((l (pop tob) (pop tob))) ((not l) nil)
+						  (push (if (typep l 'tag) l (c1expr* l info)) tnb)))));maybe copy-info here
+			    (cond (nv (cmpnote "caught ~s~%" nv) (setf (var-type nv) (var-mt nv)) t)
+				  ((not dne) 
+				   (dolist (v vl) (setf (var-tag v) t))
+				   (setq dne t)))))
+			 (dolist (v vl) (setf (var-tag v) nil))
+			 tnb))))))))
+
+				     
   ;;; Process non-tag forms.
-  (setq body (mapcar #'(lambda (x) (if (typep x 'tag) x (c1expr* x info)))
-                     body))
+;  (setq body (mapcar (lambda (x) (if (typep x 'tag) x (c1expr* x info)))
+;                     body))
 
   ;;; Delete redundant tags.
   (do ((l body (cdr l))

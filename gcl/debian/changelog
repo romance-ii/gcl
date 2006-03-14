@@ -59,8 +59,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * restore compiler::co1 to typep after definition in gcl_predlib for
     use in later compilations in the same file
   * fix log type propagator
+  * Replace autodeclaration of constant let bindings with catch/trhow
+    algorithm around tagbody, if, and setq
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 14 Mar 2006 23:50:43 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 14 Mar 2006 23:57:39 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
