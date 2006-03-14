@@ -62,6 +62,8 @@
 (defun object-type (thing &optional lim)
   (let* ((type (type-of thing)))
     (cond ((type>= 'integer type) `(integer ,thing ,thing))
+	  ((type>= 'short-float type) `(short-float ,thing ,thing))
+	  ((type>= 'long-float type) `(long-float ,thing ,thing))
 	  ((eq type 'cons) (cond ((or lim (cons-tp-limit thing 0 0)) 
 				  `(cons ,(object-type (car thing) t) ,(if (cdr thing) (object-type (cdr thing) t) 'null)))
 				 ((si::improper-consp thing) `(list))
@@ -447,10 +449,28 @@
       (unless (some (lambda (x) (complexp (bound x))) v)
 	(mk-tp e (mmin v) (mmax v))))))
 
-(dolist (l '(/ floor ceiling truncate round ffloor fceiling ftruncate fround log))
+(dolist (l '(/ floor ceiling truncate round ffloor fceiling ftruncate fround))
   (si::putprop l t 'zero-pole))
-(dolist (l '(+ - * / log exp float sqrt atan max min))
+(dolist (l '(+ - * / exp float sqrt atan max min))
   (si::putprop l 'super-range 'type-propagator))
+
+(defun log-wrap (x y)
+  (if (= 0 x) (symbol-value '-inf) (log x y)))
+
+(defun log-propagator (f t1 &optional (t2 `(short-float ,(exp 1.0s0) ,(exp 1.0s0))))
+  (super-range 'log-wrap t1 t2))
+(si::putprop 'log 'log-propagator 'type-propagator)
+
+(defun last-cons-type (tp &optional l)
+  (cond ((and l (atom tp)) tp)
+	((and (consp tp) (eq (car tp) 'cons) 
+	      (cddr tp) (not (cdddr tp))) (last-cons-type (caddr tp) t))))
+
+(defun cdr-propagator (f t1)
+  (when (or (type>= 'proper-list t1) (eq (last-cons-type t1) 'null))
+    'proper-list))
+;(si::putprop 'cdr 'cdr-propagator 'type-propagator)
+
 
 (defun mod-propagator (f t1 t2)
   (let ((sr (super-range '* '(integer 0 1) t2)))

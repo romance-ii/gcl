@@ -58,8 +58,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * make maybe-clear-input accessible within serror
   * restore compiler::co1 to typep after definition in gcl_predlib for
     use in later compilations in the same file
+  * fix log type propagator
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 14 Mar 2006 23:48:16 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 14 Mar 2006 23:50:43 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
