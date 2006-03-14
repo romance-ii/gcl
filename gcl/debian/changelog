@@ -56,8 +56,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * Fix multiple-value-setq evalmacro bug recently introduced
   * Clean some pcl compilation warnings
   * make maybe-clear-input accessible within serror
+  * restore compiler::co1 to typep after definition in gcl_predlib for
+    use in later compilations in the same file
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 14 Mar 2006 23:47:17 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 14 Mar 2006 23:48:16 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

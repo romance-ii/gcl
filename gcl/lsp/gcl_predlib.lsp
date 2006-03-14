@@ -144,7 +144,7 @@
 (defun typep (object type &optional env)
   (declare (ignore env) (optimize (safety 1)))
   (typep-int object type))
-
+(si::putprop 'typep 'compiler::co1typep 'compiler::co1)
 
 ;;FIXME -- globalize
 (defun assert-type (obj tp)
