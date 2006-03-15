@@ -131,8 +131,11 @@ backq_cdr(object x)
 
 		case APPEND:
 			if (vs_head == Cnil) {
-				vs_popp;
-				return(EVAL);
+			  vs_popp;
+			  if (!consp(vs_head) ||
+			      vs_head->c.c_car!=siScomma_at)
+			    return(EVAL);
+			  vs_push(Cnil);
 			}
 			kwote_cdr();
 			make_list;
@@ -140,8 +143,11 @@ backq_cdr(object x)
 
 		case NCONC:
 			if (vs_head == Cnil) {
-				vs_popp;
-				return(EVAL);
+			  vs_popp;
+			  if (!consp(vs_head) ||
+			      vs_head->c.c_car!=siScomma_dot)
+			    return(EVAL);
+			  vs_push(Cnil);
 			}
 			kwote_cdr();
 			make_list;

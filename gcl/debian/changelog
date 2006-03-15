@@ -61,8 +61,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * fix log type propagator
   * Replace autodeclaration of constant let bindings with catch/trhow
     algorithm around tagbody, if, and setq
+  * backquote fix
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 14 Mar 2006 23:57:39 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 15 Mar 2006 16:01:21 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
