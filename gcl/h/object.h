@@ -1100,9 +1100,9 @@ EXTER char *tmp_alloc;
 #define HIND 0
 #define LIND 1
 #endif
-#ifndef VOL
-#define VOL
-#endif
+/* #ifndef VOL */
+#define VOL volatile
+/* #endif */
 
 
 #define isUpper(xxx) (((xxx)&0200) == 0 && isupper((int)xxx))

@@ -1564,7 +1564,7 @@ echo "$ac_t""$CPP" 1>&6
 # subst GCC not only under 386-linux, but where available -- CM
 
 
-TCFLAGS="-Wall -DVOL=volatile -fsigned-char"
+TCFLAGS="-Wall -fsigned-char"
 if test "$GCC" = "yes" ; then
 	TCFLAGS="$TCFLAGS -pipe"
 	case $use in
