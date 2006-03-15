@@ -63,8 +63,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
     algorithm around tagbody, if, and setq
   * backquote fix
   * Fix function documentation wrapping by compile
+  * Fix read error in processing comments before final paren w/
+    preceding dot
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 15 Mar 2006 19:10:09 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 15 Mar 2006 20:47:22 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
