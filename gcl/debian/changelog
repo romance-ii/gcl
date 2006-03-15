@@ -62,8 +62,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * Replace autodeclaration of constant let bindings with catch/trhow
     algorithm around tagbody, if, and setq
   * backquote fix
+  * Fix function documentation wrapping by compile
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 15 Mar 2006 16:01:21 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 15 Mar 2006 19:10:09 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
