@@ -407,8 +407,8 @@ DEFUNO_NEW("COMPILED-FUNCTION-P",object,fLcompiled_function_p,LISP
 		x0 = Cnil;
 RETURN1(x0);}
 
-DEFUNO_NEW("INTERPRETED-FUNCTION-P",object,fLinterpreted_function_p,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Linterpreted_function_p,(object x0),"")
+DEFUNO_NEW("INTERPRETED-FUNCTION-P",object,fSinterpreted_function_p,SI
+   ,1,1,NONE,OO,OO,OO,OO,void,siLinterpreted_function_p,(object x0),"")
 
 {
 	/* 1 args */;

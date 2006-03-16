@@ -66,8 +66,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * Fix read error in processing comments before final paren w/
     preceding dot
   * preprocess cmpinclude.h for better gcc performance
+  * moved interpreted-function et. al. to si
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 15 Mar 2006 22:51:12 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 16 Mar 2006 00:02:09 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

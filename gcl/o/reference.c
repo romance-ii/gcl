@@ -227,7 +227,7 @@ DEFUNO_NEW("INTERPRETED-FUNCTION-LAMBDA",object,fSinterpreted_function_lambda,SI
 {
 
   if (type_of(x)!=t_ifun)
-    TYPE_ERROR(x,sLinterpreted_function);
+    TYPE_ERROR(x,siLinterpreted_function);
   return x->ifn.ifn_self;
 
 }

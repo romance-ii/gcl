@@ -462,7 +462,7 @@ LFD(siLtype_of_c)(void)
 		break;
 
 	case t_ifun:
-	  vs_base[0]=sLinterpreted_function;
+	  vs_base[0]=siLinterpreted_function;
 	  break;
 
 	default:
@@ -488,7 +488,7 @@ DEF_ORDINARY("SIMPLE-STRING",sLsimple_string,LISP,"");
 DEF_ORDINARY("FUNCTION",sLfunction,LISP,"");
 DEF_ORDINARY("FUNCTION-IDENTIFIER",sLfunction_identifier,LISP,"");
 DEF_ORDINARY("COMPILED-FUNCTION",sLcompiled_function,LISP,"");
-DEF_ORDINARY("INTERPRETED-FUNCTION",sLinterpreted_function,LISP,"");
+DEF_ORDINARY("INTERPRETED-FUNCTION",siLinterpreted_function,SI,"");
 DEF_ORDINARY("PATHNAME",sLpathname,LISP,"");
 DEF_ORDINARY("CHARACTER",sLcharacter,LISP,"");
 DEF_ORDINARY("NUMBER",sLnumber,LISP,"");

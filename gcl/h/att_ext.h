@@ -608,7 +608,7 @@ EXTER object sSsetf_function;
 EXTER object sLcommon,sLnull,sLcons,sLlist,siLproper_list,sLsymbol,sLarray,sLvector,sLbit_vector,sLstring;
 EXTER object sLsequence,sLsimple_array,sLsimple_vector,sLsimple_bit_vector,sLsimple_string;
 EXTER object sLcompiled_function,sLpathname,sLcharacter,sLnumber,sLrational,sLfloat;
-EXTER object sLinteger,sLratio,sLshort_float,sLstandard_char,sLinterpreted_function;
+EXTER object sLinteger,sLratio,sLshort_float,sLstandard_char,siLinterpreted_function;
 
 EXTER object sLchar,sLnon_negative_char,sLnegative_char,sLsigned_char,sLunsigned_char;
 EXTER object sLshort,sLnon_negative_short,sLnegative_short,sLsigned_short,sLunsigned_short;
