@@ -133,7 +133,8 @@ backq_cdr(object x)
 			if (vs_head == Cnil) {
 			  vs_popp;
 			  if (!consp(vs_head) ||
-			      vs_head->c.c_car!=siScomma_at)
+			      (vs_head->c.c_car!=siScomma_at &&
+			       vs_head->c.c_car!=siScomma_dot))
 			    return(EVAL);
 			  vs_push(Cnil);
 			}
@@ -145,7 +146,8 @@ backq_cdr(object x)
 			if (vs_head == Cnil) {
 			  vs_popp;
 			  if (!consp(vs_head) ||
-			      vs_head->c.c_car!=siScomma_dot)
+			      (vs_head->c.c_car!=siScomma_at &&
+			       vs_head->c.c_car!=siScomma_dot))
 			    return(EVAL);
 			  vs_push(Cnil);
 			}
