@@ -37,6 +37,7 @@
 (import 'si::ratiop 'compiler)
 (import 'si::short-float-p 'compiler)
 (import 'si::long-float-p 'compiler)
+(import 'si::interpreted-function 'compiler)
 
 ;;; Pass 1 generates the internal form
 ;;;	( id  info-object . rest )

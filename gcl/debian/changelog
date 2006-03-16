@@ -68,8 +68,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * preprocess cmpinclude.h for better gcc performance
   * moved interpreted-function et. al. to si
   * more complete backquote fix
+  * Fix length error reporting at safety >=1
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 16 Mar 2006 11:31:38 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 16 Mar 2006 12:32:42 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

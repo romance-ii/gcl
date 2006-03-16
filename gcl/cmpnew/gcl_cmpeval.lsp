@@ -429,7 +429,7 @@
   (declare (ignore env))
   (let ((i (gensym)) (s (gensym)))
     `(let ((,s ,(cadr form)))
-       (declare (sequence ,s))
+       ,(if *compiler-check-args* `(check-type ,s sequence) `(declare (sequence ,s)))
        (the seqind ;FIXME
 	    (if (listp ,s)	
 		(do ((,i 0 (1+ ,i)) (,s ,s (cdr ,s))) ((endp ,s) ,i)

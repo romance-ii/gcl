@@ -292,18 +292,16 @@
           ((string-equal (symbol-name reply) "NO")
            (return-from yes-or-no-p nil)))))
 
-
 (defun sharp-a-reader (stream subchar arg)
-  (declare (ignore subchar))
+  (declare (ignore subchar) (optimize (safety 1)))
   (let ((initial-contents (read stream nil nil t)))
-    (if *read-suppress*
-        nil
-        (do ((i 0 (1+ i))
-             (d nil (cons (length ic) d))
-             (ic initial-contents (if (zerop (length ic)) ic (elt ic 0))))
-            ((>= i arg)
-             (make-array (nreverse d)
-                         :initial-contents initial-contents))))))
+    (unless *read-suppress*
+      (do ((i 0 (1+ i))
+	   (d nil (cons (length ic) d))
+	   (ic initial-contents (if (zerop (length ic)) ic (elt ic 0))))
+	  ((>= i arg)
+	   (make-array (nreverse d)
+		       :initial-contents initial-contents))))))
 
 (set-dispatch-macro-character #\# #\a 'sharp-a-reader)
 (set-dispatch-macro-character #\# #\A 'sharp-a-reader)
