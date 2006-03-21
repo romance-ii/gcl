@@ -241,11 +241,11 @@
           (let* ,(reverse vl)
                 ,@decl
                 (tagbody
-                 ,label (if ,test (return (progn ,@result)))
-                        (tagbody ,@body)
-                        (setq ,@(reverse step))
-                        (go ,label))))
-  )
+                 ,label (if ,test (return (progn ,@result))
+			  (progn 
+			    (tagbody ,@body)
+			    (setq ,@(reverse step))
+			    (go ,label)))))))
 
 (defmacro case (keyform &rest clauses &aux (form nil) (key (gensym)))
   (dolist (clause (reverse clauses) `(let ((,key ,keyform)) ,form))
