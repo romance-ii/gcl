@@ -69,8 +69,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * moved interpreted-function et. al. to si
   * more complete backquote fix
   * Fix length error reporting at safety >=1
+  * check-type consolidation
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 16 Mar 2006 12:32:42 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 21 Mar 2006 22:19:15 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

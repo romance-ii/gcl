@@ -161,20 +161,20 @@
   (FORMAT *QUERY-IO* "~&Type a form to be evaluated:~%")
   (LIST (EVAL (READ *QUERY-IO*))))
 
+(defun check-type-internal (symbol value type &optional type-string)
+  (tagbody
+   tag
+   (if (typep value type) (return-from check-type-symbol value)
+     (restart-case 
+      (specific-error :wrong-type-argument ;FIXME lose specific-error for cerror
+		      "The value ~:@(~S~) is not ~A. (bound to variable ~:@(~S~))"
+		      value (or type-string type) symbol)
+      (store-value (v)
+		   :report (lambda (stream)
+				   (format stream "supply a new value of ~s." symbol))
+		   :interactive read-evaluated-form
+		   (setq value v)
+		   (go tag))))))
+
 (DEFMACRO CHECK-TYPE (PLACE TYPE &OPTIONAL TYPE-STRING)
-  (LET ((TAG1 (GENSYM))
-	(TAG2 (GENSYM)))
-    `(BLOCK ,TAG1
-       (TAGBODY ,TAG2
-	 (IF (TYPEP ,PLACE ',TYPE) (RETURN-FROM ,TAG1 NIL))
-	 (RESTART-CASE 
-	  (specific-error :wrong-type-argument
-			  "The value ~:@(~S~) is not ~A. (bound to variable ~:@(~S~))"
-			  ,place ,(or type-string `',type) ',place)
-	   ,@(unless (constantp place) 
-	       `((STORE-VALUE (VALUE)
-			     :REPORT (LAMBDA (STREAM)
-					     (FORMAT STREAM "Supply a new value of ~S." ',PLACE))
-			     :INTERACTIVE READ-EVALUATED-FORM
-			     (SETF ,PLACE VALUE)
-			     (GO ,TAG2)))))))))
+  `(unless (typep ,place ',type) (setf ,place (check-type-internal ',place ,place ',type ',type-string)) nil))
