@@ -789,7 +789,9 @@
 ;;from the function definitions themselves.  CM 20050106.
 (defun aref-propagator (fn x &rest inds)
   (declare (ignore fn inds))
-  (let ((x (cmp-norm-tp x)))
+  (let* ((x (cmp-norm-tp x))
+	 (x (if (boundp '*compiler-output1*) (type-and 'array x) x)) ;;detect pass2 FIXME
+	 )
     (and (consp x) (member (car x) '(array simple-array))
        (let ((uaet (and (not (eq (cadr x) '*)) (upgraded-array-element-type (nil-to-t (cadr x))))))
 	 ;; FIXME -- inline bit-vectors too.
