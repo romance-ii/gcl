@@ -521,9 +521,9 @@ else
 # FIXME -- remove when mingw compiler issues are fixed
 	case "$use" in
 	  *mingw*)
-		TO3FLAGS="-O3 $TFPFLAG";;
+		TO3FLAGS="-Os $TFPFLAG";;
 	  *)
-		TO3FLAGS="-O3 $TFPFLAG";;
+		TO3FLAGS="-Os $TFPFLAG";;
 	esac
 #	TO3FLAGS="-O3 $TFPFLAG"
 	TO2FLAGS="-O"
