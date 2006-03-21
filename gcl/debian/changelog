@@ -89,8 +89,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * proper-list is a useful-c-type, remove brt slot in var
   * remove some C warnings
   * rewrite do* and hence dolist to handle type propagation
+  * check-type consolidation, proper-list propagation and logic, not in
+    predicate list, ldelete-if, prune-type
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 21 Mar 2006 22:39:48 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 21 Mar 2006 22:41:42 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

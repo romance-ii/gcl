@@ -146,23 +146,17 @@
   (typep-int object type))
 (si::putprop 'typep 'compiler::co1typep 'compiler::co1)
 
-;;FIXME -- globalize
-(defun assert-type (obj tp)
-  (unless (typep obj tp)
-    (specific-error :wrong-type-argument "~S is not of type ~S." obj tp)))
-
-
 (defun in-interval-p (x interval)
   (let ((low '*) (high '*))
     (when interval
-      (assert-type  interval 'cons)
+      (check-type  interval cons)
       (or (eq (car interval) '*)
-	  (assert-type (car interval) '(or (cons real null) real)))
+	  (check-type (car interval) (or (cons real null) real)))
       (setq low (car interval))
       (when (cdr interval)
-	(assert-type (cdr interval) 'cons)
+	(check-type (cdr interval) cons)
 	(or (eq (cadr interval) '*)
-	    (assert-type  (cadr interval) '(or (cons real null) real)))
+	    (check-type  (cadr interval) (or (cons real null) real)))
 	(setq high (cadr interval))))
     (if (not interval)
         (setq low '* high '*)
@@ -234,7 +228,7 @@
 (defun sequence-type-length-type (type)
   (cond ((eq type 'null) `(eql 0));;FIXME accelerators
 	((eq type 'cons) `(integer 1))
-	((consp type) (sequence-type-length-type-int (normalize-type-int type nil)))))
+	((consp type) (sequence-type-length-type-int (normalize-type type)))))
 
 (defun sequence-type-element-type-int (type)
     (case (car type)
@@ -249,10 +243,13 @@
 		     (mapcar 'sequence-type-element-type-int (cdr type))))))
 	  
 (defun sequence-type-element-type (type)
-  (let ((x (sequence-type-element-type-int (normalize-type-int type nil))))
-    (or (eq x '*) x)))
+  (let* ((type (resolve-type type))
+	 (type (unless (cadr type) (car type))))
+    (let ((x (sequence-type-element-type-int type)))
+      (or (eq x '*) x))))
 
-
+(defmacro check-type-eval (place type)
+  `(assert (typep ,place ,type) (,place) 'type-error :datum ,place :expected-type ,type))
 
 ;;; COERCE function.
 (defun coerce (object type)
@@ -267,14 +264,14 @@
    ((subtypep1 type 'list)
     (let* ((l (length object))
 	   (x (sequence-type-length-type type)))
-      (when x (assert-type l x))
+      (when x (check-type l x))
       (do ((ll nil (cons (elt object i) ll))
 	   (i (1- l) (1- i)))
 	  ((< i 0) ll))))
    ((subtypep1 type 'array)
     (let* ((l (length object))
 	   (x (sequence-type-length-type type)))
-      (when x (assert-type l x))
+      (when x (check-type-eval l x))
       (do ((seq (make-sequence type l))
 	   (i 0 (1+ i))
 	   (l l))
@@ -289,7 +286,7 @@
 	(complex (realpart object) (imagpart object))
       (complex (coerce (realpart object) (cadr type))
 	       (coerce (imagpart object) (cadr type)))))
-   ((assert-type object type))))
+   ((check-type-eval object type))))
 
 ;;; DEFTYPE macro.
 (defmacro deftype (name lambda-list &rest body &aux decls prot)
@@ -428,7 +425,7 @@
        (or (and (atom (cdr x)) (cdr x))
 	   (improper-consp-int (cdr x) (cddr x)))))
 
-(deftype proper-list () `(or null (and cons (not (satisfies improper-consp)))))
+;(deftype proper-list () `(or null (and cons (not (satisfies improper-consp)))))
 
 (deftype extended-char () nil)
 (deftype base-char () `(or standard-char non-standard-base-char))
@@ -523,11 +520,18 @@
 (defun long-float-p (x)
   (and (floatp x) (eql x (float x 0.0))))
 
+(defun proper-listp (x)
+  (or (not x) (and (consp x) (not (improper-consp x)))))
+
+(deftype not-type nil 'null)
+
 (defconstant +type-alist+ '((null . null)
+	  (not-type . not)
           (symbol . symbolp)
           (keyword . keywordp)
 	  (non-logical-pathname . non-logical-pathname-p)
 	  (logical-pathname . logical-pathname-p)
+	  (proper-list . proper-listp)
 	  (non-keyword-symbol . non-keyword-symbol-p)
 	  (standard-char . standard-char-p)
 	  (non-standard-base-char . non-standard-base-char-p)
@@ -570,7 +574,7 @@
 
 (defconstant +singleton-types+ '(non-keyword-symbol keyword standard-char
 				      non-standard-base-char 
-				      package cons-member
+				      package cons-member proper-list
 				      broadcast-stream concatenated-stream echo-stream file-stream string-stream
 				      synonym-stream two-way-stream 
 				      non-logical-pathname logical-pathname
@@ -659,6 +663,14 @@
        (do ((,ind ,lsym (cdr ,ind)) (,p 0 (1+ ,p))) ((or (not ,ind) (eq ,i (car ,ind))) (and ,ind ,p))
 	   (declare (seqind ,p))))))
 
+(defmacro ldelete-if (fn lst)
+  (let ((lsym (gensym)) (f (gensym)) (p (gensym)) (ind (gensym)))
+    `(let ((,lsym ,lst))
+       (do ((,p nil (or ,p ,f)) ,f (,ind ,lsym (cdr ,ind))) ((not ,ind) ,f)
+	   (if (funcall ,fn (car ,ind))
+	       (when ,p (setq ,p (rplacd ,p (cdr ,ind))))
+	     (setq ,f (or ,f ,ind) ,p (cdr ,p)))))))
+
 (defmacro lremove-if (fn lst)
   (let ((lsym (gensym)) (tmp (gensym)) (r (gensym)) (l (gensym)) (ind (gensym)))
     `(let ((,lsym ,lst) ,r ,l)
@@ -675,7 +687,7 @@
 
 
 (defun resolve-type (type)
-  (nreconstruct-type (nprocess-type (normalize-type-int type t))))
+  (nreconstruct-type (nprocess-type (normalize-type type t))))
 
 
 (defun copy-type (type res)
@@ -684,10 +696,26 @@
 	((member (car type) '(member eql)) type)
 	((copy-type (cdr type) (cons (car type) res)))))
 
-(defun normalize-type (type &optional ar);FIXME
-  (normalize-type-int type ar))
+(defun normalize-type (tp &optional ar);FIXME
+  (let* ((tp (normalize-type-int tp ar))
+	 (lt (list-types tp)))
+    (if lt 
+	(nsublis `(((proper-list) . (or  (member nil) (cons (t) (proper-list)) ,@lt))) tp :test 'equal)
+      tp)))
 
 (defmacro maybe-eval (x) `(if (and (consp ,x) (eq (car ,x) 'load-time-value)) (eval (cadr ,x)) ,x))
+
+(defun proper-cons-tp (tp)
+  (cond ((eq (car tp) 'cons) (cons 'cons (list '(t) (proper-cons-tp (caddr tp)))))
+	('(member nil))))
+
+(defun list-types (tp &optional r)
+  (cond ((atom tp) r)
+	((consp (car tp)) (let ((r (list-types (car tp) r))) (list-types (cdr tp) r)))
+	((equal tp '(member nil)) (pushnew tp r :test 'eq) (list-types (cdr tp) r))
+	((eq (car tp) 'cons) (pushnew (proper-cons-tp tp) r :test 'equal) (list-types (cdr tp) r))
+	((list-types (cdr tp) r))))
+
 
 ;;FIXME loose the ar and default to t
 (defun normalize-type-int (type ar &aux tem)
@@ -1307,17 +1335,31 @@
   
 
 
+(defun prune-type (z q i w) ;FIXME optional tail recursion
+  (declare (seqind i))
+  (cond ((= i (length +array-type-alist+))
+	 (setf (cadar q) '*)
+	 (ldelete-if (lambda (y) (unless (eq y (car q)) (and (consp y) (eq (car y) 'array)))) z))
+	((not w) z)
+	((or (atom (car w)) (not (eq (caar w) 'array))) (prune-type z q i (cdr w)))
+	((not q) (prune-type z w (1+ i) (cdr w)))
+	((equal (caddar w) (caddar q)) (prune-type z q (1+ i) (cdr w)))
+	(z)))
+
 (defun nreconstruct-type-int (x)
   (if (ntp-ukn x) t
     (if (ntp-def x)
 	(let ((z (nreconstruct-type-int (ntp-not x))))
 	  (or (not z) `(not ,z)))
-      (let ((z (lremove-if 
-		'not 
-		(mapcar (lambda (x)
-			  (let ((op (cdr (assoc (car x) +kindom-recon-ops-alist+))))
-			    (funcall op x))) (ntp-tps x)))))
+      (let* ((z (lremove-if 
+		 'not 
+		 (mapcar (lambda (x)
+			   (let ((op (cdr (assoc (car x) +kindom-recon-ops-alist+))))
+			     (funcall op x))) (ntp-tps x))))
+	     (z (prune-type z nil 0 z)))
 	(if (cdr z) `(or ,@z) (car z))))))
+
+
 
 (defun nreconstruct-type (x)
   (list (nreconstruct-type-int x) (ntp-ukn x)))
