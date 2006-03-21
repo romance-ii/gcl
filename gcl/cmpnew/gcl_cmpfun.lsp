@@ -338,8 +338,9 @@
   (si::putprop l 'do-eq-et-al 'c1g))
 
 (defun num-type-bounds (t1)
-  (let ((t1 (cmp-norm-tp t1))
-	(i 1) j)
+  (let* ((t1 (cmp-norm-tp `(and ,t1 real)))
+	 (t1 (if (eq (car t1) 'or) (cmp-norm-tp (mapcar (lambda (x) (if (atom x) x  (cons 'long-float (cdr x)))) t1)) t1))
+	 (i 1) j)
     (mapcar (lambda (x) 
 	      (setq j i i (- i)
 		    x (cond ((atom x) x)
@@ -374,7 +375,7 @@
 (dolist (l `(>= > < <= = /=))
   (si::putprop l 'do-num-relations 'c1g))
 
-(dolist (l `(eq eql equal equalp > >= < <= = /= 
+(dolist (l `(eq eql equal equalp > >= < <= = /= length ;FIXME get a good list here
 		,@(mapcar (lambda (x) (cdr x)) (remove-if-not (lambda (x) (symbolp (cdr x))) +type-alist+))))
   (si::putprop l t 'c1no-side-effects))
 
@@ -434,8 +435,8 @@
 	 (nargs (c1args args info))
 	 (tp (car (rassoc fn +type-alist+))))
     (let ((at (and (not (cdr args)) (info-type (cadar nargs)))))
-      (cond ((and at (type>= tp at)) (c1expr** t info))
-	    ((not (type-and at tp)) (c1expr** nil info))
+      (cond ((and at (type>= tp at)) (c1t))
+	    ((not (type-and at tp)) (c1nil))
 	    ((list 'call-global info fn nargs))))))
 (dolist (l +type-alist+) (when (symbolp (cdr l)) (si::putprop (cdr l) 'do-predicate 'c1g)))
 
@@ -1072,10 +1073,10 @@
   (let* ((info (make-info))
 	(nargs (c1args args info)))
     (setf (info-type info) 
-	  (let ((v (reduce (lambda (x y) (list 'cons (info-type (cadr x)) y)) (append nargs '(null)) :from-end t)))
-	    (if (cons-tp-limit v 0 0)
-		(cmp-norm-tp (nil-to-t v))
-	      'si::proper-list)))
+	  (cmp-norm-tp 'proper-list)
+;	  (let ((v (reduce (lambda (x y) (list 'cons (info-type (cadr x)) y)) (append nargs '(null)) :from-end t)))
+;	    (cmp-norm-tp (if (cons-tp-limit v 0 0) (nil-to-t v) 'proper-list)))
+	  )
     (list 'call-global info 'list nargs)))
 (si::putprop 'list 'c1list 'c1)
       
