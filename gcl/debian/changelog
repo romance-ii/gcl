@@ -70,8 +70,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * more complete backquote fix
   * Fix length error reporting at safety >=1
   * check-type consolidation
+  * use resolve-type to normalize all types in compiler
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 21 Mar 2006 22:19:15 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 21 Mar 2006 22:22:27 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

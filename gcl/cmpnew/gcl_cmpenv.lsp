@@ -496,7 +496,7 @@
 					  decl var)
 				   (push (cons var 'dynamic-extent) ts)))
 			(otherwise
-			 (let ((type (t-to-nil (type-filter stype))))
+			 (let ((type (cmp-norm-tp stype)))
 			   (if type
 			       (dolist** (var (cdr decl))
 					 (cmpck (not (symbolp var))
