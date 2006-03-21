@@ -161,8 +161,14 @@
           )
   (setf (info-type info) (type-and (info-type (cadar (c1args (car args) info)))
 				   (info-type (cadar (c1args (cdr args) info)))))
-  (list 'multiple-value-setq info (reverse vrefs) (c1expr* (cadr args) info))
-  )
+  (let* ((v (c1expr* (cadr args) info))
+	 (it (info-type (cadr v))))
+    (cond ((and (consp it) (eq (car it) 'values))
+	   (do ((tp (cdr it) (cdr tp)) (a (car args) (cdr a)))
+	       ((or (not tp) (not a)) (dolist (a a) (do-setq-tp (car (c1vref a)) '(opaque-function) t)))
+	       (do-setq-tp (car (c1vref (car a))) '(opaque-function) (car tp))))
+	  ((dolist (a (car args)) (do-setq-tp (car (c1vref a)) '(opaque-function) t))))
+    (list 'multiple-value-setq info (reverse vrefs) v)))
 
 
 (defun multiple-value-check (vrefs form)

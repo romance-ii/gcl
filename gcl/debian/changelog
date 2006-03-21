@@ -82,8 +82,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     several values
   * propagate null bindings
   * map-functions return proper-lists
+  * fix c1multiple-value-setq to handle new type modification strategy
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 21 Mar 2006 22:32:11 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 21 Mar 2006 22:32:47 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
