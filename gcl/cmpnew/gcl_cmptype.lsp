@@ -49,8 +49,8 @@
 ;;; Check if THING is an object of the type TYPE.
 ;;; Depends on the implementation of TYPE-OF.
 
-(defvar *car-limit* 5)
-(defvar *cdr-limit* 5)
+(defvar *car-limit* -1);1)
+(defvar *cdr-limit* -1);5)
 (defun cons-tp-limit (x i j)
   (declare (seqind i j))
   (cond ((> i *car-limit*) nil)
@@ -61,7 +61,8 @@
 
 (defun object-type (thing &optional lim)
   (let* ((type (type-of thing)))
-    (cond ((type>= 'integer type) `(integer ,thing ,thing))
+    (cond ((eq thing t) '(member t))
+	  ((type>= 'integer type) `(integer ,thing ,thing))
 	  ((type>= 'short-float type) `(short-float ,thing ,thing))
 	  ((type>= 'long-float type) `(long-float ,thing ,thing))
 	  ((eq type 'cons) (cond ((or lim (cons-tp-limit thing 0 0)) 
@@ -81,7 +82,7 @@
    (r f) 
    (gethash tp *norm-tp-hash*)
    (cond (f r)
-	 ((setf (gethash tp *norm-tp-hash*) (si::normalize-type-int tp t))))))
+	 ((setf (gethash tp *norm-tp-hash*) (let ((tp (resolve-type tp))) (unless (cadr tp) (car tp))))))))
 
 (defun type-and (t1 t2)
   (let ((x (cons t1 t2)))
@@ -99,54 +100,7 @@
      (cond (f r)
 	   ((setf (gethash x *or-tp-hash*) (type-or1-int t1 t2)))))))
 
-;;FIXME -- this function needs a rewrite.  CM 20050106
-(defun type-filter (type)
-  (when (and (symbolp type) (get type 'si::deftype-definition) (not (get type 's-data)) (not (eq type 'string)))
-    (return-from type-filter type))
-  (case type
-    ((character short-float long-float boolean symbol cons list sequence) type)
-    ((single-float double-float) 'long-float)
-    (keyword 'symbol)
-    ((nil t) t)
-    (t (let ((type (cmp-norm-tp type)) element-type)
-	 (case (car type)
-	   ((simple-array array)
-	    (cond ((or (endp (cdr type))
-		       (not (setq element-type
-				  (cond ((eq '*  (cadr type)) nil)
-					((si::best-array-element-type
-					  (cadr type)))
-					(t t)))))
-		   t)	; I don't know.
-		  ((and (not (endp (cddr type)))
-			(not (eq (caddr type) '*))
-			(or (eql (caddr type) 1)
-			    (and (consp (caddr type))
-				 (= (length (caddr type)) 1))))
-		   (case element-type
-		     (bit 'bit-vector)
-		     (t (list 'vector element-type))))
-		  (t (list 'array element-type))))
-	   ((integer signed-byte unsigned-byte) type)
-	   ((short-float) 'short-float)
-	   ((long-float double-float single-float) 'long-float)
-	   ((stream) 'stream)
-	   (t (cond ((car (member type 
-				  '(fixnum integer character short-float long-float
-					   (vector t) string bit-vector
-					   (vector fixnum) (vector short-float) (vector long-float)
-					   (array t) (array bit) (array fixnum)
-					   (array short-float) (array long-float))
-				  :test 'type<=)))
-		    ((eq (car type) 'values)
-		     (if  (null (cddr type))
-			 (list 'values (type-filter (second type)))
-		       t))
-		    ((and (eq (car type) 'satisfies)
-			  (symbolp (second type))
-			  (get (second type) 'type-filter)))
-		    (t t)))
-	   )))))
+(defmacro type-filter (type) `(nil-to-t (cmp-norm-tp ,type)))
 
 (defun literalp (form)
   (or (constantp form) (and (consp form) (eq (car form) 'load-time-value))))
@@ -458,6 +412,7 @@
   (if (= 0 x) (symbol-value '-inf) (log x y)))
 
 (defun log-propagator (f t1 &optional (t2 `(short-float ,(exp 1.0s0) ,(exp 1.0s0))))
+  (declare (ignore f))
   (super-range 'log-wrap t1 t2))
 (si::putprop 'log 'log-propagator 'type-propagator)
 
@@ -467,10 +422,16 @@
 	      (cddr tp) (not (cdddr tp))) (last-cons-type (caddr tp) t))))
 
 (defun cdr-propagator (f t1)
-  (when (or (type>= 'proper-list t1) (eq (last-cons-type t1) 'null))
-    'proper-list))
-;(si::putprop 'cdr 'cdr-propagator 'type-propagator)
+  (cond ((type>= 'null t1) t1) ;FIXME clb ccb do-setq-tp
+	((and (consp t1) (eq (car t1) 'cons)) (caddr t1))
+	((type>= 'proper-list t1) 'proper-list)))
+(si::putprop 'cdr 'cdr-propagator 'type-propagator)
 
+(defun cons-propagator (f t1 t2)
+  (cond ((cons-tp-limit t2 0 0) (cmp-norm-tp `(cons ,t1 ,t2)))
+	((type>= 'proper-list t2) (cmp-norm-tp 'proper-list))
+	((cmp-norm-tp 'cons))))
+(si::putprop 'cons 'cons-propagator 'type-propagator)
 
 (defun mod-propagator (f t1 t2)
   (let ((sr (super-range '* '(integer 0 1) t2)))
@@ -552,13 +513,7 @@
 	 (type-and (second type1) type2))
 	((subtypep1 type2 type1) type2)
 	((subtypep1 type1 type2) type1)
-	((car (resolve-type `(and ,type1 ,type2))))))
-;	((let* ((n (cmp-norm-tp `(and ,type1 ,type2)))
-;		(tem (cmp-norm-tp (car (si::nreconstruct-type (si::nprocess-type n))))))
-;	   (cond ((equal tem (caddr n)) type2) ;;FIXME centralize normalization
-;		 ((equal tem (cadr n)) type1)
-;		 ((not (car tem)) nil)
-;		 (tem))))))
+	((cmp-norm-tp `(and ,type1 ,type2)))))
 		 
 (defun type>= (type1 type2)
   (equal (type-and type1 type2) type2))
@@ -582,14 +537,7 @@
 	((member type2 '(t object *)) type2)
 	((subtypep1 type1 type2) type2)
 	((subtypep1 type2 type1) type1)
-	((car (resolve-type `(or ,type1 ,type2))))))
-;	((let* ((n (cmp-norm-tp `(or ,type1 ,type2)))
-;		(tem (cmp-norm-tp (car (si::nreconstruct-type (si::nprocess-type n))))))
-;	   (cond ((equal tem (caddr n)) type2) ;;FIXME centralize normalization
-;		 ((equal tem (cadr n)) type1)
-;		 ((not (car tem)) nil)
-;		 ((eq (car tem) t))
-;		 (tem))))))
+	((type-filter `(or ,type1 ,type2)))))
 
 (defun reset-info-type (info)
   (if (info-type info)
