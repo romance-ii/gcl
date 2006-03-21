@@ -76,8 +76,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * use with-restore-vars to restore variable settings in conditionally
     executed code
   * fix num-type-bounds on real types, cons tp limit at 0
+  * use with-restore-vars to restore variable settings in conditionally
+    executed code, propagate var types in fmla-infer and fmla-eval-const
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 21 Mar 2006 22:28:25 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 21 Mar 2006 22:29:31 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
