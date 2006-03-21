@@ -121,7 +121,7 @@
 	   (cond ((not ft) nb)
 		 ((every (lambda (x) (if (var-p x) (var-tag x) t)) *vars*)
 		  (let ((nb (cons ft nb)))
-		    (do ((tob (pop ob) (pop ob))) ((not tob)nb) (push (if (typep tob 'tag) tob (c1expr* tob info)) nb))))
+		    (do ((tob (pop ob) (pop ob))) ((not tob) nb) (push (if (typep tob 'tag) tob (c1expr* tob info)) nb))))
 		 ((let ((nt (gensym)) (nb (cons ft nb)) vl)
 		    (dolist (v *vars*) (when (var-p v) (unless (var-tag v) (setf (var-tag v) nt) (push v vl))))
 		    (do ((tob ob ob) (tnb nb nb) dne)
