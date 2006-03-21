@@ -678,7 +678,7 @@ SYMBOL:
 static void
 Lleft_parenthesis_reader()
 {
-	object in, c, x;
+	object in, x;
 	object *p;
 
 	check_arg(2);
@@ -710,6 +710,7 @@ Lleft_parenthesis_reader()
 		  if (*p==OBJNULL) 
 		    READER_ERROR(in,"Object missing after dot.");
 		  else do {
+		    object c=OBJNULL;
 		    read_char_to(c,in,end_of_stream(in));
 		    switch (char_code(c)) {
 		    case ')':

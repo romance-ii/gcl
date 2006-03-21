@@ -1965,7 +1965,7 @@ LFD(Lmake_echo_stream)()
 static int
 stream_to_handle(object s, int output)
 {
-	FILE *f;
+	FILE *f=NULL;
  BEGIN:
 	if (type_of(s) != t_stream)
 		return -1;
@@ -1996,7 +1996,7 @@ stream_to_handle(object s, int output)
 object make_stream_from_fd ( object command, int fd, enum smmode smm )
 {
 	object stream = (object) alloc_object(t_stream);
-        char *mode;
+        char *mode="r";
 	switch(smm)
 	{
 	case smm_input:

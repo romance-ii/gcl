@@ -181,9 +181,10 @@ LFD(Lsymbol_value)(void)
 	if (type_of(sym) != t_symbol)
 		not_a_symbol(sym);
 	if (sym->s.s_dbind == OBJNULL)
-		FEunbound_variable(sym);
+	  FEunbound_variable(sym);
 	else
-		vs_base[0] = sym->s.s_dbind;
+	  vs_base[0] = sym->s.s_dbind;
+
 }
 
 LFD(Lboundp)(void)
@@ -219,6 +220,13 @@ LFD(Lspecial_form_p)(void)
 		vs_base[0] = Ct;
 	else
 		vs_base[0] = Cnil;
+}
+
+DEFUNO_NEW("LEXICAL-BINDING-ENVIRONMENT",object,fSlexical_binding_environment,SI
+	   ,0,0,NONE,OO,OO,OO,OO,void,siLlexical_binding_environment,(void),"") {
+
+  RETURN1(lex_env[0]);
+
 }
 
 DEFUNO_NEW("INTERPRETED-FUNCTION-LAMBDA",object,fSinterpreted_function_lambda,SI

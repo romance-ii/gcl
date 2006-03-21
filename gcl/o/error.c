@@ -162,28 +162,31 @@ Icall_continue_error_handler(object error_name,object error_format_string,int nf
 }
 
 DEFUNO_NEW("ERROR",object,fLerror,LISP
-       ,1,F_ARG_LIMIT,NONE,OO,OO,OO,OO,void,Lerror,(object fmt_string,...),"")
-{ int n = VFUN_NARGS,i=0;
-  object b[F_ARG_LIMIT];
+	   ,1,F_ARG_LIMIT,NONE,OO,OO,OO,OO,void,Lerror,(object name_or_fmt,...),"") {
+
+  int n=VFUN_NARGS-1,i=4;
+  object b[F_ARG_LIMIT],name,fmt_string;
   va_list ap;
 
-  b[0]=sKerror;
+  va_start(ap,name_or_fmt);
+  if (type_of(name_or_fmt)==t_string) {
+    name=sKerror;
+    fmt_string=name_or_fmt;
+  } else {
+    name=name_or_fmt;
+    fmt_string=va_arg(ap,object);
+    n--;
+  }
+  b[0]=name;
   b[1]=Cnil;
   b[2]=ihs_top_function_name(ihs_top-1);
   b[3]=null_string;
   b[4]=fmt_string;
-  i=4;
-  va_start(ap,fmt_string);
-  while (--n)
+  while (n--)
     b[++i]=va_arg(ap,object);
   va_end(ap);
   RETURN1(IapplyVector(sSuniversal_error_handler,++i,b));
-/*    RETURN1(Iapply_fun_n2(sSuniversal_error_handler,5,n-1, */
-/*  			  sKerror, */
-/*  			  Cnil, */
-/*  			  ihs_top_function_name(ihs_top-1), */
-/*  			  null_string,fmt_string, */
-/*  		       &ap)); */
+
 }
 
 DEFUN_NEW("SPECIFIC-ERROR",object,fLspecific_error,LISP
@@ -230,29 +233,30 @@ DEFUN_NEW("SPECIFIC-CORRECTABLE-ERROR",object,fLspecific_correctable_error,LISP
 
 
 DEFUNO_NEW("CERROR",object,fLcerror,LISP
-       ,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,void,Lcerror,(object continue_fmt_string,object fmt_string,...),"")
-{ int n = VFUN_NARGS,i=0;
-  object b[F_ARG_LIMIT];
-  va_list ap;
+	   ,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,void,Lcerror,(object continue_fmt_string,object name_or_fmt,...),"") {
 
-  b[0]=sKerror;
-  b[1]=Cnil;
+  int n=VFUN_NARGS-2,i=4;
+  object b[F_ARG_LIMIT],fmt_string,name;
+  va_list ap;
+  
+  va_start(ap,name_or_fmt);
+  if (type_of(name_or_fmt)==t_string) {
+    name=sKerror;
+    fmt_string=name_or_fmt;
+  } else {
+    name=name_or_fmt;
+    fmt_string=va_arg(ap,object);
+    n--;
+  }
+  b[0]=name;
+  b[1]=Ct;
   b[2]=ihs_top_function_name(ihs_top-1);
-  b[3]=null_string;
+  b[3]=continue_fmt_string;
   b[4]=fmt_string;
-  i=4;
-  n--;
-  va_start(ap,fmt_string);
-  while (--n)
+  while (n--)
     b[++i]=va_arg(ap,object);
   va_end(ap);
   RETURN1(IapplyVector(sSuniversal_error_handler,++i,b));
-/*    RETURN1(Iapply_fun_n2(sSuniversal_error_handler,5,n-2, */
-/*  			  sKerror, */
-/*  			  Ct, */
-/*  			  ihs_top_function_name(ihs_top-1), */
-/*  		       continue_fmt_string,fmt_string, */
-/*  		       &ap)); */
 }
 
 

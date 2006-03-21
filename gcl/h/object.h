@@ -1372,7 +1372,7 @@ extern void *stack_alloc_start,*stack_alloc_end;
                                             _x->sm.sm_fd=fd_;\
                                             _x;})
 
-#define writable_ptr(a_) (((void *)(a_)>=DBEGIN && (void *)(a_)<(void *)heap_end) || is_imm_fixnum(a_))
+#define writable_ptr(a_) (((unsigned long)(a_)>=DBEGIN && (void *)(a_)<(void *)heap_end) || is_imm_fixnum(a_))
 
 #define write_pointer_object(a_,b_) fSwrite_pointer_object(a_,b_)
 

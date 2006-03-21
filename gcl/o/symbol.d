@@ -240,9 +240,9 @@ object s;
 	if (type_of(s) != t_symbol)
 		FEinvalid_variable("~S is not a symbol.", s);
 */
-	if (s->s.s_dbind == OBJNULL)
-		FEunbound_variable(s);
-	return(s->s.s_dbind);
+  if (s->s.s_dbind == OBJNULL)
+    FEunbound_variable(s);
+  return(s->s.s_dbind);
 }
 
 object

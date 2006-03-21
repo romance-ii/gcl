@@ -257,11 +257,14 @@
   (error-name correctable function-name
    continue-format-string error-format-string
    &rest args &aux message)
-  (declare (ignore error-name) (:dynamic-extent args))
+  (declare (:dynamic-extent args))
   (let ((*print-pretty* nil)
         (*print-level* *debug-print-level*)
         (*print-length* *debug-print-level*)
         (*print-case* :upcase))
+    (unless (stringp error-format-string)
+      (setq args (cons error-format-string args))
+      (setq error-format-string (apply 'string-concatenate (cons error-name (make-list (length args) :initial-element " ~s")))))
        (terpri *error-output*)
        (cond ((and correctable *break-enable*)
               (format *error-output* "~&Correctable error: ")
