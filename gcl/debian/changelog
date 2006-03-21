@@ -80,8 +80,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     executed code, propagate var types in fmla-infer and fmla-eval-const
   * fix aref-propagator to work in pass2 when var-type might have
     several values
+  * propagate null bindings
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 21 Mar 2006 22:30:44 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 21 Mar 2006 22:31:15 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

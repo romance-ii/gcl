@@ -480,12 +480,9 @@ Cannot compile ~a.~%"
 	   (values (symbol-function name) warnings failures)))
 	(t (error "can't compile ~a" name))))
 
-(defun assert-type (obj tp)
-  (unless (typep obj tp)
-    (specific-error :wrong-type-argument "~S is not of type ~S." obj tp)))
 
 (defun disassemble (name &optional (asm t) &aux tem)
-  (assert-type name '(or function function-identifier))
+  (check-type name (or function function-identifier))
   (cond ((and (consp name)
 	      (eq (car name) 'lambda))
 	 (eval `(defun cmp-anon ,@ (cdr name)))
