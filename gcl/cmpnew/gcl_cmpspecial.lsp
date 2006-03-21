@@ -60,6 +60,7 @@
   (setq info (copy-info (cadr form)))
   (setq type (type-and (type-filter (car args)) (info-type info)))
   (when (null type)
+    (when (eq (car args) 'boolean) (return-from c1the (c1the (list (car args) `(unless (eq nil ,(cadr args)) t)))))
     (cmpwarn "Type mismatch was found in ~s." (cons 'the args)))
   (setf (info-type info) type)
   (list* (car form) info (cddr form))
