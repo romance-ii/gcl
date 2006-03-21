@@ -45,7 +45,7 @@
 (defun make-sequence (type size &key (initial-element nil iesp))
 
   (let ((x (sequence-type-length-type type)))
-    (when x (assert-type size x)))
+    (when x (check-type-eval size x)))
   (cond 
    ((member type '(list cons null));;FIXME these are accelerators
     (make-list size :initial-element (and iesp initial-element)))
@@ -58,9 +58,9 @@
    ((subtypep1 type 'array)
     (let ((element-type (sequence-type-element-type type)))
       (unless element-type
-	(assert-type type '(member list array)))
+	(check-type type '(member list vector)))
       (make-sequence-vector element-type size iesp initial-element)))
-   ((assert-type type '(member list array)))))
+   ((check-type type '(member list vector)))))
 
 
 (defun concatenate (result-type &rest sequences)

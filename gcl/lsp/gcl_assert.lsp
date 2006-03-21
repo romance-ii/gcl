@@ -34,17 +34,24 @@
 ;(proclaim '(optimize (safety 2) (space 3)))
 
 
-(defmacro check-type (place typespec &optional (string nil s))
-  (declare (optimize (safety 1)))
-  `(do ((*print-level* 4)
-        (*print-length* 4))
-       ((typep ,place ',typespec) nil)
-       (specific-error :wrong-type-argument
-               "The value ~:@(~S~) is not ~A. (bound to variable ~:@(~S~))"
-               ,place ,(if s string `',typespec) ',place )
-       ,(ask-for-form place)
-       (format *error-output* "Now continuing ...~%")))
+(defun check-type-symbol (symbol value typespec &optional s)
+  (do nil
+      ((typep value typespec) value)
+      (let ((*print-level* 4) (*print-length* 4))
+	(cerror (format nil "The value ~:@(~S~) bound to variable ~:@(~S~) is not ~A -- choose a new value" 
+			value symbol (or s typespec))
+		'type-error :datum value :expected-type (or s typespec)))
+      (progn (format  *error-output*
+		      "Please input a new form (to be evaluated) for the place ~:@(~S~): "
+		      symbol)
+	     (finish-output *error-output*)
+	     (setf value (eval (read))))
+      (format *error-output* "Now continuing ...~%")))
 
+(defmacro check-type (place typespec &optional string)
+  (declare (optimize (safety 1)))
+  `(unless (typep ,place ',typespec) (setf ,place (check-type-symbol ',place ,place ',typespec ',string)) nil))
+  
 
 (defmacro assert (test-form &optional places string &rest args)
   (declare (optimize (safety 1)))
@@ -60,10 +67,10 @@
 
 (defun ask-for-form (place)
   `(progn (format  *error-output*
-                   "Please input the new value for the place ~:@(~S~): "
+                   "Please input a new form (to be evaluated) for the place ~:@(~S~): "
                    ',place)
           (finish-output *error-output*)
-          (setf ,place (read))))
+          (setf ,place (eval (read)))))
 
 
 (defmacro ecase (keyform &rest clauses &aux (key (gensym)))

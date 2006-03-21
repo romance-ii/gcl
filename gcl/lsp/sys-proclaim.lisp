@@ -1,6 +1,12 @@
 
 (IN-PACKAGE "SYSTEM") 
 (PROCLAIM
+    '(FTYPE (FUNCTION (FIXNUM T T *) T) check-type-symbol))
+(PROCLAIM
+    '(FTYPE (FUNCTION () T) lexical-binding-environment))
+(PROCLAIM
+    '(FTYPE (FUNCTION (T T SEQIND T) T) prune-type))
+(PROCLAIM
     '(FTYPE (FUNCTION (SEQIND T) T) SMALLNTHCDR))
 (PROCLAIM
     '(FTYPE (FUNCTION (T SEQIND T T) T) BIGNTHCDR))
@@ -110,7 +116,7 @@
             DECODE-UNIVERSAL-TIME READ-FROM-STRING STEPPER APROPOS
             FTRUNCATE PPRINT-DISPATCH SHOW-INFO NLOAD APROPOS-DOC)) 
 (PROCLAIM
-    '(FTYPE (FUNCTION (T) T) sequencep short-float-p long-float-p ratiop
+    '(FTYPE (FUNCTION (T) T) proper-listp sequencep short-float-p long-float-p ratiop
 	    first second third fourth fifth sixth seventh eighth ninth tenth
 	    improper-consp TYPE-OF CLASS-OF NON-LOGICAL-PATHNAME-P DO-F SLOOP::POINTER-FOR-COLLECT
 	    sequence-type-element-type  sequence-type-element-type-int

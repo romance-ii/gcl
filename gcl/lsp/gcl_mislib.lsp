@@ -208,6 +208,7 @@
 			((+ x (* 2 (1+ most-positive-fixnum))))))))))
 
 (defun room (&optional x)
+  (declare (ignore x))
   (let ((l (multiple-value-list (si:room-report)))
         maxpage holepage leftpage ncbpage maxcbpage ncb cbgbccount npage
         rbused rbfree nrbpage rbgbccount
