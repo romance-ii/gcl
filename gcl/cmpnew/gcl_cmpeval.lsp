@@ -208,7 +208,7 @@
 (defun result-type-from-args (f args)
   (when (not (eq '* (get f 'return-type))) ;;FIXME  make sure return-type and proclaimed-return-type are in sync
     (let* ((be (get f 'type-propagator))
-	   (ba (and be (apply be f (mapcar #'coerce-to-one-value args)))))
+	   (ba (and be (si::dt-apply be (cons f (mapcar 'coerce-to-one-value args))))));FIXME
       (when ba
 	(return-from result-type-from-args ba)))
     (dolist (v '(inline-always inline-unsafe))
@@ -425,25 +425,44 @@
   (declare (vector x))
   (if (array-has-fill-pointer-p x) (fill-pointer x) (array-dimension x 0)))
 
+(defmacro with-var-form-type ((v f tp) &rest body)
+  ``(let ((,,v ,,f))
+     ,@(when *compiler-check-args* `((check-type ,,v ,,tp)))
+     (let ((,,v ,,v))
+       (declare (,,tp ,,v))
+       ,,@body)))
+
+(defun elt-expander (form env)
+  (declare (ignore env))
+  (let ((i (gensym)) (s (gensym)))
+    (with-var-form-type 
+     (s (cadr form) 'sequence)
+     (with-var-form-type 
+      (i (caddr form) 'seqind)
+      `(if (listp ,s) (nth ,i ,s) (aref ,s ,i))))))
+(si::putprop 'elt (function elt-expander) 'si::compiler-macro-prop)
+
+
 (defun length-expander (form env)
   (declare (ignore env))
   (let ((i (gensym)) (s (gensym)))
-    `(let ((,s ,(cadr form)))
-       ,(if *compiler-check-args* `(check-type ,s sequence) `(declare (sequence ,s)))
-       (the seqind ;FIXME
-	    (if (listp ,s)	
-		(do ((,i 0 (1+ ,i)) (,s ,s (cdr ,s))) ((endp ,s) ,i)
-		    (declare (seqind ,i)))
-	      (let ((,s ,s)) ;;FIXME should be automatic co1typep
-		(cmp-vec-length ,s)))))))
+    (with-var-form-type (s (cadr form) 'sequence)
+     `(the seqind ;FIXME
+	  (if (listp ,s)	
+	      (do ((,i 0 (1+ ,i)) (,s ,s (cdr ,s))) ((endp ,s) ,i)
+		  (declare (seqind ,i)))
+	    (let ((,s ,s)) ;;FIXME should be automatic co1typep
+	      (cmp-vec-length ,s)))))))
 (si::putprop 'length (function length-expander) 'si::compiler-macro-prop)
 
 
 (defun endp-expander (form env)
   (declare (ignore env))
-  (if *compiler-check-args*
-      `(not (or (consp ,(cadr form)) (check-type ,(cadr form) null)))
-    `(not ,(cadr form))))
+  (let ((x (gensym)))
+    `(let ((,x ,(cadr form)))
+       (cond ,@(when *compiler-check-args* `(((consp ,x) nil)))
+	     ((not ,x))
+	     ,@(when *compiler-check-args* `(((error 'type-error :datum ,x :expected-type 'list))))))));;cannot continue
 (si::putprop 'endp (function endp-expander) 'si::compiler-macro-prop)
   
 (defun garef (a i l)
@@ -536,7 +555,7 @@
 		      ,k (ash ,j 1))
 		  (return-from ,block))))))))
 
-(defconstant +hash-index-type+ (car (si::resolve-type `(or (integer -1 -1) seqind))))
+(defconstant +hash-index-type+ (car (resolve-type `(or (integer -1 -1) seqind))))
 
 (defun sort-expander (form env)
   (declare (ignore env))
@@ -982,6 +1001,8 @@
                                   (setq forms (reverse fl)))))
                   (list 'call-local info (cddr fd) forms))
              (c1expr (cmp-expand-macro fd fname args))))
+	((and (get fname 'c1no-side-effects) (every 'constantp args))
+	 (c1expr `(quote ,(cmp-eval `(,fname ,@args)))))
         ((let ((fn (get fname 'si::compiler-macro-prop)) (res (cons fname args)))
 	   (and fn
 		(let ((fd (cmp-eval `(funcall ',fn ',res nil))))
@@ -990,8 +1011,6 @@
 	((and (setq fd (get fname 'co1))
 	      (inline-possible fname)
 	      (funcall fd fname args)))
-	((and (get fname 'c1no-side-effects) (every 'constantp args))
-	 (c1expr `(quote ,(cmp-eval `(,fname ,@args)))))
         ((and (setq fd (get fname 'c1)) (inline-possible fname))
          (funcall fd args))
         ((and (setq fd (get fname 'c1g)) (inline-possible fname))
