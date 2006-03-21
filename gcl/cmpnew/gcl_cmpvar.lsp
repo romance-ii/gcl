@@ -59,7 +59,6 @@
   		;;; Not used for LEXICAL.
   (dt t)	;;; Declared Type of the variable.
   (type t)	;;; Current Type of the variable.
-  (brt t)	;;; Restriction super-type in this if branch FIXME probably unnecessary as a slot
   (mt t)	;;; Maximum type of the life of this binding
   tag           ;;; Inner tag (to binding) being analyzed if any
   (register 0 :type unsigned-short)  ;;; If greater than specified am't this goes into register.
@@ -347,13 +346,16 @@
   )
 
 ;(defconstant +useful-c-types+ '(fixnum short-float long-float proper-list t)) ;FIXME
-(defconstant +useful-c-types+ '(fixnum short-float long-float t)) ;FIXME
+(defconstant +useful-c-types+ '(fixnum short-float long-float proper-list t)) ;FIXME
 
 (defun do-setq-tp (v form t1)
   (when (eq (var-kind v) 'lexical)
     (let* ((tp (type-and (var-dt v) t1)))
       (unless tp
 	(cmpwarn "Type mismatches between ~s/~s and ~s/~s." (var-name v) (var-dt v) form t1))
+      (when (boundp '*restore-vars*) 
+	(unless (member v *restore-vars* :key 'car)
+	  (push (list v (var-type v)) *restore-vars*)))
       (setf (var-type v) tp)
       (unless (type>= (var-mt v) tp)
 	(setf (var-mt v) (type-or1 (var-mt v) tp))
@@ -363,7 +365,7 @@
 		 (tp (type-and (var-dt v) t1)))
 	    (unless (and (type>= (var-mt v) tp)
 			 (every (lambda (x) (eq t (var-tag x))) (info-referred-array (second ff))))
-	      (let* ((nmt (car (member (var-mt v) +useful-c-types+ :test (lambda (x y) (and (type>= y x) (or (eq y t) (not (type>= x y))))))))
+	      (let* ((nmt (car (member (var-mt v) +useful-c-types+ :test 'type<=)))
 		     (nmt (type-and nmt (var-dt v))))
 		(setf (var-mt v) nmt)))
 	    (setf (var-type v) (var-mt v))

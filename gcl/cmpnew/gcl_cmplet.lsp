@@ -222,6 +222,7 @@
 	  (var-mt v) (var-type v)
 	  (var-loc v) (unless (and (eq (var-loc v) 'object)
 				   (t-to-nil (var-type v))) (var-loc v)))))
+
 (defun c1let (args &aux (info (make-info))(setjmps *setjmps*)
                         (forms nil) (vars nil) (vnames nil)
                         ss is ts body other-decls
@@ -240,7 +241,8 @@
            (let ((v (c1make-var x ss is ts)))
                 (push x vnames)
                 (push v vars)
-                (push (default-init (var-type v)) forms)))
+                (set-var-init-type (car vars) 'null)
+		(push (default-init (var-type v)) forms)))
           (t (cmpck (not (and (consp x) (or (endp (cdr x)) (endp (cddr x)))))
                     "The variable binding ~s is illegal." x)
              (let ((v (c1make-var (car x) ss is ts)))
@@ -374,6 +376,7 @@
                 (push x vnames)
                 (push (default-init (var-type v)) forms)
                 (push v vars)
+                (set-var-init-type (car vars) 'null)
                 (push v *vars*)))
           ((not (and (consp x) (or (endp (cdr x)) (endp (cddr x)))))
            (cmperr "The variable binding ~s is illegal." x))

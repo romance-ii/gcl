@@ -86,8 +86,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * coerce general types within '(the boolean )
   * type centralization around cmp-norm-tp and resolve-type, cons-tp-
     limit at 0, eliminate type-filter
+  * proper-list is a useful-c-type, remove brt slot in var
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 21 Mar 2006 22:35:29 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 21 Mar 2006 22:36:18 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
