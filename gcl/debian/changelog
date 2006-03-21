@@ -81,8 +81,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * fix aref-propagator to work in pass2 when var-type might have
     several values
   * propagate null bindings
+  * map-functions return proper-lists
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 21 Mar 2006 22:31:15 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 21 Mar 2006 22:32:11 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

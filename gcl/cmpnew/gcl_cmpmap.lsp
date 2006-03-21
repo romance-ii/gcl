@@ -44,8 +44,8 @@
         (too-few-args 'map-function 2 (length args)))
   (setq funob (c1funob (car args)))
   (setq info (copy-info (cadr funob)))
-  (list name info funob car-p (c1args (cdr args) info))
-  )
+  (setf (info-type info) 'proper-list)
+  (list name info funob car-p (c1args (cdr args) info)))
 
 (defun c2mapcar (funob car-p args &aux (*vs* *vs*) (*inline-blocks* 0))
   (let ((label (next-label*))
