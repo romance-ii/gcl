@@ -64,6 +64,12 @@
 ;;; when the compiler begins to process a closure.  A local macro definition
 ;;; is a list ( macro-name expansion-function).
 
+(defmacro with-restore-vars (&rest body); `(progn ,@body))
+  (let ((l (gensym)))
+    `(let (*restore-vars* ,l)
+       (unwind-protect (progn ,@body)
+	 (do nil ((not (setq ,l (pop *restore-vars*)))) (setf (var-type (car ,l)) (cadr ,l)))))))
+
 (defun c1flet (args &aux body ss ts is other-decl info
                          (defs1 nil) (local-funs nil) (closures nil) (*info* (copy-info *info*)))
   (when (endp args) (too-few-args 'flet 1 0))
@@ -81,9 +87,10 @@
     (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
     
     (let ((*vars* *vars*))
-      (c1add-globals ss)
-      (check-vdecl nil ts is)
-      (setq body (c1decl-body other-decl body)))
+      (with-restore-vars 
+       (c1add-globals ss)
+       (check-vdecl nil ts is)
+       (setq body (c1decl-body other-decl body))))
 
     (setq info (copy-info (cadr body))))
   
@@ -93,7 +100,12 @@
 		   (*funs* (cons 'cb *funs*))
 		   (*blocks* (cons 'cb *blocks*))
 		   (*tags* (cons 'cb *tags*)))
-               (let ((lam (c1lambda-expr (cadr def) (fun-name (car def)))))
+               (let ((lam 
+		      (with-restore-vars 
+		       (mapc (lambda (x) (when (var-p x) 
+					   (push (list x (var-type x)) *restore-vars*) 
+					   (setf (var-type x) (var-dt x)))) *vars*)
+		       (c1lambda-expr (cadr def) (fun-name (car def))))))
 		 (add-info info (cadr lam))
 		 ;; fun-info, CM 20031008  accumulate local function info, particularly changed-vars,
 		 ;; and pass upwards to call-local and call-global to prevent certain inlining in inline-args
@@ -105,7 +117,12 @@
 	     (let ((*blocks* (cons 'lb *blocks*))
 		   (*tags* (cons 'lb *tags*))
 		   (*vars* (cons 'lb *vars*)))
-               (let ((lam (c1lambda-expr (cadr def) (fun-name (car def)))))
+               (let ((lam 
+		      (with-restore-vars 
+		       (mapc (lambda (x) (when (var-p x) 
+					   (push (list x (var-type x)) *restore-vars*) 
+					   (setf (var-type x) (var-dt x)))) *vars*)
+		       (c1lambda-expr (cadr def) (fun-name (car def))))))
 		 (add-info info (cadr lam))
 		 ;; fun-info, CM 20031008  accumulate local function info, particularly changed-vars,
 		 ;; and pass upwards to call-local and call-global to prevent certain inlining in inline-args
@@ -130,11 +147,15 @@
     (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
     
     (let ((*vars* *vars*))
-      (c1add-globals ss)
-      (check-vdecl nil ts is)
-      (setq body (c1decl-body other-decl body)))
+      (with-restore-vars
+       (mapc (lambda (x) (when (and (var-p x) (or (var-ref-ccb x) (eq 'clb (var-loc x))))
+			   (push (list x (var-type x)) *restore-vars*)
+			   (setf (var-type x) (var-dt x)))) *vars*)
+       (c1add-globals ss)
+       (check-vdecl nil ts is)
+       (setq body (c1decl-body other-decl body))))
 
-    ;; Apparently this is not scricttly necessary, just changes to body
+    ;; Apparently this is not strictly necessary, just changes to body
     (add-info info (cadr body)))
   
   (if (or local-funs closures)
@@ -198,9 +219,11 @@
 
   (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
   (let ((*vars* *vars*))
-       (c1add-globals ss)
-       (check-vdecl nil ts is)
-       (setq body (c1decl-body other-decl body)))
+    (with-restore-vars
+     (c1add-globals ss)
+     (check-vdecl nil ts is)
+     (setq body (c1decl-body other-decl body))))
+
   (setq info (copy-info (cadr body)))
 
   (block local-process
@@ -214,7 +237,12 @@
          (let ((*blocks* (cons 'lb *blocks*))
                (*tags* (cons 'lb *tags*))
                (*vars* (cons 'lb *vars*)))
-              (let ((lam (c1lambda-expr (cadddr def) (fun-name (car def)))))
+              (let ((lam 
+		     (with-restore-vars
+		      (mapc (lambda (x) (when (var-p x) 
+					  (push (list x (var-type x)) *restore-vars*)
+					  (setf (var-type x) (var-dt x)))) *vars*)
+		      (c1lambda-expr (cadddr def) (fun-name (car def))))))
                    (add-info info (cadr lam))
 		   ;; fun-info, CM 20031008  accumulate local function info, particularly changed-vars,
 		   ;; and pass upwards to call-local and call-global to prevent certain inlining in inline-args
@@ -236,7 +264,12 @@
                (*funs* (cons 'cb *funs*))
                (*blocks* (cons 'cb *blocks*))
                (*tags* (cons 'cb *tags*)))
-              (let ((lam (c1lambda-expr (cadddr def) (fun-name (car def)))))
+              (let ((lam 
+		     (with-restore-vars
+		      (mapc (lambda (x) (when (var-p x) 
+					  (push (list x (var-type x)) *restore-vars*)
+					  (setf (var-type x) (var-dt x)))) *vars*)
+		      (c1lambda-expr (cadddr def) (fun-name (car def))))))
                    (add-info info (cadr lam))
 		   ;; fun-info, CM 20031008  accumulate local function info, particularly changed-vars,
 		   ;; and pass upwards to call-local and call-global to prevent certain inlining in inline-args
@@ -259,9 +292,13 @@
 
   (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
   (let ((*vars* *vars*))
-    (c1add-globals ss)
-    (check-vdecl nil ts is)
-    (setq body (c1decl-body other-decl body)))
+    (with-restore-vars
+     (mapc (lambda (x) (when (and (var-p x) (or (var-ref-ccb x) (eq 'clb (var-loc x))))
+			 (push (list x (var-type x)) *restore-vars*)
+			 (setf (var-type x) (var-dt x)))) *vars*)
+     (c1add-globals ss)
+     (check-vdecl nil ts is)
+     (setq body (c1decl-body other-decl body))))
   (add-info info (cadr body))
 
   (if (or local-funs closures)

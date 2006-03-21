@@ -73,8 +73,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * use resolve-type to normalize all types in compiler
   * new expanders for elt, length, and endp respecting safety 1 arg
     checking
+  * use with-restore-vars to restore variable settings in conditionally
+    executed code
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 21 Mar 2006 22:23:43 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 21 Mar 2006 22:25:23 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
