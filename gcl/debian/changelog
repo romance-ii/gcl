@@ -92,8 +92,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * check-type consolidation, proper-list propagation and logic, not in
     predicate list, ldelete-if, prune-type
   * O3 ->  Os
+  * extern inline __gmpz_get_strp
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 21 Mar 2006 22:44:18 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 22 Mar 2006 15:29:02 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

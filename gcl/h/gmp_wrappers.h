@@ -75,8 +75,8 @@ GMP_EXTERN int jmp_gmp;
 #undef mpz_get_strp
 #define mpz_get_strp __gmpz_get_strp
 
-static char *
-__gmpz_get_strp(char **a,int b,mpz_t c) {return __gmpz_get_str(*a,b,c);}
+GMP_EXTERN_INLINE char *
+__gmpz_get_strp(char **a,int b,mpz_t c) {return __gmpz_get_str(*a,b,c);} /*FIXME*/
 
 /* GMP_WRAPPERS: the gmp library uses heap allocation in places for
    temporary storage.  This greatly complicates relocatable bignum
