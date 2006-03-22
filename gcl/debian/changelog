@@ -93,8 +93,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     predicate list, ldelete-if, prune-type
   * O3 ->  Os
   * extern inline __gmpz_get_strp
+  * prune cmpinclude.h
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 22 Mar 2006 15:29:02 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 22 Mar 2006 15:29:35 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
