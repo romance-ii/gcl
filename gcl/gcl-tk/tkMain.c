@@ -274,7 +274,7 @@ TkX_Wish (argc, argv)
      * Parse command-line arguments.
      */
 
-    if (Tk_ParseArgv(interp, (Tk_Window) NULL, &argc, (const char **)argv, argTable, 0)
+    if (Tk_ParseArgv(interp, (Tk_Window) NULL, &argc, (void *)argv, argTable, 0)
 	    != TCL_OK) {
 	fprintf(stderr, "%s\n", interp->result);
 	exit(1);
@@ -326,7 +326,7 @@ TkX_Wish (argc, argv)
      * specified on the command line.
      */
 
-    args = Tcl_Merge(argc-1, (const char **)argv+1);
+    args = Tcl_Merge(argc-1, (void *)argv+1);
     Tcl_SetVar(interp, "argv", args, TCL_GLOBAL_ONLY);
     ckfree(args);
     sprintf(buf, "%d", argc-1);
@@ -565,8 +565,8 @@ StdinProc(clientData, mask)
 	  if (msg->type == m_tcl_command_wait_response
 	      || code)
 	    {
-	      unsigned char buf[4];
-	      unsigned char *p = buf;
+	      char buf[4];
+	      char *p = buf;
 	      /*header */
 	      *p++ = (code ? '1' : '0');
 	      bcopy(msg->msg_id,p,3);

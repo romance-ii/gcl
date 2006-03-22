@@ -98,8 +98,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * type-error in non-ansi image
   * faster nth-value from tkl.lisp into gcl_listlib.lsp
   * clean up some warnings +c1t+ and +c1nil+ constants
+  * clean tkMain.c warnings
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 22 Mar 2006 15:51:02 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 22 Mar 2006 16:14:50 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
