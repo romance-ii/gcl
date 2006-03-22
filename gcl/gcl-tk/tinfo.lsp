@@ -383,7 +383,7 @@
 
 
 (defun show-this-node (textwin x y)
- (let ((inds (get_tag_range  textwin  'xref "@": x :",": y  :return
+ (let ((inds (get_tag_range  textwin  'xref "@" :|| x :"," :|| y  :return
 		      'list-strings)))
    (cond ((and inds (listp inds) (eql (length inds) 2))
 	  (show-info (nsubstitute #\space #\newline

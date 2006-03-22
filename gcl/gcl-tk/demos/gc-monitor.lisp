@@ -73,8 +73,8 @@
 		  wid : "c" ht
 		  :width "3m" :tag "graph" :fill "aquamarine4" )
 	(funcall (conc f '.data) :configure :text
-		 gccount	: " gc's for ": npages :
-		 " pages (used=" : nused : ")")
+		 gccount	: " gc's for " :|| npages :
+		 " pages (used=" :|| nused : ")")
 	(cond ((eql special-type v)
 	       (cond
 		(clicked
