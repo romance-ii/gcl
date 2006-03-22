@@ -281,3 +281,6 @@
 
 /* Define if we are using a builtin Th interpreter. */
 #undef HAVE_TK
+
+/* If using WinMain entry point on WIndows rather than main (). */
+#undef WITH_WINMAIN

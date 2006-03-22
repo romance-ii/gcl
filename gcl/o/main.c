@@ -59,6 +59,10 @@ void initialize_process();
 
 #ifdef _WIN32
 
+#ifdef WITH_WINMAIN
+#  include <windows.h>
+#endif
+
 extern void init_shared_memory (void);
 int is_shared_memory_initialised = FALSE;
 
@@ -136,8 +140,186 @@ clear_c_stack(VOL unsigned n) {
 
 unsigned long cssize      = 0;
 
+#ifdef WITH_WINMAIN
+
+
+#  define MAX_CONSOLE_LINES 500
+
+void SetupConsole ( void )
+{
+#if 1
+
+    AllocConsole( );
+    freopen("CONIN$","rb",stdin);
+    freopen("CONOUT$","wb",stdout);
+    freopen("CONOUT$","wb",stderr);
+
+#else
+    int hConHandle;
+    long lStdHandle;
+    CONSOLE_SCREEN_BUFFER_INFO coninfo;
+    FILE *fp;
+
+    /* allocate a console for this app */
+    AllocConsole();
+
+    /* set the screen buffer to be big enough to let us scroll text */
+    GetConsoleScreenBufferInfo ( GetStdHandle (STD_OUTPUT_HANDLE), &coninfo );
+    coninfo.dwSize.Y = MAX_CONSOLE_LINES;
+    SetConsoleScreenBufferSize ( GetStdHandle (STD_OUTPUT_HANDLE), coninfo.dwSize);
+
+    /* redirect unbuffered STDOUT to the console */
+    lStdHandle = (long)GetStdHandle(STD_OUTPUT_HANDLE);
+    hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+    fp = _fdopen( hConHandle, "w" );
+    *stdout = *fp;
+    setvbuf( stdout, NULL, _IONBF, 0 );
+
+    /* redirect unbuffered STDIN to the console */
+    lStdHandle = (long)GetStdHandle(STD_INPUT_HANDLE);
+    hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+    fp = _fdopen( hConHandle, "r" );
+    *stdin = *fp;
+    setvbuf( stdin, NULL, _IONBF, 0 );
+
+    /* redirect unbuffered STDERR to the console */
+    lStdHandle = (long)GetStdHandle(STD_ERROR_HANDLE);
+    hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+    fp = _fdopen( hConHandle, "w" );
+    *stderr = *fp;
+    setvbuf( stderr, NULL, _IONBF, 0 );
+#endif
+}
+
+
+/* Borrowed from TK 8.4.2 */
+
+static void
+setargv ( int *argcPtr, char ***argvPtr )
+{
+    char *p, *arg, *argSpace;
+    char **argv;
+    int argc, size, inquote, copy, slashes;
+    LPTSTR cmdLine = GetCommandLine ();
+    
+    /*
+     * Precompute an overly pessimistic guess at the number of arguments
+     * in the command line by counting non-space spans.
+     */
+
+    size = 2;
+    for (p = cmdLine; *p != '\0'; p++) {
+	if ((*p == ' ') || (*p == '\t')) {	/* INTL: ISO space. */
+	    size++;
+	    while ((*p == ' ') || (*p == '\t')) { /* INTL: ISO space. */
+		p++;
+	    }
+	    if (*p == '\0') {
+		break;
+	    }
+	}
+    }
+    argSpace = (char *) malloc ( (unsigned) (size * sizeof (char *) + strlen ( cmdLine ) + 1 ) );
+    argv = (char **) argSpace;
+    argSpace += size * sizeof(char *);
+    size--;
+
+    p = cmdLine;
+    for (argc = 0; argc < size; argc++) {
+	argv[argc] = arg = argSpace;
+	while ((*p == ' ') || (*p == '\t')) {	/* INTL: ISO space. */
+	    p++;
+	}
+	if (*p == '\0') {
+	    break;
+	}
+
+	inquote = 0;
+	slashes = 0;
+	while (1) {
+	    copy = 1;
+	    while (*p == '\\') {
+		slashes++;
+		p++;
+	    }
+	    if (*p == '"') {
+		if ((slashes & 1) == 0) {
+		    copy = 0;
+		    if ((inquote) && (p[1] == '"')) {
+			p++;
+			copy = 1;
+		    } else {
+			inquote = !inquote;
+		    }
+                }
+                slashes >>= 1;
+            }
+
+            while (slashes) {
+		*arg = '\\';
+		arg++;
+		slashes--;
+	    }
+
+	    if ((*p == '\0')
+		    || (!inquote && ((*p == ' ') || (*p == '\t')))) { /* INTL: ISO space. */
+		break;
+	    }
+	    if (copy != 0) {
+		*arg = *p;
+		arg++;
+	    }
+	    p++;
+        }
+	*arg = '\0';
+	argSpace = arg + 1;
+    }
+    argv[argc] = NULL;
+
+    *argcPtr = argc;
+    *argvPtr = argv;
+}
+
+int APIENTRY
+WinMain ( HINSTANCE hInstance,
+	  HINSTANCE hPrevInstance,
+	  LPSTR lpszCmdLine,
+	  int nCmdShow )
+{
+    char **argv, **envp = NULL;
+    int argc;
+    setargv ( &argc, &argv );
+    {
+        int index = 1;
+        int console = TRUE;
+        while ( argv[index] ) {
+	    if ( 0 == strcmp ( argv[index], "-noconsole" ) ) {
+	        console = FALSE;
+	    }
+	    index++;
+        }
+        if ( console ) {
+	  SetupConsole ();
+	} 
+    }
+    gcl_main ( argc, argv, envp );
+    FreeConsole ();
+}
+
+#else /* WITH_WINMAIN */
+
 int
-main(int argc, char **argv, char **envp) {
+main(int argc, char **argv, char **envp)
+{
+  gcl_main ( argc, argv, envp );
+}
+ 
+#endif /* WITH_WINMAIN */
+
+int
+gcl_main(int argc, char **argv, char **envp)
+{
+
 #if defined ( BSD ) && defined ( RLIMIT_STACK )
     struct rlimit rl;
 #endif

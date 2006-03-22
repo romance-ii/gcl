@@ -95,6 +95,10 @@ AC_ARG_ENABLE(common-binary,
                          instruction sets, (default is =yes)],
 [use_common_binary=$enableval],[use_common_binary="yes"])
 
+AC_ARG_ENABLE(winmain,
+[ --enable-winmain=no   will use WinMain rather than main, (default is =no)],
+[use_winmain=$enableval],[use_winmain="no"])
+
 AC_ARG_ENABLE(japi,
 [ --enable-japi=yes      will compile in support for the JAPI graphical
                          interface if present on your system],
@@ -274,9 +278,18 @@ case $canonical in
      i*mingw*)
        if test "$use_common_binary" = "yes"; then
          host=i386-pc-mingw32
-         PROCESSOR_FLAGS="-march=i686 -mfpmath=387"
+         arch_flags="-march=i686 -mfpmath=387"
          echo "The host is canonicalised to $host"
        fi
+
+       if test "$use_winmain" = "yes"; then
+         win_flags=-mwindows
+	 AC_DEFINE(WITH_WINMAIN)
+         echo "Using WinMain entry point."
+       fi
+
+       PROCESSOR_FLAGS="$arch_flags $win_flags"
+
        # If we have set the C stack size on the command line then send them to
        # the linker.  Set a default otherwise of 2 Mbytes (Windows default).
        if test "$enable_cssize" == "" ; then
@@ -468,7 +481,7 @@ if test "$GCC" = "yes" ; then
 	     *mingw*)
 	        echo "WARNING: Remove -fno-zero-initialized-in-bss from makedefs if gcc less than 3.3.1."
 	        echo "         It is ptherwise needed for the Unexec stuff to work."
-		TCFLAGS="$TCFLAGS -fno-zero-initialized-in-bss -mms-bitfields";;
+		TCFLAGS="$TCFLAGS -fno-zero-initialized-in-bss -mms-bitfields $win_flags";;
         esac
 fi
 #if test -f /proc/sys/kernel/exec-shield ; then
@@ -2384,7 +2397,7 @@ AC_SUBST(LEADING_UNDERSCORE)
 AC_SUBST(GNU_LD)
 
 if test "$use" = "mingw" ; then
-   LD_STACK_FLAGS="-Wl,--stack=$enable_cssize"
+   LD_STACK_FLAGS="$win_flags -Wl,--stack=$enable_cssize"
    AC_SUBST(LD_STACK_FLAGS)
 fi
 
