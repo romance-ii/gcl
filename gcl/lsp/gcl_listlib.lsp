@@ -262,8 +262,8 @@
   (cadr (cddddr (cddddr x))))
 
 ; Courtesy Paul Dietz
-;(defmacro nth-value (n expr)
-;  (declare (optimize (safety 1)))
-;  `(nth ,n (multiple-value-list ,expr)))
-(defmacro nth-value (n form)
-  `(multiple-value-bind ,(make-list (+ n 1) :initial-element 'a) ,form  a))
+(defmacro nth-value (n expr)
+  (declare (optimize (safety 1)))
+  `(nth ,n (multiple-value-list ,expr)))
+;(defmacro nth-value (n form)
+;  `(multiple-value-bind ,(make-list (+ n 1) :initial-element 'a) ,form  a))
