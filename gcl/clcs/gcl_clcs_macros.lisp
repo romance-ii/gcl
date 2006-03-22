@@ -164,7 +164,7 @@
 (defun check-type-internal (symbol value type &optional type-string)
   (tagbody
    tag
-   (if (typep value type) (return-from check-type-symbol value)
+   (if (typep value type) (return-from check-type-internal value)
      (restart-case 
       (specific-error :wrong-type-argument ;FIXME lose specific-error for cerror
 		      "The value ~:@(~S~) is not ~A. (bound to variable ~:@(~S~))"
