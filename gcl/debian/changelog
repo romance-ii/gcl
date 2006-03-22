@@ -101,8 +101,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * clean tkMain.c warnings
   * clean some gcl-tk warnings
   * O3 for the interpreter
+  * fix max/min propagator
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 22 Mar 2006 16:38:16 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 22 Mar 2006 17:17:52 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

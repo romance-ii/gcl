@@ -1008,14 +1008,14 @@
 ;(si::putprop 'max 'super-range 'type-propagator)
 (push '((t t) t #.(flags set)"@01;(number_compare(#0,#1)>=0?(#0):#1)")
    (get 'max 'inline-always))
- (push '((fixnum fixnum) fixnum #.(flags rfa set)"@01;((#0)>=(#1)?(#0):#1)")
+ (push '((fixnum-float fixnum-float) fixnum-float #.(flags rfa set)"@01;((#0)>=(#1)?(#0):#1)")
    (get 'max 'inline-always))
 
 ;;MIN
 ;(si::putprop 'min 'super-range 'type-propagator)
 (push '((t t) t #.(flags set)"@01;(number_compare(#0,#1)<=0?(#0):#1)")
    (get 'min 'inline-always))
-(push '((fixnum fixnum) fixnum #.(flags rfa set)"@01;((#0)<=(#1)?(#0):#1)")
+(push '((fixnum-float fixnum-float) fixnum-float #.(flags rfa set)"@01;((#0)<=(#1)?(#0):#1)")
    (get 'min 'inline-always))
 
 ;;MINUSP

@@ -405,11 +405,17 @@
 
 (dolist (l '(/ floor ceiling truncate round ffloor fceiling ftruncate fround))
   (si::putprop l t 'zero-pole))
-(dolist (l '(+ - * / exp float sqrt atan max min))
+(dolist (l '(+ - * / exp float sqrt atan))
   (si::putprop l 'super-range 'type-propagator))
 
 (defun log-wrap (x y)
   (if (= 0 x) (symbol-value '-inf) (log x y)))
+
+(defun max-propagator (f t1 &optional (t2 nil t2p))
+  (cond ((not t2p) (super-range f t1))
+	((member-if (lambda (x) (and (type>= x t1) (type>= x t2))) +real-contagion-list+) (super-range f t1 t2)))) ;;FIXME super-range needs to handle or types, right now punt to rfa in gcl_cmpopt.
+(si::putprop 'max 'max-propagator 'type-propagator)
+(si::putprop 'min 'max-propagator 'type-propagator)
 
 (defun log-propagator (f t1 &optional (t2 `(short-float ,(exp 1.0s0) ,(exp 1.0s0))))
   (declare (ignore f))
