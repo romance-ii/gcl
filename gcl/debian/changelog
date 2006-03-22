@@ -106,8 +106,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * fix (rotatef) bug
   * No __VERSION__ in h/cmpinclude.h
   * ~ in compile-file paths
+  * Fix gemtemp package arg
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 22 Mar 2006 21:22:08 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 22 Mar 2006 21:25:15 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

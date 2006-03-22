@@ -555,7 +555,12 @@ DEFVAR("*GENSYM-COUNTER*",sLgensym_counter,LISP,make_fixnum(0),"");
 	int i, j;
 @
 	check_type_string(&prefix);
-	check_type_package(&pack);
+        if (type_of(pack)!=t_package) 
+           {object tem; 
+            tem=find_package(pack);
+            if (tem==Cnil) FEerror("No package named ~a exists",1,pack); 
+            pack=tem;}
+/* 	check_type_package(&pack); */
 /*
 	gentemp_counter = 0;
 */
