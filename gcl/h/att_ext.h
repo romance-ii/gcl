@@ -622,7 +622,7 @@ EXTER object sLseqind,sLrnkind;
 
 EXTER object sLcomplex;
 EXTER object sLsingle_float,sLpackage,sLbignum,sLrandom_state,sLdouble_float,sLstream,sLbit,sLreadtable;
-EXTER object sLlong_float,sLhash_table,sLstructure,sLboolean,sLfile_stream,sLinput_stream,sLoutput_stream;
+EXTER object sLlong_float,sLhash_table,sLstructure,sLboolean,sLfile_stream,sLinput_stream,sLoutput_stream,sLtype_error;
 
 #ifdef ANSI_COMMON_LISP
 /* new ansi types */
@@ -635,7 +635,7 @@ EXTER object sLparse_error,sLprint_not_readable,sLprogram_error,sLreader_error,s
 EXTER object sLsimple_base_string,sLsimple_condition,sLsimple_type_error,sLsimple_warning,sLstandard_class;
 EXTER object sLstandard_generic_function,sLstandard_method,sLstandard_object,sLstorage_condition;
 EXTER object sLstream_error,sLstring_stream,sLstructure_class,sLstyle_warning,sLsynonym_stream;
-EXTER object sLtwo_way_stream,sLtype_error,sLunbound_slot,sLunbound_variable,sLundefined_function,sLwarning;
+EXTER object sLtwo_way_stream,sLunbound_slot,sLunbound_variable,sLundefined_function,sLwarning;
 EXTER object sLmethod_combination,sLstructure_object,sLdynamic_extent;
 #endif
 

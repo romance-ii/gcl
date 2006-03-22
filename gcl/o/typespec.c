@@ -573,6 +573,8 @@ DEF_ORDINARY("LOGICAL-PATHNAME",sLlogical_pathname,LISP,"");
 
 DEF_ORDINARY("BASE-CHAR",sLbase_char,LISP,"");
 
+DEF_ORDINARY("TYPE-ERROR",sLtype_error,LISP,"");
+
 #ifdef ANSI_COMMON_LISP
 /* New ansi types */
 DEF_ORDINARY("METHOD-COMBINATION",sLmethod_combination,LISP,"");
@@ -620,7 +622,6 @@ DEF_ORDINARY("STRUCTURE-OBJECT",sLstructure_object,LISP,"");
 DEF_ORDINARY("STYLE-WARNING",sLstyle_warning,LISP,"");
 DEF_ORDINARY("SYNONYM-STREAM",sLsynonym_stream,LISP,"");
 DEF_ORDINARY("TWO-WAY-STREAM",sLtwo_way_stream,LISP,"");
-DEF_ORDINARY("TYPE-ERROR",sLtype_error,LISP,"");
 DEF_ORDINARY("UNBOUND-SLOT",sLunbound_slot,LISP,"");
 DEF_ORDINARY("UNBOUND-VARIABLE",sLunbound_variable,LISP,"");
 DEF_ORDINARY("UNDEFINED-FUNCTION",sLundefined_function,LISP,"");
