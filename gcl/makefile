@@ -337,7 +337,7 @@ $(HDIR)cmpinclude.h: $(CMPINCLUDE_FILES) $(HDIR)config.h
 		-e "/End for cmpinclude/,50000d" > tmpx
 	echo -e '#include "h/config.h"\n#ifdef SGC\n"#define SGC"\n#else\n"#undef SGC"\n#endif' | cpp 2>/dev/null| grep -v '^ *$$' | tail -1l | tr -d '"' >>tmpx
 	cat $(CMPINCLUDE_FILES) >> tmpx
-	cpp -P -dD tmpx |grep -v STDC_HOSTED | grep -v "^static  *__"  >tmpx1 && mv tmpx1 tmpx
+	cpp -P -dD tmpx |grep -v STDC_HOSTED | grep -v __VERSION__ | grep -v "^static  *__"  >tmpx1 && mv tmpx1 tmpx
 	./xbin/move-if-changed mv tmpx h/cmpinclude.h
 	./xbin/move-if-changed cp h/cmpinclude.h o/cmpinclude.h
 
