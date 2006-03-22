@@ -118,12 +118,6 @@
   (add-load-time-sharp-comma)
   nil)
 
-(defvar *c1nil* (list 'LOCATION (make-info :type (object-type nil)) nil))
-(defun c1nil () *c1nil*)
-(defvar *c1t* (list 'LOCATION (make-info :type (object-type t)) t))
-(defun c1t () *c1t*)
-
-
 (defun flags-pos (flag &aux (i 0))
   (declare (fixnum i))
   (dolist
@@ -681,7 +675,7 @@
 	 (tf (if itemp `(funcall ,test ,(if rev el item) ,(if rev item el)) `(funcall ,test ,el)))
 	 (tf (if test-not `(not ,tf) tf))
 	 (tf (if retp `(and ,rf ,tf) tf))
-	 (ef `(or (not ,x) ,tf)))
+	 (ef `(or (endp ,x) ,tf)))
 	 `(do ((,x ,list (cdr ,x))) (,ef ,rf))))
 
 (defun possible-eq-list-search (item list special-keys &rest r &key key (test ''eql testp) (test-not nil test-notp))
@@ -818,7 +812,7 @@
 
 (defun possible-eq-sequence-search (item seq special-keys &rest r 
 					 &key key start end (test ''eql testp) (test-not nil test-notp))
-  (declare (ignore key))
+  (declare (ignore key start end testp));FIXME
   (let* ((test (if test-notp test-not test))
 	 (test (if (and (consp test) (eq (car test) 'function)) `(quote ,(cadr test)) test))
 	 (r `(,@special-keys ,@r)))
@@ -874,6 +868,7 @@
 
 
 (defmacro map-into-compiler-macro (&whole w &rest args)
+  (declare (ignore w))
   (let* ((syms (reduce (lambda (&rest r) 
 			 (when r 
 			   (if (or (constantp (cadr r))

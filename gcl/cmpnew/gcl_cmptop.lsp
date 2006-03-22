@@ -904,7 +904,7 @@
 					     (ll-optionals ll)
 					     (ll-keywords-p ll))))
 
-  (dolist (v (car ll))
+  (dotimes (i (length (car ll)))
     (push (list 'cvar (cs-push t t)) reqs))
   
   (wt-comment "local entry for function " (function-string fname))

@@ -422,18 +422,21 @@
 	      (cddr tp) (not (cdddr tp))) (last-cons-type (caddr tp) t))))
 
 (defun cdr-propagator (f t1)
+  (declare (ignore f))
   (cond ((type>= 'null t1) t1) ;FIXME clb ccb do-setq-tp
 	((and (consp t1) (eq (car t1) 'cons)) (caddr t1))
 	((type>= 'proper-list t1) 'proper-list)))
 (si::putprop 'cdr 'cdr-propagator 'type-propagator)
 
 (defun cons-propagator (f t1 t2)
+  (declare (ignore f))
   (cond ((cons-tp-limit t2 0 0) (cmp-norm-tp `(cons ,t1 ,t2)))
 	((type>= 'proper-list t2) (cmp-norm-tp 'proper-list))
 	((cmp-norm-tp 'cons))))
 (si::putprop 'cons 'cons-propagator 'type-propagator)
 
 (defun mod-propagator (f t1 t2)
+  (declare (ignore f t1))
   (let ((sr (super-range '* '(integer 0 1) t2)))
     (when sr
       (do ((x (cdr sr) (cdr x))) ((not x) sr)
@@ -442,6 +445,7 @@
 (si::putprop 'mod 'mod-propagator 'type-propagator)
 
 (defun random-propagator (f t1 &optional t2)
+  (declare (ignore t2))
   (mod-propagator f t1 t1))
 (si::putprop 'random 'random-propagator 'type-propagator)
 
@@ -490,6 +494,7 @@
 (si::putprop 'expt 'expt-propagator 'type-propagator)
 
 (defun abs-propagator (f t1)
+  (declare (ignore f))
   (type-and (type-or1 t1 (super-range '- t1)) '(real 0)))
 (si::putprop 'abs 'abs-propagator 'type-propagator)
 
@@ -561,6 +566,12 @@
 (defun check-form-type (type form original-form)
   (when (null (type-and type (info-type (cadr form))))
         (cmpwarn "The type of the form ~s is not ~s, but ~s." original-form type (info-type (cadr form)))))
+
+(defconstant +c1nil+ (list 'LOCATION (make-info :type (object-type nil)) nil))
+(defmacro c1nil () `+c1nil+)
+(defconstant +c1t+ (list 'LOCATION (make-info :type (object-type t)) t))
+(defmacro c1t () `+c1t+)
+
 
 (defun default-init (type)
   (let ((type (promoted-c-type type)))

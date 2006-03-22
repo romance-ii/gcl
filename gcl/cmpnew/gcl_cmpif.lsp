@@ -91,7 +91,7 @@
 	(fmla-and (reduce (reduce-lambda (x y) (tp-reduce 'type-and 'type-or1 x y nil)) (maplist 'fmla-infer-tp (cdr fmla))))
 	(fmla-or  (reduce (reduce-lambda (x y) (tp-reduce 'type-or1 'type-and x y nil)) (maplist 'fmla-infer-tp (cdr fmla))))
 	(fmla-not (mapcar (lambda (x) (cons (car x) (cons (cddr x) (cadr x)))) (fmla-infer-tp (cdr fmla))))
-	(var (let ((tp (info-type (second fmla)))) (list (cons (var-name (car (third fmla))) (cons '(not null) 'null)))))
+	(var (list (cons (var-name (car (third fmla))) (cons '(not null) 'null))))
 	(call-global
 	 (let* ((fn (third fmla)) (rfn (cdr (assoc fn +bool-inf-op-list+)))
 		(args (fourth fmla)) (l (length args)) (pt (get fn 'si::predicate-type)))
