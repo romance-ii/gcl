@@ -479,12 +479,13 @@
        (setq stores (nreverse stores))
        (setq store-forms (nreverse store-forms))
        (setq access-forms (nreverse access-forms))
-       `(let* ,(nconc pairs
+       (when pairs
+	 `(let* ,(nconc pairs
 		      (mapcar #'list stores (cdr access-forms))
 		      (list (list (car (last stores)) (car access-forms))))
 	    ,@store-forms
 	    nil
-	    ))
+	    )))
     (multiple-value-bind (vars vals stores1 store-form access-form)
 	(get-setf-method (car r) env)
       (setq pairs (nconc pairs (mapcar #'list vars vals)))

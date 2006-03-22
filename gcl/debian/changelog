@@ -103,8 +103,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * O3 for the interpreter
   * fix max/min propagator
   * revert from bogus nth-value
+  * fix (rotatef) bug
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 22 Mar 2006 17:38:32 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 22 Mar 2006 18:14:35 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
