@@ -105,8 +105,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * revert from bogus nth-value
   * fix (rotatef) bug
   * No __VERSION__ in h/cmpinclude.h
+  * ~ in compile-file paths
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 22 Mar 2006 21:21:48 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 22 Mar 2006 21:22:08 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

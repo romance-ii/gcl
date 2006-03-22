@@ -603,7 +603,7 @@ SYSTEM_SPECIAL_INIT
 	      )
 
    #-(or dos winnt)
-   (format nil  "~a -I~a ~a ~a -c ~s -o ~s ~a"
+   (format nil  "~a -I~a ~a ~a -c ~a -o ~a ~a"
 	   *cc*
 	   (concatenate 'string si::*system-directory* "../h")
 	   (if (and (boundp '*c-debug*) *c-debug*) " -g " "")
@@ -650,21 +650,20 @@ SYSTEM_SPECIAL_INIT
 
 (defun compiler-cc (c-pathname o-pathname  )
   (safe-system
+   (or 
+    #+winnt (prep-win-path (compiler-command c-pathname o-pathname))
+    #+(or vax system-v e15 dgux sgi) 
     (format
      nil
      (prog1
-	 #+irix5 (compiler-command c-pathname o-pathname )
 	 #+vax "~a ~@[~*-O ~]-S -I. -w ~a ; as -J -W -o ~A ~A"
-	 #+(or system-v e15 dgux sgi ) "~a ~@[~*-O ~]-c -I. ~a 2> /dev/null"
-	 #+winnt (prep-win-path (compiler-command c-pathname o-pathname ))
-	 #-winnt (compiler-command c-pathname o-pathname)
+	 #-vax "~a ~@[~*-O ~]-c -I. ~a 2> /dev/null"
 	 )
      *cc*
      (if (or (= *speed* 2) (= *speed* 3)) t nil)
-            (namestring c-pathname)
-             (namestring o-pathname)
-  
-            ))
+     (namestring c-pathname)
+     (namestring o-pathname))
+    (compiler-command c-pathname o-pathname)))
   
   #+dont_need
   (let ((cname (pathname-name c-pathname))
