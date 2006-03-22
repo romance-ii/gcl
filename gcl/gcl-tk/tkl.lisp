@@ -112,8 +112,8 @@
 
 )
 
-(defmacro nth-value (n form)
-  `(multiple-value-bind ,(make-list (+ n 1) :initial-element 'a) ,form  a))
+;(defmacro nth-value (n form)
+;  `(multiple-value-bind ,(make-list (+ n 1) :initial-element 'a) ,form  a))
 
 (defvar *tk-command* nil)
 

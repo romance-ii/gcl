@@ -96,8 +96,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * prune cmpinclude.h
   * winmain reordering
   * type-error in non-ansi image
+  * faster nth-value from tkl.lisp into gcl_listlib.lsp
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 22 Mar 2006 15:43:21 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 22 Mar 2006 15:47:58 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
