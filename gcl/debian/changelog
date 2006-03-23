@@ -116,8 +116,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     package forms to top of data file
   * seqindp predicate
   * car propagator
+  * cleanup non-destructive list functions in gcl_listlib.lsp
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 23 Mar 2006 23:10:33 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 23 Mar 2006 23:11:06 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
