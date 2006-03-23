@@ -56,7 +56,7 @@
 ;; a lambda.  Is used to eliminate mix of downward and regular closures.
 (defvar *local-functions* nil)
 
- 
+
 
 ;;; *objects* holds ( { object vv-index }* ).
 ;;; *constants* holds ( { symbol vv-index }* ).
@@ -124,7 +124,7 @@
 (si:putprop 'import t 'package-operation)
 (si:putprop 'provide t 'package-operation)
 (si:putprop 'require t 'package-operation)
-;(si:putprop 'defpackage:defpackage t 'package-operation)
+(si:putprop 'defpacakge t 'package-operation)
 
 ;;; Pass 1 top-levels.
 
@@ -273,8 +273,7 @@
 				 form)))
 		      (maybe-eval t res) 
 		      (t1ordinary form)
-		      ;(wt-data-package-operation res)
-		      ))
+		      (when (member fun '(make-package defpackage)) (wt-data-package-operation form))))
                    ((setq fd (get fun 't1))
                     (when *compile-print* (print-current-form))
                     (funcall fd args))
