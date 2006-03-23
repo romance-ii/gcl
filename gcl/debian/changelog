@@ -117,8 +117,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * seqindp predicate
   * car propagator
   * cleanup non-destructive list functions in gcl_listlib.lsp
+  * really fix rotatef
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 23 Mar 2006 23:11:06 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 23 Mar 2006 23:11:30 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
