@@ -107,8 +107,12 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * No __VERSION__ in h/cmpinclude.h
   * ~ in compile-file paths
   * Fix gemtemp package arg
+  * Better nthcdr-expander;compiler-macros for intersection,union,set-
+    difference,set-exclusive-or, and subsetp;wrap symbol functions in
+    (function ) for call-global funcalls and applys (which happen at
+    safety 3)
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 22 Mar 2006 21:25:15 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 23 Mar 2006 23:07:06 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

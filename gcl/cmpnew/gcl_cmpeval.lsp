@@ -358,30 +358,17 @@
 (si::putprop '/= (function logical-outer-nest) 'si::compiler-macro-prop)
 (si::putprop 'char/= (function logical-outer-nest) 'si::compiler-macro-prop)
 
-;; (setf (symbol-function 'cmp-nth) (symbol-function 'nth))
-;; (defun nth-expander (form env)
-;;   (declare (ignore env))
-;;   (let ((n (gensym)) (l (gensym)))
-;;     `(let ((,n ,(cadr form))
-;; 	   (,l ,(caddr form)))
-;;        (if (typep ,n 'fixnum)
-;; 	   (let ((,n ,n))
-;; 	     (declare (fixnum ,n))
-;; 	     (cmp-nth ,n ,l))
-;; 	 (cmp-nth ,n ,l)))))
-;; (si::putprop 'nth 'nth-expander 'si::compiler-macro-prop)
-
 (setf (symbol-function 'cmp-nthcdr) (symbol-function 'nthcdr))
 (defun nthcdr-expander (form env)
   (declare (ignore env))
-  (let ((n (gensym)) (l (gensym)))
-    `(let ((,n ,(cadr form))
-	   (,l ,(caddr form)))
-       (if (typep ,n 'fixnum)
-	   (let ((,n ,n))
-	     (declare (fixnum ,n))
-	     (cmp-nthcdr ,n ,l))
-	 (cmp-nthcdr ,n ,l)))))
+  (if (= (length form) 3)
+      (let* ((non (inlinable-fn (cadr form))) ;;FIXME, we need to centralize things like this
+	     (n (if non (cadr form) (gensym))) (l (gensym)))
+	`(let (,@(unless non `((,n ,(cadr form)))) (,l ,(caddr form)))
+	   (if (typep ,n 'seqind);;FIX typep inference to branch types outside of +type-alist+
+	       (cmp-nthcdr ,n ,l)
+	     (cmp-nthcdr ,n ,l))))
+    form))
 (si::putprop 'nthcdr 'nthcdr-expander 'si::compiler-macro-prop)
 
 (setf (symbol-function 'cmp-nth) (symbol-function 'nth))
@@ -454,9 +441,10 @@
   (declare (ignore env))
   (let ((x (gensym)))
     `(let ((,x ,(cadr form)))
-       (cond ,@(when *compiler-check-args* `(((consp ,x) nil)))
-	     ((not ,x))
-	     ,@(when *compiler-check-args* `(((error 'type-error :datum ,x :expected-type 'list))))))));;cannot continue
+       (cond ((not ,x))
+	     ,@(when *compiler-check-args* 
+		 `(((consp ,x) nil)
+		   ((error 'type-error :datum ,x :expected-type 'list))))))));;cannot continue
 (si::putprop 'endp (function endp-expander) 'si::compiler-macro-prop)
   
 (defun garef (a i l)
@@ -666,20 +654,20 @@
 
 (si::putprop 'array-dimension (function array-dimension-expander) 'si::compiler-macro-prop)
 
-(defun do-list-search (test list &key (k1 nil k1p) (key nil keyp) (item nil itemp) rev (ret nil retp) test-not ((:test foo)))
+(defun do-list-search (test list &key (k1 nil k1p) key (item nil itemp) rev (ret nil retp) test-not ((:test foo)))
   (declare (ignore foo))
   (let* ((x (gensym))
 	 (rf (if retp `(funcall ,ret ,x) x))
 	 (el (if k1p `(funcall ,k1 ,rf) rf))
-	 (el (if keyp `(funcall ,key ,el) el))
+	 (el (if key `(if ,key (funcall ,key ,el) ,el) el))
 	 (tf (if itemp `(funcall ,test ,(if rev el item) ,(if rev item el)) `(funcall ,test ,el)))
 	 (tf (if test-not `(not ,tf) tf))
 	 (tf (if retp `(and ,rf ,tf) tf))
 	 (ef `(or (endp ,x) ,tf)))
 	 `(do ((,x ,list (cdr ,x))) (,ef ,rf))))
 
-(defun possible-eq-list-search (item list special-keys &rest r &key key (test ''eql testp) (test-not nil test-notp))
-  (declare (ignore key))
+(defun possible-eq-list-search (item list special-keys &rest r &key rev key (test ''eql testp) (test-not nil test-notp))
+  (declare (ignore key rev));FIXME
   (let* ((test (cond ((and testp test-notp) `(or ,test ,test-not ''eql)) (test-notp test-not) (test)))
 	 (test (if (and (consp test) (eq (car test) 'function)) `(quote ,(cadr test)) test))
 	 (r `(,@special-keys ,@r)))
@@ -700,7 +688,6 @@
 				 (car r) 
 			       `(,@(car r) (,(gensym) ,(cadr r))))))
 			 args :initial-value nil))
-;	   (syms `((,(gensym) ,(car args)) (,(gensym) ,(cadr args)) ,@syms))
 	   (r (mapcar (lambda (x) (cond ((constantp x) x)
 					((and (consp x) (eq (car x) 'lambda)) x)
 					((car (rassoc x syms :key 'car :test 'equal))) (x))) args))
@@ -723,6 +710,46 @@
 (si::putprop 'rassoc (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
 (si::putprop 'rassoc-if (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
 (si::putprop 'rassoc-if-not (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
+
+(defmacro intersection-compiler-macro (&whole w &rest args)
+  (if (or (< (length args) 2) (do ((r (cddr args) (cddr r))) ((not (and r (keywordp (car r)))) r)))
+      w
+    (let* ((syms (reduce (lambda (&rest r) 
+			   (when r 
+			     (if (inlinable-fn (cadr r))
+				 (car r) 
+			       `(,@(car r) (,(gensym) ,(cadr r))))))
+			 args :initial-value nil))
+	   (r (mapcar (lambda (x) (cond ((inlinable-fn x) x)
+					((car (rassoc x syms :key 'car :test 'equal))) (x))) args))
+	   (ks (cadr (member :key r)))
+	   (ans (gensym)) (l (gensym)) (z (gensym))
+	   (syms `(,@syms ,@(unless (eq (car w) 'subsetp) `((,ans ,(when (eq (car w) 'union) (cadr r))))))))
+      `(let* (,@syms)
+	 (dolist (,l ,(car r) ,(if (eq (car w) 'subsetp) t ans))
+	   (let ((,z (if ,ks (funcall ,ks ,l) ,l)))
+	     (,(if (eq (car w) 'intersection) 'when 'unless) (member ,z ,(cadr r) ,@(cddr r)) 
+	       ,(if (eq (car w) 'subsetp) `(return nil) `(push ,l ,ans)))))))))
+(si::putprop 'intersection (macro-function 'intersection-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'union (macro-function 'intersection-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'set-difference (macro-function 'intersection-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'subsetp (macro-function 'intersection-compiler-macro) 'si::compiler-macro-prop)
+	  
+(defmacro set-exclusive-or-compiler-macro (&whole w &rest args)
+  (if (or (< (length args) 2) (do ((r (cddr args) (cddr r))) ((not (and r (keywordp (car r)))) r)))
+      w
+    (let* ((syms (reduce (lambda (&rest r) 
+			   (when r 
+			     (if (inlinable-fn (cadr r))
+				 (car r) 
+			       `(,@(car r) (,(gensym) ,(cadr r))))))
+			 args :initial-value nil))
+	   (r (mapcar (lambda (x) (cond ((inlinable-fn x) x)
+					((car (rassoc x syms :key 'car :test 'equal))) (x))) args)))
+      `(let* (,@syms)
+	 (nconc (set-difference ,(car r) ,(cadr r) ,@(cddr r))
+		(set-difference ,(cadr r) ,(car r) :rev t ,@(cddr r)))))))
+(si::putprop 'set-exclusive-or (macro-function 'set-exclusive-or-compiler-macro) 'si::compiler-macro-prop)
 
 ;;start end count position
 (defun do-sequence-search (fn vars &key dest newseq sum pos start end count test test-not
@@ -1043,6 +1070,10 @@
          (cmperr "Sharp-comma-macro was found in a bad place."))
         (t (let* ((info (make-info
 			 :sp-change (null (get fname 'no-sp-change))))
+		  (args (if (and (member fname '(funcall apply))
+				 (and (consp (car args)) (eq (caar args) 'quote) (symbolp (cadar args))))
+			    `((function ,(cadar args)) ,@(cdr args))
+			  args))
                   (forms (c1args args info))) ;; info updated by args here
 	     (let ((return-type (get-return-type fname)))
 	       (when return-type
@@ -1072,46 +1103,8 @@
 		   (check-form-type (car arg-types)
 				    (car fl) (car al))
 		   (pop arg-types))))
-	     (case fname
-	       (aref
-		(let ((etype (info-type (cadar forms))))
-		  (when (or (and (eq etype 'string)
-				 (setq etype 'character))
-			    (and (consp etype)
-				 (or (eq (car etype) 'array)
-				     (eq (car etype) 'vector))
-				 (setq etype (cadr etype))))
-		    (setq etype
-			  (type-and (info-type info) etype))
-		    (when (null etype)
-		      (cmpwarn
-		       "Type mismatch was found in ~s."
-		       (cons fname args)))
-		    (setf (info-type info) etype))))
-	       (si:aset
-		(let ((etype (info-type (cadar forms))))
-		  (when (or (and (eq etype 'string)
-				 (setq etype 'character))
-			    (and (consp etype)
-				 (or (eq (car etype) 'array)
-				     (eq (car etype) 'vector))
-				 (setq etype (cadr etype))))
-		    (setq etype
-			  (type-and (info-type info)
-				    (type-and (info-type
-					       (cadar (last forms)))
-					      etype)))
-		    (when (null etype)
-		      (cmpwarn
-		       "Type mismatch was found in ~s."
-		       (cons fname args)))
-		    (setf (info-type info) etype)
-		    (setf (info-type (cadar (last forms)))
-			  etype)
-		    ))))
 	     ;; some functions can have result type deduced from
 	     ;; arg types.
-	     
 	     (let ((tem (result-type-from-args fname
 					       (mapcar #'(lambda (x) (info-type (cadr x)))
 						       forms))))
