@@ -111,8 +111,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     difference,set-exclusive-or, and subsetp;wrap symbol functions in
     (function ) for call-global funcalls and applys (which happen at
     safety 3)
+  * prevent typep -> predicate -> typep loop for structure predicates
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 23 Mar 2006 23:07:06 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 23 Mar 2006 23:08:15 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
