@@ -208,6 +208,14 @@
 (push '((fixnum) boolean #.(flags rfa)"1")
    (get 'system:fixnump 'inline-always))
 
+;;SYSTEM:SEQINDP
+ (push '((t) boolean #.(flags rfa) #.(format nil "(type_of(#0)==t_fixnum && ({fixnum _t=fix(#0);_t>=0 && _t<=~s;}))" array-dimension-limit))
+   (get 'system::seqindp 'inline-always))
+(push '((fixnum) boolean #.(flags rfa)#.(format nil "(#0>=0 && #0<=~s)" array-dimension-limit))
+   (get 'system::seqindp 'inline-always))
+(push '((seqind) boolean #.(flags rfa)"1")
+   (get 'system::seqindp 'inline-always))
+
 ;;SYSTEM:MV-REF
  (push '((fixnum) t #.(flags ans set)"(MVloc[(#0)])")
    (get 'system:mv-ref 'inline-always))
@@ -1042,57 +1050,14 @@
  (push '((t) t #.(flags ans set)"nreverse(#0)")
    (get 'nreverse 'inline-always))
 
-;;NTH
-; (push '((t t) t #.(flags)"nth(fixint(#0),#1)")
-;   (get 'nth 'inline-always))
-;(push '((fixnum t) t #.(flags)"nth(#0,#1)")
-;   (get 'nth 'inline-always))
-;(push '((t t) t #.(flags)"nth(fix(#0),#1)")
-;   (get 'nth 'inline-unsafe))
-
-;; (push '((seqind proper-list) proper-list #.(flags rfa)"({register fixnum _i=#0;register object _x=#1;for (;_i--;_x=_x->c.c_cdr);_x->c.c_car;})")
-;;    (get 'nth 'inline-always))
-;; (push '(((and (integer 0) (not seqind)) proper-list) null #.(flags rfa)"Cnil")
-;;    (get 'nth 'inline-always))
-;; (push '((fixnum t) proper-list #.(flags rfa)"({register fixnum _i=#0;register object _x=#1;for (;_i--;_x=_x->c.c_cdr);_x->c.c_car;})")
-;;    (get 'nth 'inline-unsafe))
-;; (push '(((not fixnum) proper-list) null #.(flags rfa)"Cnil")
-;;    (get 'nth 'inline-unsafe))
-
-;; (push '((seqind proper-list) proper-list #.(flags rfa)"({register fixnum _i=#0;register object _x=#1;for (;_i--;_x=_x->c.c_cdr);_x->c.c_car;})")
-;;    (get 'cmp-nth 'inline-always))
-;; (push '(((and (integer 0) (not seqind)) proper-list) null #.(flags rfa)"Cnil")
-;;    (get 'cmp-nth 'inline-always))
-;; (push '((fixnum t) proper-list #.(flags rfa)"({register fixnum _i=#0;register object _x=#1;for (;_i--;_x=_x->c.c_cdr);_x->c.c_car;})")
-;;    (get 'cmp-nth 'inline-unsafe))
-;; (push '(((not fixnum) proper-list) null #.(flags rfa)"Cnil")
-;;    (get 'cmp-nth 'inline-unsafe))
-
-;;NTHCDR
-; (push '((t t) t #.(flags)"nthcdr(fixint(#0),#1)")
-;   (get 'nthcdr 'inline-always))
-;(push '((fixnum t) t #.(flags)"nthcdr(#0,#1)")
-;   (get 'nthcdr 'inline-always))
-;(push '((t t) t #.(flags)"nthcdr(fix(#0),#1)")
-;   (get 'nthcdr 'inline-unsafe))
-
-;; (push '((seqind proper-list) proper-list #.(flags rfa)"({register fixnum _i=#0;register object _x=#1;for (;_i--;_x=_x->c.c_cdr);_x;})")
-;;    (get 'nthcdr 'inline-always))
-;; (push '(((and (integer 0) (not seqind)) proper-list) null #.(flags rfa)"Cnil")
-;;    (get 'nthcdr 'inline-always))
-;; (push '((fixnum t) proper-list #.(flags rfa)"({register fixnum _i=#0;register object _x=#1;for (;_i--;_x=_x->c.c_cdr);_x;})")
-;;    (get 'nthcdr 'inline-unsafe))
-;; (push '(((not fixnum) proper-list) null #.(flags rfa)"Cnil")
-;;    (get 'nthcdr 'inline-unsafe))
-
 ;;CMP-NTHCDR
 (push '((seqind proper-list) proper-list #.(flags rfa)"({register fixnum _i=#0;register object _x=#1;for (;_i--;_x=_x->c.c_cdr);_x;})")
    (get 'cmp-nthcdr 'inline-always))
 (push '(((and (integer 0) (not seqind)) proper-list) null #.(flags rfa)"Cnil")
    (get 'cmp-nthcdr 'inline-always))
-(push '((fixnum t) proper-list #.(flags rfa)"({register fixnum _i=#0;register object _x=#1;for (;_i--;_x=_x->c.c_cdr);_x;})")
+(push '((seqind t) proper-list #.(flags rfa)"({register fixnum _i=#0;register object _x=#1;for (;_i--;_x=_x->c.c_cdr);_x;})")
    (get 'cmp-nthcdr 'inline-unsafe))
-(push '(((not fixnum) proper-list) null #.(flags rfa)"Cnil")
+(push '(((not seqind) proper-list) null #.(flags rfa)"Cnil")
    (get 'cmp-nthcdr 'inline-unsafe))
 
 

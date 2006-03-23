@@ -114,8 +114,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * prevent typep -> predicate -> typep loop for structure predicates
   * import defpackage into compiler, and copy defpackage and make-
     package forms to top of data file
+  * seqindp predicate
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 23 Mar 2006 23:09:12 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 23 Mar 2006 23:09:50 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

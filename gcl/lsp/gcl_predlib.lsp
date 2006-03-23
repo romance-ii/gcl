@@ -329,6 +329,8 @@
 ;;; Some DEFTYPE definitions.
 (deftype seqind ()
   `(integer 0 ,array-dimension-limit))
+(defun seqindp (x) (and (fixnump x) (>= x 0) (<= x array-dimension-limit)))
+
 (deftype rnkind ()
   `(integer 0 ,array-rank-limit))
 (deftype bit () '(integer 0 1))
@@ -549,6 +551,7 @@
           (atom . atom)
           (cons . consp)
           (list . listp)
+          (seqind . seqindp)
           (fixnum . fixnump)
           (integer . integerp)
           (rational . rationalp)
