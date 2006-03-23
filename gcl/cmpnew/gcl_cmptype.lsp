@@ -441,6 +441,11 @@
 	((cmp-norm-tp 'cons))))
 (si::putprop 'cons 'cons-propagator 'type-propagator)
 
+(defun car-propagator (f t1)
+  (declare (ignore f))
+  (when (type>= 'null t1) 'null))
+(si::putprop 'car 'car-propagator 'type-propagator)
+
 (defun mod-propagator (f t1 t2)
   (declare (ignore f t1))
   (let ((sr (super-range '* '(integer 0 1) t2)))

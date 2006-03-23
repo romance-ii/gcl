@@ -115,8 +115,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * import defpackage into compiler, and copy defpackage and make-
     package forms to top of data file
   * seqindp predicate
+  * car propagator
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 23 Mar 2006 23:09:50 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 23 Mar 2006 23:10:33 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
