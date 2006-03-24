@@ -288,7 +288,7 @@ case $canonical in
          echo "Using WinMain entry point."
        fi
 
-       PROCESSOR_FLAGS="$arch_flags $win_flags"
+       PROCESSOR_FLAGS="$arch_flags"
 
        # If we have set the C stack size on the command line then send them to
        # the linker.  Set a default otherwise of 2 Mbytes (Windows default).
@@ -1760,7 +1760,9 @@ AC_EGREP_HEADER([gettimeofday],
     		 AC_DEFINE(GETTOD_NOT_DECLARED)])
 
 
-AC_CHECK_LIB(m,sin,LIBS="${LIBS} -lm",true)
+if test "$use" != "mingw" ; then
+   AC_CHECK_LIB(m,sin,LIBS="${LIBS} -lm",true)
+fi
 AC_CHECK_LIB(mingwex,main,LIBS="${LIBS} -lmingwex",true)
 
 EXTRA_LOBJS=
