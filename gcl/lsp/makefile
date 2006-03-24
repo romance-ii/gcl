@@ -19,7 +19,7 @@ NPREFS:= export autoload auto_new
 SRC:= $(addprefix gcl_,$(addsuffix .lsp,$(PREFS) $(NCPREFS)))
 OBJS:=$(addprefix gcl_,$(addsuffix .o,$(PREFS)))
 
-COMPILE_FILE=$(PORTDIR)/saved_pre_gcl $(PORTDIR) -system-p -c-file -data-file \
+COMPILE_FILE=$(PORTDIR)/saved_pre_gcl $(PORTDIR) $(LISPFLAGS) -system-p -c-file -data-file \
 	-o-file nil -h-file -compile
 #CFLAGS	= -c -O -I../h 
 
@@ -43,7 +43,7 @@ all:	$(OBJS)
 	${APPEND} ${NULLFILE} $*.data  $*.o
 
 .lsp.fn: ../cmpnew/gcl_collectfn.o
-	../xbin/make-fn $*.lsp ../unixport/saved_pre_gcl
+	../xbin/make-fn $*.lsp ../unixport/saved_pre_gcl $(LISPFLAGS) 
 
 all:	$(OBJS)
 
@@ -66,7 +66,7 @@ dummy3 $(NEWCFILES): sys-proclaim.lisp
 sys-proclaim.lisp: fns
 	echo '(in-package "SYSTEM")' \
 	'(load "../cmpnew/gcl_collectfn")'\
-	'(compiler::make-all-proclaims "*.fn")' | ../unixport/saved_pre_gcl
+	'(compiler::make-all-proclaims "*.fn")' | ../unixport/saved_pre_gcl $(LISPFLAGS) 
 
 
 newc:	

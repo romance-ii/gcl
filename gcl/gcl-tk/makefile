@@ -23,13 +23,13 @@ WGCLDIR=`echo $(GCLDIR) | sed -e 'sX^/\([a-z]\)X\1:Xg'`
 
 all: gcltksrv   tkl.o tinfo.o  demos/gc-monitor.o gcltkaux
 	(cd demos ; \
-	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../unixport/$(FLISP)$(EXE)) 
+	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../unixport/$(FLISP)$(EXE) $(LISPFLAGS)) 
 
 .lisp.o:
-	echo "(compile-file \"$*.lisp\" :c-file nil :c-debug nil)" | ../unixport/$(FLISP)$(EXE)
+	echo "(compile-file \"$*.lisp\" :c-file nil :c-debug nil)" | ../unixport/$(FLISP)$(EXE) $(LISPFLAGS)
 
 .lsp.o:
-	echo "(compile-file \"$*.lsp\" :c-file nil :c-debug nil)" | ../unixport/$(FLISP)$(EXE)
+	echo "(compile-file \"$*.lsp\" :c-file nil :c-debug nil)" | ../unixport/$(FLISP)$(EXE) $(LISPFLAGS)
 
 
 

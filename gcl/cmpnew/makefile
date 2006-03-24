@@ -19,7 +19,7 @@ SRC:= $(addprefix gcl_,$(addsuffix .lsp,$(PREFS) $(NCPREFS)))
 OBJS:=$(addprefix gcl_,$(addsuffix .o,$(PREFS)))
 FNS:= $(OBJS:.o=.fn)
 
-COMPILE_FILE=$(PORTDIR)/saved_pre_gcl $(PORTDIR) -system-p -c-file -data-file \
+COMPILE_FILE=$(PORTDIR)/saved_pre_gcl $(PORTDIR) $(LISPFLAGS) -system-p -c-file -data-file \
 	-o-file nil -h-file -compile
 #CFLAGS	= -c -O -I../h 
 
@@ -46,15 +46,15 @@ all:	$(OBJS)
 	${APPEND} ${NULLFILE} $*.data  $*.o
 
 gcl_collectfn.o:
-	$(PORTDIR)/saved_pre_gcl $(PORTDIR)/ -compile $*
+	$(PORTDIR)/saved_pre_gcl $(PORTDIR)/ $(LISPFLAGS) -compile $*
 
 .lisp.o:
 	@ ../xbin/if-exists $(PORTDIR)/saved_pre_gcl \
-	"$(PORTDIR)/saved_pre_gcl $(PORTDIR)/ -compile $*.lisp " 
+	"$(PORTDIR)/saved_pre_gcl $(PORTDIR)/ $(LISPFLAGS) -compile $*.lisp " 
 sys-proclaim.lisp: $(FNS)
 	echo '(in-package "COMPILER")' \
 	'(load "../cmpnew/gcl_collectfn")(load "../lsp/sys-proclaim.lisp")'\
-	'(compiler::make-all-proclaims "*.fn")' | ../unixport/saved_pre_gcl
+	'(compiler::make-all-proclaims "*.fn")' | ../unixport/saved_pre_gcl $(LISPFLAGS)
 
 
 newfn:	

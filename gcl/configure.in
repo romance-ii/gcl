@@ -126,6 +126,7 @@ AC_MSG_RESULT(host=$host)
 
 PROCESSOR_FLAGS=${PROCESSOR_FLAGS:-""}
 LD_STACK_FLAGS=""
+LISPFLAGS=""
 
 use=unknown
 TLDFLAGS=""
@@ -281,10 +282,10 @@ case $canonical in
          arch_flags="-march=i686 -mfpmath=387"
          echo "The host is canonicalised to $host"
        fi
-
        if test "$use_winmain" = "yes"; then
          win_flags=-mwindows
 	 AC_DEFINE(WITH_WINMAIN)
+	 LISPFLAGS=-noconsole
          echo "Using WinMain entry point."
        fi
 
@@ -2397,7 +2398,7 @@ AC_SUBST(O2FLAGS)
 AC_SUBST(EXTRA_LOBJS)
 AC_SUBST(LEADING_UNDERSCORE)
 AC_SUBST(GNU_LD)
-
+AC_SUBST(LISPFLAGS)
 if test "$use" = "mingw" ; then
    LD_STACK_FLAGS="$win_flags -Wl,--stack=$enable_cssize"
    AC_SUBST(LD_STACK_FLAGS)

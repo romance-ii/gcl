@@ -115,7 +115,7 @@ saved_%:raw_% $(RSYM) init_%.lsp raw_%_map \
 	cp init_$*.lsp foo
 	echo " (in-package \"USER\")(system:save-system \"$@\")" >>foo
 #	cp $(PORTDIR)/raw_$*$(EXE) $(PORTDIR)/raw_$*.bak$(EXE)
-	$(PORTDIR)/raw_$*$(EXE) $(PORTDIR)/ -libdir $(GCLDIR)/ < foo
+	$(PORTDIR)/raw_$*$(EXE) $(PORTDIR)/ $(LISPFLAGS) -libdir $(GCLDIR)/ < foo
 
 $(RSYM): $(SPECIAL_RSYM) $(HDIR)/mdefs.h
 	$(CC) $(CFLAGS) -I$(HDIR) -I$(ODIR) -o $(RSYM) $(SPECIAL_RSYM)

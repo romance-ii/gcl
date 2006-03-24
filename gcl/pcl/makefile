@@ -26,7 +26,7 @@ all: $(addsuffix .c,$(AFILES)) $(addsuffix .o,$(AFILES))
 saved_gcl_pcl: ../unixport/saved_mod_gcl
 	cp ../h/cmpinclude.h .
 	echo $(SETUP) '(pcl::compile-pcl)' | $< 
-	echo $(SETUP) '(pcl::load-pcl)(si::save-system "$@")' | $<
+	echo $(SETUP) '(pcl::load-pcl)(si::save-system "$@")' | $< $(LISPFLAGS)
 
 $(addsuffix .c,$(AFILES)) $(addsuffix .data,$(AFILES))\
 	$(addsuffix .h,$(AFILES)) $(addsuffix .lsp,$(GFILES)): \
@@ -54,10 +54,10 @@ remake-sys-files:
 	rm -f *.o *gazonk*
 	cp ../h/cmpinclude.h .
 	echo ${SETUP} '(load "../cmpnew/gcl_collectfn.lsp")(compiler::emit-fn t)' \
-		'(pcl::compile-pcl)' | ../unixport/saved_mod_gcl ../unixport/
+		'(pcl::compile-pcl)' | ../unixport/saved_mod_gcl ../unixport/ $(LISPFLAGS)
 	echo ${SETUP} '(load "../cmpnew/gcl_collectfn.lsp") '\
 		'(pcl::load-pcl)(in-package "PCL")(renew-sys-files)' | \
-		../unixport/saved_mod_gcl ../unixport/
+		../unixport/saved_mod_gcl ../unixport/ $(LISPFLAGS) 
 	cp sys-proclaim.lisp xxx
 	cat xxx | sed -e "s/COMPILER::CMP-ANON//g" > sys-proclaim.lisp
 	rm xxx
