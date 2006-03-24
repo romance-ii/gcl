@@ -450,47 +450,50 @@ gcl_main(int argc, char **argv, char **envp)
 
 void SetupConsole ( void )
 {
-#if 1
+#if 0
 
-    AllocConsole( );
-    freopen("CONIN$","rb",stdin);
-    freopen("CONOUT$","wb",stdout);
-    freopen("CONOUT$","wb",stderr);
+    AllocConsole ( );
+    freopen ( "CONIN$",  "rb", stdin  );
+    freopen ( "CONOUT$", "wb", stdout );
+    freopen ( "CONOUT$", "wb", stderr );
 
 #else
-    int hConHandle;
-    long lStdHandle;
-    CONSOLE_SCREEN_BUFFER_INFO coninfo;
-    FILE *fp;
 
     /* allocate a console for this app */
-    AllocConsole();
+    AllocConsole ();
 
-    /* set the screen buffer to be big enough to let us scroll text */
-    GetConsoleScreenBufferInfo ( GetStdHandle (STD_OUTPUT_HANDLE), &coninfo );
-    coninfo.dwSize.Y = MAX_CONSOLE_LINES;
-    SetConsoleScreenBufferSize ( GetStdHandle (STD_OUTPUT_HANDLE), coninfo.dwSize);
+    /* Set the console up */
+    {
+        HANDLE hStdOut = GetStdHandle ( STD_OUTPUT_HANDLE );
+        int    fdOut   = _open_osfhandle ( hStdOut, _O_TEXT );
+        
+        HANDLE hStdIn  = GetStdHandle ( STD_INPUT_HANDLE );
+        int    fdIn    = _open_osfhandle ( hStdIn,  _O_TEXT );
 
-    /* redirect unbuffered STDOUT to the console */
-    lStdHandle = (long)GetStdHandle(STD_OUTPUT_HANDLE);
-    hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
-    fp = _fdopen( hConHandle, "w" );
-    *stdout = *fp;
-    setvbuf( stdout, NULL, _IONBF, 0 );
+        HANDLE hStdErr = GetStdHandle ( STD_ERROR_HANDLE );
+        int    fdErr   = _open_osfhandle ( hStdErr, _O_TEXT );
 
-    /* redirect unbuffered STDIN to the console */
-    lStdHandle = (long)GetStdHandle(STD_INPUT_HANDLE);
-    hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
-    fp = _fdopen( hConHandle, "r" );
-    *stdin = *fp;
-    setvbuf( stdin, NULL, _IONBF, 0 );
+        CONSOLE_SCREEN_BUFFER_INFO coninfo;
+        FILE *fp;
 
-    /* redirect unbuffered STDERR to the console */
-    lStdHandle = (long)GetStdHandle(STD_ERROR_HANDLE);
-    hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
-    fp = _fdopen( hConHandle, "w" );
-    *stderr = *fp;
-    setvbuf( stderr, NULL, _IONBF, 0 );
+        /* set the screen buffer to be big enough to let us scroll text */
+        GetConsoleScreenBufferInfo ( hStdOut, &coninfo );
+        coninfo.dwSize.Y = MAX_CONSOLE_LINES;
+        SetConsoleScreenBufferSize ( hStdOut, coninfo.dwSize);
+
+        /* redirect unbuffered std i/o to the console */
+        fp = _fdopen ( fdOut, "w" );
+        *stdout = *fp;
+        setvbuf ( stdout, NULL, _IONBF, 0 );
+
+        fp = _fdopen ( fdIn, "r" );
+        *stdin = *fp;
+        setvbuf ( stdin, NULL, _IONBF, 0 );
+
+        fp = _fdopen ( fdErr, "w" );
+        *stderr = *fp;
+        setvbuf ( stderr, NULL, _IONBF, 0 );
+    }
 #endif
 }
 
@@ -591,6 +594,7 @@ WinMain ( HINSTANCE hInstance,
 {
     char **argv, **envp = NULL;
     int argc;
+    int rv;
     setargv ( &argc, &argv );
     {
         int index = 1;
@@ -605,8 +609,9 @@ WinMain ( HINSTANCE hInstance,
 	  SetupConsole ();
 	} 
     }
-    gcl_main ( argc, argv, envp );
+    rv = gcl_main ( argc, argv, envp );
     FreeConsole ();
+    return ( rv );
 }
 
 #else /* WITH_WINMAIN */

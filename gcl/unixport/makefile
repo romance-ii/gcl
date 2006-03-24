@@ -114,6 +114,7 @@ saved_%:raw_% $(RSYM) init_%.lsp raw_%_map \
 
 	cp init_$*.lsp foo
 	echo " (in-package \"USER\")(system:save-system \"$@\")" >>foo
+#	cp $(PORTDIR)/raw_$*$(EXE) $(PORTDIR)/raw_$*.bak$(EXE)
 	$(PORTDIR)/raw_$*$(EXE) $(PORTDIR)/ -libdir $(GCLDIR)/ < foo
 
 $(RSYM): $(SPECIAL_RSYM) $(HDIR)/mdefs.h
@@ -154,6 +155,7 @@ else
 	$(CC) -o raw_$*$(EXE) $(filter %.o,$^) \
 		-L. $(EXTRA_LD_LIBS) $(LD_LIBS_PRE) -l$* $(LD_LIBS_POST)
 endif
+#	cp raw_$*_map raw_$*_map.bak
 #	diff map_$* map_$*.old >/dev/null || (cp map_$* map_$*.old && rm -f $@ && $(MAKE) $@)
 #	cp map_$*.old map_$*
 
