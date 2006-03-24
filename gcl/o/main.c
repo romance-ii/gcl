@@ -445,20 +445,10 @@ gcl_main(int argc, char **argv, char **envp)
 
 #ifdef WITH_WINMAIN
 
-
 #  define MAX_CONSOLE_LINES 500
 
 void SetupConsole ( void )
 {
-#if 0
-
-    AllocConsole ( );
-    freopen ( "CONIN$",  "rb", stdin  );
-    freopen ( "CONOUT$", "wb", stdout );
-    freopen ( "CONOUT$", "wb", stderr );
-
-#else
-
     /* allocate a console for this app */
     AllocConsole ();
 
@@ -494,7 +484,6 @@ void SetupConsole ( void )
         *stderr = *fp;
         setvbuf ( stderr, NULL, _IONBF, 0 );
     }
-#endif
 }
 
 
