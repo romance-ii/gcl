@@ -982,6 +982,8 @@ int level;
 			} else if (char_code(x) < 040) {
 				write_ch('^');
 				write_ch(char_code(x) + 0100);
+				if (char_code(x)==28)
+				  write_ch(char_code(x) + 0100);
 			} else
 				write_ch(char_code(x));
 			break;
