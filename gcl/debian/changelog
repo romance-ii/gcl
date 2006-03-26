@@ -127,8 +127,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     var-type at the head and type-or'ed back at the end,tagbody typing
     from last non-tag form, fix expt propagator, do not warn of unused
     variables on trial tagbody runs
+  * revert NO_main_HERE_PLEASE in plttest.c
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 26 Mar 2006 04:27:14 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 26 Mar 2006 04:49:39 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

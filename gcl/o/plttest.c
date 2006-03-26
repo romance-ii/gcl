@@ -11,7 +11,7 @@ extern int _mcount();
 #define mmcount _mcount
 
 int
-NO_main_HERE_PLEASE(int argc,char * argv[],char *envp[]) {
+main(int argc,char * argv[],char *envp[]) {
 
   FILE *f=NULL;
   char ch=0;
