@@ -122,7 +122,8 @@
 (defun check-vref (var)
   (when (and (eq (var-kind var) 'LEXICAL)
              (not (var-ref var)) ;;; This field may be IGNORE.
-             (not (var-ref-ccb var)))
+             (not (var-ref-ccb var))
+	     (every (lambda (x) (or (not (var-p x)) (not (t-to-nil (var-tag x))))) *vars*))
         (cmpwarn "The variable ~s is not used." (var-name var))))
 
 (defun c1var (name)
@@ -345,8 +346,6 @@
              )))
   )
 
-;(defconstant +useful-c-types+ '(fixnum short-float long-float proper-list t)) ;FIXME
-(defconstant +useful-c-types+ '(fixnum short-float long-float proper-list t)) ;FIXME
 
 (defun do-setq-tp (v form t1)
   (when (eq (var-kind v) 'lexical)

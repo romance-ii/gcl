@@ -43,6 +43,7 @@
            value-to-go		;;; Where the value of the block to go.
            var			;;; The block name holder.  Used only in
            			;;; the error message.
+	   type
            )
 
 (defvar *blocks* nil)
@@ -59,12 +60,12 @@
   (let* ((blk (make-blk :name (car args) :ref nil :ref-ccb nil :ref-clb nil))
          (*blocks* (cons blk *blocks*))
          (body (c1progn (cdr args))))
-  (if (or (blk-ref-ccb blk) (blk-ref-clb blk))
-   (incf *setjmps*))
-
-        (if (or (blk-ref-ccb blk) (blk-ref-clb blk) (blk-ref blk))
-            (list 'block (reset-info-type (cadr body)) blk body)
-            body))
+    (if (or (blk-ref-ccb blk) (blk-ref-clb blk))
+	(incf *setjmps*))
+    (setf (info-type (cadr body)) (type-or1 (info-type (cadr body)) (blk-type blk)))
+    (if (or (blk-ref-ccb blk) (blk-ref-clb blk) (blk-ref blk))
+	(list 'block (cadr body) blk body)
+      body))
   )
 
 (defun c2block (blk body)
@@ -138,8 +139,11 @@
                            (ccb (setf (blk-ref-ccb blk) t))
                            (clb (setf (blk-ref-clb blk) t))
                            (t (setf (blk-ref blk) t)))
+			  (setf (blk-type (car blks)) (type-or1 (blk-type (car blks)) (info-type (cadr val))))
                           (return (list 'return-from
-                                        (reset-info-type (cadr val))
+                                        (let ((info (copy-info (reset-info-type (cadr val)))))
+					  (setf (info-type info) nil)
+					  info)
                                         blk clb ccb val)))))))
   )
 

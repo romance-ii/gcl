@@ -118,8 +118,17 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * car propagator
   * cleanup non-destructive list functions in gcl_listlib.lsp
   * really fix rotatef
+  * block typeing via return-from, return-from and go are of type
+    nil,fix endp-expansion for type inference purposes,mapcar et.al
+    compiler macro,fix make-array typing,tighten fmla-eval-const to
+    detect when one of and is known nil or one of or is known t (FIXME,
+    needs to handle if fmla too),c1the var-tag thwoing on type conflict
+    detection,restore-vars around trial tagbody runs, with var-mt set to
+    var-type at the head and type-or'ed back at the end,tagbody typing
+    from last non-tag form, fix expt propagator, do not warn of unused
+    variables on trial tagbody runs
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 23 Mar 2006 23:11:30 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 26 Mar 2006 04:27:14 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

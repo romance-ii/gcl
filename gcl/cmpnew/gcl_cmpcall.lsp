@@ -363,20 +363,29 @@
 	      (setq link-string
 		    (with-output-to-string
 		     (st)
-		    (format st  "(*(LnkLI~d))(" n)
-		    (do ((com)
-			 (v argtypes (cdr v))
-			 (i 0 (+ 1 i)))
-			((null v))
-			(cond ((eq (car v) '*)
-			       (setq vararg t)
-			       (princ "#*"  st))
-			      (t 
-			       (if com  (princ "," st) (setq com t))
-			       (format st "#~a" i))))
-		    (princ ")" st)
-		    )
-		    )
+		     (let ((as (with-output-to-string
+				 (st)
+				 (do ((com)
+				      (v argtypes (cdr v))
+				      (i 0 (+ 1 i)))
+				     ((null v))
+				     (cond ((eq (car v) '*)
+					    (setq vararg t)
+					    (princ "#*"  st))
+					   (t 
+					    (if com  (princ "," st) (setq com t))
+					    (format st "#~a" i)))))))
+
+		       (format st "((*LnkLI~d)(~a))" n as))))
+
+
+;		       (let ((x (cdr (assoc fname *global-funs*))))
+;			 (if (and x (not (member '* argtypes))) 
+;			     (progn ;(format st "LI~d(~a)" x as) FIXME
+;			       (format st "(LI~d==*LnkLI~d ? LI~d(~a) : (*LnkLI~d)(~a))" x n x as n as)
+;			       (format t "(LI~d==*LnkLI~d ? LI~d(~a) : (*LnkLI~d)(~a))" x n x as n as)
+;			       )
+;			   (format st "((*LnkLI~d)(~a))" n as)))
 
 	      ;; If link is bound above, closure is unprintable as is in its own environment
 	      ;; enables tracing of inline-type-matches.  CM 20050106

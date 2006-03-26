@@ -123,16 +123,21 @@
 		  (let ((nb (cons ft nb)))
 		    (do ((tob (pop ob) (pop ob))) ((not tob) nb) (push (if (typep tob 'tag) tob (c1expr* tob info)) nb))))
 		 ((let ((nt (gensym)) (nb (cons ft nb)) vl)
-		    (dolist (v *vars*) (when (var-p v) (unless (var-tag v) (setf (var-tag v) nt) (push v vl))))
+		    (dolist (v *vars*) (when (var-p v) (unless (var-tag v) 
+							 (push (list v (var-mt v)) vl)
+							 (setf (var-tag v) nt (var-mt v) (var-type v)))))
 		    (do ((tob ob ob) (tnb nb nb) dne)
 			((not 
-			  (let ((nv (catch nt (do ((l (pop tob) (pop tob))) ((not l) nil)
-						  (push (if (typep l 'tag) l (c1expr* l info)) tnb)))));maybe copy-info here
+			  (let ((nv  (with-restore-vars  
+				      (catch nt 
+					(do ((l (pop tob) (pop tob))) ((not l) (when dne (setq *restore-vars* nil)))
+					    (push (if (typep l 'tag) l (c1expr* l info)) tnb))))));maybe copy-info here
 			    (cond (nv (cmpnote "caught ~s~%" nv) (setf (var-type nv) (var-mt nv)) t)
 				  ((not dne) 
-				   (dolist (v vl) (setf (var-tag v) t))
-				   (setq dne t)))))
-			 (dolist (v vl) (setf (var-tag v) nil))
+				      (dolist (v vl) (setf (var-tag (car v)) t 
+							   (var-mt (car v)) (type-or1 (var-mt (car v)) (cadr v))))
+				      (setq dne t)))))
+			 (dolist (v vl) (setf (var-tag (car v)) nil))
 			 tnb))))))))
 
 				     
@@ -144,6 +149,7 @@
   (do ((l body (cdr l))
        (body1 nil) (ref nil) (ref-clb nil) (ref-ccb nil))
       ((endp l)
+       (when (and (listp (car body1)) (info-p (cadar body1))) (setf (info-type info) (info-type (cadar body1))))
        (if (or ref-ccb ref-clb ref)
            (progn (setq body1 (reverse body1))
 		  ;; If ref-ccb is set, we will cons up the environment, hence
@@ -292,7 +298,7 @@
              (cond (ccb (setf (tag-ref-ccb tag) t))
                    (clb (setf (tag-ref-clb tag) t))
                    (t (setf (tag-ref tag) t)))
-             (return (list 'go *info* clb ccb tag))))))))
+             (return (list 'go (let ((info (copy-info *info*))) (setf (info-type info) nil) info) clb ccb tag))))))))
 
 (defun c2go (clb ccb tag)
   (cond (ccb (c2go-ccb tag))

@@ -39,16 +39,6 @@
 (defun note-branch-elimination (test-form val elim-form)
   (cmpnote "Test form ~S is ~S,~%;; eliminating branch ~S~%" test-form val elim-form))
 
-;; (defun min-real-bound (x)
-;;   (if (and (consp x) (member (car x) '(integer short-float long-float)))
-;;       (or (not (member x '(integer short-float long-float) :test 'type<=))
-;; 	  (nil-to-t (cadr x)))))
-
-;; (defun max-real-bound (x)
-;;   (if (and (consp x) (member (car x) '(integer short-float long-float)))
-;;       (or (not (member x '(integer short-float long-float) :test 'type<=))
-;; 	  (nil-to-t (caddr x)))))
-
 (defun negate (tp)
   (or (not tp) (unless (eq tp t) `(not ,tp))))
 
@@ -107,62 +97,6 @@
 	(otherwise (when (consp (car fmla))
 		     (fmla-infer-tp (car fmla))))))
 
-;; (defun c1if (args &aux info f)
-;;   (when (or (endp args) (endp (cdr args)))
-;;         (too-few-args 'if 2 (length args)))
-;;   (unless (or (endp (cddr args)) (endp (cdddr args)))
-;;           (too-many-args 'if 3 (length args)))
-;;   (setq f (c1fmla-constant (car args)))
-
-;;   (case f
-;;         ((t) 
-;; 	 (when (caddr args) (note-branch-elimination (car args) t (caddr args)))
-;; 	 (c1expr (cadr args)))
-;;         ((nil) 
-;; 	 (note-branch-elimination (car args) nil (cadr args))
-;; 	(if (endp (cddr args)) (c1nil) (c1expr (caddr args))))
-;;         (otherwise
-;;          (setq info (make-info))
-;; 	 (let* ((*fmla-eval-const* t)
-;; 		(fmla (c1fmla f info))
-;; 		(fmlae (fmla-eval-const fmla)))
-;; 	   (if *fmla-eval-const*
-;; 	       (cond (fmlae 
-;; 		      (when (caddr args) (note-branch-elimination (car args) t (caddr args)))
-;; 		      (c1expr** (cadr args) info))
-;; 		     (t (note-branch-elimination (car args) nil (cadr args)) 
-;; 			(if (endp (cddr args)) (c1nil) (c1expr** (caddr args) info))))
-;; 	     (let ((inf (fmla-infer-tp fmla)) r trv frv)
-;; 	       (dolist (l inf)
-;; 		 (let ((v (car (member (car l) *vars* :key (lambda (x) (when (var-p x) (var-name x)))))))
-;; 		   (when v
-;; 		     (push (list v (var-type v) (var-brt v) (cdr l)) r))))
-;; 	       (unwind-protect
-;; 		   (let* ((*restore-vars*)
-;; 			  (tb (progn (dolist (l r) 
-;; 				       (setf (var-brt (car l)) (car (cadddr l)))
-;; 				       (setf (var-type (car l)) (type-and (cadr l) (var-brt (car l)))))
-;; 				     (c1expr* (cadr args) info)))
-;; 			  (trv (copy-list *restore-vars*))
-;; 			  (*restore-vars*)
-;; 			  (fb (if (endp (cddr args)) (c1nil)
-;; 				(progn (dolist (l r) 
-;; 					 (setf (var-brt (car l)) (cdr (cadddr l)))
-;; 					 (setf (var-type (car l)) (type-and (cadr l) (var-brt (car l)))))
-;; 				       (c1expr* (caddr args) info))))
-;; 			  (frv (copy-list *restore-vars*)))
-;; 		     (setf (info-type info) (type-or1 (info-type (cadr tb)) 
-;; 						      (if (endp (cddr args)) 'null
-;; 							(info-type (cadr fb)))))
-;; 		     (do ((rv (pop trv) (pop trv))) ((not rv)) (setf (var-type (car rv)) (type-or1 (var-type (car rv)) (cadr rv))))
-;; 		     (do ((rv (pop frv) (pop frv))) ((not rv)) (setf (var-type (car rv)) (type-or1 (var-type (car rv)) (cadr rv))))
-;; 		     (list 'if info fmla tb fb))
-;; 		 (progn
-;; 		   (dolist (l (append trv frv))
-;; 		     (setf (var-type (car l)) (cadr l)))
-;; 		   (dolist (l r)
-;; 		     (setf (var-type (car l)) (cadr l) (var-brt (car l)) (caddr l)))))))))))
-
 (defvar *restore-vars*)
 
 (defun c1if (args &aux info f)
@@ -181,10 +115,9 @@
 	(if (endp (cddr args)) (c1nil) (c1expr (caddr args))))
         (otherwise
          (setq info (make-info))
-	 (let* ((*fmla-eval-const* t)
-		(fmla (c1fmla f info))
+	 (let* ((fmla (c1fmla f info))
 		(fmlae (fmla-eval-const fmla)))
-	   (if *fmla-eval-const*
+	   (if (not (eq fmlae 'boolean))
 	       (cond (fmlae 
 		      (when (caddr args) (note-branch-elimination (car args) t (caddr args)))
 		      (c1expr** (cadr args) info))
@@ -213,26 +146,41 @@
 			 (push (list (car l) (var-type (car l))) trv)
 			 (setf (var-type (car l)) (cadr l)))
 		     (do ((rv (pop   r) (pop   r))) ((not rv)) (setf (var-type (car rv)) (cadr rv)))
-		     (do ((rv (pop trv) (pop trv))) ((not rv)) (setf (var-type (car rv)) (type-or1 (var-type (car rv)) (cadr rv))))
+		     (do ((rv (pop trv) (pop trv))) ((not rv)) 
+			 (setf (var-type (car rv)) (type-or1 (var-type (car rv)) (cadr rv))))
 		     (list 'if info fmla tb fb))
 		 (dolist (l (append *restore-vars* r))
 		   (setf (var-type (car l)) (cadr l))))))))))
 
-(defvar *fmla-eval-const*)
+(defun t-and (x y)
+  (cond ((eq x 'boolean) (when y 'boolean))
+	((eq y 'boolean) (when x 'boolean))
+	((and x y))))
+
+(defun t-or (x y)
+  (cond ((eq x 'boolean) (or (eq y t) 'boolean))
+	((eq y 'boolean) (or (eq x t) 'boolean))
+	((or x y))))
+
+(defun t-not (x)
+  (if (eq x 'boolean)
+      'boolean
+    (not x)))
+
 (defun fmla-eval-const (fmla)
   (case (car fmla)
-	(fmla-and (and (fmla-eval-const (cdr fmla)) (fmla-eval-const (cddr fmla))))
-	(fmla-or (or (fmla-eval-const (cdr fmla)) (fmla-eval-const (cddr fmla))))
-	(fmla-not (not (fmla-eval-const (cdr fmla))))
+	(fmla-and (t-and (fmla-eval-const (cdr fmla)) (fmla-eval-const (cddr fmla))))
+	(fmla-or (t-or (fmla-eval-const (cdr fmla)) (fmla-eval-const (cddr fmla))))
+	(fmla-not (t-not (fmla-eval-const (cdr fmla))))
 	(location (caddr fmla))
 	((t nil) (car fmla))
 	(var (cond ((type>= 'null (info-type (second fmla))) nil) 
 		   ((type>= '(not null) (info-type (second fmla))) t)
-		   ((setq *fmla-eval-const* nil))))
+		   ('boolean)))
 	(otherwise (if (consp (car fmla)) 
 		       (fmla-eval-const (car fmla)) 
-		     (setq *fmla-eval-const* nil)))))
-		  
+		     'boolean))))
+
 (defun c1fmla-constant (fmla &aux f)
   (cond
    ((consp fmla)

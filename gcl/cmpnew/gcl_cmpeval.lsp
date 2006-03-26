@@ -436,12 +436,11 @@
 	      (cmp-vec-length ,s)))))))
 (si::putprop 'length (function length-expander) 'si::compiler-macro-prop)
 
-
 (defun endp-expander (form env)
   (declare (ignore env))
   (let ((x (gensym)))
     `(let ((,x ,(cadr form)))
-       (cond ((not ,x))
+       (cond ((not ,x) t);;Cannot infer the type of x below without the t 
 	     ,@(when *compiler-check-args* 
 		 `(((consp ,x) nil)
 		   ((error 'type-error :datum ,x :expected-type 'list))))))));;cannot continue
@@ -751,6 +750,37 @@
 		(set-difference ,(cadr r) ,(car r) :rev t ,@(cddr r)))))))
 (si::putprop 'set-exclusive-or (macro-function 'set-exclusive-or-compiler-macro) 'si::compiler-macro-prop)
 
+(defmacro mapcar-compiler-macro (&whole w &rest args)
+  (if (< (length args) 2) 
+      w
+    (let* ((syms (unless (inlinable-fn (car args)) `((,(gensym) ,(car args)))))
+	   (syms `(,@syms ,@(reduce (lambda (&rest r) 
+				      (when r 
+					`(,@(car r) (,(gensym) ,(cadr r)))))
+				    (cdr args) :initial-value nil)))
+	   (r (mapcar (lambda (x) (cond ((car (rassoc x syms :key 'car :test 'equal))) (x))) args))
+	   (ans (gensym)) (l (gensym)) (tmp (gensym))
+	   (car (member (car w) '(mapcar mapcan mapc)))
+	   (fc `(funcall ,(car r) ,@(if car (mapcar (lambda (x) `(car ,x)) (cdr r)) (cdr r))))
+	   (accum (member (car w) '(mapcar maplist mapcan mapcon)))
+	   (cat (member (car w) '(mapcan mapcon)))
+	   (syms `(,@syms ,@(if accum `(,ans ,l) `((,ans ,(cadr r)))))))
+      `(let* (,@syms)
+	 (do (,@(mapcar (lambda (x) `(,x ,x (cdr ,x))) (cdr r)))
+	     ((or ,@(mapcar (lambda (x) `(endp ,x)) (cdr r))) ,ans)
+	     ,(cond (cat `(setq ,l (let ((,tmp ,fc))
+			      (cond (,l (last (rplacd ,l ,tmp))) ((listp ,tmp) (last (setq ,ans ,tmp))) ((setq ,ans ,tmp))))))
+		    (accum `(setq ,l (let ((,tmp (cons ,fc nil)))
+			      (if ,l (cdr (rplacd ,l ,tmp)) (setq ,ans ,tmp)))))
+		    (fc)))))))
+(si::putprop 'mapcar (macro-function 'mapcar-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'maplist (macro-function 'mapcar-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'mapc (macro-function 'mapcar-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'mapl (macro-function 'mapcar-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'mapcan (macro-function 'mapcar-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'mapcon (macro-function 'mapcar-compiler-macro) 'si::compiler-macro-prop)
+      
+	   
 ;;start end count position
 (defun do-sequence-search (fn vars &key dest newseq sum pos start end count test test-not
 			      (item nil itemp) ret k1 (key nil keyp) rev not (iv nil ivp))

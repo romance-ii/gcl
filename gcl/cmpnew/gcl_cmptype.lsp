@@ -498,10 +498,12 @@
 (si::putprop 'ash 'ash-propagator 'type-propagator)
 
 (defun expt-propagator (f t1 t2)
-  (cond ((and (type>= 'integer t1) 
-	      (or (not (type>= 'fixnum t1))
-		  (not (type>= '(integer #.most-negative-fixnum #.(integer-length most-positive-fixnum)) t2)))) nil)
-	((super-range f t1 t2))))
+  (cond ((let ((v1 (member-if (lambda (x) (type>= t1 x) (type>= x t1)) +real-contagion-list+))
+	       (v2 (member-if (lambda (x) (type>= t2 x) (type>= x t2)) +real-contagion-list+)))
+	   (or (car (member (car v1) v2)) (car (member (car v2) v1)))))
+	((or (not (type>= '(real #.(float most-negative-fixnum) #.(float most-positive-fixnum)) t1))
+	     (not (type>= '(real #.(float most-negative-fixnum) #.(float (integer-length most-positive-fixnum))) t2))) nil)
+	((type-or1 (super-range f (type-and '(real (0)) t1) t2) (super-range f (type-and '(real * (0)) t1) t2)))))
 (si::putprop 'expt 'expt-propagator 'type-propagator)
 
 (defun abs-propagator (f t1)
