@@ -428,22 +428,21 @@
   (declare (ignore env))
   (let ((i (gensym)) (s (gensym)))
     (with-var-form-type (s (cadr form) 'sequence)
-     `(the seqind ;FIXME
-	  (if (listp ,s)	
+     `(if (listp ,s)	
 	      (do ((,i 0 (1+ ,i)) (,s ,s (cdr ,s))) ((endp ,s) ,i)
 		  (declare (seqind ,i)))
-	    (let ((,s ,s)) ;;FIXME should be automatic co1typep
-	      (cmp-vec-length ,s)))))))
+	(cmp-vec-length ,s)))))
 (si::putprop 'length (function length-expander) 'si::compiler-macro-prop)
 
 (defun endp-expander (form env)
   (declare (ignore env))
-  (let ((x (gensym)))
-    `(let ((,x ,(cadr form)))
-       (cond ((not ,x) t);;Cannot infer the type of x below without the t 
-	     ,@(when *compiler-check-args* 
-		 `(((consp ,x) nil)
-		   ((error 'type-error :datum ,x :expected-type 'list))))))));;cannot continue
+  (if *compiler-check-args*
+      (let ((x (gensym)))
+	`(let ((,x ,(cadr form)))
+	   (cond ((not ,x) t);;Cannot infer the type of x below without the t 
+		 ((consp ,x) nil)
+		 ((error 'type-error :datum ,x :expected-type 'list)))));;cannot continue
+    `(not ,(cadr form))))
 (si::putprop 'endp (function endp-expander) 'si::compiler-macro-prop)
   
 (defun garef (a i l)
@@ -514,7 +513,7 @@
 	   (let ((,seq ,seq))
 	     (declare (list ,seq))
 	     ,(qsl-fun seq (caddr form) (if (cdddr form) (fifth form) ''identity) t)))))))
-(si::putprop 'sort (function qsort-expander) 'si::compiler-macro-prop)
+(si::putprop 'sort        'qsort-expander 'si::compiler-macro-prop)
 
 (defun mheap (a r b key p)
   (let ((block (gensym)) (j (gensym)) (k (gensym)) (k1 (gensym)) (kk (gensym)) (kk1 (gensym)) (x (gensym)))
@@ -615,9 +614,15 @@
 
 (si::putprop 'array-row-major-index (function array-row-major-index-expander) 'si::compiler-macro-prop)
 
-(defmacro with-pulled-array (bindings form &body body)
+;; (defmacro with-pulled-array (bindings form &body body)
+;;   `(let ((,(car bindings) (cadr ,form)))
+;;      (let ((,(cadr bindings) (and (consp ,(car bindings)) `((,(gensym) ,,(car bindings))))))
+;;        (let ((,(caddr bindings) (or (caar ,(cadr bindings)) ,(car bindings))))
+;; 	 ,@body))))
+	
+(defmacro with-pulled-array (bindings form &body body) ;FIXME
   `(let ((,(car bindings) (cadr ,form)))
-     (let ((,(cadr bindings) (and (consp ,(car bindings)) `((,(gensym) ,,(car bindings))))))
+     (let ((,(cadr bindings) `((,(gensym) ,,(car bindings)))))
        (let ((,(caddr bindings) (or (caar ,(cadr bindings)) ,(car bindings))))
 	 ,@body))))
 	
@@ -682,13 +687,11 @@
       w
     (let* ((syms (reduce (lambda (&rest r) 
 			   (when r 
-			     (if (or (constantp (cadr r))
-				     (and (consp (cadr r)) (eq (caadr r) 'lambda))) 
+			     (if (inlinable-fn (cadr r))
 				 (car r) 
 			       `(,@(car r) (,(gensym) ,(cadr r))))))
 			 args :initial-value nil))
-	   (r (mapcar (lambda (x) (cond ((constantp x) x)
-					((and (consp x) (eq (car x) 'lambda)) x)
+	   (r (mapcar (lambda (x) (cond ((inlinable-fn x) x)
 					((car (rassoc x syms :key 'car :test 'equal))) (x))) args))
 	   (specials (if (member (car w) '(rassoc rassoc-if rassoc-if-not)) '(:k1 'cdr) '(:k1 'car)))
 	   (specials (if (member (car w) '(member assoc rassoc)) `(:item ,(car r) ,@specials) specials))
@@ -782,7 +785,7 @@
       
 	   
 ;;start end count position
-(defun do-sequence-search (fn vars &key dest newseq sum pos start end count test test-not
+(defun do-sequence-search (fn vars &key (some nil somep) dest newseq sum pos start end count test test-not
 			      (item nil itemp) ret k1 (key nil keyp) rev not (iv nil ivp))
   (declare (ignore test not))
   (let* (
@@ -807,6 +810,7 @@
 	 (out (gensym))
 	 (lh (gensym))
 	 (sv (gensym))
+	 (sm (gensym))
 	 (fv (gensym))
 	 (p  (gensym))
 	 (cv  (gensym))
@@ -815,6 +819,7 @@
 	 (tf (if itemp (if (and (not sum) (= (length vars) 1)) (cons item tf) (baboon)) tf))
 	 (tf (if rev (nreverse tf) tf))
 	 (tf `(funcall ,fn ,@tf))
+	 (tf (if somep `(setq ,sm ,tf) tf))
 	 (tf (if test-not `(not ,tf) tf))
 
 	 (tf (if (and sum (not ivp)) (if (= (length vars) 1) `(if ,fv ,tf ,first) (baboon)) tf))
@@ -830,6 +835,7 @@
 	 (lf (if (or dest (eq newseq :list))
 		 `(,@lf (,p (unless (typep ,dest 'vector) ,dest))) lf))
 	 (lf (if sum `(,@lf (,fv ,ivp) (,sv ,iv)) lf))
+	 (lf (if somep `(,@lf (,sm ,(not some))) lf))
 	 (lf (if count `(,@lf (,cv 0)) lf))
 	 (lf (if (eq newseq :list ) `(,@lf ,lh) lf))
 	 (inf (if (or dest (eq newseq :list)) 
@@ -858,6 +864,7 @@
 		   (sum `(if ,fv ,sv (funcall ,fn)))
 		   (count cv) 
 		   (pos `(unless (= ,i ,l) ,i))
+		   (somep (if some sm `(not ,sm)))
 		   ((if ret `(funcall ,ret ,(caar gs)) (caar gs))))))
 
     `(let* ,lf  
@@ -871,7 +878,7 @@
 					 &key key start end (test ''eql testp) (test-not nil test-notp))
   (declare (ignore key start end testp));FIXME
   (let* ((test (if test-notp test-not test))
-	 (test (if (and (consp test) (eq (car test) 'function)) `(quote ,(cadr test)) test))
+	 (test (if (and (consp test) (eq (car test) 'function) (symbolp (cadr test))) `(quote ,(cadr test)) test))
 	 (r `(,@special-keys ,@r)))
     (let ((form (apply 'do-sequence-search test (list seq) r)))
       (if (member :item special-keys)
@@ -888,7 +895,9 @@
     (position-if-not . (:test-not (:pos t)))
     (count . (:item (:count t)))
     (count-if . (:test (:count t)))
-    (count-if-not . (:test-not (:count t)))))
+    (count-if-not . (:test-not (:count t)))
+    (some . (:test (:some t)))
+    (notevery . (:test-not (:some nil)))))
 
 (defmacro seq-compiler-macro (&whole w &rest args)
   (if (or (< (length args) 2) 
@@ -922,6 +931,15 @@
 (si::putprop 'count (macro-function 'seq-compiler-macro) 'si::compiler-macro-prop)
 (si::putprop 'count-if (macro-function 'seq-compiler-macro) 'si::compiler-macro-prop)
 (si::putprop 'count-if-not (macro-function 'seq-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'some (macro-function 'seq-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'notevery (macro-function 'seq-compiler-macro) 'si::compiler-macro-prop)
+
+(defmacro notany-compiler-macro (&rest args)
+  `(not (some ,@args)))
+(si::putprop 'notany (macro-function 'notany-compiler-macro) 'si::compiler-macro-prop)
+(defmacro every-compiler-macro (&rest args)
+  `(not (notevery ,@args)))
+(si::putprop 'every (macro-function 'every-compiler-macro) 'si::compiler-macro-prop)
 
 
 (defmacro map-into-compiler-macro (&whole w &rest args)
@@ -1101,7 +1119,9 @@
         (t (let* ((info (make-info
 			 :sp-change (null (get fname 'no-sp-change))))
 		  (args (if (and (member fname '(funcall apply))
-				 (and (consp (car args)) (eq (caar args) 'quote) (symbolp (cadar args))))
+				 (consp (car args))
+				 (eq (caar args) 'quote)
+				 (symbolp (cadar args)))
 			    `((function ,(cadar args)) ,@(cdr args))
 			  args))
                   (forms (c1args args info))) ;; info updated by args here
@@ -1161,7 +1181,7 @@
 (defun c1lambda-fun (lambda-expr args &aux (info (make-info :sp-change t)))
   (if (not (intersection '(&optional &rest &key &aux &allow-other-keys) (car lambda-expr)))
       (c1expr
-       `(let* (,@(mapcar (lambda (x y) (list x y)) (car lambda-expr)  args))
+       `(let (,@(mapcar (lambda (x y) (list x y)) (car lambda-expr)  args))
 	  ,@(cdr lambda-expr)))
     (progn 
       (setq args (c1args args info))

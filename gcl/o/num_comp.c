@@ -310,8 +310,7 @@ LFD(Lmax)(void)
 	for (i = 0;  i < narg;  i++)
 		check_type_or_rational_float(&vs_base[i]);
 	for (i = 1, max = vs_base[0];  i < narg;  i++)
-		if (number_compare(max, vs_base[i]) < 0)
-			max = vs_base[i];
+	  max = number_compare(max, vs_base[i]) < 0 ? fixnum_float_contagion(vs_base[i],max) : fixnum_float_contagion(max,vs_base[i]);
 	vs_top = vs_base+1;
 	vs_base[0] = max;
 }
@@ -327,8 +326,7 @@ LFD(Lmin)(void)
 	for (i = 0;  i < narg;  i++)
 		check_type_or_rational_float(&vs_base[i]);
 	for (i = 1, min = vs_base[0];  i < narg;  i++)
-		if (number_compare(min, vs_base[i]) > 0)
-			min = vs_base[i];
+	  min = number_compare(min, vs_base[i]) > 0 ? fixnum_float_contagion(vs_base[i],min) : fixnum_float_contagion(min,vs_base[i]);
 	vs_top = vs_base+1;
 	vs_base[0] = min;
 }

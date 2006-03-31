@@ -42,7 +42,7 @@
 (defun negate (tp)
   (or (not tp) (unless (eq tp t) `(not ,tp))))
 
-(defun tp-reduce (f1 f2 l1 l2 r)
+(defun tp-reduce (f1 f2 l1 l2 r);;FIXME this needs to work on vars, not names
   (cond (l1 (tp-reduce f1 f2 (cdr l1) l2 
 		       (cons (cons (caar l1) 
 				   (cons 
@@ -58,7 +58,7 @@
 (defconstant +bool-inf-op-list+ '((> . <=) (>= . <) (< . >=) (<= . >)))
 
 
-(defun two-tp-inf (fn t2)
+(defun two-tp-inf (fn t2);;FIXME use num type bounds here for or types
   (case fn
 	((> >=) (if (and (consp t2) (member (car t2) '(integer short-float long-float)))
 		    `(real ,(or (cadr t2) '*)) t))
@@ -67,7 +67,7 @@
 
 (defmacro vl-name (x) `(var-name (car (third ,x))))
 (defmacro itp (x) `(info-type (second ,x)))
-(defmacro vlp (x) `(eq 'var (car ,x)))
+(defmacro vlp (x) `(and (eq 'var (car ,x)) (eq (var-kind (car (third ,x))) 'lexical)))
 (defmacro tppr (f r x) (let ((s (gensym))) `(let ((,s (cmp-norm-tp ,x))) (cons (two-tp-inf ,f ,s) (two-tp-inf ,r ,s)))))
 (defmacro reduce-lambda ((x y) &rest forms)
   (let ((xy (gensym)))
@@ -81,19 +81,19 @@
 	(fmla-and (reduce (reduce-lambda (x y) (tp-reduce 'type-and 'type-or1 x y nil)) (maplist 'fmla-infer-tp (cdr fmla))))
 	(fmla-or  (reduce (reduce-lambda (x y) (tp-reduce 'type-or1 'type-and x y nil)) (maplist 'fmla-infer-tp (cdr fmla))))
 	(fmla-not (mapcar (lambda (x) (cons (car x) (cons (cddr x) (cadr x)))) (fmla-infer-tp (cdr fmla))))
-	(var (list (cons (var-name (car (third fmla))) (cons '(not null) 'null))))
+	(var (when (vlp fmla) (list (cons (var-name (car (third fmla))) (cons '(not null) 'null)))))
 	(call-global
 	 (let* ((fn (third fmla)) (rfn (cdr (assoc fn +bool-inf-op-list+)))
 		(args (fourth fmla)) (l (length args)) (pt (get fn 'si::predicate-type)))
-	   (cond ((and (= l 1) (eq (car (first args)) 'var) pt) (list (cons (vl-name (first args)) (cons pt `(not ,pt)))))
+	   (cond ((and (= l 1) (vlp (first args)) pt) (list (cons (vl-name (first args)) (cons pt `(not ,pt)))))
 		 ((and (= l 2) rfn)
 		  (let (r)
 		    (when (vlp (first args))
 		      (push (cons (vl-name (first args)) (tppr fn rfn (itp (second args)))) r))
 		    (when (vlp (second args))
 		      (push (cons (vl-name (second args)) (tppr rfn fn (itp (first args)))) r))
-		    r))
-		 ((map 'list (lambda (x) (cons (var-name x) (cons t t))) (info-referred-array (second fmla)))))))
+		    r)))))
+	;;((map 'list (lambda (x) (cons (var-name x) (cons t t))) (info-referred-array (second fmla))))
 	(otherwise (when (consp (car fmla))
 		     (fmla-infer-tp (car fmla))))))
 
@@ -127,7 +127,7 @@
 	       (dolist (l inf)
 		 (let ((v (car (member (car l) *vars* :key (lambda (x) (when (var-p x) (var-name x)))))))
 		   (when v
-		     (push (list v (var-type v) (cdr l)) r))))
+		     (push (list v (var-type v) (cdr l)) r))));;FIXME return in this from from infer-tp
 	       (unwind-protect
 		   (let* ((tb (progn (dolist (l r) 
 				       (setf (var-type (car l)) (type-and (cadr l) (car (caddr l)))))
@@ -226,14 +226,14 @@
             (and (case (length (cdr fmla))
                    (0 (c1t))
                    (1 (c1fmla (cadr fmla) info))
-                   (t (cons 'FMLA-AND
-                            (mapcar #'(lambda (x) (c1fmla x info))
+                   (t (cons 'FMLA-AND ;;FIXME pass this all through iff and avoid duplication of this logic here
+                            (mapcar (lambda (x) (with-restore-vars (prog1 (c1fmla x info) (do (l) ((not (setq l (pop *restore-vars*)))) (setf (var-type (car l)) (type-or1 (var-type (car l)) (cadr l)))))))
                                     (cdr fmla))))))
             (or (case (length (cdr fmla))
                    (0 (c1nil))
                    (1 (c1fmla (cadr fmla) info))
                    (t (cons 'FMLA-OR
-                            (mapcar #'(lambda (x) (c1fmla x info))
+                            (mapcar (lambda (x) (with-restore-vars (prog1 (c1fmla x info) (do (l) ((not (setq l (pop *restore-vars*)))) (setf (var-type (car l)) (type-or1 (var-type (car l)) (cadr l)))))))
                                     (cdr fmla))))))
             ((not null)
                   (when (endp (cdr fmla)) (too-few-args 'not 1 0))

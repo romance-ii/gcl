@@ -64,11 +64,14 @@
 ;;; when the compiler begins to process a closure.  A local macro definition
 ;;; is a list ( macro-name expansion-function).
 
-(defmacro with-restore-vars (&rest body); `(progn ,@body))
+(defmacro pop-restore-vars nil
   (let ((l (gensym)))
-    `(let (*restore-vars* ,l)
+    `(do (,l) ((not (setq ,l (pop *restore-vars*)))) (setf (var-type (car ,l)) (cadr ,l)))))
+
+(defmacro with-restore-vars (&rest body); `(progn ,@body))
+    `(let (*restore-vars*)
        (unwind-protect (progn ,@body)
-	 (do nil ((not (setq ,l (pop *restore-vars*)))) (setf (var-type (car ,l)) (cadr ,l)))))))
+	 (pop-restore-vars))))
 
 (defun c1flet (args &aux body ss ts is other-decl info
                          (defs1 nil) (local-funs nil) (closures nil) (*info* (copy-info *info*)))

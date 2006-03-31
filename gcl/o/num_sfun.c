@@ -281,8 +281,10 @@ number_sqrt(object x)
 	case t_bignum:
 	case t_ratio:
 	  d=sqrt(number_to_double(x));
-	  if (d!=(number_to_double((q=double_to_integer(d)))))
-	    t=t_longfloat;
+/* 	  if (d!=(number_to_double((q=double_to_integer(d))))) */
+/* 	    t=t_longfloat; */
+	  q=Cnil;
+	  t=t_longfloat;
 	  break;
 	case t_shortfloat:
 	  d=sqrt((double)(sf(x)));

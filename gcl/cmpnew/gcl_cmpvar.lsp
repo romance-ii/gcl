@@ -122,8 +122,8 @@
 (defun check-vref (var)
   (when (and (eq (var-kind var) 'LEXICAL)
              (not (var-ref var)) ;;; This field may be IGNORE.
-             (not (var-ref-ccb var))
-	     (every (lambda (x) (or (not (var-p x)) (not (t-to-nil (var-tag x))))) *vars*))
+             (not (var-ref-ccb var)))
+;	     (every (lambda (x) (or (not (var-p x)) (not (t-to-nil (var-tag x))))) *vars*))
         (cmpwarn "The variable ~s is not used." (var-name var))))
 
 (defun c1var (name)
@@ -358,17 +358,11 @@
       (setf (var-type v) tp)
       (unless (type>= (var-mt v) tp)
 	(setf (var-mt v) (type-or1 (var-mt v) tp))
-	(when (t-to-nil (var-tag v))
-	  (let* ((ff (c1expr form))
-		 (t1 (info-type (second ff)))
-		 (tp (type-and (var-dt v) t1)))
-	    (unless (and (type>= (var-mt v) tp)
-			 (every (lambda (x) (eq t (var-tag x))) (info-referred-array (second ff))))
-	      (let* ((nmt (car (member (var-mt v) +useful-c-types+ :test 'type<=)))
-		     (nmt (type-and nmt (var-dt v))))
-		(setf (var-mt v) nmt)))
-	    (setf (var-type v) (var-mt v))
-	    (throw (var-tag v) v)))))))
+	(when (var-tag v)
+	  (let* ((nmt (car (member (var-mt v) +useful-c-types+ :test 'type<=)))
+		 (nmt (type-and nmt (var-dt v))))
+	    (setf (var-mt v) nmt))
+	  (throw (var-tag v) v))))))
 	
 
 (defun c1setq1 (name form &aux (info (make-info)) type form1 name1)

@@ -1608,7 +1608,7 @@
                      (object (wt (cadr arg)))
                      (char (wt "code_char((long)" (cadr arg) ")"))
                      (int (when (zerop *space*) (wt "CMP"))
-                          (wt "make_fixnum((long)" (cadr arg) ")"))
+                          (wt "make_fixnum(" (cadr arg) ")"))
                      (float (wt "make_shortfloat((double)" (cadr arg) ")"))
                      (double (wt "make_longfloat((double)" (cadr arg) ")")))
                (wt ");"))

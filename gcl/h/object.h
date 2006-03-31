@@ -486,6 +486,9 @@ struct string {           /*  string header  */
 #define CONTROL_ERROR(a_) ({object tp_err=make_simple_string(a_);\
                            Icall_error_handler(sKcontrol_error,tp_err,0);})
 
+#define PROGRAM_ERROR(a_,b_) ({object tp_err=make_simple_string(a_);\
+                             Icall_error_handler(sKprogram_error,tp_err,1,(b_));})
+
 #define READER_ERROR(a_,b_)  ({object rd_err=make_simple_string("Read error on stream ~S: " b_);\
                               Icall_error_handler(sKreader_error,rd_err,1,(a_));})
 
@@ -1377,3 +1380,19 @@ extern void *stack_alloc_start,*stack_alloc_end;
 #define write_pointer_object(a_,b_) fSwrite_pointer_object(a_,b_)
 
 #define read_pointer_object(a_) fSread_pointer_object(a_)
+
+#define fixnum_float_contagion(a_,b_) \
+  ({register object _a=(a_),_x=_a,_b=(b_);\
+    register enum type _ta=type_of(_a),_tb=type_of(_b);\
+    if (_ta!=_tb)\
+       switch(_ta) {\
+          case t_shortfloat: if (_tb==t_longfloat) _x=make_longfloat(sf(_a)); break;\
+          case t_fixnum: \
+              switch(_tb) {\
+                  case t_longfloat:  _x=make_longfloat (fix(_a));break;\
+                  case t_shortfloat: _x=make_shortfloat(fix(_a));break;\
+                  default: break;}\
+          break;\
+          default: break;}\
+   _x;})
+                                        

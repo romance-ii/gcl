@@ -225,16 +225,19 @@ shift_integer(object x, fixnum w) {
 }
 	
 
-static int
-int_bit_length(int i)
-{
-	int	count, j;
-
-	count = 0;
-	for (j = 0; j <= (LOG_WORD_SIZE-1) ; j++)
-		if (((i >> j) & 1) == 1) count = j + 1;
-	return(count);
+static fixnum
+int_bit_length(fixnum i) {
+  fixnum j;
+  for (j=LOG_WORD_SIZE-1;j>=0 && !((i>>j)&1);j--);
+  return j+1;
 }
+
+	
+/* 	count = 0; */
+/* 	for (j = 0; j <= (LOG_WORD_SIZE-1) ; j++) */
+/* 		if (((i >> j) & 1) == 1) count = j + 1; */
+/* 	return(count); */
+/* } */
 
 
 

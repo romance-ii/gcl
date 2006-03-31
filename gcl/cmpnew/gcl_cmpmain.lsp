@@ -445,8 +445,7 @@ Cannot compile ~a.~%"
 (defun compile (name &optional def &aux tem gaz (*default-pathname-defaults* #"."))
 
   (cond ((not(symbolp name)) (error "Must be a name"))
-	((and (consp def)
-	      (member (car def) '(lambda )))
+	((or (si::interpreted-function-p def) (and (consp def) (eq (car def) 'lambda)))
 	 (or name (setf name 'cmp-anon))
 	 (setf (symbol-function name)
 	       def)
@@ -773,7 +772,6 @@ SYSTEM_SPECIAL_INIT
 	 (c (merge-pathnames (make-pathname :type "c") c)))
   
   (with-open-file (st c :direction :output)
-		  (format st "#include <string.h>~%")
 		  (format st "#include ~a~%~%" *cmpinclude*)
 
 		  (format st "#define load2(a) do {")

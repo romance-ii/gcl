@@ -1109,8 +1109,12 @@ collected result will be returned as the value of the LOOP."
 
 
 (defun loop-pseudo-body (form)
-  (cond ((or *loop-emitted-body* *loop-inside-conditional*) (push form *loop-body*))
-	(t (push form *loop-before-loop*) (push form *loop-after-body*))))
+   (push form *loop-body*))
+;;   (cond (*loop-emitted-body* (push form *loop-body*))
+;; 	(*loop-inside-conditional* (push form *loop-body*) (push nil *loop-before-loop*) (push nil *loop-after-body*))
+;; ;	(*loop-inside-while* (nconc *loop-before-loop* (list nil)) (nconc *loop-after-body* (list form)))
+;; 	(t (push form *loop-before-loop*)
+;; 	   (push form *loop-after-body*))))
 
 (defun loop-emit-body (form)
   (setq *loop-emitted-body* t)
@@ -1916,6 +1920,7 @@ collected result will be returned as the value of the LOOP."
 	 (limit-given nil)			;T when prep phrase has specified end
 	 (limit-constantp nil)
 	 (limit-value nil)
+	 (indexv (or indexv (gensym)))
 	 )
      (when variable (loop-make-iteration-variable variable nil variable-type))
      (do ((l prep-phrases (cdr l)) (prep) (form) (odir)) ((null l))

@@ -66,23 +66,41 @@
   (incf *error-count*)
   (throw *cmperr-tag* '*cmperr-tag*))
 
+(defvar *warning-note-stack*)
+
 (defvar *suppress-compiler-warnings* nil)
 
+(defmacro maybe-to-wn-stack (&rest body)
+  (let ((cf (gensym)))
+  `(if (boundp '*warning-note-stack*)
+       (let ((,cf *current-form*)) (push (lambda nil (let ((*current-form* ,cf)) ,@body)) *warning-note-stack*))
+     (progn ,@body))))
+
+(defun output-warning-note-stack nil
+  (when (boundp '*warning-note-stack*)
+    (do ((*warning-note-stack* (nreverse *warning-note-stack*)))
+	((not *warning-note-stack*))
+      (funcall (pop *warning-note-stack*)))))
+  
+  
 (defun cmpwarn (string &rest args &aux (*print-case* :upcase))
   (unless *suppress-compiler-warnings*
-    (print-current-form)
-    (format t ";; Warning: ")
-    (apply #'format t string args)
-    (terpri))
+    (maybe-to-wn-stack
+     (print-current-form)
+     (format t ";; Warning: ")
+     (apply #'format t string args)
+     (terpri)))
   nil)
 
 (defvar *suppress-compiler-notes* t)
 
 (defun cmpnote (string &rest args &aux (*print-case* :upcase))
   (unless *suppress-compiler-notes* 
-    (terpri)
-    (format t ";; Note: ")
-    (apply #'format t string args))
+    (maybe-to-wn-stack
+     (print-current-form)
+     (format t ";; Note: ")
+     (apply #'format t string args)
+     (terpri)))
   nil)
 
 (defun print-current-form ()

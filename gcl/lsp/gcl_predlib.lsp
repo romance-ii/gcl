@@ -136,7 +136,7 @@
 	 ((if (symbolp tp) (get tp 's-data) (typep-int tp 's-data))
 	  (let ((z (structure-subtype-p object tp))) z))
 	 ((classp tp)
-	  (values (subtypep (class-of object) tp)))))))
+	  (subtypep1 (class-of object) tp))))))
 	 
 
 ;;; TYPEP predicate.
@@ -251,42 +251,47 @@
 (defmacro check-type-eval (place type)
   `(assert (typep ,place ,type) (,place) 'type-error :datum ,place :expected-type ,type))
 
+(defconstant +coerce-list+ '(list vector string array character short-float long-float float complex function null cons))
+
 ;;; COERCE function.
 (defun coerce (object type)
   (declare (optimize (safety 1)))
   (when (typep-int object type)
     (return-from coerce object))
-  (cond
-   ((subtypep1 type 'function)
-    (cond ((symbolp object) (symbol-function object))
-	  ((and (consp object) (eq (car object) 'lambda)) (eval `(function ,object)))
-	  ((function-identifierp object) (get (cadr object) 'setf-function))));FIXME
-   ((subtypep1 type 'list)
-    (let* ((l (length object))
-	   (x (sequence-type-length-type type)))
-      (when x (check-type l x))
-      (do ((ll nil (cons (elt object i) ll))
-	   (i (1- l) (1- i)))
-	  ((< i 0) ll))))
-   ((subtypep1 type 'array)
-    (let* ((l (length object))
-	   (x (sequence-type-length-type type)))
-      (when x (check-type-eval l x))
-      (do ((seq (make-sequence type l))
-	   (i 0 (1+ i))
-	   (l l))
-	  ((>= i l) seq)
-	  (setf (elt seq i) (elt object i)))))
-   ((subtypep1 type 'character) (character object))
-   ((subtypep1 type 'short-float) (float object 0.0S0))
-   ((subtypep1 type 'long-float) (float object 0.0L0))
-   ((subtypep1 type 'float) (float object))
-   ((subtypep1 type 'complex)
-    (if (or (atom type) (null (cdr type)) (null (cadr type)) (eq (cadr type) '*))
-	(complex (realpart object) (imagpart object))
-      (complex (coerce (realpart object) (cadr type))
-	       (coerce (imagpart object) (cadr type)))))
-   ((check-type-eval object type))))
+  (let ((tp (or (car (member (if (atom type) type (car type)) +coerce-list+))
+		(car (member type +coerce-list+ :test 'subtypep1)))))
+    (case tp
+      (function
+       (cond ((symbolp object) (symbol-function object))
+	     ((and (consp object) (eq (car object) 'lambda)) (eval `(function ,object)))
+	     ((function-identifierp object) (get (cadr object) 'setf-function))));FIXME
+      ((null cons list)
+       (let* ((l (length object))
+	      (x (sequence-type-length-type type)))
+	 (when x (check-type l x))
+	 (do ((ll nil (cons (aref object i) ll))
+	      (i (1- l) (1- i)))
+	     ((< i 0) ll))))
+      ((vector string array)
+       (let* ((l (length object))
+	      (x (sequence-type-length-type type))
+	      (v (typep object 'list)))
+	 (when x (check-type-eval l x))
+	 (do ((seq (make-sequence type l))
+	      (i 0 (1+ i))
+	      (p (and v object) (and p (cdr p))))
+	     ((>= i l) seq)
+	  (setf (aref seq i) (or (car p) (aref object i))))));;FIXME
+      (character (character object))
+      (short-float (float object 0.0S0))
+      (long-float (float object 0.0L0))
+      (float (float object))
+      (complex
+       (if (or (atom type) (null (cdr type)) (null (cadr type)) (eq (cadr type) '*))
+	   (complex (realpart object) (imagpart object))
+	 (complex (coerce (realpart object) (cadr type))
+		  (coerce (imagpart object) (cadr type)))))
+      (otherwise (check-type-eval object type)))))
 
 ;;; DEFTYPE macro.
 (defmacro deftype (name lambda-list &rest body &aux decls prot)

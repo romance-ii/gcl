@@ -654,12 +654,12 @@
 				  (cond ((>= n max) (setq  max n)))
 				  (wt-loc (nth n locs)))))
                          (incf i 2))
-			((char= char #\$)
+			((char= char #\@);FIXME better error checking
 			 (let* ((n (- (char-code (char fun (1+ i))) #.(char-code #\1)))
-				(pos (position #\$ fun :start (+ i 2)))
+				(pos (position #\@ fun :start (+ i 2)))
 				(new-fun (subseq fun (+ i 2) pos))
 				(*value-to-go* (or (nth n *values-to-go*)
-						   (and (member *value-to-go* '(top return) :test #'eq)
+						   (and (member *value-to-go* '(top return))
 						       (list 'vs (vs-push)))
 						   'trash)))
 			   (set-loc (list (nth n others) (flags) new-fun locs))
@@ -683,7 +683,7 @@
 (defun wt-inline-fixnum (side-effectp fun locs)
   (declare (ignore side-effectp))
   (when (zerop *space*) (wt "CMP"))
-  (wt "make_fixnum((long)") (wt-inline-loc fun locs) (wt ")"))
+  (wt "make_fixnum(") (wt-inline-loc fun locs) (wt ")"))
 
 (defun wt-inline-integer (side-effectp fun locs)
   (declare (ignore side-effectp))
@@ -792,14 +792,9 @@
 ;;from the function definitions themselves.  CM 20050106.
 (defun aref-propagator (fn x &rest inds)
   (declare (ignore fn inds))
-  (let* ((x (cmp-norm-tp x))
-	 (x (if (boundp '*compiler-output1*) (type-and 'array x) x)) ;;detect pass2 FIXME
-	 )
+  (let* ((x (cmp-norm-tp x)))
     (and (consp x) (member (car x) '(array simple-array))
-       (let ((uaet (and (not (eq (cadr x) '*)) (upgraded-array-element-type (nil-to-t (cadr x))))))
-	 ;; FIXME -- inline bit-vectors too.
-	 (unless nil;(eq uaet 'bit)
-	   uaet)))))
+	 (and (not (eq (cadr x) '*)) (upgraded-array-element-type (nil-to-t (cadr x)))))))
 
 (defun var-array-type (a)
   (when (consp a)

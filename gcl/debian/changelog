@@ -129,8 +129,26 @@ gclcvs (2.7.0-54) unstable; urgency=low
     variables on trial tagbody runs
   * revert NO_main_HERE_PLEASE in plttest.c
   * fix prin1 on code-char 28
+  * length-expander cleanup,endp-expander cleanup,bind alll arrays in
+    aref expansion to avoid pass2 typing,inlinable=fn in member-
+    compiler-macro,some,every,notany,notevery compiler macros,wrap
+    functions in `(function ) at safety 3,let*->let in c1lambda-
+    fun,with-restore-vars cleanup,boolean info in do-eq-et-al,constant
+    list checking in c1is-eq-tp-list,c1make-array type fixing,onliny
+    infer lexicals in fmla-infer-tp,do not infer (t t) types in fmla-
+    infer-tp,wrap fmla-and and fmla-or c1expr in with-restore-vars as is
+    conditional,replace $ inline string escape with @ for multiple value
+    inlining,not (long) cast in make_fixnum,arref-propagator
+    cleanup,allow compile nil (function f),fix compiler__lionk for new
+    cmpinclude.h,max min sqrt float_integer coersion,tag setq typing
+    code cleanup,max,min,expt,integer-length type-propagator
+    fixes,optional warning/note output stack,var-tag no longer t,do-
+    setq-tp always bumps type on conflict,restrict get-var-types in
+    collectfn.lsp (needs more work),cmod et.al. are not predicates,some
+    C program_error support,speedup coerce/make-sequence,loop test
+    fixes,preliminary macro_function arg fix
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 26 Mar 2006 23:11:30 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 31 Mar 2006 21:58:11 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

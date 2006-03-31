@@ -116,7 +116,7 @@ float object_to_float();
 double object_to_double();
 
 /*  error.c  */
-EXTER object sKerror,sKparse_error,sKreader_error;;
+EXTER object sKerror,sKparse_error,sKreader_error,sKprogram_error;
 EXTER object sKwrong_type_argument;
 EXTER object sKcontrol_error;
 EXTER object sKcatch;

@@ -114,7 +114,7 @@
 
 
 (defun get-var-types (lis)
-  (sloop::sloop for v in lis collect (var-type v)))
+  (sloop::sloop for v in lis collect (or (si::classp (var-type v)) (si::structurep (var-type v)) (var-type v))))
 
 (defun record-arg-info( lambda-list &aux (cf (current-fn)))
   (setf (fn-arg-types cf) (get-var-types (car lambda-list)))

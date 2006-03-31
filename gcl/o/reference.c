@@ -202,7 +202,8 @@ LFD(Lboundp)(void)
 
 LFD(Lmacro_function)(void)
 {
-	check_arg(1);
+	if (vs_top-vs_base<1 || vs_top-vs_base>2)
+	  check_arg_failed(1);
 	if (type_of(vs_base[0]) != t_symbol)
 		not_a_symbol(vs_base[0]);
 	if (vs_base[0]->s.s_gfdef != OBJNULL && vs_base[0]->s.s_mflag)

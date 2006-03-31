@@ -278,16 +278,12 @@
                    &aux (block-p nil) (bindings nil) initials used-vars
                         (*unwind-exit* *unwind-exit*)
                         (*vs* *vs*) (*clink* *clink*) (*ccb-vs* *ccb-vs*))
-       (declare (object block-p))
-
   (do ((vl vars (cdr vl)) (fl forms (cdr fl)) (prev-ss nil))
       ((endp vl))
-      (declare (object vl fl))
       (let* ((form (car fl)) (var (car vl))
 	    (kind (c2var-kind var)))
-           (declare (object form var))
 	   ;;FIXME -- we still write unused variables.  CM 20050106
-	   (unless (and (member (car form) '(return return-from throw go) :test #'eq)
+	   (unless (and (member (car form) '(return return-from throw go) )
 			(not (is-referred var (cadr body)))
 			(not (is-changed var (cadr body))))
 	     (push var used-vars))
@@ -306,7 +302,6 @@
 		 (push (list var (caddr form)) bindings)))
               (VAR
                (let ((var1 (caaddr form)))
-                    (declare (object var1))
                     (cond ((or (args-info-changed-vars var1 (cdr fl))
                                (and (member (var-kind var1) '(SPECIAL GLOBAL))
                                     (member (var-name var1) prev-ss)))

@@ -874,13 +874,13 @@
 ;   (get 'floor 'inline-always))
 ;(si::putprop 'floor 'floor-propagator 'type-propagator)
 (push '((fixnum fixnum) (values fixnum fixnum) #.(flags rfa set)
-	 "@01;({fixnum _t=(#0)/(#1);_t=((#0)<=0 && (#1)<=0) || ((#0)>=0 && (#1)>=0) || ((#1)*_t==(#0)) ? _t : _t-1;$1((#0)-_t*(#1))$ _t;})")
+	 "@01;({fixnum _t=(#0)/(#1);_t=((#0)<=0 && (#1)<=0) || ((#0)>=0 && (#1)>=0) || ((#1)*_t==(#0)) ? _t : _t-1;@1((#0)-_t*(#1))@ _t;})")
    (get 'floor 'inline-always))
 
 ;;CEILING
 ;(si::putprop 'ceiling 'floor-propagator 'type-propagator)
 (push '((fixnum fixnum) (values fixnum fixnum) #.(flags rfa set)
-	 "@01;({fixnum _t=(#0)/(#1);_t=((#0)<=0 && (#1)>=0) || ((#0)>=0 && (#1)<=0) || ((#1)*_t==(#0)) ? _t : _t+1;$1((#0)-_t*(#1))$ _t;})")
+	 "@01;({fixnum _t=(#0)/(#1);_t=((#0)<=0 && (#1)>=0) || ((#0)>=0 && (#1)<=0) || ((#1)*_t==(#0)) ? _t : _t+1;@1((#0)-_t*(#1))@ _t;})")
    (get 'ceiling 'inline-always))
 
 
@@ -1012,18 +1012,30 @@
  (push '((fixnum) t #.(flags ans) MAKE-LIST-INLINE)
    (get 'make-list 'inline-always))
 
+;;INTEGER-LENGTH
+(push '((fixnum) fixnum #.(flags rfa set) 
+	#.(format nil "({register fixnum _x=#0,_t=~s;for (;_t>=0 && !((_x>>_t)&1);_t--);_t+1;})" (integer-length most-positive-fixnum)))
+   (get 'integer-length 'inline-always))
+
+
 ;;MAX
-;(si::putprop 'max 'super-range 'type-propagator)
-(push '((t t) t #.(flags set)"@01;(number_compare(#0,#1)>=0?(#0):#1)")
+(push '((t t) t #.(flags set)"@01;({register int _r=number_compare(#0,#1); fixnum_float_contagion(_r>=0 ? #0 : #1,_r>=0 ? #1 : #0);})")
    (get 'max 'inline-always))
- (push '((fixnum-float fixnum-float) fixnum-float #.(flags rfa set)"@01;((#0)>=(#1)?(#0):#1)")
+(push '((fixnum-float fixnum-float) long-float #.(flags set)"@01;((double)((#0)>=(#1)?(#0):#1))")
+   (get 'max 'inline-always))
+(push '((fixnum-float fixnum-float) short-float #.(flags set)"@01;((float)((#0)>=(#1)?(#0):#1))")
+   (get 'max 'inline-always))
+(push '((fixnum-float fixnum-float) fixnum #.(flags set)"@01;((fixnum)((#0)>=(#1)?(#0):#1))")
    (get 'max 'inline-always))
 
 ;;MIN
-;(si::putprop 'min 'super-range 'type-propagator)
-(push '((t t) t #.(flags set)"@01;(number_compare(#0,#1)<=0?(#0):#1)")
+(push '((t t) t #.(flags set)"@01;({register int _r=number_compare(#0,#1); fixnum_float_contagion(_r<=0 ? #0 : #1,_r<=0 ? #1 : #0);})")
    (get 'min 'inline-always))
-(push '((fixnum-float fixnum-float) fixnum-float #.(flags rfa set)"@01;((#0)<=(#1)?(#0):#1)")
+(push '((fixnum-float fixnum-float) long-float #.(flags set)"@01;((double)((#0)<=(#1)?(#0):#1))")
+   (get 'min 'inline-always))
+(push '((fixnum-float fixnum-float) short-float #.(flags set)"@01;((float)((#0)<=(#1)?(#0):#1))")
+   (get 'min 'inline-always))
+(push '((fixnum-float fixnum-float) fixnum #.(flags set)"@01;((fixnum)((#0)<=(#1)?(#0):#1))")
    (get 'min 'inline-always))
 
 ;;MINUSP
@@ -1227,7 +1239,7 @@ TRUNCATE_USE_C
 #+
 TRUNCATE_USE_C
 ;(si::putprop 'truncate 'floor-propagator 'type-propagator)
-(push '((fixnum fixnum) (values fixnum fixnum) #.(flags rfa)"({fixnum _t=(#0)/(#1);$1(#0)-_t*(#1)$ _t;})")
+(push '((fixnum fixnum) (values fixnum fixnum) #.(flags rfa)"({fixnum _t=(#0)/(#1);@1(#0)-_t*(#1)@ _t;})")
    (get 'truncate 'inline-always))
 (push '((fixnum-float) fixnum #.(flags)"(fixnum)(#0)")
    (get 'truncate 'inline-always))

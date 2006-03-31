@@ -180,7 +180,8 @@ FFN(Fgo)(object args)
 		FEtoo_many_argumentsF(args);
 	lex_tag = lex_tag_sch(MMcar(args));
 	if (MMnull(lex_tag))
-		FEerror("~S is an undefined tag.", 1, MMcar(args));
+/* 		FEerror("~S is an undefined tag.", 1, MMcar(args)); */
+		PROGRAM_ERROR("~S is an undefined tag.", MMcar(args));
 	fr = frs_sch(MMcaddr(lex_tag));
 	if (fr == NULL)
 		FEerror("The tag ~S is missing.", 1, MMcar(args));

@@ -116,29 +116,36 @@
 	(nreverse 
 	 (let* (nb 
 		(ob body)
-		(ft (do ((l (pop ob) (pop ob))) ((or (not l) (typep l 'tag)) l)
-			(push (c1expr* l info) nb))))
-	   (cond ((not ft) nb)
-		 ((every (lambda (x) (if (var-p x) (var-tag x) t)) *vars*)
-		  (let ((nb (cons ft nb)))
-		    (do ((tob (pop ob) (pop ob))) ((not tob) nb) (push (if (typep tob 'tag) tob (c1expr* tob info)) nb))))
-		 ((let ((nt (gensym)) (nb (cons ft nb)) vl)
-		    (dolist (v *vars*) (when (var-p v) (unless (var-tag v) 
-							 (push (list v (var-mt v)) vl)
-							 (setf (var-tag v) nt (var-mt v) (var-type v)))))
-		    (do ((tob ob ob) (tnb nb nb) dne)
-			((not 
-			  (let ((nv  (with-restore-vars  
-				      (catch nt 
-					(do ((l (pop tob) (pop tob))) ((not l) (when dne (setq *restore-vars* nil)))
-					    (push (if (typep l 'tag) l (c1expr* l info)) tnb))))));maybe copy-info here
-			    (cond (nv (cmpnote "caught ~s~%" nv) (setf (var-type nv) (var-mt nv)) t)
-				  ((not dne) 
-				      (dolist (v vl) (setf (var-tag (car v)) t 
-							   (var-mt (car v)) (type-or1 (var-mt (car v)) (cadr v))))
-				      (setq dne t)))))
-			 (dolist (v vl) (setf (var-tag (car v)) nil))
-			 tnb))))))))
+		(ft (do (l) ((or (not (setq l (pop ob))) (typep l 'tag)) l)
+			    (push (c1expr* l info) nb))))
+	   (if (not ft) nb
+	     (let ((nt (gensym)) (nb (cons ft nb)) vl)
+	       (dolist (v *vars*) (when (var-p v) 
+				    (push (list v (var-mt v) (var-tag v)) vl)
+				    (setf (var-tag v) nt (var-mt v) (var-type v))))
+	       (unwind-protect 
+		   (do ((tob ob ob) (tnb nb nb))
+		       ((not 
+			 (let ((nv (with-restore-vars  
+				     (catch nt 
+				       (do (l *warning-note-stack*) 
+					   ((not (setq l (pop tob))) (output-warning-note-stack) (setq *restore-vars* nil))
+					 (push (if (typep l 'tag) 
+						   (progn (pop-restore-vars) l)
+						 (c1expr* l info)) tnb))))));maybe copy-info here
+			   (when nv 
+;			     (cmpnote "caught ~s~%" nv)
+			     (let ((ov (car (member nv vl :key 'car))))
+			       (when (caddr ov)
+				 (unless (type>= (cadr ov) (var-mt nv))
+				   (setf (cadr ov) (var-mt nv))
+;				   (format t "~s~%~s~%" vl ov)
+;				   (break)
+				   (throw (caddr ov) nv))))
+			     (setf (var-type nv) (var-mt nv)))))
+			tnb))
+		 (dolist (v vl) (setf (var-mt (car v)) (type-or1 (var-mt (car v)) (cadr v))
+				      (var-tag (car v)) (caddr v)))))))))
 
 				     
   ;;; Process non-tag forms.

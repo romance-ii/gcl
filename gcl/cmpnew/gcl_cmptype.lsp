@@ -405,17 +405,17 @@
 
 (dolist (l '(/ floor ceiling truncate round ffloor fceiling ftruncate fround))
   (si::putprop l t 'zero-pole))
-(dolist (l '(+ - * / exp float sqrt atan))
+(dolist (l '(+ - * / exp float sqrt atan min max))
   (si::putprop l 'super-range 'type-propagator))
 
 (defun log-wrap (x y)
   (if (= 0 x) (symbol-value '-inf) (log x y)))
 
-(defun max-propagator (f t1 &optional (t2 nil t2p))
-  (cond ((not t2p) (super-range f t1))
-	((member-if (lambda (x) (and (type>= x t1) (type>= x t2))) +real-contagion-list+) (super-range f t1 t2)))) ;;FIXME super-range needs to handle or types, right now punt to rfa in gcl_cmpopt.
-(si::putprop 'max 'max-propagator 'type-propagator)
-(si::putprop 'min 'max-propagator 'type-propagator)
+;; (defun max-propagator (f t1 &optional (t2 nil t2p))
+;;   (cond ((not t2p) (super-range f t1))
+;; 	((member-if (lambda (x) (and (type>= x t1) (type>= x t2))) +real-contagion-list+) (super-range f t1 t2)))) ;;FIXME super-range needs to handle or types, right now punt to rfa in gcl_cmpopt.
+;; (si::putprop 'max 'max-propagator 'type-propagator)
+;; (si::putprop 'min 'max-propagator 'type-propagator)
 
 (defun log-propagator (f t1 &optional (t2 `(short-float ,(exp 1.0s0) ,(exp 1.0s0))))
   (declare (ignore f))
@@ -498,13 +498,17 @@
 (si::putprop 'ash 'ash-propagator 'type-propagator)
 
 (defun expt-propagator (f t1 t2)
-  (cond ((let ((v1 (member-if (lambda (x) (type>= t1 x) (type>= x t1)) +real-contagion-list+))
+  (cond ((or (not (type>= '(real #.(float most-negative-fixnum) #.(float most-positive-fixnum)) t1))
+	     (not (type>= '(real #.(float most-negative-fixnum) #.(float (integer-length most-positive-fixnum))) t2)))
+	 (let ((v1 (member-if (lambda (x) (type>= t1 x) (type>= x t1)) +real-contagion-list+))
 	       (v2 (member-if (lambda (x) (type>= t2 x) (type>= x t2)) +real-contagion-list+)))
 	   (or (car (member (car v1) v2)) (car (member (car v2) v1)))))
-	((or (not (type>= '(real #.(float most-negative-fixnum) #.(float most-positive-fixnum)) t1))
-	     (not (type>= '(real #.(float most-negative-fixnum) #.(float (integer-length most-positive-fixnum))) t2))) nil)
 	((type-or1 (super-range f (type-and '(real (0)) t1) t2) (super-range f (type-and '(real * (0)) t1) t2)))))
 (si::putprop 'expt 'expt-propagator 'type-propagator)
+
+(defun integer-length-propagator (f t1)
+  (when (type>= 'fixnum t1) (type-or1 (super-range f (type-and '(real 0) t1)) (super-range f (type-and '(real * 0) t1)))))
+(si::putprop 'integer-length 'integer-length-propagator 'type-propagator)
 
 (defun abs-propagator (f t1)
   (declare (ignore f))

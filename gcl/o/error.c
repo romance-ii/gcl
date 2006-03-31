@@ -817,6 +817,7 @@ check_arg_range(int n, int m)
 DEF_ORDINARY("TERMINAL-INTERRUPT",sSterminal_interrupt,SI,"");
 DEF_ORDINARY("WRONG-TYPE-ARGUMENT",sKwrong_type_argument,KEYWORD,"");
 DEF_ORDINARY("CONTROL-ERROR",sKcontrol_error,KEYWORD,"");
+DEF_ORDINARY("PROGRAM-ERROR",sKprogram_error,KEYWORD,"");
 DEF_ORDINARY("TOO-FEW-ARGUMENTS",sKtoo_few_arguments,KEYWORD,"");
 DEF_ORDINARY("TOO-MANY-ARGUMENTS",sKtoo_many_arguments,KEYWORD,"");
 DEF_ORDINARY("UNEXPECTED-KEYWORD",sKunexpected_keyword,KEYWORD,"");
