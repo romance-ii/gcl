@@ -8,6 +8,7 @@
   (DO ((L '())
        (C CASES (CDR C)))
       ((NULL C) (NREVERSE L))
+      (check-type (car c) cons)
       (LET ((KEYS (CAAR C)))
 	   (COND ((ATOM KEYS)
 		  (COND ((NULL KEYS))
