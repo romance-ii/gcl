@@ -45,7 +45,7 @@
     '(FTYPE (FUNCTION (T T T) *) READ-INSPECT-COMMAND SHARP-S-READER)) 
 (PROCLAIM '(FTYPE (FUNCTION (T T T T T T T) *) TRACE-CALL)) 
 (PROCLAIM
-    '(FTYPE (FUNCTION (T T T) T)
+    '(FTYPE (FUNCTION (T T T) T) copy-tree-int copy-list-int
             SLOOP::LOOP-PARSE-ADDITIONAL-COLLECTIONS CONS-OP COMPLEX-OP
             ARRAY-OP SETF-EXPAND-1 LIST-MERGE-SORT WARN-VERSION
             SINGLE-OP RANGE-OP DEPOSIT-FIELD KEY-LIST MAKE-T-TYPE
@@ -116,7 +116,7 @@
             DECODE-UNIVERSAL-TIME READ-FROM-STRING STEPPER APROPOS
             FTRUNCATE PPRINT-DISPATCH SHOW-INFO NLOAD APROPOS-DOC)) 
 (PROCLAIM
-    '(FTYPE (FUNCTION (T) T) seqindp proper-listp sequencep short-float-p long-float-p ratiop
+    '(FTYPE (FUNCTION (T) T) copy-list copy-tree seqindp proper-listp sequencep short-float-p long-float-p ratiop
 	    first second third fourth fifth sixth seventh eighth ninth tenth
 	    improper-consp TYPE-OF CLASS-OF NON-LOGICAL-PATHNAME-P DO-F SLOOP::POINTER-FOR-COLLECT
 	    sequence-type-element-type  sequence-type-element-type-int
