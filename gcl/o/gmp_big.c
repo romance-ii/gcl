@@ -476,6 +476,21 @@ integer_quotient_remainder_1(object x, object y, object *qp, object *rp)
   return;
 }
 
+void
+integer_quotient_remainder_1_ui(object x, unsigned long y, object *qp, object *rp)
+{
+  *qp = new_bignum();
+  *rp = new_bignum();
+  /* we may need to coerce the fixnums to MP here, and
+     we use the temporary storage of the rp/qp as inputs.
+     since overlap is allowed in the mpz_tdiv_qr operation..
+  */    
+  mpz_tdiv_qr_ui(MP(*qp),MP(*rp),INTEGER_TO_MP(x,big_fixnum1),y);
+  *qp = normalize_big(*qp);
+  *rp = normalize_big(*rp);
+  return;
+}
+
 #define HAVE_MP_COERCE_TO_STRING
      
 object

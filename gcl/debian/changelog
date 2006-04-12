@@ -153,8 +153,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * inline make_cons
   * listlib function overhaul
   * make-sequence cleanup
+  * faster truncate
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 12 Apr 2006 13:38:20 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 12 Apr 2006 13:39:13 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
