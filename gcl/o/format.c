@@ -752,7 +752,7 @@ fmt_hexadecimal(bool colon, bool atsign)
 static void
 fmt_radix(bool colon, bool atsign)
 {
-	int radix=0, mincol=0, padchar=0, commachar=0, commainterval=0;;
+	int radix=0, mincol=0, padchar=0, commachar=0, commainterval=0;
 	object x;
 	int i, j, k;
 	int s, t;

@@ -2438,38 +2438,40 @@ object path;
   enum type tp;
 @
 
-  vs_mark;
-  vs_push(s);
-
-  tp=type_of(s);
-  if (tp!=t_pathname &&
-      tp!=t_string &&
-      tp!=t_symbol &&
-      tp!=t_stream) {
-    wrong_type_argument(TSor_pathname_string_symbol_stream, s);
-    s=Cnil;
-
-  } else {
-
-    s = coerce_to_pathname(s); 
+  {
+    vs_mark;
     vs_push(s);
     
-    if ((s->pn.pn_host == Cnil) || (s->pn.pn_host == sKunspecific)) {
-      file_type_error("Pathname ~S is not a ~S.",s, sLlogical_pathname);
+    tp=type_of(s);
+    if (tp!=t_pathname &&
+	tp!=t_string &&
+	tp!=t_symbol &&
+	tp!=t_stream) {
+      wrong_type_argument(TSor_pathname_string_symbol_stream, s);
       s=Cnil;
-    } else
-      if ((s->pn.pn_device != Cnil) && (s->pn.pn_device != sKunspecific)) {
+      
+    } else {
+      
+      s = coerce_to_pathname(s); 
+      vs_push(s);
+      
+      if ((s->pn.pn_host == Cnil) || (s->pn.pn_host == sKunspecific)) {
 	file_type_error("Pathname ~S is not a ~S.",s, sLlogical_pathname);
 	s=Cnil;
       } else
-	if (pathname_lookup(s->pn.pn_host,sSApathname_logicalA) == Cnil) {
+	if ((s->pn.pn_device != Cnil) && (s->pn.pn_device != sKunspecific)) {
 	  file_type_error("Pathname ~S is not a ~S.",s, sLlogical_pathname);
 	  s=Cnil;
 	} else
-	  s->pn.pn_device = sKunspecific; /*FIXME side effect*/
-  }
+	  if (pathname_lookup(s->pn.pn_host,sSApathname_logicalA) == Cnil) {
+	    file_type_error("Pathname ~S is not a ~S.",s, sLlogical_pathname);
+	    s=Cnil;
+	  } else
+	    s->pn.pn_device = sKunspecific; /*FIXME side effect*/
+    }
 
-  vs_reset;
+    vs_reset;
+  }
   @(return s)
 
 @)

@@ -154,8 +154,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * listlib function overhaul
   * make-sequence cleanup
   * faster truncate
+  * old (gcc) compiler cleanups
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 12 Apr 2006 13:39:13 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 12 Apr 2006 13:40:00 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

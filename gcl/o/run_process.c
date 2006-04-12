@@ -463,7 +463,7 @@ FFN(siLmake_socket_stream)()
 {
   check_arg(2);
   vs_base[0] = make_socket_stream(vs_base[0], vs_base[1]);
-  vs_pop;
+  vs_popp;
 }
 
 /*

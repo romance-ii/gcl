@@ -291,8 +291,7 @@ object list_vector_new(fixnum n,object first,va_list ap)
  va_end(ap);
  return res;
 }*/
-
-   
+  
 
 object list(fixnum n,...) { 
 
