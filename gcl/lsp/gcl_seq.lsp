@@ -46,39 +46,25 @@
 
 (defun make-sequence (type size &key (initial-element nil iesp))
 
-  (let ((x (sequence-type-length-type type)))
-    (when x (check-type-eval size x)))
+;  (let ((x (sequence-type-length-type type)))
+;    (when x (check-type-eval size x)))
 
-  (let ((tp (or (car (member (if (atom type) type (car type)) +coerce-list+))
-		(car (member type +coerce-list+ :test 'subtypep1)))))
-    (case tp
-      ((list cons null)
-       (make-list size :initial-element (and iesp initial-element)))
-      (string
-       (make-sequence-vector 'character size iesp initial-element))
-      ((vector array)
-       (let ((element-type (sequence-type-element-type type)))
-	 (unless element-type
-	   (check-type type '(member list vector)))
-	 (make-sequence-vector element-type size iesp initial-element)))
-      (otherwise (check-type type '(member list vector))))))
-
-;;   (cond 
-;;    ((member type '(list cons null));;FIXME these are accelerators
-;;     (make-list size :initial-element (and iesp initial-element)))
-;;    ((eq type 'string)
-;;     (make-sequence-vector 'character size iesp initial-element))
-;;    ((eq type 'vector)
-;;     (make-sequence-vector t size iesp initial-element))
-;;    ((subtypep1 type 'list)
-;;     (make-list size :initial-element (and iesp initial-element)))
-;;    ((subtypep1 type 'array)
-;;     (let ((element-type (sequence-type-element-type type)))
-;;       (unless element-type
-;; 	(check-type type '(member list vector)))
-;;       (make-sequence-vector element-type size iesp initial-element)))
-;;    ((check-type type '(member list vector)))))
-
+  (let* ((tp (or (car (member (if (atom type) type (car type)) +coerce-list+))
+		 (car (member type +coerce-list+ :test 'subtypep1))))
+	 (res 
+	  (case tp
+		((list cons null)
+		 (make-list size :initial-element (and iesp initial-element)))
+		(string
+		 (make-sequence-vector 'character size iesp initial-element))
+		((vector array)
+		 (let ((element-type (sequence-type-element-type type)))
+		   (unless element-type
+		     (check-type type '(member list vector)))
+		   (make-sequence-vector element-type size iesp initial-element)))
+		 (otherwise (check-type type '(member list vector))))))
+    (check-type-eval res type)
+    res))
 
 (defun concatenate (result-type &rest sequences)
   (if (eq result-type 'list)
