@@ -188,8 +188,13 @@
 
 (defun subtypep1 (t1 t2)
   (or (not t1) (eq t2 t)
-      (not (car (resolve-type `(and ,t1 ,(negate t2)))))
-      (not (car (resolve-type `(and (type-max ,t1) ,(negate `(type-min ,t2))))))))
+    (let* ((rt (resolve-type `(and ,t1 ,(negate t2))))
+	   (mt (when (cadr rt) (resolve-type `(and (type-max ,t1) ,(negate `(type-min ,t2))))))
+	   (rt (when (or (not (cadr rt)) (car mt)) rt)))
+      (not (car rt)))))
+    
+;;       (not (car (resolve-type `(and ,t1 ,(negate t2)))))
+;;       (not (car (resolve-type `(and (type-max ,t1) ,(negate `(type-min ,t2))))))))
 
 (defun subtypep (t1 t2 &optional env)
   (declare (ignore env) (optimize (safety 1)))
@@ -281,7 +286,7 @@
 	      (i 0 (1+ i))
 	      (p (and v object) (and p (cdr p))))
 	     ((>= i l) seq)
-	  (setf (aref seq i) (or (car p) (aref object i))))));;FIXME
+	  (setf (aref seq i) (if p (car p) (aref object i))))));;FIXME
       (character (character object))
       (short-float (float object 0.0S0))
       (long-float (float object 0.0L0))
@@ -332,6 +337,21 @@
 		',name)))
 
 ;;; Some DEFTYPE definitions.
+
+(defconstant +ifb+ (- (car (last (multiple-value-list (si::heap-report))))))
+(defconstant +ifr+ (ash (- +ifb+)  -1))
+(defconstant +ift+ '(integer #.(- +ifr+) #.(1- +ifr+)))
+
+(deftype eql-is-eq-tp () `(or #.+ift+ (not (or number character))))
+(deftype equal-is-eq-tp () `(or #.+ift+ (not (or cons string bit-vector pathname number character))))
+(deftype equalp-is-eq-tp () `(not (or array hash-table structure cons string
+				      bit-vector pathname number character)))
+
+;To pevent typep/predicate loops
+(defun eql-is-eq (x) (typep x (funcall (get 'eql-is-eq-tp 'deftype-definition))))
+(defun equal-is-eq (x) (typep x (funcall (get 'equal-is-eq-tp 'deftype-definition))))
+(defun equalp-is-eq (x) (typep x (funcall (get 'equalp-is-eq-tp 'deftype-definition))))
+
 (deftype seqind ()
   `(integer 0 ,array-dimension-limit))
 (defun seqindp (x) (and (fixnump x) (>= x 0) (<= x array-dimension-limit)))
@@ -535,6 +555,9 @@
 (defconstant +type-alist+ '((null . null)
 	  (not-type . not)
           (symbol . symbolp)
+          (eql-is-eq-tp . eql-is-eq)
+          (equal-is-eq-tp . equal-is-eq)
+          (equalp-is-eq-tp . equalp-is-eq)
           (keyword . keywordp)
 	  (non-logical-pathname . non-logical-pathname-p)
 	  (logical-pathname . logical-pathname-p)

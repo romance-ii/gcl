@@ -38,6 +38,12 @@
 (import 'si::short-float-p 'compiler)
 (import 'si::long-float-p 'compiler)
 (import 'si::interpreted-function 'compiler)
+(import 'si::eql-is-eq 'compiler)
+(import 'si::equal-is-eq 'compiler)
+(import 'si::equalp-is-eq 'compiler)
+(import 'si::eql-is-eq-tp 'compiler)
+(import 'si::equal-is-eq-tp 'compiler)
+(import 'si::equalp-is-eq-tp 'compiler)
 (let ((p (find-package "DEFPACKAGE")))
   (when p
     (import (find-symbol "DEFPACKAGE" p) 'compiler)))

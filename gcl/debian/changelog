@@ -149,8 +149,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     fixes,preliminary macro_function arg fix
   * Check types in case expansions
   * last, nconc, nreconc, and map compiler macros
+  * reorganize eql-is-eq types
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 12 Apr 2006 13:33:38 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 12 Apr 2006 13:34:11 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

@@ -292,38 +292,19 @@
   )
 
 
-(defconstant +ifb+ (- (car (last (multiple-value-list (si::heap-report))))))
-(defconstant +ifr+ (ash (- +ifb+)  -1))
-(defconstant +ift+ '(integer #.(- +ifr+) #.(1- +ifr+)))
-
-;FIXME compiler-macrexpand source to (if (typep ....) ...) when needed (member-compiler-macro et al)?
-
-(defconstant +eql-is-eq-tp+ `(or #.+ift+ (not (or number character))))
-(defconstant +equal-is-eq-tp+ `(or #.+ift+ (not (or cons string bit-vector pathname number character))))
-(defconstant +equalp-is-eq-tp+ `(not (or array hash-table structure cons string bit-vector pathname number character)))
-
 (defmacro eq-subtp (x y)  ;FIXME axe mult values
   (let ((s (gensym)))
     `(let ((,s (type>= ,y ,x)))
        (values ,s (or ,s (type>= `(not ,,y) x))))))
 
-(defun eql-is-eq (x)
-  (typep x +eql-is-eq-tp+))
-
 (defun eql-is-eq-tp (x)
-  (eq-subtp x +eql-is-eq-tp+))
-
-(defun equal-is-eq (x)
-  (typep x +equal-is-eq-tp+))
+  (eq-subtp x 'eql-is-eq-tp))
 
 (defun equal-is-eq-tp (x)
-  (eq-subtp x +equal-is-eq-tp+))
-
-(defun equalp-is-eq (x)
-  (typep x +equalp-is-eq-tp+))
+  (eq-subtp x 'equal-is-eq-tp))
 
 (defun equalp-is-eq-tp (x)
-  (eq-subtp x +equalp-is-eq-tp+))
+  (eq-subtp x 'equalp-is-eq-tp))
 
 (defun do-eq-et-al (fn args)
   (let* ((tf (cadr (test-to-tf fn)))
