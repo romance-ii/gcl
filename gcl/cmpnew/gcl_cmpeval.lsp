@@ -306,6 +306,43 @@
 (si::putprop 'gcd (function binary-nest) 'si::compiler-macro-prop)
 (si::putprop 'lcm (function binary-nest) 'si::compiler-macro-prop)
 
+(defun last-expander (form env)
+  (declare (ignore env))
+  (if (or (not (cdr form)) (cdddr form)) form
+    (let ((v (gensym)) (f (gensym)) (n (gensym)) (i (gensym)))
+      `(let ((,f ,(cadr form)) 
+	     (,n ,(or (caddr form) 1)))
+	 ,@(when *compiler-check-args* `((check-type ,f list)(check-type ,n (integer 0))))
+	 (let ((,v (do ((,v ,f (cdr ,v)) (,i 0 (1+ ,i))) ((or (= ,i ,n) (not (consp ,v))) ,v) (declare (seqind ,i)))))
+	   (do ((,f ,f (cdr ,f)) (,v ,v (cdr ,v))) ((not (consp ,v)) ,f)))))))
+(si::putprop 'last (function last-expander) 'si::compiler-macro-prop)
+       
+(defun nreconc-expander (form env)
+  (declare (ignore env))
+  (if (or (not (cddr form)) (cdddr form)) form
+    (let ((v (gensym)) (f (gensym)) (tl (gensym)))
+      `(let ((,f ,(cadr form)) (,tl ,(caddr form)))
+	 (do ((,f ,f (or ,v ,f)) (,v (cdr ,f) (cdr ,v))) ((endp ,v) (if ,f (setf (cdr ,f) ,tl) (setq ,f ,tl)) ,f)
+	   (setf (cdr ,f) ,tl ,tl ,f))))))
+(si::putprop 'nreconc (function nreconc-expander) 'si::compiler-macro-prop)
+       
+
+
+(defun nconc-expander-int (form len)
+  (declare (fixnum len) (list form))
+  (cond ((> len 2)
+	 (let ((v (gensym)) (f (gensym)) (tl (gensym)))
+	   `(let* ((,f ,(cadr form)) (,v (last ,f)) (,tl ,(nconc-expander-int `(,(car form) ,@(cddr form)) (1- len))))
+	      (if ,v (setf (cdr ,v) ,tl) (setq ,f ,tl))
+	      ,f)))
+	((= len 2) (cadr form))))
+
+(defun nconc-expander (form env)
+  (declare (ignore env))
+  (nconc-expander-int form (length form)))
+(si::putprop 'nconc (function nconc-expander) 'si::compiler-macro-prop)
+
+
 (defun invert-binary-nest (form env)
   (declare (ignore env))
   (if (> (length form) 3)
@@ -785,19 +822,22 @@
       
 	   
 ;;start end count position
-(defun do-sequence-search (fn vars &key (some nil somep) dest newseq sum pos start end count test test-not
+(defun do-sequence-search (fn vars &key (some nil somep) (dest nil destp) (newseq nil newseqp) sum pos start
+			      end count test test-not
 			      (item nil itemp) ret k1 (key nil keyp) rev not (iv nil ivp))
   (declare (ignore test not))
-  (let* (
+  (let* ((newseq (cmp-eval newseq))
+	 (ns newseq)
+	 (newseq (and newseqp (cond ((not newseq) :nil) ((type>= 'list newseq) :list) ((type>= 'vector newseq) :vector))))
 	 (gs (mapcar (lambda (x) (list (gensym) x)) vars))
 
 	 (l (gensym))
 	 (lf (mapcar (lambda (x) `(length ,x)) vars))
-	 (lf (if dest `((if (typep ,dest 'vector) (array-dimension ,dest 0) (length ,dest)) ,@lf) lf))
+	 (lf (if destp `((if (typep ,dest 'vector) (array-dimension ,dest 0) (length ,dest)) ,@lf) lf))
 	 (lf (if end `(,end ,@lf) lf))
 	 (lf (if (> (length lf) 1) (cons 'min lf) (car lf)))
 	 (lf (if (or pos start end (eq newseq :vector)) lf
-		     `(if (or ,@(when dest `((typep ,dest 'vector)))
+		     `(if (or ,@(when destp `((typep ,dest 'vector)))
 			      ,@(mapcar (lambda (x) `(typep ,x 'vector)) vars)) ,lf -1)))
 	 (lf `((,l ,lf)))
 	 (i (gensym))
@@ -831,21 +871,23 @@
 	 (lf (if (eq newseq :vector) 
 		 `(,@lf (,out (make-array ,l 
 					  :fill-pointer ,l 
-					  :element-type (cmp-array-element-type ,@vars)))) lf))
-	 (lf (if (or dest (eq newseq :list))
+					  :element-type ',(upgraded-array-element-type (si::sequence-type-element-type ns))))) lf))
+;					  :element-type (cmp-array-element-type ,@vars)))) lf))
+	 (lf (if (or destp (eq newseq :list))
 		 `(,@lf (,p (unless (typep ,dest 'vector) ,dest))) lf))
 	 (lf (if sum `(,@lf (,fv ,ivp) (,sv ,iv)) lf))
 	 (lf (if somep `(,@lf (,sm ,(not some))) lf))
 	 (lf (if count `(,@lf (,cv 0)) lf))
 	 (lf (if (eq newseq :list ) `(,@lf ,lh) lf))
-	 (inf (if (or dest (eq newseq :list)) 
-		  `((,p ,p (if (typep ,dest 'vector) ,p (cdr ,p))) ,@inf) inf))
-	 (tf (cond (dest `(cond ((typep ,dest 'vector) (setf (aref ,dest ,i) ,tf) nil)
-				((setf (car ,p) ,tf) nil)))
+	 (inf (if (or destp (eq newseq :list)) 
+		  `((,p ,p (if (or (typep ,dest 'vector) ,(eq newseq :list)) ,p (cdr ,p))) ,@inf) inf))
+	 (tf (cond (destp `(cond ((typep ,dest 'vector) (setf (aref ,dest ,i) ,tf) nil)
+				 ((setf (car ,p) ,tf) nil)))
 		   ((eq newseq :list) `(and (setq ,p (let ((,tmp (cons ,tf nil))) 
-						       (if ,p (cdr (rplacd ,p ,tmp)) 
+						       (if ,p (cdr (rplacd ,p ,tmp))
 							 (setq ,lh ,tmp)))) nil))
 		   ((eq newseq :vector) `(and (setf (aref ,out ,i) ,tf) nil))
+		   ((eq newseq :nil) `(and ,tf nil))
 		   (sum `(progn (setq ,sv ,tf ,fv t) nil))
 		   (count `(progn (when ,tf (incf ,cv)) nil))
 		   (tf)))
@@ -856,9 +898,10 @@
 	 (ef (if (or pos start end (eq newseq :vector)) ef `(and (>= ,l 0) ,ef)))
 	 (ef `(if ,ef t
 		,@(if (or pos start end (eq newseq :vector)) `(,tf)
-		    `(,(reduce (lambda (x y) `(if (and (not (typep ,(cadr x) 'vector)) (not ,(car x))) t ,y))
-			       `(,@(when dest `((,p ,dest))) ,@gs) :initial-value tf :from-end t)))))
-	 (rf (cond (dest dest) 
+		    `(,(reduce (lambda (x y) `(if (and (not (typep ,(cadr x) 'vector)) (endp ,(car x))) t ,y))
+			       `(,@(when destp `((,p ,dest))) ,@gs) :initial-value tf :from-end t)))))
+	 (rf (cond (destp dest) 
+		   ((eq newseq :nil) nil) 
 		   ((eq newseq :list) lh) 
 		   ((eq newseq :vector) out) 
 		   (sum `(if ,fv ,sv (funcall ,fn)))
@@ -869,7 +912,7 @@
 
     `(let* ,lf  
        ,@(when count `((declare (seqind  ,cv))))
-       ,@(when dest
+       ,@(when destp
 	   `((when (and (typep ,dest 'vector) (array-has-fill-pointer-p ,dest))
 	       (setf (fill-pointer ,dest) ,l))))
        (do ,inf (,ef ,rf)(declare (seqind ,i))))))
@@ -941,22 +984,34 @@
   `(not (notevery ,@args)))
 (si::putprop 'every (macro-function 'every-compiler-macro) 'si::compiler-macro-prop)
 
+;; (defmacro maybe-with-syms-r (conditional (syms r args) &rest body)
+
+;;   `(if ,condition
+;;     (let* ((,syms (reduce (lambda (&rest r) 
+;; 			   (when r 
+;; 			     (if (inlinable-fn (cadr r))
+;; 				 (car r) 
+;; 			       `(,@(car r) (,(gensym) ,(cadr r))))))
+;; 			 ,args :initial-value nil))
+;; 	   (,r (mapcar (lambda (x) (cond ((inlinable-fn x) x)
+;; 					 ((car (rassoc x syms :key 'car :test 'equal))) (x))) args)))
 
 (defmacro map-into-compiler-macro (&whole w &rest args)
-  (declare (ignore w))
-  (let* ((syms (reduce (lambda (&rest r) 
-			 (when r 
-			   (if (or (constantp (cadr r))
-				   (and (consp (cadr r)) (eq (caadr r) 'lambda))) 
-			       (car r) 
-			     `(,@(car r) (,(gensym) ,(cadr r))))))
-		       args :initial-value nil))
-	 (r (mapcar (lambda (x) (cond ((constantp x) x)
-				      ((and (consp x) (eq (car x) 'lambda)) x)
-				      ((car (rassoc x syms :key 'car :test 'equal))) (x))) args)))
-    `(let ,syms
-       ,(do-sequence-search (cadr r) (cddr r) :dest (car r)))))
+  (if (or (< (length args) 3) (and (eq (car w) 'map) (or (not (constantp (car args)))
+							 (not (type>= 'sequence (cmp-eval (car args)))))))
+      w
+    (let* ((syms (reduce (lambda (&rest r) 
+			   (when r 
+			     (if (inlinable-fn (cadr r))
+				 (car r) 
+			       `(,@(car r) (,(gensym) ,(cadr r))))))
+			 args :initial-value nil))
+	   (r (mapcar (lambda (x) (cond ((inlinable-fn x) x)
+					      ((car (rassoc x syms :key 'car :test 'equal))) (x))) args)))
+      `(let ,syms
+	 ,(do-sequence-search (cadr r) (cddr r) (if (eq (car w) 'map) :newseq :dest) (car r))))))
 (si::putprop 'map-into (macro-function 'compiler::map-into-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'map (macro-function 'compiler::map-into-compiler-macro) 'si::compiler-macro-prop)
 
 (defmacro reduce-compiler-macro (&whole w &rest args)
   (if (or (< (length args) 2) 
