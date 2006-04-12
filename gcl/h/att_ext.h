@@ -260,7 +260,7 @@ object cdddar();
 object cddddr();
 object nth();
 object nthcdr();
-object make_cons();
+object make_cons1();
 object list(fixnum,...);
 object listA(fixnum,...);
 object append();

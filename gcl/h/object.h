@@ -1396,3 +1396,5 @@ extern void *stack_alloc_start,*stack_alloc_end;
           default: break;}\
    _x;})
                                         
+
+#define make_cons(a_,b_) ({register struct typemanager *_tm=tm_table+(int)t_cons;register object _x;if (!stack_alloc_start && _tm->tm_free) {_x=_tm->tm_free;_tm->tm_free=OBJ_LINK(_x);_tm->tm_nfree--;_tm->tm_nused++;_x->c.c_car=(a_);_x->c.c_cdr=(b_);} else _x=make_cons1(a_,b_);_x;})

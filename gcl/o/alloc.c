@@ -435,7 +435,7 @@ Use ALLOCATE to expand the space.",
 }
 
 object
-make_cons(object a, object d)
+make_cons1(object a, object d)
 {
 	 object obj;
 	 char *p;

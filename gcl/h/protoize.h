@@ -2,7 +2,7 @@
 /* alloc.c:149:OF */ extern void add_page_to_freelist (char *p, struct typemanager *tm); /* (p, tm) char *p; struct typemanager *tm; */
 /* alloc.c:196:OF */ extern object type_name (int t); /* (t) int t; */
 /* alloc.c:213:OF */ extern object alloc_object (enum type t); /* (t) enum type t; */
-/* alloc.c:296:OF */ extern object make_cons (object a, object d); /* (a, d) object a; object d; */
+/* alloc.c:296:OF */ extern object make_cons1 (object a, object d); /* (a, d) object a; object d; */
 /* alloc.c:364:OF */ extern object on_stack_cons (object x, object y); /* (x, y) object x; object y; */
 /* alloc.c:376:OF */ extern object fSallocated (object typ); /* (typ) object typ; */
 /* alloc.c:401:OF */ extern object fSreset_number_used (object typ); /* (typ) object typ; */
@@ -82,6 +82,7 @@
 /* gmp_big.c:454:OF */ extern object maybe_replace_big (object x); /* (x) object x; */
 /* gmp_big.c:472:OF */ extern object bignum2 ( int h,  int l); /* (h, l) unsigned int h; unsigned int l; */
 /* gmp_big.c:482:OF */ extern void integer_quotient_remainder_1 (object x, object y, object *qp, object *rp); /* (x, y, qp, rp) object x; object y; object *qp; object *rp; */
+/* gmp_big.c:482:OF */ extern void integer_quotient_remainder_1_ui (object x, unsigned long y, object *qp, object *rp); /* (x, y, qp, rp) object x; object y; object *qp; object *rp; */
 /* gmp_big.c:502:OF */ extern object coerce_big_to_string (object x, int printbase); /* (x, printbase) object x; int printbase; */
 /* gmp_big.c:521:OF */ extern void gcl_init_big (void); /* () */
 /* big.c:72:OF */ extern int big_sign (object x); /* (x) object x; */
