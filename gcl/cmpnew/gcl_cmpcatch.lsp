@@ -34,7 +34,7 @@
   (when (endp args) (too-few-args 'catch 1 0))
   (setq tag (c1expr (car args)))
   (add-info info (cadr tag))
-  (setq args (c1progn (cdr args)))
+  (with-restore-vars (setq args (c1progn (cdr args))))
   (add-info info (cadr args))
   (list 'catch info tag args))
 
