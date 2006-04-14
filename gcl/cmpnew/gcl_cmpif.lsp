@@ -116,14 +116,17 @@
         (otherwise
          (setq info (make-info))
 	 (let* ((fmla (c1fmla f info))
-		(fmlae (fmla-eval-const fmla)))
+		(inf (fmla-infer-tp fmla))
+		(fmlae (fmla-eval-const fmla))
+		(fmlae (if (notevery 'cadr inf) nil fmlae))
+		(fmlae (if (notevery 'cddr inf) t   fmlae)))
 	   (if (not (eq fmlae 'boolean))
 	       (cond (fmlae 
 		      (when (caddr args) (note-branch-elimination (car args) t (caddr args)))
 		      (c1expr** (cadr args) info))
 		     (t (note-branch-elimination (car args) nil (cadr args)) 
 			(if (endp (cddr args)) (c1nil) (c1expr** (caddr args) info))))
-	     (let ((inf (fmla-infer-tp fmla)) r trv *restore-vars*)
+	     (let (r trv *restore-vars*)
 	       (dolist (l inf)
 		 (let ((v (car (member (car l) *vars* :key (lambda (x) (when (var-p x) (var-name x)))))))
 		   (when v

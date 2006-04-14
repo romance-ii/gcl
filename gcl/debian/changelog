@@ -156,8 +156,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * faster truncate
   * old (gcc) compiler cleanups
   * wrap c1catch in writh-restore-vars
+  * Eliminate branches with variables with nil effective types
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 13 Apr 2006 23:38:25 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 14 Apr 2006 14:23:27 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
