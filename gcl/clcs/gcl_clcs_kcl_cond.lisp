@@ -16,10 +16,10 @@
 					   (list error-name correctable function-name
 						 continue-format-string error-format-string)))
   (si::maybe-clear-input)
-  (when (equal internal-error-parms *internal-error-parms*)
-    (format t "Universal error handler called recursively ~S~%"
-	    internal-error-parms)
-	    (return-from clcs-universal-error-handler))
+;;   (when (equal internal-error-parms *internal-error-parms*)
+;;     (format t "Universal error handler called recursively ~S~%"
+;; 	    internal-error-parms)
+;; 	    (return-from clcs-universal-error-handler))
   (let* ((*internal-error-parms* (list error-name
 				       correctable
 				       function-name
@@ -164,6 +164,7 @@
     (:too-few-arguments   t internal-simple-control-error)
     (:too-many-arguments  t internal-simple-control-error)
     (:control-error 	  t internal-simple-control-error)
+    (:program-error 	  t internal-simple-program-error)
     (:unexpected-keyword  t internal-simple-control-error)
     (:parse-error         t internal-simple-parse-error)
     (:reader-error        t internal-simple-reader-error :stream)

@@ -157,8 +157,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * old (gcc) compiler cleanups
   * wrap c1catch in writh-restore-vars
   * Eliminate branches with variables with nil effective types
+  * disable recursion protection in universal error handler for now
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 14 Apr 2006 14:23:27 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri, 14 Apr 2006 14:52:36 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

@@ -156,11 +156,11 @@ signaled at this point in the stack.  For the moment the rest of the VARIABLES a
 				 ,error-format-string ,@error-handler-args)))
   (declare (:dynamic-extent error-handler-args))
   (si::maybe-clear-input)
-  (when (equal internal-error-parms *internal-error-parms*)
-    (format t "Error handler called recursively ~S~%"
-	    internal-error-parms)
-    ;; FIXME
-    (return-from si::universal-error-handler nil))
+;;   (when (equal internal-error-parms *internal-error-parms*)
+;;     (format t "Error handler called recursively ~S~%"
+;; 	    internal-error-parms)
+;;     ;; FIXME
+;;     (return-from si::universal-error-handler nil))
   (let ((*internal-error-parms* internal-error-parms))
   (when *show-all-debug-info*
     (si::simple-backtrace)
