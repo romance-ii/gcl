@@ -34,7 +34,27 @@
   (when (endp args) (too-few-args 'catch 1 0))
   (setq tag (c1expr (car args)))
   (add-info info (cadr tag))
-  (with-restore-vars (setq args (c1progn (cdr args))))
+  (let (vl (nt (gensym)))
+    (dolist (v *vars*) (when (var-p v) 
+			 (push (list v (var-mt v) (var-tag v)) vl)
+			 (setf (var-tag v) nt (var-mt v) (var-type v))))
+    (setq args
+	  (unwind-protect
+	      (do (nargs)
+		  ((not 
+		    (let ((nv (with-restore-vars
+			       (catch nt
+				 (setq nargs (c1progn (cdr args))) nil))))
+		      (when nv
+			(let ((ov (car (member nv vl :key 'car))))
+			  (when (caddr ov)
+			    (unless (type>= (cadr ov) (var-mt nv))
+			      (setf (cadr ov) (var-mt nv))
+			      (throw (caddr ov) nv))))
+			(setf (var-type nv) (var-mt nv)))))
+		   nargs))
+	    (dolist (v vl) (setf (var-mt (car v)) (type-or1 (var-mt (car v)) (cadr v))
+				 (var-tag (car v)) (caddr v))))))
   (add-info info (cadr args))
   (list 'catch info tag args))
 
