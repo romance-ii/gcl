@@ -159,8 +159,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * Eliminate branches with variables with nil effective types
   * disable recursion protection in universal error handler for now
   * Treat catch like tagbody
+  * Fix static weak symbol reloc bug
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 14 Apr 2006 16:52:47 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 17 Apr 2006 17:26:33 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

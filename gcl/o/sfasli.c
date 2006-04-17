@@ -101,7 +101,7 @@ build_symbol_table_bfd(void) {
       }
       if (q[u]->value) {
 	h->type=bfd_link_hash_defined;
-	h->u.def.value=q[u]->value+q[u]->section->vma;
+	h->u.def.value=q[u]->value+((q[u]->flags & BSF_WEAK) ? -q[u]->section->vma : q[u]->section->vma);
 	h->u.def.section=q[u]->section;
       }
     }
