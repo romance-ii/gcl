@@ -6,6 +6,7 @@
 (make-package "TK" :use '("LISP" "SLOOP"))
 (make-package "JAPI-PRIMITIVES" :use '("LISP"))
 (make-package "TK-PRIMITIVES" :use '("LISP"))
+#+win32(make-package :WIN32-PRIMITIVES :use '("LISP"))
 
 @LI-PCL-PACKAGE@
 

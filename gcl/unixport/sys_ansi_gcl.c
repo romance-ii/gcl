@@ -181,7 +181,9 @@ gcl_init_system(object no_init)
   ar_check_init(gcl_clcs_kcl_cond,no_init);
   ar_check_init(gcl_clcs_top_patches,no_init);
   ar_check_init(gcl_clcs_install,no_init);
-  
+#ifdef _WIN32  
+  ar_check_init(gcl_win32,no_init);
+#endif  
 }
 
 static int ngazonk;

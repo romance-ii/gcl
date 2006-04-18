@@ -85,11 +85,16 @@ gcl_init_system(object no_init)
   ar_check_init(gcl_defstruct,no_init);
   ar_check_init(gcl_describe,no_init);
 #ifdef HAVE_JAPI_H
-  lsp_init("../mod/gcl_japi.lsp"); /* Needed for package declaration when compiling later. */
+  lsp_init("../mod/gcl_japi.lsp");  /* Needed for package declaration when compiling later. */
 #endif
 #ifdef HAVE_TK
-  lsp_init("../mod/gcl_tk.lsp"); /* Needed for package declaration when compiling later. */
+  lsp_init("../mod/gcl_tk.lsp");    /* Needed for package declaration when compiling later. */
 #endif
+#if 0
+#ifdef _WIN32  
+  lsp_init("../mod/gcl_win32.lsp"); /* Needed for package declaration when compiling later. */
+#endif
+#endif  
   ar_check_init(gcl_iolib,no_init);
   ar_check_init(gcl_listlib,no_init);
   ar_check_init(gcl_mislib,no_init);
@@ -130,7 +135,6 @@ gcl_init_system(object no_init)
   ar_check_init(gcl_cmpvs,no_init);
   ar_check_init(gcl_cmpwt,no_init);
   ar_check_init(gcl_cmpmain,no_init);
-
   
 }
 

@@ -1766,12 +1766,18 @@ if test "$use" != "mingw" ; then
 fi
 AC_CHECK_LIB(mingwex,main,LIBS="${LIBS} -lmingwex",true)
 
+if test "$use" = "mingw" ; then
+EXTRA_LOBJS="gcl_win32.o"
+else
 EXTRA_LOBJS=
+fi
+
 if test "$try_japi" = "yes" ; then
    AC_CHECK_HEADERS(japi.h,[AC_DEFINE(HAVE_JAPI_H)
 				 EXTRA_LOBJS="${EXTRA_LOBJS} gcl_japi.o"
 			 	 LIBS="${LIBS} -ljapi -lwsock32"] )
 fi
+
 if test "$use" = "mingw" ; then
  if test "$try_xdr" = "yes" ; then
    AC_CHECK_HEADERS(rpc/rpc.h,[AC_DEFINE(HAVE_XDR)

@@ -97,6 +97,11 @@ gcl_init_system(object no_init)
 #ifdef HAVE_TK
   lsp_init("../mod/gcl_tk.lsp"); /* Needed for package declaration when compiling later. */
 #endif
+#if 0
+#ifdef _WIN32   
+  lsp_init("../mod/gcl_win32.lsp");
+#endif
+#endif  
   lsp_init("../lsp/gcl_iolib.lsp");
 /*   lsp_init("../lsp/gcl_listlib.lsp"); */
 /*   lsp_init("../lsp/gcl_mislib.lsp"); */

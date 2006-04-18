@@ -10765,7 +10765,12 @@ else
 fi
 
 
+if test "$use" = "mingw" ; then
+EXTRA_LOBJS="gcl_win32.o"
+else
 EXTRA_LOBJS=
+fi
+
 if test "$try_japi" = "yes" ; then
 
 for ac_header in japi.h
@@ -10915,6 +10920,7 @@ fi
 done
 
 fi
+
 if test "$use" = "mingw" ; then
  if test "$try_xdr" = "yes" ; then
 
