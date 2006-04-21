@@ -1,5 +1,5 @@
 
-@node Compiler Definitions, Function and Variable Index, Miscellaneous, Top
+@node Compiler Definitions, JAPI GUI Library Binding, Miscellaneous, Top
 @chapter Compiler Definitions
 
 @defun EMIT-FN (turn-on)

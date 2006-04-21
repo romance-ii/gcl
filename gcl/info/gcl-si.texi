@@ -61,6 +61,7 @@ END-INFO-DIR-ENTRY
 * Debugging::			
 * Miscellaneous::		
 * Compiler Definitions::	
+* JAPI GUI Library Binding::
 * Function and Variable Index::	 
 
  --- The Detailed Node Listing ---
@@ -133,6 +134,8 @@ Miscellaneous
 @include misc.texi
 
 @include compiler-defs.texi
+
+@include japi.texi
 
 @include gcl-si-index.texi
 

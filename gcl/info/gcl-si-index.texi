@@ -1,4 +1,4 @@
-@node Function and Variable Index, , Compiler Definitions, Top
+@node Function and Variable Index, ,JAPI GUI Library Binding, Top
 @appendix Function and Variable Index
 @printindex vr
 
