@@ -82,6 +82,25 @@ rando(object x, object rs) {
 #define RS_DEF_INIT 0
 #endif
 
+#if __GNU_MP_VERSION >= 4 && __GNU_MP_VERSION_MINOR >= 2
+extern void * (*gcl_gmp_allocfun) (size_t);
+static void * (*old_gcl_gmp_allocfun) (size_t);
+static void * trap_result;
+static size_t trap_size;
+
+static void *
+trap_gcl_gmp_allocfun(size_t size){
+
+  if (trap_size)
+    return old_gcl_gmp_allocfun(size);
+  else {
+    trap_size=size/MP_LIMB_SIZE;
+    trap_result=old_gcl_gmp_allocfun(size);
+    return trap_result;
+  }
+
+}
+#endif
 
 static object
 make_random_state(object rs) {
@@ -98,8 +117,33 @@ make_random_state(object rs) {
   
   z = alloc_object(t_random);
   bzero(&z->rnd.rnd_state,sizeof(z->rnd.rnd_state));
+
+#if __GNU_MP_VERSION >= 4 && __GNU_MP_VERSION_MINOR >= 2
+  if (!trap_size) {
+    old_gcl_gmp_allocfun=gcl_gmp_allocfun;
+    gcl_gmp_allocfun=trap_gcl_gmp_allocfun;
+  }
+#endif
   gmp_randinit_default(&z->rnd.rnd_state);
-  
+#if __GNU_MP_VERSION >= 4 && __GNU_MP_VERSION_MINOR >= 2
+  if (gcl_gmp_allocfun==trap_gcl_gmp_allocfun) {
+
+    void **p=(void *)&z->rnd.rnd_state,**pe=p+sizeof(z->rnd.rnd_state)/sizeof(*p);
+    int i;
+
+    for (i=0;p<pe && (*p<(void *)DBEGIN || *p>(void *)core_end || (*p==trap_result && ++i));p++);
+    if (p!=pe || i!=1)
+      FEerror("Unknown pointer in rnd_date!",0);
+
+    if (z->rnd.rnd_state._mp_seed->_mp_d!=trap_result)
+      FEerror("Unknown pointer in rnd_date!",0);
+
+    gcl_gmp_allocfun=old_gcl_gmp_allocfun;
+
+  }
+  z->rnd.rnd_state._mp_seed->_mp_alloc=trap_size;
+#endif
+    
   if (rs == Ct) 
     gmp_randseed_ui(&z->rnd.rnd_state,RS_DEF_INIT);
   else

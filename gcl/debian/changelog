@@ -160,8 +160,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * disable recursion protection in universal error handler for now
   * Treat catch like tagbody
   * Fix static weak symbol reloc bug
+  * gmp 4.2 support
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 17 Apr 2006 17:26:33 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 10 May 2006 21:26:42 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
