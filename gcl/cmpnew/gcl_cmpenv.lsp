@@ -262,19 +262,20 @@
       (get fname 'proclaimed-arg-types)))
 
 (defun get-return-type (fname)
-  (let* ((x (assoc fname *function-declarations*))
-         (type1 (if x (caddr x) (get fname 'proclaimed-return-type)))
-	 (type (if (get fname 'predicate) 'boolean
-		 (get fname 'return-type))))
-        (cond (type1
-	       (cond (type
-		      (cond ((setq type (type-and type type1)) type)
-			    (t
-			     (cmpwarn
-			      "The return type of ~s was badly declared."
-			      fname))))
-		     (t type1)))
-              (t type))))
+  (when (symbolp fname)
+    (let* ((x (assoc fname *function-declarations*))
+	   (type1 (if x (caddr x) (get fname 'proclaimed-return-type)))
+	   (type (if (get fname 'predicate) 'boolean
+		   (get fname 'return-type))))
+      (cond (type1
+	     (cond (type
+		    (cond ((setq type (type-and type type1)) type)
+			  (t
+			   (cmpwarn
+			    "The return type of ~s was badly declared."
+			    fname))))
+		   (t type1)))
+	    (t type)))))
 
 (defun get-local-arg-types (fun &aux x)
   (if (setq x (assoc fun *function-declarations*))
@@ -594,6 +595,7 @@
 (defun local-compile-decls (decls)
   (dolist** 
    (decl decls)
+   (unless (consp decl) (setq decl (list decl 3)))
    (case (car decl)
 	 (debug (setq *debug* (cadr decl)))
 	 (safety
@@ -604,6 +606,8 @@
 		  *compiler-push-events* (>= level 3))))
 	 (space (setq *space* (cadr decl)))
 	 (notinline (push (cadr decl) *notinline*))
+	 (speed) ;;FIXME
+	 (compilation-speed) ;;FIXME
 	 (inline
 	   (setq *notinline* (remove (cadr decl) *notinline*)))
 	 (otherwise (baboon)))))

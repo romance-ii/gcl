@@ -161,8 +161,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * Treat catch like tagbody
   * Fix static weak symbol reloc bug
   * gmp 4.2 support
+  * preliminary autoproclamation
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 10 May 2006 21:26:42 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 15 May 2006 17:27:29 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

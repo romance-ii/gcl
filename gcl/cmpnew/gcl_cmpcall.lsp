@@ -78,7 +78,7 @@
                                (eq (car fd) 'call-local)
                                fd)
                           (list 'call-global
-                                (make-info
+                                (make-info :type (or (get-return-type (cadr fun)) '*)
                                  :sp-change
                                  (null (get (cadr fun) 'no-sp-change)))
                                 (cadr fun)))
@@ -97,7 +97,7 @@
                                (eq (car fd) 'call-local)
                                fd)
                           (list 'call-global
-                                (make-info
+                                (make-info :type (or (get-return-type (cadr fun)) '*)
                                  :sp-change
                                  (null (get (cadr fun) 'no-sp-change)))
                                 (cadr fun)))
@@ -109,12 +109,12 @@
 			     (eq (car fd) 'call-local)
 			     fd)
 			(list 'call-global
-			      (make-info
+			      (make-info :type (or (get-return-type new) '*)
 			       :sp-change
 				   (null (get new 'no-sp-change)))
 			      new))))
 		 ))))
-   (let ((x (c1expr fun)) (info (make-info :sp-change t)))
+   (let ((x (c1expr fun)) (info (make-info :type (or (get-return-type fun) '*) :sp-change t)))
         (add-info info (cadr x))
         (list 'ordinary info x))
    ))

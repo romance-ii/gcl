@@ -62,7 +62,7 @@
          (body (c1progn (cdr args))))
     (if (or (blk-ref-ccb blk) (blk-ref-clb blk))
 	(incf *setjmps*))
-    (setf (info-type (cadr body)) (type-or1 (info-type (cadr body)) (blk-type blk)))
+    (when (blk-type blk) (setf (info-type (cadr body)) (type-or1 (info-type (cadr body)) (blk-type blk))))
     (if (or (blk-ref-ccb blk) (blk-ref-clb blk) (blk-ref blk))
 	(list 'block (cadr body) blk body)
       body))

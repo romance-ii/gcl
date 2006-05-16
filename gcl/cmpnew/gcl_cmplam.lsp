@@ -342,6 +342,11 @@
 
   (setq body (c1decl-body other-decls body))
 
+  (dolist (l (list requireds optionals keywords aux-vars))
+    (dolist (v l)
+      (when (var-p v)
+	(setf (var-type v) (var-mt v)))))
+
   (add-info info (cadr body))
 
   (dolist** (var requireds) (check-vref var))
@@ -356,6 +361,7 @@
   
   (when aux-vars
         (add-info aux-info (cadr body))
+	(setf (info-type aux-info) (info-type (cadr body)))
         (setq body (list 'let* aux-info aux-vars aux-inits body))
 	(or (eql setjmps *setjmps*) (setf (info-volatile aux-info) t)))
 

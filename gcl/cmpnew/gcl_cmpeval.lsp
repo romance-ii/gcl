@@ -1171,7 +1171,7 @@
          )
         ((eq fname 'si:|#,|)
          (cmperr "Sharp-comma-macro was found in a bad place."))
-        (t (let* ((info (make-info
+        (t (let* ((info (make-info :type '*
 			 :sp-change (null (get fname 'no-sp-change))))
 		  (args (if (and (member fname '(funcall apply))
 				 (consp (car args))
@@ -1180,11 +1180,17 @@
 			    `((function ,(cadar args)) ,@(cdr args))
 			  args))
                   (forms (c1args args info))) ;; info updated by args here
-	     (let ((return-type (get-return-type fname)))
+	     (let ((return-type (get-return-type 
+				 (case fname 
+				       ((funcall apply) 
+					(and (consp (car args)) (eq (caar args) 'function) (cadar args))) 
+				       (otherwise fname)))))
 	       (when return-type
-		 (if (or (eq return-type '*) (equal return-type '(*)))
-		     (setf return-type nil)
-		   (setf (info-type info) return-type))))
+		 (setf (info-type info) (if (or (eq return-type '*) (equal return-type '(*))) '* return-type))
+;		 (if (or (eq return-type '*) (equal return-type '(*)))
+;		     (setf return-type nil)
+;		   (setf (info-type info) return-type))
+		 ))
 	     (let ((arg-types (get-arg-types fname)))
                      ;;; Add type information to the arguments.
 	       (when arg-types
@@ -1285,6 +1291,10 @@
   (if *safe-compile*
       (wt-nl "vs_reserve(VM" *reservation-cmacro* ");")
       (wt-nl "vs_check;"))
+  (let ((cm *reservation-cmacro*))
+    (if (zerop *max-vs*)
+	(wt-h "#define VMR" cm "(VMT" cm ") return(VMT" cm ");")
+      (wt-h "#define VMR" cm "(VMT" cm ") vs_top=base ; return(VMT" cm ");")))
   (wt-nl) (reset-top)
   (c2expr form)
   (push (cons *reservation-cmacro* *max-vs*) *reservations*)

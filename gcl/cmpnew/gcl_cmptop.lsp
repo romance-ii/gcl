@@ -515,25 +515,44 @@
 	(si::string-concatenate "(SETF " (symbol-name sname) ")")
       (symbol-name name))))
 
-(defun t1defun (args &aux (setjmps *setjmps*) (defun 'defun) (*sharp-commas* nil) name)
+(defvar *compiler-auto-proclaim* t)
+
+(defun t1defun (args &aux (setjmps *setjmps*) (defun 'defun) (*sharp-commas* nil) fname lambda-expr cfun doc)
   (when (or (endp args) (endp (cdr args)))
         (too-few-args 'defun 2 (length args)))
-  (cmpck (not (setq name (function-symbol (car args))))
+  (cmpck (not (setq fname (function-symbol (car args))))
          "The function name ~s is not valid." (car args))
+  (setq cfun (or (get fname 'Ufun) (next-cfun)))
   (maybe-eval nil  (cons 'defun args))
  (tagbody
    top
   (setq *non-package-operation* t)
   (setq *local-functions* nil)
-  (let* ((*vars* nil) (*funs* nil) (*blocks* nil) (*tags* nil) lambda-expr
-         (*special-binding* nil)
-	 (fname name)
-	 (cfun (or (get fname 'Ufun) (next-cfun)))
-	 (doc nil))
-       (declare (object fname))
-       (setq lambda-expr (c1lambda-expr (cdr args) fname))
+  (let* ((*vars* nil) (*funs* nil) (*blocks* nil) (*tags* nil)
+         (*special-binding* nil))
+;       (let ((args (car (recursively-cmp-macroexpand (list (cons 'lambda (cdr args))) nil))))
+;	 (setq lambda-expr (c1lambda-expr (cdr args) fname)))
+       (setq lambda-expr (c1lambda-expr (cdr args) fname)))
   (or (eql setjmps *setjmps*) (setf (info-volatile (cadr lambda-expr)) t))
   (check-downward (cadr lambda-expr))
+
+  (when *compiler-auto-proclaim*
+    (let* ((al (mapcar 'var-type (caaddr lambda-expr)))
+	   (rt (info-type (cadar (last lambda-expr))));FIXME
+	   (rt (if (and (consp rt) (eq 'values (car rt))) '* rt)))
+      (when (notevery 'null (cdaddr lambda-expr)) (if al (nconc al '(*)) (setq al '(*))))
+      (cmpnote "(proclaim '(ftype (function ~s ~s) ~s~%" al rt fname)
+      (let ((oal (get fname 'proclaimed-arg-types)))
+	(when oal
+	  (unless (and (= (length al) (length oal))
+		       (every (lambda (x y) (or (and (eq x '*) (eq y '*)) (type>= y x))) al oal))
+	    (cmpwarn "arg type mismatch in auto-proclamation ~s -> ~s~%" oal al))))
+      (let ((ort (get fname 'proclaimed-return-type)))
+	(when ort
+	  (unless (or (and (eq rt '*) (or (eq ort '*) (equal ort '(*)))) (type>= ort rt))
+	    (cmpwarn "ret type mismatch in auto-proclamation ~s -> ~s~%" ort rt))))
+      (proclaim `(ftype (function ,al ,rt) ,fname))))
+    
 
 ;;provide a simple way for the user to declare functions to
 ;;have fixed args without having to count them, and make mistakes.
@@ -619,7 +638,7 @@
        (push (cons fname cfun) *global-funs*)
 
        
-       )))
+       ))
 
 (defun make-inline-string (cfun args fname)
   (if (null args)

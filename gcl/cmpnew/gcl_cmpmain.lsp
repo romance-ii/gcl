@@ -443,6 +443,10 @@ Cannot compile ~a.~%"
     ))
 
 (defun compile (name &optional def &aux tem gaz (*default-pathname-defaults* #"."))
+  
+  (when (eq name 'cmp-anon)
+    (dolist (l '(proclaimed-function proclaimed-arg-types proclaimed-return-type))
+      (remprop name l)))
 
   (cond ((not(symbolp name)) (error "Must be a name"))
 	((or (si::interpreted-function-p def) (and (consp def) (eq (car def) 'lambda)))
@@ -484,6 +488,8 @@ Cannot compile ~a.~%"
   (check-type name (or function function-identifier))
   (cond ((and (consp name)
 	      (eq (car name) 'lambda))
+	 (dolist (l '(proclaimed-function proclaimed-return-type proclaimed-arg-types))
+	   (remprop 'cmp-anon l))
 	 (eval `(defun cmp-anon ,@ (cdr name)))
 	 (disassemble 'cmp-anon asm))
 	((not(symbolp name)) (princ "Not a lambda or a name") nil)

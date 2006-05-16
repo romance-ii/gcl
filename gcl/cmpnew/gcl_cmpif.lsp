@@ -112,7 +112,7 @@
 	 (c1expr (cadr args)))
         ((nil) 
 	 (note-branch-elimination (car args) nil (cadr args))
-	(if (endp (cddr args)) (c1nil) (c1expr (caddr args))))
+	 (if (endp (cddr args)) (c1nil) (c1expr (caddr args))))
         (otherwise
          (setq info (make-info))
 	 (let* ((fmla (c1fmla f info))
@@ -465,7 +465,7 @@
 
 (defun c1case (args &optional (default nil))
   (when (endp args) (too-few-args 'case 1 0))
-  (let* ((info (make-info))
+  (let* ((info (make-info :type nil))
          (key-form (c1expr* (car args) info))
          (clauses nil) or-list)
     (cond ((type>= 'fixnum (info-type (second key-form)))
@@ -484,6 +484,7 @@
 			    (prog1
 				(c1progn (cdr clause))
 			      (dolist (l *restore-vars*) (push (list (car l) (var-type (car l))) or-list)))))
+	     (setf (info-type info) (type-or1 (info-type info) (info-type (cadr default))))
              (add-info info (cadr default)))
             (t (let* ((keylist
                        (cond ((consp (car clause))
@@ -497,6 +498,7 @@
 				 (c1progn (cdr clause))
 			       (dolist (l *restore-vars*) (push (list (car l) (var-type (car l))) or-list))))))
                  (add-info info (cadr body))
+		 (setf (info-type info) (type-or1 (info-type info) (info-type (cadr body))))
                  (push (cons keylist body) clauses)))))
     (dolist (l or-list ) (setf (var-type (car l)) (type-or1 (var-type (car l)) (cadr l))))
     (list 'case info key-form (reverse clauses) (or default (c1nil)))))

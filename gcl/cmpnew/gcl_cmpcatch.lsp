@@ -29,7 +29,7 @@
 (si:putprop 'throw 'c1throw 'c1special)
 (si:putprop 'throw 'c2throw 'c2)
 
-(defun c1catch (args &aux (info (make-info :sp-change t)) tag)
+(defun c1catch (args &aux (info (make-info :type '* :sp-change t)) tag)
   (incf *setjmps*)
   (when (endp args) (too-few-args 'catch 1 0))
   (setq tag (c1expr (car args)))
