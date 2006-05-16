@@ -1996,8 +1996,7 @@ Lsharp_dollar_reader()
 	if (tx!=t_fixnum && tx!=t_bignum)
 	  FEerror("Cannot make a random-state with the value ~S.",1, x);
 	vs_base[0] = alloc_object(t_random);
-	bzero(&vs_base[0]->rnd.rnd_state,sizeof(vs_base[0]->rnd.rnd_state));
-	gmp_randinit_default(&vs_base[0]->rnd.rnd_state);
+	init_gmp_rnd_state(&vs_base[0]->rnd.rnd_state);
 	if (tx==t_fixnum)
 	  gmp_randseed_ui(&vs_base[0]->rnd.rnd_state,fix(x));
 	else

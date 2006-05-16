@@ -153,6 +153,7 @@ MEM_GMP_CALL(3,void,mpz_gcd,1,mpz_t,mpz_t,mpz_t)
 MEM_GMP_CALL(3,gmp_ulint,mpz_gcd_ui,1,mpz_t,mpz_t,unsigned long int)
 MEM_GMP_CALL(3,void,mpz_divexact,1,mpz_t,mpz_t,mpz_t)
 MEM_GMP_CALL(3,void,mpz_divexact_ui,1,mpz_t,mpz_t,unsigned long int)
+MEM_GMP_CALL(2,void,mpz_fac_ui,1,mpz_t,unsigned long int)
 
 
      /* FIXME: find a way to have this follow the convention in gmp.h*/
@@ -196,3 +197,4 @@ MEM_GMP_CALL(3,void,mpz_divexact_ui,1,mpz_t,mpz_t,unsigned long int)
 #define __gmpz_mpz_gcd_ui m__gmpz_mpz_gcd_ui
 #define __gmpz_mpz_divexact m__gmpz_mpz_divexact
 #define __gmpz_mpz_divexact_ui m__gmpz_mpz_divexact_ui
+#define __gmpz_mpz_fac_ui m__gmpz_mpz_fac_ui

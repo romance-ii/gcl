@@ -168,8 +168,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * preliminary support for pre-macroexpansion in compiler
   * Fix proper list type handling and remove extraneous cdr in mv eval
     macros
+  * test support for si::factorial from gmp mpz_fac_ui, fix
+    gmp_randinit_default handling for gmp 4.2
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 16 May 2006 16:44:47 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 16 May 2006 16:46:22 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

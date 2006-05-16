@@ -1128,6 +1128,19 @@ zero_divisor(void)
 	FEerror("Zero divisor.", 0);
 }
 
+
+DEFUNO_NEW("FACTORIAL",object,fSfactorial,SI,1,1,NONE,OI,OO,OO,OO,void,siLfactorial,(fixnum x),"") {
+
+  object r;
+
+  if (x<0)
+    TYPE_ERROR(make_fixnum(x),sLnon_negative_fixnum);
+  r=new_bignum();
+  mpz_fac_ui(MP(r),x);
+  RETURN1(normalize_big(r));
+
+}
+  
 void
 gcl_init_num_arith(void)
 {

@@ -1752,6 +1752,9 @@ Icall_error_handler(object,object,int,...);
 void *
 gcl_gmp_alloc(size_t);
 
+void
+init_gmp_rnd_state(__gmp_randstate_struct *);
+
 int
 my_plt(const char *,unsigned long *);
 
