@@ -363,7 +363,25 @@
 		 (nmt (type-and nmt (var-dt v))))
 	    (setf (var-mt v) nmt))
 	  (throw (var-tag v) v))))))
-	
+
+(defun set-form-type (form type)
+  (let* ((it (info-type (cadr form)))
+	 (nt (type-and type it)))
+    (unless nt
+      (cmpwarn "Type mismatch: ~s ~s~%" it type))
+    (setf (info-type (cadr form)) nt)
+    (case (car form)
+	  ((let let*) (set-form-type (car (last form)) type))
+	  (progn (set-form-type (car (last (third form))) type))
+	  (if 
+	    (let ((tt (type-and type (info-type (cadr (fourth form)))))
+		  (ft (type-and type (info-type (cadr (fifth form))))))
+	      (unless tt
+		(set-form-type (fifth form) type)
+		(setf (car form) 'progn (cadr form) (cadr (fifth form)) (caddr form) (list (fifth form)) (cdddr form) nil))
+	      (unless ft
+		(set-form-type (fourth form) type)
+		(setf (car form) 'progn (cadr form) (cadr (fourth form)) (caddr form) (list (fourth form)) (cdddr form) nil)))))))
 
 (defun c1setq1 (name form &aux (info (make-info)) type form1 name1)
   (cmpck (not (symbolp name)) "The variable ~s is not a symbol." name)
@@ -380,7 +398,9 @@
     (let ((info1 (copy-info (cadr form1))))
          (setf (info-type info1) type)
          (setq form1 (list* (car form1) info1 (cddr form1)))))
-  (setf (info-type info) type)
+
+;  (setf (info-type info) type)
+  (set-form-type form1 type)
   (list 'setq info name1 form1))
 
 (defun c2setq (vref form)
@@ -447,9 +467,10 @@
 	(setq type (var-type (car vref)))
 
 	(unless (equal type (info-type (cadr form)))
-	  (let ((info1 (copy-info (cadr form))))
-	    (setf (info-type info1) type)
-	    (setq form (list* (car form) info1 (cddr form)))))
+	  (set-form-type form type))
+;	  (let ((info1 (copy-info (cadr form))))
+;	    (setf (info-type info1) type)
+;	    (setq form (list* (car form) info1 (cddr form)))))
 	(push vref vrefs)
 	(push form forms)
 	(push-changed (car vref) info)

@@ -75,8 +75,11 @@
 	    (throw (var-tag v) v)))))
     (setq type (type-filter (car args)))
     (cmpwarn "Type mismatch was found in ~s.~%Modifying type ~s to ~s." (cons 'the args) (info-type info) type))
-  (setf (info-type info) type)
-  (list* (car form) info (cddr form)))
+
+  (setq form (list* (car form) info (cddr form)))
+  (if (type>= 'boolean (car args)) (setf (info-type (cadr form)) type) (set-form-type form type))
+;  (setf (info-type info) type)
+  form)
 
 (defun c1compiler-let (args &aux (symbols nil) (values nil))
   (when (endp args) (too-few-args 'compiler-let 1 0))
