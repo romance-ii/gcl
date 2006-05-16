@@ -872,7 +872,7 @@
 		(wt ">>3]&=~(1<<")
 		(wt-bv-shift a i) 
 		(wt ")))"))
-	    (wt  "((" (c-cast aet) " *)(" a ")->v.v_self)[" i "]=" j))
+	    (wt  "(((" (c-cast aet) " *)(" a ")->v.v_self)[" i "]=" j ")"))
 	(wt "fSaset1(" a "," i "," j ")")))))
   
   

@@ -163,7 +163,7 @@
        (unwind-bds bds-cvar bds-bind)
        (wt-nl "VMR" *reservation-cmacro* "(" 
 	      (if (equal (rep-type (car type.wt)) "long ") "(object)" "") 
-	      "V" cvar")}"))
+	      "V" cvar");}"))
      (return))
     (t (baboon))
        ;;; Never reached
