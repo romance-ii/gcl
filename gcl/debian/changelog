@@ -162,8 +162,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * Fix static weak symbol reloc bug
   * gmp 4.2 support
   * preliminary autoproclamation
+  * numerical type propagator fixes
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 15 May 2006 17:27:29 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 16 May 2006 16:39:08 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

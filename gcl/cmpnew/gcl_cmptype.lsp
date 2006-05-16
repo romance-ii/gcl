@@ -405,8 +405,13 @@
 
 (dolist (l '(/ floor ceiling truncate round ffloor fceiling ftruncate fround))
   (si::putprop l t 'zero-pole))
-(dolist (l '(+ - * / exp float sqrt atan min max))
+(dolist (l '(+ - * exp float sqrt atan min max))
   (si::putprop l 'super-range 'type-propagator))
+
+(defun /-propagator (f t1 &optional t2)
+  (cond (t2 (super-range f t1 (type-and t2 '(not (real 0 0)))))
+	((super-range f (type-and t1 `(not (real 0 0)))))))
+(si::putprop '/ '/-propagator 'type-propagator)
 
 (defun log-wrap (x y)
   (if (= 0 x) (symbol-value '-inf) (log x y)))
@@ -480,7 +485,7 @@
 (si::putprop 'rem 'rem-propagator 'type-propagator)
 
 (defun floor-propagator (f t1 &optional (t2 '(integer 1 1)))
-  (let ((sr (super-range f t1 t2)))
+  (let ((sr (super-range f t1 (type-and t2 '(not (real 0 0))))))
     (when sr
       `(values ,sr
 	       ,(cond ((member f (sfl floor ffloor))       (mod-propagator f t1 t2))
@@ -545,16 +550,14 @@
 
 (defun type-or1-int (type1 type2)
   (cond ((equal type1 type2) type2)
-	((and (consp type2) (eq (car type2) 'values))
-	 (if (and (consp type1) (eq (car type1) 'values))
-	     (let ((r (list 'values)))
-	       (do ((t1 (cdr type1) (cdr t1))
-		    (t2 (cdr type2) (cdr t2)))
-		   ((not (and (consp t1) (consp t2))) (nreverse r))
-		 (push (type-or1 (car t1) (car t2)) r)))
-	   (type-or1 type1 (second type2))))
 	((and (consp type1) (eq (car type1) 'values))
-	 (type-or1 (second type1) type2))
+	 (let ((r (list 'values)))
+	   (do ((t1 (cdr type1) (cdr t1))
+		(t2 (if (and (consp type2) (eq (car type2) 'values)) (cdr type2) (list type2)) (cdr t2)))
+	       ((not (or (consp t1) (consp t2))) (nreverse r))
+	       (push (type-or1 (or (car t1) 'null) (or (car t2) 'null)) r))))
+	((and (consp type2) (eq (car type2) 'values))
+	 (type-or1 type2 type1))
 	((member type1 '(t object *)) type1)
 	((member type2 '(t object *)) type2)
 	((subtypep1 type1 type2) type2)

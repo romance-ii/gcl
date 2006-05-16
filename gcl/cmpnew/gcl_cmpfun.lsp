@@ -253,6 +253,7 @@
 	((progn
 	   (setq funob (c1funob (car args)))
 	   (add-info info (cadr funob))
+	   (setf (info-type info) (info-type (cadr funob)))
 	   (list 'funcall info funob (c1args (cdr args) info))))))
 
 (defun c1rplaca (args &aux (info (make-info)))
@@ -319,15 +320,41 @@
 (dolist (l `(eq eql equal equalp))
   (si::putprop l 'do-eq-et-al 'c1g))
 
+;; (defun num-type-bounds (t1)
+;;   (let* ((t1 (cmp-norm-tp `(and ,t1 real)))
+;; 	 (t1 (if (eq (car t1) 'or) (cmp-norm-tp (sublis '((integer . long-float)(ratio . long-float)(short-float . long-float)) t1))))
+;; 	 (i 1) j)
+;;     (mapcar (lambda (x) 
+;; 	      (setq j i i (- i)
+;; 		    x (cond ((atom x) x)
+;; 			    ((and (eq (car t1) 'integer) (integerp (car x))) (+ (car x) j))
+;; 			    ((car x))))) (cdr t1))))
+
+(defun xmin (x y)
+  (cond ((or (eq x '*) (eq y '*)) '*)
+	((min x y))))
+(defun xmax (x y)
+  (cond ((or (eq x '*) (eq y '*)) '*)
+	((max x y))))
+
+(defun num-type-bounds-int (t1)
+  (cond ((atom t1) nil)
+	((eq (car t1) 'or) (reduce (lambda (&rest xy) 
+				     (when xy 
+				       (let ((x (car xy))(y (cadr xy))) 
+					 `(,(xmin (car x) (car y)) ,(xmax (cadr x) (cadr y))))))
+				   (mapcar 'num-type-bounds-int (cdr t1))))
+	((member (car t1) '(integer ratio short-float long-float));FIXME
+	 (let ((i 1) j)
+	   (mapcar (lambda (x) 
+		     (setq j i i (- i)
+			   x (cond ((atom x) x)
+				   ((and (eq (car t1) 'integer) (integerp (car x))) (+ (car x) j))
+				   ((car x))))) (cdr t1))))
+	((baboon))))
+
 (defun num-type-bounds (t1)
-  (let* ((t1 (cmp-norm-tp `(and ,t1 real)))
-	 (t1 (if (eq (car t1) 'or) (cmp-norm-tp (mapcar (lambda (x) (if (atom x) x  (cons 'long-float (cdr x)))) t1)) t1))
-	 (i 1) j)
-    (mapcar (lambda (x) 
-	      (setq j i i (- i)
-		    x (cond ((atom x) x)
-			    ((and (eq (car t1) 'integer) (integerp (car x))) (+ (car x) j))
-			    ((car x))))) (cdr t1))))
+  (num-type-bounds-int (cmp-norm-tp `(and real ,t1))))
 
 
 (defun num-type-rel (fn t1 t2 &optional s)
