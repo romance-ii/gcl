@@ -743,7 +743,7 @@
 (defun list-types (tp &optional r)
   (cond ((atom tp) r)
 	((consp (car tp)) (let ((r (list-types (car tp) r))) (list-types (cdr tp) r)))
-	((equal tp '(member nil)) (pushnew tp r :test 'eq) (list-types (cdr tp) r))
+	((and (eq (car tp) 'member) (member nil tp)) (pushnew '(member nil) r :test 'eq) (list-types (cdr tp) r))
 	((eq (car tp) 'cons) (pushnew (proper-cons-tp tp) r :test 'equal) (list-types (cdr tp) r))
 	((list-types (cdr tp) r))))
 

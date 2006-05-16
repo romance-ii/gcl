@@ -194,7 +194,7 @@
       ((endp vl) `(let* ((,sym (multiple-value-list ,form)) ,@(nreverse bind))
                         ,@body))
       (push `(,(car vl) (car ,sym)) bind)
-      (push `(,sym (cdr ,sym)) bind)))
+      (unless (endp (cdr vl)) (push `(,sym (cdr ,sym)) bind))))
 
 (defmacro do (control (test . result) &rest body
               &aux (decl nil) (label (gensym)) (vl nil) (step nil))

@@ -502,7 +502,7 @@
 	   (list ',function access-form ,@(mapcar (lambda (x) (list 'quote (cadadr x))) lets)))))
 
 ;;; DEFINE-MODIFY-MACRO macro.
-;;FIXME -- this is really upgly and error prone.  CM 20041214
+;;FIXME -- this is really ugly and error prone.  CM 20041214
 (defmacro define-modify-macro (name lambda-list function &optional doc-string)
   (declare (optimize (safety 1)))
   (let ((update-form
