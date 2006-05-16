@@ -38,7 +38,7 @@
 
 (defun cmp-macroexp-with-compiler-macros (form)
   (let ((form (if (and (consp form) (eq (car form) 'or)) form (cmp-macroexpand form))))
-    (if (and (consp form) (symbolp (car form)))
+    (if (and (consp form) (symbolp (car form)) (not (eq (car form) 'or)))
 	(let ((cmf (get (car form) 'si::compiler-macro-prop)))
 	  (if cmf
 	      (cmp-eval `(funcall ',cmf ',form nil))
@@ -46,7 +46,12 @@
       form)))
 
 ;;FIXME -- this really needs replacing with another c1 pass at this point.
-(defun recursively-cmp-macroexpand (form bf &aux (*funs* *funs*))
+(defun recursively-cmp-macroexpand (form bf &aux (*funs* *funs*) (*debug* *debug*)
+					 (*compiler-check-args* *compiler-check-args*) 
+					 (*safe-compile* *safe-compile*) 
+					 (*compiler-push-events* *compiler-push-events*) 
+					 (*notinline* *notinline*)
+					 (*space* *space*))
   (if (atom form)
       form
     (let ((cf (car form)))
@@ -55,7 +60,7 @@
 			    (car (member cf '(let let* lambda the flet labels macrolet declare quote function)))
 			    (and (consp bf)
 				 (if (atom (car bf)) bf
-				   (and (member (caar bf) '(flet labels macrolet) :test #'eq) 'lambda)))))
+				   (and (member (caar bf) '(flet labels macrolet)) 'lambda)))))
 	    (new-car-bf (and (consp cf) bf (if (or (eq bf 'quote) (eq bf 'declare)) bf (list bf))))
 	    (new-cf (if (or bf (atom cf) (eq (car cf) 'lambda))
 			cf (cmp-macroexp-with-compiler-macros cf))))
@@ -63,6 +68,8 @@
 	      (progn
 		(when (eq bf 'macrolet)
 		  (push-macrolets cf))
+		(when (and (consp cf) (eq (car cf) 'declare) (consp (cadr cf)) (eq (caadr cf) 'optimize))
+		  (local-compile-decls (cdadr cf)))
 		(recursively-cmp-macroexpand (cdr form) new-cdr-bf)))))))
 
 (defun var-is-changed (var form)
