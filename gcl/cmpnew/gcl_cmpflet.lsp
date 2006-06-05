@@ -354,7 +354,7 @@
     (cmpck (or (endp def) (not (symbolp (car def))) (endp (cdr def)))
            "The macro definition ~s is illegal." def)
     (push (list (car def)
-                (caddr (si:defmacro* (car def) (cadr def) (cddr def))))
+                (si::interpreted-function-lambda (caddr (si:defmacro* (car def) (cadr def) (cddr def)))))
           *funs*))
   (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
   (c1add-globals ss)

@@ -56,7 +56,6 @@
   (setq *inline-functions* nil)
   (setq *inline-blocks* 0)
   (setq *notinline* nil)
-  (setq *eval-when-compile-only-macros* nil)
   (setq *portable-source* nil)
   (clrhash *norm-tp-hash*)
   (clrhash *and-tp-hash*)

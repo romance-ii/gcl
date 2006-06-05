@@ -33,7 +33,7 @@
 (defun push-macrolets (form)
   (dolist** (def form)
 	    (push (list (car def)
-			(caddr (si:defmacro* (car def) (cadr def) (cddr def))))
+			(si::interpreted-function-lambda (caddr (si:defmacro* (car def) (cadr def) (cddr def)))))
 		  *funs*)))
 
 (defun cmp-macroexp-with-compiler-macros (form)
