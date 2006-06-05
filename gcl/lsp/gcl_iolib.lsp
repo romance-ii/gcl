@@ -710,5 +710,7 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
   (let ((args (let ((et (cadr (member :element-type args))))
 		(if et `(:element-type ,(restrict-stream-element-type et) ,@args)
 		  args))))
-    (apply 'open1 f args)))
-  
+    (values (apply 'open1 f args))))
+
+(defun load (f &rest args)
+  (values (apply 'load1 f args)))

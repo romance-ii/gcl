@@ -46,7 +46,7 @@ int Rset = 0;
 void
 call_or_link(object sym,int setf,void **link) {
 
-  object fun = setf ? get(sym,sSsetf_function,OBJNULL) : sym->s.s_gfdef;
+  object fun = setf ? ({object ns=get(sym,sSsetf_function,OBJNULL); type_of(ns)!=t_symbol ? ns : symbol_function(ns);}) : sym->s.s_gfdef;
 #ifdef DO_FUNLINK_DEBUG
   fprintf ( stderr, "call_or_link: fun %x START for function ", fun );
   print_lisp_string ( "name: ", fun->cf.cf_name );
@@ -99,7 +99,7 @@ call_or_link(object sym,int setf,void **link) {
 void
 call_or_link_closure ( object sym, int setf, void **link, void **ptr )
 {
-    object fun = setf ? get(sym,sSsetf_function,OBJNULL) : sym->s.s_gfdef;
+    object fun = setf ? ({object ns=get(sym,sSsetf_function,OBJNULL); type_of(ns)!=t_symbol ? ns : symbol_function(ns);}) : sym->s.s_gfdef;
 #ifdef DO_FUNLINK_DEBUG
     fprintf ( stderr, "call_or_link_closure: START sym %x, link %x, *link %x, ptr %x, *ptr %x, sym->s.s_gfdef (fun) %x ",
               sym, link, *link, ptr, *ptr, fun );
@@ -310,8 +310,10 @@ clear_compiler_properties(object sym, object code)
   extern object sSclear_compiler_properties;  
   VFUN_NARGS=2; FFN(fSuse_fast_links)(Cnil,sym);
   tem = getf(sym->s.s_plist,sStraced,Cnil);
-  if (sSAinhibit_macro_specialA && sSAinhibit_macro_specialA->s.s_dbind != Cnil)
-    (void)ifuncall2(sSclear_compiler_properties, sym,code);
+  if (sSclear_compiler_properties && sSclear_compiler_properties->s.s_gfdef!=OBJNULL)
+    if ((sSAinhibit_macro_specialA && sSAinhibit_macro_specialA->s.s_dbind != Cnil) ||
+	sym->s.s_sfdef == NOT_SPECIAL)
+      (void)ifuncall2(sSclear_compiler_properties, sym,code);
   if (tem != Cnil) return tem;
   return sym;
   
@@ -1209,7 +1211,7 @@ call_proc(object sym, int setf, void **link, int argd, va_list ll)
     fprintf ( stderr, "call_proc: sym %x START\n", sym );
 #endif 
  check_type_symbol(&sym);
- fun = setf ? get(sym,sSsetf_function,OBJNULL) : sym->s.s_gfdef;
+ fun = setf ? ({object ns=get(sym,sSsetf_function,OBJNULL); type_of(ns)!=t_symbol ? ns : symbol_function(ns);}) : sym->s.s_gfdef;
  if (fun && (type_of(fun)==t_sfun
 	     || type_of(fun)==t_gfun
 	     || type_of(fun)== t_vfun)
@@ -1293,7 +1295,7 @@ call_proc(object sym, int setf, void **link, int argd, va_list ll)
      register object *base;
      enum ftype result_type;
      /* we check they are valid functions before calling this */
-     if(type_of(sym)==t_symbol) fun =  setf ? get(sym,sSsetf_function,OBJNULL) : symbol_function(sym);
+     if(type_of(sym)==t_symbol) fun =  setf ? ({object ns=get(sym,sSsetf_function,OBJNULL); type_of(ns)!=t_symbol ? ns : symbol_function(ns);}) : symbol_function(sym);
      else fun = sym;
      vs_base= (base =   vs_top);
      if (fun == OBJNULL || sym->s.s_sfdef != NOT_SPECIAL || sym->s.s_mflag) FEinvalid_function(sym);
@@ -1340,7 +1342,7 @@ call_proc_new(object sym, int setf,void **link, int argd, object first, va_list 
     fprintf ( stderr, "call_proc_new: sym %x START\n", sym );
 #endif 
  check_type_symbol(&sym);
- fun = setf ? get(sym,sSsetf_function,OBJNULL) : sym->s.s_gfdef;
+ fun = setf ? ({object ns=get(sym,sSsetf_function,OBJNULL); type_of(ns)!=t_symbol ? ns : symbol_function(ns);}) : sym->s.s_gfdef;
  if (fun && (type_of(fun)==t_sfun
 	     || type_of(fun)==t_gfun
 	     || type_of(fun)== t_vfun)
@@ -1426,7 +1428,7 @@ call_proc_new(object sym, int setf,void **link, int argd, object first, va_list 
      register object *base;
      enum ftype result_type;
      /* we check they are valid functions before calling this */
-     if(type_of(sym)==t_symbol)  fun = setf ? get(sym,sSsetf_function,OBJNULL) : symbol_function(sym);
+     if(type_of(sym)==t_symbol)  fun = setf ? ({object ns=get(sym,sSsetf_function,OBJNULL); type_of(ns)!=t_symbol ? ns : symbol_function(ns);}) : symbol_function(sym);
      else fun = sym;
      vs_base= (base =   vs_top);
      if (fun == OBJNULL || sym->s.s_sfdef != NOT_SPECIAL || sym->s.s_mflag) FEinvalid_function(sym);

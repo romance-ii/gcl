@@ -61,7 +61,7 @@ gcl_init_init()
   build_symbol_table();
 
   lsp_init("../lsp/gcl_export.lsp");
-
+  ar_init(gcl_callhash);
   ar_init(gcl_defmacro);
   ar_init(gcl_evalmacros);
   ar_init(gcl_top);
@@ -135,6 +135,7 @@ gcl_init_system(object no_init)
   ar_check_init(gcl_cmpvs,no_init);
   ar_check_init(gcl_cmpwt,no_init);
   ar_check_init(gcl_cmpmain,no_init);
+  ar_check_init(gcl_recompile,no_init);
   
 }
 

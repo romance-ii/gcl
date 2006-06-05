@@ -50,7 +50,7 @@
 (defun c1declare (args)
   (cmperr "The declaration ~s was found in a bad place." (cons 'declare args)))
 
-(defconstant +useful-c-types+ '(fixnum short-float long-float proper-list t))
+(defconstant +useful-c-types+ '(seqind fixnum short-float long-float proper-list t))
 
 (defun c1the (args &aux info form type dtype)
   (when (or (endp args) (endp (cdr args)))
@@ -74,7 +74,8 @@
 	      (setf (var-mt v) nmt))
 	    (throw (var-tag v) v)))))
     (setq type (type-filter (car args)))
-    (cmpwarn "Type mismatch was found in ~s.~%Modifying type ~s to ~s." (cons 'the args) (info-type info) type))
+    (unless (not (and dtype (info-type info)))
+      (cmpwarn "Type mismatch was found in ~s.~%Modifying type ~s to ~s." (cons 'the args) (info-type info) type)))
 
   (setq form (list* (car form) info (cddr form)))
   (if (type>= 'boolean (car args)) (setf (info-type (cadr form)) type) (set-form-type form type))

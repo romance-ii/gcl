@@ -44,5 +44,5 @@
     (apply 'compiler::compile1 system::args))
 (defun disassemble (&rest system::args &aux (*print-pretty* nil))
     (apply 'compiler::disassemble1 system::args))
-(setf (symbol-function 'si:clear-compiler-properties)
-       (symbol-function 'compiler::compiler-clear-compiler-properties))
+;(setf (symbol-function 'si:clear-compiler-properties)
+;       (symbol-function 'compiler::compiler-clear-compiler-properties))

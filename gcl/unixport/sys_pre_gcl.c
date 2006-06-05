@@ -62,6 +62,8 @@ gcl_init_init()
 
   lsp_init("../lsp/gcl_export.lsp");
 
+  lsp_init("../lsp/gcl_callhash.lsp");
+
   lsp_init("../lsp/gcl_defmacro.lsp");
   lsp_init("../lsp/gcl_evalmacros.lsp");
   lsp_init("../lsp/gcl_top.lsp");
@@ -78,9 +80,9 @@ gcl_init_system(object no_init)
   if (type_of(no_init)!=t_symbol)
     error("Supplied no_init is not of type symbol\n");
 
+  lsp_init("../lsp/gcl_predlib.lsp");
   lsp_init("../lsp/gcl_listlib.lsp");
   lsp_init("../lsp/gcl_mislib.lsp");
-  lsp_init("../lsp/gcl_predlib.lsp");
   lsp_init("../lsp/gcl_setf.lsp");
   lsp_init("../lsp/gcl_arraylib.lsp");
 

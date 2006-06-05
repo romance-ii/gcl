@@ -171,8 +171,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * test support for si::factorial from gmp mpz_fac_ui, fix
     gmp_randinit_default handling for gmp 4.2
   * call-lambda info-type propagation
+  * auto-recompilation support
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 16 May 2006 21:46:05 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon,  5 Jun 2006 22:01:13 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

@@ -176,10 +176,14 @@
 		     (CELL-ERROR-NAME CONDITION)))))
 
 (DEFINE-CONDITION UNBOUND-SLOT (CELL-ERROR)
-  ()
-  (:REPORT (LAMBDA (CONDITION STREAM)
-	     (FORMAT STREAM "The slot ~S is unbound."
-		     (CELL-ERROR-NAME CONDITION)))))
+  ((instance :initarg :instance :accessor unbound-slot-instance))
+  (:report (lambda (c s) (format s "Slot ~s is unbound in ~s"
+                                 (cell-error-name c)
+                                 (unbound-slot-instance c)))))
+;;   ()
+;;   (:REPORT (LAMBDA (CONDITION STREAM)
+;; 	     (FORMAT STREAM "The slot ~S is unbound."
+;;		     (CELL-ERROR-NAME CONDITION)))))
   
 (DEFINE-CONDITION UNDEFINED-FUNCTION (CELL-ERROR)
   ()

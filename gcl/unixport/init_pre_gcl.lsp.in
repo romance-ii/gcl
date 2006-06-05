@@ -51,58 +51,14 @@
 		       (if (si::fread tem 0 (length tem) st)
 			   (setq compiler::*cmpinclude-string* tem))))))
  
- (setf (symbol-function 'si:clear-compiler-properties)
-       (symbol-function 'compiler::compiler-clear-compiler-properties))
- (setq system::*old-top-level* (symbol-function 'system:top-level))
+; (setf (symbol-function 'si:clear-compiler-properties)
+;       (symbol-function 'compiler::compiler-clear-compiler-properties))
  
  (defvar si::*lib-directory* (namestring (make-pathname :directory (list :parent))))
- 
- (defun system::gcl-top-level (&aux tem)
-   (si::set-up-top-level)
-   
-   (if (si::get-command-arg "-compile")
-       (let (;(system::*quit-tag* (cons nil nil))
-					;(system::*quit-tags* nil) (system::*break-level* '())
-					;(system::*break-env* nil) (system::*ihs-base* 1)
-					;(system::*ihs-top* 1) (system::*current-ihs* 1)
-	     (*break-enable* nil) result)
-	 (setq result
-	       (system:error-set
-		'(progn
-		   (compile-file
-		    (si::get-command-arg "-compile")
-		    :output-file 
-		    (or (si::get-command-arg "-o")
-			(si::get-command-arg "-compile"))
-		    :o-file
-		    (cond ((equalp
-			    (si::get-command-arg "-o-file")
-			    "nil") nil)
-			  ((si::get-command-arg "-o-file" t))
-			  (t t))
-		    :c-file (si::get-command-arg "-c-file" t)
-		    :h-file (si::get-command-arg "-h-file" t)
-		    :data-file (si::get-command-arg "-data-file" t)
-		    :system-p (si::get-command-arg "-system-p" t)))))
-	 (bye (if (or compiler::*error-p* (equal result '(nil))) 1 0))))
-   (cond ((si::get-command-arg "-batch")
-	  (setf si::*top-level-hook* #'si::bye))
-	 ((si::get-command-arg "-f"))
-	 (t (format t si::*system-banner*)
-	    (let* ((c (find-package "COMPILER"))
-		   (tmp (and c (find-symbol "*TMP-DIR*" c))))
-	      (when tmp
-		(setf (symbol-value tmp) (funcall (find-symbol "GET-TEMP-DIR" c)))
-		(format t "Temporary directory for compiler files set to ~a~%" (symbol-value tmp))))))
-   (setq si::*ihs-top* 1)
-   (in-package 'system::user) (incf system::*ihs-top* 2)
-   (funcall system::*old-top-level*))
  
  (terpri)
  (setq si:*inhibit-macro-special* t)
  (gbc t) (system:reset-gbc-count)
- 
- (defun system:top-level nil (system::gcl-top-level))
  
  (setq compiler::*default-c-file* nil)
  (setq compiler::*default-h-file* nil)

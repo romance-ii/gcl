@@ -29,7 +29,7 @@
 
 
 (eval-when (compile) (proclaim '(optimize (safety 1) (space 3))))
-(eval-when (eval compile) (defun si:clear-compiler-properties (symbol)))
+;(eval-when (eval compile) (defun si:clear-compiler-properties (symbol code)))
 (eval-when (eval compile) (setq si:*inhibit-macro-special* nil))
 
 

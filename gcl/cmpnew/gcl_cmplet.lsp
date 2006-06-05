@@ -104,17 +104,6 @@
 ;	     (var-is-declared var (cdr form))))
 ;	(t nil)))
 
-(defun t-to-nil (x)
-  (if (eq x t) nil x))
-
-(defun nil-to-t (x)
-  (if x x t))
-
-(defun coerce-to-one-value (type)
-  (if (and (consp type) (eq (car type) 'values))
-      (cadr type)
-    type))
-
 (defun type-of-form (form)
   (t-to-nil (coerce-to-one-value (info-type (cadr (c1expr form))))))
   
@@ -224,6 +213,7 @@
 
 (defun set-var-init-type (v t1);;FIXME should be in c1make-var
   (when (eq (var-kind v) 'lexical)
+    (setq t1 (coerce-to-one-value t1))
     (setf (var-dt v) (var-type v)
 	  (var-type v) t1
 	  (var-mt v) (var-type v)

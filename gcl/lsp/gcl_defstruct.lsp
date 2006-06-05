@@ -71,23 +71,25 @@
      (or no-fun
 	 (and (fboundp access-function)
 	      (eq (aref accsrs offset) (symbol-function access-function)))
-	 (setf (symbol-function access-function)
-	   (or (aref accsrs offset)
-	       (setf (aref accsrs offset)
-		     (cond  ((eq accsrs *accessors*)
-				(lambda (x)
-				  (declare (optimize (safety 1)))
-				  (or (structurep x)
-				      (error "~a is not a structure" x))
-				    (structure-ref1 x offset)))
-			       ((eq accsrs *list-accessors*)
-				(lambda(x)
-				    (declare (optimize (safety 1)))
-				    (si:list-nth offset x)))
-			       ((eq accsrs *vector-accessors*)
-				(lambda(x)
-				  (declare (optimize (safety 1)))
-				  (aref x offset)))))))))
+	 (progn 
+	   (setf (symbol-function access-function)
+		 (or (aref accsrs offset)
+		     (setf (aref accsrs offset)
+			   (cond  ((eq accsrs *accessors*)
+				   (lambda (x)
+				     (declare (optimize (safety 1)))
+				     (or (structurep x)
+					 (error "~a is not a structure" x))
+				     (structure-ref1 x offset)))
+				  ((eq accsrs *list-accessors*)
+				   (lambda(x)
+				     (declare (optimize (safety 1)))
+				     (si:list-nth offset x)))
+				  ((eq accsrs *vector-accessors*)
+				   (lambda(x)
+				     (declare (optimize (safety 1)))
+				     (aref x offset)))))))
+	        (add-hash access-function `((t) ,(or (not slot-type) slot-type)) nil nil))))
     (cond (read-only
 	    (remprop access-function 'structure-access)
 	    (setf (get access-function 'struct-read-only) t))
@@ -416,6 +418,7 @@
 	     (list ar (round-up pos (size-of t)) has-holes)
 	     ))))
 
+;FIXME function-src for all functions, sigs for constructor and copier
 (defun define-structure (name conc-name no-conc type named slot-descriptions copier
 			      static include print-function constructors
 			      offset predicate &optional documentation no-funs
@@ -501,12 +504,15 @@
 		documentation))
     (when (and  (null type)  predicate)
 	  (record-fn predicate 'defun '(t) t)
+	  
 	  (or no-funs
-	      (setf (symbol-function predicate)
-		    (lambda (x)
-		      (declare (optimize (safety 1)))
-		      (si::structure-subtype-p x name))))
-	  (setf (get predicate 'compiler::co1)
+	      (progn
+		(setf (symbol-function predicate)
+		      (lambda (x)
+			(declare (optimize (safety 1)))
+			(si::structure-subtype-p x name)))
+		(add-hash predicate `((t) boolean) nil nil)))
+	      (setf (get predicate 'compiler::co1)
 		'compiler::co1structure-predicate)
 	  (setf (get predicate 'struct-predicate) name)
 	  )

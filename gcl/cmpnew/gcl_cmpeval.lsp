@@ -306,6 +306,18 @@
 (si::putprop 'gcd (function binary-nest) 'si::compiler-macro-prop)
 (si::putprop 'lcm (function binary-nest) 'si::compiler-macro-prop)
 
+;FIXME apply-expander
+(defun funcall-expander (form env);FIXME inlinable-fn?
+  (declare (ignore env))
+  (cond ((and (consp (cadr form)) (eq (caadr form) 'lambda)) (cdr form))
+	((and (consp (cadr form)) (eq (caadr form) 'function)
+	      (or (symbolp (cadadr form))
+		  (and (consp (cadadr form)) (eq (car (cadadr form)) 'lambda))))
+	 `(,(cadadr form) ,@(cddr form)))
+	((constantp (cadr form)) `(,(cmp-eval (cadr form)) ,@(cddr form)))
+	(form)))
+(si::putprop 'funcall (function funcall-expander) 'si::compiler-macro-prop)
+
 (defun last-expander (form env)
   (declare (ignore env))
   (if (or (not (cdr form)) (cdddr form)) form
@@ -438,10 +450,6 @@
 	   (do ((,s ,s (cdr ,s))) ((endp ,s) ,x)
 	       (setq ,x (cons (car ,s) ,x))))))))
 (si::putprop 'reverse (function reverse-expander) 'si::compiler-macro-prop)
-
-(defun cmp-vec-length (x)
-  (declare (vector x))
-  (if (array-has-fill-pointer-p x) (fill-pointer x) (array-dimension x 0)))
 
 (defmacro with-var-form-type ((v f tp) &rest body)
   ``(let ((,,v ,,f))
@@ -1099,6 +1107,14 @@
 	      (cons (bind-all-vars (caddr form))
 		    (if (cadddr form) (list (bind-all-vars (cadddr form))))))))
 		
+;FIXME find a better way to avoid expander recursion
+(defconstant +cmp-fn-alist+ '((cmp-nthcdr . nthcdr)
+			      (cmp-nth . nth)
+			      (cmp-aref . row-major-aref)
+			      (cmp-aset . si::aset1)
+;			      (cmp-array-element-type . si::array-element-type)
+			      (cmp-array-dimension . array-dimension)))
+
 (defun c1symbol-fun (fname args &aux fd)
   (cond ((setq fd (get fname 'c1special)) (funcall fd args))
 	((and (setq fd (get fname 'co1special))
@@ -1153,9 +1169,22 @@
 	   (and *record-call-info* (record-call-info 'record-call-info
 						   fname))
 	   nil))
+
 	;;continue
         ((setq fd (macro-function fname))
          (c1expr (cmp-expand-macro fd fname args)))
+	((when (and (member (first *current-form*) '(defun))
+		    (symbolp (second *current-form*))
+		    (symbol-package (second *current-form*)))
+	   (si::add-hash (second *current-form*) 
+			 nil 
+			 (let ((fname (or (cdr (assoc fname +cmp-fn-alist+)) fname)))
+			   (list (cons fname
+				       (let* ((at (get fname 'proclaimed-arg-types))
+					      (rt (get fname 'proclaimed-return-type))
+					      (rt (if (equal '(*) rt) '* rt)))
+					 (when (or at rt) (list at rt))))))
+			 nil)))
         ((and (setq fd (get fname 'si::structure-access))
               (inline-possible fname)
               ;;; Structure hack.
@@ -1171,7 +1200,9 @@
          )
         ((eq fname 'si:|#,|)
          (cmperr "Sharp-comma-macro was found in a bad place."))
-        (t (let* ((info (make-info :type '*
+        (t (let* ((info (make-info :type (if (eq (second *current-form*) fname) ;FIXME must be a better way
+					     (when (boundp '*recursion-detected*) (setq *recursion-detected* t) nil) 
+					   '*)
 			 :sp-change (null (get fname 'no-sp-change))))
 		  (args (if (and (member fname '(funcall apply))
 				 (consp (car args))
@@ -1492,10 +1523,10 @@
     ;; We can't read in long-floats which are too big:
     (let (tem x)
       (unless (setq tem (cadr (assoc val *objects*)))
-	(cond ((or
-		(and (= val (symbol-value '+inf)) (c1expr `(si::|#,| symbol-value '+inf)))
-		(and (= val (symbol-value '-inf)) (c1expr `(si::|#,| symbol-value '-inf)))
-		(and (not (isfinite val)) (c1expr `(si::|#,| symbol-value 'nan)))
+	(cond ((or ;FIXME this is really grotesque
+		(and (= val (symbol-value '+inf)) (let ((l (make-list 3))) (setf (car l) 'si::|#,| (cadr l) 'symbol-value (caddr l) ''+inf) (c1expr l)))
+		(and (= val (symbol-value '-inf)) (let ((l (make-list 3))) (setf (car l) 'si::|#,| (cadr l) 'symbol-value (caddr l) ''-inf) (c1expr l)))
+		(and (not (isfinite val)) (let ((l (make-list 3))) (setf (car l) 'si::|#,| (cadr l) 'symbol-value (caddr l) ''nan) (c1expr l)))
 		(and
 		 (> (setq x (abs val)) (/ most-positive-long-float 2))
 		 (c1expr `(si::|#,| * ,(/ val most-positive-long-float)
@@ -1522,6 +1553,7 @@
    (t nil)))
 
 (defmacro si::define-compiler-macro (name vl &rest body)
+  (declare (optimize (safety 1)))
   `(progn (si:putprop ',name
                       (caddr (si:defmacro* ',name ',vl ',body))
                       'si::compiler-macro-prop)

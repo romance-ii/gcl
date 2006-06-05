@@ -40,7 +40,7 @@
 
 
 ;(eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))
-(eval-when (eval compile) (defun si:clear-compiler-properties (symbol)))
+;(eval-when (eval compile) (defun si:clear-compiler-properties (symbol code)))
 (eval-when (eval compile) (setq si:*inhibit-macro-special* nil))
 
 
@@ -217,7 +217,7 @@
 (defsetf svref si:svset)
 (defsetf elt si:elt-set)
 (defsetf symbol-value set)
-(defsetf symbol-function si:fset)
+(defsetf symbol-function si::fset)
 (defsetf macro-function (s) (v) `(progn (si:fset ,s (cons 'macro ,v)) ,v))
 (defsetf aref si:aset)
 (defsetf get put-aux)

@@ -1,6 +1,6 @@
 ;; -*-Lisp-*-
 
-
+(in-package 'compiler)
 (defstruct (fasd (:type vector))
   stream
   table

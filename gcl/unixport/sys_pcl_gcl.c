@@ -62,6 +62,7 @@ gcl_init_init()
 
   lsp_init("../lsp/gcl_export.lsp");
 
+  ar_init(gcl_callhash);
   ar_init(gcl_defmacro);
   ar_init(gcl_evalmacros);
   ar_init(gcl_top);
@@ -177,6 +178,7 @@ gcl_init_system(object no_init)
 #ifdef _WIN32  
   ar_check_init(gcl_win32,no_init);
 #endif
+  ar_check_init(gcl_recompile,no_init);
   
 }
 

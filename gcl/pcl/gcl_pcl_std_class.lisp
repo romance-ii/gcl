@@ -117,8 +117,7 @@
   (lisp:documentation object doc-type))
 
 (defmethod (setf documentation) (new-value object &optional doc-type)
-  (declare (ignore new-value doc-type))
-  (error "Can't change the documentation of ~S." object))
+  (si::set-documentation object doc-type new-value))
 
 
 (defmethod documentation ((object documentation-mixin) &optional doc-type)

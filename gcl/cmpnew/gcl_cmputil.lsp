@@ -262,20 +262,20 @@
 
 (defun  compiler-def-hook (symbol code) symbol code nil)
 
-(defun compiler-clear-compiler-properties (symbol code)
-  code
-  (let ((v (symbol-plist symbol)) w)
-    (tagbody
-      top
-      (setq w (car v))
-      (cond ((and (symbolp w)
-		  (get w 'compiler-prop))
+;; (defun compiler-clear-compiler-properties (symbol code)
+;;   code
+;;   (let ((v (symbol-plist symbol)) w)
+;;     (tagbody
+;;       top
+;;       (setq w (car v))
+;;       (cond ((and (symbolp w)
+;; 		  (get w 'compiler-prop))
 
-	     (setq v (cddr v))
-	     (remprop symbol w))
-	    (t (setq v (cddr v))))
-      (or (null v) (go top)))
-    (compiler-def-hook symbol code)
-    ))
+;; 	     (setq v (cddr v))
+;; 	     (remprop symbol w))
+;; 	    (t (setq v (cddr v))))
+;;       (or (null v) (go top)))
+;;     (compiler-def-hook symbol code)
+;;     ))
 
 ;hi

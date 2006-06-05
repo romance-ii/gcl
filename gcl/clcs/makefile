@@ -9,7 +9,7 @@ all: $(addsuffix .c,$(FILES)) $(addsuffix .o,$(FILES))
 #all: $(addsuffix .o,$(FILES))
 
 saved_clcs_gcl: ../unixport/saved_pcl_gcl
-	echo '(load "myload.lisp")(si::save-system "$@")' | $< $(<D)/ $(LISPFLAGS)
+	echo '(load "myload.lisp")(setq si::*disable-recompile* t)(si::save-system "$@")' | $< $(<D)/ $(LISPFLAGS)
 
 %.h %.data %.c : %.lisp saved_clcs_gcl
 	cp ../h/cmpinclude.h .

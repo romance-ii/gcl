@@ -116,14 +116,14 @@ enum dump_type {
 
 /* set whole structures!  */
 #define SETUP_FASD_IN(fd) do{ \
-  fas_stream= (fd)->stream->sm.sm_fp; \
+  fas_stream= (fd)->stream; \
   dump_index =   fix((fd)->index) ; \
   current_fasd= * (fd);}while(0)
 
 #define SAVE_CURRENT_FASD \
    struct fasd old_fd; \
    int old_dump_index = dump_index; \
-   FILE *old_fas_stream = fas_stream; \
+   object old_fas_stream = fas_stream; \
    int old_needs_patching = needs_patching; \
    old_fd = current_fasd;
 
@@ -153,7 +153,7 @@ enum dump_type {
 
 #define FASD_VERSION 2
 
-FILE *fas_stream;
+object fas_stream;
 int dump_index;
 struct htent *gethash();
 static void read_fasd1(int i, object *loc);
@@ -164,10 +164,10 @@ object extended_read();
 */   
 /* #define DEBUG */
 
-#ifdef DEBUG
+#ifdef DEBUG /*FIXME debugging versions need sync with getc -> readc_stream, etc.*/
 
-#define PUT(x) putc1((char)x,fas_stream)
-#define GET() getc1()
+#define PUT(x) writec_stream1((char)x,fas_stream)
+#define GET() readc_stream1()
 #define D_FWRITE fwrite1
 #define D_FREAD fread1
 
@@ -236,22 +236,22 @@ char *str;
    {printf("{");
     printf(str,i);
     printf("}");}
- putc(i,fas_stream);}
+ writec_stream(i,fas_stream);}
 
 void
-putc1(x)
+writec_stream1(x)
 int x;
 {  if (debug) printf("(%x,%d,%c)",x,x,x);
-   putc(x,fas_stream);
-   fflush(stdout);
+   writec_stream(x,fas_stream);
+/*    fflush(stdout); */
  }
 
 int
-getc1()
+readc_stream1()
 { int x;
-   x= getc(fas_stream);
+   x= readc_stream(fas_stream);
   if (debug) printf("(%x,%d,%c)",x,x,x);
-  fflush(stdout);
+/*   fflush(stdout); */
   return x;
  }
 
@@ -267,9 +267,9 @@ fread1(p,n1,n2,st)
  {printf("[");
   n1=n1*n2;
   for(i=0;i<n1; i++)
-    putc(p[i],stdout);
+    writec_stream(p[i],sLAstandard_outputA->s.s_dbind);
   printf("]");
-  fflush(stdout);}
+/*   fflush(stdout);} */
     return j;
 
 }
@@ -289,14 +289,14 @@ fwrite1(p,n1,n2,st)
  {printf("[");
   n1=n1*n2;
   for(i=0;i<n1; i++)
-    putc(p[i],stdout);
+    writec_stream(p[i],sLAstandard_outputA->s.s_dbind);
   printf("]");}
     return j;
 }
 
 
-#define GET_OP() (print_op(getc(fas_stream)))
-#define PUT_OP(x) fputc(print_op(x),fas_stream)
+#define GET_OP() ((unsigned)print_op((unsigned char)readc_stream(fas_stream)))
+#define PUT_OP(x) writec_stream(print_op(x),fas_stream)
  
 #define DP(sw)  sw   /*  if (debug) {printf("\ncase sw");} */
 #define GETD(str) getd(str)
@@ -304,7 +304,7 @@ fwrite1(p,n1,n2,st)
 int
 getd(str)
  char *str;
-{ int i = getc(fas_stream);
+{ int i = (unsigned char)readc_stream(fas_stream);
  if(debug){
    printf("{");
    printf(str,i);
@@ -312,16 +312,19 @@ getd(str)
   return i;}
 #define DPRINTF(a,b)  do{if(debug) printf(a,b);} while(0)
 #else
-#define PUT(x) putc((char)x,fas_stream)
-#define GET() getc(fas_stream)
+#define PUT(x) writec_stream((char)x,fas_stream)
+#define GET() ((unsigned char)readc_stream(fas_stream))
 #define GET_OP GET
 #define PUT_OP PUT
-#define D_FWRITE fwrite
-#define D_FREAD SAFE_FREAD
+#define D_FWRITE fwrite_int
+#define D_FREAD fread_int
 #define DP(sw)  sw
 #define PUTD(a,b) PUT(b)
 #define GETD(a) GET()
 #define DPRINTF(a,b)  
+#define fwrite_int(a_,b_,c_,d_) {register char *_p=(a_),*_pe=_p+(b_)*(c_);for (;_p<_pe;) writec_stream(*_p++,(d_));}
+#define fread_int(a_,b_,c_,d_)  {register char *_p=(a_),*_pe=_p+(b_)*(c_);for (;_p<_pe;) *_p++=readc_stream(d_);}
+
 
 #endif
 
@@ -342,7 +345,7 @@ getd(str)
 
 #define MAKE_SHORT(top,bot) (((top)<< SIZE_BYTE) + (bot))
 
-#define READ_BYTE1() getc(fas_stream)
+#define READ_BYTE1() ((unsigned char)readc_stream(fas_stream))
 
 #define GET8(varx ) \
  do{unsigned long var=(unsigned long)READ_BYTE1();  \
@@ -380,7 +383,7 @@ getd(str)
 
 
 #define MASK ~(~0 << 8)
-#define WRITE_BYTEI(x,i)  putc((((x) >> (i*SIZE_BYTE)) & MASK),fas_stream)
+#define WRITE_BYTEI(x,i)  writec_stream((((x) >> (i*SIZE_BYTE)) & MASK),fas_stream)
 
 #define PUTFIX(v_) Join(PUT,SIZEOF_LONG)(v_)
 #define GETFIX(v_) Join(GET,SIZEOF_LONG)(v_)
@@ -1091,12 +1094,12 @@ lisp_eval(object x)
 
     
 
-#define CHECK_CH(i)    	   do{if ((i)==EOF && feof(fas_stream)) bad_eof();}while (0)
+#define CHECK_CH(i)    	   do{if ((i)==EOF && stream_at_end(fas_stream)) bad_eof();}while (0)
 /* grow vector AR of general type */
 static void
 grow_vector(object ar)
 {   int len=ar->v.v_dim;
-    int nl=(int) (1.5*len);
+    int nl=(int) (1.5*(len+1));
     {BEGIN_NO_INTERRUPT;
      {char *p= (char *)AR_ALLOC(alloc_contblock,nl,object);
     bcopy(ar->v.v_self,p,sizeof(object)* len);
@@ -1496,7 +1499,7 @@ read_fasl_vector(object in)
  object orig = in;
  object d;
  int tem;
- if (((tem=getc(in->sm.sm_fp)) == EOF) && feof(in->sm.sm_fp))
+ if (((tem=(unsigned char)readc_stream(in)) == EOF) && stream_at_end(in))
    { d = coerce_to_pathname(in);
      d = make_pathname(d->pn.pn_host,
 		       d->pn.pn_device,
@@ -1511,9 +1514,9 @@ read_fasl_vector(object in)
        FEerror("Can't open file ~s",1,d);
    }
  else if (tem != EOF)
-   { ungetc(tem,in->sm.sm_fp);}
+   { unreadc_stream(tem,in);}
   while (1)
-   { ch=readc_stream(in);
+   { ch=(unsigned char)readc_stream(in);
      if (ch=='#')
        {unreadc_stream(ch,in);
 	return read_fasl_vector1(in);}

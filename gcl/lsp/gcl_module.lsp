@@ -58,22 +58,37 @@
                   (load (car p)))))))
           
 
-(defun documentation (symbol doc-type)
-  (case doc-type
-    (variable (get symbol 'variable-documentation))
-    (function (get symbol 'function-documentation))
-    (structure (get symbol 'structure-documentation))
-    (type (get symbol 'type-documentation))
-    (setf (get symbol 'setf-documentation))
-    (compiler-macro (get symbol 'compiler-macro-documentation))
-    (method-combination (get symbol 'method-combination-documentation))
-    (otherwise
-     (cond
-       ((packagep symbol) 
-	(get (find-symbol (package-name symbol) :keyword) 'package-documentation))
-       ((eql doc-type t) nil)
-       (t (error "~S is an illegal documentation type." doc-type))))))
+(defun documentation (object doc-type)
+  (cond ((typep object 'function)
+	 (setq object (function-name object)))
+	((typep object 'package)
+	 (setq object (find-symbol (package-name object) :keyword))))
+  (check-type object (and symbol (not null)))
+  (ecase doc-type
+    (variable (get object 'variable-documentation))
+    (function (get object 'function-documentation))
+    (structure (get object 'structure-documentation))
+    (type (get object 'type-documentation))
+    (setf (get object 'setf-documentation))
+    (compiler-macro (get object 'compiler-macro-documentation))
+    (method-combination (get object 'method-combination-documentation))
+    ((t) (when (find-package object) (get object 'package-documentation)))))
 
+(defun set-documentation (object doc-type value)
+  (cond ((typep object 'function)
+	 (setq object (function-name object) doc-type 'function))
+	((typep object 'package)
+	 (setq object (find-symbol (package-name object) :keyword))))
+  (check-type object (and symbol (not null)))
+  (ecase doc-type
+    (variable (setf (get object 'variable-documentation) value))
+    (function (setf (get object 'function-documentation) value))
+    (structure (setf (get object 'structure-documentation) value))
+    (type (setf (get object 'type-documentation) value))
+    (setf (setf (get object 'setf-documentation) value))
+    (compiler-macro (setf (get object 'compiler-macro-documentation) value))
+    (method-combination (setf (get object 'method-combination-documentation) value))
+    ((t) (when (find-package object) (setf (get object 'package-documentation) value)))))
 
 (defun find-documentation (body)
   (if (or (endp body) (endp (cdr body)))

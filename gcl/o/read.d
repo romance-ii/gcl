@@ -52,7 +52,7 @@ object dispatch_reader;
 		 .rte_chatrait)
 
 #ifndef SHARP_EQ_CONTEXT_SIZE
-#define	SHARP_EQ_CONTEXT_SIZE	500
+#define	SHARP_EQ_CONTEXT_SIZE	4096
 #endif
 
 static void

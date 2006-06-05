@@ -72,8 +72,7 @@ FFN(Fdefun)(object args)
 	}
 	if (name->s.s_hpack == lisp_package &&
 	    name->s.s_gfdef != OBJNULL && initflag) {
-	  vs_push(make_simple_string(
-				     "~S is being redefined."));
+	  vs_push(make_simple_string("~S is being redefined."));
 	  ifuncall2(sLwarn, vs_head, name);
 	  vs_popp;
 	}

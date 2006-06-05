@@ -136,6 +136,7 @@ FFN(Ffunction)(object form)
 	if (!endp(MMcdr(form)))
 		FEtoo_many_argumentsF(form);
 	fun = MMcar(form);
+ AGAIN:
 	if (type_of(fun) == t_symbol) {
 		fd = lex_fd_sch(fun);
 		if (MMnull(fd) || MMcadr(fd) != sLfunction)
@@ -162,13 +163,12 @@ FFN(Ffunction)(object form)
 		  vs_base[0]=x;
 		}
 	} else if (setf_fn_form(fun)) {
-	        object setf_fn_def=get(MMcadr(fun),sSsetf_function,Cnil);
-		if (setf_fn_def==Cnil)
+	        fun=get(MMcadr(fun),sSsetf_function,Cnil);
+		if (fun==Cnil)
 		  FEundefined_function(fun);
-		else {
-		  vs_base = vs_top;
-		  vs_push(setf_fn_def);
-		}
+		else if (type_of(fun)==t_symbol)
+		  goto AGAIN;
+		else vs_base[0]=fun;
 	} else
 		FEinvalid_function(fun);
 }

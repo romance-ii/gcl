@@ -349,8 +349,9 @@
 
 (defun do-setq-tp (v form t1)
   (when (eq (var-kind v) 'lexical)
+    (setq t1 (coerce-to-one-value t1))
     (let* ((tp (type-and (var-dt v) t1)))
-      (unless tp
+      (unless (or tp (not (and (var-dt v) t1)))
 	(cmpwarn "Type mismatches between ~s/~s and ~s/~s." (var-name v) (var-dt v) form t1))
       (when (boundp '*restore-vars*) 
 	(unless (member v *restore-vars* :key 'car)
@@ -367,7 +368,7 @@
 (defun set-form-type (form type)
   (let* ((it (info-type (cadr form)))
 	 (nt (type-and type it)))
-    (unless nt
+    (unless (or nt (not (and type it)))
       (cmpwarn "Type mismatch: ~s ~s~%" it type))
     (setf (info-type (cadr form)) nt)
     (case (car form)

@@ -244,12 +244,12 @@
 
 
 (defun vector-pop (vector)
+  (check-type vector vector)
   (let ((fp (fill-pointer vector)))
-    (declare (fixnum fp))
     (when (= fp 0)
           (error "The fill pointer of the vector ~S zero." vector))
-    (si:fill-pointer-set vector (the fixnum (1- fp)))
-    (aref vector (the fixnum (1- fp)))))
+    (fill-pointer-set vector (1- fp))
+    (aref vector (1- fp))))
 
 
 (defun adjust-array (array new-dimensions

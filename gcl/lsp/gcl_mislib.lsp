@@ -25,8 +25,7 @@
 
 
 (export 'time)
-(export '(function-lambda-expression
-	  reset-sys-paths decode-universal-time
+(export '(reset-sys-paths decode-universal-time
 	  encode-universal-time compile-file-pathname complement constantly))
 
 
@@ -130,24 +129,6 @@
   (declare (optimize (safety 1)))
   (lambda (&rest args) (not (apply fn args))))
 
-(defun default-system-banner ()
-  (let (gpled-modules)
-    (dolist (l '(:unexec :bfd :readline))
-      (when (member l *features*)
-	(push l gpled-modules)))
-    (format nil "GCL (GNU Common Lisp)  ~a.~a.~a ~a  ~a  ~a~%~a~%~a ~a~%~a~%~a~%~%~a~%" 
-	    *gcl-major-version* *gcl-minor-version* *gcl-extra-version*
-	    (if (member :ansi-cl *features*) "ANSI" "CLtL1")
-	    (if (member :gprof *features*) "profiling" "")
-	    (si::gcl-compile-time)
-	    "Source License: LGPL(gcl,gmp,pargcl), GPL(unexec,bfd)"
-	    "Binary License: "
-	    (if gpled-modules (format nil "GPL due to GPL'ed components: ~a" gpled-modules)
-	      "LGPL")
-	    "Modifications of this banner must retain notice of a compatible license"
-	    "Dedicated to the memory of W. Schelter"
-	    "Use (help) to get some basic information on how to use GCL.")))
-
  (defun lisp-implementation-version nil
    (declare (optimize (safety 1)))
    (format nil "GCL ~a.~a.~a"
@@ -172,17 +153,6 @@
       (push (si::string-concatenate s l) nl))
     (setq si::*load-path* nl))
   nil)
-
-(defun function-lambda-expression (x) 
-  (if (typep x 'interpreted-function) 
-      (let* ((x (si::interpreted-function-lambda x)))
-	(case (car x)
-	      (lambda (values x nil nil))
-	      (lambda-block (values (cons 'lambda (cddr x))  nil (cadr x)))
-	      (lambda-closure (values (cons 'lambda (cddr (cddr x)))  (not (not (cadr x)))  nil))
-	      (lambda-block-closure (values (cons 'lambda (cdr (cddr (cddr x))))  (not (not (cadr x))) (fifth x)))
-	      (otherwise (values nil t nil))))
-    (values nil t nil)))
 
 (defun heaprep nil
   

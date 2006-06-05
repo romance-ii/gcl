@@ -9,7 +9,7 @@ PORTDIR	= ../unixport
 CAT=cat
 APPEND=../xbin/append
 
-PREFS:= arraylib assert defmacro defstruct \
+PREFS:= recompile callhash arraylib assert defmacro defstruct \
 	  describe evalmacros \
 	  iolib listlib mislib module numlib \
 	  packlib predlib \
@@ -72,4 +72,7 @@ sys-proclaim.lisp: fns
 newc:	
 	$(MAKE) $(OBJS) -e "NEWCFILES=`echo $(OBJS) | sed -e 's:\.o:.c:g'`"
 
+
+gcl_recompile.lsp:
+	touch $@
 

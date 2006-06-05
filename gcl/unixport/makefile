@@ -46,8 +46,9 @@ OOBJS:=$(shell j=$$(ar t $(ODIR)/gcllib.a) ; for i in $$(ls -1 $(ODIR)/*.o) ; do
 OOBJS:=$(filter-out $(FIRST_FILE),$(OOBJS))
 OOBJS:=$(filter-out $(LAST_FILE),$(OOBJS))
 OOBJS:=$(filter-out $(ODIR)/plttest.o,$(OOBJS))
-OBJS:=$(OOBJS) $(shell ls -1 $(LSPDIR)/*.o)
+OBJS:=$(OOBJS) $(shell ls -1 $(LSPDIR)/*.o | grep -v recompile.o)
 OBJS:=$(OBJS) $(shell ls -1 $(CMPDIR)/*.o | grep -v collectfn.o)
+OBJS:=$(OBJS) gcl_recompile.o
 
 MODOBJS:=$(shell ls -1 $(MDIR)/*.o)
 PCLOBJS:=$(MODOBJS) $(shell ls -1 $(PCLDIR)/*.o)
@@ -115,13 +116,22 @@ saved_%:raw_% $(RSYM) init_%.lsp raw_%_map \
 	cp init_$*.lsp foo
 	echo " (in-package \"USER\")(system:save-system \"$@\")" >>foo
 #	cp $(PORTDIR)/raw_$*$(EXE) $(PORTDIR)/raw_$*.bak$(EXE)
+	rm -f gcl_recompile*
+	$(MAKE) raw_$*$(EXE)
 	$(PORTDIR)/raw_$*$(EXE) $(PORTDIR)/ $(LISPFLAGS) -libdir $(GCLDIR)/ < foo
+	$(MAKE) raw_$*$(EXE)
+	$(PORTDIR)/raw_$*$(EXE) $(PORTDIR)/ $(LISPFLAGS) -libdir $(GCLDIR)/ < foo
+	ar x lib$*.a gcl_recompile.o
+	touch -r lib$*.a gcl_recompile.o
 
 $(RSYM): $(SPECIAL_RSYM) $(HDIR)/mdefs.h
 	$(CC) $(CFLAGS) -I$(HDIR) -I$(ODIR) -o $(RSYM) $(SPECIAL_RSYM)
 
 $(HDIR)/mdefs.h: $(HDIR)/include.h
 	cat $(HDIR)/include.h | sed -e "/include/d" > $(HDIR)/mdefs.h
+
+gcl_recompile.o: ../lsp/gcl_recompile.o
+	cp $< $@
 
 libgcl.a: $(OBJS) sys_gcl.o gmpfiles bfdfiles # plt_gcl.o
 	rm -rf $@

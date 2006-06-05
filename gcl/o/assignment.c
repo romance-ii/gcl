@@ -139,6 +139,42 @@ DEFUNO_NEW("SET",object,fLset,LISP
 	RETURN1(value);
 }
 
+DEFUNO_NEW("FUNCTION-NAME",object,fSfunction_name,SI
+	   ,1,1,NONE,OO,OO,OO,OO,void,siLfunction_name,(object x),"") {
+
+  switch(type_of(x)) {
+  case t_sfun:
+  case t_gfun:
+  case t_vfun:
+  case t_afun:	
+  case t_cfun:
+    x=x->cf.cf_name;
+    break;
+  case t_ifun:
+    x=x->ifn.ifn_self;
+    x=consp(x) ? 
+      (x->c.c_car==sLlambda_block ?
+       x->c.c_cdr->c.c_car :
+       (x->c.c_car==sLlambda_block_closure ? 
+	x->c.c_cdr->c.c_cdr->c.c_cdr->c.c_cdr->c.c_car : Cnil)) : Cnil;
+    break;
+  case t_closure:
+  case t_cclosure:
+    x=x->cc.cc_name;
+    break;
+  default:
+    TYPE_ERROR(x,sLfunction);
+    x=Cnil;
+    break;
+  }
+
+  return x;
+
+}
+
+	
+
+
 DEFUNO_NEW("FSET",object,fSfset,SI
    ,2,2,NONE,OO,OO,OO,OO,void,siLfset,(object sym,object function),"")
 
@@ -377,6 +413,7 @@ setf(object place, object form)
 	  object y=args;
 	  /* FIXME do a direct funcall here */
 	  y=append(list(1,form),y);
+	  x=type_of(x)==t_symbol ? symbol_function(x) : x;
 	  y=MMcons(x,y);
 	  y=MMcons(sLfuncall,y);
 	  result=Ieval(y);

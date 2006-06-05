@@ -405,8 +405,14 @@
 
 (dolist (l '(/ floor ceiling truncate round ffloor fceiling ftruncate fround))
   (si::putprop l t 'zero-pole))
-(dolist (l '(+ - * exp float sqrt atan min max))
+(dolist (l '(+ - * exp float sqrt atan))
   (si::putprop l 'super-range 'type-propagator))
+
+(defun min-max-propagator (f &optional (t1 nil t1p) (t2 nil t2p))
+  (cond (t2p (super-range f t1 t2))
+	(t1p (super-range f t1))))
+(si::putprop 'max 'min-max-propagator 'type-propagator)
+(si::putprop 'min 'min-max-propagator 'type-propagator)
 
 (defun /-propagator (f t1 &optional t2)
   (cond (t2 (super-range f t1 (type-and t2 '(not (real 0 0)))))
@@ -575,7 +581,7 @@
 
 (defun and-form-type (type form original-form &aux type1)
   (setq type1 (type-and type (info-type (cadr form))))
-  (when (null type1)
+  (when (and (null type1) type (info-type (cadr form)))
         (cmpwarn "The type of the form ~s is not ~s, but ~s." original-form type (info-type (cadr form))))
   (if (eq type1 (info-type (cadr form)))
       form
@@ -584,7 +590,7 @@
            (list* (car form) info (cddr form)))))
 
 (defun check-form-type (type form original-form)
-  (when (null (type-and type (info-type (cadr form))))
+  (when (and (null (type-and type (info-type (cadr form)))) type (info-type (cadr form)))
         (cmpwarn "The type of the form ~s is not ~s, but ~s." original-form type (info-type (cadr form)))))
 
 (defconstant +c1nil+ (list 'LOCATION (make-info :type (object-type nil)) nil))

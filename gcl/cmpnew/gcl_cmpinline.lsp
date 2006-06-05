@@ -44,9 +44,17 @@
 (import 'si::eql-is-eq-tp 'compiler)
 (import 'si::equal-is-eq-tp 'compiler)
 (import 'si::equalp-is-eq-tp 'compiler)
+(import 'si::is-eq-test-item-list 'compiler)
+(import 'si::cmp-vec-length 'compiler)
+(import 'si::proclaim-from-argd 'compiler)
 (let ((p (find-package "DEFPACKAGE")))
   (when p
     (import (find-symbol "DEFPACKAGE" p) 'compiler)))
+
+(defmacro is-setf-function (name)
+  `(and (consp ,name) (eq (car ,name) 'setf) 
+	(consp (cdr ,name)) (symbolp (cadr ,name))
+	(null (cddr ,name))))
 
 ;;; Pass 1 generates the internal form
 ;;;	( id  info-object . rest )
@@ -56,7 +64,6 @@
 ;;;  for dramatic compilation speed improvements when the number of variables
 ;;;  are large, as occurs at present in running the random-int-form tester.
 ;;;  20040320 CM
-
 
 (defmacro mia (x y) `(make-array ,x :adjustable t :fill-pointer ,y))
 (defmacro eql-not-nil (x y) `(and ,x (eql ,x ,y)))
@@ -812,7 +819,7 @@
 	   (or (cdr (assoc (cadr a) *c-vars*))
 	       (car (rassoc (cadr a) *c-vars*)))))))
 
-;(setf (symbol-function 'cmp-aref) (symbol-function 'row-major-aref))
+(setf (symbol-function 'cmp-aref) (symbol-function 'row-major-aref))
 
 (defmacro wt-bv-index (a i)
  `(wt "(((" ,a ")->bv.bv_offset) + " ,i ")"))
@@ -845,7 +852,7 @@
 	(wt "fLrow_major_aref(" a "," i ")")))))
   
   
-;(setf (symbol-function 'cmp-aset) (symbol-function 'si::aset1))
+(setf (symbol-function 'cmp-aset) (symbol-function 'si::aset1))
 
 (defun cmp-aset-inline-types (&rest r)
   (let ((art (car r)))

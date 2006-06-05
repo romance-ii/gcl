@@ -33,7 +33,7 @@
 ;;; If *safe-compile* is ON, some kind of run-time checks are not
 ;;; included in the compiled code.  The default value is OFF.
 
-
+(defvar *portable-source*)
 
 (defun init-env ()
   (setq *next-cvar* 0)
@@ -56,6 +56,8 @@
   (setq *inline-functions* nil)
   (setq *inline-blocks* 0)
   (setq *notinline* nil)
+  (setq *eval-when-compile-only-macros* nil)
+  (setq *portable-source* nil)
   (clrhash *norm-tp-hash*)
   (clrhash *and-tp-hash*)
   (clrhash *or-tp-hash*))
@@ -143,6 +145,27 @@
 ;;;	( {type}* [ &optional {type}* ] [ &rest type ] [ &key {type}* ] )
 ;;; though &optional, &rest, and &key return types are simply ignored.
 
+(defun t-to-nil (x)
+  (if (eq x t) nil x))
+
+(defun nil-to-t (x)
+  (if x x t))
+
+(defun is-global-arg-type (x)
+  (let ((x (promoted-c-type x)))
+    (or (eq x t) (member x +c-global-arg-types+))))
+(defun is-local-arg-type (x)
+  (let ((x (promoted-c-type x)))
+    (or (eq x t) (member x +c-local-arg-types+))))
+(defun is-local-var-type (x)
+  (let ((x (promoted-c-type x)))
+    (or (eq x t) (member x +c-local-var-types+))))
+
+(defun coerce-to-one-value (type)
+  (cond ((and (consp type) (eq (car type) 'values)) (coerce-to-one-value (cadr type)))
+	((eq type '*))
+	(type)))
+
 (defun function-arg-types (arg-types &aux vararg (types nil) result)
   (setq result
 	(do ((al arg-types (cdr al))
@@ -159,7 +182,7 @@
 			       ((< i 9)
 				(let ((tem
 				       (type-filter (car al))))
-				  (if (is-local-arg-type tem) tem t)))
+				  (if (is-local-arg-type tem) (nil-to-t (car al)) t)));FIXME
 			      (t (if (eq (car al) '*) '* t)))
 			types)))
   ;;only type t args for var arg so far.
@@ -188,7 +211,7 @@
 		(nreverse result))
 	     (let ((tem  (if (eq (car v) '*) '* (type-filter (car v)))))
 	       (unless (or (eq tem '*) (is-local-arg-type tem)) (setq tem t))
-	       (push  tem result))))))
+	       (push (or (car (member tem '(* t))) (car v)) result))))));FIXME
 
 (defun put-procls (fname arg-types return-types procl)
 

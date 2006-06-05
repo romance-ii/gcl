@@ -19,7 +19,7 @@ SETUP='(load "../clcs/package.lisp")(load "../clcs/myload1.lisp")(load "sys-pack
 	'(setq compiler::*default-c-file* t)'\
 	'(setq compiler::*default-data-file* t)'\
 	'(setq compiler::*default-system-p* t)' \
-	'(setq compiler::*keep-gaz* t compiler::*tmp-dir* "")'
+	'(setq compiler::*keep-gaz* t compiler::*tmp-dir* "" si::*disable-recompile* t)'
 
 all: $(addsuffix .c,$(AFILES)) $(addsuffix .o,$(AFILES)) 
 
@@ -68,3 +68,4 @@ tar:
 
 tar1:
 	(cd .. ; tar cvf - `basename ${DIR}` | gzip -c > `basename ${DIR}`.tgz) 
+.PRECIOUS: gcl_pcl_boot.c

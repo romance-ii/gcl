@@ -122,9 +122,9 @@
 	     ;;the compiler put in unnecessary code
 	     ;;if we just had say (values nil)
 	     ;; so if we know there's one value only:
-	     (c1expr (car args)))
+	     (c1expr (let ((s (gensym))) `(let ((,s ,(car args))) ,s))))
 	    (t  (setq args (c1args args info))
-		(setf (info-type info) (cons 'values (mapcar (lambda (x) (info-type (cadr x))) args)))
+		(setf (info-type info) (cons 'values (mapcar (lambda (x) (coerce-to-one-value (info-type (cadr x)))) args)))
 		(list 'values info args))))
 
 (defun c2values (forms &aux (base *vs*) (*vs* *vs*))

@@ -445,6 +445,7 @@ Cannot compile ~a.~%"
 (defun compile (name &optional def &aux tem gaz (*default-pathname-defaults* #"."))
   
   (when (eq name 'cmp-anon)
+    (remhash name si::*call-hash-table*)
     (dolist (l '(proclaimed-function proclaimed-arg-types proclaimed-return-type))
       (remprop name l)))
 
@@ -490,6 +491,7 @@ Cannot compile ~a.~%"
 	      (eq (car name) 'lambda))
 	 (dolist (l '(proclaimed-function proclaimed-return-type proclaimed-arg-types))
 	   (remprop 'cmp-anon l))
+	 (remhash 'cmp-anon si::*call-hash-table*)
 	 (eval `(defun cmp-anon ,@ (cdr name)))
 	 (disassemble 'cmp-anon asm))
 	((not(symbolp name)) (princ "Not a lambda or a name") nil)

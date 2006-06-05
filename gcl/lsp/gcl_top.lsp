@@ -85,7 +85,7 @@
 (defvar *top-eof* (cons nil nil))
 (defvar *no-prompt* nil)
 
-(defun top-level ()
+(defun top-level1 ()
   (let ((+ nil) (++ nil) (+++ nil)
         (- nil) 
         (* nil) (** nil) (*** nil)
@@ -108,7 +108,7 @@
                   (package-name *package*))))
       (reset-stack-limits)
       ;; have to exit and re-enter to multiply stacks
-      (cond (*multiply-stacks* (Return-from top-level)))
+      (cond (*multiply-stacks* (Return-from top-level1)))
       (when (catch *quit-tag*
               (setq - (locally (declare (notinline read))
                                (read *standard-input* nil *top-eof*)))
@@ -125,6 +125,76 @@
         (setq *evalhook* nil *applyhook* nil)
         (terpri *error-output*)
         (break-current)))))
+
+(defun default-system-banner ()
+  (let (gpled-modules)
+    (dolist (l '(:unexec :bfd :readline))
+      (when (member l *features*)
+	(push l gpled-modules)))
+    (format nil "GCL (GNU Common Lisp)  ~a.~a.~a ~a  ~a  ~a~%~a~%~a ~a~%~a~%~a~%~%~a~%" 
+	    *gcl-major-version* *gcl-minor-version* *gcl-extra-version*
+	    (if (member :ansi-cl *features*) "ANSI" "CLtL1")
+	    (if (member :gprof *features*) "profiling" "")
+	    (si::gcl-compile-time)
+	    "Source License: LGPL(gcl,gmp,pargcl), GPL(unexec,bfd)"
+	    "Binary License: "
+	    (if gpled-modules (format nil "GPL due to GPL'ed components: ~a" gpled-modules)
+	      "LGPL")
+	    "Modifications of this banner must retain notice of a compatible license"
+	    "Dedicated to the memory of W. Schelter"
+	    "Use (help) to get some basic information on how to use GCL.")))
+
+ (defvar *system-banner*)
+
+ (defun gcl-top-level ()
+
+   (set-up-top-level)
+   
+   (if (get-command-arg "-compile")
+       (let (;(system::*quit-tag* (cons nil nil))
+					;(system::*quit-tags* nil) (system::*break-level* '())
+					;(system::*break-env* nil) (system::*ihs-base* 1)
+					;(system::*ihs-top* 1) (system::*current-ihs* 1)
+	     (*break-enable* nil) result)
+	 (setq result
+	       (system:error-set
+		'(progn
+		   (compile-file
+		    (get-command-arg "-compile")
+		    :output-file 
+		    (or (get-command-arg "-o")
+			(get-command-arg "-compile"))
+		    :o-file
+		    (cond ((equalp
+			    (get-command-arg "-o-file")
+			    "nil") nil)
+			  ((get-command-arg "-o-file" t))
+			  (t t))
+		    :c-file (get-command-arg "-c-file" t)
+		    :h-file (get-command-arg "-h-file" t)
+		    :data-file (get-command-arg "-data-file" t)
+		    :system-p (get-command-arg "-system-p" t)))))
+	 (bye (if (or (and (find-package "COMPILER") 
+			   (find-symbol "*ERROR-P*" (find-package "COMPILER"))
+			   (symbol-value (find-symbol "*ERROR-P*" (find-package "COMPILER"))))
+		      (equal result '(nil))) 1 0))))
+   (cond ((get-command-arg "-batch")
+	  (setf *top-level-hook* #'bye))
+	 ((get-command-arg "-f"))
+	 (t (when (boundp '*gcl-major-version*)
+	      (unless (boundp '*system-banner*) (setq *system-banner* (default-system-banner))))
+	    (when (boundp '*system-banner*)
+	      (format t "~a~%" *system-banner*))
+	    (let* ((c (find-package "COMPILER"))
+		   (tmp (and c (find-symbol "*TMP-DIR*" c))))
+	      (when tmp
+		(setf (symbol-value tmp) (funcall (find-symbol "GET-TEMP-DIR" c)))
+	(format t "Temporary directory for compiler files set to ~a~%" (symbol-value tmp))))))
+   (setq *ihs-top* 1)
+   (in-package 'system::user) (incf system::*ihs-top* 2)
+   (top-level1))
+
+(defun top-level nil (gcl-top-level))
 
 (defun process-some-args (args)
   (loop
@@ -251,6 +321,7 @@
           (t (format *error-output* "~&Warning: ")
              (let ((*indent-formatted-output* t))
                (apply #'format *error-output* format-string args))
+	     (terpri *error-output*)
              nil))))
 
 (defun universal-error-handler
@@ -655,15 +726,14 @@ add a new one, add an 'si::break-command property:")
 
 ;;make sure '/' terminated
 
-(defun coerce-slash-terminated (v )
-  (declare (string v))
+(defun coerce-slash-terminated (v)
+  (declare (string v));(return-from coerce-slash-terminated  v)
   (or (stringp v) (error "not a string ~a" v))
   (let ((n (length v)))
-    (declare (fixnum n))
-    (unless (and (> n 0) (eql
-			  (the character(aref v (the fixnum (- n 1)))) #\/))
+    (unless (and (> n 0) (eql (aref v (- n 1)) #\/))
 	    (setf v (format nil "~a/" v))))
   v)
+
 (defun fix-load-path (l)
   (when (not (equal l *fixed-load-path*))
       (do ((x l (cdr x)) )

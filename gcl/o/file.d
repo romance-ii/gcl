@@ -1717,11 +1717,12 @@ BEGIN:
 		return(0);
 
 	case smm_string_output:
-		if (disp < STRING_STREAM_STRING(strm)->st.st_fillp) {
+		if (disp < STRING_STREAM_STRING(strm)->st.st_dim) {
 			STRING_STREAM_STRING(strm)->st.st_fillp = disp;
 			/* strm->sm.sm_int0 = disp; */
 		} else {
-			disp -= STRING_STREAM_STRING(strm)->st.st_fillp;
+			disp -= (STRING_STREAM_STRING(strm)->st.st_fillp=
+				 STRING_STREAM_STRING(strm)->st.st_dim);
 			while (disp-- > 0)
 				writec_stream(' ', strm);
 		}
@@ -2534,8 +2535,9 @@ extern object truename();
 
 DEFVAR("*COLLECT-BINARY-MODULES*",sSAcollect_binary_modulesA,SI,sLnil,"");
 DEFVAR("*BINARY-MODULES*",sSAbinary_modulesA,SI,Cnil,"");
+DEFVAR("*DISABLE-RECOMPILE*",sSAdisable_recompile,SI,Ct,"");
 
-@(static defun load (pathname
+@(static defun load1 (pathname
 	      &key (verbose `symbol_value(sLAload_verboseA)`)
 		   (print `symbol_value(sLAload_printA)`)
 		    (if_does_not_exist sKerror)
@@ -2862,8 +2864,16 @@ int out;
  case smm_output:
   if (!out) cannot_read(strm);
   break;
- case smm_input:
+ case smm_string_output:
+   if (!out) cannot_read(strm);
+   return (strm);
+  break;
+ case smm_input: 
     if (out) cannot_write(strm);
+  break;
+ case smm_string_input:
+    if (out) cannot_write(strm);
+    return (strm);
   break;
  case smm_io:
 /*  case smm_socket: */
@@ -3409,7 +3419,7 @@ gcl_init_file_function()
 /* 	make_function("READ-SEQUENCE", Lread_sequence); */
 /* 	make_function("WRITE-SEQUENCE", Lwrite_sequence); */
 
-	make_function("LOAD", Lload);
+	make_function("LOAD1", Lload1);
 
 	make_si_function("GET-STRING-INPUT-STREAM-INDEX",
 			 siLget_string_input_stream_index);

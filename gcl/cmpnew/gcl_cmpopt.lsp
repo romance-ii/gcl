@@ -199,8 +199,10 @@
    (get 'system:elt-set 'inline-unsafe))
 
 ;;SYSTEM:FILL-POINTER-SET
- (push '((t fixnum) fixnum #.(flags rfa set)"(((#0)->st.st_fillp)=(((#0)->st.st_hasfillp) ? (#1) : ((#0)->st.st_fillp)))")
+ (push '((t fixnum) seqind #.(flags rfa set)"(((#0)->st.st_fillp)=(((#0)->st.st_hasfillp) ? (#1) : ((#0)->st.st_fillp)))")
    (get 'system:fill-pointer-set 'inline-unsafe))
+ (push '(((vector) seqind) seqind #.(flags rfa set)"(((#0)->st.st_fillp)=(((#0)->st.st_hasfillp) ? (#1) : ((#0)->st.st_fillp)))")
+   (get 'system:fill-pointer-set 'inline-always))
 
 ;;SYSTEM:FIXNUMP
  (push '((t) boolean #.(flags rfa)"type_of(#0)==t_fixnum")

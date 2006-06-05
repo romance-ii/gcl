@@ -41,8 +41,9 @@
 	(T
 	 (FORMAT T "~&No such restart."))))
 
+;;FIXME -- ooverwrite others directly too
 ;; From akcl-1-530, changes marked with ;***
-(defun clcs-break-level (at &optional env)
+(defun break-level (at &optional env)
   (let* ((*break-message* (if (or (stringp at) (conditionp at)) ;***
 			      at *break-message*))  ;***
 	 (*quit-tags* (cons (cons *break-level* *quit-tag*) *quit-tags*)) ;***
