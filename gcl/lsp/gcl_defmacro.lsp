@@ -83,7 +83,6 @@
                           &aux *dl* (*key-check* nil)
                                (*arg-check* nil)
                                doc decls whole ppn (env nil) envp)
-  (declare (ignore name))
   (cond ((listp vl))
         ((symbolp vl) (setq vl (list '&rest vl)))
         (t (error "The defmacro-lambda-list ~s is not a list." vl)))
