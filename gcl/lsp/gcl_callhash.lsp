@@ -138,7 +138,7 @@
 		  (lambda (x y) 
 		    (member (car x) (all-callees (car y) nil)))))
       (maphash (lambda (x y) (when (call-sig y) (proclaim `(ftype (function ,@(call-sig y)) ,x)))) *call-hash-table*)
-      (unless pnp (delete-file pn))
+      (unless pnp (when (probe-file pn) (delete-file pn)))
       (map nil (lambda (fn)
 		 (format t "Callee ~s sigchange ~s to ~s, recompiling ~s~%" 
 			 (cadr fn) (caddr fn) (cadddr fn) (car fn))) *needs-recompile*)
