@@ -295,6 +295,13 @@ object in;
 
 	x = read_object(in);
 	vs_push(x);
+	while (listen_stream(in)) {
+	  object c=read_char(in);
+	  if (cat(c)!=cat_whitespace) {
+	    unread_char(c,in);
+	    break;
+	  }
+	}
 
 	if (sharp_eq_context_max > 0)
 		x = vs_head = patch_sharp(x);
@@ -2336,12 +2343,13 @@ READ:
 	else if (strm == Ct)
 		strm = symbol_value(sLAterminal_ioA);
 	check_type_stream(&strm);
-	if (!listen_stream(strm)) {
+	if (stream_at_end(strm)) {
 		if (eof_errorp == Cnil)
 			@(return eof_value)
 		else
 			end_of_stream(strm);
 	}
+        if (!listen_stream(strm)) @(return Cnil)
 	@(return `read_char(strm)`)
 @)
 

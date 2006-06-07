@@ -172,8 +172,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     gmp_randinit_default handling for gmp 4.2
   * call-lambda info-type propagation
   * auto-recompilation support
+  * fix read-char-no-hang
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  5 Jun 2006 22:01:13 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed,  7 Jun 2006 15:04:48 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

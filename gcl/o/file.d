@@ -823,16 +823,16 @@ BEGIN:
 		if (strm->sm.sm_fp == NULL)
 			closed_stream(strm);
 		c = kclgetc(strm->sm.sm_fp);
-		if (c == EOF) {
-        	    if (xkclfeof(c,strm->sm.sm_fp))
-			end_of_stream(strm);
-		    else c = kclgetc(strm->sm.sm_fp);
-		    if (c == EOF) end_of_stream(strm);
-		}
+/* 		if (c == EOF) { */
+/*         	    if (xkclfeof(c,strm->sm.sm_fp)) */
+/* 			end_of_stream(strm); */
+/* 		    else c = kclgetc(strm->sm.sm_fp); */
+/* 		    if (c == EOF) end_of_stream(strm); */
+/* 		} */
 		
-		c &= 0377;
+/* 		c &= 0377; */
 		/* strm->sm.sm_int0++; */
-		return(c);
+		return(c==EOF ? c : (c&0377));
 
 	case smm_synonym:
 		strm = symbol_value(strm->sm.sm_object0);
@@ -1462,6 +1462,8 @@ BEGIN:
 	case smm_input:
 		if (strm->sm.sm_fp == NULL)
 			closed_stream(strm);
+		if (isatty(fileno(strm->sm.sm_fp)) && !listen_stream(strm))
+		  return(feof(strm->sm.sm_fp) ? TRUE : FALSE);
 		{int prev_signals_allowed = signals_allowed;
 	       AGAIN:
 		signals_allowed= sig_at_read;
