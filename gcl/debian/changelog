@@ -173,8 +173,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * call-lambda info-type propagation
   * auto-recompilation support
   * fix read-char-no-hang
+  * string comparison functions are not predicates
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  7 Jun 2006 15:04:48 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu,  8 Jun 2006 18:39:52 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
