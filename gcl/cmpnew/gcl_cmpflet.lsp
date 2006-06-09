@@ -152,7 +152,7 @@
     (let ((*vars* *vars*))
       (with-restore-vars
        (mapc (lambda (x) (when (and (var-p x) (or (var-ref-ccb x) (eq 'clb (var-loc x))))
-			   (push (list x (var-type x)) *restore-vars*)
+;			   (push (list x (var-type x)) *restore-vars*)
 			   (setf (var-type x) (var-dt x)))) *vars*)
        (c1add-globals ss)
        (check-vdecl nil ts is)
@@ -297,7 +297,7 @@
   (let ((*vars* *vars*))
     (with-restore-vars
      (mapc (lambda (x) (when (and (var-p x) (or (var-ref-ccb x) (eq 'clb (var-loc x))))
-			 (push (list x (var-type x)) *restore-vars*)
+;			 (push (list x (var-type x)) *restore-vars*)
 			 (setf (var-type x) (var-dt x)))) *vars*)
      (c1add-globals ss)
      (check-vdecl nil ts is)

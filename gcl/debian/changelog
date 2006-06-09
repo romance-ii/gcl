@@ -175,8 +175,13 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * fix read-char-no-hang
   * string comparison functions are not predicates
   * first automatic state function for mutual recursion support
+  * Fix typing bug in c1flet/c1labels,make (values form) an efficient
+    return,portable code turns &aux into let* to make the lambda
+    funcallable (in preparation for automatic state/mutual recursion
+    conversion),speed up proper-list type-or, give fdefinition a lisp
+    definition to set up the prototype (removes a number of * returns)
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  8 Jun 2006 18:53:52 +0000
+ -- Camm Maguire <camm@enhanced.com>  Fri,  9 Jun 2006 20:50:39 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

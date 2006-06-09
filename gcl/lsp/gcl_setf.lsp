@@ -620,6 +620,16 @@
        (prog1 (car ,access-form)
               ,store-form))))
 
+(defun fdefinition (name)
+  (declare (optimize (safety 1)))
+  (check-type name function-identifier)
+  (cond ((symbolp name) (values (symbol-function name)))
+	((let ((z (get (cadr name) 'setf-function)))
+	   (cond ((not z) (error :undefined-function "function ~s is undefined" name))
+		 ((functionp z) z)
+		 ((fdefintion z)))))))
+		 
+
 (defun (setf fdefinition) (def fn)
   (declare (optimize (safety 1)))
   (when (not (functionp def))

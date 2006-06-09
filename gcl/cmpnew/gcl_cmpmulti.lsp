@@ -110,15 +110,15 @@
   )
 
 (defun c1values (args &aux (info (make-info)))
-      (cond ((and args (not (cdr args))
-		  (or (not (consp (car args)))
-		      (and (symbolp (caar args))
-			   (let ((tem (get-return-type (caar args))))
-			     (and tem
-				  (or (atom tem)
-				      (and (consp tem)
-					   (null (cdr tem))
-					   (not (eq '* (car tem))))))))))
+      (cond ((and args (not (cdr args)))
+;		  (or (not (consp (car args)))
+;		      (and (symbolp (caar args))
+;			   (let ((tem (get-return-type (caar args))))
+;			     (and tem
+;				  (or (atom tem)
+;				      (and (consp tem)
+;					   (null (cdr tem))
+;					   (not (eq '* (car tem))))))))))
 	     ;;the compiler put in unnecessary code
 	     ;;if we just had say (values nil)
 	     ;; so if we know there's one value only:

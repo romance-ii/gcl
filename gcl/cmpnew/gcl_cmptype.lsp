@@ -77,6 +77,7 @@
 (defvar *and-tp-hash* (make-hash-table :test 'equal))
 (defvar *or-tp-hash* (make-hash-table :test 'equal))
 
+
 (defun cmp-norm-tp (tp)
   (multiple-value-bind 
    (r f) 
@@ -564,6 +565,8 @@
 	       (push (type-or1 (or (car t1) 'null) (or (car t2) 'null)) r))))
 	((and (consp type2) (eq (car type2) 'values))
 	 (type-or1 type2 type1))
+	;;FIXME!!! This belongs in predlib.
+	((and (= 2 (length (intersection (list type1 type2) '(proper-list (cons t proper-list)) :test 'equal))) 'proper-list))
 	((member type1 '(t object *)) type1)
 	((member type2 '(t object *)) type2)
 	((subtypep1 type1 type2) type2)

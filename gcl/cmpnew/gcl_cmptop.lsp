@@ -570,6 +570,22 @@
 
 (defvar *recursion-detected*)
 
+(defun aux-decls (auxs decls)
+  (let (ad dd)
+    (dolist (l decls)
+      (let* ((b (cadr l))
+	     (b (if (eq (car b) 'type) (cdr b) b)))
+	(cond ((eq (car b) 'optimize) (push l dd))
+	      ((let ((tt (intersection (cdr b) auxs)))
+		 (cond ((not tt) (push l dd))
+		       ((let ((z (if (eq b (cadr l)) (list (caadr l)) (list (caadr l) (cadadr l)))))
+			  (push `(declare (,@z ,@tt)) ad)
+			  (let ((q (set-difference (cdr b) auxs)))
+			    (when q
+			      (push `(declare (,@z ,@q)) dd)))))))))))
+    (list (nreverse ad) (nreverse dd))))
+
+
 (defun t1defun (args &aux (setjmps *setjmps*) (defun 'defun) (*sharp-commas* nil) fname lambda-expr cfun doc)
   (when (or (endp args) (endp (cdr args)))
         (too-few-args 'defun 2 (length args)))
@@ -706,14 +722,17 @@
 	 (when (and (consp args) (stringp (car args))) (push (pop args) doc))
 	 (do nil ((or (not args) (not (consp (car args))) (not (eq (caar args) 'declare))))
 	     (push (pop args) decls))
-	 (push (cons fname (pd `(lambda ,ll
+	 (let* ((nal (do (r (y ll)) ((or (not y) (eq (car y) '&aux)) (nreverse r)) (push (pop y) r)))
+		(al (cdr (member '&aux ll)))
+		(dd (aux-decls (mapcar (lambda (x) (if (atom x) x (car x))) al) decls)))
+	 (push (cons fname (pd `(lambda ,nal
 				  ,@doc
 				  (declare (optimize (safety ,(cond (*compiler-push-events* 3)
 								    (*safe-compile* 2)
 								    (*compiler-check-args* 1)
 								    (0)))))
-				  ,@(nreverse decls)
-				  (block ,fname ,@args)))) *portable-source*))))
+				  ,@(nreverse (cadr dd))
+				  (block ,fname (let* ,al ,@(car dd) ,@args))))) *portable-source*)))))
 
 (defun make-inline-string (cfun args fname)
   (if (null args)
