@@ -627,7 +627,7 @@
 	((let ((z (get (cadr name) 'setf-function)))
 	   (cond ((not z) (error :undefined-function "function ~s is undefined" name))
 		 ((functionp z) z)
-		 ((fdefintion z)))))))
+		 ((fdefinition z)))))))
 		 
 
 (defun (setf fdefinition) (def fn)
