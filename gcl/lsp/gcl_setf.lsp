@@ -626,7 +626,7 @@
   (cond ((symbolp name) (values (symbol-function name)))
 	((let ((z (get (cadr name) 'setf-function)))
 	   (cond ((not z) (error :undefined-function "function ~s is undefined" name))
-		 ((not (symbolp z) z))
+		 ((not (symbolp z)) z)
 		 ((fdefinition z)))))))
 		 
 
