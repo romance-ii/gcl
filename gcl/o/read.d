@@ -295,6 +295,8 @@ object in;
 
 	x = read_object(in);
 	vs_push(x);
+
+#ifndef _WIN32        
 	while (listen_stream(in)) {
 	  object c=read_char(in);
 	  if (cat(c)!=cat_whitespace) {
@@ -302,6 +304,7 @@ object in;
 	    break;
 	  }
 	}
+#endif        
 
 	if (sharp_eq_context_max > 0)
 		x = vs_head = patch_sharp(x);
