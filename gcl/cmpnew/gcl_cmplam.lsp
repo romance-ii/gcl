@@ -130,7 +130,7 @@
 
 (defun decls-from-procls (ll procls body)
   (cond ((or (null procls) (eq (car procls) '*)
-	     (null ll) (member (car ll) '(&whole &optional &rest &key &environment) :test #'eq)) nil)
+	     (null ll) (member (car ll) '(&whole &optional &rest &key &environment))) nil)
 	((eq (car procls) t)
 	 (decls-from-procls (cdr ll) (cdr procls) body))
 	(t

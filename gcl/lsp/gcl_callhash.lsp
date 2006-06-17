@@ -169,6 +169,26 @@
     
     
 
+(defun recompile (fn &optional (pn "/tmp/recompile.lsp" pnp))
+  (unless pnp (when (probe-file pn) (delete-file pn)))
+  (with-open-file
+   (s pn :direction :output :if-exists :append :if-does-not-exist :create)
+   (let ((*print-radix* nil)
+	 (*print-base* 10)
+	 (*print-circle* t)
+	 (*print-pretty* nil)
+	 (*print-level* nil)
+	 (*print-length* nil)
+	 (*print-case* :downcase)
+	 (*print-gensym* t)
+	 (*print-array* t)
+	 (si::*print-package* t)
+	 (si::*print-structure* t))
+     (let* ((src (function-src fn)))
+       (if src (prin1 `(defun ,fn ,@(cdr src)) s)
+	 (remove-recompile fn))
+       (load (compile-file pn :system-p t :c-file t :h-file t :data-file t))))))
+
 (defun do-recompile (&optional (pn "/tmp/recompile.lsp" pnp))
   (unless (or *disable-recompile* (= 0 (length *needs-recompile*)))
     (let ((*disable-recompile* t))
@@ -205,8 +225,8 @@
     (do-recompile pn)))
 
 ;FIXME!!!
-(defun is-eq-test-item-list (&rest r)
-  (format t "Should never be called ~s~%" r))
+(defun is-eq-test-item-list (x y z w)
+  (format t "Should never be called ~s ~s ~s ~s~%" x y z w))
 
 (defun cmp-vec-length (x)
   (declare (vector x))

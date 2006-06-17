@@ -32,13 +32,14 @@
 (defun fast-link-proclaimed-type-p (fname &optional args)
   (and 
        (symbolp fname)
-       (and (< (the fixnum(length args)) 64)
+       (and (< (length args) 64)
 	    (or  (and (get fname 'fixed-args)
 		      (listp args))
 		 (and
 		  (get fname 'proclaimed-function)
-		  (link-arg-p (get fname 'proclaimed-return-type))
-		  (dolist (v (get fname 'proclaimed-arg-types) t)
+		  (let ((v (get-return-type fname)))
+		    (and v (type>= t v) (link-arg-p v)))
+		  (dolist (v (get-arg-types fname) t)
 			  (or  (eq v '*)(link-arg-p v) (return nil))))))))
 
 (si::putprop 'funcall 'c2funcall-aux 'wholec2)
@@ -154,7 +155,7 @@
 ;			(eq *value-to-go* 'trash)
 ;			(and (consp *value-to-go*)
 ;			     (eq (car *value-to-go*) 'var))
-			(and info (equal (info-type info) '(values t)))))
+			(and info (type>= t (info-type info)))))
 		  (c2funcall-sfun form args info)
 		  (return-from c2funcall nil)))
            (unless loc
@@ -300,7 +301,7 @@
      ( t; *Fast-link-compiling*
       (cond ((and
 	      	      (listp args)
-	      (< (the fixnum (length args)) 10)
+	      (< (length args) 10)
 	      (or
 		   *ifuncall*
 		   (get fname 'ifuncall))
@@ -345,7 +346,7 @@
 		      (leng (and (listp args) (length args))))
 	     (setq argtypes
 		   (cond ((get fname 'proclaimed-function)
-			  (get fname 'proclaimed-arg-types))
+			  (get-arg-types fname))
 			 ((setq tem (get fname ' fixed-args))
 			  (cond ((si:fixnump tem)
 				 (or (equal leng tem)
@@ -395,14 +396,12 @@
 					    (wt-inline-loc link-string l)
 					    (wt ")")))))
 		(push (list fname argtypes
-			    (or (get fname 'proclaimed-return-type)
-				t)
+			    (let ((z (get-return-type fname))) (cond ((eq z #tboolean)) ((not z)) (z)))
 			    (flags side-effect-p allocates-new-storage)
 			    (or link link-string) 'link-call)
 		      *inline-functions*))
 	      (setq link-info (list fname (format nil "LI~d" n)
-				    (or (get fname 'proclaimed-return-type)
-					t)
+				    (let ((z (get-return-type fname))) (cond ((eq z #tboolean)) ((not z)) (z)))
 				     argtypes)))))
 	  (t	   
 	   (check-fname-args fname args)

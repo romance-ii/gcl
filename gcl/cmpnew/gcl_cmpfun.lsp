@@ -296,16 +296,16 @@
 (defmacro eq-subtp (x y)  ;FIXME axe mult values
   (let ((s (gensym)))
     `(let ((,s (type>= ,y ,x)))
-       (values ,s (or ,s (type>= `(not ,,y) x))))))
+       (values ,s (or ,s (type>= (cmp-norm-tp `(not ,,y)) x))))))
 
 (defun eql-is-eq-tp (x)
-  (eq-subtp x 'eql-is-eq-tp))
+  (eq-subtp x #teql-is-eq-tp))
 
 (defun equal-is-eq-tp (x)
-  (eq-subtp x 'equal-is-eq-tp))
+  (eq-subtp x #tequal-is-eq-tp))
 
 (defun equalp-is-eq-tp (x)
-  (eq-subtp x 'equalp-is-eq-tp))
+  (eq-subtp x #tequalp-is-eq-tp))
 
 (defun do-eq-et-al (fn args)
   (let* ((tf (cadr (test-to-tf fn)))
@@ -385,7 +385,7 @@
   (si::putprop l 'do-num-relations 'c1g))
 
 (dolist (l `(eq eql equal equalp > >= < <= = /= length ;FIXME get a good list here
-		,@(mapcar (lambda (x) (cdr x)) (remove-if-not (lambda (x) (symbolp (cdr x))) +type-alist+))))
+		,@(mapcar (lambda (x) (cdr x)) (remove-if-not (lambda (x) (symbolp (cdr x))) +cmp-type-alist+))))
   (si::putprop l t 'c1no-side-effects))
 
 ;;bound type comparisons
@@ -416,8 +416,8 @@
 	  ((member test `(equal ,#'equal)) '(equal-is-eq equal-is-eq-tp))
 	  ((member test `(equalp ,#'equalp)) '(equalp-is-eq equalp-is-eq-tp)))))
 
-(defun is-eq-test-item-list (test item list)
-  (declare (ignore list))
+(defun is-eq-test-item-list (test item list rest)
+  (declare (ignore list rest))
   (let ((tf (car (test-to-tf test))))
     (and tf (funcall tf item))))
 	
@@ -433,7 +433,13 @@
 	 (multiple-value-bind 
 	  (m2 f2) (list-tp-test tf (info-type (cadadr nargs)))
 	  (declare (ignore f2))
-	  (let ((m2 (or m2 (when (constantp (caddr args)) (every (car ltf) (cmp-eval (caddr args)))))))
+	  (let ((m2 (or m2 
+			(let* ((ret (and (constantp (cadddr args)) (cadr (member :ret (cmp-eval (cadddr args))))))
+			       (k1  (when ret (cadr (member :k1  (cadddr args))))))
+			  (when (constantp k1)
+			    (when (constantp (caddr args)) 
+			      (let ((z (cmp-eval (caddr args))))
+				(every (car ltf) (if k1 (mapcar (cmp-eval k1) z) z)))))))))
 	    (cond ((or m1 m2) (c1t))
 		  (f1 (c1nil))
 		  ((let ((info (make-info))) 
@@ -443,12 +449,12 @@
 (defun do-predicate (fn args)
   (let* ((info (make-info :type 'boolean))
 	 (nargs (c1args args info))
-	 (tp (car (rassoc fn +type-alist+))))
-    (let ((at (and (not (cdr args)) (info-type (cadar nargs)))))
+	 (tp (car (rassoc fn +cmp-type-alist+))))
+    (let ((at (and (not (cdr args)) (coerce-to-one-value (info-type (cadar nargs))))))
       (cond ((and at (type>= tp at)) (c1t))
 	    ((not (type-and at tp)) (c1nil))
 	    ((list 'call-global info fn nargs))))))
-(dolist (l +type-alist+) (when (symbolp (cdr l)) (si::putprop (cdr l) 'do-predicate 'c1g)))
+(dolist (l +cmp-type-alist+) (when (symbolp (cdr l)) (si::putprop (cdr l) 'do-predicate 'c1g)))
 
 ;(defun c1or (args)
 ;  (cond ((null args) (c1expr nil))
@@ -513,13 +519,13 @@
 			       (let ((v (cmp-eval (car args)))) 
 				 (list (if (listp v) v (list v))))))
 			 ((one-int-tp st))
-			 ((not (type-and 'list (nil-to-t st))) `((*)))
+			 ((not (type-and #tlist (nil-to-t st))) `((*)))
 			 ((and (eq (caar nargs) 'call-global) (eq (caddar nargs) 'list))
 			  `(,(mapcar (lambda (x) (let ((tp (cmp-norm-tp (info-type (cadr x))))) 
 						   (or (caar (one-int-tp tp)) `*)))
 				     (fourth (car nargs)))))
 			 (`(*))))))
-	(setf (info-type info) `(array ,@eltp ,@szf))
+	(setf (info-type info) (cmp-norm-tp `(array ,@eltp ,@szf)))
 	(list 'call-global info 'make-array nargs)))))
 (si::putprop 'make-array 'c1make-array 'c1)
 
@@ -629,14 +635,14 @@
 		(integerp (car specs))
 		(< (+ (car specs)(cdr specs))
 		   len)
-		(type>= 'fixnum (result-type (second args))))
+		(type>= #tfixnum (result-type (second args))))
 	   (c1expr `(the fixnum (si::ldb1 ,(car specs) ,(cdr specs) ,(second args))))))))
 
 	  
 (si:putprop 'length 'c1length 'c1)
 
 (defun c1length (args &aux (info (make-info)))
-  (setf (info-type info) 'seqind)
+  (setf (info-type info) #tseqind)
   (cond ((and (consp (car args))
 	      (eq (caar args) 'symbol-name)
 	      (let ((args1 (cdr (car args))))
@@ -683,7 +689,7 @@
 		   `(let ((,c ,(second args)))
 		      (declare (type ,(result-type (second args))
 				     ,c))
-		      (and (typep ,c 'character)
+		      (and (typep ,c #tcharacter)
 			   (= (char-code ,(car args))
 			      (the fixnum
 				   (char-code
@@ -712,7 +718,8 @@
 
 (defun co1typep (f args &aux tem) f
   (let* ((x (car args))  new
-	 (type (and (literalp (cadr args)) (cmp-eval (cadr args)))))
+	 (type (and (literalp (cadr args)) (cmp-norm-tp (cmp-eval (cadr args)))))
+	 (type (unless (eq type '*) type)))
       (let* ((rt (result-type (car args)))
 	     (ta (type-and rt type)))
 ;	(format t "~a ~a ~a ~a~%" type rt ta (eq ta rt))
@@ -725,21 +732,20 @@
     (setq new
 	  (cond
 	   ((null type) nil)
-	   ((and (setq f (assoc type +type-alist+ :test 'equal))
+	   ((and (setq f (assoc type +cmp-type-alist+ :test 'equal))
 		 (not (get (cdr f) 'si::struct-predicate)))
 	    (list (cdr f) x))
 	   ((and (consp type)
-		 (or (and (eq (car type) 'vector)
+		 (or (and (eq (car type) #tvector)
 			  (null (cddr type)))
 		     (and 
 		      (member (car type)
-			      '(array vector simple-array))
+			      #l(array vector simple-array))
 		      (equal (third type) '(*)))))
-	    (setq tem (si::best-array-element-type
-		       (second type)))
-	    (cond ((eq tem 'character) `(stringp ,x))
-		  ((eq tem 'bit) `(bit-vector-p ,x))
-		  ((setq tem (position tem +array-types+))
+	    (setq tem (cmp-norm-tp (si::best-array-element-type (second type))))
+	    (cond ((eq tem #tcharacter) `(stringp ,x))
+		  ((eq tem #tbit) `(bit-vector-p ,x))
+		  ((setq tem (position tem +cmp-array-types+))
 		   `(the boolean (vector-type ,x ,tem)))))
 	   ((and (consp type)
 		 (eq (car type) 'satisfies)
@@ -749,14 +755,14 @@
 		 (symbol-package (cadr type))
 		 (null (cddr type))
 		 `(,(cadr type) ,x)))
-	   ((type>= 'fixnum  type)
+	   ((type>= #tfixnum  type)
 	    (setq tem (cmp-norm-tp type))
 	    (and (consp tem)
 		 (si::fixnump (second tem))
 		 (si::fixnump (third  tem))
 		 `(let ((.tem ,x))
 		    (declare (type ,(result-type x) .tem))
-		    (and (typep .tem 'fixnum)
+		    (and (si::fixnump .tem)
 			 (>=  (the fixnum .tem) ,(second tem))
 			 (<=  (the fixnum .tem) ,(third tem))))))
 	   ((and (symbolp type)
@@ -974,19 +980,8 @@
 
 
 
-
 (defun aet-c-type (type)
-  (ecase type
-    ((t) "object")
-    ((character signed-char non-negative-char) "char")
-    ((non-negative-fixnum fixnum) "fixnum")
-    (unsigned-char "unsigned char")
-    ((signed-short non-negative-short) "short")
-    (unsigned-short "unsigned short")
-    ((signed-int non-negative-int) "int")
-    (unsigned-int "unsigned int")
-    (long-float "longfloat")
-    (short-float "shortfloat")))
+  (or (cdr (assoc type +c-type-string-alist+)) (baboon)))
 
 
 (si:putprop 'vector-push 'co1vector-push 'co1)
@@ -1068,9 +1063,13 @@
 	      ((prog prog*)
 	       `(,f ,(car args)
 		    ,@ (fixup (cdr args)))))))))
+
+(defun sublis1 (x y z)
+  (format t "Should never be called: ~s ~s ~s~%" x y z))
+
 (si::putprop 'sublis 'co1sublis 'co1)
 (defun co1sublis (f args &aux test) f
- (and (case (length args)
+ (and (case (length args);FIXME
 	(2 (setq test 'eql1))
 	(4 (and (eq (third args) :test)
 		(cond ((member (fourth args) '(equal (function equal))) (setq test 'equal1))
@@ -1081,6 +1080,21 @@
 	(c1expr `(let ((,s ,(car args)))
 		   (sublis1 ,s ,(second args) ',test))))))
 
+;; (defun c1sublis1 (args)
+;;   (let* ((info (make-info :type 'list))
+;; 	 (args (c1args args info)))
+;;     (list 'sublis1 info args)))
+;; (si:putprop 'sublis1 'c1sublis1 'c1)
+
+;; (defun c2sublis1 (args)
+;;   (let* ((args (inline-args args '(t t)))
+;; 	 (a (car args))
+;; 	 (b (cadr args))
+;; 	 (c (caddr args)))
+;;     (let ((tst (car (rassoc (cadr c) *objects* :key 'car))))
+;;       (unless (member tst '(eq equal1 eql1)) (error "bad test"))
+;;       (wt "check_alist(" a ");sublis1(" a "," b "," (format nil "~(&~a~));" tst)))))
+;; (si:putprop 'sublis1 'c2sublis1 'c2)
 
 (defun sublis1-inline (a b c)
   (let ((tst (car (find (cadr c) *objects* :key 'cadr))))

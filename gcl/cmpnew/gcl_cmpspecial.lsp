@@ -50,7 +50,7 @@
 (defun c1declare (args)
   (cmperr "The declaration ~s was found in a bad place." (cons 'declare args)))
 
-(defconstant +useful-c-types+ '(seqind fixnum short-float long-float proper-list t))
+(defconstant +useful-c-types+ #l(boolean seqind fixnum short-float long-float proper-list t))
 
 (defun c1the (args &aux info form type dtype)
   (when (or (endp args) (endp (cdr args)))
@@ -62,7 +62,7 @@
   (setq dtype (type-filter (car args)))
   (setq type (type-and dtype (info-type info)))
   (when (null type)
-    (when (eq (car args) 'boolean) (return-from c1the (c1the (list (car args) `(unless (eq nil ,(cadr args)) t)))))
+    (when (eq dtype #tboolean) (return-from c1the (c1the (list dtype `(unless (eq nil ,(cadr args)) t)))))
     (when (eq (car form) 'var)
       (let* ((v (car (third form)))
 	     (tg (t-to-nil (var-tag v))))
@@ -73,12 +73,12 @@
 		   (nmt (type-and nmt (var-dt v))))
 	      (setf (var-mt v) nmt))
 	    (throw (var-tag v) v)))))
-    (setq type (type-filter (car args)))
+    (setq type dtype)
     (unless (not (and dtype (info-type info)))
       (cmpwarn "Type mismatch was found in ~s.~%Modifying type ~s to ~s." (cons 'the args) (info-type info) type)))
 
   (setq form (list* (car form) info (cddr form)))
-  (if (type>= 'boolean (car args)) (setf (info-type (cadr form)) type) (set-form-type form type))
+  (if (type>= #tboolean dtype) (setf (info-type (cadr form)) type) (set-form-type form type))
 ;  (setf (info-type info) type)
   form)
 

@@ -29,9 +29,6 @@
 
 (in-package 'compiler)
 
-(import 'si::+array-types+ 'compiler)
-(import 'si::+aet-type-object+ 'compiler)
-
 (si:putprop 'progn 'c1progn 'c1special)
 (si:putprop 'progn 'c2progn 'c2)
 
@@ -144,7 +141,7 @@
 
 (defun fix-opt (opt)
   (let ((a (cddr opt)))
-    (unless (typep (car a ) 'fixnum)
+    (unless (typep (car a ) #tfixnum)
     (if *compiler-in-use*
 	(cmpwarn "Obsolete optimization: use fix-opt ~s"  opt))
 		     
@@ -204,7 +201,7 @@
     (let* ((be (get f 'type-propagator))
 	   (ba (and be (si::dt-apply be (cons f (mapcar 'coerce-to-one-value args))))));FIXME
       (when ba
-	(return-from result-type-from-args ba)))
+	(return-from result-type-from-args (cmp-norm-tp ba))))
     (dolist (v '(inline-always inline-unsafe))
       (let* ((w (get f v)))
 	(if (and w (symbolp (caar w)) (flag-p (third (car w)) itf))
@@ -220,7 +217,7 @@
 				    (or  (eq (car a) (car b))
 					 (type>= (car b) (car a))))
 			 (return nil))))
-	      (return-from result-type-from-args (second w)))))))))
+	      (return-from result-type-from-args (cmp-norm-tp (second w))))))))))
 	
 
 ;; omitting a flag means it is set to nil.
@@ -414,7 +411,7 @@
       (let* ((non (inlinable-fn (cadr form))) ;;FIXME, we need to centralize things like this
 	     (n (if non (cadr form) (gensym))) (l (gensym)))
 	`(let (,@(unless non `((,n ,(cadr form)))) (,l ,(caddr form)))
-	   (if (typep ,n 'seqind);;FIX typep inference to branch types outside of +type-alist+
+	   (if (typep ,n ',#tseqind);;FIX typep inference to branch types outside of +type-alist+
 	       (cmp-nthcdr ,n ,l)
 	     (cmp-nthcdr ,n ,l))))
     form))
@@ -441,14 +438,14 @@
   (declare (ignore env))
   (let ((x (gensym)) (i (gensym)) (s (gensym)))
     `(let ((,s ,(cadr form)))
-       (if (typep ,s 'vector)
-	   (let ((,x (make-array (length ,s) :element-type (cmp-array-element-type ,s))))
-	     (do ((,i 0 (1+ ,i))) ((= ,i (length ,s)) ,x)
-		 (declare (seqind ,i))
-		 (setf (aref ,x (1- (- (length ,s) ,i))) (aref ,s ,i))))
-	 (let (,x)
-	   (do ((,s ,s (cdr ,s))) ((endp ,s) ,x)
-	       (setq ,x (cons (car ,s) ,x))))))))
+       (if (listp ,s)
+	   (let (,x)
+	     (do ((,s ,s (cdr ,s))) ((endp ,s) ,x)
+	       (setq ,x (cons (car ,s) ,x))))
+	 (let ((,x (make-array (length ,s) :element-type (cmp-array-element-type ,s))))
+	   (do ((,i 0 (1+ ,i))) ((= ,i (length ,s)) ,x)
+	     (declare (seqind ,i))
+	     (setf (aref ,x (1- (- (length ,s) ,i))) (aref ,s ,i))))))))
 (si::putprop 'reverse (function reverse-expander) 'si::compiler-macro-prop)
 
 (defmacro with-var-form-type ((v f tp) &rest body)
@@ -462,9 +459,9 @@
   (declare (ignore env))
   (let ((i (gensym)) (s (gensym)))
     (with-var-form-type 
-     (s (cadr form) 'sequence)
+     (s (cadr form) #tsequence)
      (with-var-form-type 
-      (i (caddr form) 'seqind)
+      (i (caddr form) #tseqind)
       `(if (listp ,s) (nth ,i ,s) (aref ,s ,i))))))
 (si::putprop 'elt (function elt-expander) 'si::compiler-macro-prop)
 
@@ -472,7 +469,7 @@
 (defun length-expander (form env)
   (declare (ignore env))
   (let ((i (gensym)) (s (gensym)))
-    (with-var-form-type (s (cadr form) 'sequence)
+    (with-var-form-type (s (cadr form) #tsequence)
      `(if (listp ,s)	
 	      (do ((,i 0 (1+ ,i)) (,s ,s (cdr ,s))) ((endp ,s) ,i)
 		  (declare (seqind ,i)))
@@ -503,7 +500,7 @@
        ,(when list `(do ((,fi 0 (1+ ,fi)) (,l ,l (cdr ,l))) ((= ,fi ,ll))
 	   (declare (seqind ,fi))
 	   (setf (aref ,a ,fi) ,l)))
-       (let* ((,ii (make-array 1024 :element-type 'non-negative-fixnum :adjustable t))
+       (let* ((,ii (make-array 1024 :element-type ',#tnon-negative-fixnum :adjustable t))
 	      (,s 2))
 	 (declare (seqind ,s) ((vector seqind) ,ii));FIXME (adjust-array
 	 (setf (aref ,ii 0) 0 (aref ,ii 1) ,ll)
@@ -551,13 +548,13 @@
       form
     (let ((seq (gensym)))
       `(let ((,seq ,(cadr form)))
-	 (if (typep ,seq 'vector)
+	 (if (listp ,seq)
 	     (let ((,seq ,seq))
-	       (declare (vector ,seq))
-	       ,(qsl-fun seq (caddr form) (if (cdddr form) (fifth form) ''identity) nil))
+	       (declare (list ,seq))
+	       ,(qsl-fun seq (caddr form) (if (cdddr form) (fifth form) ''identity) t))
 	   (let ((,seq ,seq))
-	     (declare (list ,seq))
-	     ,(qsl-fun seq (caddr form) (if (cdddr form) (fifth form) ''identity) t)))))))
+	     (declare (vector ,seq))
+	     ,(qsl-fun seq (caddr form) (if (cdddr form) (fifth form) ''identity) nil)))))))
 (si::putprop 'sort        'qsort-expander 'si::compiler-macro-prop)
 
 (defun mheap (a r b key p)
@@ -580,7 +577,7 @@
 		      ,k (ash ,j 1))
 		  (return-from ,block))))))))
 
-(defconstant +hash-index-type+ (car (resolve-type `(or (integer -1 -1) seqind))))
+(defconstant +hash-index-type+ #t(or (integer -1 -1) seqind))
 
 (defun sort-expander (form env)
   (declare (ignore env))
@@ -722,7 +719,7 @@
 	 (r `(,@special-keys ,@r)))
     (let ((form (apply 'do-list-search test list r)))
       (if (member :item special-keys)
-	  `(if (is-eq-test-item-list ,test ,item ,list); (and (eq ,test 'eql) (eql-is-eq ,item ,test ,list))
+	  `(if (is-eq-test-item-list ,test ,item ,list ',r); (and (eq ,test 'eql) (eql-is-eq ,item ,test ,list))
 	       ,(apply 'do-list-search ''eq list r)
 	     ,form)
 	form))))
@@ -836,21 +833,23 @@
   (declare (ignore test not))
   (let* ((newseq (cmp-eval newseq))
 	 (ns newseq)
-	 (newseq (and newseqp (cond ((not newseq) :nil) ((type>= 'list newseq) :list) ((type>= 'vector newseq) :vector))))
+	 (newseq (and newseqp (cond ((not newseq) :nil) 
+				    ((type>= #tlist (cmp-norm-tp newseq)) :list)
+				    ((type>= #tvector (cmp-norm-tp newseq)) :vector))))
 	 (gs (mapcar (lambda (x) (list (gensym) x)) vars))
 
 	 (l (gensym))
 	 (lf (mapcar (lambda (x) `(length ,x)) vars))
-	 (lf (if destp `((if (typep ,dest 'vector) (array-dimension ,dest 0) (length ,dest)) ,@lf) lf))
+	 (lf (if destp `((if (listp ,dest) (length ,dest) (array-dimension ,dest 0)) ,@lf) lf))
 	 (lf (if end `(,end ,@lf) lf))
 	 (lf (if (> (length lf) 1) (cons 'min lf) (car lf)))
 	 (lf (if (or pos start end (eq newseq :vector)) lf
-		     `(if (or ,@(when destp `((typep ,dest 'vector)))
-			      ,@(mapcar (lambda (x) `(typep ,x 'vector)) vars)) ,lf -1)))
+		     `(if (and ,@(when destp `((listp ,dest)))
+			       ,@(mapcar (lambda (x) `(listp ,x)) vars)) -1 ,lf)))
 	 (lf `((,l ,lf)))
 	 (i (gensym))
 
-	 (tf (mapcar (lambda (x) `(if (typep ,(cadr x) 'vector) (aref ,(cadr x) ,i) (car ,(car x)))) gs))
+	 (tf (mapcar (lambda (x) `(if (listp ,(cadr x)) (car ,(car x)) (aref ,(cadr x) ,i))) gs))
 	 (tf (if ret (mapcar (lambda (x) `(funcall ,ret ,x)) tf) tf))
 	 (tf (if k1 (mapcar (lambda (x) `(funcall ,k1 ,x)) tf) tf))
 	 (tf (if keyp (mapcar (lambda (x) `(funcall ,key ,x)) tf) tf))
@@ -873,24 +872,24 @@
 	 (tf (if (and sum (not ivp)) (if (= (length vars) 1) `(if ,fv ,tf ,first) (baboon)) tf))
 
 	 (inf (mapcar (lambda (x) 
-			`(,(car x) ,(cadr x) (if (typep ,(cadr x) 'vector) ,(car x) (cdr ,(car x))))) gs))
+			`(,(car x) ,(cadr x) (if (listp ,(cadr x)) (cdr ,(car x)) ,(car x)))) gs))
 	 (inf `((,i 0 ,@(if (or pos start end (eq newseq :vector)) `((+ ,i 1)) `((if (>= ,l 0) (+ ,i 1) ,i)))) ,@inf))
 
 	 (lf (if (eq newseq :vector) 
 		 `(,@lf (,out (make-array ,l 
 					  :fill-pointer ,l 
-					  :element-type ',(upgraded-array-element-type (si::sequence-type-element-type ns))))) lf))
+					  :element-type ',(cmp-norm-tp (upgraded-array-element-type (si::sequence-type-element-type ns)))))) lf))
 ;					  :element-type (cmp-array-element-type ,@vars)))) lf))
 	 (lf (if (or destp (eq newseq :list))
-		 `(,@lf (,p (unless (typep ,dest 'vector) ,dest))) lf))
+		 `(,@lf (,p (when (listp ,dest) ,dest))) lf))
 	 (lf (if sum `(,@lf (,fv ,ivp) (,sv ,iv)) lf))
 	 (lf (if somep `(,@lf (,sm ,(not some))) lf))
 	 (lf (if count `(,@lf (,cv 0)) lf))
 	 (lf (if (eq newseq :list ) `(,@lf ,lh) lf))
 	 (inf (if (or destp (eq newseq :list)) 
-		  `((,p ,p (if (or (typep ,dest 'vector) ,(eq newseq :list)) ,p (cdr ,p))) ,@inf) inf))
-	 (tf (cond (destp `(cond ((typep ,dest 'vector) (setf (aref ,dest ,i) ,tf) nil)
-				 ((setf (car ,p) ,tf) nil)))
+		  `((,p ,p (if (and (listp ,dest) ,(not (eq newseq :list))) (cdr ,p) ,p)) ,@inf) inf))
+	 (tf (cond (destp `(cond ((listp ,dest) (setf (car ,p) ,tf) nil)
+				 ((setf (aref ,dest ,i) ,tf) nil)))
 		   ((eq newseq :list) `(and (setq ,p (let ((,tmp (cons ,tf nil))) 
 						       (if ,p (cdr (rplacd ,p ,tmp))
 							 (setq ,lh ,tmp)))) nil))
@@ -906,7 +905,7 @@
 	 (ef (if (or pos start end (eq newseq :vector)) ef `(and (>= ,l 0) ,ef)))
 	 (ef `(if ,ef t
 		,@(if (or pos start end (eq newseq :vector)) `(,tf)
-		    `(,(reduce (lambda (x y) `(if (and (not (typep ,(cadr x) 'vector)) (endp ,(car x))) t ,y))
+		    `(,(reduce (lambda (x y) `(if (and (listp ,(cadr x)) (endp ,(car x))) t ,y))
 			       `(,@(when destp `((,p ,dest))) ,@gs) :initial-value tf :from-end t)))))
 	 (rf (cond (destp dest) 
 		   ((eq newseq :nil) nil) 
@@ -921,8 +920,9 @@
     `(let* ,lf  
        ,@(when count `((declare (seqind  ,cv))))
        ,@(when destp
-	   `((when (and (typep ,dest 'vector) (array-has-fill-pointer-p ,dest))
-	       (setf (fill-pointer ,dest) ,l))))
+	   `((unless (listp ,dest) 
+	       (when (array-has-fill-pointer-p ,dest)
+		 (setf (fill-pointer ,dest) ,l)))))
        (do ,inf (,ef ,rf)(declare (seqind ,i))))))
 
 (defun possible-eq-sequence-search (item seq special-keys &rest r 
@@ -933,7 +933,7 @@
 	 (r `(,@special-keys ,@r)))
     (let ((form (apply 'do-sequence-search test (list seq) r)))
       (if (member :item special-keys)
-	  `(if (is-eq-test-item-list ,test ,item ,seq); FIXME
+	  `(if (is-eq-test-item-list ,test ,item ,seq ',r); FIXME
 	       ,(apply 'do-sequence-search ''eq (list seq) r)
 	     ,form)
 	form))))
@@ -969,13 +969,13 @@
 	   (form (apply 'possible-eq-sequence-search (car r) (cadr r) specials `(,@overrides ,@(cddr r)))))
       `(let (,@syms)
 	 ,@(if (constantp (cadr r)) (list form)
-	     `((if (typep ,(cadr r) 'vector)
-		   (let ((,(cadr r) ,(cadr r)))
-		     (declare (vector ,(cadr r)))
-		     ,form)
+	     `((if (listp ,(cadr r))
 		 (let ((,(cadr r) ,(cadr r)))
 		   (declare (list ,(cadr r)))
-		   ,form))))))))
+		   ,form)
+		   (let ((,(cadr r) ,(cadr r)))
+		     (declare (vector ,(cadr r)))
+		     ,form))))))))
 (si::putprop 'position (macro-function 'seq-compiler-macro) 'si::compiler-macro-prop)
 (si::putprop 'position-if (macro-function 'seq-compiler-macro) 'si::compiler-macro-prop)
 (si::putprop 'position-if-not (macro-function 'seq-compiler-macro) 'si::compiler-macro-prop)
@@ -1006,7 +1006,7 @@
 
 (defmacro map-into-compiler-macro (&whole w &rest args)
   (if (or (< (length args) 3) (and (eq (car w) 'map) (or (not (constantp (car args)))
-							 (not (type>= 'sequence (cmp-eval (car args)))))))
+							 (not (type>= #tsequence (cmp-norm-tp (cmp-eval (car args))))))))
       w
     (let* ((syms (reduce (lambda (&rest r) 
 			   (when r 
@@ -1035,12 +1035,12 @@
 	   (form (apply 'do-sequence-search (car r) (list (cadr r)) `( :sum t ,@(substitute :iv :initial-value (cddr args))))))
       `(let ,syms
 	 ,@(if (constantp (cadr r)) (list form)
-	     `((if (typep ,(cadr r) 'vector)
-		   (let ((,(cadr r) ,(cadr r)))
-		     (declare (vector ,(cadr r)))
-		     ,form)
+	     `((if (listp ,(cadr r))
 		 (let ((,(cadr r) ,(cadr r)))
 		   (declare (list ,(cadr r)))
+		   ,form)
+		 (let ((,(cadr r) ,(cadr r)))
+		   (declare (vector ,(cadr r)))
 		   ,form))))))))
 (si::putprop 'reduce (macro-function 'compiler::reduce-compiler-macro) 'si::compiler-macro-prop)
 
@@ -1181,8 +1181,8 @@
 			 (let ((fname (or (cdr (assoc fname +cmp-fn-alist+)) fname)))
 			   (list (cons fname
 				       (let* ((at (get fname 'proclaimed-arg-types))
-					      (rt (get fname 'proclaimed-return-type))
-					      (rt (if (equal '(*) rt) '* rt)))
+					      (rt (get fname 'proclaimed-return-type)))
+;					      (rt (if (equal '(*) rt) '* rt)))
 					 (when (or at rt) (list at rt))))))
 			 nil)))
         ((and (setq fd (get fname 'si::structure-access))
@@ -1217,7 +1217,8 @@
 					(and (consp (car args)) (eq (caar args) 'function) (cadar args))) 
 				       (otherwise fname)))))
 	       (when return-type
-		 (setf (info-type info) (if (or (eq return-type '*) (equal return-type '(*))) '* return-type))
+;		 (setf (info-type info) (if (or (eq return-type '*) (equal return-type '(*))) '* return-type))
+		 (setf (info-type info) return-type)
 ;		 (if (or (eq return-type '*) (equal return-type '(*)))
 ;		     (setf return-type nil)
 ;		   (setf (info-type info) return-type))
@@ -1248,7 +1249,7 @@
 	     ;; some functions can have result type deduced from
 	     ;; arg types.
 	     (let ((tem (result-type-from-args fname
-					       (mapcar #'(lambda (x) (info-type (cadr x)))
+					       (mapcar (lambda (x) (coerce-to-one-value (info-type (cadr x))))
 						       forms))))
 	       (when tem
 		 (setq tem (type-and tem (info-type info)))
@@ -1401,8 +1402,8 @@
 	 )
     (setf (info-type info) (if (and (eq name 'si::s-data) (= index 2))
 			       ;;FIXME -- this belongs somewhere else.  CM 20050106
-			       '(vector unsigned-char)
-			     (type-filter (nth aet-type +array-types+))))
+			       #t(vector unsigned-char)
+			     (type-filter (nth aet-type +cmp-array-types+))))
     (list 'structure-ref info
 	  (c1expr* form info)
 	  (add-symbol name)
@@ -1415,7 +1416,7 @@
 	 (index (caddr form)))
     (cond (sd
 	    (let* ((aet-type (aref (si::s-data-raw sd) index))
-		   (type (nth aet-type +array-types+)))
+		   (type (nth aet-type +cmp-array-types+)))
 	      (cond ((eq (inline-type (type-filter type)) 'inline)
 		     (or (= aet-type +aet-type-object+) (error "bad type ~a" type))))
 	      (setf (info-type (car arg)) (type-filter type))
@@ -1437,7 +1438,7 @@
 (defun c2structure-ref (form name-vv index sd
                              &aux (*vs* *vs*) (*inline-blocks* 0))
   (let ((loc (car (inline-args (list form) '(t))))
-	(type (nth (aref (si::s-data-raw sd) index) +array-types+)))
+	(type (nth (aref (si::s-data-raw sd) index) +cmp-array-types+)))
        (unwind-exit
 	 (list (inline-type (type-filter type))
 			  (flags) 'my-call
@@ -1451,7 +1452,7 @@
   (let* ((raw (si::s-data-raw sd))
 	 (spos (si::s-data-slot-position sd)))
     (if *safe-compile* (wfs-error)
-      (wt "STREF("  (aet-c-type (nth (aref raw ind) +array-types+) )
+      (wt "STREF("  (aet-c-type (nth (aref raw ind) +cmp-array-types+) )
 	  "," loc "," (aref spos ind) ")"))))
 
 
@@ -1489,7 +1490,7 @@
                           &aux locs (*vs* *vs*) (*inline-blocks* 0))
   name-vv
   (let* ((raw (si::s-data-raw sd))
-  (type (nth (aref raw ind) +array-types+))
+  (type (nth (aref raw ind) +cmp-array-types+))
   (spos (si::s-data-slot-position sd))
   (tftype (type-filter type))
   ix iy)
@@ -1508,6 +1509,8 @@
   (close-inline-blocks)
   ))
 
+(defun sv-wrap (x) `(symbol-value ',x))
+
 (defun c1constant-value (val always-p)
   (cond
    ((eq val nil) (c1nil))
@@ -1521,23 +1524,18 @@
           (list 'CHARACTER-VALUE (add-object val) (char-code val))))
    ((typep val 'long-float)
     ;; We can't read in long-floats which are too big:
-    (let (tem x)
-      (unless (setq tem (cadr (assoc val *objects*)))
-	(cond ((or ;FIXME this is really grotesque
-		(and (= val (symbol-value '+inf)) (let ((l (make-list 3))) (setf (car l) 'si::|#,| (cadr l) 'symbol-value (caddr l) ''+inf) (c1expr l)))
-		(and (= val (symbol-value '-inf)) (let ((l (make-list 3))) (setf (car l) 'si::|#,| (cadr l) 'symbol-value (caddr l) ''-inf) (c1expr l)))
-		(and (not (isfinite val)) (let ((l (make-list 3))) (setf (car l) 'si::|#,| (cadr l) 'symbol-value (caddr l) ''nan) (c1expr l)))
-		(and
-		 (> (setq x (abs val)) (/ most-positive-long-float 2))
-		 (c1expr `(si::|#,| * ,(/ val most-positive-long-float)
-			       most-positive-long-float)))
-		(and
-		 (< x (* least-positive-long-float 1.0d20))
-		 (c1expr `(si::|#,| * ,(/ val least-positive-long-float)
-			       least-positive-long-float))))
-	       (push (list val (setq tem *next-vv*)) *objects*))))
-      (list 'LOCATION (make-info :type `(long-float ,val ,val))
-	    (list 'LONG-FLOAT-VALUE (or tem (add-object val)) val))))
+    (let* (sc 
+	   (vv 
+	    (cond ((= val +inf) (add-object (cons 'si::|#,| `(symbol-value ','+inf))));This cannot be a constant list
+		  ((= val -inf) (add-object (cons 'si::|#,| `(symbol-value ','-inf))))
+		  ((not (isfinite val)) (add-object (cons 'si::|#,| `(symbol-value ','nan))))
+		  ((> (abs val) (/ most-positive-long-float 2))
+		   (add-object (cons 'si::|#,| `(* ,(/ val most-positive-long-float) most-positive-long-float))))
+		  ((< (abs val) (* least-positive-long-float 1.0d20))
+		   (add-object (cons `si::|#,| `(* ,(/ val least-positive-long-float) least-positive-long-float))))
+		  ((setq sc t) (add-object val)))))
+      `(location ,(make-info :type (if (isfinite val) `(long-float ,val ,val) 'long-float))
+		 ,(if sc `(long-float-value ,vv ,val) `(vv ,vv)))))
    ((typep val 'short-float)
     (list 'LOCATION (make-info :type `(short-float ,val ,val))
           (list 'SHORT-FLOAT-VALUE (add-object val) val)))

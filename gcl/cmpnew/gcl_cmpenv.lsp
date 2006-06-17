@@ -56,10 +56,8 @@
   (setq *inline-functions* nil)
   (setq *inline-blocks* 0)
   (setq *notinline* nil)
-  (setq *portable-source* nil)
-  (clrhash *norm-tp-hash*)
-  (clrhash *and-tp-hash*)
-  (clrhash *or-tp-hash*))
+  (setq *portable-source* nil))
+
 
 (defvar *next-cvar* 0)
 (defvar *next-cmacro* 0)
@@ -232,18 +230,18 @@
    ((and (symbolp fname)
 	 (listp decl) (listp (cdr decl)))
     (cond ((or (null decl)(eq (car decl) '*)) (setq arg-types '(*)))
-	  (t (setq arg-types (function-arg-types (car decl)))
-	     ))
+	  (t (setq arg-types (function-arg-types (car decl)))))
     (setq return-types (function-return-type (cdr decl)))
     (when (and (consp return-types) (consp (cdr return-types)))
       (setq return-types (cons 'values return-types)))
     (cond ((and (consp return-types)	; ie not nil
-		(endp (cdr return-types))
-		(not (eq (car return-types) '*)))
+		(endp (cdr return-types)))
 	   (setq return-types
 		 ;; varargs must return type t currently.
-		 (if (member '* (and (consp arg-types) arg-types)) t
-		   (car return-types))))
+		 (if (and (type>= t (cmp-norm-tp (car return-types)))
+			  (member '* (and (consp arg-types) arg-types))) 
+		     t (car return-types))
+		 procl (unless (eq '* return-types) procl)))
 	  (t (setq procl nil)))
     (cond ((and (listp arg-types)
 		(< (length arg-types) call-arguments-limit)))
@@ -279,25 +277,28 @@
         (t (warn "The function name ~s is not a symbol." fname))))
 
 (defun get-arg-types (fname &aux x)
-  (if (setq x (assoc fname *function-declarations*))
-      (cadr x)
-      (get fname 'proclaimed-arg-types)))
+  (mapcar 'cmp-norm-tp 
+	  (if (setq x (assoc fname *function-declarations*))
+	      (cadr x)
+	    (get fname 'proclaimed-arg-types))))
 
 (defun get-return-type (fname)
-  (when (symbolp fname)
-    (let* ((x (assoc fname *function-declarations*))
-	   (type1 (if x (caddr x) (get fname 'proclaimed-return-type)))
-	   (type (if (get fname 'predicate) 'boolean
-		   (get fname 'return-type))))
-      (cond (type1
-	     (cond (type
-		    (cond ((setq type (type-and type type1)) type)
-			  (t
-			   (cmpwarn
-			    "The return type of ~s was badly declared."
-			    fname))))
-		   (t type1)))
-	    (t type)))))
+  (cmp-norm-tp 
+   (when (symbolp fname)
+     (let* ((x (assoc fname *function-declarations*))
+	    (type1 (if x (caddr x) (get fname 'proclaimed-return-type)))
+					;	   (type1 (if (equal '(*) type1) '* type1))
+	    (type (if (get fname 'predicate) #tboolean
+		    (get fname 'return-type))))
+       (cond (type1
+	      (cond (type
+		     (cond ((setq type (type-and type type1)) type)
+			   (t
+			    (cmpwarn
+			     "The return type of ~s was badly declared."
+			     fname))))
+		    (t type1)))
+	     (t type))))))
 
 (defun get-local-arg-types (fun &aux x)
   (if (setq x (assoc fun *function-declarations*))
@@ -520,7 +521,7 @@
 				   (push (cons var 'dynamic-extent) ts)))
 			(otherwise
 			 (let ((type (cmp-norm-tp stype)))
-			   (if type
+			   (if (not (eq type '*))
 			       (dolist** (var (cdr decl))
 					 (cmpck (not (symbolp var))
 						"The type declaration ~s contains a non-symbol ~s."

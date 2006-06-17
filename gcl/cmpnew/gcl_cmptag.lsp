@@ -334,14 +334,14 @@
 
 
 (defun wt-switch-case (x)
-  (cond (x (wt-nl (if (typep x 'fixnum) "case " "") x ":"))))
+  (cond (x (wt-nl (if (typep x #tfixnum) "case " "") x ":"))))
 
 (defun c1switch(form  &aux (*tags* *tags*))
   (let* ((switch-op  (car form))
 	 (body (cdr form))
 	 (switch-op-1 (c1expr switch-op)))
     (cond ((and (typep (second switch-op-1 ) 'info)
-		(type>= 'fixnum (info-type (second switch-op-1))))
+		(type>= #tfixnum (info-type (second switch-op-1))))
 	   ;;optimize into a C switch:
 	   ;;If we ever get GCC to do switch's with an enum arg,
 	   ;;which don't do bounds checking, then we will
@@ -369,7 +369,7 @@
 						  nil
 						  :ref-ccb nil
 						  :ref-clb nil)))
-			       (cond((typep x 'fixnum)
+			       (cond((typep x #tfixnum)
 				     (setf (tag-ref tag) t)
 				     (setf (tag-switch tag) x))
 				    ((eq t x)
@@ -387,7 +387,7 @@
 	  (t (c1expr (cmp-macroexpand-1 (cons 'switch form)))))))
 
 (defun c2switch (op ref-clb ref-ccb body &aux  (*inline-blocks* 0)(*vs* *vs*))
-  (let ((args (inline-args (list op ) '(fixnum ))))
+  (let ((args (inline-args (list op ) `(,#tfixnum ))))
     (wt-inline-loc "switch(#0){" args)
     (cond (ref-ccb (c2tagbody-ccb body))
 	  (ref-clb (c2tagbody-clb body))

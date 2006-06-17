@@ -169,7 +169,7 @@
 (defun result-type-from-loc (x)
   (cond ((consp x)
 	 (case (car x)
-	   ((fixnum-value inline-fixnum) 'fixnum)
+	   ((fixnum-value inline-fixnum) #tfixnum)
 	   (var (var-type (second x)))
 	   ;; eventually separate out other inlines
 	   (t (cond ((and (symbolp (car x))
@@ -274,7 +274,7 @@
 	  (add-value-type nil (or fname  'unknown-values))
 	(add-value-type (result-type-from-loc loc) nil)))
     (return-fixnum
-      (add-value-type 'fixnum nil))
+      (add-value-type #tfixnum nil))
     (return-object
       (add-value-type t nil))
     (top (setq *top-data* (cons fname nil)))))

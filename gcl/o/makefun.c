@@ -157,7 +157,8 @@ put_fn_procls(object sym,int argd,int oneval) {
       break;
     }
   else
-    ta=MMcons(sLA,Cnil);
+/*     ta=MMcons(sLA,Cnil); */
+    ta=sLA;
   putprop(sym,ta,sSproclaimed_return_type);
   if (oneval)
     putprop(sym,Ct,sSproclaimed_function);

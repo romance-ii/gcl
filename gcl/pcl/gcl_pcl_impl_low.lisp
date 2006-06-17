@@ -149,21 +149,26 @@ return o->s.s_gfdef==OBJNULL ? Cnil : Ct;
 
 (defentry %fboundp (object) (object __fboundp))
 
-(eval-when (compile eval load)
+(eval-when (compile eval load);FIXME do pushn here from compiler
+(defun do-norm (entry)
+  `(,(car entry) ,(mapcar 'compiler::cmp-norm-tp (cadr entry))
+    ,(compiler::cmp-norm-tp (caddr entry))
+    ,@(cdddr entry)))
+
 (defparameter *gcl-function-inlines*
-  '( (%fboundp (t) compiler::boolean nil nil "(#0)->s.s_gfdef!=OBJNULL")
-     (%symbol-function (t) t nil nil "(#0)->s.s_gfdef")
-     (si:%structure-name (t) t nil nil "(#0)->str.str_def->str.str_self[0]")
-    (si:%compiled-function-name (t) t nil nil "(#0)->cf.cf_name")
-    (si:%set-compiled-function-name (t t) t t nil "((#0)->cf.cf_name)=(#1)")
-    (cclosurep (t) compiler::boolean nil nil "type_of(#0)==t_cclosure")
-    (sfun-p (t) compiler::boolean nil nil "type_of(#0)==t_sfun")
-    (%cclosure-env (t) t nil nil "(#0)->cc.cc_env")
-    (%set-cclosure-env (t t) t t nil "((#0)->cc.cc_env)=(#1)")
-    #+turbo-closure
-    (%cclosure-env-nthcdr (fixnum t) t nil nil "(#1)->cc.cc_turbo[#0]")
-    
-    (logxor (fixnum fixnum) fixnum nil nil "((#0) ^ (#1))")))
+  (mapcar 'do-norm
+	  '( (%fboundp (t) compiler::boolean nil nil "(#0)->s.s_gfdef!=OBJNULL")
+	     (%symbol-function (t) t nil nil "(#0)->s.s_gfdef")
+	     (si:%structure-name (t) t nil nil "(#0)->str.str_def->str.str_self[0]")
+	     (si:%compiled-function-name (t) t nil nil "(#0)->cf.cf_name")
+	     (si:%set-compiled-function-name (t t) t t nil "((#0)->cf.cf_name)=(#1)")
+	     (cclosurep (t) compiler::boolean nil nil "type_of(#0)==t_cclosure")
+	     (sfun-p (t) compiler::boolean nil nil "type_of(#0)==t_sfun")
+	     (%cclosure-env (t) t nil nil "(#0)->cc.cc_env")
+	     (%set-cclosure-env (t t) t t nil "((#0)->cc.cc_env)=(#1)")
+	     #+turbo-closure
+	     (%cclosure-env-nthcdr (fixnum t) t nil nil "(#1)->cc.cc_turbo[#0]")
+	     (logxor (fixnum fixnum) fixnum nil nil "((#0) ^ (#1))"))))
 
 (defun make-function-inline (inline)
   (setf (get (car inline) 'compiler::inline-always)
@@ -190,7 +195,7 @@ return o->s.s_gfdef==OBJNULL ? Cnil : Ct;
                                       (cadr inline))))
                     `((eval-when (compile eval load)
 				 (make-function-inline
-				  ',(cons name (cdr inline))))
+				  `(,',name ,@(cdr (assoc ',(car inline) *gcl-function-inlines*)))))
                       ,@(when (or (every #'(lambda (type) (eq type 't))
                                          (cadr inline))
                                   (char= #\% (aref (symbol-name (car inline)) 0)))
@@ -200,7 +205,7 @@ return o->s.s_gfdef==OBJNULL ? Cnil : Ct;
                                               `((declare (type ,var-type ,var)))))
                                         vars (cadr inline))
                               (the ,(caddr inline) (,name ,@vars)))
-                            (make-function-inline ',inline))))))
+                            (make-function-inline `(,',(car inline) ,@(cdr (assoc ',(car inline) *gcl-function-inlines*)))))))))
               *gcl-function-inlines*)))
 
 (define-inlines)

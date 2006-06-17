@@ -564,8 +564,10 @@
 
 ;FIXME should be able to carry a full type here.
 (defun sanitize-tp (tp)
-  (cond	((and (consp tp) (eq (car tp) 'values) (not (cddr tp))) (cadr tp))
-	((or (eq tp '*) (and (consp tp) (member (car tp) '(* values)))) '*)
+  (cond	;((and (consp tp) (eq (car tp) 'values) (not (cddr tp))) (cadr tp))
+	;((or (eq tp '*) (and (consp tp) (member (car tp) '(* values)))) '*)
+        ((eq tp '*) tp)
+        ((and (consp tp) (eq (car tp) 'values)) (cmp-norm-tp `(values ,@(mapcar 'sanitize-tp (cdr tp)))))
 	((car (member tp +useful-c-types+ :test 'type<=)))));FIXME recursion
 
 (defvar *recursion-detected*)
@@ -615,21 +617,21 @@
 
 	(cmpnote "(proclaim '(ftype (function ~s ~s) ~s~%" al rt fname)
 
-	(let ((oal (get fname 'proclaimed-arg-types))
-	      (ort (get fname 'proclaimed-return-type)))
+	(let ((oal (get-arg-types fname))
+	      (ort (get-return-type fname)))
 	  (when oal
 	    (unless (and (= (length al) (length oal))
 			 (every (lambda (x y) (or (and (eq x '*) (eq y '*)) (type>= y x))) al oal))
 	      (cmpwarn "arg type mismatch in auto-proclamation ~s -> ~s~%" oal al)
 	      ))
 	  (when ort
-	    (unless (or (and (eq rt '*) (or (eq ort '*) (equal ort '(*)))) (type>= ort rt))
+	    (unless (type>= ort rt)
 	      ;(cmpwarn "ret type mismatch in auto-proclamation ~s -> ~s~%" ort rt)
 	      ))
 	  (proclaim `(ftype (function ,al ,rt) ,fname));FIXME replace proclaim
-	  (si::add-hash fname (let* ((at (get fname 'proclaimed-arg-types))
-				     (rt (get fname 'proclaimed-return-type))
-				     (rt (if (equal '(*) rt) '* rt)))
+	  (si::add-hash fname (let* ((at (get-arg-types fname))
+				     (rt (get-return-type fname)))
+;				     (rt (if (equal '(*) rt) '* rt)))
 				(when (or at rt) (list at rt))) nil nil)
 	  (when *recursion-detected*;FIXME
 	    (unless (and (equal oal (get fname 'proclaimed-arg-types)) (equal ort (get fname 'proclaimed-return-type)))
@@ -683,7 +685,7 @@
 				      t))
 			   (type-and (car types) (var-type var))
 			   (or (member (car types)
-				       '(fixnum character
+				       #l(fixnum character
 						long-float short-float))
 			       (eq (var-loc var) 'object)
 			       *c-gc* 
@@ -1463,7 +1465,7 @@
 	 (let ((addr (make-info))
 	       (data (make-info)))
 	   (do-referred (v info)
-	     (cond ((member (var-type v) '(FIXNUM CHARACTER SHORT-FLOAT LONG-FLOAT) :test #'eq)
+	     (cond ((member (var-type v) #l(FIXNUM CHARACTER SHORT-FLOAT LONG-FLOAT))
 		    (push-referred v data))
 		   (t
 		    (push-referred v addr))))
@@ -1498,6 +1500,13 @@
 
 
 
+(defconstant +wt-c-var-alist+ `((,#tfixnum ."make_fixnum")
+				(,#tinteger ."make_integer") 
+				(,#tcharacter  ."code_char")
+				(,#tlong-float  ."make_longfloat")
+				(,#tshort-float ."make_shortfloat")
+				(object . "")))
+
 (defun wt-global-entry (fname cfun arg-types return-type)
     (cond ((get fname 'no-global-entry)(return-from wt-global-entry nil)))
     (wt-comment "global entry for the function " (function-string fname))
@@ -1505,25 +1514,22 @@
     (wt-nl1 "{	register object *base=vs_base;")
     (when (or *safe-compile* *compiler-check-args*)
           (wt-nl "check_arg(" (length arg-types) ");"))
-    (wt-nl "base[0]=" (case (promoted-c-type return-type)
-                            (fixnum (if (zerop *space*)
-                                        "CMPmake_fixnum"
-                                        "make_fixnum"))
-                            (character "code_char")
-                            (long-float "make_longfloat")
-                            (short-float "make_shortfloat")
-                            (otherwise ""))
+    (wt-nl "base[0]=" (let* ((tp (promoted-c-type return-type))
+			     (z (cdr (assoc tp +wt-c-var-alist+))))
+			(if (and (eq #tfixnum tp) (zerop *space*)) 
+			  (concatenate 'string "CMP" z) (or z "")));FIXME t
            "(" (c-function-name "LI" cfun fname) "(")
     (do ((types arg-types (cdr types))
          (n 0 (1+ n)))
         ((endp types))
         (declare (object types) (fixnum n))
-        (wt (case (promoted-c-type (car types))
-                  (fixnum "fix")
-                  (character "char_code")
-                  (long-float "lf")
-                  (short-float "sf")
-                  (otherwise ""))
+        (wt (let ((z (promoted-c-type (car types))))
+	      (cond ;FIXME
+		 ((eq z #tfixnum) "fix")
+		 ((eq z #tcharacter) "char_code")
+		 ((eq z #tlong-float) "lf")
+		 ((eq z #tshort-float) "sf")
+		 ("")))
             "(base[" n "])")
         (unless (endp (cdr types)) (wt ",")))
     (wt "));")
@@ -1531,14 +1537,16 @@
     (wt-nl1 "}")
     )
 
+(defconstant +wt-c-rep-alist+ `((,#tfixnum ."fixnum ")
+				(,#tinteger ."GEN ") 
+				(,#tcharacter  ."unsigned char ")
+				(,#tlong-float  ."double ")
+				(,#tshort-float ."float ")
+				(object . "object ")))
+
 (defun rep-type (type)
-  (case (promoted-c-type type)
-    (fixnum "fixnum ")
-    (integer "GEN ")
-    (character "unsigned char ")
-    (short-float "float ")
-    (long-float "double ")
-    (otherwise "object ")))
+  (let ((z (promoted-c-type type)))
+    (or (cdr (assoc z +wt-c-rep-alist+)) "object ")))
 
 
 (defun t1defmacro (args)

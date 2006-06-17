@@ -120,13 +120,14 @@ gcl_init_system(object no_init)
 /*   lsp_init("../mod/gcl_defpackage.lsp"); */
 /*   lsp_init("../mod/gcl_make_defpackage.lsp"); */
 
+  lsp_init("../cmpnew/gcl_cmptype.lsp");
   lsp_init("../cmpnew/gcl_cmpinline.lsp");
   lsp_init("../cmpnew/gcl_cmputil.lsp");
 
   lsp_init("../lsp/gcl_debug.lsp");
   lsp_init("../lsp/gcl_info.lsp");
 
-  lsp_init("../cmpnew/gcl_cmptype.lsp");
+/*   lsp_init("../cmpnew/gcl_cmptype.lsp"); */
   lsp_init("../cmpnew/gcl_cmpbind.lsp");
   lsp_init("../cmpnew/gcl_cmpblock.lsp");
   lsp_init("../cmpnew/gcl_cmpcall.lsp");

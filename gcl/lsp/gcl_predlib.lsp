@@ -131,10 +131,10 @@
     ((file-stream string-stream synonym-stream concatenated-stream
 		  broadcast-stream two-way-stream echo-stream) (eq (type-of-c object) tp))
     (t (cond 
-	 ((setq tem (when (symbolp tp) (get tp 'deftype-definition)))
-	  (typep-int object (dt-apply tem i)))
 	 ((if (symbolp tp) (get tp 's-data) (typep-int tp 's-data))
 	  (let ((z (structure-subtype-p object tp))) z))
+	 ((setq tem (when (symbolp tp) (get tp 'deftype-definition)))
+	  (typep-int object (dt-apply tem i)))
 	 ((classp tp)
 	  (subtypep1 (class-of object) tp))))))
 	 
@@ -298,6 +298,10 @@
 		  (coerce (imagpart object) (cadr type)))))
       (otherwise (check-type-eval object type)))))
 
+(defun maybe-clear-tp (sym)
+  (let* ((p (find-package "COMPILER")) (s (and p (find-symbol "*NORM-TP-HASH*" p))))
+    (when (and s (boundp s)) (remhash sym (symbol-value s)))))
+
 ;;; DEFTYPE macro.
 (defmacro deftype (name lambda-list &rest body &aux decls prot)
   ;; Replace undefaultized optional parameter X by (X '*).
@@ -331,6 +335,7 @@
 		(proclaim '(ftype (function ,prot t) ,fun-name))
 		(defun ,fun-name ,lambda-list ,@decls (block ,name ,@body))
 		(putprop ',name ',fun-name 'deftype-definition)
+		(maybe-clear-tp ',name)
 		(putprop ',name
 			 ,(find-documentation body)
 			 'type-documentation)
@@ -478,6 +483,7 @@
 (deftype function (&optional as vs) 
   (declare (ignore as vs)) 
   `(or interpreted-function compiled-function generic-function))
+(deftype generic-function nil nil);Overwritten by pcl check
 
 (deftype integer (&optional (low '*) (high '*)) `(integer ,low ,high))
 (deftype ratio (&optional (low '*) (high '*)) `(ratio ,low ,high))
@@ -547,8 +553,13 @@
 (defun long-float-p (x)
   (and (floatp x) (eql x (float x 0.0))))
 
-(defun proper-listp (x)
-  (or (not x) (and (consp x) (not (improper-consp x)))))
+;(defun proper-listp (x)
+;  (or (not x) (and (consp x) (not (improper-consp x)))))
+
+(deftype proper-list () `(or null proper-cons))
+
+(defun proper-consp (x)
+  (and (consp x) (not (improper-consp x))))
 
 (deftype not-type nil 'null)
 
@@ -561,7 +572,7 @@
           (keyword . keywordp)
 	  (non-logical-pathname . non-logical-pathname-p)
 	  (logical-pathname . logical-pathname-p)
-	  (proper-list . proper-listp)
+	  (proper-cons . proper-consp)
 	  (non-keyword-symbol . non-keyword-symbol-p)
 	  (standard-char . standard-char-p)
 	  (non-standard-base-char . non-standard-base-char-p)
@@ -605,7 +616,7 @@
 
 (defconstant +singleton-types+ '(non-keyword-symbol keyword standard-char
 				      non-standard-base-char 
-				      package cons-member proper-list
+				      package cons-member proper-cons
 				      broadcast-stream concatenated-stream echo-stream file-stream string-stream
 				      synonym-stream two-way-stream 
 				      non-logical-pathname logical-pathname
@@ -727,24 +738,31 @@
 	((member (car type) '(member eql)) type)
 	((copy-type (cdr type) (cons (car type) res)))))
 
+(defun expand-proper-cons (tp lt)
+  (cond ((atom tp))
+	((equal (car tp) '(proper-cons)) (setf (car tp) `(or (cons (t) (member nil)) (cons (t) (proper-cons)) ,@lt)))
+	((eq (car tp) 'cons))
+	((and (expand-proper-cons (car tp) lt) (expand-proper-cons (cdr tp) lt)))))
+
 (defun normalize-type (tp &optional ar);FIXME
   (let* ((tp (normalize-type-int tp ar))
 	 (lt (list-types tp)))
-    (if lt 
-	(nsublis `(((proper-list) . (or  (member nil) (cons (t) (proper-list)) ,@lt))) tp :test 'equal)
-      tp)))
+    (when lt (expand-proper-cons tp lt))
+    tp))
 
 (defmacro maybe-eval (x) `(if (and (consp ,x) (eq (car ,x) 'load-time-value)) (eval (cadr ,x)) ,x))
 
-(defun proper-cons-tp (tp)
-  (cond ((eq (car tp) 'cons) (cons 'cons (list '(t) (proper-cons-tp (caddr tp)))))
-	('(member nil))))
+(defun proper-cons-tp (tp end)
+  (cond ((eq (car tp) 'cons) (cons 'cons (list '(t) (proper-cons-tp (caddr tp) end))))
+	(end)))
 
 (defun list-types (tp &optional r)
   (cond ((atom tp) r)
 	((consp (car tp)) (let ((r (list-types (car tp) r))) (list-types (cdr tp) r)))
-	((and (eq (car tp) 'member) (member nil tp)) (pushnew '(member nil) r :test 'eq) (list-types (cdr tp) r))
-	((eq (car tp) 'cons) (pushnew (proper-cons-tp tp) r :test 'equal) (list-types (cdr tp) r))
+	((eq (car tp) 'cons) 
+	 (pushnew (proper-cons-tp tp '(proper-cons)) r :test 'equal)
+	 (pushnew (proper-cons-tp tp '(member nil)) r :test 'equal)
+	 (list-types (cdr tp) r))
 	((list-types (cdr tp) r))))
 
 
@@ -1038,7 +1056,7 @@
 ;; SINGLETON-TYPES
 
 (defun single-load (ntp type)
-  (ntp-ld ntp `(,(car type) t)))
+  (ntp-ld ntp `(,(car type) ,(or (cadr type) t))))
 
 (defun single-atm (x)
   (cond ((or (eq x t) (not x)))
@@ -1071,7 +1089,8 @@
 	      (not (negate (cadr x))))))
 
 (defun single-recon (x)
-  (cond ((atom (cadr x)) (car x))
+  (cond ((eq (cadr x) t) (car x))
+	((and (consp (cadr x)) (eq (caadr x) 'not)) `(and ,(car x) ,(cadr x)))
 	((cadr x))))
 
 
@@ -1122,11 +1141,13 @@
 	      (not (negate (cadr x))))))
 
 (defun array-recon (x) 
-  `(array ,(car (rassoc (car x) +array-type-alist+)) ,(cond ((eq (cadr x) t) '*) ((atom (cadr x)) (cadr x)) ((mapcar (lambda (x) (if (eq x t) '* x)) (cadr x))))))
+  `(array ,(car (rassoc (car x) +array-type-alist+)) 
+	  ,(cond ((eq (cadr x) t) '*) ((atom (cadr x)) (cadr x)) 
+		 ((mapcar (lambda (x) (if (eq x t) '* x)) (cadr x))))))
 
 ;; STRUCTURES
 
-(defun structure-load (ntp type) (single-load ntp type));;FIXME macro
+(defun structure-load (ntp type) (single-load ntp type))
 
 (defun structure-atm (x) (standard-atm x))
 
@@ -1147,7 +1168,7 @@
 	      ((and or) (sigalg-op op (cadr x) (cadr y) 'structure^ 'structure-atm))
 	      (not (negate (cadr x))))))
 
-(defun structure-recon (x) (cadr x))
+(defun structure-recon (x) (single-recon x))
 
 ;; STANDARD-OBJECTS
 
@@ -1180,7 +1201,7 @@
 	      ((and or) (sigalg-op op (cadr x) (cadr y) 'standard^ 'standard-atm))
 	      (not (negate (cadr x))))))
 
-(defun standard-recon (x) (cadr x))
+(defun standard-recon (x) (let ((z (cadr x))) (if (eq z t) (or (find-class 'standard-object) 'standard-object) z)))
 
 ;; CONS
 

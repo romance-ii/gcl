@@ -180,8 +180,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     funcallable (in preparation for automatic state/mutual recursion
     conversion),speed up proper-list type-or, give fdefinition a lisp
     definition to set up the prototype (removes a number of * returns)
+  * eq uniq types, values return type autoproclamation support
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  9 Jun 2006 20:50:39 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 17 Jun 2006 19:26:49 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

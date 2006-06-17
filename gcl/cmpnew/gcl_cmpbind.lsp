@@ -48,22 +48,22 @@
 		 (wt-vs (var-ref var))
 		 (wt ";"))
 		(t (wfs-error))))
-	(INTEGER
-	 (wt-nl "SETQ_IO(V" (var-loc var)","
-		"V" (var-loc var)"alloc,")
-	 (wt "(") (wt-vs (var-ref var)) (wt "),")
-	 (wt (bignum-expansion-storage) ");"))
         (t
-         (wt-nl "V" (var-loc var) "=")
-         (case (var-kind var)
-               (OBJECT)
-               (FIXNUM (wt "fix"))
-               (CHARACTER (wt "char_code"))
-               (LONG-FLOAT (wt "lf"))
-               (SHORT-FLOAT (wt "sf"))
-               (t (baboon)))
-         (wt "(") (wt-vs (var-ref var)) (wt ");")))
-  )
+	 (cond ((eq (var-kind var) #tinteger)
+		(wt-nl "SETQ_IO(V" (var-loc var)","
+		       "V" (var-loc var)"alloc,")
+		(wt "(") (wt-vs (var-ref var)) (wt "),")
+		(wt (bignum-expansion-storage) ");"))
+	       (t 
+		(wt-nl "V" (var-loc var) "=")
+		(cond ;FIXME
+		 ((eq (var-kind var) 'OBJECT))
+		 ((eq (var-kind var) #tfixnum) (wt "fix"))
+		 ((eq (var-kind var) #tcharacter) (wt "char_code"))
+		 ((eq (var-kind var) #tlong-float) (wt "lf"))
+		 ((eq (var-kind var) #tshort-float) (wt "sf"))
+		 ((baboon)))
+		(wt "(") (wt-vs (var-ref var)) (wt ");"))))))
 
 (defun c2bind-loc (var loc)
   (case (var-kind var)
@@ -82,19 +82,20 @@
 
         (DOWN
 	  (wt-nl "base0[" (var-loc var) "]=" loc ";"))
-	(INTEGER
-	 (let ((*inline-blocks* 0) (*restore-avma* *restore-avma*))
-	   (save-avma '(nil integer))
-	   (wt-nl "V" (var-loc var) "= ")
-	   (wt-integer-loc loc)
-	   (wt ";")
-	   (close-inline-blocks)))
         (t
-         (wt-nl "V" (var-loc var) "= ")
-         (let ((wtf (cdr (assoc (var-kind var) +wt-loc-alist+))))
-          (unless wtf (baboon))
-          (funcall wtf loc))
-         (wt ";"))))
+	 (cond ((eq (var-kind var) #tinteger)
+		(let ((*inline-blocks* 0) (*restore-avma* *restore-avma*))
+		  (save-avma '(nil integer))
+		  (wt-nl "V" (var-loc var) "= ")
+		  (wt-integer-loc loc)
+		  (wt ";")
+		  (close-inline-blocks)))
+	       (t
+		(wt-nl "V" (var-loc var) "= ")
+		(let ((wtf (cdr (assoc (var-kind var) +wt-loc-alist+))))
+		  (unless wtf (baboon))
+		  (funcall wtf loc))
+		(wt ";"))))))
 
 (defun c2bind-init (var init)
   (case (var-kind var)

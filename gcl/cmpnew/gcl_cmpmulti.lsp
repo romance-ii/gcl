@@ -124,7 +124,7 @@
 	     ;; so if we know there's one value only:
 	     (c1expr (let ((s (gensym))) `(let ((,s ,(car args))) ,s))))
 	    (t  (setq args (c1args args info))
-		(setf (info-type info) (cons 'values (mapcar (lambda (x) (coerce-to-one-value (info-type (cadr x)))) args)))
+		(setf (info-type info) (cmp-norm-tp (cons 'values (mapcar (lambda (x) (coerce-to-one-value (info-type (cadr x)))) args))))
 		(list 'values info args))))
 
 (defun c2values (forms &aux (base *vs*) (*vs* *vs*))
@@ -159,8 +159,8 @@
           (push var vrefs)
           (push-changed (car var) info)
           )
-  (setf (info-type info) (type-and (info-type (cadar (c1args (car args) info)))
-				   (info-type (cadar (c1args (cdr args) info)))))
+  (setf (info-type info) (type-and (info-type (cadar (last (c1args (car args) info))))
+				   (info-type (cadar (last (c1args (cdr args) info))))))
   (let* ((v (c1expr* (cadr args) info))
 	 (it (info-type (cadr v))))
     (cond ((and (consp it) (eq (car it) 'values))
@@ -180,7 +180,8 @@
 		       (and tem
 			    ;; proclaimed to have 1 arg:
 			    (consp tem)
-			    (not (equal tem '(*)))
+;			    (not (equal tem '(*)))
+			    (not (eq tem '*))
 			    (null (cdr tem)))))
 		(cmpwarn "~A was proclaimed to have only one return value. ~%;But you appear to want multiple values." fname))))))
 		

@@ -106,13 +106,14 @@ gcl_init_system(object no_init)
   ar_check_init(gcl_sloop,no_init);
   ar_check_init(gcl_serror,no_init);
 	
+  ar_check_init(gcl_cmptype,no_init);
   ar_check_init(gcl_cmpinline,no_init);
   ar_check_init(gcl_cmputil,no_init);
 
   ar_check_init(gcl_debug,no_init);
   ar_check_init(gcl_info,no_init);
 
-  ar_check_init(gcl_cmptype,no_init);
+/*   ar_check_init(gcl_cmptype,no_init); */
   ar_check_init(gcl_cmpbind,no_init);
   ar_check_init(gcl_cmpblock,no_init);
   ar_check_init(gcl_cmpcall,no_init);

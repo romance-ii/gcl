@@ -228,6 +228,14 @@
   (or (si::fixnump n) (wfs-error))
   (wt "base0[" n "]"))
 
+(defconstant +wt-c-var-alist+ `((,#tfixnum ."make_fixnum")
+				(,#tinteger ."make_integer") 
+				(,#tcharacter  ."code_char")
+				(,#tlong-float  ."make_longfloat")
+				(,#tshort-float ."make_shortfloat")
+				(object . "")))
+
+
 (defun wt-var (var ccb)
   (case (var-kind var)
         (LEXICAL (cond (ccb (wt-ccb-vs (var-ref-ccb var)))
@@ -245,16 +253,12 @@
         (GLOBAL (if *safe-compile*
                     (wt "symbol_value(VV[" (var-loc var) "])")
                     (wt "(VV[" (var-loc var) "]->s.s_dbind)")))
-        (t (case (var-kind var)
-                 (FIXNUM (when (zerop *space*) (wt "CMP"))
-                         (wt "make_fixnum"))
-		 (INTEGER (wt "make_integer")) 
-                 (CHARACTER (wt "code_char"))
-                 (LONG-FLOAT (wt "make_longfloat"))
-                 (SHORT-FLOAT (wt "make_shortfloat"))
-                 (OBJECT)
-                 (t (baboon)))
-           (wt "(V" (var-loc var) ")"))
+        (t (let ((z (cdr (assoc (var-kind var) +wt-c-var-alist+))))
+	     (unless z (baboon))
+	     (when (and (eq #tfixnum (var-kind var)) (zerop *space*)) 
+	       (wt "CMP"))
+	     (wt z)
+           (wt "(V" (var-loc var) ")")))
         ))
 
 ;; When setting bignums across setjmps, cannot use alloca as longjmp
@@ -284,38 +288,37 @@
 	    (DOWN
 	      (wt-nl "") (wt-down (var-loc var))
 	      (wt "=" loc ";"))
-	    (INTEGER
-	     (let ((first (and (consp loc) (car loc)))
-		   (n (var-loc var)))
-	       (case first
-		 (inline-fixnum
-		  (wt-nl "ISETQ_FIX(V"n",V"n"alloc,")
-		  (wt-inline-loc (caddr loc) (cadddr loc)))
-		 (fixnum-value (wt-nl "ISETQ_FIX(V"n",V"n"alloc,"(caddr loc)))
-
-		 (var
-		  (case (var-kind (cadr loc))
-		    (integer (wt "SETQ_II(V"n",V"n"alloc,V" (var-loc (cadr loc)) ","
-				 (bignum-expansion-storage)))
-		    (fixnum  (wt "ISETQ_FIX(V"n",V"n"alloc,V" (var-loc (cadr loc))))
-		    (otherwise (wt "SETQ_IO(V"n",V"n"alloc,"loc ","
-				   (bignum-expansion-storage)))))
-		 (vs (wt "SETQ_IO(V"n",V"n"alloc,"loc ","
-			 (bignum-expansion-storage)))
-		 (otherwise
-		  (let ((*inline-blocks* 0) (*restore-avma* *restore-avma*))
-		    (save-avma '(nil integer))
-		    (wt-nl "SETQ_II(V"n",V" n"alloc,")
-		    (wt-integer-loc loc)
-		    (wt "," (bignum-expansion-storage) ");")
-		    (close-inline-blocks))
-		  (return-from set-var nil))
-		  )
-	       (wt ");")))
             (t
-             (wt-nl "V" (var-loc var) "= ")
-	     (funcall (or (cdr (assoc (var-kind var) +wt-loc-alist+)) (baboon)) loc)
-             (wt ";")))))
+	     (cond ((eq (var-kind var) #tinteger)
+		    (let ((first (and (consp loc) (car loc)))
+			  (n (var-loc var)))
+		      (case first
+			(inline-fixnum
+			 (wt-nl "ISETQ_FIX(V"n",V"n"alloc,")
+			 (wt-inline-loc (caddr loc) (cadddr loc)))
+			(fixnum-value (wt-nl "ISETQ_FIX(V"n",V"n"alloc,"(caddr loc)))
+			(var
+			 (cond 
+			  ((eq (var-kind (cadr loc)) #tinteger) 
+			   (wt "SETQ_II(V"n",V"n"alloc,V" (var-loc (cadr loc)) "," (bignum-expansion-storage)))
+			  ((eq (var-kind (cadr loc)) #tfixnum)  
+			   (wt "ISETQ_FIX(V"n",V"n"alloc,V" (var-loc (cadr loc))))
+			  ((wt "SETQ_IO(V"n",V"n"alloc,"loc "," (bignum-expansion-storage)))))
+			(vs (wt "SETQ_IO(V"n",V"n"alloc,"loc ","
+				(bignum-expansion-storage)))
+			(otherwise
+			 (let ((*inline-blocks* 0) (*restore-avma* *restore-avma*))
+			   (save-avma '(nil integer))
+			   (wt-nl "SETQ_II(V"n",V" n"alloc,")
+			   (wt-integer-loc loc)
+			   (wt "," (bignum-expansion-storage) ");")
+			   (close-inline-blocks))
+			 (return-from set-var nil)))
+		      (wt ");")))
+		   (t 
+		    (wt-nl "V" (var-loc var) "= ")
+		    (funcall (or (cdr (assoc (var-kind var) +wt-loc-alist+)) (baboon)) loc)
+		    (wt ";")))))))
 
 (defun sch-global (name)
   (dolist* (var *undefined-vars* nil)
@@ -366,7 +369,7 @@
 	  (throw (var-tag v) v))))))
 
 (defun set-form-type (form type)
-  (let* ((it (info-type (cadr form)))
+  (let* ((it (coerce-to-one-value (info-type (cadr form))))
 	 (nt (type-and type it)))
     (unless (or nt (not (and type it)))
       (cmpwarn "Type mismatch: ~s ~s~%" it type))
@@ -375,8 +378,8 @@
 	  ((let let*) (set-form-type (car (last form)) type))
 	  (progn (set-form-type (car (last (third form))) type))
 	  (if 
-	    (let ((tt (type-and type (info-type (cadr (fourth form)))))
-		  (ft (type-and type (info-type (cadr (fifth form))))))
+	    (let ((tt (type-and type (coerce-to-one-value (info-type (cadr (fourth form))))))
+		  (ft (type-and type (coerce-to-one-value (info-type (cadr (fifth form)))))))
 	      (unless tt
 		(set-form-type (fifth form) type)
 		(setf (car form) 'progn (cadr form) (cadr (fifth form)) (caddr form) (list (fifth form)) (cdddr form) nil))
@@ -505,9 +508,9 @@
 (defun wt-var-decl (var)
   (cond ((var-p var)
 	 (let ((n (var-loc var)))
-	   (cond ((eq (var-kind var) 'integer)(wt "IDECL(")))
+	   (cond ((eq (var-kind var) #tinteger)(wt "IDECL(")))
 	   (wt *volatile* (register var) (rep-type (var-kind var))
 	       "V" n )
-	   (if (eql (var-kind var) 'integer) (wt ",V"n"space,V"n"alloc)"))
+	   (if (eql (var-kind var) #tinteger) (wt ",V"n"space,V"n"alloc)"))
 	   (wt ";")))
         (t (wfs-error))))

@@ -22,35 +22,6 @@
 
 (in-package 'compiler)
 
-(import 'si::proclaimed-arg-types 'compiler)
-(import 'si::proclaimed-return-type 'compiler)
-(import 'si::proclaimed-function 'compiler)
-(import 'si::proper-list 'compiler)
-(import 'si::subtypep1 'compiler)
-(import 'si::resolve-type 'compiler)
-(import 'si::+inf 'compiler)
-(import 'si::-inf 'compiler)
-(import 'si::nan 'compiler)
-(import 'si::isfinite 'compiler)
-(import 'si::+type-alist+ 'compiler)
-(import 'si::sequencep 'compiler)
-(import 'si::ratiop 'compiler)
-(import 'si::short-float-p 'compiler)
-(import 'si::long-float-p 'compiler)
-(import 'si::interpreted-function 'compiler)
-(import 'si::eql-is-eq 'compiler)
-(import 'si::equal-is-eq 'compiler)
-(import 'si::equalp-is-eq 'compiler)
-(import 'si::eql-is-eq-tp 'compiler)
-(import 'si::equal-is-eq-tp 'compiler)
-(import 'si::equalp-is-eq-tp 'compiler)
-(import 'si::is-eq-test-item-list 'compiler)
-(import 'si::cmp-vec-length 'compiler)
-(import 'si::proclaim-from-argd 'compiler)
-(let ((p (find-package "DEFPACKAGE")))
-  (when p
-    (import (find-symbol "DEFPACKAGE" p) 'compiler)))
-
 (defmacro is-setf-function (name)
   `(and (consp ,name) (eq (car ,name) 'setf) 
 	(consp (cdr ,name)) (symbolp (cadr ,name))
@@ -68,7 +39,7 @@
 (defmacro mia (x y) `(make-array ,x :adjustable t :fill-pointer ,y))
 (defmacro eql-not-nil (x y) `(and ,x (eql ,x ,y)))
 
-(defstruct (info (:copier old-copy-info))
+(defstruct (info (:copier old-copy-info) (:constructor old-make-info))
   (type t)		;;; Type of the form.
   (sp-change nil)	;;; Whether execution of the form may change
 			;;; the value of a special variable *VS*.
@@ -88,25 +59,32 @@
 ;; allocate them on the local stack and save gc, but cannot be passed
 ;; as function arguments or returned therefrom.  20050707 CM.
 
-(defconstant +c-global-arg-types+   `(fixnum)) ;FIXME (long-float short-float) later
-(defconstant +c-local-arg-types+    (union +c-global-arg-types+ '(fixnum character long-float short-float)))
-(defconstant +c-local-var-types+    (union +c-local-arg-types+ '(fixnum character long-float short-float integer)))
+(defconstant +c-global-arg-types-syms+   `(fixnum)) ;FIXME (long-float short-float) later
+(defconstant +c-local-arg-types-syms+    (union +c-global-arg-types-syms+ '(fixnum character long-float short-float)))
+(defconstant +c-local-var-types-syms+    (union +c-local-arg-types-syms+ '(fixnum character long-float short-float integer)))
 
 (defun get-sym (args)
   (intern (apply 'concatenate 'string (mapcar 'string args))))
 
 (defconstant +set-return-alist+ 
-  (mapcar (lambda (x) (cons (get-sym `("RETURN-" ,x)) (get-sym `("SET-RETURN-" ,x)))) +c-local-arg-types+))
+  (mapcar (lambda (x) (cons (get-sym `("RETURN-" ,x)) (get-sym `("SET-RETURN-" ,x)))) +c-local-arg-types-syms+))
 (defconstant +return-alist+ 
-  (mapcar (lambda (x) (cons x (get-sym `("RETURN-" ,x)))) (cons 'object +c-local-arg-types+)))
+  (mapcar (lambda (x) (cons (if (eq x 'object) x (cmp-norm-tp x)) (get-sym `("RETURN-" ,x)))) (cons 'object +c-local-arg-types-syms+)))
 (defconstant +wt-loc-alist+ 
   `((object . wt-loc)
-    ,@(mapcar (lambda (x) (cons x (get-sym `("WT-" ,x "-LOC")))) +c-local-var-types+)))
+    ,@(mapcar (lambda (x) (cons (cmp-norm-tp x) (get-sym `("WT-" ,x "-LOC")))) +c-local-var-types-syms+)))
 (defconstant +coersion-alist+
-  (mapcar (lambda (x) (cons x (get-sym `(,x "-LOC")))) +c-local-var-types+))
+  (mapcar (lambda (x) (cons (cmp-norm-tp x) (get-sym `(,x "-LOC")))) +c-local-var-types-syms+))
 (defconstant +inline-types-alist+ 
-  `((boolean . inline-cond) (t . inline) 
-    ,@(mapcar (lambda (x) (cons x (get-sym `("INLINE-" ,x)))) +c-local-var-types+)))
+  `((,#tboolean . inline-cond) (t . inline) 
+    ,@(mapcar (lambda (x) (cons (cmp-norm-tp x) (get-sym `("INLINE-" ,x)))) +c-local-var-types-syms+)))
+
+(defconstant +c-global-arg-types+   (mapcar 'cmp-norm-tp +c-global-arg-types-syms+)) ;FIXME (long-float short-float) later
+(defconstant +c-local-arg-types+    (mapcar 'cmp-norm-tp +c-local-arg-types-syms+))
+(defconstant +c-local-var-types+    (mapcar 'cmp-norm-tp +c-local-var-types-syms+))
+
+
+
 
 (defun copy-array (array)
   (declare ((vector t) array))
@@ -124,13 +102,22 @@
 	  (copy-array (info-changed-array info)))    
     new-info))
 
+(defun make-info (&rest args)
+  (let ((z (member :type args)))
+    (if z (apply 'old-make-info (mapcar (lambda (x) (if (eq x (cadr z)) (cmp-norm-tp x) x)) args))
+      (apply 'old-make-info args))))
+
+(defconstant +c1nil+ (list 'LOCATION (make-info :type (object-type nil)) nil))
+(defmacro c1nil () `+c1nil+)
+(defconstant +c1t+ (list 'LOCATION (make-info :type (object-type t)) t))
+(defmacro c1t () `+c1t+)
+
 (defun bsearchleq (x a i j le)
-  (declare (object x le) ((vector t) a) (fixnum i j))
-  (when (eql i j)
+  (declare ((vector t) a) (seqind i j))
+  (when (= i j)
     (return-from bsearchleq (if (or le (and (< i (length a)) (eq x (aref a i)))) i (length a))))
-  (let* ((k (the fixnum (+ i (the fixnum (ash (the fixnum (- j i) ) -1)))))
+  (let* ((k (+ i (ash (- j i) -1)))
 	 (y (aref a k)))
-    (declare (fixnum k) (object y))
     (cond ((si::objlt x y)
 	   (bsearchleq x a i k le))
 	  ((eq x y) k)
@@ -228,17 +215,20 @@
   to-info)
 
 (defun args-info-changed-vars (var forms)
-  (case (var-kind var)
-    ((LEXICAL FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT OBJECT)
-     (dolist** (form forms)
-	       (when (is-changed var (cadr form))
-                 (return-from args-info-changed-vars t))))
-    (REPLACED nil)
-    (t (dolist** (form forms nil)
-		 (when (or (is-changed var (cadr form))
-			   (info-sp-change (cadr form)))
-                   (return-from args-info-changed-vars t)))))
-  )
+  (if (member (var-kind var) #l(FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT))
+      (dolist** (form forms)
+		(when (is-changed var (cadr form))
+		  (return-from args-info-changed-vars t)))
+    (case (var-kind var)
+	  ((LEXICAL OBJECT)
+	   (dolist** (form forms)
+		     (when (is-changed var (cadr form))
+		       (return-from args-info-changed-vars t))))
+	  (REPLACED nil)
+	  (t (dolist** (form forms nil)
+		       (when (or (is-changed var (cadr form))
+				 (info-sp-change (cadr form)))
+			 (return-from args-info-changed-vars t)))))))
 
 ;; Variable references in arguments can also be via replaced variables
 ;; (see gcl_cmplet.lsp) It appears that this is not necessary when
@@ -266,18 +256,22 @@
 	 (return-from is-rep-referred t))))))
 
 (defun args-info-referred-vars (var forms)
-  (case (var-kind var)
-        ((LEXICAL REPLACED FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT OBJECT)
-         (dolist** (form forms nil)
-           (when (or (is-referred var (cadr form))
-		     (is-rep-referred var (cadr form)))
-                 (return-from args-info-referred-vars t))))
-        (t (dolist** (form forms nil)
+  (if (member (var-kind var) #l(FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT))
+      (dolist** (form forms nil)
+		(when (or (is-referred var (cadr form))
+			  (is-rep-referred var (cadr form)))
+		  (return-from args-info-referred-vars t)))
+    (case (var-kind var)
+	  ((LEXICAL REPLACED OBJECT)
+	   (dolist** (form forms nil)
 		     (when (or (is-referred var (cadr form))
-			       (is-rep-referred var (cadr form))
-			       (info-sp-change (cadr form)))
+			       (is-rep-referred var (cadr form)))
 		       (return-from args-info-referred-vars t))))
-        ))
+	  (t (dolist** (form forms nil)
+		       (when (or (is-referred var (cadr form))
+				 (is-rep-referred var (cadr form))
+				 (info-sp-change (cadr form)))
+			 (return-from args-info-referred-vars t)))))))
 
 ;;; Valid property names for open coded functions are:
 ;;;  INLINE
@@ -319,31 +313,33 @@
       (let ((form (car forms))
             (type (car types)))
         (declare (object form type))
+	(let ((type (cond ((type>= type t) type) 
+			  ((type>= type (info-type (cadr form))) (promoted-c-type (type-and type (info-type (cadr form)))))
+			  (type))));FIXME fixnum-float support
         (case (car form)
               (LOCATION (push (coerce-loc (caddr form) type) locs))
               (VAR
-               (cond ((args-info-changed-vars (caaddr form) (cdr forms))
-                      (cond ((and (member (var-kind (caaddr form)) +c-local-var-types+)
-                                  (eq type (var-kind (caaddr form))))
-                             (let ((cvar (cs-push type t)))
-                               (wt-nl "{" (rep-type type) "V" cvar "= V"
-                                      (var-loc (caaddr form)) ";")
-                               (push (list 'cvar cvar 'inline-args) locs)
-                               (inc-inline-blocks)))
-                            (t 
-                             (let ((temp (wt-c-push type)))
-                               (wt-nl temp "= ")
-                               (wt-var (caaddr form) (cadr (caddr form)))
-                               (wt ";")
-                               (push (coerce-loc temp type) locs)))))
-                     ((and (member (var-kind (caaddr form)) +c-local-var-types+)
+	       (cond ((args-info-changed-vars (caaddr form) (cdr forms))
+		      (cond ((and (member (var-kind (caaddr form)) +c-local-var-types+)
+				  (eq type (var-kind (caaddr form))))
+			     (let ((cvar (cs-push type t)))
+			       (wt-nl "{" (rep-type type) "V" cvar "= V"
+				      (var-loc (caaddr form)) ";")
+			       (push (list 'cvar cvar 'inline-args) locs)
+			       (inc-inline-blocks)))
+			    ((let ((temp (wt-c-push type)))
+			       (wt-nl temp "= ")
+			       (wt-var (caaddr form) (cadr (caddr form)))
+			       (wt ";")
+			       (push (coerce-loc temp type) locs)))))
+		     ((and (member (var-kind (caaddr form)) +c-local-var-types+)
 			   (not (eq type (var-kind (caaddr form)))))
 		      (let ((temp (cs-push type)))
 			(wt-nl "V" temp " = "
 			       (coerce-loc (cons 'var (caddr form)) type) ";")
 			(push (list 'cvar temp) locs)))
-                     (t (push (coerce-loc (cons 'VAR (caddr form)) type)
-                              locs))))
+		     ((push (coerce-loc (cons 'VAR (caddr form)) type)
+			    locs))))
               (CALL-GLOBAL
                (if (let ((fname (caddr form)))
 		     (and (inline-possible fname)
@@ -356,7 +352,7 @@
                          ((or (and (flag-p (caddr ii) ans)(not *c-gc*))
 						; returns new object
                               (and (member (cadr ii)
-                                           '(FIXNUM LONG-FLOAT SHORT-FLOAT))
+                                           #l(FIXNUM LONG-FLOAT SHORT-FLOAT))
                                    (not (eq type (cadr ii)))))
 			  (let ((temp (cs-push type)))
 			    (wt-nl "V" temp " = " (coerce-loc loc type) ";")
@@ -420,7 +416,7 @@
 				    nil)))))
 		   (let ((*value-to-go* temp))
 		     (c2expr* form)
-		     (push (coerce-loc temp type) locs))))))))
+		     (push (coerce-loc temp type) locs)))))))))
 
 (defun coerce-loc (loc type)
   (let ((tl (cdr (assoc (promoted-c-type type) +coersion-alist+))))
@@ -502,7 +498,7 @@
   ;; ( n . string , function ) or string , function
   
   (when (and (setq x (get fname 'vfun))
-	     (if (and (consp x) (typep (car x) 'fixnum))
+	     (if (and (consp x) (typep (car x) #tfixnum))
 		 (prog1 (>= (length args)  (car x)) (setq x (cdr x)))
 	       t))
 	(return-from get-inline-info
@@ -517,7 +513,7 @@
 (defun inline-type-matches (fname inline-info arg-types return-type
                                         &aux (rts nil))
   (declare (ignore fname))
-  (if (not (typep (third inline-info) 'fixnum))
+  (if (not (typep (third inline-info) #tfixnum))
       (fix-opt inline-info))
   ;;         FIXME -- the idea here is that an inline might want to
   ;;         force the coersion of certain arguments, notably fixnums,
@@ -537,13 +533,13 @@
 		  (cond ((equal types '(*))
 			 (setq types `(,last *))))
 		  (let ((arg-type (coerce-to-one-value arg-type)))
-		    (cond ((eq (car types) 'fixnum-float)
-			   (cond ((type>= 'fixnum arg-type)
-				  (push 'fixnum rts))
-				 ((type>= 'long-float arg-type)
-				  (push 'long-float rts))
-				 ((type>= 'short-float arg-type)
-				  (push 'short-float rts))
+		    (cond ((eq (car types) #tfixnum-float);FIXME remove?
+			   (cond ((type>= #tfixnum arg-type)
+				  (push #tfixnum rts))
+				 ((type>= #tlong-float arg-type)
+				  (push #tlong-float rts))
+				 ((type>= #tshort-float arg-type)
+				  (push #tshort-float rts))
 				 (t (return nil))))
 			  ((type>= (car types) arg-type)
 			   (push (car types) rts))
@@ -578,7 +574,7 @@
               (VAR
                (when (or (args-info-changed-vars (caaddr form) (cdr forms))
                          (and (member (var-kind (caaddr form))
-                                      '(FIXNUM LONG-FLOAT SHORT-FLOAT))
+                                      #l(FIXNUM LONG-FLOAT SHORT-FLOAT))
                               (not (eq (car types)
                                        (var-kind (caaddr form))))))
                      (return t)))
@@ -594,7 +590,7 @@
 			 (flag-p (caddr ii) set)
 			 (flag-p (caddr ii) is)
                          (and (member (cadr ii)
-                                      '(fixnum long-float short-float))
+                                      #l(fixnum long-float short-float))
                               (not (eq (car types) (cadr ii))))
                          (need-to-protect (cadddr form) (car ii)))
                      (return t))))
@@ -762,20 +758,23 @@
 
 ;;FIXME -- All the var and C type code, e.g. var-type and var-kind, needs much centralization.
 ;;         20050106 CM.
+;; (defun c-cast (aet)
+;;   (case aet
+;;     (signed-char "char")
+;;     ((bit character unsigned-char non-negative-char) "unsigned char")
+;;     (signed-short "short")
+;;     ((non-negative-short unsigned-short) "unsigned short")
+;;     (signed-int "int")
+;;     ((non-negative-int unsigned-int) "unsigned int")
+;;     ((signed-fixnum fixnum #tnon-negative-fixnum) "fixnum")
+;;     ((unsigned-fixnum ) "object") ;FIXME
+;;     (short-float "float")
+;;     (long-float "double")
+;;     ((t object) "object")
+;;     (otherwise (baboon))))
 (defun c-cast (aet)
-  (case aet
-    (signed-char "char")
-    ((bit character unsigned-char non-negative-char) "unsigned char")
-    (signed-short "short")
-    ((non-negative-short unsigned-short) "unsigned short")
-    (signed-int "int")
-    ((non-negative-int unsigned-int) "unsigned int")
-    ((signed-fixnum fixnum non-negative-fixnum) "fixnum")
-    ((unsigned-fixnum ) "object") ;FIXME
-    (short-float "float")
-    (long-float "double")
-    ((t object) "object")
-    (otherwise (baboon))))
+  (or (cdr (assoc aet +c-type-string-alist+)) (baboon)))
+
 
 
 ;;FIXME -- This set of inlining/type-propagation work makes use of
@@ -806,8 +805,9 @@
 (defun aref-propagator (fn x &rest inds)
   (declare (ignore fn inds))
   (let* ((x (cmp-norm-tp x)))
-    (and (consp x) (member (car x) '(array simple-array))
-	 (and (not (eq (cadr x) '*)) (upgraded-array-element-type (nil-to-t (cadr x)))))))
+    (cmp-norm-tp 
+     (and (consp x) (member (car x) '(array simple-array))
+	  (and (not (eq (cadr x) '*)) (upgraded-array-element-type (nil-to-t (cadr x))))))))
 
 (defun var-array-type (a)
   (when (consp a)
@@ -834,14 +834,14 @@
   (let ((art (car r)))
     (let ((aet (aref-propagator 'cmp-aref art)))
       (if aet
-	  `((,art seqind) ,aet)
-	`((t seqind) t)))))
+	  `((,(cmp-norm-tp art) ,#tseqind) ,aet)
+	`((t ,#tseqind) t)))))
 
 (defun cmp-aref-inline (a i)
   (let ((at (nil-to-t (var-array-type a))))
     (let ((aet (aref-propagator 'cmp-aref at)))
       (if aet
-	  (if (eq aet 'bit) 
+	  (if (eq aet #tbit) 
 	      (progn
 		(wt  "(((" (c-cast aet) " *)(" a ")->bv.bv_self)[")
 		(wt-bv-index a i)
@@ -858,8 +858,8 @@
   (let ((art (car r)))
     (let ((aet (aref-propagator 'cmp-aset art)))
       (if aet
-	  `((,art seqind ,aet) ,aet)
-	`((t seqind t) t)))))
+	  `((,(cmp-norm-tp art) ,#tseqind ,aet) ,aet)
+	`((t ,#tseqind t) t)))))
 
 
 	       
@@ -868,7 +868,7 @@
   (let ((at (nil-to-t (var-array-type a))))
     (let ((aet (aref-propagator 'cmp-aset at)))
       (if aet
-	  (if (eq aet 'bit) 
+	  (if (eq aet #tbit) 
 	      (progn 
 		(wt  "(" j " ? (((" (c-cast aet) " *)(" a ")->bv.bv_self)[")
 		(wt-bv-index a i)
@@ -887,8 +887,8 @@
 ;(proclaim '(ftype (function (t rnkind) seqind) cmp-array-dimension))
 (defun cmp-array-dimension-inline-types (&rest r)
   (if (aref-propagator 'cmp-array-dimension (car r))
-      `((,(car r) rnkind) seqind)
-    `((t rnkind) seqind)))
+      `((,(cmp-norm-tp (car r)) ,#trnkind) ,#tseqind)
+    `((t ,#trnkind) ,#tseqind)))
 
 
 ;;FIXME lose the normalize-type
@@ -917,18 +917,37 @@
   ;;; The value NIL for each parameter except for fname means "not known".
   (when cname-string (si:putprop fname cname-string 'Lfun))
   (when arg-types
-        (si:putprop fname (mapcar #'(lambda (x)
-				      (if (eq x '*) '* (type-filter x)))
-				      arg-types) 'arg-types))
+        (si:putprop fname (mapcar 'cmp-norm-tp arg-types) 'arg-types))
 
   (when return-type
-	(let ((rt (function-return-type (if (atom return-type)
-					    (list return-type)
-					  return-type))))
+	(let ((rt (function-return-type (if (atom return-type) (list return-type) return-type))))
 	  (or  (consp rt) (setq rt (list rt)))
-	(si:putprop fname (if (null (cdr rt)) (car rt) (cons 'values rt))
-				'return-type)))
+	(si:putprop fname (type-filter (if (null (cdr rt)) (car rt) (cons 'values rt))) 'return-type)))
   (when never-change-special-var-p (si:putprop fname t 'no-sp-change))
-  (when predicate (si:putprop fname t 'predicate))
-  )
+  (when predicate (si:putprop fname t 'predicate)))
 
+;;FIXME -- This function needs expansion on centralization.  CM 20050106
+(defun promoted-c-type (type)
+  (let ((type (coerce-to-one-value type)))
+    (let ((ct (if (eq type 'object) type;FIXME!!!
+		(when type (car (member type
+;			   '(signed-char signed-short fixnum integer)
+;			   '(signed-char unsigned-char signed-short unsigned-short fixnum integer)
+			   `(,#tboolean ,@+c-local-var-types+)
+			   :test 'type<=))))))
+      (cond (ct)
+;	    ((eq type 'boolean))
+	    (type)))))
+;      (or ct type))))
+;      (if (integer-typep type)
+;	(cond ;((subtypep type 'signed-char) 'signed-char)
+;	 ((subtypep type 'fixnum) 'fixnum)
+;	 ((subtypep type 'integer) 'integer)
+;	 (t  (error "Cannot promote type ~S to C type~%" type)))
+;      type)))
+
+(defun default-init (type)
+  (let ((type (promoted-c-type type)))
+    (when (member type +c-local-var-types+)
+      (cmpwarn "The default value of NIL is not ~S." type)))
+  (c1nil))

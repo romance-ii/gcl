@@ -36,7 +36,7 @@
 (DEFSYSFUN 'FILE-AUTHOR "Lfile_author" '(T) 'T NIL NIL) 
 (DEFSYSFUN 'STRING-CAPITALIZE "Lstring_capitalize" '(T *) 'STRING NIL
     NIL) 
-(DEFSYSFUN 'MACROEXPAND "Lmacroexpand" '(T *) '(VALUES T T) NIL NIL) 
+(DEFSYSFUN 'MACROEXPAND "Lmacroexpand" '(T *) '(VALUES PROPER-LIST BOOLEAN) NIL NIL) 
 (DEFSYSFUN 'NCONC "Lnconc" '(*) 'T NIL NIL) 
 (DEFSYSFUN 'BOOLE "Lboole" '(T T T) 'T NIL NIL) 
 (DEFSYSFUN 'TAILP "Ltailp" '(T T) 'T NIL T) 
