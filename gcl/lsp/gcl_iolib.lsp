@@ -230,6 +230,10 @@
 	  ((subtypep1 (stream-element-type ostream) 'character)
 	   (length (let ((*print-escape* nil)) (write-to-string object)))))))
 
+(defmacro with-temp-file ((s pn) (tmp ext) &rest body) 
+  `(let* ((,s (temp-stream ,tmp ,ext)) 
+	  (,pn (stream-object1 ,s))) 
+     (unwind-protect (progn ,@body) (close ,s))))
 
 (defmacro with-open-file ((stream . filespec) . body)
   (declare (optimize (safety 1)))

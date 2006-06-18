@@ -147,6 +147,35 @@ object strm;
 	FEerror("Unexpected end of ~S.", 1, strm);
 }
 
+DEFUNO_NEW("TEMP-STREAM",object,fStemp_stream,SI
+	   ,2,2,NONE,OO,OO,OO,OO,void,siLtemp_stream,(object x,object ext),"") {
+  
+  object st;
+  char *c,*d;
+  int l;
+  check_type(x,t_string);
+  check_type(ext,t_string);
+  if (!(c=alloca(x->st.st_fillp+ext->st.st_fillp+8)))
+    FEerror("Cannot allocate temp name space",0);
+  if (!(d=alloca(x->st.st_fillp+ext->st.st_fillp+8)))
+    FEerror("Cannot allocate temp name space",0);
+  memcpy(c,x->st.st_self,x->st.st_fillp);
+  memcpy(c+x->st.st_fillp,"XXXXXX",6);
+  c[x->st.st_fillp+6]=0;
+  l=mkstemp(c);
+  memcpy(d,c,x->st.st_fillp+6);
+  memcpy(d+x->st.st_fillp+6,".",1);
+  memcpy(d+x->st.st_fillp+7,ext->st.st_self,ext->st.st_fillp);
+  d[x->st.st_fillp+ext->st.st_fillp+7]=0;
+  if (rename(c,d))
+    FEerror("Cannot rename ~s to ~s",2,make_simple_string(c),make_simple_string(d));
+  st=make_simple_string(d);
+  x=open_stream(st,smm_output,sKsupersede,Cnil);
+  close(l);
+  RETURN1(x);
+
+}
+
 DEFUNO_NEW("TERMINAL-INPUT-STREAM-P",object,fSterminal_input_stream_p,SI
 	  ,1,1,NONE,OO,OO,OO,OO,void,siLterminal_input_stream_p,(object x),"")
 {

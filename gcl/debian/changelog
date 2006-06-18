@@ -181,8 +181,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     conversion),speed up proper-list type-or, give fdefinition a lisp
     definition to set up the prototype (removes a number of * returns)
   * eq uniq types, values return type autoproclamation support
+  * preliminary temp stream facility
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 17 Jun 2006 19:26:49 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 18 Jun 2006 16:16:21 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
