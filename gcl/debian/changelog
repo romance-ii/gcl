@@ -182,8 +182,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     definition to set up the prototype (removes a number of * returns)
   * eq uniq types, values return type autoproclamation support
   * preliminary temp stream facility
+  * integrate temp-file facility into do-recompile
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 18 Jun 2006 16:16:21 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 19 Jun 2006 00:51:53 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

@@ -73,6 +73,7 @@
 (import 'si::proclaim-from-argd 'compiler)
 (import 'si::+array-types+ 'compiler)
 (import 'si::+aet-type-object+ 'compiler)
+(import 'si::*tmp-dir* 'compiler)
 
 (let ((p (find-package "DEFPACKAGE")))
   (when p

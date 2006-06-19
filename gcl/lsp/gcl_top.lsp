@@ -185,11 +185,8 @@
 	      (unless (boundp '*system-banner*) (setq *system-banner* (default-system-banner))))
 	    (when (boundp '*system-banner*)
 	      (format t "~a~%" *system-banner*))
-	    (let* ((c (find-package "COMPILER"))
-		   (tmp (and c (find-symbol "*TMP-DIR*" c))))
-	      (when tmp
-		(setf (symbol-value tmp) (funcall (find-symbol "GET-TEMP-DIR" c)))
-	(format t "Temporary directory for compiler files set to ~a~%" (symbol-value tmp))))))
+	    (setq *tmp-dir* (get-temp-dir))
+	    (format t "Temporary directory for compiler files set to ~a~%" *tmp-dir*)))
    (setq *ihs-top* 1)
    (in-package 'system::user) (incf system::*ihs-top* 2)
    (top-level1))

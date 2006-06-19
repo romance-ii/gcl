@@ -233,7 +233,7 @@
 (defmacro with-temp-file ((s pn) (tmp ext) &rest body) 
   `(let* ((,s (temp-stream ,tmp ,ext)) 
 	  (,pn (stream-object1 ,s))) 
-     (unwind-protect (progn ,@body) (close ,s))))
+     (unwind-protect (progn ,@body) (progn (close ,s) (delete-file ,s)))))
 
 (defmacro with-open-file ((stream . filespec) . body)
   (declare (optimize (safety 1)))
