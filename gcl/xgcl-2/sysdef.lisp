@@ -35,19 +35,48 @@
       "gcl_X10"
       "gcl_Xinit"
       "gcl_dwtrans"
-      "gcl_sysinit"
+;      "gcl_sysinit"
       ))
 
 
 (defun compile-xgcl()
-  (mapcar #'(lambda (x)
-              (compile-file (format nil "~a.lsp" x) :system-p t)) *files*)
-  )
+  (mapc (lambda (x) 
+	  (let ((x (concatenate 'string compiler::*cc* "-I../h " (namestring x))))
+	    (unless (zerop (system x))
+	      (error "compile failure: ~s~%" x))))
+	(directory "*.c"))
+  (mapc (lambda (x)
+	  (compile-file (format nil "~a.lsp" x) :system-p t)) *files*))
 
 
 (defun load-xgcl()
-  (mapcar #'(lambda (x) (load (format nil "~a.o" x))) *files*))
+  (mapcar (lambda (x) (load (format nil "~a.o" x))) *files*))
 
+(defun load-interp-xgcl()
+  (mapcar (lambda (x) (load (format nil "~a.lsp" x))) *files*))
+
+(defun save-xgcl (pn)
+  (let* ((x (mapcar (lambda (x) (probe-file (concatenate 'string x ".o"))) *files*))
+	 (y (directory "*.o"))
+	 (z (set-difference y x :test 'equal)))
+    (compiler::link x 
+		    (namestring pn) 
+		    (format nil "(load ~s)
+                                 (mapc 'load '~s)
+                                 (let ((si::*disable-recompile* nil))
+                                    (si::do-recompile ~s))" 
+			    "sysdef.lisp" x (let ((q "gcl_xrecompile.lsp")) (when (probe-file q) (delete-file q)) q))
+		    (reduce (lambda (&rest xy) (when xy (concatenate 'string (namestring (car xy)) " " (cadr xy)))) z
+			    :initial-value " -lXmu -lXt -lXext -lXaw6 -lX11" :from-end t) nil)
+    (let ((x (append x (list "gcl_xrecompile.o"))))
+      (compiler::link x 
+		      (namestring pn) 
+		      (format nil "(load ~s)
+                                   (mapc 'load '~s)
+                                   (setq si::*optimize-maximum-pages* t si::*disable-recompile* nil)" 
+			      "sysdef.lisp" x (let ((q "gcl_xrecompile.lsp")) (when (probe-file q) (delete-file q)) q))
+		    (reduce (lambda (&rest xy) (when xy (concatenate 'string (namestring (car xy)) " " (cadr xy)))) z
+			    :initial-value " -lXmu -lXt -lXext -lXaw6 -lX11" :from-end t) nil))))
 
 
 
