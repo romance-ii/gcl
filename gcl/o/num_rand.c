@@ -120,7 +120,7 @@ init_gmp_rnd_state(__gmp_randstate_struct *x) {
     void **p=(void *)x,**pe=p+sizeof(*x)/sizeof(*p);
     int i;
 
-    for (i=0;p<pe && (*p<(void *)DBEGIN || *p>(void *)core_end || (*p==trap_result && ++i));p++);
+    for (i=0;p<pe && (!*p || *p<(void *)DBEGIN || *p>(void *)core_end || (*p==trap_result && ++i));p++);
     if (p!=pe || i!=1)
       FEerror("Unknown pointer in rnd_date!",0);
 

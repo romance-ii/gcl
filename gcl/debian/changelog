@@ -183,8 +183,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * eq uniq types, values return type autoproclamation support
   * preliminary temp stream facility
   * integrate temp-file facility into do-recompile
+  * restore automatic heap start lowering
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 19 Jun 2006 00:51:53 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 20 Jun 2006 15:11:52 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

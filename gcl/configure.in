@@ -1371,7 +1371,7 @@ else
 if test "$enable_static" = "yes" ; then
   heap_ceiling=0x0
 else
-if ! test -x ldd ; then
+if ! test -x `which ldd` ; then
   heap_ceiling=0x0
 else
 echo "int main() {return 0;}" >foo.c
