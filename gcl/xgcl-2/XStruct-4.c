@@ -27,61 +27,49 @@
 #include <X11/Xutil.h>
 
 #include "include.h"
-
+#define int fixnum
 /********* XExtCodes funcions *****/
 
-int  make_XExtCodes (){
+int  make_XExtCodes (void) {
           return ((int) calloc(1, sizeof(XExtCodes)));
 }
 
-int  XExtCodes_first_error(i)
-XExtCodes* i;
+int  XExtCodes_first_error(XExtCodes *i)
 {
           return(i->first_error);
 }
 
-void set_XExtCodes_first_error(i, j)
-XExtCodes* i;
-int j;
+void set_XExtCodes_first_error(XExtCodes *i, int j)
 {
           i->first_error = j;
 }
 
-int  XExtCodes_first_event(i)
-XExtCodes* i;
+int  XExtCodes_first_event(XExtCodes *i)
 {
           return(i->first_event);
 }
 
-void set_XExtCodes_first_event(i, j)
-XExtCodes* i;
-int j;
+void set_XExtCodes_first_event(XExtCodes *i, int j)
 {
           i->first_event = j;
 }
 
-int  XExtCodes_major_opcode(i)
-XExtCodes* i;
+int  XExtCodes_major_opcode(XExtCodes *i)
 {
           return(i->major_opcode);
 }
 
-void set_XExtCodes_major_opcode(i, j)
-XExtCodes* i;
-int j;
+void set_XExtCodes_major_opcode(XExtCodes *i, int j)
 {
           i->major_opcode = j;
 }
 
-int  XExtCodes_extension(i)
-XExtCodes* i;
+int  XExtCodes_extension(XExtCodes *i)
 {
           return(i->extension);
 }
 
-void set_XExtCodes_extension(i, j)
-XExtCodes* i;
-int j;
+void set_XExtCodes_extension(XExtCodes *i, int j)
 {
           i->extension = j;
 }
@@ -89,45 +77,36 @@ int j;
 
 /********* XPixmapFormatValues funcions *****/
 
-int  make_XPixmapFormatValues (){
+int  make_XPixmapFormatValues (void) {
           return ((int) calloc(1, sizeof(XPixmapFormatValues)));
 }
 
-int  XPixmapFormatValues_scanline_pad(i)
-XPixmapFormatValues* i;
+int  XPixmapFormatValues_scanline_pad(XPixmapFormatValues *i)
 {
           return(i->scanline_pad);
 }
 
-void set_XPixmapFormatValues_scanline_pad(i, j)
-XPixmapFormatValues* i;
-int j;
+void set_XPixmapFormatValues_scanline_pad(XPixmapFormatValues *i, int j)
 {
           i->scanline_pad = j;
 }
 
-int  XPixmapFormatValues_bits_per_pixel(i)
-XPixmapFormatValues* i;
+int  XPixmapFormatValues_bits_per_pixel(XPixmapFormatValues *i)
 {
           return(i->bits_per_pixel);
 }
 
-void set_XPixmapFormatValues_bits_per_pixel(i, j)
-XPixmapFormatValues* i;
-int j;
+void set_XPixmapFormatValues_bits_per_pixel(XPixmapFormatValues *i, int j)
 {
           i->bits_per_pixel = j;
 }
 
-int  XPixmapFormatValues_depth(i)
-XPixmapFormatValues* i;
+int  XPixmapFormatValues_depth(XPixmapFormatValues *i)
 {
           return(i->depth);
 }
 
-void set_XPixmapFormatValues_depth(i, j)
-XPixmapFormatValues* i;
-int j;
+void set_XPixmapFormatValues_depth(XPixmapFormatValues *i, int j)
 {
           i->depth = j;
 }
@@ -135,305 +114,236 @@ int j;
 
 /********* XGCValues funcions *****/
 
-int  make_XGCValues (){
+int  make_XGCValues (void) {
           return ((int) calloc(1, sizeof(XGCValues)));
 }
 
-char XGCValues_dashes(i)
-XGCValues* i;
+char XGCValues_dashes(XGCValues *i)
 {
           return(i->dashes);
 }
 
-void set_XGCValues_dashes(i, j)
-XGCValues* i;
-char j;
+void set_XGCValues_dashes(XGCValues *i, char j)
 {
           i->dashes = j;
 }
 
-int  XGCValues_dash_offset(i)
-XGCValues* i;
+int  XGCValues_dash_offset(XGCValues *i)
 {
           return(i->dash_offset);
 }
 
-void set_XGCValues_dash_offset(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_dash_offset(XGCValues *i, int j)
 {
           i->dash_offset = j;
 }
 
-int  XGCValues_clip_mask(i)
-XGCValues* i;
+int  XGCValues_clip_mask(XGCValues *i)
 {
           return(i->clip_mask);
 }
 
-void set_XGCValues_clip_mask(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_clip_mask(XGCValues *i, int j)
 {
           i->clip_mask = j;
 }
 
-int  XGCValues_clip_y_origin(i)
-XGCValues* i;
+int  XGCValues_clip_y_origin(XGCValues *i)
 {
           return(i->clip_y_origin);
 }
 
-void set_XGCValues_clip_y_origin(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_clip_y_origin(XGCValues *i, int j)
 {
           i->clip_y_origin = j;
 }
 
-int  XGCValues_clip_x_origin(i)
-XGCValues* i;
+int  XGCValues_clip_x_origin(XGCValues *i)
 {
           return(i->clip_x_origin);
 }
 
-void set_XGCValues_clip_x_origin(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_clip_x_origin(XGCValues *i, int j)
 {
           i->clip_x_origin = j;
 }
 
-int  XGCValues_graphics_exposures(i)
-XGCValues* i;
+int  XGCValues_graphics_exposures(XGCValues *i)
 {
           return(i->graphics_exposures);
 }
 
-void set_XGCValues_graphics_exposures(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_graphics_exposures(XGCValues *i, int j)
 {
           i->graphics_exposures = j;
 }
 
-int  XGCValues_subwindow_mode(i)
-XGCValues* i;
+int  XGCValues_subwindow_mode(XGCValues *i)
 {
           return(i->subwindow_mode);
 }
 
-void set_XGCValues_subwindow_mode(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_subwindow_mode(XGCValues *i, int j)
 {
           i->subwindow_mode = j;
 }
 
-int  XGCValues_font(i)
-XGCValues* i;
+int  XGCValues_font(XGCValues *i)
 {
           return(i->font);
 }
 
-void set_XGCValues_font(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_font(XGCValues *i, int j)
 {
           i->font = j;
 }
 
-int  XGCValues_ts_y_origin(i)
-XGCValues* i;
+int  XGCValues_ts_y_origin(XGCValues *i)
 {
           return(i->ts_y_origin);
 }
 
-void set_XGCValues_ts_y_origin(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_ts_y_origin(XGCValues *i, int j)
 {
           i->ts_y_origin = j;
 }
 
-int  XGCValues_ts_x_origin(i)
-XGCValues* i;
+int  XGCValues_ts_x_origin(XGCValues *i)
 {
           return(i->ts_x_origin);
 }
 
-void set_XGCValues_ts_x_origin(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_ts_x_origin(XGCValues *i, int j)
 {
           i->ts_x_origin = j;
 }
 
-int  XGCValues_stipple(i)
-XGCValues* i;
+int  XGCValues_stipple(XGCValues *i)
 {
           return(i->stipple);
 }
 
-void set_XGCValues_stipple(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_stipple(XGCValues *i, int j)
 {
           i->stipple = j;
 }
 
-int  XGCValues_tile(i)
-XGCValues* i;
+int  XGCValues_tile(XGCValues *i)
 {
           return(i->tile);
 }
 
-void set_XGCValues_tile(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_tile(XGCValues *i, int j)
 {
           i->tile = j;
 }
 
-int  XGCValues_arc_mode(i)
-XGCValues* i;
+int  XGCValues_arc_mode(XGCValues *i)
 {
           return(i->arc_mode);
 }
 
-void set_XGCValues_arc_mode(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_arc_mode(XGCValues *i, int j)
 {
           i->arc_mode = j;
 }
 
-int  XGCValues_fill_rule(i)
-XGCValues* i;
+int  XGCValues_fill_rule(XGCValues *i)
 {
           return(i->fill_rule);
 }
 
-void set_XGCValues_fill_rule(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_fill_rule(XGCValues *i, int j)
 {
           i->fill_rule = j;
 }
 
-int  XGCValues_fill_style(i)
-XGCValues* i;
+int  XGCValues_fill_style(XGCValues *i)
 {
           return(i->fill_style);
 }
 
-void set_XGCValues_fill_style(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_fill_style(XGCValues *i, int j)
 {
           i->fill_style = j;
 }
 
-int  XGCValues_join_style(i)
-XGCValues* i;
+int  XGCValues_join_style(XGCValues *i)
 {
           return(i->join_style);
 }
 
-void set_XGCValues_join_style(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_join_style(XGCValues *i, int j)
 {
           i->join_style = j;
 }
 
-int  XGCValues_cap_style(i)
-XGCValues* i;
+int  XGCValues_cap_style(XGCValues *i)
 {
           return(i->cap_style);
 }
 
-void set_XGCValues_cap_style(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_cap_style(XGCValues *i, int j)
 {
           i->cap_style = j;
 }
 
-int  XGCValues_line_style(i)
-XGCValues* i;
+int  XGCValues_line_style(XGCValues *i)
 {
           return(i->line_style);
 }
 
-void set_XGCValues_line_style(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_line_style(XGCValues *i, int j)
 {
           i->line_style = j;
 }
 
-int  XGCValues_line_width(i)
-XGCValues* i;
+int  XGCValues_line_width(XGCValues *i)
 {
           return(i->line_width);
 }
 
-void set_XGCValues_line_width(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_line_width(XGCValues *i, int j)
 {
           i->line_width = j;
 }
 
-int  XGCValues_background(i)
-XGCValues* i;
+int  XGCValues_background(XGCValues *i)
 {
           return(i->background);
 }
 
-void set_XGCValues_background(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_background(XGCValues *i, int j)
 {
           i->background = j;
 }
 
-int  XGCValues_foreground(i)
-XGCValues* i;
+int  XGCValues_foreground(XGCValues *i)
 {
           return(i->foreground);
 }
 
-void set_XGCValues_foreground(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_foreground(XGCValues *i, int j)
 {
           i->foreground = j;
 }
 
-int  XGCValues_plane_mask(i)
-XGCValues* i;
+int  XGCValues_plane_mask(XGCValues *i)
 {
           return(i->plane_mask);
 }
 
-void set_XGCValues_plane_mask(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_plane_mask(XGCValues *i, int j)
 {
           i->plane_mask = j;
 }
 
-int  XGCValues_function(i)
-XGCValues* i;
+int  XGCValues_function(XGCValues *i)
 {
           return(i->function);
 }
 
-void set_XGCValues_function(i, j)
-XGCValues* i;
-int j;
+void set_XGCValues_function(XGCValues *i, int j)
 {
           i->function = j;
 }
@@ -528,110 +438,86 @@ int j;
 
 /********* Visual funcions *****/
 
-int  make_Visual (){
+int  make_Visual (void) {
           return ((int) calloc(1, sizeof(Visual)));
 }
 
-int  Visual_map_entries(i)
-Visual* i;
+int  Visual_map_entries(Visual *i)
 {
           return(i->map_entries);
 }
 
-void set_Visual_map_entries(i, j)
-Visual* i;
-int j;
+void set_Visual_map_entries(Visual *i, int j)
 {
           i->map_entries = j;
 }
 
-int  Visual_bits_per_rgb(i)
-Visual* i;
+int  Visual_bits_per_rgb(Visual *i)
 {
           return(i->bits_per_rgb);
 }
 
-void set_Visual_bits_per_rgb(i, j)
-Visual* i;
-int j;
+void set_Visual_bits_per_rgb(Visual *i, int j)
 {
           i->bits_per_rgb = j;
 }
 
-int   Visual_blue_mask(i)
-Visual* i;
+int   Visual_blue_mask(Visual *i)
 {
           return(i->blue_mask);
 }
 
-void set_Visual_blue_mask(i, j)
-Visual* i;
-int j;
+void set_Visual_blue_mask(Visual *i, int j)
 {
           i->blue_mask = j;
 }
 
-int  Visual_green_mask(i)
-Visual* i;
+int  Visual_green_mask(Visual *i)
 {
           return(i->green_mask);
 }
 
-void set_Visual_green_mask(i, j)
-Visual* i;
-int j;
+void set_Visual_green_mask(Visual *i, int j)
 {
           i->green_mask = j;
 }
 
-int  Visual_red_mask(i)
-Visual* i;
+int  Visual_red_mask(Visual *i)
 {
           return(i->red_mask);
 }
 
-void set_Visual_red_mask(i, j)
-Visual* i;
-int j;
+void set_Visual_red_mask(Visual *i, int j)
 {
           i->red_mask = j;
 }
 
-int  Visual_class(i)
-Visual* i;
+int  Visual_class(Visual *i)
 {
           return(i->class);
 }
 
-void set_Visual_class(i, j)
-Visual* i;
-int j;
+void set_Visual_class(Visual *i, int j)
 {
           i->class = j;
 }
 
-int  Visual_visualid(i)
-Visual* i;
+int  Visual_visualid(Visual *i)
 {
           return(i->visualid);
 }
 
-void set_Visual_visualid(i, j)
-Visual* i;
-int j;
+void set_Visual_visualid(Visual *i, int j)
 {
           i->visualid = j;
 }
 
-XExtData *Visual_ext_data(i)
-Visual* i;
+XExtData *Visual_ext_data(Visual *i)
 {
           return(i->ext_data);
 }
 
-void set_Visual_ext_data(i, j)
-Visual* i;
-XExtData *j;
+void set_Visual_ext_data(Visual *i, XExtData *j)
 {
           i->ext_data = j;
 }
@@ -639,45 +525,36 @@ XExtData *j;
 
 /********* Depth funcions *****/
 
-int  make_Depth (){
+int  make_Depth (void) {
           return ((int) calloc(1, sizeof(Depth)));
 }
 
-Visual *Depth_visuals(i)
-Depth* i;
+Visual *Depth_visuals(Depth *i)
 {
           return(i->visuals);
 }
 
-void set_Depth_visuals(i, j)
-Depth* i;
-Visual *j;
+void set_Depth_visuals(Depth *i, Visual *j)
 {
           i->visuals = j;
 }
 
-int  Depth_nvisuals(i)
-Depth* i;
+int  Depth_nvisuals(Depth *i)
 {
           return(i->nvisuals);
 }
 
-void set_Depth_nvisuals(i, j)
-Depth* i;
-int j;
+void set_Depth_nvisuals(Depth *i, int j)
 {
           i->nvisuals = j;
 }
 
-int  Depth_depth(i)
-Depth* i;
+int  Depth_depth(Depth *i)
 {
           return(i->depth);
 }
 
-void set_Depth_depth(i, j)
-Depth* i;
-int j;
+void set_Depth_depth(Depth *i, int j)
 {
           i->depth = j;
 }
@@ -685,266 +562,206 @@ int j;
 
 /********* Screen funcions *****/
 
-int  make_Screen (){
+int  make_Screen (void) {
           return ((int) calloc(1, sizeof(Screen)));
 }
 
-int  Screen_root_input_mask(i)
-Screen* i;
+int  Screen_root_input_mask(Screen *i)
 {
           return(i->root_input_mask);
 }
 
-void set_Screen_root_input_mask(i, j)
-Screen* i;
-int j;
+void set_Screen_root_input_mask(Screen *i, int j)
 {
           i->root_input_mask = j;
 }
 
-int  Screen_save_unders(i)
-Screen* i;
+int  Screen_save_unders(Screen *i)
 {
           return(i->save_unders);
 }
 
-void set_Screen_save_unders(i, j)
-Screen* i;
-int j;
+void set_Screen_save_unders(Screen *i, int j)
 {
           i->save_unders = j;
 }
 
-int  Screen_backing_store(i)
-Screen* i;
+int  Screen_backing_store(Screen *i)
 {
           return(i->backing_store);
 }
 
-void set_Screen_backing_store(i, j)
-Screen* i;
-int j;
+void set_Screen_backing_store(Screen *i, int j)
 {
           i->backing_store = j;
 }
 
-int  Screen_min_maps(i)
-Screen* i;
+int  Screen_min_maps(Screen *i)
 {
           return(i->min_maps);
 }
 
-void set_Screen_min_maps(i, j)
-Screen* i;
-int j;
+void set_Screen_min_maps(Screen *i, int j)
 {
           i->min_maps = j;
 }
 
-int  Screen_max_maps(i)
-Screen* i;
+int  Screen_max_maps(Screen *i)
 {
           return(i->max_maps);
 }
 
-void set_Screen_max_maps(i, j)
-Screen* i;
-int j;
+void set_Screen_max_maps(Screen *i, int j)
 {
           i->max_maps = j;
 }
 
-int  Screen_black_pixel(i)
-Screen* i;
+int  Screen_black_pixel(Screen *i)
 {
           return(i->black_pixel);
 }
 
-void set_Screen_black_pixel(i, j)
-Screen* i;
-int j;
+void set_Screen_black_pixel(Screen *i, int j)
 {
           i->black_pixel = j;
 }
 
-int  Screen_white_pixel(i)
-Screen* i;
+int  Screen_white_pixel(Screen *i)
 {
           return(i->white_pixel);
 }
 
-void set_Screen_white_pixel(i, j)
-Screen* i;
-int j;
+void set_Screen_white_pixel(Screen *i, int j)
 {
           i->white_pixel = j;
 }
 
-int  Screen_cmap(i)
-Screen* i;
+int  Screen_cmap(Screen *i)
 {
           return(i->cmap);
 }
 
-void set_Screen_cmap(i, j)
-Screen* i;
-int j;
+void set_Screen_cmap(Screen *i, int j)
 {
           i->cmap = j;
 }
 
-GC  Screen_default_gc(i)
-Screen* i;
+GC  Screen_default_gc(Screen *i)
 {
           return(i->default_gc);
 }
 
-void set_Screen_default_gc(i, j)
-Screen* i;
-GC j;
+void set_Screen_default_gc(Screen *i, GC j)
 {
           i->default_gc = j;
 }
 
-Visual *Screen_root_visual(i)
-Screen* i;
+Visual *Screen_root_visual(Screen *i)
 {
           return(i->root_visual);
 }
 
-void set_Screen_root_visual(i, j)
-Screen* i;
-Visual *j;
+void set_Screen_root_visual(Screen *i, Visual *j)
 {
           i->root_visual = j;
 }
 
-int  Screen_root_depth(i)
-Screen* i;
+int  Screen_root_depth(Screen *i)
 {
           return(i->root_depth);
 }
 
-void set_Screen_root_depth(i, j)
-Screen* i;
-int j;
+void set_Screen_root_depth(Screen *i, int j)
 {
           i->root_depth = j;
 }
 
-Depth *Screen_depths(i)
-Screen* i;
+Depth *Screen_depths(Screen *i)
 {
           return(i->depths);
 }
 
-void set_Screen_depths(i, j)
-Screen* i;
-Depth *j;
+void set_Screen_depths(Screen *i, Depth *j)
 {
           i->depths = j;
 }
 
-int  Screen_ndepths(i)
-Screen* i;
+int  Screen_ndepths(Screen *i)
 {
           return(i->ndepths);
 }
 
-void set_Screen_ndepths(i, j)
-Screen* i;
-int j;
+void set_Screen_ndepths(Screen *i, int j)
 {
           i->ndepths = j;
 }
 
-int  Screen_mheight(i)
-Screen* i;
+int  Screen_mheight(Screen *i)
 {
           return(i->mheight);
 }
 
-void set_Screen_mheight(i, j)
-Screen* i;
-int j;
+void set_Screen_mheight(Screen *i, int j)
 {
           i->mheight = j;
 }
 
-int  Screen_mwidth(i)
-Screen* i;
+int  Screen_mwidth(Screen *i)
 {
           return(i->mwidth);
 }
 
-void set_Screen_mwidth(i, j)
-Screen* i;
-int j;
+void set_Screen_mwidth(Screen *i, int j)
 {
           i->mwidth = j;
 }
 
-int  Screen_height(i)
-Screen* i;
+int  Screen_height(Screen *i)
 {
           return(i->height);
 }
 
-void set_Screen_height(i, j)
-Screen* i;
-int j;
+void set_Screen_height(Screen *i, int j)
 {
           i->height = j;
 }
 
-int  Screen_width(i)
-Screen* i;
+int  Screen_width(Screen *i)
 {
           return(i->width);
 }
 
-void set_Screen_width(i, j)
-Screen* i;
-int j;
+void set_Screen_width(Screen *i, int j)
 {
           i->width = j;
 }
 
-int  Screen_root(i)
-Screen* i;
+int  Screen_root(Screen *i)
 {
           return(i->root);
 }
 
-void set_Screen_root(i, j)
-Screen* i;
-int j;
+void set_Screen_root(Screen *i, int j)
 {
           i->root = j;
 }
 
-Display *Screen_display(i)
-Screen* i;
+Display *Screen_display(Screen *i)
 {
           return(i->display);
 }
 
-void set_Screen_display(i, j)
-Screen* i;
-Display *j;
+void set_Screen_display(Screen *i, Display *j)
 {
            i->display = j;
 }
 
-XExtData *Screen_ext_data(i)
-Screen* i;
+XExtData *Screen_ext_data(Screen *i)
 {
           return(i->ext_data);
 }
 
-void set_Screen_ext_data(i, j)
-Screen* i;
-XExtData *j;
+void set_Screen_ext_data(Screen *i, XExtData *j)
 {
           i->ext_data = j;
 }
@@ -952,58 +769,46 @@ XExtData *j;
 
 /********* ScreenFormat funcions *****/
 
-int  make_ScreenFormat (){
+int  make_ScreenFormat (void) {
           return ((int) calloc(1, sizeof(ScreenFormat)));
 }
 
-int  ScreenFormat_scanline_pad(i)
-ScreenFormat* i;
+int  ScreenFormat_scanline_pad(ScreenFormat *i)
 {
           return(i->scanline_pad);
 }
 
-void set_ScreenFormat_scanline_pad(i, j)
-ScreenFormat* i;
-int j;
+void set_ScreenFormat_scanline_pad(ScreenFormat *i, int j)
 {
           i->scanline_pad = j;
 }
 
-int  ScreenFormat_bits_per_pixel(i)
-ScreenFormat* i;
+int  ScreenFormat_bits_per_pixel(ScreenFormat *i)
 {
           return(i->bits_per_pixel);
 }
 
-void set_ScreenFormat_bits_per_pixel(i, j)
-ScreenFormat* i;
-int j;
+void set_ScreenFormat_bits_per_pixel(ScreenFormat *i, int j)
 {
           i->bits_per_pixel = j;
 }
 
-int  ScreenFormat_depth(i)
-ScreenFormat* i;
+int  ScreenFormat_depth(ScreenFormat *i)
 {
           return(i->depth);
 }
 
-void set_ScreenFormat_depth(i, j)
-ScreenFormat* i;
-int j;
+void set_ScreenFormat_depth(ScreenFormat *i, int j)
 {
           i->depth = j;
 }
 
-XExtData *ScreenFormat_ext_data(i)
-ScreenFormat* i;
+XExtData *ScreenFormat_ext_data(ScreenFormat *i)
 {
           return(i->ext_data);
 }
 
-void set_ScreenFormat_ext_data(i, j)
-ScreenFormat* i;
-XExtData *j;
+void set_ScreenFormat_ext_data(ScreenFormat *i, XExtData *j)
 {
           i->ext_data = j;
 }
@@ -1011,201 +816,156 @@ XExtData *j;
 
 /********* XSetWindowAttributes funcions *****/
 
-int  make_XSetWindowAttributes (){
+int  make_XSetWindowAttributes (void) {
           return ((int) calloc(1, sizeof(XSetWindowAttributes)));
 }
 
-int  XSetWindowAttributes_cursor(i)
-XSetWindowAttributes* i;
+int  XSetWindowAttributes_cursor(XSetWindowAttributes *i)
 {
           return(i->cursor);
 }
 
-void set_XSetWindowAttributes_cursor(i, j)
-XSetWindowAttributes* i;
-int j;
+void set_XSetWindowAttributes_cursor(XSetWindowAttributes *i, int j)
 {
           i->cursor = j;
 }
 
-int  XSetWindowAttributes_colormap(i)
-XSetWindowAttributes* i;
+int  XSetWindowAttributes_colormap(XSetWindowAttributes *i)
 {
           return(i->colormap);
 }
 
-void set_XSetWindowAttributes_colormap(i, j)
-XSetWindowAttributes* i;
-int j;
+void set_XSetWindowAttributes_colormap(XSetWindowAttributes *i, int j)
 {
           i->colormap = j;
 }
 
-int  XSetWindowAttributes_override_redirect(i)
-XSetWindowAttributes* i;
+int  XSetWindowAttributes_override_redirect(XSetWindowAttributes *i)
 {
           return(i->override_redirect);
 }
 
-void set_XSetWindowAttributes_override_redirect(i, j)
-XSetWindowAttributes* i;
-int j;
+void set_XSetWindowAttributes_override_redirect(XSetWindowAttributes *i, int j)
 {
           i->override_redirect = j;
 }
 
-int  XSetWindowAttributes_do_not_propagate_mask(i)
-XSetWindowAttributes* i;
+int  XSetWindowAttributes_do_not_propagate_mask(XSetWindowAttributes *i)
 {
           return(i->do_not_propagate_mask);
 }
 
-void set_XSetWindowAttributes_do_not_propagate_mask(i, j)
-XSetWindowAttributes* i;
-int j;
+void set_XSetWindowAttributes_do_not_propagate_mask(XSetWindowAttributes *i, int j)
 {
           i->do_not_propagate_mask = j;
 }
 
-int  XSetWindowAttributes_event_mask(i)
-XSetWindowAttributes* i;
+int  XSetWindowAttributes_event_mask(XSetWindowAttributes *i)
 {
           return(i->event_mask);
 }
 
-void set_XSetWindowAttributes_event_mask(i, j)
-XSetWindowAttributes* i;
-int j;
+void set_XSetWindowAttributes_event_mask(XSetWindowAttributes *i, int j)
 {
           i->event_mask = j;
 }
 
-int  XSetWindowAttributes_save_under(i)
-XSetWindowAttributes* i;
+int  XSetWindowAttributes_save_under(XSetWindowAttributes *i)
 {
           return(i->save_under);
 }
 
-void set_XSetWindowAttributes_save_under(i, j)
-XSetWindowAttributes* i;
-int j;
+void set_XSetWindowAttributes_save_under(XSetWindowAttributes *i, int j)
 {
           i->save_under = j;
 }
 
-int  XSetWindowAttributes_backing_pixel(i)
-XSetWindowAttributes* i;
+int  XSetWindowAttributes_backing_pixel(XSetWindowAttributes *i)
 {
           return(i->backing_pixel);
 }
 
-void set_XSetWindowAttributes_backing_pixel(i, j)
-XSetWindowAttributes* i;
-int j;
+void set_XSetWindowAttributes_backing_pixel(XSetWindowAttributes *i, int j)
 {
           i->backing_pixel = j;
 }
 
-int  XSetWindowAttributes_backing_planes(i)
-XSetWindowAttributes* i;
+int  XSetWindowAttributes_backing_planes(XSetWindowAttributes *i)
 {
           return(i->backing_planes);
 }
 
-void set_XSetWindowAttributes_backing_planes(i, j)
-XSetWindowAttributes* i;
-int j;
+void set_XSetWindowAttributes_backing_planes(XSetWindowAttributes *i, int j)
 {
           i->backing_planes = j;
 }
 
-int  XSetWindowAttributes_backing_store(i)
-XSetWindowAttributes* i;
+int  XSetWindowAttributes_backing_store(XSetWindowAttributes *i)
 {
           return(i->backing_store);
 }
 
-void set_XSetWindowAttributes_backing_store(i, j)
-XSetWindowAttributes* i;
-int j;
+void set_XSetWindowAttributes_backing_store(XSetWindowAttributes *i, int j)
 {
           i->backing_store = j;
 }
 
-int  XSetWindowAttributes_win_gravity(i)
-XSetWindowAttributes* i;
+int  XSetWindowAttributes_win_gravity(XSetWindowAttributes *i)
 {
           return(i->win_gravity);
 }
 
-void set_XSetWindowAttributes_win_gravity(i, j)
-XSetWindowAttributes* i;
-int j;
+void set_XSetWindowAttributes_win_gravity(XSetWindowAttributes *i, int j)
 {
           i->win_gravity = j;
 }
 
-int  XSetWindowAttributes_bit_gravity(i)
-XSetWindowAttributes* i;
+int  XSetWindowAttributes_bit_gravity(XSetWindowAttributes *i)
 {
           return(i->bit_gravity);
 }
 
-void set_XSetWindowAttributes_bit_gravity(i, j)
-XSetWindowAttributes* i;
-int j;
+void set_XSetWindowAttributes_bit_gravity(XSetWindowAttributes *i, int j)
 {
           i->bit_gravity = j;
 }
 
-int  XSetWindowAttributes_border_pixel(i)
-XSetWindowAttributes* i;
+int  XSetWindowAttributes_border_pixel(XSetWindowAttributes *i)
 {
           return(i->border_pixel);
 }
 
-void set_XSetWindowAttributes_border_pixel(i, j)
-XSetWindowAttributes* i;
-int j;
+void set_XSetWindowAttributes_border_pixel(XSetWindowAttributes *i, int j)
 {
           i->border_pixel = j;
 }
 
-int  XSetWindowAttributes_border_pixmap(i)
-XSetWindowAttributes* i;
+int  XSetWindowAttributes_border_pixmap(XSetWindowAttributes *i)
 {
           return(i->border_pixmap);
 }
 
-void set_XSetWindowAttributes_border_pixmap(i, j)
-XSetWindowAttributes* i;
-int j;
+void set_XSetWindowAttributes_border_pixmap(XSetWindowAttributes *i, int j)
 {
           i->border_pixmap = j;
 }
 
-int  XSetWindowAttributes_background_pixel(i)
-XSetWindowAttributes* i;
+int  XSetWindowAttributes_background_pixel(XSetWindowAttributes *i)
 {
           return(i->background_pixel);
 }
 
-void set_XSetWindowAttributes_background_pixel(i, j)
-XSetWindowAttributes* i;
-int j;
+void set_XSetWindowAttributes_background_pixel(XSetWindowAttributes *i, int j)
 {
           i->background_pixel = j;
 }
 
-int  XSetWindowAttributes_background_pixmap(i)
-XSetWindowAttributes* i;
+int  XSetWindowAttributes_background_pixmap(XSetWindowAttributes *i)
 {
           return(i->background_pixmap);
 }
 
-void set_XSetWindowAttributes_background_pixmap(i, j)
-XSetWindowAttributes* i;
-int j;
+void set_XSetWindowAttributes_background_pixmap(XSetWindowAttributes *i, int j)
 {
           i->background_pixmap = j;
 }
@@ -1213,305 +973,236 @@ int j;
 
 /********* XWindowAttributes funcions *****/
 
-int  make_XWindowAttributes (){
+int  make_XWindowAttributes (void) {
           return ((int) calloc(1, sizeof(XWindowAttributes)));
 }
 
-Screen *XWindowAttributes_screen(i)
-XWindowAttributes* i;
+Screen *XWindowAttributes_screen(XWindowAttributes *i)
 {
           return(i->screen);
 }
 
-void set_XWindowAttributes_screen(i, j)
-XWindowAttributes* i;
-Screen *j;
+void set_XWindowAttributes_screen(XWindowAttributes *i, Screen *j)
 {
           i->screen = j;
 }
 
-int  XWindowAttributes_override_redirect(i)
-XWindowAttributes* i;
+int  XWindowAttributes_override_redirect(XWindowAttributes *i)
 {
           return(i->override_redirect);
 }
 
-void set_XWindowAttributes_override_redirect(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_override_redirect(XWindowAttributes *i, int j)
 {
           i->override_redirect = j;
 }
 
-int  XWindowAttributes_do_not_propagate_mask(i)
-XWindowAttributes* i;
+int  XWindowAttributes_do_not_propagate_mask(XWindowAttributes *i)
 {
           return(i->do_not_propagate_mask);
 }
 
-void set_XWindowAttributes_do_not_propagate_mask(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_do_not_propagate_mask(XWindowAttributes *i, int j)
 {
           i->do_not_propagate_mask = j;
 }
 
-int  XWindowAttributes_your_event_mask(i)
-XWindowAttributes* i;
+int  XWindowAttributes_your_event_mask(XWindowAttributes *i)
 {
           return(i->your_event_mask);
 }
 
-void set_XWindowAttributes_your_event_mask(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_your_event_mask(XWindowAttributes *i, int j)
 {
           i->your_event_mask = j;
 }
 
-int  XWindowAttributes_all_event_masks(i)
-XWindowAttributes* i;
+int  XWindowAttributes_all_event_masks(XWindowAttributes *i)
 {
           return(i->all_event_masks);
 }
 
-void set_XWindowAttributes_all_event_masks(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_all_event_masks(XWindowAttributes *i, int j)
 {
           i->all_event_masks = j;
 }
 
-int  XWindowAttributes_map_state(i)
-XWindowAttributes* i;
+int  XWindowAttributes_map_state(XWindowAttributes *i)
 {
           return(i->map_state);
 }
 
-void set_XWindowAttributes_map_state(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_map_state(XWindowAttributes *i, int j)
 {
           i->map_state = j;
 }
 
-int  XWindowAttributes_map_installed(i)
-XWindowAttributes* i;
+int  XWindowAttributes_map_installed(XWindowAttributes *i)
 {
           return(i->map_installed);
 }
 
-void set_XWindowAttributes_map_installed(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_map_installed(XWindowAttributes *i, int j)
 {
           i->map_installed = j;
 }
 
-int  XWindowAttributes_colormap(i)
-XWindowAttributes* i;
+int  XWindowAttributes_colormap(XWindowAttributes *i)
 {
           return(i->colormap);
 }
 
-void set_XWindowAttributes_colormap(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_colormap(XWindowAttributes *i, int j)
 {
           i->colormap = j;
 }
 
-int  XWindowAttributes_save_under(i)
-XWindowAttributes* i;
+int  XWindowAttributes_save_under(XWindowAttributes *i)
 {
           return(i->save_under);
 }
 
-void set_XWindowAttributes_save_under(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_save_under(XWindowAttributes *i, int j)
 {
           i->save_under = j;
 }
 
-int  XWindowAttributes_backing_pixel(i)
-XWindowAttributes* i;
+int  XWindowAttributes_backing_pixel(XWindowAttributes *i)
 {
           return(i->backing_pixel);
 }
 
-void set_XWindowAttributes_backing_pixel(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_backing_pixel(XWindowAttributes *i, int j)
 {
           i->backing_pixel = j;
 }
 
-int  XWindowAttributes_backing_planes(i)
-XWindowAttributes* i;
+int  XWindowAttributes_backing_planes(XWindowAttributes *i)
 {
           return(i->backing_planes);
 }
 
-void set_XWindowAttributes_backing_planes(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_backing_planes(XWindowAttributes *i, int j)
 {
           i->backing_planes = j;
 }
 
-int  XWindowAttributes_backing_store(i)
-XWindowAttributes* i;
+int  XWindowAttributes_backing_store(XWindowAttributes *i)
 {
           return(i->backing_store);
 }
 
-void set_XWindowAttributes_backing_store(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_backing_store(XWindowAttributes *i, int j)
 {
           i->backing_store = j;
 }
 
-int  XWindowAttributes_win_gravity(i)
-XWindowAttributes* i;
+int  XWindowAttributes_win_gravity(XWindowAttributes *i)
 {
           return(i->win_gravity);
 }
 
-void set_XWindowAttributes_win_gravity(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_win_gravity(XWindowAttributes *i, int j)
 {
           i->win_gravity = j;
 }
 
-int  XWindowAttributes_bit_gravity(i)
-XWindowAttributes* i;
+int  XWindowAttributes_bit_gravity(XWindowAttributes *i)
 {
           return(i->bit_gravity);
 }
 
-void set_XWindowAttributes_bit_gravity(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_bit_gravity(XWindowAttributes *i, int j)
 {
           i->bit_gravity = j;
 }
 
-int  XWindowAttributes_class(i)
-XWindowAttributes* i;
+int  XWindowAttributes_class(XWindowAttributes *i)
 {
           return(i->class);
 }
 
-void set_XWindowAttributes_class(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_class(XWindowAttributes *i, int j)
 {
           i->class = j;
 }
 
-int  XWindowAttributes_root(i)
-XWindowAttributes* i;
+int  XWindowAttributes_root(XWindowAttributes *i)
 {
           return(i->root);
 }
 
-void set_XWindowAttributes_root(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_root(XWindowAttributes *i, int j)
 {
           i->root = j;
 }
 
-Visual *XWindowAttributes_visual(i)
-XWindowAttributes* i;
+Visual *XWindowAttributes_visual(XWindowAttributes *i)
 {
           return(i->visual);
 }
 
-void set_XWindowAttributes_visual(i, j)
-XWindowAttributes* i;
-Visual *j;
+void set_XWindowAttributes_visual(XWindowAttributes *i, Visual *j)
 {
           i->visual = j;
 }
 
-int  XWindowAttributes_depth(i)
-XWindowAttributes* i;
+int  XWindowAttributes_depth(XWindowAttributes *i)
 {
           return(i->depth);
 }
 
-void set_XWindowAttributes_depth(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_depth(XWindowAttributes *i, int j)
 {
           i->depth = j;
 }
 
-int  XWindowAttributes_border_width(i)
-XWindowAttributes* i;
+int  XWindowAttributes_border_width(XWindowAttributes *i)
 {
           return(i->border_width);
 }
 
-void set_XWindowAttributes_border_width(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_border_width(XWindowAttributes *i, int j)
 {
           i->border_width = j;
 }
 
-int  XWindowAttributes_height(i)
-XWindowAttributes* i;
+int  XWindowAttributes_height(XWindowAttributes *i)
 {
           return(i->height);
 }
 
-void set_XWindowAttributes_height(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_height(XWindowAttributes *i, int j)
 {
           i->height = j;
 }
 
-int  XWindowAttributes_width(i)
-XWindowAttributes* i;
+int  XWindowAttributes_width(XWindowAttributes *i)
 {
           return(i->width);
 }
 
-void set_XWindowAttributes_width(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_width(XWindowAttributes *i, int j)
 {
           i->width = j;
 }
 
-int  XWindowAttributes_y(i)
-XWindowAttributes* i;
+int  XWindowAttributes_y(XWindowAttributes *i)
 {
           return(i->y);
 }
 
-void set_XWindowAttributes_y(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_y(XWindowAttributes *i, int j)
 {
           i->y = j;
 }
 
-int  XWindowAttributes_x(i)
-XWindowAttributes* i;
+int  XWindowAttributes_x(XWindowAttributes *i)
 {
           return(i->x);
 }
 
-void set_XWindowAttributes_x(i, j)
-XWindowAttributes* i;
-int j;
+void set_XWindowAttributes_x(XWindowAttributes *i, int j)
 {
           i->x = j;
 }
@@ -1519,45 +1210,36 @@ int j;
 
 /********* XHostAddress funcions *****/
 
-int  make_XHostAddress (){
+int  make_XHostAddress (void) {
           return ((int) calloc(1, sizeof(XHostAddress)));
 }
 
-char *XHostAddress_address(i)
-XHostAddress* i;
+char *XHostAddress_address(XHostAddress *i)
 {
           return(i->address);
 }
 
-void set_XHostAddress_address(i, j)
-XHostAddress* i;
-char *j;
+void set_XHostAddress_address(XHostAddress *i, char *j)
 {
           i->address = j;
 }
 
-int  XHostAddress_length(i)
-XHostAddress* i;
+int  XHostAddress_length(XHostAddress *i)
 {
           return(i->length);
 }
 
-void set_XHostAddress_length(i, j)
-XHostAddress* i;
-int j;
+void set_XHostAddress_length(XHostAddress *i, int j)
 {
           i->length = j;
 }
 
-int  XHostAddress_family(i)
-XHostAddress* i;
+int  XHostAddress_family(XHostAddress *i)
 {
           return(i->family);
 }
 
-void set_XHostAddress_family(i, j)
-XHostAddress* i;
-int j;
+void set_XHostAddress_family(XHostAddress *i, int j)
 {
           i->family = j;
 }
@@ -1565,214 +1247,166 @@ int j;
 
 /********* XImage funcions *****/
 
-int  make_XImage (){
+int  make_XImage (void) {
           return ((int) calloc(1, sizeof(XImage)));
 }
 
-XPointer XImage_obdata(i)
-XImage* i;
+XPointer XImage_obdata(XImage *i)
 {
           return(i->obdata);
 }
 
-void set_XImage_obdata(i, j)
-XImage* i;
-XPointer j;
+void set_XImage_obdata(XImage *i, XPointer j)
 {
           i->obdata = j;
 }
 
-int  XImage_blue_mask(i)
-XImage* i;
+int  XImage_blue_mask(XImage *i)
 {
           return(i->blue_mask);
 }
 
-void set_XImage_blue_mask(i, j)
-XImage* i;
-int j;
+void set_XImage_blue_mask(XImage *i, int j)
 {
           i->blue_mask = j;
 }
 
-int  XImage_green_mask(i)
-XImage* i;
+int  XImage_green_mask(XImage *i)
 {
           return(i->green_mask);
 }
 
-void set_XImage_green_mask(i, j)
-XImage* i;
-int j;
+void set_XImage_green_mask(XImage *i, int j)
 {
           i->green_mask = j;
 }
 
-int  XImage_red_mask(i)
-XImage* i;
+int  XImage_red_mask(XImage *i)
 {
           return(i->red_mask);
 }
 
-void set_XImage_red_mask(i, j)
-XImage* i;
-int j;
+void set_XImage_red_mask(XImage *i, int j)
 {
           i->red_mask = j;
 }
 
-int  XImage_bits_per_pixel(i)
-XImage* i;
+int  XImage_bits_per_pixel(XImage *i)
 {
           return(i->bits_per_pixel);
 }
 
-void set_XImage_bits_per_pixel(i, j)
-XImage* i;
-int j;
+void set_XImage_bits_per_pixel(XImage *i, int j)
 {
           i->bits_per_pixel = j;
 }
 
-int  XImage_bytes_per_line(i)
-XImage* i;
+int  XImage_bytes_per_line(XImage *i)
 {
           return(i->bytes_per_line);
 }
 
-void set_XImage_bytes_per_line(i, j)
-XImage* i;
-int j;
+void set_XImage_bytes_per_line(XImage *i, int j)
 {
           i->bytes_per_line = j;
 }
 
-int  XImage_depth(i)
-XImage* i;
+int  XImage_depth(XImage *i)
 {
           return(i->depth);
 }
 
-void set_XImage_depth(i, j)
-XImage* i;
-int j;
+void set_XImage_depth(XImage *i, int j)
 {
           i->depth = j;
 }
 
-int  XImage_bitmap_pad(i)
-XImage* i;
+int  XImage_bitmap_pad(XImage *i)
 {
           return(i->bitmap_pad);
 }
 
-void set_XImage_bitmap_pad(i, j)
-XImage* i;
-int j;
+void set_XImage_bitmap_pad(XImage *i, int j)
 {
           i->bitmap_pad = j;
 }
 
-int  XImage_bitmap_bit_order(i)
-XImage* i;
+int  XImage_bitmap_bit_order(XImage *i)
 {
           return(i->bitmap_bit_order);
 }
 
-void set_XImage_bitmap_bit_order(i, j)
-XImage* i;
-int j;
+void set_XImage_bitmap_bit_order(XImage *i, int j)
 {
           i->bitmap_bit_order = j;
 }
 
-int  XImage_bitmap_unit(i)
-XImage* i;
+int  XImage_bitmap_unit(XImage *i)
 {
           return(i->bitmap_unit);
 }
 
-void set_XImage_bitmap_unit(i, j)
-XImage* i;
-int j;
+void set_XImage_bitmap_unit(XImage *i, int j)
 {
           i->bitmap_unit = j;
 }
 
-int  XImage_byte_order(i)
-XImage* i;
+int  XImage_byte_order(XImage *i)
 {
           return(i->byte_order);
 }
 
-void set_XImage_byte_order(i, j)
-XImage* i;
-int j;
+void set_XImage_byte_order(XImage *i, int j)
 {
           i->byte_order = j;
 }
 
-char *XImage_data(i)
-XImage* i;
+char *XImage_data(XImage *i)
 {
           return(i->data);
 }
 
-void set_XImage_data(i, j)
-XImage* i;
-char *j;
+void set_XImage_data(XImage *i, char *j)
 {
           i->data = j;
 }
 
-int  XImage_format(i)
-XImage* i;
+int  XImage_format(XImage *i)
 {
           return(i->format);
 }
 
-void set_XImage_format(i, j)
-XImage* i;
-int j;
+void set_XImage_format(XImage *i, int j)
 {
           i->format = j;
 }
 
-int  XImage_xoffset(i)
-XImage* i;
+int  XImage_xoffset(XImage *i)
 {
           return(i->xoffset);
 }
 
-void set_XImage_xoffset(i, j)
-XImage* i;
-int j;
+void set_XImage_xoffset(XImage *i, int j)
 {
           i->xoffset = j;
 }
 
-int  XImage_height(i)
-XImage* i;
+int  XImage_height(XImage *i)
 {
           return(i->height);
 }
 
-void set_XImage_height(i, j)
-XImage* i;
-int j;
+void set_XImage_height(XImage *i, int j)
 {
           i->height = j;
 }
 
-int  XImage_width(i)
-XImage* i;
+int  XImage_width(XImage *i)
 {
           return(i->width);
 }
 
-void set_XImage_width(i, j)
-XImage* i;
-int j;
+void set_XImage_width(XImage *i, int j)
 {
           i->width = j;
 }
@@ -1780,97 +1414,76 @@ int j;
 
 /********* XWindowChanges funcions *****/
 
-int  make_XWindowChanges (){
+int  make_XWindowChanges (void) {
           return ((int) calloc(1, sizeof(XWindowChanges)));
 }
 
-int  XWindowChanges_stack_mode(i)
-XWindowChanges* i;
+int  XWindowChanges_stack_mode(XWindowChanges *i)
 {
           return(i->stack_mode);
 }
 
-void set_XWindowChanges_stack_mode(i, j)
-XWindowChanges* i;
-int j;
+void set_XWindowChanges_stack_mode(XWindowChanges *i, int j)
 {
           i->stack_mode = j;
 }
 
-int  XWindowChanges_sibling(i)
-XWindowChanges* i;
+int  XWindowChanges_sibling(XWindowChanges *i)
 {
           return(i->sibling);
 }
 
-void set_XWindowChanges_sibling(i, j)
-XWindowChanges* i;
-int j;
+void set_XWindowChanges_sibling(XWindowChanges *i, int j)
 {
           i->sibling = j;
 }
 
-int  XWindowChanges_border_width(i)
-XWindowChanges* i;
+int  XWindowChanges_border_width(XWindowChanges *i)
 {
           return(i->border_width);
 }
 
-void set_XWindowChanges_border_width(i, j)
-XWindowChanges* i;
-int j;
+void set_XWindowChanges_border_width(XWindowChanges *i, int j)
 {
           i->border_width = j;
 }
 
-int  XWindowChanges_height(i)
-XWindowChanges* i;
+int  XWindowChanges_height(XWindowChanges *i)
 {
           return(i->height);
 }
 
-void set_XWindowChanges_height(i, j)
-XWindowChanges* i;
-int j;
+void set_XWindowChanges_height(XWindowChanges *i, int j)
 {
           i->height = j;
 }
 
-int  XWindowChanges_width(i)
-XWindowChanges* i;
+int  XWindowChanges_width(XWindowChanges *i)
 {
           return(i->width);
 }
 
-void set_XWindowChanges_width(i, j)
-XWindowChanges* i;
-int j;
+void set_XWindowChanges_width(XWindowChanges *i, int j)
 {
           i->width = j;
 }
 
-int  XWindowChanges_y(i)
-XWindowChanges* i;
+int  XWindowChanges_y(XWindowChanges *i)
 {
           return(i->y);
 }
 
-void set_XWindowChanges_y(i, j)
-XWindowChanges* i;
-int j;
+void set_XWindowChanges_y(XWindowChanges *i, int j)
 {
           i->y = j;
 }
 
-int  XWindowChanges_x(i)
-XWindowChanges* i;
+int  XWindowChanges_x(XWindowChanges *i)
 {
           return(i->x);
 }
 
-void set_XWindowChanges_x(i, j)
-XWindowChanges* i;
-int j;
+void set_XWindowChanges_x(XWindowChanges *i, int j)
 {
           i->x = j;
 }
@@ -1878,84 +1491,66 @@ int j;
 
 /********* XColor funcions *****/
 
-int  make_XColor (){
+int  make_XColor (void) {
           return ((int) calloc(1, sizeof(XColor)));
 }
 
-char XColor_pad(i)
-XColor* i;
+char XColor_pad(XColor *i)
 {
           return(i->pad);
 }
 
-void set_XColor_pad(i, j)
-XColor* i;
-char j;
+void set_XColor_pad(XColor *i, char j)
 {
           i->pad = j;
 }
 
-char XColor_flags(i)
-XColor* i;
+char XColor_flags(XColor *i)
 {
           return(i->flags);
 }
 
-void set_XColor_flags(i, j)
-XColor* i;
-char j;
+void set_XColor_flags(XColor *i, char j)
 {
           i->flags = j;
 }
 
-int  XColor_blue(i)
-XColor* i;
+int  XColor_blue(XColor *i)
 {
           return(i->blue);
 }
 
-void set_XColor_blue(i, j)
-XColor* i;
-int j;
+void set_XColor_blue(XColor *i, int j)
 {
           i->blue = j;
 }
 
-int  XColor_green(i)
-XColor* i;
+int  XColor_green(XColor *i)
 {
           return(i->green);
 }
 
-void set_XColor_green(i, j)
-XColor* i;
-int j;
+void set_XColor_green(XColor *i, int j)
 {
           i->green = j;
 }
 
-int  XColor_red(i)
-XColor* i;
+int  XColor_red(XColor *i)
 {
           return(i->red);
 }
 
-void set_XColor_red(i, j)
-XColor* i;
-int j;
+void set_XColor_red(XColor *i, int j)
 {
           i->red = j;
 }
 
-int  XColor_pixel(i)
-XColor* i;
+int  XColor_pixel(XColor *i)
 {
           return(i->pixel);
 }
 
-void set_XColor_pixel(i, j)
-XColor* i;
-int j;
+void set_XColor_pixel(XColor *i, int j)
 {
           i->pixel = j;
 }
@@ -1963,58 +1558,46 @@ int j;
 
 /********* XSegment funcions *****/
 
-int  make_XSegment (){
+int  make_XSegment (void) {
           return ((int) calloc(1, sizeof(XSegment)));
 }
 
-int  XSegment_y2(i)
-XSegment* i;
+int  XSegment_y2(XSegment *i)
 {
           return(i->y2);
 }
 
-void set_XSegment_y2(i, j)
-XSegment* i;
-int j;
+void set_XSegment_y2(XSegment *i, int j)
 {
           i->y2 = j;
 }
 
-int  XSegment_x2(i)
-XSegment* i;
+int  XSegment_x2(XSegment *i)
 {
           return(i->x2);
 }
 
-void set_XSegment_x2(i, j)
-XSegment* i;
-int j;
+void set_XSegment_x2(XSegment *i, int j)
 {
           i->x2 = j;
 }
 
-int  XSegment_y1(i)
-XSegment* i;
+int  XSegment_y1(XSegment *i)
 {
           return(i->y1);
 }
 
-void set_XSegment_y1(i, j)
-XSegment* i;
-int j;
+void set_XSegment_y1(XSegment *i, int j)
 {
           i->y1 = j;
 }
 
-int  XSegment_x1(i)
-XSegment* i;
+int  XSegment_x1(XSegment *i)
 {
           return(i->x1);
 }
 
-void set_XSegment_x1(i, j)
-XSegment* i;
-int j;
+void set_XSegment_x1(XSegment *i, int j)
 {
           i->x1 = j;
 }
@@ -2022,32 +1605,26 @@ int j;
 
 /********* XPoint funcions *****/
 
-int  make_XPoint (){
+int  make_XPoint (void) {
           return ((int) calloc(1, sizeof(XPoint)));
 }
 
-int  XPoint_y(i)
-XPoint* i;
+int  XPoint_y(XPoint *i)
 {
           return(i->y);
 }
 
-void set_XPoint_y(i, j)
-XPoint* i;
-int j;
+void set_XPoint_y(XPoint *i, int j)
 {
           i->y = j;
 }
 
-int  XPoint_x(i)
-XPoint* i;
+int  XPoint_x(XPoint *i)
 {
           return(i->x);
 }
 
-void set_XPoint_x(i, j)
-XPoint* i;
-int j;
+void set_XPoint_x(XPoint *i, int j)
 {
           i->x = j;
 }
@@ -2055,58 +1632,46 @@ int j;
 
 /********* XRectangle funcions *****/
 
-int  make_XRectangle (){
+int  make_XRectangle (void) {
           return ((int) calloc(1, sizeof(XRectangle)));
 }
 
-int  XRectangle_height(i)
-XRectangle* i;
+int  XRectangle_height(XRectangle *i)
 {
           return(i->height);
 }
 
-void set_XRectangle_height(i, j)
-XRectangle* i;
-int j;
+void set_XRectangle_height(XRectangle *i, int j)
 {
           i->height = j;
 }
 
-int  XRectangle_width(i)
-XRectangle* i;
+int  XRectangle_width(XRectangle *i)
 {
           return(i->width);
 }
 
-void set_XRectangle_width(i, j)
-XRectangle* i;
-int j;
+void set_XRectangle_width(XRectangle *i, int j)
 {
           i->width = j;
 }
 
-int  XRectangle_y(i)
-XRectangle* i;
+int  XRectangle_y(XRectangle *i)
 {
           return(i->y);
 }
 
-void set_XRectangle_y(i, j)
-XRectangle* i;
-int j;
+void set_XRectangle_y(XRectangle *i, int j)
 {
           i->y = j;
 }
 
-int  XRectangle_x(i)
-XRectangle* i;
+int  XRectangle_x(XRectangle *i)
 {
           return(i->x);
 }
 
-void set_XRectangle_x(i, j)
-XRectangle* i;
-int j;
+void set_XRectangle_x(XRectangle *i, int j)
 {
           i->x = j;
 }
@@ -2114,84 +1679,66 @@ int j;
 
 /********* XArc funcions *****/
 
-int  make_XArc (){
+int  make_XArc (void) {
           return ((int) calloc(1, sizeof(XArc)));
 }
 
-int  XArc_angle2(i)
-XArc* i;
+int  XArc_angle2(XArc *i)
 {
           return(i->angle2);
 }
 
-void set_XArc_angle2(i, j)
-XArc* i;
-int j;
+void set_XArc_angle2(XArc *i, int j)
 {
           i->angle2 = j;
 }
 
-int  XArc_angle1(i)
-XArc* i;
+int  XArc_angle1(XArc *i)
 {
           return(i->angle1);
 }
 
-void set_XArc_angle1(i, j)
-XArc* i;
-int j;
+void set_XArc_angle1(XArc *i, int j)
 {
           i->angle1 = j;
 }
 
-int  XArc_height(i)
-XArc* i;
+int  XArc_height(XArc *i)
 {
           return(i->height);
 }
 
-void set_XArc_height(i, j)
-XArc* i;
-int j;
+void set_XArc_height(XArc *i, int j)
 {
           i->height = j;
 }
 
-int  XArc_width(i)
-XArc* i;
+int  XArc_width(XArc *i)
 {
           return(i->width);
 }
 
-void set_XArc_width(i, j)
-XArc* i;
-int j;
+void set_XArc_width(XArc *i, int j)
 {
           i->width = j;
 }
 
-int  XArc_y(i)
-XArc* i;
+int  XArc_y(XArc *i)
 {
           return(i->y);
 }
 
-void set_XArc_y(i, j)
-XArc* i;
-int j;
+void set_XArc_y(XArc *i, int j)
 {
           i->y = j;
 }
 
-int  XArc_x(i)
-XArc* i;
+int  XArc_x(XArc *i)
 {
           return(i->x);
 }
 
-void set_XArc_x(i, j)
-XArc* i;
-int j;
+void set_XArc_x(XArc *i, int j)
 {
           i->x = j;
 }
@@ -2199,110 +1746,86 @@ int j;
 
 /********* XKeyboardControl funcions *****/
 
-int  make_XKeyboardControl (){
+int  make_XKeyboardControl (void) {
           return ((int) calloc(1, sizeof(XKeyboardControl)));
 }
 
-int  XKeyboardControl_auto_repeat_mode(i)
-XKeyboardControl* i;
+int  XKeyboardControl_auto_repeat_mode(XKeyboardControl *i)
 {
           return(i->auto_repeat_mode);
 }
 
-void set_XKeyboardControl_auto_repeat_mode(i, j)
-XKeyboardControl* i;
-int j;
+void set_XKeyboardControl_auto_repeat_mode(XKeyboardControl *i, int j)
 {
           i->auto_repeat_mode = j;
 }
 
-int  XKeyboardControl_key(i)
-XKeyboardControl* i;
+int  XKeyboardControl_key(XKeyboardControl *i)
 {
           return(i->key);
 }
 
-void set_XKeyboardControl_key(i, j)
-XKeyboardControl* i;
-int j;
+void set_XKeyboardControl_key(XKeyboardControl *i, int j)
 {
           i->key = j;
 }
 
-int  XKeyboardControl_led_mode(i)
-XKeyboardControl* i;
+int  XKeyboardControl_led_mode(XKeyboardControl *i)
 {
           return(i->led_mode);
 }
 
-void set_XKeyboardControl_led_mode(i, j)
-XKeyboardControl* i;
-int j;
+void set_XKeyboardControl_led_mode(XKeyboardControl *i, int j)
 {
           i->led_mode = j;
 }
 
-int  XKeyboardControl_led(i)
-XKeyboardControl* i;
+int  XKeyboardControl_led(XKeyboardControl *i)
 {
           return(i->led);
 }
 
-void set_XKeyboardControl_led(i, j)
-XKeyboardControl* i;
-int j;
+void set_XKeyboardControl_led(XKeyboardControl *i, int j)
 {
           i->led = j;
 }
 
-int  XKeyboardControl_bell_duration(i)
-XKeyboardControl* i;
+int  XKeyboardControl_bell_duration(XKeyboardControl *i)
 {
           return(i->bell_duration);
 }
 
-void set_XKeyboardControl_bell_duration(i, j)
-XKeyboardControl* i;
-int j;
+void set_XKeyboardControl_bell_duration(XKeyboardControl *i, int j)
 {
           i->bell_duration = j;
 }
 
-int  XKeyboardControl_bell_pitch(i)
-XKeyboardControl* i;
+int  XKeyboardControl_bell_pitch(XKeyboardControl *i)
 {
           return(i->bell_pitch);
 }
 
-void set_XKeyboardControl_bell_pitch(i, j)
-XKeyboardControl* i;
-int j;
+void set_XKeyboardControl_bell_pitch(XKeyboardControl *i, int j)
 {
           i->bell_pitch = j;
 }
 
-int  XKeyboardControl_bell_percent(i)
-XKeyboardControl* i;
+int  XKeyboardControl_bell_percent(XKeyboardControl *i)
 {
           return(i->bell_percent);
 }
 
-void set_XKeyboardControl_bell_percent(i, j)
-XKeyboardControl* i;
-int j;
+void set_XKeyboardControl_bell_percent(XKeyboardControl *i, int j)
 {
           i->bell_percent = j;
 }
 
-int  XKeyboardControl_key_click_percent(i)
-XKeyboardControl* i;
+int  XKeyboardControl_key_click_percent(XKeyboardControl *i)
 {
           return(i->key_click_percent);
 }
 
-void set_XKeyboardControl_key_click_percent(i, j)
-XKeyboardControl* i;
-int j;
+void set_XKeyboardControl_key_click_percent(XKeyboardControl *i, int j)
 {
           i->key_click_percent = j;
 }
@@ -2310,97 +1833,76 @@ int j;
 
 /********* XKeyboardState funcions *****/
 
-int  make_XKeyboardState (){
+int  make_XKeyboardState (void) {
           return ((int) calloc(1, sizeof(XKeyboardState)));
 }
 
-char *XKeyboardState_auto_repeats(i)
-XKeyboardState* i;
+char *XKeyboardState_auto_repeats(XKeyboardState *i)
 {
           return(i->auto_repeats);
 }
 
-void set_XKeyboardState_auto_repeats(i, j)
-XKeyboardState* i;
-char	*j;
+void set_XKeyboardState_auto_repeats(XKeyboardState *i, char *j)
 {
           strcpy(i->auto_repeats,  j);
 }
 
-int  XKeyboardState_global_auto_repeat(i)
-XKeyboardState* i;
+int  XKeyboardState_global_auto_repeat(XKeyboardState *i)
 {
           return(i->global_auto_repeat);
 }
 
-void set_XKeyboardState_global_auto_repeat(i, j)
-XKeyboardState* i;
-int j;
+void set_XKeyboardState_global_auto_repeat(XKeyboardState *i, int j)
 {
           i->global_auto_repeat = j;
 }
 
-int  XKeyboardState_led_mask(i)
-XKeyboardState* i;
+int  XKeyboardState_led_mask(XKeyboardState *i)
 {
           return(i->led_mask);
 }
 
-void set_XKeyboardState_led_mask(i, j)
-XKeyboardState* i;
-int j;
+void set_XKeyboardState_led_mask(XKeyboardState *i, int j)
 {
           i->led_mask = j;
 }
 
-int  XKeyboardState_bell_duration(i)
-XKeyboardState* i;
+int  XKeyboardState_bell_duration(XKeyboardState *i)
 {
           return(i->bell_duration);
 }
 
-void set_XKeyboardState_bell_duration(i, j)
-XKeyboardState* i;
-int j;
+void set_XKeyboardState_bell_duration(XKeyboardState *i, int j)
 {
           i->bell_duration = j;
 }
 
-int  XKeyboardState_bell_pitch(i)
-XKeyboardState* i;
+int  XKeyboardState_bell_pitch(XKeyboardState *i)
 {
           return(i->bell_pitch);
 }
 
-void set_XKeyboardState_bell_pitch(i, j)
-XKeyboardState* i;
-int j;
+void set_XKeyboardState_bell_pitch(XKeyboardState *i, int j)
 {
           i->bell_pitch = j;
 }
 
-int  XKeyboardState_bell_percent(i)
-XKeyboardState* i;
+int  XKeyboardState_bell_percent(XKeyboardState *i)
 {
           return(i->bell_percent);
 }
 
-void set_XKeyboardState_bell_percent(i, j)
-XKeyboardState* i;
-int j;
+void set_XKeyboardState_bell_percent(XKeyboardState *i, int j)
 {
           i->bell_percent = j;
 }
 
-int  XKeyboardState_key_click_percent(i)
-XKeyboardState* i;
+int  XKeyboardState_key_click_percent(XKeyboardState *i)
 {
           return(i->key_click_percent);
 }
 
-void set_XKeyboardState_key_click_percent(i, j)
-XKeyboardState* i;
-int j;
+void set_XKeyboardState_key_click_percent(XKeyboardState *i, int j)
 {
           i->key_click_percent = j;
 }
@@ -2408,45 +1910,36 @@ int j;
 
 /********* XTimeCoord funcions *****/
 
-int  make_XTimeCoord (){
+int  make_XTimeCoord (void) {
           return ((int) calloc(1, sizeof(XTimeCoord)));
 }
 
-int  XTimeCoord_y(i)
-XTimeCoord* i;
+int  XTimeCoord_y(XTimeCoord *i)
 {
           return(i->y);
 }
 
-void set_XTimeCoord_y(i, j)
-XTimeCoord* i;
-int j;
+void set_XTimeCoord_y(XTimeCoord *i, int j)
 {
           i->y = j;
 }
 
-int  XTimeCoord_x(i)
-XTimeCoord* i;
+int  XTimeCoord_x(XTimeCoord *i)
 {
           return(i->x);
 }
 
-void set_XTimeCoord_x(i, j)
-XTimeCoord* i;
-int j;
+void set_XTimeCoord_x(XTimeCoord *i, int j)
 {
           i->x = j;
 }
 
-int  XTimeCoord_time(i)
-XTimeCoord* i;
+int  XTimeCoord_time(XTimeCoord *i)
 {
           return(i->time);
 }
 
-void set_XTimeCoord_time(i, j)
-XTimeCoord* i;
-int j;
+void set_XTimeCoord_time(XTimeCoord *i, int j)
 {
           i->time = j;
 }
@@ -2454,32 +1947,26 @@ int j;
 
 /********* XModifierKeymap funcions *****/
 
-int  make_XModifierKeymap (){
+int  make_XModifierKeymap (void) {
           return ((int) calloc(1, sizeof(XModifierKeymap)));
 }
 
-KeyCode *XModifierKeymap_modifiermap(i)
-XModifierKeymap* i;
+KeyCode *XModifierKeymap_modifiermap(XModifierKeymap *i)
 {
           return(i->modifiermap);
 }
 
-void set_XModifierKeymap_modifiermap(i, j)
-XModifierKeymap* i;
-KeyCode *j;
+void set_XModifierKeymap_modifiermap(XModifierKeymap *i, KeyCode *j)
 {
           i->modifiermap = j;
 }
 
-int  XModifierKeymap_max_keypermod(i)
-XModifierKeymap* i;
+int  XModifierKeymap_max_keypermod(XModifierKeymap *i)
 {
           return(i->max_keypermod);
 }
 
-void set_XModifierKeymap_max_keypermod(i, j)
-XModifierKeymap* i;
-int j;
+void set_XModifierKeymap_max_keypermod(XModifierKeymap *i, int j)
 {
           i->max_keypermod = j;
 }

@@ -1,10 +1,12 @@
-; draw.lsp                  Gordon S. Novak Jr.                11 Nov 94
+; draw.lsp                  Gordon S. Novak Jr.       ; 05 Jan 04
 
 ; Functions to make drawings interactively
 
-; Copyright (c) 1994 Gordon S. Novak Jr. and The University of Texas at Austin.
+; Copyright (c) 2004 Gordon S. Novak Jr. and The University of Texas at Austin.
 
-; See the file gnu.license .
+; 11 Nov 94; 05 Jan 95; 15 Jan 98; 09 Feb 99; 04 Dec 00; 28 Feb 02
+
+; See the file gnu.license
 
 ; This program is free software; you can redistribute it and/or modify
 ; it under the terms of the GNU General Public License as published by
@@ -33,8 +35,6 @@
 
 ; The small square in the drawing menu is a "button" for picture menus.
 ; If buttons are used, a picmenu-spec will be produced with the program.
-
-(in-package :user)
 
 (defvar *draw-window*        nil)
 (defvar *draw-window-width*  600)
@@ -151,16 +151,16 @@
 	  (radius     ((max radiusx radiusy)))
 	  (center     (offset + size / 2))
 	  (delta      ((sqrt (abs (radiusx ^ 2 - radiusy ^ 2)))))
-	  (p1         ((if (radiusx > radiusy)
-			   then (a vector x = (x center) - delta
-				          y = (y center))
-			   else (a vector x = (x center)
-				          y = (y center) - delta))))
+	  (p1         ((if (radiusx > radiusy)                ; 05 Jan 04
+			   (a vector x = (x center) - delta
+				     y = (y center))
+			   (a vector x = (x center)
+				     y = (y center) - delta))))
 	  (p2         ((if (radiusx > radiusy)
-			   then (a vector x = (x center) + delta
-				          y = (y center))
-			   else (a vector x = (x center)
-				          y = (y center) + delta)))) )
+			   (a vector x = (x center) + delta
+			             y = (y center))
+			   (a vector x = (x center)
+			             y = (y center) + delta)))) )
   msg    ((draw       draw-ellipse-draw)
 	  (snap       draw-ellipse-snap)
 	  (selectedp  draw-ellipse-selectedp) )
@@ -225,13 +225,14 @@
 
 ) ; glispobjects
 
+; 05 Jan 04
 ; Get drawing description associated with name
-(gldefun draw-desc (name\:symbol)
+(gldefun draw-desc ((name symbol))
   (result draw-desc)
-  (let (dd\:draw-desc)
-    (dd \:= (draw-descr name))
-    (if ~ dd then (dd \:= (a draw-desc with name = name))
-	          (setf (draw-descr name) dd))
+  (let ((dd draw-desc))
+    (dd = (draw-descr name))
+    (if ~ dd (progn (dd = (a draw-desc with name = name))
+		    (setf (draw-descr name) dd)))
     dd))
 
 ; Make a window to draw in.
@@ -243,22 +244,23 @@
 			   "Draw window"))) )
 
 ; 09 Sep 92; 11 Sep 92; 14 Sep 92; 16 Sep 92; 21 Oct 92; 21 May 93; 17 Dec 93
-(gldefun draw (name\:symbol)
-  (let (w dd done sel (redraw t) new\:draw-object)
-    (w \:= (draw-window))
+; 05 Jan 04
+(gldefun draw ((name symbol))
+  (let (w dd done sel (redraw t) (new draw-object))
+    (w = (draw-window))
     (open w)
     (or *draw-menu-set* (draw-init-menus))
-    (dd \:= (draw-desc name))
+    (dd = (draw-desc name))
     (unless (member name *draw-objects*)
       (setq *draw-objects* (nconc *draw-objects* (list name))))
     (draw dd w)
     (while ~ done do
-      (sel \:= (menu-set-select *draw-menu-set* redraw))
-      (redraw \:= nil)
+      (sel = (menu-set-select *draw-menu-set* redraw))
+      (redraw = nil)
       (case (menu-name sel)
 	(command
 	  (case (port sel)
-	    (done    (done \:= t))
+	    (done    (done = t))
 	    (move    (draw-desc-move dd w))
 	    (delete  (draw-desc-delete dd w))
 	    (copy    (draw-desc-copy dd w))
@@ -275,192 +277,193 @@
 		       (format t "Latex Mode is now ~A~%" *draw-latex-mode*))
 	    ))
 	(draw
-	  (new \:= nil)
+	  (new = nil)
 	  (case (port sel)
-	    (rectangle (new \:= (draw-box-get dd w)))
-	    (rcbox     (new \:= (draw-rcbox-get dd w)))
-	    (circle    (new \:= (draw-circle-get dd w)))
-	    (ellipse   (new \:= (draw-ellipse-get dd w)))
-	    (line      (new \:= (draw-line-get dd w)))
-	    (arrow     (new \:= (draw-arrow-get dd w)))
-	    (dot       (new \:= (draw-dot-get dd w)))
-	    (erase     (new \:= (draw-erase-get dd w)))
-	    (button    (new \:= (draw-button-get dd w)))
-	    (text      (new \:= (draw-text-get dd w)))
-	    (refpt     (new \:= (draw-refpt-get dd w))))
+	    (rectangle (new = (draw-box-get dd w)))
+	    (rcbox     (new = (draw-rcbox-get dd w)))
+	    (circle    (new = (draw-circle-get dd w)))
+	    (ellipse   (new = (draw-ellipse-get dd w)))
+	    (line      (new = (draw-line-get dd w)))
+	    (arrow     (new = (draw-arrow-get dd w)))
+	    (dot       (new = (draw-dot-get dd w)))
+	    (erase     (new = (draw-erase-get dd w)))
+	    (button    (new = (draw-button-get dd w)))
+	    (text      (new = (draw-text-get dd w)))
+	    (refpt     (new = (draw-refpt-get dd w))))
 	  (if new
-	      then ((offset new) _- (offset dd))
-                   ((objects dd) _+ new)
-	           (draw new w (offset dd))))
+	      (progn ((offset new) _- (offset dd))
+		     ((objects dd) _+ new)
+		     (draw new w (offset dd)))))
 	(background nil)) )
     (setf (draw-descr name) dd)
     (unless *draw-leave-window* (close w))
     name ))
 
 ; 09 Sep 92
-(gldefun draw-desc-draw (dd\:draw-desc w\:window)
+(gldefun draw-desc-draw ((dd draw-desc) (w window))
   (let ( (off (offset dd)) )
     (clear w)
     (for obj in (objects dd) (draw obj w off))
     (force-output w)  ))
 
-; 11 Sep 92; 12 Sep 92; 06 Oct 92
+; 11 Sep 92; 12 Sep 92; 06 Oct 92; 05 Jan 04
 ; Find a draw-object such that point p selects it
-(gldefun draw-desc-selected (dd\:draw-desc p\:vector)
+(gldefun draw-desc-selected ((dd draw-desc) (p vector))
   (result draw-object)
   (let (objs objsb obj)
-    (objs \:= (for obj in objects when (selectedp obj p (offset dd))
+    (objs = (for obj in objects when (selectedp obj p (offset dd))
 		   collect obj))
     (if objs
-	then (if (null (rest objs))
-		 then (obj \:= (first objs))
-	         else (objsb \:= (for z in objs
+        (if (null (rest objs))
+	    (obj = (first objs))
+	    (progn (objsb = (for z in objs
 				      when (member (first z)
 						   '(draw-button draw-dot))
 				      collect z))
-		      (if (and objsb (null (rest objsb)))
-			  then (obj \:= (first objsb)))) )
+		   (if (and objsb (null (rest objsb)))
+		       (obj = (first objsb)))) ) )
     obj))
 
-; 11 Sep 92; 12 Sep 92; 13 Sep 92
+; 11 Sep 92; 12 Sep 92; 13 Sep 92; 05 Jan 04
 ; Find a draw-object such that point p selects it
-(gldefun draw-desc-find (dd\:draw-desc w\:window &optional crossflg\:boolean)
+(gldefun draw-desc-find ((dd draw-desc) (w window) &optional (crossflg boolean))
   (result draw-object)
   (let (p obj)
     (while ~ obj do
-      (p \:= (if crossflg then (draw-get-cross dd w)
-	                  else (draw-get-crosshairs dd w)))
-      (obj \:= (draw-desc-selected dd p)) )
+      (p = (if crossflg (draw-get-cross dd w)
+	                (draw-get-crosshairs dd w)))
+      (obj = (draw-desc-selected dd p)) )
     obj))
 
 ; 15 Sep 92
-(gldefun draw-get-cross (dd\:draw-desc w\:window)
+(gldefun draw-get-cross ((dd draw-desc) (w window))
   (result vector)
   (draw-desc-snap dd (window-get-cross w)))
 
 ; 15 Sep 92
-(gldefun draw-get-crosshairs (dd\:draw-desc w\:window)
+(gldefun draw-get-crosshairs ((dd draw-desc) (w window))
   (result vector)
   (draw-desc-snap dd (window-get-crosshairs w)))
 
 ; 12 Sep 92; 14 Sep 92; 06 Oct 92
 ; Delete selected object
-(gldefun draw-desc-delete (dd\:draw-desc w\:window)
+(gldefun draw-desc-delete ((dd draw-desc) (w window))
   (let (obj)
-    (obj \:= (draw-desc-find dd w t))
+    (obj = (draw-desc-find dd w t))
     (erase obj w (offset dd))
     ((objects dd) _- obj) ))
 
 ; 12 Sep 92; 07 Oct 92
 ; Copy selected object
-(gldefun draw-desc-copy (dd\:draw-desc w\:window)
-  (let (obj objb\:draw-object)
-    (obj \:= (draw-desc-find dd w))
-    (objb \:= (copy-tree obj))
+(gldefun draw-desc-copy ((dd draw-desc) (w window))
+  (let (obj (objb draw-object))
+    (obj = (draw-desc-find dd w))
+    (objb = (copy-tree obj))
     (draw-get-object-pos objb w)
     ((offset objb) _- (offset dd))
     (draw objb w (offset dd))
     (force-output w)
     ((objects dd) _+ objb) ))
 
-; 12 Sep 92; 13 Sep 92; 07 Oct 92
+; 12 Sep 92; 13 Sep 92; 07 Oct 92; 05 Jan 04
 ; Move selected object
-(gldefun draw-desc-move (dd\:draw-desc w\:window)
+(gldefun draw-desc-move ((dd draw-desc) (w window))
   (let (obj)
-    (if (obj \:= (draw-desc-find dd w))
-	then (move obj w (offset dd)))  ))
+    (if (obj = (draw-desc-find dd w))
+        (move obj w (offset dd)))  ))
 
-; 14 Sep 92
+; 14 Sep 92; 28 Feb 02; 05 Jan 04
 ; Reset origin of object group
-(gldefun draw-desc-origin (dd\:draw-desc w\:window)
+(gldefun draw-desc-origin ((dd draw-desc) (w window))
   (let (sel)
     (draw-desc-bounds dd)
-    (sel \:= (menu '(("To zero" . zero) ("Select" . select))))
-    (if (sel = 'select)
-	then ((offset dd) \:= (get-box-position w (x (size dd)) (y (size dd))))
-      elseif (sel = 'zero) then ((offset dd) \:= (a vector x 0 y 0)) ) ))
+    (sel = (menu '(("To zero" . zero) ("Select" . select))))
+    (if (sel == 'select)
+	((offset dd) = (get-box-position w (x (size dd)) (y (size dd))))
+        (if (sel == 'zero) ((offset dd) = (a vector x 0 y 0)) ) )))
 
 ; 14 Sep 92
 ; Compute boundaries of objects in a drawing; set offset and size of
 ; the draw-desc and reset offsets of items relative to it.
-(gldefun draw-desc-bounds (dd\:draw-desc)
+(gldefun draw-desc-bounds ((dd draw-desc))
   (let ((xmin 9999) (ymin 9999) (xmax 0) (ymax 0) basev)
     (for obj in objects do
-      (xmin \:= (min xmin (x (offset obj))
+      (xmin = (min xmin (x (offset obj))
 		     ((x (offset obj)) + (x (size obj)))))
-      (ymin \:= (min ymin (y (offset obj))
+      (ymin = (min ymin (y (offset obj))
 		     ((y (offset obj)) + (y (size obj)))))
-      (xmax \:= (max xmax (x (offset obj))
+      (xmax = (max xmax (x (offset obj))
 		     ((x (offset obj)) + (x (size obj)))))
-      (ymax \:= (max ymax (y (offset obj))
+      (ymax = (max ymax (y (offset obj))
 		     ((y (offset obj)) + (y (size obj))))) )
-    ((x (size dd)) \:= (xmax - xmin))
-    ((y (size dd)) \:= (ymax - ymin))
-    (basev \:= (a vector with x = xmin y = ymin))
-    ((offset dd) \:= basev)
+    ((x (size dd)) = (xmax - xmin))
+    ((y (size dd)) = (ymax - ymin))
+    (basev = (a vector with x = xmin y = ymin))
+    ((offset dd) = basev)
     (for obj in objects do ((offset obj) _- basev)) ))
 
-; 14 Sep 92; 16 Sep 92; 19 Dec 93
+; 14 Sep 92; 16 Sep 92; 19 Dec 93; 15 Jan 98
 ; Produce LaTex output for object group.
 ; LaTex can only *approximately* reproduce the picture.
-(gldefun draw-desc-latex (dd\:draw-desc)
+(gldefun draw-desc-latex ((dd draw-desc))
   (let (base bx by sx sy)
-    (format t "   \\begin{picture}(~5,2F,~5,2F)(0,0)~%"
+    (format t "   \\begin{picture}(~5,0F,~5,0F)(0,0)~%"
 	    (x (size dd) * *draw-latex-factor*)
 	    (y (size dd) * *draw-latex-factor*) )
     (for obj in (objects dd) do
-      (base \:= (offset dd) + (offset obj))
-      (bx \:= (x base) * *draw-latex-factor*)
-      (by \:= (y base) * *draw-latex-factor*)
-      (sx \:= (x (size obj)) * *draw-latex-factor*)
-      (sy \:= (y (size obj)) * *draw-latex-factor*)
+      (base = (offset dd) + (offset obj))
+      (bx = (x base) * *draw-latex-factor*)
+      (by = (y base) * *draw-latex-factor*)
+      (sx = (x (size obj)) * *draw-latex-factor*)
+      (sy = (y (size obj)) * *draw-latex-factor*)
       (case (first obj)
 	(draw-line (latex-line (x base) (y base)
 			       ((x base) + sx) ((y base) + sy)))
 	(draw-arrow (latex-line (x base) (y base)
 			       ((x base) + sx) ((y base) + sy) t) )
 	(draw-box
-	  (format t "   \\put(~5,2F,~5,2F) {\\framebox(~5,2F,~5,2F)}~%"
+	  (format t "   \\put(~5,0F,~5,0F) {\\framebox(~5,0F,~5,0F)}~%"
 		  bx by sx sy))
 	(draw-rcbox
-	  (format t "   \\put(~5,2F,~5,2F) {\\oval(~5,2F,~5,2F)}~%"
+	  (format t "   \\put(~5,0F,~5,0F) {\\oval(~5,0F,~5,0F)}~%"
 		  (bx + sx / 2) (by + sy / 2) sx sy))
 	(draw-circle
-	  (format t "   \\put(~5,2F,~5,2F) {\\circle{~5,2F}}~%"
+	  (format t "   \\put(~5,0F,~5,0F) {\\circle{~5,0F}}~%"
 		  (bx + sx / 2) (by + sy / 2) sx))
 	(draw-ellipse
-	  (format t "   \\put(~5,2F,~5,2F) {\\oval(~5,2F,~5,2F)}~%"
+	  (format t "   \\put(~5,0F,~5,0F) {\\oval(~5,0F,~5,0F)}~%"
 		  (bx + sx / 2) (by + sy / 2) sx sy))
 	(draw-button
-	  (format t "   \\put(~5,2F,~5,2F) {\\framebox(~5,2F,~5,2F)}~%"
+	  (format t "   \\put(~5,0F,~5,0F) {\\framebox(~5,0F,~5,0F)}~%"
 		  bx by sx sy))
 	(draw-erase )
 	(draw-dot
-	  (format t "   \\put(~5,2F,~5,2F) {\\circle*{~5,2F}}~%"
+	  (format t "   \\put(~5,0F,~5,0F) {\\circle*{~5,0F}}~%"
 		  (bx + sx / 2) (by + sy / 2) sx))
 	(draw-text
-	  (format t "   \\put(~5,2F,~5,2F) {~A}~%"
+	  (format t "   \\put(~5,0F,~5,0F) {~A}~%"
 		  bx (by + 4 * *draw-latex-factor*) (contents obj)) ) ) )
     (format t "   \\end{picture}~%")  ))
 
-; 14 Sep 92; 15 Sep 92; 16 Sep 92; 05 Oct 92; 17 Dec 93; 21 Dec 93
+; 14 Sep 92; 15 Sep 92; 16 Sep 92; 05 Oct 92; 17 Dec 93; 21 Dec 93; 28 Feb 02
+; 05 Jan 04
 ; Produce program to draw object group
-(gldefun draw-desc-program (dd\:draw-desc)
+(gldefun draw-desc-program ((dd draw-desc))
   (let (base bx by sx sy tox toy r rx ry s code fncode fnname cd)
-    (code \:= (for obj in (objects dd) when
-		(cd \:= (progn
-		  (base \:= (offset dd) + (offset obj) - (refpt dd))
-		  (bx \:= (x base))
-		  (by \:= (y base))
-		  (sx \:= (x (size obj)))
-		  (sy \:= (y (size obj)))
-		  (tox \:= bx + sx)
-		  (toy \:= by + sy)
-		  (if ((car obj) = 'draw-circle)
-		      then (r \:= (x (size obj)) / 2))
-		  (if ((car obj) = 'draw-ellipse)
-		      then (rx \:= (x (size obj)) / 2)
-		           (ry \:= (y (size obj)) / 2))
+    (code = (for obj in (objects dd) when
+		(cd = (progn
+		  (base = (offset dd) + (offset obj) - (refpt dd))
+		  (bx = (x base))
+		  (by = (y base))
+		  (sx = (x (size obj)))
+		  (sy = (y (size obj)))
+		  (tox = bx + sx)
+		  (toy = by + sy)
+		  (if ((car obj) == 'draw-circle)
+		      (r = (x (size obj)) / 2))
+		  (if ((car obj) == 'draw-ellipse)
+		      (progn (rx = (x (size obj)) / 2)
+			     (ry = (y (size obj)) / 2)))
 		  (draw-optimize
 		    (case (first obj)
 		      (draw-line `(window-draw-line-xy w (+ x ,bx)  (+ y ,by)
@@ -482,15 +485,15 @@
 						         ,sx ,sy))
 		      (draw-dot `(window-draw-dot-xy w (+ x ,(+ 2 bx))
 						     (+ y ,(+ 2 by))))
-		      (draw-text (s \:= (stringify (contents obj)))
+		      (draw-text (s = (stringify (contents obj)))
 				 `(window-printat-xy w ,s (+ x ,bx) (+ y ,by)))
 		      )) ))
 		collect cd))
-    (fncode \:= (cons 'lambda (cons (list 'w 'x 'y)
+    (fncode = (cons 'lambda (cons (list 'w 'x 'y)
 				    (nconc code
 					   (list (list 'window-force-output
 						       'w))))))
-    (fnname \:= (fnname dd))
+    (fnname = (fnname dd))
     (setf (symbol-function fnname) fncode)
     (format t "Constructed program (~A w x y)~%" fnname)
     (draw-desc-picmenu dd)
@@ -501,35 +504,35 @@
 (defun draw-optimize (x)  (if (fboundp 'glunwrap) (glunwrap x nil) x))
 
 ; 14 Sep 92
-(gldefun draw-desc-fnname (dd\:draw-desc)
+(gldefun draw-desc-fnname ((dd draw-desc))
   (intern (concatenate 'string "DRAW-" (symbol-name (name dd)))) )
 
-; 14 Sep 92; 06 Oct 92; 08 Apr 93
+; 14 Sep 92; 06 Oct 92; 08 Apr 93; 28 Feb 02; 05 Jan 04
 ; Produce a picmenu-spec from the buttons of a drawing description
-(gldefun draw-desc-picmenu (dd\:draw-desc)
+(gldefun draw-desc-picmenu ((dd draw-desc))
   (let (buttons)
-    (buttons \:= (for obj in (objects dd) when ((first obj) = 'draw-button)
+    (buttons = (for obj in (objects dd) when ((first obj) == 'draw-button)
 		      collect (list (contents obj)
 				    ((a vector x 2 y 2) + (offset obj)
 				      + (offset dd) )) ) )
     (if buttons
-	then (setf (get (name dd) 'picmenu-spec)
-		   (list 'picmenu-spec (x (size dd)) (y (size dd)) buttons
-			 t (fnname dd) '9x15))) ))
+        (setf (get (name dd) 'picmenu-spec)
+	      (list 'picmenu-spec (x (size dd)) (y (size dd)) buttons
+		    t (fnname dd) '9x15))) ))
 
-; 15 Sep 92
-(gldefun draw-desc-snap (dd\:draw-desc p\:vector)
+; 15 Sep 92; 05 Jan 04
+(gldefun draw-desc-snap ((dd draw-desc) (p vector))
   (result vector)
   (let (psnap obj (objs (objects dd)) )
     (if *draw-snap-flag*
-	then (while objs and ~ psnap do
-               (obj \:= (pop objs))
-	       (psnap \:= (draw-object-snap obj p (offset dd))) ) )
+        (while objs and ~ psnap do
+          (obj = (pop objs))
+	  (psnap = (draw-object-snap obj p (offset dd))) ) )
     (or psnap p) ))
 
 ; 10 Sep 92; 12 Sep 92
 ; Move specified object
-(gldefun draw-object-move (d\:draw-object w\:window off\:vector)
+(gldefun draw-object-move ((d draw-object) (w window) (off vector))
   (let ()
     (erase d w off)
     (draw-get-object-pos d w)
@@ -558,63 +561,63 @@
 (defun draw-object-selectedp (d w off)
   (funcall (glmethod (car d) 'selectedp) d w off) )
 
-; 12 Sep 92; 07 Oct 92
-(gldefun draw-get-object-pos (d\:draw-object w\:window)
+; 12 Sep 92; 07 Oct 92; 28 Feb 02; 05 Jan 04
+(gldefun draw-get-object-pos ((d draw-object) (w window))
   (window-get-icon-position w 
-    (if ((first d) = 'draw-text) then #'draw-text-draw-outline
-                                 else #'draw-object-draw-at)
+    (if ((first d) == 'draw-text) #'draw-text-draw-outline
+                                  #'draw-object-draw-at)
     (list d)) )
 
-; 10 Sep 92; 15 Sep 92
-(gldefun draw-object-erase (d\:draw-object w\:window off\:vector)
+; 10 Sep 92; 15 Sep 92; 05 Jan 04
+(gldefun draw-object-erase ((d draw-object) (w window) (off vector))
   (let ()
     (if ((first d) <> 'draw-erase)
-	then (set-xor w)
-             (draw d w off)
-	     (unset w)) ))
+	(progn (set-xor w)
+	       (draw d w off)
+	       (unset w)) )))
 
-; 09 Sep 92; 17 Dec 93; 19 Dec 93
-(gldefun draw-line-draw (d\:draw-line w\:window off\:vector)
-  (let ((from (off + (offset d))) (to (off  + (offset d)) + (size d)) )
+; 09 Sep 92; 17 Dec 93; 19 Dec 93; 04 Dec 00
+(gldefun draw-line-draw ((d draw-line) (w window) (off vector))
+  (let ((from (off + (offset d))) (to ((off  + (offset d)) + (size d))) )
     (draw-line-xy w (x from) (y from) (x to) (y to)) ))
 
-; 11 Sep 92; 17 Dec 93; 19 Dec 93
-(gldefun draw-arrow-draw (d\:draw-arrow w\:window off\:vector)
-  (let ((from (off + (offset d))) (to (off  + (offset d)) + (size d)) )
+; 11 Sep 92; 17 Dec 93; 19 Dec 93; 04 Dec 00
+(gldefun draw-arrow-draw ((d draw-arrow) (w window) (off vector))
+  (let ((from (off + (offset d))) (to ((off  + (offset d)) + (size d))) )
     (draw-arrow-xy w (x from) (y from) (x to) (y to)) ))
 
 ; 09 Sep 92; 10 Sep 92; 12 Sep 92
-(gldefun draw-line-selectedp (d\:draw-line pt\:vector off\:vector)
+(gldefun draw-line-selectedp ((d draw-line) (pt vector) (off vector))
   (let ((ptp (pt - off)))
     (and (contains? (vregion d) ptp)
 	 ((distance (line d) ptp) < 5) ) ))
 
-; 09 Sep 92; 10 Sep 92; 15 Sep 92; 17 Dec 93
-(gldefun draw-line-get (dd\:draw-desc w\:window)
+; 09 Sep 92; 10 Sep 92; 15 Sep 92; 17 Dec 93; 05 Jan 04
+(gldefun draw-line-get ((dd draw-desc) (w window))
   (let (from to)
-    (from \:= (draw-get-crosshairs dd w))
-    (to   \:= (if *draw-latex-mode*
-		  then (window-get-latex-position w (x from) (y from) nil)
-		  else (draw-desc-snap dd 
-			  (window-get-line-position w (x from) (y from)))))
+    (from = (draw-get-crosshairs dd w))
+    (to   = (if *draw-latex-mode*
+	        (window-get-latex-position w (x from) (y from) nil)
+		(draw-desc-snap dd 
+				(window-get-line-position w (x from) (y from)))))
     (a draw-line with offset = from  size = (to - from)) ))
 
-; 11 Sep 92; 15 Sep 92; 17 Dec 93
-(gldefun draw-arrow-get (dd\:draw-desc w\:window)
+; 11 Sep 92; 15 Sep 92; 17 Dec 93; 05 Jan 04
+(gldefun draw-arrow-get ((dd draw-desc) (w window))
   (let (from to)
-    (from \:= (draw-get-crosshairs dd w))
-    (to   \:= (if *draw-latex-mode*
-		  then (window-get-latex-position w (x from) (y from) nil)
-		  else (draw-desc-snap dd 
+    (from = (draw-get-crosshairs dd w))
+    (to   = (if *draw-latex-mode*
+	        (window-get-latex-position w (x from) (y from) nil)
+	        (draw-desc-snap dd 
 			  (window-get-line-position w (x from) (y from)))))
     (a draw-arrow with offset = from  size = (to - from)) ))
 
 ; 09 Sep 92
-(gldefun draw-box-draw (d\:draw-box w\:window off\:vector)
+(gldefun draw-box-draw ((d draw-box) (w window) (off vector))
   (draw-box w (off + (offset d)) (size d)) )
 
 ; 09 Sep 92; 11 Sep 92
-(gldefun draw-box-selectedp (d\:draw-box p\:vector off\:vector)
+(gldefun draw-box-selectedp ((d draw-box) (p vector) (off vector))
   (let ((pt (p - off)))
     (or (and ((y pt) < (top (vregion d)) + 5)
 	     ((y pt) > (bottom (vregion d)) - 5)
@@ -626,20 +629,20 @@
 		 ((abs (y pt) - (bottom (vregion d))) < 5))) ) ))
 
 ; 11 Sep 92
-(gldefun draw-box-get (dd\:draw-desc w\:window)
+(gldefun draw-box-get ((dd draw-desc) (w window))
   (let (box)
-    (box \:= (window-get-region w))
+    (box = (window-get-region w))
     (a draw-box with offset = (start box)  size = (size box)) ))
 
 ; (dotimes (i 10) (print (draw-box-selectedp db (window-get-point dw))))
 
 ; 16 Sep 92
-(gldefun draw-rcbox-draw (d\:draw-box w\:window off\:vector)
+(gldefun draw-rcbox-draw ((d draw-box) (w window) (off vector))
   (draw-rcbox-xy w ((x off) + (x (offset d))) ((y off) + (y (offset d)))
 		   (x (size d)) (y (size d)) 8) )
 
 ; 16 Sep 92
-(gldefun draw-rcbox-selectedp (d\:draw-box p\:vector off\:vector)
+(gldefun draw-rcbox-selectedp ((d draw-box) (p vector) (off vector))
   (let ((pt (p - off)))
     (or (and ((y pt) < (top (vregion d)) - 3)
 	     ((y pt) > (bottom (vregion d)) + 3)
@@ -651,37 +654,37 @@
 		 ((abs (y pt) - (bottom (vregion d))) < 5))) ) ))
 
 ; 16 Sep 92
-(gldefun draw-rcbox-get (dd\:draw-desc w\:window)
+(gldefun draw-rcbox-get ((dd draw-desc) (w window))
   (let (box)
-    (box \:= (window-get-region w))
+    (box = (window-get-region w))
     (a draw-rcbox with offset = (start box)  size = (size box)) ))
 
 ; 09 Sep 92
-(gldefun draw-circle-draw (d\:draw-circle w\:window off\:vector)
+(gldefun draw-circle-draw ((d draw-circle) (w window) (off vector))
   (draw-circle w (off + (center d)) (radius d)) )
 
 ; 09 Sep 92; 11 Sep 92; 17 Sep 92
-(gldefun draw-circle-selectedp (d\:draw-circle p\:vector off\:vector)
+(gldefun draw-circle-selectedp ((d draw-circle) (p vector) (off vector))
   ((abs (radius d) - (magnitude ((center d) + off) - p)) < 5) )
 
 ; 11 Sep 92; 15 Sep 92
-(gldefun draw-circle-get (dd\:draw-desc w\:window)
+(gldefun draw-circle-get ((dd draw-desc) (w window))
   (let (cir cent)
-    (cent \:= (draw-get-crosshairs dd w))
-    (cir \:= (window-get-circle w cent))
+    (cent = (draw-get-crosshairs dd w))
+    (cir = (window-get-circle w cent))
     (a draw-circle with
        offset = (a vector with x = ( (x (center cir)) - (radius cir) )
 		               y = ( (y (center cir)) - (radius cir) ))
        size   = (a vector with x = 2 * (radius cir) y = 2 * (radius cir))) ))
 
 ; 11 Sep 92
-(gldefun draw-ellipse-draw (d\:draw-ellipse w\:window off\:vector)
+(gldefun draw-ellipse-draw ((d draw-ellipse) (w window) (off vector))
   (let ((c (off + (center d))))
     (draw-ellipse-xy w (x c) (y c) (radiusx d) (radiusy d)) ))
 
 ; 11 Sep 92; 15 Sep 92; 17 Sep 92
 ; Uses the fact that sum of distances from foci is constant.
-(gldefun draw-ellipse-selectedp (d\:draw-ellipse p\:vector off\:vector)
+(gldefun draw-ellipse-selectedp ((d draw-ellipse) (p vector) (off vector))
   (let ((pt (p - off)))
     ( (abs ( (magnitude ((p1 d) - pt)) +  (magnitude ((p2 d) - pt)) )
       - 2 * (radius d)) < 2) ))
@@ -698,10 +701,10 @@
       (terpri)) ))
 
 ; 11 Sep 92
-(gldefun draw-ellipse-get (dd\:draw-desc w\:window)
+(gldefun draw-ellipse-get ((dd draw-desc) (w window))
   (let (ell cent)
-    (cent \:= (draw-get-crosshairs dd w))
-    (ell \:= (window-get-ellipse w cent))
+    (cent = (draw-get-crosshairs dd w))
+    (ell = (window-get-ellipse w cent))
     (a draw-ellipse with
        offset = (a vector with x = ( (x (center ell)) - (x (halfsize ell)) )
 		               y = ( (y (center ell)) - (y (halfsize ell)) ))
@@ -709,142 +712,142 @@
 		               y = 2 * (y (halfsize ell)))) ))
       
 ; 10 Sep 92
-(gldefun draw-null-draw (d\:draw-null w\:window off\:vector) nil)
+(gldefun draw-null-draw ((d draw-null) (w window) (off vector)) nil)
 
 ; 10 Sep 92; 11 Sep 92
-(gldefun draw-null-selectedp (d\:draw-null pt\:vector off\:vector) nil)
+(gldefun draw-null-selectedp ((d draw-null) (pt vector) (off vector)) nil)
 
 ; 11 Sep 92
-(gldefun draw-button-draw (d\:draw-button w\:window off\:vector)
+(gldefun draw-button-draw ((d draw-button) (w window) (off vector))
   (draw-box w (off + (offset d)) (a vector x = 4 y = 4)) )
 
 ; 11 Sep 92
-(gldefun draw-button-selectedp (d\:draw-button p\:vector off\:vector)
+(gldefun draw-button-selectedp ((d draw-button) (p vector) (off vector))
   (let ( (ptx (((x p) - (x off)) - (x (offset d))))
 	 (pty (((y p) - (y off)) - (y (offset d)))) )
     (and (ptx > -2) (ptx < 6) (pty > -2) (pty < 6) ) ))
  ))
 
 ; 11 Sep 92
-(gldefun draw-button-get (dd\:draw-desc w\:window)
+(gldefun draw-button-get ((dd draw-desc) (w window))
   (let (cent var)
     (princ "Enter button name: ")
-    (var \:= (read))
-    (cent \:= (draw-get-crosshairs dd w))
+    (var = (read))
+    (cent = (draw-get-crosshairs dd w))
     (a draw-button with
        offset = (a vector with x = ((x cent) - 2) y = ((y cent) - 2))
        size   = (a vector with x = 4 y = 4)
        contents = var) ))
 
 ; 14 Sep 92
-(gldefun draw-erase-draw (d\:draw-box w\:window off\:vector)
+(gldefun draw-erase-draw ((d draw-box) (w window) (off vector))
   (erase-area w (off + (offset d)) (size d)) )
 
 ; 14 Sep 92
-(gldefun draw-erase-selectedp (d\:draw-box p\:vector off\:vector)
+(gldefun draw-erase-selectedp ((d draw-box) (p vector) (off vector))
   (let ((pt (p - off)))
     (contains? (region d) pt) ))
 
 ; 14 Sep 92
-(gldefun draw-erase-get (dd\:draw-desc w\:window)
+(gldefun draw-erase-get ((dd draw-desc) (w window))
   (let (box)
-    (box \:= (window-get-region w))
+    (box = (window-get-region w))
     (a draw-erase with offset = (start box)  size = (size box)) ))
 
 ; 11 Sep 92; 14 Sep 92
-(gldefun draw-dot-draw (d\:draw-dot w\:window off\:vector)
+(gldefun draw-dot-draw ((d draw-dot) (w window) (off vector))
   (window-draw-dot-xy w ((x off) + (x (offset d)) + 2)
 		        ((y off) + (y (offset d)) + 2) ) )
 
 ; 11 Sep 92; 15 Sep 92
-(gldefun draw-dot-get (dd\:draw-desc w\:window)
+(gldefun draw-dot-get ((dd draw-desc) (w window))
   (let (cent)
-    (cent \:= (draw-get-crosshairs dd w))
+    (cent = (draw-get-crosshairs dd w))
     (a draw-dot with
        offset = (a vector with x = ((x cent) - 2) y = ((y cent) - 2))
        size   = (a vector with x = 4 y = 4)) ))
 
 ; 17 Dec 93
-(gldefun draw-refpt-draw (d\:draw-refpt w\:window off\:vector)
+(gldefun draw-refpt-draw ((d draw-refpt) (w window) (off vector))
   (window-draw-crosshairs-xy w ((x off) + (x (offset d)))
 		               ((y off) + (y (offset d))) ) )
 
 ; 17 Dec 93
-(gldefun draw-refpt-selectedp (d\:draw-button p\:vector off\:vector)
+(gldefun draw-refpt-selectedp ((d draw-button) (p vector) (off vector))
   (let ( (ptx (((x p) - (x off)) - (x (offset d))))
 	 (pty (((y p) - (y off)) - (y (offset d)))) )
     (and (ptx > -3) (ptx < 3) (pty > -3) (pty < 3) ) ))
 
-; 17 Dec 93
-(gldefun draw-refpt-get (dd\:draw-desc w\:window)
+; 17 Dec 93; 05 Jan 04
+(gldefun draw-refpt-get ((dd draw-desc) (w window))
   (let (cent refpt)
-    (if (refpt \:= (assoc 'draw-refpt (objects dd)))
-	then (set-erase *draw-window*)
-             (draw refpt *draw-window* (a vector with x = 0 y = 0))
-	     (unset *draw-window*)
-	     ((objects dd) _- refpt) )
-    (cent \:= (draw-get-crosshairs dd w))
+    (if (refpt = (assoc 'draw-refpt (objects dd)))
+	(progn (set-erase *draw-window*)
+	       (draw refpt *draw-window* (a vector with x = 0 y = 0))
+	       (unset *draw-window*)
+	       ((objects dd) _- refpt) ) )
+    (cent = (draw-get-crosshairs dd w))
     (a draw-refpt with offset = cent
 		       size   = (a vector with x = 0 y = 0)) ))
 
-; 17 Dec 93
-(gldefun draw-desc-refpt (dd\:draw-desc) (result vector)
+; 17 Dec 93; 05 Jan 04
+(gldefun draw-desc-refpt ((dd draw-desc)) (result vector)
   (let (refpt)
-    (refpt \:= (assoc 'draw-refpt (objects dd)))
-    (if refpt then (offset refpt)
-              else (a vector x = 0 y = 0)) ))
+    (refpt = (assoc 'draw-refpt (objects dd)))
+    (if refpt (offset refpt)
+              (a vector x = 0 y = 0)) ))
 
 ; 11 Sep 92; 06 Oct 92; 19 Dec 93; 11 Nov 94
-(gldefun draw-text-draw (d\:draw-text w\:window off\:vector)
+(gldefun draw-text-draw ((d draw-text) (w window) (off vector))
   (printat-xy w (contents d) ((x off) + (x (offset d)))
 	                     ((y off) + (y (offset d)))) )
 
 ; 07 Oct 92
-(gldefun draw-text-draw-outline (w\:window x\:integer y\:integer d\:draw-text)
+(gldefun draw-text-draw-outline ((w window) (x integer) (y integer) (d draw-text))
   (setf (second d) (list x y))
   (draw-box-xy w x (y + 2) (x (size d)) (y (size d))) )
 
 ; 11 Sep 92
-(gldefun draw-text-selectedp (d\:draw-text pt\:vector off\:vector)
+(gldefun draw-text-selectedp ((d draw-text) (pt vector) (off vector))
   (let ((ptp (pt - off)))
     (contains? (vregion d) ptp)))
 
 ; 11 Sep 92; 17 Sep 92; 06 Oct 92; 11 Nov 94
-(gldefun draw-text-get (dd\:draw-desc w\:window)
+(gldefun draw-text-get ((dd draw-desc) (w window))
   (let (txt lng off)
     (princ "Enter text string: ")
-    (txt \:= (stringify (read)))
-    (lng \:= (string-width w txt))
-    (off \:= (get-box-position w lng 14))
+    (txt = (stringify (read)))
+    (lng = (string-width w txt))
+    (off = (get-box-position w lng 14))
     (a draw-text with  offset   = (off + (a vector x 0 y 4))
                        size     = (a vector with x = lng y = 14)
                        contents = txt) ))
 
-; 15 Sep 92
+; 15 Sep 92; 05 Jan 04
 ; Test if a point p1 is close to a point p2.  If so, result is p2, else nil.
-(gldefun draw-snapp (p1\:vector off\:vector p2x\:integer p2y\:integer)
+(gldefun draw-snapp ((p1 vector) (off vector) (p2x integer) (p2y integer))
   (if (and ((abs ((x p1) - (x off) - p2x)) < 4)
 	   ((abs ((y p1) - (y off) - p2y)) < 4) )
-      then (a vector with x = ((x off) + p2x) y = ((y off) + p2y)) ))
+      (a vector with x = ((x off) + p2x) y = ((y off) + p2y)) ))
 
 ; 15 Sep 92
-(gldefun draw-dot-snap (d\:draw-dot p\:vector off\:vector)
+(gldefun draw-dot-snap ((d draw-dot) (p vector) (off vector))
   (draw-snapp p off ((x (offset d)) + 2)
 		    ((y (offset d)) + 2) ) )
 
 ; 17 Dec 93
-(gldefun draw-refpt-snap (d\:draw-refpt p\:vector off\:vector)
+(gldefun draw-refpt-snap ((d draw-refpt) (p vector) (off vector))
   (draw-snapp p off (x (offset d)) (y (offset d)) ) )
 
 ; 15 Sep 92
-(gldefun draw-line-snap (d\:draw-line p\:vector off\:vector)
+(gldefun draw-line-snap ((d draw-line) (p vector) (off vector))
   (or (draw-snapp p off (x (offset d)) (y (offset d)))
       (draw-snapp p off ( (x (offset d)) + (x (size d)) )
 		        ( (y (offset d)) + (y (size d)) ) ) ))
 
 ; 15 Sep 92; 19 Dec 93
 ; Snap for square: corners, middle of sides.
-(gldefun draw-box-snap (d\:draw-box p\:vector off\:vector)
+(gldefun draw-box-snap ((d draw-box) (p vector) (off vector))
   (let ((xoff (x (offset d))) (yoff (y (offset d)))
 	(xsize (x (size d)) ) (ysize (y (size d)) ) )
     (or (draw-snapp p off xoff yoff)
@@ -857,7 +860,7 @@
 	(draw-snapp p off (xoff + xsize) (yoff + ysize / 2)) ) ))
 
 ; 15 Sep 92
-(gldefun draw-circle-snap (d\:draw-circle p\:vector off\:vector)
+(gldefun draw-circle-snap ((d draw-circle) (p vector) (off vector))
   (or (draw-snapp p off ( (x (offset d)) + (radius d) )
 		        ( (y (offset d)) + (radius d) ) )
       (draw-snapp p off ( (x (offset d)) + (radius d) )
@@ -870,7 +873,7 @@
 		        ( (y (offset d)) + (radius d) ) ) ))
 
 ; 15 Sep 92
-(gldefun draw-ellipse-snap (d\:draw-ellipse p\:vector off\:vector)
+(gldefun draw-ellipse-snap ((d draw-ellipse) (p vector) (off vector))
   (or (draw-snapp p off ( (x (offset d)) + (radiusx d) )
 		        ( (y (offset d)) + (radiusy d) ) )
       (draw-snapp p off ( (x (offset d)) + (radiusx d) )
@@ -883,7 +886,7 @@
 		        ( (y (offset d)) + (radiusy d) ) ) ))
 
 ; 16 Sep 92
-(gldefun draw-rcbox-snap (d\:draw-rcbox p\:vector off\:vector)
+(gldefun draw-rcbox-snap ((d draw-rcbox) (p vector) (off vector))
   (let ( (rx ((x (size d)) / 2)) (ry ((y (size d)) / 2)) )
     (or (draw-snapp p off ( (x (offset d)) + rx ) (y (offset d)) )
 	(draw-snapp p off (x (offset d)) ( (y (offset d)) + ry ) )
@@ -893,10 +896,10 @@
 		          ( (y (offset d)) + ry ) )  ) ))
 
 ; 15 Sep 92
-(gldefun draw-no-snap (d\:draw-ellipse p\:vector off\:vector) nil)
+(gldefun draw-no-snap ((d draw-ellipse) (p vector) (off vector)) nil)
 
 ; 11 Sep 92
-(gldefun draw-multi-draw (d\:draw-multi w\:window off\:vector)
+(gldefun draw-multi-draw ((d draw-multi) (w window) (off vector))
   (let ( (totaloff ((offset d) + off)) )
     (for subd in (contents d) do
       (draw subd w totaloff)) ))
@@ -959,7 +962,7 @@
   (window-draw-crosshairs-xy w (+ x 15) (+ y 9))
   (window-draw-circle-xy w (+ x 15) (+ y 9) 2))
 
-; 14 Sep 92
+; 14 Sep 92; 15 Jan 98
 ; Draw a line or arrow in LaTex form
 (defun latex-line (fromx fromy x y &optional arrowflg)
   (let (dx dy sx sy siz err errb)
@@ -989,7 +992,7 @@
 			     (setq sy (1+ j))))))
 	      (setq sx (* sx (latex-sign dx)))
 	      (setq sy (* sy (latex-sign dy))) )))
-    (format t "   \\put(~5,2F,~5,2F) {\\~A(~D,~D){~5,2F}}~%"
+    (format t "   \\put(~5,0F,~5,0F) {\\~A(~D,~D){~5,0F}}~%"
 	    (* fromx *draw-latex-factor*) (* fromy *draw-latex-factor*)
 	    (if arrowflg "vector" "line") sx sy siz)  ))
 
@@ -1052,10 +1055,11 @@
 	       "glisp/draw-header.lsp")      ; header file
   (cf drawtrans) )
 
-; 16 Nov 92; 08 Apr 93; 08 Oct 93; 20 Apr 94; 29 Oct 94
+; 16 Nov 92; 08 Apr 93; 08 Oct 93; 20 Apr 94; 29 Oct 94; 09 Feb 99
 ; Output drawing descriptions and functions to the specified file
-(defun draw-out (&optional file names)
+(defun draw-out (&optional names file)
   (or names (setq names *draw-objects*))
   (if (not (consp names)) (setq names (list names)))
   (draw-output (or file "glisp/draw.del") names)
-  (setq *draw-objects* (set-difference *draw-objects* names)) )
+  (setq *draw-objects* (set-difference *draw-objects* names))
+  names )

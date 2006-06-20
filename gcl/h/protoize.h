@@ -142,6 +142,7 @@ struct key {short n,allow_other_keys;
 /* cmpaux.c:106:OF */ /* extern int ifloor (int x, int y); */ /* (x, y) int x; int y; */
 /* cmpaux.c:124:OF */ /* extern int imod (int x, int y); */ /* (x, y) int x; int y; */
 /* cmpaux.c:185:OF */ extern int object_to_int (object x); /* (x) object x; */
+/* cmpaux.c:185:OF */ extern fixnum object_to_fixnum (object x); /* (x) object x; */
 /* cmpaux.c:263:OF */ extern char *object_to_string (object x); /* (x) object x; */
 typedef int (*FUNC)();
 /* cmpaux.c:294:OF */ extern void call_init (int init_address, object memory, object fasl_vec, FUNC fptr); /* (init_address, memory, fasl_vec, fptr) int init_address; object memory; object fasl_vec; FUNC fptr; */

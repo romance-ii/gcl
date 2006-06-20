@@ -25,31 +25,30 @@
 #include <X11/Xresource.h>
 #include <X11/keysym.h>
 
-int IsKeypadKey(keysym) int keysym; { 
+int IsKeypadKey(int keysym) { 
  return  (((unsigned)(keysym) >= XK_KP_Space) && ((unsigned)(keysym) <= XK_KP_Equal));}
 
-int IsCursorKey(keysym) int keysym; { 
+int IsCursorKey(int keysym) { 
   return (((unsigned)(keysym) >= XK_Home)     && ((unsigned)(keysym) <  XK_Select));}
 
-int IsPFKey(keysym) int keysym; { 
+int IsPFKey(int keysym) { 
   return (((unsigned)(keysym) >= XK_KP_F1)     && ((unsigned)(keysym) <= XK_KP_F4));}
 
-int IsFunctionKey(keysym) int keysym; { 
+int IsFunctionKey(int keysym) { 
   return (((unsigned)(keysym) >= XK_F1)       && ((unsigned)(keysym) <= XK_F35));}
 
-int IsMiscFunctionKey(keysym) int keysym; { 
+int IsMiscFunctionKey(int keysym) { 
   return (((unsigned)(keysym) >= XK_Select)   && ((unsigned)(keysym) <  XK_KP_Space));}
 
-int IsModifierKey(keysym) int keysym; { 
+int IsModifierKey(int keysym) { 
   return (((unsigned)(keysym) >= XK_Shift_L)  && ((unsigned)(keysym) <= XK_Hyper_R));}
 
-int XUniqueContext() 
+int XUniqueContext(void)
 {
       	return( ((int)XrmUniqueQuark()) );
 }
 
-int XStringToContext(string) 
-	char *string; 
+int XStringToContext(char *string)
 {
    	return( (int)XrmStringToQuark(string) );
 }

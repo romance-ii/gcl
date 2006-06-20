@@ -162,75 +162,76 @@ IconPositionHint IconMaskHint WindowGroupHint))
 (defconstant XCNOMEM   1    ) ;; Out of memory 
 (defconstant XCNOENT   2    ) ;; No entry in table 
 
-;;typedef int XContext;
+;;typedef fixnum XContext;
 
+(clines "#include \"xgcl.h\"")
 
 (defentry XSaveContext(
 
-    int 	;; display 
-    int		;; w 
-    int		;; context 
-     int 	;; data 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum		;; context 
+     fixnum 	;; data 
 
-)( int "XSaveContext"))
+)( fixnum "XSaveContext"))
 
 
 
 (defentry XFindContext(
 
-    int 	;; display 
-    int		;; w 
-    int		;; context 
-    int 	;; data_return 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum		;; context 
+    fixnum 	;; data_return 
 
-)( int "XFindContext"))
+)( fixnum "XFindContext"))
 
 
 
 (defentry XDeleteContext(
 
-    int 	;; display 
-    int		;; w 
-    int		;; context 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum		;; context 
 
-)( int "XDeleteContext"))
+)( fixnum "XDeleteContext"))
 
 
 
 
 (defentry  XGetWMHints(
 
-    int 	;; display 
-    int		;; w 		      
+    fixnum 	;; display 
+    fixnum		;; w 		      
 
-)( int  "XGetWMHints"))
+)( fixnum  "XGetWMHints"))
 
 
 (defentry XCreateRegion(
 
 ;;    void
 
-)( int "XCreateRegion"))
+)( fixnum "XCreateRegion"))
 
 
 (defentry XPolygonRegion(
 
-    int 	;; points 
-    int			;; n 
-    int			;; fill_rule 
+    fixnum 	;; points 
+    fixnum			;; n 
+    fixnum			;; fill_rule 
 
-)( int "XPolygonRegion"))
+)( fixnum "XPolygonRegion"))
 
 
 
 (defentry  XGetVisualInfo(
 
-    int 	;; display 
-    int		;; vinfo_mask 
-    int ;; vinfo_template 
-    int 	;; nitems_return 
+    fixnum 	;; display 
+    fixnum		;; vinfo_mask 
+    fixnum ;; vinfo_template 
+    fixnum 	;; nitems_return 
 
-)( int  "XGetVisualInfo"))
+)( fixnum  "XGetVisualInfo"))
 
 ;; Allocation routines for properties that may get longer 
 
@@ -239,206 +240,206 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 ;;    void
 
-)( int  "XAllocSizeHints" ))
+)( fixnum  "XAllocSizeHints" ))
 
 
 (defentry  XAllocStandardColormap (
 
 ;;    void
 
-)( int  "XAllocStandardColormap" ))
+)( fixnum  "XAllocStandardColormap" ))
 
 
 (defentry  XAllocWMHints (
 
 ;;    void
 
-)( int  "XAllocWMHints" ))
+)( fixnum  "XAllocWMHints" ))
 
 
 (defentry  XAllocClassHint (
 
 ;;    void
 
-)( int  "XAllocClassHint" ))
+)( fixnum  "XAllocClassHint" ))
 
 
 (defentry  XAllocIconSize (
 
 ;;    void
 
-)( int  "XAllocIconSize" ))
+)( fixnum  "XAllocIconSize" ))
 
 ;; ICCCM routines for data structures defined in this file 
 
 
 (defentry XGetWMSizeHints(
 
-    int 	;; display 
-    int		;; w 
-    int 	;; hints_return 
-    int 	;; supplied_return 
-    int		;; property 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum 	;; hints_return 
+    fixnum 	;; supplied_return 
+    fixnum		;; property 
 
-)( int "XGetWMSizeHints"))
+)( fixnum "XGetWMSizeHints"))
 
 
 (defentry XGetWMNormalHints(
 
-    int 	;; display 
-    int		;; w 
-    int 	;; hints_return 
-    int 	;; supplied_return  
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum 	;; hints_return 
+    fixnum 	;; supplied_return  
 
-)( int "XGetWMNormalHints"))
+)( fixnum "XGetWMNormalHints"))
 
 
 (defentry XGetRGBColormaps(
 
-    int 	;; display 
-    int		;; w 
-    int  ;; stdcmap_return 
-    int 	;; count_return 
-    int		;; property 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum  ;; stdcmap_return 
+    fixnum 	;; count_return 
+    fixnum		;; property 
 
-)( int "XGetRGBColormaps"))
+)( fixnum "XGetRGBColormaps"))
 
 
 (defentry XGetTextProperty(
 
-    int 	;; display 
-    int		;; window 
-    int ;; text_prop_return 
-    int		;; property 
+    fixnum 	;; display 
+    fixnum		;; window 
+    fixnum ;; text_prop_return 
+    fixnum		;; property 
 
-)( int "XGetTextProperty"))
+)( fixnum "XGetTextProperty"))
 
 
 (defentry XGetWMName(
 
-    int 	;; display 
-    int		;; w 
-    int ;; text_prop_return 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum ;; text_prop_return 
 
-)( int "XGetWMName"))
+)( fixnum "XGetWMName"))
 
 
 (defentry XGetWMIconName(
 
-    int 	;; display 
-    int		;; w 
-    int ;; text_prop_return 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum ;; text_prop_return 
 
-)( int "XGetWMIconName"))
+)( fixnum "XGetWMIconName"))
 
 
 (defentry XGetWMClientMachine(
 
-    int 	;; display 
-    int		;; w 
-    int ;; text_prop_return 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum ;; text_prop_return 
 
-)( int "XGetWMClientMachine"))
+)( fixnum "XGetWMClientMachine"))
 
 
 (defentry XSetWMProperties(
 
-    int 	;; display 
-    int		;; w 
-    int ;; window_name 
-    int ;; icon_name 
-    int 	;; argv 
-    int			;; argc 
-    int 	;; normal_hints 
-    int 	;; wm_hints 
-    int 	;; class_hints 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum ;; window_name 
+    fixnum ;; icon_name 
+    fixnum 	;; argv 
+    fixnum			;; argc 
+    fixnum 	;; normal_hints 
+    fixnum 	;; wm_hints 
+    fixnum 	;; class_hints 
 
 )( void "XSetWMProperties"))
 
 
 (defentry XSetWMSizeHints(
 
-    int 	;; display 
-    int		;; w 
-    int 	;; hints 
-    int		;; property 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum 	;; hints 
+    fixnum		;; property 
 
 )( void "XSetWMSizeHints"))
 
 
 (defentry XSetWMNormalHints(
 
-    int 	;; display 
-    int		;; w 
-    int 	;; hints 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum 	;; hints 
 
 )( void "XSetWMNormalHints"))
 
 
 (defentry XSetRGBColormaps(
 
-    int 	;; display 
-    int		;; w 
-    int ;; stdcmaps 
-    int			;; count 
-    int		;; property 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum ;; stdcmaps 
+    fixnum			;; count 
+    fixnum		;; property 
 
 )( void "XSetRGBColormaps"))
 
 
 (defentry XSetTextProperty(
 
-    int 	;; display 
-    int		;; w 
-    int ;; text_prop 
-    int		;; property 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum ;; text_prop 
+    fixnum		;; property 
 
 )( void "XSetTextProperty"))
 
 
 (defentry XSetWMName(
 
-    int 	;; display 
-    int		;; w 
-    int ;; text_prop 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum ;; text_prop 
 
 )( void "XSetWMName"))
 
 
 (defentry XSetWMIconName(
 
-    int 	;; display 
-    int		;; w 
-    int ;; text_prop 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum ;; text_prop 
 
 )( void "XSetWMIconName"))
 
 
 (defentry XSetWMClientMachine(
 
-    int 	;; display 
-    int		;; w 
-    int ;; text_prop 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum ;; text_prop 
 
 )( void "XSetWMClientMachine"))
 
 
 (defentry XStringListToTextProperty(
 
-    int 	;; list 
-    int			;; count 
-    int ;; text_prop_return 
+    fixnum 	;; list 
+    fixnum			;; count 
+    fixnum ;; text_prop_return 
 
-)( int "XStringListToTextProperty"))
+)( fixnum "XStringListToTextProperty"))
 
 
 (defentry XTextPropertyToStringList(
 
-    int ;; text_prop 
-    int 		;; list_return 
-    int 	;; count_return 
+    fixnum ;; text_prop 
+    fixnum 		;; list_return 
+    fixnum 	;; count_return 
 
-)( int "XTextPropertyToStringList"))
+)( fixnum "XTextPropertyToStringList"))
 
 ;; The following declarations are alphabetized. 
 
@@ -446,8 +447,8 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XClipBox(
 
-    int		;; r 
-    int 	;; rect_return 
+    fixnum		;; r 
+    fixnum 	;; rect_return 
 
 )( void "XClipBox"))
 
@@ -455,7 +456,7 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XDestroyRegion(
 
-    int		;; r 
+    fixnum		;; r 
 
 )( void "XDestroyRegion"))
 
@@ -463,7 +464,7 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XEmptyRegion(
 
-    int		;; r 
+    fixnum		;; r 
 
 )( void "XEmptyRegion"))
 
@@ -471,8 +472,8 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XEqualRegion(
 
-    int		;; r1 
-    int		;; r2 
+    fixnum		;; r1 
+    fixnum		;; r2 
 
 )( void "XEqualRegion"))
 
@@ -480,72 +481,72 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XGetClassHint(
 
-    int 	;; display 
-    int		;; w 
-    int 	;; class_hints_return 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum 	;; class_hints_return 
 
-)( int "XGetClassHint"))
+)( fixnum "XGetClassHint"))
 
 
 
 (defentry XGetIconSizes(
 
-    int 	;; display 
-    int		;; w 
-    int 		;; size_list_return 
-    int 	;; count_return 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum 		;; size_list_return 
+    fixnum 	;; count_return 
 
-)( int "XGetIconSizes"))
+)( fixnum "XGetIconSizes"))
 
 
 
 (defentry XGetNormalHints(
 
-    int 	;; display 
-    int		;; w 
-    int 	;; hints_return 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum 	;; hints_return 
 
-)( int "XGetNormalHints"))
+)( fixnum "XGetNormalHints"))
 
 
 
 (defentry XGetSizeHints(
 
-    int 	;; display 
-    int		;; w 
-    int 	;; hints_return 
-    int		;; property 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum 	;; hints_return 
+    fixnum		;; property 
 
-)( int "XGetSizeHints"))
+)( fixnum "XGetSizeHints"))
 
 
 
 (defentry XGetStandardColormap(
 
-    int 	;; display 
-    int		;; w 
-    int ;; colormap_return 
-    int		;; property 			    
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum ;; colormap_return 
+    fixnum		;; property 			    
 
-)( int "XGetStandardColormap"))
+)( fixnum "XGetStandardColormap"))
 
 
 
 (defentry XGetZoomHints(
 
-    int 	;; display 
-    int		;; w 
-    int 	;; zhints_return 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum 	;; zhints_return 
 
-)( int "XGetZoomHints"))
+)( fixnum "XGetZoomHints"))
 
 
 
 (defentry XIntersectRegion(
 
-    int		;; sra 
-    int		;; srb 
-    int		;; dr_return 
+    fixnum		;; sra 
+    fixnum		;; srb 
+    fixnum		;; dr_return 
 
 )( void "XIntersectRegion"))
 
@@ -553,33 +554,33 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XLookupString(
 
-    int 	;; event_struct 
+    fixnum 	;; event_struct 
     object		;; buffer_return 
-    int			;; bytes_buffer 
-    int 	;; keysym_return 
-    int ;; int_in_out 
+    fixnum			;; bytes_buffer 
+    fixnum 	;; keysym_return 
+    fixnum ;; int_in_out 
 
-)( int "XLookupString"))
+)( fixnum "XLookupString"))
 
 
 
 (defentry XMatchVisualInfo(
 
-    int 	;; display 
-    int			;; screen 
-    int			;; depth 
-    int			;; class 
-    int ;; vinfo_return 
+    fixnum 	;; display 
+    fixnum			;; screen 
+    fixnum			;; depth 
+    fixnum			;; class 
+    fixnum ;; vinfo_return 
 
-)( int "XMatchVisualInfo"))
+)( fixnum "XMatchVisualInfo"))
 
 
 
 (defentry XOffsetRegion(
 
-    int		;; r 
-    int			;; dx 
-    int			;; dy 
+    fixnum		;; r 
+    fixnum			;; dx 
+    fixnum			;; dy 
 
 )( void "XOffsetRegion"))
 
@@ -587,41 +588,41 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XPointInRegion(
 
-    int		;; r 
-    int			;; x 
-    int			;; y 
+    fixnum		;; r 
+    fixnum			;; x 
+    fixnum			;; y 
 
-)( int "XPointInRegion"))
+)( fixnum "XPointInRegion"))
 
 
 
 (defentry XPolygonRegion(
 
-    int 	;; points 
-    int			;; n 
-    int			;; fill_rule 
+    fixnum 	;; points 
+    fixnum			;; n 
+    fixnum			;; fill_rule 
 
-)( int "XPolygonRegion"))
+)( fixnum "XPolygonRegion"))
 
 
 
 (defentry XRectInRegion(
 
-    int		;; r 
-    int			;; x 
-    int			;; y 
-     int	;; width 
-     int	;; height 
+    fixnum		;; r 
+    fixnum			;; x 
+    fixnum			;; y 
+     fixnum	;; width 
+     fixnum	;; height 
 
-)( int "XRectInRegion"))
+)( fixnum "XRectInRegion"))
 
 
 
 (defentry XSetClassHint(
 
-    int 	;; display 
-    int		;; w 
-    int 	;; class_hints 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum 	;; class_hints 
 
 )( void "XSetClassHint"))
 
@@ -629,10 +630,10 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XSetIconSizes(
 
-    int 	;; display 
-    int		;; w 
-    int 	;; size_list 
-    int			;; count     
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum 	;; size_list 
+    fixnum			;; count     
 
 )( void "XSetIconSizes"))
 
@@ -640,9 +641,9 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XSetNormalHints(
 
-    int 	;; display 
-    int		;; w 
-    int 	;; hints 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum 	;; hints 
 
 )( void "XSetNormalHints"))
 
@@ -650,10 +651,10 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XSetSizeHints(
 
-    int 	;; display 
-    int		;; w 
-    int 	;; hints 
-    int		;; property 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum 	;; hints 
+    fixnum		;; property 
 
 )( void "XSetSizeHints"))
 
@@ -661,14 +662,14 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XSetStandardProperties(
 
-    int 	;; display 
-    int		;; w 
+    fixnum 	;; display 
+    fixnum		;; w 
      object		;; window_name 
      object		;; icon_name 
-    int		;; icon_pixmap 
-    int 	;; argv 
-    int			;; argc 
-    int 	;; hints 
+    fixnum		;; icon_pixmap 
+    fixnum 	;; argv 
+    fixnum			;; argc 
+    fixnum 	;; hints 
 
 )( void "XSetStandardProperties"))
 
@@ -676,9 +677,9 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XSetWMHints(
 
-    int 	;; display 
-    int		;; w 
-    int 	;; wm_hints 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum 	;; wm_hints 
 
 )( void "XSetWMHints"))
 
@@ -686,9 +687,9 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XSetRegion(
 
-    int 	;; display 
-    int			;; gc 
-    int		;; r 
+    fixnum 	;; display 
+    fixnum			;; gc 
+    fixnum		;; r 
 
 )( void "XSetRegion"))
 
@@ -696,10 +697,10 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XSetStandardColormap(
 
-    int 	;; display 
-    int		;; w 
-    int ;; colormap 
-    int		;; property 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum ;; colormap 
+    fixnum		;; property 
 
 )( void "XSetStandardColormap"))
 
@@ -707,9 +708,9 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XSetZoomHints(
 
-    int 	;; display 
-    int		;; w 
-    int 	;; zhints 
+    fixnum 	;; display 
+    fixnum		;; w 
+    fixnum 	;; zhints 
 
 )( void "XSetZoomHints"))
 
@@ -717,9 +718,9 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XShrinkRegion(
 
-    int		;; r 
-    int			;; dx 
-    int			;; dy 
+    fixnum		;; r 
+    fixnum			;; dx 
+    fixnum			;; dy 
 
 )( void "XShrinkRegion"))
 
@@ -727,9 +728,9 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XSubtractRegion(
 
-    int		;; sra 
-    int		;; srb 
-    int		;; dr_return 
+    fixnum		;; sra 
+    fixnum		;; srb 
+    fixnum		;; dr_return 
 
 )( void "XSubtractRegion"))
 
@@ -737,9 +738,9 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XUnionRectWithRegion(
 
-    int 	;; rectangle 
-    int		;; src_region 
-    int		;; dest_region_return 
+    fixnum 	;; rectangle 
+    fixnum		;; src_region 
+    fixnum		;; dest_region_return 
 
 )( void "XUnionRectWithRegion"))
 
@@ -747,9 +748,9 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XUnionRegion(
 
-    int		;; sra 
-    int		;; srb 
-    int		;; dr_return 
+    fixnum		;; sra 
+    fixnum		;; srb 
+    fixnum		;; dr_return 
 
 )( void "XUnionRegion"))
 
@@ -757,52 +758,52 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 (defentry XWMGeometry(
 
-    int 	;; display 
-    int			;; screen_number 
+    fixnum 	;; display 
+    fixnum			;; screen_number 
      object		;; user_geometry 
      object		;; default_geometry 
-     int	;; border_width 
-    int 	;; hints 
-    int 	;; x_return 
-    int 	;; y_return 
-    int 	;; width_return 
-    int 	;; height_return 
-    int 	;; gravity_return 
+     fixnum	;; border_width 
+    fixnum 	;; hints 
+    fixnum 	;; x_return 
+    fixnum 	;; y_return 
+    fixnum 	;; width_return 
+    fixnum 	;; height_return 
+    fixnum 	;; gravity_return 
 
-)( int "XWMGeometry"))
+)( fixnum "XWMGeometry"))
 
 
 
 (defentry XXorRegion(
 
-    int		;; sra 
-    int		;; srb 
-    int		;; dr_return 
+    fixnum		;; sra 
+    fixnum		;; srb 
+    fixnum		;; dr_return 
 
 )( void "XXorRegion"))
 ;;
  ;; These macros are used to give some sugar to the image routines so that
  ;; naive people are more comfortable with them.
  
-(defentry XDestroyImage(int) (int "XDestroyImage"))
-(defentry XGetPixel(int int int) (int "XGetPixel" ))
-(defentry XPutPixel(int int int int) ( int "XPutPixel"))
-(defentry XSubImage(int  int int int int) (int  "XSubImage"))
-(defentry XAddPixel(int  int) (int  "XAddPixel"))
+(defentry XDestroyImage(fixnum) (fixnum "XDestroyImage"))
+(defentry XGetPixel(fixnum fixnum fixnum) (fixnum "XGetPixel" ))
+(defentry XPutPixel(fixnum fixnum int fixnum) ( fixnum "XPutPixel"))
+(defentry XSubImage(fixnum  fixnum int fixnum fixnum) (fixnum  "XSubImage"))
+(defentry XAddPixel(fixnum  fixnum) (fixnum  "XAddPixel"))
 ;;
  ;; Keysym macros, used on Keysyms to test for classes of symbols
 
-(defentry IsKeypadKey(int)  (int "IsKeypadKey"))
+(defentry IsKeypadKey(fixnum)  (fixnum "IsKeypadKey"))
 
-(defentry IsCursorKey(int) (int "IsCursorKey"))
+(defentry IsCursorKey(fixnum) (fixnum "IsCursorKey"))
 
-(defentry IsPFKey(int) (int "IsPFKey"))
+(defentry IsPFKey(fixnum) (fixnum "IsPFKey"))
 
-(defentry  IsFunctionKey(int) (int "IsFunctionKey"))
+(defentry  IsFunctionKey(fixnum) (fixnum "IsFunctionKey"))
 
-(defentry IsMiscFunctionKey(int)  (int "IsMiscFunctionKey"))
+(defentry IsMiscFunctionKey(fixnum)  (fixnum "IsMiscFunctionKey"))
 
-(defentry IsModifierKey(int) (int "IsModifierKey"))
-(defentry XUniqueContext() (int  "XUniqueContext"))
-(defentry  XStringToContext(object) (int  "XStringToContext"))
+(defentry IsModifierKey(fixnum) (fixnum "IsModifierKey"))
+(defentry XUniqueContext() (fixnum  "XUniqueContext"))
+(defentry  XStringToContext(object) (fixnum  "XStringToContext"))
 

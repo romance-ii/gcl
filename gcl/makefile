@@ -35,9 +35,13 @@ TESTDIR = ansi-tests
 
 VERSION=`cat majvers`.`cat minvers`
 
-all: $(BUILD_BFD) $(PORTDIR)/$(FLISP) command cmpnew/gcl_collectfn.o lsp/gcl_info.o do-gcl-tk do-info pargcl_all
+all: $(BUILD_BFD) system command cmpnew/gcl_collectfn.o lsp/gcl_info.o do-gcl-tk do-info pargcl_all
 
-ASRC:=$(shell ls -1 o/*.c o/*.d o/*.h h/*.h lsp/*.lsp cmpnew/*.lsp mod/*.lsp pcl/*sp clcs/*sp)
+system: $(PORTDIR)/$(FLISP)
+	[ "$X_LIBS" == "" ] || cd xgcl-2 && make saved_xgcl LISP=../$< && mv saved_xgcl ../$(PORTDIR)/$(FLISP)
+	touch $@
+
+ASRC:=$(shell ls -1 o/*.c o/*.d o/*.h h/*.h lsp/*.lsp cmpnew/*.lsp mod/*.lsp pcl/*sp clcs/*sp xgcl-2/*p)
 TAGS: $(ASRC)
 	etags $^
 
@@ -308,7 +312,7 @@ gclclean:
 	rm -rf windows/Output
 	rm -f ansi-tests/test_results ansi-tests/gazonk* \
 		ansi-tests/generated-eval-when-test-file.lisp
-	rm -f config.log config.cache config.status $(PORTDIR)/gmon.out gcl.script machine
+	rm -f config.log config.cache config.status $(PORTDIR)/gmon.out gcl.script machine system
 
 
 clean: gclclean
@@ -337,7 +341,7 @@ $(HDIR)cmpinclude.h: $(CMPINCLUDE_FILES) $(HDIR)config.h
 		-e "/End for cmpinclude/,50000d" > tmpx
 	echo -e '#include "h/config.h"\n#ifdef SGC\n"#define SGC"\n#else\n"#undef SGC"\n#endif' | cpp 2>/dev/null| grep -v '^ *$$' | tail -1l | tr -d '"' >>tmpx
 	cat $(CMPINCLUDE_FILES) >> tmpx
-	cpp -P -dD tmpx |grep -v STDC_HOSTED | grep -v __VERSION__ | grep -v "^static  *__"  >tmpx1 && mv tmpx1 tmpx
+	cpp -P -dD tmpx |grep -v __STDC_ | grep -v __GNUC_ | grep -v __VERSION__ | grep -v "^static  *__"  >tmpx1 && mv tmpx1 tmpx
 	./xbin/move-if-changed mv tmpx h/cmpinclude.h
 	./xbin/move-if-changed cp h/cmpinclude.h o/cmpinclude.h
 

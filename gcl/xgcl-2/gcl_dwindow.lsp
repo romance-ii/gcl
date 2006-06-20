@@ -1,15 +1,18 @@
-; dwindow.lsp               Gordon S. Novak Jr.            14 Mar 95
+; dwindow.lsp               Gordon S. Novak Jr.           ; 26 Jan 06
 
 ; Window types and interface functions for using X windows from GNU Common Lisp
 
-; Copyright (c) 1995 Gordon S. Novak Jr. and The University of Texas at Austin.
+; Copyright (c) 2006 Gordon S. Novak Jr. and The University of Texas at Austin.
+
+; 08 Jan 97; 17 May 02; 17 May 04; 18 May 04; 01 Jun 04; 18 Aug 04; 24 Jan 06
+; 26 Jan 06
 
 ; See the files gnu.license and dec.copyright .
 
 ; This program is free software; you can redistribute it and/or modify
 ; it under the terms of the GNU General Public License as published by
-; the Free Software Foundation; either version 1, or (at your option)
-; any later version.
+; the Free Software Foundation; either version 2 of the License, or
+; (at your option) any later version.
 
 ; This program is distributed in the hope that it will be useful,
 ; but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,7 +21,7 @@
 
 ; You should have received a copy of the GNU General Public License
 ; along with this program; if not, write to the Free Software
-; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+; Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 ; Some of the files that interface to the Xlib are adapted from DEC/MIT files.
 ; See the file dec.copyright for details.
@@ -42,7 +45,10 @@
 (defvar *window-fonts* (list
 			(list 'courier-bold-12
 			      "*-*-courier-bold-r-*-*-12-*-*-*-*-*-iso8859-1")
-			(list '8x10 "8x10")
+			(list 'courier-medium-12
+			      "*-*-courier-medium-r-*-*-12-*-*-*-*-*-iso8859-1")
+			(list '6x12 "6x12")
+			(list '8x13 "8x13")
 			(list '9x15 "9x15")))
 
 (glispglobals (*window-menu*          menu)
@@ -100,12 +106,6 @@
 (defvar *window-meta*)        ; set if meta down when char is pressed
 (defvar *window-ctrl*)        ; set if ctrl down when char is pressed
 (defvar *window-shift*)       ; set if shift down when char is pressed
-(defvar *window-string* (make-string 100))
-(defvar *window-string-count*)
-(defvar *window-string-max*)
-(defvar *window-input-string-x*)
-(defvar *window-input-string-y*)
-(defvar *window-input-string-charwidth*)
 
 (defvar *window-shift-keys*     nil)
 (defvar *window-control-keys*   nil)
@@ -139,8 +139,8 @@
 	(title-present (title and ((length title) > 0)))
 	(width         (picture-width))
 	(height        (picture-height))
-	(base-x        ((if flat then parent-offset-x else 0)))
-	(base-y        ((if flat then parent-offset-y else 0)))
+	(base-x        ((if flat parent-offset-x 0)))
+	(base-y        ((if flat parent-offset-y 0)))
 	(offset        menu-offset)
 	(size          menu-size)
 	(region        ((virtual region with start = voffset size = vsize)))
@@ -206,7 +206,7 @@
 			  (drawfn          anything)
 			  (menu-font       symbol) ))
 
-(picmenu-button (list (name          symbol)
+(picmenu-button (list (buttonname    symbol)
 		      (offset        vector)
 		      (size          vector)
 		      (highlightfn   anything)
@@ -230,10 +230,10 @@
 		     (subtrackfn      anything)
 		     (subtrackparms   (listof anything)))
   prop ((menuw          (menu-window or (barmenu-init self)) result window)
-	(picture-width  ((if (horizontal m) then (maxval m)
-			                    else (barwidth m)) ))
-	(picture-height ((if (horizontal m) then (barwidth m)
-			                    else (maxval m)) )) )
+	(picture-width  ((if (horizontal m) (maxval m)
+			                    (barwidth m)) ))
+	(picture-height ((if (horizontal m) (barwidth m)
+			                    (maxval m)) )) )
   msg  ((init           barmenu-init)
 	(init?          ((menu-window and (picture-height > 0))
 			  or (init self)))
@@ -243,6 +243,67 @@
 	(update-value   barmenu-update-value)
 	(calculate-size barmenu-calculate-size) )
 supers (menu))
+
+; Note: data through 'permanent' must be same as in menu.
+(textmenu (listobject (menu-window     window)
+		      (flat            boolean)
+		      (parent-window   drawable)
+		      (parent-offset-x integer)
+		      (parent-offset-y integer)
+		      (picture-width   integer)
+		      (picture-height  integer)
+		      (title           string)
+		      (permanent       boolean)
+		      (text            string)
+		      (drawing-width   integer)
+		      (drawing-height  integer)
+		      (boxflg          boolean)
+		      (menu-font       symbol) )
+
+  prop ((menuw          (menu-window or (textmenu-init self)) result window) )
+  msg  ((init                textmenu-init)
+	(init?        ((menu-window and (picture-height > 0)) or (init self)))
+	(create              textmenu-create result textmenu)
+	(select              textmenu-select)
+	(draw                textmenu-draw)
+	(calculate-size      textmenu-calculate-size)
+	(set-text            textmenu-set-text open t) )
+ supers (menu) )
+
+; Note: data through 'permanent' must be same as in menu.
+(editmenu (listobject (menu-window     window)
+		      (flat            boolean)
+		      (parent-window   drawable)
+		      (parent-offset-x integer)
+		      (parent-offset-y integer)
+		      (picture-width   integer)
+		      (picture-height  integer)
+		      (title           string)
+		      (permanent       boolean)
+		      (text            (listof string))
+		      (drawing-width   integer)
+		      (drawing-height  integer)
+		      (boxflg          boolean)
+		      (menu-font       symbol)
+		      (column          integer)
+		      (line            integer)
+		      (scrollval       integer) )
+  prop ((menuw          (menu-window or (editmenu-init self)) result window)
+	(scroll       ((if (numberp scrollval)
+			   scrollval
+			   0))) )
+
+  msg  ((init                editmenu-init)
+	(init?        ((menu-window and (picture-height > 0)) or (init self)))
+	(create              editmenu-create result editmenu)
+	(select              editmenu-select)
+	(draw                editmenu-draw)
+	(edit                editmenu-edit)
+	(carat               editmenu-carat)
+	(display             editmenu-display)
+	(calculate-size      editmenu-calculate-size)
+	(line-y              editmenu-line-y open t) )
+ supers (menu) )
 
 (window (listobject (parent drawable)
 		    (gcontext anything)
@@ -261,7 +322,9 @@ prop    ((width          (drawable-width))
          (yposition      window-yposition result integer open t)
 	 (wfunction          window-wfunction        open t)
 	 (foreground         window-foreground       open t)
-	 (background         window-background       open t)  )
+	 (background         window-background       open t)
+	 (font-width         ((string-width self "W")))
+	 (font-height        ((string-height self "Tg")))   )
 msg     ((force-output       window-force-output     open t)
 	 (set-font           window-set-font)
 	 (set-foreground     window-set-foreground   open t)
@@ -355,6 +418,10 @@ msg     ((force-output       window-force-output     open t)
 	 (free-color         window-free-color)
 	 (get-chars          window-get-chars)
 	 (input-string       window-input-string)
+	 (string-width       window-string-width)
+	 (string-extents     window-string-extents)
+	 (string-height      window-string-height)
+	 (draw-carat         window-draw-carat)
 	  ))
 
 (rgb (list (red integer) (green integer) (blue integer)))
@@ -408,20 +475,21 @@ msg     ((force-output       window-force-output     open t)
   (setq *mouse-window* (int-pos *child-return* 0)) )
 
 ; 13 Aug 91; 14 Aug 91; 06 Sep 91; 12 Sep 91; 06 Dec 91; 01 May 92; 01 Sep 92
+(setf (glfnresulttype 'window-create) 'window)
 (gldefun window-create (width height &optional str parentw pos-x pos-y font)
   (let (w pw fg-color bg-color)
     (or *window-display* (window-Xinit))
     (setq fg-color *default-fg-color*)
     (setq bg-color *default-bg-color*)
-    (unless pos-x (pos-x \:= *window-default-pos-x*))
-    (unless pos-y (pos-y \:= *window-default-pos-y*))
-    (w \:= (a window with
+    (unless pos-x (pos-x = *window-default-pos-x*))
+    (unless pos-y (pos-y = *window-default-pos-y*))
+    (w = (a window with
 	      drawable-width  = width
 	      drawable-height = height
-              label           = (if str (stringify str) else " ") ))
-    (pw \:= (or parentw *root-window*))
+              label           = (if str (stringify str) " ") ))
+    (pw = (or parentw *root-window*))
     (window-get-geometry-b pw)
-    ((parent w) \:=
+    ((parent w) =
        (XCreateSimpleWindow *window-display* pw
 			    pos-x
 			    ((int-pos *height-return* 0)
@@ -440,7 +508,7 @@ msg     ((force-output       window-force-output     open t)
 			     (get-c-string (label w))  ; icon name
 			     none null null
 			     *default-size-hints*)
-    ((gcontext w) \:= (XCreateGC *window-display* (parent w) 0 null))
+    ((gcontext w) = (XCreateGC *window-display* (parent w) 0 null))
     (set-foreground w fg-color)
     (set-background w bg-color)
     (set-font w (or font *window-default-font-name*))
@@ -456,20 +524,19 @@ msg     ((force-output       window-force-output     open t)
     (open w)
     w  ))
 
-; 06 Aug 91
+; 06 Aug 91; 17 May 04
 ; Set the font for a window to the one specified by fontsymbol.
 ; derived from Nguyen's my-load-font.
-(gldefun window-set-font (w\:window fontsymbol\:symbol)
+(gldefun window-set-font ((w window) (fontsymbol symbol))
   (let (fontstring font-info (display *window-display*))
-    (fontstring \:= (or (cadr (assoc fontsymbol *window-fonts*))
+    (fontstring = (or (cadr (assoc fontsymbol *window-fonts*))
 			(stringify fontsymbol)))
-    (font-info \:= (XloadQueryFont display
+    (font-info = (XloadQueryFont display
 					 (get-c-string fontstring)))
     (if (eql 0 font-info)
-	then (format t "~%can't open font ~a ~a~%" fontsymbol fontstring)
-	else (XsetFont display (gcontext w)
-			     (Xfontstruct-fid font-info))
-	     ((font w) \:= font-info) ) ))
+	(format t "~%can't open font ~a ~a~%" fontsymbol fontstring)
+	(progn (XsetFont display (gcontext w) (Xfontstruct-fid font-info))
+	       ((font w) = font-info)) ) ))
 
 ; 15 Oct 91
 (defun window-font-info (fontsymbol)
@@ -480,45 +547,45 @@ msg     ((force-output       window-force-output     open t)
 
 
 ; Functions to allow access to window properties from plain Lisp
-(gldefun window-gcontext        (w\:window) (gcontext w))
-(gldefun window-parent          (w\:window) (parent w))
-(gldefun window-drawable-height (w\:window) (drawable-height w))
-(gldefun window-drawable-width  (w\:window) (drawable-width w))
-(gldefun window-label           (w\:window) (label w))
-(gldefun window-font            (w\:window) (font w))
+(gldefun window-gcontext        ((w window)) (gcontext w))
+(gldefun window-parent          ((w window)) (parent w))
+(gldefun window-drawable-height ((w window)) (drawable-height w))
+(gldefun window-drawable-width  ((w window)) (drawable-width w))
+(gldefun window-label           ((w window)) (label w))
+(gldefun window-font            ((w window)) (font w))
 
 ; 07 Aug 91; 14 Aug 91
-(gldefun window-foreground (w\:window)
+(gldefun window-foreground ((w window))
   (XGetGCValues *window-display* (gcontext w) GCForeground
 		      *GC-Values*)
   (XGCValues-foreground  *GC-Values*) )
 
-(gldefun window-set-foreground (w\:window fg-color\:integer)
+(gldefun window-set-foreground ((w window) (fg-color integer))
   (XsetForeground *window-display* (gcontext w) fg-color))
 
-(gldefun window-background (w\:window)
+(gldefun window-background ((w window))
   (XGetGCValues *window-display* (gcontext w) GCBackground
 		      *GC-Values*)
   (XGCValues-Background  *GC-Values*) )
 
-(gldefun window-set-background (w\:window bg-color\:integer)
+(gldefun window-set-background ((w window) (bg-color integer))
   (XsetBackground *window-display* (gcontext w) bg-color))
 
 ; 08 Aug 91
-(gldefun window-wfunction (w\:window)
+(gldefun window-wfunction ((w window))
   (XGetGCValues *window-display* (gcontext w) GCFunction
 		      *GC-Values*)
   (XGCValues-function *GC-Values*) )
 
 ; 08 Aug 91
 ; Get the geometry parameters of a window into global variables
-(gldefun window-get-geometry (w\:window) (window-get-geometry-b (parent w)))
+(gldefun window-get-geometry ((w window)) (window-get-geometry-b (parent w)))
 
 ; 06 Dec 91
 ; Set cursor to a selected cursor number
-(gldefun window-set-cursor (w\:window n\:integer)
+(gldefun window-set-cursor ((w window) (n integer))
   (let (c)
-    (c \:= (XCreateFontCursor *window-display* n) )
+    (c = (XCreateFontCursor *window-display* n) )
     (XDefineCursor *window-display* (parent w) c) ))
 
 (defun window-get-geometry-b (w)
@@ -528,7 +595,7 @@ msg     ((force-output       window-force-output     open t)
 
 ; 15 Aug 91
 ; clear event queue of previous motion events
-(gldefun window-sync (w\:window)
+(gldefun window-sync ((w window))
   (Xsync *window-display* 1) )
 
 ; 03 Oct 91; 06 Oct 94
@@ -538,12 +605,12 @@ msg     ((force-output       window-force-output     open t)
 
 ; 08 Aug 91; 12 Sep 91; 28 Oct 91
 ; Make a list of window geometry, (x y width height border-width).
-(gldefun window-geometry (w\:window)
+(gldefun window-geometry ((w window))
   (let (sh)
-    (sh \:= (window-screen-height))
+    (sh = (window-screen-height))
     (get-geometry w)
-  ((drawable-width w) \:= (int-pos *width-return* 0))
-  ((drawable-height w) \:= (int-pos *height-return* 0))
+  ((drawable-width w) = (int-pos *width-return* 0))
+  ((drawable-height w) = (int-pos *height-return* 0))
     (list (int-pos *x-return* 0)
 	  (sh - (int-pos *y-return* 0)
 	      - (int-pos *height-return* 0))
@@ -552,43 +619,44 @@ msg     ((force-output       window-force-output     open t)
 	  (int-pos *border-width-return* 0)) ))
 
 ; 27 Nov 91
-(gldefun window-size (w\:window) (result vector)
+(gldefun window-size ((w window)) (result vector)
   (get-geometry w)
-  (list ((drawable-width w) \:= (int-pos *width-return* 0))
-	((drawable-height w) \:= (int-pos *height-return* 0)) ) )
+  (list ((drawable-width w) = (int-pos *width-return* 0))
+	((drawable-height w) = (int-pos *height-return* 0)) ) )
 
-(gldefun window-left (w\:window)
+(gldefun window-left ((w window))
   (get-geometry w)
   (int-pos *x-return* 0))
 
 ; Get top of window in X (y increasing downwards) coordinates.
-(gldefun window-top-neg-y (w\:window)
+(gldefun window-top-neg-y ((w window))
   (get-geometry w)
   (int-pos *y-return* 0))
 
 ; 08 Aug 91
 ; Reset the local geometry parameters of a window from its X values.
 ; Needed, for example, if the user resizes the window by mouse command.
-(gldefun window-reset-geometry (w\:window)
+(gldefun window-reset-geometry ((w window))
   (get-geometry w)
-  ((drawable-width w) \:= (int-pos *width-return* 0))
-  ((drawable-height w) \:= (int-pos *height-return* 0)) )
+  ((drawable-width w) = (int-pos *width-return* 0))
+  ((drawable-height w) = (int-pos *height-return* 0)) )
 
-(gldefun window-force-output (&optional w\:window)
+(gldefun window-force-output (&optional (w window))
   (Xflush *window-display*))
 
-(gldefun window-query-pointer (w\:window) (window-query-pointer-b (parent w)) )
+(gldefun window-query-pointer ((w window))
+  (window-query-pointer-b (parent w)) )
 
 (defun window-query-pointer-b (w)
   (XQueryPointer *window-display* w
 		 *root-return* *child-return* *root-x-return* *root-y-return*
 		 *win-x-return* *win-y-return* *mask-return*) )
 
-(gldefun window-positive-y (w\:\window y\:integer) ((height w) - y))
+(gldefun window-positive-y ((w window) (y integer)) ((height w) - y))
 
 ; 08 Aug 91
 ; Set parameters of a window for drawing by XOR, saving old values.
-(gldefun window-set-xor (w\:window)
+(gldefun window-set-xor ((w window))
   (let ((gc (gcontext w)) )
     (setq *window-save-function*   (wfunction w))
     (XsetFunction   *window-display* gc GXxor)
@@ -598,14 +666,14 @@ msg     ((force-output       window-force-output     open t)
 
 ; 08 Aug 91
 ; Reset parameters of a window after change, using saved values.
-(gldefun window-unset (w\:window)
+(gldefun window-unset ((w window))
   (let ((gc (gcontext w)) )
     (XsetFunction   *window-display* gc *window-save-function*)
     (XsetForeground *window-display* gc *window-save-foreground*) ))
 
 ; 04 Sep 91
 ; Reset parameters of a window, using default values.
-(gldefun window-reset (w\:window)
+(gldefun window-reset ((w window))
   (let ((gc (gcontext w)) )
     (XsetFunction   *window-display* gc GXcopy)
     (XsetForeground *window-display* gc *default-fg-color*)
@@ -613,14 +681,14 @@ msg     ((force-output       window-force-output     open t)
 
 ; 09 Aug 91; 03 Sep 92
 ; Set parameters of a window for erasing, saving old values.
-(gldefun window-set-erase (w\:window)
+(gldefun window-set-erase ((w window))
   (let ((gc (gcontext w)) )
     (setq *window-save-function* (wfunction w))
     (XsetFunction *window-display* gc GXcopy)
     (setq *window-save-foreground* (foreground w))
     (XsetForeground *window-display* gc (background w)) ))
 
-(gldefun window-set-copy (w\:window)
+(gldefun window-set-copy ((w window))
   (let ((gc (gcontext w)) )
     (setq *window-save-function*   (wfunction w))
     (XsetFunction *window-display* gc GXcopy)
@@ -628,7 +696,7 @@ msg     ((force-output       window-force-output     open t)
 
 ; 12 Aug 91
 ; Set parameters of a window for inversion, saving old values.
-(gldefun window-set-invert (w\:window)
+(gldefun window-set-invert ((w window))
   (let ((gc (gcontext w)) )
     (setq *window-save-function*   (wfunction w))
     (XsetFunction *window-display* gc GXxor)
@@ -637,7 +705,7 @@ msg     ((force-output       window-force-output     open t)
 		    (logxor *window-save-foreground* (background w))) ))
 
 ; 13 Aug 91
-(gldefun window-set-line-width (w\:window width\:integer)
+(gldefun window-set-line-width ((w window) (width integer))
   (set-line-attr w width nil nil nil))
 
 ; 13 Aug 91; 12 Sep 91
@@ -651,21 +719,21 @@ msg     ((force-output       window-force-output     open t)
 
 ; 13 Aug 91
 ; Set standard line attributes
-(gldefun window-std-line-attr (w\:window)
+(gldefun window-std-line-attr ((w window))
   (XsetLineAttributes *window-display* (gcontext w)
 		      1 LineSolid CapButt JoinMiter) )
 
 ; 06 Aug 91; 08 Aug 91; 12 Sep 91
-(gldefun window-draw-line (w\:window from\:vector to\:vector
+(gldefun window-draw-line ((w window) (from vector) (to vector)
 				     &optional linewidth)
   (window-draw-line-xy w (x from) (y from) (x to) (y to) linewidth) )
 
 ; 19 Dec 90; 07 Aug 91; 08 Aug 91; 09 Aug 91; 13 Aug 91; 12 Sep 91; 28 Sep 94
-(gldefun window-draw-line-xy (w\:window fromx\:integer
-					fromy\:integer
-					tox\:integer   toy\:integer
+(gldefun window-draw-line-xy ((w window) (fromx integer)
+					(fromy integer)
+					(tox integer)   (toy integer)
 					&optional linewidth
-					operation\:atom)
+					(operation atom))
   (let ( (qqwheight (drawable-height w)) )
     (if (linewidth and (linewidth <> 1)) (set-line-width w linewidth))
     (case operation
@@ -711,7 +779,7 @@ msg     ((force-output       window-force-output     open t)
 
 ; 08 Aug 91; 14 Aug 91; 12 Sep 91
 (gldefun window-draw-box
-	 (w\:window offset\:vector size\:vector &optional linewidth)
+	 ((w window) (offset vector) (size vector) &optional linewidth)
   (window-draw-box-xy w (x offset) (y offset) (x size) (y size) linewidth) )
 
 ; 08 Aug 91; 12 Sep 91; 11 Dec 91; 01 Sep 92; 02 Sep 92
@@ -719,16 +787,16 @@ msg     ((force-output       window-force-output     open t)
 ; was  (XDrawRectangle *window-display* (parent w) (gcontext w)
 ;		       offsetx (- qqwheight (offsety + sizey)) sizex sizey)
 (gldefun window-draw-box-xy
-	 (w\:window offsetx\:integer offsety\:integer
-		    sizex\:integer   sizey\:integer
+	 ((w window) (offsetx integer) (offsety integer)
+		    (sizex integer)   (sizey integer)
 		    &optional linewidth)
   (let ((qqwheight (drawable-height w)) miny lw lw2 lw2b (pw (parent w))
 	(gc  (gcontext w)))
     (if (linewidth and (linewidth <> 1)) (set-line-width w linewidth))
-    (lw \:= (or linewidth 1))
-    (lw2 \:= lw / 2)
-    (lw2b \:= (lw + 1) / 2)
-    (miny \:= offsety - lw2b)
+    (lw = (or linewidth 1))
+    (lw2 = lw / 2)
+    (lw2b = (lw + 1) / 2)
+    (miny = offsety - lw2b)
     (XdrawLine *window-display*  pw gc offsetx (- qqwheight miny)
 	       offsetx (- qqwheight (miny + sizey + lw)))
     (XdrawLine *window-display*  pw gc
@@ -744,8 +812,8 @@ msg     ((force-output       window-force-output     open t)
 
 ; 26 Nov 91
 (gldefun window-xor-box-xy
-	 (w\:window offsetx\:integer offsety\:integer
-		    sizex\:integer   sizey\:integer
+	 ((w window) (offsetx integer) (offsety integer)
+		    (sizex integer)   (sizey integer)
 		    &optional linewidth)
   (window-set-xor w)
   (window-draw-box-xy w offsetx offsety sizex sizey linewidth)
@@ -753,23 +821,24 @@ msg     ((force-output       window-force-output     open t)
 
 ; 15 Aug 91; 12 Sep 91
 ; Draw a box whose corners are specified
-(gldefun window-draw-box-corners (w\:window xa\:integer ya\:integer
-				  xb\:integer yb\:integer
+(gldefun window-draw-box-corners ((w window) (xa integer) (ya integer)
+				  (xb integer) (yb integer)
 				  &optional lw)
   (draw-box-xy w (min xa xb) (min ya yb) (abs (- xa xb)) (abs (- ya yb)) lw) )
 
 ; 13 Sep 91
 ; Draw a box with round corners
-(gldefun window-draw-rcbox-xy (w\:window x\:integer y\:integer width\:integer
-					 height\:integer radius\:integer
+(gldefun window-draw-rcbox-xy ((w window) (x integer) (y integer)
+			       (width integer)
+			       (height integer) (radius integer)
 					 &optional linewidth)
   (let (x1 x2 y1 y2 r)
-    (r \:= (max 0 (min radius (truncate (abs width) 2)
+    (r = (max 0 (min radius (truncate (abs width) 2)
 			           (truncate (abs height) 2))))
-    (x1 \:= x + r)
-    (x2 \:= x + width - r)
-    (y1 \:= y + r)
-    (y2 \:= y + height - r)
+    (x1 = x + r)
+    (x2 = x + width - r)
+    (y1 = y + r)
+    (y2 = y + height - r)
     (draw-line-xy w x1 y x2 y linewidth)
     (draw-line-xy w (x + width) y1 (x + width) y2 linewidth)
     (draw-line-xy w x1 (y + height) x2 (y + height) linewidth)
@@ -780,9 +849,9 @@ msg     ((force-output       window-force-output     open t)
     (draw-arc-xy w x1 y2 r r  90 90 linewidth) ))
 
 ; 13 Aug 91; 15 Aug 91; 12 Sep 91
-(gldefun window-draw-arc-xy (w\:window x\:integer y\:integer
-			     radiusx\:integer radiusy\:integer
-			     anglea\:number angleb\:number
+(gldefun window-draw-arc-xy ((w window) (x integer) (y integer)
+			     (radiusx integer) (radiusy integer)
+			     (anglea number) (angleb number)
 			     &optional linewidth)
   (if (linewidth and (linewidth <> 1)) (set-line-width w linewidth))
   (XdrawArc *window-display* (parent w) (gcontext w)
@@ -792,8 +861,8 @@ msg     ((force-output       window-force-output     open t)
   (if (linewidth and (linewidth <> 1)) (set-line-width w 1)) )
 
 ; 08 Aug 91; 12 Sep 91
-(gldefun window-draw-circle-xy (w\:window x\:integer y\:integer
-					  radius\:integer
+(gldefun window-draw-circle-xy ((w window) (x integer) (y integer)
+					  (radius integer)
 					  &optional linewidth)
   (if (linewidth and (linewidth <> 1)) (set-line-width w linewidth))
   (XdrawArc *window-display* (parent w) (gcontext w)
@@ -802,26 +871,26 @@ msg     ((force-output       window-force-output     open t)
   (if (linewidth and (linewidth <> 1)) (set-line-width w 1)) )
 
 ; 06 Aug 91; 14 Aug 91; 12 Sep 91
-(gldefun window-draw-circle (w\:window pos\:vector radius\:integer
+(gldefun window-draw-circle ((w window) (pos vector) (radius integer)
 				       &optional linewidth)
   (window-draw-circle-xy w (x pos) (y pos) radius linewidth) )
 
 ; 08 Aug 91; 09 Sep 91
-(gldefun window-erase-area (w\:window offset\:vector size\:vector)
+(gldefun window-erase-area ((w window) (offset vector) (size vector))
   (window-erase-area-xy w (x offset) (y offset) (x size) (y size)))
 
 ; 09 Sep 91; 11 Dec 91
-(gldefun window-erase-area-xy (w\:window xoff\:integer yoff\:integer
-				         xsize\:integer ysize\:integer)
+(gldefun window-erase-area-xy ((w window) (xoff integer) (yoff integer)
+				         (xsize integer) (ysize integer))
   (XClearArea *window-display* (parent w)
 	      xoff (positive-y w (yoff + ysize - 1))
 	      xsize ysize
 	      0 ))     ;   exposures
 
 ; 21 Dec 93
-(gldefun window-erase-box-xy (w\:window xoff\:integer yoff\:integer
-				        xsize\:integer ysize\:integer
-					&optional linewidth\:integer)
+(gldefun window-erase-box-xy ((w window) (xoff integer) (yoff integer)
+				        (xsize integer) (ysize integer)
+					&optional (linewidth integer))
   (XClearArea *window-display* (parent w)
 		    (xoff - (or linewidth 1) / 2)
 		    (positive-y w (yoff + ysize + (or linewidth 1) / 2))
@@ -830,13 +899,13 @@ msg     ((force-output       window-force-output     open t)
 		    0 ))    ;   exposures
 
 ; 15 Aug 91; 12 Sep 91
-(gldefun window-draw-ellipse-xy (w\:window x\:integer y\:integer
-			         rx\:integer ry\:integer &optional lw)
+(gldefun window-draw-ellipse-xy ((w window) (x integer) (y integer)
+			         (rx integer) (ry integer) &optional lw)
   (draw-arc-xy w x y rx ry 0 360 lw))
 
 ; 09 Aug 91
-(gldefun window-copy-area-xy (w\:window fromx fromy\:integer
-					tox toy\:integer width height)
+(gldefun window-copy-area-xy ((w window) fromx (fromy integer)
+					tox (toy integer) width height)
   (let ((qqwheight (drawable-height w)))
     (set-copy w)
     (XCopyArea *window-display* (parent w) (parent w) (gcontext w)
@@ -846,16 +915,16 @@ msg     ((force-output       window-force-output     open t)
     (unset w) ))
 
 ; 07 Dec 90; 09 Aug 91; 12 Sep 91
-(gldefun window-invertarea (w\:window area\:region)
+(gldefun window-invertarea ((w window) (area region))
   (window-invert-area-xy w (left area) (bottom area)
 			   (width area) (height area)))
 
 ; 07 Dec 90; 09 Aug 91; 12 Sep 91
-(gldefun window-invert-area (w\:window offset\:vector size\:vector)
+(gldefun window-invert-area ((w window) (offset vector) (size vector))
   (window-invert-area-xy w (x offset) (y offset) (x size) (y size)) )
 
 ; 12 Aug 91; 15 Aug 91; 13 Dec 91
-(gldefun window-invert-area-xy (w\:window left bottom\:integer width height)
+(gldefun window-invert-area-xy ((w window) left (bottom integer) width height)
   (set-invert w)
   (XFillRectangle *window-display* (parent w) (gcontext w)
 	          left (- (drawable-height w) (bottom + height - 1))
@@ -863,56 +932,88 @@ msg     ((force-output       window-force-output     open t)
   (unset w) )
 
 ; 05 Dec 90; 15 Aug 91
-(gldefun window-prettyprintat (w\:window s\:string pos\:vector)
+(gldefun window-prettyprintat ((w window) (s string) (pos vector))
   (printat w s pos) )
 
-(gldefun window-prettyprintat-xy (w\:window s\:string x\:integer y\:integer)
+(gldefun window-prettyprintat-xy ((w window) (s string) (x integer)
+				  (y integer))
   (printat-xy w s x y))
 
 ; 06 Aug 91; 08 Aug 91; 15 Aug 91
-(gldefun window-printat (w\:window s\:string pos\:vector)
+(gldefun window-printat ((w window) (s string) (pos vector))
   (printat-xy w s (x pos) (y pos)) )
 
 ; 06 Aug 91; 08 Aug 91; 12 Aug 91
-(gldefun window-printat-xy (w\:window s\:string x\:integer y\:integer)
+(gldefun window-printat-xy ((w window) (s string) (x integer) (y integer))
   (let ( (sstr (stringify s)) )
     (XdrawImageString *window-display* (parent w) (gcontext w)
 		      x (- (drawable-height w) y)
 		      (get-c-string sstr) (length sstr)) ))
 
+; 19 Apr 95; 02 May 95; 17 May 04
+; Print a string that may contain #\Newline characters in a window.
+(gldefun window-print-line ((w window) (str string) (x integer) (y integer)
+				      &optional (deltay integer))
+  (let ((lng (length str)) (n 0) end strb done)
+    (while ~done
+      (end = (position #\Newline str :test #'char= :start n))
+      (strb = (subseq str n end))
+      (printat-xy w strb x y)
+      (if (numberp end)
+	  (n = (1+ end))
+	  (done = t))
+      (y _- (or deltay 16))
+      (if (y < 0) (done = t)))
+    (force-output w) ))
+
+; 02 May 95; 08 May 95
+; Print a list of strings in a window.
+(gldefun window-print-lines ((w window) (lines (listof string))
+				       (x integer) (y integer)
+				       &optional (deltay integer))
+  (for str in lines when (y > 0) (printat-xy w str x y) (y _- (or deltay 16))) )
+
 ; 08 Aug 91
 ; Find the width of a string when printed in a given window
-(gldefun window-string-width  (w\:window s\:string)
+(gldefun window-string-width  ((w window) (s string))
   (let ((sstr (stringify s)))
     (XTextWidth (font w) (get-c-string sstr) (length sstr)) ))
 
 ; 01 Dec 93
 ; Find the ascent and descent of a string when printed in a given window
-(gldefun window-string-extents  (w\:window s\:string)
+(gldefun window-string-extents  ((w window) (s string))
   (let ((sstr (stringify s)))
     (XTextExtents (font w) (get-c-string sstr) (length sstr)
       *direction-return* *ascent-return* *descent-return* *overall-return*)
     (list (int-pos *ascent-return* 0)
 	  (int-pos *descent-return* 0)) ))
 
+; Find the height (ascent + descent) of a string when printed in a given window
+(gldefun window-string-height  ((w window) (s string))
+  (let ((sstr (stringify s)))
+    (XTextExtents (font w) (get-c-string sstr) (length sstr)
+      *direction-return* *ascent-return* *descent-return* *overall-return*)
+    (+ (int-pos *ascent-return* 0)
+       (int-pos *descent-return* 0)) ))
+
 ; 15 Oct 91
-(gldefun window-font-string-width (font s\:string)
+(gldefun window-font-string-width (font (s string))
   (let ((sstr (stringify s)))
     (XTextWidth font (get-c-string sstr) (length sstr)) ))
 
-(gldefun window-yposition (w\:window)
+(gldefun window-yposition ((w window))
   (window-get-mouse-position)
   (positive-y w (- *mouse-y* (top-neg-y w))) )
 
-(gldefun window-centeroffset (w\:window v\:vector)
+(gldefun window-centeroffset ((w window) (v vector))
   (a vector with x = (truncate ((width w)  - (x v)) 2)
                  y = (truncate ((height w) - (y v)) 2)))
 
 ; 18 Aug 89; 15 Aug 91
 ; Command to a window display manager 
-(gldefun dowindowcom (w\:window)
+(gldefun dowindowcom ((w window))
   (let (comm)
-    (comm \:= (select (window-menu)) )
+    (comm = (select (window-menu)) )
   (case comm
 	(close  (close w))
 	(paint  (paint w))
@@ -928,30 +1029,30 @@ msg     ((force-output       window-force-output     open t)
 	(a menu with items = '(close paint clear move)))) )
 
 ; 06 Dec 90; 11 Mar 93
-(gldefun window-close (w\:window)
+(gldefun window-close ((w window))
     (unmap w)
     (force-output w)
     (window-wait-unmap w))
 
-(gldefun window-unmap (w\:window)
+(gldefun window-unmap ((w window))
   (XUnMapWindow *window-display* (parent w)) )
 
 ; 06 Aug 91; 22 Aug 91
-(gldefun window-open (w\:window)
+(gldefun window-open ((w window))
   (mapw w)
   (force-output w)
   (wait-exposure w) )
 
-(gldefun window-map (w\:window)
+(gldefun window-map ((w window))
   (XMapWindow *window-display* (parent w))  )
 
 ; 08 Aug 91; 02 Sep 91
-(gldefun window-destroy (w\:window)
+(gldefun window-destroy ((w window))
   (XDestroyWindow *window-display* (parent w))
   (force-output w)
-  ((parent w) \:= nil)
+  ((parent w) = nil)
   (XFreeGC *window-display* (gcontext w))
-  ((gcontext w) \:= nil) )
+  ((gcontext w) = nil) )
 
 ; 09 Sep 91
 ; Wait 3 seconds, then destroy the window where the mouse is.  Use with care.
@@ -968,12 +1069,12 @@ msg     ((force-output       window-force-output     open t)
 	       (Xflush *window-display*))) ))
 
 ; 07 Aug 91
-(gldefun window-clear (w\:window)
+(gldefun window-clear ((w window))
   (XClearWindow *window-display* (parent w))
   (force-output w) )
 
 ; 08 Aug 91
-(gldefun window-moveto-xy (w\:window x\:integer y\:integer)
+(gldefun window-moveto-xy ((w window) (x integer) (y integer))
   (XMoveWindow *window-display* (parent w)
 		     x (- (window-screen-height) y)) )
 
@@ -991,13 +1092,13 @@ msg     ((force-output       window-force-output     open t)
 
 ; 15 Aug 91; 06 May 93
 ; Move a window.
-(gldefun window-move (w\:window)
+(gldefun window-move ((w window))
   (window-get-mouse-position)
   (XMoveWindow *window-display* (parent w)
 	       *mouse-x* (- (window-screen-height) *mouse-y*)) )
 
 ; 15 Sep 93; 06 Jan 94
-(gldefun window-draw-border (w\:window)
+(gldefun window-draw-border ((w window))
   (draw-box-xy w 0 1 ((x (size w)) - 1) ((y (size w)) - 1))
   (force-output w) )
 
@@ -1106,12 +1207,12 @@ lp  (XGetWindowAttributes *window-display* win *window-attr*)
 ; 14 Dec 90; 17 Dec 90; 13 Aug 91; 20 Aug 91; 30 Aug 91; 09 Sep 91; 11 Sep 91
 ; 15 Oct 91; 16 Oct 91; 10 Feb 92; 25 Sep 92; 26 Sep 92
 ; Initialize a menu
-(gldefun menu-init (m\:menu)
+(gldefun menu-init ((m menu))
   (let ()
     (or *window-display* (window-Xinit))    ; init windows if necessary
     (calculate-size m)
     (if ~ (flat m)
-	((menu-window m) \:= (window-create (picture-width m)
+	((menu-window m) = (window-create (picture-width m)
 					    (picture-height m)
 					    ((title m) or "")
 					    (parent-window m)
@@ -1119,186 +1220,189 @@ lp  (XGetWindowAttributes *window-display* win *window-attr*)
 					    (parent-offset-y m)
 					    (menu-font m) )) ) ))
 
-; 25 Sep 92; 26 Sep 92; 11 Mar 93; 05 Oct 93; 08 Oct 93
+; 25 Sep 92; 26 Sep 92; 11 Mar 93; 05 Oct 93; 08 Oct 93; 17 May 04
 ; Calculate the displayed size of a menu
-(gldefun menu-calculate-size (m\:menu)
+(gldefun menu-calculate-size ((m menu))
   (let (maxwidth maxheight nitems)
-    (or (menu-font m) ((menu-font m) \:= '9x15))
-    (maxwidth \:= (find-item-width m (title m))
+    (or (menu-font m) ((menu-font m) = '9x15))
+    (maxwidth = (find-item-width m (title m))
 	          + (if (or (flat m) *window-add-menu-title*)
-			then 0 else *menu-title-pad*))
-    (maxheight \:=  13)                      ; ***** fix for font
-    (nitems \:= (if (and (title-present m)
+			0
+		        *menu-title-pad*))
+    (maxheight =  13)                      ; ***** fix for font
+    (nitems = (if (and (title-present m)
 			 (or (flat m) *window-add-menu-title*))
-		    then 1 else 0))
+		  1 0))
     (for item in (items m) do
       (nitems _+ 1)
-      (maxwidth  \:= (max maxwidth  (find-item-width m item)))
-      (maxheight \:= (max maxheight (find-item-height m item))) )
-    ((item-width m) \:= maxwidth + 6)
-    ((picture-width m) \:= (item-width m) + 1)
-    ((item-height m) \:=  maxheight + 2)
-    ((picture-height m) \:= ((item-height m) * nitems) + 2)
+      (maxwidth  = (max maxwidth  (find-item-width m item)))
+      (maxheight = (max maxheight (find-item-height m item))) )
+    ((item-width m) = maxwidth + 6)
+    ((picture-width m) = (item-width m) + 1)
+    ((item-height m) =  maxheight + 2)
+    ((picture-height m) = ((item-height m) * nitems) + 2)
     (adjust-offset m) ))
 
-; 06 Sep 91; 09 Sep 91; 10 Sep 91; 21 May 93
+; 06 Sep 91; 09 Sep 91; 10 Sep 91; 21 May 93; 30 May 02; 17 May 04
 ; Adjust a menu's offset position if necessary to keep it in parent window.
-(gldefun menu-adjust-offset (m\:menu)
+(gldefun menu-adjust-offset ((m menu))
   (let (xbase ybase wbase hbase xoff yoff wgm width height)
-    (width \:= (picture-width m))
-    (height \:= (picture-height m))
+    (width = (picture-width m))
+    (height = (picture-height m))
     (if ~ (parent-window m)
-	then (window-get-mouse-position)  ; put it where the mouse is
-	     (wgm \:= t)                  ; set flag that we got mouse position
-	     ((parent-window m) \:= *root-window*)) ; 21 May 93 was *mouse-window*
+	(progn (window-get-mouse-position)  ; put it where the mouse is
+	       (wgm = t)                  ; set flag that we got mouse position
+	       ((parent-window m) = *root-window*))) ; 21 May 93 was *mouse-window*
     (window-get-geometry-b (parent-window m))
     (setq xbase (int-pos *x-return* 0))
     (setq ybase (int-pos *y-return* 0))
     (setq wbase (int-pos *width-return* 0))
     (setq hbase (int-pos *height-return* 0))
-    (if (~ (parent-offset-x m) or (parent-offset-x m) = 0)
-	then (or wgm (window-get-mouse-position))
-             (xoff \:= ((*mouse-x* - xbase) - (width  / 2) - 4))
-             (yoff \:= ((hbase - (*mouse-y* - ybase)) - (height / 2)))
-	else (xoff \:= (parent-offset-x m))
-	     (yoff \:= (parent-offset-y m)))
-    ((parent-offset-x m) \:= (max 0 (min xoff (wbase - width))))
-    ((parent-offset-y m) \:= (max 0 (min yoff (hbase - height)))) ))
+    (if (~ (parent-offset-x m) or (parent-offset-x m) == 0)
+	(progn (or wgm (window-get-mouse-position))
+	       (xoff = ((*mouse-x* - xbase) - (width  / 2) - 4))
+	       (yoff = ((hbase - (*mouse-y* - ybase)) - (height / 2))))
+	(progn (xoff = (parent-offset-x m))
+	       (yoff = (parent-offset-y m))))
+    ((parent-offset-x m) = (max 0 (min xoff (wbase - width))))
+    ((parent-offset-y m) = (max 0 (min yoff (hbase - height)))) ))
 
 ; 07 Dec 90; 14 Dec 90; 12 Aug 91; 22 Aug 91; 09 Sep 91; 10 Sep 91; 28 Jan 92;
-; 10 Feb 92; 26 Sep 92; 11 Mar 93; 08 Oct 93
-(gldefun menu-draw (m\:menu)
+; 10 Feb 92; 26 Sep 92; 11 Mar 93; 08 Oct 93; 17 May 04
+(gldefun menu-draw ((m menu))
   (let (mw xzero yzero bottom)
     (init? m)
-    (xzero \:= (menu-x m 0))
-    (yzero \:= (menu-y m 0))
-    (mw \:= (menu-window m))
+    (xzero = (menu-x m 0))
+    (yzero = (menu-y m 0))
+    (mw = (menu-window m))
     (open mw)
     (clear m)
     (if (flat m) (draw-box-xy mw (xzero - 1) yzero ((picture-width m) + 2)
 			      ((picture-height m) + 1) 1))
-    (bottom \:= (yzero + (picture-height m) + 3))
+    (bottom = (yzero + (picture-height m) + 3))
     (if (and (title-present m)
 	     (or (flat m) *window-add-menu-title*))
-	then (bottom _- (item-height m))
-             (printat-xy mw (stringify (title m)) (+ xzero 3) bottom)
-             (invert-area-xy mw xzero (bottom - 2)
-			        ((picture-width m) + 1) (item-height m)))
+	(progn (bottom _- (item-height m))
+	       (printat-xy mw (stringify (title m)) (+ xzero 3) bottom)
+	       (invert-area-xy mw xzero (bottom - 2)
+			       ((picture-width m) + 1) (item-height m))))
     (for item in (items m) do
 	 (bottom _- (item-height m))
 	 (display-item m item (+ xzero 3) bottom) )
     (force-output mw) ))
 
+; 17 May 04
 (gldefun menu-item-value (self item)
-  (if (consp item) then (cdr item) else item))
+  (if (consp item) (cdr item) item))
 
-; 06 Sep 91; 11 Sep 91; 15 Oct 91; 16 Oct 91; 23 Oct 91
-(gldefun menu-find-item-width (self\:menu item)
-  (let (tmp\:vector)
+; 06 Sep 91; 11 Sep 91; 15 Oct 91; 16 Oct 91; 23 Oct 91; 17 May 04
+(gldefun menu-find-item-width ((self menu) item)
+  (let ((tmp vector))
     (if (and (consp item)
 	     (symbolp (car item))
 	     (fboundp (car item)))
-        then (or (and (tmp \:= (get (car item) 'display-size))
-		      (x tmp))
-		 40)
-        else (window-font-string-width
+	(or (and (tmp = (get (car item) 'display-size))
+		 (x tmp))
+	    40)
+        (window-font-string-width
 	      (or (and (flat self)
 		       (menu-window self)
 		       (font (menu-window self)))
 		  (window-font-info (menu-font self)))
-	      (stringify (if (consp item) then (car item) else item)))) ))
+	      (stringify (if (consp item) (car item) item)))) ))
 
 
-; 09 Sep 91; 10 Sep 91; 11 Sep 91
-(gldefun menu-find-item-height (self\:menu item)     ; ***** fix for font
-  (let (tmp\:vector)
+; 09 Sep 91; 10 Sep 91; 11 Sep 91; 17 mAY 04
+(gldefun menu-find-item-height ((self menu) item)     ; ***** fix for font
+  (let ((tmp vector))
     (if (and (consp item)
 	     (symbolp (car item))
-	     (tmp \:= (get (car item) 'display-size)))
-	then ((y tmp) + 3)
-        else 15) ))
+	     (tmp = (get (car item) 'display-size)))
+	((y tmp) + 3)
+        15) ))
 
-; 09 Sep 91; 10 Sep 91; 10 Feb 92
-(gldefun menu-clear (m\:menu)
+; 09 Sep 91; 10 Sep 91; 10 Feb 92; 17 May 04
+(gldefun menu-clear ((m menu))
   (if (flat m)
       (erase-area-xy (menu-window m) ((base-x m) - 1) ((base-y m) - 1)
 		     ((picture-width m) + 3) ((picture-height m) + 3))
-      else (clear (menu-window m))) )
+      (clear (menu-window m))) )
 
-; 06 Sep 91; 04 Dec 91
-(gldefun menu-display-item (self\:menu item x y)
+; 06 Sep 91; 04 Dec 91; 17 May 04
+(gldefun menu-display-item ((self menu) item x y)
   (let ((mw (menu-window self)))
     (if (consp item)
-        then (if (and (symbolp (car item))
+        (if (and (symbolp (car item))
 		      (fboundp (car item)))
- 		 then (funcall (car item) mw x y)
-	         elseif (or (stringp (car item)) (symbolp (car item))
+ 		 (funcall (car item) mw x y)
+	         (if (or (stringp (car item)) (symbolp (car item))
 			    (numberp (car item)))
-	         then (printat-xy mw (car item) x y)
-		 else (printat-xy mw (stringify item) x y))
-        else (printat-xy mw (stringify item) x y)) ))
+		     (printat-xy mw (car item) x y)
+		     (printat-xy mw (stringify item) x y)))
+        (printat-xy mw (stringify item) x y)) ))
 
 ; 07 Dec 90; 18 Dec 90; 15 Aug 91; 27 Aug 91; 06 Sep 91; 10 Sep 91; 29 Sep 92
-; 04 Aug 93; 07 Jan 94
-(gldefun menu-choose (m\:menu inside\:boolean)
+; 04 Aug 93; 07 Jan 94; 17 May 04; 18 May 04
+(gldefun menu-choose ((m menu) (inside boolean))
   (let (mw current-item-n newn itemh itms nitems val maxx xzero yzero)
     (init? m)
-    (mw \:= (menu-window m))
+    (mw = (menu-window m))
     (draw m)
-    (xzero \:= (menu-x m 0))
-    (yzero \:= (menu-y m 0))
-    (maxx \:= (+ xzero (picture-width m)))
-    (itemh \:= (item-height m))
-    (itms \:= (items m))
-    (nitems \:= (length itms))
+    (xzero = (menu-x m 0))
+    (yzero = (menu-y m 0))
+    (maxx = (+ xzero (picture-width m)))
+    (itemh = (item-height m))
+    (itms = (items m))
+    (nitems = (length itms))
     (track-mouse mw
       #'(lambda (x y code)
 	  (setq *window-menu-code* code)
           (setq newn (1- (- nitems (truncate (- y (+ yzero 3)) itemh))))
 	  (if ((x >= xzero) and (x <= maxx)
 	       and (newn >= 0) and (newn < nitems))
-	      then
+	      (progn
 	      (if current-item-n
-		  then (if (/= newn current-item-n)
-			   then (unbox-item m current-item-n)
+		  (if (/= newn current-item-n)
+			   (progn (unbox-item m current-item-n)
 			        (box-item m newn)
-				(current-item-n \:= newn))
-		  else (inside \:= t)
+				(current-item-n = newn)))
+		  (progn (inside = t)
 		       (box-item m newn)
-		       (current-item-n \:= newn))
+		       (current-item-n = newn)))
 	      (if (and current-item-n (> code 0))
-		  (unbox-item m current-item-n)
-		  (val \:= current-item-n))
-	      else (if current-item-n
-		       then (unbox-item m current-item-n)
-		            (current-item-n \:= nil))
+		  (progn (unbox-item m current-item-n)
+			 (val = current-item-n))))
+	      (progn (if current-item-n
+			 (progn (unbox-item m current-item-n)
+				(current-item-n = nil)))
 	           (if (> code 0) or
 		       (inside and ((x < xzero) or (x > maxx)
 				    or (y < yzero)
 				    or (y > (yzero + (picture-height m)))))
-		       then (val \:= -777))))
+		       (val = -777)))))
       t)
     (if (val <> -777) (item-value m (nth val itms)) ) ))
 
 ; 07 Dec 90; 12 Aug 91; 10 Sep 91; 05 Oct 92
-(gldefun menu-box-item (m\:menu item\:integer)
+(gldefun menu-box-item ((m menu) (item integer))
   (let (itemh nitems (mw (menuw m)) )
-    (itemh \:= (item-height m))
-    (nitems \:= (length (items m)))
+    (itemh = (item-height m))
+    (nitems = (length (items m)))
     (set-xor mw)
     (draw-box-xy mw (menu-x m 1) (menu-y m ((nitems - item - 1) * itemh + 2))
 		    ((item-width m) - 2) itemh 1)
     (unset mw) ))
 
 ; 07 Dec 90; 12 Aug 91; 14 Aug 91; 15 Aug 91; 05 Oct 92
-(gldefun menu-unbox-item (m\:menu item\:integer)
+(gldefun menu-unbox-item ((m menu) (item integer))
   (box-item m item) )
 
 ; 11 Sep 91; 08 Sep 92; 28 Sep 92; 18 Jan 94
-(gldefun menu-item-position (m\:menu itemname\:symbol &optional place\:symbol)
+(gldefun menu-item-position ((m menu) (itemname symbol)
+			     &optional (place symbol))
   (let ((n 0) found itms item (xsize (item-width m)) (ysize (item-height m)))
-    (itms \:= (items m))
-    (found \:= (null itemname))
+    (itms = (items m))
+    (found = (null itemname))
     (while itms and ~ found do
 	   (n _+ 1)
 	   (item -_ itms)
@@ -1310,7 +1414,7 @@ lp  (XGetWindowAttributes *window-display* win *window-attr*)
 			    (eq (cdr item) itemname)
 			    (and (consp (cdr item))
 				 (eq (cadr item) itemname)))))
-	       (found \:= t)))
+	       (found = t)))
     (if found (a vector with
 		 x = ((menu-x m 0) +
 		      (case place
@@ -1325,25 +1429,26 @@ lp  (XGetWindowAttributes *window-display* win *window-attr*)
 			(top ysize)
 			else 0)) )) ))
 
-; 10 Dec 90; 13 Dec 90; 10 Sep 91; 29 Sep 92
+; 10 Dec 90; 13 Dec 90; 10 Sep 91; 29 Sep 92; 17 May 04
 ; Choose from menu, then close it
-(gldefun menu-select (m\:menu &optional inside) (menu-select-b m nil inside))
-(gldefun menu-select! (m\:menu) (menu-select-b m t nil))
-(gldefun menu-select-b (m\:menu flg\:boolean inside\:boolean)
+(gldefun menu-select ((m menu) &optional inside) (menu-select-b m nil inside))
+(gldefun menu-select! ((m menu)) (menu-select-b m t nil))
+(gldefun menu-select-b ((m menu) (flg boolean) (inside boolean))
   (prog (res)
-lp  (res \:= (choose m inside))
+lp  (res = (choose m inside))
     (if (flg and ~res) (go lp))
     (if ~(permanent m)
-	(if (flat m) then (clear m)
-	                  (force-output (menu-window m))
-	             else (close (menu-window m))))
+	(if (flat m)
+	    (progn (clear m)
+		   (force-output (menu-window m)))
+	    (close (menu-window m))))
     (return res)))
 
-; 12 Aug 91
-(gldefun menu-destroy (m\:menu)
+; 12 Aug 91; 17 May 04
+(gldefun menu-destroy ((m menu))
   (if ~ (flat m)
-      then (destroy (menu-window m))
-           ((menu-window m) \:= nil) ))
+      (progn (destroy (menu-window m))
+	     ((menu-window m) = nil) )))
 
 ; 19 Aug 91; 02 Sep 91
 ; Easy interface to make a menu, select from it, and destroy it.
@@ -1354,12 +1459,13 @@ lp  (res \:= (choose m inside))
     (menu-destroy m)
     res ))
 
-; 12 Aug 91; 15 Aug 91; 06 Sep 91; 09 Sep 91; 12 Sep 91; 23 Oct 91
+; 12 Aug 91; 15 Aug 91; 06 Sep 91; 09 Sep 91; 12 Sep 91; 23 Oct 91; 17 May 04
 ; Simple call from plain Lisp to make a menu.
-(gldefun menu-create (items &optional title parentw\:window x y
-			    perm\:boolean flat\:boolean font\:symbol)
-  (a menu with title           = (if title (stringify title) else "")
-               menu-window     = (if flat then parentw)
+(setf (glfnresulttype 'menu-create) 'menu)
+(gldefun menu-create (items &optional title (parentw window) x y
+			    (perm boolean) (flat boolean) (font symbol))
+  (a menu with title           = (if title (stringify title) "")
+               menu-window     = (if flat parentw)
                items           = items
                parent-window   = (parent parentw)
 	       parent-offset-x = x
@@ -1369,48 +1475,53 @@ lp  (res \:= (choose m inside))
 	       menu-font       = font ))
 
 ; 15 Oct 91; 30 Oct 91
-(gldefun menu-offset (m\:menu)
+(gldefun menu-offset ((m menu))
   (result vector)
   (a vector with x = (base-x m) y = (base-y m)))
 
-; 15 Oct 91; 30 Oct 91; 25 Sep 92; 29 Sep 92
-(gldefun menu-size (m\:menu)
+; 15 Oct 91; 30 Oct 91; 25 Sep 92; 29 Sep 92; 18 Apr 95; 25 Jul 96
+(gldefun menu-size ((m menu))
   (result vector)
   (if ((picture-width m) <= 0)
-      (if ((first m) = 'picmenu)
-	  then (picmenu-calculate-size m)
-	  else (menu-calculate-size m)))
+      (case (first m)
+	(picmenu (picmenu-calculate-size m))
+	(barmenu (barmenu-calculate-size m))
+	(textmenu (textmenu-calculate-size m))
+	(editmenu (editmenu-calculate-size m))
+	(t (menu-calculate-size m))))
   (a vector with x = (picture-width m) y = (picture-height m)) )
 
-; 15 Oct 91
-(gldefun menu-moveto-xy (m\:menu x\:integer y\:integer)
+; 15 Oct 91; 17 May 04
+(gldefun menu-moveto-xy ((m menu) (x integer) (y integer))
   (if (flat m)
-      then ((parent-offset-x m) \:= x)
-           ((parent-offset-y m) \:= y)
-	   (adjust-offset m)) )
+      (progn ((parent-offset-x m) = x)
+	     ((parent-offset-y m) = y)
+	     (adjust-offset m)) ))
 
-; 27 Nov 92
+; 27 Nov 92; 17 May 04
 ; Reposition a menu to a position specified by the user by mouse click
-(gldefun menu-reposition (m\:menu)
+(gldefun menu-reposition ((m menu))
   (let (sizev pos)
   (if (flat m)
-      (sizev \:= (size m))
-      (pos \:= (get-box-position (menu-window m) (x sizev) (y sizev)))
-      (moveto-xy m (x pos) (y pos)) ) ))
+      (progn (sizev = (size m))
+	     (pos = (get-box-position (menu-window m) (x sizev) (y sizev)))
+	     (moveto-xy m (x pos) (y pos)) ) )))
 
 ; 09 Sep 91; 11 Sep 91; 12 Sep 91; 14 Sep 91
 ; Simple call from plain Lisp to make a picture menu.
+(setf (glfnresulttype 'picmenu-create) 'picmenu)
 (gldefun picmenu-create
-  (buttons width\:integer height\:integer drawfn
-         &optional title dotflg\:boolean parentw\:window x y
-	           perm\:boolean flat\:boolean font\:symbol boxflg\:boolean)
+  (buttons (width integer) (height integer) drawfn
+         &optional title (dotflg boolean) (parentw window) x y (perm boolean)
+	 (flat boolean) (font symbol) (boxflg boolean))
   (picmenu-create-from-spec
     (picmenu-create-spec buttons width height drawfn dotflg font)
     title parentw x y perm flat boxflg))                  
 
 ; 14 Sep 91
-(gldefun picmenu-create-spec (buttons width\:integer height\:integer drawfn
-		              &optional dotflg\:boolean font\:symbol)
+(setf (glfnresulttype 'picmenu-create-spec) 'picmenu-spec)
+(gldefun picmenu-create-spec (buttons (width integer) (height integer) drawfn
+		              &optional (dotflg boolean) (font symbol))
   (a picmenu-spec with drawing-width   = width
                        drawing-height  = height
 		       buttons         = buttons
@@ -1418,12 +1529,13 @@ lp  (res \:= (choose m inside))
 		       drawfn          = drawfn
 		       menu-font       = (font or '9x15)))
 
-; 14 Sep 91
+; 14 Sep 91; 17 May 04
+(setf (glfnresulttype 'picmenu-create-from-spec) 'picmenu)
 (gldefun picmenu-create-from-spec
-	 (spec\:picmenu-spec &optional title parentw\:window x y
-	           perm\:boolean flat\:boolean boxflg\:boolean)
-  (a picmenu with title           = (if title (stringify title) else "")
-                  menu-window     = (if flat then parentw)
+	 ((spec picmenu-spec) &optional title (parentw window) x y
+	           (perm boolean) (flat boolean) (boxflg boolean))
+  (a picmenu with title           = (if title (stringify title) "")
+                  menu-window     = (if flat parentw)
 		  parent-window   = (if parentw (parent parentw))
 		  parent-offset-x = x
 		  parent-offset-y = y
@@ -1432,27 +1544,27 @@ lp  (res \:= (choose m inside))
 		  spec            = spec
 		  boxflg          = boxflg))
 
-; 29 Sep 92; 13 Oct 93
-(gldefun picmenu-calculate-size (m\:picmenu)
+; 29 Sep 92; 13 Oct 93; 17 May 04
+(gldefun picmenu-calculate-size ((m picmenu))
   (let (maxwidth maxheight)
-    (maxwidth \:= (max (if (title m) then ((* 9 (length (title m))) + 6)
-		                     else 0)
+    (maxwidth = (max (if (title m) ((* 9 (length (title m))) + 6)
+		                   0)
 		       (drawing-width m)))
-    (maxheight \:= (if (and (title-present m)
+    (maxheight = (if (and (title-present m)
 			    (or (flat m) *window-add-menu-title*))
-		       then 15 else 0)
+		       15 0)
 	           + (drawing-height m))
-    ((picture-width m) \:= maxwidth)
-    ((picture-height m) \:= maxheight) ))
+    ((picture-width m) = maxwidth)
+    ((picture-height m) = maxheight) ))
 
 ; 09 Sep 91; 10 Sep 91; 29 Sep 92
 ; Initialize a picture menu
-(gldefun picmenu-init (m\:picmenu)
+(gldefun picmenu-init ((m picmenu))
   (let ()
     (calculate-size m)
     (adjust-offset m)
     (if ~ (flat m)
-	((menu-window m) \:= (window-create (picture-width m)
+	((menu-window m) = (window-create (picture-width m)
 					    (picture-height m)
 					    ((title m) or "")
 					    (parent-window m)
@@ -1461,30 +1573,31 @@ lp  (res \:= (choose m inside))
 					    (menu-font m) )) ) ))
 
 ; 09 Sep 91; 10 Sep 91; 11 Sep 91; 10 Feb 92; 05 Oct 92; 30 Oct 92; 13 Oct 93
+; 17 May 04
 ; Draw a picture menu
-(gldefun picmenu-draw (m\:picmenu)
+(gldefun picmenu-draw ((m picmenu))
   (let (mw bottom xzero yzero)
     (init? m)
-    (mw \:= (menu-window m))
+    (mw = (menu-window m))
     (open mw)
     (clear m)
-    (xzero \:= (menu-x m 0))
-    (yzero \:= (menu-y m 0))
-    (bottom \:= yzero + (picture-height m))
+    (xzero = (menu-x m 0))
+    (yzero = (menu-y m 0))
+    (bottom = yzero + (picture-height m))
     (if (and (title-present m)
 			    (or (flat m) *window-add-menu-title*))
-	then (printat-xy mw (stringify (title m)) (xzero + 3) (bottom - 13))
-             (invert-area-xy mw xzero (bottom - 15) (picture-width m) 16))
+	(progn (printat-xy mw (stringify (title m)) (xzero + 3) (bottom - 13))
+	       (invert-area-xy mw xzero (bottom - 15) (picture-width m) 16)))
     (funcall (drawfn m) mw xzero yzero)
     (if (boxflg m) (draw-box-xy mw xzero yzero
 				   (picture-width m) (picture-height m) 1))
     (if (dotflg m)
-	then (for b in (buttons m) do (draw-button m b)) )
-    ((deleted-buttons m) \:= nil)
+	(for b in (buttons m) do (draw-button m b)) )
+    ((deleted-buttons m) = nil)
     (force-output mw) ))
 
 ; 05 Oct 92
-(gldefun picmenu-draw-button (m\:picmenu b\:picmenu-button)
+(gldefun picmenu-draw-button ((m picmenu) (b picmenu-button))
   (let ((mw (menu-window m)))
     (set-invert mw)
     (draw-box-xy mw ((menu-x m 0) + (x (offset b)) - 2)
@@ -1492,115 +1605,117 @@ lp  (res \:= (choose m inside))
 		    4 4 1)
     (unset mw) ))
 
-; 05 Oct 92; 30 Oct 92
+; 05 Oct 92; 30 Oct 92; 17 May 04
 ; Delete a button and erase it from the display
-(gldefun picmenu-delete-named-button (m\:picmenu name\:symbol)
+(gldefun picmenu-delete-named-button ((m picmenu) (name symbol))
   (let (b)
-    (if (and (b \:= (assoc name (buttons m)))
+    (if (and (b = (assoc name (buttons m)))
 	     ~ (name <= (deleted-buttons m)))
-	then (if (dotflg m) (draw-button m b))
-	     ((deleted-buttons m) +_ name) )
+	(progn (if (dotflg m) (draw-button m b))
+	       ((deleted-buttons m) +_ name) ))
     (force-output (menu-window m)) ))
 
 ; 09 Sep 91; 10 Sep 91; 18 Sep 91; 29 Sep 92; 26 Oct 92; 30 Oct 92; 06 May 93
-; 04 Aug 93; 07 JAN 94
+; 04 Aug 93; 07 Jan 94; 30 May 02; 17 May 04; 18 May 04; 01 Jun 04; 24 Jan 06
 ; inside = t if the mouse is already inside the menu area
 ; anyclick = value to return for a mouse click that is not on a button.
-(gldefun picmenu-select (m\:picmenu &optional inside anyclick)
-  (let (mw current-button\:picmenu-button item items val\:picmenu-button
+(gldefun picmenu-select ((m picmenu) &optional inside anyclick)
+  (let (mw (current-button picmenu-button) item items (val picmenu-button)
 	   xzero yzero codeval)
-    (mw \:= (menuw m))
+    (mw = (menuw m))
     (if ~ (permanent m) (draw m))
-    (xzero \:= (menu-x m 0))
-    (yzero \:= (menu-y m 0))
+    (xzero = (menu-x m 0))
+    (yzero = (menu-y m 0))
     (track-mouse mw
       #'(lambda (x y code)
 	  (setq *window-menu-code* code)
-	  (x \:= (x - xzero))
-	  (y \:= (y - yzero))
+	  (x = (x - xzero))
+	  (y = (y - yzero))
 	  (if ((x >= 0) and (x <= (picture-width m))
 	        and (y >= 0) and (y <= (picture-height m)))
-	      then (inside \:= t))
+	      (inside = t))
 	  (if current-button
 	      (if ~ (containsxy? current-button x y)
-		  then (unbox-item m current-button)
-		       (current-button \:= nil)))
+		  (progn (unbox-item m current-button)
+			 (current-button = nil))))
 	  (if ~ current-button
-	      then (items \:= (buttons m))
-	           (while ~ current-button and (item -_ items) do
+	      (progn (items = (buttons m))
+		     (while ~ current-button and (item -_ items) do
 			  (if (and (containsxy? item x y)
-				   ~ ((name item) <= (deleted-buttons m)))
-			      then (box-item m item)
-			           (current-button \:= item))))
+			           (not ((buttonname item) <=
+                                           (deleted-buttons m))))
+			      (progn (box-item m item)
+				     (current-button = item))))))
 	  (if (or (> code 0)
 	          (and inside (or (x < 0) (x > (picture-width m))
 				  (y < 0) (y > (picture-height m)))))
-	      then (if current-button then (unbox-item m current-button))
-	           (codeval \:= code)
-	           (val \:= (if (and (> code 0) current-button)
-				then current-button
-				else *picmenu-no-selection*)) ))
+	      (progn (if current-button (unbox-item m current-button))
+	           (codeval = code)
+	           (val = (if (and (> code 0) current-button)
+			      current-button
+			      *picmenu-no-selection*)) )))
       t)
     (if ~(permanent m)
-	(if (flat m) then (clear m)
-	                  (force-output (menu-window m))
-	             else (close (menu-window m))))
-    (if (val = *picmenu-no-selection*)
-	then (and (> codeval 0) anyclick)
-        else (name val)) ))
+	(if (flat m) (progn (clear m)
+			    (force-output (menu-window m)))
+	             (close (menu-window m))))
+    (if (val == *picmenu-no-selection*)
+	(and (> codeval 0) anyclick)
+        (buttonname val)) ))
 
 
-; 09 Sep 91; 10 Sep 91
-(gldefun picmenu-box-item (m\:picmenu item\:picmenu-button)
+; 09 Sep 91; 10 Sep 91; 17 May 04
+(gldefun picmenu-box-item ((m picmenu) (item picmenu-button))
   (let ((mw (menuw m)) xoff yoff siz)
-    (xoff \:= (menu-x m (x (offset item))))
-    (yoff \:= (menu-y m (y (offset item))))
+    (xoff = (menu-x m (x (offset item))))
+    (yoff = (menu-y m (y (offset item))))
     (if (highlightfn item)
-	then (funcall (highlightfn item) (menuw m) xoff yoff)
-        else (set-xor mw)
-	     (if (siz \:= (size item))
-	         then (draw-box-xy mw (xoff - (x siz) / 2)
+	(funcall (highlightfn item) (menuw m) xoff yoff)
+        (progn (set-xor mw)
+	     (if (siz = (size item))
+	         (draw-box-xy mw (xoff - (x siz) / 2)
 			              (yoff - (y siz) / 2)
 				      (x siz) (y siz) 1)
-		 else (draw-box-xy mw (xoff - 6) (yoff - 6) 12 12 1))
+		 (draw-box-xy mw (xoff - 6) (yoff - 6) 12 12 1))
 	     (unset mw)
-	     (force-output mw) ) ))
+	     (force-output mw) ) )))
 
-; 09 Sep 91; 06 May 93
-(gldefun picmenu-unbox-item (m\:picmenu item\:picmenu-button)
+; 09 Sep 91; 06 May 93; 17 May 04
+(gldefun picmenu-unbox-item ((m picmenu) (item picmenu-button))
   (let ((mw (menuw m)))
     (if (unhighlightfn item)
-	then (funcall (unhighlightfn item) (menuw m)
+	(progn (funcall (unhighlightfn item) (menuw m)
 		      (x (offset item)) (y (offset item)))
-             (force-output mw)
-        else (box-item m item) ) ))
+             (force-output mw))
+        (box-item m item) ) ))
 
 (defun picmenu-destroy (m) (menu-destroy m))
 
 ; 09 Sep 91; 10 Sep 91; 11 Sep 91
-(gldefun picmenu-button-containsxy? (b\:picmenu-button x\:integer y\:integer)
+(gldefun picmenu-button-containsxy? ((b picmenu-button) (x integer)
+				     (y integer))
   (let ((xsize 6) (ysize 6))
-    (if (size b) then (xsize \:= (x (size b)) / 2)
-                      (ysize \:= (y (size b)) / 2))
+    (if (size b) (progn (xsize = (x (size b)) / 2)
+			(ysize = (y (size b)) / 2)))
     ((x >= ((x (offset b)) - xsize)) and (x <= ((x (offset b)) + xsize)) and
      (y >= ((y (offset b)) - ysize)) and (y <= ((y (offset b)) + ysize)) ) ))
 
-; 11 Sep 91; 08 Sep 92; 18 Jan 94
-(gldefun picmenu-item-position (m\:picmenu itemname\:symbol
-					   &optional place\:symbol)
-  (let (b\:picmenu-button (xsize 0) (ysize 0) xoff yoff)
+; 11 Sep 91; 08 Sep 92; 18 Jan 94; 30 May 02; 17 May 04; 24 Jan 06
+(gldefun picmenu-item-position ((m picmenu) (itemname symbol)
+					   &optional (place symbol))
+  (let ((b picmenu-button) (xsize 0) (ysize 0) xoff yoff)
     (if (null itemname)
-	then (xsize \:= (picture-width m))
-	     (ysize \:= ((picture-height m) - (drawing-height m)) / 2)
-	     (xoff \:= xsize / 2)
-	     (yoff \:= (drawing-height m) + ysize / 2)		       
-	else (if (b \:= (that (buttons m) with name = itemname))
-		 then (if (size b)
-			  then (xsize \:= (x (size b)))
-			       (ysize \:= (y (size b))))
-	              (xoff \:= (x (offset b)))
-		      (yoff \:= (y (offset b))) ) )
-    (if xoff then (a vector with
+	(progn (xsize = (picture-width m))
+	     (ysize = ((picture-height m) - (drawing-height m)) / 2)
+	     (xoff = xsize / 2)
+	     (yoff = (drawing-height m) + ysize / 2))		       
+	(if (b = (that (buttons m) with buttonname == itemname))
+		 (progn (if (size b)
+			  (progn (xsize = (x (size b)))
+				 (ysize = (y (size b)))))
+			(xoff = (x (offset b)))
+			(yoff = (y (offset b))) ) ))
+    (if xoff (a vector with
 		     x = ((menu-x m xoff) + (case place
 					      ((center top bottom) 0)
 					      (left (- (xsize / 2)))
@@ -1612,14 +1727,15 @@ lp  (res \:= (choose m inside))
 					      (top (ysize / 2))
 					      else 0))) ) ))
 
-; 03 Jan 94; 18 Jan 94
+; 03 Jan 94; 18 Jan 94; 17 May 04
 ; Simple call from plain Lisp to make a picture menu.
+(setf (glfnresulttype 'barmenu-create) 'barmenu)
 (gldefun barmenu-create
-  (maxval\:integer initval\:integer barwidth\:integer
-         &optional title horizontal\:boolean subtrackfn subtrackparms
-	 parentw\:window x y perm\:boolean flat\:boolean color\:rgb)
-  (a barmenu with title           = (if title (stringify title) else "")
-                  menu-window     = (if flat then parentw)
+  ((maxval integer) (initval integer) (barwidth integer)
+         &optional title (horizontal boolean) subtrackfn subtrackparms
+	 (parentw window) x y (perm boolean) (flat boolean) (color rgb))
+  (a barmenu with title           = (if title (stringify title) "")
+                  menu-window     = (if flat parentw)
 		  parent-window   = (if parentw (parent parentw))
 		  parent-offset-x = (or x 0)
 		  parent-offset-y = (or y 0)
@@ -1633,97 +1749,198 @@ lp  (res \:= (choose m inside))
 		  subtrackparms   = subtrackparms
 		  color           = color) )
 
-; 03 Jan 94
-(gldefun barmenu-calculate-size (m\:barmenu)
+; 03 Jan 94; 17 May 04
+(gldefun barmenu-calculate-size ((m barmenu))
   (let (maxwidth maxheight)
-    (maxwidth \:= (max (if (title m) then ((* 9 (length (title m))) + 6)
-		                     else 0)
+    (maxwidth = (max (if (title m) ((* 9 (length (title m))) + 6)
+		                   0)
 		       (barwidth m)))
-    (maxheight \:= (if (and (title-present m)
+    (maxheight = (if (and (title-present m)
 			    (or (flat m) *window-add-menu-title*))
-		       then 15 else 0)
+		       15 0)
 	           + (maxval m))
-    ((picture-width m) \:= maxwidth)
-    ((picture-height m) \:= maxheight) ))
+    ((picture-width m) = maxwidth)
+    ((picture-height m) = maxheight) ))
 
 ; 03 Jan 94
 ; Initialize a picture menu
-(gldefun barmenu-init (m\:barmenu)
+(gldefun barmenu-init ((m barmenu))
   (let ()
     (calculate-size m)
     (adjust-offset m)
     (if ~ (flat m)
-	((menu-window m) \:= (window-create (picture-width m)
+	((menu-window m) = (window-create (picture-width m)
 					    (picture-height m)
 					    ((title m) or "")
 					    (parent-window m)
 					    (parent-offset-x m)
 					    (parent-offset-y m) )) ) ))
 
-; 03 Jan 94; 18 Jan 94
+; 03 Jan 94; 18 Jan 94; 17 May 04; 18 May 04
 ; Draw a picture menu
-(gldefun barmenu-draw (m\:barmenu)
+(gldefun barmenu-draw ((m barmenu))
   (let (mw xzero yzero)
     (init? m)
-    (mw \:= (menu-window m))
+    (mw = (menu-window m))
     (open mw)
     (clear m)
-    (xzero \:= (menu-x m ((picture-width m) / 2)))
-    (yzero \:= (menu-y m 0))
-    (if (color m) then (window-set-color mw (color m)))
+    (xzero = (menu-x m ((picture-width m) / 2)))
+    (yzero = (menu-y m 0))
+    (if (color m) (window-set-color mw (color m)))
     (if (horizontal m)
-	then (draw-line-xy (menu-window m) xzero yzero
+	(draw-line-xy (menu-window m) xzero yzero
 			   (xzero + (value m)) yzero (barwidth m))
-        else (draw-line-xy (menu-window m) xzero yzero
+        (draw-line-xy (menu-window m) xzero yzero
 			   xzero (+ yzero (value m)) (barwidth m)) )
-    (if (color m) then (window-reset-color mw))
+    (if (color m) (window-reset-color mw))
     (force-output mw) ))
 
 ; 03 Jan 94; 04 Jan 94; 07 Jan 94; 18 Jan 94
 ; inside = t if the mouse is already inside the menu area
-(gldefun barmenu-select (m\:barmenu &optional inside)
+(gldefun barmenu-select ((m barmenu) &optional inside)
   (let (mw xzero yzero val)
-    (mw \:= (menuw m))
+    (mw = (menuw m))
     (if ~ (permanent m) (draw m))
-    (xzero \:= (menu-x m ((picture-width m) / 2)))
-    (yzero \:= (menu-y m 0))
+    (xzero = (menu-x m ((picture-width m) / 2)))
+    (yzero = (menu-y m 0))
     (when (window-track-mouse-in-region mw (menu-x m 0) yzero
 	        (picture-width m) (picture-height m) t t)		
       (track-mouse mw
         #'(lambda (x y code)
 	    (setq *window-menu-code* code)
-	    (val \:= (if (horizontal m) then (x - xzero) else (y - yzero)))
+	    (val = (if (horizontal m) (x - xzero) (y - yzero)))
 	    (update-value m val)
 	    (if (> code 0) code) ))
       val) ))
 
-; 03 Jan 93
+; 03 Jan 93; 17 May 04
 (defvar *barmenu-update-value-cons* (cons nil nil))  ; reusable cons
-(gldefun barmenu-update-value (m\:barmenu val\:integer)
+(gldefun barmenu-update-value ((m barmenu) (val integer))
   (let ((mw (menuw m)) xzero yzero)
-    (val \:= (max 0 (min val (maxval m))))
+    (val = (max 0 (min val (maxval m))))
     (if (val <> (value m))
-	then (if (val < (value m))
-		 then (set-erase mw)
-	         else (if (color m) then (window-set-color mw (color m))))
-             (xzero \:= (menu-x m ((picture-width m) / 2)))
-	     (yzero \:= (menu-y m 0))
+	(progn (if (val < (value m))
+		   (set-erase mw)
+	           (if (color m) (window-set-color mw (color m))))
+             (xzero = (menu-x m ((picture-width m) / 2)))
+	     (yzero = (menu-y m 0))
              (if (horizontal m)
-		 then (draw-line-xy (menu-window m)
+		 (draw-line-xy (menu-window m)
 				    (+ xzero (value m)) yzero
 				    (+ xzero val) yzero (barwidth m))
-                 else (draw-line-xy (menu-window m)
+                 (draw-line-xy (menu-window m)
 				    xzero (+ yzero (value m))
 				    xzero (+ yzero val) (barwidth m)) )
              (if (val < (value m))
-		 then (unset mw)
-	         else (if (color m) then (window-reset-color mw)) )
-	     ((value m) \:= val)
+		 (unset mw)
+	         (if (color m) (window-reset-color mw)) )
+	     ((value m) = val)
 	     (if (subtrackfn m)
-		 then ((car *barmenu-update-value-cons*) \:= val)
-	              ((cdr *barmenu-update-value-cons*) \:= (subtrackparms m))
-		      (apply (subtrackfn m) *barmenu-update-value-cons*))
-	     (force-output mw) ) ))
+		 (progn ((car *barmenu-update-value-cons*) = val)
+	              ((cdr *barmenu-update-value-cons*) = (subtrackparms m))
+		      (apply (subtrackfn m) *barmenu-update-value-cons*)))
+	     (force-output mw) ) )))
+
+; Functions for text input "menus".  Derived from picmenu code.
+; Making text input analogous to menus allows use with menu-sets.
+
+; 18 Apr 95; 17 May 04
+; (setq tm (textmenu-create 200 30 nil myw 50 50 t t '9x15 t "Rutabagas"))
+; Simple call from plain Lisp to make a text menu.
+(setf (glfnresulttype 'textmenu-create) 'textmenu)
+(gldefun textmenu-create ((width integer) (height integer)
+			  &optional title (parentw window) x y
+				    (perm boolean) (flat boolean)
+				    (font symbol) (boxflg boolean)
+				    (initial-text string))
+  (a textmenu with title           = (if title (stringify title) "")
+                   menu-window     = (if flat parentw)
+		   parent-window   = (if parentw (parent parentw))
+		   parent-offset-x = (or x 0)
+		   parent-offset-y = (or y 0)
+		   permanent       = perm
+		   flat            = flat
+		   drawing-width   = width
+		   drawing-height  = height
+		   menu-font       = (font or '9x15)
+		   boxflg          = boxflg
+		   text            = initial-text) )
+
+; 18 Apr 95; 17 May 04
+(gldefun textmenu-calculate-size ((m textmenu))
+  (let (maxwidth maxheight)
+    (maxwidth = (max (if (title m) ((* 9 (length (title m))) + 6)
+		                   0)
+		       (drawing-width m)))
+    (maxheight = (if (and (title-present m)
+			    (or (flat m) *window-add-menu-title*))
+		       15 0)
+	           + (drawing-height m))
+    ((picture-width m) = maxwidth)
+    ((picture-height m) = maxheight) ))
+
+; 18 Apr 95
+; Initialize a picture menu
+(gldefun textmenu-init ((m textmenu))
+  (let ()
+    (calculate-size m)
+    (adjust-offset m)
+    (if ~ (flat m)
+	((menu-window m) =
+	  (window-create (picture-width m) (picture-height m)
+			 ((title m) or "") (parent-window m)
+			 (parent-offset-x m) (parent-offset-y m)
+			 (menu-font m) )) ) ))
+
+; 18 Apr 95; 14 Aug 96; 17 May 04
+; Draw a picture menu
+(gldefun textmenu-draw ((m textmenu))
+  (let (mw bottom xzero yzero)
+    (init? m)
+    (mw = (menu-window m))
+    (open mw)
+    (clear m)
+    (xzero = (menu-x m 0))
+    (yzero = (menu-y m 0))
+    (bottom = yzero + (picture-height m))
+    (if (and (title-present m)
+			    (or (flat m) *window-add-menu-title*))
+	(progn (printat-xy mw (stringify (title m)) (xzero + 3) (bottom - 13))
+	       (invert-area-xy mw xzero (bottom - 15) (picture-width m) 16)))
+    (if (text m)
+	(printat-xy mw (text m) (xzero + 10)
+			 (yzero + (picture-height m) / 2 - 8)))
+    (if (boxflg m) (draw-box-xy mw xzero yzero
+				   (picture-width m) (picture-height m) 1))
+    (force-output mw) ))
+
+; 18 Apr 95; 20 Apr 95; 21 Apr 95; 14 Aug 96; 17 May 04; 01 Jun 04
+(gldefun textmenu-select ((m textmenu) &optional inside)
+  (let (mw xzero yzero codeval res)
+    (mw = (menuw m))
+    (if ~ (permanent m) (draw m))
+    (xzero = (menu-x m 0))
+    (yzero = (menu-y m 0))
+    (track-mouse mw
+      #'(lambda (x y code)
+	  (setq *window-menu-code* code)
+	  (x = (x - xzero))
+	  (y = (y - yzero))
+	  (if (or (> code 0)
+	          (or (x < 0) (x > (picture-width m))
+		      (y < 0) (y > (picture-height m))))
+	      (codeval = code)) )
+      t)
+    (if (and (not (permanent m)) (not (flat m)))
+	(close (menu-window m)))
+    (if (codeval > 0)
+	(progn (draw m)
+	     (input-string mw (text m) (xzero + 10)
+			   (yzero + (picture-height m) / 2 - 8)
+			   ((picture-width m) - 12)) ) )))
+
+(gldefun textmenu-set-text ((m textmenu) &optional (s string))
+  ((text m) = (or s "")))
 
 ; 15 Aug 91
 ; Get a point position by mouse click.  Returns (x y).
@@ -2036,7 +2253,7 @@ lp  (res \:= (choose m inside))
 
 ; 31 Dec 93
 ; Reset window colors to default foreground and background.
-(gldefun window-reset-color (w\:window)
+(gldefun window-reset-color ((w window))
   (XSetForeground *window-display* (gcontext w) *default-fg-color*)
   (XSetBackground *window-display* (gcontext w) *default-bg-color*) )
 
@@ -2077,10 +2294,11 @@ lp  (res \:= (choose m inside))
 	(XFreeColors *window-display*
 			   *default-colormap* xcolor 1 0)) ) )
 
-; 31 Dec 93
-; Get characters within a window, calling function fn with arg (char).
+; 31 Dec 93; 18 Jul 96; 25 Jul 96
+; Get characters or mouse clicks within a window, calling function fn
+; with arguments (char button x y args).
 ; Tracking continues until fn returns non-nil; result is that value.
-(defun window-get-chars (w fn)
+(defun window-get-chars (w fn &optional args)
   (let (win res)
     (or *window-keyinit* (window-init-keymap))
     (setq *window-shift* nil)
@@ -2089,22 +2307,23 @@ lp  (res \:= (choose m inside))
     (setq win (window-parent w))
     (Xsync *window-display* 1) ; clear event queue of prev motion events
     (Xselectinput *window-display* win
-			(+ KeyPressMask KeyReleaseMask))
+			(+ KeyPressMask KeyReleaseMask ButtonPressMask))
  ;; Event processing loop: stop when function returns non-nil.
   (while (null res)
     (XNextEvent *window-display* *window-event*)
     (let ((type (XAnyEvent-type *window-event*))
 	  (eventwindow (XAnyEvent-window *window-event*)))
       (if (eql eventwindow win)
-	  (setq res (window-process-char-event w type fn))) ))
+	  (setq res (window-process-char-event w type fn args))) ))
   res))
 
-; 31 Dec 93; 18 Jan 94; 04 Oct 94
+; 31 Dec 93; 18 Jan 94; 04 Oct 94; 18 Jul 96; 19 Jul 96; 22 Jul 96; 23 Jul 96
+; 25 Jul 96
 ; Process a character event.  type is event type.
 ; For Control, Shift, and Meta, global flags are set.
-; fn is called for other characters.
-(defun window-process-char-event (w type fn)
-  (let (code)
+; (fn char button x y) is called for other characters.
+(defun window-process-char-event (w type fn args)
+  (let (code eventwindow)
     (if (eql type KeyRelease)
 	(progn
 	  (setq code (XButtonEvent-button *window-event*))
@@ -2123,11 +2342,26 @@ lp  (res \:= (choose m inside))
 		      (progn (setq *window-ctrl* t) nil)
 		      (if (member code *window-meta-keys*)
 			  (progn (setq *window-meta* t) nil)
-			  (funcall fn w (or (aref (if *window-shift*
-						      *window-shiftkeymap*
-						      *window-keymap*)
-						  code)
-					    #\Space)) ))))) ) ))
+			  (funcall fn w (window-char-decode code) 0 0 0
+				   args) ))))
+	    (if (eql type ButtonPress)
+		(funcall fn w 0 (XButtonEvent-button *window-event*)
+		                (XMotionEvent-x *window-event*)
+			        (- (window-drawable-height w)
+				   (XMotionEvent-y *window-event*))
+				args)) ) ) ))
+
+; 23 Jul 96; 23 Dec 96
+; Change keyboard code into character; assumes ASCII for control chars
+(defun window-char-decode (code)
+  (let (char)
+    (setq char (aref (if *window-shift* *window-shiftkeymap* *window-keymap*)
+		     code))
+    (if (and char *window-ctrl*)
+	(setq char (code-char (- (char-code (char-upcase char)) 64))))
+    (if (and char *window-meta*)             ; simulate meta using 128
+	(setq char (code-char (+ (char-code (char-upcase char)) 128))))
+    (or char #\Space) ))
 
 ; 31 Dec 93; 04 Oct 94; 16 Nov 94
 ; Get character within a window, calling function fn with arg (char).
@@ -2152,68 +2386,450 @@ lp  (res \:= (choose m inside))
 	  (setq res (XButtonEvent-button *window-event*)) ) ))
   res))
 
-; 31 Dec 93
+; 31 Dec 93; 19 Jul 96; 12 Aug 96; 13 Aug 96
 ; Input a string from keyboard, echo in window.  str is initial string.
 ; Backspace is handled; terminate with return.  Size is max width in pixels.
 (defun window-input-string (w str x y &optional size)
+  (car (window-edit w x y (or size 100) 16 (list (or str "")) nil t t) ) )
+
+; 19 Jul 96; 22 Jul 96; 12 Aug 96; 13 Aug 96
+; Edit strings in a window area with Emacs-subset editor
+; strings is a list of strings, which is the return value
+; scroll is number of lines to scroll down before displaying text,
+;           or t to have one line only and terminate on return.
+; endp is T to begin edit at end of first line
+; e.g.  (window-draw-box-xy myw 48 48 204 204)
+;       (window-edit myw 50 50 200 200 '("Now is the time" "for all" "good"))
+(gldefun window-edit (w x y width height &optional strings boxflg scroll endp)
+  (let (em)
+    (em = (editmenu-create width height nil w x y nil t '9x15 boxflg
+			     strings scroll endp))
+    (edit em)
+    (carat em)   ; erase the carat
+    (text em) ))
+
+; 25 Jul 96; 26 Jul 96; 12 Aug 96; 13 Aug 96; 15 Aug 96; 17 May 04
+; (setq em (editmenu-create 200 30 nil myw 50 50 t t '9x15 t ("Rutabagas")))
+; Simple call from plain Lisp to make an edit menu.
+(setf (glfnresulttype 'editmenu-create) 'editmenu)
+(gldefun editmenu-create ((width integer) (height integer)
+			  &optional title (parentw window) x y
+				    (perm boolean) (flat boolean)
+				    (font symbol) (boxflg boolean)
+				    (initial-text (listof string))
+				    scrollval (endp boolean))
+  (an editmenu with title           = (if title (stringify title) "")
+                    menu-window     = (if flat parentw)
+		    parent-window   = (if parentw (parent parentw))
+		    parent-offset-x = (or x 0)
+		    parent-offset-y = (or y 0)
+		    permanent       = perm
+		    flat            = flat
+		    drawing-width   = width
+		    drawing-height  = height
+		    menu-font       = (font or '9x15)
+		    boxflg          = boxflg
+		    text            = (or initial-text (list ""))
+		    scrollval       = (or scrollval 0)
+		    line            = (if (numberp scrollval)
+					  scrollval
+					  0)
+		    column          = (if endp
+					  (length (car (nthcdr
+							(if (numberp scrollval)
+							    scrollval
+							    0)
+							initial-text)))
+					  0)) )
+
+; 25 Jul 96
+(gldefun editmenu-calculate-size ((m editmenu))
+  ((picture-width m) = (drawing-width m))
+  ((picture-height m) = (drawing-height m)) )
+
+; 18 Apr 95
+; Initialize a picture menu
+(gldefun editmenu-init ((m editmenu))
   (let ()
-    (setq *window-input-string-x* x)
-    (setq *window-input-string-y* y)
-    (setq *window-input-string-charwidth* (window-string-width w "M"))
-    (setq *window-string-max* (if size
-				  (/ size *window-input-string-charwidth*)
-				  100))
-    (setq *window-string-count* (if str (min (length str)
-					     *window-string-max*)
-				        0))
-    (window-erase-area-xy w x (- y 2) (or size 100) 14)
-    (if (> *window-string-count* 0)
-	(progn (dotimes (i *window-string-count*)
-		 (setf (char *window-string* i) (char str i)) )
-	       (window-printat-xy w str x y)))
-    (window-draw-carat w)
-    (window-get-chars w #'window-input-char-fn) ))
+    (calculate-size m)
+    (adjust-offset m)
+    (if ~ (flat m)
+	((menu-window m) =
+	  (window-create (picture-width m) (picture-height m)
+			 ((title m) or "") (parent-window m)
+			 (parent-offset-x m) (parent-offset-y m)
+			 (menu-font m) )) ) ))
 
-; 31 Dec 93
-; Process input characters for window-input-string
-(defun window-input-char-fn (w char)
-  (let ((tmpstring "Z"))
-    (window-draw-carat w)                          ; erase the input pointer
-    (if (char= char #\Return)
-	(subseq *window-string* 0 *window-string-count*)
-	(progn
-	  (if (char= char #\Backspace)
-	      (if (> *window-string-count* 0)
-		  (progn (decf *window-string-count*)
-			 (window-printat-xy w " "
-			   (+ *window-input-string-x*
-			      (* *window-string-count*
-				 *window-input-string-charwidth*))
-			    *window-input-string-y*)
-			 (window-draw-carat w)))
-	      (if (< *window-string-count* *window-string-max*)
-		  (progn (setf (char *window-string* *window-string-count*)
-			       char)
-			 (incf *window-string-count*)
-			 (setf (char tmpstring 0) char)
-			 (window-printat-xy w tmpstring
-			   (+ *window-input-string-x*
-			      (* (1- *window-string-count*)
-				 *window-input-string-charwidth*))
-			   *window-input-string-y*)
-			 (window-draw-carat w))))
-	  nil) ) ))      ; return nil to continue input
+; 25 Jul 96; 31 July 96; 14 Aug 96
+(gldefun editmenu-draw ((m editmenu))
+  (let (mw xzero yzero)
+    (init? m)
+    (mw = (menu-window m))
+    (open mw)
+    (clear m)
+    (xzero = (menu-x m 0))
+    (yzero = (menu-y m 0))
+    (if (boxflg m) (draw-box-xy mw xzero yzero
+				   (picture-width m) (picture-height m) 1))
+    (display m 0 0 (not (numberp scrollval))) ))
 
-; 31 Dec 93
-(defun window-draw-carat (w)
-  (let ((origx *window-input-string-x*) (y *window-input-string-y*) x)
-    (setq x (+ origx (* *window-input-string-charwidth*
-			*window-string-count*)))
-    (window-set-xor w)
-    (window-draw-line-xy w (- x 2) (- y 2) (+ x 3) y)
-    (window-draw-line-xy w (+ x 3) y (+ x 8) (- y 2))
-    (window-unset w)
-    (window-force-output w) ))
+; 19 Jul 96; 22 Jul 96; 23 Jul 96; 25 Jul 96; 31 July 96; 01 Aug 96; 17 May 04
+; 18 Aug 04; 27 Jan 06
+; Display contents of edit area
+; Begin with the specified line and char number; one line only if only is T.
+(gldefun editmenu-display ((m editmenu) line char only)
+  (let (lines y maxwidth linewidth (w (menuw m)))
+    (setq lines (nthcdr line (text m)))
+    (setq y (line-y m (- line (scroll m))))
+    (setq maxwidth (truncate (- (picture-width m) 6) (font-width (menuw m))))
+    (while (and lines (>= y (menu-y m 4)))
+      (when (< char maxwidth)
+	  (if (> char 0)
+	      (printat-xy w (subseq (first lines) char
+				    (min maxwidth (length (first lines))))
+			    (menu-x m (+ 2 (* char (font-width (menuw m)))))
+			    y)
+	      (printat-xy w (if (<= (length (first lines)) maxwidth)
+				(first lines)
+			        (subseq (first lines) 0 maxwidth))
+			    (menu-x m 2) y)))
+      (setq linewidth (+ 2 (* (font-width (menuw m)) (length (first lines)))))
+      (window-erase-area-xy w (menu-x m linewidth)
+		       (- y 2)
+		       (- (picture-width m) (+ linewidth 2))
+		       (font-height (menuw m)))
+      (y _- (font-height (menuw m)))
+      (if only (setq lines nil)
+	       (progn (pop lines)
+	            (if (and (null lines) (>= y (menu-y m 4)))
+                            ; erase an extra line at the end
+			(window-erase-area-xy w (menu-x m 2)
+				         (- y 2)
+					 (- (picture-width m) 4)
+					 (font-height (menuw m))) ) ))
+      (setq char 0) )
+    (force-output w) ))
+
+; 19 Jul 96; 22 Jul 96; 25 Jul 96; 31 Jul 96; 01 Aug 96
+; draw/erase carat at the specified position
+(gldefun editmenu-carat ((m editmenu))
+  (let ((w (menuw m)))
+    (draw-carat w (menu-x m (+ 2 (* (column m) (font-width (menuw m)))))
+	          (- (line-y m (line m)) 2))
+    (force-output w) ))
+
+; 19 Jul 96; 25 Jul 96; 31 Jul 96; 01 Aug 96; 17 May 04
+; erase at the current position.  onep = t to erase only one char
+(gldefun editmenu-erase ((m editmenu) onep)
+  (let ((w (menuw m)) xw)
+    (xw = (+ 2 (* (font-width w) (column m))))
+    (erase-area-xy w (menu-x m xw)
+		     (- (line-y m (line m)) (cadr (string-extents w "Tg")))
+		     (if onep (font-width w)
+		              (- (picture-width m) xw))
+		     (font-height w))
+    (force-output w) ))
+
+; 01 Aug 96
+; Calculate the y position of the current line
+(gldefun editmenu-line-y ((m editmenu) (line integer))
+  (menu-y m (- (picture-height m)
+	       (+ -1 (* (font-height (menuw m))
+		        (1+ (- line (scroll m))))))) )
+
+; 25 Jul 96; 30 Jul 96; 31 Jul 96; 01 Aug 96; 13 Aug 96; 24 Sep 96; 08 Jan 97
+; 17 May 04
+(gldefun editmenu-select ((m editmenu) &optional inside)
+  (let (mw codeval res xval yval)
+    (mw = (menuw m))
+    (if ~ (permanent m) (draw m))
+    (track-mouse mw
+      #'(lambda (x y code)
+	  (setq *window-menu-code* code)
+	  (if (or (> code 0)
+		  (x < (parent-offset-x m))
+		  (x > (+ (parent-offset-x m) (picture-width m)))
+	          (y < (parent-offset-y m))
+		  (y > (+ (parent-offset-y m) (picture-height m))))
+	      (progn (codeval = code)
+	           (xval = x)
+		   (yval = y)) ))
+      t)
+;    (if (and (not (permanent m)) (not (flat m)) (close (menu-window m)))) ; ??
+    (if (codeval > 0)
+	(editmenu-edit m codeval xval yval)) ))
+
+; 13 Aug 96; 15 Aug 96
+; begin active editing of an editmenu.
+; (code x y), if present, represent a mouse click in the window.
+(gldefun editmenu-edit ((m editmenu) &optional code x y)
+  (let ((mw (menuw m)))
+    (draw m)
+    (carat m)
+    (if code (editmenu-edit-fn mw nil code x y (list m)) )
+    (setq *window-editmenu-kill-strings* nil)
+    (window-get-chars mw #'editmenu-edit-fn (list m))
+    (text m) ))
+
+
+; 31 Dec 93; 18 Jul 96; 19 Jul 96; 22 Jul 96; 23 Jul 96; 25 Jul 96; 26 Jul 96
+; 30 Jul 96; 13 Aug 96; 14 Aug 96; 23 Dec 96; 17 May 04; 18 May 04
+; Process input characters and mouse clicks for editmenu eidting
+(gldefun editmenu-edit-fn ((w window) char (button integer) (buttonx integer)
+				(buttony integer) args)
+  (let (m\:editmenu inside done)
+    (m = (car args))
+    (carat m)                                  ; erase carat
+    (if (and (numberp button)
+	     (not (zerop button)))
+	(progn (inside = (editmenu-setxy m buttonx buttony))
+	     (case button
+	       (1 (if inside
+		      (progn (carat m) nil) ; return nil to continue input
+		      t)) ; quit on click outside the editing area
+	       (2 (if inside
+		      (progn (editmenu-yank m)
+		           (carat m)
+			   nil)) )))
+        (progn (if (< (char-code char) 32)
+		   (case char of
+		         (#\Return     (if (numberp (scrollval m))
+					   (editmenu-return m)
+					   (done = t)) )
+		         (#\Backspace  (editmenu-backspace m))
+			 (#\^D         (editmenu-delete m))
+		         (#\^N         (if (numberp (scrollval m))
+					   (editmenu-next m)))
+			 (#\^P         (editmenu-previous m))
+		         (#\^F         (editmenu-forward m))
+		         (#\^B         (editmenu-backward m))
+			 (#\^A         (editmenu-beginning m))
+			 (#\^E         (editmenu-end m))
+			 (#\^K         (editmenu-kill m))
+			 (#\^Y         (editmenu-yank m))
+			 else            nil)
+		   (if (> (char-code char) 128)
+			    (progn (setq char (code-char
+					      (- (char-code char) 128)))
+			         (case char of
+				   (#\B (editmenu-meta-b m))
+				   (#\F (editmenu-meta-f m))
+				   else nil))
+			    (editmenu-char m char)))
+	       (carat m)
+	       done)  )))    ; return nil to continue input
+
+; 31 Jul 96; 15 Aug 96; 17 May 04
+; Set cursor location based on mouse click; returns T if inside menu region
+(gldefun editmenu-setxy ((m editmenu) (buttonx integer) (buttony integer))
+  (let (linecons okay)
+    (setq okay
+	  (and (>= buttonx (parent-offset-x m))
+	       (<= buttonx (+ (parent-offset-x m) (picture-width m)))
+	       (>= buttony (parent-offset-y m))
+	       (<= buttony (+ (parent-offset-y m) (picture-height m))) ))
+    (if okay
+	(progn ((line m) = (min (1- (length (text m)))
+		       (+ (scroll m)
+			  (truncate (- (menu-y m (- (picture-height m) 6))
+				       buttony)
+				    (font-height (menuw m))))))
+	       (linecons = (nthcdr (line m) (text m)))
+	       ((column m) = (min (length (car linecons))
+				  (truncate (- buttonx (menu-x m 2))
+					    (font-width (menuw m))))) ))
+    okay))
+
+; 19 Jul 96; 22 Jul 96; 25 Jul 96; 17 May 04
+; Process an ordinary input character
+(gldefun editmenu-char ((m editmenu) char)
+  (let ((linecons (nthcdr (line m) (text m))) )
+    (if (<= (length (car linecons)) (column m))
+	((car linecons) =                ; insert char at end of line
+	      (concatenate 'string (car linecons) (string char)))
+        ((car linecons) =                ; insert char in middle of line
+	      (concatenate 'string
+			   (subseq (car linecons) 0 (column m))
+			   (string char)
+			   (subseq (car linecons) (column m)))) )
+    (display m (line m) (column m) t)
+    ((column m) _+ 1) ))
+
+; 23 Dec 96
+; Get the current character in an editment
+(gldefun editmenu-current-char ((m editmenu))
+  (let ((linecons (nthcdr (line m) (text m))) )
+    (char (car linecons) (column m)) ))
+
+; 19 Jul 96; 22 Jul 96; 25 Jul 96; 17 May 04
+; Process a Return character
+(gldefun editmenu-return ((m editmenu))
+  (let ((linecons (nthcdr (line m) (text m))))
+    (if (<= (length (car linecons)) (column m))
+	((cdr linecons) = (cons "" (cdr linecons)))    ; end of line
+        (progn ((cdr linecons) = (cons (subseq (car linecons) (column m))
+				       (cdr linecons)))
+	     ((car linecons) = (subseq (car linecons) 0 (column m)))))
+    (display m (line m) 0 nil)
+    ((line m) _+ 1)
+    ((column m) = 0) ))
+
+; 19 Jul 96; 22 Jul 96; 25 Jul 96; 30 Jul 96; 31 Jul 96; 17 May 04
+; Process a backspace
+(gldefun editmenu-backspace ((m editmenu))
+  (let (tmp linedel (linecons (nthcdr (line m) (text m))))
+    (if (> (column m) 0)
+	(progn ((column m) _- 1)   ; middle/end of line
+	     ((car linecons) =
+		     (concatenate 'string
+				  (subseq (car linecons) 0 (column m))
+				  (subseq (car linecons)
+					  (1+ (column m))))))
+        (if (> (line m) 0)
+	    (progn ((line m) _- 1)
+		      (linedel = t)
+		      (linecons = (nthcdr (line m) (text m)))
+		      ((column m) = (length (car linecons)))
+		      (tmp = (concatenate 'string (car linecons)
+					    (cadr linecons)))
+		      ((cdr linecons) = (cddr linecons))
+		      ((car linecons) = tmp) ) ))
+    (display m (line m) (column m) (not linedel)) ))
+
+; 23 Jul 96; 25 Jul 96
+; Move cursor to end of line: C-E
+(gldefun editmenu-end ((m editmenu))
+  (let ((linecons (nthcdr (line m) (text m))) )
+    ((column m) = (length (car linecons))) ))
+
+; 23 Jul 96; 25 Jul 96
+; Move cursor to beginning of line: C-A
+(gldefun editmenu-beginning ((m editmenu))
+  ((column m) = 0))
+
+; 22 Jul 96; 25 Jul 96; 14 Aug 96; 17 May 04
+; Move cursor forward: C-F
+(gldefun editmenu-forward ((m editmenu))
+  (let ((linecons (nthcdr (line m) (text m))))
+    (if (< (column m) (length (car linecons)))
+	((column m) _+ 1)
+        (if (numberp (scrollval m))
+	    (progn ((line m) _+ 1)
+		      (if (null (cdr linecons))
+			  ((cdr linecons) = (list "")))
+		      ((column m) = 0)) ) )))
+
+; 23 Dec 96; 17 May 04
+; Move cursor forward over a word: M-F
+(gldefun editmenu-meta-f ((m editmenu))
+  (let (found done)
+    (while (and (or (< (line m) (1- (length (text m))))
+		    (< (column m) (length (nth (line m) (text m)))))
+		(not found))
+      (if (editmenu-alphanumbericp (editmenu-current-char m))
+	  (found = t)
+	  (editmenu-forward m) ) )
+    (if found
+	(while (and (or (< (line m) (1- (length (text m))))
+			     (< (column m) (length (nth (line m) (text m)))))
+			 (not done))
+	       (if (editmenu-alphanumbericp (editmenu-current-char m))
+		    (editmenu-forward m)
+		    (done = t) )) ) ))
+
+; 23 Dec 96
+; alphanumbericp not defined in gcl
+(defun editmenu-alphanumbericp (x)
+  (or (alpha-char-p x) (not (null (digit-char-p x)))) )
+
+; 22 Jul 96; 25 Jul 96
+; Move cursor to next line: C-N
+(gldefun editmenu-next ((m editmenu))
+  (let ((linecons (nthcdr (line m) (text m))))
+    ((line m)_+ 1)
+    (if (null (cdr linecons))
+	((cdr linecons) = (list "")))
+    (setq linecons (cdr linecons))
+    ((column m) = (min (column m) (length (car linecons)))) ))
+
+; 22 Jul 96; 23 Jul 96; 25 Jul 96; 30 Jul 96; 17 May 04
+; Move cursor backward: C-B
+(gldefun editmenu-backward ((m editmenu))
+  (if (> (column m) 0)
+      ((column m) _- 1)
+      (if (> (line m) 0)
+	  (progn ((line m) _- 1)
+		 ((column m) = (length (nth (line m) (text m)))) ) ) ))
+
+; 23 Dec 96; 17 May 04
+; Move cursor backward over a word: M-B
+(gldefun editmenu-meta-b ((m editmenu))
+  (let (found done)
+    (while (and (or (> (column m) 0) (> (line m) 0))
+		(not found))
+      (editmenu-backward m)
+      (if (editmenu-alphanumbericp (editmenu-current-char m))
+	  (found = t)))
+    (if found
+	(progn (while (and (or (> (column m) 0) (> (line m) 0))
+			 (not done))
+	       (if (editmenu-alphanumbericp (editmenu-current-char m))
+		   (editmenu-backward m)
+		   (done = t) ))
+	     (unless (editmenu-alphanumbericp (editmenu-current-char m))
+	       (editmenu-forward m)) ) )))
+
+; 22 Jul 96; 23 Jul 96; 25 Jul 96; 17 May 04
+; Move cursor to previous line: C-P
+(gldefun editmenu-previous ((m editmenu))
+  (if (> (line m) 0)
+      (progn ((line m) _- 1)
+	   ((column m) = (min (column m)
+				(length (nth (line m) (text m))))))))
+
+; 23 Jul 96; 25 Jul 96
+; Delete character ahead of cursor: C-D
+(gldefun editmenu-delete ((m editmenu))
+  (editmenu-forward m)
+  (editmenu-backspace m))
+
+(defvar *window-editmenu-kill-strings* nil)
+
+; 31 Jul 96; 17 May 04
+(gldefun editmenu-kill ((m editmenu))
+  (let ((linecons (nthcdr (line m) (text m))))
+    (if ((column m) < (length (car linecons)))
+	(progn (setq *window-editmenu-kill-strings*
+		   (list (subseq (car linecons) (column m))))
+	       ((car linecons) = (subseq (car linecons) 0 (column m)))
+	       (display m (line m) (column m) t))
+        (editmenu-delete m) ) ))
+
+; 31 Jul 96; 01 Aug 96; 17 May 04
+(gldefun editmenu-yank ((m editmenu))
+  (let ((linecons (nthcdr (line m) (text m))) (col (column m)))
+    (when *window-editmenu-kill-strings*
+      (if (<= (length (car linecons)) (column m))
+	  (progn ((car linecons) =                ; insert at end of line
+		(concatenate 'string (car linecons)
+			     (car *window-editmenu-kill-strings*)))
+	       ((column m) = (length (car linecons))))
+	  (progn ((car linecons) =                ; insert in middle of line
+		(concatenate 'string
+			     (subseq (car linecons) 0 col)
+			     (car *window-editmenu-kill-strings*)
+			     (subseq (car linecons) col)))
+	       ((column m) _+ (length (car *window-editmenu-kill-strings*))) ))
+      (display m (line m) col t) ) ))
+
+; 31 Dec 93; 19 Jul 96
+; Draw a carat symbol /\ centered at x and with top at y.
+(defun window-draw-carat (w x y)
+  (window-set-xor w)
+  (window-draw-line-xy w (- x 5) (- y 2) x y)
+  (window-draw-line-xy w x y (+ x 5) (- y 2))
+  (window-unset w)
+  (window-force-output w) )
 
 ; 31 Dec 93; 04 Oct 94; 15 Nov 94; 16 Nov 94; 14 Mar 95
 ; Initialize mapping between keys and ASCII.

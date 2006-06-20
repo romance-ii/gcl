@@ -1738,7 +1738,9 @@
   (wt-h header ";")
   (wt-nl1 "{")
   (wt-nl1 "object *vs=vs_top;")
-  (wt-nl1 "object *old_top=vs_top+" vs-size ";")
+  (when (or (> vs-size 0)
+	    (some (lambda (x) (or (not (stringp x)) (not (constantp x)))) body))
+    (wt-nl1 "object *old_top=vs_top+" vs-size ";"))
   (when (> vs-size 0) (wt-nl "vs_top=old_top;"))
   (wt-nl1 "{")
   (dolist** (s body)
@@ -1806,7 +1808,7 @@
   (cmpck (not (symbolp (car args)))
          "The function name ~s is not a symbol." (car args))
   (dolist** (x (cadr args))
-    (cmpck (not (member x '(object char int float double string)))
+    (cmpck (not (member x '(object char int fixnum float double string)))
            "The C-type ~s is illegal." x))
   (setq cfspec (caddr args))
   (cond ((symbolp cfspec)
@@ -1816,7 +1818,7 @@
          (setq type 'object)
          (setq cname cfspec))
         ((and (consp cfspec)
-              (member (car cfspec) '(void object char int float double
+              (member (car cfspec) '(void object char int fixnum float double
 					  string))
               (consp (cdr cfspec))
               (or (symbolp (cadr cfspec)) (stringp (cadr cfspec)))
@@ -1852,7 +1854,7 @@
           (do ((types arg-types (cdr types))
                (i 0 (1+ i)))
               (nil)
-              (declare (object types) (fixnum i))
+              (declare (fixnum i))
               (case (car types)
                     (object (wt-nl "vs_base[" i "]"))
                     (otherwise
@@ -1868,7 +1870,7 @@
         (void (wt "Cnil"))
         (object (wt "x"))
         (char (wt "code_char(x)"))
-        (int (when (zerop *space*) (wt "CMP"))
+        ((fixnum int) (when (zerop *space*) (wt "CMP"))
              (wt "make_fixnum(x)"))
 	(string
 	  (wt "make_simple_string(x)"))

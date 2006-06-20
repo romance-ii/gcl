@@ -205,6 +205,31 @@ object_to_int(object x)
 	return(i);
 }
 
+fixnum
+object_to_fixnum(object x)
+{
+	fixnum i=0;
+
+	switch (type_of(x)) {
+	case t_character:
+	  i = char_code(x);  break;
+	case t_fixnum:
+	  i = fix(x);  break;
+	case t_bignum:
+	  i = number_to_double(x);
+	  break;
+	case t_ratio:
+	  i = number_to_double(x);  break;
+	case t_shortfloat:
+	  i = sf(x);  break;
+	case t_longfloat:
+	  i = lf(x);  break;
+	default:
+	  FEcannot_coerce(sLinteger,x);
+	}
+	return(i);
+}
+
 float 
 object_to_float(object x) 
 { 

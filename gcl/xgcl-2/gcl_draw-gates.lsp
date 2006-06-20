@@ -1,6 +1,6 @@
 ; draw-gates.lsp                  Gordon S. Novak Jr.              20 Oct 94
 
-; Copyright (c) 1994 Gordon S. Novak Jr. and The University of Texas at Austin.
+; Copyright (c) 1995 Gordon S. Novak Jr. and The University of Texas at Austin.
 
 ; See the file gnu.license .
 
@@ -20,8 +20,6 @@
 
 ; Written by: Gordon S. Novak Jr., Department of Computer Sciences,
 ; University of Texas at Austin  78712.    novak@cs.utexas.edu
-
-(in-package :user)
 
 (defun draw-nand (w x y)
   (window-draw-arc-xy w (+ x 24) (+ y 16) 16 16 -90 180)

@@ -1,3 +1,4 @@
+(setq si::*optimize-maximum-pages* nil)
 (push :common-lisp *features*)
 (push :ansi-cl *features*)
   
@@ -300,12 +301,8 @@
 		 (setf system:*default-time-zone* (get-system-time-zone))
 	       (setf system:*default-time-zone* 6)))
   
-  (if (fboundp 'si::user-init) (si::user-init))
-  (setq si::*disable-recompile* nil)
-  (si::do-recompile "gcl_recompile.lsp")	
-  (maphash (lambda (x y) (when (si::call-sig y) (proclaim `(ftype (function ,@(si::call-sig y)) ,x)))) si::*call-hash-table*)
-  (conditions::install-clcs-symbols)
   (si::set-up-top-level)
+  (if (fboundp 'si::user-init) (si::user-init))
   
   (setq si::*gcl-extra-version* @LI-EXTVERS@
 	si::*gcl-minor-version* @LI-MINVERS@ 

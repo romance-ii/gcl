@@ -1,3 +1,4 @@
+(setq si::*optimize-maximum-pages* nil)
 (make-package "COMPILER" :use '("LISP"))
 (make-package "SLOOP" :use '("LISP"))
 (make-package "SERROR" :use '("LISP" "SLOOP"))
@@ -77,13 +78,6 @@
  
  (si::set-up-top-level)
   (if (fboundp 'si::user-init) (si::user-init))
-;(break)
-; (si::use-fast-links nil)
- (setq si::*disable-recompile* nil)
- (si::do-recompile "gcl_recompile.lsp")	
- (maphash (lambda (x y) (when (si::call-sig y) (proclaim `(ftype (function ,@(si::call-sig y)) ,x)))) si::*call-hash-table*)
-; (si::use-fast-links t)
-; (si::set-up-top-level)
  
  (setq si::*gcl-extra-version* @LI-EXTVERS@
        si::*gcl-minor-version* @LI-MINVERS@

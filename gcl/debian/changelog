@@ -184,8 +184,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * preliminary temp stream facility
   * integrate temp-file facility into do-recompile
   * restore automatic heap start lowering
+  * xgcl integration; smaller images; fewer recompiles; eq type
+    comparison;128M more heap
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 20 Jun 2006 15:11:52 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 20 Jun 2006 22:50:41 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

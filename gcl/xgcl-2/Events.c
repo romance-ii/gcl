@@ -25,204 +25,159 @@
 #include <X11/Xlib.h>
 
 #include "include.h"
-
+#define int fixnum
 /********* XKeyEvent funcions *****/
 
-int  make_XKeyEvent (){
+int  make_XKeyEvent (void) {
           return ((int) calloc(1, sizeof(XKeyEvent)));
 }
 
-int  XKeyEvent_same_screen(i)
-XKeyEvent* i;
+int  XKeyEvent_same_screen(XKeyEvent *i)
 {
           return(i->same_screen);
 }
 
-void set_XKeyEvent_same_screen(i, j)
-XKeyEvent* i;
-int j;
+void set_XKeyEvent_same_screen(XKeyEvent *i, int j)
 {
           i->same_screen = j;
 }
 
-int  XKeyEvent_keycode(i)
-XKeyEvent* i;
+int  XKeyEvent_keycode(XKeyEvent *i)
 {
           return(i->keycode);
 }
 
-void set_XKeyEvent_keycode(i, j)
-XKeyEvent* i;
-int j;
+void set_XKeyEvent_keycode(XKeyEvent *i, int j)
 {
           i->keycode = j;
 }
 
-int  XKeyEvent_state(i)
-XKeyEvent* i;
+int  XKeyEvent_state(XKeyEvent *i)
 {
           return(i->state);
 }
 
-void set_XKeyEvent_state(i, j)
-XKeyEvent* i;
-int j;
+void set_XKeyEvent_state(XKeyEvent *i, int j)
 {
           i->state = j;
 }
 
-int  XKeyEvent_y_root(i)
-XKeyEvent* i;
+int  XKeyEvent_y_root(XKeyEvent *i)
 {
           return(i->y_root);
 }
 
-void set_XKeyEvent_y_root(i, j)
-XKeyEvent* i;
-int j;
+void set_XKeyEvent_y_root(XKeyEvent *i, int j)
 {
           i->y_root = j;
 }
 
-int  XKeyEvent_x_root(i)
-XKeyEvent* i;
+int  XKeyEvent_x_root(XKeyEvent *i)
 {
           return(i->x_root);
 }
 
-void set_XKeyEvent_x_root(i, j)
-XKeyEvent* i;
-int j;
+void set_XKeyEvent_x_root(XKeyEvent *i, int j)
 {
           i->x_root = j;
 }
 
-int  XKeyEvent_y(i)
-XKeyEvent* i;
+int  XKeyEvent_y(XKeyEvent *i)
 {
           return(i->y);
 }
 
-void set_XKeyEvent_y(i, j)
-XKeyEvent* i;
-int j;
+void set_XKeyEvent_y(XKeyEvent *i, int j)
 {
           i->y = j;
 }
 
-int  XKeyEvent_x(i)
-XKeyEvent* i;
+int  XKeyEvent_x(XKeyEvent *i)
 {
           return(i->x);
 }
 
-void set_XKeyEvent_x(i, j)
-XKeyEvent* i;
-int j;
+void set_XKeyEvent_x(XKeyEvent *i, int j)
 {
           i->x = j;
 }
 
-int  XKeyEvent_time(i)
-XKeyEvent* i;
+int  XKeyEvent_time(XKeyEvent *i)
 {
           return(i->time);
 }
 
-void set_XKeyEvent_time(i, j)
-XKeyEvent* i;
-int j;
+void set_XKeyEvent_time(XKeyEvent *i, int j)
 {
           i->time = j;
 }
 
-int  XKeyEvent_subwindow(i)
-XKeyEvent* i;
+int  XKeyEvent_subwindow(XKeyEvent *i)
 {
           return(i->subwindow);
 }
 
-void set_XKeyEvent_subwindow(i, j)
-XKeyEvent* i;
-int j;
+void set_XKeyEvent_subwindow(XKeyEvent *i, int j)
 {
           i->subwindow = j;
 }
 
-int  XKeyEvent_root(i)
-XKeyEvent* i;
+int  XKeyEvent_root(XKeyEvent *i)
 {
           return(i->root);
 }
 
-void set_XKeyEvent_root(i, j)
-XKeyEvent* i;
-int j;
+void set_XKeyEvent_root(XKeyEvent *i, int j)
 {
           i->root = j;
 }
 
-int  XKeyEvent_window(i)
-XKeyEvent* i;
+int  XKeyEvent_window(XKeyEvent *i)
 {
           return(i->window);
 }
 
-void set_XKeyEvent_window(i, j)
-XKeyEvent* i;
-int j;
+void set_XKeyEvent_window(XKeyEvent *i, int j)
 {
           i->window = j;
 }
 
-Display *XKeyEvent_display(i)
-XKeyEvent* i;
+Display *XKeyEvent_display(XKeyEvent *i)
 {
           return(i->display);
 }
 
-void set_XKeyEvent_display(i, j)
-XKeyEvent* i;
-Display *j;
+void set_XKeyEvent_display(XKeyEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XKeyEvent_send_event(i)
-XKeyEvent* i;
+int  XKeyEvent_send_event(XKeyEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XKeyEvent_send_event(i, j)
-XKeyEvent* i;
-int j;
+void set_XKeyEvent_send_event(XKeyEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XKeyEvent_serial(i)
-XKeyEvent* i;
+int  XKeyEvent_serial(XKeyEvent *i)
 {
           return(i->serial);
 }
 
-void set_XKeyEvent_serial(i, j)
-XKeyEvent* i;
-int j;
+void set_XKeyEvent_serial(XKeyEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XKeyEvent_type(i)
-XKeyEvent* i;
+int  XKeyEvent_type(XKeyEvent *i)
 {
           return(i->type);
 }
 
-void set_XKeyEvent_type(i, j)
-XKeyEvent* i;
-int j;
+void set_XKeyEvent_type(XKeyEvent *i, int j)
 {
           i->type = j;
 }
@@ -230,201 +185,156 @@ int j;
 
 /********* XButtonEvent funcions *****/
 
-int  make_XButtonEvent (){
+int  make_XButtonEvent (void) {
           return ((int) calloc(1, sizeof(XButtonEvent)));
 }
 
-int  XButtonEvent_same_screen(i)
-XButtonEvent* i;
+int  XButtonEvent_same_screen(XButtonEvent *i)
 {
           return(i->same_screen);
 }
 
-void set_XButtonEvent_same_screen(i, j)
-XButtonEvent* i;
-int j;
+void set_XButtonEvent_same_screen(XButtonEvent *i, int j)
 {
           i->same_screen = j;
 }
 
-int  XButtonEvent_button(i)
-XButtonEvent* i;
+int  XButtonEvent_button(XButtonEvent *i)
 {
           return(i->button);
 }
 
-void set_XButtonEvent_button(i, j)
-XButtonEvent* i;
-int j;
+void set_XButtonEvent_button(XButtonEvent *i, int j)
 {
           i->button = j;
 }
 
-int  XButtonEvent_state(i)
-XButtonEvent* i;
+int  XButtonEvent_state(XButtonEvent *i)
 {
           return(i->state);
 }
 
-void set_XButtonEvent_state(i, j)
-XButtonEvent* i;
-int j;
+void set_XButtonEvent_state(XButtonEvent *i, int j)
 {
           i->state = j;
 }
 
-int  XButtonEvent_y_root(i)
-XButtonEvent* i;
+int  XButtonEvent_y_root(XButtonEvent *i)
 {
           return(i->y_root);
 }
 
-void set_XButtonEvent_y_root(i, j)
-XButtonEvent* i;
-int j;
+void set_XButtonEvent_y_root(XButtonEvent *i, int j)
 {
           i->y_root = j;
 }
 
-int  XButtonEvent_x_root(i)
-XButtonEvent* i;
+int  XButtonEvent_x_root(XButtonEvent *i)
 {
           return(i->x_root);
 }
 
-void set_XButtonEvent_x_root(i, j)
-XButtonEvent* i;
-int j;
+void set_XButtonEvent_x_root(XButtonEvent *i, int j)
 {
           i->x_root = j;
 }
 
-int  XButtonEvent_y(i)
-XButtonEvent* i;
+int  XButtonEvent_y(XButtonEvent *i)
 {
           return(i->y);
 }
 
-void set_XButtonEvent_y(i, j)
-XButtonEvent* i;
-int j;
+void set_XButtonEvent_y(XButtonEvent *i, int j)
 {
           i->y = j;
 }
 
-int  XButtonEvent_x(i)
-XButtonEvent* i;
+int  XButtonEvent_x(XButtonEvent *i)
 {
           return(i->x);
 }
 
-void set_XButtonEvent_x(i, j)
-XButtonEvent* i;
-int j;
+void set_XButtonEvent_x(XButtonEvent *i, int j)
 {
           i->x = j;
 }
 
-int  XButtonEvent_time(i)
-XButtonEvent* i;
+int  XButtonEvent_time(XButtonEvent *i)
 {
           return(i->time);
 }
 
-void set_XButtonEvent_time(i, j)
-XButtonEvent* i;
-int j;
+void set_XButtonEvent_time(XButtonEvent *i, int j)
 {
           i->time = j;
 }
 
-int  XButtonEvent_subwindow(i)
-XButtonEvent* i;
+int  XButtonEvent_subwindow(XButtonEvent *i)
 {
           return(i->subwindow);
 }
 
-void set_XButtonEvent_subwindow(i, j)
-XButtonEvent* i;
-int j;
+void set_XButtonEvent_subwindow(XButtonEvent *i, int j)
 {
           i->subwindow = j;
 }
 
-int  XButtonEvent_root(i)
-XButtonEvent* i;
+int  XButtonEvent_root(XButtonEvent *i)
 {
           return(i->root);
 }
 
-void set_XButtonEvent_root(i, j)
-XButtonEvent* i;
-int j;
+void set_XButtonEvent_root(XButtonEvent *i, int j)
 {
           i->root = j;
 }
 
-int  XButtonEvent_window(i)
-XButtonEvent* i;
+int  XButtonEvent_window(XButtonEvent *i)
 {
           return(i->window);
 }
 
-void set_XButtonEvent_window(i, j)
-XButtonEvent* i;
-int j;
+void set_XButtonEvent_window(XButtonEvent *i, int j)
 {
           i->window = j;
 }
 
-Display *XButtonEvent_display(i)
-XButtonEvent* i;
+Display *XButtonEvent_display(XButtonEvent *i)
 {
           return(i->display);
 }
 
-void set_XButtonEvent_display(i, j)
-XButtonEvent* i;
-Display *j;
+void set_XButtonEvent_display(XButtonEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XButtonEvent_send_event(i)
-XButtonEvent* i;
+int  XButtonEvent_send_event(XButtonEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XButtonEvent_send_event(i, j)
-XButtonEvent* i;
-int j;
+void set_XButtonEvent_send_event(XButtonEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XButtonEvent_serial(i)
-XButtonEvent* i;
+int  XButtonEvent_serial(XButtonEvent *i)
 {
           return(i->serial);
 }
 
-void set_XButtonEvent_serial(i, j)
-XButtonEvent* i;
-int j;
+void set_XButtonEvent_serial(XButtonEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XButtonEvent_type(i)
-XButtonEvent* i;
+int  XButtonEvent_type(XButtonEvent *i)
 {
           return(i->type);
 }
 
-void set_XButtonEvent_type(i, j)
-XButtonEvent* i;
-int j;
+void set_XButtonEvent_type(XButtonEvent *i, int j)
 {
           i->type = j;
 }
@@ -432,201 +342,156 @@ int j;
 
 /********* XMotionEvent funcions *****/
 
-int  make_XMotionEvent (){
+int  make_XMotionEvent (void) {
           return ((int) calloc(1, sizeof(XMotionEvent)));
 }
 
-int  XMotionEvent_same_screen(i)
-XMotionEvent* i;
+int  XMotionEvent_same_screen(XMotionEvent *i)
 {
           return(i->same_screen);
 }
 
-void set_XMotionEvent_same_screen(i, j)
-XMotionEvent* i;
-int j;
+void set_XMotionEvent_same_screen(XMotionEvent *i, int j)
 {
           i->same_screen = j;
 }
 
-char XMotionEvent_is_hint(i)
-XMotionEvent* i;
+char XMotionEvent_is_hint(XMotionEvent *i)
 {
           return(i->is_hint);
 }
 
-void set_XMotionEvent_is_hint(i, j)
-XMotionEvent* i;
-char j;
+void set_XMotionEvent_is_hint(XMotionEvent *i, char j)
 {
           i->is_hint = j;
 }
 
-int  XMotionEvent_state(i)
-XMotionEvent* i;
+int  XMotionEvent_state(XMotionEvent *i)
 {
           return(i->state);
 }
 
-void set_XMotionEvent_state(i, j)
-XMotionEvent* i;
-int j;
+void set_XMotionEvent_state(XMotionEvent *i, int j)
 {
           i->state = j;
 }
 
-int  XMotionEvent_y_root(i)
-XMotionEvent* i;
+int  XMotionEvent_y_root(XMotionEvent *i)
 {
           return(i->y_root);
 }
 
-void set_XMotionEvent_y_root(i, j)
-XMotionEvent* i;
-int j;
+void set_XMotionEvent_y_root(XMotionEvent *i, int j)
 {
           i->y_root = j;
 }
 
-int  XMotionEvent_x_root(i)
-XMotionEvent* i;
+int  XMotionEvent_x_root(XMotionEvent *i)
 {
           return(i->x_root);
 }
 
-void set_XMotionEvent_x_root(i, j)
-XMotionEvent* i;
-int j;
+void set_XMotionEvent_x_root(XMotionEvent *i, int j)
 {
           i->x_root = j;
 }
 
-int  XMotionEvent_y(i)
-XMotionEvent* i;
+int  XMotionEvent_y(XMotionEvent *i)
 {
           return(i->y);
 }
 
-void set_XMotionEvent_y(i, j)
-XMotionEvent* i;
-int j;
+void set_XMotionEvent_y(XMotionEvent *i, int j)
 {
           i->y = j;
 }
 
-int  XMotionEvent_x(i)
-XMotionEvent* i;
+int  XMotionEvent_x(XMotionEvent *i)
 {
           return(i->x);
 }
 
-void set_XMotionEvent_x(i, j)
-XMotionEvent* i;
-int j;
+void set_XMotionEvent_x(XMotionEvent *i, int j)
 {
           i->x = j;
 }
 
-int  XMotionEvent_time(i)
-XMotionEvent* i;
+int  XMotionEvent_time(XMotionEvent *i)
 {
           return(i->time);
 }
 
-void set_XMotionEvent_time(i, j)
-XMotionEvent* i;
-int j;
+void set_XMotionEvent_time(XMotionEvent *i, int j)
 {
           i->time = j;
 }
 
-int  XMotionEvent_subwindow(i)
-XMotionEvent* i;
+int  XMotionEvent_subwindow(XMotionEvent *i)
 {
           return(i->subwindow);
 }
 
-void set_XMotionEvent_subwindow(i, j)
-XMotionEvent* i;
-int j;
+void set_XMotionEvent_subwindow(XMotionEvent *i, int j)
 {
           i->subwindow = j;
 }
 
-int  XMotionEvent_root(i)
-XMotionEvent* i;
+int  XMotionEvent_root(XMotionEvent *i)
 {
           return(i->root);
 }
 
-void set_XMotionEvent_root(i, j)
-XMotionEvent* i;
-int j;
+void set_XMotionEvent_root(XMotionEvent *i, int j)
 {
           i->root = j;
 }
 
-int  XMotionEvent_window(i)
-XMotionEvent* i;
+int  XMotionEvent_window(XMotionEvent *i)
 {
           return(i->window);
 }
 
-void set_XMotionEvent_window(i, j)
-XMotionEvent* i;
-int j;
+void set_XMotionEvent_window(XMotionEvent *i, int j)
 {
           i->window = j;
 }
 
-Display *XMotionEvent_display(i)
-XMotionEvent* i;
+Display *XMotionEvent_display(XMotionEvent *i)
 {
           return(i->display);
 }
 
-void set_XMotionEvent_display(i, j)
-XMotionEvent* i;
-Display *j;
+void set_XMotionEvent_display(XMotionEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XMotionEvent_send_event(i)
-XMotionEvent* i;
+int  XMotionEvent_send_event(XMotionEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XMotionEvent_send_event(i, j)
-XMotionEvent* i;
-int j;
+void set_XMotionEvent_send_event(XMotionEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XMotionEvent_serial(i)
-XMotionEvent* i;
+int  XMotionEvent_serial(XMotionEvent *i)
 {
           return(i->serial);
 }
 
-void set_XMotionEvent_serial(i, j)
-XMotionEvent* i;
-int j;
+void set_XMotionEvent_serial(XMotionEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XMotionEvent_type(i)
-XMotionEvent* i;
+int  XMotionEvent_type(XMotionEvent *i)
 {
           return(i->type);
 }
 
-void set_XMotionEvent_type(i, j)
-XMotionEvent* i;
-int j;
+void set_XMotionEvent_type(XMotionEvent *i, int j)
 {
           i->type = j;
 }
@@ -634,227 +499,176 @@ int j;
 
 /********* XCrossingEvent funcions *****/
 
-int  make_XCrossingEvent (){
+int  make_XCrossingEvent (void) {
           return ((int) calloc(1, sizeof(XCrossingEvent)));
 }
 
-int  XCrossingEvent_state(i)
-XCrossingEvent* i;
+int  XCrossingEvent_state(XCrossingEvent *i)
 {
           return(i->state);
 }
 
-void set_XCrossingEvent_state(i, j)
-XCrossingEvent* i;
-int j;
+void set_XCrossingEvent_state(XCrossingEvent *i, int j)
 {
           i->state = j;
 }
 
-int  XCrossingEvent_focus(i)
-XCrossingEvent* i;
+int  XCrossingEvent_focus(XCrossingEvent *i)
 {
           return(i->focus);
 }
 
-void set_XCrossingEvent_focus(i, j)
-XCrossingEvent* i;
-int j;
+void set_XCrossingEvent_focus(XCrossingEvent *i, int j)
 {
           i->focus = j;
 }
 
-int  XCrossingEvent_same_screen(i)
-XCrossingEvent* i;
+int  XCrossingEvent_same_screen(XCrossingEvent *i)
 {
           return(i->same_screen);
 }
 
-void set_XCrossingEvent_same_screen(i, j)
-XCrossingEvent* i;
-int j;
+void set_XCrossingEvent_same_screen(XCrossingEvent *i, int j)
 {
           i->same_screen = j;
 }
 
-int  XCrossingEvent_detail(i)
-XCrossingEvent* i;
+int  XCrossingEvent_detail(XCrossingEvent *i)
 {
           return(i->detail);
 }
 
-void set_XCrossingEvent_detail(i, j)
-XCrossingEvent* i;
-int j;
+void set_XCrossingEvent_detail(XCrossingEvent *i, int j)
 {
           i->detail = j;
 }
 
-int  XCrossingEvent_mode(i)
-XCrossingEvent* i;
+int  XCrossingEvent_mode(XCrossingEvent *i)
 {
           return(i->mode);
 }
 
-void set_XCrossingEvent_mode(i, j)
-XCrossingEvent* i;
-int j;
+void set_XCrossingEvent_mode(XCrossingEvent *i, int j)
 {
           i->mode = j;
 }
 
-int  XCrossingEvent_y_root(i)
-XCrossingEvent* i;
+int  XCrossingEvent_y_root(XCrossingEvent *i)
 {
           return(i->y_root);
 }
 
-void set_XCrossingEvent_y_root(i, j)
-XCrossingEvent* i;
-int j;
+void set_XCrossingEvent_y_root(XCrossingEvent *i, int j)
 {
           i->y_root = j;
 }
 
-int  XCrossingEvent_x_root(i)
-XCrossingEvent* i;
+int  XCrossingEvent_x_root(XCrossingEvent *i)
 {
           return(i->x_root);
 }
 
-void set_XCrossingEvent_x_root(i, j)
-XCrossingEvent* i;
-int j;
+void set_XCrossingEvent_x_root(XCrossingEvent *i, int j)
 {
           i->x_root = j;
 }
 
-int  XCrossingEvent_y(i)
-XCrossingEvent* i;
+int  XCrossingEvent_y(XCrossingEvent *i)
 {
           return(i->y);
 }
 
-void set_XCrossingEvent_y(i, j)
-XCrossingEvent* i;
-int j;
+void set_XCrossingEvent_y(XCrossingEvent *i, int j)
 {
           i->y = j;
 }
 
-int  XCrossingEvent_x(i)
-XCrossingEvent* i;
+int  XCrossingEvent_x(XCrossingEvent *i)
 {
           return(i->x);
 }
 
-void set_XCrossingEvent_x(i, j)
-XCrossingEvent* i;
-int j;
+void set_XCrossingEvent_x(XCrossingEvent *i, int j)
 {
           i->x = j;
 }
 
-int  XCrossingEvent_time(i)
-XCrossingEvent* i;
+int  XCrossingEvent_time(XCrossingEvent *i)
 {
           return(i->time);
 }
 
-void set_XCrossingEvent_time(i, j)
-XCrossingEvent* i;
-int j;
+void set_XCrossingEvent_time(XCrossingEvent *i, int j)
 {
           i->time = j;
 }
 
-int  XCrossingEvent_subwindow(i)
-XCrossingEvent* i;
+int  XCrossingEvent_subwindow(XCrossingEvent *i)
 {
           return(i->subwindow);
 }
 
-void set_XCrossingEvent_subwindow(i, j)
-XCrossingEvent* i;
-int j;
+void set_XCrossingEvent_subwindow(XCrossingEvent *i, int j)
 {
           i->subwindow = j;
 }
 
-int  XCrossingEvent_root(i)
-XCrossingEvent* i;
+int  XCrossingEvent_root(XCrossingEvent *i)
 {
           return(i->root);
 }
 
-void set_XCrossingEvent_root(i, j)
-XCrossingEvent* i;
-int j;
+void set_XCrossingEvent_root(XCrossingEvent *i, int j)
 {
           i->root = j;
 }
 
-int  XCrossingEvent_window(i)
-XCrossingEvent* i;
+int  XCrossingEvent_window(XCrossingEvent *i)
 {
           return(i->window);
 }
 
-void set_XCrossingEvent_window(i, j)
-XCrossingEvent* i;
-int j;
+void set_XCrossingEvent_window(XCrossingEvent *i, int j)
 {
           i->window = j;
 }
 
-Display *XCrossingEvent_display(i)
-XCrossingEvent* i;
+Display *XCrossingEvent_display(XCrossingEvent *i)
 {
           return(i->display);
 }
 
-void set_XCrossingEvent_display(i, j)
-XCrossingEvent* i;
-Display *j;
+void set_XCrossingEvent_display(XCrossingEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XCrossingEvent_send_event(i)
-XCrossingEvent* i;
+int  XCrossingEvent_send_event(XCrossingEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XCrossingEvent_send_event(i, j)
-XCrossingEvent* i;
-int j;
+void set_XCrossingEvent_send_event(XCrossingEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XCrossingEvent_serial(i)
-XCrossingEvent* i;
+int  XCrossingEvent_serial(XCrossingEvent *i)
 {
           return(i->serial);
 }
 
-void set_XCrossingEvent_serial(i, j)
-XCrossingEvent* i;
-int j;
+void set_XCrossingEvent_serial(XCrossingEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XCrossingEvent_type(i)
-XCrossingEvent* i;
+int  XCrossingEvent_type(XCrossingEvent *i)
 {
           return(i->type);
 }
 
-void set_XCrossingEvent_type(i, j)
-XCrossingEvent* i;
-int j;
+void set_XCrossingEvent_type(XCrossingEvent *i, int j)
 {
           i->type = j;
 }
@@ -862,97 +676,76 @@ int j;
 
 /********* XFocusChangeEvent funcions *****/
 
-int  make_XFocusChangeEvent (){
+int  make_XFocusChangeEvent (void) {
           return ((int) calloc(1, sizeof(XFocusChangeEvent)));
 }
 
-int  XFocusChangeEvent_detail(i)
-XFocusChangeEvent* i;
+int  XFocusChangeEvent_detail(XFocusChangeEvent *i)
 {
           return(i->detail);
 }
 
-void set_XFocusChangeEvent_detail(i, j)
-XFocusChangeEvent* i;
-int j;
+void set_XFocusChangeEvent_detail(XFocusChangeEvent *i, int j)
 {
           i->detail = j;
 }
 
-int  XFocusChangeEvent_mode(i)
-XFocusChangeEvent* i;
+int  XFocusChangeEvent_mode(XFocusChangeEvent *i)
 {
           return(i->mode);
 }
 
-void set_XFocusChangeEvent_mode(i, j)
-XFocusChangeEvent* i;
-int j;
+void set_XFocusChangeEvent_mode(XFocusChangeEvent *i, int j)
 {
           i->mode = j;
 }
 
-int  XFocusChangeEvent_window(i)
-XFocusChangeEvent* i;
+int  XFocusChangeEvent_window(XFocusChangeEvent *i)
 {
           return(i->window);
 }
 
-void set_XFocusChangeEvent_window(i, j)
-XFocusChangeEvent* i;
-int j;
+void set_XFocusChangeEvent_window(XFocusChangeEvent *i, int j)
 {
           i->window = j;
 }
 
-Display *XFocusChangeEvent_display(i)
-XFocusChangeEvent* i;
+Display *XFocusChangeEvent_display(XFocusChangeEvent *i)
 {
           return(i->display);
 }
 
-void set_XFocusChangeEvent_display(i, j)
-XFocusChangeEvent* i;
-Display *j;
+void set_XFocusChangeEvent_display(XFocusChangeEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XFocusChangeEvent_send_event(i)
-XFocusChangeEvent* i;
+int  XFocusChangeEvent_send_event(XFocusChangeEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XFocusChangeEvent_send_event(i, j)
-XFocusChangeEvent* i;
-int j;
+void set_XFocusChangeEvent_send_event(XFocusChangeEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XFocusChangeEvent_serial(i)
-XFocusChangeEvent* i;
+int  XFocusChangeEvent_serial(XFocusChangeEvent *i)
 {
           return(i->serial);
 }
 
-void set_XFocusChangeEvent_serial(i, j)
-XFocusChangeEvent* i;
-int j;
+void set_XFocusChangeEvent_serial(XFocusChangeEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XFocusChangeEvent_type(i)
-XFocusChangeEvent* i;
+int  XFocusChangeEvent_type(XFocusChangeEvent *i)
 {
           return(i->type);
 }
 
-void set_XFocusChangeEvent_type(i, j)
-XFocusChangeEvent* i;
-int j;
+void set_XFocusChangeEvent_type(XFocusChangeEvent *i, int j)
 {
           i->type = j;
 }
@@ -960,76 +753,60 @@ int j;
 
 /********* XKeymapEvent funcions *****/
 
-int  make_XKeymapEvent (){
+int  make_XKeymapEvent (void) {
           return ((int) calloc(1, sizeof(XKeymapEvent)));
 }
 
-char* XKeymapEvent_key_vector(i)
-XKeymapEvent* i;
+char* XKeymapEvent_key_vector(XKeymapEvent *i)
 {
           return(i->key_vector);
 }
-int  XKeymapEvent_window(i)
-XKeymapEvent* i;
+int  XKeymapEvent_window(XKeymapEvent *i)
 {
           return(i->window);
 }
 
-void set_XKeymapEvent_window(i, j)
-XKeymapEvent* i;
-int j;
+void set_XKeymapEvent_window(XKeymapEvent *i, int j)
 {
           i->window = j;
 }
 
-Display * XKeymapEvent_display(i)
-XKeymapEvent* i;
+Display * XKeymapEvent_display(XKeymapEvent *i)
 {
           return(i->display);
 }
 
-void set_XKeymapEvent_display(i, j)
-XKeymapEvent* i;
-Display *j;
+void set_XKeymapEvent_display(XKeymapEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XKeymapEvent_send_event(i)
-XKeymapEvent* i;
+int  XKeymapEvent_send_event(XKeymapEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XKeymapEvent_send_event(i, j)
-XKeymapEvent* i;
-int j;
+void set_XKeymapEvent_send_event(XKeymapEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XKeymapEvent_serial(i)
-XKeymapEvent* i;
+int  XKeymapEvent_serial(XKeymapEvent *i)
 {
           return(i->serial);
 }
 
-void set_XKeymapEvent_serial(i, j)
-XKeymapEvent* i;
-int j;
+void set_XKeymapEvent_serial(XKeymapEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XKeymapEvent_type(i)
-XKeymapEvent* i;
+int  XKeymapEvent_type(XKeymapEvent *i)
 {
           return(i->type);
 }
 
-void set_XKeymapEvent_type(i, j)
-XKeymapEvent* i;
-int j;
+void set_XKeymapEvent_type(XKeymapEvent *i, int j)
 {
           i->type = j;
 }
@@ -1037,136 +814,106 @@ int j;
 
 /********* XExposeEvent funcions *****/
 
-int  make_XExposeEvent (){
+int  make_XExposeEvent (void) {
           return ((int) calloc(1, sizeof(XExposeEvent)));
 }
 
-int  XExposeEvent_count(i)
-XExposeEvent* i;
+int  XExposeEvent_count(XExposeEvent *i)
 {
           return(i->count);
 }
 
-void set_XExposeEvent_count(i, j)
-XExposeEvent* i;
-int j;
+void set_XExposeEvent_count(XExposeEvent *i, int j)
 {
           i->count = j;
 }
 
-int  XExposeEvent_height(i)
-XExposeEvent* i;
+int  XExposeEvent_height(XExposeEvent *i)
 {
           return(i->height);
 }
 
-void set_XExposeEvent_height(i, j)
-XExposeEvent* i;
-int j;
+void set_XExposeEvent_height(XExposeEvent *i, int j)
 {
           i->height = j;
 }
 
-int  XExposeEvent_width(i)
-XExposeEvent* i;
+int  XExposeEvent_width(XExposeEvent *i)
 {
           return(i->width);
 }
 
-void set_XExposeEvent_width(i, j)
-XExposeEvent* i;
-int j;
+void set_XExposeEvent_width(XExposeEvent *i, int j)
 {
           i->width = j;
 }
 
-int  XExposeEvent_y(i)
-XExposeEvent* i;
+int  XExposeEvent_y(XExposeEvent *i)
 {
           return(i->y);
 }
 
-void set_XExposeEvent_y(i, j)
-XExposeEvent* i;
-int j;
+void set_XExposeEvent_y(XExposeEvent *i, int j)
 {
           i->y = j;
 }
 
-int  XExposeEvent_x(i)
-XExposeEvent* i;
+int  XExposeEvent_x(XExposeEvent *i)
 {
           return(i->x);
 }
 
-void set_XExposeEvent_x(i, j)
-XExposeEvent* i;
-int j;
+void set_XExposeEvent_x(XExposeEvent *i, int j)
 {
           i->x = j;
 }
 
-int  XExposeEvent_window(i)
-XExposeEvent* i;
+int  XExposeEvent_window(XExposeEvent *i)
 {
           return(i->window);
 }
 
-void set_XExposeEvent_window(i, j)
-XExposeEvent* i;
-int j;
+void set_XExposeEvent_window(XExposeEvent *i, int j)
 {
           i->window = j;
 }
 
-Display *XExposeEvent_display(i)
-XExposeEvent* i;
+Display *XExposeEvent_display(XExposeEvent *i)
 {
           return(i->display);
 }
 
-void set_XExposeEvent_display(i, j)
-XExposeEvent* i;
-Display *j;
+void set_XExposeEvent_display(XExposeEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XExposeEvent_send_event(i)
-XExposeEvent* i;
+int  XExposeEvent_send_event(XExposeEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XExposeEvent_send_event(i, j)
-XExposeEvent* i;
-int j;
+void set_XExposeEvent_send_event(XExposeEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XExposeEvent_serial(i)
-XExposeEvent* i;
+int  XExposeEvent_serial(XExposeEvent *i)
 {
           return(i->serial);
 }
 
-void set_XExposeEvent_serial(i, j)
-XExposeEvent* i;
-int j;
+void set_XExposeEvent_serial(XExposeEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XExposeEvent_type(i)
-XExposeEvent* i;
+int  XExposeEvent_type(XExposeEvent *i)
 {
           return(i->type);
 }
 
-void set_XExposeEvent_type(i, j)
-XExposeEvent* i;
-int j;
+void set_XExposeEvent_type(XExposeEvent *i, int j)
 {
           i->type = j;
 }
@@ -1174,162 +921,126 @@ int j;
 
 /********* XGraphicsExposeEvent funcions *****/
 
-int  make_XGraphicsExposeEvent (){
+int  make_XGraphicsExposeEvent (void) {
           return ((int) calloc(1, sizeof(XGraphicsExposeEvent)));
 }
 
-int  XGraphicsExposeEvent_minor_code(i)
-XGraphicsExposeEvent* i;
+int  XGraphicsExposeEvent_minor_code(XGraphicsExposeEvent *i)
 {
           return(i->minor_code);
 }
 
-void set_XGraphicsExposeEvent_minor_code(i, j)
-XGraphicsExposeEvent* i;
-int j;
+void set_XGraphicsExposeEvent_minor_code(XGraphicsExposeEvent *i, int j)
 {
           i->minor_code = j;
 }
 
-int  XGraphicsExposeEvent_major_code(i)
-XGraphicsExposeEvent* i;
+int  XGraphicsExposeEvent_major_code(XGraphicsExposeEvent *i)
 {
           return(i->major_code);
 }
 
-void set_XGraphicsExposeEvent_major_code(i, j)
-XGraphicsExposeEvent* i;
-int j;
+void set_XGraphicsExposeEvent_major_code(XGraphicsExposeEvent *i, int j)
 {
           i->major_code = j;
 }
 
-int  XGraphicsExposeEvent_count(i)
-XGraphicsExposeEvent* i;
+int  XGraphicsExposeEvent_count(XGraphicsExposeEvent *i)
 {
           return(i->count);
 }
 
-void set_XGraphicsExposeEvent_count(i, j)
-XGraphicsExposeEvent* i;
-int j;
+void set_XGraphicsExposeEvent_count(XGraphicsExposeEvent *i, int j)
 {
           i->count = j;
 }
 
-int  XGraphicsExposeEvent_height(i)
-XGraphicsExposeEvent* i;
+int  XGraphicsExposeEvent_height(XGraphicsExposeEvent *i)
 {
           return(i->height);
 }
 
-void set_XGraphicsExposeEvent_height(i, j)
-XGraphicsExposeEvent* i;
-int j;
+void set_XGraphicsExposeEvent_height(XGraphicsExposeEvent *i, int j)
 {
           i->height = j;
 }
 
-int  XGraphicsExposeEvent_width(i)
-XGraphicsExposeEvent* i;
+int  XGraphicsExposeEvent_width(XGraphicsExposeEvent *i)
 {
           return(i->width);
 }
 
-void set_XGraphicsExposeEvent_width(i, j)
-XGraphicsExposeEvent* i;
-int j;
+void set_XGraphicsExposeEvent_width(XGraphicsExposeEvent *i, int j)
 {
           i->width = j;
 }
 
-int  XGraphicsExposeEvent_y(i)
-XGraphicsExposeEvent* i;
+int  XGraphicsExposeEvent_y(XGraphicsExposeEvent *i)
 {
           return(i->y);
 }
 
-void set_XGraphicsExposeEvent_y(i, j)
-XGraphicsExposeEvent* i;
-int j;
+void set_XGraphicsExposeEvent_y(XGraphicsExposeEvent *i, int j)
 {
           i->y = j;
 }
 
-int  XGraphicsExposeEvent_x(i)
-XGraphicsExposeEvent* i;
+int  XGraphicsExposeEvent_x(XGraphicsExposeEvent *i)
 {
           return(i->x);
 }
 
-void set_XGraphicsExposeEvent_x(i, j)
-XGraphicsExposeEvent* i;
-int j;
+void set_XGraphicsExposeEvent_x(XGraphicsExposeEvent *i, int j)
 {
           i->x = j;
 }
 
-Drawable XGraphicsExposeEvent_drawable(i)
-XGraphicsExposeEvent* i;
+Drawable XGraphicsExposeEvent_drawable(XGraphicsExposeEvent *i)
 {
           return(i->drawable);
 }
 
-void set_XGraphicsExposeEvent_drawable(i, j)
-XGraphicsExposeEvent* i;
-Drawable j;
+void set_XGraphicsExposeEvent_drawable(XGraphicsExposeEvent *i, Drawable j)
 {
           i->drawable = j;
 }
 
-Display * XGraphicsExposeEvent_display(i)
-XGraphicsExposeEvent* i;
+Display * XGraphicsExposeEvent_display(XGraphicsExposeEvent *i)
 {
           return(i->display);
 }
 
-void set_XGraphicsExposeEvent_display(i, j)
-XGraphicsExposeEvent* i;
-Display *j;
+void set_XGraphicsExposeEvent_display(XGraphicsExposeEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XGraphicsExposeEvent_send_event(i)
-XGraphicsExposeEvent* i;
+int  XGraphicsExposeEvent_send_event(XGraphicsExposeEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XGraphicsExposeEvent_send_event(i, j)
-XGraphicsExposeEvent* i;
-int j;
+void set_XGraphicsExposeEvent_send_event(XGraphicsExposeEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XGraphicsExposeEvent_serial(i)
-XGraphicsExposeEvent* i;
+int  XGraphicsExposeEvent_serial(XGraphicsExposeEvent *i)
 {
           return(i->serial);
 }
 
-void set_XGraphicsExposeEvent_serial(i, j)
-XGraphicsExposeEvent* i;
-int j;
+void set_XGraphicsExposeEvent_serial(XGraphicsExposeEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XGraphicsExposeEvent_type(i)
-XGraphicsExposeEvent* i;
+int  XGraphicsExposeEvent_type(XGraphicsExposeEvent *i)
 {
           return(i->type);
 }
 
-void set_XGraphicsExposeEvent_type(i, j)
-XGraphicsExposeEvent* i;
-int j;
+void set_XGraphicsExposeEvent_type(XGraphicsExposeEvent *i, int j)
 {
           i->type = j;
 }
@@ -1337,97 +1048,76 @@ int j;
 
 /********* XNoExposeEvent funcions *****/
 
-int  make_XNoExposeEvent (){
+int  make_XNoExposeEvent (void) {
           return ((int) calloc(1, sizeof(XNoExposeEvent)));
 }
 
-int  XNoExposeEvent_minor_code(i)
-XNoExposeEvent* i;
+int  XNoExposeEvent_minor_code(XNoExposeEvent *i)
 {
           return(i->minor_code);
 }
 
-void set_XNoExposeEvent_minor_code(i, j)
-XNoExposeEvent* i;
-int j;
+void set_XNoExposeEvent_minor_code(XNoExposeEvent *i, int j)
 {
           i->minor_code = j;
 }
 
-int  XNoExposeEvent_major_code(i)
-XNoExposeEvent* i;
+int  XNoExposeEvent_major_code(XNoExposeEvent *i)
 {
           return(i->major_code);
 }
 
-void set_XNoExposeEvent_major_code(i, j)
-XNoExposeEvent* i;
-int j;
+void set_XNoExposeEvent_major_code(XNoExposeEvent *i, int j)
 {
           i->major_code = j;
 }
 
-Drawable XNoExposeEvent_drawable(i)
-XNoExposeEvent* i;
+Drawable XNoExposeEvent_drawable(XNoExposeEvent *i)
 {
           return(i->drawable);
 }
 
-void set_XNoExposeEvent_drawable(i, j)
-XNoExposeEvent* i;
-Drawable j;
+void set_XNoExposeEvent_drawable(XNoExposeEvent *i, Drawable j)
 {
           i->drawable = j;
 }
 
-Display *XNoExposeEvent_display(i)
-XNoExposeEvent* i;
+Display *XNoExposeEvent_display(XNoExposeEvent *i)
 {
           return(i->display);
 }
 
-void set_XNoExposeEvent_display(i, j)
-XNoExposeEvent* i;
-Display *j;
+void set_XNoExposeEvent_display(XNoExposeEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XNoExposeEvent_send_event(i)
-XNoExposeEvent* i;
+int  XNoExposeEvent_send_event(XNoExposeEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XNoExposeEvent_send_event(i, j)
-XNoExposeEvent* i;
-int j;
+void set_XNoExposeEvent_send_event(XNoExposeEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XNoExposeEvent_serial(i)
-XNoExposeEvent* i;
+int  XNoExposeEvent_serial(XNoExposeEvent *i)
 {
           return(i->serial);
 }
 
-void set_XNoExposeEvent_serial(i, j)
-XNoExposeEvent* i;
-int j;
+void set_XNoExposeEvent_serial(XNoExposeEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XNoExposeEvent_type(i)
-XNoExposeEvent* i;
+int  XNoExposeEvent_type(XNoExposeEvent *i)
 {
           return(i->type);
 }
 
-void set_XNoExposeEvent_type(i, j)
-XNoExposeEvent* i;
-int j;
+void set_XNoExposeEvent_type(XNoExposeEvent *i, int j)
 {
           i->type = j;
 }
@@ -1435,84 +1125,66 @@ int j;
 
 /********* XVisibilityEvent funcions *****/
 
-int  make_XVisibilityEvent (){
+int  make_XVisibilityEvent (void) {
           return ((int) calloc(1, sizeof(XVisibilityEvent)));
 }
 
-int  XVisibilityEvent_state(i)
-XVisibilityEvent* i;
+int  XVisibilityEvent_state(XVisibilityEvent *i)
 {
           return(i->state);
 }
 
-void set_XVisibilityEvent_state(i, j)
-XVisibilityEvent* i;
-int j;
+void set_XVisibilityEvent_state(XVisibilityEvent *i, int j)
 {
           i->state = j;
 }
 
-int  XVisibilityEvent_window(i)
-XVisibilityEvent* i;
+int  XVisibilityEvent_window(XVisibilityEvent *i)
 {
           return(i->window);
 }
 
-void set_XVisibilityEvent_window(i, j)
-XVisibilityEvent* i;
-int j;
+void set_XVisibilityEvent_window(XVisibilityEvent *i, int j)
 {
           i->window = j;
 }
 
-Display *XVisibilityEvent_display(i)
-XVisibilityEvent* i;
+Display *XVisibilityEvent_display(XVisibilityEvent *i)
 {
           return(i->display);
 }
 
-void set_XVisibilityEvent_display(i, j)
-XVisibilityEvent* i;
-Display *j;
+void set_XVisibilityEvent_display(XVisibilityEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XVisibilityEvent_send_event(i)
-XVisibilityEvent* i;
+int  XVisibilityEvent_send_event(XVisibilityEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XVisibilityEvent_send_event(i, j)
-XVisibilityEvent* i;
-int j;
+void set_XVisibilityEvent_send_event(XVisibilityEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XVisibilityEvent_serial(i)
-XVisibilityEvent* i;
+int  XVisibilityEvent_serial(XVisibilityEvent *i)
 {
           return(i->serial);
 }
 
-void set_XVisibilityEvent_serial(i, j)
-XVisibilityEvent* i;
-int j;
+void set_XVisibilityEvent_serial(XVisibilityEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XVisibilityEvent_type(i)
-XVisibilityEvent* i;
+int  XVisibilityEvent_type(XVisibilityEvent *i)
 {
           return(i->type);
 }
 
-void set_XVisibilityEvent_type(i, j)
-XVisibilityEvent* i;
-int j;
+void set_XVisibilityEvent_type(XVisibilityEvent *i, int j)
 {
           i->type = j;
 }
@@ -1520,162 +1192,126 @@ int j;
 
 /********* XCreateWindowEvent funcions *****/
 
-int  make_XCreateWindowEvent (){
+int  make_XCreateWindowEvent (void) {
           return ((int) calloc(1, sizeof(XCreateWindowEvent)));
 }
 
-int  XCreateWindowEvent_override_redirect(i)
-XCreateWindowEvent* i;
+int  XCreateWindowEvent_override_redirect(XCreateWindowEvent *i)
 {
           return(i->override_redirect);
 }
 
-void set_XCreateWindowEvent_override_redirect(i, j)
-XCreateWindowEvent* i;
-int j;
+void set_XCreateWindowEvent_override_redirect(XCreateWindowEvent *i, int j)
 {
           i->override_redirect = j;
 }
 
-int  XCreateWindowEvent_border_width(i)
-XCreateWindowEvent* i;
+int  XCreateWindowEvent_border_width(XCreateWindowEvent *i)
 {
           return(i->border_width);
 }
 
-void set_XCreateWindowEvent_border_width(i, j)
-XCreateWindowEvent* i;
-int j;
+void set_XCreateWindowEvent_border_width(XCreateWindowEvent *i, int j)
 {
           i->border_width = j;
 }
 
-int  XCreateWindowEvent_height(i)
-XCreateWindowEvent* i;
+int  XCreateWindowEvent_height(XCreateWindowEvent *i)
 {
           return(i->height);
 }
 
-void set_XCreateWindowEvent_height(i, j)
-XCreateWindowEvent* i;
-int j;
+void set_XCreateWindowEvent_height(XCreateWindowEvent *i, int j)
 {
           i->height = j;
 }
 
-int  XCreateWindowEvent_width(i)
-XCreateWindowEvent* i;
+int  XCreateWindowEvent_width(XCreateWindowEvent *i)
 {
           return(i->width);
 }
 
-void set_XCreateWindowEvent_width(i, j)
-XCreateWindowEvent* i;
-int j;
+void set_XCreateWindowEvent_width(XCreateWindowEvent *i, int j)
 {
           i->width = j;
 }
 
-int  XCreateWindowEvent_y(i)
-XCreateWindowEvent* i;
+int  XCreateWindowEvent_y(XCreateWindowEvent *i)
 {
           return(i->y);
 }
 
-void set_XCreateWindowEvent_y(i, j)
-XCreateWindowEvent* i;
-int j;
+void set_XCreateWindowEvent_y(XCreateWindowEvent *i, int j)
 {
           i->y = j;
 }
 
-int  XCreateWindowEvent_x(i)
-XCreateWindowEvent* i;
+int  XCreateWindowEvent_x(XCreateWindowEvent *i)
 {
           return(i->x);
 }
 
-void set_XCreateWindowEvent_x(i, j)
-XCreateWindowEvent* i;
-int j;
+void set_XCreateWindowEvent_x(XCreateWindowEvent *i, int j)
 {
           i->x = j;
 }
 
-int  XCreateWindowEvent_window(i)
-XCreateWindowEvent* i;
+int  XCreateWindowEvent_window(XCreateWindowEvent *i)
 {
           return(i->window);
 }
 
-void set_XCreateWindowEvent_window(i, j)
-XCreateWindowEvent* i;
-int j;
+void set_XCreateWindowEvent_window(XCreateWindowEvent *i, int j)
 {
           i->window = j;
 }
 
-int  XCreateWindowEvent_parent(i)
-XCreateWindowEvent* i;
+int  XCreateWindowEvent_parent(XCreateWindowEvent *i)
 {
           return(i->parent);
 }
 
-void set_XCreateWindowEvent_parent(i, j)
-XCreateWindowEvent* i;
-int j;
+void set_XCreateWindowEvent_parent(XCreateWindowEvent *i, int j)
 {
           i->parent = j;
 }
 
-Display *XCreateWindowEvent_display(i)
-XCreateWindowEvent* i;
+Display *XCreateWindowEvent_display(XCreateWindowEvent *i)
 {
           return(i->display);
 }
 
-void set_XCreateWindowEvent_display(i, j)
-XCreateWindowEvent* i;
-Display *j;
+void set_XCreateWindowEvent_display(XCreateWindowEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XCreateWindowEvent_send_event(i)
-XCreateWindowEvent* i;
+int  XCreateWindowEvent_send_event(XCreateWindowEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XCreateWindowEvent_send_event(i, j)
-XCreateWindowEvent* i;
-int j;
+void set_XCreateWindowEvent_send_event(XCreateWindowEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XCreateWindowEvent_serial(i)
-XCreateWindowEvent* i;
+int  XCreateWindowEvent_serial(XCreateWindowEvent *i)
 {
           return(i->serial);
 }
 
-void set_XCreateWindowEvent_serial(i, j)
-XCreateWindowEvent* i;
-int j;
+void set_XCreateWindowEvent_serial(XCreateWindowEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XCreateWindowEvent_type(i)
-XCreateWindowEvent* i;
+int  XCreateWindowEvent_type(XCreateWindowEvent *i)
 {
           return(i->type);
 }
 
-void set_XCreateWindowEvent_type(i, j)
-XCreateWindowEvent* i;
-int j;
+void set_XCreateWindowEvent_type(XCreateWindowEvent *i, int j)
 {
           i->type = j;
 }
@@ -1683,84 +1319,66 @@ int j;
 
 /********* XDestroyWindowEvent funcions *****/
 
-int  make_XDestroyWindowEvent (){
+int  make_XDestroyWindowEvent (void) {
           return ((int) calloc(1, sizeof(XDestroyWindowEvent)));
 }
 
-int  XDestroyWindowEvent_window(i)
-XDestroyWindowEvent* i;
+int  XDestroyWindowEvent_window(XDestroyWindowEvent *i)
 {
           return(i->window);
 }
 
-void set_XDestroyWindowEvent_window(i, j)
-XDestroyWindowEvent* i;
-int j;
+void set_XDestroyWindowEvent_window(XDestroyWindowEvent *i, int j)
 {
           i->window = j;
 }
 
-int  XDestroyWindowEvent_event(i)
-XDestroyWindowEvent* i;
+int  XDestroyWindowEvent_event(XDestroyWindowEvent *i)
 {
           return(i->event);
 }
 
-void set_XDestroyWindowEvent_event(i, j)
-XDestroyWindowEvent* i;
-int j;
+void set_XDestroyWindowEvent_event(XDestroyWindowEvent *i, int j)
 {
           i->event = j;
 }
 
-Display *XDestroyWindowEvent_display(i)
-XDestroyWindowEvent* i;
+Display *XDestroyWindowEvent_display(XDestroyWindowEvent *i)
 {
           return(i->display);
 }
 
-void set_XDestroyWindowEvent_display(i, j)
-XDestroyWindowEvent* i;
-Display *j;
+void set_XDestroyWindowEvent_display(XDestroyWindowEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XDestroyWindowEvent_send_event(i)
-XDestroyWindowEvent* i;
+int  XDestroyWindowEvent_send_event(XDestroyWindowEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XDestroyWindowEvent_send_event(i, j)
-XDestroyWindowEvent* i;
-int j;
+void set_XDestroyWindowEvent_send_event(XDestroyWindowEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XDestroyWindowEvent_serial(i)
-XDestroyWindowEvent* i;
+int  XDestroyWindowEvent_serial(XDestroyWindowEvent *i)
 {
           return(i->serial);
 }
 
-void set_XDestroyWindowEvent_serial(i, j)
-XDestroyWindowEvent* i;
-int j;
+void set_XDestroyWindowEvent_serial(XDestroyWindowEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XDestroyWindowEvent_type(i)
-XDestroyWindowEvent* i;
+int  XDestroyWindowEvent_type(XDestroyWindowEvent *i)
 {
           return(i->type);
 }
 
-void set_XDestroyWindowEvent_type(i, j)
-XDestroyWindowEvent* i;
-int j;
+void set_XDestroyWindowEvent_type(XDestroyWindowEvent *i, int j)
 {
           i->type = j;
 }
@@ -1768,97 +1386,76 @@ int j;
 
 /********* XUnmapEvent funcions *****/
 
-int  make_XUnmapEvent (){
+int  make_XUnmapEvent (void) {
           return ((int) calloc(1, sizeof(XUnmapEvent)));
 }
 
-int  XUnmapEvent_from_configure(i)
-XUnmapEvent* i;
+int  XUnmapEvent_from_configure(XUnmapEvent *i)
 {
           return(i->from_configure);
 }
 
-void set_XUnmapEvent_from_configure(i, j)
-XUnmapEvent* i;
-int j;
+void set_XUnmapEvent_from_configure(XUnmapEvent *i, int j)
 {
           i->from_configure = j;
 }
 
-int  XUnmapEvent_window(i)
-XUnmapEvent* i;
+int  XUnmapEvent_window(XUnmapEvent *i)
 {
           return(i->window);
 }
 
-void set_XUnmapEvent_window(i, j)
-XUnmapEvent* i;
-int j;
+void set_XUnmapEvent_window(XUnmapEvent *i, int j)
 {
           i->window = j;
 }
 
-int  XUnmapEvent_event(i)
-XUnmapEvent* i;
+int  XUnmapEvent_event(XUnmapEvent *i)
 {
           return(i->event);
 }
 
-void set_XUnmapEvent_event(i, j)
-XUnmapEvent* i;
-int j;
+void set_XUnmapEvent_event(XUnmapEvent *i, int j)
 {
           i->event = j;
 }
 
-Display *XUnmapEvent_display(i)
-XUnmapEvent* i;
+Display *XUnmapEvent_display(XUnmapEvent *i)
 {
           return(i->display);
 }
 
-void set_XUnmapEvent_display(i, j)
-XUnmapEvent* i;
-Display *j;
+void set_XUnmapEvent_display(XUnmapEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XUnmapEvent_send_event(i)
-XUnmapEvent* i;
+int  XUnmapEvent_send_event(XUnmapEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XUnmapEvent_send_event(i, j)
-XUnmapEvent* i;
-int j;
+void set_XUnmapEvent_send_event(XUnmapEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XUnmapEvent_serial(i)
-XUnmapEvent* i;
+int  XUnmapEvent_serial(XUnmapEvent *i)
 {
           return(i->serial);
 }
 
-void set_XUnmapEvent_serial(i, j)
-XUnmapEvent* i;
-int j;
+void set_XUnmapEvent_serial(XUnmapEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XUnmapEvent_type(i)
-XUnmapEvent* i;
+int  XUnmapEvent_type(XUnmapEvent *i)
 {
           return(i->type);
 }
 
-void set_XUnmapEvent_type(i, j)
-XUnmapEvent* i;
-int j;
+void set_XUnmapEvent_type(XUnmapEvent *i, int j)
 {
           i->type = j;
 }
@@ -1866,97 +1463,76 @@ int j;
 
 /********* XMapEvent funcions *****/
 
-int  make_XMapEvent (){
+int  make_XMapEvent (void) {
           return ((int) calloc(1, sizeof(XMapEvent)));
 }
 
-int  XMapEvent_override_redirect(i)
-XMapEvent* i;
+int  XMapEvent_override_redirect(XMapEvent *i)
 {
           return(i->override_redirect);
 }
 
-void set_XMapEvent_override_redirect(i, j)
-XMapEvent* i;
-int j;
+void set_XMapEvent_override_redirect(XMapEvent *i, int j)
 {
           i->override_redirect = j;
 }
 
-int  XMapEvent_window(i)
-XMapEvent* i;
+int  XMapEvent_window(XMapEvent *i)
 {
           return(i->window);
 }
 
-void set_XMapEvent_window(i, j)
-XMapEvent* i;
-int j;
+void set_XMapEvent_window(XMapEvent *i, int j)
 {
           i->window = j;
 }
 
-int  XMapEvent_event(i)
-XMapEvent* i;
+int  XMapEvent_event(XMapEvent *i)
 {
           return(i->event);
 }
 
-void set_XMapEvent_event(i, j)
-XMapEvent* i;
-int j;
+void set_XMapEvent_event(XMapEvent *i, int j)
 {
           i->event = j;
 }
 
-Display *XMapEvent_display(i)
-XMapEvent* i;
+Display *XMapEvent_display(XMapEvent *i)
 {
           return(i->display);
 }
 
-void set_XMapEvent_display(i, j)
-XMapEvent* i;
-Display *j;
+void set_XMapEvent_display(XMapEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XMapEvent_send_event(i)
-XMapEvent* i;
+int  XMapEvent_send_event(XMapEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XMapEvent_send_event(i, j)
-XMapEvent* i;
-int j;
+void set_XMapEvent_send_event(XMapEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XMapEvent_serial(i)
-XMapEvent* i;
+int  XMapEvent_serial(XMapEvent *i)
 {
           return(i->serial);
 }
 
-void set_XMapEvent_serial(i, j)
-XMapEvent* i;
-int j;
+void set_XMapEvent_serial(XMapEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XMapEvent_type(i)
-XMapEvent* i;
+int  XMapEvent_type(XMapEvent *i)
 {
           return(i->type);
 }
 
-void set_XMapEvent_type(i, j)
-XMapEvent* i;
-int j;
+void set_XMapEvent_type(XMapEvent *i, int j)
 {
           i->type = j;
 }
@@ -1964,84 +1540,66 @@ int j;
 
 /********* XMapRequestEvent funcions *****/
 
-int  make_XMapRequestEvent (){
+int  make_XMapRequestEvent (void) {
           return ((int) calloc(1, sizeof(XMapRequestEvent)));
 }
 
-int  XMapRequestEvent_window(i)
-XMapRequestEvent* i;
+int  XMapRequestEvent_window(XMapRequestEvent *i)
 {
           return(i->window);
 }
 
-void set_XMapRequestEvent_window(i, j)
-XMapRequestEvent* i;
-int j;
+void set_XMapRequestEvent_window(XMapRequestEvent *i, int j)
 {
           i->window = j;
 }
 
-int  XMapRequestEvent_parent(i)
-XMapRequestEvent* i;
+int  XMapRequestEvent_parent(XMapRequestEvent *i)
 {
           return(i->parent);
 }
 
-void set_XMapRequestEvent_parent(i, j)
-XMapRequestEvent* i;
-int j;
+void set_XMapRequestEvent_parent(XMapRequestEvent *i, int j)
 {
           i->parent = j;
 }
 
-Display *XMapRequestEvent_display(i)
-XMapRequestEvent* i;
+Display *XMapRequestEvent_display(XMapRequestEvent *i)
 {
           return(i->display);
 }
 
-void set_XMapRequestEvent_display(i, j)
-XMapRequestEvent* i;
-Display *j;
+void set_XMapRequestEvent_display(XMapRequestEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XMapRequestEvent_send_event(i)
-XMapRequestEvent* i;
+int  XMapRequestEvent_send_event(XMapRequestEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XMapRequestEvent_send_event(i, j)
-XMapRequestEvent* i;
-int j;
+void set_XMapRequestEvent_send_event(XMapRequestEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XMapRequestEvent_serial(i)
-XMapRequestEvent* i;
+int  XMapRequestEvent_serial(XMapRequestEvent *i)
 {
           return(i->serial);
 }
 
-void set_XMapRequestEvent_serial(i, j)
-XMapRequestEvent* i;
-int j;
+void set_XMapRequestEvent_serial(XMapRequestEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XMapRequestEvent_type(i)
-XMapRequestEvent* i;
+int  XMapRequestEvent_type(XMapRequestEvent *i)
 {
           return(i->type);
 }
 
-void set_XMapRequestEvent_type(i, j)
-XMapRequestEvent* i;
-int j;
+void set_XMapRequestEvent_type(XMapRequestEvent *i, int j)
 {
           i->type = j;
 }
@@ -2049,136 +1607,106 @@ int j;
 
 /********* XReparentEvent funcions *****/
 
-int  make_XReparentEvent (){
+int  make_XReparentEvent (void) {
           return ((int) calloc(1, sizeof(XReparentEvent)));
 }
 
-int  XReparentEvent_override_redirect(i)
-XReparentEvent* i;
+int  XReparentEvent_override_redirect(XReparentEvent *i)
 {
           return(i->override_redirect);
 }
 
-void set_XReparentEvent_override_redirect(i, j)
-XReparentEvent* i;
-int j;
+void set_XReparentEvent_override_redirect(XReparentEvent *i, int j)
 {
           i->override_redirect = j;
 }
 
-int  XReparentEvent_y(i)
-XReparentEvent* i;
+int  XReparentEvent_y(XReparentEvent *i)
 {
           return(i->y);
 }
 
-void set_XReparentEvent_y(i, j)
-XReparentEvent* i;
-int j;
+void set_XReparentEvent_y(XReparentEvent *i, int j)
 {
           i->y = j;
 }
 
-int  XReparentEvent_x(i)
-XReparentEvent* i;
+int  XReparentEvent_x(XReparentEvent *i)
 {
           return(i->x);
 }
 
-void set_XReparentEvent_x(i, j)
-XReparentEvent* i;
-int j;
+void set_XReparentEvent_x(XReparentEvent *i, int j)
 {
           i->x = j;
 }
 
-int  XReparentEvent_parent(i)
-XReparentEvent* i;
+int  XReparentEvent_parent(XReparentEvent *i)
 {
           return(i->parent);
 }
 
-void set_XReparentEvent_parent(i, j)
-XReparentEvent* i;
-int j;
+void set_XReparentEvent_parent(XReparentEvent *i, int j)
 {
           i->parent = j;
 }
 
-int  XReparentEvent_window(i)
-XReparentEvent* i;
+int  XReparentEvent_window(XReparentEvent *i)
 {
           return(i->window);
 }
 
-void set_XReparentEvent_window(i, j)
-XReparentEvent* i;
-int j;
+void set_XReparentEvent_window(XReparentEvent *i, int j)
 {
           i->window = j;
 }
 
-int  XReparentEvent_event(i)
-XReparentEvent* i;
+int  XReparentEvent_event(XReparentEvent *i)
 {
           return(i->event);
 }
 
-void set_XReparentEvent_event(i, j)
-XReparentEvent* i;
-int j;
+void set_XReparentEvent_event(XReparentEvent *i, int j)
 {
           i->event = j;
 }
 
-Display *XReparentEvent_display(i)
-XReparentEvent* i;
+Display *XReparentEvent_display(XReparentEvent *i)
 {
           return(i->display);
 }
 
-void set_XReparentEvent_display(i, j)
-XReparentEvent* i;
-Display *j;
+void set_XReparentEvent_display(XReparentEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XReparentEvent_send_event(i)
-XReparentEvent* i;
+int  XReparentEvent_send_event(XReparentEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XReparentEvent_send_event(i, j)
-XReparentEvent* i;
-int j;
+void set_XReparentEvent_send_event(XReparentEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XReparentEvent_serial(i)
-XReparentEvent* i;
+int  XReparentEvent_serial(XReparentEvent *i)
 {
           return(i->serial);
 }
 
-void set_XReparentEvent_serial(i, j)
-XReparentEvent* i;
-int j;
+void set_XReparentEvent_serial(XReparentEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XReparentEvent_type(i)
-XReparentEvent* i;
+int  XReparentEvent_type(XReparentEvent *i)
 {
           return(i->type);
 }
 
-void set_XReparentEvent_type(i, j)
-XReparentEvent* i;
-int j;
+void set_XReparentEvent_type(XReparentEvent *i, int j)
 {
           i->type = j;
 }
@@ -2186,175 +1714,136 @@ int j;
 
 /********* XConfigureEvent funcions *****/
 
-int  make_XConfigureEvent (){
+int  make_XConfigureEvent (void) {
           return ((int) calloc(1, sizeof(XConfigureEvent)));
 }
 
-int  XConfigureEvent_override_redirect(i)
-XConfigureEvent* i;
+int  XConfigureEvent_override_redirect(XConfigureEvent *i)
 {
           return(i->override_redirect);
 }
 
-void set_XConfigureEvent_override_redirect(i, j)
-XConfigureEvent* i;
-int j;
+void set_XConfigureEvent_override_redirect(XConfigureEvent *i, int j)
 {
           i->override_redirect = j;
 }
 
-int  XConfigureEvent_above(i)
-XConfigureEvent* i;
+int  XConfigureEvent_above(XConfigureEvent *i)
 {
           return(i->above);
 }
 
-void set_XConfigureEvent_above(i, j)
-XConfigureEvent* i;
-int j;
+void set_XConfigureEvent_above(XConfigureEvent *i, int j)
 {
           i->above = j;
 }
 
-int  XConfigureEvent_border_width(i)
-XConfigureEvent* i;
+int  XConfigureEvent_border_width(XConfigureEvent *i)
 {
           return(i->border_width);
 }
 
-void set_XConfigureEvent_border_width(i, j)
-XConfigureEvent* i;
-int j;
+void set_XConfigureEvent_border_width(XConfigureEvent *i, int j)
 {
           i->border_width = j;
 }
 
-int  XConfigureEvent_height(i)
-XConfigureEvent* i;
+int  XConfigureEvent_height(XConfigureEvent *i)
 {
           return(i->height);
 }
 
-void set_XConfigureEvent_height(i, j)
-XConfigureEvent* i;
-int j;
+void set_XConfigureEvent_height(XConfigureEvent *i, int j)
 {
           i->height = j;
 }
 
-int  XConfigureEvent_width(i)
-XConfigureEvent* i;
+int  XConfigureEvent_width(XConfigureEvent *i)
 {
           return(i->width);
 }
 
-void set_XConfigureEvent_width(i, j)
-XConfigureEvent* i;
-int j;
+void set_XConfigureEvent_width(XConfigureEvent *i, int j)
 {
           i->width = j;
 }
 
-int  XConfigureEvent_y(i)
-XConfigureEvent* i;
+int  XConfigureEvent_y(XConfigureEvent *i)
 {
           return(i->y);
 }
 
-void set_XConfigureEvent_y(i, j)
-XConfigureEvent* i;
-int j;
+void set_XConfigureEvent_y(XConfigureEvent *i, int j)
 {
           i->y = j;
 }
 
-int  XConfigureEvent_x(i)
-XConfigureEvent* i;
+int  XConfigureEvent_x(XConfigureEvent *i)
 {
           return(i->x);
 }
 
-void set_XConfigureEvent_x(i, j)
-XConfigureEvent* i;
-int j;
+void set_XConfigureEvent_x(XConfigureEvent *i, int j)
 {
           i->x = j;
 }
 
-int  XConfigureEvent_window(i)
-XConfigureEvent* i;
+int  XConfigureEvent_window(XConfigureEvent *i)
 {
           return(i->window);
 }
 
-void set_XConfigureEvent_window(i, j)
-XConfigureEvent* i;
-int j;
+void set_XConfigureEvent_window(XConfigureEvent *i, int j)
 {
           i->window = j;
 }
 
-int  XConfigureEvent_event(i)
-XConfigureEvent* i;
+int  XConfigureEvent_event(XConfigureEvent *i)
 {
           return(i->event);
 }
 
-void set_XConfigureEvent_event(i, j)
-XConfigureEvent* i;
-int j;
+void set_XConfigureEvent_event(XConfigureEvent *i, int j)
 {
           i->event = j;
 }
 
-Display *XConfigureEvent_display(i)
-XConfigureEvent* i;
+Display *XConfigureEvent_display(XConfigureEvent *i)
 {
           return(i->display);
 }
 
-void set_XConfigureEvent_display(i, j)
-XConfigureEvent* i;
-Display *j;
+void set_XConfigureEvent_display(XConfigureEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XConfigureEvent_send_event(i)
-XConfigureEvent* i;
+int  XConfigureEvent_send_event(XConfigureEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XConfigureEvent_send_event(i, j)
-XConfigureEvent* i;
-int j;
+void set_XConfigureEvent_send_event(XConfigureEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XConfigureEvent_serial(i)
-XConfigureEvent* i;
+int  XConfigureEvent_serial(XConfigureEvent *i)
 {
           return(i->serial);
 }
 
-void set_XConfigureEvent_serial(i, j)
-XConfigureEvent* i;
-int j;
+void set_XConfigureEvent_serial(XConfigureEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XConfigureEvent_type(i)
-XConfigureEvent* i;
+int  XConfigureEvent_type(XConfigureEvent *i)
 {
           return(i->type);
 }
 
-void set_XConfigureEvent_type(i, j)
-XConfigureEvent* i;
-int j;
+void set_XConfigureEvent_type(XConfigureEvent *i, int j)
 {
           i->type = j;
 }
@@ -2362,110 +1851,86 @@ int j;
 
 /********* XGravityEvent funcions *****/
 
-int  make_XGravityEvent (){
+int  make_XGravityEvent (void) {
           return ((int) calloc(1, sizeof(XGravityEvent)));
 }
 
-int  XGravityEvent_y(i)
-XGravityEvent* i;
+int  XGravityEvent_y(XGravityEvent *i)
 {
           return(i->y);
 }
 
-void set_XGravityEvent_y(i, j)
-XGravityEvent* i;
-int j;
+void set_XGravityEvent_y(XGravityEvent *i, int j)
 {
           i->y = j;
 }
 
-int  XGravityEvent_x(i)
-XGravityEvent* i;
+int  XGravityEvent_x(XGravityEvent *i)
 {
           return(i->x);
 }
 
-void set_XGravityEvent_x(i, j)
-XGravityEvent* i;
-int j;
+void set_XGravityEvent_x(XGravityEvent *i, int j)
 {
           i->x = j;
 }
 
-int  XGravityEvent_window(i)
-XGravityEvent* i;
+int  XGravityEvent_window(XGravityEvent *i)
 {
           return(i->window);
 }
 
-void set_XGravityEvent_window(i, j)
-XGravityEvent* i;
-int j;
+void set_XGravityEvent_window(XGravityEvent *i, int j)
 {
           i->window = j;
 }
 
-int  XGravityEvent_event(i)
-XGravityEvent* i;
+int  XGravityEvent_event(XGravityEvent *i)
 {
           return(i->event);
 }
 
-void set_XGravityEvent_event(i, j)
-XGravityEvent* i;
-int j;
+void set_XGravityEvent_event(XGravityEvent *i, int j)
 {
           i->event = j;
 }
 
-Display *XGravityEvent_display(i)
-XGravityEvent* i;
+Display *XGravityEvent_display(XGravityEvent *i)
 {
           return(i->display);
 }
 
-void set_XGravityEvent_display(i, j)
-XGravityEvent* i;
-Display *j;
+void set_XGravityEvent_display(XGravityEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XGravityEvent_send_event(i)
-XGravityEvent* i;
+int  XGravityEvent_send_event(XGravityEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XGravityEvent_send_event(i, j)
-XGravityEvent* i;
-int j;
+void set_XGravityEvent_send_event(XGravityEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XGravityEvent_serial(i)
-XGravityEvent* i;
+int  XGravityEvent_serial(XGravityEvent *i)
 {
           return(i->serial);
 }
 
-void set_XGravityEvent_serial(i, j)
-XGravityEvent* i;
-int j;
+void set_XGravityEvent_serial(XGravityEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XGravityEvent_type(i)
-XGravityEvent* i;
+int  XGravityEvent_type(XGravityEvent *i)
 {
           return(i->type);
 }
 
-void set_XGravityEvent_type(i, j)
-XGravityEvent* i;
-int j;
+void set_XGravityEvent_type(XGravityEvent *i, int j)
 {
           i->type = j;
 }
@@ -2473,97 +1938,76 @@ int j;
 
 /********* XResizeRequestEvent funcions *****/
 
-int  make_XResizeRequestEvent (){
+int  make_XResizeRequestEvent (void) {
           return ((int) calloc(1, sizeof(XResizeRequestEvent)));
 }
 
-int  XResizeRequestEvent_height(i)
-XResizeRequestEvent* i;
+int  XResizeRequestEvent_height(XResizeRequestEvent *i)
 {
           return(i->height);
 }
 
-void set_XResizeRequestEvent_height(i, j)
-XResizeRequestEvent* i;
-int j;
+void set_XResizeRequestEvent_height(XResizeRequestEvent *i, int j)
 {
           i->height = j;
 }
 
-int  XResizeRequestEvent_width(i)
-XResizeRequestEvent* i;
+int  XResizeRequestEvent_width(XResizeRequestEvent *i)
 {
           return(i->width);
 }
 
-void set_XResizeRequestEvent_width(i, j)
-XResizeRequestEvent* i;
-int j;
+void set_XResizeRequestEvent_width(XResizeRequestEvent *i, int j)
 {
           i->width = j;
 }
 
-int  XResizeRequestEvent_window(i)
-XResizeRequestEvent* i;
+int  XResizeRequestEvent_window(XResizeRequestEvent *i)
 {
           return(i->window);
 }
 
-void set_XResizeRequestEvent_window(i, j)
-XResizeRequestEvent* i;
-int j;
+void set_XResizeRequestEvent_window(XResizeRequestEvent *i, int j)
 {
           i->window = j;
 }
 
-Display *XResizeRequestEvent_display(i)
-XResizeRequestEvent* i;
+Display *XResizeRequestEvent_display(XResizeRequestEvent *i)
 {
           return(i->display);
 }
 
-void set_XResizeRequestEvent_display(i, j)
-XResizeRequestEvent* i;
-Display *j;
+void set_XResizeRequestEvent_display(XResizeRequestEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XResizeRequestEvent_send_event(i)
-XResizeRequestEvent* i;
+int  XResizeRequestEvent_send_event(XResizeRequestEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XResizeRequestEvent_send_event(i, j)
-XResizeRequestEvent* i;
-int j;
+void set_XResizeRequestEvent_send_event(XResizeRequestEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XResizeRequestEvent_serial(i)
-XResizeRequestEvent* i;
+int  XResizeRequestEvent_serial(XResizeRequestEvent *i)
 {
           return(i->serial);
 }
 
-void set_XResizeRequestEvent_serial(i, j)
-XResizeRequestEvent* i;
-int j;
+void set_XResizeRequestEvent_serial(XResizeRequestEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XResizeRequestEvent_type(i)
-XResizeRequestEvent* i;
+int  XResizeRequestEvent_type(XResizeRequestEvent *i)
 {
           return(i->type);
 }
 
-void set_XResizeRequestEvent_type(i, j)
-XResizeRequestEvent* i;
-int j;
+void set_XResizeRequestEvent_type(XResizeRequestEvent *i, int j)
 {
           i->type = j;
 }
@@ -2571,188 +2015,146 @@ int j;
 
 /********* XConfigureRequestEvent funcions *****/
 
-int  make_XConfigureRequestEvent (){
+int  make_XConfigureRequestEvent (void) {
           return ((int) calloc(1, sizeof(XConfigureRequestEvent)));
 }
 
-int  XConfigureRequestEvent_value_mask(i)
-XConfigureRequestEvent* i;
+int  XConfigureRequestEvent_value_mask(XConfigureRequestEvent *i)
 {
           return(i->value_mask);
 }
 
-void set_XConfigureRequestEvent_value_mask(i, j)
-XConfigureRequestEvent* i;
-int j;
+void set_XConfigureRequestEvent_value_mask(XConfigureRequestEvent *i, int j)
 {
           i->value_mask = j;
 }
 
-int  XConfigureRequestEvent_detail(i)
-XConfigureRequestEvent* i;
+int  XConfigureRequestEvent_detail(XConfigureRequestEvent *i)
 {
           return(i->detail);
 }
 
-void set_XConfigureRequestEvent_detail(i, j)
-XConfigureRequestEvent* i;
-int j;
+void set_XConfigureRequestEvent_detail(XConfigureRequestEvent *i, int j)
 {
           i->detail = j;
 }
 
-int  XConfigureRequestEvent_above(i)
-XConfigureRequestEvent* i;
+int  XConfigureRequestEvent_above(XConfigureRequestEvent *i)
 {
           return(i->above);
 }
 
-void set_XConfigureRequestEvent_above(i, j)
-XConfigureRequestEvent* i;
-int j;
+void set_XConfigureRequestEvent_above(XConfigureRequestEvent *i, int j)
 {
           i->above = j;
 }
 
-int  XConfigureRequestEvent_border_width(i)
-XConfigureRequestEvent* i;
+int  XConfigureRequestEvent_border_width(XConfigureRequestEvent *i)
 {
           return(i->border_width);
 }
 
-void set_XConfigureRequestEvent_border_width(i, j)
-XConfigureRequestEvent* i;
-int j;
+void set_XConfigureRequestEvent_border_width(XConfigureRequestEvent *i, int j)
 {
           i->border_width = j;
 }
 
-int  XConfigureRequestEvent_height(i)
-XConfigureRequestEvent* i;
+int  XConfigureRequestEvent_height(XConfigureRequestEvent *i)
 {
           return(i->height);
 }
 
-void set_XConfigureRequestEvent_height(i, j)
-XConfigureRequestEvent* i;
-int j;
+void set_XConfigureRequestEvent_height(XConfigureRequestEvent *i, int j)
 {
           i->height = j;
 }
 
-int  XConfigureRequestEvent_width(i)
-XConfigureRequestEvent* i;
+int  XConfigureRequestEvent_width(XConfigureRequestEvent *i)
 {
           return(i->width);
 }
 
-void set_XConfigureRequestEvent_width(i, j)
-XConfigureRequestEvent* i;
-int j;
+void set_XConfigureRequestEvent_width(XConfigureRequestEvent *i, int j)
 {
           i->width = j;
 }
 
-int  XConfigureRequestEvent_y(i)
-XConfigureRequestEvent* i;
+int  XConfigureRequestEvent_y(XConfigureRequestEvent *i)
 {
           return(i->y);
 }
 
-void set_XConfigureRequestEvent_y(i, j)
-XConfigureRequestEvent* i;
-int j;
+void set_XConfigureRequestEvent_y(XConfigureRequestEvent *i, int j)
 {
           i->y = j;
 }
 
-int  XConfigureRequestEvent_x(i)
-XConfigureRequestEvent* i;
+int  XConfigureRequestEvent_x(XConfigureRequestEvent *i)
 {
           return(i->x);
 }
 
-void set_XConfigureRequestEvent_x(i, j)
-XConfigureRequestEvent* i;
-int j;
+void set_XConfigureRequestEvent_x(XConfigureRequestEvent *i, int j)
 {
           i->x = j;
 }
 
-int  XConfigureRequestEvent_window(i)
-XConfigureRequestEvent* i;
+int  XConfigureRequestEvent_window(XConfigureRequestEvent *i)
 {
           return(i->window);
 }
 
-void set_XConfigureRequestEvent_window(i, j)
-XConfigureRequestEvent* i;
-int j;
+void set_XConfigureRequestEvent_window(XConfigureRequestEvent *i, int j)
 {
           i->window = j;
 }
 
-int  XConfigureRequestEvent_parent(i)
-XConfigureRequestEvent* i;
+int  XConfigureRequestEvent_parent(XConfigureRequestEvent *i)
 {
           return(i->parent);
 }
 
-void set_XConfigureRequestEvent_parent(i, j)
-XConfigureRequestEvent* i;
-int j;
+void set_XConfigureRequestEvent_parent(XConfigureRequestEvent *i, int j)
 {
           i->parent = j;
 }
 
-Display *XConfigureRequestEvent_display(i)
-XConfigureRequestEvent* i;
+Display *XConfigureRequestEvent_display(XConfigureRequestEvent *i)
 {
           return(i->display);
 }
 
-void set_XConfigureRequestEvent_display(i, j)
-XConfigureRequestEvent* i;
-Display *j;
+void set_XConfigureRequestEvent_display(XConfigureRequestEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XConfigureRequestEvent_send_event(i)
-XConfigureRequestEvent* i;
+int  XConfigureRequestEvent_send_event(XConfigureRequestEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XConfigureRequestEvent_send_event(i, j)
-XConfigureRequestEvent* i;
-int j;
+void set_XConfigureRequestEvent_send_event(XConfigureRequestEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XConfigureRequestEvent_serial(i)
-XConfigureRequestEvent* i;
+int  XConfigureRequestEvent_serial(XConfigureRequestEvent *i)
 {
           return(i->serial);
 }
 
-void set_XConfigureRequestEvent_serial(i, j)
-XConfigureRequestEvent* i;
-int j;
+void set_XConfigureRequestEvent_serial(XConfigureRequestEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XConfigureRequestEvent_type(i)
-XConfigureRequestEvent* i;
+int  XConfigureRequestEvent_type(XConfigureRequestEvent *i)
 {
           return(i->type);
 }
 
-void set_XConfigureRequestEvent_type(i, j)
-XConfigureRequestEvent* i;
-int j;
+void set_XConfigureRequestEvent_type(XConfigureRequestEvent *i, int j)
 {
           i->type = j;
 }
@@ -2760,97 +2162,76 @@ int j;
 
 /********* XCirculateEvent funcions *****/
 
-int  make_XCirculateEvent (){
+int  make_XCirculateEvent (void) {
           return ((int) calloc(1, sizeof(XCirculateEvent)));
 }
 
-int  XCirculateEvent_place(i)
-XCirculateEvent* i;
+int  XCirculateEvent_place(XCirculateEvent *i)
 {
           return(i->place);
 }
 
-void set_XCirculateEvent_place(i, j)
-XCirculateEvent* i;
-int j;
+void set_XCirculateEvent_place(XCirculateEvent *i, int j)
 {
           i->place = j;
 }
 
-int  XCirculateEvent_window(i)
-XCirculateEvent* i;
+int  XCirculateEvent_window(XCirculateEvent *i)
 {
           return(i->window);
 }
 
-void set_XCirculateEvent_window(i, j)
-XCirculateEvent* i;
-int j;
+void set_XCirculateEvent_window(XCirculateEvent *i, int j)
 {
           i->window = j;
 }
 
-int  XCirculateEvent_event(i)
-XCirculateEvent* i;
+int  XCirculateEvent_event(XCirculateEvent *i)
 {
           return(i->event);
 }
 
-void set_XCirculateEvent_event(i, j)
-XCirculateEvent* i;
-int j;
+void set_XCirculateEvent_event(XCirculateEvent *i, int j)
 {
           i->event = j;
 }
 
-Display *XCirculateEvent_display(i)
-XCirculateEvent* i;
+Display *XCirculateEvent_display(XCirculateEvent *i)
 {
           return(i->display);
 }
 
-void set_XCirculateEvent_display(i, j)
-XCirculateEvent* i;
-Display *j;
+void set_XCirculateEvent_display(XCirculateEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XCirculateEvent_send_event(i)
-XCirculateEvent* i;
+int  XCirculateEvent_send_event(XCirculateEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XCirculateEvent_send_event(i, j)
-XCirculateEvent* i;
-int j;
+void set_XCirculateEvent_send_event(XCirculateEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XCirculateEvent_serial(i)
-XCirculateEvent* i;
+int  XCirculateEvent_serial(XCirculateEvent *i)
 {
           return(i->serial);
 }
 
-void set_XCirculateEvent_serial(i, j)
-XCirculateEvent* i;
-int j;
+void set_XCirculateEvent_serial(XCirculateEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XCirculateEvent_type(i)
-XCirculateEvent* i;
+int  XCirculateEvent_type(XCirculateEvent *i)
 {
           return(i->type);
 }
 
-void set_XCirculateEvent_type(i, j)
-XCirculateEvent* i;
-int j;
+void set_XCirculateEvent_type(XCirculateEvent *i, int j)
 {
           i->type = j;
 }
@@ -2858,97 +2239,76 @@ int j;
 
 /********* XCirculateRequestEvent funcions *****/
 
-int  make_XCirculateRequestEvent (){
+int  make_XCirculateRequestEvent (void) {
           return ((int) calloc(1, sizeof(XCirculateRequestEvent)));
 }
 
-int  XCirculateRequestEvent_place(i)
-XCirculateRequestEvent* i;
+int  XCirculateRequestEvent_place(XCirculateRequestEvent *i)
 {
           return(i->place);
 }
 
-void set_XCirculateRequestEvent_place(i, j)
-XCirculateRequestEvent* i;
-int j;
+void set_XCirculateRequestEvent_place(XCirculateRequestEvent *i, int j)
 {
           i->place = j;
 }
 
-int  XCirculateRequestEvent_window(i)
-XCirculateRequestEvent* i;
+int  XCirculateRequestEvent_window(XCirculateRequestEvent *i)
 {
           return(i->window);
 }
 
-void set_XCirculateRequestEvent_window(i, j)
-XCirculateRequestEvent* i;
-int j;
+void set_XCirculateRequestEvent_window(XCirculateRequestEvent *i, int j)
 {
           i->window = j;
 }
 
-int  XCirculateRequestEvent_parent(i)
-XCirculateRequestEvent* i;
+int  XCirculateRequestEvent_parent(XCirculateRequestEvent *i)
 {
           return(i->parent);
 }
 
-void set_XCirculateRequestEvent_parent(i, j)
-XCirculateRequestEvent* i;
-int j;
+void set_XCirculateRequestEvent_parent(XCirculateRequestEvent *i, int j)
 {
           i->parent = j;
 }
 
-Display *XCirculateRequestEvent_display(i)
-XCirculateRequestEvent* i;
+Display *XCirculateRequestEvent_display(XCirculateRequestEvent *i)
 {
           return(i->display);
 }
 
-void set_XCirculateRequestEvent_display(i, j)
-XCirculateRequestEvent* i;
-Display *j;
+void set_XCirculateRequestEvent_display(XCirculateRequestEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XCirculateRequestEvent_send_event(i)
-XCirculateRequestEvent* i;
+int  XCirculateRequestEvent_send_event(XCirculateRequestEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XCirculateRequestEvent_send_event(i, j)
-XCirculateRequestEvent* i;
-int j;
+void set_XCirculateRequestEvent_send_event(XCirculateRequestEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XCirculateRequestEvent_serial(i)
-XCirculateRequestEvent* i;
+int  XCirculateRequestEvent_serial(XCirculateRequestEvent *i)
 {
           return(i->serial);
 }
 
-void set_XCirculateRequestEvent_serial(i, j)
-XCirculateRequestEvent* i;
-int j;
+void set_XCirculateRequestEvent_serial(XCirculateRequestEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XCirculateRequestEvent_type(i)
-XCirculateRequestEvent* i;
+int  XCirculateRequestEvent_type(XCirculateRequestEvent *i)
 {
           return(i->type);
 }
 
-void set_XCirculateRequestEvent_type(i, j)
-XCirculateRequestEvent* i;
-int j;
+void set_XCirculateRequestEvent_type(XCirculateRequestEvent *i, int j)
 {
           i->type = j;
 }
@@ -2956,110 +2316,86 @@ int j;
 
 /********* XPropertyEvent funcions *****/
 
-int  make_XPropertyEvent (){
+int  make_XPropertyEvent (void) {
           return ((int) calloc(1, sizeof(XPropertyEvent)));
 }
 
-int  XPropertyEvent_state(i)
-XPropertyEvent* i;
+int  XPropertyEvent_state(XPropertyEvent *i)
 {
           return(i->state);
 }
 
-void set_XPropertyEvent_state(i, j)
-XPropertyEvent* i;
-int j;
+void set_XPropertyEvent_state(XPropertyEvent *i, int j)
 {
           i->state = j;
 }
 
-int  XPropertyEvent_time(i)
-XPropertyEvent* i;
+int  XPropertyEvent_time(XPropertyEvent *i)
 {
           return(i->time);
 }
 
-void set_XPropertyEvent_time(i, j)
-XPropertyEvent* i;
-int j;
+void set_XPropertyEvent_time(XPropertyEvent *i, int j)
 {
           i->time = j;
 }
 
-int  XPropertyEvent_atom(i)
-XPropertyEvent* i;
+int  XPropertyEvent_atom(XPropertyEvent *i)
 {
           return(i->atom);
 }
 
-void set_XPropertyEvent_atom(i, j)
-XPropertyEvent* i;
-int j;
+void set_XPropertyEvent_atom(XPropertyEvent *i, int j)
 {
           i->atom = j;
 }
 
-int  XPropertyEvent_window(i)
-XPropertyEvent* i;
+int  XPropertyEvent_window(XPropertyEvent *i)
 {
           return(i->window);
 }
 
-void set_XPropertyEvent_window(i, j)
-XPropertyEvent* i;
-int j;
+void set_XPropertyEvent_window(XPropertyEvent *i, int j)
 {
           i->window = j;
 }
 
-Display *XPropertyEvent_display(i)
-XPropertyEvent* i;
+Display *XPropertyEvent_display(XPropertyEvent *i)
 {
           return(i->display);
 }
 
-void set_XPropertyEvent_display(i, j)
-XPropertyEvent* i;
-Display *j;
+void set_XPropertyEvent_display(XPropertyEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XPropertyEvent_send_event(i)
-XPropertyEvent* i;
+int  XPropertyEvent_send_event(XPropertyEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XPropertyEvent_send_event(i, j)
-XPropertyEvent* i;
-int j;
+void set_XPropertyEvent_send_event(XPropertyEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XPropertyEvent_serial(i)
-XPropertyEvent* i;
+int  XPropertyEvent_serial(XPropertyEvent *i)
 {
           return(i->serial);
 }
 
-void set_XPropertyEvent_serial(i, j)
-XPropertyEvent* i;
-int j;
+void set_XPropertyEvent_serial(XPropertyEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XPropertyEvent_type(i)
-XPropertyEvent* i;
+int  XPropertyEvent_type(XPropertyEvent *i)
 {
           return(i->type);
 }
 
-void set_XPropertyEvent_type(i, j)
-XPropertyEvent* i;
-int j;
+void set_XPropertyEvent_type(XPropertyEvent *i, int j)
 {
           i->type = j;
 }
@@ -3067,97 +2403,76 @@ int j;
 
 /********* XSelectionClearEvent funcions *****/
 
-int  make_XSelectionClearEvent (){
+int  make_XSelectionClearEvent (void) {
           return ((int) calloc(1, sizeof(XSelectionClearEvent)));
 }
 
-int  XSelectionClearEvent_time(i)
-XSelectionClearEvent* i;
+int  XSelectionClearEvent_time(XSelectionClearEvent *i)
 {
           return(i->time);
 }
 
-void set_XSelectionClearEvent_time(i, j)
-XSelectionClearEvent* i;
-int j;
+void set_XSelectionClearEvent_time(XSelectionClearEvent *i, int j)
 {
           i->time = j;
 }
 
-int  XSelectionClearEvent_selection(i)
-XSelectionClearEvent* i;
+int  XSelectionClearEvent_selection(XSelectionClearEvent *i)
 {
           return(i->selection);
 }
 
-void set_XSelectionClearEvent_selection(i, j)
-XSelectionClearEvent* i;
-int j;
+void set_XSelectionClearEvent_selection(XSelectionClearEvent *i, int j)
 {
           i->selection = j;
 }
 
-int  XSelectionClearEvent_window(i)
-XSelectionClearEvent* i;
+int  XSelectionClearEvent_window(XSelectionClearEvent *i)
 {
           return(i->window);
 }
 
-void set_XSelectionClearEvent_window(i, j)
-XSelectionClearEvent* i;
-int j;
+void set_XSelectionClearEvent_window(XSelectionClearEvent *i, int j)
 {
           i->window = j;
 }
 
-Display *XSelectionClearEvent_display(i)
-XSelectionClearEvent* i;
+Display *XSelectionClearEvent_display(XSelectionClearEvent *i)
 {
           return(i->display);
 }
 
-void set_XSelectionClearEvent_display(i, j)
-XSelectionClearEvent* i;
-Display *j;
+void set_XSelectionClearEvent_display(XSelectionClearEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XSelectionClearEvent_send_event(i)
-XSelectionClearEvent* i;
+int  XSelectionClearEvent_send_event(XSelectionClearEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XSelectionClearEvent_send_event(i, j)
-XSelectionClearEvent* i;
-int j;
+void set_XSelectionClearEvent_send_event(XSelectionClearEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XSelectionClearEvent_serial(i)
-XSelectionClearEvent* i;
+int  XSelectionClearEvent_serial(XSelectionClearEvent *i)
 {
           return(i->serial);
 }
 
-void set_XSelectionClearEvent_serial(i, j)
-XSelectionClearEvent* i;
-int j;
+void set_XSelectionClearEvent_serial(XSelectionClearEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XSelectionClearEvent_type(i)
-XSelectionClearEvent* i;
+int  XSelectionClearEvent_type(XSelectionClearEvent *i)
 {
           return(i->type);
 }
 
-void set_XSelectionClearEvent_type(i, j)
-XSelectionClearEvent* i;
-int j;
+void set_XSelectionClearEvent_type(XSelectionClearEvent *i, int j)
 {
           i->type = j;
 }
@@ -3165,136 +2480,106 @@ int j;
 
 /********* XSelectionRequestEvent funcions *****/
 
-int  make_XSelectionRequestEvent (){
+int  make_XSelectionRequestEvent (void) {
           return ((int) calloc(1, sizeof(XSelectionRequestEvent)));
 }
 
-int  XSelectionRequestEvent_time(i)
-XSelectionRequestEvent* i;
+int  XSelectionRequestEvent_time(XSelectionRequestEvent *i)
 {
           return(i->time);
 }
 
-void set_XSelectionRequestEvent_time(i, j)
-XSelectionRequestEvent* i;
-int j;
+void set_XSelectionRequestEvent_time(XSelectionRequestEvent *i, int j)
 {
           i->time = j;
 }
 
-int  XSelectionRequestEvent_property(i)
-XSelectionRequestEvent* i;
+int  XSelectionRequestEvent_property(XSelectionRequestEvent *i)
 {
           return(i->property);
 }
 
-void set_XSelectionRequestEvent_property(i, j)
-XSelectionRequestEvent* i;
-int j;
+void set_XSelectionRequestEvent_property(XSelectionRequestEvent *i, int j)
 {
           i->property = j;
 }
 
-int  XSelectionRequestEvent_target(i)
-XSelectionRequestEvent* i;
+int  XSelectionRequestEvent_target(XSelectionRequestEvent *i)
 {
           return(i->target);
 }
 
-void set_XSelectionRequestEvent_target(i, j)
-XSelectionRequestEvent* i;
-int j;
+void set_XSelectionRequestEvent_target(XSelectionRequestEvent *i, int j)
 {
           i->target = j;
 }
 
-int  XSelectionRequestEvent_selection(i)
-XSelectionRequestEvent* i;
+int  XSelectionRequestEvent_selection(XSelectionRequestEvent *i)
 {
           return(i->selection);
 }
 
-void set_XSelectionRequestEvent_selection(i, j)
-XSelectionRequestEvent* i;
-int j;
+void set_XSelectionRequestEvent_selection(XSelectionRequestEvent *i, int j)
 {
           i->selection = j;
 }
 
-int  XSelectionRequestEvent_requestor(i)
-XSelectionRequestEvent* i;
+int  XSelectionRequestEvent_requestor(XSelectionRequestEvent *i)
 {
           return(i->requestor);
 }
 
-void set_XSelectionRequestEvent_requestor(i, j)
-XSelectionRequestEvent* i;
-int j;
+void set_XSelectionRequestEvent_requestor(XSelectionRequestEvent *i, int j)
 {
           i->requestor = j;
 }
 
-int  XSelectionRequestEvent_owner(i)
-XSelectionRequestEvent* i;
+int  XSelectionRequestEvent_owner(XSelectionRequestEvent *i)
 {
           return(i->owner);
 }
 
-void set_XSelectionRequestEvent_owner(i, j)
-XSelectionRequestEvent* i;
-int j;
+void set_XSelectionRequestEvent_owner(XSelectionRequestEvent *i, int j)
 {
           i->owner = j;
 }
 
-Display *XSelectionRequestEvent_display(i)
-XSelectionRequestEvent* i;
+Display *XSelectionRequestEvent_display(XSelectionRequestEvent *i)
 {
           return(i->display);
 }
 
-void set_XSelectionRequestEvent_display(i, j)
-XSelectionRequestEvent* i;
-Display *j;
+void set_XSelectionRequestEvent_display(XSelectionRequestEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XSelectionRequestEvent_send_event(i)
-XSelectionRequestEvent* i;
+int  XSelectionRequestEvent_send_event(XSelectionRequestEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XSelectionRequestEvent_send_event(i, j)
-XSelectionRequestEvent* i;
-int j;
+void set_XSelectionRequestEvent_send_event(XSelectionRequestEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XSelectionRequestEvent_serial(i)
-XSelectionRequestEvent* i;
+int  XSelectionRequestEvent_serial(XSelectionRequestEvent *i)
 {
           return(i->serial);
 }
 
-void set_XSelectionRequestEvent_serial(i, j)
-XSelectionRequestEvent* i;
-int j;
+void set_XSelectionRequestEvent_serial(XSelectionRequestEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XSelectionRequestEvent_type(i)
-XSelectionRequestEvent* i;
+int  XSelectionRequestEvent_type(XSelectionRequestEvent *i)
 {
           return(i->type);
 }
 
-void set_XSelectionRequestEvent_type(i, j)
-XSelectionRequestEvent* i;
-int j;
+void set_XSelectionRequestEvent_type(XSelectionRequestEvent *i, int j)
 {
           i->type = j;
 }
@@ -3302,123 +2587,96 @@ int j;
 
 /********* XSelectionEvent funcions *****/
 
-int  make_XSelectionEvent (){
+int  make_XSelectionEvent (void) {
           return ((int) calloc(1, sizeof(XSelectionEvent)));
 }
 
-int  XSelectionEvent_time(i)
-XSelectionEvent* i;
+int  XSelectionEvent_time(XSelectionEvent *i)
 {
           return(i->time);
 }
 
-void set_XSelectionEvent_time(i, j)
-XSelectionEvent* i;
-int j;
+void set_XSelectionEvent_time(XSelectionEvent *i, int j)
 {
           i->time = j;
 }
 
-int  XSelectionEvent_property(i)
-XSelectionEvent* i;
+int  XSelectionEvent_property(XSelectionEvent *i)
 {
           return(i->property);
 }
 
-void set_XSelectionEvent_property(i, j)
-XSelectionEvent* i;
-int j;
+void set_XSelectionEvent_property(XSelectionEvent *i, int j)
 {
           i->property = j;
 }
 
-int  XSelectionEvent_target(i)
-XSelectionEvent* i;
+int  XSelectionEvent_target(XSelectionEvent *i)
 {
           return(i->target);
 }
 
-void set_XSelectionEvent_target(i, j)
-XSelectionEvent* i;
-int j;
+void set_XSelectionEvent_target(XSelectionEvent *i, int j)
 {
           i->target = j;
 }
 
-int  XSelectionEvent_selection(i)
-XSelectionEvent* i;
+int  XSelectionEvent_selection(XSelectionEvent *i)
 {
           return(i->selection);
 }
 
-void set_XSelectionEvent_selection(i, j)
-XSelectionEvent* i;
-int j;
+void set_XSelectionEvent_selection(XSelectionEvent *i, int j)
 {
           i->selection = j;
 }
 
-int  XSelectionEvent_requestor(i)
-XSelectionEvent* i;
+int  XSelectionEvent_requestor(XSelectionEvent *i)
 {
           return(i->requestor);
 }
 
-void set_XSelectionEvent_requestor(i, j)
-XSelectionEvent* i;
-int j;
+void set_XSelectionEvent_requestor(XSelectionEvent *i, int j)
 {
           i->requestor = j;
 }
 
-Display *XSelectionEvent_display(i)
-XSelectionEvent* i;
+Display *XSelectionEvent_display(XSelectionEvent *i)
 {
           return(i->display);
 }
 
-void set_XSelectionEvent_display(i, j)
-XSelectionEvent* i;
-Display *j;
+void set_XSelectionEvent_display(XSelectionEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XSelectionEvent_send_event(i)
-XSelectionEvent* i;
+int  XSelectionEvent_send_event(XSelectionEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XSelectionEvent_send_event(i, j)
-XSelectionEvent* i;
-int j;
+void set_XSelectionEvent_send_event(XSelectionEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XSelectionEvent_serial(i)
-XSelectionEvent* i;
+int  XSelectionEvent_serial(XSelectionEvent *i)
 {
           return(i->serial);
 }
 
-void set_XSelectionEvent_serial(i, j)
-XSelectionEvent* i;
-int j;
+void set_XSelectionEvent_serial(XSelectionEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XSelectionEvent_type(i)
-XSelectionEvent* i;
+int  XSelectionEvent_type(XSelectionEvent *i)
 {
           return(i->type);
 }
 
-void set_XSelectionEvent_type(i, j)
-XSelectionEvent* i;
-int j;
+void set_XSelectionEvent_type(XSelectionEvent *i, int j)
 {
           i->type = j;
 }
@@ -3426,110 +2684,86 @@ int j;
 
 /********* XColormapEvent funcions *****/
 
-int  make_XColormapEvent (){
+int  make_XColormapEvent (void) {
           return ((int) calloc(1, sizeof(XColormapEvent)));
 }
 
-int  XColormapEvent_state(i)
-XColormapEvent* i;
+int  XColormapEvent_state(XColormapEvent *i)
 {
           return(i->state);
 }
 
-void set_XColormapEvent_state(i, j)
-XColormapEvent* i;
-int j;
+void set_XColormapEvent_state(XColormapEvent *i, int j)
 {
           i->state = j;
 }
 
-int  XColormapEvent_new(i)
-XColormapEvent* i;
+int  XColormapEvent_new(XColormapEvent *i)
 {
           return(i->new);
 }
 
-void set_XColormapEvent_new(i, j)
-XColormapEvent* i;
-int j;
+void set_XColormapEvent_new(XColormapEvent *i, int j)
 {
           i->new = j;
 }
 
-int  XColormapEvent_colormap(i)
-XColormapEvent* i;
+int  XColormapEvent_colormap(XColormapEvent *i)
 {
           return(i->colormap);
 }
 
-void set_XColormapEvent_colormap(i, j)
-XColormapEvent* i;
-int j;
+void set_XColormapEvent_colormap(XColormapEvent *i, int j)
 {
           i->colormap = j;
 }
 
-int  XColormapEvent_window(i)
-XColormapEvent* i;
+int  XColormapEvent_window(XColormapEvent *i)
 {
           return(i->window);
 }
 
-void set_XColormapEvent_window(i, j)
-XColormapEvent* i;
-int j;
+void set_XColormapEvent_window(XColormapEvent *i, int j)
 {
           i->window = j;
 }
 
-Display *XColormapEvent_display(i)
-XColormapEvent* i;
+Display *XColormapEvent_display(XColormapEvent *i)
 {
           return(i->display);
 }
 
-void set_XColormapEvent_display(i, j)
-XColormapEvent* i;
-Display *j;
+void set_XColormapEvent_display(XColormapEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XColormapEvent_send_event(i)
-XColormapEvent* i;
+int  XColormapEvent_send_event(XColormapEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XColormapEvent_send_event(i, j)
-XColormapEvent* i;
-int j;
+void set_XColormapEvent_send_event(XColormapEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XColormapEvent_serial(i)
-XColormapEvent* i;
+int  XColormapEvent_serial(XColormapEvent *i)
 {
           return(i->serial);
 }
 
-void set_XColormapEvent_serial(i, j)
-XColormapEvent* i;
-int j;
+void set_XColormapEvent_serial(XColormapEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XColormapEvent_type(i)
-XColormapEvent* i;
+int  XColormapEvent_type(XColormapEvent *i)
 {
           return(i->type);
 }
 
-void set_XColormapEvent_type(i, j)
-XColormapEvent* i;
-int j;
+void set_XColormapEvent_type(XColormapEvent *i, int j)
 {
           i->type = j;
 }
@@ -3537,98 +2771,77 @@ int j;
 
 /********* XClientMessageEvent funcions *****/
 
-int  make_XClientMessageEvent (){
+int  make_XClientMessageEvent (void) {
           return ((int) calloc(1, sizeof(XClientMessageEvent)));
 }
 
-int  XClientMessageEvent_format(i)
-XClientMessageEvent* i;
+int  XClientMessageEvent_format(XClientMessageEvent *i)
 {
           return(i->format);
 }
 
-void set_XClientMessageEvent_format(i, j)
-XClientMessageEvent* i;
-int j;
+void set_XClientMessageEvent_format(XClientMessageEvent *i, int j)
 {
           i->format = j;
 }
 
-int  XClientMessageEvent_message_type(i)
-XClientMessageEvent* i;
+int  XClientMessageEvent_message_type(XClientMessageEvent *i)
 {
           return(i->message_type);
 }
 
-void set_XClientMessageEvent_message_type(i, j)
-XClientMessageEvent* i;
-int j;
+void set_XClientMessageEvent_message_type(XClientMessageEvent *i, int j)
 {
           i->message_type = j;
 }
 
 
-int  XClientMessageEvent_window(i)
-XClientMessageEvent* i;
+int  XClientMessageEvent_window(XClientMessageEvent *i)
 {
           return(i->window);
 }
 
-void set_XClientMessageEvent_window(i, j)
-XClientMessageEvent* i;
-int j;
+void set_XClientMessageEvent_window(XClientMessageEvent *i, int j)
 {
           i->window = j;
 }
 
-Display *XClientMessageEvent_display(i)
-XClientMessageEvent* i;
+Display *XClientMessageEvent_display(XClientMessageEvent *i)
 {
           return(i->display);
 }
 
-void set_XClientMessageEvent_display(i, j)
-XClientMessageEvent* i;
-Display *j;
+void set_XClientMessageEvent_display(XClientMessageEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XClientMessageEvent_send_event(i)
-XClientMessageEvent* i;
+int  XClientMessageEvent_send_event(XClientMessageEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XClientMessageEvent_send_event(i, j)
-XClientMessageEvent* i;
-int j;
+void set_XClientMessageEvent_send_event(XClientMessageEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XClientMessageEvent_serial(i)
-XClientMessageEvent* i;
+int  XClientMessageEvent_serial(XClientMessageEvent *i)
 {
           return(i->serial);
 }
 
-void set_XClientMessageEvent_serial(i, j)
-XClientMessageEvent* i;
-int j;
+void set_XClientMessageEvent_serial(XClientMessageEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XClientMessageEvent_type(i)
-XClientMessageEvent* i;
+int  XClientMessageEvent_type(XClientMessageEvent *i)
 {
           return(i->type);
 }
 
-void set_XClientMessageEvent_type(i, j)
-XClientMessageEvent* i;
-int j;
+void set_XClientMessageEvent_type(XClientMessageEvent *i, int j)
 {
           i->type = j;
 }
@@ -3636,110 +2849,86 @@ int j;
 
 /********* XMappingEvent funcions *****/
 
-int  make_XMappingEvent (){
+int  make_XMappingEvent (void) {
           return ((int) calloc(1, sizeof(XMappingEvent)));
 }
 
-int  XMappingEvent_count(i)
-XMappingEvent* i;
+int  XMappingEvent_count(XMappingEvent *i)
 {
           return(i->count);
 }
 
-void set_XMappingEvent_count(i, j)
-XMappingEvent* i;
-int j;
+void set_XMappingEvent_count(XMappingEvent *i, int j)
 {
           i->count = j;
 }
 
-int XMappingEvent_first_keycode(i)
-XMappingEvent* i;
+int XMappingEvent_first_keycode(XMappingEvent *i)
 {
           return(i->first_keycode);
 }
 
-void set_XMappingEvent_first_keycode(i, j)
-XMappingEvent* i;
-int j;
+void set_XMappingEvent_first_keycode(XMappingEvent *i, int j)
 {
           i->first_keycode = j;
 }
 
-int  XMappingEvent_request(i)
-XMappingEvent* i;
+int  XMappingEvent_request(XMappingEvent *i)
 {
           return(i->request);
 }
 
-void set_XMappingEvent_request(i, j)
-XMappingEvent* i;
-int j;
+void set_XMappingEvent_request(XMappingEvent *i, int j)
 {
           i->request = j;
 }
 
-int  XMappingEvent_window(i)
-XMappingEvent* i;
+int  XMappingEvent_window(XMappingEvent *i)
 {
           return(i->window);
 }
 
-void set_XMappingEvent_window(i, j)
-XMappingEvent* i;
-int j;
+void set_XMappingEvent_window(XMappingEvent *i, int j)
 {
           i->window = j;
 }
 
-Display *XMappingEvent_display(i)
-XMappingEvent* i;
+Display *XMappingEvent_display(XMappingEvent *i)
 {
           return(i->display);
 }
 
-void set_XMappingEvent_display(i, j)
-XMappingEvent* i;
-Display *j;
+void set_XMappingEvent_display(XMappingEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XMappingEvent_send_event(i)
-XMappingEvent* i;
+int  XMappingEvent_send_event(XMappingEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XMappingEvent_send_event(i, j)
-XMappingEvent* i;
-int j;
+void set_XMappingEvent_send_event(XMappingEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XMappingEvent_serial(i)
-XMappingEvent* i;
+int  XMappingEvent_serial(XMappingEvent *i)
 {
           return(i->serial);
 }
 
-void set_XMappingEvent_serial(i, j)
-XMappingEvent* i;
-int j;
+void set_XMappingEvent_serial(XMappingEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XMappingEvent_type(i)
-XMappingEvent* i;
+int  XMappingEvent_type(XMappingEvent *i)
 {
           return(i->type);
 }
 
-void set_XMappingEvent_type(i, j)
-XMappingEvent* i;
-int j;
+void set_XMappingEvent_type(XMappingEvent *i, int j)
 {
           i->type = j;
 }
@@ -3747,97 +2936,76 @@ int j;
 
 /********* XErrorEvent funcions *****/
 
-int  make_XErrorEvent (){
+int  make_XErrorEvent (void) {
           return ((int) calloc(1, sizeof(XErrorEvent)));
 }
 
-char XErrorEvent_minor_code(i)
-XErrorEvent* i;
+char XErrorEvent_minor_code(XErrorEvent *i)
 {
           return(i->minor_code);
 }
 
-void set_XErrorEvent_minor_code(i, j)
-XErrorEvent* i;
-char j;
+void set_XErrorEvent_minor_code(XErrorEvent *i, char j)
 {
           i->minor_code = j;
 }
 
-char XErrorEvent_request_code(i)
-XErrorEvent* i;
+char XErrorEvent_request_code(XErrorEvent *i)
 {
           return(i->request_code);
 }
 
-void set_XErrorEvent_request_code(i, j)
-XErrorEvent* i;
-char j;
+void set_XErrorEvent_request_code(XErrorEvent *i, char j)
 {
           i->request_code = j;
 }
 
-char XErrorEvent_error_code(i)
-XErrorEvent* i;
+char XErrorEvent_error_code(XErrorEvent *i)
 {
           return(i->error_code);
 }
 
-void set_XErrorEvent_error_code(i, j)
-XErrorEvent* i;
-char j;
+void set_XErrorEvent_error_code(XErrorEvent *i, char j)
 {
           i->error_code = j;
 }
 
-int  XErrorEvent_serial(i)
-XErrorEvent* i;
+int  XErrorEvent_serial(XErrorEvent *i)
 {
           return(i->serial);
 }
 
-void set_XErrorEvent_serial(i, j)
-XErrorEvent* i;
-int j;
+void set_XErrorEvent_serial(XErrorEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XErrorEvent_resourceid(i)
-XErrorEvent* i;
+int  XErrorEvent_resourceid(XErrorEvent *i)
 {
           return(i->resourceid);
 }
 
-void set_XErrorEvent_resourceid(i, j)
-XErrorEvent* i;
-int j;
+void set_XErrorEvent_resourceid(XErrorEvent *i, int j)
 {
           i->resourceid = j;
 }
 
-Display *XErrorEvent_display(i)
-XErrorEvent* i;
+Display *XErrorEvent_display(XErrorEvent *i)
 {
           return(i->display);
 }
 
-void set_XErrorEvent_display(i, j)
-XErrorEvent* i;
-Display *j;
+void set_XErrorEvent_display(XErrorEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XErrorEvent_type(i)
-XErrorEvent* i;
+int  XErrorEvent_type(XErrorEvent *i)
 {
           return(i->type);
 }
 
-void set_XErrorEvent_type(i, j)
-XErrorEvent* i;
-int j;
+void set_XErrorEvent_type(XErrorEvent *i, int j)
 {
           i->type = j;
 }
@@ -3845,71 +3013,56 @@ int j;
 
 /********* XAnyEvent funcions *****/
 
-int  make_XAnyEvent (){
+int  make_XAnyEvent (void) {
           return ((int) calloc(1, sizeof(XAnyEvent)));
 }
 
-int  XAnyEvent_window(i)
-XAnyEvent* i;
+int  XAnyEvent_window(XAnyEvent *i)
 {
           return(i->window);
 }
 
-void set_XAnyEvent_window(i, j)
-XAnyEvent* i;
-int j;
+void set_XAnyEvent_window(XAnyEvent *i, int j)
 {
           i->window = j;
 }
 
-Display *XAnyEvent_display(i)
-XAnyEvent* i;
+Display *XAnyEvent_display(XAnyEvent *i)
 {
           return(i->display);
 }
 
-void set_XAnyEvent_display(i, j)
-XAnyEvent* i;
-Display *j;
+void set_XAnyEvent_display(XAnyEvent *i, Display *j)
 {
           i->display = j;
 }
 
-int  XAnyEvent_send_event(i)
-XAnyEvent* i;
+int  XAnyEvent_send_event(XAnyEvent *i)
 {
           return(i->send_event);
 }
 
-void set_XAnyEvent_send_event(i, j)
-XAnyEvent* i;
-int j;
+void set_XAnyEvent_send_event(XAnyEvent *i, int j)
 {
           i->send_event = j;
 }
 
-int  XAnyEvent_serial(i)
-XAnyEvent* i;
+int  XAnyEvent_serial(XAnyEvent *i)
 {
           return(i->serial);
 }
 
-void set_XAnyEvent_serial(i, j)
-XAnyEvent* i;
-int j;
+void set_XAnyEvent_serial(XAnyEvent *i, int j)
 {
           i->serial = j;
 }
 
-int  XAnyEvent_type(i)
-XAnyEvent* i;
+int  XAnyEvent_type(XAnyEvent *i)
 {
           return(i->type);
 }
 
-void set_XAnyEvent_type(i, j)
-XAnyEvent* i;
-int j;
+void set_XAnyEvent_type(XAnyEvent *i, int j)
 {
           i->type = j;
 }
@@ -3917,6 +3070,6 @@ int j;
 
 /********* XEvent funcions *****/
 
-int  make_XEvent (){
+int  make_XEvent (void) {
           return ((int) calloc(1, sizeof(XEvent)));
 }

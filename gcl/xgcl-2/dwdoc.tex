@@ -1,5 +1,5 @@
 % dwdoc.tex          Gordon S. Novak Jr.
-% 08 Oct 92; 08 Oct 93; 16 Nov 94; 05 Jan 95
+% 08 Oct 92; 08 Oct 93; 16 Nov 94; 05 Jan 95; 25 Jan 06; 26 Jan 06
 
 \documentstyle[12pt]{article}
 \setlength{\oddsidemargin}{0 in}
@@ -12,17 +12,21 @@
 
 \begin{document}
 
-\begin{center}\Large{{\bf Interface from GCL to X Windows}} \\
+\Large
+\begin{center} {\bf Interface from GCL to X Windows} \\  \end{center}
+
+\normalsize
 
 \vspace*{0.1in}
 
+\begin{center}
 \large{Gordon S. Novak Jr. \\
 Department of Computer Sciences \\
 University of Texas at Austin \\
 Austin, TX  78712} \\
 \end{center}
 
-Software copyright \copyright 1994 by Gordon S. Novak Jr. and
+Software copyright \copyright \/ by Gordon S. Novak Jr. and
 The University of Texas at Austin.  Distribution and use are allowed
 under the Gnu Public License.  Also see the copyright section at the end
 of this document for the copyright on X Consortium software.
@@ -33,7 +37,7 @@ of this document for the copyright on X Consortium software.
 
 This document describes a relatively easy-to-use interface between
 XGCL (X version of Gnu Common Lisp) and X windows.  The interface
-consists of two parts:
+consists of several parts:
 \begin{enumerate}
 \item Hiep Huu Nguyen has written (and adapted from X Consortium software)
 an interface between GCL and Xlib, the X library in C.
@@ -44,6 +48,9 @@ the {\tt dwindow} functions can be examined as examples.
 
 \item The {\tt dwindow} functions described in this document, which call
 the Xlib functions and provide an easier interface for Lisp programs.
+
+\item It is possible to make an interactive graphical interface
+within a web page; this is described in a section below.
 \end{enumerate}
 The source file for the interface (written in GLISP) is
 {\tt dwindow.lsp}; this file is compiled into a file in plain Lisp,
@@ -62,8 +69,8 @@ The type {\tt vector} is a list {\tt (x y)} of integers.  The argument
 ({\tt window} is a Lisp data structure used by the {\tt dwindow} functions).
 
 Both the Xlib and {\tt dwindow} functions are in the package {\tt xlib:}.
-The file {\tt imports.lsp} may be used to import the {\tt dwindow} symbols
-to the {\tt :user} package.
+In order to use these functions, the Lisp command {\tt (use-package 'xlib)}
+should be used to import the {\tt dwindow} symbols.
 
 
 \section{Examples and Utilities}
@@ -93,6 +100,16 @@ recreate the drawing; use {\tt origin to zero} before making a program.
 {\tt (draw-out file names)} will write definitions of drawings in the
 list {\tt names} to the file {\tt file}.
 
+\subsection{{\tt editors}}
+
+The file {\tt editorstrans.lsp} contains some interactive editing programs;
+it is a translation of the file {\tt editors.lsp} .
+One useful editor is the color editor; after entering {\tt (wtesta)}
+(in file {\tt dwtest.lsp}), enter {\tt (edit-color myw)} to edit a
+color.  The result is an {\tt rgb} list as used in {\tt window-set-color}.
+
+A simple line editor and an Emacs-like text editor are described in sections
+\ref{texted}  and \ref{emacsed} below.
 
 \section{Menus}
 
@@ -227,10 +244,10 @@ The remaining arguments are as described for menus.
 Each of the {\tt buttons} in a picmenu is a list: \\
 
 \vspace{-0.1in}
-{\tt \hspace*{0.5in} (name offset size highlightfn unhighlightfn)} \\
+{\tt \hspace*{0.5in} (buttonname offset size highlightfn unhighlightfn)} \\
 
 \vspace{-0.1in}
-{\tt name} is the name of the button; it is the value returned when that
+{\tt buttonname} is the name of the button; it is the value returned when that
 button is selected.
 {\tt offset} is a vector {\tt (x y)} that gives the offset of the center
 of the button from the lower-left corner of the picture.
@@ -556,7 +573,7 @@ the color after it is no longer needed.
 {\tt *window-xcolor*}, or the specified color.
 
 
-\subsection{Character Input}
+\subsection{Character Input} \label{texted}
 
 Characters can be input within a window by the call:
 
@@ -570,6 +587,27 @@ is displayed showing the location of the next input character.
 Characters are echoed as they are typed; backspacing erases characters,
 including those from the initial string {\tt str}.  An area of width
 {\tt size} (default 100) is erased to the right of the initial caret.
+
+
+\subsection{Emacs-like Editing} \label{emacsed}
+
+{\tt window-edit} allows editing of text using an Emacs-subset editor.
+Only a few simple Emacs commands are implemented.
+\begin{verbatim}
+   (window-edit w x y width height &optional strings boxflg scroll endp)
+\end{verbatim}
+{\tt x y width height} specify the offset and size of the editing
+area; it is a good idea to draw a box around this area first.
+{\tt strings} is an initial list of strings; the return value is a list
+of strings.
+{\tt scroll} is number of lines to scroll down before displaying text,
+          or {\tt T} to have one line only and terminate on return.
+{\tt endp} is {\tt T} to begin editing at the end of the first line.
+Example:
+\begin{verbatim}
+  (window-draw-box-xy myw 48 48 204 204)
+  (window-edit myw 50 50 200 200 '("Now is the time" "for all" "good"))
+\end{verbatim}
 
 
 \section{Mouse Interaction}
@@ -676,7 +714,7 @@ the implementation of menus and the mouse-interaction functions described in
 this section.
 
 {\tt \hspace*{0.5in} (window-track-mouse w fn \&optional outflg)}
-
+          
 \vspace{-0.05in}
 Each time the mouse position changes or a mouse button is pressed,
 the function {\tt fn} is called with
@@ -703,6 +741,22 @@ should be used with care; it can destroy a non-user window, causing
 processes associated with the window to be destroyed.  It is useful
 primarily in debugging, to get rid of a window that is left on the screen
 due to an error.
+                
+
+\section{Examples}
+
+Several interactive programs using this software for their graphical
+interface can be found at {\tt http://www.cs.utexas.edu/users/novak/}
+under the heading Software Demos.
+
+
+\section{Web Interface}
+
+This software allows a Lisp program to be used interactively within
+a web page.  There are two approaches, either using an X server on
+the computer of the person viewing the web page, or using WeirdX, a
+Java program that emulates an X server.  Details can be found at:
+{\tt http://www.cs.utexas.edu/users/novak/dwindow.html} 
 
 
 \section{Files}
@@ -713,13 +767,19 @@ due to an error.
 {\tt drawtrans.lsp}  & {\tt draw.lsp} translated into plain Lisp \\
 {\tt draw-gates.lsp} & Code to draw {\tt nand} gates etc. \\
 {\tt dwdoc.tex}      & \LaTeX \ source for this document \\
+{\tt dwexports.lsp}  & exported symbols \\
+{\tt dwimportsb.lsp} & imported symbols \\
 {\tt dwindow.lsp}    & GLISP source code for {\tt dwindow} functions \\
 {\tt dwtest.lsp}     & Examples of use of {\tt dwindow} functions \\
 {\tt dwtrans.lsp}    & {\tt dwindow.lsp} translated into plain Lisp \\
+{\tt editors.lsp}    & Editors for colors etc. \\
+{\tt editorstrans.lsp}    & translation of {\tt editors.lsp} \\
 {\tt gnu.license}    & GNU General Public License \\
 {\tt ice-cream.lsp}  & Drawing of an ice cream cone made with {\tt draw} \\
-{\tt imports.lsp}    & file to import symbols to {\tt :user} package \\
+{\tt lispserver.lsp} & Example web demo: a Lisp server \\
+{\tt lispservertrans.lsp}    & translation of {\tt lispserver.lsp} \\
 {\tt menu-set.lsp}   & GLISP source code for menu-set functions \\
+{\tt menu-settrans.lsp}   & translation of {\tt menu-set.lsp} \\
 {\tt pcalc.lsp}      & Pocket calculator implemented as a {\tt picmenu} \\
 \end{tabular}
 
@@ -786,7 +846,7 @@ due to an error.
 \vspace*{-.2in}
 
 \begin{verbatim}
-(picmenu-button (list (name           symbol)
+(picmenu-button (list (buttonname     symbol)
                       (offset         vector)
                       (size           vector)
                       (highlightfn    anything)

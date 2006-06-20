@@ -518,7 +518,7 @@
 
 ;; Polygon shapes 
 
-(defconstant Complex			0	) ;; paths may intersect 
+;(defconstant Complex			0	) ;; paths may intersect 
 (defconstant Nonconvex		1	) ;; no paths intersect, but not convex 
 (defconstant Convex			2	) ;; wholly convex 
 
@@ -684,6 +684,6 @@
 (defconstant MSBFirst		1)
 
 
-(defconstant NULL 0)
+;(defconstant NULL 0)
 
 

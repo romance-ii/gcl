@@ -50,123 +50,125 @@
 (defconstant  QueuedAfterReading 1)
 (defconstant  QueuedAfterFlush 2)
 
+(clines "#include \"xgcl.h\"")
+
 
 (defentry XLoadQueryFont(
 
-    int		;; display 
+    fixnum		;; display 
     object		;; name 
 
-)( int  "XLoadQueryFont"))
+)( fixnum  "XLoadQueryFont"))
 
 
 
 (defentry  XQueryFont(
 
-    int		;; display 
-    int			;; font_ID 
+    fixnum		;; display 
+    fixnum			;; font_ID 
 
-)( int  "XQueryFont"))
+)( fixnum  "XQueryFont"))
 
 
 
 
 (defentry  XGetMotionEvents(
 
-    int		;; display 
-    int		;; w 
-    int		;; start 
-    int		;; stop 
-    int		;; nevents_return 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; start 
+    fixnum		;; stop 
+    fixnum		;; nevents_return 
 
-)( int  "XGetMotionEvents"))
+)( fixnum  "XGetMotionEvents"))
 
 
 
 (defentry  XDeleteModifiermapEntry(
 
-    int	;; modmap 
+    fixnum	;; modmap 
 
-    int		;; keycode_entry 
+    fixnum		;; keycode_entry 
 
-    int			;; modifier 
+    fixnum			;; modifier 
 
-)( int  "XDeleteModifiermapEntry"))
+)( fixnum  "XDeleteModifiermapEntry"))
 
 
 
 (defentry  XGetModifierMapping(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( 	int "XGetModifierMapping"))
+)( 	fixnum "XGetModifierMapping"))
 
 
 
 (defentry  XInsertModifiermapEntry(
 
-    int	;; modmap 
+    fixnum	;; modmap 
 
-    int		;; keycode_entry 
+    fixnum		;; keycode_entry 
 
-    int			;; modifier     
+    fixnum			;; modifier     
 
-)( 	int  "XInsertModifiermapEntry"))
+)( 	fixnum  "XInsertModifiermapEntry"))
 
 
 
 (defentry  XNewModifiermap(
 
-    int			;; max_keys_per_mod 
+    fixnum			;; max_keys_per_mod 
 
-)( int  "XNewModifiermap"))
+)( fixnum  "XNewModifiermap"))
 
 
 
 (defentry  XCreateImage(
 
-    int		;; display 
-    int		;; visual 
-     int	;; depth 
-    int			;; format 
-    int			;; offset 
+    fixnum		;; display 
+    fixnum		;; visual 
+     fixnum	;; depth 
+    fixnum			;; format 
+    fixnum			;; offset 
    object		;; data 
-     int	;; width 
-     int	;; height 
-    int			;; bitmap_pad 
-    int			;; bytes_per_line 
+     fixnum	;; width 
+     fixnum	;; height 
+    fixnum			;; bitmap_pad 
+    fixnum			;; bytes_per_line 
 
-)( int  "XCreateImage"))
+)( fixnum  "XCreateImage"))
 
 
 (defentry  XGetImage(
 
-    int		;; display 
-    int		;; d 
-    int			;; x 
-    int			;; y 
-     int	;; width 
-     int	;; height 
-     int	;; plane_mask 
-    int			;; format 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; x 
+    fixnum			;; y 
+     fixnum	;; width 
+     fixnum	;; height 
+     fixnum	;; plane_mask 
+    fixnum			;; format 
 
-)( int  "XGetImage"))
+)( fixnum  "XGetImage"))
 
 
 (defentry  XGetSubImage(
 
-    int		;; display 
-    int		;; d 
-    int			;; x 
-    int			;; y 
-     int	;; width 
-     int	;; height 
-     int	;; plane_mask 
-    int			;; format 
-    int 	;; dest_image 
-    int			;; dest_x 
-    int			;; dest_y 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; x 
+    fixnum			;; y 
+     fixnum	;; width 
+     fixnum	;; height 
+     fixnum	;; plane_mask 
+    fixnum			;; format 
+    fixnum 	;; dest_image 
+    fixnum			;; dest_x 
+    fixnum			;; dest_y 
 
-)( int "XGetSubImage"))
+)( fixnum "XGetSubImage"))
 
 ;;Window  X function declarations.
  
@@ -176,7 +178,7 @@
 
     object		;; display_name 
 
-)( int  "XOpenDisplay"))
+)( fixnum  "XOpenDisplay"))
 
 
 
@@ -190,345 +192,345 @@
 
 (defentry  XFetchBytes(
 
-    int		;; display 
-    int		;; nbytes_return 
+    fixnum		;; display 
+    fixnum		;; nbytes_return 
 
-)( int  "XFetchBytes"))
+)( fixnum  "XFetchBytes"))
 
 
 (defentry  XFetchBuffer(
 
-    int		;; display 
-    int		;; nbytes_return 
-    int			;; buffer 
+    fixnum		;; display 
+    fixnum		;; nbytes_return 
+    fixnum			;; buffer 
 
-)( int  "XFetchBuffer"))
+)( fixnum  "XFetchBuffer"))
 
 
 (defentry  XGetAtomName(
 
-    int		;; display 
-    int		;; atom 
+    fixnum		;; display 
+    fixnum		;; atom 
 
-)( int  "XGetAtomName"))
+)( fixnum  "XGetAtomName"))
 
 
 (defentry  XGetDefault(
 
-    int		;; display 
+    fixnum		;; display 
     object		;; program 
     object		;; option 		  
 
-)( int  "XGetDefault"))
+)( fixnum  "XGetDefault"))
 
 
 (defentry  XDisplayName(
 
     object		;; string 
 
-)( int  "XDisplayName"))
+)( fixnum  "XDisplayName"))
 
 
 (defentry  XKeysymToString(
 
-    int		;; keysym 
+    fixnum		;; keysym 
 
-)( int  "XKeysymToString"))
+)( fixnum  "XKeysymToString"))
 
 
 
 
 (defentry XInternAtom(
 
-    int		;; display 
+    fixnum		;; display 
     object		;; atom_name 
-    int		;; only_if_exists 		 
+    fixnum		;; only_if_exists 		 
 
-)( int "XInternAtom"))
+)( fixnum "XInternAtom"))
 
 
 (defentry XCopyColormapAndFree(
 
-    int		;; display 
-    int		;; colormap 
+    fixnum		;; display 
+    fixnum		;; colormap 
 
-)( int "XCopyColormapAndFree"))
+)( fixnum "XCopyColormapAndFree"))
 
 
 (defentry XCreateColormap(
 
-    int		;; display 
-    int		;; w 
-    int		;; visual 
-    int			;; alloc 			 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; visual 
+    fixnum			;; alloc 			 
 
-)( int "XCreateColormap"))
+)( fixnum "XCreateColormap"))
 
 
 (defentry XCreatePixmapCursor(
 
-    int		;; display 
-    int		;; source 
-    int		;; mask 
-    int		;; foreground_color 
-    int		;; background_color 
-     int	;; x 
-     int	;; y 			   
+    fixnum		;; display 
+    fixnum		;; source 
+    fixnum		;; mask 
+    fixnum		;; foreground_color 
+    fixnum		;; background_color 
+     fixnum	;; x 
+     fixnum	;; y 			   
 
-)( int "XCreatePixmapCursor"))
+)( fixnum "XCreatePixmapCursor"))
 
 
 (defentry XCreateGlyphCursor(
 
-    int		;; display 
-    int		;; source_font 
-    int		;; mask_font 
-     int	;; source_char 
-     int	;; mask_char 
-    int		;; foreground_color 
-    int		;; background_color 
+    fixnum		;; display 
+    fixnum		;; source_font 
+    fixnum		;; mask_font 
+     fixnum	;; source_char 
+     fixnum	;; mask_char 
+    fixnum		;; foreground_color 
+    fixnum		;; background_color 
 
-)( int "XCreateGlyphCursor"))
+)( fixnum "XCreateGlyphCursor"))
 
 
 (defentry XCreateFontCursor(
 
-    int		;; display 
-     int	;; shape 
+    fixnum		;; display 
+     fixnum	;; shape 
 
-)( int "XCreateFontCursor"))
+)( fixnum "XCreateFontCursor"))
 
 
 (defentry XLoadFont(
 
-    int		;; display 
+    fixnum		;; display 
     object		;; name 
 
-)( int "XLoadFont"))
+)( fixnum "XLoadFont"))
 
 
 (defentry XCreateGC(
 
-    int		;; display 
-    int		;; d 
-     int	;; valuemask 
-    int		;; values 
+    fixnum		;; display 
+    fixnum		;; d 
+     fixnum	;; valuemask 
+    fixnum		;; values 
 
-)( int "XCreateGC"))
+)( fixnum "XCreateGC"))
 
 
 (defentry XGContextFromGC(
 
-    int			;; gc 
+    fixnum			;; gc 
 
-)( int "XGContextFromGC"))
+)( fixnum "XGContextFromGC"))
 
 
 (defentry XCreatePixmap(
 
-    int		;; display 
-    int		;; d 
-     int	;; width 
-     int	;; height 
-     int	;; depth 		        
+    fixnum		;; display 
+    fixnum		;; d 
+     fixnum	;; width 
+     fixnum	;; height 
+     fixnum	;; depth 		        
 
-)( int "XCreatePixmap"))
+)( fixnum "XCreatePixmap"))
 
 
 (defentry XCreateBitmapFromData(
 
-    int		;; display 
-    int		;; d 
+    fixnum		;; display 
+    fixnum		;; d 
     object		;; data 
-     int	;; width 
-     int	;; height 
+     fixnum	;; width 
+     fixnum	;; height 
 
-)( int "XCreateBitmapFromData"))
+)( fixnum "XCreateBitmapFromData"))
 
 
 (defentry XCreatePixmapFromBitmapData(
 
-    int		;; display 
-    int		;; d 
+    fixnum		;; display 
+    fixnum		;; d 
    object		;; data 
-     int	;; width 
-     int	;; height 
-     int	;; fg 
-     int	;; bg 
-     int	;; depth 
+     fixnum	;; width 
+     fixnum	;; height 
+     fixnum	;; fg 
+     fixnum	;; bg 
+     fixnum	;; depth 
 
-)( int "XCreatePixmapFromBitmapData"))
+)( fixnum "XCreatePixmapFromBitmapData"))
 
 
 (defentry XCreateSimpleWindow(
 
-    int		;; display 
-    int		;; parent 
-    int			;; x 
-    int			;; y 
-     int	;; width 
-     int	;; height 
-     int	;; border_width 
-     int	;; border 
-     int	;; background 
+    fixnum		;; display 
+    fixnum		;; parent 
+    fixnum			;; x 
+    fixnum			;; y 
+     fixnum	;; width 
+     fixnum	;; height 
+     fixnum	;; border_width 
+     fixnum	;; border 
+     fixnum	;; background 
 
-)( int "XCreateSimpleWindow"))
+)( fixnum "XCreateSimpleWindow"))
 
 
 (defentry XGetSelectionOwner(
 
-    int		;; display 
-    int		;; selection 
+    fixnum		;; display 
+    fixnum		;; selection 
 
-)( int "XGetSelectionOwner"))
+)( fixnum "XGetSelectionOwner"))
 
 
 (defentry XCreateWindow(
 
-    int		;; display 
-    int		;; parent 
-    int			;; x 
-    int			;; y 
-     int	;; width 
-     int	;; height 
-     int	;; border_width 
-    int			;; depth 
-     int	;; class 
-    int		;; visual 
-     int	;; valuemask 
-    int	;; attributes 
+    fixnum		;; display 
+    fixnum		;; parent 
+    fixnum			;; x 
+    fixnum			;; y 
+     fixnum	;; width 
+     fixnum	;; height 
+     fixnum	;; border_width 
+    fixnum			;; depth 
+     fixnum	;; class 
+    fixnum		;; visual 
+     fixnum	;; valuemask 
+    fixnum	;; attributes 
 
-)( int "XCreateWindow")) 
+)( fixnum "XCreateWindow")) 
 
 
 (defentry  XListInstalledColormaps(
 
-    int		;; display 
-    int		;; w 
-    int		;; num_return 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; num_return 
 
-)( int  "XListInstalledColormaps"))
+)( fixnum  "XListInstalledColormaps"))
 
 
 (defentry XListFonts(
 
-    int		;; display 
+    fixnum		;; display 
     object		;; pattern 
-    int			;; maxnames 
-    int		;; actual_count_return 
+    fixnum			;; maxnames 
+    fixnum		;; actual_count_return 
 
-)( int "XListFonts"))
+)( fixnum "XListFonts"))
 
 
 (defentry XListFontsWithInfo(
 
-    int		;; display 
+    fixnum		;; display 
     object		;; pattern 
-    int			;; maxnames 
-    int		;; count_return 
-    int		;; info_return 
+    fixnum			;; maxnames 
+    fixnum		;; count_return 
+    fixnum		;; info_return 
 
-)( int "XListFontsWithInfo"))
+)( fixnum "XListFontsWithInfo"))
 
 
 (defentry XGetFontPath(
 
-    int		;; display 
-    int		;; npaths_return 
+    fixnum		;; display 
+    fixnum		;; npaths_return 
 
-)( int "XGetFontPath"))
+)( fixnum "XGetFontPath"))
 
 
 (defentry XListExtensions(
 
-    int		;; display 
-    int		;; nextensions_return 
+    fixnum		;; display 
+    fixnum		;; nextensions_return 
 
-)( int "XListExtensions"))
+)( fixnum "XListExtensions"))
 
 
 (defentry  XListProperties(
 
-    int		;; display 
-    int		;; w 
-    int		;; num_prop_return 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; num_prop_return 
 
-)( int  "XListProperties"))
+)( fixnum  "XListProperties"))
 
 
 (defentry XListHosts(
 
-    int		;; display 
-    int		;; nhosts_return 
-    int		;; state_return 
+    fixnum		;; display 
+    fixnum		;; nhosts_return 
+    fixnum		;; state_return 
 
-)( int "XListHosts"))
+)( fixnum "XListHosts"))
 
 
 (defentry XKeycodeToKeysym(
 
-    int		;; display 
+    fixnum		;; display 
 
-    int		;; int 
+    fixnum		;; fixnum 
 
-    int			;; index 
+    fixnum			;; index 
 
-)( int "XKeycodeToKeysym"))
+)( fixnum "XKeycodeToKeysym"))
 
 
 (defentry XLookupKeysym(
 
-    int		;; key_event 
-    int			;; index 
+    fixnum		;; key_event 
+    fixnum			;; index 
 
-)( int "XLookupKeysym"))
+)( fixnum "XLookupKeysym"))
 
 
 (defentry  XGetKeyboardMapping(
 
-    int		;; display 
+    fixnum		;; display 
 
-    int		;; first_keycode
+    fixnum		;; first_keycode
 
-    int			;; keycode_count 
-    int		;; keysyms_per_keycode_return 
+    fixnum			;; keycode_count 
+    fixnum		;; keysyms_per_keycode_return 
 
-)( int  "XGetKeyboardMapping"))
+)( fixnum  "XGetKeyboardMapping"))
 
 
 (defentry XStringToKeysym(
 
     object		;; string 
 
-)( int "XStringToKeysym"))
+)( fixnum "XStringToKeysym"))
 
 
 (defentry XMaxRequestSize(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int "XMaxRequestSize"))
+)( fixnum "XMaxRequestSize"))
 
 
 (defentry XResourceManagerString(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int "XResourceManagerString"))
+)( fixnum "XResourceManagerString"))
 
 
 (defentry XDisplayMotionBufferSize(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int "XDisplayMotionBufferSize"))
+)( fixnum "XDisplayMotionBufferSize"))
 
 
 (defentry XVisualIDFromVisual(
 
-    int		;; visual 
+    fixnum		;; visual 
 
-)( int "XVisualIDFromVisual"))
+)( fixnum "XVisualIDFromVisual"))
 
 ;; routines for dealing with extensions 
 
@@ -536,216 +538,216 @@
 
 (defentry  XInitExtension(
 
-    int		;; display 
+    fixnum		;; display 
     object		;; name 
 
-)( int  "XInitExtension"))
+)( fixnum  "XInitExtension"))
 
 
 
 (defentry  XAddExtension(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int  "XAddExtension"))
+)( fixnum  "XAddExtension"))
 
 
 (defentry  XFindOnExtensionList(
 
-    int		;; structure 
-    int			;; number 
+    fixnum		;; structure 
+    fixnum			;; number 
 
-)( int  "XFindOnExtensionList"))
+)( fixnum  "XFindOnExtensionList"))
 
 
 
 ;;;fix
 
 
-(defentry XEHeadOfExtensionList(
+;(defentry XEHeadOfExtensionList(
 
-    int	;;object 
+;    fixnum	;;object 
 
-)( int "XEHeadOfExtensionList"))
+;)( fixnum "XEHeadOfExtensionList"))
 
 ;; these are routines for which there are also macros 
 
 
 (defentry XRootWindow(
 
-    int		;; display 
-    int			;; screen_number 
+    fixnum		;; display 
+    fixnum			;; screen_number 
 
-)( int "XRootWindow"))
+)( fixnum "XRootWindow"))
 
 
 (defentry XDefaultRootWindow(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int "XDefaultRootWindow"))
+)( fixnum "XDefaultRootWindow"))
 
 
 (defentry XRootWindowOfScreen(
 
-    int		;; screen 
+    fixnum		;; screen 
 
-)( int "XRootWindowOfScreen"))
+)( fixnum "XRootWindowOfScreen"))
 
 
 (defentry  XDefaultVisual(
 
-    int		;; display 
-    int			;; screen_number 
+    fixnum		;; display 
+    fixnum			;; screen_number 
 
-)( int  "XDefaultVisual"))
+)( fixnum  "XDefaultVisual"))
 
 
 (defentry  XDefaultVisualOfScreen(
 
-    int		;; screen 
+    fixnum		;; screen 
 
-)( int  "XDefaultVisualOfScreen"))
+)( fixnum  "XDefaultVisualOfScreen"))
 
 
 (defentry XDefaultGC(
 
-    int		;; display 
-    int			;; screen_number 
+    fixnum		;; display 
+    fixnum			;; screen_number 
 
-)( int "XDefaultGC"))
+)( fixnum "XDefaultGC"))
 
 
 (defentry XDefaultGCOfScreen(
 
-    int		;; screen 
+    fixnum		;; screen 
 
-)( int "XDefaultGCOfScreen"))
+)( fixnum "XDefaultGCOfScreen"))
 
 
 (defentry XBlackPixel(
 
-    int		;; display 
-    int			;; screen_number 
+    fixnum		;; display 
+    fixnum			;; screen_number 
 
-)( int "XBlackPixel"))
+)( fixnum "XBlackPixel"))
 
 
 (defentry XWhitePixel(
 
-    int		;; display 
-    int			;; screen_number 
+    fixnum		;; display 
+    fixnum			;; screen_number 
 
-)( int "XWhitePixel"))
+)( fixnum "XWhitePixel"))
 
 
 (defentry XAllPlanes(
 
 ;;    void
 
-)( int "XAllPlanes"))
+)( fixnum "XAllPlanes"))
 
 
 (defentry XBlackPixelOfScreen(
 
-    int		;; screen 
+    fixnum		;; screen 
 
-)( int "XBlackPixelOfScreen"))
+)( fixnum "XBlackPixelOfScreen"))
 
 
 (defentry XWhitePixelOfScreen(
 
-    int		;; screen 
+    fixnum		;; screen 
 
-)( int "XWhitePixelOfScreen"))
+)( fixnum "XWhitePixelOfScreen"))
 
 
 (defentry XNextRequest(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int "XNextRequest"))
+)( fixnum "XNextRequest"))
 
 
 (defentry XLastKnownRequestProcessed(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int "XLastKnownRequestProcessed"))
+)( fixnum "XLastKnownRequestProcessed"))
 
 
 (defentry  XServerVendor(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int  "XServerVendor"))
+)( fixnum  "XServerVendor"))
 
 
 (defentry  XDisplayString(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int  "XDisplayString"))
+)( fixnum  "XDisplayString"))
 
 
 (defentry XDefaultColormap(
 
-    int		;; display 
-    int			;; screen_number 
+    fixnum		;; display 
+    fixnum			;; screen_number 
 
-)( int "XDefaultColormap"))
+)( fixnum "XDefaultColormap"))
 
 
 (defentry XDefaultColormapOfScreen(
 
-    int		;; screen 
+    fixnum		;; screen 
 
-)( int "XDefaultColormapOfScreen"))
+)( fixnum "XDefaultColormapOfScreen"))
 
 
 (defentry  XDisplayOfScreen(
 
-    int		;; screen 
+    fixnum		;; screen 
 
-)( int  "XDisplayOfScreen"))
+)( fixnum  "XDisplayOfScreen"))
 
 
 (defentry  XScreenOfDisplay(
 
-    int		;; display 
-    int			;; screen_number 
+    fixnum		;; display 
+    fixnum			;; screen_number 
 
-)( int  "XScreenOfDisplay"))
+)( fixnum  "XScreenOfDisplay"))
 
 
 (defentry  XDefaultScreenOfDisplay(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int  "XDefaultScreenOfDisplay"))
+)( fixnum  "XDefaultScreenOfDisplay"))
 
 
 (defentry XEventMaskOfScreen(
 
-    int		;; screen 
+    fixnum		;; screen 
 
-)( int "XEventMaskOfScreen"))
+)( fixnum "XEventMaskOfScreen"))
 
 
 
 (defentry XScreenNumberOfScreen(
 
-    int		;; screen 
+    fixnum		;; screen 
 
-)( int "XScreenNumberOfScreen"))
+)( fixnum "XScreenNumberOfScreen"))
 
 
 
 (defentry XSetErrorHandler (
 
-    int	;; handler 
+    fixnum	;; handler 
 
-)( int "XSetErrorHandler" ))
+)( fixnum "XSetErrorHandler" ))
 
 
 ;;fix
@@ -753,28 +755,28 @@
 
 (defentry XSetIOErrorHandler (
 
-    int	;; handler 
+    fixnum	;; handler 
 
-)( int "XSetIOErrorHandler" ))
+)( fixnum "XSetIOErrorHandler" ))
 
 
 
 
 (defentry XListPixmapFormats(
 
-    int		;; display 
-    int		;; count_return 
+    fixnum		;; display 
+    fixnum		;; count_return 
 
-)( int "XListPixmapFormats"))
+)( fixnum "XListPixmapFormats"))
 
 
 (defentry  XListDepths(
 
-    int		;; display 
-    int			;; screen_number 
-    int		;; count_return 
+    fixnum		;; display 
+    fixnum			;; screen_number 
+    fixnum		;; count_return 
 
-)( int  "XListDepths"))
+)( fixnum  "XListDepths"))
 
 ;; ICCCM routines for things that don't require special include files; 
 ;; other declarations are given in Xutil.h                             
@@ -782,98 +784,98 @@
 
 (defentry XReconfigureWMWindow(
 
-    int		;; display 
-    int		;; w 
-    int			;; screen_number 
-     int	;; mask 
-    int		;; changes 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum			;; screen_number 
+     fixnum	;; mask 
+    fixnum		;; changes 
 
-)( int "XReconfigureWMWindow"))
+)( fixnum "XReconfigureWMWindow"))
 
 
 
 (defentry XGetWMProtocols(
 
-    int		;; display 
-    int		;; w 
-    int		;; protocols_return 
-    int		;; count_return 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; protocols_return 
+    fixnum		;; count_return 
 
-)( int "XGetWMProtocols"))
+)( fixnum "XGetWMProtocols"))
 
 
 (defentry XSetWMProtocols(
 
-    int		;; display 
-    int		;; w 
-    int		;; protocols 
-    int			;; count 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; protocols 
+    fixnum			;; count 
 
-)( int "XSetWMProtocols"))
+)( fixnum "XSetWMProtocols"))
 
 
 (defentry XIconifyWindow(
 
-    int		;; display 
-    int		;; w 
-    int			;; screen_number 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum			;; screen_number 
 
-)( int "XIconifyWindow"))
+)( fixnum "XIconifyWindow"))
 
 
 (defentry XWithdrawWindow(
 
-    int		;; display 
-    int		;; w 
-    int			;; screen_number 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum			;; screen_number 
 
-)( int "XWithdrawWindow"))
+)( fixnum "XWithdrawWindow"))
 
 ;;;fix
 
 
 (defentry XGetCommand(
 
-    int		;; display 
-    int		;; w 
-   int 		;; argv_return 
-    int		;; argc_return 
+    fixnum		;; display 
+    fixnum		;; w 
+   fixnum 		;; argv_return 
+    fixnum		;; argc_return 
 
-)( int "XGetCommand"))
+)( fixnum "XGetCommand"))
 
 
 (defentry XGetWMColormapWindows(
 
-    int		;; display 
-    int		;; w 
-    int		;; windows_return 
-    int		;; count_return 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; windows_return 
+    fixnum		;; count_return 
 
-)( int "XGetWMColormapWindows"))
+)( fixnum "XGetWMColormapWindows"))
 
 
 (defentry XSetWMColormapWindows(
 
-    int		;; display 
-    int		;; w 
-    int		;; colormap_windows 
-    int			;; count 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; colormap_windows 
+    fixnum			;; count 
 
-)( int "XSetWMColormapWindows"))
+)( fixnum "XSetWMColormapWindows"))
 
 
 (defentry XFreeStringList(
 
-   int 	;; list 
+   fixnum 	;; list 
 
 )( void "XFreeStringList"))
 
 
 (defentry XSetTransientForHint(
 
-    int		;; display 
-    int		;; w 
-    int		;; prop_window 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; prop_window 
 
 )( void "XSetTransientForHint"))
 
@@ -883,7 +885,7 @@
 
 (defentry XActivateScreenSaver(
 
-    int		;; display 
+    fixnum		;; display 
 
 )( void "XActivateScreenSaver"))
 
@@ -891,8 +893,8 @@
 
 (defentry XAddHost(
 
-    int		;; display 
-    int	;; host 
+    fixnum		;; display 
+    fixnum	;; host 
 
 )( void "XAddHost"))
 
@@ -900,9 +902,9 @@
 
 (defentry XAddHosts(
 
-    int		;; display 
-    int		;; hosts 
-    int			;; num_hosts     
+    fixnum		;; display 
+    fixnum		;; hosts 
+    fixnum			;; num_hosts     
 
 )( void "XAddHosts"))
 
@@ -910,8 +912,8 @@
 
 (defentry XAddToExtensionList(
 
-    int	;; structure 
-    int		;; ext_data 
+    fixnum	;; structure 
+    fixnum		;; ext_data 
 
 )( void "XAddToExtensionList"))
 
@@ -919,8 +921,8 @@
 
 (defentry XAddToSaveSet(
 
-    int		;; display 
-    int		;; w 
+    fixnum		;; display 
+    fixnum		;; w 
 
 )( void "XAddToSaveSet"))
 
@@ -928,64 +930,64 @@
 
 (defentry XAllocColor(
 
-    int		;; display 
-    int		;; colormap 
-    int		;; screen_in_out 
+    fixnum		;; display 
+    fixnum		;; colormap 
+    fixnum		;; screen_in_out 
 
-)( int "XAllocColor"))
+)( fixnum "XAllocColor"))
 
 ;;;fix
 
 
 (defentry XAllocColorCells(
 
-    int		;; display 
-    int		;; colormap 
-    int	        ;; contig 
-     int ;; plane_masks_return 
-     int	;; nplanes 
-     int ;; pixels_return 
-     int 	;; npixels 
+    fixnum		;; display 
+    fixnum		;; colormap 
+    fixnum	        ;; contig 
+     fixnum ;; plane_masks_return 
+     fixnum	;; nplanes 
+     fixnum ;; pixels_return 
+     fixnum 	;; npixels 
 
-)( int "XAllocColorCells"))
+)( fixnum "XAllocColorCells"))
 
 
 
 (defentry XAllocColorPlanes(
 
-    int		;; display 
-    int		;; colormap 
-    int		;; contig 
-     int ;; pixels_return 
-    int			;; ncolors 
-    int			;; nreds 
-    int			;; ngreens 
-    int			;; nblues 
-     int ;; rmask_return 
-     int ;; gmask_return 
-     int ;; bmask_return 
+    fixnum		;; display 
+    fixnum		;; colormap 
+    fixnum		;; contig 
+     fixnum ;; pixels_return 
+    fixnum			;; ncolors 
+    fixnum			;; nreds 
+    fixnum			;; ngreens 
+    fixnum			;; nblues 
+     fixnum ;; rmask_return 
+     fixnum ;; gmask_return 
+     fixnum ;; bmask_return 
 
-)( int "XAllocColorPlanes"))
+)( fixnum "XAllocColorPlanes"))
 
 
 
 (defentry XAllocNamedColor(
 
-    int		;; display 
-    int		;; colormap 
+    fixnum		;; display 
+    fixnum		;; colormap 
     object		;; color_name 
-    int		;; screen_def_return 
-    int		;; exact_def_return 
+    fixnum		;; screen_def_return 
+    fixnum		;; exact_def_return 
 
-)( int "XAllocNamedColor"))
+)( fixnum "XAllocNamedColor"))
 
 
 
 (defentry XAllowEvents(
 
-    int		;; display 
-    int			;; event_mode 
-    int		;; time
+    fixnum		;; display 
+    fixnum			;; event_mode 
+    fixnum		;; time
 
 )( void "XAllowEvents"))
 
@@ -993,7 +995,7 @@
 
 (defentry XAutoRepeatOff(
 
-    int		;; display 
+    fixnum		;; display 
 
 )( void "XAutoRepeatOff"))
 
@@ -1001,7 +1003,7 @@
 
 (defentry XAutoRepeatOn(
 
-    int		;; display 
+    fixnum		;; display 
 
 )( void "XAutoRepeatOn"))
 
@@ -1009,8 +1011,8 @@
 
 (defentry XBell(
 
-    int		;; display 
-    int			;; percent 
+    fixnum		;; display 
+    fixnum			;; percent 
 
 )( void "XBell"))
 
@@ -1018,42 +1020,42 @@
 
 (defentry XBitmapBitOrder(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int "XBitmapBitOrder"))
+)( fixnum "XBitmapBitOrder"))
 
 
 
 (defentry XBitmapPad(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int "XBitmapPad"))
+)( fixnum "XBitmapPad"))
 
 
 
 (defentry XBitmapUnit(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int "XBitmapUnit"))
+)( fixnum "XBitmapUnit"))
 
 
 
 (defentry XCellsOfScreen(
 
-    int		;; screen 
+    fixnum		;; screen 
 
-)( int "XCellsOfScreen"))
+)( fixnum "XCellsOfScreen"))
 
 
 
 (defentry XChangeActivePointerGrab(
 
-    int		;; display 
-     int	;; event_mask 
-    int		;; cursor 
-    int		;; time
+    fixnum		;; display 
+     fixnum	;; event_mask 
+    fixnum		;; cursor 
+    fixnum		;; time
 
 )( void "XChangeActivePointerGrab"))
 
@@ -1061,10 +1063,10 @@
 
 (defentry XChangeGC(
 
-    int		;; display 
-    int			;; gc 
-     int	;; valuemask 
-    int		;; values 
+    fixnum		;; display 
+    fixnum			;; gc 
+     fixnum	;; valuemask 
+    fixnum		;; values 
 
 )( void "XChangeGC"))
 
@@ -1072,9 +1074,9 @@
 
 (defentry XChangeKeyboardControl(
 
-    int		;; display 
-     int	;; value_mask 
-    int 	;; values 
+    fixnum		;; display 
+     fixnum	;; value_mask 
+    fixnum 	;; values 
 
 )( void "XChangeKeyboardControl"))
 
@@ -1082,11 +1084,11 @@
 
 (defentry XChangeKeyboardMapping(
 
-    int		;; display 
-    int			;; first_keycode 
-    int			;; keysyms_per_keycode 
-    int			;; keysyms 
-    int			;; num_codes 
+    fixnum		;; display 
+    fixnum			;; first_keycode 
+    fixnum			;; keysyms_per_keycode 
+    fixnum			;; keysyms 
+    fixnum			;; num_codes 
 
 )( void "XChangeKeyboardMapping"))
 
@@ -1094,12 +1096,12 @@
 
 (defentry XChangePointerControl(
 
-    int		;; display 
-    int		;; do_accel 
-    int		;; do_threshold 
-    int			;; accel_numerator 
-    int			;; accel_denominator 
-    int			;; threshold 
+    fixnum		;; display 
+    fixnum		;; do_accel 
+    fixnum		;; do_threshold 
+    fixnum			;; accel_numerator 
+    fixnum			;; accel_denominator 
+    fixnum			;; threshold 
 
 )( void "XChangePointerControl"))
 
@@ -1107,14 +1109,14 @@
 
 (defentry XChangeProperty(
 
-    int		;; display 
-    int		;; w 
-    int		;; property 
-    int		;; type 
-    int			;; format 
-    int			;; mode 
-    int 	;; data 
-    int			;; nelements 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; property 
+    fixnum		;; type 
+    fixnum			;; format 
+    fixnum			;; mode 
+    fixnum 	;; data 
+    fixnum			;; nelements 
 
 )( void "XChangeProperty"))
 
@@ -1122,9 +1124,9 @@
 
 (defentry XChangeSaveSet(
 
-    int		;; display 
-    int		;; w 
-    int			;; change_mode 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum			;; change_mode 
 
 )( void "XChangeSaveSet"))
 
@@ -1132,10 +1134,10 @@
 
 (defentry XChangeWindowAttributes(
 
-    int		;; display 
-    int		;; w 
-     int	;; valuemask 
-    int ;; attributes 
+    fixnum		;; display 
+    fixnum		;; w 
+     fixnum	;; valuemask 
+    fixnum ;; attributes 
 
 )( void "XChangeWindowAttributes"))
 
@@ -1143,51 +1145,51 @@
 
 (defentry XCheckMaskEvent(
 
-    int		;; display 
-    int		;; event_mask 
-    int		;; event_return 
+    fixnum		;; display 
+    fixnum		;; event_mask 
+    fixnum		;; event_return 
 
-)( int "XCheckMaskEvent"))
+)( fixnum "XCheckMaskEvent"))
 
 
 
 (defentry XCheckTypedEvent(
 
-    int		;; display 
-    int			;; event_type 
-    int		;; event_return 
+    fixnum		;; display 
+    fixnum			;; event_type 
+    fixnum		;; event_return 
 
-)( int "XCheckTypedEvent"))
+)( fixnum "XCheckTypedEvent"))
 
 
 
 (defentry XCheckTypedWindowEvent(
 
-    int		;; display 
-    int		;; w 
-    int			;; event_type 
-    int		;; event_return 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum			;; event_type 
+    fixnum		;; event_return 
 
-)( int "XCheckTypedWindowEvent"))
+)( fixnum "XCheckTypedWindowEvent"))
 
 
 
 (defentry XCheckWindowEvent(
 
-    int		;; display 
-    int		;; w 
-    int		;; event_mask 
-    int		;; event_return 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; event_mask 
+    fixnum		;; event_return 
 
-)( int "XCheckWindowEvent"))
+)( fixnum "XCheckWindowEvent"))
 
 
 
 (defentry XCirculateSubwindows(
 
-    int		;; display 
-    int		;; w 
-    int			;; direction 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum			;; direction 
 
 )( void "XCirculateSubwindows"))
 
@@ -1195,8 +1197,8 @@
 
 (defentry XCirculateSubwindowsDown(
 
-    int		;; display 
-    int		;; w 
+    fixnum		;; display 
+    fixnum		;; w 
 
 )( void "XCirculateSubwindowsDown"))
 
@@ -1204,8 +1206,8 @@
 
 (defentry XCirculateSubwindowsUp(
 
-    int		;; display 
-    int		;; w 
+    fixnum		;; display 
+    fixnum		;; w 
 
 )( void "XCirculateSubwindowsUp"))
 
@@ -1213,13 +1215,13 @@
 
 (defentry XClearArea(
 
-    int		;; display 
-    int		;; w 
-    int			;; x 
-    int			;; y 
-     int	;; width 
-     int	;; height 
-    int		;; exposures 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum			;; x 
+    fixnum			;; y 
+     fixnum	;; width 
+     fixnum	;; height 
+    fixnum		;; exposures 
 
 )( void "XClearArea"))
 
@@ -1227,8 +1229,8 @@
 
 (defentry XClearWindow(
 
-    int		;; display 
-    int		;; w 
+    fixnum		;; display 
+    fixnum		;; w 
 
 )( void "XClearWindow"))
 
@@ -1236,7 +1238,7 @@
 
 (defentry XCloseDisplay(
 
-    int		;; display 
+    fixnum		;; display 
 
 )( void "XCloseDisplay"))
 
@@ -1244,10 +1246,10 @@
 
 (defentry XConfigureWindow(
 
-    int		;; display 
-    int		;; w 
-     int	;; value_mask 
-    int ;; values 		 
+    fixnum		;; display 
+    fixnum		;; w 
+     fixnum	;; value_mask 
+    fixnum ;; values 		 
 
 )( void "XConfigureWindow"))
 
@@ -1255,20 +1257,20 @@
 
 (defentry XConnectionNumber(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int "XConnectionNumber"))
+)( fixnum "XConnectionNumber"))
 
 
 
 (defentry XConvertSelection(
 
-    int		;; display 
-    int		;; selection 
-    int 		;; target 
-    int		;; property 
-    int		;; requestor 
-    int		;; time
+    fixnum		;; display 
+    fixnum		;; selection 
+    fixnum 		;; target 
+    fixnum		;; property 
+    fixnum		;; requestor 
+    fixnum		;; time
 
 )( void "XConvertSelection"))
 
@@ -1276,16 +1278,16 @@
 
 (defentry XCopyArea(
 
-    int		;; display 
-    int		;; src 
-    int		;; dest 
-    int			;; gc 
-    int			;; src_x 
-    int			;; src_y 
-     int	;; width 
-     int	;; height 
-    int			;; dest_x 
-    int			;; dest_y 
+    fixnum		;; display 
+    fixnum		;; src 
+    fixnum		;; dest 
+    fixnum			;; gc 
+    fixnum			;; src_x 
+    fixnum			;; src_y 
+     fixnum	;; width 
+     fixnum	;; height 
+    fixnum			;; dest_x 
+    fixnum			;; dest_y 
 
 )( void "XCopyArea"))
 
@@ -1293,10 +1295,10 @@
 
 (defentry XCopyGC(
 
-    int		;; display 
-    int			;; src 
-     int	;; valuemask 
-    int			;; dest 
+    fixnum		;; display 
+    fixnum			;; src 
+     fixnum	;; valuemask 
+    fixnum			;; dest 
 
 )( void "XCopyGC"))
 
@@ -1304,17 +1306,17 @@
 
 (defentry XCopyPlane(
 
-    int		;; display 
-    int		;; src 
-    int		;; dest 
-    int			;; gc 
-    int			;; src_x 
-    int			;; src_y 
-     int	;; width 
-     int	;; height 
-    int			;; dest_x 
-    int			;; dest_y 
-     int	;; plane 
+    fixnum		;; display 
+    fixnum		;; src 
+    fixnum		;; dest 
+    fixnum			;; gc 
+    fixnum			;; src_x 
+    fixnum			;; src_y 
+     fixnum	;; width 
+     fixnum	;; height 
+    fixnum			;; dest_x 
+    fixnum			;; dest_y 
+     fixnum	;; plane 
 
 )( void "XCopyPlane"))
 
@@ -1322,34 +1324,34 @@
 
 (defentry XDefaultDepth(
 
-    int		;; display 
-    int			;; screen_number 
+    fixnum		;; display 
+    fixnum			;; screen_number 
 
-)( int "XDefaultDepth"))
+)( fixnum "XDefaultDepth"))
 
 
 
 (defentry XDefaultDepthOfScreen(
 
-    int		;; screen 
+    fixnum		;; screen 
 
-)( int "XDefaultDepthOfScreen"))
+)( fixnum "XDefaultDepthOfScreen"))
 
 
 
 (defentry XDefaultScreen(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int "XDefaultScreen"))
+)( fixnum "XDefaultScreen"))
 
 
 
 (defentry XDefineCursor(
 
-    int		;; display 
-    int		;; w 
-    int		;; cursor 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; cursor 
 
 )( void "XDefineCursor"))
 
@@ -1357,9 +1359,9 @@
 
 (defentry XDeleteProperty(
 
-    int		;; display 
-    int		;; w 
-    int		;; property 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; property 
 
 )( void "XDeleteProperty"))
 
@@ -1367,8 +1369,8 @@
 
 (defentry XDestroyWindow(
 
-    int		;; display 
-    int		;; w 
+    fixnum		;; display 
+    fixnum		;; w 
 
 )( void "XDestroyWindow"))
 
@@ -1376,8 +1378,8 @@
 
 (defentry XDestroySubwindows(
 
-    int		;; display 
-    int		;; w 
+    fixnum		;; display 
+    fixnum		;; w 
 
 )( void "XDestroySubwindows"))
 
@@ -1385,23 +1387,23 @@
 
 (defentry XDoesBackingStore(
 
-    int		;; screen     
+    fixnum		;; screen     
 
-)( int "XDoesBackingStore"))
+)( fixnum "XDoesBackingStore"))
 
 
 
 (defentry XDoesSaveUnders(
 
-    int		;; screen 
+    fixnum		;; screen 
 
-)( int "XDoesSaveUnders"))
+)( fixnum "XDoesSaveUnders"))
 
 
 
 (defentry XDisableAccessControl(
 
-    int		;; display 
+    fixnum		;; display 
 
 )( void "XDisableAccessControl"))
 
@@ -1410,36 +1412,36 @@
 
 (defentry XDisplayCells(
 
-    int		;; display 
-    int			;; screen_number 
+    fixnum		;; display 
+    fixnum			;; screen_number 
 
-)( int "XDisplayCells"))
+)( fixnum "XDisplayCells"))
 
 
 
 (defentry XDisplayHeight(
 
-    int		;; display 
-    int			;; screen_number 
+    fixnum		;; display 
+    fixnum			;; screen_number 
 
-)( int "XDisplayHeight"))
+)( fixnum "XDisplayHeight"))
 
 
 
 (defentry XDisplayHeightMM(
 
-    int		;; display 
-    int			;; screen_number 
+    fixnum		;; display 
+    fixnum			;; screen_number 
 
-)( int "XDisplayHeightMM"))
+)( fixnum "XDisplayHeightMM"))
 
 
 
 (defentry XDisplayKeycodes(
 
-    int		;; display 
-    int		;; min_keycodes_return 
-    int		;; max_keycodes_return 
+    fixnum		;; display 
+    fixnum		;; min_keycodes_return 
+    fixnum		;; max_keycodes_return 
 
 )( void "XDisplayKeycodes"))
 
@@ -1447,42 +1449,42 @@
 
 (defentry XDisplayPlanes(
 
-    int		;; display 
-    int			;; screen_number 
+    fixnum		;; display 
+    fixnum			;; screen_number 
 
-)( int "XDisplayPlanes"))
+)( fixnum "XDisplayPlanes"))
 
 
 
 (defentry XDisplayWidth(
 
-    int		;; display 
-    int			;; screen_number 
+    fixnum		;; display 
+    fixnum			;; screen_number 
 
-)( int "XDisplayWidth"))
+)( fixnum "XDisplayWidth"))
 
 
 
 (defentry XDisplayWidthMM(
 
-    int		;; display 
-    int			;; screen_number 
+    fixnum		;; display 
+    fixnum			;; screen_number 
 
-)( int "XDisplayWidthMM"))
+)( fixnum "XDisplayWidthMM"))
 
 
 
 (defentry XDrawArc(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int			;; x 
-    int			;; y 
-     int	;; width 
-     int	;; height 
-    int			;; angle1 
-    int			;; angle2 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum			;; x 
+    fixnum			;; y 
+     fixnum	;; width 
+     fixnum	;; height 
+    fixnum			;; angle1 
+    fixnum			;; angle2 
 
 )( void "XDrawArc"))
 
@@ -1490,11 +1492,11 @@
 
 (defentry XDrawArcs(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int 	;; arcs 
-    int			;; narcs 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum 	;; arcs 
+    fixnum			;; narcs 
 
 )( void "XDrawArcs"))
 
@@ -1502,13 +1504,13 @@
 
 (defentry XDrawImageString(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int			;; x 
-    int			;; y 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum			;; x 
+    fixnum			;; y 
     object		;; string 
-    int			;; length 
+    fixnum			;; length 
 
 )( void "XDrawImageString"))
 
@@ -1516,13 +1518,13 @@
 
 (defentry XDrawImageString16(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int			;; x 
-    int			;; y 
-     int	;; string 
-    int			;; length 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum			;; x 
+    fixnum			;; y 
+     fixnum	;; string 
+    fixnum			;; length 
 
 )( void "XDrawImageString16"))
 
@@ -1530,13 +1532,13 @@
 
 (defentry XDrawLine(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int			;; x1 
-    int			;; x2 
-    int			;; y1 
-    int			;; y2 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum			;; x1 
+    fixnum			;; x2 
+    fixnum			;; y1 
+    fixnum			;; y2 
 
 )( void "XDrawLine"))
 
@@ -1544,12 +1546,12 @@
 
 (defentry XDrawLines(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int		;; points 
-    int			;; npoints 
-    int			;; mode 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum		;; points 
+    fixnum			;; npoints 
+    fixnum			;; mode 
 
 )( void "XDrawLines"))
 
@@ -1557,11 +1559,11 @@
 
 (defentry XDrawPoint(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int			;; x 
-    int			;; y 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum			;; x 
+    fixnum			;; y 
 
 )( void "XDrawPoint"))
 
@@ -1569,12 +1571,12 @@
 
 (defentry XDrawPoints(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int		;; points 
-    int			;; npoints 
-    int			;; mode 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum		;; points 
+    fixnum			;; npoints 
+    fixnum			;; mode 
 
 )( void "XDrawPoints"))
 
@@ -1582,13 +1584,13 @@
 
 (defentry XDrawRectangle(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int			;; x 
-    int			;; y 
-     int	;; width 
-     int	;; height 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum			;; x 
+    fixnum			;; y 
+     fixnum	;; width 
+     fixnum	;; height 
 
 )( void "XDrawRectangle"))
 
@@ -1596,11 +1598,11 @@
 
 (defentry XDrawRectangles(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int 	;; rectangles 
-    int			;; nrectangles 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum 	;; rectangles 
+    fixnum			;; nrectangles 
 
 )( void "XDrawRectangles"))
 
@@ -1608,11 +1610,11 @@
 
 (defentry XDrawSegments(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int 	;; segments 
-    int			;; nsegments 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum 	;; segments 
+    fixnum			;; nsegments 
 
 )( void "XDrawSegments"))
 
@@ -1620,13 +1622,13 @@
 
 (defentry XDrawString(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int			;; x 
-    int			;; y 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum			;; x 
+    fixnum			;; y 
     object		;; string 
-    int			;; length 
+    fixnum			;; length 
 
 )( void "XDrawString"))
 
@@ -1634,13 +1636,13 @@
 
 (defentry XDrawString16(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int			;; x 
-    int			;; y 
-     int	;; string 
-    int			;; length 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum			;; x 
+    fixnum			;; y 
+     fixnum	;; string 
+    fixnum			;; length 
 
 )( void "XDrawString16"))
 
@@ -1648,13 +1650,13 @@
 
 (defentry XDrawText(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int			;; x 
-    int			;; y 
-    int 	;; items 
-    int			;; nitems 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum			;; x 
+    fixnum			;; y 
+    fixnum 	;; items 
+    fixnum			;; nitems 
 
 )( void "XDrawText"))
 
@@ -1662,13 +1664,13 @@
 
 (defentry XDrawText16(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int			;; x 
-    int			;; y 
-    int ;; items 
-    int			;; nitems 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum			;; x 
+    fixnum			;; y 
+    fixnum ;; items 
+    fixnum			;; nitems 
 
 )( void "XDrawText16"))
 
@@ -1676,7 +1678,7 @@
 
 (defentry XEnableAccessControl(
 
-    int		;; display 
+    fixnum		;; display 
 
 )( void "XEnableAccessControl"))
 
@@ -1684,34 +1686,34 @@
 
 (defentry XEventsQueued(
 
-    int		;; display 
-    int			;; mode 
+    fixnum		;; display 
+    fixnum			;; mode 
 
-)( int "XEventsQueued"))
+)( fixnum "XEventsQueued"))
 
 
 
 (defentry XFetchName(
 
-    int		;; display 
-    int		;; w 
-   int 	;; window_name_return 
+    fixnum		;; display 
+    fixnum		;; w 
+   fixnum 	;; window_name_return 
 
-)( int "XFetchName"))
+)( fixnum "XFetchName"))
 
 
 
 (defentry XFillArc(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int			;; x 
-    int			;; y 
-     int	;; width 
-     int	;; height 
-    int			;; angle1 
-    int			;; angle2 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum			;; x 
+    fixnum			;; y 
+     fixnum	;; width 
+     fixnum	;; height 
+    fixnum			;; angle1 
+    fixnum			;; angle2 
 
 )( void "XFillArc"))
 
@@ -1719,11 +1721,11 @@
 
 (defentry XFillArcs(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int 	;; arcs 
-    int			;; narcs 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum 	;; arcs 
+    fixnum			;; narcs 
 
 )( void "XFillArcs"))
 
@@ -1731,13 +1733,13 @@
 
 (defentry XFillPolygon(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int		;; points 
-    int			;; npoints 
-    int			;; shape 
-    int			;; mode 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum		;; points 
+    fixnum			;; npoints 
+    fixnum			;; shape 
+    fixnum			;; mode 
 
 )( void "XFillPolygon"))
 
@@ -1745,13 +1747,13 @@
 
 (defentry XFillRectangle(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int			;; x 
-    int			;; y 
-     int	;; width 
-     int	;; height 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum			;; x 
+    fixnum			;; y 
+     fixnum	;; width 
+     fixnum	;; height 
 
 )( void "XFillRectangle"))
 
@@ -1759,11 +1761,11 @@
 
 (defentry XFillRectangles(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int 	;; rectangles 
-    int			;; nrectangles 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum 	;; rectangles 
+    fixnum			;; nrectangles 
 
 )( void "XFillRectangles"))
 
@@ -1771,7 +1773,7 @@
 
 (defentry XFlush(
 
-    int		;; display 
+    fixnum		;; display 
 
 )( void "XFlush"))
 
@@ -1779,8 +1781,8 @@
 
 (defentry XForceScreenSaver(
 
-    int		;; display 
-    int			;; mode 
+    fixnum		;; display 
+    fixnum			;; mode 
 
 )( void "XForceScreenSaver"))
 
@@ -1796,8 +1798,8 @@
 
 (defentry XFreeColormap(
 
-    int		;; display 
-    int		;; colormap 
+    fixnum		;; display 
+    fixnum		;; colormap 
 
 )( void "XFreeColormap"))
 
@@ -1805,11 +1807,11 @@
 
 (defentry XFreeColors(
 
-    int		;; display 
-    int		;; colormap 
-     int ;; pixels 
-    int			;; npixels 
-     int	;; planes 
+    fixnum		;; display 
+    fixnum		;; colormap 
+     fixnum ;; pixels 
+    fixnum			;; npixels 
+     fixnum	;; planes 
 
 )( void "XFreeColors"))
 
@@ -1817,8 +1819,8 @@
 
 (defentry XFreeCursor(
 
-    int		;; display 
-    int		;; cursor 
+    fixnum		;; display 
+    fixnum		;; cursor 
 
 )( void "XFreeCursor"))
 
@@ -1826,7 +1828,7 @@
 
 (defentry XFreeExtensionList(
 
-   int 	;; list     
+   fixnum 	;; list     
 
 )( void "XFreeExtensionList"))
 
@@ -1834,8 +1836,8 @@
 
 (defentry XFreeFont(
 
-    int		;; display 
-    int	;; font_struct 
+    fixnum		;; display 
+    fixnum	;; font_struct 
 
 )( void "XFreeFont"))
 
@@ -1843,9 +1845,9 @@
 
 (defentry XFreeFontInfo(
 
-   int 	;; names 
-    int	;; free_info 
-    int			;; actual_count 
+   fixnum 	;; names 
+    fixnum	;; free_info 
+    fixnum			;; actual_count 
 
 )( void "XFreeFontInfo"))
 
@@ -1853,7 +1855,7 @@
 
 (defentry XFreeFontNames(
 
-   int 	;; list 
+   fixnum 	;; list 
 
 )( void "XFreeFontNames"))
 
@@ -1861,7 +1863,7 @@
 
 (defentry XFreeFontPath(
 
-   int 	;; list 
+   fixnum 	;; list 
 
 )( void "XFreeFontPath"))
 
@@ -1869,8 +1871,8 @@
 
 (defentry XFreeGC(
 
-    int		;; display 
-    int			;; gc 
+    fixnum		;; display 
+    fixnum			;; gc 
 
 )( void "XFreeGC"))
 
@@ -1878,7 +1880,7 @@
 
 (defentry XFreeModifiermap(
 
-    int	;; modmap 
+    fixnum	;; modmap 
 
 )( void "XFreeModifiermap"))
 
@@ -1886,8 +1888,8 @@
 
 (defentry XFreePixmap(
 
-    int		;; display 
-    int		;; int 
+    fixnum		;; display 
+    fixnum		;; fixnum 
 
 )( void "XFreePixmap"))
 
@@ -1895,32 +1897,32 @@
 
 (defentry XGeometry(
 
-    int		;; display 
-    int			;; screen 
+    fixnum		;; display 
+    fixnum			;; screen 
     object		;; position 
     object		;; default_position 
-     int	;; bwidth 
-     int	;; fwidth 
-     int	;; fheight 
-    int			;; xadder 
-    int			;; yadder 
-    int		;; x_return 
-    int		;; y_return 
-    int		;; width_return 
-    int		;; height_return 
+     fixnum	;; bwidth 
+     fixnum	;; fwidth 
+     fixnum	;; fheight 
+    fixnum			;; xadder 
+    fixnum			;; yadder 
+    fixnum		;; x_return 
+    fixnum		;; y_return 
+    fixnum		;; width_return 
+    fixnum		;; height_return 
 
-)( int "XGeometry"))
+)( fixnum "XGeometry"))
 
 
 
 (defentry XGetErrorDatabaseText(
 
-    int		;; display 
+    fixnum		;; display 
     object		;; name 
     object		;; message 
     object		;; default_string 
    object		;; buffer_return 
-    int			;; length 
+    fixnum			;; length 
 
 )( void "XGetErrorDatabaseText"))
 
@@ -1928,10 +1930,10 @@
 
 (defentry XGetErrorText(
 
-    int		;; display 
-    int			;; code 
+    fixnum		;; display 
+    fixnum			;; code 
    object		;; buffer_return 
-    int			;; length 
+    fixnum			;; length 
 
 )( void "XGetErrorText"))
 
@@ -1939,56 +1941,56 @@
 
 (defentry XGetFontProperty(
 
-    int	;; font_struct 
-    int		;; atom 
-     int ;; value_return 
+    fixnum	;; font_struct 
+    fixnum		;; atom 
+     fixnum ;; value_return 
 
-)( int "XGetFontProperty"))
+)( fixnum "XGetFontProperty"))
 
 
 
 (defentry XGetGCValues(
 
-    int		;; display 
-    int			;; gc 
-     int	;; valuemask 
-    int 	;; values_return 
+    fixnum		;; display 
+    fixnum			;; gc 
+     fixnum	;; valuemask 
+    fixnum 	;; values_return 
 
-)( int "XGetGCValues"))
+)( fixnum "XGetGCValues"))
 
 
 
 (defentry XGetGeometry(
 
-    int		;; display 
-    int		;; d 
-    int		;; root_return 
-    int		;; x_return 
-    int		;; y_return 
-     int	;; width_return 
-     int	;; height_return 
-     int	;; border_width_return 
-     int	;; depth_return 
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum		;; root_return 
+    fixnum		;; x_return 
+    fixnum		;; y_return 
+     fixnum	;; width_return 
+     fixnum	;; height_return 
+     fixnum	;; border_width_return 
+     fixnum	;; depth_return 
 
-)( int "XGetGeometry"))
+)( fixnum "XGetGeometry"))
 
 
 
 (defentry XGetIconName(
 
-    int		;; display 
-    int		;; w 
-   int 	;; icon_name_return 
+    fixnum		;; display 
+    fixnum		;; w 
+   fixnum 	;; icon_name_return 
 
-)( int "XGetIconName"))
+)( fixnum "XGetIconName"))
 
 
 
 (defentry XGetInputFocus(
 
-    int		;; display 
-    int		;; focus_return 
-    int		;; revert_to_return 
+    fixnum		;; display 
+    fixnum		;; focus_return 
+    fixnum		;; revert_to_return 
 
 )( void "XGetInputFocus"))
 
@@ -1996,8 +1998,8 @@
 
 (defentry XGetKeyboardControl(
 
-    int		;; display 
-    int ;; values_return 
+    fixnum		;; display 
+    fixnum ;; values_return 
 
 )( void "XGetKeyboardControl"))
 
@@ -2005,10 +2007,10 @@
 
 (defentry XGetPointerControl(
 
-    int		;; display 
-    int		;; accel_numerator_return 
-    int		;; accel_denominator_return 
-    int		;; threshold_return 
+    fixnum		;; display 
+    fixnum		;; accel_numerator_return 
+    fixnum		;; accel_denominator_return 
+    fixnum		;; threshold_return 
 
 )( void "XGetPointerControl"))
 
@@ -2016,21 +2018,21 @@
 
 (defentry XGetPointerMapping(
 
-    int		;; display 
+    fixnum		;; display 
     object	;; map_return 
-    int			;; nmap 
+    fixnum			;; nmap 
 
-)( int "XGetPointerMapping"))
+)( fixnum "XGetPointerMapping"))
 
 
 
 (defentry XGetScreenSaver(
 
-    int		;; display 
-    int		;; intout_return 
-    int		;; interval_return 
-    int		;; prefer_blanking_return 
-    int		;; allow_exposures_return 
+    fixnum		;; display 
+    fixnum		;; intout_return 
+    fixnum		;; interval_return 
+    fixnum		;; prefer_blanking_return 
+    fixnum		;; allow_exposures_return 
 
 )( void "XGetScreenSaver"))
 
@@ -2038,55 +2040,55 @@
 
 (defentry XGetTransientForHint(
 
-    int		;; display 
-    int		;; w 
-    int		;; prop_window_return 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; prop_window_return 
 
-)( int "XGetTransientForHint"))
+)( fixnum "XGetTransientForHint"))
 
 
 
 (defentry XGetWindowProperty(
 
-    int		;; display 
-    int		;; w 
-    int		;; property 
-    int		;; int_offset 
-    int		;; int_length 
-    int		;; delete 
-    int		;; req_type 
-    int 	;; actual_type_return 
-    int		;; actual_format_return 
-     int ;; nitems_return 
-     int ;; bytes_after_return 
-    int ;; prop_return 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; property 
+    fixnum		;; int_offset 
+    fixnum		;; int_length 
+    fixnum		;; delete 
+    fixnum		;; req_type 
+    fixnum 	;; actual_type_return 
+    fixnum		;; actual_format_return 
+     fixnum ;; nitems_return 
+     fixnum ;; bytes_after_return 
+    fixnum ;; prop_return 
 
-)( int "XGetWindowProperty"))
+)( fixnum "XGetWindowProperty"))
 
 
 
 (defentry XGetWindowAttributes(
 
-    int		;; display 
-    int		;; w 
-    int ;; Window_attributes_return 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum ;; Window_attributes_return 
 
-)( int "XGetWindowAttributes"))
+)( fixnum "XGetWindowAttributes"))
 
 
 
 (defentry XGrabButton(
 
-    int		;; display 
-     int	;; button 
-     int	;; modifiers 
-    int		;; grab_window 
-    int		;; owner_events 
-     int	;; event_mask 
-    int			;; pointer_mode 
-    int			;; keyboard_mode 
-    int		;; confine_to 
-    int		;; cursor 
+    fixnum		;; display 
+     fixnum	;; button 
+     fixnum	;; modifiers 
+    fixnum		;; grab_window 
+    fixnum		;; owner_events 
+     fixnum	;; event_mask 
+    fixnum			;; pointer_mode 
+    fixnum			;; keyboard_mode 
+    fixnum		;; confine_to 
+    fixnum		;; cursor 
 
 )( void "XGrabButton"))
 
@@ -2094,13 +2096,13 @@
 
 (defentry XGrabKey(
 
-    int		;; display 
-    int			;; keycode
-     int	;; modifiers 
-    int		;; grab_window 
-    int		;; owner_events 
-    int			;; pointer_mode 
-    int			;; keyboard_mode 
+    fixnum		;; display 
+    fixnum			;; keycode
+     fixnum	;; modifiers 
+    fixnum		;; grab_window 
+    fixnum		;; owner_events 
+    fixnum			;; pointer_mode 
+    fixnum			;; keyboard_mode 
 
 )( void "XGrabKey"))
 
@@ -2108,36 +2110,36 @@
 
 (defentry XGrabKeyboard(
 
-    int		;; display 
-    int		;; grab_window 
-    int		;; owner_events 
-    int			;; pointer_mode 
-    int			;; keyboard_mode 
-    int		;; int 
+    fixnum		;; display 
+    fixnum		;; grab_window 
+    fixnum		;; owner_events 
+    fixnum			;; pointer_mode 
+    fixnum			;; keyboard_mode 
+    fixnum		;; fixnum 
 
-)( int "XGrabKeyboard"))
+)( fixnum "XGrabKeyboard"))
 
 
 
 (defentry XGrabPointer(
 
-    int		;; display 
-    int		;; grab_window 
-    int		;; owner_events 
-     int	;; event_mask 
-    int			;; pointer_mode 
-    int			;; keyboard_mode 
-    int		;; confine_to 
-    int		;; cursor 
-    int		;; int 
+    fixnum		;; display 
+    fixnum		;; grab_window 
+    fixnum		;; owner_events 
+     fixnum	;; event_mask 
+    fixnum			;; pointer_mode 
+    fixnum			;; keyboard_mode 
+    fixnum		;; confine_to 
+    fixnum		;; cursor 
+    fixnum		;; fixnum 
 
-)( int "XGrabPointer"))
+)( fixnum "XGrabPointer"))
 
 
 
 (defentry XGrabServer(
 
-    int		;; display 
+    fixnum		;; display 
 
 )( void "XGrabServer"))
 
@@ -2145,32 +2147,32 @@
 
 (defentry XHeightMMOfScreen(
 
-    int		;; screen 
+    fixnum		;; screen 
 
-)( int "XHeightMMOfScreen"))
+)( fixnum "XHeightMMOfScreen"))
 
 
 
 (defentry XHeightOfScreen(
 
-    int		;; screen 
+    fixnum		;; screen 
 
-)( int "XHeightOfScreen"))
+)( fixnum "XHeightOfScreen"))
 
 
 
 (defentry XImageByteOrder(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int "XImageByteOrder"))
+)( fixnum "XImageByteOrder"))
 
 
 
 (defentry XInstallColormap(
 
-    int		;; display 
-    int		;; colormap 
+    fixnum		;; display 
+    fixnum		;; colormap 
 
 )( void "XInstallColormap"))
 
@@ -2178,17 +2180,17 @@
 
 (defentry XKeysymToKeycode(
 
-    int		;; display 
-    int		;; keysym 
+    fixnum		;; display 
+    fixnum		;; keysym 
 
-)( int "XKeysymToKeycode"))
+)( fixnum "XKeysymToKeycode"))
 
 
 
 (defentry XKillClient(
 
-    int		;; display 
-    int			;; resource 
+    fixnum		;; display 
+    fixnum			;; resource 
 
 )( void "XKillClient"))
 
@@ -2196,28 +2198,28 @@
 
 (defentry XLastKnownRequestProcessed(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int "XLastKnownRequestProcessed"))
+)( fixnum "XLastKnownRequestProcessed"))
 
 
 
 (defentry XLookupColor(
 
-    int		;; display 
-    int		;; colormap 
+    fixnum		;; display 
+    fixnum		;; colormap 
     object		;; color_name 
-    int		;; exact_def_return 
-    int		;; screen_def_return 
+    fixnum		;; exact_def_return 
+    fixnum		;; screen_def_return 
 
-)( int "XLookupColor"))
+)( fixnum "XLookupColor"))
 
 
 
 (defentry XLowerWindow(
 
-    int		;; display 
-    int		;; w 
+    fixnum		;; display 
+    fixnum		;; w 
 
 )( void "XLowerWindow"))
 
@@ -2225,8 +2227,8 @@
 
 (defentry XMapRaised(
 
-    int		;; display 
-    int		;; w 
+    fixnum		;; display 
+    fixnum		;; w 
 
 )( void "XMapRaised"))
 
@@ -2234,8 +2236,8 @@
 
 (defentry XMapSubwindows(
 
-    int		;; display 
-    int		;; w 
+    fixnum		;; display 
+    fixnum		;; w 
 
 )( void "XMapSubwindows"))
 
@@ -2243,8 +2245,8 @@
 
 (defentry XMapWindow(
 
-    int		;; display 
-    int		;; w 
+    fixnum		;; display 
+    fixnum		;; w 
 
 )( void "XMapWindow"))
 
@@ -2252,9 +2254,9 @@
 
 (defentry XMaskEvent(
 
-    int		;; display 
-    int		;; event_mask 
-    int		;; event_return 
+    fixnum		;; display 
+    fixnum		;; event_mask 
+    fixnum		;; event_return 
 
 )( void "XMaskEvent"))
 
@@ -2262,28 +2264,28 @@
 
 (defentry XMaxCmapsOfScreen(
 
-    int		;; screen 
+    fixnum		;; screen 
 
-)( int "XMaxCmapsOfScreen"))
+)( fixnum "XMaxCmapsOfScreen"))
 
 
 
 (defentry XMinCmapsOfScreen(
 
-    int		;; screen 
+    fixnum		;; screen 
 
-)( int "XMinCmapsOfScreen"))
+)( fixnum "XMinCmapsOfScreen"))
 
 
 
 (defentry XMoveResizeWindow(
 
-    int		;; display 
-    int		;; w 
-    int			;; x 
-    int			;; y 
-     int	;; width 
-     int	;; height 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum			;; x 
+    fixnum			;; y 
+     fixnum	;; width 
+     fixnum	;; height 
 
 )( void "XMoveResizeWindow"))
 
@@ -2291,10 +2293,10 @@
 
 (defentry XMoveWindow(
 
-    int		;; display 
-    int		;; w 
-    int			;; x 
-    int			;; y 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum			;; x 
+    fixnum			;; y 
 
 )( void "XMoveWindow"))
 
@@ -2302,8 +2304,8 @@
 
 (defentry XNextEvent(
 
-    int		;; display 
-    int		;; event_return 
+    fixnum		;; display 
+    fixnum		;; event_return 
 
 )( void "XNextEvent"))
 
@@ -2311,7 +2313,7 @@
 
 (defentry XNoOp(
 
-    int		;; display 
+    fixnum		;; display 
 
 )( void "XNoOp"))
 
@@ -2319,31 +2321,31 @@
 
 (defentry XParseColor(
 
-    int		;; display 
-    int		;; colormap 
+    fixnum		;; display 
+    fixnum		;; colormap 
     object		;; spec 
-    int		;; exact_def_return 
+    fixnum		;; exact_def_return 
 
-)( int "XParseColor"))
+)( fixnum "XParseColor"))
 
 
 
 (defentry XParseGeometry(
 
     object		;; parsestring 
-    int		;; x_return 
-    int		;; y_return 
-     int	;; width_return 
-     int	;; height_return 
+    fixnum		;; x_return 
+    fixnum		;; y_return 
+     fixnum	;; width_return 
+     fixnum	;; height_return 
 
-)( int "XParseGeometry"))
+)( fixnum "XParseGeometry"))
 
 
 
 (defentry XPeekEvent(
 
-    int		;; display 
-    int		;; event_return 
+    fixnum		;; display 
+    fixnum		;; event_return 
 
 )( void "XPeekEvent"))
 
@@ -2352,42 +2354,42 @@
 
 (defentry XPending(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int "XPending"))
+)( fixnum "XPending"))
 
 
 
 (defentry XPlanesOfScreen(
 
-    int		;; screen 
+    fixnum		;; screen 
     
 
-)( int "XPlanesOfScreen"))
+)( fixnum "XPlanesOfScreen"))
 
 
 
 (defentry XProtocolRevision(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int "XProtocolRevision"))
+)( fixnum "XProtocolRevision"))
 
 
 
 (defentry XProtocolVersion(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int "XProtocolVersion"))
+)( fixnum "XProtocolVersion"))
 
 
 
 
 (defentry XPutBackEvent(
 
-    int		;; display 
-    int		;; event 
+    fixnum		;; display 
+    fixnum		;; event 
 
 )( void "XPutBackEvent"))
 
@@ -2395,16 +2397,16 @@
 
 (defentry XPutImage(
 
-    int		;; display 
-    int		;; d 
-    int			;; gc 
-    int 	;; image 
-    int			;; src_x 
-    int			;; src_y 
-    int			;; dest_x 
-    int			;; dest_y 
-     int	;; width 
-     int	;; height 	  
+    fixnum		;; display 
+    fixnum		;; d 
+    fixnum			;; gc 
+    fixnum 	;; image 
+    fixnum			;; src_x 
+    fixnum			;; src_y 
+    fixnum			;; dest_x 
+    fixnum			;; dest_y 
+     fixnum	;; width 
+     fixnum	;; height 	  
 
 )( void "XPutImage"))
 
@@ -2412,70 +2414,70 @@
 
 (defentry XQLength(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int "XQLength"))
+)( fixnum "XQLength"))
 
 
 
 (defentry XQueryBestCursor(
 
-    int		;; display 
-    int		;; d 
-     int        ;; width 
-     int	;; height 
-     int	;; width_return 
-     int	;; height_return 
+    fixnum		;; display 
+    fixnum		;; d 
+     fixnum        ;; width 
+     fixnum	;; height 
+     fixnum	;; width_return 
+     fixnum	;; height_return 
 
-)( int "XQueryBestCursor"))
+)( fixnum "XQueryBestCursor"))
 
 
 
 (defentry XQueryBestSize(
 
-    int		;; display 
-    int			;; class 
-    int		;; which_screen 
-     int	;; width 
-     int	;; height 
-     int	;; width_return 
-     int	;; height_return 
+    fixnum		;; display 
+    fixnum			;; class 
+    fixnum		;; which_screen 
+     fixnum	;; width 
+     fixnum	;; height 
+     fixnum	;; width_return 
+     fixnum	;; height_return 
 
-)( int "XQueryBestSize"))
+)( fixnum "XQueryBestSize"))
 
 
 
 (defentry XQueryBestStipple(
 
-    int		;; display 
-    int		;; which_screen 
-     int	;; width 
-     int	;; height 
-     int	;; width_return 
-     int	;; height_return 
+    fixnum		;; display 
+    fixnum		;; which_screen 
+     fixnum	;; width 
+     fixnum	;; height 
+     fixnum	;; width_return 
+     fixnum	;; height_return 
 
-)( int "XQueryBestStipple"))
+)( fixnum "XQueryBestStipple"))
 
 
 
 (defentry XQueryBestTile(
 
-    int		;; display 
-    int		;; which_screen 
-     int	;; width 
-     int	;; height 
-     int	;; width_return 
-     int	;; height_return 
+    fixnum		;; display 
+    fixnum		;; which_screen 
+     fixnum	;; width 
+     fixnum	;; height 
+     fixnum	;; width_return 
+     fixnum	;; height_return 
 
-)( int "XQueryBestTile"))
+)( fixnum "XQueryBestTile"))
 
 
 
 (defentry XQueryColor(
 
-    int		;; display 
-    int		;; colormap 
-    int		;; def_in_out 
+    fixnum		;; display 
+    fixnum		;; colormap 
+    fixnum		;; def_in_out 
 
 )( void "XQueryColor"))
 
@@ -2483,10 +2485,10 @@
 
 (defentry XQueryColors(
 
-    int		;; display 
-    int		;; colormap 
-    int		;; defs_in_out 
-    int			;; ncolors 
+    fixnum		;; display 
+    fixnum		;; colormap 
+    fixnum		;; defs_in_out 
+    fixnum			;; ncolors 
 
 )( void "XQueryColors"))
 
@@ -2494,20 +2496,20 @@
 
 (defentry XQueryExtension(
 
-    int		;; display 
+    fixnum		;; display 
     object		;; name 
-    int		;; major_opcode_return 
-    int		;; first_event_return 
-    int		;; first_error_return 
+    fixnum		;; major_opcode_return 
+    fixnum		;; first_event_return 
+    fixnum		;; first_error_return 
 
-)( int "XQueryExtension"))
+)( fixnum "XQueryExtension"))
 
 
 ;;fix
 (defentry XQueryKeymap(
 
-    int		;; display 
-    int		;; keys_return 
+    fixnum		;; display 
+    fixnum		;; keys_return 
 
 )( void "XQueryKeymap"))
 
@@ -2515,30 +2517,30 @@
 
 (defentry XQueryPointer(
 
-    int		;; display 
-    int		;; w 
-    int		;; root_return 
-    int		;; child_return 
-    int		;; root_x_return 
-    int		;; root_y_return 
-    int		;; win_x_return 
-    int		;; win_y_return 
-     int       ;; mask_return 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; root_return 
+    fixnum		;; child_return 
+    fixnum		;; root_x_return 
+    fixnum		;; root_y_return 
+    fixnum		;; win_x_return 
+    fixnum		;; win_y_return 
+     fixnum       ;; mask_return 
 
-)( int "XQueryPointer"))
+)( fixnum "XQueryPointer"))
 
 
 
 (defentry XQueryTextExtents(
 
-    int		;; display 
-    int			;; font_ID 
+    fixnum		;; display 
+    fixnum			;; font_ID 
     object		;; string 
-    int			;; nchars 
-    int		;; direction_return 
-    int		;; font_ascent_return 
-    int		;; font_descent_return 
-    int	;; overall_return     
+    fixnum			;; nchars 
+    fixnum		;; direction_return 
+    fixnum		;; font_ascent_return 
+    fixnum		;; font_descent_return 
+    fixnum	;; overall_return     
 
 )( void "XQueryTextExtents"))
 
@@ -2546,14 +2548,14 @@
 
 (defentry XQueryTextExtents16(
 
-    int		;; display 
-    int			;; font_ID 
-     int	;; string 
-    int			;; nchars 
-    int		;; direction_return 
-    int		;; font_ascent_return 
-    int		;; font_descent_return 
-    int	;; overall_return 
+    fixnum		;; display 
+    fixnum			;; font_ID 
+     fixnum	;; string 
+    fixnum			;; nchars 
+    fixnum		;; direction_return 
+    fixnum		;; font_ascent_return 
+    fixnum		;; font_descent_return 
+    fixnum	;; overall_return 
 
 )( void "XQueryTextExtents16"))
 
@@ -2561,21 +2563,21 @@
 
 (defentry XQueryTree(
 
-    int		;; display 
-    int		;; w 
-    int		;; root_return 
-    int		;; parent_return 
-    int		;; children_return 
-     int	;; nchildren_return 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; root_return 
+    fixnum		;; parent_return 
+    fixnum		;; children_return 
+     fixnum	;; nchildren_return 
 
-)( int "XQueryTree"))
+)( fixnum "XQueryTree"))
 
 
 
 (defentry XRaiseWindow(
 
-    int		;; display 
-    int		;; w 
+    fixnum		;; display 
+    fixnum		;; w 
 
 )( void "XRaiseWindow"))
 
@@ -2583,27 +2585,27 @@
 
 (defentry XReadBitmapFile(
 
-    int		;; display 
-    int 		;; d 
+    fixnum		;; display 
+    fixnum 		;; d 
     object		;; filename 
-     int	;; width_return 
-     int	;; height_return 
-    int		;; bitmap_return 
-    int		;; x_hot_return 
-    int		;; y_hot_return 
+     fixnum	;; width_return 
+     fixnum	;; height_return 
+    fixnum		;; bitmap_return 
+    fixnum		;; x_hot_return 
+    fixnum		;; y_hot_return 
 
-)( int "XReadBitmapFile"))
+)( fixnum "XReadBitmapFile"))
 
 
 
 (defentry XRebindKeysym(
 
-    int		;; display 
-    int		;; keysym 
-    int		;; list 
-    int			;; mod_count 
+    fixnum		;; display 
+    fixnum		;; keysym 
+    fixnum		;; list 
+    fixnum			;; mod_count 
      object	;; string 
-    int			;; bytes_string 
+    fixnum			;; bytes_string 
 
 )( void "XRebindKeysym"))
 
@@ -2611,10 +2613,10 @@
 
 (defentry XRecolorCursor(
 
-    int		;; display 
-    int		;; cursor 
-    int		;; foreground_color 
-    int		;; background_color 
+    fixnum		;; display 
+    fixnum		;; cursor 
+    fixnum		;; foreground_color 
+    fixnum		;; background_color 
 
 )( void "XRecolorCursor"))
 
@@ -2622,7 +2624,7 @@
 
 (defentry XRefreshKeyboardMapping(
 
-    int	;; event_map     
+    fixnum	;; event_map     
 
 )( void "XRefreshKeyboardMapping"))
 
@@ -2630,8 +2632,8 @@
 
 (defentry XRemoveFromSaveSet(
 
-    int		;; display 
-    int		;; w 
+    fixnum		;; display 
+    fixnum		;; w 
 
 )( void "XRemoveFromSaveSet"))
 
@@ -2639,8 +2641,8 @@
 
 (defentry XRemoveHost(
 
-    int		;; display 
-    int ;; host 
+    fixnum		;; display 
+    fixnum ;; host 
 
 )( void "XRemoveHost"))
 
@@ -2648,9 +2650,9 @@
 
 (defentry XRemoveHosts(
 
-    int		;; display 
-    int	;; hosts 
-    int			;; num_hosts 
+    fixnum		;; display 
+    fixnum	;; hosts 
+    fixnum			;; num_hosts 
 
 )( void "XRemoveHosts"))
 
@@ -2658,11 +2660,11 @@
 
 (defentry XReparentWindow(
 
-    int		;; display 
-    int		;; w 
-    int		;; parent 
-    int			;; x 
-    int			;; y 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; parent 
+    fixnum			;; x 
+    fixnum			;; y 
 
 )( void "XReparentWindow"))
 
@@ -2670,7 +2672,7 @@
 
 (defentry XResetScreenSaver(
 
-    int		;; display 
+    fixnum		;; display 
 
 )( void "XResetScreenSaver"))
 
@@ -2678,10 +2680,10 @@
 
 (defentry XResizeWindow(
 
-    int		;; display 
-    int		;; w 
-     int	;; width 
-     int	;; height 
+    fixnum		;; display 
+    fixnum		;; w 
+     fixnum	;; width 
+     fixnum	;; height 
 
 )( void "XResizeWindow"))
 
@@ -2689,9 +2691,9 @@
 
 (defentry XRestackWindows(
 
-    int		;; display 
-    int		;; windows 
-    int			;; nwindows 
+    fixnum		;; display 
+    fixnum		;; windows 
+    fixnum			;; nwindows 
 
 )( void "XRestackWindows"))
 
@@ -2699,8 +2701,8 @@
 
 (defentry XRotateBuffers(
 
-    int		;; display 
-    int			;; rotate 
+    fixnum		;; display 
+    fixnum			;; rotate 
 
 )( void "XRotateBuffers"))
 
@@ -2708,11 +2710,11 @@
 
 (defentry XRotateWindowProperties(
 
-    int		;; display 
-    int		;; w 
-    int 	;; properties 
-    int			;; num_prop 
-    int			;; npositions 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum 	;; properties 
+    fixnum			;; num_prop 
+    fixnum			;; npositions 
 
 )( void "XRotateWindowProperties"))
 
@@ -2720,17 +2722,17 @@
 
 (defentry XScreenCount(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int "XScreenCount"))
+)( fixnum "XScreenCount"))
 
 
 
 (defentry XSelectInput(
 
-    int		;; display 
-    int		;; w 
-    int		;; event_mask 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; event_mask 
 
 )( void "XSelectInput"))
 
@@ -2738,20 +2740,20 @@
 
 (defentry XSendEvent(
 
-    int		;; display 
-    int		;; w 
-    int		;; propagate 
-    int		;; event_mask 
-    int		;; event_send 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; propagate 
+    fixnum		;; event_mask 
+    fixnum		;; event_send 
 
-)( int "XSendEvent"))
+)( fixnum "XSendEvent"))
 
 
 
 (defentry XSetAccessControl(
 
-    int		;; display 
-    int			;; mode 
+    fixnum		;; display 
+    fixnum			;; mode 
 
 )( void "XSetAccessControl"))
 
@@ -2759,9 +2761,9 @@
 
 (defentry XSetArcMode(
 
-    int		;; display 
-    int			;; gc 
-    int			;; arc_mode 
+    fixnum		;; display 
+    fixnum			;; gc 
+    fixnum			;; arc_mode 
 
 )( void "XSetArcMode"))
 
@@ -2769,9 +2771,9 @@
 
 (defentry XSetBackground(
 
-    int		;; display 
-    int			;; gc 
-     int	;; background 
+    fixnum		;; display 
+    fixnum			;; gc 
+     fixnum	;; background 
 
 )( void "XSetBackground"))
 
@@ -2779,9 +2781,9 @@
 
 (defentry XSetClipMask(
 
-    int		;; display 
-    int			;; gc 
-    int		;; int 
+    fixnum		;; display 
+    fixnum			;; gc 
+    fixnum		;; fixnum 
 
 )( void "XSetClipMask"))
 
@@ -2789,10 +2791,10 @@
 
 (defentry XSetClipOrigin(
 
-    int		;; display 
-    int			;; gc 
-    int			;; clip_x_origin 
-    int			;; clip_y_origin 
+    fixnum		;; display 
+    fixnum			;; gc 
+    fixnum			;; clip_x_origin 
+    fixnum			;; clip_y_origin 
 
 )( void "XSetClipOrigin"))
 
@@ -2800,13 +2802,13 @@
 
 (defentry XSetClipRectangles(
 
-    int		;; display 
-    int			;; gc 
-    int			;; clip_x_origin 
-    int			;; clip_y_origin 
-    int			;; rectangles 
-    int			;; n 
-    int			;; ordering 
+    fixnum		;; display 
+    fixnum			;; gc 
+    fixnum			;; clip_x_origin 
+    fixnum			;; clip_y_origin 
+    fixnum			;; rectangles 
+    fixnum			;; n 
+    fixnum			;; ordering 
 
 )( void "XSetClipRectangles"))
 
@@ -2814,8 +2816,8 @@
 
 (defentry XSetCloseDownMode(
 
-    int		;; display 
-    int			;; close_mode 
+    fixnum		;; display 
+    fixnum			;; close_mode 
 
 )( void "XSetCloseDownMode"))
 
@@ -2823,10 +2825,10 @@
 
 (defentry XSetCommand(
 
-    int		;; display 
-    int		;; w 
-   int 	;; argv 
-    int			;; argc 
+    fixnum		;; display 
+    fixnum		;; w 
+   fixnum 	;; argv 
+    fixnum			;; argc 
 
 )( void "XSetCommand"))
 
@@ -2834,11 +2836,11 @@
 
 (defentry XSetDashes(
 
-    int		;; display 
-    int			;; gc 
-    int			;; dash_offset 
+    fixnum		;; display 
+    fixnum			;; gc 
+    fixnum			;; dash_offset 
     object		;; dash_list 
-    int			;; n 
+    fixnum			;; n 
 
 )( void "XSetDashes"))
 
@@ -2846,9 +2848,9 @@
 
 (defentry XSetFillRule(
 
-    int		;; display 
-    int			;; gc 
-    int			;; fill_rule 
+    fixnum		;; display 
+    fixnum			;; gc 
+    fixnum			;; fill_rule 
 
 )( void "XSetFillRule"))
 
@@ -2856,9 +2858,9 @@
 
 (defentry XSetFillStyle(
 
-    int		;; display 
-    int			;; gc 
-    int			;; fill_style 
+    fixnum		;; display 
+    fixnum			;; gc 
+    fixnum			;; fill_style 
 
 )( void "XSetFillStyle"))
 
@@ -2866,9 +2868,9 @@
 
 (defentry XSetFont(
 
-    int		;; display 
-    int			;; gc 
-    int		;; font 
+    fixnum		;; display 
+    fixnum			;; gc 
+    fixnum		;; font 
 
 )( void "XSetFont"))
 
@@ -2876,9 +2878,9 @@
 
 (defentry XSetFontPath(
 
-    int		;; display 
-   int 	;; directories 
-    int			;; ndirs 	     
+    fixnum		;; display 
+   fixnum 	;; directories 
+    fixnum			;; ndirs 	     
 
 )( void "XSetFontPath"))
 
@@ -2886,9 +2888,9 @@
 
 (defentry XSetForeground(
 
-    int		;; display 
-    int			;; gc 
-     int	;; foreground 
+    fixnum		;; display 
+    fixnum			;; gc 
+     fixnum	;; foreground 
 
 )( void "XSetForeground"))
 
@@ -2896,9 +2898,9 @@
 
 (defentry XSetFunction(
 
-    int		;; display 
-    int			;; gc 
-    int			;; function 
+    fixnum		;; display 
+    fixnum			;; gc 
+    fixnum			;; function 
 
 )( void "XSetFunction"))
 
@@ -2906,9 +2908,9 @@
 
 (defentry XSetGraphicsExposures(
 
-    int		;; display 
-    int			;; gc 
-    int		;; graphics_exposures 
+    fixnum		;; display 
+    fixnum			;; gc 
+    fixnum		;; graphics_exposures 
 
 )( void "XSetGraphicsExposures"))
 
@@ -2916,8 +2918,8 @@
 
 (defentry XSetIconName(
 
-    int		;; display 
-    int		;; w 
+    fixnum		;; display 
+    fixnum		;; w 
     object		;; icon_name 
 
 )( void "XSetIconName"))
@@ -2926,10 +2928,10 @@
 
 (defentry XSetInputFocus(
 
-    int		;; display 
-    int		;; focus 
-    int			;; revert_to 
-    int		;; int 
+    fixnum		;; display 
+    fixnum		;; focus 
+    fixnum			;; revert_to 
+    fixnum		;; fixnum 
 
 )( void "XSetInputFocus"))
 
@@ -2937,12 +2939,12 @@
 
 (defentry XSetLineAttributes(
 
-    int		;; display 
-    int			;; gc 
-     int	;; line_width 
-    int			;; line_style 
-    int			;; cap_style 
-    int			;; join_style 
+    fixnum		;; display 
+    fixnum			;; gc 
+     fixnum	;; line_width 
+    fixnum			;; line_style 
+    fixnum			;; cap_style 
+    fixnum			;; join_style 
 
 )( void "XSetLineAttributes"))
 
@@ -2950,18 +2952,18 @@
 
 (defentry XSetModifierMapping(
 
-    int		;; display 
-    int	;; modmap 
+    fixnum		;; display 
+    fixnum	;; modmap 
 
-)( int "XSetModifierMapping"))
+)( fixnum "XSetModifierMapping"))
 
 
 
 (defentry XSetPlaneMask(
 
-    int		;; display 
-    int			;; gc 
-     int	;; plane_mask 
+    fixnum		;; display 
+    fixnum			;; gc 
+     fixnum	;; plane_mask 
 
 )( void "XSetPlaneMask"))
 
@@ -2969,21 +2971,21 @@
 
 (defentry XSetPointerMapping(
 
-    int		;; display 
+    fixnum		;; display 
      object	;; map 
-    int			;; nmap 
+    fixnum			;; nmap 
 
-)( int "XSetPointerMapping"))
+)( fixnum "XSetPointerMapping"))
 
 
 
 (defentry XSetScreenSaver(
 
-    int		;; display 
-    int			;; intout 
-    int			;; interval 
-    int			;; prefer_blanking 
-    int			;; allow_exposures 
+    fixnum		;; display 
+    fixnum			;; intout 
+    fixnum			;; interval 
+    fixnum			;; prefer_blanking 
+    fixnum			;; allow_exposures 
 
 )( void "XSetScreenSaver"))
 
@@ -2991,10 +2993,10 @@
 
 (defentry XSetSelectionOwner(
 
-    int		;; display 
-    int	        ;; selection 
-    int		;; owner 
-    int		;; int 
+    fixnum		;; display 
+    fixnum	        ;; selection 
+    fixnum		;; owner 
+    fixnum		;; fixnum 
 
 )( void "XSetSelectionOwner"))
 
@@ -3002,12 +3004,12 @@
 
 (defentry XSetState(
 
-    int		;; display 
-    int			;; gc 
-     int 	;; foreground 
-     int	;; background 
-    int			;; function 
-     int	;; plane_mask 
+    fixnum		;; display 
+    fixnum			;; gc 
+     fixnum 	;; foreground 
+     fixnum	;; background 
+    fixnum			;; function 
+     fixnum	;; plane_mask 
 
 )( void "XSetState"))
 
@@ -3015,9 +3017,9 @@
 
 (defentry XSetStipple(
 
-    int		;; display 
-    int			;; gc 
-    int		;; stipple 
+    fixnum		;; display 
+    fixnum			;; gc 
+    fixnum		;; stipple 
 
 )( void "XSetStipple"))
 
@@ -3025,9 +3027,9 @@
 
 (defentry XSetSubwindowMode(
 
-    int		;; display 
-    int			;; gc 
-    int			;; subwindow_mode 
+    fixnum		;; display 
+    fixnum			;; gc 
+    fixnum			;; subwindow_mode 
 
 )( void "XSetSubwindowMode"))
 
@@ -3035,10 +3037,10 @@
 
 (defentry XSetTSOrigin(
 
-    int		;; display 
-    int			;; gc 
-    int			;; ts_x_origin 
-    int			;; ts_y_origin 
+    fixnum		;; display 
+    fixnum			;; gc 
+    fixnum			;; ts_x_origin 
+    fixnum			;; ts_y_origin 
 
 )( void "XSetTSOrigin"))
 
@@ -3046,9 +3048,9 @@
 
 (defentry XSetTile(
 
-    int		;; display 
-    int			;; gc 
-    int		;; tile 
+    fixnum		;; display 
+    fixnum			;; gc 
+    fixnum		;; tile 
 
 )( void "XSetTile"))
 
@@ -3056,9 +3058,9 @@
 
 (defentry XSetWindowBackground(
 
-    int		;; display 
-    int		;; w 
-     int	;; background_pixel 
+    fixnum		;; display 
+    fixnum		;; w 
+     fixnum	;; background_pixel 
 
 )( void "XSetWindowBackground"))
 
@@ -3066,9 +3068,9 @@
 
 (defentry XSetWindowBackgroundPixmap(
 
-    int		;; display 
-    int		;; w 
-    int		;; background_pixmap 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; background_pixmap 
 
 )( void "XSetWindowBackgroundPixmap"))
 
@@ -3076,9 +3078,9 @@
 
 (defentry XSetWindowBorder(
 
-    int		;; display 
-    int		;; w 
-     int	;; border_pixel 
+    fixnum		;; display 
+    fixnum		;; w 
+     fixnum	;; border_pixel 
 
 )( void "XSetWindowBorder"))
 
@@ -3086,9 +3088,9 @@
 
 (defentry XSetWindowBorderPixmap(
 
-    int		;; display 
-    int		;; w 
-    int		;; border_pixmap
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; border_pixmap
 
 )( void "XSetWindowBorderPixmap"))
 
@@ -3096,9 +3098,9 @@
 
 (defentry XSetWindowBorderWidth(
 
-    int		;; display 
-    int		;; w 
-     int	;; width 
+    fixnum		;; display 
+    fixnum		;; w 
+     fixnum	;; width 
 
 )( void "XSetWindowBorderWidth"))
 
@@ -3106,9 +3108,9 @@
 
 (defentry XSetWindowColormap(
 
-    int		;; display 
-    int		;; w 
-    int		;; colormap 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; colormap 
 
 )( void "XSetWindowColormap"))
 
@@ -3116,10 +3118,10 @@
 
 (defentry XStoreBuffer(
 
-    int		;; display 
+    fixnum		;; display 
     object		;; bytes 
-    int			;; nbytes 
-    int			;; buffer 
+    fixnum			;; nbytes 
+    fixnum			;; buffer 
 
 )( void "XStoreBuffer"))
 
@@ -3127,9 +3129,9 @@
 
 (defentry XStoreBytes(
 
-    int		;; display 
+    fixnum		;; display 
     object		;; bytes 
-    int			;; nbytes 
+    fixnum			;; nbytes 
 
 )( void "XStoreBytes"))
 
@@ -3137,9 +3139,9 @@
 
 (defentry XStoreColor(
 
-    int		;; display 
-    int		;; colormap 
-    int		;; color 
+    fixnum		;; display 
+    fixnum		;; colormap 
+    fixnum		;; color 
 
 )( void "XStoreColor"))
 
@@ -3147,10 +3149,10 @@
 
 (defentry XStoreColors(
 
-    int		;; display 
-    int		;; colormap 
-    int		;; color 
-    int			;; ncolors 
+    fixnum		;; display 
+    fixnum		;; colormap 
+    fixnum		;; color 
+    fixnum			;; ncolors 
 
 )( void "XStoreColors"))
 
@@ -3158,8 +3160,8 @@
 
 (defentry XStoreName(
 
-    int		;; display 
-    int		;; w 
+    fixnum		;; display 
+    fixnum		;; w 
     object		;; window_name 
 
 )( void "XStoreName"))
@@ -3168,11 +3170,11 @@
 
 (defentry XStoreNamedColor(
 
-    int		;; display 
-    int		;; colormap 
+    fixnum		;; display 
+    fixnum		;; colormap 
     object		;; color 
-     int	;; pixel 
-    int			;; flags 
+     fixnum	;; pixel 
+    fixnum			;; flags 
 
 )( void "XStoreNamedColor"))
 
@@ -3180,8 +3182,8 @@
 
 (defentry XSync(
 
-    int		;; display 
-    int		;; discard 
+    fixnum		;; display 
+    fixnum		;; discard 
 
 )( void "XSync"))
 
@@ -3189,13 +3191,13 @@
 
 (defentry XTextExtents(
 
-    int	;; font_struct 
+    fixnum	;; font_struct 
     object		;; string 
-    int			;; nchars 
-    int		;; direction_return 
-    int		;; font_ascent_return 
-    int		;; font_descent_return 
-    int	;; overall_return 
+    fixnum			;; nchars 
+    fixnum		;; direction_return 
+    fixnum		;; font_ascent_return 
+    fixnum		;; font_descent_return 
+    fixnum	;; overall_return 
 
 )( void "XTextExtents"))
 
@@ -3203,13 +3205,13 @@
 
 (defentry XTextExtents16(
 
-    int	;; font_struct 
-     int	;; string 
-    int			;; nchars 
-    int		;; direction_return 
-    int		;; font_ascent_return 
-    int		;; font_descent_return 
-    int	;; overall_return 
+    fixnum	;; font_struct 
+     fixnum	;; string 
+    fixnum			;; nchars 
+    fixnum		;; direction_return 
+    fixnum		;; font_ascent_return 
+    fixnum		;; font_descent_return 
+    fixnum	;; overall_return 
 
 )( void "XTextExtents16"))
 
@@ -3217,43 +3219,43 @@
 
 (defentry XTextWidth(
 
-    int	;; font_struct 
+    fixnum	;; font_struct 
     object		;; string 
-    int			;; count 
+    fixnum			;; count 
 
-)( int "XTextWidth"))
+)( fixnum "XTextWidth"))
 
 
 
 (defentry XTextWidth16(
 
-    int	;; font_struct 
-    int		;; string 
-    int			;; count 
+    fixnum	;; font_struct 
+    fixnum		;; string 
+    fixnum			;; count 
 
-)( int "XTextWidth16"))
+)( fixnum "XTextWidth16"))
 
 
 
 (defentry XTranslateCoordinates(
 
-    int		;; display 
-    int		;; src_w 
-    int		;; dest_w 
-    int		;; src_x 
-    int		;; src_y 
-    int		;; dest_x_return 
-    int		;; dest_y_return 
-    int		;; child_return 
+    fixnum		;; display 
+    fixnum		;; src_w 
+    fixnum		;; dest_w 
+    fixnum		;; src_x 
+    fixnum		;; src_y 
+    fixnum		;; dest_x_return 
+    fixnum		;; dest_y_return 
+    fixnum		;; child_return 
 
-)( int "XTranslateCoordinates"))
+)( fixnum "XTranslateCoordinates"))
 
 
 
 (defentry XUndefineCursor(
 
-    int		;; display 
-    int		;; w 
+    fixnum		;; display 
+    fixnum		;; w 
 
 )( void "XUndefineCursor"))
 
@@ -3261,10 +3263,10 @@
 
 (defentry XUngrabButton(
 
-    int		;; display 
-     int	;; button 
-     int	;; modifiers 
-    int		;; grab_window 
+    fixnum		;; display 
+     fixnum	;; button 
+     fixnum	;; modifiers 
+    fixnum		;; grab_window 
 
 )( void "XUngrabButton"))
 
@@ -3272,10 +3274,10 @@
 
 (defentry XUngrabKey(
 
-    int		;; display 
-    int		;; keycode
-     int	;; modifiers 
-    int		;; grab_window 
+    fixnum		;; display 
+    fixnum		;; keycode
+     fixnum	;; modifiers 
+    fixnum		;; grab_window 
 
 )( void "XUngrabKey"))
 
@@ -3283,8 +3285,8 @@
 
 (defentry XUngrabKeyboard(
 
-    int		;; display 
-    int		;; int 
+    fixnum		;; display 
+    fixnum		;; fixnum 
 
 )( void "XUngrabKeyboard"))
 
@@ -3292,8 +3294,8 @@
 
 (defentry XUngrabPointer(
 
-    int		;; display 
-    int		;; int 
+    fixnum		;; display 
+    fixnum		;; fixnum 
 
 )( void "XUngrabPointer"))
 
@@ -3301,7 +3303,7 @@
 
 (defentry XUngrabServer(
 
-    int		;; display 
+    fixnum		;; display 
 
 )( void "XUngrabServer"))
 
@@ -3309,8 +3311,8 @@
 
 (defentry XUninstallColormap(
 
-    int		;; display 
-    int		;; colormap 
+    fixnum		;; display 
+    fixnum		;; colormap 
 
 )( void "XUninstallColormap"))
 
@@ -3318,8 +3320,8 @@
 
 (defentry XUnloadFont(
 
-    int		;; display 
-    int	;; font 
+    fixnum		;; display 
+    fixnum	;; font 
 
 )( void "XUnloadFont"))
 
@@ -3327,8 +3329,8 @@
 
 (defentry XUnmapSubwindows(
 
-    int		;; display 
-    int		;; w 
+    fixnum		;; display 
+    fixnum		;; w 
 
 )( void "XUnmapSubwindows"))
 
@@ -3336,8 +3338,8 @@
 
 (defentry XUnmapWindow(
 
-    int		;; display 
-    int		;; w 
+    fixnum		;; display 
+    fixnum		;; w 
 
 )( void "XUnmapWindow"))
 
@@ -3345,23 +3347,23 @@
 
 (defentry XVendorRelease(
 
-    int		;; display 
+    fixnum		;; display 
 
-)( int "XVendorRelease"))
+)( fixnum "XVendorRelease"))
 
 
 
 (defentry XWarpPointer(
 
-    int		;; display 
-    int		;; src_w 
-    int		;; dest_w 
-    int			;; src_x 
-    int			;; src_y 
-     int	;; src_width 
-     int	;; src_height 
-    int			;; dest_x 
-    int			;; dest_y 	     
+    fixnum		;; display 
+    fixnum		;; src_w 
+    fixnum		;; dest_w 
+    fixnum			;; src_x 
+    fixnum			;; src_y 
+     fixnum	;; src_width 
+     fixnum	;; src_height 
+    fixnum			;; dest_x 
+    fixnum			;; dest_y 	     
 
 )( void "XWarpPointer"))
 
@@ -3369,26 +3371,26 @@
 
 (defentry XWidthMMOfScreen(
 
-    int		;; screen 
+    fixnum		;; screen 
 
-)( int "XWidthMMOfScreen"))
+)( fixnum "XWidthMMOfScreen"))
 
 
 
 (defentry XWidthOfScreen(
 
-    int		;; screen 
+    fixnum		;; screen 
 
-)( int "XWidthOfScreen"))
+)( fixnum "XWidthOfScreen"))
 
 
 
 (defentry XWindowEvent(
 
-    int		;; display 
-    int		;; w 
-    int		;; event_mask 
-    int		;; event_return 
+    fixnum		;; display 
+    fixnum		;; w 
+    fixnum		;; event_mask 
+    fixnum		;; event_return 
 
 )( void "XWindowEvent"))
 
@@ -3396,15 +3398,15 @@
 
 (defentry XWriteBitmapFile(
 
-    int		;; display 
+    fixnum		;; display 
     object		;; filename 
-    int		;; bitmap 
-     int	;; width 
-     int	;; height 
-    int			;; x_hot 
-    int			;; y_hot 		     
+    fixnum		;; bitmap 
+     fixnum	;; width 
+     fixnum	;; height 
+    fixnum			;; x_hot 
+    fixnum			;; y_hot 		     
 
-)( int "XWriteBitmapFile"))
+)( fixnum "XWriteBitmapFile"))
 
 
 
@@ -3413,16 +3415,16 @@
 
 
 
-;;(defentry int (int Synchronize(
+;;(defentry fixnum (int Synchronize(
 
-;;    int		;; display 
-;;    int		;; onoff 
+;;    fixnum		;; display 
+;;    fixnum		;; onoff 
 
 ;;))()())
-;;(defentry int (int SetAfterFunction(
+;;(defentry fixnum (int SetAfterFunction(
 
-;;    int		;; display 
-;;    int (int  ( int			;; display 
+;;    fixnum		;; display 
+;;    fixnum (int  ( fixnum			;; display 
 ;;            )		;; procedure 
 
 ;;))()())					
@@ -3430,22 +3432,22 @@
 
 ;;(defentry void XPeekIfEvent(
 
-;;    int		;; display 
-;;    int		;; event_return 
-;;    int (int  ( int		;; display 
-;;               int		;; event 
+;;    fixnum		;; display 
+;;    fixnum		;; event_return 
+;;    fixnum (int  ( fixnum		;; display 
+;;               fixnum		;; event 
 ;;              object		;; arg 
 ;;             )		;; predicate 
 ;;   object		;; arg 
 
 ;;)())
 
-;;(defentry int XCheckIfEvent(
+;;(defentry fixnum XCheckIfEvent(
 
-;;    int		;; display 
-;;    int		;; event_return 
-;;    int (int  ( int			;; display 
-;;               int			;; event 
+;;    fixnum		;; display 
+;;    fixnum		;; event_return 
+;;    fixnum (int  ( fixnum			;; display 
+;;               fixnum			;; event 
 ;;              object			;; arg 
 ;;             )		;; predicate 
 ;;   object		;; arg 
@@ -3454,10 +3456,10 @@
 
 ;;(defentry void XIfEvent(
 
-;;    int		;; display 
-;;    int		;; event_return 
-;;    int (int  ( int			;; display 
-;;               int			;; event 
+;;    fixnum		;; display 
+;;    fixnum		;; event_return 
+;;    fixnum (int  ( fixnum			;; display 
+;;               fixnum			;; event 
 ;;              object			;; arg 
 ;;             )		;; predicate 
 ;;   object		;; arg 

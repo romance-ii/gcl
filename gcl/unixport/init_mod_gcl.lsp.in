@@ -68,11 +68,8 @@
 		(setf system:*default-time-zone* (get-system-time-zone))
 	      (setf system:*default-time-zone* 6)))
  
- (if (fboundp 'si::user-init) (si::user-init))
- (setq si::*disable-recompile* nil)
- (si::do-recompile "gcl_recompile.lsp")	
- (maphash (lambda (x y) (when (si::call-sig y) (proclaim `(ftype (function ,@(si::call-sig y)) ,x)))) si::*call-hash-table*)
  (si::set-up-top-level)
+ (if (fboundp 'si::user-init) (si::user-init))
  
  (setq si::*gcl-version* @LI-MINVERS@ si::*gcl-major-version* @LI-MAJVERS@)
  (setq compiler::*cc* @LI-CC@)

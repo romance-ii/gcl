@@ -124,7 +124,7 @@
     (set-xsizehints-height *default-size-hints* win-height)
     (set-xsizehints-flags *default-size-hints* (+ Psize Pposition))
     (XsetStandardProperties  *default-display*  a-window (get-c-string window-name)
-			     (get-c-string icon-name) none null null *default-size-hints*)
+			     (get-c-string icon-name) none 0 0 *default-size-hints*)
 
 ;; the events or input a window can have are set with Xselectinput
 ;;    (Xselectinput *default-display* a-window 
