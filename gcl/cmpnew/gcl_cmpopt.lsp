@@ -898,6 +898,42 @@
 (pushn '((t) t #.(flags)"CMPcadddr(#0)")
    (get 'fourth 'inline-unsafe))
 
+;;FIFTH
+ (pushn '((t) t #.(flags)"cadr(cdddr(#0))")
+   (get 'fifth 'inline-safe))
+(pushn '((t) t #.(flags)"CMPcadr(CMPcdddr(#0))")
+   (get 'fifth 'inline-unsafe))
+
+;;SIXTH
+ (pushn '((t) t #.(flags)"caddr(cdddr(#0))")
+   (get 'sixth 'inline-safe))
+(pushn '((t) t #.(flags)"CMPcaddr(CMPcdddr(#0))")
+   (get 'sixth 'inline-unsafe))
+
+;;SEVENTH
+ (pushn '((t) t #.(flags)"cadddr(cdddr(#0))")
+   (get 'seventh 'inline-safe))
+(pushn '((t) t #.(flags)"CMPcadddr(CMPcdddr(#0))")
+   (get 'seventh 'inline-unsafe))
+
+;;EIGHTH
+ (pushn '((t) t #.(flags)"cadr(cdddr(cdddr(#0)))")
+   (get 'eighth 'inline-safe))
+(pushn '((t) t #.(flags)"CMPcadr(CMPcdddr(CMPcdddr(#0)))")
+   (get 'eighth 'inline-unsafe))
+
+;;NINTH
+ (pushn '((t) t #.(flags)"caddr(cdddr(cdddr(#0)))")
+   (get 'ninth 'inline-safe))
+(pushn '((t) t #.(flags)"CMPcaddr(CMPcdddr(CMPcdddr(#0)))")
+   (get 'ninth 'inline-unsafe))
+
+;;TENTH
+ (pushn '((t) t #.(flags)"cadddr(cdddr(cdddr(#0)))")
+   (get 'tenth 'inline-safe))
+(pushn '((t) t #.(flags)"CMPcadddr(CMPcdddr(CMPcdddr(#0)))")
+   (get 'tenth 'inline-unsafe))
+
 ;;GET
  (pushn '((t t t) t #.(flags)"get(#0,#1,#2)")
    (get 'get 'inline-always))
