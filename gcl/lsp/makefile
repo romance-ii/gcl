@@ -57,7 +57,7 @@ fns:	../cmpnew/gcl_collectfn.o
 
 
 clean:
-	rm -f *.o core a.out *.fn *.c *.h *.data
+	rm -f *.o core a.out *.fn *.c *.h *.data gcl_recompile.lsp
 allclean:
 	rm -f *.h *.data *.c
 
