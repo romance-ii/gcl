@@ -59,6 +59,10 @@
 	     (maphash (lambda (x y) 
 			(when (and (fboundp x) (eq (symbol-function x) code) (call-src y))
 			  (setq new x))) *call-hash-table*)
+;	     (when (and (functionp code) (not (eq sym (function-name code))) (gethash (function-name code) *call-hash-table*) (not new))
+;	       (format t  "setf symbol function ~s ~s~%" sym (function-name code)))
+;	     (when (string= "MAKE-METHOD-LAMBDA" (symbol-name sym))
+;	       (format t  "setf symbol function ~s code ~s~%" sym code))
 	     (cond (new
 		    (let ((nr (find new *needs-recompile* :key 'car)))
 		      (when nr (add-recompile sym (cadr nr) (caddr nr) (cadddr nr))))
@@ -72,7 +76,9 @@
 		    (dolist (l (call-callees new)) 
 		      (pushnew sym (call-callers (gethash l *call-hash-table*))))
 		    (setf (call-callees h) (call-callees new) (call-src h) (call-src new)))
-		   ((setf (call-callees h) nil (call-src h) nil))))))))
+		   ((progn
+		      (remove-recompile sym)
+		      (setf (call-callees h) nil (call-src h) nil)))))))))
 
 (defun add-recompile (fn why assumed-sig actual-sig)
   (unless (find fn *needs-recompile* :key 'car)

@@ -171,7 +171,6 @@ plt.h: plttest.o pltd.h
                             if (!match(a,"^\\.")) print a;}' \
 			k=$(LEADING_UNDERSCORE) |\
 			sort | \
-			grep -v '[^ \t_]_' |\
 			awk '{A[++k]=$$0} END {for (i=1;i<=k;i++) \
 				printf("MY_PLT(%s)%s\n",A[i],i==k ? "" : ",");}' >$@
 	echo Plt table:
