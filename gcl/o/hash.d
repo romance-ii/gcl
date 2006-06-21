@@ -62,6 +62,17 @@ object sKrehash_threshold;
 
 #define MHSH(a_) ((a_) & ~(((unsigned long)1)<<(sizeof(a_)*CHAR_SIZE-1)))
 
+typedef union {/*FIXME size checks*/
+  float f;
+  unsigned long ul;
+} F2ul;
+
+typedef union {
+  double d;
+  unsigned long ul[2];
+} D2ul;
+
+
 static unsigned long
 hash_eql(object x) {
 
@@ -103,13 +114,18 @@ hash_eql(object x) {
     break;
 
   case t_shortfloat:  /*FIXME, sizeof int = sizeof float*/
-    h=*((unsigned long *) &(sf(x)));
+    { 
+      F2ul u;
+      u.f=sf(x);
+      return(u.ul);
+    }
     break;
-
+    
   case t_longfloat:
-    {
-      unsigned long *y = (unsigned long *) &lf(x);
-      h= *y + *(y+1);
+    { 
+      D2ul u;
+      u.d=lf(x);
+      return(u.ul[0]+u.ul[1]);
     }
     break;
 

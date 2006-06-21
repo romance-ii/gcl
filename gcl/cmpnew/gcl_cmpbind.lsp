@@ -39,7 +39,7 @@
                (clink (var-ref var))
                (setf (var-ref-ccb var) (ccb-vs-push))))
         (SPECIAL
-         (wt-nl "bds_bind(VV[" (var-loc var) "],") (wt-vs (var-ref var))
+         (wt-nl "bds_bind(" (vv-str (var-loc var)) ",") (wt-vs (var-ref var))
          (wt ");")
          (push 'bds-bind *unwind-exit*))
 	(DOWN
@@ -77,7 +77,7 @@
                (t
                 (wt-nl) (wt-vs (var-ref var)) (wt "= " loc ";"))))
         (SPECIAL
-         (wt-nl "bds_bind(VV[" (var-loc var) "]," loc ");")
+         (wt-nl "bds_bind(" (vv-str (var-loc var)) "," loc ");")
          (push 'bds-bind *unwind-exit*))
 
         (DOWN
@@ -125,4 +125,4 @@
 	   (c2expr* init)))))
 
 (defun set-bds-bind (loc vv)
-       (wt-nl "bds_bind(VV[" vv "]," loc ");"))
+       (wt-nl "bds_bind(" (vv-str vv) "," loc ");"))

@@ -1078,7 +1078,7 @@ set_key_struct(struct key *ks, object data)
 {int i=ks->n;
  while (--i >=0)
    {ks->keys[i].o =   data->cfd.cfd_self[ ks->keys[i].i ];
-    if (ks->defaults != (iobject *)Cstd_key_defaults)
+    if (ks->defaults != (void *)Cstd_key_defaults)
       {int m=ks->defaults[i].i;
         ks->defaults[i].o=
 	  (m==-2 ? Cnil :

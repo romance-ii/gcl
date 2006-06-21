@@ -247,12 +247,12 @@
 			(setf (var-kind var) 'object)
 			(wt-var var ccb))
                        (t (wt-vs (var-ref var)))))
-        (SPECIAL (wt "(VV[" (var-loc var) "]->s.s_dbind)"))
+        (SPECIAL (wt "(" (vv-str (var-loc var)) "->s.s_dbind)"))
         (REPLACED (wt (var-loc var)))
 	(DOWN  (wt-down (var-loc var)))
         (GLOBAL (if *safe-compile*
-                    (wt "symbol_value(VV[" (var-loc var) "])")
-                    (wt "(VV[" (var-loc var) "]->s.s_dbind)")))
+                    (wt "symbol_value(" (vv-str (var-loc var)) ")")
+                    (wt "(" (vv-str (var-loc var)) "->s.s_dbind)")))
         (t (let ((z (cdr (assoc (var-kind var) +wt-c-var-alist+))))
 	     (unless z (baboon))
 	     (when (and (eq #tfixnum (var-kind var)) (zerop *space*)) 
@@ -280,11 +280,11 @@
                            ((var-ref-ccb var) (wt-vs* (var-ref var)))
                            (t (wt-vs (var-ref var))))
                      (wt "= " loc ";"))
-            (SPECIAL (wt-nl "(VV[" (var-loc var) "]->s.s_dbind)= " loc ";"))
+            (SPECIAL (wt-nl "(" (vv-str (var-loc var)) "->s.s_dbind)= " loc ";"))
             (GLOBAL
              (if *safe-compile*
-                 (wt-nl "setq(VV[" (var-loc var) "]," loc ");")
-                 (wt-nl "(VV[" (var-loc var) "]->s.s_dbind)= " loc ";")))
+                 (wt-nl "setq(" (vv-str (var-loc var)) "," loc ");")
+                 (wt-nl "(" (vv-str (var-loc var)) "->s.s_dbind)= " loc ";")))
 	    (DOWN
 	      (wt-nl "") (wt-down (var-loc var))
 	      (wt "=" loc ";"))

@@ -245,7 +245,7 @@
         (setf (tag-unwind-exit tag) label)
         (when (tag-ref-clb tag)
           (setf (tag-ref-clb tag) ref-clb)
-          (wt-nl "if(eql(nlj_tag,VV[" (tag-var tag) "])) {")
+          (wt-nl "if(eql(nlj_tag," (vv-str (tag-var tag)) ")) {")
   	  (wt-nl "   ")
 	  (reset-top)
 	  (wt-nl "   ")
@@ -276,7 +276,7 @@
         (when (or (tag-ref-clb tag) (tag-ref-ccb tag))
           (setf (tag-ref-clb tag) ref-clb)
           (when (tag-ref-ccb tag) (setf (tag-ref-ccb tag) ref-ccb))
-          (wt-nl "if(eql(nlj_tag,VV[" (tag-var tag) "])) {")
+          (wt-nl "if(eql(nlj_tag," (vv-str (tag-var tag)) ")) {")
 	  (wt-nl "   ")
 	  (reset-top)
 	  (wt-nl "   ")
@@ -322,15 +322,14 @@
   (if (tag-ref-ccb tag)
       (wt-vs* (tag-ref-clb tag))
       (wt-vs (tag-ref-clb tag)))
-  (wt "),VV[" (tag-var tag) "]);"))
+  (wt ")," (vv-str (tag-var tag)) ");"))
 
 (defun c2go-ccb (tag)
   (wt-nl "{frame_ptr fr;")
   (wt-nl "fr=frs_sch(") (wt-ccb-vs (tag-ref-ccb tag)) (wt ");")
-  (wt-nl "if(fr==NULL)FEerror(\"The GO tag ~s is missing.\",1,VV["
-         (tag-var tag) "]);")
+  (wt-nl "if(fr==NULL)FEerror(\"The GO tag ~s is missing.\",1," (vv-str (tag-var tag)) ");")
   (wt-nl "vs_base=vs_top;")
-  (wt-nl "unwind(fr,VV[" (tag-var tag) "]);}"))
+  (wt-nl "unwind(fr," (vv-str (tag-var tag)) ");}"))
 
 
 (defun wt-switch-case (x)

@@ -168,8 +168,7 @@
 (defun c2return-ccb (blk val)
   (wt-nl "{frame_ptr fr;")
   (wt-nl "fr=frs_sch(") (wt-ccb-vs (blk-ref-ccb blk)) (wt ");")
-  (wt-nl "if(fr==NULL) FEerror(\"The block ~s is missing.\",1,VV["
-         (blk-var blk) "]);")
+  (wt-nl "if(fr==NULL) FEerror(\"The block ~s is missing.\",1," (vv-str (blk-var blk)) ");")
   (let ((*value-to-go* 'top)) (c2expr* val))
   (wt-nl "unwind(fr,Cnil);}")
   )

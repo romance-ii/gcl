@@ -78,7 +78,7 @@ fixnum_times(fixnum i, fixnum j) {
       if (i==-1 || j<= (MOST_NEGATIVE_FIX/i))
 	goto FIX;
     } else {
-      if (0<-i && -i<= (MOST_POSITIVE_FIX/-j))
+      if (i>MOST_NEGATIVE_FIX && -i<= (MOST_POSITIVE_FIX/-j))
 	goto FIX;
     }
   }

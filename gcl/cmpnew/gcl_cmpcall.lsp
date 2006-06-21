@@ -427,11 +427,11 @@
     (cond
       ((null type)
        (wt-nl1 "static void LnkT"
-	       num "(){ call_or_link(VV[" num "]," (if setf "1" "0") ",(void **)(void *)&Lnk" num");}"
+	       num "(){ call_or_link(" (vv-str num) "," (if setf "1" "0") ",(void **)(void *)&Lnk" num");}"
 	       ))
       ((eql type 'proclaimed-closure)
        (wt-nl1 "static void LnkT" num
-	       "(ptr) object *ptr;{ call_or_link_closure(VV[" num "]," (if setf "1" "0") ",(void **)(void *)&Lnk" num",(void **)(void *)&Lclptr" num");}"))
+	       "(ptr) object *ptr;{ call_or_link_closure(" (vv-str num) "," (if setf "1" "0") ",(void **)(void *)&Lnk" num",(void **)(void *)&Lclptr" num");}"))
       (t
        ;;change later to include above.
        ;;(setq type (cdr (assoc type '((t . "object")(:btpr . "bptr")))))
@@ -441,12 +441,10 @@
 		(wt "(object first,...){"
 		    (declaration-type (rep-type type)) "V1;"
 		    "va_list ap;va_start(ap,first);V1=(" (declaration-type (rep-type type)) ")call_"
-		    (if vararg "v" "") "proc_new(VV["
-		    (add-object name)"]," (if setf "1" "0") ",(void **)(void *)&Lnk" num )
+		    (if vararg "v" "") "proc_new(" (vv-str (add-object name)) "," (if setf "1" "0") ",(void **)(void *)&Lnk" num )
 		(or vararg (wt "," (proclaimed-argd args type)))
 		(wt   ",first,ap);va_end(ap);return V1;}" )))
-	     (t (wt "(){return call_proc0(VV[" (add-object name)
-		    "]," (if setf "1" "0") ",(void **)(void *)&Lnk" num ");}" ))))
+	     (t (wt "(){return call_proc0(" (vv-str (add-object name)) "," (if setf "1" "0") ",(void **)(void *)&Lnk" num ");}" ))))
       (t (error "unknown link type ~a" type)))
     (setq name (function-string name))
     (if (find #\/ name) (setq name (remove #\/ name)))
@@ -489,16 +487,16 @@
   (let ((result
   (case n
 	;(0  (list () t (flags ans set) (format nil "ifuncall0(VV[~d])" obj)))
-	(1 (list  '(t) t (flags ans set) (format nil "ifuncall1(VV[~d],(#0))" obj)
+	(1 (list  '(t) t (flags ans set) (format nil "ifuncall1(~a,(#0))" (vv-str obj))
 		  'ifuncall))
 	(2 (list  '(t t) t  (flags ans set) 
-		       (format nil "ifuncall2(VV[~d],(#0),(#1))" obj)
+		       (format nil "ifuncall2(~a,(#0),(#1))" (vv-str obj))
 		       'ifuncall))
 	(t
 	 (list (make-list n :initial-element t)
 	       t (flags ans set) 
-	       (format nil "ifuncall(VV[~a],~a~{,#~a~})"
-		       obj n
+	       (format nil "ifuncall(~a,~a~{,#~a~})"
+		       (vv-str obj) n
 		       (dotimes (i n(nreverse res))
 				(push i res)))
 	       'ifuncall)))))
@@ -511,7 +509,7 @@
 
 (defun wt-simple-call (cfun base n &optional (vv-index nil))
   (wt "simple_" cfun "(")
-  (when vv-index (wt "VV[" vv-index "],"))
+  (when vv-index (wt (vv-str vv-index) ","))
   (wt "base+" base "," n ")")
   (base-used))
 
@@ -528,9 +526,9 @@
                 (if *safe-compile*
                     (wt-nl
                      temp
-                     "=symbol_function(VV[" (add-symbol (caddr funob)) "]);")
+                     "=symbol_function(" (vv-str (add-symbol (caddr funob))) ");")
                     (wt-nl temp
-                           "=VV[" (add-symbol (caddr funob)) "]->s.s_gfdef;"))
+                           "=" (vv-str (add-symbol (caddr funob))) "->s.s_gfdef;"))
                 temp)))
         (ordinary (let* ((temp (list 'vs (vs-push)))
                          (*value-to-go* temp))
@@ -559,9 +557,9 @@
          ;;; Want to set up the return catcher.
          (unless loc
            (setq loc (list 'vs (vs-push)))
-           (wt-nl loc "=symbol_function(VV[" (add-symbol fname) "]);"))
+           (wt-nl loc "=symbol_function(" (vv-str (add-symbol fname)) ");"))
          (push-args args)
-         (wt-nl "funcall_with_catcher(VV[" (add-symbol fname) "]," loc  ");")
+         (wt-nl "funcall_with_catcher(" (vv-str (add-symbol fname)) "," loc  ");")
          (unwind-exit 'fun-val nil fname))
         (loc
          ;;; The function was already pushed.
@@ -578,8 +576,8 @@
          (let ((base *vs*))
               (setq loc (list 'vs (vs-push)))
               (if *safe-compile*
-                  (wt-nl loc "=symbol_function(VV[" (add-symbol fname) "]);")
-                  (wt-nl loc "=(VV[" (add-symbol fname) "]->s.s_gfdef);"))
+                  (wt-nl loc "=symbol_function(" (vv-str (add-symbol fname)) ");")
+                  (wt-nl loc "=(" (vv-str (add-symbol fname)) "->s.s_gfdef);"))
               (push-args-lispcall args)
               (cond ((or (eq *value-to-go* 'return)
                          (eq *value-to-go* 'top))
@@ -602,7 +600,7 @@
                          (eq *value-to-go* 'top))
                      (wt-nl "symlispcall")
                      (when inline-p (wt "_no_event"))
-                     (wt "(VV[" (add-symbol fname) "],base+" base ","
+                     (wt "(" (vv-str (add-symbol fname)) ",base+" base ","
                          (length args) ");")
                      (base-used)
                      (unwind-exit 'fun-val nil fname))

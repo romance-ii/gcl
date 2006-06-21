@@ -161,8 +161,8 @@
 
 (defun wt-symbol-function (vv)
        (if *safe-compile*
-           (wt "symbol_function(VV[" vv "])")
-           (wt "(VV[" vv "]->s.s_gfdef)")))
+           (wt "symbol_function(" (vv-str vv) ")")
+           (wt "(" (vv-str vv) "->s.s_gfdef)")))
 
 (defun wt-make-cclosure (cfun clink fname)
        (wt-nl "make_cclosure_new(" (c-function-name "LC" cfun fname) ",Cnil,")

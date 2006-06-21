@@ -187,8 +187,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * xgcl integration; smaller images; fewer recompiles; eq type
     comparison;128M more heap
   * Check for X headers before building xgcl
+  * clean up latest gcc compiler warnings
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 21 Jun 2006 16:53:21 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 21 Jun 2006 20:15:41 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

@@ -620,7 +620,7 @@
   (if rest (wt ",TRUE,") (wt ",FALSE,"))
   (if allow-other-keys (wt "TRUE,") (wt "FALSE,"))
   (wt (length keywords))
-  (dolist** (kwd keywords) (wt ",VV[" (add-symbol (car kwd)) "]"))
+  (dolist** (kwd keywords) (wt "," (vv-str (add-symbol (car kwd)))))
   (wt ");")
 
   ;;; Bind required parameters.
@@ -961,8 +961,7 @@
   (dolist** (kwd keywords)
     (let ((cvar1 (cs-push t t)))
          (wt-nl
-          "{object V" cvar1 "=getf(V" cvar ",VV[" (add-symbol (car kwd))
-          "],OBJNULL);")
+          "{object V" cvar1 "=getf(V" cvar "," (vv-str (add-symbol (car kwd))) ",OBJNULL);")
          (wt-nl "if(V" cvar1 "==OBJNULL){")
          (let ((*clink* *clink*)
                (*unwind-exit* *unwind-exit*)
@@ -982,7 +981,7 @@
              (not allow-other-keys))
         (wt-nl "check_other_key(V" cvar "," (length keywords))
         (dolist** (kwd keywords)
-                  (wt ",VV[" (add-symbol (car kwd)) "]"))
+                  (wt "," (vv-str (add-symbol (car kwd)))))
         (wt ");"))
   (dolist** (aux auxs)
             (c2dm-bind-init (car aux) (cadr aux)))
