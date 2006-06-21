@@ -186,8 +186,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * restore automatic heap start lowering
   * xgcl integration; smaller images; fewer recompiles; eq type
     comparison;128M more heap
+  * Check for X headers before building xgcl
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 20 Jun 2006 22:50:41 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 21 Jun 2006 16:53:21 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
