@@ -712,7 +712,7 @@
 ;(defun reset-info-type (x) x)
 
 (defun and-form-type (type form original-form &aux type1)
-  (setq type1 (type-and type (coerce-to-one-value (info-type (cadr form)))))
+  (setq type1 (type-and type (info-type (cadr form))))
   (when (and (null type1) type (info-type (cadr form)))
         (cmpwarn "The type of the form ~s is not ~s, but ~s." original-form type (info-type (cadr form))))
   (if (eq type1 (info-type (cadr form)))
@@ -722,7 +722,7 @@
            (list* (car form) info (cddr form)))))
 
 (defun check-form-type (type form original-form)
-  (when (and (null (type-and type (coerce-to-one-value (info-type (cadr form))))) type (info-type (cadr form)))
+  (when (and (null (type-and type (info-type (cadr form)))) type (info-type (cadr form)))
         (cmpwarn "The type of the form ~s is not ~s, but ~s." original-form type (info-type (cadr form)))))
 
 

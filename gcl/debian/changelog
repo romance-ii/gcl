@@ -189,8 +189,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * Check for X headers before building xgcl
   * clean up latest gcc compiler warnings
   * signatures for first et. al.
+  * remove erroneous coerce-to-one-value calls, extraneous ones next
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 21 Jun 2006 21:10:39 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 22 Jun 2006 19:37:55 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

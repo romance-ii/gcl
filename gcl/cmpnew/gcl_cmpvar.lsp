@@ -369,7 +369,7 @@
 	  (throw (var-tag v) v))))))
 
 (defun set-form-type (form type)
-  (let* ((it (coerce-to-one-value (info-type (cadr form))))
+  (let* ((it (info-type (cadr form)))
 	 (nt (type-and type it)))
     (unless (or nt (not (and type it)))
       (cmpwarn "Type mismatch: ~s ~s~%" it type))
@@ -378,8 +378,8 @@
 	  ((let let*) (set-form-type (car (last form)) type))
 	  (progn (set-form-type (car (last (third form))) type))
 	  (if 
-	    (let ((tt (type-and type (coerce-to-one-value (info-type (cadr (fourth form))))))
-		  (ft (type-and type (coerce-to-one-value (info-type (cadr (fifth form)))))))
+	    (let ((tt (type-and type (info-type (cadr (fourth form)))))
+		  (ft (type-and type (info-type (cadr (fifth form))))))
 	      (unless tt
 		(set-form-type (fifth form) type)
 		(setf (car form) 'progn (cadr form) (cadr (fifth form)) (caddr form) (list (fifth form)) (cdddr form) nil))

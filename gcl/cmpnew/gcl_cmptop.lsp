@@ -626,8 +626,10 @@
 	      ))
 	  (when ort
 	    (unless (type>= ort rt)
-	      ;(cmpwarn "ret type mismatch in auto-proclamation ~s -> ~s~%" ort rt)
-	      ))
+	      (when (or (and (eq rt '*) (not (eq ort '*)))
+			(and (type>= t ort) (not (type>= t rt)))
+			(and (get fname 'return-type) (type>= t (get fname 'return-type)) (not (type>= t rt))))
+		(cmpwarn "ret type mismatch in auto-proclamation ~s(~s) -> ~s~%" ort (get fname 'return-type) rt))))
 	  (proclaim `(ftype (function ,al ,rt) ,fname));FIXME replace proclaim
 	  (si::add-hash fname (let* ((at (get-arg-types fname))
 				     (rt (get-return-type fname)))
