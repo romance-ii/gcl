@@ -109,7 +109,11 @@
   (when (endp args) (too-few-args 'function 1 0))
   (unless (endp (cdr args)) (too-many-args 'function 1 (length args)))
   (let ((fun (car args)))
-       (cond ((symbolp fun)
+       (cond ((is-setf-function fun);FIXME centralize this stuff around symbols
+	      (c1expr (let ((funob (gensym)))
+			`(let ((,funob (get ',(cadr fun) 'si::setf-function)))
+			   (if (functionp ,funob) ,funob (list 'function ,funob))))))
+	     ((symbolp fun)
               (cond ((and (setq fd (c1local-closure fun))
                           (eq (car fd) 'call-local))
                      (list 'function *info* fd))

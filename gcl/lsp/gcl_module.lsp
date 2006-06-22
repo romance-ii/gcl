@@ -26,8 +26,7 @@
 (in-package 'lisp)
 
 (export '(*modules* provide require))
-(export 'documentation)
-(export '(variable function structure type setf compiler-macro))
+(export '(documentation variable function structure type setf compiler-macro))
 
 (in-package 'system)
 
