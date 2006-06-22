@@ -38,7 +38,7 @@ void set_char_array (char* array, fixnum pos, char val) {
 }
 
 fixnum int_array(fixnum size) {
-  return ((fixnum) calloc (size, sizeof(int)));
+  return ((fixnum) calloc (size, sizeof(fixnum)));
 }
 
 int int_pos (int* array, fixnum pos) {
@@ -46,6 +46,14 @@ int int_pos (int* array, fixnum pos) {
 }
 
 void set_int_array (int* array, fixnum pos, int val) {
+  array[pos] = val;
+}
+
+fixnum fixnum_pos (fixnum* array, fixnum pos) {
+  return (array[pos]);
+}
+
+void set_fixnum_array (fixnum* array, fixnum pos, fixnum val) {
   array[pos] = val;
 }
 

@@ -33,8 +33,10 @@
 (defentry char-pos (fixnum fixnum) (char char_pos))
 (defentry int-array (fixnum) (fixnum int_array))
 (defentry int-pos (fixnum fixnum) (int int_pos))
+(defentry fixnum-pos (fixnum fixnum) (fixnum int_pos))
 (defentry set-char-array (fixnum fixnum char) (void set_char_array))
 (defentry set-int-array (fixnum fixnum int) (void set_int_array))
+(defentry set-fixnum-array (fixnum fixnum int) (void set_fixnum_array))
 
 ;;from mark ring's function
 ;; General routines.
