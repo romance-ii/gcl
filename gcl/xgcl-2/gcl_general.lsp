@@ -27,14 +27,14 @@
 ; 24 Jan 06: Edited by G. Novak to remove vertex-array entries.
 
 (clines "#include \"xgcl.h\"")
-(defentry free (string) (void free))
-(defentry calloc(fixnum fixnum) (string calloc))
+(defentry free (fixnum) (void free))
+(defentry calloc(fixnum fixnum) (fixnum calloc))
 (defentry char-array (fixnum) (fixnum char_array))
 (defentry char-pos (fixnum fixnum) (char char_pos))
 (defentry int-array (fixnum) (fixnum int_array))
-(defentry int-pos (fixnum fixnum) (fixnum int_pos))
+(defentry int-pos (fixnum fixnum) (int int_pos))
 (defentry set-char-array (fixnum fixnum char) (void set_char_array))
-(defentry set-int-array (fixnum fixnum fixnum) (void set_int_array))
+(defentry set-int-array (fixnum fixnum int) (void set_int_array))
 
 ;;from mark ring's function
 ;; General routines.
@@ -56,13 +56,13 @@
   "return(a_string);"
   )
 
-(defentry  lisp-string-2 (object fixnum ) (object lisp_string))
+(defentry  lisp-string-2 (object fixnum) (object lisp_string))
 (defun lisp-string (a-string )
   (lisp-string-2 "" a-string ))
 
 ;;modified from mark ring's function
 ;; General routines.
-(defCfun "fixnum   get_st_point(object s)" 0
+(defCfun "fixnum get_st_point(object s)" 0
   " return((fixnum) s->st.st_self);"
   )
 (defentry get-st-point2 (object) (fixnum "(fixnum)get_c_string"))

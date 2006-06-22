@@ -24,34 +24,28 @@
 /* 24 Jan 06: edited by G. Novak to remove vertex_array functions,
               remove includes, change function arg lists to new form */
 #include <stdlib.h>
-#define int long
-int char_array(int size)
-{
-  return ((int) calloc (size, sizeof(char)));
+#define fixnum long
+fixnum char_array(fixnum size) {
+  return ((fixnum) calloc (size, sizeof(char)));
 }
 
-char char_pos (char* array, int pos)
-{
+char char_pos (char* array, fixnum pos) {
   return (array[pos]);
 }
 
-void set_char_array (char* array, int pos, char val)
-{
-array[pos] = val;
+void set_char_array (char* array, fixnum pos, char val) {
+  array[pos] = val;
 }
 
-int int_array(int size)
-{
-  return ((int) calloc (size, sizeof(int)));
+fixnum int_array(fixnum size) {
+  return ((fixnum) calloc (size, sizeof(int)));
 }
 
-int int_pos (int* array, int pos)
-{
+int int_pos (int* array, fixnum pos) {
   return (array[pos]);
 }
 
-void set_int_array (int* array, int pos, int val)
-{
-array[pos] = val;
+void set_int_array (int* array, fixnum pos, int val) {
+  array[pos] = val;
 }
 
