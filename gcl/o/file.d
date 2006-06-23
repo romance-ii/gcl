@@ -150,11 +150,31 @@ object strm;
 DEFUNO_NEW("TEMP-STREAM",object,fStemp_stream,SI
 	   ,2,2,NONE,OO,OO,OO,OO,void,siLtemp_stream,(object x,object ext),"") {
   
-  object st;
-  char *c,*d;
+    object st;
+#ifdef _WIN32
+    DWORD dwRetVal;
+    char lpPathBuffer[MAX_PATH];
+      
+    check_type ( x,   t_string );
+    check_type ( ext, t_string );
+
+    dwRetVal = GetTempPath ( MAX_PATH, lpPathBuffer );
+    if ( dwRetVal + ext->st.st_fillp + x->st.st_fillp + 2 > MAX_PATH ) {
+        FEerror ( "Length of temporary file path combined with file name is too large.", 0 );
+    }
+
+    strcat ( lpPathBuffer, x->st.st_self );
+    strcat ( lpPathBuffer, "." );
+    strcat ( lpPathBuffer, ext->st.st_self );
+    st = make_simple_string ( lpPathBuffer );
+    x  = open_stream ( st, smm_io, sKsupersede, Cnil );
+  
+#else
+  char *c, *d;
   int l;
   check_type(x,t_string);
   check_type(ext,t_string);
+  
   if (!(c=alloca(x->st.st_fillp+ext->st.st_fillp+8)))
     FEerror("Cannot allocate temp name space",0);
   if (!(d=alloca(x->st.st_fillp+ext->st.st_fillp+8)))
@@ -163,6 +183,7 @@ DEFUNO_NEW("TEMP-STREAM",object,fStemp_stream,SI
   memcpy(c+x->st.st_fillp,"XXXXXX",6);
   c[x->st.st_fillp+6]=0;
   l=mkstemp(c);
+  
   memcpy(d,c,x->st.st_fillp+6);
   memcpy(d+x->st.st_fillp+6,".",1);
   memcpy(d+x->st.st_fillp+7,ext->st.st_self,ext->st.st_fillp);
@@ -172,8 +193,10 @@ DEFUNO_NEW("TEMP-STREAM",object,fStemp_stream,SI
   st=make_simple_string(d);
   x=open_stream(st,smm_output,sKsupersede,Cnil);
   close(l);
-  RETURN1(x);
+#endif
 
+  RETURN1(x);
+  
 }
 
 DEFUNO_NEW("TERMINAL-INPUT-STREAM-P",object,fSterminal_input_stream_p,SI
