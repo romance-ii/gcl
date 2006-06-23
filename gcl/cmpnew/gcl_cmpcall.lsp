@@ -258,7 +258,7 @@
 ;this is now done in get-inline-info
 ;  (and  *Fast-link-compiling* (fast-link-proclaimed-type-p fname args)
 ;        (add-fast-link fname t args))
-  (if (inline-possible fname)
+  (if (or (inline-possible fname) (special-form-p fname)) ;FIXME?
     (cond 
      ;;; Tail-recursive case.
      ((and (listp args)
