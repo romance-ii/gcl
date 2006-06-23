@@ -234,7 +234,8 @@ Cannot compile ~a.~%"
     (cond ((consp *split-files*)
 	   (file-position *compiler-input* (third *split-files*))
 	   (setq output-file
-		 (make-pathname :directory (pathname-directory output-file)
+		 (make-pathname :device (pathname-device output-file)
+				:directory (pathname-directory output-file)
 				:name (format nil "~a~a"
 					      (length (second *split-files*))
 					      (pathname-name (pathname output-file)))
@@ -638,7 +639,7 @@ SYSTEM_SPECIAL_INIT
 (defun compiler-cc (c-pathname o-pathname  )
   (safe-system
    (or 
-    #+winnt (prep-win-path (compiler-command c-pathname o-pathname))
+;    #+winnt (prep-win-path (compiler-command c-pathname o-pathname))
     #+(or vax system-v e15 dgux sgi) 
     (format
      nil
