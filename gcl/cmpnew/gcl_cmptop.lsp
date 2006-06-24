@@ -802,36 +802,31 @@
 
 
 (defun wt-if-proclaimed (fname cfun lambda-expr)
-  (cond ((fast-link-proclaimed-type-p fname)
-	 (cond ((assoc fname *inline-functions*)
-		(add-init `(si::mfsfun ',fname ,(add-address (c-function-name "LI" cfun fname))
-				   ,(proclaimed-argd (get fname 'proclaimed-arg-types)
-						     (get fname 'proclaimed-return-type)
-					)		   )
-		      )
-		t)
-	       (t
-		(let ((arg-c (length (car (lambda-list lambda-expr))))
-		      (arg-p (length (get fname 'proclaimed-arg-types)))
-		      (va  (member '* (get fname 'proclaimed-arg-types))))
-		  (cond (va
-			 (or (>= arg-c (- arg-p (length va)))
-			     (cmpwarn "~a needs ~a args. ~a supplied."
-				      fname   (- arg-p (length va))
-				      arg-c)))
-				      
-			((not (eql arg-c arg-p))
-			 (cmpwarn
-			 "~%;; ~a Number of proclaimed args was ~a. ~
+  (when (fast-link-proclaimed-type-p fname)
+    (let ((at (get-arg-types fname))
+	  (rt (get-return-type fname)))
+      (cond ((assoc fname *inline-functions*)
+	     (add-init `(si::mfsfun ',fname 
+				    ,(add-address (c-function-name "LI" cfun fname))
+				    ,(proclaimed-argd at rt)))
+	     t)
+	    ((let ((arg-c (length (car (lambda-list lambda-expr))))
+		   (arg-p (length at))
+		   (va (member '* at)))
+	       (cond (va
+		      (or (>= arg-c (- arg-p (length va)))
+			  (cmpwarn "~a needs ~a args. ~a supplied." fname (- arg-p (length va)) arg-c)))
+		     ((not (eql arg-c arg-p))
+		      (cmpwarn
+		       "~%;; ~a Number of proclaimed args was ~a. ~
                           ~%;;Its definition had ~a." fname arg-p arg-c))
-			;((>= arg-c 10.)) ;checked above 
-			 ;(cmpwarn " t1defun only likes 10 args ~
-                         ;            ~%for proclaimed functions")
-			(t (cmpwarn
-			" ~a is proclaimed but not in *inline-functions* ~
-        ~%T1defun could not assure suitability of args for C call" fname
-			))))
-		nil)))))	
+					;((>= arg-c 10.)) ;checked above 
+					;(cmpwarn " t1defun only likes 10 args ~
+					;            ~%for proclaimed functions")
+		     ((cmpwarn
+		       " ~a is proclaimed but not in *inline-functions* ~
+        ~%T1defun could not assure suitability of args for C call" fname)))
+	       nil))))))
 	
 
 (defun volatile (info)
