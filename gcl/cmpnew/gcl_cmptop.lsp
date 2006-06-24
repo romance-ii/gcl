@@ -699,11 +699,11 @@
 		 (numberp cfun))))
 	;;whew: it is acceptable.
         (push (list fname
-                    (get fname 'proclaimed-arg-types)
-                    (get fname 'proclaimed-return-type)
+                    (get-arg-types fname)
+		    (let ((z (get-return-type fname))) (cond ((eq z #tboolean)) ((not z)) (z)))
 		    (flags set ans)
                     (make-inline-string
-                     cfun (get fname 'proclaimed-arg-types) fname))
+                     cfun (get-arg-types fname) fname))
               *inline-functions*))
    ((and ;(get fname 'proclaimed-function)
      (eq (get fname 'proclaimed-return-type) t))
@@ -909,20 +909,21 @@
         (t (wt-h cfun "();")
 	   (add-init `(si::mf ',fname ,(add-address (c-function-name "" cfun fname) )) )))
            
-  (let ((h (gethash fname si::*call-hash-table*)))
-    (add-init `(si::add-hash ',fname ',(si::call-sig h)
-			 ',(mapcar (lambda (x) 
-				     (cons x (let ((y (find fname si::*needs-recompile* :key 'car)))
-					       (unless (and y (eq (cadr y) x))
-						 (si::call-sig (gethash x si::*call-hash-table*))))))
-				   (sublis +cmp-fn-alist+ (si::call-callees h)))
-			 ,(let* ((w (make-string-output-stream))
-				(ss (si::open-fasd w :output nil nil))
-				(out (cdr (assoc fname *portable-source*))))
-			   (si::find-sharing-top out (aref ss 1))
-			   (si::write-fasd-top out ss)
-			   (si::close-fasd ss)
-			   (get-output-stream-string w)))))
+  (when *compiler-auto-proclaim*
+    (let ((h (gethash fname si::*call-hash-table*)))
+      (add-init `(si::add-hash ',fname ',(si::call-sig h)
+			       ',(mapcar (lambda (x) 
+					   (cons x (let ((y (find fname si::*needs-recompile* :key 'car)))
+						     (unless (and y (eq (cadr y) x))
+						       (si::call-sig (gethash x si::*call-hash-table*))))))
+					 (sublis +cmp-fn-alist+ (si::call-callees h)))
+			       ,(let* ((w (make-string-output-stream))
+				       (ss (si::open-fasd w :output nil nil))
+				       (out (cdr (assoc fname *portable-source*))))
+				  (si::find-sharing-top out (aref ss 1))
+				  (si::write-fasd-top out ss)
+				  (si::close-fasd ss)
+				  (get-output-stream-string w))))))
 
   (let ((base-name (setf-function-base-symbol fname)))
     (when base-name
@@ -1840,6 +1841,14 @@
   )
 
 (defun t3defentry (fname cfun arg-types type cname)
+;  (wt-h 
+;   (if (eq type 'string) "char *" (string-downcase (symbol-name type)))
+;   " " cname "("
+;   (with-output-to-string 
+;    (s)
+;    (do ((l arg-types (cdr l))) ((not l))
+;      (princ (if (eq (car l) 'string) "char *" (string-downcase (symbol-name type))) s)
+;      (princ (if (cdr l) "," ");") s))))
   (wt-comment "function definition for " fname)
   (wt-nl1 "static void " (c-function-name "L" cfun fname) "()")
   (wt-nl1 "{	object *old_base=vs_base;")

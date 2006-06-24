@@ -1173,7 +1173,8 @@
 	;;continue
         ((setq fd (macro-function fname))
          (c1expr (cmp-expand-macro fd fname args)))
-	((when (and (member (first *current-form*) '(defun))
+	((when (and *compiler-auto-proclaim*
+		    (member (first *current-form*) '(defun))
 		    (symbolp (second *current-form*))
 		    (symbol-package (second *current-form*)))
 	   (si::add-hash (second *current-form*) 

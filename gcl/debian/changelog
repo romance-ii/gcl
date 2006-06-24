@@ -192,8 +192,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * remove erroneous coerce-to-one-value calls, extraneous ones next
   * fix setf function safety 3 compilation -- needs more work
   * don't pass special forms through funcall_with_catcher at safety 3
+  * call add-hash only when *compiler-auto-proclaim* is set, normalize
+    arg and return types in *inline-functions*
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 23 Jun 2006 02:15:59 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 24 Jun 2006 17:07:59 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
