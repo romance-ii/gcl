@@ -45,8 +45,12 @@
 	    (unless (zerop (system x))
 	      (error "compile failure: ~s~%" x))))
 	(directory "*.c"))
-  (mapc (lambda (x)
-	  (compile-file (format nil "~a.lsp" x) :system-p t)) *files*))
+  (let ((compiler::*default-c-file* t)
+	(compiler::*default-h-file* t)
+	(compiler::*default-data-file* t)
+	(compiler::*default-system-p* t))
+    (mapc (lambda (x)
+	    (compile-file (format nil "~a.lsp" x) :system-p t)) *files*)))
 
 
 (defun load-xgcl()
@@ -67,7 +71,7 @@
                                     (si::do-recompile ~s))" 
 			    "sysdef.lisp" x (let ((q "gcl_xrecompile.lsp")) (when (probe-file q) (delete-file q)) q))
 		    (reduce (lambda (&rest xy) (when xy (concatenate 'string (namestring (car xy)) " " (cadr xy)))) z
-			    :initial-value " -lXmu -lXt -lXext -lXaw6 -lX11" :from-end t) nil)
+			    :initial-value " -lXmu -lXt -lXext -lXaw -lX11" :from-end t) nil)
     (let ((x (append x (list "gcl_xrecompile.o"))))
       (compiler::link x 
 		      (namestring pn) 
@@ -76,7 +80,7 @@
                                    (setq si::*optimize-maximum-pages* t si::*disable-recompile* nil)" 
 			      "sysdef.lisp" x (let ((q "gcl_xrecompile.lsp")) (when (probe-file q) (delete-file q)) q))
 		    (reduce (lambda (&rest xy) (when xy (concatenate 'string (namestring (car xy)) " " (cadr xy)))) z
-			    :initial-value " -lXmu -lXt -lXext -lXaw6 -lX11" :from-end t) nil))))
+			    :initial-value " -lXmu -lXt -lXext -lXaw -lX11" :from-end t) nil))))
 
 
 

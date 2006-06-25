@@ -194,8 +194,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * don't pass special forms through funcall_with_catcher at safety 3
   * call add-hash only when *compiler-auto-proclaim* is set, normalize
     arg and return types in *inline-functions*
+  * Cleanup libxaw dependencies
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 24 Jun 2006 17:07:59 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sun, 25 Jun 2006 23:18:38 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

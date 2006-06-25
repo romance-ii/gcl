@@ -810,7 +810,10 @@ miss=0
 AC_CHECK_LIB(Xmu,main,X_LIBS="$X_LIBS -lXmu",miss=1,$X_LIBS)
 AC_CHECK_LIB(Xt,main,X_LIBS="$X_LIBS -lXt",miss=1,$X_LIBS)
 AC_CHECK_LIB(Xext,main,X_LIBS="$X_LIBS -lXext",miss=1,$X_LIBS)
-AC_CHECK_LIB(Xaw6,main,X_LIBS="$X_LIBS -lXaw6",miss=1,$X_LIBS)
+AC_CHECK_LIB(Xaw,main,X_LIBS="$X_LIBS -lXaw",miss=1,$X_LIBS)
+# AC_CHECK_LIB(Xaw8,main,X_LIBS="$X_LIBS -lXaw8",
+#    AC_CHECK_LIB(Xaw7,main,X_LIBS="$X_LIBS -lXaw7",
+#       AC_CHECK_LIB(Xaw6,main,X_LIBS="$X_LIBS -lXaw6",miss=1,$X_LIBS),$X_LIBS),$X_LIBS))
 AC_CHECK_LIB(X11,main,X_LIBS="$X_LIBS -lX11",miss=1,$X_LIBS)
 AC_CHECK_HEADER(X11/Xlib.h,true,miss=1)
 AC_CHECK_HEADER(X11/Xutil.h,true,miss=1)
