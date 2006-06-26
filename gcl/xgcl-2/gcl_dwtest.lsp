@@ -24,6 +24,14 @@
 ; University of Texas at Austin  78712.    novak@cs.utexas.edu
 
 (use-package :xlib)
+(defun user::xgcl nil
+ (use-package :xlib)
+ (format t "Welcome to xgcl! Try (xgcl-demo) for a demonstration."))
+(defun user::xgcl-demo nil
+ (wtesta)
+ (wtestb)
+ (format t "Try (wtestc) ... (wtestk) for more examples."))
+
 (defmacro while (test &rest forms)
   `(loop (unless ,test (return)) ,@forms) )
 

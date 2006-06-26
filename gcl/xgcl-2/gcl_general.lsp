@@ -1,5 +1,6 @@
 (in-package :XLIB)
-; general.lsp         Hiep Huu Nguyen  ; 15 Sep 05; 24 Jan 06
+; general.lsp         Hiep Huu Nguyen       ; 24 Jun 06
+; 15 Sep 05; 24 Jan 06
 
 ; Copyright (c) 1994 Hiep Huu Nguyen and The University of Texas at Austin.
 
@@ -25,17 +26,21 @@
 ; 27 Aug 92
 ; 15 Sep 05: Edited by G. Novak to change C function headers to new form
 ; 24 Jan 06: Edited by G. Novak to remove vertex-array entries.
+; 22 Jun 06: Edited by G. Novak to fix entry types
 
 ;(defentry free (string) (void free))
 ;(defentry calloc(fixnum fixnum) (string calloc))
-(defentry char-array (fixnum) (fixnum char_array))
-(defentry char-pos (fixnum fixnum) (char char_pos))
-(defentry int-array (fixnum) (fixnum int_array))
-(defentry int-pos (fixnum fixnum) (int int_pos))
-(defentry fixnum-pos (fixnum fixnum) (fixnum fixnum_pos))
-(defentry set-char-array (fixnum fixnum char) (void set_char_array))
-(defentry set-int-array (fixnum fixnum int) (void set_int_array))
-(defentry set-fixnum-array (fixnum fixnum fixnum) (void set_fixnum_array))
+(defentry char-array (int) (fixnum char_array))
+(defentry char-pos (fixnum int) (char char_pos))
+(defentry set-char-array (fixnum int char) (void set_char_array))
+
+(defentry int-array (int) (fixnum int_array))
+(defentry int-pos (fixnum int) (int int_pos))
+(defentry set-int-array (fixnum int int) (void set_int_array))
+
+(defentry fixnum-array (int) (fixnum fixnum_array))
+(defentry fixnum-pos (fixnum int) (fixnum fixnum_pos))
+(defentry set-fixnum-array (fixnum int fixnum) (void set_fixnum_array))
 
 ;;from mark ring's function
 ;; General routines.

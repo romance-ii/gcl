@@ -1,5 +1,5 @@
-/* general-c.c           Hiep Huu Nguyen   27 Aug 92; 24 Jan 06 */
-
+/* general-c.c           Hiep Huu Nguyen   24 Jun 06 */
+/* 27 Aug 92; 24 Jan 06; 22 Jun 06  */
 /* ; Copyright (c) 1994 Hiep Huu Nguyen and The University of Texas at Austin.
 
 ; See the files gnu.license and dec.copyright .
@@ -23,37 +23,43 @@
 
 /* 24 Jan 06: edited by G. Novak to remove vertex_array functions,
               remove includes, change function arg lists to new form */
+/* 22 Jun 06: edited by G. Novak to be compatible with 64-bit machines */
+
 #include <stdlib.h>
 #define fixnum long
-fixnum char_array(fixnum size) {
+fixnum char_array(int size) {
   return ((fixnum) calloc (size, sizeof(char)));
 }
 
-char char_pos (char* array, fixnum pos) {
+char char_pos (char* array, int pos) {
   return (array[pos]);
 }
 
-void set_char_array (char* array, fixnum pos, char val) {
+void set_char_array (char* array, int pos, char val) {
   array[pos] = val;
 }
 
-fixnum int_array(fixnum size) {
+fixnum int_array(int size) {
+  return ((fixnum) calloc (size, sizeof(int)));
+}
+
+int int_pos (int* array, int pos) {
+  return (array[pos]);
+}
+
+void set_int_array (int* array, int pos, int val) {
+  array[pos] = val;
+}
+
+fixnum fixnum_array(int size) {
   return ((fixnum) calloc (size, sizeof(fixnum)));
 }
 
-int int_pos (int* array, fixnum pos) {
+fixnum fixnum_pos (fixnum* array, int pos) {
   return (array[pos]);
 }
 
-void set_int_array (int* array, fixnum pos, int val) {
-  array[pos] = val;
-}
-
-fixnum fixnum_pos (fixnum* array, fixnum pos) {
-  return (array[pos]);
-}
-
-void set_fixnum_array (fixnum* array, fixnum pos, fixnum val) {
+void set_fixnum_array (fixnum* array, int pos, fixnum val) {
   array[pos] = val;
 }
 
