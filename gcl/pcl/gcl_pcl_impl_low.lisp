@@ -73,10 +73,8 @@
 
 ;#+turbo-closure-env-size
 (clines "
-static
-object cclosure_env_nthcdr (n,cc)
-int n; object cc;
-{  object env,*turbo;
+object cclosure_env_nthcdr (fixnum n,object cc) {
+   object env,*turbo;
    if(n<0)return Cnil;
    if(type_of(cc)!=t_cclosure)return Cnil;
    if((turbo=cc->cc.cc_turbo)==NULL)
@@ -90,16 +88,16 @@ int n; object cc;
       return turbo[n];}
 }")
 
-(defentry cclosure-env-nthcdr (int object) (object cclosure_env_nthcdr))
+(defentry cclosure-env-nthcdr (fixnum object) (object cclosure_env_nthcdr))
 ;; This is the unsafe but fast version.
-(defentry %cclosure-env-nthcdr (int object) (object cclosure_env_nthcdr))
+(defentry %cclosure-env-nthcdr (fixnum object) (object cclosure_env_nthcdr))
 
 ;; FIXME The non-inlined versions should really check for uncompiled 
 ;; closeres and set the environment properly in them.  In reality,
 ;; trying to build pcl interpreted takes forever!  Also clean the list
 ;; of inlines and make sure there are real function versions for each used case.
 (clines "
-static void
+void
 set_cclosure_env(object cc,object val) {
  if (type_of(cc)==t_cclosure)
    cc->cc.cc_env=val;
@@ -110,7 +108,7 @@ set_cclosure_env(object cc,object val) {
 (defentry %set-cclosure-env (object object) (void set_cclosure_env))
 
 (clines "
-static object
+object
 cclosurep(object o) {
   return type_of(o)==t_cclosure ? Ct : Cnil;
 }
@@ -119,7 +117,7 @@ cclosurep(object o) {
 (defentry cclosurep (object) (object cclosurep))
 
 (clines "
-static object
+object
 cclosure_env(object o) {
   return type_of(o)==t_cclosure ? o->cc.cc_env : Cnil;
 }
@@ -129,7 +127,7 @@ cclosure_env(object o) {
 (defentry %cclosure-env (object) (object cclosure_env))
 
 (clines "
-static void
+void
 set_compiled_function_name(object o,object n) {
 /* check type here */
   o->cf.cf_name=n;
@@ -140,7 +138,7 @@ set_compiled_function_name(object o,object n) {
 (defentry si::%set-compiled-function-name (object object) (void set_compiled_function_name))
 
 (clines "
-static object
+object
 __fboundp(object o) {
 /* FIXME check type here*/
 return o->s.s_gfdef==OBJNULL ? Cnil : Ct;
@@ -181,8 +179,7 @@ return o->s.s_gfdef==OBJNULL ? Cnil : Ct;
                                   (if (eq (car inline) 'logxor)
                                       8 0)) ;result type from args
                           (fifth opt)))
-                  (cdr inline)))))
-)
+                  (cdr inline))))))
 
 
 (defmacro define-inlines ()
@@ -230,14 +227,8 @@ return o->s.s_gfdef==OBJNULL ? Cnil : Ct;
 
 
 (clines "
-
-
-
 object fSuse_fast_links_2(object,object);
-static
-object set_cclosure (result_cc,value_cc,available_size)
-  object result_cc,value_cc; int available_size;
-{
+object set_cclosure (object result_cc,object value_cc,fixnum available_size) {
   object result_env_tail,value_env_tail; int i;
 
   /* If we are currently using fast linking,     */
@@ -256,11 +247,10 @@ object set_cclosure (result_cc,value_cc,available_size)
   result_cc->cc.cc_self=value_cc->cc.cc_self;
   result_cc->cc.cc_data=value_cc->cc.cc_data;
 
-
   return result_cc;
 }")
 
-(defentry %set-cclosure (object object int) (object set_cclosure))
+(defentry %set-cclosure (object object fixnum) (object set_cclosure))
 
 
 (defun structure-functions-exist-p ()

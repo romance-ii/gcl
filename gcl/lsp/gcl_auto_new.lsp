@@ -222,3 +222,5 @@
 
 
 (AUTOLOAD 'init-readline '|gcl_readline|)
+(AUTOLOAD 'user::xgcl-demo '|gcl_dwtest|)
+(defun user::xgcl nil (use-package :xlib))

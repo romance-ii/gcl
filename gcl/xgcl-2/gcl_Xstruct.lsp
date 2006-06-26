@@ -27,7 +27,6 @@
 
 ;;;;;; _XQEvent funcions ;;;;;;
 
-(clines "#include \"xgcl.h\"")
 (defentry make-_XQEvent () ( fixnum  "make__XQEvent" ))
 (defentry _XQEvent-event (fixnum) ( fixnum "_XQEvent_event" ))
 (defentry set-_XQEvent-event (fixnum fixnum) ( void "set__XQEvent_event" ))

@@ -227,6 +227,9 @@
 #undef STATIC_LINKING
 #undef ADDR_NO_RANDOMIZE
 #undef LEADING_UNDERSCORE
+#undef HAVE_XGCL
+#undef HAVE_TK
+#undef WITH_WINMAIN
 
 /* The number of bytes in a char.  */
 #undef SIZEOF_CHAR
@@ -278,9 +281,3 @@
 
 /* Define if you have the <values.h> header file.  */
 #undef HAVE_VALUES_H
-
-/* Define if we are using a builtin Th interpreter. */
-#undef HAVE_TK
-
-/* If using WinMain entry point on WIndows rather than main (). */
-#undef WITH_WINMAIN

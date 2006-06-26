@@ -1181,8 +1181,8 @@
 			 nil 
 			 (let ((fname (or (cdr (assoc fname +cmp-fn-alist+)) fname)))
 			   (list (cons fname
-				       (let* ((at (get fname 'proclaimed-arg-types))
-					      (rt (get fname 'proclaimed-return-type)))
+				       (let* ((at (get-arg-types fname))
+					      (rt (get-return-type fname)))
 ;					      (rt (if (equal '(*) rt) '* rt)))
 					 (when (or at rt) (list at rt))))))
 			 nil)))

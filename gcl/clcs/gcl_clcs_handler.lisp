@@ -88,7 +88,7 @@
       (MUFFLE-WARNING ()
 	  :REPORT "Skip warning."
 	(RETURN-FROM WARN NIL)))
-    (FORMAT *ERROR-OUTPUT* "~&Warning:~%~A~%" CONDITION)
+    (FORMAT *ERROR-OUTPUT* "~&Warning:~A~%" CONDITION)
     NIL))
 
 (DEFMACRO HANDLER-CASE (FORM &REST CASES)

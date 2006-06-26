@@ -283,6 +283,7 @@
      ;;; Open-codable function call.
      ((and (listp args)
            (null loc)
+	   (not (special-form-p fname))
            (setq fd (get-inline-info fname args return-type)))
       (let ((*inline-blocks* 0)
 	    (*restore-avma*  *restore-avma*)) 
@@ -295,12 +296,11 @@
       (check-fname-args fname args)
       (push-args args)
       (wt-nl fd "();")
-      (unwind-exit 'fun-val nil fname)
-      )
+      (unwind-exit 'fun-val nil fname))
 
      ( t; *Fast-link-compiling*
       (cond ((and
-	      	      (listp args)
+	      (listp args)
 	      (< (length args) 10)
 	      (or
 		   *ifuncall*
@@ -326,8 +326,7 @@
      ((setq fd (assoc fname *global-funs*))
       (push-args args)
       (wt-nl (c-function-name "L" (cdr fd) fname) "();")
-      (unwind-exit 'fun-val nil fname)
-      )
+      (unwind-exit 'fun-val nil fname))
      ((eql fname 'funcall-c)
       (wt-funcall-c args))
 

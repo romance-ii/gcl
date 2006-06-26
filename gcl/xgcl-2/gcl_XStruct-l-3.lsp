@@ -27,7 +27,6 @@
 
 ;;;;;; XExtCodes funcions ;;;;;;
 
-(clines "#include \"xgcl.h\"")
 (defentry make-XExtCodes () ( fixnum  "make_XExtCodes" ))
 (defentry XExtCodes-first_error (fixnum) ( fixnum "XExtCodes_first_error" ))
 (defentry set-XExtCodes-first_error (fixnum fixnum) ( void "set_XExtCodes_first_error" ))

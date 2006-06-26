@@ -1384,7 +1384,7 @@ dbg:
 static void make_trampoline_internal();
 static void make_turbo_trampoline_internal();
 
-static object
+object
 make_trampoline(function)
      object function;
 {

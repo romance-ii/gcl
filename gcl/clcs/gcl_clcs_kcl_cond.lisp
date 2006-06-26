@@ -11,10 +11,10 @@
 
 (defun clcs-universal-error-handler (error-name correctable function-name
 			             continue-format-string error-format-string
-			             &rest args
-				     &aux (internal-error-parms
-					   (list error-name correctable function-name
-						 continue-format-string error-format-string)))
+			             &rest args)
+;				     &aux (internal-error-parms
+;					   (list error-name correctable function-name
+;						 continue-format-string error-format-string)))
   (si::maybe-clear-input)
 ;;   (when (equal internal-error-parms *internal-error-parms*)
 ;;     (format t "Universal error handler called recursively ~S~%"

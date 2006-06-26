@@ -25,7 +25,6 @@
 
 ;;;;;; XKeyEvent funcions ;;;;;;
 
-(clines "#include \"xgcl.h\"")
 (defentry make-XKeyEvent () ( fixnum  "make_XKeyEvent" ))
 (defentry XKeyEvent-same_screen (fixnum) ( fixnum "XKeyEvent_same_screen" ))
 (defentry set-XKeyEvent-same_screen (fixnum fixnum) ( void "set_XKeyEvent_same_screen" ))

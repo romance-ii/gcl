@@ -156,12 +156,12 @@
 	 (sts (let (sts) (dotimes (i (length syms) (nreverse sts)) (push i sts))))
 	 (lsst (1- (length sts)))
 	 (ll (cadr (car fns))))
-    `(defun ,n ,(append ll '(state))
+    `(defun ,n ,(cons 'state ll)
        (declare (fixnum state))
        ,@(let (d (z (cddr (car fns)))) 
 	   (when (stringp (car z)) (pop z))
 	   (do nil ((or (not z) (not (consp (car z))) (not (eq (caar z) 'declare))) (nreverse d)) (push (pop z) d)))
-       (macrolet ,(mapcan (lambda (x y z) `((,x ,(cadr y) `(,',n ,,@(cadr y) ,,z)))) syms fns sts)
+       (macrolet ,(mapcan (lambda (x y z) `((,x ,(cadr y) `(,',n ,,z ,,@(cadr y))))) syms fns sts)
 	 (case state
 	   ,@(mapcar (lambda (x y) `(,(if (= x lsst) 'otherwise x) (funcall ,y ,@ll))) sts fns))))))
 
@@ -171,7 +171,7 @@
 	 (sts (let (sts) (dotimes (i (length syms) (nreverse sts)) (push i sts))))
 	 (ns (inlinef n syms)))
     (eval ns)
-    (mapc (lambda (x y) (let ((z (butlast (caddr ns)))) (eval `(defun ,x ,z (,n ,@z ,y))))) syms sts)
+    (mapc (lambda (x y) (let ((z (cdr (caddr ns)))) (eval `(defun ,x ,z (,n ,y ,@z))))) syms sts)
     (dolist (l syms) (add-hash l nil (list (list n)) nil))
     n))
     

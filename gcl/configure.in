@@ -108,6 +108,9 @@ AC_ARG_ENABLE(xdr,
 [ --enable-xdr=yes       will compile in support for XDR],
 [try_xdr=$enableval],[try_xdr="no"])
 
+AC_ARG_ENABLE(xgcl,[ --enable-xgcl=yes will compile in support for XGCL],
+[enable_xgcl=$enableval],[enable_xgcl="yes"])
+
 #
 # Host information 
 #
@@ -800,34 +803,31 @@ fi
 # X windows
 # 
 
-AC_PATH_XTRA
-#echo $X_CFLAGS
-#echo $X_LIBS
-#echo $X_EXTRA_LIBS
-#echo $X_PRE_LIBS
+if test "$enable_xgcl" = "yes" ; then 
 
-miss=0
-AC_CHECK_LIB(Xmu,main,X_LIBS="$X_LIBS -lXmu",miss=1,$X_LIBS)
-AC_CHECK_LIB(Xt,main,X_LIBS="$X_LIBS -lXt",miss=1,$X_LIBS)
-AC_CHECK_LIB(Xext,main,X_LIBS="$X_LIBS -lXext",miss=1,$X_LIBS)
-AC_CHECK_LIB(Xaw,main,X_LIBS="$X_LIBS -lXaw",miss=1,$X_LIBS)
-# AC_CHECK_LIB(Xaw8,main,X_LIBS="$X_LIBS -lXaw8",
-#    AC_CHECK_LIB(Xaw7,main,X_LIBS="$X_LIBS -lXaw7",
-#       AC_CHECK_LIB(Xaw6,main,X_LIBS="$X_LIBS -lXaw6",miss=1,$X_LIBS),$X_LIBS),$X_LIBS))
-AC_CHECK_LIB(X11,main,X_LIBS="$X_LIBS -lX11",miss=1,$X_LIBS)
-AC_CHECK_HEADER(X11/Xlib.h,true,miss=1)
-AC_CHECK_HEADER(X11/Xutil.h,true,miss=1)
-AC_CHECK_HEADER(X11/Xlibint.h,true,miss=1)
-AC_CHECK_HEADER(X11/Xresource.h,true,miss=1)
-AC_CHECK_HEADER(X11/keysym.h,true,miss=1)
+   AC_PATH_XTRA
+
+   miss=0
+   AC_CHECK_LIB(Xmu,main,X_LIBS="$X_LIBS -lXmu",miss=1,$X_LIBS)
+   AC_CHECK_LIB(Xt,main,X_LIBS="$X_LIBS -lXt",miss=1,$X_LIBS)
+   AC_CHECK_LIB(Xext,main,X_LIBS="$X_LIBS -lXext",miss=1,$X_LIBS)
+   AC_CHECK_LIB(Xaw,main,X_LIBS="$X_LIBS -lXaw",miss=1,$X_LIBS)
+   AC_CHECK_LIB(X11,main,X_LIBS="$X_LIBS -lX11",miss=1,$X_LIBS)
+   AC_CHECK_HEADER(X11/Xlib.h,true,miss=1)
+   AC_CHECK_HEADER(X11/Xutil.h,true,miss=1)
+   AC_CHECK_HEADER(X11/Xlibint.h,true,miss=1)
+   AC_CHECK_HEADER(X11/Xresource.h,true,miss=1)
+   AC_CHECK_HEADER(X11/keysym.h,true,miss=1)
  
-AC_MSG_CHECKING(can compile xgcl)
-if test "$miss" = "1" ; then
-	X_CFLAGS=
-	X_LIBS=
-	AC_MSG_RESULT(no)
-else
-	AC_MSG_RESULT(yes)
+   AC_MSG_CHECKING(can compile xgcl)
+   if test "$miss" = "1" ; then
+      X_CFLAGS=
+      X_LIBS=
+      AC_MSG_RESULT(no)
+   else
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(HAVE_XGCL)
+   fi
 fi
 
 

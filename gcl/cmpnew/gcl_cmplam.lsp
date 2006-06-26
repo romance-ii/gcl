@@ -160,7 +160,7 @@
   ;;code is reverse type propagation.  CM 20050106
   (let ((decls (decls-from-procls
 		(car lambda-expr)
-		(and block-it (get block-name 'compiler::proclaimed-arg-types))
+		(and block-it (get-arg-types block-name))
 		(cdr lambda-expr))))
     (when decls
       (cmpnote "~S function args declared: ~S~%" block-name decls)
@@ -385,7 +385,7 @@
 ;;lexical closure
 
 (defun fix-down-args(requireds body name &aux auxv auxinit info v)
-  (let ((types	 (get  name 'proclaimed-arg-types))
+  (let ((types (get-arg-types name))
 	(fixed (get name 'fixed-args)))
     (do ((vv requireds (cdr vv))
 	 (typ types (cdr typ)))

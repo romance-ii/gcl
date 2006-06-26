@@ -128,7 +128,7 @@
 
 (defun default-system-banner ()
   (let (gpled-modules)
-    (dolist (l '(:unexec :bfd :readline))
+    (dolist (l '(:unexec :bfd :readline :xgcl))
       (when (member l *features*)
 	(push l gpled-modules)))
     (format nil "GCL (GNU Common Lisp)  ~a.~a.~a ~a  ~a  ~a~%~a~%~a ~a~%~a~%~a~%~%~a~%" 
@@ -136,7 +136,7 @@
 	    (if (member :ansi-cl *features*) "ANSI" "CLtL1")
 	    (if (member :gprof *features*) "profiling" "")
 	    (si::gcl-compile-time)
-	    "Source License: LGPL(gcl,gmp,pargcl), GPL(unexec,bfd)"
+	    "Source License: LGPL(gcl,gmp,pargcl), GPL(unexec,bfd,xgcl)"
 	    "Binary License: "
 	    (if gpled-modules (format nil "GPL due to GPL'ed components: ~a" gpled-modules)
 	      "LGPL")

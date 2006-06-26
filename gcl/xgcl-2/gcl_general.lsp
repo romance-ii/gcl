@@ -26,9 +26,8 @@
 ; 15 Sep 05: Edited by G. Novak to change C function headers to new form
 ; 24 Jan 06: Edited by G. Novak to remove vertex-array entries.
 
-(clines "#include \"xgcl.h\"")
-(defentry free (fixnum) (void free))
-(defentry calloc(fixnum fixnum) (fixnum calloc))
+;(defentry free (string) (void free))
+;(defentry calloc(fixnum fixnum) (string calloc))
 (defentry char-array (fixnum) (fixnum char_array))
 (defentry char-pos (fixnum fixnum) (char char_pos))
 (defentry int-array (fixnum) (fixnum int_array))
@@ -36,18 +35,24 @@
 (defentry fixnum-pos (fixnum fixnum) (fixnum fixnum_pos))
 (defentry set-char-array (fixnum fixnum char) (void set_char_array))
 (defentry set-int-array (fixnum fixnum int) (void set_int_array))
-(defentry set-fixnum-array (fixnum fixnum int) (void set_fixnum_array))
+(defentry set-fixnum-array (fixnum fixnum fixnum) (void set_fixnum_array))
 
 ;;from mark ring's function
 ;; General routines.
-(defCfun "object  get_c_string(object s)" 0
+(defCfun "object get_c_string(object s)" 0
   " return((object)s->st.st_self);"
+  )
+(defCfun "object get_c_string1(object s)" 0
+  " return((object)object_to_string(s));"
+  )
+(defCfun "fixnum get_c_string2(object s)" 0
+  " return((fixnum)get_c_string(s));"
   )
 (defentry get_c_string_2 (object) (object get_c_string))
 
 ;; make sure string is null terminated
 
-(defentry get-c-string (object) (object "(object)object_to_string"))
+(defentry get-c-string (object) (object get_c_string1));"(object)object_to_string"))
 
 ;; General routines.
 (defCfun "object lisp_string(object a_string, fixnum c_string) " 0
@@ -58,16 +63,16 @@
   "return(a_string);"
   )
 
-(defentry  lisp-string-2 (object fixnum) (object lisp_string))
+(defentry  lisp-string-2 (object fixnum ) (object lisp_string))
 (defun lisp-string (a-string )
   (lisp-string-2 "" a-string ))
 
 ;;modified from mark ring's function
 ;; General routines.
-(defCfun "fixnum get_st_point(object s)" 0
+(defCfun "fixnum   get_st_point(object s)" 0
   " return((fixnum) s->st.st_self);"
   )
-(defentry get-st-point2 (object) (fixnum "(fixnum)get_c_string"))
+(defentry get-st-point2 (object) (fixnum get_c_string2));"(fixnum)get_c_string"))
 
 ;; make sure string is null terminated
 (defun  get-st-point (string)

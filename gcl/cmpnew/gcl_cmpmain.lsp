@@ -833,9 +833,7 @@ SYSTEM_SPECIAL_INIT
 		   new
 		   (mysub (subseq str y) it new)))))
 
-(defun link (files image &optional post extra-libs (run-user-init t)
-		   &aux (system-fail nil))
-
+(defun link (files image &optional post extra-libs (run-user-init t))
   (let* ((ui (make-user-init files "user-init"))
 	 (raw (pathname image))
 	 (init (merge-pathnames (make-pathname
@@ -847,54 +845,43 @@ SYSTEM_SPECIAL_INIT
 			       raw))
 	 (map (merge-pathnames (make-pathname
 				:name (concatenate 'string (pathname-name raw) "_map")) raw))
-	 #+winnt (raw (merge-pathnames (make-pathname :type "exe") raw))
-	 )
+	 #+winnt (raw (merge-pathnames (make-pathname :type "exe") raw)))
 
     (with-open-file (st (namestring map) :direction :output))
-    (if (/= 0 (system
-     ;; <<<<<<<<<<
-     (format nil "~a ~a ~a ~a -L~a ~a ~a ~a"
-	     *ld* 
-	     (namestring raw)
-	     (namestring ui)
-	     (let ((sfiles ""))
-	       (dolist (tem files)
-		 (if (equal (pathname-type tem) "o")
-		     (setq sfiles (concatenate 'string sfiles " " (namestring tem)))))
-	       sfiles) 
-	     si::*system-directory*
-	     #+gnu-ld (format nil "-Wl,-Map ~a" (namestring map)) #-gnu-ld ""
-	     (let* ((par (namestring (make-pathname :directory '(:parent))))
-		    (i (concatenate 'string " " par))
-		    (j (concatenate 'string " " si::*system-directory* par)))
-	       (mysub *ld-libs* i j))
-	     (if (stringp extra-libs) extra-libs "")))
-     ;; >>>>>>>>>>
-	)
-	(setq system-fail t))
-    
-    (delete-file ui)
-    
-    (with-open-file (st init :direction :output)
-		    (unless run-user-init
-		      (format st "(fmakunbound 'si::user-init)~%"))
-		    (format st "(setq si::*no-init* '(")
-		    (dolist (tem files)
-		      (format st " \"~a\"" (pathname-name tem)))
-		    (format st "))~%")
-		    (with-open-file (st1 
-				     (format nil "~a~a" si::*system-directory* *init-lsp*))
-				    (si::copy-stream st1 st))
-		    (if (stringp post) (format st "~a~%" post))
-		    (format st "(si::save-system \"~a\")~%" (namestring image)))
-    
-    (if (/= 0 (system (format nil "~a ~a < ~a" 
-			      (namestring raw)
-			      si::*system-directory*
-			      (namestring init))))
-	(setq system-fail t))
-    
-    (delete-file raw)
-    (delete-file init))
-
-  (if system-fail nil image))
+    (when (= 0 (system
+		(format nil "~a ~a ~a ~a -L~a ~a ~a ~a"
+			*ld* 
+			(namestring raw)
+			(namestring ui)
+			(let ((sfiles ""))
+			  (dolist (tem files)
+			    (if (equal (pathname-type tem) "o")
+				(setq sfiles (concatenate 'string sfiles " " (namestring tem)))))
+			  sfiles) 
+			si::*system-directory*
+			#+gnu-ld (format nil "-Wl,-Map ~a" (namestring map)) #-gnu-ld ""
+			(let* ((par (namestring (make-pathname :directory '(:parent))))
+			       (i (concatenate 'string " " par))
+			       (j (concatenate 'string " " si::*system-directory* par)))
+			  (mysub *ld-libs* i j))
+			(if (stringp extra-libs) extra-libs ""))))
+      (delete-file ui)
+      (with-open-file (st init :direction :output)
+		      (unless run-user-init
+			(format st "(fmakunbound 'si::user-init)~%"))
+		      (format st "(setq si::*no-init* '(")
+		      (dolist (tem files)
+			(format st " \"~a\"" (pathname-name tem)))
+		      (format st "))~%")
+		      (with-open-file (st1 
+				       (format nil "~a~a" si::*system-directory* *init-lsp*))
+				      (si::copy-stream st1 st))
+		      (if (stringp post) (format st "~a~%" post))
+		      (format st "(si::save-system \"~a\")~%" (namestring image)))
+      (when (= 0 (system (format nil "~a ~a < ~a" 
+				 (namestring raw)
+				 si::*system-directory*
+				 (namestring init))))
+	(delete-file raw)
+	(delete-file init)
+	image))))

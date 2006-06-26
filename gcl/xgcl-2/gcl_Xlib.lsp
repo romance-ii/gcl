@@ -50,9 +50,6 @@
 (defconstant  QueuedAfterReading 1)
 (defconstant  QueuedAfterFlush 2)
 
-(clines "#include \"xgcl.h\"")
-
-
 (defentry XLoadQueryFont(
 
     fixnum		;; display 

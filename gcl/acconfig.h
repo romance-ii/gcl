@@ -271,3 +271,6 @@ SGC is enabled.  */
 #undef STATIC_LINKING
 #undef ADDR_NO_RANDOMIZE
 #undef LEADING_UNDERSCORE
+#undef HAVE_XGCL
+#undef HAVE_TK
+#undef WITH_WINMAIN

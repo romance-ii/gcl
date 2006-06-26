@@ -578,6 +578,10 @@
       (let* ((b (cadr l))
 	     (b (if (eq (car b) 'type) (cdr b) b)))
 	(cond ((eq (car b) 'optimize) (push l dd))
+	      ((eq (car b) 'class)
+	       (unless (<= (length b) 3)
+		 (cmperr "Unknown class declaration: ~s" b))
+	       (if (member (cadr b) auxs) (push l ad) (push l dd)))
 	      ((let ((tt (intersection (cdr b) auxs)))
 		 (cond ((not tt) (push l dd))
 		       ((let ((z (if (eq b (cadr l)) (list (caadr l)) (list (caadr l) (cadadr l)))))
@@ -636,7 +640,7 @@
 ;				     (rt (if (equal '(*) rt) '* rt)))
 				(when (or at rt) (list at rt))) nil nil)
 	  (when *recursion-detected*;FIXME
-	    (unless (and (equal oal (get fname 'proclaimed-arg-types)) (equal ort (get fname 'proclaimed-return-type)))
+	    (unless (and (equal oal (get-arg-types fname)) (equal ort (get-return-type fname)))
 	      (go top)))))))
     
 
@@ -662,7 +666,7 @@
 						;;; less than 10 requireds
 		   ;;; For all required parameters...
 		 (do ((vars (car lambda-list) (cdr vars))
-		      (types (get fname 'proclaimed-arg-types) (cdr types))
+		      (types (get-arg-types fname) (cdr types))
 		      (problem))
 		     ((endp vars)
 		      (and (endp types)
@@ -841,7 +845,7 @@
 
 (defun vararg-p (x)
   (and (equal (get x 'proclaimed-return-type) t)
-       (do ((v (get x 'proclaimed-arg-types) (cdr v)))
+       (do ((v (get-arg-types x) (cdr v)))
 	   ((null v) t)
 	   (or (consp v) (return nil))
 	   (or (eq (car v) t)
@@ -1836,14 +1840,14 @@
   )
 
 (defun t3defentry (fname cfun arg-types type cname)
-;  (wt-h 
-;   (if (eq type 'string) "char *" (string-downcase (symbol-name type)))
-;   " " cname "("
-;   (with-output-to-string 
-;    (s)
-;    (do ((l arg-types (cdr l))) ((not l))
-;      (princ (if (eq (car l) 'string) "char *" (string-downcase (symbol-name type))) s)
-;      (princ (if (cdr l) "," ");") s))))
+  (wt-h 
+   (if (eq type 'string) "char *" (string-downcase (symbol-name type)))
+   " " cname "("
+   (with-output-to-string 
+    (s)
+    (do ((l arg-types (cdr l))) ((not l) (princ ");"s ))
+      (princ (if (eq (car l) 'string) "char *" (string-downcase (symbol-name (car l)))) s)
+      (when (cdr l) (princ "," s)))))
   (wt-comment "function definition for " fname)
   (wt-nl1 "static void " (c-function-name "L" cfun fname) "()")
   (wt-nl1 "{	object *old_base=vs_base;")

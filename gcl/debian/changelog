@@ -195,8 +195,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * call add-hash only when *compiler-auto-proclaim* is set, normalize
     arg and return types in *inline-functions*
   * Cleanup libxaw dependencies
+  * defentry C proclamations, arg and return types from lfun list, xgcl
+    cleanup and configure support
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 25 Jun 2006 23:18:38 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 26 Jun 2006 19:14:04 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

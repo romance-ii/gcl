@@ -276,29 +276,36 @@
                *function-declarations*))
         (t (warn "The function name ~s is not a symbol." fname))))
 
-(defun get-arg-types (fname &aux x)
+(defun get-arg-types (fname)
   (mapcar 'cmp-norm-tp 
-	  (if (setq x (assoc fname *function-declarations*))
-	      (cadr x)
-	    (get fname 'proclaimed-arg-types))))
+	  (let* ((x (assoc fname *function-declarations*))
+		 (types1 (if x (cadr x) (get fname 'proclaimed-arg-types)))
+		 (types (get fname 'arg-types)))
+	    (cond ((and types types1)
+		   (let* ((l1 (length types))
+			  (l2 (length types1))
+			  (n (- (max l1 l2) (min l1 l2)))
+			  (e (make-list n :initial-element '*))
+			  (ntypes (if (> l2 l1) (append types e) types))
+			  (ntypes1 (if (> l1 l2) (append types1 e) types1))
+			  (res (mapcar 'type-and ntypes1 ntypes)))
+		     (cond ((every 'identity res) res)
+			   ((progn 
+			      (cmpwarn "The arg types of ~s were badly declared." fname)
+			      types1)))))
+		  ((or types1 types))))))
 
 (defun get-return-type (fname)
   (cmp-norm-tp 
    (when (symbolp fname)
      (let* ((x (assoc fname *function-declarations*))
 	    (type1 (if x (caddr x) (get fname 'proclaimed-return-type)))
-					;	   (type1 (if (equal '(*) type1) '* type1))
-	    (type (if (get fname 'predicate) #tboolean
-		    (get fname 'return-type))))
-       (cond (type1
-	      (cond (type
-		     (cond ((setq type (type-and type type1)) type)
-			   (t
-			    (cmpwarn
-			     "The return type of ~s was badly declared."
-			     fname))))
-		    (t type1)))
-	     (t type))))))
+	    (type (if (get fname 'predicate) #tboolean (get fname 'return-type))))
+       (cond ((and type type1 (type-and type type1)))
+	     ((and type type1) 
+	      (cmpwarn "The return type of ~s was badly declared." fname)
+	      type1)
+	     ((or type1 type)))))))
 
 (defun get-local-arg-types (fun &aux x)
   (if (setq x (assoc fun *function-declarations*))
@@ -704,18 +711,18 @@
          (dolist** (fname (cddr decl) t)
            (unless (and (get fname 'proclaimed-function)
                         (equal (function-arg-types (cadadr decl))
-                               (get fname 'proclaimed-arg-types))
+                               (get-arg-types fname))
                         (equal (function-return-type (cddadr decl))
-                               (get fname 'proclaimed-return-type)))
+                               (get-return-type fname)))
                    (return nil)))))
     (function
      (if (or (endp (cdr decl)) (endp (cddr decl)))
          (warn "The function declaration ~s is illegal." decl)
          (and (get (cadr decl) 'proclaimed-function)
               (equal (function-arg-types (caddr decl))
-                     (get (cadr decl) 'proclaimed-arg-types))
+                     (get-arg-types (cadr decl)))
               (equal (function-return-type (cdddr decl))
-                     (get (cadr decl) 'proclaimed-return-type)))))
+                     (get-return-type (cadr decl))))))
     (inline (dolist** (fun (cdr decl) t)
               (if (symbolp fun)
                   (when (get fun 'cmp-notinline) (return nil))

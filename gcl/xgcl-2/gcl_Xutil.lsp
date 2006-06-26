@@ -164,8 +164,6 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 ;;typedef fixnum XContext;
 
-(clines "#include \"xgcl.h\"")
-
 (defentry XSaveContext(
 
     fixnum 	;; display 

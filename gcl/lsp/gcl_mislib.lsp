@@ -149,7 +149,7 @@
   (setq si::*lib-directory* s)
   (setq si::*system-directory* (si::string-concatenate s "unixport/"))
   (let (nl)
-    (dolist (l '("cmpnew/" "gcl-tk/" "lsp/"))
+    (dolist (l '("cmpnew/" "gcl-tk/" "lsp/" "xgcl-2/"))
       (push (si::string-concatenate s l) nl))
     (setq si::*load-path* nl))
   nil)
