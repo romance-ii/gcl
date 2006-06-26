@@ -198,8 +198,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * defentry C proclamations, arg and return types from lfun list, xgcl
     cleanup and configure support
   * synch xgcl-2 with Novak edits
+  * fix build errors
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 26 Jun 2006 22:03:29 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 26 Jun 2006 23:22:30 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

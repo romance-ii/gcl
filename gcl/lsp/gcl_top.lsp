@@ -825,6 +825,8 @@ First directory is checked for first name and all extensions etc."
 						     "mod/") *load-path*))
      (setq *load-path* (cons (si::string-concatenate *lib-directory*
 						     "gcl-tk/") *load-path*))
+     (setq *load-path* (cons (si::string-concatenate *lib-directory*
+						     "xgcl-2/") *load-path*))
 	    )
     (when (not (boundp 'si::*system-directory*)) 
       (setq si::*system-directory* (namestring
