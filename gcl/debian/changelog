@@ -199,8 +199,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     cleanup and configure support
   * synch xgcl-2 with Novak edits
   * fix build errors
+  * fix some type prop bugs
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 26 Jun 2006 23:22:30 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 27 Jun 2006 23:56:36 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

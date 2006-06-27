@@ -77,8 +77,9 @@
   (when (endp args) (too-few-args 'multiple-value-prog1 1 0))
   (setq form (c1expr* (car args) info))
   (setq args (c1args (cdr args) info))
-  (list 'multiple-value-prog1 info form args)
-  )
+  (setf (info-type info) (info-type (cadr form)))
+  (list 'multiple-value-prog1 info form args))
+
 ;; We may record information here when *value-to-go* = 'top
 (defvar *top-data* nil)
 

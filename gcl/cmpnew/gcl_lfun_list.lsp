@@ -6,6 +6,7 @@
 
 (in-package 'compiler)
 
+(DEFSYSFUN 'si::sputprop "sputprop" '(T T T) 'T NIL NIL) 
 (DEFSYSFUN 'GENSYM "Lgensym" '(*) 'T NIL NIL) 
 (DEFSYSFUN 'SUBSEQ "Lsubseq" '(T T *) 'T NIL NIL) 
 (DEFSYSFUN 'MINUSP "Lminusp" '(T) 'T NIL T) 
