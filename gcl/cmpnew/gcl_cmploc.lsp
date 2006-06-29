@@ -198,7 +198,9 @@
 		      '(INLINE-FIXNUM INLINE-SHORT-FLOAT INLINE-LONG-FLOAT)))
          (wt "(fixnum)")(wt-inline-loc (caddr loc) (cadddr loc)))
         ((and (consp loc) (eq (car loc) 'fixnum-value))
-         (wt "(fixnum)")(wt (caddr loc)))
+         (wt "(fixnum)")
+	 (cond ((= (caddr loc) most-negative-fixnum) (wt "(" (1+ most-negative-fixnum) "- 1)"))
+	       ((wt (caddr loc)))))
         (t (wt (if *safe-compile* "fixint(" "fix(") loc ")"))))
 
 (defun wt-integer-loc (loc  &aux (avma t)(first (and (consp loc) (car loc))))

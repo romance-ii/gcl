@@ -200,8 +200,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * synch xgcl-2 with Novak edits
   * fix build errors
   * fix some type prop bugs
+  * Don't write most-negative-fixnum into C source
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 27 Jun 2006 23:56:36 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 29 Jun 2006 14:19:03 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
