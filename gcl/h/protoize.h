@@ -112,11 +112,11 @@ struct key {short n,allow_other_keys;
 /* catch.c:61:OF */ extern object fSerror_set (object x0); /* (x0) object x0; */
 /* catch.c:166:OF */ extern void gcl_init_catch (void); /* () */
 /* cfun.c:37:OF */ extern object make_cfun (void (*self)(), object name, object data, char *start, int size); /* (self, name, data, start, size) int (*self)(); object name; object data; char *start; int size; */
-/* cfun.c:56:OF */ extern object make_sfun (object name, object (*self)(), int argd, object data); /* (name, self, argd, data) object name; int (*self)(); int argd; object data; */
+/* cfun.c:56:OF */ extern object make_sfun (object name, object (*self)(), int argd, object data,object larg); /* (name, self, argd, data) object name; int (*self)(); int argd; object data; */
 /* cfun.c:91:OF */ extern object make_cclosure_new (void (*self)(), object name, object env, object data); /* (self, name, env, data) int (*self)(); object name; object env; object data; */
 /* cfun.c:108:OF */ extern object make_cclosure (void (*self)(), object name, object env, object data, char *start, int size); /* (self, name, env, data, start, size) int (*self)(); object name; object env; object data; char *start; int size; */
 /* cfun.c:124:OF */ extern object fSmc (object name, object address); /* (name, address) object name; object address; */
-/* cfun.c:150:OF */ extern object fSmfsfun (object name, object address, object argd); /* (name, address, argd) object name; object address; object argd; */
+/* cfun.c:150:OF */ extern object fSmfsfun (object name, object address, object argd,object larg); /* (name, address, argd) object name; object address; object argd; */
 /* cfun.c:174:OF */ extern object fSmfvfun (object name, object address, object argd); /* (name, address, argd) object name; object address; object argd; */
 /* cfun.c:193:OF */ extern object fSmfvfun_key (object symbol, object address, object argd, object keys); /* (symbol, address, argd, keys) object symbol; object address; object argd; object keys; */
 /* cfun.c:221:OF */ extern object fSmf (object name, object addr); /* (name, addr) object name; object addr; */
@@ -1300,10 +1300,10 @@ int
 system_time_zone_helper(void);
 
 object
-call_proc_new(object,int setf,void **,int,object,va_list);
+call_proc_new(object,int setf,int pop_one_arg,void **,int,object,va_list);
 
 object 
-call_vproc_new(object,int setf,void *,object,va_list);
+call_vproc_new(object,int setf,int pop_one_arg,void *,object,va_list);
 
 void
 funcall_with_catcher(object, object);
@@ -1770,6 +1770,23 @@ gcl_isnormal_double(double);
 
 int 
 gcl_isnormal_float(float);
+
+object
+powm_bbb(object,object,object);
+object
+powm_bfb(object,fixnum,object);
+object
+powm_fbb(fixnum,object,object);
+object
+powm_ffb(fixnum,fixnum,object);
+object
+powm_bbf(object,object,fixnum);
+object
+powm_bff(object,fixnum,fixnum);
+object
+powm_fbf(fixnum,object,fixnum);
+object
+powm_fff(fixnum,fixnum,fixnum);
 
 object
 find_init_name1(char *,unsigned);

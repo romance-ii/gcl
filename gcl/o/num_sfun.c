@@ -632,6 +632,88 @@ FFN(siLmodf)(void)
 
 }
 
+#define CTMP(a_) (type_of(a_)==t_fixnum ? stoi(fix(a_)) : MP(a_))
+
+object 
+powm_bbb(object a,object i,object m) {
+  object ans=new_bignum();
+  if (type_of(i)==t_fixnum)
+    mpz_powm_ui(MP(ans),CTMP(a),fix(i),CTMP(m));
+  else
+    mpz_powm(MP(ans),CTMP(a),MP(i),CTMP(m));
+  return(maybe_replace_big(ans));
+}
+
+object 
+powm_bfb(object a,fixnum i,object m) {
+  object ans=new_bignum();
+  mpz_powm_ui(MP(ans),CTMP(a),i,CTMP(m));
+  return(maybe_replace_big(ans));
+}
+
+object 
+powm_fbb(fixnum a,object i,object m) {
+  object ans=new_bignum();
+  if (type_of(i)==t_fixnum)
+    mpz_powm_ui(MP(ans),stoi(a),fix(i),CTMP(m));
+  else
+    mpz_powm(MP(ans),stoi(a),MP(i),CTMP(m));
+  return(maybe_replace_big(ans));
+}
+
+object 
+powm_ffb(fixnum a,fixnum i,object m) {
+  object ans=new_bignum();
+  mpz_powm_ui(MP(ans),stoi(a),i,CTMP(m));
+  return(maybe_replace_big(ans));
+}
+
+object 
+powm_bbf(object a,object i,fixnum m) {
+  object ans=new_bignum();
+  if (type_of(i)==t_fixnum)
+    mpz_powm_ui(MP(ans),CTMP(a),fix(i),stoi(m));
+  else
+    mpz_powm(MP(ans),CTMP(a),MP(i),stoi(m));
+  return(maybe_replace_big(ans));
+}
+
+object 
+powm_bff(object a,fixnum i,fixnum m) {
+  object ans=new_bignum();
+  mpz_powm_ui(MP(ans),CTMP(a),i,stoi(m));
+  return(maybe_replace_big(ans));
+}
+
+object 
+powm_fbf(fixnum a,object i,fixnum m) {
+  object ans=new_bignum();
+  if (type_of(i)==t_fixnum)
+    mpz_powm_ui(MP(ans),stoi(a),fix(i),stoi(m));
+  else
+    mpz_powm(MP(ans),stoi(a),MP(i),stoi(m));
+  return(maybe_replace_big(ans));
+}
+
+object 
+powm_fff(fixnum a,fixnum i,fixnum m) {
+  object ans=new_bignum();
+  mpz_powm_ui(MP(ans),stoi(a),i,stoi(m));
+  return(maybe_replace_big(ans));
+}
+
+
+DEFUNO_NEW("POWM",object,fSpowm,LISP
+	   ,3,3,NONE,OO,OO,OO,OO,void,siLpowm,(object a,object i,object m),"") {
+
+  check_type_integer(&a);
+  check_type_integer(&i);
+  check_type_integer(&m);
+  RETURN1(powm_bbb(a,i,m));
+
+}
+
+
 void
 gcl_init_num_sfun(void)
 {

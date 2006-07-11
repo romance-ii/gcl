@@ -25,6 +25,7 @@ GMP_EXTERN int jmp_gmp;
   comparisons with possible non mpz_t type arguments*/
 #define E21 _b==(void *)_c
 #define E31 E21||_b==(void *)_d
+#define E41 E31||_b==(void *)_e
 #define E42 _b==_d||_b==_e||_c==_d||_c==_e
 #define E20 0
 #define E11 0
@@ -154,6 +155,8 @@ MEM_GMP_CALL(3,gmp_ulint,mpz_gcd_ui,1,mpz_t,mpz_t,unsigned long int)
 MEM_GMP_CALL(3,void,mpz_divexact,1,mpz_t,mpz_t,mpz_t)
 MEM_GMP_CALL(3,void,mpz_divexact_ui,1,mpz_t,mpz_t,unsigned long int)
 MEM_GMP_CALL(2,void,mpz_fac_ui,1,mpz_t,unsigned long int)
+MEM_GMP_CALL(4,void,mpz_powm,1,mpz_t,mpz_t,mpz_t,mpz_t)
+MEM_GMP_CALL(4,void,mpz_powm_ui,1,mpz_t,mpz_t,unsigned long int,mpz_t)
 
 
      /* FIXME: find a way to have this follow the convention in gmp.h*/
@@ -198,3 +201,5 @@ MEM_GMP_CALL(2,void,mpz_fac_ui,1,mpz_t,unsigned long int)
 #define __gmpz_mpz_divexact m__gmpz_mpz_divexact
 #define __gmpz_mpz_divexact_ui m__gmpz_mpz_divexact_ui
 #define __gmpz_mpz_fac_ui m__gmpz_mpz_fac_ui
+#define __gmpz_mpz_powm m__gmpz_mpz_powm
+#define __gmpz_mpz_powm_ui m__gmpz_mpz_powm_ui

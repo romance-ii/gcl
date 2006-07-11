@@ -201,8 +201,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * fix build errors
   * fix some type prop bugs
   * Don't write most-negative-fixnum into C source
+  * export mpz_powm et.al.
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 29 Jun 2006 14:19:03 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 11 Jul 2006 21:36:09 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
