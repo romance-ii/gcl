@@ -30,7 +30,11 @@
 	     (setq *pahl* nil))))
 	((let ((h (or (gethash fn *call-hash-table*)
 		      (setf (gethash fn *call-hash-table*) (make-call :sig sig)))))
-	   (when sig (proclaim `(ftype (function ,@sig) ,fn)))
+	   (when sig 
+	     (unless (eq (cadr sig) '*) (putprop fn t 'proclaimed-function))
+	     (putprop fn (car sig) 'proclaimed-arg-types)
+	     (putprop fn (cadr sig) 'proclaimed-return-type))
+;	     (proclaim `(ftype (function ,@sig) ,fn)))
 	   (when (and sig (not (equal sig (call-sig h))))
 	     (dolist (l (call-callers h))
 	       (unless (eq l fn)
@@ -225,7 +229,7 @@
       (sort *needs-recompile*
 	    (lambda (x y) 
 	      (member (car x) (all-callees (car y) nil))))
-      (maphash (lambda (x y) (when (call-sig y) (proclaim `(ftype (function ,@(call-sig y)) ,x)))) *call-hash-table*)
+;      (maphash (lambda (x y) (when (call-sig y) (proclaim `(ftype (function ,@(call-sig y)) ,x)))) *call-hash-table*)
       (map nil (lambda (fn)
 		 (format t "Callee ~s sigchange ~s to ~s, recompiling ~s~%" 
 			 (cadr fn) (caddr fn) (cadddr fn) (car fn))) *needs-recompile*)

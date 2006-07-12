@@ -74,6 +74,7 @@
 (import 'si::+array-types+ 'compiler)
 (import 'si::+aet-type-object+ 'compiler)
 (import 'si::*tmp-dir* 'compiler)
+(import 'si::returns-exactly 'compiler)
 
 (let ((p (find-package "DEFPACKAGE")))
   (when p
@@ -108,10 +109,10 @@
 (defun dnt (tp)
   (uniq-tp
    (cond ((eq '* tp) '*)
-	 ((and (consp tp) (eq (car tp) 'values))
+	 ((and (consp tp) (member (car tp) '(values returns-exactly)))
 	  (cond ((not (cdr tp)) nil)
 		((not (cddr tp)) (cmp-norm-tp (cadr tp)))
-		(`(values ,@(mapcar 'cmp-norm-tp (cdr tp))))))
+		(`(,(car tp) ,@(mapcar 'cmp-norm-tp (cdr tp))))))
 	 ((let ((tp (resolve-type tp))) (if (cadr tp) '* (car tp)))))))
   
 (defun cmp-norm-tp (tp)
@@ -637,6 +638,7 @@
 (si::putprop 'abs 'abs-propagator 'type-propagator)
 
 (defmacro vt (tp) `(and (consp ,tp) (eq (car ,tp) 'values)))
+(defmacro et (tp) `(and (consp ,tp) (eq (car ,tp) 'returns-exactly)))
 
 ;;FIXME -- centralize subtypep, normalzie-type, type>=, type-and.
 ;;Consider traversing a static tree.  CM 20050106
@@ -644,6 +646,17 @@
   (cond ((eq type1 '*) type2)
 	((eq type2 '*) type1)
 	((equal type1 type2) type2)
+	((or (et type1) (et type2))
+	 (let* ((ntype1 (if (et type1) (cmp-norm-tp (cons 'values (cdr type1))) type1))
+		(ntype2 (if (et type2) (cmp-norm-tp (cons 'values (cdr type2))) type2))
+		(z (type-and ntype1 ntype2))
+		(lz (when (consp z) (length z))))
+	   (cond ((vt z)
+		  (and lz
+		       (or (not (et type1)) (= (length type1) lz))
+		       (or (not (et type2)) (= (length type2) lz))
+		       (cmp-norm-tp `(returns-exactly ,@(cdr z)))))
+		 (z))))
 	((or (vt type1) (vt type2))
 	 (let* ((ntype1 (if (vt type1) type1 `(values ,@(when type1 (list type1)))))
 		(ntype2 (if (vt type2) type2 `(values ,@(when type2 (list type2)))))
@@ -682,8 +695,15 @@
 (defun type-or1-int (type1 type2)
   (cond ((eq type1 '*) type1)
 	((eq type2 '*) type2)
-	((or (and (consp type1) (eq (car type1) 'values))
-	     (and (consp type2) (eq (car type2) 'values)))
+	((or (et type1) (et type2))
+	 (let* ((ntype1 (if (et type1) (cmp-norm-tp (cons 'values (cdr type1))) type1))
+		(ntype2 (if (et type2) (cmp-norm-tp (cons 'values (cdr type2))) type2))
+		(z (type-or1 ntype1 ntype2))
+		(lz (when (consp z) (length z))))
+	   (cond ((and (et type1) (et type2) (= lz (length type1)) (= lz (length type2)))
+		  (cmp-norm-tp `(returns-exactly ,@(cdr z))))
+		 (z))))
+	((or (vt type1) (vt type2))
 	 (let* ((ntype1 (if (vt type1) type1 `(values ,@(when type1 (list type1)))))
 		(ntype2 (if (vt type2) type2 `(values ,@(when type2 (list type2)))))
 		(l1 (length ntype1))

@@ -202,8 +202,14 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * fix some type prop bugs
   * Don't write most-negative-fixnum into C source
   * export mpz_powm et.al.
+  * faster mv;some optional argument tail recursion;returns-exactly type
+    support;expand mvb (x y z) (values ...);single-value returns in
+    inline-args;nval elements in sfn and vfn;MVRET_BIT;sanitize symbol-
+    plist ops in add-hash;fix debugger for interpreted
+    functions;redefine coerce to auto return t;don't load sys-proclaims
+    in final images
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 11 Jul 2006 21:36:09 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 12 Jul 2006 22:23:43 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

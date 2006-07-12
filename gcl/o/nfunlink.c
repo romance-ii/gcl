@@ -183,7 +183,7 @@ IapplyVector(object fun, int nargs, object *base)
    starting at BASE.  This pushes on the CallHist, and puts the args onto
    the arg stack, so that debuggers may examine them.  It sets
    fcall.nvalues appropriately. */
-{ object res=OBJNULL,*abase=NULL;
+{ object res=OBJNULL;
   int i=0;
   object *oldtop = vs_top;
   unsigned int  atypes=0;
@@ -206,29 +206,40 @@ IapplyVector(object fun, int nargs, object *base)
     if (nargs > F_MAX_ARGS(fun->sfn.sfn_argd) && F_MAX_ARGS(fun->sfn.sfn_argd))
       FEtoo_many_arguments(base,vs_top);
     atypes = F_TYPES(fun->sfn.sfn_argd) >> F_TYPE_WIDTH;
-    if (atypes==0) {abase = base;}
-    else { abase = ZALLOCA(nargs*sizeof(object));
-           assert(abase);
-	   for (i=0; i < nargs ; i++, atypes >>= F_TYPE_WIDTH)
-	     { object next = base[i];
-	       int atyp = atypes & MASK_RANGE(0,F_TYPE_WIDTH);
-	       if (atyp == F_object)
-		 next = next;
-	       else if (atyp == F_int)
-		 { ASSURE_TYPE(next,t_fixnum);
-		   next = COERCE_F_TYPE(next,F_object,F_int);}
-	       else if (atyp == F_shortfloat)
-		 { ASSURE_TYPE(next,t_shortfloat);
-		   next = COERCE_F_TYPE(next,F_object,F_shortfloat);}
-	       else if (atyp == F_double_ptr)
-		 { ASSURE_TYPE(next,t_longfloat);
-		   next = COERCE_F_TYPE(next,F_object,F_double_ptr);}
-	       else {FEerror("cant get here!",0);}
-	       vs_push(base[i]);
-               abase[i]=next;}
-
-	 }
-    res = c_apply_n(fun->sfn.sfn_self,nargs,abase);
+    { 
+      object *x=ZALLOCA((nargs+1)*sizeof(object)),*abase=x;
+      if (CMVFUNP(fun)) {
+	int atyp = atypes & MASK_RANGE(0,F_TYPE_WIDTH);
+	object v;
+	atypes>>=F_TYPE_WIDTH;
+	v=(object)(fcall.values+1);
+	*abase++=COERCE_F_TYPE(v,F_object,atyp);
+      }
+      if (atypes==0) {
+	memcpy(abase,base,nargs*sizeof(*abase));
+	abase+=nargs;
+      } else { 
+	assert(abase);
+	for (i=0; i < nargs ; i++, atypes >>= F_TYPE_WIDTH)
+	  { object next = base[i];
+	  int atyp = atypes & MASK_RANGE(0,F_TYPE_WIDTH);
+	  if (atyp == F_object)
+	    next = next;
+	  else if (atyp == F_int)
+	    { ASSURE_TYPE(next,t_fixnum);
+	    next = COERCE_F_TYPE(next,F_object,F_int);}
+	  else if (atyp == F_shortfloat)
+	    { ASSURE_TYPE(next,t_shortfloat);
+	    next = COERCE_F_TYPE(next,F_object,F_shortfloat);}
+	  else if (atyp == F_double_ptr)
+	    { ASSURE_TYPE(next,t_longfloat);
+	    next = COERCE_F_TYPE(next,F_object,F_double_ptr);}
+	  else {FEerror("cant get here!",0);}
+	  vs_push(base[i]);
+	  *abase++=next;}
+      }
+    res = c_apply_n(fun->sfn.sfn_self,abase-x,x);
+    }
     res = COERCE_F_TYPE(res,F_RESULT_TYPE(fun->sfn.sfn_argd),F_object);
     if (F_ARG_FLAGS_P(fun->sfn.sfn_argd,F_caller_sets_one_val))
       { fcall.nvalues = 1;}

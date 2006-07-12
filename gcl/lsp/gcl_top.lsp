@@ -517,6 +517,7 @@
           i
           (let ((fun (ihs-fun i)))
             (cond ((or (symbolp fun) (compiled-function-p fun)) fun)
+		  ((when (interpreted-function-p fun) (setq fun (interpreted-function-lambda fun)) nil))
                   ((consp fun)
                    (case (car fun)
                      (lambda fun)
@@ -541,7 +542,7 @@
   (case (frs-class i)
     (:catch
      (if (spicep (frs-tag i))
-         (or (and (setq x (member (the symbol (frs-tag i)) (vs (+ (frs-vs i) 2))
+         (or (and (setq x (member (frs-tag i) (vs (+ (frs-vs i) 2))
                                   :key #'caddr :test #'eq))
                   (if (eq (cadar x) 'block)
                       `(block ,(caar x) ***)
@@ -572,6 +573,7 @@
 (defun ihs-fname (ihs-index)
   (let ((fun (ihs-fun ihs-index)))
     (cond ((symbolp fun) fun)
+	  ((when (interpreted-function-p fun) (setq fun (interpreted-function-lambda fun)) nil))
           ((consp fun)
            (case (car fun)
              (lambda 'lambda)

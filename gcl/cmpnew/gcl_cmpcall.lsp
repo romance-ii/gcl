@@ -38,7 +38,7 @@
 		 (and
 		  (get fname 'proclaimed-function)
 		  (let ((v (get-return-type fname)))
-		    (and v (type>= t v) (link-arg-p v)))
+		    (and v (link-arg-p v) (not (eq v '*))))
 		  (dolist (v (get-arg-types fname) t)
 			  (or  (eq v '*)(link-arg-p v) (return nil))))))))
 
@@ -252,8 +252,6 @@
 
     
     
-
-
 (defun c2call-global (fname args loc return-type &aux fd (*vs* *vs*))
 ;this is now done in get-inline-info
 ;  (and  *Fast-link-compiling* (fast-link-proclaimed-type-p fname args)
@@ -268,13 +266,19 @@
 	   (or (eq *exit* 'return)
 	       (rassoc *exit* +return-alist+))
            (tail-recursion-possible)
-           (= (length args) (length (cdr *tail-recursion-info*))))
+           (<= (length args) (length (cdr *tail-recursion-info*))))
       (let* ((*value-to-go* 'trash)
              (*exit* (next-label))
              (*unwind-exit* (cons *exit* *unwind-exit*)))
-            (c2psetq (mapcar #'(lambda (v) (list v nil))
-                             (cdr *tail-recursion-info*))
-                     args)
+            (c2psetq (mapcar (lambda (v) (list (if (consp v) (car v) v) nil)) (cdr *tail-recursion-info*))
+                     (append args (mapcar 'cadr (nthcdr (length args) (cdr *tail-recursion-info*)))))
+	    (let* ((pt (remove nil (mapcar (lambda (x y)
+					     (declare (ignore y))
+					     (when (and (consp x) (caddr x)) (list (caddr x) nil))) (cdr *tail-recursion-info*) args)))
+		   (pf (remove nil (mapcar (lambda (x) (when (and (consp x) (caddr x)) (list (caddr x) nil))) 
+					   (nthcdr (length args) (cdr *tail-recursion-info*)))))
+		   (vals (append (make-list (length pt) :initial-element (c1t)) (make-list (length pf) :initial-element (c1nil)))))
+	      (c2psetq (append pt pf) vals))
             (wt-label *exit*))
       (unwind-no-exit 'tail-recursion-mark)
       (wt-nl "goto TTL;")
@@ -360,15 +364,15 @@
 			       fname leng
 			       (length argtypes))))
 	     (unless
-	      (cddr (setq link-info (assoc fname *function-links*)))
+	      (caddr (setq link-info (assoc fname *function-links*)))
 	      (setq link-string
 		    (with-output-to-string
 		     (st)
 		     (let ((as (with-output-to-string
 				 (st)
 				 (do ((com)
-				      (v argtypes (cdr v))
-				      (i 0 (+ 1 i)))
+				      (v (if (type>= t (get-return-type fname)) argtypes (cons #tfixnum argtypes)) (cdr v))
+				      (i (if (type>= t (get-return-type fname)) 0 -1) (+ 1 i)))
 				     ((null v))
 				     (cond ((eq (car v) '*)
 					    (setq vararg t)
@@ -380,14 +384,6 @@
 		       (format st "((*LnkLI~d)(~a))" n as))))
 
 
-;		       (let ((x (cdr (assoc fname *global-funs*))))
-;			 (if (and x (not (member '* argtypes))) 
-;			     (progn ;(format st "LI~d(~a)" x as) FIXME
-;			       (format st "(LI~d==*LnkLI~d ? LI~d(~a) : (*LnkLI~d)(~a))" x n x as n as)
-;			       (format t "(LI~d==*LnkLI~d ? LI~d(~a) : (*LnkLI~d)(~a))" x n x as n as)
-;			       )
-;			   (format st "((*LnkLI~d)(~a))" n as)))
-
 	      ;; If link is bound above, closure is unprintable as is in its own environment
 	      ;; enables tracing of inline-type-matches.  CM 20050106
 	      (let ((link (when vararg (lambda ( &rest l)
@@ -396,7 +392,9 @@
 					    (wt ")")))))
 		(push (list fname argtypes
 			    (let ((z (get-return-type fname))) (cond ((eq z #tboolean)) ((not z)) (z)))
-			    (flags side-effect-p allocates-new-storage)
+			    (if (type>= t (get-return-type fname))
+				(flags side-effect-p allocates-new-storage)
+			      (flags side-effect-p allocates-new-storage sets-vs-top))
 			    (or link link-string) 'link-call)
 		      *inline-functions*))
 	      (setq link-info (list fname (format nil "LI~d" n)
@@ -440,10 +438,15 @@
 		(wt "(object first,...){"
 		    (declaration-type (rep-type type)) "V1;"
 		    "va_list ap;va_start(ap,first);V1=(" (declaration-type (rep-type type)) ")call_"
-		    (if vararg "v" "") "proc_new(" (vv-str (add-object name)) "," (if setf "1" "0") ",(void **)(void *)&Lnk" num )
+		    (if vararg "v" "") "proc_new(" (vv-str (add-object name)) "," (if setf "1" "0") "," 
+		    (let ((rt (get-return-type name)))
+		      (cond ((type>= t rt) "0")
+			    ((and (consp rt) (eq (car rt) 'values)) (write-to-string (- (length rt) 2)))
+			    ((write-to-string (- (- (length rt) 2)))))) ",(void **)(void *)&Lnk" num )
 		(or vararg (wt "," (proclaimed-argd args type)))
 		(wt   ",first,ap);va_end(ap);return V1;}" )))
-	     (t (wt "(){return call_proc0(" (vv-str (add-object name)) "," (if setf "1" "0") ",(void **)(void *)&Lnk" num ");}" ))))
+	     (t (wt "(){return call_proc0(" (vv-str (add-object name)) "," 
+		    (if setf "1" "0") ",(void **)(void *)&Lnk" num ");}" ))))
       (t (error "unknown link type ~a" type)))
     (setq name (function-string name))
     (if (find #\/ name) (setq name (remove #\/ name)))

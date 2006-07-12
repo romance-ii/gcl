@@ -172,7 +172,7 @@
 (defmacro ll-keywords-p (lambda-list) `(nth 3 ,lambda-list))
 (defmacro ll-rest (lambda-list) `(nth 2 ,lambda-list))
 (defmacro ll-allow-other-keys (lambda-list) `(nth 5 ,lambda-list))
-(defmacro vargd (min max)  `(+ ,min (ash ,max 8)))
+(defmacro vargd (min max mv)  `(+ ,min (ash ,max 16) (ash (if ,mv 4 0) 8)));;fixme rationalize
 (defmacro let-pass3 (binds &body body &aux res)
   (let ((usual '((*c-vars* nil)
 		  (*vs* 0) (*max-vs* 0) (*level* 0) (*ccb-vs* 0) (*clink* nil)
@@ -548,6 +548,7 @@
 		      (when (eq (car form) 'macrolet)
 			(dolist (l (cadr form)) (push (car l) *mlts*)))
 		      (ndbctxt (portable-source (cddr form) t)))))
+	       (multiple-value-setq (portable-source (multiple-value-setq-expander (cdr form))))
 	       (multiple-value-bind `(,(car form) ,(cadr form) ,(portable-source (caddr form))
 				      ,@(let ((r (remove-if-not 'si::specialp (cadr form))))
 					  (when r `((declare (special ,@r)))))
@@ -567,7 +568,8 @@
   (cond	;((and (consp tp) (eq (car tp) 'values) (not (cddr tp))) (cadr tp))
 	;((or (eq tp '*) (and (consp tp) (member (car tp) '(* values)))) '*)
         ((eq tp '*) tp)
-        ((and (consp tp) (eq (car tp) 'values)) (cmp-norm-tp `(values ,@(mapcar 'sanitize-tp (cdr tp)))))
+        ((and (consp tp) (member (car tp) '(values returns-exactly))) 
+	 (cmp-norm-tp `(,(car tp) ,@(mapcar 'sanitize-tp (cdr tp)))))
 	((car (member tp +useful-c-types+ :test 'type<=)))));FIXME recursion
 
 (defvar *recursion-detected*)
@@ -658,7 +660,6 @@
 	  (get fname 'proclaimed-function)
 	  ;; check the args:
 	  (let ((lambda-list (lambda-list lambda-expr))bind)
-	    (declare (object lambda-list))
 	    (and (null (cadr lambda-list))	;;; no optional
 		 (null (caddr lambda-list))	;;; no rest
 		 (null (cadddr lambda-list))	;;; no keyword
@@ -673,9 +674,7 @@
 			   (cond (bind (setq args (cmpfix-args args bind))
 				       (go top))
 				 (t (not problem)))))
-		     (declare (object vars types))
 		     (let ((var (car vars)))
-		       (declare (object var))
 		       (cond  ((equal (car types) '*)(return nil)))
 		       (unless
 			 (and
@@ -699,48 +698,39 @@
 			 (unless bind
 				 (cmpwarn "Calls to ~a will be VERY SLOW. Recommend not to proclaim.  ~%;;The arg caused the problem. ~a"
 					  fname  (var-name var)))
+
 			 (setq problem t))))
 		 (numberp cfun))))
 	;;whew: it is acceptable.
         (push (list fname
                     (get-arg-types fname)
 		    (let ((z (get-return-type fname))) (cond ((eq z #tboolean)) ((not z)) (z)))
-		    (flags set ans)
+		    (if (type>= t (get-return-type fname)) (flags set ans) (flags set ans sets-vs-top))
                     (make-inline-string
                      cfun (get-arg-types fname) fname))
-              *inline-functions*))
-   ((and ;(get fname 'proclaimed-function)
-     (eq (get fname 'proclaimed-return-type) t))
-;    (setq me lambda-list)
-;    (setq me (lambda-list lambda-expr))
-    
-;    (print args)
-    ))
-    ;; variable number of args;
-	 
+              *inline-functions*)))
 
-
-       (when (cadddr lambda-expr)
-             (setq doc  (cadddr lambda-expr)))
-       (add-load-time-sharp-comma)
-       (push (list defun fname cfun lambda-expr doc *special-binding*)
-             *top-level-forms*)
-       (push (cons fname cfun) *global-funs*)
-       (let (decls doc (ll (cadr args)) (args (cddr args)))
-	 (when (and (consp args) (stringp (car args))) (push (pop args) doc))
-	 (do nil ((or (not args) (not (consp (car args))) (not (eq (caar args) 'declare))))
-	     (push (pop args) decls))
-	 (let* ((nal (do (r (y ll)) ((or (not y) (eq (car y) '&aux)) (nreverse r)) (push (pop y) r)))
-		(al (cdr (member '&aux ll)))
-		(dd (aux-decls (mapcar (lambda (x) (if (atom x) x (car x))) al) decls)))
-	 (push (cons fname (pd `(lambda ,nal
-				  ,@doc
-				  (declare (optimize (safety ,(cond (*compiler-push-events* 3)
-								    (*safe-compile* 2)
-								    (*compiler-check-args* 1)
-								    (0)))))
-				  ,@(nreverse (cadr dd))
-				  (block ,fname (let* ,al ,@(car dd) ,@args))))) *portable-source*)))))
+  (when (cadddr lambda-expr)
+    (setq doc  (cadddr lambda-expr)))
+  (add-load-time-sharp-comma)
+  (push (list defun fname cfun lambda-expr doc *special-binding*)
+	*top-level-forms*)
+  (push (cons fname cfun) *global-funs*)
+  (let (decls doc (ll (cadr args)) (args (cddr args)))
+    (when (and (consp args) (stringp (car args))) (push (pop args) doc))
+    (do nil ((or (not args) (not (consp (car args))) (not (eq (caar args) 'declare))))
+	(push (pop args) decls))
+    (let* ((nal (do (r (y ll)) ((or (not y) (eq (car y) '&aux)) (nreverse r)) (push (pop y) r)))
+	   (al (cdr (member '&aux ll)))
+	   (dd (aux-decls (mapcar (lambda (x) (if (atom x) x (car x))) al) decls)))
+      (push (cons fname (pd `(lambda ,nal
+			       ,@doc
+			       (declare (optimize (safety ,(cond (*compiler-push-events* 3)
+								 (*safe-compile* 2)
+								 (*compiler-check-args* 1)
+								 (0)))))
+			       ,@(nreverse (cadr dd))
+			       (block ,fname (let* ,al ,@(car dd) ,@args))))) *portable-source*)))))
 
 (defun make-inline-string (cfun args fname)
   (if (null args)
@@ -748,10 +738,10 @@
       (let ((o (make-array 100 :element-type 'character :fill-pointer 0
 			   :adjustable t )))
            (format o "~d(" (c-function-name "LI" cfun fname))
-           (do ((l args (cdr l))
-                (n 0 (1+ n)))
+           (do ((l (if (type>= t (get-return-type fname)) args (cons #tfixnum args)) (cdr l))
+                (n (if (type>= t (get-return-type fname)) 0 -1) (1+ n)))
                ((endp (cdr l))
-                (format o "#~d)" n))
+                (if (eq '* (car l)) (format o "#*)") (format o "#~d)" n)))
                (declare (fixnum n))
                (format o "#~d," n))
            o)))
@@ -774,10 +764,11 @@
       (if x (1+ x) 0))))
 
 (defun proclaimed-argd (args return)
-  (let ((ans (length args))
-	(i 8)
-	(type (the fixnum (f-type return)))
-	(begin t))
+  (let* ((ans (length args))
+	 (i 8)
+	 (type (the fixnum (f-type return)))
+	 (type (if (type>= t return) type (+ 4 type)));fixme rationalize
+	 (begin t))
     (declare (fixnum ans i))
     (loop
      (if (not (eql 0 type))
@@ -805,14 +796,20 @@
     (list (mapcar 'type-f args) (type-f ret))))
 
 
+(defun vald (tp)
+  (cond ((type>= t tp) 0)
+	((eq (car tp) 'returns-exactly) (- 2 (length tp)))
+	((- (length tp) 2))))
+
 (defun wt-if-proclaimed (fname cfun lambda-expr)
-  (when (fast-link-proclaimed-type-p fname)
+  (when (and (fast-link-proclaimed-type-p fname) (not (member '* (get-arg-types fname))))
     (let ((at (get-arg-types fname))
 	  (rt (get-return-type fname)))
       (cond ((assoc fname *inline-functions*)
 	     (add-init `(si::mfsfun ',fname 
 				    ,(add-address (c-function-name "LI" cfun fname))
-				    ,(proclaimed-argd at rt)))
+				    ,(proclaimed-argd at rt)
+				    ,(vald rt)))
 	     t)
 	    ((let ((arg-c (length (car (lambda-list lambda-expr))))
 		   (arg-p (length at))
@@ -844,13 +841,15 @@
 	(t "")))
 
 (defun vararg-p (x)
-  (and (equal (get x 'proclaimed-return-type) t)
-       (do ((v (get-arg-types x) (cdr v)))
-	   ((null v) t)
-	   (or (consp v) (return nil))
-	   (or (eq (car v) t)
-	       (eq (car v) '*)
-	       (return nil)))))
+  (and ;(equal (get x 'proclaimed-return-type) t)
+   (let ((rt (get-return-type x)))
+     (and rt (not (eq '* rt)) (link-arg-p rt)))
+   (do ((v (get-arg-types x) (cdr v)))
+       ((null v) t)
+       (or (consp v) (return nil))
+       (or (eq (car v) t)
+	   (eq (car v) '*)
+	   (return nil)))))
 
 
 (defun maxargs (lambda-list)
@@ -889,19 +888,21 @@
 
   (cond ((wt-if-proclaimed fname cfun lambda-expr))
 	((vararg-p fname)
-	 (let ((keyp (ll-keywords-p (lambda-list lambda-expr))))
-;	   (wt-h "static object LI" cfun "();")
+	 (let ((keyp (ll-keywords-p (lambda-list lambda-expr)))
+	       (rt (get-return-type fname)))
 	   (if keyp
 	       (add-init `(si::mfvfun-key
 			   ',fname ,(add-address (c-function-name "LI" cfun fname))
 			   ,(vargd (length (car (lambda-list lambda-expr)))
-				   (maxargs (lambda-list lambda-expr)))
-			   ,(add-address (format nil "&LI~akey" cfun)))
-			 )
+				   (maxargs (lambda-list lambda-expr))
+				   (not (type>= t rt)))
+			   ,(add-address (format nil "&LI~akey" cfun))
+			   ,(vald rt)))
 	     (add-init `(si::mfvfun ',fname ,(add-address (c-function-name "LI" cfun fname))
 				    ,(vargd (length (car (lambda-list lambda-expr)))
-					    (maxargs (lambda-list lambda-expr))))
-		       ))))
+					    (maxargs (lambda-list lambda-expr))
+					    (not (type>= t rt)))
+				    ,(vald rt))))))
 	((numberp cfun)
          (wt-h "static void " (c-function-name "L" cfun fname) "();")
 	 (add-init `(si::mf ',fname ,(add-address (c-function-name "L" cfun fname))) ))
@@ -985,12 +986,13 @@
 (defun t3defun-aux (f *exit* &rest lis)
   (let-pass3 ()   (apply f lis)))   
 
+(defvar *mv-var* nil)
+
 (defun t3defun-local-entry (fname cfun lambda-expr sp inline-info
-				   &aux specials (requireds (caaddr lambda-expr)))
+				   &aux specials (requireds (caaddr lambda-expr)) mv-var)
   (do ((vl requireds (cdr vl))
        (types (cadr inline-info) (cdr types)))
       ((endp vl))
-;      (declare (object vl types))
       (if (eq (var-kind (car vl)) 'special)
 	  (push (cons (car vl) (var-loc (car vl))) specials)
 	(setf (var-kind (car vl))
@@ -999,8 +1001,12 @@
   (wt-comment "local entry for function " (function-string fname))
   (wt-h "static " (declaration-type (rep-type (caddr inline-info))) (c-function-name "LI" cfun fname) "();")
   (wt-nl1 "static " (declaration-type (rep-type (caddr inline-info))) (c-function-name "LI" cfun fname) "(")
-  (wt-requireds  requireds
-		 (cadr inline-info))
+  (unless (type>= t (get-return-type fname))
+    (setq mv-var (make-var :type #tfixnum :kind #tfixnum :ref t :name (gensym) 
+			   :loc (cs-push #tfixnum t) :mt #tfixnum :dt #tfixnum))
+    (push mv-var requireds)
+    (setq *max-vs* (max *max-vs* (- (length (get-return-type fname)) 2))))
+  (wt-requireds  requireds (if mv-var (cons #tfixnum (cadr inline-info)) (cadr inline-info)))
          ;;; Now the body.
   (let ((cm *reservation-cmacro*)
 	(*tail-recursion-info*
@@ -1022,7 +1028,9 @@
       (push 'bds-bind *unwind-exit*)
       (setf (var-kind (car v)) 'SPECIAL)
       (setf (var-loc (car v)) (cdr v)))
-    (c2expr (caddr (cddr lambda-expr)))
+    (let ((*mv-var* mv-var))
+      (c2expr (caddr (cddr lambda-expr)))
+      (wt-V*-macros cm (caddr inline-info)))
     
 ;;; Use base if defined for lint
     (if (and (zerop *max-vs*) (not *sup-used*) (not *base-used*)) t (wt-nl "base[0]=base[0];"))
@@ -1030,8 +1038,7 @@
 ;;; Make sure to return object if necessary
     (if (equal "object " (rep-type (caddr inline-info))) (wt-nl "return Cnil;"))
     
-    (wt-nl1 "}")
-    (wt-V*-macros cm (caddr inline-info))))
+    (wt-nl1 "}")))
 
 (defvar *vararg-use-vs* nil)
 (defun set-up-var-cvs (var)
@@ -1040,7 +1047,7 @@
 ;		    ((numberp (var-loc var)))
 		    (t (setf (var-ref var) (cvs-push)))))
 
-(defun t3defun-vararg (fname cfun lambda-expr sp &aux  reqs *vararg-use-vs*
+(defun t3defun-vararg (fname cfun lambda-expr sp &aux  reqs *vararg-use-vs* mv-var
 			     block-p labels (deflt t) key-offset
 			     (*inline-blocks* 0) rest-var
 			     (ll (lambda-list lambda-expr)) va-start
@@ -1050,7 +1057,11 @@
 
   (dotimes (i (length (car ll)))
     (push (list 'cvar (cs-push t t)) reqs))
-  
+  (unless (type>= t (get-return-type fname))
+    (setq mv-var (make-var :type #tfixnum :kind #tfixnum :ref t :name (gensym) :loc (cs-push #tfixnum t) :mt #tfixnum :dt #tfixnum))
+    (push mv-var (car ll))
+    (setq *max-vs* (max *max-vs* (- (length (get-return-type fname)) 2)))
+    (push (list 'var mv-var nil) reqs))
   (wt-comment "local entry for function " (function-string fname))
   
   (let ((tmp ""))
@@ -1058,8 +1069,11 @@
     (when reqs 
       (do ((v reqs (cdr v)))
 	  ((null v))
-	  (wt "object " (car v))
-	  (setq tmp (concatenate 'string tmp "object"))
+	  (cond ((and mv-var (eq v reqs)) 
+		 (wt "fixnum V" (var-loc (cadar v)))
+		 (setq tmp (concatenate 'string tmp "fixnum")))
+		(t (wt "object " (car v))
+		 (setq tmp (concatenate 'string tmp "object"))))
 	  (or (null (cdr v)) 
 	      (progn 
 		(wt ",")
@@ -1088,13 +1102,13 @@
 	  (not (ll-rest ll))
 	  (dolist* (var (ll-requireds ll) t)
 		   (when (var-ref-ccb var) (return nil)))
-	  (null (ll-optionals ll))
+	  (every (lambda (x) (and (consp x) (consp (cadr x)) (eq (caadr x) 'location))) (ll-optionals ll));fixme function defaults
 	  (null (ll-keywords ll))
-	  (cons fname (car ll))))
+	  (cons fname (append (car ll) (ll-optionals ll)))))
 	(*unwind-exit* *unwind-exit*))
     (wt-nl1 "{	")
     (when is-var-arg	  (wt-nl "va_list ap;"))
-    (wt-nl "int narg = VFUN_NARGS;")
+    (wt-nl "int narg = VFUN_NARGS" (if mv-var "+1;" ";"))
     
     (assign-down-vars (cadr lambda-expr) cfun
 		      't3defun)
@@ -1164,7 +1178,7 @@
       (let ((*clink* *clink*)
 	    (*unwind-exit* *unwind-exit*)
 	    (*ccb-vs* *ccb-vs*))
-	(wt-nl "narg = narg - " (length reqs) ";")
+	(wt-nl "narg -= " (length reqs) ";")
 	(let ((first t))
 	  (dolist** (opt (ll-optionals ll))
 		    (push (next-label) labels)
@@ -1199,7 +1213,7 @@
 	(progn
 	  (setq rest-var (cs-push))
 	  (cond ((ll-optionals ll))
-		(t (wt-nl "narg= narg - " (length (car ll)) ";")))
+		(t (wt-nl "narg -= " (length (car ll)) ";")))
 	  (unless va-start (setq va-start t) (wt-nl "va_start(ap,first);"))
 	  (wt-nl "V" rest-var " = ")
 	  
@@ -1218,7 +1232,7 @@
     (when (ll-keywords-p ll)
       (cond ((ll-rest ll))
 	    ((ll-optionals ll))
-	    (t (wt-nl "narg= narg - " (length (car ll)) ";")))
+	    (t (wt-nl "narg -= " (length (car ll)) ";")))
       
       (unless va-start (setq va-start t) (wt-nl "va_start(ap,first);"))
       (setq deflt (mapcar 'caddr (ll-keywords ll)))
@@ -1329,7 +1343,9 @@
     (when *tail-recursion-info*
       (push 'tail-recursion-mark *unwind-exit*)
       (wt-nl "goto TTL;") (wt-nl1 "TTL:;"))
-    (c2expr (caddr (cddr lambda-expr)))
+    (let ((*mv-var* mv-var))
+      (c2expr (caddr (cddr lambda-expr)))
+      (wt-V*-macros cm (get fname 'proclaimed-return-type)))
     
     ;;; End va_list at function end
     
@@ -1343,9 +1359,7 @@
     
     (wt "}") 
     (when block-p (wt-nl "}"))
-    (close-inline-blocks)
-    (wt-V*-macros cm (get fname 'proclaimed-return-type))
-    ))
+    (close-inline-blocks)))
 
 (defun t3defun-normal (fname cfun lambda-expr sp)
          (wt-comment "function definition for " (function-string fname))
@@ -1378,30 +1392,26 @@
 (defun wt-V*-macros (cm return-type)
   (declare (ignore return-type))
   (push (cons cm *max-vs*) *reservations*)
-  (if (and (zerop *max-vs*) (not *sup-used*) (not *base-used*))
-      ;;note if (proclaim '(function foo () t))
-      ;;(defun foo () (goo)) ;then *max-vs*=0,*sup-used*=t;--wfs
-      (wt-h "#define VMB" cm)
-    (wt-h "#define VMB" cm " " 
-	  "register object *" *volatile*"base=vs_top;"))
+  
+  ;;note if (proclaim '(function foo () t))
+  ;;(defun foo () (goo)) ;then *max-vs*=0,*sup-used*=t;--wfs
+  (cond ((and (zerop *max-vs*) (not *sup-used*) (not *base-used*)) (wt-h "#define VMB" cm))
+	((wt-h "#define VMB" cm " register object *" *volatile* "base=vs_top;")))
   ;;tack following onto the VMB macro..
   (wt-cvars)
-  (if *sup-used*
-      (wt-h "#define VMS" cm
-	    " "  " register object *" *volatile*"sup=vs_top+" *max-vs*
-	    ";vs_top=sup;")
-    (if (zerop *max-vs*)
-	(wt-h "#define VMS" cm)
-      (wt-h "#define VMS" cm " vs_top += " *max-vs* ";")))
-  (if (zerop *max-vs*)
-      (wt-h "#define VMV" cm)
-    (if *safe-compile*
-	(wt-h "#define VMV" cm " vs_reserve(" *max-vs* ");")
-      (wt-h "#define VMV" cm " vs_check;")))
-  (if (zerop *max-vs*)
-      (wt-h "#define VMR" cm "(VMT" cm ") return(VMT" cm ");")
-    (wt-h "#define VMR" cm "(VMT" cm ") vs_top=base ; return(VMT" cm ");"))
-  )
+
+  (cond (*sup-used* (wt-h "#define VMS" cm  " register object *" *volatile* "sup=vs_top+" *max-vs* ";vs_top=sup;"))
+	((zerop *max-vs*) (wt-h "#define VMS" cm))
+	((wt-h "#define VMS" cm " vs_top += " *max-vs* ";")))
+  
+  (cond ((zerop *max-vs*) (wt-h "#define VMV" cm))
+	(*safe-compile*	(wt-h "#define VMV" cm " vs_reserve(" *max-vs* ");"))
+	((wt-h "#define VMV" cm " vs_check;")))
+
+  (cond (*mv-var* (wt-h "#define VMR" cm "(VMT" cm ") vs_top=V" (var-loc *mv-var*) 
+			" ? (object *)V" (var-loc *mv-var*) " : base; return(VMT" cm ");"))
+	((zerop *max-vs*) (wt-h "#define VMR" cm "(VMT" cm ") return(VMT" cm ");"))
+	((wt-h "#define VMR" cm "(VMT" cm ") vs_top=base ; return(VMT" cm ");"))))
 
 ;;Write the required args as c arguments, and declarations for the arguments.
 (defun wt-requireds (requireds arg-types)
@@ -1420,7 +1430,6 @@
 	     (types arg-types (cdr types))
 	     (prev-type nil))
 	    ((endp vl) (wt ";"))
-	    (declare (object vl))
 
 	    (if prev-type (wt ";"))
                  
@@ -1521,6 +1530,8 @@
 			(if (and (eq #tfixnum tp) (zerop *space*)) 
 			  (concatenate 'string "CMP" z) (or z "")));FIXME t
            "(" (c-function-name "LI" cfun fname) "(")
+    (unless (type>= t return-type)
+      (wt "base+1,"))
     (do ((types arg-types (cdr types))
          (n 0 (1+ n)))
         ((endp types))
@@ -1535,9 +1546,10 @@
             "(base[" n "])")
         (unless (endp (cdr types)) (wt ",")))
     (wt "));")
-    (wt-nl "vs_top=(vs_base=base)+1;")
-    (wt-nl1 "}")
-    )
+    (if (type>= t return-type)
+	(wt-nl "vs_top=(vs_base=base)+1;")
+      (wt-nl "vs_base=base;"))
+    (wt-nl1 "}"))
 
 (defconstant +wt-c-rep-alist+ `((,#tfixnum ."fixnum ")
 				(,#tinteger ."GEN ") 

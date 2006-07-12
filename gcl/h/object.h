@@ -836,7 +836,7 @@ struct sfun {
   object (*sfn_self)();    /* C start address of code */
   object   sfn_data;       /* To object holding VV vector */
   fixnum   sfn_argd;       /* description of args + number */
-  SPAD;
+  fixnum   sfn_nval;
 
 };
 
@@ -848,6 +848,16 @@ struct ifun {
 
 };
 
+#define CMVFUNP(x_) ({enum type _t=type_of(x_);((_t==t_sfun || _t==t_vfun || _t==t_gfun) && x_->sfn.sfn_argd&MVRET_BIT);})
+
+#if SIZEOF_LONG == 4
+#define VFILL_BITS 8
+#elif SIZEOF_LONG == 8
+#define VFILL_BITS 40
+#else
+#error Cannot calculate VFILL_BITS
+#endif
+
 struct vfun {
 
   FIRSTWORD; 
@@ -855,9 +865,18 @@ struct vfun {
   object           vfn_name;       /* name */
   object         (*vfn_self)();    /* C start address of code */
   object           vfn_data;       /* To object holding VV data */
-  uhfixnum         vfn_minargs;    /* Min args and where varargs start */
-  uhfixnum         vfn_maxargs;    /* Max number of args */
-  SPAD;
+#ifndef WORDS_BIGENDIAN
+  fixnum           vfn_minargs:8;  /* Min args and where varargs start */
+  fixnum           vfn_mv     :8;  /* mv bits */
+  fixnum           vfn_maxargs:8;  /* Max number of args */
+  fixnum           vfn_unused :VFILL_BITS; 
+#else
+  fixnum           vfn_unused :VFILL_BITS; 
+  fixnum           vfn_maxargs:8;  /* Max number of args */
+  fixnum           vfn_mv     :8;  /* mv bits */
+  fixnum           vfn_minargs:8;  /* Min args and where varargs start */
+#endif
+  fixnum           vfn_nval;
 
 };
 struct cfdata {
@@ -1111,21 +1130,6 @@ EXTER char *tmp_alloc;
 #define isDigit(xxx) (((xxx)&0200) == 0 && isdigit((int)xxx))
 enum ftype {f_object,f_fixnum,f_integer};
 EXTER char *alloca_val;
-
-/*          ...xx|xx|xxxx|xxxx|   
-       ret  Narg     */
-
-/*    a9a8a7a6a5a4a3a4a3a2a1a0rrrrnnnnnnnn
-         ai=argtype(i)         ret   nargs
- */
-#define SFUN_NARGS(x)   (x & 0xff) /* 8 bits */
-#define RESTYPE(x)      (x<<8)   /* 3 bits */
-/* set if the VFUN_NARGS = m ; has been set correctly */
-#define VFUN_NARG_BIT   (1 <<11) 
-#define ARGTYPE(i,x)    ((x) <<(12+(i*2)))
-#define ARGTYPE1(x)     (1 | ARGTYPE(0,x))
-#define ARGTYPE2(x,y)   (2 | ARGTYPE(0,x)  | ARGTYPE(1,y))
-#define ARGTYPE3(x,y,z) (3 | ARGTYPE(0,x) | ARGTYPE(1,y) | ARGTYPE(2,z))
 
 object make_si_sfun();
 EXTER object MVloc[10];

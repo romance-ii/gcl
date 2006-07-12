@@ -32,6 +32,7 @@
 (si:putprop 'psetq 'c2psetq 'c2)
 
 (si:putprop 'var 'set-var 'set-loc)
+(si:putprop 'cvar 'set-cvar 'set-loc)
 (si:putprop 'var 'wt-var 'wt-loc)
 
 (defstruct var
@@ -320,6 +321,15 @@
 		    (funcall (or (cdr (assoc (var-kind var) +wt-loc-alist+)) (baboon)) loc)
 		    (wt ";")))))))
 
+(defun set-cvar (loc cvar)
+  (wt-nl "V" cvar "= ")
+  (let* ((fn (or (cdr (assoc cvar *c-vars*)) t))
+	 (fn (or (car (member fn +c-local-var-types+ :test 'type<=)) 'object))
+	 (fn (cdr (assoc fn +wt-loc-alist+))))
+    (unless fn (baboon))
+    (funcall fn loc))
+  (wt ";"))
+
 (defun sch-global (name)
   (dolist* (var *undefined-vars* nil)
     (when (eq (var-name var) name) (return-from sch-global var))))
@@ -403,7 +413,7 @@
          (setf (info-type info1) type)
          (setq form1 (list* (car form1) info1 (cddr form1)))))
 
-;  (setf (info-type info) type)
+  (setf (info-type info) type)
   (set-form-type form1 type)
   (list 'setq info name1 form1))
 

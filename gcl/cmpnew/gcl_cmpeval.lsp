@@ -126,7 +126,8 @@
 	 (result-type-from-args rfa)            ;; if passed args of matching
 					        ;; type result is of result type
          (is)                                   ;; extends the `integer stack'.
-	 (inline-types-function itf)))          ;; car of ii is a function returning match info
+	 (inline-types-function itf)            ;; car of ii is a function returning match info
+	 (sets-vs-top svt)))                    ;; callee sets the vs_top variable
     (cond ((member flag v :test 'eq)
 	   (return-from flags-pos i)))
     (setq i (+ i 1)))
@@ -302,6 +303,18 @@
 
 (si::putprop 'gcd (function binary-nest) 'si::compiler-macro-prop)
 (si::putprop 'lcm (function binary-nest) 'si::compiler-macro-prop)
+
+(defun multiple-value-bind-expander (form env)
+  (declare (ignore env))
+  (if (and (consp (caddr form)) (eq (caaddr form) 'values))
+      (let ((l1 (length (cadr form))) (l2 (length (cdaddr form))))
+      `(let (,@(mapcar 'list (cadr form) (cdaddr form))
+	       ,@(when (> l1 l2)
+		   (nthcdr l2 (cadr form))))
+	 ,@(when (> l2 l1) (nthcdr l1 (cdaddr form)))
+	 ,@(cdddr form)))
+    form))
+(si::putprop 'multiple-value-bind (function multiple-value-bind-expander) 'si::compiler-macro-prop)
 
 ;FIXME apply-expander
 (defun funcall-expander (form env);FIXME inlinable-fn?

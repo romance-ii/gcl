@@ -311,6 +311,7 @@
 					     (t(push (list var) bindings)
 					      (list 'vs (var-ref var))))
 				       form)initials))
+			  ((eq (var-kind var) 'replaced))
                           ((and (can-be-replaced var body)
                                 (member (var-kind var1)
                                         '(LEXICAL REPLACED OBJECT))

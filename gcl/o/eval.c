@@ -93,12 +93,10 @@ object sSAbreak_stepA;
 static void
 quick_call_sfun(object fun)
 { DEBUG_AVMA
-  int i=fun->sfn.sfn_argd,n=SFUN_NARGS(i);
+    int i=fun->sfn.sfn_argd,n=SFUN_NARGS(i),mv=CMVFUNP(fun);
   enum ftype restype;
   object *x,res=OBJNULL,*base;
-  object *temp_ar=ZALLOCA(n*sizeof(object));
-/*   i=fun->sfn.sfn_argd; */
-/*   n=SFUN_NARGS(i); */
+  object *temp_ar=ZALLOCA((n+1)*sizeof(object));
   base = vs_base;
   if (n != vs_top - base)
     {check_arg_failed(n);}
@@ -106,22 +104,32 @@ quick_call_sfun(object fun)
   SFUN_START_ARG_TYPES(i);
   /* for moment just support object and int */
 #define COERCE_ARG(a,type)  (type==f_object ? a : (type==f_fixnum ? (object)(fix(a)) : (object)otoi(a)))
-  if (i==0)
-    x=vs_base;
-  else
-    {int j;
-     x=temp_ar;
-     for (j=0; j<n ; j++)
-       {enum ftype typ=SFUN_NEXT_TYPE(i);
-	x[j]=COERCE_ARG(vs_base[j],typ);}}
-  SET_TO_APPLY(res,fun->sfn.sfn_self,n,x);
+  x=temp_ar;
+  if (mv) 
+    *x++=(void *)(base+1);
+  if (i==0) {
+    memcpy(x,vs_base,n*sizeof(*x));
+    x+=n;
+  } else {
+    int j;
+    for (j=0;j<n;j++) {
+      enum ftype typ=SFUN_NEXT_TYPE(i);
+      *x++=COERCE_ARG(vs_base[j],typ);
+    }
+  }
+  SET_TO_APPLY(res,fun->sfn.sfn_self,x-temp_ar,temp_ar);
+  if (mv && temp_ar[0] && base >= (object *)temp_ar[0] && base < vs_top) {
+    printf("foo!\n");
+    base=((object *)temp_ar[0]-1);
+  }
   base[0]=
     (restype==f_object ?  res :
      (restype==f_fixnum ? make_fixnum((long)res) :
       (restype==f_integer ? make_integer((GEN)res) :
        (object) (FEerror("Bad result type",0),Cnil))));
   vs_base = base;
-  vs_top=base+1;
+  if (!mv)
+    vs_top=base+1;
   CHECK_AVMA;
   return;}
 
@@ -148,8 +156,16 @@ call_vfun(object fun)
   if (n > fun->vfn.vfn_maxargs)
     {FEtoo_many_arguments(base,vs_top); return;}
   VFUN_NARGS = n;
-  SET_TO_APPLY(base[0],fun->sfn.sfn_self,n,base);
-  vs_top=(vs_base=base)+1;
+  if (CMVFUNP(fun)) {
+    object *tmp=ZALLOCA((n+1)*sizeof(object));
+    memcpy(tmp+1,base,n*sizeof(*base));
+    tmp[0]=(object)(base+1);
+    SET_TO_APPLY(base[0],fun->sfn.sfn_self,n+1,tmp);
+    vs_base=base;
+  } else {
+    SET_TO_APPLY(base[0],fun->sfn.sfn_self,n,base);
+    vs_top=(vs_base=base)+1;
+  }
   CHECK_AVMA;
   return;
 }

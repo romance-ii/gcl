@@ -1335,148 +1335,162 @@ call_proc(object sym, int setf, void **link, int argd, va_list ll)
 /* For ANSI C stdarg */
 
 object
-call_proc_new(object sym, int setf,void **link, int argd, object first, va_list ll)
-{object fun;
- int nargs;
+call_proc_new(object sym, int setf,int vald, void **link, int argd, object first, va_list ll) {
+
+  object fun;
+  enum type tp;
+  int nargs,fas,do_link;
+
 #ifdef DO_FUNLINK_DEBUG_1
-    fprintf ( stderr, "call_proc_new: sym %x START\n", sym );
+  fprintf (stderr,"call_proc_new: sym %x START\n",sym);
 #endif 
- check_type_symbol(&sym);
- fun = setf ? ({object ns=get(sym,sSsetf_function,OBJNULL); type_of(ns)!=t_symbol ? ns : symbol_function(ns);}) : sym->s.s_gfdef;
- if (fun && (type_of(fun)==t_sfun
-	     || type_of(fun)==t_gfun
-	     || type_of(fun)== t_vfun)
-     && Rset) /* the && Rset is to allow tracing */
-   {object (*fn)();
-   fn = fun->sfn.sfn_self;
-   if (type_of(fun)==t_vfun)
-     { /* argd=VFUN_NARGS; */ /*remove this! */
-       nargs=SFUN_NARGS(argd);
-       if (nargs < fun->vfn.vfn_minargs || nargs > fun->vfn.vfn_maxargs
-	   || (argd & (SFUN_ARG_TYPE_MASK | SFUN_RETURN_MASK)))
-	 goto WRONG_ARGS;
-       if ((VFUN_NARG_BIT & argd) == 0)
-	 /* don't link */
-	 { 
-	   VFUN_NARGS = nargs;
-	   goto   AFTER_LINK;
-	 }
-     }
-   else /* t_gfun,t_sfun */
-     { nargs= SFUN_NARGS(argd);
-     if ((argd & (~VFUN_NARG_BIT)) != fun->sfn.sfn_argd) 
-       WRONG_ARGS:    
-     FEerror("Arg or result mismatch in call to  ~s",1,sym);
-     }
-   
-   (void) vpush_extend(link,sLAlink_arrayA->s.s_dbind);
-   (void) vpush_extend(*link,sLAlink_arrayA->s.s_dbind);	 
-   *link = (void *)fn;
-   AFTER_LINK:	
-   
-   if (nargs < 10) 
+
+  check_type_symbol(&sym);
+  fun = setf ? ({object ns=get(sym,sSsetf_function,OBJNULL); type_of(ns)!=t_symbol ? ns : symbol_function(ns);}) : sym->s.s_gfdef;
+  tp=fun ? type_of(fun) : -1;
+  nargs=SFUN_NARGS(argd);
+
+  fas=do_link=Rset;
+  switch(tp) {
+  case t_vfun:
+    if (nargs < fun->vfn.vfn_minargs || nargs > fun->vfn.vfn_maxargs
+	|| (argd & (SFUN_ARG_TYPE_MASK | SFUN_RETURN_MASK)))
+      fas=0;
+    if ((VFUN_NARG_BIT & argd) == 0)
+      do_link=0;
+    if (vald!=fun->sfn.sfn_nval) {
+      fprintf(stderr,"Warning: val mismatch in call to %-.*s prevents fast linking: %d %ld, recompile caller\n",
+	      (int)sym->s.s_fillp,sym->s.s_self,vald,fun->sfn.sfn_nval);
+      fas=0;
+    }
+    break;
+  case t_sfun: case t_gfun:
+    if ((argd & (~VFUN_NARG_BIT)) != fun->sfn.sfn_argd)
+      fas=0;
+    if (vald!=fun->sfn.sfn_nval) {
+      fprintf(stderr,"Warning: val mismatch in call to %-.*s prevents fast linking: %d %ld, recompile caller\n",
+	      (int)sym->s.s_fillp,sym->s.s_self,vald,fun->sfn.sfn_nval);
+      fas=0;
+    }
+    break;
+  default:
+    fas=0;
+  }
+
+  if (fas) {
+
+    object (*fn)();
+    fn = fun->sfn.sfn_self;
+
+    if (do_link) {
+      (void) vpush_extend(link,sLAlink_arrayA->s.s_dbind);
+      (void) vpush_extend(*link,sLAlink_arrayA->s.s_dbind);	 
+      *link = (void *)fn;
+    }
+
+   if (vald)
+     nargs++;
+
+   if (nargs < 10) {
      /* code below presumes sizeof(int) == sizeof(object)
 	Should probably not bother special casing the < 10 args
      */
-     {object x0,x1,x2,x3,x4,x5,x6,x7,x8,x9;    
-     if (nargs-- > 0)
-       /* 	 x0=va_arg(ll,object); */
-       x0=first;
-     else
-       {return(LCAST(fn)());}
-     if (nargs-- > 0)
-       x1=va_arg(ll,object);
-     else
-       { return(LCAST(fn)(x0));}
-     if (nargs-- > 0)
-       x2=va_arg(ll,object);
-     else
-       {return(LCAST(fn)(x0,x1));}
-     if (nargs-- > 0)  x3=va_arg(ll,object);
-     else
-       return(LCAST(fn)(x0,x1,x2));
-     if (nargs-- > 0)  x4=va_arg(ll,object);
-     else
-       return(LCAST(fn)(x0,x1,x2,x3));
-     if (nargs-- > 0)  x5=va_arg(ll,object);
-     else
-       return(LCAST(fn)(x0,x1,x2,x3,x4));
-     if (nargs-- > 0)  x6=va_arg(ll,object);
-     else
-       return(LCAST(fn)(x0,x1,x2,x3,x4,x5));
-     if (nargs-- > 0)  x7=va_arg(ll,object);
-     else
-       return(LCAST(fn)(x0,x1,x2,x3,x4,x5,x6));
-     if (nargs-- > 0)  x8=va_arg(ll,object);
-     else
-       return(LCAST(fn)(x0,x1,x2,x3,x4,x5,x6,x7));
-     if (nargs-- > 0)  x9=va_arg(ll,object);
-     else
-       return(LCAST(fn)(x0,x1,x2,x3,x4,x5,x6,x7,x8));
+     object x0,x1,x2,x3,x4,x5,x6,x7,x8,x9;    
+     if (nargs-- > 0) x0=first; else return(LCAST(fn)());
+     if (nargs-- > 0) x1=va_arg(ll,object); else return(LCAST(fn)(x0));
+     if (nargs-- > 0) x2=va_arg(ll,object); else return(LCAST(fn)(x0,x1));
+     if (nargs-- > 0) x3=va_arg(ll,object); else return(LCAST(fn)(x0,x1,x2));
+     if (nargs-- > 0) x4=va_arg(ll,object); else return(LCAST(fn)(x0,x1,x2,x3));
+     if (nargs-- > 0) x5=va_arg(ll,object); else return(LCAST(fn)(x0,x1,x2,x3,x4));
+     if (nargs-- > 0) x6=va_arg(ll,object); else return(LCAST(fn)(x0,x1,x2,x3,x4,x5));
+     if (nargs-- > 0) x7=va_arg(ll,object); else return(LCAST(fn)(x0,x1,x2,x3,x4,x5,x6));
+     if (nargs-- > 0) x8=va_arg(ll,object); else return(LCAST(fn)(x0,x1,x2,x3,x4,x5,x6,x7));
+     if (nargs-- > 0) x9=va_arg(ll,object); else return(LCAST(fn)(x0,x1,x2,x3,x4,x5,x6,x7,x8));
      return(LCAST(fn)(x0,x1,x2,x3,x4,x5,x6,x7,x8,x9));
      
-     }
-   else {
+   }  else {
+
      object *new;
      COERCE_VA_LIST_NEW(new,first,ll,nargs);
-     return(c_apply_n(fn,nargs,new));}
+     return(c_apply_n(fn,nargs,new));
+   
    }
- else				/* there is no cdefn property */
-   /* regular_call: */
-   { 
-     object fun;
-     register object *base;
-     enum ftype result_type;
-     /* we check they are valid functions before calling this */
-     if(type_of(sym)==t_symbol)  fun = setf ? ({object ns=get(sym,sSsetf_function,OBJNULL); type_of(ns)!=t_symbol ? ns : symbol_function(ns);}) : symbol_function(sym);
-     else fun = sym;
-     vs_base= (base =   vs_top);
-     if (fun == OBJNULL || sym->s.s_sfdef != NOT_SPECIAL || sym->s.s_mflag) FEinvalid_function(sym);
-     /* push the args */
-/*     if (type_of(fun)==t_vfun) argd=fcall.argd; */ /*remove this! */
-     nargs=SFUN_NARGS(argd);
-     result_type=SFUN_RETURN_TYPE(argd);
-     SFUN_START_ARG_TYPES(argd);
-     {int i=0;
-      if (argd==0)
-	{while(i < nargs)
-	    {vs_push(i ? va_arg(ll,object) : first);
-	     i++;}}
-      else
-	{
-	  while(i < nargs) {
-	    enum ftype typ=SFUN_NEXT_TYPE(argd);
-	    object _xx;
-	    if (typ==f_object)
-	      _xx=i ? va_arg(ll,object) : first;
-	    else if (typ==f_fixnum) {
-	      fixnum _yy;
-	      _yy=i ? va_arg(ll,fixnum) : (fixnum)first;
-	      _xx=make_fixnum(_yy);
-	    } else {
-	      GEN _yy;
-	      _yy=i ? va_arg(ll,GEN) : (GEN)first;
-	      _xx=make_integer(_yy);
-	    }
-	    vs_push(_xx);
-	    i++;
-	  }
-	}
+
+  } else {
+    
+    object res;
+    register object *base;
+    enum ftype result_type;
+    fixnum larg=0,i;
+
+    vs_base=base=vs_top; /*???*/
+
+    if (fun == OBJNULL || sym->s.s_sfdef != NOT_SPECIAL || sym->s.s_mflag) 
+      FEinvalid_function(sym);
+
+    result_type=SFUN_RETURN_TYPE(argd);
+    SFUN_START_ARG_TYPES(argd);
+
+    if (vald) {
+      larg=(fixnum)first;
+      first=va_arg(ll,object);
     }
 
+    for (i=0;i<nargs;i++) {
+
+      enum ftype typ=SFUN_NEXT_TYPE(argd);
+      object x=i ? va_arg(ll,object) : first;/* all arguments same size!!*/
+
+      switch(typ) {
+      case f_fixnum:
+	x=make_fixnum((fixnum)x);
+	break;
+      case f_integer:
+	x=make_integer((GEN)x);
+	break;
+      default:
+	break;
+      }
+
+      vs_push(x);
+    }
      vs_check;
-     
+
      funcall(fun);
-     vs_top=base;
-     /* vs_base=oldbase;
-	The caller won't expect us to restore these.  */
-     return((result_type==f_object? vs_base[0] : (result_type==f_fixnum ? (object)fix(vs_base[0]) : (object)otoi(vs_base[0]))));
-   }
+
+     res=vs_base[0];
+     if (!larg || !vald)
+       vs_top=base;
+     else {
+       object *tmp=vs_base+1,*tl=(void *)larg,*tle=tl+abs(vald);
+       for (;tl<tle && tmp<vs_top;)
+	 *tl++=*tmp++;
+       if (vald<0)
+	 for (;tl<tle;)
+	   *tl++=Cnil;
+       vs_top=tl;
+     }
+
+     switch(result_type) {
+     case f_fixnum:
+       res=(object)fix(res);
+       break;
+     case f_integer:
+       res=(object)otoi(res);
+       break;
+     default:
+       break;
+     }
+
+     return res;
+
+  }
+
 }
 
 
-object call_vproc_new(object sym, int setf,void *link, object first,va_list ll)
-{return call_proc_new(sym,setf,link,VFUN_NARGS | VFUN_NARG_BIT,first,ll);}
+object call_vproc_new(object sym, int setf,int vald,void *link, object first,va_list ll)
+{return call_proc_new(sym,setf,vald,link,VFUN_NARGS | VFUN_NARG_BIT,first,ll);}
 
 static object
 mcall_proc0(object sym,int setf,void *link,int argd,...) 

@@ -254,7 +254,7 @@
       (or (eq x '*) x))))
 
 (defmacro check-type-eval (place type)
-  `(assert (typep ,place ,type) (,place) 'type-error :datum ,place :expected-type ,type))
+  `(values (assert (typep ,place ,type) (,place) 'type-error :datum ,place :expected-type ,type)));fixme
 
 (defconstant +coerce-list+ '(list vector string array character short-float long-float float complex function null cons))
 
@@ -268,7 +268,7 @@
     (case tp
       (function
        (cond ((symbolp object) (symbol-function object))
-	     ((and (consp object) (eq (car object) 'lambda)) (eval `(function ,object)))
+	     ((and (consp object) (eq (car object) 'lambda)) (values (eval `(function ,object))))
 	     ((function-identifierp object) (get (cadr object) 'setf-function))));FIXME
       ((null cons list)
        (let* ((l (length object))

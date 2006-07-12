@@ -12,6 +12,7 @@ object MakeAfun(object (*addr)(object,object), unsigned int argd, object data)
   x->sfn.sfn_name = Cnil;
   x->sfn.sfn_self = addr;
   x->sfn.sfn_argd = argd;
+  x->sfn.sfn_nval = 0;
   if (type == t_closure)
     { x->cl.cl_env = 0;
       x->cl.cl_envdim=0;}

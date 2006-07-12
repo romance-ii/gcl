@@ -90,6 +90,7 @@
 (si:putprop 'cadr 'wt-cadr 'wt-loc)
 (si:putprop 'vs-base 'wt-vs-base 'wt-loc)
 (si:putprop 'fixnum-value 'wt-fixnum-value 'wt-loc)
+(si:putprop 'vs-address 'wt-vs-address 'wt-loc)
 (si:putprop 'fixnum-loc 'wt-fixnum-loc 'wt-loc)
 (si:putprop 'integer-loc 'wt-integer-loc 'wt-loc)
 (si:putprop 'character-value 'wt-character-value 'wt-loc)
@@ -110,6 +111,8 @@
 (defun multiple-values-p ()
   (and (consp *value-to-go*) (consp (car *value-to-go*))))
 
+(defvar *extend-vs-top*)
+
 (defun set-loc (loc &aux fd)
   (cond ((eq *value-to-go* 'return) (set-return loc))
         ((eq *value-to-go* 'trash)
@@ -124,11 +127,16 @@
          (unless (eq loc 'fun-val) (set-top loc)))
 	((multiple-values-p)
 	 (unless (eq loc 'fun-val)
-	   (let ((*values-to-go* *value-to-go*))
+	   (let ((*values-to-go* *value-to-go*) *extend-vs-top*)
 	     (do ((loc loc nil)) ((null *values-to-go*))
 	       (let ((*value-to-go* (pop *values-to-go*)))
 		 (set-loc loc)))
-	     (wt-nl)(reset-top)(wt-go *multiple-value-exit-label*))))
+	     (when *multiple-value-exit-label* 
+	       (wt-nl)
+	       (when (and *extend-vs-top* (<= (var-dynamic *mv-var*) (caddr #tshort)))
+		 (wt-nl "{register object *_x;for (_x=vs_top;_x<V" (var-loc *mv-var*) "+" (var-dynamic *mv-var*) ";) *_x++=Cnil;}"))
+	       (reset-top)
+	       (wt-go *multiple-value-exit-label*)))))
         ((setq fd (cdr (assoc *value-to-go* +set-return-alist+))) (funcall fd loc))
         ((or (not (consp *value-to-go*))
              (not (symbolp (car *value-to-go*))))
@@ -163,13 +171,14 @@
               (eql (car (var-ref (cadr loc))) *level*))
          (wt-nl "vs_top=(vs_base=base+" (cdr (var-ref (cadr loc))) ")+1;")
          (base-used))
-        (t (set-top loc)))
-  )
+        ((set-top loc))))
 
 (defun set-top (loc)
   (let ((vs-mark *vs*) (*vs* *vs*))
     (wt-nl) (wt-vs (vs-push)) (wt "= " loc ";")
-    (wt-nl "vs_top=(vs_base=base+" vs-mark ")+" (- *vs* vs-mark) ";")
+    (if (and (consp loc) (rassoc (car loc) +inline-types-alist+) (flag-p (cadr loc) sets-vs-top))
+	(wt-nl "vs_base=base+" vs-mark ";");;callee sets vs_top; obsolete ???
+      (wt-nl "vs_top=(vs_base=base+" vs-mark ")+" (- *vs* vs-mark) ";"))
     (base-used)))
 
 (defun wt-vs-base (offset) (wt "vs_base[" offset "]"))
@@ -201,6 +210,8 @@
          (wt "(fixnum)")
 	 (cond ((= (caddr loc) most-negative-fixnum) (wt "(" (1+ most-negative-fixnum) "- 1)"))
 	       ((wt (caddr loc)))))
+	((and (consp loc) (eq (car loc) 'vs-address));????
+	 (wt loc))
         (t (wt (if *safe-compile* "fixint(" "fix(") loc ")"))))
 
 (defun wt-integer-loc (loc  &aux (avma t)(first (and (consp loc) (car loc))))
@@ -232,6 +243,8 @@
   (if vv (wt (vv-str vv))
     (wt "small_fixnum(" fixnum-value ")")))
         
+(defun wt-vs-address (v i)
+  (wt v "+" i))
 
 (defun wt-character-loc (loc)
   (cond ((and (consp loc)

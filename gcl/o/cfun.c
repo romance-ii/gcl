@@ -48,35 +48,36 @@ make_cfun(void (*self)(), object name, object data, char *start, int size)
 	return(cf);
 }
 object
-make_sfun(object name, object (*self)(), int argd, object data)
-         
-              
-/*  object (*self)(); */
-                  
-{object sfn;
+make_sfun(object name, object (*self)(), int argd, object data,fixnum nval) {
+  object sfn;
        
-	sfn = alloc_object(t_sfun);
-        if(argd >15) set_type_of(sfn,t_gfun);
-	sfn->sfn.sfn_self = self;
-	sfn->sfn.sfn_name = name;
-	sfn->sfn.sfn_data = data;
-        sfn->sfn.sfn_argd = argd;
-	return(sfn);
+  sfn = alloc_object(t_sfun);
+  if(argd >15) set_type_of(sfn,t_gfun);
+  sfn->sfn.sfn_self = self;
+  sfn->sfn.sfn_name = name;
+  sfn->sfn.sfn_data = data;
+  sfn->sfn.sfn_argd = argd  | (nval ? MVRET_BIT : 0);
+  sfn->sfn.sfn_nval=  nval;
+  return(sfn);
+
 }
 
 #define VFUN_MIN_ARGS(argd) (argd & 0xff)
-#define VFUN_MAX_ARGS(argd) ((argd) >> 8)
+#define VFUN_MV_BITS(argd)  ((argd) >> 8)
+#define VFUN_MAX_ARGS(argd) ((argd) >> 16)
 
 static object
-make_vfun(object name, object (*self)(), int argd, object data)
+make_vfun(object name, object (*self)(), int argd, object data,fixnum nval)
 {object vfn;
        
 	vfn = alloc_object(t_vfun);
 	vfn->vfn.vfn_self = self;
 	vfn->vfn.vfn_name = name;
 	vfn->vfn.vfn_minargs = VFUN_MIN_ARGS(argd);
+        vfn->vfn.vfn_mv      = VFUN_MV_BITS (argd);
         vfn->vfn.vfn_maxargs = VFUN_MAX_ARGS(argd);
         vfn->vfn.vfn_data = data;
+        vfn->vfn.vfn_nval = nval;
 	return(vfn);
 }
 
@@ -119,12 +120,12 @@ DEFUN_NEW("MC",object,fSmc,SI
 }
 
 static object
-MFsfun(object sym, object (*self)(), int argd, object data)
+MFsfun(object sym, object (*self)(), int argd, object data,fixnum nval)
 {object sfn;
  if (type_of(sym)!=t_symbol) not_a_symbol(sym);
  if (sym->s.s_sfdef != NOT_SPECIAL && sym->s.s_mflag)
    sym->s.s_sfdef = NOT_SPECIAL;
- sfn = make_sfun(sym,self,argd,data);
+ sfn = make_sfun(sym,self,argd,data,nval);
  sym = clear_compiler_properties(sym,sfn);
  sym->s.s_gfdef = sfn;
  sym->s.s_mflag = FALSE;
@@ -132,21 +133,23 @@ MFsfun(object sym, object (*self)(), int argd, object data)
 }
 
 DEFUN_NEW("MFSFUN",object,fSmfsfun,SI
-   ,3,3,NONE,OO,OO,OO,OO,(object name,object address,object argd),"") 
+   ,4,4,NONE,OO,OO,OO,OO,(object name,object address,object argd,object nval),"") 
 { /* 3 args */
   dcheck_type(address,t_fixnum);
-  return MFsfun(name,PADDR(address),fix(argd),sSPmemory->s.s_dbind);RETURN1(name);
+  dcheck_type(argd,t_fixnum);
+  dcheck_type(nval,t_fixnum);
+  return MFsfun(name,PADDR(address),fix(argd),sSPmemory->s.s_dbind,fix(nval));RETURN1(name);
 }
 
 
 static object
-MFvfun(object sym, object (*self)(), int argd, object data)
+MFvfun(object sym, object (*self)(), int argd, object data,fixnum nval)
 {object vfn;
  if (type_of(sym)!=t_symbol) not_a_symbol(sym);
  if (sym->s.s_sfdef != NOT_SPECIAL && sym->s.s_mflag)
    sym->s.s_sfdef = NOT_SPECIAL;
  dcheck_type(data,t_cfdata);
- vfn = make_vfun(sym,self,argd,data);
+ vfn = make_vfun(sym,self,argd,data,nval);
  sym = clear_compiler_properties(sym,vfn);
  sym->s.s_gfdef = vfn;
  sym->s.s_mflag = FALSE;
@@ -154,25 +157,29 @@ MFvfun(object sym, object (*self)(), int argd, object data)
 }
 
 DEFUN_NEW("MFVFUN",object,fSmfvfun,SI
-   ,3,3,NONE,OO,OO,OO,OO,(object name,object address,object argd),"")
+   ,4,4,NONE,OO,OO,OO,OO,(object name,object address,object argd,object nval),"")
 
-{ /* 3 args */
-  MFvfun(name,PADDR(address),fix(argd),sSPmemory->s.s_dbind);
+{ 
+  dcheck_type(argd,t_fixnum);
+  dcheck_type(nval,t_fixnum);
+  MFvfun(name,PADDR(address),fix(argd),sSPmemory->s.s_dbind,fix(nval));
   RETURN1(name);
 }
 
 
 
 static object
-MFvfun_key(object sym, object (*self)(), int argd, object data, struct key *keys)
+MFvfun_key(object sym, object (*self)(), int argd, object data, struct key *keys,fixnum nval)
 {if (data) set_key_struct(keys,data);
- return MFvfun(sym,self,argd,data);
+ return MFvfun(sym,self,argd,data,nval);
 }
 
 DEFUN_NEW("MFVFUN-KEY",object,fSmfvfun_key,SI
-   ,4,4,NONE,OO,OO,OO,OO,(object symbol,object address,object argd,object keys),"") 
+   ,5,5,NONE,OO,OO,OO,OO,(object symbol,object address,object argd,object keys,object nval),"") 
 { /* 4 args */
- MFvfun_key(symbol,PADDR(address),fix(argd),sSPmemory->s.s_dbind,PADDR(keys));
+  dcheck_type(argd,t_fixnum);
+  dcheck_type(nval,t_fixnum);
+ MFvfun_key(symbol,PADDR(address),fix(argd),sSPmemory->s.s_dbind,PADDR(keys),fix(nval));
  RETURN1(symbol);
 }
 
@@ -265,7 +272,7 @@ make_function_internal(char *s, void (*f)())
 object
 make_si_sfun_internal(char *s, object (*f) (), int argd) {  
   object x= make_si_ordinary(s);
-  x->s.s_gfdef = make_sfun( x,f,argd, Cnil);
+  x->s.s_gfdef = make_sfun( x,f,argd,Cnil,0);
   x->s.s_mflag = FALSE;
   return(x);
 }

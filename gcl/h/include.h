@@ -57,6 +57,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "../h/mp.h"
 #endif
 
+#include "../h/sfun_argd.h"
 #include "../h/compbas.h"
 #include "../h/enum.h"
 #include "../h/object.h"

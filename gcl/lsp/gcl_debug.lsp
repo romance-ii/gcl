@@ -69,6 +69,7 @@
      (cond ((compiled-function-p fun)
 	    (setq name (compiled-function-name fun)))
 	   ((symbolp fun ) (setq name fun))
+	   ((when (interpreted-function-p fun) (setq fun (interpreted-function-lambda fun)) nil))
 	   ((and (listp fun)
 		 (member (car fun) '(lambda lambda-block)))
 	    (setq name (second fun)))
@@ -97,6 +98,7 @@
 	(t
 	 (cond ((compiled-function-p fun)
 		(setq name (compiled-function-name fun)))
+	       ((when (interpreted-function-p fun) (setq fun (interpreted-function-lambda fun)) nil))
 	       (t (setq name fun)))
          (if (symbolp name)(setq args (get name 'debug)))
 	 (let ((next (ihs-vs (f + 1 *current-ihs*))))
@@ -655,7 +657,7 @@
 
 (defun next-stack-frame (ihs  &aux line-info li i k na)
   (cond
-   ((fb < ihs *ihs-base*) (mv-values nil nil nil nil nil ))
+   ((fb < ihs *ihs-base*) (mv-values nil nil nil nil nil))
    (t (let (fun)
 	;; next lower visible ihs
 	(mv-setq (fun i) (get-next-visible-fun  ihs))
@@ -685,8 +687,8 @@
 		     (if (ihs-not-interpreted-env i)
 			 nil
 		       (let ((i (ihs-vs i)))
-			 (list (vs i) (vs (1+ i)) (vs (f + i 2))))))))
-	))))
+			 (list (vs i) (vs (1+ i)) (vs (f + i 2)))))))
+	 ((mv-values nil nil nil nil nil)))))))
 
 (defun nth-stack-frame (n &optional (ihs *ihs-top*)
 			  &aux  name line file env next)
