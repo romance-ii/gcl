@@ -208,8 +208,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     plist ops in add-hash;fix debugger for interpreted
     functions;redefine coerce to auto return t;don't load sys-proclaims
     in final images
+  * powm in si
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 12 Jul 2006 22:23:43 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 13 Jul 2006 02:50:53 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

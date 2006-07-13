@@ -703,8 +703,8 @@ powm_fff(fixnum a,fixnum i,fixnum m) {
 }
 
 
-DEFUNO_NEW("POWM",object,fSpowm,LISP
-	   ,3,3,NONE,OO,OO,OO,OO,void,siLpowm,(object a,object i,object m),"") {
+DEFUNO_NEW("POWM",object,fSpowm,SI,
+	   3,3,NONE,OO,OO,OO,OO,void,siLpowm,(object a,object i,object m),"") {
 
   check_type_integer(&a);
   check_type_integer(&i);
