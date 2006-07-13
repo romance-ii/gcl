@@ -209,8 +209,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     functions;redefine coerce to auto return t;don't load sys-proclaims
     in final images
   * powm in si
+  * fix *tail-recursion-info* for mv-var case
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 13 Jul 2006 02:50:53 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 13 Jul 2006 15:11:49 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

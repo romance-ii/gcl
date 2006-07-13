@@ -1004,9 +1004,10 @@
   (unless (type>= t (get-return-type fname))
     (setq mv-var (make-var :type #tfixnum :kind #tfixnum :ref t :name (gensym) 
 			   :loc (cs-push #tfixnum t) :mt #tfixnum :dt #tfixnum))
-    (push mv-var requireds)
     (setq *max-vs* (max *max-vs* (- (length (get-return-type fname)) 2))))
-  (wt-requireds  requireds (if mv-var (cons #tfixnum (cadr inline-info)) (cadr inline-info)))
+  (if mv-var
+      (wt-requireds (cons mv-var requireds) (cons #tfixnum (cadr inline-info)))
+    (wt-requireds  requireds (cadr inline-info)))
          ;;; Now the body.
   (let ((cm *reservation-cmacro*)
 	(*tail-recursion-info*
@@ -1104,7 +1105,7 @@
 		   (when (var-ref-ccb var) (return nil)))
 	  (every (lambda (x) (and (consp x) (consp (cadr x)) (eq (caadr x) 'location))) (ll-optionals ll));fixme function defaults
 	  (null (ll-keywords ll))
-	  (cons fname (append (car ll) (ll-optionals ll)))))
+	  (cons fname (append (if mv-var (cdr (car ll)) (car ll)) (ll-optionals ll)))))
 	(*unwind-exit* *unwind-exit*))
     (wt-nl1 "{	")
     (when is-var-arg	  (wt-nl "va_list ap;"))
