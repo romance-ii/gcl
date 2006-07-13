@@ -185,7 +185,7 @@
 	      (let ((i -1)) (mapc (lambda (x) (wt-nl "#define V" x " ((object *)V" (var-loc *mv-var*) ")[" (incf i) "]")) lbs))
 	      (set-loc loc)
 	      (mapc (lambda (x) (wt-nl "#undef V" x)) lbs)
-	      (unless (and (consp loc) (integerp (cadr loc)) (flag-p (cadr loc) sets-vs-top))
+	      (unless (and (consp loc) (rassoc (car loc) +inline-types-alist+) (flag-p (cadr loc) sets-vs-top))
 		(wt-nl "vs_top=((object *)V" (var-loc *mv-var*) ")+" nv ";"))
 	      (wt-nl "} else {")
 	      (let ((*value-to-go* (list 'cvar fv)))
