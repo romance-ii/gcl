@@ -173,7 +173,7 @@
 	      (unwind-bds bds-cvar bds-bind)
 	      (wt-nl "return(V" q ");}")))
 	   (*mv-var*
-	    (let* ((nv (cond ((and (consp fname) (eq (car fname) 'values)) (1- (cdr fname)))
+	    (let* ((nv (cond ((and (consp fname) (eq (car fname) 'values)) (max 0 (1- (cdr fname))))
 			     ((let ((rt (get-return-type fname)))
 				(and (consp rt) (member (car rt) '(values returns-exactly)) (- (length rt) 2))))
 			     (0)))
