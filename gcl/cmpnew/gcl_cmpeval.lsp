@@ -63,7 +63,7 @@
                         (list 'VV (add-object form))))
                  ((and (constantp form)  (readable-val (symbol-value form)))
 		  (or (c1constant-value (symbol-value form) nil)
-		      (c1expr (list 'quote (symbol-value form)))))
+		      (c1expr (list 'load-time-value (list 'quote (symbol-value form))))))
                  (t (c1var form))))
           ((consp form)
            (let ((fun (car form)))
