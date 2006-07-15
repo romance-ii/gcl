@@ -218,8 +218,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
     proclamations and fast-linking for certain C functions
   * faster mvprog1, mvlist, mvcall; workaround fix to missing newline
     bug
+  * fix symbol constants
+  * fix symbol constants
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 15 Jul 2006 17:17:05 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 15 Jul 2006 20:32:52 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
