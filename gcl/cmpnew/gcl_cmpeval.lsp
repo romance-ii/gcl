@@ -49,6 +49,10 @@
   (add-info (cadr form) info)
   form)
 
+(defun readable-val (val)
+  (cond ((not (arrayp val)))
+	((not (si::staticp val)))))
+
 (defun c1expr (form)
   (setq form (catch *cmperr-tag*
     (cond ((symbolp form)
@@ -57,7 +61,7 @@
                  ((keywordp form)
                   (list 'LOCATION (make-info :type (object-type form))
                         (list 'VV (add-object form))))
-                 ((constantp form) (c1expr (list 'quote (symbol-value form))))
+                 ((and (constantp form)  (readable-val (symbol-value form)) (c1expr (list 'quote (symbol-value form)))))
                  (t (c1var form))))
           ((consp form)
            (let ((fun (car form)))

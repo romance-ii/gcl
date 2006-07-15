@@ -143,7 +143,7 @@
   (dolist* (var *vars*
                (let ((var (sch-global name)))
                     (unless var
-                      (unless (si:specialp name) (undefined-variable name))
+                      (unless (or (si:specialp name) (constantp name)) (undefined-variable name))
                       (setq var (make-var :name name
                                           :kind 'GLOBAL
                                           :loc (add-symbol name)
