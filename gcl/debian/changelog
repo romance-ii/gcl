@@ -216,8 +216,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
     propagation;Can now inline funcalls to lambdas with optional
     args;don't load sys-proclaims in lsp and cmpnew cmp-init;
     proclamations and fast-linking for certain C functions
+  * faster mvprog1, mvlist, mvcall; workaround fix to missing newline
+    bug
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 15 Jul 2006 00:34:44 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 15 Jul 2006 17:17:05 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

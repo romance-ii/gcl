@@ -1177,7 +1177,7 @@
 	       (inline-possible fname)
 	       (funcall fd fname args)))
 	 ((and (setq fd (get fname 'c1)) (inline-possible fname))
-         (funcall fd args))
+	  (funcall fd args))
 	 ((and (setq fd (get fname 'c1g)) (inline-possible fname))
 	  (funcall fd fname args))
 	 ((and (setq fd (get fname 'c1conditional))
