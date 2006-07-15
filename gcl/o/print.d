@@ -1488,9 +1488,11 @@ int level;
 		}
 		if (type_of(x->str.str_def) != t_structure)
 			FEwrong_type_argument(sLstructure, x->str.str_def);
-		if (PRINTstructure ||
-			S_DATA(x->str.str_def)->print_function == Cnil)
-			  {	
+		if (S_DATA(x->str.str_def)->print_function != Cnil) {
+		  call_structure_print_function(x, level);
+		  break;
+		}
+		if (PRINTstructure) {	
 			write_str("#S");
 			x = structure_to_list(x);
 			vs_push(x);
@@ -1498,7 +1500,6 @@ int level;
 			vs_popp;
 			break;
 		}
-		call_structure_print_function(x, level);
 		break;
 
 	case t_readtable:
@@ -2064,7 +2065,7 @@ DEFVAR("*PRINT-LEVEL*",sLAprint_levelA,LISP,Cnil,"");
 DEFVAR("*PRINT-LENGTH*",sLAprint_lengthA,LISP,Cnil,"");
 DEFVAR("*PRINT-ARRAY*",sLAprint_arrayA,LISP,Ct,"");
 DEFVAR("*PRINT-PACKAGE*",sSAprint_packageA,SI,Cnil,"");
-DEFVAR("*PRINT-STRUCTURE*",sSAprint_structureA,SI,Cnil,"");
+DEFVAR("*PRINT-STRUCTURE*",sSAprint_structureA,SI,Ct,"");
 DEF_ORDINARY("PRETTY-PRINT-FORMAT",sSpretty_print_format,SI,"");
 DEFVAR("*PRINT-NANS*",sSAprint_nansA,SI,Cnil,"");
 

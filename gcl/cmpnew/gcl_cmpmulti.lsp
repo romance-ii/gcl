@@ -140,7 +140,7 @@
 				    (let ((i 0)) 
 				      (mapcan (lambda (x) (declare (ignore x))
 						(let ((s (write-to-string (incf i))))
-						  (list "@" s "(#" s ")@"))) (cdr forms))))
+						  (list (si::string-concatenate "@" s "(#" s ")@")))) (cdr forms))))
 			     "#0;})")
 			    (mapcar 'inline-type (cdr types)))
 		    (inline-args forms types))))

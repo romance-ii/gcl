@@ -161,19 +161,33 @@
 	 (declare (fixnum ,temp ,v))
 	 ,@body)))
 
-(defun cmp-eval (form)
-  (let ((x (multiple-value-list (cmp-toplevel-eval `(eval ',form)))))
-    (if (car x)
-        (let ((*print-case* :upcase))
-          (incf *error-count*)
-          (print-current-form)
-          (format t
-                  ";;; The form ~s was not evaluated successfully.~%~
-                  ;;; You are recommended to compile again.~%"
-                  form)
-          nil)
-        (values-list (cdr x)))))
+;; (defun cmp-eval (form)
+;;   (let ((x (multiple-value-list (cmp-toplevel-eval `(eval ',form)))))
+;;     (if (car x)
+;;         (let ((*print-case* :upcase))
+;;           (incf *error-count*)
+;;           (print-current-form)
+;;           (format t
+;;                   ";;; The form ~s was not evaluated successfully.~%~
+;;                   ;;; You are recommended to compile again.~%"
+;;                   form)
+;;           nil)
+;;         (values-list (cdr x)))))
 
+
+(defun cmp-eval (form)
+  (multiple-value-bind 
+   (x y) (cmp-toplevel-eval `(eval ',form))
+   (if x
+       (let ((*print-case* :upcase))
+	 (incf *error-count*)
+	 (print-current-form)
+	 (format t
+		 ";;; The form ~s was not evaluated successfully.~%~
+                  ;;; You are recommended to compile again.~%"
+		 form)
+	 nil)
+     y)))
 
 ;(si::putprop 'setf 'c1setf 'c1special)
 

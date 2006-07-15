@@ -2361,15 +2361,26 @@ for the string ~S.",
   @(return `make_string_output_stream(64)`)
 @)
 
-LFD(Lget_output_stream_string)()
-{
-	check_arg(1);
+DEFUNO_NEW("GET-OUTPUT-STREAM-STRING",object,fLget_output_stream_string,LISP,
+	   1,1,NONE,OO,OO,OO,OO,void,Lget_output_stream_string,(object stream),"") {
 
-	if (type_of(vs_base[0]) != t_stream ||
-	    (enum smmode)vs_base[0]->sm.sm_mode != smm_string_output)
-		FEerror("~S is not a string-output stream.", 1, vs_base[0]);
-	vs_base[0] = get_output_stream_string(vs_base[0]);
+  if (type_of(stream) != t_stream ||
+      (enum smmode)stream->sm.sm_mode != smm_string_output)
+    FEerror("~S is not a string-output stream.", 1, stream);
+  stream = get_output_stream_string(stream);
+  RETURN1(stream);
+
 }
+
+/* LFD(Lget_output_stream_string)() */
+/* { */
+/* 	check_arg(1); */
+
+/* 	if (type_of(vs_base[0]) != t_stream || */
+/* 	    (enum smmode)vs_base[0]->sm.sm_mode != smm_string_output) */
+/* 		FEerror("~S is not a string-output stream.", 1, vs_base[0]); */
+/* 	vs_base[0] = get_output_stream_string(vs_base[0]); */
+/* } */
 
 /*
 	(SI:OUTPUT-STREAM-STRING string-output-stream)
@@ -3446,8 +3457,8 @@ gcl_init_file_function()
 		      Lmake_string_input_stream);
 	make_function("MAKE-STRING-OUTPUT-STREAM",
 		      Lmake_string_output_stream);
-	make_function("GET-OUTPUT-STREAM-STRING",
-		      Lget_output_stream_string);
+/* 	make_function("GET-OUTPUT-STREAM-STRING", */
+/* 		      Lget_output_stream_string); */
 
 	make_si_function("OUTPUT-STREAM-STRING", siLoutput_stream_string);
 	make_si_function("FWRITE",Lfwrite);

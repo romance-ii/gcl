@@ -694,7 +694,7 @@
                          (princ char *compiler-output1*)
                          (incf i)))))
 	   (setq *values-to-go* (nthcdr maxv *values-to-go*)))
-	  (t (apply fun locs)))))
+	  ((values (apply fun locs))))))
 
 (defun wt-inline (side-effectp fun locs)
   (declare (ignore side-effectp))

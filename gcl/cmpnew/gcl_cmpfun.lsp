@@ -367,7 +367,7 @@
 		     (list f (or f (num-type-rel rfn t2 t1 t)))))
 	  ((let ((t1 (car (num-type-bounds t1)))
 		 (t2 (cadr (num-type-bounds t2))))
-	     (and (numberp t1) (numberp t2) (funcall fn t1 t2)))))))
+	     (and (numberp t1) (numberp t2) (values (funcall fn t1 t2))))))))
 
 
 (defun do-num-relations (fn args)

@@ -951,7 +951,8 @@
 	     ,form)
 	form))))
 
-(defmacro inlinable-fn (a) `(or (constantp ,a) (and (consp ,a) (member (car ,a) '(function lambda)))))
+(defmacro inlinable-fn (a) 
+  `(or (constantp ,a) (and (consp ,a) (member (car ,a) '(function lambda)))))
 
 (defconstant +seq-fn-key-list+ 
   '((position . (:item (:pos t)))
@@ -1034,6 +1035,14 @@
 (si::putprop 'map-into (macro-function 'compiler::map-into-compiler-macro) 'si::compiler-macro-prop)
 (si::putprop 'map (macro-function 'compiler::map-into-compiler-macro) 'si::compiler-macro-prop)
 
+(defun maybe-reduce-lambda-wrap (lm)
+  (cond ((atom lm) lm)
+	((eq (car lm) 'function) `(function ,(maybe-reduce-lambda-wrap (cadr lm))))
+	((and (eq (car lm) 'lambda) (not (member (caadr lm) '(&optional &rest))))
+	 (let ((x (gensym))(y (gensym))(xp (gensym)))
+	   `(lambda (&optional (,x nil ,xp) ,y) (declare (ignorable ,x ,y ,xp)) (when ,xp (funcall ,lm ,x ,y)))))
+	(lm)))
+
 (defmacro reduce-compiler-macro (&whole w &rest args)
   (if (or (< (length args) 2) 
 	  (do ((r (cddr args) (cddr r))) 
@@ -1045,7 +1054,8 @@
 			 args :initial-value nil))
 	   (r (mapcar (lambda (x) (cond ((inlinable-fn x) x)
 					((car (rassoc x syms :key 'car :test 'equal))) (x))) args))
-	   (form (apply 'do-sequence-search (car r) (list (cadr r)) `( :sum t ,@(substitute :iv :initial-value (cddr args))))))
+	   (fn (maybe-reduce-lambda-wrap (car r)))
+	   (form (apply 'do-sequence-search fn (list (cadr r)) `( :sum t ,@(substitute :iv :initial-value (cddr args))))))
       `(let ,syms
 	 ,@(if (constantp (cadr r)) (list form)
 	     `((if (listp ,(cadr r))
@@ -1129,148 +1139,141 @@
 			      (cmp-array-dimension . array-dimension)))
 
 (defun c1symbol-fun (fname args &aux fd)
-  (cond ((setq fd (get fname 'c1special)) (funcall fd args))
-	((and (setq fd (get fname 'co1special))
-	      (funcall fd fname args)))
-        ((setq fd (c1local-fun fname))
-         (if (eq (car fd) 'call-local)
-	     ;; c1local-fun now adds fun-info into (cadr fd), so we need no longer
-	     ;; do it explicitly here.  CM 20031030
-             (let* ((info (add-info (make-info :sp-change t) (cadr fd)))
-                    (forms (c1args args info)))
+  (values
+   (cond ((setq fd (get fname 'c1special)) (funcall fd args))
+	 ((and (setq fd (get fname 'co1special))
+	       (funcall fd fname args)))
+	 ((setq fd (c1local-fun fname))
+	  (if (eq (car fd) 'call-local)
+	      ;; c1local-fun now adds fun-info into (cadr fd), so we need no longer
+	      ;; do it explicitly here.  CM 20031030
+	      (let* ((info (add-info (make-info :sp-change t) (cadr fd)))
+		     (forms (c1args args info)))
                   (let ((return-type (get-local-return-type (caddr fd))))
-                       (when return-type (setf (info-type info) return-type)))
+		    (when return-type (setf (info-type info) return-type)))
                   (let ((arg-types (get-local-arg-types (caddr fd))))
                        ;;; Add type information to the arguments.
-                       (when arg-types
-                             (let ((fl nil))
-                                  (dolist** (form forms)
-                                    (cond ((endp arg-types) (push form fl))
-                                          (t (push (and-form-type
-                                                    (car arg-types) form
-                                                    (car args))
-                                                   fl)
-                                             (pop arg-types)
+		    (when arg-types
+		      (let ((fl nil))
+			(dolist** (form forms)
+				  (cond ((endp arg-types) (push form fl))
+					(t (push (and-form-type
+						  (car arg-types) form
+						  (car args))
+						 fl)
+					   (pop arg-types)
                                              (pop args))))
-                                  (setq forms (reverse fl)))))
+			(setq forms (reverse fl)))))
                   (list 'call-local info (cddr fd) forms))
-             (c1expr (cmp-expand-macro fd fname args))))
-	((and (get fname 'c1no-side-effects) (every 'constantp args))
-	 (c1expr `(quote ,(cmp-eval `(,fname ,@args)))))
-        ((let ((fn (get fname 'si::compiler-macro-prop)) (res (cons fname args)))
-	   (and fn
-		(let ((fd (cmp-eval `(funcall ',fn ',res nil))))
-                 (and (not (eq res fd))
-		      (c1expr fd))))))
-	((and (setq fd (get fname 'co1))
-	      (inline-possible fname)
-	      (funcall fd fname args)))
-        ((and (setq fd (get fname 'c1)) (inline-possible fname))
+	    (c1expr (cmp-expand-macro fd fname args))))
+	 ((and (get fname 'c1no-side-effects) (every 'constantp args))
+	  (c1expr `(quote ,(cmp-eval `(,fname ,@args)))))
+	 ((let ((fn (get fname 'si::compiler-macro-prop)) (res (cons fname args)))
+	    (and fn
+		 (let ((fd (cmp-eval `(funcall ',fn ',res nil))))
+		   (and (not (eq res fd))
+			(c1expr fd))))))
+	 ((and (setq fd (get fname 'co1))
+	       (inline-possible fname)
+	       (funcall fd fname args)))
+	 ((and (setq fd (get fname 'c1)) (inline-possible fname))
          (funcall fd args))
-        ((and (setq fd (get fname 'c1g)) (inline-possible fname))
-         (funcall fd fname args))
-        ((and (setq fd (get fname 'c1conditional))
-              (inline-possible fname)
-              (funcall (car fd) args))
-         (funcall (cdr fd) args))
-	;; record the call info if we get to here
-	((progn
-	   (and (eq (symbol-package fname) (symbol-package 'and))
-		(not (fboundp fname))
-		(cmpwarn "~A (in lisp package) is called as a function--not yet defined"
-			 fname))
-	   (and *record-call-info* (record-call-info 'record-call-info
-						   fname))
-	   nil))
-
-	;;continue
-        ((setq fd (macro-function fname))
-         (c1expr (cmp-expand-macro fd fname args)))
-	((when (and *compiler-auto-proclaim*
-		    (member (first *current-form*) '(defun))
-		    (symbolp (second *current-form*))
-		    (symbol-package (second *current-form*)))
-	   (si::add-hash (second *current-form*) 
-			 nil 
-			 (let ((fname (or (cdr (assoc fname +cmp-fn-alist+)) fname)))
-			   (list (cons fname
+	 ((and (setq fd (get fname 'c1g)) (inline-possible fname))
+	  (funcall fd fname args))
+	 ((and (setq fd (get fname 'c1conditional))
+	       (inline-possible fname)
+	       (funcall (car fd) args))
+	  (funcall (cdr fd) args))
+	 ;; record the call info if we get to here
+	 ((progn
+	    (and (eq (symbol-package fname) (symbol-package 'and))
+		 (not (fboundp fname))
+		 (cmpwarn "~A (in lisp package) is called as a function--not yet defined"
+			  fname))
+	    (and *record-call-info* (record-call-info 'record-call-info
+						      fname))
+	    nil))
+	 
+	 ;;continue
+	 ((setq fd (macro-function fname))
+	  (c1expr (cmp-expand-macro fd fname args)))
+	 ((when (and *compiler-auto-proclaim*
+		     (member (first *current-form*) '(defun))
+		     (symbolp (second *current-form*))
+		     (symbol-package (second *current-form*)))
+	    (si::add-hash (second *current-form*) 
+			  nil 
+			  (let ((fname (or (cdr (assoc fname +cmp-fn-alist+)) fname)))
+			    (list (cons fname
 				       (let* ((at (get-arg-types fname))
 					      (rt (get-return-type fname)))
-;					      (rt (if (equal '(*) rt) '* rt)))
 					 (when (or at rt) (list at rt))))))
-			 nil)))
-        ((and (setq fd (get fname 'si::structure-access))
-              (inline-possible fname)
+			  nil)))
+	 ((and (setq fd (get fname 'si::structure-access))
+	       (inline-possible fname)
               ;;; Structure hack.
-              (consp fd)
-              (si:fixnump (cdr fd))
-              (not (endp args))
-              (endp (cdr args)))
-         (case (car fd)
-               (vector (c1expr `(elt ,(car args) ,(cdr fd))))
-               (list (c1expr `(si:list-nth ,(cdr fd) ,(car args))))
-               (t (c1structure-ref1 (car args) (car fd) (cdr fd)))
-               )
-         )
-        ((eq fname 'si:|#,|)
-         (cmperr "Sharp-comma-macro was found in a bad place."))
-        (t (let* ((info (make-info :type (if (eq (second *current-form*) fname) ;FIXME must be a better way
-					     (when (boundp '*recursion-detected*) (setq *recursion-detected* t) nil) 
-					   '*)
-			 :sp-change (null (get fname 'no-sp-change))))
-		  (args (if (and (member fname '(funcall apply))
-				 (consp (car args))
-				 (eq (caar args) 'quote)
-				 (symbolp (cadar args)))
-			    `((function ,(cadar args)) ,@(cdr args))
-			  args))
-                  (forms (c1args args info))) ;; info updated by args here
-	     (let ((return-type (get-return-type 
-				 (case fname 
-				       ((funcall apply) 
-					(and (consp (car args)) (eq (caar args) 'function) (cadar args))) 
-				       (otherwise fname)))))
-	       (when return-type
-;		 (setf (info-type info) (if (or (eq return-type '*) (equal return-type '(*))) '* return-type))
-		 (setf (info-type info) return-type)
-;		 (if (or (eq return-type '*) (equal return-type '(*)))
-;		     (setf return-type nil)
-;		   (setf (info-type info) return-type))
-		 ))
-	     (let ((arg-types (get-arg-types fname)))
+	       (consp fd)
+	       (si:fixnump (cdr fd))
+	       (not (endp args))
+	       (endp (cdr args)))
+	  (case (car fd)
+		(vector (c1expr `(elt ,(car args) ,(cdr fd))))
+		(list (c1expr `(si:list-nth ,(cdr fd) ,(car args))))
+		(t (c1structure-ref1 (car args) (car fd) (cdr fd)))
+		)
+	  )
+	 ((eq fname 'si:|#,|)
+	  (cmperr "Sharp-comma-macro was found in a bad place."))
+	 (t (let* ((info (make-info :type (if (eq (second *current-form*) fname) ;FIXME must be a better way
+					      (when (boundp '*recursion-detected*) (setq *recursion-detected* t) nil) 
+					    '*)
+				    :sp-change (null (get fname 'no-sp-change))))
+		   (args (if (and (member fname '(funcall apply))
+				  (consp (car args))
+				  (eq (caar args) 'quote)
+				  (symbolp (cadar args)))
+			     `((function ,(cadar args)) ,@(cdr args))
+			   args))
+		   (forms (c1args args info))) ;; info updated by args here
+	      (let ((return-type (get-return-type 
+				  (case fname 
+					((funcall apply) 
+					 (and (consp (car args)) (eq (caar args) 'function) (cadar args))) 
+					(otherwise fname)))))
+		(when return-type
+		  (setf (info-type info) return-type)))
+	      (let ((arg-types (get-arg-types fname)))
                      ;;; Add type information to the arguments.
-	       (when arg-types
-		 (do ((fl forms (cdr fl))
-		      (fl1 nil)
-		      (al args (cdr al)))
-		     ((endp fl)
-		      (setq forms (reverse fl1)))
-		   (cond ((endp arg-types) (push (car fl) fl1))
-			 (t (push (and-form-type (car arg-types)
-						 (car fl)
-						 (car al))
-				  fl1)
-			    (pop arg-types))))))
-	     (let ((arg-types (get fname 'arg-types)))
+		(when arg-types
+		  (do ((fl forms (cdr fl))
+		       (fl1 nil)
+		       (al args (cdr al)))
+		      ((endp fl)
+		       (setq forms (reverse fl1)))
+		      (cond ((endp arg-types) (push (car fl) fl1))
+			    (t (push (and-form-type (car arg-types)
+						    (car fl)
+						    (car al))
+				     fl1)
+			       (pop arg-types))))))
+	      (let ((arg-types (get fname 'arg-types)))
                      ;;; Check argument types.
-	       (when arg-types
-		 (do ((fl forms (cdr fl))
-		      (al args (cdr al)))
-		     ((or (endp arg-types) (endp fl)))
-		   (check-form-type (car arg-types)
-				    (car fl) (car al))
-		   (pop arg-types))))
-	     ;; some functions can have result type deduced from
-	     ;; arg types.
-	     (let ((tem (result-type-from-args fname
-					       (mapcar (lambda (x) (coerce-to-one-value (info-type (cadr x))))
-						       forms))))
-	       (when tem
-		 (setq tem (type-and tem (info-type info)))
-		 (setf (info-type info) tem)))
-	     (list 'call-global info fname forms)))
-        )
-  )
+		(when arg-types
+		  (do ((fl forms (cdr fl))
+		       (al args (cdr al)))
+		      ((or (endp arg-types) (endp fl)))
+		      (check-form-type (car arg-types)
+				       (car fl) (car al))
+		      (pop arg-types))))
+	      ;; some functions can have result type deduced from
+	      ;; arg types.
+	      (let ((tem (result-type-from-args 
+			  fname
+			  (mapcar (lambda (x) (coerce-to-one-value (info-type (cadr x)))) forms))))
+		(when tem
+		  (setq tem (type-and tem (info-type info)))
+		  (setf (info-type info) tem)))
+	      (list 'call-global info fname forms))))))
 
 ;;numbers and character constants may be sometimes used, instead
 ;;of the variable, eg inside eql
@@ -1285,10 +1288,21 @@
 
 
 
-(defun c1lambda-fun (lambda-expr args &aux (info (make-info :sp-change t)))
-  (if (not (intersection '(&optional &rest &key &aux &allow-other-keys) (car lambda-expr)))
+(defun c1lambda-fun (lambda-expr args &aux (info (make-info :sp-change t)) (cle (car lambda-expr)))
+  (if (and (not (intersection '(&rest &key &aux &allow-other-keys) cle))
+	   (cond ((member '&optional cle) (>= (1- (length cle)) (length args)))
+		 ((= (length cle) (length args)))))
       (c1expr
-       `(let (,@(mapcar (lambda (x y) (list x y)) (car lambda-expr)  args))
+       `(let (,@(if (member '&optional cle)
+		    (let* ((ps (remove nil (mapcar (lambda (x) (when (consp x) (caddr x))) cle)))
+			   (ncle (remove '&optional cle))
+			   (vars (append (mapcar (lambda (x) (if (consp x) (car x) x)) ncle) ps))
+			   (vals (append args 
+					(mapcar (lambda (x) (when (consp x) (cadr x))) (nthcdr (length args) ncle))
+					(remove nil (mapcar (lambda (x y) (declare (ignore y)) (and (consp x) (caddr x) t)) ncle args))
+					(make-list (- (length ncle) (length args))))))
+		      (mapcar 'list vars vals))
+		  (mapcar (lambda (x y) (list x y)) cle  args)))
 	  ,@(cdr lambda-expr)))
     (progn 
       (setq args (c1args args info))
@@ -1297,18 +1311,19 @@
       (list 'call-lambda info lambda-expr args))))
 
 (defun c2expr (form)
-  (if (eq (car form) 'call-global)
-      (c2call-global (caddr form) (cadddr form) nil  (info-type (cadr form)))
-      (if (or (eq (car form) 'let)
-                 (eq (car form) 'let*))
-             (let ((*volatile* (volatile (cadr form))))
-                   (declare (special *volatile*))
-                   (apply (get (car form) 'c2) (cddr form)))
-	(let ((tem (get (car form) 'c2)))
-	  (cond (tem (apply tem (cddr form)))
-		((setq tem (get (car form) 'wholec2))
-		 (funcall tem form))
-		(t (baboon)))))))
+  (values
+   (if (eq (car form) 'call-global)
+       (c2call-global (caddr form) (cadddr form) nil  (info-type (cadr form)))
+     (if (or (eq (car form) 'let)
+	     (eq (car form) 'let*))
+	 (let ((*volatile* (volatile (cadr form))))
+	   (declare (special *volatile*))
+	   (apply (get (car form) 'c2) (cddr form)))
+       (let ((tem (get (car form) 'c2)))
+	 (cond (tem (apply tem (cddr form)))
+	       ((setq tem (get (car form) 'wholec2))
+		(funcall tem form))
+	       (t (baboon))))))))
 
 (defun c2funcall-sfun (fn args info &aux  locs (all (cons fn args))) info
   (let ((*inline-blocks* 0))

@@ -211,8 +211,13 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * powm in si
   * fix *tail-recursion-info* for mv-var case
   * fix unset vs_top bug in compile-file
+  * wrap reduce lambdas for null args as a convenience to the
+    user;certain compiler functions wrapped in values for type
+    propagation;Can now inline funcalls to lambdas with optional
+    args;don't load sys-proclaims in lsp and cmpnew cmp-init;
+    proclamations and fast-linking for certain C functions
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 13 Jul 2006 15:58:16 +0000
+ -- Camm Maguire <camm@enhanced.com>  Sat, 15 Jul 2006 00:34:44 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

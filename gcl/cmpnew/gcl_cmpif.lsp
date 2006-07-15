@@ -69,17 +69,11 @@
 (defmacro itp (x) `(info-type (second ,x)))
 (defmacro vlp (x) `(and (eq 'var (car ,x)) (eq (var-kind (car (third ,x))) 'lexical)))
 (defmacro tppr (f r x) (let ((s (gensym))) `(let ((,s (cmp-norm-tp ,x))) (cons (two-tp-inf ,f ,s) (two-tp-inf ,r ,s)))))
-(defmacro reduce-lambda ((x y) &rest forms)
-  (let ((xy (gensym)))
-    `(lambda (&rest ,xy)
-       (when ,xy
-	 (let ((,x (car ,xy)) (,y (cadr ,xy)))
-	   ,@forms)))))
 
 (defun fmla-infer-tp (fmla)
   (case (car fmla)
-	(fmla-and (reduce (reduce-lambda (x y) (tp-reduce 'type-and 'type-or1 x y nil)) (maplist 'fmla-infer-tp (cdr fmla))))
-	(fmla-or  (reduce (reduce-lambda (x y) (tp-reduce 'type-or1 'type-and x y nil)) (maplist 'fmla-infer-tp (cdr fmla))))
+	(fmla-and (reduce (lambda (x y) (tp-reduce 'type-and 'type-or1 x y nil)) (maplist 'fmla-infer-tp (cdr fmla))))
+	(fmla-or  (reduce (lambda (x y) (tp-reduce 'type-or1 'type-and x y nil)) (maplist 'fmla-infer-tp (cdr fmla))))
 	(fmla-not (mapcar (lambda (x) (cons (car x) (cons (cddr x) (cadr x)))) (fmla-infer-tp (cdr fmla))))
 	(var (when (vlp fmla) (list (cons (var-name (car (third fmla))) (cons #t(not null) #tnull)))))
 	(call-global

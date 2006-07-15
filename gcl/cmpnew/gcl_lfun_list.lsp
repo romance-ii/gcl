@@ -6,6 +6,14 @@
 
 (in-package 'compiler)
 
+(dolist (l '((((stream) string) . get-output-stream-string)
+	     (((symbol) string) . symbol-name)
+	     (((*) string) . si::string-concatenate)))
+  (proclaim `(ftype (function ,@(car l)) ,(cdr l))))
+
+
+
+(DEFSYSFUN 'symbol-name "Lsymbol_name" '(T) 'string NIL NIL) 
 (DEFSYSFUN 'si::sputprop "sputprop" '(T T T) 'T NIL NIL) 
 (DEFSYSFUN 'GENSYM "Lgensym" '(*) 'T NIL NIL) 
 (DEFSYSFUN 'SUBSEQ "Lsubseq" '(T T *) 'T NIL NIL) 

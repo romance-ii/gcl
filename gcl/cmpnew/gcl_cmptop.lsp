@@ -276,7 +276,7 @@
 		      (when (member fun '(make-package defpackage)) (wt-data-package-operation form))))
                    ((setq fd (get fun 't1))
                     (when *compile-print* (print-current-form))
-                    (funcall fd args))
+                    (values (funcall fd args)))
                    ((get fun 'top-level-macro)
                     (when *compile-print* (print-current-form))
                     (t1expr (cmp-macroexpand-1 form)))
@@ -1532,7 +1532,7 @@
 			  (concatenate 'string "CMP" z) (or z "")));FIXME t
            "(" (c-function-name "LI" cfun fname) "(")
     (unless (type>= t return-type)
-      (wt "base+1,"))
+      (wt "(fixnum)(base+1),"))
     (do ((types arg-types (cdr types))
          (n 0 (1+ n)))
         ((endp types))

@@ -218,7 +218,7 @@
   (si::write-fasd-top x (car *fasd-data*))
 ;  (sloop::sloop for (k v) in-table (fasd-table (car *fasd-data*))
 ;		when (>= v 0) do (print (list k v)))
-  (si::close-fasd (car *fasd-data*)))
+  (values (si::close-fasd (car *fasd-data*))))
 (defun wt-data-begin ())
 (defun wt-data-end ())
 (defun wt-data-package-operation (x)
