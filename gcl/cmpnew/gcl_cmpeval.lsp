@@ -64,8 +64,8 @@
                  ((constantp form)
                   (let ((val (symbol-value form)))
 		    (or 
-		     (c1constant-value val nil))
-		    `(location ,(make-info :type (object-type val)) (VV ,(add-constant form)))))
+		     (c1constant-value val nil)
+		     `(location ,(make-info :type (object-type val)) (VV ,(add-constant form))))))
                  ((c1var form))))
           ((consp form)
            (let ((fun (car form)))
