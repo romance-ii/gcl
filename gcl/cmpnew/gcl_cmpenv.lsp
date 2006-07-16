@@ -85,34 +85,31 @@
   (wt-data1 x)
   (get-output-stream-string *compiler-output-data*))
 
+(defun add-sharp-comma (object)
+  (cond ((caar (member object *sharp-commas* :key 'cadr :test 'equal)))
+	((push-data-incf nil)
+	 (push (list *next-vv* object) *sharp-commas*)
+	 *next-vv*)))
+
 (defun add-object (object)
   ;;; Used only during Pass 1.
-  (let ((object1 (cond ((and 
-			 (consp object)
-			 (eq (car object) 'si::|#,|)
-			 (not (si:contains-sharp-comma (cdr object))))
-			(cdr object))
-		       ((si:contains-sharp-comma object)
-			`(si::string-to-object ,(wt-to-string object)))
-		       ((typep object 'compiled-function)
-			`(function ,(or (si::compiled-function-name object)
-					(cmperr "Can't dump un named compiled funs"))))
-		       (t object))))
 
-    (or 
-     (cadr (assoc object1 *objects* :test 'equal))
-     (caar (member object1 *sharp-commas* :key #'cadr :test #'equal))
-     (progn
-       (push-data-incf (if (eq object1 object) object1))
-       (if (eq object1 object)
-	   (push (list object1 *next-vv*) *objects*)
-	 (push (list *next-vv* object1) *sharp-commas*))
-       *next-vv*))))
-
+  (cond ((and (consp object) (eq (car object) 'si::|#,|)
+	      (not (si:contains-sharp-comma (cdr object))))
+	 (add-sharp-comma (cdr object)))
+	((si:contains-sharp-comma object)
+	 (add-sharp-comma `(si::string-to-object ,(wt-to-string object))))
+	((typep object 'compiled-function)
+	 (add-sharp-comma `(function ,(or (si::compiled-function-name object)
+					  (cmperr "Can't dump un named compiled funs")))))
+	((cadr (assoc object *objects* :test 'equal)))
+	((push-data-incf object)
+	 (push (list object *next-vv*) *objects*)
+	 *next-vv*)))
 
 (defun add-constant (symbol &aux x)
   ;;; Used only during Pass 1.
-  (cond ((setq x (assoc symbol *constants*))
+  (cond ((setq x (assoc symbol *constants* :test 'equal))
          (cadr x))
         (t (push-data-incf nil)
            (push (list *next-vv* symbol) *sharp-commas*)

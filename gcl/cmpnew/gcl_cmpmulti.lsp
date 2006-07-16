@@ -41,7 +41,7 @@
 	  ((and (every (lambda (x) (or (type>= t x) (and (consp x) (eq (car x) 'returns-exactly)))) tps)
 		(inline-possible 'multiple-value-bind))
 	   (let* ((n (reduce '+ (mapcar (lambda (x) (if (type>= t x) 1 (1- (length x)))) tps)))
-		  (syms (mapcar (lambda (x) (declare (ignore c)) (gensym)) (make-list n)))
+		  (syms (mapcar (lambda (x) (declare (ignore x)) (gensym)) (make-list n)))
 		  (r syms))
 	     (c1expr
 	      (reduce (lambda (x y) 
