@@ -243,7 +243,7 @@
 	  (if (consp v) (push (list (car v) 'macro (cadr v)) env)))
   (and *record-call-info* (add-macro-callee fname))
   (if env (setq env (list nil (nreverse env) nil)))
-  (let* ((args (if (atom args) args (mapcar (lambda (x) (if (and (consp x) (eq (car x) 'load-time-value)) (cmp-eval x) x)) args)))
+  (let* (;(args (if (atom args) args (mapcar (lambda (x) (if (and (consp x) (eq (car x) 'load-time-value)) (cmp-eval x) x)) args)))
 	 (x (multiple-value-list
             (cmp-toplevel-eval
              `(funcall *macroexpand-hook* ',fd ',(cons fname args) ',env)))))
