@@ -221,8 +221,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * fix symbol constants
   * fix symbol constants
   * finally fix nqthm constant bug
+  * fix some old C function signatures
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 16 Jul 2006 03:34:33 +0000
+ -- Camm Maguire <camm@enhanced.com>  Mon, 17 Jul 2006 03:50:46 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

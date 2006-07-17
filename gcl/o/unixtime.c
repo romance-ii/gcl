@@ -155,25 +155,27 @@ LFD(Lsleep)(void)
 	vs_push(Cnil);
 }
 
-LFD(Lget_internal_run_time)(void)
-{
+DEFUNM_NEW("GET-INTERNAL-RUN-TIMES",object,fSget_internal_run_times,SI
+	   ,0,0,NONE,OO,OO,OO,OO,(void),"") {
 
 #ifdef USE_INTERNAL_REAL_TIME_FOR_RUNTIME
-        vs_push(fLget_internal_real_time());
-	vs_push(small_fixnum(0));
-	return;
+  RETURN2(fLget_internal_real_time(),small_fixnum(0));
 #else
-	struct tms buf;
-
-	check_arg(0);
-	times(&buf);
-	vs_push(make_fixnum(buf.tms_utime));
-	vs_push(make_fixnum(buf.tms_cutime));
-
+  struct tms buf;
+  
+  check_arg(0);
+  times(&buf);
+  RETURN2(make_fixnum(buf.tms_utime),make_fixnum(buf.tms_cutime));
+  
 #endif	
-	
+  
 }
 
+DEFUN_NEW("GET-INTERNAL-RUN-TIME",object,fLget_internal_run_time,LISP
+	   ,0,0,NONE,OO,OO,OO,OO,(void),"") {
+  object x=fSget_internal_run_times();
+  RETURN1(x);
+}
 
 DEFUN_NEW("GET-INTERNAL-REAL-TIME",object,fLget_internal_real_time,LISP,0,0,NONE,OO,OO,OO,OO,(void),"Run time relative to beginning")
      
@@ -226,7 +228,7 @@ gcl_init_unixtime(void)
 	make_constant("INTERNAL-TIME-UNITS-PER-SECOND", make_fixnum(HZ1));
 
 	make_function("SLEEP", Lsleep);
-	make_function("GET-INTERNAL-RUN-TIME", Lget_internal_run_time);
+/* 	make_function("GET-INTERNAL-RUN-TIME", Lget_internal_run_time); */
 #if defined __MINGW32__   || !defined NO_SYSTEM_TIME_ZONE
 	make_si_function("GET-SYSTEM-TIME-ZONE", siLget_system_time_zone);
 #endif        
