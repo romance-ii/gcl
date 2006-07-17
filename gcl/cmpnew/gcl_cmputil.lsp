@@ -211,8 +211,8 @@
   (dolist (v *funs*)
 	  (if (consp v) (push (list (car v) 'macro (cadr v)) env)))
   (if env (setq env (list nil (nreverse env) nil)))
-  (let ((x (multiple-value-list
-	     (cmp-toplevel-eval `(macroexpand ',form ',env)))))
+  (let* ((form (if (atom form) form (mapcar (lambda (x) (if (and (consp x) (eq (car x) 'load-time-value)) (cmp-eval x) x)) form)))
+	 (x (multiple-value-list (cmp-toplevel-eval `(macroexpand ',form ',env)))))
     (if (car x)
         (let ((*print-case* :upcase))
           (incf *error-count*)
@@ -226,8 +226,8 @@
 (defun cmp-macroexpand-1 (form &aux env)
   (dolist (v *funs*)
 	  (if (consp v) (push (list (car v) 'macro (cadr v)) env))) 
-  (let ((x (multiple-value-list (cmp-toplevel-eval `(macroexpand-1 ',form
-								   ',env)))))
+  (let* ((form (if (atom form) form (mapcar (lambda (x) (if (and (consp x) (eq (car x) 'load-time-value)) (cmp-eval x) x)) form)))
+	 (x (multiple-value-list (cmp-toplevel-eval `(macroexpand-1 ',form ',env)))))
     (if (car x)
         (let ((*print-case* :upcase))
           (incf *error-count*)
@@ -243,7 +243,8 @@
 	  (if (consp v) (push (list (car v) 'macro (cadr v)) env)))
   (and *record-call-info* (add-macro-callee fname))
   (if env (setq env (list nil (nreverse env) nil)))
-  (let ((x (multiple-value-list
+  (let* ((args (if (atom args) args (mapcar (lambda (x) (if (and (consp x) (eq (car x) 'load-time-value)) (cmp-eval x) x)) args)))
+	 (x (multiple-value-list
             (cmp-toplevel-eval
              `(funcall *macroexpand-hook* ',fd ',(cons fname args) ',env)))))
     (if (car x)
