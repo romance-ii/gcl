@@ -225,8 +225,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * eval load-time-values when expanding macros in the compiler
   * revert load-time-value expansion
   * first stab at mutual recursion autoproclamation
+  * fix some mutual recursion autoproclamation issues
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 18 Jul 2006 04:52:18 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 18 Jul 2006 14:41:12 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

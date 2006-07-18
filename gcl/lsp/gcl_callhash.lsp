@@ -182,8 +182,11 @@
 	((atom src) nil)
 	((eq (car src) 'macrolet)
 	 (list (mapcar 'car (cadr src)) 
-	       (mapcar 'caadr (cddr (caddr src)))))
+	       (mapcar (lambda (x) (if (eq (caadr x) 'funcall) (cadadr x) (caadr x))) (cddr (caddr src)))))
 	((or (old-src stfn (car src) syms sts srcs) (old-src stfn (cdr src) syms sts srcs)))))
+
+(defun lambda-vars (ll)
+  (remove '&optional (mapcar (lambda (x) (if (consp x) (car x) x)) ll)))
 
 (defun inlinef (n syms sts fns)
     (unless (some (lambda (x) (intersection '(&rest &key &aux &allow-other-keys) (cadr x))) fns)
@@ -192,7 +195,7 @@
 	     (min (reduce 'min (mapcar (lambda (x) 
 					 (let* ((ll (cadr x))) 
 					   (- (length ll) (length (member '&optional ll))))) fns)))
-	     (max (reduce 'max (mapcar (lambda (x) (length (remove '&optional (cadr x)))) fns)))
+	     (max (reduce 'max (mapcar (lambda (x) (length (lambda-vars (cadr x)))) fns)))
 	     (reqs (nsyms min))
 	     (opts (nsyms (- max min)))
 	     (ll (append reqs (when (> max min) (cons '&optional opts))))
@@ -205,13 +208,13 @@
 		   (let ((q (pop z)))
 		     (when (and (consp (cadr q)) (eq 'optimize (caadr q))) 
 		       (push q d)))))
-	   (macrolet ,(mapcan (lambda (x y z) `((,x ,(cadr y) `(,',n ,,z ,,@(remove '&optional (cadr y)))))) syms fns sts)
+	   (macrolet ,(mapcan (lambda (x y z) `((,x ,(cadr y) `(,',n ,,z ,,@(lambda-vars (cadr y)))))) syms fns sts)
 		     (case state
 			   ,@(mapcar (lambda (x y)
 				       `(,(if (= x lsst) 'otherwise x) 
 					 (funcall ,y ,@(reverse 
 							(early-nthcdr 
-							 (- max (length (remove '&optional (cadr y))))
+							 (- max (length (lambda-vars (cadr y))))
 							 all))))) sts fns)))))))
 
 (defun sig (x) (let ((h (gethash x *call-hash-table*))) (when h (call-sig h))))
