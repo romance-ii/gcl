@@ -24,17 +24,18 @@
 	     (defvar *needs-recompile* (make-array 10 :fill-pointer 0 :adjustable t))
 	     (defvar *ach* (make-hash-table :test 'eq))
 	     (defvar *acr* (make-hash-table :test 'eq))
+	     (defvar *cmr* nil)
 	     (setq *tmp-dir* (get-temp-dir))
 	     (setq *boot* t)
 	     (mapc 'eval (nreverse *pahl*))
 	     (setq *pahl* nil))))
 	((let ((h (or (gethash fn *call-hash-table*)
 		      (setf (gethash fn *call-hash-table*) (make-call :sig sig)))))
+	   (pushnew fn *cmr*)
 	   (when sig 
 	     (unless (eq (cadr sig) '*) (putprop fn t 'proclaimed-function))
 	     (putprop fn (car sig) 'proclaimed-arg-types)
 	     (putprop fn (cadr sig) 'proclaimed-return-type))
-;	     (proclaim `(ftype (function ,@sig) ,fn)))
 	   (when (and sig (not (equal sig (call-sig h))))
 	     (dolist (l (call-callers h))
 	       (unless (eq l fn)
@@ -42,11 +43,13 @@
 	     (setf (call-sig h) sig))
 	   (when src (setf (call-src h) src))
 	   (let (ar)
+	     (when callees (remhash fn *ach*))
 	     (dolist (l callees (unless ar (when sig (remove-recompile fn))))
 	       (pushnew (car l) (call-callees h))
 	       (let ((h (or (gethash (car l) *call-hash-table*)
 			    (setf (gethash (car l) *call-hash-table*) (make-call :sig (cdr l) :callers (list fn))))))
 		 (pushnew fn (call-callers h))
+		 (remhash (car l) *acr*)
 		 (unless (or (eq fn (car l)) (equal (cdr l) (call-sig h)))
 		   (add-recompile fn (car l) (cdr l) (call-sig h))
 		   (setq ar t)))))))))
@@ -56,11 +59,14 @@
 	 (push `(clear-compiler-properties ',sym nil) *pahl*))
 	((let ((h (or (gethash sym *call-hash-table*) 
 		      (setf (gethash sym *call-hash-table*) (make-call)))))
+
+	   (pushnew sym *cmr*)
+
 	   (dolist (l (call-callees h))
+	     (remhash l *acr*)
 	     (let ((l (gethash l *call-hash-table*)))
 	       (setf (call-callers l) (delete sym (call-callers l)))))
-	   (remhash sym *ach*)
-	   (remhash sym *acr*)
+
 	   (unless *disable-recompile*
 	     (let ((x (get sym 'state-function)))
 	       (when x
@@ -70,6 +76,7 @@
 			   (unless (eq sym x)
 			     (eval `(defun ,x ,@(cdr y))))) (car o) (cadr o))
 		   (unintern x)))))
+
 	   (let (new)
 	     (maphash (lambda (x y) 
 			(when (and (fboundp x) (eq (symbol-function x) code) (call-src y))
@@ -77,6 +84,7 @@
 	     (cond (new
 		    (let ((nr (find new *needs-recompile* :key 'car)))
 		      (when nr (add-recompile sym (cadr nr) (caddr nr) (cadddr nr))))
+		    (setf (gethash sym *ach*) (gethash new *ach*))
 		    (setq new (gethash new *call-hash-table*))
 		    (let ((ns (call-sig new)))
 		      (unless (equal ns (call-sig h))
@@ -85,10 +93,12 @@
 		      (setf (call-sig h) ns)
 		      (proclaim `(ftype (function ,@ns) ,sym)))
 		    (dolist (l (call-callees new)) 
+		      (remhash l *acr*)
 		      (pushnew sym (call-callers (gethash l *call-hash-table*))))
 		    (setf (call-callees h) (call-callees new) (call-src h) (call-src new)))
 		   ((progn
 		      (remove-recompile sym)
+		      (remhash sym *ach*)
 		      (setf (call-callees h) nil (call-src h) nil)))))))))
 
 (defun add-recompile (fn why assumed-sig actual-sig)
@@ -238,7 +248,7 @@
       (let* ((e (all-callees sym nil))
 	     (r (all-callers sym nil))
 	     (i (intersection e r)))
-	(remove-if (lambda (x) (or (get x 'mutual-recursion-group)
+	(remove-if (lambda (x) (or (get x 'mutual-recursion-group);FIXME
 				   (get x 'state-function)))
 		     (remove-if-not (lambda (x) (eq '* (cadr (sig x)))) i))))))
 
@@ -303,9 +313,11 @@
 (defun do-recompile (&optional pn)
   (unless (or *disable-recompile* (= 0 (length *needs-recompile*)))
     (let ((*disable-recompile* t))
-      (clrhash *ach*)
-      (clrhash *acr*)
-      (maphash (lambda (x y) (declare (ignore y)) (convert-to-state x)) *call-hash-table*)
+;      (clrhash *ach*)
+;      (clrhash *acr*)
+;      (maphash (lambda (x y) (declare (ignore y)) (convert-to-state x)) *call-hash-table*)
+      (dolist (l *cmr*) (convert-to-state l))
+      (setq *cmr* nil)
       (sort *needs-recompile*
 	    (lambda (x y) 
 	      (member (car x) (all-callees (car y) nil))))

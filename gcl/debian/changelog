@@ -226,8 +226,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * revert load-time-value expansion
   * first stab at mutual recursion autoproclamation
   * fix some mutual recursion autoproclamation issues
+  * faster mutual recursion detection
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 18 Jul 2006 14:41:12 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 18 Jul 2006 17:39:08 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
