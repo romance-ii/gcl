@@ -170,7 +170,11 @@
 (defun max-types (sigs &optional res)
   (cond ((not res) (max-types (cdr sigs) (ldiff (caar sigs) (member '* (caar sigs)))))
 	((not sigs) res)
-	((max-types (cdr sigs) (mapcar (lambda (x y) (or (not (equal x y)) x)) (caar sigs) res)))))
+	((max-types (cdr sigs) 
+		    (let ((z (ldiff (caar sigs) (member '* (caar sigs)))))
+		      (append
+		       (mapcar (lambda (x y) (or (not (equal x y)) x)) z res)
+		     (early-nthcdr (length z) res)))))))
 
 (defun early-nthcdr (i x)
   (declare (seqind i))
