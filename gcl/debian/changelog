@@ -224,8 +224,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * fix some old C function signatures
   * eval load-time-values when expanding macros in the compiler
   * revert load-time-value expansion
+  * first stab at mutual recursion autoproclamation
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 17 Jul 2006 22:24:44 +0000
+ -- Camm Maguire <camm@enhanced.com>  Tue, 18 Jul 2006 04:52:18 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

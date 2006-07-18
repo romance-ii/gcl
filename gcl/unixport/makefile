@@ -121,7 +121,6 @@ saved_%:raw_% $(RSYM) init_%.lsp raw_%_map \
 	$(MAKE) raw_$*$(EXE)
 	$(PORTDIR)/raw_$*$(EXE) $(PORTDIR)/ $(LISPFLAGS) -libdir $(GCLDIR)/ < foo
 
-
 #*optimize-maximum-pages* setting is redundant here, but for good measure	
 	[ "$@" != "$(FLISP)" ] || (echo "(setq si::*optimize-maximum-pages* nil)" >foo;\
 				cat init_$*.lsp >>foo;\

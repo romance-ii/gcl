@@ -76,7 +76,7 @@
 ;		(values-list values)))
 ;	    (error "~S failed." 'compile-file)))))
 
-(defun compile (name &rest args)
+(defun compile (name &optional def)
   (let (warnings failures)
     (handler-bind
      ((warning (lambda (c) 
@@ -90,9 +90,9 @@
 	       (setq failures t))))
      (loop 
       (with-simple-restart 
-       (retry "Retry compiling ~S." (cons name args))
-       (let ((res (apply #.(si::function-src 'compile) name args)))
-	 (when compiler::*error-p* (error "Compilation of ~s failed." (cons name args)))
+       (retry "Retry compiling ~S." (list name def))
+       (let ((res (funcall #.(si::function-src 'compile) name def)))
+	 (when compiler::*error-p* (error "Compilation of ~s failed." (list name def)))
 	 (return (values res warnings failures))))))))
 
 ;(defun clcs-compile (&rest args)
