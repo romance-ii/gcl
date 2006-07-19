@@ -560,8 +560,22 @@
 		(nf (if fd (cmp-expand-macro fd (car form) (cdr form)) form)))
 	   (portable-source nf (equal form nf))))))
 
-(defun pd (form)
-  (portable-source form))
+(defun pd (fname ll args)
+  (let (decls doc)
+    (when (and (consp args) (stringp (car args))) (push (pop args) doc))
+    (do nil ((or (not args) (not (consp (car args))) (not (eq (caar args) 'declare))))
+	(push (pop args) decls))
+    (let* ((nal (do (r (y ll)) ((or (not y) (eq (car y) '&aux)) (nreverse r)) (push (pop y) r)))
+	   (al (cdr (member '&aux ll)))
+	   (dd (aux-decls (mapcar (lambda (x) (if (atom x) x (car x))) al) decls)))
+      (portable-source `(lambda ,nal
+			  ,@doc
+			  (declare (optimize (safety ,(cond (*compiler-push-events* 3)
+							    (*safe-compile* 2)
+							    (*compiler-check-args* 1)
+							    (0)))))
+			  ,@(nreverse (cadr dd))
+			  (block ,fname (let* ,al ,@(car dd) ,@args)))))))
 
 ;FIXME should be able to carry a full type here.
 (defun sanitize-tp (tp)
@@ -716,21 +730,15 @@
   (push (list defun fname cfun lambda-expr doc *special-binding*)
 	*top-level-forms*)
   (push (cons fname cfun) *global-funs*)
-  (let (decls doc (ll (cadr args)) (args (cddr args)))
-    (when (and (consp args) (stringp (car args))) (push (pop args) doc))
-    (do nil ((or (not args) (not (consp (car args))) (not (eq (caar args) 'declare))))
-	(push (pop args) decls))
-    (let* ((nal (do (r (y ll)) ((or (not y) (eq (car y) '&aux)) (nreverse r)) (push (pop y) r)))
-	   (al (cdr (member '&aux ll)))
-	   (dd (aux-decls (mapcar (lambda (x) (if (atom x) x (car x))) al) decls)))
-      (push (cons fname (pd `(lambda ,nal
-			       ,@doc
-			       (declare (optimize (safety ,(cond (*compiler-push-events* 3)
-								 (*safe-compile* 2)
-								 (*compiler-check-args* 1)
-								 (0)))))
-			       ,@(nreverse (cadr dd))
-			       (block ,fname (let* ,al ,@(car dd) ,@args))))) *portable-source*)))))
+
+  (si::add-hash fname nil nil
+		(let* ((w (make-string-output-stream))
+		       (ss (si::open-fasd w :output nil nil))
+		       (out (pd fname (cadr args) (cddr args))))
+		  (si::find-sharing-top out (aref ss 1))
+		  (si::write-fasd-top out ss)
+		  (si::close-fasd ss)
+		  (get-output-stream-string w)))))
 
 (defun make-inline-string (cfun args fname)
   (if (null args)
@@ -917,13 +925,7 @@
 						     (unless (and y (eq (cadr y) x))
 						       (si::call-sig (gethash x si::*call-hash-table*))))))
 					 (sublis +cmp-fn-alist+ (si::call-callees h)))
-			       ,(let* ((w (make-string-output-stream))
-				       (ss (si::open-fasd w :output nil nil))
-				       (out (cdr (assoc fname *portable-source*))))
-				  (si::find-sharing-top out (aref ss 1))
-				  (si::write-fasd-top out ss)
-				  (si::close-fasd ss)
-				  (get-output-stream-string w))))))
+			       ,(si::call-src h)))))
 
   (let ((base-name (setf-function-base-symbol fname)))
     (when base-name

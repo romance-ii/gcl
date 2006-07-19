@@ -33,8 +33,6 @@
 ;;; If *safe-compile* is ON, some kind of run-time checks are not
 ;;; included in the compiled code.  The default value is OFF.
 
-(defvar *portable-source*)
-
 (defun init-env ()
   (setq *next-cvar* 0)
   (setq *next-cmacro* 0)
@@ -55,8 +53,7 @@
   (setq *function-declarations* nil)
   (setq *inline-functions* nil)
   (setq *inline-blocks* 0)
-  (setq *notinline* nil)
-  (setq *portable-source* nil))
+  (setq *notinline* nil))
 
 
 (defvar *next-cvar* 0)
