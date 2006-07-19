@@ -227,8 +227,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * first stab at mutual recursion autoproclamation
   * fix some mutual recursion autoproclamation issues
   * faster mutual recursion detection
+  * optional arg tail recursion for t3defun-normal case
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 18 Jul 2006 17:39:08 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 19 Jul 2006 03:54:12 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

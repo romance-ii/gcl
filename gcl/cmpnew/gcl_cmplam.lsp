@@ -424,10 +424,11 @@
                   (dolist* (var (car lambda-list) t)
                     (when (var-ref-ccb var) (return nil)))
 				;;; no required is closed in a closure,
-                  (null (cadr lambda-list))	;;; no optionals,
+                  (every (lambda (x) (and (consp x) (consp (cadr x)) (eq (caadr x) 'location))) (cadr lambda-list))
+					;(null (cadr lambda-list))	;;; no optionals,
                   (null (caddr lambda-list))	;;; no rest parameter, and
                   (not (cadddr lambda-list)))	;;; no keywords.
-             (cons fname (car lambda-list))
+             (cons fname (append (car lambda-list) (cadr lambda-list)))
              nil)))
     (let ((*rest-on-stack*
 	    (cond ((and (caddr lambda-list)
