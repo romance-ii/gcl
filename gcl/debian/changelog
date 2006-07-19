@@ -228,8 +228,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * fix some mutual recursion autoproclamation issues
   * faster mutual recursion detection
   * optional arg tail recursion for t3defun-normal case
+  * pop doc from lambda-fun -> let conversion in c1lambda-fun
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 19 Jul 2006 03:54:12 +0000
+ -- Camm Maguire <camm@enhanced.com>  Wed, 19 Jul 2006 14:05:12 +0000
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

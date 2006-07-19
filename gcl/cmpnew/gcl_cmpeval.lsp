@@ -1307,7 +1307,7 @@
 					(make-list (- (length ncle) (length args))))))
 		      (mapcar 'list vars vals))
 		  (mapcar (lambda (x y) (list x y)) cle  args)))
-	  ,@(cdr lambda-expr)))
+	  ,@(if (stringp (cadr lambda-expr)) (cddr lambda-expr) (cdr lambda-expr))))
     (progn 
       (setq args (c1args args info))
       (setq lambda-expr (c1lambda-expr lambda-expr))
