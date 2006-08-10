@@ -1294,7 +1294,7 @@ AC_SUBST(PAGEWIDTH)
 AC_TRY_RUN([#include <stdio.h>
             #include <unistd.h>
 int main() {FILE *fp=fopen("conftest1","w");
-	    fprintf(fp,"%u",262144*($SIZEOF_LONG>>2)/(1<<($PAGEWIDTH-12)));
+	    fprintf(fp,"%u",262144*( SIZEOF_LONG >>2)/(1<<($PAGEWIDTH-12)));
 	    return 0;}],def_maxpage=`cat conftest1`,def_maxpage=262144,def_maxpage=262144)
 
 AC_ARG_ENABLE(maxpage,
@@ -1494,8 +1494,9 @@ main()
   j=((unsigned long)$enable_maxpage <<$PAGEWIDTH) + $dbegin;
   j=$heap_ceiling && j>$heap_ceiling ? $heap_ceiling : j;
   j-=$dbegin;
-  for (i=1;i<<1 && i<=j;i<<=1);
-  if (i>j) i>>=1;
+  /*  for (i=1;i<<1 && i<=j;i<<=1); */
+  /*  if (i>j) i>>=1; */
+  i=j;
   fprintf(fp,"%ld",i>>$PAGEWIDTH);
   fclose(fp);
   return 0;
@@ -2344,8 +2345,9 @@ if test "$use" != "mingw" ; then
     AC_MSG_RESULT(yes)
     AC_DEFINE(HAVE_ALLOCA)
   else
-    AC_TRY_RUN([#include <alloca.h>
-    int main() { exit(alloca(500) != NULL ? 0 : 1)}],
+    AC_TRY_RUN([#include <stdio.h>
+		#include <alloca.h>
+    int main() { exit(alloca(500) != NULL ? 0 : 1);}],
     ,gcl_ok=yes, gcl_ok=no,gcl_ok=no)
     if test $gcl_ok = yes ; then
       AC_MSG_RESULT(yes)
