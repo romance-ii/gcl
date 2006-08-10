@@ -823,6 +823,8 @@ if test "$enable_xgcl" = "yes" ; then
    if test "$miss" = "1" ; then
       X_CFLAGS=
       X_LIBS=
+      X_PRE_LIBS=
+      X_EXTRA_LIBS=
       AC_MSG_RESULT(no)
    else
       AC_MSG_RESULT(yes)
@@ -2394,10 +2396,10 @@ if  2>&1 $CC -v | fgrep "gcc version 2.96" > /dev/null
 	AC_MSG_RESULT([no])
 fi 
 
-LIBS="`echo $LDFLAGS | sed 's,gcl.script,../unixport/gcl.script,g'` $TLDFLAGS $TLIBS $LIBS"
+LIBS="`echo $LDFLAGS | sed 's,gcl.script,../unixport/gcl.script,g'` $X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS $TLDFLAGS $TLIBS $LIBS"
 AC_SUBST(LIBS)
 
-FINAL_CFLAGS="$CFLAGS $TCFLAGS $PROCESSOR_FLAGS"
+FINAL_CFLAGS="$CFLAGS $X_CFLAGS $TCFLAGS $PROCESSOR_FLAGS"
 AC_SUBST(FINAL_CFLAGS)
 # Work around bug with gcc on ppc -- CM
 NIFLAGS="$CFLAGS $TCFLAGS $TONIFLAGS $PROCESSOR_FLAGS -I\$(GCLDIR)/o"

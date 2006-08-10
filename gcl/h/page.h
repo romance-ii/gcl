@@ -65,7 +65,7 @@ char sgc_type_map[MAXPAGE];
 
 
 #define  IF_WRITABLE(x,if_code) do {unsigned long xSG= page(x); \
-			    if(((xSG & (-MAXPAGE)) ==0) && xSG < MAXPAGE && \
+			    if(xSG < MAXPAGE && \
 			       (sgc_type_map[xSG] & SGC_WRITABLE)) \
 				 {if_code;}} while(0)
 

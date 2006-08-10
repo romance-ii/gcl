@@ -231,8 +231,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * pop doc from lambda-fun -> let conversion in c1lambda-fun
   * call-src set in t1defun;try to prevent extraneous mutual recursion
     state transformations
+  * Remove power of two limit to MAXPAGE;fix X lib paths
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 19 Jul 2006 23:46:21 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 10 Aug 2006 13:53:56 -0400
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

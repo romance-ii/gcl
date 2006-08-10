@@ -912,7 +912,7 @@ set_maxpage(void) {
     maxpage=page(heap_end);
     memory_protect(sgc_enabled ? 1 : 0);
   }
-  if (~(-MAXPAGE) != MAXPAGE-1) error("MAXPAGE must be power of 2");
+/*   if (~(-MAXPAGE) != MAXPAGE-1) error("MAXPAGE must be power of 2"); */
   /* FIXME ensure core_end in range for type_map reference below.  CM */
   if (core_end)
     bzero(&sgc_type_map[ page(core_end)],MAXPAGE- page(core_end));
