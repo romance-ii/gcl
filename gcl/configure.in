@@ -1403,7 +1403,11 @@ AC_DEFINE_UNQUOTED(SHARED_LIB_HEAP_CEILING,$heap_ceiling)
 
 ## Don't lower heap start if C stack is below default dbegin, as we're
 # likely to get more heap this way.
-echo "int main() {return !($heap_ceiling && (unsigned long)$dbegin < (unsigned long)$cstack_address);}" >foo.c
+if test "$enable_static" = "yes" ; then 
+   echo "int main() {return !((unsigned long)$dbegin < (unsigned long)$cstack_address);}" >foo.c
+else
+   echo "int main() {return !($heap_ceiling && (unsigned long)$dbegin < (unsigned long)$cstack_address);}" >foo.c
+fi
 $CC foo.c -o foo
 if ./foo ; then
 
