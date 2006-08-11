@@ -2338,21 +2338,24 @@ AC_SUBST(NOTIFY)
 
 if test "$use" != "mingw" ; then
   AC_MSG_CHECKING([alloca])
-  AC_TRY_RUN([int main() {return alloca(500) ? 0 : 1;}],gcl_ok=yes, gcl_ok=no,gcl_ok=no)
-  if test $gcl_ok = yes ; then
-    AC_MSG_RESULT(yes)
-    AC_DEFINE(HAVE_ALLOCA)
-  else
-    AC_TRY_RUN([#include <alloca.h>
+#  AC_TRY_RUN([#include <stdio.h>
+#  int main() {return alloca(500) ? 0 : 1;}],gcl_ok=yes, gcl_ok=no,gcl_ok=no)
+#  if test $gcl_ok = yes ; then
+#    AC_MSG_RESULT(yes)
+#    AC_DEFINE(HAVE_ALLOCA)
+#  else
+    AC_TRY_RUN([#include <stdio.h>
+		#include <alloca.h>
     int main() {return alloca(500) ? 0 : 1;}],gcl_ok=yes, gcl_ok=no,gcl_ok=no)
     if test $gcl_ok = yes ; then
       AC_MSG_RESULT(yes)
       AC_DEFINE(HAVE_ALLOCA)
       AC_DEFINE(NEED_ALLOCA_H)
-    fi
+#    fi
   fi
 
   if test $gcl_ok = no ; then     AC_MSG_RESULT(no) ; fi
+
 fi
 
 
