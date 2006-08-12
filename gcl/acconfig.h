@@ -274,3 +274,4 @@ SGC is enabled.  */
 #undef HAVE_XGCL
 #undef HAVE_TK
 #undef WITH_WINMAIN
+#undef USE_FAST_NULL_OR_ON_CSTACK_MACRO

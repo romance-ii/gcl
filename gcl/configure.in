@@ -1591,6 +1591,22 @@ else
 fi
 AC_DEFINE_UNQUOTED(CSSIZE,$enable_cssize)
 
+AC_MSG_CHECKING(for fast NULL_OR_ON_CSTACK macro)
+AC_TRY_RUN([#include <stdio.h>
+int
+main()
+{
+  return (long)$dbegin>=0 &&
+         ((long)$dbegin+((long)$enable_maxpage)<<PAGEWIDTH) >=0 &&
+	 ((long)$cstack_address<0) ? 0 : 1;
+}],tmp_fnocm=yes,tmp_fnocm=no,tmp_fnocm=no)
+if test "$tmp_cssize" != "yes" ; then
+   AC_MSG_RESULT(yes)
+   AC_DEFINE(USE_FAST_NULL_OR_ON_CSTACK_MACRO)
+else
+   AC_MSG_RESULT(no)
+fi
+
 mem_top=0
 mem_range=0
 AC_MSG_CHECKING(mem top)
