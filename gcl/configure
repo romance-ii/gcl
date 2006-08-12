@@ -5204,7 +5204,7 @@ int
 main()
 {
   return (long)$dbegin>=0 &&
-         ((long)$dbegin+((long)$enable_maxpage)<<PAGEWIDTH) >=0 &&
+         ((long)$dbegin+(long)($enable_maxpage<<PAGEWIDTH)) >=0 &&
 	 ((long)$cstack_address<0) ? 0 : 1;
 }
 EOF

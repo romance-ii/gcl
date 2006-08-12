@@ -274,7 +274,7 @@ EXTER struct printStruct *printStructBufp;
 #ifndef NULL_OR_ON_C_STACK
 
 
-#ifdef NEG_CSTACK_ADDRESS
+#ifdef USE_FAST_NULL_OR_ON_CSTACK_MACRO
 #define NULL_OR_ON_C_STACK(x) ((long)x <= DBEGIN)     
 #else
 #define NULL_OR_ON_C_STACK(x) (((unsigned long)x)<=DBEGIN || ((unsigned long)x) >= (unsigned long)(pagetochar(MAXPAGE)))

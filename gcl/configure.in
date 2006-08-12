@@ -1597,7 +1597,7 @@ int
 main()
 {
   return (long)$dbegin>=0 &&
-         ((long)$dbegin+((long)$enable_maxpage)<<PAGEWIDTH) >=0 &&
+         ((long)$dbegin+(long)($enable_maxpage<<PAGEWIDTH)) >=0 &&
 	 ((long)$cstack_address<0) ? 0 : 1;
 }],tmp_fnocm=yes,tmp_fnocm=no,tmp_fnocm=no)
 if test "$tmp_cssize" != "yes" ; then

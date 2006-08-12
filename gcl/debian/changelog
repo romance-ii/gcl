@@ -233,8 +233,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     state transformations
   * Remove power of two limit to MAXPAGE;fix X lib paths
   * uncap maxpage;configure cleanups
+  * automatic fast NULL_OR_ON_CSTACK macro detection
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 10 Aug 2006 17:34:31 -0400
+ -- Camm Maguire <camm@enhanced.com>  Fri, 11 Aug 2006 23:04:39 -0400
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
