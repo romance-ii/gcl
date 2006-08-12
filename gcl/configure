@@ -5203,9 +5203,9 @@ else
 int
 main()
 {
-  return (long)$dbegin>=0 &&
+  return ((long)$dbegin>=0 &&
          ((long)$dbegin+(long)($enable_maxpage<<PAGEWIDTH)) >=0 &&
-	 ((long)$cstack_address<0) ? 0 : 1;
+	 ((long)$cstack_address<0)) ? 0 : 1;
 }
 EOF
 if { (eval echo configure:5212: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
