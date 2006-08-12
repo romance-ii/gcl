@@ -5220,7 +5220,7 @@ fi
 rm -fr conftest*
 fi
 
-if test "$tmp_cssize" != "yes" ; then
+if test "$tmp_fnocm" = "yes" ; then
    echo "$ac_t""yes" 1>&6
    cat >> confdefs.h <<\EOF
 #define USE_FAST_NULL_OR_ON_CSTACK_MACRO 1
