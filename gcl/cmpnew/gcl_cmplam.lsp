@@ -363,11 +363,11 @@
         (add-info aux-info (cadr body))
 	(setf (info-type aux-info) (info-type (cadr body)))
         (setq body (list 'let* aux-info aux-vars aux-inits body))
-	(or (eql setjmps *setjmps*) (setf (info-volatile aux-info) t)))
+	(or (eql setjmps *setjmps*) (setf (info-volatile aux-info) 1)))
 
   ;;FIXME -- is above for aux needed too?
   (when (or optionals keywords)
-    (or (eql setjmps *setjmps*) (setf (info-volatile info) t)))
+    (or (eql setjmps *setjmps*) (setf (info-volatile info) 1)))
 
   (setq body (fix-down-args requireds body block-name))
   (setq lambda-list
@@ -770,7 +770,7 @@
   (setq body (c1decl-body other-decls body))
   (add-info *dm-info* (cadr body))
    (cond ((eql setjmps *setjmps*))
-         (t(setf (info-volatile *dm-info*) t)
+         (t(setf (info-volatile *dm-info*) 1)
            (setf (get macro-name 'contains-setjmp) t)
                ))
   (dolist* (v *dm-vars*) (check-vref v))

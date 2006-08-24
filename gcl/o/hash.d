@@ -240,9 +240,11 @@ BEGIN:
 }
 
 	
-static object
-FFN(hash_equal)(object x,int depth) {
-  return make_fixnum(ihash_equal(x,depth));
+DEFUN_NEW("HASH-EQUAL",object,fShash_equal,SI
+	  ,2,2,NONE,OO,IO,OO,OO,(object x,fixnum depth),"") {
+/* static object */
+/* FFN(hash_equal)(object x,int depth) { */
+  RETURN1(make_fixnum(ihash_equal(x,depth)));
 }
 
 #define ihash_equalp(a_,b_) ((type_of(a_)==t_symbol && (a_)->s.s_hash) ? (a_)->s.s_hash : ihash_equalp1(a_,b_))
@@ -408,9 +410,11 @@ BEGIN:
 }
 
 	
-static object
-FFN(hash_equalp)(object x,int depth) {
-  return make_fixnum(ihash_equalp(x,depth));
+DEFUN_NEW("HASH-EQUALP",object,fShash_equalp,SI
+	  ,2,2,NONE,OO,IO,OO,OO,(object x,fixnum depth),"") {
+/* static object */
+/* FFN(hash_equalp)(object x,int depth) { */
+  RETURN1(make_fixnum(ihash_equalp(x,depth)));
 }
 
 /* 
@@ -528,15 +532,16 @@ extend_hashtable(object hashtable) {
   
   /* Compute new size for the larger hashtable */
   
+  new_size=hashtable->ht.ht_size+1;
   switch (type_of(hashtable->ht.ht_rhsize)) {
   case t_fixnum:
-    new_size = hashtable->ht.ht_size + fix(hashtable->ht.ht_rhsize);
+    new_size *= fix(hashtable->ht.ht_rhsize);
     break;
   case t_shortfloat:
-    new_size = hashtable->ht.ht_size * sf(hashtable->ht.ht_rhsize);
+    new_size *= sf(hashtable->ht.ht_rhsize);
     break;
   case t_longfloat:
-    new_size = hashtable->ht.ht_size * lf(hashtable->ht.ht_rhsize);
+    new_size *= lf(hashtable->ht.ht_rhsize);
     break;
   }
   
@@ -947,8 +952,6 @@ DEFUN_NEW("HASH-TABLE-REHASH-THRESHOLD",object,fLhash_table_rehash_threshold,LIS
   RETURN1(table->ht.ht_rhthresh);
 }
 
-
-
 void
 gcl_init_hash()
 {
@@ -969,9 +972,9 @@ gcl_init_hash()
 	make_function("CLRHASH", Lclrhash);
 	make_function("HASH-TABLE-COUNT", Lhash_table_count);
    	make_function("SXHASH", Lsxhash);
-	make_si_sfun("HASH-EQUAL",hash_equal,ARGTYPE2(f_object,f_fixnum)
-						| RESTYPE(f_object));
-	make_si_sfun("HASH-EQUALP",hash_equalp,ARGTYPE2(f_object,f_fixnum)
-						| RESTYPE(f_object));
+/* 	make_si_sfun("HASH-EQUAL",hash_equal,ARGTYPE2(f_object,f_fixnum) */
+/* 						| RESTYPE(f_object)); */
+/* 	make_si_sfun("HASH-EQUALP",hash_equalp,ARGTYPE2(f_object,f_fixnum) */
+/* 						| RESTYPE(f_object)); */
 	make_si_function("HASH-SET", siLhash_set);
 }

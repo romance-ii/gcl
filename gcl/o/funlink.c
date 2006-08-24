@@ -1334,6 +1334,8 @@ call_proc(object sym, int setf, void **link, int argd, va_list ll)
 
 /* For ANSI C stdarg */
 
+DEFVAR("*FAST-LINK-WARNINGS*",sSAfast_link_warningsA,SI,Cnil,"");
+
 object
 call_proc_new(object sym, int setf,int vald, void **link, int argd, object first, va_list ll) {
 
@@ -1358,24 +1360,60 @@ call_proc_new(object sym, int setf,int vald, void **link, int argd, object first
       fas=0;
     if ((VFUN_NARG_BIT & argd) == 0)
       do_link=0;
-    if (vald!=fun->sfn.sfn_nval) {
-      fprintf(stderr,"Warning: val mismatch in call to %-.*s prevents fast linking: %d %ld, recompile caller\n",
-	      (int)sym->s.s_fillp,sym->s.s_self,vald,fun->sfn.sfn_nval);
+    if (vald!=fun->sfn.sfn_nval)
+      if (vald<=0 || 
+	  !fun->sfn.sfn_nval || 
+	  fun->sfn.sfn_nval>vald)
+	fas=0;
+    break;
+  case t_afun:
+    if (nargs<F_MIN_ARGS(fun->sfn.sfn_argd) ||
+	nargs>F_MAX_ARGS(fun->sfn.sfn_argd))
       fas=0;
+    if (argd&MVRET_BIT)
+      fas=0;
+/*     if (!F_ARG_FLAGS_P(fun->sfn.sfn_argd,F_caller_sets_one_val)) */
+/*       fas=0; */
+    if (F_ARG_FLAGS_P(fun->sfn.sfn_argd,F_requires_nargs) && !(argd&VFUN_NARG_BIT))
+      fas=0;
+    if (F_ARG_FLAGS_P(fun->sfn.sfn_argd,F_requires_fun_passed))
+      fas=0;
+    if (F_RESULT_TYPE(fun->sfn.sfn_argd)!=SFUN_RETURN_TYPE(argd) ||
+	SFUN_RETURN_TYPE(argd)>>1)
+      fas=0;
+    {
+      unsigned long a1=F_TYPES(fun->sfn.sfn_argd)>>F_TYPE_WIDTH,a2=argd;
+      unsigned long t1,t2;
+      for (t1=a1&MASK_RANGE(0,F_TYPE_WIDTH),SFUN_START_ARG_TYPES(a2),t2=SFUN_NEXT_TYPE(a2);
+	   (a1 || a2) && t1==t2 && !(t1>>1);
+	   t2=SFUN_NEXT_TYPE(a2),a1>>=F_TYPE_WIDTH,t1=a1&MASK_RANGE(0,F_TYPE_WIDTH));
+      if (a1 || a2)
+	fas=0;
     }
+    if (vald!=fun->sfn.sfn_nval)
+      if (vald<=0 || 
+	  !fun->sfn.sfn_nval || 
+	  fun->sfn.sfn_nval>vald)
+	fas=0;
     break;
   case t_sfun: case t_gfun:
-    if ((argd & (~VFUN_NARG_BIT)) != fun->sfn.sfn_argd)
+    if ((argd & (~(VFUN_NARG_BIT|MVRET_BIT))) != (fun->sfn.sfn_argd & (~MVRET_BIT)))
       fas=0;
-    if (vald!=fun->sfn.sfn_nval) {
-      fprintf(stderr,"Warning: val mismatch in call to %-.*s prevents fast linking: %d %ld, recompile caller\n",
-	      (int)sym->s.s_fillp,sym->s.s_self,vald,fun->sfn.sfn_nval);
-      fas=0;
-    }
+    if (vald!=fun->sfn.sfn_nval)
+      if (vald<=0 || 
+	  !fun->sfn.sfn_nval || 
+	  fun->sfn.sfn_nval>vald)
+	fas=0;
     break;
   default:
     fas=0;
   }
+
+  if (fas!=Rset && sSAfast_link_warningsA->s.s_dbind==Ct && 
+      (tp==t_sfun || tp==t_vfun || tp==t_gfun || tp==t_afun))
+    fprintf(stderr,"Warning: arg/val mismatch in call to %-.*s prevents fast linking: %d %ld/%d %ld, recompile caller\n",
+	    (int)sym->s.s_fillp,sym->s.s_self,(argd & (~VFUN_NARG_BIT)),fun->sfn.sfn_argd,vald,fun->sfn.sfn_nval);
+
 
   if (fas) {
 
@@ -1468,7 +1506,7 @@ call_proc_new(object sym, int setf,int vald, void **link, int argd, object first
        if (vald<0)
 	 for (;tl<tle;)
 	   *tl++=Cnil;
-       vs_top=tl;
+       vs_top=tmp>vs_top ? tl-1 : tl;
      }
 
      switch(result_type) {

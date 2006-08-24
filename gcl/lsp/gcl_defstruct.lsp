@@ -89,7 +89,7 @@
 				   (lambda(x)
 				     (declare (optimize (safety 1)))
 				     (aref x offset)))))))
-	        (add-hash access-function `((t) ,(or (not slot-type) slot-type)) nil nil))))
+	        (add-hash access-function `((t) ,(or (not slot-type) slot-type)) nil nil nil))))
     (cond (read-only
 	    (remprop access-function 'structure-access)
 	    (setf (get access-function 'struct-read-only) t))
@@ -511,7 +511,7 @@
 		      (lambda (x)
 			(declare (optimize (safety 1)))
 			(si::structure-subtype-p x name)))
-		(add-hash predicate `((t) boolean) nil nil)))
+		(add-hash predicate `((t) boolean) nil nil nil)))
 	      (setf (get predicate 'compiler::co1)
 		'compiler::co1structure-predicate)
 	  (setf (get predicate 'struct-predicate) name)

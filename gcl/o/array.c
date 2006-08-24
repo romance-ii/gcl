@@ -938,13 +938,14 @@ gset(void *p1, void *val, int n, int typ)
    */
 
 DEFUN_NEW("COPY-ARRAY-PORTION",object,fScopy_array_portion,SI,4,
-      5,NONE,OO,OI,IO,OO,(object x,object y,fixnum i1,fixnum i2,object n1o),
+      5,NONE,OO,OO,OO,OO,(object x,object y,object o1,object o2,object n1o),
    "Copy elements from X to Y starting at x[i1] to x[i2] and doing N1 \
 elements if N1 is supplied otherwise, doing the length of X - I1 \
 elements.  If the types of the arrays are not the same, this has \
 implementation dependent results.")
 { enum aelttype typ1=Iarray_element_type(x);
   enum aelttype typ2=Iarray_element_type(y);
+  fixnum i1=fix(o1),i2=fix(o2);
   int n1=fix(n1o),nc;
   if (VFUN_NARGS==4)
     { n1 = x->v.v_dim - i1;}

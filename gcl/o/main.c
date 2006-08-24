@@ -166,6 +166,13 @@ gcl_main(int argc, char **argv, char **envp)
 	}
 #endif
 
+#ifdef GCL_GPROF
+	{
+	  extern void *old_monstartup_pointer;
+	  old_monstartup_pointer=NULL;
+	}
+#endif
+
     install_segmentation_catcher();
     set_maxpage();
 
@@ -350,7 +357,8 @@ gcl_main(int argc, char **argv, char **envp)
 #ifdef INIT_CORE_END
             INIT_CORE_END
 #endif			  
-                alloc_page(-(holepage + nrbpage));
+            alloc_page(-(holepage + nrbpage));
+
         }
 
         initflag = FALSE;

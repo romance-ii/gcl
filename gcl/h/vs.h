@@ -62,3 +62,5 @@ EXTER object *vs_top;		/*  value stack top  */
 
 #define vs_reserve(x)	if(vs_base+(x) >= vs_limit)  \
 				vs_overflow();
+
+#define MULTIPLE_VALUES_LIMIT 32

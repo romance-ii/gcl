@@ -22,7 +22,8 @@
 
 (in-package 'compiler)
 
-(defvar *objects* nil)
+(defvar *objects* (make-hash-table :test 'equal))
+(defvar *objects-rev* (make-hash-table :test 'equal))
 (defvar *constants* nil)
 (defvar *sharp-commas* nil)
 (defvar *function-links* nil)
@@ -531,7 +532,7 @@
 		  ,(mapcar (lambda (x) (if (atom x) x `(,(car x) ,@(portable-source (cdr x) t)))) (cadr form))
 		  ,@(let ((r (remove-if-not 'si::specialp (mapcar (lambda (x) (if (atom x) x (car x))) (cadr form)))))
 		      (when r `((declare (special ,@r)))))
-		  ,@(ndbctxt (portable-source (cddr form) t))))
+		  ,@(ndbctxt (portable-source (if (stringp (caddr form)) (cdddr form) (cddr form)) t))))
 	       ((quote function) form)
 	       (declare 
 		(let ((opts (mapcan 'cdr 
@@ -577,15 +578,6 @@
 			  ,@(nreverse (cadr dd))
 			  (block ,fname (let* ,al ,@(car dd) ,@args)))))))
 
-;FIXME should be able to carry a full type here.
-(defun sanitize-tp (tp)
-  (cond	;((and (consp tp) (eq (car tp) 'values) (not (cddr tp))) (cadr tp))
-	;((or (eq tp '*) (and (consp tp) (member (car tp) '(* values)))) '*)
-        ((eq tp '*) tp)
-        ((and (consp tp) (member (car tp) '(values returns-exactly))) 
-	 (cmp-norm-tp `(,(car tp) ,@(mapcar 'sanitize-tp (cdr tp)))))
-	((car (member tp +useful-c-types+ :test 'type<=)))));FIXME recursion
-
 (defvar *recursion-detected*)
 
 (defun aux-decls (auxs decls)
@@ -607,6 +599,10 @@
 			      (push `(declare (,@z ,@q)) dd)))))))))))
     (list (nreverse ad) (nreverse dd))))
 
+;(defun unknown-ret-list (expr &optional res)
+;  (cond ((atom expr) nil)
+;	((case (car expr)
+;	       (call-global 
 
 (defun t1defun (args &aux (setjmps *setjmps*) (defun 'defun) (*sharp-commas* nil) fname lambda-expr cfun doc)
   (when (or (endp args) (endp (cdr args)))
@@ -615,139 +611,142 @@
          "The function name ~s is not valid." (car args))
   (setq cfun (or (get fname 'Ufun) (next-cfun)))
   (maybe-eval nil  (cons 'defun args))
- (tagbody
-   top
-  (setq *non-package-operation* t)
-  (setq *local-functions* nil)
 
   (let ((*recursion-detected* nil))
     
-    (let* ((*vars* nil) (*funs* nil) (*blocks* nil) (*tags* nil)
-	   (*special-binding* nil))
-      (setq lambda-expr (c1lambda-expr (cdr args) fname)))
-    (or (eql setjmps *setjmps*) (setf (info-volatile (cadr lambda-expr)) t))
-    (check-downward (cadr lambda-expr))
+    (tagbody
 
-    (when *compiler-auto-proclaim*
+     top
 
-      (let* ((al (mapcar (lambda (x) (sanitize-tp (var-type x))) (caaddr lambda-expr)))
-	     (rt (sanitize-tp (info-type (cadar (last lambda-expr))))))
+     (setq *non-package-operation* t)
+     (setq *local-functions* nil)
 
-	(when (notevery 'null (cdaddr lambda-expr)) (if al (nconc al '(*)) (setq al '(*))))
+     (let* ((*vars* nil) (*funs* nil) (*blocks* nil) (*tags* nil)
+	    (*special-binding* nil))
+       (setq lambda-expr (c1lambda-expr (cdr args) fname)))
+     (or (eql setjmps *setjmps*) (setf (info-volatile (cadr lambda-expr)) 1))
+     (check-downward (cadr lambda-expr))
+     
+     (when *compiler-auto-proclaim*
 
-	(cmpnote "(proclaim '(ftype (function ~s ~s) ~s~%" al rt fname)
-
-	(let ((oal (get-arg-types fname))
-	      (ort (get-return-type fname)))
-	  (when oal
-	    (unless (and (= (length al) (length oal))
-			 (every (lambda (x y) (or (and (eq x '*) (eq y '*)) (type>= y x))) al oal))
-	      (cmpwarn "arg type mismatch in auto-proclamation ~s -> ~s~%" oal al)
-	      ))
-	  (when ort
-	    (unless (type>= ort rt)
-	      (when (or (and (eq rt '*) (not (eq ort '*)))
-			(and (type>= t ort) (not (type>= t rt)))
-			(and (get fname 'return-type) (type>= t (get fname 'return-type)) (not (type>= t rt))))
-		(cmpwarn "ret type mismatch in auto-proclamation ~s(~s) -> ~s~%" ort (get fname 'return-type) rt))))
-	  (proclaim `(ftype (function ,al ,rt) ,fname));FIXME replace proclaim
-	  (si::add-hash fname (let* ((at (get-arg-types fname))
-				     (rt (get-return-type fname)))
-;				     (rt (if (equal '(*) rt) '* rt)))
-				(when (or at rt) (list at rt))) nil nil)
-	  (when *recursion-detected*;FIXME
-	    (unless (and (equal oal (get-arg-types fname)) (equal ort (get-return-type fname)))
-	      (go top)))))))
+       (let* ((al (mapcar 'var-type (caaddr lambda-expr)));(lambda (x) (readable-tp (var-type x)))
+	      (rt (info-type (cadar (last lambda-expr)))))
+	 
+	 (when (notevery 'null (cdaddr lambda-expr)) (if al (nconc al '(*)) (setq al '(*))))
+	 
+	 (cmpnote "(proclaim '(ftype (function ~s ~s) ~s~%" al rt fname)
+	 
+	 (let ((oal (get-arg-types fname))
+	       (ort (get-return-type fname)))
+	   (unless (equal oal '(*))
+	     (unless (and (= (length al) (length oal))
+			  (every (lambda (x y) (or (and (eq x '*) (eq y '*)) (type>= y x))) al oal))
+	       (cmpwarn "arg type mismatch in auto-proclamation ~s -> ~s~%" (mapcar 'export-type oal) (mapcar 'export-type al))))
+	   (unless (eq ort '*)
+	     (unless (type>= ort rt)
+	       (when (or (and (eq rt '*) (not (eq ort '*)))
+			 (and (single-type-p ort) (not (single-type-p rt)))
+			 (and (get fname 'return-type) (single-type-p (get fname 'return-type)) (not (single-type-p rt))))
+		 (cmpwarn "ret type mismatch in auto-proclamation ~s(~s) -> ~s~%" (export-type ort) (get fname 'return-type) (export-type rt)))))
+;	   (proclaim `(ftype (function ,al ,rt) ,fname));FIXME replace proclaim
+;	   (let ((at (get-arg-types fname)) (rt (get-return-type fname)))
+	   (let ((sig (list (mapcar 'export-type al) (export-type (if *recursion-detected* (bump-tp rt) rt)))))
+	     (setf (gethash fname *sigs*) sig)
+	     (si::procl fname sig))
+	   (when *recursion-detected*;FIXME
+	     (let ((al (get-arg-types fname)) (rt (get-return-type fname)))
+	       (unless (and (equal oal al) (equal ort rt) (eq *recursion-detected* 'block))
+		 (setq *recursion-detected* 'block)
+		 (go top)))))))
+;)
     
 
-;;provide a simple way for the user to declare functions to
-;;have fixed args without having to count them, and make mistakes.
-  (cond ((get fname 'fixed-args)
-	 ;the number of regular args in definition
-	 (let ((n  (length (car (lambda-list lambda-expr)))))
-	   (setf (get fname 'fixed-args)  n);;for error checking.
-	   (proclaim (list 'function fname
-			   (make-list n :initial-element t) t)))))
-        
-  (cond
-   ((and
-	  (get fname 'proclaimed-function)
-	  ;; check the args:
-	  (let ((lambda-list (lambda-list lambda-expr))bind)
-	    (and (null (cadr lambda-list))	;;; no optional
-		 (null (caddr lambda-list))	;;; no rest
-		 (null (cadddr lambda-list))	;;; no keyword
-		 (< (length (car lambda-list)) call-arguments-limit)
+     ;;provide a simple way for the user to declare functions to
+     ;;have fixed args without having to count them, and make mistakes.
+     (cond ((get fname 'fixed-args);the number of regular args in definition
+	    (let ((n  (length (car (lambda-list lambda-expr)))))
+	      (setf (get fname 'fixed-args)  n);;for error checking.
+	      (proclaim (list 'function fname
+			      (make-list n :initial-element t) t)))))
+     
+     (cond
+      ((and
+	(get fname 'proclaimed-function)
+	;; check the args:
+	(let ((lambda-list (lambda-list lambda-expr))bind)
+	  (and (null (cadr lambda-list))	;;; no optional
+	       (null (caddr lambda-list))	;;; no rest
+	       (null (cadddr lambda-list))	;;; no keyword
+	       (< (length (car lambda-list)) call-arguments-limit)
 						;;; less than 10 requireds
 		   ;;; For all required parameters...
-		 (do ((vars (car lambda-list) (cdr vars))
-		      (types (get-arg-types fname) (cdr types))
-		      (problem))
-		     ((endp vars)
-		      (and (endp types)
-			   (cond (bind (setq args (cmpfix-args args bind))
-				       (go top))
-				 (t (not problem)))))
-		     (let ((var (car vars)))
-		       (cond  ((equal (car types) '*)(return nil)))
-		       (unless
+	       (do ((vars (car lambda-list) (cdr vars))
+		    (types (get-arg-types fname) (cdr types))
+		    (problem))
+		   ((endp vars)
+		    (and (endp types)
+			 (cond (bind (setq args (cmpfix-args args bind))
+				     (go top))
+			       (t (not problem)))))
+		   (let ((var (car vars)))
+		     (cond  ((equal (car types) '*)(return nil)))
+		     (unless
 			 (and
-			   (or (and (or (eq (var-kind var) 'LEXICAL)
-					(and (eq (var-kind var)
-						 'special)
-					     (eq (car types) t)))
-				    (not (var-ref-ccb var))
-				    (not (eq (var-loc var) 'clb)))
-			       (progn (push (list 
-					      (var-name var) (gensym))
-					    bind)
-				      t))
-			   (type-and (car types) (var-type var))
-			   (or (member (car types)
-				       #l(fixnum character
+			  (or (and (or (eq (var-kind var) 'LEXICAL)
+				       (and (eq (var-kind var)
+						'special)
+					    (eq (car types) t)))
+				   (not (var-ref-ccb var))
+				   (not (eq (var-loc var) 'clb)))
+			      (progn (push (list 
+					    (var-name var) (gensym))
+					   bind)
+				     t))
+			  (type-and (car types) (var-type var))
+			  (or (member (car types)
+				      #l(fixnum character
 						long-float short-float))
-			       (eq (var-loc var) 'object)
-			       *c-gc* 
-			       (not (is-changed var (cadr lambda-expr)))))
-			 (unless bind
-				 (cmpwarn "Calls to ~a will be VERY SLOW. Recommend not to proclaim.  ~%;;The arg caused the problem. ~a"
-					  fname  (var-name var)))
-
-			 (setq problem t))))
-		 (numberp cfun))))
-	;;whew: it is acceptable.
-        (push (list fname
-                    (get-arg-types fname)
-		    (let ((z (get-return-type fname))) (cond ((eq z #tboolean)) ((not z)) (z)))
-		    (if (type>= t (get-return-type fname)) (flags set ans) (flags set ans sets-vs-top))
-                    (make-inline-string
-                     cfun (get-arg-types fname) fname))
-              *inline-functions*)))
-
-  (when (cadddr lambda-expr)
-    (setq doc  (cadddr lambda-expr)))
-  (add-load-time-sharp-comma)
-  (push (list defun fname cfun lambda-expr doc *special-binding*)
-	*top-level-forms*)
-  (push (cons fname cfun) *global-funs*)
-
-  (si::add-hash fname nil nil
-		(let* ((w (make-string-output-stream))
-		       (ss (si::open-fasd w :output nil nil))
-		       (out (pd fname (cadr args) (cddr args))))
-		  (si::find-sharing-top out (aref ss 1))
-		  (si::write-fasd-top out ss)
-		  (si::close-fasd ss)
-		  (get-output-stream-string w)))))
-
+			      (eq (var-loc var) 'object)
+			      *c-gc* 
+			      (not (is-changed var (cadr lambda-expr)))))
+		       (unless bind
+			 (cmpwarn "Calls to ~a will be VERY SLOW. Recommend not to proclaim.  ~%;;The arg caused the problem. ~a"
+				  fname  (var-name var)))
+		       
+		       (setq problem t))))
+	       (numberp cfun))))
+       ;;whew: it is acceptable.
+       (push (let ((at (get-arg-types fname)) (rt (get-return-type fname)))
+	       (list fname at (link-rt rt (member '* at))
+		     (if (single-type-p rt) (flags set ans) (flags set ans sets-vs-top))
+		     (make-inline-string cfun at fname)))
+	     *inline-functions*)))
+     
+     (when (cadddr lambda-expr)
+       (setq doc  (cadddr lambda-expr)))
+     (add-load-time-sharp-comma)
+     (push (list defun fname cfun lambda-expr doc *special-binding*)
+	   *top-level-forms*)
+     (push (cons fname cfun) *global-funs*)
+     
+     (si::add-hash fname nil nil
+		   (let* ((w (make-string-output-stream))
+			  (ss (si::open-fasd w :output nil nil))
+			  (out (pd fname (cadr args) (cddr args))))
+		     (si::find-sharing-top out (aref ss 1))
+		     (si::write-fasd-top out ss)
+		     (si::close-fasd ss)
+		     (get-output-stream-string w))
+		   (unless *compiler-compile* (namestring (pathname *compiler-input*)))))))
+  
 (defun make-inline-string (cfun args fname)
   (if (null args)
       (format nil "~d()" (c-function-name "LI" cfun fname))
-      (let ((o (make-array 100 :element-type 'character :fill-pointer 0
-			   :adjustable t )))
+      (let ((rt (get-return-type fname))
+	    (o (make-array 100 :element-type 'character :fill-pointer 0 :adjustable t )))
            (format o "~d(" (c-function-name "LI" cfun fname))
-           (do ((l (if (type>= t (get-return-type fname)) args (cons #tfixnum args)) (cdr l))
-                (n (if (type>= t (get-return-type fname)) 0 -1) (1+ n)))
+           (do ((l (if (single-type-p rt) args (cons #tfixnum args)) (cdr l))
+                (n (if (single-type-p rt) 0 -1) (1+ n)))
                ((endp (cdr l))
                 (if (eq '* (car l)) (format o "#*)") (format o "#~d)" n)))
                (declare (fixnum n))
@@ -775,7 +774,7 @@
   (let* ((ans (length args))
 	 (i 8)
 	 (type (the fixnum (f-type return)))
-	 (type (if (type>= t return) type (+ 4 type)));fixme rationalize
+	 (type (if (single-type-p return) type (+ 4 type)));fixme rationalize
 	 (begin t))
     (declare (fixnum ans i))
     (loop
@@ -805,7 +804,10 @@
 
 
 (defun vald (tp)
-  (cond ((type>= t tp) 0)
+  (cond ((single-type-p tp) 0)
+	((type>= #t(values t) tp) 1);FIXME
+	((eq tp '*) multiple-values-limit)
+	((> (length tp) (+ 2 multiple-values-limit)) (baboon))
 	((eq (car tp) 'returns-exactly) (- 2 (length tp)))
 	((- (length tp) 2))))
 
@@ -839,7 +841,7 @@
 	
 
 (defun volatile (info)
-   (if  (info-volatile info) "VOL " ""))
+   (if  (/= (info-volatile info) 0) "VOL " ""))
 
 (defun register (var)
   (cond ((and (equal *volatile* "")
@@ -849,16 +851,11 @@
 	(t "")))
 
 (defun vararg-p (x)
-  (and ;(equal (get x 'proclaimed-return-type) t)
-   (let ((rt (get-return-type x)))
-     (and rt (not (eq '* rt)) (link-arg-p rt)))
-   (do ((v (get-arg-types x) (cdr v)))
-       ((null v) t)
-       (or (consp v) (return nil))
-       (or (eq (car v) t)
-	   (eq (car v) '*)
-	   (return nil)))))
-
+  (member '* (get-arg-types x)))
+;  (and 
+;   (link-arg-p (get-return-type x))
+;   (every 'link-arg-p (get-arg-types x))))
+;   (every (lambda (y) (or (eq y t) (eq y '*))) (get-arg-types x))));FIXME keep full arg-types and link-rt them too
 
 (defun maxargs (lambda-list)
 ; any function can take &allow-other-keys in ANSI lisp 
@@ -903,13 +900,13 @@
 			   ',fname ,(add-address (c-function-name "LI" cfun fname))
 			   ,(vargd (length (car (lambda-list lambda-expr)))
 				   (maxargs (lambda-list lambda-expr))
-				   (not (type>= t rt)))
+				   (not (single-type-p rt)))
 			   ,(add-address (format nil "&LI~akey" cfun))
 			   ,(vald rt)))
 	     (add-init `(si::mfvfun ',fname ,(add-address (c-function-name "LI" cfun fname))
 				    ,(vargd (length (car (lambda-list lambda-expr)))
 					    (maxargs (lambda-list lambda-expr))
-					    (not (type>= t rt)))
+					    (not (single-type-p rt)))
 				    ,(vald rt))))))
 	((numberp cfun)
          (wt-h "static void " (c-function-name "L" cfun fname) "();")
@@ -919,13 +916,11 @@
            
   (when *compiler-auto-proclaim*
     (let ((h (gethash fname si::*call-hash-table*)))
-      (add-init `(si::add-hash ',fname ',(si::call-sig h)
+      (add-init `(si::add-hash ',fname ',(gethash fname *sigs*)
 			       ',(mapcar (lambda (x) 
-					   (cons x (let ((y (find fname si::*needs-recompile* :key 'car)))
-						     (unless (and y (eq (cadr y) x))
-						       (si::call-sig (gethash x si::*call-hash-table*))))))
+					   (cons x (si::call-sig (gethash x si::*call-hash-table*))))
 					 (sublis +cmp-fn-alist+ (si::call-callees h)))
-			       ,(si::call-src h)))))
+			       ,(si::call-src h) ,(si::call-file h)))))
 
   (let ((base-name (setf-function-base-symbol fname)))
     (when base-name
@@ -1003,10 +998,13 @@
   (wt-comment "local entry for function " (function-string fname))
   (wt-h "static " (declaration-type (rep-type (caddr inline-info))) (c-function-name "LI" cfun fname) "();")
   (wt-nl1 "static " (declaration-type (rep-type (caddr inline-info))) (c-function-name "LI" cfun fname) "(")
-  (unless (type>= t (get-return-type fname))
-    (setq mv-var (make-var :type #tfixnum :kind #tfixnum :ref t :name (gensym) 
-			   :loc (cs-push #tfixnum t) :mt #tfixnum :dt #tfixnum))
-    (setq *max-vs* (max *max-vs* (- (length (get-return-type fname)) 2))))
+  (let ((rt (get-return-type fname)))
+    (unless (single-type-p rt)
+      (setq mv-var (make-var :type #tfixnum :kind #tfixnum :ref t :name (gensym) 
+			     :loc (cs-push #tfixnum t) :mt #tfixnum :dt #tfixnum))
+      (let ((ns (abs (vald rt))))
+	(unless (= ns multiple-values-limit)
+	  (setq *max-vs* (max *max-vs* ns))))))
   (if mv-var
       (wt-requireds (cons mv-var requireds) (cons #tfixnum (cadr inline-info)))
     (wt-requireds  requireds (cadr inline-info)))
@@ -1060,11 +1058,15 @@
 
   (dotimes (i (length (car ll)))
     (push (list 'cvar (cs-push t t)) reqs))
-  (unless (type>= t (get-return-type fname))
-    (setq mv-var (make-var :type #tfixnum :kind #tfixnum :ref t :name (gensym) :loc (cs-push #tfixnum t) :mt #tfixnum :dt #tfixnum))
-    (push mv-var (car ll))
-    (setq *max-vs* (max *max-vs* (- (length (get-return-type fname)) 2)))
-    (push (list 'var mv-var nil) reqs))
+  (let ((rt (get-return-type fname)))
+    (unless (single-type-p rt)
+      (setq mv-var (make-var :type #tfixnum :kind #tfixnum :ref t :name (gensym) 
+			     :loc (cs-push #tfixnum t) :mt #tfixnum :dt #tfixnum))
+      (push mv-var (car ll))
+      (let ((ns (abs (vald rt))))
+	(unless (= ns multiple-values-limit)
+	  (setq *max-vs* (max *max-vs* ns))))
+      (push (list 'var mv-var nil) reqs)))
   (wt-comment "local entry for function " (function-string fname))
   
   (let ((tmp ""))
@@ -1533,7 +1535,7 @@
 			(if (and (eq #tfixnum tp) (zerop *space*)) 
 			  (concatenate 'string "CMP" z) (or z "")));FIXME t
            "(" (c-function-name "LI" cfun fname) "(")
-    (unless (type>= t return-type)
+    (unless (single-type-p return-type)
       (wt "(fixnum)(base+1),"))
     (do ((types arg-types (cdr types))
          (n 0 (1+ n)))
@@ -1549,13 +1551,13 @@
             "(base[" n "])")
         (unless (endp (cdr types)) (wt ",")))
     (wt "));")
-    (if (type>= t return-type)
+    (if (single-type-p return-type)
 	(wt-nl "vs_top=(vs_base=base)+1;")
       (wt-nl "vs_base=base;"))
     (wt-nl1 "}"))
 
 (defconstant +wt-c-rep-alist+ `((,#tfixnum ."fixnum ")
-				(,#tinteger ."GEN ") 
+;				(,#tinteger ."GEN ") 
 				(,#tcharacter  ."unsigned char ")
 				(,#tlong-float  ."double ")
 				(,#tshort-float ."float ")

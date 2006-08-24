@@ -25,22 +25,17 @@
 (defvar *ifuncall* nil)
 
 
-(eval-when (compile eval)
- (defmacro link-arg-p (x)
-  `(or (is-global-arg-type ,x) (not (is-local-arg-type ,x)))))
+(defun link-arg-p (x)
+  (or (is-global-arg-type x) (not (is-local-arg-type x))))
 
 (defun fast-link-proclaimed-type-p (fname &optional args)
   (and 
-       (symbolp fname)
-       (and (< (length args) 64)
-	    (or  (and (get fname 'fixed-args)
-		      (listp args))
-		 (and
-		  (get fname 'proclaimed-function)
-		  (let ((v (get-return-type fname)))
-		    (and v (link-arg-p v) (not (eq v '*))))
-		  (dolist (v (get-arg-types fname) t)
-			  (or  (eq v '*)(link-arg-p v) (return nil))))))))
+   (symbolp fname)
+   (not (get fname 'lfun))
+   (and (< (length args) 64)
+	(or  (and (get fname 'fixed-args) (listp args))
+	     (and (link-arg-p (get-return-type fname))
+		  (every 'link-arg-p (get-arg-types fname)))))))
 
 (si::putprop 'funcall 'c2funcall-aux 'wholec2)
 (si:putprop 'call-lambda 'c2call-lambda 'c2)
@@ -79,9 +74,8 @@
                                (eq (car fd) 'call-local)
                                fd)
                           (list 'call-global
-                                (make-info :type (or (get-return-type (cadr fun)) '*)
-                                 :sp-change
-                                 (null (get (cadr fun) 'no-sp-change)))
+                                (make-info :type (get-return-type (cadr fun))
+                                 :sp-change (if (null (get (cadr fun) 'no-sp-change)) 1 0))
                                 (cadr fun)))
                       )))
         (and (eq (car fun) 'function)
@@ -99,9 +93,8 @@
                                (eq (car fd) 'call-local)
                                fd)
                           (list 'call-global
-                                (make-info :type (or (get-return-type (cadr fun)) '*)
-                                 :sp-change
-                                 (null (get (cadr fun) 'no-sp-change)))
+                                (make-info :type (get-return-type (cadr fun))
+                                 :sp-change (if (null (get (cadr fun) 'no-sp-change)) 1 0))
                                 (cadr fun)))
                       )
 		 (and
@@ -111,12 +104,11 @@
 			     (eq (car fd) 'call-local)
 			     fd)
 			(list 'call-global
-			      (make-info :type (or (get-return-type new) '*)
-			       :sp-change
-				   (null (get new 'no-sp-change)))
+			      (make-info :type (get-return-type new)
+			       :sp-change (if (null (get new 'no-sp-change)) 1 0))
 			      new))))
 		 ))))
-   (let ((x (c1expr fun)) (info (make-info :type (or (get-return-type fun) '*) :sp-change t)))
+   (let ((x (c1expr fun)) (info (make-info :type (get-return-type fun) :sp-change 1)))
         (add-info info (cadr x))
         (list 'ordinary info x))
    ))
@@ -150,12 +142,11 @@
 		       *use-sfuncall*
 		       ;;Determine if only one value at most is required:
 		       (or
-			(and (not *values-to-go*) (not (and (consp *value-to-go*) (consp (car *value-to-go*)))) 
-			     (not (member *value-to-go* '(top return))))
+			(not (or (multiple-values-p) (member *value-to-go* '(top return)) (rassoc *value-to-go* +return-alist+)))
 ;			(eq *value-to-go* 'trash)
 ;			(and (consp *value-to-go*)
 ;			     (eq (car *value-to-go*) 'var))
-			(and info (type>= t (info-type info)))))
+			(and info (single-type-p (info-type info)))))
 		  (c2funcall-sfun form args info)
 		  (return-from c2funcall nil)))
            (unless loc
@@ -189,7 +180,7 @@
 	  "(*((_ob)->sfn.sfn_self)):")
    (when (< *space* 3)
 	 (setq length t)
-	 (wt-nl "(fcall.argd="  (length (cdr args)) ",_tp==t_vfun) ?")
+	 (wt-nl "(fcall.argd="  (length (cdr args)) ",_tp==t_vfun && !_ob->vfn.vfn_mv) ?");FIXME
 ;	 (wt-nl  "(*(object (*)())((" f ")->sfn.sfn_self)):"))
 	 (wt-nl  "(*((_ob)->sfn.sfn_self)):"))
    (wt-nl  "(fcall.fun=(_ob),")
@@ -321,7 +312,7 @@
 	       (close-inline-blocks)))
 	    (t
 	     (push-args args)
-	     (let ((num (add-fast-link fname nil args)))
+	     (let ((num (add-fast-link fname nil args t)))
 	       (wt-nl "(void) (*Lnk" num  ")(")
 	       (if (get fname 'proclaimed-closure) (wt "Lclptr" num))
 	       (wt  ");")
@@ -341,26 +332,28 @@
     (c2call-unknown-global fname args loc nil))
   )
 
+(defun link-rt (tp vararg)
+  (cond ((cmpt tp) (cmp-norm-tp `(,(car tp) ,@(mapcar (lambda (x) (link-rt x vararg)) (cdr tp)))))
+	((or (type>= #tboolean tp) (not tp) (and (single-type-p tp) vararg) tp))))
 
-
-(defun add-fast-link (fname type args)
-  (let (link-info (n (add-symbol fname)) vararg)
-    (cond (type  
-	   ;;should do some args checking in that case too.
-	   (let* (link-string tem argtypes
-		      (leng (and (listp args) (length args))))
+(defun add-fast-link (fname type args &optional no-open-code)
+  (declare (ignore type))
+  (let (link-info (n (add-symbol fname)) vararg (rt (get-return-type fname)))
+    (cond (no-open-code
+	   (check-fname-args fname args)
+	   (setq link-info (list fname n (when (get fname 'proclaimed-closure) 'proclaimed-closure))))
+	  ((let* (link-string tem argtypes (leng (and (listp args) (length args))))
 	     (setq argtypes
-		   (cond ((get fname 'proclaimed-function)
-			  (get-arg-types fname))
-			 ((setq tem (get fname ' fixed-args))
+		   (cond ((setq tem (get fname ' fixed-args))
 			  (cond ((si:fixnump tem)
 				 (or (equal leng tem)
-				   (cmpwarn "~a: Fixed args not fixed!"
-					    fname)))
-				(t (setf (get fname 'fixed-args) leng)))
-			  (make-list leng :initial-element t))))
-	     (and leng
-		  (or (eql leng  (length argtypes))
+				     (cmpwarn "~a: Fixed args not fixed!" fname)))
+				((setf (get fname 'fixed-args) leng)))
+			  (make-list leng :initial-element t))
+			 ((get-arg-types fname))))
+	     (when (member '* argtypes) (setq argtypes (mapcar (lambda (x) (if (eq x '*) x t)) argtypes)))
+	     (when leng
+		  (or (= leng  (length argtypes))
 		      (MEMBER '* ARGTYPES)
 		      (cmpwarn "~a called with ~a args, expected ~a "
 			       fname leng
@@ -373,8 +366,8 @@
 		     (let ((as (with-output-to-string
 				 (st)
 				 (do ((com)
-				      (v (if (type>= t (get-return-type fname)) argtypes (cons #tfixnum argtypes)) (cdr v))
-				      (i (if (type>= t (get-return-type fname)) 0 -1) (+ 1 i)))
+				      (v (if (single-type-p rt) argtypes (cons #tfixnum argtypes)) (cdr v))
+				      (i (if (single-type-p rt) 0 -1) (+ 1 i)))
 				     ((null v))
 				     (cond ((eq (car v) '*)
 					    (setq vararg t)
@@ -388,26 +381,18 @@
 
 	      ;; If link is bound above, closure is unprintable as is in its own environment
 	      ;; enables tracing of inline-type-matches.  CM 20050106
-	      (let ((link (when vararg (lambda ( &rest l)
+	      (let ((link (when vararg (lambda (&rest l)
 					    (wt "(VFUN_NARGS="(length l) ",")
 					    (wt-inline-loc link-string l)
 					    (wt ")")))))
-		(push (list fname argtypes
-			    (let ((z (get-return-type fname))) (cond ((eq z #tboolean)) ((not z)) (z)))
-			    (if (type>= t (get-return-type fname))
+		(push (list fname argtypes (link-rt rt vararg)
+			    (if (single-type-p rt)
 				(flags side-effect-p allocates-new-storage)
 			      (flags side-effect-p allocates-new-storage sets-vs-top))
 			    (or link link-string) 'link-call)
 		      *inline-functions*))
-	      (setq link-info (list fname (format nil "LI~d" n)
-				    (let ((z (get-return-type fname))) (cond ((eq z #tboolean)) ((not z)) (z)))
-				     argtypes)))))
-	  (t	   
-	   (check-fname-args fname args)
-	   (setq link-info (list fname n
-				 (if (get fname 'proclaimed-closure) 'proclaimed-closure)
-				 ))))
-    (pushnew link-info    *function-links* :test 'equal)
+	      (setq link-info (list fname (format nil "LI~d" n) (link-rt rt vararg) argtypes))))))
+    (pushnew link-info  *function-links* :test 'equal)
     n))
 
 (defun declaration-type (type) 
@@ -441,10 +426,7 @@
 		    (declaration-type (rep-type type)) "V1;"
 		    "va_list ap;va_start(ap,first);V1=(" (declaration-type (rep-type type)) ")call_"
 		    (if vararg "v" "") "proc_new(" (vv-str (add-object name)) "," (if setf "1" "0") "," 
-		    (let ((rt (get-return-type name)))
-		      (cond ((type>= t rt) "0")
-			    ((and (consp rt) (eq (car rt) 'values)) (write-to-string (- (length rt) 2)))
-			    ((write-to-string (- (- (length rt) 2)))))) ",(void **)(void *)&Lnk" num )
+		    (write-to-string (vald (get-return-type name))) ",(void **)(void *)&Lnk" num )
 		(or vararg (wt "," (proclaimed-argd args type)))
 		(wt   ",first,ap);va_end(ap);return V1;}" )))
 	     (t (wt "(){return call_proc0(" (vv-str (add-object name)) "," 

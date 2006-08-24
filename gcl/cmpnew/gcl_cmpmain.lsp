@@ -458,7 +458,7 @@ Cannot compile ~a.~%"
 	      (fn w f)
 	      (let ((*compiler-compile* t)) (compile-file gaz))
 	      (load fn)
-	      (delete-file fn)
+	      (unless *keep-gaz* (delete-file fn))
 	      (setq warnings w failures f))
 	     (unless *keep-gaz* (delete-file gaz)))
 	   (or (eq na name) (setf (symbol-function name) (symbol-function na)))

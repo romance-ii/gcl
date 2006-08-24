@@ -1,8 +1,6 @@
 
 (IN-PACKAGE "SYSTEM") 
 (PROCLAIM
-    '(FTYPE (FUNCTION (FIXNUM T T *) T) check-type-symbol))
-(PROCLAIM
     '(FTYPE (FUNCTION () T) lexical-binding-environment))
 (PROCLAIM
     '(FTYPE (FUNCTION (T T SEQIND T) T) prune-type))

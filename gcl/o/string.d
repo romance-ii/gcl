@@ -574,6 +574,7 @@ DEFUNO_NEW("STRING-CONCATENATE",object,fLstring_concatenate,SI,
   
   narg = VFUN_NARGS;
   va_start(ap,first);
+  vs_base=vs_top;
   for (i = 0, l = 0;  i < narg;  i++) {
     vs_push(coerce_to_string(i ? va_arg(ap,object) : first));
     l += vs_base[i]->st.st_fillp;

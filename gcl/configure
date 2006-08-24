@@ -647,7 +647,7 @@ if test "${enable_vssize+set}" = set; then
   enableval="$enable_vssize"
   :
 else
-  enable_vssize=131072
+  enable_vssize=262144
 fi
 
 cat >> confdefs.h <<EOF

@@ -38,3 +38,4 @@
   nil)
 
 (install-clcs-symbols)
+(load (merge-pathnames "../clcs/sys-proclaim.lisp" system:*system-directory*))

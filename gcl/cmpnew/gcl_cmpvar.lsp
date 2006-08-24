@@ -62,9 +62,12 @@
   (type t)	;;; Current Type of the variable.
   (mt t)	;;; Maximum type of the life of this binding
   tag           ;;; Inner tag (to binding) being analyzed if any
-  (register 0 :type unsigned-short)  ;;; If greater than specified am't this goes into register.
-  (dynamic 0 :type unsigned-short)   ;;; If variable is declared dynamic-extent
+  (register 0 :type unsigned-char)  ;;; If greater than specified am't this goes into register.
+  (dynamic  0 :type unsigned-char)  ;;; If variable is declared dynamic-extent
+  (space    0  :type char)          ;;; If variable is declared as an object array of this size
+  (known-init -1 :type char)        ;;; Number of above known to be implicitly initialized
   )
+
 
 ;;; A special binding creates a var object with the kind field SPECIAL,
 ;;; whereas a special declaration without binding creates a var object with
@@ -348,16 +351,12 @@
   (cond ((endp args) (c1nil))
         ((endp (cdr args)) (too-few-args 'setq 2 1))
         ((endp (cddr args)) (c1setq1 (car args) (cadr args)))
-        (t
-         (do ((pairs args (cddr pairs))
+        ((do ((pairs args (cddr pairs))
               (forms nil))
              ((endp pairs) (c1expr (cons 'progn (reverse forms))))
-             (declare (object pairs))
              (cmpck (endp (cdr pairs))
                     "No form was given for the value of ~s." (car pairs))
-             (push (list 'setq (car pairs) (cadr pairs)) forms)
-             )))
-  )
+             (push (list 'setq (car pairs) (cadr pairs)) forms)))))
 
 
 (defun do-setq-tp (v form t1)
@@ -373,7 +372,7 @@
       (unless (type>= (var-mt v) tp)
 	(setf (var-mt v) (type-or1 (var-mt v) tp))
 	(when (var-tag v)
-	  (let* ((nmt (car (member (var-mt v) +useful-c-types+ :test 'type<=)))
+	  (let* ((nmt (bump-tp (var-mt v)))
 		 (nmt (type-and nmt (var-dt v))))
 	    (setf (var-mt v) nmt))
 	  (throw (var-tag v) v))))))

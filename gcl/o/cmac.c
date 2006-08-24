@@ -188,9 +188,9 @@ gcl_init_cmac(void)
 /* add_symbol("ctimes",&ctimes,"cplus",&cplus,"cdifference",&cdifference,"cmod",
  &cmod, 0); */
 gclModulus = (&((make_si_special("MODULUS",Cnil))->s.s_dbind));
-make_si_function("CMOD",siLcmod);
-make_si_function("CPLUS",siLcplus);
-make_si_function("CTIMES",siLctimes);
-make_si_function("CDIFFERENCE",siLcdifference);
+/* make_si_function("CMOD",siLcmod); */
+/* make_si_function("CPLUS",siLcplus); */
+/* make_si_function("CTIMES",siLctimes); */
+/* make_si_function("CDIFFERENCE",siLcdifference); */
 
 }

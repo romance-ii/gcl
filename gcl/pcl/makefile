@@ -34,6 +34,7 @@ $(addsuffix .c,$(AFILES)) $(addsuffix .data,$(AFILES))\
 	rm -f *.o *gazonk*
 	cp ../h/cmpinclude.h .
 	echo ${SETUP} '(pcl::compile-pcl)' | ../unixport/saved_mod_gcl
+	rm *gazonk*.o
 	for i in gazonk* ; do \
 		j=$$(echo $$i | sed 's,\..*$$,,1');k="gazonk$$(echo $$j | cut -f3 -d\_)";\
 		l=$$(echo $$i | sed 's,^.*\.,,1');\

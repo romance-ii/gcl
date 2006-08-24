@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gcl 2.6.7-1\n"
 "Report-Msgid-Bugs-To: camm@enhanced.com\n"
-"POT-Creation-Date: 2006-04-09 01:38+0000\n"
+"POT-Creation-Date: 2006-08-24 10:20-0400\n"
 "PO-Revision-Date: 2005-10-29 14:19+0200\n"
 "Last-Translator: Sylvain Archenault <sylvain.archenault@laposte.net>\n"
 "Language-Team: French <debian-l10n-french@lists.debian.org>\n"
@@ -23,13 +23,13 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../in.gcl.templates:3
+#: ../in.gcl.templates:1001
 msgid "Use the work-in-progress ansi build by default"
 msgstr "Faut-il utiliser la compilation ANSI par défaut ?"
 
 #. Type: boolean
 #. Description
-#: ../in.gcl.templates:3
+#: ../in.gcl.templates:1001
 #, fuzzy
 msgid ""
 "GCL is in the process of providing an ANSI compliant image in addition to "
@@ -53,13 +53,13 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../in.gcl.templates:16
+#: ../in.gcl.templates:2001
 msgid "Use the profiling build by default"
 msgstr "Faut-il utiliser le profilage par défaut ?"
 
 #. Type: boolean
 #. Description
-#: ../in.gcl.templates:16
+#: ../in.gcl.templates:2001
 #, fuzzy
 msgid ""
 "GCL now has optional support for profiling via gprof.  Please see the "

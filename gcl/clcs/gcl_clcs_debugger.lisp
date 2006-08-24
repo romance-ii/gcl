@@ -96,8 +96,7 @@
 	     (LET ((HOOK *DEBUGGER-HOOK*)
 		   (*DEBUGGER-HOOK* NIL))
 		  (FUNCALL HOOK CONDITION HOOK)))
-       (funcall *debugger-function* CONDITION)
-       (values)));FIXME nil return types
+       (funcall *debugger-function* CONDITION)))
 
 (DEFUN STANDARD-DEBUGGER (CONDITION)
   (LET* ((*DEBUG-LEVEL* (1+ *DEBUG-LEVEL*))

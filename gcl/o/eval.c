@@ -118,10 +118,6 @@ quick_call_sfun(object fun)
     }
   }
   SET_TO_APPLY(res,fun->sfn.sfn_self,x-temp_ar,temp_ar);
-  if (mv && temp_ar[0] && base >= (object *)temp_ar[0] && base < vs_top) {
-    printf("foo!\n");
-    base=((object *)temp_ar[0]-1);
-  }
   base[0]=
     (restype==f_object ?  res :
      (restype==f_fixnum ? make_fixnum((long)res) :
@@ -1529,7 +1525,7 @@ fcalln1(object first,...)
     }
    if(type_of(fun)==t_cclosure)
      return(fcalln_cclosure(first,ap));
-   if(type_of(fun)==t_vfun)
+   if(type_of(fun)==t_vfun && !fun->vfn.vfn_mv)
      return(fcalln_vfun(first,ap));
    return(fcalln_general(first,ap));
   va_end(ap);

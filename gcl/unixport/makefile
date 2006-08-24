@@ -122,12 +122,12 @@ saved_%:raw_% $(RSYM) init_%.lsp raw_%_map \
 	$(PORTDIR)/raw_$*$(EXE) $(PORTDIR)/ $(LISPFLAGS) -libdir $(GCLDIR)/ < foo
 
 #*optimize-maximum-pages* setting is redundant here, but for good measure	
-	[ "$@" != "$(FLISP)" ] || (echo "(setq si::*optimize-maximum-pages* nil)" >foo;\
-				cat init_$*.lsp >>foo;\
-				echo "(setq si::*optimize-maximum-pages* t si::*disable-recompile* nil)" >>foo;\
-				echo " (in-package \"USER\")(system:save-system \"$@\")" >>foo;\
+	[ "$@" != "$(FLISP)" ] || (echo "(setq si::*optimize-maximum-pages* nil)" >foo1;\
+				cat init_$*.lsp >>foo1;\
+				echo "(setq si::*optimize-maximum-pages* t si::*disable-recompile* nil)" >>foo1;\
+				echo " (in-package \"USER\")(system:save-system \"$@\")" >>foo1;\
 				$(MAKE) raw_$*$(EXE);\
-				$(PORTDIR)/raw_$*$(EXE) $(PORTDIR)/ $(LISPFLAGS) -libdir $(GCLDIR)/ < foo;\
+				$(PORTDIR)/raw_$*$(EXE) $(PORTDIR)/ $(LISPFLAGS) -libdir $(GCLDIR)/ < foo1;\
 				ar x lib$*.a gcl_recompile.o;\
 				touch -r lib$*.a gcl_recompile.o)
 

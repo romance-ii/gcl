@@ -179,7 +179,7 @@
 
 (defun room (&optional x)
   (declare (ignore x))
-  (let ((l (multiple-value-list (si:room-report)))
+  (let ((l (room-report));(multiple-value-list (si:room-report)))
         maxpage holepage leftpage ncbpage maxcbpage ncb cbgbccount npage
         rbused rbfree nrbpage rbgbccount
         info-list link-alist)

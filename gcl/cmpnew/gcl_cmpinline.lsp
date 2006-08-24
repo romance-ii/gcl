@@ -40,49 +40,13 @@
 (defmacro eql-not-nil (x y) `(and ,x (eql ,x ,y)))
 
 (defstruct (info (:copier old-copy-info) (:constructor old-make-info))
-  (type t)		;;; Type of the form.
-  (sp-change nil)	;;; Whether execution of the form may change
-			;;; the value of a special variable *VS*.
-  (volatile nil)	;;; whether there is a possible setjmp
+  (type t)		    ;;; Type of the form.
+  (sp-change 0   :type bit) ;;; Whether execution of the form may change the value of a special variable *VS*.
+  (volatile  0   :type bit) ;;; whether there is a possible setjmp
+  (unused    0   :type char)
+  (unused1   0   :type char)
   (changed-array (mia 10 0))     ;;; List of var-objects changed by the form. 
   (referred-array (mia 10 0)))	 ;;; List of var-objects referred in the form.
-
-;; This is the begininng of the long-awaited type-handling
-;; centralization.  +c-global-arg-types+ can be passed unboxed to the
-;; interpreter -- there are at most three (encoded in a two bit field)
-;; of these which must be coordinated with the enum ftype definined in
-;; object.h. +c-local-arg-types+ is a larger set which can be passed
-;; unboxed to and from compiled functions in the same lisp source file
-;; -- these must be passable in total on the C stack by value, i.e. no
-;; pointers.  +c-local-var-types+ is a larger set which can be
-;; manipulated unboxed within compiled functions, presumably to
-;; allocate them on the local stack and save gc, but cannot be passed
-;; as function arguments or returned therefrom.  20050707 CM.
-
-(defconstant +c-global-arg-types-syms+   `(fixnum)) ;FIXME (long-float short-float) later
-(defconstant +c-local-arg-types-syms+    (union +c-global-arg-types-syms+ '(fixnum character long-float short-float)))
-(defconstant +c-local-var-types-syms+    (union +c-local-arg-types-syms+ '(fixnum character long-float short-float integer)))
-
-(defun get-sym (args)
-  (intern (apply 'concatenate 'string (mapcar 'string args))))
-
-(defconstant +set-return-alist+ 
-  (mapcar (lambda (x) (cons (get-sym `("RETURN-" ,x)) (get-sym `("SET-RETURN-" ,x)))) +c-local-arg-types-syms+))
-(defconstant +return-alist+ 
-  (mapcar (lambda (x) (cons (if (eq x 'object) x (cmp-norm-tp x)) (get-sym `("RETURN-" ,x)))) (cons 'object +c-local-arg-types-syms+)))
-(defconstant +wt-loc-alist+ 
-  `((object . wt-loc)
-    ,@(mapcar (lambda (x) (cons (cmp-norm-tp x) (get-sym `("WT-" ,x "-LOC")))) +c-local-var-types-syms+)))
-(defconstant +coersion-alist+
-  (mapcar (lambda (x) (cons (cmp-norm-tp x) (get-sym `(,x "-LOC")))) +c-local-var-types-syms+))
-(defconstant +inline-types-alist+ 
-  `((,#tboolean . inline-cond) (t . inline) 
-    ,@(mapcar (lambda (x) (cons (cmp-norm-tp x) (get-sym `("INLINE-" ,x)))) +c-local-var-types-syms+)))
-
-(defconstant +c-global-arg-types+   (mapcar 'cmp-norm-tp +c-global-arg-types-syms+)) ;FIXME (long-float short-float) later
-(defconstant +c-local-arg-types+    (mapcar 'cmp-norm-tp +c-local-arg-types-syms+))
-(defconstant +c-local-var-types+    (mapcar 'cmp-norm-tp +c-local-var-types-syms+))
-
 
 
 
@@ -209,8 +173,8 @@
 		   (declare (fixnum res))
 		   (when (>= res 0)
 		     (setq s (the fixnum (1+ res)))))))
-  (when (info-sp-change from-info)
-    (setf (info-sp-change to-info) t))
+  (when (/= (info-sp-change from-info) 0)
+    (setf (info-sp-change to-info) 1))
   ;; Return to-info, CM 20031030
   to-info)
 
@@ -227,7 +191,7 @@
 	  (REPLACED nil)
 	  (t (dolist** (form forms nil)
 		       (when (or (is-changed var (cadr form))
-				 (info-sp-change (cadr form)))
+				 (/= (info-sp-change (cadr form)) 0))
 			 (return-from args-info-changed-vars t)))))))
 
 ;; Variable references in arguments can also be via replaced variables
@@ -270,7 +234,7 @@
 	  (t (dolist** (form forms nil)
 		       (when (or (is-referred var (cadr form))
 				 (is-rep-referred var (cadr form))
-				 (info-sp-change (cadr form)))
+				 (/= (info-sp-change (cadr form)) 0))
 			 (return-from args-info-referred-vars t)))))))
 
 ;;; Valid property names for open coded functions are:
@@ -313,7 +277,7 @@
       (let ((form (car forms))
             (type (car types)))
         (declare (object form type))
-	(let ((type (cond ((type>= type t) type) 
+	(let ((type (cond ((type>= type t) type) ;;;FIXME remove?
 			  ((type>= type (info-type (cadr form))) (promoted-c-type (type-and type (info-type (cadr form)))))
 			  (type))));FIXME fixnum-float support
         (case (car form)
@@ -462,8 +426,8 @@
                  (t (push loc1 locs1))))
               (push (car l) locs1)))))
 
-  (let ((others (and (stringp fun) (consp (cadr ii)) (eq 'values (caadr ii))
-		     (mapcar #'inline-type (cddadr ii)))))
+  (let ((others (and (stringp fun) (not (single-type-p (cadr ii))) (not (type>= (cadr ii) '*))
+		     (mapcar 'inline-type (cddadr ii)))))
     (list (inline-type (cadr ii))
 	  (caddr ii)
 	  (if others (cons fun others) fun)
@@ -514,8 +478,9 @@
 (defun inline-type-matches (fname inline-info arg-types return-type
                                         &aux (rts nil))
   (declare (ignore fname))
-  (if (not (typep (third inline-info) #tfixnum))
-      (fix-opt inline-info))
+
+  (unless (si::fixnump (third inline-info))
+    (fix-opt inline-info))
   ;;         FIXME -- the idea here is that an inline might want to
   ;;         force the coersion of certain arguments, notably fixnums,
   ;;         in certain circumstances.  Thisd is already done
@@ -526,42 +491,28 @@
       (return-from inline-type-matches (when restp `(,(car restp) ,(cadr restp) ,@(cddr inline-info))))))
 ;  (if (member 'integer (car inline-info) :key (lambda (x) (if (consp x) (car x) x)) :test #'eq)
 ;      (return-from inline-type-matches nil))
-  (if (and (let ((types (car inline-info))(last t))
-                (declare (object types))
-                (dolist** (arg-type arg-types (or (equal types '(*))
-						  (endp types)))
-	                (when (endp types) (return nil))
-		  (cond ((equal types '(*))
-			 (setq types `(,last *))))
-		  (let ((arg-type (coerce-to-one-value arg-type)))
-		    (cond ((eq (car types) #tfixnum-float);FIXME remove?
-			   (cond ((type>= #tfixnum arg-type)
-				  (push #tfixnum rts))
-				 ((type>= #tlong-float arg-type)
-				  (push #tlong-float rts))
-				 ((type>= #tshort-float arg-type)
-				  (push #tshort-float rts))
+  (let ((rt (cmp-norm-tp (cadr inline-info))))
+    (if (and (type>= rt (coerce-to-one-value return-type))
+	     (let ((types (mapcar 'cmp-norm-tp (car inline-info)))(last t))
+	       (dolist** (arg-type arg-types (or (equal types '(*))
+						 (endp types)))
+			 (when (endp types) (return nil))
+			 (cond ((equal types '(*))
+				(setq types `(,last *))))
+			 (let ((arg-type (coerce-to-one-value arg-type)))
+			   (cond ((eq (car types) #tfixnum-float);FIXME remove?
+				  (cond ((type>= #tfixnum arg-type)
+					 (push #tfixnum rts))
+					((type>= #tlong-float arg-type)
+					 (push #tlong-float rts))
+					((type>= #tshort-float arg-type)
+					 (push #tshort-float rts))
+					(t (return nil))))
+				 ((type>= (car types) arg-type)
+				  (push (car types) rts))
 				 (t (return nil))))
-			  ((type>= (car types) arg-type)
-			   (push (car types) rts))
-			  (t (return nil))))
-                  (setq last (pop types))))
-	   (type>= (cadr inline-info) return-type))
-;;	   (or
-;;	    (type>= (cadr inline-info) return-type)
-;;  	    (and (eq (cadr inline-info) 'boolean) (eq return-type t)
-;;  		 (stringp (cadddr inline-info))
-;;  		 (let* ((ns (cadddr inline-info)) 
-;;  			(pos (and (eql #\@ (aref ns 0)) (position #\; ns)))
-;;  			(pos (when pos (1+ pos))))
-;;  		   (setq inline-info (list (car inline-info) t (caddr inline-info) ;;FIXME
-;;  					   (si::string-concatenate 
-;;  					    (if pos (subseq ns 0 pos) "")
-;;  					    "(" 
-;;  					    (if pos (subseq ns pos) ns)
-;;  					    ")?Ct:Cnil")))
-;;  		   t)))
-      (cons (nreverse rts) (cdr inline-info))))
+			 (setq last (pop types)))))
+      (cons (nreverse rts) (cons rt (cddr inline-info))))))
 
 (defun need-to-protect (forms types &aux ii)
   (do ((forms forms (cdr forms))
@@ -653,13 +604,18 @@
 					      (eql (setq ch (char (the string fun) (1+ i))) #\1))
 				   (baboon))
 				 (setq max -1)
-				 (wt-fixnum-loc (cond ((and (not (member *value-to-go* '(top return)))
+				 (wt-fixnum-loc (cond ((eq *value-to-go* 'top) (list 'vs-address "base" (cdr (vs-push))))
+						      ((and (not (eq *value-to-go* 'return))
 							    (not (rassoc *value-to-go* +return-alist+))
 							    (not *values-to-go*))
 						       (list 'fixnum-value nil 0))
-						      ((and *mv-var* (not (eq *value-to-go* 'top)))
-						       (when (boundp '*extend-vs-top*) (setq *extend-vs-top* t))
-						       (setq *values-to-go* nil) 
+						      (*mv-var*
+						       (cond ((>= (var-known-init *mv-var*) 0)
+							      (setq *values-to-go* 
+								    (nthcdr (var-known-init *mv-var*) *values-to-go*)))
+							     (t
+							      (unless (boundp '*extend-vs-top*) (baboon))
+							      (setq *extend-vs-top* t *values-to-go* nil)))
 						       (list 'var *mv-var* nil))
 						      ((list 'vs-address "base" (cdr (vs-push)))))))
 				 ((digit-char-p ch 10)
@@ -941,25 +897,25 @@
   (when never-change-special-var-p (si:putprop fname t 'no-sp-change))
   (when predicate (si:putprop fname t 'predicate)))
 
-;;FIXME -- This function needs expansion on centralization.  CM 20050106
-(defun promoted-c-type (type)
-  (let ((type (coerce-to-one-value type)))
-    (let ((ct (if (eq type 'object) type;FIXME!!!
-		(when type (car (member type
-;			   '(signed-char signed-short fixnum integer)
-;			   '(signed-char unsigned-char signed-short unsigned-short fixnum integer)
-			   `(,#tboolean ,@+c-local-var-types+)
-			   :test 'type<=))))))
-      (cond (ct)
-;	    ((eq type 'boolean))
-	    (type)))))
-;      (or ct type))))
-;      (if (integer-typep type)
-;	(cond ;((subtypep type 'signed-char) 'signed-char)
-;	 ((subtypep type 'fixnum) 'fixnum)
-;	 ((subtypep type 'integer) 'integer)
-;	 (t  (error "Cannot promote type ~S to C type~%" type)))
-;      type)))
+;; ;;FIXME -- This function needs expansion on centralization.  CM 20050106
+;; (defun promoted-c-type (type)
+;;   (let ((type (coerce-to-one-value type)))
+;;     (let ((ct (if (eq type 'object) type;FIXME!!!
+;; 		(when type (car (member type
+;; ;			   '(signed-char signed-short fixnum integer)
+;; ;			   '(signed-char unsigned-char signed-short unsigned-short fixnum integer)
+;; 			   `(,#tboolean ,@+c-local-var-types+)
+;; 			   :test 'type<=))))))
+;;       (cond (ct)
+;; ;	    ((eq type 'boolean))
+;; 	    (type)))))
+;; ;      (or ct type))))
+;; ;      (if (integer-typep type)
+;; ;	(cond ;((subtypep type 'signed-char) 'signed-char)
+;; ;	 ((subtypep type 'fixnum) 'fixnum)
+;; ;	 ((subtypep type 'integer) 'integer)
+;; ;	 (t  (error "Cannot promote type ~S to C type~%" type)))
+;; ;      type)))
 
 (defun default-init (type)
   (let ((type (promoted-c-type type)))

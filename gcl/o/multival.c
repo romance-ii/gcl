@@ -129,7 +129,7 @@ FFN(Fmultiple_value_prog1)(object forms)
 void
 gcl_init_multival(void)
 {
-	make_constant("MULTIPLE-VALUES-LIMIT",make_fixnum(32));
+	make_constant("MULTIPLE-VALUES-LIMIT",make_fixnum(MULTIPLE_VALUES_LIMIT));
 	make_function("VALUES",Lvalues);
 	make_function("VALUES-LIST",Lvalues_list);
 	make_special_form("MULTIPLE-VALUE-CALL",Fmultiple_value_call);

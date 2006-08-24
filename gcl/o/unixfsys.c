@@ -896,7 +896,7 @@ gcl_init_unixfsys(void)
 {
 	make_function("TRUENAME", Ltruename);
 	make_function("RENAME-FILE", Lrename_file);
-	make_function("DELETE-FILE", Ldelete_file);
+/* 	make_function("DELETE-FILE", Ldelete_file); */
 	make_function("PROBE-FILE", Lprobe_file);
 	make_function("FILE-WRITE-DATE", Lfile_write_date);
 	make_function("FILE-AUTHOR", Lfile_author);

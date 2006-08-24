@@ -1329,6 +1329,7 @@ DEFUN_NEW("GET-HOLE-SIZE",object,fSget_hole_size,SI
 
 static unsigned long start,end,gprof_on;
 static void *initial_monstartup_pointer;
+void *old_monstartup_pointer=NULL;
 
 void
 gprof_cleanup(void) {
@@ -1665,9 +1666,8 @@ free(void *ptr)
 			*p = Scdr(pp);
 #ifdef GCL_GPROF
 			if (initial_monstartup_pointer==ptr) {
+			  old_monstartup_pointer=initial_monstartup_pointer;
 			  initial_monstartup_pointer=NULL;
-			  if (core_end-heap_end>=sizeof(ptr))
-			    *(void **)heap_end=ptr;
 			}
 #endif
 			return ;
@@ -1675,7 +1675,7 @@ free(void *ptr)
 #ifdef NOFREE_ERR
 	return ;
 #else	
-	if (raw_image==FALSE || core_end-heap_end<sizeof(ptr) || ptr!=*(void **)heap_end) {
+	if (raw_image==FALSE || core_end-heap_end<sizeof(ptr) || ptr!=old_monstartup_pointer) {
 	  static void *old_ptr;
 	  if (old_ptr==ptr) return;
 	  old_ptr=ptr;

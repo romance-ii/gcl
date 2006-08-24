@@ -75,6 +75,9 @@
 (import 'si::+aet-type-object+ 'compiler)
 (import 'si::*tmp-dir* 'compiler)
 (import 'si::returns-exactly 'compiler)
+(import 'si::immfix 'compiler)
+(import 'si::proper-sequence 'compiler)
+(import 'si::proper-cons 'compiler)
 
 (let ((p (find-package "DEFPACKAGE")))
   (when p
@@ -84,36 +87,33 @@
 (defvar *uniq-tp-hash* (make-hash-table :test 'equal))
 (defvar *norm-tp-hash* (make-hash-table :test 'eq))
 
-(defun build-tp (tp)
-  (cond ((atom tp) tp)
-	((member (car tp) '(and or values cons)) (cons (car tp) (mapcar 'uniq-tp (cdr tp))))
-	((eq (car tp) 'not) (list (car tp) (uniq-tp (cadr tp))))
-	(tp)))
+(defmacro cmpt (tp)  `(and (consp ,tp) (member (car ,tp) '(returns-exactly values))))
+(defmacro cmpdt (tp) `(and (consp ,tp) (member (car ,tp) '(and or not cons returns-exactly values))))
 
-;(defun uniq-tp (tp)
-;  (let ((tp (build-tp tp)))
-;    (cond ((gethash tp *uniq-tp-hash*))
-;	  ((setf (gethash tp *uniq-tp-hash*) tp)))))
+(defun build-tp (tp)
+  (cond ((cmpdt tp) (cons (car tp) (mapcar 'uniq-tp (cdr tp))))
+	(tp)))
 
 (defun uniq-tp (tp)
   (cond ((gethash tp *uniq-tp-hash*))
 	((let ((tp (build-tp tp)))
 	   (setf (gethash tp *uniq-tp-hash*) tp)))))
 
-;(defun uniq-tp (tp &optional copy)
-;  (cond ((atom tp) tp)
-;	((member (car tp) '(and or)) 
-;	((gethash tp *uniq-tp-hash*))
-;	((let ((tp (if copy (copy-list tp) tp))) (setf (gethash tp *uniq-tp-hash*) tp)))))
+(defun readable-tp (tp)
+  (cond ((cmpdt tp) (cons (car tp) (mapcar 'readable-tp (cdr tp))))
+	((si::classp tp) (or (si::class-name tp) t))
+	((si::structurep tp) (or (si::s-data-name tp) t))
+	((and (consp tp) (eq (car tp) 'member)) `(,(car tp) ,@(sort (cdr tp) (lambda (x y) (> (si::address x) (si::address y))))))
+	(tp)))
 
 (defun dnt (tp)
   (uniq-tp
-   (cond ((eq '* tp) '*)
-	 ((and (consp tp) (member (car tp) '(values returns-exactly)))
-	  (cond ((not (cdr tp)) nil)
-		((not (cddr tp)) (cmp-norm-tp (cadr tp)))
+   (cond ((eq '* tp) tp)
+	 ((cmpt tp)
+	  (cond ((not (cdr tp)) '(returns-exactly))
+		((and (eq (car tp) 'returns-exactly) (not (cddr tp))) (cmp-norm-tp (cadr tp)))
 		(`(,(car tp) ,@(mapcar 'cmp-norm-tp (cdr tp))))))
-	 ((let ((tp (resolve-type tp))) (if (cadr tp) '* (car tp)))))))
+	 ((let ((tp (resolve-type tp))) (if (cadr tp) '* (readable-tp (car tp))))))))
   
 (defun cmp-norm-tp (tp)
   (multiple-value-bind 
@@ -124,7 +124,7 @@
 	     (r f) (gethash tp *norm-tp-hash*)
 	     (cond (f r)
 		   ((let ((nt (dnt tp)))
-		      (cond ((and (eq '* nt) (not (eq tp '*))) nt)
+		      (cond ((and (eq '* nt) (not (eq tp '*))) nt);don't hash unknown types
 			    ((setf (gethash tp *norm-tp-hash*) nt (gethash nt *norm-tp-hash*) nt))))))))))))
 
 (defun sharp-t-reader (stream subchar arg)
@@ -209,175 +209,57 @@
        (declare (:dynamic-extent ,s))
        (uniq-tp ,s))))
 
-(defun type-and (t1 t2)
-  (let* ((t1 (cmpntww t1))
-	 (t2 (cmpntww t2))
-	 (x  (uniq-tp-from-stack `and t1 t2)))
-    (multiple-value-bind 
-	(r f) (gethash x *norm-tp-hash*)
-      (cond (f r)
-	    ((setf (gethash x *norm-tp-hash*) (type-and-int t1 t2)))))))
+(defvar *and-tp-hash* (make-hash-table :test 'eq))
+(defvar  *or-tp-hash* (make-hash-table :test 'eq))
+(defconstant +useful-type-list+ '(nil 
+				  null boolean keyword symbol 
+				  proper-cons cons proper-list list 
+				  simple-vector string (vector fixnum) vector
+				  proper-sequence sequence
+				  (integer 0 0) (integer 1 1) 
+;				  bit char unsigned-char short unsigned-short 
+				  seqind immfix fixnum (integer 0) integer
+				  (short-float 0.0 0.0) (short-float * (0.0)) (short-float (0.0)) 
+				  (short-float * 0.0) (short-float 0.0) short-float
+				  (long-float 0.0 0.0) (long-float * (0.0)) (long-float (0.0)) 
+				  (long-float * 0.0) (long-float 0.0) long-float
+				  (real 0.0 0.0) (real * (0.0)) (real (0.0)) (real * 0.0) (real 0.0) real
+				  number
+				  character 
+				  t))
+(defconstant +useful-types+ (mapcar (lambda (x) (load-time-value (cmp-norm-tp x))) +useful-type-list+))
+(mapc (lambda (x) 
+	(setf (gethash x *and-tp-hash*) (make-hash-table :test 'eq :size 128))
+	(setf (gethash x  *or-tp-hash*) (make-hash-table :test 'eq :size 128))) +useful-types+)
 
-(defun type-or1 (t1 t2)
-  (let ((t1 (cmpntww t1))
-	(t2 (cmpntww t2))
-	(x  (uniq-tp-from-stack `or t1 t2)))
-    (multiple-value-bind 
-     (r f) 
-     (gethash x *norm-tp-hash*)
-     (cond (f r)
-	   ((setf (gethash x *norm-tp-hash*) (type-or1-int t1 t2)))))))
+(defun type-and (t1 t2 &aux h1 h2 r f)
+  (cond ((eq t1 t2) t2);accelerator
+	((when (setq h1 (gethash t1 *and-tp-hash*)) (multiple-value-setq (r f) (gethash t2 h1)) f) r)
+	((when (setq h2 (gethash t2 *and-tp-hash*)) (multiple-value-setq (r f) (gethash t1 h2)) f) r)
+	((let ((q (let ((x (uniq-tp-from-stack `and t1 t2)))
+		    (multiple-value-setq (r f) (gethash x *norm-tp-hash*))
+		    (cond (f r)
+			  ((setf (gethash x *norm-tp-hash*) (type-and-int t1 t2)))))))
+	   (when h1 (setf (gethash t2 h1) q))
+	   (when h2 (setf (gethash t1 h2) q))
+	   q))))
+
+(defun type-or1 (t1 t2 &aux h1 h2 r f)
+  (cond ((eq t1 t2) t2);accelerator
+	((when (setq h1 (gethash t1 *or-tp-hash*)) (multiple-value-setq (r f) (gethash t2 h1)) f) r)
+	((when (setq h2 (gethash t2 *or-tp-hash*)) (multiple-value-setq (r f) (gethash t1 h2)) f) r)
+	((let ((q (let ((x (uniq-tp-from-stack `or t1 t2)))
+		    (multiple-value-setq (r f) (gethash x *norm-tp-hash*))
+		    (cond (f r)
+			  ((setf (gethash x *norm-tp-hash*) (type-or1-int t1 t2)))))))
+	   (when h1 (setf (gethash t2 h1) q))
+	   (when h2 (setf (gethash t1 h2) q))
+	   q))))
 
 (defmacro type-filter (type) `(cmp-norm-tp ,type))
 
 (defun literalp (form)
   (or (constantp form) (and (consp form) (eq (car form) 'load-time-value))))
-
-
-
-;; old propagators
-
-;(defun random-propagator (&rest r)
-;  (let ((tp (cmp-norm-tp (cadr r))))
-;    (if (integer-typep tp)
-;	`(integer 0 ,(if (integerp (caddr tp)) (caddr tp) '*))
-;      tp)))
-
-;(defun ash-propagator (f t1 t2)
-;  (and
-;   (type>= 'fixnum t1)
-;   (type>= '(integer #.most-negative-fixnum #.(integer-length most-positive-fixnum)) t2)
-;   (super-range f t1 t2)))
-
-;(defun floor-propagator (f t1 &optional (t2 '(integer 1 1)))
-;  (let ((t1 (coerce-to-integer-type t1))
-;	(t2 (coerce-to-integer-type t2)))
-;    (and t2
-;	 (let ((i21 (integerp (cadr t2)))
-;	       (i22 (integerp (caddr t2))))
-;	   (and i21 i22 (> (* (cadr t2) (caddr t2)) 0)
-;		(let ((sr (super-range f t1 t2)))
-;		  (and sr
-;		       (list 'values sr
-;			     (let ((outer (if (< (cadr t2) 0) (cadr t2) (caddr t2))))
-;			       (let ((a (cadr (multiple-value-list
-;					      (funcall (symbol-function f) (- (1- outer)) outer))))
-;				     (b (cadr (multiple-value-list
-;					       (funcall (symbol-function f) (- (1+ outer)) outer))))
-;				     (c (cadr (multiple-value-list
-;					       (funcall (symbol-function f) (1+ outer) outer))))
-;				     (d (cadr (multiple-value-list
-;					       (funcall (symbol-function f) (1- outer) outer)))))
-;				 (let ((p (min a b c d)))
-;				   (if (< p 0)
-;				       (list (car t2) p 0)
-;				     (list (car t2) 0 (max a b c d))))))))))))))
-
-;(defmacro mfc2 (&rest r)
-;  `(cadr (multiple-value-list (mfc ,@r))))
-
-;(defun floor-propagator1 (f t1 &optional (t2 '(integer 1 1)))
-;  (let ((sr (super-range1 f t1 t2)))
-;    (when sr
-;      `(values ,sr
-;	       ,(let* ((outer (if (type>= '(real * (0)) t2)
-;				(if (consp (cadr t2)) (caadr t2) (cadr t2))
-;			      (if (consp (caddr t2)) (caaddr t2) (caddr t2))))
-;		      (a (mfc2 f 1 outer))
-;		      (b (mfc2 f -1 outer))
-;		      (c (mfc2 f (1+ outer) outer))
-;		      (d (mfc2 f (1- outer) outer))
-;		      (p (min a b c d)))
-;		 (if (< p 0)
-;		     `(,(car t2) ,p 0)
-;		   `(,(car t2) 0 ,(max a b c d))))))))
-		 
-;; (defun super-range (f &optional (t1 nil t1p) (t2 nil t2p))
-;;   (if t1p
-;;       (let ((t1 (coerce-to-integer-type t1)))
-;; 	(and t1
-;; 	     (let ((i11 (integerp (cadr t1)))
-;; 		   (i12 (integerp (caddr t1))))
-;; 	       (if (and i11 i12)
-;; 		   (if t2p
-;; 		       (let ((t2 (coerce-to-integer-type t2)))
-;; 			 (and t2 (eq (car t1) (car t2))
-;; 			      (let ((i21 (integerp (cadr t2)))
-;; 				    (i22 (integerp (caddr t2))))
-;; 				(if (and i21 i22)
-;; 				    (let ((a (funcall f (cadr t1) (cadr t2)))
-;; 					  (b (funcall f (cadr t1) (caddr t2)))
-;; 					  (c (funcall f (caddr t1) (cadr t2)))
-;; 					  (d (funcall f (caddr t1) (caddr t2))))
-;; 				      (list (car t1) (min a b c d) (max a b c d)))
-;; 				  (list (car t1) '* '*)))))
-;; 		     (let ((a (funcall f (cadr t1)))
-;; 			   (b (funcall f (caddr t1))))
-;; 		       (list (car t1) (min a b) (max a b))))
-;; 		 (list (car t1) '* '*)))))
-;;     (let ((a (funcall f)))
-;;       (list 'integer a a))))
-
-;; (defmacro pbound (a)
-;;   (let ((s (gensym)))
-;;     `(let ((,s ,a)) (cond ((consp ,s) (car ,s)) ((eq ,s '+*) 1) ((eq ,s '-*) -1) ((eq ,s '+e) 0) ((eq ,s '-e) 0) (,s)))))
-;; (defmacro qbound (a)
-;;   (let ((s (gensym)))
-;;     `(let ((,s ,a)) (cond ((consp ,s) (car ,s)) ((eq ,s '+*) 1) ((eq ,s '-*) -1) ((eq ,s '+e) 1) ((eq ,s '-e) -1) (,s)))))
-
-;; (defmacro mfc (f &rest r)
-;;   (let ((v (gensym)) (i (gensym)) (e (gensym)) (q (gensym)))
-;;     `(let ((,i (or ,@(mapcan (lambda (x) `((eq '+* ,x) (eq '-* ,x))) r)))
-;; 	   (,e (or ,@(mapcan (lambda (x) `((eq '+e ,x) (eq '-e ,x))) r)))
-;; 	   (,v ,(cons 'funcall (cons f (mapcar (lambda (x) `(pbound ,x)) r))))
-;; 	   (,q ,(cons 'funcall (cons f (mapcar (lambda (x) `(qbound ,x)) r)))))
-;; 	 (cond (,i (cond ((< ,v 0) '-*) ((> ,v 0) '+*) ((< ,q 0) '-*) ('+*)))
-;; 	       ((and ,e (= ,v 0)) (cond ((< ,q 0) '-e) ((> ,q 0) '+e) (0)))
-;; 	       ((and ,@(mapcar (lambda (x) `(or (eq ,x '+e) (eq ,x '-e) (consp ,x))) r)) (list ,v))
-;; 	       (,v)))))
-
-;; (defun integer-typep (type)
-;;   (and (consp type)
-;;        (member (car type) '(integer signed-byte unsigned-byte))
-;;        (let ((l (length type)))
-;; 	 (and (<= 1 l 3)
-;; 	      (or (< l 2) (integerp (cadr type)) (eq (cadr type) '*))
-;; 	      (or (< l 3) (integerp (caddr type)) (eq (caddr type) '*))))))
-
-;; (defun coerce-to-integer-type (t1)
-;;   (if (integer-typep t1) t1
-;;     (let ((t1 (cmp-norm-tp t1)))
-;;       (if (integer-typep t1) t1))))
-
-;; (defvar *two-stars* '(* *))
-
-;; (defun integer-norm-form (form &optional (st *two-stars* stp))
-;;   (cond ((and (not stp) (atom form)) (integer-norm-form (list form)))
-;; 	((and form (or (not st) (atom form))) (error "Bad integer type"))
-;; 	(form (cons (car form) (integer-norm-form (cdr form) (if stp (cdr st) st))))
-;; 	(st)))
-
-;; (defun integer-type-and (type1 type2)
-;;   (let ((ct1 (integer-norm-form (coerce-to-integer-type type1)))
-;; 	(ct2 (integer-norm-form (coerce-to-integer-type type2))))
-;;     (and ct1 ct2
-;; 	 (eq (car ct1) (car ct2))
-;; 	 (let ((b1 (cadr ct1))
-;; 	       (e1 (caddr ct1))
-;; 	       (b2 (cadr ct2))
-;; 	       (e2 (caddr ct2)))
-;; 	   (let ((i11 (integerp b1))
-;; 		 (i12 (integerp e1))
-;; 		 (i21 (integerp b2))
-;; 		 (i22 (integerp e2)))
-;; 	     (let ((br (if i11 (if i21 (max b1 b2) b1) (if i21 b2 '*)))
-;; 		   (er (if i12 (if i22 (min e1 e2) e1) (if i22 e2 '*))))
-;; 	       (let ((t12 (and (eql br b1) (eql er e1) type1))
-;; 		     (t21 (and (eql br b2) (eql er e2) type2)))
-;; 		     (or (and t12 t21)
-;; 			 t12 t21
-;; 			 (and (or (eq br '*) (eq er '*) (<= br er))
-;; 			      (list (car ct1) br er))))))))))
 
 (defconstant +real-contagion-list+ '(integer short-float long-float))
 
@@ -532,12 +414,6 @@
 (defun log-wrap (x y)
   (if (= 0 x) (symbol-value '-inf) (log x y)))
 
-;; (defun max-propagator (f t1 &optional (t2 nil t2p))
-;;   (cond ((not t2p) (super-range f t1))
-;; 	((member-if (lambda (x) (and (type>= x t1) (type>= x t2))) +real-contagion-list+) (super-range f t1 t2)))) ;;FIXME super-range needs to handle or types, right now punt to rfa in gcl_cmpopt.
-;; (si::putprop 'max 'max-propagator 'type-propagator)
-;; (si::putprop 'min 'max-propagator 'type-propagator)
-
 (defun log-propagator (f t1 &optional (t2 #t(short-float #.(exp 1.0s0) #.(exp 1.0s0))))
   (declare (ignore f))
   (super-range 'log-wrap t1 t2))
@@ -607,7 +483,7 @@
 	       ,(cond ((member f (sfl floor ffloor))       (mod-propagator f t1 t2))
 		      ((member f (sfl ceiling fceiling))   (super-range '- (mod-propagator f t1 t2)))
 		      ((member f (sfl truncate ftruncate round fround)) (rem-propagator f t1 t2)))))))
-					;multiplying by 0.5 for round would convert integer rages to float
+					;multiplying by 0.5 for round would convert integer ranges to float
 (dolist (l '(floor ceiling truncate round ffloor fceiling ftruncate fround))
   (si::putprop l 'floor-propagator 'type-propagator))
 
@@ -637,40 +513,33 @@
   (type-and (type-or1 t1 (super-range '- t1)) #t(real 0)))
 (si::putprop 'abs 'abs-propagator 'type-propagator)
 
-(defmacro vt (tp) `(and (consp ,tp) (eq (car ,tp) 'values)))
-(defmacro et (tp) `(and (consp ,tp) (eq (car ,tp) 'returns-exactly)))
+(defmacro eov (type1 l1 type2 l2)
+  `(if (and (= ,l1 ,l2) 
+	    (eq (car ,type1) 'returns-exactly)
+	    (eq (car ,type2) 'returns-exactly)) 
+       'returns-exactly 'values))
 
-;;FIXME -- centralize subtypep, normalzie-type, type>=, type-and.
-;;Consider traversing a static tree.  CM 20050106
 (defun type-and-int (type1 type2)
   (cond ((eq type1 '*) type2)
 	((eq type2 '*) type1)
 	((equal type1 type2) type2)
-	((or (et type1) (et type2))
-	 (let* ((ntype1 (if (et type1) (cmp-norm-tp (cons 'values (cdr type1))) type1))
-		(ntype2 (if (et type2) (cmp-norm-tp (cons 'values (cdr type2))) type2))
-		(z (type-and ntype1 ntype2))
-		(lz (when (consp z) (length z))))
-	   (cond ((vt z)
-		  (and lz
-		       (or (not (et type1)) (= (length type1) lz))
-		       (or (not (et type2)) (= (length type2) lz))
-		       (cmp-norm-tp `(returns-exactly ,@(cdr z)))))
-		 (z))))
-	((or (vt type1) (vt type2))
-	 (let* ((ntype1 (if (vt type1) type1 `(values ,@(when type1 (list type1)))))
-		(ntype2 (if (vt type2) type2 `(values ,@(when type2 (list type2)))))
+	((and (cmpt type1) (cmpt type2))
+	 (let* ((ntype1 (if (cmpt type1) (cdr type1) (when type1 (list type1))))
+		(ntype2 (if (cmpt type2) (cdr type2) (when type2 (list type2))))
 		(l1 (length ntype1))
-		(l2 (length ntype2)))
-	   (cond ((and (every 'type>= (cdr ntype1) (cdr ntype2)) (>= l1 l2)) type2)
-		 ((and (every 'type>= (cdr ntype2) (cdr ntype1)) (>= l2 l1)) type1)
-		 ((cmp-norm-tp `(values ,@(mapcar 'type-and (cdr ntype1) (cdr ntype2))))))))
+		(l2 (length ntype2))
+		(eov (eov type1 l1 type2 l2)))
+	   (cond ((and (every 'type>= ntype1 ntype2) (>= l1 l2) (eq (car type2) eov)) type2)
+		 ((and (every 'type>= ntype2 ntype1) (>= l2 l1) (eq (car type1) eov)) type1)
+		 ((cmp-norm-tp `(,eov ,@(mapcar 'type-and ntype1 ntype2)))))))
+	((cmpt type1) (type-and (or (cadr type1) #tnull) type2))
+	((cmpt type2) (type-and type1 (or (cadr type2) #tnull)))
 	((member type1 '(t object)) type2)
 	((member type2 '(t object)) type1)
 	((subtypep1 type2 type1) type2)
 	((subtypep1 type1 type2) type1)
 	((cmp-norm-tp `(and ,type1 ,type2)))))
-		 
+
 (defun type>= (type1 type2)
   (let ((t1 (cmpntww type1))
 	(t2 (cmpntww type2)))
@@ -689,38 +558,108 @@
 					;    (when (not (eq type2 (cmp-norm-tp type2))) (cmpwarn "unnorm type2 ~s~%" type2))
 ;      (equal z t1))))
       (eq z t1))))
-;  (equal (type-and type2 type1) type1))
-
 
 (defun type-or1-int (type1 type2)
   (cond ((eq type1 '*) type1)
 	((eq type2 '*) type2)
-	((or (et type1) (et type2))
-	 (let* ((ntype1 (if (et type1) (cmp-norm-tp (cons 'values (cdr type1))) type1))
-		(ntype2 (if (et type2) (cmp-norm-tp (cons 'values (cdr type2))) type2))
-		(z (type-or1 ntype1 ntype2))
-		(lz (when (consp z) (length z))))
-	   (cond ((and (et type1) (et type2) (= lz (length type1)) (= lz (length type2)))
-		  (cmp-norm-tp `(returns-exactly ,@(cdr z))))
-		 (z))))
-	((or (vt type1) (vt type2))
-	 (let* ((ntype1 (if (vt type1) type1 `(values ,@(when type1 (list type1)))))
-		(ntype2 (if (vt type2) type2 `(values ,@(when type2 (list type2)))))
+	((equal type1 type2) type2)
+	((and (cmpt type1) (cmpt type2))
+	 (let* ((ntype1 (if (cmpt type1) (cdr type1) (when type1 (list type1))))
+		(ntype2 (if (cmpt type2) (cdr type2) (when type2 (list type2))))
 		(l1 (length ntype1))
 		(l2 (length ntype2))
 		(n (- (max l1 l2) (min l1 l2)))
 		(e (make-list n :initial-element #tnull))
 		(ntype1 (if (< l1 l2) (append ntype1 e) ntype1))
-		(ntype2 (if (< l2 l1) (append ntype2 e) ntype2)))
-	   (cond ((and (every 'type>= (cdr ntype2) (cdr ntype1)) (>= l2 l1)) type2)
-		 ((and (every 'type>= (cdr ntype1) (cdr ntype2)) (>= l1 l2)) type1)
-		 ((cmp-norm-tp `(values ,@(mapcar 'type-or1 (cdr ntype1) (cdr ntype2))))))))
-	((equal type1 type2) type2)
+		(ntype2 (if (< l2 l1) (append ntype2 e) ntype2))
+		(eov (eov type1 l1 type2 l2)))
+	   (cond ((and (every 'type>= ntype2 ntype1) (>= l2 l1) (eq (car type2) eov)) type2)
+		 ((and (every 'type>= ntype1 ntype2) (>= l1 l2) (eq (car type1) eov)) type1)
+		 ((cmp-norm-tp `(,eov ,@(mapcar 'type-or1 ntype1 ntype2)))))))
+	((cmpt type1) (type-or1 type1 (cmp-norm-tp `(values ,type2))))
+	((cmpt type2) (type-or1 (cmp-norm-tp `(values ,type1)) type2))
 	((member type1 '(t object)) type1)
 	((member type2 '(t object)) type2)
 	((subtypep1 type1 type2) type2)
 	((subtypep1 type2 type1) type1)
 	((type-filter `(or ,type1 ,type2)))))
+
+;; This is the begininng of the long-awaited type-handling
+;; centralization.  +c-global-arg-types+ can be passed unboxed to the
+;; interpreter -- there are at most three (encoded in a two bit field)
+;; of these which must be coordinated with the enum ftype definined in
+;; object.h. +c-local-arg-types+ is a larger set which can be passed
+;; unboxed to and from compiled functions in the same lisp source file
+;; -- these must be passable in total on the C stack by value, i.e. no
+;; pointers.  +c-local-var-types+ is a larger set which can be
+;; manipulated unboxed within compiled functions, presumably to
+;; allocate them on the local stack and save gc, but cannot be passed
+;; as function arguments or returned therefrom.  20050707 CM.
+
+(defconstant +c-global-arg-types-syms+   `(fixnum)) ;FIXME (long-float short-float) later
+(defconstant +c-local-arg-types-syms+    (union +c-global-arg-types-syms+ '(fixnum character long-float short-float)))
+;(defconstant +c-local-var-types-syms+    (union +c-local-arg-types-syms+ '(fixnum character long-float short-float integer)))
+(defconstant +c-local-var-types-syms+    (union +c-local-arg-types-syms+ '(fixnum character long-float short-float)))
+
+(defun get-sym (args)
+  (intern (apply 'concatenate 'string (mapcar 'string args))))
+
+(defconstant +set-return-alist+ 
+  (mapcar (lambda (x) (cons (get-sym `("RETURN-" ,x)) (get-sym `("SET-RETURN-" ,x)))) +c-local-arg-types-syms+))
+(defconstant +return-alist+ 
+  (mapcar (lambda (x) (cons (if (eq x 'object) x (cmp-norm-tp x)) (get-sym `("RETURN-" ,x)))) (cons 'object +c-local-arg-types-syms+)))
+(defconstant +wt-loc-alist+ 
+  `((object . wt-loc)
+    ,@(mapcar (lambda (x) (cons (cmp-norm-tp x) (get-sym `("WT-" ,x "-LOC")))) +c-local-var-types-syms+)))
+(defconstant +coersion-alist+
+  (mapcar (lambda (x) (cons (cmp-norm-tp x) (get-sym `(,x "-LOC")))) +c-local-var-types-syms+))
+(defconstant +inline-types-alist+ 
+  `((,#tboolean . inline-cond) (t . inline) 
+    ,@(mapcar (lambda (x) (cons (cmp-norm-tp x) (get-sym `("INLINE-" ,x)))) +c-local-var-types-syms+)))
+
+(defconstant +c-global-arg-types+   (mapcar 'cmp-norm-tp +c-global-arg-types-syms+)) ;FIXME (long-float short-float) later
+(defconstant +c-local-arg-types+    (mapcar 'cmp-norm-tp +c-local-arg-types-syms+))
+(defconstant +c-local-var-types+    (mapcar 'cmp-norm-tp +c-local-var-types-syms+))
+
+
+(defvar *pmct-hash* (make-hash-table :test 'eq))
+(defun promoted-c-type (type)
+  (or (gethash type *pmct-hash*)
+      (setf (gethash type *pmct-hash*)
+	    (let ((type (coerce-to-one-value type)))
+	      (cond ((eq type 'object) type)
+		    ((when type (car (member type `(,#tboolean ,@+c-local-var-types+) :test 'type<=))))
+		    (type))))))
+
+(defvar *ctov-hash* (make-hash-table :test 'eq))
+(defun coerce-to-one-value (type)
+  (or (gethash type *ctov-hash*)
+      (setf (gethash type *ctov-hash*)
+	    (or (not type) (type-and type t)))))   
+
+(defvar *stp-hash* (make-hash-table :test 'eq))
+(defun single-type-p (type)
+  (or (gethash type *stp-hash*)
+      (setf (gethash type *stp-hash*)
+	    (type>= t type))))	   
+
+(defconstant +export-type-alist+ (mapcar 'cons +useful-type-list+ +useful-types+))
+(defvar *ext-hash* (make-hash-table :test 'eq))
+(defun export-type (type)
+  (or (gethash type *ext-hash*)
+      (setf (gethash type *ext-hash*)
+	    (cond ((single-type-p type) (or (car (rassoc type +export-type-alist+)) type))
+		  ((consp type) `(,(car type) ,@(mapcar 'export-type (cdr type))))
+		  (type)))))
+		  
+(defvar *bump-hash* (make-hash-table :test 'eq))
+(defun bump-tp (tp)
+  (or (gethash tp *bump-hash*)
+      (setf (gethash tp *bump-hash*)
+	    (cond ((eq tp '*) tp)
+		  ((and (consp tp) (member (car tp) '(values returns-exactly))) 
+		   (cmp-norm-tp `(,(car tp) ,@(mapcar 'bump-tp (cdr tp)))))
+		  ((car (member tp +useful-types+ :test 'type<=)))))))
 
 (defun reset-info-type (info)
   (if (info-type info)
@@ -728,8 +667,6 @@
            (setf (info-type info1) t)
            info1)
       info))
-
-;(defun reset-info-type (x) x)
 
 (defun and-form-type (type form original-form &aux type1)
   (setq type1 (type-and type (info-type (cadr form))))

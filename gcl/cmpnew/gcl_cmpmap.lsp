@@ -266,7 +266,7 @@
     (too-few-args 'map-function 2 (length args)))
   (let ((info (make-info)))
     (let ((nargs (c1args args info)))
-      (if (not (member-if-not (lambda (x) (type>= 'vector (info-type (cadr x)))) (cddr nargs)))
+      (if (not (member-if-not (lambda (x) (type>= #tvector (info-type (cadr x)))) (cddr nargs)))
 	(let ((l (gensym)) (i (gensym)))
 	  (c1expr 
 	   `(let ((,l (min ,@(mapcar (lambda (x) `(length ,x)) (cddr args)))))
@@ -281,7 +281,7 @@
     (too-few-args 'map-function 2 (length args)))
   (let ((info (make-info)))
     (let ((nargs (c1args (cddr args) info)))
-      (if (and (not (car args)) (not (member-if-not (lambda (x) (type>= 'vector (info-type (cadr x)))) nargs)))
+      (if (and (not (car args)) (not (member-if-not (lambda (x) (type>= #tvector (info-type (cadr x)))) nargs)))
 	  (let ((l (gensym)) (i (gensym)))
 	    (c1expr 
 	     `(let ((,l (min ,@(mapcar (lambda (x) `(length ,x)) (cddr args)))))

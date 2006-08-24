@@ -1478,7 +1478,7 @@ sgc_start(void) {
     
     {
       old_rb_start=rb_start;
-      if(!saving_system) {
+/*       if(!saving_system) */ {
 	new=alloc_relblock(((unsigned long)WSGC(tm))*PAGESIZE);
 	/* the above may cause a gc, shifting the relblock */
 	old_rb_start=rb_start;

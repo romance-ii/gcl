@@ -50,8 +50,6 @@
 (defun c1declare (args)
   (cmperr "The declaration ~s was found in a bad place." (cons 'declare args)))
 
-(defconstant +useful-c-types+ #l(boolean seqind fixnum short-float long-float proper-list t))
-
 (defun c1the (args &aux info form type dtype)
   (when (or (endp args) (endp (cdr args)))
         (too-few-args 'the 2 (length args)))
@@ -69,7 +67,7 @@
 	(when tg
 	  (unless (type>= (var-mt v) dtype)
 	    (setf (var-mt v) (type-or1 (var-mt v) dtype))
-	    (let* ((nmt (car (member (var-mt v) +useful-c-types+ :test 'type<=)))
+	    (let* ((nmt (bump-tp (var-mt v)))
 		   (nmt (type-and nmt (var-dt v))))
 	      (setf (var-mt v) nmt))
 	    (throw (var-tag v) v)))))
@@ -119,7 +117,7 @@
                      (list 'function *info* fd))
                     (t (let ((info (make-info
                                     :sp-change
-                                    (null (get fun 'no-sp-change)))))
+                                    (if (null (get fun 'no-sp-change)) 1 0))))
                             (list 'function info (list 'call-global info fun))
                             ))))
              ((and (consp fun) (eq (car fun) 'lambda))

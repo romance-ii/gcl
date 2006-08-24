@@ -102,6 +102,21 @@ trap_gcl_gmp_allocfun(size_t size){
 }
 #endif
 
+extern void
+__gmp_randget_mt ();
+extern void
+__gmp_randclear_mt ();
+extern void
+__gmp_randiset_mt ();
+
+typedef struct {void *a,*b,*c,*d;} gmp_randfnptr_t;
+static gmp_randfnptr_t Mersenne_Twister_Generator_Noseed = {
+  NULL,
+  __gmp_randget_mt,
+  __gmp_randclear_mt,
+  __gmp_randiset_mt
+};
+
 void
 init_gmp_rnd_state(__gmp_randstate_struct *x) {
 
@@ -122,10 +137,15 @@ init_gmp_rnd_state(__gmp_randstate_struct *x) {
 
     for (i=0;p<pe && (!*p || *p<(void *)DBEGIN || *p>(void *)core_end || (*p==trap_result && ++i));p++);
     if (p!=pe || i!=1)
-      FEerror("Unknown pointer in rnd_date!",0);
+      FEerror("Unknown pointer in rnd_state!",0);
 
     if (x->_mp_seed->_mp_d!=trap_result)
-      FEerror("Unknown pointer in rnd_date!",0);
+      FEerror("Unknown pointer in rnd_state!",0);
+
+    if (((gmp_randfnptr_t *)x->_mp_algdata._mp_lc)->b!=Mersenne_Twister_Generator_Noseed.b ||
+	((gmp_randfnptr_t *)x->_mp_algdata._mp_lc)->c!=Mersenne_Twister_Generator_Noseed.c ||
+	((gmp_randfnptr_t *)x->_mp_algdata._mp_lc)->d!=Mersenne_Twister_Generator_Noseed.d)
+      FEerror("Unknown pointer data in rnd_state!",0);
 
     gcl_gmp_allocfun=old_gcl_gmp_allocfun;
 
@@ -160,6 +180,8 @@ make_random_state(object rs) {
   else
     gmp_randseed(&z->rnd.rnd_state,rs->rnd.rnd_state._mp_seed);
   
+  z->rnd.rnd_state._mp_algdata._mp_lc=&Mersenne_Twister_Generator_Noseed;
+
   return(z);
 
 }

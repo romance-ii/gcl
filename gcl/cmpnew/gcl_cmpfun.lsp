@@ -512,7 +512,7 @@
     (let* ((eltp (position :element-type args))
 	   (eltp (and eltp (nth (1+ eltp) nargs)))
 	   (eltp (and eltp (consp eltp) (eq (car eltp) 'location) (caddr eltp)))
-	   (eltp (and (consp eltp) (eq (car eltp) 'VV) (caar (member (cadr eltp) *objects*  :key 'cadr))))
+	   (eltp (and (consp eltp) (eq (car eltp) 'VV) (gethash (cadr eltp) *objects-rev*)))
 	   (eltp (if eltp `(,eltp) `(*))))
       (let ((szf (let ((st (cmp-norm-tp (info-type (cadar nargs)))))
 		   (cond ((and (constantp (car args)) 
@@ -830,7 +830,7 @@
 
 (defun co1cons (f args) f
   (let ((tem (and (eql (length args) 2) (cons-to-lista args))))
-    (and (not (eq tem args))
+    (and tem (not (eq tem args))
 	 (c1expr  (if (equal '(nil) (last tem))
 		     (cons 'list (butlast tem))
 		     (cons 'list* tem))))))
@@ -1097,11 +1097,9 @@
 ;; (si:putprop 'sublis1 'c2sublis1 'c2)
 
 (defun sublis1-inline (a b c)
-  (let ((tst (car (find (cadr c) *objects* :key 'cadr))))
+  (let ((tst (gethash (cadr c) *objects-rev*)))
     (or (member tst '(eq equal1 eql1)) (error "bad test"))
-  (wt "(check_alist("
-      a
-     "),sublis1("a "," b "," (format nil "~(&~a~)))" tst))))
+  (wt "(check_alist(" a "),sublis1(" a "," b "," (format nil "~(&~a~)))" tst))))
 
   
 ;; end new		  

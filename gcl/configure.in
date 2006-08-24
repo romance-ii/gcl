@@ -20,7 +20,7 @@ AC_DEFINE_UNQUOTED(HOLEDIV,$enable_holediv)
 
 AC_ARG_ENABLE(vssize,
 [ --enable-vssize=XXXX   will compile in a value stack of size XXX],
-,enable_vssize=131072)
+,enable_vssize=262144)
 AC_DEFINE_UNQUOTED(VSSIZE,$enable_vssize)
 
 

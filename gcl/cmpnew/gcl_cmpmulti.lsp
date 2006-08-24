@@ -33,14 +33,19 @@
 (si:putprop 'multiple-value-bind 'c1multiple-value-bind 'c1)
 (si:putprop 'multiple-value-bind 'c2multiple-value-bind 'c2)
 
+(defun nval (x)
+  (cond ((type>= #t(returns-exactly) x) 0)
+	((single-type-p x) 1)
+	((consp x) (1- (length x)))))
+
 (defun c1multiple-value-call (args &aux info funob)
   (when (endp args) (too-few-args 'multiple-value-call 1 0))
   (let* ((nargs (c1args (cdr args) (make-info)))
 	 (tps (mapcar (lambda (x) (info-type (cadr x))) nargs)))
     (cond ((endp (cdr args)) (c1funcall args))
-	  ((and (every (lambda (x) (or (type>= t x) (and (consp x) (eq (car x) 'returns-exactly)))) tps)
+	  ((and (every 'nval tps)
 		(inline-possible 'multiple-value-bind))
-	   (let* ((n (reduce '+ (mapcar (lambda (x) (if (type>= t x) 1 (1- (length x)))) tps)))
+	   (let* ((n (reduce '+ (mapcar 'nval tps)))
 		  (syms (mapcar (lambda (x) (declare (ignore x)) (gensym)) (make-list n)))
 		  (r syms))
 	     (c1expr
@@ -48,7 +53,7 @@
 			(cond ((= 1 (length (car x)))
 			       `(let ((,(caar x) ,(cadr x))) ,y))
 			      (`(multiple-value-bind ,@x ,y))))
-		      (mapcar (lambda (x y) (let* ((n (if (type>= t x) 1 (1- (length x)))) syms)
+		      (mapcar (lambda (x y) (let* ((n (nval x)) syms)
 					      (dotimes (i n) (push (pop r) syms))
 					      (list (nreverse syms) y))) tps (cdr args))
 		      :from-end t :initial-value `(funcall ,(car args) ,@syms)))))
@@ -92,7 +97,7 @@
   (when (endp args) (too-few-args 'multiple-value-prog1 1 0))
   (setq form (c1expr* (car args) info))
   (let ((tp (info-type (cadr form))))
-    (cond ((type>= t tp) (let ((s (gensym))) (c1expr `(let ((,s ,(car args))) ,@(cdr args) ,s))))
+    (cond ((single-type-p tp) (let ((s (gensym))) (c1expr `(let ((,s ,(car args))) ,@(cdr args) ,s))))
 	  ((and (consp tp) (eq (car tp) 'returns-exactly))
 	   (let ((syms (mapcar (lambda (x) (declare (ignore x)) (gensym)) (cdr tp))))
 	     (c1expr `(multiple-value-bind (,@syms) ,(car args) ,@(cdr args) (values ,@syms)))))
@@ -144,7 +149,7 @@
 	     (cdr forms)
 	     (consp *current-form*)
 	     (eq 'defun (car *current-form*))
-	     (type>= t (get-return-type (cadr *current-form*))))
+	     (single-type-p (get-return-type (cadr *current-form*))))
     (cmpwarn "Trying to return multiple values. ~%;But ~a was proclaimed to have single value.~%;Only first one will assured."
 	     (cadr *current-form*)))
   
@@ -215,12 +220,12 @@
        (eq (car form) 'call-global)
        (let ((fname (third form)))
 	 (cond ((and (symbolp fname)
-		     (let ((tem (get fname 'proclaimed-return-type)))
-		       (and tem
-			    ;; proclaimed to have 1 arg:
-			    (consp tem)
-			    (not (eq tem '*))
-			    (null (cdr tem)))))
+		     (single-type-p (get-return-type fname)))
+;; 		       (and tem
+;; 			    ;; proclaimed to have 1 arg:
+;; 			    (consp tem)
+;; 			    (not (eq tem '*))
+;; 			    (null (cdr tem)))))
 		(cmpwarn "~A was proclaimed to have only one return value. ~%;But you appear to want multiple values." fname))))))
 		
 ;; (defun c2multiple-value-setq (vrefs form &aux top-data)
@@ -368,11 +373,14 @@
   (setq init-form (c1expr* (cadr args) info))
 
   (setq vars (nreverse vars))
-  (let ((tp (info-type (second init-form))))
-    (when (and (consp tp) (eq (car tp) 'values))
-      (do ((v vars (cdr v)) (t1 (cdr tp) (cdr t1)))
-	  ((or (not v) (not t1)))
-	  (set-var-init-type (car v) (car t1)))))
+  (let* ((tp (info-type (second init-form)))
+	 (tp (cond ((not tp) tp)
+		   ((single-type-p tp) (list tp))
+		   ((eq tp '*) (make-list (length vars) :initial-element t))
+		   ((cdr tp)))))
+    (do ((v vars (cdr v)) (t1 tp (cdr t1)))
+	((not v))
+	(set-var-init-type (car v) (or (car t1) #tnull))))
 
   (dolist* (v vars) (push v *vars*))
 
@@ -387,18 +395,16 @@
 
   (list 'multiple-value-bind info vars init-form body))
 
-(defun type-space (tp)
-  (cond ((and (consp tp) (member (car tp) '(values returns-exactly))) (- (length tp) 2))
-	(0)))
-
 (defun max-stack-space (form)
   (cond ((atom form) 0)
-	((info-p (car form)) (max (type-space (info-type (car form))) (max-stack-space (cdr form))))
+	((info-p (car form)) (max (abs (vald (info-type (car form)))) (max-stack-space (cdr form))))
 	((max (max-stack-space (car form)) (max-stack-space (cdr form))))))
 
 (defun stack-space (form)
-  (let ((tp (info-type (cadr form))))
-    (and (consp tp) (eq (car tp) 'returns-exactly) (- (length tp) 2))))
+  (let* ((tp (info-type (cadr form)))
+	 (vd (vald tp)))
+    (cond ((< vd 0) (- vd))
+	  ((eq tp #t(returns-exactly)) 0))))
 
 (defun c2multiple-value-bind (vars init-form body
 				   &aux (labels nil)
@@ -412,15 +418,17 @@
 	 (nv (1- (length vars)))
 	 (ns1 (stack-space init-form))
 	 (ns (max nv (or ns1 (max-stack-space init-form)))))
-    (setf (var-kind mv) (c2var-kind mv) (var-dynamic mv) (if (and ns1 (>= ns1 nv)) (- nv) nv))
+    (setf (var-kind mv) (c2var-kind mv) (var-space mv) nv (var-known-init mv) (or ns1 -1))
     (setq lbs
 	  (mapcar (lambda (x)
 		    (let ((kind (c2var-kind x))(f (eq x (car vars))))
 		      (if kind (setf (var-kind x) (if f kind 'object) (var-loc x) (cs-push (if f (var-type x) t) t))
 			(setf (var-ref x) (vs-push) x (cs-push (if f (var-type x) t) t)))))
 		  vars))
-    (wt-nl "{register " (rep-type (var-type (car vars))) " V" (car lbs) ";")
-    (wt-nl "object V" (var-loc mv) "[" ns "];")
+    (wt-nl "{")
+    (when vars
+	(wt-nl "register " (rep-type (var-type (car vars))) " V" (car lbs) ";")
+	(wt-nl "object V" (var-loc mv) "[" ns "];"))
     (let ((i -1)) (mapc (lambda (x) (wt-nl "#define V" x " V" (var-loc mv) "[" (incf i) "]")) (cdr lbs)))
     (wt-nl);FIXME
     (dotimes (i (1+ (length vars))) (push (next-label) labels))
@@ -459,4 +467,6 @@
   
   (c2expr body)
   (mapc (lambda (x) (wt-nl "#undef V" x)) (cdr lbs))
+  (wt-nl "")
+;  (when *ovs* (reset-top))
   (wt-nl "}"))

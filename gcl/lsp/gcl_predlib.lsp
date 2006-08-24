@@ -37,14 +37,18 @@
 	   (proclaim '(optimize (safety 0) (space 3) (speed 3))))
 
 (defun type-of (object)
-  (or (and (typep object 'standard-object) 
-	   (let* ((c (class-of object))
+  (cond ((not object) 'null)
+	((eq object t) 'boolean)
+	((keywordp object) 'keyword)
+	((symbolp object) 'symbol);;to get around pcl bootstrap problems
+	((typep object 'standard-object)
+	 (let* ((c (class-of object))
 		  (n (class-name c)))
 	     (if (and n (eq c (find-class n nil))) n c)))
-      (let ((tp (type-of-c object)))
+	((let ((tp (type-of-c object)))
 	(if (member tp '(vector array));FIXME
 	    `(,tp ,(upgraded-array-element-type (array-element-type object)))
-	  tp))))
+	  tp)))))
 
 (defmacro dt-apply (x y) 
   (let ((l (gensym))) 
@@ -347,6 +351,7 @@
 (defconstant +ifr+ (ash (- +ifb+)  -1))
 (defconstant +ift+ '(integer #.(- +ifr+) #.(1- +ifr+)))
 
+(deftype immfix () +ift+)
 (deftype eql-is-eq-tp () `(or #.+ift+ (not (or number character))))
 (deftype equal-is-eq-tp () `(or #.+ift+ (not (or cons string bit-vector pathname number character))))
 (deftype equalp-is-eq-tp () `(not (or array hash-table structure cons string
@@ -555,6 +560,8 @@
 
 ;(defun proper-listp (x)
 ;  (or (not x) (and (consp x) (not (improper-consp x)))))
+
+(deftype proper-sequence () `(or vector proper-list))
 
 (deftype proper-list () `(or null proper-cons))
 

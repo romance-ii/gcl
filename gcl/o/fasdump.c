@@ -515,9 +515,14 @@ do_hash(object obj, int dot)
    }
  
 static void write_fasd(object obj);
-static object
-FFN(write_fasd_top)(object obj, object x)
-{struct fasd *fd = (struct fasd *) x->v.v_self;
+
+DEFUN_NEW("WRITE-FASD-TOP",object,fSwrite_fasd_top,SI
+	  ,2,2,NONE,OO,OO,OO,OO,(object obj, object x),"") {
+
+/* static object */
+/* FFN(write_fasd_top)(object obj, object x) */
+/* { */
+struct fasd *fd = (struct fasd *) x->v.v_self;
   if (fd->direction == sKoutput)
     SETUP_FASD_IN(fd);
   else FEerror("bad value for open slot of fasd",0);
@@ -537,9 +542,12 @@ FFN(write_fasd_top)(object obj, object x)
 #define MAYBE_PATCH(result) \
   if (needs_patching)  result =fasd_patch_sharp(result,0)
 
-static object
-FFN(read_fasd_top)(object x)
-{  struct fasd *fd = (struct fasd *)  x->v.v_self;
+DEFUN_NEW("READ-FASD-TOP",object,fSread_fasd_top,SI
+	  ,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+/* static object */
+/* FFN(read_fasd_top)(object x) */
+/* { */
+  struct fasd *fd = (struct fasd *)  x->v.v_self;
    VOL int e=0;
    object result;
    SAVE_CURRENT_FASD;
@@ -583,60 +591,68 @@ object sLeq;
 object sSPinit;
 void Lmake_hash_table();
 
-static object
-FFN(open_fasd)(object stream, object direction, object eof, object tabl)
-{  object str=Cnil;
-   object result;
-   if(direction==sKinput)
-     {str=coerce_stream(stream,0);
-      if (tabl==Cnil)
-	tabl=alloc_simple_vector(0,aet_object);
-      else
-	check_type(tabl,t_vector);}
-   if(direction==sKoutput)
-     {str=coerce_stream(stream,1);
-      if(tabl==Cnil) tabl=funcall_cfun(Lmake_hash_table,2,sKtest,sLeq);
-      else
-	check_type(tabl,t_hashtable);}
-   check_type(str,t_stream);
-   result=alloc_simple_vector(sizeof(struct fasd)/sizeof(int),aet_object);
-   array_allocself(result,1,Cnil);
-   {struct fasd *fd= (struct fasd *)result->v.v_self;
-    fd->table=tabl;
-    fd->stream=stream;
-    fd->direction=direction;
-    fd->eof=eof;
-    fd->index=small_fixnum(0);
-    fd->package=symbol_value(sLApackageA);
-    fd->filepos = make_fixnum(file_position(stream));
-    
-    SETUP_FASD_IN(fd);
-    if (direction==sKoutput){
-      PUT_OP((int)d_begin_dump);
-      PUTD("version=%d",FASD_VERSION);
-      PUT4(0);  /* reserve space for the size of index array needed */
-          /*  equivalent to:   write_fasd(current_fasd.package);
-	      except we don't want to index this, so that we can open
-	      with an empty array.
-	   */
-      PUT_OP(d_package);
-      write_fasd(current_fasd.package->p.p_name);
+DEFUN_NEW("OPEN-FASD",object,fSopen_fasd,SI
+	  ,4,4,NONE,OO,OO,OO,OO,(object stream, object direction, object eof, object tabl),"") {
 
+
+/* static object */
+/* FFN(open_fasd)(object stream, object direction, object eof, object tabl) */
+/* { */
+  object str=Cnil;
+  object result;
+  if(direction==sKinput)
+    {str=coerce_stream(stream,0);
+    if (tabl==Cnil)
+      tabl=alloc_simple_vector(0,aet_object);
+    else
+      check_type(tabl,t_vector);}
+  if(direction==sKoutput)
+    {str=coerce_stream(stream,1);
+    if(tabl==Cnil) tabl=funcall_cfun(Lmake_hash_table,2,sKtest,sLeq);
+    else
+      check_type(tabl,t_hashtable);}
+  check_type(str,t_stream);
+  result=alloc_simple_vector(sizeof(struct fasd)/sizeof(int),aet_object);
+  array_allocself(result,1,Cnil);
+  {struct fasd *fd= (struct fasd *)result->v.v_self;
+  fd->table=tabl;
+  fd->stream=stream;
+  fd->direction=direction;
+  fd->eof=eof;
+  fd->index=small_fixnum(0);
+  fd->package=symbol_value(sLApackageA);
+  fd->filepos = make_fixnum(file_position(stream));
+  
+  SETUP_FASD_IN(fd);
+  if (direction==sKoutput){
+    PUT_OP((int)d_begin_dump);
+    PUTD("version=%d",FASD_VERSION);
+    PUT4(0);  /* reserve space for the size of index array needed */
+    /*  equivalent to:   write_fasd(current_fasd.package);
+	except we don't want to index this, so that we can open
+	with an empty array.
+    */
+    PUT_OP(d_package);
+    write_fasd(current_fasd.package->p.p_name);
+    
+  }
+  else			/* input */
+    { object tem;
+    read_fasd1(GET_OP(),&tem);
+    if(tem!=current_fasd.table) FEerror("not positioned at beginning of a dump",0);
     }
-    else			/* input */
-      { object tem;
-	read_fasd1(GET_OP(),&tem);
-	if(tem!=current_fasd.table) FEerror("not positioned at beginning of a dump",0);
-      }
-    fd->index=make_fixnum(dump_index);
-    fd->filepos=current_fasd.filepos;
-    fd->package=current_fasd.package;
-    return result;
+  fd->index=make_fixnum(dump_index);
+  fd->filepos=current_fasd.filepos;
+  fd->package=current_fasd.package;
+  return result;
   }}
 
-static object
-FFN(close_fasd)(object ar)
-{  struct fasd *fd= (struct fasd *)(ar->v.v_self);
+DEFUN_NEW("CLOSE-FASD",object,fSclose_fasd,SI
+	  ,1,1,NONE,OO,OO,OO,OO,(object ar),"") {
+/* static object */
+/* FFN(close_fasd)(object ar) */
+/* { */
+  struct fasd *fd= (struct fasd *)(ar->v.v_self);
    check_type(ar,t_vector);
    if (type_of(fd->table)==t_vector)
      /* input uses a vector */
@@ -1057,14 +1073,21 @@ find_sharing(object x)
 	return;
 }
 
-static object
-FFN(find_sharing_top)(object x, object table)
-{sharing_table=table;
- find_sharing(x);
- return Ct;
+/* static object */
+/* FFN(find_sharing_top)(object x, object table) */
+/* {sharing_table=table; */
+/*  find_sharing(x); */
+/*  return Ct; */
+/* } */
+
+DEFUN_NEW("FIND-SHARING-TOP",object,fSfind_sharing_top,SI
+	  ,2,2,NONE,OO,OO,OO,OO,(object x,object table),"") {
+
+  sharing_table=table;
+  find_sharing(x);
+  RETURN1(Ct);
+
 }
-
-
 
 
 
@@ -1523,7 +1546,7 @@ read_fasl_vector(object in)
      if (ch== d_begin_dump){
        unreadc_stream(ch,in);
        break;}}
- {object ar=FFN(open_fasd)(in,sKinput,0,Cnil);
+ {object ar=FFN(fSopen_fasd)(in,sKinput,0,Cnil);
   int n=fix(current_fasd.table_length);
   object result,last;
   { BEGIN_NO_INTERRUPT;
@@ -1539,13 +1562,13 @@ read_fasl_vector(object in)
   gset( current_fasd.table->v.v_self,0,n,aet_object);
   END_NO_INTERRUPT;
   }  
-  result=FFN(read_fasd_top)(ar);
+  result=FFN(fSread_fasd_top)(ar);
   if (type_of(result) !=t_vector) goto ERROR;
   last=result->v.v_self[result->v.v_fillp-1];
   if(!consp(last) || last->c.c_car !=sSPinit)
     goto ERROR;
   current_fasd.table->v.v_self = 0;
-  FFN(close_fasd)(ar);
+  FFN(fSclose_fasd)(ar);
   if (orig != in)
     close_stream(in);
   return result;
@@ -1589,10 +1612,10 @@ object IfaslInStream;
 static void
 init_fasdump(void)
 {
-  make_si_sfun("READ-FASD-TOP",read_fasd_top,1);
-  make_si_sfun("WRITE-FASD-TOP",write_fasd_top,2);
-  make_si_sfun("OPEN-FASD",open_fasd,4);  
-  make_si_sfun("CLOSE-FASD",close_fasd,1);
+/*   make_si_sfun("READ-FASD-TOP",read_fasd_top,1); */
+/*   make_si_sfun("WRITE-FASD-TOP",write_fasd_top,2); */
+/*   make_si_sfun("OPEN-FASD",open_fasd,4);   */
+/*   make_si_sfun("CLOSE-FASD",close_fasd,1); */
 /*  make_si_sfun("FASD-I-DATA",fasd_i_macro,1); */
-  make_si_sfun("FIND-SHARING-TOP",find_sharing_top,2);
+/*   make_si_sfun("FIND-SHARING-TOP",find_sharing_top,2); */
 }

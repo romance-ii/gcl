@@ -78,6 +78,7 @@ make_vfun(object name, object (*self)(), int argd, object data,fixnum nval)
         vfn->vfn.vfn_maxargs = VFUN_MAX_ARGS(argd);
         vfn->vfn.vfn_data = data;
         vfn->vfn.vfn_nval = nval;
+/* 	if (nval) set_type_of(vfn,t_gfun); */
 	return(vfn);
 }
 
@@ -262,6 +263,10 @@ make_function_internal(char *s, void (*f)())
 	vs_mark;
 
 	x = make_ordinary(s);
+	if (x->s.s_gfdef) {
+	  printf("Skipping redefinition of %-.*s\n",(int)x->st.st_fillp,x->st.st_self);
+	  return(x);
+	}
 	vs_push(x);
 	x->s.s_gfdef = make_cfun(f, x, Cnil, NULL, 0);
 	x->s.s_mflag = FALSE;
@@ -293,6 +298,10 @@ make_si_function_internal(char *s, void (*f)())
 	vs_mark;
 
 	x = make_si_ordinary(s);
+	if (x->s.s_gfdef) {
+	  printf("Skipping redefinition of %-.*s\n",(int)x->st.st_fillp,x->st.st_self);
+	  return(x);
+	}
 	vs_push(x);
 	x->s.s_gfdef = make_cfun(f, x, Cnil, NULL, 0);
 	x->s.s_mflag = FALSE;

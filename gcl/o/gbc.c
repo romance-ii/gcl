@@ -904,7 +904,7 @@ mark_c_stack(jmp_buf env1, int n, void (*fn)(void *,void *,int)) {
 #endif
   jmp_buf env;
   int where;
-  if (n== N_RECURSION_REQD)
+  if (!n)/* (n== N_RECURSION_REQD) */
     c_stack_where = (long *) (void *) &env;
   if (n > 0 ) {  
 #if defined(__hppa__)
@@ -1204,13 +1204,16 @@ GBC(enum type t) {
 	   -holepage-real_maxpage/32)/2;
     }
     
-    if (saving_system)
-      rb_start = heap_end;
-    else
+/*     if (saving_system) */
+/*       rb_start = heap_end+PAGESIZE; */
+/*     else */
 #ifdef SGC
       if (sgc_enabled==0)
 #endif
-	{rb_start = heap_end + PAGESIZE*holepage;}
+	{if (saving_system)
+	  rb_start = heap_end+PAGESIZE;
+	else
+	  rb_start = heap_end + PAGESIZE*holepage;}
     
     rb_end = heap_end + (holepage + nrbpage) *PAGESIZE;
     
@@ -1371,9 +1374,12 @@ GBC(enum type t) {
 #endif
   
   if (saving_system) {
-    j = (rb_pointer-rb_start+PAGESIZE-1) / PAGESIZE;
-    
-    heap_end += PAGESIZE*j;
+    /*FIXME::Someday figure out why we can't leave the relocatable area in place across a save*/
+    char *end=(char *)(PAGESIZE*(((unsigned long)rb_pointer+PAGESIZE-1)/PAGESIZE));
+
+/*     j = (rb_pointer-rb_start+PAGESIZE-1) / PAGESIZE; */
+  
+/*     heap_end += PAGESIZE*j; */
     
     /* When the program is re-loaded, the system initialization
        code may use malloc() before main() begins.  This
@@ -1381,18 +1387,22 @@ GBC(enum type t) {
        space for this.  One page is enough for Linux.
        Bill Metzenthen May95.
     */
-    if ( core_end < heap_end + PAGESIZE )
+    if ( core_end < end + PAGESIZE )
       {
 	fprintf(stderr,
 		"Not enough memory available for saved image\n");
 	exit(1);
       }
-    core_end = heap_end + PAGESIZE;
+    core_end = end + PAGESIZE;
     {
       unsigned long old_new_holepage=new_holepage;
       new_holepage=CORE_PAGES/HOLEDIV;
       if (available_pages<1) new_holepage=old_new_holepage;
     }
+
+    /*Leave?*/
+    for (i=page(rb_start);i<page(heap_end);i++)
+      type_map[i]=t_contiguous;
     
 /*     for (i = 0;  i < maxpage;  i++) */
 /*       if ((enum type)type_map[i] == t_contiguous) */
@@ -1405,19 +1415,25 @@ GBC(enum type t) {
 /*     ncb = 0; */
     
     /* hmm.... why is this test necessary.*/
-#ifdef SGC
-    if (sgc_enabled==0) 
-#endif
-      {holepage = new_holepage;
-      nrbpage = CORE_PAGES/INIT_NRBDIV;}
+/* #ifdef SGC */
+/*     if (sgc_enabled==0)  */
+/* #endif */
+      {holepage = 1;
+      rb_limit=end+PAGESIZE;
+      rb_end=rb_limit+2*RB_GETA;}
+/*       nrbpage = (rb_end-rb_start)/PAGESIZE;} */
     
     if (nrbpage < 0)
       error("no relocatable pages left");
     
-    rb_start = heap_end + PAGESIZE*holepage;
-    rb_end = rb_start + PAGESIZE*nrbpage;
-    rb_limit = rb_end - 2*RB_GETA;
-    rb_pointer = rb_start;
+/*     rb_start = heap_end + PAGESIZE*holepage; */
+/*     rb_end = rb_start + PAGESIZE*nrbpage; */
+/*     rb_limit = rb_end - 2*RB_GETA; */
+/*     rb_pointer = rb_start; */
+
+/*     for (i=page(rb_start);i<page(rb_end);i++) */
+/*       type_map[i]=t_relocatable; */
+
   }
   
   if (GBC_exit_hook != NULL)
@@ -1481,46 +1497,51 @@ FFN(siLheap_report)(void) {
 }  
 
 
-static void
-FFN(siLroom_report)(void) {
+DEFUN_NEW("ROOM-REPORT",object,fSroom_report,SI
+	  ,0,0,NONE,OO,OO,OO,OO,(void),"") {
+/* static void */
+/* FFN(siLroom_report)(void) { */
 
   int i;
+  object x;
   
   check_arg(0);
   
   /*
     GBC(t_contiguous);
   */
-  
-  vs_check_push(make_fixnum(real_maxpage));
-  vs_push(make_fixnum(available_pages));
-  vs_push(make_fixnum(ncbpage));
-  vs_push(make_fixnum(maxcbpage));
-  vs_push(make_fixnum(ncb));
-  vs_push(make_fixnum(cbgbccount));
-  vs_push(make_fixnum(holepage));
-  vs_push(make_fixnum(rb_pointer - rb_start));
-  vs_push(make_fixnum(rb_end - rb_pointer));
-  vs_push(make_fixnum(nrbpage));
-  vs_push(make_fixnum(rbgbccount));
+  x=Cnil;
+  x=make_cons(make_fixnum(real_maxpage),x);
+  x=make_cons(make_fixnum(available_pages),x);
+  x=make_cons(make_fixnum(ncbpage),x);
+  x=make_cons(make_fixnum(maxcbpage),x);
+  x=make_cons(make_fixnum(ncb),x);
+  x=make_cons(make_fixnum(cbgbccount),x);
+  x=make_cons(make_fixnum(holepage),x);
+  x=make_cons(make_fixnum(rb_pointer - rb_start),x);
+  x=make_cons(make_fixnum(rb_end - rb_pointer),x);
+  x=make_cons(make_fixnum(nrbpage),x);
+  x=make_cons(make_fixnum(rbgbccount),x);
   for (i = 0;  i < (int)t_end;  i++) {
-    vs_check_push(make_simple_string(tm_table[i].tm_name+1));
+    x=make_cons(make_simple_string(tm_table[i].tm_name+1),x);
     if (tm_table[i].tm_type == (enum type)i) {
-      vs_check_push(make_fixnum(TM_NUSED(tm_table[i])));
-      vs_push(make_fixnum(tm_table[i].tm_nfree+tm_table[i].tm_alt_nfree));
-      vs_push(make_fixnum(tm_table[i].tm_npage));
-      vs_push(make_fixnum(tm_table[i].tm_maxpage));
-      vs_push(make_fixnum(tm_table[i].tm_gbccount));
-      vs_push(make_fixnum(tm_table[i].tm_size/sizeof(fixnum)));
+      x=make_cons(make_fixnum(TM_NUSED(tm_table[i])),x);
+      x=make_cons(make_fixnum(tm_table[i].tm_nfree+tm_table[i].tm_alt_nfree),x);
+      x=make_cons(make_fixnum(tm_table[i].tm_npage),x);
+      x=make_cons(make_fixnum(tm_table[i].tm_maxpage),x);
+      x=make_cons(make_fixnum(tm_table[i].tm_gbccount),x);
+      x=make_cons(make_fixnum(tm_table[i].tm_size/sizeof(fixnum)),x);
     } else {
-      vs_check_push(Cnil);
-      vs_push(make_simple_string(tm_of(i)->tm_name+1));
-      vs_push(Cnil);
-      vs_push(Cnil);
-      vs_push(Cnil);
-      vs_push(Cnil);
+      x=make_cons(Cnil,x);
+      x=make_cons(make_simple_string(tm_of(i)->tm_name+1),x);
+      x=make_cons(Cnil,x);
+      x=make_cons(Cnil,x);
+      x=make_cons(Cnil,x);
+      x=make_cons(Cnil,x);
     }
   }
+  RETURN1(nreverse(x));
+
 }
 
 static void
@@ -1612,10 +1633,11 @@ DEFVAR("*GBC-MESSAGE*",sSAgbc_messageA,SI,Cnil,"");
 void
 gcl_init_GBC(void) {
 
-  make_si_function("ROOM-REPORT", siLroom_report);
+/*   make_si_function("ROOM-REPORT", siLroom_report); */
   make_si_function("HEAP-REPORT", siLheap_report);
   make_si_function("RESET-GBC-COUNT", siLreset_gbc_count);
   make_si_function("GBC-TIME",siLgbc_time);
+#ifdef SGC
   make_si_function("SGC-ON",siLsgc_on);
-
+#endif
 }

@@ -204,7 +204,8 @@
 (defun result-type-from-args (f args)
   (when (not (eq '* (get f 'return-type))) ;;FIXME  make sure return-type and proclaimed-return-type are in sync
     (let* ((be (get f 'type-propagator))
-	   (ba (and be (si::dt-apply be (cons f (mapcar 'coerce-to-one-value args))))));FIXME
+	   (ba (and be ;(si::dt-apply be (cons f (mapcar 'coerce-to-one-valuea args))))));FIXME
+		    (apply be (cons f (mapcar 'coerce-to-one-value args))))));FIXME
       (when ba
 	(return-from result-type-from-args (cmp-norm-tp ba))))
     (dolist (v '(inline-always inline-unsafe))
@@ -220,7 +221,7 @@
 		       ((null a) t)
 		       (unless (and (car a) (car b)
 				    (or  (eq (car a) (car b))
-					 (type>= (car b) (car a))))
+					 (type>= (cmp-norm-tp (car b)) (cmp-norm-tp (car a)))))
 			 (return nil))))
 	      (return-from result-type-from-args (cmp-norm-tp (second w))))))))))
 	
@@ -295,18 +296,18 @@
 	  (let-wrap lets (binary-nest-int form len)))
       form)))
 
-(si::putprop '* (function binary-nest) 'si::compiler-macro-prop)
-(si::putprop '+ (function binary-nest) 'si::compiler-macro-prop)
+(si::putprop '* 'binary-nest 'si::compiler-macro-prop)
+(si::putprop '+ 'binary-nest 'si::compiler-macro-prop)
 
-(si::putprop 'logand (function binary-nest) 'si::compiler-macro-prop)
-(si::putprop 'logior (function binary-nest) 'si::compiler-macro-prop)
-(si::putprop 'logxor (function binary-nest) 'si::compiler-macro-prop)
+(si::putprop 'logand 'binary-nest 'si::compiler-macro-prop)
+(si::putprop 'logior 'binary-nest 'si::compiler-macro-prop)
+(si::putprop 'logxor 'binary-nest 'si::compiler-macro-prop)
 
-(si::putprop 'max (function binary-nest) 'si::compiler-macro-prop)
-(si::putprop 'min (function binary-nest) 'si::compiler-macro-prop)
+(si::putprop 'max 'binary-nest 'si::compiler-macro-prop)
+(si::putprop 'min 'binary-nest 'si::compiler-macro-prop)
 
-(si::putprop 'gcd (function binary-nest) 'si::compiler-macro-prop)
-(si::putprop 'lcm (function binary-nest) 'si::compiler-macro-prop)
+(si::putprop 'gcd 'binary-nest 'si::compiler-macro-prop)
+(si::putprop 'lcm 'binary-nest 'si::compiler-macro-prop)
 
 (defun multiple-value-bind-expander (form env)
   (declare (ignore env))
@@ -318,7 +319,7 @@
 	 ,@(when (> l2 l1) (nthcdr l1 (cdaddr form)))
 	 ,@(cdddr form)))
     form))
-(si::putprop 'multiple-value-bind (function multiple-value-bind-expander) 'si::compiler-macro-prop)
+(si::putprop 'multiple-value-bind 'multiple-value-bind-expander 'si::compiler-macro-prop)
 
 ;FIXME apply-expander
 (defun funcall-expander (form env);FIXME inlinable-fn?
@@ -330,7 +331,7 @@
 	 `(,(cadadr form) ,@(cddr form)))
 	((constantp (cadr form)) `(,(cmp-eval (cadr form)) ,@(cddr form)))
 	(form)))
-(si::putprop 'funcall (function funcall-expander) 'si::compiler-macro-prop)
+(si::putprop 'funcall 'funcall-expander 'si::compiler-macro-prop)
 
 (defun last-expander (form env)
   (declare (ignore env))
@@ -341,7 +342,7 @@
 	 ,@(when *compiler-check-args* `((check-type ,f list)(check-type ,n (integer 0))))
 	 (let ((,v (do ((,v ,f (cdr ,v)) (,i 0 (1+ ,i))) ((or (= ,i ,n) (not (consp ,v))) ,v) (declare (seqind ,i)))))
 	   (do ((,f ,f (cdr ,f)) (,v ,v (cdr ,v))) ((not (consp ,v)) ,f)))))))
-(si::putprop 'last (function last-expander) 'si::compiler-macro-prop)
+(si::putprop 'last 'last-expander 'si::compiler-macro-prop)
        
 (defun nreconc-expander (form env)
   (declare (ignore env))
@@ -350,7 +351,7 @@
       `(let ((,f ,(cadr form)) (,tl ,(caddr form)))
 	 (do ((,f ,f (or ,v ,f)) (,v (cdr ,f) (cdr ,v))) ((endp ,v) (if ,f (setf (cdr ,f) ,tl) (setq ,f ,tl)) ,f)
 	   (setf (cdr ,f) ,tl ,tl ,f))))))
-(si::putprop 'nreconc (function nreconc-expander) 'si::compiler-macro-prop)
+(si::putprop 'nreconc 'nreconc-expander 'si::compiler-macro-prop)
        
 
 
@@ -366,7 +367,7 @@
 (defun nconc-expander (form env)
   (declare (ignore env))
   (nconc-expander-int form (length form)))
-(si::putprop 'nconc (function nconc-expander) 'si::compiler-macro-prop)
+(si::putprop 'nconc 'nconc-expander 'si::compiler-macro-prop)
 
 
 (defun invert-binary-nest (form env)
@@ -380,8 +381,8 @@
 	(list op (cadr form) (cons recip (cddr form))))
     form))
 
-(si::putprop '- (function invert-binary-nest) 'si::compiler-macro-prop)
-(si::putprop '/ (function invert-binary-nest) 'si::compiler-macro-prop)
+(si::putprop '- 'invert-binary-nest 'si::compiler-macro-prop)
+(si::putprop '/ 'invert-binary-nest 'si::compiler-macro-prop)
 
 (defun logical-binary-nest (form env)
   (declare (ignore env))
@@ -394,17 +395,17 @@
 	    (push (list (car form) (car f) (cadr f)) r))))
 	form))
 
-(si::putprop '> (function logical-binary-nest) 'si::compiler-macro-prop)
-(si::putprop '>= (function logical-binary-nest) 'si::compiler-macro-prop)
-(si::putprop '< (function logical-binary-nest) 'si::compiler-macro-prop)
-(si::putprop '<= (function logical-binary-nest) 'si::compiler-macro-prop)
-(si::putprop '= (function logical-binary-nest) 'si::compiler-macro-prop)
+(si::putprop '> 'logical-binary-nest 'si::compiler-macro-prop)
+(si::putprop '>= 'logical-binary-nest 'si::compiler-macro-prop)
+(si::putprop '< 'logical-binary-nest 'si::compiler-macro-prop)
+(si::putprop '<= 'logical-binary-nest 'si::compiler-macro-prop)
+(si::putprop '= 'logical-binary-nest 'si::compiler-macro-prop)
 
-(si::putprop 'char> (function logical-binary-nest) 'si::compiler-macro-prop)
-(si::putprop 'char>= (function logical-binary-nest) 'si::compiler-macro-prop)
-(si::putprop 'char< (function logical-binary-nest) 'si::compiler-macro-prop)
-(si::putprop 'char<= (function logical-binary-nest) 'si::compiler-macro-prop)
-(si::putprop 'char= (function logical-binary-nest) 'si::compiler-macro-prop)
+(si::putprop 'char> 'logical-binary-nest 'si::compiler-macro-prop)
+(si::putprop 'char>= 'logical-binary-nest 'si::compiler-macro-prop)
+(si::putprop 'char< 'logical-binary-nest 'si::compiler-macro-prop)
+(si::putprop 'char<= 'logical-binary-nest 'si::compiler-macro-prop)
+(si::putprop 'char= 'logical-binary-nest 'si::compiler-macro-prop)
 
 (defun logical-outer-nest (form env)
   (declare (ignore env))
@@ -418,8 +419,8 @@
 	    (push (list (car form) (car f) (car g)) r)))))
     form))
 
-(si::putprop '/= (function logical-outer-nest) 'si::compiler-macro-prop)
-(si::putprop 'char/= (function logical-outer-nest) 'si::compiler-macro-prop)
+(si::putprop '/= 'logical-outer-nest 'si::compiler-macro-prop)
+(si::putprop 'char/= 'logical-outer-nest 'si::compiler-macro-prop)
 
 (setf (symbol-function 'cmp-nthcdr) (symbol-function 'nthcdr))
 (defun nthcdr-expander (form env)
@@ -448,8 +449,8 @@
   (declare (ignore env))
   `(- ,(cadr form) 1))
 
-(si::putprop '1+ (function incr-to-plus) 'si::compiler-macro-prop)
-(si::putprop '1- (function decr-to-minus) 'si::compiler-macro-prop)
+(si::putprop '1+ 'incr-to-plus 'si::compiler-macro-prop)
+(si::putprop '1- 'decr-to-minus 'si::compiler-macro-prop)
 
 (defun reverse-expander (form env)
   (declare (ignore env))
@@ -463,7 +464,7 @@
 	   (do ((,i 0 (1+ ,i))) ((= ,i (length ,s)) ,x)
 	     (declare (seqind ,i))
 	     (setf (aref ,x (1- (- (length ,s) ,i))) (aref ,s ,i))))))))
-(si::putprop 'reverse (function reverse-expander) 'si::compiler-macro-prop)
+(si::putprop 'reverse 'reverse-expander 'si::compiler-macro-prop)
 
 (defmacro with-var-form-type ((v f tp) &rest body)
   ``(let ((,,v ,,f))
@@ -480,7 +481,7 @@
      (with-var-form-type 
       (i (caddr form) #tseqind)
       `(if (listp ,s) (nth ,i ,s) (aref ,s ,i))))))
-(si::putprop 'elt (function elt-expander) 'si::compiler-macro-prop)
+(si::putprop 'elt 'elt-expander 'si::compiler-macro-prop)
 
 
 (defun length-expander (form env)
@@ -491,7 +492,17 @@
 	      (do ((,i 0 (1+ ,i)) (,s ,s (cdr ,s))) ((endp ,s) ,i)
 		  (declare (seqind ,i)))
 	(cmp-vec-length ,s)))))
-(si::putprop 'length (function length-expander) 'si::compiler-macro-prop)
+(si::putprop 'length 'length-expander 'si::compiler-macro-prop)
+
+(defun adjoin-expander (form env)
+  (declare (ignore env))
+  (let (syms nf)
+    (dolist (l (cdr form))
+      (cond ((literalp l) (push l nf))
+	    ((let ((lb (list (gensym) l))) (push lb syms) (push (car lb) nf)))))
+    (let ((nf (nreverse nf)))
+      `(let* ,(nreverse syms) (if (member ,@nf) ,(cadr nf) (cons ,(car nf) ,(cadr nf)))))))
+(si::putprop 'adjoin 'adjoin-expander 'si::compiler-macro-prop)
 
 (defun endp-expander (form env)
   (declare (ignore env))
@@ -502,7 +513,7 @@
 		 ((consp ,x) nil)
 		 ((error 'type-error :datum ,x :expected-type 'list)))));;cannot continue
     `(not ,(cadr form))))
-(si::putprop 'endp (function endp-expander) 'si::compiler-macro-prop)
+(si::putprop 'endp 'endp-expander 'si::compiler-macro-prop)
   
 (defun garef (a i l)
   (let ((ff `(aref ,a ,i)))
@@ -572,7 +583,7 @@
 	   (let ((,seq ,seq))
 	     (declare (vector ,seq))
 	     ,(qsl-fun seq (caddr form) (if (cdddr form) (fifth form) ''identity) nil)))))))
-(si::putprop 'sort        'qsort-expander 'si::compiler-macro-prop)
+(si::putprop 'sort 'qsort-expander 'si::compiler-macro-prop)
 
 (defun mheap (a r b key p)
   (let ((block (gensym)) (j (gensym)) (k (gensym)) (k1 (gensym)) (kk (gensym)) (kk1 (gensym)) (x (gensym)))
@@ -628,8 +639,8 @@
 
 (defun identity-expander (form env)
   (declare (ignore env))
-  (cadr form))
-(si::putprop 'identity (function identity-expander) 'si::compiler-macro-prop)
+  (if (cddr form) form (cadr form)))
+(si::putprop 'identity 'identity-expander 'si::compiler-macro-prop)
 
 (defun seqind-wrap (form)
   (if *safe-compile*
@@ -651,7 +662,7 @@
 	       (,val (si::hash-entry-by-index ,(caddr form) ,ind)))
 	   (funcall ,(cadr form) ,key ,val))
 	 (go ,tag))))))
-(si::putprop 'maphash (function maphash-expander) 'si::compiler-macro-prop)
+(si::putprop 'maphash 'maphash-expander 'si::compiler-macro-prop)
 	
 (defun array-row-major-index-expander (form env &optional (it 0))
   (declare (ignore env) (fixnum it))
@@ -671,7 +682,7 @@
 				`(* ,first (array-dimension ,ar ,it))) ,second)) ,@rest)
 		nil it))))))
 
-(si::putprop 'array-row-major-index (function array-row-major-index-expander) 'si::compiler-macro-prop)
+(si::putprop 'array-row-major-index 'array-row-major-index-expander 'si::compiler-macro-prop)
 
 ;; (defmacro with-pulled-array (bindings form &body body)
 ;;   `(let ((,(car bindings) (cadr ,form)))
@@ -694,8 +705,8 @@
      (let ((lets (append lets `((,isym (array-row-major-index ,sym ,@(cddr form)))))))
        (let-wrap lets `(compiler::cmp-aref ,sym ,isym))))))
 
-(si::putprop 'aref (function aref-expander) 'si::compiler-macro-prop)
-(si::putprop 'row-major-aref (function aref-expander) 'si::compiler-macro-prop)
+(si::putprop 'aref 'aref-expander 'si::compiler-macro-prop)
+(si::putprop 'row-major-aref 'aref-expander 'si::compiler-macro-prop)
 
 (defun aset-expander (form env)
   (declare (ignore env))
@@ -705,9 +716,9 @@
      (let ((lets (append lets `((,isym (array-row-major-index ,sym ,@(butlast (cddr form))))))))
        (let-wrap lets `(compiler::cmp-aset ,sym ,isym ,(car (last form))))))))
 
-(si::putprop 'si::aset (function aset-expander) 'si::compiler-macro-prop)
+(si::putprop 'si::aset 'aset-expander 'si::compiler-macro-prop)
 ;FIXME -- test and install this and svref, CM 20050106
-;(si::putprop 'svset (function aset-expander) 'si::compiler-macro-prop)
+;(si::putprop 'svset 'aset-expander 'si::compiler-macro-prop)
 
 (defun array-dimension-expander (form env)
   (declare (ignore env))
@@ -715,7 +726,7 @@
    (ar lets sym) form
    (let-wrap lets `(compiler::cmp-array-dimension ,sym ,(caddr form)))))
 
-(si::putprop 'array-dimension (function array-dimension-expander) 'si::compiler-macro-prop)
+(si::putprop 'array-dimension 'array-dimension-expander 'si::compiler-macro-prop)
 
 (defun do-list-search (test list &key (k1 nil k1p) key (item nil itemp) rev (ret nil retp) test-not ((:test foo)))
   (declare (ignore foo))
@@ -741,7 +752,8 @@
 	     ,form)
 	form))))
 
-(defmacro member-compiler-macro (&whole w &rest args)
+;(defmacro member-compiler-macro (&whole w &rest args)
+(defun member-compiler-macro (w env &aux (args (cdr w))) (declare (ignore env))
   (if (or (< (length args) 2) (do ((r (cddr args) (cddr r))) ((not (and r (keywordp (car r)))) r)))
       w
     (let* ((syms (reduce (lambda (&rest r) 
@@ -762,17 +774,18 @@
       `(let (,@syms)
 	 ,(apply 'possible-eq-list-search (car r) (cadr r) specials `(,@overrides ,@(cddr r)))))))
 
-(si::putprop 'member (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'member-if (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'member-if-not (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'assoc (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'assoc-if (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'assoc-if-not (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'rassoc (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'rassoc-if (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'rassoc-if-not (macro-function 'member-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'member 'member-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'member-if 'member-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'member-if-not 'member-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'assoc 'member-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'assoc-if 'member-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'assoc-if-not 'member-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'rassoc 'member-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'rassoc-if 'member-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'rassoc-if-not 'member-compiler-macro 'si::compiler-macro-prop)
 
-(defmacro intersection-compiler-macro (&whole w &rest args)
+;(defmacro intersection-compiler-macro (&whole w &rest args)
+(defun intersection-compiler-macro (w env &aux (args (cdr w))) (declare (ignore env))
   (if (or (< (length args) 2) (do ((r (cddr args) (cddr r))) ((not (and r (keywordp (car r)))) r)))
       w
     (let* ((syms (reduce (lambda (&rest r) 
@@ -791,12 +804,13 @@
 	   (let ((,z (if ,ks (funcall ,ks ,l) ,l)))
 	     (,(if (eq (car w) 'intersection) 'when 'unless) (member ,z ,(cadr r) ,@(cddr r)) 
 	       ,(if (eq (car w) 'subsetp) `(return nil) `(push ,l ,ans)))))))))
-(si::putprop 'intersection (macro-function 'intersection-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'union (macro-function 'intersection-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'set-difference (macro-function 'intersection-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'subsetp (macro-function 'intersection-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'intersection 'intersection-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'union 'intersection-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'set-difference 'intersection-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'subsetp 'intersection-compiler-macro 'si::compiler-macro-prop)
 	  
-(defmacro set-exclusive-or-compiler-macro (&whole w &rest args)
+;(defmacro set-exclusive-or-compiler-macro (&whole w &rest args)
+(defun set-exclusive-or-compiler-macro (w env &aux (args (cdr w))) (declare (ignore env))
   (if (or (< (length args) 2) (do ((r (cddr args) (cddr r))) ((not (and r (keywordp (car r)))) r)))
       w
     (let* ((syms (reduce (lambda (&rest r) 
@@ -810,9 +824,10 @@
       `(let* (,@syms)
 	 (nconc (set-difference ,(car r) ,(cadr r) ,@(cddr r))
 		(set-difference ,(cadr r) ,(car r) :rev t ,@(cddr r)))))))
-(si::putprop 'set-exclusive-or (macro-function 'set-exclusive-or-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'set-exclusive-or 'set-exclusive-or-compiler-macro 'si::compiler-macro-prop)
 
-(defmacro mapcar-compiler-macro (&whole w &rest args)
+;(defmacro mapcar-compiler-macro (&whole w &rest args)
+(defun mapcar-compiler-macro (w env &aux (args (cdr w))) (declare (ignore env))
   (if (< (length args) 2) 
       w
     (let* ((syms (unless (inlinable-fn (car args)) `((,(gensym) ,(car args)))))
@@ -835,12 +850,12 @@
 		    (accum `(setq ,l (let ((,tmp (cons ,fc nil)))
 			      (if ,l (cdr (rplacd ,l ,tmp)) (setq ,ans ,tmp)))))
 		    (fc)))))))
-(si::putprop 'mapcar (macro-function 'mapcar-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'maplist (macro-function 'mapcar-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'mapc (macro-function 'mapcar-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'mapl (macro-function 'mapcar-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'mapcan (macro-function 'mapcar-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'mapcon (macro-function 'mapcar-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'mapcar 'mapcar-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'maplist 'mapcar-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'mapc 'mapcar-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'mapl 'mapcar-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'mapcan 'mapcar-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'mapcon 'mapcar-compiler-macro 'si::compiler-macro-prop)
       
 	   
 ;;start end count position
@@ -932,7 +947,10 @@
 		   (count cv) 
 		   (pos `(unless (= ,i ,l) ,i))
 		   (somep (if some sm `(not ,sm)))
-		   ((if ret `(funcall ,ret ,(caar gs)) (caar gs))))))
+		   ((let ((tmp (if end ;fixme
+				   `(unless (= ,i ,l) (if (listp ,(caar gs)) (car ,(caar gs)) (aref ,(caar gs) ,i)))
+				 `(if (listp ,(caar gs)) (car ,(caar gs)) (unless (= ,i ,l) (aref ,(caar gs) ,i))))))
+		      (if ret `(funcall ,ret ,tmp) tmp))))))
 
     `(let* ,lf  
        ,@(when count `((declare (seqind  ,cv))))
@@ -959,7 +977,10 @@
   `(or (constantp ,a) (and (consp ,a) (member (car ,a) '(function lambda)))))
 
 (defconstant +seq-fn-key-list+ 
-  '((position . (:item (:pos t)))
+  '((find . (:item))
+    (find-if . (:test))
+    (find-if-not . (:test-not))
+    (position . (:item (:pos t)))
     (position-if . (:test (:pos t)))
     (position-if-not . (:test-not (:pos t)))
     (count . (:item (:count t)))
@@ -968,7 +989,8 @@
     (some . (:test (:some t)))
     (notevery . (:test-not (:some nil)))))
 
-(defmacro seq-compiler-macro (&whole w &rest args)
+;(defmacro seq-compiler-macro (&whole w &rest args)
+(defun seq-compiler-macro (w env &aux (args (cdr w))) (declare (ignore env))
   (if (or (< (length args) 2) 
 	  (do ((r (cddr args) (cddr r))) 
 	      ((not (and r (keywordp (car r)) (not (eq (car r) :from-end)))) r))
@@ -994,21 +1016,24 @@
 		   (let ((,(cadr r) ,(cadr r)))
 		     (declare (vector ,(cadr r)))
 		     ,form))))))))
-(si::putprop 'position (macro-function 'seq-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'position-if (macro-function 'seq-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'position-if-not (macro-function 'seq-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'count (macro-function 'seq-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'count-if (macro-function 'seq-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'count-if-not (macro-function 'seq-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'some (macro-function 'seq-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'notevery (macro-function 'seq-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'find 'seq-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'find-if 'seq-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'find-if-not 'seq-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'position 'seq-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'position-if 'seq-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'position-if-not 'seq-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'count 'seq-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'count-if 'seq-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'count-if-not 'seq-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'some 'seq-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'notevery 'seq-compiler-macro 'si::compiler-macro-prop)
 
 (defmacro notany-compiler-macro (&rest args)
   `(not (some ,@args)))
-(si::putprop 'notany (macro-function 'notany-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'notany 'notany-compiler-macro 'si::compiler-macro-prop)
 (defmacro every-compiler-macro (&rest args)
   `(not (notevery ,@args)))
-(si::putprop 'every (macro-function 'every-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'every 'every-compiler-macro 'si::compiler-macro-prop)
 
 ;; (defmacro maybe-with-syms-r (conditional (syms r args) &rest body)
 
@@ -1022,7 +1047,8 @@
 ;; 	   (,r (mapcar (lambda (x) (cond ((inlinable-fn x) x)
 ;; 					 ((car (rassoc x syms :key 'car :test 'equal))) (x))) args)))
 
-(defmacro map-into-compiler-macro (&whole w &rest args)
+;(defmacro map-into-compiler-macro (&whole w &rest args)
+(defun map-into-compiler-macro (w env &aux (args (cdr w))) (declare (ignore env))
   (if (or (< (length args) 3) (and (eq (car w) 'map) (or (not (constantp (car args)))
 							 (not (type>= #tsequence (cmp-norm-tp (cmp-eval (car args))))))))
       w
@@ -1036,8 +1062,8 @@
 					      ((car (rassoc x syms :key 'car :test 'equal))) (x))) args)))
       `(let ,syms
 	 ,(do-sequence-search (cadr r) (cddr r) (if (eq (car w) 'map) :newseq :dest) (car r))))))
-(si::putprop 'map-into (macro-function 'compiler::map-into-compiler-macro) 'si::compiler-macro-prop)
-(si::putprop 'map (macro-function 'compiler::map-into-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'map-into 'map-into-compiler-macro 'si::compiler-macro-prop)
+(si::putprop 'map 'map-into-compiler-macro 'si::compiler-macro-prop)
 
 (defun maybe-reduce-lambda-wrap (lm)
   (cond ((atom lm) lm)
@@ -1047,7 +1073,8 @@
 	   `(lambda (&optional (,x nil ,xp) ,y) (declare (ignorable ,x ,y ,xp)) (when ,xp (funcall ,lm ,x ,y)))))
 	(lm)))
 
-(defmacro reduce-compiler-macro (&whole w &rest args)
+;(defmacro reduce-compiler-macro (&whole w &rest args)
+(defun reduce-compiler-macro (w env &aux (args (cdr w))) (declare (ignore env))
   (if (or (< (length args) 2) 
 	  (do ((r (cddr args) (cddr r))) 
 	      ((not (and r (keywordp (car r)) (not (eq (car r) :from-end)))) r))
@@ -1069,7 +1096,7 @@
 		 (let ((,(cadr r) ,(cadr r)))
 		   (declare (vector ,(cadr r)))
 		   ,form))))))))
-(si::putprop 'reduce (macro-function 'compiler::reduce-compiler-macro) 'si::compiler-macro-prop)
+(si::putprop 'reduce 'reduce-compiler-macro 'si::compiler-macro-prop)
 
 
 (defun and-compiler-macro (form env)
@@ -1085,26 +1112,6 @@
 	((endp (cddr form)) (cadr form))
 	((let ((s (gensym))) `(let ((,s ,(cadr form))) (if ,s ,s ,(or-compiler-macro `(or ,@(cddr form)) nil)))))))
 (si::putprop 'or 'or-compiler-macro 'si::compiler-macro-prop)
-
-;(defun do-vector-map (fn vars &key (not nil notp))
-;  (let ((i (gensym)) (l (gensym)))
-;    (let* ((tf `(funcall ,fn ,@(mapcar (lambda (x) `(aref ,x ,i)) vars)))
-;	   (tf (if notp `(not ,tf) tf))
-;	   (lf (mapcar (lambda (x) `(array-dimension ,x 0)) vars))
-;	   (lf (if (= (length lf) 1) lf `(min ,@lf))))
-;    `(let ((,l ,lf))
-;       (do ((,i 0 (+ ,i 1))) ((or (= ,i ,l) ,tf) (= ,i ,l))
-;	   (declare (seqind ,i)) )))))
-
-;(defmacro every-compiler-macro (&whole w &rest args)
-;  `(cond ((all-lists ,@(cdr args))
-;	  (not (member-if-not ,@args)))
-;	 ((all-vectors ,@(cdr args))
-;	  ,(do-vector-search (car args) (cdr args) :not t))
-;	 ((funcall (function every) ,@args))))
-;(si::putprop 'every (macro-function 'every-compiler-macro) 'si::compiler-macro-prop)
-	    
-
 
 (defun bind-all-vars-int (form nf bindings)
   (cond ((null form)
@@ -1151,7 +1158,7 @@
 	  (if (eq (car fd) 'call-local)
 	      ;; c1local-fun now adds fun-info into (cadr fd), so we need no longer
 	      ;; do it explicitly here.  CM 20031030
-	      (let* ((info (add-info (make-info :sp-change t) (cadr fd)))
+	      (let* ((info (add-info (make-info :sp-change 1) (cadr fd)))
 		     (forms (c1args args info)))
                   (let ((return-type (get-local-return-type (caddr fd))))
 		    (when return-type (setf (info-type info) return-type)))
@@ -1208,11 +1215,8 @@
 	    (si::add-hash (second *current-form*) 
 			  nil 
 			  (let ((fname (or (cdr (assoc fname +cmp-fn-alist+)) fname)))
-			    (list (cons fname
-				       (let* ((at (get-arg-types fname))
-					      (rt (get-return-type fname)))
-					 (when (or at rt) (list at rt))))))
-			  nil)))
+			    (list (cons fname (list (get-arg-types fname) (get-return-type fname)))))
+			  nil nil)))
 	 ((and (setq fd (get fname 'si::structure-access))
 	       (inline-possible fname)
               ;;; Structure hack.
@@ -1228,10 +1232,7 @@
 	  )
 	 ((eq fname 'si:|#,|)
 	  (cmperr "Sharp-comma-macro was found in a bad place."))
-	 (t (let* ((info (make-info :type (if (eq (second *current-form*) fname) ;FIXME must be a better way
-					      (when (boundp '*recursion-detected*) (setq *recursion-detected* t) nil) 
-					    '*)
-				    :sp-change (null (get fname 'no-sp-change))))
+	 (t (let* ((info (make-info :type '* :sp-change (if (null (get fname 'no-sp-change)) 1 0)))
 		   (args (if (and (member fname '(funcall apply))
 				  (consp (car args))
 				  (eq (caar args) 'quote)
@@ -1239,13 +1240,16 @@
 			     `((function ,(cadar args)) ,@(cdr args))
 			   args))
 		   (forms (c1args args info))) ;; info updated by args here
-	      (let ((return-type (get-return-type 
-				  (case fname 
-					((funcall apply) 
-					 (and (consp (car args)) (eq (caar args) 'function) (cadar args))) 
-					(otherwise fname)))))
-		(when return-type
-		  (setf (info-type info) return-type)))
+	      (let* ((return-type (get-return-type 
+				   (case fname 
+					 ((funcall apply) 
+					  (and (consp (car args)) (eq (caar args) 'function) (cadar args))) 
+					 (otherwise fname))))
+		     (return-type (unless (and (eq (second *current-form*) fname)
+					       (not (eq *recursion-detected* 'block))
+					       (setq *recursion-detected* t))
+				    return-type)))
+		(setf (info-type info) return-type))
 	      (let ((arg-types (get-arg-types fname)))
                      ;;; Add type information to the arguments.
 		(when arg-types
@@ -1292,7 +1296,7 @@
 
 
 
-(defun c1lambda-fun (lambda-expr args &aux (info (make-info :sp-change t)) (cle (car lambda-expr)))
+(defun c1lambda-fun (lambda-expr args &aux (info (make-info :sp-change 1)) (cle (car lambda-expr)))
   (if (and (not (intersection '(&rest &key &aux &allow-other-keys) cle))
 	   (cond ((member '&optional cle) (>= (1- (length cle)) (length args)))
 		 ((= (length cle) (length args)))))
@@ -1484,7 +1488,7 @@
 (defun my-call (loc name-vv ind sd) name-vv
   (let* ((raw (si::s-data-raw sd))
 	 (spos (si::s-data-slot-position sd)))
-    (if *safe-compile* (wfs-error)
+    (if *compiler-push-events* (wfs-error)
       (wt "STREF("  (aet-c-type (nth (aref raw ind) +cmp-array-types+) )
 	  "," loc "," (aref spos ind) ")"))))
 

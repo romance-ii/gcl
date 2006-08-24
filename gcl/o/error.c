@@ -837,9 +837,9 @@ DEF_ORDINARY("CATCHALL",sKcatchall,KEYWORD,"");
 void
 gcl_init_error(void)
 {
-	make_function("ERROR", Lerror);
-	make_function("CERROR", Lcerror);
-	make_si_function("IHS-TOP", siLihs_top);
+/* 	make_function("ERROR", Lerror); */
+/* 	make_function("CERROR", Lcerror); */
+/* 	make_si_function("IHS-TOP", siLihs_top); */
 	null_string = make_simple_string("");
 	enter_mark_origin(&null_string);
 }

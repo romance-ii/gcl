@@ -265,7 +265,7 @@
   (dolist** (var vars) (check-vref var))
 
 
-  (or (eql setjmps *setjmps*) (setf (info-volatile info) t))
+  (or (eql setjmps *setjmps*) (setf (info-volatile info) 1))
 
   (dolist (var vars) (setf (var-type var) (var-mt var)))
 
@@ -390,7 +390,7 @@
   (add-info info (cadr body))
   (setf (info-type info) (info-type (cadr body)))
   (dolist** (var vars) (check-vref var))
-  (or (eql setjmps *setjmps*) (setf (info-volatile info) t))
+  (or (eql setjmps *setjmps*) (setf (info-volatile info) 1))
   (dolist (var vars) (setf (var-type var) (var-mt var)))
   (list 'let*  info (reverse vars) (reverse forms) body))
 

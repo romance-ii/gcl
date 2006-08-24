@@ -94,7 +94,7 @@ DEFUN_NEW("COMPILE-REGEXP",object,fScompile_regexp,SI,1,1,NONE,OO,OO,OO,OO,(obje
 }
 
 
-DEFUN_NEW("STRING-MATCH",object,fSstring_match,SI,2,4,NONE,OO,OI,IO,OO,(object pattern,object string,...),
+DEFUN_NEW("STRING-MATCH",object,fSstring_match,SI,2,4,NONE,OO,OO,OO,OO,(object pattern,object string,...),
       "Match regexp PATTERN in STRING starting in string starting at START \
 and ending at END.  Return -1 if match not found, otherwise \
 return the start index  of the first matchs.  The variable \
@@ -125,9 +125,9 @@ be over written.   \
   end=string->st.st_fillp;
   if (nargs>2) {
     va_start(ap,string);
-    start=va_arg(ap,fixnum);
+    start=fix(va_arg(ap,object));
     if (nargs>3)
-      end=va_arg(ap,fixnum);
+      end=fix(va_arg(ap,object));
     va_end(ap);
   }
   if (start < 0 || end > string->st.st_fillp || start > end)
