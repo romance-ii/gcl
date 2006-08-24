@@ -48,7 +48,7 @@
 (DEFSYSFUN 'FILE-AUTHOR "Lfile_author" '(T) 'T NIL NIL) 
 (DEFSYSFUN 'STRING-CAPITALIZE "Lstring_capitalize" '(T *) 'STRING NIL
     NIL) 
-(DEFSYSFUN 'MACROEXPAND "Lmacroexpand" '(T *) '(VALUES PROPER-LIST BOOLEAN) NIL NIL) 
+(DEFSYSFUN 'MACROEXPAND "Lmacroexpand" '(T *) '(VALUES T BOOLEAN) NIL NIL) 
 ;(DEFSYSFUN 'MACROEXPAND "Lmacroexpand" '(T *) '* NIL NIL) 
 (DEFSYSFUN 'NCONC "Lnconc" '(*) 'T NIL NIL) 
 (DEFSYSFUN 'BOOLE "Lboole" '(T T T) 'T NIL NIL) 
@@ -228,7 +228,7 @@
 (DEFSYSFUN 'MAPCAR "Lmapcar" '(T T *) 'T NIL NIL) 
 (DEFSYSFUN 'FLOATP "Lfloatp" '(T) 'T NIL T) 
 (DEFSYSFUN 'SHADOW "Lshadow" '(T *) 'T NIL NIL) 
-(DEFSYSFUN 'MACROEXPAND-1 "Lmacroexpand_1" '(T *) '(VALUES T T) NIL
+(DEFSYSFUN 'MACROEXPAND-1 "Lmacroexpand_1" '(T *) '(VALUES T BOOLEAN) NIL
     NIL) 
 ;(DEFSYSFUN 'MACROEXPAND-1 "Lmacroexpand_1" '(T *) '* NIL NIL) 
 (DEFSYSFUN 'SXHASH "Lsxhash" '(T) 'FIXNUM NIL NIL) 
