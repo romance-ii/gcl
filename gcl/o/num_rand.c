@@ -182,8 +182,9 @@ make_random_state(object rs) {
   else
     gmp_randseed(&z->rnd.rnd_state,rs->rnd.rnd_state._mp_seed);
   
+#if __GNU_MP_VERSION >= 4 && __GNU_MP_VERSION_MINOR >= 2
   z->rnd.rnd_state._mp_algdata._mp_lc=&Mersenne_Twister_Generator_Noseed;
-
+#endif
   return(z);
 
 }
