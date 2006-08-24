@@ -41,7 +41,7 @@
 
 (defun compile-xgcl()
   (mapc (lambda (x) 
-	  (let ((x (concatenate 'string compiler::*cc* "-I../h " (namestring x))))
+	  (let ((x (concatenate 'string compiler::*cc* " -I../h " (namestring x))))
 	    (unless (zerop (system x))
 	      (error "compile failure: ~s~%" x))))
 	(directory "*.c"))
