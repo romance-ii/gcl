@@ -35,6 +35,8 @@
       "gcl_X10"
       "gcl_Xinit"
       "gcl_dwtrans"
+      "gcl_tohtml"
+      "gcl_index"
 ;      "gcl_sysinit"
       ))
 
