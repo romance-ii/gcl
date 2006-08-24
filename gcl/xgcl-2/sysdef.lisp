@@ -27,9 +27,9 @@
       "gcl_Xutil"
       "gcl_X"
       "gcl_XAtom"
-      "gcl_defentry-events"
+      "gcl_defentry_events"
       "gcl_Xstruct"
-      "gcl_XStruct-l-3"
+      "gcl_XStruct_l_3"
       "gcl_general"
       "gcl_keysymdef"
       "gcl_X10"
@@ -57,6 +57,9 @@
   (mapcar (lambda (x) (load (format nil "~a.o" x))) *files*))
 
 (defun load-interp-xgcl()
+  (mapcar (lambda (x) (load (format nil "~a.lsp" x))) *files*))
+
+(defun load-xgcl-interp()
   (mapcar (lambda (x) (load (format nil "~a.lsp" x))) *files*))
 
 (defun save-xgcl (pn)

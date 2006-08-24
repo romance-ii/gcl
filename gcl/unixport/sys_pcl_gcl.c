@@ -142,6 +142,24 @@ gcl_init_system(object no_init)
   lsp_init("../clcs/package.lisp");
   lsp_init("../clcs/myload1.lisp");
 
+#ifdef HAVE_XGCL
+  lsp_init("../xgcl-2/sysdef.lisp");
+  ar_check_init(gcl_Xlib,no_init);
+  ar_check_init(gcl_Xutil,no_init);
+  ar_check_init(gcl_X,no_init);
+  ar_check_init(gcl_XAtom,no_init);
+  ar_check_init(gcl_defentry_events,no_init);
+  ar_check_init(gcl_Xstruct,no_init);
+  ar_check_init(gcl_XStruct_l_3,no_init);
+  ar_check_init(gcl_general,no_init);
+  ar_check_init(gcl_keysymdef,no_init);
+  ar_check_init(gcl_X10,no_init);
+  ar_check_init(gcl_Xinit,no_init);
+  ar_check_init(gcl_dwtrans,no_init);
+  ar_check_init(gcl_tohtml,no_init);
+  ar_check_init(gcl_index,no_init);
+#endif
+  
   ar_check_init(gcl_pcl_pkg,no_init);
   ar_check_init(gcl_pcl_walk,no_init);
   ar_check_init(gcl_pcl_iterate,no_init);

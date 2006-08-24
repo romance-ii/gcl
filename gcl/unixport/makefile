@@ -9,6 +9,7 @@ ODIR	= ../o
 MDIR	= ../mod
 LSPDIR	= ../lsp
 CMPDIR	= ../cmpnew
+XDIR	= ../xgcl-2
 CLCSDIR = ../clcs
 PCLDIR  = ../pcl
 PORTDIR = $(shell pwd)
@@ -47,6 +48,7 @@ OOBJS:=$(filter-out $(FIRST_FILE),$(OOBJS))
 OOBJS:=$(filter-out $(LAST_FILE),$(OOBJS))
 OOBJS:=$(filter-out $(ODIR)/plttest.o,$(OOBJS))
 OBJS:=$(OOBJS) $(shell ls -1 $(LSPDIR)/*.o | grep -v recompile.o)
+OBJS:=$(OBJS) $(shell ls -1 $(XDIR)/*.o)
 OBJS:=$(OBJS) $(shell ls -1 $(CMPDIR)/*.o | grep -v collectfn.o)
 OBJS:=$(OBJS) gcl_recompile.o
 
@@ -196,4 +198,4 @@ clean:
 		gazonk*.lsp plt*h *_map saved_* lib* raw_* gcl.script gcl_recompile*
 
 .INTERMEDIATE: init_ansi_gcl.lsp.tmp init_gcl.lsp.tmp raw_gcl raw_ansi_gcl
-.PRECIOUS: init_gcl.lsp init_ansi_gcl.lsp
+.PRECIOUS: init_pre_gcl.lsp init_gcl.lsp init_ansi_gcl.lsp

@@ -1,11 +1,11 @@
-; dwindow.lsp           Gordon S. Novak Jr.           ; 25 Jun 06
+; dwindow.lsp           Gordon S. Novak Jr.           ; 23 Aug 06
 
 ; Window types and interface functions for using X windows from GNU Common Lisp
 
 ; Copyright (c) 2006 Gordon S. Novak Jr. and The University of Texas at Austin.
 
 ; 08 Jan 97; 17 May 02; 17 May 04; 18 May 04; 01 Jun 04; 18 Aug 04; 21 Jan 06
-; 24 Jan 06; 24 Jun 06
+; 24 Jan 06; 24 Jun 06; 25 Jun 06; 17 Jul 06
 
 ; See the files gnu.license and dec.copyright .
 
@@ -947,32 +947,31 @@ msg     ((force-output       window-force-output     open t)
 	 ((w window) (offset vector) (size vector) &optional linewidth)
   (window-draw-box-xy w (x offset) (y offset) (x size) (y size) linewidth) )
 
-; 08 Aug 91; 12 Sep 91; 11 Dec 91; 01 Sep 92; 02 Sep 92
+; 08 Aug 91; 12 Sep 91; 11 Dec 91; 01 Sep 92; 02 Sep 92; 17 Jul 06
 ; New version avoids XDrawRectangle, which messes up when used with XOR.
 ; was  (XDrawRectangle *window-display* (parent w) (gcontext w)
 ;		       offsetx (- qqwheight (offsety + sizey)) sizex sizey)
 (gldefun window-draw-box-xy
 	 ((w window) (offsetx integer) (offsety integer)
-		    (sizex integer)   (sizey integer)
-		    &optional linewidth)
-  (let ((qqwheight (drawable-height w)) miny lw lw2 lw2b (pw (parent w))
+		     (sizex integer)   (sizey integer)  &optional linewidth)
+  (let ((qqwheight (drawable-height w)) lw lw2 lw2b (pw (parent w))
 	(gc  (gcontext w)))
     (if (linewidth and (linewidth <> 1)) (set-line-width w linewidth))
     (lw = (or linewidth 1))
-    (lw2 = lw / 2)
-    (lw2b = (lw + 1) / 2)
-    (miny = offsety - lw2b)
-    (XdrawLine *window-display*  pw gc offsetx (- qqwheight miny)
-	       offsetx (- qqwheight (miny + sizey + lw)))
+    (lw2 = (truncate lw 2))
+    (lw2b = (truncate (lw + 1) 2))
+    (XdrawLine *window-display* pw gc
+	       (- offsetx lw2) (- qqwheight offsety)
+	       (- (+ offsetx sizex) lw2) (- qqwheight offsety))
     (XdrawLine *window-display*  pw gc
-		     (offsetx + sizex) (- qqwheight miny)
-		     (offsetx + sizex) (- qqwheight (miny + sizey + lw)))
+	       (+ offsetx sizex) (- qqwheight (- offsety lw2b))
+	       (+ offsetx sizex) (- qqwheight (+ sizey (- offsety lw2b))))
     (XdrawLine *window-display*  pw gc
-		     (offsetx + lw2b) (- qqwheight offsety)
-		     (offsetx + sizex - lw2) (- qqwheight offsety) )
+	       (+ offsetx sizex lw2b) (- qqwheight (+ offsety sizey))
+	       (+ offsetx lw2b) (- qqwheight (+ offsety sizey)))
     (XdrawLine *window-display*  pw gc
-		     (offsetx + lw2b) (- qqwheight (offsety + sizey))
-		     (offsetx + sizex - lw2) (- qqwheight (offsety + sizey)) )
+	       offsetx (- qqwheight (+ offsety sizey lw2))
+	       offsetx (- qqwheight (+ offsety lw2)) )
     (if (linewidth and (linewidth <> 1)) (set-line-width w 1)) ))
 
 ; 26 Nov 91
@@ -991,27 +990,32 @@ msg     ((force-output       window-force-output     open t)
 				  &optional lw)
   (draw-box-xy w (min xa xb) (min ya yb) (abs (- xa xb)) (abs (- ya yb)) lw) )
 
-; 13 Sep 91
+; 13 Sep 91; 17 Jul 06
 ; Draw a box with round corners
 (gldefun window-draw-rcbox-xy ((w window) (x integer) (y integer)
 			       (width integer)
 			       (height integer) (radius integer)
 					 &optional linewidth)
-  (let (x1 x2 y1 y2 r)
+  (let (x1 x2 y1 y2 r lw2 lw2b fudge)
     (r = (max 0 (min radius (truncate (abs width) 2)
 			           (truncate (abs height) 2))))
+    (if (not (numberp linewidth)) (linewidth = 1))
+    (lw2 = (truncate linewidth 2))
+    (lw2b = (truncate (1+ linewidth) 2))
+    (fudge = (if (oddp linewidth) 0 1))
     (x1 = x + r)
     (x2 = x + width - r)
     (y1 = y + r)
     (y2 = y + height - r)
-    (draw-line-xy w x1 y x2 y linewidth)
-    (draw-line-xy w (x + width) y1 (x + width) y2 linewidth)
-    (draw-line-xy w x1 (y + height) x2 (y + height) linewidth)
-    (draw-line-xy w x y1 x y2 linewidth)
-    (draw-arc-xy w x1 y1 r r 180 90 linewidth)
+    (draw-line-xy w (- (- x1 1) lw2) y x2 y linewidth)                ; bottom
+    (draw-line-xy w (x + width) (- y1 lw2b) (x + width) (+ y2 1)
+		                                           linewidth) ; right
+    (draw-line-xy w (- x1 1) (+ y height) (+ x2 lw2) (+ y height) linewidth)
+    (draw-line-xy w x y1 x (+ y2 1) linewidth)                        ; left
+    (draw-arc-xy w (- x1 fudge) y1 r r 180 90 linewidth)
     (draw-arc-xy w x2 y1 r r 270 90 linewidth)
-    (draw-arc-xy w x2 y2 r r   0 90 linewidth)
-    (draw-arc-xy w x1 y2 r r  90 90 linewidth) ))
+    (draw-arc-xy w x2 (+ y2 fudge) r r 0 90 linewidth)
+    (draw-arc-xy w (- x1 fudge) (+ y2 fudge) r r  90 90 linewidth) ))
 
 ; 13 Aug 91; 15 Aug 91; 12 Sep 91
 (gldefun window-draw-arc-xy ((w window) (x integer) (y integer)

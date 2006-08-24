@@ -231,7 +231,7 @@
                      :directory (pathname-directory p)
                      :name (pathname-name p)
                      :version (pathname-version p)) sp gp dc nt))
-	#-aosvs(dc (string-downcase (init-name p sp gp nil nt)))
+;	#-aosvs(dc (string-downcase (init-name p sp gp nil nt)))
 	((and nt
 	      (let* ((pn (pathname-name p))
 		     (pp (make-pathname :name pn)))
