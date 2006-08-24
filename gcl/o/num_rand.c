@@ -102,6 +102,7 @@ trap_gcl_gmp_allocfun(size_t size){
 }
 #endif
 
+#if __GNU_MP_VERSION >= 4 && __GNU_MP_VERSION_MINOR >= 2
 extern void
 __gmp_randget_mt ();
 extern void
@@ -116,6 +117,7 @@ static gmp_randfnptr_t Mersenne_Twister_Generator_Noseed = {
   __gmp_randclear_mt,
   __gmp_randiset_mt
 };
+#endif
 
 void
 init_gmp_rnd_state(__gmp_randstate_struct *x) {
