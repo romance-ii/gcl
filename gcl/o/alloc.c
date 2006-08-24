@@ -1675,12 +1675,15 @@ free(void *ptr)
 #ifdef NOFREE_ERR
 	return ;
 #else	
-	if (raw_image==FALSE || core_end-heap_end<sizeof(ptr) || ptr!=old_monstartup_pointer) {
-	  static void *old_ptr;
-	  if (old_ptr==ptr) return;
-	  old_ptr=ptr;
-	  FEerror("free(3) error.",0);
-	}
+#ifdef GCL_GPROF
+	if (raw_image==FALSE || core_end-heap_end<sizeof(ptr) || ptr!=old_monstartup_pointer) 
+#endif
+	  {
+	    static void *old_ptr;
+	    if (old_ptr==ptr) return;
+	    old_ptr=ptr;
+	    FEerror("free(3) error.",0);
+	  }
 	return;
 #endif	
 }
