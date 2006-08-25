@@ -462,7 +462,7 @@
   )
 
 (defun c1psetq (args &aux (vrefs nil) (forms nil)
-                          (info (make-info :type '(member nil))))
+                          (info (make-info :type #tnull)))
   (do ((l args (cddr l)))
       ((endp l))
       (declare (object l))

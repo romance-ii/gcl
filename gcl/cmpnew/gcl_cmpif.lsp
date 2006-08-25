@@ -460,7 +460,7 @@
 
 (defun c1case (args &optional (default nil))
   (when (endp args) (too-few-args 'case 1 0))
-  (let* ((info (make-info :type nil))
+  (let* ((info (make-info :type #tnil))
          (key-form (c1expr* (car args) info))
          (clauses nil) or-list)
     (cond ((type>= #tfixnum (info-type (second key-form)))

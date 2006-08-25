@@ -111,8 +111,7 @@
         (t (c2call-global
             'princ
             (list (list 'LOCATION
-                        (make-info :type
-                          (if (characterp string) 'character 'string))
+                        (make-info :type (cmp-norm-tp (if (characterp string) 'character 'string)))
                         (list 'VV (add-object string)))
                   stream) nil t))))
 
@@ -309,7 +308,7 @@
 
 (defun do-eq-et-al (fn args)
   (let* ((tf (cadr (test-to-tf fn)))
-	 (info (make-info :type 'boolean))
+	 (info (make-info :type #tboolean))
 	 (nargs (c1args args info)))
     (cond ((and tf 
 		(or (funcall tf (info-type (cadar nargs)))
@@ -371,7 +370,7 @@
 
 
 (defun do-num-relations (fn args)
-  (let* ((info (make-info :type 'boolean))
+  (let* ((info (make-info :type #tboolean))
 	 (nargs (c1args args info))
 	 (t1 (and (car args) (info-type (cadar nargs))))
 	 (t2 (and (cadr args) (info-type (cadadr nargs))))
@@ -447,7 +446,7 @@
 (si::putprop 'is-eq-test-item-list 'c1is-eq-test-item-list 'c1)
 
 (defun do-predicate (fn args)
-  (let* ((info (make-info :type 'boolean))
+  (let* ((info (make-info :type #tboolean))
 	 (nargs (c1args args info))
 	 (tp (car (rassoc fn +cmp-type-alist+))))
     (let ((at (and (not (cdr args)) (coerce-to-one-value (info-type (cadar nargs))))))

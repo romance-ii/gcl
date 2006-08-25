@@ -39,7 +39,7 @@
 (defmacro mia (x y) `(make-array ,x :adjustable t :fill-pointer ,y))
 (defmacro eql-not-nil (x y) `(and ,x (eql ,x ,y)))
 
-(defstruct (info (:copier old-copy-info) (:constructor old-make-info))
+(defstruct (info (:copier old-copy-info)) ;(:constructor old-make-info))
   (type t)		    ;;; Type of the form.
   (sp-change 0   :type bit) ;;; Whether execution of the form may change the value of a special variable *VS*.
   (volatile  0   :type bit) ;;; whether there is a possible setjmp
@@ -66,10 +66,10 @@
 	  (copy-array (info-changed-array info)))    
     new-info))
 
-(defun make-info (&rest args)
-  (let ((z (member :type args)))
-    (if z (apply 'old-make-info (mapcar (lambda (x) (if (eq x (cadr z)) (cmp-norm-tp x) x)) args))
-      (apply 'old-make-info args))))
+;; (defun make-info (&rest args)
+;;   (let ((z (member :type args)))
+;;     (if z (apply 'old-make-info (mapcar (lambda (x) (if (eq x (cadr z)) (cmp-norm-tp x) x)) args))
+;;       (apply 'old-make-info args))))
 
 (defconstant +c1nil+ (list 'LOCATION (make-info :type (object-type nil)) nil))
 (defmacro c1nil () `+c1nil+)
