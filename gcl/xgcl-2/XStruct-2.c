@@ -46,15 +46,15 @@ XEvent j;
           i->event = j;
 }
 
-int _XQEvent_next(i)
+long _XQEvent_next(i)
 _XQEvent* i;
 {
-          return((int) i->next);
+          return((long) i->next);
 }
 
 void set__XQEvent_next(i, j)
 _XQEvent* i;
-int j;
+long j;
 {
           i->next = (struct _XSQEvent *) j;
 }
@@ -210,28 +210,28 @@ int j;
           i->ascent = j;
 }
 
-int  XFontStruct_per_char(i)
+long  XFontStruct_per_char(i)
 XFontStruct* i;
 {
-          return((int) i->per_char);
+          return((long) i->per_char);
 }
 
 void set_XFontStruct_per_char(i, j)
 XFontStruct* i;
-int j;
+long j;
 {
           i->per_char = (XCharStruct *) j;
 }
 
-int XFontStruct_max_bounds(i)
+long XFontStruct_max_bounds(i)
 XFontStruct* i;
 {
-          return((int) &i->max_bounds);
+          return((long) &i->max_bounds);
 }
-int XFontStruct_min_bounds(i)
+long XFontStruct_min_bounds(i)
 XFontStruct* i;
 {
-          return((int) &i->min_bounds);
+          return((long) &i->min_bounds);
 }
 void set_XFontStruct_max_bounds(i, j)
 XFontStruct* i;
@@ -246,15 +246,15 @@ XCharStruct j;
           i->min_bounds = j;
 }
 
-int  XFontStruct_properties(i)
+long  XFontStruct_properties(i)
 XFontStruct* i;
 {
-          return((int) i->properties);
+          return((long) i->properties);
 }
 
 void set_XFontStruct_properties(i, j)
 XFontStruct* i;
-int j;
+long j;
 {
           i->properties = (XFontProp *) j;
 }
@@ -376,15 +376,15 @@ int j;
           i->fid = j;
 }
 
-int  XFontStruct_ext_data(i)
+long  XFontStruct_ext_data(i)
 XFontStruct* i;
 {
-          return((int) i->ext_data);
+          return((long) i->ext_data);
 }
 
 void set_XFontStruct_ext_data(i, j)
 XFontStruct* i;
-int j;
+long j;
 {
           i->ext_data = (XExtData *) j;
 }
@@ -435,15 +435,15 @@ int j;
           i->nchars = j;
 }
 
-int  XTextItem_chars(i)
+long  XTextItem_chars(i)
 XTextItem* i;
 {
-          return((int) i->chars);
+          return((long) i->chars);
 }
 
 void set_XTextItem_chars(i, j)
 XTextItem* i;
-int j;
+long j;
 {
           i->chars = (char *) j;
 }
@@ -527,15 +527,15 @@ int j;
           i->nchars = j;
 }
 
-int  XTextItem16_chars(i)
+long  XTextItem16_chars(i)
 XTextItem16* i;
 {
-          return((int) i->chars);
+          return((long) i->chars);
 }
 
 void set_XTextItem16_chars(i, j)
 XTextItem16* i;
-int j;
+long j;
 {
           i->chars = (XChar2b *) j;
 }
@@ -547,54 +547,54 @@ long  make_XEDataObject (){
           return ((long) calloc(1, sizeof(XEDataObject)));
 }
 
-int  XEDataObject_font(i)
+long  XEDataObject_font(i)
 XEDataObject* i;
 {
-          return((int) i->font);
+          return((long) i->font);
 }
 
 void set_XEDataObject_font(i, j)
 XEDataObject* i;
-int j;
+long j;
 {
           i->font = (XFontStruct *) j;
 }
 
-int  XEDataObject_pixmap_format(i)
+long  XEDataObject_pixmap_format(i)
 XEDataObject* i;
 {
-          return((int) i->pixmap_format);
+          return((long) i->pixmap_format);
 }
 
 void set_XEDataObject_pixmap_format(i, j)
 XEDataObject* i;
-int j;
+long j;
 {
           i->pixmap_format = (ScreenFormat *) j;
 }
 
-int  XEDataObject_screen(i)
+long  XEDataObject_screen(i)
 XEDataObject* i;
 {
-          return((int) i->screen);
+          return((long) i->screen);
 }
 
 void set_XEDataObject_screen(i, j)
 XEDataObject* i;
-int j;
+long j;
 {
           i->screen = (Screen *) j;
 }
 
-int  XEDataObject_visual(i)
+long  XEDataObject_visual(i)
 XEDataObject* i;
 {
-          return((int) i->visual);
+          return((long) i->visual);
 }
 
 void set_XEDataObject_visual(i, j)
 XEDataObject* i;
-int j;
+long j;
 {
           i->visual = (Visual *) j;
 }
@@ -1025,15 +1025,15 @@ int j;
           i->encoding = j;
 }
 
-int  XTextProperty_value(i)
+long  XTextProperty_value(i)
 XTextProperty* i;
 {
-          return((int) i->value);
+          return((long) i->value);
 }
 
 void set_XTextProperty_value(i, j)
 XTextProperty* i;
-int j;
+long j;
 {
           i->value = (unsigned char *) j;
 }
@@ -1130,28 +1130,28 @@ long  make_XClassHint (){
           return ((long) calloc(1, sizeof(XClassHint)));
 }
 
-int  XClassHint_res_class(i)
+long  XClassHint_res_class(i)
 XClassHint* i;
 {
-          return((int) i->res_class);
+          return((long) i->res_class);
 }
 
 void set_XClassHint_res_class(i, j)
 XClassHint* i;
-int j;
+long j;
 {
           i->res_class = (char *) j;
 }
 
-int  XClassHint_res_name(i)
+long  XClassHint_res_name(i)
 XClassHint* i;
 {
-          return((int) i->res_name);
+          return((long) i->res_name);
 }
 
 void set_XClassHint_res_name(i, j)
 XClassHint* i;
-int j;
+long j;
 {
           i->res_name = (char *) j;
 }
@@ -1176,15 +1176,15 @@ int j;
           i->chars_matched = j;
 }
 
-int  XComposeStatus_compose_ptr(i)
+long  XComposeStatus_compose_ptr(i)
 XComposeStatus* i;
 {
-          return((int) i->compose_ptr);
+          return((long) i->compose_ptr);
 }
 
 void set_XComposeStatus_compose_ptr(i, j)
 XComposeStatus* i;
-int j;
+long j;
 {
           i->compose_ptr = (XPointer) j;
 }
@@ -1313,15 +1313,15 @@ int j;
           i->visualid = j;
 }
 
-int  XVisualInfo_visual(i)
+long  XVisualInfo_visual(i)
 XVisualInfo* i;
 {
-          return((int) i->visual);
+          return((long) i->visual);
 }
 
 void set_XVisualInfo_visual(i, j)
 XVisualInfo* i;
-int j;
+long j;
 {
           i->visual = (Visual *) j;
 }
@@ -1462,5 +1462,4 @@ int j;
 {
           i->colormap = j;
 }
-
 

@@ -173,15 +173,15 @@ int j;
           i->window = j;
 }
 
-int  XKeyEvent_display(i)
+long  XKeyEvent_display(i)
 XKeyEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XKeyEvent_display(i, j)
 XKeyEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -375,15 +375,15 @@ int j;
           i->window = j;
 }
 
-int  XButtonEvent_display(i)
+long  XButtonEvent_display(i)
 XButtonEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XButtonEvent_display(i, j)
 XButtonEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -577,15 +577,15 @@ int j;
           i->window = j;
 }
 
-int  XMotionEvent_display(i)
+long  XMotionEvent_display(i)
 XMotionEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XMotionEvent_display(i, j)
 XMotionEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -805,15 +805,15 @@ int j;
           i->window = j;
 }
 
-int  XCrossingEvent_display(i)
+long  XCrossingEvent_display(i)
 XCrossingEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XCrossingEvent_display(i, j)
 XCrossingEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -903,15 +903,15 @@ int j;
           i->window = j;
 }
 
-int  XFocusChangeEvent_display(i)
+long  XFocusChangeEvent_display(i)
 XFocusChangeEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XFocusChangeEvent_display(i, j)
 XFocusChangeEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -980,15 +980,15 @@ int j;
           i->window = j;
 }
 
-int  XKeymapEvent_display(i)
+long  XKeymapEvent_display(i)
 XKeymapEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XKeymapEvent_display(i, j)
 XKeymapEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -1117,15 +1117,15 @@ int j;
           i->window = j;
 }
 
-int  XExposeEvent_display(i)
+long  XExposeEvent_display(i)
 XExposeEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XExposeEvent_display(i, j)
 XExposeEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -1280,15 +1280,15 @@ Drawable j;
           i->drawable = j;
 }
 
-int  XGraphicsExposeEvent_display(i)
+long  XGraphicsExposeEvent_display(i)
 XGraphicsExposeEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XGraphicsExposeEvent_display(i, j)
 XGraphicsExposeEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -1378,15 +1378,15 @@ Drawable j;
           i->drawable = j;
 }
 
-int  XNoExposeEvent_display(i)
+long  XNoExposeEvent_display(i)
 XNoExposeEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XNoExposeEvent_display(i, j)
 XNoExposeEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -1463,15 +1463,15 @@ int j;
           i->window = j;
 }
 
-int  XVisibilityEvent_display(i)
+long  XVisibilityEvent_display(i)
 XVisibilityEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XVisibilityEvent_display(i, j)
 XVisibilityEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -1626,15 +1626,15 @@ int j;
           i->parent = j;
 }
 
-int  XCreateWindowEvent_display(i)
+long  XCreateWindowEvent_display(i)
 XCreateWindowEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XCreateWindowEvent_display(i, j)
 XCreateWindowEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -1711,15 +1711,15 @@ int j;
           i->event = j;
 }
 
-int  XDestroyWindowEvent_display(i)
+long  XDestroyWindowEvent_display(i)
 XDestroyWindowEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XDestroyWindowEvent_display(i, j)
 XDestroyWindowEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -1809,15 +1809,15 @@ int j;
           i->event = j;
 }
 
-int  XUnmapEvent_display(i)
+long  XUnmapEvent_display(i)
 XUnmapEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XUnmapEvent_display(i, j)
 XUnmapEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -1907,15 +1907,15 @@ int j;
           i->event = j;
 }
 
-int  XMapEvent_display(i)
+long  XMapEvent_display(i)
 XMapEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XMapEvent_display(i, j)
 XMapEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -1992,15 +1992,15 @@ int j;
           i->parent = j;
 }
 
-int  XMapRequestEvent_display(i)
+long  XMapRequestEvent_display(i)
 XMapRequestEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XMapRequestEvent_display(i, j)
 XMapRequestEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -2129,15 +2129,15 @@ int j;
           i->event = j;
 }
 
-int  XReparentEvent_display(i)
+long  XReparentEvent_display(i)
 XReparentEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XReparentEvent_display(i, j)
 XReparentEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -2305,15 +2305,15 @@ int j;
           i->event = j;
 }
 
-int  XConfigureEvent_display(i)
+long  XConfigureEvent_display(i)
 XConfigureEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XConfigureEvent_display(i, j)
 XConfigureEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -2416,15 +2416,15 @@ int j;
           i->event = j;
 }
 
-int  XGravityEvent_display(i)
+long  XGravityEvent_display(i)
 XGravityEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XGravityEvent_display(i, j)
 XGravityEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -2514,15 +2514,15 @@ int j;
           i->window = j;
 }
 
-int  XResizeRequestEvent_display(i)
+long  XResizeRequestEvent_display(i)
 XResizeRequestEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XResizeRequestEvent_display(i, j)
 XResizeRequestEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -2703,15 +2703,15 @@ int j;
           i->parent = j;
 }
 
-int  XConfigureRequestEvent_display(i)
+long  XConfigureRequestEvent_display(i)
 XConfigureRequestEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XConfigureRequestEvent_display(i, j)
 XConfigureRequestEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -2801,15 +2801,15 @@ int j;
           i->event = j;
 }
 
-int  XCirculateEvent_display(i)
+long  XCirculateEvent_display(i)
 XCirculateEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XCirculateEvent_display(i, j)
 XCirculateEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -2899,15 +2899,15 @@ int j;
           i->parent = j;
 }
 
-int  XCirculateRequestEvent_display(i)
+long  XCirculateRequestEvent_display(i)
 XCirculateRequestEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XCirculateRequestEvent_display(i, j)
 XCirculateRequestEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -3010,15 +3010,15 @@ int j;
           i->window = j;
 }
 
-int  XPropertyEvent_display(i)
+long  XPropertyEvent_display(i)
 XPropertyEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XPropertyEvent_display(i, j)
 XPropertyEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -3108,15 +3108,15 @@ int j;
           i->window = j;
 }
 
-int  XSelectionClearEvent_display(i)
+long  XSelectionClearEvent_display(i)
 XSelectionClearEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XSelectionClearEvent_display(i, j)
 XSelectionClearEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -3245,15 +3245,15 @@ int j;
           i->owner = j;
 }
 
-int  XSelectionRequestEvent_display(i)
+long  XSelectionRequestEvent_display(i)
 XSelectionRequestEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XSelectionRequestEvent_display(i, j)
 XSelectionRequestEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -3369,15 +3369,15 @@ int j;
           i->requestor = j;
 }
 
-int  XSelectionEvent_display(i)
+long  XSelectionEvent_display(i)
 XSelectionEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XSelectionEvent_display(i, j)
 XSelectionEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -3480,15 +3480,15 @@ int j;
           i->window = j;
 }
 
-int  XColormapEvent_display(i)
+long  XColormapEvent_display(i)
 XColormapEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XColormapEvent_display(i, j)
 XColormapEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -3579,15 +3579,15 @@ int j;
           i->window = j;
 }
 
-int  XClientMessageEvent_display(i)
+long  XClientMessageEvent_display(i)
 XClientMessageEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XClientMessageEvent_display(i, j)
 XClientMessageEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -3690,15 +3690,15 @@ int j;
           i->window = j;
 }
 
-int  XMappingEvent_display(i)
+long  XMappingEvent_display(i)
 XMappingEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XMappingEvent_display(i, j)
 XMappingEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -3814,15 +3814,15 @@ int j;
           i->resourceid = j;
 }
 
-int  XErrorEvent_display(i)
+long  XErrorEvent_display(i)
 XErrorEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XErrorEvent_display(i, j)
 XErrorEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }
@@ -3860,15 +3860,15 @@ int j;
           i->window = j;
 }
 
-int  XAnyEvent_display(i)
+long  XAnyEvent_display(i)
 XAnyEvent* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_XAnyEvent_display(i, j)
 XAnyEvent* i;
-int j;
+long j;
 {
           i->display = (Display *) j;
 }

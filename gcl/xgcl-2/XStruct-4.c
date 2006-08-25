@@ -622,15 +622,15 @@ int j;
           i->visualid = j;
 }
 
-int  Visual_ext_data(i)
+long  Visual_ext_data(i)
 Visual* i;
 {
-          return((int) i->ext_data);
+          return((long) i->ext_data);
 }
 
 void set_Visual_ext_data(i, j)
 Visual* i;
-int j;
+long j;
 {
           i->ext_data = (XExtData *) j;
 }
@@ -642,15 +642,15 @@ long  make_Depth (){
           return ((long) calloc(1, sizeof(Depth)));
 }
 
-int  Depth_visuals(i)
+long  Depth_visuals(i)
 Depth* i;
 {
-          return((int) i->visuals);
+          return((long) i->visuals);
 }
 
 void set_Depth_visuals(i, j)
 Depth* i;
-int j;
+long j;
 {
           i->visuals = (Visual *) j;
 }
@@ -792,28 +792,28 @@ int j;
           i->cmap = j;
 }
 
-int  Screen_default_gc(i)
+long  Screen_default_gc(i)
 Screen* i;
 {
-          return((int) i->default_gc);
+          return((long) i->default_gc);
 }
 
 void set_Screen_default_gc(i, j)
 Screen* i;
-int j;
+long j;
 {
           i->default_gc = (GC) j;
 }
 
-int  Screen_root_visual(i)
+long  Screen_root_visual(i)
 Screen* i;
 {
-          return((int) i->root_visual);
+          return((long) i->root_visual);
 }
 
 void set_Screen_root_visual(i, j)
 Screen* i;
-int j;
+long j;
 {
           i->root_visual = (Visual *) j;
 }
@@ -831,15 +831,15 @@ int j;
           i->root_depth = j;
 }
 
-int  Screen_depths(i)
+long  Screen_depths(i)
 Screen* i;
 {
-          return((int) i->depths);
+          return((long) i->depths);
 }
 
 void set_Screen_depths(i, j)
 Screen* i;
-int j;
+long j;
 {
           i->depths = (Depth *) j;
 }
@@ -922,28 +922,28 @@ int j;
           i->root = j;
 }
 
-int Screen_display(i)
+long Screen_display(i)
 Screen* i;
 {
-          return((int) i->display);
+          return((long) i->display);
 }
 
 void set_Screen_display(i, j)
 Screen* i;
-int j;
+long j;
 {
            i->display = (struct _XDisplay *) j;
 }
 
-int  Screen_ext_data(i)
+long  Screen_ext_data(i)
 Screen* i;
 {
-          return((int) i->ext_data);
+          return((long) i->ext_data);
 }
 
 void set_Screen_ext_data(i, j)
 Screen* i;
-int j;
+long j;
 {
           i->ext_data = (XExtData *) j;
 }
@@ -994,15 +994,15 @@ int j;
           i->depth = j;
 }
 
-int  ScreenFormat_ext_data(i)
+long  ScreenFormat_ext_data(i)
 ScreenFormat* i;
 {
-          return((int) i->ext_data);
+          return((long) i->ext_data);
 }
 
 void set_ScreenFormat_ext_data(i, j)
 ScreenFormat* i;
-int j;
+long j;
 {
           i->ext_data = (XExtData *) j;
 }
@@ -1216,15 +1216,15 @@ long  make_XWindowAttributes (){
           return ((long) calloc(1, sizeof(XWindowAttributes)));
 }
 
-int  XWindowAttributes_screen(i)
+long  XWindowAttributes_screen(i)
 XWindowAttributes* i;
 {
-          return((int) i->screen);
+          return((long) i->screen);
 }
 
 void set_XWindowAttributes_screen(i, j)
 XWindowAttributes* i;
-int j;
+long j;
 {
           i->screen = (Screen *) j;
 }
@@ -1424,15 +1424,15 @@ int j;
           i->root = j;
 }
 
-int  XWindowAttributes_visual(i)
+long  XWindowAttributes_visual(i)
 XWindowAttributes* i;
 {
-          return((int) i->visual);
+          return((long) i->visual);
 }
 
 void set_XWindowAttributes_visual(i, j)
 XWindowAttributes* i;
-int j;
+long j;
 {
           i->visual = (Visual *) j;
 }
@@ -1522,15 +1522,15 @@ long  make_XHostAddress (){
           return ((long) calloc(1, sizeof(XHostAddress)));
 }
 
-int  XHostAddress_address(i)
+long  XHostAddress_address(i)
 XHostAddress* i;
 {
-          return((int) i->address);
+          return((long) i->address);
 }
 
 void set_XHostAddress_address(i, j)
 XHostAddress* i;
-int j;
+long j;
 {
           i->address = (char *) j;
 }
@@ -1568,15 +1568,15 @@ long  make_XImage (){
           return ((long) calloc(1, sizeof(XImage)));
 }
 
-int  XImage_obdata(i)
+long  XImage_obdata(i)
 XImage* i;
 {
-          return((int) i->obdata);
+          return((long) i->obdata);
 }
 
 void set_XImage_obdata(i, j)
 XImage* i;
-int j;
+long j;
 {
           i->obdata = (XPointer) j;
 }
@@ -1711,15 +1711,15 @@ int j;
           i->byte_order = j;
 }
 
-int  XImage_data(i)
+long  XImage_data(i)
 XImage* i;
 {
-          return((int) i->data);
+          return((long) i->data);
 }
 
 void set_XImage_data(i, j)
 XImage* i;
-int j;
+long j;
 {
           i->data = (char *) j;
 }
@@ -2457,15 +2457,15 @@ long  make_XModifierKeymap (){
           return ((long) calloc(1, sizeof(XModifierKeymap)));
 }
 
-int  XModifierKeymap_modifiermap(i)
+long  XModifierKeymap_modifiermap(i)
 XModifierKeymap* i;
 {
-          return((int) i->modifiermap);
+          return((long) i->modifiermap);
 }
 
 void set_XModifierKeymap_modifiermap(i, j)
 XModifierKeymap* i;
-int j;
+long j;
 {
           i->modifiermap = (KeyCode *) j;
 }
