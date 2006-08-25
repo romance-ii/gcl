@@ -261,8 +261,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     performance;fix random-seed error with newest dynamic gmp
   * xgcl update
   * fix object_to_string
+  * (hopefully) fix bss shrank when dumping error
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 25 Aug 2006 15:12:14 -0400
+ -- Camm Maguire <camm@enhanced.com>  Fri, 25 Aug 2006 16:46:37 -0400
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
