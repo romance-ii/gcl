@@ -34,6 +34,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "include.h"
 #define dcheck_type(a,b) check_type(a,b)
 
+#include "page.h"
+
 DEFUNO_NEW("SPECIALP",object,fSspecialp,SI
        ,1,1,NONE,OO,OO,OO,OO,void,siLspecialp,(object sym),"")
 {
@@ -281,26 +283,31 @@ object_to_double(object x)
    have a null character in the fillpointer position. */
 
 char *
-object_to_string(object x)
-{ unsigned int leng;
+object_to_string(object x) { 
+
+  unsigned int leng;
+  long np; 
+  char *res;
+
   if (type_of(x)!=t_string) FEwrong_type_argument(sLstring,x);
   leng= x->st.st_fillp;
   /* user has thoughtfully provided a null terminated string ! */
-    if (leng > 0 && leng < x->st.st_dim && x->st.st_self[leng]==0)
+  if (leng > 0 && leng < x->st.st_dim && x->st.st_self[leng]==0)
     return x->st.st_self;
-  if (x->st.st_dim == leng
-      && ( leng % sizeof(object))
-     )
-    { x->st.st_self[leng] = 0;
-      return x->st.st_self;
-    }
-  else
-    {char *res=malloc(leng+1);
-     bcopy(x->st.st_self,res,leng);
-     res[leng]=0;
-     return res;
-   }}
 
+  np=page(x->st.st_self);
+  if (x->st.st_dim == leng && leng & sizeof(object) 
+      && np<MAXPAGE && (type_map[np]==t_relocatable || type_map[np]==t_contiguous)) {
+    x->st.st_self[leng] = 0;
+    return x->st.st_self;
+  }  
+  
+  res=malloc(leng+1);
+  bcopy(x->st.st_self,res,leng);
+  res[leng]=0;
+  return res;
+
+}
 
 /*  typedef int (*FUNC)(); */
 
