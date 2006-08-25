@@ -85,7 +85,7 @@
     (cond ((si::objlt x y)
 	   (bsearchleq x a i k le))
 	  ((eq x y) k)
-	  (t (bsearchleq x a (1+ k) j le)))))
+	  ((bsearchleq x a (1+ k) j le)))))
 
 (defun push-array (x ar s lin)
   (declare  ((vector t) ar) (seqind s) (ignore lin))
@@ -277,8 +277,7 @@
       (let ((form (car forms))
             (type (car types)))
         (declare (object form type))
-	(let ((type (cond ((type>= type t) type) ;;;FIXME remove?
-			  ((type>= type (info-type (cadr form))) (promoted-c-type (type-and type (info-type (cadr form)))))
+	(let ((type (cond ((type>= #tfixnum-float type) (promoted-c-type (type-and type (info-type (cadr form)))))
 			  (type))));FIXME fixnum-float support
         (case (car form)
               (LOCATION (push (coerce-loc (caddr form) type) locs))
