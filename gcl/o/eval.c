@@ -1280,7 +1280,7 @@ LFD(Lapplyhook)(void)
 }
 
 DEFUNO_NEW("CONSTANTP",object,fLconstantp,LISP
-       ,1,1,NONE,OO,OO,OO,OO,void,Lconstantp,(object x0),"")
+       ,1,2,NONE,OO,OO,OO,OO,void,Lconstantp,(object x0,...),"")
 {
 	enum type x;
 	/* 1 args */

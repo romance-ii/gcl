@@ -361,7 +361,9 @@ SEARCH_DECLARE:
 		} else if (optional[i].opt_svar == v) {
 			optional[i].opt_svar_spp = Ct;
 			special_processed = TRUE;
-		}
+		} else if (optional[i].opt_init == v)
+		  special_processed = TRUE;
+		
 	if (rest_flag && rest->rest_var == v) {
 		rest->rest_spp = Ct;
 		special_processed = TRUE;
@@ -373,12 +375,14 @@ SEARCH_DECLARE:
 		} else if (keyword[i].key_svar == v) {
 			keyword[i].key_svar_spp = Ct;
 			special_processed = TRUE;
-		}
+		} else if (keyword[i].key_init == v)
+		  special_processed = TRUE;
 	for (i = 0;  i < naux;  i++)
 		if (aux[i].aux_var == v) {
 			aux[i].aux_spp = Ct;
 			special_processed = TRUE;
-		}
+		} else if (aux[i].aux_init == v)
+		  special_processed = TRUE;
 	if (special_processed)
 		continue;
 	/*  lex_special_bind(v);  */

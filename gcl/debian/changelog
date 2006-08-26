@@ -265,8 +265,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * fix arg inlining bug
   * fix the tests, propagate structure types from accessors and
     constructors
+  * fix constantp and some lambda tests, prevent tracing from wiping
+    stored function properties
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 26 Aug 2006 11:12:32 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sat, 26 Aug 2006 15:00:25 -0400
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

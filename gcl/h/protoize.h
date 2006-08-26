@@ -210,7 +210,7 @@ typedef int (*FUNC)();
 /* eval.c:1191:OF */ extern object fLeval (object x0); /* (x0) object x0; */
 /* eval.c:1203:OF */ extern void Levalhook (void); /* () */
 /* eval.c:1269:OF */ extern void Lconstantp (void); /* () */
-/* eval.c:1271:OF */ extern object fLconstantp (object x0); /* (x0) object x0; */
+/* eval.c:1271:OF */ extern object fLconstantp (object x0,...); /* (x0) object x0; */
 /* eval.c:1293:OF */ extern object ieval (object x); /* (x) object x; */
 /* eval.c:1309:OF */ extern object ifuncall1 (object fun, object arg1); /* (fun, arg1) object fun; object arg1; */
 /* eval.c:1328:OF */ extern object ifuncall2 (object fun, object arg1, object arg2); /* (fun, arg1, arg2) object fun; object arg1; object arg2; */

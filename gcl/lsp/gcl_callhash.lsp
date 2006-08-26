@@ -74,8 +74,7 @@
     (unintern x)))
 
 (defun clear-compiler-properties (sym code)
-  (cond ((not (symbol-package sym)))
-	((not (eq *boot* t))
+  (cond ((not (eq *boot* t))
 	 (push `(clear-compiler-properties ',sym nil) *pahl*))
 	((let ((h (or (gethash sym *call-hash-table*) 
 		      (setf (gethash sym *call-hash-table*) (make-call)))))
