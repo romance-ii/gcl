@@ -222,7 +222,7 @@
            (setq keys (cons '&key keys))))
      (cond ((null type)
 	    `(defun ,constructor ,keys
-	       (si:make-structure ',name ,@slot-names)))
+	       (the ,name (si:make-structure ',name ,@slot-names))))
 	   ((eq type 'vector)
 	    `(defun ,constructor ,keys
 	       (vector ,@slot-names)))

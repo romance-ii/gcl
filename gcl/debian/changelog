@@ -263,8 +263,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * fix object_to_string
   * (hopefully) fix bss shrank when dumping error
   * fix arg inlining bug
+  * fix the tests, propagate structure types from accessors and
+    constructors
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 25 Aug 2006 19:11:06 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sat, 26 Aug 2006 11:12:32 -0400
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

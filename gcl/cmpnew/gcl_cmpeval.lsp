@@ -1433,20 +1433,21 @@
 (defun c1structure-ref1 (form name index &aux (info (make-info)))
   ;;; Explicitly called from c1expr and c1structure-ref.
   (cond (*safe-compile* (c1expr `(si::structure-ref ,form ',name ,index)))
-	(t
-  (let* ((sd (get name 'si::s-data))
-	 (aet-type (aref (si::s-data-raw sd) index))
-	 )
-    (setf (info-type info) (if (and (eq name 'si::s-data) (= index 2))
-			       ;;FIXME -- this belongs somewhere else.  CM 20050106
-			       #t(vector unsigned-char)
-			     (type-filter (nth aet-type +cmp-array-types+))))
-    (list 'structure-ref info
-	  (c1expr* form info)
-	  (add-symbol name)
-	  index sd)
-    
-    ))))
+	((let* ((sd (get name 'si::s-data))
+		(aet-type (aref (si::s-data-raw sd) index))
+		(sym (find-symbol (si::string-concatenate
+				   (si::s-data-conc-name sd)
+				   (car (nth index (si::s-data-slot-descriptions sd))))))
+		(tp (if sym (get-return-type sym) '*))
+		(tp (type-and tp (nth aet-type +cmp-array-types+)))) 
+
+	   (setf (info-type info) (if (and (eq name 'si::s-data) (= index 2));;FIXME -- this belongs somewhere else.  CM 20050106
+				      #t(vector unsigned-char)
+				      tp))
+	   (list 'structure-ref info
+		 (c1expr* form info)
+		 (add-symbol name)
+		 index sd)))))
 
 (defun coerce-loc-structure-ref (arg type-wanted &aux (form (cdr arg)))
   (let* ((sd (fourth form))
