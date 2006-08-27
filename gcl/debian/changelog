@@ -267,8 +267,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
     constructors
   * fix constantp and some lambda tests, prevent tracing from wiping
     stored function properties
+  * only do mutual recursion when src is present
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 26 Aug 2006 15:00:25 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sun, 27 Aug 2006 11:09:34 -0400
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

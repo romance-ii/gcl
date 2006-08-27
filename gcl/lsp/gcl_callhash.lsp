@@ -258,6 +258,7 @@
 							 all))))) sts fns)))))))
 
 (defun sig (x) (let ((h (gethash x *call-hash-table*))) (when h (call-sig h))))
+(defun src (x) (let ((h (gethash x *call-hash-table*))) (when h (call-src h))))
 (defun file (x) (let ((h (gethash x *call-hash-table*))) (when h (call-file h))))
 (defun callees (x) (let ((h (gethash x *call-hash-table*))) (when h (call-callees h))))
 (defun callers (x) (let ((h (gethash x *call-hash-table*))) (when h (call-callers h))))
@@ -275,7 +276,7 @@
       (when (eq '* (cadr y))
 	(let ((e (same-file-all-callees sym nil (file sym)))
 	      (r (same-file-all-callers sym nil (file sym))))
-	  (remove-if-not (lambda (x) (eq '* (cadr (sig x)))) (intersection e r)))))))
+	  (remove-if-not (lambda (x) (and (src x) (eq '* (cadr (sig x))))) (intersection e r)))))))
 
 ;(defun mutual-recursion-peers (sym)
 ;  (unless (or (get sym 'state-function) (get sym 'mutual-recursion-group))
