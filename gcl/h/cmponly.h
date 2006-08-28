@@ -75,3 +75,5 @@ MP_INT * otoi(object x);
 
 #define	cclosure_call	funcall
 
+object fcalln1();
+#define fcalln ((object (*)())fcalln1)

@@ -148,8 +148,8 @@ object ifuncall(object,int,...);
 object ifuncall1();
 object ifuncall2();
 object ifuncall3();
-object fcalln1();
-#define fcalln ((object (*)())fcalln1)
+/* object fcalln1(); */
+/* #define fcalln ((object (*)())fcalln1) */
 object Ieval();
 object Imacro_expand1();
 

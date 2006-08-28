@@ -276,7 +276,10 @@
       (when (eq '* (cadr y))
 	(let ((e (same-file-all-callees sym nil (file sym)))
 	      (r (same-file-all-callers sym nil (file sym))))
-	  (remove-if-not (lambda (x) (and (src x) (eq '* (cadr (sig x))))) (intersection e r)))))))
+	  (remove-if-not (lambda (x) (and (eq (symbol-package x) (symbol-package sym))
+					  (let ((h (gethash x *call-hash-table*)))
+					    (and h (call-src h) (eq '* (cadr (call-sig h)))))))
+			 (intersection e r)))))))
 
 ;(defun mutual-recursion-peers (sym)
 ;  (unless (or (get sym 'state-function) (get sym 'mutual-recursion-group))
