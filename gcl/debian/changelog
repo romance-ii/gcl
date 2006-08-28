@@ -268,8 +268,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * fix constantp and some lambda tests, prevent tracing from wiping
     stored function properties
   * only do mutual recursion when src is present
+  * fix bds_bind ordering error
 
- -- Camm Maguire <camm@enhanced.com>  Sun, 27 Aug 2006 11:09:34 -0400
+ -- Camm Maguire <camm@enhanced.com>  Mon, 28 Aug 2006 10:44:41 -0400
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
