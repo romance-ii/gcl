@@ -747,6 +747,12 @@ unexec (char *new_name, char *old_name, unsigned int data_start, unsigned int bs
 #else
   new_bss_addr = old_bss_addr + old_bss_size + 0x1234;
 #endif
+#if defined (emacs) || !defined (DEBUG)
+  if ((unsigned) new_bss_addr < (unsigned) old_bss_addr + old_bss_size) {
+    sbrk(PAGESIZE*(((unsigned) old_bss_addr + old_bss_size-(unsigned) new_bss_addr+PAGESIZE-1)/PAGESIZE));
+    new_bss_addr=(ElfW(Addr))sbrk(0);
+  }
+#endif
   new_data2_addr = old_bss_addr;
   new_data2_size = new_bss_addr - old_bss_addr;
   new_data2_offset  = OLD_SECTION_H (old_data_index).sh_offset +
@@ -762,12 +768,6 @@ unexec (char *new_name, char *old_name, unsigned int data_start, unsigned int bs
   fprintf (stderr, "new_data2_offset %x\n", new_data2_offset);
 #endif
 
-#if defined (emacs) || !defined (DEBUG)
-  if ((unsigned) new_bss_addr < (unsigned) old_bss_addr + old_bss_size) {
-    sbrk(PAGESIZE*(((unsigned) old_bss_addr + old_bss_size-(unsigned) new_bss_addr+PAGESIZE-1)/PAGESIZE));
-    new_bss_addr=(ElfW(Addr))sbrk(0);
-  }
-#endif
   if ((unsigned) new_bss_addr < (unsigned) old_bss_addr + old_bss_size)
     fatal (".bss shrank when undumping???\n");
 
