@@ -270,8 +270,10 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * only do mutual recursion when src is present
   * fix bds_bind ordering error
   * install xgcl-2/sysdef.lisp
+  * fix info dir and emacs site lisp dir installation
+  * New xgcl readme
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 30 Aug 2006 10:31:13 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed, 30 Aug 2006 11:33:57 -0400
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
