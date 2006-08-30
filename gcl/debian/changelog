@@ -274,8 +274,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * New xgcl readme
   * lowercase build-deps
   * protect get_interna_run_times for ia64
+  * Remove bashism from debian/rules
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 30 Aug 2006 11:39:52 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed, 30 Aug 2006 11:57:48 -0400
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
