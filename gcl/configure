@@ -772,7 +772,7 @@ if test "${enable_infodir+set}" = set; then
   enableval="$enable_infodir"
   INFO_DIR=$enableval
 else
-  INFO_DIR="unknown"
+  INFO_DIR=$prefix/share/info
 fi
 
 INFO_DIR=`eval echo $INFO_DIR/`
@@ -782,7 +782,7 @@ if test "${enable_emacsdir+set}" = set; then
   enableval="$enable_emacsdir"
   EMACS_SITE_LISP=$enableval
 else
-  EMACS_SITE_LISP="unknown"
+  EMACS_SITE_LISP=$prefix/share/emacs/site-lisp
 fi
 
 EMACS_SITE_LISP=`eval echo $EMACS_SITE_LISP`
