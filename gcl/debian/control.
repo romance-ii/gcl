@@ -2,7 +2,7 @@ Source: gcl
 Section: interpreters
 Priority: optional
 Maintainer: Camm Maguire <camm@enhanced.com>
-Build-Depends: debhelper (>= 4.1.16), emacs21 | emacsen, libreadline5-dev | libreadline-dev, m4, tk8.4-dev, tetex-bin, texinfo, binutils-dev, libgmp3-dev, autotools-dev, common-lisp-controller, libXmu-dev, libXaw7-dev
+Build-Depends: debhelper (>= 4.1.16), emacs21 | emacsen, libreadline5-dev | libreadline-dev, m4, tk8.4-dev, tetex-bin, texinfo, binutils-dev, libgmp3-dev, autotools-dev, common-lisp-controller, libxmu-dev, libxaw7-dev
 Standards-Version: 3.6.2.1
 
 Package: gcl
