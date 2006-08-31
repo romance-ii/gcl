@@ -930,7 +930,8 @@ gcl_init_alloc(void) {
   long i;
 #ifdef GCL_GPROF
    extern void *GCL_GPROF_START;
-   unsigned textpage=2*((void *)&etext-(void *)&GCL_GPROF_START)/PAGESIZE;
+   long textpage=2*((void *)&etext-(void *)&GCL_GPROF_START)/PAGESIZE,t1=2*((void *)&etext-(void *)GCL_GPROF_START)/PAGESIZE;
+   textpage=t1>0 && (textpage<0 || t1<textpage) ? t1 : textpage;
 #endif
   
   if (gcl_alloc_initialized) return;
