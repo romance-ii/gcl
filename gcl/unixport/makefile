@@ -199,7 +199,8 @@ plt_%.o: plt_%.h plt.c
 clean:
 	rm -rf  saved_*$(EXE) raw_*$(EXE) *.o core a.out $(RSYM) \
 		$(LSPDIR)/auto_new.lsp foo *maxima* init_*.lsp lib*.a gmp* bfd* *.lsp.tmp \
-		gazonk*.lsp plt*h *_map saved_* lib* raw_* gcl.script gcl_recompile* pre_init.lsp post_init.lsp final
+		gazonk*.lsp plt*h *_map saved_* lib* raw_* gcl.script gcl_recompile* \
+		pre_init.lsp post_init.lsp final recompile.h
 
 .INTERMEDIATE: init_ansi_gcl.lsp.tmp init_gcl.lsp.tmp raw_gcl raw_ansi_gcl
 .PRECIOUS: init_pre_gcl.lsp init_gcl.lsp init_ansi_gcl.lsp

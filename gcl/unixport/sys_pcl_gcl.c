@@ -197,7 +197,6 @@ gcl_init_system(object no_init)
 #ifdef _WIN32  
   ar_check_init(gcl_win32,no_init);
 #endif
-  ar_check_init(gcl_recompile,no_init);
   
 }
 

@@ -160,8 +160,6 @@ gcl_init_system(object no_init)
   ar_check_init(gcl_index,no_init);
 #endif
     
-  ar_check_init(gcl_recompile,no_init);
-  
 }
 
 int
