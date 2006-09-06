@@ -50,7 +50,7 @@ OOBJS:=$(filter-out $(ODIR)/plttest.o,$(OOBJS))
 OBJS:=$(OOBJS) $(shell ls -1 $(LSPDIR)/*.o | grep -v recompile.o)
 OBJS:=$(OBJS) $(shell ls -1 $(XDIR)/*.o)
 OBJS:=$(OBJS) $(shell ls -1 $(CMPDIR)/*.o | grep -v collectfn.o)
-ROBJS:=$(shell ls -1 gcl_recompile*.o)
+ROBJS:=$(shell ls -1 gcl_recompile?*.o)
 OBJS:=$(OBJS) $(ROBJS)
 
 MODOBJS:=$(shell ls -1 $(MDIR)/*.o)

@@ -146,8 +146,6 @@
    (cond ((atom *split-files*)(return (values (when tem (truename tem)) warnings failures)))
 	 ((and (consp *split-files*) (null (third *split-files*)))
 	  (let* ((gaz (gazonk-name))
-		 (gaz (merge-pathnames (make-pathname :name (pathname-name gaz) :type (pathname-type gaz))
-				       (pathname filename)))
 		 (*readtable* (si::standard-readtable)))
 	    (with-open-file 
 	     (st gaz :direction :output)
@@ -157,7 +155,7 @@
 		    st))
 	    (setq *split-files* nil)
 	    (unless (member :output-file args)
-		(setq args (append args (list :output-file (get-output-pathname filename "o" nil nil nil)))))
+		(setq args (append args (list :output-file (merge-pathnames (make-pathname :type "o") (pathname filename))))))
 	    (return 
 	     (let ((tem (apply 'compile-file gaz args)))
 	       (unless *keep-gaz* (delete-file gaz))
