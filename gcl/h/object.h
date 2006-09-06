@@ -688,7 +688,7 @@ struct stream {
 };
 /* flags */
 #define GET_STREAM_FLAG(strm,name) ((strm)->sm.sm_flags & (1<<(name)))
-#define SET_STREAM_FLAG(strm,name,val) {if (val) (strm)->sm.sm_flags |= (1<<(name)); (strm)->sm.sm_flags &= ~(1<<(name));}
+#define SET_STREAM_FLAG(strm,name,val) {if (val) (strm)->sm.sm_flags |= (1<<(name)); else (strm)->sm.sm_flags &= ~(1<<(name));}
 
 #define GCL_MODE_BLOCKING 1
 #define GCL_MODE_NON_BLOCKING 0
