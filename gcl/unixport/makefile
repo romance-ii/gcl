@@ -50,7 +50,8 @@ OOBJS:=$(filter-out $(ODIR)/plttest.o,$(OOBJS))
 OBJS:=$(OOBJS) $(shell ls -1 $(LSPDIR)/*.o | grep -v recompile.o)
 OBJS:=$(OBJS) $(shell ls -1 $(XDIR)/*.o)
 OBJS:=$(OBJS) $(shell ls -1 $(CMPDIR)/*.o | grep -v collectfn.o)
-OBJS:=$(OBJS) gcl_recompile.o
+ROBJS:=$(shell ls -1 gcl_recompile*.o)
+OBJS:=$(OBJS) $(ROBJS)
 
 MODOBJS:=$(shell ls -1 $(MDIR)/*.o)
 PCLOBJS:=$(MODOBJS) $(shell ls -1 $(PCLDIR)/*.o)
@@ -78,7 +79,6 @@ init_pcl_gcl.lsp.tmp: init_pcl_gcl.lsp.in \
 		$(shell ls -1 ../clcs/clcs_*.lisp)
 
 	awk '/^ *@LI-PCL-PACKAGE@/{i=1;next} {if (i==0) print}' $< >$@
-#	cat ../cmpnew/gcl_cmpmain.lsp >>$@
 	cat ../pcl/sys-package.lisp >>$@
 	awk '/^ *@LI-PCL-PACKAGE@/{i=1;next} {if (i==1) print}' $< >>$@
 
@@ -87,7 +87,6 @@ init_ansi_gcl.lsp.tmp: init_ansi_gcl.lsp.in \
 
 	awk '/^ *@LI-PCL-PACKAGE@/{i=1;next} \
 		/^ *@LI-CLCS-PACKAGE@/{i=2;next} {if (i==0) print}' $< >$@
-#	cat ../cmpnew/gcl_cmpmain.lsp >>$@
 	cat ../pcl/sys-package.lisp >>$@
 	awk '/^ *@LI-PCL-PACKAGE@/{i=1;next} \
 		/^ *@LI-CLCS-PACKAGE@/{i=2;next} {if (i==1) print}' $< >>$@
@@ -110,37 +109,42 @@ init_%.lsp: init_%.lsp.tmp
 		-e "s#@LI-OPT-TWO@#\"$(O2FLAGS)\"#1" \
 		-e "s#@LI-INIT-LSP@#\"$@\"#1" >$@
 
-saved_%:raw_% $(RSYM) init_%.lsp raw_%_map \
+final: $(FLISP)
+	rm -f recompile.h pre_init.lsp post_init.lsp
+	echo "(let ((si::*disable-recompile* nil))(si::do-recompile \"gcl_recompile.lsp\"))" | $<
+	echo "(setq si::*optimize-maximum-pages* nil)" >pre_init.lsp;
+	echo "(setq si::*optimize-maximum-pages* t si::*disable-recompile* nil)" >post_init.lsp;
+	$(MAKE) $(FLISP)
+	rm -f pre_init.lsp post_init.lsp
+	touch $@
+
+recompile.h: makefile $(ROBJS)
+	echo -n $(filter-out $<,$^) | \
+		sed -e 's,gcl_recompile,,g' -e 's,\.o,,g' | \
+		tr ' ' '\012' | sort -n | \
+		awk '{printf("  ar_check_init(gcl_recompile%s,no_init);\n",$$1)}'  >$@;
+
+sys_ansi_gcl.o sys_gcl.o: recompile.h
+
+pre_init.lsp post_init.lsp:
+	touch $@
+
+saved_%:raw_% $(RSYM) init_%.lsp pre_init.lsp post_init.lsp raw_%_map \
 		$(CMPDIR)/gcl_lfun_list.lsp \
 		$(CMPDIR)/gcl_cmpopt.lsp $(HDIR)/cmpinclude.h \
 		$(LSPDIR)/gcl_auto_new.lsp
 
-
-	cat init_$*.lsp >foo
-	[ "$@" != "$(FLISP)" ] || echo "(let ((si::*disable-recompile* nil)) (si::do-recompile \"gcl_recompile.lsp\"))" >>foo	
-	[ "$@" = "$(FLISP)" ]  || echo " (in-package \"USER\")(system:save-system \"$@\")" >>foo
-	rm -f gcl_recompile*
-	$(MAKE) raw_$*$(EXE)
-	$(PORTDIR)/raw_$*$(EXE) $(PORTDIR)/ $(LISPFLAGS) -libdir $(GCLDIR)/ < foo
-
-#*optimize-maximum-pages* setting is redundant here, but for good measure	
-	[ "$@" != "$(FLISP)" ] || (echo "(setq si::*optimize-maximum-pages* nil)" >foo1;\
-				cat init_$*.lsp >>foo1;\
-				echo "(setq si::*optimize-maximum-pages* t si::*disable-recompile* nil)" >>foo1;\
-				echo " (in-package \"USER\")(system:save-system \"$@\")" >>foo1;\
-				$(MAKE) raw_$*$(EXE);\
-				$(PORTDIR)/raw_$*$(EXE) $(PORTDIR)/ $(LISPFLAGS) -libdir $(GCLDIR)/ < foo1;\
-				ar x lib$*.a gcl_recompile.o;\
-				touch -r lib$*.a gcl_recompile.o)
+	cp pre_init.lsp foo
+	cat init_$*.lsp >>foo
+	cat post_init.lsp >>foo
+	echo " (in-package \"USER\")(system:save-system \"$@\")" >>foo
+	$< $(PORTDIR)/ $(LISPFLAGS) -libdir $(GCLDIR)/ < foo
 
 $(RSYM): $(SPECIAL_RSYM) $(HDIR)/mdefs.h
 	$(CC) $(CFLAGS) -I$(HDIR) -I$(ODIR) -o $(RSYM) $(SPECIAL_RSYM)
 
 $(HDIR)/mdefs.h: $(HDIR)/include.h
 	cat $(HDIR)/include.h | sed -e "/include/d" > $(HDIR)/mdefs.h
-
-gcl_recompile.o: ../lsp/gcl_recompile.o
-	cp $< $@
 
 libgcl.a: $(OBJS) sys_gcl.o gmpfiles bfdfiles # plt_gcl.o
 	rm -rf $@
@@ -195,7 +199,7 @@ plt_%.o: plt_%.h plt.c
 clean:
 	rm -rf  saved_*$(EXE) raw_*$(EXE) *.o core a.out $(RSYM) \
 		$(LSPDIR)/auto_new.lsp foo *maxima* init_*.lsp lib*.a gmp* bfd* *.lsp.tmp \
-		gazonk*.lsp plt*h *_map saved_* lib* raw_* gcl.script gcl_recompile*
+		gazonk*.lsp plt*h *_map saved_* lib* raw_* gcl.script gcl_recompile* pre_init.lsp post_init.lsp final
 
 .INTERMEDIATE: init_ansi_gcl.lsp.tmp init_gcl.lsp.tmp raw_gcl raw_ansi_gcl
 .PRECIOUS: init_pre_gcl.lsp init_gcl.lsp init_ansi_gcl.lsp

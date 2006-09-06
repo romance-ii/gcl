@@ -78,6 +78,7 @@
 (import 'si::immfix 'compiler)
 (import 'si::proper-sequence 'compiler)
 (import 'si::proper-cons 'compiler)
+(import 'si::*split-files* 'compiler)
 
 (let ((p (find-package "DEFPACKAGE")))
   (when p

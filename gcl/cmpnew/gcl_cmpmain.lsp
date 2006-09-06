@@ -109,7 +109,7 @@
 ;;  If *split-files* is a number then, separate compilations for sections
 ;;  *split-files* long, with the 
 ;;  will be performed for separate chunks of the lisp files.
-(defvar *split-files* nil)  ;; if 
+;(defvar *split-files* nil)  ;; if 
 
 (defun check-end (form eof)
   (cond  ((eq form eof)
@@ -145,8 +145,10 @@
    (setq tem (apply 'compiler::compile-file1 filename args))
    (cond ((atom *split-files*)(return (values (when tem (truename tem)) warnings failures)))
 	 ((and (consp *split-files*) (null (third *split-files*)))
-	  (let ((gaz (let ((*DEFAULT-PATHNAME-DEFAULTS* filename)) (gazonk-name)))
-		(*readtable* (si::standard-readtable)))
+	  (let* ((gaz (gazonk-name))
+		 (gaz (merge-pathnames (make-pathname :name (pathname-name gaz) :type (pathname-type gaz))
+				       (pathname filename)))
+		 (*readtable* (si::standard-readtable)))
 	    (with-open-file 
 	     (st gaz :direction :output)
 	     (print `(eval-when (load eval)
@@ -237,8 +239,8 @@ Cannot compile ~a.~%"
 		 (make-pathname :device (pathname-device output-file)
 				:directory (pathname-directory output-file)
 				:name (format nil "~a~a"
-					      (length (second *split-files*))
-					      (pathname-name (pathname output-file)))
+					      (pathname-name (pathname output-file))
+					      (length (second *split-files*)))
 				:type "o"))
 	   
 	   (push (pathname-name output-file)   (second *split-files*))
@@ -331,7 +333,8 @@ Cannot compile ~a.~%"
 
             (when prev (set-dispatch-macro-character #\# #\, prev rtb)))))
 
-    (setq *init-name* (init-name input-pathname system-p))
+    (with-open-file (s output-file :if-does-not-exist :create))
+    (setq *init-name* (init-name output-file system-p))
     
       (when (zerop *error-count*)
         (when *compile-verbose* (format t "~&;; End of Pass 1.  ~%"))
