@@ -277,8 +277,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * Remove bashism from debian/rules
   * add xgcl doc-base file
   * fix ia64 build
+  * fix warning-swallowing bug in c1tagbody
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 31 Aug 2006 15:12:44 -0400
+ -- Camm Maguire <camm@enhanced.com>  Tue,  5 Sep 2006 23:19:05 -0400
 
 gclcvs (2.7.0-53) unstable; urgency=low
 

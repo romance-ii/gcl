@@ -128,19 +128,16 @@
 		       ((not 
 			 (let ((nv (with-restore-vars  
 				     (catch nt 
-				       (do (l *warning-note-stack*) 
+				       (do (l *warning-note-stack* *undefined-vars*) 
 					   ((not (setq l (pop tob))) (output-warning-note-stack) (setq *restore-vars* nil))
 					 (push (if (typep l 'tag) 
 						   (progn (pop-restore-vars) l)
 						 (c1expr* l info)) tnb))))));maybe copy-info here
 			   (when nv 
-;			     (cmpnote "caught ~s~%" nv)
 			     (let ((ov (car (member nv vl :key 'car))))
 			       (when (caddr ov)
 				 (unless (type>= (cadr ov) (var-mt nv))
 				   (setf (cadr ov) (var-mt nv))
-;				   (format t "~s~%~s~%" vl ov)
-;				   (break)
 				   (throw (caddr ov) nv))))
 			     (setf (var-type nv) (var-mt nv)))))
 			tnb))
@@ -148,10 +145,6 @@
 				      (var-tag (car v)) (caddr v)))))))))
 
 				     
-  ;;; Process non-tag forms.
-;  (setq body (mapcar (lambda (x) (if (typep x 'tag) x (c1expr* x info)))
-;                     body))
-
   ;;; Delete redundant tags.
   (do ((l body (cdr l))
        (body1 nil) (ref nil) (ref-clb nil) (ref-ccb nil))
