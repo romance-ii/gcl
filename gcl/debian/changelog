@@ -282,8 +282,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * split recompile files;faster funcalls with optional tracing (more
     work here);unique sigs in call-hash-table;some makefile reworking
   * fix socket write error
+  * new Swedish translation
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  6 Sep 2006 09:50:07 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed,  6 Sep 2006 09:52:53 -0400
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
