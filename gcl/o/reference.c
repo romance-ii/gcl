@@ -163,9 +163,10 @@ FFN(Ffunction)(object form)
 		  vs_base[0]=x;
 		}
 	} else if (setf_fn_form(fun)) {
+                object sff=fun;
 	        fun=get(MMcadr(fun),sSsetf_function,Cnil);
 		if (fun==Cnil)
-		  FEundefined_function(fun);
+		  FEundefined_function(sff);
 		else if (type_of(fun)==t_symbol)
 		  goto AGAIN;
 		else vs_base[0]=fun;

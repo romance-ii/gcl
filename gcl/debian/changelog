@@ -278,8 +278,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * add xgcl doc-base file
   * fix ia64 build
   * fix warning-swallowing bug in c1tagbody
+  * Better undefined function message for setf funs
 
- -- Camm Maguire <camm@enhanced.com>  Tue,  5 Sep 2006 23:19:05 -0400
+ -- Camm Maguire <camm@enhanced.com>  Tue,  5 Sep 2006 23:25:47 -0400
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
