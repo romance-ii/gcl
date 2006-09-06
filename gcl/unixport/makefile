@@ -111,7 +111,7 @@ init_%.lsp: init_%.lsp.tmp
 
 final: $(FLISP)
 	rm -f recompile.h pre_init.lsp post_init.lsp
-	echo "(let ((si::*disable-recompile* nil))(si::do-recompile \"gcl_recompile.lsp\"))" | $<
+	echo "(let ((si::*disable-recompile* nil))(si::do-recompile \"gcl_recompile.lsp\"))" | ./$<
 	echo "(setq si::*optimize-maximum-pages* nil)" >pre_init.lsp;
 	echo "(setq si::*optimize-maximum-pages* t si::*disable-recompile* nil)" >post_init.lsp;
 	$(MAKE) $(FLISP)
