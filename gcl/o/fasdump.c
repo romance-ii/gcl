@@ -322,8 +322,10 @@ getd(str)
 #define PUTD(a,b) PUT(b)
 #define GETD(a) GET()
 #define DPRINTF(a,b)  
-#define fwrite_int(a_,b_,c_,d_) {register char *_p=(a_),*_pe=_p+(b_)*(c_);for (;_p<_pe;) writec_stream(*_p++,(d_));}
-#define fread_int(a_,b_,c_,d_)  {register char *_p=(a_),*_pe=_p+(b_)*(c_);for (;_p<_pe;) *_p++=readc_stream(d_);}
+/* #define fwrite_int(a_,b_,c_,d_) {register char *_p=(a_),*_pe=_p+(b_)*(c_);for (;_p<_pe;) writec_stream(*_p++,(d_));} */
+/* #define fread_int(a_,b_,c_,d_)  {register char *_p=(a_),*_pe=_p+(b_)*(c_);for (;_p<_pe;) *_p++=readc_stream(d_);} */
+#define fwrite_int(a_,b_,c_,d_) {register unsigned _i;for (_i=0;_i<(b_)*(c_);_i++) writec_stream(((char *)(a_))[_i],(d_));}
+#define fread_int(a_,b_,c_,d_)  {register unsigned _i;for (_i=0;_i<(b_)*(c_);_i++) ((char *)(a_))[_i]=readc_stream(d_);}
 
 
 #endif
