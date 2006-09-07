@@ -569,24 +569,24 @@ object host, device, directory, name, type, version, casekey;
 
 static int
 parse_namestring_check(s,start,end,c,restrict)
-char *s;
+object s;
 int start, end;
 char c;
 int restrict;
 {	
-	int i;
-	for (i=start; (s[i]!=c) && (i<end); i++) {
+  int i;
+	for (i=start; (s->st.st_self[i]!=c) && (i<end); i++) {
 	    if ((restrict==':') &&
-	    	!( isalnum(s[i]) || (s[i]=='-') || (s[i]=='.') ))
+	    	!( isalnum(s->st.st_self[i]) || (s->st.st_self[i]=='-') || (s->st.st_self[i]=='.') ))
 	    	return -2;
 #ifdef ANSI
 	    if ((restrict==';') && pathname_resolve(pathKansi) &&
-	    	!( isalnum(s[i]) || (s[i]=='-') ||
-		     (s[i]=='*') || (s[i]=='?') ))
+	    	!( isalnum(s->st.st_self[i]) || (s->st.st_self[i]=='-') ||
+		     (s->st.st_self[i]=='*') || (s->st.st_self[i]=='?') ))
 	    	return -2;
 #endif
 	}
-	return ((i<end) && (s[i]==c)) ? i : -1;
+	return ((i<end) && (s->st.st_self[i]==c)) ? i : -1;
 }
 
 /*
@@ -598,13 +598,13 @@ int restrict;
 
 static object
 parse_namestring_make(s,start,end)
-char *s;
+object s;
 int start, end;
 {
 	int i,j;
 	object x;
 	for (i=0,j=start; (j<end) && (i<token->st.st_dim);)
-	    token->st.st_self[i++] = s[j++];
+	    token->st.st_self[i++] = s->st.st_self[j++];
 	token->st.st_fillp = i;
 	x=copy_simple_string(token);
 	vs_push(x); /* parse_namestring will vs_reset later */
@@ -679,7 +679,6 @@ int start, end, *ep;
 	int assume=0;
 	int relative=0;
 	int name_type_key=0;
-	char *p;
 	vs_mark; /* only push stack - but dont'nt use it */
 
 	if (type_of(s) != t_string)
@@ -687,19 +686,16 @@ int start, end, *ep;
 
 	*ep=end;
 
-	p = s->st.st_self;
-
-	/* ignore leading and trailing spaces */
-	for (;isspace(p[start]) && (start<end); start++);
-	for (;(start<end) && isspace(p[end-1]); end--);
+	for (;isspace(s->st.st_self[start]) && (start<end); start++);
+	for (;(start<end) && isspace(s->st.st_self[end-1]); end--);
 
 	i=start;
 
 	/* try on host or device */
-	if ((j=parse_namestring_check(p,i,end,':',':')) >= 0) {
+	if ((j=parse_namestring_check(s,i,end,':',':')) >= 0) {
 	    x=Cnil;
 	    if (j>i) {
-		x=parse_namestring_make(p,i,j);
+		x=parse_namestring_make(s,i,j);
 		if (pathname_lookup(x,sSApathname_logicalA) != Cnil) {
 		    assume=';';
 		    host = pathname_case_word(x,sKdowncase);
@@ -750,11 +746,11 @@ int start, end, *ep;
 	while (i<end) {
 	    /* try on unix like directories */
 	    if ((assume != ';') &&
-	        ((j=parse_namestring_check(p,i,end,'/',0)) >= 0)) {
+	        ((j=parse_namestring_check(s,i,end,'/',0)) >= 0)) {
 		assume='/';
 		x=Cnil;
 		if (j>i) {
-		    x=parse_namestring_make(p,i,j);
+		    x=parse_namestring_make(s,i,j);
 		    x=parse_namestring_key(x,sKdirectory,assume);
 		}
 		if ((directory == Cnil) && (x==Cnil)) {
@@ -777,11 +773,11 @@ int start, end, *ep;
 
 	    /* try on lisp like directories */
 	    if ((assume != '/') &&
-	    	((j=parse_namestring_check(p,i,end,';',';')) >= 0)) {
+	    	((j=parse_namestring_check(s,i,end,';',';')) >= 0)) {
 		assume=';';
 		x=Cnil;
 		if (j>i) {
-		    x=parse_namestring_make(p,i,j);
+		    x=parse_namestring_make(s,i,j);
 		    x=pathname_case_word(x,sKdowncase);
 		    x=parse_namestring_key(x,sKdirectory,assume);
 		}
@@ -811,11 +807,11 @@ int start, end, *ep;
 
 	    /* try on special cases */
 	    if ((assume!=';') && (
-	        ((end-i==1) && !strncmp(p+i,"~",1) && (directory == Cnil)) ||
-	        ((end-i==1) && !strncmp(p+i,".",1)) ||
-	        ((end-i==2) && !strncmp(p+i,"..",2)) ||
-	        ((end-i==3) && !strncmp(p+i,"...",3)))) {
-		x=parse_namestring_make(p,i,end);
+	        ((end-i==1) && !strncmp(s->st.st_self+i,"~",1) && (directory == Cnil)) ||
+	        ((end-i==1) && !strncmp(s->st.st_self+i,".",1)) ||
+	        ((end-i==2) && !strncmp(s->st.st_self+i,"..",2)) ||
+	        ((end-i==3) && !strncmp(s->st.st_self+i,"...",3)))) {
+		x=parse_namestring_make(s,i,end);
 		x=parse_namestring_key(x,sKdirectory,'/');
 		if (directory == Cnil) {
 		    directory=make_cons(x,Cnil);
@@ -830,21 +826,21 @@ int start, end, *ep;
 	    } else {
 
 	    /* try on name, type and version */
-	        j=parse_namestring_check(p,i,end,'.',assume);
+	        j=parse_namestring_check(s,i,end,'.',assume);
 		if ((j==-2) && (assume == ';'))
 		    return(file_error("Invalid character in logical pathname namestring ~S.", s));
 		if ((j==-1) || ((assume != ';') && (name_type_key==1)))
 		    j=end;
 		x=Cnil;
 		if (j>i) {
-		    x=parse_namestring_make(p,i,j);
+		    x=parse_namestring_make(s,i,j);
 		    if (assume == ';')
 			x=pathname_case_word(x,sKdowncase);
 		    switch (name_type_key++) {
 		    case 0:
 			name=parse_namestring_key(x,sKname,assume);
 			if (j+1==end)
-			    type=parse_namestring_make(p,j+1,end);
+			    type=parse_namestring_make(s,j+1,end);
 			break;
 		    case 1:
 			type=parse_namestring_key(x,sKtype,assume);
@@ -881,7 +877,6 @@ object x;
 	int e;
 	vs_mark;
 	vs_push(y);
-
 	while (x != Cnil) {
 	    switch (type_of(x)) {
 
@@ -1070,7 +1065,7 @@ char c;
     }
 }
 
-void namestring_add_string(s)
+static void namestring_add_string(s)
 char *s;
 {   while (*s) namestring_add_char(*s++);
 }
@@ -1319,7 +1314,7 @@ object pathname;
 
 LFD(Lpathname)(void)
 {
-	check_arg(1);
+        check_arg(1);
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 	vs_base[0] = coerce_to_pathname(vs_base[0]);
 }
@@ -1825,70 +1820,71 @@ object build,t;
  */
 
 static object
-pathstring_match_range(s,sl,p,pl,build)
-const char *s, *p;
-int sl,pl;
-object build;
-{
-	const char *next, *try;
-        object r;
+pathstring_match_range(object s,int ss,int sl,object p,int ps,int pl,object build) {
 
-	while ((sl > 0) && *s) {
-	    if ((pl <= 0) || !*p)
-	        return Cnil;
+  int next,try;
+  object r;
+  
+  while ((sl > 0) && s->st.st_self[ss]) {
 
-	    if ((*p == '*') || ((*p == '?') && (*s != '*'))) {
-	        if ((pl == 1) && ((*p == '*') ||
-			((*p == '?') && (*s != '*') && (sl == 1)))) {
-		    if (consp(build)) {
-		        char *t;
-			t=token->st.st_self;
-			while ((sl > 0) && *s) {
-			    *t++=*s++; sl--;
-			}
-			token->st.st_fillp=t-token->st.st_self;
-			build=pathstring_match_add(build,token);
-		    }
-		    return build;
-		}
-		next = p+1;
-		try = (*p == '*') ? s : s+1;
-		while ((s+sl-try>0) && *try) {
-		    if (((*try == *next) || (*next == '?') || (*next == '*')) &&
-			((r=pathstring_match_range(
-				try,s+sl-try, next,pl-1, build))!=Cnil)) {
-			    if (consp(r)) {
-				char *t;
-				t=token->st.st_self;
-				while ((sl > 0) && (s<try) && *s) {
-				    *t++=*s++; sl--;
-				}
-				token->st.st_fillp=t-token->st.st_self;
-				build=pathstring_match_add(r,token);
-			    }
-			    return build;
-		        }
+    if ((pl <= 0) || !p->st.st_self[ps])
+      return Cnil;
+    
+    if ((p->st.st_self[ps] == '*') || 
+	((p->st.st_self[ps] == '?') && 
+	 (s->st.st_self[ss] != '*'))) {
 
-		    if (*p == '*')
-			try++;
-		    else
-		        return Cnil;
-		}
-		return Cnil;
-	    }
-	    if (*s == *p) {
-		s++, p++, sl--, pl--;
-	    } else
-		return Cnil;
+      if ((pl == 1) && 
+	  ((p->st.st_self[ps] == '*') ||
+	   ((p->st.st_self[ps] == '?') && (s->st.st_self[ss] != '*') && (sl == 1)))) {
+
+	if (consp(build)) {
+	  unsigned t=0;
+	  while ((sl > 0) && s->st.st_self[ss]) {
+	    token->st.st_self[t++]=s->st.st_self[ss++]; sl--;
+	  }
+	  token->st.st_fillp=t;
+	  build=pathstring_match_add(build,token);
 	}
-	if ((*p == '*') && (pl == 1)) {
-	    if (consp(build)) {
-		token->st.st_fillp=0;
-		build=pathstring_match_add(build,token);
+	return build;
+      }
+      next = ps+1;
+      try = (p->st.st_self[ps] == '*') ? ss : ss+1;
+      while ((ss+sl-try>0) && s->st.st_self[try]) {
+	if (((s->st.st_self[try] == p->st.st_self[next]) || 
+	     (p->st.st_self[next] == '?') || (p->st.st_self[next] == '*')) &&
+	    ((r=pathstring_match_range(s,try,sl-try,p,next,pl-1,build))!=Cnil)) {
+	  if (consp(r)) {
+	    unsigned t=0;
+	    while ((sl > 0) && (ss<try) && s->st.st_self[ss]) {
+	      token->st.st_self[t++]=s->st.st_self[ss++]; sl--;
 	    }
-	    return build;
+	    token->st.st_fillp=t;
+	    build=pathstring_match_add(r,token);
+	  }
+	  return build;
 	}
-	return (pl == 0) ? build : Cnil;
+	
+	if (p->st.st_self[ps] == '*')
+	  try++;
+	else
+	  return Cnil;
+      }
+      return Cnil;
+    }
+    if (s->st.st_self[ss] == p->st.st_self[ps]) {
+      ss++, ps++, sl--, pl--;
+    } else
+      return Cnil;
+  }
+  if ((p->st.st_self[ps] == '*') && (pl == 1)) {
+    if (consp(build)) {
+      token->st.st_fillp=0;
+      build=pathstring_match_add(build,token);
+    }
+    return build;
+  }
+  return (pl == 0) ? build : Cnil;
 }
 
 /*
@@ -1912,8 +1908,8 @@ object s,m,b;
 	    r = b;
 	else
 	if ((type_of(s) == t_string) && (type_of(m) == t_string))
-	    r = pathstring_match_range(s->st.st_self, s->st.st_fillp,
-	    			       m->st.st_self, m->st.st_fillp,
+	    r = pathstring_match_range(s,0, s->st.st_fillp,
+	    			       m,0, m->st.st_fillp,
 				       b);
 	else
 	    r = Cnil;
@@ -2111,9 +2107,9 @@ object pathobject_patch(s,xa)
 object s,*xa;
 {
 	int i,j;
-	char *t;
+	unsigned t;
 	object p;
-	t=token->st.st_self;
+	t=0;
 
 
 	if (s == sKwild) {
@@ -2121,7 +2117,7 @@ object s,*xa;
 		(type_of((*xa)->c.c_car)==t_string)) {
 		p=(*xa)->c.c_car;
 		for (j=0;j<p->st.st_fillp; j++)
-		    *t++=p->st.st_self[j];
+		    token->st.st_self[t++]=p->st.st_self[j];
 		p=(*xa)->c.c_cdr;
 		*xa=p;
 	    } else
@@ -2139,13 +2135,13 @@ object s,*xa;
 	if (type_of(s) == t_string) {
 	    for (i=0; i<s->st.st_fillp; i++) {
 	    	if ((s->st.st_self[i]!='*') && (s->st.st_self[i]!='?'))
-		    *t++=s->st.st_self[i];
+		    token->st.st_self[t++]=s->st.st_self[i];
 		else
 		if ((consp(*xa)) &&
 		    (type_of((*xa)->c.c_car)==t_string)) {
 		    p=(*xa)->c.c_car;
 		    for (j=0;j<p->st.st_fillp; j++)
-			*t++=p->st.st_self[j];
+			token->st.st_self[t++]=p->st.st_self[j];
 		    p=(*xa)->c.c_cdr;
 		    *xa=p;
 		} else
@@ -2154,7 +2150,7 @@ object s,*xa;
 	    }
 	} else
 	    FEerror("Invalid wild pathobject_patch ~S string",1,s);
-        token->st.st_fillp=t-token->st.st_self;
+        token->st.st_fillp=t;
 
 	p=copy_simple_string(token);
 	vs_push(p);

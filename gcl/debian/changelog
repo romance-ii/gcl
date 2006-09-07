@@ -284,8 +284,9 @@ gclcvs (2.7.0-54) unstable; urgency=low
   * fix socket write error
   * new Swedish translation
   * fix fadump/gc bug
+  * fix pathname gc bug
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  7 Sep 2006 07:38:55 -0400
+ -- Camm Maguire <camm@enhanced.com>  Thu,  7 Sep 2006 11:45:52 -0400
 
 gclcvs (2.7.0-53) unstable; urgency=low
 
