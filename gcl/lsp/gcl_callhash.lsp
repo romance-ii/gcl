@@ -397,7 +397,7 @@
 			((remove-recompile fn))))))
 	    (let* ((*split-files* 100000)(o (compile-file tpn)))
 	      (load o)
-	      (mapcar 'delete-file (directory (string-concatenate (pathname-name o) "*." (pathname-type o))))))))
+	      (mapcar 'delete-file (directory (merge-pathnames (pathname (string-concatenate (pathname-name o) "*")) o)))))))
     (cond ((or *cmr* (> (length *needs-recompile*) 0)) (do-recompile pn))
 	  (pn 
 	   (with-open-file 
