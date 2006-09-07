@@ -1,112 +1,45 @@
-gclcvs (2.7.0-54) unstable; urgency=low
+gclcvs (2.7.0-56) unstable; urgency=low
 
-  * LITTLE_END -> WORDS_BIGENDIAN
-  * NULL_OR_ON_C_STACK macro check fix, exclude sparc symbols beginning
-    with . from plt table
-  * clear only terminal input on error
-  * Use internal gettext for bfd
-  * Restore xgcl
-  * Set compiler::*tmp-dir* at runtime
-  * report tmp-dir setting with system-banner to enable clean -eval -
-    batch operation; fix listen on socket streams; use (abs (getpid)) in
-    tmp names for Windows
-  * fix configure unbalanced quotes
-  * Fix no arg type numerical propagation
-  * Do not dump arrays with array-element-types other than t to data
-    file
-  * limit multiple-value-binding autodeclaration nesting depth following
-    let
-  * limit cons type calculations
-  * Better cond evalmacro
-  * improper-consp, and better si::proper-list deftype
-  * support for bignums in nth et.al.
-  * Fix typep on simple-arrays
-  * Fix branch cut of atanh
-  * Support for certain subtypep calls on partially unknown satisfies
-    types
-  * Represent mv types internally as '(values ...) -- FIXME do this more
-    carefully
-  * Inf and nan constants
-  * binary nexting of gcd and lcm; support for writing inf and nan into
-    .data files
-  * limit list type length in c1list
-  * Fix multiple-value-binding autodeclaration when binding vars have
-    identical names in outer scope
-  * abs and sqrt optimizers
-  * propagate floating point types, new propagator code for random ash
-    floor et. al. + - * / lcm gcd log exp expt atan sqrt max min abs mod
-    rem
-  * prevent nested free errors
-  * Make undefined-vars assumed global a warning
-  * use same nesting level limits for let and mv binding
-    autodeclarations
-  * cmp-nthcdr expander
-  * Push gclp in front of -static for static linking
-  * skip over null bfd sections in bfd_build_symbol_tabls
-  * expt-propagator, float propagator using super-range
-  * revert atanh branch cut change
-  * revert boolean to t coercion in inline-type-matches, rely on normal
-    coercion and boolean type-propagation to enable optimization of
-    boolean->t functions
-  * More useful do evalmacro;fix nthcdr error order;fix simple-array
-    typep;new predicates in 'si and optimizers in compiler;ynchronize
-    +type-alist+
-  * Only clear real terminal input on error
-  * Fix check-type restarts for constant places
-  * Fix multiple-value-setq evalmacro bug recently introduced
-  * Clean some pcl compilation warnings
-  * make maybe-clear-input accessible within serror
-  * restore compiler::co1 to typep after definition in gcl_predlib for
-    use in later compilations in the same file
-  * fix log type propagator
-  * Replace autodeclaration of constant let bindings with catch/trhow
-    algorithm around tagbody, if, and setq
-  * backquote fix
-  * Fix function documentation wrapping by compile
-  * Fix read error in processing comments before final paren w/
-    preceding dot
-  * preprocess cmpinclude.h for better gcc performance
-  * moved interpreted-function et. al. to si
-  * more complete backquote fix
-  * Fix length error reporting at safety >=1
-  * check-type consolidation
-  * use resolve-type to normalize all types in compiler
-  * new expanders for elt, length, and endp respecting safety 1 arg
-    checking
-  * use with-restore-vars to restore variable settings in conditionally
-    executed code
-  * fix num-type-bounds on real types, cons tp limit at 0
-  * use with-restore-vars to restore variable settings in conditionally
-    executed code, propagate var types in fmla-infer and fmla-eval-const
-  * fix aref-propagator to work in pass2 when var-type might have
-    several values
-  * propagate null bindings
-  * map-functions return proper-lists
-  * fix c1multiple-value-setq to handle new type modification strategy
-  * coerce general types within '(the boolean )
-  * type centralization around cmp-norm-tp and resolve-type, cons-tp-
-    limit at 0, eliminate type-filter
-  * proper-list is a useful-c-type, remove brt slot in var
-  * remove some C warnings
-  * rewrite do* and hence dolist to handle type propagation
-  * check-type consolidation, proper-list propagation and logic, not in
-    predicate list, ldelete-if, prune-type
-  * O3 ->  Os
-  * extern inline __gmpz_get_strp
-  * prune cmpinclude.h
-  * winmain reordering
-  * type-error in non-ansi image
-  * faster nth-value from tkl.lisp into gcl_listlib.lsp
-  * clean up some warnings +c1t+ and +c1nil+ constants
-  * clean tkMain.c warnings
-  * clean some gcl-tk warnings
-  * O3 for the interpreter
-  * fix max/min propagator
-  * revert from bogus nth-value
-  * fix (rotatef) bug
-  * No __VERSION__ in h/cmpinclude.h
-  * ~ in compile-file paths
-  * Fix gemtemp package arg
+  * New cvs snapshot
+  * rules changes Closes: #376807.
+  * Apply socket patch (thanks!) Closes: #385728
+  * Install new sv.po, Closes: 333655.
+  * xgcl update
+  * fix object_to_string
+  * (hopefully) fix bss shrank when dumping error
+  * fix arg inlining bug
+  * fix the tests, propagate structure types from accessors and
+    constructors
+  * fix constantp and some lambda tests, prevent tracing from wiping
+    stored function properties
+  * only do mutual recursion when src is present
+  * fix bds_bind ordering error
+  * install xgcl-2/sysdef.lisp
+  * fix info dir and emacs site lisp dir installation
+  * New xgcl readme
+  * lowercase build-deps
+  * protect get_internal_run_times for ia64
+  * Remove bashism from debian/rules
+  * add xgcl doc-base file
+  * fix ia64 build
+  * split recompile files;faster funcalls with optional tracing (more
+    work here);unique sigs in call-hash-table;some makefile reworking
+  * fix build on small reloc record architectures
+  * fix warning-swallowing bug in c1tagbody
+  * Better undefined function message for setf funs
+  * fix fadump/gc bug
+  * fix pathname gc bug
+  * Clean up after split-files recompile
+  * Cleanup common-lisp controller script; fix setf symbol-function type
+    propagation, Closes: #385745
+
+ -- Camm Maguire <camm@enhanced.com>  Thu,  7 Sep 2006 16:52:18 -0400
+
+gclcvs (2.7.0-55) unstable; urgency=low
+
+  * New cvs snapshot
+  * new release Closes: #382247, Closes: #358309, Closes: #338613,Closes: #347560
+  * Try not depending on specific gcc, Closes: #342967.
   * Better nthcdr-expander;compiler-macros for intersection,union,set-
     difference,set-exclusive-or, and subsetp;wrap symbol functions in
     (function ) for call-global funcalls and applys (which happen at
@@ -259,33 +192,118 @@ gclcvs (2.7.0-54) unstable; urgency=low
     save;fastlinking to fasd, error, format, and other C
     functions;preserve relocatable block across image saves for
     performance;fix random-seed error with newest dynamic gmp
-  * xgcl update
-  * fix object_to_string
-  * (hopefully) fix bss shrank when dumping error
-  * fix arg inlining bug
-  * fix the tests, propagate structure types from accessors and
-    constructors
-  * fix constantp and some lambda tests, prevent tracing from wiping
-    stored function properties
-  * only do mutual recursion when src is present
-  * fix bds_bind ordering error
-  * install xgcl-2/sysdef.lisp
-  * fix info dir and emacs site lisp dir installation
-  * New xgcl readme
-  * lowercase build-deps
-  * protect get_interna_run_times for ia64
-  * Remove bashism from debian/rules
-  * add xgcl doc-base file
-  * fix ia64 build
-  * fix warning-swallowing bug in c1tagbody
-  * Better undefined function message for setf funs
-  * split recompile files;faster funcalls with optional tracing (more
-    work here);unique sigs in call-hash-table;some makefile reworking
-  * fix socket write error
-  * new Swedish translation
-  * fix fadump/gc bug
-  * fix pathname gc bug
-  * Clean up after split-files recompile
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 29 Aug 2006 13:30:41 -0400
+
+gclcvs (2.7.0-54) unstable; urgency=low
+
+  * LITTLE_END -> WORDS_BIGENDIAN
+  * NULL_OR_ON_C_STACK macro check fix, exclude sparc symbols beginning
+    with . from plt table
+  * clear only terminal input on error
+  * Use internal gettext for bfd
+  * Restore xgcl
+  * Set compiler::*tmp-dir* at runtime
+  * report tmp-dir setting with system-banner to enable clean -eval -
+    batch operation; fix listen on socket streams; use (abs (getpid)) in
+    tmp names for Windows
+  * fix configure unbalanced quotes
+  * Fix no arg type numerical propagation
+  * Do not dump arrays with array-element-types other than t to data
+    file
+  * limit multiple-value-binding autodeclaration nesting depth following
+    let
+  * limit cons type calculations
+  * Better cond evalmacro
+  * improper-consp, and better si::proper-list deftype
+  * support for bignums in nth et.al.
+  * Fix typep on simple-arrays
+  * Fix branch cut of atanh
+  * Support for certain subtypep calls on partially unknown satisfies
+    types
+  * Represent mv types internally as '(values ...) -- FIXME do this more
+    carefully
+  * Inf and nan constants
+  * binary nexting of gcd and lcm; support for writing inf and nan into
+    .data files
+  * limit list type length in c1list
+  * Fix multiple-value-binding autodeclaration when binding vars have
+    identical names in outer scope
+  * abs and sqrt optimizers
+  * propagate floating point types, new propagator code for random ash
+    floor et. al. + - * / lcm gcd log exp expt atan sqrt max min abs mod
+    rem
+  * prevent nested free errors
+  * Make undefined-vars assumed global a warning
+  * use same nesting level limits for let and mv binding
+    autodeclarations
+  * cmp-nthcdr expander
+  * Push gclp in front of -static for static linking
+  * skip over null bfd sections in bfd_build_symbol_tabls
+  * expt-propagator, float propagator using super-range
+  * revert atanh branch cut change
+  * revert boolean to t coercion in inline-type-matches, rely on normal
+    coercion and boolean type-propagation to enable optimization of
+    boolean->t functions
+  * More useful do evalmacro;fix nthcdr error order;fix simple-array
+    typep;new predicates in 'si and optimizers in compiler;ynchronize
+    +type-alist+
+  * Only clear real terminal input on error
+  * Fix check-type restarts for constant places
+  * Fix multiple-value-setq evalmacro bug recently introduced
+  * Clean some pcl compilation warnings
+  * make maybe-clear-input accessible within serror
+  * restore compiler::co1 to typep after definition in gcl_predlib for
+    use in later compilations in the same file
+  * fix log type propagator
+  * Replace autodeclaration of constant let bindings with catch/trhow
+    algorithm around tagbody, if, and setq
+  * backquote fix
+  * Fix function documentation wrapping by compile
+  * Fix read error in processing comments before final paren w/
+    preceding dot
+  * preprocess cmpinclude.h for better gcc performance
+  * moved interpreted-function et. al. to si
+  * more complete backquote fix
+  * Fix length error reporting at safety >=1
+  * check-type consolidation
+  * use resolve-type to normalize all types in compiler
+  * new expanders for elt, length, and endp respecting safety 1 arg
+    checking
+  * use with-restore-vars to restore variable settings in conditionally
+    executed code
+  * fix num-type-bounds on real types, cons tp limit at 0
+  * use with-restore-vars to restore variable settings in conditionally
+    executed code, propagate var types in fmla-infer and fmla-eval-const
+  * fix aref-propagator to work in pass2 when var-type might have
+    several values
+  * propagate null bindings
+  * map-functions return proper-lists
+  * fix c1multiple-value-setq to handle new type modification strategy
+  * coerce general types within '(the boolean )
+  * type centralization around cmp-norm-tp and resolve-type, cons-tp-
+    limit at 0, eliminate type-filter
+  * proper-list is a useful-c-type, remove brt slot in var
+  * remove some C warnings
+  * rewrite do* and hence dolist to handle type propagation
+  * check-type consolidation, proper-list propagation and logic, not in
+    predicate list, ldelete-if, prune-type
+  * O3 ->  Os
+  * extern inline __gmpz_get_strp
+  * prune cmpinclude.h
+  * winmain reordering
+  * type-error in non-ansi image
+  * faster nth-value from tkl.lisp into gcl_listlib.lsp
+  * clean up some warnings +c1t+ and +c1nil+ constants
+  * clean tkMain.c warnings
+  * clean some gcl-tk warnings
+  * O3 for the interpreter
+  * fix max/min propagator
+  * revert from bogus nth-value
+  * fix (rotatef) bug
+  * No __VERSION__ in h/cmpinclude.h
+  * ~ in compile-file paths
+  * Fix gemtemp package arg
 
  -- Camm Maguire <camm@enhanced.com>  Thu,  7 Sep 2006 13:18:42 -0400
 

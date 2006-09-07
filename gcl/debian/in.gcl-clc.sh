@@ -97,16 +97,11 @@ for PROF in n y; do
 	    echo $progname Installing clc as $image ...
 	    if test -x $gcl_bin; then
 		$gcl_bin <<!INSTALL_CLC!
-(in-package :common-lisp)
-(unless (fboundp 'load-time-value)
-  (defun load-time-value (obj) obj)
-  (export (find-symbol "LOAD-TIME-VALUE")))
-
 (in-package :common-lisp-user)
 (load "$clc_src/common-lisp-controller/common-lisp-controller.lisp")
 
 (in-package :common-lisp-controller)
-(init-common-lisp-controller "$gcl_clc" :version 3)
+(init-common-lisp-controller-v4 "$gcl_clc")
 
 (defun send-clc-command (command package)
   "Overrides global definition."
