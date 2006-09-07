@@ -110,12 +110,11 @@ init_%.lsp: init_%.lsp.tmp
 		-e "s#@LI-INIT-LSP@#\"$@\"#1" >$@
 
 final: $(FLISP)
-	rm -f recompile.h pre_init.lsp post_init.lsp
 	echo "(let ((si::*disable-recompile* nil))(si::do-recompile \"gcl_recompile.lsp\"))" | ./$<
 	echo "(setq si::*optimize-maximum-pages* nil)" >pre_init.lsp;
 	echo "(setq si::*optimize-maximum-pages* t si::*disable-recompile* nil)" >post_init.lsp;
 	$(MAKE) $(FLISP)
-	rm -f pre_init.lsp post_init.lsp
+	rm -f pre_init.lsp post_init.lsp recompile.h gcl_recompile*
 	touch $@
 
 recompile.h: makefile $(ROBJS)
@@ -202,5 +201,5 @@ clean:
 		gazonk*.lsp plt*h *_map saved_* lib* raw_* gcl.script gcl_recompile* \
 		pre_init.lsp post_init.lsp final recompile.h
 
-.INTERMEDIATE: init_ansi_gcl.lsp.tmp init_gcl.lsp.tmp raw_gcl raw_ansi_gcl
+.INTERMEDIATE: init_ansi_gcl.lsp.tmp init_gcl.lsp.tmp raw_gcl raw_ansi_gcl recompile.h pre_init.lsp post_init.lsp
 .PRECIOUS: init_pre_gcl.lsp init_gcl.lsp init_ansi_gcl.lsp
