@@ -90,7 +90,7 @@ for PROF in n y; do
 	    }
 	    rm -rf $gcl_clc
 	    mkdir -p $gcl_clc
-	    chown cl-builder.cl-builder $gcl_clc
+#	    chown cl-builder.cl-builder $gcl_clc
 	    
 	    rm -f $image
 
@@ -101,7 +101,7 @@ for PROF in n y; do
 (load "$clc_src/common-lisp-controller/common-lisp-controller.lisp")
 
 (in-package :common-lisp-controller)
-(init-common-lisp-controller-v4 "$gcl_clc")
+(init-common-lisp-controller-v4 "$(basename $gcl_clc)")
 
 (defun send-clc-command (command package)
   "Overrides global definition."

@@ -5,8 +5,8 @@ all: objects docs
 objects: $(LISP)
 	echo '(load "sysdef.lisp")(xlib::compile-xgcl)' | $(LISP)
 
-saved_%: $(LISP)
-	echo '(load "sysdef.lisp")(xlib::compile-xgcl)(xlib::save-xgcl "$@")' | $(LISP)
+#saved_%: $(LISP)
+#	echo '(load "sysdef.lisp")(xlib::compile-xgcl)(xlib::save-xgcl "$@")' | $(LISP)
 
 docs: dwdoc/dwdoccontents.html dwdoc.pdf
 
@@ -26,7 +26,7 @@ clean:
 	rm -f gcl_xrecompile* user-init* gcl*c gcl*h gcl*data
 	rm -rf dwdoc
 
-install: all
+install: docs
 	-mkdir -p $(DESTDIR)$(INFO_DIR)../doc
-#	-cp -r dwdoc $(DESTDIR)$(INFO_DIR)../doc
+	-cp -r dwdoc $(DESTDIR)$(INFO_DIR)../doc
 	-cp *tex *.pdf $(DESTDIR)$(INFO_DIR)../doc

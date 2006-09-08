@@ -261,6 +261,7 @@ install_unix:
 #	echo '(load "../tkl.o")(TK::GET-AUTOLOADS (directory "*.lisp"))' | ../../$(PORTDIR)/$(FLISP)$(EXE)) ; fi
 	if test "$(EMACS_SITE_LISP)" != "" ; then (cd elisp ; $(MAKE) install DESTDIR=$(DESTDIR)) ; fi
 	if test "$(INFO_DIR)" != "unknown"; then (cd info ; $(MAKE) ; $(MAKE) install DESTDIR=$(DESTDIR)) ; fi
+	[ "$(X_LIBS)" == "" ] || if test "$(INFO_DIR)" != "unknown"; then (cd xgcl-2 ; $(MAKE) install LISP=../unixport/saved_pre_gcl DESTDIR=$(DESTDIR)) ; fi
 
 install_windows:
 	mkdir -p $(DESTDIR)$(prefix)/lib 
