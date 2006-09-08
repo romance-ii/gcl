@@ -91,6 +91,7 @@ static size_t trap_size;
 static void *
 trap_gcl_gmp_allocfun(size_t size){
 
+  size+=size%MP_LIMB_SIZE;
   if (trap_size)
     return old_gcl_gmp_allocfun(size);
   else {
@@ -122,17 +123,19 @@ static gmp_randfnptr_t Mersenne_Twister_Generator_Noseed = {
 void
 init_gmp_rnd_state(__gmp_randstate_struct *x) {
 
+  static int n;
+
   bzero(x,sizeof(*x));
   
 #if __GNU_MP_VERSION >= 4 && __GNU_MP_VERSION_MINOR >= 2
-  if (!trap_size) {
-    old_gcl_gmp_allocfun=gcl_gmp_allocfun;
-    gcl_gmp_allocfun=trap_gcl_gmp_allocfun;
-  }
+/*   if (!trap_size) { */
+  old_gcl_gmp_allocfun=gcl_gmp_allocfun;
+  gcl_gmp_allocfun=trap_gcl_gmp_allocfun;
+/*   } */
 #endif
   gmp_randinit_default(x);
 #if __GNU_MP_VERSION >= 4 && __GNU_MP_VERSION_MINOR >= 2
-  if (gcl_gmp_allocfun==trap_gcl_gmp_allocfun) {
+  if (!n) {
 
     void **p=(void *)x,**pe=p+sizeof(*x)/sizeof(*p);
     int i;
@@ -149,9 +152,10 @@ init_gmp_rnd_state(__gmp_randstate_struct *x) {
 	((gmp_randfnptr_t *)x->_mp_algdata._mp_lc)->d!=Mersenne_Twister_Generator_Noseed.d)
       FEerror("Unknown pointer data in rnd_state!",0);
 
-    gcl_gmp_allocfun=old_gcl_gmp_allocfun;
+    n=1;
 
   }
+  gcl_gmp_allocfun=old_gcl_gmp_allocfun;
   x->_mp_seed->_mp_alloc=trap_size;
 #endif
     

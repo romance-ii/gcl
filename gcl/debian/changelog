@@ -1,3 +1,9 @@
+gclcvs (2.7.0-57) unstable; urgency=low
+
+  * remove emacs build-depends;64bit hash and gmp fixes
+
+ -- Camm Maguire <camm@enhanced.com>  Fri,  8 Sep 2006 13:31:02 -0400
+
 gclcvs (2.7.0-56) unstable; urgency=low
 
   * New cvs snapshot

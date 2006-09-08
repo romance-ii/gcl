@@ -64,12 +64,12 @@ object sKrehash_threshold;
 
 typedef union {/*FIXME size checks*/
   float f;
-  unsigned long ul;
+  unsigned int ul;
 } F2ul;
 
 typedef union {
   double d;
-  unsigned long ul[2];
+  unsigned int ul[2];
 } D2ul;
 
 
@@ -373,7 +373,7 @@ BEGIN:
 	  if (s_type[i]==aet_object)
 	    h += ihash_equalp(x->str.str_self[i],depth);
 	  else
-	    h += ((int)x->str.str_self[i]) + depth++;
+	    h += ((long)x->str.str_self[i]) + depth++;
 	break;
       }
 
