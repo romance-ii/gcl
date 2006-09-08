@@ -58,6 +58,7 @@ EXTER bds_ptr bds_save_top;
    that a throw out will be ok */
 #define	bds_bind(sym, val)  \
 	({object _sym=(sym),_val=(val);\
+         bds_check;\
          bds_ptr _b = bds_top+1; \
         (_b)->bds_sym = (_sym);  \
 	_b->bds_val = (_sym)->s.s_dbind;  \

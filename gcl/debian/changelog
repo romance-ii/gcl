@@ -32,8 +32,9 @@ gclcvs (2.7.0-56) unstable; urgency=low
   * Clean up after split-files recompile
   * Cleanup common-lisp controller script; fix setf symbol-function type
     propagation, Closes: #385745
+  * check for overflow in bds_bind
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  7 Sep 2006 16:52:18 -0400
+ -- Camm Maguire <camm@enhanced.com>  Thu,  7 Sep 2006 21:25:26 -0400
 
 gclcvs (2.7.0-55) unstable; urgency=low
 
