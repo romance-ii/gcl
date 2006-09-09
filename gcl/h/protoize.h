@@ -1839,4 +1839,7 @@ gprof_cleanup(void);
 unsigned long
 ihash_equal1(object,int);
 
+object
+interactive_stream_p(object);
+
 /* void call_after_gbc_hook(int); */

@@ -1,8 +1,9 @@
 gclcvs (2.7.0-57) unstable; urgency=low
 
   * remove emacs build-depends;64bit hash and gmp fixes
+  * some preliminary pprint test fixes
 
- -- Camm Maguire <camm@enhanced.com>  Fri,  8 Sep 2006 13:31:02 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sat,  9 Sep 2006 01:52:48 -0400
 
 gclcvs (2.7.0-56) unstable; urgency=low
 

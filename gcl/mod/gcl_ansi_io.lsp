@@ -28,11 +28,21 @@
     (write-string z s)
     nil))
 
-(defun pprint-tabular (s x &optional (c t) a ts)
-  (let* ((z (substitute #\Tab #\Space (write-to-string x)))
+(defun tabify (ts q &optional r (j ts))
+  (cond ((not q) (nreverse r))
+	((member (car q) '(#\( #\))) (tabify ts (cdr q) (cons (car q) r) j))
+	((eql (car q) #\Space)
+	 (let ((z (member #\Space q :test-not 'eql)))
+	   (dotimes (i (- j (- (length q) (length z)))) (push #\Space r))
+	   (tabify ts z (cons (car q) r))))
+	((tabify ts (cdr q) (cons (car q) r) (let ((w (1- j))) (if (= w 0) ts w))))))
+
+(defun pprint-tabular (s x &optional (c t) a (ts 16))
+  (let* ((z (write-to-string x))
 	 (z (if (not (listp x)) z
-	       (let ((lz (length z)))
-		 (if c z (subseq z 1 (1- lz)))))))
+             (let* ((z (coerce (tabify ts (coerce z 'list)) 'string))
+                    (lz (length z)))
+              (if c z (subseq z 1 (1- lz)))))))
     (write-string z s)
     nil))
 
@@ -44,6 +54,9 @@
 	((circlep-int (cdr x) (cddr y)))))
 
 (defmacro circlep (x) `(and (consp ,x) (circlep-int ,x (cdr ,x))))
+
+(defun pprint-indent (&rest r) nil)
+(defun pprint-newline (&rest r) nil)
 
 (defmacro pprint-logical-block ((s x &key (prefix "") (per-line-prefix "") (suffix "")) &body body)
   (let ((nx (gensym)) (xx (gensym)) (count (gensym)) (end (gensym)) (eprefix (gensym))
@@ -61,6 +74,12 @@
 	     (unless (eq ,xx ,nx) (go ,end))
 	     (incf ,count)
 	     (pop ,nx)))
+	 (pprint-indent (&rest r))
+	 (pprint-newline 
+	  (a &optional (b nil bp)) 
+	  (when (eq a :mandatory)
+	    (if bp `(progn (write #\Backspace :stream ,b)(write #\Newline :stream ,b))
+	      `(progn (write #\Backspace)(write #\Newline)))))
 	 (pprint-exit-if-list-exhausted
 	  nil
 	  '(unless ,nx (go ,end)))
