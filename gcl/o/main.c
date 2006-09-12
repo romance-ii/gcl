@@ -383,7 +383,7 @@ gcl_main(int argc, char **argv, char **envp)
 #ifdef HAVE_READLINE
         gcl_init_readline_function();
 #endif
-	reinit_gmp_gen();
+	reinit_gmp();
 #ifdef HAVE_TK
 #  ifdef _WIN32
 	Tcl_FindExecutable ( argv[0] );
