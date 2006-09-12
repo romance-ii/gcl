@@ -5,8 +5,9 @@ gclcvs (2.7.0-58) unstable; urgency=low
   * Reset gmp mersenne pointers on startup
   * mips support
   * Fix mv-setq and symbol-macrolet tests
+  * fix trace on mutual recursion functions
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 12 Sep 2006 09:50:30 -0400
+ -- Camm Maguire <camm@enhanced.com>  Tue, 12 Sep 2006 13:04:45 -0400
 
 gclcvs (2.7.0-57) unstable; urgency=low
 

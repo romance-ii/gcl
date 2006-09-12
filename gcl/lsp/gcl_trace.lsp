@@ -180,11 +180,12 @@
 	(untrace-one fname))
   (check-trace-spec form)
   (setq form (trace-one-preprocess form))
-  (si:fset (setq f (gensym)) (symbol-function fname))
+  (let((x (get fname 'state-function))) (when x (break-state 'trace x)))
+  (fset (setq f (gensym)) (symbol-function fname))
   (eval `(defun ,fname (&rest args)
 	   (trace-call ',f args
 		       ,@(cddr form))))
-  (si:putprop fname f 'traced)
+  (putprop fname f 'traced)
   (setq *trace-list* (cons (cons fname (cadr form)) *trace-list*))
   (list fname))
 
