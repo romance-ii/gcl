@@ -130,13 +130,13 @@
 	   (do ((loc loc nil)) ((null *values-to-go*))
 	       (let ((*value-to-go* (pop *values-to-go*)))
 		 (set-loc loc)))
-	   (when *multiple-value-exit-label* 
+	   (when *mvb-vals* 
 	     (wt-nl)
 	     (when (and *extend-vs-top* (> (var-space *mv-var*) 0))
 	       (let ((l (var-loc *mv-var*)))
 		 (wt-nl "for (vs_top=vs_top<V" l "? V" l ": vs_top;vs_top<V" l "+" (var-space *mv-var*) ";) *vs_top++=Cnil;")))
 	     (reset-top)
-	     (wt-go *multiple-value-exit-label*))))
+	     (wt-nl "vals_set=1;"))))
         ((setq fd (cdr (assoc *value-to-go* +set-return-alist+))) (values (funcall fd loc)))
         ((or (not (consp *value-to-go*))
              (not (symbolp (car *value-to-go*))))

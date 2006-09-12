@@ -1,9 +1,18 @@
+gclcvs (2.7.0-58) unstable; urgency=low
+
+  * some preliminary pprint test fixes
+  * Fix mv-bind /bds-bind ordering error
+  * Reset gmp mersenne pointers on startup
+  * mips support
+  * Fix mv-setq and symbol-macrolet tests
+
+ -- Camm Maguire <camm@enhanced.com>  Tue, 12 Sep 2006 09:50:30 -0400
+
 gclcvs (2.7.0-57) unstable; urgency=low
 
   * remove emacs build-depends;64bit hash and gmp fixes
-  * some preliminary pprint test fixes
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  9 Sep 2006 01:52:48 -0400
+ -- Camm Maguire <camm@enhanced.com>  Fri,  8 Sep 2006 13:31:02 -0400
 
 gclcvs (2.7.0-56) unstable; urgency=low
 

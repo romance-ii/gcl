@@ -121,6 +121,17 @@ static gmp_randfnptr_t Mersenne_Twister_Generator_Noseed = {
 #endif
 
 void
+reinit_gmp() {
+
+#if __GNU_MP_VERSION >= 4 && __GNU_MP_VERSION_MINOR >= 2
+  Mersenne_Twister_Generator_Noseed.b=__gmp_randget_mt;
+  Mersenne_Twister_Generator_Noseed.c=__gmp_randclear_mt;
+  Mersenne_Twister_Generator_Noseed.d=__gmp_randiset_mt;
+#endif
+
+}
+
+void
 init_gmp_rnd_state(__gmp_randstate_struct *x) {
 
   static int n;

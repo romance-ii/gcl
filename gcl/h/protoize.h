@@ -1842,4 +1842,8 @@ ihash_equal1(object,int);
 object
 interactive_stream_p(object);
 
+void
+reinit_gmp(void);
+
+
 /* void call_after_gbc_hook(int); */

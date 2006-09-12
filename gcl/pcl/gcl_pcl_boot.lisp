@@ -2050,15 +2050,21 @@ work during bootstrapping.
 #-cmu ;; CMUCL Has a real symbol-macrolet
 (progn
 (defmacro symbol-macrolet (bindings &body body &environment env)
-  (let ((specs (mapcar #'(lambda (binding)
-			   (list (car binding)
-				 (variable-lexical-p (car binding) env)
-				 (cadr binding)))
+  (let ((specs (mapcar (lambda (binding)
+			 (when (or (si::specialp (car binding)) (constantp (car binding)))
+			   (error 'program-error));FIXME
+			 (list (car binding)
+			       (variable-lexical-p (car binding) env)
+			       (cadr binding)))
 		       bindings)))
-    (walk-form `(progn ,@body)
+    (do ((l body (cdr l)))
+	((or (atom (car l)) (not (eq (caar l) 'declare))))
+      (dolist (ll (cdar l))
+	(when (and (consp ll) (eq (car ll) 'special) (some (lambda (x) (assoc x bindings)) (cdr ll)))
+	  (error 'program-error))));FIXME
+    (walk-form `(let nil ,@body)
 	       env
-	       #'(lambda (f c e)
-		   (expand-symbol-macrolet-internal specs f c e)))))
+	       (lambda (f c e) (expand-symbol-macrolet-internal specs f c e)))))
 
 (defun expand-symbol-macrolet-internal (specs form context env)
   (let ((entry nil))
@@ -2094,13 +2100,19 @@ work during bootstrapping.
 		 (walker::recons form kind new-tail)))))
 	  ((eq (car form) 'multiple-value-setq)
 	   (let* ((vars (cadr form))
-		  (gensyms (mapcar #'(lambda (i) (declare (ignore i)) (gensym))
-				   vars)))
-	     `(multiple-value-bind ,gensyms 
-		  ,(caddr form)
-		.,(reverse (mapcar #'(lambda (v g) `(setf ,v ,g))
-				   vars
-				   gensyms)))))
+		  (vars (mapcar (lambda (x) 
+				  (let ((y (assoc x specs)))
+				    (if (and y (eq (cadr y) (variable-lexical-p x env))) (walker::macroexpand-all (caddr y) env) x))) vars))
+		  (gensyms (mapcar (lambda (i) (declare (ignore i)) (gensym)) vars))
+		  (pls (mapcan 'cdr (copy-tree (remove-if-not 'consp vars))))
+		  (psyms (mapcar (lambda (x) (declare (ignore x)) (gensym)) pls))
+		  (ppsyms psyms)
+		  (vars (mapcar (lambda (x) (if (atom x) x (cons (car x) (mapcar (lambda (x) (pop ppsyms)) (cdr x))))) vars)))
+	     `(let* ,(mapcar 'list psyms pls)
+		(multiple-value-bind 
+		 ,gensyms 
+		 ,(caddr form)
+		 .,(reverse (mapcar (lambda (v g) `(setf ,v ,g)) vars gensyms))))))
 	  (t form))))
 )
 

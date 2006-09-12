@@ -227,7 +227,7 @@ LFD(Lspecial_form_p)(void)
 DEFUNO_NEW("LEXICAL-BINDING-ENVIRONMENT",object,fSlexical_binding_environment,SI
 	   ,0,0,NONE,OO,OO,OO,OO,void,siLlexical_binding_environment,(void),"") {
 
-  RETURN1(lex_env[0]);
+  RETURN1(list(3,lex_env[0],lex_env[1],lex_env[2]));
 
 }
 
