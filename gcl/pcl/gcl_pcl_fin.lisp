@@ -1384,7 +1384,7 @@ dbg:
 static void make_trampoline_internal();
 static void make_turbo_trampoline_internal();
 
-object
+static object
 make_trampoline(function)
      object function;
 {
@@ -1413,7 +1413,7 @@ make_turbo_trampoline_internal(base0)
 
 ")
 
-(defentry make-trampoline (object) (object make_trampoline))
+(defentry make-trampoline (object) (static object make_trampoline))
 )
 
 #+IBCL

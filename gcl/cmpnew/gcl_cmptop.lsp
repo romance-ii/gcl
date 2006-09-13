@@ -1819,7 +1819,7 @@
   (wt-nl1 "}")
   )
 
-(defun t1defentry (args &aux type cname (cfun (next-cfun)) cfspec)
+(defun t1defentry (args &aux type cname (cfun (next-cfun)) cfspec static)
   (when (or (endp args) (endp (cdr args)) (endp (cddr args)))
         (too-few-args 'defentry 3 (length args)))
   (cmpck (not (symbolp (car args)))
@@ -1834,6 +1834,8 @@
         ((stringp cfspec)
          (setq type 'object)
          (setq cname cfspec))
+	((and (consp cfspec) (eq (car cfspec) 'static)
+	      (setq static t cfspec (cdr cfspec)) nil))
         ((and (consp cfspec)
               (member (car cfspec) '(void object char int fixnum float double
 					  string))
@@ -1845,7 +1847,7 @@
                         (cadr cfspec)))
          (setq type (car cfspec)))
         (t (cmperr "The C function specification ~s is illegal." cfspec)))
-  (push (list 'defentry (car args) cfun (cadr args) type cname)
+  (push (list 'defentry (car args) cfun (cadr args) (if static (list 'static type) type) cname)
         *top-level-forms*)
   (push (cons (car args) cfun) *global-funs*)
   )
@@ -1858,6 +1860,7 @@
 
 (defun t3defentry (fname cfun arg-types type cname)
   (wt-h 
+   (if (and (consp type) (eq (car type) 'static) (setq type (cadr type))) "static " "")
    (if (eq type 'string) "char *" (string-downcase (symbol-name type)))
    " " cname "("
    (with-output-to-string 

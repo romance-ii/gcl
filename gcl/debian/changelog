@@ -1,3 +1,10 @@
+gclcvs (2.7.0-59) unstable; urgency=low
+
+  * fix trace on mutual recursion functions
+  * restore alpha build with static defentry support
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 13 Sep 2006 17:30:22 -0400
+
 gclcvs (2.7.0-58) unstable; urgency=low
 
   * some preliminary pprint test fixes
@@ -5,9 +12,8 @@ gclcvs (2.7.0-58) unstable; urgency=low
   * Reset gmp mersenne pointers on startup
   * mips support
   * Fix mv-setq and symbol-macrolet tests
-  * fix trace on mutual recursion functions
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 12 Sep 2006 13:04:45 -0400
+ -- Camm Maguire <camm@enhanced.com>  Tue, 12 Sep 2006 09:50:30 -0400
 
 gclcvs (2.7.0-57) unstable; urgency=low
 

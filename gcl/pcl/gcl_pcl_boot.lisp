@@ -2107,7 +2107,7 @@ work during bootstrapping.
 		  (pls (mapcan 'cdr (copy-tree (remove-if-not 'consp vars))))
 		  (psyms (mapcar (lambda (x) (declare (ignore x)) (gensym)) pls))
 		  (ppsyms psyms)
-		  (vars (mapcar (lambda (x) (if (atom x) x (cons (car x) (mapcar (lambda (x) (pop ppsyms)) (cdr x))))) vars)))
+		  (vars (mapcar (lambda (x) (if (atom x) x (cons (car x) (mapcar (lambda (x) (declare (ignore x)) (pop ppsyms)) (cdr x))))) vars)))
 	     `(let* ,(mapcar 'list psyms pls)
 		(multiple-value-bind 
 		 ,gensyms 

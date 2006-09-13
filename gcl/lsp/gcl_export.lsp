@@ -292,6 +292,7 @@ defcfun
 defentry
 defla
 
+static 
 void
 object
 char
