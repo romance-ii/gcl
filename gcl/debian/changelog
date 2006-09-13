@@ -2,8 +2,9 @@ gclcvs (2.7.0-59) unstable; urgency=low
 
   * fix trace on mutual recursion functions
   * restore alpha build with static defentry support
+  * Try stepping around hppa/gmp oddity
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 13 Sep 2006 17:30:22 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed, 13 Sep 2006 17:43:15 -0400
 
 gclcvs (2.7.0-58) unstable; urgency=low
 

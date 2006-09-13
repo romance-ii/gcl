@@ -148,7 +148,7 @@ init_gmp_rnd_state(__gmp_randstate_struct *x) {
 #if __GNU_MP_VERSION >= 4 && __GNU_MP_VERSION_MINOR >= 2
   if (!n) {
 
-    void **p=(void *)x,**pe=p+sizeof(*x)/sizeof(*p);
+    void **p=(void *)x,**pe=p+sizeof(*x)/sizeof(*p)-1;/*FIXME*/
     int i;
 
     for (i=0;p<pe && (!*p || *p<(void *)DBEGIN || *p>(void *)core_end || (*p==trap_result && ++i));p++);
