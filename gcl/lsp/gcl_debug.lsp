@@ -348,15 +348,15 @@
 
 (defun stream-name (str) (namestring (pathname str)))
 )  
-(clines "object stream_name(str) object str;{
+(clines "static object stream_name(str) object str;{
      if (str->sm.sm_object1 != 0 && type_of(str->sm.sm_object1)==t_string)
      return str->sm.sm_object1; else return Cnil; }")
 
-(defentry stream-name (object) (object "stream_name"))
+(defentry stream-name (object) (static object "stream_name"))
 
-(clines "object closedp(str) object str;{return (str->sm.sm_fp==0 ? Ct :Cnil); }")
+(clines "static object closedp(str) object str;{return (str->sm.sm_fp==0 ? Ct :Cnil); }")
 
-(defentry closedp (object) (object "closedp"))
+(defentry closedp (object) (static object "closedp"))
 
 (defun find-line-in-fun (form env fun  counter &aux tem)
   (setq tem (get fun 'line-info))
