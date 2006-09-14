@@ -457,18 +457,15 @@ object y;
     return(y);
 }
 
-LFD(Lsymbol_name)()
-{
-	check_arg(1);
-        vs_base[0]=symbol_name(vs_base[0]);
+DEFUN_NEW("SYMBOL-NAME",object,fLsymbol_name,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+/* LFD(Lsymbol_name)() */
+  RETURN1(symbol_name(sym));
 }
 
-LFD(Lmake_symbol)()
-{
-	check_arg(1);
-
-	check_type_string(&vs_base[0]);
-	vs_base[0] = make_symbol(vs_base[0]);
+DEFUN_NEW("MAKE-SYMBOL",object,fLmake_symbol,LISP,1,1,NONE,OO,OO,OO,OO,(object name),"") {
+/* LFD(Lmake_symbol)() */
+  check_type_string(&name);
+  RETURN1(make_symbol(name));
 }
 
 @(defun copy_symbol (sym &optional cp &aux x)
@@ -487,67 +484,129 @@ LFD(Lmake_symbol)()
 
 DEFVAR("*GENSYM-COUNTER*",sLgensym_counter,LISP,make_fixnum(0),"");
 
-@(defun gensym (&optional (x gensym_prefix) &aux sym)
-	int i, j, sign, size;
-        fixnum f;
-        char *q=NULL,*p=NULL;
-        object this_gensym_prefix,big;
-        object this_gensym_counter;
-@
-        this_gensym_prefix=gensym_prefix;
-	this_gensym_counter=sLgensym_counter->s.s_dbind;
-	if (type_of(x) == t_string)
-		this_gensym_prefix = x;
-	else {
-		check_type_non_negative_integer(&x);
-		this_gensym_counter=x;
-	}
-        if (x==gensym_prefix) 
-                sLgensym_counter->s.s_dbind=number_plus(sLgensym_counter->s.s_dbind,small_fixnum(1));
+DEFUN_NEW("GENSYM",object,fLgensym,LISP,0,1,NONE,OO,OO,OO,OO,(object x),"") {
 
-        switch (type_of(this_gensym_counter)) {
-	case t_bignum:
-	  big=this_gensym_counter;
-	  sign=BIG_SIGN(big);
-	  size = mpz_sizeinbase(MP(big),10)+2+(sign<0? 1 : 0);
-	  if (!(p=ZALLOCA(size)))
-	    FEerror("Cannot alloca gensym name", 0);
-	  mpz_get_strp(&p,10,MP(big));
-	  j=size-5;
-	  j=j<0 ? 0 : j;
-	  while (p[j]) j++;
-	  q=p+j;
-	  break;
-	case t_fixnum:
-	  for (size=1,f=fix(this_gensym_counter);f;f/=10,size++);
-	  q=p=ZALLOCA(size+5);
-	  if ((j=snprintf(p,size+5,"%d",(int)fix(this_gensym_counter)))<=0)
-	    FEerror("Cannot write gensym counter",0);
-	  q=p+j;
-	  break;
-	default:
-	  FEerror("Bad gensym counter type", 0);
-	  break;
-	}
+  int i, j, sign, size;
+  fixnum f;
+  char *q=NULL,*p=NULL;
+  object this_gensym_prefix,big;
+  object this_gensym_counter,sym;
 
-/*         FIXME: come up with a better call sequence */
-/*         this_gensym_counter_string=fLformat_1(Cnil,make_simple_string("~S"),this_gensym_counter); */
-/*        i=this_gensym_counter_string->st.st_fillp; */
+  if (VFUN_NARGS!=1)
+    x=gensym_prefix;
 
-	i = (q-p)+this_gensym_prefix->st.st_fillp;
-	set_up_string_register("");
-	sym = make_symbol(string_register);
-	{BEGIN_NO_INTERRUPT;	
-	sym->s.s_fillp = i;
-	sym->s.s_self = alloc_relblock(i);
-	i=this_gensym_prefix->st.st_fillp;
-	for (j = 0;  j < i;  j++)
-		sym->s.s_self[j] = this_gensym_prefix->st.st_self[j];
-	for (;j<sym->s.s_fillp;j++)
-               sym->s.s_self[j] = p[j-i];
-	END_NO_INTERRUPT;}	
-	@(return sym)
-@)
+  this_gensym_prefix=gensym_prefix;
+  this_gensym_counter=sLgensym_counter->s.s_dbind;
+  if (type_of(x) == t_string) {
+    this_gensym_prefix = x;
+    sLgensym_counter->s.s_dbind=number_plus(sLgensym_counter->s.s_dbind,small_fixnum(1));
+  } else {
+    check_type_non_negative_integer(&x);
+    this_gensym_counter=x;
+  }
+  
+  switch (type_of(this_gensym_counter)) {
+  case t_bignum:
+    big=this_gensym_counter;
+    sign=BIG_SIGN(big);
+    size = mpz_sizeinbase(MP(big),10)+2+(sign<0? 1 : 0);
+    if (!(p=ZALLOCA(size)))
+      FEerror("Cannot alloca gensym name", 0);
+    mpz_get_strp(&p,10,MP(big));
+    j=size-5;
+    j=j<0 ? 0 : j;
+    while (p[j]) j++;
+    q=p+j;
+    break;
+  case t_fixnum:
+    for (size=1,f=fix(this_gensym_counter);f;f/=10,size++);
+    q=p=ZALLOCA(size+5);
+    if ((j=snprintf(p,size+5,"%d",(int)fix(this_gensym_counter)))<=0)
+      FEerror("Cannot write gensym counter",0);
+    q=p+j;
+    break;
+  default:
+    FEerror("Bad gensym counter type", 0);
+    break;
+  }
+  
+  i = (q-p)+this_gensym_prefix->st.st_fillp;
+  set_up_string_register("");
+  sym = make_symbol(string_register);
+  {
+    BEGIN_NO_INTERRUPT;	
+    sym->s.s_fillp = i;
+    sym->s.s_self = alloc_relblock(i);
+    i=this_gensym_prefix->st.st_fillp;
+    for (j = 0;  j < i;  j++)
+      sym->s.s_self[j] = this_gensym_prefix->st.st_self[j];
+    for (;j<sym->s.s_fillp;j++)
+      sym->s.s_self[j] = p[j-i];
+    END_NO_INTERRUPT;
+  }	
+  
+  RETURN1(sym);
+
+}
+
+	
+
+/* @(defun gensym (&optional (x gensym_prefix) &aux sym) */
+/* 	int i, j, sign, size; */
+/*         fixnum f; */
+/*         char *q=NULL,*p=NULL; */
+/*         object this_gensym_prefix,big; */
+/*         object this_gensym_counter; */
+/* @ */
+/*         this_gensym_prefix=gensym_prefix; */
+/* 	this_gensym_counter=sLgensym_counter->s.s_dbind; */
+/*         if (type_of(x) == t_string) { */
+/* 		this_gensym_prefix = x; */
+/*                 sLgensym_counter->s.s_dbind=number_plus(sLgensym_counter->s.s_dbind,small_fixnum(1)); */
+/* 	} else { */
+/* 		check_type_non_negative_integer(&x); */
+/* 		this_gensym_counter=x; */
+/* 	} */
+
+/*         switch (type_of(this_gensym_counter)) { */
+/* 	case t_bignum: */
+/* 	  big=this_gensym_counter; */
+/* 	  sign=BIG_SIGN(big); */
+/* 	  size = mpz_sizeinbase(MP(big),10)+2+(sign<0? 1 : 0); */
+/* 	  if (!(p=ZALLOCA(size))) */
+/* 	    FEerror("Cannot alloca gensym name", 0); */
+/* 	  mpz_get_strp(&p,10,MP(big)); */
+/* 	  j=size-5; */
+/* 	  j=j<0 ? 0 : j; */
+/* 	  while (p[j]) j++; */
+/* 	  q=p+j; */
+/* 	  break; */
+/* 	case t_fixnum: */
+/* 	  for (size=1,f=fix(this_gensym_counter);f;f/=10,size++); */
+/* 	  q=p=ZALLOCA(size+5); */
+/* 	  if ((j=snprintf(p,size+5,"%d",(int)fix(this_gensym_counter)))<=0) */
+/* 	    FEerror("Cannot write gensym counter",0); */
+/* 	  q=p+j; */
+/* 	  break; */
+/* 	default: */
+/* 	  FEerror("Bad gensym counter type", 0); */
+/* 	  break; */
+/* 	} */
+
+/* 	i = (q-p)+this_gensym_prefix->st.st_fillp; */
+/* 	set_up_string_register(""); */
+/* 	sym = make_symbol(string_register); */
+/* 	{BEGIN_NO_INTERRUPT;	 */
+/* 	sym->s.s_fillp = i; */
+/* 	sym->s.s_self = alloc_relblock(i); */
+/* 	i=this_gensym_prefix->st.st_fillp; */
+/* 	for (j = 0;  j < i;  j++) */
+/* 		sym->s.s_self[j] = this_gensym_prefix->st.st_self[j]; */
+/* 	for (;j<sym->s.s_fillp;j++) */
+/*                sym->s.s_self[j] = p[j-i]; */
+/* 	END_NO_INTERRUPT;}	 */
+/* 	@(return sym) */
+/* @) */
 
 @(defun gentemp (&optional (prefix gentemp_prefix)
 			   (pack `current_package()`)
@@ -699,10 +758,10 @@ gcl_init_symbol_function()
 	make_function("SYMBOL-PLIST", Lsymbol_plist);
 	make_function("GETF", Lgetf);
 	make_function("GET-PROPERTIES", Lget_properties);
-	make_function("SYMBOL-NAME", Lsymbol_name);
-	make_function("MAKE-SYMBOL", Lmake_symbol);
+/* 	make_function("SYMBOL-NAME", Lsymbol_name); */
+/* 	make_function("MAKE-SYMBOL", Lmake_symbol); */
 	make_function("COPY-SYMBOL", Lcopy_symbol);
-	make_function("GENSYM", Lgensym);
+/* 	make_function("GENSYM", Lgensym); */
 	make_function("GENTEMP", Lgentemp);
 	make_function("SYMBOL-PACKAGE", Lsymbol_package);
 	make_function("KEYWORDP", Lkeywordp);

@@ -388,7 +388,7 @@ mipself_create_got(bfd *b,asymbol **syms,
 	asymbol *symbol = *(reloc->sym_ptr_ptr);
 	if ((reloc->howto==info->reloc_call16) 
 	    || ((reloc->howto==info->reloc_got16) 
-		&& !(symbol->flags & BSF_SECTION_SYM))) {
+		&& !(symbol->flags & BSF_LOCAL))) {
 
 	  /* Search entry in GOT table */
 	  const char *name = (*reloc->sym_ptr_ptr)->name;
@@ -500,7 +500,7 @@ mipself_fix_relocs(bfd *b,asymbol ** symbols,int symbol_count,
 
 	if ((reloc->howto==info->reloc_call16) 
 	    || ((reloc->howto==info->reloc_got16) 
-		&& !(symbol->flags & BSF_SECTION_SYM))) {
+		&& !(symbol->flags & BSF_LOCAL))) {
 
 	  /* Find GOT entry */
 	  mipself_got_entry *gotent = (mipself_got_entry*)

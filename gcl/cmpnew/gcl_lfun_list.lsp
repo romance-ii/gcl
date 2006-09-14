@@ -8,15 +8,17 @@
 
 (dolist (l '((((stream) string) . get-output-stream-string)
 	     (((symbol) string) . symbol-name)
+	     (((string) symbol) . make-symbol)
+	     (((*) symbol) . gensym)
 	     (((t *) nil) . error)
 	     (((*) string) . si::string-concatenate)))
   (proclaim `(ftype (function ,@(car l)) ,(cdr l))))
 
 
 
-(DEFSYSFUN 'symbol-name "Lsymbol_name" '(T) 'string NIL NIL) 
+;(DEFSYSFUN 'symbol-name "Lsymbol_name" '(T) 'string NIL NIL) 
 (DEFSYSFUN 'si::sputprop "sputprop" '(T T T) 'T NIL NIL) 
-(DEFSYSFUN 'GENSYM "Lgensym" '(*) 'T NIL NIL) 
+;(DEFSYSFUN 'GENSYM "Lgensym" '(*) 'T NIL NIL) 
 (DEFSYSFUN 'SUBSEQ "Lsubseq" '(T T *) 'T NIL NIL) 
 (DEFSYSFUN 'MINUSP "Lminusp" '(T) 'T NIL T) 
 (DEFSYSFUN 'INTEGER-DECODE-FLOAT "Linteger_decode_float" '(T)
@@ -89,7 +91,7 @@
 (DEFSYSFUN 'LIST "Llist" '(*) 'T NIL NIL) 
 (DEFSYSFUN 'USE-PACKAGE "Luse_package" '(T *) 'T NIL NIL) 
 (DEFSYSFUN 'FILE-LENGTH "Lfile_length" '(T) 'T NIL NIL) 
-(DEFSYSFUN 'MAKE-SYMBOL "Lmake_symbol" '(T) 'T NIL NIL) 
+;(DEFSYSFUN 'MAKE-SYMBOL "Lmake_symbol" '(T) 'T NIL NIL) 
 (DEFSYSFUN 'STRING-RIGHT-TRIM "Lstring_right_trim" '(T T) 'STRING NIL
     NIL) 
 (DEFSYSFUN 'ENOUGH-NAMESTRING "Lenough_namestring" '(T *) 'STRING NIL
@@ -206,7 +208,7 @@
 (DEFSYSFUN 'ATAN "Latan" '(T *) 'T NIL NIL) 
 ;(DEFSYSFUN 'DELETE-FILE "Ldelete_file" '(T) 'T NIL NIL) 
 (DEFSYSFUN 'FLOAT-RADIX "Lfloat_radix" '(T) 'FIXNUM NIL NIL) 
-(DEFSYSFUN 'SYMBOL-NAME "Lsymbol_name" '(T) 'STRING NIL NIL) 
+;(DEFSYSFUN 'SYMBOL-NAME "Lsymbol_name" '(T) 'STRING NIL NIL) 
 (DEFSYSFUN 'CLEAR-INPUT "Lclear_input" '(*) 'T NIL NIL) 
 (DEFSYSFUN 'FIND-SYMBOL "Lfind_symbol" '(T *) '(VALUES T T) NIL NIL) 
 ;(DEFSYSFUN 'FIND-SYMBOL "Lfind_symbol" '(T *) '* NIL NIL) 

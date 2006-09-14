@@ -55,7 +55,7 @@ FFN(Fdefun)(object args)
 	    object x;
 	    vs_base = vs_top;
 	    x=alloc_object(t_ifun);
-	    x->ifn.ifn_self=MMcons(sLlambda, MMcdr(args));
+	    x->ifn.ifn_self=list(3,sLlambda,MMcadr(args),listA(3,sLblock,MMcadr(name),MMcddr(args)));
 	    vs_push(x);
 	    putprop(MMcadr(name),vs_base[0],sSsetf_function);
 	    vs_base[0]=name;
