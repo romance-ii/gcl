@@ -1,11 +1,11 @@
-; dwindow.lsp           Gordon S. Novak Jr.           ; 23 Aug 06
+; dwindow.lsp           Gordon S. Novak Jr.           ; 08 Sep 06
 
 ; Window types and interface functions for using X windows from GNU Common Lisp
 
 ; Copyright (c) 2006 Gordon S. Novak Jr. and The University of Texas at Austin.
 
 ; 08 Jan 97; 17 May 02; 17 May 04; 18 May 04; 01 Jun 04; 18 Aug 04; 21 Jan 06
-; 24 Jan 06; 24 Jun 06; 25 Jun 06; 17 Jul 06
+; 24 Jan 06; 24 Jun 06; 25 Jun 06; 17 Jul 06; 23 Aug 06
 
 ; See the files gnu.license and dec.copyright .
 
@@ -36,157 +36,6 @@
 ; Modified for AKCL/X using Hiep Huu Nguyen's interfaces from AKCL -> C -> X.
 ; Parts of Nguyen's file Xinit.lsp are included.
 
-(in-package :XLIB)
-
-(setf (get 'xlib::int-pos 'user::glfnresulttype) 'lisp::integer)
-(setf (get 'xlib::fixnum-pos 'user::glfnresulttype) 'lisp::integer)
-
-; exported symbols: from dwimports.lsp
-(dolist (x '( menu
- window-get-mouse-position window-create window-set-font
- window-font-info window-gcontext window-parent
- window-drawable-height window-drawable-width window-label
- window-font window-foreground window-set-foreground
- window-background window-set-background window-wfunction
- window-get-geometry window-get-geometry-b window-sync
- window-screen-height window-geometry window-size
- window-left window-top-neg-y window-reset-geometry
- window-force-output window-query-pointer window-set-xor
- window-unset window-reset window-set-erase
- window-set-copy window-set-invert window-set-line-width
- window-set-line-attr window-std-line-attr window-draw-line
- window-draw-line-xy window-draw-arrowhead-xy
- window-draw-arrow-xy window-draw-arrow2-xy window-draw-box
- window-draw-box-xy window-xor-box-xy window-draw-box-corners
- window-draw-rcbox-xy window-draw-arc-xy
- window-draw-circle-xy window-draw-circle window-erase-area
- window-erase-area-xy window-erase-box-xy
- window-draw-ellipse-xy window-copy-area-xy window-invertarea
- window-invert-area window-invert-area-xy
- window-prettyprintat window-prettyprintat-xy window-printat
- window-printat-xy window-string-width window-string-height
- window-string-extents window-font-string-width
- window-yposition window-centeroffset dowindowcom
- window-menu window-close window-unmap window-open
- window-map window-destroy window-destroy-selected-window
- window-clear window-moveto-xy window-paint
- window-move window-draw-border window-track-mouse
- window-wait-exposure window-wait-unmap
- window-init-mouse-poll window-poll-mouse menu-init
- menu-calculate-size menu-adjust-offset menu-draw
- menu-item-value menu-find-item-width menu-find-item-height
- menu-clear menu-display-item menu-choose menu-box-item
- menu-unbox-item menu-item-position menu-select
- menu-select! menu-select-b menu-destroy
- menu-create menu-offset menu-size menu-moveto-xy
- menu-reposition picmenu-create picmenu-create-spec
- picmenu-create-from-spec picmenu-calculate-size picmenu-init
- picmenu-draw picmenu-draw-button picmenu-delete-named-button
- picmenu-select picmenu-box-item picmenu-unbox-item
- picmenu-destroy picmenu-button-containsxy?
- picmenu-item-position barmenu-create
- barmenu-calculate-size barmenu-init barmenu-draw
- barmenu-select barmenu-update-value window-get-point
- window-get-click window-get-line-position
- window-get-latex-position window-get-box-position
- window-get-icon-position window-get-region
- window-get-box-size window-track-mouse-in-region
- window-adjust-box-side window-adj-box-xy window-get-circle
- window-circle-radius window-draw-circle-pt
- window-get-ellipse window-draw-ellipse-pt
- window-draw-vector-pt window-get-vector-end
- window-get-crosshairs window-draw-crosshairs-xy
- window-get-cross window-draw-cross-xy window-draw-dot-xy
- window-draw-latex-xy window-reset-color
- window-set-color-rgb window-set-xcolor window-set-color
- window-set-color window-free-color window-get-chars
- window-process-char-event window-input-string
- window-input-char-fn window-draw-carat window-init-keymap
- window-set-cursor window-positive-y window-code-char
- window-get-raw-char
- window-print-line window-print-lines textmenu-create
- textmenu-calculate-size textmenu-init textmenu-draw
- textmenu-select textmenu-set-text textmenu
- editmenu editmenu-create editmenu-calculate-size
- editmenu-init editmenu-draw editmenu-display
- window-edit
- window-edit-display editmenu-carat editmenu-erase
- window-edit-erase editmenu-select editmenu-edit-fn
- window-edit-fn editmenu-setxy editmenu-char
- editmenu-edit
- *window-editmenu-kill-strings*
-*window-add-menu-title*
-*window-menu*
-*mouse-x*
-*mouse-y*
-*mouse-window*
-*window-fonts*
-*window-display*
-*window-screen*
-*root-window*
-*black-pixel*
-*white-pixel*
-*default-fg-color*
-*default-bg-color*
-*default-size-hints*
-*default-GC*
-*default-colormap*
-*window-event*
-*window-default-pos-x*
-*window-default-pos-y*
-*window-default-border*
-*window-default-font-name*
-*window-default-cursor*
-*window-save-foreground*
-*window-save-function*
-*window-attributes*
-*window-attr*
-*menu-title-pad*
-*root-return*
-*child-return*
-*root-x-return*
-*root-y-return*
-*win-x-return*
-*win-y-return*
-*mask-return*
-*x-return*
-*y-return*
-*width-return*
-*height-return*
-*depth-return*
-*border-width-return*
-*text-width-return*
-*direction-return*
-*ascent-return*
-*descent-return*
-*overall-return*
-*GC-Values*
-*window-xcolor*
-*window-menu-code*
-
-*window-keymap*
-*window-shiftkeymap*
-*window-keyinit*
-*window-meta*
-*window-ctrl*
-*window-shift*
-*window-string*
-*window-string-count*
-*window-string-max*
-*window-input-string-x*
-*window-input-string-y*
-*window-input-string-charwidth*
-
-*window-shift-keys*
-*window-control-keys*
-*window-meta-keys*
-*barmenu-update-value-cons*
-*picmenu-no-selection*
-*min-keycodes-return*
-*max-keycodes-return*
-*keycodes-return*
- ))
-  (export x))         ; export the above symbols
 
 (defvar *window-add-menu-title* nil)  ; t to add title bar within menu area
 (defvar *window-menu* nil)
@@ -640,9 +489,10 @@ msg     ((force-output       window-force-output     open t)
   (setq *mouse-window* (fixnum-pos *child-return* 0)) )  ; 22 Jun 06
 
 ; 13 Aug 91; 14 Aug 91; 06 Sep 91; 12 Sep 91; 06 Dec 91; 01 May 92; 01 Sep 92
+; 08 Sep 06
 (setf (glfnresulttype 'window-create) 'window)
 (gldefun window-create (width height &optional str parentw pos-x pos-y font)
-  (let (w pw fg-color bg-color)
+  (let (w pw fg-color bg-color (null 0))
     (or *window-display* (window-Xinit))
     (setq fg-color *default-fg-color*)
     (setq bg-color *default-bg-color*)
@@ -1056,13 +906,13 @@ msg     ((force-output       window-force-output     open t)
 	      xsize ysize
 	      0 ))     ;   exposures
 
-; 21 Dec 93
+; 21 Dec 93; 08 Sep 06
 (gldefun window-erase-box-xy ((w window) (xoff integer) (yoff integer)
 				        (xsize integer) (ysize integer)
 					&optional (linewidth integer))
   (XClearArea *window-display* (parent w)
-		    (xoff - (or linewidth 1) / 2)
-		    (positive-y w (yoff + ysize + (or linewidth 1) / 2))
+		    (xoff - (truncate (or linewidth 1) 2))
+		    (positive-y w (+ yoff ysize (truncate (or linewidth 1) 2)))
 		    (xsize + (or linewidth 1))
 		    (ysize + (or linewidth 1))
 		    0 ))    ;   exposures
@@ -1412,7 +1262,7 @@ lp  (XGetWindowAttributes *window-display* win *window-attr*)
     ((picture-height m) = ((item-height m) * nitems) + 2)
     (adjust-offset m) ))
 
-; 06 Sep 91; 09 Sep 91; 10 Sep 91; 21 May 93; 30 May 02; 17 May 04
+; 06 Sep 91; 09 Sep 91; 10 Sep 91; 21 May 93; 30 May 02; 17 May 04; 08 Sep 06
 ; Adjust a menu's offset position if necessary to keep it in parent window.
 (gldefun menu-adjust-offset ((m menu))
   (let (xbase ybase wbase hbase xoff yoff wgm width height)
@@ -1429,8 +1279,8 @@ lp  (XGetWindowAttributes *window-display* win *window-attr*)
     (setq hbase (int-pos *height-return* 0))
     (if (~ (parent-offset-x m) or (parent-offset-x m) == 0)
 	(progn (or wgm (window-get-mouse-position))
-	       (xoff = ((*mouse-x* - xbase) - (width  / 2) - 4))
-	       (yoff = ((hbase - (*mouse-y* - ybase)) - (height / 2))))
+	       (xoff = ((*mouse-x* - xbase) - (truncate width 2) - 4))
+	       (yoff = ((hbase - (*mouse-y* - ybase)) - (truncate height 2))))
 	(progn (xoff = (parent-offset-x m))
 	       (yoff = (parent-offset-y m))))
     ((parent-offset-x m) = (max 0 (min xoff (wbase - width))))
@@ -1566,7 +1416,7 @@ lp  (XGetWindowAttributes *window-display* win *window-attr*)
 (gldefun menu-unbox-item ((m menu) (item integer))
   (box-item m item) )
 
-; 11 Sep 91; 08 Sep 92; 28 Sep 92; 18 Jan 94
+; 11 Sep 91; 08 Sep 92; 28 Sep 92; 18 Jan 94; 08 Sep 06
 (gldefun menu-item-position ((m menu) (itemname symbol)
 			     &optional (place symbol))
   (let ((n 0) found itms item (xsize (item-width m)) (ysize (item-height m)))
@@ -1587,13 +1437,13 @@ lp  (XGetWindowAttributes *window-display* win *window-attr*)
     (if found (a vector with
 		 x = ((menu-x m 0) +
 		      (case place
-			((center top bottom) (xsize / 2))
+			((center top bottom) (truncate xsize 2))
 			(left -1)
 			(right xsize + 2)
 			else 0))
 		 y = ((menu-y m (((length (items m)) - n) * ysize)) +
 		      (case place
-			((center right left) (ysize / 2))
+			((center right left) (truncate ysize 2))
 			(bottom 0)
 			(top ysize)
 			else 0)) )) ))
@@ -1833,7 +1683,7 @@ lp  (res = (choose m inside))
         (buttonname val)) ))
 
 
-; 09 Sep 91; 10 Sep 91; 17 May 04
+; 09 Sep 91; 10 Sep 91; 17 May 04; 08 Sep 06
 (gldefun picmenu-box-item ((m picmenu) (item picmenu-button))
   (let ((mw (menuw m)) xoff yoff siz)
     (xoff = (menu-x m (x (offset item))))
@@ -1842,8 +1692,8 @@ lp  (res = (choose m inside))
 	(funcall (highlightfn item) (menuw m) xoff yoff)
         (progn (set-xor mw)
 	     (if (siz = (size item))
-	         (draw-box-xy mw (xoff - (x siz) / 2)
-			              (yoff - (y siz) / 2)
+	         (draw-box-xy mw (xoff - (truncate (x siz) 2))
+			              (yoff - (truncate (y siz) 2))
 				      (x siz) (y siz) 1)
 		 (draw-box-xy mw (xoff - 6) (yoff - 6) 12 12 1))
 	     (unset mw)
@@ -1860,24 +1710,24 @@ lp  (res = (choose m inside))
 
 (defun picmenu-destroy (m) (menu-destroy m))
 
-; 09 Sep 91; 10 Sep 91; 11 Sep 91
+; 09 Sep 91; 10 Sep 91; 11 Sep 91; 08 Sep 06
 (gldefun picmenu-button-containsxy? ((b picmenu-button) (x integer)
 				     (y integer))
   (let ((xsize 6) (ysize 6))
-    (if (size b) (progn (xsize = (x (size b)) / 2)
-			(ysize = (y (size b)) / 2)))
+    (if (size b) (progn (xsize = (truncate (x (size b)) 2))
+			(ysize = (truncate (y (size b)) 2))))
     ((x >= ((x (offset b)) - xsize)) and (x <= ((x (offset b)) + xsize)) and
      (y >= ((y (offset b)) - ysize)) and (y <= ((y (offset b)) + ysize)) ) ))
 
-; 11 Sep 91; 08 Sep 92; 18 Jan 94; 30 May 02; 17 May 04; 24 Jan 06
+; 11 Sep 91; 08 Sep 92; 18 Jan 94; 30 May 02; 17 May 04; 24 Jan 06; 08 Sep 06
 (gldefun picmenu-item-position ((m picmenu) (itemname symbol)
 					   &optional (place symbol))
   (let ((b picmenu-button) (xsize 0) (ysize 0) xoff yoff)
     (if (null itemname)
 	(progn (xsize = (picture-width m))
-	     (ysize = ((picture-height m) - (drawing-height m)) / 2)
-	     (xoff = xsize / 2)
-	     (yoff = (drawing-height m) + ysize / 2))		       
+	     (ysize = (truncate ((picture-height m) - (drawing-height m)) 2))
+	     (xoff = (truncate xsize 2))
+	     (yoff = (drawing-height m) + (truncate ysize 2)))		       
 	(if (b = (that (buttons m) with buttonname == itemname))
 		 (progn (if (size b)
 			  (progn (xsize = (x (size b)))
@@ -1887,13 +1737,13 @@ lp  (res = (choose m inside))
     (if xoff (a vector with
 		     x = ((menu-x m xoff) + (case place
 					      ((center top bottom) 0)
-					      (left (- (xsize / 2)))
-					      (right (xsize / 2))
+					      (left (- (truncate xsize 2)))
+					      (right (truncate xsize 2))
 					      else 0))
 		     y = ((menu-y m yoff) + (case place
 					      ((center right left) 0)
-					      (bottom (- (ysize / 2)))
-					      (top (ysize / 2))
+					      (bottom (- (truncate ysize 2)))
+					      (top (truncate ysize 2))
 					      else 0))) ) ))
 
 ; 03 Jan 94; 18 Jan 94; 17 May 04
@@ -1945,7 +1795,7 @@ lp  (res = (choose m inside))
 					    (parent-offset-x m)
 					    (parent-offset-y m) )) ) ))
 
-; 03 Jan 94; 18 Jan 94; 17 May 04; 18 May 04
+; 03 Jan 94; 18 Jan 94; 17 May 04; 18 May 04; 08 Sep 06
 ; Draw a picture menu
 (gldefun barmenu-draw ((m barmenu))
   (let (mw xzero yzero)
@@ -1953,7 +1803,7 @@ lp  (res = (choose m inside))
     (mw = (menu-window m))
     (open mw)
     (clear m)
-    (xzero = (menu-x m ((picture-width m) / 2)))
+    (xzero = (menu-x m (truncate (picture-width m) 2)))
     (yzero = (menu-y m 0))
     (if (color m) (window-set-color mw (color m)))
     (if (horizontal m)
@@ -1964,13 +1814,13 @@ lp  (res = (choose m inside))
     (if (color m) (window-reset-color mw))
     (force-output mw) ))
 
-; 03 Jan 94; 04 Jan 94; 07 Jan 94; 18 Jan 94
+; 03 Jan 94; 04 Jan 94; 07 Jan 94; 18 Jan 94; 08 Sep 06
 ; inside = t if the mouse is already inside the menu area
 (gldefun barmenu-select ((m barmenu) &optional inside)
   (let (mw xzero yzero val)
     (mw = (menuw m))
     (if ~ (permanent m) (draw m))
-    (xzero = (menu-x m ((picture-width m) / 2)))
+    (xzero = (menu-x m (truncate (picture-width m) 2)))
     (yzero = (menu-y m 0))
     (when (window-track-mouse-in-region mw (menu-x m 0) yzero
 	        (picture-width m) (picture-height m) t t)		
@@ -1982,7 +1832,7 @@ lp  (res = (choose m inside))
 	    (if (> code 0) code) ))
       val) ))
 
-; 03 Jan 93; 17 May 04
+; 03 Jan 93; 17 May 04; 08 Sep 06
 (defvar *barmenu-update-value-cons* (cons nil nil))  ; reusable cons
 (gldefun barmenu-update-value ((m barmenu) (val integer))
   (let ((mw (menuw m)) xzero yzero)
@@ -1991,7 +1841,7 @@ lp  (res = (choose m inside))
 	(progn (if (val < (value m))
 		   (set-erase mw)
 	           (if (color m) (window-set-color mw (color m))))
-             (xzero = (menu-x m ((picture-width m) / 2)))
+             (xzero = (menu-x m (truncate (picture-width m) 2)))
 	     (yzero = (menu-y m 0))
              (if (horizontal m)
 		 (draw-line-xy (menu-window m)
@@ -2061,7 +1911,7 @@ lp  (res = (choose m inside))
 			 (parent-offset-x m) (parent-offset-y m)
 			 (menu-font m) )) ) ))
 
-; 18 Apr 95; 14 Aug 96; 17 May 04
+; 18 Apr 95; 14 Aug 96; 17 May 04; 08 Sep 06
 ; Draw a picture menu
 (gldefun textmenu-draw ((m textmenu))
   (let (mw bottom xzero yzero)
@@ -2078,12 +1928,12 @@ lp  (res = (choose m inside))
 	       (invert-area-xy mw xzero (bottom - 15) (picture-width m) 16)))
     (if (text m)
 	(printat-xy mw (text m) (xzero + 10)
-			 (yzero + (picture-height m) / 2 - 8)))
+			 (yzero + (truncate (picture-height m) 2) - 8)))
     (if (boxflg m) (draw-box-xy mw xzero yzero
 				   (picture-width m) (picture-height m) 1))
     (force-output mw) ))
 
-; 18 Apr 95; 20 Apr 95; 21 Apr 95; 14 Aug 96; 17 May 04; 01 Jun 04
+; 18 Apr 95; 20 Apr 95; 21 Apr 95; 14 Aug 96; 17 May 04; 01 Jun 04; 08 Sep 06
 (gldefun textmenu-select ((m textmenu) &optional inside)
   (let (mw xzero yzero codeval res)
     (mw = (menuw m))
@@ -2105,7 +1955,7 @@ lp  (res = (choose m inside))
     (if (codeval > 0)
 	(progn (draw m)
 	     (input-string mw (text m) (xzero + 10)
-			   (yzero + (picture-height m) / 2 - 8)
+			   (yzero + (truncate (picture-height m) 2) - 8)
 			   ((picture-width m) - 12)) ) )))
 
 (gldefun textmenu-set-text ((m textmenu) &optional (s string))
@@ -2487,12 +2337,12 @@ lp  (res = (choose m inside))
   res))
 
 ; 31 Dec 93; 18 Jan 94; 04 Oct 94; 18 Jul 96; 19 Jul 96; 22 Jul 96; 23 Jul 96
-; 25 Jul 96
+; 25 Jul 96; 08 Sep 06
 ; Process a character event.  type is event type.
 ; For Control, Shift, and Meta, global flags are set.
 ; (fn char button x y) is called for other characters.
 (defun window-process-char-event (w type fn args)
-  (let (code eventwindow)
+  (let (code)
     (if (eql type KeyRelease)
 	(progn
 	  (setq code (XButtonEvent-button *window-event*))

@@ -495,16 +495,16 @@ DEFUN_NEW("GENSYM",object,fLgensym,LISP,0,1,NONE,OO,OO,OO,OO,(object x),"") {
   if (VFUN_NARGS!=1)
     x=gensym_prefix;
 
-  this_gensym_prefix=gensym_prefix;
-  this_gensym_counter=sLgensym_counter->s.s_dbind;
   if (type_of(x) == t_string) {
     this_gensym_prefix = x;
+    this_gensym_counter=sLgensym_counter->s.s_dbind;
     sLgensym_counter->s.s_dbind=number_plus(sLgensym_counter->s.s_dbind,small_fixnum(1));
   } else {
     check_type_non_negative_integer(&x);
     this_gensym_counter=x;
+    this_gensym_prefix=gensym_prefix;
   }
-  
+    
   switch (type_of(this_gensym_counter)) {
   case t_bignum:
     big=this_gensym_counter;
@@ -558,16 +558,17 @@ DEFUN_NEW("GENSYM",object,fLgensym,LISP,0,1,NONE,OO,OO,OO,OO,(object x),"") {
 /*         object this_gensym_prefix,big; */
 /*         object this_gensym_counter; */
 /* @ */
-/*         this_gensym_prefix=gensym_prefix; */
-/* 	this_gensym_counter=sLgensym_counter->s.s_dbind; */
-/*         if (type_of(x) == t_string) { */
-/* 		this_gensym_prefix = x; */
-/*                 sLgensym_counter->s.s_dbind=number_plus(sLgensym_counter->s.s_dbind,small_fixnum(1)); */
-/* 	} else { */
-/* 		check_type_non_negative_integer(&x); */
-/* 		this_gensym_counter=x; */
-/* 	} */
 
+/*   if (type_of(x) == t_string) { */
+/*     this_gensym_prefix = x; */
+/*     this_gensym_counter=sLgensym_counter->s.s_dbind; */
+/*     sLgensym_counter->s.s_dbind=number_plus(sLgensym_counter->s.s_dbind,small_fixnum(1)); */
+/*   } else { */
+/*     check_type_non_negative_integer(&x); */
+/*     this_gensym_counter=x; */
+/*     this_gensym_prefix=gensym_prefix; */
+/*   } */
+    
 /*         switch (type_of(this_gensym_counter)) { */
 /* 	case t_bignum: */
 /* 	  big=this_gensym_counter; */

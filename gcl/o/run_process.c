@@ -24,6 +24,11 @@ License for more details.
 
 #define IN_RUN_PROCESS
 #include "include.h"
+
+#ifdef HAVE_SYS_SOCKIO_H
+#include <sys/sockio.h>
+#endif
+
 #ifdef RUN_PROCESS
 
 void setup_stream_buffer(object);

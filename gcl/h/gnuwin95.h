@@ -64,7 +64,7 @@
 #endif
 
 #define brk(x) printf("not doing break\n");
-#include <varargs.h>     
+#include <stdarg.h>     
 #include <stdio.h>
 #define UNIXSAVE "unexnt.c"
 

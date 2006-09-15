@@ -231,6 +231,7 @@
 #undef HAVE_TK
 #undef WITH_WINMAIN
 #undef USE_FAST_NULL_OR_ON_CSTACK_MACRO
+#undef HAVE_SYS_SOCKIO_H
 
 /* The number of bytes in a char.  */
 #undef SIZEOF_CHAR
@@ -279,6 +280,9 @@
 
 /* Define if you have the <sys/ioctl.h> header file.  */
 #undef HAVE_SYS_IOCTL_H
+
+/* Define if you have the <sys/sockio.h> header file.  */
+#undef HAVE_SYS_SOCKIO_H
 
 /* Define if you have the <values.h> header file.  */
 #undef HAVE_VALUES_H

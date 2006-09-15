@@ -75,7 +75,7 @@ $(PORTDIR)/saved_pre_gcl: $(HDIR)cmpinclude.h
 $(PORTDIR)/saved_gcl: $(PORTDIR)/saved_pre_gcl $(HDIR)cmpinclude.h 
 	(cd $(LSPDIR); touch *.lsp ; $(MAKE) all)
 	(cd $(CMPDIR); touch *.lsp ; $(MAKE) all)
-	[ "$(X_LIBS)" == "" ] || (cd xgcl-2 && make LISP=../$<)
+	[ "$(X_LIBS)" == "" ] || (cd xgcl-2 && $(MAKE) LISP=../$<)
 	cd $(@D) && $(MAKE) $(@F)
 
 $(PORTDIR)/saved_mod_gcl: $(PORTDIR)/saved_gcl

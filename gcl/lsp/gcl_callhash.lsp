@@ -361,7 +361,7 @@
 		   (make-pathname :directory (butlast (pathname-directory x)) 
 				  :name (car (last (pathname-directory x))))
 		   x))))
-	(when (directory x) 
+	(when (si::stat x) 
 	  (return-from 
 	   get-temp-dir 
 	   (namestring 

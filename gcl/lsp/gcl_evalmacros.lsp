@@ -91,6 +91,10 @@
 (defmacro loop (&rest body &aux (tag (gensym)))
   `(block nil (tagbody ,tag (progn ,@body) (go ,tag))))
 
+(import 'while 'user)
+(defmacro while (test &rest forms)
+ `(loop (unless ,test (return)) ,@forms) )
+
 (defmacro defmacro (name vl &rest body)
   `(si:define-macro ',name (si:defmacro* ',name ',vl ',body)))
 

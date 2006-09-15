@@ -347,6 +347,8 @@ case $use in
 	def_statsysbfd="no" ; def_custreloc="yes" ;;
     powerpc-macosx)
 	def_statsysbfd="no" ; def_locbfd="yes" ;;
+    *solaris*)
+	def_statsysbfd="no" ; def_locbfd="yes" ;;
 esac
 
 AC_ARG_ENABLE(dlopen,
@@ -478,9 +480,9 @@ AC_SUBST(CC)
 # subst GCC not only under 386-linux, but where available -- CM
 
 
-TCFLAGS="-Wall -fsigned-char"
+TCFLAGS="-fsigned-char"
 if test "$GCC" = "yes" ; then
-	TCFLAGS="$TCFLAGS -pipe"
+	TCFLAGS="$TCFLAGS -pipe -Wall "
 	case $use in
 	     *mingw*)
 	        echo "WARNING: Remove -fno-zero-initialized-in-bss from makedefs if gcc less than 3.3.1."
@@ -504,15 +506,22 @@ TO2FLAGS=""
 case "$use" in
   *mingw*)
 	TFPFLAG="";;
+   m68k*)#FIXME gcc 4.x bug workaround
+	TFPFLAG="";;
   *)
 	TFPFLAG="-fomit-frame-pointer";;
 esac
 
-AC_CHECK_PROGS(AWK,gawk nawk awk,"")
+AC_CHECK_PROGS(AWK,gawk nawk awk)
+
+# Work around system/gprof mips hang
+case $use in
+  mips*) enable_gprof="no";;
+esac		     
 
 if test "$enable_gprof" = "yes" ; then
-	TCFLAGS="$TCFLAGS -pg"
-	TLIBS="$TLIBS -pg"
+        TCFLAGS="$TCFLAGS -pg";
+        TLIBS="$TLIBS -pg";
 	TFPFLAG=""
 	AC_DEFINE(GCL_GPROF)
 	AC_MSG_CHECKING(for text start)
@@ -1765,6 +1774,8 @@ AC_CHECK_HEADERS(sys/ioctl.h)
 
 # OpenBSD has elf_abi.h instead of elf.h
 AC_CHECK_HEADERS(elf.h elf_abi.h)
+
+AC_CHECK_HEADERS(sys/sockio.h)
 
 
 #--------------------------------------------------------------------

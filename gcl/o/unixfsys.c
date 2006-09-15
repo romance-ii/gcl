@@ -519,6 +519,34 @@ DEFUN_NEW("STAT",object,fSstat,SI,1,1,NONE,OO,OO,OO,OO,(object path),"") {
 
 
 
+DEF_ORDINARY("DIRECTORY",sKdirectory,KEYWORD,"");
+DEF_ORDINARY("LINK",sKlink,KEYWORD,"");
+DEF_ORDINARY("FILE",sKfile,KEYWORD,"");
+
+extern char *ctime_r(const time_t *,char *);
+
+DEFUN_NEW("STAT",object,fSstat,SI,1,1,NONE,OO,OO,OO,OO,(object path),"") {
+
+  char filename[4096];
+  struct stat ss;
+  
+
+  bzero(filename,sizeof(filename));
+  coerce_to_filename(path,filename);
+  if (lstat(filename,&ss))
+    RETURN1(Cnil);
+  else {/* ctime_r insufficiently portable */
+    /* int j;
+       ctime_r(&ss.st_ctime,filename);
+       j=strlen(filename);
+       if (isspace(filename[j-1]))
+       filename[j-1]=0;*/
+    RETURN1(list(3,S_ISDIR(ss.st_mode) ? sKdirectory : 
+		 (S_ISLNK(ss.st_mode) ? sKlink : sKfile),
+		 make_fixnum(ss.st_size),make_fixnum(ss.st_ctime)));
+  }
+}
+
 DEFUN_NEW("SETENV",object,fSsetenv,SI,2,2,NONE,OO,OO,OO,OO,(object variable,object value),"Set environment VARIABLE to VALUE")
 
 {

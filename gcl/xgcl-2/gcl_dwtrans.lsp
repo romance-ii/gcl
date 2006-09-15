@@ -1,4 +1,4 @@
-; 23 Aug 2006 14:01:25 CDT
+; 08 Sep 2006 15:33:41 CDT
 ; dwtrans.lsp  -- translation of dwindow.lsp
 
 ; Copyright (c) 2006 Gordon S. Novak Jr. and The University of Texas at Austin.
@@ -834,8 +834,9 @@
 
 (DEFUN WINDOW-ERASE-BOX-XY
        (W XOFF YOFF XSIZE YSIZE &OPTIONAL LINEWIDTH)
-  (XCLEARAREA *WINDOW-DISPLAY* (CADR W) (- XOFF (/ (OR LINEWIDTH 1) 2))
-      (- (CADDDR W) (+ (+ YOFF YSIZE) (/ (OR LINEWIDTH 1) 2)))
+  (XCLEARAREA *WINDOW-DISPLAY* (CADR W)
+      (- XOFF (TRUNCATE (OR LINEWIDTH 1) 2))
+      (- (CADDDR W) (+ YOFF YSIZE (TRUNCATE (OR LINEWIDTH 1) 2)))
       (+ XSIZE (OR LINEWIDTH 1)) (+ YSIZE (OR LINEWIDTH 1)) 0))
 
 (DEFUN WINDOW-DRAW-ELLIPSE-XY (W X Y RX RY &OPTIONAL LW)
@@ -1184,8 +1185,9 @@
     (IF (OR (NOT (FIFTH M)) (ZEROP (FIFTH M)))
         (PROGN
           (OR WGM (WINDOW-GET-MOUSE-POSITION))
-          (SETQ XOFF (+ -4 (- (- *MOUSE-X* XBASE) (/ WIDTH 2))))
-          (SETQ YOFF (- (- HBASE (- *MOUSE-Y* YBASE)) (/ HEIGHT 2))))
+          (SETQ XOFF (+ -4 (- (- *MOUSE-X* XBASE) (TRUNCATE WIDTH 2))))
+          (SETQ YOFF
+                (- (- HBASE (- *MOUSE-Y* YBASE)) (TRUNCATE HEIGHT 2))))
         (PROGN (SETQ XOFF (FIFTH M)) (SETQ YOFF (SIXTH M))))
     (SETF (FIFTH M) (MAX 0 (MIN XOFF (- WBASE WIDTH))))
     (SETF (SIXTH M) (MAX 0 (MIN YOFF (- HBASE HEIGHT))))))
@@ -1263,12 +1265,12 @@
 
 (DEFUN MENU-CLEAR (M)
   (IF (CADDR M)
-      (LET ((GLVAR16279 (+ 3 (EIGHTH M))))
+      (LET ((GLVAR66219 (+ 3 (EIGHTH M))))
         (XCLEARAREA *WINDOW-DISPLAY* (CADADR M)
             (1- (IF (CADDR M) (FIFTH M) 0))
             (- (CADDDR (CADR M))
-               (1- (+ (1- (IF (CADDR M) (SIXTH M) 0)) GLVAR16279)))
-            (+ 3 (SEVENTH M)) GLVAR16279 0))
+               (1- (+ (1- (IF (CADDR M) (SIXTH M) 0)) GLVAR66219)))
+            (+ 3 (SEVENTH M)) GLVAR66219 0))
       (PROGN
         (XCLEARWINDOW *WINDOW-DISPLAY* (CADADR M))
         (XFLUSH *WINDOW-DISPLAY*))))
@@ -1384,14 +1386,14 @@
     (IF FOUND
         (LIST (+ (IF (CADDR M) (FIFTH M) 0)
                  (CASE PLACE
-                   ((CENTER TOP BOTTOM) (/ XSIZE 2))
+                   ((CENTER TOP BOTTOM) (TRUNCATE XSIZE 2))
                    (LEFT -1)
                    (RIGHT (+ 2 XSIZE))
                    (T 0)))
               (+ (+ (IF (CADDR M) (SIXTH M) 0)
                     (* (- (LENGTH (NTH 13 M)) N) YSIZE))
                  (CASE PLACE
-                   ((CENTER RIGHT LEFT) (/ YSIZE 2))
+                   ((CENTER RIGHT LEFT) (TRUNCATE YSIZE 2))
                    (BOTTOM 0)
                    (TOP YSIZE)
                    (T 0)))))))
@@ -1660,8 +1662,9 @@
                               *GC-VALUES*)
                           (XGCVALUES-BACKGROUND *GC-VALUES*)))))
           (IF (SETQ SIZ (CADDR ITEM))
-              (WINDOW-DRAW-BOX-XY MW (- XOFF (/ (CAR SIZ) 2))
-                  (- YOFF (/ (CADR SIZ) 2)) (CAR SIZ) (CADR SIZ) 1)
+              (WINDOW-DRAW-BOX-XY MW (- XOFF (TRUNCATE (CAR SIZ) 2))
+                  (- YOFF (TRUNCATE (CADR SIZ) 2)) (CAR SIZ) (CADR SIZ)
+                  1)
               (WINDOW-DRAW-BOX-XY MW (+ -6 XOFF) (+ -6 YOFF) 12 12 1))
           (LET ((GC (CADDR MW)))
             (XSETFUNCTION *WINDOW-DISPLAY* GC *WINDOW-SAVE-FUNCTION*)
@@ -1682,8 +1685,8 @@
 (DEFUN PICMENU-BUTTON-CONTAINSXY? (B X Y)
   (LET ((XSIZE 6) (YSIZE 6))
     (WHEN (CADDR B)
-      (SETQ XSIZE (/ (CAADDR B) 2))
-      (SETQ YSIZE (/ (CADR (CADDR B)) 2)))
+      (SETQ XSIZE (TRUNCATE (CAADDR B) 2))
+      (SETQ YSIZE (TRUNCATE (CADR (CADDR B)) 2)))
     (AND (>= X (- (CAADR B) XSIZE)) (<= X (+ (CAADR B) XSIZE))
          (>= Y (- (CADADR B) YSIZE)) (<= Y (+ (CADADR B) YSIZE)))))
 
@@ -1692,9 +1695,9 @@
     (IF (NULL ITEMNAME)
         (PROGN
           (SETQ XSIZE (SEVENTH M))
-          (SETQ YSIZE (/ (- (EIGHTH M) (CADDR (NTH 10 M))) 2))
-          (SETQ XOFF (/ XSIZE 2))
-          (SETQ YOFF (+ (CADDR (NTH 10 M)) (/ YSIZE 2))))
+          (SETQ YSIZE (TRUNCATE (- (EIGHTH M) (CADDR (NTH 10 M))) 2))
+          (SETQ XOFF (TRUNCATE XSIZE 2))
+          (SETQ YOFF (+ (CADDR (NTH 10 M)) (TRUNCATE YSIZE 2))))
         (WHEN (SETQ B (ASSOC ITEMNAME (CADDDR (NTH 10 M))))
           (WHEN (CADDR B)
             (SETQ XSIZE (CAADDR B))
@@ -1705,14 +1708,14 @@
         (LIST (+ (+ (IF (CADDR M) (FIFTH M) 0) XOFF)
                  (CASE PLACE
                    ((CENTER TOP BOTTOM) 0)
-                   (LEFT (- (/ XSIZE 2)))
-                   (RIGHT (/ XSIZE 2))
+                   (LEFT (- (TRUNCATE XSIZE 2)))
+                   (RIGHT (TRUNCATE XSIZE 2))
                    (T 0)))
               (+ (+ (IF (CADDR M) (SIXTH M) 0) YOFF)
                  (CASE PLACE
                    ((CENTER RIGHT LEFT) 0)
-                   (BOTTOM (- (/ YSIZE 2)))
-                   (TOP (/ YSIZE 2))
+                   (BOTTOM (- (TRUNCATE YSIZE 2)))
+                   (TOP (TRUNCATE YSIZE 2))
                    (T 0)))))))
 
 
@@ -1754,7 +1757,8 @@
     (XFLUSH *WINDOW-DISPLAY*)
     (WINDOW-WAIT-EXPOSURE MW)
     (MENU-CLEAR M)
-    (SETQ XZERO (+ (IF (CADDR M) (FIFTH M) 0) (/ (SEVENTH M) 2)))
+    (SETQ XZERO
+          (+ (IF (CADDR M) (FIFTH M) 0) (TRUNCATE (SEVENTH M) 2)))
     (SETQ YZERO (IF (CADDR M) (SIXTH M) 0))
     (IF (NTH 10 M) (WINDOW-SET-COLOR MW (NTH 10 M)))
     (IF (NTH 14 M)
@@ -1786,7 +1790,8 @@
   (LET (MW XZERO YZERO VAL)
     (SETQ MW (OR (CADR M) (BARMENU-INIT M)))
     (IF (NOT (TENTH M)) (BARMENU-DRAW M))
-    (SETQ XZERO (+ (IF (CADDR M) (FIFTH M) 0) (/ (SEVENTH M) 2)))
+    (SETQ XZERO
+          (+ (IF (CADDR M) (FIFTH M) 0) (TRUNCATE (SEVENTH M) 2)))
     (SETQ YZERO (IF (CADDR M) (SIXTH M) 0))
     (WHEN (WINDOW-TRACK-MOUSE-IN-REGION MW (IF (CADDR M) (FIFTH M) 0)
               YZERO (SEVENTH M) (EIGHTH M) T T)
@@ -1823,7 +1828,8 @@
                       *GC-VALUES*)
                   (XGCVALUES-BACKGROUND *GC-VALUES*))))
           (IF (NTH 10 M) (WINDOW-SET-COLOR MW (NTH 10 M))))
-      (SETQ XZERO (+ (IF (CADDR M) (FIFTH M) 0) (/ (SEVENTH M) 2)))
+      (SETQ XZERO
+            (+ (IF (CADDR M) (FIFTH M) 0) (TRUNCATE (SEVENTH M) 2)))
       (SETQ YZERO (IF (CADDR M) (SIXTH M) 0))
       (IF (NTH 14 M)
           (LET ((QQWHEIGHT (CADDDR (CADR M))))
@@ -1933,7 +1939,7 @@
         (LET ((SSTR (STRINGIFY (NTH 10 M))))
           (XDRAWIMAGESTRING *WINDOW-DISPLAY* (CADR MW) (CADDR MW)
               (+ 10 XZERO)
-              (+ 8 (- (CADDDR MW) (+ YZERO (/ (EIGHTH M) 2))))
+              (+ 8 (- (CADDDR MW) (+ YZERO (TRUNCATE (EIGHTH M) 2))))
               (GET-C-STRING SSTR) (LENGTH SSTR))))
     (IF (NTH 13 M)
         (WINDOW-DRAW-BOX-XY MW XZERO YZERO (SEVENTH M) (EIGHTH M) 1))
@@ -1962,7 +1968,7 @@
     (WHEN (PLUSP CODEVAL)
       (TEXTMENU-DRAW M)
       (WINDOW-INPUT-STRING MW (NTH 10 M) (+ 10 XZERO)
-          (+ -8 (+ YZERO (/ (EIGHTH M) 2))) (+ -12 (SEVENTH M))))))
+          (+ -8 (+ YZERO (TRUNCATE (EIGHTH M) 2))) (+ -12 (SEVENTH M))))))
 
 (DEFUN TEXTMENU-SET-TEXT (M &OPTIONAL S) (SETF (NTH 10 M) (OR S "")))
 
@@ -2286,8 +2292,7 @@
     RES))
 
 (DEFUN WINDOW-PROCESS-CHAR-EVENT (W TYPE FN ARGS)
-  (LET (CODE EVENTWINDOW)
-    (declare (ignore eventwindow))
+  (LET (CODE)
     (IF (EQL TYPE KEYRELEASE)
         (PROGN
           (SETQ CODE (XBUTTONEVENT-BUTTON *WINDOW-EVENT*))
@@ -2494,7 +2499,7 @@
                   (XTEXTWIDTH (SEVENTH W) (GET-C-STRING SSTR)
                               (LENGTH SSTR)))
                 (NTH 15 M))))
-    (LET ((GLVAR24026 (WINDOW-STRING-HEIGHT W "Tg")))
+    (LET ((GLVAR73902 (WINDOW-STRING-HEIGHT W "Tg")))
       (XCLEARAREA *WINDOW-DISPLAY* (CADR W)
           (+ (IF (CADDR M) (FIFTH M) 0) XW)
           (- (CADDDR W)
@@ -2514,13 +2519,13 @@
                                    *DESCENT-RETURN* *OVERALL-RETURN*)
                                (LIST (INT-POS *ASCENT-RETURN* 0)
                                      (INT-POS *DESCENT-RETURN* 0)))))
-                    GLVAR24026)))
+                    GLVAR73902)))
           (IF ONEP
               (LET ((SSTR (STRINGIFY "W")))
                 (XTEXTWIDTH (SEVENTH W) (GET-C-STRING SSTR)
                     (LENGTH SSTR)))
               (- (SEVENTH M) XW))
-          GLVAR24026 0))
+          GLVAR73902 0))
     (XFLUSH *WINDOW-DISPLAY*)))
 
 (DEFUN EDITMENU-LINE-Y (M LINE)
@@ -2823,7 +2828,3 @@
             ((EQL CODE XK_RETURN) #\Return)
             ((EQL CODE XK_TAB) #\Tab)
             ((EQL CODE XK_BACKSPACE) #\Backspace)))))
-
-
-
-
