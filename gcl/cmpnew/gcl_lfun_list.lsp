@@ -9,7 +9,6 @@
 (dolist (l '((((stream) string) . get-output-stream-string)
 	     (((symbol) string) . symbol-name)
 	     (((string) symbol) . make-symbol)
-	     (((*) symbol) . gensym)
 	     (((t *) nil) . error)
 	     (((*) string) . si::string-concatenate)))
   (proclaim `(ftype (function ,@(car l)) ,(cdr l))))
@@ -18,7 +17,7 @@
 
 ;(DEFSYSFUN 'symbol-name "Lsymbol_name" '(T) 'string NIL NIL) 
 (DEFSYSFUN 'si::sputprop "sputprop" '(T T T) 'T NIL NIL) 
-;(DEFSYSFUN 'GENSYM "Lgensym" '(*) 'T NIL NIL) 
+;(DEFSYSFUN 'GENSYM "Lgensym" '(*) 'SYMBOL NIL NIL) 
 (DEFSYSFUN 'SUBSEQ "Lsubseq" '(T T *) 'T NIL NIL) 
 (DEFSYSFUN 'MINUSP "Lminusp" '(T) 'T NIL T) 
 (DEFSYSFUN 'INTEGER-DECODE-FLOAT "Linteger_decode_float" '(T)

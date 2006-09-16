@@ -1393,5 +1393,12 @@ TRUNCATE_USE_C
       (get 'gethash 'inline-unsafe))
 
 
-;;si::HASH-SET
-(push '((t t t) t #.(flags set) "(sethash(#0,#1,#2),#2)") (get 'si::hash-set 'inline-unsafe))
+;;si::GENSYM0
+(push '(nil symbol #.(flags ans set rfa) "fSgensym0()") (get 'si::gensym0 'inline-always))
+
+;;si::GENSYM1S
+(push '((string) symbol #.(flags ans set rfa) "fSgensym1s(#0)") (get 'si::gensym1s 'inline-always))
+
+;;si::GENSYM1IG
+(push '((t) symbol #.(flags ans set rfa) "fSgensym1ig(#0)") (get 'si::gensym1ig 'inline-always))
+

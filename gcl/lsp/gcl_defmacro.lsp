@@ -79,6 +79,11 @@
 
 
 
+(defun gensym (&optional (x nil xp))
+  (cond ((not xp) (gensym0))
+	((stringp x) (gensym1s x))
+	((gensym1ig x))))
+			 
 (defun si:defmacro* (name vl body
                           &aux *dl* (*key-check* nil)
                                (*arg-check* nil)

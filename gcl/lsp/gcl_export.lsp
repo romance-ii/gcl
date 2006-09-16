@@ -300,4 +300,6 @@ int
 float
 double
 
+gensym
+
 ))

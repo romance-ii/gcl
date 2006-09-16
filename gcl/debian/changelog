@@ -5,8 +5,9 @@ gclcvs (2.7.0-61) unstable; urgency=low
     instead of awk;si::stat function;fix 'the boolean type coersion
     error;no varargs on cygwin;while eval macro;gensym counter
     fixes;xgcl updates
+  * fastlink gensym
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 15 Sep 2006 13:59:21 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sat, 16 Sep 2006 00:50:35 -0400
 
 gclcvs (2.7.0-60) unstable; urgency=low
 

@@ -309,6 +309,13 @@
 (si::putprop 'gcd 'binary-nest 'si::compiler-macro-prop)
 (si::putprop 'lcm 'binary-nest 'si::compiler-macro-prop)
 
+(defun gensym-expander (form env)
+  (declare (ignore env))
+  `(cond ((not ,(cadr form)) (si::gensym0))
+	 ((stringp ,(cadr form)) (si::gensym1s ,(cadr form)))
+	 ((si::gensym1ig ,(cadr form)))))
+(si::putprop 'gensym 'gensym-expander 'si::compiler-macro-prop)
+
 (defun multiple-value-bind-expander (form env)
   (declare (ignore env))
   (if (and (consp (caddr form)) (eq (caaddr form) 'values))

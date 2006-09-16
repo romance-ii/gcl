@@ -442,4 +442,3 @@
 (defun cmp-vec-length (x)
   (declare (vector x))
   (if (array-has-fill-pointer-p x) (fill-pointer x) (array-dimension x 0)))
-

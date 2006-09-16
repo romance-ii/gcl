@@ -484,27 +484,15 @@ DEFUN_NEW("MAKE-SYMBOL",object,fLmake_symbol,LISP,1,1,NONE,OO,OO,OO,OO,(object n
 
 DEFVAR("*GENSYM-COUNTER*",sLgensym_counter,LISP,make_fixnum(0),"");
 
-DEFUN_NEW("GENSYM",object,fLgensym,LISP,0,1,NONE,OO,OO,OO,OO,(object x),"") {
+static object
+gensym_int(object this_gensym_prefix,object this_gensym_counter) {
 
   int i, j, sign, size;
   fixnum f;
   char *q=NULL,*p=NULL;
-  object this_gensym_prefix,big;
-  object this_gensym_counter,sym;
+  object big;
+  object sym;
 
-  if (VFUN_NARGS!=1)
-    x=gensym_prefix;
-
-  if (type_of(x) == t_string) {
-    this_gensym_prefix = x;
-    this_gensym_counter=sLgensym_counter->s.s_dbind;
-    sLgensym_counter->s.s_dbind=number_plus(sLgensym_counter->s.s_dbind,small_fixnum(1));
-  } else {
-    check_type_non_negative_integer(&x);
-    this_gensym_counter=x;
-    this_gensym_prefix=gensym_prefix;
-  }
-    
   switch (type_of(this_gensym_counter)) {
   case t_bignum:
     big=this_gensym_counter;
@@ -530,16 +518,16 @@ DEFUN_NEW("GENSYM",object,fLgensym,LISP,0,1,NONE,OO,OO,OO,OO,(object x),"") {
     break;
   }
   
-  i = (q-p)+this_gensym_prefix->st.st_fillp;
+  i = (q-p)+(this_gensym_prefix==OBJNULL ? 1 : this_gensym_prefix->st.st_fillp);
   set_up_string_register("");
   sym = make_symbol(string_register);
   {
     BEGIN_NO_INTERRUPT;	
     sym->s.s_fillp = i;
     sym->s.s_self = alloc_relblock(i);
-    i=this_gensym_prefix->st.st_fillp;
+    i=this_gensym_prefix==OBJNULL ? 1 : this_gensym_prefix->st.st_fillp;
     for (j = 0;  j < i;  j++)
-      sym->s.s_self[j] = this_gensym_prefix->st.st_self[j];
+      sym->s.s_self[j] = this_gensym_prefix==OBJNULL ? 'G' : this_gensym_prefix->st.st_self[j];
     for (;j<sym->s.s_fillp;j++)
       sym->s.s_self[j] = p[j-i];
     END_NO_INTERRUPT;
@@ -549,65 +537,32 @@ DEFUN_NEW("GENSYM",object,fLgensym,LISP,0,1,NONE,OO,OO,OO,OO,(object x),"") {
 
 }
 
-	
+DEFUN_NEW("GENSYM0",object,fSgensym0,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
 
-/* @(defun gensym (&optional (x gensym_prefix) &aux sym) */
-/* 	int i, j, sign, size; */
-/*         fixnum f; */
-/*         char *q=NULL,*p=NULL; */
-/*         object this_gensym_prefix,big; */
-/*         object this_gensym_counter; */
-/* @ */
+  object x;
 
-/*   if (type_of(x) == t_string) { */
-/*     this_gensym_prefix = x; */
-/*     this_gensym_counter=sLgensym_counter->s.s_dbind; */
-/*     sLgensym_counter->s.s_dbind=number_plus(sLgensym_counter->s.s_dbind,small_fixnum(1)); */
-/*   } else { */
-/*     check_type_non_negative_integer(&x); */
-/*     this_gensym_counter=x; */
-/*     this_gensym_prefix=gensym_prefix; */
-/*   } */
-    
-/*         switch (type_of(this_gensym_counter)) { */
-/* 	case t_bignum: */
-/* 	  big=this_gensym_counter; */
-/* 	  sign=BIG_SIGN(big); */
-/* 	  size = mpz_sizeinbase(MP(big),10)+2+(sign<0? 1 : 0); */
-/* 	  if (!(p=ZALLOCA(size))) */
-/* 	    FEerror("Cannot alloca gensym name", 0); */
-/* 	  mpz_get_strp(&p,10,MP(big)); */
-/* 	  j=size-5; */
-/* 	  j=j<0 ? 0 : j; */
-/* 	  while (p[j]) j++; */
-/* 	  q=p+j; */
-/* 	  break; */
-/* 	case t_fixnum: */
-/* 	  for (size=1,f=fix(this_gensym_counter);f;f/=10,size++); */
-/* 	  q=p=ZALLOCA(size+5); */
-/* 	  if ((j=snprintf(p,size+5,"%d",(int)fix(this_gensym_counter)))<=0) */
-/* 	    FEerror("Cannot write gensym counter",0); */
-/* 	  q=p+j; */
-/* 	  break; */
-/* 	default: */
-/* 	  FEerror("Bad gensym counter type", 0); */
-/* 	  break; */
-/* 	} */
+  x=sLgensym_counter->s.s_dbind;
+  sLgensym_counter->s.s_dbind=number_plus(sLgensym_counter->s.s_dbind,small_fixnum(1));
+  RETURN1(gensym_int(OBJNULL,x));
 
-/* 	i = (q-p)+this_gensym_prefix->st.st_fillp; */
-/* 	set_up_string_register(""); */
-/* 	sym = make_symbol(string_register); */
-/* 	{BEGIN_NO_INTERRUPT;	 */
-/* 	sym->s.s_fillp = i; */
-/* 	sym->s.s_self = alloc_relblock(i); */
-/* 	i=this_gensym_prefix->st.st_fillp; */
-/* 	for (j = 0;  j < i;  j++) */
-/* 		sym->s.s_self[j] = this_gensym_prefix->st.st_self[j]; */
-/* 	for (;j<sym->s.s_fillp;j++) */
-/*                sym->s.s_self[j] = p[j-i]; */
-/* 	END_NO_INTERRUPT;}	 */
-/* 	@(return sym) */
-/* @) */
+}
+
+DEFUN_NEW("GENSYM1S",object,fSgensym1s,SI,1,1,NONE,OO,OO,OO,OO,(object g),"") {
+
+  object x;
+
+  x=sLgensym_counter->s.s_dbind;
+  sLgensym_counter->s.s_dbind=number_plus(sLgensym_counter->s.s_dbind,small_fixnum(1));
+  RETURN1(gensym_int(g,x));
+
+}
+
+DEFUN_NEW("GENSYM1IG",object,fSgensym1ig,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+
+  check_type_non_negative_integer(&x);
+  RETURN1(gensym_int(NULL,x));
+
+}
 
 @(defun gentemp (&optional (prefix gentemp_prefix)
 			   (pack `current_package()`)
@@ -735,7 +690,7 @@ void
 gcl_init_symbol()
 {
 	string_register = alloc_simple_string(0);
-	gensym_prefix = make_simple_string("G");
+/* 	gensym_prefix = make_simple_string("G"); */
 /* 	gensym_counter = 0; */
 	gentemp_prefix = make_simple_string("T");
 	gentemp_counter = 0;
@@ -746,7 +701,7 @@ gcl_init_symbol()
 	token->st.st_adjustable = TRUE;
 
 	enter_mark_origin(&string_register);
-	enter_mark_origin(&gensym_prefix);
+/* 	enter_mark_origin(&gensym_prefix); */
 	enter_mark_origin(&gentemp_prefix);
 	enter_mark_origin(&token);
 }
