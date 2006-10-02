@@ -101,7 +101,8 @@
 	  ((and (consp tp) (eq (car tp) 'returns-exactly))
 	   (let ((syms (mapcar (lambda (x) (declare (ignore x)) (gensym)) (cdr tp))))
 	     (c1expr `(multiple-value-bind (,@syms) ,(car args) ,@(cdr args) (values ,@syms)))))
-	  ((setq args (c1args (cdr args) info))
+	  (t 
+	   (setq args (c1args (cdr args) info))
 	   (setf (info-type info) (info-type (cadr form)))
 	   (list 'multiple-value-prog1 info form args)))))
 
