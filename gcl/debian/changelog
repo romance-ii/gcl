@@ -1,8 +1,9 @@
 gclcvs (2.7.0-62) unstable; urgency=low
 
   * fix c1mvprog1 bug
+  * fix compiled cond tests
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  2 Oct 2006 10:51:05 -0400
+ -- Camm Maguire <camm@enhanced.com>  Tue,  3 Oct 2006 14:57:55 -0400
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

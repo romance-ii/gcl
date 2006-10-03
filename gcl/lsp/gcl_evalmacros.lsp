@@ -132,7 +132,7 @@
     (dolist (l x form)
       (cond ((endp (cdr l))
 	     (if (or (constantp (car l)) (eq l (car x)))
-		 (setq form (car l))
+		 (setq form `(values ,(car l)))
 	       (let ((sym (gensym)))
 		 (setq form `(let ((,sym ,(car l))) (if ,sym ,sym ,form))))))
 	    ((and (constantp (car l)) (car l))
