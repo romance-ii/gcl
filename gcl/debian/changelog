@@ -3,8 +3,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * fix c1mvprog1 bug
   * fix compiled cond tests
   * fix expt-propagator
+  * Fix various setf tests
 
- -- Camm Maguire <camm@enhanced.com>  Wed,  4 Oct 2006 13:48:08 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed,  4 Oct 2006 17:16:48 -0400
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

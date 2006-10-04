@@ -515,7 +515,7 @@
 
 (defun make-class-predicate-name (name)
   (intern (format nil "~A::~A class predicate"
-		  (package-name (symbol-package name))
+		  (package-name (or (symbol-package name) *package*))
 		  name)
 	  *the-pcl-package*))
 

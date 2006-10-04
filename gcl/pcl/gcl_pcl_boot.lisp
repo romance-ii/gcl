@@ -2075,7 +2075,7 @@ work during bootstrapping.
 	       (caddr entry)
 	       form))
 	  ((not (listp form)) form)
-	  ((member (car form) '(setq setf))
+	  ((member (car form) '(setq setf psetf));FIXME -- other setf forms?  or real symbol-macrolet
 	   ;; Have to be careful.  We must only convert the form to a SETF
 	   ;; form when we convert one of the 'logical' variables to a form
 	   ;; Otherwise we will get looping in implementations where setf
@@ -2090,7 +2090,7 @@ work during bootstrapping.
 				       (eq (cadr entry)
 					   (variable-lexical-p (car tail)
 							       env)))
-				  (progn (setq kind 'setf)
+				  (progn (setq kind (if (eq kind 'psetf) kind 'setf))
 					 (caddr entry))
 				  (car tail))
 			      (cadr tail)

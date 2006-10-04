@@ -705,6 +705,7 @@ needs_escape (object x) {
   for (i=0;i<x->s.s_fillp;i++) 
     switch(x->s.s_self[i]) {
     case ' ':
+    case '#':
     case '(':
     case ')':
     case ':':
