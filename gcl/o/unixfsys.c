@@ -35,6 +35,10 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #ifdef __MINGW32__
 #  include <windows.h>        
+/* Windows has no symlink, therefore no lstat.  Without symlinks lstat
+   is equivalent to stat anyway.  */
+#  define S_ISLNK(a) 0
+#  define lstat stat
 #endif
 
 #ifdef BSD
