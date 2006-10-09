@@ -484,14 +484,21 @@
     (error "~S not a symbol" sym))
   (or
    (setf-function-proxy-symbol sym)
-   (let ((new (intern (symbol-name (gensym (concatenate 'string (symbol-name sym) "-SETF"))) (symbol-package sym)));FIXME not necessary
-	 (prop (get sym 'setf-proclamations)))
+   (let ((new (gensym (concatenate 'string (symbol-name sym) "-SETF")))
+	 (prop (get sym 'setf-proclamations))
+	 (cmpm (get sym 'si::compiler-macro-prop-setf)))
+     (let ((p (or (symbol-package sym)
+		  (unless *tmp-pack*
+		    (setq *tmp-pack* (make-package (symbol-name (gensym))))))))
+       (import new p))
      (push (cons sym new) *setf-function-proxy-symbols*)
      (when prop
        (dolist (l '(proclaimed-arg-types proclaimed-return-type proclaimed-function))
 	 (let ((prop (assoc l prop)))
 	   (when prop
 	     (si::putprop new (cdr prop) l)))))
+     (when cmpm
+       (si::putprop new cmpm 'si::compiler-macro-prop))
      new)))
 
 (defun function-symbol (name)
@@ -535,9 +542,9 @@
 		  ,@(ndbctxt (portable-source (if (stringp (caddr form)) (cdddr form) (cddr form)) t))))
 	       ((quote function) form)
 	       (declare 
-		(let ((opts (mapcan 'cdr 
+		(let ((opts (mapcan (lambda (x) (if (eq (car x) 'optimize) (cdr x) (list x)))
 				    (remove-if-not
-				     (lambda (x) (and (consp x) (eq (car x) 'optimize)))
+				     (lambda (x) (and (consp x) (member (car x) '(optimize notinline))))
 				     (cdr form)))))
 		  (when opts (local-compile-decls opts)))
 		form)
@@ -557,7 +564,8 @@
 	       ((case ccase ecase) `(,(car form) ,(portable-source (cadr form))
 				     ,@(mapcar (lambda (x) `(,(car x) ,@(portable-source (cdr x) t))) (cddr form))))))
 	((let* ((fd (and (symbolp (car form)) (not (member (car form) *mlts*))
-			 (or (get (car form) 'si::compiler-macro-prop) (macro-function (car form)))))
+			 (or (unless (member (car form) *notinline*) (get (car form) 'si::compiler-macro-prop))
+			     (macro-function (car form)))))
 		(nf (if fd (cmp-expand-macro fd (car form) (cdr form)) form)))
 	   (portable-source nf (equal form nf))))))
 

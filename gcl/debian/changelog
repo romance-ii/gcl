@@ -5,8 +5,13 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * fix expt-propagator
   * Fix various setf tests
   * fix lstat for mingw
+  * intern gensyms in tmp-pack in compile;redirect setf funcalls to
+    proxy symbol;do not expand compiler macros when declared
+    notinline;setf compiler macros;function-lambda-expression for (some)
+    compiled functions;placeholeder define-symbol-macro;named block for
+    setf functions;fix macro-function tests;in-package is a macro
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  5 Oct 2006 13:29:56 -0400
+ -- Camm Maguire <camm@enhanced.com>  Mon,  9 Oct 2006 19:21:41 -0400
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

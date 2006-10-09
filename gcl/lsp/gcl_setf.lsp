@@ -65,7 +65,7 @@
 	 (unless (= (list-length (cadr rest)) 1)
 		 (error "(store-variable) expected."))
          `(eval-when (compile eval load)
-	         (si:putprop ',access-fn ',rest 'setf-lambda)
+	         (si:putprop ',access-fn '(,(car rest) ,(cadr rest) (block ,access-fn ,@(cddr rest))) 'setf-lambda)
                  (remprop ',access-fn 'setf-update-fn)
                  (remprop ',access-fn 'setf-method)
                  (si:putprop ',access-fn
@@ -213,7 +213,7 @@
 (defsetf elt si:elt-set)
 (defsetf symbol-value set)
 (defsetf symbol-function si::fset)
-(defsetf macro-function (s) (v) `(progn (si:fset ,s (cons 'macro ,v)) ,v))
+(defsetf macro-function (s &optional env) (v) `(progn (si:fset ,s (cons 'macro ,v)) ,v))
 (defsetf aref si:aset)
 (defsetf get put-aux)
 (defmacro put-aux (a b &rest l)

@@ -108,6 +108,7 @@ void old(void) \
 #define make_function(a_,b_) make_function_internal(a_,FFN(b_))
 #define make_si_function(a_,b_) make_si_function_internal(a_,FFN(b_))
 #define make_special_form(a_,b_) make_special_form_internal(a_,FFN(b_))
+#define make_macro_function(a_,b_) make_macro_internal(a_,FFN(b_))
 #define make_si_sfun(a_,b_,c_) make_si_sfun_internal(a_,FFN(b_),c_)
 #define STATD static
 #else
@@ -117,6 +118,7 @@ void old(void) \
 #define make_function(a_,b_) make_function_internal(a_,b_)
 #define make_si_function(a_,b_) make_si_function_internal(a_,b_)
 #define make_special_form(a_,b_) make_special_form_internal(a_,b_)
+#define make_macro_function(a_,b_) make_macro_internal(a_,b_)
 #define make_si_sfun(a_,b_,c_) make_si_sfun_internal(a_,b_,c_)
 #define STATD
 #endif

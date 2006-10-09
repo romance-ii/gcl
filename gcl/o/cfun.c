@@ -321,6 +321,16 @@ make_special_form_internal(char *s, void (*f)())
 	return(x);
 }
 
+object
+make_macro_internal(char *s, void (*f)())
+{
+	object x;
+	x = make_ordinary(s);
+	x->s.s_gfdef = make_cfun(f, x, Cnil, NULL, 0);
+	x->s.s_mflag=TRUE;
+	return(x);
+}
+
 DEFUN_NEW("COMPILED-FUNCTION-NAME",object,fScompiled_function_name,SI
    ,1,1,NONE,OO,OO,OO,OO,(object fun),"")
 

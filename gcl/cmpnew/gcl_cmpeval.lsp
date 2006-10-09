@@ -94,10 +94,15 @@
 	     `(load-time-value (si::nani ,(si::address x))))))
 	((consp form)
 	 (cons (wrap-literals (car form)) (wrap-literals (cdr form))))
-	((or (symbolp form) (rationalp form) (characterp form))
+	((symbolp form)
+	 (unless (symbol-package form)
+	   (unless *tmp-pack*
+	     (setq *tmp-pack* (make-package (symbol-name (gensym)))))
+	   (import form *tmp-pack*))
+	 form)
+	((or (rationalp form) (characterp form))
 	 form)
 	(`(load-time-value (si::nani ,(si::address form))))))
-
 
 (defun c1load-time-value (arg)
   (c1constant-value
@@ -329,13 +334,15 @@
 (si::putprop 'multiple-value-bind 'multiple-value-bind-expander 'si::compiler-macro-prop)
 
 ;FIXME apply-expander
-(defun funcall-expander (form env);FIXME inlinable-fn?
+(defun funcall-expander (form env &aux x);FIXME inlinable-fn?
   (declare (ignore env))
   (cond ((and (consp (cadr form)) (eq (caadr form) 'lambda)) (cdr form))
 	((and (consp (cadr form)) (eq (caadr form) 'function)
-	      (or (symbolp (cadadr form))
-		  (and (consp (cadadr form)) (eq (car (cadadr form)) 'lambda))))
-	 `(,(cadadr form) ,@(cddr form)))
+	      (setq x (cadadr form))
+	      (setq x (if (is-setf-function x) (make-setf-function-proxy-symbol (cadr x)) x))
+	      (or (symbolp x)
+		  (and (consp x) (eq (car x) 'lambda))))
+	 `(,x ,@(cddr form)))
 	((constantp (cadr form)) `(,(cmp-eval (cadr form)) ,@(cddr form)))
 	(form)))
 (si::putprop 'funcall 'funcall-expander 'si::compiler-macro-prop)
@@ -1188,6 +1195,7 @@
 	  (c1expr `(quote ,(cmp-eval `(,fname ,@args)))))
 	 ((let ((fn (get fname 'si::compiler-macro-prop)) (res (cons fname args)))
 	    (and fn
+		 (not (member fname *notinline*))
 		 (let ((fd (cmp-eval `(funcall ',fn ',res nil))))
 		   (and (not (eq res fd))
 			(c1expr fd))))))
@@ -1597,16 +1605,25 @@
 
 (defmacro si::define-compiler-macro (name vl &rest body)
   (declare (optimize (safety 1)))
-  `(progn (si:putprop ',name
-                      (caddr (si:defmacro* ',name ',vl ',body))
-                      'si::compiler-macro-prop)
-          ',name))  
+  (if (is-setf-function name)
+      `(progn (si::putprop ',(cadr name)
+			   (caddr (si:defmacro* ',(cadr name) ',vl ',body))
+			   'si::compiler-macro-prop-setf)
+	      ',name)
+    `(progn (si:putprop ',name
+			(caddr (si:defmacro* ',name ',vl ',body))
+			'si::compiler-macro-prop)
+	    ',name)))
 
 (defun si::compiler-macro-function (name)
-  (get name 'si::compiler-macro-prop))  
+  (if (is-setf-function name)
+      (get (cadr name) 'si::compiler-macro-prop-setf)
+    (get name 'si::compiler-macro-prop)))
 
 (defun si::undef-compiler-macro (name)
-  (remprop name 'si::compiler-macro-prop))
+  (if (is-setf-function name)
+      (remprop (cadr name) 'si::compiler-macro-prop-setf)
+    (remprop name 'si::compiler-macro-prop)))
 
 (defvar *compiler-temps*
         '(tmp0 tmp1 tmp2 tmp3 tmp4 tmp5 tmp6 tmp7 tmp8 tmp9))

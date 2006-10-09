@@ -56,6 +56,7 @@
   (setq *function-declarations* nil)
   (setq *inline-functions* nil)
   (setq *inline-blocks* 0)
+  (setq *tmp-pack* nil)
   (setq *notinline* nil))
 
 (defvar *sigs* (make-hash-table :test 'eq))
@@ -64,6 +65,7 @@
 (defvar *next-cmacro* 0)
 (defvar *next-vv* -1)
 (defvar *next-cfun* 0)
+(defvar *tmp-pack* nil)
 
 ;;; *next-cvar* holds the last cvar number used.
 ;;; *next-cmacro* holds the last cmacro number used.

@@ -201,16 +201,41 @@ LFD(Lboundp)(void)
 		vs_base[0] = Ct;
 }
 
-LFD(Lmacro_function)(void)
-{
-	if (vs_top-vs_base<1 || vs_top-vs_base>2)
-	  check_arg_failed(1);
-	if (type_of(vs_base[0]) != t_symbol)
-		not_a_symbol(vs_base[0]);
-	if (vs_base[0]->s.s_gfdef != OBJNULL && vs_base[0]->s.s_mflag)
-		vs_base[0] = vs_base[0]->s.s_gfdef;
-	else
-		vs_base[0] = Cnil;
+LFD(Lmacro_function)(void) {
+
+  object envir;
+  object *lex=lex_env;
+  object buf[3];
+  int n;
+
+  n=vs_top-vs_base;
+
+  if (n== 1) {
+    buf[0]=sLnil;
+    buf[1]=sLnil;
+    buf[2]=sLnil;
+  } else if (n==2) {
+    envir=vs_base[1];
+    buf[0]=car(envir);
+    envir=Mcdr(envir);
+    buf[1]=car(envir);
+    envir=Mcdr(envir);
+    buf[2]=car(envir);
+  }
+  else {
+    VFUN_NARGS=n;
+    check_arg_range(1,2);
+  }
+
+  lex_env = buf;
+  
+  if (type_of(vs_base[0]) != t_symbol)
+    not_a_symbol(vs_base[0]);
+
+  vs_base[0]=macro_def_int(vs_base[0]);
+  vs_top=vs_base+1;
+  lex_env = lex;
+
 }
 
 LFD(Lspecial_form_p)(void)

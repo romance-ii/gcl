@@ -122,6 +122,7 @@ struct key {short n,allow_other_keys;
 /* cfun.c:221:OF */ extern object fSmf (object name, object addr); /* (name, addr) object name; object addr; */
 /* cfun.c:269:OF */ extern object fSmm (object name, object addr); /* (name, addr) object name; object addr; */
 /* cfun.c:283:OF */ extern object make_function_internal (char *s, void(*f)()); /* (s, f) char *s; int (*f)(); */
+/* cfun.c:283:OF */ extern object make_macro_internal (char *s, void(*f)()); /* (s, f) char *s; int (*f)(); */
 /* cfun.c:299:OF */ extern object make_si_sfun_internal (char *s, object (*f)(), int argd); /* (s, f, argd) char *s; int (*f)(); int argd; */
 /* cfun.c:322:OF */ extern object make_si_function_internal (char *s, void (*f) ()); /* (s, f) char *s; int (*f)(); */
 /* cfun.c:341:OF */ extern object make_special_form_internal (char *s, void (*f)()); /* (s, f) char *s; int (*f)(); */
@@ -1844,5 +1845,8 @@ interactive_stream_p(object);
 
 void
 reinit_gmp(void);
+
+object
+macro_def_int(object);
 
 /* void call_after_gbc_hook(int); */

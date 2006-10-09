@@ -1,4 +1,9 @@
 ;; -*-Lisp-*-
+
+(in-package 'lisp)
+
+(export '(function-lambda-expression))
+
 (in-package 'si)
 
 (*make-special '*pahl*)
@@ -7,8 +12,6 @@
 (eval-when (load eval)
 	   (setq *pahl* nil)
 	   (setq *boot* nil))
-
-(export '(function-lambda-expression))
 
 (defun add-hash (fn sig callees src file)
   (cond ((not (eq *boot* t))
@@ -190,17 +193,18 @@
   `(lambda ,ll ,@doc ,@decls (block ,block ,@rest))))
        
 
-(defun function-lambda-expression (x) 
-  (if (typep x 'interpreted-function) 
-      (let* ((x (si::interpreted-function-lambda x)))
-	(case (car x)
-	      (lambda (values x nil nil))
-	      (lambda-block (values (block-lambda (caddr x) (cadr x) (cdddr x)) nil (cadr x)))
-	      (lambda-closure (values (cons 'lambda (cddr (cddr x)))  (not (not (cadr x)))  nil))
-	      (lambda-block-closure (values (block-lambda (caddr (cdddr x)) (cadr (cdddr x)) (cddr (cddr (cddr x)))) 
-				     (not (not (cadr x))) (fifth x)))
-	      (otherwise (values nil t nil))))
-    (values nil t nil)))
+(defun function-lambda-expression (y) 
+  (let ((x (typecase y
+	    (interpreted-function (interpreted-function-lambda y))
+	    (compiled-function (function-src (function-name y)))
+	    (otherwise nil))))
+    (case (car x)
+	  (lambda (values x nil (function-name y)))
+	  (lambda-block (values (block-lambda (caddr x) (cadr x) (cdddr x)) nil (cadr x)))
+	  (lambda-closure (values (cons 'lambda (cddr (cddr x)))  (not (not (cadr x)))  (function-name y)))
+	  (lambda-block-closure (values (block-lambda (caddr (cdddr x)) (cadr (cdddr x)) (cddr (cddr (cddr x)))) 
+					(not (not (cadr x))) (fifth x)))
+	  (otherwise (values nil t nil)))))
 
 (defun function-src (sym)
   (or

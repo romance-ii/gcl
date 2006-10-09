@@ -23,7 +23,7 @@
 
 (in-package "LISP")
 
-(export '(defvar defparameter defconstant memq))
+(export '(defvar defparameter defconstant memq define-symbol-macro))
 
 (in-package "SYSTEM")
 
@@ -97,6 +97,8 @@
 
 (defmacro defmacro (name vl &rest body)
   `(si:define-macro ',name (si:defmacro* ',name ',vl ',body)))
+
+(defmacro define-symbol-macro (&rest body) (declare (ignore body)) nil);FIXME placeholder
 
 (defmacro defun (name lambda-list &rest body)
   (multiple-value-bind (doc decl body)

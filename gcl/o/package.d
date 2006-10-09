@@ -602,6 +602,7 @@ object s, p;
 	ip = &P_INTERNAL(p ,j);
 	p->p.p_internal_fp++;
 	*ip = make_cons(s, *ip);
+	if (s->s.s_hpack==Cnil) s->s.s_hpack=p;
 }
 
 static void
@@ -780,57 +781,40 @@ delete_package(object n) {
 #ifdef ANSI_COMMON_LISP
 extern object sKuse;
 extern object sKnicknames;
-static void
-FFN(Fin_package)(object form)
-{
-	object pack,ret,*mark;
+DEF_ORDINARY("IN-PACKAGE-INTERNAL",sSin_package_internal,SI,"");
+DEFUN_NEW("IN-PACKAGE-INTERNAL",object,fSin_package_internal,SI,2,2,NONE,OO,OO,OO,OO,(object p,object r),"") {
 
-	if (endp(form))
-		FEtoo_few_argumentsF(form);
-	vs_base = vs_top;
-	vs_push(MMcar(form));
-	mark = vs_top;
- 
- 	if ((consp(vs_head)) &&
-	    (vs_head->c.c_car == sLquote) &&
-	    (consp(vs_head->c.c_cdr)) &&
-	    (vs_head->c.c_cdr->c.c_cdr = Cnil))
-	    vs_head = vs_head->c.c_cdr->c.c_car;
-	if ((type_of(vs_head) == t_character) ||
-	    (type_of(vs_head) == t_symbol))
-	    vs_head = coerce_to_string(vs_head);
-	if (type_of(vs_head) != t_string)
-	    FEerror("Wrong thing in-package ~S.",1,vs_head);
+  object use=Cnil,nick=Cnil;
 
-	pack=vs_head;
+  if ((type_of(p) == t_character) ||
+      (type_of(p) == t_symbol))
+    p = coerce_to_string(p);
+  if (type_of(p) != t_string)
+    FEerror("Wrong thing in-package ~S.",1,p);
+  
+  /*fixme non-std error check?*/
+  for (;consp(r) && consp(r->c.c_cdr);r=r->c.c_cdr->c.c_cdr) {
+    if (r->c.c_car==sKuse)
+      use=Ieval(r->c.c_cdr->c.c_car);
+    if (r->c.c_car==sKnicknames)
+      nick=Ieval(r->c.c_cdr->c.c_car);
+  }
 
-	if (endp(MMcdr(form)))
-	    ret=in_package(pack, Cnil, Cnil, 0, 0);
-	else {
-	    object use=Cnil;
-	    object nick=Cnil;
-	    object q=Cnil;
-	    object p=form->c.c_cdr;
+  RETURN1(in_package(p,nick,use,0,0));
 
-	    while ((consp(p)) &&
-	    	   ((p->c.c_car == sKuse) || (p->c.c_car == sKnicknames)) &&
-	           (consp(p->c.c_cdr))) {
-		q=p->c.c_cdr->c.c_car;
-		if (q->c.c_car == sLquote)
-		    q = q->c.c_cdr->c.c_car;
-	        if (p->c.c_car == sKuse)
-		    use=q;
-		else
-	        if (p->c.c_car == sKnicknames)
-		    nick=q;
-	        p=p->c.c_cdr->c.c_cdr;
-		q=Cnil;
-	    }
-	    ret=in_package(pack, nick, use, 0, 0);
-        }
-	vs_top = mark;
-	vs_head = ret;
 }
+
+
+static void
+FFN(Fin_package)(void) {
+
+  vs_base[0]=list(3,
+		  sSin_package_internal,
+		  MMcadr(vs_base[0]),
+		  list(2,sLquote,MMcddr(vs_base[0])));
+
+}
+
 #endif
 
 LFD(Lfind_package)()
@@ -1265,7 +1249,7 @@ gcl_init_package_function()
 	make_function("DELETE-PACKAGE", Ldelete_package);
 #ifdef ANSI_COMMON_LISP
 	make_si_function("KCL-IN-PACKAGE", Lin_package);
-	make_special_form("IN-PACKAGE", Fin_package);
+	make_macro_function("IN-PACKAGE", Fin_package);
 #else
 	make_function("IN-PACKAGE", Lin_package);
 #endif

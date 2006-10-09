@@ -434,8 +434,7 @@ Cannot compile ~a.~%"
   (cond ((not(symbolp name)) (error "Must be a name"))
 	((or (si::interpreted-function-p def) (and (consp def) (eq (car def) 'lambda)))
 	 (or name (setf name 'cmp-anon))
-	 (setf (symbol-function name)
-	       def)
+	 (setf (symbol-function name) def)
 	 (compile name))
 	(def (error "def not a lambda expression"))
 	((setq tem (macro-function name))
@@ -463,6 +462,9 @@ Cannot compile ~a.~%"
 	      (setq warnings w failures f))
 	     (unless *keep-gaz* (delete-file gaz)))
 	   (or (eq na name) (setf (symbol-function name) (symbol-function na)))
+	   (when *tmp-pack*
+	     (delete-package *tmp-pack*)
+	     (setq *tmp-pack* nil))
 	   (values (symbol-function name) warnings failures)))
 	(t (error "can't compile ~a" name))))
 

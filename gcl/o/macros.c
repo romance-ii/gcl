@@ -145,26 +145,33 @@ Imacro_expand1(object exp_fun, object form)
 	the expansion function if the form is a macro form.  Otherwise,
 	MACRO_DEF returns NIL.
 */
-static object
-macro_def(object form)
-{
-	object head, fd;
 
-	if (!consp(form))
-		return(Cnil);
-	head = MMcar(form);
-	if (type_of(head) != t_symbol)
-		return(Cnil);
-	fd = lex_fd_sch(head);
-	if (MMnull(fd))
-		if (head->s.s_mflag)
-			return(head->s.s_gfdef);
-		else
-			return(Cnil);
-	else if (MMcadr(fd) == sLmacro)
-		return(MMcaddr(fd));
-	else
-		return(Cnil);
+object
+macro_def_int(object sym) {
+
+  object fd; 
+
+  if (type_of(sym) != t_symbol)
+    return(Cnil);
+  fd = lex_fd_sch(sym);
+  if (MMnull(fd))
+    if (sym->s.s_mflag)
+      return(sym->s.s_gfdef);
+    else
+      return(Cnil);
+  else if (MMcadr(fd) == sLmacro)
+    return(MMcaddr(fd));
+  else
+    return(Cnil);
+}
+
+static object
+macro_def(object form) {
+
+  if (!consp(form))
+    return(Cnil);
+  return macro_def_int(MMcar(form));
+
 }
 
 DEFUNOM_NEW("MACROEXPAND",object,fLmacroexpand,LISP
