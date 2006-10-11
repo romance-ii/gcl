@@ -10,8 +10,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
     notinline;setf compiler macros;function-lambda-expression for (some)
     compiled functions;placeholeder define-symbol-macro;named block for
     setf functions;fix macro-function tests;in-package is a macro
+  * backoff to gcc-3.4 on alpha,arm,hppa, and m68k
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  9 Oct 2006 19:21:41 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed, 11 Oct 2006 10:18:49 -0400
 
 gclcvs (2.7.0-61) unstable; urgency=low
 
