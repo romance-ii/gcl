@@ -2,8 +2,8 @@ Source: gclcvs
 Section: interpreters
 Priority: optional
 Maintainer: Camm Maguire <camm@enhanced.com>
-Build-Depends: debhelper (>= 4.1.16), libreadline5-dev | libreadline-dev, m4, tk8.4-dev, tetex-bin, texinfo, binutils-dev, libgmp3-dev, autotools-dev, common-lisp-controller, libxmu-dev, libxaw7-dev
-Standards-Version: 3.6.2.1
+Build-Depends: debhelper (>= 4.1.16), libreadline5-dev | libreadline-dev, m4, tk8.4-dev, tetex-bin, texinfo, binutils-dev, libgmp3-dev, autotools-dev, common-lisp-controller, libxmu-dev, libxaw7-dev, gcc-3.4 [ alpha arm m68k hppa ]
+Standards-Version: 3.7.2
 
 Package: gclcvs
 Architecture: any
