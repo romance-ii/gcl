@@ -146,46 +146,45 @@
 
  (defvar *system-banner*)
 
- (defun gcl-top-level ()
+ (defun gcl-top-level nil
 
    (set-up-top-level)
    
-   (if (get-command-arg "-compile")
-       (let (;(system::*quit-tag* (cons nil nil))
+   (cond ((get-command-arg "-compile")
+	  (let (;(system::*quit-tag* (cons nil nil))
 					;(system::*quit-tags* nil) (system::*break-level* '())
 					;(system::*break-env* nil) (system::*ihs-base* 1)
 					;(system::*ihs-top* 1) (system::*current-ihs* 1)
-	     (*break-enable* nil) result)
-	 (setq result
-	       (system:error-set
-		'(progn
-		   (compile-file
-		    (get-command-arg "-compile")
-		    :output-file 
-		    (or (get-command-arg "-o")
-			(get-command-arg "-compile"))
-		    :o-file
-		    (cond ((equalp
-			    (get-command-arg "-o-file")
-			    "nil") nil)
-			  ((get-command-arg "-o-file" t))
-			  (t t))
-		    :c-file (get-command-arg "-c-file" t)
-		    :h-file (get-command-arg "-h-file" t)
-		    :data-file (get-command-arg "-data-file" t)
-		    :system-p (get-command-arg "-system-p" t)))))
-	 (bye (if (or (and (find-package "COMPILER") 
-			   (find-symbol "*ERROR-P*" (find-package "COMPILER"))
-			   (symbol-value (find-symbol "*ERROR-P*" (find-package "COMPILER"))))
-		      (equal result '(nil))) 1 0))))
-   (cond ((get-command-arg "-batch")
+		(*break-enable* nil) result)
+	    (setq result
+		  (system:error-set
+		   '(progn
+		      (compile-file
+		       (get-command-arg "-compile")
+		       :output-file 
+		       (or (get-command-arg "-o")
+			   (get-command-arg "-compile"))
+		       :o-file
+		       (cond ((equalp
+			       (get-command-arg "-o-file")
+			       "nil") nil)
+			     ((get-command-arg "-o-file" t))
+			     (t t))
+		       :c-file (get-command-arg "-c-file" t)
+		       :h-file (get-command-arg "-h-file" t)
+		       :data-file (get-command-arg "-data-file" t)
+		       :system-p (get-command-arg "-system-p" t)))))
+	    (bye (if (or (and (find-package "COMPILER") 
+			      (find-symbol "*ERROR-P*" (find-package "COMPILER"))
+			      (symbol-value (find-symbol "*ERROR-P*" (find-package "COMPILER"))))
+			 (equal result '(nil))) 1 0))))
+	 ((get-command-arg "-batch")
 	  (setf *top-level-hook* #'bye))
 	 ((get-command-arg "-f"))
 	 (t (when (boundp '*gcl-major-version*)
 	      (unless (boundp '*system-banner*) (setq *system-banner* (default-system-banner))))
 	    (when (boundp '*system-banner*)
 	      (format t "~a~%" *system-banner*))
-	    (setq *tmp-dir* (get-temp-dir))
 	    (format t "Temporary directory for compiler files set to ~a~%" *tmp-dir*)))
    (setq *ihs-top* 1)
    (in-package 'system::user) (incf system::*ihs-top* 2)
@@ -809,48 +808,42 @@ First directory is checked for first name and all extensions etc."
    (let ((tem (or (si::get-command-arg flag) (and (boundp sym) (symbol-value sym)))))
       (if tem (set sym (si::coerce-slash-terminated tem)))))
 
-(defun set-up-top-level ( &aux (i (si::argc)) tem)
+(defun set-up-top-level ( &aux (i (argc)) tem)
   (declare (fixnum i))
   (loop (setq i (- i 1))
 	(cond ((< i 0)(return nil))
 	      (t (setq tem (cons (argv i) tem)))))
   (setq *command-args* tem)
+  (setq *tmp-dir* (get-temp-dir))
   (setq tem *lib-directory*)
-  (let ((dir (si::getenv "GCL_LIBDIR")))
-    (or (set-dir  'si::*lib-directory* "-libdir")
-	(if dir (setq *lib-directory* (coerce-slash-terminated dir))))
-    (unless
-     (and *load-path* (equal tem *lib-directory*))
-     (setq *load-path* (cons (si::string-concatenate *lib-directory*
-						     "lsp/") *load-path*))
-     (setq *load-path* (cons (si::string-concatenate *lib-directory*
-						     "mod/") *load-path*))
-     (setq *load-path* (cons (si::string-concatenate *lib-directory*
-						     "gcl-tk/") *load-path*))
-     (setq *load-path* (cons (si::string-concatenate *lib-directory*
-						     "xgcl-2/") *load-path*))
-	    )
-    (when (not (boundp 'si::*system-directory*)) 
-      (setq si::*system-directory* (namestring
-        (truename (make-pathname :name nil :type nil :defaults (si::argv 0))))))
-    (set-dir  'si::*system-directory* "-dir")
-    (if (multiple-value-setq (tem tem) (get-command-arg "-f"))
-	(let (*load-verbose*)
-	  (si::process-some-args si::*command-args*)
-	  (setq si::*command-args* tem)
-	  (si::do-f (car si::*command-args*))))
-    ))
+  (let ((dir (getenv "GCL_LIBDIR")))
+    (unless (set-dir '*lib-directory* "-libdir")
+      (when dir (setq *lib-directory* (coerce-slash-terminated dir))))
+    (unless (and *load-path* (equal tem *lib-directory*))
+      (setq *load-path* (cons (string-concatenate *lib-directory* "lsp/") *load-path*))
+      (setq *load-path* (cons (string-concatenate *lib-directory* "mod/") *load-path*))
+      (setq *load-path* (cons (string-concatenate *lib-directory* "gcl-tk/") *load-path*))
+      (setq *load-path* (cons (string-concatenate *lib-directory* "xgcl-2/") *load-path*)))
+    (when (not (boundp '*system-directory*)) 
+      (setq *system-directory* 
+	    (namestring	(truename (make-pathname :name nil :type nil :defaults (argv 0))))))
+    (set-dir '*system-directory* "-dir")
+    (when (multiple-value-setq (tem tem) (get-command-arg "-f"))
+      (let (*load-verbose*)
+	(process-some-args *command-args*)
+	(setq *command-args* tem)
+	(do-f (car *command-args*))))))
 
 (defun do-f (file )
   (let ((eof '(nil)) tem
 	*break-enable*)
     (catch *quit-tag*
-      (with-open-file (st file)
-		      (READ-LINE ST)
-		      (LOOP
-		       (SETQ TEM (READ ST NIL EOF))
-		       (COND ((EQ EOF TEM) (return nil)))
-		       (EVAL TEM)))
+      (with-open-file 
+       (st file)
+       (READ-LINE ST)
+       (LOOP
+	(SETQ TEM (READ ST NIL EOF))
+	(COND ((EQ EOF TEM) (return nil)))
+	(EVAL TEM)))
       (bye))
-      (bye 1)
-      ))
+    (bye 1)))
