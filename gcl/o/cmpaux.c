@@ -296,7 +296,7 @@ object_to_string(object x) {
     return x->st.st_self;
 
   np=page(x->st.st_self);
-  if (x->st.st_dim == leng && leng & sizeof(object) 
+  if (x->st.st_dim == leng && leng % sizeof(object) 
       && np<MAXPAGE && (type_map[np]==t_relocatable || type_map[np]==t_contiguous)) {
     x->st.st_self[leng] = 0;
     return x->st.st_self;
