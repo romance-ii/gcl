@@ -15,8 +15,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * Newer standards
   * set *tmp-dir* in all command-line situations
   * fix typeo in object_to_string
+  * Fix make-pathname error with supplied :relative directories
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 14 Oct 2006 21:20:40 -0400
+ -- Camm Maguire <camm@enhanced.com>  Mon, 16 Oct 2006 13:02:24 -0400
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

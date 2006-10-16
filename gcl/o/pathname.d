@@ -1464,6 +1464,8 @@ int *eep;
 		x = merge_pathnames(x, defaults, Cnil);
 		wrap_pathname(x);
 	}
+        if (directory_supplied_p && consp(directory) && directory->c.c_car==sKrelative) 
+           x->pn.pn_directory=directory;/* merge pathnames swallows some :relative*/
 #ifdef ANSI_COMMON_LISP
 	if ((defaults != Cnil) && !pathname_resolve(pathKansi)) {
 #else
