@@ -196,3 +196,4 @@ if (realpath (buf, fub) == 0) {                             \
 }                                                           \
 (a_) = fub;                                                 \
 } while (0)
+

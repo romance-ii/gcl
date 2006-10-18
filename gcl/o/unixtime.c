@@ -177,6 +177,7 @@ DEFUN_NEW("GET-INTERNAL-RUN-TIME",object,fLget_internal_run_time,LISP
   RETURN1(x);
 }
 
+
 DEFUN_NEW("GETTIMEOFDAY",object,fSgettimeofday,SI,0,0,NONE,OO,OO,OO,OO,(void),"Return time with maximum resolution") {
 #ifdef __MINGW32__
     struct timeb t;

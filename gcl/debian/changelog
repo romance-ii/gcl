@@ -17,8 +17,10 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * fix typeo in object_to_string
   * Fix make-pathname error with supplied :relative directories
   * unrestricted gcc for alpha
+  * si::gettimeofday function for HOL88 build
+  * macosx fixes
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 17 Oct 2006 16:34:57 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed, 18 Oct 2006 13:17:03 -0400
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

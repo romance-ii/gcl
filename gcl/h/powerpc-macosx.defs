@@ -33,3 +33,4 @@ INITFORM = (si::build-symbol-table)
 ARRS = libtool -static -o
 
 FINAL_CFLAGS := `echo $(FINAL_CFLAGS) | sed -e 's:-g::g'`
+

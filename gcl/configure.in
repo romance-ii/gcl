@@ -633,6 +633,7 @@ if test "$use" = "powerpc-macosx" ; then
 	AC_MSG_ERROR(need malloc.h on macosx)))
 fi
 
+
 # sysconf
 
 AC_CHECK_HEADER(unistd.h,
