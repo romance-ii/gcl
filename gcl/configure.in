@@ -627,6 +627,12 @@ else
     fi
 fi
 
+if test "$use" = "powerpc-macosx" ; then
+   AC_CHECK_HEADER(malloc/malloc.h,AC_DEFINE(HAVE_MALLOC_MALLOC_H),
+      AC_CHECK_HEADER(objc/malloc.h,AC_DEFINE(HAVE_OBJC_MALLOC_H),
+	AC_MSG_ERROR(need malloc.h on macosx)))
+fi
+
 # sysconf
 
 AC_CHECK_HEADER(unistd.h,

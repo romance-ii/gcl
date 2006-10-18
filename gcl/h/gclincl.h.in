@@ -232,6 +232,8 @@
 #undef WITH_WINMAIN
 #undef USE_FAST_NULL_OR_ON_CSTACK_MACRO
 #undef HAVE_SYS_SOCKIO_H
+#undef HAVE_MALLOC_MALLOC_H
+#undef HAVE_OBJC_MALLOC_H
 
 /* The number of bytes in a char.  */
 #undef SIZEOF_CHAR

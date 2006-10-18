@@ -38,8 +38,9 @@ extern char *get_dbegin ();
 #undef SET_REAL_MAXPAGE
 #define SET_REAL_MAXPAGE { my_sbrk(0); real_maxpage = (int) mach_maplimit/PAGESIZE; }
 
-#define sbrk my_sbrk
+#include <unistd.h> /* to get sbrk defined */
 extern void *my_sbrk(int incr);
+#define sbrk my_sbrk
 
 
 /** (si::save-system "...") a.k.a. unexec implementation  */

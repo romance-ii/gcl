@@ -6,7 +6,7 @@ CC = gcc $(CPPFLAGS)
 
 # Set this to avoid warnings when linking against libncurses.
 # This is due to the requirements of the two level namespace.
-LIBS := `echo $(LIBS) | sed -e 's/-lncurses/ /'` /sw/lib/libintl.dylib
+LIBS := `echo $(LIBS) | sed -e 's/-lncurses/ /'` -lintl
 
 # Set this for the linker to operate correctly.
 MACOSX_DEPLOYMENT_TARGET = 10.2

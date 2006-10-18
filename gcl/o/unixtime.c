@@ -177,6 +177,23 @@ DEFUN_NEW("GET-INTERNAL-RUN-TIME",object,fLget_internal_run_time,LISP
   RETURN1(x);
 }
 
+DEFUN_NEW("GETTIMEOFDAY",object,fSgettimeofday,SI,0,0,NONE,OO,OO,OO,OO,(void),"Return time with maximum resolution") {
+#ifdef __MINGW32__
+    struct timeb t;
+    ftime(&t);
+    return make_longfloat(((longfloat)t.time+1.0e-3*t.millitm)*HZ1);
+#endif  
+#ifdef BSD
+    struct timeval tzp;
+    gettimeofday(&tzp,0);
+    return make_longfloat((longfloat)tzp.tv_sec+1.0e-6*tzp.tv_usec);
+#endif
+#ifdef ATT
+    return make_longfloat((longfloat)time(0));
+#endif
+}
+
+
 DEFUN_NEW("GET-INTERNAL-REAL-TIME",object,fLget_internal_real_time,LISP,0,0,NONE,OO,OO,OO,OO,(void),"Run time relative to beginning")
      
 {
