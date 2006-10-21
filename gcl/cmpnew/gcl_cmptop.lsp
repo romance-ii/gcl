@@ -549,7 +549,6 @@
 		  (when opts (local-compile-decls opts)))
 		form)
 	       (the `(,(car form) ,(cadr form) ,@(portable-source (cddr form) t)))
-	       (funcall `(,(car form) ,@(portable-source (cdr form) t)))
 	       ((flet labels macrolet) 
 		`(,(car form)
 		  ,(mapcar (lambda (x) `(,(car x) ,@(cdr (portable-source `(lambda ,@(cdr x)))))) (cadr form))
@@ -570,8 +569,10 @@
 		(nf (if fd (cmp-expand-macro fd (car form) (cdr form)) form)))
 	   (portable-source nf (equal form nf))))))
 
+(defvar *no-proxy-symbols* nil)
+
 (defun pd (fname ll args)
-  (let (decls doc)
+  (let (decls doc (*no-proxy-symbols* t))
     (when (and (consp args) (stringp (car args))) (push (pop args) doc))
     (do nil ((or (not args) (not (consp (car args))) (not (eq (caar args) 'declare))))
 	(push (pop args) decls))

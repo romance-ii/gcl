@@ -339,7 +339,7 @@
   (cond ((and (consp (cadr form)) (eq (caadr form) 'lambda)) (cdr form))
 	((and (consp (cadr form)) (eq (caadr form) 'function)
 	      (setq x (cadadr form))
-	      (setq x (if (is-setf-function x) (make-setf-function-proxy-symbol (cadr x)) x))
+	      (setq x (if (is-setf-function x) (unless *no-proxy-symbols* (make-setf-function-proxy-symbol (cadr x))) x))
 	      (or (symbolp x)
 		  (and (consp x) (eq (car x) 'lambda))))
 	 `(,x ,@(cddr form)))
