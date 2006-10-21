@@ -20,8 +20,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * si::gettimeofday function for HOL88 build
   * macosx fixes
   * don't allow setf-proxy-symbols into portable-source
+  * Clear up erroneous pcl compiler warnings re: continue
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 21 Oct 2006 13:42:40 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sat, 21 Oct 2006 14:14:17 -0400
 
 gclcvs (2.7.0-61) unstable; urgency=low
 
