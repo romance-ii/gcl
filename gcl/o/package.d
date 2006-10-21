@@ -778,7 +778,6 @@ delete_package(object n) {
 	@(return `in_package(pack_name, nicknames, use,fix(internal),fix(external))`)
 @)
 
-#ifdef ANSI_COMMON_LISP
 extern object sKuse;
 extern object sKnicknames;
 DEF_ORDINARY("IN-PACKAGE-INTERNAL",sSin_package_internal,SI,"");
@@ -804,6 +803,7 @@ DEFUN_NEW("IN-PACKAGE-INTERNAL",object,fSin_package_internal,SI,2,2,NONE,OO,OO,O
 
 }
 
+#ifdef ANSI_COMMON_LISP
 
 static void
 FFN(Fin_package)(void) {
