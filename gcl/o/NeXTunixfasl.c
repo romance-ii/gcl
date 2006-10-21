@@ -335,7 +335,7 @@ fasload(pathname)
     call_init(entry - object_start, memory, fasl_data,0);
 
     if (symbol_value(sLAload_verboseA) != Cnil)
-	printf("start address -T 0x%08x ", entry);
+	printf(" ;; start address -T 0x%08x ", entry);
 
     vs_base = old_vs_base;
     vs_top = old_vs_top;
@@ -437,7 +437,7 @@ faslink(pathname, ldargstring)
     call_init(entry - object_start, memory, fasl_data,0);
 
     if (symbol_value(sLAload_verboseA) != Cnil)
-	printf("start address -T 0x%08x \n", entry);
+	printf(" ;; start address -T 0x%08x \n", entry);
 
     vs_base = old_vs_base;
     vs_top = old_vs_top;

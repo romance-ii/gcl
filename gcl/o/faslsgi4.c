@@ -279,7 +279,7 @@ AGAIN:
 	if (fseek(fp, textstart, 0) < 0)
 		error("file seek error");
 #ifdef mips
-	printf("start address -T %x ",memory->cfd.cfd_start);
+	printf(" ;; start address -T %x ",memory->cfd.cfd_start);
 	bzero(memory->cfd.cfd_start, MIPS_ROUND);
 	fread((void *)sectionheader.s_vaddr, textsize + datasize, 1, fp);
 #else
@@ -419,7 +419,7 @@ object faslfile, ldargstring;
 	if (fseek(fp, textstart, 0) < 0)
 		error("file seek error");
 #ifdef mips
-	printf("start address -T %x ",memory->cfd.cfd_start);
+	printf(" ;; start address -T %x ",memory->cfd.cfd_start);
 	bzero(memory->cfd.cfd_start, MIPS_ROUND);
 	fread((void *)sectionheader.s_vaddr, textsize + datasize, 1, fp);
 #else

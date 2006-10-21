@@ -563,6 +563,20 @@ DEFUN_NEW("GENSYM1IG",object,fSgensym1ig,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") 
   RETURN1(gensym_int(NULL,x));
 
 }
+#ifdef STATIC_FUNCTION_POINTERS
+object
+fSgensym0(void) {
+  return FFN(fSgensym0)();
+}
+object
+fSgensym1s(object x) {
+  return FFN(fSgensym1s)(x);
+}
+object
+fSgensym1ig(object x) {
+  return FFN(fSgensym1ig)(x);
+}
+#endif
 
 @(defun gentemp (&optional (prefix gentemp_prefix)
 			   (pack `current_package()`)

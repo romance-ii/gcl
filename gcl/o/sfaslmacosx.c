@@ -248,7 +248,7 @@ int fasload (object faslfile)
     memory->cfd.cfd_size = 0;
     
     if (symbol_value (sLAload_verboseA) != Cnil)	
-        printf (" start address (dynamic) %p ", fptr);
+        printf (" ;; start address (dynamic) %p ", fptr);
     
     call_init (0, memory, data, fptr);
     

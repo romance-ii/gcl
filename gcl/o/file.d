@@ -2482,7 +2482,7 @@ LFD(Lstream_element_type)()
 	    (filename->st.st_self[0] != '|')) {
 		check_type_or_pathname_string_symbol_stream(&filename);
 		if (wild_pathname_p(filename,Cnil) == Ct) {
-		    file_error("File ~S is wild.",filename);
+		    PATHNAME_ERROR("Filename is wild.",filename);
 		    @(return Cnil)
 		}
 		filename = coerce_to_local_namestring(filename);
@@ -2608,19 +2608,20 @@ DEFVAR("*DISABLE-RECOMPILE*",sSAdisable_recompile,SI,Ct,"");
 		    (if_does_not_exist sKerror)
 	      &aux pntype fasl_filename lsp_filename filename
 		   defaults strm stdoutput x
-		   package)
+		   package readtable)
 	bds_ptr old_bds_top;
 	int i;
 	object strm1;
 @
 	check_type_or_pathname_string_symbol_stream(&pathname);
+        if (type_of(pathname)==t_stream) {old_bds_top=bds_top;strm=strm1=pathname;goto STREAM;}
 	pathname = coerce_to_pathname(pathname);
 	defaults = symbol_value(Vdefault_pathname_defaults);
 	defaults = coerce_to_pathname(defaults);
 	pathname = merge_pathnames(pathname, defaults, sKnewest);
 	pntype = pathname->pn.pn_type;
 	if (wild_pathname_p(pathname,Cnil) == Ct) {
-	    file_error("File ~S is wild.",pathname);
+	    PATHNAME_ERROR("Filename is wild.",pathname);
 	    @(return Cnil)
 	}
 	filename = coerce_to_local_namestring(pathname);
@@ -2637,10 +2638,11 @@ DEFVAR("*DISABLE-RECOMPILE*",sSAdisable_recompile,SI,Ct,"");
 	  char b[32],fn[4096];/*FIXME*/
 	  int i,n;
 	  coerce_to_local_filename(pathname,fn);
-	  if (!(f=fopen(fn,"rb")))
-	    file_error("Cannot open ~S",pathname);
-	  n=fread(b,sizeof(b),1,f);
-	  fclose(f);
+	  n=0;
+	  if ((f=fopen(fn,"rb"))) {
+	    n=fread(b,sizeof(b),1,f);
+	    fclose(f);
+	  }
 	  for (i=0;i<n && (!iscntrl(b[i]) || isspace(b[i]));i++);
 	  if (i<n)
 	    fasl_filename = coerce_to_local_namestring(pathname);
@@ -2651,7 +2653,7 @@ DEFVAR("*DISABLE-RECOMPILE*",sSAdisable_recompile,SI,Ct,"");
 			SETUP_PRINT_DEFAULT(fasl_filename);
 			if (file_column(PRINTstream) != 0)
 				write_str("\n");
-			write_str("Loading ");
+			write_str(";; Loading ");
 			PRINTescape = FALSE;
 			write_object(fasl_filename, 0);
 			write_str("\n");
@@ -2660,7 +2662,9 @@ DEFVAR("*DISABLE-RECOMPILE*",sSAdisable_recompile,SI,Ct,"");
 		}
 		package = symbol_value(sLApackageA);
 		bds_bind(sLApackageA, package);
-		bds_bind(sSAload_pathnameA,fasl_filename);
+		readtable = symbol_value(Vreadtable);
+		bds_bind(Vreadtable, readtable);
+		bds_bind(sSAload_pathnameA,pathname);
 		bds_bind(sSAload_truenameA,truename(pathname));
 		if (sSAcollect_binary_modulesA->s.s_dbind==Ct) {
 		  object _x=sSAbinary_modulesA->s.s_dbind;
@@ -2680,7 +2684,7 @@ DEFVAR("*DISABLE-RECOMPILE*",sSAdisable_recompile,SI,Ct,"");
 			vs_top = PRINTvs_top;
 			if (file_column(PRINTstream) != 0)
 				write_str("\n");
-			write_str("Fasload successfully ended.");
+			write_str(";; Fasload successfully ended.");
 			write_str("\n");
 			CLEANUP_PRINT_DEFAULT;
 			flush_stream(PRINTstream);
@@ -2690,7 +2694,7 @@ DEFVAR("*DISABLE-RECOMPILE*",sSAdisable_recompile,SI,Ct,"");
 			SETUP_PRINT_DEFAULT(fasl_filename);
 			if (file_column(PRINTstream) != 0)
 				write_str("\n");
-			write_str("Finished loading ");
+			write_str(";; Finished loading ");
 			PRINTescape = FALSE;
 			write_object(fasl_filename, 0);
 			write_str("\n");
@@ -2720,11 +2724,12 @@ DEFVAR("*DISABLE-RECOMPILE*",sSAdisable_recompile,SI,Ct,"");
 	= open_stream(filename, smm_input, Cnil, if_does_not_exist);
 	if (strm == Cnil)
 		@(return Cnil)
+  STREAM:
 	if (verbose != Cnil) {
 		SETUP_PRINT_DEFAULT(filename);
 		if (file_column(PRINTstream) != 0)
 			write_str("\n");
-		write_str("Loading ");
+		write_str(";; Loading ");
 		PRINTescape = FALSE;
 		write_object(filename, 0);
 		write_str("\n");
@@ -2733,8 +2738,11 @@ DEFVAR("*DISABLE-RECOMPILE*",sSAdisable_recompile,SI,Ct,"");
 	}
 	package = symbol_value(sLApackageA);
 	bds_bind(sSAload_pathnameA,pathname);
-	bds_bind(sSAload_truenameA,truename(pathname));
+        pathname=(type_of(pathname)==t_stream) ? Cnil : truename(pathname);
+	bds_bind(sSAload_truenameA,pathname);
 	bds_bind(sLApackageA, package);
+        readtable = symbol_value(Vreadtable);
+        bds_bind(Vreadtable, readtable);
 	bds_bind(sLAstandard_inputA, strm);
 	frs_push(FRS_PROTECT, Cnil);
 	if (nlj_active) {
@@ -2777,7 +2785,7 @@ DEFVAR("*DISABLE-RECOMPILE*",sSAdisable_recompile,SI,Ct,"");
 		SETUP_PRINT_DEFAULT(filename);
 		if (file_column(PRINTstream) != 0)
 			write_str("\n");
-		write_str("Finished loading ");
+		write_str(";; Finished loading ");
 		PRINTescape = FALSE;
 		write_object(filename, 0);
 		write_str("\n");
@@ -3392,6 +3400,8 @@ DEF_ORDINARY("EXTERNAL-FORMAT",sKexternal_format,KEYWORD,"");
 DEF_ORDINARY("DIRECTION",sKdirection,KEYWORD,"");
 DEF_ORDINARY("ELEMENT-TYPE",sKelement_type,KEYWORD,"");
 DEF_ORDINARY("ERROR",sKerror,KEYWORD,"");
+DEF_ORDINARY("FILE-ERROR",sKfile_error,KEYWORD,"");
+DEF_ORDINARY("PATHNAME-ERROR",sKpathname_error,KEYWORD,"");
 DEF_ORDINARY("IF-DOES-NOT-EXIST",sKif_does_not_exist,KEYWORD,"");
 DEF_ORDINARY("IF-EXISTS",sKif_exists,KEYWORD,"");
 DEF_ORDINARY("INPUT",sKinput,KEYWORD,"");

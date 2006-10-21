@@ -512,6 +512,7 @@
 		
 	     
 (defun expt-propagator (f t1 t2)
+  (declare (ignore f))
   (cond ((or (type-and #tcomplex t1) (type-and #tcomplex t2)) nil)
 	((type-and #t(or ratio (real * (0))) t1) nil)
 	((and (type-and #tinteger t1) (type-and #t(real * (0)) t2)) nil)

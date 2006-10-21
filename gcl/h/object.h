@@ -492,6 +492,12 @@ struct string {           /*  string header  */
 #define READER_ERROR(a_,b_)  ({object rd_err=make_simple_string("Read error on stream ~S: " b_);\
                               Icall_error_handler(sKreader_error,rd_err,1,(a_));})
 
+#define FILE_ERROR(a_,b_)    ({object rd_err=make_simple_string("File error on ~S: " a_);\
+                              Icall_error_handler(sKfile_error,rd_err,1,(b_));})
+
+#define PATHNAME_ERROR(a_,b_) ({object rd_err=make_simple_string("Pathname error on ~S: " a_);\
+                               Icall_error_handler(sKpathname_error,rd_err,1,(b_));})
+
 #define NERROR(a_)  ({object fmt=make_simple_string(a_ ": line ~a, file ~a, function ~a");\
                     {object line=make_fixnum(__LINE__);\
                     {object file=make_simple_string(__FILE__);\

@@ -180,7 +180,9 @@
   )
 
 (defun add-init (x &optional endp)
-  (let ((tem (cons (si::hash-equal x -1000) x)))
+  (let* ((x (if (and (consp x) (member (car x) '(shadow shadowing-import)))
+		(cons 'si::|#,| x) x))
+	 (tem (cons (si::hash-equal x -1000) x)))
     (setf (data-inits)
 		    (if endp
 			(nconc (data-inits) (list tem))

@@ -921,22 +921,19 @@
 		    (cond ((and (eql ans ,si::*eof*)
 				(sfeof  ,stream))
 			   ,eof)
-			  (t ,(if (eq read-fun 'read-char1)
-				       '(code-char ans) 'ans))
-			  ))
-		   (t
-		    (,read-fun ,stream  ,eof)
-		     )
+			  (,(if (eq read-fun 'read-char1) '(code-char ans) 'ans))))
+		   ((,read-fun ,stream  ,eof))
 		   ))))
-       (t
-	`(let ((.strm. ,(car args)))
+       (`(let ((.strm. ,(car args)))
 	   (declare (type ,(result-type (car args)) .strm.))
 	     ,(fast-read (cons '.strm. (cdr args)) read-fun)))))))
 
 (defun co1read-byte (f args &aux tem) f
-  (cond ((setq tem (fast-read args 'read-byte1))
+  (let* ((s (gensym))(nargs (cons s (cdr args))))
+  (cond ((setq tem (fast-read nargs 'read-byte1))
 	 (let ((*space* 10))		;prevent recursion!
-	   (c1expr tem)))))
+	   (c1expr `(let ((,s ,(car args))) 
+		      (if (= 1 (si::get-byte-stream-nchars ,s)) ,tem ,(cons f nargs)))))))))
 
 (defun co1read-char (f args &aux tem) f
   (cond ((setq tem (fast-read args 'read-char1))

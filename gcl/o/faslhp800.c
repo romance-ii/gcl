@@ -131,7 +131,7 @@ char *lib_string;
   call_init(init_address,memory,read_fasl_vector(faslfile),0);
   close_stream (faslfile);
   if(symbol_value(sLAload_verboseA)!=Cnil)
-    printf("start address -T %x ",memory->cfd.cfd_start);
+    printf(" ;; start address -T %x ",memory->cfd.cfd_start);
   return(memory->cfd.cfd_size);
 }
 

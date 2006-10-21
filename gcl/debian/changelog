@@ -22,8 +22,11 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * don't allow setf-proxy-symbols into portable-source
   * Clear up erroneous pcl compiler warnings re: continue
   * unrestricted gcc on m68k; no profiling but C optimization on hppa
+  * fix load and open ansi tests; Better file and pathname error
+    handling; handle shadow et. all in data file for HOL88 support;
+    gensym handles for ia64;
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 21 Oct 2006 15:16:12 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sat, 21 Oct 2006 15:27:22 -0400
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

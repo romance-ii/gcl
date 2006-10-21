@@ -204,7 +204,7 @@ AGAIN:
 		" ",
 		tempfilename);
 	 if(symbol_value(sLAload_verboseA)!=Cnil)		
-        printf("start address -T %x ",memory->cfd.cfd_start);
+        printf(" ;; start address -T %x ",memory->cfd.cfd_start);
 #endif
 #ifdef ATT
 	coerce_to_filename(symbol_value(sSAsystem_directoryA),
@@ -351,7 +351,7 @@ SEEK_TO_END_OFILE(faslfile->sm.sm_fp);
 		   ldargstr,
 		   tempfilename);
 	 if(symbol_value(sLAload_verboseA)!=Cnil)	
-        printf("start address -T %x ",memory->cfd.cfd_start);
+        printf(" ;; start address -T %x ",memory->cfd.cfd_start);
 	if (system(command) != 0)
 		FEerror("The linkage editor failed.", 0);
 

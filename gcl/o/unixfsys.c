@@ -239,7 +239,7 @@ truename(object pathname)
 	vs_push(pathname);
 
 	if (wild_pathname_p(pathname,Cnil) == Ct)
-	    return(file_error("File ~S is wild.",pathname));
+	    return(PATHNAME_ERROR("Filename is wild.",pathname));
 
 	coerce_to_local_filename(pathname, filename);
 
@@ -250,7 +250,7 @@ truename(object pathname)
 	    int newlen;
 	    newlen=readlink(filename,newname,MAXPATHLEN-1);
 	    if (newlen < 0)
-		return(file_error("Symlink broken at ~S.",pathname));
+		return(FILE_ERROR("Broken symlink",pathname));
 	    for (p = filename, q = 0;  *p != '\0';  p++)
 		    if (*p == '/') q = p;
 	    if (q == 0 || *newname == '/')
@@ -437,7 +437,7 @@ LFD(Ltruename)(void)
 	vs_base[0]=coerce_to_pathname(vs_base[0]);
 
 	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
-	    file_error("File ~S is wild.",vs_base[0]);
+	    PATHNAME_ERROR("Filename is wild.",vs_base[0]);
 	    vs_base[0] = Cnil;
 	    return;
 	}
@@ -447,7 +447,7 @@ LFD(Ltruename)(void)
              ((vs_base[0]->pn.pn_type != Cnil) &&
 		(vs_base[0]->pn.pn_type != sKunspecific))) &&
 	    !file_exists(vs_base[0])) {
-	    file_error("File ~S does not exist.",vs_base[0]);
+	    FILE_ERROR("File does not exist.",vs_base[0]);
 	    vs_base[0] = Cnil;
 	} else 
 	    vs_base[0] = truename(vs_base[0]);
@@ -463,7 +463,7 @@ LFD(Lrename_file)(void)
 	check_type_or_Pathname_string_symbol(&vs_base[1]);
 
 	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
-	    file_error("File ~S is wild.",vs_base[0]);
+	    PATHNAME_ERROR("Filename is wild.",vs_base[0]);
 	    vs_base[0] = Cnil;
 	    return;
 	}
@@ -474,7 +474,7 @@ LFD(Lrename_file)(void)
 	vs_base[1] = merge_pathnames(vs_base[1], vs_base[0], Cnil);
 
 	if (wild_pathname_p(vs_base[1],Cnil) == Ct) {
-	    file_error("File ~S is wild.",vs_base[1]);
+	    PATHNAME_ERROR("Filename is wild.",vs_base[1]);
 	    vs_base[0] = Cnil;
 	    return;
 	}
@@ -555,7 +555,7 @@ DEFUNO_NEW("DELETE-FILE",object,fLdelete_file,LISP
 	check_type_or_pathname_string_symbol_stream(&path);
 
 	if (wild_pathname_p(path,Cnil) == Ct)
-	    RETURN1(file_error("File ~S is wild.",path));
+	    RETURN1(PATHNAME_ERROR("Filename is wild.",path));
 
 	coerce_to_local_filename(path, filename);
  	if (unlink(filename) < 0 && rmdir(filename) < 0)
@@ -577,7 +577,7 @@ LFD(Lprobe_file)(void)
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 
 	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
-	    file_error("File ~S is wild.",vs_base[0]);
+	    PATHNAME_ERROR("Filename is wild.",vs_base[0]);
 	    vs_base[0] = Cnil;
 	    return;
 	}
@@ -597,7 +597,7 @@ LFD(Lfile_write_date)(void)
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 
 	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
-	    file_error("File ~S is wild.",vs_base[0]);
+	    PATHNAME_ERROR("Filename is wild.",vs_base[0]);
 	    vs_base[0] = Cnil;
 	    return;
 	}
@@ -623,7 +623,7 @@ LFD(Lfile_author)(void)
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 
 	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
-	    file_error("File ~S is wild.",vs_base[0]);
+	    PATHNAME_ERROR("Filename is wild.",vs_base[0]);
 	    vs_base[0] = Cnil;
 	    return;
 	}
@@ -870,7 +870,7 @@ FFN(siLchdir)(void)
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 
 	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
-	    file_error("File ~S is wild.",vs_base[0]);
+	    PATHNAME_ERROR("Filename is wild.",vs_base[0]);
 	    vs_base[0] = Cnil;
 	    return;
 	}
@@ -890,7 +890,7 @@ FFN(siLmkdir)(void)
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 
 	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
-	    file_error("File ~S is wild.",vs_base[0]);
+	    PATHNAME_ERROR("Filename is wild.",vs_base[0]);
 	    vs_base[0] = Cnil;
 	    return;
 	}
@@ -914,7 +914,7 @@ FFN(siLrmdir)(void)
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 
 	if (wild_pathname_p(vs_base[0],Cnil) == Ct) {
-	    file_error("File ~S is wild.",vs_base[0]);
+	    PATHNAME_ERROR("Filename is wild.",vs_base[0]);
 	    vs_base[0] = Cnil;
 	    return;
 	}

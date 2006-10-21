@@ -106,15 +106,15 @@
 ;		(values-list values)))
 ;	    (error "~S failed." 'compile)))))
 
-(defun load (&rest args)
+(defun load (pn &rest args)
   (loop (with-simple-restart 
 	 (retry "Retry loading file ~S." (car args))
-	 (return (apply #.(si::function-src 'load) args)))))
+	 (return (apply #.(si::function-src 'load) pn args)))))
 
-(defun open (&rest args)
+(defun open (pn &rest args)
   (loop (with-simple-restart 
 	 (retry "Retry opening file ~S." (car args))
-	 (return (apply #.(si::function-src 'open) args)))))
+	 (return (apply #.(si::function-src 'open) pn args)))))
 
 ;(defun clcs-load (&rest args)
 ;  (loop (with-simple-restart (retry "Retry loading file ~S." (car args))

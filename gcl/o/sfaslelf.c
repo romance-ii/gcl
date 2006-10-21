@@ -373,7 +373,7 @@ fasload(faslfile)
    vs_top = old_vs_top;
 
    if(symbol_value(sLAload_verboseA)!=Cnil)
-     printf("start address -T %p ",memory->cfd.cfd_start);
+     printf(" ;; start address -T %p ",memory->cfd.cfd_start);
    return(memory->cfd.cfd_size);
 
 #endif /* STAND */

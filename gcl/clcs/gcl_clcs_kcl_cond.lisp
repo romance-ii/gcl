@@ -168,6 +168,8 @@
     (:unexpected-keyword  t internal-simple-control-error)
     (:parse-error         t internal-simple-parse-error)
     (:reader-error        t internal-simple-reader-error :stream)
+    (:file-error          t internal-simple-file-error :pathname)
+    (:pathname-error      t internal-simple-file-error :pathname)
     (:invalid-form        t internal-simple-program-error)
     (:invalid-variable    t internal-simple-program-error )
 
