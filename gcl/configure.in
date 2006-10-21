@@ -341,7 +341,7 @@ case $use in
 		ia64*)
 			def_dlopen="yes" ; def_statsysbfd="no" ;;
 		hppa*)
-			def_dlopen="yes" ; def_statsysbfd="no" ; def_pic="yes" ; def_debug="yes" ;;
+			def_dlopen="yes" ; def_statsysbfd="no" ; def_pic="yes" ;; # def_debug="yes" ;;
 	esac;;
     *mingw*)
 	def_statsysbfd="no" ; def_custreloc="yes" ;;
@@ -517,6 +517,7 @@ AC_CHECK_PROGS(AWK,gawk nawk awk)
 # Work around system/gprof mips hang
 case $use in
   mips*) enable_gprof="no";;
+  hppa*) enable_gprof="no";;
 esac		     
 
 if test "$enable_gprof" = "yes" ; then

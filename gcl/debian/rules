@@ -23,9 +23,9 @@ endif
 #ifeq ($(ARCHT),alpha)
 #MCC:=gcc-3.4
 #endif
-ifeq ($(ARCHT),m68k)
-MCC:=gcc-3.4
-endif
+#ifeq ($(ARCHT),m68k)
+#MCC:=gcc-3.4
+#endif
 
 RELOC=locbfd
 
