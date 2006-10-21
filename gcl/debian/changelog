@@ -19,8 +19,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * unrestricted gcc for alpha
   * si::gettimeofday function for HOL88 build
   * macosx fixes
+  * don't allow setf-proxy-symbols into portable-source
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 18 Oct 2006 13:17:03 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sat, 21 Oct 2006 13:42:40 -0400
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

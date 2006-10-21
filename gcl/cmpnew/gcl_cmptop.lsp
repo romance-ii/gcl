@@ -549,6 +549,7 @@
 		  (when opts (local-compile-decls opts)))
 		form)
 	       (the `(,(car form) ,(cadr form) ,@(portable-source (cddr form) t)))
+	       (funcall `(,(car form) ,@(portable-source (cdr form) t)))
 	       ((flet labels macrolet) 
 		`(,(car form)
 		  ,(mapcar (lambda (x) `(,(car x) ,@(cdr (portable-source `(lambda ,@(cdr x)))))) (cadr form))
