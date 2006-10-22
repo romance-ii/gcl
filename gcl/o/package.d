@@ -808,10 +808,14 @@ DEFUN_NEW("IN-PACKAGE-INTERNAL",object,fSin_package_internal,SI,2,2,NONE,OO,OO,O
 static void
 FFN(Fin_package)(void) {
 
-  vs_base[0]=list(3,
-		  sSin_package_internal,
-		  MMcadr(vs_base[0]),
-		  list(2,sLquote,MMcddr(vs_base[0])));
+  object x;
+
+  VFUN_NARGS=vs_top-vs_base;
+  check_arg_range(2,2);
+  x=MMcadr(vs_base[0]);
+  x=type_of(x)==t_symbol ? list(2,sLquote,x) : x;
+  vs_base[0]=list(3,sSin_package_internal,x,list(2,sLquote,MMcddr(vs_base[0])));
+  vs_top=vs_base+1;
 
 }
 
