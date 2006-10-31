@@ -27,8 +27,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
     gensym handles for ia64;
   * Fix leading underscore behavior of my_plt
   * fix default INFO_DIR behavior
+  * gcc 4.x on hppa, no C optimization
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 31 Oct 2006 08:39:32 -0500
+ -- Camm Maguire <camm@enhanced.com>  Tue, 31 Oct 2006 08:41:47 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

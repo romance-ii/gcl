@@ -17,9 +17,9 @@ MCC:=gcc
 ifeq ($(ARCHT),arm)
 MCC:=gcc-3.4
 endif
-ifeq ($(ARCHT),hppa)
-MCC:=gcc-3.4
-endif
+#ifeq ($(ARCHT),hppa)
+#MCC:=gcc-3.4
+#endif
 #ifeq ($(ARCHT),alpha)
 #MCC:=gcc-3.4
 #endif

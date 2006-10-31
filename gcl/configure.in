@@ -341,7 +341,7 @@ case $use in
 		ia64*)
 			def_dlopen="yes" ; def_statsysbfd="no" ;;
 		hppa*)
-			def_dlopen="yes" ; def_statsysbfd="no" ; def_pic="yes" ;; # def_debug="yes" ;;
+			def_dlopen="yes" ; def_statsysbfd="no" ; def_pic="yes" ; def_debug="yes" ;;
 	esac;;
     *mingw*)
 	def_statsysbfd="no" ; def_custreloc="yes" ;;
