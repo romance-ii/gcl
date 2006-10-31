@@ -25,8 +25,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * fix load and open ansi tests; Better file and pathname error
     handling; handle shadow et. all in data file for HOL88 support;
     gensym handles for ia64;
+  * Fix leading underscore behavior of my_plt
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 21 Oct 2006 15:27:22 -0400
+ -- Camm Maguire <camm@enhanced.com>  Tue, 31 Oct 2006 08:38:34 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

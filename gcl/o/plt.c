@@ -25,7 +25,7 @@ static int
 pltcomp(const void *v1,const void *v2) {
   const Plt *p1=v1,*p2=v2;
 
-  return strcmp(stn(p1->n),stn(p2->n));
+  return strcmp(p1->n,p2->n);
 
 }
 
@@ -182,7 +182,7 @@ my_plt(const char *s,unsigned long *v) {
     return 0;
   }
     
-  tp.n=s;
+  tp.n=stn(s);
   if ((p=bsearch(&tp,p,pe-p,sizeof(*p),pltcomp))) {
     *v=p->ad;
     return 0;
