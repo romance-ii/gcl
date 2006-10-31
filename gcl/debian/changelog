@@ -26,8 +26,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
     handling; handle shadow et. all in data file for HOL88 support;
     gensym handles for ia64;
   * Fix leading underscore behavior of my_plt
+  * fix default INFO_DIR behavior
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 31 Oct 2006 08:38:34 -0500
+ -- Camm Maguire <camm@enhanced.com>  Tue, 31 Oct 2006 08:39:32 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 
