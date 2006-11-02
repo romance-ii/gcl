@@ -28,8 +28,10 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * Fix leading underscore behavior of my_plt
   * fix default INFO_DIR behavior
   * gcc 4.x on hppa, no C optimization
+  * disable-nls added to the binutils subconfigures to avoid msgfmt
+    dependency
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 31 Oct 2006 08:41:47 -0500
+ -- Camm Maguire <camm@enhanced.com>  Thu,  2 Nov 2006 09:27:34 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

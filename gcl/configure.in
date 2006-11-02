@@ -949,7 +949,7 @@ if test "$enable_locbfd" = "yes" ; then
 	echo "# Subconfigure of LIBINTL"
 	echo "#"
 	echo "#"
-	cd binutils/intl && chmod +x configure && ./configure && cd ../..
+	cd binutils/intl && chmod +x configure && ./configure --disable-nls && cd ../..
 	echo "#"
 	echo "#"
 	echo "#"
@@ -962,7 +962,7 @@ if test "$enable_locbfd" = "yes" ; then
 	echo "# Subconfigure of LIBIBERTY"
 	echo "#"
 	echo "#"
-	cd binutils/libiberty && chmod +x configure && ./configure && cd ../..
+	cd binutils/libiberty && chmod +x configure && ./configure --disable-nls && cd ../..
 #       MY_SUBDIRS="$MY_SUBDIRS binutils/libiberty " 
 	echo "#"
 	echo "#"
@@ -976,7 +976,7 @@ if test "$enable_locbfd" = "yes" ; then
 	echo "# Subconfigure of BFD"
 	echo "#"
 	echo "#"
-	cd binutils/bfd && chmod +x configure && ./configure --with-included-gettext && cd ../..
+	cd binutils/bfd && chmod +x configure && ./configure --with-included-gettext --disable-nls && cd ../..
 #       MY_SUBDIRS="$MY_SUBDIRS binutils/bfd " 
 	echo "#"
 	echo "#"
