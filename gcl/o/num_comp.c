@@ -43,6 +43,8 @@ number_compare(object x, object y)
 	object q;
 	vs_mark;
 
+	x=fixnum_float_contagion(x,y);
+	y=fixnum_float_contagion(y,x);
 	switch (type_of(x)) {
 
 	case t_fixnum:
@@ -241,7 +243,7 @@ LFD(Lall_the_same)(void)
 	for (i = 0; i < narg; i++)
 		check_type_number(&vs_base[i]);
 	for (i = 1; i < narg; i++)
-		if (number_compare(vs_base[i-1], vs_base[i]) != 0) {
+		if (number_compare(vs_base[i-1],vs_base[i]) != 0) {
 			vs_top = vs_base+1;
 			vs_base[0] = Cnil;
 			return;
@@ -309,8 +311,11 @@ LFD(Lmax)(void)
 		too_few_arguments();
 	for (i = 0;  i < narg;  i++)
 		check_type_or_rational_float(&vs_base[i]);
-	for (i = 1, max = vs_base[0];  i < narg;  i++)
-	  max = number_compare(max, vs_base[i]) < 0 ? fixnum_float_contagion(vs_base[i],max) : fixnum_float_contagion(max,vs_base[i]);
+	for (i = 1, max = vs_base[0];  i < narg;  i++) {
+	  object x=fixnum_float_contagion(vs_base[i],max);
+	  max=fixnum_float_contagion(max,vs_base[i]);
+	  max = number_compare(max,x) < 0 ? x : max;
+	}
 	vs_top = vs_base+1;
 	vs_base[0] = max;
 }
@@ -325,8 +330,11 @@ LFD(Lmin)(void)
 		too_few_arguments();
 	for (i = 0;  i < narg;  i++)
 		check_type_or_rational_float(&vs_base[i]);
-	for (i = 1, min = vs_base[0];  i < narg;  i++)
-	  min = number_compare(min, vs_base[i]) > 0 ? fixnum_float_contagion(vs_base[i],min) : fixnum_float_contagion(min,vs_base[i]);
+	for (i = 1, min = vs_base[0];  i < narg;  i++) {
+	  object x=fixnum_float_contagion(vs_base[i],min);
+	  min=fixnum_float_contagion(min,vs_base[i]);
+	  min = number_compare(min,x) > 0 ? x : min;
+	}
 	vs_top = vs_base+1;
 	vs_base[0] = min;
 }

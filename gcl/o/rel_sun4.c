@@ -32,7 +32,7 @@ relocate()
 	  {
 	  case RELOC_DISP8:	       /* Disp's (pc-rel)    */
 	  case RELOC_DISP16:
-	  case RELOC_DISP32:  abort();
+	  case RELOC_DISP32:  gcl_abort();
 	  case RELOC_WDISP30:
 	    dprintf (	      symbol_table[relocation_info.r_index].n_value %d,
 		     	      symbol_table[relocation_info.r_index].n_value);
@@ -69,7 +69,7 @@ relocate()
 	    new_value= (int)start_address;
 	    break;
 	  default:
-	    abort();
+	    gcl_abort();
 	    goto DONT;
 	  }
       }
@@ -88,15 +88,15 @@ relocate()
 	break;
 
       case RELOC_DISP8:		/* Disp's (pc-rel)    */
-	abort();
+	gcl_abort();
 	*(char *)where = x = new_value + *(char *) where;
 	break;
       case RELOC_DISP16:
-	abort();
+	gcl_abort();
 	*(short *)where = x = new_value + *(short *) where;
 	break;
       case RELOC_DISP32:
-	abort();
+	gcl_abort();
 	*(int *)where = new_value + *(int *) where;
 	x =  new_value + *( int *) where;
 	break;
@@ -142,7 +142,7 @@ relocate()
 	printf ("non-supported relocation_info.r_type=%d\n",
 		relocation_info.r_type);
 	fflush (stdout);
-	abort();
+	gcl_abort();
       }
   DONT:;
   }

@@ -316,10 +316,10 @@
        (loop (when (null .plist-tail.) (return nil))
 	     (setq ,key (pop .plist-tail.))
 	     (when (null .plist-tail.)
-	       (specific-error :invalid-form 
+	       (error 'program-error :format-control
 			       "Malformed plist in doplist, odd number of elements."))
 	     (when (not (symbolp ,key))
-	       (specific-error :invalid-form 
+	       (error 'program-error :format-control 
 			       "Supplied key is not a symbol."))
 	     (setq ,val (pop .plist-tail.))
 	     (progn ,@bod)))))

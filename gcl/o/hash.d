@@ -35,9 +35,6 @@ substantially modified are "gethash" and "sethash", which in turn,
 required additional changes to be made in "make_hash_table" and
 "extend_hashtable".
 
-  - Presently, GCL does not implement EQUALP hash tables, although
-    the Common Lisp standard requires them.
-
   - We never allow a hashtable to become completely full -- no matter
     what the REHASH-THRESHOLD is; we require that there is always at
     least one empty table entry.
@@ -671,8 +668,6 @@ print_hash_table (object ht,char *procedure_name) {
   fixnum i,max_ent,err;
 @
 
-  /* EQUALP hashtables are not currently supported. */
-  
   if (test == sLeq || test == sLeq->s.s_gfdef)
      htt = htt_eq;
   else if (test == sLeql || test == sLeql->s.s_gfdef)

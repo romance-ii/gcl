@@ -20,6 +20,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #define IN_NUM_CO
+#define NEED_ISFINITE
 
 #include "include.h"
 #include "num_include.h"
@@ -50,6 +51,19 @@ static object number_nlog(object);
 static object number_atan2(object,object);
 
 
+static double
+pexp(double x,object z,int s) {
+
+  x=exp(x);
+  if (s) x=(float)x;
+  if (!x)
+    FLOATING_POINT_UNDERFLOW(sLexp,z);
+  if (!ISFINITE(x))
+    FLOATING_POINT_OVERFLOW(sLexp,z);
+  return x;
+
+}
+
 static object
 number_exp(object x)
 {
@@ -60,13 +74,13 @@ number_exp(object x)
 	case t_fixnum:
 	case t_bignum:
 	case t_ratio:
-		return(make_longfloat((longfloat)exp(number_to_double(x))));
+		return(make_longfloat((longfloat)pexp(number_to_double(x),x,0)));
 
 	case t_shortfloat:
-		return(make_shortfloat((shortfloat)exp((double)(sf(x)))));
+		return(make_shortfloat((shortfloat)pexp((double)sf(x),x,1)));
 
 	case t_longfloat:
-		return(make_longfloat(exp(lf(x))));
+		return(make_longfloat(pexp(lf(x),x,0)));
 
 	case t_complex:
 	{

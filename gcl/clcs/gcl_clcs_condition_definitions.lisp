@@ -3,499 +3,202 @@
 (IN-PACKAGE "CONDITIONS")
 
 (eval-when (compile load eval)
-(pushnew #+(or clos pcl) :clos-conditions #-(or clos pcl) :defstruct-conditions
-	 *features*)
-)
+	   (pushnew :clos-conditions *features*))
 
 (eval-when (compile load eval)
-(when (and (member :clos-conditions *features*)
-	   (member :defstruct-conditions *features*))
-  (dolist (sym '(simple-condition-format-string simple-condition-format-arguments
-		 type-error-datum type-error-expected-type
-		 case-failure-name case-failure-possibilities
-		 stream-error-stream file-error-pathname package-error-package
-		 cell-error-name arithmetic-error-operation
-		 internal-error-function-name))
-    (when (fboundp sym) (fmakunbound sym)))
-  (setq *features* (remove :defstruct-conditions *features*)))
-)
+	   (when (and (member :clos-conditions *features*)
+		      (member :defstruct-conditions *features*))
+	     (dolist (sym '(simple-condition-format-control simple-condition-format-arguments
+							   type-error-datum type-error-expected-type
+							   case-failure-name case-failure-possibilities
+							   stream-error-stream file-error-pathname package-error-package
+							   cell-error-name arithmetic-error-operation
+							   internal-error-function-name))
+	       (when (fboundp sym) (fmakunbound sym)))
+	     (setq *features* (remove :defstruct-conditions *features*))))
 
-(DEFINE-CONDITION WARNING (CONDITION)
-  ())
+(define-condition warning (condition) ())
+(define-condition style-warning (warning) ())
 
-(DEFINE-CONDITION STYLE-WARNING (WARNING)
-  ())
+(define-condition serious-condition (condition) ())
+(define-condition error (serious-condition) ())
 
-(DEFINE-CONDITION SERIOUS-CONDITION (CONDITION)
-  ())
+(define-condition simple-condition (condition)
+  ((format-control :type string
+		  :initarg :format-control
+		  :reader simple-condition-format-control
+		  :initform "")
+   (format-arguments :initarg :format-arguments
+		     :reader simple-condition-format-arguments
+		     :initform nil))
+  (:report (lambda (c s) 
+	     (call-next-method)
+	     (apply 'format s 
+		    (simple-condition-format-control c)
+		    (simple-condition-format-arguments c)))))
 
-(DEFINE-CONDITION ERROR (SERIOUS-CONDITION)
-  ())
+(define-condition simple-warning (simple-condition warning) ())
+(define-condition simple-error (simple-condition error) ())
 
-(DEFUN SIMPLE-CONDITION-PRINTER (CONDITION STREAM)
-  (APPLY #'FORMAT STREAM (SIMPLE-CONDITION-FORMAT-STRING    CONDITION)
-	 		 (SIMPLE-CONDITION-FORMAT-ARGUMENTS CONDITION)))
+(define-condition storage-condition (serious-condition) ())
+(define-condition stack-overflow    (storage-condition) ())
+(define-condition storage-exhausted (storage-condition) ())
 
-(DEFINE-CONDITION SIMPLE-CONDITION (CONDITION)
-  #-(or clos pcl)
-  (FORMAT-STRING (FORMAT-ARGUMENTS '()))
-  #+(or clos pcl)
-  ((FORMAT-STRING :type string
-		  :initarg :FORMAT-STRING
-		  :reader SIMPLE-CONDITION-FORMAT-STRING)
-   (FORMAT-ARGUMENTS :initarg :FORMAT-ARGUMENTS
-		     :reader SIMPLE-CONDITION-FORMAT-ARGUMENTS
-		     :initform '()))
-  #-(or clos pcl)(:CONC-NAME %%SIMPLE-CONDITION-)
-  (:REPORT SIMPLE-CONDITION-PRINTER))
+(define-condition type-error (error)
+  ((datum :initarg :datum
+	  :reader type-error-datum)
+   (expected-type :initarg :expected-type
+		  :reader type-error-expected-type))
+  (:report ("~s is not of type ~s: " datum expected-type)))
+(define-condition simple-type-error (simple-error type-error) ())
 
-(DEFINE-CONDITION SIMPLE-WARNING (#+(or clos pcl) SIMPLE-CONDITION WARNING)
-  #-(or clos pcl)
-  (FORMAT-STRING (FORMAT-ARGUMENTS '()))
-  #+(or clos pcl)
+(define-condition program-error (error) ())
+(define-condition control-error (error) ())
+(define-condition parse-error (error) ())
+
+(define-condition print-not-readable (error) 
+  ((object :initarg :object
+	   :reader print-not-readable-object))
+  (:report ("Object ~s is unreadable: " object)))
+
+(define-condition stream-error (error)
+  ((stream :initarg :stream
+	   :reader stream-error-stream))
+  (:report ("Stream error on stream ~s: " stream)))
+
+(define-condition reader-error (parse-error stream-error) ())
+
+(define-condition end-of-file (stream-error)
   ()
-  #-(or clos pcl)(:CONC-NAME %%SIMPLE-WARNING-)
-  #-(or clos pcl)(:REPORT SIMPLE-CONDITION-PRINTER))
+  (:report ("Unexpected end of file: ")))
 
-(DEFINE-CONDITION SIMPLE-ERROR (#+(or clos pcl) SIMPLE-CONDITION ERROR)
-  #-(or clos pcl)
-  (FORMAT-STRING (FORMAT-ARGUMENTS '()))
-  #+(or clos pcl)
-  ()
-  #-(or clos pcl)(:CONC-NAME %%SIMPLE-ERROR-)
-  #-(or clos pcl)(:REPORT SIMPLE-CONDITION-PRINTER))
+(define-condition file-error (error)
+  ((pathname :initarg :pathname
+	     :reader file-error-pathname))
+  (:report ("File error on ~s: " pathname)))
 
-(DEFINE-CONDITION STORAGE-CONDITION (SERIOUS-CONDITION) ())
-
-(DEFINE-CONDITION STACK-OVERFLOW    (STORAGE-CONDITION) ())
-
-(DEFINE-CONDITION STORAGE-EXHAUSTED (STORAGE-CONDITION) ())
-
-(DEFINE-CONDITION TYPE-ERROR (ERROR)
-  #-(or clos pcl)
-  (DATUM EXPECTED-TYPE)
-  #+(or clos pcl)
-  ((DATUM :initarg :DATUM
-	  :reader TYPE-ERROR-DATUM)
-   (EXPECTED-TYPE :initarg :EXPECTED-TYPE
-		  :reader TYPE-ERROR-EXPECTED-TYPE))
-  (:report
-    (lambda (condition stream)
-      (format stream "~S is not of type ~S."
-	      (TYPE-ERROR-DATUM CONDITION)
-	      (TYPE-ERROR-EXPECTED-TYPE CONDITION)))))
-
-(DEFINE-CONDITION SIMPLE-TYPE-ERROR (#+(or clos pcl) SIMPLE-CONDITION TYPE-ERROR)
-  #-(or clos pcl)
-  (FORMAT-STRING (FORMAT-ARGUMENTS '()))
-  #+(or clos pcl)
-  ()
-  #-(or clos pcl)(:CONC-NAME %%SIMPLE-TYPE-ERROR-)
-  #-(or clos pcl)(:REPORT SIMPLE-CONDITION-PRINTER))
-
-(DEFINE-CONDITION CASE-FAILURE (TYPE-ERROR)
- #-(or clos pcl)
- (NAME POSSIBILITIES)
- #+(or clos pcl)
- ((NAME :initarg :NAME
-	:reader CASE-FAILURE-NAME)
-  (POSSIBILITIES :initarg :POSSIBILITIES
-		 :reader CASE-FAILURE-POSSIBILITIES))
-  (:REPORT
-    (LAMBDA (CONDITION STREAM)
-      (FORMAT STREAM "~S fell through ~S expression.~%Wanted one of ~:S."
-	      (TYPE-ERROR-DATUM CONDITION)
-	      (CASE-FAILURE-NAME CONDITION)
-	      (CASE-FAILURE-POSSIBILITIES CONDITION)))))
-
-(DEFINE-CONDITION PROGRAM-ERROR (ERROR)
-  ())
-
-(DEFINE-CONDITION CONTROL-ERROR (ERROR)
-  ())
-
-(DEFINE-CONDITION PARSE-ERROR (ERROR)
-  ())
-
-(DEFINE-CONDITION PRINT-NOT-READABLE (ERROR)
-  ())
-
-(DEFINE-CONDITION STREAM-ERROR (ERROR)
-  #-(or clos pcl)
-  (STREAM)
-  #+(or clos pcl)
-  ((STREAM :initarg :STREAM
-	   :reader STREAM-ERROR-STREAM)))
-
-(DEFINE-CONDITION READER-ERROR (PARSE-ERROR STREAM-ERROR)
-  ()
-  (:report
-    (lambda (condition stream)
-      (format stream "Read error on stream ~S:."
-	      (STREAM-ERROR-STREAM CONDITION)))))
-
-(DEFINE-CONDITION END-OF-FILE (STREAM-ERROR)
-  ()
-  (:REPORT (LAMBDA (CONDITION STREAM)
-	     (FORMAT STREAM "Unexpected end of file on ~S."
-		     (STREAM-ERROR-STREAM CONDITION)))))
-
-(DEFINE-CONDITION FILE-ERROR (ERROR)
-  #-(or clos pcl)
-  (PATHNAME)
-  #+(or clos pcl)
-  ((PATHNAME :initarg :PATHNAME
-	     :reader FILE-ERROR-PATHNAME)))
-
-(DEFINE-CONDITION PACKAGE-ERROR (ERROR)
-  #-(or clos pcl)
-  (PACKAGE)
-  #+(or clos pcl)
-  ((PACKAGE :initarg :PACKAGE
-	    :reader PACKAGE-ERROR-PACKAGE)
-   (MESSAGE :initarg :MESSAGE
-	    :reader PACKAGE-ERROR-MESSAGE))
-  (:report
-    (lambda (condition stream)
-      (format stream "A package error occurred on ~S: ~S."
-	      (PACKAGE-ERROR-PACKAGE CONDITION)
-	      (PACKAGE-ERROR-MESSAGE CONDITION)))))
+(define-condition package-error (error)
+  ((package :initarg :package
+	    :reader package-error-package))
+  (:report ("Package error on ~s: " package)))
 	      
+(define-condition cell-error (error)
+  ((name :initarg :name
+	 :reader cell-error-name))
+  (:report ("Cell error on ~s: " name)))
 
-(DEFINE-CONDITION CELL-ERROR (ERROR)
-  #-(or clos pcl)
-  (NAME)
-  #+(or clos pcl)
-  ((NAME :initarg :NAME
-	 :reader CELL-ERROR-NAME)))
-
-(DEFINE-CONDITION UNBOUND-VARIABLE (CELL-ERROR)
+(define-condition unbound-variable (cell-error)
   ()
-  (:REPORT (LAMBDA (CONDITION STREAM)
-	     (FORMAT STREAM "The variable ~S is unbound."
-		     (CELL-ERROR-NAME CONDITION)))))
+  (:report ("Unbound variable: ")))
 
-(DEFINE-CONDITION UNBOUND-SLOT (CELL-ERROR)
-  ((instance :initarg :instance :accessor unbound-slot-instance))
-  (:report (lambda (c s) (format s "Slot ~s is unbound in ~s"
-                                 (cell-error-name c)
-                                 (unbound-slot-instance c)))))
-;;   ()
-;;   (:REPORT (LAMBDA (CONDITION STREAM)
-;; 	     (FORMAT STREAM "The slot ~S is unbound."
-;;		     (CELL-ERROR-NAME CONDITION)))))
+(define-condition unbound-slot (cell-error)
+  ((instance :initarg :instance 
+	     :reader unbound-slot-instance))
+  (:report ("Slot is unbound in ~s: " instance)))
   
-(DEFINE-CONDITION UNDEFINED-FUNCTION (CELL-ERROR)
+(define-condition undefined-function (cell-error)
   ()
-  (:REPORT (LAMBDA (CONDITION STREAM)
-	     (FORMAT STREAM "The function ~S is undefined."
-		     (CELL-ERROR-NAME CONDITION)))))
+  (:report ("Undefined function: ")))
 
-(DEFINE-CONDITION ARITHMETIC-ERROR (ERROR)
-  #-(or clos pcl)
-  (OPERATION OPERANDS)
-  #+(or clos pcl)
-  ((OPERATION :initarg :OPERATION
-	      :reader ARITHMETIC-ERROR-OPERATION)))
+(define-condition arithmetic-error (ERROR)
+  ((operation :initarg :operation
+	      :reader arithmetic-error-operation)
+   (operands :initarg :operands
+	      :reader arithmetic-error-operands))
+    (:report ("Arithmetic error when performing ~s on ~s: " operation operands)))
 
-(DEFINE-CONDITION DIVISION-BY-ZERO         (ARITHMETIC-ERROR)
-  ())
+(define-condition division-by-zero (arithmetic-error) ())
 
-(DEFINE-CONDITION FLOATING-POINT-OVERFLOW  (ARITHMETIC-ERROR)
-  ())
+(define-condition floating-point-overflow (arithmetic-error) ())
 
-(DEFINE-CONDITION FLOATING-POINT-INVALID-OPERATION  (ARITHMETIC-ERROR)
-  ())
+(define-condition floating-point-invalid-operation (arithmetic-error) ())
 
-(DEFINE-CONDITION FLOATING-POINT-INEXACT  (ARITHMETIC-ERROR)
-  ())
+(define-condition floating-point-inexact (arithmetic-error) ())
 
-(DEFINE-CONDITION FLOATING-POINT-UNDERFLOW (ARITHMETIC-ERROR)
-  ())
+(define-condition floating-point-underflow (arithmetic-error) ())
 
-(DEFINE-CONDITION ABORT-FAILURE (CONTROL-ERROR) ()
-  (:REPORT "Abort failed."))
+(define-condition pathname-error (file-error) ())
 
-#+kcl
-(progn
-(define-condition internal-warning ( warning)
-  #-(or clos pcl)
-  ((function-name nil))
-  #+(or clos pcl)
+(define-condition case-failure (type-error)
+ ((name :initarg :name
+	:reader case-failure-name)
+  (possibilities :initarg :possibilities
+		 :reader case-failure-possibilities))
+  (:report
+    (lambda (condition stream)
+      (format stream "~s fell through ~s expression.~%wanted one of ~:s."
+	      (type-error-datum condition)
+	      (case-failure-name condition)
+	      (case-failure-possibilities condition)))))
+
+(define-condition abort-failure (control-error) () (:report "abort failed."))
+
+(define-condition internal-warning (warning)
   ((function-name :initarg :function-name
 		  :reader internal-error-function-name
-		  :initform 'nil))
+		  :initform nil))
   (:report (lambda (condition stream)
 	     (when (internal-error-function-name condition)
 	       (format stream "Warning in ~S [or a callee]: "
 		       (internal-error-function-name condition)))
-	     #+(or clos pcl)(call-next-method))))
+	     (call-next-method))))
 
-(define-condition internal-error ( error)
-  #-(or clos pcl)
-  ((function-name nil))
-  #+(or clos pcl)
+(define-condition internal-error (error)
   ((function-name :initarg :function-name
 		  :reader internal-error-function-name
-		  :initform 'nil))
+		  :initform nil))
   (:report (lambda (condition stream)
 	     (when (internal-error-function-name condition)
 	       (format stream "Error in ~S [or a callee]: "
 		       (internal-error-function-name condition)))
-	     #+(or clos pcl)(call-next-method))))
+	     (call-next-method))))
 
-(defun internal-simple-error-printer (condition stream)
-  (when (internal-error-function-name condition)
-    (format stream "Error in ~S [or a callee]: "
-	    (internal-error-function-name condition)))
-  (apply #'format stream (simple-condition-format-string    condition)
-	 		 (simple-condition-format-arguments condition)))
+(define-condition internal-condition (condition)
+  ((function-name :initarg :function-name
+		  :reader internal-condition-function-name
+		  :initform nil))
+  (:report (lambda (condition stream)
+	     (when (internal-condition-function-name condition)
+	       (format stream "Condition in ~S [or a callee]: "
+		       (internal-condition-function-name condition)))
+	     (call-next-method))))
 
-(defun internal-simple-warning-printer (condition stream)
-  (when (internal-error-function-name condition)
-    (format stream "Warning in ~S [or a callee]: "
-	    (internal-error-function-name condition)))
-  (apply #'format stream (simple-condition-format-string    condition)
-	 		 (simple-condition-format-arguments condition)))
+(define-condition internal-simple-condition (internal-condition simple-condition) ())
 
-(define-condition internal-simple-error 
-    (internal-error #+(or clos pcl) simple-condition)
-  #-(or clos pcl)
-  ((function-name nil) format-string (format-arguments '()))
-  #+(or clos pcl)
-  ()
-  #-(or clos pcl)(:conc-name %%internal-simple-error-)
-  (:report internal-simple-error-printer))
+(define-condition internal-simple-error (internal-condition simple-error) ())
+(define-condition internal-simple-type-error (internal-condition simple-type-error) ())
+(define-condition internal-simple-warning (internal-condition simple-warning) ())
 
-(define-condition internal-simple-warning 
-    (internal-warning #+(or clos pcl) simple-condition)
-  #-(or clos pcl)
-  ((function-name nil) format-string (format-arguments '()))
-  #+(or clos pcl)
-  ()
-  #-(or clos pcl)(:conc-name %%internal-simple-warning-)
-  (:report internal-simple-warning-printer))
+(defun symcat (x y) (values (intern (concatenate 'string (string x) (string y)) 'conditions)))
 
-(define-condition internal-type-error 
-    (#+(or clos pcl) internal-error type-error)
-  #-(or clos pcl)
-  ((function-name nil))
-  #+(or clos pcl)
-  ()
-  #-(or clos pcl)(:conc-name %%internal-type-error-)
-  #-(or clos pcl)(:report (lambda (condition stream)
-			    (when (internal-error-function-name condition)
-			      (format stream "Error in ~S [or a callee]: "
-				      (internal-error-function-name condition)))
-			    (format stream "~S is not of type ~S."
-				    (type-error-datum condition)
-				    (type-error-expected-type condition)))))
+#.`(eval-when 
+    (compile load eval) 
+    ,@(mapcar (lambda (x) 
+		`(define-condition ,(symcat "INTERNAL-SIMPLE-" x)  (internal-condition simple-condition ,x) ())) 
+	      `(stack-overflow storage-exhausted print-not-readable end-of-file style-warning
+			       unbound-variable unbound-slot undefined-function division-by-zero
+			       case-failure abort-failure
+			      ,@(mapcar (lambda (x) (symcat "FLOATING-POINT-" x)) 
+					'(overflow underflow invalid-operation inexact))
+			      ,@(mapcar (lambda (x) (symcat x "-ERROR"))
+					'(program control parse stream reader file
+					       package cell arithmetic pathname)))))
 
-(define-condition internal-package-error 
-   (#+(or clos pcl) internal-error package-error)
- #-(or clos pcl)
- ((function-name nil))
- #+(or clos pcl)
- ()
- #-(or clos pcl)(:conc-name %%internal-package-error-)
- #-(or clos pcl)(:report (lambda (condition stream)
-			    (when (internal-error-function-name condition)
-			      (format stream "Error in ~S [or a callee]: "
-				      (internal-error-function-name condition)))
-			    (format stream "A package error occurred on ~S: ~S."
-				    (package-error-package condition)
-				    (package-error-message condition)))))
-
-(define-condition internal-simple-program-error 
-    (#+(or clos pcl) internal-simple-error program-error)
-  #-(or clos pcl)
-  ((function-name nil) format-string (format-arguments '()))
-  #+(or clos pcl)
-  ()
-  #-(or clos pcl)(:conc-name %%internal-simple-program-error-)
-  #-(or clos pcl)(:report internal-simple-error-printer))
-
-(define-condition internal-simple-reader-error 
-    (#+(or clos pcl) internal-simple-error reader-error)
-  #-(or clos pcl)
-  ((function-name nil) format-string (format-arguments '()))
-  #+(or clos pcl)
-  ()
-  #-(or clos pcl)(:conc-name %%internal-simple-reader-error-)
-  #-(or clos pcl)(:report internal-simple-error-printer))
-
-(define-condition internal-simple-parse-error 
-    (#+(or clos pcl) internal-simple-error parse-error)
-  #-(or clos pcl)
-  ((function-name nil) format-string (format-arguments '()))
-  #+(or clos pcl)
-  ()
-  #-(or clos pcl)(:conc-name %%internal-simple-parse-error-)
-  #-(or clos pcl)(:report internal-simple-error-printer))
-
-(define-condition internal-simple-control-error 
-    (#+(or clos pcl) internal-simple-error control-error)
-  #-(or clos pcl)
-  ((function-name nil) format-string (format-arguments '()))
-  #+(or clos pcl)
-  ()
-  #-(or clos pcl)(:conc-name %%internal-simple-control-error-)
-  #-(or clos pcl)(:report internal-simple-error-printer))
-
-(define-condition internal-unbound-variable 
-    (#+(or clos pcl) internal-error unbound-variable)
-  #-(or clos pcl)
-  ((function-name nil))
-  #+(or clos pcl)
-  ()
-  #-(or clos pcl)(:conc-name %%internal-unbound-variable-)
-  #-(or clos pcl)(:REPORT (LAMBDA (CONDITION STREAM)
-			    (when (internal-error-function-name condition)
-			      (format stream "Error in ~S [or a callee]: "
-				      (internal-error-function-name condition)))
-			    (FORMAT STREAM "The variable ~S is unbound."
-				    (CELL-ERROR-NAME CONDITION)))))
-
-(define-condition internal-undefined-function 
-    (#+(or clos pcl) internal-error undefined-function)
-  #-(or clos pcl)
-  ((function-name nil))
-  #+(or clos pcl)
-  ()
-  #-(or clos pcl)(:conc-name %%internal-undefined-function-)
-  #-(or clos pcl)(:REPORT (LAMBDA (CONDITION STREAM)
-			    (when (internal-error-function-name condition)
-			      (format stream "Error in ~S [or a callee]: "
-				      (internal-error-function-name condition)))
-			    (FORMAT STREAM "The function ~S is undefined."
-				    (CELL-ERROR-NAME CONDITION)))))
-
-(define-condition internal-end-of-file 
-    (#+(or clos pcl) internal-error end-of-file)
-  #-(or clos pcl)
-  ((function-name nil))
-  #+(or clos pcl)
-  ()
-  #-(or clos pcl)(:conc-name %%internal-end-of-file-)
-  #-(or clos pcl)(:REPORT (LAMBDA (CONDITION STREAM)
-			    (when (internal-error-function-name condition)
-			      (format stream "Error in ~S [or a callee]: "
-				      (internal-error-function-name condition)))
-			    (FORMAT STREAM "Unexpected end of file on ~S."
-				    (STREAM-ERROR-STREAM CONDITION)))))
-
-(define-condition internal-simple-file-error
-    (#+(or clos pcl) internal-simple-error file-error)
-  #-(or clos pcl)
-  ((function-name nil) format-string (format-arguments '()))
-  #+(or clos pcl)
-  ()
-  #-(or clos pcl)(:conc-name %%internal-simple-file-error-)
-  #-(or clos pcl)(:report internal-simple-error-printer))
-
-(define-condition internal-simple-stream-error 
-    (#+(or clos pcl) internal-simple-error stream-error)
-  #-(or clos pcl)
-  ((function-name nil) format-string (format-arguments '()))
-  #+(or clos pcl)
-  ()
-  #-(or clos pcl)(:conc-name %%internal-simple-stream-error-)
-  #-(or clos pcl)(:report internal-simple-error-printer))
-
-#-(or pcl clos)
-(defun internal-error-function-name (condition)
-  (etypecase condition
-    (internal-error                
-     (%%internal-error-function-name condition))
-    (internal-simple-error         
-     (%%internal-simple-error-function-name condition))
-    (internal-type-error 
-     (%%internal-type-error-function-name condition))
-    (internal-simple-program-error
-     (%%internal-simple-program-error-function-name condition))
-    (internal-simple-parse-error
-     (%%internal-simple-parse-error-function-name condition))
-    (internal-simple-control-error
-     (%%internal-simple-control-error-function-name condition))
-    (internal-unbound-variable  
-     (%%internal-unbound-variable-function-name condition))
-    (internal-undefined-function 
-     (%%internal-undefined-function-function-name condition))
-    (internal-end-of-file        
-     (%%internal-end-of-file-function-name condition))
-    (internal-simple-file-error  
-     (%%internal-simple-file-error-function-name condition))
-    (internal-simple-stream-error 
-     (%%internal-simple-stream-error-function-name condition))))
-)
-
-#-(or clos pcl)
-(progn
-
-(DEFUN SIMPLE-CONDITION-FORMAT-STRING (CONDITION)
-  (ETYPECASE CONDITION
-    (SIMPLE-CONDITION  (%%SIMPLE-CONDITION-FORMAT-STRING  CONDITION))
-    (SIMPLE-WARNING    (%%SIMPLE-WARNING-FORMAT-STRING    CONDITION))
-    (SIMPLE-TYPE-ERROR (%%SIMPLE-TYPE-ERROR-FORMAT-STRING CONDITION))
-    (SIMPLE-ERROR      (%%SIMPLE-ERROR-FORMAT-STRING      CONDITION))
-    #+kcl(internal-simple-error
-	  (%%internal-simple-error-format-string condition))
-    #+kcl(internal-simple-program-error
-	  (%%internal-simple-program-error-format-string condition))
-    #+kcl(internal-simple-reader-error
-	  (%%internal-simple-reader-error-format-string condition))
-    #+kcl(internal-simple-parse-error
-	  (%%internal-simple-parse-error-format-string condition))
-    #+kcl(internal-simple-control-error
-	  (%%internal-simple-control-error-format-string condition))
-    #+kcl(internal-simple-file-error
-	  (%%internal-simple-file-error-format-string condition))
-    #+kcl(internal-simple-stream-error
-	  (%%internal-simple-stream-error-format-string condition))))
-
-(DEFUN SIMPLE-CONDITION-FORMAT-ARGUMENTS (CONDITION)
-  (ETYPECASE CONDITION
-    (SIMPLE-CONDITION  (%%SIMPLE-CONDITION-FORMAT-ARGUMENTS  CONDITION))
-    (SIMPLE-WARNING    (%%SIMPLE-WARNING-FORMAT-ARGUMENTS    CONDITION))
-    (SIMPLE-TYPE-ERROR (%%SIMPLE-TYPE-ERROR-FORMAT-ARGUMENTS CONDITION))
-    (SIMPLE-ERROR      (%%SIMPLE-ERROR-FORMAT-ARGUMENTS      CONDITION))
-    #+kcl(internal-simple-error
-	  (%%internal-simple-error-format-arguments condition))
-    #+kcl(internal-simple-program-error
-	  (%%internal-simple-program-error-format-arguments condition))
-    #+kcl(internal-simple-reader-error
-	  (%%internal-simple-reader-error-format-arguments condition))
-    #+kcl(internal-simple-parse-error
-	  (%%internal-simple-parse-error-format-arguments condition))
-    #+kcl(internal-simple-control-error
-	  (%%internal-simple-control-error-format-arguments condition))
-    #+kcl(internal-simple-file-error
-	  (%%internal-simple-file-error-format-arguments condition))
-    #+kcl(internal-simple-stream-error
-	  (%%internal-simple-stream-error-format-arguments condition))))
+(defvar *simple-condition-class* (find-class 'simple-condition))
+(defvar *internal-error-class*   (find-class 'internal-error))
+(defvar *internal-warning-class*   (find-class 'internal-error));fixme
 
 (defun simple-condition-class-p (type)
-  (member type '(SIMPLE-CONDITION SIMPLE-WARNING SIMPLE-TYPE-ERROR SIMPLE-ERROR
-		 #+kcl internal-simple-error
-		 #+kcl internal-simple-program-error
-		 #+kcl internal-simple-reader-error
-		 #+kcl internal-simple-parse-error
-		 #+kcl internal-simple-control-error
-		 #+kcl internal-simple-file-error
-		 #+kcl internal-simple-stream-error)))
-)
-
-#+(or clos pcl)
-(progn
-(defvar *simple-condition-class* (find-class 'simple-condition))
-
-(defun simple-condition-class-p (TYPE)
-  (when (symbolp TYPE)
-    (setq TYPE (find-class TYPE)))
-  (and (typep TYPE 'standard-class)
+  (when (symbolp type)
+    (setq type (find-class type)))
+  (and (typep type 'standard-class)
        (member *simple-condition-class* 
-	       (#+pcl pcl::class-precedence-list
-		#-pcl clos::class-precedence-list
-		  type))))
-)
+	       (pcl::class-precedence-list type))))
 
+(defun internal-simple-condition-class-p (type)
+  (let ((type (if (symbolp type) (find-class type) type))
+	(cpl (pcl::class-precedence-list type)))
+    (and (typep type 'standard-class)
+	 (member *simple-condition-class* cpl)
+	 (or (member *internal-error-class* cpl)
+	     (member *internal-warning-class* cpl)))))

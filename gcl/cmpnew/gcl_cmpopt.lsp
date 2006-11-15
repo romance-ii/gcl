@@ -772,7 +772,9 @@
    (get 'consp 'inline-always))
 
 ;;COS
- (push '((long-float) long-float #.(flags rfa)"cos(#0)")
+ (push '((fixnum-float) (long-float -1.0 1.0) #.(flags rfa)"cos(#0)")
+   (get 'cos 'inline-always))
+ (push '((short-float) (short-float -1.0 1.0) #.(flags rfa)"cosf(#0)")
    (get 'cos 'inline-always))
 
 ;;DIGIT-CHAR-P
@@ -831,20 +833,23 @@
 ;;EXPT
  (push '((t t) t #.(flags ans)"number_expt(#0,#1)")
    (get 'expt 'inline-always))
-
-(push '((fixnum fixnum) fixnum #.(flags)(LAMBDA (LOC1 LOC2)
-                                          (IF
-                                           (AND (CONSP LOC1)
-                                            (EQ (CAR LOC1) 'FIXNUM-LOC)
-                                            (CONSP (CADR LOC1))
-                                            (EQ (CAADR LOC1)
-                                             'FIXNUM-VALUE)
-                                            (EQUAL (CADDR (CADR LOC1))
-                                             2))
-                                           (WT "(1<<(" LOC2 "))")
-                                           (WT "fixnum_expt(" LOC1 #\,
-                                            LOC2 #\)))))
+ (push '((fixnum-float fixnum-float) long-float #.(flags)"exp((#1)*log(#0))")
    (get 'expt 'inline-always))
+ (push '((short-float short-float) short-float #.(flags)"expf((#1)*logf(#0))")
+   (get 'expt 'inline-always))
+ (push '((fixnum fixnum) fixnum #.(flags)(LAMBDA (LOC1 LOC2)
+						 (IF
+						  (AND (CONSP LOC1)
+						       (EQ (CAR LOC1) 'FIXNUM-LOC)
+						       (CONSP (CADR LOC1))
+						       (EQ (CAADR LOC1)
+							   'FIXNUM-VALUE)
+						       (EQUAL (CADDR (CADR LOC1))
+							      2))
+						  (WT "(1<<(" LOC2 "))")
+						  (WT "fixnum_expt(" LOC1 #\,
+						      LOC2 #\)))))
+       (get 'expt 'inline-always))
 
 
 ;;FILL-POINTER
@@ -1045,6 +1050,22 @@
  (push '((t) boolean #.(flags rfa)"listp(#0)")
    (get 'listp 'inline-always))
 
+;;LOG
+ (push '((fixnum-float) long-float #.(flags)"log(#0)")
+   (get 'log 'inline-always))
+ (push '((short-float) short-float #.(flags)"logf(#0)")
+   (get 'log 'inline-always))
+ (push '((fixnum-float fixnum-float) long-float #.(flags)"log(#0)/log(#1)")
+   (get 'log 'inline-always))
+ (push '((short-float short-float) short-float #.(flags)"logf(#0)/logf(#1)")
+   (get 'log 'inline-always))
+
+;;EXP
+ (push '((fixnum-float) long-float #.(flags)"exp(#0)")
+   (get 'exp 'inline-always))
+ (push '((short-float) short-float #.(flags)"expf(#0)")
+   (get 'expf 'inline-always))
+
 ;;LOGAND
  (push '((fixnum fixnum) fixnum #.(flags rfa)"((#0) & (#1))")
    (get 'logand 'inline-always))
@@ -1232,7 +1253,9 @@ TRUNCATE_USE_C
    (get 'second 'inline-unsafe))
 
 ;;SIN
- (push '((long-float) long-float #.(flags rfa)"sin(#0)")
+ (push '((fixnum-float) (long-float -1.0 1.0) #.(flags rfa)"sin(#0)")
+   (get 'sin 'inline-always))
+ (push '((short-float) (short-float -1.0 1.0) #.(flags rfa)"sinf(#0)")
    (get 'sin 'inline-always))
 
 ;;STRING
@@ -1266,18 +1289,27 @@ TRUNCATE_USE_C
    (get 'symbolp 'inline-always))
 
 ;;TAN
- (push '((long-float) long-float #.(flags rfa)"tan(#0)")
+ (push '((fixnum-float) long-float #.(flags rfa)"tan(#0)")
+   (get 'tan 'inline-always))
+ (push '((short-float) short-float #.(flags rfa)"tanf(#0)")
    (get 'tan 'inline-always))
 
+;;ATAN
+ (push '((fixnum-float) (long-float #.(atan -inf) #.(atan +inf)) #.(flags rfa)"atan(#0)")
+   (get 'atan 'inline-always))
+ (push '((short-float) (short-float #.(atan (float -inf 1.0s0)) #.(atan (float +inf 1.0s0))) #.(flags rfa)"atanf(#0)")
+   (get 'atan 'inline-always))
+
 ;;SQRT
- (push '((long-float) long-float #.(flags)"sqrt((double)#0)")
+ (push '((fixnum-float) long-float #.(flags)"sqrt(#0)")
    (get 'sqrt 'inline-always))
- (push '((short-float) short-float #.(flags)"sqrt((double)#0)")
+ (push '((short-float) short-float #.(flags)"sqrtf(#0)")
    (get 'sqrt 'inline-always))
- (push '(((long-float 0.0)) (long-float 0.0) #.(flags rfa)"sqrt((double)#0)")
-   (get 'sqrt 'inline-always))
- (push '(((short-float 0.0)) (short-float 0.0) #.(flags rfa)"sqrt((double)#0)")
-   (get 'sqrt 'inline-always))
+; (push '(((long-float 0.0)) (long-float 0.0) #.(flags rfa)"sqrt((double)#0)")
+;   (get 'sqrt 'inline-always))
+; (push '(((short-float 0.0)) (short-float 0.0) #.(flags rfa)"sqrt((double)#0)")
+;   (get 'sqrt 'inline-always))
+
 ; (push '(((or (integer 0) (float 0.0))) long-float #.(flags rfa)"sqrt((double)#0)")
 ;   (get 'sqrt 'inline-always))
 ; (push '(((integer 0 10)) long-float #.(flags rfa)"sqrt((double)#0)")

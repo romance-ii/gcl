@@ -953,8 +953,8 @@ a LET-like macro, and a SETQ-like macro, which perform LOOP-style destructuring.
 (defun loop-error (format-string &rest format-args)
   #+(or Genera CLOE) (declare (dbg:error-reporter))
   #+Genera (setq format-args (copy-list format-args))	;Don't ask.
-  (specific-error :invalid-form  "~?~%Current LOOP context:~{ ~S~}."
-			       format-string format-args (loop-context)))
+  (error 'program-error :format-control "~?~%Current LOOP context:~{ ~S~}."
+	 :format-arguments (list format-string format-args (loop-context))))
 
 
 (defun loop-warn (format-string &rest format-args)

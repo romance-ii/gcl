@@ -106,16 +106,14 @@ file_error(str,obj)
 char *str;
 object obj;
 {
-	object s,e;
+	object e;
         vs_mark;
 
-	s=make_simple_string(str);
-	vs_push(s);
 	sSApathname_errorA->s.s_dbind=obj;
 	e= (symbol_value(sSApathname_expandA) == Cnil) ?
 	    obj : expand_pathname(obj);
         vs_push(e);
-	Icall_error_handler(sKpathname_error, s , 1, e);
+	PATHNAME_ERROR(e,str,1,e);
 	vs_reset;
 	return Cnil;
 }
@@ -125,15 +123,13 @@ file_type_error(str,obj,typ)
 char *str;
 object obj,typ;
 {
-	object s,e;
+	object e;
         vs_mark;
 
-	s=make_simple_string(str);
-	vs_push(s);
 	e= (symbol_value(sSApathname_expandA) == Cnil) ?
 	    obj : expand_pathname(obj);
         vs_push(e);
-	Icall_error_handler(sKpathname_error, s , 2, e, typ);
+	TYPE_ERROR(e,typ);
 	vs_reset;
 	return Cnil;
 }

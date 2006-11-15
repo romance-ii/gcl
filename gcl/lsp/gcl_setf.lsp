@@ -628,15 +628,12 @@
 (defun (setf fdefinition) (def fn)
   (declare (optimize (safety 1)))
   (when (not (functionp def))
-    (specific-error :wrong-type-argument "~S is not of type ~S~%" def 'function))
+    (error 'type-error :datum def :expected-type 'function))
   (cond ((symbolp fn)
 	 (when (special-operator-p fn)
-	   (specific-error :wrong-type-argument
-			   "~S is a special operator and cannot be chenged by (set fdefinition), expect ~S~%"
-			   fn '(or symbol function)))
+	   (error 'type-error :datum fn :expected-type` '(or symbol function)))
 	 (setf (symbol-function fn) def))
 	(t
 	 (unless (and (consp fn) (eq (car fn) 'setf) (symbolp (cadr fn)) (null (cddr fn)))
-	   (specific-error :wrong-type-argument
-			   "~S is not of type ~S~%" fn 'function))
+	   (error 'type-error :datum fn :expected-type 'function))
 	 (setf (get (cadr fn) 'setf-function) def))))

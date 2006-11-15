@@ -46,7 +46,7 @@ License for more details.
 #ifdef STAND
 #include "include.h"
 
-#define FEerror(a...) do {fprintf(stderr,##a);exit(1);} while (0)
+#define FEerror(a...) do {fprintf(stderr,##a);gcl_abort();} while (0)
 #endif
 
 static void relocate_symbols(Elf32_Sym *sym,int nsyms,int nscns, int *init_address_ptr);

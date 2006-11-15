@@ -2414,9 +2414,8 @@ READ:
 	@(return x `make_fixnum(e)`)
 
 CANNOT_PARSE:
-	Icall_error_handler(sKparse_error,
-			    make_simple_string("Cannot parse an integer in the string ~S."), 
-			    1, strng);
+  PARSE_ERROR("Cannot parse integer from string");
+
 @)
 
 /* @(defun read_byte (binary_input_stream */

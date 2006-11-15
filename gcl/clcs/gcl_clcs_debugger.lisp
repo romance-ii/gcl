@@ -90,13 +90,13 @@
 (defvar *DEBUGGER-HOOK* nil)
 (defvar *debugger-function* 'STANDARD-DEBUGGER)
 
-(DEFUN INVOKE-DEBUGGER (&OPTIONAL (DATUM "Debug") &REST ARGUMENTS)
-  (LET ((CONDITION (COERCE-TO-CONDITION DATUM ARGUMENTS 'SIMPLE-CONDITION 'DEBUG)))
-       (WHEN *DEBUGGER-HOOK*
-	     (LET ((HOOK *DEBUGGER-HOOK*)
-		   (*DEBUGGER-HOOK* NIL))
-		  (FUNCALL HOOK CONDITION HOOK)))
-       (funcall *debugger-function* CONDITION)))
+(DEFUN INVOKE-DEBUGGER (condition)
+  (WHEN *DEBUGGER-HOOK*
+	(LET ((HOOK *DEBUGGER-HOOK*)
+	      (*DEBUGGER-HOOK* NIL))
+	     (FUNCALL HOOK CONDITION HOOK)))
+  (funcall *debugger-function* CONDITION)
+  (throw si::*quit-tag* si::*quit-tag*))
 
 (DEFUN STANDARD-DEBUGGER (CONDITION)
   (LET* ((*DEBUG-LEVEL* (1+ *DEBUG-LEVEL*))

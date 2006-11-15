@@ -385,28 +385,27 @@
 	  (loop for (slot . more) on (getf initargs :direct-slots)
 		for slot-name = (getf slot :name)
 		if (some (lambda (s) (eq slot-name (getf s :name))) more) do
-		(specific-error :invalid-form
+		(error 'program-error :format-control
 				"More than one direct slot with name ~S."
-				slot-name)
+				:format-arguments (list slot-name))
 		else do
 		(loop for (option value . more) on slot by #'cddr
 		      when (and (member option '(:allocation :type :initform
 							     :documentation))
 				(not (eq unsupplied
 					 (getf more option unsupplied)))) do
-					 (specific-error :invalid-form
+					 (error 'program-error :format-control
 							 "Duplicate slot option ~S for slot ~S."
-							 option slot-name)))
+							 :format-arguments (list option slot-name))))
 	  ;;
 	  ;; CLHS: signal PROGRAM-ERROR, if an initialization argument name
 	  ;; appears more than once in :DEFAULT-INITARGS class option.
 	  (loop for (initarg . more) on (getf initargs :direct-default-initargs)
 		for name = (car initarg) 
 		when (some (lambda (a) (eq (car a) name)) more) do
-		(specific-error :invalid-form
+		(error 'program-error :format-control
 				"Duplicate initialization argument ~
-                name ~S in :default-initargs of class ~A."
-				name class))
+                name ~S in :default-initargs of class ~A." :format-arguments (list name class)))
 	  ;;
 	  (loop (unless (remf initargs :metaclass) (return)))
 	  (loop (unless (remf initargs :direct-superclasses) (return)))

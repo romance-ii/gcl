@@ -319,8 +319,8 @@
 (DEFSYSFUN 'EQUALP "Lequalp" '(T T) 'T NIL T) 
 (DEFSYSFUN 'SIMPLE-BIT-VECTOR-P "Lsimple_bit_vector_p" '(T) 'T NIL T) 
 (DEFSYSFUN 'MEMBER-IF-NOT "Lmember_if_not" '(T T *) 'T NIL NIL) 
-(DEFSYSFUN 'MAKE-TWO-WAY-STREAM "Lmake_two_way_stream" '(T T) 'T NIL
-    NIL) 
+;(DEFSYSFUN 'MAKE-TWO-WAY-STREAM "Lmake_two_way_stream" '(T T) 'T NIL
+;    NIL) 
 (DEFSYSFUN 'PARSE-INTEGER "Lparse_integer" '(T *) '(returns-exactly (or integer (member nil)) seqind) NIL NIL) 
 (DEFSYSFUN '+ "Lplus" '(*) 'T NIL NIL) 
 (DEFSYSFUN '= "Lall_the_same" '(T *) 'T NIL T) 
@@ -375,7 +375,7 @@
 (DEFSYSFUN 'COMPILED-FUNCTION-P "Lcompiled_function_p" '(T) 'T NIL T) 
 (DEFSYSFUN 'SUBLIS "Lsublis" '(T T *) 'T NIL NIL) 
 (DEFSYSFUN 'PATHNAME-NAME "Lpathname_name" '(T) 'T NIL NIL) 
-(DEFSYSFUN 'IMPORT "Limport" '(T *) 'T NIL NIL) 
+;(DEFSYSFUN 'IMPORT "Limport" '(T *) 'T NIL NIL) 
 (DEFSYSFUN 'LOGXOR "Llogxor" '(*) 'T NIL NIL) 
 (DEFSYSFUN 'RASSOC-IF-NOT "Lrassoc_if_not" '(T T) 'T NIL NIL) 
 (DEFSYSFUN 'CHAR-GREATERP "Lchar_greaterp" '(T *) 'T NIL T) 

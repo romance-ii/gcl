@@ -109,7 +109,7 @@ make_ratio(object num, object den,int pre_cancelled)
 	vs_mark;
 
 	if (den==small_fixnum(0) /* number_zerop(den) */)
-		FEerror("Zero denominator.", 0);
+	  DIVISION_BY_ZERO(sLD,list(2,num,den));
 	if (num==small_fixnum(0)/* number_zerop(num) */)
 		return(num);
 	if (number_minusp(den)) {

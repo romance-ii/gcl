@@ -1179,7 +1179,7 @@ DEFUNOM_NEW("FUNCALL",object,fLfuncall,LISP
 DEFUNOM_NEW("APPLY",object,fLapply,LISP
        ,2,MAX_ARGS,NONE,OO,OO,OO,OO,void,Lapply,(object fun,...),"")
 {	int m,n=VFUN_NARGS;
-	object list;
+	object olist;
 	object buf[MAX_ARGS];
 	object *base=buf;
 	va_list ap;
@@ -1189,12 +1189,12 @@ DEFUNOM_NEW("APPLY",object,fLapply,LISP
 	  {*base++ = va_arg(ap,object);
 	 }
 	m = n-2;
-	list = va_arg(ap,object);
+	olist = va_arg(ap,object);
 	va_end(ap);
-	while (!endp(list))
+	while (!endp(olist))
 	  { if (m >= MAX_ARGS) FEerror(" Lisps arglist maximum surpassed",0);
-	    *base++ = Mcar(list);
-	    list = Mcdr(list);
+	    *base++ = Mcar(olist);
+	    olist = Mcdr(olist);
 	    m++;}
 	return IapplyVector(fun,m,buf);
       }

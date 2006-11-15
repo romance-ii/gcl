@@ -89,8 +89,11 @@ int index;
 	int i,max;
 	object l;
 
-	if (index < 0) 
-	  TYPE_ERROR(make_fixnum(index),sLnon_negative_fixnum);
+	if (index < 0) {
+	  object y=make_fixnum(index);
+	  TYPE_ERROR(y,sLnon_negative_fixnum);
+	  index=fix(y);
+	}
 	switch (type_of(seq)) {
 	case t_cons:
 		for (i = index, l = seq;  i > 0;  --i)
@@ -131,9 +134,11 @@ int index;
 	}
 
 E:
-	TYPE_ERROR(make_fixnum(index),MMcons(sLinteger,
-					     MMcons(make_fixnum(0),
-						    MMcons(MMcons(make_fixnum(max),Cnil),Cnil))));
+	{
+	  object y=make_fixnum(index);
+	  TYPE_ERROR(y,MMcons(sLinteger,MMcons(make_fixnum(0),MMcons(MMcons(make_fixnum(max),Cnil),Cnil))));
+	  index=fix(y);
+	}
 	return(Cnil);
 }
 
@@ -156,8 +161,11 @@ object val;
 	int i,max;
 	object l;
 
-	if (index < 0) 
-	  TYPE_ERROR(make_fixnum(index),sLnon_negative_fixnum);
+	if (index < 0) {
+	  object y=make_fixnum(index);
+	  TYPE_ERROR(y,sLnon_negative_fixnum);
+	  index=fix(y);
+	}
 	switch (type_of(seq)) {
 	case t_cons:
 		for (i = index, l = seq;  i > 0;  --i)
@@ -196,9 +204,11 @@ object val;
 	}
 
 E:
-	TYPE_ERROR(make_fixnum(index),MMcons(sLinteger,
-					     MMcons(make_fixnum(0),
-						    MMcons(MMcons(make_fixnum(max),Cnil),Cnil))));
+	{
+	  object y=make_fixnum(index);
+	  TYPE_ERROR(y,MMcons(sLinteger,MMcons(make_fixnum(0),MMcons(MMcons(make_fixnum(max),Cnil),Cnil))));
+	  index=fix(y);
+	}
 	return(Cnil);	
 }
 

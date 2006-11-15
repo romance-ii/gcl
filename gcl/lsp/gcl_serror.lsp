@@ -1,246 +1,243 @@
 ;; -*-Lisp-*-
-;;;   -*- Mode:Lisp; Package:SERROR; Base:10; Syntax:COMMON-LISP -*-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;                                                                    ;;;;;
-;;;     Copyright (c) 1985,86 by William Schelter,University of Texas  ;;;;;
-;;;     All rights reserved                                            ;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;(require "SLOOP")
-(in-package "SERROR" :use '("SLOOP" "LISP"))
-;(export '(def-error-type cond-error cond-any-error condition-case
-;	   error-name error-string error-continue-string error-format-args
-;	   ) "SERROR")
-;(provide "SERROR")
+(in-package 'lisp)
+(export '(error break cerror))
 
-(export '(def-error-type cond-error cond-any-error condition-case
-	   error-name error-string error-continue-string error-format-args
-	   ) "SERROR")
+(in-package 'si)
 
-;(eval-when (compile)
-;	   (proclaim '(optimize (safety 2) (speed 2) (space 2))))
+(defvar *error-stack* nil)
 
-;;do (require "SERROR")
-;;(use-package "SERROR")
+(defvar *proto-debug-level* 1)
+(defun proto-show-restarts nil nil)
+(defun proto-with-simple-restart (x y) (declare (ignore x)) y)
+(defun proto-continue (&rest r) (declare (ignore r)) nil)
+(defun proto-abort (&rest r) (declare (ignore r)) nil)
+(defun proto-signal (x) (declare (ignore x)) nil)
+(defun proto-invoke-restart (-) -)
+(defun proto-invoke-debugger (&optional (datum "debug") &rest arguments)
+  (let ((pe (process-error datum arguments 'debug)))
+    (universal-error-handler pe)))
 
-;;This file contains two error catching facilities.  One based on
-;;catch and throw, and the other which may involve a closure.  The
-;;latter can be more costly for frequently executed forms, but has
-;;the advantage that errors which match none of the conditions
-;;will go into the regular error handler at the point in the stack where
-;;the error occurred.
+;homogenize break-quit
 
-;;First we set up an error catching for a common lisp
-;;whose primitive error handler is called si:universal-error-handler (eg kcl).
-;;Namely if *catch-error* is not nil then that means
-;;there is a (catch ':any-error somewhere up the stack.
-;;it is thrown to, along with the condition.  
-;;At the that point if the condition matches that of 
-;;the catch, it stops there,
-;;otherwise if *catch-error* is still not nil repeat
-;;Sample interface
+(defun break-quit-one nil
+  (break-quit (length *break-level*))
+  (throw *quit-tag* *quit-tag*))
 
-;(defun te (n m)
-;  (cond-error (er) (hairy-arithmetic  m n)
-;     ((and (= 0 n) (= 0 m))(format t "Hairy arithmetic doesn't like m=0=n") 58)
-;     ((eql (error-condition-name er) :wrong-type-args)(format t "Bonus for wrong args") 50)
-;     ((symbolp n)(and (numberp (symbol-value n))(format t "Had to eval n") (te m (symbol-value n)))))
+(defun find-ihs (s i &optional (j i))
+  (cond ((eq (ihs-fname i) s) i)
+	((and (> i 0) (find-ihs s (1- i) j)))
+	(j)))
 
+(defun error-in-error (x y z)
+  (proto-signal (process-error y z x))
+  (format *debug-io* "Error in error: ~&~A ~A ~A~2%" x y z)
+  (simple-backtrace)
+  (break-quit-one))
 
+(defmacro with-error-level-bindings ((fn d a) &body forms)
+  `(let* ((error-stack *error-stack*)
+	  (*error-stack* (if (member ',fn error-stack) error-stack (cons ',fn error-stack)))
+ 	  (no-bind (and error-stack (not (eq *error-stack* error-stack))))
+	  (*ihs-base* (if no-bind *ihs-base* (1+ *ihs-top*)))
+	  (*ihs-top*  (if no-bind *ihs-top*  (1- (find-ihs ',fn (ihs-top)))))
+	  (*frs-base* (if no-bind *frs-base* (or (sch-frs-base *frs-top* *ihs-base*) (1+ (frs-top)))))
+	  (*frs-top*  (if no-bind *frs-top* (frs-top)))
+	  (*current-ihs* *ihs-top*))
+     (cond ((eq error-stack *error-stack*) (error-in-error ',fn ,d ,a))
+	   (t ,@forms))))
 
-;;if none of the cond clauses hold, then we signal a regular error using
-;;the system error handler , unless there are more *catch-error*'s up
-;;the stack.  Major defect: If none of the conditions hold, we will have
-;;to signal our real error up at the topmost *catch-error* so losing the possibility
-;;of proceeding. The alternative is to some how get the tests down to where
-;;we want them, but that seems to mean consing a closure, and keeping a
-;;stack of them.  This is getting a little fancy.  
-;;don't know how to get back (and anyway we have unwound by throwing).
-;;Major advantages: If there is no error, no closures are consed, and
-;;should be reasonably fast.
+(defun bind-test (n)
+  (let ((*error-stack* *error-stack*))
+    (cond ((> n 0) (bind-test (1- n))))))
+  
+(defun new-quit-tag nil (cons nil nil))
 
-
-
-;;****** Very system dependent.  Redefine main error handler ******
-(eval-when (load compile eval)
-#-kcl
-(defun si::universal-error-handler (&rest args)
-  (format t "Calling orignal error handler ~a" args))
-
-(defvar *error-handler-function* 'si::universal-error-handler)
-(or (get   *error-handler-function* :old-definition)
-   (setf (get *error-handler-function* :old-definition)
-	 (symbol-function *error-handler-function*)))
-)
-
-(defstruct (error-condition :named (:conc-name error-))
-  name
-  string          ;the format string given to error.
-  function        ;occurs inside here
-  continue-string
-  format-args
-  error-handler-args)
-
-(defparameter *catch-error* nil "If t errors will throw to :any-error tag")
-(defparameter *disable-catch-error* nil "If t only regular error handler will be used")
-(defparameter *catch-error-stack* (make-array 30 :fill-pointer 0) "If t only regular error handler will be used")
-(defvar *show-all-debug-info* nil "Set to t if not
- running interactively")
-
-;;principal interfaces
-
-(defmacro cond-error (variables body-form &body clauses)
-  "If a condition is signalled during evaluation of body-form, The first
-of VARIABLES is bound to the condition, and the clauses are evaluated
-like cond clauses. Note if the conditions involve lexical variables other than
-VARIABLES, there will be a new lexical closure cons'd each time through this!!
- eg:
- (cond-error (er) (1+ u)
-  ((null u) (princ er) (princ \"null arg to u\"))
-  ((symbolp u) (princ \"symbol arg\"))
-  (t 0))"
-
-  (or variables (setf variables '(ignore)))
-  (let ((catch-tag (gensym "CATCH-TAG")))
-  (let ((bod `((catch ',catch-tag 
-	       (return-from cond-error-continue
-			    (unwind-protect
-				(progn
-				  (vector-push-extend
-				   #'(lambda ,variables ,(car variables)
-				       (if (or ,@ (mapcar 'car clauses)) ',catch-tag))
-				   *catch-error-stack*)
-				  ,body-form)
-			      (incf (the fixnum (fill-pointer *catch-error-stack*))
-				    -1))))
-	     (cond ,@ clauses
-		   (t (format t "should not get here") )))))
-  (cond (variables
-	 (setf bod 
-	      ` (multiple-value-bind
-		,variables ,@ bod)))
-	 (t (setf bod (cons 'progn bod))))
-  `(block cond-error-continue ,bod))))
-
-(defmacro cond-any-error (variables body-form &body clauses)
-  "If a condition is signalled during evaluation of body-form, The first
-of VARIABLES is bound to the condition, and the clauses are evaluated
-like cond clauses, If the cond falls off the end, then the error is
-signaled at this point in the stack.  For the moment the rest of the VARIABLES are ignored.
- eg:
- (cond-error (er) (1+ u)
-  ((null u) (princ er) (princ \"null arg to u\"))
-  ((symbolp u) (princ \"symbol arg\"))
-  (t 0))"
-
-  (let ((bod `(
-	       (let ((*catch-error* t))
-		 (catch ':any-error
-		   (return-from cond-error-continue ,body-form)))
-	       (cond ,@ clauses
-		     (t (inf-signal ,@ variables))))))
-    (cond (variables
-	   (setf bod 
-		 ` (multiple-value-bind
-		    ,variables ,@ bod)))
-	  (t (setf bod (cons 'progn bod))))
-    `(block cond-error-continue ,bod)))
-
-(defvar *internal-error-parms* nil)
-
-(defun #. (if (boundp '*error-handler-function*) *error-handler-function* 'joe)
-  (error-name correctable function-name
-	      continue-format-string error-format-string
-	      &rest error-handler-args
-	      &aux (internal-error-parms
-		    `(,error-name ,correctable ,function-name ,continue-format-string 
-				 ,error-format-string ,@error-handler-args)))
-  (declare (:dynamic-extent error-handler-args))
-  (si::maybe-clear-input)
-;;   (when (equal internal-error-parms *internal-error-parms*)
-;;     (format t "Error handler called recursively ~S~%"
-;; 	    internal-error-parms)
-;;     ;; FIXME
-;;     (return-from si::universal-error-handler nil))
-  (let ((*internal-error-parms* internal-error-parms))
-  (when *show-all-debug-info*
-    (si::simple-backtrace)
-    (si::backtrace)
-    (si::break-vs))
-  (let ((err (make-error-condition
-	      :name error-name
-	      :string error-format-string
-	      :function function-name
-	      :continue-string continue-format-string
-	      :format-args error-handler-args
-	      :error-handler-args internal-error-parms)))
-    (cond (*catch-error* (throw :any-error err))
-	  ((let (flag) (do ((i 0 (the fixnum (1+ i)))
-			    (end (the fixnum
-				      (fill-pointer (the array *catch-error-stack*)))))
-			   ((>= i end))
-			   (declare (fixnum i end))
-			   (cond ((setq flag
-					(funcall (aref *catch-error-stack* i) err))
-				  (throw flag err))))))
-	  ((apply (get *error-handler-function* :old-definition) internal-error-parms))))))
-
-(defun inf-signal (&rest error-handler-args)
- (apply *error-handler-function*
-                     (error-error-handler-args (car error-handler-args ))))
-
-#|Sample call
-(defun te (n)
-  (cond-error (er) (progn (1+ n))
-     ((null n) (print n) (print er) n)
-     ((symbolp n) (print n))))
-|#
-
-(defmacro def-error-type (name (er) &body body)
-  (let ((fname (intern (format nil "~a-tester" name))))
-  `(eval-when (compile eval load)
-      (defun ,fname (,er) ,@ body)
-      (deftype ,name ()`(and error-condition (satisfies ,',fname))))))
-(def-error-type wta (er) (eql (error-name er) :wrong-type-arg))
-
-#|
-(def-error-type hi-error (er) (eql (error-string er) "hi"))
-;this matches error signaled by (error "hi") or (cerror x "hi" ..)
-;can use the above so that the user can put
-(cond-error (er ) (hairy-stuff)
-  ((typep er 'wta) ...)
-  ((typep er '(or hi-error joe)) ...)
-(defun te2 (n)
-  (sloop for i below n with x = 0 declare (fixnum x)
-	 do (cond-any-error (er) (setq x i)
-			(t (print "hi")))))
-|#
-;;In kcl cond-any-error is over 10 times as fast as cond-error, for the above.
-;;Note since t a clause we could have optimized to cond-any-error!!
-;;cond-error takes 1/1000 of second on sun 2
-;;cond-any-error takes 1/10000 of second. (assuming no error!).
+(defmacro with-read-level-bindings (&body forms)
+  `(let* ((qts (cons (cons *break-level* *quit-tag*) *quit-tags*))
+	  (qt (new-quit-tag))
+	  (be (unless p-e-p *break-enable*));fix p-e-p
+	  (rt (or *break-readtable* *readtable*))
+	  (bt (bind-test 8))
+	  (*quit-tags* qts)
+	  (*quit-tag* qt)
+	  (*break-level* break-level)
+	  (*break-enable* be)
+	  (*readtable* rt)
+	  (*break-env* nil)
+	  (*read-suppress* nil)
+	  (*error-stack* nil))
+     (declare (ignore bt))
+     (catch *quit-tag*
+       ,@forms)))
 
 
-(def-error-type subscript-out-of-bounds (er)
-  #+ti (member 'si::subscript-out-of-bounds (funcall er :condition-names))
-  #+gcl(equal (error-string er) "The first index, ~S, to the array~%~S is too large.")) ;should collect all here
-(def-error-type ERROR (er) (eql (error-name er) :error))
-(def-error-type WRONG-TYPE-ARGUMENT (er)  (eql (error-name er) :WRONG-TYPE-ARGUMENT))
-(def-error-type TOO-FEW-ARGUMENTS (er)  (eql (error-name er) :TOO-FEW-ARGUMENTS))
-(def-error-type TOO-MANY-ARGUMENTS (er)  (eql (error-name er) :TOO-MANY-ARGUMENTS))
-(def-error-type UNEXPECTED-KEYWORD (er)  (eql (error-name er) :UNEXPECTED-KEYWORD))
-(def-error-type INVALID-FORM (er)  (eql (error-name er) :INVALID-FORM))
-(def-error-type UNBOUND-VARIABLE (er)  (eql (error-name er) :UNBOUND-VARIABLE))
-(def-error-type INVALID-VARIABLE (er)  (eql (error-name er) :INVALID-VARIABLE))
-(def-error-type UNDEFINED-FUNCTION (er)  (eql (error-name er) :UNDEFINED-FUNCTION))
-(def-error-type INVALID-FUNCTION (er)   (eql (error-name er) :INVALID-FUNCTION))
 
-(defmacro condition-case (vars body-form &rest cases)
-  (let ((er (car vars)))
-  `(cond-error (,er) ,body-form
-	       ,@ (sloop for v in cases
-			 when (listp (car v))
-			 collecting `((typep ,er '(or ,@ (car v))),@ (cdr v))
-			 else
-			 collecting `((typep ,er ',(car v)),@ (cdr v))))))
+(defun processed-error-p (x) (stringp x))
+(defun coerce-to-string (datum args) 
+  (cond ((stringp datum)
+	 (if args 
+	     (let ((*print-pretty* nil)
+		   (*print-level* *debug-print-level*)
+		   (*print-length* *debug-print-level*)
+		   (*print-case* :upcase))
+	       (apply 'format nil datum args))
+	   datum))
+	((symbolp datum)
+	 (coerce-to-string
+	  (if args
+	      (apply 'string-concatenate (cons datum (make-list (length args) :initial-element " ~s")))
+	    (string datum))
+	  args))
+	("unknown error")))
 
-	       
+(defun process-error (datum args function-name &optional default-type)
+  (declare (ignore function-name default-type))
+  (coerce-to-string datum args))
+
+(defun error (datum &rest arguments)
+  (with-error-level-bindings (error datum arguments)
+   (let ((pe (process-error datum arguments 'error)))
+;     (proto-signal pe)
+     (proto-invoke-debugger pe)
+     (if *default-continue-string* 
+	 (throw 'cerror nil)
+       (throw *quit-tag* *quit-tag*)))))
+  
+(defvar *default-continue-string* nil)
+
+(defun cerror (continue-string datum &rest arguments)
+  (with-error-level-bindings (cerror datum arguments)
+   (let ((*default-continue-string* continue-string))
+     (catch 'cerror;remove in ansi
+       (proto-with-simple-restart
+	(proto-continue (apply 'format nil continue-string arguments))
+	(apply 'error datum arguments)))
+     nil)))
+
+(defun universal-error-handler
+  (error-name &optional (correctable *default-continue-string* cp)
+	      function-name
+	      (continue-format-string *default-continue-string*) error-format-string
+   &rest args)
+  (declare (:dynamic-extent args))
+
+  (maybe-clear-input)
+
+  (with-error-level-bindings (universal-error-handler error-name (list function-name 
+								       continue-format-string error-format-string args))
+
+   (let ((message (if cp (process-error error-name args 'universal-error-handler)
+		    error-name))
+	 (function-name (or function-name (ihs-fname *current-ihs*))))
+     (proto-signal message)
+     (let ((*print-pretty* nil)
+	   (*print-level* *debug-print-level*)
+	   (*print-length* *debug-print-level*)
+	   (*print-case* :upcase))
+       (terpri *error-output*)
+       (format *error-output* (if (and correctable *break-enable*) "~&Correctable error: " "~&Error: "))
+       (let ((*indent-formatted-output* t))
+	 (when (stringp message) (format *error-output* message)))
+       (terpri *error-output*)
+       (if (> (length *link-array*) 0)
+	   (format *error-output* "Fast links are on: do (si::use-fast-links nil) for debugging~%"))
+       (format *error-output* "Signalled by ~:@(~S~).~%" (or function-name "an anonymous function"))
+       (when (and correctable *break-enable*)
+	 (format *error-output* "~&If continued: ")
+	 (let ((*indent-formatted-output* t))
+	   (format *error-output* "~?~&" continue-format-string args))))
+     (force-output *error-output*)
+     (cond (correctable
+	    (proto-with-simple-restart
+	     (proto-continue (apply 'format nil continue-format-string args))
+	     (break-level message)))
+	   (t (break-level message) (throw *quit-tag* *quit-tag*))))))
+
+(defun dbl-eval (- &aux (break-command t))
+  (let ((val-list (multiple-value-list
+		   (cond 
+		    ((keywordp -)
+		     (break-call - nil 'break-command))
+		    ((and (consp -) (keywordp (car -)))
+		     (break-call (car -) (cdr -) 'break-command))
+		    ((integerp -) 
+		     (proto-break-level-invoke-restart -))     
+		    (t (setq break-command nil) (evalhook - nil nil *break-env*))))))
+    (cons break-command val-list)))
+
+
+(defun break-level (at &optional env)
+  (let* ((p-e-p (processed-error-p at))
+	 (*break-message* (if p-e-p at *break-message*))
+         (+ +) (++ ++) (+++ +++)
+         (- -)
+         (* *) (** **) (*** ***)
+         (/ /) (// //) (/// ///)
+	 (break-level (if p-e-p (cons t *break-level*) *break-level*))
+	 (debug-level *proto-debug-level*))
+
+    (catch-fatal 1)
+    (setq *interrupt-enable* t)
+    (if p-e-p 
+	(proto-with-simple-restart 
+	 (proto-abort "Return to debug level ~D." DEBUG-LEVEL)
+	 (progn
+	   (format *debug-io* "~&~A~2%" *break-message*)
+	   (set-current)
+	   (setq *no-prompt* nil)
+	   (proto-show-restarts)))
+      (set-back at env))
+    
+    (loop 
+     
+     (setq +++ ++ ++ + + -)
+     
+     (if *no-prompt* 
+	 (setq *no-prompt* nil)
+       (format *debug-io* "~&~a~a>~{~*>~}"
+	       (if p-e-p "" "dbl:")
+	       (if (eq *package* (find-package 'user)) "" (package-name *package*))
+	       break-level))
+     
+     (force-output *error-output*)
+     
+     (unless
+	 (proto-with-simple-restart 
+	  (proto-abort "Return to debug level ~D." DEBUG-LEVEL)
+	  (not
+	   (catch 'step-continue
+	     (with-read-level-bindings
+	      (setq - (dbl-read *debug-io* nil *top-eof*))
+	      (when (eq - *top-eof*) (bye -1))
+	      (let* ((ev (dbl-eval -))
+		     (break-command (car ev))
+		     (values (cdr ev)))
+		(and break-command (eq (car values) :resume)(return))
+		(setq /// // // / / values *** ** ** * * (car /))
+		(fresh-line *debug-io*)
+		(dolist (val /)
+		  (prin1 val *debug-io*)
+		  (terpri *debug-io*)))
+	      nil))))
+       (terpri *debug-io*)
+       (break-current)))))
+
+(defun break (&optional format-string &rest args &aux message)
+
+  (with-error-level-bindings
+   (break format-string args)
+   (let ((*print-pretty* nil)
+	 (*print-level* 4)
+	 (*print-length* 4)
+	 (*print-case* :upcase))
+     (terpri *error-output*)
+     (cond (format-string
+	    (format *error-output* "~&Break: ")
+	    (let ((*indent-formatted-output* t))
+	      (apply 'format *error-output* format-string args))
+	    (terpri *error-output*)
+	    (setq message (apply 'format nil format-string args)))
+	   (t (format *error-output* "~&Break.~%")
+	      (setq message ""))))
+   (let ((*break-enable* t)) (break-level message))
+   nil))

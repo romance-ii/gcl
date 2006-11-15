@@ -53,7 +53,7 @@
 (defun defmacro-error (problem kind name)
 ; FIXME check this
   (declare (ignore kind))
-  (specific-error :wrong-type-argument "~S is not of type ~S~%" problem name))
+  (error 'type-error :datum problem :expected-type name))
 
 (defun push-sub-list-binding (variable path object name error-kind error-fun)
   (let ((var (gensym "TEMP-")))

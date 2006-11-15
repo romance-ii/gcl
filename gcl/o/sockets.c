@@ -432,7 +432,7 @@ fill pointer, and this will be advanced.")
 
 
     break;
-  default: abort();
+  default: gcl_abort();
   }
   
   switch (t) {

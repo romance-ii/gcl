@@ -23,12 +23,10 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	Arithmetic operations
 */
 #define NEED_MP_H
+#define NEED_ISFINITE
 #include "include.h"
 
 #include "num_include.h"
-
-void
-zero_divisor(void);
 
 object fixnum_add(fixnum i, fixnum j)
 {
@@ -707,6 +705,8 @@ number_times(object x, object y)
 	SHORTFLOAT:
 		z = alloc_object(t_shortfloat);
 		sf(z) = (shortfloat)(dx * dy);
+		if (!sf(z) && dx && dy) FLOATING_POINT_UNDERFLOW(sLA,list(2,x,y));
+		if (!ISFINITE(sf(z))) FLOATING_POINT_OVERFLOW(sLA,list(2,x,y));
 		return(z);
 
 	case t_longfloat:
@@ -729,6 +729,8 @@ number_times(object x, object y)
 	LONGFLOAT:
 		z = alloc_object(t_longfloat);
 		lf(z) = dx * dy;
+		if (!lf(z) && dx && dy) FLOATING_POINT_UNDERFLOW(sLA,list(2,x,y));
+		if (!ISFINITE(lf(z))) FLOATING_POINT_OVERFLOW(sLA,list(2,x,y));
 		return(z);
 
 	case t_complex:
@@ -776,10 +778,8 @@ number_divide(object x, object y)
 /* 			z = make_ratio(x, y, 0); */
 			return(make_ratio(x, y, 0));
 		case t_ratio:
-			if(number_zerop(y->rat.rat_num))
-				zero_divisor();
-			return ratio_mult_with_cancellation(x,small_fixnum(1),
-							    y->rat.rat_den,y->rat.rat_num);
+		  if(number_zerop(y->rat.rat_num)) DIVISION_BY_ZERO(sLD,list(2,x,y));
+		  return ratio_mult_with_cancellation(x,small_fixnum(1),y->rat.rat_den,y->rat.rat_num);
 		case t_shortfloat:
 			dx = number_to_double(x);
 			dy = (double)(sf(y));
@@ -798,8 +798,7 @@ number_divide(object x, object y)
 		switch (type_of(y)) {
 		case t_fixnum:
 		case t_bignum:
-			if (number_zerop(y))
-				zero_divisor();
+		  if (number_zerop(y)) DIVISION_BY_ZERO(sLD,list(2,x,y));
 			return ratio_mult_with_cancellation(x->rat.rat_num,x->rat.rat_den,
 							    small_fixnum(1),y);
 		case t_ratio:
@@ -842,8 +841,7 @@ number_divide(object x, object y)
 		}
 	SHORTFLOAT:
 		z = alloc_object(t_shortfloat);
-		if (dy == 0.0)
-			zero_divisor();
+		if (dy == 0.0) DIVISION_BY_ZERO(sLD,list(2,x,y));
 		sf(z) = (shortfloat)(dx / dy);
 		return(z);
 
@@ -867,8 +865,7 @@ number_divide(object x, object y)
 		}
 	LONGFLOAT:
 		z = alloc_object(t_longfloat);
-		if (dy == 0.0)
-			zero_divisor();
+		if (dy == 0.0) DIVISION_BY_ZERO(sLD,list(2,x,y));
 		lf(z) = dx / dy;
 		return(z);
 
@@ -881,8 +878,7 @@ number_divide(object x, object y)
 		y = number_to_complex(y);
 		z1 = number_times(y->cmp.cmp_real, y->cmp.cmp_real);
 		z2 = number_times(y->cmp.cmp_imag, y->cmp.cmp_imag);
-		if (number_zerop(z3 = number_plus(z1, z2)))
-			zero_divisor();
+		if (number_zerop(z3 = number_plus(z1, z2))) DIVISION_BY_ZERO(sLD,list(2,x,y));
 		z1 = number_times(x->cmp.cmp_real, y->cmp.cmp_real);
 		z2 = number_times(x->cmp.cmp_imag, y->cmp.cmp_imag);
 		z1 = number_plus(z1, z2);
@@ -1027,6 +1023,7 @@ LFD(Ldivide)(void)
 		check_type_number(&vs_base[i]);
 	if (j == 1) {
 		vs_base[0] = number_divide(small_fixnum(1), vs_base[0]);
+		vs_top = vs_base+1;
 		return;
 	}
 	for (i = 1; i < j; i++)
@@ -1122,19 +1119,15 @@ LFD(Llcm)(void)
 	vs_top = vs_base+1;
 }
 
-void
-zero_divisor(void)
-{
-	FEerror("Zero divisor.", 0);
-}
-
-
 DEFUNO_NEW("FACTORIAL",object,fSfactorial,SI,1,1,NONE,OI,OO,OO,OO,void,siLfactorial,(fixnum x),"") {
 
   object r;
 
-  if (x<0)
-    TYPE_ERROR(make_fixnum(x),sLnon_negative_fixnum);
+  if (x<0) {
+    object y=make_fixnum(x);
+    TYPE_ERROR(y,sLnon_negative_fixnum);
+    x=fix(y);
+  }
   r=new_bignum();
   mpz_fac_ui(MP(r),x);
   RETURN1(normalize_big(r));

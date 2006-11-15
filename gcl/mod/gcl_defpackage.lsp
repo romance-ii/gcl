@@ -158,9 +158,8 @@
 				 (rest (first result)))))
 	  (sloop for option in '(:size :documentation)
 		 when (<= 2 (count option options :key #'car))
-		 do (specific-error :invalid-form 
-				    "DEFPACKAGE option ~s specified more than once."
-				    option))
+		 do (error 'program-error :format-control "DEFPACKAGE option ~s specified more than once."
+				    :format-arguments (list option)))
 	  (setq name (string name))
 	  (let ((nicknames (mapcar #'string (option-values :nicknames options)))
 		(documentation (first (option-values :documentation options)))
@@ -206,29 +205,31 @@
 			  (sloop for list in imported-from-symbol-names-list 
 				 append (rest list)))
 			 do
-			 (specific-error 
-			  :invalid-form 
-			  "The symbol ~s cannot coexist in these lists:~{ ~s~}" 
-			  (first duplicate)
+			 (error 
+			  'program-error
+			  :format-control "The symbol ~s cannot coexist in these lists:~{ ~s~}" 
+			  :format-arguments 
+			  (list (first duplicate)
 			  (sloop for num in (rest duplicate)
 				 collect 
 				 (case num 
 				       (1 :SHADOW)
 				       (2 :INTERN)
 				       (3 :SHADOWING-IMPORT-FROM)
-				       (4 :IMPORT-FROM)))))
+				       (4 :IMPORT-FROM))))))
 		  (sloop for duplicate in 
 			 (find-duplicates exported-symbol-names interned-symbol-names)
 			 do
-			 (specific-error 
-			  :invalid-form 
-			  "The symbol ~s cannot coexist in these lists:~{ ~s~}" 
-			  (first duplicate)
+			 (error 
+			  'program-error
+			  :format-control "The symbol ~s cannot coexist in these lists:~{ ~s~}" 
+			  :format-arguments 
+			  (list (first duplicate)
 			  (sloop for num in 
 				 (rest duplicate) 
 				 collect (case num 
 					       (1 :EXPORT)
-					       (2 :INTERN))))))
+					       (2 :INTERN)))))))
 	    `(eval-when (load eval compile)
 			(if (find-package ,name)
 			    (progn (rename-package ,name ,name)

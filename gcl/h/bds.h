@@ -25,19 +25,12 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	bind stack
 */
 
-struct bds_bd {
+typedef struct bds_bd {
 	object	bds_sym;	/*  symbol  */
 	object	bds_val;	/*  previous value of the symbol  */
-};
+} *bds_ptr;
 
-
-typedef struct bds_bd *bds_ptr;
-
-EXTER bds_ptr bds_org;
-
-EXTER bds_ptr bds_limit;
-
-EXTER bds_ptr bds_top;		/*  bind stack top  */
+EXTER bds_ptr bds_org,bds_limit,bds_top;
 
 #ifdef KCLOVM
 
@@ -49,22 +42,18 @@ EXTER bds_ptr bds_save_top;
 
 #endif
 
-#define	bds_check  \
-	if (bds_top >= bds_limit)  \
-		bds_overflow()
+#define	bds_check  if (bds_top >= bds_limit)  bds_overflow()
 
 /* do this so that an interrupt in the middle will leave the VALID
    part of the bds stack ie (<= bds_top) in a valid state, so
    that a throw out will be ok */
 #define	bds_bind(sym, val)  \
 	({object _sym=(sym),_val=(val);\
-         bds_check;\
-         bds_ptr _b = bds_top+1; \
-        (_b)->bds_sym = (_sym);  \
-	_b->bds_val = (_sym)->s.s_dbind;  \
-	(_sym)->s.s_dbind = (_val); bds_top=_b;})
+          if (++bds_top>=bds_limit) bds_overflow(); \
+          bds_top->bds_sym=_sym;  \
+          bds_top->bds_val=_sym->s.s_dbind;  \
+          _sym->s.s_dbind=_val;})
 
-#define	bds_unwind1  \
-	((bds_top->bds_sym)->s.s_dbind = bds_top->bds_val, --bds_top)
+#define	bds_unwind1 ((bds_top->bds_sym)->s.s_dbind = bds_top->bds_val, --bds_top)
 
 

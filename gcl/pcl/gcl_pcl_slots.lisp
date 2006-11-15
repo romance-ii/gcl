@@ -355,7 +355,7 @@
 	 instance))
 
 (defmethod slot-unbound ((class t) instance slot-name)
-  (error "The slot ~S is unbound in the object ~S." slot-name instance))
+  (error 'unbound-slot :name slot-name :instance instance))
 
 (defun slot-unbound-internal (instance position)
   (slot-unbound (class-of instance) instance 

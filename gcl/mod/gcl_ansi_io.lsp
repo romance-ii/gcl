@@ -91,7 +91,7 @@
 	  '(unless ,nx (go ,end)))
 	 (ensure-string (x)
 	  `(unless (stringp ,x)
-	     (specific-error :wrong-type-argument "~S is not of type ~S." ,x 'string))))
+	     (error 'type-error :datum ,x :expected-type 'string))))
 	(let ((,eprefix ,prefix)
 	      (,esuffix ,suffix)
 	      (,epprefix ,per-line-prefix))

@@ -333,7 +333,7 @@
 	  n)))))
     
 (defun temp-prefix nil
-  (concatenate 'string *tmp-dir* "gazonk_" (write-to-string (abs (si::getpid))) "_"))
+  (concatenate 'string *tmp-dir* "gazonk_" (write-to-string (abs (getpid))) "_"))
 
 (defun recompile (fn)
   (with-temp-file 

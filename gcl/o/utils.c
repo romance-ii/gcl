@@ -8,8 +8,8 @@
  * They may in future allow resetting the argument.
  */
 
-object CEerror(char *error_str, char *cont_str, int num, object arg1,
-	       object arg2, object arg3, object arg4);
+/* object CEerror(char *error_str, char *cont_str, int num, object arg1, */
+/* 	       object arg2, object arg3, object arg4); */
 object IisSymbol(object f)
 {
     if (type_of(f) != t_symbol) 
@@ -35,10 +35,10 @@ object Iis_fixnum(object f)
 }
 
 /* TODO: needs change in array.c */
-void Wrong_type_error(char *str, int n, ...)
-{
-    FEerror("Wrong type error", 0);
-}
+/* void Wrong_type_error(char *str, int n, ...) */
+/* { */
+/*     FEerror("Wrong type error", 0); */
+/* } */
 
 /* Apply f to the va_list ap, with an implicit number of args
    passed in VFUN_NARGS */
@@ -65,21 +65,21 @@ object Ifuncall_n(object fun, int n, ...)
 }
 
 /* TODO: check array.c and nfunlink.c */
-object Icheck_one_type(object x, enum type t)
-{
-    if (type_of(x) != t) {
-	return CEerror("Expected a ~a ", "Supply right type", 1,
-		       type_name(t), Cnil, Cnil, Cnil);
-    }
-    return x;
-}
+/* object Icheck_one_type(object x, enum type t) */
+/* { */
+/*     if (type_of(x) != t) { */
+/* 	return CEerror("Expected a ~a ", "Supply right type", 1, */
+/* 		       type_name(t), Cnil, Cnil, Cnil); */
+/*     } */
+/*     return x; */
+/* } */
 
 /* TODO: check array.c - 3 differnt tools to signal a type error !!! */
-object fSincorrect_type(object val, object type)
-{
-    return CEerror("Got ~a,Expected a ~a", "Supply a new one", 1, val,
-		   type, Cnil, Cnil);
-}
+/* object fSincorrect_type(object val, object type) */
+/* { */
+/*     return CEerror("Got ~a,Expected a ~a", "Supply a new one", 2, val, */
+/* 		   type, Cnil, Cnil); */
+/* } */
 
 /* Convert a value stack type return to an fcall multiple vaule return
    and return the actual value (or nil if no values);  */

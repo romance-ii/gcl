@@ -58,11 +58,11 @@
   `(do ((*print-level* 4)
         (*print-length* 4))
        (,test-form nil)
-       ,(if string
-            `(cerror "" ,string ,@args)
-            `(cerror "" "The assertion ~:@(~S~) is failed." ',test-form))
-       ,@(mapcar #'ask-for-form places)
-       (format *error-output* "Now continuing ...~%")))
+     ,(if string
+	  `(cerror "" ,string ,@args)
+	`(cerror "" "The assertion ~:@(~S~) is failed." ',test-form))
+     ,@(mapcar 'ask-for-form places)
+     (format *error-output* "Now continuing ...~%")))
 
 
 (defun ask-for-form (place)
@@ -145,25 +145,23 @@
    (do ((l (reverse clauses) (cdr l))
         (form `(error (typecase-error-string
                        ',keyform ,key
-                       ',(mapcar #'(lambda (l) (car l)) clauses)))))
+                       ',(mapcar (lambda (l) (car l)) clauses)))))
        ((endp l) `(let ((,key ,keyform)) ,form))
        (setq form `(if (typep ,key ',(caar l))
                        (progn ,@(cdar l))
-                       ,form))
-       )
-   )
+                       ,form))))
 
 (defmacro ctypecase (keyplace &rest clauses &aux (key (gensym)))
   (declare (optimize (safety 1)))
   `(loop (let ((,key ,keyplace))
-              ,@(mapcar #'(lambda (l)
-                                 `(when (typep ,key ',(car l))
-                                        (return (progn ,@(cdr l)))))
-                        clauses)
-              (cerror ""
-                      (typecase-error-string
-                       ',keyplace ,key
-                       ',(mapcar #'(lambda (l) (car l)) clauses))))
+	   ,@(mapcar (lambda (l)
+		       `(when (typep ,key ',(car l))
+			  (return (progn ,@(cdr l)))))
+		     clauses)
+	   (cerror ""
+		   (typecase-error-string
+		    ',keyplace ,key
+		    ',(mapcar (lambda (l) (car l)) clauses))))
          ,(ask-for-form keyplace)
          (format *error-output* "Now continuing ...~%")))
 

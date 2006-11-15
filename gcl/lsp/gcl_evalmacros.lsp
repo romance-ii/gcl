@@ -23,7 +23,7 @@
 
 (in-package "LISP")
 
-(export '(defvar defparameter defconstant memq define-symbol-macro))
+(export '(defvar defparameter defconstant memq define-symbol-macro import delete-package))
 
 (in-package "SYSTEM")
 
@@ -90,6 +90,13 @@
 
 (defmacro loop (&rest body &aux (tag (gensym)))
   `(block nil (tagbody ,tag (progn ,@body) (go ,tag))))
+
+(defun import (s &optional (p *package*))
+  (import-internal s p)
+  t)
+
+(defun delete-package (p)
+  (the boolean (values (delete-package-internal p))))
 
 (import 'while 'user)
 (defmacro while (test &rest forms)

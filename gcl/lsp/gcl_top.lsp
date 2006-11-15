@@ -69,7 +69,8 @@
 (defvar *break-env* nil)
 (defvar *ihs-base* 1)
 (defvar *ihs-top* 1)
-(defvar *current-ihs* 1)
+(defconstant +top-ihs+ 1)
+(defvar *current-ihs* +top-ihs+)
 (defvar *frs-base* 0)
 (defvar *frs-top* 0)
 (defvar *break-enable* t)
@@ -85,6 +86,20 @@
 (defvar *top-eof* (cons nil nil))
 (defvar *no-prompt* nil)
 
+(defun emergency-reset nil
+  (let ((x (load-time-value 
+	    (mapcar (lambda (x) (cons x (symbol-function x))) 
+		     '(format read find-package package-name 
+			      reset-stack-limits eq bye eval fresh-line prin1 terpri))))
+	(y (load-time-value (copy-readtable nil)))
+	(z (load-time-value (find-package 'user))))
+    (dolist (x x) 
+      (emergency-fset (car x) (cdr x)))
+    (setq *readtable* y)
+    (setq *package* z)
+    (format t "Emergency reset complete~%")))
+
+
 (defun top-level1 ()
   (let ((+ nil) (++ nil) (+++ nil)
         (- nil) 
@@ -92,40 +107,44 @@
         (/ nil) (// nil) (/// nil))
     (setq *lisp-initialized* t)
     (catch *quit-tag*
-      (progn 
-	(cond
-	 (*multiply-stacks* (setq *multiply-stacks* nil))
-	 ((probe-file "init.lsp") (load "init.lsp")))
-	(let (*load-verbose*) (process-some-args *command-args*))
-	)
+      (cond
+       (*multiply-stacks* (setq *multiply-stacks* nil))
+       ((probe-file "init.lsp") (load "init.lsp")))
+      (let (*load-verbose*) (process-some-args *command-args*))
       (and (functionp *top-level-hook*)(funcall   *top-level-hook*)))
 
     (loop
-      (setq +++ ++ ++ + + -)
-      (if *no-prompt* (setq *no-prompt* nil)
-	(format t "~%~a>"
-		(if (eq *package* (find-package 'user)) ""
-                  (package-name *package*))))
-      (reset-stack-limits)
-      ;; have to exit and re-enter to multiply stacks
-      (cond (*multiply-stacks* (Return-from top-level1)))
-      (when (catch *quit-tag*
-              (setq - (locally (declare (notinline read))
-                               (read *standard-input* nil *top-eof*)))
-              (when (eq - *top-eof*) (bye))
-;              (si::clear-c-stack 4096)
-              (let ((values (multiple-value-list
-                             (locally (declare (notinline eval)) (eval -)))))
-                (setq /// // // / / values *** ** ** * * (car /))
-                (fresh-line)
-                (dolist (val /)
-                  (locally (declare (notinline prin1)) (prin1 val))
-                  (terpri))
-                nil))
-        (setq *evalhook* nil *applyhook* nil)
-        (terpri *error-output*)
-        (break-current)))))
-
+     (when 
+	 (catch +top-abort-tag+
+	   (loop
+	    (when 
+		(catch *quit-tag*
+		  (setq +++ ++ ++ + + -)
+		  (if *no-prompt* (setq *no-prompt* nil)
+		    (format t "~%~a>"
+			    (if (eq *package* (find-package 'user)) ""
+			      (package-name *package*))))
+		  (reset-stack-limits)
+		  ;; have to exit and re-enter to multiply stacks
+		  (cond (*multiply-stacks* (Return-from top-level1)))
+		  (setq - (locally (declare (notinline read))
+				   (read *standard-input* nil *top-eof*)))
+		  (when (eq - *top-eof*) (bye))
+					;              (si::clear-c-stack 4096)
+		  (let ((values (multiple-value-list
+				 (locally (declare (notinline eval)) (eval -)))))
+		    (setq /// // // / / values *** ** ** * * (car /))
+		    (fresh-line)
+		    (dolist (val /)
+		      (locally (declare (notinline prin1)) (prin1 val))
+		      (terpri))
+		    nil))
+	      (setq *evalhook* nil *applyhook* nil)
+	      (terpri *error-output*)
+	      (break-current)))
+	   nil)
+       (emergency-reset)))))
+  
 (defun default-system-banner ()
   (let (gpled-modules)
     (dolist (l '(:unexec :bfd :readline :xgcl))
@@ -187,7 +206,7 @@
 	      (format t "~a~%" *system-banner*))
 	    (format t "Temporary directory for compiler files set to ~a~%" *tmp-dir*)))
    (setq *ihs-top* 1)
-   (in-package 'system::user) (incf system::*ihs-top* 2)
+   (in-package 'system::user) ;(incf system::*ihs-top* 2)
    (top-level1))
 
 (defun top-level nil (gcl-top-level))
@@ -209,35 +228,30 @@
 
 
 
-(defun dbl-read (&optional (stream *standard-input*) (eof-error-p t)
-			   (eof-value nil)  &aux ch)
+(defun dbl-read (&optional (stream *standard-input*) (eof-error-p t) (eof-value nil))
+
   (tagbody
    top
-   (setq ch (read-char stream eof-error-p eof-value))
-   (cond ((eql ch #\newline) (go top))
-	 ((eq ch eof-value) (return-from dbl-read eof-value)))
-   (unread-char ch stream))
+   (let ((ch (read-char stream eof-error-p eof-value)))
+     (cond ((eql ch #\newline) (go top))
+	   ((eq ch eof-value) (return-from dbl-read eof-value)))
+     (unread-char ch stream)))
 
-  (cond 
-;   ((eql #\: ch)
-;    (setq tem
-;	  (string-concatenate
-;	   "("
-;	   (read-line stream eof-error-p eof-value)")"))
-;    (read  (make-string-input-stream tem)
-;	   eof-error-p eof-value))
-	(t (read stream eof-error-p eof-value))))
+  (let* ((x (read stream eof-error-p eof-value))
+	 (ch (read-char-no-hang stream eof-error-p eof-value)))
+    (cond ((and ch (unread-char ch stream)))
+	  ((and (keywordp x) ch)
+	   (cons x (read-from-string (string-concatenate "(" (read-line stream eof-error-p eof-value) ")"))))
+	  (x))))
 
 
 (defun break-level (at &optional env)
   (let* ((*break-message* (if (stringp at) at *break-message*))
 	 (quit-tags1 (cons *break-level* *quit-tag*))
 	 (quit-tags (cons quit-tags1 *quit-tags*))
-	 (*quit-tags* quit-tags)
          (quit-tag (cons nil nil))
-         (*quit-tag* quit-tag)
-         (break-level (cons t *break-level*))
-         (*break-level* (if (not at) *break-level* break-level))
+	 (break-level1 (cons t *break-level*))
+         (break-level (if (not at) *break-level* break-level1))
          (*ihs-base* (1+ *ihs-top*))
          (*ihs-top* (1- (ihs-top)))
          (*current-ihs* *ihs-top*)
@@ -245,66 +259,62 @@
          (*frs-top* (frs-top))
          (*break-env* nil)
 	 (be *break-enable*)
-	 (*break-enable*
-	  (progn 
-	    (if (stringp at) nil be)))
-					;(*standard-input* *terminal-io*)
+	 (*break-enable* (unless (stringp at) be))
          (*readtable* (or *break-readtable* *readtable*))
          (*read-suppress* nil)
          (+ +) (++ ++) (+++ +++)
          (- -)
          (* *) (** **) (*** ***)
-         (/ /) (// //) (/// ///)
-         )
-    (declare (:dynamic-extent quit-tags quit-tags1 quit-tag break-level))
-					; (terpri *error-output*)
+         (/ /) (// //) (/// ///))
+    (declare (:dynamic-extent quit-tags quit-tags1 quit-tag break-level1))
+
     (unless (or be (not (stringp at)))
       (simple-backtrace)
-      (break-quit (length (cdr *break-level*))))
+      (break-quit (length *break-level*)))
     (catch-fatal 1)
     (setq *interrupt-enable* t)
-    (cond ((stringp at) (set-current)(terpri *error-output*)
-	   (setq *no-prompt* nil)
-	   )
-	  (t (set-back at env)))
-      (loop 
-       (setq +++ ++ ++ + + -)
-       (cond (*no-prompt* (setq *no-prompt* nil))
-	     (t
-	      (format *debug-io* "~&~a~a>~{~*>~}"
-		      (if (stringp at) "" "dbl:")
-		      (if (eq *package* (find-package 'user)) ""
-			(package-name *package*))
-		      *break-level*)))
-       (force-output *error-output*)
-       (when
-	(catch 'step-continue
-        (catch *quit-tag*
-          (setq - (locally (declare (notinline read))
-			   (dbl-read *debug-io* nil *top-eof*)))
-          (when (eq - *top-eof*) (bye -1))
-          (let* (break-command
-		 (values
-		  (multiple-value-list
-		  (LOCALLY (declare (notinline break-call evalhook))
-;			   (if (keywordp -)(setq - (cons - nil)))
-			   (cond 
-			    ((keywordp -)
-			     (setq break-command t)
-			     (break-call - nil 'si::break-command))
-			    ((and (consp -) (keywordp (car -)))
-			     (setq break-command t)
-			     (break-call (car -) (cdr -) 'si::break-command))
-			    (t (evalhook - nil nil *break-env*)))))))
-	    (and break-command (eq (car values) :resume )(return))
-            (setq /// // // / / values *** ** ** * * (car /))
-            (fresh-line *debug-io*)
-            (dolist (val /)
-		    (locally (declare (notinline prin1)) (prin1 val *debug-io*))
-		    (terpri *debug-io*)))
-          nil))
-        (terpri *debug-io*)
-        (break-current)))))
+    (cond ((stringp at) 
+	   (set-current)
+	   (terpri *error-output*)
+	   (setq *no-prompt* nil))
+	  ((set-back at env)))
+    (loop 
+     (setq +++ ++ ++ + + -)
+     (if *no-prompt* 
+	 (setq *no-prompt* nil)
+       (format *debug-io* "~&~a~a>~{~*>~}"
+	       (if (stringp at) "" "dbl:")
+	       (if (eq *package* (find-package 'user)) "" (package-name *package*))
+	       break-level))
+     (force-output *error-output*)
+     (when
+	 (catch 'step-continue
+	   (let ((*break-level* break-level)(*quit-tags* quit-tags)(*quit-tag* quit-tag))
+	     (catch *quit-tag*
+	       (setq - (locally (declare (notinline dbl-read))
+				(dbl-read *debug-io* nil *top-eof*)))
+	       (when (eq - *top-eof*) (bye -1))
+	       (let* (break-command
+		      (values
+		       (multiple-value-list
+			(LOCALLY (declare (notinline break-call evalhook))
+				 (cond 
+				  ((keywordp -)
+				   (setq break-command t)
+				   (break-call - nil 'si::break-command))
+				  ((and (consp -) (keywordp (car -)))
+				   (setq break-command t)
+				   (break-call (car -) (cdr -) 'si::break-command))
+				  (t (evalhook - nil nil *break-env*)))))))
+		 (and break-command (eq (car values) :resume )(return))
+		 (setq /// // // / / values *** ** ** * * (car /))
+		 (fresh-line *debug-io*)
+		 (dolist (val /)
+		   (locally (declare (notinline prin1)) (prin1 val *debug-io*))
+		   (terpri *debug-io*)))
+	       nil)))
+       (terpri *debug-io*)
+       (break-current)))))
 
 (defvar *debug-print-level* 3)
 
@@ -556,9 +566,9 @@
     (t `(system-internal-catcher ,(frs-tag i)))))
 
 (defun break-current ()
-  (if *break-level*
+  (if (> *current-ihs* +top-ihs+)
       (format *debug-io* "Broken at ~:@(~S~)." (ihs-fname *current-ihs*))
-      (format *debug-io* "~&Top level."))
+    (format *debug-io* "~&Top level."))
   (values))
 
 

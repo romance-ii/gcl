@@ -646,6 +646,20 @@ DEFUN_NEW("CLEAR-COMPILER-PROPERTIES",object,fSclear_compiler_properties,SI
   RETURN1(Cnil);
 }
 
+DEFUN_NEW("EMERGENCY-FSET",object,fSemergency_fset,SI
+   ,2,2,NONE,OO,OO,OO,OO,(object sym,object function),"")
+
+{
+
+  if (type_of(sym)!=t_symbol || sym->s.s_sfdef!=NOT_SPECIAL || consp(function)) {
+    printf("Emergency fset: skipping %-.*s\n",(int)sym->s.s_fillp,sym->s.s_self);
+    RETURN1(Cnil);
+  }
+  sym->s.s_gfdef=function;
+  sym->s.s_mflag=FALSE;
+  RETURN1(Ct);
+}
+
 DEF_ORDINARY("AREF",sLaref,LISP,"");
 DEF_ORDINARY("CAR",sLcar,LISP,"");
 DEF_ORDINARY("CDR",sLcdr,LISP,"");

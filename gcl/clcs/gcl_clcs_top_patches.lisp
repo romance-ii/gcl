@@ -4,36 +4,73 @@
 (import '(with-simple-restart abort continue compute-restarts
 	  *debug-level* *debug-restarts* *number-of-debug-restarts*
 	  *debug-abort* *debug-continue* *debug-condition* *debug-eval*
-	  find-restart invoke-restart invoke-restart-interactively
-	  restart-name ignore-errors show-restarts conditionp)
+	  find-restart invoke-restart invoke-restart-interactively invoke-debugger
+	  restart-name ignore-errors show-restarts conditionp signal)
 	"SYSTEM")
 
 (in-package "SYSTEM")
 
 (defvar *abort-restarts* nil)
 
-(defmacro with-clcs-break-level-bindings (&body forms)
-  `(let* ((*DEBUG-LEVEL* (1+ *DEBUG-LEVEL*))
-	  (debug-level *DEBUG-LEVEL*)
-	  (*DEBUG-RESTARTS* (COMPUTE-RESTARTS))
-	  (*NUMBER-OF-DEBUG-RESTARTS* (LENGTH *DEBUG-RESTARTS*))
-	  (*DEBUG-ABORT*    (FIND-RESTART 'ABORT))
-	  (*DEBUG-CONTINUE* (OR (LET ((C (FIND-RESTART 'CONTINUE)))
-				  (IF (OR (NOT *DEBUG-CONTINUE*)
-					  (NOT (EQ *DEBUG-CONTINUE* C)))
-				      C NIL))
-				(LET ((C (IF *DEBUG-RESTARTS*
-					     (FIRST *DEBUG-RESTARTS*) NIL)))
-				  (IF (NOT (EQ C *DEBUG-ABORT*)) C NIL))))
-	  (*DEBUG-CONDITION* (if (conditionp at) at *DEBUG-CONDITION*))
-	  (*abort-restarts* (let ((abort-list nil))
-			      (dolist (restart *DEBUG-RESTARTS*)
-				(when (eq 'abort (restart-name restart))
-				  (push restart abort-list)))
-			      (nreverse abort-list))))
-     ,@forms))
+(defconstant +protos+ (mapcar (lambda (x) (cons (intern (concatenate 'string "PROTO-" (string x))) x))
+			      '(with-simple-restart show-restarts continue break-level-invoke-restart
+						    invoke-debugger signal)))
 
-(defun clcs-break-level-invoke-restart (-)
+(defmacro with-protos (&body forms)
+`(let ((*proto-debug-level* *debug-level*))
+   ,@(nsublis +protos+ forms)))
+   
+(defun break-quit-one nil
+  (break-quit (length *abort-restarts*))
+  (throw *quit-tag* *quit-tag*))
+
+(defun processed-error-p (x) (or (stringp x) (conditionp x)))
+(defun process-error (datum args function-name &optional (default-type 'conditions::simple-error))
+  (when (symbolp datum)
+    (setq datum (if (conditions::simple-condition-class-p datum) 
+		    (conditions::symcat "INTERNAL-" datum) 
+		  (conditions::symcat "INTERNAL-SIMPLE-" datum))
+	  args `(,@args :function-name ,(ihs-fname *current-ihs*))))
+  (or (conditions::coerce-to-condition datum args default-type function-name)
+      (coerce-to-string datum args)))
+
+(defun break-level (at &optional env)
+  (let*  ((*debug-level* (1+ *debug-level*))
+	  (*debug-restarts* (compute-restarts))
+	  (*number-of-debug-restarts* (length *debug-restarts*))
+	  (*debug-abort* (find-restart 'abort))
+	  (*debug-continue* (or (let ((c (find-restart 'continue)))
+				  (unless (and *debug-continue* (eq *debug-continue* c)) c))
+				(let ((c (car *debug-restarts*)))
+				  (unless (eq c *debug-abort*) c))))
+	  (*debug-condition* (if (conditionp at) at *debug-condition*))
+	  (*abort-restarts* (remove-if-not (lambda (x) (eq 'abort (restart-name x))) *debug-restarts*)))
+    (with-protos
+     (funcall #.(function-src 'break-level) at env))))
+
+(defun new-quit-tag nil nil)
+
+(defun cerror (c d &rest a)
+  (with-protos
+    (apply #.(function-src 'cerror) c d a)))
+
+(defun error (d &rest a)
+  (with-protos
+    (apply #.(function-src 'error) d a)))
+
+(defun error-in-error (c d &rest a)
+  (with-protos
+    (apply #.(function-src 'error-in-error) c d a)))
+
+(defun universal-error-handler (e &rest a)
+  (with-protos
+    (apply #.(function-src 'universal-error-handler) e a)))
+
+(defun dbl-eval (d)
+  (with-protos
+    (funcall #.(function-src 'dbl-eval) d)))
+
+(defun break-level-invoke-restart (-)
   (COND ((AND (PLUSP -)
 	      (< - (+ *NUMBER-OF-DEBUG-RESTARTS* 1)))
 	 (LET ((RESTART (NTH (- - 1) *DEBUG-RESTARTS*)))
@@ -41,95 +78,17 @@
 	(T
 	 (FORMAT T "~&No such restart."))))
 
-;;FIXME -- ooverwrite others directly too
-;; From akcl-1-530, changes marked with ;***
-(defun break-level (at &optional env)
-  (let* ((*break-message* (if (or (stringp at) (conditionp at)) ;***
-			      at *break-message*))  ;***
-	 (*quit-tags* (cons (cons *break-level* *quit-tag*) *quit-tags*)) ;***
-         (*quit-tag* nil)    ;***
-         (*break-level* (if (conditionp at) (cons t *break-level*) *break-level*))
-         (*ihs-base* (1+ *ihs-top*))
-         (*ihs-top* (1- (ihs-top)))
-         (*current-ihs* *ihs-top*)
-         (*frs-base* (or (sch-frs-base *frs-top* *ihs-base*) (1+ (frs-top))))
-         (*frs-top* (frs-top))
-         (*break-env* nil)
-	 ;;(be *break-enable*) ;***
-	 ;;(*break-enable*               ;***
-	  ;;(progn                       ;***
-	    ;;(if (stringp at) nil be))) ;***
-	 ;;(*standard-input* *terminal-io*)
-         (*readtable* (or *break-readtable* *readtable*))
-         (*read-suppress* nil)
-         (+ +) (++ ++) (+++ +++)
-         (- -)
-         (* *) (** **) (*** ***)
-         (/ /) (// //) (/// ///)
-         )
-    ;;(terpri *error-output*)
-    (with-clcs-break-level-bindings ;***
-      (if (consp at)
-	  (set-back at env)
-	  (with-simple-restart (abort "Return to debug level ~D." DEBUG-LEVEL) ;***
-	    (format *debug-io* "~&~A~2%" *break-message*) ;***
-	    (when (> (length *link-array*) 0)
-	      (format *debug-io* 
-		      "Fast links are on: do (si::use-fast-links nil) for debugging~%"))
-	    (set-current)		;***
-	    (setq *no-prompt* nil)
-	    (show-restarts)))		;***
-      (catch-fatal 1)
-      (setq *interrupt-enable* t)
-      (loop 
-       (setq +++ ++ ++ + + -)
-       (cond (*no-prompt* (setq *no-prompt* nil))
-	     (t
-	      (format *debug-io* "~&~a~a>~{~*>~}"
-		      (if (stringp at) "" "dbl:")
-		      (if (eq *package* (find-package 'user)) ""
-			(package-name *package*))
-		      *break-level*)))
-       (unless ;***
-	(with-simple-restart (abort "Return to debug level ~D." DEBUG-LEVEL) ;***
-	  (not
-	    (catch 'step-continue
-	      (setq - (locally (declare (notinline read))
-			(dbl-read *debug-io* nil *top-eof*)))
-	      (when (eq - *top-eof*) (bye))
-	      (let* ( break-command
-		     (values
-		      (multiple-value-list
-			  (LOCALLY (declare (notinline break-call evalhook))
-			    (if (or (keywordp -) (integerp -)) ;***
-				(setq - (cons - nil)))
-			    (cond ((and (consp -) (keywordp (car -)))
-				   (setq break-command t)
-				   (break-call (car -) (cdr -)))
-				  ((and (consp -) (integerp (car -))) ;***
-				   (setq break-command t) ;***
-				   (clcs-break-level-invoke-restart (car -))) ;***
-				  (t (evalhook - nil nil *break-env*))))))) ;***
-		(setq /// // // / / values *** ** ** * * (car /))
-		(fresh-line *debug-io*)
-		(dolist (val /)
-		  (locally (declare (notinline prin1)) (prin1 val *debug-io*))
-		  (terpri *debug-io*)))
-	      nil)))			;***
-        (terpri *debug-io*)
-        (break-current))))))
-
-(defun clcs-terminal-interrupt (correctablep)
+(defun terminal-interrupt (correctablep)
   (if correctablep
       (cerror "Continues execution." "Console interrupt.")
       (error "Console interrupt -- cannot continue.")))
 
-(defun clcs-break-quit (&optional (level 0))
+(defun break-quit (&optional (level 0))
   (let ((abort (nth level (cons (find-restart 'conditions::gcl-top-restart) (reverse *abort-restarts*)))))
     (when abort (invoke-restart-interactively abort)))
   (break-current))
 
-(setq conditions::*debugger-function* 'break-level)
+(setq conditions::*debugger-function* 'universal-error-handler)
 (setq conditions::*debug-command-prefix* "")
 
 (defun break-resume ()

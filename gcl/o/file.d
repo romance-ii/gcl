@@ -144,7 +144,7 @@ void
 end_of_stream(strm)
 object strm;
 {
-	FEerror("Unexpected end of ~S.", 1, strm);
+	END_OF_FILE(strm);
 }
 
 DEFUNO_NEW("TEMP-STREAM",object,fStemp_stream,SI
@@ -503,7 +503,7 @@ object if_exists, if_does_not_exist;
 		if (fp != NULL) {
 			fclose(fp);
 			if (if_exists == sKerror)
-				FEerror("The file ~A already exists.", 1, fn);
+			  FILE_ERROR(fn,"File exists");
 			else if (if_exists == sKrename) {
 				if (smm == smm_output)
 					fp = backup_fopen(fname, "w");
@@ -538,7 +538,7 @@ object if_exists, if_does_not_exist;
 					1, if_exists);
 		} else {
 			if (if_does_not_exist == sKerror)
-				FEerror("The file ~A does not exist.", 1, fn);
+				FILE_ERROR(fn,"The file does not exist");
 			else if (if_does_not_exist == sKcreate) {
 				if (smm == smm_output) {
 				    if(fname[0]=='|')
@@ -1989,18 +1989,12 @@ LFD(Lmake_concatenated_stream)()
 	vs_base[0] = x;
 }
 
-LFD(Lmake_two_way_stream)()
-{
-	check_arg(2);
+DEFUN_NEW("MAKE-TWO-WAY-STREAM", object, fLmake_two_way_stream,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
 
-	if (type_of(vs_base[0]) != t_stream ||
-	    !input_stream_p(vs_base[0])) 
-	  TYPE_ERROR(vs_base[0],sLinput_stream);
-	if (type_of(vs_base[1]) != t_stream ||
-	    !output_stream_p(vs_base[1]))
-	  TYPE_ERROR(vs_base[1],sLoutput_stream);
-	vs_base[0] = make_two_way_stream(vs_base[0], vs_base[1]);
-	vs_popp;
+  if (type_of(x) != t_stream || !input_stream_p(x)) TYPE_ERROR(x,sLinput_stream);
+  if (type_of(y) != t_stream || !output_stream_p(y)) TYPE_ERROR(y,sLoutput_stream);
+  RETURN1(make_two_way_stream(x,y));
+  
 }
 
 LFD(Lmake_echo_stream)()
@@ -2297,7 +2291,7 @@ object make_stream_from_fd ( object command, int fd, enum smmode smm )
             execvp(c_command, argv_ptr);
             /* at this point exec has failed */
             perror("exec");
-            abort();
+            gcl_abort();
 	}
 	close(child_stdin);
 	close(child_stdout);
@@ -2482,7 +2476,7 @@ LFD(Lstream_element_type)()
 	    (filename->st.st_self[0] != '|')) {
 		check_type_or_pathname_string_symbol_stream(&filename);
 		if (wild_pathname_p(filename,Cnil) == Ct) {
-		    PATHNAME_ERROR("Filename is wild.",filename);
+		    WILD_PATH(filename);
 		    @(return Cnil)
 		}
 		filename = coerce_to_local_namestring(filename);
@@ -2621,7 +2615,7 @@ DEFVAR("*DISABLE-RECOMPILE*",sSAdisable_recompile,SI,Ct,"");
 	pathname = merge_pathnames(pathname, defaults, sKnewest);
 	pntype = pathname->pn.pn_type;
 	if (wild_pathname_p(pathname,Cnil) == Ct) {
-	    PATHNAME_ERROR("Filename is wild.",pathname);
+	    WILD_PATH(pathname);
 	    @(return Cnil)
 	}
 	filename = coerce_to_local_namestring(pathname);
@@ -2853,14 +2847,14 @@ static void
 cannot_open(fn)
 object fn;
 {
-	FEerror("Cannot open the file ~A.", 1, fn);
+	FILE_ERROR(fn,"Cannot open");
 }
 
 static void
 cannot_create(fn)
 object fn;
 {
-	FEerror("Cannot create the file ~A.", 1, fn);
+	FILE_ERROR(fn,"Cannot create");
 }
 
 static void
@@ -3282,7 +3276,7 @@ object x=Cnil;
 	    exit(0);
 	    break;
 	  case -1:
-	    abort();
+	    gcl_abort();
 	    break;
 	  default:
 	    close_stream(y);
@@ -3461,7 +3455,7 @@ gcl_init_file_function()
 	make_function("MAKE-BROADCAST-STREAM", Lmake_broadcast_stream);
 	make_function("MAKE-CONCATENATED-STREAM",
 		      Lmake_concatenated_stream);
-	make_function("MAKE-TWO-WAY-STREAM", Lmake_two_way_stream);
+/* 	make_function("MAKE-TWO-WAY-STREAM", Lmake_two_way_stream); */
 	make_function("MAKE-ECHO-STREAM", Lmake_echo_stream);
 	make_function("MAKE-STRING-INPUT-STREAM",
 		      Lmake_string_input_stream);

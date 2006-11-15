@@ -35,7 +35,6 @@
 
 ;(proclaim '(optimize (safety 2) (space 3)))
 
-
 (defmacro coerce-to-package (p)
   (if (eq p '*package*)
       p
@@ -44,7 +43,7 @@
            (unless (or
                     (packagep ,g)
                     (setq ,g (find-package (string ,g))))
-            (specific-error :package-error "A package error occurred on ~S: ~S." ,p "Cannot coerce"))
+            (error 'package-error :package ,p :format-control "Cannot coerce to package"))
           ,g))))
 
 (defun find-all-symbols (string-or-symbol)
@@ -63,31 +62,32 @@
 (defmacro do-symbols ((var &optional (package '*package*) (result-form nil))
                       . body)
   (declare (optimize (safety 1)))
-  (let ((p (gensym)) (i (gensym)) (l (gensym)) (q (gensym))
+  (let ((p (gensym)) (i (gensym)) (l (gensym)) (q (gensym)) (r (gensym)) (rr (gensym))
         (loop (gensym)) (x (gensym))(y (gensym)) (break (gensym)) declaration)
     (multiple-value-setq (declaration body) (find-declarations body))
     `(let ((,p (coerce-to-package ,package)) ,var ,l )
-       ,@declaration
        (dolist (,q (cons ,p (package-use-list ,p)) (progn (setq ,var nil) ,result-form))
-	       (multiple-value-bind 
-		(,y ,x) (package-size ,q)
-		(declare ((integer 0 1048573) ,x ,y))
-		(if (not (eq ,p ,q)) (setq ,x 0))
-		(dotimes (,i (+ ,x ,y))
-			 (setq ,l (if (< ,i ,x)
-				      (si:package-internal ,q ,i)
-				    (si:package-external ,q (- ,i ,x))))
-			 ,loop
-			 (when (null ,l) (go ,break))
-			 (setq ,var (car ,l))
-			 (if (or (eq ,q ,p) 
-				 (eq :inherited (car (last (multiple-value-list 
-							    (find-symbol (symbol-name ,var) ,p))))))
-			     (tagbody ,@body))
-			 (setq ,l (cdr ,l))
-			 (go ,loop)
-			 ,break))))))
-       
+	 ,@declaration
+	 (multiple-value-bind 
+	  (,y ,x) (package-size ,q)
+	  (declare ((integer 0 1048573) ,x ,y))
+	  (if (not (eq ,p ,q)) (setq ,x 0))
+	  (let ((,r (dotimes (,i (+ ,x ,y) ',rr)
+		      (setq ,l (if (< ,i ,x)
+				   (si:package-internal ,q ,i)
+				 (si:package-external ,q (- ,i ,x))))
+		      ,loop
+		      (when (null ,l) (go ,break))
+		      (setq ,var (car ,l))
+		      (if (or (eq ,q ,p) 
+			      (eq :inherited (car (last (multiple-value-list 
+							 (find-symbol (symbol-name ,var) ,p))))))
+			  (tagbody ,@body))
+		      (setq ,l (cdr ,l))
+		      (go ,loop)
+		      ,break)))
+	    (unless (eq ,r ',rr) (return ,r))))))))
+
 
 (defmacro do-external-symbols
           ((var &optional (package '*package*) (result-form nil)) . body)
@@ -98,8 +98,8 @@
                          (find-declarations body))
     `(let ((,p (coerce-to-package ,package)) ,var ,l)
        
-       ,@declaration
        (dotimes (,i (package-size ,p) (progn (setq ,var nil) ,result-form))
+	 ,@declaration
          (setq ,l (si:package-external ,p ,i))
        ,loop
          (when (null ,l) (go ,break))
@@ -111,9 +111,14 @@
 
 (defmacro do-all-symbols((var &optional (result-form nil)) . body)
   (declare (optimize (safety 1)))
-  `(dolist (.v (list-all-packages) ,result-form)
-	   (do-symbols (,var .v)
-		       (tagbody ,@ body))))
+  (let ((q (gensym))(p (gensym)) declaration)
+    (multiple-value-setq (declaration body) (find-declarations body))
+    `(let (,var)
+       (declare (ignorable ,var))
+       (dolist (,p (list-all-packages) ,result-form)
+	 ,@declaration
+	 (let ((,q (do-symbols (,var ,p ',q) (tagbody ,@ body))))
+	   (unless (eq ,q ',q) (return ,q)))))))
 	   
 
 (defun substringp (sub str)
@@ -191,7 +196,7 @@
         (x (gensym))(y (gensym)) (access (gensym)) declaration)
     (multiple-value-setq (declaration body) (si::find-declarations body))
     (if (null symbol-types)
-	(specific-error :too-few-arguments "Symbol type specifiers must be supplied."))
+	(error 'program-error :format-control "Symbol type specifiers must be supplied."))
     `(let ((,p (cons t (if (atom ,plist) (list ,plist) ,plist))) (,q nil) (,l nil)
 	   (,i -1) (,x 0) (,y 0) (,dum nil) (,access nil))
        (declare ((integer 0 1048573) ,x ,y))

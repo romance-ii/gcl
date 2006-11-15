@@ -139,8 +139,8 @@
 (DEFUN SIMPLE-ASSERTION-FAILURE (ASSERTION)
   (ERROR 'SIMPLE-TYPE-ERROR
 	 :DATUM ASSERTION
-	 :EXPECTED-TYPE NIL			; This needs some work in next revision. -kmp
-	 :FORMAT-STRING "The assertion ~S failed."
+	 :EXPECTED-TYPE '(not null)			; This needs some work in next revision. -kmp
+	 :FORMAT-CONTROL "The assertion ~S failed."
 	 :FORMAT-ARGUMENTS (LIST ASSERTION)))
 
 (DEFMACRO ASSERT (TEST-FORM &OPTIONAL PLACES DATUM &REST ARGUMENTS)
@@ -167,9 +167,9 @@
    tag
    (if (typep value type) (return-from check-type-internal value)
      (restart-case 
-      (specific-error :wrong-type-argument ;FIXME lose specific-error for cerror
-		      "The value ~:@(~S~) is not ~A. (bound to variable ~:@(~S~))"
-		      value (or type-string type) symbol)
+      (error 'type-error :datum value :expected-type (or type-string type)
+	     :format-control "The value ~:@(~S~) is not ~A. (bound to variable ~:@(~S~))"
+	     :format-arguments (list value (or type-string type) symbol))
       (store-value (v)
 		   :report (lambda (stream)
 				   (format stream "supply a new value of ~s." symbol))

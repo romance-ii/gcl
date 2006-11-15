@@ -46,8 +46,8 @@
   (let* ((info (initialize-info class initargs))
 	 (valid-p (initialize-info-valid-p info)))
     (when (and (consp valid-p) (eq (car valid-p) :invalid))
-      (specific-error :invalid-form "Invalid initialization argument ~S for class ~S"
-	     (cdr valid-p) (class-name class))))
+      (error 'program-error :format-control "Invalid initialization argument ~S for class ~S" :format-arguments
+	     (list (cdr valid-p) (class-name class)))))
   (let ((instance (apply #'allocate-instance class initargs)))
     (apply #'initialize-instance instance initargs)
     instance))
@@ -95,8 +95,8 @@
 	 (info (initialize-info class initargs))
 	 (valid-p (initialize-info-ri-valid-p info)))
     (when (and (consp valid-p) (eq (car valid-p) :invalid))
-      (specific-error :invalid-form "Invalid initialization argument ~S for class ~S"
-	     (cdr valid-p) (class-name class))))
+      (error 'program-error :format-control "Invalid initialization argument ~S for class ~S"
+	     :format-arguments (list (cdr valid-p) (class-name class)))))
   (apply #'shared-initialize instance nil initargs)
   instance)
 
@@ -251,9 +251,8 @@
     (doplist (key val) initargs
        (unless (memq key legal)
 	 (if error-p
-	     (specific-error :invalid-form "Invalid initialization argument ~S for class ~S"
-		    key
-		    (class-name class))
+	     (error 'program-error :format-control "Invalid initialization argument ~S for class ~S"
+		    :format-arguments (list key  (class-name class)))
 	     (return-from check-initargs-2-plist nil)))))
   t)
 
@@ -264,9 +263,8 @@
     (dolist (key initkeys)
       (unless (memq key legal)
 	(if error-p
-	    (specific-error :invalid-form "Invalid initialization argument ~S for class ~S"
-		   key
-		   (class-name class))
+	    (error 'program-error :format-control "Invalid initialization argument ~S for class ~S"
+		   :format-arguments (list key (class-name class)))
 	    (return-from check-initargs-2-list nil)))))
   t)
 

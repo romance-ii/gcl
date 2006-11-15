@@ -133,11 +133,14 @@ saved_%:raw_% $(RSYM) init_%.lsp pre_init.lsp post_init.lsp raw_%_map \
 		$(CMPDIR)/gcl_cmpopt.lsp $(HDIR)/cmpinclude.h \
 		$(LSPDIR)/gcl_auto_new.lsp
 
+	echo " (in-package \"USER\")(system:save-system \"tmp_image\")" >foo
+	./$< $(PORTDIR)/ $(LISPFLAGS) -libdir $(GCLDIR)/ < foo
 	cp pre_init.lsp foo
 	cat init_$*.lsp >>foo
 	cat post_init.lsp >>foo
 	echo " (in-package \"USER\")(system:save-system \"$@\")" >>foo
-	./$< $(PORTDIR)/ $(LISPFLAGS) -libdir $(GCLDIR)/ < foo
+	./tmp_image $(PORTDIR)/ $(LISPFLAGS) -libdir $(GCLDIR)/ < foo
+	rm -f tmp_image
 
 $(RSYM): $(SPECIAL_RSYM) $(HDIR)/mdefs.h
 	$(CC) $(CFLAGS) -I$(HDIR) -I$(ODIR) -o $(RSYM) $(SPECIAL_RSYM)

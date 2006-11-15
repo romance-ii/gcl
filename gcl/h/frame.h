@@ -30,28 +30,24 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 /*  IHS	Invocation History Stack  */
 
 typedef struct invocation_history {
-	object	ihs_function;
-	object	*ihs_base;
+  object ihs_function;
+  object *ihs_base;
 } *ihs_ptr;
 
-EXTER ihs_ptr ihs_org;
+EXTER ihs_ptr ihs_org,ihs_limit,ihs_top;
 
-EXTER ihs_ptr ihs_limit;
+#define	ihs_check if (ihs_top >= ihs_limit) ihs_overflow()
 
-EXTER ihs_ptr ihs_top;
+#define ihs_push(function)  do {\
+        if (++ihs_top>=ihs_limit) ihs_overflow();\
+	ihs_top->ihs_function = (function);  \
+	ihs_top->ihs_base = vs_base;} while (0)
+#define ihs_push_base(function,base)  do {\
+        if (++ihs_top>=ihs_limit) ihs_overflow();\
+	ihs_top->ihs_function = (function);  \
+	ihs_top->ihs_base = base;} while (0)
 
-#define	ihs_check  \
-	if (ihs_top >= ihs_limit)  \
-		ihs_overflow()
-
-#define ihs_push(function)  \
-	(++ihs_top)->ihs_function = (function);  \
-	ihs_top->ihs_base = vs_base
-#define ihs_push_base(function,base)  \
-	(++ihs_top)->ihs_function = (function);  \
-	ihs_top->ihs_base = base
-
-#define ihs_pop() 	(ihs_top--)
+#define ihs_pop() ihs_top--
 
 
 #define make_nil_block()  \
@@ -70,23 +66,21 @@ EXTER ihs_ptr ihs_top;
 /*  Frame Stack  */
 
 enum fr_class {
-	FRS_CATCH,			/* for catch,block,tabbody */
-	FRS_CATCHALL,                   /* for catchall */
-	FRS_PROTECT                	/* for protect-all */
+  FRS_CATCH,			/* for catch,block,tabbody */
+  FRS_CATCHALL,                 /* for catchall */
+  FRS_PROTECT                	/* for protect-all */
 };
 
 EXTER int in_signal_handler;
-struct frame {
+typedef struct frame {
 	jmp_buf		frs_jmpbuf;
 	object		*frs_lex;
 	bds_ptr		frs_bds_top;
-	char 	frs_class;
-	char frs_in_signal_handler;
+	char 	        frs_class;
+	char            frs_in_signal_handler;
 	object		frs_val;
 	ihs_ptr		frs_ihs;
-};
-
-typedef struct frame *frame_ptr;
+} *frame_ptr;
 
 #define	alloc_frame_id()	alloc_object(t_spice)
 
@@ -105,35 +99,27 @@ PROTECT   |               NIL                    |
 */
 
 
-EXTER frame_ptr frs_org;
+EXTER frame_ptr frs_org,frs_start,frs_limit,frs_top;
 
-EXTER frame_ptr frs_limit;
-
-EXTER frame_ptr frs_top;		/* frame stack top */
-
-
-#define frs_push(class, val)  \
-   do { frame_ptr _frs_top = frs_top +1; \
-	if (_frs_top >= frs_limit)  \
-		frs_overflow();  \
-	_frs_top->frs_lex = lex_env;\
-	_frs_top->frs_bds_top = bds_top;  \
-	_frs_top->frs_class = (class);  \
-	_frs_top->frs_in_signal_handler = in_signal_handler;  \
-	_frs_top->frs_val = (val);  \
-	_frs_top->frs_ihs = ihs_top;  \
-         frs_top=_frs_top; \
-        setjmp(_frs_top->frs_jmpbuf); \
+#define frs_push(class, val)  do {\
+        if (++frs_top >= frs_limit)  frs_overflow();  \
+	frs_top->frs_lex = lex_env;\
+	frs_top->frs_bds_top = bds_top;  \
+	frs_top->frs_class = (class);  \
+	frs_top->frs_in_signal_handler = in_signal_handler;  \
+	frs_top->frs_val = (val);  \
+	frs_top->frs_ihs = ihs_top;  \
+        setjmp(frs_top->frs_jmpbuf); \
 	} while (0)
 
-#define frs_pop()	frs_top--
+#define frs_pop() frs_top--
 
 
 /*  global variables used during non-local jump  */
 
 EXTER bool nlj_active;		/* true during non-local jump */
 EXTER frame_ptr nlj_fr;		/* frame to return  */
-EXTER object nlj_tag; 			/* throw-tag, block-id, or */
+EXTER object nlj_tag;		/* throw-tag, block-id, or */
 				/* (tagbody-id . label).   */
 
 

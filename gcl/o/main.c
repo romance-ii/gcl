@@ -656,7 +656,7 @@ error(char *s) {
   printf("\nUnrecoverable error: %s.\n", s);
   fflush(stdout);
 #ifdef UNIX
-  abort();
+  gcl_abort();
 #endif
 }
 

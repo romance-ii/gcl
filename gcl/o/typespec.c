@@ -31,54 +31,58 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 
-object sLkeyword;
+/* object sLkeyword; */
 
 
-void
-check_type_integer(object *p)
-{
-	enum type t;
+/* void */
+/* check_type_integer(object *p) */
+/* { */
+/* 	enum type t; */
 
-	while ((t = type_of(*p)) != t_fixnum && t != t_bignum)
-		*p = wrong_type_argument(sLinteger, *p);
-}
+/* 	while ((t = type_of(*p)) != t_fixnum && t != t_bignum) */
+/* 		*p = wrong_type_argument(sLinteger, *p); */
+/* } */
 
-void
-check_type_non_negative_integer(object *p)
-{
-	enum type t;
+/* void */
+/* check_type_non_negative_integer(object *p) */
+/* { */
+/* 	enum type t; */
 
-	for (;;) {
-		t = type_of(*p);
-		if (t == t_fixnum) {
-			if (fix((*p)) >= 0)
-				break;
-		} else if (t == t_bignum) {
-			if (big_sign((*p)) >= 0)
-				break;
-		}
-		*p = wrong_type_argument(TSnon_negative_integer, *p);
-	}
-}
+/* 	for (;;) { */
+/* 		t = type_of(*p); */
+/* 		if (t == t_fixnum) { */
+/* 			if (fix((*p)) >= 0) */
+/* 				break; */
+/* 		} else if (t == t_bignum) { */
+/* 			if (big_sign((*p)) >= 0) */
+/* 				break; */
+/* 		} */
+/* 		*p = wrong_type_argument(TSnon_negative_integer, *p); */
+/* 	} */
+/* } */
 
-void
-check_type_rational(object *p)
-{
-	enum type t;
+/* void */
+/* check_type_rational(object *p) */
+/* { */
+/* 	enum type t; */
 
-	while ((t = type_of(*p)) != t_fixnum &&
-	       t != t_bignum && t != t_ratio)
-		*p = wrong_type_argument(sLrational, *p);
-}
+/* 	while ((t = type_of(*p)) != t_fixnum && */
+/* 	       t != t_bignum && t != t_ratio) */
+/* 		*p = wrong_type_argument(sLrational, *p); */
+/* } */
 
-void
-check_type_float(object *p)
-{
-	enum type t;
+/* void */
+/* check_type_float(object *p) */
+/* { */
+/* 	enum type t; */
 
-	while ((t = type_of(*p)) != t_shortfloat && t != t_longfloat)
-		*p = wrong_type_argument(sLfloat, *p);
-}
+/* 	while ((t = type_of(*p)) != t_shortfloat && t != t_longfloat) */
+/* 		*p = wrong_type_argument(sLfloat, *p); */
+/* } */
+
+
+
+
 
 /* static void */
 /* check_type_or_integer_float(object *p) */
@@ -90,26 +94,34 @@ check_type_float(object *p)
 /* 		*p = wrong_type_argument(TSor_integer_float, *p); */
 /* } */
 
-void
-check_type_or_rational_float(object *p)
-{
-	enum type t;
 
-	while ((t = type_of(*p)) != t_fixnum && t != t_bignum &&
-	       t != t_ratio && t != t_shortfloat && t != t_longfloat)
-		*p = wrong_type_argument(TSor_rational_float, *p);
-}
 
-void
-check_type_number(object *p)
-{
-	enum type t;
 
-	while ((t = type_of(*p)) != t_fixnum && t != t_bignum &&
-	       t != t_ratio && t != t_shortfloat && t != t_longfloat &&
-	       t != t_complex)
-		*p = wrong_type_argument(sLnumber, *p);
-}
+
+/* void */
+/* check_type_or_rational_float(object *p) */
+/* { */
+/* 	enum type t; */
+
+/* 	while ((t = type_of(*p)) != t_fixnum && t != t_bignum && */
+/* 	       t != t_ratio && t != t_shortfloat && t != t_longfloat) */
+/* 		*p = wrong_type_argument(TSor_rational_float, *p); */
+/* } */
+
+/* void */
+/* check_type_number(object *p) */
+/* { */
+/* 	enum type t; */
+
+/* 	while ((t = type_of(*p)) != t_fixnum && t != t_bignum && */
+/* 	       t != t_ratio && t != t_shortfloat && t != t_longfloat && */
+/* 	       t != t_complex) */
+/* 		*p = wrong_type_argument(sLnumber, *p); */
+/* } */
+
+
+
+
 
 /* static void */
 /* check_type_bit(object *p) */
@@ -119,33 +131,40 @@ check_type_number(object *p)
 /* 		*p = wrong_type_argument(sLbit, *p); */
 /* } */
 
-void
-check_type_character(object *p)
-{
-	while (type_of(*p) != t_character)
-		*p = wrong_type_argument(sLcharacter, *p);
-}
 
-void
-check_type_symbol(object *p)
-{
-	while (type_of(*p) != t_symbol)
-		*p = wrong_type_argument(sLsymbol, *p);
-}
 
-void
-check_type_or_symbol_string(object *p)
-{
-	while (type_of(*p) != t_symbol && type_of(*p) != t_string)
-		*p = wrong_type_argument(TSor_symbol_string, *p);
-}
 
-void
-check_type_or_string_symbol(object *p)
-{
-	while (type_of(*p) != t_symbol && type_of(*p) != t_string)
-		*p = wrong_type_argument(TSor_string_symbol, *p);
-}
+/* void */
+/* check_type_character(object *p) */
+/* { */
+/* 	while (type_of(*p) != t_character) */
+/* 		*p = wrong_type_argument(sLcharacter, *p); */
+/* } */
+
+/* void */
+/* check_type_symbol(object *p) */
+/* { */
+/* 	while (type_of(*p) != t_symbol) */
+/* 		*p = wrong_type_argument(sLsymbol, *p); */
+/* } */
+
+/* void */
+/* check_type_or_symbol_string(object *p) */
+/* { */
+/* 	while (type_of(*p) != t_symbol && type_of(*p) != t_string) */
+/* 		*p = wrong_type_argument(TSor_symbol_string, *p); */
+/* } */
+
+/* void */
+/* check_type_or_string_symbol(object *p) */
+/* { */
+/* 	while (type_of(*p) != t_symbol && type_of(*p) != t_string) */
+/* 		*p = wrong_type_argument(TSor_string_symbol, *p); */
+/* } */
+
+
+
+
 
 /* static void */
 /* check_type_or_symbol_string_package(object *p) */
@@ -157,19 +176,27 @@ check_type_or_string_symbol(object *p)
 /*  					   *p); */
 /* } */
 
-void
-check_type_package(object *p)
-{
-	while (type_of(*p) != t_package)
-		*p = wrong_type_argument(sLpackage, *p);
-}
 
-void
-check_type_string(object *p)
-{
-	while (type_of(*p) != t_string)
-		*p = wrong_type_argument(sLstring, *p);
-}
+
+
+
+/* void */
+/* check_type_package(object *p) */
+/* { */
+/* 	while (type_of(*p) != t_package) */
+/* 		*p = wrong_type_argument(sLpackage, *p); */
+/* } */
+
+/* void */
+/* check_type_string(object *p) */
+/* { */
+/* 	while (type_of(*p) != t_string) */
+/* 		*p = wrong_type_argument(sLstring, *p); */
+/* } */
+
+
+
+
 
 /* static void */
 /* check_type_bit_vector(object *p) */
@@ -178,92 +205,99 @@ check_type_string(object *p)
 /* 		*p = wrong_type_argument(sLbit_vector, *p); */
 /* } */
 
-void
-check_type_cons(object *p)
-{
-	while (!consp(*p))
-		*p = wrong_type_argument(sLcons, *p);
-}
 
-void
-check_type_stream(object *p)
-{
-	while (type_of(*p) != t_stream)
-		*p = wrong_type_argument(sLstream, *p);
-}
 
-/* Thankfully we can do this bit of non-lispy c stuff since we pass by reference. FIXME*/
-void
-check_type_readtable_no_default(object *p) {
+
+
+/* void */
+/* check_type_cons(object *p) */
+/* { */
+/* 	while (!consp(*p)) */
+/* 		*p = wrong_type_argument(sLcons, *p); */
+/* } */
+
+/* void */
+/* check_type_stream(object *p) */
+/* { */
+/* 	while (type_of(*p) != t_stream) */
+/* 		*p = wrong_type_argument(sLstream, *p); */
+/* } */
+
+/* /\* Thankfully we can do this bit of non-lispy c stuff since we pass by reference. FIXME*\/ */
+/* void */
+/* check_type_readtable_no_default(object *p) { */
   
-  if (type_of(*p) != t_readtable)
-    *p = wrong_type_argument(sLreadtable, *p);
+/*   if (type_of(*p) != t_readtable) */
+/*     *p = wrong_type_argument(sLreadtable, *p); */
 
-}
+/* } */
 
-void
-check_type_readtable(object *p) {
+/* void */
+/* check_type_readtable(object *p) { */
   
-  if (*p==Cnil)
-    *p=standard_readtable;
-  check_type_readtable_no_default(p);
+/*   if (*p==Cnil) */
+/*     *p=standard_readtable; */
+/*   check_type_readtable_no_default(p); */
 
-}
+/* } */
 
-#ifdef UNIX
-void
-check_type_or_Pathname_string_symbol(object *p)
-{
-	enum type t;
+/* #ifdef UNIX */
+/* void */
+/* check_type_or_Pathname_string_symbol(object *p) */
+/* { */
+/* 	enum type t; */
 
-	while ((t = type_of(*p)) != t_pathname &&
-	       t != t_string && t != t_symbol)
-		*p = wrong_type_argument(
-			TSor_pathname_string_symbol, *p);
-}
-#endif
+/* 	while ((t = type_of(*p)) != t_pathname && */
+/* 	       t != t_string && t != t_symbol) */
+/* 		*p = wrong_type_argument( */
+/* 			TSor_pathname_string_symbol, *p); */
+/* } */
+/* #endif */
 
-void
-check_type_or_pathname_string_symbol_stream(object *p)
-{
-	enum type t;
+/* void */
+/* check_type_or_pathname_string_symbol_stream(object *p) */
+/* { */
+/* 	enum type t; */
 
-	while ((t = type_of(*p)) != t_pathname &&
-	       t != t_string && t != t_symbol && t != t_stream)
-		*p = wrong_type_argument(
-			TSor_pathname_string_symbol_stream, *p);
-}
+/* 	while ((t = type_of(*p)) != t_pathname && */
+/* 	       t != t_string && t != t_symbol && t != t_stream) */
+/* 		*p = wrong_type_argument( */
+/* 			TSor_pathname_string_symbol_stream, *p); */
+/* } */
 
-void
-check_type_random_state(object *p)
-{
-	while (type_of(*p) != t_random)
-		*p = wrong_type_argument(sLrandom_state, *p);
-}
+/* void */
+/* check_type_random_state(object *p) */
+/* { */
+/* 	while (type_of(*p) != t_random) */
+/* 		*p = wrong_type_argument(sLrandom_state, *p); */
+/* } */
 
-void
-check_type_hash_table(object *p)
-{
-	while (type_of(*p) != t_hashtable)
-		*p = wrong_type_argument(sLhash_table, *p);
-}
+/* void */
+/* check_type_hash_table(object *p) */
+/* { */
+/* 	while (type_of(*p) != t_hashtable) */
+/* 		*p = wrong_type_argument(sLhash_table, *p); */
+/* } */
 
-void
-check_type_array(object *p)
-{
-BEGIN:
-	switch (type_of(*p)) {
-	case t_array:
-	case t_vector:
-	case t_string:
-	case t_bitvector:
-		return;
+/* void */
+/* check_type_array(object *p) */
+/* { */
+/* BEGIN: */
+/* 	switch (type_of(*p)) { */
+/* 	case t_array: */
+/* 	case t_vector: */
+/* 	case t_string: */
+/* 	case t_bitvector: */
+/* 		return; */
 
-	default:
-		*p = wrong_type_argument(sLarray, *p);
-		goto BEGIN;
-	}
-}
+/* 	default: */
+/* 		*p = wrong_type_argument(sLarray, *p); */
+/* 		goto BEGIN; */
+/* 	} */
+/* } */
+
+
+
 
 /* static void */
 /* check_type_vector(object *p) */
@@ -281,12 +315,27 @@ BEGIN:
 /* 	} */
 /* } */
 
+enum type t_vtype;
+int vtypep_fn(object x) {return type_of(x)==t_vtype;}
+
 void
-check_type(object x, int t)
-{if (type_of(x) !=t)
-   FEerror("~s is not a ~a",2,
-	   x,make_simple_string(tm_table[t].tm_name +1));
+Check_type(object *x,int (*p)(object),object n) {
+
+  object s1,s2;
+
+  s1=make_simple_string("Supply a new value");
+  s2=make_simple_string("~S is not of type ~S.");
+  for (;!p(*x);*x=Ieval(read_object(sLAstandard_inputA->s.s_dbind)))
+    Icall_continue_error_handler(s1,sKwrong_type_argument,s2,2,*p,n);
+
 }
+
+/* void */
+/* check_type(object x, int t) */
+/* {if (type_of(x) !=t) */
+/*    FEerror("~s is not a ~a",2, */
+/* 	   x,make_simple_string(tm_table[t].tm_name +1)); */
+/* } */
    
 
 LFD(siLtype_of_c)(void)
@@ -470,6 +519,11 @@ LFD(siLtype_of_c)(void)
 	}
 }
 
+DEF_ORDINARY("FLOOR",sLfloor,LISP,"");
+DEF_ORDINARY("CEILING",sLceiling,LISP,"");
+DEF_ORDINARY("TRUNCATE",sLtruncate,LISP,"");
+DEF_ORDINARY("EXP",sLexp,LISP,"");
+DEF_ORDINARY("/",sLD,LISP,"");
 DEF_ORDINARY("COMMON",sLcommon,LISP,"");
 DEF_ORDINARY("NULL",sLnull,LISP,"");
 DEF_ORDINARY("CONS",sLcons,LISP,"");
@@ -493,6 +547,7 @@ DEF_ORDINARY("PATHNAME",sLpathname,LISP,"");
 DEF_ORDINARY("CHARACTER",sLcharacter,LISP,"");
 DEF_ORDINARY("NUMBER",sLnumber,LISP,"");
 DEF_ORDINARY("RATIONAL",sLrational,LISP,"");
+DEF_ORDINARY("REAL",sLreal,LISP,"");
 DEF_ORDINARY("FLOAT",sLfloat,LISP,"");
 DEF_ORDINARY("INTEGER",sLinteger,LISP,"");
 DEF_ORDINARY("RATIO",sLratio,LISP,"");
@@ -573,59 +628,111 @@ DEF_ORDINARY("LOGICAL-PATHNAME",sLlogical_pathname,LISP,"");
 
 DEF_ORDINARY("BASE-CHAR",sLbase_char,LISP,"");
 
-DEF_ORDINARY("TYPE-ERROR",sLtype_error,LISP,"");
 
+
+DEF_ORDINARY("CONDITION",sLcondition,LISP,"");
+DEF_ORDINARY("SERIOUS-CONDITION",sLserious_condition,LISP,"");
+DEF_ORDINARY("SIMPLE-CONDITION",sLsimple_condition,LISP,"");
+
+DEF_ORDINARY("ERROR",sLerror,LISP,"");
+DEF_ORDINARY("SIMPLE-ERROR",sLsimple_error,LISP,"");
+DEF_ORDINARY("FORMAT-CONTROL",sKformat_control,KEYWORD,"");
+DEF_ORDINARY("FORMAT-ARGUMENTS",sKformat_arguments,KEYWORD,"");
+
+DEF_ORDINARY("TYPE-ERROR",sLtype_error,LISP,"");
+DEF_ORDINARY("DATUM",sKdatum,KEYWORD,"");
+DEF_ORDINARY("EXPECTED-TYPE",sKexpected_type,KEYWORD,"");
+DEF_ORDINARY("SIMPLE-TYPE-ERROR",sLsimple_type_error,LISP,"");
+
+DEF_ORDINARY("PROGRAM-ERROR",sLprogram_error,LISP,"");
+DEF_ORDINARY("CONTROL-ERROR",sLcontrol_error,LISP,"");
+DEF_ORDINARY("PACKAGE-ERROR",sLpackage_error,LISP,"");
+DEF_ORDINARY("PACKAGE",sKpackage,KEYWORD,"");
+
+DEF_ORDINARY("STREAM-ERROR",sLstream_error,LISP,"");
+DEF_ORDINARY("STREAM",sKstream,KEYWORD,"");
+DEF_ORDINARY("END-OF-FILE",sLend_of_file,LISP,"");
+
+DEF_ORDINARY("FILE-ERROR",sLfile_error,LISP,"");
+DEF_ORDINARY("PATHNAME",sKpathname,KEYWORD,"");
+
+DEF_ORDINARY("CELL-ERROR",sLcell_error,LISP,"");
+DEF_ORDINARY("NAME",sKname,KEYWORD,"");
+DEF_ORDINARY("UNBOUND-SLOT",sLunbound_slot,LISP,"");
+DEF_ORDINARY("UNBOUND-VARIABLE",sLunbound_variable,LISP,"");
+DEF_ORDINARY("UNDEFINED-FUNCTION",sLundefined_function,LISP,"");
+
+DEF_ORDINARY("ARITHMETIC-ERROR",sLarithmetic_error,LISP,"");
+DEF_ORDINARY("OPERATION",sKoperation,KEYWORD,"");
+DEF_ORDINARY("OPERANDS",sKoperands,KEYWORD,"");
+DEF_ORDINARY("DIVISION-BY-ZERO",sLdivision_by_zero,LISP,"");
+DEF_ORDINARY("FLOATING-POINT-OVERFLOW",sLfloating_point_overflow,LISP,"");
+DEF_ORDINARY("FLOATING-POINT-UNDERFLOW",sLfloating_point_underflow,LISP,"");
+DEF_ORDINARY("FLOATING-POINT-INEXACT",sLfloating_point_inexact,LISP,"");
+DEF_ORDINARY("FLOATING-POINT-INVALID-OPERATION",sLfloating_point_invalid_operation,LISP,"");
+
+DEF_ORDINARY("PARSE-ERROR",sLparse_error,LISP,"");
+
+DEF_ORDINARY("PRINT-NOT-READABLE",sLprint_not_readable,LISP,"");
+
+DEF_ORDINARY("READER-ERROR",sLreader_error,LISP,"");
+DEF_ORDINARY("PATHNAME-ERROR",sLpathname_error,LISP,"");
+
+DEF_ORDINARY("STORAGE-CONDITION",sLstorage_condition,LISP,"");
+
+DEF_ORDINARY("WARNING",sLwarning,LISP,"");
+DEF_ORDINARY("SIMPLE-WARNING",sLsimple_warning,LISP,"");
+DEF_ORDINARY("STYLE-WARNING",sLstyle_warning,LISP,"");
 #ifdef ANSI_COMMON_LISP
 /* New ansi types */
 DEF_ORDINARY("METHOD-COMBINATION",sLmethod_combination,LISP,"");
-DEF_ORDINARY("ARITHMETIC-ERROR",sLarithmetic_error,LISP,"");
+/* DEF_ORDINARY("ARITHMETIC-ERROR",sLarithmetic_error,LISP,""); */
 DEF_ORDINARY("BASE-STRING",sLbase_string,LISP,"");
 DEF_ORDINARY("BROADCAST-STREAM",sLbroadcast_stream,LISP,"");
 DEF_ORDINARY("BUILT-IN-CLASS",sLbuilt_in_class,LISP,"");
-DEF_ORDINARY("CELL-ERROR",sLcell_error,LISP,"");
+/* DEF_ORDINARY("CELL-ERROR",sLcell_error,LISP,""); */
 DEF_ORDINARY("CLASS",sLclass,LISP,"");
 DEF_ORDINARY("CONCATENATED-STREAM",sLconcatenated_stream,LISP,"");
-DEF_ORDINARY("CONDITION",sLcondition,LISP,"");
-DEF_ORDINARY("DIVISION-BY-ZERO",sLdivision_by_zero,LISP,"");
+/* DEF_ORDINARY("CONDITION",sLcondition,LISP,""); */
+/* DEF_ORDINARY("SERIOUS-CONDITION",sLserious_condition,LISP,""); */
+/* DEF_ORDINARY("SIMPLE-CONDITION",sLsimple_condition,LISP,""); */
+/* DEF_ORDINARY("DIVISION-BY-ZERO",sLdivision_by_zero,LISP,""); */
 DEF_ORDINARY("ECHO-STREAM",sLecho_stream,LISP,"");
-DEF_ORDINARY("END-OF-FILE",sLend_of_file,LISP,"");
-DEF_ORDINARY("CONTROL-ERROR",sLcontrol_error,LISP,"");
-DEF_ORDINARY("ERROR",sLerror,LISP,"");
+/* DEF_ORDINARY("END-OF-FILE",sLend_of_file,LISP,""); */
+/* DEF_ORDINARY("CONTROL-ERROR",sLcontrol_error,LISP,""); */
 DEF_ORDINARY("EXTENDED-CHAR",sLextended_char,LISP,"");
-DEF_ORDINARY("FILE-ERROR",sLfile_error,LISP,"");
-DEF_ORDINARY("FLOATING-POINT-INEXACT",sLfloating_point_inexact,LISP,"");
-DEF_ORDINARY("FLOATING-POINT-INVALID-OPERATION",sLfloating_point_invalid_operation,LISP,"");
-DEF_ORDINARY("FLOATING-POINT-OVERFLOW",sLfloating_point_overflow,LISP,"");
-DEF_ORDINARY("FLOATING-POINT-UNDERFLOW",sLfloating_point_underflow,LISP,"");
+/* DEF_ORDINARY("FILE-ERROR",sLfile_error,LISP,""); */
+/* DEF_ORDINARY("FLOATING-POINT-INEXACT",sLfloating_point_inexact,LISP,""); */
+/* DEF_ORDINARY("FLOATING-POINT-INVALID-OPERATION",sLfloating_point_invalid_operation,LISP,""); */
+/* DEF_ORDINARY("FLOATING-POINT-OVERFLOW",sLfloating_point_overflow,LISP,""); */
+/* DEF_ORDINARY("FLOATING-POINT-UNDERFLOW",sLfloating_point_underflow,LISP,""); */
 DEF_ORDINARY("GENERIC-FUNCTION",sLgeneric_function,LISP,"");
 DEF_ORDINARY("METHOD",sLmethod,LISP,"");
 /* FIXME -- need this for types in predlib.lsp, why can't we use the keyword sKpackage_error ? */
-DEF_ORDINARY("PACKAGE-ERROR",sLpackage_error,LISP,"");
-DEF_ORDINARY("PARSE-ERROR",sLparse_error,LISP,"");
-DEF_ORDINARY("PRINT-NOT-READABLE",sLprint_not_readable,LISP,"");
-DEF_ORDINARY("PROGRAM-ERROR",sLprogram_error,LISP,"");
-DEF_ORDINARY("READER-ERROR",sLreader_error,LISP,"");
-DEF_ORDINARY("SERIOUS-CONDITION",sLserious_condition,LISP,"");
+/* DEF_ORDINARY("PACKAGE-ERROR",sLpackage_error,LISP,""); */
+/* DEF_ORDINARY("PARSE-ERROR",sLparse_error,LISP,""); */
+/* DEF_ORDINARY("PRINT-NOT-READABLE",sLprint_not_readable,LISP,""); */
+/* DEF_ORDINARY("PROGRAM-ERROR",sLprogram_error,LISP,""); */
+/* DEF_ORDINARY("READER-ERROR",sLreader_error,LISP,""); */
 DEF_ORDINARY("SIMPLE-BASE-STRING",sLsimple_base_string,LISP,"");
-DEF_ORDINARY("SIMPLE-CONDITION",sLsimple_condition,LISP,"");
-DEF_ORDINARY("SIMPLE-TYPE-ERROR",sLsimple_type_error,LISP,"");
-DEF_ORDINARY("SIMPLE-WARNING",sLsimple_warning,LISP,"");
+/* DEF_ORDINARY("SIMPLE-TYPE-ERROR",sLsimple_type_error,LISP,""); */
+/* DEF_ORDINARY("SIMPLE-WARNING",sLsimple_warning,LISP,""); */
 DEF_ORDINARY("STANDARD-CLASS",sLstandard_class,LISP,"");
 DEF_ORDINARY("STANDARD-GENERIC-FUNCTION",sLstandard_generic_function,LISP,"");
 DEF_ORDINARY("STANDARD-METHOD",sLstandard_method,LISP,"");
 DEF_ORDINARY("STANDARD-OBJECT",sLstandard_object,LISP,"");
-DEF_ORDINARY("STORAGE-CONDITION",sLstorage_condition,LISP,"");
-DEF_ORDINARY("STREAM-ERROR",sLstream_error,LISP,"");
+/* DEF_ORDINARY("STORAGE-CONDITION",sLstorage_condition,LISP,""); */
+/* DEF_ORDINARY("STREAM-ERROR",sLstream_error,LISP,""); */
 DEF_ORDINARY("STRING-STREAM",sLstring_stream,LISP,"");
 DEF_ORDINARY("STRUCTURE-CLASS",sLstructure_class,LISP,"");
 DEF_ORDINARY("STRUCTURE-OBJECT",sLstructure_object,LISP,"");
-DEF_ORDINARY("STYLE-WARNING",sLstyle_warning,LISP,"");
+/* DEF_ORDINARY("STYLE-WARNING",sLstyle_warning,LISP,""); */
 DEF_ORDINARY("SYNONYM-STREAM",sLsynonym_stream,LISP,"");
 DEF_ORDINARY("TWO-WAY-STREAM",sLtwo_way_stream,LISP,"");
-DEF_ORDINARY("UNBOUND-SLOT",sLunbound_slot,LISP,"");
-DEF_ORDINARY("UNBOUND-VARIABLE",sLunbound_variable,LISP,"");
-DEF_ORDINARY("UNDEFINED-FUNCTION",sLundefined_function,LISP,"");
-DEF_ORDINARY("WARNING",sLwarning,LISP,"");
+/* DEF_ORDINARY("UNBOUND-SLOT",sLunbound_slot,LISP,""); */
+/* DEF_ORDINARY("UNBOUND-VARIABLE",sLunbound_variable,LISP,""); */
+/* DEF_ORDINARY("UNDEFINED-FUNCTION",sLundefined_function,LISP,""); */
+/* DEF_ORDINARY("WARNING",sLwarning,LISP,""); */
 DEF_ORDINARY("DYNAMIC-EXTENT",sLdynamic_extent,LISP,"");
 #endif
 

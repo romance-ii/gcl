@@ -553,7 +553,7 @@ regatom(int *flagp)
 		}
 		 if (regcp - buf > sizeof(buf))
 		   { fprintf(stderr,"wow that is badly defined regexp..");
-		     exit(1);}
+		     gcl_abort();}
 		regcp --;
 		{ char *p=buf;
 
@@ -1487,7 +1487,7 @@ min_initial_branch_length(regexp *x, unsigned char *buf, int advance)
     { op = OP(s);
       next = (s) + NEXT(s);
       if (op != END && op != BRANCH)
-	abort();
+	gcl_abort();
       s = s+3;
       { int this = 0;
 	int anythis =0;

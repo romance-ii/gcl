@@ -40,11 +40,6 @@ enum type {
   t_other
 };
 
-#define realp(a_) ({enum type _tp=type_of(a_); _tp >= t_fixnum && _tp < t_complex;})
-#define numberp(a_) ({enum type _tp=type_of(a_); _tp >= t_fixnum && _tp <= t_complex;})
-#define eql_is_eq(a_) (is_imm_fixnum(a_) || ({enum type _tp=type_of(a_); _tp == t_cons || _tp > t_character;}))
-#define equal_is_eq(a_) (is_imm_fixnum(a_) || type_of(a_)>t_bitvector)
-#define equalp_is_eq(a_) (type_of(a_)>t_structure)
 
 enum signals_allowed_values {
   sig_none,

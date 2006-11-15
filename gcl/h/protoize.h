@@ -153,19 +153,19 @@ typedef int (*FUNC)();
 /* error.c:38:OF */ extern void terminal_interrupt (int correctable); /* (correctable) int correctable; */
 /* error.c:147:OF */ extern void Lerror (void); /* () */
 /* error.c:164:OF */ extern void Lcerror (void); /* () */
-/* error.c:184:OF */ extern void FEerror (char *s, int num, ... ); /* (s, num, arg1, arg2, arg3, arg4) char *s; int num; object arg1; object arg2; object arg3; object arg4; */
-/* error.c:203:OF */ extern void FEwrong_type_argument (object type, object value); /* (type, value) object type; object value; */
-/* error.c:210:OF */ extern void FEtoo_few_arguments (object *base, object *top); /* (base, top) object *base; object *top; */
-/* error.c:219:OF */ extern void FEtoo_few_argumentsF (object args); /* (args) object args; */
-/* error.c:227:OF */ extern void FEtoo_many_arguments (object *base, object *top); /* (base, top) object *base; object *top; */
-/* error.c:234:OF */ extern void FEtoo_many_argumentsF (object args); /* (args) object args; */
-/* error.c:247:OF */ extern void FEunexpected_keyword (object key); /* (key) object key; */
-/* error.c:258:OF */ extern void FEinvalid_form (char *s, object form); /* (s, form) char *s; object form; */
-/* error.c:266:OF */ extern void FEunbound_variable (object sym); /* (sym) object sym; */
-/* error.c:273:OF */ extern void FEinvalid_variable (char *s, object obj); /* (s, obj) char *s; object obj; */
-/* error.c:280:OF */ extern void FEundefined_function (object fname); /* (fname) object fname; */
-/* error.c:287:OF */ extern void FEinvalid_function (object obj); /* (obj) object obj; */
-/* error.c:297:OF */ extern object CEerror (char *error_str, char *cont_str, int num, object arg1, object arg2, object arg3, object arg4); /* (error_str, cont_str, num, arg1, arg2, arg3, arg4) char *error_str; char *cont_str; int num; object arg1; object arg2; object arg3; object arg4; */
+/* /\* error.c:184:OF *\/ extern void FEerror (char *s, int num, ... ); /\* (s, num, arg1, arg2, arg3, arg4) char *s; int num; object arg1; object arg2; object arg3; object arg4; *\/ */
+/* /\* error.c:203:OF *\/ extern void FEwrong_type_argument (object type, object value); /\* (type, value) object type; object value; *\/ */
+/* /\* error.c:210:OF *\/ extern void FEtoo_few_arguments (object *base, object *top); /\* (base, top) object *base; object *top; *\/ */
+/* /\* error.c:219:OF *\/ extern void FEtoo_few_argumentsF (object args); /\* (args) object args; *\/ */
+/* /\* error.c:227:OF *\/ extern void FEtoo_many_arguments (object *base, object *top); /\* (base, top) object *base; object *top; *\/ */
+/* /\* error.c:234:OF *\/ extern void FEtoo_many_argumentsF (object args); /\* (args) object args; *\/ */
+/* /\* error.c:247:OF *\/ extern void FEunexpected_keyword (object key); /\* (key) object key; *\/ */
+/* /\* error.c:258:OF *\/ extern void FEinvalid_form (char *s, object form); /\* (s, form) char *s; object form; *\/ */
+/* /\* error.c:266:OF *\/ extern void FEunbound_variable (object sym); /\* (sym) object sym; *\/ */
+/* /\* error.c:273:OF *\/ extern void FEinvalid_variable (char *s, object obj); /\* (s, obj) char *s; object obj; *\/ */
+/* /\* error.c:280:OF *\/ extern void FEundefined_function (object fname); /\* (fname) object fname; *\/ */
+/* /\* error.c:287:OF *\/ extern void FEinvalid_function (object obj); /\* (obj) object obj; *\/ */
+/* /\* error.c:297:OF *\/ extern object CEerror (char *error_str, char *cont_str, int num, object arg1, object arg2, object arg3, object arg4); /\* (error_str, cont_str, num, arg1, arg2, arg3, arg4) char *error_str; char *cont_str; int num; object arg1; object arg2; object arg3; object arg4; *\/ */
 /* error.c:330:OF */ extern object fSihs_top (void); /* () */
 /* error.c:337:OF */ extern object fSihs_fun (object x0); /* (x0) object x0; */
 /* error.c:346:OF */ extern object fSihs_vs (object x0); /* (x0) object x0; */
@@ -478,28 +478,28 @@ typedef void (*funcvoid)(void);
 /* structure.c:326:OF */ extern void siLlist_nth (void); /* () */
 /* structure.c:439:OF */ extern void gcl_init_structure_function (void); /* () */
 /* toplevel.c:211:OF */ extern void gcl_init_toplevel (void); /* () */
-/* typespec.c:38:OF */ extern void check_type_integer (object *p); /* (p) object *p; */
-/* typespec.c:47:OF */ extern void check_type_non_negative_integer (object *p); /* (p) object *p; */
-/* typespec.c:65:OF */ extern void check_type_rational (object *p); /* (p) object *p; */
-/* typespec.c:75:OF */ extern void check_type_float (object *p); /* (p) object *p; */
-/* typespec.c:94:OF */ extern void check_type_or_rational_float (object *p); /* (p) object *p; */
-/* typespec.c:104:OF */ extern void check_type_number (object *p); /* (p) object *p; */
-/* typespec.c:123:OF */ extern void check_type_character (object *p); /* (p) object *p; */
-/* typespec.c:139:OF */ extern void check_type_symbol (object *p); /* (p) object *p; */
-/* typespec.c:146:OF */ extern void check_type_or_symbol_string (object *p); /* (p) object *p; */
-/* typespec.c:153:OF */ extern void check_type_or_string_symbol (object *p); /* (p) object *p; */
-/* typespec.c:170:OF */ extern void check_type_package (object *p); /* (p) object *p; */
-/* typespec.c:177:OF */ extern void check_type_string (object *p); /* (p) object *p; */
-/* typespec.c:191:OF */ extern void check_type_cons (object *p); /* (p) object *p; */
-/* typespec.c:198:OF */ extern void check_type_stream (object *p); /* (p) object *p; */
-/* typespec.c:205:OF */ extern void check_type_readtable (object *p); /* (p) object *p; */
-/* typespec.c:205:OF */ extern void check_type_readtable_no_default (object *p); /* (p) object *p; */
-/* typespec.c:213:OF */ extern void check_type_or_Pathname_string_symbol (object *p); /* (p) object *p; */
-/* typespec.c:225:OF */ extern void check_type_or_pathname_string_symbol_stream (object *p); /* (p) object *p; */
-/* typespec.c:236:OF */ extern void check_type_random_state (object *p); /* (p) object *p; */
-/* typespec.c:243:OF */ extern void check_type_hash_table (object *p); /* (p) object *p; */
-/* typespec.c:250:OF */ extern void check_type_array (object *p); /* (p) object *p; */
-/* typespec.c:284:OF */ extern void check_type (object x, int t); /* (x, t) object x; int t; */
+/* /\* typespec.c:38:OF *\/ extern void check_type_integer (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:47:OF *\/ extern void check_type_non_negative_integer (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:65:OF *\/ extern void check_type_rational (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:75:OF *\/ extern void check_type_float (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:94:OF *\/ extern void check_type_or_rational_float (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:104:OF *\/ extern void check_type_number (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:123:OF *\/ extern void check_type_character (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:139:OF *\/ extern void check_type_symbol (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:146:OF *\/ extern void check_type_or_symbol_string (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:153:OF *\/ extern void check_type_or_string_symbol (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:170:OF *\/ extern void check_type_package (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:177:OF *\/ extern void check_type_string (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:191:OF *\/ extern void check_type_cons (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:198:OF *\/ extern void check_type_stream (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:205:OF *\/ extern void check_type_readtable (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:205:OF *\/ extern void check_type_readtable_no_default (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:213:OF *\/ extern void check_type_or_Pathname_string_symbol (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:225:OF *\/ extern void check_type_or_pathname_string_symbol_stream (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:236:OF *\/ extern void check_type_random_state (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:243:OF *\/ extern void check_type_hash_table (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:250:OF *\/ extern void check_type_array (object *p); /\* (p) object *p; *\/ */
+/* /\* typespec.c:284:OF *\/ extern void check_type (object x, int t); /\* (x, t) object x; int t; *\/ */
 /* typespec.c:294:OF */ extern void Ltype_of (void); /* () */
 /* typespec.c:493:OF */ extern void gcl_init_typespec (void); /* () */
 /* typespec.c:497:OF */ extern void gcl_init_typespec_function (void); /* () */
@@ -1750,6 +1750,9 @@ cplus(object,object);
 
 object
 Icall_error_handler(object,object,int,...);
+
+object
+Icall_continue_error_handler(object,object,object,int,...);
 
 void *
 gcl_gmp_alloc(size_t);

@@ -58,13 +58,19 @@ gcl.info: ${GCL_MAN} gcl.texi
 #	$(HTML_CMD) gcl.texi
 
 gcl-si/index.html: ${GCL_SI} gcl-si.texi
-	$(HTML_CMD) gcl-si.texi
+	mkdir -p $@
+	touch $@
+	-$(HTML_CMD) gcl-si.texi
 
 gcl-tk/index.html: ${GCL_TK} gcl-tk.texi
-	$(HTML_CMD) gcl-tk.texi
+	mkdir -p $@
+	touch $@
+	-$(HTML_CMD) gcl-tk.texi
 
 gcl/index.html: gcl.texi
-	$(HTML_CMD) gcl.texi
+	mkdir -p $@
+	touch $@
+	-$(HTML_CMD) gcl.texi
 
 install-html: gcl-tk_toc.html gcl-si_toc.html gcl_toc.html
 	cp *.html /d/www/gcl

@@ -461,51 +461,6 @@ struct string {           /*  string header  */
                            /*  string length  */
 };
 
-#define stack_string(a_,b_) struct string _s={0};\
-                            object a_=(object)&_s;\
-                            set_type_of((a_),t_string);\
-                            (a_)->st.st_self=(void *)(b_);\
-                            (a_)->st.st_dim=(a_)->st.st_fillp=strlen(b_)
-
-#define stack_fixnum(a_,b_) struct fixnum_struct _s={0};\
-                            object a_;\
-                            if (is_imm_fix(b_)) (a_)=make_fixnum(b_); else {\
-                            (a_)=(object)&_s;\
-                            set_type_of((a_),t_fixnum);\
-                            (a_)->FIX.FIXVAL=(b_);}
-
-/*FIXME the stack stuff is dangerous It works for error handling, but
-  simple errors may evan pass the format tring up the stack as a slot
-  in ansi*/
-/* #define TYPE_ERROR(a_,b_) {stack_string(tp_err,"~S is not of type ~S.");\ */
-/*                            Icall_error_handler(sKwrong_type_argument,tp_err,2,(a_),(b_));} */
-
-#define TYPE_ERROR(a_,b_) ({object tp_err=make_simple_string("~S is not of type ~S.");\
-                           Icall_error_handler(sKwrong_type_argument,tp_err,2,(a_),(b_));})
-
-#define CONTROL_ERROR(a_) ({object tp_err=make_simple_string(a_);\
-                           Icall_error_handler(sKcontrol_error,tp_err,0);})
-
-#define PROGRAM_ERROR(a_,b_) ({object tp_err=make_simple_string(a_);\
-                             Icall_error_handler(sKprogram_error,tp_err,1,(b_));})
-
-#define READER_ERROR(a_,b_)  ({object rd_err=make_simple_string("Read error on stream ~S: " b_);\
-                              Icall_error_handler(sKreader_error,rd_err,1,(a_));})
-
-#define FILE_ERROR(a_,b_)    ({object rd_err=make_simple_string("File error on ~S: " a_);\
-                              Icall_error_handler(sKfile_error,rd_err,1,(b_));})
-
-#define PATHNAME_ERROR(a_,b_) ({object rd_err=make_simple_string("Pathname error on ~S: " a_);\
-                               Icall_error_handler(sKpathname_error,rd_err,1,(b_));})
-
-#define NERROR(a_)  ({object fmt=make_simple_string(a_ ": line ~a, file ~a, function ~a");\
-                    {object line=make_fixnum(__LINE__);\
-                    {object file=make_simple_string(__FILE__);\
-                    {object function=make_simple_string(__FUNCTION__);\
-                     Icall_error_handler(sKerror,fmt,3,line,file,function);}}}})
-
-#define ASSERT(a_) if (!(a_)) NERROR("The assertion " #a_ " failed")
-
 struct ustring {
 
   FIRSTWORD;
@@ -528,10 +483,10 @@ struct ustring {
 #define  INT_GCL(x,i)  ((( int *)(x)->ust.ust_self)[i])
 
 #define BV_OFFSET(x) ((type_of(x)==t_bitvector ? x->bv.bv_offset : \
-                       type_of(x)== t_array ? x->a.a_offset : (abort(),0)))
+                       type_of(x)== t_array ? x->a.a_offset : (gcl_abort(),0)))
 
 #define SET_BV_OFFSET(x,val) ((type_of(x)==t_bitvector ? x->bv.bv_offset = val : \
-                               type_of(x)== t_array ? x->a.a_offset=val : (abort(),0)))
+                               type_of(x)== t_array ? x->a.a_offset=val : (gcl_abort(),0)))
 
 struct bitvector {         /*  bitvector header  */
 
@@ -989,12 +944,55 @@ struct freelist {
 #define set_type_of(x,y) ({object _x=(object)(x);enum type _y=(y);*(fixnum *)(_x)&=TYPE_BITS;\
                            if (_y!=t_cons) {_x->d.e=1;_x->d.t=_y;}})
 
+/*
+
+C predicates
+
+*/
+
+
 #define consp(x)         ({register object _z=(object)(x);\
                            (_z!=Cnil && !is_imm_fixnum(_z) && valid_cdr(_z));})
 #define listp(x)         ({register object _z=(object)(x);\
                            (!is_imm_fixnum(_z) && valid_cdr(_z));})
 #define atom(x)          ({register object _z=(object)(x);\
                            (_z==Cnil || is_imm_fixnum(_z) || !valid_cdr(_z));})
+
+#define join(a_,b_) a_ ## b_
+#define Join(a_,b_) join(a_,b_)
+
+
+#define SPP(a_,b_) (type_of(a_)==Join(t_,b_))
+#define streamp(a_)    SPP(a_,stream)
+#define packagep(a_)   SPP(a_,package)
+#define hashtablep(a_) SPP(a_,hashtable)
+#define randomp(a_)    SPP(a_,random)
+#define characterp(a_) SPP(a_,character)
+#define symbolp(a_)    SPP(a_,symbol)
+#define stringp(a_)    SPP(a_,string)
+#define fixnump(a_)    SPP(a_,fixnum)
+#define readtablep(a_) SPP(a_,readtable)
+
+extern int big_sign(object);
+#define integerp(a_) ({enum type _tp=type_of(a_); _tp >= t_fixnum     && _tp <= t_bignum;})
+#define non_negative_integerp(a_) ({enum type _tp=type_of(a_); (_tp == t_fixnum && fix(a_)>=0) || (_tp==t_bignum && big_sign(a_)>=0);})
+#define rationalp(a_)({enum type _tp=type_of(a_); _tp >= t_fixnum     && _tp <= t_ratio;})
+#define floatp(a_)   ({enum type _tp=type_of(a_); _tp == t_shortfloat || _tp == t_longfloat;})
+#define realp(a_)    ({enum type _tp=type_of(a_); _tp >= t_fixnum     && _tp < t_complex;})
+#define numberp(a_)  ({enum type _tp=type_of(a_); _tp >= t_fixnum     && _tp <= t_complex;})
+#define arrayp(a_)   ({enum type _tp=type_of(a_); _tp >= t_string     && _tp <= t_array;})
+#define vectorp(a_)  ({enum type _tp=type_of(a_); _tp >= t_string     && _tp < t_array;})
+
+#define string_symbolp(a_)                 ({enum type _tp=type_of(a_); _tp == t_string || _tp == t_symbol;})
+#define pathname_string_symbolp(a_)        ({enum type _tp=type_of(a_); _tp==t_pathname || _tp == t_string\
+                                                                     || _tp == t_symbol;})
+#define pathname_string_symbol_streamp(a_) ({enum type _tp=type_of(a_); _tp==t_pathname || _tp == t_string\
+                                                                     || _tp == t_symbol || _tp==t_stream;})
+#define eql_is_eq(a_)    (is_imm_fixnum(a_) || ({enum type _tp=type_of(a_); _tp == t_cons || _tp > t_character;}))
+#define equal_is_eq(a_)  (is_imm_fixnum(a_) || type_of(a_)>t_bitvector)
+#define equalp_is_eq(a_) (type_of(a_)>t_structure)
+
+
 
 /*
  Storage manager for each type.
@@ -1248,7 +1246,7 @@ EXTER object sSlambda_block_expanded;
 # ifdef __GNUC__ 
 # define assert(ex)\
 {if (!(ex)){(void)fprintf(stderr, \
-    "Assertion failed: file \"%s\", line %d\n", __FILE__, __LINE__);exit(1);}}
+    "Assertion failed: file \"%s\", line %d\n", __FILE__, __LINE__);gcl_abort();}}
 # else
 # define assert(ex)
 # endif
@@ -1274,7 +1272,7 @@ EXTER object sSlambda_block_expanded;
 #define END_NO_INTERRUPT_SAFE \
   signals_allowed = old_signals_allowed; \
   if (signals_pending) \
-    do{ if(signals_allowed ==0) /* should not get here*/abort(); \
+    do{ if(signals_allowed ==0) /* should not get here*/gcl_abort(); \
    raise_pending_signals(sig_safe)}while(0)
 
 void raise_pending_signals();
@@ -1406,3 +1404,14 @@ extern void *stack_alloc_start,*stack_alloc_end;
                                         
 
 #define make_cons(a_,b_) ({register struct typemanager *_tm=tm_table+(int)t_cons;register object _x;if (!stack_alloc_start && _tm->tm_free) {_x=_tm->tm_free;_tm->tm_free=OBJ_LINK(_x);_tm->tm_nfree--;_tm->tm_nused++;_x->c.c_car=(a_);_x->c.c_cdr=(b_);} else _x=make_cons1(a_,b_);_x;})
+
+EXTER object null_string;
+#define FEerror(a_,b_...)   Icall_error_handler(sLerror,null_string,\
+                            4,sKformat_control,make_simple_string(a_),sKformat_arguments,list(b_))
+#define TYPE_ERROR(a_,b_)   Icall_error_handler(sLtype_error,null_string,\
+                            4,sKdatum,(a_),sKexpected_type,(b_))
+#define FEinvalid_form(a_,b_) \
+  Icall_error_handler(sLprogram_error,null_string,4,\
+                      sKformat_control,make_simple_string(a_),\
+                      sKformat_arguments,list(1,(b_)))
+#define FEinvalid_variable(a_,b_) FEinvalid_form(a_,b_)

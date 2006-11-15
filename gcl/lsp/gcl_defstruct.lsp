@@ -181,7 +181,7 @@
 
 (defun maybe-cons-keyname (x &optional y)
   (unless (consp x)
-    (specific-error :invalid-form "x ~S is not a list~%" x))
+    (error 'program-error :format-control "x ~S is not a list~%" :format-arguments (list x)))
   (let ((sn (sixth x)))
     (if sn
 	(if y

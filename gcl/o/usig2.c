@@ -255,7 +255,7 @@ before_interrupt(struct save_for_interrupt *p, int allowed)
 /* #define XS(a) *pp++ =  * (void **) (&a);  */
 #include "usig2_aux.c"
    if ((pp - (&(p->save_objects)[0])) >= (sizeof(p->save_objects)/sizeof(void *)))
-     abort();
+     gcl_abort();
  }
 #define MINN(a,b) (a<b?a :b)
  p->token_st_dim = MINN(token->st.st_dim,tok_leng+1);

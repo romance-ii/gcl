@@ -65,7 +65,7 @@
 #endif
 
 #define VOID void
-#define ERROR_MESSAGE(msg)     do{ fprintf(stderr,msg); exit(1) ; } while(0)    
+#define ERROR_MESSAGE(msg)     do{ fprintf(stderr,msg); gcl_abort() ; } while(0)    
 
 #ifdef STAND
 

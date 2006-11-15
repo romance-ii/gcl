@@ -25,42 +25,29 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 	value stack
 */
 
-EXTER object *vs_org;
-EXTER object *vs_limit;	/*  value stack limit  */
+EXTER object *vs_org,*vs_limit,*vs_base,*vs_top;
 
-EXTER object *vs_base;	/*  value stack base  */
-EXTER object *vs_top;		/*  value stack top  */
+#define	vs_push(x_)	*vs_top++ = (x_)
 
-#define	vs_push(obje)	(*vs_top++ = (obje))
-
-#define	vs_pop		(*--vs_top)
-#define	vs_popp		(--vs_top)
+#define	vs_pop		*--vs_top
+#define	vs_popp		--vs_top
 #define	vs_head		vs_top[-1]
 
-#define	vs_mark		object *old_vs_top = vs_top
-#define	vs_reset	vs_top = old_vs_top
+#define	vs_mark		object *old_vs_top=vs_top
+#define	vs_reset	vs_top=old_vs_top
 
-#define	vs_check	if (vs_top >= vs_limit)  \
-				vs_overflow()
+#define	vs_check	if (vs_top>=vs_limit)  vs_overflow()
 
-#define	vs_check_push(obje)  \
-			(vs_top >= vs_limit ?  \
-			 (object)vs_overflow() : (*vs_top++ = (obje)))
+#define	vs_check_push(x_)  (vs_top >= vs_limit ?  (object)vs_overflow() : (*vs_top++=(x_)))
 
-#define	check_arg(n)  \
-			if (vs_top - vs_base != (n))  \
-				check_arg_failed(n)
+#define	check_arg(n_)  if (vs_top-vs_base!=(n_))  check_arg_failed(n_)
 
-#define CHECK_ARG_RANGE(n,m) if (VFUN_NARGS < n || VFUN_NARGS >m) \
-   check_arg_range(n,m)
+#define CHECK_ARG_RANGE(n_,m_) if (VFUN_NARGS<n_ || VFUN_NARGS>m_) check_arg_range(n_,m_)
 
-#define	MMcheck_arg(n)  \
-			if (vs_top - vs_base < (n))  \
-				too_few_arguments();  \
-			else if (vs_top - vs_base > (n))  \
-				too_many_arguments()
+#define	MMcheck_arg(n_)  do {\
+			 if (vs_top-vs_base<(n_))  too_few_arguments();  \
+			 else if (vs_top-vs_base>(n_)) too_many_arguments();} while (0)
 
-#define vs_reserve(x)	if(vs_base+(x) >= vs_limit)  \
-				vs_overflow();
+#define vs_reserve(x_)	if(vs_base+(x_) >= vs_limit) vs_overflow();
 
 #define MULTIPLE_VALUES_LIMIT 32

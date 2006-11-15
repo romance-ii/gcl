@@ -661,7 +661,7 @@
 	 (mapcan #'(lambda (slot)
 		     (mapcar #'(lambda (arg)
 				 (cons arg slot))
-			     (slot-definition-initargs slot)))
+			     (reverse (slot-definition-initargs slot))))
 		 (class-slots class)))
 	(nslots nil))
     (dolist (key nkeys)
@@ -675,6 +675,13 @@
 		     initargs-form-list)
 	  (push key nkeys)
 	  (push slot nslots))))
+    (dolist (default default-initargs)
+      (let* ((key (car default))
+	     (function (cadr default)))
+	(unless (member key nkeys)
+	  (add-forms `((funcall ,function))
+		     initargs-form-list)
+	  (push key nkeys))))
     (when separate-p
       (add-forms `((update-initialize-info-cache
 		    ,class ,(initialize-info class nkeys nil)))

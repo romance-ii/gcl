@@ -234,13 +234,11 @@ DEFUN_NEW("ASET1", object, fSaset1, SI, 3, 3, NONE, OO, IO, OO,OO,(object x, fix
       break;
     case aet_bit:
       i +=  BV_OFFSET(x);
-    AGAIN_BIT: 
       ASSURE_TYPE(val,t_fixnum);
       {int v = Mfix(val);
        if (v == 0) CLEAR_BITREF(x,i);
        else if (v == 1) SET_BITREF(x,i);
-       else {val= fSincorrect_type(val,sLbit);
-	     goto AGAIN_BIT;}
+       else TYPE_ERROR(val,sLbit);
        break;}
     case aet_fix:
     case aet_nnfix:
@@ -370,7 +368,8 @@ DEFUNO_NEW("SVSET", object, fSsvset, SI, 3, 3, NONE, OO, IO, OO,
        OO,void,siLsvset,(object x,fixnum i,object val),"")
 { if (TYPE_OF(x) != t_vector
       || DISPLACED_TO(x) != Cnil)
-    Wrong_type_error("simple array",0);
+  TYPE_ERROR(x,sLsimple_vector);
+/*     Wrong_type_error("simple array",0); */
   if (i > x->v.v_dim)
     { FEerror("out of bounds",0);
     }
@@ -705,13 +704,12 @@ FFN(Larray_displacement)(void) {
 static void
 displace(object from_array, object dest_array, int offset)
 {
-  enum aelttype typ;
+  enum aelttype typ,typ1;
   IisArray(from_array);
   IisArray(dest_array);
   typ =Iarray_element_type(from_array);
-  if (typ != Iarray_element_type(dest_array))
-    { Wrong_type_error("same element type",0);
-    }
+  if (typ != (typ1=Iarray_element_type(dest_array)))
+     TYPE_ERROR(from_array,list(2,sLarray,*aet_types[typ1].namep));
   if (offset + from_array->a.a_dim > dest_array->a.a_dim)
     { FEerror("Destination array too small to hold other array",0);
     }

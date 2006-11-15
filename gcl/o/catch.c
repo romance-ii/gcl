@@ -47,6 +47,8 @@ FFN(Fcatch)(VOL object args)
 	frs_pop();
 }
 
+DEFCONST("+TOP-ABORT-TAG+",sSPtop_abort_tagP,SI,MMcons(Cnil,Cnil),"");
+
 DEFUNM_NEW("ERROR-SET",object,fSerror_set,SI
 	   ,1,1,NONE,OO,OO,OO,OO,(volatile object x0),
        "Evaluates the FORM in the null environment.  If the evaluation \

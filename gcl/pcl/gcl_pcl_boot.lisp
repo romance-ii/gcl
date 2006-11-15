@@ -224,7 +224,7 @@ work during bootstrapping.
   (let ((initargs ())
 	(methods ()))
     (labels ((duplicate-option (name)
-	     (specific-error :invalid-form "The option ~S appears more than once." name))
+	     (error 'program-error :format-control "The option ~S appears more than once." :format-arguments (list name)))
 	     (check-declaration (declaration-specifiers)
 	       (loop for specifier in declaration-specifiers
 		     when (and (consp specifier)
@@ -232,9 +232,8 @@ work during bootstrapping.
 				       '(special ftype function inline
 						 notinline declaration)
 				       :test #'eq)) do
-				       (specific-error :invalid-form
-						       "Declaration specifier ~S is not allowed"
-						       specifier)))
+				       (error 'program-error :format-control "Declaration specifier ~S is not allowed"
+					      :format-arguments (list specifier))))
 	     (initarg (key &optional (new nil new-supplied-p))
 		      (if new-supplied-p
 			  (setf (getf initargs key) new)
@@ -269,7 +268,7 @@ work during bootstrapping.
 	   (push `(defmethod ,function-specifier ,@(cdr option))
 		 methods))
 	  (t ;unsupported things must get a 'program-error
-	   (specific-error :invalid-form "Unsupported option ~S." option))))
+	   (error 'program-error :format-control "Unsupported option ~S." :format-arguments (list option)))))
       
       (let ((declarations (initarg :declarations)))
 	(when declarations (initarg :declarations `',declarations))))
@@ -941,7 +940,7 @@ work during bootstrapping.
 (defun get-key-arg-tail (keyword list)
   (loop for (key . tail) on list by #'cddr
 	when (null tail) do
-	  (specific-error :invalid-form "Odd number of keyword arguments in ~S" list)
+	  (error 'program-error :format-control "Odd number of keyword arguments in ~S" :format-arguments (list list))
 	when (eq key keyword)
 	  return tail))
 
@@ -1231,11 +1230,11 @@ work during bootstrapping.
 
 (defun generic-clobbers-function (function-specifier)
   (restart-case
-      (specific-error :invalid-form
+      (error 'program-error :format-control
        "~S already names an ordinary function or a macro.~%~
 	If you want to replace it with a generic function, you should remove~%~
-        the existing definition beforehand.~%"
-       function-specifier)
+        the existing definition beforehand.~%" :format-arguments (list
+       function-specifier))
     (continue ()
       :report (lambda (stream)
 		(format stream "Discard the existing definition of ~S."
@@ -1374,9 +1373,9 @@ work during bootstrapping.
 			       (early-method-lambda-list method)
 			       (method-lambda-list method)))
     (flet ((lose (format-control &rest format-args)
-	     (specific-error :invalid-form
+	     (error 'program-error :format-control
 			     "Attempt to add the method ~S to the generic function ~S.~%~
-                   But ~?" method gf format-control format-args))
+                   But ~?" :format-arguments (list method gf format-control format-args)))
 	   (compare (x y)
 	     (if (> x y) "more" "fewer")))
       (let ((gf-nreq (arg-info-number-required arg-info))
@@ -2113,8 +2112,13 @@ work during bootstrapping.
 		 ,gensyms 
 		 ,(caddr form)
 		 .,(reverse (mapcar (lambda (v g) `(setf ,v ,g)) vars gensyms))))))
-	  (t form))))
-)
+	  ((eq (car form) 'conditions::restart-case)
+	   (let* ((nf (cadr form))
+		  (nf (let ((y (assoc nf specs)))
+			(if (and y (eq (cadr y) (variable-lexical-p nf env))) (walker::macroexpand-all (caddr y) env) nf))))
+	     (if (eq nf (cadr form)) form
+	       `(,(car form) ,nf ,@(cddr form)))))
+	  (t form)))))
 
 (defmacro with-slots (slots instance &body body)
   (let ((in (gensym)))

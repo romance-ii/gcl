@@ -377,7 +377,7 @@ static void unexec_doit(int infd,int outfd)
   if (malloc_cookie == 0)
     {
       fprintf(stderr, "Error in malloc_freezedry()\n");
-      abort();
+      gcl_abort();
     }
 
   {

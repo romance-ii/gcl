@@ -259,7 +259,7 @@
 			    (table *print-pprint-dispatch*))
   (declare (optimize (safety 1)))
   (unless (typep priority 'real)
-    (specific-error :wrong-type-argument "~S is not of type ~S." priority 'real))
+    (error 'type-error :datum priority :expected-type 'real))
   (let ((a (assoc type-spec (cdr table) :test 'equal)))
     (if a (setf (cdr a) (list function priority))
 	(rplacd (last table) `((,type-spec ,function ,priority)))))
@@ -271,8 +271,7 @@
     (setq table *print-pprint-dispatch*))
   (unless (and (eq (type-of table) 'cons)
   	(eq (car table) 'pprint-dispatch))
-    (specific-error :wrong-type-argument "~S is not of type ~S."
-    	table 'pprint-dispatch))
+    (error 'type-error :datum table :expected-type 'pprint-dispatch))
   (copy-seq table ))
 
 (defun y-or-n-p (&optional string &rest args)

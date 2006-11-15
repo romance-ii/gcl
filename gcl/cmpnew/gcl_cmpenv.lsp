@@ -224,7 +224,7 @@
 (defun add-function-proclamation (fname decl list &aux (procl t)
 					arg-types return-types)
  (when (not (listp list))
-   (specific-error :wrong-type-argument "~S is not of type ~S." list 'list))
+   (error 'type-error :datum list :expected-type 'list))
   (cond
    ((and (symbolp fname)
 	 (listp decl) (listp (cdr decl)))
@@ -344,9 +344,9 @@
 
 (defun proclaim (decl)
  (when (not (listp decl))
-   (specific-error :wrong-type-argument "~S is not of type ~S." decl 'list))
+   (error 'type-error :datum decl :expected-type 'list))
  (when (not (listp (cdr decl)))
-   (specific-error :wrong-type-argument "~S is not of type ~S." (cdr decl) 'list))
+   (error 'type-error :datum (cdr decl) :expected-type 'list))
   (case (car decl)
     (special
      (dolist** (var (cdr decl))
@@ -426,7 +426,7 @@
 
 (defun proclaim-var (type vl)
  (when (not (listp vl))
-   (specific-error :wrong-type-argument "~S is not of type ~S." vl 'list))
+   (error 'type-error :datum vl :expected-type 'list))
   (setq type (type-filter type))
   (dolist** (var vl)
     (cond ((symbolp var)

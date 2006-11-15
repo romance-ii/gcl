@@ -514,7 +514,7 @@ gensym_int(object this_gensym_prefix,object this_gensym_counter) {
     q=p+j;
     break;
   default:
-    FEerror("Bad gensym counter type", 0);
+    TYPE_ERROR(this_gensym_counter,sLinteger);
     break;
   }
   

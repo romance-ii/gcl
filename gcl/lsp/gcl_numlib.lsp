@@ -47,8 +47,7 @@
 
 (defun isqrt (i)
        (unless (and (integerp i) (>= i 0))
-	       (specific-error :wrong-type-argument "~S is not of type ~S."
-			       i `(integer 0 ,most-positive-fixnum)))
+	       (error 'type-error :datum i :expected-type `(integer 0 ,most-positive-fixnum)))
        (if (zerop i)
            0
            (let ((n (integer-length i)))

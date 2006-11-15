@@ -3,7 +3,8 @@
 (in-package "CONDITIONS")
 
 (defvar *shadowed-symbols* 
-  '(BREAK ERROR CERROR WARN CHECK-TYPE ASSERT ETYPECASE CTYPECASE ECASE CCASE))
+;  '(BREAK ERROR CERROR WARN CHECK-TYPE ASSERT ETYPECASE CTYPECASE ECASE CCASE))
+  '(WARN CHECK-TYPE ASSERT ETYPECASE CTYPECASE ECASE CCASE))
 
 (defun install-symbol (real clcs)
   (unless (get real 'definition-before-clcs)
@@ -31,10 +32,10 @@
 ;           (load clcs-load)
 ;           (open clcs-open)
 ;	   #+kcl (si::break-level si::clcs-break-level)
-	   #+kcl (si::terminal-interrupt si::clcs-terminal-interrupt)
-	   #+kcl (si::break-quit si::clcs-break-quit)
-	   #+kcl (si::error-set clcs-error-set)
-	   #+kcl (si::universal-error-handler clcs-universal-error-handler))))
+;	   #+kcl (si::terminal-interrupt si::clcs-terminal-interrupt)
+;	   #+kcl (si::break-quit si::clcs-break-quit)
+	   #+kcl (si::error-set clcs-error-set))))
+;	   #+kcl (si::universal-error-handler clcs-universal-error-handler))))
 
 (defun install-clcs-symbols ()
   (dolist (r *clcs-redefinitions*)
@@ -106,6 +107,16 @@
 ;		(values-list values)))
 ;	    (error "~S failed." 'compile)))))
 
+(defun import (s &optional (p *package*))
+  (loop (with-simple-restart 
+	 (retry "Retry importing ~S into ~S." s p)
+	 (return (funcall #.(si::function-src 'import) s p)))))
+
+(defun delete-package (p)
+  (loop (with-simple-restart 
+	 (retry "Retry deleting ~S." p)
+	 (return (funcall #.(si::function-src 'delete-package) p)))))
+
 (defun load (pn &rest args)
   (loop (with-simple-restart 
 	 (retry "Retry loading file ~S." (car args))
@@ -129,23 +140,4 @@
 #+(or kcl lucid cmu)
 (install-clcs-symbols)
 
-#+dsys
-(defun dsys::retry-operation (function retry-string)
-  (loop (with-simple-restart (retry retry-string)
-	  (return-from dsys::retry-operation
-	    (funcall function)))))
 
-#+dsys
-(defun dsys::operate-on-module (module initial-state system-operation)
-  (if (null dsys::*retry-operation-list*)
-      (dsys::operate-on-module1 module initial-state system-operation)
-      (let ((retry-operation (car (last dsys::*retry-operation-list*)))
-	    (dsys::*retry-operation-list* (butlast dsys::*retry-operation-list*)))
-	(restart-bind ((retry 
-			#'(lambda (&rest ignore)
-			    (declare (ignore ignore))
-			    (funcall (car retry-operation)))
-			:report-function
-			#'(lambda (stream)
-			    (write-string (cdr retry-operation) stream))))
-	   (dsys::operate-on-module module initial-state system-operation)))))

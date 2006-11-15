@@ -101,7 +101,7 @@
 
 (defun make-kcl-top-restart (quit-tag)
   (make-restart :name 'gcl-top-restart
-		:function #'(lambda () (throw (car (list quit-tag)) quit-tag))
+		:function (lambda () (throw (car (list quit-tag)) quit-tag))
 		:report-function 
 		#'(lambda (stream) 
 		    (let ((b-l (if (eq quit-tag si::*quit-tag*)
@@ -124,13 +124,11 @@
 		      *kcl-top-restarts*)))))
 
 (defun kcl-top-restarts ()
-  (let* ((old-tags (mapcan #'(lambda (e) (when (cdr e) (list (cdr e))))
-			   si::*quit-tags*))
+  (let* ((old-tags (mapcan (lambda (e) (when (cdr e) (list (cdr e)))) si::*quit-tags*))
 	 (tags (if si::*quit-tag* (cons si::*quit-tag* old-tags) old-tags))
-	 (restarts (mapcar #'find-kcl-top-restart tags)))
-    (setq *kcl-top-restarts* (mapcar #'cons tags restarts))
-    restarts))
-)  
+	 (restarts (mapcar 'find-kcl-top-restart tags)))
+    (setq *kcl-top-restarts* (mapcar 'cons tags restarts))
+    restarts)))  
 
 (DEFUN RESTART-REPORT (RESTART STREAM)
   (FUNCALL (OR (RESTART-REPORT-FUNCTION RESTART)
@@ -168,7 +166,7 @@
   
 (DEFUN INVOKE-RESTART (RESTART &REST VALUES)
   (LET ((REAL-RESTART (OR (FIND-RESTART RESTART)
-			  (specific-ERROR :control-error "Restart ~S is not active." RESTART))))
+			  (error 'control-error :format-control "Restart ~S is not active." :format-arguments (list restart)))))
        (APPLY (RESTART-FUNCTION REAL-RESTART) VALUES)))
 
 (DEFUN INVOKE-RESTART-INTERACTIVELY (RESTART)
@@ -201,36 +199,49 @@
                    `(LET ((,EXP-TEMP ,(SECOND SPEC)) (,NAME (GENSYM "OO-")))
                       `(LET ((,,NAME ,,EXP-TEMP))
                          ,,(FROB (REST SPECS) BODY))))))))
-  (FROB SPECS BODY)))
+  (FROB SPECS BODY))))
 
-(defun munge-restart-case-expression (expression data)
-  (let ((exp (macroexpand expression)))
+(defun munge-restart-case-expression (expression data env)
+  (let ((exp (macroexpand expression env)))
     (if (consp exp)
 	(let* ((name (car exp))
 	       (args (if (eq name 'cerror) (cddr exp) (cdr exp))))
-	  (if (member name '(signal error cerror warn))
-	      (once-only ((n-cond `(coerce-to-condition
-				    ,(first args)
-				    (list ,@(rest args))
-				    ',(case name
-					(warn 'simple-warning)
-					(signal 'simple-condition)
-					(t 'simple-error))
-				    ',name)))
-		`(with-condition-restarts
-		     ,n-cond
-		     (list ,@(mapcar #'(lambda (da)
-					 `(find-restart ',(nth 0 da)))
-				     data))
-		   ,(if (eq name 'cerror)
-			`(cerror ,(second expression) ,n-cond)
-			`(,name ,n-cond))))
-	      expression))
-	expression)))
+	  (cond ((member name '(error cerror))
+		 (once-only ((n-cond `(si::process-error
+				       ,(first args)
+				       (list ,@(rest args))
+				       ',name
+				       ',(case name
+					       (warn 'simple-warning)
+					       (signal 'simple-condition)
+					       (t 'simple-error)))))
+			    `(with-condition-restarts
+			      ,n-cond (car *restart-clusters*)
+;			      (list ,@(mapcar (lambda (da) `(find-restart ',(nth 0 da)))
+;					      data))
+			      ,(if (eq name 'cerror)
+				   `(cerror ,(second expression) ,n-cond)
+				 `(,name ,n-cond)))))
+		((member name '(signal warn))
+		 (once-only ((n-cond `(coerce-to-condition
+				       ,(first args)
+				       (list ,@(rest args))
+				       ',(case name
+					       (warn 'simple-warning)
+					       (signal 'simple-condition)
+					       (t 'simple-error))
+				       ',name)))
+			    `(with-condition-restarts
+			      ,n-cond (car *restart-clusters*)
+;			      (list ,@(mapcar (lambda (da) `(find-restart ',(nth 0 da)))
+;					      data))
+			      ,(if (eq name 'cerror)
+				   `(cerror ,(second expression) ,n-cond)
+				 `(,name ,n-cond)))))
+	      (expression)))
+      expression)))
 
-)
-
-(DEFMACRO RESTART-CASE (EXPRESSION &BODY CLAUSES)
+(DEFMACRO RESTART-CASE (EXPRESSION &BODY CLAUSES &environment env)
   (FLET ((TRANSFORM-KEYWORDS (&KEY REPORT INTERACTIVE TEST)
 	   (LET ((RESULT '()))
 	     (WHEN REPORT
@@ -277,7 +288,7 @@
 					  (GO ,TAG))
 				,@KEYS)))
 			DATA)
-	       (RETURN-FROM ,BLOCK-TAG ,(munge-restart-case-expression EXPRESSION data)))
+	       (RETURN-FROM ,BLOCK-TAG ,(munge-restart-case-expression EXPRESSION data env)))
 	     ,@(MAPCAN #'(LAMBDA (DATUM)
 			   (LET ((TAG  (NTH 1 DATUM))
 				 (BVL  (NTH 3 DATUM))
@@ -288,13 +299,13 @@
 					     ,TEMP-VAR)))))
 		       DATA)))))))
 
-(DEFMACRO WITH-SIMPLE-RESTART ((RESTART-NAME FORMAT-STRING
+(DEFMACRO WITH-SIMPLE-RESTART ((RESTART-NAME FORMAT-CONTROL
 					     &REST FORMAT-ARGUMENTS)
 			       &BODY FORMS)
   `(RESTART-CASE (PROGN ,@FORMS)
      (,RESTART-NAME ()
         :REPORT (LAMBDA (STREAM)
-		  (FORMAT STREAM ,FORMAT-STRING ,@FORMAT-ARGUMENTS))
+		  (FORMAT STREAM ,FORMAT-CONTROL ,@FORMAT-ARGUMENTS))
       (VALUES NIL T))))
 
 ;(DEFUN ABORT          (&optional condition)      (INVOKE-RESTART (find-restart 'ABORT condition))
@@ -324,9 +335,10 @@
 ;;; INVOKE-RESTART from signalling a control-error condition.
 ;;;
 (defmacro define-nil-returning-restart (name args doc)
+  (let ((restart (gensym)))
   `(defun ,name (,@args &optional condition)
      ,doc
-     (if (find-restart ',name condition) (invoke-restart ',name ,@args))))
+     (let ((,restart (find-restart ',name condition))) (when ,restart (invoke-restart ,restart ,@args))))))
 
 (define-nil-returning-restart continue ()
   "Transfer control to a restart named continue, returning nil if none exists.")
