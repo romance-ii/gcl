@@ -1165,6 +1165,9 @@ DEFUNOM_NEW("FUNCALL",object,fLfuncall,LISP
   object *new;
   int i,n = VFUN_NARGS-1;
 
+  if (type_of(fun)==t_symbol && 
+      (fun->s.s_mflag || fun->s.s_sfdef!=NOT_SPECIAL))
+    UNDEFINED_FUNCTION(fun);
   if (n>=65) FEerror("arg limit exceeded",0);
   new=ZALLOCA(n*sizeof(*new));
 /*   wipe_stack(&n); */

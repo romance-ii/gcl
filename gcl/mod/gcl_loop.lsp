@@ -981,6 +981,7 @@ a LET-like macro, and a SETQ-like macro, which perform LOOP-style destructuring.
 termination by an iteration driving clause, or by use of WHILE or
 UNTIL -- the epilogue code (if any) will be run, and any implicitly
 collected result will be returned as the value of the LOOP."
+  (declare (optimize (safety 1)))
   '(go end-loop))
 
 

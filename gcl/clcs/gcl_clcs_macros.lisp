@@ -178,4 +178,5 @@
 		   (go tag))))))
 
 (DEFMACRO CHECK-TYPE (PLACE TYPE &OPTIONAL TYPE-STRING)
+  (declare (optimize (safety 1)))
   `(unless (typep ,place ',type) (setf ,place (check-type-internal ',place ,place ',type ',type-string)) nil))

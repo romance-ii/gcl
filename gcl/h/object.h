@@ -1415,3 +1415,4 @@ EXTER object null_string;
                       sKformat_control,make_simple_string(a_),\
                       sKformat_arguments,list(1,(b_)))
 #define FEinvalid_variable(a_,b_) FEinvalid_form(a_,b_)
+#define FEwrong_type_argument(a_,b_) TYPE_ERROR(b_,a_)
