@@ -34,8 +34,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * Misc ansi fixes; error system overhaul
   * more careful floating point overflow to work with compiler
   * fix number comparison tests
+  * Fix error in error string printing, axe specific-error
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 15 Nov 2006 22:54:48 -0500
+ -- Camm Maguire <camm@enhanced.com>  Thu, 16 Nov 2006 10:38:57 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

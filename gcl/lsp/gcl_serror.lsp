@@ -83,11 +83,13 @@
 	       (apply 'format nil datum args))
 	   datum))
 	((symbolp datum)
-	 (coerce-to-string
-	  (if args
-	      (apply 'string-concatenate (cons datum (make-list (length args) :initial-element " ~s")))
-	    (string datum))
-	  args))
+	 (substitute 
+	  #\^ #\~ 
+	  (coerce-to-string
+	   (if args
+	       (apply 'string-concatenate (cons datum (make-list (length args) :initial-element " ~s")))
+	     (string datum))
+	  args)))
 	("unknown error")))
 
 (defun process-error (datum args function-name &optional default-type)
