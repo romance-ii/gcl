@@ -28,13 +28,13 @@
 	((and (> i 0) (find-ihs s (1- i) j)))
 	(j)))
 
-(defun error-in-error (x y z)
+(defun error-in-error (x y z e)
   (proto-signal (process-error y z x))
-  (format *debug-io* "Error in error: ~&~A ~A ~A~2%" x y z)
+  (format *debug-io* "Error in error: ~&~A ~A ~A ~A~2%" x y z e)
   (simple-backtrace)
   (break-quit-one))
 
-(defmacro with-error-level-bindings ((fn d a) &body forms)
+(defmacro with-error-level-bindings ((fn d a &optional e) &body forms)
   `(let* ((error-stack *error-stack*)
 	  (*error-stack* (if (member ',fn error-stack) error-stack (cons ',fn error-stack)))
  	  (no-bind (and error-stack (not (eq *error-stack* error-stack))))
@@ -43,7 +43,7 @@
 	  (*frs-base* (if no-bind *frs-base* (or (sch-frs-base *frs-top* *ihs-base*) (1+ (frs-top)))))
 	  (*frs-top*  (if no-bind *frs-top* (frs-top)))
 	  (*current-ihs* *ihs-top*))
-     (cond ((eq error-stack *error-stack*) (error-in-error ',fn ,d ,a))
+     (cond ((eq error-stack *error-stack*) (error-in-error ',fn ,d ,a ,e))
 	   (t ,@forms))))
 
 (defun bind-test (n)
@@ -125,8 +125,7 @@
 
   (maybe-clear-input)
 
-  (with-error-level-bindings (universal-error-handler error-name (list function-name 
-								       continue-format-string error-format-string args))
+  (with-error-level-bindings (universal-error-handler error-name args (list function-name continue-format-string error-format-string))
 
    (let ((message (if cp (process-error error-name args 'universal-error-handler)
 		    error-name))
