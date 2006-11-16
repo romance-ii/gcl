@@ -156,7 +156,7 @@ DEFUN_NEW("ISFINITE",object,fSisfinite,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
 
 
-static void
+void
 integer_decode_double(double d, int *hp, int *lp, int *ep, int *sp)
 {
 	int h, l;

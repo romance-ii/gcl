@@ -35,6 +35,17 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 	If x or y is complex, 0 or 1 is returned.
 */
+void integer_decode_double(double,int *,int *, int *,int *);
+
+#define double_to_rational(d_) ({\
+                    object x;\
+		    int h,l,e,s;\
+		    integer_decode_double(d_,&h,&l,&e,&s);\
+		    x=number_times((h!=0 || l<0) ? bignum2(h,l) : make_fixnum(l),\
+                                   number_expt(make_fixnum(2),make_fixnum(e)));\
+		    if (s<0) x=number_negate(x);\
+                    x;})
+
 int
 number_compare(object x, object y)
 {
@@ -141,15 +152,11 @@ number_compare(object x, object y)
 			vs_reset;
 			return(i);
 		case t_shortfloat:
-		  if ((float)number_to_double((q=double_to_integer((double)sf(y))))==sf(y)) 
-		    y=q;
-		  i=number_compare(x->rat.rat_num,number_times(x->rat.rat_den,y));
+		  i=number_compare(x,double_to_rational(sf(y)));
 		  vs_reset;
 		  return i;
 		case t_longfloat:
-		  if (number_to_double((q=double_to_integer(lf(y))))==lf(y)) 
-		    y=q;
-		  i=number_compare(x->rat.rat_num,number_times(x->rat.rat_den,y));
+		  i=number_compare(x,double_to_rational(lf(y)));
 		  vs_reset;
 		  return i;
 		case t_complex:
@@ -178,9 +185,7 @@ number_compare(object x, object y)
 		  dy=number_to_double(y);
 		  goto LONGFLOAT;
 		case t_ratio:
-		  if (number_to_double((q=double_to_integer(dx)))==dx) 
-		    x=q;
-		  i=number_compare(number_times(x,y->rat.rat_den),y->rat.rat_num);
+		  i=number_compare(double_to_rational(dx),y);
 		  vs_reset;
 		  return i;
 		case t_shortfloat:
