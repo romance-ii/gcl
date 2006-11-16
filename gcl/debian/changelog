@@ -38,8 +38,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * fix with-error-level-bindings
   * prevent dotimes shadowing
   * push FEwrong_type_argument into compiler
+  * fix every compiler macros
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 16 Nov 2006 16:17:50 -0500
+ -- Camm Maguire <camm@enhanced.com>  Thu, 16 Nov 2006 18:38:49 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 
