@@ -32,8 +32,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
     dependency
   * remove -lintl from powerpc-macosx.defs
   * Misc ansi fixes; error system overhaul
+  * more careful floating point overflow to work with compiler
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 15 Nov 2006 16:58:50 -0500
+ -- Camm Maguire <camm@enhanced.com>  Wed, 15 Nov 2006 21:05:57 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

@@ -706,7 +706,7 @@ number_times(object x, object y)
 		z = alloc_object(t_shortfloat);
 		sf(z) = (shortfloat)(dx * dy);
 		if (!sf(z) && dx && dy) FLOATING_POINT_UNDERFLOW(sLA,list(2,x,y));
-		if (!ISFINITE(sf(z))) FLOATING_POINT_OVERFLOW(sLA,list(2,x,y));
+		if (!ISFINITE(sf(z)) && ISFINITE(dx) && ISFINITE(dy)) FLOATING_POINT_OVERFLOW(sLA,list(2,x,y));
 		return(z);
 
 	case t_longfloat:
@@ -730,7 +730,7 @@ number_times(object x, object y)
 		z = alloc_object(t_longfloat);
 		lf(z) = dx * dy;
 		if (!lf(z) && dx && dy) FLOATING_POINT_UNDERFLOW(sLA,list(2,x,y));
-		if (!ISFINITE(lf(z))) FLOATING_POINT_OVERFLOW(sLA,list(2,x,y));
+		if (!ISFINITE(lf(z)) && ISFINITE(dx) && ISFINITE(dy)) FLOATING_POINT_OVERFLOW(sLA,list(2,x,y));
 		return(z);
 
 	case t_complex:
