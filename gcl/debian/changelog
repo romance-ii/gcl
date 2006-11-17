@@ -39,8 +39,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * prevent dotimes shadowing
   * push FEwrong_type_argument into compiler
   * fix every compiler macros
+  * no restarts in pcl, proto-abort, no continue restart duplication
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 16 Nov 2006 18:38:49 -0500
+ -- Camm Maguire <camm@enhanced.com>  Thu, 16 Nov 2006 19:28:03 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

@@ -1229,17 +1229,12 @@ work during bootstrapping.
 	   existing function-specifier all-keys)))
 
 (defun generic-clobbers-function (function-specifier)
-  (restart-case
-      (error 'program-error :format-control
-       "~S already names an ordinary function or a macro.~%~
+  (cerror "Discard the existing definition." 'program-error 
+	  :format-control
+	  "~S already names an ordinary function or a macro.~%~
 	If you want to replace it with a generic function, you should remove~%~
-        the existing definition beforehand.~%" :format-arguments (list
-       function-specifier))
-    (continue ()
-      :report (lambda (stream)
-		(format stream "Discard the existing definition of ~S."
-			function-specifier))
-      (fmakunbound function-specifier))))
+        the existing definition beforehand.~%" :format-arguments (list function-specifier))
+  (fmakunbound function-specifier))
 
 (defvar *sgf-wrapper* 
   (#+cmu17 boot-make-wrapper #-cmu17 make-wrapper

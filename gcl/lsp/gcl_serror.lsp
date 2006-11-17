@@ -15,7 +15,8 @@
 (defun proto-invoke-restart (-) -)
 (defun proto-invoke-debugger (&optional (datum "debug") &rest arguments)
   (let ((pe (process-error datum arguments 'debug)))
-    (universal-error-handler pe)))
+    (universal-error-handler pe)
+    (throw *quit-tag* *quit-tag*)))
 
 ;homogenize break-quit
 
@@ -99,11 +100,8 @@
 (defun error (datum &rest arguments)
   (with-error-level-bindings (error datum arguments)
    (let ((pe (process-error datum arguments 'error)))
-;     (proto-signal pe)
      (proto-invoke-debugger pe)
-     (if *default-continue-string* 
-	 (throw 'cerror nil)
-       (throw *quit-tag* *quit-tag*)))))
+     (throw *quit-tag* *quit-tag*))))
   
 (defvar *default-continue-string* nil)
 
@@ -125,7 +123,8 @@
 
   (maybe-clear-input)
 
-  (with-error-level-bindings (universal-error-handler error-name args (list function-name continue-format-string error-format-string))
+  (with-error-level-bindings (universal-error-handler error-name args
+						      (list function-name continue-format-string error-format-string))
 
    (let ((message (if cp (process-error error-name args 'universal-error-handler)
 		    error-name))
@@ -148,7 +147,10 @@
 	 (let ((*indent-formatted-output* t))
 	   (format *error-output* "~?~&" continue-format-string args))))
      (force-output *error-output*)
-     (cond (correctable
+     (cond ((member 'cerror *error-stack*)
+	    (break-level message)
+	    (throw 'cerror t))
+	   (correctable
 	    (proto-with-simple-restart
 	     (proto-continue (apply 'format nil continue-format-string args))
 	     (break-level message)))

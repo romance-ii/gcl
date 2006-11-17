@@ -448,7 +448,11 @@
     ;; This assumes that the WRAPPED-BODY is a let/let* form, and it
     ;; injects let-bindings of the form (ARG 'SYM) for all variables
     ;; of the argument-lambda-list; SYM is a gensym.
-    (assert (memq (first wrapped-body) '(let let*)))
+    
+;    (assert (memq (first wrapped-body) '(let let*)))
+    (unless (memq (first wrapped-body) '(let let*)) 
+      (error 'type-error :datum (first wrapped-body) :expected-type '(member let let*)))
+
     (setf (second wrapped-body)
           (append intercept-rebindings (second wrapped-body)))
     ;;

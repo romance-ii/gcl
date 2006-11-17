@@ -13,7 +13,7 @@
 (defvar *abort-restarts* nil)
 
 (defconstant +protos+ (mapcar (lambda (x) (cons (intern (concatenate 'string "PROTO-" (string x))) x))
-			      '(with-simple-restart show-restarts continue break-level-invoke-restart
+			      '(with-simple-restart show-restarts abort continue break-level-invoke-restart
 						    invoke-debugger signal)))
 
 (defmacro with-protos (&body forms)
