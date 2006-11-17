@@ -31,21 +31,26 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 LFD(Lvalues)(void)
 {
 	if (vs_base == vs_top) vs_base[0] = Cnil;
+	if (vs_top-vs_base >= MULTIPLE_VALUES_LIMIT)
+	  FEerror("Too many function call values", 0);
 }
 
 LFD(Lvalues_list)(void)
 {
 
-	object list;
+	object x;
 
 	check_arg(1);
-	list = vs_base[0];
+	x = vs_base[0];
 	vs_top = vs_base;
-	while (!endp(list)) {	
-		vs_push(MMcar(list));
-		list = MMcdr(list);
+	while (!endp(x)) {	
+		vs_push(MMcar(x));
+		x = MMcdr(x);
 	}
 	if (vs_top == vs_base) vs_base[0] = Cnil;
+	if (vs_top-vs_base >= MULTIPLE_VALUES_LIMIT)
+	  FEerror("Too many function call values", 0);
+
 }
 
 static void

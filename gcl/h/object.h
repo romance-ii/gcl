@@ -1203,12 +1203,13 @@ EXTER object MVloc[10];
 /* Number of args supplied to a variable arg t_vfun
  Used by the C function to set optionals */
 
+#define MULTIPLE_VALUES_LIMIT 32
 struct call_data { 
 
 object  fun;
 hfixnum argd;
 hfixnum nvalues;
-object  values[50];
+object  values[MULTIPLE_VALUES_LIMIT];
 double  double_return;
 
 };

@@ -50,4 +50,3 @@ EXTER object *vs_org,*vs_limit,*vs_base,*vs_top;
 
 #define vs_reserve(x_)	if(vs_base+(x_) >= vs_limit) vs_overflow();
 
-#define MULTIPLE_VALUES_LIMIT 32
