@@ -51,6 +51,13 @@
 	((subtypep1 type 'float) 'long-float)
 	(t)))
 
+(deftype fpvec nil `(and vector (satisfies array-has-fill-pointer-p)))
+
+(defun fill-pointer (x)
+  (declare (optimize (safety 1)))
+  (check-type x fpvec)
+  (fill-pointer-internal x))
+
 (defun make-array (dimensions
 		   &key (element-type t)
 			(initial-element nil)
@@ -121,9 +128,7 @@
 
 (defun vector (&rest objects &aux (l (list (length objects))))
   (declare (:dynamic-extent objects l))
-  (make-array l
-	      :element-type t
-	      :initial-contents objects))
+  (make-array l :element-type t :initial-contents objects))
 
 
 (defun array-dimensions (array)
@@ -213,38 +218,35 @@
 
 (defun vector-push (new-element vector)
   (declare (optimize (safety 1)))
-  (assert (array-has-fill-pointer-p vector))
+  (check-type vector fpvec)
   (let ((fp (fill-pointer vector)))
     (cond ((< fp (array-dimension vector 0))
            (si:aset vector fp new-element)
            (si:fill-pointer-set vector (1+ fp))
-	   fp)
-	  (t nil))))
-
-
-(defun vector-push-extend (new-element vector &optional extension)
-  (let ((fp (fill-pointer vector)))
-    (declare (fixnum fp))
-    (cond ((< fp (the fixnum (array-dimension vector 0)))
-	   (si:aset vector fp new-element)
-	   (si:fill-pointer-set vector (the fixnum (1+ fp)))
-	   fp)
-	  (t
-	   (adjust-array vector
-	                 (list (+ (array-dimension vector 0)
-				  (or extension
-				      (if (> (array-dimension vector 0)  0)
-					  (array-dimension vector 0)
-					5))))
-	                 :element-type (array-element-type vector)
-			 :fill-pointer fp)
-	   (si:aset vector fp new-element)
-	   (si:fill-pointer-set vector (the fixnum (1+ fp)))
 	   fp))))
 
 
+(defun vector-push-extend (new-element vector &optional extension)
+  (declare (optimize (safety 1)))
+  (check-type vector fpvec)
+  (let ((fp (fill-pointer vector)))
+    (unless (< fp (array-dimension vector 0))
+      (adjust-array vector
+		    (list (+ (array-dimension vector 0)
+			     (or extension
+				 (if (> (array-dimension vector 0) 0)
+				     (array-dimension vector 0)
+				   5))))
+		    :element-type (array-element-type vector)
+		    :fill-pointer fp))
+    (si:aset vector fp new-element)
+    (si:fill-pointer-set vector (1+ fp))
+    fp))
+
+
 (defun vector-pop (vector)
-  (check-type vector vector)
+  (declare (optimize (safety 1)))
+  (check-type vector fpvec)
   (let ((fp (fill-pointer vector)))
     (when (= fp 0)
           (error "The fill pointer of the vector ~S zero." vector))
@@ -269,9 +271,8 @@
         (setq new-dimensions (list new-dimensions)))
 
   (when fill-pointer-supplied-p
-    (assert (array-has-fill-pointer-p array))
-    (unless fill-pointer
-      (setf (cadr (member :fill-pointer r)) (fill-pointer array))))
+    (let ((fill-pointer (or fill-pointer (when (array-has-fill-pointer-p array) (fill-pointer array)))))
+      (setf (cadr (member :fill-pointer r)) fill-pointer)))
     
   (when (array-has-fill-pointer-p array)
     (unless fill-pointer-supplied-p

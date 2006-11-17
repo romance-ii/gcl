@@ -403,53 +403,30 @@ LFD(Llogbitp)(void)
 		vs_push(Cnil);
 }
 
-LFD(Lash)(void)
-{
-	object	r=Cnil, x, y;
-	int	w, sign_x;
+DEFUN_NEW("ASH",object,fLash,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
 
-	check_arg(2);
-        check_type_integer(&vs_base[0]);
-	check_type_integer(&vs_base[1]);
-	x = vs_base[0];
-	y = vs_base[1];
-	if (type_of(y) == t_fixnum) {
-		w = fix(y);
-		r = shift_integer(x, w);
-	} else if (type_of(y) == t_bignum)
-		goto LARGE_SHIFT;
-	else
-		;
-	goto BYE;
+  int w,sign_x;
+  
+  check_type_integer(&x);
+  check_type_integer(&y);
 
-	/*
-	bit position represented by bignum is probably
-	out of our address space. So, result is returned
-	according to sign of integer.
-	*/
-LARGE_SHIFT:
-	if (type_of(x) == t_fixnum)
-		if (fix(x) > 0)
-			sign_x = 1;
-		else if (fix(x) == 0)
-			sign_x = 0;
-		else
-			sign_x = -1;
-	else
-		sign_x = big_sign(x);
-	if (big_sign(y) < 0)
-		if (sign_x < 0)
-			r = small_fixnum(-1);
-		else
-			r = small_fixnum(0);
-	else if (sign_x == 0)
-		r = small_fixnum(0);
-	else
-		FEerror("Insufficient memory.", 0);
+  if (type_of(y) == t_fixnum) {
+    w = fix(y);
+    RETURN1(shift_integer(x,w));
+  } 
 
-BYE:
-	vs_top = vs_base;
-	vs_push(r);
+  if (x==small_fixnum(0))
+    RETURN1(x);
+
+  if (type_of(x) == t_fixnum)
+    sign_x=fix(x)>0 ? 1 : -1;
+  else
+    sign_x = big_sign(x);
+  if (big_sign(y) < 0)
+    RETURN1(sign_x < 0 ? small_fixnum(-1) : small_fixnum(0));
+  else
+    FEerror("Insufficient memory.", 0);
+  RETURN1(Cnil);
 }
 
 LFD(Llogcount)(void)
@@ -781,7 +758,7 @@ gcl_init_num_log(void)
 	make_function("LOGEQV", Llogeqv);
 	make_function("BOOLE", Lboole);
 	make_function("LOGBITP", Llogbitp);
-	make_function("ASH", Lash);
+/* 	make_function("ASH", Lash); */
 	make_function("LOGCOUNT", Llogcount);
 	make_function("INTEGER-LENGTH", Linteger_length);
 

@@ -1215,6 +1215,7 @@ double  double_return;
 EXTER struct call_data fcall;
 
 #define  VFUN_NARGS fcall.argd
+#define RETURN3(x,y,z) do{fcall.values[2]=z;fcall.values[1]=y;fcall.nvalues=3;return (x) ;} while(0)
 #define RETURN2(x,y) do{fcall.values[1]=y;fcall.nvalues=2;return (x) ;} while(0)
 #define RETURN1(x) do{fcall.nvalues=1; return (x) ;} while(0)
 #define RETURN0  do{fcall.nvalues=0; return Cnil ;} while(0)

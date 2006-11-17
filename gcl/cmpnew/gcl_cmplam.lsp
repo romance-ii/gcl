@@ -329,6 +329,7 @@
                   (push (default-init (var-type v)) aux-inits)
                   (push v aux-vars)
                   (push v *vars*))))
+      (set-var-init-type (car aux-vars) (info-type (second (car aux-inits))))
       (go Laux1)
       )
    )

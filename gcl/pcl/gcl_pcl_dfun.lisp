@@ -1009,8 +1009,9 @@ And so, we are saved.
     (declare (ignore nreq applyp nkeys))
     (with-dfun-wrappers (args metatypes)
 			(dfun-wrappers invalid-wrapper-p wrappers classes types)
-			(error "The function ~S requires at least ~D arguments"
-			       gf (length metatypes))
+			(error 'program-error 
+			       :format-control "The function ~S requires at least ~D arguments"
+			       :format-arguments (list gf (length metatypes)))
 			(multiple-value-bind (emf methods accessor-type index)
 			    (cache-miss-values-internal gf arg-info wrappers classes types state)
 			  (values emf methods

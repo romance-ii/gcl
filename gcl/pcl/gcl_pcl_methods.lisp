@@ -744,9 +744,9 @@
       (dotimes (i nreq)
 	i
 	(unless arguments
-	  (error "The function ~S requires at least ~D arguments"
-		 (generic-function-name generic-function)
-		 nreq))
+	  (error 'program-error
+		 :format-control "The function ~S requires at least ~D arguments"
+		 :format-arguments (list (generic-function-name generic-function) nreq)))
 	(let ((arg (pop arguments)))
 	  (push (if type-modifier `(,type-modifier ,arg) arg) types-rev)))
       (values (nreverse types-rev) arg-info))))

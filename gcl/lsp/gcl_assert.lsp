@@ -143,7 +143,8 @@
 (defmacro etypecase (keyform &rest clauses &aux (key (gensym)))
   (declare (optimize (safety 1)))
    (do ((l (reverse clauses) (cdr l))
-        (form `(error (typecase-error-string
+        (form `(error 'type-error :datum ,key :expected-type '(or ,@(mapcar (lambda (l) (car l)) clauses))
+		      :format-control (typecase-error-string
                        ',keyform ,key
                        ',(mapcar (lambda (l) (car l)) clauses)))))
        ((endp l) `(let ((,key ,keyform)) ,form))

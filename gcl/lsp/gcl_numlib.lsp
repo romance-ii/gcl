@@ -173,10 +173,10 @@
 (defun rational (x)
   (etypecase x
     (float	  
-      (multiple-value-bind (i e s) (integer-decode-float x)
-			   (if (>= s 0)
-			       (* i (expt (float-radix x) e))
-			     (- (* i (expt (float-radix x) e))))))
+      (multiple-value-bind
+       (i e s) (integer-decode-float x)
+       (let ((x (if (>= e 0) (ash i e) (/ i (ash 1 (- e))))))
+	 (if (>= s 0) x (- x)))))
     (rational x)))
 
 

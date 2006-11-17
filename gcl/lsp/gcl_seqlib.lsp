@@ -54,11 +54,11 @@
         ((vectorp sequence) (list 'array (array-element-type sequence)))
         (t (error "~S is not a sequence." sequence))))
 
-(proclaim '(function call-test (t t t t) t))
+;(proclaim '(function call-test (t t t t) t))
 (defun call-test (test test-not item keyx)
-  (cond (test (funcall test item keyx))
+  (cond (test (the boolean (values (funcall test item keyx))))
         (test-not (not (funcall test-not item keyx)))
-        (t (eql item keyx))))
+        ((eql item keyx))))
 
 
 (proclaim '(function check-seq-start-end (t t) t))
@@ -774,8 +774,7 @@
 			   (si::next-hash-table-entry ,',table ,',ind)
 			   (cond ((>= (the fixnum more) 0)
 				  (setq ,',ind more)
-				  (values t key val))
-				 (t  (values nil nil nil))))))
+				  (values t key val))))))
 		 ,@body))))
 		 
 

@@ -448,6 +448,10 @@
 (deftype list () `(or cons null))
 (deftype sequence () `(or list vector))
 
+(defun standard-charp (x)
+  (when (characterp x)
+    (standard-char-p x)))
+
 (defun non-standard-base-char-p (x)
   (and (characterp x) (not (standard-char-p x))))
 
@@ -581,7 +585,7 @@
 	  (logical-pathname . logical-pathname-p)
 	  (proper-cons . proper-consp)
 	  (non-keyword-symbol . non-keyword-symbol-p)
-	  (standard-char . standard-char-p)
+	  (standard-char . standard-charp)
 	  (non-standard-base-char . non-standard-base-char-p)
 	  (interpreted-function . interpreted-function-p)
 	  (float . floatp)

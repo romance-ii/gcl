@@ -40,8 +40,13 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * push FEwrong_type_argument into compiler
   * fix every compiler macros
   * no restarts in pcl, proto-abort, no continue restart duplication
+  * more error call fixes;no clcs sys-proclaims;aux variable init
+    types;/ inliner;array ansi fixes;ash/integer-decode-float fast-
+    links;si::fpvec type;faster rational;package routine fixes;standard-
+    char-p, digit_char, and code_char fixes;make-random-state fix;pcl
+    program errors
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 16 Nov 2006 19:28:03 -0500
+ -- Camm Maguire <camm@enhanced.com>  Fri, 17 Nov 2006 16:47:31 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

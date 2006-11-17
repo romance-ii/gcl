@@ -30,7 +30,10 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 @(defun standard_char_p (c)
 	int i;
 @
-        if (type_of(c)!=t_character) @(return Cnil)
+        if (type_of(c)!=t_character) {
+ 	  TYPE_ERROR(c,sLcharacter);
+          @(return Cnil)
+        }
 /* 	check_type_character(&c); */
 	if (char_font(c) != 0 || char_bits(c) != 0)
 		@(return Cnil)
@@ -364,11 +367,13 @@ BEGIN:
 	@(return `small_fixnum(char_font(c))`)
 @)
 
-@(defun code_char (c &o (b `make_fixnum(0)`) (f `make_fixnum(0)`))
-	object x;
+@(defun code_char (c)
+	object x,b,f;
 @
 	check_type_non_negative_integer(&c);
+        b=make_fixnum(0);/*FIXME*/
 	check_type_non_negative_integer(&b);
+        f=make_fixnum(0);/*FIXME*/
 	check_type_non_negative_integer(&f);
 	if (type_of(c) == t_bignum)
 		@(return Cnil)
@@ -444,15 +449,13 @@ int w, r;
 		return(w - 10 + 'A');
 }
 
-@(defun digit_char (w
-		    &optional
-		    (r `make_fixnum(10)`)
-		    (f `make_fixnum(0)`))
-	object x;
+@(defun digit_char (w &optional (r `make_fixnum(10)`))
+	object x,f;
 	int dw;
 @
 	check_type_non_negative_integer(&w);
 	check_type_non_negative_integer(&r);
+        f=make_fixnum(0);/*FIXME*/
 	check_type_non_negative_integer(&f);
 	if (type_of(w) == t_bignum)
 		@(return Cnil)
@@ -559,6 +562,7 @@ int w, r;
 		@(return `code_char('\b')`)
 	if (string_equal(s, STlinefeed) || string_equal(s, STnewline))
 		@(return `code_char('\n')`)
+        if (s->st.st_fillp==1) @(return `code_char(s->st.st_self[0])`)
 	@(return Cnil)
 @)
 

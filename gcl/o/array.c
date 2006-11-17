@@ -1060,21 +1060,9 @@ DEFUNO_NEW("FILL-POINTER-SET",object,fSfill_pointer_set,SI,2,2,
   return make_fixnum(0);
 }
 
-DEFUNO_NEW("FILL-POINTER",object,fLfill_pointer,LISP,1,1,NONE,OO,
-       OO,OO,OO,void,Lfill_pointer,(object x),"")
-{
-  if (!(TS_MEMBER(type_of(x),TS(t_vector)|
-		    TS(t_bitvector)|
-		    TS(t_string))))
-    goto no_fillp;
-  if (x->v.v_hasfillp == 0)
-    { goto no_fillp;}
-  return make_fixnum(x->v.v_fillp) ;
-
- no_fillp:
-  FEwrong_type_argument(sLvector,x);
-  return make_fixnum(0);
-} 
+DEFUN_NEW("FILL-POINTER-INTERNAL",object,fSfill_pointer_internal,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(make_fixnum(x->v.v_fillp));
+}
 
 DEFUN_NEW("ARRAY-HAS-FILL-POINTER-P",object,
       fLarray_has_fill_pointer_p,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
@@ -1135,24 +1123,24 @@ DEFUNO_NEW("DISPLACED-ARRAY-P",object,fSdisplaced_array_p,SI,1,
   return (x->a.a_displaced == Cnil ? Cnil : sLt);
 }
 
-DEFUNO_NEW("ARRAY-RANK",object,fLarray_rank,LISP,1,1,NONE,OO,OO,OO,
-       OO,void,Larray_rank,(object x),"")
-{ if (type_of(x) == t_array)
-    return make_fixnum(x->a.a_rank);
+DEFUN_NEW("ARRAY-RANK",object,fLarray_rank,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") { 
+  if (type_of(x) == t_array)
+    RETURN1(make_fixnum(x->a.a_rank));
   IisArray(x);
-  return make_fixnum(1);
+  RETURN1(make_fixnum(1));
 }
 
-DEFUNO_NEW("ARRAY-DIMENSION",object,fLarray_dimension,LISP,2,2,
-       NONE,OO,IO,OO,OO,void,Larray_dimension,(object x,fixnum i),"")
-{ 
-  if (type_of(x) == t_array)
-   {  if ((unsigned int)i >= x->a.a_rank)
-	FEerror("Index ~a out of bounds for array-dimension",1
-		,make_fixnum(i));
-      else { return make_fixnum(x->a.a_dims[i]);}}
-   IisArray(x);
-   return make_fixnum(x->v.v_dim);
+DEFUN_NEW("ARRAY-DIMENSION",object,fLarray_dimension,LISP,2,2,NONE,OO,IO,OO,OO,(object x,fixnum i),"") { 
+
+  if (type_of(x) == t_array) {  
+    if ((unsigned int)i >= x->a.a_rank)
+      TYPE_ERROR(make_fixnum(i),list(3,sLinteger,make_fixnum(0),make_fixnum(x->a.a_rank)));
+    else { 
+      RETURN1(make_fixnum(x->a.a_dims[i]));
+    }
+  }
+  IisArray(x);
+  RETURN1(make_fixnum(x->v.v_dim));
 }
 #ifdef STATIC_FUNCTION_POINTERS
 object
@@ -1252,14 +1240,10 @@ DEFUNO_NEW("REPLACE-ARRAY",object,fSreplace_array,SI,2,2,NONE,
   return old;
 }
 
-DEFUN_NEW("ARRAY-TOTAL-SIZE",object,fLarray_total_size,LISP,1,1,
-       NONE,OO,OO,OO,OO,(object x),"")
-{ x = IisArray(x);
-  return make_fixnum(x->a.a_dim);
+DEFUN_NEW("ARRAY-TOTAL-SIZE",object,fLarray_total_size,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") { 
+  x = IisArray(x);
+  RETURN1(make_fixnum(x->a.a_dim));
 }
-
-
-
 
 DEFUN_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
        NONE,OO,OO,OO,OO,(object array,object val,object cursor),"")

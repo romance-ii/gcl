@@ -351,6 +351,8 @@
    (get '- 'inline-always))
 
 ;;/
+(push '((t t) t #.(flags ans)"number_divide(#0,#1)")
+   (get '/ 'inline-always))
 (push '((fixnum fixnum) fixnum #.(flags)"(#0)/(#1)")
    (get '/ 'inline-always))
  (push '((fixnum-float fixnum-float) short-float #.(flags)"(double)(#0)/(double)(#1)")

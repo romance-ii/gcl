@@ -1214,29 +1214,18 @@ LFD(Lfloat_precision)(void)
 #endif
 }
 
-LFD(Linteger_decode_float)(void)
-{
-	object x;
-	int h, l, e, s;
+DEFUN_NEW("INTEGER-DECODE-FLOAT",object,fLinteger_decode_float,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") {
 
-	check_arg(1);
-	check_type_float(&vs_base[0]);
-	x = vs_base[0];
-	vs_base = vs_top;
-	if (type_of(x) == t_longfloat) {
-		integer_decode_double(lf(x), &h, &l, &e, &s);
-		if (h != 0 || l<0)
-			vs_push(bignum2(h, l));
-		else
-			vs_push(make_fixnum(l));
-		vs_push(make_fixnum(e));
-		vs_push(make_fixnum(s));
-	} else {
-		integer_decode_float((double)(sf(x)), &h, &e, &s);
-		vs_push(make_fixnum(h));
-		vs_push(make_fixnum(e));
-		vs_push(make_fixnum(s));
-	}
+  int h,l,e,s;
+  
+  check_type_float(&x);
+  h=0;
+  if (type_of(x) == t_longfloat)
+    integer_decode_double(lf(x), &h, &l, &e, &s);
+  else
+    integer_decode_float((double)(sf(x)), &l, &e, &s);
+  RETURN3((h || l<0) ? bignum2(h, l) : make_fixnum(l),make_fixnum(e),make_fixnum(s));
+
 }
 
 LFD(Lcomplex)(void)
@@ -1567,7 +1556,7 @@ gcl_init_num_co(void)
 	make_function("FLOAT-SIGN", Lfloat_sign);
 	make_function("FLOAT-DIGITS", Lfloat_digits);
 	make_function("FLOAT-PRECISION", Lfloat_precision);
-	make_function("INTEGER-DECODE-FLOAT", Linteger_decode_float);
+/* 	make_function("INTEGER-DECODE-FLOAT", Linteger_decode_float); */
 	make_function("COMPLEX", Lcomplex);
 	make_function("REALPART", Lrealpart);
 	make_function("IMAGPART", Limagpart);

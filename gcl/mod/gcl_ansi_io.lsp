@@ -7,6 +7,8 @@
 	  pprint-exit-if-list-exhausted))
 (in-package 'si)
 
+;placeholder
+(defun pprint-tab (&rest r) nil)
 
 (defun pprint-linear (s x &optional (c t) a) 
   (let* ((z (write-to-string x))

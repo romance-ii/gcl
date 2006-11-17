@@ -195,7 +195,8 @@ make_random_state(object rs) {
   if (rs == Ct) 
     gmp_randseed_ui(&z->rnd.rnd_state,RS_DEF_INIT);
   else
-    gmp_randseed(&z->rnd.rnd_state,rs->rnd.rnd_state._mp_seed);
+    memcpy(z->rnd.rnd_state._mp_seed->_mp_d,rs->rnd.rnd_state._mp_seed->_mp_d,
+	   rs->rnd.rnd_state._mp_seed->_mp_alloc*sizeof(*z->rnd.rnd_state._mp_seed->_mp_d));
   
 #if __GNU_MP_VERSION >= 4 && __GNU_MP_VERSION_MINOR >= 2
   z->rnd.rnd_state._mp_algdata._mp_lc=&Mersenne_Twister_Generator_Noseed;
