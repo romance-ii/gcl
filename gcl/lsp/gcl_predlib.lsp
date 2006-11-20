@@ -46,9 +46,9 @@
 		  (n (class-name c)))
 	     (if (and n (eq c (find-class n nil))) n c)))
 	((let ((tp (type-of-c object)))
-	(if (member tp '(vector array));FIXME
-	    `(,tp ,(upgraded-array-element-type (array-element-type object)))
-	  tp)))))
+	   (if (member tp '(vector array));FIXME
+	       `(,tp ,(upgraded-array-element-type (array-element-type object)))
+	     tp)))))
 
 (defmacro dt-apply (x y) 
   (let ((l (gensym))) 
@@ -1430,14 +1430,14 @@
 
 ;; CLASS HACKS
 
+(defvar *prevent-compiler-optimization* nil)
 
-
-(defun classp (object) (declare (ignore object)) nil)
-(defun class-precedence-list (object) (declare (ignore object)) nil)
-(defun find-class (object &optional errorp environment) (declare (ignore object errorp environment))nil)
-(defun class-name (class) (declare (ignore class)) nil)
-(defun class-of (object) (declare (ignore object)) nil)
-(defun class-direct-subclasses (object) (declare (ignore object)) nil)
+(defun classp (object) (declare (ignore object)) (the boolean *prevent-compiler-optimization*))
+(defun class-precedence-list (object) (declare (ignore object)) (the proper-list *prevent-compiler-optimization*))
+(defun find-class (object &optional errorp environment) (declare (ignore object errorp environment)) *prevent-compiler-optimization*)
+(defun class-name (class) (declare (ignore class)) (the symbol *prevent-compiler-optimization*))
+(defun class-of (object) (declare (ignore object)) *prevent-compiler-optimization*)
+(defun class-direct-subclasses (object) (declare (ignore object)) (the proper-list *prevent-compiler-optimization*))
 
 (defun is-standard-class-symbol (sym) 
   (let* ((z (get sym 'deftype-definition))

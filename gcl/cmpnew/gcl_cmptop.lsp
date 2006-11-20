@@ -657,10 +657,18 @@
 	       (when (or (and (eq rt '*) (not (eq ort '*)))
 			 (and (single-type-p ort) (not (single-type-p rt)))
 			 (and (get fname 'return-type) (single-type-p (get fname 'return-type)) (not (single-type-p rt))))
-		 (cmpwarn "ret type mismatch in auto-proclamation ~s(~s) -> ~s~%" (export-type ort) (get fname 'return-type) (export-type rt)))))
-;	   (proclaim `(ftype (function ,al ,rt) ,fname));FIXME replace proclaim
-;	   (let ((at (get-arg-types fname)) (rt (get-return-type fname)))
-	   (let ((sig (list (mapcar 'export-type al) (export-type (if *recursion-detected* (bump-tp rt) rt)))))
+		 (cmpwarn "ret type mismatch in auto-proclamation ~s(~s) -> ~s~%" 
+			  (export-type ort) (get fname 'return-type) (export-type rt)))))
+	   (let ((osig (list (mapcar 'export-type oal) (export-type ort)));(gethash fname *sigs*))
+		 (sig (list (mapcar 'export-type al) (export-type (if *recursion-detected* (bump-tp rt) rt)))))
+	     (unless (or (equal sig osig) *new-sigs-in-file*)
+	       (setq *new-sigs-in-file* 
+		     (some (lambda (x) 
+			     (unless (eq x fname)
+			       (multiple-value-bind 
+				(s f) (gethash x *sigs*) 
+				(declare (ignore s))
+				(when f (list x fname osig sig))))) (si::callers fname))))
 	     (setf (gethash fname *sigs*) sig)
 	     (si::procl fname sig))
 	   (when *recursion-detected*;FIXME
@@ -668,7 +676,6 @@
 	       (unless (and (equal oal al) (equal ort rt) (eq *recursion-detected* 'block))
 		 (setq *recursion-detected* 'block)
 		 (go top)))))))
-;)
     
 
      ;;provide a simple way for the user to declare functions to
@@ -928,7 +935,7 @@
     (let ((h (gethash fname si::*call-hash-table*)))
       (add-init `(si::add-hash ',fname ',(gethash fname *sigs*)
 			       ',(mapcar (lambda (x) 
-					   (cons x (si::call-sig (gethash x si::*call-hash-table*))))
+					   (cons x (or (gethash x *sigs*) (si::call-sig (gethash x si::*call-hash-table*)))))
 					 (sublis +cmp-fn-alist+ (si::call-callees h)))
 			       ,(si::call-src h) ,(si::call-file h)))))
 

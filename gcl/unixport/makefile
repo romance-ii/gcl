@@ -112,7 +112,7 @@ init_%.lsp: init_%.lsp.tmp
 final: $(FLISP)
 	echo "(let ((si::*disable-recompile* nil))(si::do-recompile \"gcl_recompile.lsp\"))" | ./$<
 	echo "(setq si::*optimize-maximum-pages* nil)" >pre_init.lsp;
-	echo "(setq si::*optimize-maximum-pages* t si::*disable-recompile* nil)" >post_init.lsp;
+	echo "(setq si::*optimize-maximum-pages* t si::*disable-recompile* nil)(when (> (length si::*needs-recompile*) 0) (format t \"Warning, eliminating recompiles ~s~%\" si::*needs-recompile*)(setf (fill-pointer si::*needs-recompile*) 0))" >post_init.lsp;
 	$(MAKE) $(FLISP)
 	rm -f pre_init.lsp post_init.lsp recompile.h gcl_recompile*
 	touch $@

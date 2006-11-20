@@ -408,13 +408,14 @@
       (let* ((form (car fl)) (var (car vl))
 	     (kind (c2var-kind var)))
            (declare (object form var))
-	   (unless (and (member (car form) '(return return-from throw go) :test #'eq)
+	   (unless (and (member (car form) '(return return-from throw go) :test 'eq)
 			(not (is-referred var (cadr body)))
 			(not (is-changed var (cadr body)))
 			(not (reduce (lambda (&optional x y)
-				  (and
-				   (or (and (consp x) (is-referred var (cadr x)) (is-changed var (cadr x))) x)
-				   (or (and (consp y) (is-referred var (cadr y)) (is-changed var (cadr y))) y)))
+				       (declare (ignorable y))
+				       (and
+					(or (and (consp x) (is-referred var (cadr x)) (is-changed var (cadr x))) x)
+					(or (and (consp y) (is-referred var (cadr y)) (is-changed var (cadr y))) y)))
 				     (cdr fl))))
 	     (push var used-vars))	   
 	   (cond (kind  (setf (var-kind var) kind)

@@ -102,6 +102,7 @@
                        (cond ((char= char #\\) (wt "\\\\"))
                              ((char= char #\") (wt "\\\""))
                              ((char= char #\Newline) (wt "\\n"))
+                             ((char= char #\Return) (wt "\\r"))
                              (t (wt char)))))
                 (wt "\",")
                 (if (null vv-index) (wt "Cnil") (wt "" (vv-str vv-index)))
@@ -397,6 +398,7 @@
   (cond 
    ((setq aet (aref-propagator 'list-tp-test lt))
      (let ((z (funcall tf aet))) (values z z)));;FIXME second value meaning
+   ((eq lt #tnull) (let ((z (funcall tf lt))) (values z z)))
    ((or (atom lt) (not (eq (car lt) 'cons)))
     (let ((z (and ic (funcall tf lt)))) (values z z)))
    (t 

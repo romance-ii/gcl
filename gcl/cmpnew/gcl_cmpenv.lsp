@@ -39,7 +39,6 @@
   (setq *next-vv* -1)
   (setq *next-cfun* 0)
   (setq *last-label* 0)
-  (clrhash *sigs*)
   (clrhash *objects*)
   (clrhash *objects-rev*)
 ;  (setq *objects* nil)
@@ -58,8 +57,6 @@
   (setq *inline-blocks* 0)
   (setq *tmp-pack* nil)
   (setq *notinline* nil))
-
-(defvar *sigs* (make-hash-table :test 'eq))
 
 (defvar *next-cvar* 0)
 (defvar *next-cmacro* 0)
