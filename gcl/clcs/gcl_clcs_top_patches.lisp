@@ -92,7 +92,9 @@
 (setq conditions::*debug-command-prefix* "")
 
 (defun break-resume ()
-  (and *debug-continue* (invoke-restart *debug-continue*)))
+  (if *debug-continue* 
+      (invoke-restart *debug-continue*)
+    :resume))
 
 (putprop :r 'break-resume 'break-command)
 (putprop :s 'show-restarts 'break-command)
