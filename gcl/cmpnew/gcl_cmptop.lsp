@@ -609,11 +609,6 @@
 			      (push `(declare (,@z ,@q)) dd)))))))))))
     (list (nreverse ad) (nreverse dd))))
 
-;(defun unknown-ret-list (expr &optional res)
-;  (cond ((atom expr) nil)
-;	((case (car expr)
-;	       (call-global 
-
 (defun t1defun (args &aux (setjmps *setjmps*) (defun 'defun) (*sharp-commas* nil) fname lambda-expr cfun doc)
   (when (or (endp args) (endp (cdr args)))
         (too-few-args 'defun 2 (length args)))
@@ -659,7 +654,7 @@
 			 (and (get fname 'return-type) (single-type-p (get fname 'return-type)) (not (single-type-p rt))))
 		 (cmpwarn "ret type mismatch in auto-proclamation ~s(~s) -> ~s~%" 
 			  (export-type ort) (get fname 'return-type) (export-type rt)))))
-	   (let ((osig (list (mapcar 'export-type oal) (export-type ort)));(gethash fname *sigs*))
+	   (let ((osig (or (gethash fname *sigs*) (list (mapcar 'export-type oal) (export-type ort))));(gethash fname *sigs*))
 		 (sig (list (mapcar 'export-type al) (export-type (if *recursion-detected* (bump-tp rt) rt)))))
 	     (unless (or (equal sig osig) *new-sigs-in-file*)
 	       (setq *new-sigs-in-file* 
