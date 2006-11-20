@@ -48,8 +48,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * write-line error checking
   * better enforcement of mv limit
   * iterate over pass1 until internal sig conflicts are resolved
+  * fix break-resume
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 20 Nov 2006 17:43:33 -0500
+ -- Camm Maguire <camm@enhanced.com>  Mon, 20 Nov 2006 18:23:14 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

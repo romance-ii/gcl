@@ -58,9 +58,9 @@
   (with-protos
     (apply #.(function-src 'error) d a)))
 
-(defun error-in-error (c d &rest a)
+(defun error-in-error (c d e f)
   (with-protos
-    (apply #.(function-src 'error-in-error) c d a)))
+    (funcall #.(function-src 'error-in-error) c d e f)))
 
 (defun universal-error-handler (e &rest a)
   (with-protos
