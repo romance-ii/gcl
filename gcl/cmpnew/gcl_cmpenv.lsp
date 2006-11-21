@@ -340,6 +340,7 @@
                 (get fname 'cmp-notinline))))
 
 (defun proclaim (decl)
+ (declare (optimize (safety 1)))
  (when (not (listp decl))
    (error 'type-error :datum decl :expected-type 'list))
  (when (not (listp (cdr decl)))
@@ -413,10 +414,11 @@
     (otherwise
      (unless (member (car decl) *alien-declarations*)
              (warn "The declaration specifier ~s is unknown." (car decl)))
-   (and (functionp (get (car decl) :proclaim))
-        (dolist** (v (cdr decl))
-          (funcall (get (car decl) :proclaim) v)))
-)
+     (and (symbolp (car decl))
+	  (functionp (get (car decl) :proclaim))
+	  (dolist** (v (cdr decl))
+		    (funcall (get (car decl) :proclaim) v)))
+     )
     )
   nil
   )

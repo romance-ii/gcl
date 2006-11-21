@@ -43,7 +43,13 @@
 (defvar *trace-list* nil)
 
 
+(defun all-symbols-p (x)
+  (check-type x proper-list)
+  (every 'symbolp x))
+
 (defmacro trace (&rest r)
+  (declare (optimize (safety 1)))
+  (check-type r (satisfies all-symbols-p))
   (if (null r)
       '(mapcar #'car *trace-list*)
     `(let ((old (copy-list *trace-list*)) finish-flg)
@@ -55,9 +61,11 @@
 		       (mapcar #'car (set-difference *trace-list* old :test #'equal))))))))
 
 (defmacro untrace (&rest r)
+  (declare (optimize (safety 1)))
+  (check-type r (satisfies all-symbols-p))
   (if (null r)
-      '(mapcan #'untrace-one (mapcar #'car *trace-list*))
-      `(mapcan #'untrace-one ',r)))
+      '(mapcan 'untrace-one (mapcar 'car *trace-list*))
+    `(mapcan 'untrace-one ',r)))
 
 (defun trace-one-preprocess (x)
   (cond

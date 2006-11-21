@@ -5,7 +5,8 @@
 	  *debug-level* *debug-restarts* *number-of-debug-restarts*
 	  *debug-abort* *debug-continue* *debug-condition* *debug-eval*
 	  find-restart invoke-restart invoke-restart-interactively invoke-debugger
-	  restart-name ignore-errors show-restarts conditionp signal)
+	  restart-name ignore-errors show-restarts conditionp signal store-value
+	  read-evaluated-form restart-case)
 	"SYSTEM")
 
 (in-package "SYSTEM")
@@ -98,6 +99,21 @@
 
 (putprop :r 'break-resume 'break-command)
 (putprop :s 'show-restarts 'break-command)
+
+(defun check-type-symbol (symbol value type &optional type-string)
+  (tagbody
+   tag
+   (if (typep value type) (return-from check-type-symbol value)
+     (restart-case 
+      (error 'type-error :datum value :expected-type (or type-string type))
+;	     :format-control "The value ~:@(~S~) is not ~A. (bound to variable ~:@(~S~))"
+;	     :format-arguments (list value (or type-string type) symbol))
+      (store-value (v)
+		   :report (lambda (stream)
+				   (format stream "supply a new value of ~s." symbol))
+		   :interactive read-evaluated-form
+		   (setq value v)
+		   (go tag))))))
 
 (defun break-help ()
   (format *debug-io* "

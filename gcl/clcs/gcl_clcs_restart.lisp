@@ -73,6 +73,7 @@
    Restarts-Form are associated with the condition returned by Condition-Form.
    This allows FIND-RESTART, etc., to recognize restarts that are not related
    to the error currently being debugged.  See also RESTART-CASE."
+  (declare (optimize (safety 1)))
   (let ((n-cond (gensym)))
     `(let ((*condition-restarts*
 	    (cons (let ((,n-cond ,condition-form))
@@ -139,6 +140,7 @@
            STREAM))
 
 (DEFMACRO RESTART-BIND (BINDINGS &BODY FORMS)
+  (declare (optimize (safety 1)))
   `(LET ((*RESTART-CLUSTERS* (CONS (LIST ,@(MAPCAR #'(LAMBDA (BINDING)
 						       `(MAKE-RESTART
 							  :NAME     ',(CAR BINDING)
@@ -242,6 +244,7 @@
       expression)))
 
 (DEFMACRO RESTART-CASE (EXPRESSION &BODY CLAUSES &environment env)
+  (declare (optimize (safety 1)))
   (FLET ((TRANSFORM-KEYWORDS (&KEY REPORT INTERACTIVE TEST)
 	   (LET ((RESULT '()))
 	     (WHEN REPORT
@@ -302,6 +305,7 @@
 (DEFMACRO WITH-SIMPLE-RESTART ((RESTART-NAME FORMAT-CONTROL
 					     &REST FORMAT-ARGUMENTS)
 			       &BODY FORMS)
+  (declare (optimize (safety 1)))
   `(RESTART-CASE (PROGN ,@FORMS)
      (,RESTART-NAME ()
         :REPORT (LAMBDA (STREAM)
@@ -338,6 +342,7 @@
   (let ((restart (gensym)))
   `(defun ,name (,@args &optional condition)
      ,doc
+     (declare (optimize (safety 1)))
      (let ((,restart (find-restart ',name condition))) (when ,restart (invoke-restart ,restart ,@args))))))
 
 (define-nil-returning-restart continue ()

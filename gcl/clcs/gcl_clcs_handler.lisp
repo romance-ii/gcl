@@ -5,6 +5,8 @@
 (DEFVAR *HANDLER-CLUSTERS* NIL)
 
 (DEFMACRO HANDLER-BIND (BINDINGS &BODY FORMS)
+  (declare (optimize (safety 1)))
+  (check-type bindings (satisfies si::proper-clauses-p))
   (UNLESS (EVERY #'(LAMBDA (X) (AND (LISTP X) (= (LENGTH X) 2))) BINDINGS)
     (ERROR "Ill-formed handler bindings."))
   `(LET ((*HANDLER-CLUSTERS* (CONS (LIST ,@(MAPCAR #'(LAMBDA (X) `(CONS ',(CAR X) ,(CADR X)))
@@ -15,6 +17,7 @@
 (DEFVAR *BREAK-ON-SIGNALS* NIL)
 
 (DEFUN SIGNAL (DATUM &REST ARGUMENTS)
+  (declare (optimize (safety 1)))
   (LET ((CONDITION (COERCE-TO-CONDITION DATUM ARGUMENTS 'SIMPLE-CONDITION 'SIGNAL))
         (*HANDLER-CLUSTERS* *HANDLER-CLUSTERS*))
     (IF (TYPEP CONDITION *BREAK-ON-SIGNALS*)
@@ -82,6 +85,7 @@
 ;;   NIL)
 
 (DEFUN WARN (DATUM &REST ARGUMENTS)
+  (declare (optimize (safety 1)))
   (LET ((CONDITION
 	  (COERCE-TO-CONDITION DATUM ARGUMENTS 'SIMPLE-WARNING 'WARN)))
     (CHECK-TYPE CONDITION WARNING "a warning condition")
@@ -96,6 +100,8 @@
     NIL))
 
 (DEFMACRO HANDLER-CASE (FORM &REST CASES)
+  (declare (optimize (safety 1)))
+  (check-type cases (satisfies si::proper-clauses-p))
   (LET ((NO-ERROR-CLAUSE (ASSOC ':NO-ERROR CASES)))
     (IF NO-ERROR-CLAUSE
 	(LET ((NORMAL-RETURN (MAKE-SYMBOL "NORMAL-RETURN"))
@@ -137,6 +143,7 @@
 			   ANNOTATED-CASES))))))))
 
 (DEFMACRO IGNORE-ERRORS (&REST FORMS)
+  (declare (optimize (safety 1)))
   `(HANDLER-CASE (PROGN ,@FORMS)
      (ERROR (CONDITION) (VALUES NIL CONDITION))))
 

@@ -153,7 +153,8 @@
 	   (correctable
 	    (proto-with-simple-restart
 	     (proto-continue (apply 'format nil continue-format-string args))
-	     (break-level message)))
+	     (break-level message))
+	    nil)
 	   (t (break-level message) (throw *quit-tag* *quit-tag*))))))
 
 (defun dbl-eval (- &aux (break-command t))

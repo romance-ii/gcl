@@ -1936,12 +1936,12 @@ int base;
 @(defun write_string (strng &o strm &k start end)
 	int s, e, i;
 @
+	check_type_string(&strng);
 	get_string_start_end(strng, start, end, &s, &e);
 	if (strm == Cnil)
 		strm = symbol_value(sLAstandard_outputA);
 	else if (strm == Ct)
 		strm = symbol_value(sLAterminal_ioA);
-	check_type_string(&strng);
 	check_type_stream(&strm);
 	for (i = s;  i < e;  i++)
 		writec_stream(strng->st.st_self[i], strm);

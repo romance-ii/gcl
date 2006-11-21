@@ -7,6 +7,7 @@
 (in-package 'compiler)
 
 (dolist (l '((((stream) string) . get-output-stream-string)
+	     (((simple-vector seqind) t) . svref)
 	     (((symbol) string) . symbol-name)
 	     (((array rnkind)  seqind) . array-dimension)
 	     (((array)  seqind) . array-total-size)
@@ -173,7 +174,7 @@
 (DEFSYSFUN 'COPY-SYMBOL "Lcopy_symbol" '(T *) 'T NIL NIL) 
 (DEFSYSFUN 'ACONS "Lacons" '(T T T) 'T NIL NIL) 
 (DEFSYSFUN 'ADJUSTABLE-ARRAY-P "Ladjustable_array_p" '(T) 'T NIL T) 
-(DEFSYSFUN 'SVREF "Lsvref" '(T T) 'T NIL NIL) 
+;(DEFSYSFUN 'SVREF "Lsvref" '(T T) 'T NIL NIL) 
 ;(DEFSYSFUN 'APPLY "Lapply" '(T T *) 'T NIL NIL) 
 (DEFSYSFUN 'DECODE-FLOAT "Ldecode_float" '(T) '(VALUES T T T) NIL NIL) 
 ;(DEFSYSFUN 'DECODE-FLOAT "Ldecode_float" '(T) '* NIL NIL) 

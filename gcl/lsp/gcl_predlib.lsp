@@ -202,6 +202,8 @@
 
 (defun subtypep (t1 t2 &optional env)
   (declare (ignore env) (optimize (safety 1)))
+  (check-type t1 (or symbol proper-list))
+  (check-type t2 (or symbol proper-list))
   (if (or (not t1) (eq t2 t))
       (values t t)
     (let* ((rt (resolve-type `(and ,t1 ,(negate t2))))
@@ -265,16 +267,20 @@
 ;;; COERCE function.
 (defun coerce (object type)
   (declare (optimize (safety 1)))
+  (check-type type (or symbol proper-list))
   (when (typep-int object type)
     (return-from coerce object))
   (let ((tp (or (car (member (if (atom type) type (car type)) +coerce-list+))
 		(car (member type +coerce-list+ :test 'subtypep1)))))
     (case tp
       (function
-       (cond ((symbolp object) (symbol-function object))
-	     ((and (consp object) (eq (car object) 'lambda)) (values (eval `(function ,object))))
-	     ((function-identifierp object) (get (cadr object) 'setf-function))));FIXME
-      ((null cons list)
+       (coerce 
+	(cond ((symbolp object) (symbol-function object))
+	      ((and (consp object) (eq (car object) 'lambda)) (values (eval `(function ,object))))
+	      ((function-identifierp object) (coerce (get (cadr object) 'setf-function) tp))
+	      ((check-type-eval object type)))
+	type))
+       ((null cons list)
        (let* ((l (length object))
 	      (x (sequence-type-length-type type)))
 	 (when x (check-type l x))

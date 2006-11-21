@@ -67,6 +67,7 @@
   nil)
 
 (defmacro pprint-logical-block ((s x &key (prefix "") (per-line-prefix "") (suffix "")) &body body)
+  (declare (optimize (safety 1)))
   (let ((nx (gensym)) (xx (gensym)) (count (gensym)) (end (gensym)) (eprefix (gensym))
 	(epprefix (gensym)) (esuffix (gensym)) (very-end (gensym)))
     `(let ((,count 0) (,nx ,x))

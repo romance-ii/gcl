@@ -141,17 +141,17 @@ fScheck_bounds_bounds(object x, int i)
     }
 }
 
-DEFUNO_NEW("SVREF", object, fLsvref, LISP, 2, 2,
-      ONE_VAL, OO, IO, OO,OO,void,Lsvref,(object x,fixnum i),
-      "For array X and index I it returns (aref x i) ")
-{
- if (type_of(x)==t_vector
-     && (enum aelttype)x->v.v_elttype == aet_object
-     && x->v.v_dim > i)
-   RETURN1(x->v.v_self[i]);
- if (x->v.v_dim > i) illegal_index(x,make_fixnum(i));
- FEerror("Bad simple vector ~a",1,x);
+DEFUN_NEW("SVREF",object,fLsvref,LISP,2,2,ONE_VAL,OO,IO,OO,OO,(object x,fixnum i),"For array X and index I it returns (aref x i) ") {
+
+ if (type_of(x)==t_vector && (enum aelttype)x->v.v_elttype == aet_object) {
+     if (x->v.v_dim > i)
+       RETURN1(x->v.v_self[i]);
+     else
+       TYPE_ERROR(make_fixnum(i),list(3,sLinteger,make_fixnum(0),make_fixnum(x->v.v_dim)));
+ } else
+   TYPE_ERROR(x,sLsimple_vector);
  return(Cnil);
+
 }
     
 DEFUNO_NEW("ROW-MAJOR-AREF", object, fLrow_major_aref, LISP, 2, 2,

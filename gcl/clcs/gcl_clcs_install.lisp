@@ -4,7 +4,8 @@
 
 (defvar *shadowed-symbols* 
 ;  '(BREAK ERROR CERROR WARN CHECK-TYPE ASSERT ETYPECASE CTYPECASE ECASE CCASE))
-  '(WARN CHECK-TYPE ASSERT ETYPECASE CTYPECASE ECASE CCASE))
+;  '(WARN CHECK-TYPE ASSERT ETYPECASE CTYPECASE ECASE CCASE))
+  '(WARN))
 
 (defun install-symbol (real clcs)
   (unless (get real 'definition-before-clcs)

@@ -4,7 +4,8 @@
 (in-package "CONDITIONS")
 
 (defvar *shadowed-symbols1* 
-  '(ASSERT ETYPECASE CTYPECASE ECASE CCASE))
+;  '(ASSERT ETYPECASE CTYPECASE ECASE CCASE))
+  '())
 
 (defun install-symbol (real clcs)
   (unless (get real 'definition-before-clcs)

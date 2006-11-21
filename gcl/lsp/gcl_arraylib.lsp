@@ -265,8 +265,12 @@
 			  (static nil static-supplied-p))
 
   (declare (ignore initial-element static displaced-index-offset) ;FIXME
-	   (:dynamic-extent r new-dimensions))
+	   (:dynamic-extent r new-dimensions)
+	   (optimize (safety 1)))
 
+  (check-type array array)
+  (check-type new-dimensions (or seqind proper-list))
+  
   (when (integerp new-dimensions)
         (setq new-dimensions (list new-dimensions)))
 
