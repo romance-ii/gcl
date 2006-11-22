@@ -193,16 +193,16 @@
   (declare (optimize (safety 2)));prevent unsafe inline of nthcdr
   (car (nthcdr n x)))
 
-(defun first (x) (declare (optimize (safety 1))) (nth 0 x)) 
-(defun second (x) (declare (optimize (safety 1))) (nth 1 x)) 
-(defun third (x) (declare (optimize (safety 1))) (nth 2 x)) 
-(defun fourth (x) (declare (optimize (safety 1))) (nth 3 x)) 
-(defun fifth (x) (declare (optimize (safety 1))) (nth 4 x)) 
-(defun sixth (x) (declare (optimize (safety 1))) (nth 5 x)) 
-(defun seventh (x) (declare (optimize (safety 1))) (nth 6 x)) 
-(defun eighth (x) (declare (optimize (safety 1))) (nth 7 x)) 
-(defun ninth (x) (declare (optimize (safety 1))) (nth 8 x)) 
-(defun tenth (x) (declare (optimize (safety 1))) (nth 9 x)) 
+(defun first (x) (declare (optimize (safety 2))) (nth 0 x)) 
+(defun second (x) (declare (optimize (safety 2))) (nth 1 x)) 
+(defun third (x) (declare (optimize (safety 2))) (nth 2 x)) 
+(defun fourth (x) (declare (optimize (safety 2))) (nth 3 x)) 
+(defun fifth (x) (declare (optimize (safety 2))) (nth 4 x)) 
+(defun sixth (x) (declare (optimize (safety 2))) (nth 5 x)) 
+(defun seventh (x) (declare (optimize (safety 2))) (nth 6 x)) 
+(defun eighth (x) (declare (optimize (safety 2))) (nth 7 x)) 
+(defun ninth (x) (declare (optimize (safety 2))) (nth 8 x)) 
+(defun tenth (x) (declare (optimize (safety 2))) (nth 9 x)) 
 
 ; Courtesy Paul Dietz
 (defmacro nth-value (n expr)

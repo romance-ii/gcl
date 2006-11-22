@@ -244,7 +244,7 @@
       expression)))
 
 (DEFMACRO RESTART-CASE (EXPRESSION &BODY CLAUSES &environment env)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (FLET ((TRANSFORM-KEYWORDS (&KEY REPORT INTERACTIVE TEST)
 	   (LET ((RESULT '()))
 	     (WHEN REPORT

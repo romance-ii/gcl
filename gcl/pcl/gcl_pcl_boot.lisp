@@ -1996,6 +1996,7 @@ work during bootstrapping.
 
 (defun parse-specialized-lambda-list (arglist &optional post-keyword)
   ;;(declare (values parameters lambda-list specializers required-parameters))
+  (check-type arglist list)
   (let ((arg (car arglist)))
     (cond ((null arglist) (values nil nil nil nil))
 	  ((eq arg '&aux)
@@ -2116,6 +2117,7 @@ work during bootstrapping.
 	  (t form)))))
 
 (defmacro with-slots (slots instance &body body)
+  (declare (optimize (safety 2)))
   (let ((in (gensym)))
     `(let ((,in ,instance))
        (declare (ignorable ,in))

@@ -4,14 +4,11 @@
 
 (DEFVAR *HANDLER-CLUSTERS* NIL)
 
-(import 'si::list-of 'conditions)
-(import 'si::proper-list 'conditions)
 (DEFMACRO HANDLER-BIND (BINDINGS &BODY FORMS)
-  (declare (optimize (safety 1)))
-  (check-type bindings (list-of proper-list))
-  (UNLESS (EVERY #'(LAMBDA (X) (AND (LISTP X) (= (LENGTH X) 2))) BINDINGS)
-    (ERROR "Ill-formed handler bindings."))
-  `(LET ((*HANDLER-CLUSTERS* (CONS (LIST ,@(MAPCAR #'(LAMBDA (X) `(CONS ',(CAR X) ,(CADR X)))
+  (declare (optimize (safety 2)))
+;  (UNLESS (AND (LISTP BINDINGS) (EVERY (LAMBDA (X) (AND (LISTP X) (= (LENGTH X) 2))) BINDINGS))
+;    (ERROR "Ill-formed handler bindings."))
+  `(LET ((*HANDLER-CLUSTERS* (CONS (LIST ,@(MAPCAR (LAMBDA (X) `(CONS ',(CAR X) ,(CADR X)))
 						   BINDINGS))
 				   *HANDLER-CLUSTERS*)))
      ,@FORMS))
@@ -102,8 +99,7 @@
     NIL))
 
 (DEFMACRO HANDLER-CASE (FORM &REST CASES)
-  (declare (optimize (safety 1)))
-  (check-type cases (list-of proper-list))
+  (declare (optimize (safety 2)))
   (LET ((NO-ERROR-CLAUSE (ASSOC ':NO-ERROR CASES)))
     (IF NO-ERROR-CLAUSE
 	(LET ((NORMAL-RETURN (MAKE-SYMBOL "NORMAL-RETURN"))

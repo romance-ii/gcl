@@ -54,8 +54,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * mark nil-named hpacks
   * list-of and type-spec types, remove obsolete functions in
     clcs_macros.lisp
+  * fix more segfaults on bad input
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 22 Nov 2006 15:26:08 -0500
+ -- Camm Maguire <camm@enhanced.com>  Wed, 22 Nov 2006 18:54:24 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 
