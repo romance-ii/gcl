@@ -300,6 +300,8 @@ mark_object(object x) {
     mark_object(x->s.s_plist);
     mark_object(x->s.s_gfdef);
     mark_object(x->s.s_dbind);
+    if (x->s.s_hpack!=Cnil && x->s.s_hpack->p.p_name==Cnil)
+      mark_object(x->s.s_hpack);
     if (x->s.s_self == NULL)
       break;
     if ((int)what_to_collect >= (int)t_contiguous) {

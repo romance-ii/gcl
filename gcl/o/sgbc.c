@@ -197,6 +197,8 @@ sgc_mark_object1(object x) {
     sgc_mark_cons(x->s.s_plist);});
     sgc_mark_object(x->s.s_gfdef);
     sgc_mark_object(x->s.s_dbind);
+    if (x->s.s_hpack!=Cnil && x->s.s_hpack->p.p_name==Cnil)
+      sgc_mark_object(x->s.s_hpack);
     if (x->s.s_self == NULL)
       break;
     /* to do */

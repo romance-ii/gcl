@@ -51,8 +51,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * fix break-resume
   * segfault crash fixes; centralize on one version of assert, check-
     type and cases
+  * mark nil-named hpacks
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 21 Nov 2006 18:59:05 -0500
+ -- Camm Maguire <camm@enhanced.com>  Wed, 22 Nov 2006 13:20:03 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 
