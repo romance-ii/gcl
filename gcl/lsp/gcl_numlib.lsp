@@ -247,11 +247,11 @@
   (cons size position))
 
 (defun byte-size (bytespec)
-  (check-type bytespec proper-list)
+  (check-type bytespec cons)
   (car bytespec))
 
 (defun byte-position (bytespec)
-  (check-type bytespec proper-list)
+  (check-type bytespec cons)
   (cdr bytespec))
 
 (defun ldb (bytespec integer)

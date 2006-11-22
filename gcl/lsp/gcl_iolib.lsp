@@ -146,10 +146,10 @@
 
 (defun read-from-string (string
                          &optional (eof-error-p t) eof-value
-                         &key (start 0) end preserve-whitespace)
+                         &key (start 0) (end nil end-p) preserve-whitespace)
   (declare (optimize (safety 1)))
   (check-type string string)
-  (setq end (length string))
+  (unless end-p (setq end (length string)))
   (let ((stream (make-string-input-stream string start end)))
     (if preserve-whitespace
         (values (read-preserving-whitespace stream eof-error-p eof-value)

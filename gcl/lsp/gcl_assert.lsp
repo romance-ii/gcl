@@ -74,13 +74,9 @@
 (defun clause-type (clauses)
   `(or ,@(mapcan (lambda (x) (mapcar (lambda (y) `(eql ,y)) (if (listp (car x)) (car x) (list (car x))))) clauses)))
 
-(defun proper-clauses-p (x)
-  (when (typep x 'proper-list)
-    (every (lambda (x) (typep x 'proper-list)) x)))
-
 (defmacro ecase (keyform &rest clauses &aux (key (gensym)))
   (declare (optimize (safety 1)))
-  (check-type clauses (satisfies proper-clauses-p))
+  (check-type clauses (list-of proper-list))
   (let ((tp (clause-type clauses)))
     (do ((l (reverse clauses) (cdr l))
 	 (form `(let ((*print-level* 4)
@@ -100,7 +96,7 @@
 
 (defmacro ccase (keyplace &rest clauses &aux (key (gensym)))
   (declare (optimize (safety 1)))
-  (check-type clauses (satisfies proper-clauses-p))
+  (check-type clauses (list-of proper-list))
    `(loop (let ((,key ,keyplace))
 	    ,@(mapcar (lambda (l)
 			`(when ,(if (listp (car l))
@@ -114,7 +110,7 @@
 
 (defmacro typecase (keyform &rest clauses)
   (declare (optimize (safety 1)))
-  (check-type clauses (satisfies proper-clauses-p))
+  (check-type clauses (list-of proper-list))
   (do ((l (reverse clauses) (cdr l))
        (form nil) (key (gensym)))
       ((endp l) `(let ((,key ,keyform)) ,form))
@@ -127,7 +123,7 @@
 
 (defmacro etypecase (keyform &rest clauses &aux (key (gensym)))
   (declare (optimize (safety 1)))
-  (check-type clauses (satisfies proper-clauses-p))
+  (check-type clauses (list-of proper-list))
   (let ((tp `(or ,@(mapcar 'car clauses))))
    (do ((l (reverse clauses) (cdr l))
         (form `(error 'type-error :datum ,key :expected-type ',tp)))
@@ -139,7 +135,7 @@
 
 (defmacro ctypecase (keyplace &rest clauses &aux (key (gensym)))
   (declare (optimize (safety 1)))
-  (check-type clauses (satisfies proper-clauses-p))
+  (check-type clauses (list-of proper-list))
   `(loop (let ((,key ,keyplace))
 	   ,@(mapcar (lambda (l)
 		       `(when (typep ,key ',(car l))

@@ -202,8 +202,8 @@
 
 (defun subtypep (t1 t2 &optional env)
   (declare (ignore env) (optimize (safety 1)))
-  (check-type t1 (or symbol proper-list))
-  (check-type t2 (or symbol proper-list))
+  (check-type t1 type-spec)
+  (check-type t2 type-spec)
   (if (or (not t1) (eq t2 t))
       (values t t)
     (let* ((rt (resolve-type `(and ,t1 ,(negate t2))))
@@ -267,7 +267,7 @@
 ;;; COERCE function.
 (defun coerce (object type)
   (declare (optimize (safety 1)))
-  (check-type type (or symbol proper-list))
+  (check-type type type-spec)
   (when (typep-int object type)
     (return-from coerce object))
   (let ((tp (or (car (member (if (atom type) type (car type)) +coerce-list+))
@@ -579,6 +579,24 @@
   (and (consp x) (not (improper-consp x))))
 
 (deftype not-type nil 'null)
+(deftype list-of (y) 
+  (let* ((sym (intern (string-concatenate "LIST-OF-" (symbol-name y)) 'si))) 
+    (unless (fboundp sym)
+      (eval `(defun ,sym (x) 
+	       (declare (proper-list x))
+	       (every (lambda (x) (typep x ',y)) x)))) 
+    `(and proper-list (satisfies ,sym))))
+
+#.`(eval-when 
+    (compile load eval) 
+    ,@(mapcar (lambda (x) 
+		`(defun ,(intern (string-concatenate "LIST-OF-" (symbol-name x))) (w)
+		   (declare (proper-list w))
+		   (every (lambda (z) (typep z ',x)) w)))
+	      '(symbol seqind proper-list)))
+
+(deftype type-spec nil `(or symbol class structure proper-cons))
+(deftype fpvec nil `(and vector (satisfies array-has-fill-pointer-p)))
 
 (defconstant +type-alist+ '((null . null)
 	  (not-type . not)

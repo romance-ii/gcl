@@ -2,25 +2,25 @@
 
 (IN-PACKAGE "CONDITIONS")
 
-(EVAL-WHEN (EVAL COMPILE LOAD)
+;; (EVAL-WHEN (EVAL COMPILE LOAD)
 
-(DEFUN ACCUMULATE-CASES (MACRO-NAME CASES LIST-IS-ATOM-P)
-  (DO ((L '())
-       (C CASES (CDR C)))
-      ((NULL C) (NREVERSE L))
-      (check-type (car c) cons)
-      (LET ((KEYS (CAAR C)))
-	   (COND ((ATOM KEYS)
-		  (COND ((NULL KEYS))
-			((MEMBER KEYS '(OTHERWISE T))
-			 (IF (NOT (MEMBER MACRO-NAME '( ECASE CCASE ETYPECASE CTYPECASE)))
-			     (ERROR "OTHERWISE is not allowed in ~S expressions." MACRO-NAME))
-			   (PUSH (LIST KEYS) L))
-			(T (PUSH KEYS L))))
-		 (LIST-IS-ATOM-P
-		  (PUSH KEYS L))
-		 (T (DOLIST (KEY KEYS) (PUSH KEY L)))))))
-);NEHW-LAVE
+;; (DEFUN ACCUMULATE-CASES (MACRO-NAME CASES LIST-IS-ATOM-P)
+;;   (DO ((L '())
+;;        (C CASES (CDR C)))
+;;       ((NULL C) (NREVERSE L))
+;;       (check-type (car c) cons)
+;;       (LET ((KEYS (CAAR C)))
+;; 	   (COND ((ATOM KEYS)
+;; 		  (COND ((NULL KEYS))
+;; 			((MEMBER KEYS '(OTHERWISE T))
+;; 			 (IF (NOT (MEMBER MACRO-NAME '( ECASE CCASE ETYPECASE CTYPECASE)))
+;; 			     (ERROR "OTHERWISE is not allowed in ~S expressions." MACRO-NAME))
+;; 			   (PUSH (LIST KEYS) L))
+;; 			(T (PUSH KEYS L))))
+;; 		 (LIST-IS-ATOM-P
+;; 		  (PUSH KEYS L))
+;; 		 (T (DOLIST (KEY KEYS) (PUSH KEY L)))))))
+;; );NEHW-LAVE
 
 ;(DEFUN ESCAPE-SPECIAL-CASES (CASES)
 ;  (DO ((L '())
@@ -35,12 +35,12 @@
 ;		 (T
 ;		  (PUSH (CONS KEYS (CDR (CAR C))) L))))))
 
-(DEFUN ESCAPE-SPECIAL-CASES-REPLACE (CASES)
-  (DO ((C CASES (CDR C)))
-      ((NULL C) CASES)
-      (LET ((KEYS (CAAR C)))
-	   (IF (MEMBER KEYS '(OTHERWISE T))
-	       (RPLACA (CAR C) (LIST KEYS))))))
+;; (DEFUN ESCAPE-SPECIAL-CASES-REPLACE (CASES)
+;;   (DO ((C CASES (CDR C)))
+;;       ((NULL C) CASES)
+;;       (LET ((KEYS (CAAR C)))
+;; 	   (IF (MEMBER KEYS '(OTHERWISE T))
+;; 	       (RPLACA (CAR C) (LIST KEYS))))))
 
 ;; (DEFMACRO ECASE (KEYFORM &REST CASES)
 ;;   (declare (optimize (safety 1)))
@@ -118,30 +118,30 @@
 ;; 		   (SETF ,KEYPLACE VALUE)
 ;; 		   (GO ,TAG2))))))))))
 
-(DEFUN ASSERT-REPORT (NAMES STREAM)
-  (FORMAT STREAM "Retry assertion")
-  (IF NAMES
-      (FORMAT STREAM " with new value~P for ~{~S~^, ~}."
-	      (LENGTH NAMES) NAMES)
-      (FORMAT STREAM ".")))
+;; (DEFUN ASSERT-REPORT (NAMES STREAM)
+;;   (FORMAT STREAM "Retry assertion")
+;;   (IF NAMES
+;;       (FORMAT STREAM " with new value~P for ~{~S~^, ~}."
+;; 	      (LENGTH NAMES) NAMES)
+;;       (FORMAT STREAM ".")))
 
-(DEFUN ASSERT-PROMPT (NAME VALUE)
-  (COND ((Y-OR-N-P "The old value of ~S is ~S.~
-		  ~%Do you want to supply a new value? "
-		   NAME VALUE)
-	 (FORMAT *QUERY-IO* "~&Type a form to be evaluated:~%")
-	 (FLET ((READ-IT () (EVAL (READ *QUERY-IO*))))
-	   (IF (SYMBOLP NAME) ;Help user debug lexical variables
-	       (PROGV (LIST NAME) (LIST VALUE) (READ-IT))
-	       (READ-IT))))
-	(T VALUE)))
+;; (DEFUN ASSERT-PROMPT (NAME VALUE)
+;;   (COND ((Y-OR-N-P "The old value of ~S is ~S.~
+;; 		  ~%Do you want to supply a new value? "
+;; 		   NAME VALUE)
+;; 	 (FORMAT *QUERY-IO* "~&Type a form to be evaluated:~%")
+;; 	 (FLET ((READ-IT () (EVAL (READ *QUERY-IO*))))
+;; 	   (IF (SYMBOLP NAME) ;Help user debug lexical variables
+;; 	       (PROGV (LIST NAME) (LIST VALUE) (READ-IT))
+;; 	       (READ-IT))))
+;; 	(T VALUE)))
 
-(DEFUN SIMPLE-ASSERTION-FAILURE (ASSERTION)
-  (ERROR 'SIMPLE-TYPE-ERROR
-	 :DATUM ASSERTION
-	 :EXPECTED-TYPE '(not null)			; This needs some work in next revision. -kmp
-	 :FORMAT-CONTROL "The assertion ~S failed."
-	 :FORMAT-ARGUMENTS (LIST ASSERTION)))
+;; (DEFUN SIMPLE-ASSERTION-FAILURE (ASSERTION)
+;;   (ERROR 'SIMPLE-TYPE-ERROR
+;; 	 :DATUM ASSERTION
+;; 	 :EXPECTED-TYPE '(not null)			; This needs some work in next revision. -kmp
+;; 	 :FORMAT-CONTROL "The assertion ~S failed."
+;; 	 :FORMAT-ARGUMENTS (LIST ASSERTION)))
 
 ;; (DEFMACRO ASSERT (TEST-FORM &OPTIONAL PLACES DATUM &REST ARGUMENTS)
 ;;   (declare (optimize (safety 1)))

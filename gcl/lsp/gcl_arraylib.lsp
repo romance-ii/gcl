@@ -51,8 +51,6 @@
 	((subtypep1 type 'float) 'long-float)
 	(t)))
 
-(deftype fpvec nil `(and vector (satisfies array-has-fill-pointer-p)))
-
 (defun fill-pointer (x)
   (declare (optimize (safety 1)))
   (check-type x fpvec)

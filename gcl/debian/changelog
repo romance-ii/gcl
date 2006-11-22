@@ -52,8 +52,10 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * segfault crash fixes; centralize on one version of assert, check-
     type and cases
   * mark nil-named hpacks
+  * list-of and type-spec types, remove obsolete functions in
+    clcs_macros.lisp
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 22 Nov 2006 13:20:03 -0500
+ -- Camm Maguire <camm@enhanced.com>  Wed, 22 Nov 2006 15:26:08 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 
