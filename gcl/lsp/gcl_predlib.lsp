@@ -43,12 +43,15 @@
 	((symbolp object) 'symbol);;to get around pcl bootstrap problems
 	((typep object 'standard-object)
 	 (let* ((c (class-of object))
-		  (n (class-name c)))
+		(n (class-name c)))
 	     (if (and n (eq c (find-class n nil))) n c)))
 	((let ((tp (type-of-c object)))
-	   (if (member tp '(vector array));FIXME
-	       `(,tp ,(upgraded-array-element-type (array-element-type object)))
-	     tp)))))
+	   (cond ((member tp '(vector array));FIXME
+		  `(,tp ,(upgraded-array-element-type (array-element-type object))))
+		 ((and (symbolp tp) (string= "STD-INSTANCE" (symbol-name tp)) ;FIXME
+		       (string= "PCL" (package-name (symbol-package tp))))
+		  (class-of object))
+		 (tp))))))
 
 (defmacro dt-apply (x y) 
   (let ((l (gensym))) 
