@@ -17,10 +17,10 @@
 
 (IN-PACKAGE "CONDITIONS" :USE '("LISP"))
 
-(SHADOW '(WARN))
+(SHADOW '())
 
 (EXPORT '(;; Shadowed symbols
-	  WARN))
+	  ))
 (EXPORT '(;; New symbols
 	  *BREAK-ON-SIGNALS* *DEBUGGER-HOOK* SIGNAL
 			     WITH-CONDITION-RESTARTS

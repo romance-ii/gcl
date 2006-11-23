@@ -56,8 +56,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
     clcs_macros.lisp
   * fix more segfaults on bad input
   * fix subtypep tyep-of class-of
+  * get rid of last shadow in conditions:: warn
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 22 Nov 2006 21:16:52 -0500
+ -- Camm Maguire <camm@enhanced.com>  Thu, 23 Nov 2006 00:13:21 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

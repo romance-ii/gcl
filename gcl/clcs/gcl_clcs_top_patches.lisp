@@ -6,7 +6,7 @@
 	  *debug-abort* *debug-continue* *debug-condition* *debug-eval*
 	  find-restart invoke-restart invoke-restart-interactively invoke-debugger
 	  restart-name ignore-errors show-restarts conditionp signal store-value
-	  read-evaluated-form restart-case)
+	  read-evaluated-form restart-case muffle-warning)
 	"SYSTEM")
 
 (in-package "SYSTEM")
@@ -15,7 +15,8 @@
 
 (defconstant +protos+ (mapcar (lambda (x) (cons (intern (concatenate 'string "PROTO-" (string x))) x))
 			      '(with-simple-restart show-restarts abort continue break-level-invoke-restart
-						    invoke-debugger signal)))
+						    invoke-debugger signal return-from muffle-warning
+						    restart-case)))
 
 (defmacro with-protos (&body forms)
 `(let ((*proto-debug-level* *debug-level*))
@@ -34,6 +35,10 @@
 	  args `(,@args :function-name ,(ihs-fname *current-ihs*))))
   (or (conditions::coerce-to-condition datum args default-type function-name)
       (coerce-to-string datum args)))
+(defun process-warning (datum args function-name &optional (default-type 'conditions::simple-warning))
+  (let ((r (process-error datum args function-name default-type)))
+    (check-type r warning "a warning condition")
+    r))
 
 (defun break-level (at &optional env)
   (let*  ((*debug-level* (1+ *debug-level*))
@@ -58,6 +63,10 @@
 (defun error (d &rest a)
   (with-protos
     (apply #.(function-src 'error) d a)))
+
+(defun warn (d &rest a)
+  (with-protos
+    (apply #.(function-src 'warn) d a)))
 
 (defun error-in-error (c d e f)
   (with-protos

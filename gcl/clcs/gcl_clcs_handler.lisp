@@ -83,20 +83,20 @@
 ;; 		      :FORMAT-ARGUMENTS FORMAT-ARGUMENTS)))
 ;;   NIL)
 
-(DEFUN WARN (DATUM &REST ARGUMENTS)
-  (declare (optimize (safety 1)))
-  (LET ((CONDITION
-	  (COERCE-TO-CONDITION DATUM ARGUMENTS 'SIMPLE-WARNING 'WARN)))
-    (CHECK-TYPE CONDITION WARNING "a warning condition")
-    (IF *BREAK-ON-WARNINGS*
-	(BREAK "~A~%Break entered because of *BREAK-ON-WARNINGS*."
-	       CONDITION))
-    (RESTART-CASE (SIGNAL CONDITION)
-      (MUFFLE-WARNING ()
-	  :REPORT "Skip warning."
-	(RETURN-FROM WARN NIL)))
-    (FORMAT *ERROR-OUTPUT* "~&Warning:~A~%" CONDITION)
-    NIL))
+;; (DEFUN WARN (DATUM &REST ARGUMENTS)
+;;   (declare (optimize (safety 1)))
+;;   (LET ((CONDITION
+;; 	  (COERCE-TO-CONDITION DATUM ARGUMENTS 'SIMPLE-WARNING 'WARN)))
+;;     (CHECK-TYPE CONDITION WARNING "a warning condition")
+;;     (IF *BREAK-ON-WARNINGS*
+;; 	(BREAK "~A~%Break entered because of *BREAK-ON-WARNINGS*."
+;; 	       CONDITION))
+;;     (RESTART-CASE (SIGNAL CONDITION)
+;;       (MUFFLE-WARNING ()
+;; 	  :REPORT "Skip warning."
+;; 	(RETURN-FROM WARN NIL)))
+;;     (FORMAT *ERROR-OUTPUT* "~&Warning:~A~%" CONDITION)
+;;     NIL))
 
 (DEFMACRO HANDLER-CASE (FORM &REST CASES)
   (declare (optimize (safety 2)))

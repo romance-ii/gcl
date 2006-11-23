@@ -9,7 +9,10 @@
 (defvar *proto-debug-level* 1)
 (defun proto-show-restarts nil nil)
 (defun proto-with-simple-restart (x y) (declare (ignore x)) y)
+(defun proto-restart-case (x &rest y) (declare (ignore y)) x)
 (defun proto-continue (&rest r) (declare (ignore r)) nil)
+(defun proto-return-from (&rest r) (declare (ignore r)) nil)
+(defun proto-muffle-warning (&rest r) (declare (ignore r)) nil)
 (defun proto-abort (&rest r) (declare (ignore r)) nil)
 (defun proto-signal (x) (declare (ignore x)) nil)
 (defun proto-invoke-restart (-) -)
@@ -93,10 +96,23 @@
 	  args)))
 	("unknown error")))
 
+(defun warn (datum &rest arguments)
+  (declare (optimize (safety 1)))
+  (let ((c (process-warning datum arguments 'warn)))
+    (when *break-on-warnings*
+	(break "~A~%break entered because of *break-on-warnings*." c))
+    (let (warn)
+      (proto-restart-case
+       (proto-signal c)
+       (proto-muffle-warning nil :report "Skip warning."  (proto-return-from warn nil))))
+    (format *error-output* "~&Warning:~a~%" c)
+    nil))
+
 (defun process-error (datum args function-name &optional default-type)
   (declare (ignore function-name default-type))
   (coerce-to-string datum args))
-
+(defun process-warning (datum args function-name &optional default-type)
+  (process-error datum args function-name default-type))
 (defun error (datum &rest arguments)
   (with-error-level-bindings (error datum arguments)
    (let ((pe (process-error datum arguments 'error)))
