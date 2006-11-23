@@ -32,7 +32,7 @@
 	 `(lambda (c s) 
 	    (declare (ignorable c))
 	    (call-next-method)
-	    (format s ,(car x) ,@(mapcar (lambda (st) (list (slot-sym y st) 'c)) (cdr x)))))))
+	    (format s ,(car x) ,@(mapcar (lambda (st) `(if (slot-boundp c ',st) (,(slot-sym y st) c) 'unbound)) (cdr x)))))))
 
 (defun default-report (x)
   `(lambda (c s) (call-next-method) (format s "~s " ',x)))

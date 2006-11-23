@@ -62,8 +62,7 @@
 
 (defmacro assert (test-form &optional places string &rest args)
   (declare (optimize (safety 1)))
-  `(do ((*print-level* 4)
-        (*print-length* 4))
+  `(do nil ;((*print-level* 4) (*print-length* 4))
        (,test-form nil)
      ,(if string
 	  `(cerror "" ,string ,@args)
