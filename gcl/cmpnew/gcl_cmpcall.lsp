@@ -176,7 +176,7 @@
 	  (wt-nl f " = " (car args) ","))
   (wt-nl "({object _ob=" f ",_z;")
   (wt-nl "enum type _tp;extern int Rset;")
-  (wt-nl "if (!Rset) _tp=0; else if ((_tp=type_of(_ob))==t_symbol) {_ob=_ob->s.s_gfdef;_tp=type_of(_ob);}")
+  (wt-nl "if (!Rset) _tp=-1; else if ((_tp=type_of(_ob))==t_symbol) {_ob=_ob->s.s_gfdef;_tp=_ob==OBJNULL ? -1 : type_of(_ob);}")
   (wt-nl "switch(_tp) {")
   (wt-nl "case t_sfun: _z=_ob->sfn.sfn_self(")
   (when (cdr args) (wt (cadr args))

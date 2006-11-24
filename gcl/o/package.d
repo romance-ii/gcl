@@ -1019,9 +1019,11 @@ BEGIN:
 		break;
 
 	case t_cons:
-		for (l = symbols;  !endp(l);  l = l->c.c_cdr)
-			export(l->c.c_car, pack);
-		break;
+	  for (l = symbols;  !endp(l);  l = l->c.c_cdr) {
+	    check_type_symbol(&l->c.c_car);
+	    export(l->c.c_car, pack);
+	  }
+	  break;
 
 	default:
 		check_type_symbol(&symbols);
@@ -1045,8 +1047,10 @@ BEGIN:
 		break;
 
 	case t_cons:
-		for (l = symbols;  !endp(l);  l = l->c.c_cdr)
-			unexport(l->c.c_car, pack);
+	  for (l = symbols;  !endp(l);  l = l->c.c_cdr) {
+	    check_type_symbol(&l->c.c_car);
+	    unexport(l->c.c_car, pack);
+	  }
 		break;
 
 	default:

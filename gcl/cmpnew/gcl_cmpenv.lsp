@@ -403,25 +403,16 @@
            (unless (member x *alien-declarations*)
                    (push x *alien-declarations*))
            (warn "The declaration specifier ~s is not a symbol." x))))
-    ;;FIXME
-    ((array atom bignum bit bit-vector character common compiled-function
-      complex cons double-float fixnum float hash-table integer keyword list
-      long-float nil null number package pathname random-state ratio rational
-      readtable sequence short-float simple-array simple-bit-vector
-      simple-string simple-vector single-float standard-char stream string
-      string-char symbol t vector signed-byte unsigned-byte)
-     (proclaim-var (car decl) (cdr decl)))
     (otherwise
-     (unless (member (car decl) *alien-declarations*)
-             (warn "The declaration specifier ~s is unknown." (car decl)))
-     (and (symbolp (car decl))
-	  (functionp (get (car decl) :proclaim))
-	  (dolist** (v (cdr decl))
-		    (funcall (get (car decl) :proclaim) v)))
-     )
-    )
-  nil
-  )
+     (cond ((not (eq '* (cmp-norm-tp (car decl))))
+	    (proclaim-var (car decl) (cdr decl)))
+	   (t (unless (member (car decl) *alien-declarations*)
+		(warn "The declaration specifier ~s is unknown." (car decl)))
+	      (and (symbolp (car decl))
+		   (functionp (get (car decl) :proclaim))
+		   (dolist** (v (cdr decl))
+			     (funcall (get (car decl) :proclaim) v)))))))
+  nil)
 
 (defun proclaim-var (type vl)
  (when (not (listp vl))

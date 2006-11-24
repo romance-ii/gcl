@@ -48,7 +48,7 @@
 	((let ((tp (type-of-c object)))
 	   (cond ((member tp '(vector array));FIXME
 		  `(,tp ,(upgraded-array-element-type (array-element-type object))))
-		 ((and (symbolp tp) (string= "STD-INSTANCE" (symbol-name tp)) ;FIXME
+		 ((and (symbolp tp) (string= "STD-INSTANCE" (symbol-name tp)) ;FIXME import pcl::std-instance-p
 		       (string= "PCL" (package-name (symbol-package tp))))
 		  (class-of object))
 		 (tp))))))

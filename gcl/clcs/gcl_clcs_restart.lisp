@@ -140,7 +140,7 @@
            STREAM))
 
 (DEFMACRO RESTART-BIND (BINDINGS &BODY FORMS)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   `(LET ((*RESTART-CLUSTERS* (CONS (LIST ,@(MAPCAR #'(LAMBDA (BINDING)
 						       `(MAKE-RESTART
 							  :NAME     ',(CAR BINDING)

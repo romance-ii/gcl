@@ -58,8 +58,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * fix subtypep tyep-of class-of
   * get rid of last shadow in conditions:: warn
   * no print bindings in assert, unbound slot condition printing
+  * misc error fixes
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 23 Nov 2006 10:25:22 -0500
+ -- Camm Maguire <camm@enhanced.com>  Fri, 24 Nov 2006 11:57:56 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

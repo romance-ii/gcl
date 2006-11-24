@@ -203,6 +203,7 @@
 ;;; 
 ;;; 
 (defun standard-instance-access (instance location)
+  (check-type instance (satisfies std-instance-p))
   (%instance-ref (std-instance-slots instance) location))
 
 (defun funcallable-standard-instance-access (instance location)

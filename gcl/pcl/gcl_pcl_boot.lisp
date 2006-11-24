@@ -2034,7 +2034,7 @@ work during bootstrapping.
 	       (parse-specialized-lambda-list (cdr arglist))
 	     (values (cons (if (listp arg) (car arg) arg) parameters)
 		     (cons (if (listp arg) (car arg) arg) lambda-list)
-		     (cons (if (listp arg) (cadr arg) t) specializers)
+		     (cons (if (and (listp arg) (listp (cdr arg))) (cadr arg) t) specializers)
 		     (cons (if (listp arg) (car arg) arg) required)))))))
 
 

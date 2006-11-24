@@ -1492,12 +1492,15 @@ fcalln_vfun(object first,va_list vl)
 }
 
 object 
-fcalln1(object first,...)
-{  va_list ap;
-   object fun=fcall.fun;
-   DEBUG_AVMA
-   va_start(ap,first);
-   if(type_of(fun)==t_cfun)
+fcalln1(object first,...) {  
+
+  va_list ap;
+  object fun=fcall.fun;
+  enum type tp;
+  DEBUG_AVMA
+  va_start(ap,first);
+  tp=fun==OBJNULL ? -1 : type_of(fun);
+  if(tp==t_cfun)
      {object *base=vs_top,*old_base=base;
       int i=fcall.argd;
       vs_base=base;
@@ -1526,9 +1529,9 @@ fcalln1(object first,...)
       CHECK_AVMA;
       return(vs_base[0]);
     }
-   if(type_of(fun)==t_cclosure)
+   if(tp==t_cclosure)
      return(fcalln_cclosure(first,ap));
-   if(type_of(fun)==t_vfun && !fun->vfn.vfn_mv)
+   if(tp==t_vfun && !fun->vfn.vfn_mv)
      return(fcalln_vfun(first,ap));
    return(fcalln_general(first,ap));
   va_end(ap);
