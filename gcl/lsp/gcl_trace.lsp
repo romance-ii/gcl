@@ -44,24 +44,18 @@
 
 
 (defmacro trace (&rest r)
-  (declare (optimize (safety 1)))
-  (check-type r (list-of symbol))
   (if (null r)
-      '(mapcar #'car *trace-list*)
+      '(mapcar 'car *trace-list*)
     `(let ((old (copy-list *trace-list*)) finish-flg)
        (unwind-protect
-	   (prog1 (mapcan #'trace-one ',r)
+	   (prog1 (mapcan 'trace-one ',r)
 	     (setq finish-flg t))
 	 (when (null finish-flg)
 	       (format *standard-output* "~%Newly traced functions:  ~S"
-		       (mapcar #'car (set-difference *trace-list* old :test #'equal))))))))
+		       (mapcar 'car (set-difference *trace-list* old :test #'equal))))))))
 
 (defmacro untrace (&rest r)
-  (declare (optimize (safety 1)))
-  (check-type r (list-of symbol))
-  (if (null r)
-      '(mapcan 'untrace-one (mapcar 'car *trace-list*))
-    `(mapcan 'untrace-one ',r)))
+  `(mapcan 'untrace-one ',(or r *trace-list*)))
 
 (defun trace-one-preprocess (x)
   (cond
@@ -171,6 +165,7 @@
 			form (car args))))))))
 
 (defun trace-one (form &aux f (fname (if (consp form) (car form) form)))
+  (check-trace-spec form)
   (when (null (fboundp fname))
         (format *trace-output* "The function ~S is not defined.~%" fname)
         (return-from trace-one nil))
@@ -182,7 +177,6 @@
         (return-from trace-one nil))
   (when (get fname 'traced)
 	(untrace-one fname))
-  (check-trace-spec form)
   (setq form (trace-one-preprocess form))
   (let((x (get fname 'state-function))) (when x (break-state 'trace x)))
   (fset (setq f (gensym)) (symbol-function fname))
@@ -239,6 +233,7 @@
    (t (apply temp-name args))))
 
 (defun untrace-one (fname &aux sym)
+  (check-type fname symbol)
   (cond ((setq sym (get fname 'traced))
 	 (remprop fname 'traced)
 	 (cond

@@ -59,8 +59,10 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * get rid of last shadow in conditions:: warn
   * no print bindings in assert, unbound slot condition printing
   * misc error fixes
+  * continue/resume  restart around break; fix declaim warning;fix if
+    bounds checking;fix trace
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 24 Nov 2006 11:57:56 -0500
+ -- Camm Maguire <camm@enhanced.com>  Fri, 24 Nov 2006 17:20:44 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

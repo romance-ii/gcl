@@ -259,5 +259,7 @@
 	    (setq message (apply 'format nil format-string args)))
 	   (t (format *error-output* "~&Break.~%")
 	      (setq message ""))))
-   (let ((*break-enable* t)) (break-level message))
+   (proto-with-simple-restart 
+    (proto-continue "Return from break.")
+    (let ((*break-enable* t)) (break-level message)))
    nil))

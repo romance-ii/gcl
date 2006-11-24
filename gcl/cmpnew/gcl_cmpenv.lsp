@@ -424,7 +424,7 @@
                  (v (sch-global var)))
                 (setq type1 (if type1 (type-and type1 type) type))
                 (when v (setq type1 (type-and type1 (var-type v))))
-                (when (null type1) (warn
+                (when (and type (var-type v) (null type1)) (warn
       "Inconsistent type declaration was found for the variable ~s."
                                     var))
                 (si:putprop var type1 'cmp-type)

@@ -60,9 +60,9 @@
 
 (defun two-tp-inf (fn t2);;FIXME use num type bounds here for or types
   (case fn
-	((> >=) (if (and (consp t2) (member (car t2) #l(integer short-float long-float)))
+	((> >=) (if (and (consp t2) (member (car t2) '(integer short-float long-float)))
 		    (cmp-norm-tp `(real ,(or (cadr t2) '*))) t))
-	((< <=) (if (and (consp t2) (member (car t2) #l(integer short-float long-float)))
+	((< <=) (if (and (consp t2) (member (car t2) '(integer short-float long-float)))
 		    (cmp-norm-tp `(real * ,(or (caddr t2) '*))) t))))
 
 (defmacro vl-name (x) `(var-name (car (third ,x))))

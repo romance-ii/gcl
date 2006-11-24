@@ -80,6 +80,10 @@
   (with-protos
     (funcall #.(function-src 'dbl-eval) d)))
 
+(defun break (&rest a)
+  (with-protos
+    (apply #.(function-src 'break) a)))
+
 (defun break-level-invoke-restart (-)
   (COND ((AND (PLUSP -)
 	      (< - (+ *NUMBER-OF-DEBUG-RESTARTS* 1)))
