@@ -415,22 +415,23 @@
   nil)
 
 (defun proclaim-var (type vl)
- (when (not (listp vl))
-   (error 'type-error :datum vl :expected-type 'list))
+  (check-type vl list)
   (setq type (type-filter type))
   (dolist** (var vl)
     (cond ((symbolp var)
            (let ((type1 (get var 'cmp-type))
                  (v (sch-global var)))
-                (setq type1 (if type1 (type-and type1 type) type))
-                (when v (setq type1 (type-and type1 (var-type v))))
-                (when (and type (var-type v) (null type1)) (warn
-      "Inconsistent type declaration was found for the variable ~s."
-                                    var))
-                (si:putprop var type1 'cmp-type)
-                (when v (setf (var-type v) type1))))
-          (t
-           (warn "The variable name ~s is not a symbol." var)))))
+	     (let ((t2 (type-and type1 type)))
+	       (when (and type type1 (not t2))
+		 (warn "Inconsistent type declaration was found for the variable ~s." var))
+	       (setq type1 t2))
+	     (when v
+	       (let ((t2 (type-and type1 (var-type v))))
+		 (when (and type1 (var-type v) (not t2))
+		   (warn "Inconsistent type declaration was found for the variable ~s." var))
+		 (setf type1 t2 (var-type v) type1)))
+	     (si:putprop var type1 'cmp-type)))
+          ((warn "The variable name ~s is not a symbol." var)))))
 
 (defun c1body (body doc-p &aux (ss nil) (is nil) (ts nil) (others nil)
                     doc form)

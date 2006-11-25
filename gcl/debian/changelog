@@ -61,8 +61,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * misc error fixes
   * continue/resume  restart around break; fix declaim warning;fix if
     bounds checking;fix trace
+  * fix proclaim-var
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 24 Nov 2006 17:20:44 -0500
+ -- Camm Maguire <camm@enhanced.com>  Fri, 24 Nov 2006 21:59:03 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 
