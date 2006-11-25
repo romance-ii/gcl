@@ -55,7 +55,7 @@
 		       (mapcar 'car (set-difference *trace-list* old :test #'equal))))))))
 
 (defmacro untrace (&rest r)
-  `(mapcan 'untrace-one ',(or r *trace-list*)))
+  `(mapcan 'untrace-one ',(or r (mapcar 'car *trace-list*))))
 
 (defun trace-one-preprocess (x)
   (cond
