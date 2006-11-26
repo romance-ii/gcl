@@ -99,7 +99,51 @@
 	      (cond ((jumps-to-p (car w) name)
 		     (setq end w))))))))
 
+;fixme c1expr info-type nil
+(defun recognizable-go-form (form)
+  (when (consp form)
+    (case (car form)
+	  ((throw go return return-from) t)
+	  ((let progn let* lambda the multiple-value-bind) (recognizable-go-form (car (last form))))
+	  (if (and (recognizable-go-form (caddr form)) (recognizable-go-form (cadddr form))))
+	  ;fixme other cases handled homogenously
+	  ((ccase ecase case) (every (lambda (x) (recognizable-go-form (car (last x)))) (cddr form))))))
+
+(defun munge-tagbody (form)
+  (let (r)
+    (do nil ((not form) (nreverse r))
+	(let ((l (texpand (pop form))))
+	  (push
+	   (cond ((and (consp l) (eq (car l) 'if) (not (cdddr l)) 
+		       (recognizable-go-form (portable-source (caddr l))))
+		  `(,(car l) ,(cadr l) ,(caddr l)
+		    (progn ,@(do (q (nf form (cdr nf))) 
+				 ((or (not nf) (atom (car nf))) (setq form nf) (nreverse q))
+				 (push (car nf) q)))))
+		 (l)) r)))))
+
+(defun effective-macro-fn (fn)
+  (or (let ((fd (c1local-fun fn))) (unless (and (consp fd) (eq (car fd) 'call-local)) fd))
+      (unless (member fn *notinline*) (get fn 'si::compiler-macro-prop))
+      (macro-function fn)))
+
+;;FIXME cannot use portable source as sloop macroexpand order is
+;;wrong, hence same skips over macrolets.
+(defun texpand (form &aux fd)
+  (cond ((atom form) form)
+	((not (symbolp (car form))) form)
+	;;FIXME these taken from portable-source
+	((member (car form) '(multiple-value-bind case ccase ecase flet labels
+						  macrolet the declare quote function let let* lambda)) form)
+	((setq fd (effective-macro-fn (car form))) 
+	 (let ((nf (cmp-expand-macro fd (car form) (cdr form)))) 
+	   (if (equal nf form) form (texpand nf))))
+	(form)))
+
 (defun c1tagbody (body &aux (*tags* *tags*) (info (make-info)))
+
+  ;fixme  This needs doing in a separate pass1 loop, but appears quite hairy at the moment.
+  (setq body (munge-tagbody body))
   ;;; Establish tags.
   (setq body
         (mapcar

@@ -270,7 +270,7 @@
 ;;; COERCE function.
 (defun coerce (object type)
   (declare (optimize (safety 1)))
-  (check-type type type-spec)
+  (check-type type (and (not null) type-spec))
   (when (typep-int object type)
     (return-from coerce object))
   (let ((tp (or (car (member (if (atom type) type (car type)) +coerce-list+))

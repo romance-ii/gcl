@@ -63,8 +63,10 @@ gclcvs (2.7.0-62) unstable; urgency=low
     bounds checking;fix trace
   * fix proclaim-var
   * fix untrace
+  * proclaim fixes;experimental tagbody optimization;error on coerce to
+    nil;fix no pplicable error message
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 25 Nov 2006 11:24:26 -0500
+ -- Camm Maguire <camm@enhanced.com>  Sat, 25 Nov 2006 21:47:57 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

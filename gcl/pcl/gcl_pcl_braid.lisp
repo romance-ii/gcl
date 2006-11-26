@@ -759,7 +759,7 @@
   '(or standard-object structure-object))
 
 (defmethod no-applicable-method (generic-function &rest args)
-  (cerror "Retry call to ~S"
+  (cerror "Retry call"
 	  "No matching method for the generic-function ~S,~@
           when called with arguments ~S."
 	  generic-function args)
