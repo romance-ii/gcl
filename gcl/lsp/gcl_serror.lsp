@@ -87,14 +87,19 @@
 	       (apply 'format nil datum args))
 	   datum))
 	((symbolp datum)
-	 (substitute 
-	  #\^ #\~ 
-	  (coerce-to-string
-	   (if args
-	       (apply 'string-concatenate (cons datum (make-list (length args) :initial-element " ~s")))
-	     (string datum))
-	  args)))
-	("unknown error")))
+	 (let* ((fc (cadr (member :format-control args)))
+		(fa (cadr (member :format-arguments args)))
+		(tl (list :format-control :format-arguments fc fa))
+		(args (nconc (remove-if (lambda (x) (not (not (member x tl)))) args)
+			     (list (when fc (apply 'format nil fc fa))))))
+	   (substitute 
+	    #\^ #\~ 
+	    (coerce-to-string
+	     (if args
+		 (apply 'string-concatenate (cons datum (make-list (length args) :initial-element " ~s")))
+	       (string datum))
+	     args))))
+	 ("unknown error")))
 
 (defun warn (datum &rest arguments)
   (declare (optimize (safety 1)))
