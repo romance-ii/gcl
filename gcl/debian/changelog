@@ -66,8 +66,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * proclaim fixes;experimental tagbody optimization;error on coerce to
     nil;fix no pplicable error message
   * fix cltl1 error messages
+  * work around for hppa gmp support
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 28 Nov 2006 17:32:13 -0500
+ -- Camm Maguire <camm@enhanced.com>  Wed, 29 Nov 2006 17:03:25 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 
