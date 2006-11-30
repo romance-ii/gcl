@@ -67,8 +67,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
     nil;fix no pplicable error message
   * fix cltl1 error messages
   * work around for hppa gmp support
+  * new hppa compiler options
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 29 Nov 2006 17:03:25 -0500
+ -- Camm Maguire <camm@enhanced.com>  Wed, 29 Nov 2006 21:03:12 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 
