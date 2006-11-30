@@ -447,7 +447,7 @@ DEFUNO_NEW("IHS-TOP",object,fSihs_top,SI
 {
 	/* 0 args */
   fixnum i=ihs_top-ihs_org;
-  for (;i>=0 && type_of(ihs_org[i].ihs_function)==t_afun && ihs_org[i].ihs_function->sfn.sfn_self==fSihs_top;i--);
+  for (;i>=0 && type_of(ihs_org[i].ihs_function)==t_afun && ihs_org[i].ihs_function->sfn.sfn_self==FFN(fSihs_top);i--);
   RETURN1(make_fixnum(i));
 }
 
