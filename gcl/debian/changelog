@@ -70,8 +70,9 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * new hppa compiler options
   * s_hpack to Cnil in gbc whens et to nil package;FFN(fSihs_top) for
     ia64
+  * Fix set-form-type on nil return forms (non-local exits)
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 30 Nov 2006 12:07:51 -0500
+ -- Camm Maguire <camm@enhanced.com>  Mon,  4 Dec 2006 14:07:15 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

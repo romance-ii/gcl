@@ -387,8 +387,8 @@
 	  ((let let*) (set-form-type (car (last form)) type))
 	  (progn (set-form-type (car (last (third form))) type))
 	  (if 
-	    (let ((tt (type-and type (info-type (cadr (fourth form)))))
-		  (ft (type-and type (info-type (cadr (fifth form))))))
+	    (let ((tt (type-and type (nil-to-t (info-type (cadr (fourth form))))))
+		  (ft (type-and type (nil-to-t (info-type (cadr (fifth form)))))))
 	      (unless tt
 		(set-form-type (fifth form) type)
 		(setf (car form) 'progn (cadr form) (cadr (fifth form)) (caddr form) (list (fifth form)) (cdddr form) nil))
