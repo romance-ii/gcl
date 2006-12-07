@@ -509,3 +509,4 @@ object ihs_top_function_name(ihs_ptr h);
    abort();\
  })
 
+#define stack_cons() ({object _d=vs_pop,_a=vs_pop;vs_push(make_cons(_a,_d));})

@@ -55,10 +55,19 @@
         (t (error "~S is not a sequence." sequence))))
 
 ;(proclaim '(function call-test (t t t t) t))
-(defun call-test (test test-not item keyx)
-  (cond (test (the boolean (values (funcall test item keyx))))
-        (test-not (not (funcall test-not item keyx)))
-        ((eql item keyx))))
+(defmacro call-test (test test-not item keyx)
+  (let ((j1 (gensym)) (j2 (gensym))(tst (gensym))(tstn (gensym)))
+    `(let ((,j1 ,item)(,j2 ,keyx)(,tst ,test)(,tstn ,test-not))
+       (cond (,tst (funcall ,tst ,j1 ,j2))
+	     (,tstn (not (funcall ,tstn ,j1 ,j2)))
+	     ((eql ,j1 ,j2))))))
+
+(defmacro call-test-key (test test-not key i1 i2)
+  (let ((j1 (gensym)) (j2 (gensym))(tst (gensym))(tstn (gensym))(ky (gensym)))
+    `(let ((,ky ,key)(,j1 ,i1)(,j2 ,i2)(,tst ,test)(,tstn ,test-not))
+       (if ,ky 
+	   (call-test ,tst ,tstn (funcall ,ky ,j1) (funcall ,ky ,j2))
+	 (call-test ,tst ,tstn ,i1 ,i2)))))
 
 
 (proclaim '(function check-seq-start-end (t t) t))
@@ -72,41 +81,51 @@
 (defun test-error()
   (error "both test and test not supplied"))
 
-(defun bad-seq-limit (x &optional y)
-  (error 'type-error :datum (if y (list x y) x) :expected-type "in sequence limit"))
+(defun bad-seq-limit (x y)
+  (declare (seqind x y))
+  (error 'type-error :datum x  :expected-type (if (= y 0) '(integer 0) '(integer 0 y))))
 
 
 (eval-when (compile eval)
-(proclaim '(function the-start (t) fixnum))
-(proclaim '(function the-end (t fixnum) fixnum))
+;(proclaim '(function the-start (t) fixnum))
+;(proclaim '(function the-end (t fixnum) fixnum))
 (defmacro f+ (x y) `(the fixnum (+ (the fixnum ,x) (the fixnum ,y))))
 (defmacro f- (x y) `(the fixnum (- (the fixnum ,x) (the fixnum ,y))))
 
-(defmacro with-start-end ( start end seq &body body)
-  `(let ((,start (if ,start (the-start ,start) 0)))
-     (declare (fixnum ,start))
+(defmacro with-start-end (start end seq &body body)
+  `(let ((,start (the-start ,start)))
      (check-type ,seq sequence)
-     (let ((,end (the-end ,end (length ,seq)))) 
-       (declare (fixnum ,end))
-       (or (<= ,start ,end) (bad-seq-limit  ,start ,end))
-       ,@ body)))
-)
+     (let ((,seq ,seq));;FIXME
+       (declare (sequence ,seq))
+       (let ((,end (the-end ,end (length ,seq))))
+	 (or (<= ,start ,end) (bad-seq-limit  ,start ,end))
+	 ,@body))))
+
+(defmacro with-start-end-length (start end length seq &body body)
+  `(let ((,start (the-start ,start)))
+     (check-type ,seq sequence)
+     (let ((,seq ,seq));;FIXME
+       (declare (sequence ,seq))
+       (let* ((,length (length ,seq))(,end (the-end ,end ,length)))
+	 (or (<= ,start ,end) (bad-seq-limit  ,start ,end))
+	 ,@body)))))
 
 (defun the-end (x y)
-  (cond ((fixnump x)
-	 (or (<= (the fixnum x) y)
-	     (bad-seq-limit x))
+  (declare (seqind y))
+  (cond ((seqindp x)
+	 (unless (<= x y)
+	   (bad-seq-limit x y))
 	 x)
 	((null x) y)
-	(t (bad-seq-limit x))))
+	(t (error 'type-error :datum x :expected-type '(or null seqind)) y)))
 	
 (defun the-start (x)
-  (cond ((fixnump x)
-	 (or (>= (the fixnum x) 0)
-	     (bad-seq-limit x))
-	 (the fixnum x))
+  (cond ((seqindp x)
+	 (unless (>= x 0)
+	     (bad-seq-limit x 0))
+	 x)
 	((null x) 0)
-	(t (bad-seq-limit x))))
+	(t (error 'type-error :datum x :expected-type '(or null seqind)))))
   
 
 
@@ -367,7 +386,7 @@
 (defseq count () nil nil
   `(do (,iterate-i ,kount-0)
        (,endp-i k)
-     (declare (fixnum i k))
+     (declare (seqind i k))
      (when (and ,satisfies-the-test)
            ,kount-up)))
 
@@ -375,7 +394,7 @@
 (defseq internal-count () t nil
   `(do (,iterate-i ,kount-0)
        (,endp-i k)
-     (declare (fixnum i k))
+     (declare (seqind i k))
      (when (and ,within-count ,satisfies-the-test)
            ,kount-up)))
 
@@ -558,38 +577,106 @@
 
 
 (defun search (sequence1 sequence2
-               &key from-end test test-not 
-                    (key #'identity)
-		    start1 start2
+               &key from-end test test-not
+                    key
+		    (start1 0) (start2 0)
 		    end1 end2)
   (declare (optimize (safety 1)))
   (and test test-not (test-error))
-  (with-start-end start1 end1 sequence1
-   (with-start-end start2 end2 sequence2  
-    (if (not from-end)
-        (loop
-         (do ((i1 start1 (f+ 1  i1))
-              (i2 start2 (f+ 1  i2)))
-             ((>= i1 end1) (return-from search start2))
-           (declare (fixnum i1 i2))
-           (when (>= i2 end2) (return-from search nil))
-           (unless (call-test test test-not
-                              (funcall key (elt sequence1 i1))
-                              (funcall key (elt sequence2 i2)))
-                   (return nil)))
-         (setf  start2 (f+ 1  start2)))
-        (loop
-         (do ((i1 (f+ -1  end1) (f+ -1  i1))
-              (i2 (f+ -1  end2) (f+ -1  i2)))
-             ((< i1 start1) (return-from search (the fixnum (f+ 1  i2))))
-           (declare (fixnum i1 i2))
-           (when (< i2 start2) (return-from search nil))
-           (unless (call-test test test-not
-                              (funcall key (elt sequence1 i1))
-                              (funcall key (elt sequence2 i2)))
-                   (return nil)))
-         (setq  end2 (f+ -1  end2)))))))
+  (check-type sequence1 sequence)
+  (check-type sequence2 sequence)
+  (check-type start1 seqind)
+  (check-type start2 seqind)
+  (when end1 (check-type end1 seqind))
+  (when end2 (check-type end2 seqind))
 
+  (let ((s1 sequence1)(s2 sequence2)(i1 start1)(i2 start2)(e1 end1)(e2 end2)(st (or test test-not)))
+    (declare (sequence s1 s2)(seqind i1 i2)((or null seqind) e1 e2))
+    (let* ((eq (unless st (every 'eql-is-eq s1))) m (mv 0) x1 x2
+	   (l1 (listp s1))(l2 (listp s2))
+	   (e1 (or e1 (unless l1 (length s1))))(e2 (or e2 (unless l2 (length s2)))))
+      (do ((is2 i2 (1+ is2))
+	   (ps2 s2 p2)
+	   (p2 (when l2 (nthcdr i2 s2)) (cdr p2))
+	   (p1 (when l1 (nthcdr i1 s1))))
+	  ((if e2 (> is2 e2) (endp ps2)) (when m mv))
+	  (declare (seqind is2))
+	  (do ((p1 p1 (cdr p1))
+	       (p2 p2 (cdr p2))
+	       (i1 i1  (1+ i1))
+	       (i2 is2 (1+ i2)))
+	      ((or (setq x1 (if e1 (>= i1 e1) (endp p1)))
+		   (setq x2 (if e2 (>= i2 e2) (endp p2))))
+	       (when x1 (if from-end (setq m t mv is2) (return-from search is2))))
+	      (declare (seqind i1 i2))
+	      (let ((el1 (if l1 (car p1) (aref s1 i1)))
+		    (el2 (if l2 (car p2) (aref s2 i2))))
+		(when key (setq el1 (funcall key el1) el2 (funcall key el2)))
+		(unless
+		    (cond (eq (eq el1 el2))
+			  ((not st) (eql el1 el2))
+			  (test (funcall test el1 el2))
+			  ((not (funcall test-not el1 el2))))
+		  (return nil))))))))
+
+#|
+  (do (;(end2 (length sequence2))
+       (start2 start2 (1+ start2))
+					;	 (p1 (nthcdr start1 sequence1))
+       (p2 (nthcdr start2 sequence2) (cdr p2))) ((endp p2))
+       (declare (seqind start2))
+       (do ((p1 p1 (cdr p1))
+	    (p2 p2 (cdr p2)))
+	   ((endp p1) (return-from search start2))
+	   (unless (if eq (eq (car p1) (car p2)) (call-test-key test test-not key (car p1) (car p2)))
+	     (return nil))))
+
+  (let ((start2 0)(start1 0)(sequence1 sequence1)(sequence2 sequence2)(eq (and (not test) (not test-not) (every 'eql-is-eq sequence1))))
+;  (with-start-end-length start1 end1 length1 sequence1
+;   (with-start-end-length start2 end2 length2 sequence2  
+    (declare (seqind start1 start2))
+    (declare (list sequence1 sequence2))
+    (do (;(end2 (length sequence2))
+	 (start2 start2 (1+ start2))
+;	 (p1 (nthcdr start1 sequence1))
+	 (p2 (nthcdr start2 sequence2) (cdr p2))) ((endp p2))
+	 (declare (seqind start2))
+	 (do ((p1 p1 (cdr p1))
+	      (p2 p2 (cdr p2)))
+	     ((endp p1) (return-from search start2))
+	     (unless (if eq (eq (car p1) (car p2)) (call-test-key test test-not key (car p1) (car p2)))
+	     (return nil)))))
+;))
+
+  (with-start-end-length start1 end1 length1 sequence1
+   (with-start-end-length start2 end2 length2 sequence2  
+;    (when from-end 
+;      (setq sequence1 (reverse sequence1) sequence2 (reverse sequence2)
+;	    start1 (- length1 end1) end1 (- length1 start1) 
+;	    start2 (- length2 end2) end2 (- length2 start2)))
+    (if t;(not from-end)
+	(if t;(listp sequence2)
+	    (do ((start2 start2 (1+ start2))
+		 (p1 (nthcdr start1 sequence1))
+		 (p2 (nthcdr start2 sequence2) (cdr p2))) ((>= start2 end2))
+		(do ((p1 p1 (cdr p1))
+		     (p2 p2 (cdr p2)))
+		    ((endp p1) (return-from search start2))
+		    (unless (call-test-key test test-not key (car p1) (car p2))
+		      (return nil))))
+        (do ((start2 start2 (1+ start2))) ((>= start2 end2))
+         (do ((i1 start1 (1+ i1))
+              (i2 start2 (1+ i2)))
+             ((or (>= i1 end1) (>= i2 end2)) (return-from search (when (>= i1 end1) start2)))
+           (unless (call-test-key test test-not key (elt sequence1 i1) (elt sequence2 i2))
+	     (return nil)))))
+        (do ((end2 end2 (1- end2))) ((>= start2 end2))
+         (do ((i1 (1- end1) (1- i1))
+              (i2 (1- end2) (1- i2)))
+             ((or (< i1 start1) (< i2 start2)) (return-from search (when (< i1 start1) (1+ i2))))
+           (unless (call-test-key test test-not key (elt sequence1 i1) (elt sequence2 i2))
+	     (return nil))))))))
+|#
 
 (defun sort (sequence predicate &key (key #'identity))
   (declare (optimize (safety 1)))

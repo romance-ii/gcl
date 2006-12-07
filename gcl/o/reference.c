@@ -28,26 +28,36 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 
-LFD(Lfboundp)(void)
-{
-	object sym;
+DEFUN_NEW("FBOUNDP-SYM",object,fSfboundp_sym,SI,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
 
-	check_arg(1);
-	sym = vs_base[0];
-	if (type_of(sym) != t_symbol) {
-	  if (setf_fn_form(sym)) {
-	    vs_base[0]=get(MMcadr(sym),sSsetf_function,Cnil);
-	    return;
-	  } else
-	    not_a_symbol(sym);
-	}
-	if (sym->s.s_sfdef != NOT_SPECIAL)
-		vs_base[0] = Ct;
-	else if (sym->s.s_gfdef == OBJNULL)
-		vs_base[0]= Cnil;
-	else
-		vs_base[0]= Ct;
+  if (type_of(sym) != t_symbol) {
+    not_a_symbol(sym);
+    RETURN1(Cnil);
+  }
+  RETURN1(sym->s.s_sfdef!=NOT_SPECIAL || sym->s.s_gfdef ? Ct : Cnil);
+
 }
+
+DEFUN_NEW("FBOUNDP-CONS",object,fSfboundp_cons,SI,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+
+  if (!setf_fn_form(sym)) {
+    not_a_symbol(sym);/*FIXME*/
+    RETURN1(Cnil);
+  }
+  RETURN1(get(MMcadr(sym),sSsetf_function,Cnil)==Cnil ? Cnil : Ct);
+
+}
+
+
+DEFUN_NEW("FBOUNDP",object,fLfboundp,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+
+  if (type_of(sym) == t_symbol)
+    RETURN1(FFN(fSfboundp_sym)(sym));
+  else
+    RETURN1(FFN(fSfboundp_cons)(sym));
+
+}
+
 /* FIXME find out where this is called and if it needs to handle setf functions */
 object
 symbol_function(object sym)
@@ -70,46 +80,43 @@ symbol_function(object sym)
 		(special . address)		for special forms.
 */
 
-static void
-symbol_function_internal(int allow_setf) {
-	object sym;
+static object
+symbol_function_internal(object sym,int allow_setf) {
 
-	check_arg(1);
-	sym = vs_base[0];
-	if (type_of(sym) != t_symbol) {
-	  if (allow_setf && setf_fn_form(sym)) {
-	    vs_base[0]=getf(MMcadr(sym)->s.s_plist,sSsetf_function,Cnil);
-	    return;
-	  } else
-		not_a_symbol(sym);
-	}
-	if (sym->s.s_sfdef != NOT_SPECIAL) {
-		vs_push(make_fixnum((long)(sym->s.s_sfdef)));
-		vs_base[0] = sLspecial;
-		stack_cons();
-		return;
-	}
-	if (sym->s.s_gfdef==OBJNULL)
-		FEundefined_function(sym);
-	if (sym->s.s_mflag) {
-		vs_push(sym->s.s_gfdef);
-		vs_base[0] = sLmacro;
-		stack_cons();
-		return;
-	}
-	vs_base[0] = sym->s.s_gfdef;
+  if (type_of(sym)!=t_symbol) {
+    
+    if (allow_setf && setf_fn_form(sym))
+      return getf(MMcadr(sym)->s.s_plist,sSsetf_function,Cnil);
+    else {
+      not_a_symbol(sym);
+      return Cnil;
+    }
+  }
+
+  if (sym->s.s_sfdef != NOT_SPECIAL)
+    return make_cons(sLspecial,make_fixnum((long)(sym->s.s_sfdef)));
+  
+  if (sym->s.s_gfdef==OBJNULL)
+    FEundefined_function(sym);
+  
+  if (sym->s.s_mflag)
+    return make_cons(sLmacro,sym->s.s_gfdef);
+  
+  return sym->s.s_gfdef;
+  
 }
 
 
-LFD(Lsymbol_function)(void)
-{
-  symbol_function_internal(0);
+DEFUN_NEW("SYMBOL-FUNCTION",object,fLsymbol_function,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+
+  RETURN1(symbol_function_internal(sym,0));
+
 }
 /* FIXME add setf expander for fdefinition */
 
-LFD(Lfdefinition)(void) {
+DEFUN_NEW("FDEFINITION",object,fLfdefinition,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
 
-  symbol_function_internal(1);
+  RETURN1(symbol_function_internal(sym,1));
 
 }  
 
@@ -174,31 +181,23 @@ FFN(Ffunction)(object form)
 		FEinvalid_function(fun);
 }
 
-LFD(Lsymbol_value)(void)
-{
-	object sym;
-	check_arg(1);
-	sym = vs_base[0];
-	if (type_of(sym) != t_symbol)
-		not_a_symbol(sym);
-	if (sym->s.s_dbind == OBJNULL)
-	  FEunbound_variable(sym);
-	else
-	  vs_base[0] = sym->s.s_dbind;
+DEFUN_NEW("SYMBOL-VALUE",object,fLsymbol_value,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
 
+  if (type_of(sym) != t_symbol)
+    not_a_symbol(sym);
+  if (sym->s.s_dbind == OBJNULL)
+    FEunbound_variable(sym);
+  else
+    RETURN1(sym->s.s_dbind);
+  RETURN1(Cnil);
 }
 
-LFD(Lboundp)(void)
-{
-	object sym;
-	check_arg(1);
-	sym=vs_base[0];
-	if (type_of(sym) != t_symbol)
-		not_a_symbol(sym);
-	if (sym->s.s_dbind == OBJNULL)
-		vs_base[0] = Cnil;
-	else
-		vs_base[0] = Ct;
+DEFUN_NEW("BOUNDP",object,fLboundp,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+
+  if (type_of(sym) != t_symbol)
+    not_a_symbol(sym);
+  RETURN1(sym->s.s_dbind == OBJNULL ? Cnil : Ct);
+
 }
 
 LFD(Lmacro_function)(void) {
@@ -271,13 +270,13 @@ DEFUNO_NEW("INTERPRETED-FUNCTION-LAMBDA",object,fSinterpreted_function_lambda,SI
 void
 gcl_init_reference(void)
 {
-	make_function("SYMBOL-FUNCTION", Lsymbol_function);
-	make_function("FDEFINITION", Lfdefinition);
-	make_function("FBOUNDP", Lfboundp);
+/* 	make_function("SYMBOL-FUNCTION", Lsymbol_function); */
+/* 	make_function("FDEFINITION", Lfdefinition); */
+/* 	make_function("FBOUNDP", Lfboundp); */
 	sLquote=make_special_form("QUOTE", Fquote);
 	sLfunction = make_special_form("FUNCTION", Ffunction);
-	make_function("SYMBOL-VALUE", Lsymbol_value);
-	make_function("BOUNDP", Lboundp);
+/* 	make_function("SYMBOL-VALUE", Lsymbol_value); */
+/* 	make_function("BOUNDP", Lboundp); */
 	make_function("MACRO-FUNCTION", Lmacro_function);
 	make_function("SPECIAL-FORM-P", Lspecial_form_p);
 	make_function("SPECIAL-OPERATOR-P", Lspecial_form_p);

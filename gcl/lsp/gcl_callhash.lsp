@@ -35,8 +35,9 @@
 	     (mapc 'eval (nreverse *pahl*))
 	     (setq *pahl* nil))))
 ;	((not (symbol-package fn)) nil);FIXME
-	((let* ((sig (or (gethash sig *unique-sigs*)
-			 (setf (gethash sig *unique-sigs*) sig)))
+	((let* ((sig (when sig
+		       (or (gethash sig *unique-sigs*)
+			   (setf (gethash sig *unique-sigs*) sig))))
 		(h (or (gethash fn *call-hash-table*)
 		       (setf (gethash fn *call-hash-table*) (make-call :sig sig)))))
 	   (let ((x (get fn 'state-function)))
@@ -51,14 +52,15 @@
 		 (setf (call-sig h) sig)))
 	   (when src (setf (call-src h) src))
 	   (when file (unless (call-file h) (setf (call-file h) file)))
-	   (let (ar)
-	     (unless (every (lambda (x) (member (car x) (call-callees h))) callees)
-	       (pushnew fn *cmr*))
-	     (dolist (l callees (unless ar (when (and sig callees) (remove-recompile fn))));fixme
-	       (pushnew (car l) (call-callees h))
+	   (let (ar cm)
+	     (dolist (l callees (progn (when cm (pushnew fn *cmr* :test 'eq))
+				       (unless ar (when (and sig callees) (remove-recompile fn)))));fixme
+	       (unless (member (car l) (call-callees h) :test 'eq)
+		 (push (car l) (call-callees h))
+		 (setq cm t))
 	       (let ((h (or (gethash (car l) *call-hash-table*)
 			    (setf (gethash (car l) *call-hash-table*) (make-call :sig (cdr l) :callers (list fn))))))
-		 (pushnew fn (call-callers h))
+		 (pushnew fn (call-callers h) :test 'eq)
 		 (unless (or (eq fn (car l)) (equal (cdr l) (call-sig h)))
 		   (add-recompile fn (car l) (cdr l) (call-sig h))
 		   (setq ar t)))))))))

@@ -129,11 +129,6 @@
  (push '(((real 0.0)) t #.(flags)"#0")
    (get 'abs 'inline-always))
 
-;;SYMBOL-LENGTH
- (push '((t) fixnum #.(flags rfa set)
-  "@0;(type_of(#0)==t_symbol ? (#0)->s.st_fillp :not_a_variable((#0)))")
-   (get 'symbol-length 'inline-always))
-
 ;;VECTOR-TYPE
  (push '((t fixnum) boolean #.(flags rfa)
   "@0;(type_of(#0) == t_vector && (#0)->v.v_elttype == (#1))")
@@ -528,6 +523,8 @@
 ;;BOUNDP
  (push '((t) boolean #.(flags rfa)"(#0)->s.s_dbind!=OBJNULL")
    (get 'boundp 'inline-unsafe))
+ (push '((symbol) boolean #.(flags rfa)"(#0)->s.s_dbind!=OBJNULL")
+   (get 'boundp 'inline-always))
 
 ;;CAAAAR
  (push '((t) t #.(flags)"caaaar(#0)")
@@ -1278,13 +1275,44 @@ TRUNCATE_USE_C
 (push '((t fixnum) t #.(flags)"(#0)->v.v_self[#1]")
    (get 'svref 'inline-unsafe))
 
+;;SYMBOL-LENGTH
+ (push '((t) seqind #.(flags rfa set)
+  "@0;(type_of(#0)==t_symbol ? (#0)->s.st_fillp :not_a_variable((#0)))")
+   (get 'symbol-length 'inline-always))
+ (push '((t) seqind #.(flags rfa set) "(#0)->s.st_fillp")
+   (get 'symbol-length 'inline-unsafe))
+ (push '((symbol) seqind #.(flags rfa set) "(#0)->s.st_fillp")
+   (get 'symbol-length 'inline-always))
+
 ;;SYMBOL-NAME
- (push '((t) t #.(flags ans)"symbol_name(#0)")
+ (push '((t) string #.(flags ans rfa)"symbol_name(#0)")
    (get 'symbol-name 'inline-always))
 
 ;;SYMBOL-PLIST
-(push '((t) t #.(flags) "((#0)->s.s_plist)")
+(push '((t) si::proper-list #.(flags rfa) "((#0)->s.s_plist)")
     (get 'symbol-plist 'inline-unsafe))
+(push '((symbol) si::proper-list #.(flags rfa) "((#0)->s.s_plist)")
+    (get 'symbol-plist 'inline-always))
+
+;;SYMBOL-PACKAGE
+(push '((t) (or null package) #.(flags rfa) "((#0)->s.s_hpack)")
+    (get 'symbol-package 'inline-unsafe))
+(push '((symbol) (or null package) #.(flags rfa) "((#0)->s.s_hpack)")
+    (get 'symbol-package 'inline-always))
+
+;;SYMBOL-VALUE
+(push '((t) t #.(flags) "((#0)->s.s_dbind)")
+    (get 'symbol-value 'inline-unsafe))
+
+;;SYMBOL-FUNCTION
+(push '((t) function #.(flags rfa) "({register object _sym=#0;_sym->s.s_sfdef!=NOT_SPECIAL ? make_cons(sLspecial,make_fixnum((long)_sym->s.s_sfdef)) : (_sym->s.s_mflag ? make_cons(sLmacro,_sym->s.s_gfdef) : _sym->s.s_gfdef);})")
+      (get 'symbol-function 'inline-unsafe))
+
+;;SI::FBOUNDP-SYM
+(push '((t) boolean #.(flags rfa) "@0;(#0->s.s_sfdef!=NOT_SPECIAL || #0->s.s_gfdef)")
+      (get 'si::fboundp-sym 'inline-unsafe))
+(push '((symbol) boolean #.(flags rfa) "@0;(#0->s.s_sfdef!=NOT_SPECIAL || #0->s.s_gfdef)")
+      (get 'si::fboundp-sym 'inline-always))
 
 ;;SYMBOLP
  (push '((t) boolean #.(flags rfa)"type_of(#0)==t_symbol")
@@ -1436,3 +1464,6 @@ TRUNCATE_USE_C
 ;;si::GENSYM1IG
 (push '((t) symbol #.(flags ans set rfa) "fSgensym1ig(#0)") (get 'si::gensym1ig 'inline-always))
 
+;;SI::HASH-SET
+ (push '((t t t) t #.(flags) "@2;(sethash(#0,#1,#2),#2)")
+   (get 'si::hash-set 'inline-unsafe))

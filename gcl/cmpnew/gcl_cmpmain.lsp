@@ -400,7 +400,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
   (cond ((not(symbolp name)) (error "Must be a name"))
 	((or (si::interpreted-function-p def) (and (consp def) (eq (car def) 'lambda)))
 	 (or name (setf name 'cmp-anon))
-	 (setf (symbol-function name) def)
+	 (setf (symbol-function name) (coerce def 'function))
 	 (compile name))
 	(def (error "def not a lambda expression"))
 	((setq tem (macro-function name))
@@ -409,8 +409,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	 (setf (macro-function name) (macro-function name))
 	 ;; FIXME -- support warnings-p and failures-p.  CM 20041119
 	 (values name nil nil))
-	((and (setq tem (symbol-function name))
-	      (or (consp tem) (when (typep tem 'interpreted-function) (setq tem (si::interpreted-function-lambda tem)))))
+	((setq tem (function-lambda-expression (symbol-function name)))
 	 (let ((na (if (symbol-package name) name 'cmp-anon))
 	       (tem (if *keep-gaz* tem (wrap-literals tem))) warnings failures)
 	   (unless (and (fboundp 'si::init-cmp-anon) (or (si::init-cmp-anon) (fmakunbound 'si::init-cmp-anon)))
@@ -782,30 +781,23 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 		    (format st "}~%~%")))
 		    
   (compiler-cc c o)
-;  (system (format nil "~a ~a" *cc* tem))
-;   (with-open-file (s c) (si::copy-stream s *standard-output*))
   (delete-file c)
 
   o))
- 
-(defun mysub (str it new)
-  (let ((x (search it str)))
-    (unless x
-      (return-from mysub str))
-    (let ((y (+ (length it) (the fixnum x))))
-      (declare (fixnum y))
-      (concatenate (lisp::type-of str)
-		   (subseq str 0 x)
-		   new
-		   (mysub (subseq str y) it new)))))
 
+(defun mysub (str it new)
+  (declare (string str it new));FIXME
+  (let ((x (search it str)))
+    (cond ((not x) str)
+	  ((si::string-concatenate (subseq str 0 x) new (mysub (subseq str (+ x (length it))) it new))))))
+ 
 (defun link (files image &optional post extra-libs (run-user-init t))
   (let* ((ui (make-user-init files "user-init"))
 	 (raw (pathname image))
 	 (init (merge-pathnames (make-pathname
 				 :name (concatenate 'string "init_" (pathname-name raw))
 				 :type "lsp") raw))
-	 (raw (merge-pathnames raw (make-pathname :directory (list :current))))
+	 #-winnt (raw (merge-pathnames raw (make-pathname :directory (list :current))))
 	 (raw (merge-pathnames (make-pathname
 				:name (concatenate 'string "raw_" (pathname-name raw)))
 			       raw))

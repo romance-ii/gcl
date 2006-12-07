@@ -400,12 +400,9 @@ LFD(Lremprop)()
 	vs_popp;
 }
 
-LFD(Lsymbol_plist)()
-{
-	check_arg(1);
-
-	check_type_symbol(&vs_base[0]);
-	vs_base[0] = vs_base[0]->s.s_plist;
+DEFUN_NEW("SYMBOL-PLIST",object,fLsymbol_plist,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+  check_type_symbol(&sym);
+  RETURN1(sym->s.s_plist);
 }
 
 @(defun getf (place indicator &optional deflt)
@@ -618,22 +615,13 @@ ONCE_MORE:
 	@(return smbl)
 @)
 
-LFD(Lsymbol_package)()
-{
-	check_arg(1);
-
-	check_type_symbol(&vs_base[0]);
-	vs_base[0] = vs_base[0]->s.s_hpack;
+DEFUN_NEW("SYMBOL-PACKAGE",object,fLsymbol_package,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+  check_type_symbol(&sym);
+  RETURN1(sym->s.s_hpack);
 }
 
-LFD(Lkeywordp)()
-{
-	check_arg(1);
-
-	if (type_of(vs_base[0]) == t_symbol && keywordp(vs_base[0]))
-		vs_base[0] = Ct;
-	else
-		vs_base[0] = Cnil;
+DEFUN_NEW("KEYWORDP",object,fLkeywordp,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+  RETURN1(type_of(sym) == t_symbol && keywordp(sym) ? Ct : Cnil);
 }
 
 /*
@@ -725,7 +713,7 @@ gcl_init_symbol_function()
 {
 	make_function("GET", Lget);
 	make_function("REMPROP", Lremprop);
-	make_function("SYMBOL-PLIST", Lsymbol_plist);
+/* 	make_function("SYMBOL-PLIST", Lsymbol_plist); */
 	make_function("GETF", Lgetf);
 	make_function("GET-PROPERTIES", Lget_properties);
 /* 	make_function("SYMBOL-NAME", Lsymbol_name); */
@@ -733,8 +721,8 @@ gcl_init_symbol_function()
 	make_function("COPY-SYMBOL", Lcopy_symbol);
 /* 	make_function("GENSYM", Lgensym); */
 	make_function("GENTEMP", Lgentemp);
-	make_function("SYMBOL-PACKAGE", Lsymbol_package);
-	make_function("KEYWORDP", Lkeywordp);
+/* 	make_function("SYMBOL-PACKAGE", Lsymbol_package); */
+/* 	make_function("KEYWORDP", Lkeywordp); */
 
 	make_si_function("PUT-F", siLput_f);
 	make_si_function("REM-F", siLrem_f);

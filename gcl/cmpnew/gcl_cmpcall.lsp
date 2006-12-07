@@ -367,7 +367,10 @@
 
 (defun link-rt (tp vararg)
   (cond ((cmpt tp) (cmp-norm-tp `(,(car tp) ,@(mapcar (lambda (x) (link-rt x vararg)) (cdr tp)))))
-	((or (type>= #tboolean tp) (not tp) (and (single-type-p tp) vararg) tp))))
+	((or (type>= #tboolean tp) (not tp) (and (single-type-p tp) vararg) 
+	     (car (member tp `(,@+c-local-var-types+ t *) :test 'type<=))))))
+
+
 
 (defun add-fast-link (fname type args &optional no-open-code)
   (declare (ignore type))
@@ -418,13 +421,14 @@
 					    (wt "(VFUN_NARGS="(length l) ",")
 					    (wt-inline-loc link-string l)
 					    (wt ")")))))
-		(push (list fname argtypes (link-rt rt vararg)
+		(push (list fname (mapcar (lambda (x) (link-rt x vararg)) argtypes) (link-rt rt vararg)
 			    (if (single-type-p rt)
 				(flags side-effect-p allocates-new-storage)
 			      (flags side-effect-p allocates-new-storage sets-vs-top))
 			    (or link link-string) 'link-call)
 		      *inline-functions*))
-	      (setq link-info (list fname (format nil "LI~d" n) (link-rt rt vararg) argtypes))))))
+	      (setq link-info (list fname (format nil "LI~d" n) (link-rt rt vararg) 
+				    (mapcar (lambda (x) (link-rt x vararg)) argtypes)))))))
     (pushnew link-info  *function-links* :test 'equal)
     n))
 

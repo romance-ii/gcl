@@ -59,10 +59,10 @@
 		 (make-sequence-vector 'character size iesp initial-element))
 		((vector array)
 		 (let ((element-type (sequence-type-element-type type)))
-		   (unless element-type
-		     (check-type type '(member list vector)))
+		   (when (eq element-type 'error)
+		     (check-type type (member list vector)))
 		   (make-sequence-vector element-type size iesp initial-element)))
-		 (otherwise (check-type type '(member list vector))))))
+		 (otherwise (check-type type (member list vector))))))
     (check-type-eval res type)
     res))
 

@@ -474,7 +474,7 @@
 	   (let (,x)
 	     (do ((,s ,s (cdr ,s))) ((endp ,s) ,x)
 	       (setq ,x (cons (car ,s) ,x))))
-	 (let ((,x (make-array (length ,s) :element-type (cmp-array-element-type ,s))))
+	 (let ((,x (make-array (length ,s) :element-type (array-element-type ,s))))
 	   (do ((,i 0 (1+ ,i))) ((= ,i (length ,s)) ,x)
 	     (declare (seqind ,i))
 	     (setf (aref ,x (1- (- (length ,s) ,i))) (aref ,s ,i))))))))
@@ -660,6 +660,15 @@
   (if *safe-compile*
       form
     `(the seqind ,form)))
+
+(defun fboundp-expander (form env)
+  (declare (ignore env))
+  (let ((s (gensym)))
+  `(let ((,s ,(cadr form)))
+     (cond ((symbolp ,s) (si::fboundp-sym ,s))
+	   ((is-setf-function ,s) (when (get (cadr ,s) 'si::setf-function) t))
+	   ((check-type ,s si::function-identifier))))))
+(si::putprop 'fboundp 'fboundp-expander 'si::compiler-macro-prop)
 
 (defun maphash-expander (form env)
   (declare (ignore env))
@@ -925,7 +934,6 @@
 		 `(,@lf (,out (make-array ,l 
 					  :fill-pointer ,l 
 					  :element-type ',(cmp-norm-tp (upgraded-array-element-type (si::sequence-type-element-type ns)))))) lf))
-;					  :element-type (cmp-array-element-type ,@vars)))) lf))
 	 (lf (if (or destp (eq newseq :list))
 		 `(,@lf (,p (when (listp ,dest) ,dest))) lf))
 	 (lf (if sum `(,@lf (,fv ,ivp) (,sv ,iv)) lf))
@@ -1068,7 +1076,10 @@
 ;(defmacro map-into-compiler-macro (&whole w &rest args)
 (defun map-into-compiler-macro (w env &aux (args (cdr w))) (declare (ignore env))
   (if (or (< (length args) 3) (and (eq (car w) 'map) (or (not (constantp (car args)))
-							 (not (type>= #tsequence (cmp-norm-tp (cmp-eval (car args))))))))
+							 (let ((tp (cmp-norm-tp (cmp-eval (car args)))))
+							   (or 
+							    (not (type>= #tsequence tp))
+							    (eq 'error (si::sequence-type-element-type tp)))))))
       w
     (let* ((syms (reduce (lambda (&rest r) 
 			   (when r 
@@ -1077,11 +1088,11 @@
 			       `(,@(car r) (,(gensym) ,(cadr r))))))
 			 args :initial-value nil))
 	   (r (mapcar (lambda (x) (cond ((inlinable-fn x) x)
-					      ((car (rassoc x syms :key 'car :test 'equal))) (x))) args)))
+					((car (rassoc x syms :key 'car :test 'equal))) (x))) args)))
       `(let ,syms
 	 ,(do-sequence-search (cadr r) (cddr r) (if (eq (car w) 'map) :newseq :dest) (car r))))))
+(si::putprop 'map      'map-into-compiler-macro 'si::compiler-macro-prop)
 (si::putprop 'map-into 'map-into-compiler-macro 'si::compiler-macro-prop)
-(si::putprop 'map 'map-into-compiler-macro 'si::compiler-macro-prop)
 
 (defun maybe-reduce-lambda-wrap (lm)
   (cond ((atom lm) lm)
@@ -1164,7 +1175,6 @@
 			      (cmp-nth . nth)
 			      (cmp-aref . row-major-aref)
 			      (cmp-aset . si::aset1)
-;			      (cmp-array-element-type . si::array-element-type)
 			      (cmp-array-dimension . array-dimension)))
 
 (defun c1symbol-fun (fname args &aux fd)

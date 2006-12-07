@@ -253,7 +253,8 @@
 		       (when xy 
 			 (cond ((eq (car xy) '*) (cadr xy))
 			       ((eq (cadr xy) '*) (car xy))
-			       ((eq (car xy) (cadr xy)) (car xy)))))
+			       ((eq (car xy) (cadr xy)) (car xy))
+			       ('error))))
 		     (mapcar 'sequence-type-element-type-int (cdr type))))))
 	  
 (defun sequence-type-element-type (type)

@@ -214,16 +214,16 @@ object x;
 	return(Cnil);
 }*/
 
-void
-stack_cons(void)
-{
-	object c;
+/* void */
+/* stack_cons(void) */
+/* { */
+/* 	object c; */
 
-	c = alloc_object(t_cons);
-	c->c.c_cdr = vs_pop;
-	c->c.c_car = vs_pop;
-	*vs_top++ = c;
-}
+/* 	c = alloc_object(t_cons); */
+/* 	c->c.c_cdr = vs_pop; */
+/* 	c->c.c_car = vs_pop; */
+/* 	*vs_top++ = c; */
+/* } */
 
 object on_stack_list_vector_new(fixnum n,object first,va_list ap)
 {object res=(object) alloca_val;

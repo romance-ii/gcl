@@ -59,11 +59,13 @@
 
 
 (defun two-tp-inf (fn t2);;FIXME use num type bounds here for or types
-  (case fn
-	((> >=) (if (and (consp t2) (member (car t2) '(integer short-float long-float)))
-		    (cmp-norm-tp `(real ,(or (cadr t2) '*))) t))
-	((< <=) (if (and (consp t2) (member (car t2) '(integer short-float long-float)))
-		    (cmp-norm-tp `(real * ,(or (caddr t2) '*))) t))))
+  (if (type-and t2 #tratio) t ;;FIXME
+    (let ((t2 (type-and #tlong-float (sublis '((integer . long-float) (short-float . long-float)) t2))))
+      (case fn
+	(>  (cmp-norm-tp `(real ,(cond ((numberp (cadr t2)) (list (cadr t2))) ((cadr t2)) ('*)))))
+	(>= (cmp-norm-tp `(real ,(or (cadr t2) '*))))
+	(<  (cmp-norm-tp `(real * ,(cond ((numberp (caddr t2)) (list (caddr t2))) ((caddr t2)) ('*)))))
+	(<= (cmp-norm-tp `(real * ,(or (caddr t2) '*))))))))
 
 (defmacro vl-name (x) `(var-name (car (third ,x))))
 (defmacro itp (x) `(info-type (second ,x)))

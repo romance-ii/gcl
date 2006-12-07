@@ -578,7 +578,8 @@
 	(push (pop args) decls))
     (let* ((nal (do (r (y ll)) ((or (not y) (eq (car y) '&aux)) (nreverse r)) (push (pop y) r)))
 	   (al (cdr (member '&aux ll)))
-	   (dd (aux-decls (mapcar (lambda (x) (if (atom x) x (car x))) al) decls)))
+	   (dd (aux-decls (mapcar (lambda (x) (if (atom x) x (car x))) al) decls))
+	   (*mlts* '(or and not)));FIXME
       (portable-source `(lambda ,nal
 			  ,@doc
 			  (declare (optimize (safety ,(cond (*compiler-push-events* 3)
@@ -728,8 +729,10 @@
 		       (setq problem t))))
 	       (numberp cfun))))
        ;;whew: it is acceptable.
-       (push (let ((at (get-arg-types fname)) (rt (get-return-type fname)))
-	       (list fname at (link-rt rt (member '* at))
+       (push (let* ((at (get-arg-types fname))
+		    (vr (member '* at))
+		    (rt (get-return-type fname)))
+	       (list fname (mapcar (lambda (x) (link-rt x vr)) at) (link-rt rt vr)
 		     (if (single-type-p rt) (flags set ans) (flags set ans sets-vs-top))
 		     (make-inline-string cfun at fname)))
 	     *inline-functions*)))

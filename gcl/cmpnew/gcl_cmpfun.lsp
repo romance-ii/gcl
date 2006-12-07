@@ -465,40 +465,16 @@
 ;	((let ((info (make-info))) (list 'call-global info 'or (c1args args info))))))
 ;(si::putprop 'or 'c1or 'c1)
 
-(defun cmp-array-element-type (&rest args)
-  (and 
-   args
-   (let ((z (or (not (typep (car args) 'array)) (upgraded-array-element-type (array-element-type (car args)))))
-	 (y (apply 'cmp-array-element-type (cdr args))))
-     ;;need type-or here
-     (cond ((type>= y z) y)
-	   ((type>= z y) z)
-	   (t)))))
-
-(defun array-element-subtype (type)
-  (let ((type (cmp-norm-tp type)))
-    (or 
-     (not (consp type))
-     (not (member (car type) '(array simple-array)))
-     (null (cadr type))
-     (eq (cadr type) '*)
-     (cadr type))))
-
-(defun cmp-array-element-subtype (args)
-  (and 
-   args
-   (let ((z (array-element-subtype (car args)))
-	 (y (cmp-array-element-subtype (cdr args))))
-     ;;need type-or here
-     (cond ((type>= y z) y)
-	   ((type>= z y) z)
-	   (t)))))
-
-(defun c1cmp-array-element-type (args)
+(defun c1array-element-type (args)
   (let* ((info (make-info))
-	 (nargs (c1args args info)))
-    (c1expr `(quote ,(cmp-array-element-subtype (mapcar (lambda (x) (info-type (cadr x))) nargs))))))
-(si::putprop 'cmp-array-element-type 'c1cmp-array-element-type 'c1)
+	 (nargs (c1args args info))
+	 (vt (info-type (cadar nargs)))
+	 (vt (if (type>= #tarray vt) (si::sequence-type-element-type-int vt) 'error))
+	 (vt (if (eq '* vt) 'error vt)))
+    (cond ((not (eq 'error vt))
+	   (c1expr `(quote ,vt)))
+	  ((list 'call-global info 'array-element-type nargs)))))
+(si::putprop 'array-element-type 'c1array-element-type 'c1)
 
 (defun cons-type-length (type)
   (cond ((and (consp type) (eq (car type) 'cons)) (the seqind (+ 1 (cons-type-length (caddr type)))))
@@ -1143,7 +1119,4 @@
        (wt ";")))
   (unwind-exit (list 'CAR l))
   (wt "}")
-  (close-inline-blocks)
-  )
-
-
+  (close-inline-blocks))

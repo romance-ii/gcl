@@ -1086,9 +1086,8 @@ DEFUN_NEW("ARRAY-HAS-FILL-POINTER-P",object,
      
 */
 
-DEFUNO_NEW("ARRAY-ELEMENT-TYPE",object,fLarray_element_type,
-       LISP,1,1,NONE,OO,OO,OO,OO,void,Larray_element_type,(object x),"")
-{ enum aelttype t;
+DEFUN_NEW("ARRAY-ELEMENT-TYPE",object,fLarray_element_type,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") { 
+  enum aelttype t;
   t = Iarray_element_type(x);
   return * aet_types[(int)t].namep;
 }

@@ -71,8 +71,19 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * s_hpack to Cnil in gbc whens et to nil package;FFN(fSihs_top) for
     ia64
   * Fix set-form-type on nil return forms (non-local exits)
+  * more array tests for gcl;axe clcs-error-set;broaden fast-link
+    checking types;axe cmp-array-element-type;c1array-element-
+    type;fboundp-expander;redo sequence-type-element-type;tighter two-
+    tp-inf;faster make-info;function-lambda-expression in
+    disassemble;boundp,symbol-package,symbol-value,symbol-function, and
+    fboundp inlines;exclude and,or,not from portable-source
+    expansion;stack_cons macro;speedup add-hash and clear-compiler-
+    properties;faster search;tighter returns on
+    search,position,count,mismatch;underflow errors with C
+    optimization;boundp,symbol-package,symbol-value,symbol-function,
+    array-element-type and fboundp fastlinks
 
- -- Camm Maguire <camm@enhanced.com>  Mon,  4 Dec 2006 14:07:15 -0500
+ -- Camm Maguire <camm@enhanced.com>  Thu,  7 Dec 2006 18:51:28 -0500
 
 gclcvs (2.7.0-61) unstable; urgency=low
 
