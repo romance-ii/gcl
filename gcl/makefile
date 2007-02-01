@@ -74,8 +74,8 @@ $(PORTDIR)/saved_pre_gcl: $(HDIR)cmpinclude.h
 	cd $(@D) && echo '(si::use-fast-links nil)(load "boot.lisp")' | $(@F) && $(MAKE) saved_gcl && mv saved_gcl $(@F)
 
 $(PORTDIR)/saved_gcl: $(PORTDIR)/saved_pre_gcl $(HDIR)cmpinclude.h 
-	(cd $(LSPDIR); touch *.lsp ; $(MAKE) all)
-	(cd $(CMPDIR); touch *.lsp ; $(MAKE) all)
+#	(cd $(LSPDIR); touch *.lsp ; $(MAKE) all)
+#	(cd $(CMPDIR); touch *.lsp ; $(MAKE) all)
 	cd $(@D) && echo '(load "boot.lisp")' | $< && $(MAKE) $(@F)
 
 $(PORTDIR)/saved_mod_gcl: $(PORTDIR)/saved_gcl
