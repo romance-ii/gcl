@@ -76,7 +76,7 @@ $(PORTDIR)/saved_pre_gcl: $(HDIR)cmpinclude.h
 $(PORTDIR)/saved_gcl: $(PORTDIR)/saved_pre_gcl $(HDIR)cmpinclude.h 
 #	(cd $(LSPDIR); touch *.lsp ; $(MAKE) all)
 #	(cd $(CMPDIR); touch *.lsp ; $(MAKE) all)
-	cd $(@D) && echo '(load "boot.lisp")' | $< && $(MAKE) $(@F)
+	cd $(@D) && echo '(load "boot.lisp")' | $(<F) && $(MAKE) $(@F)
 
 $(PORTDIR)/saved_mod_gcl: $(PORTDIR)/saved_gcl
 	(cd $(MODDIR); $(MAKE) clean; $(MAKE) all)
