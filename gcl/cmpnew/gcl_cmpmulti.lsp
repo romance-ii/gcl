@@ -43,7 +43,7 @@
   (let* ((nargs (c1args (cdr args) (make-info)))
 	 (tps (mapcar (lambda (x) (info-type (cadr x))) nargs)))
     (cond ((endp (cdr args)) (c1funcall args))
-	  ((and (every 'nval tps)
+	  ((and (not (member-if-not 'nval tps))
 		(inline-possible 'multiple-value-bind))
 	   (let* ((n (reduce '+ (mapcar 'nval tps)))
 		  (syms (mapcar (lambda (x) (declare (ignore x)) (gensym)) (make-list n)))
@@ -138,7 +138,10 @@
 
 (defun c1values (args &aux (info (make-info)))
       (cond ((and args (not (cdr args)))
-	     (c1expr (let ((s (gensym))) `(let ((,s ,(car args))) ,s))))
+	     (let ((nargs (c1args args info)))
+	       (if (type>= t (info-type (cadar nargs)))
+		   (c1expr (car args))
+		 (c1expr (let ((s (gensym))) `(let ((,s ,(car args))) ,s))))))
 	    (t  (setq args (c1args args info))
 		(setf (info-type info) 
 		      (cmp-norm-tp 
@@ -269,36 +272,36 @@
 ;(defvar *dmbsrl* 2)
 
 ;;FIXME -- rewrite this more in line with let case, to catch certain changed bindings too.
-(defun declare-multiple-value-bindings (args specials)
-  (if (>= *dlbs* *dlbsrl*) args
-    (let ((*dlbs* (1+ *dlbs*))
-	  (info (make-info))
-	  (newvars *vars*))
-      (dolist (var (car args))
-	(push (c1make-var var nil nil nil) newvars))
-      (let ((expt (let ((*suppress-compiler-warnings* t)
-			(*suppress-compiler-notes* t))
-		    (prog1 
-			(info-type (cadr (c1expr (cadr args))))
-		      (let ((*vars* newvars)
-			    (*undefined-vars* *undefined-vars*))
-			(c1args (c1body (cddr args) nil) info))))))
-	(let* ((decls (remove-if-not 
-		       't-to-nil
-		       (if (and (consp expt) (eq (car expt) 'values))
-			   (mapcar 'list (cdr expt) (car args))
-			 (list (list expt (caar args)))) :key 'car))
-	       (decls (remove-if
-		       (lambda (x)
-			 (or (si::specialp x) (member x specials)
-			     (let ((nv (car (member x newvars :key 'var-name :test 'eq))))
-			       (when (is-changed nv info)
-				 (cmpnote "Multiple-value-binding ~S is changed and cannot be declared~%" x)
-				 t)))) decls :key 'cadr)))
-	  (if decls
-	      (progn (cmpnote "Multiple-value bindings ~S of type ~S~%" (car args) decls )
-		     (cons (car args) (cons (cadr args) (cons (cons 'declare decls) (cddr args)))))
-	    args))))))
+;; (defun declare-multiple-value-bindings (args specials)
+;;   (if (>= *dlbs* *dlbsrl*) args
+;;     (let ((*dlbs* (1+ *dlbs*))
+;; 	  (info (make-info))
+;; 	  (newvars *vars*))
+;;       (dolist (var (car args))
+;; 	(push (c1make-var var nil nil nil) newvars))
+;;       (let ((expt (let ((*suppress-compiler-warnings* t)
+;; 			(*suppress-compiler-notes* t))
+;; 		    (prog1 
+;; 			(info-type (cadr (c1expr (cadr args))))
+;; 		      (let ((*vars* newvars)
+;; 			    (*undefined-vars* *undefined-vars*))
+;; 			(c1args (c1body (cddr args) nil) info))))))
+;; 	(let* ((decls (remove-if-not 
+;; 		       't-to-nil
+;; 		       (if (and (consp expt) (eq (car expt) 'values))
+;; 			   (mapcar 'list (cdr expt) (car args))
+;; 			 (list (list expt (caar args)))) :key 'car))
+;; 	       (decls (remove-if
+;; 		       (lambda (x)
+;; 			 (or (si::specialp x) (member x specials)
+;; 			     (let ((nv (car (member x newvars :key 'var-name :test 'eq))))
+;; 			       (when (is-changed nv info)
+;; 				 (cmpnote "Multiple-value-binding ~S is changed and cannot be declared~%" x)
+;; 				 t)))) decls :key 'cadr)))
+;; 	  (if decls
+;; 	      (progn (cmpnote "Multiple-value bindings ~S of type ~S~%" (car args) decls )
+;; 		     (cons (car args) (cons (cadr args) (cons (cons 'declare decls) (cddr args)))))
+;; 	    args))))))
 
 ;(defun multiple-binding-decls (vars mv-form body &optional expn vls)
 ;  (cond ((and (not expn) (not vls) (not (eq (car mv-form) 'values)) (symbolp (car mv-form)))
@@ -360,7 +363,7 @@
   (when (or (endp args) (endp (cdr args)))
     (too-few-args 'multiple-value-bind 2 (length args)))
 
-  (setq args (declare-multiple-value-bindings args ss))
+;  (setq args (declare-multiple-value-bindings args ss))
 
   (multiple-value-setq (body ss ts is other-decls) (c1body (cddr args) nil))
 

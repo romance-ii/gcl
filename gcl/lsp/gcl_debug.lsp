@@ -100,7 +100,7 @@
 		(setq name (compiled-function-name fun)))
 	       ((when (interpreted-function-p fun) (setq fun (interpreted-function-lambda fun)) nil))
 	       (t (setq name fun)))
-         (if (symbolp name)(setq args (get name 'debug)))
+         (if (symbolp name)(setq args (get name 'debugger)))
 	 (let ((next (ihs-vs (f + 1 *current-ihs*))))
 	   (cond (next
 		  (format *debug-io* ">> ~a():" name)
@@ -720,7 +720,7 @@
 				      (end (min (ihs-vs (1+ ihs)) (vs-top))))
   (format *display-string* "")
   (do ((i base )
-       (v (get (ihs-fname ihs) 'debug) (cdr v)))
+       (v (get (ihs-fname ihs) 'debugger) (cdr v)))
       ((or (fb >= i end)(fb > (fill-pointer *display-string*) plength)))
     (format *display-string* "~a~@[~d~]=~s~@[,~]"
 	    (or (car v)  'loc) (if (not (car v)) (f - i base)) (vs i)

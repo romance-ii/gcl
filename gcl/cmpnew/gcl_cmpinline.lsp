@@ -39,24 +39,25 @@
 (defmacro mia (x y) `(si::make-vector t ,x t ,y nil nil nil nil))
 (defmacro eql-not-nil (x y) `(and ,x (eql ,x ,y)))
 
+(defvar +empty-info-array+ (make-array 0 :fill-pointer 0));FIXME cannot read constant arrays
+
 (defstruct (info (:copier old-copy-info)) ;(:constructor old-make-info))
   (type t)		    ;;; Type of the form.
   (sp-change 0   :type bit) ;;; Whether execution of the form may change the value of a special variable *VS*.
   (volatile  0   :type bit) ;;; whether there is a possible setjmp
   (unused    0   :type char)
   (unused1   0   :type char)
-  (changed-array (mia 10 0))     ;;; List of var-objects changed by the form. 
-  (referred-array (mia 10 0)))	 ;;; List of var-objects referred in the form.
-
-
+  (changed-array +empty-info-array+ :type (vector t));(mia 10 0))     ;;; List of var-objects changed by the form. 
+  (referred-array +empty-info-array+ :type (vector t)));(mia 10 0)))	 ;;; List of var-objects referred in the form.
 
 (defun copy-array (array)
   (declare ((vector t) array))
-  (let ((new-array (mia (the fixnum (array-total-size array)) (length array))))
-    (declare ((vector t) new-array))
-    (do ((i 0 (1+ i))) ((>= i (length array)) new-array)
-      (declare (fixnum i))
-      (setf (aref new-array i) (aref array i)))))
+  (cond ((eq +empty-info-array+ array) array)
+	((let ((new-array (mia (the fixnum (array-total-size array)) (length array))))
+	   (declare ((vector t) new-array))
+	   (do ((i 0 (1+ i))) ((>= i (length array)) new-array)
+	       (declare (fixnum i))
+	       (setf (aref new-array i) (aref array i)))))))
 
 (defun copy-info (info)
   (let ((new-info (old-copy-info info)))
@@ -92,13 +93,12 @@
   (let ((j (bsearchleq x ar s (length ar) t)))
     (when (and (< j (length ar)) (eq (aref ar j) x))
 	(return-from push-array -1))
-    (let ((ar (if (= (length ar) (array-total-size ar))
-		  (adjust-array ar (* 2 (length ar)))
-		ar)))
+    (let ((ar (cond ((= (length ar) (array-total-size ar)) (adjust-array ar (* 2 (length ar))))
+		    (ar))))
       (declare ((vector t) ar))
       (do ((i (length ar) (1- i))) ((<= i j))
 	  (declare (seqind i))
-	  (setf (aref ar i) (aref ar  (1- i))))
+	  (setf (aref ar i) (aref ar (1- i))))
       (setf (aref ar j) x)
       (setf (fill-pointer ar)  (1+ (length ar)))
       j)))
@@ -116,6 +116,8 @@
 (defmacro in-array (v ar)
   `(< (bsearchleq ,v ,ar 0 (length ,ar) nil) (length ,ar)))
 
+(defmacro adjustable-array (array)
+  `(if (eq ,array +empty-info-array+) (setf ,array (mia 10 0)) ,array))
 
 (defmacro do-referred ((v info) &rest body)
   `(do-array (,v (info-referred-array ,info)) ,@body))
@@ -126,13 +128,13 @@
 (defmacro is-changed (var info)
   `(in-array ,var (info-changed-array ,info)))
 (defmacro push-referred (var info)
-  `(push-array ,var (info-referred-array ,info) 0 nil))
+  `(push-array ,var (adjustable-array (info-referred-array ,info)) 0 nil))
 (defmacro push-changed (var info)
-  `(push-array ,var (info-changed-array ,info) 0 nil))
+  `(push-array ,var (adjustable-array (info-changed-array ,info)) 0 nil))
 (defmacro push-referred-with-start (var info s lin)
-  `(push-array ,var (info-referred-array ,info) ,s ,lin))
+  `(push-array ,var (adjustable-array (info-referred-array ,info)) ,s ,lin))
 (defmacro push-changed-with-start (var info s lin)
-  `(push-array ,var (info-changed-array ,info) ,s ,lin))
+  `(push-array ,var (adjustable-array (info-changed-array ,info)) ,s ,lin))
 (defmacro changed-length (info)
   `(length (info-changed-array ,info)))
 (defmacro referred-length (info)
@@ -161,22 +163,51 @@
 	 (lin)); (mlin (changed-length from-info) (changed-length to-info))))
     (declare (fixnum s) (object lin))
     (do-changed (v from-info)
-		(let ((res (push-changed-with-start v to-info s lin)))
-		  (declare (fixnum res))
-		  (when (>= res 0)
-		    (setq s (the fixnum (1+ res)))))))
+		(when (member v *vars*);(member (var-name v) *vars* :key (lambda (x) (when (var-p x) (var-name x))))
+		  (let ((res (push-changed-with-start v to-info s lin)))
+		    (declare (fixnum res))
+		    (when (>= res 0)
+		      (setq s (the fixnum (1+ res))))))))
   (let* ((s 0)
 	 (lin)); (mlin (referred-length from-info) (referred-length to-info))))
     (declare (fixnum s) (object lin))
     (do-referred (v from-info)
-		 (let ((res (push-referred-with-start v to-info s lin)))
-		   (declare (fixnum res))
-		   (when (>= res 0)
-		     (setq s (the fixnum (1+ res)))))))
+		(when (member v *vars*);(member (var-name v) *vars* :key (lambda (x) (when (var-p x) (var-name x))))
+		  (let ((res (push-referred-with-start v to-info s lin)))
+		    (declare (fixnum res))
+		    (when (>= res 0)
+		      (setq s (the fixnum (1+ res))))))))
   (when (/= (info-sp-change from-info) 0)
     (setf (info-sp-change to-info) 1))
   ;; Return to-info, CM 20031030
   to-info)
+
+;; (defun add-info (to-info from-info)
+;;   ;; Allow nil from-info without error CM 20031030
+;;   (unless from-info
+;;     (return-from add-info to-info))
+;;   (let* ((s 0)
+;; 	 (lin)); (mlin (changed-length from-info) (changed-length to-info))))
+;;     (declare (fixnum s) (object lin))
+;;     (do-changed (v from-info)
+;; 		(when (member (var-name v) *vars* :key (lambda (x) (when (var-p x) (var-name x))))
+;; 		  (let ((res (push-changed-with-start v to-info s lin)))
+;; 		    (declare (fixnum res))
+;; 		    (when (>= res 0)
+;; 		      (setq s (the fixnum (1+ res))))))))
+;;   (let* ((s 0)
+;; 	 (lin)); (mlin (referred-length from-info) (referred-length to-info))))
+;;     (declare (fixnum s) (object lin))
+;;     (do-referred (v from-info)
+;; 		(when (member (var-name v) *vars* :key (lambda (x) (when (var-p x) (var-name x))))
+;; 		  (let ((res (push-referred-with-start v to-info s lin)))
+;; 		    (declare (fixnum res))
+;; 		    (when (>= res 0)
+;; 		      (setq s (the fixnum (1+ res))))))))
+;;   (when (/= (info-sp-change from-info) 0)
+;;     (setf (info-sp-change to-info) 1))
+;;   ;; Return to-info, CM 20031030
+;;   to-info)
 
 (defun args-info-changed-vars (var forms)
   (if (member (var-kind var) #l(FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT))
@@ -704,27 +735,50 @@
 	(eq (car *value-to-go*) 'var)
 	(/= (var-dynamic (second *value-to-go*)) 0)))
 
-(defun list-inline (&rest x &aux (n (length x)))
-  (let ((tem (can-allocate-on-stack)))
-    (if tem
-	(wt "(ALLOCA_CONS(" n "),ON_STACK_LIST(" n)
-      (wt "list(" (length x)))
-    (dolist (loc x) (wt #\, loc))
-    (wt #\))
-    (if tem (wt #\)))))
+;; (defun list-inline (&rest x &aux (n (length x)))
+;;   (let ((tem (can-allocate-on-stack)))
+;;     (if tem
+;; 	(wt "(ALLOCA_CONS(" n "),ON_STACK_LIST(" n)
+;;       (wt "list(" (length x)))
+;;     (dolist (loc x) (wt #\, loc))
+;;     (wt #\))
+;;     (if tem (wt #\)))))
 
+(defun wt-stack-list* (x l &optional n)
+  (let ((z (or n (length x))))
+    (wt-nl "!" z "? Cnil : (alloca_val=alloca((" z ")*sizeof(struct cons)+sizeof(object)),");FIXME double eval
+    (wt-nl "({object _b=(void *)alloca_val;if (((unsigned long)_b)&sizeof(_b)) _b++;")
+    (wt-nl "{register struct cons *_p=(void *)_b;")
+    (cond (n (wt-nl "{struct cons *_e=_p+(" n "-1);")
+	     (wt-nl "for (;_p<_e;_p++) {_p->c_car=Cnil;_p->c_cdr=(object)(_p+1);}} _p->c_car=_p->c_cdr=Cnil;}_b;}))"))
+	  ((dolist (x x (wt-nl "_p[-1].c_cdr=" l ";}_b;}))"))
+	     (wt-nl "_p->c_car=" x ";_p->c_cdr=(object)(_p+1);_p++;"))))))
+
+(defun list-inline (&rest x)
+  (cond ((can-allocate-on-stack) (wt-stack-list* x nil))
+	((endp (cdr x)) (wt "make_cons(" (car x) ",Cnil)"))
+	(t 
+	 (wt "list(" (length x))
+	 (dolist (loc x (wt #\))) (wt #\, loc)))))
+
+(defun list*-inline (&rest x)
+  (if (can-allocate-on-stack)
+      (wt-stack-list* (butlast x) (car (last x)))
+    (case (length x)
+	  (1 (wt (car x)))
+	  (2 (wt "make_cons(" (car x) "," (cadr x) ")"))
+	  (otherwise
+	   (wt "listA(" (length x)) (dolist (loc x) (wt #\, loc)) (wt #\))))))
+  
 (defun make-list-inline (n)
-  (let ((tem (can-allocate-on-stack)))
-    (if tem
-	(wt "(ALLOCA_CONS(" n "),ON_STACK_MAKE_LIST(" n "))")
-      (wt "make_list(" n ")"))))
-
+  (if (can-allocate-on-stack)
+      (wt-stack-list* nil nil n)
+    (wt "make_list(" n ")")))
 
 (defun cons-inline (x y)
-  (let ((tem (can-allocate-on-stack)))
-    (if tem
-	(wt "ON_STACK_CONS(" x "," y ")")
-      (wt "make_cons(" x "," y ")"))))
+  (if (can-allocate-on-stack) 
+      (wt-stack-list* (list x) y)
+    (wt "make_cons(" x "," y ")")))
 
 ;;FIXME -- All the var and C type code, e.g. var-type and var-kind, needs much centralization.
 ;;         20050106 CM.
@@ -819,7 +873,9 @@
 		(wt-bv-shift a i) 
 		(wt "&0x1)"))
 	    (wt  "((" (c-cast aet) " *)(" a ")->v.v_self)[" i "]"))
-	(wt "fLrow_major_aref(" a "," i ")")))))
+	(if *safe-compile*
+	    (wt "fLrow_major_aref(" a "," i ")")
+	  (wt "((" a ")->v.v_elttype==aet_object ? (" a ")->v.v_self[" i "] : fLrow_major_aref(" a "," i "))"))))))
   
   
 (setf (symbol-function 'cmp-aset) (symbol-function 'si::aset1))
@@ -872,13 +928,6 @@
 	    ((and (constantp i) (> i 0))
 	     (wt "(" a ")->a.a_dims[(" i ")]"))
 	    ((wt "(type_of(" a ")==t_array ? (" a ")->a.a_dims[(" i ")] : (" a ")->v.v_dim)"))))))
-
-(defun list*-inline (&rest x)
-  (case (length x)
-        (1 (wt (car x)))
-        (2 (wt "make_cons(" (car x) "," (cadr x) ")"))
-        (otherwise
-         (wt "listA(" (length x)) (dolist (loc x) (wt #\, loc)) (wt #\)))))
 
 ;;; Borrowed from LFUN_LIST.LSP
 

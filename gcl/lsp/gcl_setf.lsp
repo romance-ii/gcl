@@ -43,6 +43,23 @@
 ;(eval-when (eval compile) (defun si:clear-compiler-properties (symbol code)))
 (eval-when (eval compile) (setq si:*inhibit-macro-special* nil))
 
+(defun join (l1 l2)
+  (do (r rp (l1 l1 (cdr l1)) (l2 l2 (cdr l2)))
+      ((or (endp l1) (endp l2)) r)
+      (let ((tmp (cons (list (car l1) (car l2)) nil)))
+	(setq rp (cond (rp (rplacd rp tmp) tmp) ((setq r tmp)))))))
+
+(defun to-gensyms (l1)
+  (do (r rp (l1 l1 (cdr l1)))
+      ((endp l1) r)
+      (let ((tmp (cons (gensym) nil)))
+	(setq rp (cond (rp (rplacd rp tmp) tmp) ((setq r tmp)))))))
+
+(defun to-quote-cadadr (l1)
+  (do (r rp (l1 l1 (cdr l1)))
+      ((endp l1) r)
+      (let ((tmp (cons (list 'quote (cadadr (car l1))) nil)))
+	(setq rp (cond (rp (rplacd rp tmp) tmp) ((setq r tmp)))))))
 
 ;;; DEFSETF macro.
 (defmacro defsetf (access-fn &rest rest)
@@ -135,7 +152,7 @@
 	 (apply (get (car form) 'setf-method) env (cdr form)))
 	((or (get (car form) 'setf-update-fn)
 	     (setq tem (get (car form) 'si::structure-access)))
-	 (let ((vars (mapcar (lambda (x) (declare (ignore x)) (gensym)) (cdr form)))
+	 (let ((vars (to-gensyms (cdr form)))
 	       (store (gensym)))
 	   (values vars (cdr form) (list store)
 	           (cond (tem (setf-structure-access (car vars) (car tem) (cdr tem) store))
@@ -143,7 +160,7 @@
 			    ,@vars ,store)))
 		   (cons (car form) vars))))
 	((get (car form) 'setf-lambda)
-	 (let* ((vars (mapcar (lambda (x) (declare (ignore x)) (gensym)) (cdr form)))
+	 (let* ((vars (to-gensyms (cdr form)))
 		(store (gensym))
 		(l (get (car form) 'setf-lambda))
 		;; this looks bogus to me.  What if l is compiled?--wfs
@@ -154,10 +171,7 @@
 	((macro-function (car form))
 	 (get-setf-method-multiple-value (macroexpand form env)))
 	(t 
-	 (let ((vars (mapcar #'(lambda (x)
-	                         (declare (ignore x))
-	                         (gensym))
-	                     (cdr form)))
+	 (let ((vars (to-gensyms (cdr form)))
 	       (store (gensym)))
 	   (values vars (cdr form) (list store)
 	           `(funcall
@@ -375,9 +389,7 @@
   (multiple-value-bind (vars vals stores store-form access-form)
       (get-setf-method place env)
     (declare (ignore access-form))
-    `(let* ,(mapcar #'list
-		    (append vars stores)
-		    (append vals (list newvalue)))
+    `(let* ,(join (append vars stores) (append vals (list newvalue)))
        ,store-form)))
 
 (defun setf-structure-access (struct type index newvalue)
@@ -430,9 +442,7 @@
 	     (setq store-forms (cons store-form store-forms))
 	     (setq pairs
 		   (nconc pairs
-			  (mapcar #'list
-				  (append vars stores)
-				  (append vals (list (cadr r)))))))))))
+			  (join (append vars stores) (append vals (list (cadr r)))))))))))
 
 
 ;;; SHIFTF macro.
@@ -450,13 +460,13 @@
        (setq access-forms (nreverse access-forms))
        `(let* ,(nconc pairs
 		      (list (list g (car access-forms)))
-		      (mapcar #'list stores (cdr access-forms))
+		      (join stores (cdr access-forms))
 		      (list (list (car (last stores)) (car r))))
 	    ,@store-forms
 	    ,g))
     (multiple-value-bind (vars vals stores1 store-form access-form)
 	(get-setf-method (car r) env)
-      (setq pairs (nconc pairs (mapcar #'list vars vals)))
+      (setq pairs (nconc pairs (join vars vals)))
       (setq stores (cons (car stores1) stores))
       (setq store-forms (cons store-form store-forms))
       (setq access-forms (cons access-form access-forms)))))
@@ -476,14 +486,14 @@
        (setq access-forms (nreverse access-forms))
        (when store-forms
 	 `(let* ,(nconc pairs
-		      (mapcar #'list stores (cdr access-forms))
+		      (join stores (cdr access-forms))
 		      (list (list (car (last stores)) (car access-forms))))
 	    ,@store-forms
 	    nil
 	    )))
     (multiple-value-bind (vars vals stores1 store-form access-form)
 	(get-setf-method (car r) env)
-      (setq pairs (nconc pairs (mapcar #'list vars vals)))
+      (setq pairs (nconc pairs (join vars vals)))
       (setq stores (cons (car stores1) stores))
       (setq store-forms (cons store-form store-forms))
       (setq access-forms (cons access-form access-forms)))))
@@ -494,7 +504,7 @@
       (make-update-form function access-form (cdr others)
 			(cons (list 'list (list 'quote (gensym)) (car others)) lets))
     `(list 'let* (list ,@lets)
-	   (list ',function access-form ,@(mapcar (lambda (x) (list 'quote (cadadr x))) lets)))))
+	   (list ',function access-form ,@(to-quote-cadadr lets)))))
 
 ;;; DEFINE-MODIFY-MACRO macro.
 ;;FIXME -- this is really ugly and error prone.  CM 20041214
@@ -522,9 +532,7 @@
        (multiple-value-bind (vars vals stores store-form access-form)
 	   (get-setf-method reference env)
          (list 'let*
-	       (mapcar #'list
-		       (append vars stores)
-		       (append vals (list ,update-form)))
+	       (join (append vars stores) (append vals (list ,update-form)))
 	       store-form)))))
 
 
@@ -580,9 +588,7 @@
 			   (setq ,place (cons ,myitem ,place)))))
     (multiple-value-bind (vars vals stores store-form access-form)
 			 (get-setf-method place env)
-			 `(let* ,(mapcar #'list
-					 (append (list myitem) vars stores)
-					 (append (list   item) vals (list (list 'cons myitem access-form))))
+			 `(let* ,(join (append (list myitem) vars stores) (append (list   item) vals (list (list 'cons myitem access-form))))
 			    ,store-form))))
 
 (defmacro pushnew (&environment env item place &rest rest)
@@ -593,10 +599,8 @@
 				   (setq ,place (adjoin ,myitem ,place ,@rest))))))
     (multiple-value-bind (vars vals stores store-form access-form)
 			 (get-setf-method place env)
-			 `(let* ,(mapcar #'list
-					 (append (list myitem) vars stores)
-					 (append (list   item) vals
-						 (list (list* 'adjoin myitem access-form rest))))
+			 `(let* ,(join (append (list myitem) vars stores) 
+				       (append (list item) vals  (list (list* 'adjoin myitem access-form rest))))
 			    ,store-form))))
 
 (defmacro pop (&environment env place)
@@ -609,16 +613,14 @@
                 ,temp))))
   (multiple-value-bind (vars vals stores store-form access-form)
       (get-setf-method place env)
-    `(let* ,(mapcar #'list
-		    (append vars stores)
-		    (append vals (list (list 'cdr access-form))))
+    `(let* ,(join (append vars stores) (append vals (list (list 'cdr access-form))))
        (prog1 (car ,access-form)
               ,store-form))))
 
 (defun fdefinition (name)
   (declare (optimize (safety 1)))
   (check-type name function-identifier)
-  (cond ((symbolp name) (values (symbol-function name)))
+  (cond ((symbolp name) (if (fboundp name) (symbol-function name) (error :undefined-function "function ~s is undefined" name)))
 	((let ((z (get (cadr name) 'setf-function)))
 	   (cond ((not z) (error :undefined-function "function ~s is undefined" name))
 		 ((not (symbolp z)) z)

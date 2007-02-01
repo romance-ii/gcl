@@ -1042,21 +1042,20 @@ LFD(Lldiff)() {
 	vs_popp;
 }
 
-LFD(Lrplaca)()
-{
-	check_arg(2);
-	check_type_cons(&vs_base[0]);
-	take_care(vs_base[1]);
-	vs_base[0]->c.c_car = vs_base[1];
-	vs_popp;
+DEFUN_NEW("RPLACA",object,fLrplaca,LISP,2,2,NONE,OO,OO,OO,OO,(object o,object c),"") {
+
+  check_type_cons(&o);
+  o->c.c_car = c;
+  RETURN1(o);
+
 }
 
-LFD(Lrplacd)()
-{
-	check_arg(2);
-	check_type_cons(&vs_base[0]);
-	vs_base[0]->c.c_cdr = vs_base[1];
-	vs_popp;
+DEFUN_NEW("RPLACD",object,fLrplacd,LISP,2,2,NONE,OO,OO,OO,OO,(object o,object d),"") {
+
+  check_type_cons(&o);
+  o->c.c_cdr = d;
+  RETURN1(o);
+
 }
 
 @(defun subst (new old tree &key test test_not key)
@@ -1404,8 +1403,8 @@ gcl_init_list_function()
 	make_function("BUTLAST", Lbutlast);
 	make_function("NBUTLAST", Lnbutlast);
 	make_function("LDIFF", Lldiff);
-	make_function("RPLACA", Lrplaca);
-	make_function("RPLACD", Lrplacd);
+/* 	make_function("RPLACA", Lrplaca); */
+/* 	make_function("RPLACD", Lrplacd); */
 	make_function("SUBST", Lsubst);
 	make_function("SUBST-IF", Lsubst_if);
 	make_function("SUBST-IF-NOT", Lsubst_if_not);

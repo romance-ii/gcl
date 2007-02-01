@@ -141,20 +141,20 @@ structure_set(object x, object name, int i, object v)
  return(v);
 }
 
-static void
-FFN(siLstructure_subtype_p)(void)
-{object x,y;
- check_arg(2);
- x=vs_base[0];
- y=vs_base[1];
- if (type_of(x)!=t_structure)
-   {vs_base[0]=Cnil; goto BOTTOM;}
- x=x->str.str_def;
- COERCE_DEF(y);
- if (structure_subtypep(x,y)) vs_base[0]=Ct;
- else vs_base[0]=Cnil;
- BOTTOM:
- vs_top=vs_base+1;
+DEFUN_NEW("STRUCTURE-SUBTYPE-P",object,fSstructure_subtype_p,SI,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") {
+
+/* static void */
+/* FFN(siLstructure_subtype_p)(void) */
+/* {object x,y; */
+/*  check_arg(2); */
+/*  x=vs_base[0]; */
+/*  y=vs_base[1]; */
+  if (type_of(x)!=t_structure)
+    RETURN1(Cnil);
+  x=x->str.str_def;
+  COERCE_DEF(y);
+  RETURN1(structure_subtypep(x,y) ? Ct : Cnil);
+
 }
  
      
@@ -430,7 +430,7 @@ gcl_init_structure_function(void)
 	make_si_function("STRUCTUREP", siLstructurep);
 	make_si_function("SIZE-OF", siLsize_of);
 	make_si_function("ALIGNMENT",siLalignment);
-	make_si_function("STRUCTURE-SUBTYPE-P",siLstructure_subtype_p);
+/* 	make_si_function("STRUCTURE-SUBTYPE-P",siLstructure_subtype_p); */
 	make_si_function("RPLACA-NTHCDR", siLrplaca_nthcdr);
 	make_si_function("LIST-NTH", siLlist_nth);
 	make_si_function("AET-TYPE",siLaet_type);

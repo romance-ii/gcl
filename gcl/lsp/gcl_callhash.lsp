@@ -16,7 +16,8 @@
 (defun add-hash (fn sig callees src file)
   (cond ((not (eq *boot* t))
 	 (setq *pahl* (cons `(add-hash ',fn ',sig ',callees ,src ,file) *pahl*))
-	 (unless (or (not (fboundp 'make-s-data)) (not (let ((s (find-symbol "FIND"))) (and s (fboundp s)))) *boot*)
+	 (unless (or (not (fboundp 'make-s-data)) (not (let ((s (find-symbol "UNIQUE-SIGS" (find-package "COMPILER")))) 
+							 (and s (fboundp s)))) *boot*)
 	   (setq *boot* 'add-hash) 
 	   (let ((*package* (find-package "SI")))
 	     (defstruct (call (:copier copy-call)
@@ -30,14 +31,13 @@
 	     (defvar *sfns* nil)
 	     (defvar *split-files* nil)
 	     (defvar *unique-sigs* (make-hash-table :test 'equal))
+	     (defvar *us* (find-symbol "UNIQUE-SIGS" (find-package "COMPILER")))
+;	     (assert (and *us* (fboundp *us*)))
 	     (setq *tmp-dir* (get-temp-dir))
 	     (setq *boot* t)
 	     (mapc 'eval (nreverse *pahl*))
 	     (setq *pahl* nil))))
-;	((not (symbol-package fn)) nil);FIXME
-	((let* ((sig (when sig
-		       (or (gethash sig *unique-sigs*)
-			   (setf (gethash sig *unique-sigs*) sig))))
+	((let* ((sig (when sig (funcall *us* sig)))
 		(h (or (gethash fn *call-hash-table*)
 		       (setf (gethash fn *call-hash-table*) (make-call :sig sig)))))
 	   (let ((x (get fn 'state-function)))
@@ -58,11 +58,14 @@
 	       (unless (member (car l) (call-callees h) :test 'eq)
 		 (push (car l) (call-callees h))
 		 (setq cm t))
-	       (let ((h (or (gethash (car l) *call-hash-table*)
-			    (setf (gethash (car l) *call-hash-table*) (make-call :sig (cdr l) :callers (list fn))))))
+	       (let* ((ns (cdr l))
+		      (ns (when ns (funcall *us* ns)))
+		      (h (or (gethash (car l) *call-hash-table*)
+			     (setf (gethash (car l) *call-hash-table*) (make-call :sig ns :callers (list fn)))))
+		      (os (call-sig h)))
 		 (pushnew fn (call-callers h) :test 'eq)
-		 (unless (or (eq fn (car l)) (equal (cdr l) (call-sig h)))
-		   (add-recompile fn (car l) (cdr l) (call-sig h))
+		 (unless (or (eq fn (car l)) (not os) (eq ns os))
+		   (add-recompile fn (car l) ns os)
 		   (setq ar t)))))))))
 
 (defun procl (fn sig)
@@ -120,7 +123,7 @@
 		      (let ((ns (if (and (compiled-function-p code) (not (eq (function-name code) sym))
 					 (fboundp sym) (compiled-function-p (symbol-function sym)) 
 					 (not (eq (symbol-function sym) code)))
-				    (let ((s '((*) *))) (pushnew sym *sfns*)(or (gethash s *unique-sigs*) (setf (gethash s *unique-sigs*) s)))
+				    (let ((s '((*) *))) (pushnew sym *sfns*)(funcall *us* s))
 				  (call-sig h))))
 			(unless (eq ns (call-sig h))
 			  (dolist (l (call-callers h))
@@ -191,8 +194,10 @@
 	 (doc (when (and z (stringp (car z))) (list (pop z))))
 	 (decls (let (d) (do nil ((or (not z) (not (consp (car z))) (not (eq (caar z) 'declare))) (nreverse d))
 			      (push (pop z) d))))
+	 (ctps (let (d) (do nil ((or (not z) (not (consp (car z))) (not (eq (caar z) 'check-type))) (nreverse d))
+			     (push (pop z) d))))
 	 (rest z))
-  `(lambda ,ll ,@doc ,@decls (block ,block ,@rest))))
+  `(lambda ,ll ,@doc ,@decls ,@ctps (block ,block ,@rest))))
        
 
 (defun function-lambda-expression (y) 
@@ -207,6 +212,14 @@
 	  (lambda-block-closure (values (block-lambda (caddr (cdddr x)) (cadr (cdddr x)) (cddr (cddr (cddr x)))) 
 					(not (not (cadr x))) (fifth x)))
 	  (otherwise (values nil t nil)))))
+
+(defun compress-src (src)
+  (let* ((w (make-string-output-stream))
+	 (ss (si::open-fasd w :output nil nil)))
+    (si::find-sharing-top src (aref ss 1))
+    (si::write-fasd-top src ss)
+    (si::close-fasd ss)
+    (get-output-stream-string w)))
 
 (defun function-src (sym)
   (or
@@ -255,8 +268,9 @@
 	     (tps (max-types (mapcar 'sig syms)))
 	     (min (reduce 'min (mapcar (lambda (x) 
 					 (let* ((ll (cadr x))) 
-					   (- (length ll) (length (member '&optional ll))))) fns)))
-	     (max (reduce 'max (mapcar (lambda (x) (length (lambda-vars (cadr x)))) fns)))
+					   (- (length ll) (length (member '&optional ll))))) fns)
+			  :initial-value 64));FIXME
+	     (max (reduce 'max (mapcar (lambda (x) (length (lambda-vars (cadr x)))) fns) :initial-value 0))
 	     (reqs (nsyms min))
 	     (opts (nsyms (- max min)))
 	     (ll (append reqs (when (> max min) (cons '&optional opts))))
@@ -335,7 +349,7 @@
 	  n)))))
     
 (defun temp-prefix nil
-  (concatenate 'string *tmp-dir* "gazonk_" (write-to-string (abs (getpid))) "_"))
+  (si::string-concatenate *tmp-dir* "gazonk_" (write-to-string (abs (getpid))) "_"));FIXME
 
 (defun recompile (fn)
   (with-temp-file 
@@ -442,8 +456,8 @@
 	   (let ((*split-files* 100000)) (compile-file pn :system-p t :c-file t :h-file t :data-file t))))))
 
 ;FIXME!!!
-(defun is-eq-test-item-list (x y z w)
-  (format t "Should never be called ~s ~s ~s ~s~%" x y z w))
+;(defun is-eq-test-item-list (x y z w)
+;  (format t "Should never be called ~s ~s ~s ~s~%" x y z w))
 
 (defun cmp-vec-length (x)
   (declare (vector x))

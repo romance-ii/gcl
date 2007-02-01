@@ -227,14 +227,10 @@
 (defun vector-push-extend (new-element vector &optional extension)
   (declare (optimize (safety 1)))
   (check-type vector fpvec)
-  (let ((fp (fill-pointer vector)))
-    (unless (< fp (array-dimension vector 0))
-      (adjust-array vector
-		    (list (+ (array-dimension vector 0)
-			     (or extension
-				 (if (> (array-dimension vector 0) 0)
-				     (array-dimension vector 0)
-				   5))))
+  (let ((fp (fill-pointer vector))
+	(dim (array-dimension vector 0)))
+    (unless (< fp dim)
+      (adjust-array vector (the seqind (+ dim (or extension (max 5 dim))))
 		    :element-type (array-element-type vector)
 		    :fill-pointer fp))
     (si:aset vector fp new-element)
@@ -262,60 +258,47 @@
 			  (displaced-index-offset 0)
 			  (static nil static-supplied-p))
 
-  (declare (ignore initial-element static displaced-index-offset) ;FIXME
-	   (:dynamic-extent r new-dimensions)
+  (declare (ignore initial-element initial-contents static displaced-index-offset) ;FIXME
+	   (:dynamic-extent r)
 	   (optimize (safety 1)))
 
   (check-type array array)
   (check-type new-dimensions (or seqind proper-list))
-  
-  (when (integerp new-dimensions)
-        (setq new-dimensions (list new-dimensions)))
 
-  (when fill-pointer-supplied-p
-    (let ((fill-pointer (or fill-pointer (when (array-has-fill-pointer-p array) (fill-pointer array)))))
-      (setf (cadr (member :fill-pointer r)) fill-pointer)))
-    
-  (when (array-has-fill-pointer-p array)
-    (unless fill-pointer-supplied-p
-      (push (fill-pointer array) r)
-      (push :fill-pointer r)))
-      
+  (when (and (listp new-dimensions) (not (cdr new-dimensions))) (setq new-dimensions (car new-dimensions)))
+  
   (setq element-type (array-element-type array))
   (unless (eq element-type t)
-    (push element-type r)
-    (push :element-type r))
+    (setq r (cons element-type r) r (cons :element-type r)))
 
   (unless static-supplied-p
-    (push (staticp array) r)
-    (push :static r))
+    (setq r (cons (staticp array) r) r (cons :static r)))
 
-  (let ((x (apply #'make-array new-dimensions :adjustable t r)))	
+  (cond (fill-pointer-supplied-p
+	 (let ((fill-pointer (or fill-pointer (when (array-has-fill-pointer-p array) (fill-pointer array)))))
+	   (setf (cadr (member :fill-pointer r)) fill-pointer)))
+	((array-has-fill-pointer-p array) (setq r (cons (fill-pointer array) r) r (cons :fill-pointer r))))
+      
+  (let ((x (apply 'make-array new-dimensions :adjustable t r)))	
 
     (unless (or displaced-to initial-contents-supplied-p)
 
-      (cond ((or (null (cdr new-dimensions))
+      (cond ((or (seqindp new-dimensions)
 		 (and (equal (cdr new-dimensions)
 			     (cdr (array-dimensions array)))
 		      (or (not (eq element-type 'bit))
-			  (eql 0 (the fixnum (mod (the fixnum (car (last new-dimensions))) char-length))))))
+			  (when new-dimensions (= 0 (mod (the seqind (car (last new-dimensions))) char-length))))))
 	     (copy-array-portion
 	      array x 0 0 (min (array-total-size x)
 			       (array-total-size array))))
-	    (t
-	     (do ((cursor (make-list (length new-dimensions) :initial-element 0)))
+	    ((do ((cursor (make-list (length new-dimensions) :initial-element 0)))
 		 (nil)
 	       (declare (:dynamic-extent cursor))
-	       (when (apply #'array-in-bounds-p array cursor)
-		 (aset-by-cursor
-		  x
-		  (if initial-contents-supplied-p
-		      (sequence-cursor initial-contents cursor)
-		    (apply #'aref array cursor))
-		  cursor))
+	       (when (apply 'array-in-bounds-p array cursor)
+		 (aset-by-cursor x (apply 'aref array cursor) cursor))
 	       (when (increment-cursor cursor new-dimensions)
 		 (return nil))))))
-    
+
     (replace-array array x)
 
     (when (eq fill-pointer t)

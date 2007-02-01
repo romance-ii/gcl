@@ -475,10 +475,11 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 					 a))))
 			     (si::copy-stream st *standard-output*))
 	     (with-open-file (st dn)
-			     (si::copy-stream st *standard-output*))
+			     (do (form) ((eq 'eof (setq form (read st nil 'eof)))) (princ form)))
+;			     (si::copy-stream st *standard-output*))
 	     (with-open-file (st hn)
 			     (si::copy-stream st *standard-output*))
-	     (when asm (system (si::string-concatenate "objdump -d -l "
+	     (when asm (system (si::string-concatenate "objdump --source "
 					     (namestring on))))
 	     (delete-file cn)
 	     (delete-file dn)
@@ -486,6 +487,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	     (delete-file on)
 	     (unless *keep-gaz* (delete-file gaz))
 	     nil)))
+	((setq tem (si::function-src name)) (disassemble tem asm))
 	((princ name) nil))) ;(error "can't disassemble ~a" name)
 
 

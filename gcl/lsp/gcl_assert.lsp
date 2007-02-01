@@ -49,7 +49,8 @@
 
 (defmacro check-type (place typespec &optional string)
   (declare (optimize (safety 1)))
-  `(unless (typep ,place ',typespec) (setf ,place (check-type-symbol ',place ,place ',typespec ',string)) nil))
+  `(progn (setf ,place (if (typep ,place ',typespec) ,place (the ,typespec (check-type-symbol ',place ,place ',typespec ',string)))) nil))
+;  `(unless (typep ,place ',typespec) (setf ,place (the ,typespec (check-type-symbol ',place ,place ',typespec ',string))) nil))
   
 
 (defun ask-for-form (place)
@@ -78,17 +79,11 @@
   (check-type clauses (list-of proper-list))
   (let ((tp (clause-type clauses)))
     (do ((l (reverse clauses) (cdr l))
-	 (form `(let ((*print-level* 4)
-		      (*print-length* 4))
-		  (error'type-error :datum ,key :expected-type ',tp))))
-;				    :format-control "The value of ~:@(~S~), ~:@(~S~), is ~
-;                  ~#[nonsense~;not ~:@(~S~)~;neither ~:@(~S~) nor ~:@(~S~)~
-;                  ~:;not ~@{~#[~;or ~]~:@(~S~)~^, ~}~]."
-;				    :format-arguments (list ',keyform ,key ',tp)
+	 (form `(error'type-error :datum ,key :expected-type ',tp)))
 	((endp l) `(let ((,key ,keyform)) ,form))
 	(when (caar l)
 	  (setq form `(if ,(if (listp (caar l))
-			       `(member ,key ',(caar l))
+			       `(or ,@(mapcar (lambda (x) `(eql ,key ',x)) (caar l)));`(member ,key ',(caar l))
 			     `(eql ,key ',(caar l)))
 			  (progn ,@(cdar l))
 			,form))))))
@@ -99,13 +94,11 @@
    `(loop (let ((,key ,keyplace))
 	    ,@(mapcar (lambda (l)
 			`(when ,(if (listp (car l))
-				    `(member ,key ',(car l))
+				    `(or ,@(mapcar (lambda (x) `(eql ,key ',x)) (car l)));`(member ,key ',(car l))
 				  `(eql ,key ',(car l)))
 			   (return (progn ,@(cdr l)))))
 		      clauses)
-	    (let ((*print-level* 4)
-		  (*print-length* 4))
-	      (check-type ,keyplace ,(clause-type clauses))))))
+	    (check-type ,keyplace ,(clause-type clauses)))))
 
 (defmacro typecase (keyform &rest clauses)
   (declare (optimize (safety 1)))
@@ -120,13 +113,12 @@
                      (progn ,@(cdar l))
                      ,form)))))
 
-(defmacro etypecase (keyform &rest clauses &aux (key (gensym)))
+(defmacro etypecase (keyform &rest clauses &aux (key (if (symbolp keyform) keyform (gensym))))
   (declare (optimize (safety 1)))
   (check-type clauses (list-of proper-list))
   (let ((tp `(or ,@(mapcar 'car clauses))))
    (do ((l (reverse clauses) (cdr l))
         (form `(error 'type-error :datum ,key :expected-type ',tp)))
-;		      :format-control (typecase-error-string ',keyform ,key ',tp))))
        ((endp l) `(let ((,key ,keyform)) ,form))
        (setq form `(if (typep ,key ',(caar l))
                        (progn ,@(cdar l))

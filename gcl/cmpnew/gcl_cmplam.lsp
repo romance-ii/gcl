@@ -148,7 +148,7 @@
                            (*vars* *vars*)
                            (info (make-info))
                            (aux-info nil)
-			   (setjmps *setjmps*)
+			   (setjmps *setjmps*) ctps
                       )
 
   (cmpck (endp lambda-expr)
@@ -158,15 +158,15 @@
   ;;FIXME -- this is backwards, as the proclamations should be
   ;;generated from the declarations.  What we need here and in the let
   ;;code is reverse type propagation.  CM 20050106
-  (let ((decls (decls-from-procls
-		(car lambda-expr)
-		(and block-it (get-arg-types block-name))
-		(cdr lambda-expr))))
-    (when decls
-      (cmpnote "~S function args declared: ~S~%" block-name decls)
-      (setq lambda-expr (cons (car lambda-expr) (cons (cons 'declare decls) (cdr lambda-expr))))))
+;;   (let ((decls (decls-from-procls
+;; 		(car lambda-expr)
+;; 		(and block-it (get-arg-types block-name))
+;; 		(cdr lambda-expr))))
+;;     (when decls
+;;       (cmpnote "~S function args declared: ~S~%" block-name decls)
+;;       (setq lambda-expr (cons (car lambda-expr) (cons (cons 'declare decls) (cdr lambda-expr))))))
     
-  (multiple-value-setq (body ss ts is other-decls doc)
+  (multiple-value-setq (body ss ts is other-decls doc ctps)
                        (c1body (cdr lambda-expr) t))
   
   (when block-it (setq body (list (cons 'block (cons block-name body)))))
@@ -373,13 +373,13 @@
   (setq body (fix-down-args requireds body block-name))
   (setq lambda-list
 	(list requireds optionals rest key-flag keywords allow-other-keys))
+  (dolist (l requireds) (setf (var-type l) (type-and (var-type l) (unboxed-type (cdr (assoc (var-name l) ctps))))))
   (and *record-call-info* (record-arg-info lambda-list))
   (list 'lambda
         info
 	lambda-list
         doc
-        body)
-  )
+        body))
 
 
 ;;this makes a let for REQUIREDS which are used in a downward 
@@ -425,7 +425,9 @@
                   (dolist* (var (car lambda-list) t)
                     (when (var-ref-ccb var) (return nil)))
 				;;; no required is closed in a closure,
-                  (every (lambda (x) (and (consp x) (consp (cadr x)) (eq (caadr x) 'location))) (cadr lambda-list))
+                  (not (member-if-not 
+			(lambda (x) (and (consp x) (consp (cadr x)) (eq (caadr x) 'location)))
+			(cadr lambda-list)))
 					;(null (cadr lambda-list))	;;; no optionals,
                   (null (caddr lambda-list))	;;; no rest parameter, and
                   (not (cadddr lambda-list)))	;;; no keywords.

@@ -193,6 +193,12 @@ DEFUN_NEW("GETTIMEOFDAY",object,fSgettimeofday,SI,0,0,NONE,OO,OO,OO,OO,(void),"R
     return make_longfloat((longfloat)time(0));
 #endif
 }
+#ifdef STATIC_FUNCTION_POINTERS
+object
+fSgettimeofday() {
+  return FFN(fSgettimeofday)();
+}
+#endif
 
 
 DEFUN_NEW("GET-INTERNAL-REAL-TIME",object,fLget_internal_real_time,LISP,0,0,NONE,OO,OO,OO,OO,(void),"Run time relative to beginning")

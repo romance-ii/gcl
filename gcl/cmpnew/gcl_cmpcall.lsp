@@ -35,7 +35,7 @@
    (and (< (length args) 64)
 	(or  (and (get fname 'fixed-args) (listp args))
 	     (and (link-arg-p (get-return-type fname))
-		  (every 'link-arg-p (get-arg-types fname)))))))
+		  (not (member-if-not 'link-arg-p (get-arg-types fname))))))))
 
 (si::putprop 'funcall 'c2funcall-aux 'wholec2)
 (si:putprop 'call-lambda 'c2call-lambda 'c2)
@@ -191,10 +191,14 @@
   (when (cdr args) (wt (cadr args))
 	(dolist (loc (cddr args)) (wt #\, loc)))
   (wt #\) #\; "break;")
-  (wt-nl "case t_gfun: if ((_ob->sfn.sfn_argd&~(1<<10))<15) {_z=_ob->sfn.sfn_self(0")
+  (wt-nl "case t_gfun: case t_afun: {unsigned _a=_ob->sfn.sfn_argd;if (_tp==t_gfun) {if ((_a&~(1<<10))<15) {_z=_ob->sfn.sfn_self(0")
   (when (cdr args)
     (dolist (loc (cdr args)) (wt #\, loc)))
   (wt #\) #\; "break;}")
+  (wt "} else {if (!(_a>>16)) {VFUN_NARGS=" (length (cdr args)) ";_z=_ob->sfn.sfn_self(")
+  (when (cdr args) (wt (cadr args))
+	(dolist (loc (cddr args)) (wt #\, loc)))
+  (wt #\) #\; "break;}}}")
   (wt-nl "default: fcall.argd=" (length (cdr args)) ";fcall.fun=_ob;_z=fcalln1(")
   (when (cdr args) (wt (cadr args))
 	(dolist (loc (cddr args)) (wt #\, loc)))
@@ -412,7 +416,7 @@
 					    (if com  (princ "," st) (setq com t))
 					    (format st "#~a" i)))))))
 
-		       (format st "((*LnkLI~d)(~a))" n as))))
+		       (format st "(/* ~a */(*LnkLI~d)(~a))" fname n as))))
 
 
 	      ;; If link is bound above, closure is unprintable as is in its own environment

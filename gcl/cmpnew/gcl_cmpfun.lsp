@@ -31,10 +31,10 @@
 (si:putprop 'apply-optimize 'c2apply-optimize 'c2)
 (si:putprop 'funcall 'c1funcall 'c1)
 
-(si:putprop 'rplaca 'c1rplaca 'c1)
-(si:putprop 'rplaca 'c2rplaca 'c2)
-(si:putprop 'rplacd 'c1rplacd 'c1)
-(si:putprop 'rplacd 'c2rplacd 'c2)
+;; (si:putprop 'rplaca 'c1rplaca 'c1)
+;; (si:putprop 'rplaca 'c2rplaca 'c2)
+;; (si:putprop 'rplacd 'c1rplacd 'c1)
+;; (si:putprop 'rplacd 'c2rplacd 'c2)
 
 ;(dolist (l '(si::memq 
 ;	     member member-i member-if-not
@@ -57,9 +57,9 @@
 (si:putprop 'get 'c1get 'c1)
 (si:putprop 'get 'c2get 'c2)
 
-(si:putprop 'nth '(c1nth-condition . c1nth) 'c1conditional)
-(si:putprop 'nthcdr '(c1nthcdr-condition . c1nthcdr) 'c1conditional)
-(si:putprop 'cmp-nthcdr '(c1nthcdr-condition . c1nthcdr) 'c1conditional)
+;(si:putprop 'nth '(c1nth-condition . c1nth) 'c1conditional)
+;(si:putprop 'nthcdr '(c1nthcdr-condition . c1nthcdr) 'c1conditional)
+;(si:putprop 'cmp-nthcdr '(c1nthcdr-condition . c1nthcdr) 'c1conditional)
 (si:putprop 'si:rplaca-nthcdr 'c1rplaca-nthcdr 'c1)
 (si:putprop 'si:list-nth 'c1list-nth 'c1)
 (si:putprop 'list-nth-immediate 'c2list-nth-immediate 'c2)
@@ -130,16 +130,30 @@
             stream)
       (list 'call-global info 'terpri (list stream))))
 
-(defun c1apply (args &aux info)
+
+(defun c1apply (args &aux info at)
   (when (or (endp args) (endp (cdr args)))
         (too-few-args 'apply 2 (length args)))
+  (let* ((nargs (c1args args (make-info)))
+	 (tp (info-type (cadar nargs)))
+	 (fn (when (atomic-tp tp) (coerce-to-funid (cadr tp)))))
+    (cond ((and (consp fn) (eq (car fn) 'lambda))
+	   (return-from c1apply (c1expr (blla (cadr fn) (butlast (cdr args)) (car (last args)) (cddr fn)))))
+	  ((and fn (type>= #tnull (info-type (cadar (last nargs)))))
+	   (let ((ll (mapcar (lambda (x) (list (gensym) x)) (butlast (cdr args)))))
+	     (return-from c1apply (c1expr `(let* ,ll ,(ignorable-pivot (car (last args)) `(funcall ',fn ,@(mapcar 'car ll))))))))
+	  ((setq at (and fn (symbolp fn) (maybe-inline (cons fn (cdr args)) (butlast (cdr nargs)) (car (last (cdr nargs))))))
+	   (return-from c1apply at))
+	  ((and (symbolp fn) (setq at (get-arg-types fn)) (not (member '* at)))
+	   (let ((ll (mapcar (lambda (x) (declare (ignore x)) (gensym)) at)))
+	     (return-from c1apply (c1expr (blla ll (butlast (cdr args)) (car (last args)) `((funcall ',fn ,@ll)))))))))
+
   (let ((funob (c1funob (car args))))
        (setq info (copy-info (cadr funob)))
        (setq args (c1args (cdr args) info))
        (cond ((eq (car funob) 'call-lambda)
               (let* ((lambda-expr (caddr funob))
                      (lambda-list (caddr lambda-expr)))
-                    (declare (object lambda-expr lambda-list))
                     (if (and (null (cadr lambda-list))		; No optional
                              (null (cadddr lambda-list)))	; No keyword
                         (c1apply-optimize info
@@ -148,8 +162,51 @@
                                           (car (cddddr lambda-expr))
                                           args)
                        (list 'apply info funob args))))
-             (t (list 'apply info funob args))))
-  )
+             ((list 'apply info funob args)))))
+
+;; (defun c1apply (args &aux info at)
+;;   (when (or (endp args) (endp (cdr args)))
+;;         (too-few-args 'apply 2 (length args)))
+;;   (let* ((nargs (c1args args (make-info)))
+;; 	 (tp (info-type (cadar nargs)))
+;; 	 (fn (when (atomic-tp tp) (coerce-to-funid (cadr tp))))
+;; 	 (fn (if (member fn *basic-inlines*) (si::function-src fn) fn)))
+;;     (cond ((and (consp fn) (eq (car fn) 'lambda))
+;; 	   (return-from c1apply (c1expr (blla (cadr fn) (butlast (cdr args)) (car (last args)) (cddr fn)))))
+;; 	  ((and (symbolp fn) (setq at (get-arg-types fn)) (not (member '* at)))
+;; 	   (let ((ll (mapcar (lambda (x) (declare (ignore x)) (gensym)) at)))
+;; 	     (return-from c1apply (c1expr (blla ll (butlast (cdr args)) (car (last args)) `((funcall ',fn ,@ll)))))))
+;; 	  ((and fn (type>= #tnull (info-type (cadar (last nargs)))))
+;; 	   (let ((ll (mapcar (lambda (x) (list (gensym) x)) (butlast (cdr args)))))
+;; 	     (return-from c1apply (c1expr `(let* ,ll ,(ignorable-pivot (car (last args)) `(funcall ',fn ,@(mapcar 'car ll))))))))))
+
+;; ;;   (when (and (consp (car args)) (eq (caar args) 'lambda))
+;; ;;     (return-from c1apply (c1expr (blla (cadar args) (butlast (cdr args)) (car (last args)) (cddar args)))))
+;; ;;   (let ((nargs (c1args args (make-info))))
+;; ;;     (when (type>= #tnull (info-type (cadar (last nargs))))
+;; ;;       (return-from c1apply (c1funcall (butlast args))))
+;; ;;     (let* ((tp (info-type (cadar nargs)))
+;; ;; 	   (fn (when (atomic-tp tp) 
+;; ;; 		 (let ((fn (cadr tp))) 
+;; ;; 		   (cond ((si::interpreted-function-p fn) (function-lambda-expression fn))
+;; ;; 			 ((member fn *basic-inlines*) (si::function-src fn)))))))
+;; ;;       (when fn (return-from c1apply (c1apply `(,fn ,@(cdr args)))))))
+
+;;   (let ((funob (c1funob (car args))))
+;;        (setq info (copy-info (cadr funob)))
+;;        (setq args (c1args (cdr args) info))
+;;        (cond ((eq (car funob) 'call-lambda)
+;;               (let* ((lambda-expr (caddr funob))
+;;                      (lambda-list (caddr lambda-expr)))
+;;                     (if (and (null (cadr lambda-list))		; No optional
+;;                              (null (cadddr lambda-list)))	; No keyword
+;;                         (c1apply-optimize info
+;;                                           (car lambda-list)
+;;                                           (caddr lambda-list)
+;;                                           (car (cddddr lambda-expr))
+;;                                           args)
+;;                        (list 'apply info funob args))))
+;;              ((list 'apply info funob args)))))
 
 (defun c2apply (funob args &aux (*vs* *vs*) loc)
   (setq loc (save-funob funob))
@@ -250,47 +307,55 @@
 	 (c1expr `(,(cadar args) ,@(cdr args))))
 	((constantp (car args))
 	 (c1expr `(,(cmp-eval (car args)) ,@(cdr args))))
-	((progn
-	   (setq funob (c1funob (car args)))
-	   (add-info info (cadr funob))
-	   (setf (info-type info) (info-type (cadr funob)))
-	   (list 'funcall info funob (c1args (cdr args) info))))))
+	((let* ((nargs (c1args args info))
+		(tp (info-type (cadar nargs)))
+		(fn (when (atomic-tp tp) 
+		      (let ((fn (cadr tp))) (cond ((symbolp fn) (list 'quote fn)) 
+						  ((let ((fn (and (functionp fn) (si::function-name fn)))) 
+						     (when fn (list 'quote fn))))
+						  ((and (si::interpreted-function-p fn) (function-lambda-expression fn))))))))
+	   (cond (fn (c1funcall `(,fn ,@(cdr args))))
+		 (t 
+		  (setq funob (c1funob (car args)))
+		  (add-info info (cadr funob))
+		  (setf (info-type info) (info-type (cadr funob)))
+		  (list 'funcall info funob (cdr nargs))))))))
 
-(defun c1rplaca (args &aux (info (make-info)))
-  (when (or (endp args) (endp (cdr args)))
-        (too-few-args 'rplaca 2 (length args)))
-  (unless (endp (cddr args))
-          (too-many-args 'rplaca 2 (length args)))
-  (setq args (c1args args info))
-  (list 'rplaca info args))
+;; (defun c1rplaca (args &aux (info (make-info :type #tcons)))
+;;   (when (or (endp args) (endp (cdr args)))
+;;         (too-few-args 'rplaca 2 (length args)))
+;;   (unless (endp (cddr args))
+;;           (too-many-args 'rplaca 2 (length args)))
+;;   (setq args (c1args args info))
+;;   (list 'rplaca info args))
 
-(defun c2rplaca (args &aux (*vs* *vs*) (*inline-blocks* 0))
-  (setq args (inline-args args '(t t)))
-  (safe-compile
-   (wt-nl "if(!consp(" (car args) "))"
-          "FEwrong_type_argument(Scons," (car args) ");"))
-  (wt-nl "(" (car args) ")->c.c_car = " (cadr args) ";")
-  (unwind-exit (car args))
-  (close-inline-blocks)
-  )
+;; (defun c2rplaca (args &aux (*vs* *vs*) (*inline-blocks* 0))
+;;   (setq args (inline-args args '(t t)))
+;;   (safe-compile
+;;    (wt-nl "if(!consp(" (car args) "))"
+;;           "FEwrong_type_argument(Scons," (car args) ");"))
+;;   (wt-nl "(" (car args) ")->c.c_car = " (cadr args) ";")
+;;   (unwind-exit (car args))
+;;   (close-inline-blocks)
+;;   )
 
-(defun c1rplacd (args &aux (info (make-info)))
-  (when (or (endp args) (endp (cdr args)))
-        (too-few-args 'rplacd 2 (length args)))
-  (when (not (endp (cddr args)))
-        (too-many-args 'rplacd 2 (length args)))
-  (setq args (c1args args info))
-  (list 'rplacd info args))
+;; (defun c1rplacd (args &aux (info (make-info :type #tcons)))
+;;   (when (or (endp args) (endp (cdr args)))
+;;         (too-few-args 'rplacd 2 (length args)))
+;;   (when (not (endp (cddr args)))
+;;         (too-many-args 'rplacd 2 (length args)))
+;;   (setq args (c1args args info))
+;;   (list 'rplacd info args))
 
-(defun c2rplacd (args &aux (*vs* *vs*) (*inline-blocks* 0))
-  (setq args (inline-args args '(t t)))
-  (safe-compile
-   (wt-nl "if(!consp(" (car args) "))"
-          "FEwrong_type_argument(Scons," (car args) ");"))
-  (wt-nl "(" (car args) ")->c.c_cdr = " (cadr args) ";")
-  (unwind-exit (car args))
-  (close-inline-blocks)
-  )
+;; (defun c2rplacd (args &aux (*vs* *vs*) (*inline-blocks* 0))
+;;   (setq args (inline-args args '(t t)))
+;;   (safe-compile
+;;    (wt-nl "if(!consp(" (car args) "))"
+;;           "FEwrong_type_argument(Scons," (car args) ");"))
+;;   (wt-nl "(" (car args) ")->c.c_cdr = " (cadr args) ";")
+;;   (unwind-exit (car args))
+;;   (close-inline-blocks)
+;;   )
 
 
 (defmacro eq-subtp (x y)  ;FIXME axe mult values
@@ -307,15 +372,31 @@
 (defun equalp-is-eq-tp (x)
   (eq-subtp x #tequalp-is-eq-tp))
 
+(defun atomic-tp (tp)
+  (when (consp tp)
+    (case (car tp)
+      ((integer ratio short-float long-float) (and (numberp (cadr tp))(numberp (caddr tp)) (eql (cadr tp) (caddr tp))))
+      ((eql member) (not (cddr tp))))))
+
 (defun do-eq-et-al (fn args)
   (let* ((tf (cadr (test-to-tf fn)))
 	 (info (make-info :type #tboolean))
 	 (nargs (c1args args info)))
-    (cond ((and tf 
-		(or (funcall tf (info-type (cadar nargs)))
-		    (funcall tf (info-type (cadadr nargs)))))
-	   (list 'call-global info 'eq nargs))
-	  ((list 'call-global info fn nargs)))))
+    (let ((r (list 'call-global info (if (when tf 
+					   (or (funcall tf (info-type (cadar nargs)))
+					       (funcall tf (info-type (cadadr nargs)))))
+					 'eq fn) nargs)))
+      (cond ((and (atomic-tp (info-type (cadar nargs)))
+		  (atomic-tp (info-type (cadadr nargs)))
+		  (cond ((eq (caddr r) 'eq) 
+			 (eql-is-eq (cadr (info-type (cadar nargs)))))
+			((eq (caddr r) 'eql))))
+	     (c1expr (ignorable-pivot 
+		      (car args) 
+		      (ignorable-pivot 
+		       (cadr args) 
+		       (type>= (info-type (cadar nargs)) (info-type (cadadr nargs)))))))
+	    (r)))))
 	   
 (dolist (l `(eq eql equal equalp))
   (si::putprop l 'do-eq-et-al 'c1g))
@@ -377,14 +458,16 @@
 	 (t2 (and (cadr args) (info-type (cadadr nargs))))
 	 (r (and t1 t2 (num-type-rel fn t1 t2))))
     (cond ((cddr args) (list 'call-global info fn nargs))
-	  ((car r) (c1expr** t info))
-	  ((cadr r) (c1expr** nil info))
+	  ((or (car r) (cadr r)) (c1expr (ignorable-pivot (car args) (ignorable-pivot (cadr args) (when (car r) t)))))
 	  ((list 'call-global info fn nargs)))))
 
 (dolist (l `(>= > < <= = /=))
   (si::putprop l 'do-num-relations 'c1g))
 
-(dolist (l `(eq eql equal equalp > >= < <= = /= length ;FIXME get a good list here
+(dolist (l `(eq eql equal equalp > >= < <= = /= length + - / * min max;FIXME get a good list here
+		car cdr caar cadr cdar cddr caaar caadr cadar cdaar caddr cdadr cddar cdddr 
+		caaaar caaadr caadar cadaar cdaaar caaddr cadadr cdaadr caddar cdadar cddaar
+		cadddr cdaddr cddadr cdddar cddddr logand lognot logior logxor
 		,@(mapcar (lambda (x) (cdr x)) (remove-if-not (lambda (x) (symbolp (cdr x))) +cmp-type-alist+))))
   (si::putprop l t 'c1no-side-effects))
 
@@ -440,7 +523,7 @@
 			  (when (constantp k1)
 			    (when (constantp (caddr args)) 
 			      (let ((z (cmp-eval (caddr args))))
-				(every (car ltf) (if k1 (mapcar (cmp-eval k1) z) z)))))))))
+				(not (member-if-not (car ltf) (if k1 (mapcar (cmp-eval k1) z) z))))))))))
 	    (cond ((or m1 m2) (c1t))
 		  (f1 (c1nil))
 		  ((let ((info (make-info))) 
@@ -451,11 +534,14 @@
   (let* ((info (make-info :type #tboolean))
 	 (nargs (c1args args info))
 	 (tp (car (rassoc fn +cmp-type-alist+))))
-    (let ((at (and (not (cdr args)) (coerce-to-one-value (info-type (cadar nargs))))))
-      (cond ((and at (type>= tp at)) (c1t))
-	    ((not (type-and at tp)) (c1nil))
+    (when (cdr args) (baboon))
+    (let ((at (nil-to-t (coerce-to-one-value (info-type (cadar nargs))))))
+      (cond ((type>= tp at) (c1expr (ignorable-pivot (car args) t)))
+	    ((not (type-and at tp)) (c1expr (ignorable-pivot (car args) nil)))
 	    ((list 'call-global info fn nargs))))))
-(dolist (l +cmp-type-alist+) (when (symbolp (cdr l)) (si::putprop (cdr l) 'do-predicate 'c1g)))
+(dolist (l +cmp-type-alist+) 
+  (when (symbolp (cdr l)) 
+    (si::putprop (cdr l) 'do-predicate 'c1g)))
 
 ;(defun c1or (args)
 ;  (cond ((null args) (c1expr nil))
@@ -487,10 +573,9 @@
   (let* ((info (make-info))
 	 (nargs (c1args args info)))
     (let* ((eltp (position :element-type args))
-	   (eltp (and eltp (nth (1+ eltp) nargs)))
-	   (eltp (and eltp (consp eltp) (eq (car eltp) 'location) (caddr eltp)))
-	   (eltp (and (consp eltp) (eq (car eltp) 'VV) (gethash (cadr eltp) *objects-rev*)))
-	   (eltp (if eltp `(,eltp) `(*))))
+	   (eltp (when eltp (nth (1+ eltp) nargs)))
+	   (eltp (when eltp (info-type (second eltp))))
+	   (eltp (when eltp (if (atomic-tp eltp) `(,(cadr eltp)) `(*)))))
       (let ((szf (let ((st (cmp-norm-tp (info-type (cadar nargs)))))
 		   (cond ((and (constantp (car args)) 
 			       (let ((v (cmp-eval (car args)))) 
@@ -616,18 +701,18 @@
 	   (c1expr `(the fixnum (si::ldb1 ,(car specs) ,(cdr specs) ,(second args))))))))
 
 	  
-(si:putprop 'length 'c1length 'c1)
+;; (si:putprop 'length 'c1length 'c1)
 
-(defun c1length (args &aux (info (make-info)))
-  (setf (info-type info) #tseqind)
-  (cond ((and (consp (car args))
-	      (eq (caar args) 'symbol-name)
-	      (let ((args1 (cdr (car args))))
-		(and args1 (not (cddr args1))
-		     (list 'call-global info 'symbol-length
-			   (c1args args1 info))))))
-	(t  (setq args (c1args args info))
-	    (list 'call-global info 'length args ))))
+;; (defun c1length (args &aux (info (make-info)))
+;;   (setf (info-type info) #tseqind)
+;;   (cond ((and (consp (car args))
+;; 	      (eq (caar args) 'symbol-name)
+;; 	      (let ((args1 (cdr (car args))))
+;; 		(and args1 (not (cddr args1))
+;; 		     (list 'call-global info 'symbol-length
+;; 			   (c1args args1 info))))))
+;; 	(t  (setq args (c1args args info))
+;; 	    (list 'call-global info 'length args ))))
 
 
 (defun c1get (args &aux (info (make-info)))
@@ -666,7 +751,7 @@
 		   `(let ((,c ,(second args)))
 		      (declare (type ,(result-type (second args))
 				     ,c))
-		      (and (typep ,c #tcharacter)
+		      (and (typep ,c 'character)
 			   (= (char-code ,(car args))
 			      (the fixnum
 				   (char-code
@@ -695,21 +780,26 @@
 
 (defun co1typep (f args &aux tem) f
   (let* ((x (car args))  new
-	 (type (and (literalp (cadr args)) (cmp-norm-tp (cmp-eval (cadr args)))))
-	 (type (unless (eq type '*) type)))
-      (let* ((rt (result-type (car args)))
-	     (ta (type-and rt type)))
-;	(format t "~a ~a ~a ~a~%" type rt ta (eq ta rt))
-	(cond ((eq ta rt)
-	       (setq new t)
-	       (return-from co1typep (c1t)))
-	      ((and type (not ta))
-	       (setq new nil)
-	       (return-from co1typep (c1nil)))))
+	 (etype (when (literalp (cadr args)) (cmp-eval (cadr args))))
+	 (typen (when etype (min-ftp etype)))
+	 (typex (when etype (max-vtp etype)))
+	 (rt (result-type (car args)))
+	 (type typex))
+;    (cond ((type>= typen rt)
+;	   (return-from co1typep (c1expr (ignorable-pivot (car args) (ignorable-pivot (cadr args) t)))))
+;	  ((and typex (not (type-and typex rt)))
+;	   (return-from co1typep (c1expr (ignorable-pivot (car args) (ignorable-pivot (cadr args) nil)))))
+;	  ((and (eq typex typen) (cmpao type)) 
+;	   (return-from co1typep (c1expr `(,(car type) ,@(mapcar (lambda (x) `(typep ,(car args) ',x)) (cdr type)))))))
     (setq new
 	  (cond
+	   ((type>= typen rt)
+	    (ignorable-pivot (car args) (ignorable-pivot (cadr args) t)))
+	   ((and typex (not (type-and typex rt)))
+	    (ignorable-pivot (car args) (ignorable-pivot (cadr args) nil)))
+	   ((not (eq typex typen)) nil)
 	   ((null type) nil)
-	   ((and (setq f (assoc type +cmp-type-alist+ :test 'equal))
+	   ((and (setq f (assoc type +cmp-type-alist+)) 
 		 (not (get (cdr f) 'si::struct-predicate)))
 	    (list (cdr f) x))
 	   ((and (consp type)
@@ -742,17 +832,14 @@
 		    (and (si::fixnump .tem)
 			 (>=  (the fixnum .tem) ,(second tem))
 			 (<=  (the fixnum .tem) ,(third tem))))))
-	   ((and (symbolp type)
-		 (setq tem (get type 'si::s-data)))
-	    (cond ((or (si::s-data-frozen tem)
-		       *frozen-defstructs*)
+	   ((and (symbolp etype)
+		 (setq tem (get etype 'si::s-data)))
+	    (cond ((or (si::s-data-frozen tem) *frozen-defstructs*)
 		   (struct-type-opt x tem))
-		  (t
-		   `(si::structure-subtype-p
-		     ,x ',type))))
-;	   ((and (print (list 'slow 'typep type)) nil))
-	   (t nil)))
-    (and new (c1expr `(the boolean , new)))))
+		  (`(si::structure-subtype-p ,x ',etype))))
+	   ((and (consp type) (member (car type) '(and or not)))
+	    `(,(car type) ,@(mapcar (lambda (x) `(typep ,(car args) ',x)) (cdr type))))))
+    (when new (c1expr `(the boolean , new)))))
 
 ;; this is going the wrong way.  want to go up..
 (defun struct-type-opt (x sd)
@@ -1081,13 +1168,23 @@
 (defun c1list (args)
   (let* ((info (make-info))
 	(nargs (c1args args info)))
-    (setf (info-type info) 
-	  (cmp-norm-tp 'proper-list)
-;	  (let ((v (reduce (lambda (x y) (list 'cons (info-type (cadr x)) y)) (append nargs '(null)) :from-end t)))
-;	    (cmp-norm-tp (if (cons-tp-limit v 0 0) (nil-to-t v) 'proper-list)))
-	  )
+    (setf (info-type info) (if args #tproper-cons #tnull));FIXME
     (list 'call-global info 'list nargs)))
 (si::putprop 'list 'c1list 'c1)
+      
+(defun c1list* (args)
+  (let* ((info (make-info))
+	 (nargs (c1args args info)))
+    (setf (info-type info) (if args (if (type>= #tproper-list (info-type (cadar (last nargs)))) #tproper-cons #tcons) #tnull))
+    (list 'call-global info 'list* nargs)))
+(si::putprop 'list* 'c1list* 'c1)
+      
+(defun c1append (args)
+  (let* ((info (make-info))
+	 (nargs (c1args args info)))
+    (setf (info-type info) (if args (if (type>= #tproper-list (info-type (cadar (last nargs)))) #tproper-list #tcons) #tnull));FIXME
+    (list 'call-global info 'append nargs)))
+(si::putprop 'append 'c1append 'c1)
       
 (defun c1list-nth (args &aux (info (make-info)))
   (when (or (endp args) (endp (cdr args)))

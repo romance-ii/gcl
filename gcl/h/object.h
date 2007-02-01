@@ -414,11 +414,12 @@ struct array {           /*  array header  */
   object  a_displaced;   /*  displaced  */
   hfixnum a_hasfillp:1;  /*  fillp compatability */
   hfixnum a_rank:HFILL_BITS;        /*  array rank  */
-  hfixnum a_elttype;     /*  element type  */
+  hfixnum a_adjustable:1; /*  adjustable flag  */
+  hfixnum a_elttype:HFILL_BITS;      /*  element type  */
   object *a_self;        /*  pointer to the array  */
   fixnum *a_dims;        /*  table of dimensions  */
   fixnum  a_dim;         /*  dimension  */
-  hfixnum a_adjustable;  /*  adjustable flag  */
+  hfixnum a_unused2;     /*  not used  */
   hfixnum a_offset;      /*  bitvector offset  */
   SPAD;
 
@@ -433,16 +434,13 @@ struct vector {           /*  vector header  */
   object  v_displaced;    /*  displaced  */
   hfixnum v_hasfillp:1;   /*  has-fill-pointer flag  */
   hfixnum v_unused:HFILL_BITS;   /*  rank compatibility  */
-  hfixnum v_elttype;      /*  element type  */
+  hfixnum v_adjustable:1; /*  adjustable flag  */
+  hfixnum v_elttype:HFILL_BITS;      /*  element type  */
   object *v_self;         /*  pointer to the vector  */
   fixnum  v_fillp;        /*  fill pointer  */
                           /*  For simple vectors,  */
                           /*  v_fillp is equal to v_dim.  */
   fixnum  v_dim;          /*  dimension  */
-  hfixnum v_adjustable;   /*  adjustable flag  */
-  hfixnum v_offset;       /*  not used  */
-  SPAD;
-
 };
 
 struct string {           /*  string header  */
@@ -452,7 +450,8 @@ struct string {           /*  string header  */
   object  st_displaced;    /*  displaced  */
   hfixnum st_hasfillp:1;     /*  has-fill-pointer flag  */
   hfixnum st_unused:HFILL_BITS;   /*  rank compatibility  */
-  hfixnum st_adjustable;   /*  adjustable flag  */
+  hfixnum st_adjustable:1; /*  adjustable flag  */
+  hfixnum st_elttype:HFILL_BITS;      /*  element type  */
   char    *st_self;        /*  pointer to the string  */
   fixnum   st_fillp;       /*  fill pointer  */
                            /*  For simple strings,  */
@@ -468,7 +467,8 @@ struct ustring {
   object         ust_displaced;
   hfixnum        ust_hasfillp:1;
   hfixnum        ust_unused:HFILL_BITS;   /*  rank compatibility  */
-  hfixnum        ust_adjustable;  
+  hfixnum        ust_adjustable:1; /*  adjustable flag  */
+  hfixnum        ust_elttype:HFILL_BITS;      /*  element type  */
   unsigned char *ust_self;
   fixnum         ust_fillp;
   fixnum         ust_dim;
@@ -495,14 +495,15 @@ struct bitvector {         /*  bitvector header  */
   object   bv_displaced;   /*  displaced  */
   hfixnum  bv_hasfillp:1;  /*  has-fill-pointer flag  */
   hfixnum  bv_unused:HFILL_BITS;   /*  rank compatibility  */
-  hfixnum  bv_elttype;     /*  not used  */
+  hfixnum  bv_adjustable:1; /*  adjustable flag  */
+  hfixnum  bv_elttype:HFILL_BITS;      /*  element type  */
   char    *bv_self;        /*  pointer to the bitvector  */
   fixnum   bv_fillp;       /*  fill pointer  */
                            /*  For simple bitvectors,  */
                            /*  st_fillp is equal to st_dim.  */
   fixnum   bv_dim;         /*  dimension  */
                            /*  number of bits  */
-  hfixnum  bv_adjustable;  /*  adjustable flag  */
+  hfixnum  bv_unused2;     /*  not used  */
   hfixnum  bv_offset;      /*  bitvector offset  */
                            /*  the position of the first bit  */
                            /*  in the first byte  */
@@ -516,14 +517,11 @@ struct fixarray {            /*  fixnum array header  */
 
   object    fixa_displaced;  /*  displaced  */
   hfixnum   fixa_rank;       /*  array rank  */
-  hfixnum   fixa_elttype;    /*  element type  */
+  hfixnum   fixa_adjustable:1; /*  adjustable flag  */
+  hfixnum   fixa_elttype:HFILL_BITS;      /*  element type  */
   fixnum   *fixa_self;       /*  pointer to the array  */
   fixnum   *fixa_dims;       /*  table of dimensions  */
   fixnum    fixa_dim;        /*  dimension  */
-  hfixnum   fixa_adjustable; /*  adjustable flag  */
-  hfixnum   fixa_offset;     /*  not used  */
-  SPAD;
-  
 };
 
 struct sfarray {                  /*  short-float array header  */
@@ -532,15 +530,11 @@ struct sfarray {                  /*  short-float array header  */
 
   object       sfa_displaced;     /*  displaced  */
   hfixnum      sfa_rank;          /*  array rank  */
-  hfixnum      sfa_elttype;       /*  element type  */
+  hfixnum      sfa_adjustable:1; /*  adjustable flag  */
+  hfixnum      sfa_elttype:HFILL_BITS;      /*  element type  */
   shortfloat  *sfa_self;          /*  pointer to the array  */
   fixnum      *sfa_dims;          /*  table of dimensions  */
   fixnum       sfa_dim;           /*  dimension  */
-  hfixnum      sfa_adjustable;    /*  adjustable flag  */
-  hfixnum      sfa_offset;        /*  not used  */
-  SPAD;
-
-
 
 };
 
@@ -550,13 +544,11 @@ struct lfarray {             /*  plong-float array header  */
 
   object      lfa_displaced; /*  displaced  */
   hfixnum     lfa_rank;      /*  array rank  */
-  hfixnum     lfa_elttype;   /*  element type  */
+  hfixnum     lfa_adjustable:1; /*  adjustable flag  */
+  hfixnum     lfa_elttype:HFILL_BITS;      /*  element type  */
   longfloat  *lfa_self;      /*  pointer to the array  */
   fixnum     *lfa_dims;      /*  table of dimensions  */
   fixnum      lfa_dim;       /*  dimension  */
-  hfixnum     lfa_adjustable;/*  adjustable flag  */
-  hfixnum     lfa_offset;    /*  not used  */
-  SPAD;
 
 };
 
@@ -988,7 +980,7 @@ extern int big_sign(object);
                                                                      || _tp == t_symbol;})
 #define pathname_string_symbol_streamp(a_) ({enum type _tp=type_of(a_); _tp==t_pathname || _tp == t_string\
                                                                      || _tp == t_symbol || _tp==t_stream;})
-#define eql_is_eq(a_)    (is_imm_fixnum(a_) || ({enum type _tp=type_of(a_); _tp == t_cons || _tp > t_character;}))
+#define eql_is_eq(a_)    (is_imm_fixnum(a_) || ({enum type _tp=type_of(a_); _tp == t_cons || _tp > t_complex;}))
 #define equal_is_eq(a_)  (is_imm_fixnum(a_) || type_of(a_)>t_bitvector)
 #define equalp_is_eq(a_) (type_of(a_)>t_structure)
 

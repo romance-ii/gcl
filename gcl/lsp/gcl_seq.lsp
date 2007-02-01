@@ -25,12 +25,12 @@
 
 (in-package 'lisp)
 
-(export '(make-sequence concatenate map some every notany notevery))
+(export '(make-sequence concatenate map every))
 
 (in-package 'system)
 
 
-(eval-when (compile) (proclaim '(optimize (safety 1) (space 3))))
+;(eval-when (compile) (proclaim '(optimize (safety 1) (space 3))))
 
 (defun make-sequence-vector (element-type size iesp initial-element)
   (let ((sequence (si:make-vector element-type size nil nil nil nil nil)))
@@ -99,6 +99,7 @@
 
 
 (defun map (result-type function sequence &rest more-sequences)
+  (declare (optimize (safety 1)))
   (setq more-sequences (cons sequence more-sequences))
   (let ((l (apply #'min (mapcar #'length more-sequences))))
     (if (null result-type)
@@ -118,60 +119,60 @@
                                           more-sequences))))))))
 
 
-(defun some (predicate sequence &rest more-sequences)
-  (cond
-    ((and (listp sequence) (null more-sequences))
-     ;; special case -- only one sequence, and it's a list
-     (dolist (e sequence nil)
-       (let ((that-value (funcall predicate e)))
-         (when that-value (return that-value)))))
-    (t
-     (let* ((more-sequences (cons sequence more-sequences)))
-       (do ((i 0 (1+ i))
-            (l (apply #'min (mapcar #'length more-sequences))))
-           ((>= i l) nil)
-         (declare (fixnum i l))
-         (let ((that-value
-                (apply predicate
-                       ;; (mapcar #'(lambda (z) (elt z i)) more-sequences)
-                       (let* ((head (cons nil nil))
-                              (tail head))
-                         (do ((s more-sequences (cdr s)))
-                             ((null s) (cdr head))
-                           (let ((e (car s)))
-                             (setf tail (setf (cdr tail)
-                                              (cons (if (consp e) (pop (car s)) (elt e i))
-                                                    nil))))))
-                       )))
-           (when that-value (return that-value))))))))
+;; (defun some (predicate sequence &rest more-sequences)
+;;   (cond
+;;     ((and (listp sequence) (null more-sequences))
+;;      ;; special case -- only one sequence, and it's a list
+;;      (dolist (e sequence nil)
+;;        (let ((that-value (funcall predicate e)))
+;;          (when that-value (return that-value)))))
+;;     (t
+;;      (let* ((more-sequences (cons sequence more-sequences)))
+;;        (do ((i 0 (1+ i))
+;;             (l (apply #'min (mapcar #'length more-sequences))))
+;;            ((>= i l) nil)
+;;          (declare (fixnum i l))
+;;          (let ((that-value
+;;                 (apply predicate
+;;                        ;; (mapcar #'(lambda (z) (elt z i)) more-sequences)
+;;                        (let* ((head (cons nil nil))
+;;                               (tail head))
+;;                          (do ((s more-sequences (cdr s)))
+;;                              ((null s) (cdr head))
+;;                            (let ((e (car s)))
+;;                              (setf tail (setf (cdr tail)
+;;                                               (cons (if (consp e) (pop (car s)) (elt e i))
+;;                                                     nil))))))
+;;                        )))
+;;            (when that-value (return that-value))))))))
+;;FIXME remove
+;; (defun every (predicate sequence &rest more-sequences)
+;;   (cond
+;;     ((and (listp sequence) (null more-sequences))
+;;      ;; special case -- only one sequence, and it's a list
+;;      (dolist (e sequence t)
+;;        (unless (funcall predicate e) (return nil))))
+;;     (t
+;;      (let* ((more-sequences (cons sequence more-sequences)))
+;;        (do ((i 0 (1+ i))
+;;             (l (apply #'min (mapcar #'length more-sequences))))
+;;            ((>= i l) t)
+;;          (declare (fixnum i l))
+;;          (unless (apply predicate
+;;                         ;; (mapcar #'(lambda (z) (elt z i)) more-sequences)
+;;                         (let* ((head (cons nil nil))
+;;                                (tail head))
+;;                           (do ((s more-sequences (cdr s)))
+;;                               ((null s) (cdr head))
+;;                             (let ((e (car s)))
+;;                               (setf tail (setf (cdr tail)
+;;                                                (cons (if (consp e) (pop (car s)) (elt e i))
+;;                                                      nil)))))))
+;;            (return nil)))))))
 
-(defun every (predicate sequence &rest more-sequences)
-  (cond
-    ((and (listp sequence) (null more-sequences))
-     ;; special case -- only one sequence, and it's a list
-     (dolist (e sequence t)
-       (unless (funcall predicate e) (return nil))))
-    (t
-     (let* ((more-sequences (cons sequence more-sequences)))
-       (do ((i 0 (1+ i))
-            (l (apply #'min (mapcar #'length more-sequences))))
-           ((>= i l) t)
-         (declare (fixnum i l))
-         (unless (apply predicate
-                        ;; (mapcar #'(lambda (z) (elt z i)) more-sequences)
-                        (let* ((head (cons nil nil))
-                               (tail head))
-                          (do ((s more-sequences (cdr s)))
-                              ((null s) (cdr head))
-                            (let ((e (car s)))
-                              (setf tail (setf (cdr tail)
-                                               (cons (if (consp e) (pop (car s)) (elt e i))
-                                                     nil)))))))
-           (return nil)))))))
-
-(defun notany (predicate sequence &rest more-sequences)
-  (not (apply 'some predicate sequence more-sequences)))
+;; (defun notany (predicate sequence &rest more-sequences)
+;;   (not (apply 'some predicate sequence more-sequences)))
 
 
-(defun notevery (predicate sequence &rest more-sequences)
-  (not (apply 'every predicate sequence more-sequences)))
+;; (defun notevery (predicate sequence &rest more-sequences)
+;;   (not (apply 'every predicate sequence more-sequences)))

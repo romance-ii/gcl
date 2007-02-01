@@ -46,15 +46,15 @@
 			       (catch nt
 				 (setq nargs (c1progn (cdr args))) nil))))
 		      (when nv
-			(let ((ov (car (member nv vl :key 'car))))
-			  (when (caddr ov)
-			    (unless (type>= (cadr ov) (var-mt nv))
-			      (setf (cadr ov) (var-mt nv))
-			      (throw (caddr ov) nv))))
-			(setf (var-type nv) (var-mt nv)))))
+			(do nil ((not (setq nv (pop *tvc*))) t) (setf (var-type nv) (var-mt nv))))))
 		   nargs))
-	    (dolist (v vl) (setf (var-mt (car v)) (type-or1 (var-mt (car v)) (cadr v))
-				 (var-tag (car v)) (caddr v))))))
+	    (dolist (v vl) 
+	      (when (caddr v)
+		(unless (type>= (cadr v) (var-mt (car v)))
+		  (pushnew (car v) *tvc*)))
+	      (setf (var-mt (car v)) (type-or1 (var-mt (car v)) (cadr v))
+		    (var-tag (car v)) (caddr v))))))
+
   (add-info info (cadr args))
   (list 'catch info tag args))
 
@@ -110,10 +110,12 @@
   (wt-nl "vs_base=vs_top=base+" *vs* ";")
   (base-used)
   (wt-nl "for(p= " loc ";!endp(p);p=MMcdr(p))vs_push(MMcar(p));")
-  (wt-nl "if(active)unwind(fr,tag);else{")
+  (wt-nl "if (active) {")
+  (wt-nl "unwind(fr,tag);")
+  (unwind-exit nil)
+  (wt-nl "} else {")
   (unwind-exit 'fun-val nil (if top-data (car top-data)))
-  (wt "}}")
-  )
+  (wt "}}"))
 
 (defun c1throw (args &aux (info (make-info :type #tnil)) tag)
   (when (or (endp args) (endp (cdr args)))
@@ -124,8 +126,7 @@
   (add-info info (cadr tag))
   (setq args (c1expr (cadr args)))
   (add-info info (cadr args))
-  (list 'throw info tag args)
-  )
+  (list 'throw info tag args))
 
 (defun c2throw (tag val &aux (*vs* *vs*) loc)
   (wt-nl "{frame_ptr fr;")
@@ -138,8 +139,8 @@
   (wt-nl "fr=frs_sch_catch(" loc ");")
   (wt-nl "if(fr==NULL) FEerror(\"The tag ~s is undefined.\",1," loc ");")
   (let ((*value-to-go* 'top)) (c2expr* val))
-  (wt-nl "unwind(fr," loc ");}")
-;  (wt-nl "return Cnil;}")
-  )
+  (wt-nl "unwind(fr," loc ");")
+  (unwind-exit nil)
+  (wt-nl "}"))
 
 

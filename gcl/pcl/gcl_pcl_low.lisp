@@ -65,7 +65,7 @@
 (in-package :pcl)
 
 (eval-when (compile load eval)
-(defvar *optimize-speed* '(optimize (speed 3) (safety 0)))
+(defvar *optimize-speed* '(optimize (speed 3) (safety 1)))
 )
 
 (defmacro %svref (vector index)
@@ -111,6 +111,11 @@
 ;;;
 #-new-kcl-wrapper
 (progn
+
+(eval-when (compile load eval)
+	   (deftype std-instance nil `(or structure (and standard-object (not funcallable-standard-object)))))
+;(si::putprop 'std-instance '(lambda nil `(or structure (and standard-object (not (funcallable-standard-object))))) 'si::deftype-definition)
+
 #-cmu17
 (defstruct (std-instance (:predicate std-instance-p)
 			 (:conc-name %std-instance-)
@@ -124,8 +129,6 @@
 
 (defmacro instance-ref (slots index)
   `(svref ,slots ,index))
-
-(si::putprop 'std-instance '(lambda nil `(or structure (and standard-object (not (funcallable-standard-object))))) 'si::deftype-definition)
 
 ;(defmacro std-instance-p (object)
 ;  `(or (typep ,object 'si::instance) (structurep ,object)))

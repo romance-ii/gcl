@@ -756,6 +756,18 @@
  (push '((t) boolean #.(flags rfa)"type_of(#0)==t_character")
    (get 'characterp 'inline-always))
 
+;;RPLACA
+ (push '((cons t) t #.(flags)"@0;((#0)->c.c_car=(#1),(#0))")
+   (get 'rplaca 'inline-always))
+ (push '((t t) t #.(flags)"@0;((#0)->c.c_car=(#1),(#0))")
+   (get 'rplaca 'inline-unsafe))
+
+;;RPLACD
+ (push '((cons t) t #.(flags)"@0;((#0)->c.c_cdr=(#1),(#0))")
+   (get 'rplacd 'inline-always))
+ (push '((t t) t #.(flags)"@0;((#0)->c.c_cdr=(#1),(#0))")
+   (get 'rplacd 'inline-unsafe))
+
 ;;CODE-CHAR
  (push '((fixnum) character #.(flags)"(#0)")
    (get 'code-char 'inline-always))
@@ -785,14 +797,14 @@
    (get 'elt 'inline-always))
 (push '((t fixnum) t #.(flags ans)"elt(#0,#1)")
    (get 'elt 'inline-always))
-(push '((t t) t #.(flags ans)"elt(#0,fix(#1))")
-   (get 'elt 'inline-unsafe))
+;(push '((t t) t #.(flags ans)"elt(#0,fix(#1))")
+;   (get 'elt 'inline-unsafe))
 
 ;;ENDP
  (push '((t) boolean #.(flags rfa)"endp(#0)")
        (get 'endp 'inline-safe))
-(push '((t) boolean #.(flags rfa)"(#0)==Cnil")
-      (get 'endp 'inline-unsafe))
+;(push '((t) boolean #.(flags rfa)"(#0)==Cnil")
+;      (get 'endp 'inline-unsafe))
 
 ;;EQ
  (push '((t t) boolean #.(flags rfa)"(#0)==(#1)")
@@ -851,11 +863,11 @@
        (get 'expt 'inline-always))
 
 
-;;FILL-POINTER
+;;si::FILL-POINTER-INTERNAL
  (push '((t) seqind #.(flags rfa)"((#0)->v.v_fillp)")
-   (get 'fill-pointer 'inline-unsafe))
+   (get 'si::fill-pointer-internal 'inline-unsafe))
  (push '((vector) seqind #.(flags rfa)"((#0)->v.v_fillp)")
-   (get 'fill-pointer 'inline-always))
+   (get 'si::fill-pointer-internal 'inline-always))
 
 ;;ARRAY-HAS-FILL-POINTER-P
  (push '((t) boolean #.(flags rfa)"((#0)->v.v_hasfillp)")
@@ -866,8 +878,8 @@
 ;;FIRST
  (push '((t) t #.(flags)"car(#0)")
    (get 'first 'inline-safe))
-(push '((t) t #.(flags)"CMPcar(#0)")
-   (get 'first 'inline-unsafe))
+;(push '((t) t #.(flags)"CMPcar(#0)")
+;   (get 'first 'inline-unsafe))
 
 ;;FLOAT
  (push '((fixnum-float) long-float #.(flags)"((longfloat)(#0))")
@@ -916,44 +928,44 @@
 ;;FOURTH
  (push '((t) t #.(flags)"cadddr(#0)")
    (get 'fourth 'inline-safe))
-(push '((t) t #.(flags)"CMPcadddr(#0)")
-   (get 'fourth 'inline-unsafe))
+;(push '((t) t #.(flags)"CMPcadddr(#0)")
+;   (get 'fourth 'inline-unsafe))
 
 ;;FIFTH
  (push '((t) t #.(flags)"cadr(cdddr(#0))")
    (get 'fifth 'inline-safe))
-(push '((t) t #.(flags)"CMPcadr(CMPcdddr(#0))")
-   (get 'fifth 'inline-unsafe))
+;(push '((t) t #.(flags)"CMPcadr(CMPcdddr(#0))")
+;   (get 'fifth 'inline-unsafe))
 
 ;;SIXTH
  (push '((t) t #.(flags)"caddr(cdddr(#0))")
    (get 'sixth 'inline-safe))
-(push '((t) t #.(flags)"CMPcaddr(CMPcdddr(#0))")
-   (get 'sixth 'inline-unsafe))
+;(push '((t) t #.(flags)"CMPcaddr(CMPcdddr(#0))")
+;   (get 'sixth 'inline-unsafe))
 
 ;;SEVENTH
  (push '((t) t #.(flags)"cadddr(cdddr(#0))")
    (get 'seventh 'inline-safe))
-(push '((t) t #.(flags)"CMPcadddr(CMPcdddr(#0))")
-   (get 'seventh 'inline-unsafe))
+;(push '((t) t #.(flags)"CMPcadddr(CMPcdddr(#0))")
+;   (get 'seventh 'inline-unsafe))
 
 ;;EIGHTH
  (push '((t) t #.(flags)"cadr(cdddr(cdddr(#0)))")
    (get 'eighth 'inline-safe))
-(push '((t) t #.(flags)"CMPcadr(CMPcdddr(CMPcdddr(#0)))")
-   (get 'eighth 'inline-unsafe))
+;(push '((t) t #.(flags)"CMPcadr(CMPcdddr(CMPcdddr(#0)))")
+;   (get 'eighth 'inline-unsafe))
 
 ;;NINTH
  (push '((t) t #.(flags)"caddr(cdddr(cdddr(#0)))")
    (get 'ninth 'inline-safe))
-(push '((t) t #.(flags)"CMPcaddr(CMPcdddr(CMPcdddr(#0)))")
-   (get 'ninth 'inline-unsafe))
+;(push '((t) t #.(flags)"CMPcaddr(CMPcdddr(CMPcdddr(#0)))")
+;   (get 'ninth 'inline-unsafe))
 
 ;;TENTH
  (push '((t) t #.(flags)"cadddr(cdddr(cdddr(#0)))")
    (get 'tenth 'inline-safe))
-(push '((t) t #.(flags)"CMPcadddr(CMPcdddr(CMPcdddr(#0)))")
-   (get 'tenth 'inline-unsafe))
+;(push '((t) t #.(flags)"CMPcadddr(CMPcdddr(CMPcdddr(#0)))")
+;   (get 'tenth 'inline-unsafe))
 
 ;;GET
  (push '((t t t) t #.(flags)"get(#0,#1,#2)")
@@ -987,11 +999,14 @@
  (push '((t) seqind #.(flags rfa set)"length(#0)")
    (get 'length 'inline-always))
 (push '((vector) seqind #.(flags rfa)"(#0)->v.v_fillp")
-   (get 'length 'inline-unsafe))
+   (get 'length 'inline-always))
 
 ;;CMP-VEC-LENGTH
 (push '((t) seqind #.(flags rfa)"(#0)->v.v_fillp")
    (get 'cmp-vec-length 'inline-always))
+;;si::VEC-LENGTH
+(push '((t) seqind #.(flags rfa)"(#0)->v.v_fillp")
+   (get 'si::vec-length 'inline-always))
 ;(push '(((array t)) seqind #.(flags rfa)"(#0)->v.v_fillp")
 ;   (get 'length 'inline-unsafe))
 ;(push '(((array fixnum)) seqind #.(flags rfa)"(#0)->v.v_fillp")
@@ -1002,7 +1017,7 @@
 ;;LIST
  (push '(nil t #.(flags)"Cnil")
    (get 'list 'inline-always))
-(push '((t) t #.(flags ans)"make_cons(#0,Cnil)")
+(push '((t) t #.(flags ans)LIST-INLINE)
    (get 'list 'inline-always))
 (push '((t t) t #.(flags ans)LIST-INLINE)
    (get 'list 'inline-always))
@@ -1090,7 +1105,9 @@
    (get 'lognot 'inline-always))
 
 ;;MAKE-LIST
- (push '((fixnum) t #.(flags ans) MAKE-LIST-INLINE)
+ (push '((seqind) proper-list #.(flags ans rfa) MAKE-LIST-INLINE)
+   (get 'make-list 'inline-always))
+ (push '(((integer 0 0)) null #.(flags rfa) "Cnil")
    (get 'make-list 'inline-always))
 
 ;;INTEGER-LENGTH
@@ -1144,14 +1161,14 @@
    (get 'nreverse 'inline-always))
 
 ;;CMP-NTHCDR
+(push '((seqind t) list #.(flags rfa)"({register fixnum _i=#0;register object _x=#1;for (;_i--;_x=_x->c.c_cdr);_x;})")
+   (get 'cmp-nthcdr 'inline-unsafe))
+(push '(((not seqind) proper-list) null #.(flags rfa)"Cnil")
+   (get 'cmp-nthcdr 'inline-unsafe))
 (push '((seqind proper-list) proper-list #.(flags rfa)"({register fixnum _i=#0;register object _x=#1;for (;_i--;_x=_x->c.c_cdr);_x;})")
    (get 'cmp-nthcdr 'inline-always))
 (push '(((and (integer 0) (not seqind)) proper-list) null #.(flags rfa)"Cnil")
    (get 'cmp-nthcdr 'inline-always))
-(push '((seqind t) proper-list #.(flags rfa)"({register fixnum _i=#0;register object _x=#1;for (;_i--;_x=_x->c.c_cdr);_x;})")
-   (get 'cmp-nthcdr 'inline-unsafe))
-(push '(((not seqind) proper-list) null #.(flags rfa)"Cnil")
-   (get 'cmp-nthcdr 'inline-unsafe))
 
 
 ;;NULL
@@ -1228,8 +1245,8 @@ TRUNCATE_USE_C
 ;;REST
  (push '((t) t #.(flags)"cdr(#0)")
    (get 'rest 'inline-safe))
-(push '((t) t #.(flags)"CMPcdr(#0)")
-   (get 'rest 'inline-unsafe))
+;(push '((t) t #.(flags)"CMPcdr(#0)")
+;   (get 'rest 'inline-unsafe))
 
 ;;REVERSE
  (push '((t) t #.(flags ans)"reverse(#0)")
@@ -1248,8 +1265,8 @@ TRUNCATE_USE_C
 ;;SECOND
  (push '((t) t #.(flags)"cadr(#0)")
    (get 'second 'inline-safe))
-(push '((t) t #.(flags)"CMPcadr(#0)")
-   (get 'second 'inline-unsafe))
+;(push '((t) t #.(flags)"CMPcadr(#0)")
+;   (get 'second 'inline-unsafe))
 
 ;;SIN
  (push '((fixnum-float) (long-float -1.0 1.0) #.(flags rfa)"sin(#0)")
@@ -1308,6 +1325,10 @@ TRUNCATE_USE_C
 (push '((t) function #.(flags rfa) "({register object _sym=#0;_sym->s.s_sfdef!=NOT_SPECIAL ? make_cons(sLspecial,make_fixnum((long)_sym->s.s_sfdef)) : (_sym->s.s_mflag ? make_cons(sLmacro,_sym->s.s_gfdef) : _sym->s.s_gfdef);})")
       (get 'symbol-function 'inline-unsafe))
 
+;;FUNCALLABLE-SYMBOL-FUNCTION
+(push '((t) function #.(flags rfa) "#0->s.s_gfdef")
+      (get 'funcallable-symbol-function 'inline-unsafe))
+
 ;;SI::FBOUNDP-SYM
 (push '((t) boolean #.(flags rfa) "@0;(#0->s.s_sfdef!=NOT_SPECIAL || #0->s.s_gfdef)")
       (get 'si::fboundp-sym 'inline-unsafe))
@@ -1354,8 +1375,8 @@ TRUNCATE_USE_C
 ;;THIRD
  (push '((t) t #.(flags)"caddr(#0)")
    (get 'third 'inline-safe))
-(push '((t) t #.(flags)"CMPcaddr(#0)")
-   (get 'third 'inline-unsafe))
+;(push '((t) t #.(flags)"CMPcaddr(#0)")
+;   (get 'third 'inline-unsafe))
 
 ;;TRUNCATE
 
@@ -1390,9 +1411,9 @@ TRUNCATE_USE_C
    (get 'compiled-function-p 'inline-always))
 
 ;;WRITE-CHAR
- (push '((t) t #.(flags set)
-  "@0;(writec_stream(char_code(#0),Vstandard_output->s.s_dbind),(#0))")
-   (get 'write-char 'inline-unsafe))
+; (push '((t) t #.(flags set)
+;  "@0;(writec_stream(char_code(#0),Vstandard_output->s.s_dbind),(#0))")
+;   (get 'write-char 'inline-unsafe))
 
 ;;ZEROP
  (push '((t) boolean #.(flags rfa)"number_compare(small_fixnum(0),#0)==0")

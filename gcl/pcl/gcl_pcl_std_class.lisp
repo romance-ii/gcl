@@ -336,11 +336,11 @@
 (defmethod ensure-class-using-class (name (class null) &rest args &key)
   (multiple-value-bind (meta initargs)
       (ensure-class-values class args)
-    (inform-type-system-about-class (class-prototype meta) name);***
-    (setf class (apply #'make-instance meta :name name initargs)
-	  (find-class name) class)
-    (inform-type-system-about-class class name)	                ;***
-    class))
+      (inform-type-system-about-class (class-prototype meta) name);***
+      (let ((class (apply #'make-instance meta :name name initargs)))
+	(setf (find-class name) class)
+	(inform-type-system-about-class class name)	                ;***
+	class)))
 
 (defmethod ensure-class-using-class (name (class pcl-class) &rest args &key)
   (multiple-value-bind (meta initargs)

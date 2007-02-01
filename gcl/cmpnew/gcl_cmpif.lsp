@@ -37,6 +37,8 @@
 (si:putprop 'case 'c2case 'c2)
 
 (defun note-branch-elimination (test-form val elim-form)
+;  (let ((*suppress-compiler-notes* t) (*suppress-compiler-warnings* t))
+;    (c1expr elim-form))
   (cmpnote "Test form ~S is ~S,~%;; eliminating branch ~S~%" test-form val elim-form))
 
 (defun negate (tp)
@@ -61,11 +63,12 @@
 (defun two-tp-inf (fn t2);;FIXME use num type bounds here for or types
   (if (type-and t2 #tratio) t ;;FIXME
     (let ((t2 (type-and #tlong-float (sublis '((integer . long-float) (short-float . long-float)) t2))))
-      (case fn
-	(>  (cmp-norm-tp `(real ,(cond ((numberp (cadr t2)) (list (cadr t2))) ((cadr t2)) ('*)))))
-	(>= (cmp-norm-tp `(real ,(or (cadr t2) '*))))
-	(<  (cmp-norm-tp `(real * ,(cond ((numberp (caddr t2)) (list (caddr t2))) ((caddr t2)) ('*)))))
-	(<= (cmp-norm-tp `(real * ,(or (caddr t2) '*))))))))
+      (if (not (eq (car t2) 'long-float)) t ;FIXME
+	(case fn
+	      (>  (cmp-norm-tp `(real ,(cond ((numberp (cadr t2)) (list (cadr t2))) ((cadr t2)) ('*)))))
+	      (>= (cmp-norm-tp `(real ,(or (cadr t2) '*))))
+	      (<  (cmp-norm-tp `(real * ,(cond ((numberp (caddr t2)) (list (caddr t2))) ((caddr t2)) ('*)))))
+	      (<= (cmp-norm-tp `(real * ,(or (caddr t2) '*)))))))))
 
 (defmacro vl-name (x) `(var-name (car (third ,x))))
 (defmacro itp (x) `(info-type (second ,x)))
@@ -74,8 +77,8 @@
 
 (defun fmla-infer-tp (fmla)
   (case (car fmla)
-	(fmla-and (reduce (lambda (x y) (tp-reduce 'type-and 'type-or1 x y nil)) (maplist 'fmla-infer-tp (cdr fmla))))
-	(fmla-or  (reduce (lambda (x y) (tp-reduce 'type-or1 'type-and x y nil)) (maplist 'fmla-infer-tp (cdr fmla))))
+	(fmla-and (reduce (lambda (x y) (tp-reduce 'type-and 'type-or1 x y nil)) (maplist 'fmla-infer-tp (cdr fmla))  :initial-value nil))
+	(fmla-or  (reduce (lambda (x y) (tp-reduce 'type-or1 'type-and x y nil)) (maplist 'fmla-infer-tp (cdr fmla))  :initial-value nil))
 	(fmla-not (mapcar (lambda (x) (cons (car x) (cons (cddr x) (cadr x)))) (fmla-infer-tp (cdr fmla))))
 	(var (when (vlp fmla) (list (cons (var-name (car (third fmla))) (cons #t(not null) #tnull)))))
 	(call-global
@@ -95,6 +98,19 @@
 		     (fmla-infer-tp (car fmla))))))
 
 (defvar *restore-vars*)
+
+(defun restrict-type (v ot lt)
+  (setf (var-type v) ot)
+  (unless (type>= lt ot)
+    (let ((nt (type-and ot lt)))
+      (cmpnote "restricting type of ~s to ~s~%" (var-name v) nt)
+      (setf (var-type v) nt))))
+
+(defun ignorable-pivot (pivot value)
+  (let ((s (gensym)))
+    `(let ((,s ,pivot))
+       (declare (ignorable ,s))
+       ,value)))
 
 (defun c1if (args &aux info f)
   (when (or (endp args) (endp (cdr args)))
@@ -120,33 +136,32 @@
 	   (if (not (eq fmlae 'boolean))
 	       (cond (fmlae 
 		      (when (caddr args) (note-branch-elimination (car args) t (caddr args)))
-		      (c1expr** (cadr args) info))
+		      (c1expr** (ignorable-pivot (car args) (cadr args)) info))
 		     (t (note-branch-elimination (car args) nil (cadr args)) 
-			(if (endp (cddr args)) (c1nil) (c1expr** (caddr args) info))))
+			(c1expr** (ignorable-pivot (car args) (caddr args)) info)))
 	     (let (r trv *restore-vars*)
 	       (dolist (l inf)
 		 (let ((v (car (member (car l) *vars* :key (lambda (x) (when (var-p x) (var-name x)))))))
 		   (when v
 		     (push (list v (var-type v) (cdr l)) r))));;FIXME return in this from from infer-tp
 	       (unwind-protect
-		   (let* ((tb (progn (dolist (l r) 
-				       (setf (var-type (car l)) (type-and (cadr l) (car (caddr l)))))
+		   (let* ((tb (progn (dolist (l r) (restrict-type (car l) (cadr l) (car (caddr l))))
 				     (c1expr* (cadr args) info)))
-			  (trv (do ((l (pop *restore-vars*) (pop *restore-vars*))) ((not l) trv)
+			  (trv (do ((l)) ((not (setq l (pop *restore-vars*))) trv)
 				   (push (list (car l) (var-type (car l))) trv)
 				   (setf (var-type (car l)) (cadr l))))
 			  (fb (if (endp (cddr args)) (c1nil)
-				(progn (dolist (l r) 
-					 (setf (var-type (car l)) (type-and (cadr l) (cdr (caddr l)))))
+				(progn (dolist (l r) (restrict-type (car l) (cadr l) (cdr (caddr l))))
 				       (c1expr* (caddr args) info)))))
 		     (setf (info-type info) (type-or1 (info-type (cadr tb)) 
 						      (if (endp (cddr args)) #tnull
 							(info-type (cadr fb)))))
-		     (do ((l (pop *restore-vars*) (pop *restore-vars*))) ((not l))
+		     (do ((l)) ((not (setq l (pop *restore-vars*))))
 			 (push (list (car l) (var-type (car l))) trv)
 			 (setf (var-type (car l)) (cadr l)))
-		     (do ((rv (pop   r) (pop   r))) ((not rv)) (setf (var-type (car rv)) (cadr rv)))
-		     (do ((rv (pop trv) (pop trv))) ((not rv)) 
+		     (do ((rv)) ((not (setq rv (pop r))))
+			 (setf (var-type (car rv)) (cadr rv)))
+		     (do ((rv)) ((not (setq rv (pop trv))))
 			 (setf (var-type (car rv)) (type-or1 (var-type (car rv)) (cadr rv))))
 		     (list 'if info fmla tb fb))
 		 (dolist (l (append *restore-vars* r))
@@ -172,14 +187,16 @@
 	(fmla-and (t-and (fmla-eval-const (cdr fmla)) (fmla-eval-const (cddr fmla))))
 	(fmla-or (t-or (fmla-eval-const (cdr fmla)) (fmla-eval-const (cddr fmla))))
 	(fmla-not (t-not (fmla-eval-const (cdr fmla))))
-	(location (caddr fmla))
+;	(location (caddr fmla))
 	((t nil) (car fmla))
-	(var (cond ((type>= #tnull (info-type (second fmla))) nil) 
-		   ((type>= #t(not null) (info-type (second fmla))) t)
-		   ('boolean)))
+;	((var call-global) (cond ((type>= #tnull (info-type (second fmla))) nil) ;FIXME
+;				 ((type>= #t(not null) (info-type (second fmla))) t)
+;				 ('boolean)))
 	(otherwise (if (consp (car fmla)) 
 		       (fmla-eval-const (car fmla)) 
-		     'boolean))))
+		     (cond ((type>= #tnull (info-type (second fmla))) nil) ;FIXME
+			   ((type>= #t(not null) (info-type (second fmla))) t)
+			   ('boolean))))))
 
 (defun c1fmla-constant (fmla &aux f)
   (cond
@@ -220,21 +237,35 @@
                        fmla))
    (t t)))
 
+(defvar *c1fmla-recursion* nil)
+
+(defun fmla-and-or (fmlac info tp)
+  (let (r rp)
+    (dolist (x fmlac r)
+      (with-restore-vars
+       (let ((z (c1fmla x info)))
+	 (do (l) ((not (setq l (pop *restore-vars*)))) 
+	     (setf (var-type (car l)) (type-or1 (var-type (car l)) (cadr l))))
+	 (setq rp (let ((tmp (cons z nil))) (if rp (cdr (rplacd rp tmp)) (setq r tmp))))
+	 (when (and (info-p (cadr z)) (type>= tp (info-type (cadr z))))
+	   (return r)))))))
+
 (defun c1fmla (fmla info)
   (if (consp fmla)
       (case (car fmla)
             (and (case (length (cdr fmla))
                    (0 (c1t))
                    (1 (c1fmla (cadr fmla) info))
-                   (t (cons 'FMLA-AND ;;FIXME pass this all through iff and avoid duplication of this logic here
-                            (mapcar (lambda (x) (with-restore-vars (prog1 (c1fmla x info) (do (l) ((not (setq l (pop *restore-vars*)))) (setf (var-type (car l)) (type-or1 (var-type (car l)) (cadr l)))))))
-                                    (cdr fmla))))))
+                   (t (cons 'FMLA-AND (fmla-and-or (cdr fmla) info #tnull)))))
+;;FIXME pass this all through iff and avoid duplication of this logic here
+;                            (mapcar (lambda (x) (with-restore-vars (prog1 (c1fmla x info) (do (l) ((not (setq l (pop *restore-vars*)))) (setf (var-type (car l)) (type-or1 (var-type (car l)) (cadr l)))))))
+;                                    (cdr fmla))
             (or (case (length (cdr fmla))
                    (0 (c1nil))
                    (1 (c1fmla (cadr fmla) info))
-                   (t (cons 'FMLA-OR
-                            (mapcar (lambda (x) (with-restore-vars (prog1 (c1fmla x info) (do (l) ((not (setq l (pop *restore-vars*)))) (setf (var-type (car l)) (type-or1 (var-type (car l)) (cadr l)))))))
-                                    (cdr fmla))))))
+                   (t (cons 'FMLA-OR (fmla-and-or (cdr fmla) info #t(not null))))))
+;                            (mapcar (lambda (x) (with-restore-vars (prog1 (c1fmla x info) (do (l) ((not (setq l (pop *restore-vars*)))) (setf (var-type (car l)) (type-or1 (var-type (car l)) (cadr l)))))))
+;                                    (cdr fmla))
             ((not null)
                   (when (endp (cdr fmla)) (too-few-args 'not 1 0))
                   (unless (endp (cddr fmla))
@@ -243,10 +274,11 @@
 	    ;;FIXME collapse and an or to if with compiler-macros/normal macros, and ensure order makes sense with that in c1symbol-fun
             (t (let* ((cm (and (symbolp (car fmla)) (get (car fmla) 'si::compiler-macro-prop)))
 		      (cm (and cm (funcall cm fmla nil))))
-		 (if (and cm (not (eq cm fmla)))
-		     (c1fmla cm info)
-		   (c1expr* `(the boolean ,fmla) info)))))
-      (c1expr* fmla info)))
+		 (cond ((and cm (not (eq cm fmla)))  (c1fmla cm info))
+		       ((let ((r (c1expr* fmla info))) (and (or *c1fmla-recursion*
+								(type>= #tboolean (info-type (cadr r)))) r)))
+		       ((let ((*c1fmla-recursion* t)) (c1expr* `(when ,fmla t) info)))))))
+    (c1expr* fmla info)))
 
 (defun c2if (fmla form1 form2
                   &aux (Tlabel (next-label)) Flabel)
@@ -331,7 +363,7 @@
   (cond ((endp args) (c1t))
         ((endp (cdr args)) (c1expr (car args)))
         ((let ((info (make-info))
-	       (nargs (append (mapcar (lambda (x) `(the boolean ,x)) (butlast args))
+	       (nargs (append (mapcar (lambda (x) `(when ,x t)) (butlast args))
 			      (last args))))
 	   (list 'AND info (c1args nargs info))))))
 
@@ -465,9 +497,10 @@
   (let* ((info (make-info :type #tnil))
          (key-form (c1expr* (car args) info))
          (clauses nil) or-list)
-    (cond ((type>= #tfixnum (info-type (second key-form)))
-	   (return-from c1case  (c1expr (convert-case-to-switch
-				 args default )))))
+    (cond ((unless (atomic-tp (info-type (second key-form)))
+	     (type>= #tfixnum (info-type (second key-form))))
+	   (return-from c1case  (c1expr (convert-case-to-switch args default ))))
+	  ((return-from c1case (c1expr (cmp-macroexpand `(,(if default 'ecase 'case) ,@args))))))
     (dolist (clause (cdr args))
       (cmpck (endp clause) "The CASE clause ~S is illegal." clause)
       (case (car clause)

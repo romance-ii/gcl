@@ -249,7 +249,7 @@
 
 (defun wt-fixnum-value (vv fixnum-value)
   (if vv (wt (vv-str vv))
-    (wt "small_fixnum(" fixnum-value ")")))
+    (wt "make_fixnum(" fixnum-value ")")))
         
 (defun wt-vs-address (v i)
   (wt v "+" i))

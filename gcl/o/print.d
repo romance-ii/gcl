@@ -1543,13 +1543,30 @@ int level;
 		break;
 
 	case t_ifun:
-		write_str("#<interpreted-function ");
-		if (x->ifn.ifn_self != Cnil)
-			write_object(x->ifn.ifn_self, level);
-		else
-			write_addr(x);
-		write_str(">");
-		break;
+	  if (PRINTcircle) {
+	    for (vp = PRINTvs_top;  vp < PRINTvs_limit;  vp += 2)
+	      if (x == *vp) {
+		if (vp[1] != Cnil) {
+		  write_ch('#');
+		  write_decimal((vp-PRINTvs_top)/2+1);
+		  write_ch('#');
+		  return;
+		} else {
+		  write_ch('#');
+		  write_decimal((vp-PRINTvs_top)/2+1);
+		  write_ch('=');
+		  vp[1] = Ct;
+		  break;
+		}
+	      }
+	  }
+	  write_str("#<interpreted-function ");
+	  if (x->ifn.ifn_self != Cnil)
+	    write_object(x->ifn.ifn_self, level);
+	  else
+	    write_addr(x);
+	  write_str(">");
+	  break;
 
 	case t_closure:
 	case t_cclosure:
@@ -1610,6 +1627,8 @@ BEGIN:
 	else if (t == t_vector && (enum aelttype)x->v.v_elttype == aet_object)
 		for (i = 0;  i < x->v.v_fillp;  i++)
 			travel_push_object(x->v.v_self[i]);
+	else if (t == t_ifun)
+		travel_push_object(x->ifn.ifn_self);
 	else if (t == t_cons) {
 		travel_push_object(x->c.c_car);
 		x = x->c.c_cdr;
@@ -2089,6 +2108,7 @@ gcl_init_print()
         travel_push_type[(int)t_array]=1;
 	travel_push_type[(int)t_vector]=1;
 	travel_push_type[(int)t_structure]=1;
+	travel_push_type[(int)t_ifun]=1;
 	travel_push_type[(int) t_cons]=1;
 	if(sizeof(travel_push_type) < (int) t_other)
 	  error("travel_push_size to small see print.d");

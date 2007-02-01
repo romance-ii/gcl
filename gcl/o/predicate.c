@@ -615,7 +615,6 @@ DEFUNO_NEW("EQUAL",object,fLequal,LISP
 		x0 = Ct;
 	else
 		x0 = Cnil;
-	vs_popp;
 	RETURN1(x0);
 }
 
@@ -935,9 +934,7 @@ void
 gcl_init_predicate_function(void)
 {
 
-	sLand=make_special_form("AND",Fand);
-	sLor=make_special_form("OR",For);
-
-
+  sLand=make_special_form("AND",Fand);
+  sLor=make_special_form("OR",For);
 
 }

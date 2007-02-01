@@ -121,8 +121,43 @@
 	(t 
 	 (unless (assoc (var-kind var) +wt-loc-alist+)
 	   (baboon))
-         (let ((*value-to-go* (list 'var var nil)))
-	   (c2expr* init)))))
+	 (cond ((eq (car init) 'inline)
+		(let* ((type (var-kind var))
+		       (nv (make-var :type type :loc (cs-push type t)
+				     :kind (or (car (member (promoted-c-type type) +c-local-var-types+)) 'object))))
+		  (wt-nl "{" (rep-type type) "V" (var-loc nv) ";")
+		  (let ((*value-to-go* (list 'var nv nil)))
+		    (c2expr* init))
+		  (wt-nl "V" (var-loc var) "=V" (var-loc nv) ";}")))
+	       ((let ((*value-to-go* (list 'var var nil)))
+		  (c2expr* init)))))))
+
+;; (defun c2bind-init (var init)
+;;   (case (var-kind var)
+;;         (LEXICAL
+;;          (cond ((var-ref-ccb var)
+;;                 (let ((loc (list 'vs (var-ref var))))
+;;                      (let ((*value-to-go* loc))
+;;                           (c2expr* init))
+;;                      (wt-nl loc "=MMcons(" loc ",") (wt-clink *clink*)
+;;                      (wt ");"))
+;;                 (clink (var-ref var))
+;;                 (setf (var-ref-ccb var) (ccb-vs-push)))
+;;                (t
+;;                 (let ((*value-to-go* (list 'vs (var-ref var))))
+;;                      (c2expr* init)))))
+;;         (SPECIAL
+;;          (let ((*value-to-go* (list 'bds-bind (var-loc var))))
+;;               (c2expr* init))
+;;          (push 'bds-bind *unwind-exit*))
+;; 	(DOWN
+;; 	  (let ((*value-to-go* (list 'down (var-loc var))))
+;; 	    (c2expr* init)))
+;; 	(t 
+;; 	 (unless (assoc (var-kind var) +wt-loc-alist+)
+;; 	   (baboon))
+;;          (let ((*value-to-go* (list 'var var nil)))
+;; 	   (c2expr* init)))))
 
 (defun set-bds-bind (loc vv)
        (wt-nl "bds_bind(" (vv-str vv) "," loc ");"))

@@ -466,8 +466,19 @@
 (defun  cmpfix-args (args bind &aux tem (lam (copy-list (second args))))
   (dolist (v bind)
 	  (setq tem (member (car v) lam))
-	  (and tem
-	       (setf (car tem) (second v))))
+	  (when tem
+	    (setf (car tem) (second v))
+	    (do ((f (cddr args) (cdr f))) ((endp f))
+		(cond ((stringp (car f)))
+		      ((and (consp (car f)) (eq (caar f) 'declare))
+		       (dolist (l (cdar f))
+			 (let ((l (if (eq (car l) 'type) (cdr l) l)))
+			   (when (not (eq '* (cmp-norm-tp (car l))))
+			     (nsublis (list (cons (car v) (cadr v))) (cdr l))))))
+		      ((and (consp (car f)) (eq (caar f) 'check-type))
+		       (when (eq (cadar f) (car v))
+			 (setf (cadar f) (cadr v))))
+		      ((return nil))))))
   (cond ((setq tem (member '&aux lam))
 	 (setf (cdr tem) (append bind (cdr tem))))
 	(t (setf lam (append lam (cons '&aux bind)))))
@@ -488,9 +499,9 @@
 	 (prop (get sym 'setf-proclamations))
 	 (cmpm (get sym 'si::compiler-macro-prop-setf)))
      (let ((p (or (symbol-package sym)
-		  (unless *tmp-pack*
-		    (setq *tmp-pack* (make-package (symbol-name (gensym))))))))
-       (import new p))
+		  *tmp-pack*
+		  (setq *tmp-pack* (make-package (symbol-name (gensym)))))))
+       (or (find-symbol (string new) p) (import new p)))
      (push (cons sym new) *setf-function-proxy-symbols*)
      (when prop
        (dolist (l '(proclaimed-arg-types proclaimed-return-type proclaimed-function))
@@ -549,6 +560,8 @@
 		  (when opts (local-compile-decls opts)))
 		form)
 	       (the `(,(car form) ,(cadr form) ,@(portable-source (cddr form) t)))
+	       ((and or) `(,(car form) ,@(portable-source (cdr form) t)))
+	       (check-type form)
 	       ((flet labels macrolet) 
 		`(,(car form)
 		  ,(mapcar (lambda (x) `(,(car x) ,@(cdr (portable-source `(lambda ,@(cdr x)))))) (cadr form))
@@ -571,23 +584,38 @@
 
 (defvar *no-proxy-symbols* nil)
 
+(defun this-safety-level nil
+  (cond (*compiler-push-events* 3)
+	(*safe-compile* 2)
+	(*compiler-check-args* 1)
+	(0)))
+  
 (defun pd (fname ll args)
-  (let (decls doc (*no-proxy-symbols* t))
+  (let (decls ctps doc (*no-proxy-symbols* t))
     (when (and (consp args) (stringp (car args))) (push (pop args) doc))
     (do nil ((or (not args) (not (consp (car args))) (not (eq (caar args) 'declare))))
 	(push (pop args) decls))
+    (do nil ((or (not args) (not (consp (car args))) (not (eq (caar args) 'check-type))))
+	(push (pop args) ctps))
     (let* ((nal (do (r (y ll)) ((or (not y) (eq (car y) '&aux)) (nreverse r)) (push (pop y) r)))
 	   (al (cdr (member '&aux ll)))
-	   (dd (aux-decls (mapcar (lambda (x) (if (atom x) x (car x))) al) decls))
-	   (*mlts* '(or and not)));FIXME
+	   (ax (mapcar (lambda (x) (if (atom x) x (car x))) al))
+	   (dd (aux-decls ax decls))
+	   (cc (aux-ctps  ax ctps))
+	   (sd `(declare (optimize (safety ,(this-safety-level))))))
       (portable-source `(lambda ,nal
 			  ,@doc
-			  (declare (optimize (safety ,(cond (*compiler-push-events* 3)
-							    (*safe-compile* 2)
-							    (*compiler-check-args* 1)
-							    (0)))))
-			  ,@(nreverse (cadr dd))
-			  (block ,fname (let* ,al ,@(car dd) ,@args)))))))
+			  ,@(let ((r (nreverse (cadr dd))))
+			      (unless (and (consp r) (consp (car r)) (eq (caar r) 'declare)
+					   (consp (cadar r)) (eq (caadar r) 'optimize)
+					   (consp (cadr (cadar r))) (eq (caadr (cadar r)) 'safety))
+				(push sd r))
+			      (nconc r (cadr cc)))
+			  ,@(let* ((r args)
+				   (r (if (or al (car dd)) `((let* ,al ,@(append (car dd) (car cc)) ,@r)) r))
+				   (r (if (and (consp (car r)) (eq (caar r) 'block) (eq (cadar r) fname))
+					  r `((block ,fname ,@r)))))
+			      r))))))
 
 (defvar *recursion-detected*)
 
@@ -610,6 +638,23 @@
 			      (push `(declare (,@z ,@q)) dd)))))))))))
     (list (nreverse ad) (nreverse dd))))
 
+(defun aux-ctps (auxs ctps)
+  (let (ad dd)
+    (dolist (l ctps) (if (member (cadr l) auxs) (push l ad) (push l dd)))
+    (list (nreverse ad) (nreverse dd))))
+
+(defun c1retnote (le)
+  (case (car le)
+	(call-global (list (third le) (export-type (info-type (second le)))))
+	((let let*) (list (car le) (export-type (info-type (second le))) 
+			  (mapcar (lambda (x y) (list (var-name x) (c1retnote y))) (third le) (fourth le)) (c1retnote (fifth le))))
+	((progn lambda) (list (car le) (export-type (info-type (second le))) (c1retnote (car (last (car (last le)))))))
+	(if (list (car le) (export-type (info-type (second le))) (c1retnote (fourth le)) (c1retnote (fifth le))))
+	(var (list (car le) (export-type (info-type (second le))) (var-name (car (third le)))))
+	(otherwise (list (car le) 'foo))))
+
+(defvar *callees* nil)
+
 (defun t1defun (args &aux (setjmps *setjmps*) (defun 'defun) (*sharp-commas* nil) fname lambda-expr cfun doc)
   (when (or (endp args) (endp (cdr args)))
         (too-few-args 'defun 2 (length args)))
@@ -618,7 +663,7 @@
   (setq cfun (or (get fname 'Ufun) (next-cfun)))
   (maybe-eval nil  (cons 'defun args))
 
-  (let ((*recursion-detected* nil))
+  (let (*recursion-detected* *callees* (e (or (gethash fname *sigs*) (setf (gethash fname *sigs*) (make-list 4)))))
     
     (tagbody
 
@@ -627,12 +672,12 @@
      (setq *non-package-operation* t)
      (setq *local-functions* nil)
 
-     (let* ((*vars* nil) (*funs* nil) (*blocks* nil) (*tags* nil)
-	    (*special-binding* nil))
+     (let* (*vars* *funs* *blocks* *tags* *special-binding*)
        (setq lambda-expr (c1lambda-expr (cdr args) fname)))
      (or (eql setjmps *setjmps*) (setf (info-volatile (cadr lambda-expr)) 1))
      (check-downward (cadr lambda-expr))
-     
+     (cmpnote "~s return type ~s" fname (c1retnote lambda-expr))
+
      (when *compiler-auto-proclaim*
 
        (let* ((al (mapcar 'var-type (caaddr lambda-expr)));(lambda (x) (readable-tp (var-type x)))
@@ -647,7 +692,8 @@
 	   (unless (equal oal '(*))
 	     (unless (and (= (length al) (length oal))
 			  (every (lambda (x y) (or (and (eq x '*) (eq y '*)) (type>= y x))) al oal))
-	       (cmpwarn "arg type mismatch in auto-proclamation ~s -> ~s~%" (mapcar 'export-type oal) (mapcar 'export-type al))))
+	       (cmpwarn "arg type mismatch in auto-proclamation ~s -> ~s~%" 
+			(mapcar 'export-type oal) (mapcar 'export-type al))))
 	   (unless (eq ort '*)
 	     (unless (type>= ort rt)
 	       (when (or (and (eq rt '*) (not (eq ort '*)))
@@ -655,9 +701,9 @@
 			 (and (get fname 'return-type) (single-type-p (get fname 'return-type)) (not (single-type-p rt))))
 		 (cmpwarn "ret type mismatch in auto-proclamation ~s(~s) -> ~s~%" 
 			  (export-type ort) (get fname 'return-type) (export-type rt)))))
-	   (let ((osig (or (gethash fname *sigs*) (list (mapcar 'export-type oal) (export-type ort))));(gethash fname *sigs*))
-		 (sig (list (mapcar 'export-type al) (export-type (if *recursion-detected* (bump-tp rt) rt)))))
-	     (unless (or (equal sig osig) *new-sigs-in-file*)
+	   (let* ((osig (or (car e) (list (mapcar 'export-type oal) (export-type ort))));(gethash fname *sigs*))
+		  (sig (list (mapcar 'export-type al) (export-type (if *recursion-detected* (bump-tp rt) rt)))))
+	     (unless (or (equal sig osig) *new-sigs-in-file* *recursion-detected*)
 	       (setq *new-sigs-in-file* 
 		     (some (lambda (x) 
 			     (unless (eq x fname)
@@ -665,7 +711,7 @@
 				(s f) (gethash x *sigs*) 
 				(declare (ignore s))
 				(when f (list x fname osig sig))))) (si::callers fname))))
-	     (setf (gethash fname *sigs*) sig)
+	     (setf (car e) sig)
 	     (si::procl fname sig))
 	   (when *recursion-detected*;FIXME
 	     (let ((al (get-arg-types fname)) (rt (get-return-type fname)))
@@ -716,9 +762,7 @@
 					   bind)
 				     t))
 			  (type-and (car types) (var-type var))
-			  (or (member (car types)
-				      #l(fixnum character
-						long-float short-float))
+			  (or (member (car types) (list #tfixnum #tcharacter #tlong-float #tshort-float))
 			      (eq (var-loc var) 'object)
 			      *c-gc* 
 			      (not (is-changed var (cadr lambda-expr)))))
@@ -744,15 +788,15 @@
 	   *top-level-forms*)
      (push (cons fname cfun) *global-funs*)
      
-     (si::add-hash fname nil nil
-		   (let* ((w (make-string-output-stream))
-			  (ss (si::open-fasd w :output nil nil))
-			  (out (pd fname (cadr args) (cddr args))))
-		     (si::find-sharing-top out (aref ss 1))
-		     (si::write-fasd-top out ss)
-		     (si::close-fasd ss)
-		     (get-output-stream-string w))
-		   (unless *compiler-compile* (namestring (pathname *compiler-input*)))))))
+     (setf (cadr e) *callees* 
+	   (caddr e) (let* ((w (make-string-output-stream))
+			    (ss (si::open-fasd w :output nil nil))
+			    (out (pd fname (cadr args) (cddr args))))
+		       (si::find-sharing-top out (aref ss 1))
+		       (si::write-fasd-top out ss)
+		       (si::close-fasd ss)
+		       (get-output-stream-string w))
+	   (cadddr e) (unless *compiler-compile* (namestring (pathname *compiler-input*)))))))
   
 (defun make-inline-string (cfun args fname)
   (if (null args)
@@ -930,12 +974,14 @@
 	   (add-init `(si::mf ',fname ,(add-address (c-function-name "" cfun fname) )) )))
            
   (when *compiler-auto-proclaim*
-    (let ((h (gethash fname si::*call-hash-table*)))
-      (add-init `(si::add-hash ',fname ',(gethash fname *sigs*)
-			       ',(mapcar (lambda (x) 
-					   (cons x (or (gethash x *sigs*) (si::call-sig (gethash x si::*call-hash-table*)))))
-					 (sublis +cmp-fn-alist+ (si::call-callees h)))
-			       ,(si::call-src h) ,(si::call-file h)))))
+    (add-init `(si::add-hash ',fname ,@(mapcar (lambda (x) `(quote ,x)) (gethash fname *sigs*)))))
+;;    (let ((h (gethash fname si::*call-hash-table*)))
+;;       (add-init `(si::add-hash ',fname ',(gethash fname *sigs*)
+;; 			       ',(mapcar (lambda (x) 
+;; 					   (cons x (or (gethash x *sigs*) (si::call-sig (gethash x si::*call-hash-table*)))))
+;; 					 (sublis +cmp-fn-alist+ (si::call-callees h)))
+;; 			       ,(si::call-src h) ,(si::call-file h)))
+;;      ))
 
   (let ((base-name (setf-function-base-symbol fname)))
     (when base-name
@@ -1122,7 +1168,7 @@
 	  (not (ll-rest ll))
 	  (dolist* (var (ll-requireds ll) t)
 		   (when (var-ref-ccb var) (return nil)))
-	  (every (lambda (x) (and (consp x) (consp (cadr x)) (eq (caadr x) 'location))) (ll-optionals ll));fixme function defaults
+	  (not (member-if-not (lambda (x) (and (consp x) (consp (cadr x)) (eq (caadr x) 'location))) (ll-optionals ll)));fixme function defaults
 	  (null (ll-keywords ll))
 	  (cons fname (append (if mv-var (cdr (car ll)) (car ll)) (ll-optionals ll)))))
 	(*unwind-exit* *unwind-exit*))
@@ -1178,7 +1224,7 @@
     
   ;;; Allocate the parameters.
     (dolist** (var (car ll))    (set-up-var-cvs var))
-    (dolist** (opt (ll-optionals ll))  (set-up-var-cvs (car opt)))
+    (dolist** (opt (ll-optionals ll))  (set-up-var-cvs (car opt)) (when (caddr opt) (set-up-var-cvs (caddr opt))))
     
     
     (when (ll-rest ll) (set-up-var-cvs (ll-rest ll))) 
@@ -1437,7 +1483,6 @@
 (defun wt-requireds (requireds arg-types)
   (do ((vl requireds (cdr vl)))
       ((endp vl))
-;      (declare (object vl))
       (let ((cvar (cs-push (var-type (car vl)) t)))
 	(setf (var-loc (car vl)) cvar)
 	(wt "V" cvar))
@@ -1445,18 +1490,18 @@
   (wt ")
 ")
   (when requireds
-	(wt-nl1)
-	(do ((vl requireds (cdr vl))
-	     (types arg-types (cdr types))
-	     (prev-type nil))
-	    ((endp vl) (wt ";"))
-
-	    (if prev-type (wt ";"))
-                 
-	    (wt *volatile* (register (car vl))
-		(rep-type (car types)))	
-	    (setq prev-type (car types))
-	    (wt "V" (var-loc (car vl))))))
+    (wt-nl1)
+    (do ((vl requireds (cdr vl))
+	 (types arg-types (cdr types))
+	 (prev-type nil))
+	((endp vl) (wt ";"))
+	
+	(if prev-type (wt ";"))
+	
+	(wt *volatile* (register (car vl))
+	    (rep-type (car types)));(var-kind (car vl))));(car types)))	
+	(setq prev-type (car types))
+	(wt "V" (var-loc (car vl))))))
 
 
 (defun add-debug-info (fname lambda-expr &aux locals)
@@ -2068,3 +2113,14 @@
 
 
 
+(defconstant +boot-fns+ '(c1add-globals c1expr* c1make-var cmp-norm-tp equal-is-eq eql-is-eq
+    set-var-init-type bsearchleq push-array type-of do-num-relations 
+    do-predicate type>= type-and fmla-infer-tp fmla-eval-const 
+    c1fmla c1progn  c1let* c1let 
+    result-type-from-args coerce-to-one-value check-form-type
+    maybe-inline c1local-fun c1lambda-fun c1symbol-fun c1structure-ref1
+    inline-possible cmp-eval get-return-type get-arg-types second first
+    cmp-expand-macro and-form-type get-local-arg-types
+    get-local-return-type c1args c1var function-lambda-expression
+    atomic-tp do-eq-et-al make-info c1expr** c1if add-info add-constant
+    add-object c1constant-value  c1tagbody object-type c1expr))

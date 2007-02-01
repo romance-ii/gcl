@@ -1414,6 +1414,8 @@ call_proc_new(object sym, int setf,int vald, void **link, int argd, object first
     fprintf(stderr,"Warning: arg/val mismatch in call to %-.*s prevents fast linking: %d %ld/%d %ld, recompile caller\n",
 	    (int)sym->s.s_fillp,sym->s.s_self,(argd & (~VFUN_NARG_BIT)),fun->sfn.sfn_argd,vald,fun->sfn.sfn_nval);
 
+  if (sSAprofilingA->s.s_dbind!=Cnil)
+    sSin_call->s.s_gfdef->sfn.sfn_self(sym);
 
   if (fas) {
 
@@ -1444,12 +1446,20 @@ call_proc_new(object sym, int setf,int vald, void **link, int argd, object first
      if (nargs-- > 0) x7=va_arg(ll,object); else return(LCAST(fn)(x0,x1,x2,x3,x4,x5,x6));
      if (nargs-- > 0) x8=va_arg(ll,object); else return(LCAST(fn)(x0,x1,x2,x3,x4,x5,x6,x7));
      if (nargs-- > 0) x9=va_arg(ll,object); else return(LCAST(fn)(x0,x1,x2,x3,x4,x5,x6,x7,x8));
+
+     if (sSAprofilingA->s.s_dbind!=Cnil)
+       sSout_call->s.s_gfdef->sfn.sfn_self(fSgettimeofday());
+
      return(LCAST(fn)(x0,x1,x2,x3,x4,x5,x6,x7,x8,x9));
      
    }  else {
 
      object *new;
      COERCE_VA_LIST_NEW(new,first,ll,nargs);
+
+     if (sSAprofilingA->s.s_dbind!=Cnil)
+       sSout_call->s.s_gfdef->sfn.sfn_self(fSgettimeofday());
+
      return(c_apply_n(fn,nargs,new));
    
    }
@@ -1520,6 +1530,8 @@ call_proc_new(object sym, int setf,int vald, void **link, int argd, object first
        break;
      }
 
+     if (sSAprofilingA->s.s_dbind!=Cnil)
+       sSout_call->s.s_gfdef->sfn.sfn_self(fSgettimeofday());
      return res;
 
   }

@@ -66,6 +66,7 @@
   (dynamic  0 :type unsigned-char)  ;;; If variable is declared dynamic-extent
   (space    0  :type char)          ;;; If variable is declared as an object array of this size
   (known-init -1 :type char)        ;;; Number of above known to be implicitly initialized
+  store         ;;; keep kind in hashed c1forms
   )
 
 
@@ -124,25 +125,25 @@
     var))
 
 (defun check-vref (var)
-  (when (and (eq (var-kind var) 'LEXICAL)
-             (not (var-ref var)) ;;; This field may be IGNORE.
+  (unless *in-inline*
+    (when (and (eq (var-kind var) 'LEXICAL)
+	       (not (var-ref var)) ;;; This field may be IGNORE.
              (not (var-ref-ccb var)))
-;	     (every (lambda (x) (or (not (var-p x)) (not (t-to-nil (var-tag x))))) *vars*))
-        (cmpwarn "The variable ~s is not used." (var-name var))))
+					;	     (every (lambda (x) (or (not (var-p x)) (not (t-to-nil (var-tag x))))) *vars*))
+      (cmpwarn "The variable ~s is not used." (var-name var)))))
 
 (defun c1var (name)
-  (let ((info (make-info))
+  (let ((info (make-info :referred-array (make-array 1 :fill-pointer 0)))
+;			 :changed-array +empty-info-array+))
         (vref (c1vref name)))
        (push-referred (car vref) info)
        (setf (info-type info) (var-type (car vref)))
-       (list 'var info vref))
-  )
+       (list 'var info vref)))
 
 ;;; A variable reference (vref for short) is a pair
 ;;;	( var-object  ccb-reference )
 
 (defun c1vref (name &aux (ccb nil) (clb nil))
-       (declare (object ccb clb))
   (dolist* (var *vars*
                (let ((var (sch-global name)))
                     (unless var
@@ -375,7 +376,7 @@
 	  (let* ((nmt (bump-tp (var-mt v)))
 		 (nmt (type-and nmt (var-dt v))))
 	    (setf (var-mt v) nmt))
-	  (throw (var-tag v) v))))))
+	  (pushnew v *tvc*))))));(throw (var-tag v) v)
 
 (defun set-form-type (form type)
   (let* ((it (info-type (cadr form)))

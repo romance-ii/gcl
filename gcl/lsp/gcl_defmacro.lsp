@@ -110,7 +110,7 @@
                                      )))
                 body))
   (dolist (ac *arg-check*)
-          (push `(unless (endp ,(dm-nth-cdr (cdr ac) (car ac)))
+          (push `(when ,(dm-nth-cdr (cdr ac) (car ac))
                          (dm-too-many-arguments)) body))
   (unless envp (push `(declare (ignore ,env)) decls))
 ;  (list doc ppn `(lambda-block ,name ,(reverse *dl*) ,@(append decls body)))

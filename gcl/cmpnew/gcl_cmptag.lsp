@@ -107,7 +107,7 @@
 	  ((let progn let* lambda the multiple-value-bind) (recognizable-go-form (car (last form))))
 	  (if (and (recognizable-go-form (caddr form)) (recognizable-go-form (cadddr form))))
 	  ;fixme other cases handled homogenously
-	  ((ccase ecase case) (every (lambda (x) (recognizable-go-form (car (last x)))) (cddr form))))))
+	  ((ccase ecase case) (not (member-if-not (lambda (x) (recognizable-go-form (car (last x)))) (cddr form)))))))
 
 (defun munge-tagbody (form)
   (let (r)
@@ -140,6 +140,7 @@
 	   (if (equal nf form) form (texpand nf))))
 	(form)))
 
+(defvar *tvc* nil)
 (defun c1tagbody (body &aux (*tags* *tags*) (info (make-info)))
 
   ;fixme  This needs doing in a separate pass1 loop, but appears quite hairy at the moment.
@@ -149,8 +150,7 @@
         (mapcar
          (lambda (x)
              (cond ((or (symbolp x) (integerp x))
-                    (let ((tag (make-tag :name x :ref nil
-                                         :ref-ccb nil :ref-clb nil)))
+                    (let ((tag (make-tag :name x :ref nil :ref-ccb nil :ref-clb nil)))
                       (push tag *tags*)
                       tag))
                    (t x)))
@@ -168,7 +168,7 @@
 				    (push (list v (var-mt v) (var-tag v)) vl)
 				    (setf (var-tag v) nt (var-mt v) (var-type v))))
 	       (unwind-protect 
-		   (do ((tob ob ob) (tnb nb nb))
+		   (do ((tob ob ob) (tnb nb nb) *tvc*)
 		       ((not 
 			 (let ((nv (with-restore-vars  
 				     (catch nt 
@@ -177,16 +177,15 @@
 					 (push (if (typep l 'tag) 
 						   (progn (pop-restore-vars) l)
 						 (c1expr* l info)) tnb))))));maybe copy-info here
-			   (when nv 
-			     (let ((ov (car (member nv vl :key 'car))))
-			       (when (caddr ov)
-				 (unless (type>= (cadr ov) (var-mt nv))
-				   (setf (cadr ov) (var-mt nv))
-				   (throw (caddr ov) nv))))
-			     (setf (var-type nv) (var-mt nv)))))
+			   (when nv
+			     (do nil ((not (setq nv (pop *tvc*))) t) (setf (var-type nv) (var-mt nv))))))
 			tnb))
-		 (dolist (v vl) (setf (var-mt (car v)) (type-or1 (var-mt (car v)) (cadr v))
-				      (var-tag (car v)) (caddr v)))))))))
+		 (dolist (v vl) 
+		   (when (caddr v)
+		     (unless (type>= (cadr v) (var-mt (car v)))
+		       (pushnew (car v) *tvc*)))
+		   (setf (var-mt (car v)) (type-or1 (var-mt (car v)) (cadr v))
+			 (var-tag (car v)) (caddr v)))))))))
 
 				     
   ;;; Delete redundant tags.
@@ -338,7 +337,11 @@
       (cb (setq ccb t))
       (lb (setq clb t))
       (t (when (eq (tag-name (car tags)) name)
-           (let ((tag (car tags)))
+	   (when *tvc*
+	     (let ((v (car *tvc*)))
+	       (when (var-tag v)
+		 (throw (var-tag v) v))))
+	   (let ((tag (car tags)))
              (cond (ccb (setf (tag-ref-ccb tag) t))
                    (clb (setf (tag-ref-clb tag) t))
                    (t (setf (tag-ref tag) t)))
@@ -397,6 +400,20 @@
 			   (t
 			    (push b new-body))))
 		   (nreverse new-body)))
+	   (setq body
+		 (let (skip cs new-body dfp rt)
+		   (dolist (b body (nreverse new-body))
+		     (cond ((or (symbolp b) (integerp b))
+			    (unless cs (setq cs t skip t))
+			    (let* ((e (info-type (second (c1expr b))))
+				   (df (type>= #tsymbol e))
+				   (e (if df (cmp-norm-tp `(and integer (not ,rt))) e)))
+			      (cond ((and df dfp) (cmperr "default tag must be last~%"))
+				    ((type-and (info-type (second switch-op-1)) e)
+				     (setq skip nil dfp df rt (type-or1 rt e))
+				     (push b new-body))
+				    ((cmpnote "Eliminating unreachable switch ~s" b)))))
+			   ((not skip) (setq cs nil) (push b new-body))))))
 	   (setq body
 		 (mapcar
 		  #'(lambda (x)

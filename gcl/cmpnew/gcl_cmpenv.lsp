@@ -139,11 +139,10 @@
 ;;;	( {type}* [ &optional {type}* ] [ &rest type ] [ &key {type}* ] )
 ;;; though &optional, &rest, and &key return types are simply ignored.
 
-(defun t-to-nil (x)
-  (if (eq x t) nil x))
+(defmacro t-to-nil (x) (let ((s (gensym))) `(let ((,s ,x)) (if (eq ,s t) nil ,s))))
 
-(defun nil-to-t (x)
-  (if x x t))
+(defmacro nil-to-t (x) `(or ,x t))
+
 
 (defun is-global-arg-type (x)
   (let ((x (promoted-c-type x)))
@@ -289,7 +288,7 @@
 				 (ntypes (if (> l2 l1) (append types e) types))
 				 (ntypes1 (if (> l1 l2) (append types1 e) types1))
 				 (res (mapcar 'type-and ntypes1 ntypes)))
-			    (cond ((every 'identity res) res)
+			    (cond ((not (member-if-not 'identity res)) res)
 				  ((progn 
 				     (cmpwarn "The arg types of ~s were badly declared." fname)
 				     types1)))))
@@ -335,9 +334,9 @@
 (defvar *notinline* nil)
 
 (defun inline-possible (fname)
-       (not (or *compiler-push-events*
-                (member fname *notinline*)
-                (get fname 'cmp-notinline))))
+  (not (or *compiler-push-events*
+	   (member fname *notinline*)
+	   (get fname 'cmp-notinline))))
 
 (defun proclaim (decl)
  (declare (optimize (safety 2)))
@@ -399,6 +398,7 @@
   nil)
 
 (defun proclaim-var (type vl)
+  (declare (optimize (safety 1)))
   (check-type vl list)
   (setq type (type-filter type))
   (dolist** (var vl)
@@ -417,8 +417,21 @@
 	     (si:putprop var type1 'cmp-type)))
           ((warn "The variable name ~s is not a symbol." var)))))
 
+
+(defun max-vtp (tp)
+  (let ((n (cmp-norm-tp tp)))
+    (if (eq n '*)
+	(cmp-norm-tp `(si::type-max (and t ,tp)))
+      n)))
+
+(defun min-ftp (tp)
+  (let ((n (cmp-norm-tp tp)))
+    (if (eq n '*)
+	(cmp-norm-tp `(si::type-min (or nil ,tp)))
+      n)))
+
 (defun c1body (body doc-p &aux (ss nil) (is nil) (ts nil) (others nil)
-                    doc form)
+                    doc form ctps cps)
   (loop
     (when (endp body) (return))
     (setq form (cmp-macroexpand (car body)))
@@ -428,6 +441,8 @@
      ((stringp form)
       (when (or (null doc-p) (endp (cdr body)) doc) (return))
       (setq doc form))
+     ((and (consp form) (eq (caar body) 'check-type))
+      (push (car body) ctps))
      ((and (consp form) (eq (car form) 'declare))
       (dolist** (decl (cdr form))
 ;;; Add support for 'cons' declarations, such as (declare ((vector t) foo))
@@ -439,7 +454,7 @@
 ;;		       (dft (and (symbolp dtype) (get dtype 'si::deftype-definition)))
 ;;		       (dtype (or (and dft (funcall dft)) dtype)))
 		  (if (consp dtype)
-		    (let* ((dtype (cmp-norm-tp dtype))
+		    (let* ((dtype (max-vtp dtype))
 			   (stype (car dtype)))
 ;		      (cmpck (or (not (symbolp stype)) (cdddr dtype)) "The declaration ~s is illegal." decl) FIXME
 		      (case stype
@@ -468,10 +483,12 @@
 				   (when (eq stype 'ignorable)
 				     (push 'ignorable is))
 				   (push var is)))
+			((optimize ftype inline notinline)
+			 (push decl others))
 			(type
 			 (cmpck (endp (cdr decl))
 				"The type declaration ~s is illegal." decl)
-			 (let ((type (type-filter (cadr decl))))
+			 (let ((type (max-vtp (cadr decl))))
 			   (when type
 			     (dolist** (var (cddr decl))
 				       (cmpck (not (symbolp var))
@@ -481,7 +498,7 @@
 			(class
 			 (cmpck (cdddr decl)
 				"The type declaration ~s is illegal." decl)
-			 (let ((type (type-filter (or (caddr decl) (car decl)))))
+			 (let ((type (max-vtp (or (caddr decl) (car decl)))))
 			   (when type
 			     (let ((var (cadr decl)))
 			       (cmpck (not (symbolp var))
@@ -508,8 +525,8 @@
 					  decl var)
 				   (push (cons var 'dynamic-extent) ts)))
 			(otherwise
-			 (let ((type (cmp-norm-tp stype)))
-			   (if (not (eq type '*))
+			 (let ((type (max-vtp stype)))
+			   (if (not (eq type t))
 			       (dolist** (var (cdr decl))
 					 (cmpck (not (symbolp var))
 						"The type declaration ~s contains a non-symbol ~s."
@@ -517,10 +534,26 @@
 					 (push (cons var type) ts))
 			     (push decl others))))))))))
      (t (return)))
-    (pop body)
-    )
-  (values body ss ts is others doc)
-  )
+    (pop body))
+  (dolist (l ctps) 
+    (when (and (cadr l) (symbolp (cadr l))) 
+      (let ((tp (max-vtp (caddr l)))) 
+	(unless (eq tp t) 
+	  (push (cons (cadr l) tp) cps)))))
+  (let ((s (dolist (l others *compiler-check-args*) 
+	     (let ((l (if (eq (car l) 'optimize) (cadr l) l)))
+	       (when (and (consp l) (eq (car l) 'safety) (numberp (cadr l)))
+		 (return (> (cadr l) 0)))))));FIXME
+    (when cps
+      (if s
+	  (setq body `((let ,(mapcar (lambda (x) (list (car x) (car x))) cps)
+			 (declare ,@(mapcar (lambda (x) (list (cdr x) (car x))) cps))
+			 ,@body)))
+	(setq ts (nconc cps ts))))
+    (when (and ctps s)
+      (setq body (nreconc ctps body))))
+  (values body ss ts is others doc cps))
+
 
 (defun c1decl-body (decls body &aux (dl nil))
   (if (null decls)

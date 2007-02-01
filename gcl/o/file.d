@@ -823,6 +823,7 @@ int line_length;
 	strng = alloc_object(t_string);
 	strng->st.st_hasfillp = TRUE;
 	strng->st.st_adjustable = TRUE;
+	strng->st.st_elttype = aet_ch;
 	strng->st.st_displaced = Cnil;
 	strng->st.st_dim = line_length;
 	strng->st.st_fillp = 0;

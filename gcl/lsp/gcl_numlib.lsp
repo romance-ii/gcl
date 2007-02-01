@@ -39,7 +39,8 @@
 (in-package 'system)
 
 
-(eval-when (compile) (proclaim '(optimize (safety 1) (space 3))))
+;(eval-when (compile) (proclaim '(optimize (safety 1) (space 3))))
+(eval-when (compile) (proclaim '(optimize (safety 1))))
 
 
 (defconstant imag-one #C(0 1))

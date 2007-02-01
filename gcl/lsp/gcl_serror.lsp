@@ -110,7 +110,7 @@
       (proto-restart-case
        (proto-signal c)
        (proto-muffle-warning nil :report "Skip warning."  (proto-return-from warn nil))))
-    (format *error-output* "~&Warning:~a~%" c)
+    (format *error-output* "~&Warning: ~a~%" c)
     nil))
 
 (defun process-error (datum args function-name &optional default-type)

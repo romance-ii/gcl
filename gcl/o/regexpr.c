@@ -85,7 +85,6 @@ DEFUN_NEW("COMPILE-REGEXP",object,fScompile_regexp,SI,1,1,NONE,OO,OO,OO,OO,(obje
   res->v.v_hasfillp=1;
   res->v.v_elttype=aet_uchar;
   res->v.v_adjustable=0;
-  res->v.v_offset=0;
   res->v.v_self=v;
   res->v.v_fillp=res->v.v_dim=sz;
 

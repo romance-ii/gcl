@@ -397,6 +397,7 @@ DEFUN_NEW("MAKE-VECTOR1",object,fSmake_vector1,SI,3,8,NONE,OI,
       switch(elt_type) {
       case aet_ch:
 	x = alloc_object(t_string);
+	x->ust.ust_elttype = elt_type;
 	x->ust.ust_adjustable=1;
 	goto a_string;
 	break;
@@ -1203,40 +1204,55 @@ Icheck_displaced(object displaced_list, object ar, int dim)
 /*  } */
 /* } */
 
-DEFUNO_NEW("REPLACE-ARRAY",object,fSreplace_array,SI,2,2,NONE,
-       OO,OO,OO,OO,void,siLreplace_array,(object old,object new),"")
-{ struct dummy fw ;
+DEFUNO_NEW("REPLACE-ARRAY",object,fSreplace_array,SI,2,2,NONE,OO,OO,OO,OO,void,siLreplace_array,(object old,object new),"") { 
+  
+  struct dummy fw;
+  int offset;
+  object displaced;
+  enum type otp=type_of(old),ntp=type_of(new);;
+    
   fw = old->d;
-
   old = IisArray(old);
   
-  if (TYPE_OF(old) != TYPE_OF(new)
-      || (TYPE_OF(old) == t_array && old->a.a_rank != new->a.a_rank))
-    { 
-	FEerror("Cannot do array replacement ~a by ~a",2,old,new);
-      }
-  { int offset = new->ust.ust_self  - old->ust.ust_self;
-    object displaced = make_cons(DISPLACED_TO(new),DISPLACED_FROM(old));
-    Icheck_displaced(DISPLACED_FROM(old),old,new->a.a_dim);
-    adjust_displaced(old,offset);
-/*    Iundisplace(old); */
-    if (TYPE_OF(old) == t_vector && old->v.v_hasfillp)
-      { new->v.v_hasfillp = 1;
-	new->v.v_fillp = old->v.v_fillp;}
-    if (TYPE_OF(old) == t_string)
-      old->st = new->st;
-    else
-      old->a = new ->a;
-    
-    /* prevent having two arrays with the same body--which are not related
-       that would cause the gc to try to copy both arrays and there might
-       not be enough space. */
-    new->a.a_dim = 0;
-    new->a.a_self = 0;
-    old->d = fw;
-    old->a.a_displaced = displaced;
+  if (otp != ntp || (otp == t_array && old->a.a_rank != new->a.a_rank))
+    FEerror("Cannot do array replacement ~a by ~a",2,old,new);
+
+  offset = new->ust.ust_self  - old->ust.ust_self;
+  displaced = make_cons(DISPLACED_TO(new),DISPLACED_FROM(old));
+  Icheck_displaced(DISPLACED_FROM(old),old,new->a.a_dim);
+  adjust_displaced(old,offset);
+  if (otp == t_vector && old->v.v_hasfillp) {
+    new->v.v_hasfillp = 1;
+    new->v.v_fillp = old->v.v_fillp;
   }
+  switch (otp) {
+    case t_array: 
+    old->a=new->a;
+    break;
+    case t_bitvector:/*FIXME*/
+    old->bv=new->bv;
+    break;
+    case t_vector:/*FIXME*/
+    old->v=new->v;
+    break;
+    case t_string:/*FIXME*/
+    old->st=new->st;
+    break;
+    default:
+    FEwrong_type_argument(sLarray,old);
+    break;
+  }
+    
+  /* prevent having two arrays with the same body--which are not related
+     that would cause the gc to try to copy both arrays and there might
+     not be enough space. */
+  new->a.a_dim = 0;
+  new->a.a_self = 0;
+  old->d = fw;
+  old->a.a_displaced = displaced;
+
   return old;
+
 }
 
 DEFUN_NEW("ARRAY-TOTAL-SIZE",object,fLarray_total_size,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") { 

@@ -71,23 +71,24 @@ $(PORTDIR)/saved_pre_gcl: $(HDIR)cmpinclude.h
 	rm -f o/cmpinclude.h ; cp h/cmpinclude.h o
 	(cd $(ODIR); $(MAKE) all)
 	cd $(@D) && $(MAKE) $(@F)
+	cd $(@D) && echo '(si::use-fast-links nil)(load "boot.lisp")' | $(@F) && $(MAKE) saved_gcl && mv saved_gcl $(@F)
 
 $(PORTDIR)/saved_gcl: $(PORTDIR)/saved_pre_gcl $(HDIR)cmpinclude.h 
 	(cd $(LSPDIR); touch *.lsp ; $(MAKE) all)
 	(cd $(CMPDIR); touch *.lsp ; $(MAKE) all)
+	cd $(@D) && echo '(load "boot.lisp")' | $< && $(MAKE) $(@F)
+
+$(PORTDIR)/saved_mod_gcl: $(PORTDIR)/saved_gcl
+	(cd $(MODDIR); $(MAKE) clean; $(MAKE) all)
 	[ "$(X_LIBS)" == "" ] || (cd xgcl-2 && $(MAKE) LISP=../$<)
 	cd $(@D) && $(MAKE) $(@F)
 
-$(PORTDIR)/saved_mod_gcl: $(PORTDIR)/saved_gcl
-	(cd $(MODDIR); rm -f *.c; $(MAKE) all)
-	cd $(@D) && $(MAKE) $(@F)
-
 $(PORTDIR)/saved_pcl_gcl: $(PORTDIR)/saved_mod_gcl
-	(cd $(PCLDIR); rm -f *.c; $(MAKE) all)
+	(cd $(PCLDIR); $(MAKE) clean; $(MAKE) all)
 	cd $(@D) && $(MAKE) $(@F)
 
 $(PORTDIR)/saved_ansi_gcl: $(PORTDIR)/saved_pcl_gcl
-	(cd $(CLCSDIR); rm -f *.c; $(MAKE) all)
+	(cd $(CLCSDIR); $(MAKE) clean; $(MAKE) all)
 	cd $(@D) && $(MAKE) $(@F)
 
 ansi-tests/test_results: $(PORTDIR)/saved_ansi_gcl

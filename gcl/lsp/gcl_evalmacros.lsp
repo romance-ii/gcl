@@ -28,7 +28,8 @@
 (in-package "SYSTEM")
 
 
-(eval-when (compile) (proclaim '(optimize (safety 1) (space 3))))
+;(eval-when (compile) (proclaim '(optimize (safety 1) (space 3))))
+(eval-when (compile) (proclaim '(optimize (safety 1))))
 ;(eval-when (eval compile) (defun si:clear-compiler-properties (symbol code)))
 (eval-when (eval compile) (setq si:*inhibit-macro-special* nil))
 
@@ -71,21 +72,21 @@
       (let ((x (reverse forms)))
            (do ((forms (cdr x) (cdr forms))
                 (form (car x) `(if ,(car forms) ,form)))
-               ((endp forms) form))))
-  )
+               ((endp forms) form)))))
 
 (defmacro or (&rest forms)
-  (if (endp forms)
-      nil
-      (let ((x (reverse forms)))
-           (do ((forms (cdr x) (cdr forms))
-                (form (car x)
-                      (let ((temp (gensym)))
-                           `(let ((,temp ,(car forms)))
-                                 (if ,temp ,temp ,form)))))
-               ((endp forms) form))))
-  )
-               
+  (unless (endp forms)
+    (let ((x (reverse forms)))
+      (do ((forms (cdr x) (cdr forms)) (gs)
+	   (form (car x)
+		 (if (or (constantp (car forms)) (symbolp (car forms)))
+		     (let ((temp (car forms)))
+		       `(if ,temp ,temp ,form))
+		   (let ((temp (if gs gs (setq gs (gensym)))))
+		     `(let ((,temp ,(car forms)))
+			(if ,temp ,temp ,form))))))
+               ((endp forms) form)))))
+
 (defmacro locally (&rest body) `(let () ,@body))
 
 (defmacro loop (&rest body &aux (tag (gensym)))
@@ -123,16 +124,21 @@
 
 ; assignment
 
+(defun gens (x)
+  (declare (ignorable x))
+  (gensym))
+;  (if (and (symbolp x) (not (constantp x)) (not (specialp x))) x (gensym)))
+;    (if (and (consp x) (eq (car x) 'the) (symbolp (caddr x))) (gens (caddr x))
+;      (gensym))))
+
 (defmacro psetq (&rest args)
    (do ((l args (cddr l))
         (forms nil)
         (bindings nil))
-       ((endp l) (list* 'let* (reverse bindings) (reverse (cons nil forms))))
-       (declare (object l))
-       (let ((sym (gensym)))
+       ((endp l) (list* 'let* (nreverse bindings) (nreverse (cons nil forms))))
+       (let ((sym (gens (cadr l))))
             (push (list sym (cadr l)) bindings)
-            (push (list 'setq (car l) sym) forms)))
-   )
+            (push (list 'setq (car l) sym) forms))))
 
 ; conditionals
 
@@ -140,15 +146,11 @@
   (let ((x (reverse clauses)))
     (dolist (l x form)
       (cond ((endp (cdr l))
-	     (if (or (constantp (car l)) (eq l (car x)))
-		 (setq form `(values ,(car l)))
-	       (let ((sym (gensym)))
-		 (setq form `(let ((,sym ,(car l))) (if ,sym ,sym ,form))))))
+	     (setq form (cond ((eq l (car x)) `(values ,(car l)))
+			      (`(or ,(car l) ,form)))))
 	    ((and (constantp (car l)) (car l))
 	     (setq form (if (endp (cddr l)) (cadr l) `(progn ,@(cdr l)))))
-	    ((setq form (if (endp (cddr l))
-			    `(if ,(car l) ,(cadr l) ,form)
-			  `(if ,(car l) (progn ,@(cdr l)) ,form))))))))
+	    ((setq form `(if ,(car l) ,(if (endp (cddr l)) (cadr l) `(progn ,@(cdr l))) ,form)))))))
 
 (defmacro when (pred &rest body)
   `(if ,pred (progn ,@body)))
@@ -182,10 +184,10 @@
 
 ; sequencing
 
-(defmacro prog1 (first &rest body &aux (sym (gensym)))
+(defmacro prog1 (first &rest body &aux (sym (gens first)))
   `(let ((,sym ,first)) ,@body ,sym))
 
-(defmacro prog2 (first second &rest body &aux (sym (gensym)))
+(defmacro prog2 (first second &rest body &aux (sym (gens second)))
   `(progn ,first (let ((,sym ,second)) ,@body ,sym)))
 
 ; multiple values
@@ -228,12 +230,12 @@
           (let ,(reverse vl)
                ,@decl
                (tagbody
-                ,label (if ,test 
-			   (return (progn ,@result))
-			 (progn 
-			   (tagbody ,@body)
-			   (psetq ,@(reverse step))
-			   (go ,label)))))))
+                ,label (if (not ,test)
+			   (progn 
+			     (tagbody ,@body)
+			     (psetq ,@(reverse step))
+			     (go ,label))
+			 (return (progn ,@result)))))))
 
 (defmacro do* (control (test . result) &rest body
                &aux (decl nil) (label (gensym)) (vl nil) (step nil))
@@ -254,26 +256,26 @@
           (let* ,(reverse vl)
                 ,@decl
                 (tagbody
-                 ,label (if ,test (return (progn ,@result))
-			  (progn 
-			    (tagbody ,@body)
-			    (setq ,@(reverse step))
-			    (go ,label)))))))
+                 ,label (if (not ,test)
+			    (progn 
+			      (tagbody ,@body)
+			      (setq ,@(reverse step))
+			      (go ,label))
+			  (return (progn ,@result)))))))
 
-(defmacro case (keyform &rest clauses &aux (form nil) (key (gensym)))
+(defmacro case (keyform &rest clauses &aux (form nil) (key (gens keyform)))
   (dolist (clause (reverse clauses) `(let ((,key ,keyform)) ,form))
           (declare (object clause))
     (cond ((or (eq (car clause) 't) (eq (car clause) 'otherwise))
            (setq form `(progn ,@(cdr clause))))
           ((consp (car clause))
-           (setq form `(if (member ,key ',(car clause))
+           (setq form `(if (or ,@(mapcar (lambda (x) `(eql ,key ',x)) (car clause)));(member ,key ',(car clause))
                            (progn ,@(cdr clause))
                            ,form)))
           ((car clause)
            (setq form `(if (eql ,key ',(car clause))
                            (progn ,@(cdr clause))
-                           ,form)))))
-  )
+                           ,form))))))
 
 
 (defmacro return (&optional (val nil)) `(return-from nil ,val))
@@ -300,7 +302,7 @@
 (defmacro dotimes ((var form &optional (val nil)) &rest body)
   (cond
    ((symbolp form)
-    (let ((temp (gensym)))
+    (let ((temp (gens form)))
       `(cond ((< ,form 0)
 	      (let ((,var 0))
 		(declare (fixnum ,var) (ignorable ,var))
@@ -328,7 +330,7 @@
 		`(do* ((,var 0 (1+ ,var))) ((>= ,var ,form) ,val)
 		   ,@body))))
 	(t
-	 (let ((temp (gensym)))
+	 (let ((temp (gens form)))
 	 `(let ((,temp ,form))
 	    (cond ((< ,temp 0)
 		   (let ((,var 0))

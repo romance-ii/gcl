@@ -26,7 +26,7 @@
 (in-package 'lisp)
 
 
-(export '(reduce fill replace
+(export '(reduce fill replace length elt every some notevery notany
           remove remove-if remove-if-not
           delete delete-if delete-if-not
           count count-if count-if-not
@@ -45,8 +45,508 @@
 
 ;(proclaim '(optimize (safety 2) (space 3)))
 
+(eval-when (compile eval)
 
-(proclaim '(function seqtype (t) t))
+	   (defmacro comp-key (key) 
+	     `(if (eq ,key #'identity) 0 1))
+	   
+	   (defmacro do-key (key n x) 
+	     (let ((xx (gens x)))
+	       `(let ((,xx ,x)) (case ,n (0 ,xx) (otherwise (funcall ,key ,xx))))))
+	   
+	   (defmacro comp-red (f) 
+	     `(let ((,f ,f))
+		(if (eq ,f #'+) 0
+		  (if (eq ,f #'*) 1 
+		    (if (eq ,f #'min) 2
+		      (if (eq ,f #'max) 3
+			(if (eq ,f #'logior) 4 
+			  (if (eq ,f #'logxor) 5
+			    (if (eq ,f #'logand) 6
+			      (if (eq ,f #'cons) 7
+				(if (eq ,f #'list) 8 9)))))))))))
+
+	   (defmacro comp-test (test test-not) 
+	     `(+ (if ,test-not 1 0)
+		 (let ((,test ,test))
+		   (if (eq ,test #'eq) 0
+		     (if (eq ,test #'eql) 2
+		       (if (eq ,test #'equal) 4
+			 (if (eq ,test #'equalp) 6 
+			   (if (eq ,test #'funcall) 8 10))))))))
+	   
+	   (defmacro do-test (test nn x y) 
+	     (let ((r (gensym))(n (gens nn))(nx (gens x))(ny (gens y)))
+	       `(let* ((,n ,nn)(,nx ,x)(,ny ,y)
+		       (,r (case ,n 
+				 ((0 1) (eq ,nx ,ny))
+				 ((2 3) (eql ,nx ,ny))
+				 ((4 5) (equal ,nx ,ny))
+				 ((6 7) (equalp ,nx ,ny))
+				 ((8 9) (funcall ,nx ,ny))
+				 (otherwise (funcall ,test ,nx ,ny)))))
+		  (if (= (logand ,n 1) 1) (not ,r) ,r))))
+
+	   (defmacro do-red (f nn x y) 
+	     (let ((n (gens nn))(nx (gens x))(ny (gens y)))
+	       `(let* ((,n ,nn)(,nx ,x)(,ny ,y))
+		  (case ,n 
+			(0 (+ ,nx ,ny))
+			(1 (* ,nx ,ny))
+			(2 (min ,nx ,ny))
+			(3 (max ,nx ,ny))
+			(4 (logior ,nx ,ny))
+			(5 (logxor ,nx ,ny))
+			(6 (logand ,nx ,ny))
+			(7 (cons ,nx ,ny))
+			(8 (list ,nx ,ny))
+			(otherwise (funcall f ,nx ,ny))))))
+
+	   (defmacro bump-test (nn i) 
+	     (let ((n (gens nn)))
+	       `(let ((,n ,nn))
+		  (case ,n 
+			((0 1) ,n) 
+			((2 3) (- ,n (if (eql-is-eq ,i) 2 0)))
+			((4 5) (- ,n (if (equal-is-eq ,i) 4 0)))
+			((6 7) (- ,n (if (equalp-is-eq ,i) 6 0)))
+			(otherwise ,n)))))
+	   
+;; 	   (defmacro bump-test-seq (n s) 
+;; 	     `(case ,n 
+;; 		    ((0 1) ,n) 
+;; 		    ((2 3) (- ,n (if (every 'eql-is-eq ,s) 2 0))
+;; 		     ((4 5) (- ,n (if (evrey 'equal-is-eq ,s) 4 0)))
+;; 		     ((6 7) (- ,n (if (every 'equalp-is-eq ,s) 6 0)) 
+;; 		      (otherwise ,n)))))
+	   
+	   (defun array-type-size (tp)
+	     (ecase tp
+		    (bit 1)
+		    ((character non-negative-char signed-char unsigned-char) char-length)
+		    ((non-negative-short signed-short unsigned-short) short-length)
+		    ((non-negative-fixnum fixnum t) fixnum-length)
+		    (short-float (* 4 char-length));fixme!
+		    (long-float (* 8 char-length));FIXME!
+		    ))
+
+	   (defun group-array-types (x)
+	     (when x
+	       (let* ((y (group-array-types (cdr x)))(z (rassoc (cdar x) y)))
+		 (cond (z (push (caar x) (car z)) y) ((cons (cons (list (caar x)) (cdar x)) y))))))
+	   
+	   (defconstant +grouped-array-types+ (mapcar 'car 
+						      (group-array-types 
+						       (mapcar (lambda (x) (cons x (array-type-size x))) +array-types+))))
+	   
+	   (defmacro comp-array (aet);FIXME position can't run in compiler on constant types
+	     (let ((r (gens aet)))
+	       `(let ((,r ,aet))
+		  (ecase ,r
+			 ,@(let ((k -1)) (mapcar (lambda (x) `(,x ,(incf k))) +grouped-array-types+))))))
+	   
+	   (defmacro set-same-array (n a i b j)
+	     `(case ,n
+		    ,@(let ((k -1)) 
+			(mapcar (lambda (x) 
+				  `(,(incf k) (let ((,a ,a),@(unless (eq a b) `((,b ,b))))
+						(declare ((array ,(car x)) ,a ,@(unless (eq a b) `(,b))))
+						(setf (aref ,a ,i)(aref ,b ,j))))) +grouped-array-types+))))
+	   
+	   (defmacro rotate-same-array (n a i b j)
+	     `(case ,n
+		    ,@(let ((k -1)) 
+			(mapcar (lambda (x) 
+				  `(,(incf k) (let ((,a ,a),@(unless (eq a b) `((,b ,b))))
+						(declare ((array ,(car x)) ,a ,@(unless (eq a b) `(,b))))
+						(rotatef (aref ,a ,i)(aref ,b ,j))))) +grouped-array-types+))))
+	   
+	   (defmacro i-aref (n a i)
+	     `(case ,n
+		    ,@(let ((k -1) (d t)) 
+			(delete nil 
+				(mapcar (lambda (x) 
+					  (cond ((search "NON-NEGATIVE-" (string x)) (setq d nil))
+						((prog1 `(,(if d (incf k) `(,(incf k),(incf k)))
+							  (let ((,a ,a))
+							    (declare ((array ,x) ,a))
+							    (aref ,a ,i)))
+						   (setq d t))))) +array-types+)))))
+	   
+	   
+	   (defconstant +seq-ll+ '(from-end key start end))
+
+	   (defmacro defnseq (n (il seq countp testp ifp &optional ivp) &body body)
+	     `(progn
+		(defun ,n ,(append `(,@il ,seq &key) 
+				   (when ivp (list (list 'initial-value nil 'ivsp)))
+				   (when testp (list 'test 'test-not))
+				   (when countp (list 'count)) +seq-ll+)
+		  (declare (optimize (safety 1)))
+		  (check-type ,seq proper-sequence)
+		  (check-type start (or null seqind))
+		  (check-type end (or null seqind))
+		  ,@(when countp `((check-type count (or null integer))))
+		  ,@(when testp `((and test test-not (error "both test and test not supplied"))))
+		  
+		  (let* ,(when countp `((count (if count count array-dimension-limit))
+					(count (min array-dimension-limit (max 0 count)))))
+		    (let* ((startp (when start t))(start (if startp start 0))
+			   (endp (when end t))(end (if endp end array-dimension-limit))
+			   ,@(when countp `((count count)))
+			   ,@(when testp `((test (or test test-not #'eql))
+					   (test (if (functionp test) test (funcallable-symbol-function test)))
+					   (test-comp (comp-test test test-not))))
+			   (key (or key #'identity))(key (if (functionp key) key (funcallable-symbol-function key)))
+			   (key-comp  (comp-key key)))
+		      (let* ((l (listp s))
+			     (hls (or (and from-end (or endp startp)) (not l)))
+			     (ls  (if hls (length s) array-dimension-limit))
+			     (end (if (< ls end) ls end)))
+			,@body))))
+		,@(when ifp
+		    `((defun ,(intern (string-concatenate (string n) "-IF")) 
+			,(append `(,@il ,seq &key) (when countp (list 'count)) +seq-ll+)
+			(declare (optimize (safety 1)))
+			(,n ,@il ,seq :test 'funcall :key key :start start :end end :from-end from-end 
+			    ,@(when countp `(:count count))))
+		      (defun ,(intern (string-concatenate (string n) "-IF-NOT")) 
+			,(append `(,@il ,seq &key) (when countp (list 'count)) +seq-ll+)
+			(declare (optimize (safety 1)))
+			(,n ,@il ,seq :test-not 'funcall :key key :start start :end end :from-end from-end 
+			    ,@(when countp `(:count count)))))))))
+
+
+(defun vec-length (x)
+  (declare (vector x))
+  (if (array-has-fill-pointer-p x) (fill-pointer x) (array-dimension x 0)))
+
+(defun length (x)
+  (declare (optimize (safety 1)))
+  (check-type x proper-sequence)
+  (if (listp x) (do ((i 0 (1+ i))(x x (cdr x))) ((endp x) i) (declare (seqind i))) (vec-length x)))
+
+(defun elt (seq n)
+  (declare (optimize (safety 1)))
+  (check-type seq proper-sequence)
+  (check-type n seqind)
+  (let ((q 0) r)
+    (cond ((when (listp seq) 
+	     (do ((l seq (cdr l))
+		  (i 0 (1+ i))) 
+		 ((or (endp l) (>= i n))
+		  (setq q i r l)))) (car r))
+	  ((when (< n (setq q (length seq))) (setq r seq))
+	   (aref r n))
+	  ((error 'type-error :datum n :expected-type `(integer 0 (,q)))))))
+
+(defun nreverse (s)
+  (declare (optimize (safety 1)))
+  (check-type s proper-sequence)
+  (cond ((listp s) (do ((p)(cdp)(pp s)) ((endp pp) p)
+		       (setq cdp (cdr pp) p (rplacd pp p) pp cdp)))
+	((let ((ls (length s))(n (comp-array (array-element-type s))))
+	   (do ((i 0 (1+ i))(j (1- ls) (1- j))) ((>= i j) s)
+	       (rotate-same-array n s i s j))))))
+
+(defun reverse (s)
+  (declare (optimize (safety 1)))
+  (check-type s sequence)
+  (cond ((listp s) (do ((r)(p s (cdr p))) ((endp p) r)
+		       (setq r (cons (car p) r))))
+	((let* ((ls (length s))
+		(aet (array-element-type s))
+		(r (make-array ls :element-type aet))
+		(n (comp-array aet)))
+	   (do ((i 0 (1+ i))(j (1- ls) (1- j))) ((>= i ls) r)
+	       (set-same-array n r i s j))))))
+
+(defun subseq (s start &optional end)
+  (check-type s sequence)
+  (check-type start seqind)
+  (unless end (setq end array-dimension-limit))
+  (check-type end seqind)
+
+  (let ((s s)(start start)(end end))
+    (declare (sequence s) (seqind start end))
+    (cond ((listp s)
+	   (do ((i start (1+ i))(r)(rp)(p (nthcdr start s) (cdr p))) ((or (>= i end) (endp p)) r)
+	       (let ((tmp (cons (car p) nil))) (setq rp (if rp (cdr (rplacd rp tmp)) (setq r tmp))))))
+	  ((let* ((ls (length s))
+		  (end (if (> end ls) ls end))
+		  (aet (array-element-type s))
+		  (r (make-array (- end start) :element-type aet))
+		  (ac (comp-array aet))
+		  (lr (length r)))
+	     (do ((j 0 (1+ j))(i start (1+ i))) ((or (>= i end) (>= j lr)) r)
+		  (set-same-array ac r j s i)))))))
+
+(defnseq delete-duplicates (nil s nil t nil)
+
+  (when from-end 
+    (setq s (nreverse s))
+    (let ((tmp start))
+      (setq start (if endp (- ls end) 0) end (if hls (- ls tmp) array-dimension-limit))))
+  (let* ((r (unless (and l (= start 0)) s))(rp (when (and l (> start 0)) (nthcdr (1- start) r))))
+  (do ((i start (1+ i))
+       (p (when l (if rp (cdr rp) s)) (cdr p))
+       (ri start))
+      ((or (>= i end) (when l (endp p)))
+       (let ((r (cond (l (when rp (rplacd rp p)) (or r p))
+		      ((do ((m i (1+ m))) ((>= m ls) 
+					   (cond ((array-has-fill-pointer-p r) 
+						  (setf (fill-pointer r) ri) r)
+						 ((subseq r 0 ri))))
+			       (setf (aref r ri) (aref r m) ri (1+ ri)))))))
+	 (if from-end (nreverse r) r)))
+    (declare (seqind ri))
+    (let ((el1 (do-key key key-comp (if l (car p) (aref s i)))))
+      (unless
+	  (do ((j (1+ i) (1+ j))
+	       (q (cdr p) (cdr q))
+	       (test-comp (bump-test test-comp el1)))
+	      ((or (>= j end) (when l (endp q))))
+	    (let ((el2 (do-key key key-comp (if l (car q) (aref s j)))))
+	      (when (do-test test test-comp el1 el2)
+		(return t))))
+	(cond (l (setq rp (if rp (cdr (rplacd rp p)) p) r (or r p)))
+	      ((setf (aref r ri) (aref r i) ri (1+ ri)))))))))
+
+(defnseq remove-duplicates (nil s nil t nil)
+
+  (let* ((aet (unless l (array-element-type s)))
+	 (ac  (if l 0 (comp-array aet))))
+    (when from-end 
+      (setq s (reverse s))
+      (let ((tmp start))
+	(setq start (if endp (- ls end) 0) end (if hls (- ls tmp) array-dimension-limit))))
+    (do ((i start (1+ i))
+	 (k 0)
+	 (h s)
+	 (p (when l (nthcdr start s)) (cdr p))
+	 (r)(rp)(ri 0))
+	((or (>= i end) (when l (endp p)))
+	 (let ((r (cond (l (nconc r h))
+			((not r) s)
+			((do ((m k (1+ m))) ((>= m ls) (setf (fill-pointer r) ri) r) 
+			   (set-same-array ac r ri s m)(setf ri (1+ ri)))))))
+	   (if from-end (nreverse r) r)))
+      (declare (seqind ri))
+      (let* ((el1 (if l (car p) (i-aref ac s i)))
+	     (el1 (do-key key key-comp el1)))
+	(when
+	    (do ((j (1+ i) (1+ j))
+		 (q (cdr p) (cdr q))
+		 (test-comp (bump-test test-comp el1)))
+		((or (>= j end) (when l (endp q))))
+	      (let* ((el2 (if l (car q) (i-aref ac s j)))
+		     (el2 (do-key key key-comp el2)))
+		(when (do-test test test-comp el1 el2)
+		  (return t))))
+	  (unless (or l r) (setq r (make-array ls :element-type (array-element-type s) :fill-pointer 0) ri 0))
+	  (do ((m k (1+ m))(hp (when l h) (cdr hp))) ((>= m i) (setq k (1+ i) h (cdr hp)))
+	    (if l 
+		(let ((tmp (cons (car hp) nil))) (setq rp (if rp (cdr (rplacd rp tmp)) (setq r tmp))))
+	      (progn (set-same-array ac r ri s m)(setf ri (1+ ri))))))))))
+
+
+(defnseq substitute ((newitem item) s t t t)
+  (let* ((test-comp (bump-test test-comp item))
+	 (aet (unless l (array-element-type s)))
+	 (ac  (if l 0 (comp-array aet))))
+    (when from-end 
+      (setq s (reverse s))
+      (let ((tmp start))
+	(setq start (if endp (- ls end) 0) end (if hls (- ls tmp) array-dimension-limit))))
+    (do ((i start (1+ i))(k 0)(j 0)(h s)(r)(rp)
+	 (p (when l (nthcdr start s)) (cdr p)))
+	((or (>= i end) (>= j count) (when l (endp p)))
+	 (let ((r (cond (l (nconc r h))
+			((not r) s)
+			((do ((m k (1+ m))) ((>= m ls) (setf (fill-pointer r) m) r) 
+			     (setf (aref r m) (aref s m)))))))
+	   (if from-end (nreverse r) r)))
+	(let* ((el2 (do-key key key-comp (if l (car p) (aref s i)))))
+	  (when (do-test test test-comp item el2)
+	    (unless (or l r) (setq r (make-array ls :element-type aet :fill-pointer t)))
+	    (do ((m k (1+ m))(hp (when l h) (cdr hp))) ((> m i) (setq k (1+ i) j (1+ j) h hp))
+		(cond (l (let ((tmp (cons (if (eq p hp) newitem (car hp)) nil))) (setq rp (if rp (cdr (rplacd rp tmp)) (setq r tmp)))))
+		      ((if (= i m) (setf (aref r m) newitem) (set-same-array ac r m s m))))))))))
+
+(defnseq nsubstitute ((newitem item) s t t t)
+  (let* ((test-comp (bump-test test-comp item)))
+    (when from-end 
+      (setq s (nreverse s))
+      (let ((tmp start))
+	(setq start (if endp (- ls end) 0) end (if hls (- ls tmp) array-dimension-limit))))
+    (let* ()
+      (do ((i start (1+ i))(j 0)
+	   (p (when l (nthcdr start s)) (cdr p)))
+	  ((or (>= i end) (>= j count) (when l (endp p))) (if from-end (nreverse s) s))
+	  (let ((el2 (do-key key key-comp (if l (car p) (aref s i)))))
+	    (when (do-test test test-comp item el2)
+	      (incf j) 
+	      (cond (l (rplaca p newitem))
+		    ((setf (aref s i) newitem)))))))))
+
+(defnseq count ((item) s nil t t)
+  (let* ((test-comp (bump-test test-comp item)))
+    (when from-end 
+      (setq s (reverse s))
+      (let ((tmp start))
+	(setq start (if endp (- ls end) 0) end (if hls (- ls tmp) array-dimension-limit))))
+    (do ((i start (1+ i))(j 0)
+	 (p (when l (nthcdr start s)) (cdr p)))
+	((or (>= i end) (when l (endp p))) j)
+	(declare (seqind j));FIXME iteration counting
+	(let ((el2 (do-key key key-comp (if l (car p) (aref s i)))))
+	  (when (do-test test test-comp item el2)
+	    (incf j))))))
+
+(defnseq position ((item) s nil t t)
+  (let* ((test-comp (bump-test test-comp item))
+	 (ls (if (and (not hls) from-end) (length s) ls))
+	 (hls (or from-end hls)))
+    (when from-end 
+      (setq s (reverse s))
+      (let ((tmp start))
+	(setq start (if endp (- ls end) 0) end (if hls (- ls tmp) array-dimension-limit))))
+    (do ((i start (1+ i))
+	 (p (when l (nthcdr start s)) (cdr p)))
+	((or (>= i end) (when l (endp p))))
+	(let ((el2 (do-key key key-comp (if l (car p) (aref s i)))))
+	  (when (do-test test test-comp item el2)
+	    (return-from position (if from-end (the seqind (- ls (1+ i))) i)))))));FIXME
+
+(defnseq find ((item) s nil t t)
+  (let* ((test-comp (bump-test test-comp item))
+	 (ls (if (and (not hls) from-end) (length s) ls))
+	 (hls (or from-end hls)))
+    (when from-end 
+      (setq s (reverse s))
+      (let ((tmp start))
+	(setq start (if endp (- ls end) 0) end (if hls (- ls tmp) array-dimension-limit))))
+    (do ((i start (1+ i))
+	 (p (when l (nthcdr start s)) (cdr p)))
+	((or (>= i end) (when l (endp p))))
+	(let* ((el (if l (car p) (aref s i)))
+	       (el2 (do-key key key-comp el)))
+	  (when (do-test test test-comp item el2)
+	    (return-from find el))))))
+
+
+(defnseq remove ((item) s t t t)
+  (let* ((test-comp (bump-test test-comp item))
+	 (aet (unless l (array-element-type s)))
+	 (ac  (if l 0 (comp-array aet))))
+    (when from-end 
+      (setq s (reverse s))
+      (let ((tmp start))
+	(setq start (if endp (- ls end) 0) end (if hls (- ls tmp) array-dimension-limit))))
+    (let ((end1   (if l end (min (1+ end) array-dimension-limit)))
+	  (count1 (if l count (min (1+ count) array-dimension-limit))))
+      (do ((i start (1+ i))(k 0)(j 0)(h s)(r)(rp)(ri 0)
+	   (p (when l (nthcdr start s)) (cdr p)))
+	  ((or (>= i end1) (>= j count1) (when l (endp p)))
+	   (let ((r (cond (l (when rp (rplacd rp h)) (or r h))
+			  ((not r) s)
+			  (t (setf (fill-pointer r) ri) r))))
+	     (if from-end (nreverse r) r)))
+	  (declare (seqind ri))
+	  (let* ((e (or (= i end) (= j count)))
+		 (i (if e (if r ls k) i)))
+	    (when (or e (do-test test test-comp item (do-key key key-comp (if l (car p) (aref s i)))))
+	      (unless (or l e r) (setq r (make-array ls :element-type aet :fill-pointer 0)))
+	      (do ((m k (1+ m))(hp (when l h) (cdr hp))) ((>= m i) (setq k (1+ i) j (1+ j) h (cdr hp)))
+		  (cond (l (let ((tmp (cons (car hp) nil))) (setq rp (if rp (cdr (rplacd rp tmp)) (setq r tmp)))))
+			(t (set-same-array ac r ri s m)(setf ri (1+ ri)))))))))))
+
+(defnseq delete ((item) s t t t)
+  (let* ((test-comp (bump-test test-comp item))
+	 (aet (unless l (array-element-type s)))
+	 (ac  (if l 0 (comp-array aet))))
+    (when from-end 
+      (setq s (nreverse s))
+      (let ((tmp start))
+	(setq start (if endp (- ls end) 0) end (if hls (- ls tmp) array-dimension-limit))))
+    (let* ((r (unless (and l (= start 0)) s))(rp (when (and l (> start 0)) (nthcdr (1- start) r))))
+      (do ((i start (1+ i))(j 0)(ri start)
+	   (p (when l (if rp (cdr rp) s)) (cdr p)))
+	  ((or (>= i end) (>= j count) (when l (endp p)))
+	   (let ((r (cond (l (when rp (rplacd rp p)) (or r p))
+			  ((do ((m i (1+ m))) 
+			       ((>= m ls) 
+				(cond ((array-has-fill-pointer-p r) (setf (fill-pointer r) ri) r) 
+				      ((subseq r 0 ri))))
+			       (set-same-array ac r ri r m)(setf ri (1+ ri)))))))
+	     (if from-end (nreverse r) r)))
+	  (cond ((do-test test test-comp item (do-key key key-comp (if l (car p) (aref s i)))) (incf j))
+		((cond (l (setq rp (if rp (cdr (rplacd rp p)) p) r (or r p)))
+		       (t (set-same-array ac r ri r i)(setf ri (1+ ri))))))))))
+
+
+(defnseq reduce ((f) s nil nil nil t)
+  (when from-end 
+    (setq s (reverse s))
+    (let ((tmp start))
+      (setq start (if endp (- ls end) 0) end (if hls (- ls tmp) array-dimension-limit))))
+  (do ((p (when l (nthcdr start s)) (cdr p))
+       (i start (1+ i))
+       (f (if (functionp f) f (funcallable-symbol-function f)))
+       (red-comp (comp-red f))
+       (rx initial-value (let* ((el (do-key key key-comp (if l (car p) (aref s i))))
+			       (ry (if from-end rx el))
+			       (rx (if from-end el rx)))
+			  (cond (ivsp (do-red f red-comp rx ry))
+				((setq ivsp t) el)))))
+      ((or (>= i end) (when l (endp p))) (if ivsp rx (values (funcall f))))))
+
+
+(defun every (pred seq &rest seqs)
+  (declare (optimize (safety 1))
+	   (:dynamic-extent seqs))
+  (check-type seq proper-sequence)
+  (let* ((l (listp seq)) (ls (length seqs)) (vals (make-list ls))
+	 (end (reduce (lambda (y x) (min (if (listp x) array-dimension-limit (length x)) y)) seqs
+		      :initial-value (if l array-dimension-limit (length seq)))))
+    (declare (:dynamic-extent vals))
+    (do ((i 0 (1+ i))
+	 (seq seq)
+	 (seqs seqs))
+	((or (when l (endp seq)) (>= i end) 
+	     (reduce (lambda (y x) (or y (when (listp x) (endp x)))) seqs :initial-value nil)) t)
+	(do ((v vals (cdr v))(l seqs (cdr l))) ((endp l)) (setf (car v) (if (listp (car l)) (pop (car l)) (aref (car l) i))))
+	(unless (apply pred (if l (pop seq) (aref seq i)) vals)
+	  (return nil)))))
+
+(defun some (pred seq &rest seqs)
+  (declare (optimize (safety 1))
+	   (:dynamic-extent seqs))
+  (check-type seq proper-sequence)
+  (let* ((l (listp seq)) (ls (length seqs)) (vals (make-list ls))
+	 (end (reduce (lambda (y x) (min (if (listp x) array-dimension-limit (length x)) y)) seqs
+		      :initial-value (if l array-dimension-limit (length seq)))))
+    (declare (:dynamic-extent vals))
+    (do ((i 0 (1+ i))
+	 (seq seq)
+	 (seqs seqs))
+	((or (when l (endp seq)) (>= i end) 
+	     (reduce (lambda (y x) (or y (when (listp x) (endp x)))) seqs :initial-value nil)))
+	(do ((v vals (cdr v))(l seqs (cdr l))) ((endp l)) (setf (car v) (if (listp (car l)) (pop (car l)) (aref (car l) i))))
+	(let ((r (apply pred (if l (pop seq) (aref seq i)) vals)))
+	  (when r (return r))))))
+
+(defun notevery (pred seq &rest seqs)
+  (declare (optimize (safety 1))
+	   (:dynamic-extent seqs))
+  (not (apply 'every pred seq seqs)))
+
+(defun notany (pred seq &rest seqs)
+  (declare (optimize (safety 1))
+	   (:dynamic-extent seqs))
+  (not (apply 'some pred seq seqs)))
+
+
 (defun seqtype (sequence)
   (cond ((listp sequence) 'list)
         ((stringp sequence) 'string)
@@ -54,16 +554,15 @@
         ((vectorp sequence) (list 'array (array-element-type sequence)))
         (t (error "~S is not a sequence." sequence))))
 
-;(proclaim '(function call-test (t t t t) t))
 (defmacro call-test (test test-not item keyx)
-  (let ((j1 (gensym)) (j2 (gensym))(tst (gensym))(tstn (gensym)))
+  (let ((j1 (gens item)) (j2 (gens keyx))(tst (gens test))(tstn (gens test-not)))
     `(let ((,j1 ,item)(,j2 ,keyx)(,tst ,test)(,tstn ,test-not))
        (cond (,tst (funcall ,tst ,j1 ,j2))
 	     (,tstn (not (funcall ,tstn ,j1 ,j2)))
 	     ((eql ,j1 ,j2))))))
 
 (defmacro call-test-key (test test-not key i1 i2)
-  (let ((j1 (gensym)) (j2 (gensym))(tst (gensym))(tstn (gensym))(ky (gensym)))
+  (let ((j1 (gens i1)) (j2 (gens i2))(tst (gens test))(tstn (gens test-not))(ky (gens key)))
     `(let ((,ky ,key)(,j1 ,i1)(,j2 ,i2)(,tst ,test)(,tstn ,test-not))
        (if ,ky 
 	   (call-test ,tst ,tstn (funcall ,ky ,j1) (funcall ,ky ,j2))
@@ -77,18 +576,12 @@
   (when (> (the fixnum start) (the fixnum end))
         (error "START is greater than END.")))
 
-(proclaim '(function test-error() t))
-(defun test-error()
-  (error "both test and test not supplied"))
-
 (defun bad-seq-limit (x y)
   (declare (seqind x y))
   (error 'type-error :datum x  :expected-type (if (= y 0) '(integer 0) '(integer 0 y))))
 
 
 (eval-when (compile eval)
-;(proclaim '(function the-start (t) fixnum))
-;(proclaim '(function the-end (t fixnum) fixnum))
 (defmacro f+ (x y) `(the fixnum (+ (the fixnum ,x) (the fixnum ,y))))
 (defmacro f- (x y) `(the fixnum (- (the fixnum ,x) (the fixnum ,y))))
 
@@ -127,39 +620,6 @@
 	((null x) 0)
 	(t (error 'type-error :datum x :expected-type '(or null seqind)))))
   
-
-
-(defun reduce (function sequence
-               &key from-end
-                    start 
-                    end
-		    (initial-value nil ivsp)
-		    (key #'identity))
-  (declare (optimize (safety 1)))
-  (with-start-end  start end sequence
-     (cond ((not from-end)
-           (when (null ivsp)
-                 (when (>= start end)
-                       (return-from reduce (let ((z (funcall function))) z)))
-		 (setq initial-value (funcall key (elt sequence start)))
-                 (setf start (f+ 1 start))
-		 )
-           (do ((x initial-value
-		   (funcall function x (funcall key (prog1 (elt sequence start)
-					      (setf start (f+ 1 start))
-						       )))))
-               ((>= start end) x)))
-          (t
-           (when (null ivsp)
-                 (when (>= start end)
-                       (return-from reduce (let ((z (funcall function))) z)))
-                 (setf end (f+ end -1))
-		  (setq initial-value (funcall key (elt sequence end)))
-		  )
-	    (do ((x initial-value (funcall function (funcall key (elt sequence end)) x)))
-               ((>= start end) x)
-	       (setf end (f+ -1 end)))))))
-
 
 (defun fill (sequence item
 		      &key start end )
@@ -257,7 +717,7 @@
 			       (t count))))))
               ,@(if countp '((declare (fixnum count))))
               nil
-	      (and test test-not (test-error))
+	      (and test test-not (error "both test and test not supplied"))
                 (if (not from-end)
                     ,(eval-body)
                     ,(progn (setq from-end t
@@ -303,92 +763,7 @@
 )
 
 
-(defseq remove () t nil
-  (if (not from-end)
-      `(if (listp sequence)
-           (let ((l sequence) (l1 nil))
-             (do ((i 0 (f+ 1  i)))
-                 ((>= i start))
-               (declare (fixnum i))
-               (push (car l) l1)
-               (pop l))
-             (do ((i start (f+ 1  i)) (j 0))
-                 ((or (>= i end) (>= j count) (endp l))
-                  (nreconc l1 l))
-               (declare (fixnum i j))
-               (cond ((call-test test test-not item (funcall key (car l)))
-                      (setf  j (f+ 1  j))
-                      (pop l))
-                     (t
-                      (push (car l) l1)
-                      (pop l)))))
-           (delete item sequence
-                   :from-end from-end
-                   :test test :test-not test-not
-                   :start start :end end
-                   :count count
-                   :key key))
-      `(delete item sequence
-               :from-end from-end
-               :test test :test-not test-not
-               :start start :end end
-               :count count
-               :key key)))
 
-
-(defseq delete () t t
-  (if (not from-end)
-      `(if (listp sequence)
-           (let* ((l0 (cons nil sequence)) (l l0))
-             (do ((i 0 (f+ 1  i)))
-                 ((>= i start))
-               (declare (fixnum i))
-               (pop l))
-             (do ((i start (f+ 1  i)) (j 0))
-                 ((or (>= i end) (>= j count) (endp (cdr l))) (cdr l0))
-               (declare (fixnum i j))
-               (cond ((call-test test test-not item (funcall key (cadr l)))
-                      (setf  j (f+ 1  j))
-                      (rplacd l (cddr l)))
-                     (t (setq l (cdr l))))))
-           (let (,number-satisfied)
-             (declare (fixnum n))
-             (when (< n count) (setq count n))
-             (do ((newseq
-                   (make-sequence (seqtype sequence)
-                                  (the fixnum (f- l count))))
-                  ,iterate-i-everywhere
-                  (j 0)
-                  ,kount-0)
-                 (,endp-i-everywhere newseq)
-               (declare (fixnum i j k))
-               (cond ((and ,i-in-range ,within-count ,satisfies-the-test)
-                      ,kount-up)
-                     (t (setf (elt newseq j) ,x)
-                        (setf  j (f+ 1  j)))))))
-      `(let (,number-satisfied)
-         (declare (fixnum n))
-         (when (< n count) (setq count n))
-         (do ((newseq
-               (make-sequence (seqtype sequence) (the fixnum (f- l count))))
-              ,iterate-i-everywhere
-              (j (f+ -1 (the fixnum (f- l count))))
-;              (j (f- (the fixnum (f+ -1  end)) n))
-              ,kount-0)
-             (,endp-i-everywhere newseq)
-           (declare (fixnum i j k))
-           (cond ((and ,i-in-range ,within-count ,satisfies-the-test)
-                  ,kount-up)
-                 (t (setf (elt newseq j) ,x)
-                    (setq  j (f+ -1  j))))))))
-
-
-(defseq count () nil nil
-  `(do (,iterate-i ,kount-0)
-       (,endp-i k)
-     (declare (seqind i k))
-     (when (and ,satisfies-the-test)
-           ,kount-up)))
 
 
 (defseq internal-count () t nil
@@ -398,152 +773,6 @@
      (when (and ,within-count ,satisfies-the-test)
            ,kount-up)))
 
-
-(defseq substitute (newitem) t t
-  `(do ((newseq (make-sequence (seqtype sequence) l))
-        ,iterate-i-everywhere
-        ,kount-0)
-       (,endp-i-everywhere newseq)
-     (declare (fixnum i k))
-     (cond ((and ,i-in-range ,within-count ,satisfies-the-test)
-            (setf (elt newseq i) newitem)
-            ,kount-up)
-           (t (setf (elt newseq i) ,x)))))
-
-
-(defseq nsubstitute (newitem) t nil
-  `(do (,iterate-i ,kount-0)
-       (,endp-i sequence)
-     (declare (fixnum i k))
-     (when (and ,within-count ,satisfies-the-test)
-           (setf ,x newitem)
-           ,kount-up)))
-
-
-(defseq find () nil nil
-  `(do (,iterate-i)
-       (,endp-i nil)
-     (declare (fixnum i))
-     (when ,satisfies-the-test (return ,x))))
-
-
-(defseq position () nil nil
-  `(do (,iterate-i)
-       (,endp-i nil)
-     (declare (fixnum i))
-     (when ,satisfies-the-test (return i))))
-
-
-(defun remove-duplicates (sequence
-                          &key from-end
-                               test test-not
-			       start end
-                               (key #'identity))
-  (declare (optimize (safety 1)))
-  (and test test-not (test-error))
-  (when (and (listp sequence) (not from-end) (null start)
-	     (null end))
-        (when (endp sequence) (return-from remove-duplicates nil))
-        (do ((l sequence (cdr l)) (l1 nil))
-            ((endp (cdr l))
-             (return-from remove-duplicates (nreconc l1 l)))
-          (unless (member1 (car l) (cdr l)
-                           :test test :test-not test-not
-                           :key key)
-                  (setq l1 (cons (car l) l1)))))
-  (delete-duplicates sequence
-                     :from-end from-end
-                     :test test :test-not test-not
-                     :start start :end end
-                     :key key))
-       
-
-(defun delete-duplicates (sequence
-                          &key from-end
-                               test test-not
-                               start
-                               end 
-                               (key #'identity))
-  (declare (optimize (safety 1)))
-  (and test test-not (test-error))
-  (when (and (listp sequence) (not from-end) (null start)
-	     (null end))
-        (when (endp sequence) (return-from delete-duplicates nil))
-        (do ((l sequence))
-            ((endp (cdr l))
-             (return-from delete-duplicates sequence))
-            (cond ((member1 (car l) (cdr l)
-                            :test test :test-not test-not
-                            :key key)
-                   (rplaca l (cadr l))
-                   (rplacd l (cddr l)))
-                  (t (setq l (cdr l))))))
-  (with-start-end 
-   start end sequence
-   (let ((l (length sequence)))
-    (if (not from-end)
-        (do ((n 0)
-             (i start (f+ 1  i)))
-            ((>= i end)
-             (do ((newseq (make-sequence (seqtype sequence)
-                                         (the fixnum (f- l n))))
-                  (i 0 (f+ 1  i))
-                  (j 0))
-                 ((>= i l) newseq)
-               (declare (fixnum i j))
-               (cond ((and (<= start i)
-                           (< i end)
-                           (position (funcall key (elt sequence i))
-                                     sequence
-                                     :test test
-                                     :test-not test-not
-                                     :start (the fixnum (f+ 1  i))
-                                     :end end
-                                     :key key)))
-                     (t
-                      (setf (elt newseq j) (elt sequence i))
-                      (setf  j (f+ 1  j))))))
-          (declare (fixnum n i))
-          (when (position (funcall key (elt sequence i))
-                          sequence
-                          :test test
-                          :test-not test-not
-                          :start (the fixnum (f+ 1  i))
-                          :end end
-                          :key key)
-                (setf  n (f+ 1  n))))
-        (do ((n 0)
-             (i (f+ -1  end) (f+ -1  i)))
-            ((< i start)
-             (do ((newseq (make-sequence (seqtype sequence)
-                                         (the fixnum (f- l n))))
-                  (i (f+ -1  l) (f+ -1  i))
-                  (j (f- (the fixnum (f+ -1  l)) n)))
-                 ((< i 0) newseq)
-               (declare (fixnum i j))
-               (cond ((and (<= start i)
-                           (< i end)
-                           (position (funcall key (elt sequence i))
-                                     sequence
-                                     :from-end t
-                                     :test test
-                                     :test-not test-not
-                                     :start start
-                                     :end i
-                                     :key key)))
-                     (t
-                      (setf (elt newseq j) (elt sequence i))
-                      (setq  j (f+ -1  j))))))
-          (declare (fixnum n i))
-          (when (position (funcall key (elt sequence i))
-                          sequence
-                          :from-end t
-                          :test test
-                          :test-not test-not
-                          :start start
-                          :end i
-                          :key key)
-                (setf  n (f+ 1  n))))))))
        
 
 (defun mismatch (sequence1 sequence2
@@ -552,7 +781,7 @@
 		      start1 start2
 		      end1 end2)
   (declare (optimize (safety 1)))
-  (and test test-not (test-error))
+  (and test test-not (error "both test and test not supplied"))
   (with-start-end start1 end1 sequence1
    (with-start-end start2 end2 sequence2
     (if (not from-end)
@@ -582,7 +811,7 @@
 		    (start1 0) (start2 0)
 		    end1 end2)
   (declare (optimize (safety 1)))
-  (and test test-not (test-error))
+  (and test test-not (error "both test and test not supplied"))
   (check-type sequence1 sequence)
   (check-type sequence2 sequence)
   (check-type start1 seqind)
@@ -592,7 +821,7 @@
 
   (let ((s1 sequence1)(s2 sequence2)(i1 start1)(i2 start2)(e1 end1)(e2 end2)(st (or test test-not)))
     (declare (sequence s1 s2)(seqind i1 i2)((or null seqind) e1 e2))
-    (let* ((eq (unless st (every 'eql-is-eq s1))) m (mv 0) x1 x2
+    (let* ((eq (unless st (every (lambda (x) (eql-is-eq (if key (funcall key x) x))) s1))) m (mv 0) x1 x2
 	   (l1 (listp s1))(l2 (listp s2))
 	   (e1 (or e1 (unless l1 (length s1))))(e2 (or e2 (unless l2 (length s2)))))
       (do ((is2 i2 (1+ is2))
@@ -618,72 +847,6 @@
 			  (test (funcall test el1 el2))
 			  ((not (funcall test-not el1 el2))))
 		  (return nil))))))))
-
-#|
-  (do (;(end2 (length sequence2))
-       (start2 start2 (1+ start2))
-					;	 (p1 (nthcdr start1 sequence1))
-       (p2 (nthcdr start2 sequence2) (cdr p2))) ((endp p2))
-       (declare (seqind start2))
-       (do ((p1 p1 (cdr p1))
-	    (p2 p2 (cdr p2)))
-	   ((endp p1) (return-from search start2))
-	   (unless (if eq (eq (car p1) (car p2)) (call-test-key test test-not key (car p1) (car p2)))
-	     (return nil))))
-
-  (let ((start2 0)(start1 0)(sequence1 sequence1)(sequence2 sequence2)(eq (and (not test) (not test-not) (every 'eql-is-eq sequence1))))
-;  (with-start-end-length start1 end1 length1 sequence1
-;   (with-start-end-length start2 end2 length2 sequence2  
-    (declare (seqind start1 start2))
-    (declare (list sequence1 sequence2))
-    (do (;(end2 (length sequence2))
-	 (start2 start2 (1+ start2))
-;	 (p1 (nthcdr start1 sequence1))
-	 (p2 (nthcdr start2 sequence2) (cdr p2))) ((endp p2))
-	 (declare (seqind start2))
-	 (do ((p1 p1 (cdr p1))
-	      (p2 p2 (cdr p2)))
-	     ((endp p1) (return-from search start2))
-	     (unless (if eq (eq (car p1) (car p2)) (call-test-key test test-not key (car p1) (car p2)))
-	     (return nil)))))
-;))
-
-  (with-start-end-length start1 end1 length1 sequence1
-   (with-start-end-length start2 end2 length2 sequence2  
-;    (when from-end 
-;      (setq sequence1 (reverse sequence1) sequence2 (reverse sequence2)
-;	    start1 (- length1 end1) end1 (- length1 start1) 
-;	    start2 (- length2 end2) end2 (- length2 start2)))
-    (if t;(not from-end)
-	(if t;(listp sequence2)
-	    (do ((start2 start2 (1+ start2))
-		 (p1 (nthcdr start1 sequence1))
-		 (p2 (nthcdr start2 sequence2) (cdr p2))) ((>= start2 end2))
-		(do ((p1 p1 (cdr p1))
-		     (p2 p2 (cdr p2)))
-		    ((endp p1) (return-from search start2))
-		    (unless (call-test-key test test-not key (car p1) (car p2))
-		      (return nil))))
-        (do ((start2 start2 (1+ start2))) ((>= start2 end2))
-         (do ((i1 start1 (1+ i1))
-              (i2 start2 (1+ i2)))
-             ((or (>= i1 end1) (>= i2 end2)) (return-from search (when (>= i1 end1) start2)))
-           (unless (call-test-key test test-not key (elt sequence1 i1) (elt sequence2 i2))
-	     (return nil)))))
-        (do ((end2 end2 (1- end2))) ((>= start2 end2))
-         (do ((i1 (1- end1) (1- i1))
-              (i2 (1- end2) (1- i2)))
-             ((or (< i1 start1) (< i2 start2)) (return-from search (when (< i1 start1) (1+ i2))))
-           (unless (call-test-key test test-not key (elt sequence1 i1) (elt sequence2 i2))
-	     (return nil))))))))
-|#
-
-(defun sort (sequence predicate &key (key #'identity))
-  (declare (optimize (safety 1)))
-  (check-type sequence sequence)
-  (if (listp sequence)
-      (list-merge-sort sequence predicate key)
-      (quick-sort sequence 0 (the fixnum (length sequence)) predicate key)))
 
 
 (defun list-merge-sort (l predicate key)
@@ -740,7 +903,6 @@
    (let ((z (sort l)))
      z)))
 
-
 #|
 (defun list-quick-sort (l predicate key)
   (if (or (endp l) (endp (cdr l)))
@@ -784,6 +946,14 @@
               (elt seq j) d)
         (quick-sort seq start j pred key)
         (quick-sort seq (f+ 1  j) end pred key))))
+
+(defun sort (sequence predicate &key (key #'identity))
+  (declare (optimize (safety 1)))
+  (check-type sequence sequence)
+  (if (listp sequence)
+      (list-merge-sort sequence predicate key)
+      (quick-sort sequence 0 (the fixnum (length sequence)) predicate key)))
+
 
 (defun stable-sort (sequence predicate &key (key #'identity))
   (declare (optimize (safety 1)))
@@ -851,7 +1021,7 @@
 
 (defmacro with-hash-table-iterator ((name hash-table) &body body)
   (declare (optimize (safety 1)))
-  (let ((table (gensym ))
+  (let ((table (gens hash-table ))
 	(ind (gensym "ind")))
     `(let ((,table ,hash-table)
 	   (,ind 0))

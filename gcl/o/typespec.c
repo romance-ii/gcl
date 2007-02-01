@@ -519,6 +519,9 @@ LFD(siLtype_of_c)(void)
 	}
 }
 
+DEF_ORDINARY("IN-CALL",sSin_call,SI,"");
+DEF_ORDINARY("OUT-CALL",sSout_call,SI,"");
+DEFVAR("*PROFILING*",sSAprofilingA,SI,sLnil,"");
 DEF_ORDINARY("FLOOR",sLfloor,LISP,"");
 DEF_ORDINARY("CEILING",sLceiling,LISP,"");
 DEF_ORDINARY("TRUNCATE",sLtruncate,LISP,"");
