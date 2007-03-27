@@ -153,13 +153,14 @@
       (with-restore-vars
        (mapc (lambda (x) (when (and (var-p x) (or (var-ref-ccb x) (eq 'clb (var-loc x))))
 ;			   (push (list x (var-type x)) *restore-vars*)
-			   (setf (var-type x) (var-dt x)))) *vars*)
+			   (setf (var-type x) (var-mt x)))) *vars*)
        (c1add-globals ss)
        (check-vdecl nil ts is)
        (setq body (c1decl-body other-decl body))))
 
     ;; Apparently this is not strictly necessary, just changes to body
     (add-info info (cadr body)))
+  (setf (info-type info) (info-type (cadr body)))
   
   (if (or local-funs closures)
       (list 'flet info (reverse local-funs) (reverse closures) body)
@@ -298,11 +299,12 @@
     (with-restore-vars
      (mapc (lambda (x) (when (and (var-p x) (or (var-ref-ccb x) (eq 'clb (var-loc x))))
 ;			 (push (list x (var-type x)) *restore-vars*)
-			 (setf (var-type x) (var-dt x)))) *vars*)
+			 (setf (var-type x) (var-mt x)))) *vars*)
      (c1add-globals ss)
      (check-vdecl nil ts is)
      (setq body (c1decl-body other-decl body))))
   (add-info info (cadr body))
+  (setf (info-type info) (info-type (cadr body)))
 
   (if (or local-funs closures)
       (list 'labels info (reverse local-funs) (reverse closures) body)

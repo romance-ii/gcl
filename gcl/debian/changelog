@@ -82,8 +82,17 @@ gclcvs (2.7.0-62) unstable; urgency=low
     search,position,count,mismatch;underflow errors with C
     optimization;boundp,symbol-package,symbol-value,symbol-function,
     array-element-type and fboundp fastlinks
+  * use-fast-links in ansi-tests;process-warning safety 1 to keep check-
+    type FIXME;sigs from call-hasht-table in compiler TODO
+    centralize;remove sort expander macro and rely on generic maybe-
+    inline with new sort function definition FIXME comp-key and comp-
+    test, performace;fix labels/flet propagation;fix write-char and
+    write-byte optional compilation FIXME;subtype of declared type in
+    set-var-init-type;fix write-char inline;comment out unused compiler-
+    def-hook for now FIXME find out the origin and purpose of this;fix
+    copy-readtable;make empty gcl_recompile.lsp in boot
 
- -- Camm Maguire <camm@enhanced.com>  Thu,  7 Dec 2006 18:51:28 -0500
+ -- Camm Maguire <camm@enhanced.com>  Tue, 27 Mar 2007 18:53:28 -0400
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

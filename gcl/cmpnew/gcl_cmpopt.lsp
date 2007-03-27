@@ -1411,9 +1411,9 @@ TRUNCATE_USE_C
    (get 'compiled-function-p 'inline-always))
 
 ;;WRITE-CHAR
-; (push '((t) t #.(flags set)
-;  "@0;(writec_stream(char_code(#0),Vstandard_output->s.s_dbind),(#0))")
-;   (get 'write-char 'inline-unsafe))
+(push '((t) t #.(flags set)
+ "@0;(writec_stream(char_code(#0),sLAstandard_outputA->s.s_dbind),(#0))")
+  (get 'write-char 'inline-unsafe))
 
 ;;ZEROP
  (push '((t) boolean #.(flags rfa)"number_compare(small_fixnum(0),#0)==0")

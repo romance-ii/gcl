@@ -1005,39 +1005,69 @@
 	 (let ((*space* 10))		;prevent recursion!
 	   (c1expr tem)))))    
 
-(defun cfast-write (args write-fun)
-  (cond
-    ((and (not *safe-compile*)
-	  (< *space* 2)
-	  (boundp 'si::*eof*))
-     (let ((stream (second args)))
-       (or stream (setq stream '*standard-output*))
-     (cond
-       ((atom stream)
-	`(cond ((fp-okp ,stream)
-		(the fixnum (sputc .ch ,stream)))
-	       (t    (,write-fun  .ch ,stream))))
-       (t `(let ((.str ,stream))
-	     (declare (type ,(result-type stream) .str))
-	     ,(cfast-write (list '.ch '.str) write-fun))))))))
+;; (defun cfast-write (args write-fun)
+;;   (cond
+;;     ((and (not *safe-compile*)
+;; 	  (< *space* 2)
+;; 	  (boundp 'si::*eof*))
+;;      (let ((stream (second args)))
+;;        (or stream (setq stream '*standard-output*))
+;;      (cond
+;;        ((atom stream)
+;; 	`(cond ((fp-okp ,stream)
+;; 		(the fixnum (sputc .ch ,stream)))
+;; 	       (t    (,write-fun  .ch ,stream))))
+;;        (t `(let ((.str ,stream))
+;; 	     (declare (type ,(result-type stream) .str))
+;; 	     ,(cfast-write (list '.ch '.str) write-fun))))))))
+
+(defun cfast-write (args write-fun tp)
+  (when (and (not *safe-compile*)
+	     (< *space* 2)
+	     (boundp 'si::*eof*))
+    (let* ((stream (second args))(stream (or stream '*standard-output*)))
+      (if (atom stream)
+	  (let ((ch (gensym))) 
+	    `(let ((,ch ,(car args)))
+	       (declare (,tp ,ch))
+	       (if (fp-okp ,stream) (sputc ,ch ,stream) (,write-fun ,ch ,stream))
+	       ,ch))
+	(let ((str (gensym)))
+	  `(let ((,str ,stream))
+	     (declare (type ,(result-type stream) ,str))
+	     ,(cfast-write (list (car args) str) write-fun tp)))))))
+
 
 (defun co1write-byte (f args) f
-  (let ((tem (cfast-write args 'write-byte)))
-    (if tem (let ((*space* 10))
-	      (c1expr
-		`(let ((.ch ,(car args)))
-		   (declare (fixnum .ch))
-		   ,tem
-		   ,(if (atom (car args)) (car args) '.ch)))))))
+  (let ((tem (cfast-write args 'write-byte 'fixnum)))
+    (when tem 
+      (let ((*space* 10))
+	(c1expr tem)))))
+
 
 (defun co1write-char (f args) f
-  (let ((tem (cfast-write args 'write-char)))
-    (if tem (let ((*space* 10))
-	      (c1expr
-		`(let ((.ch ,(car args)))
-		   (declare (character .ch))
-		   ,tem
-		   ,(if (atom (car args)) (car args) '.ch)))))))
+  (let* ((tem (cfast-write args 'write-char 'character)))
+    (when tem 
+      (let ((*space* 10))
+	(c1expr tem)))))
+
+;; (defun co1write-byte (f args) f
+;;   (let ((tem (cfast-write args 'write-byte)))
+;;     (if tem (let ((*space* 10))
+;; 	      (c1expr
+;; 		`(let ((.ch ,(car args)))
+;; 		   (declare (fixnum .ch))
+;; 		   ,tem
+;; 		   ,(if (atom (car args)) (car args) '.ch)))))))
+
+;; (defun co1write-char (f args) f
+;;   (let ((tem (cfast-write args 'write-char)))
+;;     (if tem (let ((*space* 10))
+;; 	      (c1expr
+;; 		`(let ((.ch ,(car args)))
+;; 		   (declare (character .ch))
+;; 		   ,tem
+;; 		   ,(if (atom (car args)) (car args) '.ch)))))))
 
 
 

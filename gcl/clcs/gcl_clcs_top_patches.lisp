@@ -37,6 +37,7 @@
       (coerce-to-string datum args)))
 (defun process-warning (datum args function-name &optional (default-type 'conditions::simple-warning))
   (let ((r (process-error datum args function-name default-type)))
+    (declare (optimize (safety 1)))
     (check-type r warning "a warning condition")
     r))
 

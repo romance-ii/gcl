@@ -293,6 +293,7 @@
 				     (cmpwarn "The arg types of ~s were badly declared." fname)
 				     types1)))))
 			 ((or types1 types))
+			 ((car (si::sig fname)))
 			 ((not (intersection '(proclaimed-arg-types arg-types) (symbol-plist fname))) '(*))))))))
 
 (defun get-return-type (fname)
@@ -306,6 +307,7 @@
 		   (cmpwarn "The return type of ~s was badly declared." fname)
 		   type1)
 		  ((or type1 type))
+		  ((cadr (si::sig fname)))
 		  ((not (intersection '(proclaimed-return-type return-type) (symbol-plist fname))) '*)))))))
 
 (defun get-local-arg-types (fun &aux x)

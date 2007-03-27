@@ -107,6 +107,7 @@
     (when *break-on-warnings*
 	(break "~A~%break entered because of *break-on-warnings*." c))
     (let (warn)
+      (declare (ignorable warn))
       (proto-restart-case
        (proto-signal c)
        (proto-muffle-warning nil :report "Skip warning."  (proto-return-from warn nil))))

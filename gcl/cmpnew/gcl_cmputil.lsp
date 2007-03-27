@@ -275,7 +275,7 @@
 		       top-level-macro t3 t2 t1 package-operation))
 	   (si::putprop v t 'compiler-prop ))
 
-(defun  compiler-def-hook (symbol code) symbol code nil)
+;; (defun  compiler-def-hook (symbol code) symbol code nil)
 
 ;; (defun compiler-clear-compiler-properties (symbol code)
 ;;   code

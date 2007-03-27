@@ -2019,41 +2019,47 @@ Lsharp_dollar_reader()
 */
 
 static object
-copy_readtable(from, to)
-object from, to;
-{
-	struct rtent *rtab;
-	int i, j;
-	vs_mark;
-	{BEGIN_NO_INTERRUPT;
-	if (to == Cnil) {
-		to = alloc_object(t_readtable);
-		to->rt.rt_self = NULL;
-			/*  For GBC not to go mad.  */
-		vs_push(to);
-			/*  Saving for GBC.  */
-		to->rt.rt_self
-		= rtab
- 		= (struct rtent *)
-	  	alloc_contblock(RTABSIZE * sizeof(struct rtent));
-		for (i = 0;  i < RTABSIZE;  i++)
-			rtab[i] = from->rt.rt_self[i];
-				/*  structure assignment  */
-	} else
-	 rtab=to->rt.rt_self;
-	for (i = 0;  i < RTABSIZE;  i++)
-		if (from->rt.rt_self[i].rte_dtab != NULL) {
-			rtab[i].rte_dtab
- 			= (object *)
-			  alloc_contblock(RTABSIZE * sizeof(object));
-			for (j = 0;  j < RTABSIZE;  j++)
-				rtab[i].rte_dtab[j]
-				= from->rt.rt_self[i].rte_dtab[j];
-		}
-	to->rt.rt_case=from->rt.rt_case;
-	vs_reset;
-	END_NO_INTERRUPT;}
-	return(to);
+copy_readtable(object from,object to) {
+
+  struct rtent *rtab;
+  int i, j;
+  vs_mark;
+
+  {BEGIN_NO_INTERRUPT;
+
+  if (to == Cnil) {
+    to = alloc_object(t_readtable);
+    to->rt.rt_self = NULL;
+    /*  For GBC not to go mad.  */
+    vs_push(to);
+    /*  Saving for GBC.  */
+    to->rt.rt_self
+      = rtab
+      = (struct rtent *)
+      alloc_contblock(RTABSIZE * sizeof(struct rtent));
+    /* 		for (i = 0;  i < RTABSIZE;  i++) */
+    /* 			rtab[i] = from->rt.rt_self[i]; */
+  } else
+    rtab=to->rt.rt_self;
+
+  /*  structure assignment  */
+  for (i = 0;  i < RTABSIZE;  i++)
+    rtab[i] = from->rt.rt_self[i];
+
+  for (i = 0;  i < RTABSIZE;  i++)
+    if (from->rt.rt_self[i].rte_dtab != NULL) {
+      rtab[i].rte_dtab
+	= (object *)
+	alloc_contblock(RTABSIZE * sizeof(object));
+      for (j = 0;  j < RTABSIZE;  j++)
+	rtab[i].rte_dtab[j]
+	  = from->rt.rt_self[i].rte_dtab[j];
+    }
+  to->rt.rt_case=from->rt.rt_case;
+  vs_reset;
+  END_NO_INTERRUPT;}
+  return(to);
+
 }
 
 static object
