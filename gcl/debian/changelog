@@ -1,3 +1,109 @@
+gclcvs (2.7.0-65) unstable; urgency=low
+
+  * Fix set-form-type on nil return forms (non-local exits)
+  * more array tests for gcl;axe clcs-error-set;broaden fast-link
+    checking types;axe cmp-array-element-type;c1array-element-
+    type;fboundp-expander;redo sequence-type-element-type;tighter two-
+    tp-inf;faster make-info;function-lambda-expression in
+    disassemble;boundp,symbol-package,symbol-value,symbol-function, and
+    fboundp inlines;exclude and,or,not from portable-source
+    expansion;stack_cons macro;speedup add-hash and clear-compiler-
+    properties;faster search;tighter returns on
+    search,position,count,mismatch;underflow errors with C
+    optimization;boundp,symbol-package,symbol-value,symbol-function,
+    array-element-type and fboundp fastlinks
+  * use-fast-links in ansi-tests;process-warning safety 1 to keep check-
+    type FIXME;sigs from call-hasht-table in compiler TODO
+    centralize;remove sort expander macro and rely on generic maybe-
+    inline with new sort function definition FIXME comp-key and comp-
+    test, performace;fix labels/flet propagation;fix write-char and
+    write-byte optional compilation FIXME;subtype of declared type in
+    set-var-init-type;fix write-char inline;comment out unused compiler-
+    def-hook for now FIXME find out the origin and purpose of this;fix
+    copy-readtable;make empty gcl_recompile.lsp in boot
+  * fix remove-duplicates
+  * compiler::structurep to work around disjoint standard-
+    object/structure types;update i10 NMU changes from Debian;fix misc.
+    slot ansi tests;
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 28 Mar 2007 18:11:06 -0400
+
+gclcvs (2.7.0-64.2) unstable; urgency=low
+
+  * Non-maintainer upload to fix some more pending l10n issues.
+  * Debconf translations:
+    - German. Closes: #410689
+    - Galician. Closes: #413565
+    - Portuguese. Closes: #413589
+
+ -- Christian Perrier <bubulle@debian.org>  Tue,  6 Mar 2007 21:03:04 +0100
+
+gclcvs (2.7.0-64.1) unstable; urgency=low
+
+  * Non-maintainer upload to fix l10n issues
+  * Rewrite the debconf templates to fix the Developer's Reference
+    recommendations. Closes: #327449
+  * Debconf translation updates:
+    - French updated.
+    - Czech updated. Closes: #389212
+
+ -- Christian Perrier <bubulle@debian.org>  Thu, 25 Jan 2007 22:38:21 +0100
+
+gclcvs (2.7.0-64) unstable; urgency=low
+
+  * s_hpack to Cnil in gbc whens et to nil package;FFN(fSihs_top) for
+    ia64
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 30 Nov 2006 12:08:31 -0500
+
+gclcvs (2.7.0-63) unstable; urgency=low
+
+  * Fix leading underscore behavior of my_plt
+  * fix default INFO_DIR behavior
+  * gcc 4.x on hppa, no C optimization
+  * disable-nls added to the binutils subconfigures to avoid msgfmt
+    dependency
+  * remove -lintl from powerpc-macosx.defs
+  * Misc ansi fixes; error system overhaul
+  * more careful floating point overflow to work with compiler
+  * fix number comparison tests
+  * Fix error in error string printing, axe specific-error
+  * fix with-error-level-bindings
+  * prevent dotimes shadowing
+  * push FEwrong_type_argument into compiler
+  * fix every compiler macros
+  * no restarts in pcl, proto-abort, no continue restart duplication
+  * more error call fixes;no clcs sys-proclaims;aux variable init
+    types;/ inliner;array ansi fixes;ash/integer-decode-float fast-
+    links;si::fpvec type;faster rational;package routine fixes;standard-
+    char-p, digit_char, and code_char fixes;make-random-state fix;pcl
+    program errors
+  * write-line error checking
+  * better enforcement of mv limit
+  * iterate over pass1 until internal sig conflicts are resolved
+  * fix break-resume
+  * segfault crash fixes; centralize on one version of assert, check-
+    type and cases
+  * mark nil-named hpacks
+  * list-of and type-spec types, remove obsolete functions in
+    clcs_macros.lisp
+  * fix more segfaults on bad input
+  * fix subtypep tyep-of class-of
+  * get rid of last shadow in conditions:: warn
+  * no print bindings in assert, unbound slot condition printing
+  * misc error fixes
+  * continue/resume  restart around break; fix declaim warning;fix if
+    bounds checking;fix trace
+  * fix proclaim-var
+  * fix untrace
+  * proclaim fixes;experimental tagbody optimization;error on coerce to
+    nil;fix no pplicable error message
+  * fix cltl1 error messages
+  * work around for hppa gmp support
+  * new hppa compiler options
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 29 Nov 2006 22:02:47 -0500
+
 gclcvs (2.7.0-62) unstable; urgency=low
 
   * fix c1mvprog1 bug
@@ -70,30 +176,8 @@ gclcvs (2.7.0-62) unstable; urgency=low
   * new hppa compiler options
   * s_hpack to Cnil in gbc whens et to nil package;FFN(fSihs_top) for
     ia64
-  * Fix set-form-type on nil return forms (non-local exits)
-  * more array tests for gcl;axe clcs-error-set;broaden fast-link
-    checking types;axe cmp-array-element-type;c1array-element-
-    type;fboundp-expander;redo sequence-type-element-type;tighter two-
-    tp-inf;faster make-info;function-lambda-expression in
-    disassemble;boundp,symbol-package,symbol-value,symbol-function, and
-    fboundp inlines;exclude and,or,not from portable-source
-    expansion;stack_cons macro;speedup add-hash and clear-compiler-
-    properties;faster search;tighter returns on
-    search,position,count,mismatch;underflow errors with C
-    optimization;boundp,symbol-package,symbol-value,symbol-function,
-    array-element-type and fboundp fastlinks
-  * use-fast-links in ansi-tests;process-warning safety 1 to keep check-
-    type FIXME;sigs from call-hasht-table in compiler TODO
-    centralize;remove sort expander macro and rely on generic maybe-
-    inline with new sort function definition FIXME comp-key and comp-
-    test, performace;fix labels/flet propagation;fix write-char and
-    write-byte optional compilation FIXME;subtype of declared type in
-    set-var-init-type;fix write-char inline;comment out unused compiler-
-    def-hook for now FIXME find out the origin and purpose of this;fix
-    copy-readtable;make empty gcl_recompile.lsp in boot
-  * fix remove-duplicates
-
- -- Camm Maguire <camm@enhanced.com>  Wed, 28 Mar 2007 06:34:53 -0400
+  
+ -- Camm Maguire <camm@enhanced.com>  Sat, 21 Oct 2006 15:27:22 -0400
 
 gclcvs (2.7.0-61) unstable; urgency=low
 

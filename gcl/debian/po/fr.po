@@ -1,3 +1,4 @@
+# translation of fr.po to French
 # Translators, if you are not familiar with the PO format, gettext
 # documentation is worth reading, especially sections dedicated to
 # this format, e.g. by running:
@@ -7,30 +8,31 @@
 # /usr/share/doc/po-debconf/README-trans
 # or http://www.debian.org/intl/l10n/po-debconf/README-trans
 # Developers do not need to manually edit POT or PO files.
-# 
-# 
+#
+#
+# Christian Perrier <bubulle@debian.org>, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: gcl 2.6.7-1\n"
-"Report-Msgid-Bugs-To: camm@enhanced.com\n"
-"POT-Creation-Date: 2006-08-24 10:20-0400\n"
-"PO-Revision-Date: 2005-10-29 14:19+0200\n"
-"Last-Translator: Sylvain Archenault <sylvain.archenault@laposte.net>\n"
+"Project-Id-Version: fr\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-01-21 08:47+0100\n"
+"PO-Revision-Date: 2007-01-21 08:48+0100\n"
+"Last-Translator: Christian Perrier <bubulle@debian.org>\n"
 "Language-Team: French <debian-l10n-french@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-15\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #. Type: boolean
 #. Description
 #: ../in.gcl.templates:1001
-msgid "Use the work-in-progress ansi build by default"
+msgid "Use the work-in-progress ANSI build by default?"
 msgstr "Faut-il utiliser la compilation ANSI par défaut ?"
 
 #. Type: boolean
 #. Description
 #: ../in.gcl.templates:1001
-#, fuzzy
 msgid ""
 "GCL is in the process of providing an ANSI compliant image in addition to "
 "its traditional CLtL1 image still in production use.  Please see the README."
@@ -41,26 +43,28 @@ msgid ""
 "for the CLtL1 build, e.g. GCL_ANSI=t gcl@EXT@.  The flavor of the build in "
 "force will be reported in the initial startup banner."
 msgstr ""
-"GCL gère désormais le profilage via gprof. Veuillez consulter la "
-"documentation si::gprof-start et si::gprof-quit pour plus d'informations. La "
-"construction produite avec cette option est plus lente que la construction "
-"classique. Par conséquent il n'est pas recommandé de l'utiliser en "
-"production. Vous pouvez localement modifier ce choix en affectant à la "
-"variable d'environnement GCL_PROF, une chaîne non vide pour activer le "
-"profilage, ou une chaîne vide pour une compilation optimisée, par exemple "
-"GCL_PROF=t gcl@EXT@. Si le profilage est activé, cela sera affiché dans le "
-"bandeau de démarrage."
+"GCL a pour but de fournir une image en accord avec la définition de l'ANSI "
+"en plus de son image traditionnelle CLtL1 qui est toujours utilisée en "
+"production. La valeur de cette variable déterminera quelle norme vous allez "
+"utiliser par défaut lors de l'exécution de « gcl@EXT@ ». Vous pouvez "
+"localement modifier ce choix en créant la variable d'environnement GCL_ANSI "
+"et en lui affectant une chaîne non vide pour une compilation respectant la "
+"norme définie par l'ANSI, et une chaîne vide pour une compilation en accord "
+"avec la norme CLtL1, par exemple GCL_ANSI=t gcl@EXT@. Vous pouvez être "
+"intéressé par l'inspection des résultats des tests esquissant le niveau de "
+"conformité avec la standard ANSI atteint jusqu'à aujourd'hui. Ceux-ci sont "
+"disponibles dans le fichier /usr/share/doc/gcl/test_resuts.gz. Le type de "
+"compilation sera affiché dans le bandeau de démarrage."
 
 #. Type: boolean
 #. Description
 #: ../in.gcl.templates:2001
-msgid "Use the profiling build by default"
+msgid "Use the profiling build by default?"
 msgstr "Faut-il utiliser le profilage par défaut ?"
 
 #. Type: boolean
 #. Description
 #: ../in.gcl.templates:2001
-#, fuzzy
 msgid ""
 "GCL now has optional support for profiling via gprof.  Please see the "
 "documentation for si::gprof-start and si::gprof-quit for details. As this "
@@ -81,35 +85,3 @@ msgstr ""
 "GCL_PROF=t gcl@EXT@. Si le profilage est activé, cela sera affiché dans le "
 "bandeau de démarrage."
 
-#~ msgid ""
-#~ "GCL is one of the oldest free common lisp systems still in use. Several "
-#~ "production systems have used it for over a decade.  The common lisp "
-#~ "standard in effect when GCL was first released is known as \"Common Lisp, "
-#~ "the Language\" (CLtL1) after a book by Steele of the same name providing "
-#~ "this specification.  Subsequently, a much expanded standard was adopted "
-#~ "by the American National Standards Institute (ANSI), which is still "
-#~ "considered the definitive common lisp language specification to this "
-#~ "day.  GCL is in the process of providing an ANSI compliant image in "
-#~ "addition to its traditional CLtL1 image still in production use.  Setting "
-#~ "this variable will determine which image you will use by default on "
-#~ "executing 'gcl@EXT@'.  You can locally override this choice by setting "
-#~ "the GCL_ANSI environment variable to any non-empty string for the ANSI "
-#~ "build, and to the empty string for the CLtL1 build, e.g. GCL_ANSI=t "
-#~ "gcl@EXT@.  You may be interested in reviewing the ANSI test results "
-#~ "sketching the level of compliance achieved thus far in /usr/share/doc/"
-#~ "gcl@EXT@/test_results.gz.  The flavor of the build in force will be "
-#~ "reported in the initial startup banner."
-#~ msgstr ""
-#~ "GCL a pour but de fournir une image en accord avec la définition de "
-#~ "l'ANSI en plus de son image traditionnelle CLtL1 qui est toujours "
-#~ "utilisée en production. La valeur de cette variable déterminera quelle "
-#~ "norme vous allez utiliser par défaut lors de l'exécution de « gcl@EXT@ ». "
-#~ "Vous pouvez localement modifier ce choix en créant la variable "
-#~ "d'environnement GCL_ANSI et en lui affectant une chaîne non vide pour une "
-#~ "compilation respectant la norme définie par l'ANSI, et une chaîne vide "
-#~ "pour une compilation en accord avec la norme CLtL1, par exemple "
-#~ "GCL_ANSI=t gcl@EXT@. Vous pouvez être intéressé par l'inspection des "
-#~ "résultats des tests esquissant le niveau de conformité avec la standard "
-#~ "ANSI atteint jusqu'à aujourd'hui. Ceux-ci sont disponibles dans le "
-#~ "fichier /usr/share/doc/gcl/test_resuts.gz. Le type de compilation sera "
-#~ "affiché dans le bandeau de démarrage."

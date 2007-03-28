@@ -261,6 +261,9 @@
 ;;SYSTEM:STRUCTUREP
  (push '((t) boolean #.(flags rfa)"type_of(#0)==t_structure")
    (get 'system:structurep 'inline-always))
+;;COMPILER:STRUCTUREP
+ (push '((t) boolean #.(flags rfa)"type_of(#0)==t_structure")
+   (get 'compiler::structurep 'inline-always))
 
 ;;SYSTEM:SVSET
  (push '((t t t) t #.(flags set)"aset1(#0,fixint(#1),#2)")

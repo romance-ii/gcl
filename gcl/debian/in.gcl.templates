@@ -1,6 +1,6 @@
 Template: gcl@EXT@/default_gcl_ansi
 Type: boolean
-_Description: Use the work-in-progress ansi build by default
+_Description: Use the work-in-progress ANSI build by default?
  GCL is in the process of providing an ANSI compliant image in addition to
  its traditional CLtL1 image still in production use.  Please see the
  README.Debian file for a brief description of these terms.  Setting this
@@ -13,7 +13,7 @@ _Description: Use the work-in-progress ansi build by default
 
 Template: gcl@EXT@/default_gcl_prof
 Type: boolean
-_Description: Use the profiling build by default
+_Description: Use the profiling build by default?
  GCL now has optional support for profiling via gprof.  Please see the
  documentation
  for si::gprof-start and si::gprof-quit for details. As this build is slower

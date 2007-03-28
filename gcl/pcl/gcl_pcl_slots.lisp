@@ -97,7 +97,7 @@
     (if (null entry)
 	(slot-missing (wrapper-class wrapper) object slot-name 'slot-value)
 	(if (eq (cdr entry) *slot-unbound*)
-	    (slot-unbound (wrapper-class wrapper) object slot-name)
+	    (values (slot-unbound (wrapper-class wrapper) object slot-name))
 	    (cdr entry)))))
 
 (defun set-class-slot-value-1 (new-value object wrapper slot-name)
@@ -147,9 +147,10 @@
   (let* ((class (class-of object))
 	 (slot-definition (find-slot-definition class slot-name)))
     (if (null slot-definition)
-	(slot-missing class object slot-name 'setf)
-	(setf (slot-value-using-class class object slot-definition) 
-	      new-value))))
+	(slot-missing class object slot-name 'setf new-value)
+      (setf (slot-value-using-class class object slot-definition) 
+	    new-value))
+    new-value))
 
 (setf (gdefinition 'set-slot-value-normal) #'set-slot-value)
 
@@ -166,8 +167,8 @@
   (let* ((class (class-of object))
 	 (slot-definition (find-slot-definition class slot-name)))
     (if (null slot-definition)
-	(slot-missing class object slot-name 'slot-boundp)
-	(slot-boundp-using-class class object slot-definition))))
+	(values (slot-missing class object slot-name 'slot-boundp))
+      (slot-boundp-using-class class object slot-definition))))
 
 (setf (gdefinition 'slot-boundp-normal) #'slot-boundp)
 
@@ -183,7 +184,8 @@
          (slot-definition (find-slot-definition class slot-name)))
     (if (null slot-definition)
         (slot-missing class object slot-name 'slot-makunbound)
-        (slot-makunbound-using-class class object slot-definition))))
+        (slot-makunbound-using-class class object slot-definition))
+    object))
 
 (defun slot-exists-p (object slot-name)
   (let ((class (class-of object)))
@@ -231,7 +233,7 @@
                            so it can't be read by the default ~s method."
 			  slotd 'slot-value-using-class)))))
     (if (eq value *slot-unbound*)
-	(slot-unbound class object (slot-definition-name slotd))
+	(values (slot-unbound class object (slot-definition-name slotd)))
 	value)))
 
 (defmethod (setf slot-value-using-class)
@@ -313,7 +315,7 @@
 	 (value (funcall function object)))
     #+cmu (declare (type function function))
     (if (eq value *slot-unbound*)
-	(slot-unbound class object (slot-definition-name slotd))
+	(values (slot-unbound class object (slot-definition-name slotd)))
 	value)))
 
 (defmethod (setf slot-value-using-class)
@@ -359,13 +361,13 @@
   (error 'unbound-slot :name slot-name :instance instance))
 
 (defun slot-unbound-internal (instance position)
-  (slot-unbound (class-of instance) instance 
+  (values (slot-unbound (class-of instance) instance 
 		(etypecase position
 		  (fixnum 
 		   (nth position 
 			(wrapper-instance-slots-layout (wrapper-of instance))))
 		  (cons
-		   (car position)))))
+		   (car position))))))
 
 
 (defmethod allocate-instance ((class standard-class) &rest initargs)
