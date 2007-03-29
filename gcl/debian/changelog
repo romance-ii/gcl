@@ -26,8 +26,10 @@ gclcvs (2.7.0-65) unstable; urgency=low
     object/structure types;update i10 NMU changes from Debian;fix misc.
     slot ansi tests;
   * ansi functionp in trad image too
+  * Depend on common-lisp-controller, Closes: #416514.
+  * Fix bad symlink in pargcl source.
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 29 Mar 2007 10:27:59 -0400
+ -- Camm Maguire <camm@enhanced.com>  Thu, 29 Mar 2007 12:56:28 -0400
 
 gclcvs (2.7.0-64.2) unstable; urgency=low
 
