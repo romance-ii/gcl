@@ -351,7 +351,8 @@ DEFUNO_NEW("FUNCTIONP",object,fLfunctionp,LISP
 	    || t == t_closure|| t == t_afun
 	    || t == t_vfun || t == t_ifun) {
 		x0 = Ct;
-#ifndef ANSI_COMMON_LISP
+/* #ifndef ANSI_COMMON_LISP */
+#if 0
 	} else if (t == t_symbol) {
 	  if (x0->s.s_gfdef != OBJNULL &&
 	      x0->s.s_mflag == FALSE)
