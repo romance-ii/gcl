@@ -189,7 +189,7 @@
 
 (defun multiple-value-setq-expander (args)
   (let ((syms (mapcar (lambda (x) (declare (ignore x)) (gensym)) (car args))))
-    `(multiple-value-bind ,syms ,(cadr args) (psetq ,@(mapcan 'list (car args) syms)))))
+    `(multiple-value-bind ,syms ,(cadr args) (setq ,@(mapcan 'list (car args) syms)))))
 
 (defun c1multiple-value-setq (args)
   (c1expr (multiple-value-setq-expander args)))

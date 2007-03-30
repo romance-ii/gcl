@@ -676,7 +676,7 @@ LFD(Ldirectory)(void)
 	FILE *fp;
 	register int i, c;
 	object *top;
-	char iobuffer[BUFSIZ];
+	char iobuffer[BUFSIZ],ch;
 	extern FILE *popen(const char *, const char *);
 
 	if (vs_top - vs_base < 1)
@@ -689,24 +689,10 @@ LFD(Ldirectory)(void)
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
 	vs_base[0] = coerce_to_pathname(vs_base[0]);
 
-	if (vs_base[0]->pn.pn_name==Cnil && vs_base[0]->pn.pn_type==Cnil) {
-		coerce_to_local_filename(vs_base[0], filename);
-		strcat(filename, "*");
-	} else if (vs_base[0]->pn.pn_name==Cnil) {
-		vs_base[0]->pn.pn_name = sKwild;
-		coerce_to_local_filename(vs_base[0], filename);
-		vs_base[0]->pn.pn_name = Cnil;
-	} else if (vs_base[0]->pn.pn_type==Cnil) {
-		coerce_to_local_filename(vs_base[0], filename);
-		strcat(filename, "*");
-	} else
-		coerce_to_local_filename(vs_base[0], filename);
-
-	sprintf(command, "j=%s ; "
-		         "while [ \"$j\" != \"\" ] ; do "
-                            "ls -d $(echo $j | cut -f-256 -d\\ ); "
-                            "j=$(echo $j | cut -s -f257- -d\\ ); "
-                            "done 2> /dev/null", filename);
+	ch=(vs_base[0]->pn.pn_name==Cnil && vs_base[0]->pn.pn_type==Cnil) ? '!' : ' ';
+	coerce_to_local_filename(vs_base[0], filename);
+	sprintf(command, "IFS='' shopt -s dotglob; "
+		         "j=\"%s\"; for i in $j ; do ! [ -e \"$i\" ] || %c [ -d \"$i\" ] || echo \"$i\" ; done", filename, ch);
 	fp = popen(command, "r");
 	setbuf(fp, iobuffer);
 	for (;;) {
