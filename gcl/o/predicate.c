@@ -754,6 +754,10 @@ equalp1(register object x, register object y) {
 
   case t_pathname:
     return(equal(x, y));
+  case t_random:
+    return(x->rnd.rnd_state._mp_seed->_mp_alloc==y->rnd.rnd_state._mp_seed->_mp_alloc &&
+	   !memcmp(x->rnd.rnd_state._mp_seed->_mp_d,y->rnd.rnd_state._mp_seed->_mp_d,
+		   x->rnd.rnd_state._mp_seed->_mp_alloc*sizeof(*x->rnd.rnd_state._mp_seed->_mp_d)));
   default:
     break;
   }
