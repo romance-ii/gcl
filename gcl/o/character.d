@@ -563,6 +563,18 @@ int w, r;
 	if (string_equal(s, STlinefeed) || string_equal(s, STnewline))
 		@(return `code_char('\n')`)
         if (s->st.st_fillp==1) @(return `code_char(s->st.st_self[0])`)
+        if (s->st.st_fillp==2 && s->st.st_self[0]=='^') {
+	  int ch=s->st.st_self[1]-'A'+1;
+	  @(return `code_char(ch)`)
+        }
+        if (s->st.st_fillp==3 && s->st.st_self[0]=='^' && s->st.st_self[1]=='\\' && s->st.st_self[2]=='\\') {
+	  int ch=s->st.st_self[1]-'A'+1;
+	  @(return `code_char(ch)`)
+        }
+        if (s->st.st_fillp==4 && s->st.st_self[0]=='\\') {
+	  int ch=(s->st.st_self[1]-'0')*8*8+(s->st.st_self[2]-'0')*8+(s->st.st_self[3]-'0');
+	  @(return `code_char(ch)`)
+        }
 	@(return Cnil)
 @)
 
