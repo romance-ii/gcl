@@ -1,7 +1,7 @@
 gclcvs (2.7.0-66) unstable; urgency=low
 
   * clisp-style directory;fix multiple-setq-expander
-  * fix 64bit array sizes
+  * fix 64bit array sizes, Closes: #417049
   * fix name-char on control characters
   * fix reading and printing of random-states
   * fix reading and printing of floats
