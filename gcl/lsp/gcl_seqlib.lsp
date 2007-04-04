@@ -125,6 +125,7 @@
 		    (bit 1)
 		    ((character non-negative-char signed-char unsigned-char) char-length)
 		    ((non-negative-short signed-short unsigned-short) short-length)
+		    ((non-negative-int signed-int unsigned-int) int-length)
 		    ((non-negative-fixnum fixnum t) fixnum-length)
 		    (short-float (* 4 char-length));fixme!
 		    (long-float (* 8 char-length));FIXME!
