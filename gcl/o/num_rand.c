@@ -167,7 +167,7 @@ init_gmp_rnd_state(__gmp_randstate_struct *x) {
 
   }
   gcl_gmp_allocfun=old_gcl_gmp_allocfun;
-  x->_mp_seed->_mp_alloc=trap_size;
+  x->_mp_seed->_mp_alloc=x->_mp_seed->_mp_size=trap_size;
 #endif
     
 

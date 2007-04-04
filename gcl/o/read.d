@@ -758,6 +758,25 @@ ENDUP:
 	 (i) == 'b' || (i) == 'B')
 
 double pow();
+
+static double
+new_fraction(char *s,int end,int exp_pos) {
+
+  char ch,ch1;
+  double fraction;
+
+  ch=s[end];
+  s[end]=0;
+  if (exp_pos>=0) {ch1=s[exp_pos];s[exp_pos]='E';}
+  sscanf(s,"%lf",&fraction);
+  s[end]=ch;
+  if (exp_pos>=0) s[exp_pos]=ch1;
+
+  return fraction;
+
+}
+
+
 /*
 	Parse_number(s, end, ep, radix) parses C string s up to (but
 	not including) s[end] using radix as the radix for the
@@ -774,7 +793,7 @@ parse_number(char *s, int end, int *ep, int radix) {
   object integer_part;
   double fraction, fraction_unit, f;
   char exponent_marker;
-  int exponent;
+  int exponent,exp_pos=-1;
   int i, j, k;
   int d;
   vs_mark;
@@ -920,6 +939,7 @@ parse_number(char *s, int end, int *ep, int radix) {
   if (radix!=10)
     FEerror("Parse_number radix error", 0);
   exponent_marker = s[i];
+  exp_pos=i;
   i++;
   if (i >= end)
     goto NO_NUMBER;
@@ -961,11 +981,11 @@ parse_number(char *s, int end, int *ep, int radix) {
     goto MAKE_FLOAT;
     
   case 's':  case 'S':
-    x = make_shortfloat((shortfloat)fraction);
+    x = make_shortfloat((shortfloat)new_fraction(s,end,exp_pos));/*FIXME code above cannot re-read denormalized numbers accurately*/
     break;
     
   case 'f':  case 'F':  case 'd':  case 'D':  case 'l':  case 'L':
-    x = make_longfloat((longfloat)fraction);
+    x = make_longfloat((longfloat)new_fraction(s,end,exp_pos));
     break;
     
   case 'b':  case 'B':
@@ -2003,14 +2023,16 @@ Lsharp_dollar_reader()
 	vs_popp;
 	x = read_object(vs_base[0]);
 	tx=type_of(x);
-	if (tx!=t_fixnum && tx!=t_bignum)
-	  FEerror("Cannot make a random-state with the value ~S.",1, x);
 	vs_base[0] = alloc_object(t_random);
 	init_gmp_rnd_state(&vs_base[0]->rnd.rnd_state);
-	if (tx==t_fixnum)
-	  gmp_randseed_ui(&vs_base[0]->rnd.rnd_state,fix(x));
-	else
-	  gmp_randseed(&vs_base[0]->rnd.rnd_state,MP(x));
+	if (tx!=t_fixnum || fix(x)) {
+	  if (tx!=t_bignum)
+	    FEerror("Cannot make a random-state with the value ~S.",1, x);
+	  if (x->big.big_mpz_t._mp_size!=vs_base[0]->rnd.rnd_state._mp_seed->_mp_size)
+	    FEerror("Cannot make a random-state with the value ~S.",1, x);
+	  memcpy(vs_base[0]->rnd.rnd_state._mp_seed->_mp_d,x->big.big_mpz_t._mp_d,
+		 vs_base[0]->rnd.rnd_state._mp_seed->_mp_size*sizeof(*vs_base[0]->rnd.rnd_state._mp_seed->_mp_d));
+	}
 
 }
 

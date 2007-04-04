@@ -415,7 +415,7 @@ bool shortp;
 	int n = FPRC+1;
 
 	if (shortp)
-		n = 7;
+	  n = 9;
 	edit_double(n, d, &sign, buff, &exp);
 	if (sign==2) {write_str("#<");
 		      write_str(buff);
@@ -799,10 +799,10 @@ int level;
 	    fix(sSAprin_levelA->s.s_dbind)>level)
 	  level=fix(sSAprin_levelA->s.s_dbind);
 
-	if (PRINTlevel >= 0 && level >= PRINTlevel) {
-	  write_ch('#');
-	  return;
-	}
+/* 	if (PRINTlevel >= 0 && level >= PRINTlevel) { */
+/* 	  write_ch('#'); */
+/* 	  return; */
+/* 	} */
 
 	if (x == OBJNULL) {
 		write_str("#<OBJNULL>");
@@ -945,12 +945,13 @@ int level;
 		}
 		write_str("#\\");
 		switch (char_code(x)) {
+
 		case '\r':
 			write_str("Return");
 			break;
 
 		case ' ':
-			write_str("Space");
+			write_str(" ");
 			break;
 
 		case '\177':
@@ -1018,7 +1019,7 @@ int level;
 		write_ch(':');
 	      } else if (PRINTpackage||find_symbol(x,current_package())!=x || !intern_flag) {
 		
-		print_symbol_name_body(x->s.s_hpack->p.p_name,0);
+		print_symbol_name_body(x->s.s_hpack->p.p_name,1);
 		
 		if (find_symbol(x, x->s.s_hpack) != x)
 		  error("can't print symbol");
