@@ -6,6 +6,9 @@
 #include <setjmp.h>
 #include <stdio.h>
 #include <math.h>
+#include <strings.h>
+#include <stdio.h>
+#include <math.h>
 
 #include "include.h"
 
