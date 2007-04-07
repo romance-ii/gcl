@@ -1,55 +1,65 @@
 
-OFLAG	=  -O
-LIBS	= -lm -lsocket -lnsl
+# notes for redhat 6.0
+#  the configure should select the compiler GCC=/usr/bin/i386-glibc20-linux-gcc
+#  However for the gcl-tk directory, you must use plain 'gcc' since
+#  that must link with the tcl tk libs which have been compiled with it.
+#  so after configure change to GCC=gcc in the gcl-tk/makefile
 
-# tell linker to remember where it got the shared object...
-# should have the same for TCL/TK if you used shared libs..
-X11_LIBS=-Xlinker -R${X11_LIBS_DIR} -L${X11_LIBS_DIR} -lX11
 
-ODIR_DEBUG=-O4
+# Machine dependent makefile definitions for intel 386,486 running linux
 
-#gcc 2.1 and 2.2 compile akcl correctly as far as I have been able to determine.
-#gcc 2.3.3 does not compile akcl correctly
-#gcc 2.4.5 does compile akcl, but does fail on some subsequent tests.
-#gcc 2.5.3 does compile gcl correctly however it has a known bug.
-#gcc 2.6.3 appears to compile gcl ok
+LBINDIR=/usr/local/bin
 
-CC = gcc -I${GCLDIR}/o  -DVOL=volatile -fsigned-char
-# static doesn't work with gcl on solaris 2.5 x86  
-# LDCC= ${CC} -static
-ODIR_DEBUG= -O
+#OFLAG        =  -g -Wall
+#OFLAG       =  -g -Wall -fomit-frame-pointer -Werror
+#LIBS   = -lm 
 
-#The new optional for money compiler has not been tested recently.
-# it used to fail to compile o/format.o correctly.
-#CC =  /usr/local/lang/cc  -DVOL=  -I$(GCLDIR)/o -Bstatic -temp=. -pipe
-ODIR_DEBUG= -O4
+#ODIR_DEBUG= -g -Wall  -fomit-frame-pointer -Werror
+#ODIR_DEBUG= -g -Wall
 
-AS=/usr/ccs/bin/as -P -D__svr4__
+# This CC string will be used for compilation of the system,
+# and also in the compiler::*cc* variable for later compilation of
+# lisp files.
+# (the -pipe is just since our file system is slow..)
+#CC = ${GCC} -pipe -fwritable-strings  -DVOL=volatile -I$(GCLDIR)/o -fsigned-char -Wall $(EXTRA_CFLAGS) -fomit-frame-pointer -Werror -g
 
-CFLAGS	= -c $(DEFS)  -I../h
+# under redhat 6.1 and slackware 7.0 we needed to have this
+# link be static, but should be ok with the fix to unixport/rsym_elf.c
+LDCC=${CC} -static
+LDCC=${CC}
 
-MAIN    = ../o/main.o
+# note for linuxaout on an elf machine add -b i486-linuxaout 
+# CC = gcc -pipe -fwritable-strings  -DVOL=volatile -I$(GCLDIR)/o -fsigned-char -b i486-linuxaout 
 
-MPFILES=$(MPDIR)/mpi-sol-sparc.o $(MPDIR)/sparcdivul3.o $(MPDIR)/libmport.a
-MPFILES=${MPDIR}/mpi.o $(MPDIR)/libmport.a
+# Enable the fastloading mechanism which does not use ld -A
+# requires c/rel_.. machine dependent code.
 
-RSYM	= rsym
-SFASL	= $(ODIR)/sfasl.o
+RSYM     = rsym
+ifneq ($(findstring bfd,$(LIBS)),) 
+RSYM    = 
+endif
+ifneq ($(BUILD_BFD),) 
+RSYM    = 
+endif
+#ifneq ($(findstring -ldl,$(LIBS)),) 
+#RSYM    = 
+#endif
 
-# This function will be run before dumping.
+SFASL        = $(ODIR)/sfasl.o
+
+
+#MPFILES= $(MPDIR)/mpi-386d.o   $(MPDIR)/libmport.a
+
+
 # When using SFASL it is good to have (si::build-symbol-table)
 INITFORM=(si::build-symbol-table)
 
-GNULIB1=
-
 # Use symbolic links
 SYMB=-s
+
+LIBFILES=bsearch.o
+
 # the  make to use for saved_kcp the profiler.
-KCP=kcp-sun
+KCP=kcp-bsd
 
-NULLFILE = ../h/secondary_sun_magic
-# no ranlib so use dummy
-RANLIB=true
-# use the sun ar
-AR=/usr/ccs/bin/ar qc
-
+SHELL=/bin/bash

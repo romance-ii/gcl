@@ -278,4 +278,5 @@ SGC is enabled.  */
 #undef HAVE_SYS_SOCKIO_H
 #undef HAVE_MALLOC_MALLOC_H
 #undef HAVE_OBJC_MALLOC_H
-
+#undef INFINITY
+#undef NAN

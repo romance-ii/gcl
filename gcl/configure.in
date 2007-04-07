@@ -1255,6 +1255,20 @@ AC_MSG_RESULT($sizeof_contblock)
 AC_DEFINE_UNQUOTED(SIZEOF_CONTBLOCK,$sizeof_contblock)
 
 
+# pagewidth
+AC_MSG_CHECKING(for pagewidth)
+AC_TRY_RUN([#include <stdio.h>
+            #include <unistd.h>
+int main() {size_t i=getpagesize(),j; 
+	    FILE *fp=fopen("conftest1","w");
+	    for (j=0;i>>=1;j++);
+	    if (j<12) {printf("pagewidth %u is too small\n",j);return -1;}
+	    fprintf(fp,"%u",j);
+	    return 0;}],PAGEWIDTH=`cat conftest1`,PAGEWIDTH=0,PAGEWIDTH=0)
+AC_MSG_RESULT($PAGEWIDTH)
+AC_DEFINE_UNQUOTED(PAGEWIDTH,$PAGEWIDTH)
+AC_SUBST(PAGEWIDTH)
+
 AC_MSG_CHECKING(DBEGIN)
 AC_TRY_RUN([#include <stdio.h>
             #include <stdlib.h>
@@ -1285,7 +1299,7 @@ main(int argc,char * argv[])
 #if defined (__APPLE__) && defined (__MACH__)
   fprintf(fp,"((unsigned long)get_dbegin())");
 #else
-  fprintf(fp,"0x%lx",((unsigned long) b) & ~(unsigned long)0xffffff);
+  fprintf(fp,"0x%lx",((unsigned long) b) & ~(unsigned long)((1<<PAGEWIDTH)-1));
 #endif
 #endif
   fclose(fp);
@@ -1293,20 +1307,6 @@ main(int argc,char * argv[])
 }],dbegin=`cat conftest1`,dbegin=0,dbegin=0)
 #AC_DEFINE_UNQUOTED(DBEGIN,$dbegin)
 AC_MSG_RESULT($dbegin)
-
-# pagewidth
-AC_MSG_CHECKING(for pagewidth)
-AC_TRY_RUN([#include <stdio.h>
-            #include <unistd.h>
-int main() {size_t i=getpagesize(),j; 
-	    FILE *fp=fopen("conftest1","w");
-	    for (j=0;i>>=1;j++);
-	    if (j<12) {printf("pagewidth %u is too small\n",j);return -1;}
-	    fprintf(fp,"%u",j);
-	    return 0;}],PAGEWIDTH=`cat conftest1`,PAGEWIDTH=0,PAGEWIDTH=0)
-AC_MSG_RESULT($PAGEWIDTH)
-AC_DEFINE_UNQUOTED(PAGEWIDTH,$PAGEWIDTH)
-AC_SUBST(PAGEWIDTH)
 
 AC_TRY_RUN([#include <stdio.h>
             #include <unistd.h>
@@ -1395,6 +1395,9 @@ AC_MSG_CHECKING(for shared library/C stack ceiling to heap)
 if test "$use" = "mingw" ; then
   heap_ceiling=2000000000
 else
+if test "$use" = "solaris-i386" ; then
+  heap_ceiling=0x0
+else
 if test "$enable_static" = "yes" ; then
   heap_ceiling=0x0
 else
@@ -1412,6 +1415,7 @@ int main() {
     h=c>d && c<h ? c : h;
     fprintf(fp,"0x%lx",h);
     return 0;}],heap_ceiling=`cat conftest1`,echo failed;exit 1,echo failed;exit 1)
+fi
 fi
 fi
 fi
@@ -1896,6 +1900,46 @@ AC_TRY_RUN([#define _GNU_SOURCE 1
 		AC_DEFINE(HAVE_FINITE) AC_MSG_RESULT(yes),
 		HAVE_FINITE=0 AC_MSG_RESULT(no),HAVE_FINITE=0 AC_MSG_RESULT(no))
 	,HAVE_ISFINITE=0 AC_MSG_RESULT(no),HAVE_ISFINITE=0 AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING([for INFINITY])
+AC_TRY_RUN([#define _GNU_SOURCE 1
+	    #include <math.h>
+	    int main() {
+		double d=INFINITY;
+		return 0;
+		}],
+		AC_MSG_RESULT(yes),
+		AC_MSG_CHECKING([for builtin_inf()])
+		AC_TRY_RUN([#include <math.h>
+	                    #include <ieeefp.h>
+			    int main() {
+				double d=__builtin_inf();
+				return 0;
+				}],
+		AC_DEFINE_UNQUOTED(INFINITY,__builtin_inf()) AC_MSG_RESULT(yes),
+		AC_MSG_RESULT(no),AC_MSG_RESULT(no))
+	,AC_MSG_RESULT(no) exit 1,AC_MSG_RESULT(no) exit 1)
+
+AC_MSG_CHECKING([for NAN])
+AC_TRY_RUN([#define _GNU_SOURCE 1
+	    #include <math.h>
+	    int main() {
+		double d=NAN;
+		return 0;
+		}],
+		AC_MSG_RESULT(yes),
+		AC_MSG_CHECKING([for builtin_nan()])
+		AC_TRY_RUN([#include <math.h>
+	                    #include <ieeefp.h>
+			    int main() {
+				double d=__builtin_nan("0x0");
+				return 0;
+				}],
+		AC_DEFINE_UNQUOTED(NAN,__builtin_nan("0x0")) AC_MSG_RESULT(yes),
+		AC_MSG_RESULT(no) exit 1,AC_MSG_RESULT(no) exit 1)
+	,HAVE_NAN=0 AC_MSG_RESULT(no),HAVE_NAN=0 AC_MSG_RESULT(no))
+
+
 
 
 

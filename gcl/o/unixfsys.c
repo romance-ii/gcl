@@ -499,7 +499,7 @@ DEF_ORDINARY("DIRECTORY",sKdirectory,KEYWORD,"");
 DEF_ORDINARY("LINK",sKlink,KEYWORD,"");
 DEF_ORDINARY("FILE",sKfile,KEYWORD,"");
 
-extern char *ctime_r(const time_t *,char *);
+/* extern char *ctime_r(const time_t *,char *); */
 
 DEFUN_NEW("STAT",object,fSstat,SI,1,1,NONE,OO,OO,OO,OO,(object path),"") {
 

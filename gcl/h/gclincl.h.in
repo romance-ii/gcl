@@ -234,6 +234,8 @@
 #undef HAVE_SYS_SOCKIO_H
 #undef HAVE_MALLOC_MALLOC_H
 #undef HAVE_OBJC_MALLOC_H
+#undef INFINITY
+#undef NAN
 
 /* The number of bytes in a char.  */
 #undef SIZEOF_CHAR
@@ -288,4 +290,3 @@
 
 /* Define if you have the <values.h> header file.  */
 #undef HAVE_VALUES_H
-

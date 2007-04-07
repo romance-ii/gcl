@@ -1,3 +1,9 @@
+gclcvs (2.7.0-67) unstable; urgency=low
+
+  * solaris-x86 support
+
+ -- Camm Maguire <camm@enhanced.com>  Sat, 07 Apr 2007 01:34:01 -0400
+
 gclcvs (2.7.0-66) unstable; urgency=low
 
   * clisp-style directory;fix multiple-setq-expander
