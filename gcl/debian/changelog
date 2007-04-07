@@ -1,8 +1,9 @@
 gclcvs (2.7.0-67) unstable; urgency=low
 
   * solaris-x86 support
+  * Fix 64bit gcl-tk bug, Closes: #417848
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 07 Apr 2007 01:34:01 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sat,  7 Apr 2007 01:49:36 -0400
 
 gclcvs (2.7.0-66) unstable; urgency=low
 
