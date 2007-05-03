@@ -1,3 +1,10 @@
+gclcvs (2.7.0-68) unstable; urgency=low
+
+  * compile without wrap-literals and pass1 prin1/read;no add-object on
+    characters;leave doc strings in portable source
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 03 May 2007 16:16:42 -0400
+
 gclcvs (2.7.0-67) unstable; urgency=low
 
   * solaris-x86 support

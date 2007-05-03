@@ -273,8 +273,8 @@
            (eq (car loc) 'character-value))))
 
 (defun wt-character-value (vv character-code)
-       (declare (ignore character-code))
-       (wt (vv-str vv)))
+  (if vv (wt (vv-str vv))
+    (wt "code_char(" character-code ")")))
 
 (defun wt-long-float-loc (loc)
   (cond ((and (consp loc)

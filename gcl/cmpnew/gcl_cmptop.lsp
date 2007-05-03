@@ -550,7 +550,7 @@
 		  ,(mapcar (lambda (x) (if (atom x) x `(,(car x) ,@(portable-source (cdr x) t)))) (cadr form))
 		  ,@(let ((r (remove-if-not 'si::specialp (mapcar (lambda (x) (if (atom x) x (car x))) (cadr form)))))
 		      (when r `((declare (special ,@r)))))
-		  ,@(ndbctxt (portable-source (if (stringp (caddr form)) (cdddr form) (cddr form)) t))))
+		  ,@(ndbctxt (portable-source (cddr form) t))))
 	       ((quote function) form)
 	       (declare 
 		(let ((opts (mapcan (lambda (x) (if (eq (car x) 'optimize) (cdr x) (list x)))
@@ -592,7 +592,7 @@
   
 (defun pd (fname ll args)
   (let (decls ctps doc (*no-proxy-symbols* t))
-    (when (and (consp args) (stringp (car args))) (push (pop args) doc))
+    (when (and (consp args) (stringp (car args)) (cdr args) (not doc)) (push (pop args) doc))
     (do nil ((or (not args) (not (consp (car args))) (not (eq (caar args) 'declare))))
 	(push (pop args) decls))
     (do nil ((or (not args) (not (consp (car args))) (not (eq (caar args) 'check-type))))

@@ -98,30 +98,11 @@
 (defun c1sharp-comma (arg)
   (c1constant-value (cons 'si:|#,| arg) t))
 
-(defun wrap-literals (form)
-  (cond ((and (consp form) (eq (car form) 'quote))
-	 (let ((x (cadr form)))
-	   (if (and (symbolp x)
-		    (eq :external (cadr (multiple-value-list (find-symbol (symbol-name x) 'lisp)))))
-	       form
-	     `(load-time-value (si::nani ,(si::address x))))))
-	((consp form)
-	 (cons (wrap-literals (car form)) (wrap-literals (cdr form))))
-	((symbolp form)
-	 (unless (symbol-package form)
-	   (unless *tmp-pack*
-	     (setq *tmp-pack* (make-package (symbol-name (gensym)))))
-	   (import form *tmp-pack*))
-	 form)
-	((or (rationalp form) (characterp form))
-	 form)
-	(`(load-time-value (si::nani ,(si::address form))))))
-
 (defun c1load-time-value (arg)
   (c1constant-value
    (cons 'si:|#,|
 	 (if *compiler-compile*
-	     (let ((x (cmp-eval (car arg))))
+	     (let ((x (cmp-eval (car arg))));FIXME double cmp-eval with c1constant-value
 	       (if (and (cdr arg) (cadr arg))
 		   x
 		 `(si::nani ,(si::address x))))
@@ -1977,7 +1958,7 @@
    ((si:fixnump val)
     (list 'LOCATION info (list 'FIXNUM-VALUE (unless (si::seqindp val) (add-object val)) val)))
    ((characterp val)
-    (list 'LOCATION info (list 'CHARACTER-VALUE (add-object val) (char-code val))))
+    (list 'LOCATION info (list 'CHARACTER-VALUE nil (char-code val))))
    ((typep val 'long-float)
     ;; We can't read in long-floats which are too big:
     (let* (sc 
@@ -1998,11 +1979,13 @@
    ((and (consp val) (eq (car val) 'si::|#,|))
     (setf (info-type info) (object-type (cmp-eval (cdr val))))
     (list 'LOCATION info (list 'VV (add-object val))))
+   (*compiler-compile* 
+    (setf (info-type info) (object-type val))
+    (list 'LOCATION info (list 'VV (add-object (cons 'si::|#,| `(si::nani ,(si::address val)))))))
    ((and (arrayp val) (not (si::staticp val)) (eq (array-element-type val) t)) ;; This must be readable
     (list 'LOCATION info (list 'VV (add-object val))))
    (always-p
-    (list 'LOCATION info (list 'VV (add-object val))))
-   (t nil)))
+    (list 'LOCATION info (list 'VV (add-object val))))))
 
 ;; (defun c1constant-value (val always-p)
 ;;   (cond

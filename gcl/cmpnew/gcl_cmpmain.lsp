@@ -260,45 +260,47 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
       
       (wt-data-begin)
       
-      (let* ((rtb *readtable*)
-	     (prev (when (eq (get-macro-character #\# rtb)
-			     (get-macro-character #\# (si:standard-readtable)))
-		     (get-dispatch-macro-character #\# #\, rtb))))
-	
-	(when (and prev (eq prev (get-dispatch-macro-character #\# #\, (si:standard-readtable))))
-	  (set-dispatch-macro-character #\# #\, 'si:sharp-comma-reader-for-compiler rtb)
-	  (setq prev nil))
-	
-	;; t1expr the package ops again..
-	(when (consp *split-files*) (dolist (v (fourth *split-files*)) (t1expr v)))
-	
-	(unwind-protect
-	    (do ((form (read *compiler-input* nil eof) (read *compiler-input* nil eof))
-		 (load-flag (or (eq :defaults *eval-when-defaults*)
-				(intersection '(load :load-toplevel) *eval-when-defaults*))))
-		(nil)
-		
-		(unless (eq form eof)
-		  (if load-flag
-		      (t1expr form)
-		    (maybe-eval nil form)))
-		
-		(when (or (eq form eof) (and *split-files* (> (file-position *compiler-input*) (car *split-files*))))
-		  
-		  (when *new-sigs-in-file*
-		    (cmpwarn "Caller ~s appears after callee ~s,~%   whose sig changed from ~s to ~s, restart pass1~%"
-			     (car *new-sigs-in-file*) (cadr *new-sigs-in-file*) (caddr *new-sigs-in-file*)
-			     (cadddr *new-sigs-in-file*))
-		    (return-from compile-file1 'again))
-		  
-		  (when *split-files*
-		    (push (pathname-name output-file) (second *split-files*))
-		    (setf (third *split-files*) (unless (eq form eof) (file-position *compiler-input*)))
-		    (setf (fourth *split-files*) (reverse (third *data*))))
-		  
-		  (return nil)))
+      (if *compiler-compile*
+	  (t1expr *compiler-compile*)
+	(let* ((rtb *readtable*)
+	       (prev (when (eq (get-macro-character #\# rtb)
+			       (get-macro-character #\# (si:standard-readtable)))
+		       (get-dispatch-macro-character #\# #\, rtb))))
 	  
-	  (when prev (set-dispatch-macro-character #\# #\, prev rtb))))
+	  (when (and prev (eq prev (get-dispatch-macro-character #\# #\, (si:standard-readtable))))
+	    (set-dispatch-macro-character #\# #\, 'si:sharp-comma-reader-for-compiler rtb)
+	    (setq prev nil))
+	  
+	  ;; t1expr the package ops again..
+	  (when (consp *split-files*) (dolist (v (fourth *split-files*)) (t1expr v)))
+	  
+	  (unwind-protect
+	      (do ((form (read *compiler-input* nil eof) (read *compiler-input* nil eof))
+		   (load-flag (or (eq :defaults *eval-when-defaults*)
+				  (intersection '(load :load-toplevel) *eval-when-defaults*))))
+		  (nil)
+		  
+		  (unless (eq form eof)
+		    (if load-flag
+			(t1expr form)
+		      (maybe-eval nil form)))
+		  
+		  (when (or (eq form eof) (and *split-files* (> (file-position *compiler-input*) (car *split-files*))))
+		    
+		    (when *new-sigs-in-file*
+		      (cmpwarn "Caller ~s appears after callee ~s,~%   whose sig changed from ~s to ~s, restart pass1~%"
+			       (car *new-sigs-in-file*) (cadr *new-sigs-in-file*) (caddr *new-sigs-in-file*)
+			       (cadddr *new-sigs-in-file*))
+		      (return-from compile-file1 'again))
+		    
+		    (when *split-files*
+		      (push (pathname-name output-file) (second *split-files*))
+		      (setf (third *split-files*) (unless (eq form eof) (file-position *compiler-input*)))
+		      (setf (fourth *split-files*) (reverse (third *data*))))
+		    
+		    (return nil)))
+	    
+	    (when prev (set-dispatch-macro-character #\# #\, prev rtb)))))
       
       
       (with-open-file (s output-file :if-does-not-exist :create))
@@ -410,18 +412,16 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	 ;; FIXME -- support warnings-p and failures-p.  CM 20041119
 	 (values name nil nil))
 	((setq tem (function-lambda-expression (symbol-function name)))
-	 (let ((na (if (symbol-package name) name 'cmp-anon))
-	       (tem (if *keep-gaz* tem (wrap-literals tem))) warnings failures)
+	 (let ((na (if (symbol-package name) name 'cmp-anon)) warnings failures)
 	   (unless (and (fboundp 'si::init-cmp-anon) (or (si::init-cmp-anon) (fmakunbound 'si::init-cmp-anon)))
 	     (with-open-file
-	      (st (setq gaz (gazonk-name)) :direction :output)
-	      (prin1-cmp `(defun ,na ,@ (ecase (car tem)
-					       (lambda (cdr tem))
-					       (lambda-block (cddr tem))
-					       ))       st))
+	      (st (setq gaz (gazonk-name)) :direction :output))
 	     (multiple-value-bind 
 	      (fn w f)
-	      (let ((*compiler-compile* t)) (compile-file gaz))
+	      (let ((*compiler-compile* `(defun ,na 
+					   ,@(ecase (car tem)
+						    (lambda (cdr tem))
+						    (lambda-block (cddr tem)))))) (compile-file gaz))
 	      (load fn)
 	      (unless *keep-gaz* (delete-file fn))
 	      (setq warnings w failures f))
