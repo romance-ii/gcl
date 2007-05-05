@@ -151,7 +151,7 @@
     
     (let ((*vars* *vars*))
       (with-restore-vars
-       (mapc (lambda (x) (when (and (var-p x) (or (var-ref-ccb x) (eq 'clb (var-loc x))))
+       (mapc (lambda (x) (when (and (var-p x) (var-cb x))
 ;			   (push (list x (var-type x)) *restore-vars*)
 			   (setf (var-type x) (var-mt x)))) *vars*)
        (c1add-globals ss)
@@ -297,7 +297,7 @@
   (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
   (let ((*vars* *vars*))
     (with-restore-vars
-     (mapc (lambda (x) (when (and (var-p x) (or (var-ref-ccb x) (eq 'clb (var-loc x))))
+     (mapc (lambda (x) (when (and (var-p x) (var-cb x))
 ;			 (push (list x (var-type x)) *restore-vars*)
 			 (setf (var-type x) (var-mt x)))) *vars*)
      (c1add-globals ss)

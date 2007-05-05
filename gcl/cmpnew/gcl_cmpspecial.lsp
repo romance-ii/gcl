@@ -104,20 +104,25 @@
   (progv symbols values (c2expr body)))
 
 (defun funid-to-fun (id)
-  (cond ((symbolp id) (cond ((and (fboundp id) (let ((fun (symbol-function id))) (when (eq (si::function-name fun) id) fun))))
-			    ((cmp-eval `(function (lambda (&rest r) (declare (:dynamic-extent r)) (apply ',id r)))))))
+  (cond ((symbolp id) 
+	 (cond ((when (fboundp id) 
+		  (let ((fun (symbol-function id))) (when (eq (si::function-name fun) id) fun))))
+	       ((cmp-eval `(function (lambda (&rest r) (declare (:dynamic-extent r)) (apply ',id r)))))))
 	((functionp id) id)
 	((not (consp id)) nil)
 	((is-setf-function id) nil)
 	((cmp-eval `(function ,id)))))
 
-(defun fun-to-id (fun)
-  (cond ((si::function-name fun))
-	((si::interpreted-function-p fun) (function-lambda-expression fun))))
-
-(defun coerce-to-funid (ob)
-  (cond ((functionp ob) (fun-to-id ob))
-	(ob)))
+(defun coerce-to-funid (fn)
+  (cond ((symbolp fn) fn)
+	((not (functionp fn)) nil)
+	((si::function-name fn))
+	((and (si::interpreted-function-p fn)
+	      (not (member-if-not 
+		    (lambda (x) (eq x (car (member (var-name x) *vars* 
+						   :key (lambda (x) (when (var-p x) (var-name x)))))))
+		    (cadr (si::interpreted-function-lambda fn))))
+	      (function-lambda-expression fn)))))
 
 (defun c1function (args &aux fd)
   (when (endp args) (too-few-args 'function 1 0))
@@ -144,6 +149,9 @@
 		  (*blocks* (cons 'cb *blocks*))
 		  (*tags* (cons 'cb *tags*)))
 	     (setq fun (c1lambda-expr (cdr fun)))
+	     (let ((l (si::interpreted-function-lambda (cadr tp)))) 
+	       (setf (cadr l) (remove-if-not 'var-cb 
+			       (coerce (info-referred-array (cadr fun)) 'list))))
 	     (setf (info-type (cadr fun)) tp)
 	     (list 'function (cadr fun) fun)))
 	  (t (cmperr "The function ~s is illegal." fun)))))

@@ -132,13 +132,16 @@
 					;	     (every (lambda (x) (or (not (var-p x)) (not (t-to-nil (var-tag x))))) *vars*))
       (cmpwarn "The variable ~s is not used." (var-name var)))))
 
+(defun var-cb (v)
+  (or (var-ref-ccb v) (eq 'clb (var-loc v))))
+
 (defun c1var (name)
   (let ((info (make-info :referred-array (make-array 1 :fill-pointer 0)))
 ;			 :changed-array +empty-info-array+))
         (vref (c1vref name)))
-       (push-referred (car vref) info)
-       (setf (info-type info) (var-type (car vref)))
-       (list 'var info vref)))
+    (push-referred (car vref) info)
+    (setf (info-type info) (if (var-cb (car vref)) (var-dt (car vref)) (var-type (car vref))))
+    (list 'var info vref)))
 
 ;;; A variable reference (vref for short) is a pair
 ;;;	( var-object  ccb-reference )
@@ -169,8 +172,7 @@
 		      (setf (var-register var)
 			    (the fixnum (+ 1 (the fixnum (var-register var)))))
 		      ))
-             (return-from c1vref (list var ccb)))))
-  )
+             (return-from c1vref (list var ccb))))))
 
 (defun c2var-kind (var)
   (if (and (eq (var-kind var) 'LEXICAL)

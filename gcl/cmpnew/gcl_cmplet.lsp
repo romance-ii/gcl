@@ -545,8 +545,7 @@
 	   (and (eq (var-kind var) 'object)
 		(< (the fixnum (var-register var))
 		   (the fixnum *register-min*))))
-       (null (var-ref-ccb var))
-       (not (eq (var-loc var) 'clb))
+       (not (var-cb var))
        (not (var-store var))
        (not (is-changed var (cadr body)))))
 

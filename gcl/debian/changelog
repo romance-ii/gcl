@@ -2,8 +2,11 @@ gclcvs (2.7.0-68) unstable; urgency=low
 
   * compile without wrap-literals and pass1 prin1/read;no add-object on
     characters;leave doc strings in portable source
+  * protect closure inlining to within scope of live bindings;*keep-gaz*
+    makes compile into compile-file;c1var propagates declared type
+    within closures;fix ensure--directories-exist
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 03 May 2007 16:16:42 -0400
+ -- Camm Maguire <camm@enhanced.com>  Fri, 04 May 2007 21:37:34 -0400
 
 gclcvs (2.7.0-67) unstable; urgency=low
 

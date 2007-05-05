@@ -755,8 +755,7 @@
 				       (and (eq (var-kind var)
 						'special)
 					    (eq (car types) t)))
-				   (not (var-ref-ccb var))
-				   (not (eq (var-loc var) 'clb)))
+				   (not (var-cb var)))
 			      (progn (push (list 
 					    (var-name var) (gensym))
 					   bind)

@@ -310,10 +310,9 @@
 	((let* ((nargs (c1args args info))
 		(tp (info-type (cadar nargs)))
 		(fn (when (atomic-tp tp) 
-		      (let ((fn (cadr tp))) (cond ((symbolp fn) (list 'quote fn)) 
-						  ((let ((fn (and (functionp fn) (si::function-name fn)))) 
-						     (when fn (list 'quote fn))))
-						  ((and (si::interpreted-function-p fn) (function-lambda-expression fn))))))))
+		      (let ((fn (coerce-to-funid (cadr tp)))) 
+			(cond ((and (consp fn) (eq (car fn) 'lambda)) fn)
+			      ((list 'quote fn)))))))
 	   (cond (fn (c1funcall `(,fn ,@(cdr args))))
 		 (t 
 		  (setq funob (c1funob (car args)))
