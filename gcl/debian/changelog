@@ -2,8 +2,9 @@ gclcvs (2.7.0-69) unstable; urgency=low
 
   * zero out bss when sec_load not set;support for reading random states
     with old gmp libraries;faster number_compare
+  * faster sort
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 10 May 2007 20:21:05 -0400
+ -- Camm Maguire <camm@enhanced.com>  Thu, 10 May 2007 20:22:05 -0400
 
 gclcvs (2.7.0-68) unstable; urgency=low
 
