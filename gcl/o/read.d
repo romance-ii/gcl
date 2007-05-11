@@ -2026,12 +2026,15 @@ Lsharp_dollar_reader()
 	vs_base[0] = alloc_object(t_random);
 	init_gmp_rnd_state(&vs_base[0]->rnd.rnd_state);
 	if (tx!=t_fixnum || fix(x)) {
-	  if (tx!=t_bignum)
+	  if (tx==t_fixnum) {
+	    if (vs_base[0]->rnd.rnd_state._mp_seed->_mp_size!=1)
+	      FEerror("Cannot make a random-state with the value ~S.",1, x);
+	    mpz_set_ui(vs_base[0]->rnd.rnd_state._mp_seed,fix(x));
+	  } else if (x->big.big_mpz_t._mp_size!=vs_base[0]->rnd.rnd_state._mp_seed->_mp_size) {
 	    FEerror("Cannot make a random-state with the value ~S.",1, x);
-	  if (x->big.big_mpz_t._mp_size!=vs_base[0]->rnd.rnd_state._mp_seed->_mp_size)
-	    FEerror("Cannot make a random-state with the value ~S.",1, x);
-	  memcpy(vs_base[0]->rnd.rnd_state._mp_seed->_mp_d,x->big.big_mpz_t._mp_d,
-		 vs_base[0]->rnd.rnd_state._mp_seed->_mp_size*sizeof(*vs_base[0]->rnd.rnd_state._mp_seed->_mp_d));
+	    memcpy(vs_base[0]->rnd.rnd_state._mp_seed->_mp_d,x->big.big_mpz_t._mp_d,
+		   vs_base[0]->rnd.rnd_state._mp_seed->_mp_size*sizeof(*vs_base[0]->rnd.rnd_state._mp_seed->_mp_d));
+	  }
 	}
 
 }

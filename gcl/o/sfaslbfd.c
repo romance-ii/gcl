@@ -385,8 +385,11 @@ fasload(object faslfile) {
 
    for (s=b->sections;s;s=s->next) {
      
-     if (!(s->flags & SEC_LOAD))
+     if (!(s->flags & SEC_LOAD)) {
+       if (s->flags & SEC_ALLOC)
+	 memset((void *)(unsigned long)s->output_section->vma,0,s->size);
        continue;
+     }
      
      link_order.u.indirect.section=s;
      

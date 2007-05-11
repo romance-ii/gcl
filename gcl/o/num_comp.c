@@ -47,195 +47,222 @@ void integer_decode_double(double,int *,int *, int *,int *);
                     x;})
 
 int
-number_compare(object x, object y)
-{
-	int i;
-	double dx, dy=0.0;
-	object q;
-	vs_mark;
+number_compare(object x, object y) {
 
-	x=fixnum_float_contagion(x,y);
-	y=fixnum_float_contagion(y,x);
-	switch (type_of(x)) {
+  double dx;
+  static double dy;
+  object q;
+  enum type tx,ty;
 
-	case t_fixnum:
-		switch (type_of(y)) {
-		case t_fixnum:
-			if (fix(x) < fix(y))
-				return(-1);
-			else if (fix(x) == fix(y))
-				return(0);
-			else
-				return(1);
-		case t_bignum:
-			i = big_sign(y);
-			if (i < 0)
-				return(1);
-			else
-				return(-1);
-		case t_ratio:
-			x = number_times(x, y->rat.rat_den);
-			y = y->rat.rat_num;
-			vs_push(x);
-			i = number_compare(x, y);
-			vs_reset;
-			return(i);
-		case t_shortfloat:
-			dx = (double)(fix(x));
-			dy = (double)(sf(y));
-			goto LONGFLOAT;
-		case t_longfloat:
-			dx = (double)(fix(x));
-			dy = lf(y);
-			goto LONGFLOAT;
-		case t_complex:
-			goto Y_COMPLEX;
-		default:
-			wrong_type_argument(sLnumber, y);
-		}
+  tx=type_of(x);
+  ty=type_of(y);
+  
+  switch (tx) {
+    
+  case t_fixnum:
 
-	case t_bignum:
-		switch (type_of(y)) {
-		case t_fixnum:
-			i = big_sign(x);
-			if (i < 0)
-				return(-1);
-			else
-				return(1);
-		case t_bignum:
-			 return cmpii(MP(x),MP(y));
-		case t_ratio:
-			x = number_times(x, y->rat.rat_den);
-			y = y->rat.rat_num;
-			vs_push(x);
-			i = number_compare(x, y);
-			vs_reset;
-			return(i);
-		case t_shortfloat:
-		  if ((float)number_to_double((q=double_to_integer((double)sf(y))))==sf(y)) {
-		    i=number_compare(x,q);
-		    vs_reset;
-		    return i;
-		  }
-		  dx=number_to_double(x);
-		  dy=(double)sf(y);
-		  goto LONGFLOAT;
-		case t_longfloat:
-		  if (number_to_double((q=double_to_integer(lf(y))))==lf(y)) {
-		    i=number_compare(x,q);
-		    vs_reset;
-		    return i;
-		  }
-		  dx=number_to_double(x);
-		  dy=lf(y);
-		  goto LONGFLOAT;
-		case t_complex:
-			goto Y_COMPLEX;
-		default:
-			wrong_type_argument(sLnumber, y);
-		}
+    switch (ty) {
 
-	case t_ratio:
-		switch (type_of(y)) {
-		case t_fixnum:
-		case t_bignum:
-			y = number_times(y, x->rat.rat_den);
-			x = x->rat.rat_num;
-			vs_push(y);
-			i = number_compare(x, y);
-			vs_reset;
-			return(i);
-		case t_ratio:
-			vs_push(number_times(x->rat.rat_num,y->rat.rat_den));
-			vs_push(number_times(y->rat.rat_num,x->rat.rat_den));
-			i = number_compare(vs_top[-2], vs_top[-1]);
-			vs_reset;
-			return(i);
-		case t_shortfloat:
-		  i=number_compare(x,double_to_rational(sf(y)));
-		  vs_reset;
-		  return i;
-		case t_longfloat:
-		  i=number_compare(x,double_to_rational(lf(y)));
-		  vs_reset;
-		  return i;
-		case t_complex:
-			goto Y_COMPLEX;
-		default:
-			wrong_type_argument(sLnumber, y);
-		}
+    case t_fixnum:
 
-	case t_shortfloat:
-		dx = (double)(sf(x));
-		goto LONGFLOAT0;
+      if (is_imm_fixnum(x)) {
 
-	case t_longfloat:
-		dx = lf(x);
- 	LONGFLOAT0:
-		switch (type_of(y)) {
-		case t_fixnum:
-			dy = (double)(fix(y));
-			goto LONGFLOAT;
-		case t_bignum:
-		  if (number_to_double((q=double_to_integer(dx)))==dx) {
-		    i=number_compare(q,y);
-		    vs_reset;
-		    return i;
-		  }
-		  dy=number_to_double(y);
-		  goto LONGFLOAT;
-		case t_ratio:
-		  i=number_compare(double_to_rational(dx),y);
-		  vs_reset;
-		  return i;
-		case t_shortfloat:
-			dy = (double)(sf(y));
-			goto LONGFLOAT;
-		case t_longfloat:
-			dy = lf(y);
-			goto LONGFLOAT;
-		case t_complex:
-			goto Y_COMPLEX;
-		default:
-		  break;
-		}
-	LONGFLOAT:
-		if (dx == dy)
-			return(0);
-		else if (dx < dy)
-			return(-1);
-		else
-			return(1);
+	if (is_imm_fixnum(y))
+	  return x<y ? -1 : (x==y ? 0 : 1);
+	else
+	  return fix(y)<0 ? 1 : -1;
 
-	Y_COMPLEX:
-		if (number_zerop(y->cmp.cmp_imag))
-			if (number_compare(x, y->cmp.cmp_real) == 0)
-				return(0);
-			else
-				return(1);
-		else
-			return(1);
+      } else {
 
-	case t_complex:
-	  if (type_of(y) != t_complex) {
-	    if (number_zerop(x->cmp.cmp_imag))
-	      if (number_compare(x->cmp.cmp_real, y) == 0)
-		return(0);
-	      else
-		return(1);
-	    else
-	      return(1);
-	  }
-	  if (number_compare(x->cmp.cmp_real, y->cmp.cmp_real) == 0 &&
-	      number_compare(x->cmp.cmp_imag, y->cmp.cmp_imag) == 0 )
-	    return(0);
-	  else
-	    return(1);
+	if (is_imm_fixnum(y))
+	  return fix(x)<0 ? -1 : 1;
+	else {
+	  fixnum fx=fix(x),fy=fix(y);
+	  return fx<fy ? -1 : (fx==fy ? 0 : 1);
 
-	default:
-		FEwrong_type_argument(sLnumber, x);
-		return(0);
 	}
+
+      }
+
+    case t_bignum:
+      return big_sign(y) < 0 ? 1 : -1;
+
+    case t_ratio:
+      x = number_times(x, y->rat.rat_den);
+      y = y->rat.rat_num;
+      return(number_compare(x, y));
+
+    case t_shortfloat:
+      {
+	volatile float fx=fix(x);
+	dx = fx;
+	dy = sf(y);
+      }
+      goto LONGFLOAT;
+
+    case t_longfloat:
+      dx = fix(x);
+      dy = lf(y);
+      goto LONGFLOAT;
+
+    case t_complex:
+      goto Y_COMPLEX;
+
+    default:
+      wrong_type_argument(sLnumber, y);
+
+    }
+    
+  case t_bignum:
+
+    switch (ty) {
+
+    case t_fixnum:
+      return big_sign(x) < 0 ? -1 : 1;
+
+    case t_bignum:
+      return cmpii(MP(x),MP(y));
+
+    case t_ratio:
+      x = number_times(x, y->rat.rat_den);
+      y = y->rat.rat_num;
+      return(number_compare(x, y));
+
+    case t_shortfloat:
+
+      if ((float)number_to_double((q=double_to_integer((double)sf(y))))==sf(y))
+	return(number_compare(x,q));
+
+      dx=number_to_double(x);
+      dy=sf(y);
+      goto LONGFLOAT;
+
+    case t_longfloat:
+      if (number_to_double((q=double_to_integer(lf(y))))==lf(y))
+	return(number_compare(x,q));
+
+      dx=number_to_double(x);
+      dy=lf(y);
+      goto LONGFLOAT;
+
+    case t_complex:
+      goto Y_COMPLEX;
+
+    default:
+      wrong_type_argument(sLnumber, y);
+
+    }
+    
+  case t_ratio:
+
+    switch (ty) {
+    case t_fixnum:
+    case t_bignum:
+
+      y = number_times(y, x->rat.rat_den);
+      x = x->rat.rat_num;
+      return(number_compare(x, y));
+
+    case t_ratio:
+      {
+	object x1,y1;
+	x1=number_times(x->rat.rat_num,y->rat.rat_den);
+	y1=number_times(y->rat.rat_num,x->rat.rat_den);
+	return(number_compare(x1,y1));
+      }
+
+    case t_shortfloat:
+      return(number_compare(x,double_to_rational(sf(y))));
+
+    case t_longfloat:
+      return(number_compare(x,double_to_rational(lf(y))));
+
+    case t_complex:
+      goto Y_COMPLEX;
+
+    default:
+      wrong_type_argument(sLnumber, y);
+
+    }
+    
+  case t_shortfloat:
+
+    dx = sf(x);
+    goto LONGFLOAT0;
+    
+  case t_longfloat:
+    dx = lf(x);
+
+  LONGFLOAT0:
+
+    switch (ty) {
+
+    case t_fixnum:
+
+      if (tx==t_shortfloat) {
+	volatile float fy=fix(y);
+	dy=fy;
+      } else
+	dy=fix(y);
+      goto LONGFLOAT;
+
+    case t_bignum:
+
+      if (number_to_double((q=double_to_integer(dx)))==dx)
+	return(number_compare(q,y));
+      dy=number_to_double(y);
+      goto LONGFLOAT;
+
+    case t_ratio:
+      return(number_compare(double_to_rational(dx),y));
+
+    case t_shortfloat:
+      dy = sf(y);
+      goto LONGFLOAT;
+
+    case t_longfloat:
+      dy = lf(y);
+      goto LONGFLOAT;
+
+    case t_complex:
+      goto Y_COMPLEX;
+
+    default:
+      break;
+    }
+
+  LONGFLOAT:
+
+    return(dx < dy ? -1 : (dx == dy) ? 0 : 1);
+    
+  Y_COMPLEX:
+
+    if (number_zerop(y->cmp.cmp_imag))
+      return(number_compare(x, y->cmp.cmp_real) ? 1 : 0);
+    else
+      return(1);
+    
+  case t_complex:
+
+    if (ty != t_complex) {
+      if (number_zerop(x->cmp.cmp_imag))
+	return(number_compare(x->cmp.cmp_real, y) ? 1 : 0);
+      else
+	return(1);
+    }
+
+    if (number_compare(x->cmp.cmp_real, y->cmp.cmp_real) == 0 &&
+	number_compare(x->cmp.cmp_imag, y->cmp.cmp_imag) == 0 )
+      return(0);
+    else
+      return(1);
+    
+  default:
+    FEwrong_type_argument(sLnumber, x);
+    return(0);
+
+  }
+
 }
 
 LFD(Lall_the_same)(void)

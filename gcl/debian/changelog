@@ -1,3 +1,10 @@
+gclcvs (2.7.0-69) unstable; urgency=low
+
+  * zero out bss when sec_load not set;support for reading random states
+    with old gmp libraries;faster number_compare
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 10 May 2007 20:21:05 -0400
+
 gclcvs (2.7.0-68) unstable; urgency=low
 
   * compile without wrap-literals and pass1 prin1/read;no add-object on
