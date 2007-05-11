@@ -855,14 +855,14 @@
      (wt "&0x7)" #+clx-little-endian ")")))
 
 (defun cmp-aref-inline-types (&rest r)
-  (let ((art (car r)))
+  (let ((art (type-and #tarray (car r))))
     (let ((aet (aref-propagator 'cmp-aref art)))
       (if aet
 	  `((,(cmp-norm-tp art) ,#tseqind) ,aet)
 	`((t ,#tseqind) t)))))
 
 (defun cmp-aref-inline (a i)
-  (let ((at (nil-to-t (var-array-type a))))
+  (let ((at (nil-to-t (type-and #tarray (var-array-type a)))))
     (let ((aet (aref-propagator 'cmp-aref at)))
       (if aet
 	  (if (eq aet #tbit) 
@@ -881,7 +881,7 @@
 (setf (symbol-function 'cmp-aset) (symbol-function 'si::aset1))
 
 (defun cmp-aset-inline-types (&rest r)
-  (let ((art (car r)))
+  (let ((art (type-and #tarray (car r))))
     (let ((aet (aref-propagator 'cmp-aset art)))
       (if aet
 	  `((,(cmp-norm-tp art) ,#tseqind ,aet) ,aet)
@@ -891,7 +891,7 @@
 	       
 
 (defun cmp-aset-inline (a i j)
-  (let ((at (nil-to-t (var-array-type a))))
+  (let ((at (nil-to-t (type-and #tarray (var-array-type a)))))
     (let ((aet (aref-propagator 'cmp-aset at)))
       (if aet
 	  (if (eq aet #tbit) 
@@ -912,14 +912,14 @@
 (setf (symbol-function 'cmp-array-dimension) (symbol-function 'array-dimension))
 ;(proclaim '(ftype (function (t rnkind) seqind) cmp-array-dimension))
 (defun cmp-array-dimension-inline-types (&rest r)
-  (if (aref-propagator 'cmp-array-dimension (car r))
+  (if (aref-propagator 'cmp-array-dimension (type-and #tarray (car r)))
       `((,(cmp-norm-tp (car r)) ,#trnkind) ,#tseqind)
     `((t ,#trnkind) ,#tseqind)))
 
 
 ;;FIXME lose the normalize-type
 (defun cmp-array-dimension-inline (a i)
-  (let ((at (cmp-norm-tp (var-array-type a))))
+  (let ((at (nil-to-t (type-and #tarray (var-array-type a)))))
     (let ((aet (and (consp at) (member (car at) '(array simple-array)))))
       (cond ((and (not *safe-compile*) (not aet))
 	     (wt "fixint(fLarray_dimension(" a "," i "))"))

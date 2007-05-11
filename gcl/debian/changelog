@@ -3,8 +3,10 @@ gclcvs (2.7.0-69) unstable; urgency=low
   * zero out bss when sec_load not set;support for reading random states
     with old gmp libraries;faster number_compare
   * faster sort
+  * type-and types in cmp-aref-inline et.al. with array -- FIXME needs
+    generalization
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 10 May 2007 20:22:05 -0400
+ -- Camm Maguire <camm@enhanced.com>  Thu, 10 May 2007 20:23:25 -0400
 
 gclcvs (2.7.0-68) unstable; urgency=low
 
