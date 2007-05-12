@@ -663,14 +663,14 @@
   (setq cfun (or (get fname 'Ufun) (next-cfun)))
   (maybe-eval nil  (cons 'defun args))
 
-  (let (*recursion-detected* *callees* (e (or (gethash fname *sigs*) (setf (gethash fname *sigs*) (make-list 4)))))
+  (let (*recursion-detected* *warning-note-stack* *callees* (e (or (gethash fname *sigs*) (setf (gethash fname *sigs*) (make-list 4)))))
     
     (tagbody
 
      top
 
      (setq *non-package-operation* t)
-     (setq *local-functions* nil)
+     (setq *local-functions* nil *warning-note-stack* nil)
 
      (let* (*vars* *funs* *blocks* *tags* *special-binding*)
        (setq lambda-expr (c1lambda-expr (cdr args) fname)))
@@ -712,7 +712,8 @@
 				(declare (ignore s))
 				(when f (list x fname osig sig))))) (si::callers fname))))
 	     (setf (car e) sig)
-	     (si::procl fname sig))
+;	     (si::procl fname sig)
+	     )
 	   (when *recursion-detected*;FIXME
 	     (let ((al (get-arg-types fname)) (rt (get-return-type fname)))
 	       (unless (and (equal oal al) (equal ort rt) (eq *recursion-detected* 'block))
@@ -730,9 +731,9 @@
      
      (cond
       ((and
-	(get fname 'proclaimed-function)
+;	(get fname 'proclaimed-function)
 	;; check the args:
-	(let ((lambda-list (lambda-list lambda-expr))bind)
+	(let ((lambda-list (lambda-list lambda-expr)) bind)
 	  (and (null (cadr lambda-list))	;;; no optional
 	       (null (caddr lambda-list))	;;; no rest
 	       (null (cadddr lambda-list))	;;; no keyword
@@ -779,7 +780,9 @@
 		     (if (single-type-p rt) (flags set ans) (flags set ans sets-vs-top))
 		     (make-inline-string cfun at fname)))
 	     *inline-functions*)))
-     
+
+     (output-warning-note-stack)
+
      (when (cadddr lambda-expr)
        (setq doc  (cadddr lambda-expr)))
      (add-load-time-sharp-comma)
@@ -892,7 +895,7 @@
 					;((>= arg-c 10.)) ;checked above 
 					;(cmpwarn " t1defun only likes 10 args ~
 					;            ~%for proclaimed functions")
-		     ((cmpwarn
+		     (t (cmpwarn
 		       " ~a is proclaimed but not in *inline-functions* ~
         ~%T1defun could not assure suitability of args for C call" fname)))
 	       nil))))))

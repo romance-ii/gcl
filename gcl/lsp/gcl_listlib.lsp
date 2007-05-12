@@ -349,8 +349,7 @@
 	     (setq tr (if rep n tr))
 	     (do nil ((or (not cs) (eq g (car cs))))
 		 (setq a (pop cs) c (pop st) tr (if (and (eq a (car c)) (eq tr (cdr c))) c (cons a tr))))
-	     (unless cs (return tr))
-	     (setf (car cs) tr tr (cdar st)))
+	     (if cs (setf (car cs) tr tr (cdar st)) (return tr)))
 	    ((setq st (cons tr st) cs (cons g cs) tr (car tr))))))
 
 (deflist nsubst ((n o) tr t nil)
@@ -361,8 +360,7 @@
 	     (setq tr (if rep n tr))
 	     (do nil ((or (not cs) (eq g (car cs))))
 		 (setf (caar st) (pop cs) (cdar st) tr tr (pop st)))
-	     (unless cs (return tr))
-	     (setf (car cs) tr tr (cdar st)))
+	     (if cs (setf (car cs) tr tr (cdar st)) (return tr)))
 	    ((setq st (cons tr st) cs (cons g cs) tr (car tr))))))
 
 (defllist sublis (al tr nil)
@@ -373,8 +371,7 @@
 	     (setq tr (if rep (cdr rep) tr))
 	     (do nil ((or (not cs) (eq g (car cs))))
 		 (setq a (pop cs) c (pop st) tr (if (and (eq a (car c)) (eq tr (cdr c))) c (cons a tr))))
-	     (unless cs (return tr))
-	     (setf (car cs) tr tr (cdar st)))
+	     (if cs (setf (car cs) tr tr (cdar st)) (return tr)))
 	    ((setq st (cons tr st) cs (cons g cs) tr (car tr))))))
 
 (defllist nsublis (al tr nil)
@@ -385,8 +382,7 @@
 	     (setq tr (if rep (cdr rep) tr))
 	     (do nil ((or (not cs) (eq g (car cs))))
 		 (setf (caar st) (pop cs) (cdar st) tr tr (pop st)))
-	     (unless cs (return tr))
-	     (setf (car cs) tr tr (cdar st)))
+	     (if cs (setf (car cs) tr tr (cdar st)) (return tr)))
 	    ((setq st (cons tr st) cs (cons g cs) tr (car tr))))))
 
 (defllist intersection (l1 l2 t)

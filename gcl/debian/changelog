@@ -5,8 +5,13 @@ gclcvs (2.7.0-69) unstable; urgency=low
   * faster sort
   * type-and types in cmp-aref-inline et.al. with array -- FIXME needs
     generalization
+  * sync procls with si::sig;fix add-function-declaration ret-type;fix
+    get-arg-types/get-return-type for nil values;cmpwarn in c1decl-
+    body;defer warnings to top of t1defun;*sigs* instead of procl in
+    t1defun for local function signature capture in compile only;faster
+    stable-sort
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 10 May 2007 20:23:25 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sat, 12 May 2007 04:35:06 -0400
 
 gclcvs (2.7.0-68) unstable; urgency=low
 

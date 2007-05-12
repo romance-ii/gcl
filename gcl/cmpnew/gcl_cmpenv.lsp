@@ -206,15 +206,18 @@
 ;; 	       (push (or (car (member tem '(* t))) (car v)) result))))));FIXME
 
 (defun put-procls (fname arg-types return-types procl)
+  (declare (ignore procl))
+  (si::add-hash fname (list arg-types return-types) nil nil nil))
+;  (unless *compiler-auto-proclaim* (si::add-hash fname (list arg-types return-types) nil nil nil)))
 
-  (if (eq arg-types '*)
-      (remprop fname  'proclaimed-arg-types)
-    (si:putprop fname  arg-types  'proclaimed-arg-types))
+;;   (if (eq arg-types '*)
+;;       (remprop fname  'proclaimed-arg-types)
+;;     (si:putprop fname  arg-types  'proclaimed-arg-types))
 
-  (si:putprop fname return-types  'proclaimed-return-type)
+;;   (si:putprop fname return-types  'proclaimed-return-type)
 
-  (if procl  (si:putprop fname t 'proclaimed-function)
-    (remprop fname 'proclaimed-function)))
+;;   (if procl  (si:putprop fname t 'proclaimed-function)
+;;     (remprop fname 'proclaimed-function)))
 
 
 (defun add-function-proclamation (fname decl list &aux (procl t)
@@ -269,46 +272,48 @@
   (cond ((symbolp fname)
          (push (list (sch-local-fun fname)
                      (function-arg-types arg-types)
-                     (let ((z (function-return-type return-types)))
-		       (if (member (car z) '(values returns-exactly)) (cdr z) z)))
+                     (function-return-type return-types))
                *function-declarations*))
         (t (warn "The function name ~s is not a symbol." fname))))
 
-(defun get-arg-types (fname)
+(defun get-arg-types (fname &aux x)
   (mapcar 'cmp-norm-tp 
 	  (cond ((not (symbolp fname)) '(*))
-		((let* ((x (assoc fname *function-declarations*))
-			(types1 (if x (cadr x) (get fname 'proclaimed-arg-types)))
-			(types (get fname 'arg-types)))
-		   (cond ((and types types1)
-			  (let* ((l1 (length types))
-				 (l2 (length types1))
-				 (n (- (max l1 l2) (min l1 l2)))
-				 (e (make-list n :initial-element '*))
-				 (ntypes (if (> l2 l1) (append types e) types))
-				 (ntypes1 (if (> l1 l2) (append types1 e) types1))
-				 (res (mapcar 'type-and ntypes1 ntypes)))
-			    (cond ((not (member-if-not 'identity res)) res)
-				  ((progn 
-				     (cmpwarn "The arg types of ~s were badly declared." fname)
-				     types1)))))
-			 ((or types1 types))
-			 ((car (si::sig fname)))
-			 ((not (intersection '(proclaimed-arg-types arg-types) (symbol-plist fname))) '(*))))))))
+		((let* ((types1 (cond ((setq x (assoc fname *function-declarations*)) (cadr x))
+				       ((setq x (car (gethash fname *sigs*))) (car x))
+				       ((get fname 'proclaimed-arg-types '(*)))))
+			(types (get fname 'arg-types types1))
+			(l1 (length types))
+			(l2 (length types1))
+			(n (- (max l1 l2) (min l1 l2)))
+			(e (make-list n :initial-element '*))
+			(ntypes (if (> l2 l1) (append types e) types))
+			(ntypes1 (if (> l1 l2) (append types1 e) types1))
+			(res (mapcar 'type-and ntypes1 ntypes)))
+		   (cond ((not (member-if-not 'identity res)) res)
+			 ((progn 
+			    (cmpwarn "The arg types of ~s were badly declared." fname)
+			    types1))))))))
+;			 ((or types1 types))
+;			 ((car (si::sig fname)))
+;			 ((not (intersection '(proclaimed-arg-types arg-types) (symbol-plist fname))) '(*))))))))
 
 (defun get-return-type (fname)
   (cmp-norm-tp 
    (cond ((not (symbolp fname)) '*)
-	 ((let* ((x (assoc fname *function-declarations*))
-		 (type1 (if x (caddr x) (get fname 'proclaimed-return-type)))
-		 (type (if (get fname 'predicate) #tboolean (get fname 'return-type))))
-	    (cond ((and type type1 (type-and type type1)))
-		  ((and type type1) 
-		   (cmpwarn "The return type of ~s was badly declared." fname)
-		   type1)
-		  ((or type1 type))
-		  ((cadr (si::sig fname)))
-		  ((not (intersection '(proclaimed-return-type return-type) (symbol-plist fname))) '*)))))))
+	 ((let* ((type1 (cond ((setq x (assoc fname *function-declarations*)) (caddr x))
+				       ((setq x (car (gethash fname *sigs*))) (cadr x))
+				       ((get fname 'proclaimed-return-type '*))))
+		 (type (if (get fname 'predicate) #tboolean (get fname 'return-type type1))))
+	    (type-and type type1))))))
+
+;(cond ()
+;      (t (cmpwarn "The return type of ~s was badly declared." fname)
+;	 type1))
+
+;		  ((or type1 type))
+;		  ((cadr (si::sig fname)))
+;		  ((not (intersection '(proclaimed-return-type return-type) (symbol-plist fname))) '*)))))))
 
 (defun get-local-arg-types (fun &aux x)
   (if (setq x (assoc fun *function-declarations*))
@@ -575,7 +580,7 @@
                          (not (consp (cdr x)))
                          (not (numberp (cadr x)))
                          (not (<= 0 (cadr x) 3)))
-                     (warn "The OPTIMIZE proclamation ~s is illegal." x)
+                     (cmpwarn "The OPTIMIZE proclamation ~s is illegal." x)
                      (case (car x)
 			   (debug (setq *debug* (cadr x))
 				  (push (list 'debug (cadr x)) dl))
@@ -588,14 +593,13 @@
                            (space (setq *space* (cadr x))
                                   (push (list 'space (cadr x)) dl))
                            ((speed compilation-speed))
-                           (t (warn "The OPTIMIZE quality ~s is unknown."
-                                    (car x)))))))
+                           (t (cmpwarn "The OPTIMIZE quality ~s is unknown." (car x)))))))
               (ftype
                (if (or (endp (cdr decl))
                        (not (consp (cadr decl)))
                        (not (eq (caadr decl) 'function))
                        (endp (cdadr decl)))
-                   (warn "The function declaration ~s is illegal." decl)
+                   (cmpwarn "The function declaration ~s is illegal." decl)
                    (dolist** (fname (cddr decl))
                      (add-function-declaration
                       fname (cadadr decl) (cddadr decl)))))
@@ -603,7 +607,7 @@
                (if (or (endp (cdr decl))
                        (endp (cddr decl))
                        (not (symbolp (cadr decl))))
-                   (warn "The function declaration ~s is illegal." decl)
+                   (cmpwarn "The function declaration ~s is illegal." decl)
                    (add-function-declaration
                     (cadr decl) (caddr decl) (cdddr decl))))
               (inline
@@ -611,24 +615,23 @@
                  (if (symbolp fun)
                      (progn (push (list 'inline fun) dl)
                             (setq *notinline* (remove fun *notinline*)))
-                     (warn "The function name ~s is not a symbol." fun))))
+                     (cmpwarn "The function name ~s is not a symbol." fun))))
               (notinline
                (dolist** (fun (cdr decl))
                  (if (symbolp fun)
                      (progn (push (list 'notinline fun) dl)
                             (push fun *notinline*))
-                     (warn "The function name ~s is not a symbol." fun))))
+                     (cmpwarn "The function name ~s is not a symbol." fun))))
               (declaration
                (dolist** (x (cdr decl))
                  (if (symbolp x)
                      (unless (member x *alien-declarations*)
                              (push x *alien-declarations*))
-                     (warn "The declaration specifier ~s is not a symbol."
+                     (cmpwarn "The declaration specifier ~s is not a symbol."
                            x))))
               (otherwise
                (unless (member (car decl) *alien-declarations*)
-                 (warn "The declaration specifier ~s is unknown."
-                       (car decl))))
+                 (cmpwarn "The declaration specifier ~s is unknown." (car decl))))
               ))
            (setq body (c1progn body))
            (list 'decl-body (cadr body) dl body)

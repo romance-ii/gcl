@@ -172,8 +172,8 @@
 		       ((not 
 			 (let ((nv (with-restore-vars  
 				     (catch nt 
-				       (do (l *warning-note-stack* *undefined-vars*) 
-					   ((not (setq l (pop tob))) (output-warning-note-stack) (setq *restore-vars* nil))
+				       (do (l (*warning-note-stack* *warning-note-stack*) *undefined-vars*) 
+					   ((not (setq l (pop tob))) (setq *restore-vars* nil))
 					 (push (if (typep l 'tag) 
 						   (progn (pop-restore-vars) l)
 						 (c1expr* l info)) tnb))))));maybe copy-info here
