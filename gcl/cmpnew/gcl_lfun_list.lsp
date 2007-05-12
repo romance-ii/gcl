@@ -56,7 +56,7 @@
 	     (((float) (returns-exactly (integer 0) fixnum (member 1 -1))) . integer-decode-float);fixme
 	     (((t *) nil) . error);fixme
 	     (((*) string) . si::string-concatenate)))
-  (proclaim `(ftype (function ,@(car l)) ,(cdr l))))
+  (si::add-hash (cdr l) (car l) nil nil nil))
 
 
 

@@ -11,8 +11,10 @@ gclcvs (2.7.0-69) unstable; urgency=low
     t1defun for local function signature capture in compile only;faster
     stable-sort
   * ignore user procls when auto-proclaiming
+  * fix sysfun proclaims in lfun_list;protected fixint in
+    quick_call_sfun
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 12 May 2007 04:47:24 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sat, 12 May 2007 12:56:51 -0400
 
 gclcvs (2.7.0-68) unstable; urgency=low
 

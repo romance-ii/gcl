@@ -103,7 +103,7 @@ quick_call_sfun(object fun)
   restype = SFUN_RETURN_TYPE(i);
   SFUN_START_ARG_TYPES(i);
   /* for moment just support object and int */
-#define COERCE_ARG(a,type)  (type==f_object ? a : (type==f_fixnum ? (object)(fix(a)) : (object)otoi(a)))
+#define COERCE_ARG(a,type)  (type==f_object ? a : (type==f_fixnum ? (object)(fixint(a)) : (object)otoi(a)))
   x=temp_ar;
   if (mv) 
     *x++=(void *)(base+1);
