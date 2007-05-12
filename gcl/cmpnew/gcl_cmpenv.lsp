@@ -207,8 +207,8 @@
 
 (defun put-procls (fname arg-types return-types procl)
   (declare (ignore procl))
-  (si::add-hash fname (list arg-types return-types) nil nil nil))
-;  (unless *compiler-auto-proclaim* (si::add-hash fname (list arg-types return-types) nil nil nil)))
+;  (si::add-hash fname (list arg-types return-types) nil nil nil))
+  (unless *compiler-auto-proclaim* (si::add-hash fname (list arg-types return-types) nil nil nil)))
 
 ;;   (if (eq arg-types '*)
 ;;       (remprop fname  'proclaimed-arg-types)

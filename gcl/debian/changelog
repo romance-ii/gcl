@@ -10,8 +10,9 @@ gclcvs (2.7.0-69) unstable; urgency=low
     body;defer warnings to top of t1defun;*sigs* instead of procl in
     t1defun for local function signature capture in compile only;faster
     stable-sort
+  * ignore user procls when auto-proclaiming
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 12 May 2007 04:35:06 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sat, 12 May 2007 04:47:24 -0400
 
 gclcvs (2.7.0-68) unstable; urgency=low
 
