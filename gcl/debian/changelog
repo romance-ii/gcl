@@ -14,8 +14,9 @@ gclcvs (2.7.0-69) unstable; urgency=low
   * fix sysfun proclaims in lfun_list;protected fixint in
     quick_call_sfun
   * compile errors are program-errors
+  * accept T type declarations
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 14 May 2007 18:43:10 -0400
+ -- Camm Maguire <camm@enhanced.com>  Mon, 14 May 2007 18:43:44 -0400
 
 gclcvs (2.7.0-68) unstable; urgency=low
 

@@ -298,7 +298,7 @@
 ;			 ((car (si::sig fname)))
 ;			 ((not (intersection '(proclaimed-arg-types arg-types) (symbol-plist fname))) '(*))))))))
 
-(defun get-return-type (fname)
+(defun get-return-type (fname &aux x)
   (cmp-norm-tp 
    (cond ((not (symbolp fname)) '*)
 	 ((let* ((type1 (cond ((setq x (assoc fname *function-declarations*)) (caddr x))
@@ -533,13 +533,12 @@
 				   (push (cons var 'dynamic-extent) ts)))
 			(otherwise
 			 (let ((type (max-vtp stype)))
-			   (if (not (eq type t))
+			   (unless (eq type t)
 			       (dolist** (var (cdr decl))
 					 (cmpck (not (symbolp var))
 						"The type declaration ~s contains a non-symbol ~s."
 						decl var)
-					 (push (cons var type) ts))
-			     (push decl others))))))))))
+					 (push (cons var type) ts)))))))))))
      (t (return)))
     (pop body))
   (dolist (l ctps) 
