@@ -464,6 +464,28 @@
 (si::putprop '1+ 'incr-to-plus 'si::compiler-macro-prop)
 (si::putprop '1- 'decr-to-minus 'si::compiler-macro-prop)
 
+(defun plusp-compiler-macro (form env)
+  (declare (ignore env))
+  (if (and (cdr form) (endp (cddr form)))
+      `(> ,(cadr form) 0)
+    form))
+(si::putprop 'plusp 'plusp-compiler-macro 'si::compiler-macro-prop)
+
+(defun minusp-compiler-macro (form env)
+  (declare (ignore env))
+  (if (and (cdr form) (endp (cddr form)))
+      `(< ,(cadr form) 0)
+    form))
+(si::putprop 'minusp 'minusp-compiler-macro 'si::compiler-macro-prop)
+
+(defun zerop-compiler-macro (form env)
+  (declare (ignore env))
+  (if (and (cdr form) (endp (cddr form)))
+      `(= ,(cadr form) 0)
+    form))
+(si::putprop 'zerop 'zerop-compiler-macro 'si::compiler-macro-prop)
+
+
 ;; (defun reverse-expander (form env)
 ;;   (declare (ignore env))
 ;;   (let ((x (gensym)) (i (gensym)) (s (gensym)))
