@@ -306,7 +306,7 @@
 
 ;;+
 ;(si::putprop '+ 'super-range 'type-propagator)
-(push '((t t) t #.(flags ans)"number_plus(#0,#1)")
+(push '((t t) t #.(flags ans)"@01;({object _t;if (!is_imm_fixnum(#0) || !is_imm_fixnum(#1) || !is_imm_fixnum((_t=(object)((unsigned long)#0+fix(#1))))) _t=number_plus(#0,#1);_t;})")
    (get '+ 'inline-always))
 (push '((fixnum-float fixnum-float) short-float #.(flags)"(double)(#0)+(double)(#1)")
    (get '+ 'inline-always))
@@ -316,18 +316,17 @@
    (get '+ 'inline-always))
 (push '((short-float short-float) short-float #.(flags rfa)"(#0)+(#1)")
    (get '+ 'inline-always))
-
 (push '((fixnum fixnum) fixnum #.(flags)"(#0)+(#1)")
    (get '+ 'inline-always))
 
 ;;-
 ;(si::putprop '- 'super-range 'type-propagator)
-(push '((t) t #.(flags ans)"number_negate(#0)")
+(push '((t) t #.(flags ans)"@0;({object _t;if (is_imm_fixnum(#0) && (#0!=(object)IM_FIX_BASE)) _t=(object)((unsigned long)make_fixnum(0)-fix(#0)); else _t=number_negate(#0);_t;})")
    (get '- 'inline-always))
 (push '(((integer #.(1+ most-negative-fixnum) #.most-positive-fixnum)) fixnum #.(flags)"-(#0)")
    (get '- 'inline-always))
 
-(push '((t t) t #.(flags ans)"number_minus(#0,#1)")
+(push '((t t) t #.(flags ans)"@01;({object _t;if (!is_imm_fixnum(#0) || !is_imm_fixnum(#1) || !is_imm_fixnum((_t=(object)((unsigned long)#0-fix(#1))))) _t=number_minus(#0,#1);_t;})")
    (get '- 'inline-always))
 (push '((fixnum-float fixnum-float) short-float #.(flags)"(double)(#0)-(double)(#1)")
    (get '- 'inline-always))
@@ -362,35 +361,35 @@
 (push '((short-float short-float) short-float #.(flags rfa)"(#0)/(#1)")
    (get '/ 'inline-always))
 
+;;1+
+;;  (push '((t) t #.(flags ans)"one_plus(#0)")
+;;    (get '1+ 'inline-always))
+;; (push '((fixnum-float) short-float #.(flags)"(double)(#0)+1")
+;;    (get '1+ 'inline-always))
+;; (push '((fixnum-float) long-float #.(flags)"(double)(#0)+1")
+;;    (get '1+ 'inline-always))
+;; (push '((fixnum) fixnum #.(flags)"(#0)+1")
+;;    (get '1+ 'inline-always))
+
+
+;; ;;1-
+;;  (push '((t) t #.(flags ans)"one_minus(#0)")
+;;    (get '1- 'inline-always))
+;; (push '((fixnum) fixnum #.(flags)"(#0)-1")
+;;    (get '1- 'inline-always))
+;; (push '((fixnum-float) short-float #.(flags)"(double)(#0)-1")
+;;    (get '1- 'inline-always))
+;; (push '((fixnum-float) long-float #.(flags)"(double)(#0)-1")
+;;    (get '1- 'inline-always))
+
 ;;/=
- (push '((t t) boolean #.(flags rfa)"number_compare(#0,#1)!=0")
+ (push '((t t) boolean #.(flags rfa)"@01;({int _t=0;if (is_imm_fixnum(#0) || is_imm_fixnum(#1)) {if ((#0)!=(#1)) _t=1;} else {if (number_compare(#0,#1)!=0) _t=1;} _t;})")
    (get '/= 'inline-always))
 (push '((fixnum-float fixnum-float) boolean #.(flags rfa)"(#0)!=(#1)")
    (get '/= 'inline-always))
 
-;;1+
- (push '((t) t #.(flags ans)"one_plus(#0)")
-   (get '1+ 'inline-always))
-(push '((fixnum-float) short-float #.(flags)"(double)(#0)+1")
-   (get '1+ 'inline-always))
-(push '((fixnum-float) long-float #.(flags)"(double)(#0)+1")
-   (get '1+ 'inline-always))
-(push '((fixnum) fixnum #.(flags)"(#0)+1")
-   (get '1+ 'inline-always))
-
-
-;;1-
- (push '((t) t #.(flags ans)"one_minus(#0)")
-   (get '1- 'inline-always))
-(push '((fixnum) fixnum #.(flags)"(#0)-1")
-   (get '1- 'inline-always))
-(push '((fixnum-float) short-float #.(flags)"(double)(#0)-1")
-   (get '1- 'inline-always))
-(push '((fixnum-float) long-float #.(flags)"(double)(#0)-1")
-   (get '1- 'inline-always))
-
 ;;<
- (push '((t t) boolean #.(flags rfa)"number_compare(#0,#1)<0")
+ (push '((t t) boolean #.(flags rfa)"@01;({int _t=0;if (is_imm_fixnum(#0) && is_imm_fixnum(#1)) {if ((#0)<(#1)) _t=1;} else {if (number_compare(#0,#1)<0) _t=1;} _t;})")
    (get '< 'inline-always))
 (push '((fixnum-float fixnum-float) boolean #.(flags rfa)"(#0)<(#1)")
    (get '< 'inline-always))
@@ -400,25 +399,25 @@
    (get 'si::objlt 'inline-always))
 
 ;;<=
-(push '((t t) boolean #.(flags rfa)"number_compare(#0,#1)<=0")
-      (get '<= 'inline-always))
+ (push '((t t) boolean #.(flags rfa)"@01;({int _t=0;if (is_imm_fixnum(#0) && is_imm_fixnum(#1)) {if ((#0)<=(#1)) _t=1;} else {if (number_compare(#0,#1)<=0) _t=1;} _t;})")
+   (get '<= 'inline-always))
 (push '((fixnum-float fixnum-float) boolean #.(flags rfa)"(#0)<=(#1)")
       (get '<= 'inline-always))
 
 ;;=
-(push '((t t) boolean #.(flags rfa)"number_compare(#0,#1)==0")
-      (get '= 'inline-always))
+ (push '((t t) boolean #.(flags rfa)"@01;({int _t=0;if (is_imm_fixnum(#0) || is_imm_fixnum(#1)) {if ((#0)==(#1)) _t=1;} else {if (number_compare(#0,#1)==0) _t=1;} _t;})")
+   (get '= 'inline-always))
 (push '((fixnum-float fixnum-float) boolean #.(flags rfa)"(#0)==(#1)")
       (get '= 'inline-always))
 
 ;;>
-(push '((t t) boolean #.(flags rfa)"number_compare(#0,#1)>0")
-      (get '> 'inline-always))
+ (push '((t t) boolean #.(flags rfa)"@01;({int _t=0;if (is_imm_fixnum(#0) && is_imm_fixnum(#1)) {if ((#0)>(#1)) _t=1;} else {if (number_compare(#0,#1)>0) _t=1;} _t;})")
+   (get '> 'inline-always))
 (push '((fixnum-float fixnum-float) boolean #.(flags rfa)"(#0)>(#1)")
       (get '> 'inline-always))
 
 ;;>=
- (push '((t t) boolean #.(flags rfa)"number_compare(#0,#1)>=0")
+ (push '((t t) boolean #.(flags rfa)"@01;({int _t=0;if (is_imm_fixnum(#0) && is_imm_fixnum(#1)) {if ((#0)>=(#1)) _t=1;} else {if (number_compare(#0,#1)>=0) _t=1;} _t;})")
    (get '>= 'inline-always))
 (push '((fixnum-float fixnum-float) boolean #.(flags rfa)"(#0)>=(#1)")
    (get '>= 'inline-always))
@@ -1139,11 +1138,11 @@
 (push '((fixnum-float fixnum-float) fixnum #.(flags set)"@01;((fixnum)((#0)<=(#1)?(#0):#1))")
    (get 'min 'inline-always))
 
-;;MINUSP
- (push '((t) boolean #.(flags rfa)"number_compare(small_fixnum(0),#0)>0")
-   (get 'minusp 'inline-always))
- (push '((fixnum-float) boolean #.(flags rfa)"(#0)<0")
-   (get 'minusp 'inline-always))
+;; ;;MINUSP
+;;  (push '((t) boolean #.(flags rfa)"number_compare(small_fixnum(0),#0)>0")
+;;    (get 'minusp 'inline-always))
+;;  (push '((fixnum-float) boolean #.(flags rfa)"(#0)<0")
+;;    (get 'minusp 'inline-always))
 
 ;;MOD
 ; (push '((fixnum fixnum) fixnum #.(flags rfa)"@01;(#0>=0&&(#1)>0?(#0)%(#1):imod(#0,#1))")
@@ -1198,11 +1197,11 @@
  (push '((t) boolean #.(flags rfa)"@0;equalp_is_eq(#0)")
    (get 'equalp-is-eq 'inline-always))
 
-;;PLUSP
- (push '((t) boolean #.(flags rfa)"number_compare(small_fixnum(0),#0)<0")
-   (get 'plusp 'inline-always))
-(push '((fixnum-float) boolean #.(flags rfa)"(#0)>0")
-   (get 'plusp 'inline-always))
+;; ;;PLUSP
+;;  (push '((t) boolean #.(flags rfa)"number_compare(small_fixnum(0),#0)<0")
+;;    (get 'plusp 'inline-always))
+;; (push '((fixnum-float) boolean #.(flags rfa)"(#0)>0")
+;;    (get 'plusp 'inline-always))
 
 ;;PRIN1
  (push '((t t) t #.(flags set)"prin1(#0,#1)")
@@ -1418,11 +1417,11 @@ TRUNCATE_USE_C
  "@0;(writec_stream(char_code(#0),sLAstandard_outputA->s.s_dbind),(#0))")
   (get 'write-char 'inline-unsafe))
 
-;;ZEROP
- (push '((t) boolean #.(flags rfa)"number_compare(small_fixnum(0),#0)==0")
-   (get 'zerop 'inline-always))
-(push '((fixnum-float) boolean #.(flags rfa)"(#0)==0")
-   (get 'zerop 'inline-always))
+;; ;;ZEROP
+;;  (push '((t) boolean #.(flags rfa)"number_compare(small_fixnum(0),#0)==0")
+;;    (get 'zerop 'inline-always))
+;; (push '((fixnum-float) boolean #.(flags rfa)"(#0)==0")
+;;    (get 'zerop 'inline-always))
 
 ;;CMOD
  (push '((t) t #.(flags) "cmod(#0)")
