@@ -21,8 +21,9 @@ gclcvs (2.7.0-69) unstable; urgency=low
   * restart pass1 is a note
   * inline imm_fixnum comparisons and sums
   * elide munge-tagbody
+  * do not repeat special declarations in portable-source
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 14 May 2007 19:08:43 -0400
+ -- Camm Maguire <camm@enhanced.com>  Mon, 14 May 2007 19:09:11 -0400
 
 gclcvs (2.7.0-68) unstable; urgency=low
 
