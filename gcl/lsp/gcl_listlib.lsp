@@ -294,9 +294,9 @@
 
 (deflist member ((item) list t t)
   (do ((list list (cdr list)))
-	((endp list))
-	(when (do-test test test-comp item (do-key key key-comp (car list)))
-	  (return list))))
+      ((endp list))
+      (when (do-test test test-comp item (do-key key key-comp (car list)))
+	(return list))))
 
 (deflist adjoin ((oitem) olist nil t)
   (do ((list olist (cdr list))(item (do-key key key-comp oitem)))

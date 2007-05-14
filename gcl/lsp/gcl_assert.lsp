@@ -79,7 +79,7 @@
   (check-type clauses (list-of proper-list))
   (let ((tp (clause-type clauses)))
     (do ((l (reverse clauses) (cdr l))
-	 (form `(error'type-error :datum ,key :expected-type ',tp)))
+	 (form `(error 'type-error :datum ,key :expected-type ',tp)))
 	((endp l) `(let ((,key ,keyform)) ,form))
 	(when (caar l)
 	  (setq form `(if ,(if (listp (caar l))
