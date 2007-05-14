@@ -288,7 +288,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 		  (when (or (eq form eof) (and *split-files* (> (file-position *compiler-input*) (car *split-files*))))
 		    
 		    (when *new-sigs-in-file*
-		      (cmpwarn "Caller ~s appears after callee ~s,~%   whose sig changed from ~s to ~s, restart pass1~%"
+		      (cmpnote "Caller ~s appears after callee ~s,~%   whose sig changed from ~s to ~s, restart pass1~%"
 			       (car *new-sigs-in-file*) (cadr *new-sigs-in-file*) (caddr *new-sigs-in-file*)
 			       (cadddr *new-sigs-in-file*))
 		      (return-from compile-file1 'again))
