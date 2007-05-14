@@ -1127,6 +1127,10 @@ FFN(siLsave_system)(void) {
   DO_BEFORE_SAVE
 #endif	
     
+    sLAstandard_inputA->s.s_dbind=standard_io;
+    sLAstandard_outputA->s.s_dbind=standard_io;
+    sLAerror_outputA->s.s_dbind=standard_io;
+
     saving_system = TRUE;
   GBC(t_contiguous);
   
