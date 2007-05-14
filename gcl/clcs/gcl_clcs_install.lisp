@@ -64,7 +64,7 @@
       (with-simple-restart 
        (retry "Retry compiling file ~S." file)
        (let ((res (apply #.(si::function-src 'compile-file) file args)))
-	 (when compiler::*error-p* (error "Compilation of ~s failed." file))
+	 (when compiler::*error-p* (error 'program-error :format-control "Compilation of ~s failed." :format-arguments (list file)))
 	 (return (values res warnings failures))))))))
 
 ;(defun clcs-compile-file (file &rest args)
@@ -94,7 +94,8 @@
       (with-simple-restart 
        (retry "Retry compiling ~S." (list name def))
        (let ((res (funcall #.(si::function-src 'compile) name def)))
-	 (when compiler::*error-p* (error "Compilation of ~s failed." (list name def)))
+	 (when compiler::*error-p* (error 'program-error :format-control "Compilation of ~s failed." 
+					  :format-arguments (list (list name def))))
 	 (return (values res warnings failures))))))))
 
 ;(defun clcs-compile (&rest args)
