@@ -16,8 +16,10 @@ gclcvs (2.7.0-69) unstable; urgency=low
   * compile errors are program-errors
   * accept T type declarations
   * plusp,minusp, and zerop compiler macros
+  * optimize inferred variable types outside of if forms with no false
+    branch and true branch returning nil type
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 14 May 2007 18:44:57 -0400
+ -- Camm Maguire <camm@enhanced.com>  Mon, 14 May 2007 19:07:03 -0400
 
 gclcvs (2.7.0-68) unstable; urgency=low
 
