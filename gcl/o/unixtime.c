@@ -163,7 +163,7 @@ DEFUNM_NEW("GET-INTERNAL-RUN-TIMES",object,fSget_internal_run_times,SI
 #else
   struct tms buf;
   
-  check_arg(0);
+/*   check_arg(0); */
   times(&buf);
   RETURN2(make_fixnum(buf.tms_utime),make_fixnum(buf.tms_cutime));
   
