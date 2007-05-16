@@ -25,8 +25,9 @@ gclcvs (2.7.0-69) unstable; urgency=low
   * fast 0-arg calls
   * reset standard_io on save-system
   * no check_arg in DEFUN_NEW C functions
+  * fix read-char-no-hang on mingw
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 14 May 2007 20:07:26 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed, 16 May 2007 10:37:16 -0400
 
 gclcvs (2.7.0-68) unstable; urgency=low
 

@@ -208,3 +208,6 @@ extern int is_shared_memory_initialised;
 
 
 /* End for cmpinclude */
+extern int mingwlisten(FILE *);
+#undef LISTEN_FOR_INPUT
+#define LISTEN_FOR_INPUT(fp) do {if (mingwlisten(fp)) return 0;} while (0)
