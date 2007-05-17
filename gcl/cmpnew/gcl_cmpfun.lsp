@@ -1030,7 +1030,6 @@
       (if (atom stream)
 	  (let ((ch (gensym))) 
 	    `(let ((,ch ,(car args)))
-	       (declare (,tp ,ch))
 	       (if (fp-okp ,stream) (sputc ,ch ,stream) (,write-fun ,ch ,stream))
 	       ,ch))
 	(let ((str (gensym)))
