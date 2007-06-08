@@ -1,0 +1,72 @@
+# Galician translation of gclcvs's debconf templates
+# This file is distributed under the same license as the gclcvs package.
+# Jacobo Tarrio <jtarrio@debian.org>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gclcvs\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-01-21 08:47+0100\n"
+"PO-Revision-Date: 2007-03-05 21:30+0100\n"
+"Last-Translator: Jacobo Tarrio <jtarrio@debian.org>\n"
+"Language-Team: Galician <proxecto@trasno.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:1001
+msgid "Use the work-in-progress ANSI build by default?"
+msgstr "¿Empregar por defecto a versión ANSI que se está a facer?"
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:1001
+msgid ""
+"GCL is in the process of providing an ANSI compliant image in addition to "
+"its traditional CLtL1 image still in production use.  Please see the README."
+"Debian file for a brief description of these terms.  Setting this variable "
+"will determine which image you will use by default on executing 'gcl@EXT@'.  "
+"You can locally override this choice by setting the GCL_ANSI environment "
+"variable to any non-empty string for the ANSI build, and to the empty string "
+"for the CLtL1 build, e.g. GCL_ANSI=t gcl@EXT@.  The flavor of the build in "
+"force will be reported in the initial startup banner."
+msgstr ""
+"Estase a traballar para que GCL forneza unha imaxe ANSI ademáis da imaxe "
+"CLtL1 que aínda se emprega en produción. Consulte o ficheiro README.Debian "
+"para ver unha descrición breve deses termos. Ao estabrecer esa variable ha "
+"determinar a imaxe que ha empregar por defecto ao executar \"gcl@EXT@\". "
+"Pode empregar a outra imaxe estabrecendo a variable de ambiente GCL_ANSI a "
+"calquera cadea non baleira para empregar a versión ANSI, e á cadea baleira "
+"para empregar a versión CLtL1; por exemplo, GCL_ANSI=t gcl@EXT@. Hase "
+"informar da versión en uso no cartel que aparece ao iniciar o programa."
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:2001
+msgid "Use the profiling build by default?"
+msgstr "¿Empregar por defecto a versión con cronometrado?"
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:2001
+msgid ""
+"GCL now has optional support for profiling via gprof.  Please see the "
+"documentation for si::gprof-start and si::gprof-quit for details. As this "
+"build is slower than builds without gprof support, it is not recommended for "
+"final production use. You can locally override the default choice made here "
+"by setting the GCL_PROF environment variable to any non-empty string for "
+"profiling support, and to the empty string for the more optimized builds, e."
+"g. GCL_PROF=t gcl@EXT@.  If profiling is enabled, this will be reported in "
+"the initial startup banner."
+msgstr ""
+"GCL agora ten soporte opcional de cronometrado mediante gprof. Consulte a "
+"documentación de si::gprof-start e si::gprof-quit para máis detalles. Xa que "
+"esta versión é máis lenta que as que non teñen soporte de gprof, non se "
+"recomenda que a empregue para o uso en produción. Pode empregar unha versión "
+"distinta á seleccionada estabrecendo a variable de ambiente GCL_PROF a "
+"calquera cadea non baleira para empregar o soporte de cronometrado, ou á "
+"cadea baleira para as versións máis optimizadas; por exemplo, GCL_PROF=t "
+"gcl@EXT@. Se está activado o cronometrado, hase informar diso no cartel que "
+"aparece ao iniciar o programa."
