@@ -147,6 +147,7 @@ object faslfile;
 #endif
 
 	memory = alloc_object(t_cfdata);
+	memory->cfd.cfd_dlist = Cnil;
 	memory->cfd.cfd_self = NULL;
 	memory->cfd.cfd_start = NULL;
 	memory->cfd.cfd_size = textsize + datasize + bsssize;
@@ -317,6 +318,7 @@ faslink(object faslfile, object ldargstring)
 	fread(&header, sizeof(header), 1, fp);
 	{BEGIN_NO_INTERRUPT;
 	memory = alloc_object(t_cfdata);
+	memory->cfd.cfd_dlist=Cnil;
 	memory->cfd.cfd_self=0;
 	memory->cfd.cfd_start = NULL;
 	memory->cfd.cfd_size = textsize + datasize + bsssize;

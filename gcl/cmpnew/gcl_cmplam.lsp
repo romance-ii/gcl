@@ -543,7 +543,7 @@
          (wt-nl "vs_top[0]=Cnil;")
          (wt-nl "{object *p=vs_top;")
          (wt-nl " for(;p>vs_base;p--)p[-1]="
-		(if *rest-on-stack* "ON_STACK_CONS" "MMcons")
+		(if *rest-on-stack* (progn (add-bzero) "ON_STACK_CONS") "MMcons")
 		"(p[-1],p[0]);}")
          (c2bind rest)
          (wt-nl)

@@ -1043,7 +1043,7 @@ gcl_init_alloc(void) {
 	  sizeof(struct shortfloat_struct), 256 ,1,0);
   init_tm(t_longfloat, "LLONG-FLOAT",
 	  sizeof(struct longfloat_struct), 170 ,1,0);
-  init_tm(t_complex, "CCOMPLEX", sizeof(struct complex), 170 ,1,0);
+  init_tm(t_complex, "CCOMPLEX", sizeof(struct ocomplex), 170 ,1,0);
   init_tm(t_character,"#CHARACTER",sizeof(struct character), 256 ,1,0);
   init_tm(t_package, ":PACKAGE", sizeof(struct package), 2*PAGESIZE / sizeof(struct package),1,0);
   init_tm(t_hashtable, "hHASH-TABLE", sizeof(struct hashtable), 78,1,0 );

@@ -37,21 +37,20 @@ bfd_hash_transfer(struct bfd_link_hash_entry *h,void *v) {
   
 }  
 
+extern int mcount();
+
 /* Replace this with gcl's own hash structure at some point */
 static int
 build_symbol_table_bfd(void) {
 
   int u,v;
-  unsigned long pa;
   asymbol **q;
-
+  
   bfd_init();
   if (!(bself=bfd_openr(kcl_self,0)))
     FEerror("Cannot open self\n",0);
   if (!bfd_check_format(bself,bfd_object))
     FEerror("I'm not an object",0);
-/*    if (link_info.hash) */
-/*      bfd_link_hash_table_free(bself,link_info.hash); */
   if (!(link_info.hash = bfd_link_hash_table_create (bself)))
     FEerror("Cannot make hash table",0);
   if (!bfd_link_add_symbols(bself,&link_info))
@@ -90,15 +89,6 @@ build_symbol_table_bfd(void) {
     if (h->type!=bfd_link_hash_defined) {
       if (!q[u]->section)
 	FEerror("Symbol ~S is missing section",1,make_simple_string(q[u]->name));
-      if (!my_plt(q[u]->name,&pa)) {
-/* 	printf("my_plt %s %p\n",q[u]->name,(void *)pa); */
-#ifndef STATIC_LINKING	
-	if (q[u]->value && q[u]->value!=pa)
-	  FEerror("plt address mismatch", 0);
-	else
-#endif
-	  q[u]->value=pa;
-      }
       if (q[u]->value) {
 	h->type=bfd_link_hash_defined;
 	h->u.def.value=q[u]->value+((q[u]->flags & BSF_WEAK) ? -q[u]->section->vma : q[u]->section->vma);
@@ -126,6 +116,9 @@ build_symbol_table_bfd(void) {
     vs_base=ovsb;
 
     bfd_link_hash_traverse(link_info.hash,bfd_hash_transfer,NULL);
+    sethash(make_simple_string(mcount),
+	    sSAlink_hash_tableA->s.s_dbind,
+	    make_fixnum((fixnum)mcount));
 
     bfd_close(bself);
     bself=NULL;

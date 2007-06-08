@@ -33,6 +33,8 @@
 ;;; If *safe-compile* is ON, some kind of run-time checks are not
 ;;; included in the compiled code.  The default value is OFF.
 
+(defvar *dlinks* (make-hash-table :test 'equal))
+
 (defun init-env ()
   (setq *next-cvar* 0)
   (setq *next-cmacro* 0)
@@ -41,7 +43,7 @@
   (setq *last-label* 0)
   (clrhash *objects*)
   (clrhash *objects-rev*)
-;  (setq *objects* nil)
+  (clrhash *dlinks*)
   (setq *constants* nil)
   (setq *local-funs* nil)
   (setq *global-funs* nil)
@@ -70,6 +72,32 @@
 ;;; *next-cfun* holds the last cfun used.
 
 (defmacro next-cfun () '(incf *next-cfun*))
+
+(defun add-setjmp nil
+  (add-dladdress "dlsetjmp" (mdlsym "setjmp" "libc.so.6")))
+(defun add-bzero nil
+  (add-dladdress "dlbzero" (mdlsym "bzero" "libc.so.6"))
+  (add-dladdress "dlmemset" (mdlsym "memset" "libc.so.6")))
+(defun add-getc nil
+  (add-dladdress "dlgetc" (mdlsym "getc" "libc.so.6")))
+(defun add-putc nil
+  (add-dladdress "dlputc" (mdlsym "putc" "libc.so.6")))
+(defun add-feof nil
+  (add-dladdress "dlfeof" (mdlsym "feof" "libc.so.6")))
+(defun add-fdopen nil
+  (add-dladdress "dlfdopen" (mdlsym "fdopen" "libc.so.6")))
+(defun add-read nil
+  (add-dladdress "dlread" (mdlsym "read" "libc.so.6")))
+(defun add-write nil
+  (add-dladdress "dlwrite" (mdlsym "write" "libc.so.6")))
+(defun add-libc (x)
+  (add-dladdress (strcat "dl" x) (mdlsym x (lib-name "libc"))))
+
+(defun add-dladdress (n l) 
+  (unless (gethash n *dlinks*) 
+    (wt-h "static void *" n #+static"=" #+static(symbol-name l) ";")
+    (setf (gethash n *dlinks*) t)
+    (add-dl `(si::mdl ',(symbol-name l) ',(package-name (symbol-package l)) ,(add-address (concatenate 'string "&" n))))))
 
 (defun add-symbol (symbol)
   (let ((x (gethash symbol *objects*)))
@@ -338,7 +366,14 @@
 ;;; Proclamation and declaration handling.
 
 (defvar *alien-declarations* nil)
+(defvar *inline* nil)
 (defvar *notinline* nil)
+
+(defun inline-asserted (fname)
+  (unless *compiler-push-events*
+    (or 
+     (member fname *inline*)
+     (get fname 'cmp-inline))))
 
 (defun inline-possible (fname)
   (not (or *compiler-push-events*
@@ -364,7 +399,7 @@
 		 (debug (setq *debug* (cadr x)))
                  (safety (setq *compiler-check-args* (>= (cadr x) 1))
                          (setq *safe-compile* (>= (cadr x) 2))
-                         (setq *compiler-push-events* (>= (cadr x) 3)))
+                         (setq *compiler-push-events* (and nil (>= (cadr x) 3))));FIXME
                  (space (setq *space* (cadr x)))
                  (speed (setq *speed* (cadr x)))
                  (compilation-speed (setq *speed* (- 3 (cadr x)))))))
@@ -379,11 +414,15 @@
    (inline
      (dolist** (fun (cdr decl))
 	       (check-type fun si::function-identifier)
-               (when (symbolp fun) (remprop fun 'cmp-notinline))))
+               (when (symbolp fun) 
+		 (si:putprop fun t 'cmp-inline)
+		 (remprop fun 'cmp-notinline))))
     (notinline
      (dolist** (fun (cdr decl))
 	       (check-type fun si::function-identifier)
-               (when (symbolp fun) (si:putprop fun t 'cmp-notinline))))
+               (when (symbolp fun) 
+		 (si:putprop fun t 'cmp-notinline)
+		 (remprop fun 'cmp-inline))))
     ((object ignore ignorable)
      (dolist** (var (cdr decl))
 	       (check-type var si::function-identifier)))
@@ -553,7 +592,7 @@
     (when cps
       (if s
 	  (setq body `((let ,(mapcar (lambda (x) (list (car x) (car x))) cps)
-			 (declare ,@(mapcar (lambda (x) (list (cdr x) (car x))) cps))
+;			 (declare ,@(mapcar (lambda (x) (list (cdr x) (car x))) cps))
 			 ,@body)))
 	(setq ts (nconc cps ts))))
     (when (and ctps s)
@@ -567,6 +606,7 @@
       (let ((*function-declarations* *function-declarations*)
             (*alien-declarations* *alien-declarations*)
             (*notinline* *notinline*)
+            (*inline* *inline*)
             (*space* *space*)
 	    (*compiler-check-args* *compiler-check-args*)
 	    (*safe-compile* *safe-compile*))
@@ -613,13 +653,15 @@
                (dolist** (fun (cdr decl))
                  (if (symbolp fun)
                      (progn (push (list 'inline fun) dl)
+			    (pushnew fun *inline*)
                             (setq *notinline* (remove fun *notinline*)))
                      (cmpwarn "The function name ~s is not a symbol." fun))))
               (notinline
                (dolist** (fun (cdr decl))
                  (if (symbolp fun)
                      (progn (push (list 'notinline fun) dl)
-                            (push fun *notinline*))
+                            (pushnew fun *notinline*)
+			    (setq *inline* (remove fun *inline*)))
                      (cmpwarn "The function name ~s is not a symbol." fun))))
               (declaration
                (dolist** (x (cdr decl))
@@ -651,7 +693,7 @@
 	    (declare (fixnum level))
 	    (setq *compiler-check-args* (>= level 1)
 		  *safe-compile* (>= level 2)
-		  *compiler-push-events* (>= level 3))))
+		  *compiler-push-events* (and nil (>= level 3)))));FIXME
 	 (space (setq *space* (cadr decl)))
 	 (notinline (push (cadr decl) *notinline*))
 	 (speed) ;;FIXME

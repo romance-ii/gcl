@@ -126,6 +126,7 @@
 (si:putprop 'provide t 'package-operation)
 (si:putprop 'require t 'package-operation)
 (si:putprop 'defpacakge t 'package-operation)
+(si:putprop 'mdlsym t 'package-operation)
 
 ;;; Pass 1 top-levels.
 
@@ -274,7 +275,7 @@
 				 form)))
 		      (maybe-eval t res) 
 		      (t1ordinary form)
-		      (when (member fun '(make-package defpackage)) (wt-data-package-operation form))))
+		      (when (member fun '(mdlsym make-package defpackage)) (wt-data-package-operation form))));FIXME
                    ((setq fd (get fun 't1))
                     (when *compile-print* (print-current-form))
                     (values (funcall fd args)))
@@ -309,6 +310,7 @@
 		*current-form* *vcs-used*)
   (declare (special *current-form* *vcs-used*))
 
+;;  #+gprof(add-libc "mcount")
   (setq *top-level-forms* (reverse *top-level-forms*))
 
   ;;; Initialization function.
@@ -671,8 +673,8 @@
   (setq cfun (or (get fname 'Ufun) (next-cfun)))
   (maybe-eval nil  (cons 'defun args))
 
-  (let (*recursion-detected* *warning-note-stack* *callees* (e (or (gethash fname *sigs*) (setf (gethash fname *sigs*) (make-list 4)))))
-    
+  (let* (*recursion-detected* *warning-note-stack* *callees* (e (or (gethash fname *sigs*) (setf (gethash fname *sigs*) (make-list 4)))))
+	 
     (tagbody
 
      top
@@ -770,7 +772,7 @@
 					   bind)
 				     t))
 			  (type-and (car types) (var-type var))
-			  (or (member (car types) (list #tfixnum #tcharacter #tlong-float #tshort-float))
+			  (or (member (car types) +c-local-var-types+)
 			      (eq (var-loc var) 'object)
 			      *c-gc* 
 			      (not (is-changed var (cadr lambda-expr)))))
@@ -1298,9 +1300,11 @@
 		     *rest-on-stack*)))
 	    (if (ll-keywords-p ll)
 		(cond (*rest-on-stack*
+		       (add-bzero)
 		       (wt "(ALLOCA_CONS(narg),ON_STACK_MAKE_LIST(narg));"))
 		      (t (wt "make_list(narg);")))
 	      (cond (*rest-on-stack*
+		     (add-bzero)
 		     (wt "(ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));"
 			 ))
 		    (t  (wt "list_vector_new(narg,first,ap);"))))
@@ -1551,7 +1555,7 @@
 	 (let ((addr (make-info))
 	       (data (make-info)))
 	   (do-referred (v info)
-	     (cond ((member (var-type v) #l(FIXNUM CHARACTER SHORT-FLOAT LONG-FLOAT))
+	     (cond ((member (var-type v) +c-local-var-types+)
 		    (push-referred v data))
 		   (t
 		    (push-referred v addr))))
@@ -1586,13 +1590,6 @@
 
 
 
-(defconstant +wt-c-var-alist+ `((,#tfixnum ."make_fixnum")
-				(,#tinteger ."make_integer") 
-				(,#tcharacter  ."code_char")
-				(,#tlong-float  ."make_longfloat")
-				(,#tshort-float ."make_shortfloat")
-				(object . "")))
-
 (defun wt-global-entry (fname cfun arg-types return-type)
     (cond ((get fname 'no-global-entry)(return-from wt-global-entry nil)))
     (wt-comment "global entry for the function " (function-string fname))
@@ -1612,12 +1609,7 @@
         ((endp types))
         (declare (object types) (fixnum n))
         (wt (let ((z (promoted-c-type (car types))))
-	      (cond ;FIXME
-		 ((eq z #tfixnum) "fix")
-		 ((eq z #tcharacter) "char_code")
-		 ((eq z #tlong-float) "lf")
-		 ((eq z #tshort-float) "sf")
-		 ("")))
+	      (or (cdr (assoc z +to-c-var-alist+)) ""))
             "(base[" n "])")
         (unless (endp (cdr types)) (wt ",")))
     (wt "));")
@@ -1631,6 +1623,8 @@
 				(,#tcharacter  ."unsigned char ")
 				(,#tlong-float  ."double ")
 				(,#tshort-float ."float ")
+				(,#tfcomplex ."fcomplex ")
+				(,#tdcomplex ."dcomplex ")
 				(object . "object ")))
 
 (defun rep-type (type)

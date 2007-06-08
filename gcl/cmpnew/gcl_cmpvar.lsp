@@ -235,13 +235,6 @@
   (or (si::fixnump n) (wfs-error))
   (wt "base0[" n "]"))
 
-(defconstant +wt-c-var-alist+ `((,#tfixnum ."make_fixnum")
-				(,#tinteger ."make_integer") 
-				(,#tcharacter  ."code_char")
-				(,#tlong-float  ."make_longfloat")
-				(,#tshort-float ."make_shortfloat")
-				(object . "")))
-
 
 (defun wt-var (var ccb)
   (case (var-kind var)

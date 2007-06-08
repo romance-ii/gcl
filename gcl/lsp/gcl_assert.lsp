@@ -103,36 +103,29 @@
 (defmacro typecase (keyform &rest clauses)
   (declare (optimize (safety 1)))
   (check-type clauses (list-of proper-list))
-  (do ((l (reverse clauses) (cdr l))
-       (form nil) (key (gensym)))
-      ((endp l) `(let ((,key ,keyform)) ,form))
-      (if (or (eq (caar l) 't) (eq (caar l) 'otherwise))
-          (setq form `(progn ,@(cdar l)))
-          (setq form
-                `(if (typep ,key (quote ,(caar l)))
-                     (progn ,@(cdar l))
-                     ,form)))))
-
+  (let ((key (unless (symbolp keyform) (gensym))))
+    (do ((l (reverse clauses) (cdr l))
+	 (form nil))
+	((endp l) (if key `(let ((,key ,keyform)) ,form) form))
+      (let ((z `(progn ,@(cdar l))))
+	(setq form (if (member (caar l) '(otherwise t)) z 
+		     `(if (typep ,(or key keyform) ',(caar l)) ,z ,form)))))))
+	
 (defmacro etypecase (keyform &rest clauses &aux (key (if (symbolp keyform) keyform (gensym))))
   (declare (optimize (safety 1)))
   (check-type clauses (list-of proper-list))
   (let ((tp `(or ,@(mapcar 'car clauses))))
-   (do ((l (reverse clauses) (cdr l))
-        (form `(error 'type-error :datum ,key :expected-type ',tp)))
-       ((endp l) `(let ((,key ,keyform)) ,form))
-       (setq form `(if (typep ,key ',(caar l))
-                       (progn ,@(cdar l))
-                       ,form)))))
+    `(typecase ,keyform ,@clauses (t (error 'type-error :datum ,key :expected-type ',tp)))))
 
-(defmacro ctypecase (keyplace &rest clauses &aux (key (gensym)))
+(defmacro ctypecase (keyform &rest clauses &aux (key (gensym)))
   (declare (optimize (safety 1)))
   (check-type clauses (list-of proper-list))
-  `(loop (let ((,key ,keyplace))
-	   ,@(mapcar (lambda (l)
-		       `(when (typep ,key ',(car l))
-			  (return (progn ,@(cdr l)))))
-		     clauses)
-	   (check-type ,keyplace (or ,@(mapcar 'car clauses))))))
+  `(loop
+    (typecase ,keyform
+      ,@(mapcar (lambda (l)
+		  `(,(car l) (return (progn ,@(subst key keyform (cdr l))))))
+		clauses))
+    (check-type ,keyform (or ,@(mapcar 'car clauses)))))
 
 ;; (defun typecase-error-string
 ;;        (keyform keyvalue negs

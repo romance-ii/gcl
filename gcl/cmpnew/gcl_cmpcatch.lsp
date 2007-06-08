@@ -73,6 +73,7 @@
   )
 
 (defun set-push-catch-frame (loc)
+  (add-setjmp)
   (wt-nl "frs_push(FRS_CATCH," loc ");"))
 
 (defun c1unwind-protect (args &aux (info (make-info :sp-change 1)) form)
@@ -92,6 +93,7 @@
                          &aux (*vs* *vs*) (loc (list 'vs (vs-push)))
 			 top-data)
   ;;;  exchanged following two lines to eliminate setjmp clobbering warning
+  (add-setjmp)
   (wt-nl "frs_push(FRS_PROTECT,Cnil);")
   (wt-nl "{object tag=Cnil;frame_ptr fr=NULL;object p;bool active;")
   (wt-nl "if(nlj_active){tag=nlj_tag;fr=nlj_fr;active=TRUE;}")
@@ -116,6 +118,13 @@
   (wt-nl "} else {")
   (unwind-exit 'fun-val nil (if top-data (car top-data)))
   (wt "}}"))
+
+(defun c1no-value (args)
+  (declare (ignore args))
+  (list 'si::no-value (make-info :type #tnil)))
+(defun c2no-value nil (wt "return Cnil;"))
+(si::putprop 'si::no-value 'c1no-value 'c1)
+(si::putprop 'si::no-value 'c2no-value 'c2)
 
 (defun c1throw (args &aux (info (make-info :type #tnil)) tag)
   (when (or (endp args) (endp (cdr args)))

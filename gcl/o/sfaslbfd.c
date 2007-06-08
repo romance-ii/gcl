@@ -287,6 +287,7 @@ fasload(object faslfile) {
       } else {
 
 	struct htent *x;
+/* 	unsigned long ad; */
 
 	set_type_of(&st,t_string);
 	st.st_self=(char *)q[u]->name;
@@ -334,6 +335,7 @@ fasload(object faslfile) {
   max_align=1<<max_align;
 
   memory = alloc_object(t_cfdata);
+  memory->cfd.cfd_dlist = Cnil;
   memory->cfd.cfd_self = 0;
   memory->cfd.cfd_start = 0;
   memory->cfd.cfd_size = curr_size + (max_align > sizeof(char *) ? max_align :0);

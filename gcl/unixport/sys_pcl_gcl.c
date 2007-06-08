@@ -92,8 +92,10 @@ gcl_init_system(object no_init)
 #ifdef HAVE_TK
   ar_check_init(gcl_tk,no_init);
 #endif
-  ar_check_init(gcl_iolib,no_init);
   ar_check_init(gcl_mislib,no_init);
+  ar_check_init(gcl_iolib,no_init);
+  ar_check_init(gcl_bnum,no_init);
+  ar_check_init(gcl_mnum,no_init);
   ar_check_init(gcl_numlib,no_init);
   ar_check_init(gcl_packlib,no_init);
   ar_check_init(gcl_seq,no_init);

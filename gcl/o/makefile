@@ -34,7 +34,7 @@ DECL := $(HDIR)/new_decl.h
 	rm $*.c
 
 CPP=
-%.ini: %.c grab_defs plt.h
+%.ini: %.c grab_defs #plt.h
 	[ -e $(DECL) ] || touch $(DECL)
 	$(CC) -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c | sed -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
 
@@ -81,7 +81,7 @@ OBJS	= $(OD)typespec.o $(OD)alloc.o $(OD)gbc.o \
 	$(OD)print.o $(OD)format.o $(OD)pathname.o \
 	$(OD)unixfsys.o $(OD)unixfasl.o $(OD)error.o \
 	$(OD)unixtime.o $(OD)unixsys.o $(OD)unixsave.o \
-	$(OD)funlink.o  $(OD)plt.o \
+	$(OD)funlink.o  \
 	$(OD)fat_string.o ${ODIR}/run_process.o \
 	$(OD)nfunlink.o $(OD)usig.o $(OD)usig2.o $(OD)utils.o \
 	$(OD)makefun.o $(OD)sockets.o $(OD)gmp_wrappers.o $(OD)clxsocket.o  \
@@ -175,11 +175,16 @@ plt.h: plttest.o pltd.h
 			grep -v _gp_disp | \
 			$(AWK) '{A[++k]=$$0} END {for (i=1;i<=k;i++) \
 				printf("MY_PLT(%s)%s\n",A[i],i==k ? "" : ",");}' >$@
+	rm $@
+	touch $@
 	echo Plt table:
 	cat $@
 
 plt.o: plt.c plt.h
 	$(CC) -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO) 
+
+cfun.o: cfun.c
+	$(CC) -D_GNU_SOURCE -c $(CFLAGS) $(DEFS) $*.c $(AUX_INFO) 
 
 
 ALIB=${LIBFILES} #user_init.o ${EXTRA_LIB}

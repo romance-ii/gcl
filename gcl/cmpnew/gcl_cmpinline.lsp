@@ -210,7 +210,7 @@
 ;;   to-info)
 
 (defun args-info-changed-vars (var forms)
-  (if (member (var-kind var) #l(FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT))
+  (if (member (var-kind var) +c-local-var-types+)
       (dolist** (form forms)
 		(when (is-changed var (cadr form))
 		  (return-from args-info-changed-vars t)))
@@ -251,7 +251,7 @@
 	 (return-from is-rep-referred t))))))
 
 (defun args-info-referred-vars (var forms)
-  (if (member (var-kind var) #l(FIXNUM CHARACTER LONG-FLOAT SHORT-FLOAT))
+  (if (member (var-kind var) +c-local-var-types+)
       (dolist** (form forms nil)
 		(when (or (is-referred var (cadr form))
 			  (is-rep-referred var (cadr form)))
@@ -308,8 +308,7 @@
       (let ((form (car forms))
             (type (car types)))
         (declare (object form type))
-	(let ((type (cond ((type>= #tfixnum-float type) (promoted-c-type (type-and type (info-type (cadr form)))))
-			  (type))));FIXME fixnum-float support
+	(let ((type (adj-cnum-tp type (info-type (cadr form)))))
         (case (car form)
               (LOCATION (push (coerce-loc (caddr form) type) locs))
               (VAR
@@ -345,8 +344,7 @@
                         (cond
                          ((or (and (flag-p (caddr ii) ans)(not *c-gc*))
 						; returns new object
-                              (and (member (cadr ii)
-                                           #l(FIXNUM LONG-FLOAT SHORT-FLOAT))
+                              (and (member (cadr ii) +c-local-var-types+)
                                    (not (eq type (cadr ii)))))
 			  (let* ((temp (cs-push type))(*value-to-go* `(cvar ,temp)))
 			    (wt-nl "V" temp " = " (coerce-loc loc type) ";")
@@ -505,6 +503,12 @@
 			       (wt ")")))))
   nil)
 
+(defun adj-cnum-tp (tp ref)
+  (if (and (type>= #tcnum tp) (not (type>= #tcnum (promoted-c-type tp))))
+      (let ((pr (promoted-c-type ref)))
+	(when (and (type>= #tcnum pr) (type>= tp ref)) ref))
+    tp))
+
 (defun inline-type-matches (fname inline-info arg-types return-type
                                         &aux (rts nil))
   (declare (ignore fname))
@@ -521,8 +525,9 @@
       (return-from inline-type-matches (when restp `(,(car restp) ,(cadr restp) ,@(cddr inline-info))))))
 ;  (if (member 'integer (car inline-info) :key (lambda (x) (if (consp x) (car x) x)) :test #'eq)
 ;      (return-from inline-type-matches nil))
-  (let ((rt (cmp-norm-tp (cadr inline-info))))
-    (if (and (type>= rt (coerce-to-one-value return-type))
+  (let* ((return-type (coerce-to-one-value return-type))
+	 (rt (adj-cnum-tp (cmp-norm-tp (cadr inline-info)) return-type)))
+    (if (and (and return-type (type>= rt return-type))
 	     (let ((types (mapcar 'cmp-norm-tp (car inline-info)))(last t))
 	       (dolist** (arg-type arg-types (or (equal types '(*))
 						 (endp types)))
@@ -530,17 +535,10 @@
 			 (cond ((equal types '(*))
 				(setq types `(,last *))))
 			 (let ((arg-type (coerce-to-one-value arg-type)))
-			   (cond ((eq (car types) #tfixnum-float);FIXME remove?
-				  (cond ((type>= #tfixnum arg-type)
-					 (push #tfixnum rts))
-					((type>= #tlong-float arg-type)
-					 (push #tlong-float rts))
-					((type>= #tshort-float arg-type)
-					 (push #tshort-float rts))
-					(t (return nil))))
-				 ((type>= (car types) arg-type)
-				  (push (car types) rts))
-				 (t (return nil))))
+			   (cond ((let ((tp (adj-cnum-tp (car types) arg-type)))
+				    (when (and arg-type (type>= tp arg-type))
+				      (push tp rts))))
+				 ((return nil))))
 			 (setq last (pop types)))))
       (cons (nreverse rts) (cons rt (cddr inline-info))))))
 
@@ -555,8 +553,7 @@
               (LOCATION)
               (VAR
                (when (or (args-info-changed-vars (caaddr form) (cdr forms))
-                         (and (member (var-kind (caaddr form))
-                                      #l(FIXNUM LONG-FLOAT SHORT-FLOAT))
+                         (and (member (var-kind (caaddr form)) +c-local-var-types+)
                               (not (eq (car types)
                                        (var-kind (caaddr form))))))
                      (return t)))
@@ -571,8 +568,7 @@
 			 (flag-p (caddr ii) allocates-new-storage)
 			 (flag-p (caddr ii) set)
 			 (flag-p (caddr ii) is)
-                         (and (member (cadr ii)
-                                      #l(fixnum long-float short-float))
+                         (and (member (cadr ii) +c-local-var-types+)
                               (not (eq (car types) (cadr ii))))
                          (need-to-protect (cadddr form) (car ii)))
                      (return t))))
@@ -602,6 +598,8 @@
 (si:putprop 'inline-character 'wt-inline-character 'wt-loc)
 (si:putprop 'inline-long-float 'wt-inline-long-float 'wt-loc)
 (si:putprop 'inline-short-float 'wt-inline-short-float 'wt-loc)
+(si:putprop 'inline-dcomplex 'wt-inline-dcomplex 'wt-loc)
+(si:putprop 'inline-fcomplex 'wt-inline-fcomplex 'wt-loc)
 
 (defun wt-inline-loc (fun locs &aux (i 0) (max -2) (maxv 0))
   (declare (fixnum i max maxv))
@@ -710,6 +708,14 @@
 (defun wt-inline-short-float (side-effectp fun locs)
   (declare (ignore side-effectp))
   (wt "make_shortfloat(") (wt-inline-loc fun locs) (wt ")"))
+
+(defun wt-inline-fcomplex (side-effectp fun locs)
+  (declare (ignore side-effectp))
+  (wt "make_fcomplex(") (wt-inline-loc fun locs) (wt ")"))
+
+(defun wt-inline-dcomplex (side-effectp fun locs)
+  (declare (ignore side-effectp))
+  (wt "make_dcomplex(") (wt-inline-loc fun locs) (wt ")"))
 
 (defun args-cause-side-effect (forms &aux ii)
   (dolist** (form forms nil)

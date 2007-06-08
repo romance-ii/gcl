@@ -48,6 +48,47 @@ DEFUNO_NEW("SPECIALP",object,fSspecialp,SI
 	RETURN1(sym);
 }
 
+DEFUN_NEW("BIG-TO-DOUBLE",object,fSbig_to_double,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  if (type_of(x)!=t_bignum)
+    TYPE_ERROR(x,sLbignum);
+  RETURN1(make_longfloat(big_to_double(x)));
+}
+
+DEFUN_NEW("LONG-TO-SHORT",object,fSlong_to_short,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  if (type_of(x)!=t_longfloat)
+    TYPE_ERROR(x,sLlong_float);
+  RETURN1(make_shortfloat((float)lf(x)));
+}
+
+DEFUN_NEW("COMPLEX-REAL",object,fScomplex_real,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  if (type_of(x)!=t_complex)
+    TYPE_ERROR(x,sLcomplex);
+  RETURN1(x->cmp.cmp_real);
+}
+
+DEFUN_NEW("COMPLEX-IMAG",object,fScomplex_imag,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  if (type_of(x)!=t_complex)
+    TYPE_ERROR(x,sLcomplex);
+  RETURN1(x->cmp.cmp_imag);
+}
+
+DEFUN_NEW("RATIO-NUMERATOR",object,fSratio_numerator,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  if (type_of(x)!=t_ratio)
+    TYPE_ERROR(x,sLratio);
+  RETURN1(x->rat.rat_num);
+}
+
+DEFUN_NEW("RATIO-DENOMINATOR",object,fSratio_denominator,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  if (type_of(x)!=t_ratio)
+    TYPE_ERROR(x,sLratio);
+  RETURN1(x->rat.rat_den);
+}
+
+DEFUN_NEW("C-TYPE",object,fSc_type,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+  RETURN1(make_fixnum(type_of(x)));
+}
+DEFCONST("C-TYPE-MAX", sSc_type_max,LISP, make_fixnum(t_end-1),"");
+
 DEF_ORDINARY("DEBUGGER",sSdebugger,SI,"");
 
 DEFUN_NEW("DEFVAR1",object,fSdefvar1,SI
@@ -249,6 +290,80 @@ object_to_float(object x)
 		f = sf(x);  break; 
 	case t_longfloat: 
 		f = lf(x);  break; 
+	default: 
+		FEcannot_coerce(sLfloat,x);
+	} 
+	return(f); 
+} 
+
+object
+make_fcomplex(fcomplex x) {
+
+  object r,i,y;
+  r=make_shortfloat(creal(x));
+  i=make_shortfloat(cimag(x));
+  y=alloc_object(t_complex);
+  y->cmp.cmp_real=r;
+  y->cmp.cmp_imag=i;
+  return y;
+}
+
+fcomplex 
+object_to_fcomplex(object x) 
+{ 
+	fcomplex f=0.0; 
+
+	switch (type_of(x)) { 
+	case t_character: 
+		f = char_code(x);  break; 
+	case t_fixnum: 
+		f = fix(x);  break; 
+	case t_bignum: 
+	case t_ratio: 
+		f = number_to_double(x);  break; 
+	case t_shortfloat: 
+		f = sf(x);  break; 
+	case t_longfloat: 
+		f = lf(x);  break; 
+	case t_complex: 
+		f = object_to_float(x->cmp.cmp_real)+object_to_float(x->cmp.cmp_imag)*I;  break; 
+	default: 
+		FEcannot_coerce(sLfloat,x);
+	} 
+	return(f); 
+} 
+
+object
+make_dcomplex(dcomplex x) {
+
+  object r,i,y;
+  r=make_longfloat(creal(x));
+  i=make_longfloat(cimag(x));
+  y=alloc_object(t_complex);
+  y->cmp.cmp_real=r;
+  y->cmp.cmp_imag=i;
+  return y;
+}
+
+dcomplex 
+object_to_dcomplex(object x) 
+{ 
+	dcomplex f=0.0; 
+
+	switch (type_of(x)) { 
+	case t_character: 
+		f = char_code(x);  break; 
+	case t_fixnum: 
+		f = fix(x);  break; 
+	case t_bignum: 
+	case t_ratio: 
+		f = number_to_double(x);  break; 
+	case t_shortfloat: 
+		f = sf(x);  break; 
+	case t_longfloat: 
+		f = lf(x);  break; 
+	case t_complex: 
+		f = object_to_double(x->cmp.cmp_real)+I*object_to_double(x->cmp.cmp_imag);  break; 
 	default: 
 		FEcannot_coerce(sLfloat,x);
 	} 
@@ -483,8 +598,9 @@ gcl_init_or_load1(void (*fn)(void),char *file)
      memory->cfd.cfd_fillp=0;
      memory->cfd.cfd_size = 0;
      printf("Initializing %s\n",file); fflush(stdout);
-     fasl_data = read_fasl_data(file);
      memory->cfd.cfd_start= (char *)fn;
+     memory->cfd.cfd_dlist=Cnil;
+     fasl_data = read_fasl_data(file);
      call_init(0,memory,fasl_data,0);
   }
  else

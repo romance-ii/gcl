@@ -61,22 +61,25 @@
                     (setq x (floor (+ x y) 2))))))
 
 
-(defun abs (z)
-  (cond ((complexp z)
-	 ;; Compute (sqrt (+ (* x x) (* y y))) carefully to prevent
-	 ;; overflow!
-	 (let* ((x (abs (realpart z)))
-		(y (abs (imagpart z))))
-	   (if (< x y)
-	       (rotatef x y))
-	   (if (zerop x)
-	       x
-	       (let ((r (/  y x)))
-		 (* x (sqrt (+ 1 (* r r))))))))
-	(t				; Should this be (realp z) instead of t?
-	 (if (minusp z)
-	     (- z)
-	     z))))
+(defun logandc2 (x y) (boole boole-andc2 x y))
+(defun byte-position (bytespec)
+  (check-type bytespec cons)
+  (cdr bytespec))
+(defun byte-size (bytespec)
+  (check-type bytespec cons)
+  (car bytespec))
+(defun ldb (bytespec integer)
+  (logandc2 (ash integer (- (byte-position bytespec)))
+	    (- (ash 1 (byte-size bytespec)))))
+(defun mask-field (bytespec integer)
+  (ash (ldb bytespec integer) (byte-position bytespec)))
+(defun dpb (newbyte bytespec integer)
+  (logxor integer
+	  (mask-field bytespec integer)
+	  (ash (logandc2 newbyte
+			 (- (ash 1 (byte-size bytespec))))
+	       (byte-position bytespec))))
+
 
 
 (defun phase (x)
@@ -85,72 +88,72 @@
 
 (defun signum (x) (if (zerop x) x (/ x (abs x))))
 
-(defun cis (x) (exp (* imag-one x)))
+(defun cis (x) (exp (* #c(0 1) x)))
 
-(defmacro asincos (x f)
-  (let* ((rad (list 'sqrt (list '- 1d0 (list '* x x))))
-	 (ff (if f (list '* imag-one x) x))
-	 (ss (if f rad (list '* imag-one rad))))
-    `(let* ((sf (or (typep ,x 'short-float) (typep ,x '(complex short-float))))
-	    (c (- (* imag-one
-		     (log (+ ,ff ,ss)))))
-	    (c (if (or (and (not (complexp ,x)) (<= ,x 1) (>= ,x -1))
-		       (zerop (imagpart c)))
-		   (realpart c)
-		 c)))
-       (if sf (coerce c (if (complexp c) '(complex short-float) 'short-float)) c))))
+;; (defmacro asincos (x f)
+;;   (let* ((rad (list 'sqrt (list '- 1d0 (list '* x x))))
+;; 	 (ff (if f (list '* imag-one x) x))
+;; 	 (ss (if f rad (list '* imag-one rad))))
+;;     `(let* ((sf (or (typep ,x 'short-float) (typep ,x '(complex short-float))))
+;; 	    (c (- (* imag-one
+;; 		     (log (+ ,ff ,ss)))))
+;; 	    (c (if (or (and (not (complexp ,x)) (<= ,x 1) (>= ,x -1))
+;; 		       (zerop (imagpart c)))
+;; 		   (realpart c)
+;; 		 c)))
+;;        (if sf (coerce c (if (complexp c) '(complex short-float) 'short-float)) c))))
 
-(defun asin (x)
-  (asincos x t))
+;; (defun asin (x)
+;;   (asincos x t))
 
-(defun acos (x)
-  (asincos x nil))
+;; (defun acos (x)
+;;   (asincos x nil))
 
-(defun sinh (z)
-  (cond ((complexp z)
-	 ;; For complex Z, compute the real and imaginary parts
-	 ;; separately to get better precision.
-	 (let ((x (realpart z))
-	       (y (imagpart z)))
-	   (complex (* (sinh x) (cos y))
-		    (* (cosh x) (sin y)))))
-	(t				; Should this be (realp z) instead of t?
-	 (let ((limit #.(expt (* double-float-epsilon 45/2) 1/5)))
-	   (if (< (- limit) z limit)
-	       ;; For this region, write use the fact that sinh z =
-	       ;; z*exp(z)*[(1 - exp(-2z))/(2z)].  Then use the first
-	       ;; 4 terms in the Taylor series expansion of
-	       ;; (1-exp(-2z))/2/z.  series expansion of (1 -
-	       ;; exp(2*x)).  This is needed because there is severe
-	       ;; roundoff error calculating (1 - exp(-2z)) for z near
-	       ;; 0.
-	       (* z (exp z)
-		  (- 1 (* z
-			  (- 1 (* z
-				  (- 2/3 (* z
-					    (- 1/3 (* 2/15 z)))))))))
-	       (let ((e (exp z)))
-		 (* 1/2 (- e (/ e)))))))))
+;; (defun sinh (z)
+;;   (cond ((complexp z)
+;; 	 ;; For complex Z, compute the real and imaginary parts
+;; 	 ;; separately to get better precision.
+;; 	 (let ((x (realpart z))
+;; 	       (y (imagpart z)))
+;; 	   (complex (* (sinh x) (cos y))
+;; 		    (* (cosh x) (sin y)))))
+;; 	(t				; Should this be (realp z) instead of t?
+;; 	 (let ((limit #.(expt (* double-float-epsilon 45/2) 1/5)))
+;; 	   (if (< (- limit) z limit)
+;; 	       ;; For this region, write use the fact that sinh z =
+;; 	       ;; z*exp(z)*[(1 - exp(-2z))/(2z)].  Then use the first
+;; 	       ;; 4 terms in the Taylor series expansion of
+;; 	       ;; (1-exp(-2z))/2/z.  series expansion of (1 -
+;; 	       ;; exp(2*x)).  This is needed because there is severe
+;; 	       ;; roundoff error calculating (1 - exp(-2z)) for z near
+;; 	       ;; 0.
+;; 	       (* z (exp z)
+;; 		  (- 1 (* z
+;; 			  (- 1 (* z
+;; 				  (- 2/3 (* z
+;; 					    (- 1/3 (* 2/15 z)))))))))
+;; 	       (let ((e (exp z)))
+;; 		 (* 1/2 (- e (/ e)))))))))
 
 ;(defun sinh (x) (/ (- (exp x) (exp (- x))) 2.0d0))
 
-(defun cosh (z)
-  (cond ((complexp z)
-	 ;; For complex Z, compute the real and imaginary parts
-	 ;; separately to get better precision.
-	 (let ((x (realpart z))
-	       (y (imagpart z)))
-	   (complex (* (cosh x) (cos y))
-		    (* (sinh x) (sin y)))))
-	(t				; Should this be (realp z) instead of t?
-	 ;; For real Z, there's no chance of round-off error, so
-	 ;; direct evaluation is ok.
-	 (let ((e (exp z)))
-	   (* 1/2 (+ e (/ e)))))))
+;; (defun cosh (z)
+;;   (cond ((complexp z)
+;; 	 ;; For complex Z, compute the real and imaginary parts
+;; 	 ;; separately to get better precision.
+;; 	 (let ((x (realpart z))
+;; 	       (y (imagpart z)))
+;; 	   (complex (* (cosh x) (cos y))
+;; 		    (* (sinh x) (sin y)))))
+;; 	(t				; Should this be (realp z) instead of t?
+;; 	 ;; For real Z, there's no chance of round-off error, so
+;; 	 ;; direct evaluation is ok.
+;; 	 (let ((e (exp z)))
+;; 	   (* 1/2 (+ e (/ e)))))))
 ;(defun cosh (x) (/ (+ (exp x) (exp (- x))) 2.0d0))
-(defun tanh (x) (/ (sinh x) (cosh x)))
+;(defun tanh (x) (/ (sinh x) (cosh x)))
 
-(defun asinh (x) (log (+ x (sqrt (+ 1 (* x x))))))
+;(defun asinh (x) (log (+ x (sqrt (+ 1 (* x x))))))
 ;(defun acosh (x)
 ;  (log (+ x
 ;	  (* (1+ x)
@@ -158,13 +161,13 @@
 ;(defun acosh (x)
 ;       (log (+ x
 ;	       (sqrt (* (1- x) (1+ x))))))
-(defun acosh (x)
-  (* 2 (log (+ (sqrt (/ (1+ x) 2)) (sqrt (/ (1- x) 2))))))
-(defun atanh (x)
-       (when (or (= x 1) (= x -1))
-             (error "The argument ~S for ~S, is a logarithmic singularity."
-                    x 'atan))
-       (log (/ (1+ x) (sqrt (- 1 (* x x))))))
+;(defun acosh (x)
+;  (* 2 (log (+ (sqrt (/ (1+ x) 2)) (sqrt (/ (1- x) 2))))))
+;(defun atanh (x)
+;       (when (or (= x 1) (= x -1))
+;             (error "The argument ~S for ~S, is a logarithmic singularity."
+;                    x 'atan))
+;       (log (/ (1+ x) (sqrt (- 1 (* x x))))))
 ;;        (let ((y (log (/ (1+ x) (sqrt (- 1 (* x x)))))))
 ;; 	 (if (and (= (imagpart x) 0) (complexp y))
 ;; 	     (complex (realpart y) (- (imagpart y)))
@@ -236,7 +239,6 @@
 (defun lognand (x y) (boole boole-nand x y))
 (defun lognor (x y) (boole boole-nor x y))
 (defun logandc1 (x y) (boole boole-andc1 x y))
-(defun logandc2 (x y) (boole boole-andc2 x y))
 (defun logorc1 (x y) (boole boole-orc1 x y))
 (defun logorc2 (x y) (boole boole-orc2 x y))
 
@@ -247,30 +249,21 @@
 (defun byte (size position)
   (cons size position))
 
-(defun byte-size (bytespec)
-  (check-type bytespec cons)
-  (car bytespec))
 
-(defun byte-position (bytespec)
-  (check-type bytespec cons)
-  (cdr bytespec))
 
-(defun ldb (bytespec integer)
-  (logandc2 (ash integer (- (byte-position bytespec)))
-            (- (ash 1 (byte-size bytespec)))))
+
+
+
 
 (defun ldb-test (bytespec integer)
   (not (zerop (ldb bytespec integer))))
 
-(defun mask-field (bytespec integer)
-  (ash (ldb bytespec integer) (byte-position bytespec)))
 
-(defun dpb (newbyte bytespec integer)
-  (logxor integer
-          (mask-field bytespec integer)
-          (ash (logandc2 newbyte
-                         (- (ash 1 (byte-size bytespec))))
-               (byte-position bytespec))))
+
+
 
 (defun deposit-field (newbyte bytespec integer)
   (dpb (ash newbyte (- (byte-position bytespec))) bytespec integer))
+
+;(defdlfun (:double "cblas_ddot" "libblas.so") :int :double* :int :double* :int)
+

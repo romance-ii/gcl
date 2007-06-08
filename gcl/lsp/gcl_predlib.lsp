@@ -205,8 +205,6 @@
 (defmacro check-type-eval (place type)
   `(values (assert (typep ,place ,type) (,place) 'type-error :datum ,place :expected-type ,type)));fixme
 
-(defconstant +coerce-list+ '(list vector string array character short-float long-float float complex function null cons))
-
 (defun function-identifierp (tp)
   (or (symbolp tp)
       (and (consp tp) (eq (car tp) 'lambda))
@@ -376,13 +374,16 @@
 (deftype unsigned-lfixnum ()`(unsigned-byte ,lfixnum-length))
 (deftype lfixnum ()`(signed-lfixnum))
 
+(deftype fcomplex nil `(complex short-float))
+(deftype dcomplex nil `(complex long-float))
 
-;;FIXME this is really ugly, but we need nreconstruct-type to return
-;;values that are equal to normalize type in the compiler (type-and,
-;;etc.)
-;(deftype vector (&optional element-type size)
-;  `(array ,element-type (,size)))
-;see below
+;; (defun key-fn-p (x)
+;;   (or (funcall x nil) t))
+;; (deftype key-fn nil `(or (eql ,#'identity) (satisfies key-fn-p)))
+
+;; (defun test-fn-p (x)
+;;   (or (funcall x nil nil) t))
+;; (deftype test-fn nil `(satisfies test-fn-p))
 
 (deftype string (&optional size)
   `(array character (,size)))
@@ -499,10 +500,18 @@
   (or (listp x) (vectorp x)))
 
 (defun short-float-p (x)
-  (and (floatp x) (eql x (float x 0.0s0))))
+  (= (c-type x) #.(c-type 0.0s0)))
+;  (and (floatp x) (eql x (float x 0.0s0))))
 
 (defun long-float-p (x)
-  (and (floatp x) (eql x (float x 0.0))))
+  (= (c-type x) #.(c-type 0.0)))
+;  (and (floatp x) (eql x (float x 0.0))))
+
+(defun fcomplexp (x)
+  (and (complexp x) (short-float-p (realpart x)) (short-float-p (imagpart x))))
+
+(defun dcomplexp (x)
+  (and (complexp x) (long-float-p (realpart x)) (long-float-p (imagpart x))))
 
 ;(defun proper-listp (x)
 ;  (or (not x) (and (consp x) (not (improper-consp x)))))
@@ -556,9 +565,12 @@
 	  (standard-char . standard-charp)
 	  (non-standard-base-char . non-standard-base-char-p)
 	  (interpreted-function . interpreted-function-p)
+	  (real . realp)
 	  (float . floatp)
 	  (short-float . short-float-p)
 	  (long-float . long-float-p)
+	  (fcomplex . fcomplexp)
+	  (dcomplex . dcomplexp)
 	  (array . arrayp)
 	  (vector . vectorp)
 	  (bit-vector . bit-vector-p)
@@ -774,15 +786,28 @@
 	((integer-range-fixup (cdr x) 
 			      (cons (cons (imod (caar x) 1) (imod (cdar x) -1)) res)))))
 
+(defun tp-bnd (nx a tp)
+  (if (eq tp 'ratio) 
+      (let ((z (rational nx))) 
+	(if (and a (integerp z)) (list z) z))
+    (float nx (if (eq tp 'short-float) 0.0s0 0.0))))
+
+(defun get-tp-bnd (x tp)
+  (let* ((a (atom x))
+	 (nx (if a x (car x))))
+    (if (or (eq nx '*) (typep nx tp)) x
+      (let ((z (tp-bnd nx a tp))) (if a z (list z))))))
+
 (defun number-range-fixup (x tp)
   (if (eq tp 'integer)
       (integer-range-fixup x)
     (lremove-if (lambda (x) (let ((a (car x)) (d (cdr x))) 
-			     (let ((na (if (atom a) a (car a))) (nd (if (atom d) d (car d))))
-			       (and (not (eq na '*)) (not (eq nd '*))
-				    (= na nd)
-				    (or (listp a) (listp d)))))) x)))
-
+			      (let ((na (if (atom a) a (car a))) (nd (if (atom d) d (car d))))
+				(and (not (eq na '*)) (not (eq nd '*))
+				     (= na nd)
+				     (or (listp a) (listp d))))))
+;		x)))
+		(mapcar (lambda (x) (cons (get-tp-bnd (car x) tp) (get-tp-bnd (cdr x) tp))) x))))
 
 ;; GENERIC SIGMA ALGEBRA OPERATIONS
 
@@ -908,10 +933,12 @@
 (defun elgt (x y)
   (cond ((or (eq (car x) '*) (eq (cdr y) '*)) nil)
 	((and (integerp (car x)) (integerp (cdr y))) (> (car x) (1+ (cdr y))))
-	((and (integerp (range-num (car x))) 
-	      (integerp (range-num (cdr y)))) (>= (range-num (car x)) (1+ (range-num (cdr y)))))
-	((and (numberp (car x)) (numberp (cdr y))) (> (car x) (cdr y)))
-	((>= (range-num (car x)) (range-num (cdr y))))))
+;	((and (integerp (range-num (car x))) 
+;	      (integerp (range-num (cdr y)))) (>= (range-num (car x)) (1+ (range-num (cdr y)))))
+	((and (listp (car x)) (listp (cdr y))) (>= (range-num (car x)) (range-num (cdr y))))
+	((> (range-num (car x)) (range-num (cdr y))))))
+;	((and (numberp (car x)) (numberp (cdr y))) (> (car x) (cdr y)))
+;	((>= (range-num (car x)) (range-num (cdr y))))))
 
 (defun elin (x y op)
   (cond ((eq x '*) y)
@@ -1189,11 +1216,14 @@
 		   (let* ((z (cond ((member l +range-types+)
 				    (reduce 'range-or (mapcar (lambda (x) (number-range-fixup `((,x . ,x)) l)) z)))
 				   ((and (consp l) (eq (car l) 'complex))
-				    (cons
-				     (reduce 'range-or (mapcar (lambda (x) (let ((q (realpart x))) 
-									     (number-range-fixup `((,q . ,q)) (cadr l)))) z))
-				     (reduce 'range-or (mapcar (lambda (x) (let ((q (imagpart x))) 
-									     (number-range-fixup `((,q . ,q)) (cadr l)))) z))))
+				    (let ((q (reduce 'range-or (mapcar (lambda (x) (let ((q (realpart x))(r (imagpart x)))
+									    (number-range-fixup `((,(min q r) . ,(max q r))) (cadr l)))) z))))
+				      (cons q q)))
+;				    (cons
+;				     (reduce 'range-or (mapcar (lambda (x) (let ((q (realpart x))) 
+;									     (number-range-fixup `((,q . ,q)) (cadr l)))) z))
+;				     (reduce 'range-or (mapcar (lambda (x) (let ((q (imagpart x))) 
+;									     (number-range-fixup `((,q . ,q)) (cadr l)))) z))))
 				   (`(member ,@z))))
 			  (lst (and (consp l) (if (eq (car l) 'array) +array-type-alist+ +complex-type-alist+)))
 			  (z (and z `(,(if lst (cdr (assoc (cadr l) lst)) l) ,z))))

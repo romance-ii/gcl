@@ -124,8 +124,11 @@ ihs_top_function_name(ihs_ptr h)
 
 
 object
-Icall_error_handler(object error_name,object error_format_string,int nfmt_args,...)
-{ object b[20];
+Icall_error_handler(object error_name,object error_format_string,int nfmt_args,...) { 
+
+  object b[20],*bs=vs_base,res;
+  int n;
+
   b[0]= error_name;
   b[1]= Cnil;  /* continue format */
   b[2] = ihs_top_function_name(ihs_top);
@@ -139,12 +142,21 @@ Icall_error_handler(object error_name,object error_format_string,int nfmt_args,.
      }
     va_end(ap);
   }
-  return IapplyVector(sSuniversal_error_handler,nfmt_args+5,b);
+  res=IapplyVector(sSuniversal_error_handler,nfmt_args+5,b);
+  n = fcall.nvalues;
+  vs_base = bs;
+  vs_top =  bs+ n;
+  while (--n> 0 ) bs[n] = fcall.values[n];
+  bs[0] = res;
+  return res;
 }
 
 object
-Icall_continue_error_handler(object continue_format_string,object error_name,object error_format_string,int nfmt_args,...)
-{ object b[20];
+Icall_continue_error_handler(object continue_format_string,object error_name,object error_format_string,int nfmt_args,...) { 
+
+  object b[20],*bs=vs_base,res;
+  int n;
+
   b[0]= error_name;
   b[1]= Ct;  /* continue format */
   b[2] = ihs_top_function_name(ihs_top);
@@ -158,14 +170,20 @@ Icall_continue_error_handler(object continue_format_string,object error_name,obj
      }
     va_end(ap);
   }
-  return IapplyVector(sSuniversal_error_handler,nfmt_args+5,b);
+  res=IapplyVector(sSuniversal_error_handler,nfmt_args+5,b);
+  n = fcall.nvalues;
+  vs_base = bs;
+  vs_top =  bs+ n;
+  while (--n> 0 ) bs[n] = fcall.values[n];
+  bs[0] = res;
+  return res;
 }
 
 DEFUNO_NEW("ERROR",object,fLerror,LISP
 	   ,1,F_ARG_LIMIT,NONE,OO,OO,OO,OO,void,Lerror,(object name_or_fmt,...),"") {
 
   int n=VFUN_NARGS-1,i=4;
-  object b[F_ARG_LIMIT],name,fmt_string;
+  object b[F_ARG_LIMIT],name,fmt_string,*bs=vs_base,res;
   va_list ap;
 
   va_start(ap,name_or_fmt);
@@ -185,7 +203,13 @@ DEFUNO_NEW("ERROR",object,fLerror,LISP
   while (n--)
     b[++i]=va_arg(ap,object);
   va_end(ap);
-  RETURN1(IapplyVector(sSuniversal_error_handler,++i,b));
+  res=IapplyVector(sSuniversal_error_handler,++i,b);
+  n = fcall.nvalues;
+  vs_base = bs;
+  vs_top =  bs+ n;
+  while (--n> 0 ) bs[n] = fcall.values[n];
+  bs[0] = res;
+  RETURN1(res);
 
 }
 
@@ -236,9 +260,9 @@ DEFUNO_NEW("CERROR",object,fLcerror,LISP
 	   ,2,F_ARG_LIMIT,NONE,OO,OO,OO,OO,void,Lcerror,(object continue_fmt_string,object name_or_fmt,...),"") {
 
   int n=VFUN_NARGS-2,i=4;
-  object b[F_ARG_LIMIT],fmt_string,name;
+  object b[F_ARG_LIMIT],fmt_string,name,*bs=vs_base,res;
   va_list ap;
-  
+
   va_start(ap,name_or_fmt);
   if (type_of(name_or_fmt)==t_string) {
     name=sKerror;
@@ -256,7 +280,13 @@ DEFUNO_NEW("CERROR",object,fLcerror,LISP
   while (n--)
     b[++i]=va_arg(ap,object);
   va_end(ap);
-  RETURN1(IapplyVector(sSuniversal_error_handler,++i,b));
+  res=IapplyVector(sSuniversal_error_handler,++i,b);
+  n = fcall.nvalues;
+  vs_base = bs;
+  vs_top =  bs+ n;
+  while (--n> 0 ) bs[n] = fcall.values[n];
+  bs[0] = res;
+  RETURN1(res);
 }
 
 

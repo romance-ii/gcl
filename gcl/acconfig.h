@@ -220,6 +220,7 @@ SGC is enabled.  */
 
 #ifdef HAVE_MATH_H
 #include <math.h>
+#include <complex.h>
 #endif
 
 #undef WORDS_BIGENDIAN

@@ -606,6 +606,7 @@ sgc_mark_object1(object x) {
 
   case t_cfdata:
     
+    sgc_mark_object(x->cfd.cfd_dlist);
     if (x->cfd.cfd_self != NULL) {
       int i=x->cfd.cfd_fillp;
       while(i-- > 0)

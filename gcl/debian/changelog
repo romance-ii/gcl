@@ -27,8 +27,10 @@ gclcvs (2.7.0-69) unstable; urgency=low
   * no check_arg in DEFUN_NEW C functions
   * fix read-char-no-hang on mingw
   * fix cfast-write -- todo, optimize
+  * support for persistent external dl function access, inline complex
+    arithmetic
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 17 May 2007 18:02:34 -0400
+ -- Camm Maguire <camm@enhanced.com>  Fri, 08 Jun 2007 11:49:29 -0400
 
 gclcvs (2.7.0-68) unstable; urgency=low
 

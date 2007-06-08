@@ -56,13 +56,7 @@
 		(wt (bignum-expansion-storage) ");"))
 	       (t 
 		(wt-nl "V" (var-loc var) "=")
-		(cond ;FIXME
-		 ((eq (var-kind var) 'OBJECT))
-		 ((eq (var-kind var) #tfixnum) (wt "fix"))
-		 ((eq (var-kind var) #tcharacter) (wt "char_code"))
-		 ((eq (var-kind var) #tlong-float) (wt "lf"))
-		 ((eq (var-kind var) #tshort-float) (wt "sf"))
-		 ((baboon)))
+		(wt (or (cdr (assoc (var-kind var) +to-c-var-alist+)) (baboon)))
 		(wt "(") (wt-vs (var-ref var)) (wt ");"))))))
 
 (defun c2bind-loc (var loc)

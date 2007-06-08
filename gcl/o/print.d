@@ -2088,7 +2088,7 @@ DEFVAR("*PRINT-ARRAY*",sLAprint_arrayA,LISP,Ct,"");
 DEFVAR("*PRINT-PACKAGE*",sSAprint_packageA,SI,Cnil,"");
 DEFVAR("*PRINT-STRUCTURE*",sSAprint_structureA,SI,Ct,"");
 DEF_ORDINARY("PRETTY-PRINT-FORMAT",sSpretty_print_format,SI,"");
-DEFVAR("*PRINT-NANS*",sSAprint_nansA,SI,Cnil,"");
+DEFVAR("*PRINT-NANS*",sSAprint_nansA,SI,Ct,"");
 
 
 /*

@@ -266,6 +266,7 @@ fasload(faslfile)
 
 #ifndef STAND
    memory = alloc_object(t_cfdata);
+   memory->cfd.cfd_dlist = Cnil;
    memory->cfd.cfd_self = 0;
    memory->cfd.cfd_start = 0;
    memory->cfd.cfd_size = current + (max_align > sizeof(char *) ?

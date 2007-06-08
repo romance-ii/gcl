@@ -168,18 +168,23 @@
 				    (push (list v (var-mt v) (var-tag v)) vl)
 				    (setf (var-tag v) nt (var-mt v) (var-type v))))
 	       (unwind-protect 
-		   (do ((tob ob ob) (tnb nb nb) *tvc*)
+		   (do ((tob ob ob) (tnb nb nb) *tvc* ns nud)
 		       ((not 
 			 (let ((nv (with-restore-vars  
 				     (catch nt 
 				       (do (l (*warning-note-stack* 
-					       (when (boundp '*warning-note-stack*) *warning-note-stack*)) *undefined-vars*) 
-					   ((not (setq l (pop tob))) (setq *restore-vars* nil))
+					       (when (boundp '*warning-note-stack*) *warning-note-stack*))
+					      *undefined-vars*) 
+					   ((not (setq l (pop tob))) 
+					    (setq ns (when (boundp '*warning-note-stack*) *warning-note-stack*) nud *undefined-vars*)
+					    (do nil ((not (setq l (pop *restore-vars*)))) 
+					      (setf (var-type (car l)) (var-mt (car l)))))
 					 (push (if (typep l 'tag) 
 						   (progn (pop-restore-vars) l)
 						 (c1expr* l info)) tnb))))));maybe copy-info here
 			   (when nv
 			     (do nil ((not (setq nv (pop *tvc*))) t) (setf (var-type nv) (var-mt nv))))))
+			(when ns (setq *warning-note-stack* ns)) (setq *undefined-vars* nud)
 			tnb))
 		 (dolist (v vl) 
 		   (when (caddr v)
@@ -272,6 +277,7 @@
   (let ((*unwind-exit* (cons 'frame *unwind-exit*))
         (ref-clb (vs-push)))
     (wt-nl) (wt-vs ref-clb) (wt "=alloc_frame_id();")
+    (add-setjmp)
     (wt-nl "frs_push(FRS_CATCH,") (wt-vs ref-clb) (wt ");")
     (wt-nl "if(nlj_active){")
     (wt-nl "nlj_active=FALSE;")
@@ -302,6 +308,7 @@
     (wt-clink) (wt ");")
     (clink ref-clb)
     (setq ref-ccb (ccb-vs-push))
+    (add-setjmp)
     (wt-nl "frs_push(FRS_CATCH,") (wt-vs* ref-clb) (wt ");")
     (wt-nl "if(nlj_active){")
     (wt-nl "nlj_active=FALSE;")

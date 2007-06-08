@@ -1764,6 +1764,9 @@ int
 my_plt(const char *,unsigned long *);
 
 int
+my_pltp(const char *,unsigned long *);
+
+int
 parse_plt(void);
 
 int
@@ -1853,3 +1856,18 @@ object
 macro_def_int(object);
 
 /* void call_after_gbc_hook(int); */
+
+int
+reset_plt(void);
+
+fcomplex
+object_to_fcomplex(object);
+
+object
+make_fcomplex(fcomplex);
+
+dcomplex
+object_to_dcomplex(object);
+
+object
+make_dcomplex(dcomplex);

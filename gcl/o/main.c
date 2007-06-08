@@ -432,7 +432,7 @@ gcl_main(int argc, char **argv, char **envp)
 
     CMPtemp = CMPtemp1 = CMPtemp2 = CMPtemp3 = OBJNULL;
 
-    parse_plt();
+/*     parse_plt(); */
     gcl_init_init();
 
     sLApackageA->s.s_dbind = user_package;
@@ -1281,6 +1281,9 @@ init_main(void) {
   ADD_FEATURE("TK-PRIMITIVES");
 #endif	 
 
+#ifdef STATIC_LINKING
+  ADD_FEATURE("STATIC");
+#endif	 
   make_special("*FEATURES*",features);}
   
   make_si_function("SAVE-SYSTEM", siLsave_system);

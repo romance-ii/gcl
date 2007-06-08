@@ -206,6 +206,7 @@ struct shortfloat_struct {
 };
 #define Msf(obje) (obje)->SF.SFVAL
 #define sf(x) Msf(x)
+#define sfc(x) (sf(x->cmp.cmp_real)+I*sf(x->cmp.cmp_imag))
 
 struct longfloat_struct {
 
@@ -217,6 +218,7 @@ struct longfloat_struct {
 };
 #define Mlf(obje) (obje)->LF.LFVAL
 #define lf(x) Mlf(x)
+#define lfc(x) (lf(x->cmp.cmp_real)+I*lf(x->cmp.cmp_imag))
 
 
 struct bignum {
@@ -239,7 +241,7 @@ struct ratio {
 
 };
 
-struct complex {
+struct ocomplex {
 
   FIRSTWORD;
 
@@ -840,7 +842,7 @@ struct cfdata {
   fixnum  cfd_size;              /* size of contblock */
   fixnum  cfd_fillp;             /* size of self */
   object *cfd_self;              /* body */
-  SPAD;
+  object  cfd_dlist;;
 
 };
 
@@ -869,7 +871,7 @@ union lispunion {
  struct ratio             rat; /*  ratio  */
  struct shortfloat_struct  SF; /*  short floating-point number  */
  struct longfloat_struct   LF; /*  plong floating-point number  */
- struct complex           cmp; /*  complex number  */
+ struct ocomplex          cmp; /*  complex number  */
  struct character          ch; /*  character  */
  struct symbol              s; /*  symbol  */
  struct package             p; /*  package  */

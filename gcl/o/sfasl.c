@@ -412,6 +412,7 @@ int fasload ( object faslfile )
             memory = alloc_object ( t_cfdata );
             memory->cfd.cfd_self = 0;
             memory->cfd.cfd_start = 0;
+            memory->cfd.cfd_dlist = Cnil;
             memory->cfd.cfd_size = datasize + textsize + bsssize + stabsize + stabstrsize + rdatasize + extra_bss;
             vs_push(memory);
             the_start = start_address =        

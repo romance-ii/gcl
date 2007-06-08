@@ -11,7 +11,7 @@ APPEND=../xbin/append
 
 PREFS:= recompile callhash arraylib assert defmacro defstruct \
 	  describe evalmacros \
-	  iolib listlib mislib module numlib \
+	  iolib listlib mislib module numlib mnum \
 	  packlib predlib \
 	  seq seqlib setf top trace sloop \
           debug info serror 

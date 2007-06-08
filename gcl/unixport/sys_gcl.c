@@ -98,8 +98,10 @@ gcl_init_system(object no_init)
   lsp_init("../mod/gcl_win32.lsp"); /* Needed for package declaration when compiling later. */
 #endif
 #endif  
-  ar_check_init(gcl_iolib,no_init);
   ar_check_init(gcl_mislib,no_init);
+  ar_check_init(gcl_iolib,no_init);
+  ar_check_init(gcl_bnum,no_init);
+  ar_check_init(gcl_mnum,no_init);
   ar_check_init(gcl_numlib,no_init);
   ar_check_init(gcl_packlib,no_init);
   ar_check_init(gcl_trace,no_init);

@@ -119,23 +119,33 @@
   (coerce-to-string datum args))
 (defun process-warning (datum args function-name &optional default-type)
   (process-error datum args function-name default-type))
+(defun no-value nil (values))
+(defun skip-error (datum)
+  (and *ignore-floating-point-errors* 
+	   (member datum '(floating-point-overflow floating-point-underflow))))
 (defun error (datum &rest arguments)
-  (with-error-level-bindings (error datum arguments)
-   (let ((pe (process-error datum arguments 'error)))
-     (proto-invoke-debugger pe)
-     (throw *quit-tag* *quit-tag*))))
+  (if (skip-error datum)
+      (no-value)
+    (with-error-level-bindings
+     (error datum arguments)
+     (let ((pe (process-error datum arguments 'error)))
+       (proto-invoke-debugger pe)
+       (throw *quit-tag* *quit-tag*)))))
   
 (defvar *default-continue-string* nil)
 
 (defun cerror (continue-string datum &rest arguments)
-  (with-error-level-bindings (cerror datum arguments)
-   (let ((*default-continue-string* continue-string))
-     (catch 'cerror;remove in ansi
-       (proto-with-simple-restart
-	(proto-continue (apply 'format nil continue-string arguments))
-	(apply 'error datum arguments)))
-     nil)))
+  (unless (skip-error datum)
+    (with-error-level-bindings
+     (cerror datum arguments)
+     (let ((*default-continue-string* continue-string))
+       (catch 'cerror;remove in ansi
+	 (proto-with-simple-restart
+	  (proto-continue (apply 'format nil continue-string arguments))
+	  (apply 'error datum arguments)))
+       nil))))
 
+(defvar *ignore-floating-point-errors* nil)
 (defun universal-error-handler
   (error-name &optional (correctable *default-continue-string* cp)
 	      function-name
@@ -143,41 +153,44 @@
    &rest args)
   (declare (:dynamic-extent args))
 
-  (maybe-clear-input)
-
-  (with-error-level-bindings (universal-error-handler error-name args
-						      (list function-name continue-format-string error-format-string))
-
-   (let ((message (if cp (process-error error-name args 'universal-error-handler)
-		    error-name))
-	 (function-name (or function-name (ihs-fname *current-ihs*))))
-     (proto-signal message)
-     (let ((*print-pretty* nil)
-	   (*print-level* *debug-print-level*)
-	   (*print-length* *debug-print-level*)
-	   (*print-case* :upcase))
-       (terpri *error-output*)
-       (format *error-output* (if (and correctable *break-enable*) "~&Correctable error: " "~&Error: "))
-       (let ((*indent-formatted-output* t))
-	 (when (stringp message) (format *error-output* message)))
-       (terpri *error-output*)
-       (if (> (length *link-array*) 0)
-	   (format *error-output* "Fast links are on: do (si::use-fast-links nil) for debugging~%"))
-       (format *error-output* "Signalled by ~:@(~S~).~%" (or function-name "an anonymous function"))
-       (when (and correctable *break-enable*)
-	 (format *error-output* "~&If continued: ")
+  (unless (skip-error error-name)
+    
+    (maybe-clear-input)
+    
+    (with-error-level-bindings
+     (universal-error-handler error-name args
+			      (list function-name continue-format-string error-format-string))
+     
+     (let ((message (if cp (process-error error-name args 'universal-error-handler)
+		      error-name))
+	   (function-name (or function-name (ihs-fname *current-ihs*))))
+       (proto-signal message)
+       (let ((*print-pretty* nil)
+	     (*print-level* *debug-print-level*)
+	     (*print-length* *debug-print-level*)
+	     (*print-case* :upcase))
+	 (terpri *error-output*)
+	 (format *error-output* (if (and correctable *break-enable*) "~&Correctable error: " "~&Error: "))
 	 (let ((*indent-formatted-output* t))
-	   (format *error-output* "~?~&" continue-format-string args))))
-     (force-output *error-output*)
-     (cond ((member 'cerror *error-stack*)
-	    (break-level message)
-	    (throw 'cerror t))
-	   (correctable
-	    (proto-with-simple-restart
-	     (proto-continue (apply 'format nil continue-format-string args))
-	     (break-level message))
-	    nil)
-	   (t (break-level message) (throw *quit-tag* *quit-tag*))))))
+	   (when (stringp message) (format *error-output* message)))
+	 (terpri *error-output*)
+	 (if (> (length *link-array*) 0)
+	     (format *error-output* "Fast links are on: do (si::use-fast-links nil) for debugging~%"))
+	 (format *error-output* "Signalled by ~:@(~S~).~%" (or function-name "an anonymous function"))
+	 (when (and correctable *break-enable*)
+	   (format *error-output* "~&If continued: ")
+	   (let ((*indent-formatted-output* t))
+	     (format *error-output* "~?~&" continue-format-string args))))
+       (force-output *error-output*)
+       (cond ((member 'cerror *error-stack*)
+	      (break-level message)
+	      (throw 'cerror t))
+	     (correctable
+	      (proto-with-simple-restart
+	       (proto-continue (apply 'format nil continue-format-string args))
+	       (break-level message))
+	      nil)
+	     (t (break-level message) (throw *quit-tag* *quit-tag*)))))))
 
 (defun dbl-eval (- &aux (break-command t))
   (let ((val-list (multiple-value-list

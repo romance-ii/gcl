@@ -271,6 +271,3 @@
   (setq *prof-list* (sort *prof-list* (lambda (x y) (> (reduce (lambda (y x) (+ y (cadr x))) (cdr x) :initial-value 0)
 						       (reduce (lambda (y x) (+ y (cadr x))) (cdr y) :initial-value 0)))))
   (print *prof-list*))
-
-
-	

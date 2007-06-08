@@ -728,6 +728,44 @@ DEFUNO_NEW("POWM",object,fSpowm,SI,
 }
 
 
+DEFUN_NEW("ISNAN",object,fSisnan,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+
+  switch (type_of(x)) {
+  case t_longfloat:
+    return isnan(lf(x)) ? Ct : Cnil;
+    break;
+  case t_shortfloat:
+    return isnan(sf(x)) ? Ct : Cnil;
+    break;
+  default:
+    return Cnil;
+    break;
+  }
+
+  return Cnil;
+
+}
+
+
+DEFUN_NEW("ISINF",object,fSisinf,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") {
+
+  switch (type_of(x)) {
+  case t_longfloat:
+    return isinf(lf(x)) ? Ct : Cnil;
+    break;
+  case t_shortfloat:
+    return  isinf(sf(x)) ? Ct : Cnil;
+    break;
+  default:
+    return Cnil;
+    break;
+  }
+
+  return Cnil;
+
+}
+
+
 void
 gcl_init_num_sfun(void)
 {

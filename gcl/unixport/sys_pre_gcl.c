@@ -89,6 +89,7 @@ gcl_init_system(object no_init)
 
   lsp_init("../lsp/gcl_seq.lsp");
   lsp_init("../lsp/gcl_seqlib.lsp");
+  lsp_init("../lsp/gcl_bnum.lsp");
   lsp_init("../lsp/gcl_numlib.lsp");
 
   lsp_init("../lsp/gcl_defstruct.lsp");
@@ -105,20 +106,10 @@ gcl_init_system(object no_init)
 #endif
 #endif  
   lsp_init("../lsp/gcl_iolib.lsp");
-/*   lsp_init("../lsp/gcl_listlib.lsp"); */
-/*   lsp_init("../lsp/gcl_mislib.lsp"); */
-/*   lsp_init("../lsp/gcl_numlib.lsp"); */
   lsp_init("../lsp/gcl_packlib.lsp");
-/*   lsp_init("../lsp/gcl_seq.lsp"); */
-/*   lsp_init("../lsp/gcl_seqlib.lsp"); */
   lsp_init("../lsp/gcl_trace.lsp");
   lsp_init("../lsp/gcl_sloop.lsp");
   lsp_init("../lsp/gcl_serror.lsp");
-
-/*   lsp_init("../mod/gcl_destructuring_bind.lsp"); */
-/*   lsp_init("../mod/gcl_loop.lsp"); */
-/*   lsp_init("../mod/gcl_defpackage.lsp"); */
-/*   lsp_init("../mod/gcl_make_defpackage.lsp"); */
 
   lsp_init("../cmpnew/gcl_cmptype.lsp");
   lsp_init("../cmpnew/gcl_cmpinline.lsp");
@@ -127,7 +118,6 @@ gcl_init_system(object no_init)
   lsp_init("../lsp/gcl_debug.lsp");
   lsp_init("../lsp/gcl_info.lsp");
 
-/*   lsp_init("../cmpnew/gcl_cmptype.lsp"); */
   lsp_init("../cmpnew/gcl_cmpbind.lsp");
   lsp_init("../cmpnew/gcl_cmpblock.lsp");
   lsp_init("../cmpnew/gcl_cmpcall.lsp");

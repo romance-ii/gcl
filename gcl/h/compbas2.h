@@ -192,5 +192,3 @@ object on_stack_make_list();
 #ifndef KEYTYPE
 #define KEYTYPE void *
 #endif
-
-

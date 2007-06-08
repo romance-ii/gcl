@@ -414,7 +414,7 @@
 			 (push v vars)
 			 (set-var-init-type (car vars) (info-type (second  (car forms))))
 			 (push v *vars*)))))
-    (when *inline-forms* (print args)(break))
+;    (when *inline-forms* (print args)(break))
     (check-vdecl vnames ts is)
     (setq body (c1decl-body other-decls body)))
   (add-info info (cadr body))

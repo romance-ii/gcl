@@ -332,7 +332,7 @@ CMPINCLUDE_FILES=$(HDIR)cmpincl1.h $(HDIR)gclincl.h $(HDIR)compbas.h $(HDIR)enum
 	$(HDIR)bds.h $(HDIR)frame.h \
 	$(HDIR)lex.h $(HDIR)eval.h    $(HDIR)funlink.h \
 	$(HDIR)att_ext.h $(HDIR)new_decl.h $(HDIR)compbas2.h \
-	$(HDIR)compat.h $(HDIR)cmponly.h $(ODIR)/regexp.h $(HDIR)/protoize.h
+	$(HDIR)compat.h $(HDIR)cmponly.h $(ODIR)/regexp.h $(HDIR)/protoize.h $(HDIR)cmponly_last.h
 
 OTHERS=$(HDIR)notcomp.h $(HDIR)rgbc.h $(HDIR)stacks.h 
 

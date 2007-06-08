@@ -215,7 +215,16 @@
 (defun length (x)
   (declare (optimize (safety 1)))
   (check-type x proper-sequence)
-  (if (listp x) (do ((i 0 (1+ i))(x x (cdr x))) ((endp x) i) (declare (seqind i))) (vec-length x)))
+  (if (listp x)
+      (cond ((endp x) 0) 
+	    ((endp (setq x (cdr x))) 1)
+	    ((endp (setq x (cdr x))) 2)
+	    ((endp (setq x (cdr x))) 3)
+	    ((endp (setq x (cdr x))) 4)
+	    ((do ((i 5 (1+ i))(x (cdr x) (cdr x))) ((endp x) i) (declare (seqind i)))))
+    (vec-length x)))
+  
+;  (if (listp x) (do ((i 0 (1+ i))(x x (cdr x))) ((endp x) i) (declare (seqind i))) (vec-length x)))
 
 (defun elt (seq n)
   (declare (optimize (safety 1)))
@@ -1007,14 +1016,22 @@
 (defun stable-sort (sequence predicate &key (key #'identity))
   (declare (optimize (safety 1)))
   (check-type sequence sequence)
-  (if (listp sequence)
-      (list-merge-sort sequence predicate key (comp-key key))
-      (if (or (stringp sequence) (bit-vector-p sequence))
-          (sort sequence predicate :key key)
-          (coerce (list-merge-sort (coerce sequence 'list)
-                                   predicate
-                                   key (comp-key key))
-                  (seqtype sequence)))))
+  (typecase 
+   sequence
+   (list (list-merge-sort sequence predicate key (comp-key key)))
+   (string (sort sequence predicate :key key))
+   (bit-vector (sort sequence predicate :key key))
+   (otherwise 
+    (coerce (list-merge-sort (coerce sequence 'list) predicate key (comp-key key))
+	    (seqtype sequence)))))
+;  (if (listp sequence)
+;      (list-merge-sort sequence predicate key (comp-key key))
+;      (if (or (stringp sequence) (bit-vector-p sequence))
+;          (sort sequence predicate :key key)
+;          (coerce (list-merge-sort (coerce sequence 'list)
+;                                   predicate
+;                                   key (comp-key key))
+;                  (seqtype sequence)))))
 
 
 (defun merge (result-type sequence1 sequence2 predicate

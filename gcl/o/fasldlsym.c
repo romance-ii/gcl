@@ -95,6 +95,7 @@ fasload(object faslfile) {
   memory->cfd.cfd_self = NULL;
   memory->cfd.cfd_start = NULL;
   memory->cfd.cfd_size = 0;
+  memory->cfd.cfd_dlist = Cnil;
 
   if(symbol_value(sLAload_verboseA)!=Cnil)	
     printf(" ;; start address (dynamic) %p ",fptr);

@@ -121,6 +121,7 @@
 		 (HANDLER-BIND ,(MAPCAR #'(LAMBDA (ANNOTATED-CASE)
 					    (LIST (CADR ANNOTATED-CASE)
 						  `#'(LAMBDA (TEMP)
+  						       (declare (ignorable temp))
 						       ,@(IF (CADDR ANNOTATED-CASE)
 							     `((SETQ ,VAR TEMP)))
 						       (GO ,(CAR ANNOTATED-CASE)))))

@@ -184,7 +184,7 @@
 			   (*compile-verbose* verbose)
                            (*package* *package*)
 			   (*DEFAULT-PATHNAME-DEFAULTS* #"")
-			   (*data* (list (make-array 50 :fill-pointer 0 :adjustable t) nil nil))
+			   (*data* (list (make-array 50 :fill-pointer 0 :adjustable t) nil nil nil))
 			   (*fasd-data* *fasd-data*)
                            (*error-count* 0))
   (declare (special *c-debug* system-p))
@@ -392,7 +392,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
     (wt-data1 form)  ;; this binds all the print stuff
     ))
 
-(defun compile (name &optional def &aux tem gaz (*default-pathname-defaults* #"."))
+(defun compile (name &optional def &aux mac tem gaz (*default-pathname-defaults* #"."))
   
   (when (eq name 'cmp-anon)
     (remhash name si::*call-hash-table*)
@@ -405,20 +405,15 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	 (setf (symbol-function name) (coerce def 'function))
 	 (compile name))
 	(def (error "def not a lambda expression"))
-	((setq tem (macro-function name))
-	 (setf (symbol-function 'cmp-anon) tem)
-	 (compile 'cmp-anon)
-	 (setf (macro-function name) (macro-function name))
 	 ;; FIXME -- support warnings-p and failures-p.  CM 20041119
-	 (values name nil nil))
-	((setq tem (function-lambda-expression (symbol-function name)))
+	((setq tem (function-lambda-expression (or (setq mac (macro-function name)) (symbol-function name))))
 	 (let ((na (if (symbol-package name) name 'cmp-anon)) warnings failures)
 	   (unless (and (fboundp 'si::init-cmp-anon) (or (si::init-cmp-anon) (fmakunbound 'si::init-cmp-anon)))
 	     (with-open-file
 	      (st (setq gaz (gazonk-name)) :direction :output))
 	     (multiple-value-bind 
 	      (fn w f)
-	      (let ((*compiler-compile* `(defun ,na 
+	      (let ((*compiler-compile* `(,(if mac 'defmacro 'defun) ,na 
 					   ,@(ecase (car tem)
 						    (lambda (cdr tem))
 						    (lambda-block (cddr tem)))))) (compile-file gaz))
@@ -434,7 +429,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	(t (error "can't compile ~a" name))))
 
 
-(defun disassemble (name &optional (asm t) &aux tem)
+(defun disassemble (name &optional (asm t) &aux tem mac)
   (check-type name (or function function-identifier))
   (cond ((and (consp name)
 	      (eq (car name) 'lambda))
@@ -444,19 +439,12 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	 (eval `(defun cmp-anon ,@ (cdr name)))
 	 (disassemble 'cmp-anon asm))
 	((not(symbolp name)) (princ "Not a lambda or a name") nil)
-	((setq tem(macro-function name))
-	 (setf (symbol-function 'cmp-tmp-macro) tem)
-	 (disassemble 'cmp-tmp-macro asm)
-	 (setf (macro-function name) (macro-function name))
-	 nil)
-	((and (setq tem (symbol-function name))
-	      (or (consp tem) (when (typep tem 'interpreted-function) 
-				(setq tem (si::interpreted-function-lambda tem))))
-	      (eq (car tem) 'lambda-block))
+	((and (setq tem (or (setq mac (macro-function name)) (symbol-function name)))
+	      (or (consp tem) (setq tem (function-lambda-expression tem))))
 	 (let ((gaz (gazonk-name)))
 	   (with-open-file
 	     (st gaz :direction :output)
-	     (prin1-cmp `(defun ,name ,@ (cddr tem))       st))
+	     (prin1-cmp `(,(if mac 'defmacro 'defun) ,name ,@(cdr tem)) st))
 	   (let (*fasd-data*)
 	     (compile-file gaz 
 			   :h-file t 
@@ -487,7 +475,6 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	     (delete-file on)
 	     (unless *keep-gaz* (delete-file gaz))
 	     nil)))
-	((setq tem (si::function-src name)) (disassemble tem asm))
 	((princ name) nil))) ;(error "can't disassemble ~a" name)
 
 
@@ -497,7 +484,8 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
     (let ((*compiler-output1* (if (eq system-p 'disassemble) *standard-output*
 				st)))
       (declare (special *compiler-output1*))
-    (with-open-file (*compiler-output2* h-pathname :direction :output)
+    (with-open-file 
+     (*compiler-output2* h-pathname :direction :output)
       (cond ((and 
 	      (stringp *cmpinclude-string*)
 	      (not system-p)

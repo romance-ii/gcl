@@ -99,12 +99,33 @@
     (setq *package* z)
     (format t "Emergency reset complete~%")))
 
+(defconstant +coerce-list+ '(list vector string array character short-float long-float float complex function null cons))
+
+(defun show-lib-syms nil
+  (when (find-package "LIB")
+    (do-external-symbols 
+     (p "LIB")
+     (print (list p (symbol-value p) (find-package p)))
+     (do-external-symbols 
+      (s p)
+      (print (list s (symbol-value s) (when (fboundp s) (symbol-function s))))))))
+
+(defun reset-lib-syms nil
+  (when (find-package "LIB")
+    (do-external-symbols 
+     (p "LIB")
+     (setf (symbol-value p) (dlopen (lib-name p)))
+     (do-external-symbols 
+      (s p)
+      (setf (symbol-value s) (dlsym (symbol-value p) s)))))
+  (cfdl))
 
 (defun top-level1 ()
   (let ((+ nil) (++ nil) (+++ nil)
         (- nil) 
         (* nil) (** nil) (*** nil)
         (/ nil) (// nil) (/// nil))
+    (reset-lib-syms)
     (setq *lisp-initialized* t)
     (catch *quit-tag*
       (cond

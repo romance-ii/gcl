@@ -676,6 +676,7 @@ mark_object(object x) {
     
   case t_cfdata:
     
+    mark_object(x->cfd.cfd_dlist);
     if (x->cfd.cfd_self != NULL)
       {int i=x->cfd.cfd_fillp;
       while(i-- > 0)
@@ -1507,8 +1508,6 @@ DEFUN_NEW("ROOM-REPORT",object,fSroom_report,SI
 
   int i;
   object x;
-  
-  check_arg(0);
   
   /*
     GBC(t_contiguous);

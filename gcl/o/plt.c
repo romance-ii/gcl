@@ -41,6 +41,12 @@ extern int mcount();
 
 #define MY_PLT(a_) {#a_,(unsigned long)(void *)a_}
 
+/* static double cos1(double x) { */
+/*   return cos(x); */
+/* } */
+/* #undef cos */
+/* #define cos cos1 */
+
 static Plt mplt[]={
 	/* This is an attempt to at least capture the addresses to
 	   which the compiler directly refers in C code. (Some symbols
@@ -59,6 +65,27 @@ static Plt mplt[]={
 #  include "plt.h"
 #endif    
 };
+
+#undef MY_PLT
+#define MY_PLT(a_) ({if (!strcmp(p->n,(#a_))) {p->ad=(unsigned long)(void *)a_;continue;}})
+
+
+int
+reset_plt() {
+
+  Plt *p=mplt,*pe=p+sizeof(mplt)/sizeof(*mplt);
+
+  for (;p<pe;p++) {
+#ifndef _WIN32
+#  include "plt.h"
+#endif    
+    ;
+  }    
+
+  return 0;
+
+}
+
 
 object sSAplt_tableA;
 DEFVAR("*PLT-TABLE*",sSAplt_tableA,SI,Cnil,"");
@@ -188,6 +215,22 @@ my_plt(const char *s,unsigned long *v) {
   tp.n=stn(s);
   if ((p=bsearch(&tp,p,pe-p,sizeof(*p),pltcomp))) {
     *v=p->ad;
+    return 0;
+  }
+
+  return -1;
+
+}
+
+
+int
+my_pltp(const char *s,unsigned long *v) {
+
+  Plt *p=mplt,*pe=p+sizeof(mplt)/sizeof(*mplt),tp;
+
+  tp.n=stn(s);
+  if ((p=bsearch(&tp,p,pe-p,sizeof(*p),pltcomp))) {
+    *v=(unsigned long)&p->ad;
     return 0;
   }
 

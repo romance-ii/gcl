@@ -24,7 +24,8 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "include.h"
-
+#include <dlfcn.h>
+#include "page.h"
 
 #define dcheck_vs do{if (vs_base < vs_org || vs_top < vs_org) error("bad vs");} while (0)
 #define dcheck_type(a,b) check_type(a,b) ; dcheck_vs 
@@ -118,6 +119,92 @@ DEFUN_NEW("MC",object,fSmc,SI
   name=make_cclosure_new(PADDR(address),name,Cnil,
 			 sSPmemory->s.s_dbind);
   RETURN1(name);
+}
+
+DEFUN_NEW("CFDL",object,fScfdl,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+
+  struct typemanager *tm=tm_of(t_cfdata);
+  extern long maxpage;
+  unsigned long i;
+  int j;
+  object x;
+  void *p;
+  for (i=0;i<maxpage;i++) {
+    if (tm!=tm_of(type_map[i]))
+      continue;
+    for (p=pagetochar(i),j=tm->tm_nppage;j>0;--j,p+=tm->tm_size) {
+      x=(object)p;
+      if (type_of(x)!=t_cfdata)
+	continue;
+      for (x=x->cfd.cfd_dlist;x!=Cnil;x=x->c.c_cdr) {
+	fixnum j=fix(x->c.c_car->c.c_cdr),k=fix(x->c.c_car->c.c_car->s.s_dbind);
+	if (*(fixnum *)j!=k)
+	  *(fixnum *)j=k;
+      }
+    }
+  }
+  RETURN1(Cnil);
+}
+    
+DEFUN_NEW("DLSYM",object,fSdlsym,SI,2,2,NONE,OI,OO,OO,OO,(fixnum h,object name),"") {
+
+  char ch;
+  void *ad;
+
+  dlerror();
+  ch=name->st.st_self[name->st.st_fillp];
+  name->st.st_self[name->st.st_fillp]=0;
+  ad=dlsym(h ? (void *)h : RTLD_DEFAULT,name->st.st_self);
+  name->st.st_self[name->st.st_fillp]=ch;
+  if (dlerror())
+    FEerror("dlsym lookup failure on ~s",1,name);
+  RETURN1(make_fixnum((fixnum)ad));
+
+}
+
+DEFUN_NEW("DLADDR",object,fSdladdr,SI,1,1,NONE,OI,OO,OO,OO,(fixnum ad),"") {
+
+  Dl_info info;
+
+  dlerror();
+  dladdr((void *)ad,&info);
+  if (dlerror())
+    FEerror("dladdr lookup failure on ~s",1,make_fixnum(ad));
+  RETURN1(coerce_to_pathname(make_simple_string(info.dli_fname)));
+
+}
+
+
+
+DEFUN_NEW("DLOPEN",object,fSdlopen,SI,1,1,NONE,OO,OO,OO,OO,(object name),"") {
+
+  char ch;
+  void *v;
+
+  dlerror();
+  ch=name->st.st_self[name->st.st_fillp];
+  name->st.st_self[name->st.st_fillp]=0;
+  v=dlopen(name->st.st_self,RTLD_LAZY|RTLD_GLOBAL);
+  name->st.st_self[name->st.st_fillp]=ch;
+  if (dlerror())
+    FEerror("dlopen faiure on ~s",1,name);
+  
+  RETURN1(make_fixnum((fixnum)v));
+
+}
+
+DEFUN_NEW("DLADDR-SET",object,fSdladdr_set,SI,2,2,NONE,OI,IO,OO,OO,(fixnum adp,fixnum ad),"") {
+
+  *(void **)adp=(void *)ad;
+  RETURN1(Cnil);
+
+}
+
+DEFUN_NEW("DLLIST-PUSH",object,fSdllist_push,SI,3,3,NONE,OO,OI,OO,OO,(object cfd,object sym,fixnum adp),"") {
+
+  cfd->cfd.cfd_dlist=MMcons(MMcons(sym,make_fixnum(adp)),cfd->cfd.cfd_dlist);
+  RETURN1(Cnil);
+
 }
 
 static object

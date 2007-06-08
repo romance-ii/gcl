@@ -107,6 +107,7 @@
 (defmacro data-vector () `(car *data*))
 (defmacro data-inits () `(second *data*))
 (defmacro data-package-ops () `(third *data*))
+(defmacro data-dl () `(fourth *data*))
 
 )
 
@@ -133,6 +134,9 @@
         ((or (typep form 'long-float)
              (typep form 'short-float))
          (format *compiler-output1* "~10,,,,,,'eG" form))
+        ((or (typep form #tfcomplex)
+             (typep form #tdcomplex))
+	 (wt "(" (realpart form) " + I * " (imagpart form) ")"))
         (t (wt-loc form)))
   nil)
 
@@ -179,23 +183,42 @@
   vec
   )
 
+(si::putprop 'si::mdl t 'dlfun)
+(si::putprop 'si::mdlsym t 'dlfun)
+(si::putprop 'si::lib-name t 'dlfun)
 (defun add-init (x &optional endp)
   (let* ((x (if (and (consp x) (member (car x) '(shadow shadowing-import)))
 		(cons 'si::|#,| x) x))
 	 (tem (cons (si::hash-equal x -1000) x)))
-    (setf (data-inits)
-		    (if endp
-			(nconc (data-inits) (list tem))
-		      (cons tem (data-inits) )))
+    (if (and (member (car x) '(si::mfsfun si::mfvfun))
+	     (consp (cadr x)) (eq (caadr x) 'quote)
+	     (symbolp (cadadr x))
+	     (get (cadadr x) 'dlfun))
+	(setf (data-dl) (if endp (nconc (data-dl) (list tem)) (cons tem (data-dl) )))
+    (setf (data-inits) (if endp (nconc (data-inits) (list tem)) (cons tem (data-inits) ))))
     x))
+
+(defun add-dl (x &optional endp)
+  (let* ((x (if (and (consp x) (member (car x) '(shadow shadowing-import)))
+		(cons 'si::|#,| x) x))
+	 (tem (cons (si::hash-equal x -1000) x)))
+    (setf (data-dl)
+		    (if endp
+			(nconc (data-dl) (list tem))
+		      (cons tem (data-dl) )))
+    x))
+
 
 (defun wt-data-file ()
   (verify-data-vector (data-vector))
   (let* ((vec (coerce (nreverse (data-inits)) 'vector)))
     (verify-data-vector vec)
-    (let ((v (make-array 2)))
-      (setf (aref v 0) `(let ((si::*disable-recompile* t)) ,@(coerce vec 'list))
-	    (aref v 1) `(si::do-recompile)
+    (let* ((dll (length (data-dl)))
+	   (v (make-array (+ 2 dll))))
+      (do ((d (nreverse (data-dl)) (cdr d)) (i 0 (1+ i))) ((>= i dll))
+	(setf (aref v i) (cdar d)))
+      (setf (aref v dll) `(let ((si::*disable-recompile* t)) ,@(coerce vec 'list))
+	    (aref v (1+ dll)) `(si::do-recompile)
 	    (aref (data-vector) (- (length (data-vector)) 1))
 	    (cons 'si::%init v)))
     (setf (data-package-ops) (nreverse (data-package-ops)))
