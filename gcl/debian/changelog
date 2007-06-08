@@ -30,8 +30,9 @@ gclcvs (2.7.0-69) unstable; urgency=low
   * support for persistent external dl function access, inline complex
     arithmetic
   * vals_set scope fix
+  * inline-boole3-string fix
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 08 Jun 2007 12:13:35 -0400
+ -- Camm Maguire <camm@enhanced.com>  Fri, 08 Jun 2007 12:25:54 -0400
 
 gclcvs (2.7.0-68) unstable; urgency=low
 
