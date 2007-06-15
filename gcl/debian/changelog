@@ -34,8 +34,9 @@ gclcvs (2.7.0-69) unstable; urgency=low
   * misc compiler fixes and optimizations
   * fix si::no-value compiler bug
   * use system awk for ldd heap ceiling test
+  * compile/disassemble segfault fix
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 15 Jun 2007 15:01:55 -0400
+ -- Camm Maguire <camm@enhanced.com>  Fri, 15 Jun 2007 19:41:23 -0400
 
 gclcvs (2.7.0-68) unstable; urgency=low
 

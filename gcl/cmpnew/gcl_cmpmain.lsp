@@ -406,7 +406,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	 (compile name))
 	(def (error "def not a lambda expression"))
 	 ;; FIXME -- support warnings-p and failures-p.  CM 20041119
-	((setq tem (function-lambda-expression (or (setq mac (macro-function name)) (symbol-function name))))
+	((and (fboundp name) (setq tem (function-lambda-expression (or (setq mac (macro-function name)) (symbol-function name)))))
 	 (let ((na (if (symbol-package name) name 'cmp-anon)) warnings failures)
 	   (unless (and (fboundp 'si::init-cmp-anon) (or (si::init-cmp-anon) (fmakunbound 'si::init-cmp-anon)))
 	     (with-open-file
@@ -439,7 +439,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	 (eval `(defun cmp-anon ,@ (cdr name)))
 	 (disassemble 'cmp-anon asm))
 	((not(symbolp name)) (princ "Not a lambda or a name") nil)
-	((and (setq tem (or (setq mac (macro-function name)) (symbol-function name)))
+	((and (setq tem (and (fboundp name) (or (setq mac (macro-function name)) (symbol-function name))))
 	      (or (consp tem) (setq tem (function-lambda-expression tem))))
 	 (let ((gaz (gazonk-name)))
 	   (with-open-file
