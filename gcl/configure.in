@@ -1404,9 +1404,10 @@ else
 if ! test -x `which ldd` ; then
   heap_ceiling=0x0
 else
-echo "int main() {return 0;}" >foo.c
-$CC foo.c -o foo
-heap_ceiling=`ldd foo | tail -n 1 | awk '{print $NF}' | tr -d '()'`
+#echo -e "#include <stdio.h>\n int main() {printf(\"foo\");return 0;}" >foo.c
+#$CC foo.c -o foo
+AAWK=`which awk`
+heap_ceiling=`ldd $AAWK | tail -n 1 | awk '{print $NF}' | tr -d '()'`
 AC_TRY_RUN([#include <stdio.h>
 int main() {
     FILE *fp=fopen("conftest1","w");
