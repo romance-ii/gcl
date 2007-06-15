@@ -306,7 +306,7 @@
 	  ((caddr z)))))
 
 (defun c2let (vars forms body
-                   &aux block-p bindings initials used-vars
+                   &aux block-p bindings initials
                         (*unwind-exit* *unwind-exit*)
                         (*vs* *vs*) (*clink* *clink*) (*ccb-vs* *ccb-vs*))
   (do ((vl vars (cdr vl)) (fl forms (cdr fl)) (prev-ss nil))
@@ -361,15 +361,14 @@
 				 ((push (list var) bindings)
 				  (list 'vs (var-ref var))))
 			   form) initials))))
-        (when (eq (var-kind var) 'SPECIAL) (push (var-name var) prev-ss))
-	(unless (type>= #tnil (info-type (cadr form)))
-	  (push var used-vars))))
+        (when (eq (var-kind var) 'SPECIAL) (push (var-name var) prev-ss))))
   
-  (setq block-p (write-block-open (nreverse used-vars)))
+  (setq block-p (write-block-open vars))
 
   (dolist* (binding (nreverse initials))
 	   (cond ((type>= #tnil (info-type (cadr (third binding)))) 
-		  (let ((*value-to-go* 'trash)) (c2expr* (third binding))))
+		  (let ((*value-to-go* 'trash)) (c2expr* (third binding)))
+		  (let ((*value-to-go* (second binding))) (c2expr* (c1nil))))
 		 ((let ((*value-to-go* (second binding)))
 		    (c2expr* (third binding))))))
   (dolist* (binding (nreverse bindings))
@@ -474,7 +473,7 @@
 ;; 	  ((caddr z)))))
 
 (defun c2let* (vars forms body
-                    &aux (block-p nil) used-vars
+                    &aux (block-p nil)
                     (*unwind-exit* *unwind-exit*)
                     (*vs* *vs*) (*clink* *clink*) (*ccb-vs* *ccb-vs*))
   (do ((vl vars (cdr vl))
@@ -511,11 +510,9 @@
 			      (setf (var-ref var) (vs-push)))))))
 		(otherwise
 		 (unless (eq (var-kind var) 'object)
-		   (setf (var-ref var) (vs-push))))))
-	(unless (type>= #tnil (info-type (cadr form)))
-	  (push var used-vars))))
+		   (setf (var-ref var) (vs-push))))))))
 
-  (setq block-p (write-block-open (nreverse used-vars)))
+  (setq block-p (write-block-open vars))
 
   (do ((vl vars (cdr vl))
        (fl forms (cdr fl))
@@ -525,7 +522,9 @@
 ;      (print (list (var-kind var) (car form)))
       (cond
        ((eq (var-kind var) 'replaced))
-       ((type>= #tnil (info-type (cadr form))) (let ((*value-to-go* 'trash)) (c2expr* form)))
+       ((type>= #tnil (info-type (cadr form))) 
+	(let ((*value-to-go* 'trash)) (c2expr* form))
+	(c2bind-loc var nil))
        ((member (var-kind var) +c-local-var-types+)
 	(let ((*value-to-go* (list 'var var nil)))
 	      (c2expr* form)))
