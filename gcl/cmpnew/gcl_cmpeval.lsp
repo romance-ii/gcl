@@ -1275,7 +1275,7 @@
 	((or (vv-p (car form)) (vv-p (cdr form))))))
 
 ;;FIXME
-(dolist (l '(coerce complement open load delete-package import compile compile-file
+(dolist (l '(coerce constantly complement open load delete-package import compile compile-file
 		  error cerror warn break get-setf-method make-list))
   (si::putprop l t 'cmp-no-src-inline))
 
@@ -1377,7 +1377,7 @@
     d))
 
 (defun maybe-inline (form c1forms &optional last &aux (*in-inline* t))
-  (when (src-inlineable form)
+  (when (and (> *speed* 0) (src-inlineable form))
     (let* ((fms (append c1forms (list last)))
 	   (tpis (mapcar (lambda (x) (when x (cons (info-type (cadr x)) (ignorable-form x)))) fms))
 	   (prop (cons (car form) tpis)))
@@ -1540,7 +1540,7 @@
 	  (if (eq (car fd) 'call-local)
 	      ;; c1local-fun now adds fun-info into (cadr fd), so we need no longer
 	      ;; do it explicitly here.  CM 20031030
-	      (let* ((info (add-info (make-info :sp-change 1) (cadr fd)))
+	      (let* ((info (add-info (make-info :type (info-type (cadr fd)) :sp-change 1) (cadr fd)))
 		     (forms (c1args args info)))
 		(let ((return-type (get-local-return-type (caddr fd))))
 		  (when return-type (setf (info-type info) return-type)))

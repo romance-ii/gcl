@@ -517,7 +517,7 @@
     (fix-opt inline-info))
   ;;         FIXME -- the idea here is that an inline might want to
   ;;         force the coersion of certain arguments, notably fixnums,
-  ;;         in certain circumstances.  Thisd is already done
+  ;;         in certain circumstances.  This is already done
   ;;         elsewhere when the function is actually called, i.e. not
   ;;         inlined, and this logic should be centralized there.  CM 20050106
   (when (flag-p (third inline-info) itf)
@@ -525,9 +525,8 @@
       (return-from inline-type-matches (when restp `(,(car restp) ,(cadr restp) ,@(cddr inline-info))))))
 ;  (if (member 'integer (car inline-info) :key (lambda (x) (if (consp x) (car x) x)) :test #'eq)
 ;      (return-from inline-type-matches nil))
-  (let* ((return-type (coerce-to-one-value return-type))
-	 (rt (adj-cnum-tp (cmp-norm-tp (cadr inline-info)) return-type)))
-    (if (and (and return-type (type>= rt return-type))
+  (let ((rt (adj-cnum-tp (cmp-norm-tp (cadr inline-info)) return-type)))
+    (if (and (type>= rt return-type);FIXME nil return-type
 	     (let ((types (mapcar 'cmp-norm-tp (car inline-info)))(last t))
 	       (dolist** (arg-type arg-types (or (equal types '(*))
 						 (endp types)))

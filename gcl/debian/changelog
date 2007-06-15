@@ -31,8 +31,9 @@ gclcvs (2.7.0-69) unstable; urgency=low
     arithmetic
   * vals_set scope fix
   * inline-boole3-string fix
+  * misc compiler fixes and optimizations
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 08 Jun 2007 12:25:54 -0400
+ -- Camm Maguire <camm@enhanced.com>  Thu, 14 Jun 2007 20:16:34 -0400
 
 gclcvs (2.7.0-68) unstable; urgency=low
 

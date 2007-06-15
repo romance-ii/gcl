@@ -363,6 +363,10 @@
   (when (or (endp args) (endp (cdr args)))
     (too-few-args 'multiple-value-bind 2 (length args)))
 
+  (when (and (caar args) (not (cdar args)))
+    (return-from c1multiple-value-bind
+		 (c1expr `(let ((,(caar args) ,(cadr args))) ,@(cddr args)))))
+
 ;  (setq args (declare-multiple-value-bindings args ss))
 
   (multiple-value-setq (body ss ts is other-decls) (c1body (cddr args) nil))

@@ -108,9 +108,10 @@
 (defvar *norm-tp-hash* (make-hash-table :test 'eq))
 
 (defmacro cmpt (tp)  `(and (consp ,tp) (member (car ,tp) '(returns-exactly values))))
-(defmacro cmpdt (tp) `(and (consp ,tp) (member (car ,tp) '(and or not cons returns-exactly values))))
+(defmacro cmpdt (tp) `(and (consp ,tp) (member (car ,tp) '(and or not cons complex
+							       returns-exactly values))))
 (defmacro cmpao (tp) `(and (consp ,tp) (member (car ,tp) '(and or))))
-(defmacro cmpmt (tp) `(and (consp ,tp) (member (car ,tp) '(not cons returns-exactly values))))
+(defmacro cmpmt (tp) `(and (consp ,tp) (member (car ,tp) '(not cons complex returns-exactly values))))
 
 (defun sort-tps (tps)
   (sort tps (lambda (x y) (> (si::address x) (si::address y)))))
@@ -587,12 +588,18 @@
 (si::putprop 'car 'car-propagator 'type-propagator)
 
 (defun mod-propagator (f t1 t2)
-  (declare (ignore f t1))
-  (let ((sr (copy-tree (super-range '* #t(integer 0 1) t2))))
-    (when sr
-      (do ((x (cdr sr) (cdr x))) ((not x) sr)
-	  (unless (or (eq (car x) '*) (consp (car x)) (= (car x) 0))
-	    (setf (car x) (list (car x))))))))
+  (cond ((and (consp t1) (eq (car t1) 'or))
+	 (reduce 'type-or1 (mapcar (lambda (x) (mod-propagator f x t2)) (cdr t1)) :initial-value nil))
+	((and (consp t2) (eq (car t2) 'or))
+	 (reduce 'type-or1 (mapcar (lambda (x) (mod-propagator f t1 x)) (cdr t2)) :initial-value nil))
+	((and (type>= #treal t1) (type>= #treal t2))
+	 (let ((r (super-range 
+		   '* 
+		   (cmp-norm-tp `(,(car t1) 0 1))
+		   (super-range '* #t(integer 0 1) t2))))
+	   (if (numberp (caddr t2));FIXME super-range epsilon support not around 0
+	       (type-and r (cmp-norm-tp `(not (,(car t2) ,(caddr t2) ,(caddr t2)))))
+	     r)))))
 (si::putprop 'mod 'mod-propagator 'type-propagator)
 
 (defun random-propagator (f t1 &optional t2)
@@ -619,7 +626,12 @@
 	    ((type-or1 t2 (super-range '- t2)))))))
 (si::putprop 'rem 'rem-propagator 'type-propagator)
 
-(defun floor-propagator (f t1 &optional (t2 #t(real 1 1)))
+(defun rcnum-types (t1)
+  (cond ((and (consp t1) (eq (car t1) 'or))
+	 (reduce 'type-or1 (mapcar 'rcnum-types (cdr t1)) :initial-value nil))
+	((car (member t1 `(,#tinteger ,#tratio ,#tshort-float ,#tlong-float) :test 'type<=)))))
+
+(defun floor-propagator (f t1 &optional (t2 (type-and (rcnum-types t1) #t(real 1 1))))
   (let ((t1 (type-and t1 #treal))(t2 (type-and t2 #treal)));FIXME
     (let ((sr (super-range f t1 (type-and t2 #t(not (real 0 0))))))
       (when sr
@@ -715,7 +727,7 @@
 (defun sqrt-propagator (f t1)
   (type-or1 (super-range f (type-and t1 #tcomplex))
 	    (type-or1 (super-range f (type-and t1 #t(real 0)))
-		      (super-range f (to-complex-tp (type-and t1 #t(real * (0))))))))
+		      (super-range 'sqrt (to-complex-tp (type-and t1 #t(real * (0))))))));FIXME
 (si::putprop 'sqrt 'sqrt-propagator 'type-propagator)
 
 (defun cos-propagator (f t1)

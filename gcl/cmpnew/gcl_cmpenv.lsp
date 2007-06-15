@@ -317,7 +317,8 @@
 			(e (make-list n :initial-element '*))
 			(ntypes (if (> l2 l1) (append types e) types))
 			(ntypes1 (if (> l1 l2) (append types1 e) types1))
-			(res (mapcar 'type-and ntypes1 ntypes)))
+			(res (mapcar (lambda (x y) (type-and (cmp-norm-tp x) (cmp-norm-tp y)))
+				     ntypes1 ntypes)))
 		   (cond ((not (member-if-not 'identity res)) res)
 			 ((progn 
 			    (cmpwarn "The arg types of ~s were badly declared." fname)
@@ -333,7 +334,7 @@
 				       ((setq x (car (gethash fname *sigs*))) (cadr x))
 				       ((get fname 'proclaimed-return-type '*))))
 		 (type (if (get fname 'predicate) #tboolean (get fname 'return-type type1))))
-	    (type-and type type1))))))
+	    (type-and (cmp-norm-tp type) (cmp-norm-tp type1)))))))
 
 ;(cond ()
 ;      (t (cmpwarn "The return type of ~s was badly declared." fname)

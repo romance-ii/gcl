@@ -138,7 +138,7 @@
 	  ((symbolp fun)
 	   (cond ((and (setq fd (c1local-closure fun))
 		       (eq (car fd) 'call-local))
-		  (list 'function *info* fd))
+		  (list 'function (make-info :type #tfunction) fd))
 		 ((let ((info (make-info :type tp :sp-change (if (null (get fun 'no-sp-change)) 1 0))))
 		    (list 'function info (list 'call-global info fun))))))
 	  ((and (consp fun) (eq (car fun) 'lambda))

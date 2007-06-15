@@ -1,7 +1,7 @@
 ;; -*-Lisp-*-
 (in-package 'lisp)
 (export
- '(float realpart imagpart numerator denominator abs))
+ '(float realpart imagpart numerator denominator))
 
 (in-package 'si)
 
@@ -76,20 +76,3 @@
    x
    (integer 1)
    (otherwise (ratio-denominator x))))
-
-;FIXME this preliminary definition is needed for bootstraping, and is overwritten later
-(defun abs (z)
-  (cond ((complexp z)
-	 ;; Compute (sqrt (+ (* x x) (* y y))) carefully to prevent
-	 ;; overflow!
-	 (let* ((x (abs (realpart z)))
-		(y (abs (imagpart z))))
-	   (if (< x y)
-	       (rotatef x y))
-	   (if (zerop x)
-	       x
-	     (let ((r (/  y x)))
-	       (* x (sqrt (+ 1 (* r r))))))))
-	((minusp z) (- z))
-	(z)))
-

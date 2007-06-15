@@ -114,6 +114,7 @@
 		 ;; and pass upwards to call-local and call-global to prevent certain inlining in inline-args
 		 ;; via args-info-changed-vars		 
 		 (add-info (fun-info (car def)) (cadr lam))
+		 (setf (info-type (fun-info (car def))) (info-type (cadr (fifth lam))))
 		 (push (list (car def) lam) closures))))
 
 	   (when (fun-ref (car def))
@@ -131,6 +132,7 @@
 		 ;; and pass upwards to call-local and call-global to prevent certain inlining in inline-args
 		 ;; via args-info-changed-vars		 
 		 (add-info (fun-info (car def)) (cadr lam))
+		 (setf (info-type (fun-info (car def))) (info-type (cadr (fifth lam))))
 		 (push (list (car def) lam) local-funs))))
 
 	   (when (or (fun-ref (car def)) (fun-ref-ccb (car def)))
@@ -252,6 +254,7 @@
 		   ;; and pass upwards to call-local and call-global to prevent certain inlining in inline-args
 		   ;; via args-info-changed-vars		 
 		   (add-info (fun-info (car def)) (cadr lam))
+		   (setf (info-type (fun-info (car def))) (info-type (cadr (fifth lam))))
                    (push (list (car def) lam) local-funs)))))
      (unless processed-flag (return-from local-process))
      )) ;;; end local process
@@ -279,6 +282,7 @@
 		   ;; and pass upwards to call-local and call-global to prevent certain inlining in inline-args
 		   ;; via args-info-changed-vars		 
 		   (add-info (fun-info (car def)) (cadr lam))
+		   (setf (info-type (fun-info (car def))) (info-type (cadr (fifth lam))))
                    (push (list (car def) lam) closures))))
        )
      (unless processed-flag (return-from closure-process))
@@ -381,6 +385,7 @@
 	   ;; through c1funob to other call methods than previously supported c1symbol-fun,
 	   ;; e.g. c1multiple-value-call, etc.  CM 20031030
 	   (add-info *info* (fun-info fun))
+	   (setf (info-type *info*) (info-type (fun-info fun)))
 	   (return (list 'call-local *info* fun ccb))))))
 
 (defun sch-local-fun (fname)
@@ -409,6 +414,7 @@
 	   ;; through c1funob to other call methods than previously supported c1symbol-fun,
 	   ;; e.g. c1multiple-value-call, etc.  CM 20031030
 	   (add-info *info* (fun-info fun))
+	   (setf (info-type *info*) (info-type (fun-info fun)))
 	   (return (list 'call-local *info* fun ccb))))))
 
 (defun c2call-local (fd args &aux (*vs* *vs*))

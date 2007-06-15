@@ -368,7 +368,8 @@
   (setq block-p (write-block-open (nreverse used-vars)))
 
   (dolist* (binding (nreverse initials))
-	   (cond ((type>= #tnil (info-type (cadr (third binding)))) (c2expr* (third binding)))
+	   (cond ((type>= #tnil (info-type (cadr (third binding)))) 
+		  (let ((*value-to-go* 'trash)) (c2expr* (third binding))))
 		 ((let ((*value-to-go* (second binding)))
 		    (c2expr* (third binding))))))
   (dolist* (binding (nreverse bindings))
@@ -524,7 +525,7 @@
 ;      (print (list (var-kind var) (car form)))
       (cond
        ((eq (var-kind var) 'replaced))
-       ((type>= #tnil (info-type (cadr form))) (c2expr* form))
+       ((type>= #tnil (info-type (cadr form))) (let ((*value-to-go* 'trash)) (c2expr* form)))
        ((member (var-kind var) +c-local-var-types+)
 	(let ((*value-to-go* (list 'var var nil)))
 	      (c2expr* form)))

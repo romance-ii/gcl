@@ -110,8 +110,8 @@
 ;   (get 'stack-cons 'inline-always))
 
 ;;SUBLIS1
- (push '((t t t) t #.(flags rfa ans set)SUBLIS1-INLINE)
-   (get 'sublis1 'inline-always))
+;;  (push '((t t t) t #.(flags rfa ans set)SUBLIS1-INLINE)
+;;    (get 'sublis1 'inline-always))
 
 ;;FIXME the MAX and MIN optimized  arg evaluations aren't logically related to side effects
 ;;      but we need to save the intermediate results in any case to avoid exponential
@@ -283,7 +283,7 @@
    (get 'ash 'inline-always))
 (push '((fixnum (integer 0 #.(integer-length most-positive-fixnum))) fixnum #.(flags)"((#0)<<(#1))")
    (get 'ash 'inline-always))
-(push '((fixnum (integer #.most-negative-fixnum -1)) fixnum #.(flags set)
+(push '((fixnum (integer #.most-negative-fixnum 0)) fixnum #.(flags set)
 	#.(concatenate 'string "@1;(-(#1)&"
 		       (write-to-string (logxor -1 (integer-length most-positive-fixnum)))
 		       "? ((#0)>=0 ? 0 : -1) : (#0)>>-(#1))"))
@@ -945,7 +945,7 @@
 
 ;;INTEGER-LENGTH
 (push '((fixnum) fixnum #.(flags rfa set) 
-	#.(format nil "({register fixnum _x=#0,_t=~s;for (;_t>=0 && !((_x>>_t)&1);_t--);_t+1;})" (integer-length most-positive-fixnum)))
+	#.(format nil "({register fixnum _x=abs(#0),_t=~s;for (;_t>=0 && !((_x>>_t)&1);_t--);_t+1;})" (integer-length most-positive-fixnum)))
    (get 'integer-length 'inline-always))
 
 
@@ -1180,9 +1180,12 @@ TRUNCATE_USE_C
 ;(si::putprop 'truncate 'floor-propagator 'type-propagator)
 (push '((fixnum fixnum) (returns-exactly fixnum fixnum) #.(flags rfa)"({fixnum _t=(#0)/(#1);@1(#0)-_t*(#1)@ _t;})")
    (get 'truncate 'inline-always))
-(push '((rcnum) fixnum #.(flags)"(fixnum)(#0)")
+(push '((fixnum) (returns-exactly fixnum fixnum) #.(flags rfa)"({fixnum _t=(#0);@1(#0)-_t@ _t;})")
    (get 'truncate 'inline-always))
-
+(push '((short-float) (returns-exactly fixnum short-float) #.(flags rfa)"({float _t=(#0);@1(#0)-_t@ _t;})")
+   (get 'truncate 'inline-always))
+(push '((long-float) (returns-exactly fixnum long-float) #.(flags rfa)"({double _t=(#0);@1(#0)-_t@ _t;})")
+   (get 'truncate 'inline-always))
 
 ;;COMPLEXP
  (push '((t) boolean #.(flags rfa) "type_of(#0)==t_complex")
