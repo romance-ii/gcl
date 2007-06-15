@@ -121,10 +121,10 @@
 
 (defun c1no-value (args)
   (declare (ignore args))
-  (list 'si::no-value (make-info :type #tnil)))
-(defun c2no-value nil (wt "return Cnil;"))
+  (let ((f (copy-tree (c1nil))))
+    (setf (cadr f) (make-info :type #tnil))
+    f))
 (si::putprop 'si::no-value 'c1no-value 'c1)
-(si::putprop 'si::no-value 'c2no-value 'c2)
 
 (defun c1throw (args &aux (info (make-info :type #tnil)) tag)
   (when (or (endp args) (endp (cdr args)))

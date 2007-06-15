@@ -32,8 +32,9 @@ gclcvs (2.7.0-69) unstable; urgency=low
   * vals_set scope fix
   * inline-boole3-string fix
   * misc compiler fixes and optimizations
+  * fix si::no-value compiler bug
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 14 Jun 2007 20:16:34 -0400
+ -- Camm Maguire <camm@enhanced.com>  Fri, 15 Jun 2007 14:32:35 -0400
 
 gclcvs (2.7.0-68) unstable; urgency=low
 
