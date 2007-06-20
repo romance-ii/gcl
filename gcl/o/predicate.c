@@ -432,141 +432,76 @@ DEFUNO_NEW("COMMONP",object,fLcommonp,LISP
 		x0 = Cnil;
 RETURN1(x0);}
 
-DEFUNO_NEW("EQ",object,fLeq,LISP
-   ,2,2,NONE,OO,OO,OO,OO,void,Leq,(object x0,object x1),"")
+DEFUNO_NEW("EQ",object,fLeq,LISP,2,2,NONE,OO,OO,OO,OO,void,Leq,(object x0,object x1),"") {
 
-{
-  /* 2 args */
+  RETURN1(x0==x1 ? Ct : Cnil);
 
-  if (x0 == x1)
-    x0 = Ct;
-  else
-    x0 = Cnil;
-	
-  RETURN1(x0)
-    ;}
-
-bool
-eql1(register object x, register object y) {
-
-  register enum type t;
-
-/* 	if (x == y) */
-/* 		return(TRUE); */
-
-  if ((t = type_of(x)) != type_of(y))
-    return(FALSE);
-
-  switch (t) {
-
-  case t_fixnum:
-    if (fix(x) == fix(y))
-      return(TRUE);
-    else
-      return(FALSE);
-    
-  case t_bignum:
-    if (big_compare(x,y) == 0)
-      return(TRUE);
-    else
-      return(FALSE);
-    
-  case t_ratio:
-    if (eql(x->rat.rat_num, y->rat.rat_num) &&
-	eql(x->rat.rat_den, y->rat.rat_den))
-      return(TRUE);
-    else
-      return(FALSE);
-
-  case t_shortfloat:
-    if (sf(x) == sf(y))
-      return(TRUE);
-    else
-      return(FALSE);
-    
-  case t_longfloat:
-    if (lf(x) == lf(y))
-      return(TRUE);
-    else
-      return(FALSE);
-    
-  case t_complex:
-    if (eql(x->cmp.cmp_real, y->cmp.cmp_real) &&
-	eql(x->cmp.cmp_imag, y->cmp.cmp_imag))
-      return(TRUE);
-    else
-      return(FALSE);
-    
-  case t_character:
-    if (char_code(x) == char_code(y) &&
-	char_bits(x) == char_bits(y) &&
-	char_font(x) == char_font(y))
-      return(TRUE);
-    else
-      return(FALSE);
-  default:
-    break;
-  }
-  return(FALSE);
 }
 
-DEFUNO_NEW("EQL",object,fLeql,LISP
-   ,2,2,NONE,OO,OO,OO,OO,void,Leql,(object x0,object x1),"")
+#define eqlm(x,y) \
+\
+  case t_fixnum:\
+    return (fix(x) == fix(y)) ? TRUE : FALSE;\
+\
+  case t_bignum:\
+    return big_compare(x,y) ? FALSE : TRUE;\
+\
+  case t_ratio:\
+    return (eql(x->rat.rat_num,y->rat.rat_num) &&\
+	    eql(x->rat.rat_den,y->rat.rat_den)) ? TRUE : FALSE;\
+\
+  case t_shortfloat:\
+    return sf(x) == sf(y) ? TRUE : FALSE;\
+\
+  case t_longfloat:\
+    return lf(x) == lf(y) ? TRUE : FALSE;\
+\
+  case t_complex:\
+    return (eql(x->cmp.cmp_real,y->cmp.cmp_real) &&\
+	    eql(x->cmp.cmp_imag,y->cmp.cmp_imag)) ? TRUE : FALSE;\
+\
+  default:\
+    return FALSE;
 
-{
-	/* 2 args */
+bool
+eql1(register object x,register object y) {
 
-	if (eql(x0, x1))
-		x0 = Ct;
-	else
-		x0 = Cnil;
-	
-RETURN1(x0);}
+  if (x==Cnil || y==Cnil || is_imm_fixnum(x) || is_imm_fixnum(y)) return FALSE;
 
+  if (valid_cdr(x) || valid_cdr(y) || x->d.t!=y->d.t) return FALSE;
+  
+  switch (x->d.t) {
+
+    eqlm(x,y);
+
+  }
+
+}
+
+DEFUNO_NEW("EQL",object,fLeql,LISP,2,2,NONE,OO,OO,OO,OO,void,Leql,(object x0,object x1),"") {
+
+  RETURN1(eql(x0,x1) ? Ct : Cnil);
+
+}
 
 
 bool
 equal1(register object x, register object y) {
 
-  register enum type t;
+  register int cx;
   
- BEGIN:
-  /*         if ( NULL == x ) { */
-  /*             FEerror ( "equal: x is a NULL pointer", 0 ); */
-  /*         } */
-  /*         if ( NULL == y ) { */
-  /*             FEerror ( "equal: y is a NULL pointer", 0 ); */
-  /*         } */
+  for (;x!=y && (cx=consp(x)) && consp(y);x=x->c.c_cdr,y=y->c.c_cdr)
+    if (!equal(x->c.c_car,y->c.c_car)) return FALSE;
 
-/*   if (x==y) */
-/*     return(TRUE); */
+  if (x==y) return TRUE;
+  if (cx)   return FALSE;
+  if (x==Cnil || y==Cnil || is_imm_fixnum(x) || is_imm_fixnum(y)) return FALSE;
 
-  if ((t = type_of(x)) != type_of(y))
-    return(FALSE);
-
-  switch (t) {
-    
-  case t_cons:
-    if (!equal(x->c.c_car, y->c.c_car))
-      return(FALSE);
-    x = x->c.c_cdr;
-    y = y->c.c_cdr;
-    if (x==y) return (TRUE);
-    goto BEGIN;
-    
-  case t_structure:
-  case t_symbol: 
-  case t_vector:
-  case t_array:
+  if (valid_cdr(y) || x->d.t!=y->d.t)
     return FALSE;
-    
-  case t_fixnum :
-    return(fix(x)==fix(y));
-  case t_shortfloat:
-    return(x->SF.SFVAL==y->SF.SFVAL);
-  case t_longfloat:
-    return(x->LF.LFVAL==y->LF.LFVAL);
-    
+  
+  switch(x->d.t) {
+
   case t_string:
     return(string_eq(x, y));
     
@@ -594,45 +529,45 @@ equal1(register object x, register object y) {
       /* version is ignored unless logical host */
       if ((type_of(x->pn.pn_host) == t_string) &&
 	  (pathname_lookup(x->pn.pn_host,sSApathname_logicalA) != Cnil))
-	return(equal(x->pn.pn_version, y->pn.pn_version) ?
-	       TRUE : FALSE);
+	return(equal(x->pn.pn_version, y->pn.pn_version) ? TRUE : FALSE);
       else
 	return(TRUE);
     } else
       return(FALSE);
-  default:
-    break;
+
+    eqlm(x,y);
+
   }
-  return(eql(x,y));
+
 }
 
-DEFUNO_NEW("EQUAL",object,fLequal,LISP
-   ,2,2,NONE,OO,OO,OO,OO,void,Lequal,(object x0,object x1),"")
 
-{
-	/* 2 args */
-
-	if (equal(x0, x1))
-		x0 = Ct;
-	else
-		x0 = Cnil;
-	RETURN1(x0);
+DEFUNO_NEW("EQUAL",object,fLequal,LISP,2,2,NONE,OO,OO,OO,OO,void,Lequal,(object x0,object x1),"") {
+  RETURN1(equal(x0, x1) ? Ct : Cnil);
 }
+
+
+
 
 bool
 equalp1(register object x, register object y) {
 
-  register enum type tx, ty;
+  register int cx;
+  enum type tx,ty;
   fixnum j;
   
- BEGIN:
-  if (eql1(x, y))
-    return(TRUE);
+  for (;x!=y && (cx=consp(x)) && consp(y);x=x->c.c_cdr,y=y->c.c_cdr)
+    if (!equalp(x->c.c_car,y->c.c_car)) return FALSE;
 
-  tx = type_of(x);
-  ty = type_of(y);
-  
-  switch (tx) {
+  if (x==y) return TRUE;
+  if (cx || listp(y))   return FALSE;
+  if (x==Cnil) return FALSE;
+
+  tx=is_imm_fixnum(x) ? t_fixnum : x->d.t;
+  ty=is_imm_fixnum(y) ? t_fixnum : y->d.t;
+
+  switch(tx) {
+
   case t_fixnum:
   case t_bignum:
   case t_ratio:
@@ -674,8 +609,10 @@ equalp1(register object x, register object y) {
     }
     else
       return(FALSE);
+
   default:
     break;
+
   }
   
   if (tx != ty)
@@ -685,14 +622,6 @@ equalp1(register object x, register object y) {
 
   case t_character:
     return(char_equal(x, y));
-    
-  case t_cons:
-    if (!equalp(x->c.c_car, y->c.c_car))
-      return(FALSE);
-    x = x->c.c_cdr;
-    y = y->c.c_cdr;
-    if (x==y) return (TRUE);
-    goto BEGIN;
     
   case t_structure:
     {
@@ -754,48 +683,35 @@ equalp1(register object x, register object y) {
 
   case t_pathname:
     return(equal(x, y));
+
   case t_random:
     return(x->rnd.rnd_state._mp_seed->_mp_alloc==y->rnd.rnd_state._mp_seed->_mp_alloc &&
 	   !memcmp(x->rnd.rnd_state._mp_seed->_mp_d,y->rnd.rnd_state._mp_seed->_mp_d,
 		   x->rnd.rnd_state._mp_seed->_mp_alloc*sizeof(*x->rnd.rnd_state._mp_seed->_mp_d)));
   default:
-    break;
+    return(FALSE);
+
   }
-  return(FALSE);
+  
   
  ARRAY:
   
   {
     fixnum i;
     
-    vs_push(Cnil);
-    vs_push(Cnil);
-    for (i = 0;  i < j;  i++) {
-      vs_top[-2] = aref(x, i);
-      vs_top[-1] = aref(y, i);
-      if (!equalp(vs_top[-2], vs_top[-1])) {
-	vs_popp;
-	vs_popp;
+    for (i = 0;  i < j;  i++)
+      if (!equalp(aref(x, i), aref(y, i)))
 	return(FALSE);
-      }
-    }
-    vs_popp;
-    vs_popp;
     return(TRUE);
   }
+
 }
 
-DEFUNO_NEW("EQUALP",object,fLequalp,LISP
-   ,2,2,NONE,OO,OO,OO,OO,void,Lequalp,(object x0,object x1),"")
 
-{
-	/* 2 args */
+DEFUNO_NEW("EQUALP",object,fLequalp,LISP,2,2,NONE,OO,OO,OO,OO,void,Lequalp,(object x0,object x1),"") {
+  
+  RETURN1(equalp(x0,x1) ? Ct : Cnil);
 
-	if (equalp(x0, x1))
-		x0 = Ct;
-	else
-		x0 = Cnil;
-	RETURN1(x0);
 }
 
 static void
