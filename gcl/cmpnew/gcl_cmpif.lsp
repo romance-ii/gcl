@@ -62,10 +62,10 @@
 
 (defun two-tp-inf (fn t2);;FIXME use num type bounds here for or types
   (if (type-and t2 #tratio) t ;;FIXME
-    (let ((t2 (type-and #tlong-float (sublis '((integer . long-float) (short-float . long-float)) t2))))
+    (let ((t2 (type-and #tlong-float (cmp-norm-tp (sublis '((integer . long-float) (short-float . long-float)) t2)))))
       (if (not (eq (car t2) 'long-float)) t ;FIXME
 	(case fn
-	      (= `(real ,(or (cadr t2) '*) ,(or (caddr t2) '*)))
+	      (= (cmp-norm-tp `(real ,(or (cadr t2) '*) ,(or (caddr t2) '*))))
 	      (/= (if (atomic-tp t2) (type-and #tnumber (cmp-norm-tp `(not (real ,@(cdr t2))))) #treal))
 	      (>  (cmp-norm-tp `(real ,(cond ((numberp (cadr t2)) (list (cadr t2))) ((cadr t2)) ('*)))))
 	      (>= (cmp-norm-tp `(real ,(or (cadr t2) '*))))

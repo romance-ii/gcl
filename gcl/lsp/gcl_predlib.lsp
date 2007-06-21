@@ -1330,7 +1330,10 @@
 	     (z (prune-type z nil 0 z)))
 	(if (cdr z) `(or ,@z) (car z))))))
 
-
+(defun last-cdr-null-p (x)
+  (cond ((atom x) nil)
+	((and (eq (car x) 'cons) (equal (caddr x) '(member nil))) t)
+	((eq (car x) 'cons) (last-cdr-null-p (caddr x)))))
 
 (defun cons-recon (x)
   (cond ((eq t (cadr x)) `(cons t t))
@@ -1338,9 +1341,10 @@
 	((cons-atm (cadr x))
 	 (let ((car (nreconstruct-type-int (copy-tree (caadr x))));FIXME
 	       (cdr (nreconstruct-type-int (copy-tree (cdadr x)))))
-	   (and car cdr `(cons ,car ,cdr))))
+	   (and car cdr (if (and (eq car t) (eq cdr 'proper-cons)) cdr `(cons ,car ,cdr)))))
 	((eq (caadr x) 'or)
-	 (let ((z (lremove-if 'not (mapcar (lambda (x) (cons-recon `(cons ,x))) (cdadr x)))))
+	 (let* ((z (remove-duplicates (lremove-if 'not (mapcar (lambda (x) (cons-recon `(cons ,x))) (cdadr x)))))
+		(z (if (member 'proper-cons z) (lremove-if 'last-cdr-null-p z) z)))
 	   (if (cdr z) `(or ,@z) (car z))))
 	((error "Bad cons recon~%"))))
 
