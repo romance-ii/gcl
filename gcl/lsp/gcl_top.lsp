@@ -125,7 +125,6 @@
         (- nil) 
         (* nil) (** nil) (*** nil)
         (/ nil) (// nil) (/// nil))
-    (reset-lib-syms)
     (setq *lisp-initialized* t)
     (catch *quit-tag*
       (cond
@@ -842,6 +841,7 @@ First directory is checked for first name and all extensions etc."
 
 (defun set-up-top-level ( &aux (i (argc)) tem)
   (declare (fixnum i))
+  (reset-lib-syms)
   (loop (setq i (- i 1))
 	(cond ((< i 0)(return nil))
 	      (t (setq tem (cons (argv i) tem)))))

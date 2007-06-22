@@ -456,9 +456,7 @@
 	      
 	      (let* ((*split-files* 100000)
 		     (o (compile-file pn :system-p t :c-file t :h-file t :data-file t)))
-		(unless pnp (load o))))))
-      
-      (format t "done~%"))))
+		(unless pnp (load o)))))))))
 
 ;; (defun do-recompile (&optional pn)
 ;;   (unless *disable-recompile*

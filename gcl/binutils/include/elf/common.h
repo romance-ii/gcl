@@ -327,6 +327,7 @@
 #define SHT_LOOS	0x60000000	/* First of OS specific semantics */
 #define SHT_HIOS	0x6fffffff	/* Last of OS specific semantics */
 
+#define SHT_GNU_HASH	0x6ffffff6	/* GNU style symbol hash table */
 #define SHT_GNU_LIBLIST	0x6ffffff7	/* List of prelink dependencies */
 
 /* The next three section types are defined by Solaris, and are named
@@ -566,6 +567,7 @@
 #define DT_VALRNGHI	0x6ffffdff
 
 #define DT_ADDRRNGLO	0x6ffffe00
+#define DT_GNU_HASH	0x6ffffef5
 #define DT_GNU_CONFLICT	0x6ffffef8
 #define DT_GNU_LIBLIST	0x6ffffef9
 #define DT_CONFIG	0x6ffffefa
