@@ -21,3 +21,9 @@
 #define isinf  ((int(*)(double))dlisinf)
 #undef isnan
 #define isnan  ((int(*)(double))dlisnan)
+#undef pipe
+#define pipe  ((int(*)(int*))dlpipe)
+#undef close
+#define close  ((int(*)(int))dlclose)
+#undef fork
+#define fork  ((int(*)(void))dlfork)

@@ -68,7 +68,7 @@
    (get 'sputc 'inline-unsafe))
 
 ;;FORK
- (push '(() t #.(flags)"myfork()")
+ (push '(() t #.(flags)(lambda nil (add-libc "memset")(add-libc "pipe")(add-libc "close")(add-libc "fork")(wt "myfork()")))
    (get 'si::fork 'inline-unsafe))
 
 ;;READ-POINTER-OBJECT

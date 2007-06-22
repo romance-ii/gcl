@@ -4,8 +4,9 @@ gclcvs (2.7.0-70) unstable; urgency=low
   * GNU_HASH section support
   * hopefully portable _mcount symbol
   * earlier lib-sym reset
+  * restore fork
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 22 Jun 2007 13:27:46 -0400
+ -- Camm Maguire <camm@enhanced.com>  Fri, 22 Jun 2007 18:45:44 -0400
 
 gclcvs (2.7.0-69) unstable; urgency=low
 
