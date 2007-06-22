@@ -119,6 +119,9 @@ build_symbol_table_bfd(void) {
     sethash(make_simple_string("_mcount"),
 	    sSAlink_hash_tableA->s.s_dbind,
 	    make_fixnum((fixnum)_mcount));
+    sethash(make_simple_string("mcount"),
+	    sSAlink_hash_tableA->s.s_dbind,
+	    make_fixnum((fixnum)_mcount));
 
     bfd_close(bself);
     bself=NULL;
