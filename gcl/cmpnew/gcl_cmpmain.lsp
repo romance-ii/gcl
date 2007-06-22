@@ -139,9 +139,7 @@
 
    (clrhash *sigs*)
 
-   (let ((rl (length si::*needs-recompile*)))
-     (do nil ((not (eq (setq tem (let (*new-sigs-in-file*) (apply 'compile-file1 filename args))) 'again)))
-	 (setf (fill-pointer si::*needs-recompile*) rl)))
+   (do nil ((not (eq (setq tem (let (*new-sigs-in-file*) (apply 'compile-file1 filename args))) 'again))))
 
    (cond ((atom *split-files*)(return (values (when tem (truename tem)) warnings failures)))
 	 ((and (consp *split-files*) (null (third *split-files*)))
@@ -302,7 +300,8 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 	    
 	    (when prev (set-dispatch-macro-character #\# #\, prev rtb)))))
       
-      
+      (when *sig-discovery* (return-from compile-file1 (values)))
+
       (with-open-file (s output-file :if-does-not-exist :create))
       (setq *init-name* (init-name output-file system-p))
       
@@ -417,8 +416,9 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 					   ,@(ecase (car tem)
 						    (lambda (cdr tem))
 						    (lambda-block (cddr tem)))))) (compile-file gaz))
-	      (load fn)
-	      (unless *keep-gaz* (delete-file fn))
+	      (when fn 
+		(load fn)
+		(unless *keep-gaz* (delete-file fn)))
 	      (setq warnings w failures f))
 	     (unless *keep-gaz* (delete-file gaz)))
 	   (or (eq na name) (setf (symbol-function name) (symbol-function na)))

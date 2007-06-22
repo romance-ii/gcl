@@ -1,3 +1,9 @@
+gclcvs (2.7.0-70) unstable; urgency=low
+
+  * faster recompilation
+
+ -- Camm Maguire <camm@enhanced.com>  Fri, 22 Jun 2007 03:55:39 -0400
+
 gclcvs (2.7.0-69) unstable; urgency=low
 
   * zero out bss when sec_load not set;support for reading random states

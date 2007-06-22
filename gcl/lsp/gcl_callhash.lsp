@@ -32,7 +32,8 @@
 	     (defvar *rfns* nil)
 	     (defvar *sfns* nil)
 	     (defvar *split-files* nil)
-	     (defvar *unique-sigs* (make-hash-table :test 'equal))
+	     (defvar *sig-discovery* nil)
+;	     (defvar *unique-sigs* (make-hash-table :test 'equal))
 	     (defvar *us* (find-symbol "UNIQUE-SIGS" (find-package "COMPILER")))
 ;	     (assert (and *us* (fboundp *us*)))
 	     (setq *tmp-dir* (get-temp-dir))
@@ -143,7 +144,7 @@
   (let ((p (position fn *needs-recompile* :key 'car)))
     (when p
       (decf (fill-pointer *needs-recompile*))
-      (do ((i p (1+ i))) ((= i (length *needs-recompile*)))
+      (do ((i p (1+ i))) ((>= i (length *needs-recompile*)))
 	(setf (aref *needs-recompile* i) (aref *needs-recompile* (1+ i)))))))
 
 (defun clr-call nil 
@@ -392,70 +393,140 @@
 	     :directory (when (or (pathname-directory x) (pathname-name x))
 			  (append (pathname-directory x) (list (pathname-name x))))))))))))
 
-(defun do-recompile (&optional pn)
+(defun do-recompile (&optional (pn nil pnp))
+
   (unless *disable-recompile*
-    (let ((*disable-recompile* t))
-      (when (= 0 (length *needs-recompile*)) (do nil ((not *cmr*)) (convert-to-state (pop *cmr*))))
-      (unless (= 0 (length *needs-recompile*))
-	(sort *needs-recompile*
-	      (lambda (x y) (member (car x) (callees (car y)))))
-	(map nil (lambda (fn)
-		   (cond ((eq (cadr fn) 'mutual-recursion)
-			  (format t "Mutual recursion detected: ~s, recompiling ~s~%" 
-				  (get (car fn) 'mutual-recursion-group) (car fn)))
-			 ((format t "Callee ~s sigchange ~s to ~s, recompiling ~s~%" 
-			   (cadr fn) (caddr fn) (cadddr fn) (car fn))))) *needs-recompile*)
-	(with-temp-file 
-	    (s tpn) ((temp-prefix) "lsp")
-	    (let ((*print-radix* nil)
-		  (*print-base* 10)
-		  (*print-circle* t)
-		  (*print-pretty* nil)
-		  (*print-level* nil)
-		  (*print-length* nil)
-		  (*print-case* :downcase)
-		  (*print-gensym* t)
-		  (*print-array* t)
-		  (si::*print-package* t)
-		  (si::*print-structure* t))
-	      (dotimes (i (length *needs-recompile*))
-		(let* ((fn (car (aref *needs-recompile* i)))
-		       (src (function-src fn)))
-		  (when pn (push fn *rfns*))
-		  (cond (src 
-			   (prin1 `(defun ,fn ,@(cdr src)) s)
-			   (dolist (l '(state-function mutual-recursion-group))
-			     (let ((x (get fn l)))
-			       (when x 
-				 (prin1 `(putprop ',fn ',x ',l) s)))))
-			((remove-recompile fn))))))
-	    (let* ((*split-files* 100000)(o (compile-file tpn)))
-	      (load o)
-	      (mapcar 'delete-file (directory (merge-pathnames (pathname (string-concatenate (pathname-name o) "*")) o)))))))
-    (cond ((or *cmr* (> (length *needs-recompile*) 0)) (do-recompile pn))
-	  (pn 
-	   (with-open-file 
-	    (f pn :direction :output :if-exists :append :if-does-not-exist :create)
-	    (let ((*print-radix* nil)
-		  (*print-base* 10)
-		  (*print-circle* t)
-		  (*print-pretty* nil)
-		  (*print-level* nil)
-		  (*print-length* nil)
-		  (*print-case* :downcase)
-		  (*print-gensym* t)
-		  (*print-array* t)
-		  (si::*print-package* t)
-		  (si::*print-structure* t))
-	      (setq *rfns* (delete-duplicates (nreverse *rfns*)))
-	      (do (l) ((not (setq l (pop *rfns*))))
-		(prin1 `(defun ,l ,@(cdr (function-src l))) f)
-		(dolist (p '(state-function mutual-recursion-group))
-		  (let ((x (get l p)))
-		    (when x 
-		      (prin1 `(putprop ',l ',x ',p) f)))))
-	      (prin1 `(setq *cmr* nil) f)))
-	   (let ((*split-files* 100000)) (compile-file pn :system-p t :c-file t :h-file t :data-file t))))))
+
+    (let ((*disable-recompile* t) rfns)
+
+      (do nil ((and (not *cmr*) (= (length *needs-recompile*) 0)) (setq rfns (nreverse rfns)))
+
+	  (when (= 0 (length *needs-recompile*)) (do nil ((not *cmr*)) (convert-to-state (pop *cmr*))))
+
+	  (unless (= 0 (length *needs-recompile*))
+
+	    (sort *needs-recompile*
+		  (lambda (x y) (member (car x) (callees (car y)))))
+
+	    (map nil (lambda (fn)
+		       (when (eq (cadr fn) 'mutual-recursion)
+			 (format t "Mutual recursion detected: ~s, recompiling ~s~%" 
+				 (get (car fn) 'mutual-recursion-group) (car fn)))) *needs-recompile*)
+
+	    (format t "Pass1 signature discovery on ~s functions ...~%" (length *needs-recompile*))
+
+	    (let (fns)
+	      (dotimes (i (length *needs-recompile*)) 
+		(let ((fn (car (aref *needs-recompile* i))))
+		(pushnew fn rfns)
+		(push fn fns)))
+
+	      (let ((*sig-discovery* t)(*compile-verbose* nil)) 
+		(dolist (fn (nreverse fns))
+		  (if (eq (function-name (symbol-function fn)) fn)
+		      (compile fn)
+		    (progn
+		      (format t "skipping ~s~%" fn)
+		      (remove-recompile fn))))))))
+
+      (if (and pnp (not pn))
+
+	  (let (files)
+	    (dolist (l rfns)
+	      (let ((file (file l))) (when file (pushnew file files :test 'string=))))
+	    (format t "Updating original source files ~s~%" files)
+	    (dolist (l files)
+	      (when (probe-file l) (compile-file l :system-p t :c-file t :h-file t :data-file t))))
+	
+	(when rfns
+	  (with-temp-file
+	      (s tpn) ((temp-prefix) "lsp")
+	      (unless pnp (setq pn s))
+	      (format t "Compiling and loading new source in ~s~%" pn)
+	      (with-open-file 
+	       (f pn :direction :output :if-exists :append :if-does-not-exist :create)
+	       (with-compile-file-syntax
+		(dolist (l rfns)
+		  (prin1 `(defun ,l ,@(cdr (function-src l))) f)
+		  (dolist (p '(state-function mutual-recursion-group))
+		    (let ((x (get l p)))
+		      (when x 
+			(prin1 `(putprop ',l ',x ',p) f)))))
+		(prin1 `(setq *cmr* nil) f)))
+	      
+	      (let* ((*split-files* 100000)
+		     (o (compile-file pn :system-p t :c-file t :h-file t :data-file t)))
+		(unless pnp (load o))))))
+      
+      (format t "done~%"))))
+
+;; (defun do-recompile (&optional pn)
+;;   (unless *disable-recompile*
+;;     (let ((*disable-recompile* t))
+;;       (when (= 0 (length *needs-recompile*)) (do nil ((not *cmr*)) (convert-to-state (pop *cmr*))))
+;;       (unless (= 0 (length *needs-recompile*))
+;; 	(sort *needs-recompile*
+;; 	      (lambda (x y) (member (car x) (callees (car y)))))
+;; 	(map nil (lambda (fn)
+;; 		   (cond ((eq (cadr fn) 'mutual-recursion)
+;; 			  (format t "Mutual recursion detected: ~s, recompiling ~s~%" 
+;; 				  (get (car fn) 'mutual-recursion-group) (car fn)))
+;; 			 ((format t "Callee ~s sigchange ~s to ~s, recompiling ~s~%" 
+;; 			   (cadr fn) (caddr fn) (cadddr fn) (car fn))))) *needs-recompile*)
+;; 	(with-temp-file 
+;; 	    (s tpn) ((temp-prefix) "lsp")
+;; 	    (let ((*print-radix* nil)
+;; 		  (*print-base* 10)
+;; 		  (*print-circle* t)
+;; 		  (*print-pretty* nil)
+;; 		  (*print-level* nil)
+;; 		  (*print-length* nil)
+;; 		  (*print-case* :downcase)
+;; 		  (*print-gensym* t)
+;; 		  (*print-array* t)
+;; 		  (si::*print-package* t)
+;; 		  (si::*print-structure* t))
+;; 	      (dotimes (i (length *needs-recompile*))
+;; 		(let* ((fn (car (aref *needs-recompile* i)))
+;; 		       (src (function-src fn)))
+;; 		  (when pn (push fn *rfns*))
+;; 		  (cond (src 
+;; 			   (prin1 `(defun ,fn ,@(cdr src)) s)
+;; 			   (dolist (l '(state-function mutual-recursion-group))
+;; 			     (let ((x (get fn l)))
+;; 			       (when x 
+;; 				 (prin1 `(putprop ',fn ',x ',l) s)))))
+;; 			((remove-recompile fn))))))
+;; 	    (let* ((*split-files* 100000)(*sig-discovery* t));(o (compile-file tpn)))
+;; 	      (compile-file tpn)
+;; 	      ;(load o)
+;; ;	      (mapcar 'delete-file (directory (merge-pathnames (pathname (string-concatenate (pathname-name o) "*")) o)))
+;; ))))
+;;     (cond ((or *cmr* (> (length *needs-recompile*) 0)) (do-recompile pn))
+;; 	  (pn 
+;; 	   (with-open-file 
+;; 	    (f pn :direction :output :if-exists :append :if-does-not-exist :create)
+;; 	    (let ((*print-radix* nil)
+;; 		  (*print-base* 10)
+;; 		  (*print-circle* t)
+;; 		  (*print-pretty* nil)
+;; 		  (*print-level* nil)
+;; 		  (*print-length* nil)
+;; 		  (*print-case* :downcase)
+;; 		  (*print-gensym* t)
+;; 		  (*print-array* t)
+;; 		  (si::*print-package* t)
+;; 		  (si::*print-structure* t))
+;; 	      (setq *rfns* (delete-duplicates (nreverse *rfns*)))
+;; 	      (do (l) ((not (setq l (pop *rfns*))))
+;; 		(prin1 `(defun ,l ,@(cdr (function-src l))) f)
+;; 		(dolist (p '(state-function mutual-recursion-group))
+;; 		  (let ((x (get l p)))
+;; 		    (when x 
+;; 		      (prin1 `(putprop ',l ',x ',p) f)))))
+;; 	      (prin1 `(setq *cmr* nil) f)))
+;; 	   (let ((*split-files* 100000)) (compile-file pn :system-p t :c-file t :h-file t :data-file t))))))
+
 
 ;FIXME!!!
 ;(defun is-eq-test-item-list (x y z w)

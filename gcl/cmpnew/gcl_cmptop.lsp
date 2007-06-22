@@ -800,15 +800,19 @@
 	   *top-level-forms*)
      (push (cons fname cfun) *global-funs*)
      
-     (setf (cadr e) *callees* 
-	   (caddr e) (let* ((w (make-string-output-stream))
-			    (ss (si::open-fasd w :output nil nil))
-			    (out (pd fname (cadr args) (cddr args))))
-		       (si::find-sharing-top out (aref ss 1))
-		       (si::write-fasd-top out ss)
-		       (si::close-fasd ss)
-		       (get-output-stream-string w))
-	   (cadddr e) (unless *compiler-compile* (namestring (pathname *compiler-input*)))))))
+     (setf (cadr e) *callees*)
+
+     (if *sig-discovery*
+	 (si::add-hash fname (car e) (cadr e)  nil nil)
+       (setf (caddr e) (let* ((w (make-string-output-stream))
+			      (ss (si::open-fasd w :output nil nil))
+			      (out (pd fname (cadr args) (cddr args))))
+			 (si::find-sharing-top out (aref ss 1))
+			 (si::write-fasd-top out ss)
+			 (si::close-fasd ss)
+			 (get-output-stream-string w))
+	     (cadddr e) (unless *compiler-compile* 
+			  (namestring (pathname *compiler-input*))))))))
   
 (defun make-inline-string (cfun args fname)
   (if (null args)

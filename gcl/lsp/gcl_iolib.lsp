@@ -591,10 +591,27 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
 
 ; i know this should be in cmpnew - but its easier here.
 
+(defmacro with-compile-file-syntax (&body body)
+  `(let ((*print-radix* nil)
+	 (*print-base* 10)
+	 (*print-circle* t)
+	 (*print-pretty* nil)
+	 (*print-level* nil)
+	 (*print-length* nil)
+	 (*print-case* :downcase)
+	 (*print-gensym* t)
+	 (*print-array* t)
+	 (*print-package* t)
+	 (*print-structure* t))
+     ,@body))
+
 (defmacro with-compilation-unit (opt &rest body)   
   (declare (optimize (safety 1)))
   (declare (ignore opt)) 
-  `(progn ,@body))
+  `(progn
+     (let ((*disable-recompile* t))
+       ,@body)
+     (do-recompile nil)))
 
 (defun get-byte-stream-nchars (s)
   (check-type s stream)
