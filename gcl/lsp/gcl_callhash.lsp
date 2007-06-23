@@ -557,7 +557,10 @@
 	  sym))))
 
 (defun lib-name (p)
-  (string-concatenate p ".so" (if (string= "libc" p) ".6" "")))
+  (string-concatenate p ".so" (if (string= "libc" p) 
+				  #+(or alpha ia64) ".6.1"
+				  #-(or alpha ia64) ".6" "")))
+				  
 
 (defun mdl (n p vad)
   (let* ((sym (mdlsym n (lib-name p)))
