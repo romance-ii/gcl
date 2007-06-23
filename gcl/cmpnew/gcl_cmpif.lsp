@@ -523,7 +523,7 @@
   (let* ((info (make-info :type #tnil))
          (key-form (with-restore-vars (c1expr* (car args) info)))
          (clauses nil) or-list)
-    (cond ((unless (atomic-tp (info-type (second key-form)))
+    (cond #-mips((unless (atomic-tp (info-type (second key-form)));FIXME
 	     (type>= #tfixnum (nil-to-t (info-type (second key-form)))))
 	   (return-from c1case  (c1expr (convert-case-to-switch args default ))))
 	  ((return-from c1case (c1expr (cmp-macroexpand `(,(if default 'ecase 'case) ,@args))))))

@@ -3,8 +3,9 @@ gclcvs (2.7.0-71) unstable; urgency=low
   * imm_fixnum inline arithmetic fix
   * fix libc name on alpha/ia64
   * fix struct tests
+  * mips switch workaround
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 23 Jun 2007 15:15:42 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sat, 23 Jun 2007 18:31:28 -0400
 
 gclcvs (2.7.0-70) unstable; urgency=low
 
