@@ -54,18 +54,21 @@ typedef double complex dcomplex;
   } _t;})
 
 #define immnum_plus(x,y) ({object _x=x,_y=y,_t;\
-  if (!is_imm_fixnum(_x) || !is_imm_fixnum(_y) || !is_imm_fixnum(_t=(object)((unsigned long)_x+fix(_y))))\
+  if (!is_imm_fixnum(_x) || !is_imm_fixnum(_y) || \
+      !is_unmrkd_imm_fixnum(_t=(object)((unsigned long)_x+fix_imm_fixnum(_y))))\
     _t=number_plus(_x,_y);\
   _t;})
 
 #define immnum_minus(x,y) ({object _x=x,_y=y,_t;\
-  if (!is_imm_fixnum(_x) || !is_imm_fixnum(_y) || !is_imm_fixnum(_t=(object)((unsigned long)_x-fix(_y))))\
+  if (!is_imm_fixnum(_x) || !is_imm_fixnum(_y) || \
+      !is_unmrkd_imm_fixnum(_t=(object)((unsigned long)_x-fix_imm_fixnum(_y))))\
     _t=number_minus(_x,_y);\
   _t;})
 
+/*FIXME symmetric immfix range */
 #define immnum_negate(x) ({object _x=x,_t;\
   if (is_imm_fixnum(_x) && (unsigned long)_x!=IM_FIX_BASE)\
-     _t=(object)((unsigned long)make_fixnum(0)-fix(_x));\
+     _t=(object)((unsigned long)make_fixnum(0)-fix_imm_fixnum(_x));\
   else\
     _t=number_negate(_x);\
   _t;})

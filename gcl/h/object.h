@@ -163,6 +163,7 @@ struct fixnum_struct {
 #define      mark_imm_fixnum(a_)        ((a_)=((object)(((fixnum)(a_)) | IM_FIX_LIM)))
 #define    unmark_imm_fixnum(a_)        ((a_)=((object)(((fixnum)(a_)) &~ IM_FIX_LIM)))
 #define        is_imm_fixnum(a_)        (((ufixnum)(a_))>=IM_FIX_BASE)
+#define is_unmrkd_imm_fixnum(a_)        (is_imm_fixnum(a_)&&!is_marked_imm_fixnum(a_))
 #define is_marked_imm_fixnum(a_)        (((fixnum)(a_))&IM_FIX_LIM)
 #define           is_imm_fix(a_)        (!(((a_)+(IM_FIX_LIM>>1))&-IM_FIX_LIM))
 #define        un_imm_fixnum(a_)        ((a_)=((object)(((fixnum)(a_))&~(IM_FIX_BASE))))
@@ -172,6 +173,7 @@ struct fixnum_struct {
 #define      mark_imm_fixnum(a_)        
 #define    unmark_imm_fixnum(a_)        
 #define        is_imm_fixnum(a_)        0
+#define is_unmrkd_imm_fixnum(a_)        0
 #define is_marked_imm_fixnum(a_)        0
 #define           is_imm_fix(a_)        0
 #define        un_imm_fixnum(a_)        
