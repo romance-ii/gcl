@@ -308,8 +308,9 @@ static object set_cclosure (object result_cc,object value_cc,fixnum available_si
                           (setf (symbol-function writer-sym) writer)
                           (do-standard-defsetf-1 reader-sym)
                           (list (list slot-name
-				      (find-symbol (concatenate 'string (symbol-name type) "-" (symbol-name slot-name))
-						   (symbol-package type))
+				      (find-symbol (concatenate 'string (symbol-name type)
+								"-" (symbol-name slot-name)) 
+						   (or (symbol-package type) *package*))
                                       reader-sym
 				      writer
 				      (third slotd)

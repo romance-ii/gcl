@@ -247,7 +247,7 @@
          ;; The name is at the NAME-OFFSET in the vector.
          (unless named (error "The structure should be named."))
          `(defun ,predicate (x)
-            (and (vectorp x)
+            (and (typep x '(vector t))
                  (> (the fixnum (length x)) ,name-offset)
                  (eq (aref (the (vector t) x) ,name-offset) ',name))))
         ((eq type 'list)

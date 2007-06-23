@@ -7,8 +7,9 @@ gclcvs (2.7.0-70) unstable; urgency=low
   * restore fork
   * imm_fixnum inline artihmetic fix
   * fix libc name on alpha/ia64
+  * fix struct tests
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 23 Jun 2007 14:58:31 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sat, 23 Jun 2007 14:59:27 -0400
 
 gclcvs (2.7.0-69) unstable; urgency=low
 
