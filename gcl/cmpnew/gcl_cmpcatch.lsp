@@ -73,7 +73,7 @@
   )
 
 (defun set-push-catch-frame (loc)
-  (add-setjmp)
+  (add-libc "setjmp")
   (wt-nl "frs_push(FRS_CATCH," loc ");"))
 
 (defun c1unwind-protect (args &aux (info (make-info :sp-change 1)) form)
@@ -93,7 +93,7 @@
                          &aux (*vs* *vs*) (loc (list 'vs (vs-push)))
 			 top-data)
   ;;;  exchanged following two lines to eliminate setjmp clobbering warning
-  (add-setjmp)
+  (add-libc "setjmp")
   (wt-nl "frs_push(FRS_PROTECT,Cnil);")
   (wt-nl "{object tag=Cnil;frame_ptr fr=NULL;object p;bool active;")
   (wt-nl "if(nlj_active){tag=nlj_tag;fr=nlj_fr;active=TRUE;}")

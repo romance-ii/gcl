@@ -1304,11 +1304,13 @@
 		     *rest-on-stack*)))
 	    (if (ll-keywords-p ll)
 		(cond (*rest-on-stack*
-		       (add-bzero)
+		       (add-libc "bzero")
+		       (add-libc "memset")
 		       (wt "(ALLOCA_CONS(narg),ON_STACK_MAKE_LIST(narg));"))
 		      (t (wt "make_list(narg);")))
 	      (cond (*rest-on-stack*
-		     (add-bzero)
+		     (add-libc "bzero")
+		     (add-libc "memset")
 		     (wt "(ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));"
 			 ))
 		    (t  (wt "list_vector_new(narg,first,ap);"))))

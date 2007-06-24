@@ -53,18 +53,18 @@
    (get 'long-float-p 'inline-always))
 
 ;;SFEOF
- (push '((t) boolean #.(flags set rfa)(lambda (x) (add-feof) (wt "(feof((" x ")->sm.sm_fp))")))
+ (push '((t) boolean #.(flags set rfa)(lambda (x) (add-libc "feof") (wt "(feof((" x ")->sm.sm_fp))")))
    (get 'sfeof 'inline-unsafe))
 
 
 ;;SGETC1
- (push '((t) fixnum #.(flags set rfa) (lambda (x) (add-getc) (wt "(getc((" x ")->sm.sm_fp))")))
+ (push '((t) fixnum #.(flags set rfa) (lambda (x) (add-libc "getc") (wt "(getc((" x ")->sm.sm_fp))")))
    (get 'sgetc1 'inline-unsafe))
 
 ;;SPUTC
- (push '((fixnum t) fixnum #.(flags set rfa)(lambda (x y) (add-putc) (wt "(putc(" x ",(" y ")->sm.sm_fp))")))
+ (push '((fixnum t) fixnum #.(flags set rfa)(lambda (x y) (add-libc "putc") (wt "(putc(" x ",(" y ")->sm.sm_fp))")))
    (get 'sputc 'inline-always))
-(push '((character t) fixnum #.(flags set rfa)(lambda (x y) (add-putc) (wt "(putc(" x ",(" y ")->sm.sm_fp))")))
+(push '((character t) fixnum #.(flags set rfa)(lambda (x y) (add-libc "putc") (wt "(putc(" x ",(" y ")->sm.sm_fp))")))
    (get 'sputc 'inline-always))
 
 ;;FORK

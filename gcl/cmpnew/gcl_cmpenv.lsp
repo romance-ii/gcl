@@ -73,23 +73,6 @@
 
 (defmacro next-cfun () '(incf *next-cfun*))
 
-(defun add-setjmp nil
-  (add-dladdress "dlsetjmp" (mdlsym "setjmp" "libc.so.6")))
-(defun add-bzero nil
-  (add-dladdress "dlbzero" (mdlsym "bzero" "libc.so.6"))
-  (add-dladdress "dlmemset" (mdlsym "memset" "libc.so.6")))
-(defun add-getc nil
-  (add-dladdress "dlgetc" (mdlsym "getc" "libc.so.6")))
-(defun add-putc nil
-  (add-dladdress "dlputc" (mdlsym "putc" "libc.so.6")))
-(defun add-feof nil
-  (add-dladdress "dlfeof" (mdlsym "feof" "libc.so.6")))
-(defun add-fdopen nil
-  (add-dladdress "dlfdopen" (mdlsym "fdopen" "libc.so.6")))
-(defun add-read nil
-  (add-dladdress "dlread" (mdlsym "read" "libc.so.6")))
-(defun add-write nil
-  (add-dladdress "dlwrite" (mdlsym "write" "libc.so.6")))
 (defun add-libc (x)
   (add-dladdress (strcat "dl" x) (mdlsym x (lib-name "libc"))))
 

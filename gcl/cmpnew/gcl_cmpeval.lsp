@@ -2287,3 +2287,12 @@
 (si::putprop 'cstr 'c1cstr 'c1)
 (defun wt-cstr (str) (wt str))
 (si::putprop 'cstr 'wt-cstr 'wt-loc)
+
+
+(defun c1clines (args)
+  (list 'clines (make-info :type nil) (with-output-to-string (s) (princ (car args) s))))
+(defun c2clines (clines)
+  (wt-nl clines))
+(si::putprop 'clines 'c1clines 'c1)
+(si::putprop 'clines 'c2clines 'c2)
+
