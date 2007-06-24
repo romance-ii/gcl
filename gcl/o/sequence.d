@@ -182,15 +182,15 @@ object val;
 
 	case t_vector:
 	case t_bitvector:
-		if (index >= seq->v.v_fillp) {
-			max=seq->v.v_fillp;
+		if (index >= seq->v.v_dim) {
+			max=seq->v.v_dim;
 			goto E;
 		}
 		return(aset(seq, index, val));
 
 	case t_string:
-		if (index >= seq->st.st_fillp) {
-			max=seq->st.st_fillp;
+		if (index >= seq->st.st_dim) {
+			max=seq->st.st_dim;
 			goto E;
 		}
 		if (type_of(val) != t_character)

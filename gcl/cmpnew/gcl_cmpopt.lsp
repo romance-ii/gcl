@@ -63,9 +63,9 @@
 
 ;;SPUTC
  (push '((fixnum t) fixnum #.(flags set rfa)(lambda (x y) (add-putc) (wt "(putc(" x ",(" y ")->sm.sm_fp))")))
-   (get 'sputc 'inline-unsafe))
+   (get 'sputc 'inline-always))
 (push '((character t) fixnum #.(flags set rfa)(lambda (x y) (add-putc) (wt "(putc(" x ",(" y ")->sm.sm_fp))")))
-   (get 'sputc 'inline-unsafe))
+   (get 'sputc 'inline-always))
 
 ;;FORK
  (push '(() t #.(flags)(lambda nil (add-libc "memset")(add-libc "pipe")(add-libc "close")(add-libc "fork")(wt "myfork()")))
