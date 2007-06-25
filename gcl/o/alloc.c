@@ -210,7 +210,7 @@ add_page_to_freelist(char *p, struct typemanager *tm)
     are many arrays in a system to make the headers not writable,
     but just SGC_TOUCH the header each time you write to it.   this
     is what is done with t_structure */
-  if (t== (tm_of(t_array)->tm_type))
+ if (t== (tm_of(t_array)->tm_type) || t== (tm_of(t_vector)->tm_type)) /*FIXME, do the touch*/
    sgc_type_map[np] |= SGC_PERM_WRITABLE;
    
 #endif 

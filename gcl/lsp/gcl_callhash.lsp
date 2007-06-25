@@ -194,13 +194,13 @@
 
 (defun block-lambda (ll block body)
   (let* ((z body)
-	 (doc (when (and z (stringp (car z))) (list (pop z))))
-	 (decls (let (d) (do nil ((or (not z) (not (consp (car z))) (not (eq (caar z) 'declare))) (nreverse d))
+	 (decls (let (d) (do nil ((or (not z) (and (not (stringp (car z))) 
+						   (or (not (consp (car z))) (not (eq (caar z) 'declare))))) (nreverse d))
 			      (push (pop z) d))))
 	 (ctps (let (d) (do nil ((or (not z) (not (consp (car z))) (not (eq (caar z) 'check-type))) (nreverse d))
 			     (push (pop z) d))))
 	 (rest z))
-  `(lambda ,ll ,@doc ,@decls ,@ctps (block ,block ,@rest))))
+  `(lambda ,ll ,@decls ,@ctps (block ,block ,@rest))))
        
 
 (defun function-lambda-expression (y) 
@@ -441,6 +441,7 @@
 	(when rfns
 	  (with-temp-file
 	      (s tpn) ((temp-prefix) "lsp")
+	      (declare (ignore tpn))
 	      (unless pnp (setq pn s))
 	      (format t "Compiling and loading new source in ~s~%" pn)
 	      (with-open-file 
@@ -568,6 +569,7 @@
 	(t (error "~S is not a feature expression." x))))
 
 (defun sharp-+-reader (stream subchar arg)
+  (declare (ignore subchar arg))
   (if (eval-feature (let ((*read-suppress* nil) 
 			  (*read-base* 10.)
 			  (*package* (load-time-value (find-package 'keyword))))
@@ -580,6 +582,7 @@
                               (si::standard-readtable))
 
 (defun sharp---reader (stream subchar arg)
+  (declare (ignore subchar arg))
   (if (eval-feature (let ((*read-suppress* nil)
 			  (*read-base* 10.)
 			  (*package* (load-time-value (find-package 'keyword))))
