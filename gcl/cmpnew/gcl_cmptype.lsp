@@ -501,7 +501,7 @@
 (si::putprop 'si::complex-real 'complex-real-imag-type-propagator 'type-propagator)
 (si::putprop 'si::complex-imag 'complex-real-imag-type-propagator 'type-propagator)
 
-(defun complex-propagator (f t1 t2)
+(defun complex-propagator (f t1 &optional (t2 t1))
   (declare (ignore f))
   (when (and (type>= #treal t1) (type>= #treal t2))
     (to-complex-tp (super-range '+ t1 t2))))
