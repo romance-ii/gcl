@@ -441,7 +441,7 @@
 	(when rfns
 	  (with-temp-file
 	      (s tpn) ((temp-prefix) "lsp")
-	      (declare (ignore tpn))
+	      tpn
 	      (unless pnp (setq pn s))
 	      (format t "Compiling and loading new source in ~s~%" pn)
 	      (with-open-file 
