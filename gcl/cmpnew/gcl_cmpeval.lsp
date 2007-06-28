@@ -1810,10 +1810,18 @@
 		      (characterp tem)))
 	     (setq found t) (setf (car v) tem)))))
 
+(defun remove-doc-string (body)
+  (nconc (do (d doc) ((or (not body) (if (stringp (car body)) 
+					 (or (endp (cdr body)) doc)
+				       (or (not (consp (car body))) (not (eq 'declare (caar body))))))
+		      (nreverse d))
+	     (let ((x (pop body))) (if (stringp x) (unless doc (push x doc)) (push x d)))) body))
+  
+
 (defun blla (l a last body)
   (let (r k rb rv lvp)
     (do ((l l) (a a))
-	((not l) `(let* ,(nreverse r) ,@body))
+	((not l) `(let* ,(nreverse r) ,@(remove-doc-string body)))
       (cond ((let ((z (member (car l) '(&optional &rest &key &allow-other-keys &aux)))) (when z (setq k z))) (pop l))
 	    ((when last (unless a (push (list (setq lvp (gensym)) last) r) (setq last nil))))
 	    ((not k) (push (list (pop l) (cond (a (pop a)) (lvp `(pop ,lvp)))) r))
