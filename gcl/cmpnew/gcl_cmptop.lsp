@@ -602,8 +602,9 @@
   
 (defun pd (fname ll args)
   (let (decls ctps doc (*no-proxy-symbols* t))
-    (do nil ((or (not args) (and (not (stringp (car args))) (or (not (consp (car args))) (not (eq (caar args) 'declare))))))
-	(if (stringp (car args)) (unless doc (push (pop args) doc)) (push (pop args) decls)))
+    (do nil ((or (not args) (if (stringp (car args)) (or (endp (cdr args)) doc)
+			      (or (not (consp (car args))) (not (eq (caar args) 'declare))))))
+	(let ((x (pop args))) (if (stringp x) (unless doc (push x doc)) (push x decls))))
     (do nil ((or (not args) (not (consp (car args))) (not (eq (caar args) 'check-type))))
 	(push (pop args) ctps))
     (let* ((nal (do (r (y ll)) ((or (not y) (eq (car y) '&aux)) (nreverse r)) (push (pop y) r)))

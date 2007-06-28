@@ -469,8 +469,8 @@
       (setq form (cmp-eval form)))
     (cond
      ((stringp form)
-      (unless (or (null doc-p) (endp (cdr body)) doc)
-      (setq doc form)))
+      (when (or (null doc-p) (endp (cdr body)) doc) (return))
+      (setq doc form))
      ((and (consp form) (eq (caar body) 'check-type))
       (push (car body) ctps))
      ((and (consp form) (eq (car form) 'declare))
