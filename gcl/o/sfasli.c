@@ -37,7 +37,13 @@ bfd_hash_transfer(struct bfd_link_hash_entry *h,void *v) {
   
 }  
 
+#ifdef GCL_GPROF
 extern int _mcount();
+int
+mcount_wrapper(unsigned long u1,unsigned long u2) {
+  return _mcount(u1,u2);
+}
+#endif
 
 /* Replace this with gcl's own hash structure at some point */
 static int
@@ -116,12 +122,15 @@ build_symbol_table_bfd(void) {
     vs_base=ovsb;
 
     bfd_link_hash_traverse(link_info.hash,bfd_hash_transfer,NULL);
+
+#ifdef GCL_GPROF
     sethash(make_simple_string("_mcount"),
 	    sSAlink_hash_tableA->s.s_dbind,
-	    make_fixnum((fixnum)_mcount));
+	    make_fixnum((fixnum)mcount_wrapper));
     sethash(make_simple_string("mcount"),
 	    sSAlink_hash_tableA->s.s_dbind,
-	    make_fixnum((fixnum)_mcount));
+	    make_fixnum((fixnum)mcount_wrapper));
+#endif
 
     bfd_close(bself);
     bself=NULL;

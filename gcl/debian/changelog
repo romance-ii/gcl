@@ -1,8 +1,9 @@
 gclcvs (2.7.0-73) unstable; urgency=low
 
   * fix intermingled doc-string/declaration handling
-  
- -- Camm Maguire <camm@enhanced.com>  Thu, 28 Jun 2007 15:58:58 -0400
+  * mcount_wrapper
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 28 Jun 2007 22:50:01 -0400
 
 gclcvs (2.7.0-72) unstable; urgency=low
 
