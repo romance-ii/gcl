@@ -135,6 +135,12 @@
        (dolist (l *restore-vars*) (push (list (car l) (var-type (car l))) trv));)
        (list b trv)))))
 
+(defun fmla-c1expr (fmla)
+  (cond ((not fmla) nil)
+	((member (car fmla) '(fmla-and fmla-or fmla-not)) (fmla-c1expr (cdr fmla)))
+	((consp (car fmla)) (append (fmla-c1expr (car fmla)) (fmla-c1expr (cdr fmla))))
+	((list fmla))))
+
 (defun c1if (args &aux info f)
   (when (or (endp args) (endp (cdr args)))
         (too-few-args 'if 2 (length args)))
@@ -158,11 +164,13 @@
 		(fmlae (if (notevery 'cadr inf) nil fmlae))
 		(fmlae (if (notevery 'cddr inf) t   fmlae)))
 	   (if (not (eq fmlae 'boolean))
-	       (cond (fmlae 
-		      (when (caddr args) (note-branch-elimination (car args) t (caddr args)))
-		      (c1expr** (ignorable-pivot (car args) (cadr args)) info))
-		     (t (note-branch-elimination (car args) nil (cadr args)) 
-			(c1expr** (ignorable-pivot (car args) (caddr args)) info)))
+
+ 	       (cond (fmlae 
+  		      (when (caddr args) (note-branch-elimination (car args) t (caddr args)))
+  		      (new-c1progn (fmla-c1expr fmla) (c1expr** (cadr args) info)))
+  		     (t (note-branch-elimination (car args) nil (cadr args)) 
+  			(new-c1progn (fmla-c1expr fmla) (c1expr** (caddr args) info))))
+	     
 	     (let (r)
 	       (dolist (l inf)
 		 (let ((v (car (member (car l) *vars* :key (lambda (x) (when (var-p x) (var-name x)))))))
@@ -265,6 +273,7 @@
 
 (defvar *c1fmla-recursion* nil)
 
+;;FIXME pass this all through iff and avoid duplication of this logic here
 (defun fmla-and-or (fmlac info tp)
   (let (r rp)
     (dolist (x fmlac r)
@@ -277,34 +286,31 @@
 	   (return r)))))))
 
 (defun c1fmla (fmla info)
-  (if (consp fmla)
-      (case (car fmla)
-            (and (case (length (cdr fmla))
-                   (0 (c1t))
-                   (1 (c1fmla (cadr fmla) info))
-                   (t (cons 'FMLA-AND (fmla-and-or (cdr fmla) info #tnull)))))
-;;FIXME pass this all through iff and avoid duplication of this logic here
-;                            (mapcar (lambda (x) (with-restore-vars (prog1 (c1fmla x info) (do (l) ((not (setq l (pop *restore-vars*)))) (setf (var-type (car l)) (type-or1 (var-type (car l)) (cadr l)))))))
-;                                    (cdr fmla))
-            (or (case (length (cdr fmla))
-                   (0 (c1nil))
-                   (1 (c1fmla (cadr fmla) info))
-                   (t (cons 'FMLA-OR (fmla-and-or (cdr fmla) info #t(not null))))))
-;                            (mapcar (lambda (x) (with-restore-vars (prog1 (c1fmla x info) (do (l) ((not (setq l (pop *restore-vars*)))) (setf (var-type (car l)) (type-or1 (var-type (car l)) (cadr l)))))))
-;                                    (cdr fmla))
-            ((not null)
-                  (when (endp (cdr fmla)) (too-few-args 'not 1 0))
-                  (unless (endp (cddr fmla))
-                          (too-many-args 'not 1 (length (cdr fmla))))
-                  (list 'FMLA-NOT (c1fmla (cadr fmla) info)))
-	    ;;FIXME collapse and an or to if with compiler-macros/normal macros, and ensure order makes sense with that in c1symbol-fun
-            (t (let* ((cm (and (symbolp (car fmla)) (get (car fmla) 'si::compiler-macro-prop)))
-		      (cm (and cm (funcall cm fmla nil))))
-		 (cond ((and cm (not (eq cm fmla)))  (c1fmla cm info))
-		       ((let ((r (c1expr* fmla info))) (and (or *c1fmla-recursion*
-								(type>= #tboolean (info-type (cadr r)))) r)))
-		       ((let ((*c1fmla-recursion* t)) (c1expr* `(when ,fmla t) info)))))))
-    (c1expr* fmla info)))
+  (if (atom fmla) (c1expr* fmla info)
+    (case (car fmla)
+	  (and (case (length (cdr fmla))
+		     (0 (c1t))
+		     (1 (c1fmla (cadr fmla) info))
+		     (t (cons 'FMLA-AND (fmla-and-or (cdr fmla) info #tnull)))))
+	  (or (case (length (cdr fmla))
+		    (0 (c1nil))
+		    (1 (c1fmla (cadr fmla) info))
+		    (t (cons 'FMLA-OR (fmla-and-or (cdr fmla) info #t(not null))))))
+	  ((not null)
+	   (when (endp (cdr fmla)) (too-few-args 'not 1 0))
+	   (unless (endp (cddr fmla))
+	     (too-many-args 'not 1 (length (cdr fmla))))
+	   (list 'FMLA-NOT (c1fmla (cadr fmla) info)))
+	  (t (let* ((cm (and (symbolp (car fmla)) (get (car fmla) 'si::compiler-macro-prop)))
+		    (cm (and cm (funcall cm fmla nil))))
+	       (cond ((and cm (not (eq cm fmla)))  (c1fmla cm info))
+		     ((let ((r (c1expr* fmla info))) 
+			(if (type>= #tboolean (info-type (cadr r))) r
+			  (let ((info (make-info :type #tboolean)))
+			    (add-info info (cadr r))
+			    (list 'if info 
+				  (list 'call-global info 'eq (list r (c1nil)))
+				  (c1nil) (c1t))))))))))))
 
 (defun c2if (fmla form1 form2
                   &aux (Tlabel (next-label)) Flabel)
