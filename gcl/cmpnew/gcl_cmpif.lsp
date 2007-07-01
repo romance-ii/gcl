@@ -135,11 +135,31 @@
        (dolist (l *restore-vars*) (push (list (car l) (var-type (car l))) trv));)
        (list b trv)))))
 
+(defun c-and (y x)
+  (if (type>= #tnull (info-type (cadr y))) y
+    (let ((x (fmla-c1expr x)))
+      (list 'if (make-info :type (type-or1 (info-type (cadr x)) #tnull)) y x (c1nil)))))
+
+(defun c-or (y x)
+  (if (type>= #t(not null) (info-type (cadr y))) y
+    (let ((x (fmla-c1expr x)))
+      (list 'if (make-info :type (type-or1 (info-type (cadr x)) #t(member t))) y (c1t) x))))
+
+(defun c-not (x)
+  (let ((x (fmla-c1expr x)))
+    (cond ((type>= #tnull (info-type (cadr x))) 
+	   (list 'progn (make-info :type #t(member t)) (list x (c1t))))
+	  ((type>= #t(not null) (info-type (cadr x))) 
+	   (list 'progn (make-info :type #tnull) (list x (c1nil))))
+	  ((list 'if (make-info :type #tboolean) x (c1nil) (c1t))))))
+
+
 (defun fmla-c1expr (fmla)
-  (cond ((not fmla) nil)
-	((member (car fmla) '(fmla-and fmla-or fmla-not)) (fmla-c1expr (cdr fmla)))
-	((consp (car fmla)) (append (fmla-c1expr (car fmla)) (fmla-c1expr (cdr fmla))))
-	((list fmla))))
+  (case (car fmla)
+	(fmla-and (reduce 'c-and (cdr fmla) :initial-value (c1t)))
+	(fmla-or  (reduce 'c-or  (cdr fmla) :initial-value (c1nil)))
+	(fmla-not (c-not (fmla-c1expr (cadr fmla))))
+	(otherwise fmla)))
 
 (defun c1if (args &aux info f)
   (when (or (endp args) (endp (cdr args)))
@@ -167,9 +187,9 @@
 
  	       (cond (fmlae 
   		      (when (caddr args) (note-branch-elimination (car args) t (caddr args)))
-  		      (new-c1progn (fmla-c1expr fmla) (c1expr** (cadr args) info)))
+  		      (new-c1progn (list (fmla-c1expr fmla)) (c1expr** (cadr args) info)))
   		     (t (note-branch-elimination (car args) nil (cadr args)) 
-  			(new-c1progn (fmla-c1expr fmla) (c1expr** (caddr args) info))))
+  			(new-c1progn (list (fmla-c1expr fmla)) (c1expr** (caddr args) info))))
 	     
 	     (let (r)
 	       (dolist (l inf)
@@ -271,9 +291,6 @@
                        fmla))
    (t t)))
 
-(defvar *c1fmla-recursion* nil)
-
-;;FIXME pass this all through iff and avoid duplication of this logic here
 (defun fmla-and-or (fmlac info tp)
   (let (r rp)
     (dolist (x fmlac r)
@@ -282,7 +299,7 @@
 	 (do (l) ((not (setq l (pop *restore-vars*)))) 
 	     (setf (var-type (car l)) (type-or1 (var-type (car l)) (cadr l))))
 	 (setq rp (let ((tmp (cons z nil))) (if rp (cdr (rplacd rp tmp)) (setq r tmp))))
-	 (when (and (info-p (cadr z)) (type>= tp (info-type (cadr z))))
+	 (when (type>= tp (info-type (cadr (fmla-c1expr z))))
 	   (return r)))))))
 
 (defun c1fmla (fmla info)
