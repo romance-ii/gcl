@@ -83,7 +83,7 @@
 			 (not (symbolp (car def)))
 			 (endp (cdr def)))
 		     "The function definition ~s is illegal." def)
-	      (let ((fun (make-fun :name (car def) :ref nil :ref-ccb nil :info (make-info :sp-change 1))))
+	      (let ((fun (make-fun :name (car def) :ref nil :ref-ccb nil :info (make-info :type '* :sp-change 1))))
 		(push fun *funs*)
 		(push (list fun (cdr def)) defs1)))
 
@@ -215,7 +215,7 @@
     (cmpck (member (car def) fnames)
            "The function ~s was already defined." (car def))
     (push (car def) fnames)
-    (let ((fun (make-fun :name (car def) :ref nil :ref-ccb nil :info (make-info :sp-change 1))))
+    (let ((fun (make-fun :name (car def) :ref nil :ref-ccb nil :info (make-info :type '* :sp-change 1))))
          (push fun *funs*)
          (push (list fun nil nil (cdr def)) defs1)))
 

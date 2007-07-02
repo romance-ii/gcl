@@ -149,6 +149,35 @@ alphaelf_new_lo16_reloc (bfd *abfd,
 
 }
 
+static bfd_reloc_status_type
+alphaelf_new_gprel32_reloc (bfd *abfd, 
+                         arelent *reloc_entry,
+                         asymbol *symbol,
+                         PTR data,
+                         asection *input_section,
+                         bfd *output_bfd,
+                         char **error_message) {
+
+  int insn;
+
+  bfd_vma addr = ptrvma(data) + reloc_entry->address;
+  bfd_vma value = symbol->section->vma + symbol->value + reloc_entry->addend;
+
+  insn = bfd_get_32(abfd, (bfd_byte*)vmaptr(addr));
+  if ((insn & 0xffff))
+    return bfd_reloc_notsupported;
+
+  check_gp(abfd);
+  value = value - gp;
+
+  insn = (value & 0xffffffff);
+
+  bfd_put_32 (abfd, insn, (bfd_byte*)vmaptr(addr));
+
+  return bfd_reloc_ok;
+
+}
+
 static void
 alphaelf_install_patches(bfd *abfd) {
 
@@ -176,6 +205,11 @@ alphaelf_install_patches(bfd *abfd) {
   assert(howto);
   if (howto->special_function != alphaelf_new_literal_reloc)
       howto->special_function = alphaelf_new_literal_reloc;
+
+  howto = bfd_reloc_type_lookup(abfd,BFD_RELOC_GPREL32);
+  assert(howto);
+  if (howto->special_function != alphaelf_new_gprel32_reloc)
+      howto->special_function =  alphaelf_new_gprel32_reloc;
 
 }
 
