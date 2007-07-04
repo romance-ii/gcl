@@ -1242,10 +1242,11 @@ DEFUN_NEW("ALLOCATE-RELOCATABLE-PAGES",object,fSallocate_relocatable_pages,SI
   CHECK_ARG_RANGE(1,2);
   if (npages  <= 0)
     FEerror("Requires positive arg",0);
-  if ((nrbpage > npages && rb_pointer >= rb_start + PAGESIZE*npages - 2*RB_GETA)
-      || 2*npages > real_maxpage-page(heap_end)-new_holepage-real_maxpage/32)
-    FEerror("Can't set the limit for relocatable blocks to ~D.",
-	    1, make_fixnum(npages));
+  if (nrbpage > npages || 2*npages > real_maxpage-page(heap_end)-new_holepage-real_maxpage/32) {
+    RETURN1(make_fixnum(nrbpage));
+  }
+/*     FEerror("Can't set the limit for relocatable blocks to ~D.", */
+/* 	    1, make_fixnum(npages)); */
   rb_end += (npages-nrbpage)*PAGESIZE;
   nrbpage = npages;
   rb_limit = rb_end - 2*RB_GETA;
