@@ -4,8 +4,9 @@ gclcvs (2.7.0-75) unstable; urgency=low
   * intdiv conditional for alpha
   * libc-ext; FIXME
   * safe allocate_relocatable_pages
+  * cfdl only on unmarked non-free cfdata objects
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 04 Jul 2007 14:54:32 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed, 04 Jul 2007 14:55:05 -0400
 
 gclcvs (2.7.0-74) unstable; urgency=low
 

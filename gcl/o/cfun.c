@@ -134,7 +134,7 @@ DEFUN_NEW("CFDL",object,fScfdl,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
       continue;
     for (p=pagetochar(i),j=tm->tm_nppage;j>0;--j,p+=tm->tm_size) {
       x=(object)p;
-      if (type_of(x)!=t_cfdata)
+      if (type_of(x)!=t_cfdata || is_marked_or_free(x))
 	continue;
       for (x=x->cfd.cfd_dlist;x!=Cnil;x=x->c.c_cdr) {
 	fixnum j=fix(x->c.c_car->c.c_cdr),k=fix(x->c.c_car->c.c_car->s.s_dbind);
@@ -174,7 +174,9 @@ DEFUN_NEW("DLADDR",object,fSdladdr,SI,1,1,NONE,OI,OO,OO,OO,(fixnum ad),"") {
 
 }
 
-
+DEFUN_NEW("LIBC-EXT",object,fSlibc_ext,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+  RETURN1(make_simple_string(LIBC_EXT));/*FIXME*/
+}
 
 DEFUN_NEW("DLOPEN",object,fSdlopen,SI,1,1,NONE,OO,OO,OO,OO,(object name),"") {
 
@@ -470,8 +472,4 @@ DEFUN_NEW("TURBO-CLOSURE",object,fSturbo_closure,SI
 
 
 void
-gcl_init_cfun(void)
-{
-	
-}
-
+gcl_init_cfun(void) {}
