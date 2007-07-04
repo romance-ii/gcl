@@ -2,8 +2,9 @@ gclcvs (2.7.0-75) unstable; urgency=low
 
   * fmla-tp;switch conditional for mips
   * intdiv conditional for alpha
+  * libc-ext; FIXME
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 04 Jul 2007 14:52:25 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed, 04 Jul 2007 14:53:50 -0400
 
 gclcvs (2.7.0-74) unstable; urgency=low
 

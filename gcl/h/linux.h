@@ -160,3 +160,6 @@ do { int c = 0; \
    (a_)=q;\
  }\
 } while(0)
+
+#undef LIBC_EXT
+#define LIBC_EXT ".6" /*FIXME*/

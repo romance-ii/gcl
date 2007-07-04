@@ -10,4 +10,4 @@ int cacheflush(void *,int,int);
                         cacheflush(v,ve-v,BCACHE);\
                     } while(0)
 #define SPECIAL_BFD_INCLUDE "sfaslbfd_mips.c"
-#define ADDITIONAL_FEATURES ADD_FEATURE("MIPS")
+#define NOSWITCH

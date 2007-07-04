@@ -11,5 +11,6 @@
 #include <asm/system.h>
 #define CLEAR_CACHE imb()
 #define SPECIAL_BFD_INCLUDE "sfaslbfd_alpha.c"
-
-#define ADDITIONAL_FEATURES ADD_FEATURE("ALPHA")
+#define NOINTDIV
+#undef LIBC_EXT
+#define LIBC_EXT ".6.1" /*FIXME*/
