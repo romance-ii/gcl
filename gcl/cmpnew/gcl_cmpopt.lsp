@@ -746,12 +746,14 @@
 ;  "@01;(#0>=0&&(#1)>0?(#0)/(#1):ifloor(#0,#1))")
 ;   (get 'floor 'inline-always))
 ;(si::putprop 'floor 'floor-propagator 'type-propagator)
+#+intdiv
 (push '((fixnum fixnum) (returns-exactly fixnum fixnum) #.(flags rfa set)
 	 "@01;({fixnum _t=(#0)/(#1);_t=((#0)<=0 && (#1)<=0) || ((#0)>=0 && (#1)>=0) || ((#1)*_t==(#0)) ? _t : _t-1;@1((#0)-_t*(#1))@ _t;})")
    (get 'floor 'inline-always))
 
 ;;CEILING
 ;(si::putprop 'ceiling 'floor-propagator 'type-propagator)
+#+intdiv
 (push '((fixnum fixnum) (returns-exactly fixnum fixnum) #.(flags rfa set)
 	 "@01;({fixnum _t=(#0)/(#1);_t=((#0)<=0 && (#1)>=0) || ((#0)>=0 && (#1)<=0) || ((#1)*_t==(#0)) ? _t : _t+1;@1((#0)-_t*(#1))@ _t;})")
    (get 'ceiling 'inline-always))
@@ -971,6 +973,7 @@
 
 
 ;;MOD
+#+intdiv
  (push '((fixnum fixnum) fixnum #.(flags rfa set)"@01;({register fixnum _t=(#0)%(#1);((#1)<0 && _t<=0) || ((#1)>0 && _t>=0) ? _t : _t + (#1);})")
    (get 'mod 'inline-always))
 
@@ -1058,8 +1061,7 @@
 ;;REM
 
 
-#+
-TRUNCATE_USE_C
+#+intdiv
 (push '((fixnum fixnum) fixnum #.(flags rfa)"(#0)%(#1)")
    (get 'rem 'inline-always))
 
@@ -1175,8 +1177,7 @@ TRUNCATE_USE_C
 
 ;;TRUNCATE
 
-#+
-TRUNCATE_USE_C
+#+intdiv
 ;(si::putprop 'truncate 'floor-propagator 'type-propagator)
 (push '((fixnum fixnum) (returns-exactly fixnum fixnum) #.(flags rfa)"({fixnum _t=(#0)/(#1);@1(#0)-_t*(#1)@ _t;})")
    (get 'truncate 'inline-always))
