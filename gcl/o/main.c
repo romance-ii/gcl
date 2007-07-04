@@ -1236,6 +1236,14 @@ init_main(void) {
   ADD_FEATURE("CLX-LITTLE-ENDIAN");
 #endif
   
+#ifndef NOSWITCH
+  ADD_FEATURE("SWITCH");
+#endif
+
+#ifndef NOINTDIV
+  ADD_FEATURE("INTDIV");
+#endif
+
 #ifndef PECULIAR_MACHINE
 #define BIGM    (int)((((unsigned int)(-1))/2))	 
   { 
