@@ -291,6 +291,18 @@
                        fmla))
    (t t)))
 
+(defun fmla-tp (fmla)
+  (case (car fmla)
+	((fmla-and fmla-or)
+	 (let* ((tp (if (eq (car fmla) 'fmla-and) #tnull #t(not null)))
+		(z (or (member tp (cdr fmla) :key 'fmla-tp :test 'type>=) (last fmla))))
+	   (fmla-tp (car z))))
+	(fmla-not (let ((tp (fmla-tp (cadr fmla)))) 
+		    (cond ((type>= #tnull tp) #t(member t))
+			  ((type>= #t(not null) tp) #tnull) 
+			  (#tboolean))))
+	(otherwise (info-type (cadr fmla)))))
+
 (defun fmla-and-or (fmlac info tp)
   (let (r rp)
     (dolist (x fmlac r)
@@ -299,7 +311,7 @@
 	 (do (l) ((not (setq l (pop *restore-vars*)))) 
 	     (setf (var-type (car l)) (type-or1 (var-type (car l)) (cadr l))))
 	 (setq rp (let ((tmp (cons z nil))) (if rp (cdr (rplacd rp tmp)) (setq r tmp))))
-	 (when (type>= tp (info-type (cadr (fmla-c1expr z))))
+	 (when (type>= tp (fmla-tp z))
 	   (return r)))))))
 
 (defun c1fmla (fmla info)
@@ -546,7 +558,7 @@
   (let* ((info (make-info :type #tnil))
          (key-form (with-restore-vars (c1expr* (car args) info)))
          (clauses nil) or-list)
-    (cond #-mips((unless (atomic-tp (info-type (second key-form)));FIXME
+    (cond #+switch((unless (atomic-tp (info-type (second key-form)));FIXME
 	     (type>= #tfixnum (nil-to-t (info-type (second key-form)))))
 	   (return-from c1case  (c1expr (convert-case-to-switch args default ))))
 	  ((return-from c1case (c1expr (cmp-macroexpand `(,(if default 'ecase 'case) ,@args))))))
