@@ -1424,7 +1424,8 @@ GBC(enum type t) {
 /* #endif */
       {holepage = 1;
       rb_limit=end+PAGESIZE;
-      rb_end=rb_limit+2*RB_GETA;}
+      rb_end=rb_limit+2*RB_GETA;
+      rb_end=rb_end>core_end ? core_end : rb_end;}
 /*       nrbpage = (rb_end-rb_start)/PAGESIZE;} */
     
     if (nrbpage < 0)
