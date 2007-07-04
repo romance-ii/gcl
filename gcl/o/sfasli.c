@@ -183,19 +183,19 @@ LFD(build_symbol_table)(void) {
     unlink(tmpfile1);
     qsort((char*)(c_table.ptable),(int)(c_table.length),sizeof(struct node),node_compare);
 
-    {
-      struct node *p,*pe;
-      for (p=*c_table.ptable,pe=p+c_table.length;p<pe;p++) {
-	unsigned long pa;
-	if (!my_plt(p->string,&pa)) {
-/* 	  printf("my_plt %s %p %p\n",p->string,(void *)pa,(void *)p->address); */
-	  if (p->address && p->address!=pa)
-	    FEerror("plt address mismatch",0);
-	  else
-	    p->address=pa;
-	}
-      }
-    }
+/*     { */
+/*       struct node *p,*pe; */
+/*       for (p=*c_table.ptable,pe=p+c_table.length;p<pe;p++) { */
+/* 	unsigned long pa; */
+/* 	if (!my_plt(p->string,&pa)) { */
+/* /\* 	  printf("my_plt %s %p %p\n",p->string,(void *)pa,(void *)p->address); *\/ */
+/* 	  if (p->address && p->address!=pa) */
+/* 	    FEerror("plt address mismatch",0); */
+/* 	  else */
+/* 	    p->address=pa; */
+/* 	} */
+/*       } */
+/*     } */
 
   }
 #else /* special_rsym */

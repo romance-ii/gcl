@@ -6,8 +6,9 @@ gclcvs (2.7.0-75) unstable; urgency=low
   * safe allocate_relocatable_pages
   * cfdl only on unmarked non-free cfdata objects
   * rb_end<core_end protection
+  * remove my_plt references on rsym systems
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 04 Jul 2007 14:55:37 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed, 04 Jul 2007 14:56:14 -0400
 
 gclcvs (2.7.0-74) unstable; urgency=low
 
