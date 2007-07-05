@@ -5057,7 +5057,6 @@ else
 		 #endif
 		    execvp(argv[0],argv);
 		 #endif  
-		 b = (void *) malloc(1000);
 		 fp = fopen("conftest1","w");
 
 		 #ifdef _WIN32
@@ -5066,6 +5065,7 @@ else
 		 #if defined (__APPLE__) && defined (__MACH__)
 		   fprintf(fp,"((unsigned long)get_dbegin())");
 		 #else
+     		   b = (void *) sbrk(0);
 		   fprintf(fp,"0x%lx",((unsigned long) b) & ~(unsigned long)0xffffff);
 		 #endif
 		 #endif
