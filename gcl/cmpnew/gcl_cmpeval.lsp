@@ -2264,7 +2264,7 @@
   (declare (:dynamic-extent r))
   (apply 'concatenate 'string (mapcar 'string-downcase r)))
 
-(defmacro defdlfun ((crt name lib) &rest tps)
+(defmacro defdlfun ((crt name &optional (lib "")) &rest tps)
   (let* ((sym  (mdlsym name lib))
 	 (symi (intern (strcat sym "-INLINE") 'compiler))
 	 (dls  (strcat "DL" name))

@@ -3,8 +3,9 @@ gclcvs (2.7.0-76) unstable; urgency=low
   * abandon mcount_wrapper
   * use sbrk to find DBEGIN
   * more robust dlopen
+  * simpler dlsym handling
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 05 Jul 2007 16:20:05 -0400
+ -- Camm Maguire <camm@enhanced.com>  Thu, 05 Jul 2007 19:15:11 -0400
 
 gclcvs (2.7.0-75) unstable; urgency=low
 

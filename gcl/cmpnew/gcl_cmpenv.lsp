@@ -74,7 +74,7 @@
 (defmacro next-cfun () '(incf *next-cfun*))
 
 (defun add-libc (x)
-  (add-dladdress (strcat "dl" x) (mdlsym x (lib-name "libc"))))
+  (add-dladdress (strcat "dl" x) (mdlsym x)))
 
 (defun add-dladdress (n l) 
   (unless (gethash n *dlinks*) 

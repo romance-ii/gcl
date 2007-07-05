@@ -49,7 +49,7 @@
 
 (defmacro check-type (place typespec &optional string)
   (declare (optimize (safety 1)))
-  `(progn (setf ,place (if (typep ,place ',typespec) ,place (the ,typespec (check-type-symbol ',place ,place ',typespec ',string)))) nil))
+  `(progn (setf ,place (the ,typespec (if (typep ,place ',typespec) ,place (check-type-symbol ',place ,place ',typespec ',string)))) nil))
 ;  `(unless (typep ,place ',typespec) (setf ,place (the ,typespec (check-type-symbol ',place ,place ',typespec ',string))) nil))
   
 

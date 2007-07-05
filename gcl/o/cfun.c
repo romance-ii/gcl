@@ -155,7 +155,7 @@ DEFUN_NEW("DLSYM",object,fSdlsym,SI,2,2,NONE,OI,OO,OO,OO,(fixnum h,object name),
   ch=name->st.st_self[name->st.st_fillp];
   name->st.st_self[name->st.st_fillp]=0;
   if (h) {
-    ad=dlsym(h,name->st.st_self);
+    ad=dlsym((void *)h,name->st.st_self);
     if (!dlerror()) {
       name->st.st_self[name->st.st_fillp]=ch;
       RETURN1(make_fixnum((fixnum)ad));
@@ -181,10 +181,6 @@ DEFUN_NEW("DLADDR",object,fSdladdr,SI,1,1,NONE,OI,OO,OO,OO,(fixnum ad),"") {
 
 }
 
-DEFUN_NEW("LIBC-EXT",object,fSlibc_ext,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
-  RETURN1(make_simple_string(LIBC_EXT));/*FIXME*/
-}
-
 DEFUN_NEW("DLOPEN",object,fSdlopen,SI,1,1,NONE,OO,OO,OO,OO,(object name),"") {
 
   char ch;
@@ -193,7 +189,7 @@ DEFUN_NEW("DLOPEN",object,fSdlopen,SI,1,1,NONE,OO,OO,OO,OO,(object name),"") {
   dlerror();
   ch=name->st.st_self[name->st.st_fillp];
   name->st.st_self[name->st.st_fillp]=0;
-  v=dlopen(name->st.st_self,RTLD_LAZY|RTLD_GLOBAL);
+  v=dlopen(name->st.st_fillp ? name->st.st_self : 0,RTLD_LAZY|RTLD_GLOBAL);
   name->st.st_self[name->st.st_fillp]=ch;
   if (dlerror())
     FEerror("dlopen faiure on ~s",1,name);

@@ -538,26 +538,18 @@
   (if (array-has-fill-pointer-p x) (fill-pointer x) (array-dimension x 0)))
 
 
-
 (defun mdlsym (str &optional (n "" np))
   (let* ((pk (or (find-package "LIB") (make-package "LIB")))
-	 (ns (if np (pathname-name n) n)))
-    (or (let* ((pp (find-symbol ns pk))
-	       (pp (when pp (find-package pp))))
-	  (when pp (find-symbol str pp)))
-	(let* ((k (dlopen n))
-	       (ad (dlsym k str))
-	       (p (pathname-name (dladdr ad)))
-	       (psym (intern p pk))
-	       (nsym (intern ns pk))
-	       (npk (or (find-package nsym)
-			(if (eq nsym psym) (make-package nsym :use '(lisp)) 
-			  (make-package nsym :nicknames (list psym) :use '(lisp)))))
-	       (sym (and (shadow str npk) (intern str npk))))
-	  (export (list psym nsym) pk)
-	  (export sym npk)
-	  (setf (symbol-value psym) k (symbol-value nsym) k (symbol-value sym) ad)
-	  sym))))
+	 (k  (if np (dlopen n) 0))
+	 (ad (dlsym k str))
+	 (p (pathname-name (dladdr ad)))
+	 (psym (intern p pk))
+	 (npk (or (find-package psym) (make-package psym :use '(lisp))))
+	 (sym (and (shadow str npk) (intern str npk))))
+    (export (list psym) pk)
+    (export sym npk)
+    (setf (symbol-value psym) k (symbol-value sym) ad)
+    sym))
 
 (defun eval-feature (x)
   (cond ((atom x)
@@ -598,7 +590,8 @@
 
 
 (defun lib-name (p)
-  (string-concatenate p ".so" (if (string= "libc" p) (libc-ext) "")))
+  (if (or (string= p "libc") (string= p "libm")) "" 
+    (string-concatenate p ".so")))
 				  
 (defun mdl (n p vad)
   (let* ((sym (mdlsym n (lib-name p)))
