@@ -148,16 +148,23 @@ DEFUN_NEW("CFDL",object,fScfdl,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
     
 DEFUN_NEW("DLSYM",object,fSdlsym,SI,2,2,NONE,OI,OO,OO,OO,(fixnum h,object name),"") {
 
-  char ch;
+  char ch,*er;
   void *ad;
 
   dlerror();
   ch=name->st.st_self[name->st.st_fillp];
   name->st.st_self[name->st.st_fillp]=0;
-  ad=dlsym(h ? (void *)h : RTLD_DEFAULT,name->st.st_self);
+  if (h) {
+    ad=dlsym(h,name->st.st_self);
+    if (!dlerror()) {
+      name->st.st_self[name->st.st_fillp]=ch;
+      RETURN1(make_fixnum((fixnum)ad));
+    }
+  }
+  ad=dlsym(RTLD_DEFAULT,name->st.st_self);
+  if ((er=dlerror()))
+    FEerror("dlsym lookup failure on ~s: ~s",2,name,make_simple_string(er));
   name->st.st_self[name->st.st_fillp]=ch;
-  if (dlerror())
-    FEerror("dlsym lookup failure on ~s",1,name);
   RETURN1(make_fixnum((fixnum)ad));
 
 }
