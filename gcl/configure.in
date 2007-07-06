@@ -2415,24 +2415,15 @@ AC_SUBST(NOTIFY)
 # the time handling for unixtime, add timezone
 
 if test "$use" != "mingw" ; then
-  AC_MSG_CHECKING([alloca])
-#  AC_TRY_RUN([#include <stdio.h>
-#  int main() {return alloca(500) ? 0 : 1;}],gcl_ok=yes, gcl_ok=no,gcl_ok=no)
-#  if test $gcl_ok = yes ; then
-#    AC_MSG_RESULT(yes)
-#    AC_DEFINE(HAVE_ALLOCA)
-#  else
-    AC_TRY_RUN([#include <stdio.h>
-		#include <alloca.h>
-    int main() {return alloca(500) ? 0 : 1;}],gcl_ok=yes, gcl_ok=no,gcl_ok=no)
-    if test $gcl_ok = yes ; then
-      AC_MSG_RESULT(yes)
-      AC_DEFINE(HAVE_ALLOCA)
-      AC_DEFINE(NEED_ALLOCA_H)
-#    fi
-  fi
-
-  if test $gcl_ok = no ; then     AC_MSG_RESULT(no) ; fi
+  AC_CHECK_HEADER(alloca.h,AC_DEFINE(NEED_ALLOCA_H) AC_DEFINE(HAVE_ALLOCA),	
+    AC_MSG_CHECKING([alloca])
+      AC_TRY_RUN([#include <stdio.h>
+      int main() {return alloca(500) ? 0 : 1;}],gcl_ok=yes, gcl_ok=no,gcl_ok=no)
+      if test $gcl_ok = yes ; then
+          AC_MSG_RESULT(yes)
+	        AC_DEFINE(HAVE_ALLOCA)
+      fi
+      if test $gcl_ok = no ; then     AC_MSG_RESULT(no) ; fi)
 
 fi
 

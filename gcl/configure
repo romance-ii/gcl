@@ -7988,25 +7988,55 @@ NOTIFY=$enable_notify
 # the time handling for unixtime, add timezone
 
 if test "$use" != "mingw" ; then
-  echo $ac_n "checking alloca""... $ac_c" 1>&6
-echo "configure:7993: checking alloca" >&5
-#  AC_TRY_RUN([#include <stdio.h>
-#  int main() {return alloca(500) ? 0 : 1;}],gcl_ok=yes, gcl_ok=no,gcl_ok=no)
-#  if test $gcl_ok = yes ; then
-#    AC_MSG_RESULT(yes)
-#    AC_DEFINE(HAVE_ALLOCA)
-#  else
-    if test "$cross_compiling" = yes; then
+  ac_safe=`echo "alloca.h" | sed 'y%./+-%__p_%'`
+echo $ac_n "checking for alloca.h""... $ac_c" 1>&6
+echo "configure:7994: checking for alloca.h" >&5
+if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  cat > conftest.$ac_ext <<EOF
+#line 7999 "configure"
+#include "confdefs.h"
+#include <alloca.h>
+EOF
+ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
+{ (eval echo configure:8004: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
+if test -z "$ac_err"; then
+  rm -rf conftest*
+  eval "ac_cv_header_$ac_safe=yes"
+else
+  echo "$ac_err" >&5
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  rm -rf conftest*
+  eval "ac_cv_header_$ac_safe=no"
+fi
+rm -f conftest*
+fi
+if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
+  echo "$ac_t""yes" 1>&6
+  cat >> confdefs.h <<\EOF
+#define NEED_ALLOCA_H 1
+EOF
+ cat >> confdefs.h <<\EOF
+#define HAVE_ALLOCA 1
+EOF
+
+else
+  echo "$ac_t""no" 1>&6
+echo $ac_n "checking alloca""... $ac_c" 1>&6
+echo "configure:8030: checking alloca" >&5
+      if test "$cross_compiling" = yes; then
   gcl_ok=no
 else
   cat > conftest.$ac_ext <<EOF
-#line 8004 "configure"
+#line 8035 "configure"
 #include "confdefs.h"
 #include <stdio.h>
-		#include <alloca.h>
-    int main() {return alloca(500) ? 0 : 1;}
+      int main() {return alloca(500) ? 0 : 1;}
 EOF
-if { (eval echo configure:8010: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:8040: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   gcl_ok=yes
 else
@@ -8018,20 +8048,16 @@ fi
 rm -fr conftest*
 fi
 
-    if test $gcl_ok = yes ; then
-      echo "$ac_t""yes" 1>&6
-      cat >> confdefs.h <<\EOF
+      if test $gcl_ok = yes ; then
+          echo "$ac_t""yes" 1>&6
+	        cat >> confdefs.h <<\EOF
 #define HAVE_ALLOCA 1
 EOF
 
-      cat >> confdefs.h <<\EOF
-#define NEED_ALLOCA_H 1
-EOF
+      fi
+      if test $gcl_ok = no ; then     echo "$ac_t""no" 1>&6 ; fi
+fi
 
-#    fi
-  fi
-
-  if test $gcl_ok = no ; then     echo "$ac_t""no" 1>&6 ; fi
 
 fi
 
@@ -8062,7 +8088,7 @@ fi
 # redhat/cygnus released for some reason a buggy version of gcc,
 # which no one else released.   Catch that here.
 echo $ac_n "checking for buggy gcc version from redhat""... $ac_c" 1>&6
-echo "configure:8066: checking for buggy gcc version from redhat" >&5
+echo "configure:8092: checking for buggy gcc version from redhat" >&5
 if  2>&1 $CC -v | fgrep "gcc version 2.96" > /dev/null 
    then 
         BROKEN_O4_OPT=1
