@@ -1,3 +1,9 @@
+gclcvs (2.7.0-77) unstable; urgency=low
+
+  * on_exit fix for freebsd
+
+ -- Camm Maguire <camm@enhanced.com>  Fri,  6 Jul 2007 16:33:24 -0400
+
 gclcvs (2.7.0-76) unstable; urgency=low
 
   * abandon mcount_wrapper

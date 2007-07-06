@@ -3147,7 +3147,7 @@ maccept(object x) {
 #include <sys/resource.h>
 #include <signal.h>
 
-#if defined(DARWIN)
+#if defined(DARWIN) || defined(FREE_BSD)
 #define on_exit(a,b)
 #else
 static void
