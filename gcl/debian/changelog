@@ -5,8 +5,9 @@ gclcvs (2.7.0-76) unstable; urgency=low
   * more robust dlopen
   * simpler dlsym handling
   * fix alloca detection for bsd
+  * fix cmpinclude.h for bsd
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 06 Jul 2007 09:16:37 -0400
+ -- Camm Maguire <camm@enhanced.com>  Fri, 06 Jul 2007 10:03:19 -0400
 
 gclcvs (2.7.0-75) unstable; urgency=low
 
