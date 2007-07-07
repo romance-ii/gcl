@@ -4,8 +4,9 @@ gclcvs (2.7.0-77) unstable; urgency=low
   * pass ambient disable-recompile and optimize-maximum-pages settings
     through compiler::link
   * car et.al source, faster bootstrap, new safety 3 mode
+  * prop hash on safety level
 
- -- Camm Maguire <camm@enhanced.com>  Sat,  7 Jul 2007 10:58:56 -0400
+ -- Camm Maguire <camm@enhanced.com>  Sat,  7 Jul 2007 13:51:44 -0400
 
 gclcvs (2.7.0-76) unstable; urgency=low
 

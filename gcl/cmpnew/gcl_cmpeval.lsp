@@ -1331,7 +1331,7 @@
       (let ((res (list c1 sz (info-type (cadr c1)))))
 	(when (inline-hasheable form fms c1) 
 	  (setf (gethash prop *prop-hash*) res))
-	(if (acceptable-inline res form (cdr prop)) res (cons nil (cdr res)))))))
+	(if (acceptable-inline res form (cddr prop)) res (cons nil (cdr res)))))))
 
 (defun match-c1forms (ofs fms)
   (mapcar (lambda (x) 
@@ -1344,7 +1344,7 @@
 
     (when h
 
-      (unless (acceptable-inline h form (cdr prop))
+      (unless (acceptable-inline h form (cddr prop))
 	(return-from get-inline-h (cons nil (cdr h))))
 
       (let* ((f (car h))
@@ -1381,7 +1381,7 @@
   (when (and (not *compiler-new-safety*) (> *speed* 0) (src-inlineable form))
     (let* ((fms (append c1forms (list last)))
 	   (tpis (mapcar (lambda (x) (when x (cons (info-type (cadr x)) (ignorable-form x)))) fms))
-	   (prop (cons (car form) tpis)))
+	   (prop (cons (car form) (cons (this-safety-level) tpis))))
 
       (mark-for-hash-inlining fms)
 
