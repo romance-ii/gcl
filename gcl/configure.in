@@ -521,7 +521,7 @@ case $use in
 esac		     
 
 case $use in
-  ia64*) enable_debug="yes";;
+#  ia64*) enable_debug="yes";;
   hppa*) enable_debug="yes";;
 esac		     
 
@@ -554,6 +554,8 @@ else
 	case "$use" in
 	  *mingw*)
 		TO3FLAGS="-O3 $TFPFLAG";;
+	  *ia64*)
+		TO3FLAGS="-g -O2";;
 	  *)
 		TO3FLAGS="-O3 $TFPFLAG";;
 	esac
@@ -2481,7 +2483,7 @@ NIFLAGS="$CFLAGS $TCFLAGS $TONIFLAGS $PROCESSOR_FLAGS -I\$(GCLDIR)/o"
 AC_SUBST(NIFLAGS)
 CFLAGS="$CFLAGS $TCFLAGS $TO3FLAGS $PROCESSOR_FLAGS -I\$(GCLDIR)/o"
 AC_SUBST(CFLAGS)
-O3FLAGS=`echo $TO3FLAGS | sed 's,O3,Os,g'`
+O3FLAGS=`echo $TO3FLAGS | sed 's,O3,Os,g'| sed 's,O2,Os,g'`
 AC_SUBST(O3FLAGS)
 O2FLAGS=$TO2FLAGS
 AC_SUBST(O2FLAGS)
