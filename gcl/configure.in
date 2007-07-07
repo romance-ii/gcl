@@ -1277,15 +1277,15 @@ AC_SUBST(PAGEWIDTH)
 AC_MSG_CHECKING(DBEGIN)
 AC_TRY_RUN([#include <stdio.h>
             #include <stdlib.h>
+            #include <unistd.h>
 	    #ifdef NEED_NONRANDOM_SBRK
 		   #include <syscall.h>
 		   #include <sys/personality.h>
-		   #include <unistd.h>
 	   #endif
 int
 main(int argc,char * argv[])
 {
-  char *b;
+  void *b;
   FILE *fp;
 
 #ifdef NEED_NONRANDOM_SBRK
@@ -1303,7 +1303,7 @@ main(int argc,char * argv[])
 #if defined (__APPLE__) && defined (__MACH__)
   fprintf(fp,"((unsigned long)get_dbegin())");
 #else
-  b = (void *) sbrk(0);
+  b = sbrk(0);
   fprintf(fp,"0x%lx",((unsigned long) b) & ~(unsigned long)((1<<PAGEWIDTH)-1));
 #endif
 #endif
@@ -1476,15 +1476,15 @@ if ./foo ; then
    AC_MSG_CHECKING("revised DBEGIN")
    AC_TRY_RUN([#include <stdio.h>
                #include <stdlib.h>
+	       #include <unistd.h>
 	       #ifdef NEED_NONRANDOM_SBRK
 	       #include <syscall.h>
 	       #include <linux/personality.h>
-	       #include <unistd.h>
 	       #endif
 	       int
 	       main(int argc,char * argv[])
 	       {
-	         char *b;
+	         void *b;
 		 FILE *fp;
 
 		 #ifdef NEED_NONRANDOM_SBRK
@@ -1503,7 +1503,7 @@ if ./foo ; then
 		 #if defined (__APPLE__) && defined (__MACH__)
 		   fprintf(fp,"((unsigned long)get_dbegin())");
 		 #else
-     		   b = (void *) sbrk(0);
+     		   b = sbrk(0);
 		   fprintf(fp,"0x%lx",((unsigned long) b) & ~(unsigned long)0xffffff);
 		 #endif
 		 #endif
