@@ -520,6 +520,11 @@ case $use in
   hppa*) enable_gprof="no";;
 esac		     
 
+case $use in
+  ia64*) enable_debug="yes";;
+  hppa*) enable_debug="yes";;
+esac		     
+
 if test "$enable_gprof" = "yes" ; then
         TCFLAGS="$TCFLAGS -pg";
         TLIBS="$TLIBS -pg";
@@ -549,8 +554,6 @@ else
 	case "$use" in
 	  *mingw*)
 		TO3FLAGS="-O3 $TFPFLAG";;
-	  *ia64*)
-		TO3FLAGS="-O2 -g $TFPFLAG";;
 	  *)
 		TO3FLAGS="-O3 $TFPFLAG";;
 	esac
