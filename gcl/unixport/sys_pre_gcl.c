@@ -140,7 +140,6 @@ gcl_init_system(object no_init)
   lsp_init("../cmpnew/gcl_cmpvs.lsp");
   lsp_init("../cmpnew/gcl_cmpwt.lsp");
   lsp_init("../cmpnew/gcl_cmpmain.lsp");
-
   
 }
 

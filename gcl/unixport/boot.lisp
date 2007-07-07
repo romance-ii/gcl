@@ -1,7 +1,7 @@
 ;(si::use-fast-links nil)
 ;(setq compiler::*space* 3)
 
-(dolist (l '(listlib predlib arraylib seq seqlib bnum))
+(dolist (l '(c listlib predlib arraylib seq seqlib bnum))
   (time (load (compile-file
 	       (concatenate 'string "../lsp/gcl_" (string-downcase (string l)) ".lsp")
 	       :c-file t :h-file t :data-file t :system-p t))))

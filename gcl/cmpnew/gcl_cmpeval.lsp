@@ -205,7 +205,8 @@
 				
 
 (defun result-type-from-args (f args)
-  (when (not (eq '* (get f 'return-type))) ;;FIXME  make sure return-type and proclaimed-return-type are in sync
+  (when (and (not *compiler-new-safety*) 
+	     (not (eq '* (get f 'return-type)))) ;;FIXME  make sure return-type and proclaimed-return-type are in sync
     (let* ((be (get f 'type-propagator))
 	   (ba (and be ;(si::dt-apply be (cons f (mapcar 'coerce-to-one-valuea args))))));FIXME
 		    (apply be (cons f (mapcar 'coerce-to-one-value args))))));FIXME
@@ -1377,7 +1378,7 @@
     d))
 
 (defun maybe-inline (form c1forms &optional last &aux (*in-inline* t))
-  (when (and (> *speed* 0) (src-inlineable form))
+  (when (and (not *compiler-new-safety*) (> *speed* 0) (src-inlineable form))
     (let* ((fms (append c1forms (list last)))
 	   (tpis (mapcar (lambda (x) (when x (cons (info-type (cadr x)) (ignorable-form x)))) fms))
 	   (prop (cons (car form) tpis)))

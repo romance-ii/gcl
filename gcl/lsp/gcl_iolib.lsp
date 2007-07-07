@@ -608,10 +608,9 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
 (defmacro with-compilation-unit (opt &rest body)   
   (declare (optimize (safety 1)))
   (declare (ignore opt)) 
-  `(progn
-     (let ((*disable-recompile* t))
-       ,@body)
-     (do-recompile nil)))
+  `(let ((res (multiple-value-list (let ((*disable-recompile* t)) ,@body))))
+     (do-recompile nil)
+     (values-list res)))
 
 (defun get-byte-stream-nchars (s)
   (check-type s stream)

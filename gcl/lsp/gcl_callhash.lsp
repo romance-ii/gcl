@@ -436,7 +436,7 @@
 	  (let (files)
 	    (dolist (l rfns)
 	      (let ((file (file l))) (when file (pushnew file files :test 'string=))))
-	    (format t "Updating original source files ~s~%" files)
+	    (when files (format t "Updating original source files ~s~%" files))
 	    (dolist (l files)
 	      (when (probe-file l) (compile-file l :system-p t :c-file t :h-file t :data-file t))))
 	

@@ -102,14 +102,15 @@
 	     (object (setf (var-loc var) 'object))
 	     (register (setf (var-register var) (+ (var-register var) 100)))
 	     (dynamic-extent  (setf (var-dynamic var) 1))
-	     (t (setf (var-type var) (nil-to-t (type-and (var-type var) (cdr v))))))))
+	     (t (unless *compiler-new-safety* (setf (var-type var) (nil-to-t (type-and (var-type var) (cdr v))))))
+	     )))
     
     (cond ((or (member name specials) (si:specialp name))
 	   (setf (var-kind var) 'SPECIAL)
 	   (setf (var-loc var) (add-symbol name))
-	   (when (and (not (assoc name types)) (setq x (get name 'cmp-type)))
+	   (when (and (not *compiler-new-safety*) (not (assoc name types)) (setq x (get name 'cmp-type)))
 	     (setf (var-type var) x))
-              (setq *special-binding* t))
+	   (setq *special-binding* t))
 	  (t
 	   (and (boundp '*c-gc*) *c-gc*
 		(or (null (var-type var))

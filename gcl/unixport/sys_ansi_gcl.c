@@ -83,6 +83,7 @@ gcl_init_system(object no_init)
   ar_check_init(gcl_setf,no_init);
   ar_check_init(gcl_arraylib,no_init);
   ar_check_init(gcl_assert,no_init);
+  ar_check_init(gcl_c,no_init);
   ar_check_init(gcl_listlib,no_init);
   ar_check_init(gcl_defstruct,no_init);
   ar_check_init(gcl_describe,no_init);

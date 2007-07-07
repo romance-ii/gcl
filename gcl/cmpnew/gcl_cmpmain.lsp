@@ -651,8 +651,9 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
   (format t "~&;; OPTIMIZE levels: Safety=~d~:[ (No runtime error checking)~;~], Space=~d, Speed=~d, (Debug quality ignored)~%"
           (cond ((null *compiler-check-args*) 0)
                 ((null *safe-compile*) 1)
-                ((null *compiler-push-events*) 2)
-                (t 3))
+                ((null *compiler-new-safety*) 2)
+                ((null *compiler-push-events*) 3)
+                (t 4))
           *safe-compile* *space* *speed* *debug*))
 
 (defun nconc-files (a b)

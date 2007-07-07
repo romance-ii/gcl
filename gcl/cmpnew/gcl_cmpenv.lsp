@@ -24,6 +24,7 @@
 
 (defvar *safe-compile* nil)
 (defvar *compiler-check-args* nil)
+(defvar *compiler-new-safety* nil)
 (defvar *compiler-push-events* nil)
 (defvar *speed* 3)
 (defvar *space* 0)
@@ -383,7 +384,8 @@
 		 (debug (setq *debug* (cadr x)))
                  (safety (setq *compiler-check-args* (>= (cadr x) 1))
                          (setq *safe-compile* (>= (cadr x) 2))
-                         (setq *compiler-push-events* (and nil (>= (cadr x) 3))));FIXME
+                         (setq *compiler-new-safety* (>= (cadr x) 3))
+			 (setq *compiler-push-events* (>= (cadr x) 4)))
                  (space (setq *space* (cadr x)))
                  (speed (setq *speed* (cadr x)))
                  (compilation-speed (setq *speed* (- 3 (cadr x)))))))
@@ -677,7 +679,8 @@
 	    (declare (fixnum level))
 	    (setq *compiler-check-args* (>= level 1)
 		  *safe-compile* (>= level 2)
-		  *compiler-push-events* (and nil (>= level 3)))));FIXME
+		  *compiler-new-safety* (>= level 3)
+		  *compiler-push-events* (>= level 4))));FIXME
 	 (space (setq *space* (cadr decl)))
 	 (notinline (push (cadr decl) *notinline*))
 	 (speed) ;;FIXME
@@ -690,6 +693,7 @@
   (let ((*compiler-check-args* *compiler-check-args*)
         (*safe-compile* *safe-compile*)
         (*compiler-push-events* *compiler-push-events*)
+        (*compiler-new-safety* *compiler-new-safety*)
         (*notinline* *notinline*)
         (*space* *space*)
         (*debug* *debug*))

@@ -1351,6 +1351,9 @@ gcl_init_list_function()
 	make_function("CAR", Lcar);
 	make_function("CDR", Lcdr);
 
+	make_si_function("CONS-CAR", Lcar);
+	make_si_function("CONS-CDR", Lcdr);
+
 	make_function("CAAR", Lcaar);
 	make_function("CADR", Lcadr);
 	make_function("CDAR", Lcdar);

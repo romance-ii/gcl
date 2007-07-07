@@ -78,6 +78,7 @@ gcl_init_system(object no_init)
   if (type_of(no_init)!=t_symbol)
     error("Supplied no_init is not of type symbol\n");
 
+  ar_check_init(gcl_c,no_init);
   ar_check_init(gcl_listlib,no_init);
   ar_check_init(gcl_predlib,no_init);
   ar_check_init(gcl_arraylib,no_init);

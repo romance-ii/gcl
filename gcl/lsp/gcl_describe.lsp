@@ -366,7 +366,7 @@
           ((fboundp symbol)
            (doc1
             (or (documentation symbol 'function)
-                (if (consp (setq x (symbol-function symbol)))
+                (if (consp (setq x (function-lambda-expression (symbol-function symbol))))
                     (case (car x)
                           (lambda (format nil "~%Args: ~S" (cadr x)))
                           (lambda-block (format nil "~%Args: ~S" (caddr x)))
