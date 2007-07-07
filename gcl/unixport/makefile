@@ -110,11 +110,11 @@ init_%.lsp: init_%.lsp.tmp
 		-e "s#@LI-INIT-LSP@#\"$@\"#1" >$@
 
 final: $(FLISP)
-	echo "(let ((si::*disable-recompile* nil))(si::do-recompile \"gcl_recompile.lsp\"))" | ./$<
+	echo "(let ((si::*disable-recompile* nil)(compiler::*default-c-file* t)(compiler::*default-h-file* t)(compiler::*default-system-p* t)(compiler::*default-data-file* t))(si::do-recompile \"gcl_recompile.lsp\"))" | ./$<
 	echo "(setq si::*optimize-maximum-pages* nil)" >pre_init.lsp;
 	echo "(setq si::*optimize-maximum-pages* t si::*disable-recompile* nil)(when (> (length si::*needs-recompile*) 0) (format t \"Warning, eliminating recompiles ~s~%\" si::*needs-recompile*)(setf (fill-pointer si::*needs-recompile*) 0))" >post_init.lsp;
 	$(MAKE) $(FLISP)
-	rm -f pre_init.lsp post_init.lsp recompile.h gcl_recompile*
+	rm -f pre_init.lsp post_init.lsp recompile.h #gcl_recompile*
 	touch $@
 
 recompile.h: makefile $(ROBJS)
