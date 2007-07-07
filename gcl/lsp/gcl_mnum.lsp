@@ -1,11 +1,11 @@
 ;; -*-Lisp-*-
 (in-package 'si)
 
-#+c99
-(progn
-
 (import 'compiler::defdlfun 'si)
 (import 'compiler::strcat 'si)
+
+#+c99
+(progn
 
 (eval-when
     (compile eval)
