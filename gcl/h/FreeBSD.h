@@ -107,3 +107,4 @@ do {								\
 /* End for cmpinclude */
 
 #define FREE_BSD
+#define NO_C99

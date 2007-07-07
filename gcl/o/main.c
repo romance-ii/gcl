@@ -1285,6 +1285,10 @@ init_main(void) {
   ADD_FEATURE("JAPI-PRIMITIVES");
 #endif	 
 
+#ifndef NO_C99
+  ADD_FEATURE("C99");
+#endif	 
+
 #ifdef HAVE_TK
   ADD_FEATURE("TK-PRIMITIVES");
 #endif	 

@@ -1,6 +1,9 @@
 ;; -*-Lisp-*-
 (in-package 'si)
 
+#+c99
+(progn
+
 (import 'compiler::defdlfun 'si)
 (import 'compiler::strcat 'si)
 
@@ -203,3 +206,4 @@
 (defmfun "acos"  acos (and (>= x -1) (<= x 1)))
 (defmfun "asin"  asin (and (>= x -1) (<= x 1)))
 (defmfun "sqrt"  sqrt (>= x 0))
+)
