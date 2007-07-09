@@ -294,9 +294,9 @@
 
 
 
-(dolist (v '(throw coerce single-value  sort delete remove char-upcase
-		   si::fset typep))
-	(si::putprop v t 'return-type))
+;(dolist (v '(throw coerce single-value  sort delete remove char-upcase
+;		   si::fset typep))
+;	(si::putprop v t 'return-type))
 
 (defun init-fn () nil)
 

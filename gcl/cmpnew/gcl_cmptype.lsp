@@ -503,7 +503,8 @@
 
 (defun complex-propagator (f t1 &optional (t2 t1))
   (declare (ignore f))
-  (when (and (type>= #treal t1) (type>= #treal t2))
+  (let ((t1 (type-and #treal t1))
+	(t2 (type-and #treal t2)))
     (to-complex-tp (super-range '+ t1 t2))))
 (si::putprop 'complex 'complex-propagator 'type-propagator)
 

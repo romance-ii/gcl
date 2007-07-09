@@ -7,8 +7,9 @@ gclcvs (2.7.0-77) unstable; urgency=low
   * prop hash on safety level
   * no c99 functions for bsd yet
   * lower ia64 C optimization
+  * fix complex type propagation
 
- -- Camm Maguire <camm@enhanced.com>  Sat, 07 Jul 2007 16:29:42 -0400
+ -- Camm Maguire <camm@enhanced.com>  Mon, 09 Jul 2007 09:02:25 -0400
 
 gclcvs (2.7.0-76) unstable; urgency=low
 
