@@ -1,7 +1,10 @@
 ;; -*-Lisp-*-
+(in-package 'lisp)
+
+(export 'abs)
+
 (in-package 'si)
 
-(import 'lisp::abs 'si)
 (import 'compiler::defdlfun 'si)
 (import 'compiler::strcat 'si)
 
