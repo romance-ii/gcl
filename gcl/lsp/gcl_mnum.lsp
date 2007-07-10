@@ -1,6 +1,7 @@
 ;; -*-Lisp-*-
 (in-package 'si)
 
+(import 'lisp::abs 'si)
 (import 'compiler::defdlfun 'si)
 (import 'compiler::strcat 'si)
 
@@ -223,4 +224,4 @@
 	    x
 	  (let ((r (/  y x)))
 	    (* x (sqrt (+ 1 (* r r))))))))
-  (if (minusp z) (- z) z)))
+  (if (minusp z) (- z) z))
