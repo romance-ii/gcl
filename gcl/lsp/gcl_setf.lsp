@@ -63,7 +63,7 @@
 
 ;;; DEFSETF macro.
 (defmacro defsetf (access-fn &rest rest)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (cond ((and (car rest) (or (symbolp (car rest)) (functionp (car rest))))
          `(eval-when(compile eval load)
                  (si:putprop ',access-fn ',(car rest) 'setf-update-fn)
@@ -111,7 +111,7 @@
           ',access-fn))
 
 (defmacro define-setf-expander (access-fn &rest rest)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   `(define-setf-method ,access-fn ,@rest))
 
 ;;; GET-SETF-METHOD.
@@ -125,7 +125,7 @@
     (values vars vals stores store-form access-form)))
 
 (defun get-setf-expansion (form &optional env)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (get-setf-method form env))
 
 ;;;; GET-SETF-METHOD-MULTIPLE-VALUE.
@@ -421,7 +421,7 @@
 ;;; PSETF macro.
 
 (defmacro psetf (&environment env &rest rest)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (cond ((endp rest) nil)
         ((endp (cdr rest)) (error "~S is an illegal PSETF form." rest))
         ((endp (cddr rest))
@@ -447,7 +447,7 @@
 
 ;;; SHIFTF macro.
 (defmacro shiftf (&environment env &rest rest )
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (do ((r rest (cdr r))
        (pairs nil)
        (stores nil)
@@ -474,7 +474,7 @@
 
 ;;; ROTATEF macro.
 (defmacro rotatef (&environment env &rest rest )
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (do ((r rest (cdr r))
        (pairs nil)
        (stores nil)
@@ -509,7 +509,7 @@
 ;;; DEFINE-MODIFY-MACRO macro.
 ;;FIXME -- this is really ugly and error prone.  CM 20041214
 (defmacro define-modify-macro (name lambda-list function &optional doc-string)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (let ((update-form
 	 (do ((l lambda-list (cdr l))
 	      (vs nil))
@@ -549,7 +549,7 @@
 
 ;;; This definition was obtained from SBCL
 (defmacro remf (&environment env place indicator)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (multiple-value-bind (dummies vals newval setter getter)
       (get-setf-method place env)
     (do* ((d dummies (cdr d))
@@ -581,7 +581,7 @@
 (define-modify-macro decf (&optional (delta 1)) -)
 
 (defmacro push (&environment env item place)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (let ((myitem (gensym)))
     (when (symbolp place)
       (return-from push `(let* ((,myitem ,item))
@@ -592,7 +592,7 @@
 			    ,store-form))))
 
 (defmacro pushnew (&environment env item place &rest rest)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (let ((myitem (gensym)))
     (cond ((symbolp place)
 	   (return-from pushnew `(let* ((,myitem ,item))
@@ -604,7 +604,7 @@
 			    ,store-form))))
 
 (defmacro pop (&environment env place)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (when (symbolp place)
         (return-from pop
           (let ((temp (gensym)))
@@ -618,7 +618,7 @@
               ,store-form))))
 
 (defun fdefinition (name)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type name function-identifier)
   (cond ((symbolp name) (if (fboundp name) (symbol-function name) (error :undefined-function "function ~s is undefined" name)))
 	((let ((z (get (cadr name) 'setf-function)))
@@ -628,7 +628,7 @@
 		 
 
 (defun (setf fdefinition) (def fn)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (when (not (functionp def))
     (error 'type-error :datum def :expected-type 'function))
   (cond ((symbolp fn)

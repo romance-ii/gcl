@@ -9,8 +9,12 @@ gclcvs (2.7.0-77) unstable; urgency=low
   * lower ia64 C optimization
   * fix complex type propagation
   * abs for -c99
+  * system fns at safety 2;c-type-propagator fix;tighten rplacd-
+    propagator;better c1retnote;long C names without gprof;maybe-
+    reverse-type-prop;implement safety 1 definition in unchecked
+    subcalls
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 10 Jul 2007 10:54:42 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed, 11 Jul 2007 11:59:38 -0400
 
 gclcvs (2.7.0-76) unstable; urgency=low
 

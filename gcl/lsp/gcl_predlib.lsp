@@ -146,7 +146,7 @@
 	     (subtypep1 (class-of object) tp))))))
 
 (defun typep (object type &optional env)
-  (declare (ignore env) (optimize (safety 1)))
+  (declare (ignore env) (optimize (safety 2)))
   (typep-int object type))
 (si::putprop 'typep 'compiler::co1typep 'compiler::co1)
 
@@ -195,11 +195,11 @@
 
 
 (defun upgraded-complex-part-type (type &optional environment) 
-  (declare (ignore environment) (optimize (safety 1)) )
+  (declare (ignore environment) (optimize (safety 2)) )
   type)
 
 (defun upgraded-array-element-type (type &optional environment)
-  (declare (ignore environment) (optimize (safety 1)))
+  (declare (ignore environment) (optimize (safety 2)))
   (best-array-element-type type))
 
 (defmacro check-type-eval (place type)
@@ -216,7 +216,7 @@
 
 ;;; COERCE function.
 (defun coerce (object type)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type type (and (not null) type-spec))
   (when (typep-int object type)
     (return-from coerce object))
@@ -265,7 +265,7 @@
 ;;; DEFTYPE macro.
 (defmacro deftype (name lambda-list &rest body &aux decls prot)
   ;; Replace undefaultized optional parameter X by (X '*).
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (do ((b body body)) ((or (not b) (not (consp (car b))) (not (eq 'declare (caar b)))) (nreverse decls))
       (let ((d (pop body)))
 	(unless (member-if (lambda (x) (and (consp x) (eq (car x) 'special))) (cdr d)) ;FIXME
@@ -1468,7 +1468,7 @@
 ;;       (not (car (resolve-type `(and (type-max ,t1) ,(negate `(type-min ,t2))))))))
 
 (defun subtypep (t1 t2 &optional env)
-  (declare (ignore env) (optimize (safety 1)))
+  (declare (ignore env) (optimize (safety 2)))
   (check-type t1 type-spec)
   (check-type t2 type-spec)
   (if (or (not t1) (eq t2 t))

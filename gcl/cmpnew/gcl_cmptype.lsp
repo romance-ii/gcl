@@ -516,7 +516,8 @@
 	((type>= #tratio  t1)      (object-type #.(c-type 1/2)))
 	((type>= #tcomplex  t1)    (object-type #.(c-type #c(0 1))))
 	((and (consp t1) (eq (car t1) 'not)) 
-	 (type-and (c-type-propagator f t) (cmp-norm-tp `(not ,(c-type-propagator f (cadr t1))))))
+	 (type-or1 (type-and (c-type-propagator f t) (cmp-norm-tp `(not ,(c-type-propagator f #tnumber))))
+		   (c-type-propagator f (type-and #tnumber t1))))
 	((and (consp t1) (eq (car t1) 'or)) 
 	 (reduce (lambda (y x) (type-or1 (c-type-propagator f x) y)) (cdr t1) :initial-value nil))
 	((type>= #tinteger t1)     (type-or1 (c-type-propagator f #tfixnum) (c-type-propagator f #tbignum)))
@@ -548,7 +549,7 @@
 	  ((type>= #tnull t1) t1) ;FIXME clb ccb do-setq-tp
 	  ((and (consp t1) (eq (car t1) 'cons)) (caddr t1))
 	  ((type>= #tproper-list t1) #tproper-list))))
-(si::putprop 'cdr 'cdr-propagator 'type-propagator)
+(si::putprop 'si::cons-cdr 'cdr-propagator 'type-propagator)
 
 (defun make-list-propagator (f t1 &rest r)
   (declare (ignore f r))
@@ -575,7 +576,11 @@
 
 (defun rplacd-propagator (f t1 t2)
   (declare (ignore f t1))
-  (when (type>= #tproper-list t2) #tproper-cons))
+  (dolist (v *vars* #tcons);FIXME variable alias slot
+    (when (var-p v) 
+      (when (type>= #tproper-cons (var-type v)) 
+	(do-setq-tp v nil (if (type>= #tproper-list t2) #tproper-cons #tcons)))))
+  (if (type>= #tproper-list t2) #tproper-cons #tcons))
 (si::putprop 'rplacd 'rplacd-propagator 'type-propagator)
 
 (defun cons-propagator (f t1 t2)
@@ -588,7 +593,7 @@
 (defun car-propagator (f t1)
   (declare (ignore f))
   (when (type>= #tnull t1) #tnull))
-(si::putprop 'car 'car-propagator 'type-propagator)
+(si::putprop 'si::cons-car 'car-propagator 'type-propagator)
 
 (defun mod-propagator (f t1 t2)
   (cond ((and (consp t1) (eq (car t1) 'or))

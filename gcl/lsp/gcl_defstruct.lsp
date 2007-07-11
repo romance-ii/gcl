@@ -77,17 +77,17 @@
 		     (setf (aref accsrs offset)
 			   (cond  ((eq accsrs *accessors*)
 				   (lambda (x)
-				     (declare (optimize (safety 1)))
+				     (declare (optimize (safety 2)))
 				     (or (structurep x)
 					 (error "~a is not a structure" x))
 				     (structure-ref1 x offset)))
 				  ((eq accsrs *list-accessors*)
 				   (lambda(x)
-				     (declare (optimize (safety 1)))
+				     (declare (optimize (safety 2)))
 				     (si:list-nth offset x)))
 				  ((eq accsrs *vector-accessors*)
 				   (lambda(x)
-				     (declare (optimize (safety 1)))
+				     (declare (optimize (safety 2)))
 				     (aref x offset)))))))
 	        (add-hash access-function `((t) ,(or (not slot-type) slot-type)) nil nil nil))))
     (cond (read-only
@@ -128,7 +128,7 @@
   `(let ((def (cadar 
 	       (member (key-name ,key ,prior-keyword) ,keydefs
 		       :key (lambda (k)
-			      (declare (optimize (safety 1)))
+			      (declare (optimize (safety 2)))
 			      (when (consp k) (car k)))))))
      (if def
 	 (cond ((not (consp ,key))
@@ -509,7 +509,7 @@
 	      (progn
 		(setf (symbol-function predicate)
 		      (lambda (x)
-			(declare (optimize (safety 1)))
+			(declare (optimize (safety 2)))
 			(si::structure-subtype-p x name)))
 		(add-hash predicate `((t) boolean) nil nil nil)))
 	      (setf (get predicate 'compiler::co1)
@@ -520,7 +520,7 @@
 
 		  
 (defmacro defstruct (name &rest slots)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (let ((slot-descriptions slots)
         options
         conc-name
@@ -612,7 +612,7 @@
       (error "Cannot specify both :print-function and :print-object."))
     (when print-object
       (setq print-function (lambda (x y z) 
-			     (declare (optimize (safety 1)))
+			     (declare (optimize (safety 2)))
 			     (declare (ignore z)) (funcall print-object x y))))
 
     (and include (not print-function)

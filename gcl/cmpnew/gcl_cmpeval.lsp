@@ -199,13 +199,11 @@
 			 for w in (reverse (remove-duplicates
 					    (copy-list (get sym u))
 					    :test 'equal))
-			 do (output-opt w  sym u))))))
-
-)				      
+			 do (output-opt w  sym u)))))))				      
 				
 
 (defun result-type-from-args (f args)
-  (when (and (not *compiler-new-safety*) 
+  (when (and (or (not *compiler-new-safety*) (member f '(unbox box addr-call)));FIXME 
 	     (not (eq '* (get f 'return-type)))) ;;FIXME  make sure return-type and proclaimed-return-type are in sync
     (let* ((be (get f 'type-propagator))
 	   (ba (and be ;(si::dt-apply be (cons f (mapcar 'coerce-to-one-valuea args))))));FIXME
@@ -1381,6 +1379,7 @@
   (when (and (not *compiler-new-safety*) (> *speed* 0) (src-inlineable form))
     (let* ((fms (append c1forms (list last)))
 	   (tpis (mapcar (lambda (x) (when x (cons (info-type (cadr x)) (ignorable-form x)))) fms))
+	   (*compiler-check-args* (>= (this-safety-level) 2))
 	   (prop (cons (car form) (cons (this-safety-level) tpis))))
 
       (mark-for-hash-inlining fms)
@@ -1532,6 +1531,12 @@
 (defvar *in-inline* nil)
 (defvar *callees* nil)
 
+(defun maybe-reverse-type-prop (dt f)
+  (unless *safe-compile*
+    (let ((v (and (consp f) (eq (car f) 'var) (caaddr f))))
+      (when (var-p v)
+	(do-setq-tp v nil (type-and dt (var-type v)))))))
+
 (defun c1symbol-fun (fname args &aux fd)
   (values
    (cond ((setq fd (get fname 'c1special)) (funcall fd args))
@@ -1647,12 +1652,12 @@
 			(setq p (null (info-type (cadar n)))))
 		(setf (info-type info) nil)
 		(return-from c1symbol-fun (list 'call-global info fname forms)))
-		
-	      (when (eq fname 'rplacd)
-		(dolist (v *vars*)
-		  (when (var-p v) 
-		    (when (type>= #tproper-cons (var-type v)) 
-		      (do-setq-tp v nil #tcons)))))
+
+	      (do ((a (get-arg-types fname) (if (eq '* (car a)) a (cdr a)))
+		   (r args (cdr r))
+		   (f forms (cdr f)))
+		  ((or (endp f) (endp a)))
+		  (maybe-reverse-type-prop (car a) (car f)))
 	      
 	      ;; some functions can have result type deduced from
 	      ;; arg types.
@@ -2199,7 +2204,7 @@
 ;;    (t nil)))
 
 (defmacro si::define-compiler-macro (name vl &rest body)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (if (is-setf-function name)
       `(progn (si::putprop ',(cadr name)
 			   (caddr (si:defmacro* ',(cadr name) ',vl ',body))
@@ -2285,7 +2290,7 @@
      (push '(,(mapcar (lambda (x) (get x 'lisp-type)) tps) ,(get crt 'lisp-type) ,(flags rfa) ,symi) 
 	   (get ',sym 'inline-always))
      (defun ,sym ,args
-       (declare (optimize (safety 1)))
+       (declare (optimize (safety 2)))
        ,@(mapcar (lambda (x y) `(check-type ,x ,(get y 'lisp-type))) args tps)
        (box ,crt
 	  (addr-call (cstr ,cast)

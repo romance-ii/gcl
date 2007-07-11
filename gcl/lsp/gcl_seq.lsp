@@ -30,7 +30,7 @@
 (in-package 'system)
 
 
-;(eval-when (compile) (proclaim '(optimize (safety 1) (space 3))))
+;(eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))
 
 (defun make-sequence-vector (element-type size iesp initial-element)
   (let ((sequence (si:make-vector element-type size nil nil nil nil nil)))
@@ -99,7 +99,7 @@
 
 
 (defun map (result-type function sequence &rest more-sequences)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (setq more-sequences (cons sequence more-sequences))
   (let ((l (apply #'min (mapcar #'length more-sequences))))
     (if (null result-type)

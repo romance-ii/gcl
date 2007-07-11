@@ -36,7 +36,7 @@
 
 
 (defmacro time (form)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (let ((real-start (gensym)) (real-end (gensym)) (gbc-time-start (gensym))
 	(gbc-time (gensym)) (x (gensym)) (run-start (gensym)) (run-end (gensym))
 	(child-run-start (gensym)) (child-run-end (gensym)))
@@ -76,7 +76,7 @@
        -460)))
 
 (defun decode-universal-time (ut &optional (tz *default-time-zone*))
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (let (sec min h d m y dow)
     (decf ut (* tz 3600))
     (multiple-value-setq (d ut) (floor ut seconds-per-day))
@@ -101,7 +101,7 @@
 
 (defun encode-universal-time (sec min h d m y
                               &optional (tz *default-time-zone*))
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (incf h tz)
   (when (<= 0 y 99)
         (multiple-value-bind (sec min h d m y1 dow dstp tz)
@@ -118,19 +118,19 @@
 
 ; Courtesy Paul Dietz
 (defun compile-file-pathname (pathname)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (make-pathname :defaults pathname :type "o"))
 (defun constantly (x)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (lambda (&rest args)
     (declare (ignore args) (dynamic-extent args))
     x))
 (defun complement (fn)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (lambda (&rest args) (not (apply fn args))))
 
  (defun lisp-implementation-version nil
-   (declare (optimize (safety 1)))
+   (declare (optimize (safety 2)))
    (format nil "GCL ~a.~a.~a"
 	   si::*gcl-major-version*
 	   si::*gcl-minor-version*

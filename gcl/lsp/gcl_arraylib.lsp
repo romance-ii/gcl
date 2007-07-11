@@ -52,7 +52,7 @@
 	(t)))
 
 (defun fill-pointer (x)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type x fpvec)
   (fill-pointer-internal x))
 
@@ -215,7 +215,7 @@
 
 
 (defun vector-push (new-element vector)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type vector fpvec)
   (let ((fp (fill-pointer vector)))
     (cond ((< fp (array-dimension vector 0))
@@ -225,7 +225,7 @@
 
 
 (defun vector-push-extend (new-element vector &optional extension)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type vector fpvec)
   (let ((fp (fill-pointer vector))
 	(dim (array-dimension vector 0)))
@@ -239,7 +239,7 @@
 
 
 (defun vector-pop (vector)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type vector fpvec)
   (let ((fp (fill-pointer vector)))
     (when (= fp 0)
@@ -260,7 +260,7 @@
 
   (declare (ignore initial-element initial-contents static displaced-index-offset) ;FIXME
 	   (:dynamic-extent r)
-	   (optimize (safety 1)))
+	   (optimize (safety 2)))
 
   (check-type array array)
   (check-type new-dimensions (or seqind proper-list))

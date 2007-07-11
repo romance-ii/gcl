@@ -976,7 +976,7 @@
 
 ;;FUNCALLABLE-SYMBOL-FUNCTION
 (push '((t) function #.(flags rfa) "#0->s.s_gfdef")
-      (get 'funcallable-symbol-function 'inline-unsafe))
+      (get 'funcallable-symbol-function 'inline-always))
 
 ;;SI::FBOUNDP-SYM
 (push '((t) boolean #.(flags rfa) "@0;(#0->s.s_sfdef!=NOT_SPECIAL || #0->s.s_gfdef)")
@@ -1153,9 +1153,8 @@
 	  (get 'unbox 'inline-always))))
 
 ;;si::c-type
-(push '((t) t #.(flags)"make_fixnum(type_of(#0))") (get 'si::c-type 'inline-always))
-(push '((t) fixnum #.(flags)"type_of(#0)") (get 'si::c-type 'inline-always))
-
+(push '((t) t #.(flags) "make_fixnum(type_of(#0))") (get 'si::c-type 'inline-always))
+(push '((t) fixnum #.(flags) "type_of(#0)") (get 'si::c-type 'inline-always))
 
 (push '((long-float) short-float #.(flags rfa) "((float)#0)" ) (get 'si::long-to-short 'inline-always))
 (push '((t) short-float #.(flags) "((float)lf(#0))" ) (get 'si::long-to-short 'inline-unsafe))

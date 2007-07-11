@@ -102,7 +102,7 @@
 	 ("unknown error")))
 
 (defun warn (datum &rest arguments)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (let ((c (process-warning datum arguments 'warn)))
     (when *break-on-warnings*
 	(break "~A~%break entered because of *break-on-warnings*." c))

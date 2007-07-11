@@ -430,7 +430,7 @@
   nil)
 
 (defun proclaim-var (type vl)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type vl list)
   (setq type (type-filter type))
   (dolist** (var vl)

@@ -99,7 +99,7 @@
  (defmacro deflist (n (il list ifp plp) &body body)
    `(progn
       (defun ,n ,(append `(,@il ,list) +list-ll+)
-	(declare (optimize (safety 1)))
+	(declare (optimize (safety 2)))
 	,@(when plp `((check-type ,list proper-list)))
 	(and test test-not (error "both test and test not supplied"))
 	(let* ((key (or key #'identity))(key (if (functionp key) key (funcallable-symbol-function key)))
@@ -112,17 +112,17 @@
       ,@(when ifp
 	  `((defun ,(intern (string-concatenate (string n) "-IF")) 
 	      ,(append `(,@il ,list) +list-ll+)
-	      (declare (optimize (safety 1))(ignore test test-not))
+	      (declare (optimize (safety 2))(ignore test test-not))
 	      (,n ,@il ,list :test 'funcall :key key))
 	    (defun ,(intern (string-concatenate (string n) "-IF-NOT")) 
 	      ,(append `(,@il ,list) +list-ll+)
-	      (declare (optimize (safety 1)) (ignore test test-not))
+	      (declare (optimize (safety 2)) (ignore test test-not))
 	      (,n ,@il ,list :test-not 'funcall :key key))))))
  
  (defmacro defllist (n (l1 l2 plp) &body body)
    `(progn
       (defun ,n ,(append `(,l1 ,l2) +list-ll+)
-	(declare (optimize (safety 1)))
+	(declare (optimize (safety 2)))
 	(check-type ,l1 proper-list)
 	,@(when plp `((check-type ,l2 proper-list)))
 	(let* ((key (or key #'identity))(key (if (functionp key) key (funcallable-symbol-function key)))
@@ -133,7 +133,7 @@
       (setq ,rp (cond (,rp (rplacd ,rp tmp) tmp) ((setq ,r tmp))))))
  
  (defmacro cons-length (x)
-   (declare (optimize (safety 1)))
+   (declare (optimize (safety 2)))
    `(let ((,x ,x))
       (if (not ,x) 0
 	(do ((i 1 (1+ i))(s ,x (cdr s))(f (cdr ,x) (cddr f)))
@@ -143,12 +143,12 @@
 		  ((endp (cdr f)) (return (- (+ i i))))))))))
 
 (defun endp (x)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type x list)
   (not x))
 
 (defun nthcdr (n x)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type n (integer 0))
   (check-type x list)
   (when x
@@ -158,7 +158,7 @@
       (do ((x x (cdr x))(n n (1- n))) ((or (<= n 0) (endp x)) x)))))
 
 (defun last (x &optional (n 1));FIXME check for circle
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type x list)
   (check-type n (integer 0))
   (let* ((n (min array-dimension-limit n))
@@ -169,7 +169,7 @@
 	((atom w) x))))
 
 (defun butlast (x &optional (n 1));FIXME check for circle
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type x list)
   (check-type n (integer 0))
   (let* ((n (min array-dimension-limit n))
@@ -181,7 +181,7 @@
 	(let ((tmp (cons (car x) nil))) (collect r rp tmp)))))
 
 (defun nbutlast (x &optional (n 1));FIXME check for circle
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type x list)
   (check-type n (integer 0))
   (let* ((n (min array-dimension-limit n))
@@ -192,20 +192,20 @@
 	((atom w) (when rp (rplacd rp nil) r)))))
 
 (defun ldiff (l tl &aux (test #'eql))
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type l list)
   (do (r rp (tc (bump-test (comp-test test nil) tl)) (l l (cdr l))) 
       ((cond ((do-test test tc l tl)) ((atom l) (when rp (rplacd rp l)))) r)
       (let ((tmp (cons (car l) nil))) (collect r rp tmp))))
 
 (defun tailp (tl l &aux (test #'eql))
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type l list)
   (do (r (tc (bump-test (comp-test test nil) tl)) (l l (cdr l))) 
       ((cond ((setq r (do-test test tc l tl))) ((atom l))) r)))
 	   
 (defun list-length (l)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type l list)
   (cond ((endp l) 0) 
 	((endp (setq l (cdr l))) 1)
@@ -216,42 +216,42 @@
 	   (when (<= x 0) (+ 4 (- x)))))))
 
 (defun make-list (n &key initial-element)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type n seqind)
   (do (r (n n (1- n))) ((<= n 0) r)
       (push initial-element r)))
 
 (defun rest (l)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type l list)
   (cdr l))
 
 (defun acons (key datum alist)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (cons (cons key datum) alist))
 
 (defun pairlis (k d &optional a)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type k proper-list)
   (check-type d proper-list)
   (do ((k k (cdr k)) (d d (cdr d)) (a a (acons (car k) (car d) a)))
       ((or (endp k) (endp d)) a)))
 
 (defun copy-list (l)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type l list)
   (do (r rp (l l (cdr l))) ((atom l) (when rp (rplacd rp l)) r)
       (let ((tmp (cons (car l) nil))) (collect r rp tmp))))
 
 (defun copy-alist (l)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type l proper-list)
   (do (r rp (l l (cdr l))) ((endp l) r)
       (let ((tmp (cons (let ((e (car l))) (cond ((consp e) (cons (car e) (cdr e))) (e))) nil))) 
 	(collect r rp tmp))))
 
 (defun nconc (&rest l)
-  (declare (optimize (safety 1)) (:dynamic-extent l))
+  (declare (optimize (safety 2)) (:dynamic-extent l))
   (do (r rp (l l (cdr l)))
       ((endp l) r)
       (let ((it (car l)))
@@ -259,35 +259,35 @@
 	(when (and (cdr l) (consp it)) (setq rp (last it))))))
 
 (defun nreconc (list tail)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type list proper-list)
   (do (cdp (p tail)(pp list)) ((endp pp) p)
       (setq cdp (cdr pp) p (rplacd pp p) pp cdp)))
 
 (defun nth (n x)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type n (integer 0))
   (check-type x list)
   (car (nthcdr n x)))
 
-(defun first (x)   (declare (optimize (safety 1))) (check-type x list) (car x))
-(defun second (x)  (declare (optimize (safety 1))) (check-type x list) (cadr x))
-(defun third (x)   (declare (optimize (safety 1))) (check-type x list) (caddr x))
-(defun fourth (x)  (declare (optimize (safety 1))) (check-type x list) (cadddr x))
-(defun fifth (x)   (declare (optimize (safety 1))) (check-type x list) (car (cddddr x)))
-(defun sixth (x)   (declare (optimize (safety 1))) (check-type x list) (cadr (cddddr x)))
-(defun seventh (x) (declare (optimize (safety 1))) (check-type x list) (caddr (cddddr x)))
-(defun eighth (x)  (declare (optimize (safety 1))) (check-type x list) (cadddr (cddddr x)))
-(defun ninth (x)   (declare (optimize (safety 1))) (check-type x list) (car (cddddr (cddddr x))))
-(defun tenth (x)   (declare (optimize (safety 1))) (check-type x list) (cadr (cddddr (cddddr x))))
+(defun first (x)   (declare (optimize (safety 2))) (check-type x list) (car x))
+(defun second (x)  (declare (optimize (safety 2))) (check-type x list) (cadr x))
+(defun third (x)   (declare (optimize (safety 2))) (check-type x list) (caddr x))
+(defun fourth (x)  (declare (optimize (safety 2))) (check-type x list) (cadddr x))
+(defun fifth (x)   (declare (optimize (safety 2))) (check-type x list) (car (cddddr x)))
+(defun sixth (x)   (declare (optimize (safety 2))) (check-type x list) (cadr (cddddr x)))
+(defun seventh (x) (declare (optimize (safety 2))) (check-type x list) (caddr (cddddr x)))
+(defun eighth (x)  (declare (optimize (safety 2))) (check-type x list) (cadddr (cddddr x)))
+(defun ninth (x)   (declare (optimize (safety 2))) (check-type x list) (car (cddddr (cddddr x))))
+(defun tenth (x)   (declare (optimize (safety 2))) (check-type x list) (cadr (cddddr (cddddr x))))
 
 ; Courtesy Paul Dietz
 (defmacro nth-value (n expr)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   `(nth ,n (multiple-value-list ,expr)))
 
 (defun copy-tree (tr)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (do (st cs a (g (load-time-value (gensym)))) (nil)
       (declare (:dynamic-extent st cs))
       (cond ((atom tr)
@@ -328,7 +328,7 @@
 	    (return c))))))
 
 (defun tree-equal (tr1 tr2 &key test test-not)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (and test test-not (error "both test and test not supplied"))
   (let* ((test (or test test-not #'eql))
 	 (test (if (functionp test) test (funcallable-symbol-function test)))
@@ -456,14 +456,14 @@
 
 
 (defun mapl (f l1 &rest l)
-  (declare (optimize (safety 1))(:dynamic-extent l))
+  (declare (optimize (safety 2))(:dynamic-extent l))
   (check-type l1 proper-list)
   (do ((r l1) (l1 l1 (cdr l1)) (l l (mapl (lambda (x) (setf (car x) (cdar x))) l)))
       ((or (endp l1) (member-if 'endp l)) r)
       (apply f l1 l)))
 
 (defun mapcar (f l1 &rest l)
-  (declare (optimize (safety 1))(:dynamic-extent l))
+  (declare (optimize (safety 2))(:dynamic-extent l))
   (check-type l1 proper-list)
   (do (r rp (vals (make-list (list-length l))))
       ((or (endp l1) (member-if 'endp l)) r)
@@ -473,7 +473,7 @@
 	(collect r rp tmp))))
 
 (defun maplist (f l1 &rest l)
-  (declare (optimize (safety 1))(:dynamic-extent l))
+  (declare (optimize (safety 2))(:dynamic-extent l))
   (check-type l1 proper-list)
   (do (r rp (l1 l1 (cdr l1)) (l l (mapl (lambda (x) (setf (car x) (cdar x))) l)))
       ((or (endp l1) (member-if 'endp l)) r)
@@ -481,7 +481,7 @@
 	(collect r rp tmp))))
 
 (defun mapc (f l1 &rest l)
-  (declare (optimize (safety 1))(:dynamic-extent l))
+  (declare (optimize (safety 2))(:dynamic-extent l))
   (check-type l1 proper-list)
   (do ((r l1) (vals (make-list (list-length l))))
       ((or (endp l1) (member-if 'endp l)) r)
@@ -490,7 +490,7 @@
       (apply f (pop l1) vals)))
 
 (defun mapcan (f l1 &rest l)
-  (declare (optimize (safety 1))(:dynamic-extent l))
+  (declare (optimize (safety 2))(:dynamic-extent l))
   (check-type l1 proper-list)
   (do (r rp (vals (make-list (list-length l))))
       ((or (endp l1) (member-if 'endp l)) r)
@@ -502,7 +502,7 @@
 
 
 (defun mapcon (f l1 &rest l)
-  (declare (optimize (safety 1))(:dynamic-extent l))
+  (declare (optimize (safety 2))(:dynamic-extent l))
   (check-type l1 proper-list)
   (do (r rp (l1 l1 (cdr l1)) (l l (mapl (lambda (x) (setf (car x) (cdar x))) l)))
       ((or (endp l1) (member-if 'endp l)) r)
@@ -512,13 +512,13 @@
 
 
 (defun append (&rest l)
-  (declare (optimize (safety 1))(:dynamic-extent l))
+  (declare (optimize (safety 2))(:dynamic-extent l))
   (do (r rp (l l (cdr l))) ((endp (cdr l)) (cond (rp (rplacd rp (car l)) r) ((car l))))
       (do ((c (car l) (cdr c))) ((endp c))
 	  (let ((tmp (cons (car c) nil))) (collect r rp tmp)))))
 
 (defun revappend (list tail)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type list proper-list)
   (do (cdp (p tail)(pp list)) ((endp pp) p)
       (setq cdp (cdr pp) p (cons (car pp) p) pp cdp)))

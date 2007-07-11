@@ -33,7 +33,7 @@
 	(if ny (setq dy (* 0.5 dy)) (setq y (ash y -1) dy (float y))))))
 
 (defun float (x &optional z)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type x real)
   (check-type z (or null float))
   (let ((s (typep z 'short-float)))
@@ -46,7 +46,7 @@
      (ratio       (let ((z (ratio-to-double x))) (if s (long-to-short z) z))))))
 
 (defun realpart (x)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type x number)
   (typecase
    x
@@ -54,7 +54,7 @@
    (otherwise (complex-real x))))
 
 (defun imagpart (x)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type x number)
   (typecase
    x
@@ -62,7 +62,7 @@
    (otherwise (complex-imag x))))
 
 (defun numerator (x)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type x rational)
   (typecase
    x
@@ -70,7 +70,7 @@
    (otherwise (ratio-numerator x))))
 
 (defun denominator (x)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type x rational)
   (typecase
    x

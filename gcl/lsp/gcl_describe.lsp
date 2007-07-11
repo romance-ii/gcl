@@ -322,7 +322,7 @@
                              (*print-level* nil)
                              (*print-length* nil))
 ;  "The lisp function DESCRIBE."
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (terpri)
   (catch 'quit-inspect (inspect-object object))
   (terpri)
@@ -336,7 +336,7 @@
                             (*print-level* 3)
                             (*print-length* 3))
 ;  "The lisp function INSPECT."
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (read-line)
   (princ "Type ? and a newline for help.")
   (terpri)

@@ -244,18 +244,17 @@
 
 ;; FIXME consider making this a macro
 (defun c-function-name (prefix num fname)
-  #-gprof (declare (ignore fname))
   (si::string-concatenate
    (string prefix)
    (write-to-string num)
-   #+gprof  (let ((fname (string fname)))
-	      (si::string-concatenate
-	       "__"
-	       (dash-to-underscore fname)
-	       "__"
-	       (if (boundp '*compiler-input*)
-		   (subseq (init-name *compiler-input* t) 4)
-		 "")))))
+   (let ((fname (string fname)))
+     (si::string-concatenate
+      "__"
+      (dash-to-underscore fname)
+      "__"
+      (if (boundp '*compiler-input*)
+	  (subseq (init-name *compiler-input* t) 4)
+	"")))))
 
 (defun t1expr (form &aux (*current-form* form) (*first-error* t))
   (catch *cmperr-tag*
@@ -660,9 +659,14 @@
 	(call-global (list (third le) (export-type (info-type (second le)))))
 	((let let*) (list (car le) (export-type (info-type (second le))) 
 			  (mapcar (lambda (x y) (list (var-name x) (c1retnote y))) (third le) (fourth le)) (c1retnote (fifth le))))
-	((progn lambda) (list (car le) (export-type (info-type (second le))) (c1retnote (car (last (car (last le)))))))
+	(progn (list (car le) (export-type (info-type (second le))) (c1retnote (car (last (car (last le)))))))
+	((lambda inline decl-body) (list (car le) (export-type (info-type (second le))) (c1retnote (car (last le)))))
 	(if (list (car le) (export-type (info-type (second le))) (c1retnote (fourth le)) (c1retnote (fifth le))))
 	(var (list (car le) (export-type (info-type (second le))) (var-name (car (third le)))))
+	(location (list (car le) (export-type (info-type (second le)))))
+	(return-from (list (car le) (c1retnote (car (last le)))))
+	(tagbody `(,(car le) ,(export-type (info-type (second le))) ,@(mapcar (lambda(x) (unless (tag-p x) (c1retnote x))) (car (last le)))))
+	(block `(,(car le) ,(export-type (info-type (second le))) ,@(mapcar 'c1retnote (last le))))
 	(otherwise (list (car le) 'foo))))
 
 (defvar *callees* nil)
@@ -1646,7 +1650,7 @@
         (too-few-args 'defmacro 2 (length args)))
   (cmpck (not (symbolp (car args)))
          "The macro name ~s is not a symbol." (car args))
-  (maybe-eval t (cons 'defmacro args))
+  (maybe-eval (not (macro-function (car args))) (cons 'defmacro args))
   (setq *non-package-operation* t)
   (let ((*vars* nil) (*funs* nil) (*blocks* nil) (*tags* nil)
         (*sharp-commas* nil) (*special-binding* nil)
@@ -1657,8 +1661,7 @@
 		   (car macro-lambda)   ;doc
 		   (cadr macro-lambda)  ; ppn
                    *special-binding*)
-             *top-level-forms*))
-  )
+             *top-level-forms*)))
 
 
 (defun t2defmacro (fname cfun macro-lambda doc ppn sp)

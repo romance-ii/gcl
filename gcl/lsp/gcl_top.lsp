@@ -811,7 +811,7 @@ First directory is checked for first name and all extensions etc."
 		(aload path)
 		(funcall sym form env)))))
 
-(eval-when (compile) (proclaim '(optimize (safety 0))) )
+;(eval-when (compile) (proclaim '(optimize (safety 0))) )
 (defvar si::*command-args* nil)
 (defun si::get-command-arg (a &optional val-if-there &aux (v *command-args*))
   (declare (string a))

@@ -76,7 +76,7 @@
 	(setf (get ',cf 'compiler::type-propagator) ',tp)
 	(defun ,(or n (intern (string-upcase x))) (x)
 	  ,@(unless (and n (not (string= (string-upcase n) (string-upcase x))))
-	      `((declare (optimize (safety 1)))
+	      `((declare (optimize (safety 2)))
 		(check-type x number)))
 	  (let ((x ,(if protect-real `(if (and (realp x) (not ,protect-real))
 					  (if (floatp x) (complex x (float 0.0 x))
@@ -110,7 +110,7 @@
 	(setf (get ',c 'compiler::type-propagator)  ',tp)
 	(setf (get ',cf 'compiler::type-propagator)  ',tp)
 	(defun ,(or n (intern (string-upcase x))) (x)
-	  ,@(unless n `((declare (optimize (safety 1)))
+	  ,@(unless n `((declare (optimize (safety 2)))
 			(check-type x number)))
 	  (typecase x
 			 (long-float  (,b x))
@@ -128,7 +128,7 @@
 	(mdlsym ,x)
 	(mdlsym (string-concatenate ,x "f"))
 	(defun ,(or n (intern (string-upcase x))) (x z)
-	  ,(unless n `((declare (optimize (safety 1)))
+	  ,(unless n `((declare (optimize (safety 2)))
 		       (check-type x real)
 		       (check-type z real)))
 	  (typecase 
@@ -186,7 +186,7 @@
 (defrmfun "atan2"  rawatan2)
 (defmfun "atan" rawatan)
 (defun atan (x &optional (z 0.0 zp))
-  (declare (optimize (safety 1)) (inline rawatan2 rawatan))
+  (declare (optimize (safety 2)) (inline rawatan2 rawatan))
   (check-type x number)
   (check-type z real)
   (cond (zp 
@@ -196,7 +196,7 @@
 
 (defmfun "log" rawlog (>= x 0))
 (defun log (x &optional b)
-  (declare (optimize (safety 1)) (inline rawlog))
+  (declare (optimize (safety 2)) (inline rawlog))
   (check-type x number)
   (check-type b (or null number))
   (if b 
@@ -214,7 +214,7 @@
 
 #-c99
 (defun abs (z)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type z number)
   (if (complexp z)
       ;; Compute (sqrt (+ (* x x) (* y y))) carefully to prevent

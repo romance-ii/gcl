@@ -28,13 +28,14 @@
 (in-package "SYSTEM")
 
 
-;(eval-when (compile) (proclaim '(optimize (safety 1) (space 3))))
-(eval-when (compile) (proclaim '(optimize (safety 1))))
+;(eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))
+;(eval-when (compile) (proclaim '(optimize (safety 2))))
 ;(eval-when (eval compile) (defun si:clear-compiler-properties (symbol code)))
 (eval-when (eval compile) (setq si:*inhibit-macro-special* nil))
 
 
 (defmacro defvar (var &optional (form nil form-sp) doc-string)
+  (declare (optimize (safety 2)))
   `(progn (si:*make-special ',var)
 	  ,(if doc-string
 	       `(si:putprop ',var ,doc-string 'variable-documentation))
@@ -45,6 +46,7 @@
 	  )
 
 (defmacro defparameter (var form &optional doc-string)
+  (declare (optimize (safety 2)))
   (if doc-string
       `(progn (si:*make-special ',var)
               (si:putprop ',var ,doc-string 'variable-documentation)
@@ -55,6 +57,7 @@
               ',var)))
 
 (defmacro defconstant (var form &optional doc-string)
+  (declare (optimize (safety 2)))
   (if doc-string
       `(progn (si:*make-constant ',var ,form)
               (si:putprop ',var ,doc-string 'variable-documentation)
@@ -67,6 +70,7 @@
 ;;; Thus their names need not be exported.
 
 (defmacro and (&rest forms)
+  (declare (optimize (safety 2)))
   (if (endp forms)
       t
       (let ((x (reverse forms)))
@@ -75,6 +79,7 @@
                ((endp forms) form)))))
 
 (defmacro or (&rest forms)
+  (declare (optimize (safety 2)))
   (unless (endp forms)
     (let ((x (reverse forms)))
       (do ((forms (cdr x) (cdr forms)) (gs)
@@ -87,9 +92,10 @@
 			(if ,temp ,temp ,form))))))
                ((endp forms) form)))))
 
-(defmacro locally (&rest body) `(let () ,@body))
+(defmacro locally (&rest body)   (declare (optimize (safety 2))) `(let () ,@body))
 
 (defmacro loop (&rest body &aux (tag (gensym)))
+  (declare (optimize (safety 2)))
   `(block nil (tagbody ,tag (progn ,@body) (go ,tag))))
 
 (defun import (s &optional (p *package*))
@@ -101,14 +107,17 @@
 
 (import 'while 'user)
 (defmacro while (test &rest forms)
+  (declare (optimize (safety 2)))
  `(loop (unless ,test (return)) ,@forms) )
 
 (defmacro defmacro (name vl &rest body)
+  (declare (optimize (safety 2)))
   `(si:define-macro ',name (si:defmacro* ',name ',vl ',body)))
 
 (defmacro define-symbol-macro (&rest body) (declare (ignore body)) nil);FIXME placeholder
 
 (defmacro defun (name lambda-list &rest body)
+  (declare (optimize (safety 2)))
   (multiple-value-bind (doc decl body)
        (find-doc body nil)
     (if doc
@@ -132,6 +141,7 @@
 ;      (gensym))))
 
 (defmacro psetq (&rest args)
+  (declare (optimize (safety 2)))
    (do ((l args (cddr l))
         (forms nil)
         (bindings nil))
@@ -143,6 +153,7 @@
 ; conditionals
 
 (defmacro cond (&rest clauses &aux (form nil))
+  (declare (optimize (safety 2)))
   (let ((x (reverse clauses)))
     (dolist (l x form)
       (cond ((endp (cdr l))
@@ -153,14 +164,17 @@
 	    ((setq form `(if ,(car l) ,(if (endp (cddr l)) (cadr l) `(progn ,@(cdr l))) ,form)))))))
 
 (defmacro when (pred &rest body)
+  (declare (optimize (safety 2)))
   `(if ,pred (progn ,@body)))
 
 (defmacro unless (pred &rest body)
+  (declare (optimize (safety 2)))
   `(if (not ,pred) (progn ,@body)))
 
 ; program feature
 
 (defmacro prog (vl &rest body &aux (decl nil))
+  (declare (optimize (safety 2)))
   (do ()
       ((or (endp body)
            (not (consp (car body)))
@@ -172,6 +186,7 @@
   )
 
 (defmacro prog* (vl &rest body &aux (decl nil))
+  (declare (optimize (safety 2)))
   (do ()
       ((or (endp body)
            (not (consp (car body)))
@@ -185,17 +200,21 @@
 ; sequencing
 
 (defmacro prog1 (first &rest body &aux (sym (gens first)))
+  (declare (optimize (safety 2)))
   `(let ((,sym ,first)) ,@body ,sym))
 
 (defmacro prog2 (first second &rest body &aux (sym (gens second)))
+  (declare (optimize (safety 2)))
   `(progn ,first (let ((,sym ,second)) ,@body ,sym)))
 
 ; multiple values
 
 (defmacro multiple-value-list (form)
+  (declare (optimize (safety 2)))
   `(multiple-value-call 'list ,form))
 
 (defmacro multiple-value-setq (vars form)
+  (declare (optimize (safety 2)))
   (do ((vl vars (cdr vl))
        (sym (gensym))
        (forms nil))
@@ -203,6 +222,7 @@
       (push `(setq ,@(when forms `(,sym (cdr ,sym))) ,(car vl) (car ,sym)) forms)))
 
 (defmacro multiple-value-bind (vars form &rest body)
+  (declare (optimize (safety 2)))
   (do ((vl vars (cdr vl))
        (sym (gensym))
        (bind nil))
@@ -213,6 +233,7 @@
 
 (defmacro do (control (test . result) &rest body
               &aux (decl nil) (label (gensym)) (vl nil) (step nil))
+  (declare (optimize (safety 2)))
   (do ()
       ((or (endp body)
            (not (consp (car body)))
@@ -239,6 +260,7 @@
 
 (defmacro do* (control (test . result) &rest body
                &aux (decl nil) (label (gensym)) (vl nil) (step nil))
+  (declare (optimize (safety 2)))
   (do ()
       ((or (endp body)
            (not (consp (car body)))
@@ -264,6 +286,7 @@
 			  (return (progn ,@result)))))))
 
 (defmacro case (keyform &rest clauses &aux (form nil) (key (gens keyform)))
+  (declare (optimize (safety 2)))
   (dolist (clause (reverse clauses) `(let ((,key ,keyform)) ,form))
           (declare (object clause))
     (cond ((or (eq (car clause) 't) (eq (car clause) 'otherwise))
@@ -278,10 +301,11 @@
                            ,form))))))
 
 
-(defmacro return (&optional (val nil)) `(return-from nil ,val))
+(defmacro return (&optional (val nil))   (declare (optimize (safety 2))) `(return-from nil ,val))
 
 (defmacro dolist ((var form &optional (val nil)) &rest body
                                                  &aux (temp (gensym)))
+  (declare (optimize (safety 2)))
   `(do* ((,temp ,form (cdr ,temp)))
 	((endp ,temp) ,val)
 	(let ((,var (car ,temp)))
@@ -300,6 +324,7 @@
 ;; of the other argument in the comparison, apparently to symmetrize
 ;; the long integer range.  20040403 CM.
 (defmacro dotimes ((var form &optional (val nil)) &rest body)
+  (declare (optimize (safety 2)))
   (cond
    ((symbolp form)
     (let ((temp (gens form)))
@@ -348,10 +373,11 @@
 
 
 (defmacro declaim (&rest l)
+  (declare (optimize (safety 2)))
  `(eval-when (compile eval load)
 	     ,@(mapcar #'(lambda (x) `(proclaim ',x)) l)))
 
-(defmacro lambda ( &rest l) `(function (lambda ,@l)))
+(defmacro lambda ( &rest l)   (declare (optimize (safety 2))) `(function (lambda ,@l)))
 
 (defmacro memq (a b) `(member ,a ,b :test 'eq))
 

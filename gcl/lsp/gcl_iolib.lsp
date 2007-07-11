@@ -58,31 +58,31 @@
 (in-package 'system)
 
 (defun concatenated-stream-streams (stream)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type stream concatenated-stream)
   (stream-object0 stream))
 (defun broadcast-stream-streams (stream)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type stream broadcast-stream)
   (stream-object0 stream))
 (defun two-way-stream-input-stream (stream)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type stream two-way-stream)
   (stream-object0 stream))
 (defun echo-stream-input-stream (stream)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type stream echo-stream)
   (stream-object0 stream))
 (defun two-way-stream-output-stream (stream)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type stream two-way-stream)
   (stream-object1 stream))
 (defun echo-stream-output-stream (stream)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type stream echo-stream)
   (stream-object1 stream))
 (defun synonym-stream-symbol (stream)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type stream synonym-stream)
   (stream-object0 stream))
 ;(proclaim '(optimize (safety 2) (space 3)))
@@ -103,7 +103,7 @@
 
 
 (defmacro with-open-stream ((var stream) . body)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (multiple-value-bind 
    (ds b)
    (find-declarations body)
@@ -117,7 +117,7 @@
 
 
 (defmacro with-input-from-string ((var string &key index start end) . body)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (multiple-value-bind 
    (ds b)
    (find-declarations body)
@@ -131,7 +131,7 @@
 
 
 (defmacro with-output-to-string ((var &optional string &key element-type) . body)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (multiple-value-bind 
    (ds b)
    (find-declarations body)
@@ -147,7 +147,7 @@
 (defun read-from-string (string
                          &optional (eof-error-p t) eof-value
                          &key (start 0) (end nil end-p) preserve-whitespace)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type string string)
   (unless end-p (setq end (length string)))
   (let ((stream (make-string-input-stream string start end)))
@@ -175,7 +175,7 @@
 			    ( readably nil readably-supplied-p )
 			    ( right-margin nil right-margin-supplied-p )
                         &aux (stream (make-string-output-stream)))
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (let*((*print-array*
 	  (if array-supplied-p array *print-array*))
 	(*print-base*
@@ -211,19 +211,19 @@
 
 (defun prin1-to-string (object
                         &aux (stream (make-string-output-stream)))
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (prin1 object stream)
   (get-output-stream-string stream))
 
 
 (defun princ-to-string (object
                         &aux (stream (make-string-output-stream)))
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (princ object stream)
   (get-output-stream-string stream))
 
 (defun file-string-length (ostream object)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (let ((ostream (if (typep ostream 'broadcast-stream) 
 		     (car (last (broadcast-stream-streams ostream)))
 		   ostream)))
@@ -237,7 +237,7 @@
      (unwind-protect (progn ,@body) (progn (close ,s) (delete-file ,s)))))
 
 (defmacro with-open-file ((stream . filespec) . body)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (multiple-value-bind 
    (ds b)
    (find-declarations body)
@@ -249,7 +249,7 @@
 	(if ,stream (close ,stream))))))
 
 (defun pprint-dispatch (obj &optional (table *print-pprint-dispatch*))
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (let ((fun (si:get-pprint-dispatch obj table)))
     (if fun (values fun t) (values 'si:default-pprint-object nil))))
 
@@ -258,7 +258,7 @@
 (defun set-pprint-dispatch (type-spec function &optional
 			    (priority 0)
 			    (table *print-pprint-dispatch*))
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (unless (typep priority 'real)
     (error 'type-error :datum priority :expected-type 'real))
   (let ((a (assoc type-spec (cdr table) :test 'equal)))
@@ -267,7 +267,7 @@
   nil)
 
 (defun copy-pprint-dispatch (&optional table)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (unless table
     (setq table *print-pprint-dispatch*))
   (unless (and (eq (type-of table) 'cons)
@@ -297,7 +297,7 @@
            (return-from yes-or-no-p nil)))))
 
 (defun sharp-a-reader (stream subchar arg)
-  (declare (ignore subchar) (optimize (safety 1)))
+  (declare (ignore subchar) (optimize (safety 2)))
   (let ((initial-contents (read stream nil nil t)))
     (unless *read-suppress*
       (do ((i 0 (1+ i))
@@ -320,7 +320,7 @@
 (defvar *dribble-saved-terminal-io* nil)
 
 (defun dribble (&optional (pathname "DRIBBLE.LOG" psp) (f :supersede))
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (cond ((not psp)
          (when (null *dribble-stream*) (error "Not in dribble."))
          (if (eq *dribble-io* *terminal-io*)
@@ -352,7 +352,7 @@
 ;;; ensure-directories-exist 
 
 (defun ensure-directories-exist (pathspec &key verbose)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (let* ((path (pathname pathspec))
 	 (dir (make-pathname :host (pathname-host path)
 			     :device (pathname-device path)
@@ -435,7 +435,7 @@
       value))
 
 (defun logical-pathname-translations (key)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (let ((k (if (stringp key) (string-right-trim ":" (string-downcase key)) key)))
       (cdr (si:pathname-lookup k si:*pathname-logical*))))
 
@@ -528,7 +528,7 @@
 ; simple formatter macro
 
 (defmacro formatter ( control-string )
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   `(progn
      (lambda (*standard-output* &rest arguments)                                
        (let ((*format-unused-args* nil))
@@ -543,7 +543,7 @@
 The forms of the body are executed in a print environment that corresponds to
 the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
 *package* is \"CL-USER\", etc."
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   `(let*((*package* (find-package :cl-user))
 	 (*print-array* t) ;; print-array -> core dampft
 	 (*print-base* 10)
@@ -582,7 +582,7 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
   
 (defmacro print-unreadable-object
 	  ((object stream &key type identity) &body body)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (if body
       `(flet ((.print-unreadable-object-body. () ,@body))
 	 (si::print-unreadable-object-function
@@ -606,7 +606,7 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
      ,@body))
 
 (defmacro with-compilation-unit (opt &rest body)   
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (declare (ignore opt)) 
   `(let ((res (multiple-value-list (let ((*disable-recompile* t)) ,@body))))
      (do-recompile nil)
@@ -620,14 +620,14 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
     nc))
 
 (defun write-byte (j s)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (let ((nc (get-byte-stream-nchars s))
 	(ff (1- (expt 2 char-length))))
     (do ((k 0 (1+ k))(i j (ash i (- char-length)))) ((= k nc) j)
 	(write-char (code-char (logand i ff)) s))))
 
 (defun read-byte (s &optional (eof-error-p t) eof-value)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (let ((nc (get-byte-stream-nchars s)))
     (do ((j 0 (1+ j)) 
 	 (i 0 (logior i
@@ -639,7 +639,7 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
 
 
 (defun read-sequence (seq strm &key (start 0) (end nil))
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type seq sequence)
   (check-type start (integer 0))
   (when end (check-type end (integer 0)))
@@ -668,7 +668,7 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
 
 
 (defun write-sequence (seq strm &key (start 0) (end nil))
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type seq sequence)
   (check-type start (integer 0))
   (when end (check-type end (integer 0)))
@@ -717,7 +717,7 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
 	((check-type tp (member character integer)))))
 
 (defun open (f &rest args)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (let ((args (let ((et (cadr (member :element-type args))))
 		(if et `(:element-type ,(restrict-stream-element-type et) ,@args)
 		  args))))

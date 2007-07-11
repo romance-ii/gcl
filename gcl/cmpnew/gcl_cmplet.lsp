@@ -102,7 +102,8 @@
 				      (c1expr* (cadr x) info)
 				      (cadr x)))
 		     forms)
-	       (set-var-init-type (car vars) (info-type (second (car forms))))))))
+	       (set-var-init-type (car vars) (info-type (second (car forms))))
+	       (maybe-reverse-type-prop (var-type v) (car forms))))))
 
   (dolist* (v (reverse vars)) (push v *vars*))
 
@@ -231,6 +232,7 @@
 			       forms)
 			 (push v vars)
 			 (set-var-init-type (car vars) (info-type (second  (car forms))))
+			 (maybe-reverse-type-prop (var-type v) (car forms))
 			 (push v *vars*)))))
 ;    (when *inline-forms* (print args)(break))
     (check-vdecl vnames ts is)

@@ -47,7 +47,7 @@
           ,g))))
 
 (defun find-all-symbols (string-designator)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (setq string-designator (string string-designator))
   (mapcan (lambda (p)
               (multiple-value-bind (s i)
@@ -60,7 +60,7 @@
 
 (defmacro do-symbols ((var &optional (package '*package*) (result-form nil))
                       . body)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (let ((p (gensym)) (i (gensym)) (l (gensym)) (q (gensym)) (r (gensym)) (rr (gensym))
         (loop (gensym)) (x (gensym))(y (gensym)) (break (gensym)) declaration)
     (multiple-value-setq (declaration body) (find-declarations body))
@@ -90,7 +90,7 @@
 
 (defmacro do-external-symbols
           ((var &optional (package '*package*) (result-form nil)) . body)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (let ((p (gensym)) (i (gensym)) (l (gensym))
         (loop (gensym)) (break (gensym)) declaration)
     (multiple-value-setq (declaration body)
@@ -109,7 +109,7 @@
        ,break))))
 
 (defmacro do-all-symbols((var &optional (result-form nil)) . body)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (let ((q (gensym))(p (gensym)) declaration)
     (multiple-value-setq (declaration body) (find-declarations body))
     `(let (,var)
@@ -164,8 +164,7 @@
 
 
 (defun apropos-list (string &optional package &aux list)
-  (declare (optimize (safety 1)))
-  (setq list nil)
+  (declare (optimize (safety 2)))
   (setq string (string string))
   (cond (package
          (do-symbols (symbol package)
@@ -184,13 +183,13 @@
 	       #'string< :key #'symbol-name))
 
 (defun apropos (string &optional package)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (dolist (symbol (apropos-list string package))
     (print-symbol-apropos symbol))
   (values))
 
 (defmacro with-package-iterator ((name plist &rest symbol-types) . body)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (let ((p (gensym)) (i (gensym)) (l (gensym)) (q (gensym)) (dum (gensym))
         (x (gensym))(y (gensym)) (access (gensym)) declaration)
     (multiple-value-setq (declaration body) (si::find-declarations body))

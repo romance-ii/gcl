@@ -48,7 +48,7 @@
 	     (setf value (eval (read))))))
 
 (defmacro check-type (place typespec &optional string)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   `(progn (setf ,place (the ,typespec (if (typep ,place ',typespec) ,place (check-type-symbol ',place ,place ',typespec ',string)))) nil))
 ;  `(unless (typep ,place ',typespec) (setf ,place (the ,typespec (check-type-symbol ',place ,place ',typespec ',string))) nil))
   
@@ -62,7 +62,7 @@
 
 
 (defmacro assert (test-form &optional places string &rest args)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   `(do nil ;((*print-level* 4) (*print-length* 4))
        (,test-form nil)
      ,(if string
@@ -75,7 +75,7 @@
   `(or ,@(mapcan (lambda (x) (mapcar (lambda (y) `(eql ,y)) (if (listp (car x)) (car x) (list (car x))))) clauses)))
 
 (defmacro ecase (keyform &rest clauses &aux (key (gensym)))
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type clauses (list-of proper-list))
   (let ((tp (clause-type clauses)))
     (do ((l (reverse clauses) (cdr l))
@@ -89,7 +89,7 @@
 			,form))))))
 
 (defmacro ccase (keyplace &rest clauses &aux (key (gensym)))
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type clauses (list-of proper-list))
    `(loop (let ((,key ,keyplace))
 	    ,@(mapcar (lambda (l)
@@ -101,7 +101,7 @@
 	    (check-type ,keyplace ,(clause-type clauses)))))
 
 (defmacro typecase (keyform &rest clauses)
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type clauses (list-of proper-list))
   (let ((key (unless (symbolp keyform) (gensym))))
     (do ((l (reverse clauses) (cdr l))
@@ -112,13 +112,13 @@
 		     `(if (typep ,(or key keyform) ',(caar l)) ,z ,form)))))))
 	
 (defmacro etypecase (keyform &rest clauses &aux (key (if (symbolp keyform) keyform (gensym))))
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type clauses (list-of proper-list))
   (let ((tp `(or ,@(mapcar 'car clauses))))
     `(typecase ,keyform ,@clauses (t (error 'type-error :datum ,key :expected-type ',tp)))))
 
 (defmacro ctypecase (keyform &rest clauses &aux (key (gensym)))
-  (declare (optimize (safety 1)))
+  (declare (optimize (safety 2)))
   (check-type clauses (list-of proper-list))
   `(loop
     (typecase ,keyform
