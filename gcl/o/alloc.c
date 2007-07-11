@@ -559,6 +559,8 @@ DEFUN_NEW("TOTAL-BYTES-ALLOCATED",object,fStotal_bytes_allocated,SI,0,0,NONE,OO,
       continue;
     bytes += TM_NUSED(*tm) * tm->tm_size;
   }
+  bytes+=ncbpage*PAGESIZE;
+  bytes+=rb_pointer-rb_start;
   RETURN1(make_fixnum(bytes));
 
 }
