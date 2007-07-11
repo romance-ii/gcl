@@ -548,6 +548,21 @@ DEFUNM_NEW("ALLOCATED",object,fSallocated,SI,1,1,NONE,OO,OO,OO,OO,(object typ),"
 	     ));
 }
  
+
+
+DEFUN_NEW("TOTAL-BYTES-ALLOCATED",object,fStotal_bytes_allocated,SI,0,0,NONE,OO,OO,OO,OO,(void),"") {
+  int i;
+  unsigned long bytes;
+  for(bytes=0,i=t_start; i < t_end; i++) {
+    struct typemanager *tm=tm_of(i);
+    if (tm->tm_type!=i)
+      continue;
+    bytes += TM_NUSED(*tm) * tm->tm_size;
+  }
+  RETURN1(make_fixnum(bytes));
+
+}
+
 DEFUN_NEW("RESET-NUMBER-USED",object,fSreset_number_used,SI,0,1,NONE,OO,OO,OO,OO,(object typ),"")
 {int i;
  if (VFUN_NARGS == 1)

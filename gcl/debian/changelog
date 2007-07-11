@@ -13,8 +13,9 @@ gclcvs (2.7.0-77) unstable; urgency=low
     propagator;better c1retnote;long C names without gprof;maybe-
     reverse-type-prop;implement safety 1 definition in unchecked
     subcalls
+  * total-bytes-allocated thanks Stephen Wilson;fix install
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 11 Jul 2007 11:59:38 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed, 11 Jul 2007 15:58:10 -0400
 
 gclcvs (2.7.0-76) unstable; urgency=low
 
