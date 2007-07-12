@@ -35,6 +35,7 @@
 ;;; included in the compiled code.  The default value is OFF.
 
 (defvar *dlinks* (make-hash-table :test 'equal))
+(defvar *list-syms* (make-hash-table :test 'eq))
 
 (defun init-env ()
   (setq *next-cvar* 0)
@@ -45,6 +46,7 @@
   (clrhash *objects*)
   (clrhash *objects-rev*)
   (clrhash *dlinks*)
+  (clrhash *list-syms*)
   (setq *constants* nil)
   (setq *local-funs* nil)
   (setq *global-funs* nil)

@@ -15,8 +15,9 @@ gclcvs (2.7.0-77) unstable; urgency=low
     subcalls
   * total-bytes-allocated thanks Stephen Wilson;fix install
   * fix install
+  * fmla-tp fix, thanks stephen wilson and waldek
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 11 Jul 2007 22:08:36 -0400
+ -- Camm Maguire <camm@enhanced.com>  Thu, 12 Jul 2007 17:10:04 -0400
 
 gclcvs (2.7.0-76) unstable; urgency=low
 
