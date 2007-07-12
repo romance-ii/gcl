@@ -1212,15 +1212,12 @@
 
 (defun c1list (args)
   (let* ((info (make-info))
-	 (nargs (c1args args info)))
+	(nargs (c1args args info)))
     (setf (info-type info) (cond ((not args) #tnull)
 				 ((< (length args) 5)
 				  (cmp-norm-tp (reduce (lambda (y x) (declare (ignore x)) `(cons t ,y)) args :initial-value 'null)))
 				 (#tproper-cons)));FIXME
-    (let ((res (list 'call-global info 'list nargs)))
-      (unless (member-if-not 'symbolp args)
-	(setf (gethash res *list-syms*) args))
-      res)))
+    (list 'call-global info 'list nargs)))
 (si::putprop 'list 'c1list 'c1)
       
 (defun c1list* (args)
