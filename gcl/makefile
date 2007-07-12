@@ -178,7 +178,7 @@ command:
 merge:
 	$(CC) -o merge merge.c
 
-LISP_LIB=bin/gcl clcs/packages.lisp clcs/myload1.lisp clcs/gcl_clcs_macros.lisp cmpnew/gcl_collectfn.o cmpnew/gcl_collectfn.lsp xgcl-2/sysdef.lisp xgcl-2/gcl_dwtest.lsp xgcl-2/gcl_dwtestcases.lsp lsp/gcl_gprof.lsp lsp/gcl_info.o lsp/gcl_profile.lsp lsp/gcl_export.lsp lsp/gcl_autoload.lsp cmpnew/gcl_cmpmain.lsp cmpnew/gcl_cmpopt.lsp cmpnew/gcl_lfun_list.lsp lsp/gcl_auto_new.lsp h/cmpinclude.h unixport/init_$(SYSTEM).lsp unixport/lib$(SYSTEM).a unixport/libgclp.a gcl-tk/tk-package.lsp $(TK_LISP_LIB) $(RL_LIB) $(FIRST_FILE) $(LAST_FILE) $(addsuffix /sys-proclaim.lisp,lsp cmpnew pcl clcs) unixport/gcl.script
+LISP_LIB=clcs/package.lisp clcs/myload1.lisp clcs/gcl_clcs_macros.lisp cmpnew/gcl_collectfn.o cmpnew/gcl_collectfn.lsp xgcl-2/sysdef.lisp xgcl-2/gcl_dwtest.lsp xgcl-2/gcl_dwtestcases.lsp lsp/gcl_gprof.lsp lsp/gcl_info.o lsp/gcl_profile.lsp lsp/gcl_export.lsp lsp/gcl_autoload.lsp cmpnew/gcl_cmpmain.lsp cmpnew/gcl_cmpopt.lsp cmpnew/gcl_lfun_list.lsp lsp/gcl_auto_new.lsp h/cmpinclude.h unixport/init_$(SYSTEM).lsp unixport/lib$(SYSTEM).a unixport/libgclp.a gcl-tk/tk-package.lsp $(TK_LISP_LIB) $(RL_LIB) $(FIRST_FILE) $(LAST_FILE) $(addsuffix /sys-proclaim.lisp,lsp cmpnew pcl clcs) unixport/gcl.script
 
 install_command:
 	rm -f bin/$(BINSCPT)
@@ -241,6 +241,7 @@ install_unix:
 	mkdir -p $(DESTDIR)$(INSTALL_LIB_DIR)
 	MINSTALL_LIB_DIR=`echo $(INSTALL_LIB_DIR) | sed -e 'sX^\([a-z]\):X/\1Xg'` ; \
 	$(MAKE) install_command "INSTALL_LIB_DIR=$(INSTALL_LIB_DIR)" "prefix=$(prefix)" "DESTDIR=$(DESTDIR)" "BINDIR=$$MINSTALL_LIB_DIR/unixport"
+	cp bin/$(BINSCPT) $(DESTDIR)$(prefix)/bin/
 	rm -f $(DESTDIR)$(prefix)/bin/gcl.exe
 	tar cf - $(PORTDIR)/$(FLISP)$(EXE) info/*.info* $(LISP_LIB) \
 	$(TCL_EXES)  |  (cd $(DESTDIR)$(INSTALL_LIB_DIR) ;tar xf -)
