@@ -14,9 +14,9 @@ export DH_COMPAT=4
 ARCHT:=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 
 MCC:=gcc
-ifeq ($(ARCHT),arm)
-MCC:=gcc-3.4
-endif
+#ifeq ($(ARCHT),arm)
+#MCC:=gcc-3.4
+#endif
 #ifeq ($(ARCHT),hppa)
 #MCC:=gcc-3.4
 #endif

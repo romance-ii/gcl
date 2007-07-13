@@ -554,8 +554,6 @@ else
 	case "$use" in
 	  *mingw*)
 		TO3FLAGS="-O3 $TFPFLAG";;
-	  *ia64*)
-		TO3FLAGS="-g -O2";;
 	  *)
 		TO3FLAGS="-O3 $TFPFLAG";;
 	esac
