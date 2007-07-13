@@ -556,10 +556,29 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 		 (t ""))	
 	   (namestring (first args))
 	   (namestring (second args))
-	   #+native-reloc ""
-	   #-native-reloc
-	   (let ((n (namestring (second args))))
-	     (format nil " ; mv ~a ~aX; cc -shared ~aX -o ~a ; rm -f ~aX" n n n n n)))))
+	   (prog1
+	       #+aix3
+	     (format nil " -w ;ar x /lib/libc.a fsavres.o  ; ar qc XXXfsave fsavres.o ; echo init_~a > XXexp ; mv  ~a  XXX~a ; ld -r -D-1 -bexport:XXexp -bgc XXX~a -o ~a XXXfsave ; rm -f XXX~a XXexp XXXfsave fsavres.o"
+		     *init-name*
+		     (setq na (namestring (get-output-pathname na "o" nil)))
+		     na na na na na)
+	     #+(or dlopen irix5)
+	     (if (not system-p)
+		 (format nil
+			 " -w ; mv ~a XX~a ; ld  ~a -shared XX~a  -o ~a -lc ; rm -f XX~a"  
+			 (setq na (namestring (get-output-pathname na "o" nil)))			    na
+			 #+ignore-unresolved "-ignore_unresolved"
+			 #+expect-unresolved "-expect_unresolved '*'"
+			 na na na))	
+			    
+	     #+bsd ""
+;	     #+bsd "-w"
+	     #-(or aix3 bsd irix3) " 2> /dev/null ")
+		  
+		 
+	   )
+   )
+  )
 
 ; Windows short form paths may contain tilde (~) which conflicts with
 ; format directives.
