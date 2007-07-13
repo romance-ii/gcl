@@ -1,5 +1,5 @@
 
-#ifndef SPECIAL_SETJMP
+#ifndef __ia64__/*FIXME*/
 #undef setjmp
 #define setjmp ((int(*)(void *))dlsetjmp)
 #endif
