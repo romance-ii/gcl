@@ -47,31 +47,21 @@ fasload(object faslfile) {
 
   void *dlp ;
   int (*fptr)();
-  char buf[MAXPATHLEN],b[MAXPATHLEN],filename[MAXPATHLEN];
-  static int count;
+  char buf[MAXPATHLEN],b[MAXPATHLEN];
   object memory,data,faslstream;
   struct name_list *nl;
   object x;
 
   bzero(buf,sizeof(buf)); /*GC partial stack hole closing*/
   bzero(b,sizeof(b));
-  bzero(filename,sizeof(filename));
 
   /* this is just to allow reloading in the same file twice.
    */
-  coerce_to_filename(truename(faslfile), filename);
-  if (!count)
-    count=time(0);
-  ASSERT(snprintf(buf,sizeof(buf),"/tmp/ufas%dxXXXXXX",count++)>0);
-  ASSERT(mkstemp(buf)>=0);
-
+  coerce_to_filename(truename(faslfile), buf);
   ASSERT((nl=(void *) malloc(strlen(buf)+1+sizeof(nl))));
   nl->next = loaded_files;
   loaded_files = nl;
   strcpy(nl->name,buf);
-
-  ASSERT(snprintf(b,sizeof(b),"cc -shared %s -o %s",filename,buf)>0);
-  ASSERT(!system(b));
 
   if (!(dlp = dlopen(buf,RTLD_NOW))) {
     fputs(dlerror(),stderr);
@@ -102,7 +92,6 @@ fasload(object faslfile) {
 
   call_init(0,memory,data,fptr);
 
-  unlink(buf);
   close_stream(faslstream);
 
   return memory->cfd.cfd_size;
