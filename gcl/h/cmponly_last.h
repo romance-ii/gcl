@@ -1,6 +1,8 @@
 
+#ifndef SPECIAL_SETJMP
 #undef setjmp
 #define setjmp ((int(*)(void *))dlsetjmp)
+#endif
 #undef getc
 #define getc   ((int(*)(void *))dlgetc)
 #undef putc
