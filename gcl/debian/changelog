@@ -20,8 +20,9 @@ gclcvs (2.7.0-77) unstable; urgency=low
   * revert simpler fasldlsym handling for now
   * special setjmp for ia64
   * copt for ia64;gcc 4.x for arm
+  * _mcount for ppc
 
- -- Camm Maguire <camm@enhanced.com>  Fri, 13 Jul 2007 18:22:52 -0400
+ -- Camm Maguire <camm@enhanced.com>  Fri, 13 Jul 2007 23:41:54 -0400
 
 gclcvs (2.7.0-76) unstable; urgency=low
 

@@ -38,7 +38,7 @@ bfd_hash_transfer(struct bfd_link_hash_entry *h,void *v) {
 }  
 
 #ifdef GCL_GPROF
-extern void mcount();
+extern void _mcount();
 /* int */
 /* mcount_wrapper(unsigned long u1,unsigned long u2) { */
 /*   return _mcount(u1,u2); */
@@ -126,12 +126,12 @@ build_symbol_table_bfd(void) {
 #ifdef GCL_GPROF
     sethash(make_simple_string("_mcount"),
 	    sSAlink_hash_tableA->s.s_dbind,
-	    make_fixnum((fixnum)mcount));
+	    make_fixnum((fixnum)_mcount));
     sethash(make_simple_string("mcount"),
 	    sSAlink_hash_tableA->s.s_dbind,
-	    make_fixnum((fixnum)mcount));
+	    make_fixnum((fixnum)_mcount));
 
-    if ((fixnum)mcount<DBEGIN || (fixnum)mcount>=(DBEGIN+MAXPAGE*PAGESIZE))
+    if ((fixnum)_mcount<DBEGIN || (fixnum)_mcount>=(DBEGIN+MAXPAGE*PAGESIZE))
       fprintf(stderr,"Warning, symbol address for mcount off core\n");
 #endif
 
