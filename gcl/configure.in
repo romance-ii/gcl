@@ -552,8 +552,9 @@ if test "$enable_debug" = "yes" ; then
 	# for subconfigurations
 	CFLAGS="$CFLAGS -g"
 else
+	case $use in
 # FIXME -- remove when compiler issues are fixed
-	  *hppa*)
+	  hppa*)
 		TO3FLAGS="-O2 -g";;
 	  *)
 		TO3FLAGS="-O3 $TFPFLAG";;
