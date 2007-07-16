@@ -172,12 +172,19 @@ DEFUN_NEW("DLSYM",object,fSdlsym,SI,2,2,NONE,OI,OO,OO,OO,(fixnum h,object name),
 DEFUN_NEW("DLADDR",object,fSdladdr,SI,1,1,NONE,OI,OO,OO,OO,(fixnum ad),"") {
 
   Dl_info info;
+  unsigned u;
+  char *c;
 
   dlerror();
   dladdr((void *)ad,&info);
   if (dlerror())
     FEerror("dladdr lookup failure on ~s",1,make_fixnum(ad));
-  RETURN1(coerce_to_pathname(make_simple_string(info.dli_fname)));
+  u=(unsigned)info.dli_fbase;
+  c=info.dli_fname;
+  if (u>=DBEGIN && u<core_end)
+    c="";
+
+  RETURN1(coerce_to_pathname(make_simple_string(c)));
 
 }
 

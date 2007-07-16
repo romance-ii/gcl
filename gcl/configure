@@ -8109,7 +8109,7 @@ EOF
 	echo "$ac_t""no" 1>&6
 fi 
 
-LIBS="`echo $LDFLAGS | sed 's,gcl.script,../unixport/gcl.script,g'` $X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS $TLDFLAGS $TLIBS $LIBS"
+LIBS="`echo $LDFLAGS | sed 's,gcl.script,../unixport/gcl.script,g'` $X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS $TLDFLAGS $TLIBS -ldl $LIBS"
 
 
 FINAL_CFLAGS="$CFLAGS $X_CFLAGS $TCFLAGS $PROCESSOR_FLAGS"

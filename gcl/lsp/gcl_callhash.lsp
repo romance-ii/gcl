@@ -542,7 +542,7 @@
   (let* ((pk (or (find-package "LIB") (make-package "LIB")))
 	 (k  (if np (dlopen n) 0))
 	 (ad (dlsym k str))
-	 (p (pathname-name (dladdr ad)))
+	 (p (or (pathname-name (dladdr ad)) ""))
 	 (psym (intern p pk))
 	 (npk (or (find-package psym) (make-package psym :use '(lisp))))
 	 (sym (and (shadow str npk) (intern str npk))))
@@ -590,7 +590,7 @@
 
 
 (defun lib-name (p)
-  (if (or (string= p "libc") (string= p "libm")) "" 
+  (if (or (string= p "") (string= p "libc") (string= p "libm")) "" 
     (string-concatenate p ".so")))
 				  
 (defun mdl (n p vad)
