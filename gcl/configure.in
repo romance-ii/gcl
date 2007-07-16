@@ -508,7 +508,7 @@ case "$use" in
 	TFPFLAG="";;
    m68k*)#FIXME gcc 4.x bug workaround
 	TFPFLAG="";;
-   *hppa*)#FIXME gcc 4.x bug workaround
+   hppa*)#FIXME gcc 4.x bug workaround
 	TFPFLAG="";;
   *)
 	TFPFLAG="-fomit-frame-pointer";;
