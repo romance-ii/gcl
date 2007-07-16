@@ -508,6 +508,8 @@ case "$use" in
 	TFPFLAG="";;
    m68k*)#FIXME gcc 4.x bug workaround
 	TFPFLAG="";;
+   *hppa*)#FIXME gcc 4.x bug workaround
+	TFPFLAG="";;
   *)
 	TFPFLAG="-fomit-frame-pointer";;
 esac
@@ -550,10 +552,9 @@ if test "$enable_debug" = "yes" ; then
 	# for subconfigurations
 	CFLAGS="$CFLAGS -g"
 else
-# FIXME -- remove when mingw compiler issues are fixed
-	case "$use" in
-	  *mingw*)
-		TO3FLAGS="-O3 $TFPFLAG";;
+# FIXME -- remove when compiler issues are fixed
+	  *hppa*)
+		TO3FLAGS="-O2 -g";;
 	  *)
 		TO3FLAGS="-O3 $TFPFLAG";;
 	esac
