@@ -295,7 +295,8 @@
 	((fmla-and fmla-or)
 	 (let ((tp (if (eq (car fmla) 'fmla-and) #tnull #t(not null)))
 	       (z (mapcar 'fmla-tp (cdr fmla))))
-	   (reduce (lambda (y x) (if (type>= tp y) y (type-or1 x (type-and tp y)))) (cdr z) :initial-value (car z))))
+	   (reduce (lambda (y x) (if (type>= tp y) y 
+				   (type-or1 x (type-and tp y)))) (cdr z) :initial-value (car z))))
 	(fmla-not (let ((tp (fmla-tp (cadr fmla)))) 
 		    (cond ((type>= #tnull tp) #t(member t))
 			  ((type>= #t(not null) tp) #tnull) 
@@ -303,15 +304,15 @@
 	(otherwise (info-type (cadr fmla)))))
 
 (defun fmla-and-or (fmlac info tp)
-  (let (r rp)
+  (let (r rp z)
     (dolist (x fmlac r)
       (with-restore-vars
-       (let ((z (c1fmla x info)))
-	 (do (l) ((not (setq l (pop *restore-vars*)))) 
-	     (setf (var-type (car l)) (type-or1 (var-type (car l)) (cadr l))))
-	 (setq rp (let ((tmp (cons z nil))) (if rp (cdr (rplacd rp tmp)) (setq r tmp))))
-	 (when (type>= tp (fmla-tp z))
-	   (return r)))))))
+       (setq z (c1fmla x info))
+       (do (l) ((not (setq l (pop *restore-vars*)))) 
+	 (setf (var-type (car l)) (type-or1 (var-type (car l)) (cadr l)))))
+      (setq rp (let ((tmp (cons z nil))) (if rp (cdr (rplacd rp tmp)) (setq r tmp))))
+      (when (type>= tp (fmla-tp z))
+	(return r)))))
 
 (defun c1fmla (fmla info)
   (if (atom fmla) (c1expr* fmla info)
