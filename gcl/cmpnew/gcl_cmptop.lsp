@@ -260,7 +260,6 @@
   (catch *cmperr-tag*
     (when (consp form)
       (let ((fun (car form)) (args (cdr form)) fd)
-           (declare (object fun args))
            (cond
             ((symbolp fun)
              (cond ((eq fun 'si:|#,|)
@@ -1712,39 +1711,22 @@
      (wt-cvars))))
 
 
+(defun tlclp (form)
+  (cond ((atom form) nil)
+	((member (car form) '(defmacro defun lambda)))
+	((and (symbolp (car form)) (macro-function (car form)))
+	 (tlclp (cmp-macroexpand-1 form)))
+	((or (tlclp (car form)) (tlclp (cdr form))))))
 
 (defun t1ordinary (form &aux tem )
   (setq *non-package-operation* t)
   ;; check for top level functions
-  (cond (*compile-ordinaries*
+  (cond ((or *compile-ordinaries* (tlclp form))
 	 (maybe-eval nil form)
 	 (let ((gen (gensym "progn 'compile")))
 	   (proclaim `(function ,gen nil t))
 	   (t1expr `(defun ,gen (), form nil))
 	   (push (list 'ordinary `(,gen) ) *top-level-forms*)))
-	;;Hack to things like (setq bil #'(lambda () ...)) or (foo nil #'(lambda () ..))
-	;; but not (let ((x ..)) (setq bil #'(lambda () ..)))
-	;; for the latter you must use (progn 'compile ...)
-	((and (consp form)
-	      (symbolp (car form))
-	      (or (eq (car form) 'setq)
-		  (not (special-form-p (car form))))
-	      (do ((v (cdr form) (and (consp v) (cdr v)))
-		   (i 1 (the fixnum (+ 1 i))))
-		  ((or (>= i 1000)
-		       (not (consp v))) nil)
-		  (declare (fixnum i))
-		  (cond ((and (consp (car v))
-			      (eq (caar v) 'function)
-			      (consp (setq tem (second (car v))))
-			      (eq (car tem) 'lambda))
-			 (let ((gen (gensym)))
-			   (t1expr `(defun ,gen ,@ (cdr tem)))
-			   (return-from t1ordinary
-					(t1ordinary (append
-						     (subseq form 0 i)
-						     `((symbol-function ', gen))
-						     (nthcdr (+ 1 i) form))))))))))
 	(t 
 	 (maybe-eval nil form)
 	 (let ((*vars* nil) (*funs* nil) (*blocks* nil) (*tags* nil)
