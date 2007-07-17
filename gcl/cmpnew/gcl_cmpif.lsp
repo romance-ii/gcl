@@ -77,6 +77,10 @@
 (defmacro vlp (x) `(and (eq 'var (car ,x)) (eq (var-kind (car (third ,x))) 'lexical)))
 (defmacro tppr (f r x) (let ((s (gensym))) `(let ((,s (cmp-norm-tp ,x))) (cons (two-tp-inf ,f ,s) (two-tp-inf ,r ,s)))))
 
+(defun get-object-value (c1x)
+  (when (and (eq 'location (car c1x)) (eq 'vv (caaddr c1x)))
+    (gethash (cadr (caddr c1x)) *objects-rev*)))
+
 (defun fmla-infer-tp (fmla)
   (unless *compiler-new-safety*
     (case (car fmla)
@@ -94,6 +98,9 @@
 		  (pt (get fn 'si::predicate-type)));FIXME +cmp-type-alist+
 	     (cond ((and (= l 1) (vlp (first args)) pt) 
 		    (list (cons (vl-name (first args)) (cons (cmp-norm-tp pt) (cmp-norm-tp `(not ,pt))))))
+		   ((and (= l 2) (eq fn 'typep) (vlp (first args))
+			 (let ((tp (cmp-norm-tp (get-object-value (second args)))))
+			   (when tp (list (cons (vl-name (first args)) (cons tp (cmp-norm-tp `(not ,tp)))))))))
 		   ((and (= l 2) rfn)
 		    (let (r)
 		      (when (vlp (first args))

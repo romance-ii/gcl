@@ -172,8 +172,8 @@ DEFUN_NEW("DLSYM",object,fSdlsym,SI,2,2,NONE,OI,OO,OO,OO,(fixnum h,object name),
 DEFUN_NEW("DLADDR",object,fSdladdr,SI,1,1,NONE,OI,OO,OO,OO,(fixnum ad),"") {
 
   Dl_info info;
-  unsigned u;
-  char *c;
+  unsigned long u;
+  const char *c;
 
   dlerror();
   dladdr((void *)ad,&info);
@@ -181,7 +181,7 @@ DEFUN_NEW("DLADDR",object,fSdladdr,SI,1,1,NONE,OI,OO,OO,OO,(fixnum ad),"") {
     FEerror("dladdr lookup failure on ~s",1,make_fixnum(ad));
   u=(unsigned)info.dli_fbase;
   c=info.dli_fname;
-  if (u>=DBEGIN && u<core_end)
+  if (u>=DBEGIN && u<(unsigned long)core_end)
     c="";
 
   RETURN1(coerce_to_pathname(make_simple_string(c)));

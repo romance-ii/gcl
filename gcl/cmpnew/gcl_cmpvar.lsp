@@ -67,6 +67,7 @@
   (space    0  :type char)          ;;; If variable is declared as an object array of this size
   (known-init -1 :type char)        ;;; Number of above known to be implicitly initialized
   store         ;;; keep kind in hashed c1forms
+  aliases
   )
 
 
@@ -401,6 +402,9 @@
   (setq form1 (c1expr form))
   (add-info info (cadr form1))
   
+  (when (eq (car form1) 'var)
+    (pushnew (caaddr form1) (var-aliases (car name1))))
+
   (do-setq-tp (car name1) form (info-type (cadr form1)))
   (setq type (var-type (car name1)))
 
@@ -472,6 +476,9 @@
       (let* ((vref (c1vref (car l)))
              (form (c1expr (cadr l)))
              (type (type-and (var-dt (car vref)) (info-type (cadr form)))))
+
+	(when (eq (car form) 'var)
+	  (pushnew (caaddr form) (var-aliases (car vref))))
 
 	(do-setq-tp (car vref) (cadr l) (info-type (cadr form)))
 	(setq type (var-type (car vref)))

@@ -72,7 +72,7 @@
   (when (and (or (eq tp 'structure) (eq tp 'compiled-function)) (typep-int object 'standard-object))
     (return-from typep-int nil))
   (let ((f (and (not i) (symbolp tp) (get tp 'type-predicate))))
-    (when f (return-from typep-int (let ((z (funcall f object))) z))))
+    (when f (return-from typep-int (let ((z (funcall f object))) (when z t)))))
   (case tp
 	(cons (and (consp object)
 		   (or (not i)
@@ -89,7 +89,7 @@
 	 (do ((l i (cdr l)))
 	     ((null l) t)
 	     (unless (typep-int object (car l)) (return nil))))
-	(satisfies (let ((z (funcall (car i) object))) z))
+	(satisfies (let ((z (funcall (car i) object))) (when z t)))
 	((t) t)
 	((nil) nil)
 	(boolean (or (eq object 't) (eq object 'nil)))
@@ -139,7 +139,7 @@
 		      broadcast-stream two-way-stream echo-stream) (eq (type-of-c object) tp))
 	(t (cond 
 	    ((if (symbolp tp) (get tp 's-data) (typep-int tp 's-data))
-	     (let ((z (structure-subtype-p object tp))) z))
+	     (let ((z (structure-subtype-p object tp))) (when z t)))
 	    ((setq tem (when (symbolp tp) (get tp 'deftype-definition)))
 	     (typep-int object (dt-apply tem i)))
 	    ((classp tp)

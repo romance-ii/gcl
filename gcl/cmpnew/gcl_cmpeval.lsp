@@ -1274,7 +1274,7 @@
 	((or (vv-p (car form)) (vv-p (cdr form))))))
 
 ;;FIXME
-(dolist (l '(coerce constantly complement open load delete-package import compile compile-file
+(dolist (l '(typep coerce constantly complement open load delete-package import compile compile-file
 		  error cerror warn break get-setf-method make-list))
   (si::putprop l t 'cmp-no-src-inline))
 

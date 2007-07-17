@@ -102,6 +102,10 @@
 				      (c1expr* (cadr x) info)
 				      (cadr x)))
 		     forms)
+
+	       (when (eq (caar forms) 'var)
+		 (pushnew (caaddr (car forms)) (var-aliases (car vars))))
+
 	       (set-var-init-type (car vars) (info-type (second (car forms))))
 	       (maybe-reverse-type-prop (var-type v) (car forms))))))
 
@@ -231,6 +235,8 @@
                                            (cadr x))))
 			       forms)
 			 (push v vars)
+			 (when (eq (caar forms) 'var)
+			   (pushnew (caaddr (car forms)) (var-aliases (car vars))))
 			 (set-var-init-type (car vars) (info-type (second  (car forms))))
 			 (maybe-reverse-type-prop (var-type v) (car forms))
 			 (push v *vars*)))))
