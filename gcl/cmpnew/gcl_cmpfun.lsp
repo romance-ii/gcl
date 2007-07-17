@@ -1021,22 +1021,6 @@
 	 (let ((*space* 10))		;prevent recursion!
 	   (c1expr tem)))))    
 
-;; (defun cfast-write (args write-fun)
-;;   (cond
-;;     ((and (not *safe-compile*)
-;; 	  (< *space* 2)
-;; 	  (boundp 'si::*eof*))
-;;      (let ((stream (second args)))
-;;        (or stream (setq stream '*standard-output*))
-;;      (cond
-;;        ((atom stream)
-;; 	`(cond ((fp-okp ,stream)
-;; 		(the fixnum (sputc .ch ,stream)))
-;; 	       (t    (,write-fun  .ch ,stream))))
-;;        (t `(let ((.str ,stream))
-;; 	     (declare (type ,(result-type stream) .str))
-;; 	     ,(cfast-write (list '.ch '.str) write-fun))))))))
-
 (defun cfast-write (args write-fun tp)
   (when (and (not *safe-compile*)
 	     (< *space* 2)
@@ -1045,7 +1029,7 @@
       (if (atom stream)
 	  (let ((ch (gensym))) 
 	    `(let ((,ch ,(car args)))
-	       (if (fp-okp ,stream) (sputc ,ch ,stream) (,write-fun ,ch ,stream))
+	       (if (and (fp-okp ,stream) (typep ,ch ',tp)) (sputc ,ch ,stream) (,write-fun ,ch ,stream))
 	       ,ch))
 	(let ((str (gensym)))
 	  `(let ((,str ,stream))

@@ -3,8 +3,9 @@ gclcvs (2.7.0-78) unstable; urgency=low
   * tidy fmla-and-or;prune some numeric types containing inf
   * support old style dladdr
   * lower hppa C optimization
+  * cfast-write fix
 
- -- Camm Maguire <camm@enhanced.com>  Mon, 16 Jul 2007 13:55:46 -0400
+ -- Camm Maguire <camm@enhanced.com>  Tue, 17 Jul 2007 10:22:22 -0400
 
 gclcvs (2.7.0-77) unstable; urgency=low
 
