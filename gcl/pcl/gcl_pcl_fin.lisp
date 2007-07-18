@@ -1392,10 +1392,10 @@ make_trampoline(function)
 #ifdef TURBO_CLOSURE
   if(type_of(function)==t_cclosure)
     {if(function->cc.cc_turbo==NULL)turbo_closure(function);
-     vs_head=make_cclosure(make_turbo_trampoline_internal,Cnil,vs_head,Cnil,NULL,0);
+     vs_head=make_cclosure_new(make_turbo_trampoline_internal,Cnil,vs_head,Cnil);
      return vs_pop;}
 #endif
-  vs_head=make_cclosure(make_trampoline_internal,Cnil,vs_head,Cnil,NULL,0);
+  vs_head=make_cclosure_new(make_trampoline_internal,Cnil,vs_head,Cnil);
   return vs_pop;
 }
 

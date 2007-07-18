@@ -7,8 +7,9 @@ gclcvs (2.7.0-78) unstable; urgency=low
   * boolean return for typep, infer typep;var-aliases for rplacd proper-
     cons bumping
   * compile top level closures
+  * all cclosures turbo, fix top-level-form compile
 
- -- Camm Maguire <camm@enhanced.com>  Tue, 17 Jul 2007 16:15:31 -0400
+ -- Camm Maguire <camm@enhanced.com>  Tue, 17 Jul 2007 23:43:57 -0400
 
 gclcvs (2.7.0-77) unstable; urgency=low
 

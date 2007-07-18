@@ -83,6 +83,38 @@ make_vfun(object name, object (*self)(), int argd, object data,fixnum nval)
 	return(vfn);
 }
 
+void
+turbo_closure(object fun)
+{
+  object l,*block;
+  int n;
+
+/*   if(fun->cc.cc_turbo==NULL) */
+  if(1)
+    {BEGIN_NO_INTERRUPT;
+     for (n = 0, l = fun->cc.cc_env;  !endp(l);  n++, l = l->c.c_cdr);
+    {
+     block= AR_ALLOC(alloc_contblock,(1+n),object);
+     *block=make_fixnum(n);
+     fun->cc.cc_turbo = block+1; /* equivalent to &block[1] */
+     for (n = 0, l = fun->cc.cc_env;  !endp(l);  n++, l = l->c.c_cdr)
+       fun->cc.cc_turbo[n] = l;}
+      END_NO_INTERRUPT;
+   }
+}
+
+DEFUN_NEW("TURBO-CLOSURE",object,fSturbo_closure,SI
+   ,1,1,NONE,OO,OO,OO,OO,(object funobj),"")
+
+{
+	/* 1 args */
+	if (type_of(funobj) == t_cclosure)
+		turbo_closure(funobj);
+	RETURN1(funobj);
+}
+
+
+
 object
 make_cclosure_new(void (*self)(), object name, object env, object data)
 {
@@ -94,20 +126,21 @@ make_cclosure_new(void (*self)(), object name, object env, object data)
 	cc->cc.cc_env = env;
 	cc->cc.cc_data = data;
 	cc->cc.cc_turbo = NULL;
+	turbo_closure(cc);
 	return(cc);
 }
 
 
-object
-make_cclosure(void (*self)(), object name, object env, object data, char *start, int size)
-{
-	if(data && type_of(data)==t_cfdata)
-	  { data->cfd.cfd_start=start; 
-	    data->cfd.cfd_size=size;}
-	  else if(size) FEerror("Bad call to make_cclosure",0);
-	return make_cclosure_new(self,name,env,data);
+/* object */
+/* make_cclosure(void (*self)(), object name, object env, object data, char *start, int size) */
+/* { */
+/* 	if(data && type_of(data)==t_cfdata) */
+/* 	  { data->cfd.cfd_start=start;  */
+/* 	    data->cfd.cfd_size=size;} */
+/* 	  else if(size) FEerror("Bad call to make_cclosure",0); */
+/* 	return make_cclosure_new(self,name,env,data); */
 
-}
+/* } */
 
 
 DEFUN_NEW("MC",object,fSmc,SI
@@ -449,37 +482,6 @@ DEFUN_NEW("COMPILED-FUNCTION-NAME",object,fScompiled_function_name,SI
 	  FEerror("~S is not a compiled-function.", 1, fun);
 	}RETURN1(fun);
 }
-
-void
-turbo_closure(object fun)
-{
-  object l,*block;
-  int n;
-
-  if(fun->cc.cc_turbo==NULL)
-    {BEGIN_NO_INTERRUPT;
-     for (n = 0, l = fun->cc.cc_env;  !endp(l);  n++, l = l->c.c_cdr);
-    {
-     block= AR_ALLOC(alloc_contblock,(1+n),object);
-     *block=make_fixnum(n);
-     fun->cc.cc_turbo = block+1; /* equivalent to &block[1] */
-     for (n = 0, l = fun->cc.cc_env;  !endp(l);  n++, l = l->c.c_cdr)
-       fun->cc.cc_turbo[n] = l;}
-      END_NO_INTERRUPT;
-   }
-}
-
-DEFUN_NEW("TURBO-CLOSURE",object,fSturbo_closure,SI
-   ,1,1,NONE,OO,OO,OO,OO,(object funobj),"")
-
-{
-	/* 1 args */
-	if (type_of(funobj) == t_cclosure)
-		turbo_closure(funobj);
-	RETURN1(funobj);
-}
-
-
 
 void
 gcl_init_cfun(void) {}

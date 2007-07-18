@@ -1713,15 +1713,13 @@
 
 (defun tlclp (form)
   (cond ((atom form) nil)
-	((member (car form) '(defmacro defun lambda)))
-	((and (symbolp (car form)) (macro-function (car form)))
-	 (tlclp (cmp-macroexpand-1 form)))
+	((member (car form) '(si::define-macro si::fset)))
 	((or (tlclp (car form)) (tlclp (cdr form))))))
 
 (defun t1ordinary (form &aux tem )
   (setq *non-package-operation* t)
   ;; check for top level functions
-  (cond ((or *compile-ordinaries* (tlclp form))
+  (cond ((or *compile-ordinaries* (tlclp (portable-source form)))
 	 (maybe-eval nil form)
 	 (let ((gen (gensym "progn 'compile")))
 	   (proclaim `(function ,gen nil t))
