@@ -1,8 +1,9 @@
 gclcvs (2.7.0-79) unstable; urgency=low
 
   * local imb() for alpha
+  * no gprof on ppc
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 18 Jul 2007 16:48:58 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed, 18 Jul 2007 17:17:03 -0400
 
 gclcvs (2.7.0-78) unstable; urgency=low
 

@@ -520,6 +520,7 @@ AC_CHECK_PROGS(AWK,gawk nawk awk)
 case $use in
   mips*) enable_gprof="no";;
   hppa*) enable_gprof="no";;
+  powerpc*) enable_gprof="no";;
 esac		     
 
 #case $use in
