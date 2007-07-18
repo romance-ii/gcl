@@ -1,3 +1,9 @@
+gclcvs (2.7.0-79) unstable; urgency=low
+
+  * local imb() for alpha
+
+ -- Camm Maguire <camm@enhanced.com>  Wed, 18 Jul 2007 16:48:58 -0400
+
 gclcvs (2.7.0-78) unstable; urgency=low
 
   * tidy fmla-and-or;prune some numeric types containing inf
