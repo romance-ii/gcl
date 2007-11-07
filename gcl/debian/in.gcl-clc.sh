@@ -83,6 +83,10 @@ for PROF in n y; do
 	    ;;
 	
 	install-clc)
+	    if ! [ -e /etc/default/$(basename $gcl_bin) ] ; then
+		echo $(basename $gcl_bin) not configured, aborting
+		exit 5
+	    fi
 	    echo $progname Uninstalling clc image and purging object cache ...
 	    test -x $gcl_bin || {
 		echo "Cannot install as there is no GCL"

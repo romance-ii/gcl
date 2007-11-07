@@ -2,8 +2,21 @@ gclcvs (2.7.0-79) unstable; urgency=low
 
   * local imb() for alpha
   * no gprof on ppc
+  * Bug fix: "gclcvs: installation fails", thanks to Lucas Nussbaum
+    (Closes: #432003). Abort clc if gcl not installed yet
+  * Bug fix: "gclcvs: FTBFS: do_init is undefined", thanks to Lucas
+    Nussbaum (Closes: #432341). Fixed since -78.
+  * Bug fix: "FTBFS (hppa): Bus error compiling tkl.o", thanks to dann
+    frazier (Closes: #434671). autobuilt -78 fine
+  * Bug fix: "gclcvs: should this package be removed?", thanks to Lucas
+    Nussbaum (Closes: #449352).  No, but thanks for the reports
+  * Bug fix: "gclcvs build-depends on gcc-3.4/g++-3.4", thanks to Matthias
+    Klose (Closes: #440422). Remove arm build-dep
+  * Bug fix: "gclcvs: [INTL:es] Spanish translation for the debconf
+    template", thanks to Rudy Godoy (Closes: #423708). Thanks
+  * build-dep texlive-latex-base
 
- -- Camm Maguire <camm@enhanced.com>  Wed, 18 Jul 2007 17:17:03 -0400
+ -- Camm Maguire <camm@enhanced.com>  Wed, 07 Nov 2007 17:22:11 -0500
 
 gclcvs (2.7.0-78) unstable; urgency=low
 
