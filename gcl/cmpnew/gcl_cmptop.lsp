@@ -1716,7 +1716,7 @@
 	((member (car form) '(si::define-macro si::fset)))
 	((or (tlclp (car form)) (tlclp (cdr form))))))
 
-(defun t1ordinary (form &aux tem )
+(defun t1ordinary (form)
   (setq *non-package-operation* t)
   ;; check for top level functions
   (cond ((or *compile-ordinaries* (tlclp (portable-source form)))
