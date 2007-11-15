@@ -204,6 +204,7 @@
   (FROB SPECS BODY))))
 
 (defun munge-restart-case-expression (expression data env)
+  (declare (ignorable data))
   (let ((exp (macroexpand expression env)))
     (if (consp exp)
 	(let* ((name (car exp))

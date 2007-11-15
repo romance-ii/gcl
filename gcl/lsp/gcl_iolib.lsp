@@ -566,28 +566,22 @@ the one defined in the ANSI standard. *print-base* is 10, *print-array* is t,
 	 (*readtable* (copy-readtable (si::standard-readtable))))
     ,@body))
 
-; and again from ECLS
-
-(defun print-unreadable-object-function (object stream type identity function)
-  (declare (:dynamic-extent function))
-  (princ "#<" stream)
-  (when type
-    (prin1 (type-of object) stream))
-  (when (and type function) (princ " " stream))
-  (when function (funcall function))
-  (when (and (or type function) identity) (princ " " stream))
-  ; (when identity (princ (si:pointer object) stream))
-  (princ ">" stream)
-  nil)
-  
 (defmacro print-unreadable-object
 	  ((object stream &key type identity) &body body)
   (declare (optimize (safety 2)))
-  (if body
-      `(flet ((.print-unreadable-object-body. () ,@body))
-	 (si::print-unreadable-object-function
-	   ,object ,stream ,type ,identity #'.print-unreadable-object-body.))
-    `(si::print-unreadable-object-function ,object ,stream ,type ,identity nil)))
+  (let ((q `(princ " " ,stream)))
+    `(if *print-readably* 
+	 (error 'print-not-readable :object ,object)
+       (progn
+	 (princ "#<" ,stream)
+	 ,@(when type `((prin1 (type-of ,object) ,stream) ,q))
+	 ,@body
+	 ,@(when identity
+	     (let ((z `(princ (address ,object) ,stream)))
+	       (if (and (not body) type) (list z) (list q z))))
+	 (princ ">" ,stream)
+	 nil))))
+;     (print-unreadable-object-function ,object ,stream ,type ,identity ,(when body `(lambda nil ,@body)))))
 
 ; i know this should be in cmpnew - but its easier here.
 

@@ -86,13 +86,16 @@
 (defvar *top-eof* (cons nil nil))
 (defvar *no-prompt* nil)
 
+(defun user-package nil
+  (find-package (if (member :ansi-cl *features*) "CL-USER" "USER")))
+
 (defun emergency-reset nil
   (let ((x (load-time-value 
 	    (mapcar (lambda (x) (cons x (symbol-function x))) 
 		     '(format read find-package package-name 
 			      reset-stack-limits eq bye eval fresh-line prin1 terpri))))
 	(y (load-time-value (copy-readtable nil)))
-	(z (load-time-value (find-package 'user))))
+	(z (load-time-value (user-package))))
     (dolist (x x) 
       (emergency-fset (car x) (cdr x)))
     (setq *readtable* y)
@@ -142,7 +145,7 @@
 		  (setq +++ ++ ++ + + -)
 		  (if *no-prompt* (setq *no-prompt* nil)
 		    (format t "~%~a>"
-			    (if (eq *package* (find-package 'user)) ""
+			    (if (eq *package* (user-package)) ""
 			      (package-name *package*))))
 		  (reset-stack-limits)
 		  ;; have to exit and re-enter to multiply stacks
@@ -226,7 +229,8 @@
 	      (format t "~a~%" *system-banner*))
 	    (format t "Temporary directory for compiler files set to ~a~%" *tmp-dir*)))
    (setq *ihs-top* 1)
-   (in-package 'system::user) ;(incf system::*ihs-top* 2)
+;   (in-package 'system::user) ;(incf system::*ihs-top* 2)
+   (setq *package* (user-package))
    (top-level1))
 
 (defun top-level nil (gcl-top-level))

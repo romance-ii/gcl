@@ -99,33 +99,23 @@
     (if files (or tags (info-error "Need tags if have multiple files")))
     (list* tags (nreverse files))))
 
-(defun re-quote-string (x &aux (i 0) (len (length x)) ch
-			   (extra 0)  )
-  (declare (fixnum i len extra))
-  (let ((x (if (stringp x) x (string x))))
-    (declare (string x))
-    (let (tem)
-      (tagbody
-       AGAIN
-       (while (< i len)
-	 (setq ch (aref x i))
-	 (cond ((position ch "\\()[]+.*|^$?")
-		(cond (tem 
-		       (vector-push-extend #\\ tem))
-		      (t (incf extra)))))
-	 (if tem
-	     (vector-push-extend ch tem))
-	 (setq i (+ i 1)))
-       (cond (tem )
-	     ((> extra 0)
-	      (setq tem 
-		    (make-array (f + (length x) extra)
-				:element-type 'character :fill-pointer 0))
-	      (setq i 0)
-	      (go AGAIN))
-	     (t (setq tem x)))
-       )
-      tem)))
+(defun re-quote-string (x &aux (i 0) ch (extra 0))
+  (declare (fixnum i extra))
+  (let* ((x (if (stringp x) x (string x)))
+	 (len (length x))
+	 (tem x))
+    (while (< i len)
+      (setq ch (aref x i))
+      (when (position ch "\\()[]+.*|^$?")
+	(when (eq x tem)
+	  (setq tem 
+		(make-array len :adjustable t
+			    :element-type 'character :fill-pointer 0))
+	  (dotimes (j i) (setf (aref tem j) (aref x j))))
+	(vector-push-extend #\\ tem))
+      (unless (eq tem x) (vector-push-extend ch tem))
+      (setq i (+ i 1)))
+    (remove-if-not 'standard-char-p tem)))
 
 (defun get-match (string i)
   (subseq string (match-beginning i) (match-end i)))
