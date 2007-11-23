@@ -10,7 +10,7 @@
 #export DH_VERBOSE=1
 
 # This is the debhelper compatability version to use.
-export DH_COMPAT=4
+#export DH_COMPAT=4
 ARCHT:=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 
 MCC:=gcc
@@ -126,7 +126,7 @@ build-%-stamp: configure-%-stamp
 	touch $@
 
 bclean-stamp:
-	-$(MAKE) clean
+	$(MAKE) clean
 	touch $@
 
 ansi-tests/test_results: build-ansi-stamp
@@ -148,7 +148,7 @@ clean: debian/control debian/gcl$(EXT).templates
 	rm -f *stamp
 	debconf-updatepo
 
-	-$(MAKE) clean
+	$(MAKE) clean
 
 	dh_clean
 	rm -rf debian/gprof debian/ansi-gprof debian/trad debian/ansi $(INS) debian/substvars

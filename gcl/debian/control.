@@ -2,7 +2,7 @@ Source: gcl
 Section: interpreters
 Priority: optional
 Maintainer: Camm Maguire <camm@enhanced.com>
-Build-Depends: debhelper (>= 4.1.16), libreadline5-dev | libreadline-dev, m4, tk8.4-dev, texlive-latex-base, texinfo, binutils-dev, libgmp3-dev, autotools-dev, common-lisp-controller, libxmu-dev, libxaw7-dev
+Build-Depends: debhelper (>= 4.1.16), libreadline5-dev | libreadline-dev, m4, tk8.4-dev, texlive-latex-base, texinfo, binutils-dev, libgmp3-dev, autotools-dev, common-lisp-controller, libxmu-dev, libxaw7-dev, po-debconf
 Standards-Version: 3.7.2
 
 Package: gcl
