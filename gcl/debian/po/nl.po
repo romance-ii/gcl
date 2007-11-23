@@ -1,0 +1,42 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gcl\n"
+"Report-Msgid-Bugs-To: camm@enhanced.com\n"
+"POT-Creation-Date: 2006-10-16 12:39-0400\n"
+"PO-Revision-Date: 2007-03-27 22:55+0100\n"
+"Last-Translator: Bart Cornelis <cobaco@skolelinux.no>\n"
+"Language-Team: debian-l10n-dutch <debian-l10n-dutch@lists.debian.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Dutch\n"
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:1001
+msgid "Use the work-in-progress ansi build by default"
+msgstr "Standaard de in-ontwikkeling-zijnde ansi-build gebruiken?"
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:1001
+msgid "GCL is in the process of providing an ANSI compliant image in addition to its traditional CLtL1 image still in production use.  Please see the README.Debian file for a brief description of these terms.  Setting this variable will determine which image you will use by default on executing 'gcl@EXT@'.  You can locally override this choice by setting the GCL_ANSI environment variable to any non-empty string for the ANSI build, and to the empty string for the CLtL1 build, e.g. GCL_ANSI=t gcl@EXT@.  The flavor of the build in force will be reported in the initial startup banner."
+msgstr "GCL is bezig om naast het traditionele en nog steeds in productie gebruikte CLtL1-image ook een ANSI-conform image te voorzien. Een korte beschrijving van deze termen vindt u in /usr/share/doc/gcl/README.Debian . De waarde van deze variabele bepaald welke image standaard gebruikt wordt bij het uitvoeren van 'gcl@EXT@'. U kunt deze keuze lokaal overstijgen via de omgevingsvariabele GCL_ANSI: op een niet-lege string voor de ANSI-image, en een lege string voor de CLtL1-image (bv. GCLANSI=t gcl@EXT@). De soort van de actieve image wordt aangegeven in de initiële opstartbanier. "
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:2001
+msgid "Use the profiling build by default"
+msgstr "Standaard de profiling-build gebruiken"
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:2001
+msgid "GCL now has optional support for profiling via gprof.  Please see the documentation for si::gprof-start and si::gprof-quit for details. As this build is slower than builds without gprof support, it is not recommended for final production use. You can locally override the default choice made here by setting the GCL_PROF environment variable to any non-empty string for profiling support, and to the empty string for the more optimized builds, e.g. GCL_PROF=t gcl@EXT@.  If profiling is enabled, this will be reported in the initial startup banner."
+msgstr "GCL ondersteund nu optioneel profiling via gprof. Meer details vindt u in de documentatie van si::gprof-start en si::gprof-quit. Aangezien dit trager is dan zonder gprof-ondersteuning, is dit af te raden voor produktiegebruik. U kunt lokaal de standaardkeuze overstijgen via de omgevingsvariabele GCL_PROF: een lege-string om de ondersteuning voor profiling te activeren, en een lege string voor meer geoptimaliseerde builds (e.g. GCL_PROF=t gcl@EXT@). Als profiling actief is wordt dit aangegeven in de initiële opstartbannier"
+

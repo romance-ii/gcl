@@ -1,0 +1,123 @@
+# gcl po-debconf translation to Spanish
+# Copyright (C) 2005 Software in the Public Interest
+# This file is distributed under the same license as the gcl package.
+#
+# Changes:
+#  - Initial translation
+#         César Gómez Martín <cesar.gomez@gmail.com>
+#
+#  - Revision
+#         Rudy Godoy Guillén <rudyd@stone-head.org>, 2007
+#
+#   Traductores, si no conoce el formato PO, merece la pena leer la
+#   documentación de gettext, especialmente las secciones dedicadas a este
+#   formato, por ejemplo ejecutando:
+#          info -n '(gettext)PO Files'
+#          info -n '(gettext)Header Entry'
+# Equipo de traducción al español, por favor, lean antes de traducir
+# los siguientes documentos:
+#
+#  - El proyecto de traducción de Debian al español
+#    http://www.debian.org/intl/spanish/
+#    especialmente las notas de traducción en
+#    http://www.debian.org/intl/spanish/notas
+#
+#  - La guía de traducción de po's de debconf:
+#    /usr/share/doc/po-debconf/README-trans
+#    o http://www.debian.org/intl/l10n/po-debconf/README-trans
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gcl 2.6.7-11\n"
+"Report-Msgid-Bugs-To: camm@enhanced.com\n"
+"POT-Creation-Date: 2006-10-16 12:39-0400\n"
+"PO-Revision-Date: 2007-05-13 18:58-0500\n"
+"Last-Translator: César Gómez Martín <cesar.gomez@gmail.com>\n"
+"Language-Team: Debian l10n spanish <debian-l10n-spanish@lists.debian.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Spanish\n"
+"X-Poedit-Country: SPAIN\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:1001
+msgid "Use the work-in-progress ansi build by default"
+msgstr "Utilizar por omisión el paquete ansi que todavía está en desarrollo"
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:1001
+msgid ""
+"GCL is in the process of providing an ANSI compliant image in addition to "
+"its traditional CLtL1 image still in production use.  Please see the README."
+"Debian file for a brief description of these terms.  Setting this variable "
+"will determine which image you will use by default on executing 'gcl@EXT@'.  "
+"You can locally override this choice by setting the GCL_ANSI environment "
+"variable to any non-empty string for the ANSI build, and to the empty string "
+"for the CLtL1 build, e.g. GCL_ANSI=t gcl@EXT@.  The flavor of the build in "
+"force will be reported in the initial startup banner."
+msgstr ""
+"GCL está en proceso de incorporar una imagen compatible con ANSI en adición a su imagen CLtL1 tradicional que todavía se usa en producción. Por favor, véase el fichero README de Debian para una breve descripción acerca de estos términos. El definir esta variable determinará qué imagen utilizar de manera predeterminada cuando ejecute «gcl@EXT@».\n"
+"Puede anular esta elección localmente definiendo la variable de entorno GCL_ANSI a una cadena no vacía para la compilación ANSI, y a una vacía para la compilación CLtL1, ejemplo: GCL_ANSI=t gcl@EXT@. La versión de la compilación se indicará en el anuncio inicial de arranque."
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:2001
+msgid "Use the profiling build by default"
+msgstr "Utilizar la compilación con perfilado por omisión"
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:2001
+msgid ""
+"GCL now has optional support for profiling via gprof.  Please see the "
+"documentation for si::gprof-start and si::gprof-quit for details. As this "
+"build is slower than builds without gprof support, it is not recommended for "
+"final production use. You can locally override the default choice made here "
+"by setting the GCL_PROF environment variable to any non-empty string for "
+"profiling support, and to the empty string for the more optimized builds, e."
+"g. GCL_PROF=t gcl@EXT@.  If profiling is enabled, this will be reported in "
+"the initial startup banner."
+msgstr "Ahora GCL tiene soporte opcional para perfilado a través de gprof. Por favor, mire la documentación de «si::gprof-start» y de «si::gprof-quit» y «si::gprof-quit» si desea más detalles. Dado que esta compilación es más lenta que otras sin soporte para gprof, no se recomienda usarlo en producción. Puede anular esta elección de forma local mediante el establecimiento de la variable de entorno GCL_PROF a cualquier cadena no vacía para soporte de perfiles, y a la cadena vacía para los paquetes más optimizados, es decir GCL_PROF=t gcl. Si el perfilado está activo se indicará en el anuncio inicial de arranque."
+
+#~ msgid ""
+#~ "GCL is one of the oldest free common lisp systems still in use. Several "
+#~ "production systems have used it for over a decade.  The common lisp "
+#~ "standard in effect when GCL was first released is known as \"Common Lisp, "
+#~ "the Language\" (CLtL1) after a book by Steele of the same name providing "
+#~ "this specification.  Subsequently, a much expanded standard was adopted "
+#~ "by the American National Standards Institute (ANSI), which is still "
+#~ "considered the definitive common lisp language specification to this "
+#~ "day.  GCL is in the process of providing an ANSI compliant image in "
+#~ "addition to its traditional CLtL1 image still in production use.  Setting "
+#~ "this variable will determine which image you will use by default on "
+#~ "executing 'gcl'.  You can locally override this choice by setting the "
+#~ "GCL_ANSI environment variable to any non-empty string for the ANSI build, "
+#~ "and to the empty string for the CLtL1 build, e.g. GCL_ANSI=t gcl.  You "
+#~ "may be interested in reviewing the ANSI test results sketching the level "
+#~ "of compliance achieved thus far in /usr/share/doc/gcl/test_results.gz.  "
+#~ "The flavor of the build in force will be reported in the initial startup "
+#~ "banner."
+#~ msgstr ""
+#~ "GCL es uno de los sistemas libres de «common lisp» más antiguos que "
+#~ "todavía se usan. Varios sistemas en producción han estado usándolo "
+#~ "durante más de una década. Cuando GCL se liberó por primera vez, el "
+#~ "estándar «common lisp» se conocía como «Common Lisp, the "
+#~ "Language» (CLtL1) después de un libro escrito por Steele que llevaba el "
+#~ "mismo nombre y que proporcionaba esta especificación. Posteriormente se "
+#~ "adoptó en el Instituto Nacional de Estándares Americano (ANSI) un "
+#~ "estándar más extendido, que todavía se considera la especificación "
+#~ "definitiva del lenguaje «common lisp» hasta hoy. GCL está en el proceso "
+#~ "de proporcionar una imagen conforme a ANSI además de su imagen CltL1 "
+#~ "tradicional que todavía se usa en producción. Al establecer esta variable "
+#~ "se determinará la imagen por omisión que usará al ejecutar «gcl». Puede "
+#~ "anular esta elección de forma local mediante el establecimiento de la "
+#~ "variable de entorno GCL_ANSI a cualquier cadena no vacía para el paquete "
+#~ "ANSI, y a la cadena vacía para el paquete CLtL1, i.e. GCL_ANSI=t gcl. "
+#~ "Quizás esté interesado en revisar los resultados de las pruebas ANSI "
+#~ "describiendo el nivel de conformidad logrado hasta ahora en /usr/share/"
+#~ "doc/gcl/test_results.gz. Se informará del tipo de paquete usado en el "
+#~ "anuncio inicial de arranque."

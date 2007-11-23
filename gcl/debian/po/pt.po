@@ -1,25 +1,28 @@
-# Portuguese translation for gclcvs debconf messages
-# 2007 Miguel Figueiredo
-# Released under the same license as the gclcvs package
-# Miguel Figueiredo <elmig@debianpt.org>, 2007.
+# translation of gcl debconf to Portuguese
+# Copyright (C) 2007 Américo Monteiro
+# This file is distributed under the same license as the gcl package.
 #
+# Américo Monteiro <a_monteiro@netcabo.pt>, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: gclcvs\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-21 08:47+0100\n"
-"PO-Revision-Date: 2007-03-05 22:21+0000\n"
-"Last-Translator: Miguel Figueiredo <elmig@debianpt.org>\n"
+"Project-Id-Version: gcl 2.6.7-34\n"
+"Report-Msgid-Bugs-To: camm@enhanced.com\n"
+"POT-Creation-Date: 2006-10-16 12:39-0400\n"
+"PO-Revision-Date: 2007-09-01 23:24+0100\n"
+"Last-Translator: Américo Monteiro <a_monteiro@netcabo.pt>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #. Type: boolean
 #. Description
 #: ../in.gcl.templates:1001
-msgid "Use the work-in-progress ANSI build by default?"
-msgstr "Utilizar, por omissão, a compilação ANSI com trabalho a decorrer?"
+msgid "Use the work-in-progress ansi build by default"
+msgstr ""
+"Usar o 'ainda em desenvolvimento' pacote préviamente compilado ansi por "
+"pré-definição"
 
 #. Type: boolean
 #. Description
@@ -34,21 +37,22 @@ msgid ""
 "for the CLtL1 build, e.g. GCL_ANSI=t gcl@EXT@.  The flavor of the build in "
 "force will be reported in the initial startup banner."
 msgstr ""
-"GCL está no processo de disponibilizar uma imagem conforme com ANSI além da "
-"sua tradicional imagem CLtL1 ainda em utilização em produção.  Para uma "
-"breve descrição destes termos por favor veja o ficheiro README.Debian.  "
-"Definir esta variável irá determinar qual a imagem você irá utilizar por "
-"omissão ao executar 'gcl@EXT@'.  Pode, localmente, ultrapassar esta escolha "
-"ao definir a variável de ambiente GCL_ANSI como uma string não-vazia para a "
-"compilação ANSI, e para uma string vazia para a compilação CLtL1, e.g. "
-"GCL_ANSI=t gcl@EXT@.  A variante da compilação a ser forçada será relatada "
-"no banner do arranque inicial."
+"GCL está no processo de disponibilizar uma imagem de acordo com a ANSI além "
+"da sua tradicional imagem CLtL1 ainda em utilização em produção.  Por favor "
+"veja o ficheiro README.Debian para uma breve descrição destes termos.  "
+"Regular esta variável irá determinar qual a imagem que irá usar por "
+"pré-definição ao executar 'gcl@EXT@'.  Você pode sobrepor localmente esta "
+"opção ao regular a variável de ambiente GCL_ANSI para uma string não vazia, "
+"para o pacote ANSI previamente compilado; e uma string vazia para o pacote "
+"CLtL1 previamente compilado, por exemplo: GCL_ANSI=t gcl@EXT@.  O sabor do "
+"pacote previamente compilado em força será reportado no banner inicial de "
+"arranque."
 
 #. Type: boolean
 #. Description
 #: ../in.gcl.templates:2001
-msgid "Use the profiling build by default?"
-msgstr "Utilizar, por omissão, a compilação de teste de desempenho?"
+msgid "Use the profiling build by default"
+msgstr "Usar, como pré-definição, a compilação com 'profiling'"
 
 #. Type: boolean
 #. Description
@@ -63,12 +67,13 @@ msgid ""
 "g. GCL_PROF=t gcl@EXT@.  If profiling is enabled, this will be reported in "
 "the initial startup banner."
 msgstr ""
-"O GCL tem agora suporte opcional para teste de desempenho (profiling) "
-"através do gprof.  Para mais detalhes por favor veja a documentação para "
-"si::gprof-start e para si::gprof-quit. Como esta compilação é mais lenta do "
-"que as compilações sem o suporte para gprof, não é recomendado para uso "
-"final em produção. Para suporte a profiling você pode ultrapassar localmente "
-"a escolha por omissão feita aqui definindo a variável de ambiente GCL_PROF "
-"para qualquer string não-vazia, e uma string vazia para compilações mais "
-"optimizadas, e.g. GCL_PROF=t gcl@EXT@. Se o profiling estiver activado, isto "
-"será reportado no banner inicial do arranque."
+"GLC tem agora suporte opcional para 'profiling' via gprof. Por favor veja a "
+"documentação de si::gprof-start e si::gprof-quit para detalhes. Como esta "
+"compilação é mais lenta do que as compilações sem o sem suporte para gprof, "
+"não é recomendado para utilização final em produção. Você pode sobrepor "
+"localmente a opção pré-definida aqui ao regular a variável de ambiente "
+"GCL_PROF para qualquer string não vazia para suporte de 'profiling'; e para "
+"compilações mais optimizadas, uma string vazia. Por exemplo: GCL_PROF=t "
+"gcl@EXT@.  Se o 'profiling' for activado, isto será reportado no banner "
+"inicial de arranque."
+
