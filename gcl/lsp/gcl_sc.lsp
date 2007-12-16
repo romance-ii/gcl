@@ -1,7 +1,7 @@
 ;to-do fast link defentry, sig propagation
 
 (in-package 'lisp)
-(dolist (l '(string char schar string= string/= string> string>= 
+(export '(string char schar string= string/= string> string>= 
 		    string< string<= string-equal string-not-equal
 		    string-greaterp string-not-lessp string-lessp
 		    string-not-greaterp  char-code  code-char  char-upcase
@@ -9,11 +9,6 @@
 		    char<=  char-equal  char-not-equal  char-greaterp
 		    char-lessp  char-not-greaterp  char-not-lessp
 		    upper-case-p  lower-case-p  both-case-p))
-  (export l)
-;   (remprop l (find-symbol "LFUN") (find-package "COMPILER"))
-;   (remprop l 'compiler::inline-always)
-;   (remprop l 'compiler::inline-unsafe)
-  )
 
 (in-package 'si)
 (defCfun "object char_to_string(char c)" 0 "{ object x;char s[2];s[0]=1;s[1]=0;x=make_simple_string(s);x->st.st_self[0]=c;return(x);}")
@@ -167,7 +162,7 @@
   (declare (optimize (safety 1)))
   (check-type c character)
   (if (lower-case-p c)
-      (code-char (+ d #.(- (char-code #\A) (char-code #\a))))
+      (code-char (+ (char-code c) #.(- (char-code #\A) (char-code #\a))))
     c))
 
 

@@ -117,8 +117,8 @@ final: $(FLISP)
 	rm -f pre_init.lsp post_init.lsp recompile.h #gcl_recompile*
 	touch $@
 
-recompile.h: makefile $(ROBJS)
-	echo -n $(filter-out $<,$^) | \
+recompile.h: 
+	echo -n $(ROBJS) | \
 		sed -e 's,gcl_recompile,,g' -e 's,\.o,,g' | \
 		tr ' ' '\012' | sort -n | \
 		awk '{printf("  ar_check_init(gcl_recompile%s,no_init);\n",$$1)}'  >$@;
