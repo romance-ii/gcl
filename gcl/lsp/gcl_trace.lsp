@@ -241,7 +241,7 @@
 	 (fn (and (consp fn) (third fn))))
     (and (consp fn) (eq (car fn) 'trace-call) sym)))
 
-(defun untrace-one (fname &aux sym)
+(defun untrace-one (fname)
   (let* ((ofname fname)
 	 (fname (funid-sym fname))
 	 (sym (traced-sym fname))
