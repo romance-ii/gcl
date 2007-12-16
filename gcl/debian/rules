@@ -84,7 +84,7 @@ configure-%-stamp: $(CFGS)
 
 	dh_testdir
 
-	! [ -e unixport/saved_pre_gcl ] || ( for i in o lsp cmpnew unixport pcl clcs ; do $(MAKE) -C $$i clean ; done )
+	! [ -e unixport/saved_pre_gcl ] || ( for i in o lsp cmpnew unixport pcl clcs gcl-tk ; do $(MAKE) -C $$i clean ; done )
 
 	chmod -R +x gmp3/*
 
