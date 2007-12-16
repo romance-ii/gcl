@@ -99,6 +99,7 @@
 (import 'si::isnan 'compiler)
 (import 'si::*sig-discovery* 'compiler)
 (import 'si::*compile-verbose* 'compiler)
+(import 'si::multiple-value-setq-expander 'compiler)
 
 
 (let ((p (find-package "DEFPACKAGE")))

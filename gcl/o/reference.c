@@ -38,23 +38,24 @@ DEFUN_NEW("FBOUNDP-SYM",object,fSfboundp_sym,SI,1,1,NONE,OO,OO,OO,OO,(object sym
 
 }
 
-DEFUN_NEW("FBOUNDP-CONS",object,fSfboundp_cons,SI,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
+/* DEFUN_NEW("FBOUNDP-CONS",object,fSfboundp_cons,SI,1,1,NONE,OO,OO,OO,OO,(object sym),"") { */
 
-  if (!setf_fn_form(sym)) {
-    not_a_symbol(sym);/*FIXME*/
-    RETURN1(Cnil);
-  }
-  RETURN1(get(MMcadr(sym),sSsetf_function,Cnil)==Cnil ? Cnil : Ct);
+/*   if (!setf_fn_form(sym)) { */
+/*     not_a_symbol(sym);/\*FIXME*\/ */
+/*     RETURN1(Cnil); */
+/*   } */
+/*   RETURN1(get(MMcadr(sym),sSsetf_function,Cnil)==Cnil ? Cnil : Ct); */
 
-}
+/* } */
 
 
 DEFUN_NEW("FBOUNDP",object,fLfboundp,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {
 
-  if (type_of(sym) == t_symbol)
-    RETURN1(FFN(fSfboundp_sym)(sym));
-  else
-    RETURN1(FFN(fSfboundp_cons)(sym));
+  if (type_of(sym) != t_symbol)
+    sym=ifuncall1(sSfunid_to_sym,sym);
+  RETURN1(FFN(fSfboundp_sym)(sym));
+/*   else */
+/*     RETURN1(FFN(fSfboundp_cons)(sym)); */
 
 }
 
@@ -83,14 +84,14 @@ symbol_function(object sym)
 static object
 symbol_function_internal(object sym,int allow_setf) {
 
+  if (allow_setf && type_of(sym)!=t_symbol)
+    sym=ifuncall1(sSfunid_to_sym,sym);
+
   if (type_of(sym)!=t_symbol) {
     
-    if (allow_setf && setf_fn_form(sym))
-      return getf(MMcadr(sym)->s.s_plist,sSsetf_function,Cnil);
-    else {
-      not_a_symbol(sym);
-      return Cnil;
-    }
+    not_a_symbol(sym);
+    return Cnil;
+
   }
 
   if (sym->s.s_sfdef != NOT_SPECIAL)
@@ -169,16 +170,12 @@ FFN(Ffunction)(object form)
 		  x->ifn.ifn_self=vs_base[0];
 		  vs_base[0]=x;
 		}
-	} else if (setf_fn_form(fun)) {
-                object sff=fun;
-	        fun=get(MMcadr(fun),sSsetf_function,Cnil);
-		if (fun==Cnil)
-		  FEundefined_function(sff);
-		else if (type_of(fun)==t_symbol)
-		  goto AGAIN;
-		else vs_base[0]=fun;
-	} else
-		FEinvalid_function(fun);
+	} else {
+	        fun=ifuncall1(sSfunid_to_sym,fun);
+/* 		if (fun==Cnil) */
+/* 		  FEundefined_function(sff); */
+		goto AGAIN;
+	}
 }
 
 DEFUN_NEW("SYMBOL-VALUE",object,fLsymbol_value,LISP,1,1,NONE,OO,OO,OO,OO,(object sym),"") {

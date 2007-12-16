@@ -77,3 +77,5 @@ MP_INT * otoi(object x);
 
 object fcalln1();
 #define fcalln ((object (*)())fcalln1)
+
+#include <ctype.h>

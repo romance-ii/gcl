@@ -223,31 +223,45 @@ work during bootstrapping.
 (defun expand-defgeneric (function-specifier lambda-list options)
   (let ((initargs ())
 	(methods ()))
-    (labels ((duplicate-option (name)
-	     (error 'program-error :format-control "The option ~S appears more than once." :format-arguments (list name)))
+    (labels ((loose (format-control &rest format-arguments)
+		    (error 'program-error
+		     (format nil "~~@<Generic function ~~s: ~?.~~@:>" format-control format-arguments)
+		     function-specifier))
+	     (duplicate-option (name) (loose "The option ~S appears more than once." name))
 	     (check-declaration (declaration-specifiers)
 	       (loop for specifier in declaration-specifiers
 		     when (and (consp specifier)
-			       (member (car specifier)
-				       '(special ftype function inline
-						 notinline declaration)
-				       :test #'eq)) do
-				       (error 'program-error :format-control "Declaration specifier ~S is not allowed"
-					      :format-arguments (list specifier))))
+			       (member (car specifier) '(special ftype function inline notinline declaration))) do
+				       (loose "Declaration specifier ~S is not allowed" specifier)))
+	     (check-argument-precedence-order (precedence)
+	       (let ((required (ldiff lambda-list
+				      (member-if (lambda (x) (member x '(&optional &rest &key &allow-other-keys &aux))) lambda-list))))
+		 (when (set-difference required precedence)
+		   (loose "Argument precedence order must list all ~
+                           required parameters and only those: ~s"
+			  precedence))
+		 (when (/= (length (remove-duplicates precedence))
+			   (length precedence))
+		   (loose "Duplicate parameter names in argument ~
+                           precedence order: ~s"
+			  precedence))))
 	     (initarg (key &optional (new nil new-supplied-p))
 		      (if new-supplied-p
 			  (setf (getf initargs key) new)
 			(getf initargs key))))
+      (when (and (symbolp function-specifier)
+		 (special-operator-p function-specifier))
+	(loose "Special operators cannot be made generic functions"))
       (dolist (option options)
 	(case (car option)
 	  (:argument-precedence-order
-	   (if (initarg :argument-precedence-order)
-	       (duplicate-option :argument-precedence-order)
-	     (initarg :argument-precedence-order `',(cdr option))))
+	   (when (initarg :argument-precedence-order)
+	     (duplicate-option :argument-precedence-order))
+	   (check-argument-precedence-order (cdr option))
+	   (initarg :argument-precedence-order `',(cdr option)))
 	  (declare
 	   (check-declaration (cdr option))
-	   (initarg :declarations
-		    (append (cdr option) (initarg :declarations))))
+	   (initarg :declarations (append (cdr option) (initarg :declarations))))
 	  (:documentation
 	   (if (initarg :documentation)
 	       (duplicate-option :documentation)
@@ -265,10 +279,8 @@ work during bootstrapping.
 	       (duplicate-option :method-class)
 	     (initarg :method-class `',(cadr option))))
 	  (:method
-	   (push `(defmethod ,function-specifier ,@(cdr option))
-		 methods))
-	  (t ;unsupported things must get a 'program-error
-	   (error 'program-error :format-control "Unsupported option ~S." :format-arguments (list option)))))
+	   (push `(defmethod ,function-specifier ,@(cdr option)) methods))
+	  (t (loose "Unsupported option ~S." option))))
       
       (let ((declarations (initarg :declarations)))
 	(when declarations (initarg :declarations `',declarations))))
@@ -789,15 +801,15 @@ work during bootstrapping.
 	   (cond ((null args)
 		  (if (eql nreq 0) 
 		      (invoke-fast-method-call emf)
-		      (error "wrong number of args")))
+		      (error 'program-error :format-control "wrong number of args")))
 		 ((null (cdr args))
 		  (if (eql nreq 1) 
 		      (invoke-fast-method-call emf (car args))
-		      (error "wrong number of args")))
+		      (error 'program-error :format-control "wrong number of args")))
 		 ((null (cddr args))
 		  (if (eql nreq 2) 
 		      (invoke-fast-method-call emf (car args) (cadr args))
-		      (error "wrong number of args")))
+		      (error 'program-error :format-control "wrong number of args")))
 		 (t
 		  (apply (fast-method-call-function emf)
 			 (fast-method-call-pv-cell emf)
@@ -1218,8 +1230,8 @@ work during bootstrapping.
 				&key environment
 				&allow-other-keys)
   (declare (ignore environment))
-  (let ((existing (and (gboundp function-specifier)		       
-		       (gdefinition function-specifier))))
+  (let* ((function-specifier (or (get (si::funid-sym function-specifier) 'si::traced) function-specifier))
+	 (existing (and (gboundp function-specifier) (gdefinition function-specifier))))
     (when (and existing
 	       (eq *boot-state* 'complete)
 	       (null (generic-function-p existing)))
@@ -1597,7 +1609,7 @@ work during bootstrapping.
      (let ((method-class (getf ,all-keys :method-class '.shes-not-there.)))
        (unless (eq method-class '.shes-not-there.)
 	 (setf (getf ,all-keys :method-class)
-	       (find-class method-class t ,env))))))
+	       (if (classp method-class) method-class (find-class method-class t ,env)))))))
      
 (defun real-ensure-gf-using-class--generic-function
        (existing
@@ -2070,29 +2082,26 @@ work during bootstrapping.
 	       (caddr entry)
 	       form))
 	  ((not (listp form)) form)
-	  ((member (car form) '(setq setf psetf));FIXME -- other setf forms?  or real symbol-macrolet
+	  ((member (car form) '(setq setf psetq psetf));FIXME -- other setf forms?  or real symbol-macrolet
 	   ;; Have to be careful.  We must only convert the form to a SETF
 	   ;; form when we convert one of the 'logical' variables to a form
 	   ;; Otherwise we will get looping in implementations where setf
 	   ;; is a macro which expands into setq.
 	   (let ((kind (car form)))
 	     (labels ((scan-setf (tail)
-			(if (null tail)
-			    nil
-			    (walker::relist*
-			      tail
-			      (if (and (setq entry (assoc (car tail) specs))
-				       (eq (cadr entry)
-					   (variable-lexical-p (car tail)
-							       env)))
-				  (progn (setq kind (if (eq kind 'psetf) kind 'setf))
-					 (caddr entry))
-				  (car tail))
-			      (cadr tail)
-			      (scan-setf (cddr tail))))))
+				 (when tail
+				   (walker::relist*
+				    tail
+				    (if (and (setq entry (assoc (car tail) specs))
+					     (eq (cadr entry) (variable-lexical-p (car tail) env)))
+					(progn (setq kind (if (eq kind 'psetf) kind 'setf))
+					       (caddr entry))
+				      (car tail))
+				    (cadr tail)
+				    (scan-setf (cddr tail))))))
 	       (let (new-tail)
 		 (setq new-tail (scan-setf (cdr form)))
-		 (walker::recons form kind new-tail)))))
+		 (let ((r (walker::recons form kind new-tail))) (if (eq (car form) 'psetq) `(progn ,r nil) r))))))
 	  ((eq (car form) 'multiple-value-setq)
 	   (let* ((vars (cadr form))
 		  (vars (mapcar (lambda (x) 
@@ -2114,7 +2123,72 @@ work during bootstrapping.
 			(if (and y (eq (cadr y) (variable-lexical-p nf env))) (walker::macroexpand-all (caddr y) env) nf))))
 	     (if (eq nf (cadr form)) form
 	       `(,(car form) ,nf ,@(cddr form)))))
-	  (t form)))))
+	  ((and (not (eq (car form) 'symbol-macrolet)) (eq 'lisp::macro (cadar (assoc (car form) env :key 'car))))
+	   (let ((kind (car form)))
+	     (labels ((scan-setf (tail)
+				 (when tail
+				   (walker::relist*
+				    tail
+				    (if (and (setq entry (assoc (car tail) specs))
+					     (eq (cadr entry) (variable-lexical-p (car tail) env)))
+					(caddr entry)
+				      (car tail))
+				    (scan-setf (cdr tail))))))
+	       (walker::recons form kind (scan-setf (cdr form))))))
+	  (form)))))
+
+;; (defun expand-symbol-macrolet-internal (specs form context env)
+;;   (let ((entry nil))
+;;     (cond ((not (eq context :eval)) form)
+;; 	  ((symbolp form)
+;; 	   (if (and (setq entry (assoc form specs))
+;; 		    (eq (cadr entry) (variable-lexical-p form env)))
+;; 	       (caddr entry)
+;; 	       form))
+;; 	  ((not (listp form)) form)
+;; 	  ((member (car form) '(setq setf psetq psetf));FIXME -- other setf forms?  or real symbol-macrolet
+;; 	   ;; Have to be careful.  We must only convert the form to a SETF
+;; 	   ;; form when we convert one of the 'logical' variables to a form
+;; 	   ;; Otherwise we will get looping in implementations where setf
+;; 	   ;; is a macro which expands into setq.
+;; 	   (let ((kind (car form)))
+;; 	     (labels ((scan-setf (tail)
+;; 				 (if (null tail)
+;; 				     nil
+;; 				   (walker::relist*
+;; 				    tail
+;; 				    (if (and (setq entry (assoc (car tail) specs))
+;; 					     (eq (cadr entry) (variable-lexical-p (car tail) env)))
+;; 					(progn (setq kind (if (eq kind 'psetf) kind 'setf))
+;; 					       (caddr entry))
+;; 				      (car tail))
+;; 				    (cadr tail)
+;; 				    (scan-setf (cddr tail))))))
+;; 	       (let (new-tail)
+;; 		 (setq new-tail (scan-setf (cdr form)))
+;; 		 (let ((r (walker::recons form kind new-tail))) (if (eq (car form) 'psetq) `(progn ,r nil) r))))))
+;; 	  ((eq (car form) 'multiple-value-setq)
+;; 	   (let* ((vars (cadr form))
+;; 		  (vars (mapcar (lambda (x) 
+;; 				  (let ((y (assoc x specs)))
+;; 				    (if (and y (eq (cadr y) (variable-lexical-p x env))) (walker::macroexpand-all (caddr y) env) x))) vars))
+;; 		  (gensyms (mapcar (lambda (i) (declare (ignore i)) (gensym)) vars))
+;; 		  (pls (mapcan 'cdr (copy-tree (remove-if-not 'consp vars))))
+;; 		  (psyms (mapcar (lambda (x) (declare (ignore x)) (gensym)) pls))
+;; 		  (ppsyms psyms)
+;; 		  (vars (mapcar (lambda (x) (if (atom x) x (cons (car x) (mapcar (lambda (x) (declare (ignore x)) (pop ppsyms)) (cdr x))))) vars)))
+;; 	     `(let* ,(mapcar 'list psyms pls)
+;; 		(multiple-value-bind 
+;; 		 ,gensyms 
+;; 		 ,(caddr form)
+;; 		 .,(reverse (mapcar (lambda (v g) `(setf ,v ,g)) vars gensyms))))))
+;; 	  ((eq (car form) 'conditions::restart-case)
+;; 	   (let* ((nf (cadr form))
+;; 		  (nf (let ((y (assoc nf specs)))
+;; 			(if (and y (eq (cadr y) (variable-lexical-p nf env))) (walker::macroexpand-all (caddr y) env) nf))))
+;; 	     (if (eq nf (cadr form)) form
+;; 	       `(,(car form) ,nf ,@(cddr form)))))
+;; 	  (t form)))))
 
 (defmacro with-slots (slots instance &body body)
   (declare (optimize (safety 2)))

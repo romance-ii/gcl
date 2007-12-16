@@ -267,7 +267,7 @@ struct character {
 
 EXTER struct character character_table1[256+128] OBJ_ALIGN; /*FIXME, sync with char code constants above.*/
 #define character_table (character_table1+128)
-#define code_char(c)    (object)(character_table+(c))
+#define code_char(c)    (object)(character_table+((unsigned char)(c)))
 #define char_code(obje) (obje)->ch.ch_code
 #define char_font(obje) (obje)->ch.ch_font
 #define char_bits(obje) (obje)->ch.ch_bits

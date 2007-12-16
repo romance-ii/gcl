@@ -681,7 +681,7 @@ internal error handling mechanism. \
    continue-format-string error-format-string \
    &rest args)");
 DEFUN_NEW("UNIVERSAL-ERROR-HANDLER",object,fSuniversal_error_handler,SI
-	   ,5,F_ARG_LIMIT,NONE,OO,OO,OO,OO,(object x0,object x1,object x2,object x3,object error_fmt_string),"")
+	   ,1,F_ARG_LIMIT,NONE,OO,OO,OO,OO,(object x0,object x1,object x2,object x3,object error_fmt_string),"")
 {
 	int i;
 	/* 5 args */

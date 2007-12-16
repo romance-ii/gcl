@@ -316,7 +316,9 @@
                (t (format t "~S - ~S" object (type-of object))))))
 
 
-(defun describe (object &aux (*inspect-mode* nil)
+(defun describe (object &optional stream
+			&aux (*standard-output* (cond ((eq stream t) *terminal-io*) ((not stream) *standard-output*) (stream)))
+			     (*inspect-mode* nil)
                              (*inspect-level* 0)
                              (*inspect-history* nil)
                              (*print-level* nil)

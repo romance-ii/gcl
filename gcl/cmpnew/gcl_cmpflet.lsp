@@ -79,8 +79,9 @@
 
   (let ((*funs* *funs*))
     (dolist** (def (car args))
+	      (let* ((x (car def))(y (si::funid-sym x))) (unless (eq x y) (setq def (cons y (cdr def)))))
 	      (cmpck (or (endp def)
-			 (not (symbolp (car def)))
+;			 (not (symbolp (car def)))
 			 (endp (cdr def)))
 		     "The function definition ~s is illegal." def)
 	      (let ((fun (make-fun :name (car def) :ref nil :ref-ccb nil :info (make-info :type '* :sp-change 1))))
@@ -210,7 +211,8 @@
 
   ;;; bind local-functions
   (dolist** (def (car args))
-    (cmpck (or (endp def) (not (symbolp (car def))) (endp (cdr def)))
+    (let* ((x (car def))(y (si::funid-sym x))) (unless (eq x y) (setq def (cons y (cdr def)))))
+    (cmpck (or (endp def) (endp (cdr def)))
            "The local function definition ~s is illegal." def)
     (cmpck (member (car def) fnames)
            "The function ~s was already defined." (car def))
@@ -357,7 +359,8 @@
                         (*funs* *funs*) (*vars* *vars*))
   (when (endp args) (too-few-args 'macrolet 1 0))
   (dolist** (def (car args))
-    (cmpck (or (endp def) (not (symbolp (car def))) (endp (cdr def)))
+    (let* ((x (car def))(y (si::funid-sym x))) (unless (eq x y) (setq def (cons y (cdr def)))))
+    (cmpck (or (endp def) (endp (cdr def)))
            "The macro definition ~s is illegal." def)
     (push (list (car def)
                 (si::interpreted-function-lambda (caddr (si:defmacro* (car def) (cadr def) (cddr def)))))

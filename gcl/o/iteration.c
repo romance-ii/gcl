@@ -326,7 +326,7 @@ FFN(Fdolist)(VOL object arg)
 	}
 
 	eval_assign(start->bt_init, listform);
-	body = find_special(MMcdr(arg), start, start+1);
+	body = find_special(MMcdr(arg), start, start+1,NULL); /*?*/
 	vs_push(body);
 	bind_var(start->bt_var, Cnil, start->bt_spp);
 	if ((enum stype)start->bt_var->s.s_stype != stp_ordinary)
@@ -410,7 +410,7 @@ FFN(Fdotimes)(VOL object arg)
 	if (type_of(start->bt_init) != t_fixnum &&
 	    type_of(start->bt_init) != t_bignum)
 		FEwrong_type_argument(sLinteger, start->bt_init);
-	body = find_special(MMcdr(arg), start, start+1);
+	body = find_special(MMcdr(arg), start, start+1,NULL); /*?*/
 	vs_push(body);
 	bind_var(start->bt_var, make_fixnum(0), start->bt_spp);
 	if ((enum stype)start->bt_var->s.s_stype != stp_ordinary) {

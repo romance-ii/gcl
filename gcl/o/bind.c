@@ -95,6 +95,7 @@ lambda_bind(object *arg_top)
 	struct aux *aux=NULL;
 	int naux;
 	bool special_processed;
+	object s[1],ss;
 	vs_mark;
 
 	bds_check;
@@ -106,6 +107,7 @@ lambda_bind(object *arg_top)
 
 	required = (struct required *)vs_top;
 	nreq = 0;
+	s[0]=Cnil;
 	for (;;) {
 		if (endp(lambda_list))
 			goto REQUIRED_ONLY;
@@ -361,8 +363,8 @@ SEARCH_DECLARE:
 		} else if (optional[i].opt_svar == v) {
 			optional[i].opt_svar_spp = Ct;
 			special_processed = TRUE;
-		} else if (optional[i].opt_init == v)
-		  special_processed = TRUE;
+		} /* else if (optional[i].opt_init == v) */
+/* 		  special_processed = TRUE; */
 		
 	if (rest_flag && rest->rest_var == v) {
 		rest->rest_spp = Ct;
@@ -375,18 +377,18 @@ SEARCH_DECLARE:
 		} else if (keyword[i].key_svar == v) {
 			keyword[i].key_svar_spp = Ct;
 			special_processed = TRUE;
-		} else if (keyword[i].key_init == v)
-		  special_processed = TRUE;
+		} /* else if (keyword[i].key_init == v) */
+/* 		  special_processed = TRUE; */
 	for (i = 0;  i < naux;  i++)
 		if (aux[i].aux_var == v) {
 			aux[i].aux_spp = Ct;
 			special_processed = TRUE;
-		} else if (aux[i].aux_init == v)
-		  special_processed = TRUE;
+		} /* else if (aux[i].aux_init == v) */
+/* 		  special_processed = TRUE; */
 	if (special_processed)
 		continue;
 	/*  lex_special_bind(v);  */
-	lex_env[0] = MMcons(MMcons(v, Cnil), lex_env[0]);
+	s[0] = MMcons(MMcons(v, Cnil), s[0]);
 
 /**/
 				}
@@ -508,6 +510,13 @@ SEARCH_DECLARE:
 		vs_reset;
 		vs_head = body;
 	}
+
+	if (s[0]!=Cnil) {
+	  for (ss=s[0];ss->c.c_cdr!=Cnil;ss=ss->c.c_cdr);
+	  ss->c.c_cdr=lex_env[0];
+	  lex_env[0]=s[0];
+	}
+	
 	return;
 
 REQUIRED_ONLY:
@@ -545,7 +554,7 @@ REQUIRED_ONLY:
 		continue;
 	/*  lex_special_bind(v);  */
 	temporary = MMcons(v, Cnil);
-	lex_env[0] = MMcons(temporary, lex_env[0]);
+	s[0] = MMcons(temporary, s[0]);
 
 /**/
 				}
@@ -571,6 +580,14 @@ REQUIRED_ONLY:
 		vs_reset;
 		vs_head = body;
 	}
+
+	if (s[0]!=Cnil) {
+	  for (ss=s[0];ss->c.c_cdr!=Cnil;ss=ss->c.c_cdr);
+	  ss->c.c_cdr=lex_env[0];
+	  lex_env[0]=s[0];
+	}
+	
+
 }
 
 void
@@ -620,7 +637,7 @@ struct bind_temp {
 */
 
 object
-find_special(object body, struct bind_temp *start, struct bind_temp *end)
+find_special(object body, struct bind_temp *start, struct bind_temp *end,object *s)
 { 
         object temporary;
 	object form=Cnil;
@@ -630,6 +647,7 @@ find_special(object body, struct bind_temp *start, struct bind_temp *end)
 	vs_mark;
 
 	vs_push(Cnil);
+	s=s ? s : lex_env;
 	for (;  !endp(body);  body = body->c.c_cdr) {
 		form = body->c.c_car;
 
@@ -663,7 +681,7 @@ find_special(object body, struct bind_temp *start, struct bind_temp *end)
 		continue;
 	/*  lex_special_bind(v);  */
 	temporary = MMcons(v, Cnil);
-	lex_env[0] = MMcons(temporary, lex_env[0]);
+	s[0] = MMcons(temporary, s[0]);
 /**/
 				}
 			}
@@ -682,10 +700,10 @@ let_bind(object body, struct bind_temp *start, struct bind_temp *end)
 	struct bind_temp *bt;
 
 	bds_check;
-	vs_push(find_special(body, start, end));
 	for (bt = start;  bt < end;  bt++) {
 		eval_assign(bt->bt_init, bt->bt_init);
 	}
+	vs_push(find_special(body, start, end,NULL));
 	for (bt = start;  bt < end;  bt++) {
 		bind_var(bt->bt_var, bt->bt_init, bt->bt_spp);
 	}
@@ -696,12 +714,19 @@ object
 letA_bind(object body, struct bind_temp *start, struct bind_temp *end)
 {
 	struct bind_temp *bt;
-	
+	object s[1],ss;
+
 	bds_check;
-	vs_push(find_special(body, start, end));
+	s[0]=Cnil;
+	vs_push(find_special(body, start, end,s));
 	for (bt = start;  bt < end;  bt++) {
 		eval_assign(bt->bt_init, bt->bt_init);
 		bind_var(bt->bt_var, bt->bt_init, bt->bt_spp);
+	}
+	if (s[0]!=Cnil) {
+	  for (ss=s[0];ss->c.c_cdr!=Cnil;ss=ss->c.c_cdr);
+	  ss->c.c_cdr=lex_env[0];
+	  lex_env[0]=s[0];
 	}
 	return(vs_pop);
 }

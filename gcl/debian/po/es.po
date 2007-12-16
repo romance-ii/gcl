@@ -29,8 +29,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gcl 2.6.7-11\n"
-"Report-Msgid-Bugs-To: camm@enhanced.com\n"
-"POT-Creation-Date: 2006-10-16 12:39-0400\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-01-21 08:47+0100\n"
 "PO-Revision-Date: 2007-05-13 18:58-0500\n"
 "Last-Translator: César Gómez Martín <cesar.gomez@gmail.com>\n"
 "Language-Team: Debian l10n spanish <debian-l10n-spanish@lists.debian.org>\n"
@@ -44,7 +44,8 @@ msgstr ""
 #. Type: boolean
 #. Description
 #: ../in.gcl.templates:1001
-msgid "Use the work-in-progress ansi build by default"
+#, fuzzy
+msgid "Use the work-in-progress ANSI build by default?"
 msgstr "Utilizar por omisión el paquete ansi que todavía está en desarrollo"
 
 #. Type: boolean
@@ -60,13 +61,21 @@ msgid ""
 "for the CLtL1 build, e.g. GCL_ANSI=t gcl@EXT@.  The flavor of the build in "
 "force will be reported in the initial startup banner."
 msgstr ""
-"GCL está en proceso de incorporar una imagen compatible con ANSI en adición a su imagen CLtL1 tradicional que todavía se usa en producción. Por favor, véase el fichero README de Debian para una breve descripción acerca de estos términos. El definir esta variable determinará qué imagen utilizar de manera predeterminada cuando ejecute «gcl@EXT@».\n"
-"Puede anular esta elección localmente definiendo la variable de entorno GCL_ANSI a una cadena no vacía para la compilación ANSI, y a una vacía para la compilación CLtL1, ejemplo: GCL_ANSI=t gcl@EXT@. La versión de la compilación se indicará en el anuncio inicial de arranque."
+"GCL está en proceso de incorporar una imagen compatible con ANSI en adición "
+"a su imagen CLtL1 tradicional que todavía se usa en producción. Por favor, "
+"véase el fichero README de Debian para una breve descripción acerca de estos "
+"términos. El definir esta variable determinará qué imagen utilizar de manera "
+"predeterminada cuando ejecute «gcl@EXT@».\n"
+"Puede anular esta elección localmente definiendo la variable de entorno "
+"GCL_ANSI a una cadena no vacía para la compilación ANSI, y a una vacía para "
+"la compilación CLtL1, ejemplo: GCL_ANSI=t gcl@EXT@. La versión de la "
+"compilación se indicará en el anuncio inicial de arranque."
 
 #. Type: boolean
 #. Description
 #: ../in.gcl.templates:2001
-msgid "Use the profiling build by default"
+#, fuzzy
+msgid "Use the profiling build by default?"
 msgstr "Utilizar la compilación con perfilado por omisión"
 
 #. Type: boolean
@@ -81,7 +90,16 @@ msgid ""
 "profiling support, and to the empty string for the more optimized builds, e."
 "g. GCL_PROF=t gcl@EXT@.  If profiling is enabled, this will be reported in "
 "the initial startup banner."
-msgstr "Ahora GCL tiene soporte opcional para perfilado a través de gprof. Por favor, mire la documentación de «si::gprof-start» y de «si::gprof-quit» y «si::gprof-quit» si desea más detalles. Dado que esta compilación es más lenta que otras sin soporte para gprof, no se recomienda usarlo en producción. Puede anular esta elección de forma local mediante el establecimiento de la variable de entorno GCL_PROF a cualquier cadena no vacía para soporte de perfiles, y a la cadena vacía para los paquetes más optimizados, es decir GCL_PROF=t gcl. Si el perfilado está activo se indicará en el anuncio inicial de arranque."
+msgstr ""
+"Ahora GCL tiene soporte opcional para perfilado a través de gprof. Por "
+"favor, mire la documentación de «si::gprof-start» y de «si::gprof-quit» y "
+"«si::gprof-quit» si desea más detalles. Dado que esta compilación es más "
+"lenta que otras sin soporte para gprof, no se recomienda usarlo en "
+"producción. Puede anular esta elección de forma local mediante el "
+"establecimiento de la variable de entorno GCL_PROF a cualquier cadena no "
+"vacía para soporte de perfiles, y a la cadena vacía para los paquetes más "
+"optimizados, es decir GCL_PROF=t gcl. Si el perfilado está activo se "
+"indicará en el anuncio inicial de arranque."
 
 #~ msgid ""
 #~ "GCL is one of the oldest free common lisp systems still in use. Several "

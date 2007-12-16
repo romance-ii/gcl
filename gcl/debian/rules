@@ -27,9 +27,9 @@ MCC:=gcc
 #MCC:=gcc-3.4
 #endif
 
-RELOC=locbfd
+#RELOC=locbfd
+RELOC?=statsysbfd
 
-#RELOC?=statsysbfd
 #ifeq ($(ARCHT),alpha)
 #RELOC=dlopen
 #endif

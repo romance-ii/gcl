@@ -304,4 +304,9 @@ gensym
 
 lisp
 
+car
+cdr
+cadr
+caddr
+
 ))

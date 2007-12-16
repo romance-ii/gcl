@@ -99,8 +99,8 @@
     (if files (or tags (info-error "Need tags if have multiple files")))
     (list* tags (nreverse files))))
 
-(defun re-quote-string (x &aux (i 0) ch (extra 0))
-  (declare (fixnum i extra))
+(defun re-quote-string (x &aux (i 0) ch)
+  (declare (fixnum i))
   (let* ((x (if (stringp x) x (string x)))
 	 (len (length x))
 	 (tem x))

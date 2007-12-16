@@ -66,11 +66,14 @@ typedef double complex dcomplex;
   _t;})
 
 /*FIXME symmetric immfix range */
+#if defined(IM_FIX_BASE)
 #define immnum_negate(x) ({object _x=x,_t;\
   if (is_imm_fixnum(_x) && (unsigned long)_x!=IM_FIX_BASE)\
      _t=(object)((unsigned long)make_fixnum(0)-fix_imm_fixnum(_x));\
   else\
     _t=number_negate(_x);\
   _t;})
-
+#else
+#define immnum_negate(x) ({object _x=x,_t;_t=number_negate(_x);_t;})
+#endif
 

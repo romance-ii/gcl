@@ -78,10 +78,8 @@
 (defun current-fn ()
   (cond ((and (consp *current-form*)
 	      (member (car *current-form*) '(defun defmacro))
-	      (or (is-setf-function (second *current-form*))
-		  (and
-		   (symbolp  (second *current-form*))
-		   (symbol-package (second *current-form*)))));;don't record gensym'd
+	      (let ((sym (si::funid-sym (second *current-form*))))
+		    (symbol-package sym)));;don't record gensym'd
 	 (cond ((and *current-fn*
 		     (equal (second *current-form*)  (fn-name *current-fn*)))
 		*current-fn*)

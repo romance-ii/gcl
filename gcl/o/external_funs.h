@@ -164,7 +164,7 @@ extern GEN icopy_fixnum GPR((object a, GEN y));;
 extern int lambda_bind GPR((object *arg_top));;  
 extern int bind_var GPR((object var, object val, object spp));;  
 extern int illegal_lambda GPR((void));;  
-extern object find_special GPR((object body, struct bind_temp *start, struct bind_temp *end));;  
+extern object find_special GPR((object body, struct bind_temp *start, struct bind_temp *end,object *));;  
 extern object let_bind GPR((object body, struct bind_temp *start, struct bind_temp *end));;  
 extern object letA_bind GPR((object body, struct bind_temp *start, struct bind_temp *end));;  
 extern int parse_key GPR((object *base, bool rest, bool allow_other_keys, register int n, int __builtin_va_alist));;  

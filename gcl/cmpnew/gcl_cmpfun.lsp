@@ -152,11 +152,14 @@
 (defun c1apply (args &aux info at tpl)
   (when (or (endp args) (endp (cdr args)))
         (too-few-args 'apply 2 (length args)))
+
   (let* ((nargs (c1args args (make-info)))
 	 (tp (info-type (cadar nargs)))
 	 (fn (when (atomic-tp tp) (coerce-to-funid (cadr tp)))))
     (cond ((and (consp fn) (eq (car fn) 'lambda))
 	   (return-from c1apply (c1expr (blla (cadr fn) (butlast (cdr args)) (car (last args)) (cddr fn)))))
+	  ((eq fn (cadr *current-form*))
+	   (return-from c1apply (c1expr (blla-recur fn (caddr *current-form*) (butlast (cdr args)) (car (last (cdr args)))))))
 	  ((and fn (type>= +list5+ (setq tpl (info-type (cadar (last nargs))))))
 	   (let* ((ll (mapcar (lambda (x) (list (gensym) x)) (butlast (cdr args))))
 		  (la (car (last args)))
@@ -1204,14 +1207,18 @@
 (defun c1list* (args)
   (let* ((info (make-info))
 	 (nargs (c1args args info)))
-    (setf (info-type info) (if args (if (type>= #tproper-list (info-type (cadar (last nargs)))) #tproper-cons #tcons) #tnull));FIXME
+    (setf (info-type info) (cond ((not nargs) #tnull) ((not (cdr nargs)) (info-type (cadar nargs))) 
+				 ((type>= #tproper-list (info-type (cadar (last nargs)))) #tproper-cons)
+				 (#tcons)));FIXME
     (list 'call-global info 'list* nargs)))
 (si::putprop 'list* 'c1list* 'c1)
       
 (defun c1append (args)
   (let* ((info (make-info))
 	 (nargs (c1args args info)))
-    (setf (info-type info) (if args (if (type>= #tproper-list (info-type (cadar (last nargs)))) #tproper-list #tcons) #tnull));FIXME
+    (setf (info-type info) (cond ((not nargs) #tnull) ((not (cdr nargs)) (info-type (cadar nargs))) 
+				 ((type>= #tproper-list (info-type (cadar (last nargs)))) #tproper-cons)
+				 (#tcons)));FIXME
     (list 'call-global info 'append nargs)))
 (si::putprop 'append 'c1append 'c1)
       

@@ -58,10 +58,8 @@
   `(mapcan 'untrace-one ',(or r (mapcar 'car *trace-list*))))
 
 (defun trace-one-preprocess (x)
-  (cond
-   ((symbolp x)
-    (trace-one-preprocess (list x)))
-   (t					; We've checked for CONSP with null last CDR
+  (if (symbolp x)
+      (trace-one-preprocess (list x))
     (do ((tail (cdr x) (cddr tail))
 	 (declarations)
 	 (entryform `(cons (quote ,(car x)) arglist))
@@ -72,27 +70,27 @@
 	 (depth) (depthvar))
 	((null tail)
 	 (when depth
-	       ;; Modify the :cond so that it first checks depth, and then
-	       ;; modify the :entry so that it first increments depth.  Notice
-	       ;; that :cond will be fully evaluated before depth is incremented.
-	       (setq depthvar (gensym))
-	       ;; now reset the condform
-	       (if
-		(eq condform t)
-		(setq condform
-		      `(< ,depthvar ,depth))
-		 (setq condform `(if (< ,depthvar ,depth) ,condform nil)))
-	       (setq declarations (cons (cons depthvar 0) declarations))
-	       ;; I'll have the depth be incremented for all the entry stuff and no exit stuff,
-	       ;; since I don't see any more uniform, logical way to do this.
-	       (setq entrycondform
-		     `(progn
-			(setq ,depthvar (1+ ,depthvar))
-			,entrycondform))
-	       (setq exitcondform
-		     `(progn
-			  (setq ,depthvar (1- ,depthvar))
-			,exitcondform)))
+	   ;; Modify the :cond so that it first checks depth, and then
+	   ;; modify the :entry so that it first increments depth.  Notice
+	   ;; that :cond will be fully evaluated before depth is incremented.
+	   (setq depthvar (gensym))
+	   ;; now reset the condform
+	   (if
+	       (eq condform t)
+	       (setq condform
+		     `(< ,depthvar ,depth))
+	     (setq condform `(if (< ,depthvar ,depth) ,condform nil)))
+	   (setq declarations (cons (cons depthvar 0) declarations))
+	   ;; I'll have the depth be incremented for all the entry stuff and no exit stuff,
+	   ;; since I don't see any more uniform, logical way to do this.
+	   (setq entrycondform
+		 `(progn
+		    (setq ,depthvar (1+ ,depthvar))
+		    ,entrycondform))
+	   (setq exitcondform
+		 `(progn
+		    (setq ,depthvar (1- ,depthvar))
+		    ,exitcondform)))
 	 `(,(car x) ,declarations
 	   (quote ,condform)
 	   (quote ,entrycondform) (quote ,entryform)
@@ -114,7 +112,7 @@
 	      (:exitcond (setq exitcondform (cadr tail)))
 	      (:exit (setq exitform (cadr tail))) 
 	      (:depth (setq depth (cadr tail)))
-	      (otherwise nil))))))
+	      (otherwise nil)))))
 
 (defun check-trace-spec (form)
   (or (symbolp form)
@@ -164,28 +162,31 @@
                          in ~S where instead there was ~S~&"
 			form (car args))))))))
 
-(defun trace-one (form &aux f (fname (if (consp form) (car form) form)))
-  (check-trace-spec form)
-  (when (null (fboundp fname))
-        (format *trace-output* "The function ~S is not defined.~%" fname)
-        (return-from trace-one nil))
-  (when (special-form-p fname)
-        (format *trace-output* "~S is a special form.~%" fname)
-        (return-from trace-one nil))
-  (when (macro-function fname)
-        (format *trace-output* "~S is a macro.~%" fname)
-        (return-from trace-one nil))
-  (when (get fname 'traced)
-	(untrace-one fname))
-  (setq form (trace-one-preprocess form))
-  (let((x (get fname 'state-function))) (when x (break-state 'trace x)))
-  (fset (setq f (gensym)) (symbol-function fname))
-  (eval `(defun ,fname (&rest args)
-	   (trace-call ',f args
-		       ,@(cddr form))))
-  (putprop fname f 'traced)
-  (setq *trace-list* (cons (cons fname (cadr form)) *trace-list*))
-  (list fname))
+(defun trace-one (form &aux f)
+   (let* ((n (funid-sym-p form))
+	  (n1 (or n (funid-sym (car form))))
+	  (ofname (if n form (car form)))
+	  (form (or n (cons n1 (cdr form))))
+	  (fname n1))
+     (check-trace-spec form)
+     (when (null (fboundp fname))
+       (format *trace-output* "The function ~S is not defined.~%" fname)
+       (return-from trace-one nil))
+     (when (special-form-p fname)
+       (format *trace-output* "~S is a special form.~%" fname)
+       (return-from trace-one nil))
+     (when (macro-function fname)
+       (format *trace-output* "~S is a macro.~%" fname)
+       (return-from trace-one nil))
+     (when (get fname 'traced)
+       (untrace-one ofname))
+     (setq form (trace-one-preprocess form))
+     (let ((x (get fname 'state-function))) (when x (break-state 'trace x)))
+     (fset (setq f (gensym)) (symbol-function fname))
+     (eval `(defun ,fname (&rest args) (trace-call ',f args ,@(cddr form))))
+     (putprop fname f 'traced)
+     (setq *trace-list* (cons (cons ofname (cadr form)) *trace-list*))
+     (list ofname)))
 
 (defun reset-trace-declarations (declarations)
   (when declarations
@@ -232,33 +233,28 @@
     (values-list vals))
    (t (apply temp-name args))))
 
-(defun untrace-one (fname &aux sym)
-  (check-type fname symbol)
-  (cond ((setq sym (get fname 'traced))
-	 (remprop fname 'traced)
-	 (cond
-	  ((not (fboundp fname))
-	   (format *trace-output*
-		   "The function ~S was traced, but is no longer defined.~%"
-		   fname))
+(defun traced-sym (fname)
+  (let* ((sym (when (symbolp fname) (get fname 'traced)))
+	 (fn (when (and sym (symbolp sym) (fboundp fname)) 
+	       (function-lambda-expression (symbol-function fname))))
+	 (fn (and (consp fn) (third fn)))
+	 (fn (and (consp fn) (third fn))))
+    (and (consp fn) (eq (car fn) 'trace-call) sym)))
 
-	  ;;(LAMBDA-BLOCK block-name lambda-list (TRACE-CALL ... ))
-	  ((let ((fn (and (interpreted-function-p (symbol-function fname))
-			  (interpreted-function-lambda (symbol-function fname)))))
-	     (and (consp (nth 3 fn))
-		  (eq (car (nth 3 fn)) 'trace-call)))
-	   (si:fset fname (symbol-function sym)))
-	  (t
-	   (format *trace-output*
-		   "The function ~S was traced, but redefined.~%"
-		   fname)))
-	 (setq *trace-list*
-	       (delete-if #'(lambda (u) (eq (car u) fname))
-			  *trace-list* :count 1))
-	 (list fname))
-        (t
-         (format *trace-output* "The function ~S is not traced.~%" fname)
-         nil)))
+(defun untrace-one (fname &aux sym)
+  (let* ((ofname fname)
+	 (fname (funid-sym fname))
+	 (sym (traced-sym fname))
+	 (g (get fname 'traced)))
+    (unless sym
+      (cond ((not g) (warn "The function ~S is not traced.~%" fname))
+	    ((fboundp fname) (warn "The function ~S was traced, but redefined.~%" ofname))
+	    ((warn "The function ~S was traced, but is no longer defined.~%"  ofname))))
+    (remprop fname 'traced)
+    (setq *trace-list* (delete-if #'(lambda (u) (equal (car u) ofname)) *trace-list* :count 1))
+    (when sym
+      (fset fname (symbol-function sym)))
+    (when g (list ofname))))
 
 #| Example of tracing a function "fact" so that only the outermost call is traced.
 

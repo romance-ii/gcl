@@ -39,6 +39,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "include.h"
 #include <unistd.h>
 #include "num_include.h"
+#include "page.h"
 
 #define LINE_LENGTH get_line_length()
 #define MINIMUM_RIGHT_MARGIN 1
@@ -1596,67 +1597,177 @@ int level;
 	}
 }
 
-char travel_push_type[(int)t_other]; 
+/* char travel_push_type[(int)t_other];  */
+
+/* static void */
+/* travel_push_object(x) */
+/* object x; */
+/* { */
+/* 	enum type t; */
+/* 	int i; */
+/* 	object *vp; */
+
+/* 	cs_check(x); */
+
+/* BEGIN: */
+/* 	t = type_of(x); */
+/* 	if(travel_push_type[(int)t]==0) return; */
+/* 	if(t==t_symbol && x->s.s_hpack != Cnil) return; */
+
+/* 	for (vp = PRINTvs_top;  vp < vs_top;  vp += 2) */
+/* 		if (x == *vp) { */
+/* 			if (vp[1] != Cnil) */
+/* 				return; */
+/* 			vp[1] = Ct; */
+/* 			return; */
+/* 		} */
+/* 	vs_check_push(x); */
+/* 	vs_check_push(Cnil); */
+/* 	if (t == t_array && (enum aelttype)x->a.a_elttype == aet_object) */
+/* 		for (i = 0;  i < x->a.a_dim;  i++) */
+/* 			travel_push_object(x->a.a_self[i]); */
+/* 	else if (t == t_vector && (enum aelttype)x->v.v_elttype == aet_object) */
+/* 		for (i = 0;  i < x->v.v_fillp;  i++) */
+/* 			travel_push_object(x->v.v_self[i]); */
+/* 	else if (t == t_ifun) */
+/* 		travel_push_object(x->ifn.ifn_self); */
+/* 	else if (t == t_cons) { */
+/* 		travel_push_object(x->c.c_car); */
+/* 		x = x->c.c_cdr; */
+/* 		goto BEGIN; */
+/* 	} else if (t == t_structure) { */
+/* 		for (i = 0;  i < S_DATA(x->str.str_def)->length;  i++) */
+/* 		  travel_push_object(structure_ref(x,x->str.str_def,i)); */
+/* 	} */
+/* } */
+
+static int dgs;
 
 static void
-travel_push_object(x)
-object x;
-{
-	enum type t;
-	int i;
-	object *vp;
+travel_push_new(object x) {
 
-	cs_check(x);
+  object y;
+  int i;
 
-BEGIN:
-	t = type_of(x);
-	if(travel_push_type[(int)t]==0) return;
-	if(t==t_symbol && x->s.s_hpack != Cnil) return;
+ BEGIN:
+  if (NULL_OR_ON_C_STACK(x)) return;
+  if (is_marked(x)) {
+    vs_check_push(x);
+    vs_check_push(Cnil);
+    return;
+  }
+  switch (type_of(x)) {
+  case t_symbol:
+    if (dgs && x->s.s_hpack==Cnil) {mark(x);}
+    break;
+  case t_cons:
+    y=x->c.c_cdr;
+    mark(x);
+    travel_push_new(x->c.c_car);
+    x=y;
+    goto BEGIN;
+    break;
+  case t_array:
+    mark(x);
+    if ((enum aelttype)x->a.a_elttype == aet_object)
+      for (i=0;i<x->a.a_dim;i++)
+	travel_push_new(x->a.a_self[i]);
+    break;
+  case t_vector:
+    mark(x);
+    if ((enum aelttype)x->v.v_elttype == aet_object)
+      for (i=0;i<x->v.v_fillp;i++)
+	travel_push_new(x->v.v_self[i]);
+    break;
+  case t_ifun:
+    mark(x);
+    x=x->ifn.ifn_self;
+    goto BEGIN;
+    break;
+  case t_structure:
+    mark(x);
+    for (i = 0;  i < S_DATA(x->str.str_def)->length;  i++)
+      travel_push_new(structure_ref(x,x->str.str_def,i));
+    break;
+  default:
+    break;
 
-	for (vp = PRINTvs_top;  vp < vs_top;  vp += 2)
-		if (x == *vp) {
-			if (vp[1] != Cnil)
-				return;
-			vp[1] = Ct;
-			return;
-		}
-	vs_check_push(x);
-	vs_check_push(Cnil);
-	if (t == t_array && (enum aelttype)x->a.a_elttype == aet_object)
-		for (i = 0;  i < x->a.a_dim;  i++)
-			travel_push_object(x->a.a_self[i]);
-	else if (t == t_vector && (enum aelttype)x->v.v_elttype == aet_object)
-		for (i = 0;  i < x->v.v_fillp;  i++)
-			travel_push_object(x->v.v_self[i]);
-	else if (t == t_ifun)
-		travel_push_object(x->ifn.ifn_self);
-	else if (t == t_cons) {
-		travel_push_object(x->c.c_car);
-		x = x->c.c_cdr;
-		goto BEGIN;
-	} else if (t == t_structure) {
-		for (i = 0;  i < S_DATA(x->str.str_def)->length;  i++)
-		  travel_push_object(structure_ref(x,x->str.str_def,i));
-	}
+  }
+
 }
 
+
 static void
-setupPRINTcircle(x,dogensyms)
-     object x;
-     int dogensyms;
-{  object *vp,*vq;
-   travel_push_type[(int)t_symbol]=dogensyms;
-   travel_push_type[(int)t_array]=
-       (travel_push_type[(int)t_vector]=PRINTarray);
-   travel_push_object(x);
-   for (vp = vq = PRINTvs_top;  vp < vs_top;  vp += 2)
-     if (vp[1] != Cnil) {
-       vq[0] = vp[0];
-       vq[1] = Cnil;
-       vq += 2;
-     }
-   PRINTvs_limit = vs_top = vq;
- }
+travel_clear_new(object x) {
+
+  int i;
+
+ BEGIN:
+  if (NULL_OR_ON_C_STACK(x) || !is_marked(x)) return;
+  unmark(x);
+  switch (type_of(x)) {
+  case t_cons:
+    travel_clear_new(x->c.c_car);
+    x=x->c.c_cdr;
+    goto BEGIN;
+    break;
+  case t_array:
+    if ((enum aelttype)x->a.a_elttype == aet_object)
+      for (i=0;i<x->a.a_dim;i++)
+	travel_clear_new(x->a.a_self[i]);
+    break;
+  case t_vector:
+    if ((enum aelttype)x->v.v_elttype == aet_object)
+      for (i=0;i<x->v.v_fillp;i++)
+	travel_clear_new(x->v.v_self[i]);
+    break;
+  case t_ifun:
+    x=x->ifn.ifn_self;
+    goto BEGIN;
+    break;
+  case t_structure:
+    for (i = 0;  i < S_DATA(x->str.str_def)->length;  i++)
+      travel_clear_new(structure_ref(x,x->str.str_def,i));
+    break;
+  default:
+    break;
+
+  }
+
+}
+
+
+static void
+setupPRINTcircle(object x,int dogensyms) {
+
+  BEGIN_NO_INTERRUPT;
+  dgs=dogensyms;
+  travel_push_new(x);
+  dgs=0;
+  PRINTvs_limit = vs_top;
+  travel_clear_new(x);
+  END_NO_INTERRUPT;
+
+}
+
+/* static void */
+/* setupPRINTcircle(object x,int dogensyms) { */
+/*   object *vp,*vq; */
+
+/*   travel_push_type[(int)t_symbol]=dogensyms; */
+/*   travel_push_type[(int)t_array]= */
+/*     (travel_push_type[(int)t_vector]=PRINTarray); */
+/*   travel_push_object(x); */
+/*   for (vp = vq = PRINTvs_top;  vp < vs_top;  vp += 2) */
+/*     if (vp[1] != Cnil) { */
+/*       vq[0] = vp[0]; */
+/*       vq[1] = Cnil; */
+/*       vq += 2; */
+/*     } */
+
+/*   PRINTvs_limit = vs_top = vq; */
+
+/* } */
 
 void
 setupPRINTdefault(x)
@@ -2106,13 +2217,13 @@ void
 gcl_init_print()
 {
 
-        travel_push_type[(int)t_array]=1;
-	travel_push_type[(int)t_vector]=1;
-	travel_push_type[(int)t_structure]=1;
-	travel_push_type[(int)t_ifun]=1;
-	travel_push_type[(int) t_cons]=1;
-	if(sizeof(travel_push_type) < (int) t_other)
-	  error("travel_push_size to small see print.d");
+/*         travel_push_type[(int)t_array]=1; */
+/* 	travel_push_type[(int)t_vector]=1; */
+/* 	travel_push_type[(int)t_structure]=1; */
+/* 	travel_push_type[(int)t_ifun]=1; */
+/* 	travel_push_type[(int) t_cons]=1; */
+/* 	if(sizeof(travel_push_type) < (int) t_other) */
+/* 	  error("travel_push_size to small see print.d"); */
 
 	PRINTstream = Cnil;
 	enter_mark_origin(&PRINTstream);

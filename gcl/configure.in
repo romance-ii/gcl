@@ -927,17 +927,21 @@ if test "$enable_statsysbfd" = "yes" || test "$enable_dynsysbfd" = "yes" ; then
 		MP=`$CC [ -Wl,-M ] -static -o foo foo.c -lbfd -liberty 2>&1 | grep -v : | tr '()' '\012\012' | $AWK '{print $NF}' | sort | uniq`
 		rm -f foo.c foo
 		if echo $MP | tr ' ' '\012' | grep -q libbfd.a ; then
-		   TLIBS="$TLIBS `echo $MP | tr ' ' '\012' | grep libbfd.a | $AWK '{i=split($1,A,"/");for (j=1;j<=i;j++) if (j>1 && A[[j]]=="..") {j--;i-=2;for (k=j;k<=i;k++) A[[k]]=A[[k+2]];j--;}} END {for (j=1;j<=i;j++) printf("%s%s",A[[j]],j!=i ? "/" : "")}'`"
+		   LIBBFD="`echo $MP | tr ' ' '\012' | grep libbfd.a | $AWK '{i=split($1,A,"/");for (j=1;j<=i;j++) if (j>1 && A[[j]]=="..") {j--;i-=2;for (k=j;k<=i;k++) A[[k]]=A[[k+2]];j--;}} END {for (j=1;j<=i;j++) printf("%s%s",A[[j]],j!=i ? "/" : "")}'`"
 		else
 		   echo Guessing path to libbfd.a due to gcc bug
-		   TLIBS="$TLIBS /usr/lib/libbfd.a"
+		   LIBBFD="/usr/lib/libbfd.a"
 		fi   
 		if echo $MP | tr ' ' '\012' | grep -q libiberty.a ; then
-		   TLIBS="$TLIBS `echo $MP | tr ' ' '\012' | grep libiberty.a | $AWK '{i=split($1,A,"/");for (j=1;j<=i;j++) if (j>1 && A[[j]]=="..") {j--;i-=2;for (k=j;k<=i;k++) A[[k]]=A[[k+2]];j--;}} END {for (j=1;j<=i;j++) printf("%s%s",A[[j]],j!=i ? "/" : "")}'`"
+		   LIBIBERTY="`echo $MP | tr ' ' '\012' | grep libiberty.a | $AWK '{i=split($1,A,"/");for (j=1;j<=i;j++) if (j>1 && A[[j]]=="..") {j--;i-=2;for (k=j;k<=i;k++) A[[k]]=A[[k+2]];j--;}} END {for (j=1;j<=i;j++) printf("%s%s",A[[j]],j!=i ? "/" : "")}'`"
 		else
 		   echo Guessing path to libiberty.a due to gcc bug
-		   TLIBS="$TLIBS /usr/lib/libiberty.a"
+		   LIBIBERTY="/usr/lib/libiberty.a"
 		fi   
+		BUILD_BFD=copy_bfd
+		AC_SUBST(BUILD_BFD)
+		AC_SUBST(LIBBFD)
+		AC_SUBST(LIBIBERTY)
 	else
 		TLIBS="$TLIBS -lbfd -liberty"
 	fi
@@ -1653,6 +1657,7 @@ main()
   m=$dbegin + ((unsigned long)$enable_maxpage << $PAGEWIDTH);
   l=l<m ? m : l;
   for (i=j=k;j && i<l;j>>=1,i|=j);
+  if (j<(k>>3)) i=0;
   j=1;
   j<<=$PAGEWIDTH;
   j<<=4;
@@ -1685,8 +1690,8 @@ if test "$mem_top" != "0" ; then
 fi
 
 if test "$enable_immfix" = "yes" ; then
-  if test "$mem_top" != "0" ; then
-     if test "$mem_range" != "0" ; then 
+  if test "$mem_top" != "0x0" ; then
+     if test "$mem_range" != "0x0" ; then 
 	AC_DEFINE_UNQUOTED(IM_FIX_BASE,$mem_top)
         AC_DEFINE_UNQUOTED(IM_FIX_LIM,$mem_range)
      fi

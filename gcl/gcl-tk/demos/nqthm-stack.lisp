@@ -16,8 +16,8 @@
   (button (conc w '.redo) :text "Show Frames" :command
 	  `(show-frames))
   (checkbutton (conc w '.rew) :text "Maintain Frames"
-	  :variable '(boolean user::do-frames)
-	  :command '(user::MAINTAIN-REWRITE-PATH user::do-frames))
+	  :variable '(boolean #+anci-cl cl-user::do-frames #-ansi-cl user::do-frames)
+	  :command #+ansi-cl '(cl-user::MAINTAIN-REWRITE-PATH cl-user::do-frames) #-ansi-cl '(user::MAINTAIN-REWRITE-PATH user::do-frames))
   (pack (conc w '.frame) :side "top" :expand "yes" :fill "y")
   (pack (conc w '.rew)(conc w '.redo) (conc w '.ok)  :side "bottom" :fill "x")
   (scrollbar (conc w '.frame '.scroll) :relief "sunken"
@@ -30,13 +30,14 @@
   (pack (conc w '.frame.list) :side "left" :expand "yes" :fill "both")
   (setq *list-box* (conc w '.frame.list)))
 
-(in-package "USER")
+#+ansi-cl(in-package "CL-USER")
+#-ansi-cl(in-package "USER")
 
 (defun tk::show-frames()
   (funcall tk::*list-box* :delete 0 "end")
   (apply tk::*list-box* :insert 0
-	 (sloop::sloop for i below user::REWRITE-PATH-STK-PTR
-	    do (setq tem (aref user::REWRITE-PATH-STK i))
+	 (sloop::sloop for i below #+ansi-cl cl-user::REWRITE-PATH-STK-PTR #-ansi-cl user::REWRITE-PATH-STK-PTR
+	    do (setq tem (aref #+ansi-cl cl-user::REWRITE-PATH-STK #-ansi-cl user::REWRITE-PATH-STK i))
 	    (setq tem 
 	    (display-rewrite-path-token
 	     (nth 0 tem)

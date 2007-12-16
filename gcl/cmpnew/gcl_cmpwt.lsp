@@ -151,8 +151,16 @@
 
 (defvar *fasd-data*)
 
+(defun data-symbol (x)
+;  (or (setf-function-base-symbol x)
+  (when (and *compiler-compile* (symbolp x))
+    (unless (symbol-package x)
+      (setq *tmp-pack* (or *tmp-pack* (make-package (symbol-name (gensym)))))
+      (import x *tmp-pack*)
+      x)))
+
 (defun push-data-incf (x)
-  (let ((x (or (setf-function-base-symbol x) x)))
+  (let ((x (or (data-symbol x) x)))
     (vector-push-extend (cons (si::hash-equal x -1000) x) (data-vector))
     (incf *next-vv*)))
 

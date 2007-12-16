@@ -134,7 +134,7 @@
        (*multiply-stacks* (setq *multiply-stacks* nil))
        ((probe-file "init.lsp") (load "init.lsp")))
       (let (*load-verbose*) (process-some-args *command-args*))
-      (and (functionp *top-level-hook*)(funcall   *top-level-hook*)))
+      (and (functionp *top-level-hook*)(funcall *top-level-hook*)))
 
     (loop
      (when 

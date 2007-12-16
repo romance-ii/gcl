@@ -48,7 +48,7 @@
 	 (if (eq (car fd) 'call-local) nil  fd))
 	(t (macro-function name))))
 
-(defun c1funob (fun &aux fd)
+(defun c1funob (fun &aux fd sym)
   ;;; NARGS is the number of arguments.  If the number is unknown, (e.g.
   ;;; in case of APPLY), then NARGS should be NIL.
   (cond ((and (consp fun)
@@ -88,25 +88,25 @@
 			(setf (info-type (cadr lambda-expr)) (info-type (cadar (last lambda-expr))))
 			(list 'call-lambda (cadr lambda-expr) lambda-expr))
                       )
-                 (and (symbolp (cadr fun))
-                      (or (and (setq fd (c1local-fun (cadr fun)))
+                 (and (setq sym (si::funid-sym-p (cadr fun)))
+                      (or (and (setq fd (c1local-fun sym))
                                (eq (car fd) 'call-local)
                                fd)
                           (list 'call-global
-                                (make-info :type (get-return-type (cadr fun))
-                                 :sp-change (if (null (get (cadr fun) 'no-sp-change)) 1 0))
-                                (cadr fun)))
+                                (make-info :type (get-return-type sym)
+                                 :sp-change (if (null (get sym 'no-sp-change)) 1 0))
+                                sym))
                       )
-		 (and
-		  (is-setf-function (cadr fun))
-		  (let ((new (make-setf-function-proxy-symbol (cadadr fun))))
-		    (or (and (setq fd (c1local-fun new))
-			     (eq (car fd) 'call-local)
-			     fd)
-			(list 'call-global
-			      (make-info :type (get-return-type new)
-			       :sp-change (if (null (get new 'no-sp-change)) 1 0))
-			      new))))
+;; 		 (and
+;; 		  (is-setf-function (cadr fun))
+;; 		  (let ((new (make-setf-function-proxy-symbol (cadadr fun))))
+;; 		    (or (and (setq fd (c1local-fun new))
+;; 			     (eq (car fd) 'call-local)
+;; 			     fd)
+;; 			(list 'call-global
+;; 			      (make-info :type (get-return-type new)
+;; 			       :sp-change (if (null (get new 'no-sp-change)) 1 0))
+;; 			      new))))
 		 ))))
    (let ((x (c1expr fun)) (info (make-info :type (get-return-type fun) :sp-change 1)))
         (add-info info (cadr x))
@@ -280,40 +280,93 @@
 
     
     
+(setf (get 'recur 'c1) 'c1recur)
+(setf (get 'recur 'c2) 'c2recur)
+
+(defun c1recur (args)
+  (let* ((fname (pop args))
+	 (funob (c1funob fname))
+	 (fname (cmp-eval fname))
+	 (rt (get-return-type fname))
+	 (rt (unless (and (not (eq *recursion-detected* 'block))
+			  (setq *recursion-detected* t)) rt))
+	 (info (copy-info (cadr funob)))
+	 (ap (pop args))
+	 (*fn-val-list* (append args *fn-val-list*))
+	 (nargs (c1args args info)))
+    (setf (info-type info) rt)
+    (list 'recur info funob ap nargs)))
+
+(defun find-var (n x &optional f)
+  (cond ((not f) (or (find-var n x t) (baboon)))
+	((var-p x) (when (eq n (var-name x)) x))
+	((atom x) nil)
+	((or (find-var n (car x) f) (find-var n (cdr x) f)))))
+
+(defun ori-p (x)
+  (and (consp x) 
+       (eq (car x) 'var) 
+       (char= #\Z (aref (symbol-name (var-name (caaddr x))) 0))))
+
+(defun c2recur (funob ap args)
+  (cond ((and *tail-recursion-info*
+	      (or (eq *exit* 'return) (rassoc *exit* +return-alist+))
+	      (tail-recursion-possible))
+	 (let* ((*value-to-go* 'trash)
+		(*exit* (next-label))
+		(*unwind-exit* (cons *exit* *unwind-exit*))
+		(syms (remove-if 'ori-p args))
+		(h (mapcar (lambda (x) (list (find-var (get (var-name (caaddr x)) 'kp) *tail-recursion-info*) nil)) syms)));FIXME
+	   (c2psetq h syms)
+	   (wt-label *exit*))
+	 (unwind-no-exit 'tail-recursion-mark)
+	 (wt-nl "goto TTL;")
+	 (cmpnote "Tail-recursive call of ~s was replaced by iteration." (car *tail-recursion-info*)));FIXME
+	((let ((args (remove-if-not 'ori-p args)))
+	   (if ap (c2apply funob args)
+	     (c2call-global (caddr funob) args (save-funob funob) (info-type (cadr funob))))))))
+
+(defun kp (x y)
+  (setf (get y 'kp) x)
+  (cons x y))
+
+(defun ll-sym (x &optional kn)
+  (cond ((atom x) x)
+	((atom (car x)) (car x))
+	(kn (caar x))
+	((cadar x))))
+
+(defun ll-alist (l &aux k)
+  (mapcan (lambda (x) 
+	    (cond ((member x lambda-list-keywords) (setq k x) nil)
+		  (`(,@(when (and (consp x) (caddr x)) (list (kp (caddr x) (gensym "P"))))
+		     ,(kp (ll-sym x) (gensym (if k (string (aref (symbol-name k) 1)) "G"))))))) l))
+
+(defun name-keys (l &aux k)
+  (mapcar (lambda (x)
+	    (cond ((member x lambda-list-keywords) (setq k x) x)
+		  ((eq k '&key) (cond ((atom x) (list (list (intern (symbol-name x) 'keyword) x)))
+				      ((atom (car x)) (list* (list (intern (symbol-name (car x)) 'keyword) (car x)) (cdr x)))
+				      (x)))
+		  (x))) l))
+
+
+(defun blla-recur (f ll args last) 
+  (let* ((ll (ldiff ll (member '&aux ll)))
+	 (ll (name-keys ll))
+	 (s (ll-alist ll))
+	 (sl (sublis s ll))
+	 (v (mapcar 'cdr s))
+	 (al (mapcar (lambda (x) (list (gensym "Z") x)) (append args (when last (list last)))))
+	 (a (mapcar 'car al))
+	 (last (when last (car (last a))))
+	 (args (if last (butlast a) a)))
+    `(let* ,al
+       ,(blla sl args last `((recur ',f ,(when last t) ,@a ,@v))))))
+
 (defun c2call-global (fname args loc return-type &aux fd (*vs* *vs*))
-;this is now done in get-inline-info
-;  (and  *Fast-link-compiling* (fast-link-proclaimed-type-p fname args)
-;        (add-fast-link fname t args))
   (if (or (inline-possible fname) (special-form-p fname)) ;FIXME?
     (cond 
-     ;;; Tail-recursive case.
-     ((and (listp args)
-           *do-tail-recursion*
-           *tail-recursion-info*
-           (eq (car *tail-recursion-info*) fname)
-	   (or (eq *exit* 'return)
-	       (rassoc *exit* +return-alist+))
-           (tail-recursion-possible)
-           (<= (length args) (length (cdr *tail-recursion-info*))))
-      (let* ((*value-to-go* 'trash)
-             (*exit* (next-label))
-             (*unwind-exit* (cons *exit* *unwind-exit*))
-	     (ctr (cdr *tail-recursion-info*)))
-	(c2psetq (mapcar (lambda (v) (list (if (consp v) (car v) v) nil)) ctr)
-		 (append args (mapcar 'cadr (nthcdr (length args) ctr))))
-	(let* ((pt (remove nil (mapcar (lambda (x y)
-					 (declare (ignore y))
-					 (when (and (consp x) (caddr x)) (list (caddr x) nil))) ctr args)))
-	       (pf (remove nil (mapcar (lambda (x) (when (and (consp x) (caddr x)) (list (caddr x) nil))) 
-				       (nthcdr (length args) ctr))))
-	       (vals (append (make-list (length pt) :initial-element (c1t))
-			     (make-list (length pf) :initial-element (c1nil)))))
-	  (c2psetq (append pt pf) vals))
-	(wt-label *exit*))
-      (unwind-no-exit 'tail-recursion-mark)
-      (wt-nl "goto TTL;")
-      (cmpnote "Tail-recursive call of ~s was replaced by iteration." fname))
-
      ;;; Open-codable function call.
      ((and (listp args)
            (null loc)
@@ -416,7 +469,7 @@
 					    (if com  (princ "," st) (setq com t))
 					    (format st "#~a" i)))))))
 
-		       (format st "(/* ~a */(*LnkLI~d)(~a))" fname n as))))
+		       (format st "(/* ~a */(*LnkLI~d)(~a))" (function-string fname) n as))))
 
 
 	      ;; If link is bound above, closure is unprintable as is in its own environment
@@ -448,7 +501,9 @@
 	(num (second x))
 	(type (third x))
 	(args (fourth x))
-	(setf (setf-function-base-symbol (first x))))
+;	(setf (setf-function-base-symbol (first x)))
+	(setf nil)
+	)
     (cond
       ((null type)
        (wt-nl1 "static void LnkT"

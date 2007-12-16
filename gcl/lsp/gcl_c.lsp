@@ -1,3 +1,9 @@
+(in-package 'lisp)
+
+(export '(car cdr caar cadr cdar cddr caaar caadr cadar caddr cdaar cdadr cddar cdddr
+          caaaar caaadr caadar caaddr cadaar cadadr caddar cadddr cdaaar cdaadr cdadar
+          cdaddr cddaar cddadr cdddar cddddr))
+
 (in-package 'si)
 
 (defun car (x)

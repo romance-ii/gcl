@@ -62,7 +62,7 @@ setup_READtable()
 }
 
 struct sharp_eq_context_struct {
-	object	sharp_index;
+	fixnum	sharp_index;
 	object	sharp_eq;
 	object	sharp_sharp;
 } sharp_eq_context[SHARP_EQ_CONTEXT_SIZE];
@@ -1791,6 +1791,7 @@ static void
 Lsharp_eq_reader()
 {
 	int i;
+	fixnum f;
 
 	check_arg(3);
 	if (READsuppress) {
@@ -1799,22 +1800,22 @@ Lsharp_eq_reader()
 	}
 	if (vs_base[2] == Cnil)
 		FEerror("The #= readmacro requires an argument.", 0);
+	if (type_of(vs_base[2])!=t_fixnum)
+		FEerror("The #= readmacro requires a fixnum argument.", 0);
+	f=fix(vs_base[2]);
 	for (i = 0;  i < sharp_eq_context_max;  i++)
-		if (eql(sharp_eq_context[i].sharp_index, vs_base[2]))
-			FEerror("Duplicate definitions for #~D=.",
-				1, vs_base[2]);
+	  if (sharp_eq_context[i].sharp_index==f)
+	    FEerror("Duplicate definitions for #~D=.",1, vs_base[2]);
 	if (sharp_eq_context_max >= SHARP_EQ_CONTEXT_SIZE)
-		FEerror("Too many #= definitions.", 0);
+	  FEerror("Too many #= definitions.", 0);
 	i = sharp_eq_context_max++;
-	sharp_eq_context[i].sharp_index = vs_base[2];
+	sharp_eq_context[i].sharp_index = f;
 	sharp_eq_context[i].sharp_sharp = OBJNULL;
 	vs_base[0]
 	= sharp_eq_context[i].sharp_eq
 	= read_object(vs_base[0]);
-	if (sharp_eq_context[i].sharp_eq
-	    == sharp_eq_context[i].sharp_sharp)
-		FEerror("#~D# is defined by itself.",
-			1, sharp_eq_context[i].sharp_index);
+	if (sharp_eq_context[i].sharp_eq==sharp_eq_context[i].sharp_sharp)
+	  FEerror("#~D# is defined by itself.",1,make_fixnum(sharp_eq_context[i].sharp_index));
 	vs_top = vs_base+1;
 }
 
@@ -1822,6 +1823,7 @@ static void
 Lsharp_sharp_reader()
 {
 	int i;
+	fixnum f;
 
 	check_arg(3);
 	if (READsuppress) {
@@ -1831,17 +1833,17 @@ Lsharp_sharp_reader()
 		return;
 	}
 	if (vs_base[2] == Cnil)
-		FEerror("The ## readmacro requires an argument.", 0);
+	  FEerror("The ## readmacro requires an argument.", 0);
+	if (type_of(vs_base[2])!=t_fixnum)
+	  FEerror("The ## readmacro requires a fixnum argument.", 0);
+	f=fix(vs_base[2]);
 	for (i = 0;  ;  i++)
-		if (i >= sharp_eq_context_max)
-			FEerror("#~D# is undefined.", 1, vs_base[2]);
-		else if (eql(sharp_eq_context[i].sharp_index,
-			     vs_base[2]))
-			break;
-	if (sharp_eq_context[i].sharp_sharp == OBJNULL) {
-		sharp_eq_context[i].sharp_sharp
-		= alloc_object(t_spice);
-	}
+	  if (i >= sharp_eq_context_max)
+	    FEerror("#~D# is undefined.", 1, vs_base[2]);
+	  else if (sharp_eq_context[i].sharp_index==f)
+	    break;
+	if (sharp_eq_context[i].sharp_sharp == OBJNULL)
+	  sharp_eq_context[i].sharp_sharp = alloc_object(t_spice);
 	vs_base[0] = sharp_eq_context[i].sharp_sharp;
 	vs_top = vs_base+1;
 }

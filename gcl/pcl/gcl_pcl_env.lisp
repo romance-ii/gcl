@@ -60,18 +60,21 @@
 #-Genera
 (progn
 
-(defun pcl-describe (object #+Lispm &optional #+Lispm no-complaints)
-  (let (#+Lispm (*describe-no-complaints* no-complaints))
-    #+Lispm (declare (special *describe-no-complaints*))
-    (describe-object object *standard-output*)
+;; (defun pcl-describe (object #+Lispm &optional #+Lispm no-complaints)
+;;   (let (#+Lispm (*describe-no-complaints* no-complaints))
+;;     #+Lispm (declare (special *describe-no-complaints*))
+;;     (describe-object object *standard-output*)
+;;     (values)))
+
+(defun pcl-describe (object &optional stream)
+  (let ((stream (cond ((eq stream t) *terminal-io*) ((not stream) *standard-output*) (stream))))
+    (describe-object object stream)
     (values)))
 
 (defmethod describe-object (object stream)
   #-cmu
-    (cond ((or #+kcl (packagep object))
-	   (describe-package object stream))
-	  (t
-	   (funcall (original-definition 'describe) object)))
+    (cond ((or #+kcl (packagep object)) (describe-package object stream))
+	  ((funcall (original-definition 'describe) object stream)))
   #+cmu
   (describe object stream))
 

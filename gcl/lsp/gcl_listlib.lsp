@@ -27,11 +27,15 @@
 
 
 (in-package 'lisp)
-
-(export '(union nunion intersection nintersection endp last nconc nreconc
-          set-difference nset-difference set-exclusive-or nset-exclusive-or
-          subsetp nth-value nth nthcdr first second third fourth fifth sixth
-	  seventh eighth ninth tenth))
+(export '(endp nthcdr last butlast nbutlast ldiff tailp list-length make-list 
+	       rest acons pairlis copy-list copy-alist nconc nreconc nth first
+	       second third fourth fifth sixth seventh eighth ninth tenth copy-tree
+	       tree-equal mapl mapcar maplist mapc mapcan mapcon append revappend 
+	       member member-if member-if-not adjoin adjoin-if adjoin-if-not assoc
+	       assoc-if assoc-if-not rassoc rassoc-if rassoc-if-not subst subst-if
+	       subst-if-not nsubst nsubst-if nsubst-if-not sublis nsublis intersection
+	       nintersection union nunion set-difference nset-difference set-exclusive-or
+	       nset-exclusive-or subsetp nth-value))
 
 (in-package 'system)
 

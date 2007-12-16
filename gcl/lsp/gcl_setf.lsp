@@ -81,34 +81,39 @@
 	(t
 	 (unless (= (list-length (cadr rest)) 1)
 		 (error "(store-variable) expected."))
-         `(eval-when (compile eval load)
-	         (si:putprop ',access-fn '(,(car rest) ,(cadr rest) (block ,access-fn ,@(cddr rest))) 'setf-lambda)
-                 (remprop ',access-fn 'setf-update-fn)
-                 (remprop ',access-fn 'setf-method)
-                 (si:putprop ',access-fn
-                             ,(find-documentation (cddr rest))
-                             'setf-documentation)
-                 ',access-fn))))
-
-
+	 (multiple-value-bind
+	  (doc decls body)
+	  (find-doc (cddr rest) nil)
+	  `(eval-when (compile eval load)
+		      (si:putprop 
+		       ',access-fn 
+		       (lambda ,(car rest) ,@decls (lambda ,(cadr rest) (block ,access-fn ,@body))) 'setf-lambda)
+		      (remprop ',access-fn 'setf-update-fn)
+		      (remprop ',access-fn 'setf-method)
+		      (si:putprop ',access-fn
+				  ,doc
+				  'setf-documentation)
+		      ',access-fn)))))
+  
+  
 ;;; DEFINE-SETF-METHOD macro.
-(defmacro define-setf-method (access-fn &rest rest &aux args env body)
-  (multiple-value-setq (args env) 
-		       (get-&environment (car rest)))
-  (setq body (cdr rest))
-  (cond (env (setq args (cons env args)))
-	(t (setq args (cons (gensym) args))
-	   (push `(declare (ignore ,(car args))) body)))
-  `(eval-when (compile eval load)
-          (si:putprop ',access-fn
-		      #'(lambda ,args (block ,access-fn ,@ body))
-		      'setf-method)
-          (remprop ',access-fn 'setf-lambda)
-          (remprop ',access-fn 'setf-update-fn)
-          (si:putprop ',access-fn
-                      ,(find-documentation (cdr rest))
-                      'setf-documentation)
-          ',access-fn))
+(defmacro define-setf-method (access-fn &rest rest &aux body)
+  (multiple-value-bind
+   (args env) 
+   (get-&environment (car rest))
+   (setq body (cdr rest))
+   (cond (env (setq args (cons env args)))
+	 ((setq args (cons (gensym) args))
+	  (push `(declare (ignore ,(car args))) body)))
+   `(eval-when (compile eval load)
+	       (si:putprop ',access-fn
+			   #'(lambda ,args (block ,access-fn ,@ body)) 'setf-method)
+	       (remprop ',access-fn 'setf-lambda)
+	       (remprop ',access-fn 'setf-update-fn)
+	       (si:putprop ',access-fn
+			   ,(find-documentation (cdr rest))
+			   'setf-documentation)
+	       ',access-fn)))
 
 (defmacro define-setf-expander (access-fn &rest rest)
   (declare (optimize (safety 2)))
@@ -156,15 +161,15 @@
 	       (store (gensym)))
 	   (values vars (cdr form) (list store)
 	           (cond (tem (setf-structure-access (car vars) (car tem) (cdr tem) store))
-			 (`(,(get (car form) 'setf-update-fn)
-			    ,@vars ,store)))
+			 ((let ((f (get (car form) 'setf-update-fn)))
+			    `(,f ,@vars ,store))))
 		   (cons (car form) vars))))
 	((get (car form) 'setf-lambda)
 	 (let* ((vars (to-gensyms (cdr form)))
 		(store (gensym))
-		(l (get (car form) 'setf-lambda))
+		(f (get (car form) 'setf-lambda)))
 		;; this looks bogus to me.  What if l is compiled?--wfs
-		(f `(lambda ,(car l) #'(lambda ,(cadr l) ,@(cddr l)))))
+;		(f `(lambda ,(car l) #'(lambda ,(cadr l) ,@(cddr l)))))
 	   (values vars (cdr form) (list store)
 		   (funcall (apply f vars) store)
 		   (cons (car form) vars))))
@@ -227,11 +232,12 @@
 (defsetf elt si:elt-set)
 (defsetf symbol-value set)
 (defsetf symbol-function si::fset)
-(defsetf macro-function (s &optional env) (v) `(progn (si:fset ,s (cons 'macro ,v)) ,v))
+(defsetf macro-function (s &optional env) (v) `(let ((env ,env)) (declare (ignorable env)) (si:fset ,s (cons 'macro ,v)) ,v))
 (defsetf aref si:aset)
 (defsetf get put-aux)
 (defmacro put-aux (a b &rest l)
-  `(si::sputprop ,a ,b ,(car (last l))))
+  `(si::sputprop ,a ,b (progn ,@l)))
+;  `(si::sputprop ,a ,b ,(car (last l))))
 (defsetf nth (n l) (v) `(progn (rplaca (nthcdr ,n ,l) ,v) ,v))
 (defsetf char si:char-set)
 (defsetf schar si:schar-set)
@@ -380,7 +386,7 @@
 	  (multiple-value-setq (place g) (macroexpand place env))
 	  (if g (return-from setf-expand-1 (setf-expand-1 place newvalue env))))
   (when (and (symbolp (car place)) (setq g (get (car place) 'setf-update-fn)))
-        (return-from setf-expand-1 `(,g ,@(cdr place) ,newvalue)))
+    (return-from setf-expand-1 `(,g ,@(cdr place) ,newvalue)))
   (cond ((and (symbolp (car place))
 	      (setq g (get (car place) 'structure-access)))
 	 (return-from setf-expand-1
@@ -408,15 +414,21 @@
 
 ;;; SETF macro.
 
-(defun setf-helper (rest env)
-  (setq rest (cdr rest))
+;; (defun setf-helper (rest env)
+;;   (setq rest (cdr rest))
+;;   (cond ((endp rest) nil)
+;; ;        ((endp (cdr rest)) (error "~S is an illegal SETF form." rest))
+;;         ((endp (cddr rest)) (setf-expand-1 (car rest) (cadr rest) env))
+;;         (t (cons 'progn (setf-expand rest env)))))
+
+;; ;(setf (macro-function 'setf) 'setf-help)
+;; (si::fset 'setf (cons 'macro (symbol-function 'setf-helper)))
+
+(defmacro setf (&environment env &rest rest)
   (cond ((endp rest) nil)
 ;        ((endp (cdr rest)) (error "~S is an illegal SETF form." rest))
         ((endp (cddr rest)) (setf-expand-1 (car rest) (cadr rest) env))
-        (t (cons 'progn (setf-expand rest env)))))
-
-;(setf (macro-function 'setf) 'setf-help)
-(si::fset 'setf (cons 'macro (symbol-function 'setf-helper)))
+        ((cons 'progn (setf-expand rest env)))))
 
 ;;; PSETF macro.
 
@@ -617,25 +629,16 @@
        (prog1 (car ,access-form)
               ,store-form))))
 
-(defun fdefinition (name)
+(defun fdefinition (n)
   (declare (optimize (safety 2)))
-  (check-type name function-identifier)
-  (cond ((symbolp name) (if (fboundp name) (symbol-function name) (error :undefined-function "function ~s is undefined" name)))
-	((let ((z (get (cadr name) 'setf-function)))
-	   (cond ((not z) (error :undefined-function "function ~s is undefined" name))
-		 ((not (symbolp z)) z)
-		 ((fdefinition z)))))))
-		 
+  (let ((n (funid-sym n)))
+    (if (fboundp n)
+	(symbol-function n)
+      (error 'undefined-function :name n))))
 
-(defun (setf fdefinition) (def fn)
+(defun (setf fdefinition) (def n)
   (declare (optimize (safety 2)))
-  (when (not (functionp def))
-    (error 'type-error :datum def :expected-type 'function))
-  (cond ((symbolp fn)
-	 (when (special-operator-p fn)
-	   (error 'type-error :datum fn :expected-type` '(or symbol function)))
-	 (setf (symbol-function fn) def))
-	(t
-	 (unless (and (consp fn) (eq (car fn) 'setf) (symbolp (cadr fn)) (null (cddr fn)))
-	   (error 'type-error :datum fn :expected-type 'function))
-	 (setf (get (cadr fn) 'setf-function) def))))
+  (check-type def function)
+  (let ((n (funid-sym n)))
+    (assert (not (special-operator-p n)))
+    (setf (symbol-function n) def)))

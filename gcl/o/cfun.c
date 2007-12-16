@@ -360,8 +360,12 @@ MM(object sym, void (*self)(), char *start, int size, object data)
 
 	if (type_of(sym) != t_symbol)
 		not_a_symbol(sym);
-	if (sym->s.s_sfdef != NOT_SPECIAL && sym->s.s_mflag)
-		sym->s.s_sfdef = NOT_SPECIAL;
+	if (sym->s.s_sfdef != NOT_SPECIAL)
+	  if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
+	    sym->s.s_sfdef = NOT_SPECIAL;
+
+/*  && sym->s.s_mflag) */
+/* 		sym->s.s_sfdef = NOT_SPECIAL; */
 	cf = alloc_object(t_cfun);
 	cf->cf.cf_self = self;
 	cf->cf.cf_name = sym;

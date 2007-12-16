@@ -151,7 +151,7 @@ FFN(Fmultiple_value_bind)(object form)
 	}
 	{
 	 object *vt = vs_top;
-	 vs_push(find_special(body, start, (struct bind_temp *)vt));
+	 vs_push(find_special(body, start, (struct bind_temp *)vt,NULL)); /*?*/
 	}
 	for (i = 0;  i < n;  i++)
 		bind_var(start[i].bt_var,
@@ -217,7 +217,13 @@ FFN(Fflet)(object args)
 	def_list = MMcar(args);
 	lex_copy();
 	while (!endp(def_list)) {
-		def = MMcar(def_list);
+	  object x;
+	  def = MMcar(def_list);
+	  x=MMcar(def);
+	  if (type_of(x)!=t_symbol) {
+	    x=ifuncall1(sSfunid_to_sym,x);
+	    def=MMcons(x,MMcdr(def));
+	  }
 		if (endp(def) || endp(MMcdr(def)) ||
 		    type_of(MMcar(def)) != t_symbol)
 		  /* FIXME need t read environment for setf functions
@@ -237,10 +243,12 @@ is an illegal function definition in FLET.",
 		lex_fun_bind(MMcar(def), top[0]);
 		def_list = MMcdr(def_list);
 	}
-	vs_push(find_special(MMcdr(args), NULL, NULL));
+	vs_push(find_special(MMcdr(args), NULL, NULL,NULL));
 	Fprogn(vs_head);
 	lex_env = lex;
 }
+
+DEF_ORDINARY("FUNID-TO-SYM",sSfunid_to_sym,SI,"");
 
 static void
 FFN(Flabels)(object args)
@@ -259,12 +267,18 @@ FFN(Flabels)(object args)
 	def_list = MMcar(args);
 	lex_copy();
 	while (!endp(def_list)) {
-		def = MMcar(def_list);
-		if (endp(def) || endp(MMcdr(def)) ||
-		    type_of(MMcar(def)) != t_symbol)
-			FEerror("~S~%\
-is an illegal function definition in LABELS.",
-				1, def);
+	  object x;
+	  def = MMcar(def_list);
+	  x=MMcar(def);
+	  if (type_of(x)!=t_symbol) {
+	    x=ifuncall1(sSfunid_to_sym,x);
+	    def=MMcons(x,MMcdr(def));
+	  }
+
+	  if (endp(def) || endp(MMcdr(def)) ||
+	      type_of(MMcar(def)) != t_symbol)
+	    FEerror("~S~%\
+is an illegal function definition in LABELS.",1, def);
 		top[0] = MMcons(lex[2], def);
 		top[0] = MMcons(Cnil, top[0]);
 		top[1] = MMcons(top[0], top[1]);
@@ -283,7 +297,7 @@ is an illegal function definition in LABELS.",
 		MMcaar(closure_list) = lex_env[1];
 		closure_list = MMcdr(closure_list);
 	}
-	vs_push(find_special(MMcdr(args), NULL, NULL));
+	vs_push(find_special(MMcdr(args), NULL, NULL,NULL));
 	Fprogn(vs_head);
 	lex_env = lex;
 }
@@ -303,7 +317,13 @@ FFN(Fmacrolet)(object args)
 	def_list = MMcar(args);
 	lex_copy();
 	while (!endp(def_list)) {
-		def = MMcar(def_list);
+	  object x;
+	  def = MMcar(def_list);
+	  x=MMcar(def);
+	  if (type_of(x)!=t_symbol) {
+	    x=ifuncall1(sSfunid_to_sym,x);
+	    def=MMcons(x,MMcdr(def));
+	  }
 		if (endp(def) || endp(MMcdr(def)) ||
 		    type_of(MMcar(def)) != t_symbol)
 			FEerror("~S~%\
@@ -316,7 +336,7 @@ is an illegal macro definition in MACROFLET.",
 		lex_macro_bind(MMcar(def), MMcaddr(top[0]));
 		def_list = MMcdr(def_list);
 	}
-	vs_push(find_special(MMcdr(args), NULL, NULL));
+	vs_push(find_special(MMcdr(args), NULL, NULL,NULL));
 	Fprogn(vs_head);
 	lex_env = lex;
 }

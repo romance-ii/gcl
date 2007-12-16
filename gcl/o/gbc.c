@@ -1495,8 +1495,8 @@ FFN(siLheap_report)(void) {
   vs_push(make_fixnum(IM_FIX_BASE));
   vs_push(make_fixnum(IM_FIX_LIM));
 #else  
-  vs_push(Cnil);
-  vs_push(Cnil);
+  vs_push(make_fixnum(0));
+  vs_push(make_fixnum(0));
 #endif
 
 }  

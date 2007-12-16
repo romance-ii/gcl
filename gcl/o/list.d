@@ -27,12 +27,14 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "include.h"
 #include "num_include.h"
-
-#define TARG1(a,b) (reverse_comparison!=Cnil ? (b) : (a))
-#define TARG2(a,b) (reverse_comparison!=Cnil ? (a) : (b))
+#include "boot.h"
 
 object sKinitial_element;
 
+#ifndef LISP_BOOT
+
+#define TARG1(a,b) (reverse_comparison!=Cnil ? (b) : (a))
+#define TARG2(a,b) (reverse_comparison!=Cnil ? (a) : (b))
 #define	TEST(x)		(*tf)(x)
 
 #define	saveTEST  \
@@ -155,7 +157,7 @@ LFD(f_if_not)()  \
 	vs_push(sLfuncall);  \
 	f();  \
 }
-
+#endif
 /* static bool
 endp1(x)
 object x;
@@ -353,31 +355,6 @@ object listA(fixnum n, ...)
 	return(vs_pop);
 }
 
-static bool
-tree_equal(x, y)
-object x, y;
-{
-	cs_check(x);
-
-BEGIN:
-	if (consp(x))
-		if (consp(y))
-			if (tree_equal(x->c.c_car, y->c.c_car)) {
-				x = x->c.c_cdr;
-				y = y->c.c_cdr;
-				goto BEGIN;
-			} else
-				return(FALSE);
-		else
-			return(FALSE);
-	else {
-		item_compared = x;
-		if (TEST(y))
-			return(TRUE);
-		else
-			return(FALSE);
-	}
-}
 
 object
 append(x, y)
@@ -422,6 +399,7 @@ object x;
 	return(vs_pop);
 }
 
+#ifndef LISP_BOOT
 /*
 	Copy_alist(x) copies alist x.
 */
@@ -557,6 +535,32 @@ object alist, *treep;
 		nsublis(alist, &(*treep)->c.c_cdr);
 	}
 }
+#endif
+
+
+DEFUN_NEW("CONS-CAR",object,fScons_car,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") { 
+  if (!listp(x))
+    TYPE_ERROR(x,sLlist);
+  RETURN1(x->c.c_car);
+}
+
+DEFUN_NEW("CONS-CDR",object,fScons_cdr,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") { 
+  if (!listp(x))
+    TYPE_ERROR(x,sLlist);
+  RETURN1(x->c.c_cdr);
+}
+
+
+DEFUN_NEW("CONS",object,fLcons,LISP,2,2,NONE,OO,OO,OO,OO,(object a,object d),"") {
+
+  object x=alloc_object(t_cons);
+  x->c.c_car=a;
+  x->c.c_cdr=d;
+  RETURN1(x);
+
+}
+
+#ifndef LISP_BOOT
 
 LFD(Lcar)()
 {
@@ -636,57 +640,103 @@ LFD(Lcddadr)(){check_arg(1); vs_base[0] = cdr(cdr(car(cdr(vs_base[0]))));}
 LFD(Lcdddar)(){check_arg(1); vs_base[0] = cdr(cdr(cdr(car(vs_base[0]))));}
 LFD(Lcddddr)(){check_arg(1); vs_base[0] = cdr(cdr(cdr(cdr(vs_base[0]))));}
 
-/* DEFUNO_NEW("NTH",object,fLnth,LISP,2,2,NONE,OI,OO,OO,OO,void,Lnth,(fixnum index,object list),"") */
-/* { object x = list; */
-/*   if (index < 0) */
-/*     FEerror("Negative index: ~D.", 1, make_fixnum(index)); */
-/*   while (1) */
-/*     {if (consp(x)) */
-/*        { if (index == 0) */
-/* 	   RETURN1(Mcar(x)); */
-/* 	 else {x = Mcdr(x); index--;}} */
-/*       else if (x == sLnil) RETURN1(sLnil); */
-/*       else FEwrong_type_argument(sLlist, list);} */
-/* }    */
-/* #ifdef STATIC_FUNCTION_POINTERS */
-/* object */
-/* fLnth(fixnum index,object list) { */
-/* 	return FFN(fLnth)(index,list); */
-/* } */
-/* #endif */
+DEFUN_NEW("SET-DIFFERENCE",object,fLset_difference,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") { 
+  object z=Cnil,yy;
+  for (;!endp(x);x=x->c.c_cdr) {
+    for (yy=y;!endp(yy) && !eql(x->c.c_car,yy->c.c_car);yy=yy->c.c_cdr);
+    if (yy==Cnil)
+      z=MMcons(x->c.c_car,z);
+  }
+  RETURN1(z);
 
-/* DEFUN_NEW("FIRST",object,fLfirst,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")  */
-/* { RETURN1(car(x)) ;} */
+}
 
-/* DEFUN_NEW("SECOND",object,fLsecond,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") */
-/* { return fLnth(1,x);} */
-/* DEFUN_NEW("THIRD",object,fLthird,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") */
-/* { return fLnth(2,x);} */
-/* DEFUN_NEW("FOURTH",object,fLfourth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") */
-/* { return fLnth(3,x);} */
-/* DEFUN_NEW("FIFTH",object,fLfifth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") */
-/* { return fLnth(4,x);} */
-/* DEFUN_NEW("SIXTH",object,fLsixth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") */
-/* { return fLnth(5,x);} */
-/* DEFUN_NEW("SEVENTH",object,fLseventh,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") */
-/* { return fLnth(6,x);} */
-/* DEFUN_NEW("EIGHTH",object,fLeighth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") */
-/* { return fLnth(7,x);} */
-/* DEFUN_NEW("NINTH",object,fLninth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") */
-/* { return fLnth(8,x);} */
-/* DEFUN_NEW("TENTH",object,fLtenth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"") */
-/* { return fLnth(9,x);} */
+DEFUN_NEW("UNION",object,fLunion,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"") { 
+  object z=y,yy;
+  for (;!endp(x);x=x->c.c_cdr) {
+    for (yy=z;!endp(yy) && !eql(x->c.c_car,yy->c.c_car);yy=yy->c.c_cdr);
+    if (yy==Cnil)
+      z=MMcons(x->c.c_car,z);
+  }
+  RETURN1(z);
 
-LFD(Lcons)()
+}
+
+
+DEFUN_NEW("NTH",object,fLnth,LISP,2,2,NONE,OO,OO,OO,OO,(object i,object lst),"") { 
+  object x = lst;
+  fixnum index=fixint(i);
+  if (index < 0)
+    FEerror("Negative index: ~D.", 1, make_fixnum(index));
+  while (1)
+    {if (consp(x))
+       { if (index == 0)
+	   RETURN1(Mcar(x));
+	 else {x = Mcdr(x); index--;}}
+      else if (x == sLnil) RETURN1(sLnil);
+      else FEwrong_type_argument(sLlist, lst);}
+}
+
+DEFUN_NEW("NTHCDR",object,fLnthcdr,LISP,2,2,NONE,OO,OO,OO,OO,(object i,object lst),"") { 
+  object x = lst;
+  fixnum index=fixint(i);
+  if (index < 0)
+    FEerror("Negative index: ~D.", 1, make_fixnum(index));
+  while (1)
+    {if (consp(x))
+       { if (index == 0)
+	   RETURN1(x);
+	 else {x = Mcdr(x); index--;}}
+      else if (x == sLnil) RETURN1(sLnil);
+      else FEwrong_type_argument(sLlist, lst);}
+}
+
+DEFUN_NEW("FIRST",object,fLfirst,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+{ RETURN1(car(x)) ;}
+
+DEFUN_NEW("SECOND",object,fLsecond,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+{ return fLnth(make_fixnum(1),x);}
+DEFUN_NEW("THIRD",object,fLthird,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+{ return fLnth(make_fixnum(2),x);}
+DEFUN_NEW("FOURTH",object,fLfourth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+{ return fLnth(make_fixnum(3),x);}
+DEFUN_NEW("FIFTH",object,fLfifth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+{ return fLnth(make_fixnum(4),x);}
+DEFUN_NEW("SIXTH",object,fLsixth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+{ return fLnth(make_fixnum(5),x);}
+DEFUN_NEW("SEVENTH",object,fLseventh,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+{ return fLnth(make_fixnum(6),x);}
+DEFUN_NEW("EIGHTH",object,fLeighth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+{ return fLnth(make_fixnum(7),x);}
+DEFUN_NEW("NINTH",object,fLninth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+{ return fLnth(make_fixnum(8),x);}
+DEFUN_NEW("TENTH",object,fLtenth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
+{ return fLnth(make_fixnum(9),x);}
+
+static bool
+tree_equal(x, y)
+object x, y;
 {
-	object x;
+	cs_check(x);
 
-	check_arg(2);
-	x = alloc_object(t_cons);
-	x->c.c_car = vs_base[0];
-	x->c.c_cdr = vs_base[1];
-	vs_base[0] = x;
-	vs_popp;
+BEGIN:
+	if (consp(x))
+		if (consp(y))
+			if (tree_equal(x->c.c_car, y->c.c_car)) {
+				x = x->c.c_cdr;
+				y = y->c.c_cdr;
+				goto BEGIN;
+			} else
+				return(FALSE);
+		else
+			return(FALSE);
+	else {
+		item_compared = x;
+		if (TEST(y))
+			return(TRUE);
+		else
+			return(FALSE);
+	}
 }
 
 @(defun tree_equal (x y &key test test_not)
@@ -742,45 +792,6 @@ LFD(Llist_length)()
 }
 
 
-/* object */
-/* nth(fixnum n, object x) { */
-
-/* 	if (n < 0) { */
-/* 		vs_push(make_fixnum(n)); */
-/* 		FEerror("Negative index: ~D.", 1, vs_head); */
-/* 	} */
-/* 	while (n-- > 0) */
-/* 		if (endp(x)) { */
-/* 			return(Cnil); */
-/* 		} else */
-/* 			x = x->c.c_cdr; */
-/* 	if (endp(x)) */
-/* 		return(Cnil); */
-/* 	else */
-/* 		return(x->c.c_car); */
-/* } */
-
-/* LFD(Lnthcdr)() */
-/* { */
-/* 	check_arg(2); */
-/* 	vs_base[0] = nthcdr(fixint(vs_base[0]), vs_base[1]); */
-/* 	vs_popp; */
-/* } */
-
-/* object */
-/* nthcdr(fixnum n, object x) { */
-
-/* 	if (n < 0) { */
-/* 		vs_push(make_fixnum(n)); */
-/* 		FEwrong_type_argument(sLnon_negative_fixnum, vs_head); */
-/* 	} */
-/* 	while (n-- > 0) */
-/* 		if (endp(x)) { */
-/* 			return(Cnil); */
-/* 		} else */
-/* 			x = x->c.c_cdr; */
-/* 	return(x); */
-/* } */
 
 LFD(Llast)() {
 	object t;
@@ -816,6 +827,8 @@ LFD(Llast)() {
 	}
 
 }
+
+#endif
 
 LFD(Llist)()
 {
@@ -870,6 +883,8 @@ fixnum n;
   while (n-- > 0)
     x = make_cons(Cnil, x);
  return x;}
+
+#ifndef LISP_BOOT
 
 @(defun make_list (size &key initial_element &aux x)
 	fixnum i=0;
@@ -1042,6 +1057,8 @@ LFD(Lldiff)() {
 	vs_popp;
 }
 
+#endif
+
 DEFUN_NEW("RPLACA",object,fLrplaca,LISP,2,2,NONE,OO,OO,OO,OO,(object o,object c),"") {
 
   check_type_cons(&o);
@@ -1057,6 +1074,8 @@ DEFUN_NEW("RPLACD",object,fLrplacd,LISP,2,2,NONE,OO,OO,OO,OO,(object o,object d)
   RETURN1(o);
 
 }
+
+#ifndef LISP_BOOT
 
 @(defun subst (new old tree &key test test_not key)
 	saveTEST;
@@ -1084,37 +1103,34 @@ PREDICATE(Lsubst,Lsubst_if,Lsubst_if_not, 3)
 
 PREDICATE(Lnsubst,Lnsubst_if,Lnsubst_if_not, 3)
 
-object
-sublis1(alist,tree,tst)
-     object alist,tree;
-     bool (*tst)();
-{object v;
- for (v=alist ; v!=Cnil; v=v->c.c_cdr)
-   { if (v->c.c_car->c.c_car == tree || (*tst)(v->c.c_car->c.c_car ,tree))
-       return(v->c.c_car->c.c_cdr);}
- if (consp(tree))
-   {object ntree=make_cons(sublis1(alist,tree->c.c_car,tst),
-			   tree->c.c_cdr);
-    ntree->c.c_cdr=sublis1(alist,ntree->c.c_cdr,tst);
-    return ntree;
-  }
-  return tree;
-}
+#endif
 
-/* static int
-eq(x,y)
-object x,y;
-{return (x==y);}*/
+/* object */
+/* sublis1(alist,tree,tst) */
+/*      object alist,tree; */
+/*      bool (*tst)(); */
+/* {object v; */
+/*  for (v=alist ; v!=Cnil; v=v->c.c_cdr) */
+/*    { if (v->c.c_car->c.c_car == tree || (*tst)(v->c.c_car->c.c_car ,tree)) */
+/*        return(v->c.c_car->c.c_cdr);} */
+/*  if (consp(tree)) */
+/*    {object ntree=make_cons(sublis1(alist,tree->c.c_car,tst), */
+/* 			   tree->c.c_cdr); */
+/*     ntree->c.c_cdr=sublis1(alist,ntree->c.c_cdr,tst); */
+/*     return ntree; */
+/*   } */
+/*   return tree; */
+/* } */
 
-void
-check_alist(alist)
-object alist;
-{
-    object v;
-    for (v=alist ; !endp(v) ; v=v->c.c_cdr)
-        if (!consp(v->c.c_car) && v->c.c_car != Cnil)
-	     FEwrong_type_argument(sLlist, v);
-}
+/* void */
+/* check_alist(alist) */
+/* object alist; */
+/* { */
+/*     object v; */
+/*     for (v=alist ; !endp(v) ; v=v->c.c_cdr) */
+/*         if (!consp(v->c.c_car) && v->c.c_car != Cnil) */
+/* 	     FEwrong_type_argument(sLlist, v); */
+/* } */
  
 void
 check_proper_list(alist)
@@ -1129,7 +1145,14 @@ object alist;
     if (v != Cnil)
       TYPE_ERROR(alist,siLproper_list);
 }
- 
+
+
+DEFUN_NEW("PROPER-LISTP",object,fSproper_listp,SI,1,1,NONE,OO,OO,OO,OO,(object x),"") { 
+  check_proper_list(x);
+  RETURN1(Ct);
+}
+
+#ifndef LISP_BOOT
 
 @(defun sublis (alist tree &key test test_not key)
 
@@ -1294,6 +1317,8 @@ LFD(Lassoc_if_not)() { car_or_cdr = car; true_or_false = FALSE; FFN(Lassoc_or_ra
 LFD(Lrassoc_if)() { car_or_cdr = cdr; true_or_false = TRUE; FFN(Lassoc_or_rassoc_predicate)(); }
 LFD(Lrassoc_if_not)() { car_or_cdr = cdr; true_or_false = FALSE; FFN(Lassoc_or_rassoc_predicate)(); }
 
+#endif
+
 bool
 member_eq(x, l)
 object x, l;
@@ -1304,27 +1329,6 @@ object x, l;
 			return(TRUE);
 	return(FALSE);
 }
-
-/* static void */
-/* FFN(siLmemq)() */
-/* { */
-/* 	object x, l; */
-
-/* 	check_arg(2); */
-
-/* 	x = vs_base[0]; */
-/* 	l = vs_base[1]; */
-
-/* 	for (;  consp(l);  l = l->c.c_cdr) */
-/* 		if (x == l->c.c_car) { */
-/* 			vs_base[0] = l; */
-/* 			vs_popp; */
-/* 			return; */
-/* 		} */
-	
-/* 	vs_base[0] = Cnil; */
-/* 	vs_popp; */
-/* } */
 
 void
 delete_eq(x, lp)
@@ -1348,12 +1352,9 @@ gcl_init_list_function()
 
 	sKinitial_element = make_keyword("INITIAL-ELEMENT");
 
+#ifndef LISP_BOOT
 	make_function("CAR", Lcar);
 	make_function("CDR", Lcdr);
-
-	make_si_function("CONS-CAR", Lcar);
-	make_si_function("CONS-CDR", Lcdr);
-
 	make_function("CAAR", Lcaar);
 	make_function("CADR", Lcadr);
 	make_function("CDAR", Lcdar);
@@ -1382,18 +1383,11 @@ gcl_init_list_function()
 	make_function("CDDADR", Lcddadr);
 	make_function("CDDDAR", Lcdddar);
 	make_function("CDDDDR", Lcddddr);
-
-	make_function("CONS", Lcons);
+	make_function("REST",   Lcdr);
 	make_function("TREE-EQUAL", Ltree_equal);
 	make_function("ENDP", Lendp);
 	make_function("LIST-LENGTH", Llist_length);
-
-
-	make_function("REST", Lcdr);
-/* 	make_function("NTHCDR", Lnthcdr); */
 	make_function("LAST", Llast);
-	make_function("LIST", Llist);
-	make_function("LIST*", LlistA);
 	make_function("MAKE-LIST", Lmake_list);
 	make_function("APPEND", Lappend);
 	make_function("COPY-LIST", Lcopy_list);
@@ -1402,12 +1396,9 @@ gcl_init_list_function()
 	make_function("REVAPPEND", Lrevappend);
 	make_function("NCONC", Lnconc);
 	make_function("NRECONC", Lreconc);
-
 	make_function("BUTLAST", Lbutlast);
 	make_function("NBUTLAST", Lnbutlast);
 	make_function("LDIFF", Lldiff);
-/* 	make_function("RPLACA", Lrplaca); */
-/* 	make_function("RPLACD", Lrplacd); */
 	make_function("SUBST", Lsubst);
 	make_function("SUBST-IF", Lsubst_if);
 	make_function("SUBST-IF-NOT", Lsubst_if_not);
@@ -1422,7 +1413,6 @@ gcl_init_list_function()
 	make_si_function("MEMBER1", Lmember1);
 	make_function("TAILP", Ltailp);
 	make_function("ADJOIN", Ladjoin);
-
 	make_function("ACONS", Lacons);
 	make_function("PAIRLIS", Lpairlis);
 	make_function("ASSOC", Lassoc);
@@ -1431,7 +1421,9 @@ gcl_init_list_function()
 	make_function("RASSOC", Lrassoc);
 	make_function("RASSOC-IF", Lrassoc_if);
 	make_function("RASSOC-IF-NOT", Lrassoc_if_not);
+#endif
 
-/* 	make_si_function("MEMQ", siLmemq); */
+	make_function("LIST", Llist);
+	make_function("LIST*", LlistA);
 
 }

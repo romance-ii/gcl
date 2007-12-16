@@ -112,11 +112,14 @@
 		  type))))
 
 (DEFUN MAKE-CONDITION (TYPE &REST SLOT-INITIALIZATIONS)
-  (unless (condition-class-p TYPE)
-    (ERROR 'SIMPLE-TYPE-ERROR
-	   :DATUM TYPE
-	   :EXPECTED-TYPE '(SATISFIES condition-class-p)
-	   :FORMAT-CONTROL "Not a condition type: ~S"
-	   :FORMAT-ARGUMENTS (LIST TYPE)))
-  (apply 'make-instance TYPE SLOT-INITIALIZATIONS))
+  (let ((tp (car (si::resolve-type type))))
+    (when (and (consp tp) (eq (car tp) 'or))
+      (return-from make-condition (apply 'make-condition (cadr tp) slot-initializations)))
+    (unless (condition-class-p tp)
+      (ERROR 'SIMPLE-TYPE-ERROR
+	     :DATUM TYPE
+	     :EXPECTED-TYPE '(SATISFIES condition-class-p)
+	     :FORMAT-CONTROL "Not a condition type: ~S"
+	     :FORMAT-ARGUMENTS (LIST TYPE)))
+    (apply 'make-instance tp SLOT-INITIALIZATIONS)))
 

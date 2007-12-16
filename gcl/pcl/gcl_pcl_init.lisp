@@ -248,6 +248,7 @@
   (unless (getf initargs :allow-other-keys)
     ;; Now check the supplied-initarg-names and the default initargs
     ;; against the total set that we know are legal.
+    (push :allow-other-keys legal)
     (doplist (key val) initargs
        (unless (memq key legal)
 	 (if error-p

@@ -187,12 +187,14 @@
     (base-used)))
   (unwind-exit 'fun-val nil (cons 'values (length forms))))
 
-(defun multiple-value-setq-expander (args)
-  (let ((syms (mapcar (lambda (x) (declare (ignore x)) (gensym)) (car args))))
-    `(multiple-value-bind ,syms ,(cadr args) (setq ,@(mapcan 'list (car args) syms)))))
+;; (defun multiple-value-setq-expander (args)
+;;   (let ((syms (mapcar (lambda (x) (declare (ignore x)) (gensym)) (car args))))
+;;     (if syms
+;; 	`(multiple-value-bind ,syms ,(cadr args) (setq ,@(nreverse (mapcan 'list syms (car args)))))
+;;       `(values ,(cadr args)))))
 
 (defun c1multiple-value-setq (args)
-  (c1expr (multiple-value-setq-expander args)))
+  (c1expr (apply 'multiple-value-setq-expander args)))
 
 ;; (defun c1multiple-value-setq (args &aux (info (make-info)) (vrefs nil))
 ;;   (when (or (endp args) (endp (cdr args)))
@@ -371,12 +373,14 @@
 
   (multiple-value-setq (body ss ts is other-decls) (c1body (cddr args) nil))
 
-  (c1add-globals ss)
+;  (c1add-globals ss)
 
   (dolist** (s (car args))
     (let ((v (c1make-var s ss is ts)))
       (push s vnames)
       (push v vars)))
+
+  (c1add-globals (set-difference ss vnames))
 
   (setq init-form (c1expr* (cadr args) info))
 

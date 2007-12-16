@@ -82,7 +82,7 @@
 
   (multiple-value-setq (body ss ts is other-decls) (c1body (cdr args) nil))
 
-  (c1add-globals ss)
+;  (c1add-globals ss)
 
   (dolist** (x (car args))
     (cond ((symbolp x)
@@ -108,6 +108,8 @@
 
 	       (set-var-init-type (car vars) (info-type (second (car forms))))
 	       (maybe-reverse-type-prop (var-type v) (car forms))))))
+
+  (c1add-globals (set-difference ss vnames))
 
   (dolist* (v (reverse vars)) (push v *vars*))
 
@@ -209,7 +211,7 @@
   (when (endp args) (too-few-args 'let* 1 0))
 
   (multiple-value-setq (body ss ts is other-decls) (c1body (cdr args) nil))
-  (c1add-globals ss)
+;  (c1add-globals ss)
 
   (let ((*vars* *vars*));FIXME c1let too
     (dolist** (x (car args))
@@ -240,6 +242,7 @@
 			 (set-var-init-type (car vars) (info-type (second  (car forms))))
 			 (maybe-reverse-type-prop (var-type v) (car forms))
 			 (push v *vars*)))))
+    (c1add-globals (set-difference ss vnames))
 ;    (when *inline-forms* (print args)(break))
     (check-vdecl vnames ts is)
     (setq body (c1decl-body other-decls body)))

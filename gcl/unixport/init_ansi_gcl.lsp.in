@@ -31,6 +31,7 @@
  ;; must be printed (see License).
 (progn 
 
+ (setq si:*inhibit-macro-special* t)
  (system:init-system) 
  (gbc t)
 

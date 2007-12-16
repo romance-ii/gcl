@@ -729,8 +729,10 @@ initlisp(void) {
 	NewInit();
 
         if ( NULL_OR_ON_C_STACK(&j) == 0
+#if defined(IM_FIX_BASE)
              || NULL_OR_ON_C_STACK(IM_FIX_BASE) == 0
              || NULL_OR_ON_C_STACK((IM_FIX_BASE|IM_FIX_LIM)) == 0
+#endif
              || NULL_OR_ON_C_STACK(Cnil) != 0
              || (((unsigned long )core_end) !=0
                   && NULL_OR_ON_C_STACK(core_end) != 0))

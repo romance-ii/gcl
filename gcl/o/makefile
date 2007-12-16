@@ -41,7 +41,7 @@ CPP=
 %.ini: %.d $(DPP) grab_defs
 	[ -e $(DECL) ] || touch $(DECL)
 	$(DPP) $*
-	./grab_defs < $*.c > $*.ini
+	$(CC) -DNO_DEFUN $(CFLAGS) $(DEFS) -E $*.c | sed -e 's:\"[ ]*):\"):g' | ./grab_defs > $*.ini
 	rm $*.c
 
 X11_INCLUDE=${TK_XINCLUDES} ${HAVE_X11}
@@ -100,6 +100,10 @@ go:
 $(DPP):	../bin/dpp.c
 	${CC} ${DEFS} -o $@ $<
 
+boot.h:
+	touch $@
+
+list.c: boot.h
 
 new-init: 
 	$(MAKE) new_init.c decls1

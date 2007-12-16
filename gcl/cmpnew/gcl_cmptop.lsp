@@ -105,7 +105,7 @@
 
 ;;; *global-entries* holds (... ( fname cfun return-types arg-type ) ...).
 
-(defvar *setf-function-proxy-symbols* nil)
+;(defvar *setf-function-proxy-symbols* nil)
 
 ;; alist of proxy sybmols to name functions defun'ed as (setf foo)
 
@@ -448,10 +448,8 @@
           (otherwise (cmperr "The EVAL-WHEN situation ~s is illegal."
                              situation))))
   (let ((*eval-when-defaults* (car args)))
-    (when load-flag
-	   (t1progn (cdr args)))
-    (when compile-flag (cmp-eval (cons 'progn (cdr args))))))
-
+    (cond (load-flag (t1progn (cdr args)))
+	  (compile-flag (cmp-eval (cons 'progn (cdr args)))))))
 
 (defvar *compile-ordinaries* nil)
 
@@ -484,50 +482,52 @@
 	(t (setf lam (append lam (cons '&aux bind)))))
   (list* (car args) lam (cddr args)))
 
-(defmacro setf-function-proxy-symbol (sym)
-  `(cdr (assoc ,sym *setf-function-proxy-symbols*)))
+;; (defmacro setf-function-proxy-symbol (sym)
+;;   `(cdr (assoc ,sym *setf-function-proxy-symbols*)))
 
-(defmacro setf-function-base-symbol (sym)
-  `(car (rassoc ,sym *setf-function-proxy-symbols*)))
+;; (defmacro setf-function-base-symbol (sym)
+;;   `(car (rassoc ,sym *setf-function-proxy-symbols*)))
 
-(defun make-setf-function-proxy-symbol (sym)
-  (unless (symbolp sym)
-    (error "~S not a symbol" sym))
-  (or
-   (setf-function-proxy-symbol sym)
-   (let ((new (gensym (concatenate 'string (symbol-name sym) "-SETF")))
-	 (prop (get sym 'setf-proclamations))
-	 (cmpm (get sym 'si::compiler-macro-prop-setf)))
-     (let ((p (or (symbol-package sym)
-		  *tmp-pack*
-		  (setq *tmp-pack* (make-package (symbol-name (gensym)))))))
-       (or (find-symbol (string new) p) (import new p)))
-     (push (cons sym new) *setf-function-proxy-symbols*)
-     (when prop
-       (dolist (l '(proclaimed-arg-types proclaimed-return-type proclaimed-function))
-	 (let ((prop (assoc l prop)))
-	   (when prop
-	     (si::putprop new (cdr prop) l)))))
-     (when cmpm
-       (si::putprop new cmpm 'si::compiler-macro-prop))
-     new)))
+;; (defun make-setf-function-proxy-symbol (sym)
+;;   (unless (symbolp sym)
+;;     (error "~S not a symbol" sym))
+;;   (or
+;;    (setf-function-proxy-symbol sym)
+;;    (let ((new (gensym (concatenate 'string (symbol-name sym) "-SETF")))
+;; 	 (prop (get sym 'setf-proclamations))
+;; 	 (cmpm (get sym 'si::compiler-macro-prop-setf)))
+;;      (let ((p (or (symbol-package sym)
+;; 		  *tmp-pack*
+;; 		  (setq *tmp-pack* (make-package (symbol-name (gensym)))))))
+;;        (or (find-symbol (string new) p) (import new p)))
+;;      (push (cons sym new) *setf-function-proxy-symbols*)
+;;      (when prop
+;;        (dolist (l '(proclaimed-arg-types proclaimed-return-type proclaimed-function))
+;; 	 (let ((prop (assoc l prop)))
+;; 	   (when prop
+;; 	     (si::putprop new (cdr prop) l)))))
+;;      (when cmpm
+;;        (si::putprop new cmpm 'si::compiler-macro-prop))
+;;      new)))
 
 (defun function-symbol (name)
-  (cond
-   ((symbolp name)
-    name)
-   ((is-setf-function name)
-    (make-setf-function-proxy-symbol (cadr name)))
-   (t
-    nil)))
+  (si::funid-sym name))
+;;   (cond
+;;    ((symbolp name)
+;;     name)
+;;    ((is-setf-function name)
+;;     (make-setf-function-proxy-symbol (cadr name)))
+;;    (t
+;;     nil)))
 
 (defun function-string (name)
   (unless (symbolp name)
     (error "function names must be symbols~%"))
-  (let ((sname (setf-function-base-symbol name)))
-    (if sname
-	(si::string-concatenate "(SETF " (symbol-name sname) ")")
-      (symbol-name name))))
+  (si::string-concatenate (let ((p (symbol-package name))) (if p (package-name p) "")) "::" (symbol-name name)))
+;;   (let ((sname (setf-function-base-symbol name)))
+;;     (if sname
+;; 	(si::string-concatenate "(SETF " (symbol-name sname) ")")
+;;       (symbol-name name))))
 
 (defvar *compiler-auto-proclaim* t)
 (defvar *mlts* nil)
@@ -577,7 +577,7 @@
 		      (when (eq (car form) 'macrolet)
 			(dolist (l (cadr form)) (push (car l) *mlts*)))
 		      (ndbctxt (portable-source (cddr form) t)))))
-	       (multiple-value-setq (portable-source (multiple-value-setq-expander (cdr form))))
+	       (multiple-value-setq (portable-source (apply 'multiple-value-setq-expander (cdr form))))
 	       (multiple-value-bind `(,(car form) ,(cadr form) ,(portable-source (caddr form))
 				      ,@(let ((r (remove-if (lambda (x) (or (not (si::specialp x)) 
 									    (is-declared-special x (cdddr form)))) (cadr form))))
@@ -591,7 +591,7 @@
 		(nf (if fd (cmp-expand-macro fd (car form) (cdr form)) form)))
 	   (portable-source nf (equal form nf))))))
 
-(defvar *no-proxy-symbols* nil)
+;(defvar *no-proxy-symbols* nil)
 
 (defun this-safety-level nil
   (cond (*compiler-push-events* 4)
@@ -601,7 +601,7 @@
 	(0)))
   
 (defun pd (fname ll args)
-  (let (decls ctps doc (*no-proxy-symbols* t))
+  (let (decls ctps doc)
     (do nil ((or (not args) (if (stringp (car args)) (or (endp (cdr args)) doc)
 			      (or (not (consp (car args))) (not (eq (caar args) 'declare))))))
 	(let ((x (pop args))) (if (stringp x) (unless doc (push x doc)) (push x decls))))
@@ -738,55 +738,44 @@
 
      ;;provide a simple way for the user to declare functions to
      ;;have fixed args without having to count them, and make mistakes.
-     (cond ((get fname 'fixed-args);the number of regular args in definition
-	    (let ((n  (length (car (lambda-list lambda-expr)))))
-	      (setf (get fname 'fixed-args)  n);;for error checking.
-	      (proclaim (list 'function fname
-			      (make-list n :initial-element t) t)))))
+     (when (get fname 'fixed-args);the number of regular args in definition
+       (let ((n  (length (car (lambda-list lambda-expr)))))
+	 (setf (get fname 'fixed-args)  n);;for error checking.
+	 (proclaim (list 'function fname (make-list n :initial-element t) t))))
      
-     (cond
-      ((and
-;	(get fname 'proclaimed-function)
-	;; check the args:
-	(let ((lambda-list (lambda-list lambda-expr)) bind)
-	  (and (null (cadr lambda-list))	;;; no optional
-	       (null (caddr lambda-list))	;;; no rest
-	       (null (cadddr lambda-list))	;;; no keyword
-	       (< (length (car lambda-list)) call-arguments-limit)
+     (when
+	 (let ((lambda-list (lambda-list lambda-expr)) bind)
+	   (and (null (cadr lambda-list))	;;; no optional
+		(null (caddr lambda-list))	;;; no rest
+		(null (cadddr lambda-list))	;;; no keyword
+		(< (length (car lambda-list)) call-arguments-limit)
 						;;; less than 10 requireds
 		   ;;; For all required parameters...
-	       (do ((vars (car lambda-list) (cdr vars))
-		    (types (get-arg-types fname) (cdr types))
-		    (problem))
-		   ((endp vars)
-		    (and (endp types)
-			 (cond (bind (setq args (cmpfix-args args bind))
-				     (go top))
-			       (t (not problem)))))
-		   (let ((var (car vars)))
-		     (cond  ((equal (car types) '*)(return nil)))
-		     (unless
-			 (and
-			  (or (and (or (eq (var-kind var) 'LEXICAL)
-				       (and (eq (var-kind var)
-						'special)
-					    (eq (car types) t)))
-				   (not (var-cb var)))
-			      (progn (push (list 
-					    (var-name var) (gensym))
-					   bind)
-				     t))
-			  (type-and (car types) (var-type var))
-			  (or (member (car types) +c-local-var-types+)
-			      (eq (var-loc var) 'object)
-			      *c-gc* 
-			      (not (is-changed var (cadr lambda-expr)))))
-		       (unless bind
-			 (cmpwarn "Calls to ~a will be VERY SLOW. Recommend not to proclaim.  ~%;;The arg caused the problem. ~a"
-				  fname  (var-name var)))
-		       
-		       (setq problem t))))
-	       (numberp cfun))))
+		(do ((vars (car lambda-list) (cdr vars))
+		     (types (get-arg-types fname) (cdr types))
+		     (problem))
+		    ((endp vars)
+		     (and (endp types)
+			  (cond (bind (setq args (cmpfix-args args bind)) (go top))
+				((not problem)))))
+		    (let ((var (car vars)))
+		      (cond  ((equal (car types) '*)(return nil)))
+		      (unless
+			  (and
+			   (or (and (or (eq (var-kind var) 'LEXICAL)
+					(and (eq (var-kind var) 'special) (eq (car types) t)))
+				    (not (var-cb var)))
+			       (push (list (var-name var) (var-name var)) bind))
+			   (type-and (car types) (var-type var))
+			   (or (member (car types) +c-local-var-types+)
+			       (eq (var-loc var) 'object)
+			       *c-gc* 
+			       (not (is-changed var (cadr lambda-expr)))))
+			(unless bind
+			  (cmpwarn "Calls to ~a will be VERY SLOW. Recommend not to proclaim.  ~%;;The arg caused the problem. ~a"
+				   fname  (var-name var)))
+			(setq problem t))))
+		(numberp cfun)))
        ;;whew: it is acceptable.
        (push (let* ((at (get-arg-types fname))
 		    (vr (member '* at))
@@ -817,7 +806,7 @@
 			 (si::close-fasd ss)
 			 (get-output-stream-string w))
 	     (cadddr e) (unless *compiler-compile* 
-			  (namestring (pathname *compiler-input*))))))))
+			  (namestring (pathname *compiler-input*)))))))
   
 (defun make-inline-string (cfun args fname)
   (if (null args)
@@ -1004,9 +993,9 @@
 ;; 			       ,(si::call-src h) ,(si::call-file h)))
 ;;      ))
 
-  (let ((base-name (setf-function-base-symbol fname)))
-    (when base-name
-      (add-init `(si::putprop ',base-name ',fname 'si::setf-function))))
+  ;; (let ((base-name (setf-function-base-symbol fname)))
+;;     (when base-name
+;;       (add-init `(si::putprop ',base-name ',fname 'si::setf-function))))
 
   (cond ((< *space* 2)
 	 (setf (get fname 'debug-prop) t)
@@ -1068,6 +1057,10 @@
 
 (defvar *mv-var* nil)
 
+(defun tail-recursion-info (fname mv-var ll)
+  (when *do-tail-recursion*
+    (cons fname (append (if mv-var (cdr (car ll)) (car ll)) (ll-optionals ll) (list (ll-rest ll)) (ll-keywords ll)))))
+
 (defun t3defun-local-entry (fname cfun lambda-expr sp inline-info
 				   &aux specials (requireds (caaddr lambda-expr)) mv-var)
   (do ((vl requireds (cdr vl))
@@ -1093,8 +1086,7 @@
     (wt-requireds  requireds (cadr inline-info)))
          ;;; Now the body.
   (let ((cm *reservation-cmacro*)
-	(*tail-recursion-info*
-	 (if *do-tail-recursion* (cons fname requireds) nil))
+	(*tail-recursion-info* (tail-recursion-info fname nil (lambda-list lambda-expr)))
 	(*unwind-exit* *unwind-exit*))
     (wt-nl1 "{	")
     (assign-down-vars (cadr lambda-expr) cfun
@@ -1180,19 +1172,7 @@
          ;;; Now the body.
   
   (let ((cm *reservation-cmacro*)
-	(*tail-recursion-info*
-	 ;; to do:  When can we do tail recursion?
-	 ;; Should be able to do the optionals case, where the
-	 ;; optional defaults are constants.    But this
-	 ;; is probably not worth it.
-	 (and
-	  *do-tail-recursion*
-	  (not (ll-rest ll))
-	  (dolist* (var (ll-requireds ll) t)
-		   (when (var-ref-ccb var) (return nil)))
-	  (not (member-if-not (lambda (x) (and (consp x) (consp (cadr x)) (eq (caadr x) 'location))) (ll-optionals ll)));fixme function defaults
-	  (null (ll-keywords ll))
-	  (cons fname (append (if mv-var (cdr (car ll)) (car ll)) (ll-optionals ll)))))
+	(*tail-recursion-info* (tail-recursion-info fname mv-var ll))
 	(*unwind-exit* *unwind-exit*))
     (wt-nl1 "{	")
     (when is-var-arg	  (wt-nl "va_list ap;"))
@@ -1418,13 +1398,12 @@
 		     (let ((*clink* *clink*)
 			   (*unwind-exit* *unwind-exit*)
 			   (*ccb-vs* *ccb-vs*))
-		       (c2bind-init (cadr kwd) (caddr kwd)))
-		     (unless (eq (var-kind (cadddr kwd)) 'DUMMY) (c2bind-loc (cadddr kwd) nil))
+		       (c2bind-init (cadr kwd) (caddr kwd))
+		       (unless (eq (var-kind (cadddr kwd)) 'DUMMY) (c2bind-loc (cadddr kwd) nil)))
 		     
 		     (wt-nl "}else{")
 		     (c2bind (cadr kwd))
-		     (unless (eq (var-kind (cadddr kwd)) 'DUMMY) (c2bind-loc (cadddr kwd)
-									     t))
+		     (unless (eq (var-kind (cadddr kwd)) 'DUMMY) (c2bind-loc (cadddr kwd) t))
 		     
 		     (wt "}")))
 	      
@@ -1607,7 +1586,7 @@
     (wt-comment "global entry for the function " (function-string fname))
     (wt-nl1 "static void " (c-function-name "L" cfun fname) "()")
     (wt-nl1 "{	register object *base=vs_base;")
-    (when (or *safe-compile* *compiler-check-args*)
+    (when (or *safe-compile* *compiler-check-args* t);FIXME
           (wt-nl "check_arg(" (length arg-types) ");"))
     (wt-nl "base[0]=" (let* ((tp (promoted-c-type return-type))
 			     (z (cdr (assoc tp +wt-c-var-alist+))))
@@ -1615,7 +1594,8 @@
 			  (concatenate 'string "CMP" z) (or z "")));FIXME t
            "(" (c-function-name "LI" cfun fname) "(")
     (unless (single-type-p return-type)
-      (wt "(fixnum)(base+1),"))
+      (wt "(fixnum)(base+1)")
+      (unless (endp arg-types) (wt ",")))
     (do ((types arg-types (cdr types))
          (n 0 (1+ n)))
         ((endp types))

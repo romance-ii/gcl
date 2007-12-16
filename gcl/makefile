@@ -56,6 +56,12 @@ binutils/intl/libintl.a:
 binutils/bfd/libbfd.a binutils/libiberty/libiberty.a: binutils/intl/libintl.a
 	cd $(@D) && $(MAKE)
 
+copy_iberty: $(LIBIBERTY)
+	cd binutils/libiberty && ar x $<
+
+copy_bfd: $(LIBBFD) copy_iberty
+	cd binutils/bfd && ar x $<
+
 h/bfd.h: binutils/bfd/libbfd.a binutils/libiberty/libiberty.a
 	cp $(<D)/$(@F) $@
 
@@ -66,12 +72,14 @@ $(PORTDIR)/saved_pre_gcl: $(HDIR)cmpinclude.h
 	(cd $(BINDIR); $(MAKE) all)
 	$(MAKE) mpfiles
 	rm -f o/cmpinclude.h ; cp h/cmpinclude.h o
-	(cd $(ODIR); $(MAKE) all)
+	(cd $(ODIR); rm -f boot.h; touch boot.h; $(MAKE) all)
 	$(MAKE) $<
 	rm -f o/cmpinclude.h ; cp h/cmpinclude.h o
 	(cd $(ODIR); $(MAKE) all)
 	cd $(@D) && $(MAKE) $(@F)
-	cd $(@D) && echo '(si::use-fast-links nil)(declaim (optimize (safety 3)))(time (load "boot.lisp"))' | ./$(@F) && $(MAKE) saved_gcl && mv saved_gcl $(@F)
+	cd $(@D) && echo '(time (let ((*features* (cons :pre-gcl *features*)))(load "boot.lisp")))' | ./$(@F)
+	cd $(ODIR) && rm -f boot.h && echo "#define LISP_BOOT" > boot.h && $(MAKE) all
+	cd $(@D) && $(MAKE) saved_gcl && mv saved_gcl $(@F)
 
 $(PORTDIR)/saved_gcl: $(PORTDIR)/saved_pre_gcl $(HDIR)cmpinclude.h 
 #	(cd $(LSPDIR); touch *.lsp ; $(MAKE) all)
@@ -307,6 +315,7 @@ gclclean:
 	cd xgcl-2 && $(MAKE) clean
 	(cd $(TESTDIR); $(MAKE) clean)
 	(cd info ; $(MAKE) clean)
+	find binutils -name "*.o" -exec rm {} \;
 	rm -f foo.tcl config.log makedefs makedefsafter config.cache config.status makedefc
 	rm -f h/config.h h/gclincl.h h/cmpinclude.h h/gmp.h
 	rm -f xbin/gcl foo foo.c bin/gclm.bat gmp_all

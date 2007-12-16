@@ -180,13 +180,18 @@ DEFUNO_NEW("FSET",object,fSfset,SI
 
 {
 	/* 2 args */
-        if (type_of(sym) != t_symbol) {
-	  if (setf_fn_form(sym)) {
-	    putprop(MMcadr(sym),function,sSsetf_function);
-	    return(function);
-	  } else
-	    not_a_symbol(sym);
-	}
+/*         if (type_of(sym) != t_symbol) { */
+/* 	  if (setf_fn_form(sym)) { */
+/* 	    putprop(MMcadr(sym),function,sSsetf_function); */
+/* 	    return(function); */
+/* 	  } else */
+/* 	    not_a_symbol(sym); */
+/* 	} */
+  if (type_of(sym)!=t_symbol)
+    sym=ifuncall1(sSfunid_to_sym,sym);
+
+/*   if (type_of(sym)!=t_symbol) */
+/*     not_a_symbol(sym); */
 	if (sym->s.s_sfdef != NOT_SPECIAL) {
 		if (sym->s.s_mflag) {
 			if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
@@ -271,44 +276,44 @@ DEFUNO_NEW("MAKUNBOUND",object,fLmakunbound,LISP
 
 object sStraced;
 
-DEFUNO_NEW("FMAKUNBOUND",object,fLfmakunbound,LISP
-   ,1,1,NONE,OO,OO,OO,OO,void,Lfmakunbound,(object sym),"")
+DEFUNO_NEW("FMAKUNBOUND",object,fLfmakunbound,LISP,1,1,NONE,OO,OO,OO,OO,void,Lfmakunbound,(object sym),"") {
 
-{
+  object rsym;
 
-  if(type_of(sym) != t_symbol && !setf_fn_form(sym)) 
-    TYPE_ERROR(sym,sLfunction_identifier);
+  rsym=type_of(sym)==t_symbol ? sym : ifuncall1(sSfunid_to_sym,sym);
+/*   if (rsym==Cnil)  */
+/*     TYPE_ERROR(sym,sLfunction_identifier); */
 
-  /*FIXME -- store a symbol in plist for setf functions as opposed to
-    the function itself, and centralize function name resolution.
-    Allow for tracing, etc. thereby. 20050307 CM*/
+/*   /\*FIXME -- store a symbol in plist for setf functions as opposed to */
+/*     the function itself, and centralize function name resolution. */
+/*     Allow for tracing, etc. thereby. 20050307 CM*\/ */
 
-  if (setf_fn_form(sym)) {
+/*   if (setf_fn_form(sym)) { */
 
-    if (get(sym->c.c_cdr->c.c_car,sSsetf_function,OBJNULL)!=OBJNULL)
-/*       FEundefined_function(sym); */
-      remf(&sym->c.c_cdr->c.c_car->s.s_plist,sSsetf_function);
-    RETURN1(sym);
-  }
+/*     if (get(sym->c.c_cdr->c.c_car,sSsetf_function,OBJNULL)!=OBJNULL) */
+/* /\*       FEundefined_function(sym); *\/ */
+/*       remf(&sym->c.c_cdr->c.c_car->s.s_plist,sSsetf_function); */
+/*     RETURN1(sym); */
+/*   } */
 
   /* 1 args */
 
-  if (sym->s.s_sfdef != NOT_SPECIAL) {
-    if (sym->s.s_mflag) {
+  if (rsym->s.s_sfdef != NOT_SPECIAL) {
+    if (rsym->s.s_mflag) {
       if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
-	sym->s.s_sfdef = NOT_SPECIAL;
+	rsym->s.s_sfdef = NOT_SPECIAL;
     } else if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
-      FEerror("~S, a special form, cannot be redefined.", 1, sym);
+      FEerror("~S, a special form, cannot be redefined.", 1, rsym);
   }
-  remf(&(sym->s.s_plist),sStraced);
-  clear_compiler_properties(sym,Cnil);
-  if (sym->s.s_hpack == lisp_package &&
-      sym->s.s_gfdef != OBJNULL && initflag) {
-    ifuncall2(sLwarn, make_simple_string("~S is being redefined."), sym);
+  remf(&(rsym->s.s_plist),sStraced);
+  clear_compiler_properties(rsym,Cnil);
+  if (rsym->s.s_hpack == lisp_package &&
+      rsym->s.s_gfdef != OBJNULL && initflag) {
+    ifuncall2(sLwarn, make_simple_string("~S is being redefined."), rsym);
   }
 
-  sym->s.s_gfdef = OBJNULL;
-  sym->s.s_mflag = FALSE;
+  rsym->s.s_gfdef = OBJNULL;
+  rsym->s.s_mflag = FALSE;
   RETURN1(sym);
 
 }
@@ -408,17 +413,17 @@ setf(object place, object form)
 		return result;
 	}
 
-	/* FIXME should this be removed as it appears to usurp setf-expanders? */
-	if ((x=getf(fun->s.s_plist,sSsetf_function,Cnil))!=Cnil) {
-	  object y=args;
-	  /* FIXME do a direct funcall here */
-	  y=append(list(1,form),y);
-	  x=type_of(x)==t_symbol ? symbol_function(x) : x;
-	  y=MMcons(x,y);
-	  y=MMcons(sLfuncall,y);
-	  result=Ieval(y);
-	  return result;
-	}
+/* 	/\* FIXME should this be removed as it appears to usurp setf-expanders? *\/ */
+/* 	if ((x=getf(fun->s.s_plist,sSsetf_function,Cnil))!=Cnil) { */
+/* 	  object y=args; */
+/* 	  /\* FIXME do a direct funcall here *\/ */
+/* 	  y=append(list(1,form),y); */
+/* 	  x=type_of(x)==t_symbol ? symbol_function(x) : x; */
+/* 	  y=MMcons(x,y); */
+/* 	  y=MMcons(sLfuncall,y); */
+/* 	  result=Ieval(y); */
+/* 	  return result; */
+/* 	} */
 
 	x = getf(fun->s.s_plist, sSstructure_access, Cnil);
 	if (x == Cnil || !consp(x))

@@ -42,27 +42,31 @@ static void
 FFN(Fdefun)(object args)
 {
 
-	object name;
+	object name,oname;
 	object body, form;
 
 	if (endp(args) || endp(MMcdr(args)))
 		FEtoo_few_argumentsF(args);
 	if (MMcadr(args) != Cnil && !consp(MMcadr(args)))
 		FEerror("~S is an illegal lambda-list.", 1, MMcadr(args));
-	name = MMcar(args);
-	if (type_of(name) != t_symbol) {
-	  if (setf_fn_form(name)) {
-	    object x;
-	    vs_base = vs_top;
-	    x=alloc_object(t_ifun);
-	    x->ifn.ifn_self=list(3,sLlambda,MMcadr(args),listA(3,sLblock,MMcadr(name),MMcddr(args)));
-	    vs_push(x);
-	    putprop(MMcadr(name),vs_base[0],sSsetf_function);
-	    vs_base[0]=name;
-	    return;
-	  } else
-	    not_a_symbol(name);
-	}
+	oname=name = MMcar(args);
+	
+	if (type_of(name) != t_symbol)
+	  name=ifuncall1(sSfunid_to_sym,name);
+
+/* 	if (type_of(name) != t_symbol) { */
+/* 	  if (setf_fn_form(name)) { */
+/* 	    object x; */
+/* 	    vs_base = vs_top; */
+/* 	    x=alloc_object(t_ifun); */
+/* 	    x->ifn.ifn_self=list(3,sLlambda,MMcadr(args),listA(3,sLblock,MMcadr(name),MMcddr(args))); */
+/* 	    vs_push(x); */
+/* 	    putprop(MMcadr(name),vs_base[0],sSsetf_function); */
+/* 	    vs_base[0]=name; */
+/* 	    return; */
+/* 	  } else */
+/* 	    not_a_symbol(name); */
+/* 	} */
 	if (name->s.s_sfdef != NOT_SPECIAL) {
 	  if (name->s.s_mflag) {
 	    if (symbol_value(sSAinhibit_macro_specialA) != Cnil)
@@ -91,7 +95,7 @@ FFN(Fdefun)(object args)
 	vs_base[0]=x;
 	fname->s.s_gfdef = vs_base[0];
 	fname->s.s_mflag = FALSE;}
-	vs_base[0] = name;
+	vs_base[0] = oname;
 	for (body = MMcddr(args);  !endp(body);  body = body->c.c_cdr) {
 	  form = macro_expand(body->c.c_car);
 	  if (type_of(form) == t_string) {
@@ -186,7 +190,7 @@ FFN(Flocally)(object body)
 	object *oldlex = lex_env;
 
 	lex_copy();
-	body = find_special(body, NULL, NULL);
+	body = find_special(body, NULL, NULL,NULL);
 	vs_push(body);
 	Fprogn(body);
 	lex_env = oldlex;
@@ -241,7 +245,7 @@ DEF_ORDINARY("PROGN",sLprogn,LISP,"");
 DEF_ORDINARY("TYPEP",sLtypep,LISP,"");
 DEF_ORDINARY("VALUES",sLvalues,LISP,"");
 DEF_ORDINARY("VARIABLE-DOCUMENTATION",sSvariable_documentation,SI,"");
-DEF_ORDINARY("SETF-FUNCTION",sSsetf_function,SI,"");
+/* DEF_ORDINARY("SETF-FUNCTION",sSsetf_function,SI,""); */
 DEF_ORDINARY("WARN",sLwarn,LISP,"");
 
 void
@@ -253,7 +257,7 @@ gcl_init_toplevel(void)
 	make_special_form("EVAL-WHEN", Feval_when);
 	make_special_form("LOAD-TIME-VALUE", Fload_time_value);
 	make_special_form("THE", Fthe);
-	sLdeclare=make_special_form("DECLARE",Fdeclare);
+	sLdeclare=make_function("DECLARE",Fdeclare);
 	make_special_form("LOCALLY",Flocally);
 
 

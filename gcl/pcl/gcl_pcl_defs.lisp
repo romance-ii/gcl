@@ -134,16 +134,7 @@
   ;; FIXME add setf expander for fdefinition -- right now we go through
   ;; the following code which expands to a call to si::fset
   #+(and setf (not cmu) (not kcl)) (setf (fdefinition name) new-definition)
-  #+kcl (setf (symbol-function 
-	       (let ((sym (when (symbolp name) (get name 'si::traced))) first-form)
-		 (if (and sym
-			  (consp (symbol-function name))
-			  (consp (setq first-form
-				       (nth 3 (symbol-function name))))
-			  (eq (car first-form) 'si::trace-call))
-		     sym
-		     name)))
-	      new-definition)
+  #+kcl (setf (symbol-function (or (si::traced-sym name) name)) new-definition)
   #+cmu (progn
 	  (c::%%defun name new-definition nil)
 	  (c::note-name-defined name :function)
@@ -968,6 +959,10 @@
       (pretty-arglist
 	:initform ()
 	:accessor gf-pretty-arglist)
+      (declarations
+       :initform ()
+       :initarg :declare
+       :reader generic-function-declarations)
       )
   (:metaclass funcallable-standard-class)
   (:default-initargs :method-class *the-class-standard-method*
@@ -1026,7 +1021,7 @@
   (let ((l (nth 4 (car (member sym *early-class-definitions* :key 'cadr)))))
     (append l (reduce (lambda (&rest r) (when r (apply 'union r))) (mapcar 'mk-early-cpl l)))))
 
-(defun early-class-precedence-list-symbol (x &aux tem)
+(defun early-class-precedence-list-symbol (x)
   (cond ((mk-early-cpl x))
 	((setq tem (gethash x *find-class*))
 	 (early-class-precedence-list (car tem)))))

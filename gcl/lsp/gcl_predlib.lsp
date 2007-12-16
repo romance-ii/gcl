@@ -225,9 +225,10 @@
     (case tp
       (function
        (coerce 
-	(cond ((symbolp object) (cond ((fboundp object) (symbol-function object)) ((check-type-eval object type))))
+	(cond ((let ((object (funid-sym-p object))) 
+		 (when object 
+		   (cond ((fboundp object) (symbol-function object)) ((check-type-eval object type))))))
 	      ((and (consp object) (eq (car object) 'lambda)) (values (eval `(function ,object))))
-	      ((function-identifierp object) (coerce (get (cadr object) 'setf-function) tp))
 	      ((check-type-eval object type)))
 	type))
        ((null cons list)
@@ -305,7 +306,7 @@
 
 (defconstant +ifb+ (- (car (last (multiple-value-list (si::heap-report))))))
 (defconstant +ifr+ (ash (- +ifb+)  -1))
-(defconstant +ift+ '(integer #.(- +ifr+) #.(1- +ifr+)))
+(defconstant +ift+ (when (> #.+ifr+ 0) '(integer #.(- +ifr+) #.(1- +ifr+))))
 
 (deftype immfix () +ift+)
 (deftype eql-is-eq-tp () `(or #.+ift+ (not number)))

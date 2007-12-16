@@ -82,7 +82,7 @@ gcl_init_system(object no_init)
 
   lsp_init("../lsp/gcl_predlib.lsp");
   lsp_init("../lsp/gcl_assert.lsp");
-  lsp_init("../lsp/gcl_listlib.lsp");
+/*   lsp_init("../lsp/gcl_listlib.lsp"); */
   lsp_init("../lsp/gcl_mislib.lsp");
   lsp_init("../lsp/gcl_setf.lsp");
   lsp_init("../lsp/gcl_arraylib.lsp");

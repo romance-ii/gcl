@@ -43,10 +43,13 @@ vpush_extend(void *,object);
 object sLAlink_arrayA;
 int Rset = 0;
 
+#define s2f(sym_,setf_) ({object t_=setf_ ? ifuncall1(sSfunid_to_sym,sym_) : sym_; t_->s.s_gfdef;})
+/*   object fun = setf ? ({object ns=get(sym,sSsetf_function,OBJNULL); type_of(ns)!=t_symbol ? ns : symbol_function(ns);}) : sym->s.s_gfdef; */
+
 void
 call_or_link(object sym,int setf,void **link) {
 
-  object fun = setf ? ({object ns=get(sym,sSsetf_function,OBJNULL); type_of(ns)!=t_symbol ? ns : symbol_function(ns);}) : sym->s.s_gfdef;
+  object fun = s2f(sym,setf);
 #ifdef DO_FUNLINK_DEBUG
   fprintf ( stderr, "call_or_link: fun %x START for function ", fun );
   print_lisp_string ( "name: ", fun->cf.cf_name );
@@ -99,7 +102,7 @@ call_or_link(object sym,int setf,void **link) {
 void
 call_or_link_closure ( object sym, int setf, void **link, void **ptr )
 {
-    object fun = setf ? ({object ns=get(sym,sSsetf_function,OBJNULL); type_of(ns)!=t_symbol ? ns : symbol_function(ns);}) : sym->s.s_gfdef;
+    object fun = s2f(sym,setf);
 #ifdef DO_FUNLINK_DEBUG
     fprintf ( stderr, "call_or_link_closure: START sym %x, link %x, *link %x, ptr %x, *ptr %x, sym->s.s_gfdef (fun) %x ",
               sym, link, *link, ptr, *ptr, fun );
@@ -1348,7 +1351,7 @@ call_proc_new(object sym, int setf,int vald, void **link, int argd, object first
 #endif 
 
   check_type_symbol(&sym);
-  fun = setf ? ({object ns=get(sym,sSsetf_function,OBJNULL); type_of(ns)!=t_symbol ? ns : symbol_function(ns);}) : sym->s.s_gfdef;
+  fun = s2f(sym,setf);
   tp=fun ? type_of(fun) : -1;
   nargs=SFUN_NARGS(argd);
 

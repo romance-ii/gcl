@@ -628,11 +628,11 @@
 	method)))
   
 (defun real-remove-method (generic-function method)
-  (if  (neq generic-function (method-generic-function method))
-       (error "The method ~S is attached to the generic function~@
-               ~S.  It can't be removed from the generic function~@
-               to which it is not attached."
-	      method (method-generic-function method))
+  (unless (neq generic-function (method-generic-function method))
+;;        (error "The method ~S is attached to the generic function~@
+;;                ~S.  It can't be removed from the generic function~@
+;;                to which it is not attached."
+;; 	      method (method-generic-function method))
        (let* ((name         (generic-function-name generic-function))
 	      (specializers (method-specializers method))
 	      (methods      (generic-function-methods generic-function))
