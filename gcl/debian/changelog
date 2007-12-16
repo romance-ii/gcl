@@ -5,7 +5,7 @@ gclcvs (2.7.0-80) unstable; urgency=low
   * debian bug sync with 2.6.8pre
   * ansi-fixes;tail-recursion expansion;support build w/o immfix
 
- -- Camm Maguire <camm@intech21.enhanced.com>  Sat, 15 Dec 2007 23:53:38 -0500
+ -- Camm Maguire <camm@enhanced.com>  Sat, 15 Dec 2007 23:53:38 -0500
 
 gclcvs (2.7.0-79) unstable; urgency=low
 
