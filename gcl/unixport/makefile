@@ -114,10 +114,12 @@ final: $(FLISP)
 	echo "(setq si::*optimize-maximum-pages* nil)" >pre_init.lsp;
 	echo "(setq si::*optimize-maximum-pages* t si::*disable-recompile* nil)(when (> (length si::*needs-recompile*) 0) (format t \"Warning, eliminating recompiles ~s~%\" si::*needs-recompile*)(setf (fill-pointer si::*needs-recompile*) 0))" >post_init.lsp;
 	$(MAKE) $(FLISP)
-	rm -f pre_init.lsp post_init.lsp recompile.h #gcl_recompile*
+	rm -f pre_init.lsp post_init.lsp #recompile.h #gcl_recompile*
 	touch $@
 
-recompile.h: $(ROBJS)
+FORCE:
+
+recompile.h: FORCE $(ROBJS)
 	echo -n $(ROBJS) | \
 		sed -e 's,gcl_recompile,,g' -e 's,\.o,,g' | \
 		tr ' ' '\012' | sort -n | \
