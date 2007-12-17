@@ -30,18 +30,16 @@ MCC:=gcc
 #RELOC=locbfd
 RELOC?=statsysbfd
 
-#ifeq ($(ARCHT),alpha)
-#RELOC=dlopen
-#endif
-
-# MIPS bfd support added 20050407 CM
-#ifeq ($(ARCHT),mips)
-#RELOC=dlopen
-#endif
-#ifeq ($(ARCHT),mipsel)
-#RELOC=dlopen
-#endif
-
+#FIXME upstream bfd data structures are read-only
+ifeq ($(ARCHT),alpha)
+RELOC=locbfd
+endif
+ifeq ($(ARCHT),mips)
+RELOC=locbfd
+endif
+ifeq ($(ARCHT),mipsel)
+RELOC=locbfd
+endif
 
 ifeq ($(ARCHT),ia64)
 RELOC=dlopen

@@ -1245,10 +1245,10 @@
     (when (ll-optionals ll)
       (let ((*clink* *clink*)
 	    (*unwind-exit* *unwind-exit*)
-	    (*ccb-vs* *ccb-vs*))
+	    (*ccb-vs* *ccb-vs*)
+	    (first t))
 	(wt-nl "narg -= " (length reqs) ";")
-	(let ((first t))
-	  (dolist** (opt (ll-optionals ll))
+	(dolist** (opt (ll-optionals ll))
 		    (push (next-label) labels)
 		    (wt-nl "if (" (if (cdr labels) "--" "") "narg <= 0) ")
 		    (wt-go (car labels))
@@ -1258,12 +1258,12 @@
 		    (setq first nil)
 		    (wt "}")
 		    (when (caddr opt) (c2bind-loc (caddr opt) t)))
-	  (when (and (not first) (or (ll-rest ll) (ll-keywords ll)))
-	    (wt-nl "first=va_arg(ap,object);"))))
+	(wt-nl "--narg; ")
+	(when (and (not first) (or (ll-rest ll) (ll-keywords ll)))
+	  (wt-nl "if (narg>0) first=va_arg(ap,object);")))
       (setq labels (nreverse labels))
       
       (let ((label (next-label)))
-	(wt-nl "--narg; ")
 	(wt-go label)
 	
              ;;; Bind unspecified optional parameters.
@@ -1290,15 +1290,18 @@
 		     *rest-on-stack*)))
 	    (if (ll-keywords-p ll)
 		(cond (*rest-on-stack*
-		       (add-libc "bzero")
-		       (add-libc "memset")
-		       (wt "(ALLOCA_CONS(narg),ON_STACK_MAKE_LIST(narg));"))
+;		       (add-libc "bzero")
+;		       (add-libc "memset")
+;		       (wt "(ALLOCA_CONS(narg),ON_STACK_MAKE_LIST(narg));")
+		       (wt-stack-list* nil nil "narg")
+		       (wt ";"))
 		      (t (wt "make_list(narg);")))
 	      (cond (*rest-on-stack*
-		     (add-libc "bzero")
-		     (add-libc "memset")
-		     (wt "(ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));"
-			 ))
+;		     (add-libc "bzero")
+;		     (add-libc "memset")
+;		     (wt "(ALLOCA_CONS(narg),ON_STACK_LIST_VECTOR_NEW(narg,first,ap));")
+		     (wt-stack-list* nil nil "narg" "({object _t=first;first=va_arg(ap,object);_t;})" "first")
+		     (wt ";"))
 		    (t  (wt "list_vector_new(narg,first,ap);"))))
 	    (c2bind-loc (ll-rest ll) (list 'cvar rest-var)))))
     (when (ll-keywords-p ll)
@@ -2088,17 +2091,3 @@
 ;	 (dotimes (temp (- *cs* 1) t) (format *compiler-output2* ",Cnil"))
 ;	 (format *compiler-output2* "};"))
     (format *compiler-output2* " object Vcs[~a];" *cs*)))
-
-
-
-(defconstant +boot-fns+ '(c1add-globals c1expr* c1make-var cmp-norm-tp equal-is-eq eql-is-eq
-    set-var-init-type bsearchleq push-array type-of do-num-relations 
-    do-predicate type>= type-and fmla-infer-tp fmla-eval-const 
-    c1fmla c1progn  c1let* c1let 
-    result-type-from-args coerce-to-one-value check-form-type
-    maybe-inline c1local-fun c1lambda-fun c1symbol-fun c1structure-ref1
-    inline-possible cmp-eval get-return-type get-arg-types second first
-    cmp-expand-macro and-form-type get-local-arg-types
-    get-local-return-type c1args c1var function-lambda-expression
-    atomic-tp do-eq-et-al make-info c1expr** c1if add-info add-constant
-    add-object c1constant-value  c1tagbody object-type c1expr))
