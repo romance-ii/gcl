@@ -44,7 +44,7 @@
 (DEFSYSFUN 'INT-CHAR "Lint_char" '(T) 'CHARACTER NIL NIL) 
 (DEFSYSFUN 'CHAR-INT "Lchar_int" '(T) 'FIXNUM NIL NIL) 
 (DEFSYSFUN '/= "Lall_different" '(T *) 'T NIL T) 
-(DEFSYSFUN 'COPY-SEQ "Lcopy_seq" '(T) 'T NIL NIL) 
+;(DEFSYSFUN 'COPY-SEQ "Lcopy_seq" '(T) 'T NIL NIL) 
 ;(DEFSYSFUN 'KEYWORDP "Lkeywordp" '(T) 'T NIL T) 
 (DEFSYSFUN 'NAME-CHAR "Lname_char" '(T) 'CHARACTER NIL NIL) 
 (DEFSYSFUN 'CHAR-NAME "Lchar_name" '(T) 'T NIL NIL) 

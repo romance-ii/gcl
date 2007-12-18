@@ -695,23 +695,23 @@ DEFUN_NEW("FIRST",object,fLfirst,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
 { RETURN1(car(x)) ;}
 
 DEFUN_NEW("SECOND",object,fLsecond,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
-{ return fLnth(make_fixnum(1),x);}
+{ return FFN(fLnth)(make_fixnum(1),x);}
 DEFUN_NEW("THIRD",object,fLthird,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
-{ return fLnth(make_fixnum(2),x);}
+{ return FFN(fLnth)(make_fixnum(2),x);}
 DEFUN_NEW("FOURTH",object,fLfourth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
-{ return fLnth(make_fixnum(3),x);}
+{ return FFN(fLnth)(make_fixnum(3),x);}
 DEFUN_NEW("FIFTH",object,fLfifth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
-{ return fLnth(make_fixnum(4),x);}
+{ return FFN(fLnth)(make_fixnum(4),x);}
 DEFUN_NEW("SIXTH",object,fLsixth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
-{ return fLnth(make_fixnum(5),x);}
+{ return FFN(fLnth)(make_fixnum(5),x);}
 DEFUN_NEW("SEVENTH",object,fLseventh,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
-{ return fLnth(make_fixnum(6),x);}
+{ return FFN(fLnth)(make_fixnum(6),x);}
 DEFUN_NEW("EIGHTH",object,fLeighth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
-{ return fLnth(make_fixnum(7),x);}
+{ return FFN(fLnth)(make_fixnum(7),x);}
 DEFUN_NEW("NINTH",object,fLninth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
-{ return fLnth(make_fixnum(8),x);}
+{ return FFN(fLnth)(make_fixnum(8),x);}
 DEFUN_NEW("TENTH",object,fLtenth,LISP,1,1,NONE,OO,OO,OO,OO,(object x),"")
-{ return fLnth(make_fixnum(9),x);}
+{ return FFN(fLnth)(make_fixnum(9),x);}
 
 static bool
 tree_equal(x, y)

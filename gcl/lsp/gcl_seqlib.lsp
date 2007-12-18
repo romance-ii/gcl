@@ -26,7 +26,7 @@
 (in-package 'lisp)
 
 
-(export '(reduce fill replace length elt every some notevery notany
+(export '(copy-seq reduce fill replace length elt every some notevery notany
           remove remove-if remove-if-not
           delete delete-if delete-if-not
           count count-if count-if-not
@@ -1101,3 +1101,14 @@
 		 ,@body))))
 		 
 
+(defun copy-seq (s) 
+  (declare (optimize (safety 1)))
+  (check-type s sequence)
+  (if (listp s)
+      (copy-list s)
+    (let* ((n (length s))
+	   (aet (array-element-type s))
+	   (o (make-array n :element-type aet))
+	   (ac (comp-array aet)))
+      (do ((i 0 (1+ i))) ((>= i n) o) 
+	  (set-same-array ac o i s i)))))

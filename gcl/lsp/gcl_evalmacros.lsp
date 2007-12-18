@@ -105,7 +105,7 @@
 (defun delete-package (p)
   (the boolean (values (delete-package-internal p))))
 
-(import 'while 'user)
+(import 'while #+ansi-cl 'cl-user #-ansi-cl 'user)
 (defmacro while (test &rest forms)
   (declare (optimize (safety 2)))
  `(loop (unless ,test (return)) ,@forms))

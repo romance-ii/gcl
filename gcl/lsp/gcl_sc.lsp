@@ -2,13 +2,15 @@
 
 (in-package 'lisp)
 (export '(string char schar string= string/= string> string>= 
-		    string< string<= string-equal string-not-equal
-		    string-greaterp string-not-lessp string-lessp
-		    string-not-greaterp  char-code  code-char  char-upcase
-		    char-downcase  char=  char/=  char>  char>=  char<
-		    char<=  char-equal  char-not-equal  char-greaterp
-		    char-lessp  char-not-greaterp  char-not-lessp
-		    upper-case-p  lower-case-p  both-case-p))
+		 string< string<= string-equal string-not-equal
+		 string-greaterp string-not-lessp string-lessp
+		 string-not-greaterp  char-code  code-char  char-upcase
+		 char-downcase  char=  char/=  char>  char>=  char<
+		 char<=  char-equal  char-not-equal  char-greaterp
+		 char-lessp  char-not-greaterp  char-not-lessp
+		 upper-case-p  lower-case-p  both-case-p
+		 string-upcase string-downcase nstring-upcase nstring-downcase
+		 string-trim string-left-trim string-right-trim))
 
 (in-package 'si)
 (defCfun "object char_to_string(char c)" 0 "{ object x;char s[2];s[0]=1;s[1]=0;x=make_simple_string(s);x->st.st_self[0]=c;return(x);}")
@@ -38,6 +40,22 @@
   (check-type x simple-string)
   (check-type i seqind)
   (aref x i))
+
+(defmacro defstr1 (n case copy)
+  `(defun ,n (s &key (start 0) end)
+     (declare (optimize (safety 1)))
+     (check-type start seqind)
+     (check-type end (or null seqind))
+     (let* ((s (string s))
+	    (end (or end (length s)))
+	    (n (,copy s)))
+       (do ((i start (1+ i))) ((>= i end) n)
+	   (setf (aref n i) (,case (aref s i)))))))
+
+(defstr1  string-upcase   char-upcase   copy-seq)
+(defstr1  string-downcase char-downcase copy-seq)
+(defstr1 nstring-upcase   char-upcase   identity)
+(defstr1 nstring-downcase char-downcase identity)
 
 
 (defmacro defstr (name (s1 s2) = &body body)
@@ -204,4 +222,34 @@
 
 (defnchr char/= (= char-code))
 (defnchr char-not-equal (char-equal identity))
+
+(defun string-left-trim (b s)
+  (declare (optimize (safety 1)))
+  (check-type b sequence)
+  (let ((s (string s)))
+    (do ((l (length s))
+	 (i 0 (1+ i)))
+	((or (>= i l) (not (find (aref s i) b)))
+	 (if (= i 0) s (subseq s i))))))
+      
+
+(defun string-right-trim (b s)
+  (declare (optimize (safety 1)))
+  (check-type b sequence)
+  (let* ((s (string s))
+	 (l (length s)))
+    (do ((i (1- l) (1- i)))
+	((or (< i 0) (not (find (aref s i) b)))
+	 (if (= i l) s (subseq s 0 (1+ i)))))))
+
+(defun string-trim (b s)
+  (declare (optimize (safety 1)))
+  (check-type b sequence)
+  (let* ((s (string s))
+	 (l (length s)))
+    (do ((i 0 (1+ i)))
+	((or (>= i l) (not (find (aref s i) b)))
+	 (do ((j (1- l) (1- j)))
+	     ((or (< j i) (not (find (aref s j) b)))
+	      (if (and (= i 0) (= j l)) s (subseq s i (1+ j)))))))))
 
