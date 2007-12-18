@@ -1,8 +1,9 @@
 gclcvs (2.7.0-82) unstable; urgency=low
 
   * ia64 build fix, more library functions
+  * vertical bar reader fix
 
- -- Camm Maguire <camm@intech21.enhanced.com>  Tue, 18 Dec 2007 04:56:03 -0500
+ -- Camm Maguire <camm@enhanced.com>  Tue, 18 Dec 2007 10:56:22 -0500
 
 gclcvs (2.7.0-81) unstable; urgency=low
 

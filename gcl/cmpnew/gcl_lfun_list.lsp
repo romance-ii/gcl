@@ -59,7 +59,7 @@
 ;(DEFSYSFUN 'CAAR "Lcaar" '(T) 'T NIL NIL) 
 ;#-clcs (DEFSYSFUN 'LOAD "Lload" '(T *) 'T NIL NIL) 
 ;#-clcs (DEFSYSFUN 'OPEN "Lopen" '(T *) 'T NIL NIL) 
-(DEFSYSFUN 'BOTH-CASE-P "Lboth_case_p" '(T) 'T NIL T) 
+;(DEFSYSFUN 'BOTH-CASE-P "Lboth_case_p" '(T) 'T NIL T) 
 (DEFSYSFUN 'NULL "Lnull" '(T) 'T NIL T) 
 (DEFSYSFUN 'RENAME-FILE "Lrename_file" '(T T) 'T NIL NIL) 
 (DEFSYSFUN 'FILE-AUTHOR "Lfile_author" '(T) 'T NIL NIL) 
@@ -85,7 +85,7 @@
 (DEFSYSFUN 'SYSTEM::PUTPROP "siLputprop" '(T T T) 'T NIL NIL) 
 (DEFSYSFUN 'REMPROP "Lremprop" '(T T) 'T NIL NIL) 
 ;(DEFSYSFUN 'SYMBOL-PACKAGE "Lsymbol_package" '(T) 'T NIL NIL) 
-(DEFSYSFUN 'NSTRING-UPCASE "Lnstring_upcase" '(T *) 'STRING NIL NIL) 
+;(DEFSYSFUN 'NSTRING-UPCASE "Lnstring_upcase" '(T *) 'STRING NIL NIL) 
 ;(DEFSYSFUN 'STRING>= "Lstring_ge" '(T T *) 'T NIL NIL) 
 ;(DEFSYSFUN 'REALPART "Lrealpart" '(T) 'T NIL NIL) 
 ;;broken on suns..
@@ -107,8 +107,8 @@
 (DEFSYSFUN 'USE-PACKAGE "Luse_package" '(T *) 'T NIL NIL) 
 (DEFSYSFUN 'FILE-LENGTH "Lfile_length" '(T) 'T NIL NIL) 
 ;(DEFSYSFUN 'MAKE-SYMBOL "Lmake_symbol" '(T) 'T NIL NIL) 
-(DEFSYSFUN 'STRING-RIGHT-TRIM "Lstring_right_trim" '(T T) 'STRING NIL
-    NIL) 
+;(DEFSYSFUN 'STRING-RIGHT-TRIM "Lstring_right_trim" '(T T) 'STRING NIL
+;    NIL) 
 (DEFSYSFUN 'ENOUGH-NAMESTRING "Lenough_namestring" '(T *) 'STRING NIL
     NIL) 
 (DEFSYSFUN 'PRINT "Lprint" '(T *) 'T NIL NIL) 
@@ -148,7 +148,7 @@
 ;(DEFSYSFUN 'CDDDR "Lcdddr" '(T) 'T NIL NIL) 
 (DEFSYSFUN 'PRIN1 "Lprin1" '(T *) 'T NIL NIL) 
 (DEFSYSFUN 'PRINC "Lprinc" '(T *) 'T NIL NIL) 
-(DEFSYSFUN 'LOWER-CASE-P "Llower_case_p" '(T) 'T NIL T) 
+;(DEFSYSFUN 'LOWER-CASE-P "Llower_case_p" '(T) 'T NIL T) 
 ;(DEFSYSFUN 'CHAR<= "Lchar_le" '(T *) 'T NIL T) 
 ;(DEFSYSFUN 'STRING-EQUAL "Lstring_equal" '(T T *) 'T NIL T) 
 (DEFSYSFUN 'CLEAR-OUTPUT "Lclear_output" '(*) 'T NIL NIL) 
@@ -217,8 +217,8 @@
 (DEFSYSFUN 'LCM "Llcm" '(T *) 'T NIL NIL) 
 ;(DEFSYSFUN 'ELT "Lelt" '(T T) 'T NIL NIL) 
 ;(DEFSYSFUN 'COS "Lcos" '(T) 'T NIL NIL) 
-(DEFSYSFUN 'NSTRING-DOWNCASE "Lnstring_downcase" '(T *) 'STRING NIL
-    NIL) 
+;(DEFSYSFUN 'NSTRING-DOWNCASE "Lnstring_downcase" '(T *) 'STRING NIL
+;    NIL) 
 ;(DEFSYSFUN 'COPY-ALIST "Lcopy_alist" '(T) 'T NIL NIL) 
 ;(DEFSYSFUN 'ATAN "Latan" '(T *) 'T NIL NIL) 
 ;(DEFSYSFUN 'DELETE-FILE "Ldelete_file" '(T) 'T NIL NIL) 
@@ -278,7 +278,7 @@
 ;(DEFSYSFUN 'CAADR "Lcaadr" '(T) 'T NIL NIL) 
 ;(DEFSYSFUN 'CHAR= "Lchar_eq" '(T *) 'T NIL T) 
 (DEFSYSFUN 'ALPHA-CHAR-P "Lalpha_char_p" '(T) 'T NIL T) 
-(DEFSYSFUN 'STRING-TRIM "Lstring_trim" '(T T) 'STRING NIL NIL) 
+;(DEFSYSFUN 'STRING-TRIM "Lstring_trim" '(T T) 'STRING NIL NIL) 
 (DEFSYSFUN 'MAKE-PACKAGE "Lmake_package" '(T *) 'T NIL NIL) 
 (DEFSYSFUN 'CLOSE "Lclose" '(T *) 'T NIL NIL) 
 ;(DEFSYSFUN 'DENOMINATOR "Ldenominator" '(T) 'T NIL NIL) 
@@ -287,7 +287,7 @@
 (DEFSYSFUN 'ROUND "Lround" '(T *) '(RETURNS-EXACTLY INTEGER REAL) NIL NIL) 
 ;(DEFSYSFUN 'ROUND "Lround" '(T *) '* NIL NIL) 
 ;(DEFSYSFUN 'SUBST "Lsubst" '(T T T *) 'T NIL NIL) 
-(DEFSYSFUN 'UPPER-CASE-P "Lupper_case_p" '(T) 'T NIL T) 
+;(DEFSYSFUN 'UPPER-CASE-P "Lupper_case_p" '(T) 'T NIL T) 
 ;(DEFSYSFUN 'ARRAY-ELEMENT-TYPE "Larray_element_type" '(T) 'T NIL NIL) 
 ;(DEFSYSFUN 'ADJOIN "Ladjoin" '(T T *) 'T NIL NIL) 
 (DEFSYSFUN 'LOGAND "Llogand" '(*) 'T NIL NIL) 
@@ -423,8 +423,8 @@
 (DEFSYSFUN 'MOD "Lmod" '(T T) 'T NIL NIL) 
 (DEFSYSFUN 'DIGIT-CHAR "Ldigit_char" '(T *) '(or null CHARACTER) NIL NIL) 
 (DEFSYSFUN 'PROBE-FILE "Lprobe_file" '(T) 'T NIL NIL) 
-(DEFSYSFUN 'STRING-LEFT-TRIM "Lstring_left_trim" '(T T) 'STRING NIL
-    NIL) 
+;(DEFSYSFUN 'STRING-LEFT-TRIM "Lstring_left_trim" '(T T) 'STRING NIL
+;    NIL) 
 (DEFSYSFUN 'PATHNAME-VERSION "Lpathname_version" '(T) 'T NIL NIL) 
 (DEFSYSFUN 'WRITE-LINE "Lwrite_line" '(T *) 'T NIL NIL) 
 (DEFSYSFUN 'EVAL "Leval" '(T) '* NIL NIL) 
