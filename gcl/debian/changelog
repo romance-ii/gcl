@@ -2,7 +2,7 @@ gclcvs (2.7.0-83) unstable; urgency=low
 
   * arm and ia64 gcc bug workarounds
 
- -- Camm Maguire <camm@intech21.enhanced.com>  Tue,  1 Jan 2008 15:24:55 -0500
+ -- Camm Maguire <camm@enhanced.com>  Tue,  1 Jan 2008 15:24:55 -0500
 
 gclcvs (2.7.0-82) unstable; urgency=low
 
