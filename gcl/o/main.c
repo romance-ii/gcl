@@ -1242,6 +1242,10 @@ init_main(void) {
   ADD_FEATURE("SWITCH");
 #endif
 
+#ifndef NODYNEXT
+  ADD_FEATURE("DYNAMIC-EXTENT");
+#endif
+
 #ifndef NOINTDIV
   ADD_FEATURE("INTDIV");
 #endif

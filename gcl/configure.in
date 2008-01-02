@@ -500,6 +500,7 @@ fi
 
 TO3FLAGS=""
 TO2FLAGS=""
+TOSFLAGS=""
 
 #TFPFLAG="-fomit-frame-pointer"
 # FIXME -- remove when mingw compiler issues are fixed
@@ -553,15 +554,16 @@ if test "$enable_debug" = "yes" ; then
 	# for subconfigurations
 	CFLAGS="$CFLAGS -g"
 else
+	TOSFLAGS="-Os $TFPFLAG"
+	TO3FLAGS="-O3 $TFPFLAG"
+	TO2FLAGS="-O"
 	case $use in
 # FIXME -- remove when compiler issues are fixed
 	  hppa*)
 		TO3FLAGS="-O2 -g";;
-	  *)
-		TO3FLAGS="-O3 $TFPFLAG";;
+	  ia64*)
+		TOSFLAGS="-O2 $TFPFLAG";;
 	esac
-#	TO3FLAGS="-O3 $TFPFLAG"
-	TO2FLAGS="-O"
 fi
 
 # gcc on ppc cannot compile our new_init.c with full opts --CM
@@ -2489,7 +2491,7 @@ NIFLAGS="$CFLAGS $TCFLAGS $TONIFLAGS $PROCESSOR_FLAGS -I\$(GCLDIR)/o"
 AC_SUBST(NIFLAGS)
 CFLAGS="$CFLAGS $TCFLAGS $TO3FLAGS $PROCESSOR_FLAGS -I\$(GCLDIR)/o"
 AC_SUBST(CFLAGS)
-O3FLAGS=`echo $TO3FLAGS | sed 's,O3,Os,g'| sed 's,O2,Os,g'`
+O3FLAGS=$TOSFLAGS
 AC_SUBST(O3FLAGS)
 O2FLAGS=$TO2FLAGS
 AC_SUBST(O2FLAGS)

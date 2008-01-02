@@ -22,3 +22,4 @@
 } while (0)
 
 #define SGC
+#define NODYNEXT

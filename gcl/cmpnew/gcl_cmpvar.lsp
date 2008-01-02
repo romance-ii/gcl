@@ -102,7 +102,7 @@
        (case (cdr v)
 	     (object (setf (var-loc var) 'object))
 	     (register (setf (var-register var) (+ (var-register var) 100)))
-	     (dynamic-extent  (setf (var-dynamic var) 1))
+	     #+dynamic-extent (dynamic-extent  (setf (var-dynamic var) 1))
 	     (t (unless *compiler-new-safety* (setf (var-type var) (nil-to-t (type-and (var-type var) (cdr v))))))
 	     )))
     
