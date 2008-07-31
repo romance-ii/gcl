@@ -1065,8 +1065,8 @@ AC_TRY_RUN([#include <unistd.h>
 
 if test "$HAVE_SBRK" = "1" ; then
 
-	AC_CHECK_HEADER(sys/personality.h, true,
-		   AC_MSG_RESULT(sys/personality.h not found))
+#	AC_CHECK_HEADER(sys/personality.h, true,
+#		   AC_MSG_RESULT(sys/personality.h not found))
 
 	AC_MSG_CHECKING([for ADDR_NO_RANDOMIZE constant])
 	AC_TRY_RUN([#include <sys/personality.h>
@@ -1086,20 +1086,10 @@ if test "$HAVE_SBRK" = "1" ; then
 	fi
 
 	AC_MSG_CHECKING([for personality(ADDR_NO_RANDOMIZE) support])
-	AC_TRY_RUN([#include <sys/personality.h>
-                    #include <syscall.h>
-                    #include <unistd.h>
-		    #include <stdio.h>
-		    int main(int argc,char *argv[]) {
-			FILE *f;
-			long oldpers = personality(0xffffffffUL);
-			long retval =  personality(oldpers | ADDR_NO_RANDOMIZE);
-			long newpers = personality(0xffffffffUL);
-			if (!(f=fopen("conftest1","w"))) return -1;
-			fprintf(f,"%d",retval != -1 && newpers & ADDR_NO_RANDOMIZE);
-			return 0;
-			}],
-			CAN_UNRANDOMIZE_SBRK=`cat conftest1`,CAN_UNRANDOMIZE_SBRK=0,CAN_UNRANDOMIZE_SBRK=0)
+	AC_TRY_RUN([void gprof_cleanup() {};
+		    int main(int argc,char *argv[],char *envp[]) {
+	            #include "h/unrandomize.h"
+		    return 0;}],CAN_UNRANDOMIZE_SBRK=1,CAN_UNRANDOMIZE_SBRK=0,CAN_UNRANDOMIZE_SBRK=0)
 
 	if test "$CAN_UNRANDOMIZE_SBRK" != 0 ; then
 		AC_MSG_RESULT(yes)
@@ -1109,56 +1099,30 @@ if test "$HAVE_SBRK" = "1" ; then
 	fi
 
 	AC_MSG_CHECKING([that sbrk is (now) non-random])
-	AC_TRY_RUN([#include <unistd.h>
-		    #include <stdio.h>
-		    #ifdef CAN_UNRANDOMIZE_SBRK
-		    #include <sys/personality.h>
-                    #include <syscall.h>
-                    #include <unistd.h>
-		    #endif
+	AC_TRY_RUN([#include <stdio.h>
+	            void gprof_cleanup() {};
 		    int main(int argc,char * argv[],char * envp[]) {
 			FILE *f;
 			#ifdef CAN_UNRANDOMIZE_SBRK
-			long pers = personality(0xffffffffUL);
-			if (!(pers & ADDR_NO_RANDOMIZE)) {
-			  long retval=personality(pers | ADDR_NO_RANDOMIZE);
-			  long newpers = personality(0xffffffffUL);
-			  if (retval != -1 && newpers & ADDR_NO_RANDOMIZE)
-			    execve(*argv,argv,envp);    
-			  exit(-1);
-			}
+			#include "h/unrandomize.h"
 			#endif
 			if (!(f=fopen("conftest1","w"))) return -1;
 			fprintf(f,"%u",sbrk(0));
-			return 0;
-			}],SBRK=`cat conftest1`,SBRK=0,SBRK=0)
+			return 0;}],SBRK=`cat conftest1`,SBRK=0,SBRK=0)
 	if test "$SBRK" = "0" ; then
 		AC_MSG_RESULT(cannot trap sbrk)
 		exit 1
 	fi
-	AC_TRY_RUN([#include <unistd.h>
-		    #include <stdio.h>
-		    #ifdef CAN_UNRANDOMIZE_SBRK
-		    #include <sys/personality.h>
-                    #include <syscall.h>
-                    #include <unistd.h>
-		    #endif
+	AC_TRY_RUN([#include <stdio.h>
+                    void gprof_cleanup() {};
 		    int main(int argc,char * argv[],char * envp[]) {
 			FILE *f;
 			#ifdef CAN_UNRANDOMIZE_SBRK
-			long pers = personality(0xffffffffUL);
-			if (!(pers & ADDR_NO_RANDOMIZE)) {
-			  long retval=personality(pers | ADDR_NO_RANDOMIZE);
-			  long newpers = personality(0xffffffffUL);
-			  if (retval != -1 && newpers & ADDR_NO_RANDOMIZE)
-			    execve(*argv,argv,envp);    
-			  exit(-1);
-			}
+			#include "h/unrandomize.h"
 			#endif
 			if (!(f=fopen("conftest1","w"))) return -1;
 			fprintf(f,"%u",sbrk(0));
-			return 0;
-			}],SBRK1=`cat conftest1`,SBRK1=0,SBRK1=0)
+			return 0;}],SBRK1=`cat conftest1`,SBRK1=0,SBRK1=0)
 	if test "$SBRK1" = "0" ; then
 		AC_MSG_RESULT(cannot trap sbrk)
 		exit 1
@@ -1280,11 +1244,8 @@ AC_MSG_CHECKING(DBEGIN)
 AC_TRY_RUN([#include <stdio.h>
             #include <stdlib.h>
             #include <unistd.h>
-	    #ifdef CAN_UNRANDOMIZE_SBRK
-		   #include <sys/personality.h>
-		   #include <syscall.h>
-		   #include <unistd.h>
-	   #endif
+
+void gprof_cleanup() {};
 int
 main(int argc,char * argv[])
 {
@@ -1292,15 +1253,9 @@ main(int argc,char * argv[])
   FILE *fp;
 
 #ifdef CAN_UNRANDOMIZE_SBRK
-  long pers = personality(0xffffffffUL);
-  if (!(pers & ADDR_NO_RANDOMIZE)) {
-    long retval=personality(pers | ADDR_NO_RANDOMIZE);
-    long newpers = personality(0xffffffffUL);
-    if (retval != -1 && newpers & ADDR_NO_RANDOMIZE)
-      execve(*argv,argv,envp);    
-      exit(-1);
-  }
+#include "h/unrandomize.h"
 #endif
+			
   fp = fopen("conftest1","w");
 
 #ifdef _WIN32

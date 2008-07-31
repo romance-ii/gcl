@@ -8,8 +8,9 @@ gclcvs (2.7.0-85) unstable; urgency=low
     patch.
   * Bug fix: "gcl: Builds broken package with gcc-4.3", thanks to Daniel
     Schepler (Closes: #467474).  Added sincos to plttest.c
+  * No infinite unrandomization loops
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 31 Jul 2008 01:41:59 +0000
+ -- Camm Maguire <camm@enhanced.com>  Thu, 31 Jul 2008 15:48:04 -0400
 
 gclcvs (2.7.0-84) unstable; urgency=low
 
