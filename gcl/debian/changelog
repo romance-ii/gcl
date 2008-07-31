@@ -1,3 +1,16 @@
+gclcvs (2.7.0-85) unstable; urgency=low
+
+  * Incorporate Debian NMU from 2.6.7
+  * Bug fix: "[INTL:sv] po-debconf file for gcl", thanks to Martin Ågren
+    (Closes: #492241).
+  * Bug fix: "gcl: FTBFS [amd64]: cannot trap sbrk", thanks to Daniel
+    Schepler (Closes: #487435).  Modified and applied personality handling
+    patch.
+  * Bug fix: "gcl: Builds broken package with gcc-4.3", thanks to Daniel
+    Schepler (Closes: #467474).  Added sincos to plttest.c
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 31 Jul 2008 01:41:59 +0000
+
 gclcvs (2.7.0-84) unstable; urgency=low
 
   * #-dynamic-extent arm build fix

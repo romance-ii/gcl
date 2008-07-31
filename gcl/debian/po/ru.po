@@ -1,0 +1,99 @@
+# translation of ru.po to Russian
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Yuri Kozlov <kozlov.y@gmail.com>, 2008.
+msgid ""
+msgstr ""
+"Project-Id-Version: 2.6.7-36\n"
+"Report-Msgid-Bugs-To: gcl@packages.debian.org\n"
+"POT-Creation-Date: 2007-12-23 08:47+0100\n"
+"PO-Revision-Date: 2008-01-03 10:22+0300\n"
+"Last-Translator: Yuri Kozlov <kozlov.y@gmail.com>\n"
+"Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:2001
+msgid "Use the work-in-progress ANSI build by default?"
+msgstr "Использовать разрабатываемую ANSI сборку по умолчанию?"
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:2001
+msgid ""
+"GCL is in the process of providing an ANSI compliant image in addition to "
+"its traditional CLtL1 image still in production use."
+msgstr ""
+"Помимо обычного образа CLtL1, используемого в повсеместной работе, GCL имеет "
+"практически готовый образ, соответствующий ANSI."
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:2001
+msgid ""
+"Please see the README.Debian file for a brief description of these terms. "
+"Choosing this option will determine which image will be used by default when "
+"executing 'gcl@EXT@'."
+msgstr ""
+"Краткое описание приведено в файле README.Debian. Данным выбором "
+"определяется, какой из образов будет использован по умолчанию при выполнении "
+"'gcl@EXT@'."
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:2001
+msgid ""
+"This setting may be overridden by setting the GCL_ANSI environment variable "
+"to any non-empty string for the ANSI build, and to the empty string for the "
+"CLtL1 build, e.g. GCL_ANSI=t gcl@EXT@. The currently enforced build flavor "
+"will be reported in the initial startup banner."
+msgstr ""
+"Эта настройка может быть переопределена установкой переменной окружения "
+"GCL_ANSI в непустое значение для ANSI сборки, а пустым значением выбирается "
+"CLtL1 сборка, например GCL_ANSI=t gcl@EXT@. Текущий используемый тип сборки "
+"будет показан при первом запуске."
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:3001
+msgid "Use the profiling build by default?"
+msgstr "Использовать по умолчанию профилируемую сборку?"
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:3001
+msgid "GCL has optional support for profiling via gprof."
+msgstr "GCL поддерживает необязательное профилирование через gprof."
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:3001
+msgid ""
+"Please see the documentation for si::gprof-start and si::gprof-quit for "
+"details. As this build is slower than builds without gprof support, it is "
+"not recommended for final production use."
+msgstr ""
+"Подробней об этом смотрите в документации на si::gprof-start и si::gprof-"
+"quit. Так как данная сборка работает медленнее чем без поддержки gprof, её "
+"не рекомендуется использовать в реальной работе."
+
+#. Type: boolean
+#. Description
+#: ../in.gcl.templates:3001
+msgid ""
+"Set the GCL_PROF environment variable to the empty string for more optimized "
+"builds, or any non-empty string for profiling support; e.g. GCL_PROF=t "
+"gcl@EXT@. If profiling is enabled, this will be reported in the initial "
+"startup banner."
+msgstr ""
+"Задание переменной окружения GCL_PROF пустого значения включает более "
+"оптимизированную сборку, а любое непустое -- поддержку профилирования; "
+"например GCL_PROF=t gcl@EXT@. Если профилирование включено, то об этом будет "
+"написано при первом запуске."

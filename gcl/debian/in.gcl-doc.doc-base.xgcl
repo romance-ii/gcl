@@ -2,7 +2,7 @@ Document: gcl@EXT@-si-doc
 Title: GNU Common Lisp Documentation -- System Internals 
 Author: W. Schelter
 Abstract: Documentation on GCL-specific Lisp system functions
-Section: Apps/Programming
+Section: Programming
 
 Format: TEX
 Files: /usr/share/doc/gcl@EXT@-doc/dwdoc.tex

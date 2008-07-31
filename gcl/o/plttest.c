@@ -9,6 +9,7 @@
 
 extern int _mcount();
 #define mmcount _mcount
+extern void sincos(double,double *,double *);
 
 int
 main(int argc,char * argv[],char *envp[]) {
@@ -20,6 +21,7 @@ main(int argc,char * argv[],char *envp[]) {
   long l;
   unsigned long ul;
 
+  sscanf(argv[1],"%lf",&d);
   bzero(&env,sizeof(env));
   memset(&env,0,sizeof(env));
   
@@ -44,6 +46,7 @@ main(int argc,char * argv[],char *envp[]) {
 
   d=cos(d);
   d=sin(d);
+  sincos(d,&d,&d);
   d=tan(d);
 
   d=acos(d);

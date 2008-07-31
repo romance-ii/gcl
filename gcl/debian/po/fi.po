@@ -1,26 +1,22 @@
-# translation of gcl debconf to Portuguese
-# Copyright (C) 2007 Américo Monteiro
-# This file is distributed under the same license as the gcl package.
-#
-# Américo Monteiro <a_monteiro@netcabo.pt>, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: gcl 2.6.7-36\n"
+"Project-Id-Version: gcl\n"
 "Report-Msgid-Bugs-To: gcl@packages.debian.org\n"
 "POT-Creation-Date: 2007-12-23 08:47+0100\n"
-"PO-Revision-Date: 2007-12-23 16:44+0000\n"
-"Last-Translator: Américo Monteiro <a_monteiro@netcabo.pt>\n"
-"Language-Team: Portuguese <traduz@debianpt.org>\n"
+"PO-Revision-Date: 2007-12-29 23:28+0200\n"
+"Last-Translator: Esko Arajärvi <edu@iki.fi>\n"
+"Language-Team: Finnish <debian-l10n-finnish@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
+"X-Poedit-Language: Finnish\n"
+"X-Poedit-Country: Finland\n"
 
 #. Type: boolean
 #. Description
 #: ../in.gcl.templates:2001
 msgid "Use the work-in-progress ANSI build by default?"
-msgstr "Usar a compilação 'ainda em desenvolvimento' ANSI por prédefinição? "
+msgstr "Käytetäänkö kehitettävää ANSI-käännöstä oletuksena?"
 
 #. Type: boolean
 #. Description
@@ -29,8 +25,8 @@ msgid ""
 "GCL is in the process of providing an ANSI compliant image in addition to "
 "its traditional CLtL1 image still in production use."
 msgstr ""
-"GCL está no processo de disponibilizar uma imagem compatível com ANSI como "
-"adição à sua imagem tradicional CLtL1 ainda em utilização de produção."
+"GCL:n on tarkoitus tarjota ANSI-yhteensopiva kuva perinteisen, vielä "
+"tuotantokäytössä olevan CLtL1-kuvan lisäksi."
 
 #. Type: boolean
 #. Description
@@ -40,9 +36,9 @@ msgid ""
 "Choosing this option will determine which image will be used by default when "
 "executing 'gcl@EXT@'."
 msgstr ""
-"Por favor veja o ficheiro README.Debian para uma breve descrição destes "
-"termos. Escolher esta opção irá determinar qual imagem será usada por "
-"prédefinição ao executar 'gcl@EXT@'."
+"Tiedostosta README.Debian löytyy (englanniksi) näiden termien lyhyet "
+"kuvaukset. Tämä valinta vaikuttaa siihen mitä kuvaa käytetään oletuksena "
+"ajettaessa ”gcl@EXT@”."
 
 #. Type: boolean
 #. Description
@@ -53,23 +49,23 @@ msgid ""
 "CLtL1 build, e.g. GCL_ANSI=t gcl@EXT@. The currently enforced build flavor "
 "will be reported in the initial startup banner."
 msgstr ""
-"Esta opção pode ser sobreposta ao regular a variável de ambiente GCL_ANSI "
-"para qualquer string não-vazia para a compilação ANSI, e para uma string "
-"vazia para a compilação CLtL1, como por exemplo GCL_ANSI=t gcl@EXT@. O tipo "
-"de compilação actualmente imposto será reportado no banner inicial de "
-"arranque."
+"Tämä asetus voidaan ohittaa asettamalla GCL_ANSI-ympäristömuuttuja. Jos "
+"muuttujan arvo on mikä tahansa ei-tyhjä merkkijono, käytetään ANSI-"
+"käännöstä, ja jos muuttujan arvo on tyhjä merkkijono, käytetään CLtL1-"
+"käännöstä. Esimerkiksi: GCL_ANSI=t gcl@EXT@. Käytetty pakotettu käännöstapa "
+"raportoidaan käynnistysruudussa."
 
 #. Type: boolean
 #. Description
 #: ../in.gcl.templates:3001
 msgid "Use the profiling build by default?"
-msgstr "Usar, como pré-definição, a compilação com 'profiling'?"
+msgstr "Käytetäänkö profilointia oletuksena?"
 
 #. Type: boolean
 #. Description
 #: ../in.gcl.templates:3001
 msgid "GCL has optional support for profiling via gprof."
-msgstr "O GCL tem suporte opcional para 'profiling' via gprof."
+msgstr "GCL tukee valinnaisesti profilointia gprofin avulla."
 
 #. Type: boolean
 #. Description
@@ -79,9 +75,9 @@ msgid ""
 "details. As this build is slower than builds without gprof support, it is "
 "not recommended for final production use."
 msgstr ""
-"Por favor veja a documentação de si::gprof-start e si::gprof-quit para mais "
-"detalhes. Como esta compilação é mais lenta do que as compilações sem o "
-"suporte para gprof, não é recomendada para utilização de produção final."
+"Katso yksityiskohdat (englanniksi) dokumentaatiosta kohdista si::gprof-start "
+"ja si::gprof-quit. Koska tämä käännös on hitaampi kuin käännökset ilman "
+"gprof-tukea, tätä ei suositella tuotantokäyttöön."
 
 #. Type: boolean
 #. Description
@@ -92,7 +88,7 @@ msgid ""
 "gcl@EXT@. If profiling is enabled, this will be reported in the initial "
 "startup banner."
 msgstr ""
-"Regule a variável de ambiente GCL_PROF para uma string vazia para mais "
-"compilações optimizadas, ou para qualquer string não-vazia para suporte de "
-"'profiling'; como por exemplo GCL_PROF=t gcl@EXT@. Se o 'profiling' estiver "
-"activo, isto será reportado no banner inicial de arranque."
+"Aseta GCL_PROF-ympäristömuuttuja tyhjäksi merkkijonoksi käyttääksesi "
+"optimoidumpia käännöksiä ja miksi tahansa ei-tyhjäksi merkkijonoksi "
+"käyttääksesi profilointia. Esimerkiksi: GCL_PROF=t gcl@EXT@. Jos profilointi "
+"on aktivoituna, se raportoidaan käynnistysruudussa."
