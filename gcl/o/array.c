@@ -1584,15 +1584,15 @@ DEFUN_NEW("ASET-BY-CURSOR",object,fSaset_by_cursor,SI,3,3,
 				ind[43],ind[44],ind[45],ind[46],ind[47],ind[48],ind[49],
 				ind[50],ind[51],ind[52],ind[53],ind[54],ind[55],ind[56],
 				ind[57],ind[58],ind[59],ind[60],ind[61],ind[62]);break;
-	case 64:  (*FFN(fSaset))(ind[0],ind[1],ind[2],ind[3],ind[4],ind[5],ind[6],ind[7],
-				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14],
-				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21],
-				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28],
-				ind[29],ind[30],ind[31],ind[32],ind[33],ind[34],ind[35],
-				ind[36],ind[37],ind[38],ind[39],ind[40],ind[41],ind[42],
-				ind[43],ind[44],ind[45],ind[46],ind[47],ind[48],ind[49],
-				ind[50],ind[51],ind[52],ind[53],ind[54],ind[55],ind[56],
-				ind[57],ind[58],ind[59],ind[60],ind[61],ind[62],ind[63]);break;
+/* 	case 64:  (*FFN(fSaset))(ind[0],ind[1],ind[2],ind[3],ind[4],ind[5],ind[6],ind[7], */
+/* 				ind[8],ind[9],ind[10],ind[11],ind[12],ind[13],ind[14], */
+/* 				ind[15],ind[16],ind[17],ind[18],ind[19],ind[20],ind[21], */
+/* 				ind[22],ind[23],ind[24],ind[25],ind[26],ind[27],ind[28], */
+/* 				ind[29],ind[30],ind[31],ind[32],ind[33],ind[34],ind[35], */
+/* 				ind[36],ind[37],ind[38],ind[39],ind[40],ind[41],ind[42], */
+/* 				ind[43],ind[44],ind[45],ind[46],ind[47],ind[48],ind[49], */
+/* 				ind[50],ind[51],ind[52],ind[53],ind[54],ind[55],ind[56], */
+/* 				ind[57],ind[58],ind[59],ind[60],ind[61],ind[62],ind[63]);break; */
 	default: FEerror("Exceeded call-arguments-limit ",0);
 	} 
 	

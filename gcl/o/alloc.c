@@ -1364,7 +1364,7 @@ gprof_cleanup(void) {
 
     char b[PATH_MAX],b1[PATH_MAX];
 
-    if (!getwd(b))
+    if (!getcwd(b,sizeof(b)))
       FEerror("Cannot get working directory", 0);
     if (chdir(P_tmpdir))
       FEerror("Cannot change directory to tmpdir", 0);
@@ -1439,7 +1439,7 @@ DEFUN_NEW("GPROF-QUIT",object,fSgprof_quit,SI
   }
 
 #else
-  if (!getwd(b))
+  if (!getcwd(b,sizeof(b)))
     FEerror("Cannot get working directory", 0);
 #endif
   if (chdir(P_tmpdir))

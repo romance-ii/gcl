@@ -9,8 +9,38 @@ gclcvs (2.7.0-85) unstable; urgency=low
   * Bug fix: "gcl: Builds broken package with gcc-4.3", thanks to Daniel
     Schepler (Closes: #467474).  Added sincos to plttest.c
   * No infinite unrandomization loops
+  * Bug fix: "gclcvs 2.7.0-84 uninstallable: requires exact obsolete
+    version of binutils-dev", thanks to Francois-Rene Rideau (Closes:
+    #469178).  Remove dependency
+  * Accept NMU, Closes: #450981 Closes: #457113 Closes: #457154 Closes:
+    #457359 Closes: #472473 Closes: #473249 Closes: #474085
+  * variable gp_disp name for mips
+  * larger immfixnum space requirement to step around sparc stack location
+  * compiler warning cleanups
+  * __divdi3 et.al symbols for ia64 and arm
 
- -- Camm Maguire <camm@enhanced.com>  Thu, 31 Jul 2008 15:48:04 -0400
+ -- Camm Maguire <camm@enhanced.com>  Fri, 01 Aug 2008 17:43:45 -0400
+
+gclcvs (2.7.0-84.1) unstable; urgency=low
+
+  * Non-maintainer upload to fix pending l10n issues.
+  * Debconf translations:
+    - Dutch. Closes: #450981
+    - Portuguese. Closes: #457113
+    - French. Closes: #457154
+    - German. Closes: #457359
+    - Finnish. Closes: #472473
+    - Russian. Closes: #473249
+    - Czech. Closes: #474085
+  * [Lintian] Correct FSF address in debian/copyright
+  * [Lintian] Add copyright information in debian/copyright
+  * [Lintian] Correct doc-base section to "Programming"
+  * [Lintian] Remove non-managed format files "Tex" in doc-base control
+    files
+  * [Lintian] Remove reference to several non-existing files in doc-base
+    control files
+
+ -- Christian Perrier <bubulle@debian.org>  Thu, 03 Apr 2008 19:09:22 +0200
 
 gclcvs (2.7.0-84) unstable; urgency=low
 

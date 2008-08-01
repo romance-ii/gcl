@@ -281,3 +281,4 @@ SGC is enabled.  */
 #undef HAVE_OBJC_MALLOC_H
 #undef INFINITY
 #undef NAN
+#undef GP_DISP

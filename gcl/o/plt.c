@@ -35,6 +35,10 @@ pltcomp(const void *v1,const void *v2) {
 /* extern int _mcount(); */
 extern int mcount();
 extern void sincos(double,double *,double *);
+extern int __divdi3();
+extern int __moddi3();
+extern int __udivdi3();
+extern int __umoddi3();
 
 #ifndef _WIN32
 #  include "pltd.h"

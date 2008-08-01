@@ -524,6 +524,36 @@ case $use in
   powerpc*) enable_gprof="no";;
 esac		     
 
+case $use in
+  mips*)
+	AC_MSG_CHECKING([for _gp_disp name])
+	cat >foo.c <<EOF
+#include <stdio.h>
+int
+main(int argc,char * argv[]) {
+  printf("%s\n",argv[1]);
+  return 0;
+}
+EOF
+
+	$(CC) -g foo.c -c -o foo.o
+	GP_DISP=""
+	if nm foo.o | grep " U " | grep -q _gp_disp; then
+	   GP_DISP="_gp_disp"
+	else
+	   if nm foo.o | grep " U " | grep -q __gnu_local_gp; then
+	      GP_DISP="__gnu_local_gp"
+	   else
+	      if test "$enable_locbfd" = "yes" ; then
+	   	AC_MSG_ERROR([cannot determine _gp_disp name for locbfd use])
+	      fi		     
+	   fi
+        fi
+	AC_MSG_RESULT($GP_DISP)
+	AC_DEFINE_UNQUOTED(GP_DISP,$GP_DISP)
+	rm -f foo*;;
+esac
+
 #case $use in
 #  ia64*) enable_debug="yes";;
 #  hppa*) enable_debug="yes";;
@@ -1298,7 +1328,7 @@ main()
 
   j=1;
   j<<=$PAGEWIDTH;
-  j<<=4;
+  j<<=16;
   j--;
   i=(unsigned long)&v;
   i+=j;

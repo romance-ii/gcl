@@ -844,20 +844,20 @@ LFD(LlistA)()
 	while (vs_top > vs_base + 1)
 		stack_cons();
 }
-static object copy_off_stack_tree(x)
-object x;
-{object *p;
- p = &x;
- TOP:
- if (consp(*p))
-   { if(!inheap(*p))
-       *p=make_cons(copy_off_stack_tree((*p)->c.c_car),(*p)->c.c_cdr);
-   else
-     (*p)->c.c_car = copy_off_stack_tree((*p)->c.c_car);
-     p = &((*p)->c.c_cdr);
-     goto TOP;}
- return x;
-}
+/* static object copy_off_stack_tree(x) */
+/* object x; */
+/* {object *p; */
+/*  p = &x; */
+/*  TOP: */
+/*  if (consp(*p)) */
+/*    { if(!inheap(*p)) */
+/*        *p=make_cons(copy_off_stack_tree((*p)->c.c_car),(*p)->c.c_cdr); */
+/*    else */
+/*      (*p)->c.c_car = copy_off_stack_tree((*p)->c.c_car); */
+/*      p = &((*p)->c.c_cdr); */
+/*      goto TOP;} */
+/*  return x; */
+/* } */
 
         
  

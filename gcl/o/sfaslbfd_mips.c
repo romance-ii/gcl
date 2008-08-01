@@ -65,7 +65,7 @@ mipself_new_hi16_reloc (bfd *abfd,
     return bfd_reloc_notsupported;    
 
   /* Test if symbol is '_gp_disp' because it changes everything */
-  if (!strcmp(symbol->name, "_gp_disp"))  {
+  if (!strcmp(symbol->name,GP_DISP))  {
 
     mipself_gpdisp_hiaddr = ptrvma(data) + reloc_entry->address;
     mipself_gpdisp_value = symbol->section->vma + symbol->value;
@@ -97,7 +97,7 @@ mipself_new_lo16_reloc (bfd *abfd,
 
   /* Test if symbol is '_gp_disp' because it changes everything */
 
-  if(!strcmp(symbol->name, "_gp_disp")) {
+  if(!strcmp(symbol->name,GP_DISP)) {
     
     int loinsn, hiinsn;
     
@@ -180,7 +180,7 @@ mipself_new_got16_reloc (bfd *abfd,
   bfd_byte *addr;
 
   /* If symbol is '_gp_disp' same as CALL16 */
-  if (!strcmp(symbol->name,"_gp_disp"))
+  if (!strcmp(symbol->name,GP_DISP))
     return mipself_new_call16_reloc(abfd, reloc_entry, symbol,
                                     data, input_section, 
                                     output_bfd, error_message);
@@ -466,7 +466,7 @@ mipself_fix_relocs(bfd *b,asymbol ** symbols,int symbol_count,
   /* Locate and patch gpdisp symbol */
   for (i=0; i<symbol_count; i++)
 
-    if (!strcmp(symbols[i]->name, "_gp_disp")) {
+    if (!strcmp(symbols[i]->name,GP_DISP)) {
 
       gpdisp = symbols[i];
       gpdisp->value = 0;
