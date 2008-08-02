@@ -536,7 +536,7 @@ main(int argc,char * argv[]) {
 }
 EOF
 
-	$(CC) -g foo.c -c -o foo.o
+	$CC -g foo.c -c -o foo.o
 	GP_DISP=""
 	if nm foo.o | grep " U " | grep -q _gp_disp; then
 	   GP_DISP="_gp_disp"
