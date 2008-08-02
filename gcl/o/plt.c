@@ -39,6 +39,14 @@ extern int __divdi3();
 extern int __moddi3();
 extern int __udivdi3();
 extern int __umoddi3();
+extern int __divsi3();
+extern int __modsi3();
+extern int __udivsi3();
+extern int __umodsi3();
+extern int $$divI();
+extern int $$divU();
+extern int $$remI();
+extern int $$remU();
 
 #ifndef _WIN32
 #  include "pltd.h"

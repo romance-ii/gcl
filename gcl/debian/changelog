@@ -1,3 +1,11 @@
+gclcvs (2.7.0-86) unstable; urgency=low
+
+  * enable_pic enforced on all mips reloc options, gcc-4.3 has -mno-shared
+    by default, which eliminates _gp_disp from the code.
+  * more div/rem symbols for arm and hppa
+  
+ -- Camm Maguire <camm@sacrifice.m.enhanced.com>  Sat, 02 Aug 2008 00:23:30 +0000
+
 gclcvs (2.7.0-85) unstable; urgency=low
 
   * Incorporate Debian NMU from 2.6.7
