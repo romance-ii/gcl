@@ -1673,7 +1673,7 @@ done
 
 # Work around system/gprof mips hang
 case $use in
-  mips*) enable_gprof="no" ; enable_pic="yes" ;;
+  mips*) enable_gprof="no" ; enable_pic="yes" ;; #FIXME actually -mshared might suffice, at least for locbfd
   hppa*) enable_gprof="no" ; enable_pic="yes" ;;
   powerpc*) enable_gprof="no";;
 esac		     
