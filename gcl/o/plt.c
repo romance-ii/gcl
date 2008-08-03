@@ -47,6 +47,10 @@ extern int $$divI();
 extern int $$divU();
 extern int $$remI();
 extern int $$remU();
+extern int __divq();
+extern int __divqu();
+extern int __remq();
+extern int __remqu();
 
 #ifndef _WIN32
 #  include "pltd.h"

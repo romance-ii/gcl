@@ -1,3 +1,9 @@
+gclcvs (2.7.0-87) unstable; urgency=low
+
+  * more div/remq sybols for alpha
+
+ -- Camm Maguire <camm@sacrifice.m.enhanced.com>  Sun, 03 Aug 2008 10:41:19 +0000
+
 gclcvs (2.7.0-86) unstable; urgency=low
 
   * enable_pic enforced on all mips reloc options, gcc-4.3 has -mno-shared
