@@ -1044,7 +1044,7 @@ AC_TRY_RUN([int main () {
     char c[sizeof(long)];
   } u;
   u.l = 1;
-  return *u.c!=0;
+  return *u.c;
 }],AC_MSG_RESULT(little),
    AC_MSG_RESULT(big) 
    AC_DEFINE(WORDS_BIGENDIAN),
