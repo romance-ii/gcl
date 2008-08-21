@@ -561,8 +561,10 @@ else
 # FIXME -- remove when compiler issues are fixed
 	  hppa*)
 		TO3FLAGS="-O2 -g";;
+	  sparc*)
+		TOSFLAGS="-O2 -g";; # workaround sparc gcc longjmp bug
 	  ia64*)
-		TOSFLAGS="-O2 $TFPFLAG";;
+		TOSFLAGS="-O2 -g";;
 	esac
 fi
 
@@ -1030,9 +1032,41 @@ return 0;
 AC_MSG_RESULT($char_size)
 AC_DEFINE_UNQUOTED(CHAR_SIZE,$char_size)
 
-AC_C_BIGENDIAN()
+#AC_C_BIGENDIAN()
+#AC_SUBST(WORDS_BIGENDIAN)
+
+AC_MSG_CHECKING(for byte order)
+AC_TRY_RUN([int main () {
+  /* Are we little or big endian?  Adapted from Harbison&Steele.  */
+  union
+  {
+    long l;
+    char c[sizeof(long)];
+  } u;
+  u.l = 1;
+  return *u.c!=0;
+}],AC_MSG_RESULT(little),
+   AC_MSG_RESULT(big) 
+   AC_DEFINE(WORDS_BIGENDIAN),
+   AC_MSG_RESULT([WARNING: ASSUMING LITTLE ENDIAN FOR CROSS COMPILING !!!]))
 AC_SUBST(WORDS_BIGENDIAN)
 
+
+AC_MSG_CHECKING(for word order)
+AC_TRY_RUN([int main () {
+  /* Are we little or big endian?  Adapted from Harbison&Steele.  */
+  union
+  {
+    double d;
+    long l[sizeof(double)/sizeof(long)];
+  } u;
+  u.d = 1.0;
+  return *u.l!=0;
+}],AC_MSG_RESULT(little),
+   AC_MSG_RESULT(big) 
+   AC_DEFINE(DOUBLE_BIGENDIAN),
+   AC_MSG_RESULT([WARNING: ASSUMING LITTLE ENDIAN FOR CROSS COMPILING !!!]))
+AC_SUBST(DOUBLE_BIGENDIAN)
 
 #AC_CHECK_HEADERS(endian.h,
 #	AC_MSG_CHECKING(endianness)

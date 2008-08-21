@@ -1,8 +1,17 @@
+gclcvs (2.7.0-88) unstable; urgency=low
+
+  * redo unrandomize.h to enable compilation under -O2 -- FIXME
+  * DOUBLE_BIGENDIAN supplements WORDS_BIGENDIAN
+  * proper -Os sparc workaround
+
+ -- Camm Maguire <camm@maguirefamily.org>  Wed, 20 Aug 2008 20:44:06 +0000
+
 gclcvs (2.7.0-87) unstable; urgency=low
 
   * more div/remq sybols for alpha
+  * -O2 -g on sparc to workaround longjmp bug.
 
- -- Camm Maguire <camm@sacrifice.m.enhanced.com>  Sun, 03 Aug 2008 10:41:19 +0000
+ -- Camm Maguire <camm@intech21.enhanced.com>  Wed,  6 Aug 2008 15:59:30 -0400
 
 gclcvs (2.7.0-86) unstable; urgency=low
 

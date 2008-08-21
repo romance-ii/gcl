@@ -224,6 +224,7 @@ SGC is enabled.  */
 #endif
 
 #undef WORDS_BIGENDIAN
+#undef DOUBLE_BIGENDIAN
 
 #undef PAGEWIDTH
 

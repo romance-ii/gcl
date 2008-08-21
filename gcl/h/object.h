@@ -1113,7 +1113,7 @@ EXTER char *tmp_alloc;
 /*  For IEEEFLOAT, the double may have exponent in the second word
 (little endian) or first word.*/
 
-#if !defined(WORDS_BIGENDIAN)
+#if !defined(DOUBLE_BIGENDIAN)
 #define HIND 1  /* (int) of double where the exponent and most signif is */
 #define LIND 0  /* low part of a double */
 #else /* big endian */
