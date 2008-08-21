@@ -1,3 +1,9 @@
+gclcvs (2.7.0-89) unstable; urgency=low
+
+  * fix endian checks
+
+ -- Camm Maguire <camm@enhanced.com>  Thu, 21 Aug 2008 10:56:19 -0400
+
 gclcvs (2.7.0-88) unstable; urgency=low
 
   * redo unrandomize.h to enable compilation under -O2 -- FIXME

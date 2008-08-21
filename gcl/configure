@@ -4106,7 +4106,7 @@ int main () {
     char c[sizeof(long)];
   } u;
   u.l = 1;
-  return !*u.c;
+  return u.c[sizeof(long)-1] ? 1 : 0; 
 }
 EOF
 if { (eval echo configure:4113: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
@@ -4141,10 +4141,10 @@ int main () {
   union
   {
     double d;
-    long l[sizeof(double)/sizeof(long)];
+    int l[sizeof(double)/sizeof(int)];
   } u;
   u.d = 1.0;
-  return *u.l!=0;
+  return u.l[sizeof(double)/sizeof(int)-1] ? 0 : 1;
 }
 EOF
 if { (eval echo configure:4151: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null

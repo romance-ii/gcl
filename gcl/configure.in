@@ -1044,7 +1044,7 @@ AC_TRY_RUN([int main () {
     char c[sizeof(long)];
   } u;
   u.l = 1;
-  return !*u.c;
+  return u.c[sizeof(long)-1] ? 1 : 0; 
 }],AC_MSG_RESULT(little),
    AC_MSG_RESULT(big) 
    AC_DEFINE(WORDS_BIGENDIAN),
@@ -1058,10 +1058,10 @@ AC_TRY_RUN([int main () {
   union
   {
     double d;
-    long l[sizeof(double)/sizeof(long)];
+    int l[sizeof(double)/sizeof(int)];
   } u;
   u.d = 1.0;
-  return *u.l!=0;
+  return u.l[sizeof(double)/sizeof(int)-1] ? 0 : 1;
 }],AC_MSG_RESULT(little),
    AC_MSG_RESULT(big) 
    AC_DEFINE(DOUBLE_BIGENDIAN),
