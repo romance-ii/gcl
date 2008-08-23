@@ -1281,7 +1281,7 @@ AC_TRY_RUN([#include <stdio.h>
 
 void gprof_cleanup() {};
 int
-main(int argc,char * argv[])
+main(int argc,char * argv[],char *envp[])
 {
   void *b;
   FILE *fp;
@@ -1472,24 +1472,15 @@ if ./foo ; then
    AC_TRY_RUN([#include <stdio.h>
                #include <stdlib.h>
 	       #include <unistd.h>
-	       #ifdef NEED_NONRANDOM_SBRK
-	       #include <syscall.h>
-	       #include <linux/personality.h>
-	       #endif
 	       int
-	       main(int argc,char * argv[])
+	       main(int argc,char * argv[],char * envp[])
 	       {
 	         void *b;
 		 FILE *fp;
 
-		 #ifdef NEED_NONRANDOM_SBRK
-		 #if SIZEOF_LONG == 4
-		 if (!syscall(SYS_personality,PER_LINUX32))
-		 #else
-		 if (!syscall(SYS_personality,PER_LINUX))
-		 #endif
-		    execvp(argv[0],argv);
-		 #endif  
+		#ifdef CAN_UNRANDOMIZE_SBRK
+		#include "h/unrandomize.h"
+		#endif
 		 fp = fopen("conftest1","w");
 
 		 #ifdef _WIN32
