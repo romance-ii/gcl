@@ -940,15 +940,30 @@ set_maxpage(void) {
   SET_REAL_MAXPAGE;
 }
 
+#ifdef GCL_GPROF
+static unsigned long textstart,textend,textpage;
+static void init_textpage() {
+
+  extern void *GCL_GPROF_START;
+  unsigned long s=(unsigned long)GCL_GPROF_START;
+
+  textstart=(unsigned long)&GCL_GPROF_START;
+  textend=(unsigned long)&etext;
+  if (s<textend && (textstart>textend || s>textstart))
+    textstart=s;
+
+  textpage=2*(textend-textstart)/PAGESIZE;
+  
+}
+#endif
 
 void
 gcl_init_alloc(void) {
 
   long i;
+
 #ifdef GCL_GPROF
-   extern void *GCL_GPROF_START;
-   long textpage=2*((void *)&etext-(void *)&GCL_GPROF_START)/PAGESIZE,t1=2*((void *)&etext-(void *)GCL_GPROF_START)/PAGESIZE;
-   textpage=t1>0 && (textpage<0 || t1<textpage) ? t1 : textpage;
+  init_textpage();
 #endif
   
   if (gcl_alloc_initialized) return;
@@ -1391,7 +1406,7 @@ DEFUN_NEW("GPROF-START",object,fSgprof_start,SI
   static int n;
 
   if (!gprof_on) {
-    start=start ? start : (unsigned long)&GCL_GPROF_START;
+    start=start ? start : textstart;
     end=end ? end : (unsigned long)core_end;
     monstartup(start,end);
     gprof_on=1;
@@ -1635,14 +1650,8 @@ malloc(size_t size) {
 	   startup.  In saved images, monstartup memory is only
 	   allocated with gprof-start. 20040804 CM*/
 #ifdef GCL_GPROF
-	{
-	  extern void *GCL_GPROF_START;
-
-	  if (!initflag && size > ((void *)&etext-(void *)&GCL_GPROF_START)
-	      && !initial_monstartup_pointer) 
-	    initial_monstartup_pointer=malloc_list->c.c_car->st.st_self;
-
-	}
+	if (!initflag && size>(textend-textstart) && !initial_monstartup_pointer) 
+	  initial_monstartup_pointer=malloc_list->c.c_car->st.st_self;
 #endif
 	
 #ifdef SGC

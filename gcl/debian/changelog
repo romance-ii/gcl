@@ -1,8 +1,10 @@
 gclcvs (2.7.0-90) unstable; urgency=low
 
   * configure fixes for unrandomize.h
+  * backoff on arm opts
+  * more careful handling of GCL_GPROF_START
 
- -- Camm Maguire <camm@maguirefamily.org>  Sat, 23 Aug 2008 15:06:23 +0000
+ -- Camm Maguire <camm@maguirefamily.org>  Sat, 23 Aug 2008 21:32:41 +0000
 
 gclcvs (2.7.0-89) unstable; urgency=low
 
