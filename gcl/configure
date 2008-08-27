@@ -1723,7 +1723,7 @@ else
 	  hppa*)
 		TO3FLAGS="-O2 -g";;
 	  sparc*)
-		TOSFLAGS="-O2 -g";; # workaround sparc gcc longjmp bug
+		TOSFLAGS="-O2 -g" # workaround sparc gcc longjmp bug
 		TO3FLAGS="-O2 -g";; # workaround sparc gcc longjmp bug
 	  ia64*)
 		TOSFLAGS="-O2 -g";;
