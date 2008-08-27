@@ -58,17 +58,17 @@ gcl.info: ${GCL_MAN} gcl.texi
 #	$(HTML_CMD) gcl.texi
 
 gcl-si/index.html: ${GCL_SI} gcl-si.texi
-	mkdir -p $@
+	mkdir -p $(@D)
 	touch $@
 	-$(HTML_CMD) gcl-si.texi
 
 gcl-tk/index.html: ${GCL_TK} gcl-tk.texi
-	mkdir -p $@
+	mkdir -p $(@D)
 	touch $@
 	-$(HTML_CMD) gcl-tk.texi
 
 gcl/index.html: gcl.texi
-	mkdir -p $@
+	mkdir -p $(@D)
 	touch $@
 	-$(HTML_CMD) gcl.texi
 
