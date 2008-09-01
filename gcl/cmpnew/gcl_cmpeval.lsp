@@ -1324,11 +1324,47 @@
 	  (setf (gethash prop *prop-hash*) res))
 	(if (acceptable-inline res form (cddr prop)) res (cons nil (cdr res)))))))
 
+	   
 (defun match-c1forms (ofs fms)
   (mapcar (lambda (x) 
 	    (or (car (member (info-unused1 (cadr x)) fms 
 			     :key (lambda (x) (when x (info-unused1 (cadr x)))))) x)) ofs))
 
+(defun array-replace (x y z)
+  (do ((i 0 (1+ i))) ((>= i (length x)))
+    (when (eq y (aref x i))
+      (setf (aref x i) z))))
+
+(defun info-replace-var (x y z)
+  (array-replace (info-referred-array x) y z)
+  (array-replace (info-changed-array x) y z))
+
+(defun info-var-match (i v)
+  (or (is-referred v i) (is-changed v i)))
+
+(defun collect-matching-vars (ov f)
+  (cond ((var-p f) (when (or (member f ov) (intersection (var-aliases f) ov)) (list f)))
+	((info-p f) (let (r) 
+		      (dolist (ov ov r) 
+			(when (info-var-match f ov) (push ov r)))))
+	((atom f) nil)
+	((union (collect-matching-vars ov (car f)) (collect-matching-vars ov (cdr f))))))
+
+(defun collect-matching-info (ov f)
+  (cond ((info-p f) (when (member-if (lambda (x) (info-var-match f x)) ov) (list f)))
+	((atom f) nil)
+	((union (collect-matching-info ov (car f)) (collect-matching-info ov (cdr f))))))
+
+(defun fms-fix (f fms)
+  (let* ((vv (collect-matching-vars (third f) fms))
+	 (ii (collect-matching-info vv fms))
+	 (nv (mapcar 'copy-var vv))
+	 (a (mapcar 'cons vv nv))
+	 (nv (mapc (lambda (x) (setf (var-aliases x) (sublis a (var-aliases x)))) nv))
+	 (ni (mapcar 'copy-info ii))
+	 (ni (mapc (lambda (x) (mapc (lambda (y z) (info-replace-var x y z)) vv nv)) ni)))
+    (sublis (nconc a (mapcar 'cons ii ni)) fms)))
+  
 (defun get-inline-h (form prop fms)
 
   (let ((h (gethash prop *prop-hash*)))
@@ -1339,21 +1375,23 @@
 	(return-from get-inline-h (cons nil (cdr h))))
 
       (let* ((f (car h))
-	     (ofs (when (eq (car (fourth f)) 'let*) (fourth (fourth f))))
+	     (ff (fourth f))
+	     (lf (eq (car ff) 'let*))
+	     (fms (if lf (fms-fix ff fms) fms))
+	     (ofs (when lf (fourth ff)))
+	     (nfs (match-c1forms ofs fms))
+	     (al (cons (cons ofs nfs) nil))
 	     (oi (cadr f))
 	     (info (make-info))
+	     (al (cons (cons oi info) al))
 	     (n (caddr f))
-	     (nfs (match-c1forms ofs fms)))
+	     (al (cons (cons n (with-output-to-string (s) (princ form s))) al)))
 
 	(set-vars f)
 	(setf (info-type info) (info-type oi))
 	(dolist (l nfs) (add-info info (cadr l)))
 
-	(cons
-	 (sublis (list (cons oi info) 
-		       (cons ofs nfs) 
-		       (cons n (with-output-to-string (s) (princ form s)))) f)
-	 (cdr h))))))
+	(cons (sublis al f) (cdr h))))))
   
 
 (defun acceptable-inline (h form tpis)
