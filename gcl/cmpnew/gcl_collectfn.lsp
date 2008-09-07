@@ -35,6 +35,8 @@
   macros
   )
 
+(si::freeze-defstruct 'fn)
+
 (defvar *other-form* (make-fn))
 (defvar *all-fns* nil)
 (defvar *call-table* (make-hash-table :test #'equal))

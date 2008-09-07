@@ -523,11 +523,11 @@
 (defun function-string (name)
   (unless (symbolp name)
     (error "function names must be symbols~%"))
-  (si::string-concatenate (let ((p (symbol-package name))) (if p (package-name p) "")) "::" (symbol-name name)))
-;;   (let ((sname (setf-function-base-symbol name)))
-;;     (if sname
-;; 	(si::string-concatenate "(SETF " (symbol-name sname) ")")
-;;       (symbol-name name))))
+  (delete-if (lambda (x) (or (eq x #\@) (eq x #\/)))
+	     (si::string-concatenate 
+	      (let ((p (symbol-package name))) (if p (package-name p) ""))
+	      "::"
+	      (symbol-name name))))
 
 (defvar *compiler-auto-proclaim* t)
 (defvar *mlts* nil)

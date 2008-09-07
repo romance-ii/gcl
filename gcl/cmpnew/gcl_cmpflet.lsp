@@ -57,6 +57,8 @@
                                 ;;;     (* a (%f8))))
            )
 
+(si::freeze-defstruct 'fun)
+
 (defvar *funs* nil)
 
 ;;; During Pass 1, *funs* holds a list of fun objects, local macro definitions
@@ -201,8 +203,7 @@
          (setf (fun-ref-ccb fun) (ccb-vs-push))
          ))
 
-  (c2expr body)
-  )
+  (c2expr body))
 
 (defun c1labels (args &aux body ss ts is other-decl info
                       (defs1 nil) (local-funs nil) (closures nil)
@@ -355,28 +356,28 @@
   (c2expr body)
   )
 
-(defun c1macrolet (args &aux body ss ts is other-decl
-                        (*funs* *funs*) (*vars* *vars*))
+(defvar *macrolet-env* nil)
+
+(defun c1macrolet (args &aux body ss ts is other-decl env
+                        (*funs* *funs*) (*vars* *vars*) (*macrolet-env* *macrolet-env*))
   (when (endp args) (too-few-args 'macrolet 1 0))
   (dolist** (def (car args))
     (let* ((x (car def))(y (si::funid-sym x))) (unless (eq x y) (setq def (cons y (cdr def)))))
     (cmpck (or (endp def) (endp (cdr def)))
            "The macro definition ~s is illegal." def)
-    (push (list (car def)
-                (si::interpreted-function-lambda (caddr (si:defmacro* (car def) (cadr def) (cddr def)))))
-          *funs*))
+    (let* ((n (car def))
+	   (b (si::interpreted-function-lambda (caddr (si:defmacro* n (cadr def) (cddr def))))))
+      (push (list n 'macro b) env)))
+  (when env (setq *macrolet-env* (list nil (append (cadr *macrolet-env*) (nreverse env)) nil)))
   (multiple-value-setq (body ss ts is other-decl) (c1body (cdr args) t))
   (c1add-globals ss)
   (check-vdecl nil ts is)
-  (c1decl-body other-decl body)
-  )
+  (c1decl-body other-decl body))
 
 (defun c1local-fun (fname &aux (ccb nil))
   (declare (object ccb))
   (dolist* (fun *funs* nil)
     (cond ((eq fun 'CB) (setq ccb t))
-          ((consp fun)
-           (when (eq (car fun) fname) (return (cadr fun))))
           ((eq (fun-name fun) fname)
            (if ccb
                (setf (fun-ref-ccb fun) t)

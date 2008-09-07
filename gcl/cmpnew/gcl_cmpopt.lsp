@@ -251,6 +251,8 @@
 ;;SYSTEM:STRUCTURE-DEF
  (push '((t) t #.(flags)"(#0)->str.str_def")
    (get 'system:structure-def 'inline-unsafe))
+ (push '((structure) structure #.(flags)"(#0)->str.str_def")
+   (get 'system:structure-def 'inline-always))
 
 ;;SYSTEM:STRUCTURE-REF
  (push '((t t fixnum) t #.(flags ans)"structure_ref(#0,#1,#2)")

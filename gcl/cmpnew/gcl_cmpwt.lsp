@@ -34,6 +34,8 @@
   evald_forms ; list of forms eval'd. (load-time-eval)
   )
 
+(si::freeze-defstruct 'fasd)
+
 (defvar *fasd-ops*
 '(  d_nil         ;/* dnil: nil */
   d_eval_skip    ;    /* deval o1: evaluate o1 after reading it */

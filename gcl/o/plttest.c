@@ -3,6 +3,7 @@
 #include <setjmp.h>
 #include <stdio.h>
 #include <math.h>
+#include <complex.h>
 
 /*  We try here to compile in function addresses to which it is known
     that the compiler will make *direct* reference.  20040308 CM */
@@ -20,6 +21,7 @@ main(int argc,char * argv[],char *envp[]) {
   double d=0.1;
   long l;
   unsigned long ul;
+  double complex dc;
 
   sscanf(argv[1],"%lf",&d);
   bzero(&env,sizeof(env));
@@ -48,6 +50,9 @@ main(int argc,char * argv[],char *envp[]) {
   d=sin(d);
   sincos(d,&d,&d);
   d=tan(d);
+  dc=d+d*I;
+  dc*=dc;
+  d=creal(dc);
 
   d=acos(d);
   d=asin(d);

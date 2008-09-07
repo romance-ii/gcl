@@ -1,3 +1,20 @@
+gclcvs (2.7.0-93) unstable; urgency=low
+
+  * freeze-defstructs
+  * catch/do-setq-tp/throw fix
+  * faster get-arg-types/get-return-type, normalized types in unique-sigs
+  * more rubust c1form hashing
+  * *macrolet-env* separated from *funs*, simpler faster cmp-macroexpand et. al.
+  * structurep shared with 'si and compiler, inline for si::structure-def,
+    fast structure predicates.
+  * mre effective trim-vars, preserving both let and let* order
+  * no #\@ or #\/ in function-strings, interferes with inline codes.
+  * rewrite defmlfun so that the compiler can see the restricted ranges of
+    the real subfunctions.
+  * allow for just one gcl_recompile.o file
+
+ -- Camm Maguire <camm@debian.org>  Sat, 06 Sep 2008 19:50:26 +0000
+
 gclcvs (2.7.0-92) unstable; urgency=low
 
   * enable_debug on sparc

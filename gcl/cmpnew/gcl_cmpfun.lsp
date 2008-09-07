@@ -855,8 +855,6 @@
 	    `(,(car type) ,@(mapcar (lambda (x) `(typep ,(car args) ',x)) (cdr type))))))
     (when new (c1expr `(the boolean , new)))))
 
-(defun structurep (x) (si::structurep x))
-
 ;; this is going the wrong way.  want to go up..
 (defun struct-type-opt (x sd)
   (let ((s (gensym))

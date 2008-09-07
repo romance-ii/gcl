@@ -1231,20 +1231,11 @@
 
 (defun copy-vars (form)
   (cond ((var-p form) (setf (var-store form) (var-kind form)))
-;	(list (var-kind form) (var-ref form) (var-ref-ccb form) (var-loc form)
-;						   (var-type form))))
-	((atom form))
-	(t (copy-vars (car form)) (copy-vars (cdr form)))))
+	((consp form) (copy-vars (car form)) (copy-vars (cdr form)))))
 
 (defun set-vars (form)
-  (cond ((var-p form) (setf (var-kind form) (var-store form)
-;			    (var-ref form) (cadr (var-store form))
-;			    (var-ref-ccb form) (caddr (var-store form))
-;			    (var-loc form) (cadddr (var-store form))
-;			    (var-type form) (fifth (var-store form))
-			    ))
-	((atom form))
-	(t (set-vars (car form)) (set-vars (cdr form)))))
+  (cond ((var-p form) (setf (var-kind form) (var-store form)))
+	((consp form) (set-vars (car form)) (set-vars (cdr form)))))
 
 (defun global-ref-p (form)
   (cond ((and (var-p form) (member (var-kind form) '(global special))))
@@ -1319,16 +1310,17 @@
 	   (c1 (c1inline (list form src)))
 	   (sz (c1size c1)))
       (copy-vars c1)
-      (let ((res (list c1 sz (info-type (cadr c1)))))
+      (let ((res (list c1 sz (info-type (cadr c1)) fms)))
 	(when (inline-hasheable form fms c1) 
 	  (setf (gethash prop *prop-hash*) res))
 	(if (acceptable-inline res form (cddr prop)) res (cons nil (cdr res)))))))
 
 	   
-(defun match-c1forms (ofs fms)
-  (mapcar (lambda (x) 
-	    (or (car (member (info-unused1 (cadr x)) fms 
-			     :key (lambda (x) (when x (info-unused1 (cadr x)))))) x)) ofs))
+(defun info-form-alist (o n)
+  (mapcan (lambda (o) 
+	    (when o
+	      (let ((n (car (member (info-unused1 (cadr o)) n :key (lambda (x) (when x (info-unused1 (cadr x))))))))
+		(when n (list (cons o n)))))) o))
 
 (defun array-replace (x y z)
   (do ((i 0 (1+ i))) ((>= i (length x)))
@@ -1348,12 +1340,12 @@
 		      (dolist (ov ov r) 
 			(when (info-var-match f ov) (push ov r)))))
 	((atom f) nil)
-	((union (collect-matching-vars ov (car f)) (collect-matching-vars ov (cdr f))))))
+	((nunion (collect-matching-vars ov (car f)) (collect-matching-vars ov (cdr f))))))
 
 (defun collect-matching-info (ov f)
   (cond ((info-p f) (when (member-if (lambda (x) (info-var-match f x)) ov) (list f)))
 	((atom f) nil)
-	((union (collect-matching-info ov (car f)) (collect-matching-info ov (cdr f))))))
+	((nunion (collect-matching-info ov (car f)) (collect-matching-info ov (cdr f))))))
 
 (defun fms-fix (f fms)
   (let* ((vv (collect-matching-vars (third f) fms))
@@ -1375,17 +1367,13 @@
 	(return-from get-inline-h (cons nil (cdr h))))
 
       (let* ((f (car h))
-	     (ff (fourth f))
-	     (lf (eq (car ff) 'let*))
-	     (fms (if lf (fms-fix ff fms) fms))
-	     (ofs (when lf (fourth ff)))
-	     (nfs (match-c1forms ofs fms))
-	     (al (cons (cons ofs nfs) nil))
+	     (fms (fms-fix (fourth f) fms))
+	     (al (info-form-alist (car (last h)) fms))
+	     (nfs (mapcar 'cdr al))
 	     (oi (cadr f))
 	     (info (make-info))
 	     (al (cons (cons oi info) al))
-	     (n (caddr f))
-	     (al (cons (cons n (with-output-to-string (s) (princ form s))) al)))
+	     (al (cons (cons (caddr f) (with-output-to-string (s) (princ form s))) al)))
 
 	(set-vars f)
 	(setf (info-type info) (info-type oi))
@@ -1573,29 +1561,26 @@
    (cond ((setq fd (get fname 'c1special)) (funcall fd args))
 	 ((and (setq fd (get fname 'co1special))
 	       (funcall fd fname args)))
+	 ((setq fd (caddar (member fname (cadr *macrolet-env*) :key 'car)))
+	  (c1expr (cmp-expand-macro fd fname args)))
 	 ((setq fd (c1local-fun fname))
-	  (if (eq (car fd) 'call-local)
-	      ;; c1local-fun now adds fun-info into (cadr fd), so we need no longer
-	      ;; do it explicitly here.  CM 20031030
-	      (let* ((info (add-info (make-info :type (info-type (cadr fd)) :sp-change 1) (cadr fd)))
-		     (forms (c1args args info)))
-		(let ((return-type (get-local-return-type (caddr fd))))
-		  (when return-type (setf (info-type info) return-type)))
-		(let ((arg-types (get-local-arg-types (caddr fd))))
+	  ;; c1local-fun now adds fun-info into (cadr fd), so we need no longer
+	  ;; do it explicitly here.  CM 20031030
+	  (let* ((info (add-info (make-info :type (info-type (cadr fd)) :sp-change 1) (cadr fd)))
+		 (forms (c1args args info)))
+	    (let ((return-type (get-local-return-type (caddr fd))))
+	      (when return-type (setf (info-type info) return-type)))
+	    (let ((arg-types (get-local-arg-types (caddr fd))))
                        ;;; Add type information to the arguments.
-		  (when arg-types
-		    (let ((fl nil))
-		      (dolist** (form forms)
-				(cond ((endp arg-types) (push form fl))
-				      (t (push (and-form-type
-						(car arg-types) form
-						(car args))
-					       fl)
-					 (unless (eq '* (car arg-types)) (pop arg-types))
-					 (pop args))))
-		      (setq forms (reverse fl)))))
-		(list 'call-local info (cddr fd) forms))
-	    (c1expr (cmp-expand-macro fd fname args))))
+	      (when arg-types
+		(let ((fl nil))
+		  (dolist** (form forms)
+			    (cond ((endp arg-types) (push form fl))
+				  ((push (and-form-type (car arg-types) form (car args)) fl)
+				   (unless (eq '* (car arg-types)) (pop arg-types))
+				   (pop args))))
+		  (setq forms (reverse fl)))))
+	    (list 'call-local info (cddr fd) forms)))
 	 ((let ((fn (get fname 'si::compiler-macro-prop)) (res (cons fname args)))
 	    (and fn
 		 (not (member fname *notinline*))
@@ -2273,16 +2258,6 @@
          (si:define-compiler-macro ,name ,temps
            (list* 'let ,binding ',body))))))
 
-(defun name-to-sd (x &aux sd)
-  (or (and (symbolp x) (setq sd (get x 'si::s-data)))
-      (error "The structure ~a is undefined." x))
-  sd)
-
-;; lay down code for a load time eval constant.
-(defun name-sd1 (x)
-  (or  (get x 'name-to-sd)
-      (setf (get x 'name-sd)
-	    `(si::|#,| name-to-sd ',x))))
 
 (defun co1structure-predicate (f args &aux tem)
   (cond ((and (symbolp f)

@@ -46,6 +46,8 @@
 	   type
            )
 
+(si::freeze-defstruct 'blk)
+
 (defvar *blocks* nil)
 
 ;;; During Pass 1, *blocks* holds a list of blk objects and the symbols 'CB'

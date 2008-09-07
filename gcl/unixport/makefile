@@ -51,6 +51,9 @@ OBJS:=$(OOBJS) $(shell ls -1 $(LSPDIR)/*.o | grep -v recompile.o)
 OBJS:=$(OBJS) $(shell ls -1 $(XDIR)/*.o)
 OBJS:=$(OBJS) $(shell ls -1 $(CMPDIR)/*.o | grep -v collectfn.o)
 ROBJS:=$(shell ls -1 gcl_recompile?*.o)
+ifeq ($(ROBS),"")
+ROBJS:=$(shell ls -1 gcl_recompile.o)
+endif
 OBJS:=$(OBJS) $(ROBJS)
 
 MODOBJS:=$(shell ls -1 $(MDIR)/*.o)
@@ -120,10 +123,10 @@ final: $(FLISP)
 FORCE:
 
 recompile.h: FORCE $(ROBJS)
-	echo -n $(ROBJS) | \
+	echo -n $(ROBJS) | sed 's,gcl_recompile.o,gcl_recompileq.o,g' |\
 		sed -e 's,gcl_recompile,,g' -e 's,\.o,,g' | \
 		tr ' ' '\012' | sort -n | \
-		awk '{printf("  ar_check_init(gcl_recompile%s,no_init);\n",$$1)}'  >$@;
+		awk '{a=$$1;if (a=="q") a="";printf("  ar_check_init(gcl_recompile%s,no_init);\n",a)}'  >$@;
 
 sys_ansi_gcl.o sys_gcl.o: recompile.h
 

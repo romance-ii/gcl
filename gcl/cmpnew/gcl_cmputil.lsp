@@ -206,57 +206,34 @@
 ;				   'setf
 ;				   args)))))
 
-(defun cmp-macroexpand (form &aux env)
-  ;;Obtain the local macro environment for expansion.
-  (dolist (v *funs*)
-	  (if (consp v) (push (list (car v) 'macro (cadr v)) env)))
-  (if env (setq env (list nil (nreverse env) nil)))
-  (let* (;(form (if (atom form) form (mapcar (lambda (x) (if (and (consp x) (eq (car x) 'load-time-value)) (cmp-eval x) x)) form)))
-	 (x (multiple-value-list (cmp-toplevel-eval `(macroexpand ',form ',env)))))
-    (if (car x)
-        (let ((*print-case* :upcase))
-          (incf *error-count*)
-          (print-current-form)
-          (format t
-                  ";;; The macro form ~s was not expanded successfully.~%"
-                  form)
-          `(error "Macro-expansion of ~s failed at compile time." ',form))
-        (cadr x))))
+(defmacro macroexpand-helper (pre meth form)
+  (let ((c (gensym))(x (gensym))(e (gensym)))
+    `(let ((,c (when (consp ,form) (car ,form))))
+       ,@(when pre `(,pre))
+       (cond ((not ,c) ,form)
+	     ((not (symbolp ,c)) ,form)
+	     ((and (not (assoc ,c (cadr *macrolet-env*))) (not (macro-function ,c))) ,form)
+	     ((let* ((,x (multiple-value-list (cmp-toplevel-eval `,,meth)))
+		     (,e (car ,x)))
+		(cond ((not ,e) (cadr ,x))
+		      ((let ((*print-case* :upcase))
+			 (incf *error-count*)
+			 (print-current-form)
+			 (format t ";;; The macro form ~s was not expanded successfully.~%" ,form)
+			 `(error "Macro-expansion of ~s failed at compile time." ',,form))))))))))
 
-(defun cmp-macroexpand-1 (form &aux env)
-  (dolist (v *funs*)
-	  (if (consp v) (push (list (car v) 'macro (cadr v)) env))) 
-  (let* (;(form (if (atom form) form (mapcar (lambda (x) (if (and (consp x) (eq (car x) 'load-time-value)) (cmp-eval x) x)) form)))
-	 (x (multiple-value-list (cmp-toplevel-eval `(macroexpand-1 ',form ',env)))))
-    (if (car x)
-        (let ((*print-case* :upcase))
-          (incf *error-count*)
-          (print-current-form)
-          (format t
-                  ";;; The macro form ~s was not expanded successfully.~%"
-                  form)
-          `(error "Macro-expansion of ~s failed at compile time." ',form))
-        (cadr x))))
+(defun cmp-macroexpand (form)
+  (macroexpand-helper nil `(macroexpand ',form ',*macrolet-env*) form))
 
-(defun cmp-expand-macro (fd fname args &aux env)
-  (dolist (v *funs*)
-	  (if (consp v) (push (list (car v) 'macro (cadr v)) env)))
-  (and *record-call-info* (add-macro-callee fname))
-  (if env (setq env (list nil (nreverse env) nil)))
-  (let* (;(args (if (atom args) args (mapcar (lambda (x) (if (and (consp x) (eq (car x) 'load-time-value)) (cmp-eval x) x)) args)))
-	 (x (multiple-value-list
-            (cmp-toplevel-eval
-             `(funcall *macroexpand-hook* ',fd ',(cons fname args) ',env)))))
-    (if (car x)
-        (let ((*print-case* :upcase))
-          (incf *error-count*)
-          (print-current-form)
-          (format t
-            ";;; The macro form (~s ...) was not expanded successfully.~%"
-            fname)
-          `(error "Macro-expansion of ~s failed at compile time."
-                  ',(cons fname args)))
-        (cadr x))))
+(defun cmp-macroexpand-1 (form)
+  (macroexpand-helper nil `(macroexpand-1 ',form ',*macrolet-env*) form))
+
+(defun cmp-expand-macro (fd fname args)
+  (let ((x (cons fname args)))
+    (macroexpand-helper
+     (and *record-call-info* (add-macro-callee fname))
+     `(funcall *macroexpand-hook* ',fd ',x ',*macrolet-env*)
+     x)))
 
 (defvar *compiler-break-enable* nil)
 

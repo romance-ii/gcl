@@ -64,7 +64,15 @@
 	  (c (mdlsym (string-concatenate "c" x)))
 	  (cf (mdlsym (string-concatenate "c" x "f")))
 	  (ts (intern (string-upcase x)))
-	  (tp (get ts 'compiler::type-propagator)))
+	  (tp (get ts 'compiler::type-propagator))
+	  (body `(typecase x
+		   (long-float  (,b x))
+		   (short-float (,f x))
+;                  (fixnum      (,b (float x 0.0)))
+		   (rational    (,b (float x 0.0)))
+		   (dcomplex    (,c x))
+		   (fcomplex    (,cf x))
+		   (otherwise   (,c (complex (float (realpart x) 0.0) (float (imagpart x) 0.0)))))))
      `(progn
 	(mdlsym ,x)
 	(mdlsym (string-concatenate ,x "f"))
@@ -78,20 +86,15 @@
 	  ,@(unless (and n (not (string= (string-upcase n) (string-upcase x))))
 	      `((declare (optimize (safety 2)))
 		(check-type x number)))
-	  (let ((x ,(if protect-real `(if (and (realp x) (not ,protect-real))
-					  (if (floatp x) (complex x (float 0.0 x))
-					    (complex (float x 0.0) 0.0))
-					x) `x)))
-	    (typecase x
-		      (long-float  (,b x))
-		      (short-float (,f x))
-;		      (fixnum      (,b (float x 0.0)))
-		      (rational    (,b (float x 0.0)))
-		      (dcomplex    (,c x))
-		      (fcomplex    (,cf x))
-		      (otherwise   (,c (complex (float (realpart x) 0.0) (float (imagpart x) 0.0))))))))))
-   
- 
+	  ,(if protect-real
+	       `(if (and (realp x) ,protect-real)
+		    ,body
+		  (let ((x (cond ((not (realp x)) x) 
+				 ((floatp x) (complex x (float 0.0 x)))
+				 ((complex (float x 0.0) 0.0)))))
+		    ,body))
+	     body)))))
+
  (defmacro defmabs (x &optional n)
    (let* ((i (mdlsym x))
 	  (b (mdlsym (string-concatenate "f" x)))

@@ -70,6 +70,8 @@
   aliases
   )
 
+(si::freeze-defstruct 'var)
+
 
 ;;; A special binding creates a var object with the kind field SPECIAL,
 ;;; whereas a special declaration without binding creates a var object with
@@ -373,7 +375,8 @@
 	  (let* ((nmt (bump-tp (var-mt v)))
 		 (nmt (type-and nmt (var-dt v))))
 	    (setf (var-mt v) nmt))
-	  (pushnew v *tvc*))))));(throw (var-tag v) v)
+	  (pushnew v *tvc*)
+	  (when (member (var-tag v) *catch-tags*) (throw (var-tag v) v)))))))
 
 (defun set-form-type (form type)
   (let* ((it (info-type (cadr form)))

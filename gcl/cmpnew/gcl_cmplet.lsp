@@ -58,17 +58,21 @@
 	((side-effects-p f) nil)
 	(t)))
 
-(defun trim-vars (vars forms body &optional star)
+(defun trim-vars (vars forms body)
 
-  (do (nv nf nb (vs vars (cdr vs)) (fs forms (cdr fs))) 
+  (do (nv nf nz (vs vars (cdr vs)) (fs forms (cdr fs))) 
       ((or (endp vs) (endp fs)) 
-       (list nv nf (new-c1progn nb body)))
+       (if nf (setf (car nf) (new-c1progn nz (car nf))) (setf body (new-c1progn nz body)))
+       (list nv nf body))
       (let ((var (car vs)) (form (car fs)))
 	(cond ((and (eq (var-kind var) 'LEXICAL)
 		    (not (eq t (var-ref var))) ;;; This field may be IGNORE.
 		    (not (var-ref-ccb var)))
-	       (unless (ignorable-form form) (cond (star (push var nv) (push form nf)) ((push form nb)))))
-	      ((push var nv) (push form nf))))))
+	       (unless (ignorable-form form) (push form nz)))
+	      ((push var nv) 
+	       (if nf (setf (car nf) (new-c1progn nz (car nf))) (setf body (new-c1progn nz body)))
+	       (setq nz nil)
+	       (push form nf))))))
 
 
 (defun c1let (args &aux (info (make-info))(setjmps *setjmps*)
@@ -252,54 +256,9 @@
   (or (eql setjmps *setjmps*) (setf (info-volatile info) 1))
   (dolist (var vars) (setf (var-type var) (var-mt var)))
 
-  (let ((z (trim-vars vars forms body t)))
+  (let ((z (trim-vars vars forms body)))
     (cond ((car z) (list* 'let* info z))
 	  ((caddr z)))))
-
-;; (defun c1let* (args &aux (forms nil) (vars nil) (vnames nil)
-;; 		(setjmps *setjmps*)
-;;                     ss is ts body other-decls
-;;                     (info (make-info)) (*vars* *vars*))
-;;   (when (endp args) (too-few-args 'let* 1 0))
-
-;; ;  (setq args (declare-let-bindings-new1 args t ss))
-
-;;   (multiple-value-setq (body ss ts is other-decls) (c1body (cdr args) nil))
-;;   (c1add-globals ss)
-
-;;   (dolist** (x (car args))
-;;     (cond ((symbolp x)
-;;            (let ((v (c1make-var x ss is ts)))
-;;                 (push x vnames)
-;;                 (push (default-init (var-type v)) forms)
-;;                 (push v vars)
-;;                 (set-var-init-type (car vars) #tnull)
-;;                 (push v *vars*)))
-;;           ((not (and (consp x) (or (endp (cdr x)) (endp (cddr x)))))
-;;            (cmperr "The variable binding ~s is illegal." x))
-;;           (t (let ((v (c1make-var (car x) ss is ts)))
-;;                   (push (car x) vnames)
-;;                   (push (if (endp (cdr x))
-;;                             (default-init (var-type v))
-;;                             (and-form-type (var-type v)
-;;                                            (c1expr* (cadr x) info)
-;;                                            (cadr x)))
-;;                         forms)
-;;                   (push v vars)
-;; 		  (set-var-init-type (car vars) (info-type (second  (car forms))))
-;;                   (push v *vars*)))))
-
-;;   (check-vdecl vnames ts is)
-;;   (setq body (c1decl-body other-decls body))
-;;   (add-info info (cadr body))
-;;   (setf (info-type info) (info-type (cadr body)))
-;;   (dolist** (var vars) (check-vref var))
-;;   (or (eql setjmps *setjmps*) (setf (info-volatile info) 1))
-;;   (dolist (var vars) (setf (var-type var) (var-mt var)))
-
-;;   (let ((z (trim-vars vars forms body t)))
-;;     (cond ((car z) (list* 'let* info z))
-;; 	  ((caddr z)))))
 
 (defun c2let* (vars forms body
                     &aux (block-p nil)

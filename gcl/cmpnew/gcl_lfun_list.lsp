@@ -9,6 +9,7 @@
 (dolist (l '((((stream) string) . get-output-stream-string)
 	     (((simple-vector seqind) t) . svref)
 	     (((si::function-identifier) boolean) . fboundp)
+	     (((structure) structure) . si::structure-def)
 	     (((list) t) . si::cons-car)
 	     (((list) t) . si::cons-cdr)
 	     (((t t) cons) . cons)

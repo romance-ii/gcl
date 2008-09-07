@@ -39,6 +39,17 @@
 (defmacro mia (x y) `(si::make-vector t ,x t ,y nil nil nil nil))
 (defmacro eql-not-nil (x y) `(and ,x (eql ,x ,y)))
 
+(defun name-to-sd (x &aux sd)
+  (or (and (symbolp x) (setq sd (get x 'si::s-data)))
+      (error "The structure ~a is undefined." x))
+  sd)
+
+;; lay down code for a load time eval constant.
+(defun name-sd1 (x)
+  (or  (get x 'name-to-sd)
+      (setf (get x 'name-sd)
+	    `(si::|#,| name-to-sd ',x))))
+
 (defvar +empty-info-array+ (make-array 0 :fill-pointer 0));FIXME cannot read constant arrays
 
 (defstruct (info (:copier old-copy-info)) ;(:constructor old-make-info))
@@ -49,6 +60,8 @@
   (unused1   0   :type char)
   (changed-array +empty-info-array+ :type (vector t));(mia 10 0))     ;;; List of var-objects changed by the form. 
   (referred-array +empty-info-array+ :type (vector t)));(mia 10 0)))	 ;;; List of var-objects referred in the form.
+
+(si::freeze-defstruct 'info)
 
 (defun copy-array (array)
   (declare ((vector t) array))

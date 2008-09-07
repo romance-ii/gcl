@@ -29,6 +29,8 @@
 (si:putprop 'throw 'c1throw 'c1special)
 (si:putprop 'throw 'c2throw 'c2)
 
+(defvar *catch-tags* nil)
+
 (defun c1catch (args &aux (info (make-info :type #t* :sp-change 1)) tag)
   (incf *setjmps*)
   (when (endp args) (too-few-args 'catch 1 0))
@@ -42,9 +44,10 @@
 	  (unwind-protect
 	      (do (nargs)
 		  ((not 
-		    (let ((nv (with-restore-vars
-			       (catch nt
-				 (setq nargs (c1progn (cdr args))) nil))))
+		    (let* ((*catch-tags* (cons nt *catch-tags*))
+			   (nv (with-restore-vars
+				(catch nt
+				  (setq nargs (c1progn (cdr args))) nil))))
 		      (when nv
 			(do nil ((not (setq nv (pop *tvc*))) t) (setf (var-type nv) (var-mt nv))))))
 		   nargs))

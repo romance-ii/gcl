@@ -48,6 +48,8 @@
 	   switch               ;;; tag for switch.  A fixnum or 'default
            )
 
+(si::freeze-defstruct 'tag)
+
 (defvar *tags* nil)
 
 ;;; During Pass 1, *tags* holds a list of tag objects and the symbols 'CB'

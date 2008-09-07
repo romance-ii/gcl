@@ -100,7 +100,7 @@
 (import 'si::*sig-discovery* 'compiler)
 (import 'si::*compile-verbose* 'compiler)
 (import 'si::multiple-value-setq-expander 'compiler)
-
+(import 'si::structurep 'compiler)
 
 (let ((p (find-package "DEFPACKAGE")))
   (when p
@@ -966,8 +966,8 @@
 
 (defvar *unique-sigs* (make-hash-table :test 'equal))
 (defun unique-sigs (sig)
-  (let ((sig (list (mapcar (lambda (x) (export-type (cmp-norm-tp x))) (car sig))
-		   (export-type (cmp-norm-tp (cadr sig))))))
+  (let ((sig (list (mapcar (lambda (x) (cmp-norm-tp x)) (car sig))
+		   (cmp-norm-tp (cadr sig)))))
     (or (gethash sig *unique-sigs*) (setf (gethash sig *unique-sigs*) sig))))
 		  
 (defvar *bump-hash* (make-hash-table :test 'eq))
