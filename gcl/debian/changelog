@@ -12,8 +12,10 @@ gclcvs (2.7.0-93) unstable; urgency=low
   * rewrite defmlfun so that the compiler can see the restricted ranges of
     the real subfunctions.
   * allow for just one gcl_recompile.o file
+  * cond macro fix
+  * only auto-inline lisp symbols
 
- -- Camm Maguire <camm@debian.org>  Sat, 06 Sep 2008 19:50:26 +0000
+ -- Camm Maguire <camm@maguirefamily.org>  Mon, 08 Sep 2008 01:02:55 +0000
 
 gclcvs (2.7.0-92) unstable; urgency=low
 

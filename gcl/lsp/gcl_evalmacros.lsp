@@ -236,7 +236,7 @@
         (forms nil)
         (bindings nil))
        ((endp l) (list* 'let* (nreverse bindings) (nreverse (cons nil forms))))
-       (let ((sym (gens (cadr l))))
+       (let ((sym (gens (cadr l)))):data-
             (push (list sym (cadr l)) bindings)
             (push (list 'setq (car l) sym) forms))))
 
@@ -249,7 +249,9 @@
       (cond ((endp (cdr l))
 	     (setq form (cond ((eq l (car x)) `(values ,(car l)))
 			      (`(or ,(car l) ,form)))))
-	    ((and (constantp (car l)) (car l))
+	    ((let ((c (car l)))
+	       (when (constantp c) (cond ((symbolp c) (symbol-value c)) ;fixme constant-eval
+					 ((when (consp c) (eq (car c) 'quote)) (cadr c)) (t))))
 	     (setq form (if (endp (cddr l)) (cadr l) `(progn ,@(cdr l)))))
 	    ((setq form `(if ,(car l) ,(if (endp (cddr l)) (cadr l) `(progn ,@(cdr l))) ,form)))))))
 

@@ -1274,7 +1274,7 @@
 	 (not (eq n (cadr *src-inline-recursion*)))
 	 (or (inline-asserted n)
 	     (multiple-value-bind (s k) (find-symbol (symbol-name n) 'lisp) 
-				  (when s (eq k :external)))))))
+				  (when (eq n s) (eq k :external)))))))
 
 (defun mark-for-hash-inlining (fms)
   (let ((i 0)
