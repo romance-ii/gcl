@@ -263,8 +263,8 @@
 	((setq x (car (gethash fname *sigs*))) (mapcar 'cmp-norm-tp (car x)))
 	((setq x (si::sig fname)) (car x))
 	((not (symbolp fname)) '(*))
-	((not (eq (setq x (get fname 'proclaimed-arg-types 0)) 0)) (mapcar 'cmp-norm-tp x))
-	((not (eq (setq x (get fname 'arg-types 0)) 0)) (mapcar 'cmp-norm-tp x))
+	((not (eq (setq x (get fname 'proclaimed-arg-types t)) t)) (mapcar 'cmp-norm-tp x))
+	((not (eq (setq x (get fname 'arg-types t)) t)) (mapcar 'cmp-norm-tp x))
 	('(*))))
 
 
@@ -273,8 +273,8 @@
 	((setq x (car (gethash fname *sigs*))) (cmp-norm-tp (cadr x)))
 	((setq x (si::sig fname)) (cadr x))
 	((not (symbolp fname)) '*)
-	((not (eq (setq x (get fname 'proclaimed-return-type 0)) 0)) x)
-	((not (eq (setq x (get fname 'return-type 0)) 0)) x)
+	((not (eq (setq x (get fname 'proclaimed-return-type t)) t)) x)
+	((not (eq (setq x (get fname 'return-type t)) t)) x)
 	('*)))
 
 (defun get-local-arg-types (fun &aux x)
