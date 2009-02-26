@@ -212,7 +212,7 @@ DEFUN_NEW("DLADDR",object,fSdladdr,SI,1,1,NONE,OI,OO,OO,OO,(fixnum ad),"") {
   dladdr((void *)ad,&info);
   if (dlerror())
     FEerror("dladdr lookup failure on ~s",1,make_fixnum(ad));
-  u=(unsigned)info.dli_fbase;
+  u=(unsigned long)info.dli_fbase;
   c=info.dli_fname;
   if (u>=DBEGIN && u<(unsigned long)core_end)
     c="";
