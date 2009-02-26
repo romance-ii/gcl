@@ -96,7 +96,9 @@ do {static struct sigaction action; \
 
 #define	IEEEFLOAT
        
+#ifndef HAVE_XDR /*FIXME configure*/
 #define HAVE_XDR
+#endif
 
 #define USE_ULONG_
 

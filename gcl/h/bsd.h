@@ -89,7 +89,9 @@ do {char *x=sbrk(0); \
    and get a stream connection with it */
 #define RUN_PROCESS
 
+#ifndef HAVE_XDR /*FIXME configure*/
 #define HAVE_XDR
+#endif
 
 #define WANT_VALLOC  
 

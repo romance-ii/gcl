@@ -1,3 +1,10 @@
+gclcvs (2.7.0-93.10) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * xdr define fix
+
+ --  <camm@maguirefamily.org>  Thu, 26 Feb 2009 21:54:25 +0000
+
 gclcvs (2.7.0-93.9) unstable; urgency=low
 
   * Non-maintainer upload.
