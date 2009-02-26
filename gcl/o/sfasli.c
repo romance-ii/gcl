@@ -57,6 +57,9 @@ build_symbol_table_bfd(void) {
     FEerror("Cannot open self\n",0);
   if (!bfd_check_format(bself,bfd_object))
     FEerror("I'm not an object",0);
+#ifdef HAVE_OUTPUT_BFD
+  link_info.output_bfd = bfd_openw("/dev/null", bfd_get_target(bself));
+#endif
   if (!(link_info.hash = bfd_link_hash_table_create (bself)))
     FEerror("Cannot make hash table",0);
   if (!bfd_link_add_symbols(bself,&link_info))
