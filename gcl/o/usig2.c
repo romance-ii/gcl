@@ -63,23 +63,24 @@ unsigned long s4_neg_int[4],small_neg_int[3],small_pos_int[3];
 
 handler_function_type our_signal_handler[32];
 
-struct save_for_interrupt{
-   object free1[32];
-   object free2[32];
-   object altfree1[32];
-   object altfree2[32];
-   union lispunion buf[32];
-   struct call_data fcall;
-   object  *vs_top,vs_topVAL,*vs_base;
-   struct bds_bd  *bds_top,bds_topVAL;
-   struct  invocation_history *ihs_top,ihs_topVAL;
-   char *token_bufp;
-   char token_buf [4*INITIAL_TOKEN_LENGTH];
-   int token_st_dim;
-   /* for storing the XS objects in te usig2_aux.c */
-   void *save_objects[75];
+struct save_for_interrupt {
+
+  object free1[t_end];
+  object free2[t_end];
+  object altfree1[t_end];
+  object altfree2[t_end];
+  union lispunion buf[t_end];
+  struct call_data fcall;
+  object  *vs_top,vs_topVAL,*vs_base;
+  struct bds_bd  *bds_top,bds_topVAL;
+  struct  invocation_history *ihs_top,ihs_topVAL;
+  char *token_bufp;
+  char token_buf [4*INITIAL_TOKEN_LENGTH];
+  int token_st_dim;
+  /* for storing the XS objects in te usig2_aux.c */
+  void *save_objects[75];
    
- };
+};
 
 
 /* note these are the reverse of the ones in unixint.c
@@ -208,118 +209,148 @@ invoke_handler(int signo, int allowed)
 }}
 
 int tok_leng;
+
 static void
-before_interrupt(struct save_for_interrupt *p, int allowed)
-{int i;
+before_interrupt(struct save_for_interrupt *p,int allowed) {
+
  /* all this must be run in no interrupts mode */
- if ( allowed < sig_safe)
-   {				/* save tht tops of the free stacks */
-     for(i=0; i < t_end ; i++)
-       { struct typemanager *ad = &tm_table[i];
-	 {SS1(p->free1[i],ad->tm_free);
-	  if (p->free1[i])
-	    { char *beg =  (char *) (p->free1[i]);
-	      object x = (object)beg;
-	      int amt = ad->tm_size;
-	      SS1(p->free2[i],OBJ_LINK(p->free1[i]));
-	      ad->tm_nfree --;
-	      bcopy(beg ,&(p->buf[i]), amt);
-	      bzero(beg+8,amt-8);
-	      make_unfree(x);
-	      if (p->free2[i])
-		{ x = (object) p->free2[i];
-		  beg = (char *)x;
-		  make_unfree(x);
-		  bzero(beg+8,amt-8);
-		  SS1(ad->tm_free,OBJ_LINK(p->free2[i]));
-		  ad->tm_nfree --;
-		}
-	      else
-		{ SS1(ad->tm_free, OBJ_LINK(p->free1[i]));
-		}}
-	}}
+ if ( allowed < sig_safe) {
+
+   int i;
+
+   /* save tht tops of the free stacks */
+   for (i=0;i<t_end;i++) {
+
+     struct typemanager *ad = &tm_table[i];
+
+     if ((p->free1[i]=ad->tm_free)) {
+
+       void *beg=p->free1[i];
+       object x=beg;
+       int amt=ad->tm_size;
+
+       memcpy(p->buf+i,beg,amt);
+       bzero(beg+sizeof(struct freelist),amt-sizeof(struct freelist));/*FIXME t_free -> struct freelist **/
+       ad->tm_nfree--;
+       make_unfree(x);
+
+       
+       if ((p->free2[i]=OBJ_LINK(p->free1[i]))) {
+
+	 beg=p->free2[i];
+	 x=beg;
+	 bzero(beg+sizeof(struct freelist),amt-sizeof(struct freelist));
+	 ad->tm_nfree--;
+	 make_unfree(x);
+
+	 ad->tm_free=OBJ_LINK(p->free2[i]);
+
+       } else
+
+	 ad->tm_free=p->free2[i];
+
+     }
    }
- SS1(p->fcall,fcall);
- SS1(p->vs_top,vs_top);
- SS1(p->vs_topVAL,*vs_top);
- SS1(p->vs_base,vs_base);
- SS1(p->bds_top,bds_top);
- SS1(p->bds_topVAL,*bds_top);
- SS1(p->ihs_top,ihs_top);
- SS1(p->ihs_topVAL,*ihs_top);
- { void **pp = p->save_objects;
+ }
+   
+ p->fcall=fcall;
+ p->vs_top=vs_top;
+ p->vs_topVAL=*vs_top;
+ p->vs_base=vs_base;
+ p->bds_top=bds_top;
+ p->bds_topVAL=*bds_top;
+ p->ihs_top=ihs_top;
+ p->ihs_topVAL=*ihs_top;
+
+ { 
+
+   void **pp=p->save_objects;
+
 #undef XS
 #undef XSI
 #define XS(a) *pp++ = (void *) (a);
 #define XSI(a) *pp++ = (void *)(long)(a);
-/* #define XS(a) *pp++ =  * (void **) (&a);  */
+
 #include "usig2_aux.c"
-   if ((pp - (&(p->save_objects)[0])) >= (sizeof(p->save_objects)/sizeof(void *)))
+
+   if (pp-p->save_objects>=(sizeof(p->save_objects)/sizeof(void *)))
      gcl_abort();
+
  }
-#define MINN(a,b) (a<b?a :b)
- p->token_st_dim = MINN(token->st.st_dim,tok_leng+1);
- if (p->token_st_dim < sizeof(p->token_buf))
-   p->token_bufp = p->token_buf;
- else { p->token_bufp= (void *)OUR_ALLOCA(p->token_st_dim);}
- bcopy(token->st.st_self,p->token_bufp,p->token_st_dim);
+
+ p->token_st_dim=tok_leng+1;
+ if (token->st.st_dim<p->token_st_dim)
+   p->token_st_dim=token->st.st_dim;
+ if (p->token_st_dim<sizeof(p->token_buf))
+   p->token_bufp=p->token_buf;
+ else 
+   p->token_bufp=(void *)OUR_ALLOCA(p->token_st_dim);
+
+ memcpy(p->token_bufp,token->st.st_self,p->token_st_dim);
   
 }
 
 static void
-after_interrupt(struct save_for_interrupt *p, int allowed)
-{int i;
- /* all this must be run in no interrupts mode */
- if ( allowed < sig_safe)
-   {
-     for(i=0; i < t_end ; i++)
-       { struct typemanager *ad = &tm_table[i];
-	 object current_fl = ad->tm_free;
-	 {RS1(p->free1[i],ad->tm_free);
-	  if (p->free1[i])
-	    { char *beg =  (char *) (p->free1[i]);
-	      object x = (object)beg;
-	      int amt = ad->tm_size;
-	      RS1(p->free2[i],(p->free1[i]));
-	      if (is_marked_or_free(x)) error("should not be free");
-	      bcopy(&(p->buf[i]),beg, amt);
-	      if (p->free2[i])
-		{ x = (object) p->free2[i];
-		  if (is_marked_or_free(x)) error("should not be free");
-		  make_free(x);
-		  F_LINK(F_LINK(ad->tm_free)) = (long )current_fl;
-		  ad->tm_nfree += 2;
-		}
-	      else
-		ad->tm_nfree =1;
-	    }
-       
-	  else     ad->tm_nfree =0;
-	}}
-   }
-  RS1(p->fcall,fcall);
-  RS1(p->vs_top,vs_top);
-  RS1(p->vs_topVAL,*vs_top);
-  RS1(p->vs_base,vs_base);
-  RS1(p->bds_top,bds_top);
-  RS1(p->bds_topVAL,*bds_top);
-  RS1(p->ihs_top,ihs_top);
-  RS1(p->ihs_topVAL,*ihs_top);
- { void **pp = p->save_objects;
+after_interrupt(struct save_for_interrupt *p,int allowed) {
+  
+  /* all this must be run in no interrupts mode */
+  if ( allowed < sig_safe) {
+
+    int i;
+     for(i=0; i < t_end ; i++) {
+
+       struct typemanager *ad = &tm_table[i];
+       object current_fl = ad->tm_free;
+
+       if ((ad->tm_free=p->free1[i])) { 
+
+	 void *beg=p->free1[i];
+	 object x=beg;
+	 int amt=ad->tm_size;
+
+	 if (is_marked_or_free(x)) error("should not be free");
+	 memcpy(beg,p->buf+i,amt);
+
+	 if ((p->free1[i]=p->free2[i])) { 
+
+	   x=p->free2[i];
+	   if (is_marked_or_free(x)) error("should not be free");
+
+	   make_free(x);
+	   F_LINK(F_LINK(ad->tm_free))=(long)current_fl;
+	   ad->tm_nfree+=2;
+
+	 } else
+	   ad->tm_nfree=1;
+       } else
+	 ad->tm_nfree =0;
+     }
+  }
+
+  fcall=p->fcall;
+  vs_top=p->vs_top;
+  *vs_top=p->vs_topVAL;
+  vs_base=p->vs_base;
+  bds_top=p->bds_top;
+  *bds_top=p->bds_topVAL;
+  ihs_top=p->ihs_top;
+  *ihs_top=p->ihs_topVAL;
+
+  { 
+
+    void **pp=p->save_objects;
+
 #undef XS
 #undef XSI
+#define XS(a) a=(void *)(*pp++)
+#define XSI(a) {union {void *v;long l;} u; u.v=*pp++;a=u.l;}
 
- /*  #define XS(a) a = (void *)(*pp++)
-     We store back in the location 'a' the value we have saved. 
-  */
- 
-/* #define XS(a) do { void **_p = (void **)(&a); *_p = (void *)(*pp++);}while(0) */
-#define XS(a) a = (void *)(*pp++)
-#define XSI(a) {union {void *v;long l;}u; u.v=*pp++; a = u.l;}
 #include "usig2_aux.c"
- }
 
-  bcopy(p->token_bufp,token->st.st_self,p->token_st_dim);
+  }
+
+  memcpy(token->st.st_self,p->token_bufp,p->token_st_dim);
+
 }
 
 
