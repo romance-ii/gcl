@@ -85,11 +85,12 @@ do {static struct sigaction action; \
 
 /* unblock signals m and n, and set val to signal_mask(m) | signal_mask(n)
    if they were set */
-#define SIG_UNBLOCK_SIGNALS(val,m,n) \
-    current_mask = sigblock(0);  \
-    sigsetmask(~(sigmask(m)) & ~(sigmask(n)) & current_mask); \
-    result = (current_mask & sigmask(m) ? signal_mask(m) : 0) \
-      | (current_mask & sigmask(n) ? signal_mask(n) : 0);
+/* #define SIG_UNBLOCK_SIGNALS(val,m,n) \ */
+/*     current_mask = sigblock(0);  \ */
+/*     sigsetmask(~(sigmask(m)) & ~(sigmask(n)) & current_mask); \ */
+/*     result = (current_mask & sigmask(m) ? signal_mask(m) : 0) \ */
+/*       | (current_mask & sigmask(n) ? signal_mask(n) : 0); */
+#define HAVE_SIGPROCMASK
 
 #define RUN_PROCESS
 
