@@ -1,3 +1,10 @@
+gclcvs (2.7.0-93.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * modern configure.in
+
+ --  <camm@maguirefamily.org>  Thu, 26 Feb 2009 21:21:12 +0000
+
 gclcvs (2.7.0-93) unstable; urgency=low
 
   * freeze-defstructs

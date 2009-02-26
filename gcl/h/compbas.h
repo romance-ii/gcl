@@ -8,6 +8,21 @@
 			   
 #define STSET(type,x,i,val)  do{SGC_TOUCH(x);STREF(type,x,i) = (val);} while(0)
 
+
+#ifndef HAVE_MATH_H
+#error Need math.h
+#endif
+#include <math.h>
+
+#ifndef HAVE_COMPLEX_H
+#error Need complex.h
+#endif
+#include <complex.h>
+
+#ifdef HAVE_ALLOCA_H /*FIXME check if this is truly optional*/
+#include <alloca.h>
+#endif
+
 typedef float  complex fcomplex;
 typedef double complex dcomplex;
 
@@ -76,4 +91,3 @@ typedef double complex dcomplex;
 #else
 #define immnum_negate(x) ({object _x=x,_t;_t=number_negate(_x);_t;})
 #endif
-
