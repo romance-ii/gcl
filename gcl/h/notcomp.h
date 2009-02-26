@@ -499,7 +499,7 @@ object ihs_top_function_name(ihs_ptr h);
                     {object function=make_simple_string(__FUNCTION__);\
                      Icall_error_handler(sKerror,fmt,3,line,file,function);}}}})
 
-#define ASSERT(a_) if (!(a_)) NERROR("The assertion " #a_ " failed")
+#define ASSERT(a_) do {if (!(a_)) NERROR("The assertion " #a_ " failed");} while (0)
 
 #define gcl_abort()  ({\
    frame_ptr fr=frs_sch_catch(sSPtop_abort_tagP->s.s_dbind);\

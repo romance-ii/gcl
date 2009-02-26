@@ -150,6 +150,9 @@
 /* Define to 1 if you have the <readline/readline.h> header file. */
 #undef HAVE_READLINE_READLINE_H
 
+/* Define to 1 if you have the `rename' function. */
+#undef HAVE_RENAME
+
 /* have readline completion matches */
 #undef HAVE_RL_COMPENTRY_FUNC_T
 

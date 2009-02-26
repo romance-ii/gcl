@@ -578,7 +578,7 @@ object getf();
 object get();
 object putf();
 object putprop();
-object sputprop();
+object fSsputprop();
 object remprop();
 object gensym();		/*  to be deleted  */
 

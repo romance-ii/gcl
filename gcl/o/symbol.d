@@ -309,23 +309,14 @@ object s, v, p;
 	return(v);
 }
 
+DEFUN_NEW("SPUTPROP",object,fSsputprop,SI,3,3,NONE,OO,OO,OO,OO,(object s,object p,object v),"") {
 
-/* done in the right order for efficient setf.. */
-STATD object
-FFN(sputprop)(s, p, v)
-object s, v, p;
-{
-	if (type_of(s) != t_symbol)
-		not_a_symbol(s);
-	s->s.s_plist = putf(s->s.s_plist, v, p);
-	return(v);
+  if (type_of(s) != t_symbol)
+    not_a_symbol(s);
+  s->s.s_plist = putf(s->s.s_plist, v, p);
+  return(v);
+
 }
-#ifdef STATIC_FUNCTION_POINTERS
-object
-sputprop(object s, object p, object v) {
-	return FFN(sputprop)(s,p,v);
-}
-#endif
 
 /*
 	Remf(p, i) removes property i
@@ -729,7 +720,7 @@ gcl_init_symbol_function()
 	make_si_function("SET-SYMBOL-PLIST", siLset_symbol_plist);
 
 	make_si_function("PUTPROP", siLputprop);
-	make_si_sfun("SPUTPROP",sputprop,3);
+/* 	make_si_sfun("SPUTPROP",sputprop,3); */
 
 
 	siSpname = make_si_ordinary("PNAME");

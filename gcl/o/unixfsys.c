@@ -151,63 +151,67 @@ DEV_FOUND:
 #endif
 
 
-#ifdef HAVE_GETCWD
-char *
-getwd(char *buffer)
-{
-#ifndef _WIN32    
-	char *getcwd(char *, size_t);
-#endif
-	return(getcwd(buffer, MAXPATHLEN));
-}
-#endif
-
 void
-coerce_to_filename(object pathname, char *p)
-{
-    object namestring;
+coerce_to_filename(object pathname, char *p) {
 
-    vs_mark;
-    namestring = coerce_to_namestring(pathname);
-    vs_push(namestring);
-
+  object namestring=coerce_to_namestring(pathname);;
+  
 #if !defined(NO_PWD_H) && !defined(STATIC_LINKING)
-    if(namestring->st.st_self[0]=='~') {
-	char name[20];
-	int n;
-	char *q = namestring->st.st_self;
+  
+  if (namestring->st.st_self[0]=='~') {
+    
+    char *q=namestring->st.st_self,*b;
+    int n,m=0;
+    long r;
+    struct passwd *pwent,pw;
 #ifndef __STDC__
-	extern struct passwd *getpwuid();
-	extern struct passwd *getpwnam();
+    extern struct passwd *getpwuid_r();
+    extern struct passwd *getpwnam_r();
 #endif
-	struct passwd *pwent;
-	int m=0;
 
-	q=namestring->st.st_self;
-	for (n=0; n< namestring->st.st_fillp; n++)
-	    if (q[n]=='/') break;
-	bcopy(q+1,name,n-1);
-	name[n-1]= 0;
-	pwent = (n==1 ? getpwuid(getuid()) : getpwnam(name));
-	if (pwent==0 || ((m = strlen(pwent->pw_dir)) &&
-		    (m + namestring->st.st_fillp -n) >= MAXPATHLEN -16)) {
-		FEerror("Can't expand pathname ~a", 1,namestring);
-	}
-	bcopy(pwent->pw_dir,p,m);
-	bcopy(namestring->st.st_self+n,p+m,namestring->st.st_fillp-n);
-	p[m+namestring->st.st_fillp-n]=0;
-    } else
-#endif
-    {	if (namestring->st.st_fillp >= MAXPATHLEN - 16) {
-	    FEerror("Too long filename: ~S.", 1, namestring);
-	}
-	bcopy(namestring->st.st_self,p,namestring->st.st_fillp);
-	p[namestring->st.st_fillp]=0;
+    ASSERT((r=sysconf(_SC_GETPW_R_SIZE_MAX))>=0);
+    ASSERT(b=alloca(r));
+
+    for (n=1;n<namestring->st.st_fillp && q[n]!='/'; n++);
+    if (n==1)
+
+      ASSERT(!getpwuid_r(getuid(),&pw,b,r,&pwent));
+
+    else {
+
+      char *name;
+
+      ASSERT(name=alloca(n));
+      memcpy(name,q+1,n-1);
+      name[n-1]= 0;
+
+      ASSERT(!getpwnam_r(name,&pw,b,r,&pwent));
+
     }
+
+    if (pwent==0 || 
+	((m=strlen(pwent->pw_dir)) && m+namestring->st.st_fillp-n>=MAXPATHLEN-16))
+      FEerror("Can't expand pathname ~a",1,namestring);
+
+    memcpy(p,pwent->pw_dir,m);
+    memcpy(p+m,namestring->st.st_self+n,namestring->st.st_fillp-n);
+    p[m+namestring->st.st_fillp-n]=0;
+
+  } else
+
+#endif
+
+    {
+      if (namestring->st.st_fillp>=MAXPATHLEN-16)
+	FEerror("Too long filename: ~S.",1,namestring);
+      memcpy(p,namestring->st.st_self,namestring->st.st_fillp);
+      p[namestring->st.st_fillp]=0;
+    }
+
 #ifdef FIX_FILENAME
     FIX_FILENAME(pathname,p);
 #endif
-    vs_reset;
+
 }
 
 void
@@ -231,7 +235,6 @@ truename(object pathname)
 	char truefilename[MAXPATHLEN];
 	char current_directory[MAXPATHLEN];
 	char directory[MAXPATHLEN];
-	char *getwd(char *buffer);
 	int islinkcount=8;
 	struct stat filestatus;
 
@@ -278,6 +281,8 @@ truename(object pathname)
             object x;
             fix_filename(x, current_directory);
         }
+#elif HAVE_GETCWD
+	getcwd(current_directory,sizeof(current_directory));
 #else
         getwd(current_directory);
 #endif        
@@ -313,7 +318,11 @@ truename(object pathname)
 #endif	
 	{
 		*q++ = '\0';
+#if HAVE_GETCWD
+		getcwd(current_directory,sizeof(current_directory));
+#else
 		getwd(current_directory);
+#endif
 		if (chdir(filename) < 0)
 		    FEerror("Cannot get the truename of ~S.", 1, pathname);
 #ifdef __MINGW32__
@@ -329,6 +338,8 @@ truename(object pathname)
                     object x;
                     fix_filename(x, directory);
                 }
+#elif HAVE_GETCWD
+		p = getcwd(directory,sizeof(directory));
 #else
 		p = getwd(directory);
 #endif                
@@ -411,11 +422,17 @@ FILE *
 backup_fopen(char *filename, char *option)
 {
 	char backupfilename[MAXPATHLEN];
+#ifndef HAVE_RENAME
 	char command[MAXPATHLEN * 2];
+#endif
 
 	strcat(strcpy(backupfilename, filename), ".BAK");
+#ifdef HAVE_RENAME
+	ASSERT(!rename(filename,backupfilename));
+#else
 	sprintf(command, "mv %s %s", filename, backupfilename);
 	system(command);
+#endif
 	return(fopen(filename, option));
 }
 
@@ -457,6 +474,9 @@ LFD(Lrename_file)(void)
 {
 	char filename[MAXPATHLEN];
 	char newfilename[MAXPATHLEN];
+#ifndef HAVE_RENAME
+	char command[MAXPATHLEN * 2];
+#endif
 
 	check_arg(2);
 	check_type_or_pathname_string_symbol_stream(&vs_base[0]);
@@ -481,9 +501,7 @@ LFD(Lrename_file)(void)
 
 	coerce_to_local_filename(vs_base[1], newfilename);
 #ifdef HAVE_RENAME
-	if (rename(filename, newfilename) < 0)
-		FEerror("Cannot rename the file ~S to ~S.",
-			2, vs_base[0], vs_base[1]);
+	ASSERT(!rename(filename, newfilename));
 #else
 	sprintf(command, "mv %s %s", filename, newfilename);
 	system(command);

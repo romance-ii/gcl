@@ -245,7 +245,7 @@
    (get 'system:set-mv 'inline-always))
 
 ;;SYSTEM:SPUTPROP
- (push '((t t t) t #.(flags set)"sputprop(#0,#1,#2)")
+ (push '((symbol t t) t #.(flags set)"fSsputprop(#0,#1,#2)")
    (get 'system:sputprop 'inline-always))
 
 ;;SYSTEM:STRUCTURE-DEF

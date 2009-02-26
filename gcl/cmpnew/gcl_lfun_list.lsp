@@ -19,6 +19,7 @@
 	     (((symbol) (or null package)) . symbol-package)
 	     (((symbol) string) . symbol-name)
 	     (((symbol) t) . symbol-value)
+	     (((symbol t t) t) . si::sputprop)
 	     (((symbol) function) . symbol-function)
 	     (((array rnkind)  seqind) . array-dimension)
 	     (((array)  seqind) . array-total-size)
@@ -33,7 +34,7 @@
   (si::add-hash (cdr l) (car l) nil nil nil))
 
 ;(DEFSYSFUN 'symbol-name "Lsymbol_name" '(T) 'string NIL NIL) 
-(DEFSYSFUN 'si::sputprop "sputprop" '(T T T) 'T NIL NIL) 
+;(DEFSYSFUN 'si::sputprop "sputprop" '(T T T) 'T NIL NIL) 
 ;(DEFSYSFUN 'GENSYM "Lgensym" '(*) 'SYMBOL NIL NIL) 
 ;(DEFSYSFUN 'SUBSEQ "Lsubseq" '(T T *) 'T NIL NIL) 
 (DEFSYSFUN 'MINUSP "Lminusp" '(T) 'T NIL T) 

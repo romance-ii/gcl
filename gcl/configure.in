@@ -1784,6 +1784,7 @@ AC_SUBST(CLSTANDARD)
 # Check if Posix compliant getcwd exists, if not we'll use getwd.
 AC_CHECK_FUNCS(getcwd)
 AC_CHECK_FUNCS(getwd)
+AC_CHECK_FUNCS(rename)
 AC_CHECK_FUNC(uname, , AC_DEFINE(NO_UNAME,1,[no uname call]))
 AC_CHECK_FUNC(gettimeofday, , AC_DEFINE(NO_GETTOD,1,[no gettimeofday call]))
 
