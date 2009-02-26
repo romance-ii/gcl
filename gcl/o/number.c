@@ -286,27 +286,29 @@ number_to_double(object x)
 }
 
 void
-gcl_init_number(void)
-{
+gcl_init_number(void) {
 
-	shortfloat_zero = alloc_object(t_shortfloat);
-	sf(shortfloat_zero) = (shortfloat)0.0;
-	longfloat_zero = alloc_object(t_longfloat);
-	lf(longfloat_zero) = (longfloat)0.0;
-	enter_mark_origin(&shortfloat_zero);
-	enter_mark_origin(&longfloat_zero);
+#if !defined(IM_FIX_BASE) || !defined(IM_FIX_LIM)
+  fSallocate_bigger_fixnum_range(-1024,1023);
+#endif
 
-  	make_constant("MOST-POSITIVE-FIXNUM",
-		      make_fixnum(MOST_POSITIVE_FIX));
-	make_constant("MOST-NEGATIVE-FIXNUM",
-		      make_fixnum(MOST_NEGATIVE_FIX));
+  shortfloat_zero = alloc_object(t_shortfloat);
+  sf(shortfloat_zero) = (shortfloat)0.0;
+  longfloat_zero = alloc_object(t_longfloat);
+  lf(longfloat_zero) = (longfloat)0.0;
+  enter_mark_origin(&shortfloat_zero);
+  enter_mark_origin(&longfloat_zero);
+  
+  make_constant("MOST-POSITIVE-FIXNUM",make_fixnum(MOST_POSITIVE_FIX));
+  make_constant("MOST-NEGATIVE-FIXNUM",make_fixnum(MOST_NEGATIVE_FIX));
 
-	gcl_init_big();
-	gcl_init_num_pred();
-	gcl_init_num_comp();
-	gcl_init_num_arith();
-	gcl_init_num_co();
-	gcl_init_num_log();
-	gcl_init_num_sfun();
-	gcl_init_num_rand();
+  gcl_init_big();
+  gcl_init_num_pred();
+  gcl_init_num_comp();
+  gcl_init_num_arith();
+  gcl_init_num_co();
+  gcl_init_num_log();
+  gcl_init_num_sfun();
+  gcl_init_num_rand();
+
 }

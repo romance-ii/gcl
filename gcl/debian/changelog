@@ -1,3 +1,11 @@
+gclcvs (2.7.0-93.6) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * make sure there are always some immfixnums so == small_fixnum will
+    not break
+
+ --  <camm@maguirefamily.org>  Thu, 26 Feb 2009 21:33:27 +0000
+
 gclcvs (2.7.0-93.5) unstable; urgency=low
 
   * Non-maintainer upload.
