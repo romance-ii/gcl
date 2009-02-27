@@ -1,88 +1,3 @@
-gclcvs (2.7.0-93.12) unstable; urgency=low
-
-  * Non-maintainer upload.
-  * buffer overflow fix
-
- --  <camm@maguirefamily.org>  Fri, 27 Feb 2009 02:24:32 +0000
-
-gclcvs (2.7.0-93.11) unstable; urgency=low
-
-  * Non-maintainer upload.
-  * unixfsys cleanups, sputprop redefine
-
- --  <camm@maguirefamily.org>  Thu, 26 Feb 2009 22:38:51 +0000
-
-gclcvs (2.7.0-93.10) unstable; urgency=low
-
-  * Non-maintainer upload.
-  * xdr define fix
-
- --  <camm@maguirefamily.org>  Thu, 26 Feb 2009 21:54:25 +0000
-
-gclcvs (2.7.0-93.9) unstable; urgency=low
-
-  * Non-maintainer upload.
-  * 64bit dladdr fix
-
- --  <camm@maguirefamily.org>  Thu, 26 Feb 2009 21:52:11 +0000
-
-gclcvs (2.7.0-93.8) unstable; urgency=low
-
-  * Non-maintainer upload.
-  * fix eq 0 bug in get-arg-types/get-return-type
-
- --  <camm@maguirefamily.org>  Thu, 26 Feb 2009 21:41:21 +0000
-
-gclcvs (2.7.0-93.7) unstable; urgency=low
-
-  * Non-maintainer upload.
-  * close file descriptor leak in run_process fork
-
- --  <camm@maguirefamily.org>  Thu, 26 Feb 2009 21:34:19 +0000
-
-gclcvs (2.7.0-93.6) unstable; urgency=low
-
-  * Non-maintainer upload.
-  * make sure there are always some immfixnums so == small_fixnum will
-    not break
-
- --  <camm@maguirefamily.org>  Thu, 26 Feb 2009 21:33:27 +0000
-
-gclcvs (2.7.0-93.5) unstable; urgency=low
-
-  * Non-maintainer upload.
-  * new unexelf.c
-
- --  <camm@maguirefamily.org>  Thu, 26 Feb 2009 21:32:36 +0000
-
-gclcvs (2.7.0-93.4) unstable; urgency=low
-
-  * Non-maintainer upload.
-  * output_bfd fix
-
- --  <camm@maguirefamily.org>  Thu, 26 Feb 2009 21:32:01 +0000
-
-gclcvs (2.7.0-93.3) unstable; urgency=low
-
-  * Non-maintainer upload.
-  * Use sigprocmask to unblock signals
-
- --  <camm@maguirefamily.org>  Thu, 26 Feb 2009 21:31:31 +0000
-
-gclcvs (2.7.0-93.2) unstable; urgency=low
-
-  * Non-maintainer upload.
-  * 64bit interrupt fix
-
- --  <camm@maguirefamily.org>  Thu, 26 Feb 2009 21:30:54 +0000
-
-gclcvs (2.7.0-93.1) unstable; urgency=low
-
-  * Non-maintainer upload.
-  * modern configure.in
-
- --  <camm@maguirefamily.org>  Thu, 26 Feb 2009 21:21:12 +0000
-
 gclcvs (2.7.0-93) unstable; urgency=low
 
   * freeze-defstructs
@@ -99,8 +14,31 @@ gclcvs (2.7.0-93) unstable; urgency=low
   * allow for just one gcl_recompile.o file
   * cond macro fix
   * only auto-inline lisp symbols
+  * modern configure.in
+  * 64bit interrupt fix
+  * Use sigprocmask to unblock signals
+  * output_bfd fix
+  * new unexelf.c
+  * make sure there are always some immfixnums so == small_fixnum will
+    not break
+  * close file descriptor leak in run_process fork
+  * fix eq 0 bug in get-arg-types/get-return-type
+  * 64bit dladdr fix
+  * xdr define fix
+  * unixfsys cleanups, sputprop redefine
+  * buffer overflow fix
+  * new maintainer email address
 
- -- Camm Maguire <camm@maguirefamily.org>  Mon, 08 Sep 2008 01:02:55 +0000
+ -- Camm Maguire <camm@debian.org>  Fri, 27 Feb 2009 03:52:45 +0000
+
+gclcvs (2.7.0-92.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Fix pending l10n issues. Debconf translations:
+    - Swedish. Closes: #492177
+    - Italian. Closes: #504155
+
+ -- Christian Perrier <bubulle@debian.org>  Sun, 02 Nov 2008 08:04:31 +0100
 
 gclcvs (2.7.0-92) unstable; urgency=low
 
