@@ -28,8 +28,15 @@ gclcvs (2.7.0-93) unstable; urgency=low
   * unixfsys cleanups, sputprop redefine
   * buffer overflow fix
   * new maintainer email address
+  * no SGC on sparc until mprotect bug fixed
+  * Bug fix: "violation", thanks to Martin Zobel-Helas (Closes: #496030).
+    Guarantee some small fixnums at all times.  Fixme -- consider effect
+    on eql-is-eq types.
+  * Bug fix: "update", thanks to Clytie Siddall (Closes: #513347).  vi.po
+    installed
+  * latest config.guess and config.sub
 
- -- Camm Maguire <camm@debian.org>  Fri, 27 Feb 2009 03:52:45 +0000
+ -- Camm Maguire <camm@debian.org>  Fri, 27 Feb 2009 17:35:04 +0000
 
 gclcvs (2.7.0-92.1) unstable; urgency=low
 
