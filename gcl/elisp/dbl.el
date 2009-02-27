@@ -97,30 +97,32 @@
 ;(define-key ctl-x-map "&" 'send-dbl-command)
 
 ;;Of course you may use `def-dbl' with any other dbl command, including
-;;user defined ones.   
+;;user defined ones.
 
-(defmacro def-dbl (name key &optional doc)
-  (let* ((fun (intern (format "dbl-%s" (read name))))
-	 )
-    (list 'progn
- 	  (list 'defun fun '(arg)
-		(or doc "")
-		'(interactive "p")
-		(list 'dbl-call name 'arg))
-	  (list 'define-key 'dbl-mode-map key  (list 'quote fun)))))
+(defmacro def-dbl (name keys &optional doc)
+  (let ((keys (if (consp keys) keys (list keys)))
+	 (fun (intern (format "dbl-%s" (read name)))))
+    `(progn
+       (defun ,fun (arg)
+	 ,(or doc "")
+	 (interactive "p")
+	 (dbl-call ,name arg)
+	 ,@(mapcar #'(lambda (key) `(define-key dbl-mode-map ,key ',fun)) keys)))))
 
-(def-dbl ":step %p"   "\M-s" "Step one source line with display")
-(def-dbl ":step %p"   "\C-c\C-s" "Step one source line with display")
+(def-dbl ":step %p"   ("\M-s" "\C-c\C-s") "Step one source line with display")
 (def-dbl ":stepi %p"  "\C-c\t" "Step one instruction with display")
-(def-dbl ":next %p"   "\M-n" "Step one source line (skip functions)")
-(def-dbl ":next %p"   "\C-c\C-n" "Step one source line (skip functions)")
-(def-dbl ":r"   "\M-c" "Continue with display")
+(def-dbl ":next %p"   ("\M-n" "\C-c\C-n") "Step one source line (skip functions)")
+(def-dbl ":r"         "\M-c" "Continue with display")
 
-(def-dbl ":finish" "\C-c\C-f" "Finish executing current function")
+(def-dbl ":finish"    "\C-c\C-f" "Finish executing current function")
 (def-dbl ":up %p"     "\C-cu"   "Go up N stack frames (numeric arg) with display")
 (def-dbl ":down %p"   "\C-cd"   "Go down N stack frames (numeric arg) with display")
 
 
+(defvar dbl-last-frame nil)
+(defvar dbl-last-frame-displayed-p t)
+(defvar dbl-delete-prompt-marker nil)
+
 (defun dbl-mode ()
   "Major mode for interacting with an inferior Lisp or Maxima process.
 It is like an ordinary shell, except that it understands certain special
@@ -236,14 +238,10 @@ You may also enter keyword break commands.
 
   (interactive "p")
   
-  (let ( tem
-	(dir default-directory)
-	;; important for winnt version of emacs
+  (let (;; important for winnt version of emacs
 	(binary-process-input t)
 	(binary-process-output nil)
-	switches
-	(name (concat "dbl" (if (equal p 1) "" p) ""))
-	)
+	(name (concat "dbl" (if (equal p 1) "" p) "")))
     
     (switch-to-buffer (concat "*" name "*"))
     (or (bolp) (newline))
@@ -289,13 +287,12 @@ the `--fullname' keyword as in:
 ;; each filename-and-line-number;
 ;; that DBL prints to identify the selected frame.
 ;; It records the filename and line number, and maybe displays that file.
-(defun dbl-filter (proc string)
-  (let ((inhibit-quit t))
-    (set-buffer (process-buffer proc))
-    (goto-char (point-max))
-    (insert string)
-    (goto-char (point-max))
-    ))
+;(defun dbl-filter (proc string)
+;  (let ((inhibit-quit t))
+;    (set-buffer (process-buffer proc))
+;    (goto-char (point-max))
+;    (insert string)
+;    (goto-char (point-max))))
 
 
 (defun dbl-filter (proc string)
@@ -314,14 +311,13 @@ the `--fullname' keyword as in:
 	  (let ((end (string-match "\n" string)))
 	    (if end
               (progn
-		(setq me string)
 		(cond ((string-match
 			"\032\032\\([A-Za-z]?:?[^:]*\\):\\([0-9]*\\):[^\n]+\n"
 			string)
 		       (setq dbl-last-frame
 			      (cons
 			      (match-string 1 string)
-			      (string-to-int  (match-string 2 string))))
+			      (string-to-number  (match-string 2 string))))
 		       
 		       (cond ((equal (cdr dbl-last-frame)  0)
 			      ;(message "got 0")
@@ -358,8 +354,7 @@ the `--fullname' keyword as in:
 (defun dbl-filter-insert (proc string)
   (let (moving
 	output-after-point 
-	(old-buffer (current-buffer))
-	start)
+	(old-buffer (current-buffer)))
     (set-buffer (process-buffer proc))
     ;; test to see if we will move the point.   We want that the
     ;; window-point of the buffer, should be equal to process-mark. 
@@ -370,7 +365,6 @@ the `--fullname' keyword as in:
 	(save-excursion
 	  ;; Insert the text, moving the process-marker.
 	  (goto-char (process-mark proc))
-	  (setq start (point))
 	  (insert string)
 	  (set-marker (process-mark proc) (point))
 	 ; (setq bill (cons (list 'hi (process-mark proc) (marker-position (process-mark proc)) (point)) bill))
@@ -490,17 +484,17 @@ If a non process buffer, just return current file and line number.
     (end-of-line)
     (cond ((get-buffer-process (current-buffer))
 	   (cond
-	    ((save-excursion
+	    ((progn
 	       (beginning-of-line)
 		(get-text-property (point) 'file-line)))
 	    ((progn (end-of-line) (re-search-backward " \\([^: ]+\\):\\([0-9]+\\)" 300 nil))
-	     (setq file (buffer-substring (match-beginning 1) (match-end 1)))
-	     (setq line (buffer-substring (match-beginning 2) (match-end 2)))
-	     (setq line (read line))
-	     (and (integerp line)
-		  (setq file (search-path file 'dbl-dirs))
-		  (list file line)))))
-	  (t (list (buffer-file-name) (+ 1 (count-lines (point))))))))
+	     (let* ((file (buffer-substring (match-beginning 1) (match-end 1)))
+		    (line (buffer-substring (match-beginning 2) (match-end 2)))
+		    (line (read line))
+		    (file (search-path file 'dbl-dirs)))
+	     (and (integerp line) file (list file line))))))
+	  (t (list (buffer-file-name) (+ 1 (if (featurep 'xemacs) (line-number)
+					     (line-number-at-pos))))))))
 
 (defun dbl-find-and-display-line ()
   (interactive)
@@ -554,7 +548,7 @@ If a non process buffer, just return current file and line number.
   (goto-char (point-max))
   (setq dbl-delete-prompt-marker (point-marker))
   (dbl-set-buffer)
-  (send-string (get-buffer-process current-dbl-buffer)
+  (process-send-string (get-buffer-process current-dbl-buffer)
 	       (concat command "\n"))))
 
 (defun dbl-subtitute-% (command n)
@@ -566,8 +560,8 @@ If a non process buffer, just return current file and line number.
 	   (cond (in-dbl (setq file-line (dbl-find-line)))
 		 (t (setq file-line
 			  (list (buffer-file-name)
-				(+ 1 (count-lines
-							 (point)))))))))
+				(+ 1 (if (featurep 'xemacs) (line-number)
+				       (line-number-at-pos)))))))))
     (while (and command (string-match "\\([^%]*\\)%\\([adeflp]\\)" command))
       (let ((letter (string-to-char (substring command (match-beginning 2))))
 	    subst)
@@ -620,10 +614,9 @@ If a non process buffer, just return current file and line number.
 	     (if (get-buffer-process (current-buffer))
 		 (setq current-dbl-buffer (current-buffer)))
 	     (message name)
-	     (send-string (get-buffer-process current-dbl-buffer)
+	     (process-send-string (get-buffer-process current-dbl-buffer)
 			  (concat name "\n"))
-	     (other-window 1)
-	     )))
+	     (other-window 1))))
 	(t
   
 	 (let ((file-name (file-name-nondirectory buffer-file-name))
@@ -632,26 +625,28 @@ If a non process buffer, just return current file and line number.
 		       (1+ (count-lines 1 (point))))))
 	   (and    downcase-filenames-for-dbl
 		   (setq file-name (downcase file-name)))
-	   (send-string (get-buffer-process current-dbl-buffer)
+	   (process-send-string (get-buffer-process current-dbl-buffer)
 			(concat "break " file-name ":" line "\n"))))))
 	
 	
 (defun dbl-read-address()
   "Return a string containing the core-address found in the buffer at point."
   (save-excursion
-   (let ((pt (dot)) found begin)
-     (setq found (if (search-backward "0x" (- pt 7) t)(dot)))
-     (cond (found (forward-char 2)(setq result
-			(buffer-substring found
-				 (progn (re-search-forward "[^0-9a-f]")
-					(forward-char -1)
-					(dot)))))
+   (let* ((pt (point)) begin
+	  (found (if (search-backward "0x" (- pt 7) t) (point))))
+     
+     (cond (found (forward-char 2)
+		  (buffer-substring 
+		   found
+		   (progn (re-search-forward "[^0-9a-f]")
+			  (forward-char -1)
+			  (point))))
 	   (t (setq begin (progn (re-search-backward "[^0-9]") (forward-char 1)
-				 (dot)))
+				 (point)))
 	      (forward-char 1)
 	      (re-search-forward "[^0-9]")
 	      (forward-char -1)
-	      (buffer-substring begin (dot)))))))
+	      (buffer-substring begin (point)))))))
 
 
 (defvar dbl-commands nil
@@ -679,7 +674,7 @@ It is for customization by you.")
 		 (if (stringp comm) (format comm addr) (funcall comm addr))))
 	  (t (setq comm addr)))
     (switch-to-buffer current-dbl-buffer)
-    (goto-char (dot-max))
-    (insert-string comm)))
+    (goto-char (point-max))
+    (insert comm)))
 
 (provide 'dbl)
