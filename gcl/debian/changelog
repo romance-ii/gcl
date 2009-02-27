@@ -35,8 +35,9 @@ gclcvs (2.7.0-93) unstable; urgency=low
   * Bug fix: "update", thanks to Clytie Siddall (Closes: #513347).  vi.po
     installed
   * latest config.guess and config.sub
+  * titles for texi files
 
- -- Camm Maguire <camm@debian.org>  Fri, 27 Feb 2009 17:35:04 +0000
+ -- Camm Maguire <camm@debian.org>  Fri, 27 Feb 2009 17:47:52 +0000
 
 gclcvs (2.7.0-92.1) unstable; urgency=low
 

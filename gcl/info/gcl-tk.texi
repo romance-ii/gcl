@@ -1,6 +1,7 @@
 \input texinfo
 @c -*-texinfo-*-
 @c @smallbook
+@settitle GCL TK Manual
 @setfilename gcl-tk.info
 
 @c to update the menus do: 

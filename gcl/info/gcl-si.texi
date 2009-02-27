@@ -10,6 +10,7 @@
 
 @c @smallbook
 @setfilename gcl-si.info
+@settitle GCL SI Manual
 @synindex vr fn
 
 @c to update the menus do: 
