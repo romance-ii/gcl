@@ -1,30 +1,30 @@
 # Vietnamese translation for GCL.
-# Copyright © 2007 Free Software Foundation, Inc.
-# Clytie Siddall <clytie@riverland.net.au>, 2007
+# Copyright © 2009 Free Software Foundation, Inc.
+# Clytie Siddall <clytie@riverland.net.au>, 2007-2009.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gcl 2.6.7-36\n"
+"Project-Id-Version: gclcvs 2.7.0-92.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-01-21 08:47+0100\n"
-"PO-Revision-Date: 2008-01-04 16:27+1030\n"
+"PO-Revision-Date: 2009-01-28 21:03+1030\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
 "Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: LocFactoryEditor 1.7b1\n"
+"X-Generator: LocFactoryEditor 1.8\n"
 
+#: ../in.gcl.templates:1001
 #. Type: boolean
 #. Description
-#: ../in.gcl.templates:1001
 msgid "Use the work-in-progress ANSI build by default?"
 msgstr "Dùng bản xây dựng đang phát triển ANSI theo mặc định không?"
 
+#: ../in.gcl.templates:1001
 #. Type: boolean
 #. Description
-#: ../in.gcl.templates:1001
 msgid ""
 "GCL is in the process of providing an ANSI compliant image in addition to "
 "its traditional CLtL1 image still in production use.  Please see the README."
@@ -34,17 +34,17 @@ msgid ""
 "variable to any non-empty string for the ANSI build, and to the empty string "
 "for the CLtL1 build, e.g. GCL_ANSI=t gcl@EXT@.  The flavor of the build in "
 "force will be reported in the initial startup banner."
-msgstr ""
+msgstr "GCL đang cung cấp một ảnh tương thích với ANSI, thêm vào ảnh CLtL1 truyền thống vẫn còn được sử dụng hằng ngày. Xem tập tin Đọc Đi README.Debian để tìm mô tả ngắn về hai thuật ngữ này. Đặt biến này thì quyết định ảnh nào bạn sử dụng theo mặc định khi thực hiện câu lệnh « gcl@EXT@ ». Bạn cũng có thể ghi đè lên sự chọn đó một cách cục bộ bằng cách đặt biến môi trường « GCL_ANSI » thành bất cứ chuỗi trống nào cho bản xây dựng ANSI, và thành chuỗi trống cho bản xây dựng CLtL1, v.d. « GCL_ANSI=t gcl@EXT@ ». Kiểu bản xây dựng vẫn hoạt động sẽ được thông báo trong băng cờ khởi chạy đầu tiên."
 
+#: ../in.gcl.templates:2001
 #. Type: boolean
 #. Description
-#: ../in.gcl.templates:2001
 msgid "Use the profiling build by default?"
 msgstr "Dùng bản xây dựng đo hiệu năng sử dụng theo mặc định không?"
 
+#: ../in.gcl.templates:2001
 #. Type: boolean
 #. Description
-#: ../in.gcl.templates:2001
 msgid ""
 "GCL now has optional support for profiling via gprof.  Please see the "
 "documentation for si::gprof-start and si::gprof-quit for details. As this "
@@ -54,55 +54,4 @@ msgid ""
 "profiling support, and to the empty string for the more optimized builds, e."
 "g. GCL_PROF=t gcl@EXT@.  If profiling is enabled, this will be reported in "
 "the initial startup banner."
-msgstr ""
-
-#~ msgid ""
-#~ "GCL is in the process of providing an ANSI compliant image in addition to "
-#~ "its traditional CLtL1 image still in production use."
-#~ msgstr ""
-#~ "GCL đang phát triển chức năng cung cấp ảnh tùy theo ANSI thêm vào ảnh "
-#~ "CLtL1 truyền thống vẫn còn được sử dụng trong trường hợp sản xuất."
-
-#~ msgid ""
-#~ "Please see the README.Debian file for a brief description of these terms. "
-#~ "Choosing this option will determine which image will be used by default "
-#~ "when executing 'gcl@EXT@'."
-#~ msgstr ""
-#~ "Xem tài liệu Đọc Đi (README.Debian) để tìm mô tả ngắn về các thuật ngữ "
-#~ "này. Bật tùy chọn này thì xác định ảnh nào cần dùng theo mặc định khi "
-#~ "thực hiện lệnh « gcl@EXT@ »."
-
-#~ msgid ""
-#~ "This setting may be overridden by setting the GCL_ANSI environment "
-#~ "variable to any non-empty string for the ANSI build, and to the empty "
-#~ "string for the CLtL1 build, e.g. GCL_ANSI=t gcl@EXT@. The currently "
-#~ "enforced build flavor will be reported in the initial startup banner."
-#~ msgstr ""
-#~ "Vẫn còn có thể ghi đè lên thiết lập này bằng cách đặt biến môi trường « "
-#~ "GCL_ANSI » thành bắt cứ chuỗi không rỗng cho bản xây dựng ANSI, và cho "
-#~ "chuỗi rỗng cho bản xây dựng CLtL1, v.d. « GCL_ANSI=t gcl@EXT@ ». Kiểu bản "
-#~ "xây dựng hiện thời được chọn sẽ được thông báo trên băng cờ khởi chạy đầu "
-#~ "tiên."
-
-#~ msgid "GCL has optional support for profiling via gprof."
-#~ msgstr "GCL có hỗ trợ tùy chọn để đo hiệu năng sử dụng thông qua gprof."
-
-#~ msgid ""
-#~ "Please see the documentation for si::gprof-start and si::gprof-quit for "
-#~ "details. As this build is slower than builds without gprof support, it is "
-#~ "not recommended for final production use."
-#~ msgstr ""
-#~ "Xem tài liệu hướng dẫn về « si::gprof-start » và « si::gprof-quit » để tìm "
-#~ "chi tiết. Vì bản xây dựng này chạy chậm hơn các bản xây dựng không hỗ trợ "
-#~ "gprof, không khuyên bạn sử dụng nó trong trường hợp sản xuất cuối cùng."
-
-#~ msgid ""
-#~ "Set the GCL_PROF environment variable to the empty string for more "
-#~ "optimized builds, or any non-empty string for profiling support; e.g. "
-#~ "GCL_PROF=t gcl@EXT@. If profiling is enabled, this will be reported in "
-#~ "the initial startup banner."
-#~ msgstr ""
-#~ "Đặt biến môi trường « GCL_PROF » thành chuỗi rỗng cho các bản xây dựng tối "
-#~ "ưu hơn, hoặc cho bất cứ chuỗi không rỗng nào để hỗ trợ chức năng đo hiệu "
-#~ "năng sử dụng, v.d. « GCL_PROF=t gcl@EXT@ ». Hiệu lực chức năng đo hiệu "
-#~ "năng sử dụng thì nó được thông báo trên băng cờ khởi chạy đầu tiên."
+msgstr "Phiên bản GCL này có tùy chọn hỗ trợ chức năng đo hiệu năng sử dụng, thông qua phần mềm gprof. Xem tài liệu hướng dẫn về « si::gprof-start » và « si::gprof-quit » để tìm chi tiết. Vì bản xây dựng này chạy chậm hơn bản không hỗ trợ gprof, không khuyên bạn đặt tùy chọn này khi làm việc hàng ngày. Bạn cũng có thể ghi đè lên sự chọn đó một cách cục bộ bằng cách đặt biến môi trường « GCL_PROF » thành bất cứ chuỗi trống nào cho bản hỗ trợ chức năng đo hiệu năng sử dụng, và thành chuỗi trống cho bản nhanh hơn, v.d. « GCL_PROF=t gcl@EXT@ ». Chức năng đo hiệu năng sử dụng vẫn hoạt động sẽ được thông báo trong băng cờ khởi chạy đầu tiên."
