@@ -112,7 +112,6 @@ object LISP_string;
 
 object sSAignore_eof_on_terminal_ioA;
 
-extern void coerce_to_local_filename(object p,char *f);
 extern char *lisp_to_string(object string);
 
 static bool

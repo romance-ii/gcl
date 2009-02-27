@@ -510,3 +510,6 @@ object ihs_top_function_name(ihs_ptr h);
  })
 
 #define stack_cons() ({object _d=vs_pop,_a=vs_pop;vs_push(make_cons(_a,_d));})
+
+#define coerce_to_filename(a_,b_) coerce_to_filename1(a_,b_,sizeof(b_))
+#define coerce_to_local_filename(a_,b_) coerce_to_local_filename1(a_,b_,sizeof(b_))

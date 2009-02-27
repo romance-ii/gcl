@@ -41,13 +41,7 @@ Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #  define lstat stat
 #endif
 
-#ifdef BSD
-#define HAVE_RENAME
-#endif
-
 void Ldirectory(void);
-
-
 
 #ifdef NEED_GETWD
 #include <sys/dir.h>
@@ -152,7 +146,7 @@ DEV_FOUND:
 
 
 void
-coerce_to_filename(object pathname, char *p) {
+coerce_to_filename1(object pathname, char *p,unsigned sz) {
 
   object namestring=coerce_to_namestring(pathname);;
   
@@ -190,7 +184,7 @@ coerce_to_filename(object pathname, char *p) {
     }
 
     if (pwent==0 || 
-	((m=strlen(pwent->pw_dir)) && m+namestring->st.st_fillp-n>=MAXPATHLEN-16))
+	((m=strlen(pwent->pw_dir)) && m+namestring->st.st_fillp-n+1>=sz))
       FEerror("Can't expand pathname ~a",1,namestring);
 
     memcpy(p,pwent->pw_dir,m);
@@ -202,7 +196,7 @@ coerce_to_filename(object pathname, char *p) {
 #endif
 
     {
-      if (namestring->st.st_fillp>=MAXPATHLEN-16)
+      if (namestring->st.st_fillp+1>=sz)
 	FEerror("Too long filename: ~S.",1,namestring);
       memcpy(p,namestring->st.st_self,namestring->st.st_fillp);
       p[namestring->st.st_fillp]=0;
@@ -215,7 +209,7 @@ coerce_to_filename(object pathname, char *p) {
 }
 
 void
-coerce_to_local_filename(object pathname, char *p)
+coerce_to_local_filename1(object pathname, char *p,unsigned sz)
 {
     object namestring;
 
@@ -223,7 +217,7 @@ coerce_to_local_filename(object pathname, char *p)
     vs_push(pathname); 
     namestring=coerce_to_local_namestring(pathname);
     vs_push(namestring);
-    coerce_to_filename(namestring, p);
+    coerce_to_filename1(namestring,p,sz);
     vs_reset;
 }
 
@@ -521,7 +515,7 @@ DEF_ORDINARY("FILE",sKfile,KEYWORD,"");
 
 DEFUN_NEW("STAT",object,fSstat,SI,1,1,NONE,OO,OO,OO,OO,(object path),"") {
 
-  char filename[4096];
+  char filename[MAXPATHLEN];
   struct stat ss;
   
 
