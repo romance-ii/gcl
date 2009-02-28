@@ -678,8 +678,8 @@ X_CFLAGS
 X_PRE_LIBS
 X_LIBS
 X_EXTRA_LIBS
-HAVE_OUTPUT_BFD
 BUILD_BFD
+HAVE_OUTPUT_BFD
 LIBBFD
 LIBIBERTY
 WORDS_BIGENDIAN
@@ -9171,7 +9171,73 @@ _ACEOF
 
 fi
 
-if test "$enable_statsysbfd" = "yes" || test "$enable_dynsysbfd" = "yes" ; then
+if test "$enable_locbfd" = "yes" ; then
+
+	# check for gettext.  It is part of glibc, but others
+	# need GNU gettext separately.
+#	AC_CHECK_HEADER(libintl.h, true,
+#			   AC_MSG_ERROR(libintl.h (gettext) not found))
+#	AC_SEARCH_LIBS(dgettext, intl, true, AC_MSG_ERROR(gettext library not found))
+
+	echo "#"
+	echo "#"
+	echo "# -------------------------"
+	echo "# Subconfigure of LIBINTL"
+	echo "#"
+	echo "#"
+	cd binutils/intl
+	chmod +x configure && ./configure --disable-nls
+	cd ../..
+	echo "#"
+	echo "#"
+	echo "#"
+	echo "# Subconfigure of LIBINTL done"
+	echo "# ------------------------------"
+	echo "#"
+	echo "#"
+	echo "#"
+	echo "# -------------------------"
+	echo "# Subconfigure of LIBIBERTY"
+	echo "#"
+	echo "#"
+	cd binutils/libiberty
+	chmod +x configure && ./configure --disable-nls
+	cd ../..
+#       MY_SUBDIRS="$MY_SUBDIRS binutils/libiberty "
+	echo "#"
+	echo "#"
+	echo "#"
+	echo "# Subconfigure of LIBIBERTY done"
+	echo "# ------------------------------"
+	echo "#"
+	echo "#"
+	echo "#"
+	echo "# -------------------"
+	echo "# Subconfigure of BFD"
+	echo "#"
+	echo "#"
+	cd binutils/bfd
+	chmod +x configure && ./configure --with-included-gettext --disable-nls
+	cd ../..
+#       MY_SUBDIRS="$MY_SUBDIRS binutils/bfd "
+	echo "#"
+	echo "#"
+	echo "#"
+	echo "# Subconfigure of BFD done"
+	echo "# ------------------------"
+	echo "#"
+#	TLIBS="$TLIBS ./binutils/bfd/libbfd.a ./binutils/libiberty/libiberty.a"
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_LIBBFD 1
+_ACEOF
+
+	BUILD_BFD="h/bfd.h h/bfdlink.h h/ansidecl.h h/symcat.h"
+
+	export C_INCLUDE_PATH=`pwd`/binutils/include:`pwd`/binutils/bfd:$C_INCLUDE_PATH
+fi
+
+if test "$enable_statsysbfd" = "yes" || test "$enable_dynsysbfd" = "yes" || test "$enable_locbfd" = "yes" ; then
 
    if test "${ac_cv_header_bfd_h+set}" = set; then
   { echo "$as_me:$LINENO: checking for bfd.h" >&5
@@ -9802,65 +9868,6 @@ fi
 	else
 		TLIBS="$TLIBS -lbfd -liberty"
 	fi
-fi
-
-if test "$enable_locbfd" = "yes" ; then
-
-	# check for gettext.  It is part of glibc, but others
-	# need GNU gettext separately.
-#	AC_CHECK_HEADER(libintl.h, true,
-#			   AC_MSG_ERROR(libintl.h (gettext) not found))
-#	AC_SEARCH_LIBS(dgettext, intl, true, AC_MSG_ERROR(gettext library not found))
-
-	echo "#"
-	echo "#"
-	echo "# -------------------------"
-	echo "# Subconfigure of LIBINTL"
-	echo "#"
-	echo "#"
-	cd binutils/intl && chmod +x configure && ./configure --disable-nls && cd ../..
-	echo "#"
-	echo "#"
-	echo "#"
-	echo "# Subconfigure of LIBINTL done"
-	echo "# ------------------------------"
-	echo "#"
-	echo "#"
-	echo "#"
-	echo "# -------------------------"
-	echo "# Subconfigure of LIBIBERTY"
-	echo "#"
-	echo "#"
-	cd binutils/libiberty && chmod +x configure && ./configure --disable-nls && cd ../..
-#       MY_SUBDIRS="$MY_SUBDIRS binutils/libiberty "
-	echo "#"
-	echo "#"
-	echo "#"
-	echo "# Subconfigure of LIBIBERTY done"
-	echo "# ------------------------------"
-	echo "#"
-	echo "#"
-	echo "#"
-	echo "# -------------------"
-	echo "# Subconfigure of BFD"
-	echo "#"
-	echo "#"
-	cd binutils/bfd && chmod +x configure && ./configure --with-included-gettext --disable-nls && cd ../..
-#       MY_SUBDIRS="$MY_SUBDIRS binutils/bfd "
-	echo "#"
-	echo "#"
-	echo "#"
-	echo "# Subconfigure of BFD done"
-	echo "# ------------------------"
-	echo "#"
-#	TLIBS="$TLIBS ./binutils/bfd/libbfd.a ./binutils/libiberty/libiberty.a"
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_LIBBFD 1
-_ACEOF
-
-	BUILD_BFD="h/bfd.h h/bfdlink.h h/ansidecl.h h/symcat.h"
-
 fi
 
 #AC_CONFIG_SUBDIRS($MY_SUBDIRS)
@@ -20148,8 +20155,8 @@ X_CFLAGS!$X_CFLAGS$ac_delim
 X_PRE_LIBS!$X_PRE_LIBS$ac_delim
 X_LIBS!$X_LIBS$ac_delim
 X_EXTRA_LIBS!$X_EXTRA_LIBS$ac_delim
-HAVE_OUTPUT_BFD!$HAVE_OUTPUT_BFD$ac_delim
 BUILD_BFD!$BUILD_BFD$ac_delim
+HAVE_OUTPUT_BFD!$HAVE_OUTPUT_BFD$ac_delim
 LIBBFD!$LIBBFD$ac_delim
 LIBIBERTY!$LIBIBERTY$ac_delim
 WORDS_BIGENDIAN!$WORDS_BIGENDIAN$ac_delim

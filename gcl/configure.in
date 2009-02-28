@@ -876,7 +876,69 @@ if test "$enable_dlopen" = "yes" ; then
 
 fi
 
-if test "$enable_statsysbfd" = "yes" || test "$enable_dynsysbfd" = "yes" ; then
+if test "$enable_locbfd" = "yes" ; then
+
+	# check for gettext.  It is part of glibc, but others
+	# need GNU gettext separately.
+#	AC_CHECK_HEADER(libintl.h, true,
+#			   AC_MSG_ERROR(libintl.h (gettext) not found))
+#	AC_SEARCH_LIBS(dgettext, intl, true, AC_MSG_ERROR(gettext library not found))
+ 
+	echo "#"
+	echo "#"
+	echo "# -------------------------"
+	echo "# Subconfigure of LIBINTL"
+	echo "#"
+	echo "#"
+	cd binutils/intl
+	chmod +x configure && ./configure --disable-nls
+	cd ../..
+	echo "#"
+	echo "#"
+	echo "#"
+	echo "# Subconfigure of LIBINTL done"
+	echo "# ------------------------------"
+	echo "#"
+	echo "#"
+	echo "#"
+	echo "# -------------------------"
+	echo "# Subconfigure of LIBIBERTY"
+	echo "#"
+	echo "#"
+	cd binutils/libiberty
+	chmod +x configure && ./configure --disable-nls
+	cd ../..
+#       MY_SUBDIRS="$MY_SUBDIRS binutils/libiberty " 
+	echo "#"
+	echo "#"
+	echo "#"
+	echo "# Subconfigure of LIBIBERTY done"
+	echo "# ------------------------------"
+	echo "#"
+	echo "#"
+	echo "#"
+	echo "# -------------------"
+	echo "# Subconfigure of BFD"
+	echo "#"
+	echo "#"
+	cd binutils/bfd
+	chmod +x configure && ./configure --with-included-gettext --disable-nls
+	cd ../..
+#       MY_SUBDIRS="$MY_SUBDIRS binutils/bfd " 
+	echo "#"
+	echo "#"
+	echo "#"
+	echo "# Subconfigure of BFD done"
+	echo "# ------------------------"
+	echo "#"
+#	TLIBS="$TLIBS ./binutils/bfd/libbfd.a ./binutils/libiberty/libiberty.a"
+	AC_DEFINE(HAVE_LIBBFD,1,[use libbfd])
+	BUILD_BFD="h/bfd.h h/bfdlink.h h/ansidecl.h h/symcat.h"
+	AC_SUBST(BUILD_BFD)
+	export C_INCLUDE_PATH=`pwd`/binutils/include:`pwd`/binutils/bfd:$C_INCLUDE_PATH
+fi
+
+if test "$enable_statsysbfd" = "yes" || test "$enable_dynsysbfd" = "yes" || test "$enable_locbfd" = "yes" ; then
 
    AC_CHECK_HEADER(bfd.h,
    AC_CHECK_LIB(bfd,bfd_init,
@@ -971,61 +1033,6 @@ flib() {
 	else
 		TLIBS="$TLIBS -lbfd -liberty"
 	fi
-fi
-
-if test "$enable_locbfd" = "yes" ; then
-
-	# check for gettext.  It is part of glibc, but others
-	# need GNU gettext separately.
-#	AC_CHECK_HEADER(libintl.h, true,
-#			   AC_MSG_ERROR(libintl.h (gettext) not found))
-#	AC_SEARCH_LIBS(dgettext, intl, true, AC_MSG_ERROR(gettext library not found))
- 
-	echo "#"
-	echo "#"
-	echo "# -------------------------"
-	echo "# Subconfigure of LIBINTL"
-	echo "#"
-	echo "#"
-	cd binutils/intl && chmod +x configure && ./configure --disable-nls && cd ../..
-	echo "#"
-	echo "#"
-	echo "#"
-	echo "# Subconfigure of LIBINTL done"
-	echo "# ------------------------------"
-	echo "#"
-	echo "#"
-	echo "#"
-	echo "# -------------------------"
-	echo "# Subconfigure of LIBIBERTY"
-	echo "#"
-	echo "#"
-	cd binutils/libiberty && chmod +x configure && ./configure --disable-nls && cd ../..
-#       MY_SUBDIRS="$MY_SUBDIRS binutils/libiberty " 
-	echo "#"
-	echo "#"
-	echo "#"
-	echo "# Subconfigure of LIBIBERTY done"
-	echo "# ------------------------------"
-	echo "#"
-	echo "#"
-	echo "#"
-	echo "# -------------------"
-	echo "# Subconfigure of BFD"
-	echo "#"
-	echo "#"
-	cd binutils/bfd && chmod +x configure && ./configure --with-included-gettext --disable-nls && cd ../..
-#       MY_SUBDIRS="$MY_SUBDIRS binutils/bfd " 
-	echo "#"
-	echo "#"
-	echo "#"
-	echo "# Subconfigure of BFD done"
-	echo "# ------------------------"
-	echo "#"
-#	TLIBS="$TLIBS ./binutils/bfd/libbfd.a ./binutils/libiberty/libiberty.a"
-	AC_DEFINE(HAVE_LIBBFD,1,[use libbfd])
-	BUILD_BFD="h/bfd.h h/bfdlink.h h/ansidecl.h h/symcat.h"
-	AC_SUBST(BUILD_BFD)
 fi
 
 #AC_CONFIG_SUBDIRS($MY_SUBDIRS)

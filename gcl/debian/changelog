@@ -1,3 +1,12 @@
+gclcvs (2.7.0-94) unstable; urgency=low
+
+  * ${misc:Depends} for doc package
+  * standard 3.8.0
+  * zlib1g-dev build dependency
+  * lintian cleanups
+
+ -- Camm Maguire <camm@debian.org>  Sat, 28 Feb 2009 17:21:54 +0000
+
 gclcvs (2.7.0-93) unstable; urgency=low
 
   * freeze-defstructs
