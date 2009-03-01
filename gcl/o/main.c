@@ -84,7 +84,7 @@ Tcl_Interp *tcl_interpreter;
 char stdin_buf[BUFSIZ + EXTRA_BUFSIZE];
 char stdout_buf[BUFSIZ + EXTRA_BUFSIZE];
 
-char *system_directory   = NULL;
+/* char *system_directory   = NULL; */
 int page_multiple        = 1;
 
 int    debug             = FALSE;		/* debug switch */
@@ -203,33 +203,36 @@ gcl_main(int argc, char **argv, char **envp)
 #endif	
     if ( !initflag ) {
         /* An uninitialised system eg raw_gcl */
-        if ( argc < 2 ) {
-            /* Provide the current directory as a default */
-            system_directory = (char *) malloc ( strlen ( "./" ) + 3 );
-            strcpy ( system_directory, "./" );
-        } else {
-            int lastchar = strlen ( argv[1] ) - 1;
-            /* Squirrel away the system directory provided as argv[1] */
-            system_directory = (char *) malloc ( strlen ( argv[1] ) + 3 );
-            strcpy ( system_directory, argv[1] );
-            if ( system_directory[0] != '/' ) {
-                strcpy ( system_directory, "./" );
-            } else {
-                int j;
-                for ( j = strlen ( system_directory ); system_directory[j-1] != '/'; --j );
-                system_directory[j] = '\0';
-            }
+
+      bzero(system_directory,sizeof(system_directory));
+
+      if (argc<2)
+	strncpy(system_directory,"./",sizeof(system_directory));
+
+      else {
+
+	int lastchar=strlen(argv[1])-1;
+
+/* 	strncpy(system_directory,argv[1],sizeof(system_directory)); */
+/* 	if (system_directory[0]!='/') { */
+/* 	  strncpy(system_directory,"./",sizeof(system_directory)); */
+/* 	} else { */
+/* 	  int j; */
+/* 	  for (j=strlen(system_directory);system_directory[j-1]!='/';--j); */
+/* 	  system_directory[j]='\0'; */
+/* 	} */
             
-            if ( argv[1][lastchar] != '/') {
-                error ( "Can't get the system directory." );
-            }
-            strcpy ( system_directory, argv[1] );
-        }
+	if (argv[1][lastchar]!='/') {
+	  error ( "Can't get the system directory." );
+	}
+	strncpy (system_directory,argv[1],sizeof(system_directory));
+
+      }
     }
 #else  /* UNIX */
     if (!initflag && argc > 1) {
         error("can't get the system directory");
-        strcpy(system_directory, argv[1]);
+        strncpy(system_directory, argv[1] ,sizeof(system_directory));
     }
 #endif /* UNIX */
     GBC_enable = FALSE;

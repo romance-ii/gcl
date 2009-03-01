@@ -1,3 +1,9 @@
+gclcvs (2.7.0-95) unstable; urgency=low
+
+  * static system_directory
+
+ -- Camm Maguire <camm@debian.org>  Sun, 01 Mar 2009 05:47:30 +0000
+
 gclcvs (2.7.0-94) unstable; urgency=low
 
   * ${misc:Depends} for doc package
