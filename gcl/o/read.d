@@ -719,24 +719,11 @@ Lleft_parenthesis_reader()
 		    READER_ERROR(in,"Two dots appeared consecutively.");
 		  if (*p==OBJNULL) 
 		    READER_ERROR(in,"Object missing after dot.");
-		  else do {
-		    object c=OBJNULL;
-		    read_char_to(c,in,end_of_stream(in));
-		    switch (char_code(c)) {
-		    case ')':
-		      goto ENDUP;
-		      break;
-		    case ';':
-		      do { read_char_to(c,in,end_of_stream(in)); } while (char_code(c)!='\n');
-		      continue;
-		      break;
-		    default:
-		      if (cat(c)==cat_whitespace)
-			continue;
-		      READER_ERROR(in,"Expecting right parenthesis after dot and object.");
-		      break;
-		    } 
-		  } while (1);
+		  delimiting_char = code_char(')');
+		  in_list_flag = TRUE;
+		  if (read_object(in)!=OBJNULL)
+		    READER_ERROR(in,"Two objects after dot.");
+		  goto ENDUP;
 		}
 		vs_push(x);
 		*p = make_cons(x, Cnil);
