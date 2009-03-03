@@ -317,6 +317,12 @@ DEFUN_NEW("SPUTPROP",object,fSsputprop,SI,3,3,NONE,OO,OO,OO,OO,(object s,object 
   return(v);
 
 }
+#ifdef STATIC_FUNCTION_POINTERS
+object
+fSsputprop(object x,object y,object z) {
+  return FFN(fSsputprop)(x,y,z);
+}
+#endif
 
 /*
 	Remf(p, i) removes property i

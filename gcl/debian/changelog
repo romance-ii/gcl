@@ -1,8 +1,9 @@
 gclcvs (2.7.0-96) unstable; urgency=low
 
   * reader error fix
+  * FTBS ia64 fix, (Closes: #517578).
 
- -- Camm Maguire <camm@debian.org>  Tue, 03 Mar 2009 16:49:03 +0000
+ -- Camm Maguire <camm@debian.org>  Tue, 03 Mar 2009 21:13:43 +0000
 
 gclcvs (2.7.0-95) unstable; urgency=low
 
