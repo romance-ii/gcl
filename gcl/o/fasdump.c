@@ -1384,6 +1384,7 @@ read_fasd1(int i, object *loc)
 	 object x=alloc_object(t_vector);
 	 GET4(leng);
 	 x->v.v_elttype = GETD("v_elttype=%d");
+	 x->v.v_defrank=1;
 	 x->v.v_dim=x->v.v_fillp=leng;
 	 x->v.v_self=0;
 	 x->v.v_displaced=Cnil;
@@ -1414,7 +1415,7 @@ read_fasd1(int i, object *loc)
 	 x->a.a_displaced=Cnil;
 	 x->a.a_adjustable=0;
 	 if (x->a.a_rank > 0)
-	   { x->a.a_dims = (fixnum *)alloc_relblock(sizeof(fixnum)*(x->a.a_rank)); }
+	   { x->a.a_dims = (ufixnum *)alloc_relblock(sizeof(fixnum)*(x->a.a_rank)); }
 	 for (i=0; i< x->a.a_rank ; i++)
 	   GET4(x->a.a_dims[i]);
 	 array_allocself(x,0,Cnil);

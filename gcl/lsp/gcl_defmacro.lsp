@@ -269,6 +269,11 @@
 	      (doc decls b)
 	      (find-doc (cdr body) ignore-doc)
 	      (values doc (cons d decls) b)))
+	    ((and (consp (car body)) (eq (caar body) 'check-type))
+	     (multiple-value-bind
+	      (doc decls b)
+	      (find-doc (cdr body) ignore-doc)
+	      (values doc (cons (car body) decls) b)))
 	    (t (values nil nil body))))))
 
 (defun find-declarations (body)

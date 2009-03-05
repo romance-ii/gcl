@@ -213,6 +213,18 @@
 /* using xgcl */
 #undef HAVE_XGCL
 
+/* fill bits needed in certain lisp structures */
+#undef HM1BITS
+
+/* fill bits needed in certain lisp structures */
+#undef HM2BITS
+
+/* fill bits needed in certain lisp structures */
+#undef HM5BITS
+
+/* fill bits needed in certain lisp structures */
+#undef HM7BITS
+
 /* fraction of core to separate reloc and heap */
 #undef HOLEDIV
 
@@ -245,6 +257,18 @@
 
 /* can use fcntl for listen function */
 #undef LISTEN_USE_FCNTL
+
+/* fill bits needed in certain lisp structures */
+#undef LM16BITS
+
+/* fill bits needed in certain lisp structures */
+#undef LM24BITS
+
+/* fill bits needed in certain lisp structures */
+#undef LM3BITS
+
+/* fill bits needed in certain lisp structures */
+#undef LM4BITS
 
 /* maximum number of pages to be allocated */
 #undef MAXPAGE
@@ -299,6 +323,12 @@
 
 /* system pagewidth */
 #undef PAGEWIDTH
+
+/* fill bits needed in certain lisp structures */
+#undef QM3BITS
+
+/* fill bits needed in certain lisp structures */
+#undef QM4BITS
 
 /* address at which shared lib placement terminates heap growth */
 #undef SHARED_LIB_HEAP_CEILING

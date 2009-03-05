@@ -527,6 +527,7 @@ do_init(object *statVV)
   /* switch SPinit to point to a vector of function addresses */
      
   fasl_vec->v.v_elttype = aet_fix;
+  fasl_vec->v.v_defrank=1;
   fasl_vec->v.v_dim *= (sizeof(object)/sizeof(fixnum));
   fasl_vec->v.v_fillp *= (sizeof(object)/sizeof(fixnum));
   

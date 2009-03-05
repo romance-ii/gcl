@@ -52,6 +52,7 @@ enum aelttype aet;
 	x->v.v_dim = x->v.v_fillp = l;
 	x->v.v_self = NULL;
 	x->v.v_elttype = (short)aet;
+	x->v.v_defrank = 1;
 	return(x);
 }
 
@@ -69,6 +70,7 @@ int l;
 	x->bv.bv_offset = 0;
 	x->bv.bv_self = NULL;
         x->bv.bv_elttype = aet_bit;
+        x->bv.bv_defrank = 1;
 	return(x);
 }
 

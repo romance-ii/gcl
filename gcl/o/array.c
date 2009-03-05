@@ -398,17 +398,20 @@ DEFUN_NEW("MAKE-VECTOR1",object,fSmake_vector1,SI,3,8,NONE,OI,
       case aet_ch:
 	x = alloc_object(t_string);
 	x->ust.ust_elttype = elt_type;
+	x->ust.ust_defrank=1;
 	x->ust.ust_adjustable=1;
 	goto a_string;
 	break;
       case aet_bit:
 	x = alloc_object(t_bitvector);
 	x->v.v_elttype = elt_type;
+	x->v.v_defrank=1;
 	x->v.v_adjustable=1;
 	break;
       default:
 	x = alloc_object(t_vector);}
       x->v.v_elttype = elt_type;
+      x->v.v_defrank=1;
       x->v.v_adjustable=1;
     a_string:
       x->v.v_dim = n;
@@ -584,7 +587,7 @@ DEFUN_NEW("MAKE-ARRAY1",object,fSmake_array1,SI,6,6,
     x->a.a_hasfillp = 0;
     x->a.a_rank = rank;
     x->a.a_displaced = Cnil;
-    x->a.a_dims = AR_ALLOC(alloc_relblock,rank,fixnum);
+    x->a.a_dims = AR_ALLOC(alloc_relblock,rank,ufixnum);
     i = 0;
     v = dimensions;
     while (i < rank)

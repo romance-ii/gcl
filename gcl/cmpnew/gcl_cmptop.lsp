@@ -1713,8 +1713,7 @@
 	 (let ((*vars* nil) (*funs* nil) (*blocks* nil) (*tags* nil)
 	       (*sharp-commas* nil))
 	   (push (list 'ordinary  form) *top-level-forms*)
-	   nil
-	   ))))
+	   nil))))
 
 (defun t2ordinary (form)
   (cond ((atom form))

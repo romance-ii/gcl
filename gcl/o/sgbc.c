@@ -137,7 +137,7 @@ sgc_mark_object1(object x) {
 
   fixnum i,j;
   object *p;
-  char *cp;
+  void *cp;
   
   cs_check(x);
 #if CSTACK_DIRECTION == -1
@@ -254,7 +254,7 @@ sgc_mark_object1(object x) {
 	  mark_contblock((char *)(x->ht.ht_self),
 			 j * sizeof(struct htent));
       } else if(SGC_RELBLOCK_P(x->ht.ht_self))
-	x->ht.ht_self = (struct htent *)
+	x->ht.ht_self =
 	  copy_relblock((char *)(x->ht.ht_self),
 			j * sizeof(struct htent));
     }
@@ -270,7 +270,7 @@ sgc_mark_object1(object x) {
 	  mark_contblock((char *)(x->a.a_dims),
 			 sizeof(fixnum)*x->a.a_rank);
       } else  if(SGC_RELBLOCK_P(x->a.a_dims))
-	x->a.a_dims = (fixnum *)
+	x->a.a_dims =
 	  copy_relblock((char *)(x->a.a_dims),
 			sizeof(fixnum)*x->a.a_rank);
     }
@@ -282,7 +282,7 @@ sgc_mark_object1(object x) {
       goto CASE_GENERAL;
     
   CASE_SPECIAL:
-    cp = (char *)(x->fixa.fixa_self);
+    cp = x->fixa.fixa_self;
     if (cp == NULL)
       break;
     /* set j to the size in char of the body of the array */
@@ -328,7 +328,7 @@ sgc_mark_object1(object x) {
       for (i = 0, j = x->a.a_dim;  i < j;  i++)
 	if (ON_WRITABLE_PAGE(&p[i]))
 	  sgc_mark_object(p[i]);
-    cp = (char *)p;
+    cp = p;
     j *= sizeof(object);
   COPY:
     if ((int)what_to_collect >= (int)t_contiguous) {
@@ -341,10 +341,10 @@ sgc_mark_object1(object x) {
 #ifdef HAVE_ALLOCA
 	if (!NULL_OR_ON_C_STACK(cp))  /* only if body of array not on C stack */
 #endif			  
-	  x->a.a_self = (object *)copy_relblock(cp, j);
+	  x->a.a_self = copy_relblock(cp, j);
       }
       else if (x->a.a_displaced->c.c_car == Cnil) {
-	i = (long)(object *)copy_relblock(cp, j)
+	i = (long)copy_relblock(cp, j)
 	  - (long)(x->a.a_self);
 	adjust_displaced(x, i);
       }
@@ -390,7 +390,7 @@ sgc_mark_object1(object x) {
 #ifndef GMP_USE_MALLOC
     if ((int)what_to_collect >= (int)t_contiguous) {
       j = MP_ALLOCATED(x);
-      cp = (char *)MP_SELF(x);
+      cp = MP_SELF(x);
       if (cp == 0)
 	break;
 /* #ifdef PARI */
@@ -408,7 +408,7 @@ sgc_mark_object1(object x) {
 	  mark_contblock(cp, j);
       } else 
 	if (SGC_RELBLOCK_P(cp))
-	  MP_SELF(x) = (void *) copy_relblock(cp, j);
+	  MP_SELF(x) = copy_relblock(cp, j);
     }
 #endif /* not GMP_USE_MALLOC */
     break;
@@ -474,7 +474,7 @@ sgc_mark_object1(object x) {
 			   S_DATA(def)->size);
 	  
 	} else if(SGC_RELBLOCK_P(p))
-	  x->str.str_self = (object *)
+	  x->str.str_self =
 	    copy_relblock((char *)p, S_DATA(def)->size);
       }
     }
@@ -537,7 +537,7 @@ sgc_mark_object1(object x) {
     /*FIXME: SGC_CONTBLOCK_P? */
 #define SGC_MARK_CP(a_,b_) {fixnum _t=(b_);if (inheap((a_))) {\
                               if (what_to_collect == t_contiguous) mark_contblock((void *)(a_),_t);\
-                           } else if (SGC_RELBLOCK_P((a_))) (a_)=(void *)copy_relblock((void *)(a_),_t);}
+                           } else if (SGC_RELBLOCK_P((a_))) (a_)=copy_relblock((void *)(a_),_t);}
 
 #define SGC_MARK_MP(a_) {if ((a_)->_mp_d) \
                            SGC_MARK_CP((a_)->_mp_d,(a_)->_mp_alloc*MP_LIMB_SIZE);}

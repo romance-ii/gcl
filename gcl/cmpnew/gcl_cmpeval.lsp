@@ -203,7 +203,7 @@
 				
 
 (defun result-type-from-args (f args)
-  (when (and (or (not *compiler-new-safety*) (member f '(unbox box addr-call)));FIXME 
+  (when (and (or (not *compiler-new-safety*) (member f '(unbox box addr-call el set-el)));FIXME 
 	     (not (eq '* (get f 'return-type)))) ;;FIXME  make sure return-type and proclaimed-return-type are in sync
     (let* ((be (get f 'type-propagator))
 	   (ba (and be ;(si::dt-apply be (cons f (mapcar 'coerce-to-one-valuea args))))));FIXME
@@ -1273,6 +1273,7 @@
 	 (or (si::src n) (si::interpreted-function-p (symbol-function n)))
 	 (not (eq n (cadr *src-inline-recursion*)))
 	 (or (inline-asserted n)
+	     (eq (symbol-package n) (load-time-value (find-package 'c)))
 	     (multiple-value-bind (s k) (find-symbol (symbol-name n) 'lisp) 
 				  (when (eq n s) (eq k :external)))))))
 

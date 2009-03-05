@@ -66,6 +66,7 @@ gcl_init_init()
   ar_init(gcl_defmacro);
   ar_init(gcl_c);
   ar_init(gcl_listlib);
+/*   ar_init(gcl_evalmacros); */
   lsp_init("../lsp/gcl_evalmacros.lsp");
   ar_init(gcl_top);
   ar_init(gcl_module);
@@ -100,6 +101,7 @@ gcl_init_system(object no_init)
   ar_check_init(gcl_seq,no_init);
   ar_check_init(gcl_seqlib,no_init);
   ar_check_init(gcl_sc,no_init);
+  ar_check_init(gcl_cp,no_init);
   ar_check_init(gcl_trace,no_init);
   ar_check_init(gcl_sloop,no_init);
   ar_check_init(gcl_serror,no_init);

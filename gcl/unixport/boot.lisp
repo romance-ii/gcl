@@ -5,7 +5,7 @@
 	   (declaim (optimize (safety 3)))
 	   (setf (symbol-plist 'union) nil (symbol-plist 'set-difference) nil))
 
-(dolist (l '(c listlib predlib arraylib seq seqlib bnum))
+(dolist (l '(c listlib #-pre-gcl cp predlib arraylib seq seqlib bnum))
   (time (load (compile-file
 	       (concatenate 'string "../lsp/gcl_" (string-downcase (string l)) ".lsp")
 	       :c-file t :h-file t :data-file t :system-p t))))
@@ -23,3 +23,11 @@
   (time (compile-file
 	 (concatenate 'string "../lsp/gcl_" (string-downcase (string l)) ".lsp")
 	 :c-file t :h-file t :data-file t :system-p t)))
+
+#+pre-gcl
+(progn
+  (declaim (optimize (safety 2)))
+  (dolist (l '(cp))
+    (time (load (compile-file
+		 (concatenate 'string "../lsp/gcl_" (string-downcase (string l)) ".lsp")
+		 :c-file t :h-file t :data-file t :system-p t)))))

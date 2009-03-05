@@ -102,6 +102,7 @@ gcl_init_system(object no_init)
   ar_check_init(gcl_seq,no_init);
   ar_check_init(gcl_seqlib,no_init);
   ar_check_init(gcl_sc,no_init);
+  ar_check_init(gcl_cp,no_init);
   ar_check_init(gcl_trace,no_init);
   ar_check_init(gcl_sloop,no_init);
   ar_check_init(gcl_serror,no_init);

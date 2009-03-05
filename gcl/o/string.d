@@ -44,6 +44,7 @@ int l;
 	x->st.st_hasfillp = FALSE;
 	x->st.st_adjustable = FALSE;
 	x->st.st_elttype = aet_ch;
+	x->st.st_defrank = 1;
 	x->st.st_displaced = Cnil;
 	x->st.st_dim = x->st.st_fillp = l;
 	x->st.st_self = NULL;
@@ -148,6 +149,7 @@ object x;
 	y->st.st_hasfillp = FALSE;
 	y->st.st_adjustable = FALSE;
 	y->st.st_elttype = aet_ch;
+	y->st.st_defrank = 1;
 	y->st.st_displaced = Cnil;
 	y->st.st_self = NULL;
 	vs_push(y);
@@ -235,8 +237,8 @@ LFD(siLchar_set)()
 }
 
 void
-get_string_start_end(string, start, end, ps, pe)
-object string, start, end;
+get_string_start_end(str, start, end, ps, pe)
+object str, start, end;
 int *ps, *pe;
 {
 	if (start == Cnil)
@@ -249,21 +251,21 @@ int *ps, *pe;
 			goto E;
 	}
 	if (end == Cnil) {
-		*pe = string->st.st_fillp;
+		*pe = str->st.st_fillp;
 		if (*pe < *ps)
 			goto E;
 	} else if (type_of(end) != t_fixnum)
 		goto E;
 	else {
 		*pe = fix(end);
-		if (*pe < *ps || *pe > string->st.st_fillp)
+		if (*pe < *ps || *pe > str->st.st_fillp)
 			goto E;
 	}
 	return;
 
 E:
 	FEerror("~S and ~S are illegal as :START and :END~%\
-for the string ~S.", 3, start, end, string);
+for the str ~S.", 3, start, end, str);
 }
 
 @(defun string_eq (string1 string2

@@ -736,8 +736,8 @@ letA_bind(object body, struct bind_temp *start, struct bind_temp *end)
 
 #endif
 
-#define	NOT_YET		10
-#define	FOUND		11
+#define	NOT_YET		stp_ordinary
+#define	FOUND		stp_special
 #define	NOT_KEYWORD	1
 
 void

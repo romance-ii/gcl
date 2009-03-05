@@ -1,4 +1,5 @@
 (setq si::*optimize-maximum-pages* nil)
+(make-package "C")
 (make-package "COMPILER" :use '("LISP"))
 (make-package "SLOOP" :use '("LISP"))
 (make-package "SERROR" :use '("LISP" "SLOOP"))

@@ -42,17 +42,17 @@ object make_two_way_stream(object, object);
  * Lisp Interface code.
  */
 
-char *lisp_to_string(string)
-object string;
+char *lisp_to_string(str)
+object str;
 {
 	int	i, len;
 	char	*sself;
 	char	*cstr;
 
-	len = string->st.st_fillp;
+	len = str->st.st_fillp;
 
 	cstr = (char *) malloc (len+1);
-	sself = &(string->st.st_self[0]);
+	sself = &(str->st.st_self[0]);
 	for (i=0; i<len; i++)
 	{
 		cstr[i] = sself[i];

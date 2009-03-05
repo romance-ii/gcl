@@ -83,7 +83,7 @@ designate_package(object x,struct package *p) {
 #define check_type_or_symbol_string_package(a) check_package_designator(*a)
 
 static void
-rehash_pack(object **ptab,fixnum *n,fixnum m) { 
+rehash_pack(object **ptab,ufixnum *n,fixnum m) { 
   object *ntab;
   object *tab = *ptab;
   object l,ll;

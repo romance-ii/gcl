@@ -1130,12 +1130,16 @@
 (push '(((member :address) t) fixnum #.(flags rfa) "object_to_fixnum(#1)") (get 'unbox 'inline-always))
 (push '(((member :address) fixnum) fixnum #.(flags rfa) "(#1)") (get 'unbox 'inline-always))
 
+(deftype long nil 'fixnum)
+
 (dolist (l '((:float      "make_shortfloat"      short-float     cnum)
 	     (:double     "make_longfloat"       long-float      cnum)
-	     (:char       "code_char"            char            cnum)
+	     (:character  "code_char"            character       cnum)
+	     (:char       "make_fixnum"          char            cnum)
 	     (:short      "make_fixnum"          short           cnum)
 	     (:int        "make_fixnum"          int             cnum)
 	     (:fixnum     "make_fixnum"          fixnum          cnum)
+	     (:long       "make_fixnum"          fixnum          cnum)
 	     (:fcomplex   "make_fcomplex"        fcomplex        cnum)
 	     (:dcomplex   "make_dcomplex"        dcomplex        cnum)
 	     (:string     "make_simple_string"   string)
@@ -1153,6 +1157,46 @@
     (push `(((member ,(car l)) ,(cadddr l)) opaque
 	    #.(flags rfa) ,(if (fifth l) (strcat "(#1)" (fifth l)) (strcat "(" (car l) ")" "(#1)")))   
 	  (get 'unbox 'inline-always))))
+
+
+ (defun register-key (l tt)
+
+   (push `(((member ,l) t t t) ,tt #.(flags rfa) "((#1)->#2.#3)") 
+	 (get 'el 'inline-always))
+   (push `(((member ,l) t t t seqind) ,tt #.(flags rfa) "((#1)->#2.#3[#4])")
+	 (get 'el 'inline-always))
+   (push `((,tt (member ,l) t t t) ,tt #.(flags rfa) "((#2)->#3.#4=(#0))")
+	 (get 'set-el 'inline-always))
+   (push `((,tt (member ,l) t t t seqind) ,tt #.(flags rfa) "((#2)->#3.#4[#5]=(#0))")
+	 (get 'set-el 'inline-always)))
+
+ (dolist (l '(char short long int integer keyword character real string structure symbol fixnum))
+   (let ((s (intern (symbol-name l) 'keyword)))
+     (register-key s (setf (get s 'lisp-type) (cmp-norm-tp l)))))
+
+ (dolist (l '((object t)(plist proper-list)(float short-float)(double long-float)
+	      (pack (or null package)) (direl (or keyword null string))))
+   (let ((s (intern (symbol-name (car l)) 'keyword)))
+     (register-key s (setf (get s 'lisp-type) (cmp-norm-tp (cadr l))))))
+
+ (deftype longfloat nil 'long-float)
+ (deftype shortfloat nil 'short-float)
+ (deftype hashtable nil 'hash-table)
+ (deftype ocomplex nil 'complex)
+ (deftype bitvector nil 'bit-vector)
+ (deftype random nil 'random-state)
+ (deftype cfun nil 'compiled-function);FIXME
+ (deftype cclosure nil 'compiled-function);FIXME
+ (deftype closure nil 'compiled-function);FIXME
+ (deftype sfun nil 'compiled-function);FIXME
+ (deftype ifun nil 'function);FIXME
+ (deftype vfun nil 'compiled-function);FIXME
+ (deftype ustring nil 'string);FIXME
+ (deftype fixarray nil '(array fixnum))
+ (deftype sfarray nil '(array short-float))
+ (deftype lfarray nil '(array long-float))
+ 
+
 
 ;;si::c-type
 (push '((t) t #.(flags) "make_fixnum(type_of(#0))") (get 'si::c-type 'inline-always))
