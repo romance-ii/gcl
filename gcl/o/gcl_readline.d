@@ -141,11 +141,11 @@ static char *rl_completion_words_new(char *text, int state) {
       if (temp==temp1) 
 	package=(temp[1]==':') ? sLApackageA->s.s_dbind : keyword_package;
       else {
-	struct string s;/* ={t_string,0,0,0,1,0,OBJNULL,1,0,(char *)temp1,temp-temp1}; */
+	union lispunion s={.fw=0};/* ={t_string,0,0,0,1,0,OBJNULL,1,0,(char *)temp1,temp-temp1}; */
 	set_type_of(&s,t_string);
-	s.st_self=(char *)temp1;
-	s.st_fillp=s.st_dim=temp-temp1;
-	s.st_hasfillp=1;
+	s.st.st_self=(char *)temp1;
+	s.st.st_fillp=s.st.st_dim=temp-temp1;
+	s.st.st_hasfillp=1;
 	package=find_package((object)&s);
       }
     }

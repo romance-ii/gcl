@@ -741,7 +741,7 @@ letA_bind(object body, struct bind_temp *start, struct bind_temp *end)
 #define	NOT_KEYWORD	1
 
 void
-parse_key(object *base, bool rest, bool allow_other_keys, register int n, ...)
+parse_key(object *base, bool rest, bool allow_other_keys, int n, ...)
 { 
         object temporary;
 	va_list ap;

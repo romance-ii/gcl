@@ -61,6 +61,7 @@ gcl_init_init()
   build_symbol_table();
 
   lsp_init("../lsp/gcl_export.lsp");
+  lsp_init("../lsp/gcl_pl.lsp");
 
   lsp_init("../lsp/gcl_callhash.lsp");
 

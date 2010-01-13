@@ -84,11 +84,11 @@ extern char *inet_ntoa ( struct in_addr in );
 FILE *pstreamDebug;
 int fDebugSockets;
 
-#ifdef PLATFORM_SUNOS
-static void notice_input( );
-#else
-static void notice_input();
-#endif
+/* #ifdef PLATFORM_SUNOS */
+/* static void notice_input( ); */
+/* #else */
+/* static void notice_input(); */
+/* #endif */
 
 int hdl = -1;
 
@@ -369,19 +369,19 @@ struct connection_state *sfd;
 }
   
 
-#ifdef PLATFORM_SUNOS
-static void
-notice_input( int sig, int code, struct sigcontext *s, char *a )
-#else
-static void
-notice_input( sig )
-     int sig;
-#endif
-{
-  signal( SIGIO, notice_input );
-  dfprintf(stderr, "\nNoticed input!\n" );
+/* #ifdef PLATFORM_SUNOS */
+/* static void */
+/* notice_input( int sig, int code, struct sigcontext *s, char *a ) */
+/* #else */
+/* static void */
+/* notice_input( sig ) */
+/*      int sig; */
+/* #endif */
+/* { */
+/*   signal( SIGIO, notice_input ); */
+/*   dfprintf(stderr, "\nNoticed input!\n" ); */
 
-}
+/* } */
 
 static int message_id;
 

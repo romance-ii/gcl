@@ -427,12 +427,12 @@
 
 	      (let ((*sig-discovery* t)(*compile-verbose* nil)) 
 		(dolist (fn (nreverse fns))
-		  (compile fn)
-;		  (if (eq (function-name (symbol-function fn)) fn)
-;		      (compile fn)
-;		    (progn
-;		      (format t "skipping ~s~%" fn)
-;		      (remove-recompile fn)))
+;		  (compile fn)
+		  (if (eq (function-name (symbol-function fn)) fn)
+		      (compile fn)
+		    (progn
+		      (format t "skipping ~s~%" fn)
+		      (remove-recompile fn)))
 		  )))))
 
       (if (and pnp (not pn))

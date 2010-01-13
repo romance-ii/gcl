@@ -452,12 +452,12 @@ object if_exists, if_does_not_exist;
 		
 		if ((fp == NULL) &&
 		    (sSAallow_gzipped_fileA->s.s_dbind != sLnil)) { 
-		  struct string st;
+		  union lispunion st;
 		  char buf[256];
 		  if (snprintf(buf,sizeof(buf),"%s.gz",fname)<=0)
 		    FEerror("Cannot write .gz filename",0);
-		  st.st_self=buf;
-		  st.st_dim=st.st_fillp=strlen(buf);
+		  st.st.st_self=buf;
+		  st.st.st_dim=st.st.st_fillp=strlen(buf);
 		  set_type_of(&st,t_string);
 		  if (file_exists((object)&st)) {
 		    FILE *pp;
@@ -1508,6 +1508,7 @@ stream_at_end(object strm) {
 BEGIN:
 	switch (strm->sm.sm_mode) {
 	case smm_socket:  
+	  listen_stream(strm);
 	  if (SOCKET_STREAM_FD(strm)>=0)
 	    return(FALSE);
 	  else return(TRUE);	  
@@ -1611,19 +1612,19 @@ BEGIN:
 
 	  if (SOCKET_STREAM_BUFFER(strm)->ust.ust_fillp>0) return TRUE;
 
-	  {
-	    fd_set fds;
-	    struct timeval tv;
-	    FD_ZERO(&fds);
-	    FD_SET(SOCKET_STREAM_FD(strm),&fds);
-	    memset(&tv,0,sizeof(tv));
-	    return select(SOCKET_STREAM_FD(strm)+1,&fds,NULL,NULL,&tv)>0 ? TRUE : FALSE;
- 	  }
-/* 	  { int ch  = getCharGclSocket(strm,Cnil); */
-/* 	   if (ch == EOF) return FALSE; */
-/* 	   else unreadc_stream(ch,strm); */
-/* 	   return TRUE; */
-/* 	  } */
+	  /* { */
+	  /*   fd_set fds; */
+	  /*   struct timeval tv; */
+	  /*   FD_ZERO(&fds); */
+	  /*   FD_SET(SOCKET_STREAM_FD(strm),&fds); */
+	  /*   memset(&tv,0,sizeof(tv)); */
+	  /*   return select(SOCKET_STREAM_FD(strm)+1,&fds,NULL,NULL,&tv)>0 ? TRUE : FALSE; */
+ 	  /* } */
+	  { int ch  = getCharGclSocket(strm,Cnil);
+	   if (ch == EOF) return FALSE;
+	   else unreadc_stream(ch,strm);
+	   return TRUE;
+	  }
 #endif	   
 
 	case smm_input:

@@ -137,8 +137,14 @@ case $canonical in
      *x86_64*linux*)
 	use=amd64-linux;;
 
+     *x86_64*kfreebsd*)
+	use=amd64-linux;;
+
      *86*linux*)
 	use=386-linux;;
+
+     *86*kfreebsd*)
+	use=386-kfreebsd;;
 
 # m6800 not working with gcc-3.2
      m68k*linux*)
@@ -604,6 +610,48 @@ if test "$enable_pic" = "yes" ; then
 	TCFLAGS="$TCFLAGS -fPIC"
 fi
 
+FDEBUG=`echo $CFLAGS | tr ' ' '\012' |grep "^\-g$"`
+#CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-g$"`
+FOMITF=`echo $CFLAGS | tr ' ' '\012' |grep "^\-fomit-frame-pointer$"`
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-fomit-frame-pointer$"`
+FOOPT3=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O3$"`
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O3$"`
+FOOPT2=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O2$"`
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O2$"`
+FOOPT1=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O1$"`
+TMP=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O$"`
+FOOPT1="$FOOPT1$TMP"
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O1$"|grep -v "^\-O$"`
+FOOPT0=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O0$"`
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O0$"`
+
+if test "$FOOPT0" != "" ; then
+   TO3FLAGS=`echo $TO3FLAGS | sed 's,\-O[[123 ]],-O0 ,g' | sed 's,\-O$,-O0 ,g'`
+   TO2FLAGS=`echo $TO2FLAGS | sed 's,\-O[[123 ]],-O0 ,g' | sed 's,\-O$,-O0 ,g'`
+   TOSFLAGS=`echo $TOSFLAGS | sed 's,\-O[[123 ]],-O0 ,g' | sed 's,\-O$,-O0 ,g'`
+else 
+if test "$FOOPT1" != "" ; then
+   TO3FLAGS=`echo $TO3FLAGS | sed 's,\-O[[2-3]],-O1,g'`
+   TO2FLAGS=`echo $TO2FLAGS | sed 's,\-O[[2-3]],-O1,g'`
+   TOSFLAGS=`echo $TOSFLAGS | sed 's,\-O[[2-3]],-O1,g'`
+else 
+if test "$FOOPT2" != "" ; then
+   TO3FLAGS=`echo "$TO3FLAGS" | sed 's,\-O3,-O2,g'`
+   TO2FLAGS=`echo "$TO2FLAGS" | sed 's,\-O3,-O2,g'`
+   TOSFLAGS=`echo "$TOSFLAGS" | sed 's,\-O3,-O2,g'`
+fi
+fi
+fi
+
+if test "$FDEBUG" != "" ; then
+   TO3FLAGS=`echo $TO3FLAGS | sed 's,\-fomit-frame-pointer,,g'`
+   TO2FLAGS=`echo $TO2FLAGS | sed 's,\-fomit-frame-pointer,,g'`
+   TOSFLAGS=`echo $TOSFLAGS | sed 's,\-fomit-frame-pointer,,g'`
+fi
+
+if test "$FOMITF" != "" ; then
+   TO3FLAGS="$TO3FLAGS $FOMITF"
+fi
 
 
 # Step 1: set the variable "system" to hold the name and version number
@@ -833,13 +881,14 @@ rm -f foo.c foo.o foo map
 
 if test "$enable_xgcl" = "yes" ; then 
 
-   AC_PATH_XTRA
+#   AC_PATH_XTRA
+   AC_PATH_X
 
    miss=0
-   AC_CHECK_LIB(Xmu,main,X_LIBS="$X_LIBS -lXmu",miss=1,$X_LIBS)
-   AC_CHECK_LIB(Xt,main,X_LIBS="$X_LIBS -lXt",miss=1,$X_LIBS)
-   AC_CHECK_LIB(Xext,main,X_LIBS="$X_LIBS -lXext",miss=1,$X_LIBS)
-   AC_CHECK_LIB(Xaw,main,X_LIBS="$X_LIBS -lXaw",miss=1,$X_LIBS)
+#   AC_CHECK_LIB(Xmu,main,X_LIBS="$X_LIBS -lXmu",miss=1,$X_LIBS)
+#   AC_CHECK_LIB(Xt,main,X_LIBS="$X_LIBS -lXt",miss=1,$X_LIBS)
+#   AC_CHECK_LIB(Xext,main,X_LIBS="$X_LIBS -lXext",miss=1,$X_LIBS)
+#   AC_CHECK_LIB(Xaw,main,X_LIBS="$X_LIBS -lXaw",miss=1,$X_LIBS)
    AC_CHECK_LIB(X11,main,X_LIBS="$X_LIBS -lX11",miss=1,$X_LIBS)
    AC_CHECK_HEADER(X11/Xlib.h,true,miss=1)
    AC_CHECK_HEADER(X11/Xutil.h,true,miss=1)
@@ -994,7 +1043,7 @@ if test "$enable_statsysbfd" = "yes" || test "$enable_dynsysbfd" = "yes" || test
 	if test "$enable_statsysbfd" = "yes" && ! $CC -v 2>&1 | fgrep ming > /dev/null ; then
 
 		echo 'int main() {bfd_init();bfd_openr("/dev/null",0);return 0;}' >foo.c
-		MP=`$CC [ -Wl,-M ] -static -o foo foo.c -lbfd -liberty 2>&1 | grep -v : | tr '()' '\012\012' | $AWK '{print $NF}' | sort | uniq`
+		MP=`$CC [ -Wl,-M ] -static -o foo foo.c -lbfd -liberty -ldl 2>&1 | grep -v : | tr '()' '\012\012' | $AWK '{print $NF}' | sort | uniq`
 		rm -f foo.c foo
 
 flib() {
@@ -1027,11 +1076,14 @@ flib() {
 		AC_CHECK_LIB(z,inflate,
 			[TLIBS="$TLIBS -lz"],
 			AC_MSG_ERROR([Need zlib for bfd linking]),[])
+		AC_CHECK_LIB(dl,dlsym,
+			[TLIBS="$TLIBS -ldl"],
+			AC_MSG_ERROR([Need libdl for bfd linking]),[])
 		AC_SUBST(BUILD_BFD)
 		AC_SUBST(LIBBFD)
 		AC_SUBST(LIBIBERTY)
 	else
-		TLIBS="$TLIBS -lbfd -liberty"
+		TLIBS="$TLIBS -lbfd -liberty -ldl"
 	fi
 fi
 
@@ -1350,11 +1402,11 @@ AC_RUN_IFELSE(AC_LANG_PROGRAM([[
 	]],[[
 
 	FILE *f=fopen("conftest1","w");
-	fixnum g=0;
-	fobj(g)->d.e=-1;
-	fobj(g)->d.t=-1;
-	fobj(g)->d.s=-1;
-	fprintf(f,"0x%x",g);
+	union lispunion g={.fw=0};
+	g.d.e=-1;
+	g.d.t=-1;
+	g.d.s=-1;
+	fprintf(f,"0x%x",g.fw);
 	fclose(f);
 	return 0;
 	]]),type_bits=`cat conftest1`,
@@ -2109,12 +2161,12 @@ if test "$enable_readline" = "yes" ; then
 	AC_CHECK_HEADERS(readline/readline.h,
 		AC_CHECK_LIB(readline,main,
 			AC_DEFINE(HAVE_READLINE,1,[have readline library]) 
-			TLIBS="$TLIBS -lreadline -lncurses"
+			TLIBS="$TLIBS -lreadline"
 			RL_OBJS=gcl_readline.o
 # Readline support now initialized automatically when compiled in, this lisp
 # object no longer needed, 20040102 CM
 #			RL_LIB=mod/gcl_readline.o
-			,,-lncurses))
+			,,))
 
 # These tests discover differences between readline 4.1 and 4.3
 	AC_CHECK_LIB(readline,rl_completion_matches,

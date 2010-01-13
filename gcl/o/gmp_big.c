@@ -301,10 +301,57 @@ big_minus(object x)
 /* } */
 
 	
+#ifndef IEEEFLOAT
+#error big_to_double requires IEEEFLOAT
+#endif
+
+
+static int
+double_exponent(double d) {
+  
+  union {double d;int i[2];} u;
+  
+  if (d == 0.0)
+    return(0);
+
+  u.d=d;
+  return (((u.i[HIND] & 0x7ff00000) >> 20) - 1022);
+
+}
+
+static double
+set_exponent(double d, int e) {
+
+  union {double d;int i[2];} u;
+  
+  if (d == 0.0)
+    return(0.0);
+  
+  u.d=d;
+  u.i[HIND]= (u.i[HIND] & 0x800fffff) | (((e + 1022) << 20) & 0x7ff00000);
+  return(u.d);
+
+}
+	
+
 double
-big_to_double(object x)
-{
-  return mpz_get_d(MP(x));
+big_to_double(object x) {
+
+  double d=mpz_get_d(MP(x));
+  int s=mpz_sizeinbase(MP(x),2);
+  if (s>=54 && mpz_tstbit(MP(x),s-54)) {
+
+    union {double d;int i[2];} u;
+    
+    u.i[HIND]=0;
+    u.i[LIND]=1;
+    
+    d+=(d>0.0 ? 1.0 : -1.0)*set_exponent(u.d,double_exponent(d)-53);
+
+  }
+
+  return d;
+
 }
 
 

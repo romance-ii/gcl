@@ -142,7 +142,27 @@ gcl_main(int argc, char **argv, char **envp)
     struct rlimit rl;
 #endif
 
+#ifdef GET_FULL_PATH_SELF
+	GET_FULL_PATH_SELF(kcl_self);
+#else
+	kcl_self = argv[0];
+#endif
+
+#ifdef FIX_FILENAME
+    {
+        int n = strlen ( kcl_self );
+        FIX_FILENAME ( Cnil, kcl_self );
+        if ( strlen ( kcl_self ) > n ) {
+            error ( "name grew" );
+        }
+    }
+#endif	
+
+    *argv=kcl_self;
+
 #ifdef CAN_UNRANDOMIZE_SBRK
+/* #include <stdio.h> */
+/* #include <stdlib.h> */
 #include "unrandomize.h"
 #endif
 
@@ -186,21 +206,7 @@ gcl_main(int argc, char **argv, char **envp)
     ARGV = argv;
 #ifdef UNIX
     ENVP = envp;
-#ifdef GET_FULL_PATH_SELF
-	GET_FULL_PATH_SELF(kcl_self);
-#else
-	kcl_self = argv[0];
-#endif
 
-#ifdef FIX_FILENAME
-    {
-        int n = strlen ( kcl_self );
-        FIX_FILENAME ( Cnil, kcl_self );
-        if ( strlen ( kcl_self ) > n ) {
-            error ( "name grew" );
-        }
-    }
-#endif	
     if ( !initflag ) {
         /* An uninitialised system eg raw_gcl */
 
@@ -636,10 +642,10 @@ error(char *s) {
 #endif
       install_segmentation_catcher();
     {
-      struct string st;
+      union lispunion st;
       set_type_of(&st,t_string);
-      st.st_dim=st.st_fillp=s ? strlen(s) : 0;
-      st.st_self=s;
+      st.st.st_dim=st.st.st_fillp=s ? strlen(s) : 0;
+      st.st.st_self=s;
       FEerror("Caught fatal error [memory may be damaged]: ~a",1,&st);
     }
   }
@@ -653,13 +659,14 @@ error(char *s) {
 static void
 initlisp(void) {
 
-	fixnum j,a;
+	fixnum j;
+	object a;
 
-	a=(fixnum)Cnil;
+	a=Cnil;
 	if (NOT_OBJECT_ALIGNED(a))
 	  error("Cnil is not properly aligned");
 
-	a=(fixnum)Ct;
+	a=Ct;
 	if (NOT_OBJECT_ALIGNED(a))
 	  error("Ct is not properly aligned");
 

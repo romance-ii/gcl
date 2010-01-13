@@ -159,7 +159,7 @@ plttest.o: plttest.c
 	$(CC) -c $(CFLAGS) $(DEFS) -fno-builtin $*.c $(AUX_INFO) 
 
 pltd.h: plttest.o
-	nm $< | $(AWK) '/ U / {a=$$2;if (k) sub("^_","",a);\
+	nm $< | $(AWK) '/ U / {if (NF!=2) next;a=$$2;if (k) sub("^_","",a);\
                             b=a;gsub("_"," ",b);\
                             if (!match(j,b) && !match(b,"IO") && !match(b,"^\\.")) printf("extern int %s();\n",a)}' \
                         j="$$(cpp plttest.c | sed 's,^ .*[^a-zA-Z_,]\([a-zA-Z_]*\)(.*,\1,g' |\

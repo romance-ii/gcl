@@ -150,12 +150,12 @@ init_gmp_rnd_state(__gmp_randstate_struct *x) {
 
     if (x->_mp_seed->_mp_d!=trap_result)
       FEerror("Unknown pointer in rnd_state!",0);
-#ifndef __hppa__ /*FIXME*/
-    if (((gmp_randfnptr_t *)x->_mp_algdata._mp_lc)->b!=Mersenne_Twister_Generator_Noseed.b ||
-	((gmp_randfnptr_t *)x->_mp_algdata._mp_lc)->c!=Mersenne_Twister_Generator_Noseed.c ||
-	((gmp_randfnptr_t *)x->_mp_algdata._mp_lc)->d!=Mersenne_Twister_Generator_Noseed.d)
-      FEerror("Unknown pointer data in rnd_state!",0);
-#endif
+/* #ifndef __hppa__ /\*FIXME*\/ */
+/*     if (((gmp_randfnptr_t *)x->_mp_algdata._mp_lc)->b!=Mersenne_Twister_Generator_Noseed.b || */
+/* 	((gmp_randfnptr_t *)x->_mp_algdata._mp_lc)->c!=Mersenne_Twister_Generator_Noseed.c || */
+/* 	((gmp_randfnptr_t *)x->_mp_algdata._mp_lc)->d!=Mersenne_Twister_Generator_Noseed.d) */
+/*       FEerror("Unknown pointer data in rnd_state!",0); */
+/* #endif */
 
     n=1;
 

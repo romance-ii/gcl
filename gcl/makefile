@@ -78,7 +78,7 @@ $(PORTDIR)/saved_pre_gcl: $(HDIR)cmpinclude.h
 #	(cd $(ODIR); $(MAKE) all)
 	cd $(@D) && $(MAKE) $(@F)
 	cd $(@D) && echo '(time (let ((*features* (cons :pre-gcl *features*)))(load "boot.lisp")))' | ./$(@F)
-	cd $(ODIR) && rm -f boot.h && echo "#define LISP_BOOT" > boot.h && $(MAKE) all
+#	cd $(ODIR) && rm -f boot.h && echo "#define LISP_BOOT" > boot.h && $(MAKE) all
 	cd $(@D) && $(MAKE) saved_gcl && mv saved_gcl $(@F)
 	touch $< $@
 

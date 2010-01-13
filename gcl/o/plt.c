@@ -171,16 +171,14 @@ parse_plt() {
   for (i=j=0,li=Cnil;fgets(b,sizeof(b),f);) {
     if (!memchr(b,10,sizeof(b)-1))
       FEerror("plt buffer too small", 0);
-    if (memcmp(b," .plt",4) && !i)
+    if (!memcmp(b," .plt",4)) {
+      i=1;
       continue;
-    if (*b=='\r' || *b=='\n') {
+    }
+    if (*b!=' ' || b[1]!=' ' || !i) {
       i=0;
       continue;
-    } else
-      if (!i) {
-	i=1;
-	continue;
-      }
+    }
     if (sscanf(b,"%lx%n",&u,&n)!=1)
       FEerror("Cannot read address", 0);
     for (c=b+n;*c==32;c++);

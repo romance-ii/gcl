@@ -1337,8 +1337,7 @@ GBC(enum type t) {
 #ifdef SGC
     /* we don't know which pages have relblock on them */
     if(sgc_enabled)
-      make_writable(page(rb_start),
-		    (rb_pointer-rb_start + PAGESIZE - 1)/PAGESIZE);
+      make_writable(page(rb_start),page(rb_pointer+PAGESIZE-1));
     
 #endif		
     rb_limit = rb_end - 2*RB_GETA;

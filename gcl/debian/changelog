@@ -1,9 +1,12 @@
-gclcvs (2.7.0-96.1) unstable; urgency=low
+gclcvs (2.7.0-97) unstable; urgency=low
 
   * Non-maintainer upload.
   * c package
+  * sync with latest 2.6.8 cleanups
+  * strict aliasing fixes
+  * new config.guess config.sub
 
- --  <camm@maguirefamily.org>  Thu, 05 Mar 2009 20:34:43 +0000
+ -- Camm Maguire <camm@debian.org>  Wed, 13 Jan 2010 21:55:47 +0000
 
 gclcvs (2.7.0-96) unstable; urgency=low
 

@@ -746,7 +746,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 		    (format st "};~%~%")
 		    
 		    (format st "static int user_init_run;~%")
-		    (format st "#define my_load(a_,b_) {if (!user_init_run && (a_)) gcl_init_or_load1((a_),(b_));(a_)=0;}~%~%")
+		    (format st "#define my_load(a_,b_) {if (!user_init_run && (a_) && (b_)) gcl_init_or_load1((a_),(b_));(a_)=0;(b_)=0;}~%~%")
                     
 		    (format st "object user_init(void) {~%")
 		    (format st "user_init_run=1;~%")

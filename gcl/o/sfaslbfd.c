@@ -257,7 +257,7 @@ fasload(object faslfile) {
   entry_name_ptr=*entry_name ? entry_name : entry_name+1;
 
   {
-    struct string st;
+    union lispunion st;
     memset(&st,0,sizeof(st));
     set_type_of(&st,t_string);
 
@@ -290,8 +290,8 @@ fasload(object faslfile) {
 /* 	unsigned long ad; */
 
 	set_type_of(&st,t_string);
-	st.st_self=(char *)q[u]->name;
-	st.st_fillp=st.st_dim=strlen(st.st_self);
+	st.st.st_self=(char *)q[u]->name;
+	st.st.st_fillp=st.st.st_dim=strlen(st.st.st_self);
 	if ((x=gethash((object)&st,sSAlink_hash_tableA->s.s_dbind))->hte_key==OBJNULL)
 	  continue;
 

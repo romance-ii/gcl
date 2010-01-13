@@ -81,7 +81,7 @@ typedef unsigned char   uqfixnum;
 
 #endif
 
-#define NOT_OBJECT_ALIGNED(a_) fobj(a_)->td.emf
+#define NOT_OBJECT_ALIGNED(a_) ({union lispunion _t={.vw=(void *)(a_)};_t.td.emf;})
 #define ROUNDUP(x_,y_) (((unsigned long)(x_)+(y_ -1)) & ~(y_ -1))
 #define ROUNDDN(x_,y_) (((unsigned long)(x_)) & ~(y_ -1))
 
@@ -195,7 +195,6 @@ struct fixnum_struct {
 #define set_fix(a_,b_)   ((a_)->FIX.FIXVAL=(b_))
 
 #define Zcdr(a_)                 (*(object *)(a_))/* ((a_)->c.c_cdr) */ /*FIXME*/
-#define fobj(a_)                 ((object)&(a_))
 #define is_marked(a_)            (is_imm_fixnum(Zcdr(a_)) ? is_marked_imm_fixnum(Zcdr(a_)) : (a_)->d.m)
 #define is_marked_or_free(a_)    (is_imm_fixnum(Zcdr(a_)) ? is_marked_imm_fixnum(Zcdr(a_)) : (a_)->md.mf)
 #define mark(a_)                 if (is_imm_fixnum(Zcdr(a_))) mark_imm_fixnum(Zcdr(a_)); else (a_)->d.m=1
@@ -324,8 +323,8 @@ struct symbol {
 /* #define Ct     ((object)((char *)Cnil+sizeof(struct symbol))) */
 /* #define Dotnil ((object)((char *)Ct+sizeof(struct symbol))) */
 
-EXTER struct symbol Cnil_body OBJ_ALIGN;
-EXTER struct symbol Ct_body OBJ_ALIGN;
+EXTER union lispunion Cnil_body OBJ_ALIGN;
+EXTER union lispunion Ct_body OBJ_ALIGN;
 
 #define Cnil ((object)&Cnil_body)
 #define Ct   ((object)&Ct_body)
@@ -376,7 +375,7 @@ struct cons {
 
 };
 /*FIXME, review handling of imm fix here*/
-#define Scdr(a_) ({object _t=(a_)->c.c_cdr;unmark(fobj(_t));_t;})
+#define Scdr(a_) ({union lispunion _t={.vw=(a_)->c.c_cdr};unmark(&_t);_t.vw;})
 
 enum httest {   /*  hash table key test function  */
   htt_eq,       /*  eq  */
@@ -881,12 +880,21 @@ union lispunion {
  struct mark               md; /*  mark dummy  */
  struct sgcm              smd; /*  sgc mark dummy  */
  struct typew              td; /*  type dummy  */
+ fixnum                    fw;
+ void *                    vw;
 
  struct fixarray         fixa; /*  fixnum array  */
  struct sfarray           sfa; /*  short-float array  */
  struct lfarray           lfa; /*  plong-float array  */
 
 };
+
+/* EXTER union lispunion character_table1[256+128] OBJ_ALIGN; /\*FIXME, sync with char code constants above.*\/ */
+/* #define character_table (character_table1+128) */
+/* #define code_char(c)    (object)(character_table+((unsigned char)(c))) */
+/* #define char_code(obje) (obje)->ch.ch_code */
+/* #define char_font(obje) (obje)->ch.ch_font */
+/* #define char_bits(obje) (obje)->ch.ch_bits */
 
 #define address_int ufixnum
 
@@ -916,7 +924,7 @@ struct freelist {
                            _z==Cnil ? t_symbol : \
                            (is_imm_fixnum(_z) ? t_fixnum : \
                            (valid_cdr(_z) ?  t_cons  : _z->d.t));})
-#define set_type_of(x,y) ({object _x=(object)(x);enum type _y=(y);*(fixnum *)(_x)&=TYPE_BITS;\
+#define set_type_of(x,y) ({object _x=(object)(x);enum type _y=(y);(_x)->fw&=TYPE_BITS;\
                            if (_y!=t_cons) {_x->d.e=1;_x->d.t=_y;}})
 
 /*

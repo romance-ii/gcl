@@ -663,6 +663,57 @@ DEFUN_NEW("UNION",object,fLunion,LISP,2,2,NONE,OO,OO,OO,OO,(object x,object y),"
 }
 
 
+DEFUN_NEW("SET-DIFFERENCE-EQ",object,fSset_difference_eq,SI,2,8,NONE,OO,OO,OO,OO,
+	  (object x,object y,...),"") { 
+  object z=Cnil,yy;
+  for (;x!=Cnil;x=x->c.c_cdr) {
+    for (yy=y;yy!=Cnil && x->c.c_car!=yy->c.c_car;yy=yy->c.c_cdr);
+    if (yy==Cnil)
+      z=MMcons(x->c.c_car,z);
+  }
+  RETURN1(z);
+
+}
+
+DEFUN_NEW("UNION-EQ",object,fSunion_eq,SI,2,8,NONE,OO,OO,OO,OO,
+	  (object x,object y,...),"") { 
+  object z=y,yy;
+  for (;x!=Cnil;x=x->c.c_cdr) {
+    for (yy=z;yy!=Cnil && x->c.c_car!=yy->c.c_car;yy=yy->c.c_cdr);
+    if (yy==Cnil)
+      z=MMcons(x->c.c_car,z);
+  }
+  RETURN1(z);
+
+}
+
+DEFUN_NEW("NUNION-EQ",object,fSnunion_eq,SI,2,8,NONE,OO,OO,OO,OO,
+	  (object x,object y,...),"") { 
+  object z=Cnil,zp=z,yy;
+  for (;x!=Cnil;x=x->c.c_cdr) {
+    for (yy=y;yy!=Cnil && x->c.c_car!=yy->c.c_car;yy=yy->c.c_cdr);
+    if (yy==Cnil) {
+      if (zp!=Cnil) zp->c.c_cdr=x; else z=x;
+      zp=x;
+    }
+  }
+  if (zp!=Cnil) zp->c.c_cdr=y;
+  RETURN1(z!=Cnil ? z : y);
+
+}
+
+DEFUN_NEW("INTERSECTION-EQ",object,fSintersection_eq,SI,2,8,NONE,OO,OO,OO,OO,
+	  (object x,object y,...),"") { 
+  object z=Cnil,yy;
+  for (;x!=Cnil;x=x->c.c_cdr) {
+    for (yy=y;yy!=Cnil && x->c.c_car!=yy->c.c_car;yy=yy->c.c_cdr);
+    if (yy!=Cnil)
+      z=MMcons(x->c.c_car,z);
+  }
+  RETURN1(z);
+
+}
+
 DEFUN_NEW("NTH",object,fLnth,LISP,2,2,NONE,OO,OO,OO,OO,(object i,object lst),"") { 
   object x = lst;
   fixnum index=fixint(i);
