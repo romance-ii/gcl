@@ -1,4 +1,4 @@
-; 27 Jan 2006 14:58:53 CST
+; 07 Jan 2010 16:40:19 EST
 ; drawtrans.lsp  -- translation of draw.lsp       Gordon S. Novak Jr.
 
 ; Copyright (c) 2006 Gordon S. Novak Jr. and The University of Texas at Austin.
@@ -42,7 +42,7 @@
          (ADD-ITEM MENU-SET-ADD-ITEM) (FIND-ITEM MENU-SET-FIND-ITEM)
          (DELETE-ITEM MENU-SET-DELETE-ITEM)
          (REMOVE-ITEMS MENU-SET-REMOVE-ITEMS)
-         (ITEM-POSITION MENU-SET-ITEM-POSITION)
+         (ITEM-POSITION MENU-SET-ITEM-POSITION) (ITEMP MENU-SET-ITEMP)
          (ADJUST MENU-SET-ADJUST) (MOVE MENU-SET-MOVE)
          (DRAW-CONN MENU-SET-DRAW-CONN))))
 (SETF (GET 'MENU-SET-ITEM 'GLSTRUCTURE)
@@ -82,7 +82,7 @@
 
 (DEFUN MENU-SET-CREATE (W &OPTIONAL FN) (LIST 'MENU-SET W NIL FN))
 (SETF (GET 'MENU-SET-CREATE 'GLARGUMENTS)
-      '((W WINDOW) (&OPTIONAL NIL) (FN NIL)))
+      '((W WINDOW) (&OPTIONAL NIL)))
 (SETF (GET 'MENU-SET-CREATE 'GLFNRESULTTYPE) 'MENU-SET)
 
 
@@ -95,20 +95,18 @@
                      #'(LAMBDA (X Y CODE)
                          (OR (AND (PLUSP CODE) (SETQ LASTX X)
                                   (SETQ LASTY Y) CODE)
-                             (SOME #'(LAMBDA (GLVAR22053)
+                             (SOME #'(LAMBDA (GLVAR128)
                                        (IF
                                         (AND
-                                         (>= X
-                                          (FIFTH (CADDR GLVAR22053)))
-                                         (<= X
-                                          (+ (FIFTH (CADDR GLVAR22053))
-                                           (SEVENTH (CADDR GLVAR22053))))
-                                         (>= Y
-                                          (SIXTH (CADDR GLVAR22053)))
-                                         (<= Y
-                                          (+ (SIXTH (CADDR GLVAR22053))
-                                           (EIGHTH (CADDR GLVAR22053)))))
-                                        GLVAR22053))
+                                         (BETWEEN X
+                                          (FIFTH (CADDR GLVAR128))
+                                          (+ (FIFTH (CADDR GLVAR128))
+                                           (SEVENTH (CADDR GLVAR128))))
+                                         (BETWEEN Y
+                                          (SIXTH (CADDR GLVAR128))
+                                          (+ (SIXTH (CADDR GLVAR128))
+                                           (EIGHTH (CADDR GLVAR128)))))
+                                        GLVAR128))
                                    (CADDR MS))))))
            (IF (NUMBERP ITM)
                (SETQ RESB (LIST (LIST LASTX LASTY) 'BACKGROUND ITM))
@@ -120,11 +118,10 @@
                               (NOT (ZEROP *WINDOW-MENU-CODE*)))
                          (SETQ RES
                                (LIST NIL (CAR ITM) *WINDOW-MENU-CODE*)))))))
-    (WINDOW-FORCE-OUTPUT (CADR MS))
+    (XFLUSH *WINDOW-DISPLAY*)
     (OR RES RESB)))
 (SETF (GET 'MENU-SET-SELECT 'GLARGUMENTS)
-      '((MS MENU-SET) (&OPTIONAL NIL) (REDRAW BOOLEAN)
-        (ENABLED (LISTOF SYMBOL))))
+      '((MS MENU-SET) (&OPTIONAL BOOLEAN) (REDRAW (LISTOF SYMBOL))))
 (SETF (GET 'MENU-SET-SELECT 'GLFNRESULTTYPE) 'MENU-SELECTION)
 
 
@@ -141,6 +138,11 @@
     (SETF (FIFTH MENU) (CAR OFFSET))
     (SETF (SIXTH MENU) (CADR OFFSET))
     (MENU-SET-ADD-ITEM MS NAME SYM MENU)))
+(SETF (GET 'MENU-SET-ADD-MENU 'GLARGUMENTS)
+      '((MS MENU-SET) (NAME SYMBOL) (SYM SYMBOL) (TITLE STRING)
+        (ITEMS NIL) (&OPTIONAL VECTOR)))
+(SETF (GET 'MENU-SET-ADD-MENU 'GLFNRESULTTYPE) '(LISTOF MENU-SET-ITEM))
+
 
 (DEFUN MENU-SET-ADD-ITEM (MS NAME SYM MENU)
   (SETF (CADDR MS) (NCONC (CADDR MS) (CONS (LIST NAME SYM MENU) NIL))))
@@ -173,8 +175,7 @@
     (MENU-SET-ADD-ITEM MS NAME SYM MENU)))
 (SETF (GET 'MENU-SET-ADD-PICMENU 'GLARGUMENTS)
       '((MS MENU-SET) (NAME SYMBOL) (SYM SYMBOL) (TITLE STRING)
-        (SPEC PICMENU-SPEC) (&OPTIONAL NIL) (OFFSET VECTOR)
-        (NOBOX BOOLEAN)))
+        (SPEC PICMENU-SPEC) (&OPTIONAL VECTOR) (OFFSET BOOLEAN)))
 (SETF (GET 'MENU-SET-ADD-PICMENU 'GLFNRESULTTYPE)
       '(LISTOF MENU-SET-ITEM))
 
@@ -182,7 +183,7 @@
 (DEFUN MENU-SET-ADD-COMPONENT (MS NAME &OPTIONAL OFFSET)
   (MENU-SET-ADD-PICMENU MS (MENU-SET-NAME NAME) NAME NIL NAME OFFSET T))
 (SETF (GET 'MENU-SET-ADD-COMPONENT 'GLARGUMENTS)
-      '((MS MENU-SET) (NAME SYMBOL) (&OPTIONAL NIL) (OFFSET VECTOR)))
+      '((MS MENU-SET) (NAME SYMBOL) (&OPTIONAL VECTOR)))
 (SETF (GET 'MENU-SET-ADD-COMPONENT 'GLFNRESULTTYPE)
       '(LISTOF MENU-SET-ITEM))
 
@@ -198,7 +199,7 @@
   (MENU-SET-ADD-ITEM MS NAME SYM MENU))
 (SETF (GET 'MENU-SET-ADD-BARMENU 'GLARGUMENTS)
       '((MS MENU-SET) (NAME SYMBOL) (SYM SYMBOL) (MENU BARMENU)
-        (TITLE STRING) (&OPTIONAL NIL) (OFFSET VECTOR)))
+        (TITLE STRING) (&OPTIONAL VECTOR)))
 (SETF (GET 'MENU-SET-ADD-BARMENU 'GLFNRESULTTYPE)
       '(LISTOF MENU-SET-ITEM))
 
@@ -222,6 +223,20 @@
 (SETF (GET 'MENU-SET-NAMED-MENU 'GLFNRESULTTYPE) 'MENU-SET-MENU)
 
 
+(DEFUN MENU-SET-ITEMP (MS NAME ITEMNAME)
+  (LET ((THISMENU (MENU-SET-NAMED-MENU MS NAME)))
+    (IF (EQ (FIRST THISMENU) 'MENU)
+        (SOME #'(LAMBDA (X)
+                  (OR (EQ X ITEMNAME)
+                      (AND (CONSP X) (EQ (CAR X) ITEMNAME))))
+              (NTH 13 THISMENU))
+        (IF (EQ (FIRST THISMENU) 'PICMENU)
+            (ASSOC ITEMNAME (CADDDR (NTH 10 THISMENU)))))))
+(SETF (GET 'MENU-SET-ITEMP 'GLARGUMENTS)
+      '((MS MENU-SET) (NAME SYMBOL) (ITEMNAME SYMBOL)))
+(SETF (GET 'MENU-SET-ITEMP 'GLFNRESULTTYPE) 'BOOLEAN)
+
+
 (DEFUN MENU-CONNS-NAMED-ITEM (MC NAME)
   (MENU-SET-NAMED-ITEM (CADR MC) NAME))
 (SETF (GET 'MENU-CONNS-NAMED-ITEM 'GLARGUMENTS)
@@ -239,20 +254,18 @@
 (DEFUN MENU-SET-FIND-ITEM (MS POS)
   (LET (MITEM)
     (DOLIST (MI (CADDR MS))
-      (IF (AND (>= (CAR POS)
-                   (LET ((SELF (CADDR MI)))
-                     (IF (CADDR SELF) (FIFTH SELF) 0)))
-               (<= (CAR POS)
-                   (+ (LET ((SELF (CADDR MI)))
-                        (IF (CADDR SELF) (FIFTH SELF) 0))
-                      (SEVENTH (CADDR MI))))
-               (>= (CADR POS)
-                   (LET ((SELF (CADDR MI)))
-                     (IF (CADDR SELF) (SIXTH SELF) 0)))
-               (<= (CADR POS)
-                   (+ (LET ((SELF (CADDR MI)))
-                        (IF (CADDR SELF) (SIXTH SELF) 0))
-                      (EIGHTH (CADDR MI)))))
+      (IF (AND (BETWEEN (CAR POS)
+                        (LET ((SELF (CADDR MI)))
+                          (IF (CADDR SELF) (FIFTH SELF) 0))
+                        (+ (LET ((SELF (CADDR MI)))
+                             (IF (CADDR SELF) (FIFTH SELF) 0))
+                           (SEVENTH (CADDR MI))))
+               (BETWEEN (CADR POS)
+                        (LET ((SELF (CADDR MI)))
+                          (IF (CADDR SELF) (SIXTH SELF) 0))
+                        (+ (LET ((SELF (CADDR MI)))
+                             (IF (CADDR SELF) (SIXTH SELF) 0))
+                           (EIGHTH (CADDR MI)))))
           (SETQ MITEM MI)))
     MITEM))
 (SETF (GET 'MENU-SET-FIND-ITEM 'GLARGUMENTS)
@@ -299,7 +312,9 @@
     (T (GLSEND M ITEM-POSITION NAME LOC))))
 
 (DEFUN MENU-SET-DRAW (MS)
-  (WINDOW-OPEN (CADR MS))
+  (XMAPWINDOW *WINDOW-DISPLAY* (CADADR MS))
+  (XFLUSH *WINDOW-DISPLAY*)
+  (WINDOW-WAIT-EXPOSURE (CADR MS))
   (DOLIST (ITEM (CADDR MS)) (MENU-MDRAW (CADDR ITEM))))
 
 (DEFUN MENU-SET-ITEM-POSITION (MS DESC &OPTIONAL LOC)
@@ -308,7 +323,7 @@
     (OR (MENU-MITEM-POSITION M (CAR DESC) LOC)
         (MENU-MITEM-POSITION M NIL LOC))))
 (SETF (GET 'MENU-SET-ITEM-POSITION 'GLARGUMENTS)
-      '((MS MENU-SET) (DESC MENU-PORT) (&OPTIONAL NIL) (LOC SYMBOL)))
+      '((MS MENU-SET) (DESC MENU-PORT) (&OPTIONAL SYMBOL)))
 (SETF (GET 'MENU-SET-ITEM-POSITION 'GLFNRESULTTYPE) 'VECTOR)
 
 
@@ -322,10 +337,11 @@
       (SETQ DESCB TMP))
     (SETQ PA (MENU-SET-ITEM-POSITION MS DESCA 'RIGHT))
     (SETQ PB (MENU-SET-ITEM-POSITION MS DESCB 'LEFT))
-    (WINDOW-DRAW-CIRCLE (CADR MS) PA 3)
-    (WINDOW-DRAW-LINE (CADR MS) PA PB)
-    (WINDOW-DRAW-CIRCLE (CADR MS) PB 3)
-    (WINDOW-FORCE-OUTPUT (CADR MS))))
+    (WINDOW-DRAW-CIRCLE-XY (CADR MS) (CAR PA) (CADR PA) 3 NIL)
+    (WINDOW-DRAW-LINE-XY (CADR MS) (CAR PA) (CADR PA) (CAR PB)
+        (CADR PB) NIL)
+    (WINDOW-DRAW-CIRCLE-XY (CADR MS) (CAR PB) (CADR PB) 3 NIL)
+    (XFLUSH *WINDOW-DISPLAY*)))
 
 (DEFUN MENU-SET-ADJUST (MS NAME EDGE FROM OFFSET)
   (LET (M FROMM PLACE)
@@ -359,6 +375,17 @@
 (SETF (GET 'MENU-SET-ADJUST 'GLFNRESULTTYPE) 'INTEGER)
 
 
+(DEFUN VECTOR-SNAP (FIXED APPROX &OPTIONAL TOLERANCE)
+  (OR TOLERANCE (SETQ TOLERANCE 10))
+  (IF (< (ABS (- (CAR FIXED) (CAR APPROX))) TOLERANCE)
+      (LIST (CAR FIXED) (CADR APPROX))
+      (IF (< (ABS (- (CADR FIXED) (CADR APPROX))) TOLERANCE)
+          (LIST (CAR APPROX) (CADR FIXED)) APPROX)))
+(SETF (GET 'VECTOR-SNAP 'GLARGUMENTS)
+      '((FIXED VECTOR) (APPROX VECTOR) (&OPTIONAL NIL)))
+(SETF (GET 'VECTOR-SNAP 'GLFNRESULTTYPE) 'VECTOR)
+
+
 (DEFUN MENU-CONNS-CREATE (MS) (LIST 'MENU-CONNS MS NIL))
 (SETF (GET 'MENU-CONNS-CREATE 'GLARGUMENTS) '((MS MENU-SET)))
 (SETF (GET 'MENU-CONNS-CREATE 'GLFNRESULTTYPE) 'MENU-CONNS)
@@ -370,11 +397,13 @@
 
 (DEFUN MENU-CONNS-MOVE (MC)
   (MENU-SET-MOVE (CADR MC))
-  (WINDOW-CLEAR (CADADR MC))
+  (XCLEARWINDOW *WINDOW-DISPLAY* (CADR (CADADR MC)))
+  (XFLUSH *WINDOW-DISPLAY*)
   (MENU-CONNS-DRAW MC))
 
 (DEFUN MENU-CONNS-REDRAW (MC)
-  (WINDOW-CLEAR (CADADR MC))
+  (XCLEARWINDOW *WINDOW-DISPLAY* (CADR (CADADR MC)))
+  (XFLUSH *WINDOW-DISPLAY*)
   (MENU-CONNS-DRAW MC))
 
 (DEFUN MENU-CONNS-ADD-CONN (MC)
@@ -686,7 +715,9 @@
 (DEFUN DRAW (NAME)
   (LET (W DD DONE SEL (REDRAW T) NEW)
     (SETQ W (DRAW-WINDOW))
-    (WINDOW-OPEN W)
+    (XMAPWINDOW *WINDOW-DISPLAY* (CADR W))
+    (XFLUSH *WINDOW-DISPLAY*)
+    (WINDOW-WAIT-EXPOSURE W)
     (OR *DRAW-MENU-SET* (DRAW-INIT-MENUS))
     (SETQ DD (DRAW-DESC NAME))
     (UNLESS (MEMBER NAME *DRAW-OBJECTS*)
@@ -701,16 +732,21 @@
                         (MOVE (DRAW-DESC-MOVE DD W))
                         (DELETE (DRAW-DESC-DELETE DD W))
                         (COPY (DRAW-DESC-COPY DD W))
-                        (REDRAW (WINDOW-CLEAR W) (SETQ REDRAW T)
-                                (DRAW-DESC-DRAW DD W))
+                        (REDRAW (XCLEARWINDOW *WINDOW-DISPLAY*
+                                    (CADR W))
+                                (XFLUSH *WINDOW-DISPLAY*)
+                                (SETQ REDRAW T) (DRAW-DESC-DRAW DD W))
                         (ORIGIN (DRAW-DESC-ORIGIN DD W)
-                                (WINDOW-CLEAR W) (SETQ REDRAW T)
-                                (DRAW-DESC-DRAW DD W))
+                                (XCLEARWINDOW *WINDOW-DISPLAY*
+                                    (CADR W))
+                                (XFLUSH *WINDOW-DISPLAY*)
+                                (SETQ REDRAW T) (DRAW-DESC-DRAW DD W))
                         (PROGRAM (DRAW-DESC-PROGRAM DD))
                         (LATEX (DRAW-DESC-LATEX DD))
-                        (LATEXMODE (SETQ *DRAW-LATEX-MODE*
-                                    (NOT *DRAW-LATEX-MODE*))
-                                   (FORMAT T "Latex Mode is now ~A~%"
+                        (LATEXMODE
+                            (SETQ *DRAW-LATEX-MODE*
+                                  (NOT *DRAW-LATEX-MODE*))
+                            (FORMAT T "Latex Mode is now ~A~%"
                                     *DRAW-LATEX-MODE*))))
              (DRAW (SETQ NEW NIL)
                    (CASE (CAR SEL)
@@ -734,17 +770,27 @@
                      (DRAW-OBJECT-DRAW NEW W (CADDDR DD))))
              (BACKGROUND)))
     (SETF (DRAW-DESCR NAME) DD)
-    (UNLESS *DRAW-LEAVE-WINDOW* (WINDOW-CLOSE W))
+    (UNLESS *DRAW-LEAVE-WINDOW*
+      (PROGN
+        (XUNMAPWINDOW *WINDOW-DISPLAY* (CADR W))
+        (XFLUSH *WINDOW-DISPLAY*)
+        (WINDOW-WAIT-UNMAP W)))
     NAME))
 (SETF (GET 'DRAW 'GLARGUMENTS) '((NAME SYMBOL)))
 (SETF (GET 'DRAW 'GLFNRESULTTYPE) 'SYMBOL)
 
 
+(DEFUN COPY-DRAW-DESC (FROM TO)
+  (LET (OLD)
+    (SETQ OLD (COPY-TREE (GET FROM 'DRAW-DESCR)))
+    (SETF (GET TO 'DRAW-DESCR) (CONS (CAR OLD) (CONS TO (CDDR OLD))))))
+
 (DEFUN DRAW-DESC-DRAW (DD W)
   (LET ((OFF (CADDDR DD)))
-    (WINDOW-CLEAR W)
+    (XCLEARWINDOW *WINDOW-DISPLAY* (CADR W))
+    (XFLUSH *WINDOW-DISPLAY*)
     (DOLIST (OBJ (CADDR DD)) (DRAW-OBJECT-DRAW OBJ W OFF))
-    (WINDOW-FORCE-OUTPUT W)))
+    (XFLUSH *WINDOW-DISPLAY*)))
 
 (DEFUN DRAW-DESC-SELECTED (DD P)
   (LET (OBJS OBJSB OBJ)
@@ -779,7 +825,7 @@
            (SETQ OBJ (DRAW-DESC-SELECTED DD P)))
     OBJ))
 (SETF (GET 'DRAW-DESC-FIND 'GLARGUMENTS)
-      '((DD DRAW-DESC) (W WINDOW) (&OPTIONAL NIL) (CROSSFLG BOOLEAN)))
+      '((DD DRAW-DESC) (W WINDOW) (&OPTIONAL BOOLEAN)))
 (SETF (GET 'DRAW-DESC-FIND 'GLFNRESULTTYPE) 'DRAW-OBJECT)
 
 
@@ -814,7 +860,7 @@
           (LIST (- (CAADR OBJB) (CAR (CADDDR DD)))
                 (- (CADADR OBJB) (CADR (CADDDR DD)))))
     (DRAW-OBJECT-DRAW OBJB W (CADDDR DD))
-    (WINDOW-FORCE-OUTPUT W)
+    (XFLUSH *WINDOW-DISPLAY*)
     (SETF (CADDR DD) (NCONC (CADDR DD) (CONS OBJB NIL)))))
 (SETF (GET 'DRAW-DESC-COPY 'GLARGUMENTS) '((DD DRAW-DESC) (W WINDOW)))
 (SETF (GET 'DRAW-DESC-COPY 'GLFNRESULTTYPE) '(LISTOF DRAW-OBJECT))
@@ -883,13 +929,13 @@
                     BX BY SX SY))
         (DRAW-RCBOX
             (FORMAT T "   \\put(~5,0F,~5,0F) {\\oval(~5,0F,~5,0F)}~%"
-                    (+ BX (/ SX 2)) (+ BY (/ SY 2)) SX SY))
+                    (+ BX (* 1/2 SX)) (+ BY (* 1/2 SY)) SX SY))
         (DRAW-CIRCLE
             (FORMAT T "   \\put(~5,0F,~5,0F) {\\circle{~5,0F}}~%"
-                    (+ BX (/ SX 2)) (+ BY (/ SY 2)) SX))
+                    (+ BX (* 1/2 SX)) (+ BY (* 1/2 SY)) SX))
         (DRAW-ELLIPSE
             (FORMAT T "   \\put(~5,0F,~5,0F) {\\oval(~5,0F,~5,0F)}~%"
-                    (+ BX (/ SX 2)) (+ BY (/ SY 2)) SX SY))
+                    (+ BX (* 1/2 SX)) (+ BY (* 1/2 SY)) SX SY))
         (DRAW-BUTTON
             (FORMAT T
                     "   \\put(~5,0F,~5,0F) {\\framebox(~5,0F,~5,0F)}~%"
@@ -897,7 +943,7 @@
         (DRAW-ERASE)
         (DRAW-DOT
             (FORMAT T "   \\put(~5,0F,~5,0F) {\\circle*{~5,0F}}~%"
-                    (+ BX (/ SX 2)) (+ BY (/ SY 2)) SX))
+                    (+ BX (* 1/2 SX)) (+ BY (* 1/2 SY)) SX))
         (DRAW-TEXT
             (FORMAT T "   \\put(~5,0F,~5,0F) {~A}~%" BX
                     (+ BY (* 4 *DRAW-LATEX-FACTOR*)) (CADDDR OBJ)))))
@@ -911,18 +957,18 @@
                                  (PROGN
                                    (SETQ BASE
                                     (LET
-                                     ((GLVAR25425
+                                     ((GLVAR133
                                        (LIST
                                         (+ (CAR (CADDDR DD))
                                          (CAADR OBJ))
                                         (+ (CADR (CADDDR DD))
                                          (CADADR OBJ))))
-                                      (GLVAR25428 (DRAW-DESC-REFPT DD)))
+                                      (GLVAR134 (DRAW-DESC-REFPT DD)))
                                       (LIST
-                                       (- (CAR GLVAR25425)
-                                        (CAR GLVAR25428))
-                                       (- (CADR GLVAR25425)
-                                        (CADR GLVAR25428)))))
+                                       (- (CAR GLVAR133)
+                                        (CAR GLVAR134))
+                                       (- (CADR GLVAR133)
+                                        (CADR GLVAR134)))))
                                    (SETQ BX (CAR BASE))
                                    (SETQ BY (CADR BASE))
                                    (SETQ SX (CAADDR OBJ))
@@ -930,10 +976,11 @@
                                    (SETQ TOX (+ BX SX))
                                    (SETQ TOY (+ BY SY))
                                    (IF (EQ (CAR OBJ) 'DRAW-CIRCLE)
-                                    (SETQ R (/ (CAADDR OBJ) 2)))
+                                    (SETQ R (* 1/2 (CAADDR OBJ))))
                                    (WHEN (EQ (CAR OBJ) 'DRAW-ELLIPSE)
-                                     (SETQ RX (/ (CAADDR OBJ) 2))
-                                     (SETQ RY (/ (CADR (CADDR OBJ)) 2)))
+                                     (SETQ RX (* 1/2 (CAADDR OBJ)))
+                                     (SETQ RY
+                                      (* 1/2 (CADR (CADDR OBJ)))))
                                    (DRAW-OPTIMIZE
                                     (CASE (FIRST OBJ)
                                       (DRAW-LINE
@@ -988,11 +1035,6 @@
     (SETF (SYMBOL-FUNCTION FNNAME) FNCODE)
     (FORMAT T "Constructed program (~A w x y)~%" FNNAME)
     (DRAW-DESC-PICMENU DD)))
-(SETF (GET 'DRAW-DESC-PROGRAM 'GLARGUMENTS) '((DD DRAW-DESC)))
-(SETF (GET 'DRAW-DESC-PROGRAM 'GLFNRESULTTYPE)
-      '(LIST GLTYPE INTEGER INTEGER (LISTOF (LIST ANYTHING VECTOR))
-             BOOLEAN SYMBOL SYMBOL))
-
 
 (DEFUN DRAW-OPTIMIZE (X) (IF (FBOUNDP 'GLUNWRAP) (GLUNWRAP X NIL) X))
 
@@ -1009,19 +1051,19 @@
                       (AND (EQ (FIRST OBJ) 'DRAW-BUTTON)
                            (CONS (LIST (CADDDR OBJ)
                                        (LET
-                                        ((GLVAR25733
+                                        ((GLVAR136
                                           (LET
-                                           ((GLVAR25709
+                                           ((GLVAR135
                                              (COPY-LIST '(2 2))))
                                             (LIST
-                                             (+ (CAR GLVAR25709)
+                                             (+ (CAR GLVAR135)
                                               (CAADR OBJ))
-                                             (+ (CADR GLVAR25709)
+                                             (+ (CADR GLVAR135)
                                               (CADADR OBJ))))))
                                          (LIST
-                                          (+ (CAR GLVAR25733)
+                                          (+ (CAR GLVAR136)
                                            (CAR (CADDDR DD)))
-                                          (+ (CADR GLVAR25733)
+                                          (+ (CADR GLVAR136)
                                            (CADR (CADDDR DD))))))
                                  NIL)))
                   (CADDR DD)))
@@ -1051,7 +1093,7 @@
   (SETF (CADR D)
         (LIST (- (CAADR D) (CAR OFF)) (- (CADADR D) (CADR OFF))))
   (DRAW-OBJECT-DRAW D W OFF)
-  (WINDOW-FORCE-OUTPUT W))
+  (XFLUSH *WINDOW-DISPLAY*))
 
 (DEFUN DRAW-OBJECT-DRAW-AT (W X Y D)
   (SETF (SECOND D) (LIST X Y))
@@ -1078,39 +1120,59 @@
 
 (DEFUN DRAW-OBJECT-ERASE (D W OFF)
   (WHEN (NOT (EQ (FIRST D) 'DRAW-ERASE))
-    (WINDOW-SET-XOR W)
+    (LET ((GC (CADDR W)))
+      (SETQ *WINDOW-SAVE-FUNCTION*
+            (PROGN
+              (XGETGCVALUES *WINDOW-DISPLAY* (CADDR W) 1 *GC-VALUES*)
+              (XGCVALUES-FUNCTION *GC-VALUES*)))
+      (XSETFUNCTION *WINDOW-DISPLAY* GC 6)
+      (SETQ *WINDOW-SAVE-FOREGROUND*
+            (PROGN
+              (XGETGCVALUES *WINDOW-DISPLAY* (CADDR W) 4 *GC-VALUES*)
+              (XGCVALUES-FOREGROUND *GC-VALUES*)))
+      (XSETFOREGROUND *WINDOW-DISPLAY* GC
+          (LOGXOR *WINDOW-SAVE-FOREGROUND*
+                  (PROGN
+                    (XGETGCVALUES *WINDOW-DISPLAY* (CADDR W) 8
+                        *GC-VALUES*)
+                    (XGCVALUES-BACKGROUND *GC-VALUES*)))))
     (DRAW-OBJECT-DRAW D W OFF)
-    (WINDOW-UNSET W)))
+    (LET ((GC (CADDR W)))
+      (XSETFUNCTION *WINDOW-DISPLAY* GC *WINDOW-SAVE-FUNCTION*)
+      (XSETFOREGROUND *WINDOW-DISPLAY* GC *WINDOW-SAVE-FOREGROUND*))))
 
 (DEFUN DRAW-LINE-DRAW (D W OFF)
   (LET ((FROM (LIST (+ (CAR OFF) (CAADR D)) (+ (CADR OFF) (CADADR D))))
-        (TO (LET ((GLVAR26041
+        (TO (LET ((GLVAR137
                       (LIST (+ (CAR OFF) (CAADR D))
                             (+ (CADR OFF) (CADADR D)))))
-              (LIST (+ (CAR GLVAR26041) (CAADDR D))
-                    (+ (CADR GLVAR26041) (CADR (CADDR D)))))))
-    (WINDOW-DRAW-LINE-XY W (CAR FROM) (CADR FROM) (CAR TO) (CADR TO))))
+              (LIST (+ (CAR GLVAR137) (CAADDR D))
+                    (+ (CADR GLVAR137) (CADR (CADDR D)))))))
+    (LET ((QQWHEIGHT (CADDDR W)))
+      (XDRAWLINE *WINDOW-DISPLAY* (CADR W) (CADDR W) (CAR FROM)
+          (- QQWHEIGHT (CADR FROM)) (CAR TO) (- QQWHEIGHT (CADR TO)))
+      NIL)))
 
 (DEFUN DRAW-ARROW-DRAW (D W OFF)
   (LET ((FROM (LIST (+ (CAR OFF) (CAADR D)) (+ (CADR OFF) (CADADR D))))
-        (TO (LET ((GLVAR26179
+        (TO (LET ((GLVAR138
                       (LIST (+ (CAR OFF) (CAADR D))
                             (+ (CADR OFF) (CADADR D)))))
-              (LIST (+ (CAR GLVAR26179) (CAADDR D))
-                    (+ (CADR GLVAR26179) (CADR (CADDR D)))))))
+              (LIST (+ (CAR GLVAR138) (CAADDR D))
+                    (+ (CADR GLVAR138) (CADR (CADDR D)))))))
     (WINDOW-DRAW-ARROW-XY W (CAR FROM) (CADR FROM) (CAR TO) (CADR TO))))
 
 (DEFUN DRAW-LINE-SELECTEDP (D PT OFF)
   (LET ((PTP (LIST (- (CAR PT) (CAR OFF)) (- (CADR PT) (CADR OFF)))))
-    (AND (>= (CAR PTP) (+ -2 (+ (CAADR D) (MIN 0 (CAADDR D)))))
-         (<= (CAR PTP)
-             (+ 2
-                (+ (+ (CAADR D) (MIN 0 (CAADDR D))) (ABS (CAADDR D)))))
-         (>= (CADR PTP) (+ -2 (+ (CADADR D) (MIN 0 (CADR (CADDR D))))))
-         (<= (CADR PTP)
-             (+ 2
-                (+ (+ (CADADR D) (MIN 0 (CADR (CADDR D))))
-                   (ABS (CADR (CADDR D))))))
+    (AND (BETWEEN (CAR PTP) (+ -2 (+ (CAADR D) (MIN 0 (CAADDR D))))
+                  (+ 2
+                     (+ (+ (CAADR D) (MIN 0 (CAADDR D)))
+                        (ABS (CAADDR D)))))
+         (BETWEEN (CADR PTP)
+                  (+ -2 (+ (CADADR D) (MIN 0 (CADR (CADDR D)))))
+                  (+ 2
+                     (+ (+ (CADADR D) (MIN 0 (CADR (CADDR D))))
+                        (ABS (CADR (CADDR D))))))
          (< (ABS (/ (- (* (CAADDR D) (- (CADR PTP) (CADADR D)))
                        (* (CADR (CADDR D)) (- (CAR PTP) (CAADR D))))
                     (SQRT (+ (EXPT (CAADDR D) 2)
@@ -1131,7 +1193,7 @@
                   (WINDOW-GET-LINE-POSITION W (CAR FROM) (CADR FROM)))))
     (LIST 'DRAW-LINE FROM
           (LIST (- (CAR TO) (CAR FROM)) (- (CADR TO) (CADR FROM))) NIL
-          0)))
+          1)))
 (SETF (GET 'DRAW-LINE-GET 'GLARGUMENTS) '((DD DRAW-DESC) (W WINDOW)))
 (SETF (GET 'DRAW-LINE-GET 'GLFNRESULTTYPE) 'DRAW-LINE)
 
@@ -1146,15 +1208,16 @@
                   (WINDOW-GET-LINE-POSITION W (CAR FROM) (CADR FROM)))))
     (LIST 'DRAW-ARROW FROM
           (LIST (- (CAR TO) (CAR FROM)) (- (CADR TO) (CADR FROM))) NIL
-          0)))
+          1)))
 (SETF (GET 'DRAW-ARROW-GET 'GLARGUMENTS) '((DD DRAW-DESC) (W WINDOW)))
 (SETF (GET 'DRAW-ARROW-GET 'GLFNRESULTTYPE) 'DRAW-ARROW)
 
 
 (DEFUN DRAW-BOX-DRAW (D W OFF)
-  (WINDOW-DRAW-BOX W
-      (LIST (+ (CAR OFF) (CAADR D)) (+ (CADR OFF) (CADADR D)))
-      (CADDR D)))
+  (LET ((GLVAR139
+            (LIST (+ (CAR OFF) (CAADR D)) (+ (CADR OFF) (CADADR D)))))
+    (WINDOW-DRAW-BOX-XY W (CAR GLVAR139) (CADR GLVAR139) (CAADDR D)
+        (CADR (CADDR D)) NIL)))
 
 (DEFUN DRAW-BOX-SELECTEDP (D P OFF)
   (LET ((PT (LIST (- (CAR P) (CAR OFF)) (- (CADR P) (CADR OFF)))))
@@ -1196,7 +1259,7 @@
 (DEFUN DRAW-BOX-GET (DD W)
   (LET (BOX)
     (SETQ BOX (WINDOW-GET-REGION W))
-    (LIST 'DRAW-BOX (CAR BOX) (CADR BOX) NIL 0)))
+    (LIST 'DRAW-BOX (CAR BOX) (CADR BOX) NIL 1)))
 (SETF (GET 'DRAW-BOX-GET 'GLARGUMENTS) '((DD DRAW-DESC) (W WINDOW)))
 (SETF (GET 'DRAW-BOX-GET 'GLFNRESULTTYPE) 'DRAW-BOX)
 
@@ -1242,44 +1305,41 @@
 (DEFUN DRAW-RCBOX-GET (DD W)
   (LET (BOX)
     (SETQ BOX (WINDOW-GET-REGION W))
-    (LIST 'DRAW-RCBOX (CAR BOX) (CADR BOX) NIL 0)))
+    (LIST 'DRAW-RCBOX (CAR BOX) (CADR BOX) NIL 1)))
 (SETF (GET 'DRAW-RCBOX-GET 'GLARGUMENTS) '((DD DRAW-DESC) (W WINDOW)))
 (SETF (GET 'DRAW-RCBOX-GET 'GLFNRESULTTYPE) 'DRAW-RCBOX)
 
 
 (DEFUN DRAW-CIRCLE-DRAW (D W OFF)
-  (WINDOW-DRAW-CIRCLE W
-      (LET ((GLVAR27825
-                (LET ((GLVAR27802
-                          (LIST (/ (CAADDR D) 2)
-                                (/ (CADR (CADDR D)) 2))))
-                  (LIST (+ (CAADR D) (CAR GLVAR27802))
-                        (+ (CADADR D) (CADR GLVAR27802))))))
-        (LIST (+ (CAR OFF) (CAR GLVAR27825))
-              (+ (CADR OFF) (CADR GLVAR27825))))
-      (/ (CAADDR D) 2)))
+  (LET ((GLVAR142
+            (LET ((GLVAR141
+                      (LET ((GLVAR140
+                                (LIST (* 1/2 (CAADDR D))
+                                      (* 1/2 (CADR (CADDR D))))))
+                        (LIST (+ (CAADR D) (CAR GLVAR140))
+                              (+ (CADADR D) (CADR GLVAR140))))))
+              (LIST (+ (CAR OFF) (CAR GLVAR141))
+                    (+ (CADR OFF) (CADR GLVAR141))))))
+    (WINDOW-DRAW-CIRCLE-XY W (CAR GLVAR142) (CADR GLVAR142)
+        (* 1/2 (CAADDR D)) NIL)))
 
 (DEFUN DRAW-CIRCLE-SELECTEDP (D P OFF)
-  (< (ABS (- (/ (CAADDR D) 2)
-             (SQRT (LET ((SELF (LET ((GLVAR27972
+  (< (ABS (- (* 1/2 (CAADDR D))
+             (LET ((SELF (LET ((GLVAR146
+                                   (LET
+                                    ((GLVAR145
                                       (LET
-                                       ((GLVAR27949
-                                         (LET
-                                          ((GLVAR27928
-                                            (LIST (/ (CAADDR D) 2)
-                                             (/ (CADR (CADDR D)) 2))))
-                                           (LIST
-                                            (+ (CAADR D)
-                                             (CAR GLVAR27928))
-                                            (+ (CADADR D)
-                                             (CADR GLVAR27928))))))
+                                       ((GLVAR144
+                                         (LIST (* 1/2 (CAADDR D))
+                                          (* 1/2 (CADR (CADDR D))))))
                                         (LIST
-                                         (+ (CAR GLVAR27949) (CAR OFF))
-                                         (+ (CADR GLVAR27949)
-                                          (CADR OFF))))))
-                                 (LIST (- (CAR GLVAR27972) (CAR P))
-                                       (- (CADR GLVAR27972) (CADR P))))))
-                     (+ (EXPT (CAR SELF) 2) (EXPT (CADR SELF) 2))))))
+                                         (+ (CAADR D) (CAR GLVAR144))
+                                         (+ (CADADR D) (CADR GLVAR144))))))
+                                     (LIST (+ (CAR GLVAR145) (CAR OFF))
+                                      (+ (CADR GLVAR145) (CADR OFF))))))
+                           (LIST (- (CAR GLVAR146) (CAR P))
+                                 (- (CADR GLVAR146) (CADR P))))))
+               (SQRT (+ (EXPT (CAR SELF) 2) (EXPT (CADR SELF) 2))))))
      5))
 (SETF (GET 'DRAW-CIRCLE-SELECTEDP 'GLARGUMENTS)
       '((D DRAW-CIRCLE) (P VECTOR) (OFF VECTOR)))
@@ -1292,98 +1352,88 @@
     (SETQ CIR (WINDOW-GET-CIRCLE W CENT))
     (LIST 'DRAW-CIRCLE
           (LIST (- (CAAR CIR) (CADR CIR)) (- (CADAR CIR) (CADR CIR)))
-          (LIST (* 2 (CADR CIR)) (* 2 (CADR CIR))) NIL 0)))
+          (LIST (* 2 (CADR CIR)) (* 2 (CADR CIR))) NIL 1)))
 (SETF (GET 'DRAW-CIRCLE-GET 'GLARGUMENTS) '((DD DRAW-DESC) (W WINDOW)))
 (SETF (GET 'DRAW-CIRCLE-GET 'GLFNRESULTTYPE) 'DRAW-CIRCLE)
 
 
 (DEFUN DRAW-ELLIPSE-DRAW (D W OFF)
-  (LET ((C (LET ((GLVAR28162
-                     (LET ((GLVAR28139
-                               (LIST (/ (CAADDR D) 2)
-                                     (/ (CADR (CADDR D)) 2))))
-                       (LIST (+ (CAADR D) (CAR GLVAR28139))
-                             (+ (CADADR D) (CADR GLVAR28139))))))
-             (LIST (+ (CAR OFF) (CAR GLVAR28162))
-                   (+ (CADR OFF) (CADR GLVAR28162))))))
-    (WINDOW-DRAW-ELLIPSE-XY W (CAR C) (CADR C) (/ (CAADDR D) 2)
-        (/ (CADR (CADDR D)) 2))))
+  (LET ((C (LET ((GLVAR148
+                     (LET ((GLVAR147
+                               (LIST (* 1/2 (CAADDR D))
+                                     (* 1/2 (CADR (CADDR D))))))
+                       (LIST (+ (CAADR D) (CAR GLVAR147))
+                             (+ (CADADR D) (CADR GLVAR147))))))
+             (LIST (+ (CAR OFF) (CAR GLVAR148))
+                   (+ (CADR OFF) (CADR GLVAR148))))))
+    (LET ((GLVAR149 (* 1/2 (CAADDR D)))
+          (GLVAR150 (* 1/2 (CADR (CADDR D)))))
+      (XDRAWARC *WINDOW-DISPLAY* (CADR W) (CADDR W)
+          (- (CAR C) GLVAR149) (- (CADDDR W) (+ (CADR C) GLVAR150))
+          (* 2 GLVAR149) (* 2 GLVAR150) 0 23040)
+      NIL)))
 
 (DEFUN DRAW-ELLIPSE-SELECTEDP (D P OFF)
   (LET ((PT (LIST (- (CAR P) (CAR OFF)) (- (CADR P) (CADR OFF)))))
-    (< (ABS (- (+ (SQRT (LET ((SELF (LET
-                                     ((GLVAR28502
-                                       (IF
-                                        (> (/ (CAADDR D) 2)
-                                         (/ (CADR (CADDR D)) 2))
-                                        (LIST
-                                         (ROUND
-                                          (-
-                                           (+ (CAADR D)
-                                            (/ (CAADDR D) 2))
-                                           (SQRT
-                                            (ABS
-                                             (/
-                                              (- (EXPT (CAADDR D) 2)
-                                               (EXPT (CADR (CADDR D))
-                                                2))
-                                              4)))))
-                                         (+ (CADADR D)
-                                          (/ (CADR (CADDR D)) 2)))
-                                        (LIST
-                                         (+ (CAADR D) (/ (CAADDR D) 2))
-                                         (ROUND
-                                          (-
-                                           (+ (CADADR D)
-                                            (/ (CADR (CADDR D)) 2))
-                                           (SQRT
-                                            (ABS
-                                             (/
-                                              (- (EXPT (CAADDR D) 2)
-                                               (EXPT (CADR (CADDR D))
-                                                2))
-                                              4)))))))))
+    (< (ABS (- (+ (LET ((SELF (LET ((GLVAR156
+                                     (IF
+                                      (> (CAADDR D) (CADR (CADDR D)))
                                       (LIST
-                                       (- (CAR GLVAR28502) (CAR PT))
-                                       (- (CADR GLVAR28502) (CADR PT))))))
-                          (+ (EXPT (CAR SELF) 2) (EXPT (CADR SELF) 2))))
-                  (SQRT (LET ((SELF (LET
-                                     ((GLVAR28750
-                                       (IF
-                                        (> (/ (CAADDR D) 2)
-                                         (/ (CADR (CADDR D)) 2))
-                                        (LIST
-                                         (ROUND
-                                          (+
-                                           (+ (CAADR D)
-                                            (/ (CAADDR D) 2))
-                                           (SQRT
-                                            (ABS
-                                             (/
-                                              (- (EXPT (CAADDR D) 2)
-                                               (EXPT (CADR (CADDR D))
-                                                2))
-                                              4)))))
-                                         (+ (CADADR D)
-                                          (/ (CADR (CADDR D)) 2)))
-                                        (LIST
-                                         (+ (CAADR D) (/ (CAADDR D) 2))
-                                         (ROUND
-                                          (+
-                                           (+ (CADADR D)
-                                            (/ (CADR (CADDR D)) 2))
-                                           (SQRT
-                                            (ABS
-                                             (/
-                                              (- (EXPT (CAADDR D) 2)
-                                               (EXPT (CADR (CADDR D))
-                                                2))
-                                              4)))))))))
+                                       (ROUND
+                                        (-
+                                         (+ (CAADR D)
+                                          (* 1/2 (CAADDR D)))
+                                         (SQRT
+                                          (ABS
+                                           (* 1/4
+                                            (- (EXPT (CAADDR D) 2)
+                                             (EXPT (CADR (CADDR D)) 2)))))))
+                                       (+ (CADADR D)
+                                        (* 1/2 (CADR (CADDR D)))))
                                       (LIST
-                                       (- (CAR GLVAR28750) (CAR PT))
-                                       (- (CADR GLVAR28750) (CADR PT))))))
-                          (+ (EXPT (CAR SELF) 2) (EXPT (CADR SELF) 2)))))
-               (* 2 (MAX (/ (CAADDR D) 2) (/ (CADR (CADDR D)) 2)))))
+                                       (+ (CAADR D) (* 1/2 (CAADDR D)))
+                                       (ROUND
+                                        (-
+                                         (+ (CADADR D)
+                                          (* 1/2 (CADR (CADDR D))))
+                                         (SQRT
+                                          (ABS
+                                           (* 1/4
+                                            (- (EXPT (CAADDR D) 2)
+                                             (EXPT (CADR (CADDR D)) 2)))))))))))
+                                (LIST (- (CAR GLVAR156) (CAR PT))
+                                      (- (CADR GLVAR156) (CADR PT))))))
+                    (SQRT (+ (EXPT (CAR SELF) 2) (EXPT (CADR SELF) 2))))
+                  (LET ((SELF (LET ((GLVAR161
+                                     (IF
+                                      (> (CAADDR D) (CADR (CADDR D)))
+                                      (LIST
+                                       (ROUND
+                                        (+
+                                         (+ (CAADR D)
+                                          (* 1/2 (CAADDR D)))
+                                         (SQRT
+                                          (ABS
+                                           (* 1/4
+                                            (- (EXPT (CAADDR D) 2)
+                                             (EXPT (CADR (CADDR D)) 2)))))))
+                                       (+ (CADADR D)
+                                        (* 1/2 (CADR (CADDR D)))))
+                                      (LIST
+                                       (+ (CAADR D) (* 1/2 (CAADDR D)))
+                                       (ROUND
+                                        (+
+                                         (+ (CADADR D)
+                                          (* 1/2 (CADR (CADDR D))))
+                                         (SQRT
+                                          (ABS
+                                           (* 1/4
+                                            (- (EXPT (CAADDR D) 2)
+                                             (EXPT (CADR (CADDR D)) 2)))))))))))
+                                (LIST (- (CAR GLVAR161) (CAR PT))
+                                      (- (CADR GLVAR161) (CADR PT))))))
+                    (SQRT (+ (EXPT (CAR SELF) 2) (EXPT (CADR SELF) 2)))))
+               (* 2 (MAX (* 1/2 (CAADDR D)) (* 1/2 (CADR (CADDR D)))))))
        2)))
 (SETF (GET 'DRAW-ELLIPSE-SELECTEDP 'GLARGUMENTS)
       '((D DRAW-ELLIPSE) (P VECTOR) (OFF VECTOR)))
@@ -1408,7 +1458,7 @@
     (LIST 'DRAW-ELLIPSE
           (LIST (- (CAAR ELL) (CAADR ELL))
                 (- (CADAR ELL) (CADADR ELL)))
-          (LIST (* 2 (CAADR ELL)) (* 2 (CADADR ELL))) NIL 0)))
+          (LIST (* 2 (CAADR ELL)) (* 2 (CADADR ELL))) NIL 1)))
 (SETF (GET 'DRAW-ELLIPSE-GET 'GLARGUMENTS)
       '((DD DRAW-DESC) (W WINDOW)))
 (SETF (GET 'DRAW-ELLIPSE-GET 'GLFNRESULTTYPE) 'DRAW-ELLIPSE)
@@ -1419,9 +1469,11 @@
 (DEFUN DRAW-NULL-SELECTEDP (D PT OFF) NIL)
 
 (DEFUN DRAW-BUTTON-DRAW (D W OFF)
-  (WINDOW-DRAW-BOX W
-      (LIST (+ (CAR OFF) (CAADR D)) (+ (CADR OFF) (CADADR D)))
-      (COPY-LIST '(4 4))))
+  (LET ((GLVAR162
+            (LIST (+ (CAR OFF) (CAADR D)) (+ (CADR OFF) (CADADR D))))
+        (GLVAR163 (COPY-LIST '(4 4))))
+    (WINDOW-DRAW-BOX-XY W (CAR GLVAR162) (CADR GLVAR162) (CAR GLVAR163)
+        (CADR GLVAR163) NIL)))
 
 (DEFUN DRAW-BUTTON-SELECTEDP (D P OFF)
   (LET ((PTX (- (- (CAR P) (CAR OFF)) (CAADR D)))
@@ -1438,21 +1490,21 @@
     (SETQ VAR (READ))
     (SETQ CENT (DRAW-GET-CROSSHAIRS DD W))
     (LIST 'DRAW-BUTTON (LIST (+ -2 (CAR CENT)) (+ -2 (CADR CENT)))
-          (COPY-LIST '(4 4)) VAR 0)))
+          (COPY-LIST '(4 4)) VAR 1)))
 (SETF (GET 'DRAW-BUTTON-GET 'GLARGUMENTS) '((DD DRAW-DESC) (W WINDOW)))
 (SETF (GET 'DRAW-BUTTON-GET 'GLFNRESULTTYPE) 'DRAW-BUTTON)
 
 
 (DEFUN DRAW-ERASE-DRAW (D W OFF)
-  (WINDOW-ERASE-AREA W
-      (LIST (+ (CAR OFF) (CAADR D)) (+ (CADR OFF) (CADADR D)))
-      (CADDR D)))
+  (LET ((GLVAR164
+            (LIST (+ (CAR OFF) (CAADR D)) (+ (CADR OFF) (CADADR D)))))
+    (WINDOW-ERASE-AREA-XY W (CAR GLVAR164) (CADR GLVAR164) (CAADDR D)
+        (CADR (CADDR D)))))
 
 (DEFUN DRAW-ERASE-SELECTEDP (D P OFF)
   (LET ((PT (LIST (- (CAR P) (CAR OFF)) (- (CADR P) (CADR OFF)))))
-    (AND (>= (CAR PT) (CAADR D)) (<= (CAR PT) (+ (CAADR D) (CAADDR D)))
-         (>= (CADR PT) (CADADR D))
-         (<= (CADR PT) (+ (CADADR D) (CADR (CADDR D)))))))
+    (AND (BETWEEN (CAR PT) (CAADR D) (+ (CAADR D) (CAADDR D)))
+         (BETWEEN (CADR PT) (CADADR D) (+ (CADADR D) (CADR (CADDR D)))))))
 (SETF (GET 'DRAW-ERASE-SELECTEDP 'GLARGUMENTS)
       '((D DRAW-BOX) (P VECTOR) (OFF VECTOR)))
 (SETF (GET 'DRAW-ERASE-SELECTEDP 'GLFNRESULTTYPE) 'BOOLEAN)
@@ -1461,7 +1513,7 @@
 (DEFUN DRAW-ERASE-GET (DD W)
   (LET (BOX)
     (SETQ BOX (WINDOW-GET-REGION W))
-    (LIST 'DRAW-ERASE (CAR BOX) (CADR BOX) NIL 0)))
+    (LIST 'DRAW-ERASE (CAR BOX) (CADR BOX) NIL 1)))
 (SETF (GET 'DRAW-ERASE-GET 'GLARGUMENTS) '((DD DRAW-DESC) (W WINDOW)))
 (SETF (GET 'DRAW-ERASE-GET 'GLFNRESULTTYPE) 'DRAW-ERASE)
 
@@ -1474,7 +1526,7 @@
   (LET (CENT)
     (SETQ CENT (DRAW-GET-CROSSHAIRS DD W))
     (LIST 'DRAW-DOT (LIST (+ -2 (CAR CENT)) (+ -2 (CADR CENT)))
-          (COPY-LIST '(4 4)) NIL 0)))
+          (COPY-LIST '(4 4)) NIL 1)))
 (SETF (GET 'DRAW-DOT-GET 'GLARGUMENTS) '((DD DRAW-DESC) (W WINDOW)))
 (SETF (GET 'DRAW-DOT-GET 'GLFNRESULTTYPE) 'DRAW-DOT)
 
@@ -1495,12 +1547,30 @@
 (DEFUN DRAW-REFPT-GET (DD W)
   (LET (CENT REFPT)
     (WHEN (SETQ REFPT (ASSOC 'DRAW-REFPT (CADDR DD)))
-      (WINDOW-SET-ERASE *DRAW-WINDOW*)
+      (LET ((GC (CADDR *DRAW-WINDOW*)))
+        (SETQ *WINDOW-SAVE-FUNCTION*
+              (PROGN
+                (XGETGCVALUES *WINDOW-DISPLAY* (CADDR *DRAW-WINDOW*) 1
+                    *GC-VALUES*)
+                (XGCVALUES-FUNCTION *GC-VALUES*)))
+        (XSETFUNCTION *WINDOW-DISPLAY* GC 3)
+        (SETQ *WINDOW-SAVE-FOREGROUND*
+              (PROGN
+                (XGETGCVALUES *WINDOW-DISPLAY* (CADDR *DRAW-WINDOW*) 4
+                    *GC-VALUES*)
+                (XGCVALUES-FOREGROUND *GC-VALUES*)))
+        (XSETFOREGROUND *WINDOW-DISPLAY* GC
+            (PROGN
+              (XGETGCVALUES *WINDOW-DISPLAY* (CADDR *DRAW-WINDOW*) 8
+                  *GC-VALUES*)
+              (XGCVALUES-BACKGROUND *GC-VALUES*))))
       (DRAW-OBJECT-DRAW REFPT *DRAW-WINDOW* (COPY-LIST '(0 0)))
-      (WINDOW-UNSET *DRAW-WINDOW*)
+      (LET ((GC (CADDR *DRAW-WINDOW*)))
+        (XSETFUNCTION *WINDOW-DISPLAY* GC *WINDOW-SAVE-FUNCTION*)
+        (XSETFOREGROUND *WINDOW-DISPLAY* GC *WINDOW-SAVE-FOREGROUND*))
       (SETF (CADDR DD) (REMOVE REFPT (CADDR DD))))
     (SETQ CENT (DRAW-GET-CROSSHAIRS DD W))
-    (LIST 'DRAW-REFPT CENT (COPY-LIST '(0 0)) NIL 0)))
+    (LIST 'DRAW-REFPT CENT (COPY-LIST '(0 0)) NIL 1)))
 (SETF (GET 'DRAW-REFPT-GET 'GLARGUMENTS) '((DD DRAW-DESC) (W WINDOW)))
 (SETF (GET 'DRAW-REFPT-GET 'GLFNRESULTTYPE) 'DRAW-REFPT)
 
@@ -1514,8 +1584,15 @@
 
 
 (DEFUN DRAW-TEXT-DRAW (D W OFF)
-  (WINDOW-PRINTAT-XY W (CADDDR D) (+ (CAR OFF) (CAADR D))
-      (+ (CADR OFF) (CADADR D))))
+  (LET ((SSTR (STRINGIFY (CADDDR D))))
+    (XDRAWIMAGESTRING *WINDOW-DISPLAY* (CADR W) (CADDR W)
+        (+ (CAR OFF) (CAADR D))
+        (- (CADDDR W) (+ (CADR OFF) (CADADR D))) (GET-C-STRING SSTR)
+        (LENGTH SSTR))))
+
+(DEFUN DRAW-TEXT-DRAW-OUTLINE (W X Y D)
+  (SETF (SECOND D) (LIST X Y))
+  (WINDOW-DRAW-BOX-XY W X (+ 2 Y) (CAADDR D) (CADR (CADDR D))))
 
 (DEFUN DRAW-TEXT-DRAW-OUTLINE (W X Y D)
   (SETF (SECOND D) (LIST X Y))
@@ -1523,15 +1600,15 @@
 
 (DEFUN DRAW-TEXT-SELECTEDP (D PT OFF)
   (LET ((PTP (LIST (- (CAR PT) (CAR OFF)) (- (CADR PT) (CADR OFF)))))
-    (AND (>= (CAR PTP) (+ -2 (+ (CAADR D) (MIN 0 (CAADDR D)))))
-         (<= (CAR PTP)
-             (+ 2
-                (+ (+ (CAADR D) (MIN 0 (CAADDR D))) (ABS (CAADDR D)))))
-         (>= (CADR PTP) (+ -2 (+ (CADADR D) (MIN 0 (CADR (CADDR D))))))
-         (<= (CADR PTP)
-             (+ 2
-                (+ (+ (CADADR D) (MIN 0 (CADR (CADDR D))))
-                   (ABS (CADR (CADDR D)))))))))
+    (AND (BETWEEN (CAR PTP) (+ -2 (+ (CAADR D) (MIN 0 (CAADDR D))))
+                  (+ 2
+                     (+ (+ (CAADR D) (MIN 0 (CAADDR D)))
+                        (ABS (CAADDR D)))))
+         (BETWEEN (CADR PTP)
+                  (+ -2 (+ (CADADR D) (MIN 0 (CADR (CADDR D)))))
+                  (+ 2
+                     (+ (+ (CADADR D) (MIN 0 (CADR (CADDR D))))
+                        (ABS (CADR (CADDR D)))))))))
 (SETF (GET 'DRAW-TEXT-SELECTEDP 'GLARGUMENTS)
       '((D DRAW-TEXT) (PT VECTOR) (OFF VECTOR)))
 (SETF (GET 'DRAW-TEXT-SELECTEDP 'GLFNRESULTTYPE) 'BOOLEAN)
@@ -1541,13 +1618,15 @@
   (LET (TXT LNG OFF)
     (PRINC "Enter text string: ")
     (SETQ TXT (STRINGIFY (READ)))
-    (SETQ LNG (WINDOW-STRING-WIDTH W TXT))
+    (SETQ LNG
+          (LET ((SSTR (STRINGIFY TXT)))
+            (XTEXTWIDTH (SEVENTH W) (GET-C-STRING SSTR) (LENGTH SSTR))))
     (SETQ OFF (WINDOW-GET-BOX-POSITION W LNG 14))
     (LIST 'DRAW-TEXT
-          (LET ((GLVAR29986 (COPY-LIST '(0 4))))
-            (LIST (+ (CAR OFF) (CAR GLVAR29986))
-                  (+ (CADR OFF) (CADR GLVAR29986))))
-          (LIST LNG 14) TXT 0)))
+          (LET ((GLVAR167 (COPY-LIST '(0 4))))
+            (LIST (+ (CAR OFF) (CAR GLVAR167))
+                  (+ (CADR OFF) (CADR GLVAR167))))
+          (LIST LNG 14) TXT 1)))
 (SETF (GET 'DRAW-TEXT-GET 'GLARGUMENTS) '((DD DRAW-DESC) (W WINDOW)))
 (SETF (GET 'DRAW-TEXT-GET 'GLFNRESULTTYPE) 'DRAW-TEXT)
 
@@ -1591,46 +1670,46 @@
         (DRAW-SNAPP P OFF (+ XOFF XSIZE) (+ YOFF YSIZE))
         (DRAW-SNAPP P OFF (+ XOFF XSIZE) YOFF)
         (DRAW-SNAPP P OFF XOFF (+ YOFF YSIZE))
-        (DRAW-SNAPP P OFF (+ XOFF (/ XSIZE 2)) YOFF)
-        (DRAW-SNAPP P OFF XOFF (+ YOFF (/ YSIZE 2)))
-        (DRAW-SNAPP P OFF (+ XOFF (/ XSIZE 2)) (+ YOFF YSIZE))
-        (DRAW-SNAPP P OFF (+ XOFF XSIZE) (+ YOFF (/ YSIZE 2))))))
+        (DRAW-SNAPP P OFF (+ XOFF (* 1/2 XSIZE)) YOFF)
+        (DRAW-SNAPP P OFF XOFF (+ YOFF (* 1/2 YSIZE)))
+        (DRAW-SNAPP P OFF (+ XOFF (* 1/2 XSIZE)) (+ YOFF YSIZE))
+        (DRAW-SNAPP P OFF (+ XOFF XSIZE) (+ YOFF (* 1/2 YSIZE))))))
 (SETF (GET 'DRAW-BOX-SNAP 'GLARGUMENTS)
       '((D DRAW-BOX) (P VECTOR) (OFF VECTOR)))
 (SETF (GET 'DRAW-BOX-SNAP 'GLFNRESULTTYPE) 'VECTOR)
 
 
 (DEFUN DRAW-CIRCLE-SNAP (D P OFF)
-  (OR (DRAW-SNAPP P OFF (+ (CAADR D) (/ (CAADDR D) 2))
-          (+ (CADADR D) (/ (CAADDR D) 2)))
-      (DRAW-SNAPP P OFF (+ (CAADR D) (/ (CAADDR D) 2)) (CADADR D))
-      (DRAW-SNAPP P OFF (CAADR D) (+ (CADADR D) (/ (CAADDR D) 2)))
-      (DRAW-SNAPP P OFF (+ (CAADR D) (/ (CAADDR D) 2))
+  (OR (DRAW-SNAPP P OFF (+ (CAADR D) (* 1/2 (CAADDR D)))
+          (+ (CADADR D) (* 1/2 (CAADDR D))))
+      (DRAW-SNAPP P OFF (+ (CAADR D) (* 1/2 (CAADDR D))) (CADADR D))
+      (DRAW-SNAPP P OFF (CAADR D) (+ (CADADR D) (* 1/2 (CAADDR D))))
+      (DRAW-SNAPP P OFF (+ (CAADR D) (* 1/2 (CAADDR D)))
           (+ (CADADR D) (CADR (CADDR D))))
       (DRAW-SNAPP P OFF (+ (CAADR D) (CAADDR D))
-          (+ (CADADR D) (/ (CAADDR D) 2)))))
+          (+ (CADADR D) (* 1/2 (CAADDR D))))))
 (SETF (GET 'DRAW-CIRCLE-SNAP 'GLARGUMENTS)
       '((D DRAW-CIRCLE) (P VECTOR) (OFF VECTOR)))
 (SETF (GET 'DRAW-CIRCLE-SNAP 'GLFNRESULTTYPE) 'VECTOR)
 
 
 (DEFUN DRAW-ELLIPSE-SNAP (D P OFF)
-  (OR (DRAW-SNAPP P OFF (+ (CAADR D) (/ (CAADDR D) 2))
-          (+ (CADADR D) (/ (CADR (CADDR D)) 2)))
-      (DRAW-SNAPP P OFF (+ (CAADR D) (/ (CAADDR D) 2)) (CADADR D))
+  (OR (DRAW-SNAPP P OFF (+ (CAADR D) (* 1/2 (CAADDR D)))
+          (+ (CADADR D) (* 1/2 (CADR (CADDR D)))))
+      (DRAW-SNAPP P OFF (+ (CAADR D) (* 1/2 (CAADDR D))) (CADADR D))
       (DRAW-SNAPP P OFF (CAADR D)
-          (+ (CADADR D) (/ (CADR (CADDR D)) 2)))
-      (DRAW-SNAPP P OFF (+ (CAADR D) (/ (CAADDR D) 2))
+          (+ (CADADR D) (* 1/2 (CADR (CADDR D)))))
+      (DRAW-SNAPP P OFF (+ (CAADR D) (* 1/2 (CAADDR D)))
           (+ (CADADR D) (CADR (CADDR D))))
       (DRAW-SNAPP P OFF (+ (CAADR D) (CAADDR D))
-          (+ (CADADR D) (/ (CADR (CADDR D)) 2)))))
+          (+ (CADADR D) (* 1/2 (CADR (CADDR D)))))))
 (SETF (GET 'DRAW-ELLIPSE-SNAP 'GLARGUMENTS)
       '((D DRAW-ELLIPSE) (P VECTOR) (OFF VECTOR)))
 (SETF (GET 'DRAW-ELLIPSE-SNAP 'GLFNRESULTTYPE) 'VECTOR)
 
 
 (DEFUN DRAW-RCBOX-SNAP (D P OFF)
-  (LET ((RX (/ (CAADDR D) 2)) (RY (/ (CADR (CADDR D)) 2)))
+  (LET ((RX (* 1/2 (CAADDR D))) (RY (* 1/2 (CADR (CADDR D)))))
     (OR (DRAW-SNAPP P OFF (+ (CAADR D) RX) (CADADR D))
         (DRAW-SNAPP P OFF (CAADR D) (+ (CADADR D) RY))
         (DRAW-SNAPP P OFF (+ (CAADR D) RX)

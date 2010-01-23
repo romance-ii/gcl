@@ -1,4 +1,4 @@
-; 27 Jan 2006 14:33:25 CST
+; 07 Jan 2010 16:46:11 EST
 
 ; menu-settrans.lsp  -- translation of menu-set.lsp       Gordon S. Novak Jr.
 
@@ -39,7 +39,7 @@
          (ADD-ITEM MENU-SET-ADD-ITEM) (FIND-ITEM MENU-SET-FIND-ITEM)
          (DELETE-ITEM MENU-SET-DELETE-ITEM)
          (REMOVE-ITEMS MENU-SET-REMOVE-ITEMS)
-         (ITEM-POSITION MENU-SET-ITEM-POSITION)
+         (ITEM-POSITION MENU-SET-ITEM-POSITION) (ITEMP MENU-SET-ITEMP)
          (ADJUST MENU-SET-ADJUST) (MOVE MENU-SET-MOVE)
          (DRAW-CONN MENU-SET-DRAW-CONN))))
 (SETF (GET 'MENU-SET-ITEM 'GLSTRUCTURE)
@@ -79,7 +79,7 @@
 
 (DEFUN MENU-SET-CREATE (W &OPTIONAL FN) (LIST 'MENU-SET W NIL FN))
 (SETF (GET 'MENU-SET-CREATE 'GLARGUMENTS)
-      '((W WINDOW) (&OPTIONAL NIL) (FN NIL)))
+      '((W WINDOW) (&OPTIONAL NIL)))
 (SETF (GET 'MENU-SET-CREATE 'GLFNRESULTTYPE) 'MENU-SET)
 
 
@@ -92,20 +92,18 @@
                      #'(LAMBDA (X Y CODE)
                          (OR (AND (PLUSP CODE) (SETQ LASTX X)
                                   (SETQ LASTY Y) CODE)
-                             (SOME #'(LAMBDA (GLVAR19345)
+                             (SOME #'(LAMBDA (GLVAR237)
                                        (IF
                                         (AND
-                                         (>= X
-                                          (FIFTH (CADDR GLVAR19345)))
-                                         (<= X
-                                          (+ (FIFTH (CADDR GLVAR19345))
-                                           (SEVENTH (CADDR GLVAR19345))))
-                                         (>= Y
-                                          (SIXTH (CADDR GLVAR19345)))
-                                         (<= Y
-                                          (+ (SIXTH (CADDR GLVAR19345))
-                                           (EIGHTH (CADDR GLVAR19345)))))
-                                        GLVAR19345))
+                                         (BETWEEN X
+                                          (FIFTH (CADDR GLVAR237))
+                                          (+ (FIFTH (CADDR GLVAR237))
+                                           (SEVENTH (CADDR GLVAR237))))
+                                         (BETWEEN Y
+                                          (SIXTH (CADDR GLVAR237))
+                                          (+ (SIXTH (CADDR GLVAR237))
+                                           (EIGHTH (CADDR GLVAR237)))))
+                                        GLVAR237))
                                    (CADDR MS))))))
            (IF (NUMBERP ITM)
                (SETQ RESB (LIST (LIST LASTX LASTY) 'BACKGROUND ITM))
@@ -117,11 +115,10 @@
                               (NOT (ZEROP *WINDOW-MENU-CODE*)))
                          (SETQ RES
                                (LIST NIL (CAR ITM) *WINDOW-MENU-CODE*)))))))
-    (WINDOW-FORCE-OUTPUT (CADR MS))
+    (XFLUSH *WINDOW-DISPLAY*)
     (OR RES RESB)))
 (SETF (GET 'MENU-SET-SELECT 'GLARGUMENTS)
-      '((MS MENU-SET) (&OPTIONAL NIL) (REDRAW BOOLEAN)
-        (ENABLED (LISTOF SYMBOL))))
+      '((MS MENU-SET) (&OPTIONAL BOOLEAN) (REDRAW (LISTOF SYMBOL))))
 (SETF (GET 'MENU-SET-SELECT 'GLFNRESULTTYPE) 'MENU-SELECTION)
 
 
@@ -140,7 +137,7 @@
     (MENU-SET-ADD-ITEM MS NAME SYM MENU)))
 (SETF (GET 'MENU-SET-ADD-MENU 'GLARGUMENTS)
       '((MS MENU-SET) (NAME SYMBOL) (SYM SYMBOL) (TITLE STRING)
-        (ITEMS NIL) (&OPTIONAL NIL) (OFFSET VECTOR)))
+        (ITEMS NIL) (&OPTIONAL VECTOR)))
 (SETF (GET 'MENU-SET-ADD-MENU 'GLFNRESULTTYPE) '(LISTOF MENU-SET-ITEM))
 
 
@@ -175,8 +172,7 @@
     (MENU-SET-ADD-ITEM MS NAME SYM MENU)))
 (SETF (GET 'MENU-SET-ADD-PICMENU 'GLARGUMENTS)
       '((MS MENU-SET) (NAME SYMBOL) (SYM SYMBOL) (TITLE STRING)
-        (SPEC PICMENU-SPEC) (&OPTIONAL NIL) (OFFSET VECTOR)
-        (NOBOX BOOLEAN)))
+        (SPEC PICMENU-SPEC) (&OPTIONAL VECTOR) (OFFSET BOOLEAN)))
 (SETF (GET 'MENU-SET-ADD-PICMENU 'GLFNRESULTTYPE)
       '(LISTOF MENU-SET-ITEM))
 
@@ -184,7 +180,7 @@
 (DEFUN MENU-SET-ADD-COMPONENT (MS NAME &OPTIONAL OFFSET)
   (MENU-SET-ADD-PICMENU MS (MENU-SET-NAME NAME) NAME NIL NAME OFFSET T))
 (SETF (GET 'MENU-SET-ADD-COMPONENT 'GLARGUMENTS)
-      '((MS MENU-SET) (NAME SYMBOL) (&OPTIONAL NIL) (OFFSET VECTOR)))
+      '((MS MENU-SET) (NAME SYMBOL) (&OPTIONAL VECTOR)))
 (SETF (GET 'MENU-SET-ADD-COMPONENT 'GLFNRESULTTYPE)
       '(LISTOF MENU-SET-ITEM))
 
@@ -200,7 +196,7 @@
   (MENU-SET-ADD-ITEM MS NAME SYM MENU))
 (SETF (GET 'MENU-SET-ADD-BARMENU 'GLARGUMENTS)
       '((MS MENU-SET) (NAME SYMBOL) (SYM SYMBOL) (MENU BARMENU)
-        (TITLE STRING) (&OPTIONAL NIL) (OFFSET VECTOR)))
+        (TITLE STRING) (&OPTIONAL VECTOR)))
 (SETF (GET 'MENU-SET-ADD-BARMENU 'GLFNRESULTTYPE)
       '(LISTOF MENU-SET-ITEM))
 
@@ -224,6 +220,20 @@
 (SETF (GET 'MENU-SET-NAMED-MENU 'GLFNRESULTTYPE) 'MENU-SET-MENU)
 
 
+(DEFUN MENU-SET-ITEMP (MS NAME ITEMNAME)
+  (LET ((THISMENU (MENU-SET-NAMED-MENU MS NAME)))
+    (IF (EQ (FIRST THISMENU) 'MENU)
+        (SOME #'(LAMBDA (X)
+                  (OR (EQ X ITEMNAME)
+                      (AND (CONSP X) (EQ (CAR X) ITEMNAME))))
+              (NTH 13 THISMENU))
+        (IF (EQ (FIRST THISMENU) 'PICMENU)
+            (ASSOC ITEMNAME (CADDDR (NTH 10 THISMENU)))))))
+(SETF (GET 'MENU-SET-ITEMP 'GLARGUMENTS)
+      '((MS MENU-SET) (NAME SYMBOL) (ITEMNAME SYMBOL)))
+(SETF (GET 'MENU-SET-ITEMP 'GLFNRESULTTYPE) 'BOOLEAN)
+
+
 (DEFUN MENU-CONNS-NAMED-ITEM (MC NAME)
   (MENU-SET-NAMED-ITEM (CADR MC) NAME))
 (SETF (GET 'MENU-CONNS-NAMED-ITEM 'GLARGUMENTS)
@@ -241,20 +251,18 @@
 (DEFUN MENU-SET-FIND-ITEM (MS POS)
   (LET (MITEM)
     (DOLIST (MI (CADDR MS))
-      (IF (AND (>= (CAR POS)
-                   (LET ((SELF (CADDR MI)))
-                     (IF (CADDR SELF) (FIFTH SELF) 0)))
-               (<= (CAR POS)
-                   (+ (LET ((SELF (CADDR MI)))
-                        (IF (CADDR SELF) (FIFTH SELF) 0))
-                      (SEVENTH (CADDR MI))))
-               (>= (CADR POS)
-                   (LET ((SELF (CADDR MI)))
-                     (IF (CADDR SELF) (SIXTH SELF) 0)))
-               (<= (CADR POS)
-                   (+ (LET ((SELF (CADDR MI)))
-                        (IF (CADDR SELF) (SIXTH SELF) 0))
-                      (EIGHTH (CADDR MI)))))
+      (IF (AND (BETWEEN (CAR POS)
+                        (LET ((SELF (CADDR MI)))
+                          (IF (CADDR SELF) (FIFTH SELF) 0))
+                        (+ (LET ((SELF (CADDR MI)))
+                             (IF (CADDR SELF) (FIFTH SELF) 0))
+                           (SEVENTH (CADDR MI))))
+               (BETWEEN (CADR POS)
+                        (LET ((SELF (CADDR MI)))
+                          (IF (CADDR SELF) (SIXTH SELF) 0))
+                        (+ (LET ((SELF (CADDR MI)))
+                             (IF (CADDR SELF) (SIXTH SELF) 0))
+                           (EIGHTH (CADDR MI)))))
           (SETQ MITEM MI)))
     MITEM))
 (SETF (GET 'MENU-SET-FIND-ITEM 'GLARGUMENTS)
@@ -301,7 +309,9 @@
     (T (GLSEND M ITEM-POSITION NAME LOC))))
 
 (DEFUN MENU-SET-DRAW (MS)
-  (WINDOW-OPEN (CADR MS))
+  (XMAPWINDOW *WINDOW-DISPLAY* (CADADR MS))
+  (XFLUSH *WINDOW-DISPLAY*)
+  (WINDOW-WAIT-EXPOSURE (CADR MS))
   (DOLIST (ITEM (CADDR MS)) (MENU-MDRAW (CADDR ITEM))))
 
 (DEFUN MENU-SET-ITEM-POSITION (MS DESC &OPTIONAL LOC)
@@ -310,7 +320,7 @@
     (OR (MENU-MITEM-POSITION M (CAR DESC) LOC)
         (MENU-MITEM-POSITION M NIL LOC))))
 (SETF (GET 'MENU-SET-ITEM-POSITION 'GLARGUMENTS)
-      '((MS MENU-SET) (DESC MENU-PORT) (&OPTIONAL NIL) (LOC SYMBOL)))
+      '((MS MENU-SET) (DESC MENU-PORT) (&OPTIONAL SYMBOL)))
 (SETF (GET 'MENU-SET-ITEM-POSITION 'GLFNRESULTTYPE) 'VECTOR)
 
 
@@ -324,10 +334,11 @@
       (SETQ DESCB TMP))
     (SETQ PA (MENU-SET-ITEM-POSITION MS DESCA 'RIGHT))
     (SETQ PB (MENU-SET-ITEM-POSITION MS DESCB 'LEFT))
-    (WINDOW-DRAW-CIRCLE (CADR MS) PA 3)
-    (WINDOW-DRAW-LINE (CADR MS) PA PB)
-    (WINDOW-DRAW-CIRCLE (CADR MS) PB 3)
-    (WINDOW-FORCE-OUTPUT (CADR MS))))
+    (WINDOW-DRAW-CIRCLE-XY (CADR MS) (CAR PA) (CADR PA) 3 NIL)
+    (WINDOW-DRAW-LINE-XY (CADR MS) (CAR PA) (CADR PA) (CAR PB)
+        (CADR PB) NIL)
+    (WINDOW-DRAW-CIRCLE-XY (CADR MS) (CAR PB) (CADR PB) 3 NIL)
+    (XFLUSH *WINDOW-DISPLAY*)))
 
 (DEFUN MENU-SET-ADJUST (MS NAME EDGE FROM OFFSET)
   (LET (M FROMM PLACE)
@@ -361,6 +372,17 @@
 (SETF (GET 'MENU-SET-ADJUST 'GLFNRESULTTYPE) 'INTEGER)
 
 
+(DEFUN VECTOR-SNAP (FIXED APPROX &OPTIONAL TOLERANCE)
+  (OR TOLERANCE (SETQ TOLERANCE 10))
+  (IF (< (ABS (- (CAR FIXED) (CAR APPROX))) TOLERANCE)
+      (LIST (CAR FIXED) (CADR APPROX))
+      (IF (< (ABS (- (CADR FIXED) (CADR APPROX))) TOLERANCE)
+          (LIST (CAR APPROX) (CADR FIXED)) APPROX)))
+(SETF (GET 'VECTOR-SNAP 'GLARGUMENTS)
+      '((FIXED VECTOR) (APPROX VECTOR) (&OPTIONAL NIL)))
+(SETF (GET 'VECTOR-SNAP 'GLFNRESULTTYPE) 'VECTOR)
+
+
 (DEFUN MENU-CONNS-CREATE (MS) (LIST 'MENU-CONNS MS NIL))
 (SETF (GET 'MENU-CONNS-CREATE 'GLARGUMENTS) '((MS MENU-SET)))
 (SETF (GET 'MENU-CONNS-CREATE 'GLFNRESULTTYPE) 'MENU-CONNS)
@@ -372,11 +394,13 @@
 
 (DEFUN MENU-CONNS-MOVE (MC)
   (MENU-SET-MOVE (CADR MC))
-  (WINDOW-CLEAR (CADADR MC))
+  (XCLEARWINDOW *WINDOW-DISPLAY* (CADR (CADADR MC)))
+  (XFLUSH *WINDOW-DISPLAY*)
   (MENU-CONNS-DRAW MC))
 
 (DEFUN MENU-CONNS-REDRAW (MC)
-  (WINDOW-CLEAR (CADADR MC))
+  (XCLEARWINDOW *WINDOW-DISPLAY* (CADR (CADADR MC)))
+  (XFLUSH *WINDOW-DISPLAY*)
   (MENU-CONNS-DRAW MC))
 
 (DEFUN MENU-CONNS-ADD-CONN (MC)

@@ -594,16 +594,6 @@ IconPositionHint IconMaskHint WindowGroupHint))
 
 
 
-(defentry XPolygonRegion(
-
-    fixnum 	;; points 
-    fixnum			;; n 
-    fixnum			;; fill_rule 
-
-)( fixnum "XPolygonRegion"))
-
-
-
 (defentry XRectInRegion(
 
     fixnum		;; r 

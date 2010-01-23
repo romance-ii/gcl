@@ -1,8 +1,8 @@
-; editors.lsp               Gordon S. Novak Jr.         ; 26 Jan 06
+; editors.lsp               Gordon S. Novak Jr.         ; 08 Dec 08
 
-; Copyright (c) 2006 Gordon S. Novak Jr. and The University of Texas at Austin.
+; Copyright (c) 2008 Gordon S. Novak Jr. and The University of Texas at Austin.
 
-; 13 Apr 95; 02 Jan 97; 28 Feb 02; 08 Jan 04; 03 Mar 04
+; 13 Apr 95; 02 Jan 97; 28 Feb 02; 08 Jan 04; 03 Mar 04; 26 Jan 06; 27 Jan 06
 
 ; This program is free software; you can redistribute it and/or modify
 ; it under the terms of the GNU General Public License as published by
@@ -379,10 +379,13 @@
 (glispglobals (*edit-color-menu-set* menu-set)
 	      (*edit-color-rmenu* barmenu))
 
-; 03 Jan 94; 04 Jan 94; 05 Jan 94
+; 03 Jan 94; 04 Jan 94; 05 Jan 94; 08 Dec 08
 (gldefun edit-color-init ((w window))
   (let (rm gm bm rgb)
     (rgb = (a rgb))
+    (glcc 'edit-color-red)
+    (glcc 'edit-color-green)
+    (glcc 'edit-color-blue)
     (*edit-color-menu-set* = (menu-set-create w nil))
     (rm = (barmenu-create 256 200 10 "" nil #'edit-color-red (list rgb) w
 			    120 40 nil t (a rgb with red = 65535)))
@@ -446,6 +449,18 @@
       (done = (and sel ((first sel) == 'done))) )
     color))
 
+; 08 Dec 08
+(gldefun color-dot ((w window) (x integer) (y integer) (color symbol))
+  (let (rgb)
+    (setq rgb (cdr (assoc color '((red 65535 0 0)
+                                  (yellow 65535 57600 0)
+                                  (green 0 50175 12287)
+                                  (blue 0 0 65535)))))
+    (or rgb (setq rgb '(30000 30000 30000)))
+    (set-color w rgb)
+    (draw-dot-xy w x y)
+    (reset-color w) ))
+
 ; 15 Oct 93; 26 Jan 06
 ; Compile the editors.lsp file into a plain Lisp file
 (defun compile-editors ()
@@ -456,3 +471,13 @@
 	       "glisp/editorstrans.lsp"         ; output file
 	       "glisp/gpl.txt")      ; header file
   (cf editorstrans) )
+
+; Compile the editors.lsp file into a plain Lisp file for XGCL
+(defun compile-editorsb ()
+  (glcompfiles *directory*
+	       '("glisp/vector.lsp"          ; auxiliary files
+                 "X/dwindow.lsp" "X/dwnoopen.lsp")
+	       '("glisp/editors.lsp")        ; translated files
+	       "glisp/editorstrans.lsp"         ; output file
+	       "glisp/gpl.txt")      ; header file
+  )

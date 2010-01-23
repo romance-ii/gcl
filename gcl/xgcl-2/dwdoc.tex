@@ -1,5 +1,5 @@
 % dwdoc.tex          Gordon S. Novak Jr.
-% 08 Oct 92; 08 Oct 93; 16 Nov 94; 05 Jan 95; 25 Jan 06; 26 Jan 06
+% 08 Oct 92; 08 Oct 93; 16 Nov 94; 05 Jan 95; 25 Jan 06; 26 Jan 06; 08 Dec 08
 
 \documentstyle[12pt]{article}
 \setlength{\oddsidemargin}{0 in}
@@ -552,10 +552,14 @@ The color of the foreground (things that are drawn, such as lines or
 characters) is set by:
 
 {\tt \hspace*{0.5in} (window-set-color w rgb \&optional background)} \\
+{\tt \hspace*{0.5in} (window-set-color-rgb w r g b \&optional background)} \\
 
 {\tt rgb} is a list {\tt (red green blue)} of 16-bit unsigned integers in
 the range {\tt 0} to {\tt 65535}.  {\tt background} is non-{\tt nil}
 to set the background color rather than the foreground color.
+
+{\tt \hspace*{0.5in} (window-reset-color w)} \\
+{\tt window-reset-color} resets a window's colors to the default values.
 
 Colors are a scarce resource; there is only a finite number of
 available colors, such as 256 colors.  If you only use a small, fixed set

@@ -1,5 +1,3 @@
-
-
 #define MAYBE_DATA_P(pp) ((char *)(pp)>= (char *) DBEGIN)
 
 #ifndef DBEGIN

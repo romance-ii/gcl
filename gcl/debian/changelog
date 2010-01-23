@@ -6,8 +6,9 @@ gclcvs (2.7.0-97) unstable; urgency=low
   * strict aliasing fixes
   * new config.guess config.sub
   * if cmpinclude.h is not available, use *cmpinclude-string* in compiler-pass2
+  * SGC fix, debian override fix, xgcl update
 
- -- Camm Maguire <camm@debian.org>  Wed, 20 Jan 2010 19:07:14 +0000
+ -- Camm Maguire <camm@debian.org>  Sat, 23 Jan 2010 00:50:24 +0000
 
 gclcvs (2.7.0-96) unstable; urgency=low
 

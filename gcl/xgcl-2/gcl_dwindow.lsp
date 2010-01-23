@@ -1,11 +1,12 @@
-; dwindow.lsp           Gordon S. Novak Jr.           ; 08 Sep 06
+; dwindow.lsp           Gordon S. Novak Jr.           ; 13 Jan 10
 
 ; Window types and interface functions for using X windows from GNU Common Lisp
 
-; Copyright (c) 2006 Gordon S. Novak Jr. and The University of Texas at Austin.
+; Copyright (c) 2010 Gordon S. Novak Jr. and The University of Texas at Austin.
 
 ; 08 Jan 97; 17 May 02; 17 May 04; 18 May 04; 01 Jun 04; 18 Aug 04; 21 Jan 06
-; 24 Jan 06; 24 Jun 06; 25 Jun 06; 17 Jul 06; 23 Aug 06
+; 24 Jan 06; 24 Jun 06; 25 Jun 06; 17 Jul 06; 23 Aug 06; 08 Sep 06; 21 May 09
+; 28 Aug 09; 31 Aug 09; 28 Oct 09; 07 Nov 09; 12 Jan 10
 
 ; See the files gnu.license and dec.copyright .
 
@@ -143,7 +144,6 @@
 		  (permanent       boolean)
 		  (menu-font       symbol)
 		  (item-width      integer)
-		  (item-height     integer)
 		  (items           (listof symbol)) )
   prop ((menuw         (menu-window or (menu-init self)) result window)
 	(title-present (title and ((length title) > 0)))
@@ -158,7 +158,7 @@
 	(vsize         ((virtual vector with x = picture-width
 				             y = picture-height)))  )
   msg  ((init          menu-init)
-	(init?         ((menu-window and (item-height > 0)) or (init self)))
+	(init?         ((menu-window and (picture-height > 0)) or (init self)))
 	(contains?     (glambda (m p) (contains? (region m) p)))
 	(create        menu-create result menu)
 	(clear         menu-clear)
@@ -169,6 +169,7 @@
 	(destroy       menu-destroy)
 	(moveto-xy     menu-moveto-xy)
 	(reposition    menu-reposition)
+	(reposition-line    menu-reposition-line)
 	(box-item      menu-box-item)
 	(unbox-item    menu-box-item)      ; same since it uses xor
         (display-item  menu-display-item)
@@ -194,7 +195,9 @@
 		     (permanent       boolean)
 		     (spec (transparent picmenu-spec))
 		     (boxflg          boolean)
-		     (deleted-buttons (listof symbol)) )
+		     (deleted-buttons (listof symbol))
+                     (button-colors   (listof (list (name symbol) (color rgb))))
+                     )
   prop ((menuw          (menu-window or (picmenu-init self)) result window) )
   msg  ((init                picmenu-init)
 	(init?         ((menu-window and (picture-height > 0)) or (init self)))
@@ -202,6 +205,8 @@
 	(select              picmenu-select)
 	(draw                picmenu-draw)
 	(draw-button         picmenu-draw-button)
+	(draw-named-button   picmenu-draw-named-button)
+        (set-named-button-color picmenu-set-named-button-color)
 	(delete-named-button picmenu-delete-named-button)
 	(box-item            picmenu-box-item)
 	(unbox-item          picmenu-unbox-item)
@@ -375,6 +380,7 @@ msg     ((force-output       window-force-output     open t)
 	 (draw-box-xy        window-draw-box-xy)
 	 (draw-box-corners   window-draw-box-corners open t)
 	 (draw-rcbox-xy      window-draw-rcbox-xy)
+         (draw-box-line-xy   window-draw-box-line-xy)
 	 (xor-box-xy         window-xor-box-xy       open t)
 	 (draw-circle        window-draw-circle      open t)
 	 (draw-circle-xy     window-draw-circle-xy   open t)
@@ -386,6 +392,8 @@ msg     ((force-output       window-force-output     open t)
 	 (copy-area-xy       window-copy-area-xy     open t)
 	 (printat            window-printat          open t)
 	 (printat-xy         window-printat-xy       open t)
+         (print-line         window-print-line)
+         (print-lines        window-print-lines)
 	 (prettyprintat      window-prettyprintat    open t)
 	 (prettyprintat-xy   window-prettyprintat-xy open t)
          (string-width       window-string-width     open t)
@@ -408,6 +416,7 @@ msg     ((force-output       window-force-output     open t)
 	 (get-latex-position  window-get-latex-position)
 	 (get-icon-position  window-get-icon-position)
 	 (get-box-position   window-get-box-position)
+	 (get-box-line-position   window-get-box-line-position)
 	 (get-box-size       window-get-box-size)
 	 (get-region         window-get-region)
 	 (adjust-box-side    window-adjust-box-side)
@@ -1239,27 +1248,26 @@ lp  (XGetWindowAttributes *window-display* win *window-attr*)
 					    (parent-offset-y m)
 					    (menu-font m) )) ) ))
 
-; 25 Sep 92; 26 Sep 92; 11 Mar 93; 05 Oct 93; 08 Oct 93; 17 May 04
+; 25 Sep 92; 26 Sep 92; 11 Mar 93; 05 Oct 93; 08 Oct 93; 17 May 04; 12 Jan 10
 ; Calculate the displayed size of a menu
 (gldefun menu-calculate-size ((m menu))
-  (let (maxwidth maxheight nitems)
+  (let (maxwidth totalheight nitems)
     (or (menu-font m) ((menu-font m) = '9x15))
     (maxwidth = (find-item-width m (title m))
 	          + (if (or (flat m) *window-add-menu-title*)
 			0
 		        *menu-title-pad*))
-    (maxheight =  13)                      ; ***** fix for font
     (nitems = (if (and (title-present m)
 			 (or (flat m) *window-add-menu-title*))
 		  1 0))
+    (totalheight =  (* nitems 13))                 ; ***** fix for font
     (for item in (items m) do
       (nitems _+ 1)
       (maxwidth  = (max maxwidth  (find-item-width m item)))
-      (maxheight = (max maxheight (find-item-height m item))) )
+      (totalheight =+ (menu-find-item-height m item)) )
     ((item-width m) = maxwidth + 6)
     ((picture-width m) = (item-width m) + 1)
-    ((item-height m) =  maxheight + 2)
-    ((picture-height m) = ((item-height m) * nitems) + 2)
+    ((picture-height m) = totalheight + 2)
     (adjust-offset m) ))
 
 ; 06 Sep 91; 09 Sep 91; 10 Sep 91; 21 May 93; 30 May 02; 17 May 04; 08 Sep 06
@@ -1287,7 +1295,7 @@ lp  (XGetWindowAttributes *window-display* win *window-attr*)
     ((parent-offset-y m) = (max 0 (min yoff (hbase - height)))) ))
 
 ; 07 Dec 90; 14 Dec 90; 12 Aug 91; 22 Aug 91; 09 Sep 91; 10 Sep 91; 28 Jan 92;
-; 10 Feb 92; 26 Sep 92; 11 Mar 93; 08 Oct 93; 17 May 04
+; 10 Feb 92; 26 Sep 92; 11 Mar 93; 08 Oct 93; 17 May 04; 12 Jan 10
 (gldefun menu-draw ((m menu))
   (let (mw xzero yzero bottom)
     (init? m)
@@ -1301,12 +1309,12 @@ lp  (XGetWindowAttributes *window-display* win *window-attr*)
     (bottom = (yzero + (picture-height m) + 3))
     (if (and (title-present m)
 	     (or (flat m) *window-add-menu-title*))
-	(progn (bottom _- (item-height m))
+	(progn (bottom _- 15)              ; ***** fix for font
 	       (printat-xy mw (stringify (title m)) (+ xzero 3) bottom)
 	       (invert-area-xy mw xzero (bottom - 2)
-			       ((picture-width m) + 1) (item-height m))))
+			       ((picture-width m) + 1) 15)))
     (for item in (items m) do
-	 (bottom _- (item-height m))
+	 (bottom _- (menu-find-item-height m item))
 	 (display-item m item (+ xzero 3) bottom) )
     (force-output mw) ))
 
@@ -1361,69 +1369,96 @@ lp  (XGetWindowAttributes *window-display* win *window-attr*)
         (printat-xy mw (stringify item) x y)) ))
 
 ; 07 Dec 90; 18 Dec 90; 15 Aug 91; 27 Aug 91; 06 Sep 91; 10 Sep 91; 29 Sep 92
-; 04 Aug 93; 07 Jan 94; 17 May 04; 18 May 04
+; 04 Aug 93; 07 Jan 94; 17 May 04; 18 May 04; 12 Jan 10; 13 Jan 10
 (gldefun menu-choose ((m menu) (inside boolean))
-  (let (mw current-item-n newn itemh itms nitems val maxx xzero yzero)
+  (let (mw current-item ybase itemh val maxx maxy xzero yzero)
     (init? m)
     (mw = (menu-window m))
     (draw m)
     (xzero = (menu-x m 0))
     (yzero = (menu-y m 0))
     (maxx = (+ xzero (picture-width m)))
-    (itemh = (item-height m))
-    (itms = (items m))
-    (nitems = (length itms))
+    (maxy = (+ yzero (picture-height m)))
+    (if (and (title-present m)
+             (or (flat m) *window-add-menu-title*))
+        (maxy =- 15))
     (track-mouse mw
       #'(lambda (x y code)
 	  (setq *window-menu-code* code)
-          (setq newn (1- (- nitems (truncate (- y (+ yzero 3)) itemh))))
-	  (if ((x >= xzero) and (x <= maxx)
-	       and (newn >= 0) and (newn < nitems))
-	      (progn
-	      (if current-item-n
-		  (if (/= newn current-item-n)
-			   (progn (unbox-item m current-item-n)
-			        (box-item m newn)
-				(current-item-n = newn)))
-		  (progn (inside = t)
-		       (box-item m newn)
-		       (current-item-n = newn)))
-	      (if (and current-item-n (> code 0))
-		  (progn (unbox-item m current-item-n)
-			 (val = current-item-n))))
-	      (progn (if current-item-n
-			 (progn (unbox-item m current-item-n)
-				(current-item-n = nil)))
-	           (if (> code 0) or
-		       (inside and ((x < xzero) or (x > maxx)
-				    or (y < yzero)
-				    or (y > (yzero + (picture-height m)))))
-		       (val = -777)))))
+	  (if (and (>= x xzero) (<= x maxx)   ; is mouse in menu area?
+                   (>= y yzero) (<= y maxy))
+              (if (or (null current-item)   ; is mouse in a new item?
+                      (< y ybase)
+                      (> y (+ ybase itemh)) )
+                  (progn 
+                    (if current-item
+                        (unbox-item m current-item ybase))
+                    (current-item = (menu-find-item-y m (- y yzero)))
+                    (if current-item
+                        (progn (ybase = (menu-item-y m current-item))
+                               (itemh = (menu-find-item-height
+                                          m current-item))
+                               (box-item m current-item ybase)
+                               (inside = t)))
+                    (if (> code 0)            ; same item: click?
+                        (progn (unbox-item m current-item ybase)
+                               (val = 1))))
+                  (if (> code 0)            ; same item: click?
+                      (progn (unbox-item m current-item ybase)
+                             (val = 1))))
+              (progn (if current-item       ; mouse outside area
+			 (progn (unbox-item m current-item ybase)
+				(current-item = nil)))
+                     (if (or (> code 0)
+                             (and inside
+                                  (or (< x xzero) (> x maxx)
+                                      (< y yzero) (> y maxy))))
+                         (val = -777)))))
       t)
-    (if (val <> -777) (item-value m (nth val itms)) ) ))
+    (if (not (eql val -777)) (item-value m current-item)) ))
 
-; 07 Dec 90; 12 Aug 91; 10 Sep 91; 05 Oct 92
-(gldefun menu-box-item ((m menu) (item integer))
-  (let (itemh nitems (mw (menuw m)) )
-    (itemh = (item-height m))
-    (nitems = (length (items m)))
+; 07 Dec 90; 12 Aug 91; 10 Sep 91; 05 Oct 92; 12 Jan 10
+(gldefun menu-box-item ((m menu) (item menu-item) (ybase integer))
+  (let ( (mw (menuw m)) )
     (set-xor mw)
-    (draw-box-xy mw (menu-x m 1) (menu-y m ((nitems - item - 1) * itemh + 2))
-		    ((item-width m) - 2) itemh 1)
+    (draw-box-xy mw (menu-x m 1) ((menu-y m ybase) + 2)
+		    ((item-width m) - 2)
+                    (menu-find-item-height m item)
+                    1)
     (unset mw) ))
 
-; 07 Dec 90; 12 Aug 91; 14 Aug 91; 15 Aug 91; 05 Oct 92
-(gldefun menu-unbox-item ((m menu) (item integer))
-  (box-item m item) )
+; 07 Dec 90; 12 Aug 91; 14 Aug 91; 15 Aug 91; 05 Oct 92; 12 Jan 10
+(gldefun menu-unbox-item ((m menu) (item menu-item) (ybase integer))
+  (box-item m item ybase) )
 
-; 11 Sep 91; 08 Sep 92; 28 Sep 92; 18 Jan 94; 08 Sep 06
+; 11 Sep 91; 08 Sep 92; 28 Sep 92; 18 Jan 94; 08 Sep 06; 12 Jan 10; 13 Jan 10
 (gldefun menu-item-position ((m menu) (itemname symbol)
 			     &optional (place symbol))
-  (let ((n 0) found itms item (xsize (item-width m)) (ysize (item-height m)))
+  (let ( (xsize (item-width m)) ybase item ysize)
+    (item = (menu-find-item m itemname))
+    (ysize = (menu-find-item-height m item))
+    (ybase = (menu-item-y m item))
+    (a vector with
+		 x = ((menu-x m 0) +
+		      (case place
+			((center top bottom) (truncate xsize 2))
+			(left -1)
+			(right xsize + 2)
+			else 0))
+		 y = ((menu-y m ybase) +
+		      (case place
+			((center right left) (truncate ysize 2))
+			(bottom 0)
+			(top ysize)
+			else 0)) ) ))
+
+; 13 Jan 10
+; find the y position of bottom of item with given name
+(gldefun menu-find-item ((m menu) (itemname symbol))
+  (let (found itms item)
     (itms = (items m))
     (found = (null itemname))
-    (while itms and ~ found do
-	   (n _+ 1)
+    (while (and itms (not found))
 	   (item -_ itms)
 	   (if (or (eq item itemname)
 		   (and (consp item)
@@ -1434,19 +1469,38 @@ lp  (XGetWindowAttributes *window-display* win *window-attr*)
 			    (and (consp (cdr item))
 				 (eq (cadr item) itemname)))))
 	       (found = t)))
-    (if found (a vector with
-		 x = ((menu-x m 0) +
-		      (case place
-			((center top bottom) (truncate xsize 2))
-			(left -1)
-			(right xsize + 2)
-			else 0))
-		 y = ((menu-y m (((length (items m)) - n) * ysize)) +
-		      (case place
-			((center right left) (truncate ysize 2))
-			(bottom 0)
-			(top ysize)
-			else 0)) )) ))
+    item))
+
+; 12 Jan 10
+; find the y position of bottom of a given item
+(gldefun menu-item-y ((m menu) (item menu-item))
+  (let (found itms itm ybase)
+    (ybase = (picture-height m) - 1)
+    (if (and (title-present m)
+             (or (flat m) *window-add-menu-title*))
+        (ybase =- 15))
+    (itms = (items m))
+    (while (and itms (not found))
+	   (itm -_ itms)
+	   (ybase =- (menu-find-item-height m itm))
+           (found = (eq item itm)) )
+    ybase))
+
+; 12 Jan 10
+; find item based on y position
+(gldefun menu-find-item-y ((m menu) (y integer))
+  (let (found itms itm ybase)
+    (ybase = (picture-height m) - 1)
+    (if (and (title-present m)
+             (or (flat m) *window-add-menu-title*))
+        (ybase =- 15))
+    (itms = (items m))
+    (while (and itms (not found))
+	   (itm -_ itms)
+	   (ybase =- (menu-find-item-height m itm))
+           (found = (and (>= y ybase)
+                         (<= y (+ ybase (menu-find-item-height m itm))))))
+    (and found itm)))
 
 ; 10 Dec 90; 13 Dec 90; 10 Sep 91; 29 Sep 92; 17 May 04
 ; Choose from menu, then close it
@@ -1526,6 +1580,17 @@ lp  (res = (choose m inside))
 	     (pos = (get-box-position (menu-window m) (x sizev) (y sizev)))
 	     (moveto-xy m (x pos) (y pos)) ) )))
 
+; 31 Aug 09
+; Reposition a menu to a position specified by the user by mouse click
+(gldefun menu-reposition-line ((m menu) (offset vector) (target vector))
+  (let (sizev pos)
+  (if (flat m)
+      (progn (sizev = (size m))
+	     (pos = (get-box-line-position (menu-window m)
+                      (x sizev) (y sizev) (x offset) (y offset)
+                      (x target) (y target)))
+	     (moveto-xy m (x pos) (y pos)) ) )))
+
 ; 09 Sep 91; 11 Sep 91; 12 Sep 91; 14 Sep 91
 ; Simple call from plain Lisp to make a picture menu.
 (setf (glfnresulttype 'picmenu-create) 'picmenu)
@@ -1535,7 +1600,7 @@ lp  (res = (choose m inside))
 	 (flat boolean) (font symbol) (boxflg boolean))
   (picmenu-create-from-spec
     (picmenu-create-spec buttons width height drawfn dotflg font)
-    title parentw x y perm flat boxflg))                  
+    title parentw x y perm flat boxflg))                 
 
 ; 14 Sep 91
 (setf (glfnresulttype 'picmenu-create-spec) 'picmenu-spec)
@@ -1561,7 +1626,8 @@ lp  (res = (choose m inside))
 		  permanent       = perm
 	          flat            = flat
 		  spec            = spec
-		  boxflg          = boxflg))
+		  boxflg          = boxflg
+))
 
 ; 29 Sep 92; 13 Oct 93; 17 May 04
 (gldefun picmenu-calculate-size ((m picmenu))
@@ -1615,14 +1681,32 @@ lp  (res = (choose m inside))
     ((deleted-buttons m) = nil)
     (force-output mw) ))
 
-; 05 Oct 92
+; 28 Oct 09
+(gldefun picmenu-draw-named-button ((m picmenu) (nm symbol))
+  (draw-button m (assoc nm (buttons m))))
+
+; 28 Oct 09
+(gldefun picmenu-set-named-button-color ((m picmenu) (nm symbol) (color rgb))
+  (let (lst)
+    (if (lst = (assoc nm (button-colors m)))
+        ((color lst) = color)
+        ((button-colors m) +_ (list nm color)) ) ))
+
+; 05 Oct 92; 28 Oct 09
 (gldefun picmenu-draw-button ((m picmenu) (b picmenu-button))
-  (let ((mw (menu-window m)))
+  (let ((mw (menu-window m)) col)
     (set-invert mw)
     (draw-box-xy mw ((menu-x m 0) + (x (offset b)) - 2)
 		    ((menu-y m 0) + (y (offset b)) - 2)
 		    4 4 1)
-    (unset mw) ))
+    (unset mw)
+    (if (setq col (assoc (buttonname b) (button-colors m)))
+        (progn (window-set-color-rgb mw (red (color col)) (green (color col))
+                                        (blue (color col)))
+               (draw-box-xy mw ((menu-x m 0) + (x (offset b)) - 1)
+		    ((menu-y m 0) + (y (offset b)) - 1)
+		    3 3 2)
+               (window-reset-color mw)) ) ))
 
 ; 05 Oct 92; 30 Oct 92; 17 May 04
 ; Delete a button and erase it from the display
@@ -2010,6 +2094,19 @@ lp  (res = (choose m inside))
 (defun window-get-box-position (w width height &optional (dx 0) (dy 0))
   (window-get-icon-position w #'window-draw-box-xy
 			      (list width height 1) dx dy))
+
+; 28 Aug 09
+; Get a position indicated by a box and line to a specified point
+(setf (glfnresulttype 'window-get-box-line-position) 'vector)
+(defun window-get-box-line-position (w width height offx offy tox toy
+                                       &optional (dx 0) (dy 0))
+  (window-get-icon-position w #'window-draw-box-line-xy
+		            (list width height offx offy tox toy) dx dy))
+
+; 01 Sep 09
+(defun window-draw-box-line-xy (w x y width height offx offy tox toy)
+  (window-draw-box-xy w x y width height)
+  (window-draw-line-xy w (+ x offx) (+ y offy) tox toy))
 
 ; 05 Sep 91
 ; Get a position indicated by an icon.

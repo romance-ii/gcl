@@ -1,7 +1,7 @@
-; 08 Sep 2006 15:33:41 CDT
-; dwtrans.lsp  -- translation of dwindow.lsp
+; 13 Jan 2010 17:40:33 EST
+; dwtrans.lsp  -- translation of dwindow.lsp          ; 07 Jan 10
 
-; Copyright (c) 2006 Gordon S. Novak Jr. and The University of Texas at Austin.
+; Copyright (c) 2010 Gordon S. Novak Jr. and The University of Texas at Austin.
 
 ; See the files gnu.license and dec.copyright .
 
@@ -464,9 +464,7 @@
       *WIDTH-RETURN* *HEIGHT-RETURN* *BORDER-WIDTH-RETURN*
       *DEPTH-RETURN*))
 
-(DEFUN WINDOW-SYNC (W)
- (declare (ignore w))
- (XSYNC *WINDOW-DISPLAY* 1))
+(DEFUN WINDOW-SYNC (W) (declare (ignore w)) (XSYNC *WINDOW-DISPLAY* 1))
 
 (DEFUN WINDOW-SCREEN-HEIGHT ()
   (WINDOW-GET-GEOMETRY-B *ROOT-WINDOW*)
@@ -986,7 +984,7 @@
   (OR *WINDOW-MENU*
       (SETQ *WINDOW-MENU*
             (LIST 'MENU (COPY-LIST '(WINDOW NIL NIL 0 0 "" NIL)) NIL
-                  NIL 0 0 0 0 "" NIL NIL 0 0 '(CLOSE PAINT CLEAR MOVE)))))
+                  NIL 0 0 0 0 "" NIL NIL 0 '(CLOSE PAINT CLEAR MOVE)))))
 
 (DEFUN WINDOW-CLOSE (W)
   (XUNMAPWINDOW *WINDOW-DISPLAY* (CADR W))
@@ -1148,25 +1146,24 @@
                 (CADDDR M) (FIFTH M) (SIXTH M) (NTH 10 M)))))
 
 (DEFUN MENU-CALCULATE-SIZE (M)
-  (LET (MAXWIDTH MAXHEIGHT NITEMS)
+  (LET (MAXWIDTH TOTALHEIGHT NITEMS)
     (OR (NTH 10 M) (SETF (NTH 10 M) '9X15))
     (SETQ MAXWIDTH
           (+ (MENU-FIND-ITEM-WIDTH M (NINTH M))
              (IF (OR (CADDR M) *WINDOW-ADD-MENU-TITLE*) 0
                  *MENU-TITLE-PAD*)))
-    (SETQ MAXHEIGHT 13)
     (SETQ NITEMS
           (IF (AND (NINTH M) (PLUSP (LENGTH (NINTH M)))
                    (OR (CADDR M) *WINDOW-ADD-MENU-TITLE*))
               1 0))
-    (DOLIST (ITEM (NTH 13 M))
+    (SETQ TOTALHEIGHT (* 13 NITEMS))
+    (DOLIST (ITEM (NTH 12 M))
       (INCF NITEMS)
       (SETQ MAXWIDTH (MAX MAXWIDTH (MENU-FIND-ITEM-WIDTH M ITEM)))
-      (SETQ MAXHEIGHT (MAX MAXHEIGHT (MENU-FIND-ITEM-HEIGHT M ITEM))))
+      (INCF TOTALHEIGHT (MENU-FIND-ITEM-HEIGHT M ITEM)))
     (SETF (NTH 11 M) (+ 6 MAXWIDTH))
     (SETF (SEVENTH M) (1+ (NTH 11 M)))
-    (SETF (NTH 12 M) (+ 2 MAXHEIGHT))
-    (SETF (EIGHTH M) (+ 2 (* (NTH 12 M) NITEMS)))
+    (SETF (EIGHTH M) (+ 2 TOTALHEIGHT))
     (MENU-ADJUST-OFFSET M)))
 
 (DEFUN MENU-ADJUST-OFFSET (M)
@@ -1194,7 +1191,7 @@
 
 (DEFUN MENU-DRAW (M)
   (LET (MW XZERO YZERO BOTTOM)
-    (OR (AND (CADR M) (PLUSP (NTH 12 M))) (MENU-INIT M))
+    (OR (AND (CADR M) (PLUSP (EIGHTH M))) (MENU-INIT M))
     (SETQ XZERO (IF (CADDR M) (FIFTH M) 0))
     (SETQ YZERO (IF (CADDR M) (SIXTH M) 0))
     (SETQ MW (CADR M))
@@ -1208,7 +1205,7 @@
     (SETQ BOTTOM (+ 3 (+ YZERO (EIGHTH M))))
     (WHEN (AND (NINTH M) (PLUSP (LENGTH (NINTH M)))
                (OR (CADDR M) *WINDOW-ADD-MENU-TITLE*))
-      (DECF BOTTOM (NTH 12 M))
+      (INCF BOTTOM -15)
       (LET ((SSTR (STRINGIFY (STRINGIFY (NINTH M)))))
         (XDRAWIMAGESTRING *WINDOW-DISPLAY* (CADR MW) (CADDR MW)
             (+ 3 XZERO) (- (CADDDR MW) BOTTOM) (GET-C-STRING SSTR)
@@ -1232,19 +1229,16 @@
                           *GC-VALUES*)
                       (XGCVALUES-BACKGROUND *GC-VALUES*)))))
       (XFILLRECTANGLE *WINDOW-DISPLAY* (CADR MW) (CADDR MW) XZERO
-          (- (CADDDR MW) (1- (+ (+ -2 BOTTOM) (NTH 12 M))))
-          (1+ (SEVENTH M)) (NTH 12 M))
+          (+ -12 (- (CADDDR MW) BOTTOM)) (1+ (SEVENTH M)) 15)
       (LET ((GC (CADDR MW)))
         (XSETFUNCTION *WINDOW-DISPLAY* GC *WINDOW-SAVE-FUNCTION*)
         (XSETFOREGROUND *WINDOW-DISPLAY* GC *WINDOW-SAVE-FOREGROUND*)))
-    (DOLIST (ITEM (NTH 13 M))
-      (DECF BOTTOM (NTH 12 M))
+    (DOLIST (ITEM (NTH 12 M))
+      (DECF BOTTOM (MENU-FIND-ITEM-HEIGHT M ITEM))
       (MENU-DISPLAY-ITEM M ITEM (+ 3 XZERO) BOTTOM))
     (XFLUSH *WINDOW-DISPLAY*)))
 
-(DEFUN MENU-ITEM-VALUE (SELF ITEM) 
-  (declare (ignore self))
-  (IF (CONSP ITEM) (CDR ITEM) ITEM))
+(DEFUN MENU-ITEM-VALUE (SELF ITEM) (declare (ignore self)) (IF (CONSP ITEM) (CDR ITEM) ITEM))
 
 (DEFUN MENU-FIND-ITEM-WIDTH (SELF ITEM)
   (LET (TMP)
@@ -1265,12 +1259,12 @@
 
 (DEFUN MENU-CLEAR (M)
   (IF (CADDR M)
-      (LET ((GLVAR66219 (+ 3 (EIGHTH M))))
+      (LET ((GLVAR386 (+ 3 (EIGHTH M))))
         (XCLEARAREA *WINDOW-DISPLAY* (CADADR M)
             (1- (IF (CADDR M) (FIFTH M) 0))
             (- (CADDDR (CADR M))
-               (1- (+ (1- (IF (CADDR M) (SIXTH M) 0)) GLVAR66219)))
-            (+ 3 (SEVENTH M)) GLVAR66219 0))
+               (1- (+ (1- (IF (CADDR M) (SIXTH M) 0)) GLVAR386)))
+            (+ 3 (SEVENTH M)) GLVAR386 0))
       (PROGN
         (XCLEARWINDOW *WINDOW-DISPLAY* (CADADR M))
         (XFLUSH *WINDOW-DISPLAY*))))
@@ -1295,53 +1289,55 @@
               (- (CADDDR MW) Y) (GET-C-STRING SSTR) (LENGTH SSTR))))))
 
 (DEFUN MENU-CHOOSE (M INSIDE)
-  (LET (MW CURRENT-ITEM-N NEWN ITEMH ITMS NITEMS VAL MAXX XZERO YZERO)
-    (OR (AND (CADR M) (PLUSP (NTH 12 M))) (MENU-INIT M))
+  (LET (MW CURRENT-ITEM YBASE ITEMH VAL MAXX MAXY XZERO YZERO)
+    (OR (AND (CADR M) (PLUSP (EIGHTH M))) (MENU-INIT M))
     (SETQ MW (CADR M))
     (MENU-DRAW M)
     (SETQ XZERO (IF (CADDR M) (FIFTH M) 0))
     (SETQ YZERO (IF (CADDR M) (SIXTH M) 0))
     (SETQ MAXX (+ XZERO (SEVENTH M)))
-    (SETQ ITEMH (NTH 12 M))
-    (SETQ ITMS (NTH 13 M))
-    (SETQ NITEMS (LENGTH ITMS))
+    (SETQ MAXY (+ YZERO (EIGHTH M)))
+    (IF (AND (NINTH M) (PLUSP (LENGTH (NINTH M)))
+             (OR (CADDR M) *WINDOW-ADD-MENU-TITLE*))
+        (INCF MAXY -15))
     (WINDOW-TRACK-MOUSE MW
         #'(LAMBDA (X Y CODE)
             (SETQ *WINDOW-MENU-CODE* CODE)
-            (SETQ NEWN
-                  (1- (- NITEMS (TRUNCATE (+ -3 (- Y YZERO)) ITEMH))))
-            (IF (AND (>= X XZERO) (<= X MAXX) (>= NEWN 0)
-                     (< NEWN NITEMS))
+            (IF (AND (>= X XZERO) (<= X MAXX) (>= Y YZERO) (<= Y MAXY))
+                (IF (OR (NULL CURRENT-ITEM) (< Y YBASE)
+                        (> Y (+ YBASE ITEMH)))
+                    (PROGN
+                      (IF CURRENT-ITEM
+                          (MENU-BOX-ITEM M CURRENT-ITEM YBASE))
+                      (SETQ CURRENT-ITEM
+                            (MENU-FIND-ITEM-Y M (- Y YZERO)))
+                      (WHEN CURRENT-ITEM
+                        (SETQ YBASE (MENU-ITEM-Y M CURRENT-ITEM))
+                        (SETQ ITEMH
+                              (MENU-FIND-ITEM-HEIGHT M CURRENT-ITEM))
+                        (MENU-BOX-ITEM M CURRENT-ITEM YBASE)
+                        (SETQ INSIDE T))
+                      (WHEN (PLUSP CODE)
+                        (MENU-BOX-ITEM M CURRENT-ITEM YBASE)
+                        (SETQ VAL 1)))
+                    (WHEN (PLUSP CODE)
+                      (MENU-BOX-ITEM M CURRENT-ITEM YBASE)
+                      (SETQ VAL 1)))
                 (PROGN
-                  (IF CURRENT-ITEM-N
-                      (WHEN (/= NEWN CURRENT-ITEM-N)
-                        (MENU-BOX-ITEM M CURRENT-ITEM-N)
-                        (MENU-BOX-ITEM M NEWN)
-                        (SETQ CURRENT-ITEM-N NEWN))
-                      (PROGN
-                        (SETQ INSIDE T)
-                        (MENU-BOX-ITEM M NEWN)
-                        (SETQ CURRENT-ITEM-N NEWN)))
-                  (WHEN (AND CURRENT-ITEM-N (PLUSP CODE))
-                    (MENU-BOX-ITEM M CURRENT-ITEM-N)
-                    (SETQ VAL CURRENT-ITEM-N)))
-                (PROGN
-                  (WHEN CURRENT-ITEM-N
-                    (MENU-BOX-ITEM M CURRENT-ITEM-N)
-                    (SETQ CURRENT-ITEM-N NIL))
+                  (WHEN CURRENT-ITEM
+                    (MENU-BOX-ITEM M CURRENT-ITEM YBASE)
+                    (SETQ CURRENT-ITEM NIL))
                   (IF (OR (PLUSP CODE)
                           (AND INSIDE
                                (OR (< X XZERO) (> X MAXX) (< Y YZERO)
-                                   (> Y (+ YZERO (EIGHTH M))))))
+                                   (> Y MAXY))))
                       (SETQ VAL -777)))))
         T)
-    (IF (/= VAL -777)
-        (IF (CONSP (NTH VAL ITMS)) (CDR (NTH VAL ITMS)) (NTH VAL ITMS)))))
+    (IF (NOT (EQL VAL -777))
+        (IF (CONSP CURRENT-ITEM) (CDR CURRENT-ITEM) CURRENT-ITEM))))
 
-(DEFUN MENU-BOX-ITEM (M ITEM)
-  (LET (ITEMH NITEMS (MW (OR (CADR M) (MENU-INIT M))))
-    (SETQ ITEMH (NTH 12 M))
-    (SETQ NITEMS (LENGTH (NTH 13 M)))
+(DEFUN MENU-BOX-ITEM (M ITEM YBASE)
+  (LET ((MW (OR (CADR M) (MENU-INIT M))))
     (LET ((GC (CADDR MW)))
       (SETQ *WINDOW-SAVE-FUNCTION*
             (PROGN
@@ -1359,20 +1355,37 @@
                         *GC-VALUES*)
                     (XGCVALUES-BACKGROUND *GC-VALUES*)))))
     (WINDOW-DRAW-BOX-XY MW (1+ (IF (CADDR M) (FIFTH M) 0))
-        (+ (IF (CADDR M) (SIXTH M) 0)
-           (+ 2 (* (1- (- NITEMS ITEM)) ITEMH)))
-        (+ -2 (NTH 11 M)) ITEMH 1)
+        (+ 2 (+ (IF (CADDR M) (SIXTH M) 0) YBASE)) (+ -2 (NTH 11 M))
+        (MENU-FIND-ITEM-HEIGHT M ITEM) 1)
     (LET ((GC (CADDR MW)))
       (XSETFUNCTION *WINDOW-DISPLAY* GC *WINDOW-SAVE-FUNCTION*)
       (XSETFOREGROUND *WINDOW-DISPLAY* GC *WINDOW-SAVE-FOREGROUND*))))
 
-(DEFUN MENU-UNBOX-ITEM (M ITEM) (MENU-BOX-ITEM M ITEM))
+(DEFUN MENU-UNBOX-ITEM (M ITEM YBASE) (MENU-BOX-ITEM M ITEM YBASE))
 
 (DEFUN MENU-ITEM-POSITION (M ITEMNAME &OPTIONAL PLACE)
-  (LET ((N 0) FOUND ITMS ITEM (XSIZE (NTH 11 M)) (YSIZE (NTH 12 M)))
-    (SETQ ITMS (NTH 13 M))
+  (LET ((XSIZE (NTH 11 M)) YBASE ITEM YSIZE)
+    (SETQ ITEM (MENU-FIND-ITEM M ITEMNAME))
+    (SETQ YSIZE (MENU-FIND-ITEM-HEIGHT M ITEM))
+    (SETQ YBASE (MENU-ITEM-Y M ITEM))
+    (LIST (+ (IF (CADDR M) (FIFTH M) 0)
+             (CASE PLACE
+               ((CENTER TOP BOTTOM) (TRUNCATE XSIZE 2))
+               (LEFT -1)
+               (RIGHT (+ 2 XSIZE))
+               (T 0)))
+          (+ (+ (IF (CADDR M) (SIXTH M) 0) YBASE)
+             (CASE PLACE
+               ((CENTER RIGHT LEFT) (TRUNCATE YSIZE 2))
+               (BOTTOM 0)
+               (TOP YSIZE)
+               (T 0))))))
+
+(DEFUN MENU-FIND-ITEM (M ITEMNAME)
+  (LET (FOUND ITMS ITEM)
+    (SETQ ITMS (NTH 12 M))
     (SETQ FOUND (NULL ITEMNAME))
-    (WHILE (AND ITMS (NOT FOUND)) (INCF N) (SETQ ITEM (POP ITMS))
+    (WHILE (AND ITMS (NOT FOUND)) (SETQ ITEM (POP ITMS))
            (IF (OR (EQ ITEM ITEMNAME)
                    (AND (CONSP ITEM)
                         (OR (EQ ITEMNAME (CAR ITEM))
@@ -1383,20 +1396,33 @@
                             (AND (CONSP (CDR ITEM))
                                  (EQ (CADR ITEM) ITEMNAME)))))
                (SETQ FOUND T)))
-    (IF FOUND
-        (LIST (+ (IF (CADDR M) (FIFTH M) 0)
-                 (CASE PLACE
-                   ((CENTER TOP BOTTOM) (TRUNCATE XSIZE 2))
-                   (LEFT -1)
-                   (RIGHT (+ 2 XSIZE))
-                   (T 0)))
-              (+ (+ (IF (CADDR M) (SIXTH M) 0)
-                    (* (- (LENGTH (NTH 13 M)) N) YSIZE))
-                 (CASE PLACE
-                   ((CENTER RIGHT LEFT) (TRUNCATE YSIZE 2))
-                   (BOTTOM 0)
-                   (TOP YSIZE)
-                   (T 0)))))))
+    ITEM))
+
+(DEFUN MENU-ITEM-Y (M ITEM)
+  (LET (FOUND ITMS ITM YBASE)
+    (SETQ YBASE (1- (EIGHTH M)))
+    (IF (AND (NINTH M) (PLUSP (LENGTH (NINTH M)))
+             (OR (CADDR M) *WINDOW-ADD-MENU-TITLE*))
+        (INCF YBASE -15))
+    (SETQ ITMS (NTH 12 M))
+    (WHILE (AND ITMS (NOT FOUND)) (SETQ ITM (POP ITMS))
+           (DECF YBASE (MENU-FIND-ITEM-HEIGHT M ITM))
+           (SETQ FOUND (EQ ITEM ITM)))
+    YBASE))
+
+(DEFUN MENU-FIND-ITEM-Y (M Y)
+  (LET (FOUND ITMS ITM YBASE)
+    (SETQ YBASE (1- (EIGHTH M)))
+    (IF (AND (NINTH M) (PLUSP (LENGTH (NINTH M)))
+             (OR (CADDR M) *WINDOW-ADD-MENU-TITLE*))
+        (INCF YBASE -15))
+    (SETQ ITMS (NTH 12 M))
+    (WHILE (AND ITMS (NOT FOUND)) (SETQ ITM (POP ITMS))
+           (DECF YBASE (MENU-FIND-ITEM-HEIGHT M ITM))
+           (SETQ FOUND
+                 (AND (>= Y YBASE)
+                      (<= Y (+ YBASE (MENU-FIND-ITEM-HEIGHT M ITM))))))
+    (AND FOUND ITM)))
 
 (DEFUN MENU-SELECT (M &OPTIONAL INSIDE) (MENU-SELECT-B M NIL INSIDE))
 
@@ -1435,7 +1461,7 @@
 
 (DEFUN MENU-CREATE (ITEMS &OPTIONAL TITLE PARENTW X Y PERM FLAT FONT)
   (LIST 'MENU (IF FLAT PARENTW) FLAT (CADR PARENTW) X Y 0 0
-        (IF TITLE (STRINGIFY TITLE) "") PERM FONT 0 0 ITEMS))
+        (IF TITLE (STRINGIFY TITLE) "") PERM FONT 0 ITEMS))
 
 (DEFUN MENU-OFFSET (M)
   (LIST (IF (CADDR M) (FIFTH M) 0) (IF (CADDR M) (SIXTH M) 0)))
@@ -1464,6 +1490,16 @@
             (WINDOW-GET-BOX-POSITION (CADR M) (CAR SIZEV) (CADR SIZEV)))
       (MENU-MOVETO-XY M (CAR POS) (CADR POS)))))
 
+(DEFUN MENU-REPOSITION-LINE (M OFFSET TARGET)
+  (LET (SIZEV POS)
+    (WHEN (CADDR M)
+      (SETQ SIZEV (MENU-SIZE M))
+      (SETQ POS
+            (WINDOW-GET-BOX-LINE-POSITION (CADR M) (CAR SIZEV)
+                (CADR SIZEV) (CAR OFFSET) (CADR OFFSET) (CAR TARGET)
+                (CADR TARGET)))
+      (MENU-MOVETO-XY M (CAR POS) (CADR POS)))))
+
 
 
 (DEFUN PICMENU-CREATE
@@ -1485,7 +1521,7 @@
 (DEFUN PICMENU-CREATE-FROM-SPEC
        (SPEC &OPTIONAL TITLE PARENTW X Y PERM FLAT BOXFLG)
   (LIST 'PICMENU (IF FLAT PARENTW) FLAT (IF PARENTW (CADR PARENTW)) X Y
-        0 0 (IF TITLE (STRINGIFY TITLE) "") PERM SPEC BOXFLG NIL))
+        0 0 (IF TITLE (STRINGIFY TITLE) "") PERM SPEC BOXFLG NIL NIL))
 
 (DEFUN PICMENU-CALCULATE-SIZE (M)
   (LET (MAXWIDTH MAXHEIGHT)
@@ -1556,8 +1592,16 @@
     (SETF (NTH 12 M) NIL)
     (XFLUSH *WINDOW-DISPLAY*)))
 
+(DEFUN PICMENU-DRAW-NAMED-BUTTON (M NM)
+  (PICMENU-DRAW-BUTTON M (ASSOC NM (CADDDR (NTH 10 M)))))
+
+(DEFUN PICMENU-SET-NAMED-BUTTON-COLOR (M NM COLOR)
+  (LET (LST)
+    (IF (SETQ LST (ASSOC NM (NTH 13 M))) (SETF (CADR LST) COLOR)
+        (PUSH (LIST NM COLOR) (NTH 13 M)))))
+
 (DEFUN PICMENU-DRAW-BUTTON (M B)
-  (LET ((MW (CADR M)))
+  (LET ((MW (CADR M)) COL)
     (LET ((GC (CADDR MW)))
       (SETQ *WINDOW-SAVE-FUNCTION*
             (PROGN
@@ -1579,7 +1623,14 @@
         (+ -2 (+ (IF (CADDR M) (SIXTH M) 0) (CADADR B))) 4 4 1)
     (LET ((GC (CADDR MW)))
       (XSETFUNCTION *WINDOW-DISPLAY* GC *WINDOW-SAVE-FUNCTION*)
-      (XSETFOREGROUND *WINDOW-DISPLAY* GC *WINDOW-SAVE-FOREGROUND*))))
+      (XSETFOREGROUND *WINDOW-DISPLAY* GC *WINDOW-SAVE-FOREGROUND*))
+    (WHEN (SETQ COL (ASSOC (CAR B) (NTH 13 M)))
+      (WINDOW-SET-COLOR-RGB MW (CAADR COL) (CADADR COL)
+          (CADDR (CADR COL)))
+      (WINDOW-DRAW-BOX-XY MW
+          (1- (+ (IF (CADDR M) (FIFTH M) 0) (CAADR B)))
+          (1- (+ (IF (CADDR M) (SIXTH M) 0) (CADADR B))) 3 3 2)
+      (WINDOW-RESET-COLOR MW))))
 
 (DEFUN PICMENU-DELETE-NAMED-BUTTON (M NAME)
   (LET (B)
@@ -2010,6 +2061,17 @@
 (DEFUN WINDOW-GET-BOX-POSITION (W WIDTH HEIGHT &OPTIONAL (DX 0) (DY 0))
   (WINDOW-GET-ICON-POSITION W #'WINDOW-DRAW-BOX-XY
       (LIST WIDTH HEIGHT 1) DX DY))
+
+
+
+(DEFUN WINDOW-GET-BOX-LINE-POSITION
+       (W WIDTH HEIGHT OFFX OFFY TOX TOY &OPTIONAL (DX 0) (DY 0))
+  (WINDOW-GET-ICON-POSITION W #'WINDOW-DRAW-BOX-LINE-XY
+      (LIST WIDTH HEIGHT OFFX OFFY TOX TOY) DX DY))
+
+(DEFUN WINDOW-DRAW-BOX-LINE-XY (W X Y WIDTH HEIGHT OFFX OFFY TOX TOY)
+  (WINDOW-DRAW-BOX-XY W X Y WIDTH HEIGHT)
+  (WINDOW-DRAW-LINE-XY W (+ X OFFX) (+ Y OFFY) TOX TOY))
 
 
 
@@ -2499,7 +2561,7 @@
                   (XTEXTWIDTH (SEVENTH W) (GET-C-STRING SSTR)
                               (LENGTH SSTR)))
                 (NTH 15 M))))
-    (LET ((GLVAR73902 (WINDOW-STRING-HEIGHT W "Tg")))
+    (LET ((GLVAR423 (WINDOW-STRING-HEIGHT W "Tg")))
       (XCLEARAREA *WINDOW-DISPLAY* (CADR W)
           (+ (IF (CADDR M) (FIFTH M) 0) XW)
           (- (CADDDR W)
@@ -2519,13 +2581,13 @@
                                    *DESCENT-RETURN* *OVERALL-RETURN*)
                                (LIST (INT-POS *ASCENT-RETURN* 0)
                                      (INT-POS *DESCENT-RETURN* 0)))))
-                    GLVAR73902)))
+                    GLVAR423)))
           (IF ONEP
               (LET ((SSTR (STRINGIFY "W")))
                 (XTEXTWIDTH (SEVENTH W) (GET-C-STRING SSTR)
                     (LENGTH SSTR)))
               (- (SEVENTH M) XW))
-          GLVAR73902 0))
+          GLVAR423 0))
     (XFLUSH *WINDOW-DISPLAY*)))
 
 (DEFUN EDITMENU-LINE-Y (M LINE)
@@ -2828,3 +2890,7 @@
             ((EQL CODE XK_RETURN) #\Return)
             ((EQL CODE XK_TAB) #\Tab)
             ((EQL CODE XK_BACKSPACE) #\Backspace)))))
+
+
+
+

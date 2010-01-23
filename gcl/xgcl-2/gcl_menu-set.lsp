@@ -1,8 +1,8 @@
-; menu-set.lsp              Gordon S. Novak Jr.             ; 02 Aug 04
+; menu-set.lsp              Gordon S. Novak Jr.             ; 17 Jan 08
 
 ; Functions to handle a set of menus within a single window.
 
-; Copyright (c) 2004 Gordon S. Novak Jr. and The University of Texas at Austin.
+; Copyright (c) 2008 Gordon S. Novak Jr. and The University of Texas at Austin.
 
 ; See the file gnu.license .
 
@@ -23,8 +23,8 @@
 ; Written by: Gordon S. Novak Jr., Department of Computer Sciences,
 ; University of Texas at Austin  78712.    novak@cs.utexas.edu
 
-; 12 Aug 96; 04 Nov 97; 28 Feb 02; 05 Jan 04; 03 Mar 04; 30 Jul 04
-
+; 12 Aug 96; 04 Nov 97; 28 Feb 02; 05 Jan 04; 03 Mar 04; 30 Jul 04; 02 Aug 04
+; 27 Jan 06
 
 ; (wtesta)                             ; in dwtest.lsp, to create window myw
 ; (setq ms (menu-set-create myw nil))
@@ -64,6 +64,7 @@
 	   (delete-item   menu-set-delete-item)
 	   (remove-items  menu-set-remove-items)
 	   (item-position menu-set-item-position)
+           (itemp         menu-set-itemp)
 	   (adjust        menu-set-adjust)
 	   (move          menu-set-move)
 	   (draw-conn     menu-set-draw-conn) )  )
@@ -234,6 +235,16 @@
   (result menu-set-menu)
   (menu (named-item ms name)))
 
+; 17 Jan 08
+(gldefun menu-set-itemp ((ms menu-set) (name symbol) (itemname symbol))
+  (let ((thismenu (named-menu ms name)))
+    (if thismenu is a menu
+        (some #'(lambda (x) (or (eq x itemname)
+                                (and (consp x) (eq (car x) itemname))))
+              (items thismenu))
+        (if thismenu is a picmenu
+            (assoc itemname (buttons thismenu)) ) ) ))
+
 ; 30 Jul 04
 (gldefun menu-conns-named-item ((mc menu-conns) (name symbol))
   (result menu-set-item)
@@ -349,6 +360,18 @@
 	                (bottom ((bottom m) = place + offset))
 			(left   ((left m) = place + offset))
 			(right  ((left m) = place - (width m) - offset)))) ) ))
+
+; 21 Nov 08
+; align the vector approx with the vector fixed if within tolerance
+(gldefun vector-snap ((fixed vector) (approx vector)
+                      &optional tolerance)
+  (let ()
+    (or tolerance (tolerance = 10))
+    (if (< (abs (- (x fixed) (x approx))) tolerance)
+        (a vector  x = (x fixed)  y = (y approx))
+        (if (< (abs (- (y fixed) (y approx))) tolerance)
+            (a vector  x = (x approx)  y = (y fixed))
+            approx) ) ))
 
 ; 12 Oct 94; 28 Feb 02
 (gldefun menu-conns-create ((ms menu-set))
@@ -486,3 +509,13 @@
 	       "glisp/menu-settrans.lsp"        ; output file
 	       "glisp/menu-set-header.lsp")     ; header file
   (compile-file "glisp/menu-settrans.lsp")  )
+
+; Compile menu-set.lsp into a plain Lisp file for XGCL distribution
+(defun compile-menu-setb ()
+  (glcompfiles *directory*
+	       '("glisp/vector.lsp"          ; auxiliary files
+                 "X/dwindow.lsp" "X/dwnoopen.lsp")
+	       '("glisp/menu-set.lsp")          ; translated files
+	       "glisp/menu-settrans.lsp"        ; output file
+	       "glisp/menu-set-header.lsp")     ; header file
+  )

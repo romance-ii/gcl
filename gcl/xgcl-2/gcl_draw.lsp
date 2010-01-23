@@ -1,10 +1,11 @@
-; draw.lsp                  Gordon S. Novak Jr.       ; 05 Jan 04
+; draw.lsp                  Gordon S. Novak Jr.       ; 06 Dec 07
 
 ; Functions to make drawings interactively
 
-; Copyright (c) 2004 Gordon S. Novak Jr. and The University of Texas at Austin.
+; Copyright (c) 2007 Gordon S. Novak Jr. and The University of Texas at Austin.
 
-; 11 Nov 94; 05 Jan 95; 15 Jan 98; 09 Feb 99; 04 Dec 00; 28 Feb 02
+; 11 Nov 94; 05 Jan 95; 15 Jan 98; 09 Feb 99; 04 Dec 00; 28 Feb 02; 05 Jan 04
+; 27 Jan 06
 
 ; See the file gnu.license
 
@@ -299,6 +300,14 @@
     (unless *draw-leave-window* (close w))
     name ))
 
+; 06 Dec 07
+; Copy a draw description to another name
+(defun copy-draw-desc (from to)
+  (let (old)
+    (setq old (copy-tree (get from 'draw-descr)))
+    (setf (get to 'draw-descr) 
+          (cons (car old) (cons to (cddr old))) ) ))
+
 ; 09 Sep 92
 (gldefun draw-desc-draw ((dd draw-desc) (w window))
   (let ( (off (offset dd)) )
@@ -372,15 +381,15 @@
     (if (obj = (draw-desc-find dd w))
         (move obj w (offset dd)))  ))
 
-; 14 Sep 92; 28 Feb 02; 05 Jan 04
+; 14 Sep 92; 28 Feb 02; 05 Jan 04; 27 Jan 06
 ; Reset origin of object group
 (gldefun draw-desc-origin ((dd draw-desc) (w window))
   (let (sel)
     (draw-desc-bounds dd)
-    (sel = (menu '(("To zero" . zero) ("Select" . select))))
+    (sel = (menu '(("To zero" . tozero) ("Select" . select))))
     (if (sel == 'select)
 	((offset dd) = (get-box-position w (x (size dd)) (y (size dd))))
-        (if (sel == 'zero) ((offset dd) = (a vector x 0 y 0)) ) )))
+        (if (sel == 'tozero) ((offset dd) = (a vector x 0 y 0)) ) )))
 
 ; 14 Sep 92
 ; Compute boundaries of objects in a drawing; set offset and size of
@@ -402,14 +411,14 @@
     ((offset dd) = basev)
     (for obj in objects do ((offset obj) _- basev)) ))
 
-; 14 Sep 92; 16 Sep 92; 19 Dec 93; 15 Jan 98
+; 14 Sep 92; 16 Sep 92; 19 Dec 93; 15 Jan 98; 06 Dec 07
 ; Produce LaTex output for object group.
 ; LaTex can only *approximately* reproduce the picture.
 (gldefun draw-desc-latex ((dd draw-desc))
   (let (base bx by sx sy)
     (format t "   \\begin{picture}(~5,0F,~5,0F)(0,0)~%"
-	    (x (size dd) * *draw-latex-factor*)
-	    (y (size dd) * *draw-latex-factor*) )
+	      (* (x (size dd)) *draw-latex-factor*)
+	      (* (y (size dd)) *draw-latex-factor*) )
     (for obj in (objects dd) do
       (base = (offset dd) + (offset obj))
       (bx = (x base) * *draw-latex-factor*)
@@ -561,7 +570,7 @@
 (defun draw-object-selectedp (d w off)
   (funcall (glmethod (car d) 'selectedp) d w off) )
 
-; 12 Sep 92; 07 Oct 92; 28 Feb 02; 05 Jan 04
+; 12 Sep 92; 07 Oct 92; 28 Feb 02; 05 Jan 04; 06 Dec 07
 (gldefun draw-get-object-pos ((d draw-object) (w window))
   (window-get-icon-position w 
     (if ((first d) == 'draw-text) #'draw-text-draw-outline
@@ -806,6 +815,11 @@
 (gldefun draw-text-draw-outline ((w window) (x integer) (y integer) (d draw-text))
   (setf (second d) (list x y))
   (draw-box-xy w x (y + 2) (x (size d)) (y (size d))) )
+
+; define compiled version directly to avoid repeated recompilation
+(defun draw-text-draw-outline (W X Y D)
+  (SETF (SECOND D) (LIST X Y))
+  (WINDOW-DRAW-BOX-XY W X (+ 2 Y) (CAADDR D) (CADR (CADDR D))))
 
 ; 11 Sep 92
 (gldefun draw-text-selectedp ((d draw-text) (pt vector) (off vector))
@@ -1054,6 +1068,16 @@
 	       "glisp/drawtrans.lsp"         ; output file
 	       "glisp/draw-header.lsp")      ; header file
   (cf drawtrans) )
+
+(defun compile-drawb ()
+  (glcompfiles *directory*
+	       '("glisp/vector.lsp"          ; auxiliary files
+                 "X/dwindow.lsp" "X/dwnoopen.lsp")
+	       '("glisp/menu-set.lsp"        ; translated files
+		 "glisp/draw.lsp")
+	       "glisp/drawtrans.lsp"         ; output file
+	       "glisp/draw-header.lsp")      ; header file
+  )
 
 ; 16 Nov 92; 08 Apr 93; 08 Oct 93; 20 Apr 94; 29 Oct 94; 09 Feb 99
 ; Output drawing descriptions and functions to the specified file
