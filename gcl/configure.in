@@ -610,20 +610,20 @@ if test "$enable_pic" = "yes" ; then
 	TCFLAGS="$TCFLAGS -fPIC"
 fi
 
-FDEBUG=`echo $CFLAGS | tr ' ' '\012' |grep "^\-g$"`
+FDEBUG=`echo $CFLAGS | tr ' ' '\012' |grep "^\-g$"|tr '\012' ' '`
 #CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-g$"`
-FOMITF=`echo $CFLAGS | tr ' ' '\012' |grep "^\-fomit-frame-pointer$"`
-CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-fomit-frame-pointer$"`
-FOOPT3=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O3$"`
-CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O3$"`
-FOOPT2=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O2$"`
-CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O2$"`
-FOOPT1=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O1$"`
-TMP=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O$"`
+FOMITF=`echo $CFLAGS | tr ' ' '\012' |grep "^\-fomit-frame-pointer$"|tr '\012' ' '`
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-fomit-frame-pointer$"|tr '\012' ' '`
+FOOPT3=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O3$"|tr '\012' ' '`
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O3$"|tr '\012' ' '`
+FOOPT2=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O2$"|tr '\012' ' '`
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O2$"|tr '\012' ' '`
+FOOPT1=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O1$"|tr '\012' ' '`
+TMP=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O$"|tr '\012' ' '`
 FOOPT1="$FOOPT1$TMP"
-CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O1$"|grep -v "^\-O$"`
-FOOPT0=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O0$"`
-CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O0$"`
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O1$"|grep -v "^\-O$"|tr '\012' ' '`
+FOOPT0=`echo $CFLAGS | tr ' ' '\012' |grep "^\-O0$"|tr '\012' ' '`
+CFLAGS=`echo $CFLAGS | tr ' ' '\012' |grep -v "^\-O0$"|tr '\012' ' '`
 
 if test "$FOOPT0" != "" ; then
    TO3FLAGS=`echo $TO3FLAGS | sed 's,\-O[[123 ]],-O0 ,g' | sed 's,\-O$,-O0 ,g'`

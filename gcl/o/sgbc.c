@@ -245,8 +245,10 @@ sgc_mark_object1(object x) {
     if (x->ht.ht_self == NULL)
       break;
     for (i = 0, j = x->ht.ht_size;  i < j;  i++) {
-      sgc_mark_object(x->ht.ht_self[i].hte_key);
-      sgc_mark_object(x->ht.ht_self[i].hte_value);
+      if (ON_WRITABLE_PAGE(&x->ht.ht_self[i])) {
+	sgc_mark_object(x->ht.ht_self[i].hte_key);
+	sgc_mark_object(x->ht.ht_self[i].hte_value);
+      }
     }
     if ((short)what_to_collect >= (short)t_contiguous) {
       if (inheap(x->ht.ht_self)) {
@@ -326,7 +328,7 @@ sgc_mark_object1(object x) {
     j=0;
     if (x->a.a_displaced->c.c_car == Cnil)
       for (i = 0, j = x->a.a_dim;  i < j;  i++)
-	/* if (ON_WRITABLE_PAGE(&p[i])) */
+	if (ON_WRITABLE_PAGE(&p[i]))
 	  sgc_mark_object(p[i]);
     cp = p;
     j *= sizeof(object);
@@ -460,12 +462,10 @@ sgc_mark_object1(object x) {
       break;
     {
       object def=x->str.str_def;
-      unsigned char * s_type = &SLOT_TYPE(def,0);
-      unsigned short *s_pos= & SLOT_POS(def,0);
+      unsigned char  *s_type = &SLOT_TYPE(def,0);
+      unsigned short *s_pos  = &SLOT_POS (def,0);
       for (i = 0, j = S_DATA(def)->length;  i < j;  i++)
-	if (s_type[i]==aet_object
-	    /* && ON_WRITABLE_PAGE(& STREF(object,x,s_pos[i])) */
-	    )
+	if (s_type[i]==aet_object && ON_WRITABLE_PAGE(&STREF(object,x,s_pos[i])))
 	  sgc_mark_object(STREF(object,x,s_pos[i]));
       if ((int)what_to_collect >= (int)t_contiguous) {
 	if (inheap(x->str.str_self)) {
@@ -1423,7 +1423,7 @@ sgc_start(void) {
       if (i>=MAXPAGE || k>MAXPAGE)
 	error("Pages out of range in sgc_start");
       for (;i<k;i++) 
-	sgc_type_map[i]|=SGC_PAGE_FLAG;
+	sgc_type_map[i]|=(SGC_PAGE_FLAG|SGC_TEMP_WRITABLE);
     }
 
     for (cbpp=&cb_pointer;*cbpp;) {
@@ -1460,7 +1460,7 @@ sgc_start(void) {
       if (j>=MAXPAGE || i>MAXPAGE)
 	error("Pages out of range in sgc_start");
       for (;j<i;j++)
-	sgc_type_map[j]|=SGC_PAGE_FLAG;
+	sgc_type_map[j]|=(SGC_PAGE_FLAG|SGC_TEMP_WRITABLE);
     }
 
     /* SGC contblock pages: switch to new free SGC contblock list. CM
@@ -1488,6 +1488,11 @@ sgc_start(void) {
 	old_rb_start=rb_start;
 	new= PAGE_ROUND_UP(new);
 	rb_start=rb_pointer=new;
+	{
+	  unsigned long i=page(new);
+	  for (i=page(new);i<MAXPAGE;i++)
+	    sgc_type_map[i]|=(SGC_PAGE_FLAG|SGC_TEMP_WRITABLE);
+	}
       }
     }
   }

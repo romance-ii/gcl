@@ -678,8 +678,14 @@ Use ALLOCATE-CONTIGUOUS-PAGES to expand the space.",
 		   swept when SGC was on.  Here we follow the behavior
 		   for other pages in add_to_freelist. CM 20030827  */
 #ifdef SGC
+
+		if (sgc_enabled)
+		  if (!WRITABLE_PAGE_P(page(p)+i)) 
+		    make_writable(page(p)+i,page(p)+i+1);
+
 		if (SGC_CONT_ENABLED)
-		  sgc_type_map[page(p)+i]|= SGC_PAGE_FLAG;
+		  sgc_type_map[page(p)+i]|= (SGC_PAGE_FLAG|SGC_TEMP_WRITABLE);
+
 #endif
 	}
 	ncbpage += m;
@@ -1232,7 +1238,7 @@ DEFUN_NEW("ALLOCATE-CONTIGUOUS-PAGES",object,fSallocate_contiguous_pages,SI
        for other pages in add_to_freelist. CM 20030827  */
 #ifdef SGC
     if (SGC_CONT_ENABLED)
-      sgc_type_map[page(p)+i]|= SGC_PAGE_FLAG;
+      sgc_type_map[page(p)+i]|= (SGC_PAGE_FLAG|SGC_TEMP_WRITABLE);
 #endif
   }
 

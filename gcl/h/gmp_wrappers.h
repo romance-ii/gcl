@@ -7,6 +7,8 @@
 
 GMP_EXTERN jmp_buf gmp_jmp;
 GMP_EXTERN int jmp_gmp;
+GMP_EXTERN void* (*gcl_gmp_allocfun)(size_t);
+GMP_EXTERN void* alloc_relblock(size_t);
 
 #define join(a_,b_) a_ ## b_
 #define Join(a_,b_) join(a_,b_)
@@ -105,13 +107,17 @@ __gmpz_get_strp(char **a,int b,mpz_t c) {return __gmpz_get_str(*a,b,c);} /*FIXME
    GMP_EXTERN_INLINE Join(RF_,rt_) Join(m,a_)(Join(P,n_)(b_)) { \
            int j;\
            Join(RD_,rt_);\
-	   jmp_gmp=0;\
-           if ((j=setjmp(gmp_jmp)))\
-              GBC(j);\
-           if (Join(Join(E,n_),s_)) jmp_gmp=-1 ; else jmp_gmp++;\
+           if ((gcl_gmp_allocfun==alloc_relblock)) {\
+	     jmp_gmp=0;\
+             if ((j=setjmp(gmp_jmp)))\
+                GBC(j);\
+             if (Join(Join(E,n_),s_)) jmp_gmp=-1 ; else jmp_gmp++;\
+           }\
            Join(RA_,rt_) a_(Join(A,n_));\
-           if (jmp_gmp<-1) GBC(-jmp_gmp);\
-           jmp_gmp=0;\
+           if ((gcl_gmp_allocfun==alloc_relblock)) {\
+             if (jmp_gmp<-1) GBC(-jmp_gmp);\
+             jmp_gmp=0;\
+           }\
            return Join(RR_,rt_);\
    }
 
