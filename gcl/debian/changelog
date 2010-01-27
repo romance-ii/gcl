@@ -8,8 +8,9 @@ gclcvs (2.7.0-97) unstable; urgency=low
   * if cmpinclude.h is not available, use *cmpinclude-string* in compiler-pass2
   * SGC fix, debian override fix, xgcl update
   * SGC fix for relocatable and contiguous gmp storage
+  * __builtin___clear_cache on arm
 
- -- Camm Maguire <camm@debian.org>  Tue, 26 Jan 2010 19:54:53 +0000
+ -- Camm Maguire <camm@debian.org>  Wed, 27 Jan 2010 23:02:34 +0000
 
 gclcvs (2.7.0-96) unstable; urgency=low
 
