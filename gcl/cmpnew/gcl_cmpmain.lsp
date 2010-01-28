@@ -483,7 +483,7 @@ Cannot compile ~a.~%" (namestring (merge-pathnames input-pathname *compiler-defa
 				  (ci *cmpinclude*)
 				  (ci (when (stringp ci) (subseq ci 1 (1- (length ci)))))
 				  (ci (concatenate 'string si::*system-directory* "../h/" ci))
-				  (system-p (when (or (eq system-p 'disassemble) (probe-file ci)) system-p))))
+				  (system-p (when (or (eq system-p 'disassemble) (probe-file ci)) system-p)))
   (declare (special *init-name*))
   (with-open-file (st c-pathname :direction :output)
     (let ((*compiler-output1* (if (eq system-p 'disassemble) *standard-output*
