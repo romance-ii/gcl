@@ -3,7 +3,7 @@ Section: lisp
 Priority: optional
 Maintainer: Camm Maguire <camm@debian.org>
 Build-Depends: debhelper (>= 5 ), libreadline-dev, m4, tk8.4-dev, texlive-latex-base, texinfo, binutils-dev, libgmp3-dev, autotools-dev, common-lisp-controller, libxmu-dev, libxaw7-dev, po-debconf, binutils-dev, zlib1g-dev
-Standards-Version: 3.8.3
+Standards-Version: 3.8.4
 
 Package: gcl
 Architecture: any
