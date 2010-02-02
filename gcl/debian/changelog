@@ -1,8 +1,16 @@
 gclcvs (2.7.0-98) unstable; urgency=low
 
   * Workaround gcc pathname -O2 bug
+  * Bug fix: "FTBFS: /bin/sh: ./tmp_image: No such file or directory",
+    thanks to Lucas Nussbaum (Closes: #534044).
+  * Bug fix: "FTBFS in various ways", thanks to Cyril Brulebois (Closes:
+    #567697).
+  * Bug fix: "replacing libreadline5-dev build dependency with
+    libreadline-dev", thanks to Matthias Klose (Closes: #553762).
+  * Bug fix: "[INTL:es] Spanish debconf template translation for gclcvs",
+    thanks to Francisco Javier Cuadrado (Closes: #549666).
 
- -- Camm Maguire <camm@debian.org>  Tue, 02 Feb 2010 17:40:07 +0000
+ -- Camm Maguire <camm@debian.org>  Tue, 02 Feb 2010 21:13:20 +0000
 
 gclcvs (2.7.0-97) unstable; urgency=low
 
