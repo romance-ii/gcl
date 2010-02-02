@@ -653,7 +653,6 @@ if test "$FOMITF" != "" ; then
    TO3FLAGS="$TO3FLAGS $FOMITF"
 fi
 
-
 # Step 1: set the variable "system" to hold the name and version number
 # for the system.  This can usually be done via the "uname" command, but
 # there are a few systems, like Next, where this doesn't work.
@@ -1610,6 +1609,7 @@ else
 #echo -e "#include <stdio.h>\n int main() {printf(\"foo\");return 0;}" >foo.c
 #$CC foo.c -o foo
 AAWK=`which awk`
+# | grep -v ld-kfreebsd needed on some strange bsd amd64 boxes
 heap_ceiling=`ldd $AAWK | tail -n 1 | $AWK '{print $NF}' | tr -d '()'`
 AC_RUN_IFELSE(AC_LANG_PROGRAM([[
 	#include <stdio.h>
@@ -1898,6 +1898,52 @@ if test "$enable_static" = "yes" ; then
    echo disabling readline when linking statically
    enable_readline="no"
 fi
+
+####  gcc compilation bugs at various optimizations
+
+QFLAGS=$CFLAGS
+CFLAGS="$CFLAGS $TO3FLAGS"
+AC_MSG_CHECKING([for pathname gcc compilation bug])
+AC_RUN_IFELSE(AC_LANG_SOURCE([[
+        #include <stdio.h>
+	#define EXTER
+	#include "$MP_INCLUDE"
+	#include "./h/enum.h"
+	#include "./h/object.h"
+
+	int foo(object wrd) {
+
+	  int i,seen_upper=0,seen_lower=0;
+
+	  if (type_of(wrd) == t_string) {
+	    for (i=0; i<wrd->st.st_fillp; i++) {
+	      if (isupper(wrd->st.st_self[[i]])) seen_upper=1;
+	      if (islower(wrd->st.st_self[[i]])) seen_lower=1;
+ 	    }
+	  }
+
+          return seen_upper*seen_lower;
+
+        }
+
+        int
+        main() {
+
+          union lispunion b;
+          object p=&b;
+
+          set_type_of(p,t_string);
+          p->st.st_self="FOO";
+          p->st.st_fillp=3;
+
+          return foo(p);
+
+        }
+
+]]),AC_MSG_RESULT([no]); PATHNAME_BUG="",AC_MSG_RESULT([yes]); PATHNAME_BUG="t")
+
+CFLAGS=$QFLAGS
+AC_SUBST(PATHNAME_BUG)
 
 #
 # ParGCL

@@ -216,7 +216,12 @@ file.o:	$(HFILES) file.d
 hash.o: $(HFILES) ${MP}
 list.o:	$(HFILES)
 package.o: $(HFILES)
+ifeq ($(PATHNAME_BUG),)
 pathname.o: $(HFILES)
+else
+pathname.o: pathname.c $(HFILES)
+	${CC} $(filter-out -O%,${CFLAGS}) -O1 -c $(DEFS) $< $(AUX_INFO) 
+endif
 print.o: $(HFILES) ${MP}
 read.o: $(HFILES) ${MP}
 sequence.o: $(HFILES)

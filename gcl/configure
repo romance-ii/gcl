@@ -638,6 +638,7 @@ CLSTANDARD
 SYSTEM
 FLISP
 PARGCLDIR
+PATHNAME_BUG
 HAVE_LONG_LONG
 PAGEWIDTH
 DOUBLE_BIGENDIAN
@@ -5280,7 +5281,6 @@ if test "$FOMITF" != "" ; then
    TO3FLAGS="$TO3FLAGS $FOMITF"
 fi
 
-
 # Step 1: set the variable "system" to hold the name and version number
 # for the system.  This can usually be done via the "uname" command, but
 # there are a few systems, like Next, where this doesn't work.
@@ -8115,6 +8115,7 @@ else
 #echo -e "#include <stdio.h>\n int main() {printf(\"foo\");return 0;}" >foo.c
 #$CC foo.c -o foo
 AAWK=`which awk`
+# | grep -v ld-kfreebsd needed on some strange bsd amd64 boxes
 heap_ceiling=`ldd $AAWK | tail -n 1 | $AWK '{print $NF}' | tr -d '()'`
 if test "$cross_compiling" = yes; then :
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
@@ -8716,6 +8717,73 @@ if test "$enable_static" = "yes" ; then
    echo disabling readline when linking statically
    enable_readline="no"
 fi
+
+####  gcc compilation bugs at various optimizations
+
+QFLAGS=$CFLAGS
+CFLAGS="$CFLAGS $TO3FLAGS"
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for pathname gcc compilation bug" >&5
+$as_echo_n "checking for pathname gcc compilation bug... " >&6; }
+if test "$cross_compiling" = yes; then :
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error "cannot run test program while cross compiling
+See \`config.log' for more details." "$LINENO" 5; }
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+        #include <stdio.h>
+	#define EXTER
+	#include "$MP_INCLUDE"
+	#include "./h/enum.h"
+	#include "./h/object.h"
+
+	int foo(object wrd) {
+
+	  int i,seen_upper=0,seen_lower=0;
+
+	  if (type_of(wrd) == t_string) {
+	    for (i=0; i<wrd->st.st_fillp; i++) {
+	      if (isupper(wrd->st.st_self[i])) seen_upper=1;
+	      if (islower(wrd->st.st_self[i])) seen_lower=1;
+ 	    }
+	  }
+
+          return seen_upper*seen_lower;
+
+        }
+
+        int
+        main() {
+
+          union lispunion b;
+          object p=&b;
+
+          set_type_of(p,t_string);
+          p->st.st_self="FOO";
+          p->st.st_fillp=3;
+
+          return foo(p);
+
+        }
+
+
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }; PATHNAME_BUG=""
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }; PATHNAME_BUG="t"
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+
+CFLAGS=$QFLAGS
+
 
 #
 # ParGCL
