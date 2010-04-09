@@ -7917,6 +7917,11 @@ else
 /* end confdefs.h.  */
 
 	#include <stdio.h>
+	void *
+	foo() {
+	      int i;
+	      return (void *)&i;
+        }
 
 int
 main ()
@@ -7929,8 +7934,9 @@ main ()
 	j=1;
 	j<<=$PAGEWIDTH;
 	j<<=16;
-	j--;
 	i=(unsigned long)&v;
+	if (foo()>i) i-=j;
+	j--;
 	i+=j;
 	i&=~j;
 	fprintf(fp,"0x%lx",i-1);

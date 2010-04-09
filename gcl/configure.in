@@ -1525,6 +1525,11 @@ AC_ARG_ENABLE(maxpage,
 AC_MSG_CHECKING(CSTACK_ADDRESS)
 AC_RUN_IFELSE(AC_LANG_PROGRAM([[
 	#include <stdio.h>
+	void *
+	foo() {
+	      int i;
+	      return (void *)&i;
+        }
 	]],[[
 	void *v ;
 	FILE *fp = fopen("conftest1","w");
@@ -1533,8 +1538,9 @@ AC_RUN_IFELSE(AC_LANG_PROGRAM([[
 	j=1;
 	j<<=$PAGEWIDTH;
 	j<<=16;
-	j--;
 	i=(unsigned long)&v;
+	if (foo()>i) i-=j;
+	j--;
 	i+=j;
 	i&=~j;
 	fprintf(fp,"0x%lx",i-1);

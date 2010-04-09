@@ -1,3 +1,10 @@
+gclcvs (2.7.0-98.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * fix cstack rounding error for rising stacks (hppa)
+
+ --  <camm@maguirefamily.org>  Fri, 09 Apr 2010 17:43:27 +0000
+
 gclcvs (2.7.0-98) unstable; urgency=low
 
   * Workaround gcc pathname -O2 bug
