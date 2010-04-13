@@ -1301,7 +1301,11 @@ Lsharp_backslash_reader()
 			/*  assuming that CHAR-FONT-LIMIT is 1  */
 	vs_popp;
 	vs_popp;
-	unread_char(code_char('\\'), vs_base[0]);
+	{
+	  union lispunion u;
+	  u.ch=character_table['\\'];
+	  unread_char(&u, vs_base[0]);
+	}
 	if (READsuppress) {
 		(void)read_object(vs_base[0]);
 		vs_base[0] = Cnil;

@@ -37,7 +37,6 @@ tries to adhere.   It is highly recommended to write programs,
 which will be in the intersection of gcl and ansi common lisp.
 Unfortunately the Ansi standard is huge, and will require a substantial
 effort, and increase in the size of gcl, to include all of it.
-.RE
 .LP
 When
 .I gcl@EXT@
@@ -47,7 +46,6 @@ is set to the list of command line arguments.
 Various
 .I options
 are understood:
-.RE
 .TP
 .BR \-eval\ command 
 .RB
@@ -74,7 +72,6 @@ be used as with the shells to write small shell programs:
 #!/usr/local/bin/gcl.exe -f
 .br
 (format t "hello world ~a~%" (nth 1 si::*command-args*))
-.RE
 
 .BR
 The value
@@ -90,7 +87,6 @@ then
 tutorial% foo billy
 .br
 hello world billy
-.RE
 
 .BR
 NOTE:  On many systems (eg SunOs) the first line of an executable
@@ -117,7 +113,6 @@ executable:
 tutorial% gcl@EXT@ -f foo "from bill"
 .br
 hello world from bill
-.RE
 
 .TP
 .B \-batch
@@ -203,13 +198,12 @@ invoked by name by C code.
 
 
 This GNU package should not be confused with the proprietary program
-distributed by FRANZ, Inc.
-Nor should it be confused with the public domain \*(Fl or the proprietary
-\*(Li.
-For anything other than program development,
-use of the lisp compiler \fIglc\fP(1L) is strongly
-recommended in preference to use of the interpreter,
-due to much higher speed.
+distributed by FRANZ, Inc.  Nor should it be confused with any public
+domain or proprietary lisp system.  
+
+For anything other than program development, use of the lisp compiler
+is strongly recommended in preference to use of the interpreter, due
+to much higher speed.
 .\".LP
 .\"This program may be used in conjunction with the UCSF
 .\".I batchqueue
@@ -221,14 +215,11 @@ due to much higher speed.
 .\"Interactive sessions are limited to 30 cpu minutes.
 .SH FILES
 .TP
-\fI/site/subsys/gcl/bin/gcl
-executable file
+\fI/usr/bin/gcl
+executable shell script wrapper
 .TP
-\fI/site/subsys/gcl/bin/gclc
-compiler
-.TP
-\fI/usr/include/cmpinclude.h
-C library file
+\fI/usr/lib/gcl-version/unixport/saved[_flavor]_gcl
+executable lisp images
 .SH "SEE ALSO"
 .sp
 \fICommon LISP: The Language\fP, Guy L. Steele, Jr., Digital Press, Bedford, MA,
