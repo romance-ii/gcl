@@ -4,8 +4,9 @@ gclcvs (2.7.0-100) unstable; urgency=high
     on hppa/ia64
   * insist on bash for dotglobbing directory command
   * fix clc script
+  * disable recompile by default for now
 
- -- Camm Maguire <camm@debian.org>  Mon, 03 May 2010 17:32:39 +0000
+ -- Camm Maguire <camm@debian.org>  Mon, 03 May 2010 19:05:09 +0000
 
 gclcvs (2.7.0-99) unstable; urgency=low
 
