@@ -5,8 +5,9 @@ gclcvs (2.7.0-100) unstable; urgency=high
   * insist on bash for dotglobbing directory command
   * fix clc script
   * disable recompile by default for now
+  * Workaround for -g -Os gcc 4.4 bug on gcl_pcl_methods.c
 
- -- Camm Maguire <camm@debian.org>  Mon, 03 May 2010 19:05:09 +0000
+ -- Camm Maguire <camm@debian.org>  Tue, 04 May 2010 15:22:33 +0000
 
 gclcvs (2.7.0-99) unstable; urgency=low
 
